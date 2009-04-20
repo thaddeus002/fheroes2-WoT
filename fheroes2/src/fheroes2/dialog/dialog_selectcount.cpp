@@ -266,6 +266,7 @@ bool Dialog::InputString(const std::string &header, std::string &res)
 
     LocalEvent & le = LocalEvent::GetLocalEvent();
 
+    buttonOk.SetDisable(res.empty());
     buttonOk.Draw();
     buttonCancel.Draw();
 
@@ -279,10 +280,10 @@ bool Dialog::InputString(const std::string &header, std::string &res)
     // message loop
     while(le.HandleEvents())
     {
-	le.MousePressLeft(buttonOk) ? buttonOk.PressDraw() : buttonOk.ReleaseDraw();
+	buttonOk.isEnable() && le.MousePressLeft(buttonOk) ? buttonOk.PressDraw() : buttonOk.ReleaseDraw();
         le.MousePressLeft(buttonCancel) ? buttonCancel.PressDraw() : buttonCancel.ReleaseDraw();
 
-        if(le.KeyPress(KEY_RETURN) || le.MouseClickLeft(buttonOk)) break;
+        if(le.KeyPress(KEY_RETURN) || (buttonOk.isEnable() && le.MouseClickLeft(buttonOk))) break;
 	else
 	if(le.KeyPress(KEY_ESCAPE) || le.MouseClickLeft(buttonCancel)){ res.clear(); break; }
 	else
@@ -359,6 +360,9 @@ bool Dialog::InputString(const std::string &header, std::string &res)
 
 		default: break;
 	    }
+
+	    buttonOk.SetDisable(res.empty());
+	    buttonOk.Draw();
 
 	    text.Set(res + "_");
 	    if(text.w() < sprite.w() - 24)

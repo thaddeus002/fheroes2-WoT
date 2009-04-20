@@ -238,7 +238,8 @@ bool SelectFileListSimple(const std::string & header, MapsFileInfoList & lists, 
 		default: break;
 	    }
 
-	    if(filename.empty()) buttonOk.SetDisable(true);
+	    buttonOk.SetDisable(filename.empty());
+
 	    redraw = true;
 	}
 
@@ -267,6 +268,7 @@ bool SelectFileListSimple(const std::string & header, MapsFileInfoList & lists, 
 	    }
 	    split.Move(top - lists.begin());
 	    redraw = true;
+	    edit_mode = false;
 	}
 
         if(le.KeyPress(KEY_DOWN) && (cur < (lists.end() - 1)))
@@ -281,6 +283,7 @@ bool SelectFileListSimple(const std::string & header, MapsFileInfoList & lists, 
 	    }
 	    split.Move(top - lists.begin());
 	    redraw = true;
+	    edit_mode = false;
 	}
 
 	if((le.MouseWheelUp(list_rt) || le.MouseWheelUp(split.GetRect())) && (top > lists.begin()))
@@ -331,20 +334,23 @@ bool SelectFileListSimple(const std::string & header, MapsFileInfoList & lists, 
 	    cur = top + static_cast<size_t>((le.MouseReleaseLeft().y - list_rt.y) * max_items / static_cast<float>(list_rt.h));
 	    if(cur > (lists.end() - 1)) cur = lists.end() - 1;
 	    redraw = true;
+	    edit_mode = false;
 	}
 
 	if(redraw)
 	{
 	    cursor.Hide();
 
-	    if(cur != lists.end())
+	    if(edit_mode && editor)
 	    {
-		ResizeToShortName((*cur).FileMaps(), filename);
-		RedrawFileListSimple(rt, header, filename, lists, top, cur, max_items);
+		RedrawFileListSimple(rt, header, filename + "_", lists, top, cur, max_items);
 	    }
 	    else
-	    if(editor)
-		RedrawFileListSimple(rt, header, filename + "_", lists, top, cur, max_items);
+	    if(cur != lists.end())
+	    {
+	    	ResizeToShortName((*cur).FileMaps(), filename);
+		RedrawFileListSimple(rt, header, filename, lists, top, cur, max_items);
+	    }
 
 	    buttonOk.Draw();
 	    buttonCancel.Draw();
