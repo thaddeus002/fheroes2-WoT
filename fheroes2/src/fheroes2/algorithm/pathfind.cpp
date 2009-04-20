@@ -30,10 +30,11 @@
 
 struct cell_t
 {
-    cell_t() : cost_g(MAXU16), cost_t(MAXU16), parent(MAXU16), open(true){};
+    cell_t() : cost_g(MAXU16), cost_t(MAXU16), cost_d(MAXU16), parent(MAXU16), open(true){};
 
     u16		cost_g;
     u16		cost_t;
+    u16		cost_d;
     u16		parent;
     bool	open;
 };
@@ -67,6 +68,12 @@ bool ImpassableCorners(const u16 from, const Direction::vector_t to, const Heroe
     }
 
     return false;
+}
+
+u16 PathGetApproximateDistance(const u16 index1, const u16 index2)
+{
+    return std::abs(static_cast<s16>(index1 % world.w()) - static_cast<s16>(index2 % world.w())) +
+        std::abs(static_cast<s16>(index1 / world.w()) - static_cast<s16>(index2 / world.w()));
 }
 
 bool Algorithm::PathFind(std::list<Route::Step> *result, const u16 from, const u16 to, const u16 limit, const Heroes *hero)
@@ -109,6 +116,7 @@ bool Algorithm::PathFind(std::list<Route::Step> *result, const u16 from, const u
 			cell.parent = cur;
 			cell.open = true;
 	    		cell.cost_t = cell.cost_g + list[cur].cost_t;
+			cell.cost_d = 50 * PathGetApproximateDistance(tmp, to);
 
 			if(MAXU16 == cell.cost_g) continue;
 
@@ -165,13 +173,15 @@ bool Algorithm::PathFind(std::list<Route::Step> *result, const u16 from, const u
 		    std::cout << "  direct: " << Direction::String(Direction::Get(cur, (*it1).first));
 		    std::cout << ", index: " << (*it1).first;
 		    std::cout << ", cost g: " << cell2.cost_g;
-		    std::cout << ", cost t: " << cell2.cost_t << std::endl;
+		    std::cout << ", cost t: " << cell2.cost_t;
+		    std::cout << ", cost d: " << cell2.cost_d << std::endl;
 		}
 	    }
 
-	    if(cell2.cost_t < tmp)
+
+	    if(cell2.cost_t + cell2.cost_d < tmp)
 	    {
-    		tmp = (*it1).second.cost_t;
+    		tmp = cell2.cost_t + cell2.cost_d;
     		alt = (*it1).first;
 	    }
 	}
@@ -195,7 +205,7 @@ bool Algorithm::PathFind(std::list<Route::Step> *result, const u16 from, const u
 	{
 	    if(MAXU16 == list[cur].parent) break;
 	    alt = cur;
-    	    cur = list[cur].parent;
+    	    cur = list[alt].parent;
 	    if(result) result->push_front(Route::Step(Direction::Get(cur, alt), list[alt].cost_g));
 	}
         return true;
