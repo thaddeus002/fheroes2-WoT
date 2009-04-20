@@ -120,6 +120,9 @@ bool Algorithm::PathFind(std::list<Route::Step> *result, const u16 from, const u
 
 			if(MAXU16 == cell.cost_g) continue;
 
+			// check monster protection
+			if(to != tmp && Maps::TileUnderProtection(tmp)) continue;
+
 			// check direct from object
 			const Maps::Tiles & tile1 = world.GetTiles(cur);
 			if(MP2::OBJ_ZERO != under && MP2::OBJ_HEROES == tile1.GetObject() &&  ! Object::AllowDirect(under, direct)) continue;
