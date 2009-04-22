@@ -165,9 +165,7 @@ void Heroes::AIAction(const u16 dst_index)
         case MP2::OBJ_TREEKNOWLEDGE:	AIToTreeKnowledge(*this, object, dst_index); break;
 
 
-	default:
-	    Error::Verbose("AI::Action: Hero " + GetName() + " say: I'm stupid, help my please..");
-	    break;
+	default: break;
     }
 }
 

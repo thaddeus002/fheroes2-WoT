@@ -461,9 +461,7 @@ void Heroes::Action(const u16 dst_index)
         case MP2::OBJ_EYEMAGI:		ActionToEyeMagi(*this, object, dst_index); break;
 
         // object
-	default:
-	    if(Settings::Get().Debug()) Error::Verbose("Heroes::Action: FIXME: " + std::string(MP2::StringObject(object)));
-	    break;
+	default: break;
     }
 }
 

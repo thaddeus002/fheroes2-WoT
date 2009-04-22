@@ -60,7 +60,6 @@ namespace Game
     void DialogPlayers(const Color::color_t, const std::string &);
     void MoveHeroFromArrowKeys(Heroes & hero, Direction::vector_t direct);
     bool HumanPlayerLossGame(void);
-    bool DefeatsAllPlayers(Color::color_t);
 };
 
 bool Game::HumanPlayerLossGame(void)
@@ -69,14 +68,6 @@ bool Game::HumanPlayerLossGame(void)
 	if(world.GetKingdom(color).isPlay() && ((LOCAL | REMOTE) & world.GetKingdom(color).Control())) return false;
 
     Error::Verbose("Game::HumanPlayerLossGame: local players or remote players not found.");
-
-    return true;
-}
-
-bool Game::DefeatsAllPlayers(Color::color_t mycolor)
-{
-    for(Color::color_t c = Color::BLUE; c != Color::GRAY; ++c)
-	if(mycolor != c && world.GetKingdom(c).isPlay()) return false;
 
     return true;
 }
@@ -1552,8 +1543,6 @@ Game::menu_t Game::HumanTurn(void)
         	    cursor.Hide();
 		    if(hero.Move())
 		    {
-			AGG::PlayMusic(MUS::FromGround(world.GetTiles(global_focus.Center()).GetGround()));
-			Game::EnvironmentSoundMixer();
             		gamearea.Center(global_focus.Center());
             		global_focus.Reset(Focus::HEROES);
             		global_focus.Redraw();
@@ -1568,21 +1557,21 @@ Game::menu_t Game::HumanTurn(void)
 		    if(myCastles.empty() && myHeroes.empty()) res = LOSSGAME;
 		    else
 		    // defeats all players
-		    if(DefeatsAllPlayers(myKingdom.GetColor())) res = WINSGAME;
+		    if(2 > world.CountPlayKingdoms()) res = WINSGAME;
 		}
 		else
 		    hero.SetMove(false);
 	    }
-
-	    if(Game::ShouldAnimateInfrequent(ticket, 12))
-	    {
-        	cursor.Hide();
-		Maps::IncreaseAnimationTicket();
-		gamearea.Redraw();
-        	cursor.Show();
-        	display.Flip();
-	    }
         }
+
+	if(Game::ShouldAnimateInfrequent(ticket, 20))
+	{
+    	    cursor.Hide();
+	    Maps::IncreaseAnimationTicket();
+	    gamearea.Redraw();
+    	    cursor.Show();
+    	    display.Flip();
+	}
 
         ++ticket;
     }
