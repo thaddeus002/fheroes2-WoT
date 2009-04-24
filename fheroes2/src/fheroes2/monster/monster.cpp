@@ -795,7 +795,7 @@ Monster::monster_t Monster::Rand(level_t level)
 	case LEVEL0: return FromInt(Rand::Get(PEASANT, WATER_ELEMENT));
 
 	case LEVEL1:
-	    switch(Rand::Get(1, 10))
+	    switch(Rand::Get(1, 9))
 	    {
 		case 1:  return PEASANT;
 		case 2:  return ARCHER;
@@ -811,7 +811,7 @@ Monster::monster_t Monster::Rand(level_t level)
 	    break;
     
 	case LEVEL2:
-	    switch(Rand::Get(1, 15))
+	    switch(Rand::Get(1, 14))
 	    {
 		case 1:  return RANGER;
 		case 2:  return PIKEMAN;
@@ -832,7 +832,7 @@ Monster::monster_t Monster::Rand(level_t level)
 	    break;
 
 	case LEVEL3:
-	    switch(Rand::Get(1, 27))
+	    switch(Rand::Get(1, 26))
 	    {
 	        case 1:  return SWORDSMAN;
 		case 2:  return MASTER_SWORDSMAN;
@@ -865,7 +865,7 @@ Monster::monster_t Monster::Rand(level_t level)
 	    break;
 
 	case LEVEL4:
-	    switch(Rand::Get(1, 14))
+	    switch(Rand::Get(1, 13))
 	    {
 		case 1:  return PALADIN;
 		case 2:  return CRUSADER;
