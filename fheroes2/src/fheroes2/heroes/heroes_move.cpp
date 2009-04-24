@@ -411,7 +411,7 @@ bool Heroes::MoveStep(bool fast)
 
 	    // check protection tile
 	    u16 dst_index2 = MAXU16;
-	    if(Maps::TileUnderProtection(index_to, &dst_index2))
+	    while(!isFreeman() && Maps::TileUnderProtection(index_to, &dst_index2))
     	    {
 		Action(dst_index2);
 		SetMove(false);
@@ -468,7 +468,7 @@ bool Heroes::MoveStep(bool fast)
 
 	// check protection tile
 	u16 dst_index2 = MAXU16;
-	if(Maps::TileUnderProtection(index_to, &dst_index2))
+	while(!isFreeman() && Maps::TileUnderProtection(index_to, &dst_index2))
         {
 	    GameArea::Get().Redraw();
 	    Display::Get().Flip();
