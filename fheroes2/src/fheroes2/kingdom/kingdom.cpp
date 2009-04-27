@@ -160,8 +160,13 @@ void Kingdom::ActionNewDay(void)
     }
 
     // check event day
-    const GameEvent::Day* event_day = world.GetEventDay(color);
-    if(event_day) AddFundsResource(event_day->GetResource());
+    std::vector<GameEvent::Day *> events;
+    events.reserve(5);
+    world.GetEventDay(color, events);
+    std::vector<GameEvent::Day *>::const_iterator it1 = events.begin();
+    std::vector<GameEvent::Day *>::const_iterator it2 = events.end();
+
+    for(; it1 != it2; ++it1) if(*it1) AddFundsResource((*it1)->GetResource());
 }
 
 void Kingdom::ActionNewWeek(void)

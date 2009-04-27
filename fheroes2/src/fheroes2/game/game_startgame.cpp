@@ -820,15 +820,20 @@ Game::menu_t Game::HumanTurn(void)
 
     // show event day
     {
-	const GameEvent::Day* event_day = world.GetEventDay(conf.MyColor());
-	if(event_day)
-	{
-        AGG::PlayMusic(MUS::NEWS, false);
-	    if(event_day->GetResource().GetValidItems())
-		Dialog::ResourceInfo("", event_day->GetMessage(), event_day->GetResource());
+        std::vector<GameEvent::Day *> events;
+        events.reserve(5);
+        world.GetEventDay(myKingdom.GetColor(), events);
+        std::vector<GameEvent::Day *>::const_iterator it1 = events.begin();
+        std::vector<GameEvent::Day *>::const_iterator it2 = events.end();
+
+        for(; it1 != it2; ++it1) if(*it1)
+        {
+    	    AGG::PlayMusic(MUS::NEWS, false);
+	    if((*it1)->GetResource().GetValidItems())
+	    	Dialog::ResourceInfo("", (*it1)->GetMessage(), (*it1)->GetResource());
 	    else
-	    if(event_day->GetMessage().size())
-		Dialog::Message("", event_day->GetMessage(), Font::BIG, Dialog::OK);
+	    if((*it1)->GetMessage().size())
+		Dialog::Message("", (*it1)->GetMessage(), Font::BIG, Dialog::OK);
 	}
     }
 

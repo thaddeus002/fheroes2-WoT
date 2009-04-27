@@ -134,7 +134,7 @@ public:
     bool CreateBoat(const u16 center, bool build);
     void ClearFog(const u8 color);
 
-    const GameEvent::Day*   GetEventDay(const Color::color_t c) const;
+    void GetEventDay(const Color::color_t, std::vector<GameEvent::Day *> &) const;
     const GameEvent::Coord* GetEventMaps(const Color::color_t c, const u16 index) const;
     GameEvent::Riddle* GetSphinx(const u16 index) const;
 

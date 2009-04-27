@@ -1681,7 +1681,7 @@ bool World::CreateBoat(const u16 center, bool build)
     return false;
 }
 
-const GameEvent::Day*  World::GetEventDay(const Color::color_t c) const
+void  World::GetEventDay(const Color::color_t c, std::vector<GameEvent::Day *> & v) const
 {
     if(vec_eventsday.size())
     {
@@ -1697,11 +1697,9 @@ const GameEvent::Day*  World::GetEventDay(const Color::color_t c) const
 
 	    if((first == today ||
 	       (sequent && (first < today && 0 == ((today - first) % sequent)))) &&
-	       (c & event.GetColors())) return *it1;
+	       (c & event.GetColors())) v.push_back(*it1);
 	}
     }
-
-    return NULL;
 }
 
 const GameEvent::Coord* World::GetEventMaps(const Color::color_t c, const u16 index) const
