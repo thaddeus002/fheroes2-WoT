@@ -20,6 +20,7 @@
 
 #ifdef WITH_NET
 
+#include <iomanip>
 #include <algorithm>
 #include <cstring>
 #include "sdlnet.h"
@@ -283,11 +284,13 @@ bool Network::Message::Pop(std::string & str)
     if(itd1 >= itd2) return false;
 
     // find end string
-    const char* end = itd1;
+    char* end = itd1;
     while(*end && end < itd2) ++end;
     if(end == itd2) return false;
 
     str = itd1;
+    itd1 = end + 1;
+
     return true;
 }
 
@@ -299,22 +302,28 @@ void Network::Message::Dump(std::ostream & stream) const
     {
 	stream << ", data:";
 	const char* cur = itd1;
-	while(cur < itd2){ stream << " 0x" << std::hex << static_cast<int>(*cur); ++cur; }
+	u8 cast;
+	while(cur < itd2){ cast = *cur; stream << " 0x" << std::setw(2) << std::setfill('0') << std::hex << static_cast<int>(cast); ++cur; }
     }
 
     stream  << std::endl;
 }
 
-Network::Socket::Socket() : sd(NULL)
+Network::Socket::Socket() : sd(NULL), sdset(NULL)
 {
 }
 
-Network::Socket::Socket(const Socket &) : sd(NULL)
+Network::Socket::Socket(const Socket &) : sd(NULL), sdset(NULL)
 {
 }
 
-Network::Socket::Socket(const TCPsocket csd) : sd(csd)
+Network::Socket::Socket(const TCPsocket csd) : sd(csd), sdset(NULL)
 {
+    if(sd)
+    {
+	sdset = SDLNet_AllocSocketSet(1);
+	SDLNet_TCP_AddSocket(sdset, sd);
+    }
 }
 
 Network::Socket & Network::Socket::operator= (const Socket &)
@@ -345,6 +354,12 @@ u16 Network::Socket::Port(void) const
     return 0;
 }
 
+bool Network::Socket::Ready(void) const
+{
+    SDLNet_CheckSockets(sdset, 0);
+    return SDLNet_SocketReady(sd);
+}
+
 bool Network::Socket::Recv(char *buf, size_t len) const
 {
     if(sd && buf)
@@ -367,6 +382,11 @@ bool Network::Socket::Open(IPaddress & ip)
     sd = SDLNet_TCP_Open(&ip);
     if(! sd)
 	std::cerr << "Network::Socket::Open: " << Network::GetError() << std::endl;
+    else
+    {
+	sdset = SDLNet_AllocSocketSet(1);
+	SDLNet_TCP_AddSocket(sdset, sd);
+    }
 
     return sd;
 }
@@ -378,8 +398,17 @@ bool Network::Socket::IsValid(void) const
 
 void Network::Socket::Close(void)
 {
-    if(sd) SDLNet_TCP_Close(sd);
-    sd = NULL;
+    if(sd)
+    {
+	if(sdset)
+	{
+	    SDLNet_TCP_DelSocket(sdset, sd);
+	    SDLNet_FreeSocketSet(sdset);
+	    sdset = NULL;
+	}
+	SDLNet_TCP_Close(sd);
+	sd = NULL;
+    }
 }
 
 Network::Server::Server()

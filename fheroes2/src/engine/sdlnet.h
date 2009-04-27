@@ -42,6 +42,8 @@ namespace Network
 	Socket(const TCPsocket);
 	~Socket();
 
+	bool		Ready(void) const;
+
 	bool		Recv(char *, size_t) const;
 	bool		Send(const char*, size_t) const;
 
@@ -57,6 +59,7 @@ namespace Network
 	Socket &	operator= (const Socket &);
 
 	TCPsocket	sd;
+	SDLNet_SocketSet sdset;
     };
 
     class Message
