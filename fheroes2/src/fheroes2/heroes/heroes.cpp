@@ -1384,7 +1384,26 @@ bool Heroes::isEnableMove(void) const
 /* set enable move */
 void Heroes::SetMove(bool f)
 {
-    f ? SetModes(ENABLEMOVE) : ResetModes(ENABLEMOVE);
+    if(f)
+	SetModes(ENABLEMOVE);
+    else
+    {
+	ResetModes(ENABLEMOVE);
+
+	// reset sprite position
+	switch(direction)
+        {
+            case Direction::TOP:            sprite_index = 0; break;
+            case Direction::BOTTOM:         sprite_index = 36; break;
+            case Direction::TOP_RIGHT:
+            case Direction::TOP_LEFT:       sprite_index = 9; break;
+            case Direction::BOTTOM_RIGHT:
+            case Direction::BOTTOM_LEFT:    sprite_index = 27; break;
+            case Direction::RIGHT:
+            case Direction::LEFT:           sprite_index = 18; break;
+            default: break;
+	}
+    }
 }
 
 void Heroes::SaveUnderObject(MP2::object_t obj)
