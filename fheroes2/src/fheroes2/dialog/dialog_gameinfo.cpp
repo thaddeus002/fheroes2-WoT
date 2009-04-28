@@ -26,7 +26,7 @@
 #include "dialog.h"
 
 extern void RedrawOpponentsInfo(const Point &);
-extern void RedrawClassInfo(const Point &, bool = false);
+extern void RedrawClassInfo(const Point &);
 
 void Dialog::GameInfo(void)
 {

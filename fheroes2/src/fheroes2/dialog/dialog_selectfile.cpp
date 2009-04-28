@@ -334,8 +334,16 @@ bool SelectFileListSimple(const std::string & header, MapsFileInfoList & lists, 
 
 	if(le.MouseClickLeft(list_rt) && lists.size())
 	{
-	    cur = top + static_cast<size_t>((le.MouseReleaseLeft().y - list_rt.y) * max_items / static_cast<float>(list_rt.h));
-	    if(cur > (lists.end() - 1)) cur = lists.end() - 1;
+	    MapsFileInfoList::iterator cur2 = top + static_cast<size_t>((le.MouseReleaseLeft().y - list_rt.y) * max_items / static_cast<float>(list_rt.h));
+	    if(cur2 > (lists.end() - 1)) cur2 = lists.end() - 1;
+	    // double click
+	    if(cur2 == cur)
+	    {
+    		result = (*cur).file;
+    		break;
+	    }
+	    else
+		cur = cur2;
 	    redraw = true;
 	    edit_mode = false;
 	}
@@ -627,8 +635,16 @@ bool DialogSelectMapsFileList(MapsFileInfoList & lists, std::string & filename)
 
 	if(le.MouseClickLeft(list_rt) && curlist->size())
 	{
-	    cur = top + static_cast<size_t>((le.MouseReleaseLeft().y - list_rt.y) * max_items / static_cast<float>(list_rt.h));
-	    if(cur > (curlist->end() - 1)) cur = curlist->end() - 1;
+	    MapsFileInfoList::iterator cur2 = top + static_cast<size_t>((le.MouseReleaseLeft().y - list_rt.y) * max_items / static_cast<float>(list_rt.h));
+	    if(cur2 > (curlist->end() - 1)) cur2 = curlist->end() - 1;
+	    // double click
+	    if(cur == cur2)
+	    {
+		res = true;
+		break;
+	    }
+	    else
+		cur = cur2;
 	    redraw = true;
 	}
 

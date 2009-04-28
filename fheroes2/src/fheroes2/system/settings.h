@@ -143,6 +143,7 @@ public:
     u8 MapsWidth(void) const;
     bool AllowColors(u8) const;
     bool KingdomColors(u8) const;
+    bool AllowChangeRace(u8) const;
     u8 AllowColorsCount(void) const;
     u8 KingdomColorsCount(void) const;
     bool MapsWithHeroes(void) const;

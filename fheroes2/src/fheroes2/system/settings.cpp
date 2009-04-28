@@ -581,6 +581,11 @@ bool Settings::AllowColors(u8 f) const
     return current_maps_file.allow_colors & f;
 }
 
+bool Settings::AllowChangeRace(u8 f) const
+{
+    return current_maps_file.rnd_colors & f;
+}
+
 bool Settings::KingdomColors(u8 f) const
 {
     return current_maps_file.kingdom_colors & f;

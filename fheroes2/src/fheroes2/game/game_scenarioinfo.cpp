@@ -43,7 +43,7 @@ u16 GetStepFor(u16, u16, u16);
 void RedrawStaticInfo(void);
 void RedrawRatingInfo(TextSprite &);
 void RedrawOpponentsInfo(const Point &);
-void RedrawClassInfo(const Point &, bool = false);
+void RedrawClassInfo(const Point &);
 void UpdateCoordOpponentsInfo(const Point &, std::vector<Rect> &);
 void UpdateCoordClassInfo(const Point &, std::vector<Rect> &);
 
@@ -227,7 +227,7 @@ Game::menu_t Game::ScenarioInfo(void)
 		RedrawStaticInfo();
 		levelCursor.Redraw();
 		RedrawOpponentsInfo(pointOpponentInfo);
-		RedrawClassInfo(pointClassInfo, true);
+		RedrawClassInfo(pointClassInfo);
 		RedrawRatingInfo(rating);
 
 		cursor.Show();
@@ -467,7 +467,7 @@ void RedrawOpponentsInfo(const Point & dst)
     }
 }
 
-void RedrawClassInfo(const Point & dst, bool modify)
+void RedrawClassInfo(const Point & dst)
 {
     Display & display = Display::Get();
     const Settings & conf = Settings::Get();
@@ -481,12 +481,12 @@ void RedrawClassInfo(const Point & dst, bool modify)
 	    const Race::race_t race = conf.KingdomRace(color);
 	    switch(race)
 	    {
-		case Race::KNGT: index = modify ? 51 : 70; break;
-	        case Race::BARB: index = modify ? 52 : 71; break;
-	        case Race::SORC: index = modify ? 53 : 72; break;
-		case Race::WRLK: index = modify ? 54 : 73; break;
-	        case Race::WZRD: index = modify ? 55 : 74; break;
-		case Race::NECR: index = modify ? 56 : 75; break;
+		case Race::KNGT: index = conf.AllowChangeRace(color) ? 51 : 70; break;
+	        case Race::BARB: index = conf.AllowChangeRace(color) ? 52 : 71; break;
+	        case Race::SORC: index = conf.AllowChangeRace(color) ? 53 : 72; break;
+		case Race::WRLK: index = conf.AllowChangeRace(color) ? 54 : 73; break;
+	        case Race::WZRD: index = conf.AllowChangeRace(color) ? 55 : 74; break;
+		case Race::NECR: index = conf.AllowChangeRace(color) ? 56 : 75; break;
 	        case Race::MULT: index = 76; break;
 		case Race::RAND: index = 58; break;
 		default: continue;
