@@ -28,6 +28,7 @@
 #include "splitter.h"
 #include "settings.h"
 #include "maps.h"
+#include "maps_fileinfo.h"
 #include "dialog.h"
 
 
@@ -35,6 +36,8 @@ extern char *basename(const char *path);
 bool SelectFileListSimple(const std::string &, MapsFileInfoList &, std::string &, bool);
 void RedrawFileListSimple(const Rect &, const std::string &, const std::string & filename, const MapsFileInfoList &, MapsFileInfoList::const_iterator, MapsFileInfoList::const_iterator, const u8);
 void RedrawMapsFileList(const Rect &, const MapsFileInfoList &, MapsFileInfoList::const_iterator, MapsFileInfoList::const_iterator, const u8);
+bool DialogSelectMapsFileList(MapsFileInfoList &, std::string &);
+bool PrepareMapsFileInfoList(MapsFileInfoList &);
 
 void ResizeToShortName(const std::string & str, std::string & res)
 {
@@ -407,7 +410,46 @@ void RedrawFileListSimple(const Rect & dst, const std::string & header, const st
     }
 }
 
-bool Dialog::SelectMapsFileList(MapsFileInfoList & lists, std::string & filename)
+bool Dialog::SelectMapsFile(std::string & filename)
+{
+    MapsFileInfoList lists;
+
+    return PrepareMapsFileInfoList(lists) && DialogSelectMapsFileList(lists, filename);
+}
+
+bool PrepareMapsFileInfoList(MapsFileInfoList & lists)
+{
+    Settings & conf = Settings::Get();
+    Dir dir;
+
+    dir.Read(conf.MapsDirectory(), ".mp2", false);
+    // loyality version
+    if(conf.Modes(Settings::PRICELOYALTY)) dir.Read(conf.MapsDirectory(), ".mx2", false);
+
+    if(dir.empty())
+    {
+        Dialog::Message(_("Warning"), _("No maps available!"), Font::BIG, Dialog::OK);
+        return false;
+    }
+
+    lists.resize(dir.size());
+    MapsFileInfoList::const_iterator res;
+    int ii = 0;
+
+    for(Dir::const_iterator itd = dir.begin(); itd != dir.end(); ++itd, ++ii)
+    if(lists[ii].ReadBIN(*itd))
+    {
+        if(conf.PreferablyCountPlayers() > lists[ii].AllowColorsCount()) --ii;
+    }
+    else --ii;
+    if(static_cast<size_t>(ii) != lists.size()) lists.resize(ii);
+
+    std::sort(lists.begin(), lists.end(), Maps::FileInfo::PredicateForSorting);
+
+    return true;
+}
+
+bool DialogSelectMapsFileList(MapsFileInfoList & lists, std::string & filename)
 {
     AGG::PreloadObject(ICN::REQSBKG);
     AGG::PreloadObject(ICN::REQUEST);

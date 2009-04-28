@@ -29,7 +29,6 @@
 #include "skill.h"
 #include "text.h"
 #include "resource.h"
-#include "maps_fileinfo.h"
 #include "game.h"
 
 #define	SHADOWWIDTH	16
@@ -40,8 +39,6 @@
 class Castle;
 class Heroes;
 class Surface;
-
-typedef std::vector<Maps::FileInfo> MapsFileInfoList;
 
 namespace Army
 {
@@ -85,7 +82,7 @@ namespace Dialog
 
     bool SelectFileLoad(std::string &);
     bool SelectFileSave(std::string &);
-    bool SelectMapsFileList(MapsFileInfoList &, std::string &);
+    bool SelectMapsFile(std::string &);
 
     // show info cell maps
     void QuickInfo(const Maps::Tiles & tile);

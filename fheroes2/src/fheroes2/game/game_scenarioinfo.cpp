@@ -17,12 +17,10 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
+
 #include <algorithm>
-#include <map>
 #include <vector>
-#include <list>
 #include <string>
-#include "dir.h"
 #include "agg.h"
 #include "gamedefs.h"
 #include "button.h"
@@ -36,6 +34,9 @@
 #include "splitter.h"
 #include "world.h"
 #include "game.h"
+
+extern bool DialogSelectMapsFileList(MapsFileInfoList &, std::string &);
+extern bool PrepareMapsFileInfoList(MapsFileInfoList &);
 
 u8  GetAllowChangeRaces(void);
 u16 GetStepFor(u16, u16, u16);
@@ -53,29 +54,8 @@ Game::menu_t Game::ScenarioInfo(void)
     Settings & conf = Settings::Get();
     conf.SetPlayers(Color::BLUE);
 
-    Dir dir;
-    dir.Read(conf.MapsDirectory(), ".mp2", false);
-    // loyality version
-    if(conf.Modes(Settings::PRICELOYALTY)) dir.Read(conf.MapsDirectory(), ".mx2", false);
-
-    if(dir.empty())
-    {
-        Dialog::Message(_("Warning"), _("No maps available!"), Font::BIG, Dialog::OK);
-        return MAINMENU;
-    }
-
-    MapsFileInfoList lists(dir.size());
-    MapsFileInfoList::const_iterator res;
-    int ii = 0;
-    for(Dir::const_iterator itd = dir.begin(); itd != dir.end(); ++itd, ++ii)
-	if(lists[ii].ReadBIN(*itd))
-	{
-	    if(Game::MULTI & conf.GameType() && conf.PreferablyCountPlayers() > lists[ii].AllowColorsCount()) --ii;
-	}
-	else --ii;
-
-    if(static_cast<size_t>(ii) != lists.size()) lists.resize(ii);
-    std::sort(lists.begin(), lists.end(), Maps::FileInfo::PredicateForSorting);
+    MapsFileInfoList lists;
+    if(!PrepareMapsFileInfoList(lists)) return MAINMENU;
 
     // preload
     AGG::PreloadObject(ICN::HEROES);
@@ -263,7 +243,7 @@ Game::menu_t Game::ScenarioInfo(void)
 	if(le.KeyPress(KEY_s) || le.MouseClickLeft(buttonSelectMaps))
 	{
 	    std::string filemaps;
-	    if(Dialog::SelectMapsFileList(lists, filemaps) && filemaps.size()) conf.LoadFileMaps(filemaps);
+	    if(DialogSelectMapsFileList(lists, filemaps) && filemaps.size()) conf.LoadFileMaps(filemaps);
 
 	    cursor.Hide();
 	    levelCursor.Hide();

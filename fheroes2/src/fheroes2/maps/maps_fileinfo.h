@@ -21,6 +21,7 @@
 #define H2MAPSFILEINFO_H
 
 #include <ctime>
+#include <vector>
 #include "gamedefs.h"
 #include "kingdom_defines.h"
 
@@ -65,5 +66,7 @@ namespace Maps
     bool with_heroes;
     };
 };
+
+typedef std::vector<Maps::FileInfo> MapsFileInfoList;
 
 #endif
