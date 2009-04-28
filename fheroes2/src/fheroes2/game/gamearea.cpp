@@ -189,7 +189,13 @@ void GameArea::Redraw(const s16 rx, const s16 ry, const u16 rw, const u16 rh, bo
             if(tile_x < gx + rx || tile_y < gy + ry || tile_x >= gx + rx + rw || tile_y >= gy + ry + rh) continue;
 	    if(it1 == hero.GetPath().begin() && skipfirst) continue;
 
-	    const u16 index = (it3 == it2 ? 0 : Route::Path::GetIndexSprite((*it1).Direction(), (*it3).Direction()));
+        u16 index = 0;
+        if(it3 != it2)
+        {
+            index = Route::Path::GetIndexSprite((*it1).Direction(), (*it3).Direction());
+            u16 penalty = Maps::Ground::GetBasePenalty(from, hero.GetLevelSkill(Skill::Secondary::PATHFINDING));
+            index += 24 * Route::Path::GetIndexMultiplier(penalty);
+        }
 	    const Sprite & sprite = AGG::GetICN(0 > green ? ICN::ROUTERED : ICN::ROUTE, index);
     	    Point dst_pt(BORDERWIDTH + TILEWIDTH * (tile_x - gx) + sprite.x() - 14, BORDERWIDTH + TILEWIDTH * (tile_y - gy) + sprite.y());
 	    display.Blit(sprite, dst_pt);

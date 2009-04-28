@@ -1,4 +1,15 @@
-SVN - up to r1006
+SVN - up to r1036
+
+Users
++ Hero path arrows now reflect movement penalties.
++ Double clicking on an entry in a file selection box will choose that item.
++ Added spanish translation.
++ Multiple events can now occur on the same day.
+
+Developers
++
+
+April 23, 2009 - Development build r1021
 
 Users
 + Added glowing outlines around currently selected monster in battles.
@@ -31,6 +42,7 @@ Users
 + Fixed a bug causing heroes to gain levels in multiple primary skills on levelup.
 + Genies now have 9% chance to halve the size of any troop attacked in battle.
 + Ghosts gain 1 unit for every unit they kill.
++ Pathfinding will now avoid tiles which would trigger a battle.
 
 Developers
 + Added wrapper library around SDL_net and networking client/server examples.

@@ -31,9 +31,9 @@ namespace Maps
 
     namespace Ground
     {
-	typedef enum
-	{
-	    UNKNOWN	= 0x0000,
+        typedef enum
+        {
+            UNKNOWN	= 0x0000,
     	    DESERT	= 0x0001,
     	    SNOW	= 0x0002,
     	    SWAMP	= 0x0004,
@@ -43,10 +43,11 @@ namespace Maps
     	    DIRT	= 0x0040,
     	    GRASS	= 0x0080,
     	    WATER	= 0x0100,
-	} ground_t;
+        } ground_t;
 
-	const std::string & String(ground_t ground);
-	u16 GetPenalty(const u16 index, const Direction::vector_t direct, const u8 pathfinding);
+        const std::string & String(ground_t ground);
+        u16 GetBasePenalty(const u16 index, const u8 pathfinding);
+        u16 GetPenalty(const u16 index, const Direction::vector_t direct, const u8 pathfinding);
     };
 };
 

@@ -73,6 +73,11 @@ void Route::Path::Reset(void)
     hide = true;
 }
 
+u16 Route::Path::GetIndexMultiplier(u16 penalty)
+{
+    return penalty / 25 - 3;
+}
+
 u16 Route::Path::GetIndexSprite(const Direction::vector_t & from, const Direction::vector_t & to)
 {
     // ICN::ROUTE
