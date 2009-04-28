@@ -22,6 +22,7 @@
 #include "settings.h"
 #include "cursor.h"
 #include "button.h"
+#include "maps.h"
 #include "dialog.h"
 
 extern void RedrawOpponentsInfo(const Point &);
@@ -45,7 +46,7 @@ void Dialog::GameInfo(void)
 
     TextBox text;
 
-    text.Set(conf.FileInfo().Name(), Font::BIG, 350);
+    text.Set(conf.MapsName(), Font::BIG, 350);
     text.Blit(pt.x + 52, pt.y + 30);
 
     text.Set(_("Map\nDifficulty"), Font::SMALL, 80);
@@ -60,22 +61,22 @@ void Dialog::GameInfo(void)
     text.Set(_("Map Size"), Font::SMALL, 80);
     text.Blit(pt.x + 322, pt.y + 61);
 
-    text.Set(Difficulty::String(conf.FileInfo().Difficulty()), Font::SMALL, 80);
+    text.Set(Difficulty::String(conf.MapsDifficulty()), Font::SMALL, 80);
     text.Blit(pt.x + 50, pt.y + 80);
 
     text.Set(Difficulty::String(conf.GameDifficulty()), Font::SMALL, 80);
     text.Blit(pt.x + 140, pt.y + 80);
 
     std::string str;
-    String::AddInt(str, Game::GetRating(conf.FileInfo().Difficulty(), conf.GameDifficulty()));
+    String::AddInt(str, Game::GetRating(conf.MapsDifficulty(), conf.GameDifficulty()));
     str.append(" %");
     text.Set(str, Font::SMALL, 80);
     text.Blit(pt.x + 230, pt.y + 80);
 
-    text.Set(Maps::SizeString(conf.FileInfo().SizeMaps().w), Font::SMALL, 80);
+    text.Set(Maps::SizeString(conf.MapsWidth()), Font::SMALL, 80);
     text.Blit(pt.x + 322, pt.y + 80);
 
-    text.Set(conf.FileInfo().Description(), Font::SMALL, 350);
+    text.Set(conf.MapsDescription(), Font::SMALL, 350);
     text.Blit(pt.x + 52, pt.y + 105);
 
     text.Set(_("Opponents"), Font::SMALL, 350);

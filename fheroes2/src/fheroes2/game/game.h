@@ -22,7 +22,6 @@
 #define H2GAME_H
 
 #include <types.h>
-#include "difficulty.h"
 
 #define RADARWIDTH	144
 #define BORDERWIDTH	16
@@ -101,7 +100,7 @@ namespace Game
     void PreloadLOOPSounds(void);
     void EnvironmentSoundMixer(void);
 
-    u8 GetRating(Difficulty::difficulty_t, Difficulty::difficulty_t);
+    u8 GetRating(u8, u8);
 
     namespace Editor
     {

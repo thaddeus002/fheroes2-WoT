@@ -678,7 +678,7 @@ void World::LoadMaps(const std::string &filename)
 			    case 3: race = Race::WRLK; break;
 			    case 4: race = Race::WZRD; break;
 			    case 5: race = Race::NECR; break;
-			    case 6: race = (Color::GRAY != color ? Settings::Get().FileInfo().KingdomRace(color) : Race::Rand()); break;
+			    case 6: race = (Color::GRAY != color ? Settings::Get().KingdomRace(color) : Race::Rand()); break;
 			}
 
 			// check heroes max count
@@ -942,7 +942,7 @@ void World::LoadMaps(const std::string &filename)
     }
     else
     // play with hero
-    if(Settings::Get().FileInfo().PlayWithHeroes())
+    if(Settings::Get().MapsWithHeroes())
 	for(u8 ii = 0; ii < vec_kingdoms.size(); ++ii)
 	    if((*vec_kingdoms[ii]).isPlay() && (*vec_kingdoms[ii]).GetCastles().size())
 	    {

@@ -35,7 +35,7 @@
 Kingdom::Kingdom(const Color::color_t cl, const Game::control_t con) : color(cl), control(con), flags(0), lost_town_days(LOST_TOWN_DAYS + 1), ai_capital(NULL)
 {
     // set play
-    if(cl & Settings::Get().FileInfo().KingdomColors()) SetModes(PLAY);
+    if(Settings::Get().KingdomColors(cl)) SetModes(PLAY);
 
     // set starting resource
     switch(Settings::Get().GameDifficulty())
@@ -274,7 +274,7 @@ u8 Kingdom::GetCountMarketplace(void) const
 
 Race::race_t Kingdom::GetRace(void) const
 {
-    return Settings::Get().FileInfo().KingdomRace(color);
+    return Settings::Get().KingdomRace(color);
 }
 
 bool Kingdom::AllowPayment(const Resource::funds_t & funds) const

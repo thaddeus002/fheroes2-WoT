@@ -43,7 +43,7 @@ void Game::SetFixVideoMode(void)
     Size fixsize(conf.VideoMode());
     u32 max = 0;
 
-    switch(conf.FileInfo().SizeMaps().w)
+    switch(conf.MapsWidth())
     {
 	default:
 	case Maps::SMALL:
@@ -194,7 +194,7 @@ Game::control_t Game::GetControl(u8 index)
     return NONE;
 }
 
-u8 Game::GetRating(Difficulty::difficulty_t maps, Difficulty::difficulty_t game)
+u8 Game::GetRating(u8 maps, u8 game)
 {
     u8 rating = 50;
 

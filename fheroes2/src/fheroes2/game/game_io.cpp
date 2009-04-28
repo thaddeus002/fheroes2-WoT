@@ -30,7 +30,6 @@
 #include "xmlccwrap.h"
 
 extern char *basename(const char *path);
-extern Race::race_t ByteToRace(u8);
 
 void Game::Save(const std::string &fn)
 {
@@ -70,8 +69,8 @@ void Game::SaveXML(const std::string &fn)
     // maps
     TiXmlElement* maps = new TiXmlElement("maps");
     root->LinkEndChild(maps);
-    maps->SetAttribute("width", conf.current_maps_file.size.w);
-    maps->SetAttribute("height", conf.current_maps_file.size.h);
+    maps->SetAttribute("width", conf.current_maps_file.size_w);
+    maps->SetAttribute("height", conf.current_maps_file.size_h);
     maps->SetAttribute("file", basename(conf.current_maps_file.file.c_str()));
     maps->SetAttribute("difficulty", conf.current_maps_file.difficulty);
     maps->SetAttribute("kingdom_colors", conf.current_maps_file.kingdom_colors);
@@ -695,9 +694,9 @@ void Game::LoadXML(const std::string &fn)
 
     // maps
     maps->Attribute("width", &res);
-    conf.current_maps_file.size.w = res;
+    conf.current_maps_file.size_w = res;
     maps->Attribute("height", &res);
-    conf.current_maps_file.size.h = res;
+    conf.current_maps_file.size_h = res;
     conf.current_maps_file.file = maps->Attribute("file");
     //
     node = maps->FirstChildElement("name");
@@ -710,17 +709,17 @@ void Game::LoadXML(const std::string &fn)
     if(node)
     {
 	node->Attribute("blue", &res);
-	conf.current_maps_file.races[0] = ByteToRace(res);
+	conf.current_maps_file.races[0] = res;
 	node->Attribute("green", &res);
-	conf.current_maps_file.races[1] = ByteToRace(res);
+	conf.current_maps_file.races[1] = res;
 	node->Attribute("red", &res);
-	conf.current_maps_file.races[2] = ByteToRace(res);
+	conf.current_maps_file.races[2] = res;
 	node->Attribute("yellow", &res);
-	conf.current_maps_file.races[3] = ByteToRace(res);
+	conf.current_maps_file.races[3] = res;
 	node->Attribute("orange", &res);
-	conf.current_maps_file.races[4] = ByteToRace(res);
+	conf.current_maps_file.races[4] = res;
 	node->Attribute("purple", &res);
-	conf.current_maps_file.races[5] = ByteToRace(res);
+	conf.current_maps_file.races[5] = res;
     }
 
     //

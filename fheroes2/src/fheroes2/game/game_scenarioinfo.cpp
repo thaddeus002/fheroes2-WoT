@@ -18,7 +18,6 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 #include <algorithm>
-#include <bitset>
 #include <map>
 #include <vector>
 #include <list>
@@ -38,7 +37,7 @@
 #include "world.h"
 #include "game.h"
 
-u8  GetAllowChangeRaces(const Maps::FileInfo &);
+u8  GetAllowChangeRaces(void);
 u16 GetStepFor(u16, u16, u16);
 void RedrawStaticInfo(void);
 void RedrawRatingInfo(TextSprite &);
@@ -68,7 +67,13 @@ Game::menu_t Game::ScenarioInfo(void)
     MapsFileInfoList lists(dir.size());
     MapsFileInfoList::const_iterator res;
     int ii = 0;
-    for(Dir::const_iterator itd = dir.begin(); itd != dir.end(); ++itd, ++ii) if(!lists[ii].ReadBIN(*itd)) --ii;
+    for(Dir::const_iterator itd = dir.begin(); itd != dir.end(); ++itd, ++ii)
+	if(lists[ii].ReadBIN(*itd))
+	{
+	    if(Game::MULTI & conf.GameType() && conf.PreferablyCountPlayers() > lists[ii].AllowColorsCount()) --ii;
+	}
+	else --ii;
+
     if(static_cast<size_t>(ii) != lists.size()) lists.resize(ii);
     std::sort(lists.begin(), lists.end(), Maps::FileInfo::PredicateForSorting);
 
@@ -89,7 +94,7 @@ Game::menu_t Game::ScenarioInfo(void)
     display.SetVideoMode(640, 480);
 
     // set first maps settings
-    conf.LoadFileMaps(lists.front().FileMaps());
+    conf.LoadFileMaps(lists.front().file);
 
     Button buttonSelectMaps(513, 77, ICN::NGEXTRA, 64, 65);
     Button buttonOk(234, 413, ICN::NGEXTRA, 66, 67);
@@ -108,7 +113,7 @@ Game::menu_t Game::ScenarioInfo(void)
     // first allow color
     conf.SetPlayers(0);
     for(Color::color_t color = Color::BLUE; color != Color::GRAY; ++color)
-	if(color & conf.FileInfo().AllowColors()){ conf.SetPlayers(color); conf.SetMyColor(color); break; }
+	if(conf.AllowColors(color)){ conf.SetPlayers(color); conf.SetMyColor(color); break; }
 
     RedrawStaticInfo();
 
@@ -128,7 +133,7 @@ Game::menu_t Game::ScenarioInfo(void)
     const Rect rectDifficultyEx(455, 124, levelCursor.w(), levelCursor.h());
     const Rect rectDifficultyIm(532, 124, levelCursor.w(), levelCursor.h());
 
-    u8 rnd_color = GetAllowChangeRaces(conf.FileInfo());
+    u8 rnd_color = GetAllowChangeRaces();
 
     TextSprite rating;
     rating.SetFont(Font::BIG);
@@ -196,7 +201,7 @@ Game::menu_t Game::ScenarioInfo(void)
 
 	// select color
 	for(Color::color_t color = Color::BLUE; color != Color::GRAY; ++color)
-	    if((conf.FileInfo().KingdomColors() & conf.FileInfo().AllowColors() & color) &&
+	    if((conf.KingdomColors(color) && conf.AllowColors(color)) &&
 		le.MouseClickLeft(coordColors[Color::GetIndex(color)]))
 	{
 	    cursor.Hide();
@@ -220,12 +225,12 @@ Game::menu_t Game::ScenarioInfo(void)
 
 	// select class
 	for(Color::color_t color = Color::BLUE; color != Color::GRAY; ++color)
-	    if((conf.FileInfo().KingdomColors() & rnd_color & color) &&
+	    if((conf.KingdomColors(rnd_color & color)) &&
 		le.MouseClickLeft(coordClass[Color::GetIndex(color)]))
 	    {
 		cursor.Hide();
 		u8 index = 0;
-		Race::race_t race = conf.FileInfo().KingdomRace(color);
+		Race::race_t race = conf.KingdomRace(color);
 		switch(race)
 		{
 		    case Race::KNGT: index = 52; race = Race::BARB; break;
@@ -237,7 +242,7 @@ Game::menu_t Game::ScenarioInfo(void)
 		    case Race::RAND: index = 51; race = Race::KNGT; break;
 		    default: break;
 		}
-		conf.FileInfo().SetKingdomRace(color, race);
+		conf.SetKingdomRace(color, race);
 
 		RedrawStaticInfo();
 		levelCursor.Redraw();
@@ -265,7 +270,7 @@ Game::menu_t Game::ScenarioInfo(void)
 	    // set first allow color
 	    conf.SetPlayers(0);
 	    for(Color::color_t col = Color::BLUE; col < Color::GRAY; ++col)
-		if(conf.FileInfo().AllowColors() & col){ conf.SetPlayers(col); conf.SetMyColor(col); break; }
+		if(conf.AllowColors(col)){ conf.SetPlayers(col); conf.SetMyColor(col); break; }
 
 	    RedrawStaticInfo();
 	    UpdateCoordOpponentsInfo(pointOpponentInfo, coordColors);
@@ -277,7 +282,7 @@ Game::menu_t Game::ScenarioInfo(void)
 	    levelCursor.Show();
 	    cursor.Show();
 	    display.Flip();
-	    rnd_color = GetAllowChangeRaces(conf.FileInfo());
+	    rnd_color = GetAllowChangeRaces();
 	}
 	else
 	// click cancel
@@ -291,13 +296,13 @@ Game::menu_t Game::ScenarioInfo(void)
 	// click ok
 	if(le.KeyPress(KEY_RETURN) || le.MouseClickLeft(buttonOk))
 	{
-	    if(Settings::Get().Debug()) Error::Verbose("select maps: " + conf.FileInfo().FileMaps());
+	    if(Settings::Get().Debug()) Error::Verbose("select maps: " + conf.MapsFile());
 	    if(Settings::Get().Debug()) Error::Verbose("difficulty: " + Difficulty::String(conf.GameDifficulty()));
 	    for(Color::color_t color = Color::BLUE; color != Color::GRAY; ++color)
-		if(conf.FileInfo().KingdomColors() & color)
+		if(conf.KingdomColors(color))
 		{
-		    if(Race::RAND == conf.FileInfo().KingdomRace(color)) conf.FileInfo().SetKingdomRace(color, Race::Rand());
-		    if(Settings::Get().Debug()) Error::Verbose(Color::String(color) + ": " + Race::String(conf.FileInfo().KingdomRace(color)));
+		    if(Race::RAND == conf.KingdomRace(color)) conf.SetKingdomRace(color, Race::Rand());
+		    if(Settings::Get().Debug()) Error::Verbose(Color::String(color) + ": " + Race::String(conf.KingdomRace(color)));
 		}
 	    if(Settings::Get().Debug()) Error::Verbose("select color: " + Color::String(conf.MyColor()));
 
@@ -318,13 +323,13 @@ Game::menu_t Game::ScenarioInfo(void)
 
 	// color
 	for(Color::color_t color = Color::BLUE; color != Color::GRAY; ++color)
-	    if(conf.FileInfo().KingdomColors() & color &&
+	    if(conf.KingdomColors(color) &&
 		le.MousePressRight(coordColors[Color::GetIndex(color)]))
 		    Dialog::Message(_("Opponents"), _("This lets you change player starting positions and colors. A particular color will always start in a particular location. Some positions may only be played by a computer player or only by a human player."), Font::BIG);
 
 	// class
 	for(Color::color_t color = Color::BLUE; color != Color::GRAY; ++color)
-	    if(conf.FileInfo().KingdomColors() & color &&
+	    if(conf.KingdomColors(color) &&
 		le.MousePressRight(coordClass[Color::GetIndex(color)]))
 		    Dialog::Message(_("Class"), _("This lets you change the class of a player. Classes are not always changeable. Depending on the scenario, a player may receive additional towns and/or heroes not of their primary alingment."), Font::BIG);
 
@@ -339,7 +344,7 @@ Game::menu_t Game::ScenarioInfo(void)
     {
 	display.Fade();
 	// Load maps
-	world.LoadMaps(conf.FileInfo().FileMaps());
+	world.LoadMaps(conf.MapsFile());
     }
 
     return result;
@@ -358,13 +363,12 @@ void UpdateCoordClassInfo(const Point & dst, std::vector<Rect> & rects)
 void UpdateCoordOpponentsInfo(const Point & dst, std::vector<Rect> & rects)
 {
     const Settings & conf = Settings::Get();
-    const std::bitset<8> colors(conf.FileInfo().KingdomColors());
-    const u8 count = colors.count();
+    const u8 count = conf.KingdomColorsCount();
     const Sprite &sprite = AGG::GetICN(ICN::NGEXTRA, 3);
     u8 current = 0;
 
     for(Color::color_t color = Color::BLUE; color != Color::GRAY; ++color)
-	if(conf.FileInfo().KingdomColors() & color)
+	if(conf.KingdomColors(color))
     	{
 	    rects[Color::GetIndex(color)] = Rect(dst.x + GetStepFor(current, sprite.w(), count), dst.y, sprite.w(), sprite.h());
     	    ++current;
@@ -392,7 +396,7 @@ void RedrawStaticInfo(void)
     text.Blit(414 - text.w()/2, 53);
 
     // maps name
-    text.Set(conf.FileInfo().Name());
+    text.Set(conf.MapsName());
     text.Blit(374 - text.w()/2, 78);
     
     // text game difficulty
@@ -424,17 +428,16 @@ void RedrawStaticInfo(void)
 void RedrawOpponentsInfo(const Point & dst)
 {
     const Settings & conf = Settings::Get();
-    const std::bitset<8> colors(conf.FileInfo().KingdomColors());
-    const u8 count = colors.count();
+    const u8 count = conf.KingdomColorsCount();
     u8 current = 0;
 
     for(Color::color_t color = Color::BLUE; color != Color::GRAY; ++color)
     {
-	if(conf.FileInfo().KingdomColors() & color)
+	if(conf.KingdomColors(color))
 	{
 	    const Sprite* sprite = NULL;
 
-	    if(!(conf.FileInfo().AllowColors() & color))
+	    if(!(conf.AllowColors(color)))
 	    {
 		switch(color)
 		{
@@ -488,15 +491,14 @@ void RedrawClassInfo(const Point & dst, bool modify)
 {
     Display & display = Display::Get();
     const Settings & conf = Settings::Get();
-    const std::bitset<8> colors(conf.FileInfo().KingdomColors());
-    const u8 count = colors.count();
+    const u8 count = conf.KingdomColorsCount();
     u8 current = 0;
 
     for(Color::color_t color = Color::BLUE; color != Color::GRAY; ++color)
-	if(conf.FileInfo().KingdomColors() & color)
+	if(conf.KingdomColors(color))
     {
 	    u8 index = 0;
-	    const Race::race_t race = conf.FileInfo().KingdomRace(color);
+	    const Race::race_t race = conf.KingdomRace(color);
 	    switch(race)
 	    {
 		case Race::KNGT: index = modify ? 51 : 70; break;
@@ -521,12 +523,12 @@ void RedrawClassInfo(const Point & dst, bool modify)
     }
 }
 
-u8 GetAllowChangeRaces(const Maps::FileInfo &maps)
+u8 GetAllowChangeRaces(void)
 {
     u8 result = 0;
 
     for(Color::color_t color = Color::BLUE; color != Color::GRAY; ++color)
-	if(Race::RAND == maps.KingdomRace(color)) result |= color;
+	if(Race::RAND == Settings::Get().KingdomRace(color)) result |= color;
 
     return result;
 }
@@ -537,7 +539,7 @@ void RedrawRatingInfo(TextSprite & sprite)
     sprite.Hide();
 
     std::string str(_("Rating %{rating}%"));
-    String::Replace(str, "%{rating}", Game::GetRating(conf.FileInfo().Difficulty(), conf.GameDifficulty()));
+    String::Replace(str, "%{rating}", Game::GetRating(conf.MapsDifficulty(), conf.GameDifficulty()));
     sprite.SetText(str);
     sprite.Show();
 }

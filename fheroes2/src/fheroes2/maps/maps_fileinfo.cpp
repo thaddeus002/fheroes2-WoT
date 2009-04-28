@@ -17,9 +17,14 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
+
+#include <bitset>
 #include <cstring>
 #include <algorithm>
 #include <fstream>
+#include "difficulty.h"
+#include "color.h"
+#include "race.h"
 #include "xmlccwrap.h"
 #include "maps_fileinfo.h"
 
@@ -49,98 +54,6 @@ Maps::FileInfo::FileInfo() : difficulty(Difficulty::EASY),
     kingdom_colors(0), allow_colors(0), rnd_colors(0), localtime(0), with_heroes(false)
 {
     for(u8 ii = 0; ii < KINGDOMMAX; ++ii) races[ii] = Race::BOMG;
-}
-
-const std::string & Maps::FileInfo::FileMaps(void) const
-{
-    return file;
-}
-
-const std::string & Maps::FileInfo::Name(void) const
-{
-    return name;
-}
-
-const std::string & Maps::FileInfo::Description(void) const
-{
-    return description;
-}
-
-const time_t & Maps::FileInfo::Time(void) const
-{
-    return localtime;
-}
-
-const Size & Maps::FileInfo::SizeMaps(void) const
-{
-    return size;
-}
-
-Difficulty::difficulty_t Maps::FileInfo::Difficulty(void) const
-{
-    return difficulty;
-}
-
-u8 Maps::FileInfo::KingdomColors(void) const
-{
-    return kingdom_colors;
-}
-
-u8 Maps::FileInfo::AllowColors(void) const
-{
-    return allow_colors;
-}
-
-u8 Maps::FileInfo::ConditionsWins(void) const
-{
-    return conditions_wins;
-}
-
-u8 Maps::FileInfo::ConditionsLoss(void) const
-{
-    return conditions_loss;
-}
-
-Race::race_t Maps::FileInfo::KingdomRace(Color::color_t color) const
-{
-    switch(color)
-    {
-        case Color::BLUE:	return races[0];
-        case Color::GREEN:	return races[1];
-        case Color::RED:	return races[2];
-        case Color::YELLOW:	return races[3];
-        case Color::ORANGE:	return races[4];
-        case Color::PURPLE:	return races[5];
-
-        default: break;
-    }
-
-    return Race::BOMG;
-}
-
-void Maps::FileInfo::SetKingdomRace(Color::color_t color, Race::race_t race)
-{
-    switch(color)
-    {
-        case Color::BLUE:	races[0] = race; break;
-        case Color::GREEN:	races[1] = race; break;
-        case Color::RED:	races[2] = race; break;
-        case Color::YELLOW:	races[3] = race; break;
-        case Color::ORANGE:	races[4] = race; break;
-        case Color::PURPLE:	races[5] = race; break;
-
-        default: break;
-    }
-}
-
-void Maps::FileInfo::SetKingdomColors(const u8 colors)
-{
-    kingdom_colors = colors;
-}
-
-bool Maps::FileInfo::PlayWithHeroes(void) const
-{
-    return with_heroes;
 }
 
 bool Maps::FileInfo::Read(const std::string &filename)
@@ -220,9 +133,9 @@ bool Maps::FileInfo::ReadXML(const std::string &filename)
 
     // maps
     maps->Attribute("width", &res);
-    size.w = res;
+    size_w = res;
     maps->Attribute("height", &res);
-    size.h = res;
+    size_h = res;
     //
     file = filename;
     //
@@ -236,21 +149,21 @@ bool Maps::FileInfo::ReadXML(const std::string &filename)
     if(node)
     {
         node->Attribute("blue", &res);
-        races[0] = ByteToRace(res);
+        races[0] = res;
         node->Attribute("green", &res);
-        races[1] = ByteToRace(res);
+        races[1] = res;
         node->Attribute("red", &res);
-        races[2] = ByteToRace(res);
+        races[2] = res;
         node->Attribute("yellow", &res);
-        races[3] = ByteToRace(res);
+        races[3] = res;
         node->Attribute("orange", &res);
-        races[4] = ByteToRace(res);
+        races[4] = res;
         node->Attribute("purple", &res);
-        races[5] = ByteToRace(res);
+        races[5] = res;
     }
     //
     maps->Attribute("difficulty", &res);
-    difficulty = Difficulty::Get(res);
+    difficulty = res;
     maps->Attribute("kingdom_colors", &res);
     kingdom_colors = res;
     maps->Attribute("allow_colors", &res);
@@ -337,11 +250,11 @@ bool Maps::FileInfo::ReadBIN(const std::string & filename)
 
     // width
     fd.read(reinterpret_cast<char *>(&byte8), 1);
-    size.w = byte8;
+    size_w = byte8;
 
     // height
     fd.read(reinterpret_cast<char *>(&byte8), 1);
-    size.h = byte8;
+    size_h = byte8;
 
     // kingdom color blue
     fd.read(reinterpret_cast<char *>(&byte8), 1);
@@ -493,32 +406,14 @@ bool Maps::FileInfo::PredicateForSorting(const FileInfo & fi1, const FileInfo & 
     return std::tolower(fi1.name[0]) < std::tolower(fi2.name[0]);
 }
 
-u8 Maps::FileInfo::Wins1(void) const
+u8 Maps::FileInfo::AllowColorsCount(void) const
 {
-    return wins1;
+    const std::bitset<8> colors(allow_colors);
+    return colors.count();
 }
 
-u8 Maps::FileInfo::Wins2(void) const
+u8 Maps::FileInfo::KingdomColorsCount(void) const
 {
-    return wins2;
-}
-
-u8 Maps::FileInfo::Wins3(void) const
-{
-    return wins3;
-}
-
-u8 Maps::FileInfo::Wins4(void) const
-{
-    return wins4;
-}
-
-u8 Maps::FileInfo::Loss1(void) const
-{
-    return loss1;
-}
-
-u8 Maps::FileInfo::Loss2(void) const
-{
-    return loss2;
+    const std::bitset<8> colors(kingdom_colors);
+    return colors.count();
 }

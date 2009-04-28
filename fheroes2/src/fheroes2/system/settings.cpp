@@ -19,6 +19,7 @@
  ***************************************************************************/
 
 #include <fstream>
+#include "maps.h"
 #include "settings.h"
 
 #define DEFAULT_PORT	5154
@@ -196,7 +197,7 @@ void Settings::LoadFileMaps(const std::string & file)
     if(! current_maps_file.Read(file)) return;
 
     // set my color
-    for(Color::color_t color = Color::BLUE; color != Color::GRAY; ++color) if(current_maps_file.AllowColors() & color)
+    for(Color::color_t color = Color::BLUE; color != Color::GRAY; ++color) if(current_maps_file.allow_colors & color)
     {
 	my_color = color;
 	break;
@@ -204,17 +205,6 @@ void Settings::LoadFileMaps(const std::string & file)
 
     // game difficulty
     game_difficulty = Difficulty::NORMAL;
-}
-
-/* get file info */
-const Maps::FileInfo & Settings::FileInfo(void) const
-{
-    return current_maps_file;
-}
-
-Maps::FileInfo & Settings::FileInfo(void)
-{
-    return current_maps_file;
 }
 
 /* return major version */
@@ -513,10 +503,7 @@ void Settings::SetPlayers(u8 c)
 
 void Settings::SetPreferablyCountPlayers(u8 c)
 {
-    if(2 > c) preferably_count_players = 0;
-    else
-    if(6 < c) preferably_count_players = 6;
-    else      preferably_count_players = c;
+    preferably_count_players = 6 < c ? 6 : c;
 }
 
 u8 Settings::PreferablyCountPlayers(void) const
@@ -532,4 +519,84 @@ void Settings::SetLocalDataPrefix(const std::string & str)
 u16 Settings::GetPort(void) const
 {
     return port;
+}
+
+
+Race::race_t Settings::KingdomRace(u8 color) const
+{
+    switch(color)
+    {
+	case Color::BLUE:       return Race::Get(current_maps_file.races[0]);
+        case Color::GREEN:      return Race::Get(current_maps_file.races[1]);
+        case Color::RED:        return Race::Get(current_maps_file.races[2]);
+        case Color::YELLOW:     return Race::Get(current_maps_file.races[3]);
+        case Color::ORANGE:     return Race::Get(current_maps_file.races[4]);
+        case Color::PURPLE:     return Race::Get(current_maps_file.races[5]);
+        default: break;
+    }
+    return Race::BOMG;
+}
+
+void Settings::SetKingdomRace(u8 color, u8 race)
+{
+    switch(color)
+    {
+        case Color::BLUE:       current_maps_file.races[0] = race; break;
+        case Color::GREEN:      current_maps_file.races[1] = race; break;
+        case Color::RED:        current_maps_file.races[2] = race; break;
+        case Color::YELLOW:     current_maps_file.races[3] = race; break;
+        case Color::ORANGE:     current_maps_file.races[4] = race; break;
+        case Color::PURPLE:     current_maps_file.races[5] = race; break;
+        default: break;
+    }
+}
+
+const std::string & Settings::MapsFile(void) const
+{
+    return current_maps_file.file;
+}
+
+const std::string & Settings::MapsName(void) const
+{
+    return current_maps_file.name;
+}
+
+const std::string & Settings::MapsDescription(void) const
+{
+    return current_maps_file.description;
+}
+
+Difficulty::difficulty_t Settings::MapsDifficulty(void) const
+{
+    return Difficulty::Get(current_maps_file.difficulty);
+}
+
+u8 Settings::MapsWidth(void) const
+{
+    return current_maps_file.size_w;
+}
+
+bool Settings::AllowColors(u8 f) const
+{
+    return current_maps_file.allow_colors & f;
+}
+
+bool Settings::KingdomColors(u8 f) const
+{
+    return current_maps_file.kingdom_colors & f;
+}
+
+u8 Settings::AllowColorsCount(void) const
+{
+    return current_maps_file.AllowColorsCount();
+}
+
+u8 Settings::KingdomColorsCount(void) const
+{
+    return current_maps_file.KingdomColorsCount();
+}
+
+bool Settings::MapsWithHeroes(void) const
+{
+    return current_maps_file.with_heroes;
 }

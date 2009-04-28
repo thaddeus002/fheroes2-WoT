@@ -30,7 +30,7 @@ Difficulty::difficulty_t& Difficulty::operator-- (Difficulty::difficulty_t& diff
 { return difficulty = ( Difficulty::EASY == difficulty ? Difficulty::IMPOSSIBLE : Difficulty::difficulty_t(difficulty - 1)); };
 
 
-const std::string & Difficulty::String(Difficulty::difficulty_t difficulty)
+const std::string & Difficulty::String(u8 difficulty)
 {
     static const std::string str_difficulty[] = { _("Easy"), _("Normal"), _("Hard"), _("Expert"), _("Impossible") };
 
@@ -41,6 +41,7 @@ const std::string & Difficulty::String(Difficulty::difficulty_t difficulty)
 	case Difficulty::HARD: 		return str_difficulty[2];
 	case Difficulty::EXPERT: 	return str_difficulty[3];
 	case Difficulty::IMPOSSIBLE: 	return str_difficulty[4];
+	default: break;
     }
 
     return str_difficulty[0];

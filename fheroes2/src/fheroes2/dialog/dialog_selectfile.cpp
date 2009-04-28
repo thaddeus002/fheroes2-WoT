@@ -18,7 +18,6 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#include <bitset>
 #include <algorithm>
 #include <string>
 #include "dir.h"
@@ -28,6 +27,7 @@
 #include "difficulty.h"
 #include "splitter.h"
 #include "settings.h"
+#include "maps.h"
 #include "dialog.h"
 
 
@@ -117,7 +117,7 @@ bool SelectFileListSimple(const std::string & header, MapsFileInfoList & lists, 
     else
     {
 	if(lists.empty()) buttonOk.SetDisable(true);
-	ResizeToShortName((*cur).FileMaps(), filename);
+	ResizeToShortName((*cur).file, filename);
     }
 
     RedrawFileListSimple(rt, header, filename, lists, top, cur, max_items);
@@ -148,7 +148,7 @@ bool SelectFileListSimple(const std::string & header, MapsFileInfoList & lists, 
 		result = Settings::Get().LocalDataPrefix() + SEPARATOR + "save" + SEPARATOR + filename + ".sav";
     	    else
     	    if(cur != lists.end())
-    		result = (*cur).FileMaps();
+    		result = (*cur).file;
     	    break;
     	}
     	else
@@ -315,10 +315,10 @@ bool SelectFileListSimple(const std::string & header, MapsFileInfoList & lists, 
 	{
 	    std::string msg(_("Are you sure you want to delete file:"));
 	    msg.append("\n \n");
-	    msg.append(basename((*cur).FileMaps().c_str()));
+	    msg.append(basename((*cur).file.c_str()));
 	    if(Dialog::YES == Dialog::Message(_("Warning!"), msg, Font::BIG, Dialog::YES | Dialog::NO))
 	    {
-		unlink((*cur).FileMaps().c_str());
+		unlink((*cur).file.c_str());
 		lists.erase(cur);
 		if(lists.empty() || filename.empty()) buttonOk.SetDisable(true);
 		top = lists.begin();
@@ -348,7 +348,7 @@ bool SelectFileListSimple(const std::string & header, MapsFileInfoList & lists, 
 	    else
 	    if(cur != lists.end())
 	    {
-	    	ResizeToShortName((*cur).FileMaps(), filename);
+	    	ResizeToShortName((*cur).file, filename);
 		RedrawFileListSimple(rt, header, filename, lists, top, cur, max_items);
 	    }
 
@@ -387,11 +387,11 @@ void RedrawFileListSimple(const Rect & dst, const std::string & header, const st
     {
 	const Maps::FileInfo & info = *ii;
 
-	const std::string name(basename(info.FileMaps().c_str()));
+	const std::string name(basename(info.file.c_str()));
 
-	std::strftime(short_date, 14, "%b %d, %H:%M", std::localtime(&info.Time()));
+	std::strftime(short_date, 14, "%b %d, %H:%M", std::localtime(&info.localtime));
 
-	text.Set(basename(info.FileMaps().c_str()), (cur == ii ? Font::YELLOW_BIG : Font::BIG));
+	text.Set(basename(info.file.c_str()), (cur == ii ? Font::YELLOW_BIG : Font::BIG));
 	text.Blit(dst.x + 45, dst.y + oy);
 
 	text.Set(short_date, (cur == ii ? Font::YELLOW_BIG : Font::BIG));
@@ -435,7 +435,7 @@ bool Dialog::SelectMapsFileList(MapsFileInfoList & lists, std::string & filename
 
     for(; cur != all.end(); ++ cur)
     {
-	switch((*cur).SizeMaps().w)
+	switch((*cur).size_w)
 	{
     	    case Maps::SMALL:	small.push_back(*cur); break;
     	    case Maps::MEDIUM:	medium.push_back(*cur); break;
@@ -664,7 +664,7 @@ bool Dialog::SelectMapsFileList(MapsFileInfoList & lists, std::string & filename
 	}
     }
 
-    filename = (*cur).FileMaps();
+    filename = (*cur).file;
 
     cursor.Hide();
     back.Restore();
@@ -682,19 +682,17 @@ void RedrawMapsFileList(const Rect & dst, const MapsFileInfoList & lists, MapsFi
     Text text;
     u16 oy = 60;
     u8 index = 0;
-    std::bitset<8> colors;
 
     for(MapsFileInfoList::const_iterator ii = top; ii != lists.end() && (ii - top < max_items); ++ii)
     {
 	const Maps::FileInfo & info = *ii;
 
-	colors = info.KingdomColors();
-	index = 19 + colors.count();
+	index = 19 + info.KingdomColorsCount();
 
 	const Sprite & spriteCount = AGG::GetICN(ICN::REQUESTS, index);
 	display.Blit(spriteCount, dst.x + 45, dst.y + oy);
 
-	switch(info.SizeMaps().w)
+	switch(info.size_w)
 	{
             case Maps::SMALL:	index = 26; break;
             case Maps::MEDIUM:	index = 27; break;
@@ -706,27 +704,26 @@ void RedrawMapsFileList(const Rect & dst, const MapsFileInfoList & lists, MapsFi
 	const Sprite & spriteSize = AGG::GetICN(ICN::REQUESTS, index);
 	display.Blit(spriteSize, dst.x + 45 + spriteCount.w() + 2, dst.y + oy);
 
-	text.Set(info.Name(), (cur == ii ? Font::YELLOW_BIG : Font::BIG));
+	text.Set(info.name, (cur == ii ? Font::YELLOW_BIG : Font::BIG));
 	text.Blit(dst.x + 100, dst.y + oy);
 
-	index = 30 + info.ConditionsWins();
+	index = 30 + info.conditions_wins;
 	const Sprite & spriteWins = AGG::GetICN(ICN::REQUESTS, index);
 	display.Blit(spriteWins, dst.x + 270, dst.y + oy);
 
-	index = 36 + info.ConditionsLoss();
+	index = 36 + info.conditions_loss;
 	const Sprite & spriteLoss = AGG::GetICN(ICN::REQUESTS, index);
 	display.Blit(spriteLoss, dst.x + 270 + spriteWins.w() + 2, dst.y + oy);
 
 	oy += text.h() + 2;
     }
 
-    colors = (*cur).KingdomColors();
-    index = 19 + colors.count();
+    index = 19 + (*cur).KingdomColorsCount();
 
     const Sprite & spriteCount = AGG::GetICN(ICN::REQUESTS, index);
     display.Blit(spriteCount, dst.x + 65, dst.y + 265);
 
-    switch((*cur).SizeMaps().w)
+    switch((*cur).size_w)
     {
 	case Maps::SMALL:	index = 26; break;
         case Maps::MEDIUM:	index = 27; break;
@@ -738,23 +735,23 @@ void RedrawMapsFileList(const Rect & dst, const MapsFileInfoList & lists, MapsFi
     const Sprite & spriteSize = AGG::GetICN(ICN::REQUESTS, index);
     display.Blit(spriteSize, dst.x + 65 + spriteCount.w() + 2, dst.y + 265);
 
-    text.Set((*cur).Name(), Font::BIG);
+    text.Set((*cur).name, Font::BIG);
     text.Blit(dst.x + 190 - text.w() / 2, dst.y + 265);
 
-    index = 30 + (*cur).ConditionsWins();
+    index = 30 + (*cur).conditions_wins;
     const Sprite & spriteWins = AGG::GetICN(ICN::REQUESTS, index);
     display.Blit(spriteWins, dst.x + 275, dst.y + 265);
 
-    index = 36 + (*cur).ConditionsLoss();
+    index = 36 + (*cur).conditions_loss;
     const Sprite & spriteLoss = AGG::GetICN(ICN::REQUESTS, index);
     display.Blit(spriteLoss, dst.x + 275 + spriteWins.w() + 2, dst.y + 265);
 
     text.Set(_("Maps Difficulty:"), Font::BIG);
     text.Blit(dst.x + 70, dst.y + 290);
 
-    text.Set(Difficulty::String((*cur).Difficulty()));
+    text.Set(Difficulty::String((*cur).difficulty));
     text.Blit(dst.x + 275 - text.w() / 2, dst.y + 290);
 
-    TextBox box((*cur).Description(), Font::BIG, 290);
+    TextBox box((*cur).description, Font::BIG, 290);
     box.Blit(dst.x + 45, dst.y + 320);
 }

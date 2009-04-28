@@ -21,6 +21,7 @@
 #define H2DIFFICULTY_H
 
 #include <string>
+#include "gamedefs.h"
 
 namespace Difficulty
 {
@@ -35,7 +36,7 @@ namespace Difficulty
     difficulty_t& operator++ (difficulty_t& difficulty);
     difficulty_t& operator-- (difficulty_t& difficulty);
     
-    const std::string & String(difficulty_t difficulty);
+    const std::string & String(u8);
     difficulty_t Get(u8);
 };
 

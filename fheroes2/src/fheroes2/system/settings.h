@@ -25,6 +25,8 @@
 #include <iostream>
 #include "gamedefs.h"
 #include "difficulty.h"
+#include "race.h"
+#include "color.h"
 #include "maps_fileinfo.h"
 #include "game.h"
 #include "game_io.h"
@@ -76,9 +78,6 @@ public:
     u32 DateBuild(void) const;
     u8 Debug(void) const;
     u8 Animation(void) const;
-
-    const Maps::FileInfo & FileInfo(void) const;
-    Maps::FileInfo & FileInfo(void);
 
     const std::string & DataDirectory(void) const;
     const std::string & MapsDirectory(void) const;
@@ -133,6 +132,20 @@ public:
     void SetLocalDataPrefix(const std::string &);
 
     u16	GetPort(void) const;
+
+    // from maps info
+    Race::race_t KingdomRace(u8) const;
+    void SetKingdomRace(u8, u8);
+    const std::string & MapsFile(void) const;
+    const std::string & MapsName(void) const;
+    const std::string & MapsDescription(void) const;
+    Difficulty::difficulty_t MapsDifficulty(void) const;
+    u8 MapsWidth(void) const;
+    bool AllowColors(u8) const;
+    bool KingdomColors(u8) const;
+    u8 AllowColorsCount(void) const;
+    u8 KingdomColorsCount(void) const;
+    bool MapsWithHeroes(void) const;
 
 protected:
     void Parse(const std::string & left, const std::string & right);

@@ -20,6 +20,7 @@
 
 #include "agg.h"
 #include "settings.h"
+#include "maps.h"
 #include "game_statuswindow.h"
 #include "game_selectobjbar.h"
 #include "game_interface.h"
