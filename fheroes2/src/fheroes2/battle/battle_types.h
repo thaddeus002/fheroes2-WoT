@@ -327,7 +327,7 @@ namespace Battle
         void PerformMagicAnimation(std::vector<Army::BattleTroop*> &, Spell::spell_t, HeroBase *);
 
         long CalculateDamage(const Army::BattleTroop &, const Army::BattleTroop &);
-        bool AdjustMorale(HeroBase *, Army::BattleTroop &);
+        void AdjustMorale(HeroBase *, Army::BattleTroop &);
         void RevertModes(u32, Army::BattleTroop &);
 
         Army::battle_t m_battleStatus;

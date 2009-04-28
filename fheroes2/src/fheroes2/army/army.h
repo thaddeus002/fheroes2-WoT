@@ -50,41 +50,7 @@ namespace Army
 
     const std::string & String(armysize_t);
     armysize_t GetSize(u16);
-
-    enum flags_t
-    {
-        ATTACKED	= 0x00000001,
-
-        RETALIATED      = 0x00000002,
-        HANDFIGHTING	= 0x00000008,
-        
-        LUCK_GOOD	= 0x00000010,
-        LUCK_BAD	= 0x00000020,
-        MORALE_GOOD	= 0x00000040,
-        MORALE_BAD	= 0x00000080,
-        
-        SP_CURE		= 0x00004000,
-        SP_DISPEL	= 0x00008000,
-        SP_BLESS	= 0x00010000,
-        SP_BLODLUST	= 0x00020000,
-        SP_CURSE	= 0x00040000,
-        SP_HASTE	= 0x00080000,
-        SP_SHIELD	= 0x00100000,
-        SP_SLOW		= 0x00200000,
-        SP_STONESKIN	= 0x00400000,
-        SP_BLIND	= 0x00800000,
-        SP_DRAGONSLAYER	= 0x01000000,
-        SP_STEELSKIN	= 0x02000000,
-        SP_ANTIMAGIC	= 0x04000000,
-        SP_PARALYZE	= 0x08000000,
-        SP_BERZERKER	= 0x10000000,
-        SP_HYPNOTIZE	= 0x20000000,
-        SP_STONE	= 0x40000000,
-        SP_DISRUPTINGRAY= 0x80000000,
-        
-        IS_MAGIC        = 0x7FFFC000,
-    };
-
+    
     class army_t
     {
 	public:

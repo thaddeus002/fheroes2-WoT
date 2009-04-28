@@ -116,7 +116,7 @@ int IMG_SavePNG_RW(SDL_RWops *src, SDL_Surface *surf,int compression){
 			SDL_SetError("Couldn't create memory for palette");
 			goto savedone;
 		}
-		for (i=0;i<fmt->palette->ncolors;i++) {
+		for (i=0;(signed int)i<fmt->palette->ncolors;i++) {
 			palette[i].red=fmt->palette->colors[i].r;
 			palette[i].green=fmt->palette->colors[i].g;
 			palette[i].blue=fmt->palette->colors[i].b;
@@ -151,7 +151,7 @@ int IMG_SavePNG_RW(SDL_RWops *src, SDL_Surface *surf,int compression){
 	png_write_info(png_ptr, info_ptr);
 
 	if (fmt->BitsPerPixel==8) { /* Paletted */
-		for(i=0;i<surf->h;i++){
+		for(i=0;(signed int)i<surf->h;i++){
 			row_pointers[i]= ((png_byte*)surf->pixels) + i*surf->pitch;
 		}
 		if(SDL_MUSTLOCK(surf)){
@@ -239,7 +239,7 @@ int IMG_SavePNG_RW(SDL_RWops *src, SDL_Surface *surf,int compression){
 			if (used_alpha) {
 				SDL_SetAlpha(surf,SDL_SRCALPHA,(Uint8)temp_alpha); /* Restore alpha settings*/
 			}
-			for(i=0;i<tempsurf->h;i++){
+			for(i=0;(signed int)i<tempsurf->h;i++){
 				row_pointers[i]= ((png_byte*)tempsurf->pixels) + i*tempsurf->pitch;
 			}
 			if(SDL_MUSTLOCK(tempsurf)){
@@ -251,7 +251,7 @@ int IMG_SavePNG_RW(SDL_RWops *src, SDL_Surface *surf,int compression){
 			}
 			SDL_FreeSurface(tempsurf);
 		} else {
-			for(i=0;i<surf->h;i++){
+			for(i=0;(signed int)i<surf->h;i++){
 				row_pointers[i]= ((png_byte*)surf->pixels) + i*surf->pitch;
 			}
 			if(SDL_MUSTLOCK(surf)){

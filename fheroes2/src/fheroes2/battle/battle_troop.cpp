@@ -340,6 +340,10 @@ void Army::BattleTroop::NewTurn(void)
     ResetModes(Army::ATTACKED);
     ResetModes(Army::RETALIATED);
     ResetModes(Army::HANDFIGHTING);
+    ResetModes(Army::LUCK_GOOD);
+    ResetModes(Army::LUCK_BAD);
+    ResetModes(Army::MORALE_GOOD);
+    ResetModes(Army::MORALE_BAD);
 }
 
 void Army::BattleTroop::SetModes(u32 f)
@@ -497,11 +501,8 @@ u16 Army::BattleTroop::GetDamageVersus(const Army::BattleTroop &defender) const
     if(id == Monster::CRUSADER && defender.GetRace() == Race::NECR)
         dmg *= 2;
     
-    // check luck x2
-    //FIXME: units will receive bonuses every turn after the actual bonus occurs
     if(Modes(LUCK_GOOD)) dmg *= 2;
-    else
-    if(Modes(LUCK_BAD)) dmg /= 2;
+    else if(Modes(LUCK_BAD)) dmg /= 2;
     
     return dmg;
 }

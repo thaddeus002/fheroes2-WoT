@@ -750,7 +750,6 @@ Army::battle_t Battle::BattleControl::RunBattle(HeroBase *hero1, HeroBase *hero2
         if(!Army::isArmyValid(m_battlefield.GetArmy(0)) || !Army::isArmyValid(m_battlefield.GetArmy(1)))
           break;
         
-        bool goodMorale = false;
         Point move(-1, -1), attack(-1, -1);
 
         if(currentTroop == (s8)troopOrder.size())
@@ -776,28 +775,21 @@ Army::battle_t Battle::BattleControl::RunBattle(HeroBase *hero1, HeroBase *hero2
         troop.ResetModes(Army::ATTACKED);
         troop.SetMoving(Army::SELECTED);
 
-        u32 savedModes = (troop.Modes(Army::MORALE_BAD)  ? Army::MORALE_BAD  : 0) |
-                         (troop.Modes(Army::MORALE_GOOD) ? Army::MORALE_GOOD : 0) |
-                         (troop.Modes(Army::LUCK_GOOD)   ? Army::LUCK_GOOD   : 0) |
-                         (troop.Modes(Army::LUCK_BAD)    ? Army::LUCK_BAD    : 0);
+        AdjustMorale(turn[currentTurn]->GetHero(), troop);
         
-        if(AdjustMorale(turn[currentTurn]->GetHero(), troop))
+        if(troop.Modes(Army::MORALE_BAD))
         {
-            if(troop.Modes(Army::MORALE_BAD))
+            if(!BattleSettings::Get().Modes(BattleSettings::OPT_LOGICONLY))
             {
-                if(!BattleSettings::Get().Modes(BattleSettings::OPT_LOGICONLY))
-                {
-                    std::string str = _("Low morale causes the %{name} to freeze in panic.");
-                    std::string monst = troop.GetName();
-                    String::Lower(monst);
-                    String::Replace(str, "%{name}", monst);
-                    m_gui->Status(str);
-                    m_gui->Redraw();
-                    m_battlefield.AnimateMorale(false, troop);
-                }
-                continue;
+                std::string str = _("Low morale causes the %{name} to freeze in panic.");
+                std::string monst = troop.GetName();
+                String::Lower(monst);
+                String::Replace(str, "%{name}", monst);
+                m_gui->Status(str);
+                m_gui->Redraw();
+                m_battlefield.AnimateMorale(false, troop);
             }
-            else goodMorale = true;
+            continue;
         }
         
         status = turn[currentTurn]->Run(troop, troopIdx, move, attack);
@@ -805,7 +797,6 @@ Army::battle_t Battle::BattleControl::RunBattle(HeroBase *hero1, HeroBase *hero2
         {
             PerformMagic(turn[currentTurn]->GetSpellTargets(), m_battlefield.GetHero(currentTurn), turn[currentTurn]->GetSpell());
             currentTroop--;
-            RevertModes(savedModes, troop);
             continue;
         }
         else if(status == GUI::AUTO)
@@ -820,7 +811,6 @@ Army::battle_t Battle::BattleControl::RunBattle(HeroBase *hero1, HeroBase *hero2
         }
         else if(status == GUI::SKIP)
         {
-            RevertModes(savedModes, troop);
             validMove = true;
             continue;
         }
@@ -835,10 +825,7 @@ Army::battle_t Battle::BattleControl::RunBattle(HeroBase *hero1, HeroBase *hero2
         else validMove = true;
         
         if(!BfValid(attack))
-        {
-            RevertModes(savedModes, troop);
             continue;
-        }
 
         bool attackerAlive = true;
         bool defenderAlive = true;
@@ -874,7 +861,7 @@ Army::battle_t Battle::BattleControl::RunBattle(HeroBase *hero1, HeroBase *hero2
         if(!Army::isArmyValid(m_battlefield.GetArmy(0)) || !Army::isArmyValid(m_battlefield.GetArmy(1)))
           break;
 
-        if(goodMorale)
+        if(troop.Modes(Army::MORALE_GOOD))
         {
             currentTroop--;
             if(!BattleSettings::Get().Modes(BattleSettings::OPT_LOGICONLY))
@@ -1083,36 +1070,16 @@ Army::BattleTroop &Battle::BattleControl::NextValidTroop(s8 &currentTroop, Index
     return *troop;
 }
 
-void Battle::BattleControl::RevertModes(u32 prevModes, Army::BattleTroop &troop)
+void Battle::BattleControl::AdjustMorale(HeroBase *hero, Army::BattleTroop &troop)
 {
-    if((prevModes & Army::MORALE_GOOD) == 0)
-        troop.ResetModes(Army::MORALE_GOOD);
-    if((prevModes & Army::MORALE_BAD) == 0)
-        troop.ResetModes(Army::MORALE_BAD);
-    if((prevModes & Army::LUCK_BAD) == 0)
-        troop.ResetModes(Army::LUCK_BAD);
-    if((prevModes & Army::LUCK_GOOD) == 0)
-        troop.ResetModes(Army::LUCK_GOOD);
-}
-
-bool Battle::BattleControl::AdjustMorale(HeroBase *hero, Army::BattleTroop &troop)
-{
-    if(!troop.isAffectedByMorale() || troop.Modes(Army::MORALE_BAD | Army::MORALE_GOOD))   
-       return false;
+    if(!troop.isAffectedByMorale())
+        return;
     
     int m = Rand::Get(1, MORALEBOUND);
     if(hero && hero->GetMorale() >= m)
-    {
         troop.SetModes(Army::MORALE_GOOD);
-        return true;
-    }
     else if(hero && hero->GetMorale() <= -m)
-    {
         troop.SetModes(Army::MORALE_BAD);
-        return true;
-    }
-
-    return false;
 }
 
 namespace Battle
