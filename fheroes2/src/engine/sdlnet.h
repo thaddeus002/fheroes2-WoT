@@ -42,6 +42,8 @@ namespace Network
 	Socket(const TCPsocket);
 	~Socket();
 
+	void		Assign(const TCPsocket);
+
 	bool		Ready(void) const;
 
 	bool		Recv(char *, size_t) const;

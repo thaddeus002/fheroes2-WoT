@@ -313,17 +313,13 @@ Network::Socket::Socket() : sd(NULL), sdset(NULL)
 {
 }
 
-Network::Socket::Socket(const Socket &) : sd(NULL), sdset(NULL)
+Network::Socket::Socket(const TCPsocket csd) : sd(NULL), sdset(NULL)
 {
+    Assign(csd);
 }
 
-Network::Socket::Socket(const TCPsocket csd) : sd(csd), sdset(NULL)
+Network::Socket::Socket(const Socket &) : sd(NULL), sdset(NULL)
 {
-    if(sd)
-    {
-	sdset = SDLNet_AllocSocketSet(1);
-	SDLNet_TCP_AddSocket(sdset, sd);
-    }
 }
 
 Network::Socket & Network::Socket::operator= (const Socket &)
@@ -335,6 +331,19 @@ Network::Socket::~Socket()
 {
     if(sd) Close();
 }
+
+void Network::Socket::Assign(const TCPsocket csd)
+{
+    if(sd) Close();
+
+    if(csd)
+    {
+	sd = csd;
+	sdset = SDLNet_AllocSocketSet(1);
+	if(sdset) SDLNet_TCP_AddSocket(sdset, sd);
+    }
+}
+
 
 u32 Network::Socket::Host(void) const
 {
@@ -378,15 +387,10 @@ bool Network::Socket::Send(const char* buf, size_t len) const
 
 bool Network::Socket::Open(IPaddress & ip)
 {
-    if(sd) Close();
-    sd = SDLNet_TCP_Open(&ip);
+    Assign(SDLNet_TCP_Open(&ip));
+
     if(! sd)
 	std::cerr << "Network::Socket::Open: " << Network::GetError() << std::endl;
-    else
-    {
-	sdset = SDLNet_AllocSocketSet(1);
-	SDLNet_TCP_AddSocket(sdset, sd);
-    }
 
     return sd;
 }
