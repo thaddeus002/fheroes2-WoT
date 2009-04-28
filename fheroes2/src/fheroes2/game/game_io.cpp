@@ -700,10 +700,10 @@ void Game::LoadXML(const std::string &fn)
     conf.current_maps_file.file = maps->Attribute("file");
     //
     node = maps->FirstChildElement("name");
-    if(node) conf.current_maps_file.name = node->GetText();
+    if(node && node->GetText()) conf.current_maps_file.name = node->GetText();
     //
     node = maps->FirstChildElement("description");
-    if(node) conf.current_maps_file.description = node->GetText();
+    if(node && node->GetText()) conf.current_maps_file.description = node->GetText();
     //
     node = maps->FirstChildElement("races");
     if(node)
@@ -1151,7 +1151,7 @@ void Game::LoadXML(const std::string &fn)
 	for(; node; node = node->NextSiblingElement())
 	{
 	    node->Attribute("index", &res);
-	    world.map_sign[res] = node->GetText();
+	    if(node->GetText()) world.map_sign[res] = node->GetText();
 	}
     }
 
@@ -1176,7 +1176,7 @@ void Game::LoadXML(const std::string &fn)
     if(rumors)
     {
 	node = rumors->FirstChildElement();
-	for(; node; node = node->NextSiblingElement())
+	for(; node; node = node->NextSiblingElement()) if(node->GetText())
 	{
 	    world.vec_rumors.push_back(node->GetText());
 	}
@@ -1213,7 +1213,7 @@ void Game::LoadXML(const std::string &fn)
 	    event->subsequent = res;
 	    node->Attribute("colors", &res);
 	    event->colors = res;
-	    event->message = node->GetText();
+	    if(node->GetText()) event->message = node->GetText();
 	    
 	    world.vec_eventsday.push_back(event);
 	}
@@ -1252,7 +1252,7 @@ void Game::LoadXML(const std::string &fn)
 	    event->cancel = str && 0 == std::strcmp(str, "true");
 	    node->Attribute("colors", &res);
 	    event->colors = res;
-	    event->message = node->GetText();
+	    if(node->GetText()) event->message = node->GetText();
 	    
 	    world.vec_eventsmap.push_back(event);
 	}
@@ -1292,14 +1292,14 @@ void Game::LoadXML(const std::string &fn)
 	    if(answers)
 	    {
 		node = answers->FirstChildElement();
-		for(; node; node = node->NextSiblingElement())
+		for(; node; node = node->NextSiblingElement()) if(node->GetText())
 		{
 		    riddle->answers.push_back(node->GetText());
 		}
 	    }
 	    
 	    node = riddle2->FirstChildElement("message");
-	    if(node) riddle->message = node->GetText();
+	    if(node && node->GetText()) riddle->message = node->GetText();
 
 	    world.vec_riddles.push_back(riddle);
 	}
