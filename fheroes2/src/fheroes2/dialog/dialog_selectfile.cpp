@@ -18,7 +18,6 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#include <bitset>
 #include <algorithm>
 #include <string>
 #include "dir.h"
@@ -28,6 +27,8 @@
 #include "difficulty.h"
 #include "splitter.h"
 #include "settings.h"
+#include "maps.h"
+#include "maps_fileinfo.h"
 #include "dialog.h"
 
 
@@ -35,6 +36,8 @@ extern char *basename(const char *path);
 bool SelectFileListSimple(const std::string &, MapsFileInfoList &, std::string &, bool);
 void RedrawFileListSimple(const Rect &, const std::string &, const std::string & filename, const MapsFileInfoList &, MapsFileInfoList::const_iterator, MapsFileInfoList::const_iterator, const u8);
 void RedrawMapsFileList(const Rect &, const MapsFileInfoList &, MapsFileInfoList::const_iterator, MapsFileInfoList::const_iterator, const u8);
+bool DialogSelectMapsFileList(MapsFileInfoList &, std::string &);
+bool PrepareMapsFileInfoList(MapsFileInfoList &);
 
 void ResizeToShortName(const std::string & str, std::string & res)
 {
@@ -117,7 +120,7 @@ bool SelectFileListSimple(const std::string & header, MapsFileInfoList & lists, 
     else
     {
 	if(lists.empty()) buttonOk.SetDisable(true);
-	ResizeToShortName((*cur).FileMaps(), filename);
+	ResizeToShortName((*cur).file, filename);
     }
 
     RedrawFileListSimple(rt, header, filename, lists, top, cur, max_items);
@@ -148,7 +151,7 @@ bool SelectFileListSimple(const std::string & header, MapsFileInfoList & lists, 
 		result = Settings::Get().LocalDataPrefix() + SEPARATOR + "save" + SEPARATOR + filename + ".sav";
     	    else
     	    if(cur != lists.end())
-    		result = (*cur).FileMaps();
+    		result = (*cur).file;
     	    break;
     	}
     	else
@@ -238,7 +241,8 @@ bool SelectFileListSimple(const std::string & header, MapsFileInfoList & lists, 
 		default: break;
 	    }
 
-	    if(filename.empty()) buttonOk.SetDisable(true);
+	    buttonOk.SetDisable(filename.empty());
+
 	    redraw = true;
 	}
 
@@ -267,6 +271,7 @@ bool SelectFileListSimple(const std::string & header, MapsFileInfoList & lists, 
 	    }
 	    split.Move(top - lists.begin());
 	    redraw = true;
+	    edit_mode = false;
 	}
 
         if(le.KeyPress(KEY_DOWN) && (cur < (lists.end() - 1)))
@@ -281,6 +286,7 @@ bool SelectFileListSimple(const std::string & header, MapsFileInfoList & lists, 
 	    }
 	    split.Move(top - lists.begin());
 	    redraw = true;
+	    edit_mode = false;
 	}
 
 	if((le.MouseWheelUp(list_rt) || le.MouseWheelUp(split.GetRect())) && (top > lists.begin()))
@@ -312,10 +318,10 @@ bool SelectFileListSimple(const std::string & header, MapsFileInfoList & lists, 
 	{
 	    std::string msg(_("Are you sure you want to delete file:"));
 	    msg.append("\n \n");
-	    msg.append(basename((*cur).FileMaps().c_str()));
+	    msg.append(basename((*cur).file.c_str()));
 	    if(Dialog::YES == Dialog::Message(_("Warning!"), msg, Font::BIG, Dialog::YES | Dialog::NO))
 	    {
-		unlink((*cur).FileMaps().c_str());
+		unlink((*cur).file.c_str());
 		lists.erase(cur);
 		if(lists.empty() || filename.empty()) buttonOk.SetDisable(true);
 		top = lists.begin();
@@ -328,23 +334,34 @@ bool SelectFileListSimple(const std::string & header, MapsFileInfoList & lists, 
 
 	if(le.MouseClickLeft(list_rt) && lists.size())
 	{
-	    cur = top + static_cast<size_t>((le.MouseReleaseLeft().y - list_rt.y) * max_items / static_cast<float>(list_rt.h));
-	    if(cur > (lists.end() - 1)) cur = lists.end() - 1;
+	    MapsFileInfoList::iterator cur2 = top + static_cast<size_t>((le.MouseReleaseLeft().y - list_rt.y) * max_items / static_cast<float>(list_rt.h));
+	    if(cur2 > (lists.end() - 1)) cur2 = lists.end() - 1;
+	    // double click
+	    if(cur2 == cur)
+	    {
+    		result = (*cur).file;
+    		break;
+	    }
+	    else
+		cur = cur2;
 	    redraw = true;
+	    edit_mode = false;
 	}
 
 	if(redraw)
 	{
 	    cursor.Hide();
 
-	    if(cur != lists.end())
+	    if(edit_mode && editor)
 	    {
-		ResizeToShortName((*cur).FileMaps(), filename);
-		RedrawFileListSimple(rt, header, filename, lists, top, cur, max_items);
+		RedrawFileListSimple(rt, header, filename + "_", lists, top, cur, max_items);
 	    }
 	    else
-	    if(editor)
-		RedrawFileListSimple(rt, header, filename + "_", lists, top, cur, max_items);
+	    if(cur != lists.end())
+	    {
+	    	ResizeToShortName((*cur).file, filename);
+		RedrawFileListSimple(rt, header, filename, lists, top, cur, max_items);
+	    }
 
 	    buttonOk.Draw();
 	    buttonCancel.Draw();
@@ -381,11 +398,11 @@ void RedrawFileListSimple(const Rect & dst, const std::string & header, const st
     {
 	const Maps::FileInfo & info = *ii;
 
-	const std::string name(basename(info.FileMaps().c_str()));
+	const std::string name(basename(info.file.c_str()));
 
-	std::strftime(short_date, 14, "%b %d, %H:%M", std::localtime(&info.Time()));
+	std::strftime(short_date, 14, "%b %d, %H:%M", std::localtime(&info.localtime));
 
-	text.Set(basename(info.FileMaps().c_str()), (cur == ii ? Font::YELLOW_BIG : Font::BIG));
+	text.Set(basename(info.file.c_str()), (cur == ii ? Font::YELLOW_BIG : Font::BIG));
 	text.Blit(dst.x + 45, dst.y + oy);
 
 	text.Set(short_date, (cur == ii ? Font::YELLOW_BIG : Font::BIG));
@@ -401,7 +418,46 @@ void RedrawFileListSimple(const Rect & dst, const std::string & header, const st
     }
 }
 
-bool Dialog::SelectMapsFileList(MapsFileInfoList & lists, std::string & filename)
+bool Dialog::SelectMapsFile(std::string & filename)
+{
+    MapsFileInfoList lists;
+
+    return PrepareMapsFileInfoList(lists) && DialogSelectMapsFileList(lists, filename);
+}
+
+bool PrepareMapsFileInfoList(MapsFileInfoList & lists)
+{
+    Settings & conf = Settings::Get();
+    Dir dir;
+
+    dir.Read(conf.MapsDirectory(), ".mp2", false);
+    // loyality version
+    if(conf.Modes(Settings::PRICELOYALTY)) dir.Read(conf.MapsDirectory(), ".mx2", false);
+
+    if(dir.empty())
+    {
+        Dialog::Message(_("Warning"), _("No maps available!"), Font::BIG, Dialog::OK);
+        return false;
+    }
+
+    lists.resize(dir.size());
+    MapsFileInfoList::const_iterator res;
+    int ii = 0;
+
+    for(Dir::const_iterator itd = dir.begin(); itd != dir.end(); ++itd, ++ii)
+    if(lists[ii].ReadBIN(*itd))
+    {
+        if(conf.PreferablyCountPlayers() > lists[ii].AllowColorsCount()) --ii;
+    }
+    else --ii;
+    if(static_cast<size_t>(ii) != lists.size()) lists.resize(ii);
+
+    std::sort(lists.begin(), lists.end(), Maps::FileInfo::PredicateForSorting);
+
+    return true;
+}
+
+bool DialogSelectMapsFileList(MapsFileInfoList & lists, std::string & filename)
 {
     AGG::PreloadObject(ICN::REQSBKG);
     AGG::PreloadObject(ICN::REQUEST);
@@ -429,7 +485,7 @@ bool Dialog::SelectMapsFileList(MapsFileInfoList & lists, std::string & filename
 
     for(; cur != all.end(); ++ cur)
     {
-	switch((*cur).SizeMaps().w)
+	switch((*cur).size_w)
 	{
     	    case Maps::SMALL:	small.push_back(*cur); break;
     	    case Maps::MEDIUM:	medium.push_back(*cur); break;
@@ -579,8 +635,16 @@ bool Dialog::SelectMapsFileList(MapsFileInfoList & lists, std::string & filename
 
 	if(le.MouseClickLeft(list_rt) && curlist->size())
 	{
-	    cur = top + static_cast<size_t>((le.MouseReleaseLeft().y - list_rt.y) * max_items / static_cast<float>(list_rt.h));
-	    if(cur > (curlist->end() - 1)) cur = curlist->end() - 1;
+	    MapsFileInfoList::iterator cur2 = top + static_cast<size_t>((le.MouseReleaseLeft().y - list_rt.y) * max_items / static_cast<float>(list_rt.h));
+	    if(cur2 > (curlist->end() - 1)) cur2 = curlist->end() - 1;
+	    // double click
+	    if(cur == cur2)
+	    {
+		res = true;
+		break;
+	    }
+	    else
+		cur = cur2;
 	    redraw = true;
 	}
 
@@ -658,7 +722,7 @@ bool Dialog::SelectMapsFileList(MapsFileInfoList & lists, std::string & filename
 	}
     }
 
-    filename = (*cur).FileMaps();
+    filename = (*cur).file;
 
     cursor.Hide();
     back.Restore();
@@ -676,19 +740,17 @@ void RedrawMapsFileList(const Rect & dst, const MapsFileInfoList & lists, MapsFi
     Text text;
     u16 oy = 60;
     u8 index = 0;
-    std::bitset<8> colors;
 
     for(MapsFileInfoList::const_iterator ii = top; ii != lists.end() && (ii - top < max_items); ++ii)
     {
 	const Maps::FileInfo & info = *ii;
 
-	colors = info.KingdomColors();
-	index = 19 + colors.count();
+	index = 19 + info.KingdomColorsCount();
 
 	const Sprite & spriteCount = AGG::GetICN(ICN::REQUESTS, index);
 	display.Blit(spriteCount, dst.x + 45, dst.y + oy);
 
-	switch(info.SizeMaps().w)
+	switch(info.size_w)
 	{
             case Maps::SMALL:	index = 26; break;
             case Maps::MEDIUM:	index = 27; break;
@@ -700,27 +762,26 @@ void RedrawMapsFileList(const Rect & dst, const MapsFileInfoList & lists, MapsFi
 	const Sprite & spriteSize = AGG::GetICN(ICN::REQUESTS, index);
 	display.Blit(spriteSize, dst.x + 45 + spriteCount.w() + 2, dst.y + oy);
 
-	text.Set(info.Name(), (cur == ii ? Font::YELLOW_BIG : Font::BIG));
+	text.Set(info.name, (cur == ii ? Font::YELLOW_BIG : Font::BIG));
 	text.Blit(dst.x + 100, dst.y + oy);
 
-	index = 30 + info.ConditionsWins();
+	index = 30 + info.conditions_wins;
 	const Sprite & spriteWins = AGG::GetICN(ICN::REQUESTS, index);
 	display.Blit(spriteWins, dst.x + 270, dst.y + oy);
 
-	index = 36 + info.ConditionsLoss();
+	index = 36 + info.conditions_loss;
 	const Sprite & spriteLoss = AGG::GetICN(ICN::REQUESTS, index);
 	display.Blit(spriteLoss, dst.x + 270 + spriteWins.w() + 2, dst.y + oy);
 
 	oy += text.h() + 2;
     }
 
-    colors = (*cur).KingdomColors();
-    index = 19 + colors.count();
+    index = 19 + (*cur).KingdomColorsCount();
 
     const Sprite & spriteCount = AGG::GetICN(ICN::REQUESTS, index);
     display.Blit(spriteCount, dst.x + 65, dst.y + 265);
 
-    switch((*cur).SizeMaps().w)
+    switch((*cur).size_w)
     {
 	case Maps::SMALL:	index = 26; break;
         case Maps::MEDIUM:	index = 27; break;
@@ -732,23 +793,23 @@ void RedrawMapsFileList(const Rect & dst, const MapsFileInfoList & lists, MapsFi
     const Sprite & spriteSize = AGG::GetICN(ICN::REQUESTS, index);
     display.Blit(spriteSize, dst.x + 65 + spriteCount.w() + 2, dst.y + 265);
 
-    text.Set((*cur).Name(), Font::BIG);
+    text.Set((*cur).name, Font::BIG);
     text.Blit(dst.x + 190 - text.w() / 2, dst.y + 265);
 
-    index = 30 + (*cur).ConditionsWins();
+    index = 30 + (*cur).conditions_wins;
     const Sprite & spriteWins = AGG::GetICN(ICN::REQUESTS, index);
     display.Blit(spriteWins, dst.x + 275, dst.y + 265);
 
-    index = 36 + (*cur).ConditionsLoss();
+    index = 36 + (*cur).conditions_loss;
     const Sprite & spriteLoss = AGG::GetICN(ICN::REQUESTS, index);
     display.Blit(spriteLoss, dst.x + 275 + spriteWins.w() + 2, dst.y + 265);
 
     text.Set(_("Maps Difficulty:"), Font::BIG);
     text.Blit(dst.x + 70, dst.y + 290);
 
-    text.Set(Difficulty::String((*cur).Difficulty()));
+    text.Set(Difficulty::String((*cur).difficulty));
     text.Blit(dst.x + 275 - text.w() / 2, dst.y + 290);
 
-    TextBox box((*cur).Description(), Font::BIG, 290);
+    TextBox box((*cur).description, Font::BIG, 290);
     box.Blit(dst.x + 45, dst.y + 320);
 }
