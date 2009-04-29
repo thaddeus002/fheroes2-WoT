@@ -169,7 +169,9 @@ namespace Battle
         Battlefield(Castle *, HeroBase *, HeroBase *, Army::army_t &, Army::army_t &, const Point &, const Maps::Tiles &);
         ~Battlefield();
 
+        void InitializeArmies();
         Army::BattleArmy_t &GetArmy(u8);
+        void SetArmy(u8, Army::army_t &);
         HeroBase *GetHero(u8);
         void SetHero(u8, HeroBase *);
         TroopIndex GetIndexFromTroop(const Army::BattleTroop &);
@@ -311,7 +313,7 @@ namespace Battle
         void NewTurn();
         void PerformTowerAttack(const Point &, const Point &, BattleCastle::CastlePieces);
         Army::battle_t RunBattle(HeroBase *, HeroBase *);
-        bool ShowLeftHeroResults(HeroBase *right, Army::battle_t result);
+        bool ShowLeftHeroResults(HeroBase &left, HeroBase *right, Army::battle_t result);
         u32 CalculateRaisedDead(HeroBase &hero, u32 perished);
         Spell::spell_t GetLearnedSpell(HeroBase &hero, std::vector<Spell::spell_t> &castSpells);
         u32 BattleSummaryVsArmy(HeroBase &, const Army::BattleArmy_t &, const Army::BattleArmy_t &, const Army::BattleArmy_t &);

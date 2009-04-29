@@ -43,7 +43,7 @@
 #define PlaySoundFailure	PlayMusicReplacement(M82::H2MINE)
 #define PlaySoundVisited	PlayMusicReplacement(M82::RSBRYFZL)
 
-void ActionToCastle(Heroes &hero, const u8 obj, const u16 dst_index);
+Army::battle_t ActionToCastle(Heroes &hero, const u8 obj, const u16 dst_index);
 void ActionToHeroes(Heroes &hero, const u8 obj, const u16 dst_index);
 void ActionToMonster(Heroes &hero, const u8 obj, const u16 dst_index);
 void ActionToBoat(Heroes &hero, const u8 obj, const u16 dst_index);
@@ -613,88 +613,98 @@ void ActionToHeroes(Heroes &hero, const u8 obj, const u16 dst_index)
     }
     else
     {
-	if(Settings::Get().Debug()) Error::Verbose("ActionToHeroes: " + hero.GetName() + " attack enemy hero " + other_hero->GetName());
-    u32 exp = 0; 
-    const Army::battle_t b = Army::Battle(hero, const_cast<Heroes &>(*other_hero), world.GetTiles(dst_index), exp);
+        if(Settings::Get().Debug()) Error::Verbose("ActionToHeroes: " + hero.GetName() + " attack enemy hero " + other_hero->GetName());
 
-	switch(b)
-	{
-	    case Army::WIN:
-		hero.TakeArtifacts(const_cast<Heroes &>(*other_hero));
-		hero.IncreaseExperience(exp);
-		AGG::PlaySound(M82::KILLFADE);
-		(*other_hero).FadeOut();
-    		world.GetKingdom((*other_hero).GetColor()).RemoveHeroes(other_hero);
-    		const_cast<Heroes &>(*other_hero).SetFreeman(b);
-	        // set default army
-		const_cast<Heroes &>(*other_hero).GetArmy().Reset(true);
-		hero.ActionAfterBattle();
-		break;
+        Army::battle_t b;
+        u32 exp = 0;
 
-	    case Army::LOSE:
-	    case Army::RETREAT:
-	    case Army::SURRENDER:
-		BattleLose(hero, b);
-		break;
+        if(other_hero->GetUnderObject() == MP2::OBJ_CASTLE)
+            b = ActionToCastle(hero, MP2::OBJ_CASTLE, dst_index);
+        else b = Army::Battle(hero, const_cast<Heroes &>(*other_hero), world.GetTiles(dst_index), exp);
+
+        switch(b)
+        {
+            case Army::WIN:
+                hero.TakeArtifacts(const_cast<Heroes &>(*other_hero));
+                hero.IncreaseExperience(exp);
+                AGG::PlaySound(M82::KILLFADE);
+                (*other_hero).FadeOut();
+                world.GetKingdom((*other_hero).GetColor()).RemoveHeroes(other_hero);
+                const_cast<Heroes &>(*other_hero).SetFreeman(b);
+                // set default army
+                const_cast<Heroes &>(*other_hero).GetArmy().Reset(true);
+                hero.ActionAfterBattle();
+                break;
+
+            case Army::LOSE:
+            case Army::RETREAT:
+            case Army::SURRENDER:
+                BattleLose(hero, b);
+                break;
 
             default: break;
-	}
+        }
     }
 }
 
-void ActionToCastle(Heroes &hero, const u8 obj, const u16 dst_index)
+Army::battle_t ActionToCastle(Heroes &hero, const u8 obj, const u16 dst_index)
 {
     const Castle *castle = world.GetCastle(dst_index);
 
-    if(! castle) return;
+    if(! castle) return Army::WIN;
 
     if(hero.GetColor() == castle->GetColor())
     {
-	if(Settings::Get().Debug()) Error::Verbose("ActionToCastle: " + hero.GetName() + " goto castle " + castle->GetName());
+        if(Settings::Get().Debug()) Error::Verbose("ActionToCastle: " + hero.GetName() + " goto castle " + castle->GetName());
 
-	Mixer::Reduce();
+        Mixer::Reduce();
 
-	if(Settings::Get().Original() && hero.GetSpellBook()) hero.AppendSpellsToBook(castle->GetMageGuild());
-	const_cast<Castle *>(castle)->OpenDialog();
+        if(Settings::Get().Original() && hero.GetSpellBook()) hero.AppendSpellsToBook(castle->GetMageGuild());
+        const_cast<Castle *>(castle)->OpenDialog();
 
-	Mixer::Enhance();
+        Mixer::Enhance();
     }
     else
     {
-	if(Settings::Get().Debug()) Error::Verbose("ActionToCastle: " + hero.GetName() + " attack enemy castle " + castle->GetName());
+        if(Settings::Get().Debug()) Error::Verbose("ActionToCastle: " + hero.GetName() + " attack enemy castle " + castle->GetName());
+        
+        u32 exp = 0;
+        Army::battle_t b;
 
-	u32 exp = 0;
-	Army::battle_t b;
-	Army::army_t army = castle->GetActualArmy();
+        const_cast<Castle *>(castle)->MergeArmies();
+        Army::army_t army = castle->GetActualArmy();
+        
+        if(army.isValid())
+        {
+            if(castle->isCastle())
+                b = Army::Battle(hero, const_cast<Castle &>(*castle), world.GetTiles(dst_index), exp);
+            else b = Army::Battle(hero, army, world.GetTiles(dst_index), exp);
+        }
+        else b = Army::WIN;
 
-	if(army.isValid())
-	{
-    	    if(castle->isCastle())
-        	b = Army::Battle(hero, const_cast<Castle &>(*castle), world.GetTiles(dst_index), exp);
-    	    else b = Army::Battle(hero, army, world.GetTiles(dst_index), exp);
-	}
-	else b = Army::WIN;
+        switch(b)
+        {
+            case Army::WIN:
+                if(exp) hero.IncreaseExperience(exp);
+                world.GetKingdom(castle->GetColor()).RemoveCastle(castle);
+                world.GetKingdom(hero.GetColor()).AddCastle(castle);
+                world.CaptureObject(dst_index, hero.GetColor());
+                Game::SelectBarCastle::Get().Redraw();
+                if(exp) hero.ActionAfterBattle();
+                break;
 
-	switch(b)
-	{
-	    case Army::WIN:
-		if(exp) hero.IncreaseExperience(exp);
-		world.GetKingdom(castle->GetColor()).RemoveCastle(castle);
-		world.GetKingdom(hero.GetColor()).AddCastle(castle);
-		world.CaptureObject(dst_index, hero.GetColor());
-		Game::SelectBarCastle::Get().Redraw();
-		if(exp) hero.ActionAfterBattle();
-		break;
-
-	    case Army::LOSE:
-	    case Army::RETREAT:
-	    case Army::SURRENDER:
-		BattleLose(hero, b);
-		break;
+            case Army::LOSE:
+            case Army::RETREAT:
+            case Army::SURRENDER:
+                BattleLose(hero, b);
+                break;
 
             default: break;
-	}
+        }
+        return b;
     }
+
+    return Army::WIN;
 }
 
 void ActionToBoat(Heroes &hero, const u8 obj, const u16 dst_index)

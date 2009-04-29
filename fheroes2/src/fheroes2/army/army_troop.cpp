@@ -99,12 +99,14 @@ u16 Army::Troop::Count(void) const
 
 u8 Army::Troop::GetAttack(void) const
 {
-    return army && army->commander ? army->commander->GetAttack() + Monster::GetAttack() : Monster::GetAttack();
+    return Monster::GetAttack() +
+            army && army->commander ? army->commander->GetAttack() : 0;
 }
 
 u8 Army::Troop::GetDefense(void) const
 {
-    return army && army->commander ? army->commander->GetDefense() + Monster::GetDefense() : Monster::GetDefense();
+    return Monster::GetDefense() +
+            army && army->commander ? army->commander->GetDefense() : 0;
 }
 
 Color::color_t Army::Troop::GetColor(void) const

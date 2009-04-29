@@ -342,7 +342,7 @@ bool Army::army_t::JoinTroop(const Troop & troop)
 	return true;
     }
 
-    return true;
+    return false;
 }
 
 bool Army::army_t::isValid(void) const

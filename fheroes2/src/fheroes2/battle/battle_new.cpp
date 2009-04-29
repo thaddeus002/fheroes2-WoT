@@ -503,35 +503,19 @@ Battle::BattleControl::BattleControl(Heroes &hero, Army::army_t& army, const Map
 }
 
 Battle::BattleControl::BattleControl(Heroes &hero, Castle &castle, const Maps::Tiles &tile, u32 &exp)
-: m_battlefield(&castle, &hero, NULL, hero.GetArmy(), castle.GetArmy(), g_baseOffset, tile)
+: m_battlefield(&castle, &hero, NULL, hero.GetArmy(), castle.GetActualArmy(), g_baseOffset, tile)
 {
     Army::BattleArmy_t heroArmyOrig, oppArmy, oppArmyOrig;
     ArmyToBattleArmy(hero.GetArmy(), heroArmyOrig);
+    ArmyToBattleArmy(castle.GetActualArmy(), oppArmyOrig);
+
     HeroBase *hero2 = castle.GetHeroes() != &hero ? castle.GetHeroes() : NULL;
-    if(hero2)
-    {
-        u8 idx = 0;
-        while(idx < ARMYMAXTROOPS)
-        {
-            Army::Troop &troop = castle.GetArmy().At(idx);
-            if(!hero2->GetArmy().JoinTroop(troop))
-                break;
-            troop.SetCount(0);
-            idx++;
-        }
-        
-        ArmyToBattleArmy(hero2->GetArmy(), oppArmyOrig);
-    }
-    else
-    {
-        if(castle.GetCaptain().isValid())
-            hero2 = &castle.GetCaptain();
-        ArmyToBattleArmy(castle.GetArmy(), oppArmyOrig);
-    }
+    if(!hero2 && castle.GetCaptain().isValid())
+        hero2 = &castle.GetCaptain();
     m_battlefield.SetHero(1, hero2);
 
     m_commanders[0] = hero.GetArmy().GetCommander();
-    m_commanders[1] = castle.GetArmy().GetCommander();
+    m_commanders[1] = hero2;
     
     m_battleStatus = RunBattle(&hero, hero2);
     BattleArmyToArmy(m_battlefield.GetArmy(0), hero.GetArmy());
@@ -552,12 +536,15 @@ Battle::BattleControl::BattleControl(Heroes &hero, Castle &castle, const Maps::T
 
 Battle::BattleControl::~BattleControl()
 {
-    if(m_gui) delete m_gui;
+    delete m_gui;
 }
 
-bool Battle::BattleControl::ShowLeftHeroResults(HeroBase *right, Army::battle_t result)
+bool Battle::BattleControl::ShowLeftHeroResults(HeroBase &left, HeroBase *right, Army::battle_t result)
 {
-    if(right && world.GetKingdom(right->GetColor()).Control() == Game::LOCAL &&
+    if(world.GetKingdom(left.GetColor()).Control() == Game::LOCAL &&
+       world.GetMyKingdom().GetColor() == left.GetColor())
+        return true;
+    else if(right && world.GetKingdom(right->GetColor()).Control() == Game::LOCAL &&
        world.GetMyKingdom().GetColor() == right->GetColor())
         return false;
     else return true;
@@ -643,7 +630,7 @@ u32 Battle::BattleControl::BattleSummaryVsHero(HeroBase &hero, const Army::Battl
     const BagArtifacts *artifacts = NULL;
     HeroBase *target = NULL, *other = NULL;
     u32 exp = 0;
-    bool leftResults = ShowLeftHeroResults(&hero2, m_battleStatus);
+    bool leftResults = ShowLeftHeroResults(hero, &hero2, m_battleStatus);
     bool success = false;
     if(leftResults)
     {
@@ -2482,6 +2469,8 @@ namespace Battle
     Battlefield::Battlefield(Castle *castle, HeroBase *hero1, HeroBase *hero2, Army::army_t &army1, Army::army_t &army2, const Point &pt, const Maps::Tiles &tiles)
     : m_background(pt, tiles)
     {
+        m_army[0] = m_army[1] = NULL;
+        
         if(!castle)
         {
             m_castle = NULL;
@@ -2495,25 +2484,28 @@ namespace Battle
             m_blockedCells.push_back(Point(0, 7)); //Block catapult cell, but nothing on battlefield
         }
 
-        m_army[0] = new Army::BattleArmy_t;
-        Army::ArmyToBattleArmy(army1, *m_army[0]);
-        m_army[1] = new Army::BattleArmy_t;
-        Army::ArmyToBattleArmy(army2, *m_army[1]);
+        SetArmy(0, army1);
+        SetArmy(1, army2);
 
         m_hero[0] = hero1;
         m_hero[1] = hero2;
-        
-        //TODO: Derive compact parameter from hero screen settings
-        InitArmyPosition(*m_army[0], false, false);
-        InitArmyPosition(*m_army[1], false, true);
+
+        InitializeArmies();
     }
 
     Battlefield::~Battlefield()
     {
-        if(m_castle) delete m_castle;
-	if(m_catapult) delete m_catapult;
-	if(m_army[0]) delete m_army[0];
-	if(m_army[1]) delete m_army[1];
+        delete m_castle;
+        delete m_catapult;
+        delete m_army[0];
+        delete m_army[1];
+    }
+
+    void Battlefield::InitializeArmies()
+    {
+        //TODO: Derive compact parameter from hero screen settings
+        InitArmyPosition(*m_army[0], false, false);
+        InitArmyPosition(*m_army[1], false, true);
     }
 
     /** Remove any units from the battle that are dead.
@@ -2558,6 +2550,13 @@ namespace Battle
     Army::BattleArmy_t &Battlefield::GetArmy(u8 num)
     {
         return *m_army[num];
+    }
+
+    void Battlefield::SetArmy(u8 num, Army::army_t &army)
+    {
+        delete m_army[num];
+        m_army[num] = new Army::BattleArmy_t;
+        Army::ArmyToBattleArmy(army, *m_army[num]);
     }
 
     HeroBase *Battlefield::GetHero(u8 num)

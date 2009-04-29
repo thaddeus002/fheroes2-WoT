@@ -1537,6 +1537,22 @@ Army::army_t & Castle::GetArmy(void)
     return army;
 }
 
+void Castle::MergeArmies(void)
+{
+    Heroes *hero = GetHeroes();
+    if(!hero)
+        return;
+
+    u8 idx = 0;
+    while(idx < ARMYMAXTROOPS)
+    {
+        Army::Troop &troop = GetArmy().At(idx);
+        if(hero->GetArmy().JoinTroop(troop))
+            troop.SetCount(0);
+        idx++;
+    }
+}
+
 const Army::army_t & Castle::GetActualArmy(void) const
 {
     const Heroes *heroes = GetHeroes();

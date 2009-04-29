@@ -10,6 +10,9 @@ Users
 + Fixed music restarting with every step taken by a player's hero.
 + Fixed relatively rare crash involving the AI and ranged units in battle,
   most obvious in the opening turn of Dragon Rider.
++ If a hero is attacked while in a castle, a castle battle is now initiated,
+  and as many troops as possible in the castle's army are moved into the
+  defending hero's army.
 
 Developers
 +
