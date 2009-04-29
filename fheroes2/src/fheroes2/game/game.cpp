@@ -194,11 +194,12 @@ Game::control_t Game::GetControl(u8 index)
     return NONE;
 }
 
-u8 Game::GetRating(u8 maps, u8 game)
+u8 Game::GetRating(void)
 {
+    Settings & conf = Settings::Get();
     u8 rating = 50;
 
-    switch(maps)
+    switch(conf.MapsDifficulty())
     {
         case Difficulty::NORMAL:     rating += 20; break;
         case Difficulty::HARD:       rating += 40; break;
@@ -207,7 +208,7 @@ u8 Game::GetRating(u8 maps, u8 game)
 	default: break;
     }
 
-    switch(game)
+    switch(conf.GameDifficulty())
     {
         case Difficulty::NORMAL:     rating += 30; break;
         case Difficulty::HARD:       rating += 50; break;
@@ -217,4 +218,37 @@ u8 Game::GetRating(u8 maps, u8 game)
     }
 
     return rating;
+}
+
+u16 Game::GetGameOverScores(void)
+{
+    Settings & conf = Settings::Get();
+
+    u8 k_size = 0;
+
+    switch(conf.MapsWidth())
+    {
+	case Maps::SMALL:	k_size = 140; break;
+	case Maps::MEDIUM:	k_size = 100; break;
+	case Maps::LARGE:	k_size =  80; break;
+	case Maps::XLARGE:	k_size =  60; break;
+	default: break;
+    }
+
+    u8 flag = 0;
+    u8 nk = 0;
+    u16 end_days = world.CountDay();
+
+    for(u16 ii = 1; ii <= end_days; ++ii)
+    {
+	nk = ii * k_size / 100;
+
+	if(0 == flag && nk > 60){ end_days = ii + (world.CountDay() - ii) / 2; flag = 1; }
+	else
+	if(1 == flag && nk > 120) end_days = ii + (world.CountDay() - ii) / 2;
+	else
+	if(nk > 180) break;
+    }
+
+    return GetRating() * (200 - nk) / 100;
 }

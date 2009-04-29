@@ -515,11 +515,9 @@ u8 GetAllowChangeRaces(void)
 
 void RedrawRatingInfo(TextSprite & sprite)
 {
-    const Settings & conf = Settings::Get();
     sprite.Hide();
-
     std::string str(_("Rating %{rating}%"));
-    String::Replace(str, "%{rating}", Game::GetRating(conf.MapsDifficulty(), conf.GameDifficulty()));
+    String::Replace(str, "%{rating}", Game::GetRating());
     sprite.SetText(str);
     sprite.Show();
 }

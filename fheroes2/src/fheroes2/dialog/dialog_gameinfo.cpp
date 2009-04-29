@@ -69,7 +69,7 @@ void Dialog::GameInfo(void)
     text.Blit(pt.x + 140, pt.y + 80);
 
     std::string str;
-    String::AddInt(str, Game::GetRating(conf.MapsDifficulty(), conf.GameDifficulty()));
+    String::AddInt(str, Game::GetRating());
     str.append(" %");
     text.Set(str, Font::SMALL, 80);
     text.Blit(pt.x + 230, pt.y + 80);
@@ -98,12 +98,16 @@ void Dialog::GameInfo(void)
     text.Set(GameOverConditions::Wins(conf.ConditionWins()), Font::SMALL, 272);
     text.Blit(pt.x + 114, pt.y + 348);
 
-
     text.Set(_("Loss\nConditions"), Font::SMALL, 80);
     text.Blit(pt.x + 40, pt.y + 390);
 
     text.Set(GameOverConditions::Loss(conf.ConditionLoss()), Font::SMALL, 272);
     text.Blit(pt.x + 114, pt.y + 396);
+
+    str = "score: ";
+    String::AddInt(str, Game::GetGameOverScores());
+    text.Set(str, Font::YELLOW_SMALL, 80);
+    text.Blit(pt.x + 415 - text.w(), pt.y + 434);
 
     Button button(pt.x + 180, pt.y + 425, ICN::SYSTEM, 1, 2);
     button.Draw();

@@ -100,7 +100,8 @@ namespace Game
     void PreloadLOOPSounds(void);
     void EnvironmentSoundMixer(void);
 
-    u8 GetRating(u8, u8);
+    u8  GetRating(void);
+    u16 GetGameOverScores(void);
 
     namespace Editor
     {
