@@ -5,6 +5,8 @@ Users
 + Double clicking on an entry in a file selection box will choose that item.
 + Added spanish translation.
 + Multiple events can now occur on the same day.
++ Fixed bug causing obelisks not to be counted past the first visited,
+  causing maps like Dragon Rider to now work.
 
 Developers
 +
