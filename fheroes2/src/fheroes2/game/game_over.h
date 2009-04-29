@@ -27,20 +27,20 @@ namespace GameOverConditions
 {
     enum wins_t
     {
-	WINS_ALL,
-	WINS_TOWN,
-	WINS_HERO,
-	WINS_ARTIFACT,
-	WINS_SIDE,
-	WINS_GOLD,
+	WINS_ALL	= 0x01,
+	WINS_TOWN	= 0x02,
+	WINS_HERO	= 0x04,
+	WINS_ARTIFACT	= 0x08,
+	WINS_SIDE	= 0x10,
+	WINS_GOLD	= 0x20,
     };
 
     enum loss_t
     {
-	LOSS_ALL,
-	LOSS_TOWN,
-	LOSS_HERO,
-	LOSS_TIME,
+	LOSS_ALL	= 0x01,
+	LOSS_TOWN	= 0x02,
+	LOSS_HERO	= 0x04,
+	LOSS_TIME	= 0x08,
     };
 
     const std::string & Wins(wins_t);

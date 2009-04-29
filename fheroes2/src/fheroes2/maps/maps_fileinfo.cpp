@@ -454,12 +454,12 @@ GameOverConditions::loss_t Maps::FileInfo::ConditionLoss(void) const
 
 bool Maps::FileInfo::WinsCompAlsoWins(void) const
 {
-    return wins1;
+    return ((GameOverConditions::WINS_TOWN | GameOverConditions::WINS_GOLD) & ConditionWins()) && wins1;
 }
 
 bool Maps::FileInfo::WinsAllowNormalVictory(void) const
 {
-    return wins2;
+    return ((GameOverConditions::WINS_TOWN | GameOverConditions::WINS_ARTIFACT | GameOverConditions::WINS_GOLD) & ConditionWins()) && wins2;
 }
 
 Artifact::artifact_t Maps::FileInfo::WinsFindArtifact(void) const
