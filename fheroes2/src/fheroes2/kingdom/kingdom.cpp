@@ -32,13 +32,9 @@
 #include "kingdom_defines.h"
 #include "kingdom.h"
 
-Kingdom::Kingdom(const Color::color_t cl, const Game::control_t con) : color(cl), control(con), flags(0), lost_town_days(LOST_TOWN_DAYS + 1), ai_capital(NULL)
+void SetStartingResource(u8 difficulty, Resource::funds_t & resource)
 {
-    // set play
-    if(Settings::Get().KingdomColors(cl)) SetModes(PLAY);
-
-    // set starting resource
-    switch(Settings::Get().GameDifficulty())
+    switch(difficulty)
     {
 	case Difficulty::EASY:
 	    resource.wood	= START_EASY_WOOD;
@@ -85,8 +81,21 @@ Kingdom::Kingdom(const Color::color_t cl, const Game::control_t con) : color(cl)
 	    resource.gems	= START_IMPOSSIBLE_GEMS;
 	    resource.gold	= START_IMPOSSIBLE_GOLD;
 	    break;
+	default: break;
     }
+}
 
+Kingdom::Kingdom(const Color::color_t cl, const Game::control_t con) : color(cl), control(con), flags(0), lost_town_days(LOST_TOWN_DAYS + 1), ai_capital(NULL)
+{
+    // set play
+    if(Settings::Get().KingdomColors(cl)) SetModes(PLAY);
+
+    // set starting resource
+    if(Game::AI == control && Difficulty::EASY < Settings::Get().GameDifficulty())
+	SetStartingResource(Difficulty::NORMAL, resource);
+    else
+	SetStartingResource(Settings::Get().GameDifficulty(), resource);
+    
     heroes.reserve(KINGDOMMAXHEROES);
     castles.reserve(15);
 }
