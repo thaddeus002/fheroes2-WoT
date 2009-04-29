@@ -1526,3 +1526,13 @@ void Castle::RecruitAllMonster(void)
     if(isBuild(DWELLING_MONSTER2)) RecruitMonster(DWELLING_MONSTER2, MAXU16);
     if(isBuild(DWELLING_MONSTER1)) RecruitMonster(DWELLING_MONSTER1, MAXU16);
 }
+
+const Army::army_t & Castle::GetArmy(void) const
+{
+    return castle_heroes ? castle_heroes->GetArmy() : army;
+}
+
+Army::army_t & Castle::GetArmy(void)
+{
+    return castle_heroes ? castle_heroes->GetArmy() : army;
+}
