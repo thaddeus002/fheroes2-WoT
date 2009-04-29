@@ -521,7 +521,6 @@ u16 Settings::GetPort(void) const
     return port;
 }
 
-
 Race::race_t Settings::KingdomRace(u8 color) const
 {
     switch(color)
@@ -604,4 +603,54 @@ u8 Settings::KingdomColorsCount(void) const
 bool Settings::MapsWithHeroes(void) const
 {
     return current_maps_file.with_heroes;
+}
+
+GameOverConditions::wins_t Settings::ConditionWins(void) const
+{
+    return current_maps_file.ConditionWins();
+}
+
+GameOverConditions::loss_t Settings::ConditionLoss(void) const
+{
+    return current_maps_file.ConditionLoss();
+}
+
+bool Settings::WinsCompAlsoWins(void) const
+{
+    return current_maps_file.WinsCompAlsoWins();
+}
+
+bool Settings::WinsAllowNormalVictory(void) const
+{
+    return current_maps_file.WinsAllowNormalVictory();
+}
+
+Artifact::artifact_t Settings::WinsFindArtifact(void) const
+{
+    return current_maps_file.WinsFindArtifact();
+}
+
+u16 Settings::WinsSidePart(void) const
+{
+    return current_maps_file.WinsSidePart();
+}
+
+u32 Settings::WinsAccumulateGold(void) const
+{
+    return current_maps_file.WinsAccumulateGold();
+}
+
+u32 Settings::WinsMapsIndexObject(void) const
+{
+    return current_maps_file.WinsMapsIndexObject();
+}
+
+u32 Settings::LossMapsIndexObject(void) const
+{
+    return current_maps_file.LossMapsIndexObject();
+}
+
+u16 Settings::LossCountDays(void) const
+{
+    return current_maps_file.LossCountDays();
 }

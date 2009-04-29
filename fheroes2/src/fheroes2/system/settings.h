@@ -147,6 +147,16 @@ public:
     u8 AllowColorsCount(void) const;
     u8 KingdomColorsCount(void) const;
     bool MapsWithHeroes(void) const;
+    GameOverConditions::wins_t ConditionWins(void) const;
+    GameOverConditions::loss_t ConditionLoss(void) const;
+    bool WinsCompAlsoWins(void) const;
+    bool WinsAllowNormalVictory(void) const;
+    Artifact::artifact_t WinsFindArtifact(void) const;
+    u16 WinsSidePart(void) const;
+    u32 WinsAccumulateGold(void) const;
+    u32 WinsMapsIndexObject(void) const;
+    u32 LossMapsIndexObject(void) const;
+    u16 LossCountDays(void) const;
 
 protected:
     void Parse(const std::string & left, const std::string & right);
@@ -181,7 +191,7 @@ private:
     u8 size_small;
 
     Maps::FileInfo current_maps_file;
-    
+
     u8 sound_volume;
     u8 music_volume;
     u8 animation;

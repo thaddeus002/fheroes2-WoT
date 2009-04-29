@@ -24,6 +24,8 @@
 #include <vector>
 #include "gamedefs.h"
 #include "kingdom_defines.h"
+#include "game_over.h"
+#include "artifact.h"
 
 namespace Maps
 {
@@ -37,6 +39,17 @@ namespace Maps
 
     u8 AllowColorsCount(void) const;
     u8 KingdomColorsCount(void) const;
+
+    GameOverConditions::wins_t ConditionWins(void) const;
+    GameOverConditions::loss_t ConditionLoss(void) const;
+    bool WinsCompAlsoWins(void) const;
+    bool WinsAllowNormalVictory(void) const;
+    Artifact::artifact_t WinsFindArtifact(void) const;
+    u16 WinsSidePart(void) const;
+    u32 WinsAccumulateGold(void) const;
+    u32 WinsMapsIndexObject(void) const;
+    u32 LossMapsIndexObject(void) const;
+    u16 LossCountDays(void) const;
 
     static bool PredicateForSorting(const FileInfo &, const FileInfo &);
 
@@ -55,11 +68,11 @@ namespace Maps
     u8 conditions_wins;
     u8 wins1;
     u8 wins2;
-    u8 wins3;
-    u8 wins4;
+    u16 wins3;
+    u16 wins4;
     u8 conditions_loss;
-    u8 loss1;
-    u8 loss2;
+    u16 loss1;
+    u16 loss2;
 
     time_t localtime;
 

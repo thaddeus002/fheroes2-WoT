@@ -26,6 +26,7 @@
 #include "color.h"
 #include "race.h"
 #include "xmlccwrap.h"
+#include "world.h"
 #include "maps_fileinfo.h"
 
 #define LENGTHNAME		16
@@ -340,26 +341,31 @@ bool Maps::FileInfo::ReadBIN(const std::string & filename)
     // data wins
     fd.read(reinterpret_cast<char *>(&byte8), 1);
     wins1 = byte8;
+    // data wins
     fd.read(reinterpret_cast<char *>(&byte8), 1);
     wins2 = byte8;
-    fd.read(reinterpret_cast<char *>(&byte8), 1);
-    wins3 = byte8;
-    fd.read(reinterpret_cast<char *>(&byte8), 1);
-    wins4 = byte8;
+    // data wins
+    fd.read(reinterpret_cast<char *>(&byte16), 2);
+    SwapLE16(byte16);
+    wins3 = byte16;
+    // data wins
+    fd.seekg(0x2c, std::ios_base::beg);
+    fd.read(reinterpret_cast<char *>(&byte16), 2);
+    SwapLE16(byte16);
+    wins4 = byte16;
 
     // loss
     fd.seekg(0x22, std::ios_base::beg);
     fd.read(reinterpret_cast<char *>(&byte8), 1);
     conditions_loss = byte8;
-
     // data loss
-    fd.read(reinterpret_cast<char *>(&byte8), 1);
-    loss1 = byte8;
-
+    fd.read(reinterpret_cast<char *>(&byte16), 2);
+    SwapLE16(byte16);
+    loss1 = byte16;
     // data loss
-    fd.seekg(0x2e, std::ios_base::beg);
-    fd.read(reinterpret_cast<char *>(&byte8), 1);
-    loss2 = byte8;
+    fd.read(reinterpret_cast<char *>(&byte16), 2);
+    SwapLE16(byte16);
+    loss2 = byte16;
 
     // start with hero
     fd.seekg(0x25, std::ios_base::beg);
@@ -416,4 +422,73 @@ u8 Maps::FileInfo::KingdomColorsCount(void) const
 {
     const std::bitset<8> colors(kingdom_colors);
     return colors.count();
+}
+
+GameOverConditions::wins_t Maps::FileInfo::ConditionWins(void) const
+{
+    switch(conditions_wins)
+    {
+	case 1:	return GameOverConditions::WINS_TOWN;
+	case 2:	return GameOverConditions::WINS_HERO;
+	case 3:	return GameOverConditions::WINS_ARTIFACT;
+	case 4:	return GameOverConditions::WINS_SIDE;
+	case 5:	return GameOverConditions::WINS_GOLD;
+	default: break;
+    }
+
+    return GameOverConditions::WINS_ALL;
+}
+
+GameOverConditions::loss_t Maps::FileInfo::ConditionLoss(void) const
+{
+    switch(conditions_loss)
+    {
+        case 1:	return GameOverConditions::LOSS_TOWN;
+        case 2: return GameOverConditions::LOSS_HERO;
+        case 3: return GameOverConditions::LOSS_TIME;
+        default: break;
+    }
+
+    return GameOverConditions::LOSS_ALL;
+}
+
+bool Maps::FileInfo::WinsCompAlsoWins(void) const
+{
+    return wins1;
+}
+
+bool Maps::FileInfo::WinsAllowNormalVictory(void) const
+{
+    return wins2;
+}
+
+Artifact::artifact_t Maps::FileInfo::WinsFindArtifact(void) const
+{
+    return Artifact::Artifact(wins3);
+}
+
+u32 Maps::FileInfo::WinsAccumulateGold(void) const
+{
+    return wins3 * 1000;
+}
+
+u16 Maps::FileInfo::WinsSidePart(void) const
+{
+    // FIX:: Maps::FileInfo::ConditionSidePart
+    return wins3;
+}
+
+u32 Maps::FileInfo::WinsMapsIndexObject(void) const
+{
+    return wins4 * world.w() + wins3;
+}
+
+u32 Maps::FileInfo::LossMapsIndexObject(void) const
+{
+    return loss2 * world.w() + loss1;
+}
+
+u16 Maps::FileInfo::LossCountDays(void) const
+{
+    return loss1;
 }
