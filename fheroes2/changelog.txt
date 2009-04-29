@@ -1,4 +1,4 @@
-SVN - up to r1036
+SVN - up to r1039
 
 Users
 + Hero path arrows now reflect movement penalties.
@@ -7,6 +7,7 @@ Users
 + Multiple events can now occur on the same day.
 + Fixed bug causing obelisks not to be counted past the first visited,
   causing maps like Dragon Rider to now work.
++ Fixed music restarting with every step taken by a player's hero.
 
 Developers
 +

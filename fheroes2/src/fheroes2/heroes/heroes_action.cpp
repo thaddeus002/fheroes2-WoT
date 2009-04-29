@@ -315,7 +315,8 @@ void Heroes::Action(const u16 dst_index)
 
     const MP2::object_t object = (dst_index == GetIndex() ? GetUnderObject() : world.GetTiles(dst_index).GetObject());
 
-    AGG::PlayMusic(MUS::FromMapObject(object), false);
+    if(MUS::FromMapObject(object) != MUS::UNKNOWN)
+        AGG::PlayMusic(MUS::FromMapObject(object), false);
 
     switch(object)
     {
