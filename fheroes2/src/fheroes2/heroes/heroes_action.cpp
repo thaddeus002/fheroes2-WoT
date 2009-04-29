@@ -1908,13 +1908,16 @@ void ActionToAncientLamp(Heroes &hero, const u8 obj, const u16 dst_index)
 		}
 		else
 		    tile.SetCountMonster(count - recruit);
+
+    		PaymentConditions::payment_t paymentCosts(PaymentConditions::BuyMonster(Monster::GENIE) * recruit);
+                world.GetKingdom(hero.GetColor()).OddFundsResource(paymentCosts);
 	    }
 	    else
 		Dialog::Message(Monster::String(Monster::GENIE), _("You are unable to recruit at this time, your ranks are full."), Font::BIG, Dialog::OK);
 	}
     }
 
-    if(Settings::Get().Debug()) Error::Verbose("ActionToTreasureChest: " + hero.GetName() + " pickup chest");
+    if(Settings::Get().Debug()) Error::Verbose("ActionToAncientLamp: " + hero.GetName() + " pickup chest");
 }
 
 void ActionToTeleports(Heroes &hero, const u16 index_from)
@@ -2190,21 +2193,6 @@ void ActionToDwellingJoinMonster(Heroes &hero, const u8 obj, const u16 dst_index
 {
     Maps::Tiles & tile = world.GetTiles(dst_index);
 
-    switch(obj)
-    {
-        case MP2::OBJ_WATCHTOWER:
-        case MP2::OBJ_EXCAVATION:
-        case MP2::OBJ_CAVE:
-        case MP2::OBJ_TREEHOUSE:
-	case MP2::OBJ_ARCHERHOUSE:
-        case MP2::OBJ_GOBLINHUT:
-        case MP2::OBJ_DWARFCOTT:
-        case MP2::OBJ_HALFLINGHOLE:
-	case MP2::OBJ_PEASANTHUT:
-        case MP2::OBJ_THATCHEDHUT: break;
-	default: return;
-    }
-
     const u32 count = tile.GetCountMonster();
 
     if(count)
@@ -2302,6 +2290,9 @@ void ActionToDwellingRecruitMonster(Heroes &hero, const u8 obj, const u16 dst_in
 		    Dialog::Message(monster.GetName(), _("You are unable to recruit at this time, your ranks are full."), Font::BIG, Dialog::OK);
 		else
 		    tile.SetCountMonster(count - recruit);
+
+		PaymentConditions::payment_t paymentCosts(PaymentConditions::BuyMonster(monster()) * recruit);
+		world.GetKingdom(hero.GetColor()).OddFundsResource(paymentCosts);
 	    }
 	}
     }
@@ -2483,6 +2474,9 @@ void ActionToDwellingBattleMonster(Heroes &hero, const u8 obj, const u16 dst_ind
 		Dialog::Message(monster.GetName(), _("You are unable to recruit at this time, your ranks are full."), Font::BIG, Dialog::OK);
     	    else
     		tile.SetCountMonster(count - recruit);
+
+    	    PaymentConditions::payment_t paymentCosts(PaymentConditions::BuyMonster(monster()) * recruit);
+    	    world.GetKingdom(hero.GetColor()).OddFundsResource(paymentCosts);
     	}
     }
 
@@ -2961,7 +2955,7 @@ void ActionToStables(Heroes &hero, const u8 obj, const u16 dst_index)
 
 
     // check already visited
-    if(hero.isVisited(obj))
+    if(visited)
     {
 	PlaySoundVisited;
     }

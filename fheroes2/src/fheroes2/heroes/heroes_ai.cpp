@@ -59,11 +59,73 @@ void AIToObelisk(Heroes &hero, const u8 obj, const u16 dst_index);
 void AIToTreeKnowledge(Heroes &hero, const u8 obj, const u16 dst_index);
 void AIToDaemonCave(Heroes &hero, const u8 obj, const u16 dst_index);
 void AIToCastle(Heroes &hero, const u8 obj, const u16 dst_index);
+void AIToSign(Heroes &hero, const u8 obj, const u16 dst_index);
+void AIToDwellingJoinMonster(Heroes &hero, const u8 obj, const u16 dst_index);
+void AIToHeroes(Heroes &hero, const u8 obj, const u16 dst_index);
+void AIToDwellingRecruitMonster(Heroes &hero, const u8 obj, const u16 dst_index);
+void AIToStables(Heroes &hero, const u8 obj, const u16 dst_index);
 
 void Heroes::AIUpdateRoles(void)
 {
     SetModes(SCOUTER);
     SetModes(HUNTER);
+}
+
+Skill::Primary::skill_t AISelectPrimarySkill(Heroes &hero)
+{
+    switch(hero.GetRace())
+    {
+	case Race::KNGT:
+	{
+	    if(5 > hero.GetDefense())	return Skill::Primary::DEFENCE;
+	    if(5 > hero.GetAttack())	return Skill::Primary::ATTACK;
+	    if(3 > hero.GetKnowledge())	return Skill::Primary::KNOWLEDGE;
+	    if(3 > hero.GetPower())	return Skill::Primary::POWER;
+    	    break;
+	}
+
+	case Race::BARB:
+	{
+	    if(5 > hero.GetAttack())	return Skill::Primary::ATTACK;
+	    if(5 > hero.GetDefense())	return Skill::Primary::DEFENCE;
+	    if(3 > hero.GetPower())	return Skill::Primary::POWER;
+	    if(3 > hero.GetKnowledge())	return Skill::Primary::KNOWLEDGE;
+	    break;
+	}
+
+	case Race::SORC:
+	case Race::WZRD:
+	{
+	    if(5 > hero.GetKnowledge())	return Skill::Primary::KNOWLEDGE;
+	    if(5 > hero.GetPower())	return Skill::Primary::POWER;
+	    if(3 > hero.GetDefense())	return Skill::Primary::DEFENCE;
+	    if(3 > hero.GetAttack())	return Skill::Primary::ATTACK;
+	    break;
+	}
+
+	case Race::WRLK:
+	case Race::NECR:
+	{
+	    if(5 > hero.GetPower())	return Skill::Primary::POWER;
+	    if(5 > hero.GetKnowledge())	return Skill::Primary::KNOWLEDGE;
+	    if(3 > hero.GetAttack())	return Skill::Primary::ATTACK;
+	    if(3 > hero.GetDefense())	return Skill::Primary::DEFENCE;
+	    break;
+	}
+	
+	default: break;
+    }
+
+    switch(Rand::Get(1,4))
+    {
+	case 1:	return Skill::Primary::ATTACK;
+	case 2:	return Skill::Primary::DEFENCE;
+	case 3:	return Skill::Primary::POWER;
+	case 4:	return Skill::Primary::KNOWLEDGE;
+	default: break;
+    }
+
+    return Skill::Primary::UNKNOWN;
 }
 
 void AIBattleLose(Heroes &hero, const u8 reason)
@@ -79,7 +141,7 @@ void Heroes::AIAction(const u16 dst_index)
     switch(object)
     {
 	case MP2::OBJ_MONSTER:		AIToMonster(*this, object, dst_index); break;
-
+	case MP2::OBJ_HEROES:		AIToHeroes(*this, object, dst_index); break;
 	case MP2::OBJ_CASTLE:		AIToCastle(*this, object, dst_index); break;
 
         // pickup object
@@ -106,6 +168,8 @@ void Heroes::AIAction(const u16 dst_index)
 
 	// event
 	case MP2::OBJ_EVENT:		AIToEvent(*this, object, dst_index); break;
+
+	case MP2::OBJ_SIGN:		AIToSign(*this, object, dst_index); break;
 
 	// increase view
 	case MP2::OBJ_OBSERVATIONTOWER:	AIToObservationTower(*this, object, dst_index); break;
@@ -164,8 +228,82 @@ void Heroes::AIAction(const u16 dst_index)
 
         case MP2::OBJ_TREEKNOWLEDGE:	AIToTreeKnowledge(*this, object, dst_index); break;
 
+        // accept army
+        case MP2::OBJ_WATCHTOWER:
+        case MP2::OBJ_EXCAVATION:
+        case MP2::OBJ_CAVE:
+        case MP2::OBJ_TREEHOUSE:
+        case MP2::OBJ_ARCHERHOUSE:
+        case MP2::OBJ_GOBLINHUT:
+        case MP2::OBJ_DWARFCOTT:
+	case MP2::OBJ_HALFLINGHOLE:
+        case MP2::OBJ_PEASANTHUT:
+        case MP2::OBJ_THATCHEDHUT:      AIToDwellingJoinMonster(*this, object, dst_index); break;
 
-	default: break;
+        // recruit army
+        case MP2::OBJ_RUINS:
+        case MP2::OBJ_TREECITY:
+        case MP2::OBJ_WAGONCAMP:
+	case MP2::OBJ_DESERTTENT:
+        // loyalty ver
+        case MP2::OBJ_WATERALTAR:
+        case MP2::OBJ_AIRALTAR:
+        case MP2::OBJ_FIREALTAR:
+        case MP2::OBJ_EARTHALTAR:
+        case MP2::OBJ_BARROWMOUNDS:     AIToDwellingRecruitMonster(*this, object, dst_index); break;
+
+        // recruit army (battle)
+        case MP2::OBJ_DRAGONCITY:
+        case MP2::OBJ_CITYDEAD:
+        case MP2::OBJ_TROLLBRIDGE:	AIToDwellingRecruitMonster(*this, object, dst_index); break;
+
+	// recruit genie
+	case MP2::OBJ_ANCIENTLAMP:	AIToDwellingRecruitMonster(*this, object, dst_index); break;
+
+	case MP2::OBJ_STABLES:		AIToStables(*this, object, dst_index); break;
+	case MP2::OBJ_ARENA:		AIToPrimarySkillObject(*this, object, dst_index); break;
+
+    	default: break;
+    }
+}
+
+void AIToHeroes(Heroes &hero, const u8 obj, const u16 dst_index)
+{
+    const Heroes *other_hero = world.GetHeroes(dst_index);
+    if(! other_hero) return;
+
+    if(hero.GetColor() == other_hero->GetColor())
+    {
+	if(Settings::Get().Debug()) Error::Verbose("AIToHeroes: " + hero.GetName() + " meeting " + other_hero->GetName());
+	Error::Verbose("FIX: AI hero meeting");
+	//hero.MeetingDialog(const_cast<Heroes &>(*other_hero));
+    }
+    else
+    {
+	if(Settings::Get().Debug()) Error::Verbose("AIToHeroes: " + hero.GetName() + " attack enemy hero " + other_hero->GetName());
+	u32 exp = 0;
+        const Army::battle_t b = Army::Battle(hero, const_cast<Heroes &>(*other_hero), world.GetTiles(dst_index), exp);
+
+        switch(b)
+        {
+            case Army::WIN:
+        	hero.TakeArtifacts(const_cast<Heroes &>(*other_hero));
+        	hero.IncreaseExperience(exp);
+        	world.GetKingdom((*other_hero).GetColor()).RemoveHeroes(other_hero);
+        	const_cast<Heroes &>(*other_hero).SetFreeman(b);
+        	// set default army
+        	const_cast<Heroes &>(*other_hero).GetArmy().Reset(true);
+        	hero.ActionAfterBattle();
+        	break;
+
+            case Army::LOSE:
+            case Army::RETREAT:
+            case Army::SURRENDER:
+                AIBattleLose(hero, b);
+                break;
+
+    	    default: break;
+	}
     }
 }
 
@@ -178,7 +316,7 @@ void AIToCastle(Heroes &hero, const u8 obj, const u16 dst_index)
     if(hero.GetColor() == castle->GetColor())
     {
         if(Settings::Get().Debug()) Error::Verbose("AIToCastle: " + hero.GetName() + " goto castle " + castle->GetName());
-        hero.AppendSpellsToBook(castle->GetMageGuild());
+        if(Settings::Get().Original() && hero.GetSpellBook()) hero.AppendSpellsToBook(castle->GetMageGuild());
     }
     else
     {
@@ -537,10 +675,17 @@ void AIToFlotSam(Heroes &hero, const u8 obj, const u16 dst_index)
     if(Settings::Get().Debug()) Error::Verbose("AIToFlotSam: " + hero.GetName() + " pickup small resource");
 }
 
+void AIToSign(Heroes &hero, const u8 obj, const u16 dst_index)
+{
+    hero.SetVisited(dst_index, Visit::LOCAL);
+    if(Settings::Get().Debug()) Error::Verbose("AIToSign: " + hero.GetName());
+}
+
 void AIToObservationTower(Heroes &hero, const u8 obj, const u16 dst_index)
 {
     Maps::ClearFog(dst_index, OBSERVATIONTOWERSCOUTE, hero.GetColor());
     hero.SetVisited(dst_index, Visit::GLOBAL);
+    if(Settings::Get().Debug()) Error::Verbose("AIToObservationTower: " + hero.GetName());
 }
 
 void AIToMagellanMaps(Heroes &hero, const u8 obj, const u16 dst_index)
@@ -613,6 +758,7 @@ void AIToPrimarySkillObject(Heroes &hero, const u8 obj, const u16 dst_index)
         case MP2::OBJ_MERCENARYCAMP:	skill = Skill::Primary::ATTACK; break;
         case MP2::OBJ_DOCTORHUT:	skill = Skill::Primary::KNOWLEDGE; break;
         case MP2::OBJ_STANDINGSTONES:	skill = Skill::Primary::POWER; break;
+        case MP2::OBJ_ARENA:		skill = AISelectPrimarySkill(hero); break;
 
     	default: break;
     }
@@ -1104,6 +1250,58 @@ void AIToDaemonCave(Heroes &hero, const u8 obj, const u16 dst_index)
     if(Settings::Get().Debug()) Error::Verbose("AIToDaemonCave: " + hero.GetName());
 }
 
+void AIToDwellingJoinMonster(Heroes &hero, const u8 obj, const u16 dst_index)
+{
+    Maps::Tiles & tile = world.GetTiles(dst_index);
+    const u32 count = tile.GetCountMonster();
+
+    if(count && hero.GetArmy().JoinTroop(Monster(Monster::FromObject(obj)), count)) tile.SetCountMonster(0);
+
+    if(Settings::Get().Debug()) Error::Verbose("AIToDwellingJoinMonster: " + hero.GetName());
+}
+
+void AIToDwellingRecruitMonster(Heroes &hero, const u8 obj, const u16 dst_index)
+{
+    Maps::Tiles & tile = world.GetTiles(dst_index);
+    const u32 count = tile.GetCountMonster();
+
+    if(count)
+    {
+        Kingdom & kingdom = world.GetKingdom(hero.GetColor());
+        const Monster monster(Monster::FromObject(obj));
+	const PaymentConditions::payment_t paymentCosts(PaymentConditions::BuyMonster(monster()) * count);
+	const Resource::funds_t & kingdomResource = kingdom.GetFundsResource();
+
+        if(paymentCosts <= kingdomResource && hero.GetArmy().JoinTroop(monster, count))
+        {
+    	    tile.SetCountMonster(0);
+	    kingdom.OddFundsResource(paymentCosts);
+
+	    // remove ancient lamp sprite
+	    if(MP2::OBJ_ANCIENTLAMP == obj)
+	    {
+	        tile.RemoveObjectSprite();
+	        tile.SetObject(MP2::OBJ_ZERO);
+	    }
+	}
+    }
+
+    if(Settings::Get().Debug()) Error::Verbose("AIToDwellingJoinMonster: " + hero.GetName());
+}
+
+void AIToStables(Heroes &hero, const u8 obj, const u16 dst_index)
+{
+    // check already visited
+    if(!hero.isVisited(obj))
+    {
+        hero.SetVisited(dst_index);
+        hero.IncreaseMovePoints(400);
+    }
+
+    if(hero.GetArmy().HasMonster(Monster::CAVALRY)) hero.GetArmy().UpgradeMonsters(Monster::CAVALRY);
+                                                                
+    if(Settings::Get().Debug()) Error::Verbose("AIToStables: " + hero.GetName());
+}
 
 
 
@@ -1246,6 +1444,77 @@ bool Heroes::AIValidObject(const u8 obj, const u16 index)
 	    break;
 	}
 
+        // accept army
+        case MP2::OBJ_WATCHTOWER:
+        case MP2::OBJ_EXCAVATION:
+        case MP2::OBJ_CAVE:
+        case MP2::OBJ_TREEHOUSE:
+        case MP2::OBJ_ARCHERHOUSE:
+        case MP2::OBJ_GOBLINHUT:
+        case MP2::OBJ_DWARFCOTT:
+	case MP2::OBJ_HALFLINGHOLE:
+        case MP2::OBJ_PEASANTHUT:
+        case MP2::OBJ_THATCHEDHUT:
+        {
+    	    Monster mons = Monster::FromObject(obj);
+	    if(world.GetTiles(index).GetCountMonster() &&
+		(army.HasMonster(mons) ||
+		(army.GetCount() < ARMYMAXTROOPS && (mons.isArchers() || mons.isFly())))) return true;
+	    break;
+	}
+
+        // recruit army
+        case MP2::OBJ_RUINS:
+        case MP2::OBJ_TREECITY:
+        case MP2::OBJ_WAGONCAMP:
+	case MP2::OBJ_DESERTTENT:
+        case MP2::OBJ_WATERALTAR:
+        case MP2::OBJ_AIRALTAR:
+        case MP2::OBJ_FIREALTAR:
+        case MP2::OBJ_EARTHALTAR:
+        case MP2::OBJ_BARROWMOUNDS:
+	{
+	    const u32 count = world.GetTiles(index).GetCountMonster();
+    	    const Monster monster(Monster::FromObject(obj));
+	    const PaymentConditions::payment_t paymentCosts(PaymentConditions::BuyMonster(monster()) * count);
+	    const Resource::funds_t & kingdomResource = world.GetKingdom(GetColor()).GetFundsResource();
+
+	    if(count && paymentCosts <= kingdomResource &&
+		(army.HasMonster(monster) ||
+		(army.GetCount() < ARMYMAXTROOPS && (monster.isArchers() || monster.isFly())))) return true;
+	    break;
+	}
+
+        // recruit army (battle)
+        case MP2::OBJ_DRAGONCITY:
+        case MP2::OBJ_CITYDEAD:
+        case MP2::OBJ_TROLLBRIDGE:
+        {
+    	    const bool battle = (Color::GRAY == world.ColorCapturedObject(index));
+	    const u32 count = world.GetTiles(index).GetCountMonster();
+    	    const Monster monster(Monster::FromObject(obj));
+	    const PaymentConditions::payment_t paymentCosts(PaymentConditions::BuyMonster(monster()) * count);
+	    const Resource::funds_t & kingdomResource = world.GetKingdom(GetColor()).GetFundsResource();
+
+	    if(!battle && count && paymentCosts <= kingdomResource &&
+		(army.HasMonster(monster) ||
+		(army.GetCount() < ARMYMAXTROOPS))) return true;
+	    break;
+        }
+
+	// recruit genie
+	case MP2::OBJ_ANCIENTLAMP:
+	{
+	    const u32 count = world.GetTiles(index).GetCountMonster();
+	    const PaymentConditions::payment_t paymentCosts(PaymentConditions::BuyMonster(Monster::GENIE) * count);
+	    const Resource::funds_t & kingdomResource = world.GetKingdom(GetColor()).GetFundsResource();
+
+	    if(count && paymentCosts <= kingdomResource &&
+		(army.HasMonster(Monster::GENIE) ||
+		(army.GetCount() < ARMYMAXTROOPS))) return true;
+	    break;
+	}
+
 	// upgrade army
 	case MP2::OBJ_HILLFORT:
             if(army.HasMonster(Monster::DWARF) ||
@@ -1260,6 +1529,17 @@ bool Heroes::AIValidObject(const u8 obj, const u16 index)
                army.HasMonster(Monster::IRON_GOLEM)) return true;
             break;
 
+	// loyalty obj
+	case MP2::OBJ_STABLES:
+	    if(army.HasMonster(Monster::CAVALRY) ||
+		! isVisited(world.GetTiles(index))) return true;
+	    break;
+
+	case MP2::OBJ_ARENA:
+	    if(! isVisited(world.GetTiles(index))) return true;
+	    break;
+
+	// poor morale obj
 	case MP2::OBJ_SHIPWRECK:
         case MP2::OBJ_GRAVEYARD:
 	case MP2::OBJ_DERELICTSHIP:
@@ -1290,7 +1570,29 @@ bool Heroes::AIValidObject(const u8 obj, const u16 index)
 	    break;
 	}
 
+	// sign
+	case MP2::OBJ_SIGN:
+	    if(!isVisited(world.GetTiles(index))) return true;
+	    break;
+
 	case MP2::OBJ_CASTLE:
+	{
+	    const Castle *castle = world.GetCastle(index);
+	    if(castle &&
+		(GetColor() == castle->GetColor() ||
+		(!castle->GetArmy().isValid() || GetArmy().StrongerEnemyArmy(castle->GetArmy())))) return true;
+	    break;
+	}
+
+	case MP2::OBJ_HEROES:
+	{
+	    const Heroes *hero = world.GetHeroes(index);
+	    if(hero &&
+		(GetColor() == hero->GetColor() ||
+		 GetArmy().StrongerEnemyArmy(hero->GetArmy()))) return true;
+	    break;
+	}
+
 	case MP2::OBJ_BOAT:
 	case MP2::OBJ_STONELIGHTS:
 	    // check later
