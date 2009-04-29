@@ -121,6 +121,8 @@ public:
 
     const Army::army_t & GetArmy(void) const;
     Army::army_t & GetArmy(void);
+    const Army::army_t & GetActualArmy(void) const;
+    Army::army_t & GetActualArmy(void);
     u16 GetDwellingLivedCount(building_t dw);
     void RecruitAllMonster(void);
 

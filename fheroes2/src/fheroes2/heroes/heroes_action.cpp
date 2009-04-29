@@ -665,11 +665,13 @@ void ActionToCastle(Heroes &hero, const u8 obj, const u16 dst_index)
 
 	u32 exp = 0;
 	Army::battle_t b;
-	if(castle->GetArmy().isValid())
+	Army::army_t army = castle->GetActualArmy();
+
+	if(army.isValid())
 	{
     	    if(castle->isCastle())
         	b = Army::Battle(hero, const_cast<Castle &>(*castle), world.GetTiles(dst_index), exp);
-    	    else b = Army::Battle(hero, const_cast<Army::army_t &>(castle->GetArmy()), world.GetTiles(dst_index), exp);
+    	    else b = Army::Battle(hero, army, world.GetTiles(dst_index), exp);
 	}
 	else b = Army::WIN;
 

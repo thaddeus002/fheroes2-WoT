@@ -1529,11 +1529,21 @@ void Castle::RecruitAllMonster(void)
 
 const Army::army_t & Castle::GetArmy(void) const
 {
+    return army;
+}
+
+Army::army_t & Castle::GetArmy(void)
+{
+    return army;
+}
+
+const Army::army_t & Castle::GetActualArmy(void) const
+{
     const Heroes *heroes = GetHeroes();
     return heroes ? heroes->GetArmy() : army;
 }
 
-Army::army_t & Castle::GetArmy(void)
+Army::army_t & Castle::GetActualArmy(void)
 {
     Heroes *heroes = GetHeroes();
     return heroes ? heroes->GetArmy() : army;

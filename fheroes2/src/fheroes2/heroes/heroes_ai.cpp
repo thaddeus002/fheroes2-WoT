@@ -309,7 +309,7 @@ void AIToHeroes(Heroes &hero, const u8 obj, const u16 dst_index)
 
 void AIToCastle(Heroes &hero, const u8 obj, const u16 dst_index)
 {
-    const Castle *castle = world.GetCastle(dst_index);
+    Castle *castle = world.GetCastle(dst_index);
 
     if(! castle) return;
 
@@ -324,10 +324,12 @@ void AIToCastle(Heroes &hero, const u8 obj, const u16 dst_index)
 
         u32 exp = 0;
         Army::battle_t b;
-        if(castle->GetArmy().isValid())
+        Army::army_t & army = castle->GetActualArmy();
+
+        if(army.isValid())
         {
             b = castle->isCastle() ? Army::Battle(hero, const_cast<Castle &>(*castle), world.GetTiles(dst_index), exp) :
-                Army::Battle(hero, const_cast<Army::army_t &>(castle->GetArmy()), world.GetTiles(dst_index), exp);
+                Army::Battle(hero, army, world.GetTiles(dst_index), exp);
         }
         else b = Army::WIN;
 
@@ -1580,7 +1582,7 @@ bool Heroes::AIValidObject(const u8 obj, const u16 index)
 	    const Castle *castle = world.GetCastle(index);
 	    if(castle &&
 		(GetColor() == castle->GetColor() ||
-		(!castle->GetArmy().isValid() || GetArmy().StrongerEnemyArmy(castle->GetArmy())))) return true;
+		(GetArmy().StrongerEnemyArmy(castle->GetActualArmy())))) return true;
 	    break;
 	}
 
