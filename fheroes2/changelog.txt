@@ -8,6 +8,8 @@ Users
 + Fixed bug causing obelisks not to be counted past the first visited,
   causing maps like Dragon Rider to now work.
 + Fixed music restarting with every step taken by a player's hero.
++ Fixed relatively rare crash involving the AI and ranged units in battle,
+  most obvious in the opening turn of Dragon Rider.
 
 Developers
 +

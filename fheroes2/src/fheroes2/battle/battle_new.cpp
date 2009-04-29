@@ -1399,7 +1399,7 @@ long Battle::BattleControl::CalculateDamage(const Army::BattleTroop &attacker, c
             else defense = 1;
         }
 
-        if(attacker.Modes(Army::HANDFIGHTING))
+        if(!attacker.Modes(Army::HANDFIGHTING))
             if(m_battlefield.IsRangedAttackBlocked(attacker, defender))
                 damage /= 2;
     }
@@ -1825,7 +1825,8 @@ namespace Battle
         move = attack = Point(-1, -1);
 
         PrepMovePoints(troopIdx);
-        
+
+        troop.ResetModes(Army::HANDFIGHTING);
         for(u16 j = 0; j < m_oppArmy->size(); j++)
         {
             if(m_battlefield->IsTroopCloseTo((*m_oppArmy)[j], troop))
