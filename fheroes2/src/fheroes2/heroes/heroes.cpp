@@ -1734,7 +1734,8 @@ void Heroes::SetFreeman(const u8 reason)
     if(Army::LOSE == reason || Army::RETREAT == reason) army.Reset();
 
     color = Color::GRAY;
-    world.GetTiles(mp).SetObject(save_maps_general);
+    if(0 <= mp.x && mp.x < world.w() &&
+       0 <= mp.y && mp.y < world.h()) world.GetTiles(mp).SetObject(save_maps_general);
     mp.x = -1;
     mp.y = -1;
     path.Reset();
