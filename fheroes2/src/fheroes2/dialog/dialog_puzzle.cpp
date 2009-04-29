@@ -128,9 +128,6 @@ void Dialog::PuzzleMaps(void)
         open_puzzle += extraPieces % max_obelisk;
     u16 revealIndex = 0;
 
-    printf("visited: %d\nexisting: %d\nreveal: %d\n", visited_obelisks, max_obelisk, open_puzzle);
-    printf("size: %d\n", revealOrder.size());
-    
     while(open_puzzle-- && revealIndex < revealOrder.size())
     {
         Point revealPt = revealOrder[revealIndex++];
