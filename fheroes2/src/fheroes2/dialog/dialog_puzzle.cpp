@@ -29,67 +29,11 @@
 #include "radar.h"
 #include "kingdom.h"
 
-
 #define PUZZLE_WIDTH 6
 #define PUZZLE_HEIGHT 8
 
-void InitPuzzle(std::vector<Point> & pieceOffsets, std::vector<Point> & revealOrder)
+void InitPuzzle(std::vector<Point> & revealOrder)
 {
-    pieceOffsets.push_back(Point(-13, 0));
-    pieceOffsets.push_back(Point(-20, 0));
-    pieceOffsets.push_back(Point(-15, 0));
-    pieceOffsets.push_back(Point(-23, 0));
-    pieceOffsets.push_back(Point(-29, 0));
-    
-    pieceOffsets.push_back(Point(0, -25));
-    pieceOffsets.push_back(Point(-16, 5));
-    pieceOffsets.push_back(Point(-13, -9));
-    pieceOffsets.push_back(Point(-19, 14));
-    pieceOffsets.push_back(Point(-22, 0));
-    pieceOffsets.push_back(Point(-18, -5));
-    
-    pieceOffsets.push_back(Point(0, -22));
-    pieceOffsets.push_back(Point(-27, -1));
-    pieceOffsets.push_back(Point(-18, -8));
-    pieceOffsets.push_back(Point(-19, 18));
-    pieceOffsets.push_back(Point(-18, 0));
-    pieceOffsets.push_back(Point(-19, -3));
-    
-    pieceOffsets.push_back(Point(0, -28));
-    pieceOffsets.push_back(Point(-20, 8));
-    pieceOffsets.push_back(Point(-13, 0));
-    pieceOffsets.push_back(Point(-20, 5));
-    pieceOffsets.push_back(Point(-23, -11));
-    pieceOffsets.push_back(Point(-16, 3));
-    
-    pieceOffsets.push_back(Point(0, -20));
-    pieceOffsets.push_back(Point(-16, -1));
-    pieceOffsets.push_back(Point(-23, -7));
-    pieceOffsets.push_back(Point(-12, 13));
-    pieceOffsets.push_back(Point(-13, -3));
-    pieceOffsets.push_back(Point(-20, -1));
-    
-    pieceOffsets.push_back(Point(0, -28));
-    pieceOffsets.push_back(Point(-19, 6));
-    pieceOffsets.push_back(Point(-18, -7));
-    pieceOffsets.push_back(Point(-19, 0));
-    pieceOffsets.push_back(Point(-18, 2));
-    pieceOffsets.push_back(Point(-27, 1));
-    
-    pieceOffsets.push_back(Point(0, -22));
-    pieceOffsets.push_back(Point(-18, -4));
-    pieceOffsets.push_back(Point(-22, -12));
-    pieceOffsets.push_back(Point(-19, 26));
-    pieceOffsets.push_back(Point(-13, -9));
-    pieceOffsets.push_back(Point(-16, 2));
-    
-    pieceOffsets.push_back(Point(0, -25));
-    pieceOffsets.push_back(Point(-29, 2));
-    pieceOffsets.push_back(Point(-23, -8));
-    pieceOffsets.push_back(Point(-15, 6));
-    pieceOffsets.push_back(Point(-20, 4));
-    pieceOffsets.push_back(Point(-13, 0));
-
     revealOrder.push_back(Point(5, 3));
     revealOrder.push_back(Point(5, 0));
     revealOrder.push_back(Point(0, 4));
@@ -111,24 +55,20 @@ void InitPuzzle(std::vector<Point> & pieceOffsets, std::vector<Point> & revealOr
     revealOrder.push_back(Point(3, 0));
     revealOrder.push_back(Point(1, 6));
     revealOrder.push_back(Point(4, 7));
-    revealOrder.push_back(Point(5, 6));
     revealOrder.push_back(Point(0, 2));
     revealOrder.push_back(Point(3, 2));
     revealOrder.push_back(Point(2, 2));
     revealOrder.push_back(Point(2, 6));
-    revealOrder.push_back(Point(7, 7));
     revealOrder.push_back(Point(5, 2));
     revealOrder.push_back(Point(4, 5));
     revealOrder.push_back(Point(0, 0));
     revealOrder.push_back(Point(0, 7));
     revealOrder.push_back(Point(5, 6));
-    revealOrder.push_back(Point(6, 7));
     revealOrder.push_back(Point(4, 4));
     revealOrder.push_back(Point(5, 5));
     revealOrder.push_back(Point(0, 1));
     revealOrder.push_back(Point(1, 3));
     revealOrder.push_back(Point(1, 4));
-    revealOrder.push_back(Point(4, 7));
     revealOrder.push_back(Point(4, 3));
     revealOrder.push_back(Point(1, 2));
     revealOrder.push_back(Point(2, 3));
@@ -137,18 +77,19 @@ void InitPuzzle(std::vector<Point> & pieceOffsets, std::vector<Point> & revealOr
     revealOrder.push_back(Point(4, 1));
     revealOrder.push_back(Point(2, 5));
     revealOrder.push_back(Point(3, 4));
-    // ?????
+    revealOrder.push_back(Point(0, 3));
+    revealOrder.push_back(Point(2, 1));
+    revealOrder.push_back(Point(3, 5));
+    revealOrder.push_back(Point(2, 4));
+    revealOrder.push_back(Point(3, 3));
 }
 
 void Dialog::PuzzleMaps(void)
 {
-    std::vector<Point> pieceOffsets;
     std::vector<Point> revealOrder;
-
-    pieceOffsets.reserve(50);
     revealOrder.reserve(50);
 
-    InitPuzzle(pieceOffsets, revealOrder);
+    InitPuzzle(revealOrder);
 
     Display & display = Display::Get();
 
@@ -159,7 +100,7 @@ void Dialog::PuzzleMaps(void)
     AGG::PlayMusic(MUS::PUZZLE);
 
     const Surface & sf = world.GetUltimateArtifactArea();
-    u8 open_puzzle = world.GetKingdom(Settings::Get().MyColor()).CountVisitedObjects(MP2::OBJ_OBELISK);
+    const u8 visited_obelisks = world.GetKingdom(Settings::Get().MyColor()).CountVisitedObjects(MP2::OBJ_OBELISK);
     const u8 max_obelisk = world.CountObeliskOnMaps();
 
     Dialog::FrameBorder background(false, sf.w(), sf.h());
@@ -181,37 +122,29 @@ void Dialog::PuzzleMaps(void)
     char pieces[PUZZLE_HEIGHT][PUZZLE_WIDTH];
     memset(pieces, 1, sizeof(pieces));
     const u16 revealPerObelisk = PUZZLE_WIDTH * PUZZLE_HEIGHT / max_obelisk;
-    //const u16 extraPieces = PUZZLE_WIDTH * PUZZLE_HEIGHT % max_obelisk;
+    const u16 extraPieces = PUZZLE_WIDTH * PUZZLE_HEIGHT % max_obelisk;
+    u8 open_puzzle = visited_obelisks * revealPerObelisk + extraPieces / max_obelisk;
+    if(visited_obelisks == max_obelisk)
+        open_puzzle += extraPieces % max_obelisk;
     u16 revealIndex = 0;
-    while(open_puzzle--)
+
+    printf("visited: %d\nexisting: %d\nreveal: %d\n", visited_obelisks, max_obelisk, open_puzzle);
+    printf("size: %d\n", revealOrder.size());
+    
+    while(open_puzzle-- && revealIndex < revealOrder.size())
     {
-        u16 toReveal = revealPerObelisk;
-        while(toReveal--)
-        {
-            if(revealIndex >= revealOrder.size())
-                continue;
-            
-            Point revealPt = revealOrder[revealIndex++];
-            pieces[revealPt.y][revealPt.x] = 0;
-        }
+        Point revealPt = revealOrder[revealIndex++];
+        pieces[revealPt.y][revealPt.x] = 0;
     }
     
     // draw pieces
-    Point drawPt(dst_pt.x, dst_pt.y);
     for(u16 y = 0; y < PUZZLE_HEIGHT; y++)
-    {
         for(u16 x = 0; x < PUZZLE_WIDTH; x++)
         {
             const Sprite &piece = AGG::GetICN(ICN::PUZZLE, y * PUZZLE_WIDTH + x);
             if(pieces[y][x]) //FIXME: Temporary until pieces can fade out
-                display.Blit(piece, drawPt);
-            drawPt.x += piece.w() + pieceOffsets[y * PUZZLE_WIDTH + x].x;
-            drawPt.y += pieceOffsets[y * PUZZLE_WIDTH + x].y;
-            if(x == PUZZLE_WIDTH - 1)
-                drawPt.y += piece.h();
+                display.Blit(piece, Point(piece.x(), piece.y()) + cur_pt);
         }
-        drawPt.x = dst_pt.x;
-    }
 
     //TODO: Make non-visible pieces fade out
 

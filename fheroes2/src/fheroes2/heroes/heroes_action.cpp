@@ -2745,7 +2745,7 @@ void ActionToEvent(Heroes &hero, const u8 obj, const u16 dst_index)
 
 void ActionToObelisk(Heroes &hero, const u8 obj, const u16 dst_index)
 {
-    if(!hero.isVisited(obj, Visit::GLOBAL))
+    if(!hero.isVisited(dst_index, Visit::GLOBAL))
     {
         hero.SetVisited(dst_index, Visit::GLOBAL);
         AGG::PlaySound(M82::EXPERNCE);
