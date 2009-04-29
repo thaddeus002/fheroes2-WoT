@@ -1527,14 +1527,14 @@ void Castle::RecruitAllMonster(void)
     if(isBuild(DWELLING_MONSTER1)) RecruitMonster(DWELLING_MONSTER1, MAXU16);
 }
 
-const Army::army_t & Castle::GetArmy(void)
+const Army::army_t & Castle::GetArmy(void) const
 {
-    castle_heroes = GetHeroes();
-    return castle_heroes ? castle_heroes->GetArmy() : army;
+    const Heroes *heroes = GetHeroes();
+    return heroes ? heroes->GetArmy() : army;
 }
 
 Army::army_t & Castle::GetArmy(void)
 {
-    castle_heroes = GetHeroes();
-    return castle_heroes ? castle_heroes->GetArmy() : army;
+    Heroes *heroes = GetHeroes();
+    return heroes ? heroes->GetArmy() : army;
 }

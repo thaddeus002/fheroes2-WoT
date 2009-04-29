@@ -119,7 +119,7 @@ public:
     u8 GetLevelMageGuild(void) const;
     const MageGuild & GetMageGuild(void) const;
 
-    const Army::army_t & GetArmy(void);
+    const Army::army_t & GetArmy(void) const;
     Army::army_t & GetArmy(void);
     u16 GetDwellingLivedCount(building_t dw);
     void RecruitAllMonster(void);
