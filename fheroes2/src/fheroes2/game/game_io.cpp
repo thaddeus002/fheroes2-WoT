@@ -119,6 +119,8 @@ void Game::SaveXML(const std::string &fn)
     wrld->SetAttribute("uniq", world.uniq0);
     wrld->SetAttribute("week", world.week_name);
     wrld->SetAttribute("count_obelisk", world.count_obelisk);
+    wrld->SetAttribute("heroes_cond_wins", world.heroes_cond_wins);
+    wrld->SetAttribute("heroes_cond_loss", world.heroes_cond_loss);
     // world->date
     node = new TiXmlElement("date");
     wrld->LinkEndChild(node);
@@ -777,6 +779,10 @@ void Game::LoadXML(const std::string &fn)
     world.week_name = Week::Get(res);
     wrld->Attribute("count_obelisk", &res);
     world.count_obelisk = res;
+    wrld->Attribute("heroes_cond_wins", &res);
+    world.heroes_cond_wins = Heroes::ConvertID(res);
+    wrld->Attribute("heroes_cond_loss", &res);
+    world.heroes_cond_loss = Heroes::ConvertID(res);
 
     // world date
     date->Attribute("month", &res);

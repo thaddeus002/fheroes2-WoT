@@ -115,6 +115,11 @@ bool Kingdom::Modes(flags_t f) const
     return flags & f;
 }
 
+bool Kingdom::isLoss(void) const
+{
+    return castles.empty() && heroes.empty();
+}
+
 void Kingdom::ActionNewDay(void)
 {
     if((castles.empty() && heroes.empty()) || 0 == lost_town_days)

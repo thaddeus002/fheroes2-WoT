@@ -198,7 +198,7 @@ Army::army_t & Captain::GetArmy(void)
     return const_cast<Army::army_t &>(home.GetArmy());
 }
 
-bool Captain::HasArtifact(const Artifact::artifact_t & art) const
+bool Captain::HasArtifact(const Artifact::artifact_t art) const
 {
     return false;
 }

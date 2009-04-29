@@ -134,6 +134,9 @@ public:
     bool CreateBoat(const u16 center, bool build);
     void ClearFog(const u8 color);
 
+    bool CheckKingdomWins(u8) const;
+    bool CheckKingdomLoss(u8) const;
+
     void GetEventDay(const Color::color_t, std::vector<GameEvent::Day *> &) const;
     const GameEvent::Coord* GetEventMaps(const Color::color_t c, const u16 index) const;
     GameEvent::Riddle* GetSphinx(const u16 index) const;
@@ -147,6 +150,7 @@ protected:
     void UpdateDwellingPopulation(void);
     void UpdateMonsterPopulation(void);
     void GetObjectIndexes(std::vector<u16> &, MP2::object_t, bool) const;
+    bool CheckKingdomNormalVictory(const Kingdom &) const;
 
 private:
     World() : Size(0, 0), ultimate_artifact_area(448, 448), width(Size::w), height(Size::h) {};
@@ -184,6 +188,9 @@ private:
 
     Week::type_t week_name;    
     u16 count_obelisk;
+
+    Heroes::heroes_t heroes_cond_wins;
+    Heroes::heroes_t heroes_cond_loss;
 
     static u32 uniq0;
 };

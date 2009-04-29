@@ -49,7 +49,7 @@ class Captain : public HeroBase
 
     const Army::army_t & GetArmy(void) const;
     Army::army_t & GetArmy(void);
-    bool HasArtifact(const Artifact::artifact_t & art) const;
+    bool HasArtifact(const Artifact::artifact_t) const;
     BagArtifacts & GetBagArtifacts(void);
     void TakeArtifacts(Heroes &);
     u16 GetMaxSpellPoints(void) const;

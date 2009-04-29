@@ -52,6 +52,7 @@ public:
     Game::control_t Control() const{ return control; };
     void SetControl(const Game::control_t con) { control = con; };
     bool isPlay(void) const{ return Modes(PLAY); };
+    bool isLoss(void) const;
     bool AllowPayment(const Resource::funds_t & funds) const;
 
     Color::color_t GetColor(void) const{ return color; };

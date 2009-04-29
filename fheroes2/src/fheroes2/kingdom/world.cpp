@@ -32,6 +32,7 @@
 #include "mp2.h"
 #include "text.h"
 #include "algorithm.h"
+#include "game_over.h"
 #include "world.h"
 
 bool PredicateHeroesIsFreeman(const Heroes *h)
@@ -981,6 +982,18 @@ void World::LoadMaps(const std::string &filename)
 	}
     }
 
+    // update wins, loss conditions
+    if(GameOverConditions::WINS_HERO == Settings::Get().ConditionWins())
+    {
+	const Heroes* hero = GetHeroes(Settings::Get().WinsMapsIndexObject());
+	heroes_cond_wins = hero ? hero->GetID() : Heroes::UNKNOWN;
+    }
+    if(GameOverConditions::LOSS_HERO == Settings::Get().ConditionLoss())
+    {
+	const Heroes* hero = GetHeroes(Settings::Get().LossMapsIndexObject());
+	heroes_cond_loss = hero ? hero->GetID() : Heroes::UNKNOWN;
+    }
+
     if(Settings::Get().Debug()) Error::Verbose("World::LoadMaps: end load.");
 }
 /* get human kindom */
@@ -1217,6 +1230,9 @@ void World::Reset(void)
 
     week_name = Week::TORTOISE;
     count_obelisk = 0;
+
+    heroes_cond_wins = Heroes::UNKNOWN;
+    heroes_cond_loss = Heroes::UNKNOWN;
 
     // reserve memory
     vec_eventsday.reserve(6);
@@ -1851,4 +1867,93 @@ void World::UpdateRecruits(Recruits & recruits) const
         while(recruits.GetID1() == recruits.GetID2()) recruits.SetHero2(GetFreemanHeroes());
     else
         recruits.SetHero2(NULL);
+}
+
+bool World::CheckKingdomNormalVictory(const Kingdom & kingdom) const
+{
+    return !kingdom.isLoss() &&
+           1 == std::count_if(&vec_kingdoms[0], &vec_kingdoms[6], std::not1(std::mem_fun(&Kingdom::isLoss)));
+}
+
+bool World::CheckKingdomWins(u8 color) const
+{
+    const Settings & conf = Settings::Get();
+    const Kingdom & kingdom = world.GetKingdom(color);
+
+    // check comp also wins
+    if(((GameOverConditions::WINS_TOWN | GameOverConditions::WINS_GOLD) & conf.ConditionWins()) &&
+	!conf.WinsCompAlsoWins() && Game::AI == kingdom.Control()) return false;
+
+    switch(conf.ConditionWins())
+    {
+        case GameOverConditions::WINS_ALL:
+	    return CheckKingdomNormalVictory(kingdom);
+
+        case GameOverConditions::WINS_TOWN:
+        {
+            const Castle *town = GetCastle(conf.WinsMapsIndexObject());
+            return ((town && town->GetColor() == color) ||
+		    (conf.WinsAllowNormalVictory() && CheckKingdomNormalVictory(kingdom)));
+        }
+
+        case GameOverConditions::WINS_HERO:
+        {
+            const Heroes *hero = GetHeroes(heroes_cond_wins);
+            return hero && Heroes::UNKNOWN != heroes_cond_wins && hero->isFreeman(); // TODO:: FIX need check killer color
+        }
+
+        case GameOverConditions::WINS_ARTIFACT:
+	{
+	    const Artifact::artifact_t art = conf.WinsFindArtifact();
+	    std::vector<Heroes *>::const_iterator beg = kingdom.GetHeroes().begin();
+	    std::vector<Heroes *>::const_iterator end = kingdom.GetHeroes().end();
+	    return (end != std::find_if(beg, end, std::bind2nd(std::mem_fun(&Heroes::HasArtifact), art)) ||
+		    (conf.WinsAllowNormalVictory() && CheckKingdomNormalVictory(kingdom)));
+	}
+
+        case GameOverConditions::WINS_SIDE:
+        {
+            // TODO:: FIX side wins conditions
+	    break;
+        }
+
+        case GameOverConditions::WINS_GOLD:
+	    return (kingdom.GetFundsGold() >= conf.WinsAccumulateGold() ||
+		    (conf.WinsAllowNormalVictory() && CheckKingdomNormalVictory(kingdom)));
+
+        default: break;
+    }
+
+    return false;
+}
+
+bool World::CheckKingdomLoss(u8 color) const
+{
+    const Settings & conf = Settings::Get();
+    const Kingdom & kingdom = GetKingdom(color);
+
+    switch(conf.ConditionLoss())
+    {
+        case GameOverConditions::LOSS_ALL:
+            return kingdom.isLoss();
+
+        case GameOverConditions::LOSS_TOWN:
+        {
+            const Castle *town = GetCastle(conf.LossMapsIndexObject());
+            return town && town->GetColor() != color;
+        }
+
+        case GameOverConditions::LOSS_HERO:
+        {
+            const Heroes *hero = GetHeroes(heroes_cond_loss);
+            return hero && Heroes::UNKNOWN != heroes_cond_loss && hero->GetColor() != color;
+        }
+
+        case GameOverConditions::LOSS_TIME:
+            return CountDay() > conf.LossCountDays();
+
+        default:break;
+    }
+
+    return false;
 }

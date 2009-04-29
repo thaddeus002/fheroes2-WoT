@@ -78,7 +78,7 @@ class HeroBase : public Skill::Primary, public BitModes
   public:
     virtual const Army::army_t & GetArmy(void) const = 0;
     virtual Army::army_t & GetArmy(void) = 0;
-    virtual bool HasArtifact(const Artifact::artifact_t & art) const = 0;
+    virtual bool HasArtifact(const Artifact::artifact_t) const = 0;
     virtual BagArtifacts & GetBagArtifacts(void) = 0;
     virtual void TakeArtifacts(Heroes &) = 0;
     virtual u16 GetMaxSpellPoints(void) const = 0;
@@ -154,6 +154,8 @@ public:
 
     const Spell::Book & SpellBook(void) const { return spell_book; };
 
+    heroes_t GetID(void) const;
+
     u8 GetAttack(void) const;
     u8 GetDefense(void) const;
     u8 GetPower(void) const;
@@ -183,8 +185,8 @@ public:
     void LevelUpSkill(const Skill::Secondary::skill_t skill);
     void FindSkillsForLevelUp(Skill::Secondary & sec1, Skill::Secondary & sec2) const;
 
-    bool PickupArtifact(const Artifact::artifact_t & art);
-    bool HasArtifact(const Artifact::artifact_t & art) const;
+    bool PickupArtifact(const Artifact::artifact_t);
+    bool HasArtifact(const Artifact::artifact_t) const;
     u8 GetCountArtifacts(void) const;
     BagArtifacts & GetBagArtifacts(void);
     void TakeArtifacts(Heroes &);

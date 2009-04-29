@@ -496,6 +496,11 @@ void Heroes::LoadFromMP2(u16 map_index, const void *ptr, const Color::color_t cl
     if(Settings::Get().Debug()) Error::Verbose("add heroes: " + name + ", color: " + Color::String(color) + ", race: " + Race::String(race));
 }
 
+Heroes::heroes_t Heroes::GetID(void) const
+{
+    return portrait;
+}
+
 const Point & Heroes::GetCenter(void) const
 { return mp; }
 
@@ -1237,12 +1242,12 @@ u8 Heroes::GetCountArtifacts(void) const
 }
 
 /* return true if artifact present */
-bool Heroes::HasArtifact(const Artifact::artifact_t & art) const
+bool Heroes::HasArtifact(const Artifact::artifact_t art) const
 {
     return artifacts.end() != std::find(artifacts.begin(), artifacts.end(), art);
 }
 
-bool Heroes::PickupArtifact(const Artifact::artifact_t & art)
+bool Heroes::PickupArtifact(const Artifact::artifact_t art)
 {
     BagArtifacts::iterator it = std::find(artifacts.begin(), artifacts.end(), Artifact::UNKNOWN);
 
