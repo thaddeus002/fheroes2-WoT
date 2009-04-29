@@ -34,7 +34,6 @@ namespace Music
 
 namespace Mixer
 {
-    void FreeChunk(const int ch);
     void Init(void);
     void Quit(void);
 
@@ -211,6 +210,8 @@ void Music::Play(const std::vector<u8> & body, bool loop)
 {
     if(! Mixer::valid) return;
 
+    Reset();
+
     bool skip = false;
 
     if(id != &body[0]) Reset();
@@ -218,9 +219,8 @@ void Music::Play(const std::vector<u8> & body, bool loop)
 
     if(!music && body.size())
     {
-	id = &body[0];
-	music = Mix_LoadMUS_RW(SDL_RWFromConstMem(&body[0], body.size()));
-	Mix_HookMusicFinished(Reset);
+        id = &body[0];
+        music = Mix_LoadMUS_RW(SDL_RWFromConstMem(&body[0], body.size()));
     }
 
     if(music && !skip) Mix_PlayMusic(music, loop ? -1 : 0);
@@ -255,9 +255,9 @@ void Music::Reset(void)
 {
     if(Mixer::valid && music)
     {
-	Mix_HaltMusic();
+        Mix_HaltMusic();
         Mix_FreeMusic(music);
-	music = NULL;
+        music = NULL;
         id = NULL;
     }
 }
@@ -266,35 +266,33 @@ void Mixer::Init(void)
 {
     if(SDL::SubSystem(SDL_INIT_AUDIO))
     {
-	hardware.freq = 22050;
-	hardware.format = AUDIO_S16;
-	hardware.channels = 2;
-	hardware.samples = 4096;
+        hardware.freq = 22050;
+        hardware.format = AUDIO_S16;
+        hardware.channels = 2;
+        hardware.samples = 4096;
 
-	if(0 != Mix_OpenAudio(hardware.freq, hardware.format, hardware.channels, hardware.samples))
-	{
-	    Error::Warning("Mixer: " + std::string(SDL_GetError()));
-	    
-	    valid = false;
-	}
-	else
-	{
-	    int channels = 0;
+        if(0 != Mix_OpenAudio(hardware.freq, hardware.format, hardware.channels, hardware.samples))
+        {
+            Error::Warning("Mixer: " + std::string(SDL_GetError()));	    
+            valid = false;
+        }
+        else
+        {
+            int channels = 0;
     	    Mix_QuerySpec(&hardware.freq, &hardware.format, &channels);
-	    hardware.channels = channels;
+            hardware.channels = channels;
 
-	    Mix_AllocateChannels(CHANNEL_RESERVED + CHANNEL_FREE);
+            Mix_AllocateChannels(CHANNEL_RESERVED + CHANNEL_FREE);
     	    Mix_ReserveChannels(CHANNEL_RESERVED);
-	    Mix_ChannelFinished(FreeChunk);
             
             valid = true;
-	}
+        }
     }
     else
     {
-	Error::Warning("Mixer: audio subsystem not initialize");
+        Error::Warning("Mixer: audio subsystem not initialize");
 
-	valid = false;
+        valid = false;
     }
 }
 
@@ -425,35 +423,24 @@ void Mixer::LoadRAW(const std::vector<u8> & body, bool loop, const u8 ch)
 
     if(CHANNEL_RESERVED <= ch)
     {
-	Error::Verbose("Mixer::LoadRAW: need reserved channel: ", ch);
-	return;
+        Error::Verbose("Mixer::LoadRAW: need reserved channel: ", ch);
+        return;
     }
 
     Mix_HaltChannel(ch);
-    Mix_Chunk* chunk = Mix_GetChunk(ch);
-    if(ch) Mix_FreeChunk(chunk);
+    Mix_Chunk *chunk = Mix_GetChunk(ch);
+    if(chunk) Mix_FreeChunk(chunk);
 
     if(body.size())
     {
-	chunk = Mix_QuickLoad_RAW(const_cast<u8 *>(&body[0]), body.size());
+        chunk = Mix_QuickLoad_RAW(const_cast<u8 *>(&body[0]), body.size());
 
-	if(chunk)
-	{
-	    Mix_PlayChannel(ch, chunk, loop ? -1 : 0);
-	    Mix_Pause(ch);
-	}
-	else
-	    Error::Warning(Mix_GetError());
-    }
-}
-
-void Mixer::FreeChunk(const int ch)
-{
-    if(CHANNEL_RESERVED <= ch)
-    {
-	Mix_Chunk *chunk = Mix_GetChunk(ch);
-
-	if(chunk) Mix_FreeChunk(chunk);
+        if(chunk)
+        {
+            Mix_PlayChannel(ch, chunk, loop ? -1 : 0);
+            Mix_Pause(ch);
+        }
+        else Error::Warning(Mix_GetError());
     }
 }
 
