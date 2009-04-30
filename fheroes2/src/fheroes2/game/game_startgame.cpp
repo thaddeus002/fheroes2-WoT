@@ -160,6 +160,10 @@ Game::menu_t Game::StartGame(void)
     	    break;
     }
 
+    // update starting resource
+    for(Color::color_t color = Color::BLUE; color != Color::GRAY; ++color) if(color & conf.Players())
+        world.GetKingdom(color).UpdateStartingResource();
+
     GameArea & areaMaps = GameArea::Get();
     areaMaps.Build();
 
