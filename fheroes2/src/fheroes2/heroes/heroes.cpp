@@ -1735,12 +1735,13 @@ bool Heroes::isFreeman(void) const
 
 void Heroes::SetFreeman(const u8 reason)
 {
+    if(isFreeman()) return;
+
     if(Army::RETREAT == reason || Army::SURRENDER == reason) world.GetKingdom(color).GetRecruits().SetHero2(this);
     if(Army::LOSE == reason || Army::RETREAT == reason) army.Reset();
 
     color = Color::GRAY;
-    if(0 <= mp.x && mp.x < world.w() &&
-       0 <= mp.y && mp.y < world.h()) world.GetTiles(mp).SetObject(save_maps_general);
+    world.GetTiles(mp).SetObject(save_maps_general);
     mp.x = -1;
     mp.y = -1;
     path.Reset();
@@ -1795,6 +1796,8 @@ void Heroes::Dump(void) const
     std::cout << "color           : " << Color::String(color) << std::endl;
     std::cout << "experience      : " << experience << std::endl;
     std::cout << "magic point     : " << magic_point << std::endl;
+    std::cout << "position x      : " << mp.x << std::endl;
+    std::cout << "position y      : " << mp.y << std::endl;
     std::cout << "move point      : " << move_point << std::endl;
     std::cout << "max magic point : " << GetMaxSpellPoints() << std::endl;
     std::cout << "max move point  : " << GetMaxMovePoints() << std::endl;

@@ -58,7 +58,7 @@ void AIToPoorLuckObject(Heroes &hero, const u8 obj, const u16 dst_index);
 void AIToObelisk(Heroes &hero, const u8 obj, const u16 dst_index);
 void AIToTreeKnowledge(Heroes &hero, const u8 obj, const u16 dst_index);
 void AIToDaemonCave(Heroes &hero, const u8 obj, const u16 dst_index);
-Army::battle_t AIToCastle(Heroes &hero, const u8 obj, const u16 dst_index);
+void AIToCastle(Heroes &hero, const u8 obj, const u16 dst_index);
 void AIToSign(Heroes &hero, const u8 obj, const u16 dst_index);
 void AIToDwellingJoinMonster(Heroes &hero, const u8 obj, const u16 dst_index);
 void AIToHeroes(Heroes &hero, const u8 obj, const u16 dst_index);
@@ -269,7 +269,7 @@ void Heroes::AIAction(const u16 dst_index)
 
 void AIToHeroes(Heroes &hero, const u8 obj, const u16 dst_index)
 {
-    const Heroes *other_hero = world.GetHeroes(dst_index);
+    Heroes *other_hero = world.GetHeroes(dst_index);
     if(! other_hero) return;
 
     if(hero.GetColor() == other_hero->GetColor())
@@ -280,24 +280,28 @@ void AIToHeroes(Heroes &hero, const u8 obj, const u16 dst_index)
     }
     else
     {
+        if(other_hero->GetUnderObject() == MP2::OBJ_CASTLE)
+    	{
+    	    AIToCastle(hero, MP2::OBJ_CASTLE, dst_index);
+    	    return;
+    	}
+
         if(Settings::Get().Debug()) Error::Verbose("AIToHeroes: " + hero.GetName() + " attack enemy hero " + other_hero->GetName());
 
         u32 exp = 0;
         Army::battle_t b;
 
-        if(other_hero->GetUnderObject() == MP2::OBJ_CASTLE)
-            b = AIToCastle(hero, MP2::OBJ_CASTLE, dst_index);
-        else b = Army::Battle(hero, const_cast<Heroes &>(*other_hero), world.GetTiles(dst_index), exp);
+        b = Army::Battle(hero, *other_hero, world.GetTiles(dst_index), exp);
 
         switch(b)
         {
             case Army::WIN:
-                hero.TakeArtifacts(const_cast<Heroes &>(*other_hero));
+                hero.TakeArtifacts(*other_hero);
                 hero.IncreaseExperience(exp);
-                world.GetKingdom((*other_hero).GetColor()).RemoveHeroes(other_hero);
-                const_cast<Heroes &>(*other_hero).SetFreeman(b);
+                world.GetKingdom(other_hero->GetColor()).RemoveHeroes(other_hero);
+                other_hero->SetFreeman(b);
                 // set default army
-                const_cast<Heroes &>(*other_hero).GetArmy().Reset(true);
+                other_hero->GetArmy().Reset(true);
                 hero.ActionAfterBattle();
                 break;
 
@@ -312,11 +316,11 @@ void AIToHeroes(Heroes &hero, const u8 obj, const u16 dst_index)
     }
 }
 
-Army::battle_t AIToCastle(Heroes &hero, const u8 obj, const u16 dst_index)
+void AIToCastle(Heroes &hero, const u8 obj, const u16 dst_index)
 {
     Castle *castle = world.GetCastle(dst_index);
 
-    if(! castle) return Army::WIN;
+    if(! castle) return;
 
     if(hero.GetColor() == castle->GetColor())
     {
@@ -328,18 +332,17 @@ Army::battle_t AIToCastle(Heroes &hero, const u8 obj, const u16 dst_index)
         if(Settings::Get().Debug()) Error::Verbose("AIToCastle: " + hero.GetName() + " attack enemy castle " + castle->GetName());
 
         u32 exp = 0;
-        Army::battle_t b;
 
-        castle->MergeArmies();
+        if(Game::AI == world.GetKingdom(castle->GetColor()).Control())
+    	    castle->MergeArmies();
+
         Army::army_t & army = castle->GetActualArmy();
 
-        if(army.isValid())
-        {
-            if(castle->isCastle())
-                b = Army::Battle(hero, const_cast<Castle &>(*castle), world.GetTiles(dst_index), exp);
-            else b = Army::Battle(hero, army, world.GetTiles(dst_index), exp);
-        }
-        else b = Army::WIN;
+    	Army::battle_t b = army.isValid() ?
+    	    (castle->isCastle() ?
+    		Army::Battle(hero, *castle, world.GetTiles(dst_index), exp) :
+    		Army::Battle(hero, army, world.GetTiles(dst_index), exp)) :
+    	    Army::WIN;
 
         switch(b)
         {
@@ -359,11 +362,7 @@ Army::battle_t AIToCastle(Heroes &hero, const u8 obj, const u16 dst_index)
 
             default: break;
         }
-
-        return b;
     }
-
-    return Army::WIN;
 }
 
 void AIToMonster(Heroes &hero, const u8 obj, const u16 dst_index)
