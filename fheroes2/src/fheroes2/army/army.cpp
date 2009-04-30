@@ -973,7 +973,7 @@ bool Army::army_t::StrongerEnemyArmy(const army_t & a)
 
 	return h1 / r2 > h2 / r1;
     }
-    return false;
+    return true;
 }
 
 const Skill::Primary* Army::army_t::GetCommander(void) const
