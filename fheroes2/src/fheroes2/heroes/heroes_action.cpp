@@ -487,7 +487,7 @@ void ActionToMonster(Heroes &hero, const u8 obj, const u16 dst_index)
         
         if(tile.IsJoiner())
         {
-            std::string message = _("A group of %{monster} with a desire for greater glory wish to join you.\nDo you accept?");
+            std::string message = _("A group of %{monster} with a desire for greater glory wish to join you. Do you accept?");
             std::string monst = monster.GetMultiName();
             String::Lower(monst);
             String::Replace(message, "%{monster}", monst);
@@ -515,7 +515,7 @@ void ActionToMonster(Heroes &hero, const u8 obj, const u16 dst_index)
                 std::string message;
                 if(tile.GetCountMonster() == 1)
                     message = _("The creature is swayed by your diplomatic tongue, and offers to join "
-                                "your army for the sum of %{gold} gold.  Do you accept?");
+                                "your army for the sum of %{gold} gold. Do you accept?");
                 else
                 {
                     message = _("The creatures are swayed by your diplomatic\ntongue, and make you an offer:\n \n");
@@ -2209,11 +2209,11 @@ void ActionToDwellingJoinMonster(Heroes &hero, const u8 obj, const u16 dst_index
     if(count)
     {
 	const Monster monster(Monster::FromObject(obj));
-        std::string message = _("A group of %{monster} with a desire for greater glory wish to join you.");
-        String::Replace(message, "%{monster}", monster.GetName());
+        std::string message = _("A group of %{monster} with a desire for greater glory wish to join you. Do you accept?");
+        String::Replace(message, "%{monster}", monster.GetMultiName());
 
         AGG::PlaySound(M82::EXPERNCE);
-	if(Dialog::YES == Dialog::Message(message, _("Do you accept?"), Font::BIG, Dialog::YES|Dialog::NO))
+        if(Dialog::YES == Dialog::Message(MP2::StringObject(obj), message, Font::BIG, Dialog::YES|Dialog::NO))
 	{
 	    if(!hero.GetArmy().JoinTroop(monster, count))
 		Dialog::Message(monster.GetName(), _("You are unable to recruit at this time, your ranks are full."), Font::BIG, Dialog::OK);

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2009-04-30 12:39-0400\n"
+"POT-Creation-Date: 2009-04-30 12:51-0400\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2324,9 +2324,10 @@ msgid "Move how many troops?"
 msgstr ""
 
 #: ../fheroes2/heroes/heroes_action.cpp:490
+#: ../fheroes2/heroes/heroes_action.cpp:2212
 msgid ""
-"A group of %{monster} with a desire for greater glory wish to join you.\n"
-"Do you accept?"
+"A group of %{monster} with a desire for greater glory wish to join you. Do "
+"you accept?"
 msgstr ""
 
 #: ../fheroes2/heroes/heroes_action.cpp:499
@@ -2337,7 +2338,7 @@ msgstr ""
 #: ../fheroes2/heroes/heroes_action.cpp:517
 msgid ""
 "The creature is swayed by your diplomatic tongue, and offers to join your "
-"army for the sum of %{gold} gold.  Do you accept?"
+"army for the sum of %{gold} gold. Do you accept?"
 msgstr ""
 
 #: ../fheroes2/heroes/heroes_action.cpp:521
@@ -2995,14 +2996,6 @@ msgstr ""
 msgid ""
 "The lighthouse is now under your control, and all of your ships will now "
 "move further each turn."
-msgstr ""
-
-#: ../fheroes2/heroes/heroes_action.cpp:2212
-msgid "A group of %{monster} with a desire for greater glory wish to join you."
-msgstr ""
-
-#: ../fheroes2/heroes/heroes_action.cpp:2216
-msgid "Do you accept?"
 msgstr ""
 
 #: ../fheroes2/heroes/heroes_action.cpp:2227
