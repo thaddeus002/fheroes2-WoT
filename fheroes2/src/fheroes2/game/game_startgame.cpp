@@ -577,7 +577,9 @@ Cursor::themes_t Game::GetCursor(const Maps::Tiles & tile)
 		    default:
 			    if(MP2::isGroundObject(tile.GetObject()))
 			    {
-				const bool protection = Maps::TileUnderProtection(tile.GetIndex());
+				const bool protection = (MP2::isPickupObject(tile.GetObject()) ? false :
+					Maps::TileUnderProtection(tile.GetIndex()));
+
 				switch(from_hero.GetRangeRouteDays(tile.GetIndex()))
 				{
 				    case 0:	return Cursor::POINTER;

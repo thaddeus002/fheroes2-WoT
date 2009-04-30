@@ -867,3 +867,24 @@ bool MP2::isCaptureObject(const u8 obj)
 
     return false;
 }
+
+bool MP2::isPickupObject(const u8 obj)
+{
+    switch(obj)
+    {
+	case MP2::OBJ_WATERCHEST:
+	case MP2::OBJ_SHIPWRECKSURVIROR:
+        case MP2::OBJ_FLOTSAM:
+        case MP2::OBJ_BOTTLE:
+        case MP2::OBJ_TREASURECHEST:
+        case MP2::OBJ_ANCIENTLAMP:
+	case MP2::OBJ_CAMPFIRE:
+        case MP2::OBJ_RESOURCE:
+        case MP2::OBJ_ARTIFACT:
+	    return true;
+
+	default: break;
+    }
+
+    return false;
+}

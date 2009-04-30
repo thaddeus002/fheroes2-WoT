@@ -534,6 +534,7 @@ namespace MP2
     bool isWaterObject(const u8 obj);
     bool isQuantityObject(const u8 obj);
     bool isCaptureObject(const u8 obj);
+    bool isPickupObject(const u8 obj);
 
     bool isDayLife(const u8 obj);
     bool isWeekLife(const u8 obj);
