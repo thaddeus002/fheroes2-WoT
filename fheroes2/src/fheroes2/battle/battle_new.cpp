@@ -498,14 +498,13 @@ Battle::BattleControl::BattleControl(Heroes &hero, Army::army_t& army, const Map
     m_battleStatus = RunBattle(&hero, NULL);
     BattleArmyToArmy(m_battlefield.GetArmy(0), hero.GetArmy());
     BattleArmyToArmy(m_battlefield.GetArmy(1), army);
-    ArmyToBattleArmy(army, oppArmy);
-    exp = BattleSummaryVsArmy(hero, heroArmyOrig, oppArmy, oppArmyOrig);
+    exp = BattleSummaryVsArmy(hero, heroArmyOrig, m_battlefield.GetArmy(1), oppArmyOrig);
 }
 
 Battle::BattleControl::BattleControl(Heroes &hero, Castle &castle, const Maps::Tiles &tile, u32 &exp)
 : m_battlefield(&castle, &hero, NULL, hero.GetArmy(), castle.GetActualArmy(), g_baseOffset, tile)
 {
-    Army::BattleArmy_t heroArmyOrig, oppArmy, oppArmyOrig;
+    Army::BattleArmy_t heroArmyOrig, oppArmyOrig;
     ArmyToBattleArmy(hero.GetArmy(), heroArmyOrig);
     ArmyToBattleArmy(castle.GetActualArmy(), oppArmyOrig);
 
@@ -519,18 +518,13 @@ Battle::BattleControl::BattleControl(Heroes &hero, Castle &castle, const Maps::T
     
     m_battleStatus = RunBattle(&hero, hero2);
     BattleArmyToArmy(m_battlefield.GetArmy(0), hero.GetArmy());
+    BattleArmyToArmy(m_battlefield.GetArmy(1), castle.GetActualArmy());
     if(hero2)
-    {
-        BattleArmyToArmy(m_battlefield.GetArmy(1), hero2->GetArmy());
         exp = BattleSummaryVsHero(hero, heroArmyOrig, *hero2, oppArmyOrig);
-    }
     else
-    {
-        BattleArmyToArmy(m_battlefield.GetArmy(1), castle.GetArmy());
-        exp = BattleSummaryVsArmy(hero, heroArmyOrig, oppArmy, oppArmyOrig);
-    }
+        exp = BattleSummaryVsArmy(hero, heroArmyOrig, m_battlefield.GetArmy(1), oppArmyOrig);
 
-    if(m_battleStatus == Army::WIN) //TODO: Vanquish present hero?
+    if(m_battleStatus == Army::WIN)
         castle.GetArmy().Clear();
 }
 
@@ -680,9 +674,6 @@ void Battle::BattleControl::InitializeLogicSettings(HeroBase *hero1, HeroBase *h
     };
     Army::BattleArmyToArmy(m_battlefield.GetArmy(0), army[0]);
     Army::BattleArmyToArmy(m_battlefield.GetArmy(1), army[1]);
-
-    const Army::BattleTroop &troop = m_battlefield.GetArmy(1)[1];
-    printf("%d %d\n", troop.GetID(), troop.Count());
 
     if((hero1 && world.GetKingdom(hero1->GetColor()).Control() == Game::LOCAL) ||
        world.GetKingdom(army[0].GetColor()).Control() == Game::LOCAL)

@@ -21,8 +21,8 @@ static void DrawArmySummary(const Army::BattleArmy_t &orig, const Army::BattleAr
 {
     if(orig.size() != current.size())
     {
-	Error::Warning("except: orig.size() != current.size()");
-	return;
+        Error::Warning("except: orig.size() != current.size()");
+        return;
     }
 
     std::vector<std::pair<const Sprite *, int> > killed;
