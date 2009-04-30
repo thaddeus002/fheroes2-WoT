@@ -22,6 +22,7 @@
 #include "agg.h"
 #include "cursor.h"
 #include "button.h"
+#include "dialog.h"
 #include "game.h"
 
 Game::menu_t Game::HighScores(void)
@@ -55,6 +56,10 @@ Game::menu_t Game::HighScores(void)
 
     cursor.Show();
     display.Flip();
+
+    std::string str;
+    String::AddInt(str, Game::GetGameOverScores());
+    Dialog::Message("Your Score:", str, Font::BIG, Dialog::OK);
 
     // highscores loop
     while(le.HandleEvents())

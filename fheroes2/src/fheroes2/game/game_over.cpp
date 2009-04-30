@@ -65,7 +65,7 @@ void GameOver::DialogWins(u16 cond)
 
 	case WINS_TOWN:
 	{
-	    body = _("You captured %{name}! You are victorious.");
+	    body = _("You captured %{name}!\nYou are victorious.");
 	    const Castle *town = world.GetCastle(conf.WinsMapsIndexObject());
 	    if(town) String::Replace(body, "%{name}", town->GetName());
 	}
@@ -73,7 +73,7 @@ void GameOver::DialogWins(u16 cond)
 
 	case WINS_HERO:
 	{
-	    body = _("You have captured the enemy hero %{name}! Your quest is complete.");
+	    body = _("You have captured the enemy hero %{name}!\nYour quest is complete.");
 	    const Heroes *hero = world.GetHeroesCondWins();
 	    if(hero) String::Replace(body, "%{name}", hero->GetName());
 	    break;
@@ -81,19 +81,19 @@ void GameOver::DialogWins(u16 cond)
 
 	case WINS_ARTIFACT:
 	{
-	    body = _("You have found the %{name}. Your quest is complete.");
+	    body = _("You have found the %{name}.\nYour quest is complete.");
 	    const Artifact::artifact_t art = conf.WinsFindArtifact();
 	    String::Replace(body, "%{name}", Artifact::String(art));
 	    break;
         }
 
         case WINS_SIDE:
-    	    body = _("The enemy is beaten. Your side has triumphed!");
+    	    body = _("The enemy is beaten.\nYour side has triumphed!");
     	    break;
 
         case WINS_GOLD:
         {
-    	    body = _("You have built up over %{count} gold in your treasury. All enemies bow before your wealth and power.");
+    	    body = _("You have built up over %{count} gold in your treasury.\nAll enemies bow before your wealth and power.");
 	    String::Replace(body, "%{count}", conf.WinsAccumulateGold());
     	    break;
 	}
@@ -113,7 +113,7 @@ void GameOver::DialogLoss(u16 cond)
     {
 	case WINS_ARTIFACT:
 	{
-	    body = _("The enemy has found the %{name}. Your quest is a failure.");
+	    body = _("The enemy has found the %{name}.\nYour quest is a failure.");
 	    const Artifact::artifact_t art = conf.WinsFindArtifact();
 	    String::Replace(body, "%{name}", Artifact::String(art));
 	    break;
@@ -121,13 +121,13 @@ void GameOver::DialogLoss(u16 cond)
 
         case WINS_SIDE:
         {
-    	    body = _("%{color} has fallen! All is lost.");
+    	    body = _("%{color} has fallen!\nAll is lost.");
     	    break;
     	}
 
         case WINS_GOLD:
         {
-    	    body = _("The enemy has built up over %{count} gold in his treasury. You must bow done in defeat before his wealth and power.");
+    	    body = _("The enemy has built up over %{count} gold in his treasury.\nYou must bow done in defeat before his wealth and power.");
 	    String::Replace(body, "%{count}", conf.WinsAccumulateGold());
     	    break;
 	}
@@ -138,21 +138,21 @@ void GameOver::DialogLoss(u16 cond)
 
 	case LOSS_TOWN:
 	{
-	    body = _("The enemy has captured %{name}! They are triumphant.");
+	    body = _("The enemy has captured %{name}!\nThey are triumphant.");
 	    const Castle *town = world.GetCastle(conf.WinsMapsIndexObject());
 	    if(town) String::Replace(body, "%{name}", town->GetName());
 	}
 
 	case LOSS_HERO:
 	{
-	    body = _("You have lost the hero %{name}. Your quest is over.");
+	    body = _("You have lost the hero %{name}.\nYour quest is over.");
 	    const Heroes *hero = world.GetHeroesCondLoss();
 	    if(hero) String::Replace(body, "%{name}", hero->GetName());
 	    break;
 	}
 
 	case LOSS_TIME:
-	    body = _("You have failed to complete your quest in time. All is lost.");
+	    body = _("You have failed to complete your quest in time.\nAll is lost.");
 	    break;
 
     	default: break;
