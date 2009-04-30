@@ -61,7 +61,7 @@ namespace Mixer
     void	Reset(const int ch = -1);
     u8		isPlaying(const int ch);
     u8		isPaused(const int ch);
-    void	PlayRAW(const std::vector<u8> & body, const int ch = -1);
+    void	PlayRAW(const std::vector<u8> & body, int ch = -1);
     void	LoadRAW(const std::vector<u8> & body, bool loop, const u8 ch);
 
     void	Reduce(void);

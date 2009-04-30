@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2009-04-29 16:45-0400\n"
+"POT-Creation-Date: 2009-04-30 11:50-0400\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1082,43 +1082,43 @@ msgstr ""
 msgid "Resource cost:"
 msgstr ""
 
-#: ../fheroes2/dialog/dialog_gameinfo.cpp:52
+#: ../fheroes2/dialog/dialog_gameinfo.cpp:53
 msgid ""
 "Map\n"
 "Difficulty"
 msgstr ""
 
-#: ../fheroes2/dialog/dialog_gameinfo.cpp:55
+#: ../fheroes2/dialog/dialog_gameinfo.cpp:56
 msgid ""
 "Game\n"
 "Difficulty"
 msgstr ""
 
-#: ../fheroes2/dialog/dialog_gameinfo.cpp:58
+#: ../fheroes2/dialog/dialog_gameinfo.cpp:59
 msgid "Rating"
 msgstr ""
 
-#: ../fheroes2/dialog/dialog_gameinfo.cpp:61
+#: ../fheroes2/dialog/dialog_gameinfo.cpp:62
 msgid "Map Size"
 msgstr ""
 
-#: ../fheroes2/dialog/dialog_gameinfo.cpp:82
+#: ../fheroes2/dialog/dialog_gameinfo.cpp:83
 #: ../fheroes2/game/game_scenarioinfo.cpp:308
 msgid "Opponents"
 msgstr ""
 
-#: ../fheroes2/dialog/dialog_gameinfo.cpp:88
+#: ../fheroes2/dialog/dialog_gameinfo.cpp:89
 #: ../fheroes2/game/game_scenarioinfo.cpp:314
 msgid "Class"
 msgstr ""
 
-#: ../fheroes2/dialog/dialog_gameinfo.cpp:94
+#: ../fheroes2/dialog/dialog_gameinfo.cpp:95
 msgid ""
 "Victory\n"
 "Conditions"
 msgstr ""
 
-#: ../fheroes2/dialog/dialog_gameinfo.cpp:97
+#: ../fheroes2/dialog/dialog_gameinfo.cpp:101
 msgid ""
 "Loss\n"
 "Conditions"
@@ -1815,8 +1815,8 @@ msgstr ""
 msgid "Impossible"
 msgstr ""
 
-#: ../fheroes2/game/game_io.cpp:679 ../fheroes2/kingdom/world.cpp:181
-#: ../fheroes2/kingdom/world.cpp:223
+#: ../fheroes2/game/game_io.cpp:681 ../fheroes2/kingdom/world.cpp:182
+#: ../fheroes2/kingdom/world.cpp:224
 msgid "Maps Loading..."
 msgstr ""
 
@@ -1970,6 +1970,46 @@ msgstr ""
 msgid "Play with 6 human players."
 msgstr ""
 
+#: ../fheroes2/game/game_over.cpp:26
+msgid "Defeat all enemy heroes and towns."
+msgstr ""
+
+#: ../fheroes2/game/game_over.cpp:26
+msgid "Capture a specific town."
+msgstr ""
+
+#: ../fheroes2/game/game_over.cpp:26
+msgid "Defeat a specific hero."
+msgstr ""
+
+#: ../fheroes2/game/game_over.cpp:26
+msgid "Find a specific artifact."
+msgstr ""
+
+#: ../fheroes2/game/game_over.cpp:26
+msgid "Your side defeats the opposing side."
+msgstr ""
+
+#: ../fheroes2/game/game_over.cpp:26
+msgid "Accumulate a large amount of gold."
+msgstr ""
+
+#: ../fheroes2/game/game_over.cpp:43
+msgid "Lose all your heroes and towns."
+msgstr ""
+
+#: ../fheroes2/game/game_over.cpp:43
+msgid "Lose a specific town."
+msgstr ""
+
+#: ../fheroes2/game/game_over.cpp:43
+msgid "Lose a specific hero."
+msgstr ""
+
+#: ../fheroes2/game/game_over.cpp:43
+msgid "Run out of time. (Fail to win by a certain point.)"
+msgstr ""
+
 #: ../fheroes2/game/game_scenarioinfo.cpp:294
 msgid "Scenario"
 msgstr ""
@@ -2031,7 +2071,7 @@ msgstr ""
 msgid "Necroman"
 msgstr ""
 
-#: ../fheroes2/game/game_scenarioinfo.cpp:521
+#: ../fheroes2/game/game_scenarioinfo.cpp:519
 msgid "Rating %{rating}%"
 msgstr ""
 
@@ -3656,46 +3696,46 @@ msgstr ""
 msgid "Jarkonas"
 msgstr ""
 
-#: ../fheroes2/heroes/heroes.cpp:1254
+#: ../fheroes2/heroes/heroes.cpp:1259
 msgid ""
 "You must purchase a spell book to use the mage guild, but you currently have "
 "no room for a spell book."
 msgstr ""
 
-#: ../fheroes2/heroes/heroes.cpp:1254
+#: ../fheroes2/heroes/heroes.cpp:1259
 msgid "Try giving one of your artifacts to another hero."
 msgstr ""
 
-#: ../fheroes2/heroes/heroes.cpp:1255
+#: ../fheroes2/heroes/heroes.cpp:1260
 msgid "You have no room to carry another artifact!"
 msgstr ""
 
-#: ../fheroes2/heroes/heroes.cpp:1334
+#: ../fheroes2/heroes/heroes.cpp:1339
 msgid "To cast spells, you must first buy a spell book for %{gold} gold"
 msgstr ""
 
-#: ../fheroes2/heroes/heroes.cpp:1340
+#: ../fheroes2/heroes/heroes.cpp:1345
 msgid "Unfortunately, you seem to be a little short of cash at the moment."
 msgstr ""
 
-#: ../fheroes2/heroes/heroes.cpp:1352
+#: ../fheroes2/heroes/heroes.cpp:1357
 msgid "Do you wish to buy one?"
 msgstr ""
 
-#: ../fheroes2/heroes/heroes.cpp:1610
+#: ../fheroes2/heroes/heroes.cpp:1615
 msgid "%{name} has gained a level."
 msgstr ""
 
-#: ../fheroes2/heroes/heroes.cpp:1612
+#: ../fheroes2/heroes/heroes.cpp:1617
 msgid "%{skill} Skill +1"
 msgstr ""
 
-#: ../fheroes2/heroes/heroes.cpp:1623 ../fheroes2/heroes/heroes.cpp:1654
-#: ../fheroes2/heroes/heroes.cpp:1686
+#: ../fheroes2/heroes/heroes.cpp:1628 ../fheroes2/heroes/heroes.cpp:1659
+#: ../fheroes2/heroes/heroes.cpp:1691
 msgid "%{name} has gained a level. %{skill} Skill +1"
 msgstr ""
 
-#: ../fheroes2/heroes/heroes.cpp:1626 ../fheroes2/heroes/heroes.cpp:1657
+#: ../fheroes2/heroes/heroes.cpp:1631 ../fheroes2/heroes/heroes.cpp:1662
 msgid "You have learned %{level} %{skill}."
 msgstr ""
 
@@ -4411,7 +4451,7 @@ msgstr ""
 msgid "Condor"
 msgstr ""
 
-#: ../fheroes2/kingdom/world.cpp:751
+#: ../fheroes2/kingdom/world.cpp:752
 msgid "This game is now in beta development version. ;)"
 msgstr ""
 

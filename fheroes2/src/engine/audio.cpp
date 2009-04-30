@@ -34,11 +34,13 @@ namespace Music
 
 namespace Mixer
 {
+    void HaltChannel(const int ch, bool force = false);
     void Init(void);
     void Quit(void);
 
     static Audio::Spec hardware;
     static bool valid		= false;
+    std::vector<Mix_Chunk *> chunks;
 }
 
 namespace Cdrom
@@ -210,20 +212,17 @@ void Music::Play(const std::vector<u8> & body, bool loop)
 {
     if(! Mixer::valid) return;
 
-    Reset();
-
-    bool skip = false;
-
-    if(id != &body[0]) Reset();
-    else skip = true;
-
-    if(!music && body.size())
+    if(id != &body[0])
     {
-        id = &body[0];
-        music = Mix_LoadMUS_RW(SDL_RWFromConstMem(&body[0], body.size()));
-    }
+        Reset();
 
-    if(music && !skip) Mix_PlayMusic(music, loop ? -1 : 0);
+        if(body.size())
+        {
+            id = &body[0];
+            music = Mix_LoadMUS_RW(SDL_RWFromConstMem(&body[0], body.size()));
+            Mix_PlayMusic(music, loop ? -1 : 0);
+        }
+    }
 }
 
 void Music::Volume(const u8 vol)
@@ -284,6 +283,10 @@ void Mixer::Init(void)
 
             Mix_AllocateChannels(CHANNEL_RESERVED + CHANNEL_FREE);
     	    Mix_ReserveChannels(CHANNEL_RESERVED);
+            Mix_GroupChannels(CHANNEL_RESERVED, CHANNEL_RESERVED + CHANNEL_FREE - 1, 0);
+            chunks.reserve(CHANNEL_RESERVED + CHANNEL_FREE);
+            for(u8 ii = 0; ii < CHANNEL_RESERVED + CHANNEL_FREE; ++ii)
+                chunks.push_back(NULL);
             
             valid = true;
         }
@@ -303,14 +306,8 @@ void Mixer::Quit(void)
     Music::Reset();
     Mixer::Reset();
 
-    // free reserved
-    for(u8 ch = 0; ch < CHANNEL_RESERVED; ++ch)
-    {
-	Mix_Chunk *chunk = Mix_GetChunk(ch);
-
-	if(chunk) Mix_FreeChunk(chunk);
-    }
-
+    HaltChannel(-1, true);
+    
     valid = false;
 
     Mix_CloseAudio();
@@ -370,15 +367,35 @@ void Mixer::Reset(const int ch)
 
     if(0 > ch)
     {
-	Music::Reset();
+        Music::Reset();
 
-	if(Cdrom::isValid()) Cdrom::Pause();
+        if(Cdrom::isValid()) Cdrom::Pause();
 
-	for(u8 ii = 0; ii < CHANNEL_RESERVED + CHANNEL_FREE; ++ii)
-	    if(ii < CHANNEL_RESERVED) Mix_Pause(ii);
-	    else Mix_HaltChannel(ii);
+        for(u8 ii = 0; ii < CHANNEL_RESERVED + CHANNEL_FREE; ++ii)
+            if(ii < CHANNEL_RESERVED) Mix_Pause(ii);
+            else HaltChannel(ii);
     }
-    else Mix_HaltChannel(ch);
+    else HaltChannel(ch);
+}
+
+void Mixer::HaltChannel(const int ch, bool force)
+{
+    if(ch < 0)
+    {
+        for(u8 ii = 0; ii < CHANNEL_RESERVED + CHANNEL_FREE; ++ii)
+            HaltChannel(ii, force);
+    }
+    else
+    {
+        Mix_HaltChannel(ch);
+        if(chunks[ch] && (ch >= CHANNEL_RESERVED || force))
+        {
+            Mix_Chunk *chunk = Mix_GetChunk(ch);
+            if(chunk)
+                Mix_FreeChunk(chunk);
+            chunks[ch] = NULL;
+        }
+    }
 }
 
 u8 Mixer::isPlaying(const int ch)
@@ -400,20 +417,26 @@ bool Mixer::isValid(void)
     return valid;
 }
 
-void Mixer::PlayRAW(const std::vector<u8> & body, const int ch)
+void Mixer::PlayRAW(const std::vector<u8> & body, int ch)
 {
     if(! valid) return;
 
-    if(0 <= ch && Mix_GetChunk(ch)) Mix_HaltChannel(ch);
+    if(ch == -1)
+        ch = Mix_GroupAvailable(0);
+    HaltChannel(ch, true);
 
     if(body.size())
     {
-	Mix_Chunk* chunk = Mix_QuickLoad_RAW(const_cast<u8 *>(&body[0]), body.size());
+        Mix_Chunk* chunk = Mix_QuickLoad_RAW(const_cast<u8 *>(&body[0]), body.size());
 
-	if(chunk)
-	    Mix_PlayChannel(ch, chunk, 0);
-	else
-	    Error::Warning(Mix_GetError());
+        if(chunks[ch] != NULL)
+            Error::Warning("Mixer::PlayRAW: Previous mix chunk was not freed");
+        chunks[ch] = chunk;
+
+        if(chunk)
+            Mix_PlayChannel(ch, chunk, 0);
+        else
+            Error::Warning(Mix_GetError());
     }
 }
 
@@ -427,13 +450,15 @@ void Mixer::LoadRAW(const std::vector<u8> & body, bool loop, const u8 ch)
         return;
     }
 
-    Mix_HaltChannel(ch);
-    Mix_Chunk *chunk = Mix_GetChunk(ch);
-    if(chunk) Mix_FreeChunk(chunk);
+    HaltChannel(ch, true);
 
     if(body.size())
     {
-        chunk = Mix_QuickLoad_RAW(const_cast<u8 *>(&body[0]), body.size());
+        Mix_Chunk *chunk = Mix_QuickLoad_RAW(const_cast<u8 *>(&body[0]), body.size());
+
+        if(chunks[ch] != NULL)
+            Error::Warning("Mixer::LoadRAW: Previous mix chunk was not freed");
+        chunks[ch] = chunk;
 
         if(chunk)
         {
