@@ -19,6 +19,12 @@
 
 static void DrawArmySummary(const Army::BattleArmy_t &orig, const Army::BattleArmy_t &current, const Rect &draw)
 {
+    if(orig.size() != current.size())
+    {
+	Error::Warning("except: orig.size() != current.size()");
+	return;
+    }
+
     std::vector<std::pair<const Sprite *, int> > killed;
     u16 width = 0, height = 0;
     for(u16 i = 0; i < orig.size(); i++)
