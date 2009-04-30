@@ -329,8 +329,8 @@ namespace Battle
         void PerformMagicAnimation(std::vector<Army::BattleTroop*> &, Spell::spell_t, HeroBase *);
 
         long CalculateDamage(const Army::BattleTroop &, const Army::BattleTroop &);
+        void ActOnGoodMorale(const Army::BattleTroop &, s8 &, bool &);
         void AdjustMorale(HeroBase *, Army::BattleTroop &);
-        void RevertModes(u32, Army::BattleTroop &);
 
         Army::battle_t m_battleStatus;
         GUI *m_gui;

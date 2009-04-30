@@ -717,6 +717,7 @@ Army::battle_t Battle::BattleControl::RunBattle(HeroBase *hero1, HeroBase *hero2
     turn[1] = CreateTurn(m_commanders[1], m_battlefield.GetArmy(1), m_battlefield.GetArmy(0));
 
     bool validMove = false; //FIXME: Hack so that battles terminate if no unit can move
+    bool goodMorale = false;
     
     NewTurn();
     
@@ -803,7 +804,10 @@ Army::battle_t Battle::BattleControl::RunBattle(HeroBase *hero1, HeroBase *hero2
         else validMove = true;
         
         if(!BfValid(attack))
+        {
+            ActOnGoodMorale(troop, currentTroop, goodMorale);
             continue;
+        }
 
         bool attackerAlive = true;
         bool defenderAlive = true;
@@ -839,20 +843,7 @@ Army::battle_t Battle::BattleControl::RunBattle(HeroBase *hero1, HeroBase *hero2
         if(!Army::isArmyValid(m_battlefield.GetArmy(0)) || !Army::isArmyValid(m_battlefield.GetArmy(1)))
           break;
 
-        if(troop.Modes(Army::MORALE_GOOD))
-        {
-            currentTroop--;
-            if(!BattleSettings::Get().Modes(BattleSettings::OPT_LOGICONLY))
-            {
-                std::string str = _("High morale enables the %{name} to attack again.");
-                std::string monst = troop.GetName();
-                String::Lower(monst);
-                String::Replace(str, "%{name}", monst);
-                m_gui->Status(str);
-                m_gui->Redraw();
-                m_battlefield.AnimateMorale(true, troop);
-            }
-        }
+        ActOnGoodMorale(troop, currentTroop, goodMorale);
     }
 
     if(status == GUI::NONE)
@@ -1046,6 +1037,26 @@ Army::BattleTroop &Battle::BattleControl::NextValidTroop(s8 &currentTroop, Index
         troop = &m_battlefield.GetTroopFromIndex(troopIdx);
     } while(!troop->isValid());
     return *troop;
+}
+
+void Battle::BattleControl::ActOnGoodMorale(const Army::BattleTroop &troop, s8 &currentTroop, bool &goodMorale)
+{
+    if(!goodMorale && troop.Modes(Army::MORALE_GOOD))
+    {
+        currentTroop--;
+        goodMorale = true;
+        if(!BattleSettings::Get().Modes(BattleSettings::OPT_LOGICONLY))
+        {
+            std::string str = _("High morale enables the %{name} to attack again.");
+            std::string monst = troop.GetName();
+            String::Lower(monst);
+            String::Replace(str, "%{name}", monst);
+            m_gui->Status(str);
+            m_gui->Redraw();
+            m_battlefield.AnimateMorale(true, troop);
+        }
+    }
+    else goodMorale = false;
 }
 
 void Battle::BattleControl::AdjustMorale(HeroBase *hero, Army::BattleTroop &troop)
