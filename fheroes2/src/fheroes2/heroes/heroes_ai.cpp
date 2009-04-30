@@ -352,6 +352,9 @@ void AIToCastle(Heroes &hero, const u8 obj, const u16 dst_index)
                 world.GetKingdom(hero.GetColor()).AddCastle(castle);
                 world.CaptureObject(dst_index, hero.GetColor());
                 if(exp) hero.ActionAfterBattle();
+                // kill guardian hero
+                if(Heroes *other_hero = world.GetHeroes(dst_index))
+                    AIBattleLose(*other_hero, b);
                 break;
 
             case Army::LOSE:

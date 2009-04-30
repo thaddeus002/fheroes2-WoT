@@ -694,6 +694,9 @@ void ActionToCastle(Heroes &hero, const u8 obj, const u16 dst_index)
                 world.CaptureObject(dst_index, hero.GetColor());
                 Game::SelectBarCastle::Get().Redraw();
                 if(exp) hero.ActionAfterBattle();
+                // kill guardian hero
+                if(Heroes *other_hero = world.GetHeroes(dst_index))
+            	    BattleLose(*other_hero, b);
                 break;
 
             case Army::LOSE:
