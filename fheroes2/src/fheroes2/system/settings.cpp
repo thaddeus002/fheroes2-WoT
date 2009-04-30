@@ -56,7 +56,7 @@ Settings::Settings() : major_version(MAJOR_VERSION), minor_version(MINOR_VERSION
     local_data_prefix("files"),
     font_normal("dejavusans.ttf"), font_small("dejavusans.ttf"), size_normal(15), size_small(10),
     sound_volume(6), music_volume(6), animation(6), game(0), players(0), preferably_count_players(0),
-    port(DEFAULT_PORT)
+    port(DEFAULT_PORT), game_over(GameOver::COND_NONE)
 {
     SetModes(SHADOW);
     SetModes(ORIGINAL);
@@ -605,12 +605,12 @@ bool Settings::MapsWithHeroes(void) const
     return current_maps_file.with_heroes;
 }
 
-GameOverConditions::wins_t Settings::ConditionWins(void) const
+GameOver::conditions_t Settings::ConditionWins(void) const
 {
     return current_maps_file.ConditionWins();
 }
 
-GameOverConditions::loss_t Settings::ConditionLoss(void) const
+GameOver::conditions_t Settings::ConditionLoss(void) const
 {
     return current_maps_file.ConditionLoss();
 }
@@ -653,4 +653,14 @@ u32 Settings::LossMapsIndexObject(void) const
 u16 Settings::LossCountDays(void) const
 {
     return current_maps_file.LossCountDays();
+}
+
+void Settings::SetGameOverResult(u16 f)
+{
+    game_over = f;
+}
+
+u16 Settings::GameOverResult(void) const
+{
+    return game_over;
 }

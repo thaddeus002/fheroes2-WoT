@@ -40,8 +40,8 @@ namespace Maps
     u8 AllowColorsCount(void) const;
     u8 KingdomColorsCount(void) const;
 
-    GameOverConditions::wins_t ConditionWins(void) const;
-    GameOverConditions::loss_t ConditionLoss(void) const;
+    GameOver::conditions_t ConditionWins(void) const;
+    GameOver::conditions_t ConditionLoss(void) const;
     bool WinsCompAlsoWins(void) const;
     bool WinsAllowNormalVictory(void) const;
     Artifact::artifact_t WinsFindArtifact(void) const;

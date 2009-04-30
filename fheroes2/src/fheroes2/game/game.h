@@ -60,8 +60,6 @@ namespace Game
 	EDITSAVEMAP,
 	EDITSTART,
 	ENDTURN,
-	WINSGAME,
-	LOSSGAME,
 	TESTING,
     } menu_t;
 

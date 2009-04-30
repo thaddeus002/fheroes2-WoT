@@ -23,28 +23,29 @@
 
 #include <string>
 
-namespace GameOverConditions
+namespace GameOver
 {
-    enum wins_t
+    enum conditions_t
     {
-	WINS_ALL	= 0x01,
-	WINS_TOWN	= 0x02,
-	WINS_HERO	= 0x04,
-	WINS_ARTIFACT	= 0x08,
-	WINS_SIDE	= 0x10,
-	WINS_GOLD	= 0x20,
+	COND_NONE	= 0x0000,
+
+	WINS_ALL	= 0x0001,
+	WINS_TOWN	= 0x0002,
+	WINS_HERO	= 0x0004,
+	WINS_ARTIFACT	= 0x0008,
+	WINS_SIDE	= 0x0010,
+	WINS_GOLD	= 0x0020,
+
+	LOSS_ALL	= 0x0100,
+	LOSS_TOWN	= 0x0200,
+	LOSS_HERO	= 0x0400,
+	LOSS_TIME	= 0x0800
     };
 
-    enum loss_t
-    {
-	LOSS_ALL	= 0x01,
-	LOSS_TOWN	= 0x02,
-	LOSS_HERO	= 0x04,
-	LOSS_TIME	= 0x08,
-    };
+    const std::string & GetString(conditions_t);
 
-    const std::string & Wins(wins_t);
-    const std::string & Loss(loss_t);
+    void DialogWins(u16);
+    void DialogLoss(u16);
 };
 
 #endif

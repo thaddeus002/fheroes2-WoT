@@ -19,36 +19,144 @@
  ***************************************************************************/
 
 #include "gamedefs.h"
+#include "dialog.h"
+#include "world.h"
+#include "castle.h"
+#include "settings.h"
 #include "game_over.h"
 
-const std::string & GameOverConditions::Wins(wins_t wins)
+const std::string & GameOver::GetString(conditions_t cond)
 {
-    static const std::string wins_str[] = { _("Defeat all enemy heroes and towns."), _("Capture a specific town."), _("Defeat a specific hero."), _("Find a specific artifact."), _("Your side defeats the opposing side."), _("Accumulate a large amount of gold.") };
+    static const std::string cond_str[] = { "None", 
+	_("Defeat all enemy heroes and towns."), _("Capture a specific town."), _("Defeat a specific hero."), _("Find a specific artifact."), _("Your side defeats the opposing side."), _("Accumulate a large amount of gold."),
+	_("Lose all your heroes and towns."), _("Lose a specific town."), _("Lose a specific hero."), _("Run out of time. (Fail to win by a certain point.)") };
 
-    switch(wins)
+    switch(cond)
     {
-	case WINS_TOWN:		return wins_str[1];
-	case WINS_HERO:		return wins_str[2];
-	case WINS_ARTIFACT:	return wins_str[3];
-        case WINS_SIDE:		return wins_str[4];
-        case WINS_GOLD:		return wins_str[5];
+	case WINS_ALL:		return cond_str[1];
+	case WINS_TOWN:		return cond_str[2];
+	case WINS_HERO:		return cond_str[3];
+	case WINS_ARTIFACT:	return cond_str[4];
+        case WINS_SIDE:		return cond_str[5];
+        case WINS_GOLD:		return cond_str[6];
+
+	case LOSS_ALL:		return cond_str[7];
+	case LOSS_TOWN:		return cond_str[8];
+	case LOSS_HERO:		return cond_str[9];
+	case LOSS_TIME:		return cond_str[10];
+
         default: break;
     }
 
-    return wins_str[0];
+    return cond_str[0];
 }
 
-const std::string & GameOverConditions::Loss(loss_t loss)
+void GameOver::DialogWins(u16 cond)
 {
-    static const std::string loss_str[] = { _("Lose all your heroes and towns."), _("Lose a specific town."), _("Lose a specific hero."), _("Run out of time. (Fail to win by a certain point.)") };
+    const Settings & conf = Settings::Get();
+    std::string body;
 
-    switch(loss)
+    switch(cond)
     {
-	case LOSS_TOWN:	return loss_str[1];
-	case LOSS_HERO:	return loss_str[2];
-	case LOSS_TIME:	return loss_str[3];
-        default: break;
+	case WINS_ALL:
+	    // %s has been vanquished!
+	    body = _("You win!");
+	    break;
+
+	case WINS_TOWN:
+	{
+	    body = _("You captured %{name}! You are victorious.");
+	    const Castle *town = world.GetCastle(conf.WinsMapsIndexObject());
+	    if(town) String::Replace(body, "%{name}", town->GetName());
+	}
+	break;
+
+	case WINS_HERO:
+	{
+	    body = _("You have captured the enemy hero %{name}! Your quest is complete.");
+	    const Heroes *hero = world.GetHeroesCondWins();
+	    if(hero) String::Replace(body, "%{name}", hero->GetName());
+	    break;
+	}
+
+	case WINS_ARTIFACT:
+	{
+	    body = _("You have found the %{name}. Your quest is complete.");
+	    const Artifact::artifact_t art = conf.WinsFindArtifact();
+	    String::Replace(body, "%{name}", Artifact::String(art));
+	    break;
+        }
+
+        case WINS_SIDE:
+    	    body = _("The enemy is beaten. Your side has triumphed!");
+    	    break;
+
+        case WINS_GOLD:
+        {
+    	    body = _("You have built up over %{count} gold in your treasury. All enemies bow before your wealth and power.");
+	    String::Replace(body, "%{count}", conf.WinsAccumulateGold());
+    	    break;
+	}
+
+    	default: break;
     }
 
-    return loss_str[0];
+    Dialog::Message("", body, Font::BIG, Dialog::OK);
+}
+
+void GameOver::DialogLoss(u16 cond)
+{
+    const Settings & conf = Settings::Get();
+    std::string body;
+
+    switch(cond)
+    {
+	case WINS_ARTIFACT:
+	{
+	    body = _("The enemy has found the %{name}. Your quest is a failure.");
+	    const Artifact::artifact_t art = conf.WinsFindArtifact();
+	    String::Replace(body, "%{name}", Artifact::String(art));
+	    break;
+        }
+
+        case WINS_SIDE:
+        {
+    	    body = _("%{color} has fallen! All is lost.");
+    	    break;
+    	}
+
+        case WINS_GOLD:
+        {
+    	    body = _("The enemy has built up over %{count} gold in his treasury. You must bow done in defeat before his wealth and power.");
+	    String::Replace(body, "%{count}", conf.WinsAccumulateGold());
+    	    break;
+	}
+
+	case LOSS_ALL:
+	    body = _("You have been eliminated from the game!!!");
+	    break;
+
+	case LOSS_TOWN:
+	{
+	    body = _("The enemy has captured %{name}! They are triumphant.");
+	    const Castle *town = world.GetCastle(conf.WinsMapsIndexObject());
+	    if(town) String::Replace(body, "%{name}", town->GetName());
+	}
+
+	case LOSS_HERO:
+	{
+	    body = _("You have lost the hero %{name}. Your quest is over.");
+	    const Heroes *hero = world.GetHeroesCondLoss();
+	    if(hero) String::Replace(body, "%{name}", hero->GetName());
+	    break;
+	}
+
+	case LOSS_TIME:
+	    body = _("You have failed to complete your quest in time. All is lost.");
+	    break;
+
+    	default: break;
+    }
+
+    Dialog::Message("", body, Font::BIG, Dialog::OK);
 }

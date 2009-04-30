@@ -424,42 +424,44 @@ u8 Maps::FileInfo::KingdomColorsCount(void) const
     return colors.count();
 }
 
-GameOverConditions::wins_t Maps::FileInfo::ConditionWins(void) const
+GameOver::conditions_t Maps::FileInfo::ConditionWins(void) const
 {
     switch(conditions_wins)
     {
-	case 1:	return GameOverConditions::WINS_TOWN;
-	case 2:	return GameOverConditions::WINS_HERO;
-	case 3:	return GameOverConditions::WINS_ARTIFACT;
-	case 4:	return GameOverConditions::WINS_SIDE;
-	case 5:	return GameOverConditions::WINS_GOLD;
+	case 0: return GameOver::WINS_ALL;
+	case 1:	return GameOver::WINS_TOWN;
+	case 2:	return GameOver::WINS_HERO;
+	case 3:	return GameOver::WINS_ARTIFACT;
+	case 4:	return GameOver::WINS_SIDE;
+	case 5:	return GameOver::WINS_GOLD;
 	default: break;
     }
 
-    return GameOverConditions::WINS_ALL;
+    return GameOver::COND_NONE;
 }
 
-GameOverConditions::loss_t Maps::FileInfo::ConditionLoss(void) const
+GameOver::conditions_t Maps::FileInfo::ConditionLoss(void) const
 {
     switch(conditions_loss)
     {
-        case 1:	return GameOverConditions::LOSS_TOWN;
-        case 2: return GameOverConditions::LOSS_HERO;
-        case 3: return GameOverConditions::LOSS_TIME;
+	case 0: return GameOver::LOSS_ALL;
+        case 1:	return GameOver::LOSS_TOWN;
+        case 2: return GameOver::LOSS_HERO;
+        case 3: return GameOver::LOSS_TIME;
         default: break;
     }
 
-    return GameOverConditions::LOSS_ALL;
+    return GameOver::COND_NONE;
 }
 
 bool Maps::FileInfo::WinsCompAlsoWins(void) const
 {
-    return ((GameOverConditions::WINS_TOWN | GameOverConditions::WINS_GOLD) & ConditionWins()) && wins1;
+    return ((GameOver::WINS_TOWN | GameOver::WINS_GOLD) & ConditionWins()) && wins1;
 }
 
 bool Maps::FileInfo::WinsAllowNormalVictory(void) const
 {
-    return ((GameOverConditions::WINS_TOWN | GameOverConditions::WINS_ARTIFACT | GameOverConditions::WINS_GOLD) & ConditionWins()) && wins2;
+    return ((GameOver::WINS_TOWN | GameOver::WINS_ARTIFACT | GameOver::WINS_GOLD) & ConditionWins()) && wins2;
 }
 
 Artifact::artifact_t Maps::FileInfo::WinsFindArtifact(void) const

@@ -137,6 +137,8 @@ Game::menu_t Game::StartGame(void)
     Settings & conf = Settings::Get();
     Display & display = Display::Get();
 
+    conf.SetGameOverResult(GameOver::COND_NONE);
+
     cursor.Hide();
 
     // preload sounds
@@ -185,13 +187,8 @@ Game::menu_t Game::StartGame(void)
 
     Game::menu_t m = ENDTURN;
 
-    u8 players = 0;
-    for(Color::color_t color = Color::BLUE; color != Color::GRAY; ++color) if((LOCAL | REMOTE) & world.GetKingdom(color).Control()) players |= color;
-    while(m == ENDTURN && players)
+    while(m == ENDTURN)
     {
-	// break if notp lay
-	if(2 > world.CountPlayKingdoms()) break;
-
 	// world new day (skip if load game)
 	if(! conf.Modes(Settings::LOADGAME)) world.NewDay();
 
@@ -232,12 +229,10 @@ Game::menu_t Game::StartGame(void)
 		    if(conf.Modes(Settings::LOADGAME)) conf.ResetModes(Settings::LOADGAME);
 		    m = HumanTurn();
 		    Mixer::Reduce();
-		    if(LOSSGAME == m) players &= ~color;
 		    break;
 
 	        case REMOTE:
 		    m = NetworkTurn(kingdom);
-		    if(LOSSGAME == m) players &= ~color;
 		    break;
 
 	        case AI:
@@ -255,17 +250,7 @@ Game::menu_t Game::StartGame(void)
 	DELAY(1);
     }
 
-
-    switch(m)
-    {
-	case WINSGAME:	Error::Verbose("Game::StartGame: wins game"); return MAINMENU;
-	case LOSSGAME:	Error::Verbose("Game::StartGame: loss game"); return MAINMENU;
-	case ENDTURN:	return QUITGAME;
-
-	default: break;
-    }
-
-    return m;
+    return m == ENDTURN ? QUITGAME : m;
 }
 
 /* open castle wrapper */
@@ -709,7 +694,7 @@ Game::menu_t Game::HumanTurn(void)
 
     Display & display = Display::Get();
     Cursor & cursor = Cursor::Get();
-    const Settings & conf = Settings::Get();
+    Settings & conf = Settings::Get();
 
     const Rect area_pos(BORDERWIDTH, BORDERWIDTH, gamearea.GetRect().w * TILEWIDTH, gamearea.GetRect().h * TILEWIDTH);
     const Rect areaScrollLeft(0, 0, BORDERWIDTH, display.h());
@@ -792,36 +777,6 @@ Game::menu_t Game::HumanTurn(void)
         Dialog::Message("", message, Font::BIG, Dialog::OK);
     }
 
-    // warning lost all town
-    if(myCastles.empty())
-    {
-	if(myHeroes.empty()) return LOSSGAME;
-
-	if(0 == myKingdom.GetLostTownDays())
-	{
-        AGG::PlayMusic(MUS::DEATH, false);
-	    std::string str = _("%{color} player, your heroes abandon you, and you are banished from this land.");
-	    String::Replace(str, "%{color}", Color::String(conf.MyColor()));
-	    DialogPlayers(conf.MyColor(), str);
-	    return LOSSGAME;
-	}
-	else
-	if(1 == myKingdom.GetLostTownDays())
-	{
-	    std::string str = _("%{color} player, this is your last day to capture a town, or you will be banished from this land.");
-	    String::Replace(str, "%{color}", Color::String(conf.MyColor()));
-	    DialogPlayers(conf.MyColor(), str);
-	}
-	else
-	if(LOST_TOWN_DAYS >= myKingdom.GetLostTownDays())
-	{
-	    std::string str = _("%{color} player, you only have %{day} days left to capture a town, or you will be banished from this land.");
-	    String::Replace(str, "%{color}", Color::String(conf.MyColor()));
-	    String::Replace(str, "%{day}", myKingdom.GetLostTownDays());
-	    DialogPlayers(conf.MyColor(), str);
-	}
-    }
-
     // show event day
     {
         std::vector<GameEvent::Day *> events;
@@ -842,7 +797,51 @@ Game::menu_t Game::HumanTurn(void)
     }
 
     Game::menu_t res = CANCEL;
+    u16 cond = GameOver::COND_NONE;
 
+    if(GameOver::COND_NONE != (cond = world.CheckKingdomLoss(myKingdom)))
+    {
+	conf.SetGameOverResult(cond);
+	GameOver::DialogLoss(cond);
+	res = MAINMENU;
+    }
+    else
+    if(GameOver::COND_NONE != (cond = world.CheckKingdomWins(myKingdom)))
+    {
+	conf.SetGameOverResult(cond);
+    	GameOver::DialogWins(cond);
+	res = HIGHSCORES;
+    }
+
+    // warning lost all town
+    if(myCastles.empty())
+    {
+	if(0 == myKingdom.GetLostTownDays())
+	{
+    	    AGG::PlayMusic(MUS::DEATH, false);
+	    std::string str = _("%{color} player, your heroes abandon you, and you are banished from this land.");
+	    String::Replace(str, "%{color}", Color::String(conf.MyColor()));
+	    DialogPlayers(conf.MyColor(), str);
+	    conf.SetGameOverResult(GameOver::LOSS_ALL);
+	    res = MAINMENU;
+	}
+	else
+	if(1 == myKingdom.GetLostTownDays())
+	{
+	    std::string str = _("%{color} player, this is your last day to capture a town, or you will be banished from this land.");
+	    String::Replace(str, "%{color}", Color::String(conf.MyColor()));
+	    DialogPlayers(conf.MyColor(), str);
+	}
+	else
+	if(LOST_TOWN_DAYS >= myKingdom.GetLostTownDays())
+	{
+	    std::string str = _("%{color} player, you only have %{day} days left to capture a town, or you will be banished from this land.");
+	    String::Replace(str, "%{color}", Color::String(conf.MyColor()));
+	    String::Replace(str, "%{day}", myKingdom.GetLostTownDays());
+	    DialogPlayers(conf.MyColor(), str);
+	}
+    }
+    
     // startgame loop
     while(!res && le.HandleEvents())
     {
@@ -1562,11 +1561,19 @@ Game::menu_t Game::HumanTurn(void)
         	    cursor.Show();
         	    display.Flip();
 
-		    // end turn: lost heroes and towns
-		    if(myCastles.empty() && myHeroes.empty()) res = LOSSGAME;
+		    if(GameOver::COND_NONE != (cond = world.CheckKingdomLoss(myKingdom)))
+		    {
+			conf.SetGameOverResult(cond);
+		    	GameOver::DialogLoss(cond);
+			res = MAINMENU;
+		    }
 		    else
-		    // defeats all players
-		    if(2 > world.CountPlayKingdoms()) res = WINSGAME;
+		    if(GameOver::COND_NONE != (cond = world.CheckKingdomWins(myKingdom)))
+		    {
+			conf.SetGameOverResult(cond);
+		    	GameOver::DialogWins(cond);
+			res = HIGHSCORES;
+		    }
 		}
 		else
 		    hero.SetMove(false);
@@ -1584,8 +1591,6 @@ Game::menu_t Game::HumanTurn(void)
 
         ++ticket;
     }
-
-    if(res == WINSGAME) Dialog::Message(_("Congratulations!"), _("You are victorious."), Font::BIG, Dialog::OK);
 
     // warning lost all town
     if(myCastles.empty() && LOST_TOWN_DAYS < myKingdom.GetLostTownDays())

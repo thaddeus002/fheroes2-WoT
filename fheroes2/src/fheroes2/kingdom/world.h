@@ -77,7 +77,6 @@ public:
     const Kingdom & GetMyKingdom(void) const;
     const Kingdom & GetKingdom(u8 color) const;
     void KingdomLoss(const Color::color_t);
-    u8 CountPlayKingdoms(void) const;
 
     const Castle * GetCastle(u16 maps_index) const;
     const Castle * GetCastle(const Point & pt) const{ return GetCastle(pt.x, pt.y); };
@@ -91,6 +90,8 @@ public:
     Heroes * GetHeroes(u16 maps_index);
     Heroes * GetHeroes(u8 ax, u8 ay) const;
     Heroes * FromJail(u16);
+    const Heroes * GetHeroesCondWins(void) const;
+    const Heroes * GetHeroesCondLoss(void) const;
 
     Surface & GetUltimateArtifactArea(void);
     u16 GetUltimateArtifactIndex(void);
@@ -134,8 +135,8 @@ public:
     bool CreateBoat(const u16 center, bool build);
     void ClearFog(const u8 color);
 
-    bool CheckKingdomWins(u8) const;
-    bool CheckKingdomLoss(u8) const;
+    u16  CheckKingdomWins(const Kingdom &) const;
+    u16 CheckKingdomLoss(const Kingdom &) const;
 
     void GetEventDay(const Color::color_t, std::vector<GameEvent::Day *> &) const;
     const GameEvent::Coord* GetEventMaps(const Color::color_t c, const u16 index) const;

@@ -147,8 +147,8 @@ public:
     u8 AllowColorsCount(void) const;
     u8 KingdomColorsCount(void) const;
     bool MapsWithHeroes(void) const;
-    GameOverConditions::wins_t ConditionWins(void) const;
-    GameOverConditions::loss_t ConditionLoss(void) const;
+    GameOver::conditions_t ConditionWins(void) const;
+    GameOver::conditions_t ConditionLoss(void) const;
     bool WinsCompAlsoWins(void) const;
     bool WinsAllowNormalVictory(void) const;
     Artifact::artifact_t WinsFindArtifact(void) const;
@@ -157,6 +157,8 @@ public:
     u32 WinsMapsIndexObject(void) const;
     u32 LossMapsIndexObject(void) const;
     u16 LossCountDays(void) const;
+    void SetGameOverResult(u16);
+    u16 GameOverResult(void) const;
 
 protected:
     void Parse(const std::string & left, const std::string & right);
@@ -201,6 +203,8 @@ private:
     u8 preferably_count_players;
     
     u16 port;
+
+    u16 game_over;
 };
 
 #endif
