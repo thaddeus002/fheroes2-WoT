@@ -964,12 +964,16 @@ void Army::army_t::CalculateForceRatiosVersus(const army_t &a, u32 &own, u32 &ot
 
 bool Army::army_t::StrongerEnemyArmy(const army_t & a)
 {
-    u32 h1 = GetHitPoints();
-    u32 h2 = a.GetHitPoints();
-    u32 r1 = 0, r2 = 0;
-    CalculateForceRatiosVersus(a, r1, r2);
+    if(a.isValid())
+    {
+	u32 h1 = GetHitPoints();
+	u32 h2 = a.GetHitPoints();
+	u32 r1 = 0, r2 = 0;
+	CalculateForceRatiosVersus(a, r1, r2);
 
-    return h1 / r2 > h2 / r1;
+	return h1 / r2 > h2 / r1;
+    }
+    return false;
 }
 
 const Skill::Primary* Army::army_t::GetCommander(void) const
