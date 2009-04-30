@@ -206,11 +206,12 @@ u16 DialogLuck(const std::string & hdr, const std::string & msg, const bool good
     return Dialog::SpriteInfo(hdr, msg, image);
 }
 
-void BattleLose(Heroes &hero, const u8 reason)
+void BattleLose(Heroes &hero, u8 reason, Color::color_t color = Color::GRAY)
 {
     AGG::PlaySound(M82::KILLFADE);
     hero.FadeOut();
     world.GetKingdom(hero.GetColor()).RemoveHeroes(&hero);
+    hero.SetKillerColor(color);
     hero.SetFreeman(reason);
     Game::Focus::Get().Reset(Game::Focus::HEROES);
     Game::Focus::Get().Redraw();
@@ -631,19 +632,14 @@ void ActionToHeroes(Heroes &hero, const u8 obj, const u16 dst_index)
             case Army::WIN:
                 hero.TakeArtifacts(*other_hero);
                 hero.IncreaseExperience(exp);
-                AGG::PlaySound(M82::KILLFADE);
-                other_hero->FadeOut();
-                world.GetKingdom(other_hero->GetColor()).RemoveHeroes(other_hero);
-                other_hero->SetFreeman(b);
-                // set default army
-                other_hero->GetArmy().Reset(true);
+                BattleLose(*other_hero, b, hero.GetColor());
                 hero.ActionAfterBattle();
                 break;
 
             case Army::LOSE:
             case Army::RETREAT:
             case Army::SURRENDER:
-                BattleLose(hero, b);
+                BattleLose(hero, b, other_hero->GetColor());
                 break;
 
             default: break;
@@ -696,13 +692,13 @@ void ActionToCastle(Heroes &hero, const u8 obj, const u16 dst_index)
                 if(exp) hero.ActionAfterBattle();
                 // kill guardian hero
                 if(Heroes *other_hero = world.GetHeroes(dst_index))
-            	    BattleLose(*other_hero, b);
+            	    BattleLose(*other_hero, b, hero.GetColor());
                 break;
 
             case Army::LOSE:
             case Army::RETREAT:
             case Army::SURRENDER:
-                BattleLose(hero, b);
+                BattleLose(hero, b, castle->GetColor());
                 break;
 
             default: break;

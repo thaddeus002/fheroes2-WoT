@@ -142,6 +142,9 @@ public:
     u8 GetType(void) const { return Skill::Primary::HEROES; };
     Spell::Book * GetSpellBook(void) { return spell_book.isActive() ? &spell_book : NULL; };
 
+    Color::color_t GetKillerColor(void) const;
+    void SetKillerColor(Color::color_t);
+
     const Surface & GetPortrait30x22(void) const;
     const Surface & GetPortrait50x46(void) const;
     const Surface & GetPortrait101x93(void) const;
@@ -271,6 +274,7 @@ private:
 
     std::string		name;
     Color::color_t	color;
+    Color::color_t	killer_color;
     u32			experience;
     u16			magic_point;
     u16			move_point;

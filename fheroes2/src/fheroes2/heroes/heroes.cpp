@@ -70,7 +70,7 @@ Heroes::heroes_t Heroes::ConvertID(u8 index)
     return index > UNKNOWN ? UNKNOWN : static_cast<heroes_t>(index);
 }
 
-Heroes::Heroes(heroes_t ht, Race::race_t rc) : experience(0), magic_point(0), move_point(0),
+Heroes::Heroes(heroes_t ht, Race::race_t rc) : killer_color(Color::GRAY), experience(0), magic_point(0), move_point(0),
     artifacts(HEROESMAXARTIFACT, Artifact::UNKNOWN), army(this), spell_book(this), portrait(ht), race(rc),
     save_maps_general(MP2::OBJ_ZERO), path(*this), direction(Direction::RIGHT), sprite_index(18)
 {
@@ -323,6 +323,7 @@ void Heroes::LoadFromMP2(u16 map_index, const void *ptr, const Color::color_t cl
     mp.y = map_index / world.h();
 
     color = cl;
+    killer_color = Color::GRAY;
 
     const u8  *ptr8  = static_cast<const u8 *>(ptr);
     u16 byte16 = 0;
@@ -1046,6 +1047,8 @@ s8 Heroes::GetLuckWithModificators(std::string *strs) const
 void Heroes::Recruit(const Color::color_t & cl, const Point & pt)
 {
     color = cl;
+    killer_color = Color::GRAY;
+
     mp = pt;
 
     Maps::Tiles & tiles = world.GetTiles(mp);
@@ -1738,7 +1741,10 @@ void Heroes::SetFreeman(const u8 reason)
     if(isFreeman()) return;
 
     if(Army::RETREAT == reason || Army::SURRENDER == reason) world.GetKingdom(color).GetRecruits().SetHero2(this);
+
     if(Army::LOSE == reason || Army::RETREAT == reason) army.Reset();
+    else
+    if(Army::LOSE == reason) army.Reset(true);
 
     color = Color::GRAY;
     world.GetTiles(mp).SetObject(save_maps_general);
@@ -1787,6 +1793,16 @@ const Surface & Heroes::GetPortrait101x93(void) const
     ICN::icn_t icn = ICN::PORTxxxx(portrait);
 
     return AGG::GetICN(ICN::UNKNOWN != icn ? icn : ICN::PORT0000, 0);
+}
+
+void Heroes::SetKillerColor(Color::color_t c)
+{
+    killer_color = c;
+}
+
+Color::color_t Heroes::GetKillerColor(void) const
+{
+    return killer_color;
 }
 
 void Heroes::Dump(void) const

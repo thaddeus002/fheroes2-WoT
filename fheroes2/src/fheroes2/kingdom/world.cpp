@@ -1925,8 +1925,10 @@ u16 World::CheckKingdomWins(const Kingdom & kingdom) const
         case GameOver::WINS_HERO:
         {
             const Heroes *hero = GetHeroesCondWins();
-            if(hero && Heroes::UNKNOWN != heroes_cond_wins && hero->isFreeman())  // TODO:: FIX need check killer color
-        	return GameOver::WINS_HERO;
+            if(hero && Heroes::UNKNOWN != heroes_cond_wins &&
+        	hero->isFreeman() &&
+        	hero->GetKillerColor() == kingdom.GetColor())
+        	    return GameOver::WINS_HERO;
     	    break;
         }
 
@@ -1986,8 +1988,10 @@ u16 World::CheckKingdomLoss(const Kingdom & kingdom) const
         case GameOver::LOSS_HERO:
         {
             const Heroes *hero = GetHeroesCondLoss();
-            if(hero && Heroes::UNKNOWN != heroes_cond_loss && hero->GetColor() != kingdom.GetColor())
-        	return GameOver::LOSS_HERO;
+            if(hero && Heroes::UNKNOWN != heroes_cond_loss &&
+        	hero->isFreeman() &&
+        	hero->GetKillerColor() != kingdom.GetColor())
+        	    return GameOver::LOSS_HERO;
     	    break;
         }
 

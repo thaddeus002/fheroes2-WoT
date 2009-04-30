@@ -128,9 +128,10 @@ Skill::Primary::skill_t AISelectPrimarySkill(Heroes &hero)
     return Skill::Primary::UNKNOWN;
 }
 
-void AIBattleLose(Heroes &hero, const u8 reason)
+void AIBattleLose(Heroes &hero, u8 reason, Color::color_t color = Color::GRAY)
 {
     world.GetKingdom(hero.GetColor()).RemoveHeroes(&hero);
+    hero.SetKillerColor(color);
     hero.SetFreeman(reason);
 }
 
@@ -298,17 +299,14 @@ void AIToHeroes(Heroes &hero, const u8 obj, const u16 dst_index)
             case Army::WIN:
                 hero.TakeArtifacts(*other_hero);
                 hero.IncreaseExperience(exp);
-                world.GetKingdom(other_hero->GetColor()).RemoveHeroes(other_hero);
-                other_hero->SetFreeman(b);
-                // set default army
-                other_hero->GetArmy().Reset(true);
+                AIBattleLose(*other_hero, b, hero.GetColor());
                 hero.ActionAfterBattle();
                 break;
 
             case Army::LOSE:
             case Army::RETREAT:
             case Army::SURRENDER:
-                AIBattleLose(hero, b);
+                AIBattleLose(hero, b, other_hero->GetColor());
                 break;
 
     	    default: break;
@@ -354,13 +352,13 @@ void AIToCastle(Heroes &hero, const u8 obj, const u16 dst_index)
                 if(exp) hero.ActionAfterBattle();
                 // kill guardian hero
                 if(Heroes *other_hero = world.GetHeroes(dst_index))
-                    AIBattleLose(*other_hero, b);
+                    AIBattleLose(*other_hero, b, hero.GetColor());
                 break;
 
             case Army::LOSE:
             case Army::RETREAT:
             case Army::SURRENDER:
-                AIBattleLose(hero, b);
+                AIBattleLose(hero, b, castle->GetColor());
                 break;
 
             default: break;
