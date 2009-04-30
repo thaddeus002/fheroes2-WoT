@@ -87,40 +87,53 @@ Game::menu_t Game::MainMenu(void)
     u32 ticket = 0;
     u32 lantern_frame = 0;
 
-    u8 buttonsFrames[5] = {
-        NEWGAME_DEFAULT,
-        LOADGAME_DEFAULT,
-        HIGHSCORES_DEFAULT,
-        CREDITS_DEFAULT,
-        QUIT_DEFAULT
+    struct ButtonInfo
+    {
+        u8 frame;
+        Button &button;
+        bool isOver;
+        bool wasOver;
+    } buttons[] = {
+        { NEWGAME_DEFAULT, buttonNewGame, false, false },
+        { LOADGAME_DEFAULT, buttonLoadGame, false, false },
+        { HIGHSCORES_DEFAULT, buttonHighScores, false, false },
+        { CREDITS_DEFAULT, buttonCredits, false, false },
+        { QUIT_DEFAULT, buttonQuit, false, false }
     };
 
-    Button *buttons[5] = {
-        &buttonNewGame,
-        &buttonLoadGame,
-        &buttonHighScores,
-        &buttonCredits,
-        &buttonQuit
-    };
-
+    for(u16 i = 0; le.MouseMotion() && i < sizeof(buttons) / sizeof(buttons[0]); i++)
+    {
+        cursor.Hide();
+        const Sprite & sprite = AGG::GetICN(ICN::BTNSHNGL, buttons[i].frame);
+        display.Blit(sprite, sprite.x(), sprite.y());
+        cursor.Show();
+    }
+    
     // mainmenu loop
     while(le.HandleEvents())
     {
-        for(u16 i = 0; i < sizeof(buttons) / sizeof(buttons[0]); i++)
+        for(u16 i = 0; le.MouseMotion() && i < sizeof(buttons) / sizeof(buttons[0]); i++)
         {
-            if(le.MousePressLeft(*buttons[i]))
-                buttons[i]->PressDraw();
-            else
+            buttons[i].wasOver = buttons[i].isOver;
+            
+            if(le.MousePressLeft(buttons[i].button))
+                buttons[i].button.PressDraw();
+
+            buttons[i].isOver = le.MouseCursor(buttons[i].button);
+
+            if((!buttons[i].isOver && buttons[i].wasOver) ||
+               (buttons[i].isOver && !buttons[i].wasOver))
             {
-                buttons[i]->ReleaseDraw();
-                u16 frame = buttonsFrames[i];
-                if(le.MouseCursor(*buttons[i]))
-                    frame++;
+                u16 frame = buttons[i].frame;
+                
+                if(!buttons[i].isOver && buttons[i].wasOver)
+                    buttons[i].button.ReleaseDraw();
+                else frame++;
+                
                 cursor.Hide();
                 const Sprite & sprite = AGG::GetICN(ICN::BTNSHNGL, frame);
                 display.Blit(sprite, sprite.x(), sprite.y());
                 cursor.Show();
-                display.Flip();
             }
         }
     

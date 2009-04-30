@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2009-04-30 12:51-0400\n"
+"POT-Creation-Date: 2009-04-30 14:36-0400\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1472,7 +1472,7 @@ msgid "Load an existing map."
 msgstr ""
 
 #: ../fheroes2/editor/editor_mainmenu.cpp:78
-#: ../fheroes2/game/game_mainmenu.cpp:139
+#: ../fheroes2/game/game_mainmenu.cpp:168
 msgid "Quit"
 msgstr ""
 
@@ -1820,39 +1820,39 @@ msgstr ""
 msgid "Maps Loading..."
 msgstr ""
 
-#: ../fheroes2/game/game_mainmenu.cpp:139
+#: ../fheroes2/game/game_mainmenu.cpp:168
 msgid "Quit Heroes of Might and Magic and return to the operating system."
 msgstr ""
 
-#: ../fheroes2/game/game_mainmenu.cpp:141
+#: ../fheroes2/game/game_mainmenu.cpp:170
 msgid "Load Game"
 msgstr ""
 
-#: ../fheroes2/game/game_mainmenu.cpp:141
+#: ../fheroes2/game/game_mainmenu.cpp:170
 msgid "Load a previously saved game."
 msgstr ""
 
-#: ../fheroes2/game/game_mainmenu.cpp:143
+#: ../fheroes2/game/game_mainmenu.cpp:172
 msgid "Credits"
 msgstr ""
 
-#: ../fheroes2/game/game_mainmenu.cpp:143
+#: ../fheroes2/game/game_mainmenu.cpp:172
 msgid "View the credits screen."
 msgstr ""
 
-#: ../fheroes2/game/game_mainmenu.cpp:145
+#: ../fheroes2/game/game_mainmenu.cpp:174
 msgid "High Scores"
 msgstr ""
 
-#: ../fheroes2/game/game_mainmenu.cpp:145
+#: ../fheroes2/game/game_mainmenu.cpp:174
 msgid "View the high score screen."
 msgstr ""
 
-#: ../fheroes2/game/game_mainmenu.cpp:147
+#: ../fheroes2/game/game_mainmenu.cpp:176
 msgid "New Game"
 msgstr ""
 
-#: ../fheroes2/game/game_mainmenu.cpp:147
+#: ../fheroes2/game/game_mainmenu.cpp:176
 msgid "Start a single or multi-player game."
 msgstr ""
 
