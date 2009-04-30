@@ -890,7 +890,7 @@ u16 Army::army_t::GetAttack(void) const
 
     for(; it1 != it2; ++it1) if((*it1).isValid()){ res += (*it1).GetAttack(); ++count; }
 
-    return res / count;
+    return count ? res / count : 0;
 }
 
 u16 Army::army_t::GetDefense(void) const
@@ -902,7 +902,7 @@ u16 Army::army_t::GetDefense(void) const
 
     for(; it1 != it2; ++it1) if((*it1).isValid()){ res += (*it1).GetDefense(); ++count; }
 
-    return res / count;
+    return count ? res / count : 0;
 }
 
 u32 Army::army_t::GetHitPoints(void) const
