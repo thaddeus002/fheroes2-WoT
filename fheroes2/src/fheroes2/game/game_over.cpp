@@ -59,7 +59,7 @@ void GameOver::DialogWins(u16 cond)
     switch(cond)
     {
 	case WINS_ALL:
-	    body = _("You win!");
+	    //body = _("You win!");
 	    break;
 
 	case WINS_TOWN:
@@ -100,7 +100,7 @@ void GameOver::DialogWins(u16 cond)
     	default: break;
     }
 
-    Dialog::Message("", body, Font::BIG, Dialog::OK);
+    if(body.size()) Dialog::Message("", body, Font::BIG, Dialog::OK);
 }
 
 void GameOver::DialogLoss(u16 cond)
@@ -157,5 +157,5 @@ void GameOver::DialogLoss(u16 cond)
     	default: break;
     }
 
-    Dialog::Message("", body, Font::BIG, Dialog::OK);
+    if(body.size()) Dialog::Message("", body, Font::BIG, Dialog::OK);
 }
