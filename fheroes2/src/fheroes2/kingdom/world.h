@@ -95,7 +95,8 @@ public:
 
     Surface & GetUltimateArtifactArea(void);
     u16 GetUltimateArtifactIndex(void);
-    Artifact::artifact_t DiggingForUltimateArtifacts(const Point & center);
+    Artifact::artifact_t GetUltimateArtifact(void) const;
+    bool DiggingForUltimateArtifact(const Point & center);
     void ActionForMagellanMaps(u8 color);
 
     u8 GetDay(void) const{ return LastDay() ? DAYOFWEEK : day % DAYOFWEEK; };
@@ -188,7 +189,6 @@ private:
     u8 month;
 
     Week::type_t week_name;    
-    u16 count_obelisk;
 
     Heroes::heroes_t heroes_cond_wins;
     Heroes::heroes_t heroes_cond_loss;

@@ -652,6 +652,11 @@ Artifact::artifact_t Settings::WinsFindArtifact(void) const
     return current_maps_file.WinsFindArtifact();
 }
 
+bool Settings::WinsFindUltimateArtifact(void) const
+{
+    return current_maps_file.WinsFindUltimateArtifact();
+}
+
 u16 Settings::WinsSidePart(void) const
 {
     return current_maps_file.WinsSidePart();

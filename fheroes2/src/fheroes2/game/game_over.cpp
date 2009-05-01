@@ -81,8 +81,8 @@ void GameOver::DialogWins(u16 cond)
 	case WINS_ARTIFACT:
 	{
 	    body = _("You have found the %{name}.\nYour quest is complete.");
-	    const Artifact::artifact_t art = conf.WinsFindArtifact();
-	    String::Replace(body, "%{name}", Artifact::String(art));
+	    const Artifact::artifact_t art = conf.WinsFindUltimateArtifact() ? world.GetUltimateArtifact() : conf.WinsFindArtifact();
+	    String::Replace(body, "%{name}", (conf.WinsFindUltimateArtifact() ? "Ultimate Artifact" : Artifact::String(art)));
 	    break;
         }
 

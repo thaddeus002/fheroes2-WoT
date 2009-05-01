@@ -118,7 +118,6 @@ void Game::SaveXML(const std::string &fn)
     wrld->SetAttribute("ultimate", world.ultimate_artifact);
     wrld->SetAttribute("uniq", world.uniq0);
     wrld->SetAttribute("week", world.week_name);
-    wrld->SetAttribute("count_obelisk", world.count_obelisk);
     wrld->SetAttribute("heroes_cond_wins", world.heroes_cond_wins);
     wrld->SetAttribute("heroes_cond_loss", world.heroes_cond_loss);
     // world->date
@@ -140,6 +139,7 @@ void Game::SaveXML(const std::string &fn)
 	tiles->LinkEndChild(tile2);
 	const Maps::Tiles & tile = *world.vec_tiles[ii];
 
+	tile2->SetAttribute("maps_index", ii);
 	tile2->SetAttribute("tile_index", tile.tile_index);
 	tile2->SetAttribute("shape", tile.shape);
 	tile2->SetAttribute("general", tile.general);
@@ -777,8 +777,6 @@ void Game::LoadXML(const std::string &fn)
     world.uniq0 = res;
     wrld->Attribute("week", &res);
     world.week_name = Week::Get(res);
-    wrld->Attribute("count_obelisk", &res);
-    world.count_obelisk = res;
     wrld->Attribute("heroes_cond_wins", &res);
     world.heroes_cond_wins = Heroes::ConvertID(res);
     wrld->Attribute("heroes_cond_loss", &res);

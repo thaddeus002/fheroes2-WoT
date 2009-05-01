@@ -970,6 +970,13 @@ Game::menu_t Game::HumanTurn(void)
 	if(le.KeyPress(KEY_d) && Game::Focus::HEROES == global_focus.Type())
 	{
 	    DiggingForArtifacts(global_focus.GetHeroes());
+	    // check game over for ultimate artifact
+	    if(GameOver::COND_NONE != (cond = world.CheckKingdomWins(myKingdom)))
+	    {
+		conf.SetGameOverResult(cond);
+		GameOver::DialogWins(cond);
+		res = HIGHSCORES;
+	    }
 	}
 	else
 	// key left
@@ -1418,7 +1425,17 @@ Game::menu_t Game::HumanTurn(void)
 		    case Dialog::WORLD:	break;
 		    case Dialog::PUZZLE:	Dialog::PuzzleMaps(); break;
 		    case Dialog::INFO:	Dialog::GameInfo(); break;
-		    case Dialog::DIG:	DiggingForArtifacts(global_focus.GetHeroes()); break;
+
+		    case Dialog::DIG:
+			DiggingForArtifacts(global_focus.GetHeroes());
+			// check game over for ultimate artifact
+			if(GameOver::COND_NONE != (cond = world.CheckKingdomWins(myKingdom)))
+			{
+			    conf.SetGameOverResult(cond);
+			    GameOver::DialogWins(cond);
+			    res = HIGHSCORES;
+			}
+			break;
 
 		    default: break;
 		}
@@ -1646,17 +1663,17 @@ bool Game::DiggingForArtifacts(const Heroes & hero)
 	AGG::PlaySound(M82::DIGSOUND);
 
 	const_cast<Heroes &>(hero).ResetMovePoints();
-	const Artifact::artifact_t ultimate = world.DiggingForUltimateArtifacts(hero.GetCenter());
+	Artifact::artifact_t ultimate = world.GetUltimateArtifact();
 
-	if(Artifact::UNKNOWN == ultimate)
-	    Dialog::Message("", _("Nothing here. Where could it be?"), Font::BIG, Dialog::OK);
-	else
+	if(world.DiggingForUltimateArtifact(hero.GetCenter()) && Artifact::UNKNOWN != ultimate)
 	{
-	    // TODO: congratulations!
+	    AGG::PlaySound(M82::TREASURE);
 	    // check returns
 	    const_cast<Heroes &>(hero).PickupArtifact(ultimate);
 	    DialogWithArtifact(_("Congratulations!"), _("After spending many hours digging here, you have uncovered the ") + Artifact::String(ultimate), ultimate);
 	}
+	else
+	    Dialog::Message("", _("Nothing here. Where could it be?"), Font::BIG, Dialog::OK);
 
 	Cursor::Get().Hide();
 	Game::SelectBarHeroes::Get().Redraw(&hero);

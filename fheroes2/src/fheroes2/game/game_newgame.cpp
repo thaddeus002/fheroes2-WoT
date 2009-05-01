@@ -210,12 +210,12 @@ Game::menu_t Game::NewMulti(void)
 	le.MousePressLeft(buttonNetwork) ? buttonNetwork.PressDraw() : buttonNetwork.ReleaseDraw();
 	le.MousePressLeft(buttonCancelGame) ? buttonCancelGame.PressDraw() : buttonCancelGame.ReleaseDraw();
 
-	if(le.MouseClickLeft(buttonHotSeat))
+	if(le.MouseClickLeft(buttonHotSeat) || le.KeyPress(KEY_h))
 	{
 	    conf.SetPreferablyCountPlayers(SelectCountPlayers());
 	    return conf.PreferablyCountPlayers() ? NEWHOTSEAT : MAINMENU;
 	}
-	if(le.MouseClickLeft(buttonNetwork)) return NEWNETWORK;
+	if(le.MouseClickLeft(buttonNetwork) || le.KeyPress(KEY_n)) return NEWNETWORK;
 	if(le.MouseClickLeft(buttonCancelGame) || le.KeyPress(KEY_ESCAPE)) return MAINMENU;
 
         // right info

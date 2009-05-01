@@ -715,7 +715,7 @@ void AIToMagellanMaps(Heroes &hero, const u8 obj, const u16 dst_index)
 
 void AIToTeleports(Heroes &hero, const u16 index_from)
 {
-    const u16 index_to = world.NextTeleport(index_from);
+    u16 index_to = world.NextTeleport(index_from);
     hero.ApplyPenaltyMovement();
 
     if(index_from == index_to)
@@ -729,6 +729,8 @@ void AIToTeleports(Heroes &hero, const u16 index_from)
 
     world.GetTiles(index_from).SetObject(MP2::OBJ_STONELIGHTS);
     world.GetTiles(index_to).SetObject(MP2::OBJ_HEROES);
+
+    if(Maps::TileUnderProtection(hero.GetIndex(), &index_to)) AIToMonster(hero, MP2::OBJ_MONSTER, index_to);
 
     if(Settings::Get().Debug()) Error::Verbose("AIToStoneLights: " + hero.GetName());
 }

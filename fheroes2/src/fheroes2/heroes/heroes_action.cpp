@@ -1933,7 +1933,7 @@ void ActionToAncientLamp(Heroes &hero, const u8 obj, const u16 dst_index)
 
 void ActionToTeleports(Heroes &hero, const u16 index_from)
 {
-    const u16 index_to = world.NextTeleport(index_from);
+    u16 index_to = world.NextTeleport(index_from);
     hero.ApplyPenaltyMovement();
 
     if(index_from == index_to)
@@ -1947,6 +1947,7 @@ void ActionToTeleports(Heroes &hero, const u16 index_from)
     hero.GetPath().Hide();
     hero.FadeOut();
 
+    Cursor::Get().Hide();
     hero.SetCenter(index_to);
     hero.Scoute();
 
@@ -1959,6 +1960,8 @@ void ActionToTeleports(Heroes &hero, const u16 index_from)
     AGG::PlaySound(M82::KILLFADE);
     hero.GetPath().Hide();
     hero.FadeIn();
+
+    if(Maps::TileUnderProtection(hero.GetIndex(), &index_to)) ActionToMonster(hero, MP2::OBJ_MONSTER, index_to);
 
     if(Settings::Get().Debug()) Error::Verbose("ActionToStoneLights: " + hero.GetName());
 }
@@ -1979,6 +1982,7 @@ void ActionToWhirlpools(Heroes &hero, const u8 obj, const u16 index_from)
     hero.GetPath().Hide();
     hero.FadeOut();
 
+    Cursor::Get().Hide();
     hero.SetCenter(index_to);
     hero.Scoute();
 

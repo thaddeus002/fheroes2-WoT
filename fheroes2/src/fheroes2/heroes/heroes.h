@@ -190,6 +190,7 @@ public:
 
     bool PickupArtifact(const Artifact::artifact_t);
     bool HasArtifact(const Artifact::artifact_t) const;
+    bool HasUltimateArtifact(void) const;
     u8 GetCountArtifacts(void) const;
     BagArtifacts & GetBagArtifacts(void);
     void TakeArtifacts(Heroes &);

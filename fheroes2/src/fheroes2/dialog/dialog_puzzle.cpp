@@ -135,6 +135,8 @@ void Dialog::PuzzleMaps(void)
     }
     
     // draw pieces
+    if(Settings::Get().Debug()) Error::Verbose("Dialog::PuzzleMaps: debug mode, show all");
+    else
     for(u16 y = 0; y < PUZZLE_HEIGHT; y++)
         for(u16 x = 0; x < PUZZLE_WIDTH; x++)
         {

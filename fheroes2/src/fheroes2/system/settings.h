@@ -157,6 +157,7 @@ public:
     bool WinsCompAlsoWins(void) const;
     bool WinsAllowNormalVictory(void) const;
     Artifact::artifact_t WinsFindArtifact(void) const;
+    bool WinsFindUltimateArtifact(void) const;
     u16 WinsSidePart(void) const;
     u32 WinsAccumulateGold(void) const;
     u32 WinsMapsIndexObject(void) const;

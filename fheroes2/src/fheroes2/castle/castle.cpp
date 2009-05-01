@@ -1475,7 +1475,7 @@ void Castle::Dump(void) const
     std::cout << "name            : " << name << std::endl;
     std::cout << "race            : " << Race::String(race) << std::endl;
     std::cout << "color           : " << Color::String(color) << std::endl;
-    std::cout << "build           : " << building << std::endl;
+    std::cout << "build           : " << "0x" << std::hex << building << std::dec << std::endl;
     std::cout << "present heroes  : " << (GetHeroes() ? "yes" : "no") << std::endl;
     std::cout << "present boat    : " << (PresentBoat() ? "yes" : "no") << std::endl;
     std::cout << "nearly sea      : " << (HaveNearlySea() ? "yes" : "no") << std::endl;

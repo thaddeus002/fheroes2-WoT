@@ -1250,6 +1250,11 @@ bool Heroes::HasArtifact(const Artifact::artifact_t art) const
     return artifacts.end() != std::find(artifacts.begin(), artifacts.end(), art);
 }
 
+bool Heroes::HasUltimateArtifact(void) const
+{
+    return artifacts.end() != std::find_if(artifacts.begin(), artifacts.end(), Artifact::Ultimate);
+}
+
 bool Heroes::PickupArtifact(const Artifact::artifact_t art)
 {
     BagArtifacts::iterator it = std::find(artifacts.begin(), artifacts.end(), Artifact::UNKNOWN);

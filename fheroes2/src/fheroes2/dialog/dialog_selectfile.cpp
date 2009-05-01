@@ -648,7 +648,7 @@ bool DialogSelectMapsFileList(MapsFileInfoList & lists, std::string & filename)
 	    redraw = true;
 	}
 
-	if((le.MouseClickLeft(buttonSelectSmall) && buttonSelectSmall.isEnable()) && buttonSelectSmall.isEnable())
+	if(((le.MouseClickLeft(buttonSelectSmall) || le.KeyPress(KEY_s)) && buttonSelectSmall.isEnable()) && buttonSelectSmall.isEnable())
 	{
 	    curlist = &small;
 	    cur = top = curlist->begin();
@@ -656,7 +656,7 @@ bool DialogSelectMapsFileList(MapsFileInfoList & lists, std::string & filename)
 	    redraw = true;
 	}
 
-	if((le.MouseClickLeft(buttonSelectMedium) && buttonSelectMedium.isEnable()) && buttonSelectMedium.isEnable())
+	if(((le.MouseClickLeft(buttonSelectMedium) || le.KeyPress(KEY_m)) && buttonSelectMedium.isEnable()) && buttonSelectMedium.isEnable())
 	{
 	    curlist = &medium;
 	    cur = top = curlist->begin();
@@ -664,7 +664,7 @@ bool DialogSelectMapsFileList(MapsFileInfoList & lists, std::string & filename)
 	    redraw = true;
 	}
 
-	if((le.MouseClickLeft(buttonSelectLarge) && buttonSelectLarge.isEnable()) && buttonSelectLarge.isEnable())
+	if(((le.MouseClickLeft(buttonSelectLarge) || le.KeyPress(KEY_l)) && buttonSelectLarge.isEnable()) && buttonSelectLarge.isEnable())
 	{
 	    curlist = &large;
 	    cur = top = curlist->begin();
@@ -672,7 +672,7 @@ bool DialogSelectMapsFileList(MapsFileInfoList & lists, std::string & filename)
 	    redraw = true;
 	}
 
-	if((le.MouseClickLeft(buttonSelectXLarge) && buttonSelectXLarge.isEnable()) && buttonSelectXLarge.isEnable())
+	if(((le.MouseClickLeft(buttonSelectXLarge) || le.KeyPress(KEY_l)) && buttonSelectXLarge.isEnable()) && buttonSelectXLarge.isEnable())
 	{
 	    curlist = &xlarge;
 	    cur = top = curlist->begin();
@@ -680,7 +680,7 @@ bool DialogSelectMapsFileList(MapsFileInfoList & lists, std::string & filename)
 	    redraw = true;
 	}
 
-	if(le.MouseClickLeft(buttonSelectAll))
+	if(le.MouseClickLeft(buttonSelectAll) || le.KeyPress(KEY_a))
 	{
 	    curlist = &all;
 	    cur = top = curlist->begin();

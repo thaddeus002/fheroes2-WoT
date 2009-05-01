@@ -768,10 +768,6 @@ void World::LoadMaps(const std::string &filename)
 	//
 	switch(tile.GetObject())
 	{
-	    case MP2::OBJ_OBELISK:
-		count_obelisk += 1;
-		break;
-
 	    case MP2::OBJ_WITCHSHUT:
 	    case MP2::OBJ_SHRINE1:
 	    case MP2::OBJ_SHRINE2:
@@ -1229,7 +1225,6 @@ void World::Reset(void)
     month = 0;
 
     week_name = Week::TORTOISE;
-    count_obelisk = 0;
 
     heroes_cond_wins = Heroes::UNKNOWN;
     heroes_cond_loss = Heroes::UNKNOWN;
@@ -1321,7 +1316,7 @@ u16 World::NextTeleport(const u16 index) const
 {
     std::vector<u16> vec_teleports;
     vec_teleports.reserve(10);
-    GetObjectIndexes(vec_teleports, MP2::OBJ_STONELIGHTS, false);
+    GetObjectIndexes(vec_teleports, MP2::OBJ_STONELIGHTS, true);
 
     if(2 > vec_teleports.size())
     {
@@ -1339,7 +1334,7 @@ u16 World::NextTeleport(const u16 index) const
     for(; it1 != it2; ++it1)
     {
 	const u16 & i = *it1;
-	if(i == index || type != GetTiles(i).GetQuantity1()) continue;
+	if(i == index || type != GetTiles(i).GetQuantity1() || NULL != world.GetHeroes(i)) continue;
 	v.push_back(i);
     }
 
@@ -1353,7 +1348,7 @@ u16 World::NextWhirlpool(const u16 index)
 {
     std::vector<u16> v3;
     v3.reserve(40);
-    GetObjectIndexes(v3, MP2::OBJ_WHIRLPOOL, false);
+    GetObjectIndexes(v3, MP2::OBJ_WHIRLPOOL, true);
 
     std::map<u32, std::vector<u16> > map_whirlpools;
     std::vector<u16>::const_iterator it3 = v3.begin();
@@ -1391,8 +1386,7 @@ u16 World::NextWhirlpool(const u16 index)
     for(; it3 != it4; ++it3)
     {
 	const u16 & i = *it3;
-	if(i == index) continue;
-	if(NULL != world.GetHeroes(i)) continue;
+	if(i == index || NULL != world.GetHeroes(i)) continue;
 	v3.push_back(i);
     }
 
@@ -1597,7 +1591,12 @@ void World::UpdateMonsterPopulation(void)
     }
 }
 
-Artifact::artifact_t World::DiggingForUltimateArtifacts(const Point & center)
+Artifact::artifact_t World::GetUltimateArtifact(void) const
+{
+    return ultimate_artifact < vec_tiles.size() ? Artifact::Artifact(vec_tiles[ultimate_artifact]->GetQuantity1()) : Artifact::UNKNOWN;
+}
+
+bool World::DiggingForUltimateArtifact(const Point & center)
 {
     Maps::Tiles & tile = GetTiles(center);
 
@@ -1616,13 +1615,7 @@ Artifact::artifact_t World::DiggingForUltimateArtifacts(const Point & center)
     }
     tile.AddonsPushLevel1(Maps::TilesAddon(0, GetUniq(), obj, idx));
 
-    if(ultimate_artifact == tile.GetIndex())
-    {
-	ultimate_artifact = 0xFFFF;
-	return Artifact::Artifact(tile.GetQuantity1());
-    }
-
-    return  Artifact::UNKNOWN;
+    return ultimate_artifact == tile.GetIndex();
 }
 
 void World::ActionForMagellanMaps(u8 color)
@@ -1783,7 +1776,26 @@ Surface & World::GetUltimateArtifactArea(void)
 
 u16 World::CountObeliskOnMaps(void)
 {
-    return count_obelisk;
+    std::vector<Maps::Tiles *>::const_iterator it1 = vec_tiles.begin();
+    std::vector<Maps::Tiles *>::const_iterator it2 = vec_tiles.end();
+    u16 res = 0;
+
+    for(; it1 != it2; ++it1) if(*it1)
+    {
+	switch((*it1)->GetObject())
+	{
+		case MP2::OBJ_OBELISK:	++res; break;
+		case MP2::OBJ_HEROES:
+		{
+		    const Heroes* hero = GetHeroes((*it1)->GetIndex());
+		    if(hero && MP2::OBJ_OBELISK == hero->GetUnderObject()) ++res;
+		    break;
+		}
+		default: break;
+	}
+    }
+
+    return res ? res : 6;
 }
 
 void World::KingdomLoss(const Color::color_t color)
@@ -1934,11 +1946,23 @@ u16 World::CheckKingdomWins(const Kingdom & kingdom) const
 
         case GameOver::WINS_ARTIFACT:
 	{
-	    const Artifact::artifact_t art = conf.WinsFindArtifact();
-	    std::vector<Heroes *>::const_iterator beg = kingdom.GetHeroes().begin();
-	    std::vector<Heroes *>::const_iterator end = kingdom.GetHeroes().end();
-	    if((end != std::find_if(beg, end, std::bind2nd(std::mem_fun(&Heroes::HasArtifact), art)) ||
-		(conf.WinsAllowNormalVictory() && CheckKingdomNormalVictory(kingdom))))
+	    if(conf.WinsFindUltimateArtifact())
+	    {
+		std::vector<Heroes *>::const_iterator beg = kingdom.GetHeroes().begin();
+		std::vector<Heroes *>::const_iterator end = kingdom.GetHeroes().end();
+		if(end != std::find_if(beg, end, std::mem_fun(&Heroes::HasUltimateArtifact)))
+		    return GameOver::WINS_ARTIFACT;
+	    }
+	    else
+	    {
+		const Artifact::artifact_t art = conf.WinsFindArtifact();
+		std::vector<Heroes *>::const_iterator beg = kingdom.GetHeroes().begin();
+		std::vector<Heroes *>::const_iterator end = kingdom.GetHeroes().end();
+		if(end != std::find_if(beg, end, std::bind2nd(std::mem_fun(&Heroes::HasArtifact), art)))
+		    return GameOver::WINS_ARTIFACT;
+	    }
+	    // check normal victory
+	    if(conf.WinsAllowNormalVictory() && CheckKingdomNormalVictory(kingdom))
 		    return GameOver::WINS_ARTIFACT;
 	    break;
 	}
