@@ -112,12 +112,13 @@ Game::menu_t Game::MainMenu(void)
     // mainmenu loop
     while(le.HandleEvents())
     {
-        for(u16 i = 0; le.MouseMotion() && i < sizeof(buttons) / sizeof(buttons[0]); i++)
+        for(u16 i = 0; i < sizeof(buttons) / sizeof(buttons[0]); i++)
         {
             buttons[i].wasOver = buttons[i].isOver;
             
             if(le.MousePressLeft(buttons[i].button))
                 buttons[i].button.PressDraw();
+            else buttons[i].button.ReleaseDraw();
 
             buttons[i].isOver = le.MouseCursor(buttons[i].button);
 
@@ -126,9 +127,8 @@ Game::menu_t Game::MainMenu(void)
             {
                 u16 frame = buttons[i].frame;
                 
-                if(!buttons[i].isOver && buttons[i].wasOver)
-                    buttons[i].button.ReleaseDraw();
-                else frame++;
+                if(buttons[i].isOver && !buttons[i].wasOver)
+                    frame++;
                 
                 cursor.Hide();
                 const Sprite & sprite = AGG::GetICN(ICN::BTNSHNGL, frame);
