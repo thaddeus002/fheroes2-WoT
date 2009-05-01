@@ -105,8 +105,8 @@ void Game::SaveXML(const std::string &fn)
     game->SetAttribute("game_difficulty", conf.game_difficulty);
     game->SetAttribute("my_color", conf.my_color);
     game->SetAttribute("cur_color", conf.cur_color);
-    game->SetAttribute("game_type", conf.game);
-    game->SetAttribute("players", conf.players);
+    game->SetAttribute("game_type", conf.game_type);
+    game->SetAttribute("players_colors", conf.players_colors);
     game->SetAttribute("preferably_count_players", conf.preferably_count_players);
     game->SetAttribute("debug", conf.debug);
 
@@ -758,9 +758,9 @@ void Game::LoadXML(const std::string &fn)
     game->Attribute("cur_color", &res);
     conf.cur_color = Color::Get(res);
     game->Attribute("game_type", &res);
-    conf.game = Game::GetControl(res);
-    game->Attribute("players", &res);
-    conf.players = res;
+    conf.game_type = Game::GetControl(res);
+    game->Attribute("players_colors", &res);
+    conf.players_colors = res;
     game->Attribute("preferably_count_players", &res);
     conf.preferably_count_players = res;
     game->Attribute("debug", &res);

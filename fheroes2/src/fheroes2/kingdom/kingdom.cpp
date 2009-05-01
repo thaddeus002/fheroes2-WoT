@@ -121,13 +121,26 @@ bool Kingdom::isLoss(void) const
     return castles.empty() && heroes.empty();
 }
 
-void Kingdom::ActionNewDay(void)
+void Kingdom::LossPostActions(void)
 {
-    if((castles.empty() && heroes.empty()) || 0 == lost_town_days)
+    if(Modes(PLAY))
     {
 	ResetModes(PLAY);
-	if(heroes.size()) FreeAllHeroes();
+	if(heroes.size())
+	{
+	    std::for_each(heroes.begin(), heroes.end(), std::bind2nd(std::mem_fun(&Heroes::SetFreeman), Army::SURRENDER));
+	    heroes.clear();
+	}
+	if(castles.size()) castles.clear();
 	world.KingdomLoss(color);
+    }
+}
+
+void Kingdom::ActionNewDay(void)
+{
+    if(isLoss() || 0 == lost_town_days)
+    {
+	LossPostActions();
 	return;
     }
 
@@ -241,11 +254,7 @@ void Kingdom::RemoveHeroes(const Heroes *hero)
     if(hero && heroes.size())
 	heroes.erase(std::find(heroes.begin(), heroes.end(), hero));
 
-    if(heroes.empty() && castles.empty())
-    {
-	ResetModes(PLAY);
-	world.KingdomLoss(color);
-    }
+    if(isLoss()) LossPostActions();
 }
 
 void Kingdom::AddCastle(const Castle *castle)
@@ -261,15 +270,13 @@ void Kingdom::RemoveCastle(const Castle *castle)
     if(castle && castles.size())
 	castles.erase(std::find(castles.begin(), castles.end(), castle));
 
-    if(heroes.empty() && castles.empty())
+    if(ai_capital == castle)
     {
-	ResetModes(PLAY);
-	world.KingdomLoss(color);
+	const_cast<Castle *>(castle)->ResetModes(Castle::CAPITAL);
+	ai_capital = NULL;
     }
 
-    const_cast<Castle *>(castle)->ResetModes(Castle::CAPITAL);
-
-    if(ai_capital == castle) ai_capital = NULL;
+    if(isLoss()) LossPostActions();
 }
 
 u8 Kingdom::GetCountCastle(void) const
@@ -382,13 +389,6 @@ void Kingdom::OddFundsResource(const Resource::funds_t & funds)
 u8 Kingdom::GetLostTownDays(void) const
 {
     return lost_town_days;
-}
-
-void Kingdom::FreeAllHeroes(void)
-{
-    std::for_each(heroes.begin(), heroes.end(), std::bind2nd(std::mem_fun(&Heroes::SetFreeman), Army::SURRENDER));
-
-    heroes.clear();
 }
 
 Recruits & Kingdom::GetRecruits(void)

@@ -87,7 +87,6 @@ public:
 
     void AddHeroes(const Heroes *hero);
     void RemoveHeroes(const Heroes *hero);
-    void FreeAllHeroes(void);
 
     void AddCastle(const Castle *castle);
     void RemoveCastle(const Castle *castle);
@@ -111,6 +110,7 @@ private:
     friend void Game::LoadXML(const std::string &);
 
     void UpdateRecruits(void);
+    void LossPostActions(void);
 
     void AICastlesTurns(void);
     void AIHeroesTurns(Heroes &);

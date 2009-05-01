@@ -51,10 +51,9 @@ void Kingdom::AIDumpCacheObjects(const IndexDistance & id) const
 
 void Kingdom::AITurns(void)
 {
-    if((castles.empty() && heroes.empty()) || color == Color::GRAY)
+    if(isLoss() || color == Color::GRAY)
     {
-	ResetModes(PLAY);
-	world.KingdomLoss(color);
+	LossPostActions();
 	return;
     }
     

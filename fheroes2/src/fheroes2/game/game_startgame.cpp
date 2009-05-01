@@ -59,17 +59,21 @@ namespace Game
     bool DiggingForArtifacts(const Heroes & hero);
     void DialogPlayers(const Color::color_t, const std::string &);
     void MoveHeroFromArrowKeys(Heroes & hero, Direction::vector_t direct);
-    bool HumanPlayerLossGame(void);
+    void CheckKingdomsLoss(void);
 };
 
-bool Game::HumanPlayerLossGame(void)
+void Game::CheckKingdomsLoss(void)
 {
-    for(Color::color_t color = Color::BLUE; color != Color::GRAY; ++color)
-	if(world.GetKingdom(color).isPlay() && ((LOCAL | REMOTE) & world.GetKingdom(color).Control())) return false;
+    Settings & conf = Settings::Get();
 
-    Error::Verbose("Game::HumanPlayerLossGame: local players or remote players not found.");
-
-    return true;
+    for(Color::color_t c = Color::BLUE; c != Color::GRAY; ++c)
+        if(!world.GetKingdom(c).isPlay() && (c & conf.CurrentKingdomColors()))
+    {
+	std::string message(_("%{color} has been vanquished!"));
+	String::Replace(message, "%{color}", Color::String(c));
+	DialogPlayers(c, message);
+	conf.SetCurrentKingdomColors(conf.CurrentKingdomColors() & ~c);
+    }
 }
 
 void Game::MoveHeroFromArrowKeys(Heroes & hero, Direction::vector_t direct)
@@ -138,6 +142,7 @@ Game::menu_t Game::StartGame(void)
     Display & display = Display::Get();
 
     conf.SetGameOverResult(GameOver::COND_NONE);
+    conf.SetCurrentKingdomColors(conf.KingdomColors());
 
     cursor.Hide();
 
@@ -148,12 +153,12 @@ Game::menu_t Game::StartGame(void)
     switch(conf.GameType())
     {
     	case Game::HOTSEAT:
-	    for(Color::color_t color = Color::BLUE; color != Color::GRAY; ++color) if(color & conf.Players())
+	    for(Color::color_t color = Color::BLUE; color != Color::GRAY; ++color) if(color & conf.PlayersColors())
         	world.GetKingdom(color).SetControl(LOCAL);
     	    break;
 
     	case Game::NETWORK:
-	    for(Color::color_t color = Color::BLUE; color != Color::GRAY; ++color) if(color & conf.Players())
+	    for(Color::color_t color = Color::BLUE; color != Color::GRAY; ++color) if(color & conf.PlayersColors())
         	world.GetKingdom(color).SetControl(color == conf.MyColor() ? LOCAL : REMOTE);
     	    break;
 
@@ -163,7 +168,7 @@ Game::menu_t Game::StartGame(void)
     }
 
     // update starting resource
-    for(Color::color_t color = Color::BLUE; color != Color::GRAY; ++color) if(color & conf.Players())
+    for(Color::color_t color = Color::BLUE; color != Color::GRAY; ++color) if(color & conf.PlayersColors())
         world.GetKingdom(color).UpdateStartingResource();
 
     GameArea & areaMaps = GameArea::Get();
@@ -243,8 +248,6 @@ Game::menu_t Game::StartGame(void)
 		    Error::Verbose("Game::StartGame: unknown control, for player: " + Color::String(color));
 		    break;
 		}
-
-		if(ENDTURN != m) break;
 	    }
 	}
 	DELAY(1);
@@ -798,9 +801,13 @@ Game::menu_t Game::HumanTurn(void)
 	}
     }
 
+    // kingdom loss dialog
+    CheckKingdomsLoss();
+
     Game::menu_t res = CANCEL;
     u16 cond = GameOver::COND_NONE;
 
+    // game over conditions
     if(GameOver::COND_NONE != (cond = world.CheckKingdomLoss(myKingdom)))
     {
 	conf.SetGameOverResult(cond);
@@ -1147,7 +1154,7 @@ Game::menu_t Game::HumanTurn(void)
 	    {
 		if(conf.Debug()) tile.DebugInfo();
 
-		if(!conf.Debug() && tile.isFog(conf.CurrentColor()))
+		if(!conf.Debug() && tile.isFog(conf.MyColor()))
 		    Dialog::QuickInfo(tile);
                 else
 		switch(tile.GetObject())
@@ -1563,6 +1570,10 @@ Game::menu_t Game::HumanTurn(void)
         	    cursor.Show();
         	    display.Flip();
 
+		    // kingdom loss dialog
+		    CheckKingdomsLoss();
+
+		    // check game over
 		    if(GameOver::COND_NONE != (cond = world.CheckKingdomLoss(myKingdom)))
 		    {
 			conf.SetGameOverResult(cond);
@@ -1615,6 +1626,9 @@ Game::menu_t Game::HumanTurn(void)
 	filename = conf.LocalDataPrefix() + SEPARATOR + "save" + SEPARATOR +  "autosave.sav";
 	Game::Save(filename);
     }
+
+    // reset sound
+    Mixer::Reset();
 
     return res;
 }

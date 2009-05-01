@@ -124,14 +124,17 @@ public:
     Color::color_t MyColor(void) const;
     void SetCurrentColor(const Color::color_t c);
     void SetMyColor(const Color::color_t c);
-    u8   Players(void) const;
-    void SetPlayers(u8 c);
+    u8   PlayersColors(void) const;
+    void SetPlayersColors(u8 c);
     u8   PreferablyCountPlayers(void) const;
     void SetPreferablyCountPlayers(u8 c);
 
     void SetLocalDataPrefix(const std::string &);
 
     u16	GetPort(void) const;
+
+    u8 CurrentKingdomColors(void) const;
+    void SetCurrentKingdomColors(u8);
 
     // from maps info
     Race::race_t KingdomRace(u8) const;
@@ -142,7 +145,9 @@ public:
     Difficulty::difficulty_t MapsDifficulty(void) const;
     u8 MapsWidth(void) const;
     bool AllowColors(u8) const;
+    Color::color_t FirstAllowColor(void) const;
     bool KingdomColors(u8) const;
+    u8 KingdomColors(void) const;
     bool AllowChangeRace(u8) const;
     u8 AllowColorsCount(void) const;
     u8 KingdomColorsCount(void) const;
@@ -198,13 +203,13 @@ private:
     u8 music_volume;
     u8 animation;
 
-    u8 game;
-    u8 players;
+    u8 game_type;
+    u8 players_colors;
     u8 preferably_count_players;
-    
-    u16 port;
+    u8 current_kingdom_colors;
+    u16 game_over_result;
 
-    u16 game_over;
+    u16 port;
 };
 
 #endif

@@ -52,7 +52,6 @@ Game::menu_t Game::ScenarioInfo(void)
     AGG::PlayMusic(MUS::MAINMENU);
 
     Settings & conf = Settings::Get();
-    conf.SetPlayers(Color::BLUE);
 
     MapsFileInfoList lists;
     if(!PrepareMapsFileInfoList(lists)) return MAINMENU;
@@ -91,9 +90,8 @@ Game::menu_t Game::ScenarioInfo(void)
     std::vector<Rect> coordClass(KINGDOMMAX);
 
     // first allow color
-    conf.SetPlayers(0);
-    for(Color::color_t color = Color::BLUE; color != Color::GRAY; ++color)
-	if(conf.AllowColors(color)){ conf.SetPlayers(color); conf.SetMyColor(color); break; }
+    conf.SetMyColor(conf.FirstAllowColor());
+    conf.SetPlayersColors(conf.MyColor());
 
     RedrawStaticInfo();
 
@@ -185,17 +183,15 @@ Game::menu_t Game::ScenarioInfo(void)
 		le.MouseClickLeft(coordColors[Color::GetIndex(color)]))
 	{
 	    cursor.Hide();
-	    const u8 players = conf.Players();
 	    switch(conf.GameType())
 	    {
 		//case Game::NETWORK:
 		case Game::HOTSEAT:
-	    	    conf.SetPlayers(players & color ? players & ~color : players | color);
+		    conf.SetPlayersColors(conf.PlayersColors() & color ? conf.PlayersColors() & ~color : conf.PlayersColors() | color);
 		    break;
 		default:
-		    conf.SetPlayers(0);
-	    	    conf.SetPlayers(color);
 		    conf.SetMyColor(color);
+		    conf.SetPlayersColors(conf.MyColor());
 	    	    break;
 	    }
 	    RedrawOpponentsInfo(pointOpponentInfo);
@@ -248,9 +244,8 @@ Game::menu_t Game::ScenarioInfo(void)
 	    cursor.Hide();
 	    levelCursor.Hide();
 	    // set first allow color
-	    conf.SetPlayers(0);
-	    for(Color::color_t col = Color::BLUE; col < Color::GRAY; ++col)
-		if(conf.AllowColors(col)){ conf.SetPlayers(col); conf.SetMyColor(col); break; }
+	    conf.SetMyColor(conf.FirstAllowColor());
+	    conf.SetPlayersColors(conf.MyColor());
 
 	    RedrawStaticInfo();
 	    UpdateCoordOpponentsInfo(pointOpponentInfo, coordColors);
@@ -431,7 +426,7 @@ void RedrawOpponentsInfo(const Point & dst)
 		}
 	    }
 	    else
-	    if(conf.Players() & color)
+	    if(conf.PlayersColors() & color)
 	    {
 		switch(color)
 		{

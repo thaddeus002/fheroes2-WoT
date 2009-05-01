@@ -55,8 +55,8 @@ Settings::Settings() : major_version(MAJOR_VERSION), minor_version(MINOR_VERSION
     my_color(Color::GRAY), cur_color(Color::GRAY), path_data_directory("data"), path_maps_directory("maps"),
     local_data_prefix("files"),
     font_normal("dejavusans.ttf"), font_small("dejavusans.ttf"), size_normal(15), size_small(10),
-    sound_volume(6), music_volume(6), animation(6), game(0), players(0), preferably_count_players(0),
-    port(DEFAULT_PORT), game_over(GameOver::COND_NONE)
+    sound_volume(6), music_volume(6), animation(6), game_type(0), players_colors(0), preferably_count_players(0),
+    current_kingdom_colors(0), game_over_result(GameOver::COND_NONE), port(DEFAULT_PORT)
 {
     SetModes(SHADOW);
     SetModes(ORIGINAL);
@@ -480,25 +480,25 @@ void Settings::SetAnimation(const u8 s)
 /* check game type */
 u8 Settings::GameType(void) const
 {
-    return game;
+    return game_type;
 }
 
 /* set game type */
 void Settings::SetGameType(const Game::type_t type)
 {
-    game = type;
+    game_type = type;
 }
 
 /* get color players */
-u8 Settings::Players(void) const
+u8 Settings::PlayersColors(void) const
 {
-    return players;
+    return players_colors;
 }
 
 /* set game color players */
-void Settings::SetPlayers(u8 c)
+void Settings::SetPlayersColors(u8 c)
 {
-    players = c;
+    players_colors = c;
 }
 
 void Settings::SetPreferablyCountPlayers(u8 c)
@@ -580,9 +580,31 @@ bool Settings::AllowColors(u8 f) const
     return current_maps_file.allow_colors & f;
 }
 
+Color::color_t Settings::FirstAllowColor(void) const
+{
+    if(current_maps_file.allow_colors & Color::BLUE)	return Color::BLUE;
+    else
+    if(current_maps_file.allow_colors & Color::GREEN)	return Color::GREEN;
+    else
+    if(current_maps_file.allow_colors & Color::RED)	return Color::RED;
+    else
+    if(current_maps_file.allow_colors & Color::YELLOW)	return Color::YELLOW;
+    else
+    if(current_maps_file.allow_colors & Color::ORANGE)	return Color::ORANGE;
+    else
+    if(current_maps_file.allow_colors & Color::PURPLE)	return Color::PURPLE;
+
+    return Color::GRAY;
+}
+
 bool Settings::AllowChangeRace(u8 f) const
 {
     return current_maps_file.rnd_colors & f;
+}
+
+u8 Settings::KingdomColors(void) const
+{
+    return current_maps_file.kingdom_colors;
 }
 
 bool Settings::KingdomColors(u8 f) const
@@ -657,10 +679,20 @@ u16 Settings::LossCountDays(void) const
 
 void Settings::SetGameOverResult(u16 f)
 {
-    game_over = f;
+    game_over_result = f;
 }
 
 u16 Settings::GameOverResult(void) const
 {
-    return game_over;
+    return game_over_result;
+}
+
+u8 Settings::CurrentKingdomColors(void) const
+{
+    return current_kingdom_colors;
+}
+
+void Settings::SetCurrentKingdomColors(u8 c)
+{
+    current_kingdom_colors = c;
 }

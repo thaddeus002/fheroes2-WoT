@@ -79,7 +79,7 @@ void Dialog::QuickInfo(const Maps::Tiles & tile)
     std::string name_object(MP2::StringObject(tile.GetObject()));
     const Settings & settings = Settings::Get();
 
-    if(!settings.Debug() && tile.isFog(settings.CurrentColor()))
+    if(!settings.Debug() && tile.isFog(settings.MyColor()))
 	name_object = _("Unchartered Territory");
     else
     switch(tile.GetObject())

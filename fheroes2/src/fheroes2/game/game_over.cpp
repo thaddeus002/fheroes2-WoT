@@ -59,7 +59,6 @@ void GameOver::DialogWins(u16 cond)
     switch(cond)
     {
 	case WINS_ALL:
-	    // %s has been vanquished!
 	    body = _("You win!");
 	    break;
 
