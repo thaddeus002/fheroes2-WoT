@@ -281,12 +281,10 @@ void Mixer::Init(void)
     	    Mix_QuerySpec(&hardware.freq, &hardware.format, &channels);
             hardware.channels = channels;
 
-            Mix_AllocateChannels(CHANNEL_RESERVED + CHANNEL_FREE);
+            Mix_AllocateChannels(CHANNEL_MAX);
     	    Mix_ReserveChannels(CHANNEL_RESERVED);
-            Mix_GroupChannels(CHANNEL_RESERVED, CHANNEL_RESERVED + CHANNEL_FREE - 1, 0);
-            chunks.reserve(CHANNEL_RESERVED + CHANNEL_FREE);
-            for(u8 ii = 0; ii < CHANNEL_RESERVED + CHANNEL_FREE; ++ii)
-                chunks.push_back(NULL);
+            Mix_GroupChannels(CHANNEL_RESERVED, CHANNEL_MAX - 1, 0);
+            chunks.resize(CHANNEL_MAX, NULL);
             
             valid = true;
         }
@@ -323,7 +321,7 @@ void Mixer::Pause(const int ch)
     if(! valid) return;
 
     if(0 > ch)
-    	for(u8 ii = CHANNEL_RESERVED; ii < CHANNEL_RESERVED + CHANNEL_FREE; ++ii) Mix_Pause(ii);
+    	for(u8 ii = CHANNEL_RESERVED; ii < CHANNEL_MAX; ++ii) Mix_Pause(ii);
     else
 	Mix_Pause(ch);
 }
@@ -341,7 +339,7 @@ void Mixer::Resume(const int ch)
     if(! valid) return;
 
     if(0 > ch)
-    	for(u8 ii = CHANNEL_RESERVED; ii < CHANNEL_RESERVED + CHANNEL_FREE; ++ii) Mix_Resume(ii);
+    	for(u8 ii = CHANNEL_RESERVED; ii < CHANNEL_MAX; ++ii) Mix_Resume(ii);
     else
 	Mix_Resume(ch);
 }
@@ -371,7 +369,7 @@ void Mixer::Reset(const int ch)
 
         if(Cdrom::isValid()) Cdrom::Pause();
 
-        for(u8 ii = 0; ii < CHANNEL_RESERVED + CHANNEL_FREE; ++ii)
+        for(u8 ii = 0; ii < CHANNEL_MAX; ++ii)
             if(ii < CHANNEL_RESERVED) Mix_Pause(ii);
             else HaltChannel(ii);
     }
@@ -386,6 +384,7 @@ void Mixer::HaltChannel(const int ch, bool force)
             HaltChannel(ii, force);
     }
     else
+    if(ch < CHANNEL_MAX)	// potential out_of_range for vector
     {
         Mix_HaltChannel(ch);
         if(chunks[ch] && (ch >= CHANNEL_RESERVED || force))

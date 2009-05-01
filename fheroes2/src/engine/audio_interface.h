@@ -25,6 +25,7 @@
 
 #define CHANNEL_RESERVED	22
 #define CHANNEL_FREE		6
+#define CHANNEL_MAX		CHANNEL_RESERVED + CHANNEL_FREE
 
 namespace Audio
 {
