@@ -241,7 +241,7 @@ Game::menu_t Game::StartGame(void)
 		    break;
 
 	        case AI:
-            	    kingdom.AITurns();
+            	    if(m == ENDTURN) kingdom.AITurns();
 		    break;
 
 		default:
