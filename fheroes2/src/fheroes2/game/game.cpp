@@ -34,7 +34,30 @@
 #include "game.h"
 
 Game::menu_t Game::Testing(u8 t){ Test::Run(t); return Game::QUITGAME; }
-Game::menu_t Game::Credits(void){ Error::Verbose("Credits: under construction."); return Game::MAINMENU; }
+
+Game::menu_t Game::Credits(void)
+{
+    const Settings & conf = Settings::Get();
+
+    std::string str("version: ");
+    String::AddInt(str, conf.MajorVersion());
+    str.append(".");
+    String::AddInt(str, conf.MinorVersion());
+
+#ifndef BUILD_RELEASE
+    str.append(", build: ");
+    String::AddInt(str, conf.DateBuild());
+#endif
+
+    str.append("\n \n");
+    str.append("Site project: https://sourceforge.net/projects/fheroes2");
+
+    Dialog::Message("Free Heroes II Engine", str, Font::SMALL, Dialog::OK);
+
+    //Error::Verbose("Credits: under construction.");
+
+    return Game::MAINMENU;
+}
 
 void Game::SetFixVideoMode(void)
 {
