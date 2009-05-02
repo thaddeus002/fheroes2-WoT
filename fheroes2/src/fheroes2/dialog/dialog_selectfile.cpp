@@ -430,9 +430,15 @@ bool PrepareMapsFileInfoList(MapsFileInfoList & lists)
     Settings & conf = Settings::Get();
     Dir dir;
 
-    dir.Read(conf.MapsDirectory(), ".mp2", false);
-    // loyality version
-    if(conf.Modes(Settings::PRICELOYALTY)) dir.Read(conf.MapsDirectory(), ".mx2", false);
+    ListMapsDirectory::const_iterator it1 = conf.GetListMapsDirectory().begin();
+    ListMapsDirectory::const_iterator it2 = conf.GetListMapsDirectory().end();
+
+    for(; it1 != it2; ++it1)
+    {
+	dir.Read(*it1, ".mp2", false);
+	// loyality version
+	if(conf.Modes(Settings::PRICELOYALTY)) dir.Read(*it1, ".mx2", false);
+    }
 
     if(dir.empty())
     {

@@ -52,12 +52,14 @@ namespace
 /* constructor */
 Settings::Settings() : major_version(MAJOR_VERSION), minor_version(MINOR_VERSION), build_date(BUILD_DATE),
     debug(0), video_mode(640, 480), game_difficulty(Difficulty::NORMAL),
-    my_color(Color::GRAY), cur_color(Color::GRAY), path_data_directory("data"), path_maps_directory("maps"),
-    local_data_prefix("files"),
+    my_color(Color::GRAY), cur_color(Color::GRAY), path_data_directory("data"), local_data_prefix("files"),
     font_normal("dejavusans.ttf"), font_small("dejavusans.ttf"), size_normal(15), size_small(10),
     sound_volume(6), music_volume(6), animation(6), game_type(0), players_colors(0), preferably_count_players(0),
     current_kingdom_colors(0), game_over_result(GameOver::COND_NONE), port(DEFAULT_PORT)
 {
+    // default maps dir
+    list_maps_directory.push_back("maps");
+
     SetModes(SHADOW);
     SetModes(ORIGINAL);
     SetModes(LOGO);
@@ -153,7 +155,12 @@ void Settings::Dump(std::ostream & stream) const
     stream <<", build " << str << std::endl;
 
     stream << "data = " << path_data_directory << std::endl;
-    stream << "maps = " << path_maps_directory << std::endl;
+
+    ListMapsDirectory::const_iterator it1 = list_maps_directory.begin();
+    ListMapsDirectory::const_iterator it2 = list_maps_directory.end();
+
+    for(; it1 != it2; ++it1)
+    stream << "maps = " << *it1 << std::endl;
 
     str.clear();
     String::AddInt(str, video_mode.w);
@@ -236,7 +243,7 @@ bool Settings::FontsRenderBlended(void) const { return Modes(FONTRENDERBLENDED);
 const std::string & Settings::DataDirectory(void) const { return path_data_directory; }
 
 /* return path to maps directory */
-const std::string & Settings::MapsDirectory(void) const { return path_maps_directory; }
+const ListMapsDirectory & Settings::GetListMapsDirectory(void) const { return list_maps_directory; }
 
 /* return path to locales directory */
 const std::string & Settings::LocalDataPrefix(void) const { return local_data_prefix; }
@@ -311,7 +318,7 @@ void Settings::Parse(const std::string & left, const std::string & right)
     if(left == "data") path_data_directory = right;
     else
     // maps directory
-    if(left == "maps") path_maps_directory = right;
+    if(left == "maps") list_maps_directory.push_back(right);
     else
     if(left == "music")
     {

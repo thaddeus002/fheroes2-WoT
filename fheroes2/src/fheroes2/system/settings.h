@@ -22,6 +22,7 @@
 #define H2SETTINGS_H
 
 #include <string>
+#include <list>
 #include <iostream>
 #include "gamedefs.h"
 #include "difficulty.h"
@@ -31,6 +32,8 @@
 #include "game.h"
 #include "game_io.h"
 #include "bitmodes.h"
+
+#define ListMapsDirectory std::list<std::string>
 
 class Settings : public BitModes
 {
@@ -80,8 +83,9 @@ public:
     u8 Animation(void) const;
 
     const std::string & DataDirectory(void) const;
-    const std::string & MapsDirectory(void) const;
     const std::string & LocalDataPrefix(void) const;
+
+    const ListMapsDirectory & GetListMapsDirectory(void) const;
 
     Difficulty::difficulty_t GameDifficulty(void) const;
 
@@ -190,8 +194,9 @@ private:
     Color::color_t cur_color;
 
     std::string path_data_directory;
-    std::string path_maps_directory;
     std::string local_data_prefix;
+
+    ListMapsDirectory list_maps_directory;
 
     std::string font_normal;
     std::string font_small;
