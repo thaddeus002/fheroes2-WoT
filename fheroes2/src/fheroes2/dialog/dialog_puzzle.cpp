@@ -32,6 +32,12 @@
 #define PUZZLE_WIDTH 6
 #define PUZZLE_HEIGHT 8
 
+void DrawPiece(const Point &cur_pt, u8 x, u8 y)
+{
+    const Sprite &piece = AGG::GetICN(ICN::PUZZLE, y * PUZZLE_WIDTH + x);
+    Display::Get().Blit(piece, Point(piece.x(), piece.y()) + cur_pt);
+}
+
 void InitPuzzle(std::vector<Point> & revealOrder)
 {
     revealOrder.push_back(Point(5, 3));
@@ -134,19 +140,6 @@ void Dialog::PuzzleMaps(void)
         pieces[revealPt.y][revealPt.x] = 0;
     }
     
-    // draw pieces
-    if(Settings::Get().Debug()) Error::Verbose("Dialog::PuzzleMaps: debug mode, show all");
-    else
-    for(u16 y = 0; y < PUZZLE_HEIGHT; y++)
-        for(u16 x = 0; x < PUZZLE_WIDTH; x++)
-        {
-            const Sprite &piece = AGG::GetICN(ICN::PUZZLE, y * PUZZLE_WIDTH + x);
-            if(pieces[y][x]) //FIXME: Temporary until pieces can fade out
-                display.Blit(piece, Point(piece.x(), piece.y()) + cur_pt);
-        }
-
-    //TODO: Make non-visible pieces fade out
-
     // The exit button ICNs for the exit button are screwed up (about 5x as much vertical space
     // as it needed, so the size is hardcoded here)
     ICN::icn_t buttonICN = Settings::Get().EvilInterface() ? ICN::LGNDXTRE : ICN::LGNDXTRA;
@@ -156,6 +149,39 @@ void Dialog::PuzzleMaps(void)
     Button buttonExit(dst_pt, buttonICN, 4, 5);
 
     buttonExit.Draw();
+
+    if(Settings::Get().Debug()) Error::Verbose("Dialog::PuzzleMaps: debug mode, show all");
+    
+    s16 alpha = 250;
+    while(!Settings::Get().Debug() && alpha >= 0)
+    {
+        Point border(BORDERWIDTH, BORDERWIDTH);
+        Point adjusted(cur_pt - (display.w() != 640 ? border : Point(0, 0)));
+        for(u8 y = 0; y < PUZZLE_HEIGHT; y++)
+            for(u8 x = 0; x < PUZZLE_WIDTH; x++)
+                if(!pieces[y][x])
+                {
+                    const Sprite &piece = AGG::GetICN(ICN::PUZZLE, y * PUZZLE_WIDTH + x);
+                    Surface fadePiece(piece);
+                    Point src(piece.x(), piece.y()), disp(src + cur_pt);
+                    src -= border;
+                    if(display.w() != 640)
+                        disp -= border;
+                    Rect area(src.x, src.y, piece.w(), piece.h());
+                    display.Blit(sf, area, disp.x, disp.y);
+                    fadePiece.SetAlpha(alpha);
+                    display.Blit(fadePiece, disp.x, disp.y);
+
+                    for(s8 i = -1; i <= 1; i++)
+                        for(s8 j = -1; j <= 1; j++)
+                            if((u8)(x + j) < PUZZLE_WIDTH && (u8)(y + i) < PUZZLE_HEIGHT && pieces[y + i][x + j])
+                                DrawPiece(adjusted, x + j, y + i);
+                }
+                else DrawPiece(adjusted, x, y);
+        alpha -= 25;
+        display.Flip();
+        DELAY(10);
+    }
 
     cursor.Show();
     display.Flip();
