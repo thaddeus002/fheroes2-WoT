@@ -278,22 +278,24 @@ void Kingdom::AIHeroesTask(Heroes & hero)
 
 	std::map<u16, MP2::object_t>::const_iterator itm1 = ai_objects.begin();
 	std::map<u16, MP2::object_t>::const_iterator itm2 = ai_objects.end();
+	bool priority = false;
 
 	for(; itm1 != itm2; ++itm1)
 	{
+	    //std::cout << "AIHeroTask: obj: " << MP2::StringObject((*itm1).second) << ", index: " << (*itm1).first << std::endl;
+
 	    if(hero.isShipMaster())
 	    {
 		if(MP2::isGroundObject((*itm1).second)) continue;
 
 		if(hero.GetPath().Calculate((*itm1).first) &&
-		   hero.AIValidObject((*itm1).second, (*itm1).first)) objs.push_back(IndexDistance((*itm1).first, hero.GetPath().size()));
+		   hero.AIValidObject((*itm1).first, (*itm1).second)) objs.push_back(IndexDistance((*itm1).first, hero.GetPath().size()));
 	    }
 	    else
 	    {
 		if(MP2::isWaterObject((*itm1).second)) continue;
 
-		if(hero.GetPath().Calculate((*itm1).first) &&
-		   hero.AIValidObject((*itm1).second, (*itm1).first))
+		if(hero.GetPath().Calculate((*itm1).first) && hero.AIValidObject((*itm1).first, (*itm1).second))
 		{
 		    u16 pos = 0;
 		    // check monster on path
@@ -308,13 +310,16 @@ void Kingdom::AIHeroesTask(Heroes & hero)
 		    }
 
 		    objs.push_back(IndexDistance((*itm1).first, hero.GetPath().size()));
+
+		    if(hero.AIPriorityObject((*itm1).first, (*itm1).second)){ std::swap(objs.front(), objs.back()); priority = true; }
 		}
 	    }
 	}
 
-	if(objs.size()) std::sort(objs.begin(), objs.end(), IndexDistance::Longest);
+	if(objs.size() && !priority) std::sort(objs.begin(), objs.end(), IndexDistance::Longest);
 	if(1 < Settings::Get().Debug()) Error::Verbose("Kingdom::AIHeroesTask: " + Color::String(color) + ", hero: " + hero.GetName() + ", unconfirmed tasks: ", objs.size());
 
+	// get random first obj
 	if(objs.size())
 	{
 	    ito1 = objs.rbegin();
@@ -330,6 +335,7 @@ void Kingdom::AIHeroesTask(Heroes & hero)
 		    index = index1;
 		}
 		else
+		if(!priority)
 		{
 		    index = Rand::Get(1) ? index1 : index2;
 		}

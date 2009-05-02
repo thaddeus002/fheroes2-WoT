@@ -237,8 +237,9 @@ public:
 
     void AIAction(const u16 dst_index);
     void AIUpdateRoles(void);
-    bool AIValidObject(const u8, const u16);
+    bool AIValidObject(u16, u8);
     void AIRescueWhereMove(u16 &);
+    bool AIPriorityObject(u16, u8);
 
     void Redraw(bool with_shadow = true) const;
     void RedrawDependencesTiles(void) const;

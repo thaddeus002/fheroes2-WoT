@@ -1329,11 +1329,34 @@ void AIToStables(Heroes &hero, const u8 obj, const u16 dst_index)
 
 
 
+/* after AIValidObject, get priority object for AI independent of distance (1 day) */
+bool Heroes::AIPriorityObject(u16 index, u8 obj)
+{
+    switch(obj)
+    {
+	// capture enemy castle
+	case MP2::OBJ_CASTLE:
+	{
+	    const Castle *castle = world.GetCastle(index);
+	    if(castle && GetColor() != castle->GetColor()) return true;
+	    break;
+	}
 
+	// kill enemy hero
+	case MP2::OBJ_HEROES:
+	{
+	    const Heroes *hero = world.GetHeroes(index);
+	    if(hero && GetColor() != hero->GetColor()) return true;
+	    break;
+	}
 
+	default: break;
+    }
 
+    return false;
+}
 
-bool Heroes::AIValidObject(const u8 obj, const u16 index)
+bool Heroes::AIValidObject(u16 index, u8 obj)
 {
     switch(obj)
     {

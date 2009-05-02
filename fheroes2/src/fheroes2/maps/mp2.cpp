@@ -713,8 +713,6 @@ bool MP2::isWaterObject(const u8 obj)
 	    case OBJ_MAGELLANMAPS:
 	    case OBJ_COAST:
 
-    	    case OBJ_HEROES:
-    	    
     	    case MP2::OBJ_MERMAID:
     	    case MP2::OBJ_SIRENS:
             return true;
@@ -798,7 +796,6 @@ bool MP2::isGroundObject(const u8 obj)
     	    
     	    case OBJ_MONSTER:
     	    case OBJ_CASTLE:
-    	    case OBJ_HEROES:
     	    case OBJ_BOAT:
 
 	    case MP2::OBJ_FIREALTAR:

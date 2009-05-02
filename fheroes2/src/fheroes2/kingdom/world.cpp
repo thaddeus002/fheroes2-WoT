@@ -1735,13 +1735,20 @@ void World::StoreActionObject(const u8 color, std::map<u16, MP2::object_t> & sto
 	const Maps::Tiles & tile = **it1;
 	if(tile.isFog(color)) continue;
 
-	if(MP2::isGroundObject(tile.GetObject()) || MP2::isWaterObject(tile.GetObject()))
+	if(MP2::isGroundObject(tile.GetObject()) || MP2::isWaterObject(tile.GetObject()) || MP2::OBJ_HEROES == tile.GetObject())
 	{
 	    // if quantity object is empty
 	    if(MP2::isQuantityObject(tile.GetObject()) && !tile.ValidQuantity()) continue;
 
 	    // skip if object captured (skip castle)
 	    if(MP2::OBJ_CASTLE != tile.GetObject() && MP2::isCaptureObject(tile.GetObject()) && color == ColorCapturedObject(tile.GetIndex())) continue;
+
+	    // skip for meeting heroes
+	    if(MP2::OBJ_HEROES == tile.GetObject())
+	    {
+		const Heroes* hero = GetHeroes(tile.GetIndex());
+		if(hero && color == hero->GetColor()) continue;
+	    }
 
 	    // check: is visited objects
 	    switch(tile.GetObject())
