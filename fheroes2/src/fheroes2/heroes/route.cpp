@@ -73,16 +73,22 @@ void Route::Path::Reset(void)
     hide = true;
 }
 
-u16 Route::Path::GetIndexMultiplier(u16 penalty)
-{
-    return penalty / 25 - 3;
-}
-
-u16 Route::Path::GetIndexSprite(const Direction::vector_t & from, const Direction::vector_t & to)
+u16 Route::Path::GetIndexSprite(const Direction::vector_t & from, const Direction::vector_t & to, u8 mod)
 {
     // ICN::ROUTE
     // start index 1, 25, 49, 73, 97, 121 (size arrow path)
     u16 index = 1;
+
+    switch(mod)
+    {
+	case 200:	index = 121; break;
+	case 175:	index = 97; break;
+	case 150:	index = 73; break;
+	case 125:	index = 49; break;
+	case 100:	index = 25; break;
+
+	default: break;
+    }
 
     switch(from)
     {

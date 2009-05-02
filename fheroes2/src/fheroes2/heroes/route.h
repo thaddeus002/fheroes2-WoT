@@ -66,8 +66,7 @@ namespace Route
 	    const_iterator Begin(void) const{ return begin(); };
 	    const_iterator End(void) const{ return end(); };
 
-        static u16  GetIndexMultiplier(u16 penalty);
-        static u16	GetIndexSprite(const Direction::vector_t & from, const Direction::vector_t & to);
+    	    static u16	GetIndexSprite(const Direction::vector_t & from, const Direction::vector_t & to, u8 mod);
 
 	private:
 	    const Heroes & hero;
