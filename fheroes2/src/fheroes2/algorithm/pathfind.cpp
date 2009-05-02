@@ -98,6 +98,7 @@ bool Algorithm::PathFind(std::list<Route::Step> *result, const u16 from, const u
     list[cur].open   = false;
 
     u32 itr = 0;
+    u16 mons = 0;
     cell_t cell;
 
     while(cur != to)
@@ -122,7 +123,7 @@ bool Algorithm::PathFind(std::list<Route::Step> *result, const u16 from, const u
 			if(MAXU16 == cell.cost_g) continue;
 
 			// check monster protection
-			if(to != tmp && Maps::TileUnderProtection(tmp)) continue;
+			if(tmp != to && Maps::TileUnderProtection(tmp, &mons) && mons != to) continue;
 
 			// check direct from object
 			const Maps::Tiles & tile1 = world.GetTiles(cur);
