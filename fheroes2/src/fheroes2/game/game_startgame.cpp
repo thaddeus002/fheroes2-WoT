@@ -979,6 +979,25 @@ Game::menu_t Game::HumanTurn(void)
 	    }
 	}
 	else
+	// space: action
+	if(le.KeyPress(KEY_SPACE) && Game::Focus::HEROES == global_focus.Type())
+	{
+	    Heroes & hero = global_focus.GetHeroes();
+	    cursor.Hide();
+            hero.SetMove(false);
+            hero.GetPath().Reset();
+            gamearea.Redraw();
+            if(MP2::isActionObject(hero.GetUnderObject(), hero.isShipMaster()))
+            {
+        	hero.ApplyPenaltyMovement();
+        	hero.Action(hero.GetIndex());
+    	    }
+	    cursor.Hide();
+    	    selectHeroes.Redraw();
+	    cursor.Show();
+	    display.Flip();
+	}
+	else
 	// key left
 	if(le.KeyPress(KEY_LEFT))
 	{

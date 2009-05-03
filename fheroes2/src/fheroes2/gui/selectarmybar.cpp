@@ -397,6 +397,7 @@ bool SelectArmyBar::QueueEventProcessing(SelectArmyBar & bar1, SelectArmyBar & b
 		{
 		    troop1.Set(troop2, redistr_count);
 		    troop2.SetCount(troop2.Count() - redistr_count);
+		    change = true;
 		}
 
 		bar1.Reset();
@@ -464,6 +465,7 @@ bool SelectArmyBar::QueueEventProcessing(SelectArmyBar & bar1, SelectArmyBar & b
 		{
 		    troop1.Set(troop2, redistr_count);
 		    troop2.SetCount(troop2.Count() - redistr_count);
+		    change = true;
 		}
 
 		bar1.Reset();

@@ -271,7 +271,7 @@ void AGG::Cache::LoadExtraICN(const ICN::icn_t icn, bool reflect)
 
 	case ICN::TREASURE:  LoadICN(ICN::OBJNRSRC); count = 2; break;
 
-	case ICN::ROUTERED:  LoadICN(ICN::ROUTE); count = 144; break;
+	case ICN::ROUTERED:  LoadICN(ICN::ROUTE); count = 145; break;
 
 	case ICN::YELLOW_FONT:  LoadICN(ICN::FONT); count = 96; break;
 	case ICN::YELLOW_SMALFONT: LoadICN(ICN::SMALFONT); count = 96; break;
