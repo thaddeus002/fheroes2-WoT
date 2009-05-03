@@ -670,9 +670,7 @@ void ActionToCastle(Heroes &hero, const u8 obj, const u16 dst_index)
         
         u32 exp = 0;
 
-        if(Game::AI == world.GetKingdom(castle->GetColor()).Control())
-    	    castle->MergeArmies();
-
+    	castle->MergeArmies();
         Army::army_t army = castle->GetActualArmy();
         
         Army::battle_t b = army.isValid() ?
