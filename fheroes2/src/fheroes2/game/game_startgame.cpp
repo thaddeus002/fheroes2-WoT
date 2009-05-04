@@ -988,14 +988,15 @@ Game::menu_t Game::HumanTurn(void)
             hero.GetPath().Reset();
             gamearea.Redraw();
             if(MP2::isActionObject(hero.GetUnderObject(), hero.isShipMaster()))
-            {
-        	hero.ApplyPenaltyMovement();
         	hero.Action(hero.GetIndex());
-    	    }
-	    cursor.Hide();
-    	    selectHeroes.Redraw();
-	    cursor.Show();
-	    display.Flip();
+	    if(MP2::OBJ_STONELIGHTS == hero.GetUnderObject() || MP2::OBJ_WHIRLPOOL == hero.GetUnderObject())
+	    {
+		cursor.Hide();
+    		hero.ApplyPenaltyMovement();
+    		selectHeroes.Redraw();
+		cursor.Show();
+		display.Flip();
+	    }
 	}
 	else
 	// key left
