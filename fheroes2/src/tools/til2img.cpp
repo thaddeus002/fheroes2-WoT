@@ -93,14 +93,7 @@ int main(int argc, char **argv)
 
     for(u16 cur = 0; cur < count; ++cur)
     {
-	const char *vdata = &body[width * height * cur];
-
-        Surface sf(width, height, 8, SDL_SWSURFACE);
-
-	sf.Lock();
-	memcpy(const_cast<void *>(sf.pixels()), vdata, width * height);
-	sf.Unlock();
-
+	Surface sf(&body[width * height * cur], width, height, 1, false);
 	std::string dstfile(prefix);
 
 	dstfile += SEPARATOR;

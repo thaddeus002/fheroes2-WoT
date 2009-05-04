@@ -504,17 +504,8 @@ void AGG::Cache::LoadTIL(const TIL::til_t til)
 		}
 
 		v.resize(4 * count, NULL);
-		
 		for(u16 ii = 0; ii < count; ++ii)
-		{
-		    Surface & sf = v[ii];
-
-		    sf.Set(width, height, 8, SDL_SWSURFACE);
-
-    		    sf.Lock();
-            	    memcpy(const_cast<void *>(sf.pixels()), &body[6 + ii * tile_size], tile_size);
-                    sf.Unlock();
-		}
+		    v[ii] = Surface(&body[6 + ii * tile_size], width, height, 1, false);
 
 		return;
 	    }

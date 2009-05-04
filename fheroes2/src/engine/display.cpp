@@ -52,7 +52,7 @@ void Display::SetVideoMode(const u16 w, const u16 h, bool fullscreen)
 
     u32 videoflags = SDL_HWPALETTE|SDL_HWSURFACE|SDL_DOUBLEBUF|SDL_HWACCEL;
 
-    if(fullscreen || (display.valid() && (display.flags() & SDL_FULLSCREEN))) videoflags |= SDL_FULLSCREEN;
+    if(fullscreen || (display.surface && (display.surface->flags & SDL_FULLSCREEN))) videoflags |= SDL_FULLSCREEN;
 
     if(!SDL_SetVideoMode(w, h, 0, videoflags))
     {

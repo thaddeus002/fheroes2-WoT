@@ -40,7 +40,7 @@ class Surface
 {
 public:
     Surface();
-    Surface(const unsigned char * pixels, unsigned int width, unsigned int height, unsigned char bytes_per_pixel, bool alpha);
+    Surface(const void* pixels, unsigned int width, unsigned int height, unsigned char bytes_per_pixel, bool alpha);
     Surface(u16 sw, u16 sh, u8 depth, u32 fl);
     Surface(u16 sw, u16 sh, bool alpha = false);
     Surface(const Surface & bs);
@@ -59,7 +59,6 @@ public:
 
     bool valid(void) const{ return surface ? true : false; };
     bool alpha(void) const;
-    u32 flags(void) const;
     u32 MapRGB(u8 r, u8 g, u8 b, u8 a = 0) const;
     void GetRGB(u32 pixel, u8 *r, u8 *g, u8 *b, u8 *a = NULL) const;
 
@@ -74,7 +73,6 @@ public:
     bool SaveBMP(const char *fn) const;
     bool SavePNG(const char *fn) const;
 
-    const void *pixels(void) const;
     const SDL_Surface *GetSurface(void) const{ return surface; };
 
     void Fill(u32 color);
@@ -115,8 +113,10 @@ public:
     void GrayScale(void);
     void Sepia(void);
     
-    void Lock(void);
-    void Unlock(void);
+    void Lock(void) const;
+    void Unlock(void) const;
+
+    static void TILReflect(Surface & sf_dst, const Surface & sf_src, const u8 shape);
 
 protected:
 #ifdef WITH_TTF

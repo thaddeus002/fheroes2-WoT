@@ -34,9 +34,9 @@ Surface::Surface() : surface(NULL)
 {
 }
 
-Surface::Surface(const unsigned char * pixels, unsigned int width, unsigned int height, unsigned char bytes_per_pixel, bool alpha)
+Surface::Surface(const void* pixels, unsigned int width, unsigned int height, unsigned char bytes_per_pixel, bool alpha)
 {
-    surface = SDL_CreateRGBSurfaceFrom((void *) pixels, width, height, bytes_per_pixel * 8, width * bytes_per_pixel,
+    surface = SDL_CreateRGBSurfaceFrom(const_cast<void *>(pixels), width, height, bytes_per_pixel * 8, width * bytes_per_pixel,
 		RMASK32, GMASK32, BMASK32, alpha ? AMASK32 : 0);
 }
 
@@ -54,8 +54,8 @@ Surface::Surface(u16 sw, u16 sh, bool alpha)
 
 Surface::Surface(const Surface & bs)
 {
-    surface = bs.valid() ?
-	SDL_ConvertSurface(const_cast<SDL_Surface *>(bs.GetSurface()), const_cast<SDL_PixelFormat *>(bs.GetPixelFormat()), bs.flags()) : NULL;
+    surface = bs.surface ?
+	SDL_ConvertSurface(bs.surface, bs.surface->format, bs.surface->flags) : NULL;
     LoadPalette();
 }
 
@@ -75,9 +75,9 @@ Surface & Surface::operator= (const Surface & bs)
 {
     if(surface) SDL_FreeSurface(surface);
 
-    if(bs.valid())
+    if(bs.surface)
     {
-	surface = SDL_ConvertSurface(const_cast<SDL_Surface *>(bs.GetSurface()), const_cast<SDL_PixelFormat *>(bs.GetPixelFormat()), bs.flags());
+	surface = SDL_ConvertSurface(bs.surface, bs.surface->format, bs.surface->flags);
 
 	if(!surface) Error::Warning("Surface: operator, error: " + std::string(SDL_GetError()));
 
@@ -132,11 +132,6 @@ u8 Surface::depth(void) const
 bool Surface::alpha(void) const
 {
     return SDL_SRCALPHA & surface->flags;
-}
-
-u32 Surface::flags(void) const
-{
-    return surface->flags;
 }
 
 u32 Surface::MapRGB(u8 r, u8 g, u8 b, u8 a) const
@@ -388,7 +383,7 @@ void Surface::FillRect(u32 color, const Rect & src)
 /* blit */
 void Surface::Blit(const Surface &src)
 {
-    SDL_BlitSurface(const_cast<SDL_Surface *>(src.GetSurface()), NULL, surface, NULL);
+    SDL_BlitSurface(src.surface, NULL, surface, NULL);
 }
 
 /* blit */
@@ -396,7 +391,7 @@ void Surface::Blit(const Surface &src, s16 dst_ox, s16 dst_oy)
 {
     Rect dstrect(dst_ox, dst_oy, surface->w, surface->h);
 
-    SDL_BlitSurface(const_cast<SDL_Surface *>(src.GetSurface()), NULL, surface, dstrect.SDLRect());
+    SDL_BlitSurface(src.surface, NULL, surface, dstrect.SDLRect());
 }
 
 /* blit */
@@ -404,15 +399,15 @@ void Surface::Blit(const Surface &src, const Rect &src_rt, s16 dst_ox, s16 dst_o
 {
     Rect dstrect(dst_ox, dst_oy, src_rt.w, src_rt.h);
 
-    SDL_BlitSurface(const_cast<SDL_Surface *>(src.GetSurface()), const_cast<Rect &>(src_rt).SDLRect(), surface, dstrect.SDLRect());
+    SDL_BlitSurface(src.surface, const_cast<Rect &>(src_rt).SDLRect(), surface, dstrect.SDLRect());
 }
 
 /* scaled from surface */
-void Surface::ScaleFrom(const Surface & bs)
+void Surface::ScaleFrom(const Surface & src)
 {
-    if(bs.w() <= w() || bs.h() <= h()) Error::Warning("Surface::ScaleFrom: incorrect size.");
+    if(src.w() <= w() || src.h() <= h()) Error::Warning("Surface::ScaleFrom: incorrect size.");
     
-    u16 *p_src = NULL;
+    const u16 *p_src = NULL;
     u16 *p_dst = NULL;
 
     u16 width = 0;
@@ -420,10 +415,8 @@ void Surface::ScaleFrom(const Surface & bs)
 
     u8 count = 0;
 
-    Surface & src = const_cast<Surface &>(bs);
-    
     src.Lock();
-    p_src = static_cast<u16 *>(const_cast<void *>(src.pixels()));
+    p_src = static_cast<u16 *>(src.surface->pixels);
 
     // count min iteration    
     width = src.w();
@@ -483,7 +476,7 @@ void Surface::ScaleFrom(const Surface & bs)
     src.Unlock();
 
     Lock();
-    memcpy(const_cast<void *>(pixels()), p_src, sizeof(u16) * (width * 2) * (height * 2));
+    memcpy(surface->pixels, p_src, sizeof(u16) * (width * 2) * (height * 2));
     Unlock();
 
     delete [] p_src;
@@ -503,11 +496,6 @@ bool Surface::SavePNG(const char *fn) const
 #endif
 }
 
-const void *Surface::pixels(void) const
-{
-    return surface ? surface->pixels : NULL;
-}
-
 void Surface::SetAlpha(u8 level)
 {
     if(!surface) return;
@@ -517,20 +505,17 @@ void Surface::SetAlpha(u8 level)
 void Surface::ResetAlpha(void)
 {
     if(!surface) return;
-    SDL_SetAlpha(surface, 0, 0);
-    surface->format->Amask = 0;
+    SDL_SetAlpha(surface, 0, 255);
 }
 
-void Surface::Lock(void)
+void Surface::Lock(void) const
 {
-    if(SDL_MUSTLOCK(surface))
-        SDL_LockSurface(surface);
+    if(SDL_MUSTLOCK(surface)) SDL_LockSurface(surface);
 }
 
-void Surface::Unlock(void)
+void Surface::Unlock(void) const
 {
-    if(SDL_MUSTLOCK(surface))
-        SDL_UnlockSurface(surface);
+    if(SDL_MUSTLOCK(surface)) SDL_UnlockSurface(surface);
 }
 
 void Surface::FreeSurface(void)
@@ -542,7 +527,7 @@ void Surface::FreeSurface(void)
 
 const SDL_PixelFormat *Surface::GetPixelFormat(void) const
 {
-    return surface->format;
+    return surface ? surface->format : NULL;
 }
 
 void Surface::ChangeColor(u32 fc, u32 tc)
@@ -702,4 +687,86 @@ void Surface::MakeContour(Surface & dst, u32 col) const
             }
         }
     dst.Unlock();
+}
+
+void Surface::TILReflect(Surface & sf_dst, const Surface & sf_src, const u8 shape)
+{
+    // valid sf_src
+    if(!sf_src.surface || sf_src.w() != sf_src.h())
+    {
+	Error::Warning("Surface::TILReflect: incorrect size");
+	return;
+    }
+
+    if(sf_src.depth() != 8)
+    {
+	Error::Warning("Surface::TILReflect: use only 8 bpp");
+	return;
+    }
+
+    const u8 tile_width = sf_src.w();
+    const u8 tile_height = sf_src.h();
+
+    // valid sf_dst
+    if(!sf_dst.surface || sf_dst.w() != tile_width || sf_dst.h() != tile_height)
+    {
+        sf_dst = Surface(tile_width, tile_height, 8, SWSURFACE);
+    }
+
+    const char* src = static_cast<const char*>(sf_src.surface->pixels);
+    char* dst = static_cast<char*>(sf_dst.surface->pixels);
+
+    s16 x, y;
+
+    char * dst2 = NULL;
+
+    sf_dst.Lock();
+
+    // draw tiles
+    switch(shape % 4)
+    {
+        // normal
+	case 0:
+	    memcpy(dst, src, tile_width * tile_height);
+            break;
+
+        // vertical reflect
+        case 1:
+	{
+	    dst2 = dst + tile_width * (tile_height - 1);
+
+	    for(int i = 0; i < tile_height; i++)
+	    {
+    		memcpy(dst2, src, tile_width);
+
+    		src += tile_width;
+    		dst2 -= tile_width;
+	    }
+	}
+            break;
+
+        // horizontal reflect
+        case 2:
+            for(y = 0; y < tile_height; ++y)
+                for(x = tile_width - 1; x >= 0; --x)
+                {
+		    dst2 = dst + y * tile_width + x;
+		    *dst2 = *src;
+                    ++src;
+                }
+            break;
+
+        // any variant
+        case 3:
+            for(y = tile_height - 1; y >= 0; --y)
+                for( x = tile_width - 1; x >= 0; --x)
+                {
+		    dst2 = dst + y * tile_width + x;
+		    *dst2 = *src;
+                    ++src;
+                }
+            break;
+    }
+
+    sf_dst.Unlock();
 }
