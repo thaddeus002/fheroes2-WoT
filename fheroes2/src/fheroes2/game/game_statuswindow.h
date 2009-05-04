@@ -47,6 +47,8 @@ public:
     void SetState(const info_t info);
     void NextState(void);
 
+    static void ResetTimer(void);
+    
     void SetResource(const Resource::resource_t, u16);
 
     void RedrawAITurns(u8 color, u8 progress) const;

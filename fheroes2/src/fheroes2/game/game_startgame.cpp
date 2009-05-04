@@ -269,6 +269,7 @@ void Game::OpenCastle(Castle *castle)
     Display & display = Display::Get();
     std::vector<Castle *>::const_iterator it = std::find(myCastles.begin(), myCastles.end(), castle);
     Game::Focus & globalfocus = Game::Focus::Get();
+    Game::StatusWindow::ResetTimer();
 
     if(it != myCastles.end())
     {
@@ -320,6 +321,7 @@ void Game::OpenHeroes(Heroes *hero)
     Display & display = Display::Get();
     std::vector<Heroes *>::const_iterator it = std::find(myHeroes.begin(), myHeroes.end(), hero);
     Game::Focus & globalfocus = Game::Focus::Get();
+    Game::StatusWindow::ResetTimer();
 
     if(it != myHeroes.end())
     {

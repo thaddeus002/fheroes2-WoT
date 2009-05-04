@@ -200,6 +200,16 @@ void Game::StatusWindow::SetResource(const Resource::resource_t res, u16 count)
     Timer::Run(timerShowLastResource, RESOURCE_WINDOW_EXPIRE, ResetResourceStatus, this);
 }
 
+void Game::StatusWindow::ResetTimer(void)
+{
+    StatusWindow & window = Get();
+    if(window.timerShowLastResource.IsValid())
+    {
+	Timer::Remove(window.timerShowLastResource);
+	ResetResourceStatus(0, &window);
+    }
+}
+
 void Game::StatusWindow::DrawResourceInfo(const u8 oh) const
 {
     std::string message = _("You find a small\nquantity of %{resource}.");
