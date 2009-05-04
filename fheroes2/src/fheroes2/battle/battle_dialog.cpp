@@ -25,40 +25,18 @@ static void DrawArmySummary(const Army::BattleArmy_t &orig, const Army::BattleAr
         return;
     }
 
-    std::vector<std::pair<const Sprite *, int> > killed;
-    u16 width = 0, height = 0;
-    for(u16 i = 0; i < orig.size(); i++)
-    {
-        int delta = orig[i].Count() - current[i].Count();
-        if(!orig[i].isValid() || delta <= 0)
-            continue;
-        const Sprite &monster = AGG::GetICN(ICN::MONS32, orig[i].GetSpriteIndex());
-        killed.push_back(std::make_pair(&monster, delta));
-        width += monster.w() + 10;
-        height = std::max(height, monster.h());
-    }
-    if(killed.size())
-    {
-        width -= 10;
-        Surface surf(width, height + 15);
-        surf.SetColorKey();
-        int x = 0;
-        for(u16 i = 0; i < killed.size(); i++)
-        {
-            const Sprite &sprite = *killed[i].first;
-            surf.Blit(sprite, x, surf.h() - sprite.h() - 15);
-            std::string amount;
-            String::AddInt(amount, killed[i].second);
-            Text number(amount, Font::SMALL);
-            number.Blit(Point(x + (sprite.w() - number.w()) / 2, surf.h() - 15), surf);	// Here is pink fringing, becose letter sprite use shadow, need draw to dislpay or use Army::DrawMons32Line
-            x += sprite.w() + 10;
-        }
-        display.Blit(surf, draw.x + (draw.w - surf.w()) / 2, draw.y);
-    }
+    Army::army_t killed;
+
+    for(u8 i = 0; i < orig.size(); i++)
+	if(orig[i].isValid() && orig[i].Count() >= current[i].Count())
+	    killed.At(i).Set(orig[i], orig[i].Count() - current[i].Count());
+
+    if(killed.isValid())
+	killed.DrawMons32Line(draw.x, draw.y, draw.w);
     else
     {
         Text none(_("None"), Font::SMALL);
-        none.Blit(draw.x + (draw.w - none.w()) / 2, draw.y);
+        none.Blit(draw.x + (draw.w - none.w()) / 2, draw.y + 15);
     }
 }
 
@@ -142,10 +120,9 @@ void Battle::BattleSummary(HeroBase &hero, u32 exp, const Army::ArmyPairs &armie
     const int textY = backgroundY + background.h() / 2 + 30;
     TextBox title(_("Battlefield Casualties"), Font::SMALL, Rect(backgroundX, textY, background.w(), 40));
     TextBox attacker(_("Attacker"), Font::SMALL, Rect(backgroundX, title.y() + int(title.h() * 1.5f), background.w(), 40));
-    TextBox defender(_("Defender"), Font::SMALL, Rect(backgroundX, attacker.y() + attacker.h() * 4, background.w(), 40));
-
-    DrawArmySummary(*armies[0].second, *armies[0].first, Rect(backgroundX, attacker.y() + attacker.h() + 5, background.w(), 0));
-    DrawArmySummary(*armies[1].second, *armies[1].first, Rect(backgroundX, defender.y() + defender.h() + 5, background.w(), 0));
+    DrawArmySummary(*armies[0].second, *armies[0].first, Rect(backgroundX + 80, attacker.y() + attacker.h() + 10, 150, 0));
+    TextBox defender(_("Defender"), Font::SMALL, Rect(backgroundX, attacker.y() + attacker.h() + 55, background.w(), 40));
+    DrawArmySummary(*armies[1].second, *armies[1].first, Rect(backgroundX + 80, defender.y() + defender.h() + 10, 150, 0));
 
     cursor.Show();
     display.Flip();
