@@ -37,8 +37,8 @@ static const struct
     u16 hp;
     Speed::speed_t speed;
     u8 grown;
-    const std::string name;
-    const std::string multiname;
+    const char* name;
+    const char* multiname;
 
 } monsters[] = {
 	{     0,   0,   0,   0,   0,  Speed::VERYSLOW,   0, "Unknown Monster", "Unknown Monsters" },
@@ -232,14 +232,20 @@ Monster::Monster() : id(UNKNOWN)
 
 Monster::Monster(monster_t m) : id(m)
 {
+    name = _(monsters[id].name);
+    multiname = _(monsters[id].multiname);
 }
 
 Monster::Monster(const Maps::Tiles & t) : id(FromMaps(t))
 {
+    name = _(monsters[id].name);
+    multiname = _(monsters[id].multiname);
 }
 
 Monster::Monster(u8 race, u32 dwelling) : id(FromDwelling(race, dwelling))
 {
+    name = _(monsters[id].name);
+    multiname = _(monsters[id].multiname);
 }
 
 bool Monster::operator== (monster_t m) const
@@ -262,14 +268,25 @@ Monster::monster_t Monster::GetID(void) const
     return id;
 }
 
+void Monster::Set(const Monster & m)
+{
+    id = m.id;
+    name = _(monsters[id].name);
+    multiname = _(monsters[id].multiname);
+}
+
 void Monster::Set(monster_t m)
 {
     id = m;
+    name = _(monsters[id].name);
+    multiname = _(monsters[id].multiname);
 }
 
 void Monster::Upgrade(void)
 {
     id = Upgrade(id);
+    name = _(monsters[id].name);
+    multiname = _(monsters[id].multiname);
 }
 
 u8 Monster::GetAttack(void) const
@@ -416,12 +433,12 @@ u8 Monster::GetSpriteIndex(void) const
 
 const std::string & Monster::GetName(void) const
 {
-    return monsters[id].name;
+    return name;
 }
 
 const std::string & Monster::GetMultiName(void) const
 {
-    return monsters[id].multiname;
+    return multiname;
 }
 
 bool Monster::isUndead(void) const
@@ -1002,11 +1019,6 @@ u8 Monster::GetLevel(monster_t m)
     return LEVEL0;
 }
 
-const std::string & Monster::String(monster_t m)
-{
-    return monsters[m].name;
-}
-
 u32 Monster::GetDwelling(monster_t m)
 {
     switch(m)
@@ -1086,9 +1098,14 @@ u32 Monster::GetDwelling(monster_t m)
     return 0;
 }
 
-const std::string & Monster::String(Monster & m)
+const char* Monster::GetName(monster_t m)
 {
-    return String(m.id);
+    return _(monsters[m].name);
+}
+
+const char* Monster::GetMultiName(monster_t m)
+{
+    return _(monsters[m].multiname);
 }
 
 Monster::monster_t Monster::Upgrade(Monster & m)

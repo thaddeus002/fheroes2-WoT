@@ -174,6 +174,7 @@ public:
     monster_t GetID(void) const;
 
     void Set(monster_t);
+    void Set(const Monster &);
     void Upgrade(void);
 
     u8 GetAttack(void) const;
@@ -224,13 +225,13 @@ public:
     const anim_t & Animation(void) const;
     void GetAnimFrames(u8 anim, u8 & start, u8 & length, bool attranged = false) const;
 
-    static const std::string & String(Monster &);
     static monster_t Upgrade(Monster &);
     static u16 GetRNDSize(Monster &);
     static u8  GetLevel(Monster &);
     static u32 GetDwelling(Monster &);
 
-    static const std::string & String(monster_t);
+    static const char* GetName(monster_t);
+    static const char* GetMultiName(monster_t);
     static monster_t Upgrade(monster_t);
     static u16 GetRNDSize(monster_t);
     static u8  GetLevel(monster_t);
@@ -244,6 +245,8 @@ public:
 
 protected:
     monster_t id;
+    std::string name;
+    std::string multiname;
 };
 
 #endif

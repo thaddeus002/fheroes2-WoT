@@ -1922,7 +1922,7 @@ void ActionToAncientLamp(Heroes &hero, const u8 obj, const u16 dst_index)
                 world.GetKingdom(hero.GetColor()).OddFundsResource(paymentCosts);
 	    }
 	    else
-		Dialog::Message(Monster::String(Monster::GENIE), _("You are unable to recruit at this time, your ranks are full."), Font::BIG, Dialog::OK);
+		Dialog::Message(Monster::GetName(Monster::GENIE), _("You are unable to recruit at this time, your ranks are full."), Font::BIG, Dialog::OK);
 	}
     }
 

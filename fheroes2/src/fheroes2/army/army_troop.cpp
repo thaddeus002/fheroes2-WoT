@@ -43,24 +43,24 @@ bool Army::Troop::HasMonster(monster_t m) const
 
 void Army::Troop::Set(const Monster & m, u16 c)
 {
-    id = m();
+    Monster::Set(m);
     count = c;
 }
 
 void Army::Troop::Set(monster_t m, u16 c)
 {
-    id = m;
+    Monster::Set(m);
     count = c;
 }
 
 void Army::Troop::SetMonster(const Monster & m)
 {
-    id = m();
+    Monster::Set(m);
 }
 
 void Army::Troop::SetMonster(monster_t m)
 {
-    id = m;
+    Monster::Set(m);
 }
 
 void Army::Troop::SetCount(u16 c)
@@ -70,7 +70,7 @@ void Army::Troop::SetCount(u16 c)
 
 void Army::Troop::Reset(void)
 {
-    id = Monster::UNKNOWN;
+    Monster::Set(Monster::UNKNOWN);
     count = 0;
 }
 
