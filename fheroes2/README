@@ -13,7 +13,8 @@ You need to have these libraries (with equivalent devel versions) to build fHero
 - gettext
 
 SDL libraries can be found at http://www.libsdl.org .
-Sourcecode: you can get it here: http://sourceforge.net/projects/fheroes2/
+Sourcecode you can get it here: http://sourceforge.net/projects/fheroes2/
+And translations: http://translations.launchpad.net/fheroes2
 
 Copy origin data/*.agg in to data directory.
 Copy maps files (*.mp2) in to maps directory.
@@ -37,6 +38,8 @@ l		- load game
 i		- game info
 p		- puzzle dialog
 d		- digging artifact for current hero
+space		- default action
+return 		- open dialog
 
 Main menu:
 n		- new game

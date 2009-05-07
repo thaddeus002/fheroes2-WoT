@@ -1000,7 +1000,23 @@ Game::menu_t Game::HumanTurn(void)
 		display.Flip();
 	    }
 	}
-	else
+        else
+        // return: open dialog
+        if(le.KeyPress(KEY_RETURN))
+        {
+            if(Game::Focus::HEROES == global_focus.Type())
+            {
+                Heroes & hero = global_focus.GetHeroes();
+                OpenHeroes(&hero);
+    	    }
+            else
+            if(Game::Focus::CASTLE == global_focus.Type())
+            {
+                Castle & castl = global_focus.GetCastle();
+                OpenCastle(&castl);
+            }
+        }
+        else
 	// key left
 	if(le.KeyPress(KEY_LEFT))
 	{
