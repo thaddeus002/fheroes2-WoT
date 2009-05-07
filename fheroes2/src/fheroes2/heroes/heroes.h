@@ -70,7 +70,7 @@
 #define DEFAULT_WZRD_POWER	2
 #define DEFAULT_WZRD_KNOWLEDGE	2
 
-typedef std::vector<Artifact::artifact_t> BagArtifacts;
+typedef std::vector<Artifact> BagArtifacts;
 class Recruits;
 
 class HeroBase : public Skill::Primary, public BitModes

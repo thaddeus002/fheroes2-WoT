@@ -238,7 +238,7 @@ void Game::SaveXML(const std::string &fn)
 	{
 	    node = new TiXmlElement("artifact");
 	    artifacts->LinkEndChild(node);
-	    node->SetAttribute("id", hero.artifacts[ii]);
+	    node->SetAttribute("id", hero.artifacts[ii].GetID());
 	}
 
 	// heroes->hero->armies
@@ -935,7 +935,7 @@ void Game::LoadXML(const std::string &fn)
 	    for(; node && ii < hero->artifacts.size(); node = node->NextSiblingElement(), ++ii)
 	    {
 	        node->Attribute("id", &res);
-		hero->artifacts[ii] = Artifact::Artifact(res);
+		hero->artifacts[ii].Set(Artifact::FromInt(res));
 	    }
 	}
 
@@ -1249,7 +1249,7 @@ void Game::LoadXML(const std::string &fn)
 	    node->Attribute("gold", &res);
 	    event->resource.gold = res;
 	    node->Attribute("artifact", &res);
-	    event->artifact = Artifact::Artifact(res);
+	    event->artifact = Artifact::FromInt(res);
 	    str = node->Attribute("computer");
 	    event->computer = str && 0 == std::strcmp(str, "true");
 	    str = node->Attribute("cancel");
@@ -1288,7 +1288,7 @@ void Game::LoadXML(const std::string &fn)
 	    riddle2->Attribute("gold", &res);
 	    riddle->resource.gold = res;
 	    riddle2->Attribute("artifact", &res);
-	    riddle->artifact = Artifact::Artifact(res);
+	    riddle->artifact = Artifact::FromInt(res);
 	    str = riddle2->Attribute("quiet");
 	    riddle->quiet = str && 0 == std::strcmp(str, "true");
 

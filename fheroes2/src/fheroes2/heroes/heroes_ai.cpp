@@ -514,8 +514,8 @@ void AIToTreasureChest(Heroes &hero, const u8 obj, const u16 dst_index)
     {
 	if(tile.GetQuantity1())
 	{
-	    const Artifact::artifact_t art = Artifact::Artifact(tile.GetQuantity1());
-	    if(!hero.PickupArtifact(art))
+	    const Artifact art(Artifact::FromInt(tile.GetQuantity1()));
+	    if(!hero.PickupArtifact(art()))
 		    resource.gold = 1500;	// it is from FAQ
 	}
 	world.GetKingdom(hero.GetColor()).AddFundsResource(resource);
@@ -524,9 +524,9 @@ void AIToTreasureChest(Heroes &hero, const u8 obj, const u16 dst_index)
     {
 	if(tile.GetQuantity1())
 	{
-	    const Artifact::artifact_t art = Artifact::Artifact(tile.GetQuantity1());
+	    const Artifact art(Artifact::FromInt(tile.GetQuantity1()));
 	
-	    if(!hero.PickupArtifact(art))
+	    if(!hero.PickupArtifact(art()))
 		    resource.gold = 1000;	// it is from FAQ
 	    world.GetKingdom(hero.GetColor()).AddFundsResource(resource);
 	}
@@ -584,9 +584,9 @@ void AIToSkeleton(Heroes &hero, const u8 obj, const u16 dst_index)
     // artifact
     if(tile.GetQuantity1() && 0 == tile.GetQuantity2())
     {
-	const Artifact::artifact_t art = Artifact::Artifact(tile.GetQuantity1());
+	const Artifact art(Artifact::FromInt(tile.GetQuantity1()));
 
-	if(hero.PickupArtifact(art))
+	if(hero.PickupArtifact(art()))
 	{
 	    tile.SetQuantity1(0);
 	    tile.SetQuantity2(0);
@@ -603,8 +603,8 @@ void AIToWagon(Heroes &hero, const u8 obj, const u16 dst_index)
     // artifact
     if(tile.GetQuantity1() && 0 == tile.GetQuantity2())
     {
-	const Artifact::artifact_t art = Artifact::Artifact(tile.GetQuantity1());
-	if(hero.PickupArtifact(art))
+	const Artifact art(Artifact::FromInt(tile.GetQuantity1()));
+	if(hero.PickupArtifact(art()))
 	    tile.SetQuantity1(0);
     }
     else
@@ -1015,10 +1015,10 @@ void AIToPoorMoraleObject(Heroes &hero, const u8 obj, const u16 dst_index)
 		{
 	    	    hero.IncreaseExperience(exp);
 	    	    complete = true;
-	    	    const Artifact::artifact_t art = Artifact::Artifact(tile.GetQuantity1());
+	    	    const Artifact art(Artifact::FromInt(tile.GetQuantity1()));
 	    	    Resource::funds_t resource;
 	    	    resource.gold = tile.GetQuantity2() * 100;
-	    	    hero.PickupArtifact(art);
+	    	    hero.PickupArtifact(art());
 	    	    world.GetKingdom(hero.GetColor()).AddFundsResource(resource);
 	    	    hero.ActionAfterBattle();
 	    	    break;
@@ -1046,7 +1046,7 @@ void AIToPoorMoraleObject(Heroes &hero, const u8 obj, const u16 dst_index)
             	    case 10: resource.gold = 1000; break;
             	    case 15: resource.gold = 2000; break;
             	    case 25: resource.gold = 5000; break;
-            	    case 50: resource.gold = 2000; art = Artifact::Artifact(tile.GetQuantity1()); break;
+            	    case 50: resource.gold = 2000; art = Artifact::FromInt(tile.GetQuantity1()); break;
             	    default: Error::Warning("ActionToPoorMoraleObject: unknown variant for ShipWreck, index: ", dst_index); break;
                 }
 
@@ -1243,7 +1243,7 @@ void AIToDaemonCave(Heroes &hero, const u8 obj, const u16 dst_index)
 		break;
 	    case 2:
 	    {
-		const Artifact::artifact_t art = Artifact::Artifact(tile.GetQuantity1());
+		const Artifact::artifact_t art = Artifact::FromInt(tile.GetQuantity1());
 		if(Artifact::UNKNOWN != art) hero.PickupArtifact(art);
     		hero.IncreaseExperience(1000);
 		tile.SetQuantity1(Artifact::UNKNOWN);

@@ -22,8 +22,9 @@
 
 #include "gamedefs.h"
 
-namespace Artifact
+class Artifact
 {
+public:
     enum artifact_t
     {
 	ULTIMATE_BOOK,
@@ -136,28 +137,52 @@ namespace Artifact
 	UNKNOWN,
     };
 
-    artifact_t RandUltimate(void);
-    artifact_t Rand(bool uniq = true);
-    artifact_t Rand1(bool uniq = true);
-    artifact_t Rand2(bool uniq = true);
-    artifact_t Rand3(bool uniq = true);
+    Artifact();
+    Artifact(artifact_t);
 
-    const std::string & String(artifact_t artifact);
-    const std::string & Description(artifact_t artifact);
-    
-    artifact_t Artifact(u8 index);
-    artifact_t FromIndexSprite(u8 index);
+    bool operator== (artifact_t) const;
+    bool operator!= (artifact_t) const;
+    artifact_t operator() (void) const;
+    artifact_t GetID(void) const;
 
-    bool Ultimate(artifact_t);
-    bool isValid(artifact_t);
+    void Set(artifact_t);
+
+    const std::string & GetName(void) const;
+    const std::string & GetDescription(void) const;
+
+    bool isUltimate(void) const;
+    bool isValid(void) const;
 
     /* objnarti.icn */
-    u8 GetIndexSprite(artifact_t);
-
+    u8 GetIndexSprite(void) const;
     /* artfx.icn */
-    u8 IndexSprite32(artifact_t);
+    u8 GetIndexSprite32(void) const;
     /* artifact.icn */
-    u8 IndexSprite64(artifact_t);
+    u8 GetIndexSprite64(void) const;
+                    
+    static artifact_t RandUltimate(void);
+    static artifact_t Rand(bool uniq = true);
+    static artifact_t Rand1(bool uniq = true);
+    static artifact_t Rand2(bool uniq = true);
+    static artifact_t Rand3(bool uniq = true);
+
+    static const char* GetName(artifact_t);
+    static const char* GetDescription(artifact_t);
+
+    static artifact_t FromInt(u16);
+    static artifact_t FromIndexSprite(u8);
+
+    /* objnarti.icn */
+    static u8 IndexSprite(artifact_t);
+    /* artfx.icn */
+    static u8 IndexSprite32(artifact_t);
+    /* artifact.icn */
+    static u8 IndexSprite64(artifact_t);
+
+private:
+    artifact_t id;
+    std::string name;
+    std::string description;
 };
 
 #endif

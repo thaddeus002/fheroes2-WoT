@@ -1593,7 +1593,7 @@ void World::UpdateMonsterPopulation(void)
 
 Artifact::artifact_t World::GetUltimateArtifact(void) const
 {
-    return ultimate_artifact < vec_tiles.size() ? Artifact::Artifact(vec_tiles[ultimate_artifact]->GetQuantity1()) : Artifact::UNKNOWN;
+    return ultimate_artifact < vec_tiles.size() ? Artifact::FromInt(vec_tiles[ultimate_artifact]->GetQuantity1()) : Artifact::UNKNOWN;
 }
 
 bool World::DiggingForUltimateArtifact(const Point & center)

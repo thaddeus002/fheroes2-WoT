@@ -18,22 +18,20 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
+#include <bitset>
 #include <string>
 #include <vector>
-#include <bitset>
 #include "settings.h"
 #include "world.h"
 #include "artifact.h"
 
-namespace Artifact
-{
-    static std::bitset<UNKNOWN + 1> used(0);
+static std::bitset<Artifact::UNKNOWN + 1> used;
 
-    static struct
-    {
-        const std::string name;
-        const std::string description;
-    } all_artifacts[] = {
+static struct
+{
+    const char* name;
+    const char* description;
+} artifacts[] = {
 	{ _("Ultimate Book"), _("The Ultimate Book of Knowledge increases your knowledge by 12.") },
 	{ _("Ultimate Sword"), _("The Ultimate Sword of Dominion increases your attack skill by 12.") },
 	{ _("Ultimate Cloak"), _("The Ultimate Cloak of Protection increases your defense skill by 12.") },
@@ -142,154 +140,92 @@ namespace Artifact
 	{ _("Spade of Necromancy"), _("The Spade gives you increased necromancy skill. ") },
 
 	{ "Unknown", "Unknown" },
-    };
+};
 
+Artifact::Artifact() : id(Artifact::UNKNOWN)
+{
 }
 
-Artifact::artifact_t Artifact::Artifact(u8 index)
+Artifact::Artifact(artifact_t a) : id(a)
 {
-    switch(index)
-    {
-        case 0x00: return ULTIMATE_BOOK;
-        case 0x01: return ULTIMATE_SWORD;
-        case 0x02: return ULTIMATE_CLOAK;
-        case 0x03: return ULTIMATE_WAND;
-        case 0x04: return ULTIMATE_SHIELD;
-        case 0x05: return ULTIMATE_STAFF;
-        case 0x06: return ULTIMATE_CROWN;
-        case 0x07: return GOLDEN_GOOSE;
-	case 0x08: return ARCANE_NECKLACE;
-	case 0x09: return CASTER_BRACELET;
-	case 0x0A: return MAGE_RING;
-	case 0x0B: return WITCHES_BROACH;
-	case 0x0C: return MEDAL_VALOR;
-	case 0x0D: return MEDAL_COURAGE;
-	case 0x0E: return MEDAL_HONOR;
-	case 0x0F: return MEDAL_DISTINCTION;
-	case 0x10: return FIZBIN_MISFORTUNE;
-	case 0x11: return THUNDER_MACE;
-	case 0x12: return ARMORED_GAUNTLETS;
-	case 0x13: return DEFENDER_HELM;
-	case 0x14: return GIANT_FLAIL;
-	case 0x15: return BALLISTA;
-	case 0x16: return STEALTH_SHIELD;
-	case 0x17: return DRAGON_SWORD;
-	case 0x18: return POWER_AXE;
-	case 0x19: return DIVINE_BREASTPLATE;
-	case 0x1A: return MINOR_SCROLL;
-	case 0x1B: return MAJOR_SCROLL;
-	case 0x1C: return SUPERIOR_SCROLL;
-	case 0x1D: return FOREMOST_SCROLL;
-	case 0x1E: return ENDLESS_SACK_GOLD;
-	case 0x1F: return ENDLESS_BAG_GOLD;
-	case 0x20: return ENDLESS_PURSE_GOLD;
-	case 0x21: return NOMAD_BOOTS_MOBILITY;
-	case 0x22: return TRAVELER_BOOTS_MOBILITY;
-	case 0x23: return RABBIT_FOOT;
-	case 0x24: return GOLDEN_HORSESHOE;
-	case 0x25: return GAMBLER_LUCKY_COIN;
-	case 0x26: return FOUR_LEAF_CLOVER;
-	case 0x27: return TRUE_COMPASS_MOBILITY;
-	case 0x28: return SAILORS_ASTROLABE_MOBILITY;
-	case 0x29: return EVIL_EYE;
-	case 0x2A: return ENCHANTED_HOURGLASS;
-	case 0x2B: return GOLD_WATCH;
-	case 0x2C: return SKULLCAP;
-	case 0x2D: return ICE_CLOAK;
-	case 0x2E: return FIRE_CLOAK;
-	case 0x2F: return LIGHTNING_HELM;
-	case 0x30: return EVERCOLD_ICICLE;
-	case 0x31: return EVERHOT_LAVA_ROCK;
-	case 0x32: return LIGHTNING_ROD;
-	case 0x33: return SNAKE_RING;
-	case 0x34: return ANKH;
-	case 0x35: return BOOK_ELEMENTS;
-	case 0x36: return ELEMENTAL_RING;
-	case 0x37: return HOLY_PENDANT;
-	case 0x38: return PENDANT_FREE_WILL;
-	case 0x39: return PENDANT_LIFE;
-	case 0x3A: return SERENITY_PENDANT;
-	case 0x3B: return SEEING_EYE_PENDANT;
-	case 0x3C: return KINETIC_PENDANT;
-	case 0x3D: return PENDANT_DEATH;
-	case 0x3E: return WAND_NEGATION;
-	case 0x3F: return GOLDEN_BOW;
-	case 0x40: return TELESCOPE;
-	case 0x41: return STATESMAN_QUILL;
-	case 0x42: return WIZARD_HAT;
-	case 0x43: return POWER_RING;
-	case 0x44: return AMMO_CART;
-	case 0x45: return TAX_LIEN;
-	case 0x46: return HIDEOUS_MASK;
-	case 0x47: return ENDLESS_POUCH_SULFUR;
-	case 0x48: return ENDLESS_VIAL_MERCURY;
-	case 0x49: return ENDLESS_POUCH_GEMS;
-	case 0x4A: return ENDLESS_CORD_WOOD;
-	case 0x4B: return ENDLESS_CART_ORE;
-	case 0x4C: return ENDLESS_POUCH_CRYSTAL;
-	case 0x4D: return SPIKED_HELM;
-	case 0x4E: return SPIKED_SHIELD;
-	case 0x4F: return WHITE_PEARL;
-	case 0x50: return BLACK_PEARL;
-	case 0x51: return MAGIC_BOOK;
-	case 0x52: return DUMMY1;
-	case 0x53: return DUMMY2;
-	case 0x54: return DUMMY3;
-	case 0x55: return DUMMY4;
-	case 0x56: return SPELL_SCROLL;
-	case 0x57: return ARM_MARTYR;
-	case 0x58: return BREASTPLATE_ANDURAN;
-	case 0x59: return BROACH_SHIELDING;
-	case 0x5A: return BATTLE_GARB;
-	case 0x5B: return CRYSTAL_BALL;
-	case 0x5C: return HEART_FIRE;
-	case 0x5D: return HEART_ICE;
-	case 0x5E: return HELMET_ANDURAN;
-	case 0x5F: return HOLY_HAMMER;
-	case 0x60: return LEGENDARY_SCEPTER;
-	case 0x61: return MASTHEAD;
-	case 0x62: return SPHERE_NEGATION;
-	case 0x63: return STAFF_WIZARDRY;
-	case 0x64: return SWORD_BREAKER;
-	case 0x65: return SWORD_ANDURAN;
-	case 0x66: return SPADE_NECROMANCY;
+    name = _(artifacts[id].name);
+    description = _(artifacts[id].description);
+}
 
-	// not used
+void Artifact::Set(artifact_t a)
+{
+    id = a;
+    name = _(artifacts[id].name);
+    description = _(artifacts[id].description);
+}
+
+bool Artifact::operator== (artifact_t a) const
+{
+    return id == a;
+}
+
+bool Artifact::operator!= (artifact_t a) const
+{
+    return id != a;
+}
+
+Artifact::artifact_t Artifact::operator() (void) const
+{
+    return id;
+}
+
+Artifact::artifact_t Artifact::GetID(void) const
+{
+    return id;
+}
+
+const std::string & Artifact::GetName(void) const
+{
+    return name;
+}
+
+const std::string & Artifact::GetDescription(void) const
+{
+    return description;
+}
+
+bool Artifact::isUltimate(void) const
+{
+    switch(id)
+    {
+	case ULTIMATE_BOOK:
+	case ULTIMATE_SWORD:
+	case ULTIMATE_CLOAK:
+	case ULTIMATE_WAND:
+	case ULTIMATE_SHIELD:
+	case ULTIMATE_STAFF:
+	case ULTIMATE_CROWN:
+	case GOLDEN_GOOSE: return true;
 	default: break;
     }
-    
-    return Artifact::UNKNOWN;
+
+    return false;
 }
 
-Artifact::artifact_t Artifact::FromIndexSprite(u8 index)
+bool Artifact::isValid(void) const
 {
-    if(0x10 < index && 0xA2 > index) return Artifact((index - 1)/2);
-    else
-    if(Settings::Get().Modes(Settings::PRICELOYALTY) && 0xAB < index && 0xCE > index) return Artifact((index - 1)/2);
-    else
-    if(0xA3 == index) return Artifact::Rand();
-    else
-    if(0xA4 == index) return Artifact::RandUltimate();
-    else
-    if(0xA7 == index) return Artifact::Rand1();
-    else
-    if(0xA9 == index) return Artifact::Rand2();
-    else
-    if(0xAB == index) return Artifact::Rand3();
-    else
-	Error::Warning("Artifact::FromMP2: unknown: ", index);
-    
-    return Artifact::UNKNOWN;
+    return id != UNKNOWN;
 }
 
-/* artifact name */
-const std::string & Artifact::String(artifact_t artifact)
-{ return all_artifacts[artifact].name; }
+u8 Artifact::GetIndexSprite(void) const
+{
+    return IndexSprite(id);
+}
 
-/* artifact description */
-const std::string & Artifact::Description(artifact_t artifact)
-{ return all_artifacts[artifact].description; }
+u8 Artifact::GetIndexSprite32(void) const
+{
+    return IndexSprite32(id);
+}
 
+u8 Artifact::GetIndexSprite64(void) const
+{
+    return IndexSprite64(id);
+}
 
 Artifact::artifact_t Artifact::RandUltimate(void)
 {
@@ -520,10 +456,46 @@ Artifact::artifact_t Artifact::Rand3(bool uniq)
     return res;
 }
 
-/* return index sprite objnarti.icn */
-u8 Artifact::GetIndexSprite(Artifact::artifact_t artifact)
+const char* Artifact::GetName(artifact_t a)
 {
-    switch(artifact)
+    return _(artifacts[a].name);
+}
+
+const char* Artifact::GetDescription(artifact_t a)
+{
+    return _(artifacts[a].description);
+}
+
+Artifact::artifact_t Artifact::FromInt(u16 index)
+{
+    return index > UNKNOWN ? UNKNOWN : static_cast<artifact_t>(index);
+}
+
+Artifact::artifact_t Artifact::FromIndexSprite(u8 index)
+{
+    if(0x10 < index && 0xA2 > index) return Artifact::FromInt((index - 1)/2);
+    else
+    if(Settings::Get().Modes(Settings::PRICELOYALTY) && 0xAB < index && 0xCE > index) return Artifact::FromInt((index - 1)/2);
+    else
+    if(0xA3 == index) return Artifact::Rand();
+    else
+    if(0xA4 == index) return Artifact::RandUltimate();
+    else
+    if(0xA7 == index) return Artifact::Rand1();
+    else
+    if(0xA9 == index) return Artifact::Rand2();
+    else
+    if(0xAB == index) return Artifact::Rand3();
+    else
+	Error::Warning("Artifact::FromIndexSprite: unknown: ", index);
+    
+    return Artifact::UNKNOWN;
+}
+
+/* return index sprite objnarti.icn */
+u8 Artifact::IndexSprite(Artifact::artifact_t a)
+{
+    switch(a)
     {
 	// null sprite
         case ULTIMATE_BOOK:			return 0x01;
@@ -622,7 +594,7 @@ u8 Artifact::GetIndexSprite(Artifact::artifact_t artifact)
     }
 
     if(Settings::Get().Modes(Settings::PRICELOYALTY))
-    switch(artifact)
+    switch(a)
     {
 	case SPELL_SCROLL:			return 0xAD;
 	case ARM_MARTYR:			return 0xAF;
@@ -645,43 +617,18 @@ u8 Artifact::GetIndexSprite(Artifact::artifact_t artifact)
 	default: break;
     }
 
-    Error::Warning("Artifact::GetIndexSprite: unknown:", artifact);
+    Error::Warning("Artifact::GetIndexSprite: unknown:", a);
 
     // null sprite
     return 0;
 }
 
-bool Artifact::Ultimate(artifact_t art)
+u8 Artifact::IndexSprite32(Artifact::artifact_t a)
 {
-    switch(art)
-    {
-	case ULTIMATE_BOOK:
-	case ULTIMATE_SWORD:
-	case ULTIMATE_CLOAK:
-	case ULTIMATE_WAND:
-	case ULTIMATE_SHIELD:
-	case ULTIMATE_STAFF:
-	case ULTIMATE_CROWN:
-	case GOLDEN_GOOSE:
-	    return true;
-
-	default: break;
-    }
-
-    return false;
+    return a;
 }
 
-bool Artifact::isValid(artifact_t art)
+u8 Artifact::IndexSprite64(Artifact::artifact_t a)
 {
-    return UNKNOWN != art;
-}
-
-u8 Artifact::IndexSprite32(Artifact::artifact_t art)
-{
-    return art;
-}
-
-u8 Artifact::IndexSprite64(Artifact::artifact_t art)
-{
-    return art + 1;
+    return a + 1;
 }

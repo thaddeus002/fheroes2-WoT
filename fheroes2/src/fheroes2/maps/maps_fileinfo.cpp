@@ -466,7 +466,7 @@ bool Maps::FileInfo::WinsAllowNormalVictory(void) const
 
 Artifact::artifact_t Maps::FileInfo::WinsFindArtifact(void) const
 {
-    return wins3 ? Artifact::Artifact(wins3 - 1) : Artifact::UNKNOWN;
+    return wins3 ? Artifact::FromInt(wins3 - 1) : Artifact::UNKNOWN;
 }
 
 bool Maps::FileInfo::WinsFindUltimateArtifact(void) const

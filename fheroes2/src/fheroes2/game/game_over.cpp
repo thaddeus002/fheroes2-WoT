@@ -82,7 +82,7 @@ void GameOver::DialogWins(u16 cond)
 	{
 	    body = _("You have found the %{name}.\nYour quest is complete.");
 	    const Artifact::artifact_t art = conf.WinsFindUltimateArtifact() ? world.GetUltimateArtifact() : conf.WinsFindArtifact();
-	    String::Replace(body, "%{name}", (conf.WinsFindUltimateArtifact() ? "Ultimate Artifact" : Artifact::String(art)));
+	    String::Replace(body, "%{name}", (conf.WinsFindUltimateArtifact() ? "Ultimate Artifact" : Artifact::GetName(art)));
 	    break;
         }
 
@@ -114,7 +114,7 @@ void GameOver::DialogLoss(u16 cond)
 	{
 	    body = _("The enemy has found the %{name}.\nYour quest is a failure.");
 	    const Artifact::artifact_t art = conf.WinsFindArtifact();
-	    String::Replace(body, "%{name}", Artifact::String(art));
+	    String::Replace(body, "%{name}", Artifact::GetName(art));
 	    break;
         }
 

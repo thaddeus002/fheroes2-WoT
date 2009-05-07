@@ -551,10 +551,10 @@ Dialog::answer_t Heroes::OpenDialog(bool readonly)
 	if(le.MouseCursor(selectArtifacts.GetArea()))
 	{
 	    const s8 index = selectArtifacts.GetIndexFromCoord(le.MouseCursor());
-	    if(0 <= index && index < HEROESMAXARTIFACT && Artifact::UNKNOWN != artifacts[index])
+	    if(0 <= index && index < HEROESMAXARTIFACT && artifacts[index] != Artifact::UNKNOWN)
 	    {
 		std::string str = _("View %{art} Info");
-		String::Replace(str, "%{art}", Artifact::String(artifacts[index]));
+		String::Replace(str, "%{art}", artifacts[index].GetName());
 		statusBar.ShowMessage(str);
 	    }
 	    else

@@ -40,9 +40,9 @@ static void DrawArmySummary(const Army::BattleArmy_t &orig, const Army::BattleAr
     }
 }
 
-static bool PredicateCanTakeArtifact(const Artifact::artifact_t &artifact)
+static bool PredicateCanTakeArtifact(const Artifact & artifact)
 {
-    return Artifact::isValid(artifact) && artifact != Artifact::MAGIC_BOOK;
+    return artifact.isValid() && artifact() != Artifact::MAGIC_BOOK;
 }
 
 void Battle::BattleSummary(HeroBase &hero, u32 exp, const Army::ArmyPairs &armies,
@@ -159,9 +159,9 @@ void Battle::BattleSummary(HeroBase &hero, u32 exp, const Army::ArmyPairs &armie
                     {
                         display.Blit(background, backgroundX, backgroundY);
                         AGG::PlaySound(M82::PICKUP01);
-                        const Sprite & art = AGG::GetICN(ICN::ARTIFACT, artifacts->at(artIndex) + 1);
+                        const Sprite & art = AGG::GetICN(ICN::ARTIFACT, artifacts->at(artIndex).GetIndexSprite64());
                         const Sprite & border = AGG::GetICN(ICN::WINLOSEB, 0);
-                        std::string artName = Artifact::String(artifacts->at(artIndex));
+                        const std::string & artName = artifacts->at(artIndex).GetName();
                         Rect titleRect(backgroundX + background.w() / 8, baseAnimY + animBase.h() + 20, background.w() * 3 / 4, background.h());
                         TextBox title(_("You have captured an enemy artifact!"), Font::BIG, titleRect);
                         Text artText(artName, Font::SMALL);

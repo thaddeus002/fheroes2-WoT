@@ -487,7 +487,7 @@ void ActionToMonster(Heroes &hero, const u8 obj, const u16 dst_index)
         
         if(tile.IsJoiner())
         {
-            std::string message = _("A group of %{monster} with a desire for greater glory wish to join you. Do you accept?");
+            std::string message = _("A group of %{monster} with a desire for greater glory wish to join you.\nDo you accept?");
             std::string monst = monster.GetMultiName();
             String::Lower(monst);
             String::Replace(message, "%{monster}", monst);
@@ -515,7 +515,7 @@ void ActionToMonster(Heroes &hero, const u8 obj, const u16 dst_index)
                 std::string message;
                 if(tile.GetCountMonster() == 1)
                     message = _("The creature is swayed by your diplomatic tongue, and offers to join "
-                                "your army for the sum of %{gold} gold. Do you accept?");
+                                "your army for the sum of %{gold} gold.\nDo you accept?");
                 else
                 {
                     message = _("The creatures are swayed by your diplomatic\ntongue, and make you an offer:\n \n");
@@ -832,16 +832,16 @@ void ActionToResource(Heroes &hero, const u8 obj, const u16 dst_index)
     {
 	    case MP2::OBJ_WINDMILL:
 	    	if(resource.GetValidItems())
-		    Dialog::ResourceInfo(_("The keeper of the mill announces:"), _("\"Milord, I have been working very hard to provide you with these resources, come back next week for more.\""), resource);
+		    Dialog::ResourceInfo("", _("The keeper of the mill announces:\n\"Milord, I have been working very hard to provide you with these resources, come back next week for more.\""), resource);
 		else
-		    Dialog::Message(_("The keeper of the mill announces:"), _("\"Milord, I am sorry, there are no resources currently available. Please try again next week.\""), Font::BIG, Dialog::OK);
+		    Dialog::Message("", _("The keeper of the mill announces:\n\"Milord, I am sorry, there are no resources currently available. Please try again next week.\""), Font::BIG, Dialog::OK);
 	    break;
 
 	    case MP2::OBJ_WATERWHEEL:
 	    	if(resource.GetValidItems())
-		    Dialog::ResourceInfo(_("The keeper of the mill announces:"), _("\"Milord, I have been working very hard to provide you with this gold, come back next week for more.\""), resource);
+		    Dialog::ResourceInfo("", _("The keeper of the mill announces:\n\"Milord, I have been working very hard to provide you with this gold, come back next week for more.\""), resource);
 		else
-		    Dialog::Message(_("The keeper of the mill announces:"), _("\"Milord, I am sorry, there is no gold currently available. Please try again next week.\""), Font::BIG, Dialog::OK);
+		    Dialog::Message("", _("The keeper of the mill announces:\n\"Milord, I am sorry, there is no gold currently available. Please try again next week.\""), Font::BIG, Dialog::OK);
 	    break;
 	    
 	    case MP2::OBJ_LEANTO:
@@ -874,13 +874,13 @@ void ActionToSkeleton(Heroes &hero, const u8 obj, const u16 dst_index)
     // artifact
     if(tile.GetQuantity1() && 0 == tile.GetQuantity2())
     {
-	const Artifact::artifact_t art = Artifact::Artifact(tile.GetQuantity1());
-
-	if(hero.PickupArtifact(art))
+	const Artifact art(Artifact::FromInt(tile.GetQuantity1()));
+	if(hero.PickupArtifact(art()))
 	{
 	    PlayPickupSound();
-	    DialogWithArtifact("You come upon the remains of an unfortunate adventurer.", "Searching through the tattered clothing, you find " + Artifact::String(art), art);
-
+	    std::string message(_("You come upon the remains of an unfortunate adventurer.\nSearching through the tattered clothing, you find %{artifact}."));
+	    String::Replace(message, "%{artifact}", art.GetName());
+	    DialogWithArtifact("", message, art());
 	    tile.SetQuantity1(0);
 	    tile.SetQuantity2(0);
 	}
@@ -888,7 +888,7 @@ void ActionToSkeleton(Heroes &hero, const u8 obj, const u16 dst_index)
     else
     {
 	PlaySoundVisited;
-	Dialog::Message("You come upon the remains of an unfortunate adventurer.", "Searching through the tattered clothing, you find nothing.", Font::BIG, Dialog::OK);
+	Dialog::Message("", _("You come upon the remains of an unfortunate adventurer.\nSearching through the tattered clothing, you find nothing."), Font::BIG, Dialog::OK);
     }
 
     if(Settings::Get().Debug()) Error::Verbose("ActionToSkeleton: " + hero.GetName());
@@ -901,12 +901,13 @@ void ActionToWagon(Heroes &hero, const u8 obj, const u16 dst_index)
     // artifact
     if(tile.GetQuantity1() && 0 == tile.GetQuantity2())
     {
-	const Artifact::artifact_t art = Artifact::Artifact(tile.GetQuantity1());
-	if(hero.PickupArtifact(art))
+	const Artifact art(Artifact::FromInt(tile.GetQuantity1()));
+	if(hero.PickupArtifact(art()))
 	{
 	    PlayPickupSound();
-	    DialogWithArtifact("You come across an old wagon left by a trader who didn't quite make it to safe terrain.", "Searching inside, you find the " + Artifact::String(art), art);
-
+	    std::string message(_("You come across an old wagon left by a trader who didn't quite make it to safe terrain.\nSearching inside, you find the %{artifact}."));
+	    String::Replace(message, "%{artifact}", art.GetName());
+	    DialogWithArtifact("", message, art());
 	    tile.SetQuantity1(0);
 	}
     }
@@ -932,7 +933,7 @@ void ActionToWagon(Heroes &hero, const u8 obj, const u16 dst_index)
 	world.GetKingdom(hero.GetColor()).AddFundsResource(resource);
 
 	PlayPickupSound();
-	Dialog::ResourceInfo("You come across an old wagon left by a trader who didn't quite make it to safe terrain.", "Inside, you find some of the wagon's cargo still intact.", resource);
+	Dialog::ResourceInfo("", _("You come across an old wagon left by a trader who didn't quite make it to safe terrain.\nInside, you find some of the wagon's cargo still intact."), resource);
 
 	tile.SetQuantity1(0);
 	tile.SetQuantity2(0);
@@ -940,7 +941,7 @@ void ActionToWagon(Heroes &hero, const u8 obj, const u16 dst_index)
     else
     {
     	PlaySoundVisited;
-	Dialog::Message("You come across an old wagon left by a trader who didn't quite make it to safe terrain.", "Unfortunately, others have found it first, and the wagon is empty.", Font::BIG, Dialog::OK);
+	Dialog::Message("", _("You come across an old wagon left by a trader who didn't quite make it to safe terrain.\nUnfortunately, others have found it first, and the wagon is empty."), Font::BIG, Dialog::OK);
     }
 
     if(Settings::Get().Debug()) Error::Verbose("ActionToWagon: " + hero.GetName());
@@ -997,15 +998,15 @@ void ActionToShrine(Heroes &hero, const u8 obj, const u16 dst_index)
     {
 	case 1:
 	    head = _("Shrine of the 1st Circle");
-	    body = _("You come across a small shrine attended by a group of novice acolytes. In exchange for your protection, they agree to teach you a simple spell - '%{spell}'.");
+	    body = _("You come across a small shrine attended by a group of novice acolytes.\nIn exchange for your protection, they agree to teach you a simple spell - '%{spell}'.");
 	    break;
 	case 2:
 	    head = _("Shrine of the 2st Circle");
-	    body = _("You come across an ornate shrine attended by a group of rotund friars. In exchange for your protection, they agree to teach you a spell - '%{spell}'.");
+	    body = _("You come across an ornate shrine attended by a group of rotund friars.\nIn exchange for your protection, they agree to teach you a spell - '%{spell}'.");
 	    break;
 	case 3:
 	    head = _("Shrine of the 3st Circle");
-	    body = _("You come across a lavish shrine attended by a group of high priests. In exchange for your protection, they agree to teach you a sophisticated spell - '%{spell}'.");
+	    body = _("You come across a lavish shrine attended by a group of high priests.\nIn exchange for your protection, they agree to teach you a sophisticated spell - '%{spell}'.");
 	    break;
 	default: return;
     }
@@ -1016,7 +1017,7 @@ void ActionToShrine(Heroes &hero, const u8 obj, const u16 dst_index)
     if(!hero.HasArtifact(Artifact::MAGIC_BOOK))
     {
 	PlaySoundFailure;
-	body += _(" Unfortunately, you have no Magic Book to record the spell with.");
+	body += _("\nUnfortunately, you have no Magic Book to record the spell with.");
 	Dialog::Message(head, body, Font::BIG, Dialog::OK);
 	return;
     }
@@ -1025,7 +1026,7 @@ void ActionToShrine(Heroes &hero, const u8 obj, const u16 dst_index)
     if(3 == spell_level && Skill::Level::NONE == hero.GetLevelSkill(Skill::Secondary::WISDOM))
     {
 	PlaySoundFailure;
-	body += _(" Unfortunately, you do not have the wisdom to understand the spell, and you are unable to learn it.");
+	body += _("\nUnfortunately, you do not have the wisdom to understand the spell, and you are unable to learn it.");
 	Dialog::Message(head, body, Font::BIG, Dialog::OK);
 	return;
     }
@@ -1051,7 +1052,7 @@ void ActionToWitchsHut(Heroes &hero, const u8 obj, const u16 dst_index)
     if(HEROESMAXSKILL == hero.CountSecondarySkill())
     {
 	PlaySoundFailure;
-	Dialog::Message(body, _("As you approach, she turns and focuses her one glass eye on you. \"You already know everything you deserve to learn!\" the witch screeches. \"NOW GET OUT OF MY HOUSE!\""), Font::BIG, Dialog::OK);
+	Dialog::Message(body, _("As you approach, she turns and focuses her one glass eye on you.\n\"You already know everything you deserve to learn!\" the witch screeches. \"NOW GET OUT OF MY HOUSE!\""), Font::BIG, Dialog::OK);
 	return;
     }
 
@@ -1059,7 +1060,7 @@ void ActionToWitchsHut(Heroes &hero, const u8 obj, const u16 dst_index)
     if(hero.HasSecondarySkill(skill))
     {
 	PlaySoundVisited;
-	Dialog::Message(body, _("As you approach, she turns and speaks. \"You already know that which I would teach you. I can help you no further.\""), Font::BIG, Dialog::OK);
+	Dialog::Message(body, _("As you approach, she turns and speaks.\n\"You already know that which I would teach you. I can help you no further.\""), Font::BIG, Dialog::OK);
 	return;
     }
 
@@ -1092,13 +1093,13 @@ void ActionToGoodLuckObject(Heroes &hero, const u8 obj, const u16 dst_index)
     	    break;
 
         case MP2::OBJ_IDOL:
-	    body_false = _("You've found an ancient and weathered stone idol. It is supposed to grant luck to visitors, but since the stars are already smiling upon you, it does nothing.");
-	    body_true = _("You've found an ancient and weathered stone idol. Kissing it is supposed to be lucky, so you do. The stone is very cold to the touch.");
+	    body_false = _("You've found an ancient and weathered stone idol.\nIt is supposed to grant luck to visitors, but since the stars are already smiling upon you, it does nothing.");
+	    body_true = _("You've found an ancient and weathered stone idol.\nKissing it is supposed to be lucky, so you do. The stone is very cold to the touch.");
     	    break;
 
         case MP2::OBJ_MERMAID:
 	    body_false = _("The mermaids silently entice you to return later and be blessed again.");
-	    body_true = _("The magical, soothing beauty of the Mermaids reaches you and your crew. Just for a moment, you forget your worries and bask in the beauty of the moment. The mermaids charms bless you with increased luck for your next combat.");
+	    body_true = _("The magical, soothing beauty of the Mermaids reaches you and your crew.\nJust for a moment, you forget your worries and bask in the beauty of the moment.\nThe mermaids charms bless you with increased luck for your next combat.");
     	    break;
 
     	default: return;
@@ -1134,7 +1135,7 @@ void ActionToPoorLuckObject(Heroes &hero, const u8 obj, const u16 dst_index)
     	    if(battle)
     	    {
 		PlaySoundWarning;
-		if(Dialog::YES == Dialog::Message(_("You come upon the pyramid of a great and ancient king."), _("You are tempted to search it for treasure, but all the old stories warn of fearful curses and undead guardians. Will you search?"), Font::BIG, Dialog::OK))
+		if(Dialog::YES == Dialog::Message("", _("You come upon the pyramid of a great and ancient king.\nYou are tempted to search it for treasure, but all the old stories warn of fearful curses and undead guardians.\nWill you search?"), Font::BIG, Dialog::OK))
 		{
 		    // battle
 		    Army::army_t army;
@@ -1177,7 +1178,7 @@ void ActionToPoorLuckObject(Heroes &hero, const u8 obj, const u16 dst_index)
 		}
     	    }
     	    else
-    		body = _("You come upon the pyramid of a great and ancient king. Routine exploration reveals that the pyramid is completely empty.");
+    		body = _("You come upon the pyramid of a great and ancient king.\nRoutine exploration reveals that the pyramid is completely empty.");
     	    break;
 
     	default: return;
@@ -1333,7 +1334,7 @@ void ActionToPoorMoraleObject(Heroes &hero, const u8 obj, const u16 dst_index)
 			{
 			    hero.IncreaseExperience(exp);
 			    complete = true;
-			    const Artifact::artifact_t art = Artifact::Artifact(tile.GetQuantity1());
+			    const Artifact::artifact_t art = Artifact::FromInt(tile.GetQuantity1());
 			    Resource::funds_t resource;
 			    resource.gold = tile.GetQuantity2() * 100;
 			    PlaySoundSuccess;
@@ -1372,7 +1373,7 @@ void ActionToPoorMoraleObject(Heroes &hero, const u8 obj, const u16 dst_index)
                 	case 10: resource.gold = 1000; break;
                 	case 15: resource.gold = 2000; break;
                 	case 25: resource.gold = 5000; break;
-                	case 50: resource.gold = 2000; art = Artifact::Artifact(tile.GetQuantity1()); break;
+                	case 50: resource.gold = 2000; art = Artifact::FromInt(tile.GetQuantity1()); break;
                 	default: Error::Warning("ActionToPoorMoraleObject: unknown variant for ShipWreck, index: ", dst_index); break;
                     }
 
@@ -1577,7 +1578,7 @@ void ActionToArtifact(Heroes &hero, const u8 obj, const u16 dst_index)
 {
     Maps::Tiles & tile = world.GetTiles(dst_index);
 
-    const Artifact::artifact_t art = Artifact::Artifact(tile.GetQuantity1());
+    const Artifact art(Artifact::FromInt(tile.GetQuantity1()));
 
     bool conditions = false;
     const u8 c = 0x0f & tile.GetQuantity2();
@@ -1589,8 +1590,8 @@ void ActionToArtifact(Heroes &hero, const u8 obj, const u16 dst_index)
 	    conditions = true;
 	    PlaySoundSuccess;
 	    std::string str = _("You've pulled a shipwreck survivor from certain death in an unforgiving ocean. Grateful, he rewards you for your act of kindness by giving you the %{art}.");
-	    String::Replace(str, "%{art}", Artifact::String(art));
-	    DialogWithArtifact(MP2::StringObject(obj), str, art);
+	    String::Replace(str, "%{art}", art.GetName());
+	    DialogWithArtifact(MP2::StringObject(obj), str, art());
 	}
 	    break;
 
@@ -1657,10 +1658,10 @@ void ActionToArtifact(Heroes &hero, const u8 obj, const u16 dst_index)
 			payment += Resource::funds_t(Resource::GOLD, 3000);
 			payment += Resource::funds_t(r, 5);
 		    }
-		    String::Replace(header, "%{art}", Artifact::String(art));
+		    String::Replace(header, "%{art}", art.GetName());
 
 		    PlaySoundWarning;
-		    if(Dialog::YES == DialogWithArtifact(header, _("Do you wish to buy this artifact?"), art, Dialog::YES | Dialog::NO))
+		    if(Dialog::YES == DialogWithArtifact(header, _("Do you wish to buy this artifact?"), art(), Dialog::YES | Dialog::NO))
 		    {
 			if(world.GetKingdom(hero.GetColor()).AllowPayment(payment))
 			{
@@ -1687,14 +1688,14 @@ void ActionToArtifact(Heroes &hero, const u8 obj, const u16 dst_index)
 			if(hero.HasSecondarySkill(Skill::Secondary::WISDOM))
 			{
 			    PlaySoundSuccess;
-			    DialogWithArtifact(MP2::StringObject(obj), _("You've found the artifact: ") + Artifact::String(art), art, Dialog::OK);
+			    DialogWithArtifact(MP2::StringObject(obj), _("You've found the artifact: ") + art.GetName(), art(), Dialog::OK);
 			    conditions = true;
 			}
 			else
 			{
 			    PlaySoundFailure;
 			    std::string str = _("The hermit tells you that he is willing to give the %{art} to the first wise person he meets.");
-			    String::Replace(str, "%{art}", Artifact::String(art));
+			    String::Replace(str, "%{art}", art.GetName());
 			    Dialog::Message(_("You've found the humble dwelling of a withered hermit."), str, Font::BIG, Dialog::OK);
 			}
 		    }
@@ -1703,14 +1704,14 @@ void ActionToArtifact(Heroes &hero, const u8 obj, const u16 dst_index)
 			if(hero.HasSecondarySkill(Skill::Secondary::LEADERSHIP))
 			{
 			    PlaySoundSuccess;
-			    DialogWithArtifact(MP2::StringObject(obj), _("You've found the artifact: ") + Artifact::String(art), art, Dialog::OK);
+			    DialogWithArtifact(MP2::StringObject(obj), _("You've found the artifact: ") + art.GetName(), art(), Dialog::OK);
 			    conditions = true;
 			}
 			else
 			{
 			    PlaySoundFailure;
 			    std::string str = _("The soldier tells you that he is willing to pass on the %{art} to the first true leader he meets.");
-			    String::Replace(str, "%{art}", Artifact::String(art));
+			    String::Replace(str, "%{art}", art.GetName());
 			    Dialog::Message(_("You've come across the spartan quarters of a retired soldier."), str, Font::BIG, Dialog::OK);
 			}
 		    }
@@ -1746,8 +1747,8 @@ void ActionToArtifact(Heroes &hero, const u8 obj, const u16 dst_index)
 		    
 		    if(battle)
 		    {
-                u32 exp = 0;
-                const Army::battle_t b = Army::Battle(hero, army, tile, exp);
+            		u32 exp = 0;
+            		const Army::battle_t b = Army::Battle(hero, army, tile, exp);
 			switch(b)
 			{
 			    case Army::WIN:
@@ -1756,8 +1757,8 @@ void ActionToArtifact(Heroes &hero, const u8 obj, const u16 dst_index)
 				conditions = true;
 				PlaySoundSuccess;
 				std::string str = _("Victorious, you take your prize, the %{art}.");
-				String::Replace(str, "%{art}", Artifact::String(art));
-				DialogWithArtifact(MP2::StringObject(obj), str, art);
+				String::Replace(str, "%{art}", art.GetName());
+				DialogWithArtifact(MP2::StringObject(obj), str, art());
 				hero.ActionAfterBattle();
 			    }
 			    break;
@@ -1781,7 +1782,7 @@ void ActionToArtifact(Heroes &hero, const u8 obj, const u16 dst_index)
 
 		default:
 		    PlaySoundSuccess;
-		    DialogWithArtifact(MP2::StringObject(obj), _("You've found the artifact: ") + Artifact::String(art), art);
+		    DialogWithArtifact(MP2::StringObject(obj), _("You've found the artifact: ") + art.GetName(), art());
 		    conditions = true;
 		    break;
 	    }
@@ -1790,7 +1791,7 @@ void ActionToArtifact(Heroes &hero, const u8 obj, const u16 dst_index)
 	default: break;
     }
 
-    if(conditions && hero.PickupArtifact(art))
+    if(conditions && hero.PickupArtifact(art()))
     {
 	PlayPickupSound();
 	AnimationRemoveObject(tile);
@@ -1825,14 +1826,14 @@ void ActionToTreasureChest(Heroes &hero, const u8 obj, const u16 dst_index)
 	else
 	if(tile.GetQuantity1())
 	{
-	    const Artifact::artifact_t art = Artifact::Artifact(tile.GetQuantity1());
+	    const Artifact art(Artifact::FromInt(tile.GetQuantity1()));
 
-	    if(hero.PickupArtifact(art))
+	    if(hero.PickupArtifact(art()))
 	    {
 		message = _("After spending hours trying to fish the chest out of the sea, you open it and find %{gold} gold and the %{art}.");
 		String::Replace(message, "%{gold}", resource.gold);
-		String::Replace(message, "%{art}", Artifact::String(art));
-		DialogWithArtifactAndGold("Chest", message, art, resource.gold);
+		String::Replace(message, "%{art}", art.GetName());
+		DialogWithArtifactAndGold("Chest", message, art(), resource.gold);
 	    }
 	    else
 	    {
@@ -1858,13 +1859,13 @@ void ActionToTreasureChest(Heroes &hero, const u8 obj, const u16 dst_index)
 
 	if(tile.GetQuantity1())
 	{
-	    const Artifact::artifact_t art = Artifact::Artifact(tile.GetQuantity1());
+	    const Artifact art(Artifact::FromInt(tile.GetQuantity1()));
 	
-	    if(hero.PickupArtifact(art))
+	    if(hero.PickupArtifact(art()))
 	    {
 		message = _("After scouring the area, you fall upon a hidden chest, containing the ancient artifact %{art}.");
-		String::Replace(message, "%{art}", Artifact::String(art));
-		DialogWithArtifact("Chest", message, art);
+		String::Replace(message, "%{art}", art.GetName());
+		DialogWithArtifact("Chest", message, art());
 	    }
 	    else
 	    {
@@ -2741,7 +2742,9 @@ void ActionToEvent(Heroes &hero, const u8 obj, const u16 dst_index)
 	    if(hero.PickupArtifact(event_maps->GetArtifact()))
 	    {
 		PlayPickupSound();
-		DialogWithArtifact("You find " + Artifact::String(event_maps->GetArtifact()), "", event_maps->GetArtifact());
+		std::string message(_("You find %{artifact}."));
+		String::Replace(message, "%{artifact}", Artifact::GetName(event_maps->GetArtifact()));
+		DialogWithArtifact("", message, event_maps->GetArtifact());
 	    }
 	}
     }
@@ -2886,9 +2889,9 @@ void ActionToDaemonCave(Heroes &hero, const u8 obj, const u16 dst_index)
 		    case 2:
 		    {
 		    	exp = 1000;
-			const Artifact::artifact_t art = Artifact::Artifact(tile.GetQuantity1());
+			const Artifact::artifact_t art = Artifact::FromInt(tile.GetQuantity1());
 			std::string str = _("The Demon screams its challenge and attacks! After a short, desperate battle, you slay the monster and find the %{art} in the back of the cave.");
-			String::Replace(str, "%{art}", Artifact::String(art));
+			String::Replace(str, "%{art}", Artifact::GetName(art));
 			if(Artifact::UNKNOWN != art) DialogArtifactWithExp("", str, art, exp);
     			hero.PickupArtifact(art);
     			hero.IncreaseExperience(exp);

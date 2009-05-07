@@ -1685,14 +1685,14 @@ bool Game::DiggingForArtifacts(const Heroes & hero)
 	AGG::PlaySound(M82::DIGSOUND);
 
 	const_cast<Heroes &>(hero).ResetMovePoints();
-	Artifact::artifact_t ultimate = world.GetUltimateArtifact();
+	const Artifact ultimate(world.GetUltimateArtifact());
 
-	if(world.DiggingForUltimateArtifact(hero.GetCenter()) && Artifact::UNKNOWN != ultimate)
+	if(world.DiggingForUltimateArtifact(hero.GetCenter()) && ultimate != Artifact::UNKNOWN)
 	{
 	    AGG::PlaySound(M82::TREASURE);
 	    // check returns
-	    const_cast<Heroes &>(hero).PickupArtifact(ultimate);
-	    DialogWithArtifact(_("Congratulations!"), _("After spending many hours digging here, you have uncovered the ") + Artifact::String(ultimate), ultimate);
+	    const_cast<Heroes &>(hero).PickupArtifact(ultimate());
+	    DialogWithArtifact(_("Congratulations!"), _("After spending many hours digging here, you have uncovered the ") + ultimate.GetName(), ultimate());
 	}
 	else
 	    Dialog::Message("", _("Nothing here. Where could it be?"), Font::BIG, Dialog::OK);

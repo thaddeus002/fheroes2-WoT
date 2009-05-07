@@ -153,15 +153,15 @@ void SelectArtifactsBar::Redraw(Surface & display)
 
     for(u8 ii = 0; ii < MAXARTIFACTLINE; ++ii)
     {
-	const Artifact::artifact_t & art = arts[ii];
+	const Artifact & art = arts[ii];
 
-	if(Artifact::UNKNOWN == art)
+	if(art == Artifact::UNKNOWN)
 	    display.Blit(*background, pt);
 	else
 	if(flags & FLAGS_USEART32)
-    	    display.Blit(AGG::GetICN(ICN::ARTFX, Artifact::IndexSprite32(art)), pt.x + 1, pt.y + 1);
+    	    display.Blit(AGG::GetICN(ICN::ARTFX, art.GetIndexSprite32()), pt.x + 1, pt.y + 1);
 	else
-    	    display.Blit(AGG::GetICN(ICN::ARTIFACT, Artifact::IndexSprite64(art)), pt);
+    	    display.Blit(AGG::GetICN(ICN::ARTIFACT, art.GetIndexSprite64()), pt);
 
 	pt.x += background->w() + interval;
     }
@@ -171,15 +171,15 @@ void SelectArtifactsBar::Redraw(Surface & display)
 
     for(u8 ii = 0; ii < MAXARTIFACTLINE; ++ii)
     {
-	const Artifact::artifact_t & art = arts[ii + MAXARTIFACTLINE];
+	const Artifact & art = arts[ii + MAXARTIFACTLINE];
 
-	if(Artifact::UNKNOWN == art)
+	if(art == Artifact::UNKNOWN)
 	    display.Blit(*background, pt);
 	else
 	if(flags & FLAGS_USEART32)
-    	    display.Blit(AGG::GetICN(ICN::ARTFX, Artifact::IndexSprite32(art)), pt.x + 1, pt.y + 1);
+    	    display.Blit(AGG::GetICN(ICN::ARTFX, art.GetIndexSprite32()), pt.x + 1, pt.y + 1);
 	else
-    	    display.Blit(AGG::GetICN(ICN::ARTIFACT, Artifact::IndexSprite64(art)), pt);
+    	    display.Blit(AGG::GetICN(ICN::ARTIFACT, art.GetIndexSprite64()), pt);
 
 	pt.x += background->w() + interval;
     }
@@ -220,7 +220,7 @@ bool SelectArtifactsBar::QueueEventProcessing(SelectArtifactsBar & bar)
     if(0 > index1 || HEROESMAXARTIFACT <= index1) return false;
     BagArtifacts & arts = bar.hero.GetBagArtifacts();
 
-    Artifact::artifact_t & art1 = arts[index1];
+    Artifact & art1 = arts[index1];
     bool change = false;
     Cursor::Get().Hide();
 
@@ -230,15 +230,15 @@ bool SelectArtifactsBar::QueueEventProcessing(SelectArtifactsBar & bar)
 	if(bar.isSelected())
 	{
 	    const s8 index2 = bar.Selected();
-	    Artifact::artifact_t & art2 = arts[index2];
+	    Artifact & art2 = arts[index2];
 
 	    // dialog
 	    if(index1 == index2)
 	    {
-		if(Artifact::MAGIC_BOOK == art1)
+		if(art1 == Artifact::MAGIC_BOOK)
 		    bar.hero.SpellBook().Open();
 		else
-		Dialog::Message(Artifact::String(art1), Artifact::Description(art1), Font::BIG, Dialog::OK);
+		Dialog::Message(art1.GetName(), art1.GetDescription(), Font::BIG, Dialog::OK);
 		//change = true;
 	    }
 	    // exchange
@@ -258,7 +258,7 @@ bool SelectArtifactsBar::QueueEventProcessing(SelectArtifactsBar & bar)
     {
         bar.Reset();
 	// show quick info
-	if(art1 != Artifact::UNKNOWN) Dialog::Message(Artifact::String(art1), Artifact::Description(art1), Font::BIG);
+	if(art1 != Artifact::UNKNOWN) Dialog::Message(art1.GetName(), art1.GetDescription(), Font::BIG);
     }
 
     Cursor::Get().Show();
@@ -289,15 +289,15 @@ bool SelectArtifactsBar::QueueEventProcessing(SelectArtifactsBar & bar1, SelectA
 	BagArtifacts & arts1 = bar1.hero.GetBagArtifacts();
 	BagArtifacts & arts2 = bar2.hero.GetBagArtifacts();
 
-	Artifact::artifact_t & art1 = arts1[index2];
-	Artifact::artifact_t & art2 = arts2[index1];
+	Artifact & art1 = arts1[index2];
+	Artifact & art2 = arts2[index1];
 
 	Cursor::Get().Hide();
 
 	// left click
 	if(le.MouseClickLeft(bar2.GetArea()))
 	{
-	    if(Artifact::MAGIC_BOOK != art1 && Artifact::MAGIC_BOOK != art2) std::swap(art1, art2);
+	    if(art1 != Artifact::MAGIC_BOOK && art2 != Artifact::MAGIC_BOOK) std::swap(art1, art2);
 	    change = true;
 
 	    bar1.Reset();
@@ -311,7 +311,7 @@ bool SelectArtifactsBar::QueueEventProcessing(SelectArtifactsBar & bar1, SelectA
 	if(le.MousePressRight(bar2.GetArea()))
 	{
 	    bar1.Reset();
-	    Dialog::Message(Artifact::String(art2), Artifact::Description(art2), Font::BIG);
+	    Dialog::Message(art2.GetName(), art2.GetDescription(), Font::BIG);
 	}
 
 	Cursor::Get().Show();
@@ -327,15 +327,15 @@ bool SelectArtifactsBar::QueueEventProcessing(SelectArtifactsBar & bar1, SelectA
 	BagArtifacts & arts1 = bar1.hero.GetBagArtifacts();
 	BagArtifacts & arts2 = bar2.hero.GetBagArtifacts();
 
-	Artifact::artifact_t & art1 = arts1[index1];
-	Artifact::artifact_t & art2 = arts2[index2];
+	Artifact & art1 = arts1[index1];
+	Artifact & art2 = arts2[index2];
 
 	Cursor::Get().Hide();
 
 	// left click
 	if(le.MouseClickLeft(bar1.GetArea()))
 	{
-	    if(Artifact::MAGIC_BOOK != art1 && Artifact::MAGIC_BOOK != art2) std::swap(art1, art2);
+	    if(art1 != Artifact::MAGIC_BOOK && art2 != Artifact::MAGIC_BOOK) std::swap(art1, art2);
 	    change = true;
 
 	    bar1.Reset();
@@ -349,7 +349,7 @@ bool SelectArtifactsBar::QueueEventProcessing(SelectArtifactsBar & bar1, SelectA
 	if(le.MousePressRight(bar1.GetArea()))
 	{
 	    bar2.Reset();
-	    Dialog::Message(Artifact::String(art1), Artifact::Description(art1), Font::BIG);
+	    Dialog::Message(art1.GetName(), art1.GetDescription(), Font::BIG);
 	}
 
 	Cursor::Get().Show();

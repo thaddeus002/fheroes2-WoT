@@ -183,7 +183,7 @@ GameEvent::Coord::Coord(u16 index, const void *ptr) : index_map(index)
     byte16 = ReadLE16(ptr8);
     ++ptr8;
     ++ptr8;
-    artifact = (0xffff != byte16 && Artifact::MAGIC_BOOK > byte16 ? artifact = Artifact::Artifact(byte16) : Artifact::UNKNOWN);
+    artifact = (0xffff != byte16 && Artifact::MAGIC_BOOK > byte16 ? artifact = Artifact::FromInt(byte16) : Artifact::UNKNOWN);
 
     // allow computer
     computer = *ptr8;
@@ -277,7 +277,7 @@ GameEvent::Riddle::Riddle(u16 index, const void *ptr) : index_map(index)
     byte16 = ReadLE16(ptr8);
     ++ptr8;
     ++ptr8;
-    artifact = (0xffff != byte16 && Artifact::MAGIC_BOOK > byte16 ? Artifact::Artifact(byte16) : Artifact::UNKNOWN);
+    artifact = (0xffff != byte16 && Artifact::MAGIC_BOOK > byte16 ? Artifact::FromInt(byte16) : Artifact::UNKNOWN);
 
     // count answers
     u8 count = *ptr8;

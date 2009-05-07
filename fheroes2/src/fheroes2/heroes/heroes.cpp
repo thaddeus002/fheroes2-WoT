@@ -412,15 +412,15 @@ void Heroes::LoadFromMP2(u16 map_index, const void *ptr, const Color::color_t cl
     Artifact::artifact_t artifact = Artifact::UNKNOWN;
 
     // artifact 1
-    if(Artifact::UNKNOWN != (artifact = Artifact::Artifact(*ptr8))) PickupArtifact(artifact);
+    if(Artifact::UNKNOWN != (artifact = Artifact::FromInt(*ptr8))) PickupArtifact(artifact);
     ++ptr8;
 
     // artifact 2
-    if(Artifact::UNKNOWN != (artifact = Artifact::Artifact(*ptr8))) PickupArtifact(artifact);
+    if(Artifact::UNKNOWN != (artifact = Artifact::FromInt(*ptr8))) PickupArtifact(artifact);
     ++ptr8;
 
     // artifact 3
-    if(Artifact::UNKNOWN != (artifact = Artifact::Artifact(*ptr8))) PickupArtifact(artifact);
+    if(Artifact::UNKNOWN != (artifact = Artifact::FromInt(*ptr8))) PickupArtifact(artifact);
     ++ptr8;
 
     // unknown byte
@@ -530,7 +530,7 @@ u8 Heroes::GetAttack(void) const
 
     for(; it != artifacts.end(); ++it)
 
-	switch(*it)
+	switch((*it).GetID())
 	{
 	    case Artifact::SPIKED_HELM:
 	    case Artifact::THUNDER_MACE:
@@ -582,7 +582,7 @@ u8 Heroes::GetDefense(void) const
 
     for(; it != artifacts.end(); ++it)
 
-	switch(*it)
+	switch((*it).GetID())
 	{
             case Artifact::SPIKED_HELM:
             case Artifact::ARMORED_GAUNTLETS:
@@ -633,7 +633,7 @@ u8 Heroes::GetPower(void) const
 
     for(; it != artifacts.end(); ++it)
 
-	switch(*it)
+	switch((*it).GetID())
 	{
             case Artifact::BROACH_SHIELDING:
                 result += -2;
@@ -689,7 +689,7 @@ u8 Heroes::GetKnowledge(void) const
 
     for(; it != artifacts.end(); ++it)
 
-	switch(*it)
+	switch((*it).GetID())
 	{
             case Artifact::WHITE_PEARL:
                 result += 1;
@@ -881,13 +881,17 @@ s8 Heroes::GetMoraleWithModificators(std::string *strs) const
 
     for(u16 i = 0; i < modifiers.size(); i++)
     {
-        Artifact::artifact_t art = (Artifact::artifact_t)modifiers[i].first;
+        Artifact::artifact_t art = Artifact::FromInt(modifiers[i].first);
 	if(!HasArtifact(art))
 	    continue;
 
         result += modifiers[i].second;
         if(strs)
-	    strs->append(Artifact::String(art) + StringModifiers(modifiers[i].second) + "\n");
+	{
+	    strs->append(Artifact::GetName(art));
+	    strs->append(StringModifiers(modifiers[i].second));
+	    strs->append("\n");
+	}
     }
 
     modifiers.clear();
@@ -976,13 +980,17 @@ s8 Heroes::GetLuckWithModificators(std::string *strs) const
     // bonus artifact
     for(u16 i = 0; i < modifiers.size(); i++)
     {
-        Artifact::artifact_t art = (Artifact::artifact_t)modifiers[i].first;
+        Artifact::artifact_t art = Artifact::FromInt(modifiers[i].first);
         if(!HasArtifact(art))
             continue;
 
         result += modifiers[i].second;
         if(strs)
-            strs->append(Artifact::String(art) + StringModifiers(modifiers[i].second) + "\n");
+	{
+	    strs->append(Artifact::GetName(art));
+	    strs->append(StringModifiers(modifiers[i].second));
+	    strs->append("\n");
+	}
     }
 
     modifiers.clear();
@@ -1229,19 +1237,18 @@ void Heroes::TakeArtifacts(Heroes & hero2)
 {
     for(u8 ii = 0; ii < HEROESMAXARTIFACT; ++ii)
     {
-        const Artifact::artifact_t art = hero2.artifacts[ii];
-        if(Artifact::UNKNOWN != art &&
-           Artifact::MAGIC_BOOK != art)
+        const Artifact & art = hero2.artifacts[ii];
+        if(art != Artifact::UNKNOWN && art != Artifact::MAGIC_BOOK)
         {
-            if(PickupArtifact(art))
-            hero2.artifacts[ii] = Artifact::UNKNOWN;
+            if(PickupArtifact(art()))
+            hero2.artifacts[ii].Set(Artifact::UNKNOWN);
         }
     }
 }
 
 u8 Heroes::GetCountArtifacts(void) const
 {
-    return std::count_if(artifacts.begin(), artifacts.end(), Artifact::isValid);
+    return std::count_if(artifacts.begin(), artifacts.end(), std::mem_fun_ref(&Artifact::isValid));
 }
 
 /* return true if artifact present */
@@ -1252,7 +1259,7 @@ bool Heroes::HasArtifact(const Artifact::artifact_t art) const
 
 bool Heroes::HasUltimateArtifact(void) const
 {
-    return artifacts.end() != std::find_if(artifacts.begin(), artifacts.end(), Artifact::Ultimate);
+    return artifacts.end() != std::find_if(artifacts.begin(), artifacts.end(), std::mem_fun_ref(&Artifact::isUltimate));
 }
 
 bool Heroes::PickupArtifact(const Artifact::artifact_t art)
@@ -1265,7 +1272,7 @@ bool Heroes::PickupArtifact(const Artifact::artifact_t art)
 	{
 	    art == Artifact::MAGIC_BOOK ?
 	    Dialog::Message(_("You must purchase a spell book to use the mage guild, but you currently have no room for a spell book."), _("Try giving one of your artifacts to another hero."), Font::BIG, Dialog::OK) :
-	    Dialog::Message(Artifact::String(art), _("You have no room to carry another artifact!"), Font::BIG, Dialog::OK);
+	    Dialog::Message(Artifact::GetName(art), _("You have no room to carry another artifact!"), Font::BIG, Dialog::OK);
 	}
 	return false;
     }
