@@ -338,29 +338,9 @@ Race::race_t Monster::GetRace(void) const
     return Race::BOMG;
 }
 
-u16 Monster::GetSpellPoints(void) const
-{
-    return 0;
-}
-
-u8 Monster::GetLevelSkill(const Skill::Secondary::skill_t skill) const
-{
-    return 0;
-}
-
-Spell::Book* Monster::GetSpellBook(void)
-{
-    return NULL;
-}
-
 u8 Monster::GetType(void) const
 {
     return Skill::Primary::MONSTER;
-}
-
-Color::color_t Monster::GetColor(void) const
-{
-    return Color::GRAY;
 }
 
 u8  Monster::GetDamageMin(void) const

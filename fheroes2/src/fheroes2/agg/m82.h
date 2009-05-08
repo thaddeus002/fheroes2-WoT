@@ -22,6 +22,7 @@
 #define H2M82_H
 
 #include <string>
+#include "gamedefs.h"
 
 namespace M82
 {
@@ -349,7 +350,7 @@ namespace M82
     } m82map_t;
 
     const std::string  & GetString(const m82_t m82);
-
+    m82_t FromSpell(u8);
 };
 
 #endif

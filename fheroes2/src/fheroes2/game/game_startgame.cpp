@@ -986,37 +986,37 @@ Game::menu_t Game::HumanTurn(void)
 	{
 	    Heroes & hero = global_focus.GetHeroes();
 	    cursor.Hide();
-            hero.SetMove(false);
-            hero.GetPath().Reset();
-            gamearea.Redraw();
-            if(MP2::isActionObject(hero.GetUnderObject(), hero.isShipMaster()))
-        	hero.Action(hero.GetIndex());
+	    hero.SetMove(false);
+	    hero.GetPath().Reset();
+	    gamearea.Redraw();
+	    if(MP2::isActionObject(hero.GetUnderObject(), hero.isShipMaster()))
+		hero.Action(hero.GetIndex());
 	    if(MP2::OBJ_STONELIGHTS == hero.GetUnderObject() || MP2::OBJ_WHIRLPOOL == hero.GetUnderObject())
 	    {
 		cursor.Hide();
-    		hero.ApplyPenaltyMovement();
-    		selectHeroes.Redraw();
+		hero.ApplyPenaltyMovement();
+		selectHeroes.Redraw();
 		cursor.Show();
 		display.Flip();
 	    }
 	}
-        else
-        // return: open dialog
-        if(le.KeyPress(KEY_RETURN))
-        {
-            if(Game::Focus::HEROES == global_focus.Type())
-            {
-                Heroes & hero = global_focus.GetHeroes();
-                OpenHeroes(&hero);
-    	    }
-            else
-            if(Game::Focus::CASTLE == global_focus.Type())
-            {
-                Castle & castl = global_focus.GetCastle();
-                OpenCastle(&castl);
-            }
-        }
-        else
+	else
+	// return: open dialog
+	if(le.KeyPress(KEY_RETURN))
+	{
+	    if(Game::Focus::HEROES == global_focus.Type())
+	    {
+		Heroes & hero = global_focus.GetHeroes();
+		OpenHeroes(&hero);
+	    }
+	    else
+	    if(Game::Focus::CASTLE == global_focus.Type())
+	    {
+		Castle & castl = global_focus.GetCastle();
+		OpenCastle(&castl);
+	    }
+	}
+	else
 	// key left
 	if(le.KeyPress(KEY_LEFT))
 	{
@@ -1434,9 +1434,9 @@ Game::menu_t Game::HumanTurn(void)
 	    if(le.MouseClickLeft(buttonSpell))
 	    {
     		if(Game::Focus::HEROES == global_focus.Type()) {
-		    Spell::spell_t spell = global_focus.GetHeroes().SpellBook().Open(Spell::Book::ADVN, true);
+		    Spell::spell_t spell = global_focus.GetHeroes().GetSpellBook().Open(SpellBook::ADVN, true);
 		    // TODO cast selected spell
-		    Error::Verbose("spell selected: " + Spell::String(spell));
+		    Error::Verbose("spell selected: " + std::string(Spell::GetName(spell)));
 		}
 	    }
 	    else

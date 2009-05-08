@@ -173,9 +173,14 @@ u8 Captain::GetType(void) const
     return Skill::Primary::CAPTAIN;
 }
 
-Spell::Book * Captain::GetSpellBook(void)
+SpellBook & Captain::GetSpellBook(void)
 {
-    return &spell_book;
+    return spell_book;
+}
+
+const SpellBook & Captain::GetSpellBook(void) const
+{
+    return spell_book;
 }
 
 u16 Captain::GetSpellPoints(void) const

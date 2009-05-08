@@ -236,7 +236,7 @@ bool SelectArtifactsBar::QueueEventProcessing(SelectArtifactsBar & bar)
 	    if(index1 == index2)
 	    {
 		if(art1 == Artifact::MAGIC_BOOK)
-		    bar.hero.SpellBook().Open();
+		    bar.hero.GetSpellBook().Open(SpellBook::ALL, false);
 		else
 		Dialog::Message(art1.GetName(), art1.GetDescription(), Font::BIG, Dialog::OK);
 		//change = true;

@@ -222,7 +222,7 @@ int Army::BattleTroop::ApplyDamage(long damage)
     return perished;
 }
 
-void Army::BattleTroop::SetMagic(Spell::magic_t &magic)
+void Army::BattleTroop::SetMagic(Battle::magic_t &magic)
 {
     //Dialog::Message("set magic", Spell::String(magic.spell), Font::BIG, Dialog::OK);
     magics.push_back(magic);
@@ -262,14 +262,14 @@ void Army::BattleTroop::ProceedMagic()
     }
 }
 
-bool Army::BattleTroop::ApplySpell(u8 spell, u8 sp)
+bool Army::BattleTroop::ApplySpell(Spell::spell_t spell, u8 sp)
 {
     //TODO: Artifacts that affect spell damage (holy pendant, etc)
 
-    if(!Spell::isTroopAffectedBySpell(spell, *this))
+    if(!Battle::isTroopAffectedBySpell(spell, *this))
         return false;
 
-    u16 dmg = Spell::GetInflictDamageVersus(spell, sp, id);
+    u16 dmg = Battle::GetInflictDamageVersus(spell, sp, id);
     ApplyDamage(dmg);
 
     if(Spell::CURE == spell || Spell::MASSCURE == spell)

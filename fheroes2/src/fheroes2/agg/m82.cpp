@@ -18,6 +18,7 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
+#include "spell.h"
 #include "m82.h"
 
 namespace M82
@@ -340,4 +341,62 @@ namespace M82
 const std::string  & M82::GetString(const m82_t m82)
 {
     return m82map[m82].string;
+}
+
+M82::m82_t M82::FromSpell(u8 spell)
+{
+    switch(spell)
+    {
+	case Spell::FIREBALL:		return FIREBALL;
+	case Spell::FIREBLAST:		return FIREBALL;
+	case Spell::LIGHTNINGBOLT:	return LIGHTBLT;
+	case Spell::CHAINLIGHTNING:	return CHAINLTE;
+	case Spell::TELEPORT:		return TELEIN;
+	case Spell::CURE:		return CURE;
+	case Spell::MASSCURE:		return MASSCURE;
+	case Spell::RESURRECT:		return RESURECT;
+	case Spell::RESURRECTTRUE:	return RESURTRU;
+	case Spell::HASTE:		return HASTE;
+	case Spell::MASSHASTE:		return MASSHAST;
+	case Spell::SLOW:		return SLOW;
+	case Spell::MASSSLOW:		return MASSSLOW;
+	case Spell::BLIND:		return BLIND;
+	case Spell::BLESS:		return BLESS;
+	case Spell::MASSBLESS:		return MASSBLES;
+	case Spell::STONESKIN:		return STONSKIN;
+	case Spell::STEELSKIN:		return STELSKIN;
+	case Spell::CURSE:		return CURSE;
+	case Spell::MASSCURSE:		return MASSCURS;
+	case Spell::ANTIMAGIC:		return ANTIMAGK;
+	case Spell::DISPEL:		return DIPMAGK;
+	case Spell::MASSDISPEL:		return DIPMAGK;
+	case Spell::ARROW:		return MAGCAROW;
+	case Spell::BERZERKER:		return BERZERK;
+	case Spell::ARMAGEDDON:		return ARMGEDN;
+	case Spell::ELEMENTALSTORM:	return STORM;
+	case Spell::METEORSHOWER:	return METEOR;
+	case Spell::PARALYZE:		return PARALIZE;
+	case Spell::HYPNOTIZE:		return HYPNOTIZ;
+	case Spell::COLDRAY:		return COLDRAY;
+	case Spell::COLDRING:		return COLDRING;
+	case Spell::DISRUPTINGRAY:	return DISRUPTR;
+	case Spell::DEATHRIPPLE:	return MNRDEATH;
+	case Spell::DRAGONSLAYER:	return DRGNSLAY;
+	case Spell::BLOODLUST:		return BLOODLUS;
+	case Spell::ANIMATEDEAD:	return RESURECT;
+	case Spell::MIRRORIMAGE:	return MIRRORIM;
+	case Spell::SHIELD:		return SHIELD;
+	case Spell::MASSSHIELD:		return MASSSHIE;
+	case Spell::SUMMONEELEMENT:	return SUMNELM;
+	case Spell::SUMMONAELEMENT:	return SUMNELM;
+	case Spell::SUMMONFELEMENT:	return SUMNELM;
+	case Spell::SUMMONWELEMENT:	return SUMNELM;
+	case Spell::EARTHQUAKE:		return ERTHQUAK;
+	case Spell::HAUNT:		return H2MINE;
+	case Spell::STONE:		return PARALIZE;
+
+	default: break;
+    }
+
+    return UNKNOWN;
 }

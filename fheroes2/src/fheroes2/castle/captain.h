@@ -30,9 +30,9 @@ class Castle;
 class Captain : public HeroBase
 {
   public:
-	Captain(const Castle &);
+    Captain(const Castle &);
 
-	bool isValid(void) const;
+    bool isValid(void) const;
     u8 GetAttack(void) const;
     u8 GetDefense(void) const;
     u8 GetPower(void) const;
@@ -41,11 +41,12 @@ class Captain : public HeroBase
     s8 GetLuck(void) const;
     Race::race_t GetRace(void) const;
     Color::color_t GetColor(void) const;
-	const std::string & GetName(void) const;
-	u8 GetType(void) const;
-	u16 GetSpellPoints(void) const;
-	Spell::Book * GetSpellBook(void);
-	u8 GetLevelSkill(const Skill::Secondary::skill_t) const;
+    const std::string & GetName(void) const;
+    u8 GetType(void) const;
+    u16 GetSpellPoints(void) const;
+    const SpellBook & GetSpellBook(void) const;
+    SpellBook & GetSpellBook(void);
+    u8 GetLevelSkill(const Skill::Secondary::skill_t) const;
 
     const Army::army_t & GetArmy(void) const;
     Army::army_t & GetArmy(void);
@@ -56,8 +57,8 @@ class Captain : public HeroBase
     void SetSpellPoints(const u16 point);
 
   private:
-	const Castle & home;
-	Spell::Book spell_book;
+    const Castle & home;
+    SpellBook spell_book;
     BagArtifacts artifacts;
     u16 spellPoints;
 };

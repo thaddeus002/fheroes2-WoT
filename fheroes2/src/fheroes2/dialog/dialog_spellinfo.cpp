@@ -41,7 +41,7 @@ void Dialog::SpellInfo(const std::string &header, const std::string &message, co
     TextBox box1(header, Font::BIG, BOXAREA_WIDTH);
     TextBox box2(message, Font::BIG, BOXAREA_WIDTH);
 
-    const Sprite & sprite = AGG::GetICN(ICN::SPELLS, Spell::GetIndexSprite(spell));
+    const Sprite & sprite = AGG::GetICN(ICN::SPELLS, Spell::IndexSprite(spell));
 
     Box box((header.size() ? box1.h() + 10 : 0) + (message.size() ? box2.h() + 10 : 0) + sprite.h(), ok_button ? Dialog::OK : 0);
 
@@ -64,7 +64,7 @@ void Dialog::SpellInfo(const std::string &header, const std::string &message, co
     display.Blit(sprite, pos.x, pos.y);
 
     // small text
-    Text text(Spell::String(spell), Font::SMALL);
+    Text text(Spell::GetName(spell), Font::SMALL);
     pos.x = box.GetArea().x + (pos.w - text.w()) / 2;
     pos.y = pos.y + sprite.h() + 10;
     text.Blit(pos);

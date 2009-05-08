@@ -868,7 +868,7 @@ Army::battle_t Battle::BattleControl::RunBattle(HeroBase *hero1, HeroBase *hero2
     return battle_status;
 }
 
-Battle::BattleTurn *Battle::BattleControl::CreateTurn(const Skill::Primary *hero, Army::BattleArmy_t &ownArmy, Army::BattleArmy_t &oppArmy, bool forceComputer /* = false */)
+Battle::BattleTurn *Battle::BattleControl::CreateTurn(const HeroBase *hero, Army::BattleArmy_t &ownArmy, Army::BattleArmy_t &oppArmy, bool forceComputer /* = false */)
 {
     const HeroBase *actualHero = dynamic_cast<const HeroBase *>(hero);
     if(!forceComputer && hero && world.GetKingdom(hero->GetColor()).Control() == Game::LOCAL)
@@ -1659,7 +1659,7 @@ bool Battle::BattleControl::PerformAttack(TroopIndex troopN, const Point &attack
     {
         std::vector<Army::BattleTroop*> affected;
         affected.push_back(targets[0]);
-        PerformMagic(affected, NULL, Spell::TroopAttack(myTroop));
+        PerformMagic(affected, NULL, Spell::TroopAttack(myTroop()));
     }
     
     return retaliate;
@@ -1667,17 +1667,17 @@ bool Battle::BattleControl::PerformAttack(TroopIndex troopN, const Point &attack
 
 void Battle::BattleControl::PerformMagicAnimation(std::vector<Army::BattleTroop*> &affected, Spell::spell_t spell, HeroBase *hero)
 {
-    AGG::PlaySound(Spell::M82(spell));
+    AGG::PlaySound(M82::FromSpell(spell));
 
     u8 spellPower = hero ? hero->GetPower() : 1;
     bool reflect = hero == m_battlefield.GetHero(1);
     m_battlefield.AnimateMagic(affected, m_battlefield.GetHero(0), m_battlefield.GetHero(1), reflect, spell);
 
-    if(!Spell::isBad((u8)spell))
+    if(!Spell::isBad(spell))
         return;
     
     for(u16 i = 0; i < affected.size(); i++) {
-        u16 damage = Spell::GetInflictDamageVersus(spell, spellPower, affected[i]->GetID());
+        u16 damage = Battle::GetInflictDamageVersus(spell, spellPower, affected[i]->GetID());
         if(!affected[i]->IsDamageFatal(damage))
             affected[i]->Animate(Monster::AS_PAIN);
         else
@@ -1685,7 +1685,7 @@ void Battle::BattleControl::PerformMagicAnimation(std::vector<Army::BattleTroop*
     }
     
     int animat = 0;
-    u16 frame = 0, mframe = AGG::GetICNCount(Spell::Icn(spell));
+    u16 frame = 0, mframe = AGG::GetICNCount(ICN::FromSpell(spell));
     while(le.HandleEvents())
     {
         if(Game::ShouldAnimateInfrequent(animat++, 3))
@@ -1693,9 +1693,9 @@ void Battle::BattleControl::PerformMagicAnimation(std::vector<Army::BattleTroop*
             m_battlefield.Redraw();
             m_gui->Redraw();
 
-            if(Spell::Icn(spell) != ICN::UNKNOWN)
+            if(ICN::FromSpell(spell) != ICN::UNKNOWN)
             {
-                const Sprite& spr = AGG::GetICN(Spell::Icn(spell), frame);
+                const Sprite & spr = AGG::GetICN(ICN::FromSpell(spell), frame);
                 for(u16 i = 0; i < affected.size(); i++)
                     display.Blit(spr, Bf2Scr(affected[i]->Position()) + spr);
             }
@@ -1736,20 +1736,20 @@ bool Battle::BattleControl::PerformMagic(std::vector<Army::BattleTroop*> &affect
 
     if(!BattleSettings::Get().Modes(BattleSettings::OPT_LOGICONLY))
     {
-        u16 damage = Spell::GetInflictDamageVersus(spell, spellpower, affected[0]->GetID());
+        u16 damage = Battle::GetInflictDamageVersus(spell, spellpower, affected[0]->GetID());
         if(damage)
         {
             std::string str;
             if(affected.size() == 1)
     	    {
     	        str = _("The %{spell} does %{value} damage.");
-    	        String::Replace(str, "%{spell}", Spell::String(spell));
+    	        String::Replace(str, "%{spell}", Spell::GetName(spell));
                 String::Replace(str, "%{value}", damage);
             }
             else
             {
     	        str = _("The %{spell} does %{value} damage to the %{name}.");
-    	        String::Replace(str, "%{spell}", Spell::String(spell));
+    	        String::Replace(str, "%{spell}", Spell::GetName(spell));
                 String::Replace(str, "%{value}", damage);
                 std::string name = affected[0]->GetName();
                 String::Lower(name);
@@ -1902,22 +1902,22 @@ namespace Battle
                 return true;
             case Spell::ALLFRIEND:
                 for(u16 i = 0; i < m_ownArmy->size(); i++)
-                    if(Spell::AllowSpell(spell, (*m_ownArmy)[i]))
+                    if(Battle::AllowSpell(spell, (*m_ownArmy)[i]))
                         targets.push_back(&(*m_ownArmy)[i]);
                 return false;
             case Spell::ALLENEMY:
                 for(u16 i = 0; i < m_oppArmy->size(); i++)
-                    if(Spell::AllowSpell(spell, (*m_oppArmy)[i]))
+                    if(Battle::AllowSpell(spell, (*m_oppArmy)[i]))
                         targets.push_back(&(*m_oppArmy)[i]);
                 return false;
             case Spell::ALLLIVE:
             case Spell::ALLDEAD:
             case Spell::ALL:
                 for(u16 i = 0; i < m_ownArmy->size(); i++)
-                    if(Spell::AllowSpell(spell, (*m_ownArmy)[i]))
+                    if(Battle::AllowSpell(spell, (*m_ownArmy)[i]))
                         targets.push_back(&(*m_ownArmy)[i]);
                 for(u16 i = 0; i< m_oppArmy->size(); i++)
-                    if(Spell::AllowSpell(spell, (*m_oppArmy)[i]))
+                    if(Battle::AllowSpell(spell, (*m_oppArmy)[i]))
                         targets.push_back(&(*m_oppArmy)[i]);
                 return false;
             case Spell::NOTARGET:
@@ -2133,9 +2133,9 @@ namespace Battle
             {
                 if(t = m_battlefield->FindTroop(*targetArmy, cur_pt), t >= 0
                 && /*Spell::AllowSpell(spell, (*targetArmy)[t])*/
-                   Spell::isTroopAffectedBySpell(spell, (*targetArmy)[t]))
+                   Battle::isTroopAffectedBySpell(spell, (*targetArmy)[t]))
                 {
-                    cursor.SetThemes((Cursor::themes_t)(cursor.SPELLNONE + Spell::GetIndexSprite(spell)));
+                    cursor.SetThemes((Cursor::themes_t)(cursor.SPELLNONE + Spell::IndexSprite(spell)));
                     if(le.MouseClickLeft(Rect(0, 0, display.w(), display.h())))
                     {
                         targets.push_back(&(*targetArmy)[t]);
@@ -2146,7 +2146,7 @@ namespace Battle
             else if(Spell::Target(spell) == Spell::FREECELL)
             {
                 if(m_battlefield->CellFree(cur_pt)) {
-                    cursor.SetThemes((Cursor::themes_t)(cursor.SPELLNONE + Spell::GetIndexSprite(spell)));
+                    cursor.SetThemes((Cursor::themes_t)(cursor.SPELLNONE + Spell::IndexSprite(spell)));
                     // TODO COLDRING & SUMMON
                 } else 
                     cursor.SetThemes(cursor.SPELLNONE);

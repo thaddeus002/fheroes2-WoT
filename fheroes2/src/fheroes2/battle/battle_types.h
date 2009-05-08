@@ -318,7 +318,7 @@ namespace Battle
         Spell::spell_t GetLearnedSpell(HeroBase &hero, std::vector<Spell::spell_t> &castSpells);
         u32 BattleSummaryVsArmy(HeroBase &, const Army::BattleArmy_t &, const Army::BattleArmy_t &, const Army::BattleArmy_t &);
         u32 BattleSummaryVsHero(HeroBase &, const Army::BattleArmy_t &, HeroBase &, const Army::BattleArmy_t &);
-        BattleTurn *CreateTurn(const Skill::Primary *, Army::BattleArmy_t &, Army::BattleArmy_t &, bool forceComputer = false);
+        BattleTurn *CreateTurn(const HeroBase *, Army::BattleArmy_t &, Army::BattleArmy_t &, bool forceComputer = false);
         Army::BattleTroop &NextValidTroop(s8 &, IndexList &);
         bool PerformMove(TroopIndex, const Point &, bool);
         bool PerformAttack(TroopIndex, const Point &);
@@ -338,7 +338,7 @@ namespace Battle
         u32 m_experience[2];
         u32 m_perished;
         std::vector<Spell::spell_t> m_spellsCast;
-        const Skill::Primary *m_commanders[2];
+        const HeroBase* m_commanders[2];
     };
 
     class BattleTurn

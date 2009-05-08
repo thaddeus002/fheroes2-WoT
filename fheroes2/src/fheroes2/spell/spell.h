@@ -22,12 +22,11 @@
 
 #include <string>
 #include "gamedefs.h"
-#include "icn.h"
-#include "m82.h"
 
-namespace Spell
+class Spell
 {
-    typedef enum
+public:
+    enum spell_t
     {
 	NONE,
 	FIREBALL,
@@ -97,12 +96,9 @@ namespace Spell
 	SETWGUARDIAN,
 
 	STONE,
-    } spell_t;
+    };
 
-    inline spell_t & operator++ (spell_t & spell){ return spell = (SETWGUARDIAN > spell ? spell_t(spell + 1) : SETWGUARDIAN); };
-    inline spell_t & operator-- (spell_t & spell){ return spell = (NONE < spell ? spell_t(spell - 1) : NONE); };
-
-    typedef enum
+    enum target_t
     {
 	NOTARGET,
 	ONEFRIEND,
@@ -114,30 +110,61 @@ namespace Spell
 	ALL,
 	//ANYCELL,
 	FREECELL
-    } target_t;
+    };
 
-    spell_t Spell(u8);
+    Spell();
+    Spell(spell_t);
 
-    const std::string &String(spell_t spell);
-    u8 Mana(spell_t spell);
-    u8 Level(u8);
-    bool isCombat(u8);
-    bool isBad(u8);
-    u16 GetInflictDamage(u8, u8);
+    bool operator== (spell_t) const;
+    bool operator!= (spell_t) const;
+    spell_t operator() (void) const;
+    spell_t GetID(void) const;
+
+    void Set(spell_t);
+
+    const std::string & GetName(void) const;
+    const std::string & GetDescription(void) const;
+
+    u8 GetMana(void) const;
+    u8 GetLevel(void) const;
+    bool isCombat(void) const;
+    bool isBad(void) const;
+    target_t GetTarget(void) const;
+    u8 GetPower(void) const;
+    u16 GetInflictDamage(u8) const;
 
     /* return index sprite spells.icn */
-    u8 GetIndexSprite(u8);
+    u8 GetIndexSprite(void) const;
     /* return index in spellinl.icn */
-    u8 GetInlIndexSprite(u8);
+    u8 GetInlIndexSprite(void) const;
 
-    target_t Target(spell_t spell);
-    u8 Power(spell_t spell);
-    ICN::icn_t Icn(spell_t spell);
-    M82::m82_t M82(spell_t spell);
-    const std::string & Description(spell_t spell);
 
-    spell_t RandCombat(const u8 lvl);
-    spell_t RandAdventure(const u8 lvl);
+    static spell_t FromInt(u8);
+    static u8 Mana(spell_t);
+    static u8 Level(spell_t);
+    static bool isCombat(spell_t);
+    static bool isBad(spell_t);
+    static target_t Target(spell_t);
+    static u8 Power(spell_t);
+
+    /* return index sprite spells.icn */
+    static u8 IndexSprite(spell_t);
+    /* return index in spellinl.icn */
+    static u8 InlIndexSprite(spell_t);
+
+    static const char* GetName(spell_t);
+    static const char* GetDescription(spell_t);
+
+    static spell_t RandCombat(u8);
+    static spell_t RandAdventure(u8);
+    static spell_t TroopAttack(u8);
+
+    static u16 InflictDamage(spell_t, u8);
+
+private:
+    spell_t id;
+    std::string name;
+    std::string description;
 };
 
 #endif

@@ -21,15 +21,15 @@
 #include "battle_troop.h"
 #include "battle_spell.h"
 
-bool Spell::AllowSpell(spell_t spell, const Army::BattleTroop &troop)
+bool Battle::AllowSpell(Spell::spell_t spell, const Army::BattleTroop &troop)
 {
-    target_t target = Target(spell);
+    Spell::target_t target = Spell::Target(spell);
     if(troop == Monster::DWARF || troop == Monster::BATTLE_DWARF) {
-        if(!Rand::Get(0,3) && target != ONEFRIEND && target != ALLFRIEND) return false;
+        if(!Rand::Get(0,3) && target != Spell::ONEFRIEND && target != Spell::ALLFRIEND) return false;
     }
-    if(troop.FindMagic(ANTIMAGIC) && target != ONEFRIEND && target != ALLFRIEND)
+    if(troop.FindMagic(Spell::ANTIMAGIC) && target != Spell::ONEFRIEND && target != Spell::ALLFRIEND)
         return false;
-    if(spell == ANTIMAGIC && troop.summoned) return false;
+    if(spell == Spell::ANTIMAGIC && troop.summoned) return false;
     switch(troop()) {
         case Monster::GREEN_DRAGON:
         case Monster::RED_DRAGON:
@@ -37,64 +37,64 @@ bool Spell::AllowSpell(spell_t spell, const Army::BattleTroop &troop)
             return false;
         default:
             switch(spell) {
-                case BLESS:
-                case MASSBLESS:
-                case CURSE:
-                case MASSCURSE:
-                case BERZERKER:
-                case BLIND:
-                case PARALYZE:
-                case HYPNOTIZE:
-                case DEATHRIPPLE:
-                case DEATHWAVE:
+                case Spell::BLESS:
+                case Spell::MASSBLESS:
+                case Spell::CURSE:
+                case Spell::MASSCURSE:
+                case Spell::BERZERKER:
+                case Spell::BLIND:
+                case Spell::PARALYZE:
+                case Spell::HYPNOTIZE:
+                case Spell::DEATHRIPPLE:
+                case Spell::DEATHWAVE:
                     return troop.GetRace() != Race::NECR;
-                case HOLYWORD:
-                case HOLYSHOUT:
+                case Spell::HOLYWORD:
+                case Spell::HOLYSHOUT:
                     return troop.GetRace() == Race::NECR;
-                case ANIMATEDEAD:
+                case Spell::ANIMATEDEAD:
                     return troop.GetRace() == Race::NECR &&
                             ( Monster(troop()).GetHitPoints() > troop.hp ||
                               troop.oldcount > troop.Count());
-                case CURE:
-                case MASSCURE:
+                case Spell::CURE:
+                case Spell::MASSCURE:
                     return Monster(troop()).GetHitPoints() > troop.hp;
-                case RESURRECT:
-                case RESURRECTTRUE:
+                case Spell::RESURRECT:
+                case Spell::RESURRECTTRUE:
                     return Monster(troop()).GetHitPoints() > troop.hp ||
                             troop.oldcount > troop.Count();
 
-                case DISPEL:
-                case MASSDISPEL:
+                case Spell::DISPEL:
+                case Spell::MASSDISPEL:
                     return troop.Magics().size();
-                    /*	FIREBALL,
-                        FIREBLAST,
-                        LIGHTNINGBOLT,
-                        CHAINLIGHTNING,
-                        TELEPORT,
-                        HASTE,
-                        MASSHASTE,
-                        SLOW,
-                        MASSSLOW,
-                        STONESKIN,
-                        STEELSKIN,
-                        ANTIMAGIC,
-                        ARROW,
-                        ARMAGEDDON,
-                        ELEMENTALSTORM,
-                        METEORSHOWER,
-                        COLDRAY,
-                        COLDRING,
-                        DISRUPTINGRAY,
-                        DRAGONSLAYER,
-                        BLOODLUST,
-                        MIRRORIMAGE,
-                        SHIELD,
-                        MASSSHIELD,
-                        SUMMONEELEMENT,
-                        SUMMONAELEMENT,
-                        SUMMONFELEMENT,
-                        SUMMONWELEMENT,
-                        EARTHQUAKE*/
+                    /*	Spell::FIREBALL,
+                        Spell::FIREBLAST,
+                        Spell::LIGHTNINGBOLT,
+                        Spell::CHAINLIGHTNING,
+                        Spell::TELEPORT,
+                        Spell::HASTE,
+                        Spell::MASSHASTE,
+                        Spell::SLOW,
+                        Spell::MASSSLOW,
+                        Spell::STONESKIN,
+                        Spell::STEELSKIN,
+                        Spell::ANTIMAGIC,
+                        Spell::ARROW,
+                        Spell::ARMAGEDDON,
+                        Spell::ELEMENTALSTORM,
+                        Spell::METEORSHOWER,
+                        Spell::COLDRAY,
+                        Spell::COLDRING,
+                        Spell::DISRUPTINGRAY,
+                        Spell::DRAGONSLAYER,
+                        Spell::BLOODLUST,
+                        Spell::MIRRORIMAGE,
+                        Spell::SHIELD,
+                        Spell::MASSSHIELD,
+                        Spell::SUMMONEELEMENT,
+                        Spell::SUMMONAELEMENT,
+                        Spell::SUMMONFELEMENT,
+                        Spell::SUMMONWELEMENT,
+                        Spell::EARTHQUAKE*/
                 default: 
                     return true;
             }
@@ -102,81 +102,81 @@ bool Spell::AllowSpell(spell_t spell, const Army::BattleTroop &troop)
     }
 }
 
-void Spell::ApplySpell(int spower, spell_t spell, Army::BattleTroop &troop)
+void Battle::ApplySpell(int spower, Spell::spell_t spell, Army::BattleTroop &troop)
 {
     //Dialog::Message("apply spell", Spell::String(spell), Font::BIG, Dialog::OK);
     magic_t magic;
     magic.spell = spell;
     magic.duration = spower;
-    if(!Power(spell)) {
+    if(!Spell::Power(spell)) {
         switch(spell) {
-            case MASSDISPEL:
-            case DISPEL:
+            case Spell::MASSDISPEL:
+            case Spell::DISPEL:
                 troop.ClearMagic();
                 return;
-                // 	TELEPORT,
-                // 	MIRRORIMAGE,
-                // 	BERZERKER,
-                // 	HYPNOTIZE,
-                // 	DISRUPTINGRAY,
-                // 	EARTHQUAKE,
+                // 	Spell::TELEPORT,
+                // 	Spell::MIRRORIMAGE,
+                // 	Spell::BERZERKER,
+                // 	Spell::HYPNOTIZE,
+                // 	Spell::DISRUPTINGRAY,
+                // 	Spell::EARTHQUAKE,
             default:
                 break;
                 // TODO
         }
-    } else if(Power(spell) == 1) {
+    } else if(Spell::Power(spell) == 1) {
         switch(spell) {
-            case MASSBLESS:
-                magic.spell = BLESS;
-            case BLESS:
-                troop.RemoveMagic(CURSE);
-                troop.RemoveMagic(MASSCURSE);
+            case Spell::MASSBLESS:
+                magic.spell = Spell::BLESS;
+            case Spell::BLESS:
+                troop.RemoveMagic(Spell::CURSE);
+                troop.RemoveMagic(Spell::MASSCURSE);
                 break;
-            case MASSCURSE:
-                magic.spell = CURSE;
-            case CURSE:
-                troop.RemoveMagic(BLESS);
-                troop.RemoveMagic(MASSBLESS);
+            case Spell::MASSCURSE:
+                magic.spell = Spell::CURSE;
+            case Spell::CURSE:
+                troop.RemoveMagic(Spell::BLESS);
+                troop.RemoveMagic(Spell::MASSBLESS);
                 break;
-            case STONESKIN:
-                troop.RemoveMagic(STEELSKIN);
+            case Spell::STONESKIN:
+                troop.RemoveMagic(Spell::STEELSKIN);
                 break;
-            case STEELSKIN:
-                troop.RemoveMagic(STONESKIN);
+            case Spell::STEELSKIN:
+                troop.RemoveMagic(Spell::STONESKIN);
                 break;
-            case MASSSLOW:
-                magic.spell = SLOW;
+            case Spell::MASSSLOW:
+                magic.spell = Spell::SLOW;
                 break;
-            case MASSSHIELD:
-                magic.spell = SHIELD;
+            case Spell::MASSSHIELD:
+                magic.spell = Spell::SHIELD;
                 break;
-            case MASSHASTE:
-                magic.spell = HASTE;
+            case Spell::MASSHASTE:
+                magic.spell = Spell::HASTE;
                 break;
-                // 	BLIND,
-                // 	SHIELD,
-                // 	ANTIMAGIC,
-                // 	PARALYZE,
-                // 	STONE,
-                // 	DRAGONSLAYER,
-                // 	BLOODLUST,
+                // 	Spell::BLIND,
+                // 	Spell::SHIELD,
+                // 	Spell::ANTIMAGIC,
+                // 	Spell::PARALYZE,
+                // 	Spell::STONE,
+                // 	Spell::DRAGONSLAYER,
+                // 	Spell::BLOODLUST,
             default:
                 break;
         }
         troop.SetMagic(magic);
     } else {
-        int damage = spower * Power(spell);
+        int damage = spower * Spell::Power(spell);
         switch(spell) {
-            case MASSCURE:
-                spell = CURE;
-            case CURE:
-            case RESURRECT:
-            case RESURRECTTRUE:
-            case ANIMATEDEAD: {
+            case Spell::MASSCURE:
+                spell = Spell::CURE;
+            case Spell::CURE:
+            case Spell::RESURRECT:
+            case Spell::RESURRECTTRUE:
+            case Spell::ANIMATEDEAD: {
                 int hp = Monster(troop()).GetHitPoints();
                 troop.hp += damage;
                 if(troop.hp > hp) {
-                    if(spell == CURE) troop.hp = hp;
+                    if(spell == Spell::CURE) troop.hp = hp;
                     else {
                         troop.SetCount(troop.Count() + troop.hp/hp);
                         troop.hp = troop.hp%hp;
@@ -192,26 +192,26 @@ void Spell::ApplySpell(int spower, spell_t spell, Army::BattleTroop &troop)
                 }
                 return;
             }
-            case SUMMONEELEMENT:
-            case SUMMONAELEMENT:
-            case SUMMONFELEMENT:
-            case SUMMONWELEMENT:
+            case Spell::SUMMONEELEMENT:
+            case Spell::SUMMONAELEMENT:
+            case Spell::SUMMONFELEMENT:
+            case Spell::SUMMONWELEMENT:
                 // TODO
                 return;
-                // 	ARROW,
-                // 	FIREBALL,
-                // 	FIREBLAST,
-                // 	LIGHTNINGBOLT,
-                // 	CHAINLIGHTNING,
-                // 	HOLYWORD,
-                // 	HOLYSHOUT,
-                // 	COLDRAY,
-                // 	COLDRING,
-                // 	DEATHRIPPLE,
-                // 	DEATHWAVE,
-                // 	ARMAGEDDON,
-                // 	ELEMENTALSTORM,
-                // 	METEORSHOWER,
+                // 	Spell::ARROW,
+                // 	Spell::FIREBALL,
+                // 	Spell::FIREBLAST,
+                // 	Spell::LIGHTNINGBOLT,
+                // 	Spell::CHAINLIGHTNING,
+                // 	Spell::HOLYWORD,
+                // 	Spell::HOLYSHOUT,
+                // 	Spell::COLDRAY,
+                // 	Spell::COLDRING,
+                // 	Spell::DEATHRIPPLE,
+                // 	Spell::DEATHWAVE,
+                // 	Spell::ARMAGEDDON,
+                // 	Spell::ELEMENTALSTORM,
+                // 	Spell::METEORSHOWER,
             default: {
                 int hp = Monster(troop()).GetHitPoints();
                 while(troop.hp < damage) {
@@ -230,7 +230,7 @@ void Spell::ApplySpell(int spower, spell_t spell, Army::BattleTroop &troop)
     }
 }
 
-bool Spell::isTroopAffectedBySpell(u8 spell, const Army::BattleTroop &troop)
+bool Battle::isTroopAffectedBySpell(Spell::spell_t spell, const Army::BattleTroop &troop)
 {
     const Monster::monster_t id = troop.GetID();
     switch(id)
@@ -324,9 +324,9 @@ bool Spell::isTroopAffectedBySpell(u8 spell, const Army::BattleTroop &troop)
     return true;
 }
 
-u16 Spell::GetInflictDamageVersus(u8 spell, u8 spellPower, const Army::BattleTroop &troop)
+u16 Battle::GetInflictDamageVersus(Spell::spell_t spell, u8 spellPower, const Army::BattleTroop &troop)
 {
-    u16 dmg = Spell::GetInflictDamage(spell, spellPower);
+    u16 dmg = Spell::InflictDamage(spell, spellPower);
 
     if(!isTroopAffectedBySpell(spell, troop))
         return 0;
@@ -368,32 +368,4 @@ u16 Spell::GetInflictDamageVersus(u8 spell, u8 spellPower, const Army::BattleTro
     }
 
     return dmg;
-}
-
-Spell::spell_t Spell::TroopAttack(const Monster & monster)
-{
-    switch(monster())
-    {
-        case Monster::CYCLOPS:
-            if(!Rand::Get(0, 4)) return PARALYZE;
-            break;
-        case Monster::UNICORN:
-            if(!Rand::Get(0, 4)) return BLIND;
-            break;
-        case Monster::MUMMY:
-            if(!Rand::Get(0, 4)) return CURSE;
-            break;
-        case Monster::ROYAL_MUMMY:
-            if(!Rand::Get(0, 3)) return CURSE;
-            break;
-        case Monster::MEDUSA:
-            if(!Rand::Get(0, 4)) return PARALYZE;
-            break;
-        case Monster::ARCHMAGE:
-            if(!Rand::Get(0, 4)) return DISPEL;
-            break;
-        default:
-            return NONE;
-    }
-    return NONE;
 }

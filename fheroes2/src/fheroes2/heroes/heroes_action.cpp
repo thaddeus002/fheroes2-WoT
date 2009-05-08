@@ -659,7 +659,7 @@ void ActionToCastle(Heroes &hero, const u8 obj, const u16 dst_index)
 
         Mixer::Reduce();
 
-        if(Settings::Get().Original() && hero.GetSpellBook()) hero.AppendSpellsToBook(castle->GetMageGuild());
+        if(Settings::Get().Original()) hero.AppendSpellsToBook(castle->GetMageGuild());
         castle->OpenDialog();
 
         Mixer::Enhance();
@@ -987,9 +987,9 @@ void ActionToFlotSam(Heroes &hero, const u8 obj, const u16 dst_index)
 
 void ActionToShrine(Heroes &hero, const u8 obj, const u16 dst_index)
 {
-    const Spell::spell_t spell = Spell::Spell(world.GetTiles(dst_index).GetQuantity1());
-    const std::string & spell_name = Spell::String(spell);
-    const u8 spell_level = Spell::Level(spell);
+    const Spell spell(Spell::FromInt(world.GetTiles(dst_index).GetQuantity1()));
+    const std::string & spell_name = spell.GetName();
+    const u8 spell_level = spell.GetLevel();
 
     std::string head;
     std::string body;
@@ -1032,9 +1032,9 @@ void ActionToShrine(Heroes &hero, const u8 obj, const u16 dst_index)
     }
 
     PlaySoundSuccess;
-    hero.AppendSpellToBook(spell);
+    hero.AppendSpellToBook(spell());
     hero.SetVisited(dst_index, Settings::Get().Original() ? Visit::LOCAL : Visit::GLOBAL); // see dialog_quickinfo
-    Dialog::SpellInfo(spell_name, body, spell);
+    Dialog::SpellInfo(spell_name, body, spell());
 
     if(Settings::Get().Debug()) Error::Verbose("ActionToShrine: " + hero.GetName());
 }
@@ -1161,7 +1161,7 @@ void ActionToPoorLuckObject(Heroes &hero, const u8 obj, const u16 dst_index)
 			    	Dialog::Message(MP2::StringObject(obj), _("Unfortunately, you do not have the wisdom to understand the spell, and you are unable to learn it."), Font::BIG, Dialog::OK);
 			    else
 			    {
-				Dialog::SpellInfo(Spell::String(spell), _("Upon defeating the monsters, you decipher an ancient glyph on the wall, telling the secret of the spell."), spell, true);
+				Dialog::SpellInfo(Spell::GetName(spell), _("Upon defeating the monsters, you decipher an ancient glyph on the wall, telling the secret of the spell."), spell, true);
 				hero.AppendSpellToBook(spell);
 			    }
 			    hero.ActionAfterBattle();

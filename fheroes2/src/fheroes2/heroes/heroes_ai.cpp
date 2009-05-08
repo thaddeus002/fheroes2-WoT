@@ -323,7 +323,7 @@ void AIToCastle(Heroes &hero, const u8 obj, const u16 dst_index)
     if(hero.GetColor() == castle->GetColor())
     {
         if(Settings::Get().Debug()) Error::Verbose("AIToCastle: " + hero.GetName() + " goto castle " + castle->GetName());
-        if(Settings::Get().Original() && hero.GetSpellBook()) hero.AppendSpellsToBook(castle->GetMageGuild());
+        if(Settings::Get().Original()) hero.AppendSpellsToBook(castle->GetMageGuild());
     }
     else
     {
@@ -832,7 +832,7 @@ void AIToWitchsHut(Heroes &hero, const u8 obj, const u16 dst_index)
 
 void AIToShrine(Heroes &hero, const u8 obj, const u16 dst_index)
 {
-    const Spell::spell_t spell = Spell::Spell(world.GetTiles(dst_index).GetQuantity1());
+    const Spell::spell_t spell = Spell::FromInt(world.GetTiles(dst_index).GetQuantity1());
     const u8 spell_level = Spell::Level(spell);
 
     // check spell book
@@ -1411,7 +1411,7 @@ bool Heroes::AIValidObject(u16 index, u8 obj)
                 // check spell book
 		HasArtifact(Artifact::MAGIC_BOOK) &&
                 // check valid level spell and wisdom skill
-                !(3 == Spell::Level(Spell::Spell(world.GetTiles(index).GetQuantity1())) &&
+                !(3 == Spell::Level(Spell::FromInt(world.GetTiles(index).GetQuantity1())) &&
                 Skill::Level::NONE == GetLevelSkill(Skill::Secondary::WISDOM))) return true;
 	    break;
 

@@ -31,6 +31,7 @@
 #include "luck.h"
 #include "morale.h"
 #include "castle.h"
+#include "heroes.h"
 #include "army.h"
 
 std::vector<Army::Troop>::iterator MaxElement(std::vector<Army::Troop>::iterator first, std::vector<Army::Troop>::iterator last, bool (*pf)(const Army::Troop &, const Army::Troop &))
@@ -110,7 +111,7 @@ Army::armysize_t Army::GetSize(u16 count)
     return FEW;
 }
 
-Army::army_t::army_t(const Skill::Primary* s) : army(ARMYMAXTROOPS), commander(s)
+Army::army_t::army_t(const HeroBase* s) : army(ARMYMAXTROOPS), commander(s)
 {
     std::vector<Troop>::iterator it1 = army.begin();
     std::vector<Troop>::const_iterator it2 = army.end();
@@ -976,7 +977,7 @@ bool Army::army_t::StrongerEnemyArmy(const army_t & a)
     return true;
 }
 
-const Skill::Primary* Army::army_t::GetCommander(void) const
+const HeroBase* Army::army_t::GetCommander(void) const
 {
     return commander;
 }

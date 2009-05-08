@@ -25,13 +25,10 @@
 #include <vector>
 #include <utility>
 #include "race.h"
-#include "color.h"
 #include "gamedefs.h"
 
 #define MAXPRIMARYSKILL		4
 #define MAXSECONDARYSKILL	14
-
-namespace Spell { class Book; };
 
 namespace Skill
 {
@@ -125,12 +122,8 @@ namespace Skill
 	virtual s8 GetMorale(void) const = 0;
 	virtual s8 GetLuck(void) const = 0;
 	virtual Race::race_t GetRace(void) const = 0;
-	virtual Color::color_t GetColor(void) const = 0;
 	virtual const std::string & GetName(void) const = 0;
 	virtual u8 GetType(void) const = 0;
-	virtual u16 GetSpellPoints(void) const = 0;
-	virtual Spell::Book * GetSpellBook(void) = 0;
-	virtual u8 GetLevelSkill(const Skill::Secondary::skill_t) const = 0;
 
         static const std::string & String(const skill_t skill);
 	static skill_t FromLevelUp(const u8 race, const u8 level);

@@ -26,12 +26,10 @@
 #include "game_io.h"
 #include "gamedefs.h"
 
-namespace Spell
+class SpellStorage
 {
-    class Storage
-    {
-    public:
-	Storage();
+public:
+	SpellStorage();
 
 	u8 Size(const u8 lvl) const;
 	u8 Size1(void) const;
@@ -47,7 +45,10 @@ namespace Spell
 	const std::list<Spell::spell_t> & Spells4(void) const;
 	const std::list<Spell::spell_t> & Spells5(void) const;
 
-    protected:
+	void Appends(const SpellStorage & st, const u8 wisdom);
+	void Append(const Spell::spell_t sp, const u8 wisdom);
+
+protected:
 	friend void Game::SaveXML(const std::string &);
 	friend void Game::LoadXML(const std::string &);
 
@@ -56,7 +57,6 @@ namespace Spell
 	std::list<Spell::spell_t>	spells_level3;
 	std::list<Spell::spell_t>	spells_level4;
 	std::list<Spell::spell_t>	spells_level5;
-    };
 };
 
 #endif

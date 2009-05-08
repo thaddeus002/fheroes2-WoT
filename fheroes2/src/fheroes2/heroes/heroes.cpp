@@ -307,7 +307,7 @@ Heroes::Heroes(heroes_t ht, Race::race_t rc) : killer_color(Color::GRAY), experi
 	    experience = 777;
 
 	    // all spell in magic book
-	    for(Spell::spell_t spell = Spell::FIREBALL; spell < Spell::SETWGUARDIAN; ++spell) spell_book.Append(spell, Skill::Level::EXPERT);
+	    for(u8 spell = Spell::FIREBALL; spell < Spell::STONE; ++spell) spell_book.Append(Spell::FromInt(spell), Skill::Level::EXPERT);
 	    break;
 
 	default: break;
@@ -1071,8 +1071,7 @@ void Heroes::Recruit(const Castle & castle)
     Recruit(castle.GetColor(), castle.GetCenter());
 
     // learn spell
-    if(castle.GetLevelMageGuild() &&
-	GetSpellBook()) AppendSpellsToBook(castle.GetMageGuild());
+    if(castle.GetLevelMageGuild()) AppendSpellsToBook(castle.GetMageGuild());
 }
 
 void Heroes::ActionNewDay(void)
@@ -1385,8 +1384,9 @@ bool Heroes::BuySpellBook(const Castle & castle)
 }
 
 /* add new spell to book from storage */
-void Heroes::AppendSpellsToBook(const Spell::Storage & spells)
+void Heroes::AppendSpellsToBook(const SpellStorage & spells)
 {
+    if(spell_book.isActive())
     spell_book.Appends(spells, GetLevelSkill(Skill::Secondary::WISDOM));
 }
 

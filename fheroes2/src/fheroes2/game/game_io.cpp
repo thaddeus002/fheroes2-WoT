@@ -964,7 +964,7 @@ void Game::LoadXML(const std::string &fn)
 	    for(; node; node = node->NextSiblingElement())
 	    {
 		node->Attribute("id", &res);
-		const Spell::spell_t spell = Spell::Spell(res);
+		const Spell::spell_t spell = Spell::FromInt(res);
 		switch(Spell::Level(spell))
 		{
 		    case 1:	hero->spell_book.spells_level1.push_back(spell); break;
@@ -1038,7 +1038,7 @@ void Game::LoadXML(const std::string &fn)
 	    for(; node; node = node->NextSiblingElement())
 	    {
 		node->Attribute("id", &res);
-		const Spell::spell_t spell = Spell::Spell(res);
+		const Spell::spell_t spell = Spell::FromInt(res);
 		switch(Spell::Level(spell))
 		{
 		    case 1:	castle->mageguild.spells_level1.push_back(spell); break;

@@ -305,8 +305,7 @@ void Castle::ActionNewDay(void)
 
     // for learns new spells need 1 day
     if(castle_heroes &&
-	GetLevelMageGuild() &&
-	castle_heroes->GetSpellBook()) castle_heroes->AppendSpellsToBook(mageguild);
+	GetLevelMageGuild()) castle_heroes->AppendSpellsToBook(mageguild);
 
     SetModes(ALLOWBUILD);
 }
@@ -996,11 +995,10 @@ void Castle::BuyBuilding(building_t build)
 	    case BUILD_MAGEGUILD4:
 	    case BUILD_MAGEGUILD5:
         	mageguild.BuildNextLevel();
-        	captain.GetSpellBook()->Activate();
-        	captain.GetSpellBook()->Appends(mageguild, captain.GetLevelSkill(Skill::Secondary::WISDOM));
+        	captain.GetSpellBook().Activate();
+        	captain.GetSpellBook().Appends(mageguild, captain.GetLevelSkill(Skill::Secondary::WISDOM));
 
-		if(castle_heroes &&
-		    castle_heroes->GetSpellBook()) castle_heroes->AppendSpellsToBook(mageguild);
+		if(castle_heroes) castle_heroes->AppendSpellsToBook(mageguild);
 		break;
 
             // build library

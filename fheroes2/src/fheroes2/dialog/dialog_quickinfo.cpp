@@ -147,7 +147,7 @@ void Dialog::QuickInfo(const Maps::Tiles & tile)
 	    if(!settings.Original() && world.GetKingdom(settings.MyColor()).isVisited(tile))
 	    {
 	    	name_object.append("\n(");
-	    	name_object.append(Spell::String(Spell::Spell(tile.GetQuantity1())));
+	    	name_object.append(Spell::GetName(Spell::FromInt(tile.GetQuantity1())));
 	    	name_object.append(")");
 	    }
 	    break;

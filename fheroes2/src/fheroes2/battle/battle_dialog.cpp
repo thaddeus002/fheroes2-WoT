@@ -187,11 +187,11 @@ void Battle::BattleSummary(HeroBase &hero, u32 exp, const Army::ArmyPairs &armie
                     {
                         //TODO: Eagle eye text
                         display.Blit(background, backgroundX, backgroundY);
-                        const Sprite &spr = AGG::GetICN(ICN::SPELLS, Spell::GetIndexSprite(spell));
+                        const Sprite &spr = AGG::GetICN(ICN::SPELLS, Spell::IndexSprite(spell));
                         display.Blit(spr, backgroundX + (background.w() - spr.w()) / 2, backgroundY + (background.h() - spr.h()) / 2);
                         AGG::PlaySound(M82::PICKUP01);
-                        if(hero.GetSpellBook())
-                            hero.GetSpellBook()->Append(spell, hero.GetLevelSkill(Skill::Secondary::WISDOM));
+                        if(hero.GetSpellBook().isActive())
+                            hero.GetSpellBook().Append(spell, hero.GetLevelSkill(Skill::Secondary::WISDOM));
                         break;
                     }
                 }
@@ -368,7 +368,7 @@ Army::battle_t Battle::HeroStatus(HeroBase &hero, StatusBar &statusBar, Spell::s
     Button buttonRet(pos_rt.x + 89, pos_rt.y + 148, butt, 11, 12);
     Button buttonSur(pos_rt.x + 148, pos_rt.y + 148, butt, 13, 14);
     Button buttonOK(pos_rt.x + 207, pos_rt.y + 148, butt, 15, 16);
-    buttonMag.SetDisable(!hero.GetSpellBook() || hero.Modes(Heroes::SPELLCASTED) || locked || quickshow);
+    buttonMag.SetDisable(!hero.GetSpellBook().isActive() || hero.Modes(Heroes::SPELLCASTED) || locked || quickshow);
     buttonRet.SetDisable(locked || quickshow);
     buttonSur.SetDisable(!cansurrender || locked || quickshow);
     buttonMag.Draw();
@@ -392,7 +392,7 @@ Army::battle_t Battle::HeroStatus(HeroBase &hero, StatusBar &statusBar, Spell::s
         if(le.KeyPress(KEY_ESCAPE)) {
             return Army::NONE;
         }
-        do_button(buttonMag, {if(spell=hero.GetSpellBook()->Open(Spell::Book::CMBT, true),spell!=Spell::NONE) {back.Restore();return Army::NONE;}}, Dialog::Message(_("Cast Spell"), _("Cast a magical spell. You may only cast one spell per combat round. The round is reset when every creature has had a turn"), Font::BIG));
+        do_button(buttonMag, {if(Spell::NONE != (spell = hero.GetSpellBook().Open(SpellBook::CMBT, true))) {back.Restore();return Army::NONE;}}, Dialog::Message(_("Cast Spell"), _("Cast a magical spell. You may only cast one spell per combat round. The round is reset when every creature has had a turn"), Font::BIG));
         do_button(buttonRet, return Army::RETREAT, Dialog::Message(_("Retreat"), _("Retreat your hero, abandoning your creatures. Your hero will be available for you to recruit again, however, the hero will have only a novice hero's forces."), Font::BIG));
         do_button(buttonSur, return Army::SURRENDER, Dialog::Message(_("Surrender"), _("Surrendering costs gold. However if you pay the ransom, the hero and all of his or her surviving creatures will be available to recruit again."), Font::BIG));
         do_button(buttonOK, return Army::NONE, Dialog::Message(_("Cancel"), _("Return to the battle."), Font::BIG));

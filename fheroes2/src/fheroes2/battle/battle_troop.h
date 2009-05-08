@@ -94,12 +94,12 @@ namespace Army
         void BlitR(const Point& dst_pt, bool reflect = false, int frame = -1);
         void Blit(const Point& dst_pt, bool reflect = false, int frame = -1);
         void Animate(u8 as = Monster::AS_NONE);
-        void SetMagic(Spell::magic_t &magic);
+        void SetMagic(Battle::magic_t &magic);
         bool FindMagic(Spell::spell_t spell) const;
         void RemoveMagic(Spell::spell_t spell);
         void ClearMagic();
         void ProceedMagic();
-        const std::vector<Spell::magic_t> &Magics() const { return magics; };
+        const std::vector<Battle::magic_t> &Magics() const { return magics; };
         
         bool IsReflected() const { return reflect; }
         void SetReflect(bool r) { lastReflect = reflect; reflect = r; }
@@ -115,7 +115,7 @@ namespace Army
         void	NewTurn(void);
 	    void	UpdateHitPoints(void);
         bool    isAffectedBySpell(u8);
-	    bool	ApplySpell(u8, u8);
+	    bool	ApplySpell(Spell::spell_t, u8);
 
         bool    IsDamageFatal(u16) const;
         bool    CanRetaliateAgainst(const BattleTroop &) const;
@@ -147,7 +147,7 @@ namespace Army
         bool saved;
         bool reflect, origReflect, lastReflect;
         MovementState moving;
-        std::vector<Spell::magic_t> magics;
+        std::vector<Battle::magic_t> magics;
 
         u8			disruptingray;
 	    std::vector<Surface *> contours;

@@ -24,41 +24,33 @@
 #include "gamedefs.h"
 #include "spell_storage.h"
 
+class HeroBase;
 class Heroes;
-namespace Skill { class Primary; };
 
-namespace Spell
+class SpellBook : public SpellStorage
 {
-    class Book : public Storage
-    {
-    public:
-	Book(const Skill::Primary *p);
-
-        void Appends(const Storage & st, const u8 wisdom);
-        void Append(const Spell::spell_t sp, const u8 wisdom);
-
-	typedef enum
+public:
+	enum filter_t
 	{
-	    ALL = 0,
-	    ADVN,
-	    CMBT
-	} filter_t;
+	    ADVN = 0x01,
+	    CMBT = 0x02,
+	    ALL  = ADVN | CMBT,
+	};
 
-	Spell::spell_t Open(filter_t filt = ALL, bool canselect=false) const;
+	SpellBook(const HeroBase *p);
+
+	Spell::spell_t Open(filter_t filt, bool canselect) const;
 	void Activate(void) { active = true; };
 	bool isActive(void) const { return active; };
 
-    private:
+private:
 	friend void Game::SaveXML(const std::string &);
 	friend void Game::LoadXML(const std::string &);
 
-	void RedrawLists(const std::vector<Spell::spell_t> & spells, const size_t cur, const Point & pt) const;
-	static Spell::spell_t GetSelected(const std::vector<Spell::spell_t> & spells, const size_t cur, const Point & pt);
-	void Filter(std::vector<Spell::spell_t> & spells, bool adv_mode) const;
+	void SetFilter(std::vector<Spell::spell_t> & spells, filter_t filter) const;
 
-	const Skill::Primary *hero;
+	const HeroBase *hero;
 	bool active;
-    };
 };
 
 #endif

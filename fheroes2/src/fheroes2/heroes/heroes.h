@@ -27,16 +27,13 @@
 #include "spell.h"
 #include "mp2.h"
 #include "dialog.h"
-#include "army.h"
-#include "skill.h"
-#include "artifact.h"
 #include "route.h"
 #include "pairs.h"
 #include "visit.h"
 #include "direction.h"
-#include "spell_book.h"
-#include "bitmodes.h"
 #include "game_io.h"
+#include "heroes_base.h"
+#include "army.h"
 #include "gamedefs.h"
 
 #define HEROESMAXARTIFACT	14
@@ -70,20 +67,7 @@
 #define DEFAULT_WZRD_POWER	2
 #define DEFAULT_WZRD_KNOWLEDGE	2
 
-typedef std::vector<Artifact> BagArtifacts;
 class Recruits;
-
-class HeroBase : public Skill::Primary, public BitModes
-{
-  public:
-    virtual const Army::army_t & GetArmy(void) const = 0;
-    virtual Army::army_t & GetArmy(void) = 0;
-    virtual bool HasArtifact(const Artifact::artifact_t) const = 0;
-    virtual BagArtifacts & GetBagArtifacts(void) = 0;
-    virtual void TakeArtifacts(Heroes &) = 0;
-    virtual u16 GetMaxSpellPoints(void) const = 0;
-    virtual void SetSpellPoints(const u16 point) = 0;
-};
 
 class Heroes : public HeroBase
 {
@@ -140,7 +124,10 @@ public:
     Race::race_t GetRace(void) const{ return race; };
     const std::string & GetName(void) const{ return name; };
     u8 GetType(void) const { return Skill::Primary::HEROES; };
-    Spell::Book * GetSpellBook(void) { return spell_book.isActive() ? &spell_book : NULL; };
+
+//    SpellBook* GetSpellBook(void) { return spell_book.isActive() ? &spell_book : NULL; };
+    const SpellBook & GetSpellBook(void) const { return spell_book; };
+    SpellBook & GetSpellBook(void) { return spell_book; };
 
     Color::color_t GetKillerColor(void) const;
     void SetKillerColor(Color::color_t);
@@ -154,8 +141,6 @@ public:
 
     const Army::army_t & GetArmy(void) const{ return army; }
     Army::army_t & GetArmy(void) { return army; };
-
-    const Spell::Book & SpellBook(void) const { return spell_book; };
 
     heroes_t GetID(void) const;
 
@@ -210,7 +195,7 @@ public:
     void ActionAfterBattle(void);
 
     bool BuySpellBook(const Castle &);
-    void AppendSpellsToBook(const Spell::Storage & spells);
+    void AppendSpellsToBook(const SpellStorage & spells);
     void AppendSpellToBook(const Spell::spell_t spell);
 
     const Route::Path & GetPath(void) const{ return path; };
@@ -285,7 +270,7 @@ private:
 
     BagArtifacts	artifacts;
     Army::army_t        army;
-    Spell::Book		spell_book;
+    SpellBook		spell_book;
 
     heroes_t		portrait;
     const Race::race_t	race;

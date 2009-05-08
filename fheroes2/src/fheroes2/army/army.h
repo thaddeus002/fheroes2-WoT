@@ -24,6 +24,7 @@
 #include <string>
 #include <vector>
 #include "bitmodes.h"
+#include "heroes_base.h"
 #include "army_troop.h"
 
 class Castle;
@@ -54,7 +55,7 @@ namespace Army
     class army_t
     {
 	public:
-	    army_t(const Skill::Primary* s = NULL);
+	    army_t(const HeroBase* s = NULL);
 
 	    army_t & operator= (const army_t &);		// deprecated, will be removed!
 
@@ -121,13 +122,13 @@ namespace Army
 
 	    void	Dump(void) const;
 
-	    const Skill::Primary* GetCommander(void) const;
+	    const HeroBase* GetCommander(void) const;
 
 	protected:
 	    friend class Troop;
 
 	    std::vector<Troop>	army;
-	    const Skill::Primary* commander;
+	    const HeroBase* commander;
     };
 };
 

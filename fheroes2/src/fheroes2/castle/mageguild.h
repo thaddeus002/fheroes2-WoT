@@ -26,7 +26,7 @@
 #include "race.h"
 #include "spell_storage.h"
 
-class MageGuild : public Spell::Storage
+class MageGuild : public SpellStorage
 {
     public:
 	MageGuild(const Race::race_t & rc);

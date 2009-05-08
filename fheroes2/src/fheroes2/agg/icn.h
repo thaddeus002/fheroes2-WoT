@@ -943,6 +943,8 @@ namespace ICN
     u16 AnimationFrame(const icn_t icn, const u16 start, const u32 ticket = 0, const u8 quantity = 0);
     bool RequiresAlpha(const icn_t icn);
     icn_t PORTxxxx(u8);
+    
+    icn_t FromSpell(u8);
 };
 
 #endif

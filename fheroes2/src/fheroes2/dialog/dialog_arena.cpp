@@ -87,6 +87,7 @@ Skill::Primary::skill_t Dialog::SelectSkillFromArena(void)
     Button buttonOk(dst_pt, system, 1, 2);
 
     LocalEvent & le = LocalEvent::GetLocalEvent();
+    bool redraw = false;
 
     buttonOk.Draw();
     cursor.Show();
@@ -99,64 +100,50 @@ Skill::Primary::skill_t Dialog::SelectSkillFromArena(void)
 
 	if(le.KeyPress(KEY_LEFT) && Skill::Primary::UNKNOWN != InfoSkillPrev(res))
 	{
-	    cursor.Hide();
 	    res = InfoSkillPrev(res);
-	    InfoSkillClear(rect1, rect2, rect3, rect4);
-	    InfoSkillSelect(res, rect1, rect2, rect3, rect4);
-	    cursor.Show();
-	    display.Flip();
+	    redraw = true;
 	}
 	else
 	if(le.KeyPress(KEY_RIGHT) && Skill::Primary::UNKNOWN != InfoSkillNext(res))
 	{
-	    cursor.Hide();
 	    res = InfoSkillNext(res);
-	    InfoSkillClear(rect1, rect2, rect3, rect4);
-	    InfoSkillSelect(res, rect1, rect2, rect3, rect4);
-	    cursor.Show();
-	    display.Flip();
+	    redraw = true;
 	}
 	else
 	if(le.MouseClickLeft(rect1))
 	{
-	    cursor.Hide();
 	    res = Skill::Primary::ATTACK;
-	    InfoSkillClear(rect1, rect2, rect3, rect4);
-	    InfoSkillSelect(res, rect1, rect2, rect3, rect4);
-	    cursor.Show();
-	    display.Flip();
+	    redraw = true;
 	}
 	else
 	if(le.MouseClickLeft(rect2))
 	{
-	    cursor.Hide();
 	    res = Skill::Primary::DEFENCE;
-	    InfoSkillClear(rect1, rect2, rect3, rect4);
-	    InfoSkillSelect(res, rect1, rect2, rect3, rect4);
-	    cursor.Show();
-	    display.Flip();
+	    redraw = true;
 	}
 	else
 	if(le.MouseClickLeft(rect3))
 	{
-	    cursor.Hide();
 	    res = Skill::Primary::POWER;
-	    InfoSkillClear(rect1, rect2, rect3, rect4);
-	    InfoSkillSelect(res, rect1, rect2, rect3, rect4);
-	    cursor.Show();
-	    display.Flip();
+	    redraw = true;
 	}
 	else
 	if(le.MouseClickLeft(rect4))
 	{
-	    cursor.Hide();
 	    res = Skill::Primary::KNOWLEDGE;
+	    redraw = true;
+	}
+
+	if(redraw)
+	{
+	    cursor.Hide();
 	    InfoSkillClear(rect1, rect2, rect3, rect4);
 	    InfoSkillSelect(res, rect1, rect2, rect3, rect4);
 	    cursor.Show();
 	    display.Flip();
+	    redraw = false;
 	}
-	
+
         if(le.KeyPress(KEY_RETURN) || le.MouseClickLeft(buttonOk)) break;
     }
 

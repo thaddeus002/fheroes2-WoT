@@ -184,11 +184,7 @@ public:
     s8 GetMorale(void) const;
     s8 GetLuck(void) const;
     Race::race_t GetRace(void) const;
-    Color::color_t GetColor(void) const;
     u8 GetType(void) const;
-    u16 GetSpellPoints(void) const;
-    Spell::Book* GetSpellBook(void);
-    u8 GetLevelSkill(const Skill::Secondary::skill_t) const;
 
     u8  GetDamageMin(void) const;
     u8  GetDamageMax(void) const;

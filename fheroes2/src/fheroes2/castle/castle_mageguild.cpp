@@ -90,11 +90,11 @@ void Castle::OpenMageGuild(void)
 	if(4 < level)
 	{
 	    const Spell::spell_t spell = mageguild.GetSpell(5, ii);
-	    const Sprite & icon = AGG::GetICN(ICN::SPELLS, Spell::GetIndexSprite(spell));
+	    const Sprite & icon = AGG::GetICN(ICN::SPELLS, Spell::IndexSprite(spell));
 
 	    display.Blit(icon, dst_pt.x + 5 - icon.w() / 2, dst_pt.y + 40 - icon.h() / 2);
 
-	    const std::string & str = Spell::String(spell);
+	    const std::string & str = Spell::GetName(spell);
 	    size_t pos;
 	    if(str.size() > 10 && std::string::npos != (pos = str.find(0x20)))
 	    {
@@ -128,11 +128,11 @@ void Castle::OpenMageGuild(void)
 	if(3 < level)
 	{
 	    const Spell::spell_t spell = mageguild.GetSpell(4, ii);
-	    const Sprite & icon = AGG::GetICN(ICN::SPELLS, Spell::GetIndexSprite(spell));
+	    const Sprite & icon = AGG::GetICN(ICN::SPELLS, Spell::IndexSprite(spell));
 
 	    display.Blit(icon, dst_pt.x + 5 - icon.w() / 2, dst_pt.y + 40 - icon.h() / 2);
 
-	    const std::string & str = Spell::String(spell);
+	    const std::string & str = Spell::GetName(spell);
 	    size_t pos;
 	    if(str.size() > 10 && std::string::npos != (pos = str.find(0x20)))
 	    {
@@ -166,11 +166,11 @@ void Castle::OpenMageGuild(void)
 	if(2 < level)
 	{
 	    const Spell::spell_t spell = mageguild.GetSpell(3, ii);
-	    const Sprite & icon = AGG::GetICN(ICN::SPELLS, Spell::GetIndexSprite(spell));
+	    const Sprite & icon = AGG::GetICN(ICN::SPELLS, Spell::IndexSprite(spell));
 
 	    display.Blit(icon, dst_pt.x + 5 - icon.w() / 2, dst_pt.y + 40 - icon.h() / 2);
 
-	    const std::string & str = Spell::String(spell);
+	    const std::string & str = Spell::GetName(spell);
 	    size_t pos;
 	    if(str.size() > 10 && std::string::npos != (pos = str.find(0x20)))
 	    {
@@ -204,11 +204,11 @@ void Castle::OpenMageGuild(void)
 	if(1 < level)
 	{
 	    const Spell::spell_t spell = mageguild.GetSpell(2, ii);
-	    const Sprite & icon = AGG::GetICN(ICN::SPELLS, Spell::GetIndexSprite(spell));
+	    const Sprite & icon = AGG::GetICN(ICN::SPELLS, Spell::IndexSprite(spell));
 	    
 	    display.Blit(icon, dst_pt.x + 5 - icon.w() / 2, dst_pt.y + 40 - icon.h() / 2);
 
-	    const std::string & str = Spell::String(spell);
+	    const std::string & str = Spell::GetName(spell);
 	    size_t pos;
 	    if(str.size() > 10 && std::string::npos != (pos = str.find(0x20)))
 	    {
@@ -242,11 +242,11 @@ void Castle::OpenMageGuild(void)
 	if(level)
 	{
 	    const Spell::spell_t spell = mageguild.GetSpell(1, ii);
-	    const Sprite & icon = AGG::GetICN(ICN::SPELLS, Spell::GetIndexSprite(spell));
+	    const Sprite & icon = AGG::GetICN(ICN::SPELLS, Spell::IndexSprite(spell));
 
 	    display.Blit(icon, dst_pt.x + 5 - icon.w() / 2, dst_pt.y + 40 - icon.h() / 2);
 
-	    const std::string & str = Spell::String(spell);
+	    const std::string & str = Spell::GetName(spell);
 	    size_t pos;
 	    if(str.size() > 10 && std::string::npos != (pos = str.find(0x20)))
 	    {
@@ -295,7 +295,7 @@ void Castle::OpenMageGuild(void)
     		if(le.MouseClickLeft(rectsLevel1[ii]))
     		{
     		    cursor.Hide();
-    		    Dialog::SpellInfo(Spell::String(spell), Spell::Description(spell), spell);
+    		    Dialog::SpellInfo(Spell::GetName(spell), Spell::GetDescription(spell), spell);
     		    cursor.Show();
     		    display.Flip();
     		}
@@ -303,7 +303,7 @@ void Castle::OpenMageGuild(void)
     		if(le.MousePressRight(rectsLevel1[ii]))
     		{
     		    cursor.Hide();
-    		    Dialog::SpellInfo(Spell::String(spell), Spell::Description(spell), spell, false);
+    		    Dialog::SpellInfo(Spell::GetName(spell), Spell::GetDescription(spell), spell, false);
     		    cursor.Show();
     		    display.Flip();
     		}
@@ -320,7 +320,7 @@ void Castle::OpenMageGuild(void)
     		if(le.MouseClickLeft(rectsLevel2[ii]))
     		{
     		    cursor.Hide();
-    		    Dialog::SpellInfo(Spell::String(spell), Spell::Description(spell), spell);
+    		    Dialog::SpellInfo(Spell::GetName(spell), Spell::GetDescription(spell), spell);
     		    cursor.Show();
     		    display.Flip();
     		}
@@ -328,7 +328,7 @@ void Castle::OpenMageGuild(void)
     		if(le.MousePressRight(rectsLevel2[ii]))
     		{
     		    cursor.Hide();
-    		    Dialog::SpellInfo(Spell::String(spell), Spell::Description(spell), spell, false);
+    		    Dialog::SpellInfo(Spell::GetName(spell), Spell::GetDescription(spell), spell, false);
     		    cursor.Show();
     		    display.Flip();
     		}
@@ -345,7 +345,7 @@ void Castle::OpenMageGuild(void)
     		if(le.MouseClickLeft(rectsLevel3[ii]))
     		{
     		    cursor.Hide();
-    		    Dialog::SpellInfo(Spell::String(spell), Spell::Description(spell), spell);
+    		    Dialog::SpellInfo(Spell::GetName(spell), Spell::GetDescription(spell), spell);
     		    cursor.Show();
     		    display.Flip();
     		}
@@ -353,7 +353,7 @@ void Castle::OpenMageGuild(void)
     		if(le.MousePressRight(rectsLevel3[ii]))
     		{
     		    cursor.Hide();
-    		    Dialog::SpellInfo(Spell::String(spell), Spell::Description(spell), spell, false);
+    		    Dialog::SpellInfo(Spell::GetName(spell), Spell::GetDescription(spell), spell, false);
     		    cursor.Show();
     		    display.Flip();
     		}
@@ -370,7 +370,7 @@ void Castle::OpenMageGuild(void)
     		if(le.MouseClickLeft(rectsLevel4[ii]))
     		{
     		    cursor.Hide();
-    		    Dialog::SpellInfo(Spell::String(spell), Spell::Description(spell), spell);
+    		    Dialog::SpellInfo(Spell::GetName(spell), Spell::GetDescription(spell), spell);
     		    cursor.Show();
     		    display.Flip();
     		}
@@ -378,7 +378,7 @@ void Castle::OpenMageGuild(void)
     		if(le.MousePressRight(rectsLevel4[ii]))
     		{
     		    cursor.Hide();
-    		    Dialog::SpellInfo(Spell::String(spell), Spell::Description(spell), spell, false);
+    		    Dialog::SpellInfo(Spell::GetName(spell), Spell::GetDescription(spell), spell, false);
     		    cursor.Show();
     		    display.Flip();
     		}
@@ -395,7 +395,7 @@ void Castle::OpenMageGuild(void)
     		if(le.MouseClickLeft(rectsLevel5[ii]))
     		{
     		    cursor.Hide();
-    		    Dialog::SpellInfo(Spell::String(spell), Spell::Description(spell), spell);
+    		    Dialog::SpellInfo(Spell::GetName(spell), Spell::GetDescription(spell), spell);
     		    cursor.Show();
     		    display.Flip();
     		}
@@ -403,7 +403,7 @@ void Castle::OpenMageGuild(void)
     		if(le.MousePressRight(rectsLevel5[ii]))
     		{
     		    cursor.Hide();
-    		    Dialog::SpellInfo(Spell::String(spell), Spell::Description(spell), spell, false);
+    		    Dialog::SpellInfo(Spell::GetName(spell), Spell::GetDescription(spell), spell, false);
     		    cursor.Show();
     		    display.Flip();
     		}

@@ -19,124 +19,40 @@
  ***************************************************************************/
 
 #include <algorithm>
+#include <functional>
 #include "agg.h"
 #include "cursor.h"
 #include "spell_book.h"
 #include "dialog.h"
+#include "heroes_base.h"
 #include "skill.h"
 
 #define SPELL_PER_PAGE	6
 
-Spell::Book::Book(const Skill::Primary *p) : hero(p), active(false)
+struct SpellFiltered : std::binary_function<Spell::spell_t, SpellBook::filter_t, bool>
+{
+    bool operator() (Spell::spell_t s, SpellBook::filter_t f) const { return ((SpellBook::ADVN & f) && Spell::isCombat(s)) || ((SpellBook::CMBT & f) && !Spell::isCombat(s)); };
+};
+
+void SpellBookRedrawLists(const std::vector<Spell::spell_t> & spells, std::vector<Rect> & coords, const size_t cur, const Point & pt, const HeroBase *hero);
+
+SpellBook::SpellBook(const HeroBase *p) : hero(p), active(false)
 {
 }
 
-void Spell::Book::Appends(const Storage & st, const u8 wisdom)
-{
-    if(st.Size1())
-    {
-	spells_level1.insert(spells_level1.begin(), st.Spells1().begin(), st.Spells1().end());
-	spells_level1.sort();
-	spells_level1.unique();
-    }
-
-    if(st.Size2())
-    {
-	spells_level2.insert(spells_level2.begin(), st.Spells2().begin(), st.Spells2().end());
-	spells_level2.sort();
-	spells_level2.unique();
-    }
-
-    if(st.Size3() && Skill::Level::BASIC <= wisdom)
-    {
-	spells_level3.insert(spells_level3.begin(), st.Spells3().begin(), st.Spells3().end());
-	spells_level3.sort();
-	spells_level3.unique();
-    }
-
-    if(st.Size4() && Skill::Level::ADVANCED <= wisdom)
-    {
-	spells_level4.insert(spells_level4.begin(), st.Spells4().begin(), st.Spells4().end());
-	spells_level4.sort();
-	spells_level4.unique();
-    }
-
-    if(st.Size5() && Skill::Level::EXPERT == wisdom)
-    {
-	spells_level5.insert(spells_level5.begin(), st.Spells5().begin(), st.Spells5().end());
-	spells_level5.sort();
-	spells_level5.unique();
-    }
-}
-
-void Spell::Book::Append(const Spell::spell_t sp, const u8 wisdom)
-{
-    switch(Spell::Level(sp))
-    {
-	case 1:
-	    if(spells_level1.end() == std::find(spells_level1.begin(), spells_level1.end(), sp))
-	    {
-		spells_level1.push_back(sp);
-		spells_level1.sort();
-	    }
-	break;
-	
-	case 2:
-	    if(spells_level2.end() == std::find(spells_level2.begin(), spells_level2.end(), sp))
-	    {
-		spells_level2.push_back(sp);
-		spells_level2.sort();
-	    }
-	break;
-	
-	case 3:
-	    if(Skill::Level::BASIC <= wisdom &&
-		spells_level3.end() == std::find(spells_level3.begin(), spells_level3.end(), sp))
-	    {
-		spells_level3.push_back(sp);
-		spells_level3.sort();
-	    }
-	break;
-
-	case 4:
-	    if(Skill::Level::ADVANCED <= wisdom &&
-		spells_level4.end() == std::find(spells_level4.begin(), spells_level4.end(), sp))
-	    {
-		spells_level4.push_back(sp);
-		spells_level4.sort();
-	    }
-	break;
-
-	case 5:
-	    if(Skill::Level::EXPERT == wisdom &&
-		spells_level5.end() == std::find(spells_level5.begin(), spells_level5.end(), sp))
-	    {
-		spells_level5.push_back(sp);
-		spells_level5.sort();
-	    }
-	break;
-	
-	default: break;
-    }
-}
-
-Spell::spell_t Spell::Book::Open(filter_t filt, bool canselect) const
+Spell::spell_t SpellBook::Open(filter_t filt, bool canselect) const
 {
     if(!active) return Spell::NONE;
 
     Display & display = Display::Get();
-
     Cursor & cursor = Cursor::Get();
+
     const Cursor::themes_t oldcursor = cursor.Themes();
     cursor.Hide();
     cursor.SetThemes(Cursor::POINTER);
 
     std::vector<Spell::spell_t> spells;
-
-    if(filt == CMBT)
-	Filter(spells, false);
-    else
-	Filter(spells, true);
+    SetFilter(spells, filt);
 
     size_t current_index = 0;
 
@@ -160,8 +76,11 @@ Spell::spell_t Spell::Book::Open(filter_t filt, bool canselect) const
     const Rect clos_rt(pos.x + 420, pos.y + 284, bookmark_clos.w(), bookmark_clos.h());
 
     Spell::spell_t curspell = Spell::NONE;
+    
+    std::vector<Rect> coords;
+    coords.reserve(SPELL_PER_PAGE * 2);
 
-    RedrawLists(spells, current_index, pos);
+    SpellBookRedrawLists(spells, coords, current_index, pos, hero);
 
     cursor.Show();
     display.Flip();
@@ -174,98 +93,97 @@ Spell::spell_t Spell::Book::Open(filter_t filt, bool canselect) const
 	if(le.MouseClickLeft(prev_list) && current_index)
 	{
 	    current_index -= 2 * SPELL_PER_PAGE;
-
-	    cursor.Hide();
-	    RedrawLists(spells, current_index, pos);
-	    cursor.Show();
-	    display.Flip();
+	    SpellBookRedrawLists(spells, coords, current_index, pos, hero);
 	}
-
+	else
 	if(le.MouseClickLeft(next_list) && spells.size() > (current_index + 2 * SPELL_PER_PAGE))
 	{
 	    current_index += 2 * SPELL_PER_PAGE;
-
-	    cursor.Hide();
-	    RedrawLists(spells, current_index, pos);
-	    cursor.Show();
-	    display.Flip();
+	    SpellBookRedrawLists(spells, coords, current_index, pos, hero);
 	}
-
-	if(le.MouseClickLeft(info_rt) && hero)
-	{
-	    std::string str = _("Your hero has %{point} spell points remaining");
-	    String::Replace(str, "%{point}", hero->GetSpellPoints());
-	    Dialog::Message("", str, Font::BIG, Dialog::OK);
-	}
-
-	if(le.MousePressRight(info_rt) && hero)
+	else
+	if((le.MouseClickLeft(info_rt) && hero) ||
+	   (le.MousePressRight(info_rt) && hero))
 	{
 	    std::string str = _("Your hero has %{point} spell points remaining");
 	    String::Replace(str, "%{point}", hero->GetSpellPoints());
 	    str += " spell points remaining";
-	    Dialog::Message("", str, Font::BIG);
-	}
-
-	if(le.MouseClickLeft(advn_rt) && filt != CMBT)
-	{
-	    Filter(spells, true);
-
 	    cursor.Hide();
-	    RedrawLists(spells, current_index, pos);
+	    Dialog::Message("", str, Font::BIG, Dialog::OK);
 	    cursor.Show();
 	    display.Flip();
 	}
-
-	if(le.MouseClickLeft(cmbt_rt) && filt != ADVN)
+	else
+	if(le.MouseClickLeft(advn_rt) && filt != ADVN)
 	{
-	    Filter(spells, false);
-
-	    cursor.Hide();
-	    RedrawLists(spells, current_index, pos);
-	    cursor.Show();
-	    display.Flip();
+	    filt = ADVN;
+	    current_index = 0;
+	    SetFilter(spells, filt);
+	    SpellBookRedrawLists(spells, coords, current_index, pos, hero);
 	}
-
+	else
+	if(le.MouseClickLeft(cmbt_rt) && filt != CMBT)
+	{
+	    filt = CMBT;
+	    current_index = 0;
+	    SetFilter(spells, filt);
+	    SpellBookRedrawLists(spells, coords, current_index, pos, hero);
+	}
+	else
 	if(le.MouseClickLeft(clos_rt) || le.KeyPress(KEY_ESCAPE)) break;
-
+	else
 	if(le.MouseClickLeft(pos))
 	{
-	    Spell::spell_t spell = GetSelected(spells, current_index, pos);
-	    if(canselect)
+	    std::vector<Rect>::const_iterator it = std::find_if(coords.begin(), coords.end(), std::bind2nd(RectIncludePoint(), le.MouseCursor()));
+	    if(it != coords.end())
 	    {
-		if(spell != Spell::NONE && hero)
+		Spell::spell_t spell = spells.at(it - coords.begin() + current_index);
+
+		if(canselect)
 		{
-		    if(hero->GetSpellPoints() >= Spell::Mana(spell))
+		    if(spell != Spell::NONE && hero)
 		    {
-			curspell = spell;
-			break;
-		    }
-		    else
-		    {
-			std::string str = _("That spell costs %{mana} mana. You only have %{point} mana, so you can't cast the spell.");
-			String::Replace(str, "%{mana}", Spell::Mana(spell));
-			String::Replace(str, "%{point}", hero->GetSpellPoints());
-			Dialog::Message("", str, Font::BIG, Dialog::OK);
+			if(hero->GetSpellPoints() >= Spell::Mana(spell))
+			{
+			    curspell = spell;
+			    break;
+			}
+			else
+			{
+			    cursor.Hide();
+			    std::string str = _("That spell costs %{mana} mana. You only have %{point} mana, so you can't cast the spell.");
+			    String::Replace(str, "%{mana}", Spell::Mana(spell));
+			    String::Replace(str, "%{point}", hero->GetSpellPoints());
+			    Dialog::Message("", str, Font::BIG, Dialog::OK);
+			    cursor.Show();
+			    display.Flip();
+			}
 		    }
 		}
-	    }
-	    else
-	    if(spell != Spell::NONE)
-	    {
-		cursor.Hide();
-		Dialog::SpellInfo(Spell::String(spell), Spell::Description(spell), spell, true);
-		cursor.Show();
-		display.Flip();
+		else
+		if(spell != Spell::NONE)
+		{
+		    cursor.Hide();
+		    Dialog::SpellInfo(Spell::GetName(spell), Spell::GetDescription(spell), spell, true);
+		    cursor.Show();
+		    display.Flip();
+		}
 	    }
 	}
 
-	if(le.MousePressRight(pos)) {
-	    Spell::spell_t spell = GetSelected(spells, current_index, pos);
-	    if(spell != Spell::NONE) {
-		cursor.Hide();
-		Dialog::SpellInfo(Spell::String(spell), Spell::Description(spell), spell, false);
-		cursor.Show();
-		display.Flip();
+	if(le.MousePressRight(pos))
+	{
+	    std::vector<Rect>::const_iterator it = std::find_if(coords.begin(), coords.end(), std::bind2nd(RectIncludePoint(), le.MouseCursor()));
+	    if(it != coords.end())
+	    {
+		Spell::spell_t spell = spells.at(it - coords.begin() + current_index);
+		if(spell != Spell::NONE)
+		{
+		    cursor.Hide();
+		    Dialog::SpellInfo(Spell::GetName(spell), Spell::GetDescription(spell), spell, false);
+		    cursor.Show();
+		    display.Flip();
+		}
 	    }
 	}
     }
@@ -279,9 +197,40 @@ Spell::spell_t Spell::Book::Open(filter_t filt, bool canselect) const
     return curspell;
 }
 
-void Spell::Book::RedrawLists(const std::vector<Spell::spell_t> & spells, const size_t cur, const Point & pt) const
+void SpellBook::SetFilter(std::vector<Spell::spell_t> & spells, filter_t filter) const
+{
+    spells.clear();
+    spells.resize(spells_level1.size() + spells_level2.size() + spells_level3.size() + spells_level4.size() + spells_level5.size(), Spell::NONE);
+    std::vector<Spell::spell_t>::iterator it = spells.begin();
+
+    if(spells_level1.size())
+    	it = std::copy(spells_level1.begin(), spells_level1.end(), it);
+
+    if(spells_level2.size())
+    	it = std::copy(spells_level2.begin(), spells_level2.end(), it);
+
+    if(spells_level3.size())
+    	it = std::copy(spells_level3.begin(), spells_level3.end(), it);
+
+    if(spells_level4.size())
+    	it = std::copy(spells_level4.begin(), spells_level4.end(), it);
+
+    if(spells_level5.size())
+    	it = std::copy(spells_level5.begin(), spells_level5.end(), it);
+
+    if(filter != ALL)
+    {
+	it = std::remove_if(spells.begin(), spells.end(), std::bind2nd(SpellFiltered(), filter));
+	if(spells.end() != it) spells.resize(it - spells.begin());
+    }
+}
+
+void SpellBookRedrawLists(const std::vector<Spell::spell_t> & spells, std::vector<Rect> & coords, const size_t cur, const Point & pt, const HeroBase *hero)
 {
     Display & display = Display::Get();
+    Cursor & cursor = Cursor::Get();
+
+    cursor.Hide();
 
     const Sprite & r_list = AGG::GetICN(ICN::BOOK, 0);
     const Sprite & l_list = AGG::GetICN(ICN::BOOK, 0, true);
@@ -302,6 +251,8 @@ void Spell::Book::RedrawLists(const std::vector<Spell::spell_t> & spells, const 
     display.Blit(bookmark_cmbt, cmbt_rt);
     display.Blit(bookmark_clos, clos_rt);
 
+    if(coords.size()) coords.clear();
+    
     Point tp = info_rt;
     tp += Point(9, 6);
     int mp = hero ? hero->GetSpellPoints() : 0;
@@ -335,13 +286,15 @@ void Spell::Book::RedrawLists(const std::vector<Spell::spell_t> & spells, const 
 	    if(SPELL_PER_PAGE == ii) ox += 70;
 
 	    const Spell::spell_t & spell = spells.at(ii + cur);
-	    const Sprite & icon = AGG::GetICN(ICN::SPELLS, Spell::GetIndexSprite(spell));
+	    const Sprite & icon = AGG::GetICN(ICN::SPELLS, Spell::IndexSprite(spell));
+	    const Rect rect(pt.x + ox - icon.w() / 2, pt.y + oy - icon.h() / 2, icon.w(), icon.h() + 10);
 
-    	    display.Blit(icon, pt.x + ox - icon.w() / 2, pt.y + oy - icon.h() / 2);
+    	    display.Blit(icon, rect.x, rect.y);
 
-    	    std::string str = Spell::String(spell) + " [";
+    	    std::string str(Spell::GetName(spell));
+    	    str.append(" [");
 	    String::AddInt(str, Spell::Mana(spell));
-	    str += "]";
+	    str.append("]");
             size_t pos;
             if(str.size() > 10 && std::string::npos != (pos = str.find(0x20)))
             {
@@ -359,94 +312,10 @@ void Spell::Book::RedrawLists(const std::vector<Spell::spell_t> & spells, const 
                 text.Blit(pt.x + ox - text.w() / 2, pt.y + oy + 25);
 	    }
     	    oy += 80;
+
+    	    coords.push_back(rect);
 	}
     }
-}
-
-Spell::spell_t Spell::Book::GetSelected(const std::vector<Spell::spell_t> & spells, const size_t cur, const Point & pt)
-{
-    u16 ox = 0;
-    u16 oy = 0;
-
-    for(u8 ii = 0; ii < 2 * SPELL_PER_PAGE; ++ii)
-    {
-	if(spells.size() > cur + ii)
-	{
-	    if(!(ii % 3))
-	    {
-		oy = 50;
-		ox += 80;
-	    }
-
-	    if(SPELL_PER_PAGE == ii) ox += 70;
-
-	    const Spell::spell_t & spell = spells.at(ii + cur);
-	    const Sprite & icon = AGG::GetICN(ICN::SPELLS, Spell::GetIndexSprite(spell));
-	    Rect rt(pt.x + ox - icon.w() / 2, pt.y + oy - icon.h() / 2, icon.w(), icon.h());
-
-	    LocalEvent & le = LocalEvent::GetLocalEvent();
-	    if(rt & le.MouseCursor()) return spell;
-
-    	    oy += 80;
-	}
-    }
-    return Spell::NONE;
-}
-
-void Spell::Book::Filter(std::vector<Spell::spell_t> & spells, bool adv_mode) const
-{
-    if(spells.size()) spells.clear();
-    
-    std::list<Spell::spell_t>::const_iterator it1;
-    std::list<Spell::spell_t>::const_iterator it2;
-
-    if(spells_level1.size())
-    {
-	it1 = spells_level1.begin();
-	it2 = spells_level1.end();
-	
-	for(; it1 != it2; ++it1)
-	    if((adv_mode && !Spell::isCombat(*it1)) || (!adv_mode && Spell::isCombat(*it1)))
-		spells.push_back(*it1);
-    }
-
-    if(spells_level2.size())
-    {
-	it1 = spells_level2.begin();
-	it2 = spells_level2.end();
-	
-	for(; it1 != it2; ++it1)
-	    if((adv_mode && !Spell::isCombat(*it1)) || (!adv_mode && Spell::isCombat(*it1)))
-		spells.push_back(*it1);
-    }
-
-    if(spells_level3.size())
-    {
-	it1 = spells_level3.begin();
-	it2 = spells_level3.end();
-	
-	for(; it1 != it2; ++it1)
-	    if((adv_mode && !Spell::isCombat(*it1)) || (!adv_mode && Spell::isCombat(*it1)))
-		spells.push_back(*it1);
-    }
-
-    if(spells_level4.size())
-    {
-	it1 = spells_level4.begin();
-	it2 = spells_level4.end();
-	
-	for(; it1 != it2; ++it1)
-	    if((adv_mode && !Spell::isCombat(*it1)) || (!adv_mode && Spell::isCombat(*it1)))
-		spells.push_back(*it1);
-    }
-
-    if(spells_level5.size())
-    {
-	it1 = spells_level5.begin();
-	it2 = spells_level5.end();
-	
-	for(; it1 != it2; ++it1)
-	    if((adv_mode && !Spell::isCombat(*it1)) || (!adv_mode && Spell::isCombat(*it1)))
-		spells.push_back(*it1);
-    }
+    cursor.Show();
+    display.Flip();
 }

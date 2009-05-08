@@ -27,19 +27,20 @@
 
 namespace Army { class BattleTroop; };
 
-namespace Spell	// or Battle 
+namespace Battle	// or move to BattleTroop
 {
-    typedef struct
+    struct magic_t
     {
-        spell_t spell;
-        u8 duration;
-    } magic_t;
+	magic_t() : spell(Spell::NONE), duration(0) {};
 
-    bool AllowSpell(spell_t spell, const Army::BattleTroop &troop);
-    void ApplySpell(int spower, spell_t spell, Army::BattleTroop &troop);
-    bool isTroopAffectedBySpell(u8 spell, const Army::BattleTroop &troop);
-    u16 GetInflictDamageVersus(u8, u8, const Army::BattleTroop &);
-    spell_t TroopAttack(const Monster &);
+	Spell::spell_t spell;
+	u8 duration;
+    };
+
+    bool AllowSpell(Spell::spell_t spell, const Army::BattleTroop &troop);
+    void ApplySpell(int spower, Spell::spell_t spell, Army::BattleTroop &troop);
+    bool isTroopAffectedBySpell(Spell::spell_t spell, const Army::BattleTroop &troop);
+    u16 GetInflictDamageVersus(Spell::spell_t spell, u8 sp, const Army::BattleTroop &);
 };
 
 #endif
