@@ -21,6 +21,7 @@
 #define H2RECT_H
 
 #include <vector>
+#include <functional>
 #include "types.h"
 
 class SDL_Rect;
@@ -83,6 +84,11 @@ public:
 
     // rect intersects rect
     bool operator& (const Rect & rt) const;
+};
+
+struct RectIncludePoint : std::binary_function<Rect, Point, bool>
+{
+    bool operator() (const Rect & r, const Point & p) const { return r & p; };
 };
 
 #endif
