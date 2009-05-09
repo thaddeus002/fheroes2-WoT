@@ -957,6 +957,11 @@ void Game::LoadXML(const std::string &fn)
 	if(book)
 	{
 	    str = book->Attribute("enable");
+	    hero->spell_book.spells_level1.clear();
+	    hero->spell_book.spells_level2.clear();
+	    hero->spell_book.spells_level3.clear();
+	    hero->spell_book.spells_level4.clear();
+	    hero->spell_book.spells_level5.clear();
 	    hero->spell_book.active = (str && 0 == std::strcmp(str, "true"));
 
 	    // load spells
