@@ -612,9 +612,7 @@ void RedrawClopOrClofSpriteFog(const u16 dst_index, const u8 ox, const u8 oy)
 	}
 
 	const Sprite & src = AGG::GetICN(ICN::CLOP32, index, revert);
-	Surface sf(src);
-	sf.SetDisplayFormat();
-	display.Blit(sf, revert ? dstx + src.x() + TILEWIDTH - src.w() : dstx + src.x(), dsty + src.y());
+	display.Blit(src, revert ? dstx + src.x() + TILEWIDTH - src.w() : dstx + src.x(), dsty + src.y());
     }
 }
 

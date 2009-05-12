@@ -119,8 +119,10 @@ bool SelectFileListSimple(const std::string & header, MapsFileInfoList & lists, 
     }
     else
     {
-	if(lists.empty()) buttonOk.SetDisable(true);
-	ResizeToShortName((*cur).file, filename);
+	if(lists.empty())
+	    buttonOk.SetDisable(true);
+	else
+	    ResizeToShortName((*cur).file, filename);
     }
 
     RedrawFileListSimple(rt, header, filename, lists, top, cur, max_items);
@@ -160,13 +162,13 @@ bool SelectFileListSimple(const std::string & header, MapsFileInfoList & lists, 
     	    result.clear();
     	    break;
 	}
-
+	else
         if(le.MouseClickLeft(enter_field) && editor)
 	{
 	    edit_mode = true;
 	    redraw = true;
 	}
-
+	else
 	if(edit_mode && le.KeyPress())
 	{
 	    switch(le.KeyValue())
@@ -245,14 +247,14 @@ bool SelectFileListSimple(const std::string & header, MapsFileInfoList & lists, 
 
 	    redraw = true;
 	}
-
+	else
         if((le.MouseClickLeft(buttonPgUp) || le.KeyPress(KEY_PAGEUP)) && (top > lists.begin()))
 	{
 	    top = (top - lists.begin() > max_items ? top - max_items : lists.begin());
 	    split.Move(top - lists.begin());
 	    redraw = true;
 	}
-
+	else
         if((le.MouseClickLeft(buttonPgDn) || le.KeyPress(KEY_PAGEDOWN)) && (top + max_items < lists.end()))
 	{
 	    top += max_items;
@@ -260,7 +262,7 @@ bool SelectFileListSimple(const std::string & header, MapsFileInfoList & lists, 
 	    split.Move(top - lists.begin());
 	    redraw = true;
 	}
-
+	else
         if(le.KeyPress(KEY_UP) && (cur > lists.begin()))
 	{
 	    --cur;
@@ -273,7 +275,7 @@ bool SelectFileListSimple(const std::string & header, MapsFileInfoList & lists, 
 	    redraw = true;
 	    edit_mode = false;
 	}
-
+	else
         if(le.KeyPress(KEY_DOWN) && (cur < (lists.end() - 1)))
 	{
 	    ++cur;
@@ -288,21 +290,21 @@ bool SelectFileListSimple(const std::string & header, MapsFileInfoList & lists, 
 	    redraw = true;
 	    edit_mode = false;
 	}
-
+	else
 	if((le.MouseWheelUp(list_rt) || le.MouseWheelUp(split.GetRect())) && (top > lists.begin()))
 	{
 	    --top;
 	    split.Backward();
 	    redraw = true;
 	}
-
+	else
 	if((le.MouseWheelDn(list_rt) || le.MouseWheelDn(split.GetRect())) && (top < (lists.end() - max_items)))
 	{
 	    ++top;
 	    split.Forward();
 	    redraw = true;
 	}
-
+	else
 	if(le.MousePressLeft(split.GetRect()) && (lists.size() > max_items))
 	{
 	    s16 seek = (le.MouseCursor().y - split.GetRect().y) * 100 / split.GetStep();
@@ -313,7 +315,7 @@ bool SelectFileListSimple(const std::string & header, MapsFileInfoList & lists, 
 	    split.Move(seek);
 	    redraw = true;
  	}
-
+	else
 	if(le.KeyPress(KEY_DELETE) && cur != lists.end())
 	{
 	    std::string msg(_("Are you sure you want to delete file:"));
@@ -362,6 +364,8 @@ bool SelectFileListSimple(const std::string & header, MapsFileInfoList & lists, 
 	    	ResizeToShortName((*cur).file, filename);
 		RedrawFileListSimple(rt, header, filename, lists, top, cur, max_items);
 	    }
+	    else
+		RedrawFileListSimple(rt, header, filename, lists, top, cur, max_items);
 
 	    buttonOk.Draw();
 	    buttonCancel.Draw();
@@ -376,7 +380,6 @@ bool SelectFileListSimple(const std::string & header, MapsFileInfoList & lists, 
 
     cursor.Hide();
     back.Restore();
-    display.Flip();
 
     return result.size();
 }
@@ -571,15 +574,16 @@ bool DialogSelectMapsFileList(MapsFileInfoList & lists, std::string & filename)
 	le.MousePressLeft(buttonSelectAll) ? buttonSelectAll.PressDraw() : buttonSelectAll.ReleaseDraw();
 
         if((le.MouseClickLeft(buttonOk) && buttonOk.isEnable()) || le.KeyPress(KEY_RETURN)){ res = true; break; }
+	else
         if(le.KeyPress(KEY_ESCAPE)){ res = false; break; }
-
+	else
         if((le.MouseClickLeft(buttonPgUp) || le.KeyPress(KEY_PAGEUP)) && (top > curlist->begin()))
 	{
 	    top = (top - curlist->begin() > max_items ? top - max_items : curlist->begin());
 	    split.Move(top - curlist->begin());
 	    redraw = true;
 	}
-
+	else
         if((le.MouseClickLeft(buttonPgDn) || le.KeyPress(KEY_PAGEDOWN)) && (top + max_items < curlist->end()))
 	{
 	    top += max_items;
@@ -587,7 +591,7 @@ bool DialogSelectMapsFileList(MapsFileInfoList & lists, std::string & filename)
 	    split.Move(top - curlist->begin());
 	    redraw = true;
 	}
-
+	else
         if(le.KeyPress(KEY_UP) && (cur > curlist->begin()))
 	{
 	    --cur;
@@ -599,7 +603,7 @@ bool DialogSelectMapsFileList(MapsFileInfoList & lists, std::string & filename)
 	    split.Move(top - curlist->begin());
 	    redraw = true;
 	}
-
+	else
         if(le.KeyPress(KEY_DOWN) && (cur < (curlist->end() - 1)))
 	{
 	    ++cur;
@@ -613,21 +617,21 @@ bool DialogSelectMapsFileList(MapsFileInfoList & lists, std::string & filename)
 	    split.Move(top - curlist->begin());
 	    redraw = true;
 	}
-
+	else
 	if((le.MouseWheelUp(list_rt) || le.MouseWheelUp(split.GetRect())) && (top > curlist->begin()))
 	{
 	    --top;
 	    split.Backward();
 	    redraw = true;
 	}
-
+	else
 	if((le.MouseWheelDn(list_rt) || le.MouseWheelDn(split.GetRect())) && (top < (curlist->end() - max_items)))
 	{
 	    ++top;
 	    split.Forward();
 	    redraw = true;
 	}
-
+	else
 	if(le.MousePressLeft(split.GetRect()) && (curlist->size() > max_items))
 	{
 	    s16 seek = (le.MouseCursor().y - split.GetRect().y) * 100 / split.GetStep();
@@ -638,7 +642,7 @@ bool DialogSelectMapsFileList(MapsFileInfoList & lists, std::string & filename)
 	    split.Move(seek);
 	    redraw = true;
  	}
-
+	else
 	if(le.MouseClickLeft(list_rt) && curlist->size())
 	{
 	    MapsFileInfoList::iterator cur2 = top + static_cast<size_t>((le.MouseReleaseLeft().y - list_rt.y) * max_items / static_cast<float>(list_rt.h));
@@ -653,7 +657,7 @@ bool DialogSelectMapsFileList(MapsFileInfoList & lists, std::string & filename)
 		cur = cur2;
 	    redraw = true;
 	}
-
+	else
 	if(((le.MouseClickLeft(buttonSelectSmall) || le.KeyPress(KEY_s)) && buttonSelectSmall.isEnable()) && buttonSelectSmall.isEnable())
 	{
 	    curlist = &small;
@@ -661,7 +665,7 @@ bool DialogSelectMapsFileList(MapsFileInfoList & lists, std::string & filename)
 	    split.SetRange(0, (max_items < curlist->size() ? curlist->size() - max_items : 0));
 	    redraw = true;
 	}
-
+	else
 	if(((le.MouseClickLeft(buttonSelectMedium) || le.KeyPress(KEY_m)) && buttonSelectMedium.isEnable()) && buttonSelectMedium.isEnable())
 	{
 	    curlist = &medium;
@@ -669,7 +673,7 @@ bool DialogSelectMapsFileList(MapsFileInfoList & lists, std::string & filename)
 	    split.SetRange(0, (max_items < curlist->size() ? curlist->size() - max_items : 0));
 	    redraw = true;
 	}
-
+	else
 	if(((le.MouseClickLeft(buttonSelectLarge) || le.KeyPress(KEY_l)) && buttonSelectLarge.isEnable()) && buttonSelectLarge.isEnable())
 	{
 	    curlist = &large;
@@ -677,7 +681,7 @@ bool DialogSelectMapsFileList(MapsFileInfoList & lists, std::string & filename)
 	    split.SetRange(0, (max_items < curlist->size() ? curlist->size() - max_items : 0));
 	    redraw = true;
 	}
-
+	else
 	if(((le.MouseClickLeft(buttonSelectXLarge) || le.KeyPress(KEY_l)) && buttonSelectXLarge.isEnable()) && buttonSelectXLarge.isEnable())
 	{
 	    curlist = &xlarge;
@@ -685,7 +689,7 @@ bool DialogSelectMapsFileList(MapsFileInfoList & lists, std::string & filename)
 	    split.SetRange(0, (max_items < curlist->size() ? curlist->size() - max_items : 0));
 	    redraw = true;
 	}
-
+	else
 	if(le.MouseClickLeft(buttonSelectAll) || le.KeyPress(KEY_a))
 	{
 	    curlist = &all;
@@ -732,7 +736,6 @@ bool DialogSelectMapsFileList(MapsFileInfoList & lists, std::string & filename)
 
     cursor.Hide();
     back.Restore();
-    display.Flip();
     
     return res;
 }
