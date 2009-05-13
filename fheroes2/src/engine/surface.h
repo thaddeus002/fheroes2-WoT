@@ -53,6 +53,12 @@ public:
     void Set(u16 sw, u16 sh, bool alpha = false);
     void Set(u16 sw, u16 sh, u8 depth, u32 fl);
 
+    bool Load(const char*);
+    bool Load(const std::string &);
+
+    bool Save(const char *) const;
+    bool Save(const std::string &) const;
+
     u16 w(void) const;
     u16 h(void) const;
     u8  depth(void) const;
@@ -70,8 +76,6 @@ public:
 
     void ScaleFrom(const Surface & bs);
 
-    bool SaveBMP(const char *fn) const;
-    bool SavePNG(const char *fn) const;
 
     const SDL_Surface *GetSurface(void) const{ return surface; };
 

@@ -479,11 +479,10 @@ int LocalEvent::GlobalFilterEvents(const SDL_Event *event)
 		std::ostringstream stream;
 #ifndef WITH_PNG
 		stream << screenshot_prefix << std::time(0) << ".bmp";
-            	if(display.SaveBMP(stream.str().c_str())) Error::Verbose("save: " + stream.str());
 #else
 		stream << screenshot_prefix << std::time(0) << ".png";
-            	if(display.SavePNG(stream.str().c_str())) Error::Verbose("save: " + stream.str());
 #endif
+            	if(display.Save(stream.str().c_str())) Error::Verbose("save: " + stream.str());
 	    }
 	    	return 0;
 

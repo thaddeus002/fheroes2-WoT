@@ -28,7 +28,10 @@
 #include "SDL_ttf.h"
 #endif
 
+#ifdef WITH_PNG
+#include "SDL_image.h"
 #include "IMG_savepng.h"
+#endif
 
 Surface::Surface() : surface(NULL)
 {
@@ -112,6 +115,37 @@ void Surface::Set(u16 sw, u16 sh, u8 depth, u32 fl)
 
     CreateSurface(sw, sh, depth,  fl);
     LoadPalette();
+}
+
+bool Surface::Load(const char* fn)
+{
+    if(surface) SDL_FreeSurface(surface);
+
+#ifdef WITH_PNG
+    if(fn) surface = IMG_Load(fn);
+#else
+    if(fn) surface = SDL_LoadBMP(fn);
+#endif
+    return surface;
+}
+
+bool Surface::Load(const std::string & str)
+{
+    return Load(str.c_str());
+}
+
+bool Surface::Save(const char *fn) const
+{
+#ifdef WITH_PNG
+    return !surface || !fn || IMG_SavePNG(fn, surface, -1) ? false : true;
+#else
+    return !surface || !fn || SDL_SaveBMP(surface, fn) ? false : true;
+#endif
+}
+
+bool Surface::Save(const std::string & str) const
+{
+    return Save(str.c_str());
 }
 
 u16 Surface::w(void) const
@@ -480,20 +514,6 @@ void Surface::ScaleFrom(const Surface & src)
     Unlock();
 
     delete [] p_src;
-}
-
-bool Surface::SaveBMP(const char *fn) const
-{
-    return !surface || SDL_SaveBMP(surface, fn) ? false : true;
-}
-
-bool Surface::SavePNG(const char *fn) const
-{
-#ifdef WITH_PNG
-    return !surface || IMG_SavePNG(fn, surface, -1) ? false : true;
-#else
-    return false;
-#endif
 }
 
 void Surface::SetAlpha(u8 level)

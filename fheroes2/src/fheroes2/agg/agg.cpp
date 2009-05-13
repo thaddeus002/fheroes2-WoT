@@ -28,11 +28,7 @@
 #include "midi_mid.h"
 #include "dir.h"
 #include "agg.h"
-
-#ifdef WITH_PNG
-#include "SDL_image.h"
 #include "xmlccwrap.h"
-#endif
 
 #define FATSIZENAME	15
 
@@ -372,7 +368,6 @@ void AGG::Cache::LoadICN(const ICN::icn_t icn, bool reflect)
     const Settings & conf = Settings::Get();
 
     // load from image cache dir
-#ifdef WITH_PNG
     if(conf.Modes(Settings::USECACHE))
     {
 	Dir dir;
@@ -399,11 +394,10 @@ void AGG::Cache::LoadICN(const ICN::icn_t icn, bool reflect)
 		xml_sprite->Attribute("ox", &ox);
 		xml_sprite->Attribute("oy", &oy);
 		const std::string sprite_file(icn_folder + SEPARATOR + xml_sprite->Attribute("name"));
-		SDL_Surface* sf = IMG_Load(sprite_file.c_str());
-		if(NULL == sf) Error::Warning("AGG::Cache::LoadICN: broken image file: " + sprite_file);
     		v.push_back(Sprite());
 		Sprite & sp = v.back();
-		sp.Set(sf);
+		sp.Load(sprite_file.c_str());
+		if(! sp.valid()) Error::Warning("AGG::Cache::LoadICN: broken image file: " + sprite_file);
 		sp.SetOffset(ox, oy);
 	    }
 	}
@@ -411,7 +405,6 @@ void AGG::Cache::LoadICN(const ICN::icn_t icn, bool reflect)
 	if(conf.Debug()) 
     	    Error::Verbose("AGG::Cache::LoadICN: broken xml file: " + xml_spec);
     }
-#endif
 
     if(conf.Debug()) Error::Verbose("AGG::Cache::LoadICN: " + ICN::GetString(icn));
 
