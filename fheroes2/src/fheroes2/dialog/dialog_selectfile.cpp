@@ -171,77 +171,7 @@ bool SelectFileListSimple(const std::string & header, MapsFileInfoList & lists, 
 	else
 	if(edit_mode && le.KeyPress())
 	{
-	    switch(le.KeyValue())
-	    {
-		case KEY_EXCLAIM:	filename += '!'; break;
-		case KEY_QUOTEDBL:	filename += '"'; break;
-		case KEY_HASH:		filename += '#'; break;
-		case KEY_DOLLAR:	filename += '$'; break;
-		case KEY_AMPERSAND:	filename += '&'; break;
-		case KEY_QUOTE:		filename += '\''; break;
-		case KEY_LEFTPAREN:	filename += '('; break;
-		case KEY_RIGHTPAREN:	filename += ')'; break;
-		case KEY_ASTERISK:	filename += '*'; break;
-		case KEY_PLUS:		filename += '+'; break;
-		case KEY_COMMA:		filename += ','; break;
-		case KEY_MINUS:		filename += '-'; break;
-		case KEY_PERIOD:	filename += '.'; break;
-		case KEY_SLASH:		filename += '/'; break;
-		case KEY_COLON:		filename += ':'; break;
-		case KEY_SEMICOLON:	filename += ';'; break;
-		case KEY_LESS:		filename += '<'; break;
-		case KEY_EQUALS:	filename += '='; break;
-		case KEY_GREATER:	filename += '>'; break;
-		case KEY_QUESTION:	filename += '?'; break;
-		case KEY_AT:		filename += '@'; break;
-		case KEY_LEFTBRACKET:	filename += '['; break;
-		case KEY_BACKSLASH:	filename += '\\'; break;
-		case KEY_RIGHTBRACKET:	filename += ']'; break;
-		case KEY_CARET:		filename += '^'; break;
-		case KEY_UNDERSCORE:	filename += '_'; break;
-
-		case KEY_0:	filename += '0'; break;
-		case KEY_1:	filename += '1'; break;
-		case KEY_2:	filename += '2'; break;
-		case KEY_3:	filename += '3'; break;
-		case KEY_4:	filename += '4'; break;
-		case KEY_5:	filename += '5'; break;
-		case KEY_6:	filename += '6'; break;
-		case KEY_7:	filename += '7'; break;
-		case KEY_8:	filename += '8'; break;
-		case KEY_9:	filename += '9'; break;
-		case KEY_a:	filename += 'a'; break;
-		case KEY_b:	filename += 'b'; break;
-		case KEY_c:	filename += 'c'; break;
-		case KEY_d:	filename += 'd'; break;
-		case KEY_e:	filename += 'e'; break;
-		case KEY_f:	filename += 'f'; break;
-		case KEY_g:	filename += 'g'; break;
-		case KEY_h:	filename += 'h'; break;
-		case KEY_i:	filename += 'i'; break;
-		case KEY_j:	filename += 'j'; break;
-		case KEY_k:	filename += 'k'; break;
-		case KEY_l:	filename += 'l'; break;
-		case KEY_m:	filename += 'm'; break;
-		case KEY_n:	filename += 'n'; break;
-		case KEY_o:	filename += 'o'; break;
-		case KEY_p:	filename += 'p'; break;
-		case KEY_q:	filename += 'q'; break;
-		case KEY_r:	filename += 'r'; break;
-		case KEY_s:	filename += 's'; break;
-		case KEY_t:	filename += 't'; break;
-		case KEY_u:	filename += 'u'; break;
-		case KEY_v:	filename += 'v'; break;
-		case KEY_w:	filename += 'w'; break;
-		case KEY_x:	filename += 'x'; break;
-		case KEY_y:	filename += 'y'; break;
-		case KEY_z:	filename += 'z'; break;
-		case KEY_SPACE:	filename += ' '; break;
-
-		case KEY_BACKSPACE: if(filename.size()) filename.resize(filename.size() - 1); break;
-
-		default: break;
-	    }
+	    String::AppendKey(filename, le.KeyValue(), le.KeyMod());
 
 	    buttonOk.SetDisable(filename.empty());
 

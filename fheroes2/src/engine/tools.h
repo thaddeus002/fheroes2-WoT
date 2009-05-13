@@ -21,6 +21,7 @@
 #define H2TOOLS_H
 
 #include <string>
+#include "localevent.h"
 #include "types.h"
 
 namespace String
@@ -35,6 +36,8 @@ namespace String
 
     void Replace(std::string &, const std::string &, const std::string &);
     void Replace(std::string &, const std::string &, int);
+
+    void AppendKey(std::string &, KeySym, u16);
 
     // from SDL_ttf
     void UTF8_to_UNICODE(u16 *unicode, const char *utf8, int len);

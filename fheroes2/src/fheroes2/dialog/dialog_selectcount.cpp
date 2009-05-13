@@ -289,77 +289,7 @@ bool Dialog::InputString(const std::string &header, std::string &res)
 	else
 	if(le.KeyPress())
 	{
-	    switch(le.KeyValue())
-	    {
-		case KEY_EXCLAIM:	res += '!'; break;
-		case KEY_QUOTEDBL:	res += '"'; break;
-		case KEY_HASH:		res += '#'; break;
-		case KEY_DOLLAR:	res += '$'; break;
-		case KEY_AMPERSAND:	res += '&'; break;
-		case KEY_QUOTE:		res += '\''; break;
-		case KEY_LEFTPAREN:	res += '('; break;
-		case KEY_RIGHTPAREN:	res += ')'; break;
-		case KEY_ASTERISK:	res += '*'; break;
-		case KEY_PLUS:		res += '+'; break;
-		case KEY_COMMA:		res += ','; break;
-		case KEY_MINUS:		res += '-'; break;
-		case KEY_PERIOD:	res += '.'; break;
-		case KEY_SLASH:		res += '/'; break;
-		case KEY_COLON:		res += ':'; break;
-		case KEY_SEMICOLON:	res += ';'; break;
-		case KEY_LESS:		res += '<'; break;
-		case KEY_EQUALS:	res += '='; break;
-		case KEY_GREATER:	res += '>'; break;
-		case KEY_QUESTION:	res += '?'; break;
-		case KEY_AT:		res += '@'; break;
-		case KEY_LEFTBRACKET:	res += '['; break;
-		case KEY_BACKSLASH:	res += '\\'; break;
-		case KEY_RIGHTBRACKET:	res += ']'; break;
-		case KEY_CARET:		res += '^'; break;
-		case KEY_UNDERSCORE:	res += '_'; break;
-
-		case KEY_0:	res += '0'; break;
-		case KEY_1:	res += '1'; break;
-		case KEY_2:	res += '2'; break;
-		case KEY_3:	res += '3'; break;
-		case KEY_4:	res += '4'; break;
-		case KEY_5:	res += '5'; break;
-		case KEY_6:	res += '6'; break;
-		case KEY_7:	res += '7'; break;
-		case KEY_8:	res += '8'; break;
-		case KEY_9:	res += '9'; break;
-		case KEY_a:	res += 'a'; break;
-		case KEY_b:	res += 'b'; break;
-		case KEY_c:	res += 'c'; break;
-		case KEY_d:	res += 'd'; break;
-		case KEY_e:	res += 'e'; break;
-		case KEY_f:	res += 'f'; break;
-		case KEY_g:	res += 'g'; break;
-		case KEY_h:	res += 'h'; break;
-		case KEY_i:	res += 'i'; break;
-		case KEY_j:	res += 'j'; break;
-		case KEY_k:	res += 'k'; break;
-		case KEY_l:	res += 'l'; break;
-		case KEY_m:	res += 'm'; break;
-		case KEY_n:	res += 'n'; break;
-		case KEY_o:	res += 'o'; break;
-		case KEY_p:	res += 'p'; break;
-		case KEY_q:	res += 'q'; break;
-		case KEY_r:	res += 'r'; break;
-		case KEY_s:	res += 's'; break;
-		case KEY_t:	res += 't'; break;
-		case KEY_u:	res += 'u'; break;
-		case KEY_v:	res += 'v'; break;
-		case KEY_w:	res += 'w'; break;
-		case KEY_x:	res += 'x'; break;
-		case KEY_y:	res += 'y'; break;
-		case KEY_z:	res += 'z'; break;
-		case KEY_SPACE:	res += ' '; break;
-
-		case KEY_BACKSPACE: if(res.size()) res.resize(res.size() - 1); break;
-
-		default: break;
-	    }
+	    String::AppendKey(res, le.KeyValue(), le.KeyMod());
 
 	    buttonOk.SetDisable(res.empty());
 	    buttonOk.Draw();

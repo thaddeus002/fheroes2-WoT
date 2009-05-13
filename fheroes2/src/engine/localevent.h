@@ -31,7 +31,7 @@ struct SDL_MouseButtonEvent;
 union SDL_Event;
 struct SDL_keysym;
 
-enum KeyMod { MOD_NONE = KMOD_NONE, MOD_CTRL = KMOD_CTRL, MOD_SHIFT = KMOD_SHIFT, MOD_ALT = KMOD_ALT };
+enum KeyMod { MOD_NONE = KMOD_NONE, MOD_CTRL = KMOD_CTRL, MOD_SHIFT = KMOD_SHIFT, MOD_ALT = KMOD_ALT, MOD_CAPS = KMOD_CAPS };
 
 enum KeySym
 {

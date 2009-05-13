@@ -179,3 +179,78 @@ void String::UNICODE_to_UTF8(std::string & utf8, const u16 *unicode, size_t len)
         }
     }
 }
+
+void String::AppendKey(std::string & res, KeySym sym, u16 mod)
+{
+    switch(sym)
+    {
+        case KEY_EXCLAIM:       res += '!'; break;
+        case KEY_QUOTEDBL:      res += '"'; break;
+        case KEY_HASH:          res += '#'; break;
+        case KEY_DOLLAR:        res += '$'; break;
+        case KEY_AMPERSAND:     res += '&'; break;
+        case KEY_QUOTE:         res += '\''; break;
+        case KEY_LEFTPAREN:     res += '('; break;
+        case KEY_RIGHTPAREN:    res += ')'; break;
+        case KEY_ASTERISK:      res += '*'; break;
+        case KEY_PLUS:          res += '+'; break;
+        case KEY_COMMA:         res += ','; break;
+        case KEY_MINUS:         res += '-'; break;
+        case KEY_PERIOD:        res += '.'; break;
+        case KEY_SLASH:         res += '/'; break;
+        case KEY_COLON:         res += ':'; break;
+        case KEY_SEMICOLON:     res += ';'; break;
+	case KEY_LESS:          res += '<'; break;
+        case KEY_EQUALS:        res += '='; break;
+	case KEY_GREATER:       res += '>'; break;
+	case KEY_QUESTION:      res += '?'; break;
+	case KEY_AT:            res += '@'; break;
+	case KEY_LEFTBRACKET:   res += '['; break;
+	case KEY_BACKSLASH:     res += '\\'; break;
+	case KEY_RIGHTBRACKET:  res += ']'; break;
+	case KEY_CARET:         res += '^'; break;
+	case KEY_UNDERSCORE:    res += '_'; break;
+        case KEY_SPACE:		res += ' '; break;
+
+        case KEY_a:     res += ((MOD_SHIFT | MOD_CAPS) & mod ? 'A' : 'a'); break;
+        case KEY_b:     res += ((MOD_SHIFT | MOD_CAPS) & mod ? 'B' : 'b'); break;
+        case KEY_c:     res += ((MOD_SHIFT | MOD_CAPS) & mod ? 'C' : 'c'); break;
+        case KEY_d:     res += ((MOD_SHIFT | MOD_CAPS) & mod ? 'D' : 'd'); break;
+        case KEY_e:     res += ((MOD_SHIFT | MOD_CAPS) & mod ? 'E' : 'e'); break;
+        case KEY_f:     res += ((MOD_SHIFT | MOD_CAPS) & mod ? 'F' : 'f'); break;
+        case KEY_g:     res += ((MOD_SHIFT | MOD_CAPS) & mod ? 'G' : 'g'); break;
+        case KEY_h:     res += ((MOD_SHIFT | MOD_CAPS) & mod ? 'H' : 'h'); break;
+        case KEY_i:     res += ((MOD_SHIFT | MOD_CAPS) & mod ? 'I' : 'i'); break;
+        case KEY_j:     res += ((MOD_SHIFT | MOD_CAPS) & mod ? 'J' : 'j'); break;
+        case KEY_k:     res += ((MOD_SHIFT | MOD_CAPS) & mod ? 'K' : 'k'); break;
+        case KEY_l:     res += ((MOD_SHIFT | MOD_CAPS) & mod ? 'L' : 'l'); break;
+        case KEY_m:     res += ((MOD_SHIFT | MOD_CAPS) & mod ? 'M' : 'm'); break;
+        case KEY_n:     res += ((MOD_SHIFT | MOD_CAPS) & mod ? 'N' : 'n'); break;
+        case KEY_o:     res += ((MOD_SHIFT | MOD_CAPS) & mod ? 'O' : 'o'); break;
+        case KEY_p:     res += ((MOD_SHIFT | MOD_CAPS) & mod ? 'P' : 'p'); break;
+        case KEY_q:     res += ((MOD_SHIFT | MOD_CAPS) & mod ? 'Q' : 'q'); break;
+        case KEY_r:     res += ((MOD_SHIFT | MOD_CAPS) & mod ? 'R' : 'r'); break;
+        case KEY_s:     res += ((MOD_SHIFT | MOD_CAPS) & mod ? 'S' : 's'); break;
+        case KEY_t:     res += ((MOD_SHIFT | MOD_CAPS) & mod ? 'T' : 't'); break;
+        case KEY_u:     res += ((MOD_SHIFT | MOD_CAPS) & mod ? 'U' : 'u'); break;
+        case KEY_v:     res += ((MOD_SHIFT | MOD_CAPS) & mod ? 'V' : 'v'); break;
+        case KEY_w:     res += ((MOD_SHIFT | MOD_CAPS) & mod ? 'W' : 'w'); break;
+        case KEY_x:     res += ((MOD_SHIFT | MOD_CAPS) & mod ? 'X' : 'x'); break;
+        case KEY_y:     res += ((MOD_SHIFT | MOD_CAPS) & mod ? 'Y' : 'y'); break;
+        case KEY_z:     res += ((MOD_SHIFT | MOD_CAPS) & mod ? 'Z' : 'z'); break;
+
+        case KEY_0:     res += '0'; break;
+        case KEY_1:     res += '1'; break;
+        case KEY_2:     res += '2'; break;
+        case KEY_3:     res += '3'; break;
+        case KEY_4:     res += '4'; break;
+        case KEY_5:     res += '5'; break;
+        case KEY_6:     res += '6'; break;
+        case KEY_7:     res += '7'; break;
+        case KEY_8:     res += '8'; break;
+        case KEY_9:     res += '9'; break;
+
+        case KEY_BACKSPACE: if(res.size()) res.resize(res.size() - 1); break;
+        default: break;
+    }
+}
