@@ -28,10 +28,12 @@
 #include "SDL_ttf.h"
 #endif
 
-#ifdef WITH_PNG
+#ifdef WITH_IMAGE
 #include "SDL_image.h"
 #include "IMG_savepng.h"
 #endif
+
+static u8 default_depth = 16;
 
 Surface::Surface() : surface(NULL)
 {
@@ -51,7 +53,7 @@ Surface::Surface(u16 sw, u16 sh, u8 depth, u32 fl)
 
 Surface::Surface(u16 sw, u16 sh, bool alpha)
 {
-    CreateSurface(sw, sh, DEFAULT_DEPTH, alpha ? SDL_SRCALPHA|SDL_SWSURFACE : SDL_SWSURFACE);
+    CreateSurface(sw, sh, default_depth, alpha ? SDL_SRCALPHA|SDL_SWSURFACE : SDL_SWSURFACE);
     LoadPalette();
 }
 
@@ -82,7 +84,7 @@ Surface & Surface::operator= (const Surface & bs)
     {
 	surface = SDL_ConvertSurface(bs.surface, bs.surface->format, bs.surface->flags);
 
-	if(!surface) Error::Warning("Surface: operator, error: " + std::string(SDL_GetError()));
+	if(!surface) Error::Warning("Surface: operator, error: " + Error::SDLError());
 
     }
     else
@@ -91,6 +93,27 @@ Surface & Surface::operator= (const Surface & bs)
     LoadPalette();
 
     return *this;
+}
+
+void Surface::SetDefaultDepth(u8 depth)
+{
+    switch(depth)
+    {
+	case 8:
+	case 16:
+	case 24:
+	case 32:
+	    default_depth = depth;
+	    break;
+
+	default:
+	    break;
+    }
+}
+
+u8 Surface::GetDefaultDepth(void)
+{
+    return default_depth;
 }
 
 void Surface::Set(SDL_Surface* sf)
@@ -105,7 +128,7 @@ void Surface::Set(u16 sw, u16 sh, bool alpha)
 {
     if(surface) SDL_FreeSurface(surface);
 
-    CreateSurface(sw, sh, DEFAULT_DEPTH, alpha ? SDL_SRCALPHA|SDL_SWSURFACE : SDL_SWSURFACE);
+    CreateSurface(sw, sh, default_depth, alpha ? SDL_SRCALPHA|SDL_SWSURFACE : SDL_SWSURFACE);
     LoadPalette();
 }
 
@@ -121,7 +144,7 @@ bool Surface::Load(const char* fn)
 {
     if(surface) SDL_FreeSurface(surface);
 
-#ifdef WITH_PNG
+#ifdef WITH_IMAGE
     if(fn) surface = IMG_Load(fn);
 #else
     if(fn) surface = SDL_LoadBMP(fn);
@@ -136,7 +159,7 @@ bool Surface::Load(const std::string & str)
 
 bool Surface::Save(const char *fn) const
 {
-#ifdef WITH_PNG
+#ifdef WITH_IMAGE
     return !surface || !fn || IMG_SavePNG(fn, surface, -1) ? false : true;
 #else
     return !surface || !fn || SDL_SaveBMP(surface, fn) ? false : true;
@@ -211,7 +234,7 @@ void Surface::CreateSurface(u16 sw, u16 sh, u8 dp, u32 fl)
 
     surface = SDL_CreateRGBSurface(fl, sw, sh, dp, rmask, gmask, bmask, amask);
 
-    if(!surface) Error::Warning("Surface::CreateSurface: empty surface, error:" + std::string(SDL_GetError()));
+    if(!surface) Error::Warning("Surface::CreateSurface: empty surface, error:" + Error::SDLError());
 }
 
 void Surface::LoadPalette(void)

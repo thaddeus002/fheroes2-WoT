@@ -25,7 +25,7 @@
 #include <cstdlib>
 
 #include "gamedefs.h"
-#include "audio.h"
+#include "engine.h"
 #include "settings.h"
 #include "dir.h"
 #include "agg.h"
@@ -164,7 +164,6 @@ int main(int argc, char **argv)
             subsystem |= INIT_AUDIO;
         if(conf.Modes(Settings::MUSIC_CD))
             subsystem |= INIT_CDROM | INIT_AUDIO;
-
 #ifdef WITH_NET
         subsystem |= INIT_TIMER;
         Network::SetProtocolVersion(static_cast<u16>((conf.MajorVersion() << 8)) | conf.MinorVersion());
@@ -177,11 +176,8 @@ int main(int argc, char **argv)
 
 	    if(Mixer::isValid())
 	    {
-                const u16 vol1 = conf.SoundVolume() * MAXVOLUME / 10;
-                const u16 vol2 = conf.MusicVolume() * MAXVOLUME / 10;
-
-                Mixer::Volume(-1, vol1);
-                Music::Volume(vol2);
+                Mixer::Volume(-1, conf.SoundVolume());
+                Music::Volume(conf.MusicVolume());
 	    }
 	    else
 	    if(conf.Sound() || conf.Music())

@@ -1,6 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2008 by Andrey Afletdinov                               *
- *   afletdinov@mail.dc.baikal.ru                                          *
+ *   Copyright (C) 2008 by Josh Matthews  <josh@joshmatthews.net>          *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -17,36 +16,17 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef H2ENGINE_H
-#define H2ENGINE_H
 
-#include "background.h"
-#include "display.h"
-#include "error.h"
-#include "localevent.h"
-#include "rect.h"
-#include "spritecursor.h"
-#include "surface.h"
-#include "palette.h"
-#include "rand.h"
-#include "tools.h"
-#include "audio.h"
-#include "audio_mixer.h"
-#include "audio_music.h"
-#include "audio_cdrom.h"
+#ifndef H2AUDIO_CDROM_H
+#define H2AUDIO_CDROM_H
+
 #include "types.h"
 
-#define INIT_VIDEO	SDL_INIT_VIDEO
-#define INIT_AUDIO	SDL_INIT_AUDIO
-#define INIT_TIMER	SDL_INIT_TIMER
-#define INIT_CDROM	SDL_INIT_CDROM
-
-namespace SDL
+namespace Cdrom
 {
-    bool Init(const u32 system = INIT_VIDEO);
-    void Quit(void);
-
-    bool SubSystem(const u32 system);
-};
+    bool	isValid(void);
+    void	Play(const u8 track, bool loop, bool force = false);
+    void	Pause(void);
+}
 
 #endif

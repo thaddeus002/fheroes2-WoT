@@ -20,10 +20,10 @@
 #ifndef H2SURFACE_H
 #define H2SURFACE_H
 
+#include <string>
 #include "rect.h"
 #include "types.h"
 
-#define DEFAULT_DEPTH           16              // Surface use bits color
 #define SWSURFACE		SDL_SWSURFACE
 
 class Palette;
@@ -121,6 +121,9 @@ public:
     void Unlock(void) const;
 
     static void TILReflect(Surface & sf_dst, const Surface & sf_src, const u8 shape);
+
+    static void SetDefaultDepth(u8);
+    static u8   GetDefaultDepth(void);
 
 protected:
 #ifdef WITH_TTF

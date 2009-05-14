@@ -20,8 +20,8 @@
 
 #include <map>
 #include <cstdlib>
+#include <algorithm>
 
-#include "audio.h"
 #include "gamedefs.h"
 #include "settings.h"
 #include "game_focus.h"
@@ -32,6 +32,11 @@
 #include "agg.h"
 #include "test.h"
 #include "game.h"
+
+namespace Game
+{
+    static std::vector<u8> reserved_vols;
+};
 
 Game::menu_t Game::Testing(u8 t){ Test::Run(t); return Game::QUITGAME; }
 
@@ -101,7 +106,10 @@ void Game::EnvironmentSoundMixer(void)
 
     if(conf.Sound())
     {
-	std::vector<u8> vols(CHANNEL_RESERVED, 0);
+	std::vector<u8> & vols = reserved_vols;
+
+	if(vols.empty())
+	    vols.resize(Mixer::CountChannelReserved(), 0);
 
         Mixer::PauseLoops();
         
@@ -116,7 +124,7 @@ void Game::EnvironmentSoundMixer(void)
 		    
     		    // calculation volume
     		    const u8 length = std::max(std::abs(xx - abs_pt.x), std::abs(yy - abs_pt.y));
-		    const u16 volume = (2 < length ? 2 : (1 < length ? 5 : (0 < length ? 7 : 10))) * MAXVOLUME * conf.SoundVolume() / 100;
+		    const u8 volume = (2 < length ? 2 : (1 < length ? 5 : (0 < length ? 7 : 10))) * conf.SoundVolume() / 10;
 		    u8 channel = 0xFF;
 		    MP2::object_t object = tile.GetObject();
 		    
@@ -164,14 +172,17 @@ void Game::EnvironmentSoundMixer(void)
 			default: continue;
 		    }
 
-		    if(volume > vols[channel]) vols[channel] = volume;
+		    if(volume > vols[channel] && channel < vols.size()) vols[channel] = volume;
 		}
 	    }
 	}
 
 	for(u8 ch = 0; ch < vols.size(); ++ch)
+	{
 	    Mixer::Volume(ch, vols[ch]);
-        
+	    vols[ch] = 0;
+	}
+
         Mixer::ResumeLoops();
     }
 }

@@ -1,6 +1,5 @@
 /***************************************************************************
  *   Copyright (C) 2008 by Andrey Afletdinov                               *
- *   afletdinov@mail.dc.baikal.ru                                          *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -17,36 +16,74 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef H2ENGINE_H
-#define H2ENGINE_H
 
-#include "background.h"
-#include "display.h"
 #include "error.h"
-#include "localevent.h"
-#include "rect.h"
-#include "spritecursor.h"
-#include "surface.h"
-#include "palette.h"
-#include "rand.h"
-#include "tools.h"
-#include "audio.h"
+#include "SDL_mixer.h"
 #include "audio_mixer.h"
 #include "audio_music.h"
-#include "audio_cdrom.h"
-#include "types.h"
 
-#define INIT_VIDEO	SDL_INIT_VIDEO
-#define INIT_AUDIO	SDL_INIT_AUDIO
-#define INIT_TIMER	SDL_INIT_TIMER
-#define INIT_CDROM	SDL_INIT_CDROM
-
-namespace SDL
+namespace Music
 {
-    bool Init(const u32 system = INIT_VIDEO);
-    void Quit(void);
+    static Mix_Music * music	= NULL;
+    static const void * id	= NULL;
+}
 
-    bool SubSystem(const u32 system);
-};
+void Music::Play(const std::vector<u8> & body, bool loop)
+{
+    if(! Mixer::isValid()) return;
 
-#endif
+    if(id != &body[0])
+    {
+        Reset();
+
+        if(body.size())
+        {
+            id = &body[0];
+            music = Mix_LoadMUS_RW(SDL_RWFromConstMem(&body[0], body.size()));
+            Mix_PlayMusic(music, loop ? -1 : 0);
+        }
+    }
+}
+
+/* range 0 - 10 */
+u8 Music::Volume(int vol)
+{
+    if(Mixer::isValid())
+    {
+	if(vol > 0)
+	    vol = (vol > 10 ? 10 : vol) * MIX_MAX_VOLUME / 10;
+	return Mix_VolumeMusic(vol);
+    }
+    return 0;
+}
+
+void Music::Pause(void)
+{
+    if(Mixer::isValid() && music) Mix_PauseMusic();
+}
+
+void Music::Resume(void)
+{
+    if(Mixer::isValid() && music) Mix_ResumeMusic();
+}
+
+bool Music::isPlaying(void)
+{
+    return Mixer::isValid() && Mix_PlayingMusic();
+}
+
+bool Music::isPaused(void)
+{
+    return Mixer::isValid() && Mix_PausedMusic();
+}
+
+void Music::Reset(void)
+{
+    if(Mixer::isValid() && music)
+    {
+        Mix_HaltMusic();
+        Mix_FreeMusic(music);
+        music = NULL;
+        id = NULL;
+    }
+}

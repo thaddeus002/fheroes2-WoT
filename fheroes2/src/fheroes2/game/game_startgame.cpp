@@ -22,7 +22,6 @@
 #include <algorithm>
 
 #include "agg.h"
-#include "audio.h"
 #include "engine.h"
 #include "button.h"
 #include "dialog.h"
@@ -1527,14 +1526,12 @@ Game::menu_t Game::HumanTurn(void)
 		
 		if(0x02 & changes)
 		{
-		    const u16 vol1 = conf.SoundVolume() * MAXVOLUME / 10;
-		    Mixer::Volume(-1, vol1);
+		    Mixer::Volume(-1, conf.SoundVolume());
 		    Game::EnvironmentSoundMixer();
 		}
 		if(0x04 & changes)
 		{
-		    const u16 vol2 = conf.MusicVolume() * MAXVOLUME / 10;
-		    Music::Volume(vol2);
+		    Music::Volume(conf.MusicVolume());
 		    Game::EnvironmentSoundMixer();
 		}
 		if(0x08 & changes)

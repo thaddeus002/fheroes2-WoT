@@ -3,7 +3,7 @@
 #
 
 TARGET := fheroes2
-SDL_LIBS := $(shell sdl-config --libs) -lSDL_mixer
+SDL_LIBS := $(shell sdl-config --libs)
 SDL_FLAGS := $(shell sdl-config --cflags)
 PNG_LIBS := $(shell libpng12-config --libs)
 PNG_FLAGS := $(shell libpng12-config --cflags)
@@ -19,8 +19,13 @@ else
 CFLAGS := $(CFLAGS) -O2
 endif
 
-ifndef WITHOUT_PNG
-CFLAGS := $(CFLAGS) -DWITH_PNG $(PNG_FLAGS)
+ifndef WITHOUT_MIXER
+CFLAGS := $(CFLAGS) -DWITH_MIXER
+SDL_LIBS := $(SDL_LIBS) -lSDL_mixer
+endif
+
+ifndef WITHOUT_IMAGE
+CFLAGS := $(CFLAGS) -DWITH_IMAGE $(PNG_FLAGS)
 SDL_LIBS := $(SDL_LIBS) -lSDL_image $(PNG_LIBS)
 endif
 

@@ -32,7 +32,7 @@ extern "C" {
 #define IMG_COMPRESS_MAX 9
 #define IMG_COMPRESS_DEFAULT -1
 
-#ifdef WITH_PNG
+#ifdef WITH_IMAGE
 /**
  * Takes a filename, a surface to save, and a compression level.  The
  * compression level can be 0(min) through 9(max), or -1(default).

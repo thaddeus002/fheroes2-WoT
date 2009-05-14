@@ -1,6 +1,5 @@
 /***************************************************************************
  *   Copyright (C) 2008 by Andrey Afletdinov                               *
- *   afletdinov@mail.dc.baikal.ru                                          *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -17,36 +16,30 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef H2ENGINE_H
-#define H2ENGINE_H
 
-#include "background.h"
-#include "display.h"
-#include "error.h"
-#include "localevent.h"
-#include "rect.h"
-#include "spritecursor.h"
-#include "surface.h"
-#include "palette.h"
-#include "rand.h"
-#include "tools.h"
-#include "audio.h"
-#include "audio_mixer.h"
-#include "audio_music.h"
-#include "audio_cdrom.h"
+#ifndef H2AUDIO_MIXER_H
+#define H2AUDIO_MIXER_H
+
+#include <vector>
 #include "types.h"
 
-#define INIT_VIDEO	SDL_INIT_VIDEO
-#define INIT_AUDIO	SDL_INIT_AUDIO
-#define INIT_TIMER	SDL_INIT_TIMER
-#define INIT_CDROM	SDL_INIT_CDROM
-
-namespace SDL
+namespace Mixer
 {
-    bool Init(const u32 system = INIT_VIDEO);
-    void Quit(void);
+    bool	isValid(void);
+    u8		Volume(const int ch, int vol = -1);
+    void	Pause(const int ch = -1);
+    void	PauseLoops(void);
+    void	Resume(const int ch = -1);
+    void	ResumeLoops(void);
+    void	Reset(const int ch = -1);
+    u8		isPlaying(const int ch);
+    u8		isPaused(const int ch);
+    void	PlayRAW(const std::vector<u8> & body, int ch = -1);
+    void	LoadRAW(const std::vector<u8> & body, bool loop, const u8 ch);
+    u8		CountChannelReserved(void);
 
-    bool SubSystem(const u32 system);
-};
+    void	Reduce(void);
+    void	Enhance(void);
+}
 
 #endif

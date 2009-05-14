@@ -39,13 +39,17 @@ bool SDL::Init(const u32 system)
 {
     if(0 > SDL_Init(system))
     {
-	Error::Warning("SDL::Init: error: " + std::string(SDL_GetError()));
+	Error::Warning("SDL::Init: error: " + Error::SDLError());
 
 	return false;
     }
 
+#ifdef WITH_MIXER
     if(SDL_INIT_AUDIO & system) Mixer::Init();
+#endif
+
     if(SDL_INIT_CDROM & system) Cdrom::Open();
+
 #ifdef WITH_TTF
     SDL::Font::Init();
 #endif
@@ -66,8 +70,12 @@ void SDL::Quit(void)
 #ifdef WITH_TTF
     SDL::Font::Quit();
 #endif
+
     if(SubSystem(SDL_INIT_CDROM)) Cdrom::Close();
+
+#ifdef WITH_MIXER
     if(SubSystem(SDL_INIT_AUDIO)) Mixer::Quit();
+#endif
 
     SDL_Quit();
 }

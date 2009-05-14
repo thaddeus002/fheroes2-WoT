@@ -477,7 +477,7 @@ int LocalEvent::GlobalFilterEvents(const SDL_Event *event)
 	    case SDLK_PRINT:
 	    {
 		std::ostringstream stream;
-#ifndef WITH_PNG
+#ifndef WITH_IMAGE
 		stream << screenshot_prefix << std::time(0) << ".bmp";
 #else
 		stream << screenshot_prefix << std::time(0) << ".png";

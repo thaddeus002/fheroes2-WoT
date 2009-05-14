@@ -297,6 +297,9 @@ void Settings::Parse(const std::string & left, const std::string & right)
     // debug
     if(left == "debug") debug = String::ToInt(right);
     else
+    // default depth
+    if(left == "default depth") Surface::SetDefaultDepth(String::ToInt(right));
+    else
     // animation
     if(left == "animation") animation = String::ToInt(right);
     else

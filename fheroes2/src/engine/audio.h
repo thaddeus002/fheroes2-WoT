@@ -21,10 +21,7 @@
 #ifndef H2AUDIO_H
 #define H2AUDIO_H
 
-#include "SDL.h"
-#include "SDL_mixer.h"
-
-#define MAXVOLUME MIX_MAX_VOLUME
+#include "types.h"
 
 namespace Audio
 {
@@ -36,10 +33,12 @@ namespace Audio
     struct CVT : public SDL_AudioCVT
     {
 	CVT();
-	
+
 	bool Build(const Spec & src, const Spec & dst);
 	bool Convert(void);
     };
+
+    Spec & GetHardwareSpec(void);
 };
 
 #endif

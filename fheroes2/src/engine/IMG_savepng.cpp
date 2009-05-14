@@ -28,7 +28,7 @@
 #include "SDL.h"
 #include "IMG_savepng.h"
 
-#ifdef WITH_PNG
+#ifdef WITH_IMAGE
 #include "png.h"
 
 int IMG_SavePNG(const char *file, SDL_Surface *surf,int compression){

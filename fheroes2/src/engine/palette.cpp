@@ -35,7 +35,7 @@ Palette::Palette()
     pal.resize(size);
 
     Surface sfa;
-    sfa.CreateSurface(1, 1, DEFAULT_DEPTH, SDL_SWSURFACE|SDL_SRCALPHA);
+    sfa.CreateSurface(1, 1, Surface::GetDefaultDepth(), SDL_SWSURFACE|SDL_SRCALPHA);
     sfa.SetAlpha(255);
 
     const unsigned char *p = kb_pal;

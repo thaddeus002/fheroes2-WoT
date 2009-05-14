@@ -23,7 +23,7 @@
 
 #include "settings.h"
 #include "text.h"
-#include "audio.h"
+#include "engine.h"
 #include "midi_xmi.h"
 #include "midi_mid.h"
 #include "dir.h"
@@ -523,7 +523,7 @@ void AGG::Cache::LoadWAV(const M82::m82_t m82)
     wav_spec.channels = 1;
     wav_spec.freq = 22050;
 
-    const Audio::Spec & hardware = Mixer::HardwareSpec();
+    const Audio::Spec & hardware = Audio::GetHardwareSpec();
 
     Audio::CVT cvt;
 

@@ -58,7 +58,7 @@ void Display::SetVideoMode(const u16 w, const u16 h, bool fullscreen)
     {
 	SDL_SetVideoMode(640, 480, 0, videoflags);
 
-	Error::Warning(std::string(SDL_GetError()));
+	Error::Warning(Error::SDLError());
     }
 }
 
