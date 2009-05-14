@@ -895,8 +895,8 @@ u16 Monster::GetRNDSize(monster_t m)
 	case Difficulty::EASY:      factor = 80; break;
 	case Difficulty::NORMAL:    factor = 100; break;
 	case Difficulty::HARD:      factor = 140; break;
-	case Difficulty::EXPERT:    factor = 200; break;
-	case Difficulty::IMPOSSIBLE:factor = 280; break;
+	case Difficulty::EXPERT:    factor = 180; break;
+	case Difficulty::IMPOSSIBLE:factor = 220; break;
 	default: break;
      }
 
