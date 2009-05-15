@@ -1658,7 +1658,7 @@ Game::menu_t Game::HumanTurn(void)
     }
 
     // warning lost all town
-    if(myCastles.empty() && LOST_TOWN_DAYS < myKingdom.GetLostTownDays())
+    if(ENDTURN == res && myHeroes.size() && myCastles.empty() && LOST_TOWN_DAYS < myKingdom.GetLostTownDays())
     {
 	std::string str = _("%{color} player, you have lost your last town. If you do not conquer another town in next week, you will be eliminated.");
 	String::Replace(str, "%{color}", Color::String(conf.MyColor()));
