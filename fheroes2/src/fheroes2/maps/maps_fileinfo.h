@@ -66,6 +66,7 @@ namespace Maps
     u8 kingdom_colors;
     u8 allow_colors;
     u8 rnd_colors;
+    u8 rnd_races;
     u8 conditions_wins;
     u8 wins1;
     u8 wins2;

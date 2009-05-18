@@ -52,7 +52,7 @@ Race::race_t ByteToRace(u8 byte)
 }
 
 Maps::FileInfo::FileInfo() : difficulty(Difficulty::EASY),
-    kingdom_colors(0), allow_colors(0), rnd_colors(0), localtime(0), with_heroes(false)
+    kingdom_colors(0), allow_colors(0), rnd_colors(0), rnd_races(0), localtime(0), with_heroes(false)
 {
     for(u8 ii = 0; ii < KINGDOMMAX; ++ii) races[ii] = Race::BOMG;
 }
@@ -171,6 +171,8 @@ bool Maps::FileInfo::ReadXML(const std::string &filename)
     allow_colors = res;
     maps->Attribute("rnd_colors", &res);
     rnd_colors = res;
+    maps->Attribute("rnd_races", &res);
+    rnd_races = res;
     maps->Attribute("conditions_wins", &res);
     conditions_wins = res;
     maps->Attribute("wins1", &res);
@@ -205,6 +207,7 @@ bool Maps::FileInfo::ReadBIN(const std::string & filename)
     kingdom_colors = 0;
     allow_colors = 0;
     rnd_colors = 0;
+    rnd_races = 0;
     localtime = 0;
 
     u8  byte8;
@@ -375,16 +378,22 @@ bool Maps::FileInfo::ReadBIN(const std::string & filename)
     // race color
     fd.read(reinterpret_cast<char *>(&byte8), 1);
     races[0] = ByteToRace(byte8);
+    if(Race::RAND == races[0]) rnd_races |= Color::BLUE;
     fd.read(reinterpret_cast<char *>(&byte8), 1);
     races[1] = ByteToRace(byte8);
+    if(Race::RAND == races[1]) rnd_races |= Color::GREEN;
     fd.read(reinterpret_cast<char *>(&byte8), 1);
     races[2] = ByteToRace(byte8);
+    if(Race::RAND == races[2]) rnd_races |= Color::RED;
     fd.read(reinterpret_cast<char *>(&byte8), 1);
     races[3] = ByteToRace(byte8);
+    if(Race::RAND == races[3]) rnd_races |= Color::YELLOW;
     fd.read(reinterpret_cast<char *>(&byte8), 1);
     races[4] = ByteToRace(byte8);
+    if(Race::RAND == races[4]) rnd_races |= Color::ORANGE;
     fd.read(reinterpret_cast<char *>(&byte8), 1);
     races[5] = ByteToRace(byte8);
+    if(Race::RAND == races[5]) rnd_races |= Color::PURPLE;
 
     // name
     char bufname[LENGTHNAME];

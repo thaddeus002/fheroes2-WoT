@@ -609,7 +609,7 @@ Color::color_t Settings::FirstAllowColor(void) const
 
 bool Settings::AllowChangeRace(u8 f) const
 {
-    return current_maps_file.rnd_colors & f;
+    return current_maps_file.rnd_races & f;
 }
 
 u8 Settings::KingdomColors(void) const

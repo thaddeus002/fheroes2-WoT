@@ -38,7 +38,6 @@
 extern bool DialogSelectMapsFileList(MapsFileInfoList &, std::string &);
 extern bool PrepareMapsFileInfoList(MapsFileInfoList &);
 
-u8  GetAllowChangeRaces(void);
 u16 GetStepFor(u16, u16, u16);
 void RedrawStaticInfo(void);
 void RedrawRatingInfo(TextSprite &);
@@ -110,8 +109,6 @@ Game::menu_t Game::ScenarioInfo(void)
     const Rect rectDifficultyHd(378, 124, levelCursor.w(), levelCursor.h());
     const Rect rectDifficultyEx(455, 124, levelCursor.w(), levelCursor.h());
     const Rect rectDifficultyIm(532, 124, levelCursor.w(), levelCursor.h());
-
-    u8 rnd_color = GetAllowChangeRaces();
 
     TextSprite rating;
     rating.SetFont(Font::BIG);
@@ -201,7 +198,7 @@ Game::menu_t Game::ScenarioInfo(void)
 
 	// select class
 	for(Color::color_t color = Color::BLUE; color != Color::GRAY; ++color)
-	    if((conf.KingdomColors(rnd_color & color)) &&
+	    if(conf.AllowChangeRace(color) &&
 		le.MouseClickLeft(coordClass[Color::GetIndex(color)]))
 	    {
 		cursor.Hide();
@@ -257,7 +254,6 @@ Game::menu_t Game::ScenarioInfo(void)
 	    levelCursor.Show();
 	    cursor.Show();
 	    display.Flip();
-	    rnd_color = GetAllowChangeRaces();
 	}
 	else
 	// click cancel
@@ -306,7 +302,7 @@ Game::menu_t Game::ScenarioInfo(void)
 	for(Color::color_t color = Color::BLUE; color != Color::GRAY; ++color)
 	    if(conf.KingdomColors(color) &&
 		le.MousePressRight(coordClass[Color::GetIndex(color)]))
-		    Dialog::Message(_("Class"), _("This lets you change the class of a player. Classes are not always changeable. Depending on the scenario, a player may receive additional towns and/or heroes not of their primary alingment."), Font::BIG);
+		    Dialog::Message(_("Class"), _("This lets you change the class of a player. Classes are not always changeable. Depending on the scenario, a player may receive additional towns and/or heroes not of their primary alignment."), Font::BIG);
 
 	//if(le.MousePressRight(?)) Dialog::Message(_("Difficulty Rating"), _("The difficulty rating reflects a combination of various settings for your game. This number will be applied to your final score."), Font::BIG);
 	if(le.MousePressRight(buttonOk)) Dialog::Message(_("OK"), _("Click to accept these settings and start a new game."), Font::BIG);
@@ -410,18 +406,18 @@ void RedrawOpponentsInfo(const Point & dst)
     {
 	if(conf.KingdomColors(color))
 	{
-	    const Sprite* sprite = NULL;
+	    u8 index = 0;
 
 	    if(!(conf.AllowColors(color)))
 	    {
 		switch(color)
 		{
-		    case Color::BLUE:	sprite = &AGG::GetICN(ICN::NGEXTRA, 15); break;
-		    case Color::GREEN:	sprite = &AGG::GetICN(ICN::NGEXTRA, 16); break;
-		    case Color::RED:	sprite = &AGG::GetICN(ICN::NGEXTRA, 17); break;
-		    case Color::YELLOW:	sprite = &AGG::GetICN(ICN::NGEXTRA, 18); break;
-		    case Color::ORANGE:	sprite = &AGG::GetICN(ICN::NGEXTRA, 19); break;
-		    case Color::PURPLE:	sprite = &AGG::GetICN(ICN::NGEXTRA, 20); break;
+		    case Color::BLUE:	index = 15; break;
+		    case Color::GREEN:	index = 16; break;
+		    case Color::RED:	index = 17; break;
+		    case Color::YELLOW:	index = 18; break;
+		    case Color::ORANGE:	index = 19; break;
+		    case Color::PURPLE:	index = 20; break;
 		    default: break;
 		}
 	    }
@@ -430,12 +426,12 @@ void RedrawOpponentsInfo(const Point & dst)
 	    {
 		switch(color)
 		{
-		    case Color::BLUE:	sprite = &AGG::GetICN(ICN::NGEXTRA,  9); break;
-		    case Color::GREEN:	sprite = &AGG::GetICN(ICN::NGEXTRA, 10); break;
-		    case Color::RED:	sprite = &AGG::GetICN(ICN::NGEXTRA, 11); break;
-		    case Color::YELLOW:	sprite = &AGG::GetICN(ICN::NGEXTRA, 12); break;
-		    case Color::ORANGE:	sprite = &AGG::GetICN(ICN::NGEXTRA, 13); break;
-		    case Color::PURPLE:	sprite = &AGG::GetICN(ICN::NGEXTRA, 14); break;
+		    case Color::BLUE:	index =  9; break;
+		    case Color::GREEN:	index = 10; break;
+		    case Color::RED:	index = 11; break;
+		    case Color::YELLOW:	index = 12; break;
+		    case Color::ORANGE:	index = 13; break;
+		    case Color::PURPLE:	index = 14; break;
 		    default: break;
 		}
 	    }
@@ -443,19 +439,20 @@ void RedrawOpponentsInfo(const Point & dst)
 	    {
 		switch(color)
 		{
-		    case Color::BLUE:	sprite = &AGG::GetICN(ICN::NGEXTRA, 3); break;
-		    case Color::GREEN:	sprite = &AGG::GetICN(ICN::NGEXTRA, 4); break;
-		    case Color::RED:	sprite = &AGG::GetICN(ICN::NGEXTRA, 5); break;
-		    case Color::YELLOW:	sprite = &AGG::GetICN(ICN::NGEXTRA, 6); break;
-		    case Color::ORANGE:	sprite = &AGG::GetICN(ICN::NGEXTRA, 7); break;
-		    case Color::PURPLE:	sprite = &AGG::GetICN(ICN::NGEXTRA, 8); break;
+		    case Color::BLUE:	index = 3; break;
+		    case Color::GREEN:	index = 4; break;
+		    case Color::RED:	index = 5; break;
+		    case Color::YELLOW:	index = 6; break;
+		    case Color::ORANGE:	index = 7; break;
+		    case Color::PURPLE:	index = 8; break;
 		    default: break;
 		}
 	    }
 
-	    if(sprite)
+	    if(index)
 	    {
-		Display::Get().Blit(*sprite, dst.x + GetStepFor(current, sprite->w(), count), dst.y);
+		const Sprite & sprite = AGG::GetICN(ICN::NGEXTRA, index);
+		Display::Get().Blit(sprite, dst.x + GetStepFor(current, sprite.w(), count), dst.y);
 		++current;
 	    }
 	}
@@ -496,16 +493,6 @@ void RedrawClassInfo(const Point & dst)
 
     	    ++current;
     }
-}
-
-u8 GetAllowChangeRaces(void)
-{
-    u8 result = 0;
-
-    for(Color::color_t color = Color::BLUE; color != Color::GRAY; ++color)
-	if(Race::RAND == Settings::Get().KingdomRace(color)) result |= color;
-
-    return result;
 }
 
 void RedrawRatingInfo(TextSprite & sprite)

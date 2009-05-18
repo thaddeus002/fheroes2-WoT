@@ -76,6 +76,7 @@ void Game::SaveXML(const std::string &fn)
     maps->SetAttribute("kingdom_colors", conf.current_maps_file.kingdom_colors);
     maps->SetAttribute("allow_colors", conf.current_maps_file.allow_colors);
     maps->SetAttribute("rnd_colors", conf.current_maps_file.rnd_colors);
+    maps->SetAttribute("rnd_races", conf.current_maps_file.rnd_races);
     maps->SetAttribute("conditions_wins", conf.current_maps_file.conditions_wins);
     maps->SetAttribute("wins1", conf.current_maps_file.wins1);
     maps->SetAttribute("wins2", conf.current_maps_file.wins2);
@@ -733,6 +734,8 @@ void Game::LoadXML(const std::string &fn)
     conf.current_maps_file.allow_colors = res;
     maps->Attribute("rnd_colors", &res);
     conf.current_maps_file.rnd_colors = res;
+    maps->Attribute("rnd_races", &res);
+    conf.current_maps_file.rnd_races = res;
     maps->Attribute("conditions_wins", &res);
     conf.current_maps_file.conditions_wins = res;
     maps->Attribute("wins1", &res);
