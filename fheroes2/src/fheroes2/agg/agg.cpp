@@ -157,7 +157,7 @@ void AGG::File::Dump(void) const
 }
 
 /* AGG::Cache constructor */
-AGG::Cache::Cache() : heroes2_agg(false)
+AGG::Cache::Cache() : sprites_memory_size(0)
 {
 #ifdef WITH_TTF
     Settings & conf = Settings::Get();
@@ -192,23 +192,26 @@ AGG::Cache & AGG::Cache::Get(void)
 /* attach AGG::File to AGG::Cache */
 bool AGG::Cache::AttachFile(const std::string & fname)
 {
+    std::string lower;
+    bool heroes2_agg = false;
     std::list<File *>::const_iterator it1 = agg_cache.begin();
     std::list<File *>::const_iterator it2 = agg_cache.end();
 
-    //if(it2 != std::find_if(it1, it2, ))
     for(; it1 != it2; ++it1)
     {
 	const File & agg_file = **it1;
-
 	if(agg_file.Name() == fname)
 	{
 	    Error::Warning("AGG::Cache::AttachFile: already present: " + fname);
-
-	    break;
+	    return false;
 	}
+
+	lower = agg_file.Name();
+	String::Lower(lower);
+	if(std::string::npos != lower.find("heroes2.agg")) heroes2_agg = true;
     }
 
-    std::string lower(fname);
+    lower = fname;
     String::Lower(lower);
 
     if(std::string::npos != lower.find(".agg"))
@@ -222,17 +225,12 @@ bool AGG::Cache::AttachFile(const std::string & fname)
 	}
 
 	if(std::string::npos != lower.find("heroes2.agg"))
-	{
 	    agg_cache.push_back(file);
-	    heroes2_agg = true;
-	}
 	else
 	if(std::string::npos != lower.find("heroes2x.agg"))
 	{
 	    if(heroes2_agg)
-	    {
 		agg_cache.insert(--(agg_cache.end()), file);
-	    }
 	    else
 		agg_cache.push_back(file);
 
@@ -399,7 +397,9 @@ void AGG::Cache::LoadICN(const ICN::icn_t icn, bool reflect)
 		sp.Load(sprite_file.c_str());
 		if(! sp.valid()) Error::Warning("AGG::Cache::LoadICN: broken image file: " + sprite_file);
 		sp.SetOffset(ox, oy);
+		sprites_memory_size += sp.GetSize();
 	    }
+	    if(2 < conf.Debug()) std::cout << "AGG::Cache::LoadICN: sprites count: " << count << ", total size: " << sprites_memory_size << std::endl;
 	}
 	else
 	if(conf.Debug()) 
@@ -448,8 +448,9 @@ void AGG::Cache::LoadICN(const ICN::icn_t icn, bool reflect)
 		    sp.Set(header.Width(), header.Height(), ICN::RequiresAlpha(icn));
 		    sp.SetOffset(header.OffsetX(), header.OffsetY());
 		    sp.LoadICN(&body[6 + header.OffsetData()], size_data, reflect);
-		    //v[ii] = sp;
+		    sprites_memory_size += sp.GetSize();
 		}
+		if(2 < conf.Debug()) std::cout << "AGG::Cache::LoadICN: sprites count: " << count_sprite << ", total size: " << sprites_memory_size << std::endl;
 
 		return;
 	    }
@@ -713,6 +714,13 @@ void AGG::Cache::FreeICN(const ICN::icn_t icn, bool reflect)
     if(Settings::Get().Debug()) Error::Verbose("AGG::Cache::FreeICN: " + ICN::GetString(icn));
 
     std::vector<Sprite> & v = reflect ? reflect_icn_cache[icn] : icn_cache[icn];
+
+    std::vector<Sprite>::const_iterator it1 = v.begin();
+    std::vector<Sprite>::const_iterator it2 = v.end();
+    for(; it1 != it2; ++it1) sprites_memory_size -= (*it1).GetSize();
+
+    if(2 < Settings::Get().Debug())
+	std::cout << "AGG::Cache::FreeICN: sprites count: " << v.size() << ", total size: " << sprites_memory_size << std::endl;
 
     if(v.size()) v.clear();
 }

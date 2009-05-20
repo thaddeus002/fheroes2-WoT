@@ -120,6 +120,8 @@ public:
     void Lock(void) const;
     void Unlock(void) const;
 
+    u32  GetSize(void) const;
+
     static void TILReflect(Surface & sf_dst, const Surface & sf_src, const u8 shape);
 
     static void SetDefaultDepth(u8);

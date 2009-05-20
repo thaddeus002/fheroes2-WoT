@@ -145,6 +145,18 @@ Game::menu_t Game::StartGame(void)
 
     cursor.Hide();
 
+    AGG::FreeObject(ICN::HEROES);
+    AGG::FreeObject(ICN::BTNSHNGL);
+    AGG::FreeObject(ICN::SHNGANIM);
+    AGG::FreeObject(ICN::BTNNEWGM);
+    AGG::FreeObject(ICN::REDBACK);
+    AGG::FreeObject(ICN::NGEXTRA);
+    AGG::FreeObject(ICN::NGHSBKG);
+    AGG::FreeObject(ICN::REQSBKG);
+    AGG::FreeObject(ICN::REQUEST);
+    AGG::FreeObject(ICN::REQUESTS);
+    AGG::FreeObject(ICN::ESCROLL);
+
     // preload sounds
     Game::PreloadLOOPSounds();
 

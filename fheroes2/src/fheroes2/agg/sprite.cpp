@@ -127,3 +127,8 @@ void Sprite::DrawICN(Surface & sf, const char *buf, const u32 size, bool reflect
 
     if(! alpha) sf.ResetAlpha();
 }
+
+u32 Sprite::GetSize(void) const
+{
+    return Surface::GetSize() + sizeof(offsetX) + sizeof(offsetY);
+}

@@ -813,3 +813,17 @@ void Surface::TILReflect(Surface & sf_dst, const Surface & sf_src, const u8 shap
 
     sf_dst.Unlock();
 }
+
+u32 Surface::GetSize(void) const
+{
+    u32 res = 0;
+
+    if(surface)
+    {
+	res = sizeof(SDL_Surface) + sizeof(SDL_PixelFormat) + surface->pitch * surface->h;
+
+	if(surface->format->palette) res += sizeof(SDL_Palette) + surface->format->palette->ncolors * sizeof(SDL_Color);
+    }
+
+    return res;
+}

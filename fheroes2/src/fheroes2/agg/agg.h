@@ -55,7 +55,7 @@ namespace AGG
     class File
     {
     public:
-	File(const std::string & fname);
+	File(const std::string &);
 	~File();
 
 	const std::string & Name(void) const;
@@ -129,7 +129,7 @@ namespace AGG
 	SDL::Font font_medium;
 	SDL::Font font_small;
 #endif
-	bool heroes2_agg;
+	u32 sprites_memory_size;
     };
 
     // wrapper AGG::PreloadObject
