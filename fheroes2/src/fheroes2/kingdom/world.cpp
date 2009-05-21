@@ -230,7 +230,7 @@ void World::LoadMaps(const std::string &filename)
     u16  byte16;
     u32  byte32;
     std::vector<u16> vec_object; // index maps for OBJ_CASTLE, OBJ_HEROES, OBJ_SIGN, OBJ_BOTTLE, OBJ_EVENT
-
+    vec_object.reserve(100);
 
     // endof
     fd.seekg(0, std::ios_base::end);
@@ -272,11 +272,11 @@ void World::LoadMaps(const std::string &filename)
     SwapLE32(byte32);
 
     // read all addons
-    std::vector<MP2::mp2addon_t> vec_mp2addons;
+    std::vector<MP2::mp2addon_t> vec_mp2addons(byte32);
 
     for(unsigned int ii = 0; ii < byte32; ++ii)
     {
-	MP2::mp2addon_t mp2addon;
+	MP2::mp2addon_t & mp2addon = vec_mp2addons[ii];
 
 	fd.read(reinterpret_cast<char *>(&mp2addon.indexAddon), sizeof(u16));
 	SwapLE16(mp2addon.indexAddon);
@@ -301,8 +301,6 @@ void World::LoadMaps(const std::string &filename)
 
 	fd.read(reinterpret_cast<char *>(&mp2addon.uniqNumberN2), sizeof(u32));
 	SwapLE32(mp2addon.uniqNumberN2);
-
-	vec_mp2addons.push_back(mp2addon);
     }
 
     const u32 endof_addons = fd.tellg();
@@ -312,7 +310,7 @@ void World::LoadMaps(const std::string &filename)
     // offset data
     fd.seekg(MP2OFFSETDATA, std::ios_base::beg);
 
-    vec_tiles.resize(width * height);
+    vec_tiles.resize(width * height, NULL);
 
     // read all tiles
     for(u16 ii = 0; ii < width * height; ++ii)
@@ -379,14 +377,14 @@ void World::LoadMaps(const std::string &filename)
 	Maps::Tiles * tile = new Maps::Tiles(ii, mp2tile);
 
 	// load all addon for current tils
-	while(byte16){
-
+	while(byte16)
+	{
 	    if(vec_mp2addons.size() <= byte16){ Error::Warning("World::World: index addons out of range!"); break; }
 
-	    (*tile).AddonsPushLevel1(vec_mp2addons.at(byte16));
-	    (*tile).AddonsPushLevel2(vec_mp2addons.at(byte16));
+	    (*tile).AddonsPushLevel1(vec_mp2addons[byte16]);
+	    (*tile).AddonsPushLevel2(vec_mp2addons[byte16]);
 
-	    byte16 = vec_mp2addons.at(byte16).indexAddon;
+	    byte16 = vec_mp2addons[byte16].indexAddon;
 	}
 
 	(*tile).AddonsSort();

@@ -36,7 +36,7 @@ bool ObjMulti::isPassable(const u16 icn, const u8 index)
 	    if(24 < index && index < 28) return false;
 	    else
 	    // dragon city
-	    if(50 < index && index < 56) return false;
+	    if(46 == index || (50 < index && index < 56)) return false;
 	    else
 	    // grave yard
 	    if(56 < index && index < 59) return false;

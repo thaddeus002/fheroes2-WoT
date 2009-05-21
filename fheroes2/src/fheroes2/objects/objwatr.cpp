@@ -30,7 +30,7 @@ bool ObjWater::isPassable(const u16 icn, const u8 index)
 	    if(2 == index) return false;
 	    else
 	    // ship
-	    if(12 == index || (18 < index && index < 23)) return false;
+	    if(11 == index || 12 == index || (18 < index && index < 23)) return false;
 	    
 	    else return true;
 

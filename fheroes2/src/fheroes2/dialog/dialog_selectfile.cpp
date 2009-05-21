@@ -612,7 +612,7 @@ bool DialogSelectMapsFileList(MapsFileInfoList & lists, std::string & filename)
 	    redraw = true;
 	}
 	else
-	if(((le.MouseClickLeft(buttonSelectXLarge) || le.KeyPress(KEY_l)) && buttonSelectXLarge.isEnable()) && buttonSelectXLarge.isEnable())
+	if(((le.MouseClickLeft(buttonSelectXLarge) || le.KeyPress(KEY_x)) && buttonSelectXLarge.isEnable()) && buttonSelectXLarge.isEnable())
 	{
 	    curlist = &xlarge;
 	    cur = top = curlist->begin();
