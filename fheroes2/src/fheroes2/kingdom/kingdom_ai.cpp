@@ -107,9 +107,9 @@ void Kingdom::AITurns(void)
 
     // turn indicator
     RedrawAITurns(color, 3);
-
+        
     // update roles
-    if(heroes.size()) std::for_each(heroes.begin(), heroes.end(), std::mem_fun(&Heroes::AIUpdateRoles));
+    if(heroes.size()) std::for_each(heroes.begin(), heroes.end(), std::bind2nd(std::mem_fun(&Heroes::SetModes), Heroes::SCOUTER|Heroes::HUNTER));
 
     // buy hero in capital
     if(heroes.empty() && ai_capital && ai_capital->isCastle())

@@ -57,19 +57,12 @@ Game::menu_t Game::HighScores(void)
     cursor.Show();
     display.Flip();
 
-    std::string str;
-    String::AddInt(str, Game::GetGameOverScores());
-    Dialog::Message("Your Score:", str, Font::BIG, Dialog::OK);
-
     // highscores loop
     while(le.HandleEvents())
     {
 	le.MousePressLeft(buttonDismiss) ? buttonDismiss.PressDraw() : buttonDismiss.ReleaseDraw();
 	le.MousePressLeft(buttonExit) ? buttonExit.PressDraw() : buttonExit.ReleaseDraw();
 
-	//if(le.MouseRight()) Error::Verbose(le.MousePressRight());
-
-	//if(le.MouseClickLeft(buttonDismiss)) return MAINMENU;
 	if(le.MouseClickLeft(buttonExit) || le.KeyPress(KEY_ESCAPE)) return MAINMENU;
     }
 

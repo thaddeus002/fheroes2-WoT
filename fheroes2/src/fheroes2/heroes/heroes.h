@@ -125,7 +125,6 @@ public:
     const std::string & GetName(void) const{ return name; };
     u8 GetType(void) const { return Skill::Primary::HEROES; };
 
-//    SpellBook* GetSpellBook(void) { return spell_book.isActive() ? &spell_book : NULL; };
     const SpellBook & GetSpellBook(void) const { return spell_book; };
     SpellBook & GetSpellBook(void) { return spell_book; };
 
@@ -221,7 +220,6 @@ public:
     bool ApplyPenaltyMovement(void);
 
     void AIAction(const u16 dst_index);
-    void AIUpdateRoles(void);
     bool AIValidObject(u16, u8);
     void AIRescueWhereMove(u16 &);
     bool AIPriorityObject(u16, u8);

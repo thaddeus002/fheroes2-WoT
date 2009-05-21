@@ -65,12 +65,6 @@ void AIToHeroes(Heroes &hero, const u8 obj, const u16 dst_index);
 void AIToDwellingRecruitMonster(Heroes &hero, const u8 obj, const u16 dst_index);
 void AIToStables(Heroes &hero, const u8 obj, const u16 dst_index);
 
-void Heroes::AIUpdateRoles(void)
-{
-    SetModes(SCOUTER);
-    SetModes(HUNTER);
-}
-
 Skill::Primary::skill_t AISelectPrimarySkill(Heroes &hero)
 {
     switch(hero.GetRace())

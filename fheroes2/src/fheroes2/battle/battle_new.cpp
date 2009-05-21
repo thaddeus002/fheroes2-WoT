@@ -1955,18 +1955,20 @@ namespace Battle
 
         bool mouseMotion = false;
 
-        // dialog menu loop
         while(le.HandleEvents())
         {
-            if(le.KeyPress(KEY_RETURN)) {
+            if(Settings::Get().Debug())
+            {
+    	      if(le.KeyPress(KEY_RETURN)) {
                 for(u16 i = 0; i < army2.size(); i++)
                     army2[i].SetCount(0);
                 return GUI::NONE;
-            }
-            if(le.KeyPress(KEY_BACKSPACE)) {
+              }
+              if(le.KeyPress(KEY_BACKSPACE)) {
                 for(u16 i = 0; i < army1.size(); i++)
                     army1[i].SetCount(0);
                 return GUI::NONE;
+              }
             }
             if(le.KeyPress(KEY_f) && m_battlefield->GetCatapult())
             {
