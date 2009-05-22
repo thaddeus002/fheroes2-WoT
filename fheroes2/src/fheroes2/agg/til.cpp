@@ -18,23 +18,23 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#include <cstdlib>
 #include "surface.h"
-#include "agg.h"
-#include "error.h"
 #include "til.h"
 
 namespace TIL
 {
-    static const tilmap_t tilmap[] = 
+    static const struct
     {
+	til_t type;
+	const char* string;
+    } tilmap[] = {
 	{ CLOF32,	"CLOF32.TIL" },
 	{ GROUND32,	"GROUND32.TIL" },
 	{ STON,		"STON.TIL" },
     };
 };
 
-const std::string  & TIL::GetString(const til_t til)
+const char* TIL::GetString(const til_t til)
 {
     return tilmap[til].string;
 }

@@ -21,9 +21,7 @@
 #ifndef H2MUS_H
 #define H2MUS_H
 
-#include <string>
 #include "gamedefs.h"
-#include "mp2.h"
 
 namespace MUS
 {
@@ -76,18 +74,11 @@ namespace MUS
         UNKNOWN
     } mus_t;
 
-    typedef struct
-    {
-        mus_t		type;
-        std::string     string;
-
-    } musmap_t;
-
-    const std::string  GetString(const mus_t mus);
+    const std::string GetString(const mus_t mus);
 
     mus_t FromGround(const u16 ground);
     mus_t FromRace(const u8 race);
-    mus_t FromMapObject(const MP2::object_t object);
+    mus_t FromMapObject(u8 object);
 };
 
 #endif

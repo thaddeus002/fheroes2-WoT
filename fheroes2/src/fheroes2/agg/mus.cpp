@@ -18,17 +18,22 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
+#include <string>
 #include <sstream>
 #include <iomanip>
 #include "race.h"
 #include "ground.h"
 #include "mus.h"
 #include "settings.h"
+#include "mp2.h"
 
 namespace MUS
 {
-    static const musmap_t musmap[] = 
+    static const struct
     {
+	mus_t type;
+	std::string string;
+    } musmap[] = {
         { UNUSED,       ""                    },
         { DATATRACK,    ""                    },
         { BATTLE1,      "Battle (1)"          },
@@ -118,7 +123,7 @@ MUS::mus_t MUS::FromRace(const u8 race)
     return UNKNOWN;
 }
 
-MUS::mus_t MUS::FromMapObject(const MP2::object_t object)
+MUS::mus_t MUS::FromMapObject(u8 object)
 {
     if(!Settings::Get().CDMusic())
         return MUS::UNKNOWN;

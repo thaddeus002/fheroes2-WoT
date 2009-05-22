@@ -21,30 +21,20 @@
 #ifndef H2TIL_H
 #define H2TIL_H
 
-#include <string>
 #include "gamedefs.h"
 
 class Surface;
 
 namespace TIL
 {
-    typedef enum
+    enum til_t
     {
 	CLOF32,
 	GROUND32,
 	STON,
+    };
 
-    } til_t;
-
-    typedef struct
-    {
-        til_t		type;
-        std::string	string;
-
-    } tilmap_t;
-    
-    const std::string  & GetString(const til_t til);
-
+    const char* GetString(const til_t til);
     void Reflect(Surface & sf_dst, const Surface & sf_src, const u8 shape);
 };
 

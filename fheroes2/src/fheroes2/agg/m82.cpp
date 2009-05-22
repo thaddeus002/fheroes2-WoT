@@ -23,8 +23,11 @@
 
 namespace M82
 {
-    static const m82map_t m82map[] = 
+    static const struct
     {
+	m82_t type;
+    	const char* string;
+    } m82map[] = {
 	{ AELMATTK,	"AELMATTK.82M" },
 	{ AELMKILL,	"AELMKILL.82M" },
 	{ AELMMOVE,	"AELMMOVE.82M" },
@@ -338,7 +341,7 @@ namespace M82
     };
 };
 
-const std::string  & M82::GetString(const m82_t m82)
+const char* M82::GetString(const m82_t m82)
 {
     return m82map[m82].string;
 }

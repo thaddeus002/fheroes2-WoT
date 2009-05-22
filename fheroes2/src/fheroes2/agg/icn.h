@@ -21,7 +21,6 @@
 #ifndef H2ICN_H
 #define H2ICN_H
 
-#include <string>
 #include "gamedefs.h"
 
 class Sprite;
@@ -932,14 +931,7 @@ namespace ICN
 	u32 offset_data;
     };
 
-    typedef struct
-    {
-        icn_t		type;
-        std::string	string;
-
-    } icnmap_t;
-
-    const std::string  & GetString(const icn_t icn);
+    const char* GetString(const icn_t icn);
     u16 AnimationFrame(const icn_t icn, const u16 start, const u32 ticket = 0, const u8 quantity = 0);
     bool RequiresAlpha(const icn_t icn);
     icn_t PORTxxxx(u8);

@@ -22,8 +22,11 @@
 
 namespace XMI
 {
-    static const xmimap_t xmimap[] = 
+    static const struct
     {
+	xmi_t type;
+	const char* string;
+   } xmimap[] = {
         { UNKNOWN,      "???"          },
 	{ MIDI0002,	"MIDI0002.XMI" },
 	{ MIDI0003,	"MIDI0003.XMI" },
@@ -45,7 +48,7 @@ namespace XMI
     };
 };
 
-const std::string  & XMI::GetString(const xmi_t xmi)
+const char* XMI::GetString(const xmi_t xmi)
 {
     return xmimap[xmi].string;
 }

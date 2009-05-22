@@ -21,12 +21,11 @@
 #ifndef H2XMI_H
 #define H2XMI_H
 
-#include <string>
 #include "mus.h"
 
 namespace XMI
 {
-    typedef enum
+    enum xmi_t
     {
 	UNKNOWN,
 	MIDI0002,
@@ -46,18 +45,9 @@ namespace XMI
 	MIDI0018,
 	MIDI0042,
 	MIDI0043,
+    };
 
-    } xmi_t;
-
-    typedef struct
-    {
-        xmi_t		type;
-        std::string	string;
-
-    } xmimap_t;
-
-    const std::string  & GetString(const xmi_t xmi);
-
+    const char* GetString(const xmi_t xmi);
     xmi_t FromMUS(const MUS::mus_t mus);
 };
 

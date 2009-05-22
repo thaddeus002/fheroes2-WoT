@@ -26,8 +26,11 @@
 
 namespace ICN
 {
-    static const icnmap_t icnmap[] = 
+    static const struct
     {
+        icn_t type;
+        const char* string;
+    } icnmap[] = {
 	{ ADVBORDE,	"ADVBORDE.ICN" },
 	{ ADVBORD,	"ADVBORD.ICN" },
 	{ ADVBTNS,	"ADVBTNS.ICN" },
@@ -904,7 +907,7 @@ namespace ICN
     };
 };
 
-const std::string  & ICN::GetString(const icn_t icn)
+const char* ICN::GetString(const icn_t icn)
 {
     return icnmap[icn].string;
 }

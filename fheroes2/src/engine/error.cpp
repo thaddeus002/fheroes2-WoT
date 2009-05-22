@@ -38,6 +38,11 @@ void Error::Warning(const std::string & message)
     std::cout << "warning: " << message << std::endl;
 }
 
+void Error::Warning(const std::string & message, const char* cstr)
+{
+    std::cout << "warning: " << message << cstr << std::endl;
+}
+
 void Error::Warning(const std::string & message, int value)
 {
     std::string str;
@@ -52,6 +57,11 @@ void Error::Warning(const std::string & message, int value)
 void Error::Verbose(const std::string & message)
 {
     std::cout << message << std::endl;
+}
+
+void Error::Verbose(const std::string & message, const char* cstr)
+{
+    std::cout << message << cstr << std::endl;
 }
 
 void Error::Verbose(const std::string & message, int value)

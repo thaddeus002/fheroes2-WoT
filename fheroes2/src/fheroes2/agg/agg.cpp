@@ -250,7 +250,7 @@ void AGG::Cache::LoadExtraICN(const ICN::icn_t icn, bool reflect)
 
     if(v.size()) return;
 
-    if(Settings::Get().Debug()) Error::Verbose("AGG::Cache::LoadICN: " + ICN::GetString(icn));
+    if(Settings::Get().Debug()) Error::Verbose("AGG::Cache::LoadICN: ", ICN::GetString(icn));
 
     u8 count = 0;		// for animation sprite need update count for ICN::AnimationFrame
 
@@ -406,7 +406,7 @@ void AGG::Cache::LoadICN(const ICN::icn_t icn, bool reflect)
     	    Error::Verbose("AGG::Cache::LoadICN: broken xml file: " + xml_spec);
     }
 
-    if(conf.Debug()) Error::Verbose("AGG::Cache::LoadICN: " + ICN::GetString(icn));
+    if(conf.Debug()) Error::Verbose("AGG::Cache::LoadICN: ", ICN::GetString(icn));
 
     // load from agg file
     if(agg_cache.size())
@@ -455,7 +455,7 @@ void AGG::Cache::LoadICN(const ICN::icn_t icn, bool reflect)
 		return;
 	    }
 
-	Error::Warning("AGG::Cache::LoadICN: not found: " + ICN::GetString(icn));
+	Error::Warning("AGG::Cache::LoadICN: not found: ", ICN::GetString(icn));
     }
 }
 
@@ -466,7 +466,7 @@ void AGG::Cache::LoadTIL(const TIL::til_t til)
 
     if(v.size()) return;
 
-    if(Settings::Get().Debug()) Error::Verbose("AGG::Cache::LoadTIL: " + TIL::GetString(til));
+    if(Settings::Get().Debug()) Error::Verbose("AGG::Cache::LoadTIL: ", TIL::GetString(til));
 
     if(agg_cache.size())
     {
@@ -504,7 +504,7 @@ void AGG::Cache::LoadTIL(const TIL::til_t til)
 		return;
 	    }
 
-	Error::Warning("AGG::Cache::LoadTIL: not found: " + TIL::GetString(til));
+	Error::Warning("AGG::Cache::LoadTIL: not found: ", TIL::GetString(til));
     }
 }
 
@@ -515,7 +515,7 @@ void AGG::Cache::LoadWAV(const M82::m82_t m82)
 
     if(v.size()) return;
 
-    if(Settings::Get().Debug()) Error::Verbose("AGG::Cache::LoadWAV: " + M82::GetString(m82));
+    if(Settings::Get().Debug()) Error::Verbose("AGG::Cache::LoadWAV: ", M82::GetString(m82));
 
     if(! Mixer::isValid()) return;
 
@@ -564,7 +564,7 @@ void AGG::Cache::LoadMID(const XMI::xmi_t xmi)
 
     if(v.size()) return;
 
-    if(Settings::Get().Debug()) Error::Verbose("AGG::Cache::LoadMID: " + XMI::GetString(xmi));
+    if(Settings::Get().Debug()) Error::Verbose("AGG::Cache::LoadMID: ", XMI::GetString(xmi));
 
     if(! Mixer::isValid()) return;
 
@@ -711,7 +711,7 @@ void AGG::Cache::LoadFNT(u16 ch)
 /* free ICN object in AGG::Cache */
 void AGG::Cache::FreeICN(const ICN::icn_t icn, bool reflect)
 {
-    if(Settings::Get().Debug()) Error::Verbose("AGG::Cache::FreeICN: " + ICN::GetString(icn));
+    if(Settings::Get().Debug()) Error::Verbose("AGG::Cache::FreeICN: ", ICN::GetString(icn));
 
     std::vector<Sprite> & v = reflect ? reflect_icn_cache[icn] : icn_cache[icn];
 
@@ -728,7 +728,7 @@ void AGG::Cache::FreeICN(const ICN::icn_t icn, bool reflect)
 /* free TIL object in AGG::Cache */
 void AGG::Cache::FreeTIL(const TIL::til_t til)
 {
-    if(Settings::Get().Debug()) Error::Verbose("AGG::Cache::FreeTIL: " + TIL::GetString(til));
+    if(Settings::Get().Debug()) Error::Verbose("AGG::Cache::FreeTIL: ", TIL::GetString(til));
 
     std::vector<Surface> & v = til_cache[til];
 
@@ -781,7 +781,7 @@ const Sprite & AGG::Cache::GetICN(const ICN::icn_t icn, u16 index, bool reflect)
 
     if(index >= v.size())
     {
-	Error::Warning("AGG::GetICN: " + ICN::GetString(icn) + ", index out of range: ", index);
+	Error::Warning("AGG::GetICN: " + std::string(ICN::GetString(icn)) + ", index out of range: ", index);
 
 	index = 0;
     }
@@ -791,7 +791,7 @@ const Sprite & AGG::Cache::GetICN(const ICN::icn_t icn, u16 index, bool reflect)
     if(! sprite.valid())
     {
 	Error::Warning("AGG::GetICN: icn: ", icn);
-	Error::Warning("AGG::GetICN: icn name: " + ICN::GetString(icn));
+	Error::Warning("AGG::GetICN: icn name: ", ICN::GetString(icn));
 	Error::Warning("AGG::GetICN: index: ", index);
 	Error::Except("AGG::GetICN: return is NULL");
     }
@@ -831,7 +831,7 @@ const Surface & AGG::Cache::GetTIL(const TIL::til_t til, u16 index, u8 shape)
 
     if(index2 >= v.size())
     {
-	Error::Warning("AGG::GetTIL: " + TIL::GetString(til) + ", index out of range: ", index);
+	Error::Warning("AGG::GetTIL: " + std::string(TIL::GetString(til)) + ", index out of range: ", index);
 	index2 = 0;
     }
 
@@ -851,7 +851,7 @@ const Surface & AGG::Cache::GetTIL(const TIL::til_t til, u16 index, u8 shape)
     if(! surface.valid())
     {
 	Error::Warning("AGG::GetTIL: icn: ", til);
-	Error::Warning("AGG::GetTIL: icn name: " + TIL::GetString(til));
+	Error::Warning("AGG::GetTIL: icn name: ", TIL::GetString(til));
 	Error::Warning("AGG::GetTIL: index: ", index);
 	Error::Except("AGG::GetTIL: return is NULL");
     }
@@ -977,7 +977,7 @@ void AGG::PlaySound(const M82::m82_t m82)
 
     if(conf.Sound())
     {
-	if(conf.Debug()) Error::Verbose("AGG::PlaySound: " + M82::GetString(m82));
+	if(conf.Debug()) Error::Verbose("AGG::PlaySound: ", M82::GetString(m82));
 
 	Mixer::PlayRAW(AGG::Cache::Get().GetWAV(m82));
     }
@@ -1007,7 +1007,7 @@ void AGG::PlayMusic(const MUS::mus_t mus, bool loop)
 	XMI::xmi_t xmi = XMI::FromMUS(mus);
 	if(XMI::UNKNOWN != xmi) Music::Play(AGG::Cache::Get().GetMID(xmi), loop);
         else Music::Reset();
-	if(conf.Debug()) Error::Verbose("AGG::PlayMusic: " + XMI::GetString(xmi));
+	if(conf.Debug()) Error::Verbose("AGG::PlayMusic: ", XMI::GetString(xmi));
     }
 }
 
