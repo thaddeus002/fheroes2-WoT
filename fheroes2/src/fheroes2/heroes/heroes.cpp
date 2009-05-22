@@ -40,9 +40,9 @@
 extern u16 DialogWithArtifact(const std::string & hdr, const std::string & msg, const Artifact::artifact_t art, const u16 buttons = Dialog::OK);
 extern void PlayPickupSound(void);
 
-const std::string & HeroesName(Heroes::heroes_t id)
+const char* HeroesName(Heroes::heroes_t id)
 {
-    static const std::string names[] = {
+    static const char* names[] = {
 	// knight
 	_("Lord Kilburn"), _("Sir Gallanth"), _("Ector"), _("Gvenneth"), _("Tyro"), _("Ambrose"), _("Ruby"), _("Maximus"), _("Dimitry"),
 	// barbarian
@@ -74,7 +74,7 @@ Heroes::Heroes(heroes_t ht, Race::race_t rc) : killer_color(Color::GRAY), experi
     artifacts(HEROESMAXARTIFACT, Artifact::UNKNOWN), army(this), spell_book(this), portrait(ht), race(rc),
     save_maps_general(MP2::OBJ_ZERO), path(*this), direction(Direction::RIGHT), sprite_index(18)
 {
-    name = HeroesName(ht);
+    name = _(HeroesName(ht));
 
     SetModes(ARMYSPREAD);
 
