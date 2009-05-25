@@ -922,10 +922,11 @@ u32 Army::army_t::GetDamageMin(void) const
     std::vector<Troop>::const_iterator it1 = army.begin();
     std::vector<Troop>::const_iterator it2 = army.end();
     u32 res = 0;
+    u8 count = 0;
 
-    for(; it1 != it2; ++it1) if((*it1).isValid()) res += (*it1).GetDamageMin();
+    for(; it1 != it2; ++it1) if((*it1).isValid()){ res += (*it1).GetDamageMin(); ++count; }
 
-    return res;
+    return count ? res / count : 0;
 }
 
 u32 Army::army_t::GetDamageMax(void) const
@@ -933,10 +934,11 @@ u32 Army::army_t::GetDamageMax(void) const
     std::vector<Troop>::const_iterator it1 = army.begin();
     std::vector<Troop>::const_iterator it2 = army.end();
     u32 res = 0;
+    u8 count = 0;
 
-    for(; it1 != it2; ++it1) if((*it1).isValid()) res += (*it1).GetDamageMax();
+    for(; it1 != it2; ++it1) if((*it1).isValid()){ res += (*it1).GetDamageMax(); ++count; }
 
-    return res;
+    return count ? res / count : 0;
 }
 
 void Army::army_t::CalculateForceRatiosVersus(const army_t &a, u32 &own, u32 &other)
