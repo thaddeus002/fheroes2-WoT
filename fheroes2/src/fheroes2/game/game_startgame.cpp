@@ -190,10 +190,6 @@ Game::menu_t Game::StartGame(void)
     Game::Focus & global_focus = Focus::Get();
     global_focus.Reset();
 
-    // generate sprite map
-    areaMaps.GenerateUltimateArtifactAreaSurface(world.GetUltimateArtifactIndex(), world.GetUltimateArtifactArea());
-    world.GetUltimateArtifactArea().Sepia();
-
     Mixer::Reset();
 
     // Create radar
@@ -980,7 +976,7 @@ Game::menu_t Game::HumanTurn(void)
 	// puzzle maps
 	if(le.KeyPress(KEY_p))
 	{
-	    Dialog::PuzzleMaps();
+	    myKingdom.PuzzleMaps().ShowMapsDialog();
 	}
 	else
 	// game info
@@ -1482,7 +1478,7 @@ Game::menu_t Game::HumanTurn(void)
 		switch(Dialog::AdventureOptions(Game::Focus::HEROES == global_focus.Type()))
 		{
 		    case Dialog::WORLD:	break;
-		    case Dialog::PUZZLE:	Dialog::PuzzleMaps(); break;
+		    case Dialog::PUZZLE: myKingdom.PuzzleMaps().ShowMapsDialog(); break;
 		    case Dialog::INFO:	Dialog::GameInfo(); break;
 
 		    case Dialog::DIG:

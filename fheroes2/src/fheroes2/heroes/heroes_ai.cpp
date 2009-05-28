@@ -1188,6 +1188,8 @@ void AIToObelisk(Heroes &hero, const u8 obj, const u16 dst_index)
     if(!hero.isVisited(obj, Visit::GLOBAL))
     {
         hero.SetVisited(dst_index, Visit::GLOBAL);
+        Kingdom & kingdom = world.GetKingdom(hero.GetColor());
+        kingdom.PuzzleMaps().Update(kingdom.CountVisitedObjects(MP2::OBJ_OBELISK), world.CountObeliskOnMaps());
     }
 
     if(Settings::Get().Debug()) Error::Verbose("AIToObelisk: " + hero.GetName());

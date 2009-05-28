@@ -25,7 +25,7 @@
 #include "race.h"
 #include "color.h"
 #include "resource.h"
-#include "gamedefs.h"
+#include "puzzle.h"
 #include "game.h"
 #include "mp2.h"
 #include "pairs.h"
@@ -103,6 +103,9 @@ public:
 
     bool HeroesMayStillMove(void) const;
 
+    const Puzzle & PuzzleMaps(void) const;
+    Puzzle & PuzzleMaps(void);
+    
     void Dump(void) const;
 
 private:
@@ -133,6 +136,8 @@ private:
     std::map<u16, MP2::object_t> ai_objects;
 
     std::list<IndexObject> visit_object;
+
+    Puzzle puzzle_maps;
 };
 
 #endif

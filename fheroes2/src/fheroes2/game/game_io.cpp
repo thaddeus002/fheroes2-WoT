@@ -490,10 +490,16 @@ void Game::SaveXML(const std::string &fn)
 	    }
 	}
 
+	// kingdoms->kingdom->recruits
 	TiXmlElement* recruits = new TiXmlElement("recruits");
 	kingdom2->LinkEndChild(recruits);
 	recruits->SetAttribute("hero1", kingdom.recruits.GetID1());
 	recruits->SetAttribute("hero2", kingdom.recruits.GetID2());
+
+	// kingdoms->kingdom->puzzle
+	TiXmlElement* puzzle = new TiXmlElement("puzzle");
+	kingdom2->LinkEndChild(puzzle);
+	puzzle->SetAttribute("value", kingdom.puzzle_maps.to_string().c_str());
     }
 
     // signs
@@ -1144,6 +1150,7 @@ void Game::LoadXML(const std::string &fn)
 	    }
 	}
 
+	// kingdoms->kingdom->recruits
 	TiXmlElement* recruits = kingdom2->FirstChildElement("recruits");
 	if(recruits)
 	{
@@ -1152,6 +1159,14 @@ void Game::LoadXML(const std::string &fn)
 	    recruits->Attribute("hero2", &res);
 	    kingdom->recruits.SetID2(res);
 	}
+
+	// kingdoms->kingdom->puzzle
+	TiXmlElement* puzzle = kingdom2->FirstChildElement("puzzle");
+	if(puzzle)
+	{
+	    kingdom->puzzle_maps = puzzle->Attribute("value");
+	}
+
 	world.vec_kingdoms.push_back(kingdom);
     }
 

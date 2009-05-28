@@ -1774,11 +1774,6 @@ u16 World::GetUltimateArtifactIndex(void)
     return ultimate_artifact;
 }
 
-Surface & World::GetUltimateArtifactArea(void)
-{
-    return ultimate_artifact_area;
-}
-
 u16 World::CountObeliskOnMaps(void)
 {
     std::vector<Maps::Tiles *>::const_iterator it1 = vec_tiles.begin();

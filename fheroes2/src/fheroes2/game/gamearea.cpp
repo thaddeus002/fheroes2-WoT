@@ -642,7 +642,8 @@ void GameArea::GenerateUltimateArtifactAreaSurface(const u16 index, Surface & sf
 	Display & display = Display::Get();
 	Point pt(index % world.w(), index / world.h());
 
-	Center(pt);
+        const Point reserved(*this);
+        Center(pt);
 	RedrawNoFog();
 
 	// blit marker
@@ -670,7 +671,11 @@ void GameArea::GenerateUltimateArtifactAreaSurface(const u16 index, Surface & sf
 	if(rt.y > BORDERWIDTH + TILEWIDTH * gh - rt.h) rt.y = BORDERWIDTH + TILEWIDTH * gh - rt.h;
 
 	sf.Blit(display, rt, 0, 0);
-	display.FillRect(0x00, 0x00, 0x00, Rect(BORDERWIDTH, BORDERWIDTH, gw * TILEWIDTH, gh * TILEWIDTH));
+
+        // restore position
+        gx = reserved.x;
+        gy = reserved.y;
+	Redraw();
     }
     else
     Error::Warning("GameArea::GenerateUltimateArtifactAreaSurface: artifact not found");

@@ -41,8 +41,8 @@ Dialog::FrameBorder::FrameBorder(bool fade, u16 enclosedWidth, u16 enclosedHeigh
 
     area.x = 640 == display.w() ? 0 : pos.x + BORDERWIDTH + SHADOWWIDTH;
     area.y = 640 == display.w() ? 0 : pos.y + BORDERWIDTH;
-    area.w = 640;
-    area.h = 480;
+    area.w = enclosedWidth;
+    area.h = enclosedHeight;
 
     if(Cursor::Get().isVisible()){ Cursor::Get().Hide(); };
     back.Save(pos);
