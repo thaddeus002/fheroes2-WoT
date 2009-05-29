@@ -199,17 +199,17 @@ void PuzzlesDraw(const Puzzle & pzl, const Surface & sf, s16 dstx, s16 dsty)
 	    for(size_t ii = 0; ii < pzl.size(); ++ii)
 	    {
     		const Sprite & piece = AGG::GetICN(ICN::PUZZLE, ii);
-		if(! pzl.test(ii))
-		{
-		    display.Blit(piece, dstx + piece.x() - BORDERWIDTH, dsty + piece.y() - BORDERWIDTH);
-		}
-		else
+		if(1 < Settings::Get().Debug() || pzl.test(ii))
 		{
 		    Surface fade(piece.w(), piece.h());
 		    fade.SetColorKey();
 		    fade.Blit(piece);
 		    fade.SetAlpha(alpha);
 		    display.Blit(fade, dstx + piece.x() - BORDERWIDTH, dsty + piece.y() - BORDERWIDTH);
+		}
+		else
+		{
+		    display.Blit(piece, dstx + piece.x() - BORDERWIDTH, dsty + piece.y() - BORDERWIDTH);
 		}
 	    }
 	    cursor.Show();

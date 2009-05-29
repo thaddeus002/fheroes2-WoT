@@ -408,6 +408,8 @@ Cursor::themes_t Game::GetCursor(const Maps::Tiles & tile)
 	{
 	    const Heroes & from_hero = focus.GetHeroes();
 
+	    if(from_hero.Modes(Heroes::ENABLEMOVE)) return Cursor::Get().Themes();
+
 	    if(from_hero.isShipMaster())
 	    {
 		switch(tile.GetObject())
