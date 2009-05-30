@@ -499,7 +499,7 @@ void Game::SaveXML(const std::string &fn)
 	// kingdoms->kingdom->puzzle
 	TiXmlElement* puzzle = new TiXmlElement("puzzle");
 	kingdom2->LinkEndChild(puzzle);
-	puzzle->SetAttribute("value", kingdom.puzzle_maps.to_string().c_str());
+	puzzle->SetAttribute("value", kingdom.puzzle_maps.to_string<char,std::char_traits<char>,std::allocator<char> >().c_str());
     }
 
     // signs

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2009-05-29 23:18-0400\n"
+"POT-Creation-Date: 2009-05-30 00:14-0400\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -221,7 +221,7 @@ msgid "Return to the battle."
 msgstr ""
 
 #: ../fheroes2/battle/battle_dialog.cpp:408
-#: ../fheroes2/battle/battle_new.cpp:3072
+#: ../fheroes2/battle/battle_new.cpp:3066
 msgid "Hero's Options"
 msgstr ""
 
@@ -316,48 +316,48 @@ msgstr ""
 msgid "%{move} %{name} here."
 msgstr ""
 
-#: ../fheroes2/battle/battle_new.cpp:3039
+#: ../fheroes2/battle/battle_new.cpp:3033
 msgid "Skip"
 msgstr ""
 
-#: ../fheroes2/battle/battle_new.cpp:3039
+#: ../fheroes2/battle/battle_new.cpp:3033
 msgid ""
 "Skip the current creature. The current creature loses its turn and does not "
 "get to go again until the next round."
 msgstr ""
 
-#: ../fheroes2/battle/battle_new.cpp:3040
-#: ../fheroes2/battle/battle_new.cpp:3064
+#: ../fheroes2/battle/battle_new.cpp:3034
+#: ../fheroes2/battle/battle_new.cpp:3058
 msgid "Auto Combat"
 msgstr ""
 
-#: ../fheroes2/battle/battle_new.cpp:3040
+#: ../fheroes2/battle/battle_new.cpp:3034
 msgid "Allows the computer to fight out the battle for you."
 msgstr ""
 
-#: ../fheroes2/battle/battle_new.cpp:3041
+#: ../fheroes2/battle/battle_new.cpp:3035
 #: ../fheroes2/editor/editor_startgame.cpp:804
 #: ../fheroes2/game/game_startgame.cpp:1599
 msgid "System Options"
 msgstr ""
 
-#: ../fheroes2/battle/battle_new.cpp:3041
+#: ../fheroes2/battle/battle_new.cpp:3035
 msgid "Allows you to customize the combat screen."
 msgstr ""
 
-#: ../fheroes2/battle/battle_new.cpp:3048
+#: ../fheroes2/battle/battle_new.cpp:3042
 msgid "Are you sure you want to retreat?"
 msgstr ""
 
-#: ../fheroes2/battle/battle_new.cpp:3060
+#: ../fheroes2/battle/battle_new.cpp:3054
 msgid "Skip this unit"
 msgstr ""
 
-#: ../fheroes2/battle/battle_new.cpp:3068
+#: ../fheroes2/battle/battle_new.cpp:3062
 msgid "Customize system options"
 msgstr ""
 
-#: ../fheroes2/battle/battle_new.cpp:3076
+#: ../fheroes2/battle/battle_new.cpp:3070
 msgid "View Opposing Hero"
 msgstr ""
 
