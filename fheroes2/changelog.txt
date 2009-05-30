@@ -1,20 +1,23 @@
-SVN - up to r1090
+SVN - up to r1115
 
 Users
-+ Added game over conditions
-+ Added If a hero is attacked in a castle, trigger castle battle, and properly merge armies before doing so.
++ Memory usage reductions.
++ Fixed various battle summary window glitches.
++ Fixed numerous errors with multi-cell attacks (dragons, cyclopes, etc).
++ Corrected logic error causing AI units to believe they could attack when they
+  shouldn't, and vice versa.
++ Added game over conditions.
 + Added puzzle piece fading effect.
-+ Fixed battle summary segfault with hero-less castle battles.
-+ Fixed enless good morale loop, and allow creatures to receive morale boosts when not attacking.
++ Creatures can now receive morale boosts when not attacking.
 + Fixed text for recruiting free monster dwellings.
 + Fixed incorrect logic for halving damage through castle walls.
-+ Fixed rare siuation in battle when ranged troops think they are performing a close attack even if they are not.
-+ Fixed starting resource for AI
-+ Fixed music resetting frequently. Fix lots of sound and music memory leaks.
-+ Enable keys repeat.
++ Fixed rare siuation in battle when ranged troops think they are performing a
+  melee attack even if they are not.
++ Fixed starting resource for AI.
++ Enabled key repeating.
 + Hero path arrows now reflect movement penalties.
 + Double clicking on an entry in a file selection box will choose that item.
-+ Added spanish translation.
++ Added Spanish translation.
 + Multiple events can now occur on the same day.
 + Fixed bug causing obelisks not to be counted past the first visited,
   causing maps like Dragon Rider to now work.
@@ -26,7 +29,8 @@ Users
   defending hero's army.
 
 Developers
-+ Remove SDL_Mixer music and sound callbacks, as they're not really necessary and potentially dangerous.
++ SDL_Mixer music and sound callbacks removed, as they were potentially dangerous
+  as used.
 
 April 23, 2009 - Development build r1021
 
