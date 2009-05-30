@@ -107,6 +107,13 @@ Army::BattleTroop & Army::BattleTroop::operator= (const Army::Troop & troop)
     return *this;
 }
 
+Point Army::BattleTroop::Front() const
+{
+    if(!isWide())
+        return Position();
+    else return Position() + Point(IsReflected() ? -1 : 1, 0);
+}
+
 void Army::BattleTroop::BlitR(const Point& dst_pt, bool reflect, int frame)
 {
     Display & display = Display::Get();

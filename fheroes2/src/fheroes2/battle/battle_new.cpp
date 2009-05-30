@@ -826,7 +826,8 @@ Army::battle_t Battle::BattleControl::RunBattle(HeroBase *hero1, HeroBase *hero2
             {
                 defender->SetModes(Army::RETALIATED);
                 TroopIndex defIdx = m_battlefield.GetIndexFromTroop(*defender);
-                PerformAttack(defIdx, troop.Position()); //FIXME: bug #2399649
+                Point retal = m_battlefield.PointToAttack(*defender, troop);
+                PerformAttack(defIdx, retal);
                 
                 attackerAlive = troop.isValid();
             }
@@ -1148,14 +1149,6 @@ Battle::WalkAction::WalkAction(Battlefield &battlefield, const Point &start, Arm
         myTroop.SetScreenPosition(Bf2Scr(myTroop.Position()));
 
         myTroop.Animate(Monster::AS_WALK);
-
-        /*DrawTroop(myTroop);
-          Display::Get().Flip();
-          while(le.HandleEvents())
-          {
-          if(le.KeyPress(KEY_RETURN))
-          break;
-          }*/
     }
     
     if(m_battlefield.GetCastle()
@@ -1214,14 +1207,6 @@ bool Battle::WalkAction::Step()
             if(m_step.y) m_step.x = -m_step.x;
             else m_step.x = 0;
             myTroop.Animate(Monster::AS_WALK);
-
-            /*DrawTroop(myTroop);
-              Display::Get().Flip();
-              while(le.HandleEvents())
-              {
-              if(le.KeyPress(KEY_RETURN))
-              break;
-              }*/
         }
         m_frame++;
     }
@@ -1429,6 +1414,7 @@ bool Battle::BattleControl::PerformAttackLogic(Army::BattleTroop &attacker, cons
     for(u16 tid = 0; tid < targets.size(); tid++)
     {
         Army::BattleTroop &target = *targets[tid];
+        target.SetMoving(Army::NOT_MOVING);
         int tempPerished = target.ApplyDamage(target.damageToApply);
         if(!tid) //Only the original target matters
         {
@@ -1445,6 +1431,10 @@ bool Battle::BattleControl::PerformAttackLogic(Army::BattleTroop &attacker, cons
 
     if(ranged) attacker.shots --;
 
+    attacker.ResetReflection();
+    if(attacker.isWide() && attacker.IsReflected() != attacker.WasReflected())
+        attacker.SetPosition(attacker.Position() + Point( attacker.IsReflected() ? 1 : -1, 0 ));
+
     return retaliate;
 }
 
@@ -1457,6 +1447,7 @@ void Battle::BattleControl::PerformAttackAnimation(Army::BattleTroop &attacker, 
     for(u16 tid = 0; tid < targets.size(); tid++)
     {
         Army::BattleTroop &target = *targets[tid];
+        target.SetMoving(Army::UNDER_ATTACK);
         long damage = target.damageToApply;
         Monster::animstate_t targetstate;
         M82::m82_t targetsound;
@@ -1493,14 +1484,6 @@ void Battle::BattleControl::PerformAttackAnimation(Army::BattleTroop &attacker, 
         mytrooptate = Monster::AS_ATT1P;
     else
         mytrooptate = Monster::AS_ATT2P;
-
-    bool reflect;
-    if(attacker.Position().y % 2 == 0)
-        reflect = attacker.Position().x >= targets[0]->Position().x;
-    else reflect = attacker.Position().x > targets[0]->Position().x;
-    attacker.SetReflect(reflect);
-    if(attacker.isWide() && attacker.WasReflected() != attacker.IsReflected())
-        attacker.SetPosition(attacker.Position() + Point( attacker.WasReflected() ? -1 : 1, 0 ));
         
     int delayFrames;
          
@@ -1577,10 +1560,6 @@ void Battle::BattleControl::PerformAttackAnimation(Army::BattleTroop &attacker, 
         }
         display.Flip();
     }
-
-    attacker.ResetReflection();
-    if(attacker.isWide() && attacker.IsReflected() != attacker.WasReflected())
-        attacker.SetPosition(attacker.Position() + Point( attacker.IsReflected() ? 1 : -1, 0 ));
 }
 
 bool Battle::BattleControl::PerformAttack(TroopIndex troopN, const Point &attack)
@@ -2380,7 +2359,7 @@ namespace Battle
             to.push_back(target.Position() + Point ( target.IsReflected() ? -1 : 1, 0 ));
 
         s8 minDX, maxDX;
-        if(target.Position().y % 2 == 0)
+        if(target.Position().y % 2)
         {
             minDX = 0;
             maxDX = 1;
@@ -2447,12 +2426,6 @@ namespace Battle
             for(delta.y = ystart; delta.y != yend; delta.y += yincr)
                 if((delta.x || delta.y) && BfValid(p + delta))
                 {
-                    /*DrawShadow(p + delta);
-                      Display::Get().Flip();
-                      while(le.HandleEvents())
-                      if(le.KeyPress(KEY_RETURN))
-                      break;*/
-                
                     // if(delta.x > 0 && delta.y) continue;
                     if(m_battlefield->CellFreeFor(p + delta, attacker, troopN)
                     && std::find(m_movePoints.begin(), m_movePoints.end(), p + delta) != m_movePoints.end()
@@ -2621,11 +2594,7 @@ namespace Battle
      */
     bool Battlefield::IsTroopAt(const Army::BattleTroop &troop, const Point &p)
     {
-        Point p2(troop.Position());
-        if(troop.isWide()) p2.x += troop.IsReflected() ? -1 : 1;
-        if(troop() != Monster::UNKNOWN && (p == troop.Position() || p == p2)) 
-            return true;
-        else return false;
+        return troop() != Monster::UNKNOWN && (p == troop.Position() || p == troop.Front());
     }
 
     /** Determine which troop, if one exists, is exactly at the given point
@@ -2808,18 +2777,40 @@ namespace Battle
         return CanAttack(first, tmpoints, second, tmpoint) >= 0;
     }
 
-    /** Popular a list with the targets for the given unit's attack at a given point
+    /** Determine the point closest to the given attacker of a given defender
+     *  \param attacker Unit performing attack
+     *  \param defender Unit defending
+     */
+    Point Battlefield::PointToAttack(const Army::BattleTroop &attacker, const Army::BattleTroop &defender)
+    {
+        if(!defender.isWide())
+            return defender.Position();
+
+        std::vector<Point> targets;
+        targets.push_back(defender.Position());
+        targets.push_back(defender.Front());
+        std::sort(targets.begin(), targets.end(), ClosestDistancePredicate(attacker.Position()));
+        return targets[0];
+    }
+
+    /** Populate a list with the targets for the given unit's attack at a given point
      *  \param[out] targets List of troop which will be affected
      *  \param[in] attacker Troop that is attacking
      *  \param[in] attack   Point which is being attacked
      *  \param[in] army1    Left army
      *  \param[in] army2    Right army
      */
-    void Battlefield::GetTargets(std::vector<Army::BattleTroop *> &targets, const Army::BattleTroop &attacker, const Point &attack)
+    void Battlefield::GetTargets(std::vector<Army::BattleTroop *> &targets, Army::BattleTroop &attacker, const Point &attack)
     {
         int t;
         Army::BattleTroop &mainTarget = (t = FindTroop(*m_army[0], attack), t >= 0 ? (*m_army[0])[t] : (*m_army[1])[FindTroop(*m_army[1], attack)]);
-        bool reflected = mainTarget.Position().x <= attacker.Position().x;
+
+        if(attack.y % 2 == 0)
+            attacker.SetReflect(attack.x < attacker.Position().x);
+        else attacker.SetReflect(attack.x <= attacker.Position().x);
+        if(attacker.isWide() && attacker.WasReflected() != attacker.IsReflected())
+            attacker.SetPosition(attacker.Position() + Point( attacker.WasReflected() ? -1 : 1, 0 ));    
+        
         targets.push_back(&mainTarget);
         switch(attacker())
         {
@@ -2829,20 +2820,15 @@ namespace Battle
             case Monster::PHOENIX:
             case Monster::CYCLOPS:
             {
-                bool wide = attacker.isWide();
-                Point base = attacker.Position();
-                int xIncr = reflected ? 0 : 1;
-                if(wide)
-                    base.x += xIncr;
-                Point incr = attack - base;
+                Point incr = attack - attacker.Front();
                 Point nextcell;
                 if(!incr.y) //Same y-plane
                     nextcell = attack + incr;
                 else
-                    nextcell = attack + Point( 0, incr.y);
-                /*printf("pos: %d, %d\n", attacker.Position().x, attacker.Position().y);
-                  printf("attack: %d, %d\n", attack.x, attack.y);
-                  printf("incr: %d, %d\n", incr.x, incr.y);*/
+                    nextcell = attack + Point( !incr.x ? (attacker.IsReflected() ? -1 : 1) : 0, incr.y);
+                /*printf("pos: %d, %d\n", attacker.Front().x, attacker.Front().y);
+                printf("attack: %d, %d\n", attack.x, attack.y);
+                printf("incr: %d, %d\n", incr.x, incr.y);*/
                 int t;
                 if((t = FindTroop(*m_army[0], nextcell)) >= 0
                    && &(*m_army[0])[t] != &attacker
@@ -2861,10 +2847,7 @@ namespace Battle
             {
                 Point base;
                 if(attacker == Monster::HYDRA)
-                {
-                    base = attacker.Position();
-                    base.x += attacker.IsReflected() ? -1 : 1;
-                }
+                    base = attacker.Front();
                 else base = attack;
                 
                 for(int x = -1; x <= 1; x++)

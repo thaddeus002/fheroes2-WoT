@@ -587,7 +587,7 @@ namespace Battle
         }
 
         // No count if troop is in motion
-        if(troop.isMoving() == Army::IN_MOTION)
+        if(troop.isMoving() == Army::IN_MOTION || troop.isMoving() == Army::UNDER_ATTACK)
             return;
         
         // draw count

@@ -180,6 +180,7 @@ namespace Battle
         static TroopIndex ApplyIndexModifier(TroopIndex);
         u8 GetSideFromIndex(TroopIndex);
 
+        static Point PointToAttack(const Army::BattleTroop &, const Army::BattleTroop &);
         static TroopIndex FindTroop(const Army::BattleArmy_t &, const Point &);
         static TroopIndex FindTroop(const std::vector<Army::BattleTroop*> &, const Point &);
         static TroopIndex FindTroopExact(const Army::BattleArmy_t &, const Point &);
@@ -192,7 +193,7 @@ namespace Battle
         int CanAttack(const Army::BattleTroop &, const PointList &, const Army::BattleTroop &, const Point &);
         bool IsTroopCloseTo(const Army::BattleTroop &, const Army::BattleTroop &);
 
-        void GetTargets(std::vector<Army::BattleTroop *> &, const Army::BattleTroop &, const Point &);
+        void GetTargets(std::vector<Army::BattleTroop *> &, Army::BattleTroop &, const Point &);
 
         void CleanupBodies();
 

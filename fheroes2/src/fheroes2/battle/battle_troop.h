@@ -34,7 +34,8 @@ namespace Army
     enum MovementState {
         NOT_MOVING,
         SELECTED,
-        IN_MOTION
+        IN_MOTION,
+        UNDER_ATTACK
     };
 
     enum flags_t
@@ -85,6 +86,7 @@ namespace Army
 	
         void SetPosition(const Point & pt) { pos = pt; };
         const Point& Position() const { return pos; };
+        Point Front() const;
         void SetScreenPosition(const Point & pt) { screenPos = pt; };
         const Point& ScreenPosition() const { return screenPos; };
         MovementState isMoving() const { return moving; }
