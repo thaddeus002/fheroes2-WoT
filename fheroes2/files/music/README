@@ -1,13 +1,49 @@
-list tracks:
+In order for fheroes2 to play the ripped HoMM II soundtrack, certain filename
+requirements must be met.  The full list of files is provided below, but there
+are ways to make the job easier than renaming 43 files.
+
+For Windows:
+  1. Install CDex (http://cdexos.sourcforge.net)
+  2. Install Python 2.x (http://www.python.org)
+  3. Unzip the fheroes2 source code
+  4. Under fheroes2/src/tools, there is a file called cdinfo.py. Double
+     click it, and a terminal window should open.
+  5. Place the HoMM II CD in the drive
+  6. Open CDex, go to Options -> Settings
+  7. Change the encoder to "Ogg Vorbis"
+  8. Click the Remote CDDB tab, click "Add Site", change Protocol to "CDDB",
+     type a@b.com in the email field, change Port to 8880
+  9. Click the Filenames tab, change Filename Format to %4, and set the
+     Recorded Tracks field to the files\music directory under your fheroes2
+     game directory.
+ 10. Click Ok, then CDDB -> Read Remote freedb
+ 11. Deselect the first track in the list, then click
+     Convert -> Extract CD track(s) to a Compressed Audio File
+ 12. When the program is finished ripping, open up fheroes2.cfg in the main
+     fheroes2 game directory in Wordpad, and change the music line to
+     "music = ext" (without the quotes)
+     
+For Linux:
+  I'm unsure of specific steps needed. You may be able to run CDex under wine
+  and follow the above steps, but this is untested. A CD ripper with the
+  ability to customize the CDDB to read from should be able to take the place
+  of CDex.
+
+You're done!  If the music is not playing ingame, feel free to ask questions
+in the fheroes2 Open Discussion message board at
+http://sourceforge.net/forum/forum.php?forum_id=335991
+
+List of required track names for full music support:
+
 02 Battle (1).ogg
 03 Battle (2).ogg
 04 Battle (3).ogg
 05 Barbarian Castle.ogg
 06 Sorceress Castle.ogg
 07 Warlock Castle.ogg
-08 Knight Castle.ogg
+08 Wizard Castle.ogg
 09 Necromancer Castle.ogg
-10 Wizard Castle.ogg
+10 Knight Castle.ogg
 11 Lava Theme.ogg
 12 Wasteland Theme.ogg
 13 Desert Theme.ogg
@@ -23,20 +59,20 @@ list tracks:
 23 Map Puzzle.ogg
 24 Roland's Campaign.ogg
 25.ogg
-25.ogg
-25.ogg
-25.ogg
-25.ogg
-25.ogg
-25.ogg
-25.ogg
-25.ogg
-25.ogg
-25.ogg
-25.ogg
-25.ogg
-25.ogg
-25.ogg
+26.ogg
+27.ogg
+28.ogg
+29.ogg
+30.ogg
+31.ogg
+32.ogg
+33.ogg
+34.ogg
+35.ogg
+36.ogg
+37.ogg
+38.ogg
+39.ogg
 40.ogg
 41.ogg
 42 Main Menu.ogg

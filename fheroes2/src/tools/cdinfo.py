@@ -42,29 +42,29 @@ offsets = []
 disclength = ""
 
 tracks = [
-    "Battle (1)",
-    "Battle (2)",
-    "Battle (3)",
-    "Barbarian Castle",
-    "Sorceress Castle",
-    "Warlock Castle",
-    "Knight Castle",
-    "Necromancer Castle",
-    "Wizard Castle",
-    "Lava Theme",
-    "Wasteland Theme",
-    "Desert Theme",
-    "Snow Theme",
-    "Swamp Theme",
-    "Ocean Theme",
-    "Dirt Theme",
-    "Grass Theme",
-    "Lost Game",
-    "Week (1)",
-    "Week (2) Month (1)",
-    "Month (2)",
-    "Map Puzzle",
-    "Roland's Campaign",
+    "02 Battle (1)",
+    "03 Battle (2)",
+    "04 Battle (3)",
+    "05 Barbarian Castle",
+    "06 Sorceress Castle",
+    "07 Warlock Castle",
+    "08 Wizard Castle",
+    "09 Necromancer Castle",
+    "10 Knight Castle",
+    "11 Lava Theme",
+    "12 Wasteland Theme",
+    "13 Desert Theme",
+    "14 Snow Theme",
+    "15 Swamp Theme",
+    "16 Ocean Theme",
+    "17 Dirt Theme",
+    "18 Grass Theme",
+    "19 Lost Game",
+    "20 Week (1)",
+    "21 Week (2) Month (1)",
+    "22 Month (2)",
+    "23 Map Puzzle",
+    "24 Roland's Campaign",
     "25",
     "26",
     "27",
@@ -82,8 +82,8 @@ tracks = [
     "39",
     "40",
     "41",
-    "Main Menu",
-    "Scenario Victory"
+    "42 Main Menu",
+    "43 Scenario Victory"
 ]
 
 discinfo = {
@@ -92,6 +92,12 @@ discinfo = {
     "DGENRE" : "Soundtrack",
     "PLAYORDER" : ""
 }
+
+def debug(*args):
+    for arg in args:
+        print arg,
+    print '\n',
+    sys.stdout.flush()
 
 class Client:
     def __init__(self, sock, addr):
@@ -109,7 +115,7 @@ class Client:
         response += "Content-Type: text/plain\r\n"
         response += "Content-Length: " + str(len(self.data)) + "\r\n"
         response += self.data + "\r\n"
-        print "sending response (%s)" % response
+        debug("sending response (%s)" % response)
         self.sock.send(response)
     
     def flush(self):
@@ -117,7 +123,7 @@ class Client:
             return
     
         if not self.http:
-            print "sending response (%s)" % self.data
+            debug("sending response (%s)" % self.data.strip())
             self.sock.send(self.data)
         else:
             self.httpFlush()
@@ -130,7 +136,7 @@ class Client:
         return self.sock.recv(size)
 
 def actOnAccept(client):
-    client.send("%s CDDBP server v1.0PL0 ready at %s" % (socket.gethostname(), time.strftime("%a %b %H:%M:%S %Y")))
+    client.send("201 %s CDDBP server v1.0PL0 ready at %s" % (socket.gethostname(), time.strftime("%a %b %H:%M:%S %Y")))
     return True
 
 def actOnQuery(client, data):
@@ -141,13 +147,13 @@ def actOnQuery(client, data):
         offsets.append(elements[4 + track].strip())
         track += 1
     disclength = elements[len(elements) - 1].strip()
-    client.send("soundtrack %s %s" % (elements[2].strip(), discinfo["DTITLE"]))
+    client.send("200 soundtrack %s %s" % (elements[2].strip(), discinfo["DTITLE"]))
     return True
 
 def actOnRead(client, data):
     global disclength
     elements = data.split(' ')
-    client.send("soundtrack %s CD database entry follows (until terminating `.')" % elements[3].strip())
+    client.send("210 soundtrack %s CD database entry follows (until terminating `.')" % elements[3].strip())
     client.send("# xmcd 2.0 CD database file")
     client.send("# Track frame offsets:")
     for offset in offsets:
@@ -171,8 +177,14 @@ def actOnQuit(client, data):
 def actOnHello(client, data):
     elements = data.split(' ')
     elements = map(lambda x: x.strip(), elements)
-    client.send("hello and welcome %s@%s running %s %s" % (elements[2], elements[3],
+    client.send("200 hello and welcome %s@%s running %s %s" % (elements[2], elements[3],
                                                                elements[4], elements[5]))
+    return True
+
+def actOnProto(client, data):
+    elements = data.split(' ')
+    elements = map(lambda x: x.strip(), elements)
+    client.send("201 OK, protocol version now: %s" % elements[1])
     return True
 
 def actHTTPcmd(client, data):
@@ -184,7 +196,12 @@ def actHTTPcmd(client, data):
     #return parseMessage(client, cmd)
     return False
 
+# Based on http://ftp.freedb.org/pub/freedb/latest/CDDBPROTO
+
 def parseMessage(client, data):
+    if not data:
+        return False
+    
     handled = False
     ret = True
     handlers = {
@@ -192,11 +209,12 @@ def parseMessage(client, data):
         "cddb hello" : actOnHello,
         "cddb query" : actOnQuery,
         "cddb read"  : actOnRead,
-        "quit"       : actOnQuit
+        "quit"       : actOnQuit,
+        "proto"      : actOnProto
     }
     for key, handler in handlers.items():
         if data.startswith(key):
-            print "handling message (%s)" % data
+            debug("handling message (%s)" % data.strip())
             ret = handler(client, data)
             client.flush()
             if client.http:
@@ -204,7 +222,8 @@ def parseMessage(client, data):
             handled = True
             break
     if not handled:
-        print "Received unexpected message (%s)" % data
+        debug("Received unexpected message (%s)" % data.strip())
+        client.send("500 error")
     return ret
 
 def main(argc, argv):
@@ -221,27 +240,28 @@ def main(argc, argv):
     except socket.error, (value, message):
         if s:
             s.close()
-            print "Socket error: " + message
+            debug("Socket error:", message)
             return 1
-    print "Started server on port %s" % port
+    debug("Started server on port %s" % port)
     while 1:
+        time.sleep(0.01)
         try:
             sock, address = s.accept()
-            print "Connection by ", address
+            debug("Connection by", address)
             client = Client(sock, address)
             actOnAccept(client)
             client.flush()
             running = True
             while running:
+                time.sleep(0.01)
                 data = client.recv(size)
-                if data:
-                    running = parseMessage(client, data)
+                running = parseMessage(client, data)
             client.close()
         except socket.error, (value, message):
-            print "Socket error: ", message
+            debug("Socket error:", message)
             client.close()
         except KeyboardInterrupt:
-            print "Shutting down server"
+            debug("Shutting down server")
             s.close();
             break
     return 0
