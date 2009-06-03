@@ -28,7 +28,7 @@
 #include <list>
 #include <deque>
 #include "network.h"
-#include "clientsocket.h"
+#include "remoteclient.h"
 
 class FH2Server : public Network::Server
 {
@@ -40,17 +40,18 @@ public:
 
     bool Bind(u16);
     void Exit(void);
-    
+
+    void StorePlayersInfo(std::vector<Player> &);
+
 protected:
-    friend class ClientSocket;
+    friend class FH2RemoteClient;
 
     FH2Server();
     int ConnectionChat(void);
 
     Mutex mutex;
     std::deque<MessageID> queue;
-    std::list<ClientSocket> clients;
-    u8 allow_colors;
+    std::list<FH2RemoteClient> clients;
     bool exit;
     u32 admin_id;
     std::string banner;

@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2006 by Andrey Afletdinov                               *
+ *   Copyright (C) 2009 by Andrey Afletdinov                               *
  *   afletdinov@mail.dc.baikal.ru                                          *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -17,33 +17,27 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef H2COLOR_H
-#define H2COLOR_H
 
-#include <string>
+#ifndef H2LOCALCLIENT_H
+#define H2LOCALCLIENT_H
+
 #include "gamedefs.h"
 
-namespace Color
+#ifdef WITH_NET
+
+#include "network.h"
+
+class FH2LocalClient : public FH2Client
 {
-    enum color_t
-    {
-        BLUE    = 0x01,
-        GREEN   = 0x02,
-        RED     = 0x04,
-        YELLOW  = 0x08,
-        ORANGE  = 0x10,
-        PURPLE  = 0x20,
-        GRAY    = 0x40,
-    };
+public:
+    FH2LocalClient();
+    bool Connect(const std::string &, u16);
 
-    inline color_t& operator++ (color_t& color){ return color = ( GRAY == color ? BLUE : color_t(color << 1)); };
-    inline color_t& operator-- (color_t& color){ return color = ( BLUE == color ? GRAY : color_t(color >> 1)); };
+    int Error(const std::string &);
+    int ConnectionChat(void);
 
-    const std::string & String(u8);
-    
-    u8 GetIndex(color_t);
-    u8 GetFirst(u8);
-    color_t Get(u8);
+    std::string server;
 };
 
+#endif
 #endif

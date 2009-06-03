@@ -67,6 +67,14 @@ Color::color_t Color::Get(u8 index)
 	case PURPLE:	return PURPLE;
 	default: break;
     }
-    
+
     return GRAY;
+}
+
+u8 Color::GetFirst(u8 colors)
+{
+    Color::color_t color = Color::BLUE;
+    for(; color != Color::GRAY; ++color) if(color & colors) return color;
+
+    return 0;
 }

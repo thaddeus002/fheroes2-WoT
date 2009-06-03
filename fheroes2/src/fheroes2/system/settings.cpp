@@ -214,6 +214,11 @@ void Settings::LoadFileMaps(const std::string & file)
     game_difficulty = Difficulty::NORMAL;
 }
 
+Maps::FileInfo & Settings::CurrentFileInfo(void)
+{
+    return current_maps_file;
+}
+
 /* return major version */
 u8 Settings::MajorVersion(void) const { return major_version; }
 
@@ -533,17 +538,7 @@ u16 Settings::GetPort(void) const
 
 Race::race_t Settings::KingdomRace(u8 color) const
 {
-    switch(color)
-    {
-	case Color::BLUE:       return Race::Get(current_maps_file.races[0]);
-        case Color::GREEN:      return Race::Get(current_maps_file.races[1]);
-        case Color::RED:        return Race::Get(current_maps_file.races[2]);
-        case Color::YELLOW:     return Race::Get(current_maps_file.races[3]);
-        case Color::ORANGE:     return Race::Get(current_maps_file.races[4]);
-        case Color::PURPLE:     return Race::Get(current_maps_file.races[5]);
-        default: break;
-    }
-    return Race::BOMG;
+    return Race::Get(current_maps_file.KingdomRace(color));
 }
 
 void Settings::SetKingdomRace(u8 color, u8 race)
@@ -592,19 +587,7 @@ bool Settings::AllowColors(u8 f) const
 
 Color::color_t Settings::FirstAllowColor(void) const
 {
-    if(current_maps_file.allow_colors & Color::BLUE)	return Color::BLUE;
-    else
-    if(current_maps_file.allow_colors & Color::GREEN)	return Color::GREEN;
-    else
-    if(current_maps_file.allow_colors & Color::RED)	return Color::RED;
-    else
-    if(current_maps_file.allow_colors & Color::YELLOW)	return Color::YELLOW;
-    else
-    if(current_maps_file.allow_colors & Color::ORANGE)	return Color::ORANGE;
-    else
-    if(current_maps_file.allow_colors & Color::PURPLE)	return Color::PURPLE;
-
-    return Color::GRAY;
+    return Color::Get(Color::GetFirst(current_maps_file.allow_colors));
 }
 
 bool Settings::AllowChangeRace(u8 f) const

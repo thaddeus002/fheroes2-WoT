@@ -26,6 +26,8 @@
 #ifdef WITH_NET
 
 #include "sdlnet.h"
+#include "client.h"
+#include "maps_fileinfo.h"
 
 typedef std::pair<Network::Message, u32> MessageID;
 
@@ -38,10 +40,10 @@ enum msg_t
         MSG_MESSAGE,
 
         MSG_HELLO,
+        MSG_PLAYERS,
         MSG_LOGOUT,
         MSG_SHUTDOWN,
 
-        MSG_LOADMAPS,
         MSG_TURNS,
         MSG_HEROES,
         MSG_CASTLE,
@@ -57,9 +59,13 @@ namespace Network
 {
     int			RunDedicatedServer(void);
     const char*         GetMsgString(u16);
+    
+    void		PacketPushMapsFileInfo(Network::Message &, const Maps::FileInfo &);
+    void		PacketPopMapsFileInfo(Network::Message &, Maps::FileInfo &);
+    void		PacketPushPlayersInfo(Network::Message &, const std::vector<Player> &);
+    void		PacketPopPlayersInfo(Network::Message &, std::vector<Player> &);
 
-    //bool PacketAsk(Socket &, Message &);
-    //bool PacketWait(Socket &, Message &, u16);
+    u8			GetPlayersColors(std::vector<Player> &);
 };
 
 #endif

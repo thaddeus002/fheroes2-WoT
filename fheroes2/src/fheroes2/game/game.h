@@ -21,7 +21,8 @@
 #ifndef H2GAME_H
 #define H2GAME_H
 
-#include <types.h>
+#include "rect.h"
+#include "types.h"
 
 #define RADARWIDTH	144
 #define BORDERWIDTH	16
@@ -30,6 +31,7 @@ class Heroes;
 class Castle;
 class Surface;
 class Kingdom;
+class Player;
 
 namespace Game
 {
@@ -100,6 +102,13 @@ namespace Game
 
     u8  GetRating(void);
     u16 GetGameOverScores(void);
+
+    namespace Scenario
+    {
+	void RedrawStaticInfo(const Point &);
+	void RedrawOpponentsInfo(const Point &, const std::vector<Player> *players = NULL);
+	void RedrawClassInfo(const Point &);
+    };
 
     namespace Editor
     {

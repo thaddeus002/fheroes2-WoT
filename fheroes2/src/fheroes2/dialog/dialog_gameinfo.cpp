@@ -23,11 +23,9 @@
 #include "cursor.h"
 #include "button.h"
 #include "maps.h"
+#include "game.h"
 #include "game_over.h"
 #include "dialog.h"
-
-extern void RedrawOpponentsInfo(const Point &);
-extern void RedrawClassInfo(const Point &);
 
 void Dialog::GameInfo(void)
 {
@@ -84,13 +82,13 @@ void Dialog::GameInfo(void)
     text.Blit(pt.x + 52, pt.y + 150);
 
     Point dst(pt.x + 40, pt.y + 165);
-    RedrawOpponentsInfo(dst);
+    Game::Scenario::RedrawOpponentsInfo(dst);
 
     text.Set(_("Class"), Font::SMALL, 350);
     text.Blit(pt.x + 52, pt.y + 225);
 
     dst.y = pt.y + 240;
-    RedrawClassInfo(dst);
+    Game::Scenario::RedrawClassInfo(dst);
 
     text.Set(_("Victory\nConditions"), Font::SMALL, 80);
     text.Blit(pt.x + 40, pt.y + 345);

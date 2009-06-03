@@ -39,6 +39,7 @@ namespace Maps
 
     u8 AllowColorsCount(void) const;
     u8 KingdomColorsCount(void) const;
+    u8 KingdomRace(u8) const;
 
     GameOver::conditions_t ConditionWins(void) const;
     GameOver::conditions_t ConditionLoss(void) const;

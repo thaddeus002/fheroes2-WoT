@@ -33,16 +33,14 @@
 #include "kingdom.h"
 #include "splitter.h"
 #include "world.h"
+#include "player.h"
 #include "game.h"
 
 extern bool DialogSelectMapsFileList(MapsFileInfoList &, std::string &);
 extern bool PrepareMapsFileInfoList(MapsFileInfoList &);
 
 u16 GetStepFor(u16, u16, u16);
-void RedrawStaticInfo(void);
 void RedrawRatingInfo(TextSprite &);
-void RedrawOpponentsInfo(const Point &);
-void RedrawClassInfo(const Point &);
 void UpdateCoordOpponentsInfo(const Point &, std::vector<Rect> &);
 void UpdateCoordClassInfo(const Point &, std::vector<Rect> &);
 
@@ -74,13 +72,13 @@ Game::menu_t Game::ScenarioInfo(void)
     // set first maps settings
     conf.LoadFileMaps(lists.front().file);
 
-    Button buttonSelectMaps(513, 77, ICN::NGEXTRA, 64, 65);
-    Button buttonOk(234, 413, ICN::NGEXTRA, 66, 67);
-    Button buttonCancel(491, 413, ICN::NGEXTRA, 68, 69);
+    const Point pointPanel(204, 32);
+    const Point pointOpponentInfo(pointPanel.x + 24, pointPanel.y + 202);
+    const Point pointClassInfo(pointPanel.x + 24, pointPanel.y + 282);
 
-    const Point pointDifficultyNormal(302, 124);
-    const Point pointOpponentInfo(228, 234);
-    const Point pointClassInfo(228, 314);
+    Button buttonSelectMaps(pointPanel.x + 309, pointPanel.y + 45, ICN::NGEXTRA, 64, 65);
+    Button buttonOk(pointPanel.x + 31, pointPanel.y + 380, ICN::NGEXTRA, 66, 67);
+    Button buttonCancel(pointPanel.x + 287, pointPanel.y + 380, ICN::NGEXTRA, 68, 69);
 
     // vector coord colors opponent
     std::vector<Rect> coordColors(KINGDOMMAX);
@@ -92,27 +90,32 @@ Game::menu_t Game::ScenarioInfo(void)
     conf.SetMyColor(conf.FirstAllowColor());
     conf.SetPlayersColors(conf.MyColor());
 
-    RedrawStaticInfo();
+    // image background
+    const Sprite &back = AGG::GetICN(ICN::HEROES, 0);
+    display.Blit(back);
+
+    Scenario::RedrawStaticInfo(pointPanel);
 
     UpdateCoordOpponentsInfo(pointOpponentInfo, coordColors);
-    RedrawOpponentsInfo(pointOpponentInfo);
+    Scenario::RedrawOpponentsInfo(pointOpponentInfo);
 
     UpdateCoordClassInfo(pointClassInfo, coordClass);
-    RedrawClassInfo(pointClassInfo);
+    Scenario::RedrawClassInfo(pointClassInfo);
 
+    const Point pointDifficultyNormal(pointPanel.x + 98, pointPanel.y + 92);
     SpriteCursor levelCursor(AGG::GetICN(ICN::NGEXTRA, 62), pointDifficultyNormal);
     levelCursor.Show(pointDifficultyNormal);
     conf.SetGameDifficulty(Difficulty::NORMAL);
 
-    const Rect rectDifficultyEs(225, 124, levelCursor.w(), levelCursor.h());
+    const Rect rectDifficultyEs(pointPanel.x + 21, pointPanel.y + 92, levelCursor.w(), levelCursor.h());
     const Rect rectDifficultyNr(pointDifficultyNormal.x, pointDifficultyNormal.y, levelCursor.w(), levelCursor.h());
-    const Rect rectDifficultyHd(378, 124, levelCursor.w(), levelCursor.h());
-    const Rect rectDifficultyEx(455, 124, levelCursor.w(), levelCursor.h());
-    const Rect rectDifficultyIm(532, 124, levelCursor.w(), levelCursor.h());
+    const Rect rectDifficultyHd(pointPanel.x + 174, pointPanel.y + 92, levelCursor.w(), levelCursor.h());
+    const Rect rectDifficultyEx(pointPanel.x + 251, pointPanel.y + 92, levelCursor.w(), levelCursor.h());
+    const Rect rectDifficultyIm(pointPanel.x + 328, pointPanel.y + 92, levelCursor.w(), levelCursor.h());
 
     TextSprite rating;
     rating.SetFont(Font::BIG);
-    rating.SetPos(370, 415);
+    rating.SetPos(pointPanel.x + 166, pointPanel.y + 383);
     RedrawRatingInfo(rating);
 
     buttonSelectMaps.Draw();
@@ -191,7 +194,7 @@ Game::menu_t Game::ScenarioInfo(void)
 		    conf.SetPlayersColors(conf.MyColor());
 	    	    break;
 	    }
-	    RedrawOpponentsInfo(pointOpponentInfo);
+	    Scenario::RedrawOpponentsInfo(pointOpponentInfo);
 	    cursor.Show();
 	    display.Flip();
 	}
@@ -217,10 +220,10 @@ Game::menu_t Game::ScenarioInfo(void)
 		}
 		conf.SetKingdomRace(color, race);
 
-		RedrawStaticInfo();
+		Scenario::RedrawStaticInfo(pointPanel);
 		levelCursor.Redraw();
-		RedrawOpponentsInfo(pointOpponentInfo);
-		RedrawClassInfo(pointClassInfo);
+		Scenario::RedrawOpponentsInfo(pointOpponentInfo);
+		Scenario::RedrawClassInfo(pointClassInfo);
 		RedrawRatingInfo(rating);
 
 		cursor.Show();
@@ -244,11 +247,11 @@ Game::menu_t Game::ScenarioInfo(void)
 	    conf.SetMyColor(conf.FirstAllowColor());
 	    conf.SetPlayersColors(conf.MyColor());
 
-	    RedrawStaticInfo();
+	    Scenario::RedrawStaticInfo(pointPanel);
 	    UpdateCoordOpponentsInfo(pointOpponentInfo, coordColors);
-	    RedrawOpponentsInfo(pointOpponentInfo);
+	    Scenario::RedrawOpponentsInfo(pointOpponentInfo);
 	    UpdateCoordClassInfo(pointClassInfo, coordClass);
-	    RedrawClassInfo(pointClassInfo);
+	    Scenario::RedrawClassInfo(pointClassInfo);
 	    RedrawRatingInfo(rating);
 	    levelCursor.Move(pointDifficultyNormal);
 	    levelCursor.Show();
@@ -346,57 +349,51 @@ void UpdateCoordOpponentsInfo(const Point & dst, std::vector<Rect> & rects)
 	}
 }
 
-void RedrawStaticInfo(void)
+void Game::Scenario::RedrawStaticInfo(const Point & pt)
 {
     Display & display = Display::Get();
-
     const Settings & conf = Settings::Get();
-
-    // image background
-    const Sprite &back = AGG::GetICN(ICN::HEROES, 0);
-    display.Blit(back);
 
     // image panel
     const Sprite &shadow = AGG::GetICN(ICN::NGHSBKG, 1);
-    display.Blit(shadow, 196, 40);
+    display.Blit(shadow, pt.x - 8, pt.y + 8);
     const Sprite &panel = AGG::GetICN(ICN::NGHSBKG, 0);
-    display.Blit(panel, 204, 33);
+    display.Blit(panel, pt);
 
     // text scenario
     Text text(_("Scenario:"), Font::BIG);
-    text.Blit(414 - text.w()/2, 53);
+    text.Blit(pt.x + (panel.w() - text.w()) / 2, pt.y + 20);
 
     // maps name
     text.Set(conf.MapsName());
-    text.Blit(374 - text.w()/2, 78);
+    text.Blit(pt.x + (panel.w() - text.w()) / 2, pt.y + 46);
     
     // text game difficulty
     text.Set(_("Game Difficulty:"));
-    text.Blit(414 - text.w()/2, 107);
+    text.Blit(pt.x + (panel.w() - text.w()) / 2, pt.y + 75);
 
     //
     text.Set(_("Easy"), Font::SMALL);
-    text.Blit(260 - text.w()/2, 196);
+    text.Blit(pt.x + 57 - text.w()/2, 196);
     text.Set(_("Normal"));
-    text.Blit(336 - text.w()/2, 196);
+    text.Blit(pt.x + 134 - text.w()/2, 196);
     text.Set(_("Hard"));
-    text.Blit(412 - text.w()/2, 196);
+    text.Blit(pt.x + 210 - text.w()/2, 196);
     text.Set(_("Expert"));
-    text.Blit(490 - text.w()/2, 196);
+    text.Blit(pt.x + 287 - text.w()/2, 196);
     text.Set(_("Impossible"));
-    text.Blit(566 - text.w()/2, 196);
+    text.Blit(pt.x + 364 - text.w()/2, 196);
 
     // text opponents
     text.Set(_("Opponents:"), Font::BIG);
-    text.Blit(414 - text.w()/2, 213);
+    text.Blit(pt.x + (panel.w() - text.w()) / 2, pt.y + 181);
 
     // text class
     text.Set(_("Class:"), Font::BIG);
-    text.Blit(414 - text.w()/2, 290);
+    text.Blit(pt.x + (panel.w() - text.w()) / 2, pt.y + 262);
 }
 
-
-void RedrawOpponentsInfo(const Point & dst)
+void Game::Scenario::RedrawOpponentsInfo(const Point & dst, const std::vector<Player> *players)
 {
     const Settings & conf = Settings::Get();
     const u8 count = conf.KingdomColorsCount();
@@ -412,12 +409,12 @@ void RedrawOpponentsInfo(const Point & dst)
 	    {
 		switch(color)
 		{
-		    case Color::BLUE:	index = 15; break;
-		    case Color::GREEN:	index = 16; break;
-		    case Color::RED:	index = 17; break;
-		    case Color::YELLOW:	index = 18; break;
-		    case Color::ORANGE:	index = 19; break;
-		    case Color::PURPLE:	index = 20; break;
+		    case Color::BLUE:	index = players ? 39 : 15; break;
+		    case Color::GREEN:	index = players ? 40 : 16; break;
+		    case Color::RED:	index = players ? 41 : 17; break;
+		    case Color::YELLOW:	index = players ? 42 : 18; break;
+		    case Color::ORANGE:	index = players ? 43 : 19; break;
+		    case Color::PURPLE:	index = players ? 44 : 20; break;
 		    default: break;
 		}
 	    }
@@ -426,12 +423,12 @@ void RedrawOpponentsInfo(const Point & dst)
 	    {
 		switch(color)
 		{
-		    case Color::BLUE:	index =  9; break;
-		    case Color::GREEN:	index = 10; break;
-		    case Color::RED:	index = 11; break;
-		    case Color::YELLOW:	index = 12; break;
-		    case Color::ORANGE:	index = 13; break;
-		    case Color::PURPLE:	index = 14; break;
+		    case Color::BLUE:	index = players ? 33 :  9; break;
+		    case Color::GREEN:	index = players ? 34 : 10; break;
+		    case Color::RED:	index = players ? 35 : 11; break;
+		    case Color::YELLOW:	index = players ? 36 : 12; break;
+		    case Color::ORANGE:	index = players ? 37 : 13; break;
+		    case Color::PURPLE:	index = players ? 38 : 14; break;
 		    default: break;
 		}
 	    }
@@ -439,12 +436,12 @@ void RedrawOpponentsInfo(const Point & dst)
 	    {
 		switch(color)
 		{
-		    case Color::BLUE:	index = 3; break;
-		    case Color::GREEN:	index = 4; break;
-		    case Color::RED:	index = 5; break;
-		    case Color::YELLOW:	index = 6; break;
-		    case Color::ORANGE:	index = 7; break;
-		    case Color::PURPLE:	index = 8; break;
+		    case Color::BLUE:	index = players ? 27 : 3; break;
+		    case Color::GREEN:	index = players ? 28 : 4; break;
+		    case Color::RED:	index = players ? 29 : 5; break;
+		    case Color::YELLOW:	index = players ? 30 : 6; break;
+		    case Color::ORANGE:	index = players ? 31 : 7; break;
+		    case Color::PURPLE:	index = players ? 32 : 8; break;
 		    default: break;
 		}
 	    }
@@ -453,13 +450,25 @@ void RedrawOpponentsInfo(const Point & dst)
 	    {
 		const Sprite & sprite = AGG::GetICN(ICN::NGEXTRA, index);
 		Display::Get().Blit(sprite, dst.x + GetStepFor(current, sprite.w(), count), dst.y);
+		
+		// draw name
+		if(players)
+		{
+		    std::vector<Player>::const_iterator itp = std::find_if(players->begin(), players->end(), std::bind2nd(std::mem_fun_ref(&Player::isColor), color));
+		    if(players->end() != itp)
+		    {
+			Text name((*itp).player_name, Font::SMALL);
+			name.Blit(dst.x + GetStepFor(current, sprite.w(), count) + (sprite.w() - name.w()) / 2, dst.y + sprite.h() - 14);
+		    }
+		}
+
 		++current;
 	    }
 	}
     }
 }
 
-void RedrawClassInfo(const Point & dst)
+void Game::Scenario::RedrawClassInfo(const Point & dst)
 {
     Display & display = Display::Get();
     const Settings & conf = Settings::Get();

@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2006 by Andrey Afletdinov                               *
+ *   Copyright (C) 2009 by Andrey Afletdinov                               *
  *   afletdinov@mail.dc.baikal.ru                                          *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -17,33 +17,26 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef H2COLOR_H
-#define H2COLOR_H
+
+#ifndef H2PLAYER_H
+#define H2PLAYER_H
 
 #include <string>
 #include "gamedefs.h"
 
-namespace Color
+class Player
 {
-    enum color_t
-    {
-        BLUE    = 0x01,
-        GREEN   = 0x02,
-        RED     = 0x04,
-        YELLOW  = 0x08,
-        ORANGE  = 0x10,
-        PURPLE  = 0x20,
-        GRAY    = 0x40,
-    };
+public:
+    Player() : player_color(0) {};
 
-    inline color_t& operator++ (color_t& color){ return color = ( GRAY == color ? BLUE : color_t(color << 1)); };
-    inline color_t& operator-- (color_t& color){ return color = ( BLUE == color ? GRAY : color_t(color >> 1)); };
+    bool isID(u32 id) const { return id == player_id; };
+    bool isColor(u8 color) const { return color == player_color; };
+    bool isName(const std::string & name) const { return name == player_name; };
 
-    const std::string & String(u8);
-    
-    u8 GetIndex(color_t);
-    u8 GetFirst(u8);
-    color_t Get(u8);
+    u8 player_color;
+    u8 player_race;
+    std::string player_name;
+    u32 player_id;
 };
 
 #endif

@@ -44,6 +44,7 @@ public:
 	NONE              = 0x00000000,
 	LOADGAME          = 0x00000001,
 	AUTOSAVE          = 0x00000002,
+	DEDICATEDSERVER   = 0x00000004,
 
         FONTRENDERBLENDED = 0x00008000,
 
@@ -75,6 +76,7 @@ public:
 
     void Dump(std::ostream & stream = std::cout) const;
     void LoadFileMaps(const std::string & file);
+    Maps::FileInfo & CurrentFileInfo(void);
 
     u8 MajorVersion(void) const;
     u8 MinorVersion(void) const;

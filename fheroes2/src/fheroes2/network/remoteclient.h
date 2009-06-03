@@ -18,47 +18,31 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#ifndef CLIENTSOCKET_H
-#define CLIENTSOCKET_H
+#ifndef H2REMOTECLIENT_H
+#define H2REMOTECLIENT_H
 
 #ifdef WITH_NET
 
 #include "gamedefs.h"
 #include "thread.h"
 #include "network.h"
-#include "bitmodes.h"
 
 class FH2Server;
 
-enum status_t
-{
-    ST_CONNECT          = 0x0001,
-    ST_ADMIN            = 0x0008,
-    ST_SHUTDOWN         = 0x0010,
-};
-
-class ClientSocket : public Network::Socket, public BitModes
+class FH2RemoteClient : public FH2Client
 {
 public:
-    ClientSocket();
+    FH2RemoteClient();
 
-    bool IsConnected(void) const;
-    void Join(TCPsocket);
+    int Error(const std::string &);
+    int ConnectionChat(void);
+
     void RunThread(void);
-    void Shutdown(void);
+    void ShutdownThread(void);
 
-    const std::string & GetName(void) const;
-    int  ConnectionChat(void);
-
-    bool IsThreadID(u32) const;
-    u32 GetThreadID(void) const;
-
-private:
     static int callbackCreateThread(void *);
 
     Thread thread;
-    Network::Message packet;
-    std::string name;
 };
 
 #endif

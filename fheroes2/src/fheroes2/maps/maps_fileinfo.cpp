@@ -433,6 +433,21 @@ u8 Maps::FileInfo::KingdomColorsCount(void) const
     return colors.count();
 }
 
+u8 Maps::FileInfo::KingdomRace(u8 color) const
+{
+    switch(color)
+    {
+        case Color::BLUE:       return races[0];
+        case Color::GREEN:      return races[1];
+	case Color::RED:        return races[2];
+        case Color::YELLOW:     return races[3];
+        case Color::ORANGE:     return races[4];
+        case Color::PURPLE:     return races[5];
+        default: break;
+    }
+    return 0;
+}
+
 GameOver::conditions_t Maps::FileInfo::ConditionWins(void) const
 {
     switch(conditions_wins)

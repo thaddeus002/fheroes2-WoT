@@ -22,22 +22,35 @@
 #define H2CLIENT_H
 
 #include "gamedefs.h"
+#include "player.h"
 
 #ifdef WITH_NET
 
-#include "network.h"
+#include <vector>
+#include "bitmodes.h"
+#include "sdlnet.h"
 
-class FH2Client : public Network::Socket
+enum status_t
+{
+    ST_CONNECT          = 0x0001,
+    ST_ADMIN            = 0x0008,
+    ST_SHUTDOWN         = 0x0010,
+    ST_ALLOWPLAYERS     = 0x0020,
+};
+
+class FH2Client : public Network::Socket, public BitModes, public Player
 {
 public:
-    FH2Client();
+    FH2Client(){ players.reserve(6); };
 
-    bool Connect(const std::string &, u16);
-    int ConnectionChat(void);
+    virtual ~FH2Client(){};
+    virtual int Error(const std::string &) = 0;
+    virtual int ConnectionChat(void) = 0;
 
-private:
-    std::string name;
-    u8 color;
+    bool IsConnected(void) const { return Modes(ST_CONNECT) && sd; };
+
+    Network::Message packet;
+    std::vector<Player> players;
 };
 
 #endif

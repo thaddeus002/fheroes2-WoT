@@ -275,11 +275,11 @@ u8 SelectCountPlayers(void)
 
 	le.MousePressLeft(buttonCancel) ? buttonCancel.PressDraw() : buttonCancel.ReleaseDraw();
 
-	if(le.MouseClickLeft(button2Players)) return 2;
-	if(le.MouseClickLeft(button3Players)) return 3;
-	if(le.MouseClickLeft(button4Players)) return 4;
-	if(le.MouseClickLeft(button5Players)) return 5;
-	if(le.MouseClickLeft(button6Players)) return 6;
+	if(le.MouseClickLeft(button2Players) || le.KeyPress(KEY_2)) return 2;
+	if(le.MouseClickLeft(button3Players) || le.KeyPress(KEY_3)) return 3;
+	if(le.MouseClickLeft(button4Players) || le.KeyPress(KEY_4)) return 4;
+	if(le.MouseClickLeft(button5Players) || le.KeyPress(KEY_5)) return 5;
+	if(le.MouseClickLeft(button6Players) || le.KeyPress(KEY_6)) return 6;
 
 	if(le.MouseClickLeft(buttonCancel) || le.KeyPress(KEY_ESCAPE)) return 0;
 
