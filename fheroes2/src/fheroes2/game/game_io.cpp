@@ -18,6 +18,7 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
+#include <sstream>
 #include <cstring>
 #include <ctime>
 #include "settings.h"
@@ -643,13 +644,46 @@ void Game::SaveXML(const std::string &fn)
 	}
     }
 
-    doc.SaveFile(fn.c_str());
+    ogzstream gzout(fn.c_str());
+    if(gzout.good())
+    {
+	TiXmlPrinter prn;
+	doc.Accept(&prn);
+	const char *buf = prn.CStr();
+	const char *ptr = buf;
+	size_t bsz = prn.Size();
+	while(ptr < buf + bsz) gzout << *ptr++;
+	gzout.close();
+    }
+    else
+    {
+	Error::Verbose("Game::LoadXML: broken gz stream");
+	return;
+    }
 }
 
 void Game::LoadXML(const std::string &fn)
 {
+    igzstream gzin(fn.c_str());
+    std::vector<char> buf;
+    buf.reserve(3500000);
+    if(gzin.good())
+    {
+	char c;
+	while(gzin.get(c)) buf.push_back(c);
+	gzin.close();
+    }
+    else
+    {
+	Error::Verbose("Game::LoadXML: broken gz stream");
+	return;
+    }
+
     TiXmlDocument doc;
-    if (!doc.LoadFile(fn.c_str())) return;
+    doc.Parse(&buf[0]);
+
+    buf.clear();
+    buf.reserve(10);
 
     TiXmlElement* root = doc.FirstChildElement();
 

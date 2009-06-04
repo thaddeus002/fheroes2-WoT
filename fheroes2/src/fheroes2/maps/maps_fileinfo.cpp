@@ -68,19 +68,16 @@ bool Maps::FileInfo::Read(const std::string &filename)
 
 bool Maps::FileInfo::ReadXML(const std::string &filename)
 {
-    TiXmlDocument doc;
-
-    // prepare small xml in to memory (for fast loading)
-    std::fstream fd(filename.c_str(), std::ios::in | std::ios::binary);
-    if(! fd || fd.fail())
+    igzstream gzin(filename.c_str());
+    if(gzin.fail())
     {
         Error::Warning("Maps::FileInfo::ReadXML: " + filename +", file not found.");
         return false;
     }
 
     std::vector<char> buf(1024, 0);
-    fd.read(&buf[0], buf.size() - 1);
-    fd.close();
+    for(u16 ii = 0; ii < buf.size() - 1; ++ii) gzin.get(buf[ii]);
+    gzin.close();
 
     const char* pred1 = "<game";
     const char* pred2 = "</fheroes2>";
@@ -95,6 +92,7 @@ bool Maps::FileInfo::ReadXML(const std::string &filename)
     buf.resize(it - buf.begin() + std::strlen(pred2) + 1);
     std::copy(pred2, pred2 + std::strlen(pred2) + 1, it);
 
+    TiXmlDocument doc;
     // parse block
     doc.Parse(&buf[0]);
 

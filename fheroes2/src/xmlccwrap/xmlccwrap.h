@@ -22,5 +22,6 @@
 #define XMLWRAP_H
 
 #include "tinyxml.h"
+#include "gzstream.h"
 
 #endif

@@ -11,10 +11,12 @@ else
 CFLAGS	:= -O2
 endif
 
+LDFLAGS  = -lz
+
 all: $(TARGET).so $(TARGET).a
 
 $(TARGET).so: $(patsubst %.cpp, %.o, $(wildcard *.cpp))
-	$(CC) -shared -fPIC -o $@ $^
+	$(CC) -shared -fPIC -o $@ $^ $(LDFLAGS)
 
 $(TARGET).a: $(patsubst %.cpp, %.o, $(wildcard *.cpp))
 	ar crvs $@ $^
