@@ -46,8 +46,8 @@ class MageGuild : public SpellStorage
 	static Spell::spell_t GetSpellRace(const Race::race_t rc, const u8 lvl);
 
     private:
-	friend void Game::SaveXML(const std::string &);
-	friend void Game::LoadXML(const std::string &);
+	friend void Game::SaveXMLDoc(TiXmlDocument &);
+	friend bool Game::LoadXMLDoc(const TiXmlDocument &);
 
 	const Race::race_t &	race;
 	u8			level;

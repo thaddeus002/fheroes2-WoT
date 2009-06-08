@@ -41,14 +41,17 @@ enum status_t
 class FH2Client : public Network::Socket, public BitModes, public Player
 {
 public:
-    FH2Client(){ players.reserve(6); };
+    FH2Client();
 
     virtual ~FH2Client(){};
-    virtual int Error(const std::string &) = 0;
     virtual int ConnectionChat(void) = 0;
 
-    bool IsConnected(void) const { return Modes(ST_CONNECT) && sd; };
+    bool IsConnected(void) const;
 
+    bool Wait(Network::Message &, u16, bool debug = false);
+    bool Send(Network::Message &, bool debug = false);
+    bool Recv(Network::Message &, bool debug = false);
+            
     Network::Message packet;
     std::vector<Player> players;
 };

@@ -40,11 +40,11 @@ bool PredicateHeroesIsFreeman(const Heroes *h)
     return h && h->isFreeman();
 }
 
-World & world = World::GetWorld();
+World & world = World::Get();
 
 u32 World::uniq0 = 0;
 
-World & World::GetWorld(void)
+World & World::Get(void)
 {
     static World insideWorld;
 

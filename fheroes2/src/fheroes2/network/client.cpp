@@ -18,26 +18,59 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#ifndef H2LOCALCLIENT_H
-#define H2LOCALCLIENT_H
-
-#include "gamedefs.h"
-
 #ifdef WITH_NET
 
-#include "network.h"
+#include "client.h"
 
-class FH2LocalClient : public FH2Client
+FH2Client::FH2Client()
 {
-public:
-    FH2LocalClient();
-    bool Connect(const std::string &, u16);
+    players.reserve(6);
+}
 
-    int ConnectionChat(void);
-    int ScenarioInfoDialog(void);
+bool FH2Client::IsConnected(void) const
+{
+    return Modes(ST_CONNECT) && sd;
+}
 
-    std::string server;
-};
+bool FH2Client::Wait(Network::Message & packet, u16 id, bool debug)
+{
+    while(1)
+    {
+        if(Ready())
+        {
+            if(!packet.Recv(*this))
+            {
+                Close();
+                if(debug) std::cerr << "error" << std::endl;
+                return false;
+            }
+            if(id == packet.GetID()) break;
+        }
+	DELAY(10);
+    }
+    return true;
+}
 
-#endif
+bool FH2Client::Send(Network::Message & packet, bool debug)
+{
+    if(!packet.Send(*this))
+    {
+        Close();
+        if(debug) std::cerr << "error" << std::endl;
+        return false;
+    }
+    return true;
+}
+
+bool FH2Client::Recv(Network::Message & packet, bool debug)
+{
+    if(!packet.Recv(*this))
+    {
+        Close();
+        if(debug) std::cerr << "error" << std::endl;
+        return false;
+    }
+    return true;
+}
+
 #endif

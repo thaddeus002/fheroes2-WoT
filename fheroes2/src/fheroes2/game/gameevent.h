@@ -44,9 +44,9 @@ public:
     const std::string & GetMessage(void) const{ return message; };
 
 private:
-    friend void Game::SaveXML(const std::string &);
-    friend void Game::LoadXML(const std::string &);
-    
+    friend void Game::SaveXMLDoc(TiXmlDocument &);
+    friend bool Game::LoadXMLDoc(const TiXmlDocument &);
+
     Resource::funds_t resource;
     bool computer;
     u16 first;
@@ -69,8 +69,8 @@ public:
     Artifact::artifact_t GetArtifact(void) const {return artifact; };
 
 private:
-    friend void Game::SaveXML(const std::string &);
-    friend void Game::LoadXML(const std::string &);
+    friend void Game::SaveXMLDoc(TiXmlDocument &);
+    friend bool Game::LoadXMLDoc(const TiXmlDocument &);
 
     u16 index_map;
     Resource::funds_t resource;
@@ -96,8 +96,8 @@ public:
     void SetQuiet(void);
 
 private:
-    friend void Game::SaveXML(const std::string &);
-    friend void Game::LoadXML(const std::string &);
+    friend void Game::SaveXMLDoc(TiXmlDocument &);
+    friend bool Game::LoadXMLDoc(const TiXmlDocument &);
 
     u16 index_map;
     Resource::funds_t resource;

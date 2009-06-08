@@ -5,18 +5,10 @@
 TARGET	:= libxmlccwrap
 CC 	:= g++
 
-ifdef DEBUG
-CFLAGS	:= -O0 -g
-else
-CFLAGS	:= -O2
-endif
-
-LDFLAGS  = -lz
-
 all: $(TARGET).so $(TARGET).a
 
 $(TARGET).so: $(patsubst %.cpp, %.o, $(wildcard *.cpp))
-	$(CC) -shared -fPIC -o $@ $^ $(LDFLAGS)
+	$(CC) -shared -fPIC -o $@ $^ $(LIBS)
 
 $(TARGET).a: $(patsubst %.cpp, %.o, $(wildcard *.cpp))
 	ar crvs $@ $^

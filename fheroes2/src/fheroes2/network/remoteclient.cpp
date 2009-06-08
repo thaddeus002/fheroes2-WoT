@@ -66,14 +66,8 @@ void FH2RemoteClient::ShutdownThread(void)
     SetModes(0);
 }
 
-int FH2RemoteClient::Error(const std::string & str)
+int FH2RemoteClient::Logout(void)
 {
-    Settings & conf = Settings::Get();
-    Close();
-    modes = 0;
-    if(2 < conf.Debug()) std::cerr << "error" << std::endl;
-    if(conf.Debug()) std::cerr << "FH2RemoteClient::Error: id: 0x" << std::hex << player_id << ", " << str << std::endl;
-
     packet.Reset();
     packet.SetID(MSG_LOGOUT);
     packet.Push(std::string("logout: lost connection"));
@@ -113,13 +107,12 @@ int FH2RemoteClient::ConnectionChat(void)
 
     // send ready
     if(extdebug) std::cerr << "FH2RemoteClient::ConnectionChat: id: 0x" << std::hex << player_id << ", send ready...";
-    if(!packet.Send(*this)) return Error("close socket");
+    if(!Send(packet, extdebug)) return Logout();
     if(extdebug) std::cerr << "ok" << std::endl;
 
     // recv hello
     if(extdebug) std::cerr << "FH2RemoteClient::ConnectionChat: id: 0x" << std::hex << player_id << ", recv hello...";
-    if(!packet.Recv(*this)) return Error("close socket");
-    if(MSG_HELLO != packet.GetID()) return Error("unknown client");
+    if(!Wait(packet, MSG_HELLO, extdebug)) return Logout();
     if(extdebug) std::cerr << "ok" << std::endl;
 
     packet.Pop(player_name);
@@ -132,7 +125,7 @@ int FH2RemoteClient::ConnectionChat(void)
     packet.Push(modes);
     packet.Push(player_id);
     if(extdebug) std::cerr << "FH2RemoteClient::ConnectionChat: id: 0x" << std::hex << player_id << ", send hello...";
-    if(!packet.Send(*this)) return Error("close socket");
+    if(!Send(packet, extdebug)) return Logout();
     if(extdebug) std::cerr << "ok" << std::endl;
 
     if(Modes(ST_ADMIN))
@@ -141,8 +134,7 @@ int FH2RemoteClient::ConnectionChat(void)
 
 	// recv maps info
 	if(extdebug) std::cerr << "FH2RemoteClient::ConnectionChat: id: 0x" << std::hex << player_id << ", recv maps...";
-	if(!packet.Recv(*this)) return Error("close socket");
-	if(MSG_MAPS != packet.GetID()) return Error("unknown client");
+	if(!Wait(packet, MSG_MAPS, extdebug)) return Logout();
 	if(extdebug) std::cerr << "ok" << std::endl;
 
         Maps::FileInfo & fi = conf.CurrentFileInfo();
@@ -162,7 +154,7 @@ int FH2RemoteClient::ConnectionChat(void)
 	packet.Reset();
 	packet.SetID(MSG_READY);
 	if(extdebug) std::cerr << "FH2RemoteClient::ConnectionChat: id: 0x" << std::hex << player_id << ", send ready...";
-	if(!packet.Send(*this)) return Error("close socket");
+	if(!Send(packet, extdebug)) return Logout();
 	if(extdebug) std::cerr << "ok" << std::endl;
     }
     else
@@ -171,8 +163,7 @@ int FH2RemoteClient::ConnectionChat(void)
 
 	// recv ready
 	if(extdebug) std::cerr << "FH2RemoteClient::ConnectionChat: id: 0x" << std::hex << player_id << ", recv ready...";
-	if(!packet.Recv(*this)) return Error("close socket");
-	if(MSG_READY != packet.GetID()) return Error("unknown client");
+	if(!Wait(packet, MSG_READY, extdebug)) return Logout();
 	if(extdebug) std::cerr << "ok" << std::endl;
 
 	// send maps
@@ -181,14 +172,13 @@ int FH2RemoteClient::ConnectionChat(void)
         Network::PacketPushMapsFileInfo(packet, conf.CurrentFileInfo());
 
         if(extdebug) std::cerr << "FH2RemoteClient::ConnectionChat send maps...";
-        if(!packet.Send(*this)) return Error("close socket");
+	if(!Send(packet, extdebug)) return Logout();
         if(extdebug) std::cerr << "ok" << std::endl;
     }
 
     // recv ready
     if(extdebug) std::cerr << "FH2RemoteClient::ConnectionChat: id: 0x" << std::hex << player_id << ", recv ready...";
-    if(!packet.Recv(*this)) return Error("close socket");
-    if(MSG_READY != packet.GetID()) return Error("unknown client");
+    if(!Wait(packet, MSG_READY, extdebug)) return Logout();
     if(extdebug) std::cerr << "ok" << std::endl;
 
     FH2Server & server = FH2Server::Get();
@@ -203,7 +193,7 @@ int FH2RemoteClient::ConnectionChat(void)
     Network::PacketPushPlayersInfo(packet, players);
 
     if(extdebug) std::cerr << "FH2RemoteClient::ConnectionChat send players colors...";
-    if(!packet.Send(*this)) return Error("close socket");
+    if(!Send(packet, extdebug)) return Logout();
     if(extdebug) std::cerr << "ok" << std::endl;
 
     if(extdebug) std::cerr << "FH2RemoteClient::ConnectionChat start queue" << std::endl;
@@ -213,17 +203,27 @@ int FH2RemoteClient::ConnectionChat(void)
 
 	if(Ready())
 	{
-	    if(!packet.Recv(*this, extdebug)) return Error("close socket");
-            if(extdebug) std::cerr << "FH2RemoteClient::ConnectionChat: recv: " << Network::GetMsgString(packet.GetID()) << std::endl;
+            if(extdebug) std::cerr << "FH2RemoteClient::ConnectionChat: recv: ";
+	    if(!Recv(packet, extdebug)) return Logout();
+            if(extdebug) std::cerr << Network::GetMsgString(packet.GetID()) << std::endl;
 
 	    // msg put to queue
-	    server.mutex.Lock();
-	    server.queue.push_back(std::make_pair(packet, player_id));
-	    server.mutex.Unlock();
+	    if(MSG_UNKNOWN != packet.GetID())
+	    {
+		server.mutex.Lock();
+		server.queue.push_back(std::make_pair(packet, player_id));
+	        server.mutex.Unlock();
+	    }
 
     	    // msg post processing
     	    switch(packet.GetID())
     	    {
+    		case MSG_UNKNOWN:
+    		{
+    		    packet.Dump();
+    		    break;
+    		}
+
     		case MSG_PLAYERS:
     		{
 		    Network::PacketPopPlayersInfo(packet, players);
@@ -238,6 +238,19 @@ int FH2RemoteClient::ConnectionChat(void)
 		        player_race = (*itp).player_race;
 		    }
     		    break;
+		}
+
+    		case MSG_MAPS:
+		{
+		    std::fstream fs("test.sav", std::ios::out | std::ios::binary);
+	    	    if(fs.good())
+	    	    {
+	    		u8 ch;
+			while(packet.Pop(ch)) fs.put(static_cast<char>(ch));
+			fs.close();
+		    }
+		    packet.Reset();
+		    break;
 		}
 
     		default:

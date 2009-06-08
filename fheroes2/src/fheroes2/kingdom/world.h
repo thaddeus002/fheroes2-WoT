@@ -60,7 +60,7 @@ public:
     void LoadMaps(const std::string &filename);
     void NewMaps(const u16 sw, const u16 sh);
 
-    static World & GetWorld(void);
+    static World & Get(void);
 
     u16 w(void){ return width; };
     u16 h(void){ return height; };
@@ -160,8 +160,8 @@ private:
 
 private:
     friend class Radar;
-    friend void Game::SaveXML(const std::string &);
-    friend void Game::LoadXML(const std::string &);
+    friend void Game::SaveXMLDoc(TiXmlDocument &);
+    friend bool Game::LoadXMLDoc(const TiXmlDocument &);
 
     std::vector<Maps::Tiles *>          vec_tiles;
     std::vector<Kingdom *>              vec_kingdoms;

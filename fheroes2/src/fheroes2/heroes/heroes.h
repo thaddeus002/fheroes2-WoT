@@ -249,8 +249,9 @@ public:
 
 private:
     friend class Recruits;
-    friend void Game::SaveXML(const std::string &);
-    friend void Game::LoadXML(const std::string &);
+    friend void Game::SaveXMLDoc(TiXmlDocument &);
+    friend bool Game::LoadXMLDoc(const TiXmlDocument &);
+
     void LevelUp(bool autoselect = false);
     Skill::Primary::skill_t LevelUpPrimarySkill(void);
     void LevelUpSecondarySkill(const Skill::Primary::skill_t, bool autoselect = false);

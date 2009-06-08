@@ -189,6 +189,6 @@ u8 Network::GetPlayersColors(std::vector<Player> & v)
     for(; it1 != it2; ++it1) if((*it1).player_id && (*it1).player_color) res |= (*it1).player_color;
                 
     return res;
-};
-                    
+}
+
 #endif

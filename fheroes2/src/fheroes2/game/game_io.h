@@ -22,14 +22,20 @@
 #define H2GAMEIO_H
 
 #include "game.h"
+#include "xmlccwrap.h"
 
 namespace Game
 {
     void Save(const std::string & fn);
     void Load(const std::string & fn);
 
-    void SaveXML(const std::string &);
-    void LoadXML(const std::string &);
+    bool SaveXML(const std::string &);
+    bool LoadXML(const std::string &);
+    bool SaveXML(std::vector<char> &);
+    bool LoadXML(const std::vector<char> &);
+
+    void SaveXMLDoc(TiXmlDocument &);
+    bool LoadXMLDoc(const TiXmlDocument &);
 };
 
 #endif

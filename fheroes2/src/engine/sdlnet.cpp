@@ -371,11 +371,21 @@ bool Network::Socket::Ready(void) const
 
 bool Network::Socket::Recv(char *buf, size_t len) const
 {
-    if(sd && buf)
+    if(sd && buf && len)
     {
-	const int rcv = SDLNet_TCP_Recv(sd, buf, len);
-	if(rcv > 0) return true;
-	std::cerr << "Network::Socket::Recv: size: " << len << ", receive: " << rcv << ", error: " << GetError() << std::endl;
+	int rcv = 0;
+	while((rcv = SDLNet_TCP_Recv(sd, buf, len)) > 0 && rcv < static_cast<int>(len))
+	{
+	    if(rcv < 0)
+	    {
+		std::cerr << "Network::Socket::Recv: size: " << std::dec << len << ", receive: " << rcv << ", error: " << GetError() << std::endl;
+		return false;
+	    }
+
+	    buf += rcv;
+	    len -= rcv;
+	}
+	return true;
     }
     return false;
 }

@@ -28,7 +28,6 @@
 #include "army.h"
 #include "world.h"
 #include "gameevent.h"
-#include "xmlccwrap.h"
 
 extern char *basename(const char *path);
 
@@ -46,16 +45,71 @@ void Game::Load(const std::string &fn)
     LoadXML(fn);
 }
 
-void Game::SaveXML(const std::string &fn)
+bool Game::SaveXML(const std::string & fn)
 {
-    std::string str;
-    const Settings & conf = Settings::Get();
     TiXmlDocument doc;
+    SaveXMLDoc(doc);
+    ogzstream gzout(fn.c_str());
+
+    if(gzout.fail())
+    {
+	Error::Verbose("Game::LoadXML: broken gz stream");
+	return false;
+    }
+
+    gzout << doc;
+    gzout.close();
+
+    return true;
+}
+
+bool Game::SaveXML(std::vector<char> & v)
+{
+    TiXmlDocument doc;
+    SaveXMLDoc(doc);
+
+    TiXmlPrinter prn;
+    doc.Accept(&prn);
+    const char *buf = prn.CStr();
+    const size_t bsz = prn.Size();
+    v.assign(buf, buf + bsz);
+
+    return true;
+}
+
+bool Game::LoadXML(const std::string & fn)
+{
+    igzstream gzin(fn.c_str());
+
+    if(gzin.fail())
+    {
+	Error::Verbose("Game::LoadXML: broken gz stream");
+	return false;
+    }
+
+    TiXmlDocument doc;
+    gzin >> doc;
+
+    return LoadXMLDoc(doc);
+}
+
+bool Game::LoadXML(const std::vector<char> & v)
+{
+    TiXmlDocument doc;
+    if(v.size()) doc.Parse(&v[0]);
+
+    return LoadXMLDoc(doc);
+}
+
+void Game::SaveXMLDoc(TiXmlDocument & doc)
+{
+    const Settings & conf = Settings::Get();
     TiXmlElement *root, *node;
 
     doc.LinkEndChild(new TiXmlDeclaration( "1.0", "", ""));
     root = new TiXmlElement("fheroes2");
 
+    std::string str;
     str.clear();
     String::AddInt(str, conf.major_version);
     str += ".";
@@ -643,77 +697,39 @@ void Game::SaveXML(const std::string &fn)
 	    node->LinkEndChild(new TiXmlText((*it1)->message.c_str()));
 	}
     }
-
-    ogzstream gzout(fn.c_str());
-    if(gzout.good())
-    {
-	TiXmlPrinter prn;
-	doc.Accept(&prn);
-	const char *buf = prn.CStr();
-	const char *ptr = buf;
-	size_t bsz = prn.Size();
-	while(ptr < buf + bsz) gzout << *ptr++;
-	gzout.close();
-    }
-    else
-    {
-	Error::Verbose("Game::LoadXML: broken gz stream");
-	return;
-    }
 }
 
-void Game::LoadXML(const std::string &fn)
+bool Game::LoadXMLDoc(const TiXmlDocument & doc)
 {
-    igzstream gzin(fn.c_str());
-    std::vector<char> buf;
-    buf.reserve(3500000);
-    if(gzin.good())
-    {
-	char c;
-	while(gzin.get(c)) buf.push_back(c);
-	gzin.close();
-    }
-    else
-    {
-	Error::Verbose("Game::LoadXML: broken gz stream");
-	return;
-    }
-
-    TiXmlDocument doc;
-    doc.Parse(&buf[0]);
-
-    buf.clear();
-    buf.reserve(10);
-
-    TiXmlElement* root = doc.FirstChildElement();
+    const TiXmlElement* root = doc.FirstChildElement();
 
     if(!root || std::strcmp("fheroes2", root->Value()))
     {
-	Error::Verbose("Game::LoadXML: broken file " + fn);
-	return;
+	Error::Verbose("Game::LoadXML: broken xml");
+	return false;
     }
 
-    TiXmlElement *node;
-    TiXmlElement *maps = root->FirstChildElement("maps");
-    TiXmlElement *game = root->FirstChildElement("game");
-    TiXmlElement *wrld = root->FirstChildElement("world");
+    const TiXmlElement *node;
+    const TiXmlElement *maps = root->FirstChildElement("maps");
+    const TiXmlElement *game = root->FirstChildElement("game");
+    const TiXmlElement *wrld = root->FirstChildElement("world");
 
     if(!maps || !game || !wrld)
     {
-	Error::Verbose("Game::LoadXML: broken file " + fn);
-	return;
+	Error::Verbose("Game::LoadXML: broken xml");
+	return false;
     }
 
-    TiXmlElement *date = wrld->FirstChildElement("date");
-    TiXmlElement *tiles = wrld->FirstChildElement("tiles");
-    TiXmlElement *kingdoms = wrld->FirstChildElement("kingdoms");
-    TiXmlElement *heroes = wrld->FirstChildElement("heroes");
-    TiXmlElement *castles = wrld->FirstChildElement("castles");
+    const TiXmlElement *date = wrld->FirstChildElement("date");
+    const TiXmlElement *tiles = wrld->FirstChildElement("tiles");
+    const TiXmlElement *kingdoms = wrld->FirstChildElement("kingdoms");
+    const TiXmlElement *heroes = wrld->FirstChildElement("heroes");
+    const TiXmlElement *castles = wrld->FirstChildElement("castles");
 
     if(!date || !tiles || !kingdoms || !heroes || !castles)
     {
-	Error::Verbose("Game::LoadXML: broken file " + fn);
-	return;
+	Error::Verbose("Game::LoadXML: broken xml");
+	return false;
     }
 
     // loading info
@@ -837,7 +853,7 @@ void Game::LoadXML(const std::string &fn)
     tiles->Attribute("size", &res);
     world.vec_tiles.reserve(res);
 
-    TiXmlElement *tile2 = tiles->FirstChildElement();
+    const TiXmlElement *tile2 = tiles->FirstChildElement();
     u16 maps_index = 0;
     for(; tile2; tile2 = tile2->NextSiblingElement(), ++maps_index)
     {
@@ -860,7 +876,7 @@ void Game::LoadXML(const std::string &fn)
 	tile->flags = res;
 
 	// tiles->tile->addons1
-	TiXmlElement *addons = tile2->FirstChildElement("addons_level1");
+	const TiXmlElement *addons = tile2->FirstChildElement("addons_level1");
 	if(addons)
 	{
 	    Maps::TilesAddon ta;
@@ -908,7 +924,7 @@ void Game::LoadXML(const std::string &fn)
     heroes->Attribute("size", &res);
     world.vec_heroes.reserve(res);
 
-    TiXmlElement *hero2 = heroes->FirstChildElement();
+    const TiXmlElement *hero2 = heroes->FirstChildElement();
     for(; hero2; hero2 = hero2->NextSiblingElement())
     {
 	// load hero
@@ -953,7 +969,7 @@ void Game::LoadXML(const std::string &fn)
 	}
 
 	hero->secondary_skills.clear();
-	TiXmlElement* skills = hero2->FirstChildElement("secondary_skills");
+	const TiXmlElement* skills = hero2->FirstChildElement("secondary_skills");
 	if(skills)
 	{
 	    size_t ii = 0;
@@ -970,7 +986,7 @@ void Game::LoadXML(const std::string &fn)
 	}
 
 	std::fill(hero->artifacts.begin(), hero->artifacts.end(), Artifact::UNKNOWN);
-	TiXmlElement* artifacts = hero2->FirstChildElement("artifacts");
+	const TiXmlElement* artifacts = hero2->FirstChildElement("artifacts");
 	if(artifacts)
 	{
 	    size_t ii = 0;
@@ -982,7 +998,7 @@ void Game::LoadXML(const std::string &fn)
 	    }
 	}
 
-	TiXmlElement* armies = hero2->FirstChildElement("armies");
+	const TiXmlElement* armies = hero2->FirstChildElement("armies");
 	if(armies)
 	{
 	    size_t ii = 0;
@@ -996,7 +1012,7 @@ void Game::LoadXML(const std::string &fn)
 	    }
 	}
 
-	TiXmlElement* book = hero2->FirstChildElement("spell_book");
+	const TiXmlElement* book = hero2->FirstChildElement("spell_book");
 	if(book)
 	{
 	    str = book->Attribute("enable");
@@ -1025,7 +1041,7 @@ void Game::LoadXML(const std::string &fn)
 	    }
 	}
 
-	TiXmlElement *visit = hero2->FirstChildElement("visit_object");
+	const TiXmlElement *visit = hero2->FirstChildElement("visit_object");
 	if(visit)
 	{
 	    node = visit->FirstChildElement();
@@ -1048,7 +1064,7 @@ void Game::LoadXML(const std::string &fn)
     castles->Attribute("size", &res);
     world.vec_castles.reserve(res);
 
-    TiXmlElement *castle2 = castles->FirstChildElement();
+    const TiXmlElement *castle2 = castles->FirstChildElement();
     for(; castle2; castle2 = castle2->NextSiblingElement())
     {
 	Point center;
@@ -1073,7 +1089,7 @@ void Game::LoadXML(const std::string &fn)
 	castle2->Attribute("building", &res);
 	castle->building = res;
 
-	TiXmlElement* mage = castle2->FirstChildElement("mageguild");
+	const TiXmlElement* mage = castle2->FirstChildElement("mageguild");
 	if(mage)
 	{
 	    mage->Attribute("level", &res);
@@ -1099,7 +1115,7 @@ void Game::LoadXML(const std::string &fn)
 	    }
 	}
 
-	TiXmlElement* armies = castle2->FirstChildElement("armies");
+	const TiXmlElement* armies = castle2->FirstChildElement("armies");
 	if(armies)
 	{
 	    size_t ii = 0;
@@ -1113,7 +1129,7 @@ void Game::LoadXML(const std::string &fn)
 	    }
 	}
 
-	TiXmlElement* dwellings = castle2->FirstChildElement("dwellings");
+	const TiXmlElement* dwellings = castle2->FirstChildElement("dwellings");
 	if(dwellings)
 	{
 	    size_t ii = 0;
@@ -1132,7 +1148,7 @@ void Game::LoadXML(const std::string &fn)
     kingdoms->Attribute("size", &res);
     world.vec_kingdoms.reserve(res);
 
-    TiXmlElement *kingdom2 = kingdoms->FirstChildElement();
+    const TiXmlElement *kingdom2 = kingdoms->FirstChildElement();
     for(; kingdom2; kingdom2 = kingdom2->NextSiblingElement())
     {
 	kingdom2->Attribute("color", &res);
@@ -1149,7 +1165,7 @@ void Game::LoadXML(const std::string &fn)
 	kingdom2->Attribute("capital", &res);
 	kingdom->ai_capital = (res ? world.GetCastle(res) : NULL);
 
-	TiXmlElement *funds = kingdom2->FirstChildElement("funds");
+	const TiXmlElement *funds = kingdom2->FirstChildElement("funds");
 	if(funds)
 	{
 	    funds->Attribute("wood", &res);
@@ -1168,7 +1184,7 @@ void Game::LoadXML(const std::string &fn)
 	    kingdom->resource.gold = res;
 	}
 
-	TiXmlElement *visit = kingdom2->FirstChildElement("visit_object");
+	const TiXmlElement *visit = kingdom2->FirstChildElement("visit_object");
 	if(visit)
 	{
 	    node = visit->FirstChildElement();
@@ -1185,7 +1201,7 @@ void Game::LoadXML(const std::string &fn)
 	}
 
 	// kingdoms->kingdom->recruits
-	TiXmlElement* recruits = kingdom2->FirstChildElement("recruits");
+	const TiXmlElement* recruits = kingdom2->FirstChildElement("recruits");
 	if(recruits)
 	{
 	    recruits->Attribute("hero1", &res);
@@ -1195,7 +1211,7 @@ void Game::LoadXML(const std::string &fn)
 	}
 
 	// kingdoms->kingdom->puzzle
-	TiXmlElement* puzzle = kingdom2->FirstChildElement("puzzle");
+	const TiXmlElement* puzzle = kingdom2->FirstChildElement("puzzle");
 	if(puzzle)
 	{
 	    kingdom->puzzle_maps = puzzle->Attribute("value");
@@ -1205,7 +1221,7 @@ void Game::LoadXML(const std::string &fn)
     }
 
     // signs
-    TiXmlElement* signs = wrld->FirstChildElement("signs");
+    const TiXmlElement* signs = wrld->FirstChildElement("signs");
     if(signs)
     {
 	node = signs->FirstChildElement();
@@ -1217,7 +1233,7 @@ void Game::LoadXML(const std::string &fn)
     }
 
     // captured objects
-    TiXmlElement* captured = wrld->FirstChildElement("captured");
+    const TiXmlElement* captured = wrld->FirstChildElement("captured");
     if(captured)
     {
 	node = captured->FirstChildElement();
@@ -1233,7 +1249,7 @@ void Game::LoadXML(const std::string &fn)
     }
 
     // rumors
-    TiXmlElement* rumors = wrld->FirstChildElement("rumors");
+    const TiXmlElement* rumors = wrld->FirstChildElement("rumors");
     if(rumors)
     {
 	node = rumors->FirstChildElement();
@@ -1244,7 +1260,7 @@ void Game::LoadXML(const std::string &fn)
     }
 
     // day events
-    TiXmlElement* devents = wrld->FirstChildElement("day_events");
+    const TiXmlElement* devents = wrld->FirstChildElement("day_events");
     if(devents)
     {
 	node = devents->FirstChildElement();
@@ -1281,7 +1297,7 @@ void Game::LoadXML(const std::string &fn)
     }
 
     // coord events
-    TiXmlElement* cevents = wrld->FirstChildElement("coord_events");
+    const TiXmlElement* cevents = wrld->FirstChildElement("coord_events");
     if(cevents)
     {
 	node = cevents->FirstChildElement();
@@ -1320,10 +1336,10 @@ void Game::LoadXML(const std::string &fn)
     }
 
     // sphinx riddles
-    TiXmlElement* sphinxes = wrld->FirstChildElement("sphinxes");
+    const TiXmlElement* sphinxes = wrld->FirstChildElement("sphinxes");
     if(sphinxes)
     {
-	TiXmlElement *riddle2 = sphinxes->FirstChildElement();
+	const TiXmlElement *riddle2 = sphinxes->FirstChildElement();
 	for(; riddle2; riddle2 = riddle2->NextSiblingElement())
 	{
 	    GameEvent::Riddle *riddle = new GameEvent::Riddle();
@@ -1349,7 +1365,7 @@ void Game::LoadXML(const std::string &fn)
 	    str = riddle2->Attribute("quiet");
 	    riddle->quiet = str && 0 == std::strcmp(str, "true");
 
-	    TiXmlElement *answers = riddle2->FirstChildElement("answers");
+	    const TiXmlElement *answers = riddle2->FirstChildElement("answers");
 	    if(answers)
 	    {
 		node = answers->FirstChildElement();
@@ -1377,4 +1393,6 @@ void Game::LoadXML(const std::string &fn)
     std::vector<Heroes *>::const_iterator ith2 = world.vec_heroes.end();
     for(; ith1 != ith2; ++ith1)
         if(*ith1) world.GetKingdom((*ith1)->GetColor()).AddHeroes(*ith1);
+    
+    return true;
 }

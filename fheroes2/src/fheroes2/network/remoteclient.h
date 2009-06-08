@@ -34,9 +34,9 @@ class FH2RemoteClient : public FH2Client
 public:
     FH2RemoteClient();
 
-    int Error(const std::string &);
     int ConnectionChat(void);
 
+    int Logout(void);
     void RunThread(void);
     void ShutdownThread(void);
 

@@ -27,6 +27,7 @@
 #include "localclient.h"
 #include "cursor.h"
 #include "button.h"
+#include "world.h"
 #include "agg.h"
 
 #ifdef WITH_NET
@@ -42,15 +43,6 @@ bool FH2LocalClient::Connect(const std::string & srv, u16 port)
     return Network::ResolveHost(ip, srv.c_str(), port) && Open(ip);
 }
 
-int FH2LocalClient::Error(const std::string & str)
-{
-    Settings & conf = Settings::Get();
-    Close();
-    if(2 < conf.Debug()) std::cerr << "error" << std::endl;
-    if(conf.Debug()) std::cerr << "FH2LocalClient::Error: " << str << std::endl;
-    return -1;
-}
-
 int FH2LocalClient::ConnectionChat(void)
 {
     Settings & conf = Settings::Get();
@@ -63,8 +55,7 @@ int FH2LocalClient::ConnectionChat(void)
 
     // recv ready, banner
     if(extdebug) std::cerr << "FH2LocalClient::ConnectionChat: recv ready...";
-    if(!packet.Recv(*this)) return Error("close socket");
-    if(MSG_READY != packet.GetID()) return Error("unknown client");
+    if(!Wait(packet, MSG_READY, extdebug)) return -1;
     if(extdebug) std::cerr << "ok" << std::endl;
 
     // get banner
@@ -73,20 +64,19 @@ int FH2LocalClient::ConnectionChat(void)
 
     // dialog: input name
     if(!Dialog::InputString("Connected to " + server + "\n \n" + str + "\n \nEnter player name:", player_name))
-	return Error("close socket");
+	return -1;
 
     // send hello
     packet.Reset();
     packet.SetID(MSG_HELLO);
     packet.Push(player_name);
     if(extdebug) std::cerr << "FH2LocalClient::ConnectionChat send hello...";
-    if(!packet.Send(*this)) return Error("close socket");
+    if(!Send(packet, extdebug)) return -1;
     if(extdebug) std::cerr << "ok" << std::endl;
 
     // recv hello, modes, player_id
     if(extdebug) std::cerr << "FH2LocalClient::ConnectionChat: recv hello...";
-    if(!packet.Recv(*this)) return Error("close socket");
-    if(MSG_HELLO != packet.GetID()) return Error("unknown client");
+    if(!Wait(packet, MSG_HELLO, extdebug)) return -1;
     if(extdebug) std::cerr << "ok" << std::endl;
     packet.Pop(modes);
     packet.Pop(player_id);
@@ -107,13 +97,12 @@ int FH2LocalClient::ConnectionChat(void)
 	Network::PacketPushMapsFileInfo(packet, conf.CurrentFileInfo());
 
 	if(extdebug) std::cerr << "FH2LocalClient::ConnectionChat send maps...";
-	if(!packet.Send(*this)) return Error("close socket");
+	if(!Send(packet, extdebug)) return -1;
 	if(extdebug) std::cerr << "ok" << std::endl;
 
 	// recv ready
 	if(extdebug) std::cerr << "FH2LocalClient::ConnectionChat: recv ready...";
-	if(!packet.Recv(*this)) return Error("close socket");
-	if(MSG_READY != packet.GetID()) return Error("unknown client");
+	if(!Wait(packet, MSG_READY, extdebug)) return -1;
 	if(extdebug) std::cerr << "ok" << std::endl;
     }
     else
@@ -124,13 +113,12 @@ int FH2LocalClient::ConnectionChat(void)
 	packet.Reset();
 	packet.SetID(MSG_READY);
 	if(extdebug) std::cerr << "FH2LocalClient::ConnectionChat send ready...";
-	if(!packet.Send(*this)) return Error("close socket");
+	if(!Send(packet, extdebug)) return -1;
 	if(extdebug) std::cerr << "ok" << std::endl;
 
 	// recv maps
 	if(extdebug) std::cerr << "FH2LocalClient::ConnectionChat: recv maps...";
-	if(!packet.Recv(*this)) return Error("close socket");
-	if(MSG_MAPS != packet.GetID()) return Error("unknown client");
+	if(!Wait(packet, MSG_MAPS, extdebug)) return -1;
 	if(extdebug) std::cerr << "ok" << std::endl;
 
 	Network::PacketPopMapsFileInfo(packet, conf.CurrentFileInfo());
@@ -140,28 +128,89 @@ int FH2LocalClient::ConnectionChat(void)
     packet.Reset();
     packet.SetID(MSG_READY);
     if(extdebug) std::cerr << "FH2LocalClient::ConnectionChat send ready...";
-    if(!packet.Send(*this)) return Error("close socket");
+    if(!Send(packet, extdebug)) return -1;
     if(extdebug) std::cerr << "ok" << std::endl;
 
     // recv players colors
     if(extdebug) std::cerr << "FH2LocalClient::ConnectionChat: recv players colors...";
-    if(!packet.Recv(*this)) return Error("close socket");
-    if(MSG_PLAYERS != packet.GetID()) return Error("unknown client");
+    if(!Wait(packet, MSG_PLAYERS, extdebug)) return -1;
     if(extdebug) std::cerr << "ok" << std::endl;
     Network::PacketPopPlayersInfo(packet, players);
 
-    // find first allow color
+    // set first allow color
     const Maps::FileInfo & fi = conf.CurrentFileInfo();
     conf.SetPlayersColors(Network::GetPlayersColors(players));
     player_color = Color::GetFirst(fi.allow_colors & (~conf.PlayersColors()));
 
-    if(0 == player_color) return Error("unknown select color. close socket.");
+    if(0 == player_color) return -1;
 
-    // find id
     std::vector<Player>::iterator itp = std::find_if(players.begin(), players.end(), std::bind2nd(std::mem_fun_ref(&Player::isID), player_id));
     if(itp != players.end()) (*itp).player_color = player_color;
     Error::Verbose("current color: " + Color::String(player_color));
 
+    // dialog scenario info
+    if(Dialog::OK != ScenarioInfoDialog())
+    {
+	packet.Reset();
+	packet.SetID(MSG_LOGOUT);
+	packet.Push(std::string("logout from connection chat"));
+	packet.Send(*this);
+	return -1;
+    }
+
+    Cursor::Get().Hide();
+
+    // load maps
+    if(ST_ADMIN & modes)
+    {
+	// send maps
+	Display::Get().Fade();
+	World::Get().LoadMaps(conf.MapsFile());
+
+	packet.Reset();
+	packet.SetID(MSG_MAPS);
+
+	std::vector<char> buf;
+	Game::SaveXML(buf);
+
+	std::vector<char>::const_iterator it1 = buf.begin();
+	std::vector<char>::const_iterator it2 = buf.end();
+	for(; it1 != it2; ++it1) packet.Push(static_cast<u8>(*it1));
+
+	if(extdebug) std::cerr << "FH2LocalClient::ConnectionChat send maps...";
+	if(!Send(packet, extdebug)) return -1;
+	if(extdebug) std::cerr << "ok" << std::endl;
+    }
+    else
+    {
+	// recv maps
+	if(extdebug) std::cerr << "FH2LocalClient::ConnectionChat: recv maps...";
+	if(!Wait(packet, MSG_READY, extdebug)) return -1;
+	if(extdebug) std::cerr << "ok" << std::endl;
+
+	std::vector<char> buf;
+	u8 ch;
+	while(packet.Pop(ch)) buf.push_back(ch);
+
+	Game::LoadXML(buf);
+    }
+
+    Cursor::Get().Show();
+    Display::Get().Flip();
+
+/*
+    while(LocalEvent::GetLocalEvent().HandleEvents())
+    {
+	DELAY(100);
+    }
+*/
+    return 0;
+}
+
+int FH2LocalClient::ScenarioInfoDialog(void)
+{
+    Settings & conf = Settings::Get();
+    bool extdebug = 2 < conf.Debug();
     bool change_players = true;
     bool update_info    = false;
 
@@ -183,21 +232,21 @@ int FH2LocalClient::ConnectionChat(void)
     Button buttonCancel(pointPanel.x + 287, pointPanel.y + 380, ICN::NGEXTRA, 68, 69);
 
     buttonSelectMaps.Draw();
-    buttonOk.Draw();
+    if(Modes(ST_ADMIN)) buttonOk.Draw();
     buttonCancel.Draw();
     cursor.Show();
     display.Flip();
 
     bool exit = false;
-    int result = 0;
     if(extdebug) std::cerr << "FH2LocalClient::ConnectionChat: start queue" << std::endl;
 
     while(!exit && le.HandleEvents())
     {
         if(Ready())
 	{
-	    if(!packet.Recv(*this, extdebug)) return Error("close socket");
-	    if(extdebug) std::cerr << "FH2LocalClient::ConnectionChat: recv: " << Network::GetMsgString(packet.GetID()) << std::endl;
+	    if(extdebug) std::cerr << "FH2LocalClient::ConnectionChat: recv: ";
+	    if(!Recv(packet, extdebug)) return -1;
+	    if(extdebug) std::cerr << Network::GetMsgString(packet.GetID()) << std::endl;
 
 	    switch(packet.GetID())
     	    {
@@ -208,7 +257,7 @@ int FH2LocalClient::ConnectionChat(void)
 		{
 		    Network::PacketPopPlayersInfo(packet, players);
 		    conf.SetPlayersColors(Network::GetPlayersColors(players));
-		    itp = std::find_if(players.begin(), players.end(), std::bind2nd(std::mem_fun_ref(&Player::isID), player_id));
+		    std::vector<Player>::iterator itp = std::find_if(players.begin(), players.end(), std::bind2nd(std::mem_fun_ref(&Player::isID), player_id));
 		    if(itp != players.end())
 		    {
 			player_color = (*itp).player_color;
@@ -247,7 +296,7 @@ int FH2LocalClient::ConnectionChat(void)
 	    Network::PacketPushPlayersInfo(packet, players);
 
 	    if(extdebug) std::cerr << "FH2RemoteClient::ConnectionChat send players colors...";
-	    if(!packet.Send(*this)) return Error("close socket");
+	    if(!Send(packet, extdebug)) return -1;
 	    if(extdebug) std::cerr << "ok" << std::endl;
 
 	    conf.SetPlayersColors(Network::GetPlayersColors(players));
@@ -257,29 +306,21 @@ int FH2LocalClient::ConnectionChat(void)
 
 	// press button
         le.MousePressLeft(buttonSelectMaps) ? buttonSelectMaps.PressDraw() : buttonSelectMaps.ReleaseDraw();
-        le.MousePressLeft(buttonOk) ? buttonOk.PressDraw() : buttonOk.ReleaseDraw();
+        Modes(ST_ADMIN) && le.MousePressLeft(buttonOk) ? buttonOk.PressDraw() : buttonOk.ReleaseDraw();
         le.MousePressLeft(buttonCancel) ? buttonCancel.PressDraw() : buttonCancel.ReleaseDraw();
 
 	// click cancel
         if(le.MouseClickLeft(buttonCancel) || le.KeyPress(KEY_ESCAPE))
-    	    exit = true;
+    	    return Dialog::CANCEL;
         else
         // click ok
         if(le.KeyPress(KEY_RETURN) || le.MouseClickLeft(buttonOk))
-        {
-    	    result = 1;
-    	    exit = true;
-        }
+    	    return Dialog::OK;
 
         DELAY(10);
     }
 
-    packet.Reset();
-    packet.SetID(MSG_LOGOUT);
-    packet.Push(std::string("logout from connection chat"));
-    packet.Send(*this);
-
-    return result;
+    return Dialog::CANCEL;
 }
 
 Game::menu_t Game::NetworkGuest(void)
