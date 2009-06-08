@@ -64,7 +64,7 @@ void Puzzle::Update(u8 open_obelisk, u8 total_obelisk)
 	ZoneOpenRandomTiles(*this, need_puzzle, &zone1_index[0], &zone1_index[23]);
 
     if(need_puzzle && ClosedTilesExists(*this, &zone2_index[0], &zone2_index[15]))
-	ZoneOpenRandomTiles(*this, need_puzzle, &zone2_index[0], &zone2_index[25]);
+	ZoneOpenRandomTiles(*this, need_puzzle, &zone2_index[0], &zone2_index[15]);
 
     if(need_puzzle && ClosedTilesExists(*this, &zone3_index[0], &zone3_index[3]))
 	ZoneOpenRandomTiles(*this, need_puzzle, &zone3_index[0], &zone3_index[3]);
