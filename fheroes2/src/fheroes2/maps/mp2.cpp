@@ -402,7 +402,7 @@ const char * MP2::StringObject(u8 object)
         case MP2::OBJN_TRADINGPOST:
         case MP2::OBJ_TRADINGPOST:		return _("Trading Post");
         case MP2::OBJN_ABANDONEDMINE:
-        case MP2::OBJ_ABANDONEDMINE:		return _("Abandone Mine");
+        case MP2::OBJ_ABANDONEDMINE:		return _("Abandoned Mine");
         case MP2::OBJN_TREEKNOWLEDGE:
         case MP2::OBJ_TREEKNOWLEDGE:		return _("Tree of Knowledge");
         case MP2::OBJN_DOCTORHUT:

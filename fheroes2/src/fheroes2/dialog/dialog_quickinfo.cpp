@@ -104,6 +104,15 @@ void Dialog::QuickInfo(const Maps::Tiles & tile)
             String::Replace(name_object, "%{monster}", name);
     	}
     	    break;
+        
+        case MP2::OBJ_ABANDONEDMINE:
+        {
+            name_object = _("guarded by lots of %{ghosts}");
+            std::string name = Monster(Monster::GHOST).GetMultiName();
+            String::Lower(name);
+            String::Replace(name_object, "%{ghosts}", name);
+            break;
+        }
 
         case MP2::OBJ_EVENT:
         case MP2::OBJ_ZERO:

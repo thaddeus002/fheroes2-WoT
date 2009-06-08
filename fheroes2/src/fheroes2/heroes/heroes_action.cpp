@@ -824,8 +824,6 @@ void ActionToResource(Heroes &hero, const u8 obj, const u16 dst_index)
 	PlaySoundSuccess;
 	world.GetKingdom(hero.GetColor()).AddFundsResource(resource);
     }
-    else
-	PlaySoundVisited;
 
     // dialog
     switch(obj)
@@ -1045,32 +1043,29 @@ void ActionToWitchsHut(Heroes &hero, const u8 obj, const u16 dst_index)
     const std::string & skill_name = Skill::Secondary::String(skill);
     const std::string head = _("Witch's Hut");
 
-    std::string body = _("You approach the hut and observe a witch inside studying an ancient tome on %{skill}.");
+    std::string body = _("You approach the hut and observe a witch inside studying an ancient tome on %{skill}.\n \n");
     String::Replace(body, "%{skill}", skill_name);
 
     // check full
     if(HEROESMAXSKILL == hero.CountSecondarySkill())
     {
-	PlaySoundFailure;
-	Dialog::Message(body, _("As you approach, she turns and focuses her one glass eye on you.\n\"You already know everything you deserve to learn!\" the witch screeches. \"NOW GET OUT OF MY HOUSE!\""), Font::BIG, Dialog::OK);
+	Dialog::Message(head, body + _("As you approach, she turns and focuses her one glass eye on you.\n\"You already know everything you deserve to learn!\" the witch screeches. \"NOW GET OUT OF MY HOUSE!\""), Font::BIG, Dialog::OK);
 	return;
     }
 
     // check present skill
     if(hero.HasSecondarySkill(skill))
     {
-	PlaySoundVisited;
-	Dialog::Message(body, _("As you approach, she turns and speaks.\n\"You already know that which I would teach you. I can help you no further.\""), Font::BIG, Dialog::OK);
+	Dialog::Message(head, body + _("As you approach, she turns and speaks.\n\"You already know that which I would teach you. I can help you no further.\""), Font::BIG, Dialog::OK);
 	return;
     }
 
-    PlaySoundSuccess;
     hero.LearnBasicSkill(skill);
     hero.SetVisited(dst_index, Settings::Get().Original() ? Visit::LOCAL : Visit::GLOBAL); // see dialog_quickinfo
 
     body = _("An ancient and immortal witch living in a hut with bird's legs for stilts teaches you %{skill} for her own inscrutable purposes.");
     String::Replace(body, "%{skill}", skill_name);
-    Dialog::SkillInfo(skill_name, body, skill, Skill::Level::BASIC);
+    Dialog::SkillInfo(head, body, skill, Skill::Level::BASIC);
 
     if(Settings::Get().Debug()) Error::Verbose("ActionToWitchsHut: " + hero.GetName());
 }
@@ -2192,7 +2187,8 @@ void ActionToCaptureObject(Heroes &hero, const u8 obj, const u16 dst_index)
     // capture object
     if(hero.GetColor() != world.ColorCapturedObject(dst_index))
     {
-	PlaySoundSuccess;
+        if(obj != MP2::OBJ_MINES && obj != MP2::OBJ_ALCHEMYLAB)
+                PlaySoundSuccess;
 	world.CaptureObject(dst_index, hero.GetColor());
 
 	if(sf) Dialog::SpriteInfo(header, body, *sf);
@@ -2226,7 +2222,6 @@ void ActionToDwellingJoinMonster(Heroes &hero, const u8 obj, const u16 dst_index
     }
     else
     {
-	PlaySoundVisited;
 	Dialog::Message("", _("As you approach the dwelling, you notice that there is no one here."), Font::BIG, Dialog::OK);
     }
 
@@ -2290,18 +2285,19 @@ void ActionToDwellingRecruitMonster(Heroes &hero, const u8 obj, const u16 dst_in
     }
 
     const u32 count = tile.GetCountMonster();
+    
+    std::string name_object(MP2::StringObject(obj));
 
     if(count)
     {
 	const Monster monster(Monster::FromObject(obj));
-	PlaySoundSuccess;
-	if(Dialog::YES == Dialog::Message("", msg_full, Font::BIG, Dialog::YES | Dialog::NO))
+	if(Dialog::YES == Dialog::Message(name_object, msg_full, Font::BIG, Dialog::YES | Dialog::NO))
 	{
 	    const u16 recruit = Dialog::RecruitMonster(monster, count);
 	    if(recruit)
 	    {
 		if(!hero.GetArmy().JoinTroop(monster, recruit))
-		    Dialog::Message(monster.GetName(), _("You are unable to recruit at this time, your ranks are full."), Font::BIG, Dialog::OK);
+		    Dialog::Message(name_object, _("You are unable to recruit at this time, your ranks are full."), Font::BIG, Dialog::OK);
 		else
 		    tile.SetCountMonster(count - recruit);
 
@@ -2312,11 +2308,10 @@ void ActionToDwellingRecruitMonster(Heroes &hero, const u8 obj, const u16 dst_in
     }
     else
     {
-	PlaySoundVisited;
-	Dialog::Message("", msg_void, Font::BIG, Dialog::OK);
+	Dialog::Message(name_object, msg_void, Font::BIG, Dialog::OK);
     }
 
-    if(Settings::Get().Debug()) Error::Verbose("ActionToDwellingRecruitMonster: " + hero.GetName() + ", object: " + std::string(MP2::StringObject(obj)));
+    if(Settings::Get().Debug()) Error::Verbose("ActionToDwellingRecruitMonster: " + hero.GetName() + ", object: " + name_object);
 }
 
 void ActionToDwellingBattleMonster(Heroes &hero, const u8 obj, const u16 dst_index)
@@ -2499,7 +2494,7 @@ void ActionToDwellingBattleMonster(Heroes &hero, const u8 obj, const u16 dst_ind
 
 void ActionToObservationTower(Heroes &hero, const u8 obj, const u16 dst_index)
 {
-    PlaySoundSuccess;
+    PlaySoundWarning;
     Dialog::Message(MP2::StringObject(obj), _("From the observation tower, you are able to see distant lands."), Font::BIG, Dialog::OK);
     Maps::ClearFog(dst_index, OBSERVATIONTOWERSCOUTE, hero.GetColor());
 }
