@@ -2187,8 +2187,6 @@ void ActionToCaptureObject(Heroes &hero, const u8 obj, const u16 dst_index)
     // capture object
     if(hero.GetColor() != world.ColorCapturedObject(dst_index))
     {
-        if(obj != MP2::OBJ_MINES && obj != MP2::OBJ_ALCHEMYLAB)
-                PlaySoundSuccess;
 	world.CaptureObject(dst_index, hero.GetColor());
 
 	if(sf) Dialog::SpriteInfo(header, body, *sf);
