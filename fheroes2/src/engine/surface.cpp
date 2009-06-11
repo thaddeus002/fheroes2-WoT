@@ -19,6 +19,7 @@
  ***************************************************************************/
 
 #include <algorithm>
+#include <cstring>
 #include "surface.h"
 #include "palette.h"
 #include "error.h"
