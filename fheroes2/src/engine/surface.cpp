@@ -57,11 +57,24 @@ Surface::Surface(u16 sw, u16 sh, bool alpha)
     LoadPalette();
 }
 
-Surface::Surface(const Surface & bs)
+Surface::Surface(const Surface & bs) : surface(NULL)
 {
-    surface = bs.surface ?
-	SDL_ConvertSurface(bs.surface, bs.surface->format, bs.surface->flags) : NULL;
-    LoadPalette();
+    if(bs.surface)
+    {
+	if(8 == bs.depth())
+	{
+	    Set(bs.w(), bs.h(), 8, SDL_SWSURFACE);
+	    Lock();
+	    memcpy(surface->pixels, bs.surface->pixels, surface->w * surface->h);
+	    Unlock();
+	}
+	else
+	{
+	    surface = SDL_ConvertSurface(bs.surface, bs.surface->format, bs.surface->flags);
+	    if(!surface) Error::Warning("Surface: copy constructor, error: " + Error::SDLError());
+	}
+	LoadPalette();
+    }
 }
 
 Surface::Surface(SDL_Surface * sf)
@@ -79,19 +92,24 @@ Surface::~Surface()
 Surface & Surface::operator= (const Surface & bs)
 {
     if(surface) SDL_FreeSurface(surface);
+    surface = NULL;
 
     if(bs.surface)
     {
-	surface = SDL_ConvertSurface(bs.surface, bs.surface->format, bs.surface->flags);
-
-	if(!surface) Error::Warning("Surface: operator, error: " + Error::SDLError());
-
+	if(8 == bs.depth())
+	{
+	    Set(bs.w(), bs.h(), 8, SDL_SWSURFACE);
+	    Lock();
+	    memcpy(surface->pixels, bs.surface->pixels, surface->w * surface->h);
+	    Unlock();
+	}
+	else
+	{
+	    surface = SDL_ConvertSurface(bs.surface, bs.surface->format, bs.surface->flags);
+	    if(!surface) Error::Warning("Surface: operator, error: " + Error::SDLError());
+	}
+	LoadPalette();
     }
-    else
-	Error::Warning("Surface: operator, empty surface");
-
-    LoadPalette();
-
     return *this;
 }
 
@@ -770,7 +788,7 @@ void Surface::TILReflect(Surface & sf_dst, const Surface & sf_src, const u8 shap
     {
         // normal
 	case 0:
-	    memcpy(dst, src, tile_width * tile_height);
+	    std::memcpy(dst, src, tile_width * tile_height);
             break;
 
         // vertical reflect

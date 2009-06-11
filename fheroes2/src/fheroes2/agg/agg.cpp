@@ -846,11 +846,12 @@ const Surface & AGG::Cache::GetTIL(const TIL::til_t til, u16 index, u8 shape)
 	    surface.Set(src.w(), src.h(), 8, SDL_SWSURFACE);
 	    TIL::Reflect(surface, src, shape);
 	}
+	else
+	Error::Warning("AGG::GetTIL: src surface is NULL");
     }
 
     if(! surface.valid())
     {
-	Error::Warning("AGG::GetTIL: icn: ", til);
 	Error::Warning("AGG::GetTIL: icn name: ", TIL::GetString(til));
 	Error::Warning("AGG::GetTIL: index: ", index);
 	Error::Except("AGG::GetTIL: return is NULL");

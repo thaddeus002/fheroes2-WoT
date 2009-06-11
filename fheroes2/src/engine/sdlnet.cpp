@@ -111,6 +111,13 @@ void Network::Message::Reset(void)
 {
     type = 0;
 
+    if(BUFSIZE != dtsz)
+    {
+	delete [] data;
+	dtsz = BUFSIZE;
+	data = new char [dtsz + 1];
+    }
+
     itd1 = data;
     itd2 = itd1;
 }
@@ -307,6 +314,16 @@ void Network::Message::Dump(std::ostream & stream) const
     }
 
     stream  << std::endl;
+}
+
+const char* Network::Message::DtPt(void) const
+{
+    return itd1;
+}
+
+size_t Network::Message::DtSz(void) const
+{
+    return itd2 > itd1 ? itd2 - itd1 : 0;
 }
 
 Network::Socket::Socket() : sd(NULL), sdset(NULL)

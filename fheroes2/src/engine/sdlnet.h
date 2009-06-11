@@ -93,6 +93,9 @@ namespace Network
 	void	Reset(void);
 	void	Dump(std::ostream & = std::cerr) const;
 
+	const char* DtPt(void) const;
+	size_t      DtSz(void) const;
+
     private:
 	void	Resize(size_t);
 	size_t	Size(void) const;
