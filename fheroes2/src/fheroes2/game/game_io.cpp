@@ -21,6 +21,7 @@
 #include <sstream>
 #include <cstring>
 #include <ctime>
+#include "zzlib.h"
 #include "settings.h"
 #include "kingdom.h"
 #include "heroes.h"
@@ -53,7 +54,7 @@ bool Game::SaveXML(const std::string & fn)
 
     if(gzout.fail())
     {
-	Error::Verbose("Game::LoadXML: broken gz stream");
+	Error::Verbose("Game::SaveXML: broken gz stream");
 	return false;
     }
 
@@ -63,18 +64,15 @@ bool Game::SaveXML(const std::string & fn)
     return true;
 }
 
-bool Game::SaveXML(std::vector<char> & v)
+bool Game::SaveZXML(std::vector<char> & v)
 {
     TiXmlDocument doc;
     SaveXMLDoc(doc);
 
-    TiXmlPrinter prn;
-    doc.Accept(&prn);
-    const char *buf = prn.CStr();
-    const size_t bsz = prn.Size();
-    v.assign(buf, buf + bsz);
+    std::ostringstream sstream;
+    sstream << doc;
 
-    return true;
+    return ZLib::Compress(v, sstream.str());
 }
 
 bool Game::LoadXML(const std::string & fn)
@@ -93,12 +91,16 @@ bool Game::LoadXML(const std::string & fn)
     return LoadXMLDoc(doc);
 }
 
-bool Game::LoadXML(const std::vector<char> & v)
+bool Game::LoadZXML(const char* srcpt, size_t srcsz)
 {
-    TiXmlDocument doc;
-    if(v.size()) doc.Parse(&v[0]);
-
-    return LoadXMLDoc(doc);
+    std::vector<char> dst;
+    if(ZLib::UnCompress(dst, srcpt, srcsz))
+    {
+	TiXmlDocument doc;
+	doc.Parse(&dst[0]);
+	return LoadXMLDoc(doc);
+    }
+    return false;
 }
 
 void Game::SaveXMLDoc(TiXmlDocument & doc)

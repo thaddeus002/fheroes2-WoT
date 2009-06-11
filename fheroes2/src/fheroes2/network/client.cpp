@@ -20,6 +20,7 @@
 
 #ifdef WITH_NET
 
+#include "localevent.h"
 #include "client.h"
 
 FH2Client::FH2Client()
@@ -34,7 +35,7 @@ bool FH2Client::IsConnected(void) const
 
 bool FH2Client::Wait(Network::Message & packet, u16 id, bool debug)
 {
-    while(1)
+    while(LocalEvent::GetLocalEvent().HandleEvents())
     {
         if(Ready())
         {

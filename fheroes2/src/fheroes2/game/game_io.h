@@ -31,8 +31,9 @@ namespace Game
 
     bool SaveXML(const std::string &);
     bool LoadXML(const std::string &);
-    bool SaveXML(std::vector<char> &);
-    bool LoadXML(const std::vector<char> &);
+
+    bool SaveZXML(std::vector<char> &);
+    bool LoadZXML(const char*, size_t);
 
     void SaveXMLDoc(TiXmlDocument &);
     bool LoadXMLDoc(const TiXmlDocument &);

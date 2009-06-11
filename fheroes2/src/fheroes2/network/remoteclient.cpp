@@ -27,6 +27,7 @@
 #include "server.h"
 #include "client.h"
 #include "remoteclient.h"
+#include "zzlib.h"
 
 int FH2RemoteClient::callbackCreateThread(void *data)
 {
@@ -245,9 +246,14 @@ int FH2RemoteClient::ConnectionChat(void)
 		    std::fstream fs("test.sav", std::ios::out | std::ios::binary);
 	    	    if(fs.good())
 	    	    {
-	    		u8 ch;
-			while(packet.Pop(ch)) fs.put(static_cast<char>(ch));
-			fs.close();
+	    		std::vector<char> v;
+	    		ZLib::UnCompress(v, packet.DtPt(), packet.DtSz());
+	    		std::vector<char>::const_iterator it1 = v.begin();
+	    		std::vector<char>::const_iterator it2 = v.end();
+	    		for(; it1 != it2; ++it1) fs.put(*it1);
+	    	    	//u8 ch;
+		    	//while(packet.Pop(ch)) fs.put(static_cast<char>(ch));
+		    	fs.close();
 		    }
 		    packet.Reset();
 		    break;

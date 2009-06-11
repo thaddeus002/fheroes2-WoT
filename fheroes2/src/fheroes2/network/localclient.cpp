@@ -170,16 +170,17 @@ int FH2LocalClient::ConnectionChat(void)
 	packet.Reset();
 	packet.SetID(MSG_MAPS);
 
-	std::vector<char> buf;
-	Game::SaveXML(buf);
+	std::vector<char> bufz;
+	Game::SaveZXML(bufz);
 
-	std::vector<char>::const_iterator it1 = buf.begin();
-	std::vector<char>::const_iterator it2 = buf.end();
-	for(; it1 != it2; ++it1) packet.Push(static_cast<u8>(*it1));
+	std::vector<char>::const_iterator it1 = bufz.begin();
+	std::vector<char>::const_iterator it2 = bufz.end();
+        for(; it1 != it2; ++it1) packet.Push(static_cast<u8>(*it1));
 
 	if(extdebug) std::cerr << "FH2LocalClient::ConnectionChat send maps...";
 	if(!Send(packet, extdebug)) return -1;
 	if(extdebug) std::cerr << "ok" << std::endl;
+	packet.Reset();
     }
     else
     {
@@ -188,11 +189,7 @@ int FH2LocalClient::ConnectionChat(void)
 	if(!Wait(packet, MSG_READY, extdebug)) return -1;
 	if(extdebug) std::cerr << "ok" << std::endl;
 
-	std::vector<char> buf;
-	u8 ch;
-	while(packet.Pop(ch)) buf.push_back(ch);
-
-	Game::LoadXML(buf);
+	Game::LoadZXML(packet.DtPt(), packet.DtSz());
     }
 
     Cursor::Get().Show();

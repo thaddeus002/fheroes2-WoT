@@ -20,8 +20,7 @@
 
 #include <iostream>
 #include <string>
-#include <unistd.h>
-#include <limits.h>
+#include <climits>
 #include <cstdlib>
 
 #include "gamedefs.h"
@@ -49,9 +48,9 @@ char *dirname(const char *path)
 
 char *basename(const char *path)
 {
-    static char buff[PATH_MAX];
+    static char buff[FILENAME_MAX];
     char *c = strrchr(path, SEPARATOR);
-    if(!c) strncpy(buff, path, PATH_MAX);
+    if(!c) strncpy(buff, path, FILENAME_MAX);
     else strcpy(buff, c + 1);
     return buff;
 }
