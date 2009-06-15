@@ -32,6 +32,8 @@ const char* Network::GetMsgString(u16 msg)
 {
     switch(msg)
     {
+        case MSG_RAW:           return "MSG_RAW";
+
         case MSG_PING:          return "MSG_PING";
         case MSG_READY:         return "MSG_READY";
         case MSG_MESSAGE:       return "MSG_MESSAGE";
@@ -53,6 +55,11 @@ const char* Network::GetMsgString(u16 msg)
     }
 
     return "MSG_UNKNOWN";
+}
+
+msg_t Network::GetMsg(u16 msg)
+{
+    return msg < MSG_UNKNOWN ? static_cast<msg_t>(msg) : MSG_UNKNOWN;
 }
 
 int Network::RunDedicatedServer(void)

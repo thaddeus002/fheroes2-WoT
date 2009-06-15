@@ -59,7 +59,8 @@ namespace Network
 {
     int			RunDedicatedServer(void);
     const char*         GetMsgString(u16);
-    
+    msg_t		GetMsg(u16);
+
     void		PacketPushMapsFileInfo(Network::Message &, const Maps::FileInfo &);
     void		PacketPopMapsFileInfo(Network::Message &, Maps::FileInfo &);
     void		PacketPushPlayersInfo(Network::Message &, const std::vector<Player> &);

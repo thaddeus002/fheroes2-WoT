@@ -191,6 +191,10 @@ int FH2Server::ConnectionChat(void)
 		    SendPacketToAllClients(clients, packet, id);
 		    break;
 
+		case MSG_MAPS:
+		    SendPacketToAllClients(clients, msg, id);
+		    break;
+
         	default: break;
             }
 

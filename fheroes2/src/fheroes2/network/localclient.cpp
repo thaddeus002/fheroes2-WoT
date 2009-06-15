@@ -82,7 +82,7 @@ int FH2LocalClient::ConnectionChat(void)
     packet.Pop(player_id);
     if(0 == player_id) Error::Warning("FH2LocalClient::ConnectionChat: player id is null");
 
-    if(ST_ADMIN & modes)
+    if(Modes(ST_ADMIN))
     {
 	if(extdebug) std::cerr << "FH2LocalClient::ConnectionChat: admin mode" << std::endl;
 
@@ -146,7 +146,6 @@ int FH2LocalClient::ConnectionChat(void)
 
     std::vector<Player>::iterator itp = std::find_if(players.begin(), players.end(), std::bind2nd(std::mem_fun_ref(&Player::isID), player_id));
     if(itp != players.end()) (*itp).player_color = player_color;
-    Error::Verbose("current color: " + Color::String(player_color));
 
     // dialog scenario info
     if(Dialog::OK != ScenarioInfoDialog())
@@ -182,25 +181,15 @@ int FH2LocalClient::ConnectionChat(void)
 	if(extdebug) std::cerr << "ok" << std::endl;
 	packet.Reset();
     }
-    else
-    {
-	// recv maps
-	if(extdebug) std::cerr << "FH2LocalClient::ConnectionChat: recv maps...";
-	if(!Wait(packet, MSG_READY, extdebug)) return -1;
-	if(extdebug) std::cerr << "ok" << std::endl;
-
-	Game::LoadZXML(packet.DtPt(), packet.DtSz());
-    }
 
     Cursor::Get().Show();
     Display::Get().Flip();
 
-/*
     while(LocalEvent::GetLocalEvent().HandleEvents())
     {
-	DELAY(100);
+	DELAY(10);
     }
-*/
+
     return 0;
 }
 
@@ -228,20 +217,26 @@ int FH2LocalClient::ScenarioInfoDialog(void)
     Button buttonOk(pointPanel.x + 31, pointPanel.y + 380, ICN::NGEXTRA, 66, 67);
     Button buttonCancel(pointPanel.x + 287, pointPanel.y + 380, ICN::NGEXTRA, 68, 69);
 
+    if(! Modes(ST_ADMIN & modes))
+    {
+	buttonOk.Press();
+	buttonOk.SetDisable(true);
+    }
+
     buttonSelectMaps.Draw();
-    if(Modes(ST_ADMIN)) buttonOk.Draw();
+    buttonOk.Draw();
     buttonCancel.Draw();
     cursor.Show();
     display.Flip();
 
     bool exit = false;
-    if(extdebug) std::cerr << "FH2LocalClient::ConnectionChat: start queue" << std::endl;
+    if(extdebug) std::cerr << "FH2LocalClient::ScenarioInfoDialog: start queue" << std::endl;
 
     while(!exit && le.HandleEvents())
     {
         if(Ready())
 	{
-	    if(extdebug) std::cerr << "FH2LocalClient::ConnectionChat: recv: ";
+	    if(extdebug) std::cerr << "FH2LocalClient::ScenarioInfoDialog: recv: ";
 	    if(!Recv(packet, extdebug)) return -1;
 	    if(extdebug) std::cerr << Network::GetMsgString(packet.GetID()) << std::endl;
 
@@ -271,6 +266,11 @@ int FH2LocalClient::ScenarioInfoDialog(void)
 		    exit = true;
 		    break;
 
+		case MSG_MAPS:
+		    cursor.Hide();
+		    Game::LoadZXML(packet.DtPt(), packet.DtSz());
+		    return Dialog::OK;
+
 		default: break;
 	    }
 	}
@@ -281,6 +281,9 @@ int FH2LocalClient::ScenarioInfoDialog(void)
 	    Game::Scenario::RedrawStaticInfo(pointPanel);
 	    Game::Scenario::RedrawOpponentsInfo(pointOpponentInfo, &players);
 	    Game::Scenario::RedrawClassInfo(pointClassInfo);
+	    buttonSelectMaps.Draw();
+	    buttonOk.Draw();
+	    buttonCancel.Draw();
 	    cursor.Show();
 	    display.Flip();
 	    update_info = false;
@@ -292,7 +295,7 @@ int FH2LocalClient::ScenarioInfoDialog(void)
 	    packet.SetID(MSG_PLAYERS);
 	    Network::PacketPushPlayersInfo(packet, players);
 
-	    if(extdebug) std::cerr << "FH2RemoteClient::ConnectionChat send players colors...";
+	    if(extdebug) std::cerr << "FH2LocalClient::ScenarioInfoDialog: send players colors...";
 	    if(!Send(packet, extdebug)) return -1;
 	    if(extdebug) std::cerr << "ok" << std::endl;
 
@@ -303,7 +306,7 @@ int FH2LocalClient::ScenarioInfoDialog(void)
 
 	// press button
         le.MousePressLeft(buttonSelectMaps) ? buttonSelectMaps.PressDraw() : buttonSelectMaps.ReleaseDraw();
-        Modes(ST_ADMIN) && le.MousePressLeft(buttonOk) ? buttonOk.PressDraw() : buttonOk.ReleaseDraw();
+        if(buttonOk.isEnable()) le.MousePressLeft(buttonOk) ? buttonOk.PressDraw() : buttonOk.ReleaseDraw();
         le.MousePressLeft(buttonCancel) ? buttonCancel.PressDraw() : buttonCancel.ReleaseDraw();
 
 	// click cancel
@@ -311,7 +314,7 @@ int FH2LocalClient::ScenarioInfoDialog(void)
     	    return Dialog::CANCEL;
         else
         // click ok
-        if(le.KeyPress(KEY_RETURN) || le.MouseClickLeft(buttonOk))
+        if(le.KeyPress(KEY_RETURN) || (buttonOk.isEnable() && le.MouseClickLeft(buttonOk)))
     	    return Dialog::OK;
 
         DELAY(10);

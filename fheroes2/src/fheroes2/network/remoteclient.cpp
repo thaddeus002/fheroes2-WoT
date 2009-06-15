@@ -209,7 +209,7 @@ int FH2RemoteClient::ConnectionChat(void)
             if(extdebug) std::cerr << Network::GetMsgString(packet.GetID()) << std::endl;
 
 	    // msg put to queue
-	    if(MSG_UNKNOWN != packet.GetID())
+	    if(MSG_UNKNOWN != Network::GetMsg(packet.GetID()))
 	    {
 		server.mutex.Lock();
 		server.queue.push_back(std::make_pair(packet, player_id));
@@ -217,14 +217,8 @@ int FH2RemoteClient::ConnectionChat(void)
 	    }
 
     	    // msg post processing
-    	    switch(packet.GetID())
+    	    switch(Network::GetMsg(packet.GetID()))
     	    {
-    		case MSG_UNKNOWN:
-    		{
-    		    packet.Dump();
-    		    break;
-    		}
-
     		case MSG_PLAYERS:
     		{
 		    Network::PacketPopPlayersInfo(packet, players);
@@ -243,18 +237,6 @@ int FH2RemoteClient::ConnectionChat(void)
 
     		case MSG_MAPS:
 		{
-		    std::fstream fs("test.sav", std::ios::out | std::ios::binary);
-	    	    if(fs.good())
-	    	    {
-	    		std::vector<char> v;
-	    		ZLib::UnCompress(v, packet.DtPt(), packet.DtSz());
-	    		std::vector<char>::const_iterator it1 = v.begin();
-	    		std::vector<char>::const_iterator it2 = v.end();
-	    		for(; it1 != it2; ++it1) fs.put(*it1);
-	    	    	//u8 ch;
-		    	//while(packet.Pop(ch)) fs.put(static_cast<char>(ch));
-		    	fs.close();
-		    }
 		    packet.Reset();
 		    break;
 		}

@@ -65,7 +65,7 @@ bool FH2Client::Send(Network::Message & packet, bool debug)
 
 bool FH2Client::Recv(Network::Message & packet, bool debug)
 {
-    if(!packet.Recv(*this))
+    if(!packet.Recv(*this, debug))
     {
         Close();
         if(debug) std::cerr << "error" << std::endl;

@@ -135,14 +135,14 @@ bool Network::Message::Recv(const Socket & csd, bool debug)
 	if((0xFF00 & proto) != (0xFF00 & head))
 	{
 	    if(debug) std::cerr << "Network::Message::Recv: unknown packet id: 0x" << std::hex << head << std::endl;
-	    return true;
+	    return false;
 	}
 
 	// check ver
 	if((0x00FF & proto) > (0x00FF & head))
 	{
-	    if(debug) std::cerr << "Network::Message::Recv: obsolete protocol proto: 0x" << std::hex << (0x00FF & head) << std::endl;
-	    return true;
+	    if(debug) std::cerr << "Network::Message::Recv: obsolete protocol ver: 0x" << std::hex << (0x00FF & head) << std::endl;
+	    return false;
 	}
 
 	u32 size;
@@ -382,8 +382,7 @@ u16 Network::Socket::Port(void) const
 
 bool Network::Socket::Ready(void) const
 {
-    SDLNet_CheckSockets(sdset, 0);
-    return SDLNet_SocketReady(sd);
+    return 0 < SDLNet_CheckSockets(sdset, 1) && 0 < SDLNet_SocketReady(sd);
 }
 
 bool Network::Socket::Recv(char *buf, size_t len) const
@@ -402,7 +401,7 @@ bool Network::Socket::Recv(char *buf, size_t len) const
 	    buf += rcv;
 	    len -= rcv;
 	}
-	return true;
+	return 0 < rcv;
     }
     return false;
 }
