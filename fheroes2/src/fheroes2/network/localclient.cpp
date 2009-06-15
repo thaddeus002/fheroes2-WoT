@@ -159,38 +159,7 @@ int FH2LocalClient::ConnectionChat(void)
 
     Cursor::Get().Hide();
 
-    // load maps
-    if(ST_ADMIN & modes)
-    {
-	// send maps
-	Display::Get().Fade();
-	World::Get().LoadMaps(conf.MapsFile());
-
-	packet.Reset();
-	packet.SetID(MSG_MAPS);
-
-	std::vector<char> bufz;
-	Game::SaveZXML(bufz);
-
-	std::vector<char>::const_iterator it1 = bufz.begin();
-	std::vector<char>::const_iterator it2 = bufz.end();
-        for(; it1 != it2; ++it1) packet.Push(static_cast<u8>(*it1));
-
-	if(extdebug) std::cerr << "FH2LocalClient::ConnectionChat send maps...";
-	if(!Send(packet, extdebug)) return -1;
-	if(extdebug) std::cerr << "ok" << std::endl;
-	packet.Reset();
-    }
-
-    Cursor::Get().Show();
-    Display::Get().Flip();
-
-    while(LocalEvent::GetLocalEvent().HandleEvents())
-    {
-	DELAY(10);
-    }
-
-    return 0;
+    return 1;
 }
 
 int FH2LocalClient::ScenarioInfoDialog(void)
@@ -210,7 +179,7 @@ int FH2LocalClient::ScenarioInfoDialog(void)
     const Point pointClassInfo(pointPanel.x + 24, pointPanel.y + 282);
 
     Game::Scenario::RedrawStaticInfo(pointPanel);
-    Game::Scenario::RedrawOpponentsInfo(pointOpponentInfo);
+    Game::Scenario::RedrawOpponentsInfo(pointOpponentInfo, &players);
     Game::Scenario::RedrawClassInfo(pointClassInfo);
 
     Button buttonSelectMaps(pointPanel.x + 309, pointPanel.y + 45, ICN::NGEXTRA, 64, 65);
@@ -269,6 +238,7 @@ int FH2LocalClient::ScenarioInfoDialog(void)
 		case MSG_MAPS:
 		    cursor.Hide();
 		    Game::LoadZXML(packet.DtPt(), packet.DtSz());
+		    conf.SetMyColor(Color::Get(player_color));
 		    return Dialog::OK;
 
 		default: break;
@@ -315,7 +285,46 @@ int FH2LocalClient::ScenarioInfoDialog(void)
         else
         // click ok
         if(le.KeyPress(KEY_RETURN) || (buttonOk.isEnable() && le.MouseClickLeft(buttonOk)))
+    	{
+	    // load maps
+	    if(Modes(ST_ADMIN))
+	    {
+		// fix random race
+		conf.FixKingdomRandomRace();
+		std::for_each(players.begin(), players.end(), Player::FixRandomRace);
+
+		packet.Reset();
+		packet.SetID(MSG_PLAYERS);
+		Network::PacketPushPlayersInfo(packet, players);
+
+		if(extdebug) std::cerr << "FH2LocalClient::ScenarioInfoDialog: send players colors...";
+		if(!Send(packet, extdebug)) return -1;
+		if(extdebug) std::cerr << "ok" << std::endl;
+
+		DELAY(100);
+
+		// send maps
+		display.Fade();
+		World::Get().LoadMaps(conf.MapsFile());
+
+		packet.Reset();
+		packet.SetID(MSG_MAPS);
+
+		std::vector<char> bufz;
+		Game::SaveZXML(bufz);
+
+		std::vector<char>::const_iterator it1 = bufz.begin();
+		std::vector<char>::const_iterator it2 = bufz.end();
+    		for(; it1 != it2; ++it1) packet.Push(static_cast<u8>(*it1));
+
+		if(extdebug) std::cerr << "FH2LocalClient::ScenarioInfoDialog: send maps...";
+		if(!Send(packet, extdebug)) return -1;
+		if(extdebug) std::cerr << "ok" << std::endl;
+		packet.Reset();
+	    }
+
     	    return Dialog::OK;
+	}
 
         DELAY(10);
     }
@@ -347,7 +356,11 @@ Game::menu_t Game::NetworkGuest(void)
 	return Game::MAINMENU;
     }
 
-    client.ConnectionChat();
+    if(0 < client.ConnectionChat())
+    {
+	Game::StartGame();
+    }
+
     client.Close();
 
     return QUITGAME;

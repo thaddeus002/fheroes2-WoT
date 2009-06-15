@@ -145,6 +145,7 @@ public:
     // from maps info
     Race::race_t KingdomRace(u8) const;
     void SetKingdomRace(u8, u8);
+    void FixKingdomRandomRace(void);
     const std::string & MapsFile(void) const;
     const std::string & MapsName(void) const;
     const std::string & MapsDescription(void) const;

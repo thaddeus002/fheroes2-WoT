@@ -166,11 +166,6 @@ Game::menu_t Game::ScenarioInfo(void)
 		levelCursor.Move(rectDifficultyIm.x, rectDifficultyIm.y);
 		conf.SetGameDifficulty(Difficulty::IMPOSSIBLE);
 	    }
-	    if(le.MouseCursor(rectDifficultyEs))
-	    {
-		levelCursor.Move(rectDifficultyEs.x, rectDifficultyEs.y);
-		conf.SetGameDifficulty(Difficulty::EASY);
-	    }
 
 	    RedrawRatingInfo(rating);
 	    cursor.Show();
@@ -272,12 +267,7 @@ Game::menu_t Game::ScenarioInfo(void)
 	{
 	    if(Settings::Get().Debug()) Error::Verbose("select maps: " + conf.MapsFile());
 	    if(Settings::Get().Debug()) Error::Verbose("difficulty: " + Difficulty::String(conf.GameDifficulty()));
-	    for(Color::color_t color = Color::BLUE; color != Color::GRAY; ++color)
-		if(conf.KingdomColors(color))
-		{
-		    if(Race::RAND == conf.KingdomRace(color)) conf.SetKingdomRace(color, Race::Rand());
-		    if(Settings::Get().Debug()) Error::Verbose(Color::String(color) + ": " + Race::String(conf.KingdomRace(color)));
-		}
+	    conf.FixKingdomRandomRace();
 	    if(Settings::Get().Debug()) Error::Verbose("select color: " + Color::String(conf.MyColor()));
 
 	    result = STARTGAME;

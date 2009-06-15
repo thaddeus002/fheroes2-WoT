@@ -258,6 +258,7 @@ Game::menu_t Game::StartGame(void)
 		    break;
 		}
 	    }
+	    if(m != ENDTURN) break;
 	}
 	DELAY(1);
     }

@@ -18,27 +18,12 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#ifndef H2PLAYER_H
-#define H2PLAYER_H
+#include "color.h"
+#include "settings.h"
+#include "player.h"
 
-#include <string>
-#include "gamedefs.h"
-
-class Player
+void Player::FixRandomRace(Player & p)
 {
-public:
-    Player() : player_color(0) {};
-
-    bool isID(u32 id) const { return id == player_id; };
-    bool isColor(u8 color) const { return color == player_color; };
-    bool isName(const std::string & name) const { return name == player_name; };
-
-    static void FixRandomRace(Player &);
-    
-    u8 player_color;
-    u8 player_race;
-    std::string player_name;
-    u32 player_id;
-};
-
-#endif
+    if(p.player_id && p.player_color && Color::GRAY != p.player_color)
+    p.player_race = Settings::Get().KingdomRace(Color::Get(p.player_color));
+}
