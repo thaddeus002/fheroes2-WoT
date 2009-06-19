@@ -50,6 +50,10 @@ ifeq ($(PLATFORM),)
 PLATFORM := unix
 endif
 
+ifeq ($(OS),Windows_NT)
+PLATFORM := mingw
+endif
+
 include Makefile.$(PLATFORM)
 
 export BUILD_DATE CFLAGS LIBS LINK SIMPLE_LINK_FLAGS LINK_FLAGS PLATFORM
