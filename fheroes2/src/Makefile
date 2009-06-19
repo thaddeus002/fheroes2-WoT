@@ -32,9 +32,6 @@ endif
 ifndef WITHOUT_UNICODE
 CFLAGS := $(CFLAGS) -DWITH_TTF
 SDL_LIBS := $(SDL_LIBS) -lSDL_ttf
-ifeq ($(OS), Windows_NT)
-LIBS := $(LIBS) -lintl -liconv
-endif
 endif
 
 ifndef WITHOUT_NETWORK
@@ -49,7 +46,13 @@ endif
 CFLAGS := $(SDL_FLAGS) $(CFLAGS)
 LIBS := $(SDL_LIBS) $(LIBS)
 
-export BUILD_DATE CFLAGS LIBS
+ifeq ($(PLATFORM),)
+PLATFORM := unix
+endif
+
+include ../Makefile.$(PLATFORM)
+
+export BUILD_DATE CFLAGS LIBS LINK SIMPLE_LINK_FLAGS LINK_FLAGS PLATFORM
 
 .PHONY: clean
 

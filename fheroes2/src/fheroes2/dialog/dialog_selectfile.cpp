@@ -30,9 +30,9 @@
 #include "maps.h"
 #include "maps_fileinfo.h"
 #include "dialog.h"
+#include "string_util.h"
 
 
-extern char *basename(const char *path);
 bool SelectFileListSimple(const std::string &, MapsFileInfoList &, std::string &, bool);
 void RedrawFileListSimple(const Rect &, const std::string &, const std::string & filename, const MapsFileInfoList &, MapsFileInfoList::const_iterator, MapsFileInfoList::const_iterator, const u8);
 void RedrawMapsFileList(const Rect &, const MapsFileInfoList &, MapsFileInfoList::const_iterator, MapsFileInfoList::const_iterator, const u8);
@@ -41,7 +41,7 @@ bool PrepareMapsFileInfoList(MapsFileInfoList &);
 
 void ResizeToShortName(const std::string & str, std::string & res)
 {
-    res.assign(basename(str.c_str()));
+    res.assign(basename_internal(str.c_str()));
     size_t it = res.find('.');
     if(std::string::npos != it) res.resize(it);
 }
@@ -250,7 +250,7 @@ bool SelectFileListSimple(const std::string & header, MapsFileInfoList & lists, 
 	{
 	    std::string msg(_("Are you sure you want to delete file:"));
 	    msg.append("\n \n");
-	    msg.append(basename((*cur).file.c_str()));
+	    msg.append(basename_internal((*cur).file.c_str()));
 	    if(Dialog::YES == Dialog::Message(_("Warning!"), msg, Font::BIG, Dialog::YES | Dialog::NO))
 	    {
 		unlink((*cur).file.c_str());
@@ -331,11 +331,11 @@ void RedrawFileListSimple(const Rect & dst, const std::string & header, const st
     {
 	const Maps::FileInfo & info = *ii;
 
-	const std::string name(basename(info.file.c_str()));
+	const std::string name(basename_internal(info.file.c_str()));
 
 	std::strftime(short_date, 14, "%b %d, %H:%M", std::localtime(&info.localtime));
 
-	text.Set(basename(info.file.c_str()), (cur == ii ? Font::YELLOW_BIG : Font::BIG));
+	text.Set(basename_internal(info.file.c_str()), (cur == ii ? Font::YELLOW_BIG : Font::BIG));
 	text.Blit(dst.x + 45, dst.y + oy);
 
 	text.Set(short_date, (cur == ii ? Font::YELLOW_BIG : Font::BIG));

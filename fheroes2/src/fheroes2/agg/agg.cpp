@@ -29,10 +29,9 @@
 #include "dir.h"
 #include "agg.h"
 #include "xmlccwrap.h"
+#include "string_util.h"
 
 #define FATSIZENAME	15
-
-char *basename(const char *path);
 
 /*AGG::File constructor */
 AGG::File::File(const std::string & fname) : filename(fname), count_items(0), stream(NULL)

@@ -29,8 +29,7 @@
 #include "army.h"
 #include "world.h"
 #include "gameevent.h"
-
-extern char *basename(const char *path);
+#include "string_util.h"
 
 void Game::Save(const std::string &fn)
 {
@@ -128,7 +127,7 @@ void Game::SaveXMLDoc(TiXmlDocument & doc)
     root->LinkEndChild(maps);
     maps->SetAttribute("width", conf.current_maps_file.size_w);
     maps->SetAttribute("height", conf.current_maps_file.size_h);
-    maps->SetAttribute("file", basename(conf.current_maps_file.file.c_str()));
+    maps->SetAttribute("file", basename_internal(conf.current_maps_file.file.c_str()));
     maps->SetAttribute("difficulty", conf.current_maps_file.difficulty);
     maps->SetAttribute("kingdom_colors", conf.current_maps_file.kingdom_colors);
     maps->SetAttribute("allow_colors", conf.current_maps_file.allow_colors);

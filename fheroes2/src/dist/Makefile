@@ -2,10 +2,14 @@
 # project: Free Heroes2
 #
 
+ifeq ($(PREFIX),)
+PREFIX := /usr/local
+endif
+
 TARGET := fheroes2
 LIBENGINE := ../engine/libengine.a ../xmlccwrap/libxmlccwrap.a
 LIBS := $(LIBENGINE) $(LIBS)
-CFLAGS := $(CFLAGS) -I../engine -I../xmlccwrap -I/usr/local/include -DBUILD_DATE=$(BUILD_DATE)
+CFLAGS := $(CFLAGS) -I../engine -I../xmlccwrap -I$(PREFIX)/include -DBUILD_DATE=$(BUILD_DATE)
 
 CC := g++
 

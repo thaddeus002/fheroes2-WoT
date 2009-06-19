@@ -35,25 +35,7 @@
 #include "image_logo.h"
 #include "image_icons.h"
 #include "network.h"
-
-char *dirname(const char *path)
-{
-    static char buff[PATH_MAX];
-    strncpy(buff, path, PATH_MAX);
-    char *c = strrchr(buff, SEPARATOR);
-    if(!c) strcpy(buff, ".");
-    else *c = 0;
-    return buff;
-}
-
-char *basename(const char *path)
-{
-    static char buff[FILENAME_MAX];
-    char *c = strrchr(path, SEPARATOR);
-    if(!c) strncpy(buff, path, FILENAME_MAX);
-    else strcpy(buff, c + 1);
-    return buff;
-}
+#include "string_util.h"
 
 int PrintHelp(const char *basename)
 {
@@ -73,7 +55,7 @@ int PrintHelp(const char *basename)
 
 int main(int argc, char **argv)
 {
-	chdir(dirname(argv[0]));
+	chdir(dirname_internal(argv[0]));
 
 	Settings & conf = Settings::Get();
 	int test = 0;

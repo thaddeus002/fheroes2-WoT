@@ -11,3 +11,6 @@ src/dist/fheroes2
 *.ogg
 data/extracted
 *.agg
+.libs
+src/tools/icn2img
+src/tools/til2img

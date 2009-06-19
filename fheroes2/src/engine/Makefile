@@ -7,11 +7,12 @@ CC := g++
 
 all: $(TARGET).a $(TARGET).so
 
-$(TARGET).so: $(patsubst %.cpp, %.o, $(wildcard *.cpp))
-	$(CC) -shared -fPIC -o $@ $^ $(LIBS)
+$(TARGET).so: $(patsubst %.cpp, %.o, $(wildcard *.cpp)) 
+	$(LINK) $(LINK_FLAGS) -o $@ $^
 
-$(TARGET).a: $(patsubst %.cpp, %.o, $(wildcard *.cpp))
+$(TARGET).a: $(patsubst %.cpp, %.o, $(wildcard *.cpp)) 
 	ar crvs $@ $^
+	ranlib $@
 
 %.o: %.cpp
 	$(CC) -c -fPIC -MD $< $(CFLAGS)
