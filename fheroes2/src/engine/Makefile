@@ -8,7 +8,7 @@ CC := g++
 all: $(TARGET).a $(TARGET).so
 
 $(TARGET).so: $(patsubst %.cpp, %.o, $(wildcard *.cpp)) 
-	$(LINK) $(LINK_FLAGS) -o $@ $^
+	$(LINK) -o $@ $^ $(LINK_FLAGS)
 
 $(TARGET).a: $(patsubst %.cpp, %.o, $(wildcard *.cpp)) 
 	ar crvs $@ $^
