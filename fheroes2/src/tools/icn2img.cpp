@@ -176,7 +176,7 @@ int main(int argc, char **argv)
     		break;
         }
 
-#ifndef WITH_PNG
+#ifndef WITH_IMAGE
 	dstfile += ".bmp";
 #else
 	dstfile += ".png";
