@@ -388,15 +388,21 @@ void AGG::Cache::LoadICN(const ICN::icn_t icn, bool reflect)
 	    TiXmlElement *xml_sprite = xml_icn->FirstChildElement();
 	    for(; xml_sprite; xml_sprite = xml_sprite->NextSiblingElement())
 	    {
+		if(std::strcmp("sprite", xml_sprite->Value())) continue;
 		xml_sprite->Attribute("ox", &ox);
 		xml_sprite->Attribute("oy", &oy);
 		const std::string sprite_file(icn_folder + SEPARATOR + xml_sprite->Attribute("name"));
     		v.push_back(Sprite());
 		Sprite & sp = v.back();
 		sp.Load(sprite_file.c_str());
-		if(! sp.valid()) Error::Warning("AGG::Cache::LoadICN: broken image file: " + sprite_file);
-		sp.SetOffset(ox, oy);
-		sprites_memory_size += sp.GetSize();
+		if(sp.valid())
+		{
+		    sp.SetOffset(ox, oy);
+		    sprites_memory_size += sp.GetSize();
+		    return;
+		}
+		else
+		    Error::Warning("AGG::Cache::LoadICN: broken image file: " + sprite_file);
 	    }
 	    if(2 < conf.Debug()) std::cout << "AGG::Cache::LoadICN: sprites count: " << count << ", total size: " << sprites_memory_size << std::endl;
 	}
