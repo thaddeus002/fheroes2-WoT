@@ -69,6 +69,7 @@ namespace Game
     typedef enum { NONE = 0, LOCAL = 1, REMOTE = 2, AI = 4 } control_t;
 
     control_t GetControl(u8);
+    type_t GetType(u8);
 
     menu_t MainMenu(void);
     menu_t NewGame(void);

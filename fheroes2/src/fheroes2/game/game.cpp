@@ -228,6 +228,19 @@ Game::control_t Game::GetControl(u8 index)
     return NONE;
 }
 
+Game::type_t Game::GetType(u8 index)
+{
+    switch(index)
+    {
+        case STANDARD:  return STANDARD;
+        case CAMPAIGN:  return CAMPAIGN;
+        case HOTSEAT:   return HOTSEAT;
+        case NETWORK:   return NETWORK;
+	default: break;
+    }
+    return UNKNOWN;
+}
+
 u8 Game::GetRating(void)
 {
     Settings & conf = Settings::Get();

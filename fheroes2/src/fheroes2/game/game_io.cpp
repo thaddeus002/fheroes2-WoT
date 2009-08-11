@@ -818,7 +818,7 @@ bool Game::LoadXMLDoc(const TiXmlDocument & doc)
     game->Attribute("cur_color", &res);
     conf.cur_color = Color::Get(res);
     game->Attribute("game_type", &res);
-    conf.game_type = Game::GetControl(res);
+    conf.game_type = Game::GetType(res);
     game->Attribute("players_colors", &res);
     conf.players_colors = res;
     game->Attribute("preferably_count_players", &res);
