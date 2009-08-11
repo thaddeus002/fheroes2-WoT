@@ -382,6 +382,7 @@ void AGG::Cache::LoadICN(const ICN::icn_t icn, bool reflect)
 	    0 == std::strcmp("icn", xml_icn->Value()))
 	{
 	    int count, ox, oy;
+	    bool good_load = true;
 	    xml_icn->Attribute("count", &count);
 	    v.reserve(count);
 
@@ -394,17 +395,21 @@ void AGG::Cache::LoadICN(const ICN::icn_t icn, bool reflect)
 		const std::string sprite_file(icn_folder + SEPARATOR + xml_sprite->Attribute("name"));
     		v.push_back(Sprite());
 		Sprite & sp = v.back();
-		sp.Load(sprite_file.c_str());
-		if(sp.valid())
+		if(sp.Load(sprite_file.c_str()) && sp.valid())
 		{
 		    sp.SetOffset(ox, oy);
 		    sprites_memory_size += sp.GetSize();
-		    return;
 		}
 		else
+		{
 		    Error::Warning("AGG::Cache::LoadICN: broken image file: " + sprite_file);
+		    good_load = false;
+		}
 	    }
 	    if(2 < conf.Debug()) std::cout << "AGG::Cache::LoadICN: sprites count: " << count << ", total size: " << sprites_memory_size << std::endl;
+
+	    // load ended
+	    if(good_load) return;
 	}
 	else
 	if(conf.Debug()) 

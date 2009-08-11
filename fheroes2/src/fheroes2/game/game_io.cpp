@@ -33,14 +33,14 @@
 
 void Game::Save(const std::string &fn)
 {
-    Error::Verbose("Game::Save: " + fn);
+    if(Settings::Get().Debug()) Error::Verbose("Game::Save: " + fn);
 
     SaveXML(fn);
 }
 
 void Game::Load(const std::string &fn)
 {
-    Error::Verbose("Game::Load: " + fn);
+    if(Settings::Get().Debug()) Error::Verbose("Game::Load: " + fn);
 
     LoadXML(fn);
 }
