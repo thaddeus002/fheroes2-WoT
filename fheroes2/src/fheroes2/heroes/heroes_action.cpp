@@ -2750,7 +2750,7 @@ void ActionToEvent(Heroes &hero, const u8 obj, const u16 dst_index)
 void ActionToObelisk(Heroes &hero, const u8 obj, const u16 dst_index)
 {
     Kingdom & kingdom = world.GetKingdom(hero.GetColor());
-    if(!hero.isVisited(dst_index, Visit::GLOBAL))
+    if(!hero.isVisited(world.GetTiles(dst_index), Visit::GLOBAL))
     {
         hero.SetVisited(dst_index, Visit::GLOBAL);
         kingdom.PuzzleMaps().Update(kingdom.CountVisitedObjects(MP2::OBJ_OBELISK), world.CountObeliskOnMaps());
