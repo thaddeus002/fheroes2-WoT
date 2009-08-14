@@ -1200,10 +1200,10 @@ Castle* Heroes::inCastle(void)
 /* is visited cell */
 bool Heroes::isVisited(const Maps::Tiles & tile, const Visit::type_t type) const
 {
-    if(Visit::GLOBAL == type) return world.GetKingdom(color).isVisited(tile);
-
     const u16 & index = tile.GetIndex();
     const MP2::object_t object = (tile.GetObject() == MP2::OBJ_HEROES ? GetUnderObject() : tile.GetObject());
+
+    if(Visit::GLOBAL == type) return world.GetKingdom(color).isVisited(index, object);
 
     return visit_object.end() != std::find(visit_object.begin(), visit_object.end(), IndexObject(index, object));
 }

@@ -307,10 +307,13 @@ bool Kingdom::AllowPayment(const Resource::funds_t & funds) const
 /* is visited cell */
 bool Kingdom::isVisited(const Maps::Tiles & tile) const
 {
-    const u16 & index = tile.GetIndex();
-    const MP2::object_t & object = tile.GetObject();
+    return isVisited(tile.GetIndex(), tile.GetObject());
+}
 
-    return visit_object.end() != std::find(visit_object.begin(), visit_object.end(), IndexObject(index, object));
+bool Kingdom::isVisited(u16 index, u8 object) const
+{
+    std::list<IndexObject>::const_iterator it = std::find_if(visit_object.begin(), visit_object.end(), std::bind2nd(std::mem_fun_ref(&IndexObject::isIndex), index));
+    return visit_object.end() != it && (*it).isObject(object);
 }
 
 /* return true if object visited */
@@ -327,13 +330,7 @@ u16 Kingdom::CountVisitedObjects(const MP2::object_t object) const
 /* set visited cell */
 void Kingdom::SetVisited(const u16 index, const MP2::object_t object)
 {
-    const Maps::Tiles & tile = world.GetTiles(index);
-
-    if(isVisited(tile)) return;
-
-    const MP2::object_t obj = object != MP2::OBJ_ZERO ? object : tile.GetObject();
-
-    if(MP2::OBJ_ZERO != obj) visit_object.push_front(IndexObject(index, obj));
+    if(!isVisited(index, object) && object != MP2::OBJ_ZERO) visit_object.push_front(IndexObject(index, object));
 }
 
 bool Kingdom::HeroesMayStillMove(void) const

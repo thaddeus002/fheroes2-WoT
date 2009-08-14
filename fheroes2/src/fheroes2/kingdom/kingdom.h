@@ -99,7 +99,8 @@ public:
     void SetVisited(const u16 index, const MP2::object_t object = MP2::OBJ_ZERO);
     u16  CountVisitedObjects(const MP2::object_t) const;
     bool isVisited(const u8 object) const;
-    bool isVisited(const Maps::Tiles & tile) const;
+    bool isVisited(const Maps::Tiles &) const;
+    bool isVisited(u16, u8) const;
 
     bool HeroesMayStillMove(void) const;
 
