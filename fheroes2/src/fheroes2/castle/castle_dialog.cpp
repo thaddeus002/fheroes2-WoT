@@ -67,7 +67,7 @@ Dialog::answer_t Castle::OpenDialog(bool fade)
     background.Redraw();
 
     // fade
-    display.Fade();
+    if(Settings::Get().Modes(Settings::FADE)) display.Fade();
         
     const Point cur_pt(background.GetArea().x, background.GetArea().y);
     Point dst_pt(cur_pt);

@@ -37,6 +37,7 @@ namespace
         { "music",             Settings::MUSIC_MIDI, Settings::MUSIC },
         { "fullscreen",        Settings::FULLSCREEN                  },
         { "evilinterface",     Settings::EVILINTERFACE               },
+        { "fade",              Settings::FADE                        },
         { "shadow",            Settings::SHADOW                      },
         { "original",          Settings::ORIGINAL                    },
         { "logo",              Settings::LOGO                        },
@@ -62,6 +63,7 @@ Settings::Settings() : major_version(MAJOR_VERSION), minor_version(MINOR_VERSION
 
     SetModes(SHADOW);
     SetModes(ORIGINAL);
+    SetModes(FADE);
     SetModes(LOGO);
 }
 
@@ -175,6 +177,7 @@ void Settings::Dump(std::ostream & stream) const
     stream << "animation = " << static_cast<int>(animation) << std::endl;
     stream << "fullscreen = " << (Modes(FULLSCREEN) ? "on"  : "off") << std::endl;
     stream << "evilinterface = " << (Modes(EVILINTERFACE) ? "on"  : "off") << std::endl;
+    stream << "fade = " << (Modes(FADE) ? "on"  : "off") << std::endl;
     stream << "shadow = " << (Modes(SHADOW) ? "on"  : "off") << std::endl;
     stream << "original = " << (Modes(ORIGINAL) ? "on"  : "off") << std::endl;
     stream << "use cache = " << (Modes(USECACHE) ? "on"  : "off") << std::endl;

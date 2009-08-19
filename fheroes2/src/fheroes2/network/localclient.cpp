@@ -304,7 +304,7 @@ int FH2LocalClient::ScenarioInfoDialog(void)
 		DELAY(100);
 
 		// send maps
-		display.Fade();
+		if(Settings::Get().Modes(Settings::FADE)) display.Fade();
 		World::Get().LoadMaps(conf.MapsFile());
 
 		packet.Reset();

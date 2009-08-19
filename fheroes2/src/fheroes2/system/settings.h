@@ -46,6 +46,7 @@ public:
 	AUTOSAVE          = 0x00000002,
 	DEDICATEDSERVER   = 0x00000004,
 
+	FADE              = 0x00004000,
         FONTRENDERBLENDED = 0x00008000,
 
         SOUND             = 0x00010000,

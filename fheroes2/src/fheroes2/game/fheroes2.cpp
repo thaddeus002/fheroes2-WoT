@@ -39,15 +39,15 @@
 
 int PrintHelp(const char *basename)
 {
-    std::cout << "Usage: " << basename << " [OPTIONS]\n" \
-	    << "  -e\teditors mode\n";
+    std::cout << "Usage: " << basename << " [OPTIONS]" << std::endl \
+	    << "  -e\teditors mode" << std::endl;
 #ifndef BUILD_RELEASE
-    std::cout << "  -d\tdebug mode\n";
+    std::cout << "  -d\tdebug mode" << std::endl;
 #endif
 #ifdef WITH_NET
-    std::cout << "  -s\tdedicated server\n";
+    std::cout << "  -s\tdedicated server" << std::endl;
 #endif
-    std::cout << "  -c\tpath to config file (default fheroes2.cfg)\n" \
+    std::cout << "  -c\tpath to config file (default fheroes2.cfg)" << std::endl \
 	    << "  -h\tprint this help and exit" << std::endl;
 
     return EXIT_SUCCESS;
@@ -278,7 +278,7 @@ int main(int argc, char **argv)
 	    }
 
 	    Display::ShowCursor();
-	    Display::Fade();
+	    if(Settings::Get().Modes(Settings::FADE)) Display::Fade();
 
 	} catch(std::bad_alloc)
 	{

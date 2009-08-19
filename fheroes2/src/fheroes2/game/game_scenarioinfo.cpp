@@ -306,7 +306,7 @@ Game::menu_t Game::ScenarioInfo(void)
 
     if(result == STARTGAME)
     {
-	display.Fade();
+	if(Settings::Get().Modes(Settings::FADE)) display.Fade();
 	// Load maps
 	world.LoadMaps(conf.MapsFile());
     }
