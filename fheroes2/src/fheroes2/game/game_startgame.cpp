@@ -1646,7 +1646,7 @@ Game::menu_t Game::HumanTurn(void)
 		Heroes & hero = global_focus.GetHeroes();
 		if(hero.isEnableMove())
 		{
-        	    //cursor.Hide();
+        	    cursor.Hide();
 		    if(hero.Move())
 		    {
         		cursor.Hide();
@@ -1658,9 +1658,9 @@ Game::menu_t Game::HumanTurn(void)
         		cursor.Show();
         		display.Flip();
 		    }
-		    //gamearea.Redraw();
-        	    //cursor.Show();
-        	    //display.Flip();
+		    gamearea.Redraw();
+        	    cursor.Show();
+        	    display.Flip();
 
 		    // kingdom loss dialog
 		    CheckKingdomsLoss();
