@@ -23,128 +23,127 @@
 #include "cursor.h"
 #include "dialog.h"
 
-Dialog::FrameBorder::FrameBorder(bool fade, u16 enclosedWidth, u16 enclosedHeight)
-: doFade(fade)
+#define  LIMITWIDTH BORDERWIDTH * 4
+#define  ANGLEWIDTH 44
+
+void DrawBorder(s16, s16, u16, u16, Surface &);
+
+Dialog::FrameBorder::FrameBorder()
+{
+}
+
+void Dialog::FrameBorder::SetPosition(s16 posx, s16 posy, u16 encw, u16 ench)
 {
     Display & display = Display::Get();
-    const Sprite & surdbkg = (Settings::Get().EvilInterface() ? AGG::GetICN(ICN::SURDRBKE, 0) : AGG::GetICN(ICN::SURDRBKG, 0));
-    
-    Rect pos;
-    
-    const u16 totalWidth = enclosedWidth + SHADOWWIDTH + 2 * BORDERWIDTH;
-    const u16 totalHeight = enclosedHeight + SHADOWWIDTH + 2 * BORDERWIDTH;
 
-    pos.x = 640 == display.w() ? 0 : (display.w() - totalWidth) / 2;
-    pos.y = 640 == display.w() ? 0 : (display.h() - totalHeight) / 2;
-    pos.w = 640 == display.w() ? 640 : totalWidth;
-    pos.h = 640 == display.w() ? 480 : totalHeight;
+    if(display.w() < encw || display.h() < ench || encw < LIMITWIDTH || ench < LIMITWIDTH)
+    Error::Warning("Dialog::FrameBorder: size out of range");
 
-    area.x = 640 == display.w() ? 0 : pos.x + BORDERWIDTH + SHADOWWIDTH;
-    area.y = 640 == display.w() ? 0 : pos.y + BORDERWIDTH;
-    area.w = enclosedWidth;
-    area.h = enclosedHeight;
+    if(Background::valid()) Background::Restore();
 
-    if(Cursor::Get().isVisible()){ Cursor::Get().Hide(); };
-    back.Save(pos);
+    if(encw && ench)
+	Background::Save(posx, posy, encw + 2 * BORDERWIDTH, ench + 2 * BORDERWIDTH);
+    else
+	Background::Save(posx, posy);
 
-    if(640 != display.w() || 480 != display.h())
-    {
-	Rect  src_rt;
-	Point dst_pt;
+    area = Rect(posx + BORDERWIDTH, posy + BORDERWIDTH, encw - BORDERWIDTH * 2, ench - BORDERWIDTH * 2);
+}
 
-	// top left angle
-	src_rt = Rect(0, 0, SHADOWWIDTH + BORDERWIDTH * 3, BORDERWIDTH);
-	dst_pt = Point(pos.x, pos.y);
-	display.Blit(surdbkg, src_rt, dst_pt);
+const Rect & Dialog::FrameBorder::GetArea(void)
+{
+    return area;
+}
 
-	// top bar
-	src_rt = Rect(SHADOWWIDTH + BORDERWIDTH * 3, 0, surdbkg.w() - SHADOWWIDTH - BORDERWIDTH * 6, BORDERWIDTH);
-	dst_pt = Point(pos.x + SHADOWWIDTH + BORDERWIDTH * 3, pos.y);
-	while(dst_pt.x + src_rt.w < pos.x + pos.w)
-	{
-	    display.Blit(surdbkg, src_rt, dst_pt);
-	    dst_pt.x += src_rt.w;
-	}
-	src_rt.w = pos.x + pos.w - dst_pt.x;
-	display.Blit(surdbkg, src_rt, dst_pt);
-
-	// top right angle
-	src_rt = Rect(surdbkg.w() - BORDERWIDTH * 3, 0, BORDERWIDTH * 3, BORDERWIDTH);
-	dst_pt = Point(pos.x + pos.w - src_rt.w, pos.y);
-	display.Blit(surdbkg, src_rt, dst_pt);
-
-	// bottom left angle
-	src_rt = Rect(0, surdbkg.h() - SHADOWWIDTH - BORDERWIDTH, SHADOWWIDTH + BORDERWIDTH * 3, BORDERWIDTH + SHADOWWIDTH);
-	dst_pt = Point(pos.x, pos.y + pos.h - BORDERWIDTH - SHADOWWIDTH);
-	display.Blit(surdbkg, src_rt, dst_pt);
-
-	// bottom bar
-	src_rt = Rect(SHADOWWIDTH + BORDERWIDTH * 3, surdbkg.h() - SHADOWWIDTH - BORDERWIDTH, surdbkg.w() - SHADOWWIDTH - BORDERWIDTH * 6, BORDERWIDTH + SHADOWWIDTH);
-	dst_pt = Point(pos.x + SHADOWWIDTH + BORDERWIDTH * 3, pos.y + pos.h - BORDERWIDTH - SHADOWWIDTH);
-	while(dst_pt.x + src_rt.w < pos.x + pos.w)
-	{
-	    display.Blit(surdbkg, src_rt, dst_pt);
-	    dst_pt.x += src_rt.w;
-	}
-	src_rt.w = pos.x + pos.w - dst_pt.x - BORDERWIDTH * 3;
-	display.Blit(surdbkg, src_rt, dst_pt);
-
-	// bottom right angle
-	src_rt = Rect(surdbkg.w() - BORDERWIDTH * 3, surdbkg.h() - SHADOWWIDTH - BORDERWIDTH, BORDERWIDTH * 3, BORDERWIDTH + SHADOWWIDTH);
-	dst_pt = Point(pos.x + pos.w - src_rt.w, pos.y + pos.h - BORDERWIDTH - SHADOWWIDTH);
-	display.Blit(surdbkg, src_rt, dst_pt);
-
-	// left top angle
-	src_rt = Rect(0, BORDERWIDTH, SHADOWWIDTH + BORDERWIDTH, BORDERWIDTH * 2);
-	dst_pt = Point(pos.x, pos.y + BORDERWIDTH);
-	display.Blit(surdbkg, src_rt, dst_pt);
-
-	// left bar
-	src_rt = Rect(0, BORDERWIDTH * 3, SHADOWWIDTH + BORDERWIDTH, surdbkg.h() - BORDERWIDTH * 6 - SHADOWWIDTH);
-	dst_pt = Point(pos.x, pos.y + BORDERWIDTH * 3);
-	while(dst_pt.y + src_rt.h < pos.y + pos.h - SHADOWWIDTH - BORDERWIDTH * 3)
-	{
-	    display.Blit(surdbkg, src_rt, dst_pt);
-	    dst_pt.y += src_rt.h;
-	}
-	src_rt.h = pos.y + pos.h - dst_pt.y - SHADOWWIDTH - BORDERWIDTH * 3;
-	display.Blit(surdbkg, src_rt, dst_pt);
-
-	// left bottom angle
-	src_rt = Rect(0, surdbkg.h() - SHADOWWIDTH - BORDERWIDTH * 3, SHADOWWIDTH + BORDERWIDTH, BORDERWIDTH * 2);
-	dst_pt = Point(pos.x, pos.y + pos.h - BORDERWIDTH * 3 - SHADOWWIDTH);
-	display.Blit(surdbkg, src_rt, dst_pt);
-
-	// right top angle
-	src_rt = Rect(surdbkg.w() - BORDERWIDTH, BORDERWIDTH, BORDERWIDTH, BORDERWIDTH * 2);
-	dst_pt = Point(pos.x + pos.w - BORDERWIDTH, pos.y + BORDERWIDTH);
-	display.Blit(surdbkg, src_rt, dst_pt);
-
-	// right bar
-	src_rt = Rect(surdbkg.w() - BORDERWIDTH, BORDERWIDTH * 3, BORDERWIDTH, surdbkg.h() - BORDERWIDTH * 6 - SHADOWWIDTH);
-	dst_pt = Point(pos.x + pos.w - BORDERWIDTH, pos.y + BORDERWIDTH * 3);
-	while(dst_pt.y + src_rt.h < pos.y + pos.h - SHADOWWIDTH - BORDERWIDTH * 3)
-	{
-	    display.Blit(surdbkg, src_rt, dst_pt);
-	    dst_pt.y += src_rt.h;
-	}
-	src_rt.h = pos.y + pos.h - dst_pt.y - SHADOWWIDTH - BORDERWIDTH * 3;
-	display.Blit(surdbkg, src_rt, dst_pt);
-
-	// right bottom angle
-	src_rt = Rect(surdbkg.w() - BORDERWIDTH, surdbkg.h() - SHADOWWIDTH - BORDERWIDTH * 3, BORDERWIDTH, BORDERWIDTH * 2);
-	dst_pt = Point(pos.x + pos.w - BORDERWIDTH, pos.y + pos.h - BORDERWIDTH * 3 - SHADOWWIDTH);
-	display.Blit(surdbkg, src_rt, dst_pt);
-    }
-    else if(fade)
-        Display::Fade();
+void Dialog::FrameBorder::Redraw(void)
+{
+    DrawBorder(area.x - BORDERWIDTH, area.y - BORDERWIDTH, GetRect().w, GetRect().h, Display::Get());
 }
 
 Dialog::FrameBorder::~FrameBorder()
 {
     if(Cursor::Get().isVisible()){ Cursor::Get().Hide(); };
-    if(doFade)
-        Display::Fade();
-    back.Restore();
-    Display::Flip();
+    Background::Restore();
+}
+
+void DrawBorder(s16 posx, s16 posy, u16 posw, u16 posh, Surface & sf)
+{
+    const Sprite & surdbkg = (Settings::Get().EvilInterface() ? AGG::GetICN(ICN::SURDRBKE, 0) : AGG::GetICN(ICN::SURDRBKG, 0));
+    Rect  src_rt;
+    Point dst_pt;
+
+    // top left angle
+    src_rt = Rect(SHADOWWIDTH, 0, ANGLEWIDTH, BORDERWIDTH);
+    dst_pt = Point(posx, posy);
+    sf.Blit(surdbkg, src_rt, dst_pt);
+
+    // top bar
+    src_rt = Rect(SHADOWWIDTH + ANGLEWIDTH + 20, 0, BORDERWIDTH * 2, BORDERWIDTH);
+    dst_pt = Point(posx + ANGLEWIDTH, posy);
+    while(dst_pt.x < posx + posw - BORDERWIDTH * 2)
+    {
+	sf.Blit(surdbkg, src_rt, dst_pt);
+	dst_pt.x += src_rt.w;
+    }
+
+    // top right angle
+    src_rt = Rect(surdbkg.w() - ANGLEWIDTH, 0, ANGLEWIDTH, BORDERWIDTH);
+    dst_pt = Point(posx + posw - src_rt.w, posy);
+    sf.Blit(surdbkg, src_rt, dst_pt);
+
+    // bottom left angle
+    src_rt = Rect(SHADOWWIDTH, surdbkg.h() - SHADOWWIDTH - BORDERWIDTH, ANGLEWIDTH, BORDERWIDTH);
+    dst_pt = Point(posx, posy + posh - src_rt.h);
+    sf.Blit(surdbkg, src_rt, dst_pt);
+
+    // bottom bar
+    src_rt = Rect(SHADOWWIDTH + ANGLEWIDTH, surdbkg.h() - SHADOWWIDTH - BORDERWIDTH, BORDERWIDTH * 2, BORDERWIDTH);
+    dst_pt = Point(posx + ANGLEWIDTH, posy + posh - src_rt.h);
+    while(dst_pt.x < posx + posw - BORDERWIDTH * 2)
+    {
+        sf.Blit(surdbkg, src_rt, dst_pt);
+        dst_pt.x += src_rt.w;
+    }
+
+    // bottom right angle
+    src_rt = Rect(surdbkg.w() - ANGLEWIDTH, surdbkg.h() - SHADOWWIDTH - BORDERWIDTH, ANGLEWIDTH, BORDERWIDTH);
+    dst_pt = Point(posx + posw - src_rt.w, posy + posh - src_rt.h);
+    sf.Blit(surdbkg, src_rt, dst_pt);
+
+    // left top angle
+    src_rt = Rect(SHADOWWIDTH, 0, BORDERWIDTH, ANGLEWIDTH);
+    dst_pt = Point(posx, posy);
+    sf.Blit(surdbkg, src_rt, dst_pt);
+
+    // left bar
+    src_rt = Rect(SHADOWWIDTH, ANGLEWIDTH, BORDERWIDTH, BORDERWIDTH * 2);
+    dst_pt = Point(posx, posy + ANGLEWIDTH);
+    while(dst_pt.y < posy + posh - BORDERWIDTH * 2)
+    {
+	sf.Blit(surdbkg, src_rt, dst_pt);
+	dst_pt.y += src_rt.h;
+    }
+
+    // left bottom angle
+    src_rt = Rect(SHADOWWIDTH, surdbkg.h() - SHADOWWIDTH - ANGLEWIDTH, BORDERWIDTH, ANGLEWIDTH);
+    dst_pt = Point(posx, posy + posh - src_rt.h);
+    sf.Blit(surdbkg, src_rt, dst_pt);
+
+    // right top angle
+    src_rt = Rect(surdbkg.w() - BORDERWIDTH, 0, BORDERWIDTH, ANGLEWIDTH);
+    dst_pt = Point(posx + posw - src_rt.w, posy);
+    sf.Blit(surdbkg, src_rt, dst_pt);
+
+    // right bar
+    src_rt = Rect(surdbkg.w() - BORDERWIDTH, ANGLEWIDTH, BORDERWIDTH, ANGLEWIDTH);
+    dst_pt = Point(posx + posw - src_rt.w, posy + ANGLEWIDTH);
+    while(dst_pt.y < posy + posh - BORDERWIDTH * 2)
+    {
+	sf.Blit(surdbkg, src_rt, dst_pt);
+	dst_pt.y += src_rt.h;
+    }
+
+    // right bottom angle
+    src_rt = Rect(surdbkg.w() - BORDERWIDTH, surdbkg.h() - SHADOWWIDTH - ANGLEWIDTH, BORDERWIDTH, ANGLEWIDTH);
+    dst_pt = Point(posx + posw - src_rt.w, posy + posh - src_rt.h);
+    sf.Blit(surdbkg, src_rt, dst_pt);
 }

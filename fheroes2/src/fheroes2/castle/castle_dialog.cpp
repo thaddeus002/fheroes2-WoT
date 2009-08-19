@@ -50,7 +50,7 @@ void Castle::RedrawNameTown(const Point & src_pt)
     text.Blit(dst_pt);
 }
 
-Dialog::answer_t Castle::OpenDialog(void)
+Dialog::answer_t Castle::OpenDialog(bool fade)
 {
     Display & display = Display::Get();
     castle_heroes = const_cast<Heroes*>(world.GetHeroes(mp.x, mp.y));
@@ -63,7 +63,12 @@ Dialog::answer_t Castle::OpenDialog(void)
     cursor.SetThemes(cursor.POINTER);
 
     Dialog::FrameBorder background;
+    background.SetPosition((display.w() - 640 - BORDERWIDTH * 2) / 2, (display.h() - 480 - BORDERWIDTH * 2) / 2, 640, 480);
+    background.Redraw();
 
+    // fade
+    display.Fade();
+        
     const Point cur_pt(background.GetArea().x, background.GetArea().y);
     Point dst_pt(cur_pt);
 
@@ -387,13 +392,15 @@ Dialog::answer_t Castle::OpenDialog(void)
 	    Dialog::answer_t result = Dialog::ZERO;
 	    
 	    std::vector<Heroes *>::const_iterator it = std::find(myHeroes.begin(), myHeroes.end(), castle_heroes);
+	    bool need_fade = (640 == display.w() && 480 == display.h());
 
 	    while(Dialog::CANCEL != result)
 	    {
 	        Display::Get().Flip();
 	        cursor.Hide();
 
-                result = (*it)->OpenDialog();
+                result = (*it)->OpenDialog(false, need_fade);
+                if(need_fade) need_fade = false;
 
 		switch(result)
         	{

@@ -424,9 +424,11 @@ Castle::building_t Castle::OpenTown(void)
     Cursor & cursor = Cursor::Get();
     cursor.Hide();
 
-    Dialog::FrameBorder background(false);
-
-    const Point cur_pt(background.GetArea().x, background.GetArea().y);
+    Dialog::FrameBorder frameborder;
+    frameborder.SetPosition((display.w() - 640 - BORDERWIDTH * 2) / 2, (display.h() - 480 - BORDERWIDTH * 2) / 2, 640, 480);
+    frameborder.Redraw();
+    
+    const Point cur_pt(frameborder.GetArea().x, frameborder.GetArea().y);
     Point dst_pt(cur_pt);
 
     display.Blit(AGG::GetICN(ICN::CASLWIND, 0), dst_pt);

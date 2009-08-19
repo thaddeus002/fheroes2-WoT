@@ -288,20 +288,27 @@ void Game::OpenCastle(Castle *castle)
     std::vector<Castle *>::const_iterator it = std::find(myCastles.begin(), myCastles.end(), castle);
     Game::Focus & globalfocus = Game::Focus::Get();
     Game::StatusWindow::ResetTimer();
-
+    bool show_position = (640 != display.w() || 480 != display.h());
+    bool need_fade = !show_position;
+    
     if(it != myCastles.end())
     {
 	Dialog::answer_t result = Dialog::ZERO;
 
 	while(Dialog::CANCEL != result)
 	{
-	    cursor.Hide();
-	    globalfocus.Set(*it);
-	    globalfocus.Redraw();
-	    cursor.Show();
-	    display.Flip();
+	    if(show_position)
+	    {
+		cursor.Hide();
+		globalfocus.Set(*it);
+		globalfocus.Redraw();
+		cursor.Show();
+		display.Flip();
+		DELAY(100);
+	    }
 
-	    result = (*it)->OpenDialog();
+	    result = (*it)->OpenDialog(need_fade);
+	    if(need_fade) need_fade = false;
 
 	    if(Dialog::PREV == result)
 	    {
@@ -318,7 +325,7 @@ void Game::OpenCastle(Castle *castle)
     }
 
     cursor.Hide();
-    Game::SelectBarCastle::Get().Redraw(*it);
+    if(it != myCastles.end()) globalfocus.Set(*it);
     if(Heroes *hero = const_cast<Heroes *>((*it)->GetHeroes())) globalfocus.Set(hero);
     globalfocus.Redraw();
     cursor.Show();
@@ -340,6 +347,8 @@ void Game::OpenHeroes(Heroes *hero)
     std::vector<Heroes *>::const_iterator it = std::find(myHeroes.begin(), myHeroes.end(), hero);
     Game::Focus & globalfocus = Game::Focus::Get();
     Game::StatusWindow::ResetTimer();
+    bool show_position = (640 != display.w() || 480 != display.h());
+    bool need_fade = !show_position;
 
     if(it != myHeroes.end())
     {
@@ -347,13 +356,18 @@ void Game::OpenHeroes(Heroes *hero)
 
 	while(Dialog::CANCEL != result)
 	{
-	    cursor.Hide();
-	    globalfocus.Set(*it);
-	    globalfocus.Redraw();
-	    cursor.Show();
-	    display.Flip();
+	    if(show_position)
+	    {
+		cursor.Hide();
+		globalfocus.Set(*it);
+		globalfocus.Redraw();
+		cursor.Show();
+		display.Flip();
+		DELAY(100);
+	    }
 
-	    result = (*it)->OpenDialog();
+	    result = (*it)->OpenDialog(false, need_fade);
+	    if(need_fade) need_fade = false;
 
 	    switch(result)
 	    {
@@ -390,6 +404,8 @@ void Game::OpenHeroes(Heroes *hero)
 	}
     }
 
+    cursor.Hide();
+    if(it != myHeroes.end()) globalfocus.Set(*it);
     globalfocus.Redraw();
     cursor.Show();
     Display::Get().Flip();
@@ -1630,18 +1646,21 @@ Game::menu_t Game::HumanTurn(void)
 		Heroes & hero = global_focus.GetHeroes();
 		if(hero.isEnableMove())
 		{
-        	    cursor.Hide();
+        	    //cursor.Hide();
 		    if(hero.Move())
 		    {
+        		cursor.Hide();
             		gamearea.Center(global_focus.Center());
             		global_focus.Reset(Focus::HEROES);
             		global_focus.Redraw();
 
 			cursor.SetThemes(GetCursor(world.GetTiles(gamearea.GetIndexFromMousePoint(le.MouseCursor()))));
+        		cursor.Show();
+        		display.Flip();
 		    }
-		    gamearea.Redraw();
-        	    cursor.Show();
-        	    display.Flip();
+		    //gamearea.Redraw();
+        	    //cursor.Show();
+        	    //display.Flip();
 
 		    // kingdom loss dialog
 		    CheckKingdomsLoss();

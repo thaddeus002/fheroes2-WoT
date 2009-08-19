@@ -37,7 +37,8 @@
 #include "statusbar.h"
 #include "selectartifactbar.h"
 
-Dialog::answer_t Heroes::OpenDialog(bool readonly)
+/* readonly: false, fade: false */
+Dialog::answer_t Heroes::OpenDialog(bool readonly, bool fade)
 {
     Display & display = Display::Get();
 
@@ -47,10 +48,14 @@ Dialog::answer_t Heroes::OpenDialog(bool readonly)
     cursor.SetThemes(cursor.POINTER);
 
     Dialog::FrameBorder frameborder;
+    frameborder.SetPosition((display.w() - 640 - BORDERWIDTH * 2) / 2, (display.h() - 480 - BORDERWIDTH * 2) / 2, 640, 480);
+    frameborder.Redraw();
 
     const Point cur_pt(frameborder.GetArea().x, frameborder.GetArea().y);
     Point dst_pt(cur_pt);
 
+    // fade
+    if(fade) display.Fade();
     display.FillRect(0, 0, 0, Rect(dst_pt, 640, 480));
 
     display.Blit(AGG::GetICN(ICN::HEROBKG, 0), dst_pt);

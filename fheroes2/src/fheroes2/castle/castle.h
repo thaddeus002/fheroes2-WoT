@@ -138,7 +138,7 @@ public:
 
     void DrawImageCastle(const Point & pt);
 
-    Dialog::answer_t OpenDialog(void);
+    Dialog::answer_t OpenDialog(bool fade = false);
 
     s8 GetMoraleWithModificators(std::string *strs = NULL) const;
     s8 GetLuckWithModificators(std::string *strs = NULL) const;

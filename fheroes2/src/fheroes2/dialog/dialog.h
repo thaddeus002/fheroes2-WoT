@@ -39,6 +39,7 @@
 class Castle;
 class Heroes;
 class Surface;
+class SpriteCursor;
 
 namespace Army
 {
@@ -144,18 +145,18 @@ private:
     Rect area;
 };
 
-class FrameBorder
+class FrameBorder : protected Background
 {
 public:
-    FrameBorder(bool fade=true, u16 width = 640, u16 height = 480);
+    FrameBorder();
     ~FrameBorder();
 
-    const Rect & GetArea(void) const{ return area; };
+    void SetPosition(s16, s16, u16 = 0, u16 = 0);
+    void Redraw(void);
+    const Rect & GetArea(void);
 
 private:
-    Background back;
     Rect area;
-    bool doFade;
 };
 
 class NetworkChat

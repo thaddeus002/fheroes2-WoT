@@ -158,18 +158,21 @@ void ShowExtendedDialog(const Puzzle & pzl, const Surface & sf)
     Cursor & cursor = Cursor::Get();
     bool evil_interface = Settings::Get().EvilInterface();
 
-    Dialog::FrameBorder border(false, sf.w(), sf.h() + 32);
-    if(evil_interface)
-	display.FillRect(80, 80, 80, border.GetArea());
-    else
-	display.FillRect(128, 64, 32, border.GetArea());
-    display.Blit(sf, border.GetArea());
+    Dialog::FrameBorder frameborder;
+    frameborder.SetPosition((display.w() - BORDERWIDTH * 2 - sf.w()) / 2, (display.h() - sf.h() - BORDERWIDTH * 2 - 32) / 2, sf.w(), sf.h() + 32);
+    frameborder.Redraw();
 
-    Point dst_pt(border.GetArea().x + sf.w() / 2 - 40, border.GetArea().y + sf.h() + 5);
+    if(evil_interface)
+	display.FillRect(80, 80, 80, frameborder.GetArea());
+    else
+	display.FillRect(128, 64, 32, frameborder.GetArea());
+    display.Blit(sf, frameborder.GetArea());
+
+    Point dst_pt(frameborder.GetArea().x + sf.w() / 2 - 40, frameborder.GetArea().y + sf.h() + 5);
     Button buttonExit(dst_pt, (evil_interface ? ICN::LGNDXTRE : ICN::LGNDXTRA), 4, 5);
 
     buttonExit.Draw();
-    PuzzlesDraw(pzl, sf, border.GetArea().x, border.GetArea().y);
+    PuzzlesDraw(pzl, sf, frameborder.GetArea().x, frameborder.GetArea().y);
 
     cursor.Show();
     display.Flip();

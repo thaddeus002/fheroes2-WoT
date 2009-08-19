@@ -182,7 +182,7 @@ public:
     u8 GetMobilityIndexSprite(void) const;
     u8 GetManaIndexSprite(void) const;
 
-    Dialog::answer_t OpenDialog(bool readonly = false);
+    Dialog::answer_t OpenDialog(bool readonly = false, bool fade = false);
     void MeetingDialog(Heroes & heroes2);
 
     void Recruit(const Color::color_t & cl, const Point & pt);
