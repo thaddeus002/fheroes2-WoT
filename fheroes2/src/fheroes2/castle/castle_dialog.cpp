@@ -163,7 +163,7 @@ Dialog::answer_t Castle::OpenDialog(bool fade)
     	display.Blit(AGG::GetICN(ICN::STRIP, 11), dst_pt);
     
     // resource
-    RedrawResourcePanel();
+    RedrawResourcePanel(cur_pt);
 
     // button exit
     dst_pt.x = cur_pt.x + 553;
@@ -460,7 +460,7 @@ Dialog::answer_t Castle::OpenDialog(bool fade)
 		SetModes(BOATPRESENT);
 		world.CreateBoat(GetIndex(), true);
 
-		RedrawResourcePanel();
+		RedrawResourcePanel(cur_pt);
 
     		// RedrawResourcePanel destroy sprite buttonExit
 		if(buttonExit.isPressed()) buttonExit.Draw();
@@ -474,7 +474,7 @@ Dialog::answer_t Castle::OpenDialog(bool fade)
 	    OpenWell();
 	    cursor.Hide();
 	    selectCaptainArmy.Redraw();
-	    RedrawResourcePanel();
+	    RedrawResourcePanel(cur_pt);
 
     	    // RedrawResourcePanel destroy sprite buttonExit
 	    if(buttonExit.isPressed()) buttonExit.Draw();
@@ -491,7 +491,7 @@ Dialog::answer_t Castle::OpenDialog(bool fade)
 	    cursor.Show();
 	    display.Flip();
 
-	    RedrawResourcePanel();
+	    RedrawResourcePanel(cur_pt);
 
 	    // RedrawResourcePanel destroy sprite buttonExit
 	    if(buttonExit.isPressed()) buttonExit.Draw();
@@ -520,7 +520,7 @@ Dialog::answer_t Castle::OpenDialog(bool fade)
 		AGG::PlaySound(M82::BUILDTWN);
 		
 		RedrawAnimationBuilding(cur_pt, build);
-		RedrawResourcePanel();		                
+		RedrawResourcePanel(cur_pt);
 
 		if(Castle::BUILD_CAPTAIN == build && ! castle_heroes)
 		    display.Blit(Portrait::Captain(race, Portrait::BIG), cur_pt.x + 5, cur_pt.y + 361);
@@ -552,7 +552,7 @@ Dialog::answer_t Castle::OpenDialog(bool fade)
 		    selectHeroesArmy.SetPos(cur_pt.x + 112, cur_pt.y + 361);
 
 		    AGG::PlaySound(M82::BUILDTWN);
-		    RedrawResourcePanel();
+		    RedrawResourcePanel(cur_pt);
 
 		    LocalEvent & le = LocalEvent::GetLocalEvent();
 		    u32 ticket = 0;
@@ -603,7 +603,7 @@ Dialog::answer_t Castle::OpenDialog(bool fade)
 		AGG::PlaySound(M82::BUILDTWN);
 
 		RedrawAnimationBuilding(cur_pt, BUILD_CASTLE);
-		RedrawResourcePanel();
+		RedrawResourcePanel(cur_pt);
 
 		// RedrawResourcePanel destroy sprite buttonExit
 		if(buttonExit.isPressed()) buttonExit.Draw();
@@ -628,7 +628,7 @@ Dialog::answer_t Castle::OpenDialog(bool fade)
 	    {
 		cursor.Hide();
 		selectCaptainArmy.Redraw();
-		RedrawResourcePanel();
+		RedrawResourcePanel(cur_pt);
 
 		if(buttonExit.isPressed()) buttonExit.Draw();
 
@@ -644,7 +644,7 @@ Dialog::answer_t Castle::OpenDialog(bool fade)
 	{
 	    cursor.Hide();
 	    selectCaptainArmy.Redraw();
-	    RedrawResourcePanel();
+	    RedrawResourcePanel(cur_pt);
 
 	    // RedrawResourcePanel destroy sprite buttonExit
 	    if(buttonExit.isPressed()) buttonExit.Draw();
@@ -659,7 +659,7 @@ Dialog::answer_t Castle::OpenDialog(bool fade)
 	{
 	    cursor.Hide();
 	    selectCaptainArmy.Redraw();
-	    RedrawResourcePanel();
+	    RedrawResourcePanel(cur_pt);
 
 	    // RedrawResourcePanel destroy sprite buttonExit
 	    if(buttonExit.isPressed()) buttonExit.Draw();
@@ -674,7 +674,7 @@ Dialog::answer_t Castle::OpenDialog(bool fade)
 	{
 	    cursor.Hide();
 	    selectCaptainArmy.Redraw();
-	    RedrawResourcePanel();
+	    RedrawResourcePanel(cur_pt);
 
 	    // RedrawResourcePanel destroy sprite buttonExit
 	    if(buttonExit.isPressed()) buttonExit.Draw();
@@ -689,7 +689,7 @@ Dialog::answer_t Castle::OpenDialog(bool fade)
 	{
 	    cursor.Hide();
 	    selectCaptainArmy.Redraw();
-	    RedrawResourcePanel();
+	    RedrawResourcePanel(cur_pt);
 
 	    // RedrawResourcePanel destroy sprite buttonExit
 	    if(buttonExit.isPressed()) buttonExit.Draw();
@@ -704,7 +704,7 @@ Dialog::answer_t Castle::OpenDialog(bool fade)
 	{
 	    cursor.Hide();
 	    selectCaptainArmy.Redraw();
-	    RedrawResourcePanel();
+	    RedrawResourcePanel(cur_pt);
 
 	    // RedrawResourcePanel destroy sprite buttonExit
 	    if(buttonExit.isPressed()) buttonExit.Draw();
@@ -719,7 +719,7 @@ Dialog::answer_t Castle::OpenDialog(bool fade)
 	{
 	    cursor.Hide();
 	    selectCaptainArmy.Redraw();
-	    RedrawResourcePanel();
+	    RedrawResourcePanel(cur_pt);
 
 	    // RedrawResourcePanel destroy sprite buttonExit
 	    if(buttonExit.isPressed()) buttonExit.Draw();
@@ -989,14 +989,12 @@ Dialog::answer_t Castle::OpenDialog(bool fade)
 }
 
 /* redraw resource info panel */
-void Castle::RedrawResourcePanel(void)
+void Castle::RedrawResourcePanel(const Point & pt)
 {
     Display & display = Display::Get();
     const Resource::funds_t & resource = world.GetMyKingdom().GetFundsResource();
 
-    Point dst_pt;
-    dst_pt.x = 640 == display.w() ? 0 : (display.w() - (640 + SHADOWWIDTH + 2 * BORDERWIDTH)) / 2 + BORDERWIDTH + SHADOWWIDTH;
-    dst_pt.y = 640 == display.w() ? 0 : (display.h() - (480 + SHADOWWIDTH + 2 * BORDERWIDTH)) / 2 + BORDERWIDTH;
+    Point dst_pt = pt;
 
     Rect src_rt(dst_pt.x + 552, dst_pt.y + 262, 82, 192);
     display.FillRect(0, 0, 0, src_rt);

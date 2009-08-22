@@ -165,7 +165,7 @@ public:
     void AIDevelopment(void);
 
 private:
-    void RedrawResourcePanel(void);
+    void RedrawResourcePanel(const Point &);
     void TownUpgradeToCastle(void);
     u32 GetBuildingRequires(const building_t & build) const;
     Rect GetCoordBuilding(building_t building, const Point & pt);

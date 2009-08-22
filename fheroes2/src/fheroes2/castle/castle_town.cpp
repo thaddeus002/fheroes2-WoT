@@ -827,7 +827,7 @@ Castle::building_t Castle::OpenTown(void)
     statusBar.SetCenter(dst_pt.x + bar.w() / 2, dst_pt.y + 11);
 
     // redraw resource panel
-    RedrawResourcePanel();
+    RedrawResourcePanel(cur_pt);
 
     // button exit
     dst_pt.x = cur_pt.x + 554;
