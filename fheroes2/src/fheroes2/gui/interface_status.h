@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2006 by Andrey Afletdinov                               *
+ *   Copyright (C) 2009 by Andrey Afletdinov                               *
  *   afletdinov@mail.dc.baikal.ru                                          *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -17,42 +17,55 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef H2RADAR_H
-#define H2RADAR_H
+
+#ifndef H2INTERFACE_STATUS_H
+#define H2INTERFACE_STATUS_H
 
 #include "gamedefs.h"
+#include "thread.h"
+#include "resource.h"
 
-class Radar
+class Surface;
+class Castle;
+class Heroes;
+
+typedef enum { STATUS_UNKNOWN, STATUS_DAY, STATUS_FUNDS, STATUS_ARMY, STATUS_RESOURCE } info_t;
+
+namespace Interface
 {
-public:
-    static Radar & Get(void);
-    ~Radar();
+    class StatusWindow : protected Rect
+    {
+    public:
+	static StatusWindow & Get(void);
 
-    const Rect & GetRect(void) const{ return pos; }
+	void SetPos(s16, s16);
+	const Rect & GetArea(void) const;
+    
+	void Redraw(void);
+	void NextState(void);
+	void SetState(info_t info);
+	void SetResource(Resource::resource_t, u16);
+	void RedrawAITurns(u8 color, u8 progress) const;
+	void QueueEventProcessing(void);
 
-    void Build(void);
-    void Generate(void);
-    void RedrawArea(const u8 color = 0xFF);
-    void HideArea(void);
-    void RedrawCursor(void);
+	static void ResetTimer(void);
 
-private:
-    Surface *GetSurfaceFromColor(const u8);
-    Radar();
+    private:
+	StatusWindow();
 
-    Rect pos;
-    Surface *spriteArea;
-    Surface *spriteCursor;
-    SpriteCursor *cursor;
+	void DrawKingdomInfo(const u8 oh = 0) const;
+	void DrawDayInfo(const u8 oh = 0) const;
+	void DrawArmyInfo(const u8 oh = 0) const;
+	void DrawResourceInfo(const u8 oh = 0) const;
+	void DrawBackground(void) const;
+	static u32 ResetResourceStatus(u32, void *);
 
-    Surface* sf_blue;
-    Surface* sf_green;
-    Surface* sf_red;
-    Surface* sf_yellow;
-    Surface* sf_orange;
-    Surface* sf_purple;
-    Surface* sf_gray;
-    Surface* sf_black;
+	info_t               state;
+	info_t               oldState;
+	Resource::resource_t lastResource;
+	u16                  countLastResource;
+	Timer                timerShowLastResource;
+    };
 };
 
 #endif

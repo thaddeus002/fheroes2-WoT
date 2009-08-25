@@ -28,7 +28,6 @@
 #include "world.h"
 #include "gamearea.h"
 #include "cursor.h"
-#include "radar.h"
 #include "splitter.h"
 #include "sizecursor.h"
 #include "direction.h"
@@ -56,7 +55,7 @@ Game::menu_t Game::Editor::StartGame()
     areaMaps.Build();
 
     Cursor & cursor = Cursor::Get();
-    Interface & I = Interface::Get();
+    EditorInterface & I = EditorInterface::Get();
 
     // cursor
     cursor.Hide();
@@ -78,7 +77,7 @@ Game::menu_t Game::Editor::StartGame()
     const Sprite & spritePanelClear = AGG::GetICN(ICN::EDITPANL, 5);
 
     // Create radar
-    Radar & radar = Radar::Get();
+    Interface::Radar & radar = I.radar;
     radar.Build();
 
     areaMaps.Redraw();
@@ -165,7 +164,6 @@ Game::menu_t Game::Editor::StartGame()
     display.Flip();
 
     //u32 ticket = 0;
-    u8 scrollDir = 0;
     // startgame loop
     while(le.HandleEvents())
     {
@@ -173,24 +171,25 @@ Game::menu_t Game::Editor::StartGame()
 	if(le.KeyPress(KEY_ESCAPE) && (Dialog::YES & Dialog::Message("", _("Are you sure you want to quit?"), Font::BIG, Dialog::YES|Dialog::NO))) return QUITGAME;
 
 	// scroll area maps left
-	if(le.MouseCursor(areaScrollLeft))	scrollDir |= GameArea::LEFT;
+	if(le.MouseCursor(areaScrollLeft))	areaMaps.SetScroll(SCROLL_LEFT);
 	else
 	// scroll area maps right
-	if(le.MouseCursor(areaScrollRight))	scrollDir |= GameArea::RIGHT;
+	if(le.MouseCursor(areaScrollRight))	areaMaps.SetScroll(SCROLL_RIGHT);
 
 	// scroll area maps top
-	if(le.MouseCursor(areaScrollTop))	scrollDir |= GameArea::TOP;
+	if(le.MouseCursor(areaScrollTop))	areaMaps.SetScroll(SCROLL_TOP);
 	else
 	// scroll area maps bottom
-	if(le.MouseCursor(areaScrollBottom))	scrollDir |= GameArea::BOTTOM;
+	if(le.MouseCursor(areaScrollBottom))	areaMaps.SetScroll(SCROLL_BOTTOM);
 
 	// point radar
-	if(le.MouseCursor(radar.GetRect()) &&
-	    (le.MouseClickLeft(radar.GetRect()) ||
-		le.MousePressLeft(radar.GetRect())))
+	if(le.MouseCursor(radar.GetArea()) &&
+	    (le.MouseClickLeft(radar.GetArea()) ||
+		le.MousePressLeft(radar.GetArea())))
 	{
-	    Rect prev(areaMaps.GetRect());
-	    areaMaps.CenterFromRadar(le.MouseCursor());
+	    const Point prev(areaMaps.GetRect());
+            const Point & pt = le.MouseCursor();
+            areaMaps.Center((pt.x - radar.GetArea().x) * world.w() / RADARWIDTH, (pt.y - radar.GetArea().y) * world.h() / RADARWIDTH);
 	    if(prev != areaMaps.GetRect())
 	    {
 		cursor.Hide();
@@ -199,8 +198,8 @@ Game::menu_t Game::Editor::StartGame()
 		I.split_h.Move(areaMaps.GetRect().x);
 		I.split_v.Move(areaMaps.GetRect().y);
 		radar.RedrawCursor();
-		Interface::DrawTopNumberCell();
-		Interface::DrawLeftNumberCell();
+		EditorInterface::DrawTopNumberCell();
+		EditorInterface::DrawLeftNumberCell();
                 areaMaps.Redraw();
 		cursor.Show();
 		display.Flip();
@@ -890,18 +889,17 @@ Game::menu_t Game::Editor::StartGame()
 	if(btnSelectObject.isPressed() && le.MousePressRight(rectObjectResource))
 	    Dialog::Message(_("Treasures"), _("Used to place a resource or treasure."), Font::BIG);
 
-	if(scrollDir)
+	if(areaMaps.NeedScroll())
 	{
 	    cursor.Hide();
 	    sizeCursor.Hide();
-	    cursor.SetThemes(GameArea::ScrollToCursor(scrollDir));
-	    areaMaps.Scroll(scrollDir);
-	    I.Scroll(scrollDir);
+	    cursor.SetThemes(areaMaps.GetScrollCursor());
+	    areaMaps.Scroll();
+	    //I.Scroll(scrollDir);
 	    areaMaps.Redraw();
 	    radar.RedrawCursor();
 	    cursor.Show();
 	    display.Flip();
-	    scrollDir = 0;
 	}
     }
 

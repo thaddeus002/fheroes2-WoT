@@ -24,7 +24,7 @@
 #include "agg.h"
 #include "gamearea.h"
 #include "button.h"
-#include "radar.h"
+#include "interface_radar.h"
 #include "world.h"
 #include "puzzle.h"
 
@@ -129,7 +129,7 @@ void ShowStandardDialog(const Puzzle & pzl, const Surface & sf)
     Display & display = Display::Get();
     Cursor & cursor = Cursor::Get();
 
-    const Rect & radar_pos = Radar::Get().GetRect();
+    const Rect & radar_pos = Interface::Radar::Get().GetArea();
     bool evil_interface = Settings::Get().EvilInterface();
 
     display.Blit(AGG::GetICN((evil_interface ? ICN::EVIWPUZL : ICN::VIEWPUZL), 0), radar_pos);

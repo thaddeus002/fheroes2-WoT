@@ -76,8 +76,16 @@ void GameArea::Build(void)
     gx = 0;
     gy = 0;
 
-    gw = (Display::Get().w() - RADARWIDTH - 3 * BORDERWIDTH) / TILEWIDTH;
-    gh = (Display::Get().h() - 2 * BORDERWIDTH) / TILEWIDTH;
+    if(Settings::Get().HideInterface())
+    {
+	gw = Display::Get().w() / TILEWIDTH;
+	gh = Display::Get().h() / TILEWIDTH;
+    }
+    else
+    {
+	gw = (Display::Get().w() - RADARWIDTH - 3 * BORDERWIDTH) / TILEWIDTH;
+	gh = (Display::Get().h() - 2 * BORDERWIDTH) / TILEWIDTH;
+    }
 
     max = world.w() * world.h() - 1;
 }
@@ -223,54 +231,35 @@ void GameArea::Redraw(const s16 rx, const s16 ry, const u16 rw, const u16 rh, bo
 
 	    if(tile.isFog(Settings::Get().MyColor())) RedrawClopOrClofSpriteFog(tile.GetIndex(), ox, oy);
     }
-
-    //
-}
-
-bool GameArea::AllowScroll(scroll_t direct)
-{
-    switch(direct)
-    {
-	case LEFT:	if(0 < gx) return true;			break;
-	case RIGHT:	if(world.w() - gw > gx) return true;	break;
-	case TOP:	if(0 < gy) return true;			break;
-	case BOTTOM:	if(world.h() - gh > gy) return true;	break;
-	default: break;
-    }
-
-    return false;
 }
 
 /* scroll area */
-void GameArea::Scroll(const u8 scroll)
+void GameArea::Scroll(void)
 {
-    if(scroll & GameArea::LEFT && 0 < gx) --gx;
+    if(scrolldir & SCROLL_LEFT && 0 < gx) --gx;
     else
-    if(scroll & GameArea::RIGHT && world.w() - gw > gx) ++gx;
+    if(scrolldir & SCROLL_RIGHT && world.w() - gw > gx) ++gx;
 
-    if(scroll & GameArea::TOP && 0 < gy) --gy;
+    if(scrolldir & SCROLL_TOP && 0 < gy) --gy;
     else
-    if(scroll & GameArea::BOTTOM && world.h() - gh > gy) ++gy;
-}
+    if(scrolldir & SCROLL_BOTTOM && world.h() - gh > gy) ++gy;
 
-/* scroll area from radar area_pos */
-void GameArea::CenterFromRadar(const Point &pt)
-{
-    // left top point
-    Point pos((pt.x - (Display::Get().w() - BORDERWIDTH - RADARWIDTH)) * world.w() / RADARWIDTH, 
-	      (pt.y - BORDERWIDTH) * world.h() / RADARWIDTH);
-
-    Center(pos);
+    scrolldir = 0;
 }
 
 /* scroll area to center point maps */
 void GameArea::Center(const Point &pt)
 {
+    Center(pt.x, pt.y);
+}
+
+void GameArea::Center(s16 px, s16 py)
+{
     Point pos;
 
     // center
-    pos.x = (0 > pt.x - gw / 2 ? 0 : pt.x - gw / 2);
-    pos.y = (0 > pt.y - gh / 2 ? 0 : pt.y - gh / 2);
+    pos.x = (0 > px - gw / 2 ? 0 : px - gw / 2);
+    pos.y = (0 > py - gh / 2 ? 0 : py - gh / 2);
 
     // our of range
     if(pos.y > world.h() - gh) pos.y = world.h() - gh;
@@ -279,46 +268,43 @@ void GameArea::Center(const Point &pt)
     if(pos.x == gx && pos.y == gy) return;
 
     // possible fast scroll
-    if(pos.y == gy && 1 == (pos.x - gx)) Scroll(GameArea::RIGHT);
+    if(pos.y == gy && 1 == (pos.x - gx)) scrolldir |= SCROLL_RIGHT;
     else
-    if(pos.y == gy && -1 == (pos.x - gx)) Scroll(GameArea::LEFT);
+    if(pos.y == gy && -1 == (pos.x - gx)) scrolldir |= SCROLL_LEFT;
     else
-    if(pos.x == gx && 1 == (pos.y - gy)) Scroll(GameArea::BOTTOM);
+    if(pos.x == gx && 1 == (pos.y - gy)) scrolldir |= SCROLL_BOTTOM;
     else
-    if(pos.x == gx && -1 == (pos.y - gy)) Scroll(GameArea::TOP);
+    if(pos.x == gx && -1 == (pos.y - gy)) scrolldir |= SCROLL_TOP;
     else
     // diagonal
     if(-1 == (pos.y - gy) && 1 == (pos.x - gx))
     {
-	Scroll(GameArea::TOP);
-	Scroll(GameArea::RIGHT);
+	scrolldir |= SCROLL_TOP | SCROLL_RIGHT;
     }
     else
     if(-1 == (pos.y - gy) && -1 == (pos.x - gx))
     {
-	Scroll(GameArea::TOP);
-	Scroll(GameArea::LEFT);
+	scrolldir |= SCROLL_TOP | SCROLL_LEFT;
     }
     else
     if(1 == (pos.y - gy) && 1 == (pos.x - gx))
     {
-	Scroll(GameArea::BOTTOM);
-	Scroll(GameArea::RIGHT);
+	scrolldir |= SCROLL_BOTTOM | SCROLL_RIGHT;
     }
     else
     if(1 == (pos.y - gy) && -1 == (pos.x - gx))
     {
-	Scroll(GameArea::BOTTOM);
-	Scroll(GameArea::LEFT);
+	scrolldir |= SCROLL_BOTTOM | SCROLL_LEFT;
     }
 
     else
     {
 	gx = pos.x;
 	gy = pos.y;
-
-	Redraw();
+	scrolldir = 0;
     }
+
+    if(scrolldir) Scroll();
 }
 
 void RedrawBoat(const Maps::Tiles & tile, const Point & dst)
@@ -616,25 +602,6 @@ void RedrawClopOrClofSpriteFog(const u16 dst_index, const u8 ox, const u8 oy)
     }
 }
 
-Cursor::themes_t GameArea::ScrollToCursor(const u8 scroll)
-{
-    switch(scroll)
-    {
-	case TOP:		return Cursor::SCROLL_TOP;
-	case BOTTOM:		return Cursor::SCROLL_BOTTOM;
-	case RIGHT:		return Cursor::SCROLL_RIGHT;
-	case LEFT:		return Cursor::SCROLL_LEFT;
-	case LEFT | TOP:	return Cursor::SCROLL_TOPLEFT;
-	case LEFT | BOTTOM:	return Cursor::SCROLL_BOTTOMLEFT;
-	case RIGHT | TOP:	return Cursor::SCROLL_TOPRIGHT;
-	case RIGHT | BOTTOM:	return Cursor::SCROLL_BOTTOMRIGHT;
-
-	default: break;
-    }
-
-    return Cursor::NONE;
-}
-
 void GameArea::GenerateUltimateArtifactAreaSurface(const u16 index, Surface & sf)
 {
     if(Maps::isValidAbsIndex(index))
@@ -679,4 +646,40 @@ void GameArea::GenerateUltimateArtifactAreaSurface(const u16 index, Surface & sf
     }
     else
     Error::Warning("GameArea::GenerateUltimateArtifactAreaSurface: artifact not found");
+}
+
+bool GameArea::NeedScroll(void) const
+{
+    return scrolldir;
+}
+
+Cursor::themes_t GameArea::GetScrollCursor(void) const
+{
+    switch(scrolldir)
+    {
+	case SCROLL_TOP:		  return Cursor::SCROLL_TOP;
+	case SCROLL_BOTTOM:		  return Cursor::SCROLL_BOTTOM;
+	case SCROLL_RIGHT:		  return Cursor::SCROLL_RIGHT;
+	case SCROLL_LEFT:		  return Cursor::SCROLL_LEFT;
+	case SCROLL_LEFT | SCROLL_TOP:	  return Cursor::SCROLL_TOPLEFT;
+	case SCROLL_LEFT | SCROLL_BOTTOM: return Cursor::SCROLL_BOTTOMLEFT;
+	case SCROLL_RIGHT | SCROLL_TOP:	  return Cursor::SCROLL_TOPRIGHT;
+	case SCROLL_RIGHT | SCROLL_BOTTOM:return Cursor::SCROLL_BOTTOMRIGHT;
+
+	default: break;
+    }
+
+    return Cursor::NONE;
+}
+
+void GameArea::SetScroll(scroll_t direct)
+{
+    switch(direct)
+    {
+	case SCROLL_LEFT:	if(0 < gx)              scrolldir |= direct;	break;
+	case SCROLL_RIGHT:	if(world.w() - gw > gx) scrolldir |= direct;	break;
+	case SCROLL_TOP:	if(0 < gy)              scrolldir |= direct;	break;
+	case SCROLL_BOTTOM:	if(world.h() - gh > gy) scrolldir |= direct;	break;
+	default: break;
+    }
 }

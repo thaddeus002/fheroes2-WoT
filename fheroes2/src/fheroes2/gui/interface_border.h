@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2006 by Andrey Afletdinov                               *
+ *   Copyright (C) 2009 by Andrey Afletdinov                               *
  *   afletdinov@mail.dc.baikal.ru                                          *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -17,42 +17,24 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef H2BUTTON_H
-#define H2BUTTON_H
 
-#include "icn.h"
+#ifndef H2INTERFACE_BORDER_H
+#define H2INTERFACE_BORDER_H
+
 #include "gamedefs.h"
 
-class Button : public Rect
+namespace Interface
 {
-public:
-    Button();
-    Button(const Point &pt, const ICN::icn_t icn, u16 index1, u16 index2);
-    Button(u16 ox, u16 oy, const ICN::icn_t icn, u16 index1, u16 index2);
+    class BorderWindow
+    {
+    public:
+    	static BorderWindow & Get(void);
 
-    bool isEnable(void) const{ return !disable; };
-    bool isDisable(void) const{ return disable; };
-    bool isPressed(void) const{ return pressed; };
-    bool isReleased(void) const{ return !pressed; };
+        void Redraw(void);
 
-    void Press(void);
-    void Release(void);
-
-    void SetPos(const Point & pt);
-    void SetPos(const u16 ox, const u16 oy);
-    void SetSprite(const ICN::icn_t icn, const u16 index1, const u16 index2);
-    void SetDisable(bool fl){ disable = fl; pressed = fl; };
-
-    void Draw(void);
-    void PressDraw(void);
-    void ReleaseDraw(void);
-
-private:
-    const Sprite *sprite1;
-    const Sprite *sprite2;
-
-    bool pressed;
-    bool disable;
+    private:
+	BorderWindow();
+    };
 };
 
 #endif

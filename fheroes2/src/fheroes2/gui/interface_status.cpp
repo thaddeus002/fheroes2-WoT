@@ -21,6 +21,7 @@
 #include <algorithm>
 #include "agg.h"
 #include "text.h"
+#include "cursor.h"
 #include "world.h"
 #include "settings.h"
 #include "kingdom.h"
@@ -28,165 +29,168 @@
 #include "heroes.h"
 #include "army.h"
 #include "game_focus.h"
-#include "game_statuswindow.h"
+#include "interface_status.h"
 
 #define RESOURCE_WINDOW_EXPIRE 4000
 
-Game::StatusWindow::StatusWindow() : state(UNKNOWN)
+Interface::StatusWindow::StatusWindow() : state(STATUS_UNKNOWN), oldState(STATUS_UNKNOWN)
 {
+    const Sprite & ston = AGG::GetICN(Settings::Get().EvilInterface() ? ICN::STONBAKE : ICN::STONBACK, 0);
+    Rect::w = ston.w();
+    Rect::h = ston.h();
 }
 
-Game::StatusWindow & Game::StatusWindow::Get(void)
+Interface::StatusWindow & Interface::StatusWindow::Get(void)
 {
-    static Game::StatusWindow wstatus;
-
+    static Interface::StatusWindow wstatus;
     return wstatus;
 }
 
-u32 Game::StatusWindow::ResetResourceStatus(u32 tick, void *ptr)
+u32 Interface::StatusWindow::ResetResourceStatus(u32 tick, void *ptr)
 {
-    if(ptr && RESOURCE == reinterpret_cast<Game::StatusWindow*>(ptr)->state)
+    if(ptr && STATUS_RESOURCE == reinterpret_cast<Interface::StatusWindow*>(ptr)->state)
     {
-	reinterpret_cast<Game::StatusWindow*>(ptr)->state = reinterpret_cast<Game::StatusWindow*>(ptr)->old_state;
-	reinterpret_cast<Game::StatusWindow*>(ptr)->Redraw();
+	reinterpret_cast<Interface::StatusWindow*>(ptr)->state = reinterpret_cast<Interface::StatusWindow*>(ptr)->oldState;
+	reinterpret_cast<Interface::StatusWindow*>(ptr)->Redraw();
     }
     else
-	Timer::Remove(reinterpret_cast<Game::StatusWindow*>(ptr)->timerShowLastResource);
+	Timer::Remove(reinterpret_cast<Interface::StatusWindow*>(ptr)->timerShowLastResource);
 
     return tick;
 }
 
-void Game::StatusWindow::SetPos(const Point &pt)
+void Interface::StatusWindow::SetPos(s16 px, s16 py)
 {
-    const Sprite & ston = AGG::GetICN(Settings::Get().EvilInterface() ? ICN::STONBAKE : ICN::STONBACK, 0);
-    pos = Rect(pt, ston.w(), ston.h());
-    count = (Display::Get().h() - BORDERWIDTH - pos.y) / TILEWIDTH;
+    Rect::x = px;
+    Rect::y = py;
+    Rect::h = Display::Get().h() - py - BORDERWIDTH;
 }
 
-const Rect & Game::StatusWindow::GetRect(void) const
+const Rect & Interface::StatusWindow::GetArea(void) const
 {
-    return pos;
+    return *this;
 }
 
-void Game::StatusWindow::SetState(const info_t info)
+void Interface::StatusWindow::SetState(info_t info)
 {
-    if(RESOURCE != state)
-    state = info;
+    if(STATUS_RESOURCE != state) state = info;
 }
 
-void Game::StatusWindow::Redraw(void)
+void Interface::StatusWindow::Redraw(void)
 {
     // restore background
     DrawBackground();
-    const Sprite & ston = AGG::GetICN(Settings::Get().EvilInterface() ? ICN::STONBAKE : ICN::STONBACK, 0);
 
     // draw info: Day and Funds and Army
-    if(UNKNOWN != state && count >= ((ston.h() * 3 + 15)/ TILEWIDTH))
+    const Sprite & ston = AGG::GetICN(Settings::Get().EvilInterface() ? ICN::STONBAKE : ICN::STONBACK, 0);
+    if(STATUS_UNKNOWN != state && h >= (ston.h() * 3 + 15))
     {
         DrawDayInfo();
         DrawKingdomInfo(ston.h() + 5);
-        if(state != RESOURCE)
+
+        if(state != STATUS_RESOURCE)
             DrawArmyInfo(2 * ston.h() + 10);
-        else DrawResourceInfo(2 * ston.h() + 10);
+        else
+    	    DrawResourceInfo(2 * ston.h() + 10);
     }
     else
     switch(state)
     {
-        case DAY:	DrawDayInfo();		break;
-        case FUNDS:	DrawKingdomInfo();	break;
-        case ARMY:	DrawArmyInfo();		break;
-        case RESOURCE: DrawResourceInfo(); break;
+        case STATUS_DAY:	DrawDayInfo();		break;
+        case STATUS_FUNDS:	DrawKingdomInfo();	break;
+        case STATUS_ARMY:	DrawArmyInfo();		break;
+        case STATUS_RESOURCE:   DrawResourceInfo();     break;
 	default: break;
     }
 }
 
-void Game::StatusWindow::NextState(void)
+void Interface::StatusWindow::NextState(void)
 {
-    if(DAY == state) state = FUNDS;
+    if(STATUS_DAY == state) state = STATUS_FUNDS;
     else
-    if(FUNDS == state) state = (Game::Focus::UNSEL == Game::Focus::Get().Type() ? DAY : ARMY);
+    if(STATUS_FUNDS == state) state = (Game::Focus::UNSEL == Game::Focus::Get().Type() ? STATUS_DAY : STATUS_ARMY);
     else
-    if(ARMY == state) state = DAY;
+    if(STATUS_ARMY == state) state = STATUS_DAY;
     else
-    if(RESOURCE == state) state = ARMY;
+    if(STATUS_RESOURCE == state) state = STATUS_ARMY;
 }
 
-void Game::StatusWindow::DrawKingdomInfo(const u8 oh) const
+void Interface::StatusWindow::DrawKingdomInfo(const u8 oh) const
 {
-    std::string count;
+    std::string str;
 
     Kingdom & myKingdom = world.GetMyKingdom();
     Display & display = Display::Get();
 
     // sprite all resource
-    display.Blit(AGG::GetICN(ICN::RESSMALL, 0), pos.x + 6, pos.y + 3 + oh);
+    display.Blit(AGG::GetICN(ICN::RESSMALL, 0), x + 6, y + 3 + oh);
 
     // count castle
-    String::AddInt(count, myKingdom.GetCountCastle());
-    Text text(count, Font::SMALL);
-    text.Blit(pos.x + 26 - text.w() / 2, pos.y + 28 + oh);
+    String::AddInt(str, myKingdom.GetCountCastle());
+    Text text(str, Font::SMALL);
+    text.Blit(x + 26 - text.w() / 2, y + 28 + oh);
     // count town
-    count.clear();
-    String::AddInt(count, myKingdom.GetCountTown());
-    text.Set(count);
-    text.Blit(pos.x + 78 - text.w() / 2, pos.y + 28 + oh);
+    str.clear();
+    String::AddInt(str, myKingdom.GetCountTown());
+    text.Set(str);
+    text.Blit(x + 78 - text.w() / 2, y + 28 + oh);
     // count gold
-    count.clear();
-    String::AddInt(count, myKingdom.GetFundsGold());
-    text.Set(count);
-    text.Blit(pos.x + 122 - text.w() / 2, pos.y + 28 + oh);
+    str.clear();
+    String::AddInt(str, myKingdom.GetFundsGold());
+    text.Set(str);
+    text.Blit(x + 122 - text.w() / 2, y + 28 + oh);
     // count wood
-    count.clear();
-    String::AddInt(count, myKingdom.GetFundsWood());
-    text.Set(count);
-    text.Blit(pos.x + 15 - text.w() / 2, pos.y + 58 + oh);
+    str.clear();
+    String::AddInt(str, myKingdom.GetFundsWood());
+    text.Set(str);
+    text.Blit(x + 15 - text.w() / 2, y + 58 + oh);
     // count mercury
-    count.clear();
-    String::AddInt(count, myKingdom.GetFundsMercury());
-    text.Set(count);
-    text.Blit(pos.x + 37 - text.w() / 2, pos.y + 58 + oh);
+    str.clear();
+    String::AddInt(str, myKingdom.GetFundsMercury());
+    text.Set(str);
+    text.Blit(x + 37 - text.w() / 2, y + 58 + oh);
     // count ore
-    count.clear();
-    String::AddInt(count, myKingdom.GetFundsOre());
-    text.Set(count);
-    text.Blit(pos.x + 60 - text.w() / 2, pos.y + 58 + oh);
+    str.clear();
+    String::AddInt(str, myKingdom.GetFundsOre());
+    text.Set(str);
+    text.Blit(x + 60 - text.w() / 2, y + 58 + oh);
     // count sulfur
-    count.clear();
-    String::AddInt(count, myKingdom.GetFundsSulfur());
-    text.Set(count);
-    text.Blit(pos.x + 84 - text.w() / 2, pos.y + 58 + oh);
+    str.clear();
+    String::AddInt(str, myKingdom.GetFundsSulfur());
+    text.Set(str);
+    text.Blit(x + 84 - text.w() / 2, y + 58 + oh);
     // count crystal
-    count.clear();
-    String::AddInt(count, myKingdom.GetFundsCrystal());
-    text.Set(count);
-    text.Blit(pos.x + 108 - text.w() / 2, pos.y + 58 + oh);
+    str.clear();
+    String::AddInt(str, myKingdom.GetFundsCrystal());
+    text.Set(str);
+    text.Blit(x + 108 - text.w() / 2, y + 58 + oh);
     // count gems
-    count.clear();
-    String::AddInt(count, myKingdom.GetFundsGems());
-    text.Set(count);
-    text.Blit(pos.x + 130 - text.w() / 2, pos.y + 58 + oh);
+    str.clear();
+    String::AddInt(str, myKingdom.GetFundsGems());
+    text.Set(str);
+    text.Blit(x + 130 - text.w() / 2, y + 58 + oh);
 }
 
-void Game::StatusWindow::DrawDayInfo(const u8 oh) const
+void Interface::StatusWindow::DrawDayInfo(const u8 oh) const
 {
     std::string message;
     Display & display = Display::Get();
 
-    display.Blit(AGG::GetICN(Settings::Get().EvilInterface() ? ICN::SUNMOONE : ICN::SUNMOON, (world.GetWeek() - 1) % 5), pos.x, pos.y + 1 + oh);
+    display.Blit(AGG::GetICN(Settings::Get().EvilInterface() ? ICN::SUNMOONE : ICN::SUNMOON, (world.GetWeek() - 1) % 5), x, y + 1 + oh);
 
     message = _("Month: %{month} Week: %{week}");
     String::Replace(message, "%{month}", world.GetMonth());
     String::Replace(message, "%{week}", world.GetWeek());
     Text text(message, Font::SMALL);
-    text.Blit(pos.x + (pos.w - text.w()) / 2, pos.y + 30 + oh);
+    text.Blit(x + (w - text.w()) / 2, y + 30 + oh);
 
     message = _("Day: %{day}");
     String::Replace(message, "%{day}", world.GetDay());
     text.Set(message, Font::BIG);
-    text.Blit(pos.x + (pos.w - text.w()) / 2, pos.y + 46 + oh);
+    text.Blit(x + (w - text.w()) / 2, y + 46 + oh);
 }
 
-void Game::StatusWindow::SetResource(const Resource::resource_t res, u16 count)
+void Interface::StatusWindow::SetResource(Resource::resource_t res, u16 count)
 {
     lastResource = res;
     countLastResource = count;
@@ -194,13 +198,13 @@ void Game::StatusWindow::SetResource(const Resource::resource_t res, u16 count)
     if(timerShowLastResource.IsValid())
 	Timer::Remove(timerShowLastResource);
     else
-	old_state = state;
+	oldState = state;
 
-    state = RESOURCE;
+    state = STATUS_RESOURCE;
     Timer::Run(timerShowLastResource, RESOURCE_WINDOW_EXPIRE, ResetResourceStatus, this);
 }
 
-void Game::StatusWindow::ResetTimer(void)
+void Interface::StatusWindow::ResetTimer(void)
 {
     StatusWindow & window = Get();
     if(window.timerShowLastResource.IsValid())
@@ -210,24 +214,24 @@ void Game::StatusWindow::ResetTimer(void)
     }
 }
 
-void Game::StatusWindow::DrawResourceInfo(const u8 oh) const
+void Interface::StatusWindow::DrawResourceInfo(const u8 oh) const
 {
     std::string message = _("You find a small\nquantity of %{resource}.");
     String::Replace(message, "%{resource}", Resource::String(lastResource));
-    TextBox text(message, Font::SMALL, pos.w);
-    text.Blit(pos.x, pos.y + 4 + oh);
+    TextBox text(message, Font::SMALL, w);
+    text.Blit(x, y + 4 + oh);
     
     Display & display = Display::Get();
     const Sprite &spr = AGG::GetICN(ICN::RESOURCE, Resource::GetIndexSprite2(lastResource));
-    display.Blit(spr, pos.x + (pos.w - spr.w()) / 2, pos.y + 6 + oh + text.h());
+    display.Blit(spr, x + (w - spr.w()) / 2, y + 6 + oh + text.h());
 
     message.clear();
     String::AddInt(message, countLastResource);
-    text.Set(message, Font::SMALL, pos.w);
-    text.Blit(pos.x + (pos.w - text.w()) / 2, pos.y + oh + text.h() + spr.h() - 8);
+    text.Set(message, Font::SMALL, w);
+    text.Blit(x + (w - text.w()) / 2, y + oh + text.h() + spr.h() - 8);
 }
 
-void Game::StatusWindow::DrawArmyInfo(const u8 oh) const
+void Interface::StatusWindow::DrawArmyInfo(const u8 oh) const
 {
     const Game::Focus & focus = Game::Focus::Get();
 
@@ -238,22 +242,22 @@ void Game::StatusWindow::DrawArmyInfo(const u8 oh) const
 
     if(4 > count)
     {
-	armies.DrawMons32Line(pos.x, pos.y + 20 + oh, 144);
+	armies.DrawMons32Line(x, y + 20 + oh, 144);
     }
     else
     if(5 > count)
     {
-	armies.DrawMons32Line(pos.x, pos.y + 15 + oh, 110, 0, 2);
-	armies.DrawMons32Line(pos.x + 20, pos.y + 30 + oh, 120, 2, 2);
+	armies.DrawMons32Line(x, y + 15 + oh, 110, 0, 2);
+	armies.DrawMons32Line(x + 20, y + 30 + oh, 120, 2, 2);
     }
     else
     {
-	armies.DrawMons32Line(pos.x, pos.y + 15 + oh, 140, 0, 3);
-	armies.DrawMons32Line(pos.x + 10, pos.y + 30 + oh, 120, 3, 2);
+	armies.DrawMons32Line(x, y + 15 + oh, 140, 0, 3);
+	armies.DrawMons32Line(x + 10, y + 30 + oh, 120, 3, 2);
     }
 }
 
-void Game::StatusWindow::RedrawAITurns(u8 color, u8 progress) const
+void Interface::StatusWindow::RedrawAITurns(u8 color, u8 progress) const
 {
     // restore background
     DrawBackground();
@@ -261,8 +265,8 @@ void Game::StatusWindow::RedrawAITurns(u8 color, u8 progress) const
     Display & display = Display::Get();
     const Sprite & glass = AGG::GetICN(ICN::HOURGLAS, 0);
 
-    u16 dst_x = pos.x + (pos.w - glass.w()) / 2;
-    u16 dst_y = pos.y + (pos.h - glass.h()) / 2;
+    u16 dst_x = x + (w - glass.w()) / 2;
+    u16 dst_y = y + (h - glass.h()) / 2;
 
     display.Blit(glass, dst_x, dst_y);
 
@@ -299,15 +303,15 @@ void Game::StatusWindow::RedrawAITurns(u8 color, u8 progress) const
     //
 }
 
-void Game::StatusWindow::DrawBackground(void) const
+void Interface::StatusWindow::DrawBackground(void) const
 {
     Display & display = Display::Get();
     const Sprite & icnston = AGG::GetICN(Settings::Get().EvilInterface() ? ICN::STONBAKE : ICN::STONBACK, 0);
-    Point dstpt(pos);
 
-    if(display.h() - BORDERWIDTH - icnston.h() > dstpt.y)
+    if(display.h() - BORDERWIDTH - icnston.h() > y)
     {
         Rect srcrt;
+	Point dstpt(x, y);
 
         srcrt.x = 0;
         srcrt.y = 0;
@@ -319,7 +323,7 @@ void Game::StatusWindow::DrawBackground(void) const
         srcrt.h = 32;
         dstpt.y = dstpt.y + 12;
 
-        for(u8 ii = 0; ii < count; ++ii)
+        for(u8 ii = 0; ii < h / TILEWIDTH; ++ii)
         {
             display.Blit(icnston, srcrt, dstpt);
     	    dstpt.y = dstpt.y + TILEWIDTH;
@@ -330,5 +334,22 @@ void Game::StatusWindow::DrawBackground(void) const
         display.Blit(icnston, srcrt, dstpt);
     }
     else
-	display.Blit(icnston, dstpt);
+	display.Blit(icnston, x, y);
+}
+
+void Interface::StatusWindow::QueueEventProcessing(void)
+{
+    Display & display = Display::Get();
+    Cursor & cursor = Cursor::Get();
+    LocalEvent & le = LocalEvent::GetLocalEvent();
+
+    if(le.MouseClickLeft(*this))
+    {
+        cursor.Hide();
+        NextState();
+        Redraw();
+        cursor.Show();
+        display.Flip();
+    }
+    if(le.MousePressRight(*this)) Dialog::Message(_("Status Window"), _("This window provides information on the status of your hero or kingdom, and shows the date. Left click here to cycle throungh these windows."), Font::BIG);
 }

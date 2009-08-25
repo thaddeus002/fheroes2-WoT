@@ -23,7 +23,8 @@
 #include "types.h"
 #include "string_util.h"
 
-char *dirname_internal(const char *path)
+#ifdef __WIN32__ /* SDL_platform.h */
+const char *dirname_internal(const char *path)
 {
     static char buff[PATH_MAX];
     strncpy(buff, path, PATH_MAX);
@@ -33,7 +34,7 @@ char *dirname_internal(const char *path)
     return buff;
 }
 
-char *basename_internal(const char *path)
+const char *basename_internal(const char *path)
 {
     static char buff[FILENAME_MAX];
     const char *c = strrchr(path, SEPARATOR);
@@ -41,3 +42,15 @@ char *basename_internal(const char *path)
     else strcpy(buff, c + 1);
     return buff;
 }
+#else
+#include <libgen.h>
+const char *dirname_internal(const char *path)
+{
+    return dirname(const_cast<char *>(path));
+}
+
+const char *basename_internal(const char *path)
+{
+    return basename(const_cast<char *>(path));
+}
+#endif

@@ -36,6 +36,8 @@ namespace
         { "sound",             Settings::SOUND                       },
         { "music",             Settings::MUSIC_MIDI, Settings::MUSIC },
         { "fullscreen",        Settings::FULLSCREEN                  },
+        { "hide interface",    Settings::HIDEINTERFACE               },
+        { "evil interface",    Settings::EVILINTERFACE               },
         { "evilinterface",     Settings::EVILINTERFACE               },
         { "fade",              Settings::FADE                        },
         { "shadow",            Settings::SHADOW                      },
@@ -65,6 +67,11 @@ Settings::Settings() : major_version(MAJOR_VERSION), minor_version(MINOR_VERSION
     SetModes(ORIGINAL);
     SetModes(FADE);
     SetModes(LOGO);
+
+    SetModes(SHOWRADAR);
+    SetModes(SHOWICONS);
+    SetModes(SHOWBUTTONS);
+    SetModes(SHOWSTATUS);
 }
 
 Settings & Settings::Get(void)
@@ -176,7 +183,8 @@ void Settings::Dump(std::ostream & stream) const
     stream << "music volume = " << static_cast<int>(music_volume) << std::endl;
     stream << "animation = " << static_cast<int>(animation) << std::endl;
     stream << "fullscreen = " << (Modes(FULLSCREEN) ? "on"  : "off") << std::endl;
-    stream << "evilinterface = " << (Modes(EVILINTERFACE) ? "on"  : "off") << std::endl;
+    stream << "hide interface = " << (Modes(HIDEINTERFACE) ? "on"  : "off") << std::endl;
+    stream << "evil interface = " << (Modes(EVILINTERFACE) ? "on"  : "off") << std::endl;
     stream << "fade = " << (Modes(FADE) ? "on"  : "off") << std::endl;
     stream << "shadow = " << (Modes(SHADOW) ? "on"  : "off") << std::endl;
     stream << "original = " << (Modes(ORIGINAL) ? "on"  : "off") << std::endl;
@@ -278,6 +286,8 @@ bool Settings::FullScreen(void) const { return Modes(FULLSCREEN); }
 
 /* return evil interface */
 bool Settings::EvilInterface(void) const { return Modes(EVILINTERFACE); }
+
+bool Settings::HideInterface(void) const { return Modes(HIDEINTERFACE); }
 
 /* return shadow */
 bool Settings::Shadow(void) const { return Modes(SHADOW); }

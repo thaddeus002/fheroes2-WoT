@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2008 by Andrey Afletdinov                               *
+ *   Copyright (C) 2009 by Andrey Afletdinov                               *
  *   afletdinov@mail.dc.baikal.ru                                          *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -20,93 +20,114 @@
 
 #include <algorithm>
 
+#include "agg.h"
 #include "castle.h"
 #include "heroes.h"
 #include "race.h"
-#include "settings.h"
-#include "agg.h"
 #include "cursor.h"
 #include "world.h"
 #include "portrait.h"
+#include "settings.h"
 #include "game_focus.h"
 #include "kingdom.h"
-#include "game_selectobjbar.h"
+#include "interface_icons.h"
 
-#define ICONS_WIDTH		46
-#define ICONS_HEIGHT		22
-#define ICONS_CURSOR_WIDTH	56
-#define ICONS_CURSOR_HEIGHT	32
-#define ICONS_CURSOR_COLOR	0x98
-
-Game::SelectObjectBar::SelectObjectBar(const s16 px, const s16 py) : pos_pt(px, py)
+namespace Game
 {
-    const u8 count_h = (Display::Get().h() - 480) / TILEWIDTH;
-    const u8 count_icons = count_h > 3 ? 8 : ( count_h < 3 ? 4 : 7);
-
-    coords.resize(count_icons);
-
-    for(u8 ii = 0; ii < count_icons; ++ii)
-        coords[ii] = Rect(pos_pt.x, pos_pt.y + ii * ICONS_CURSOR_HEIGHT, ICONS_WIDTH, ICONS_HEIGHT);
-
-    max_area.x = pos_pt.x;
-    max_area.y = pos_pt.y;
-    max_area.w = ICONS_WIDTH;
-    max_area.h = coords.back().y + ICONS_HEIGHT;
+    /* extern func from game_startgame.cpp */
+    extern void OpenCastle(Castle *);
+    extern void OpenHeroes(Heroes *);
 }
 
-void Game::SelectObjectBar::Redraw(void) const
+#define ICONS_WIDTH             46
+#define ICONS_HEIGHT            22
+#define ICONS_CURSOR_WIDTH      56
+#define ICONS_CURSOR_HEIGHT     32
+#define ICONS_CURSOR_COLOR      0x98
+
+/* Interface::IconsBar */
+Interface::IconsBar::IconsBar() : visible(false)
+{
+    area.w = ICONS_WIDTH;
+}
+
+void Interface::IconsBar::SetPos(s16 px, s16 py)
+{
+    area.x = px;
+    area.y = py;
+
+    for(u8 ii = 0; ii < coords.size(); ++ii)
+	coords[ii] = Rect(area.x, area.y + ii * ICONS_CURSOR_HEIGHT, ICONS_WIDTH, ICONS_HEIGHT);
+}
+
+void Interface::IconsBar::SetCount(u8 icons)
+{
+    coords.resize(icons);
+
+    for(u8 ii = 0; ii < icons; ++ii)
+	coords[ii] = Rect(area.x, area.y + ii * ICONS_CURSOR_HEIGHT, ICONS_WIDTH, ICONS_HEIGHT);
+
+    area.h = coords.back().y + ICONS_HEIGHT;
+}
+
+void Interface::IconsBar::Redraw(void) const
 {
     Display & display = Display::Get();
     const Sprite & back = AGG::GetICN(Settings::Get().EvilInterface() ? ICN::LOCATORE : ICN::LOCATORS, 1);
-
     for(u8 ii = 0; ii < coords.size(); ++ii) display.Blit(back, coords[ii].x, coords[ii].y);
 }
 
-const std::vector<Rect> & Game::SelectObjectBar::GetCoords(void) const
+const std::vector<Rect> & Interface::IconsBar::GetCoords(void) const
 {
     return coords;
 }
 
-const Rect & Game::SelectObjectBar::GetArea(void) const
+const Rect & Interface::IconsBar::GetArea(void) const
 {
-    return max_area;
+    return area;
 }
 
-Game::SelectBarHeroes::SelectBarHeroes() 
-    : SelectObjectBar(Display::Get().w() - RADARWIDTH - BORDERWIDTH + 5, RADARWIDTH + BORDERWIDTH + 21), visible(false)
+Splitter & Interface::IconsBar::GetSplitter(void)
+{
+    return splitter;
+}
+
+
+/*Interface::HeroesIcons */
+Interface::HeroesIcons::HeroesIcons()
 {
     sf_cursor.Set(ICONS_CURSOR_WIDTH, ICONS_CURSOR_HEIGHT);
     sf_cursor.SetColorKey();
     Cursor::DrawCursor(sf_cursor, ICONS_CURSOR_COLOR, true);
 
-    sp_cursor.Save(pos_pt);
+    splitter.SetSprite(AGG::GetICN(Settings::Get().EvilInterface() ? ICN::SCROLLE : ICN::SCROLL, 4));
+    splitter.SetOrientation(Splitter::VERTICAL);
+}
+
+void Interface::HeroesIcons::SetPos(s16 px, s16 py)
+{
+    IconsBar::SetPos(px, py);
+
+    sp_cursor.Save(area.x, area.y);
     sp_cursor.SetSprite(sf_cursor);
 
-    splitter.SetSprite(AGG::GetICN(Settings::Get().EvilInterface() ? ICN::SCROLLE : ICN::SCROLL, 4));
-    splitter.SetArea(Rect(Display::Get().w() - RADARWIDTH - BORDERWIDTH + 60, RADARWIDTH + 2 * BORDERWIDTH + 18, 10, 32 * coords.size() - 35));
-    splitter.SetOrientation(Splitter::VERTICAL);
-    splitter.SetRange(0, 0);
-    splitter.Move(0);
+    splitter.SetArea(px + 55, py + 13, 10, ICONS_CURSOR_HEIGHT * coords.size() - 35);
+
+    std::vector<Heroes *> & heroes = world.GetMyKingdom().GetHeroes();
+    splitter.SetRange(0, heroes.size() > coords.size() ? heroes.size() - coords.size() : 0);
 }
 
-Game::SelectBarHeroes & Game::SelectBarHeroes::Get(void)
-{
-    static SelectBarHeroes instance;
-
-    return instance;
-}
-
-const Heroes * Game::SelectBarHeroes::Selected(void) const
+const Heroes * Interface::HeroesIcons::Selected(void) const
 {
     return Size() && visible ? *it_cur : NULL;
 }
 
-u32 Game::SelectBarHeroes::Size(void) const
+u32 Interface::HeroesIcons::Size(void) const
 {
     return world.GetMyKingdom().GetHeroes().size();
 }
 
-void Game::SelectBarHeroes::RedrawIcon(const Heroes & hero, const Rect & dst)
+void Interface::HeroesIcons::RedrawIcon(const Heroes & hero, const Rect & dst)
 {
     Display & display = Display::Get();
 
@@ -131,7 +152,7 @@ void Game::SelectBarHeroes::RedrawIcon(const Heroes & hero, const Rect & dst)
     display.Blit(mana, dst.x + sf_blue.w() + port.w() + 2, dst.y + mana.y());
 }
 
-void Game::SelectBarHeroes::Redraw(void)
+void Interface::HeroesIcons::Redraw(void)
 {
     std::vector<Heroes *> & heroes = world.GetMyKingdom().GetHeroes();
 
@@ -139,7 +160,7 @@ void Game::SelectBarHeroes::Redraw(void)
     splitter.Hide();
     splitter.SetSprite(AGG::GetICN(Settings::Get().EvilInterface() ? ICN::SCROLLE : ICN::SCROLL, 4));
 
-    SelectObjectBar::Redraw();
+    IconsBar::Redraw();
 
     std::vector<Heroes *>::const_iterator it = it_top;
     u8 ii = 0;
@@ -160,7 +181,7 @@ void Game::SelectBarHeroes::Redraw(void)
     splitter.Show();
 }
 
-void Game::SelectBarHeroes::Redraw(const Heroes *hero)
+void Interface::HeroesIcons::Redraw(const Heroes *hero)
 {
     if(NULL == hero) return;
 
@@ -187,13 +208,13 @@ void Game::SelectBarHeroes::Redraw(const Heroes *hero)
     }
 }
 
-void Game::SelectBarHeroes::Hide(void)
+void Interface::HeroesIcons::Hide(void)
 {
     if(isSelected()) Unselect();
-    SelectObjectBar::Redraw();
+    IconsBar::Redraw();
 }
 
-void Game::SelectBarHeroes::Unselect(void)
+void Interface::HeroesIcons::Unselect(void)
 {
     if(visible)
     {
@@ -202,7 +223,7 @@ void Game::SelectBarHeroes::Unselect(void)
     }
 }
 
-void Game::SelectBarHeroes::Select(const Heroes *hero)
+void Interface::HeroesIcons::Select(const Heroes *hero)
 {
     if(NULL == hero) return;
 
@@ -248,12 +269,12 @@ void Game::SelectBarHeroes::Select(const Heroes *hero)
     visible = true;
 }
 
-bool Game::SelectBarHeroes::isSelected(void) const
+bool Interface::HeroesIcons::isSelected(void) const
 {
     return visible;
 }
 
-void Game::SelectBarHeroes::Reset(void)
+void Interface::HeroesIcons::Reset(void)
 {
     std::vector<Heroes *> & heroes = world.GetMyKingdom().GetHeroes();
 
@@ -264,10 +285,9 @@ void Game::SelectBarHeroes::Reset(void)
     visible = false;
 
     splitter.SetRange(0, heroes.size() > coords.size() ? heroes.size() - coords.size() : 0);
-    splitter.Move(0);
 }
 
-bool Game::SelectBarHeroes::Prev(void)
+bool Interface::HeroesIcons::Prev(void)
 {
     std::vector<Heroes *> & heroes = world.GetMyKingdom().GetHeroes();
 
@@ -283,7 +303,7 @@ bool Game::SelectBarHeroes::Prev(void)
     return false;
 }
 
-bool Game::SelectBarHeroes::Next(void)
+bool Interface::HeroesIcons::Next(void)
 {
     std::vector<Heroes *> & heroes = world.GetMyKingdom().GetHeroes();
     std::vector<Heroes *>::const_iterator it = heroes.end();
@@ -300,7 +320,7 @@ bool Game::SelectBarHeroes::Next(void)
     return false;
 }
 
-void Game::SelectBarHeroes::SetTop(const u8 index)
+void Interface::HeroesIcons::SetTop(const u8 index)
 {
     std::vector<Heroes *> & heroes = world.GetMyKingdom().GetHeroes();
 
@@ -310,7 +330,7 @@ void Game::SelectBarHeroes::SetTop(const u8 index)
 	it_top = heroes.begin() + index;
 }
 
-const Heroes * Game::SelectBarHeroes::MouseClickLeft(void) const
+const Heroes * Interface::HeroesIcons::MouseClickLeft(void) const
 {
     std::vector<Heroes *> & heroes = world.GetMyKingdom().GetHeroes();
     LocalEvent & le = LocalEvent::GetLocalEvent();
@@ -329,7 +349,7 @@ const Heroes * Game::SelectBarHeroes::MouseClickLeft(void) const
     return NULL;
 }
 
-const Heroes * Game::SelectBarHeroes::MousePressRight(void) const
+const Heroes * Interface::HeroesIcons::MousePressRight(void) const
 {
     std::vector<Heroes *> & heroes = world.GetMyKingdom().GetHeroes();
     LocalEvent & le = LocalEvent::GetLocalEvent();
@@ -348,45 +368,42 @@ const Heroes * Game::SelectBarHeroes::MousePressRight(void) const
     return NULL;
 }
 
-Splitter & Game::SelectBarHeroes::GetSplitter(void)
-{
-    return splitter;
-}
 
-Game::SelectBarCastle::SelectBarCastle()
-    : SelectObjectBar(Display::Get().w() - RADARWIDTH - BORDERWIDTH + 77, RADARWIDTH + BORDERWIDTH + 21), visible(false)
+/* Interface::CastleIcons */
+Interface::CastleIcons::CastleIcons()
 {
     sf_cursor.Set(ICONS_CURSOR_WIDTH, ICONS_CURSOR_HEIGHT);
     sf_cursor.SetColorKey();
     Cursor::DrawCursor(sf_cursor, ICONS_CURSOR_COLOR, true);
 
-    sp_cursor.Save(pos_pt);
+    splitter.SetSprite(AGG::GetICN(Settings::Get().EvilInterface() ? ICN::SCROLLE : ICN::SCROLL, 4));
+    splitter.SetOrientation(Splitter::VERTICAL);
+}
+
+void Interface::CastleIcons::SetPos(s16 px, s16 py)
+{
+    IconsBar::SetPos(px, py);
+
+    sp_cursor.Save(area.x, area.y);
     sp_cursor.SetSprite(sf_cursor);
 
-    splitter.SetSprite(AGG::GetICN(Settings::Get().EvilInterface() ? ICN::SCROLLE : ICN::SCROLL, 4));
-    splitter.SetArea(Rect(Display::Get().w() - RADARWIDTH - BORDERWIDTH + 132, RADARWIDTH + 2 * BORDERWIDTH + 18, 10, 32 * coords.size() - 35));
-    splitter.SetOrientation(Splitter::VERTICAL);
-    splitter.SetRange(0, 0);
+    splitter.SetArea(px + 55, py + 13, 10, ICONS_CURSOR_HEIGHT * coords.size() - 35);
+
+    std::vector<Castle *> & castles = world.GetMyKingdom().GetCastles();
+    splitter.SetRange(0, castles.size() > coords.size() ? castles.size() - coords.size() : 0);
 }
 
-Game::SelectBarCastle & Game::SelectBarCastle::Get(void)
-{
-    static SelectBarCastle instance;
-
-    return instance;
-}
-
-const Castle * Game::SelectBarCastle::Selected(void) const
+const Castle * Interface::CastleIcons::Selected(void) const
 {
     return Size() && visible ? *it_cur : NULL;
 }
 
-u32 Game::SelectBarCastle::Size(void) const
+u32 Interface::CastleIcons::Size(void) const
 {
     return world.GetMyKingdom().GetCastles().size();
 }
 
-void Game::SelectBarCastle::RedrawIcon(const Castle & castle, const Rect & dst)
+void Interface::CastleIcons::RedrawIcon(const Castle & castle, const Rect & dst)
 {
     Display & display = Display::Get();
 
@@ -401,7 +418,7 @@ void Game::SelectBarCastle::RedrawIcon(const Castle & castle, const Rect & dst)
         case Race::WRLK: index_sprite = castle.isCastle() ? 12 : 18; break;
         case Race::WZRD: index_sprite = castle.isCastle() ? 13 : 19; break;
         case Race::NECR: index_sprite = castle.isCastle() ? 14 : 20; break;
-        default: Error::Warning("Game::SelectBarCastle::Redraw: unknown race.");
+        default: Error::Warning("Interface::CastleIcons::Redraw: unknown race.");
     }
 
     display.Blit(AGG::GetICN(interface ? ICN::LOCATORE : ICN::LOCATORS, index_sprite), dst.x, dst.y);
@@ -411,7 +428,7 @@ void Game::SelectBarCastle::RedrawIcon(const Castle & castle, const Rect & dst)
         display.Blit(AGG::GetICN(interface ? ICN::LOCATORE : ICN::LOCATORS, 24), dst.x + 39, dst.y + 1);
 }
 
-void Game::SelectBarCastle::Redraw(void)
+void Interface::CastleIcons::Redraw(void)
 {
     std::vector<Castle *> & castles = world.GetMyKingdom().GetCastles();
 
@@ -419,7 +436,7 @@ void Game::SelectBarCastle::Redraw(void)
     splitter.Hide();
     splitter.SetSprite(AGG::GetICN(Settings::Get().EvilInterface() ? ICN::SCROLLE : ICN::SCROLL, 4));
 
-    SelectObjectBar::Redraw();
+    IconsBar::Redraw();
 
     std::vector<Castle *>::const_iterator it = it_top;
     u8 ii = 0;
@@ -440,7 +457,7 @@ void Game::SelectBarCastle::Redraw(void)
     splitter.Show();
 }
 
-void Game::SelectBarCastle::Redraw(const Castle *castle)
+void Interface::CastleIcons::Redraw(const Castle *castle)
 {
     if(NULL == castle) return;
 
@@ -467,13 +484,13 @@ void Game::SelectBarCastle::Redraw(const Castle *castle)
     }
 }
 
-void Game::SelectBarCastle::Hide(void)
+void Interface::CastleIcons::Hide(void)
 {
     if(isSelected()) Unselect();
-    SelectObjectBar::Redraw();
+    IconsBar::Redraw();
 }
 
-void Game::SelectBarCastle::Unselect(void)
+void Interface::CastleIcons::Unselect(void)
 {
     if(visible)
     {
@@ -482,7 +499,7 @@ void Game::SelectBarCastle::Unselect(void)
     }
 }
 
-void Game::SelectBarCastle::Select(const Castle *castle)
+void Interface::CastleIcons::Select(const Castle *castle)
 {
     if(NULL == castle) return;
 
@@ -526,12 +543,12 @@ void Game::SelectBarCastle::Select(const Castle *castle)
     visible = true;
 }
 
-bool Game::SelectBarCastle::isSelected(void) const
+bool Interface::CastleIcons::isSelected(void) const
 {
     return visible;
 }
 
-void Game::SelectBarCastle::Reset(void)
+void Interface::CastleIcons::Reset(void)
 {
     std::vector<Castle *> & castles = world.GetMyKingdom().GetCastles();
     sp_cursor.Hide();
@@ -541,10 +558,9 @@ void Game::SelectBarCastle::Reset(void)
     visible = false;
 
     splitter.SetRange(0, castles.size() > coords.size() ? castles.size() - coords.size() : 0);
-    splitter.Move(0);
 }
 
-bool Game::SelectBarCastle::Prev(void)
+bool Interface::CastleIcons::Prev(void)
 {
     std::vector<Castle *> & castles = world.GetMyKingdom().GetCastles();
 
@@ -560,7 +576,7 @@ bool Game::SelectBarCastle::Prev(void)
     return false;
 }
 
-bool Game::SelectBarCastle::Next(void)
+bool Interface::CastleIcons::Next(void)
 {
     std::vector<Castle *> & castles = world.GetMyKingdom().GetCastles();
     std::vector<Castle *>::const_iterator it = castles.end();
@@ -577,7 +593,7 @@ bool Game::SelectBarCastle::Next(void)
     return false;
 }
 
-void Game::SelectBarCastle::SetTop(const u8 index)
+void Interface::CastleIcons::SetTop(const u8 index)
 {
     std::vector<Castle *> & castles = world.GetMyKingdom().GetCastles();
     
@@ -587,7 +603,7 @@ void Game::SelectBarCastle::SetTop(const u8 index)
 	it_top = castles.begin() + index;
 }
 
-const Castle * Game::SelectBarCastle::MouseClickLeft(void) const
+const Castle * Interface::CastleIcons::MouseClickLeft(void) const
 {
     std::vector<Castle *> & castles = world.GetMyKingdom().GetCastles();
     LocalEvent & le = LocalEvent::GetLocalEvent();
@@ -606,7 +622,7 @@ const Castle * Game::SelectBarCastle::MouseClickLeft(void) const
     return NULL;
 }
 
-const Castle * Game::SelectBarCastle::MousePressRight(void) const
+const Castle * Interface::CastleIcons::MousePressRight(void) const
 {
     std::vector<Castle *> & castles = world.GetMyKingdom().GetCastles();
     LocalEvent & le = LocalEvent::GetLocalEvent();
@@ -625,7 +641,260 @@ const Castle * Game::SelectBarCastle::MousePressRight(void) const
     return NULL;
 }
 
-Splitter & Game::SelectBarCastle::GetSplitter(void)
+
+/* Interface::IconsPanel */
+Interface::IconsPanel::IconsPanel() : Rect(0, 0, 144, 128), count_icons(4)
 {
-    return splitter;
+}
+
+Interface::IconsPanel & Interface::IconsPanel::Get(void)
+{
+    static IconsPanel iconsPanel;
+
+    return iconsPanel;
+}
+
+const Rect & Interface::IconsPanel::GetArea(void) const
+{
+    return *this;
+}
+
+u8 Interface::IconsPanel::CountIcons(void) const
+{
+    return count_icons;
+}
+
+void Interface::IconsPanel::SetPos(s16 ox, s16 oy)
+{
+    Rect::x = ox;
+    Rect::y = oy;
+
+    Display & display = Display::Get();
+    const ICN::icn_t icnscroll = Settings::Get().EvilInterface() ? ICN::SCROLLE : ICN::SCROLL;
+
+    buttonScrollHeroesUp.SetSprite(icnscroll, 0, 1);
+    buttonScrollCastleUp.SetSprite(icnscroll, 0, 1);
+    buttonScrollHeroesDown.SetSprite(icnscroll, 2, 3);
+    buttonScrollCastleDown.SetSprite(icnscroll, 2, 3);
+
+    const u8 count_h = (display.h() - 480) / TILEWIDTH;
+    count_icons = count_h > 3 ? 8 : ( count_h < 3 ? 4 : 7);
+    Rect::h = count_icons * ICONS_CURSOR_HEIGHT;
+
+    buttonScrollHeroesUp.SetPos(ox + ICONS_CURSOR_WIDTH + 1, oy + 1);
+    buttonScrollCastleUp.SetPos(ox + 2 * ICONS_CURSOR_WIDTH + buttonScrollHeroesUp.w + 3, oy + 1);
+    buttonScrollHeroesDown.SetPos(ox + ICONS_CURSOR_WIDTH + 1, oy + count_icons * ICONS_CURSOR_HEIGHT - buttonScrollHeroesDown.h - 1);
+    buttonScrollCastleDown.SetPos(ox + 2 * ICONS_CURSOR_WIDTH + buttonScrollHeroesDown.w + 3, oy + count_icons * ICONS_CURSOR_HEIGHT - buttonScrollCastleDown.h - 1);
+    
+    heroesIcons.SetPos(ox + 5, oy + 5);
+    heroesIcons.SetCount(count_icons);
+
+    castleIcons.SetPos(ox + 77, oy + 5);
+    castleIcons.SetCount(count_icons);
+}
+
+void Interface::IconsPanel::Redraw(void)
+{
+    Display & display = Display::Get();
+    const ICN::icn_t icnscroll = Settings::Get().EvilInterface() ? ICN::SCROLLE : ICN::SCROLL;
+
+    buttonScrollHeroesUp.SetSprite(icnscroll, 0, 1);
+    buttonScrollCastleUp.SetSprite(icnscroll, 0, 1);
+    buttonScrollHeroesDown.SetSprite(icnscroll, 2, 3);
+    buttonScrollCastleDown.SetSprite(icnscroll, 2, 3);
+
+    Rect srcrt;
+    Point dstpt;
+
+    // ICON PANEL
+    const Sprite & icnadv = AGG::GetICN(Settings::Get().EvilInterface() ? ICN::ADVBORDE : ICN::ADVBORD, 0);
+    srcrt.x = icnadv.w() - RADARWIDTH - BORDERWIDTH;
+    srcrt.y = RADARWIDTH + 2 * BORDERWIDTH;
+    srcrt.w = RADARWIDTH;
+    srcrt.h = 32;
+    dstpt.x = x;
+    dstpt.y = y;
+    display.Blit(icnadv, srcrt, dstpt);
+    srcrt.y = srcrt.y + srcrt.h;
+    dstpt.y = dstpt.y + srcrt.h;
+    srcrt.h = 32;
+    for(u8 ii = 0; ii < count_icons - 2; ++ii)
+    {
+	display.Blit(icnadv, srcrt, dstpt);
+	dstpt.y += srcrt.h;
+    }
+    srcrt.y = srcrt.y + 64;
+    srcrt.h = 32;
+    display.Blit(icnadv, srcrt, dstpt);
+
+    buttonScrollHeroesUp.Draw();
+    buttonScrollCastleUp.Draw();
+    buttonScrollHeroesDown.Draw();
+    buttonScrollCastleDown.Draw();
+
+    heroesIcons.Redraw();
+    castleIcons.Redraw();        
+}
+
+void Interface::IconsPanel::QueueEventProcessing(void)
+{
+    Display & display = Display::Get();
+    Cursor & cursor = Cursor::Get();
+
+    LocalEvent & le = LocalEvent::GetLocalEvent();
+
+    Game::Focus & global_focus = Game::Focus::Get();
+
+    HeroesIcons & selectHeroes = heroesIcons;
+    CastleIcons & selectCastle = castleIcons;
+
+    Splitter & splitCastle = selectCastle.GetSplitter();
+    Splitter & splitHeroes = selectHeroes.GetSplitter();
+
+    const Kingdom & myKingdom = world.GetMyKingdom();
+    const std::vector<Castle *> & myCastles = myKingdom.GetCastles();
+    const std::vector<Heroes *> & myHeroes = myKingdom.GetHeroes();
+
+    le.MousePressLeft(buttonScrollHeroesUp) ? buttonScrollHeroesUp.PressDraw() : buttonScrollHeroesUp.ReleaseDraw();
+    le.MousePressLeft(buttonScrollCastleUp) ? buttonScrollCastleUp.PressDraw() : buttonScrollCastleUp.ReleaseDraw();
+    le.MousePressLeft(buttonScrollHeroesDown) ? buttonScrollHeroesDown.PressDraw() : buttonScrollHeroesDown.ReleaseDraw();
+    le.MousePressLeft(buttonScrollCastleDown) ? buttonScrollCastleDown.PressDraw() : buttonScrollCastleDown.ReleaseDraw();
+
+    // click Scroll Heroes Up
+    if((le.MouseWheelUp(selectHeroes.GetArea()) ||
+	le.MouseWheelUp(splitHeroes.GetRect()) ||
+	le.MouseClickLeft(buttonScrollHeroesUp)) && selectHeroes.Prev())
+    {
+        cursor.Hide();
+        selectHeroes.Redraw();
+        cursor.Show();
+        display.Flip();
+    }
+    else
+    // click Scroll Castle Up
+    if((le.MouseWheelUp(selectCastle.GetArea()) ||
+        le.MouseWheelUp(splitCastle.GetRect()) ||
+        le.MouseClickLeft(buttonScrollCastleUp)) && selectCastle.Prev())
+    {
+        cursor.Hide();
+        selectCastle.Redraw();
+        cursor.Show();
+        display.Flip();
+    }
+    else
+    // click Scroll Heroes Down
+    if((le.MouseWheelDn(selectHeroes.GetArea()) ||
+        le.MouseWheelDn(splitHeroes.GetRect()) ||
+        le.MouseClickLeft(buttonScrollHeroesDown)) &&
+        selectHeroes.Next())
+    {
+        cursor.Hide();
+        selectHeroes.Redraw();
+        cursor.Show();
+        display.Flip();
+    }
+    else
+    // click Scroll Castle Down
+    if((le.MouseWheelDn(selectCastle.GetArea()) ||
+        le.MouseWheelDn(splitCastle.GetRect())  ||
+        le.MouseClickLeft(buttonScrollCastleDown)) &&
+        selectCastle.Next())
+    {
+        cursor.Hide();
+        selectCastle.Redraw();
+        cursor.Show();
+        display.Flip();
+    }
+
+    // move splitter cursor castle
+    if(le.MousePressLeft(selectCastle.GetSplitter().GetRect()) &&
+        myCastles.size() > count_icons)
+    {
+        if(0 != splitCastle.GetStep())
+        {
+            u32 seek = (le.MouseCursor().y - splitCastle.GetRect().y) * 100 / splitCastle.GetStep();
+            if(seek > myCastles.size() - count_icons) seek = myCastles.size() - count_icons;
+
+            cursor.Hide();
+            splitCastle.Move(seek);
+            selectCastle.SetTop(seek);
+    	    selectCastle.Redraw();
+            cursor.Show();
+            display.Flip();
+        }
+    }
+    else
+    // move splitter cursor heroes
+    if(le.MousePressLeft(selectHeroes.GetSplitter().GetRect()) &&
+        myHeroes.size() > count_icons)
+    {
+        if(0 != splitHeroes.GetStep())
+	{
+            u32 seek = (le.MouseCursor().y - splitHeroes.GetRect().y) * 100 / splitHeroes.GetStep();
+            if(seek > myHeroes.size() - count_icons) seek = myHeroes.size() - count_icons;
+
+	    cursor.Hide();
+	    splitHeroes.Move(seek);
+	    selectHeroes.SetTop(seek);
+	    selectHeroes.Redraw();
+            cursor.Show();
+            display.Flip();
+	}
+    }
+
+    // click Heroes Icons
+    if(const Heroes * hero = selectHeroes.MouseClickLeft())
+    {
+	if(hero == selectHeroes.Selected())
+    	    Game::OpenHeroes(const_cast<Heroes *>(hero));
+        else
+        {
+    	    cursor.Hide();
+            global_focus.Set(const_cast<Heroes *>(hero));
+            global_focus.Redraw();
+            cursor.Show();
+            display.Flip();
+        }
+    }
+    else
+    if(const Heroes * hero = selectHeroes.MousePressRight())
+    {
+        cursor.Hide();
+        Dialog::QuickInfo(*hero);
+        cursor.Show();
+        display.Flip();
+    }
+    else
+    // click Castle Icons
+    if(const Castle * cstl = selectCastle.MouseClickLeft())
+    {
+        if(cstl == selectCastle.Selected())
+    	    Game::OpenCastle(const_cast<Castle *>(cstl));
+        else
+        {
+            cursor.Hide();
+            global_focus.Set(const_cast<Castle *>(cstl));
+            global_focus.Redraw();
+            cursor.Show();
+            display.Flip();
+        }
+    }
+    else
+    if(const Castle * cstl = selectCastle.MousePressRight())
+    {
+        cursor.Hide();
+        Dialog::QuickInfo(*cstl);
+        cursor.Show();
+        display.Flip();
+    }
+}
+
+Interface::HeroesIcons & Interface::IconsPanel::GetHeroesBar(void)
+{
+    return heroesIcons;
+}
+
+Interface::CastleIcons & Interface::IconsPanel::GetCastleBar(void)
+{
+    return castleIcons;
 }

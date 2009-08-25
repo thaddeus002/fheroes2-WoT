@@ -26,7 +26,7 @@
 #include "world.h"
 #include "castle.h"
 #include "cursor.h"
-#include "radar.h"
+#include "interface_radar.h"
 
 #define RADARCOLOR	0x40	// index palette
 #define COLOR_DESERT	0x70
@@ -51,13 +51,15 @@
 u32 GetPaletteIndexFromGround(const u16 ground);
 
 /* constructor */
-Radar::Radar() : spriteArea(NULL), spriteCursor(NULL), cursor(NULL),
+Interface::Radar::Radar() : spriteArea(NULL), spriteCursor(NULL), cursor(NULL),
     sf_blue(NULL), sf_green(NULL), sf_red(NULL), sf_yellow(NULL),
     sf_orange(NULL), sf_purple(NULL), sf_gray(NULL), sf_black(NULL)
 {
+    Rect::w = RADARWIDTH;
+    Rect::h = RADARWIDTH;
 }
 
-Radar::~Radar()
+Interface::Radar::~Radar()
 {
     if(cursor) delete cursor;
     if(spriteArea) delete spriteArea;
@@ -72,11 +74,20 @@ Radar::~Radar()
     if(sf_black) delete sf_black;
 }
 
-/* construct gui */
-void Radar::Build(void)
+void Interface::Radar::SetPos(s16 px, s16 py)
 {
-    pos = Rect(Display::Get().w() - BORDERWIDTH - RADARWIDTH, BORDERWIDTH, RADARWIDTH, RADARWIDTH);
+    Rect::x = px;
+    Rect::y = py;
+}
 
+const Rect & Interface::Radar::GetArea(void) const
+{
+    return *this;
+}
+
+/* construct gui */
+void Interface::Radar::Build(void)
+{
     if(cursor) delete cursor;
     if(spriteArea) delete spriteArea;
     if(spriteCursor) delete spriteCursor;
@@ -92,17 +103,17 @@ void Radar::Build(void)
     spriteArea = new Surface(RADARWIDTH, RADARWIDTH);
     spriteCursor = new Surface(static_cast<u16>(GameArea::w() * (RADARWIDTH / static_cast<float>(world.w()))),
                 	static_cast<u16>(GameArea::h() * (RADARWIDTH / static_cast<float>(world.h()))));
-    cursor = new SpriteCursor(*spriteCursor, pos.x, pos.y);
+    cursor = new SpriteCursor(*spriteCursor, x, y);
 
-    const u8 x = world.w() == Maps::SMALL ? 4 : 2;
-    sf_blue = new Surface(x, x);
-    sf_green = new Surface(x, x);
-    sf_red = new Surface(x, x);
-    sf_yellow = new Surface(x, x);
-    sf_orange = new Surface(x, x);
-    sf_purple = new Surface(x, x);
-    sf_gray = new Surface(x, x);
-    sf_black = new Surface(x, x);
+    const u8 n = world.w() == Maps::SMALL ? 4 : 2;
+    sf_blue = new Surface(n, n);
+    sf_green = new Surface(n, n);
+    sf_red = new Surface(n, n);
+    sf_yellow = new Surface(n, n);
+    sf_orange = new Surface(n, n);
+    sf_purple = new Surface(n, n);
+    sf_gray = new Surface(n, n);
+    sf_black = new Surface(n, n);
 
     sf_blue->Fill(sf_blue->GetColor(COLOR_BLUE));
     sf_green->Fill(sf_green->GetColor(COLOR_GREEN));
@@ -117,7 +128,7 @@ void Radar::Build(void)
     Cursor::DrawCursor(*spriteCursor, RADARCOLOR);
 }
 
-Radar & Radar::Get(void)
+Interface::Radar & Interface::Radar::Get(void)
 {
     static Radar radar0;
 
@@ -125,13 +136,13 @@ Radar & Radar::Get(void)
 }
 
 /* generate mini maps */
-void Radar::Generate(void)
+void Interface::Radar::Generate(void)
 {
     const u16 world_w = world.w();
     const u16 world_h = world.h();
 
-    const u8 x = world.w() == Maps::SMALL ? 4 : 2;
-    Surface tile_surface(x, x);
+    const u8 n = world.w() == Maps::SMALL ? 4 : 2;
+    Surface tile_surface(n, n);
 
     for(u16 index = 0; index < world_w * world_h; ++index)
     {
@@ -153,13 +164,19 @@ void Radar::Generate(void)
     }
 }
 
-void Radar::HideArea(void)
+void Interface::Radar::HideArea(void)
 {
-    Display::Get().Blit(AGG::GetICN((Settings::Get().EvilInterface() ? ICN::HEROLOGE : ICN::HEROLOGO), 0), pos.x, pos.y);
+    Display::Get().Blit(AGG::GetICN((Settings::Get().EvilInterface() ? ICN::HEROLOGE : ICN::HEROLOGO), 0), x, y);
+}
+
+void Interface::Radar::Redraw(void)
+{
+    RedrawArea(Settings::Get().MyColor());
+    RedrawCursor();
 }
 
 /* redraw radar area for color */
-void Radar::RedrawArea(const u8 color)
+void Interface::Radar::RedrawArea(const u8 color)
 {
     Display & display = Display::Get();
 
@@ -168,7 +185,7 @@ void Radar::RedrawArea(const u8 color)
     const Surface *tile_surface = NULL;
 
     cursor->Hide();
-    display.Blit(*spriteArea, pos.x, pos.y);
+    display.Blit(*spriteArea, x, y);
 
     for(u16 index = 0; index < world_w * world_h; ++index)
     {
@@ -214,21 +231,21 @@ void Radar::RedrawArea(const u8 color)
 	    float dstx = (index % world_w) * RADARWIDTH / world_w;
 	    float dsty = (index / world_h) * RADARWIDTH / world_w;
 
-	    display.Blit(*tile_surface, pos.x + static_cast<u16>(dstx), pos.y + static_cast<u16>(dsty));
+	    display.Blit(*tile_surface, x + static_cast<u16>(dstx), y + static_cast<u16>(dsty));
 	}
     }
 }
 
 /* redraw radar cursor */
-void Radar::RedrawCursor(void)
+void Interface::Radar::RedrawCursor(void)
 {
     cursor->Hide();
-    cursor->Move(pos.x + GameArea::x() * RADARWIDTH / world.w(),
-                pos.y + GameArea::y() * RADARWIDTH / world.h());
+    cursor->Move(x + GameArea::x() * RADARWIDTH / world.w(),
+                y + GameArea::y() * RADARWIDTH / world.h());
     cursor->Show();
 }
 
-Surface *Radar::GetSurfaceFromColor(const u8 color)
+Surface* Interface::Radar::GetSurfaceFromColor(const u8 color)
 {
     switch(color)
     {
@@ -262,4 +279,30 @@ u32 GetPaletteIndexFromGround(const u16 ground)
     }
 
     return 0;
+}
+
+void Interface::Radar::QueueEventProcessing(void)
+{
+    Display & display = Display::Get();
+    Cursor & cursor = Cursor::Get();
+    GameArea & gamearea = GameArea::Get();
+    LocalEvent & le = LocalEvent::GetLocalEvent();
+
+    if(le.MouseCursor(*this) &&
+        (le.MouseClickLeft(*this) || le.MousePressLeft(*this)))
+    {
+        const Point prev(gamearea.GetRect());
+        const Point & pt = le.MouseCursor();
+	gamearea.Center((pt.x - x) * world.w() / RADARWIDTH, (pt.y - y) * world.h() / RADARWIDTH);
+        if(prev != gamearea.GetRect())
+        {
+            cursor.Hide();
+            RedrawCursor();
+            gamearea.Redraw();
+            cursor.Show();
+            display.Flip();
+        }
+    }
+
+    if(le.MousePressRight(*this)) Dialog::Message(_("World Map"), _("A miniature view of the known world. Left click to move viewing area."), Font::BIG);
 }

@@ -138,8 +138,7 @@ public:
     static void SetStateDefaults(void);
     static void SetState(u8 type, bool enable);
     static u8   GetState(u8 type);
-
-    bool operator() (void) const{ return keep_going; };
+    static void SetMouseRedraw(bool);
 
     bool HandleEvents(void);
 
@@ -196,11 +195,13 @@ private:
 
     static int GlobalFilterEvents(const SDL_Event *event);
 
-    static bool   keep_going;
+    enum flag_t { KEY_PRESSED = 0x01, MOUSE_MOTION = 0x02, MOUSE_PRESSED = 0x04, MOUSE_REDRAW = 0x08, };
+
+    static void SetModes(flag_t);
+    static void ResetModes(flag_t);
+
+    static u8     modes;
     static KeySym key_value;
-    static bool   key_pressed;
-    static bool   mouse_motion;
-    static bool   mouse_pressed;
     static u8     mouse_state;
     static u8     mouse_button;
 

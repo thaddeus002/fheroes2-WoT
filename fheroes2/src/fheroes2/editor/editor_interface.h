@@ -24,22 +24,20 @@
 #include "gamedefs.h"
 #include "button.h"
 #include "splitter.h"
-#include "game.h"
+#include "interface_radar.h"
 
-namespace Game
+class EditorInterface
 {
-namespace Editor
-{
-    class Interface
-    {
-    public:
-    	static Interface & Get(void);
+public:
+    	static EditorInterface & Get(void);
 
 	static void	DrawTopNumberCell(void);
 	static void	DrawLeftNumberCell(void);
 
 	void	Draw(void);
 	void	Scroll(const u8 scroll);
+
+	Interface::Radar radar;
 
 	Button btnLeftTopScroll;
         Button btnRightTopScroll;
@@ -69,10 +67,8 @@ namespace Editor
 	Splitter split_h;
 	Splitter split_v;
 
-    private:
-	Interface();
-    };
-};
+private:
+	EditorInterface();
 };
 
 #endif

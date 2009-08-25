@@ -20,7 +20,7 @@
 
 #ifndef STRING_UTIL_H
 
-char *dirname_internal(const char *);
-char *basename_internal(const char *);
+const char *dirname_internal(const char *);
+const char *basename_internal(const char *);
 
 #endif

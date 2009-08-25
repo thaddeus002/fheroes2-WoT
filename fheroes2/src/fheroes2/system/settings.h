@@ -46,6 +46,12 @@ public:
 	AUTOSAVE          = 0x00000002,
 	DEDICATEDSERVER   = 0x00000004,
 
+	SHOWRADAR         = 0x00000200,
+	SHOWICONS         = 0x00000400,
+	SHOWBUTTONS       = 0x00000800,
+	SHOWSTATUS        = 0x00001000,
+        HIDEINTERFACE     = 0x00002000,
+
 	FADE              = 0x00004000,
         FONTRENDERBLENDED = 0x00008000,
 
@@ -104,6 +110,7 @@ public:
     bool Music(void) const;
     bool CDMusic(void) const;
     bool FullScreen(void) const;
+    bool HideInterface(void) const;
     bool EvilInterface(void) const;
     bool Shadow(void) const;
     bool Logo(void) const;

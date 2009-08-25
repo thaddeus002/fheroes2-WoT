@@ -24,7 +24,7 @@
 #include "world.h"
 #include "editor_interface.h"
 
-Game::Editor::Interface::Interface()
+EditorInterface::EditorInterface() : radar(Interface::Radar::Get())
 {
     btnLeftTopScroll.SetSprite(ICN::ESCROLL, 12, 13);
     btnRightTopScroll.SetSprite(ICN::ESCROLL, 14, 15);
@@ -55,14 +55,14 @@ Game::Editor::Interface::Interface()
     split_v.SetSprite(AGG::GetICN(ICN::ESCROLL, 3));
 }
 
-Game::Editor::Interface & Game::Editor::Interface::Get(void)
+EditorInterface & EditorInterface::Get(void)
 {
-    static Interface interface;
+    static EditorInterface einterface;
 
-    return interface;
+    return einterface;
 }
 
-void Game::Editor::Interface::Draw(void)
+void EditorInterface::Draw(void)
 {
     Display & display = Display::Get();
     GameArea & areaMaps = GameArea::Get();
@@ -112,7 +112,7 @@ void Game::Editor::Interface::Draw(void)
     src_rt.y = spriteLeftBar.h() - TILEWIDTH;
     display.Blit(spriteLeftBar,src_rt, dst_pt);
 
-    // draw interface
+    // draw EditorInterface
     const Sprite & spriteAdv = AGG::GetICN(ICN::ADVBORD, 0);
 
     // left top static border
@@ -328,34 +328,34 @@ void Game::Editor::Interface::Draw(void)
     split_v.Move(areaMaps.GetRect().y);
 }
 
-void Game::Editor::Interface::Scroll(const u8 scroll)
+void EditorInterface::Scroll(const u8 scroll)
 {
-    if(scroll & GameArea::LEFT)
+    if(scroll & SCROLL_LEFT)
     {
 	split_h.Backward();
 	DrawTopNumberCell();
     }
     else
-    if(scroll & GameArea::RIGHT)
+    if(scroll & SCROLL_RIGHT)
     {
 	split_h.Forward();
 	DrawTopNumberCell();
     }
     
-    if(scroll & GameArea::TOP)
+    if(scroll & SCROLL_TOP)
     {
 	split_v.Backward();
 	DrawLeftNumberCell();
     }
     else
-    if(scroll & GameArea::BOTTOM)
+    if(scroll & SCROLL_BOTTOM)
     {
 	split_v.Forward();
 	DrawLeftNumberCell();
     }
 }
 
-void Game::Editor::Interface::DrawTopNumberCell(void)
+void EditorInterface::DrawTopNumberCell(void)
 {
     const Rect & area = GameArea::Get().GetRect();
     Point dst_pt;
@@ -376,7 +376,7 @@ void Game::Editor::Interface::DrawTopNumberCell(void)
     }
 }
 
-void Game::Editor::Interface::DrawLeftNumberCell(void)
+void EditorInterface::DrawLeftNumberCell(void)
 {
     const Rect & area = GameArea::Get().GetRect();
     Point dst_pt;

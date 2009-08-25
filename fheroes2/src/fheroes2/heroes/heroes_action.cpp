@@ -28,8 +28,8 @@
 #include "battle.h"
 #include "gamearea.h"
 #include "game_focus.h"
-#include "game_selectobjbar.h"
-#include "game_statuswindow.h"
+#include "interface_status.h"
+#include "interface_icons.h"
 #include "kingdom.h"
 #include "cursor.h"
 #include "algorithm.h"
@@ -686,7 +686,7 @@ void ActionToCastle(Heroes &hero, const u8 obj, const u16 dst_index)
                 world.GetKingdom(castle->GetColor()).RemoveCastle(castle);
                 world.GetKingdom(hero.GetColor()).AddCastle(castle);
                 world.CaptureObject(dst_index, hero.GetColor());
-                Game::SelectBarCastle::Get().Redraw();
+		Interface::IconsPanel::Get().GetCastleBar().Redraw();
                 if(exp) hero.ActionAfterBattle();
                 // kill guardian hero
                 if(Heroes *other_hero = world.GetHeroes(dst_index))
@@ -789,8 +789,8 @@ void ActionToPickupResource(Heroes &hero, const u8 obj, const u16 dst_index)
             break;
 
         default:
-            Game::StatusWindow::Get().SetResource(res, (Resource::GOLD == res ? 100 * count : count));
-            Game::StatusWindow::Get().Redraw();
+            Interface::StatusWindow::Get().SetResource(res, (Resource::GOLD == res ? 100 * count : count));
+            Interface::StatusWindow::Get().Redraw();
             Display::Get().Flip();
             break;
     }

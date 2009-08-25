@@ -18,61 +18,48 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#ifndef H2STATUSWINDOW_H
-#define H2STATUSWINDOW_H
+#ifndef H2INTERFACE_RADAR_H
+#define H2INTERFACE_RADAR_H
 
-#include "thread.h"
 #include "gamedefs.h"
-#include "game.h"
-#include "resource.h"
 
-class Surface;
-class Castle;
-class Heroes;
-
-namespace Game
+namespace Interface
 {
+    class Radar : protected Rect
+    {
+    public:
+	static Radar & Get(void);
+	~Radar();
 
-class StatusWindow
-{
-public:
-    typedef enum { UNKNOWN, DAY, FUNDS, ARMY, RESOURCE } info_t;
+	void SetPos(s16, s16);
+	const Rect & GetArea(void) const;
 
-    static StatusWindow & Get(void);
+	void Build(void);
+	void Generate(void);
+	void Redraw(void);
+	void RedrawArea(const u8 color = 0xFF);
+	void HideArea(void);
+	void RedrawCursor(void);
 
-    void SetPos(const Point &pt);
-    const Rect & GetRect(void) const;
-    
-    void Redraw(void);
-    void SetState(const info_t info);
-    void NextState(void);
+	void QueueEventProcessing(void);
 
-    static void ResetTimer(void);
-    
-    void SetResource(const Resource::resource_t, u16);
+    private:
+	Surface *GetSurfaceFromColor(const u8);
+	Radar();
 
-    void RedrawAITurns(u8 color, u8 progress) const;
+        Surface *spriteArea;
+	Surface *spriteCursor;
+	SpriteCursor *cursor;
 
-private:
-    StatusWindow();
-    void DrawKingdomInfo(const u8 oh = 0) const;
-    void DrawDayInfo(const u8 oh = 0) const;
-    void DrawArmyInfo(const u8 oh = 0) const;
-    void DrawResourceInfo(const u8 oh = 0) const;
-    void DrawBackground(void) const;
-    static u32 ResetResourceStatus(u32, void *);
-
-    Rect pos;
-    u8 count;
-
-    info_t state;
-
-    Resource::resource_t lastResource;
-    u16 countLastResource;
-    Timer timerShowLastResource;
-    info_t old_state;
-};
-
+        Surface* sf_blue;
+	Surface* sf_green;
+        Surface* sf_red;
+	Surface* sf_yellow;
+        Surface* sf_orange;
+	Surface* sf_purple;
+        Surface* sf_gray;
+	Surface* sf_black;
+    };
 };
 
 #endif

@@ -24,8 +24,7 @@
 #include "cursor.h"
 #include "engine.h"
 #include "gamearea.h"
-#include "game_statuswindow.h"
-#include "radar.h"
+#include "interface_status.h"
 #include "heroes.h"
 #include "castle.h"
 #include "world.h"
@@ -36,7 +35,7 @@
 void RedrawAITurns(u8 color, u8 i)
 {
     Cursor::Get().Hide();
-    Game::StatusWindow::Get().RedrawAITurns(color, i);
+    Interface::StatusWindow::Get().RedrawAITurns(color, i);
     Cursor::Get().Show();
     Display::Get().Flip();
 }

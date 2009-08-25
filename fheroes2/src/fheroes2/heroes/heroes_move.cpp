@@ -24,8 +24,6 @@
 #include "settings.h"
 #include "gamearea.h"
 #include "kingdom.h"
-#include "game_statuswindow.h"
-#include "game_selectobjbar.h"
 #include "maps_tiles.h"
 #include "castle.h"
 #include "heroes.h"

@@ -23,20 +23,21 @@
 #include "gamedefs.h"
 #include "cursor.h"
 
+enum scroll_t
+{
+    SCROLL_NONE	  = 0x00,
+    SCROLL_LEFT	  = 0x01,
+    SCROLL_RIGHT  = 0x02,
+    SCROLL_TOP	  = 0x04,
+    SCROLL_BOTTOM = 0x08,
+};
+
 class GameArea : protected Rect
 {
 public:
     static GameArea & Get(void);
     void Build(void);
 
-    enum scroll_t
-    {
-	NONE	= 0x00,
-	LEFT	= 0x01,
-	RIGHT	= 0x02,
-	TOP	= 0x04,
-	BOTTOM	= 0x08,
-    };
 
     const Rect & GetRect(void) const { return *this; };
 
@@ -46,12 +47,14 @@ public:
     static u16 h(void) { return Get().GetRect().h; };
 
     static void SrcRectFixed(Rect & src, Point & dst, const u16 rw, const u16 rh);
-    static Cursor::themes_t ScrollToCursor(const u8 scroll);
 
-    bool AllowScroll(scroll_t);
-    void Scroll(const u8 scroll);
+    Cursor::themes_t GetScrollCursor(void) const;
+    bool NeedScroll(void) const;
+    void Scroll(void);
+    void SetScroll(scroll_t);
+
+    void Center(s16, s16);
     void Center(const Point &pt);
-    void CenterFromRadar(const Point &pt);
 
     void Redraw(const s16 rx = 0, const s16 ry = 0, const u16 rw = w(), const u16 rh = h(), bool drawFog = true) const;
     void Redraw(const Rect & rt, bool drawFog = true) const;
@@ -72,6 +75,8 @@ private:
     u16 & gh;
 
     u16 max;
+    
+    u8 scrolldir;
 };
 
 #endif

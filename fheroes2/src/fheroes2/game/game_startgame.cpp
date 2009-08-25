@@ -28,7 +28,6 @@
 #include "world.h"
 #include "gamearea.h"
 #include "cursor.h"
-#include "radar.h"
 #include "castle.h"
 #include "heroes.h"
 #include "splitter.h"
@@ -36,8 +35,6 @@
 #include "ground.h"
 #include "gameevent.h"
 #include "game_interface.h"
-#include "game_statuswindow.h"
-#include "game_selectobjbar.h"
 #include "game_io.h"
 #include "settings.h"
 #include "route.h"
@@ -58,10 +55,44 @@ namespace Game
     bool DiggingForArtifacts(const Heroes & hero);
     void DialogPlayers(const Color::color_t, const std::string &);
     void MoveHeroFromArrowKeys(Heroes & hero, Direction::vector_t direct);
-    void CheckKingdomsLoss(void);
+    bool CheckGameOver(Game::menu_t &);
+
+    void MouseCursorAreaClickLeft(u16);
+    void FocusHeroesClickLeftAction(Heroes &, u16);
+    void FocusCastleClickLeftAction(Castle &, u16);
+    void MouseCursorAreaPressRight(u16);
+
+    void ButtonNextHero(void);
+    void ButtonMovement(void);
+    void ButtonKingdom(void);
+    void ButtonSpell(void);
+    void ButtonEndTurn(Game::menu_t &);
+    void ButtonAdventure(Game::menu_t &);
+    void ButtonFile(Game::menu_t &);
+    void ButtonSystem(void);
+
+    void KeyPress_ESC(menu_t &);
+    void KeyPress_e(menu_t &);
+    void KeyPress_h(void);
+    void KeyPress_t(void);
+    void KeyPress_s(void);
+    void KeyPress_l(menu_t &);
+    void KeyPress_p(void);
+    void KeyPress_i(void);
+    void KeyPress_d(menu_t &);
+    void KeyPress_SPACE(void);
+    void KeyPress_RETURN(void);
+    void KeyPress_LEFT(void);
+    void KeyPress_RIGHT(void);
+    void KeyPress_TOP(void);
+    void KeyPress_BOTTOM(void);
+
+    void NewWeekDialog(void);
+    void ShowEventDay(void);
+    void ShowWarningLostTowns(menu_t &);
 };
 
-void Game::CheckKingdomsLoss(void)
+bool Game::CheckGameOver(Game::menu_t & res)
 {
     Settings & conf = Settings::Get();
 
@@ -73,6 +104,27 @@ void Game::CheckKingdomsLoss(void)
 	DialogPlayers(c, message);
 	conf.SetCurrentKingdomColors(conf.CurrentKingdomColors() & ~c);
     }
+
+    u16 cond = GameOver::COND_NONE;
+    const Kingdom & myKingdom = world.GetMyKingdom();
+
+    if(GameOver::COND_NONE != (cond = world.CheckKingdomLoss(myKingdom)))
+    {
+	conf.SetGameOverResult(cond);
+	GameOver::DialogLoss(cond);
+	res = MAINMENU;
+	return true;
+    }
+    else
+    if(GameOver::COND_NONE != (cond = world.CheckKingdomWins(myKingdom)))
+    {
+	conf.SetGameOverResult(cond);
+    	GameOver::DialogWins(cond);
+	res = HIGHSCORES;
+	return true;
+    }
+
+    return false;
 }
 
 void Game::MoveHeroFromArrowKeys(Heroes & hero, Direction::vector_t direct)
@@ -192,12 +244,15 @@ Game::menu_t Game::StartGame(void)
 
     Mixer::Reset();
 
-    // Create radar
-    Radar & radar = Radar::Get();
+    // draw interface
+    Interface::Basic & I = Interface::Basic::Get();
+    Interface::Radar & radar = I.radar;
+    Interface::HeroesIcons & heroesBar = I.iconsPanel.GetHeroesBar();
+    Interface::CastleIcons & castleBar = I.iconsPanel.GetCastleBar();
+    Interface::StatusWindow& statusWin = I.statusWindow;
     radar.Build();
 
-    // draw interface
-    Game::Interface::Get().Draw();
+    //I.Redraw();
 
     Game::menu_t m = ENDTURN;
 
@@ -229,10 +284,10 @@ Game::menu_t Game::StartGame(void)
 		    if(Game::HOTSEAT == conf.GameType())
 		    {
 			conf.SetMyColor(Color::GRAY);
-			SelectBarCastle::Get().Hide();
-			SelectBarHeroes::Get().Hide();
-			StatusWindow::Get().SetState(StatusWindow::UNKNOWN);
-			StatusWindow::Get().Redraw();
+			castleBar.Hide();
+			heroesBar.Hide();
+			statusWin.SetState(STATUS_UNKNOWN);
+			statusWin.Redraw();
 			areaMaps.Redraw();
 			display.Flip();
 			std::string str = _("%{color} player's turn");
@@ -287,7 +342,7 @@ void Game::OpenCastle(Castle *castle)
     Display & display = Display::Get();
     std::vector<Castle *>::const_iterator it = std::find(myCastles.begin(), myCastles.end(), castle);
     Game::Focus & globalfocus = Game::Focus::Get();
-    Game::StatusWindow::ResetTimer();
+    Interface::StatusWindow::ResetTimer();
     bool show_position = (640 != display.w() || 480 != display.h());
     bool need_fade = !show_position;
     
@@ -346,7 +401,7 @@ void Game::OpenHeroes(Heroes *hero)
     Display & display = Display::Get();
     std::vector<Heroes *>::const_iterator it = std::find(myHeroes.begin(), myHeroes.end(), hero);
     Game::Focus & globalfocus = Game::Focus::Get();
-    Game::StatusWindow::ResetTimer();
+    Interface::StatusWindow::ResetTimer();
     bool show_position = (640 != display.w() || 480 != display.h());
     bool need_fade = !show_position;
 
@@ -391,21 +446,20 @@ void Game::OpenHeroes(Heroes *hero)
 		    (*it)->FadeOut();
 		    (*it)->SetFreeman(0);
 		    myKingdom.RemoveHeroes(*it);
-
-		    cursor.Hide();
-    		    globalfocus.Reset(Game::Focus::HEROES);
-    		    globalfocus.Redraw();
-
+		    it = myHeroes.begin();
 		    result = Dialog::CANCEL;
 		    break;
-	
+
 		default: break;
 	    }
 	}
     }
 
     cursor.Hide();
-    if(it != myHeroes.end()) globalfocus.Set(*it);
+    if(it != myHeroes.end())
+	globalfocus.Set(*it);
+    else
+        globalfocus.Reset(Game::Focus::HEROES);
     globalfocus.Redraw();
     cursor.Show();
     Display::Get().Flip();
@@ -731,9 +785,7 @@ bool Game::ShouldAnimateInfrequent(u32 ticket, u32 modifier)
 Game::menu_t Game::HumanTurn(void)
 {
     Game::Focus & global_focus = Focus::Get();
-    Radar & radar = Radar::Get();
     GameArea & gamearea = GameArea::Get();
-    Game::StatusWindow & statusWindow = Game::StatusWindow::Get();
 
     Display & display = Display::Get();
     Cursor & cursor = Cursor::Get();
@@ -746,24 +798,14 @@ Game::menu_t Game::HumanTurn(void)
     const Rect areaScrollBottom(0, display.h() - BORDERWIDTH, display.w(), BORDERWIDTH);
     const Rect areaLeftPanel(display.w() - 2 * BORDERWIDTH - RADARWIDTH, 0, BORDERWIDTH + RADARWIDTH, display.h());
 
-    u8 scrollDir = GameArea::NONE;
     LocalEvent & le = LocalEvent::GetLocalEvent();
     u32 ticket = 0;
+    Game::menu_t res = CANCEL;
+    int index_maps = 0;
 
-    Game::Interface & I = Game::Interface::Get();
-
-    Button &buttonScrollHeroesUp = I.buttonScrollHeroesUp;
-    Button &buttonScrollCastleUp = I.buttonScrollCastleUp;
-    Button &buttonNextHero = I.buttonNextHero;
-    Button &buttonMovement = I.buttonMovement;
-    Button &buttonKingdom = I.buttonKingdom;
-    Button &buttonSpell = I.buttonSpell;
-    Button &buttonEndTur = I.buttonEndTur;
-    Button &buttonAdventure = I.buttonAdventure;
-    Button &buttonFile = I.buttonFile;
-    Button &buttonSystem = I.buttonSystem;
-    Button &buttonScrollHeroesDown = I.buttonScrollHeroesDown;
-    Button &buttonScrollCastleDown = I.buttonScrollCastleDown;
+    Interface::Basic & I = Interface::Basic::Get();
+    Interface::Radar & radar = I.radar;
+    Interface::StatusWindow & statusWindow = I.statusWindow;
 
     const Kingdom & myKingdom = world.GetMyKingdom();
     const std::vector<Castle *> & myCastles = myKingdom.GetCastles();
@@ -771,14 +813,7 @@ Game::menu_t Game::HumanTurn(void)
 
     global_focus.Reset();
 
-    Game::SelectBarCastle & selectCastle = Game::SelectBarCastle::Get();
-    Game::SelectBarHeroes & selectHeroes = Game::SelectBarHeroes::Get();
-
-    Splitter & splitCastle = selectCastle.GetSplitter();
-    Splitter & splitHeroes = selectHeroes.GetSplitter();
-
-    selectHeroes.Redraw();
-    selectCastle.Redraw();
+    I.Redraw(REDRAW_ICONS | REDRAW_BUTTONS | REDRAW_BORDER);
 
     switch(global_focus.Type())
     {
@@ -797,319 +832,81 @@ Game::menu_t Game::HumanTurn(void)
     }
 
     //Override whatever the focus set the window to show
-    statusWindow.SetState(StatusWindow::DAY);
+    statusWindow.SetState(STATUS_DAY);
     global_focus.Redraw();
 
     AGG::PlayMusic(MUS::FromGround(world.GetTiles(global_focus.Center()).GetGround()));
     Game::EnvironmentSoundMixer();
-
-    std::string filename;
 
     cursor.Show();
     display.Flip();
 
     // new week dialog
     if(1 < world.CountWeek() && world.BeginWeek())
-    {
-        const Week::type_t name = world.GetWeekType();
-        std::string message = world.BeginMonth() ? _("Astrologers proclaim month of the %{name}.") : _("Astrologers proclaim week of the %{name}.");
-        AGG::PlayMusic(world.BeginMonth() ? MUS::WEEK2_MONTH1 : MUS::WEEK1, false);
-        String::Replace(message, "%{name}", Week::GetString(name));
-        message += "\n \n";
-        message += (name == Week::PLAGUE ? _(" All populations are halved.") : _(" All dwellings increase population."));
-        Dialog::Message("", message, Font::BIG, Dialog::OK);
-    }
+	NewWeekDialog();
 
     // show event day
-    {
-        std::vector<GameEvent::Day *> events;
-        events.reserve(5);
-        world.GetEventDay(myKingdom.GetColor(), events);
-        std::vector<GameEvent::Day *>::const_iterator it1 = events.begin();
-        std::vector<GameEvent::Day *>::const_iterator it2 = events.end();
+    ShowEventDay();
 
-        for(; it1 != it2; ++it1) if(*it1)
-        {
-    	    AGG::PlayMusic(MUS::NEWS, false);
-	    if((*it1)->GetResource().GetValidItems())
-	    	Dialog::ResourceInfo("", (*it1)->GetMessage(), (*it1)->GetResource());
-	    else
-	    if((*it1)->GetMessage().size())
-		Dialog::Message("", (*it1)->GetMessage(), Font::BIG, Dialog::OK);
-	}
-    }
-
-    // kingdom loss dialog
-    CheckKingdomsLoss();
-
-    Game::menu_t res = CANCEL;
-    u16 cond = GameOver::COND_NONE;
-
-    // game over conditions
-    if(GameOver::COND_NONE != (cond = world.CheckKingdomLoss(myKingdom)))
-    {
-	conf.SetGameOverResult(cond);
-	GameOver::DialogLoss(cond);
-	res = MAINMENU;
-    }
-    else
-    if(GameOver::COND_NONE != (cond = world.CheckKingdomWins(myKingdom)))
-    {
-	conf.SetGameOverResult(cond);
-    	GameOver::DialogWins(cond);
-	res = HIGHSCORES;
-    }
+    // check game over
+    CheckGameOver(res);
 
     // warning lost all town
-    if(myCastles.empty())
-    {
-	if(0 == myKingdom.GetLostTownDays())
-	{
-    	    AGG::PlayMusic(MUS::DEATH, false);
-	    std::string str = _("%{color} player, your heroes abandon you, and you are banished from this land.");
-	    String::Replace(str, "%{color}", Color::String(conf.MyColor()));
-	    DialogPlayers(conf.MyColor(), str);
-	    conf.SetGameOverResult(GameOver::LOSS_ALL);
-	    res = MAINMENU;
-	}
-	else
-	if(1 == myKingdom.GetLostTownDays())
-	{
-	    std::string str = _("%{color} player, this is your last day to capture a town, or you will be banished from this land.");
-	    String::Replace(str, "%{color}", Color::String(conf.MyColor()));
-	    DialogPlayers(conf.MyColor(), str);
-	}
-	else
-	if(LOST_TOWN_DAYS >= myKingdom.GetLostTownDays())
-	{
-	    std::string str = _("%{color} player, you only have %{day} days left to capture a town, or you will be banished from this land.");
-	    String::Replace(str, "%{color}", Color::String(conf.MyColor()));
-	    String::Replace(str, "%{day}", myKingdom.GetLostTownDays());
-	    DialogPlayers(conf.MyColor(), str);
-	}
-    }
-    
+    if(myCastles.empty()) ShowWarningLostTowns(res);
+
     // startgame loop
-    while(!res && le.HandleEvents())
+    while(CANCEL == res && le.HandleEvents())
     {
-	// Hot Keys:
-	// ESC
-	if(le.KeyPress(KEY_ESCAPE))
+	// hot keys
+	if(le.KeyPress()) switch(le.KeyValue())
 	{
-    	    // stop hero
-    	    if(Game::Focus::HEROES == global_focus.Type() && global_focus.GetHeroes().isEnableMove())
-    	    	global_focus.GetHeroes().SetMove(false);
-    	    else
-    	    if(Dialog::YES & Dialog::Message("", _("Are you sure you want to quit?"), Font::BIG, Dialog::YES|Dialog::NO))
-		res = QUITGAME;
-
-    	    continue;
-	}
-        else
-        // press End Turn
-        if(le.KeyPress(KEY_e))
-        {
-            if(Game::Focus::HEROES == global_focus.Type())
-                global_focus.GetHeroes().SetMove(false);
-
-            if(!myKingdom.HeroesMayStillMove() ||
-                Dialog::YES == Dialog::Message("", _("One or more heroes may still move, are you sure you want to end your turn?"), Font::BIG, Dialog::YES | Dialog::NO))
-		res = ENDTURN;
-
-    	    continue;
-        }
-        else
-        // press Next Hero
-        if(le.KeyPress(KEY_h) && myHeroes.size())
-	{
-	    if(Game::Focus::HEROES != global_focus.Type())
-	    {
-		cursor.Hide();
-		global_focus.Reset(Game::Focus::HEROES);
-		global_focus.Redraw();
-		cursor.Show();
-		display.Flip();
-	    }
-	    else
-	    {
-	        std::vector<Heroes *>::const_iterator it = std::find(myHeroes.begin(), myHeroes.end(), &global_focus.GetHeroes());
-        	++it;
-                if(it == myHeroes.end()) it = myHeroes.begin();
-		cursor.Hide();
-		global_focus.Set(*it);
-		global_focus.Redraw();
-		cursor.Show();
-		display.Flip();
-	    }
-	}
-        else
-        // press Next Tower
-        if(le.KeyPress(KEY_t) && myCastles.size())
-	{
-	    if(Game::Focus::CASTLE != global_focus.Type())
-	    {
-		cursor.Hide();
-		global_focus.Reset(Game::Focus::CASTLE);
-		global_focus.Redraw();
-		cursor.Show();
-		display.Flip();
-	    }
-	    else
-	    {
-	        std::vector<Castle *>::const_iterator it = std::find(myCastles.begin(), myCastles.end(), &global_focus.GetCastle());
-        	++it;
-                if(it == myCastles.end()) it = myCastles.begin();
-		cursor.Hide();
-		global_focus.Set(*it);
-		global_focus.Redraw();
-		cursor.Show();
-		display.Flip();
-	    }
-	}
-	else
-	// save game
-	if(le.KeyPress(KEY_s))
-	{
-	    if(Dialog::SelectFileSave(filename) && filename.size())
-	    {
-		Game::Save(filename);
-		Dialog::Message("", _("Game saved successfully."), Font::BIG, Dialog::OK);
-	    }
-	}
-	else
-	// load game
-	if(le.KeyPress(KEY_l))
-	{
-	    if(conf.Original())
-	    {
-		if(Dialog::YES == Dialog::Message("", _("Are you sure you want to load a new game? (Your current game will be lost)"), Font::BIG, Dialog::YES|Dialog::NO))
-		return LOADGAME;
-	    }
-	    else
-	    {
-		// fast load
-		if(Dialog::SelectFileLoad(filename) && filename.size()){ Game::Load(filename); return STARTGAME; }
-	    }
-	}
-	else
-	// puzzle maps
-	if(le.KeyPress(KEY_p))
-	{
-	    myKingdom.PuzzleMaps().ShowMapsDialog();
-	}
-	else
-	// game info
-	if(le.KeyPress(KEY_i))
-	{
-	    Dialog::GameInfo();
-	}
-	else
-	// dig artifact
-	if(le.KeyPress(KEY_d) && Game::Focus::HEROES == global_focus.Type())
-	{
-	    DiggingForArtifacts(global_focus.GetHeroes());
-	    // check game over for ultimate artifact
-	    if(GameOver::COND_NONE != (cond = world.CheckKingdomWins(myKingdom)))
-	    {
-		conf.SetGameOverResult(cond);
-		GameOver::DialogWins(cond);
-		res = HIGHSCORES;
-	    }
-	}
-	else
-	// space: action
-	if(le.KeyPress(KEY_SPACE) && Game::Focus::HEROES == global_focus.Type())
-	{
-	    Heroes & hero = global_focus.GetHeroes();
-	    cursor.Hide();
-	    hero.SetMove(false);
-	    hero.GetPath().Reset();
-	    gamearea.Redraw();
-	    if(MP2::isActionObject(hero.GetUnderObject(), hero.isShipMaster()))
-		hero.Action(hero.GetIndex());
-	    if(MP2::OBJ_STONELIGHTS == hero.GetUnderObject() || MP2::OBJ_WHIRLPOOL == hero.GetUnderObject())
-	    {
-		cursor.Hide();
-		hero.ApplyPenaltyMovement();
-		selectHeroes.Redraw();
-		cursor.Show();
-		display.Flip();
-	    }
-	}
-	else
-	// return: open dialog
-	if(le.KeyPress(KEY_RETURN))
-	{
-	    if(Game::Focus::HEROES == global_focus.Type())
-	    {
-		Heroes & hero = global_focus.GetHeroes();
-		OpenHeroes(&hero);
-	    }
-	    else
-	    if(Game::Focus::CASTLE == global_focus.Type())
-	    {
-		Castle & castl = global_focus.GetCastle();
-		OpenCastle(&castl);
-	    }
-	}
-	else
-	// key left
-	if(le.KeyPress(KEY_LEFT))
-	{
-	    // scroll map
-	    if((MOD_CTRL & le.KeyMod()) && gamearea.AllowScroll(GameArea::LEFT)) scrollDir |= GameArea::LEFT;
-	    else
-	    // move hero
-	    if(Focus::HEROES == global_focus.Type()) MoveHeroFromArrowKeys(global_focus.GetHeroes(), Direction::LEFT);
-	}
-	else
-	// key right
-	if(le.KeyPress(KEY_RIGHT))
-	{
-	    // scroll map
-	    if((MOD_CTRL & le.KeyMod()) && gamearea.AllowScroll(GameArea::RIGHT)) scrollDir |= GameArea::RIGHT;
-	    else
-	    // move hero
-	    if(Focus::HEROES == global_focus.Type()) MoveHeroFromArrowKeys(global_focus.GetHeroes(), Direction::RIGHT);
-	}
-	else
-	// key top
-	if(le.KeyPress(KEY_UP))
-	{
-	    // scroll map
-	    if((MOD_CTRL & le.KeyMod()) && gamearea.AllowScroll(GameArea::TOP)) scrollDir |= GameArea::TOP;
-	    else
-	    // move hero
-	    if(Focus::HEROES == global_focus.Type()) MoveHeroFromArrowKeys(global_focus.GetHeroes(), Direction::TOP);
-	}
-	else
-	// key bottom
-	if(le.KeyPress(KEY_DOWN))
-	{
-	    // scroll map
-	    if((MOD_CTRL & le.KeyMod()) && gamearea.AllowScroll(GameArea::BOTTOM)) scrollDir |= GameArea::BOTTOM;
-	    else
-	    // move hero
-	    if(Focus::HEROES == global_focus.Type()) MoveHeroFromArrowKeys(global_focus.GetHeroes(), Direction::BOTTOM);
+	    // exit
+	    case KEY_ESCAPE:	KeyPress_ESC(res); break;
+    	    // end turn
+	    case KEY_e:		KeyPress_e(res); break;
+    	    // next hero
+	    case KEY_h:		KeyPress_h(); break;
+    	    // next town
+	    case KEY_t:		KeyPress_t(); break;
+	    // save game
+	    case KEY_s:		KeyPress_s(); break;
+	    // load game
+	    case KEY_l:		KeyPress_l(res); break;
+	    // puzzle map
+	    case KEY_p:		KeyPress_p(); break;
+	    // info game
+	    case KEY_i:		KeyPress_i(); break;
+	    // dig artifact
+	    case KEY_d:		KeyPress_d(res); break;
+	    // default action
+	    case KEY_SPACE:	KeyPress_SPACE(); break;
+	    // hero/town dialog
+	    case KEY_RETURN:	KeyPress_RETURN(); break;
+	    // scroll
+	    case KEY_LEFT:	KeyPress_LEFT(); break;
+	    case KEY_RIGHT:	KeyPress_RIGHT(); break;
+	    case KEY_UP:	KeyPress_TOP(); break;
+	    case KEY_DOWN:	KeyPress_BOTTOM(); break;
+	    default: break;
 	}
 
 	// scroll area maps left
-	if(le.MouseCursor(areaScrollLeft) && gamearea.AllowScroll(GameArea::LEFT)) scrollDir |= GameArea::LEFT;
+	if(le.MouseCursor(areaScrollLeft)) gamearea.SetScroll(SCROLL_LEFT);
         else
 	// scroll area maps right
-	if(le.MouseCursor(areaScrollRight) && gamearea.AllowScroll(GameArea::RIGHT)) scrollDir |= GameArea::RIGHT;
+	if(le.MouseCursor(areaScrollRight)) gamearea.SetScroll(SCROLL_RIGHT);
 	
 	// scroll area maps top
-	if(le.MouseCursor(areaScrollTop) && gamearea.AllowScroll(GameArea::TOP)) scrollDir |= GameArea::TOP;
+	if(le.MouseCursor(areaScrollTop)) gamearea.SetScroll(SCROLL_TOP);
 	else
 	// scroll area maps bottom
-	if(le.MouseCursor(areaScrollBottom) && gamearea.AllowScroll(GameArea::BOTTOM)) scrollDir |= GameArea::BOTTOM;
+	if(le.MouseCursor(areaScrollBottom)) gamearea.SetScroll(SCROLL_BOTTOM);
 
 	// cursor over game area
 	if(le.MouseCursor(area_pos))
 	{
 	    const Point & mouse_coord = le.MouseCursor();
-	    const int index_maps = gamearea.GetIndexFromMousePoint(mouse_coord);
+	    index_maps = gamearea.GetIndexFromMousePoint(mouse_coord);
 	    if(0 > index_maps) continue;
 
 	    const Maps::Tiles & tile = world.GetTiles(index_maps);
@@ -1118,522 +915,52 @@ Game::menu_t Game::HumanTurn(void)
 	    // change cusor if need
 	    if(CursorChangePosition(index_maps)) cursor.SetThemes(GetCursor(tile));
 
-	    if(le.MouseClickLeft(tile_pos))
-	    {
-		if(Cursor::POINTER != cursor.Themes()) switch(global_focus.Type())
-		{
-		    case Focus::HEROES:
-		    {
-			Heroes & from_hero = global_focus.GetHeroes();
-			
-			switch(tile.GetObject())
-			{
-    			    // from hero to castle
-    			    case MP2::OBJN_CASTLE:
-    			    {
-    				const Castle *to_castle = world.GetCastle(index_maps);
-
-    				if(NULL != to_castle)
-    				{
-				    if(from_hero.GetColor() == to_castle->GetColor())
-				    {
-					cursor.Hide();
-					global_focus.Set(const_cast<Castle *>(to_castle));
-					global_focus.Redraw();
-					cursor.Show();
-					display.Flip();
-				    }
-				    else
-					ShowPathOrStartMoveHero(&from_hero, Maps::GetIndexFromAbsPoint(to_castle->GetCenter()));
-    				}
-			    }
-			    break;
-
-    			    // from hero to hero
-    			    case MP2::OBJ_HEROES:
-    			    {
-			        const Heroes * to_hero = world.GetHeroes(index_maps);
-
-			        if(NULL != to_hero)
-			        {
-			    	    if(from_hero.GetCenter() == to_hero->GetCenter())
-					OpenHeroes(&from_hero);
-				    else
-					ShowPathOrStartMoveHero(&from_hero, index_maps);
-    				}
-    			    }
-    			    break;
-
-			    default:
-				if(tile.isPassable(&from_hero) || MP2::isActionObject(tile.GetObject(), from_hero.isShipMaster()))
-				    ShowPathOrStartMoveHero(&from_hero, index_maps);
-			    break;
-			}
-		    }
-		    break;
-
-		    case Focus::CASTLE:
-		    {
-			Castle & from_castle = global_focus.GetCastle();
-
-			switch(tile.GetObject())
-			{
-			    // from castle to castle
-			    case MP2::OBJN_CASTLE:
-			    case MP2::OBJ_CASTLE:
-			    {
-    				const Castle *to_castle = world.GetCastle(index_maps);
-
-    				if(NULL != to_castle &&
-    				    from_castle.GetColor() == to_castle->GetColor())
-    				{
-				    // is selected open dialog
-				    if(from_castle.GetCenter() == to_castle->GetCenter())
-					OpenCastle(&from_castle);
-				    // select other castle
-				    else
-				    {
-					cursor.Hide();
-					global_focus.Set(const_cast<Castle *>(to_castle));
-					global_focus.Redraw();
-					cursor.Show();
-					display.Flip();
-				    }
-				}
-			    }
-			    break;
-
-			    // from castle to heroes
-			    case MP2::OBJ_HEROES:
-			    {
-    				const Heroes *to_hero = world.GetHeroes(index_maps);
-
-				if(NULL != to_hero &&
-    				    from_castle.GetColor() == to_hero->GetColor())
-    				{
-    				    cursor.Hide();
-    				    global_focus.Set(const_cast<Heroes *>(to_hero));
-    				    global_focus.Redraw();
-    				    cursor.Show();
-				    display.Flip();
-        			}
-			    }
-			    break;
-
-			    default:
-			    break;
-			}
-		    }
-		    break;
-		    
-		    default:
-		    break;
-		}
-	    }
+	    if(le.MouseClickLeft(tile_pos) && Cursor::POINTER != cursor.Themes())
+		MouseCursorAreaClickLeft(index_maps);
 	    else
 	    if(le.MousePressRight(tile_pos))
-	    {
-		if(conf.Debug()) tile.DebugInfo();
-
-		if(!conf.Debug() && tile.isFog(conf.MyColor()))
-		    Dialog::QuickInfo(tile);
-                else
-		switch(tile.GetObject())
-		{
-		    case MP2::OBJN_CASTLE:
-		    case MP2::OBJ_CASTLE:
-    		    {
-    		    	const Castle *castle = world.GetCastle(tile.GetIndex());
-			if(castle) Dialog::QuickInfo(*castle);
-		    }
-		    break;
-
-		    case MP2::OBJ_HEROES:
-    		    {
-    		    	const Heroes *heroes = world.GetHeroes(tile.GetIndex());
-			if(heroes) Dialog::QuickInfo(*heroes);
-		    }
-		    break;
-
-		    default:
-			Dialog::QuickInfo(tile);
-		    break;
-		}
-	    }
-	// end cursor over game area
+		MouseCursorAreaPressRight(index_maps);
 	}
 	else
-	// cursor over left panel
-	if(le.MouseCursor(areaLeftPanel))
+	// cursor over radar
+	if(le.MouseCursor(I.radar.GetArea()))
 	{
 	    cursor.SetThemes(Cursor::POINTER);
-
-	    // draw push buttons
-	    le.MousePressLeft(buttonScrollHeroesUp) ? buttonScrollHeroesUp.PressDraw() : buttonScrollHeroesUp.ReleaseDraw();
-	    le.MousePressLeft(buttonScrollCastleUp) ? buttonScrollCastleUp.PressDraw() : buttonScrollCastleUp.ReleaseDraw();
-	    le.MousePressLeft(buttonNextHero) ? buttonNextHero.PressDraw() : buttonNextHero.ReleaseDraw();
-	    le.MousePressLeft(buttonMovement) ? buttonMovement.PressDraw() : buttonMovement.ReleaseDraw();
-	    le.MousePressLeft(buttonKingdom) ? buttonKingdom.PressDraw() : buttonKingdom.ReleaseDraw();
-	    le.MousePressLeft(buttonSpell) ? buttonSpell.PressDraw() : buttonSpell.ReleaseDraw();
-	    le.MousePressLeft(buttonEndTur) ? buttonEndTur.PressDraw() : buttonEndTur.ReleaseDraw();
-	    le.MousePressLeft(buttonAdventure) ? buttonAdventure.PressDraw() : buttonAdventure.ReleaseDraw();
-	    le.MousePressLeft(buttonFile) ? buttonFile.PressDraw() : buttonFile.ReleaseDraw();
-	    le.MousePressLeft(buttonSystem) ? buttonSystem.PressDraw() : buttonSystem.ReleaseDraw();
-	    le.MousePressLeft(buttonScrollHeroesDown) ? buttonScrollHeroesDown.PressDraw() : buttonScrollHeroesDown.ReleaseDraw();
-	    le.MousePressLeft(buttonScrollCastleDown) ? buttonScrollCastleDown.PressDraw() : buttonScrollCastleDown.ReleaseDraw();
-
-	    // point radar
-	    if(le.MouseCursor(radar.GetRect()) &&
-		(le.MouseClickLeft(radar.GetRect()) ||
-		    le.MousePressLeft(radar.GetRect())))
-	    {
-		const Point prev(gamearea.GetRect());
-		gamearea.CenterFromRadar(le.MouseCursor());
-		if(prev != gamearea.GetRect())
-		{
-		    cursor.Hide();
-		    radar.RedrawCursor();
-		    gamearea.Redraw();
-		    cursor.Show();
-		    display.Flip();
-		}
-	    }
-
-	    // click Scroll Heroes Up
-	    if((le.MouseWheelUp(selectHeroes.GetArea()) ||
-		le.MouseWheelUp(splitHeroes.GetRect()) ||
-		le.MouseClickLeft(buttonScrollHeroesUp)) && selectHeroes.Prev())
-	    {
-		cursor.Hide();
-		selectHeroes.Redraw();
-		cursor.Show();
-		display.Flip();
-	    }
-	    else
-	    // click Scroll Castle Up
-	    if((le.MouseWheelUp(selectCastle.GetArea()) ||
-		le.MouseWheelUp(splitCastle.GetRect()) ||
-		le.MouseClickLeft(buttonScrollCastleUp)) && selectCastle.Prev())
-	    {
-		cursor.Hide();
-		selectCastle.Redraw();
-		cursor.Show();
-		display.Flip();
-	    }
-	    else
-	    // click Scroll Heroes Down
-	    if((le.MouseWheelDn(selectHeroes.GetArea()) ||
-		le.MouseWheelDn(splitHeroes.GetRect()) ||
-		le.MouseClickLeft(buttonScrollHeroesDown)) && 
-		selectHeroes.Next())
-	    {
-		cursor.Hide();
-		selectHeroes.Redraw();
-		cursor.Show();
-		display.Flip();
-	    }
-	    else
-	    // click Scroll Castle Down
-	    if((le.MouseWheelDn(selectCastle.GetArea()) ||
-		le.MouseWheelDn(splitCastle.GetRect())  ||
-		le.MouseClickLeft(buttonScrollCastleDown)) &&
-		selectCastle.Next())
-	    {
-		cursor.Hide();
-		selectCastle.Redraw();
-		cursor.Show();
-		display.Flip();
-	    }
-
-    	    // move splitter cursor castle
-    	    if(le.MousePressLeft(selectCastle.GetSplitter().GetRect()) &&
-    		myCastles.size() > I.CountIcons())
-    	    {
-    		Splitter & splitter = selectCastle.GetSplitter();
-    		if(0 != splitter.GetStep())
-    		{
-    		    u32 seek = (le.MouseCursor().y - splitter.GetRect().y) * 100 / splitter.GetStep();
-        	    if(seek > myCastles.size() - I.CountIcons()) seek = myCastles.size() - I.CountIcons();
-
-        	    cursor.Hide();
-        	    splitter.Move(seek);
-		    selectCastle.SetTop(seek);
-		    selectCastle.Redraw();
-        	    cursor.Show();
-        	    display.Flip();
-		}
-	    }
-	    else
-    	    // move splitter cursor heroes
-    	    if(le.MousePressLeft(selectHeroes.GetSplitter().GetRect()) &&
-    		myHeroes.size() > I.CountIcons())
-    	    {
-    		Splitter & splitter = selectHeroes.GetSplitter();
-    		if(0 != splitter.GetStep())
-    		{
-    		    u32 seek = (le.MouseCursor().y - splitter.GetRect().y) * 100 / splitter.GetStep();
-        	    if(seek > myHeroes.size() - I.CountIcons()) seek = myHeroes.size() - I.CountIcons();
-
-        	    cursor.Hide();
-        	    splitter.Move(seek);
-		    selectHeroes.SetTop(seek);
-		    selectHeroes.Redraw();
-        	    cursor.Show();
-        	    display.Flip();
-		}
-	    }
-
-	    // click Heroes Icons
-	    if(const Heroes * hero = selectHeroes.MouseClickLeft())
-	    {
-		if(hero == selectHeroes.Selected())
-		    OpenHeroes(const_cast<Heroes *>(hero));
-		else
-		{
-		    cursor.Hide();
-		    global_focus.Set(const_cast<Heroes *>(hero));
-		    global_focus.Redraw();
-		    cursor.Show();
-		    display.Flip();
-		}
-	    }
-	    else
-	    if(const Heroes * hero = selectHeroes.MousePressRight())
-	    {
-		cursor.Hide();
-		Dialog::QuickInfo(*hero);
-		cursor.Show();
-		display.Flip();
-	    }
-	    else
-	    // click Castle Icons
-	    if(const Castle * cstl = selectCastle.MouseClickLeft())
-	    {
-		if(cstl == selectCastle.Selected())
-		    OpenCastle(const_cast<Castle *>(cstl));
-		else
-		{
-		    cursor.Hide();
-		    global_focus.Set(const_cast<Castle *>(cstl));
-		    global_focus.Redraw();
-		    cursor.Show();
-		    display.Flip();
-		}
-	    }
-	    else
-	    if(const Castle * cstl = selectCastle.MousePressRight())
-	    {
-		cursor.Hide();
-		Dialog::QuickInfo(*cstl);
-		cursor.Show();
-		display.Flip();
-	    }
-
-	    // click Next Hero
-	    if(le.MouseClickLeft(buttonNextHero) && myHeroes.size())
-	    {
-		if(Game::Focus::HEROES != global_focus.Type())
-		{
-		    cursor.Hide();
-		    global_focus.Reset(Game::Focus::HEROES);
-		    global_focus.Redraw();
-		    cursor.Show();
-		    display.Flip();
-		}
-		else
-		{
-		    std::vector<Heroes *>::const_iterator it = std::find(myHeroes.begin(), myHeroes.end(), &global_focus.GetHeroes());
-                    ++it;
-                    if(it == myHeroes.end()) it = myHeroes.begin();
-		    cursor.Hide();
-		    global_focus.Set(*it);
-		    global_focus.Redraw();
-		    cursor.Show();
-		    display.Flip();
-		}
-	    }
-	    else
-	    // click Continue Movement
-	    if(le.MouseClickLeft(buttonMovement))
-	    {
-    		if(Game::Focus::HEROES == global_focus.Type() &&
-    		    global_focus.GetHeroes().GetPath().isValid())
-		    global_focus.GetHeroes().SetMove(!global_focus.GetHeroes().isEnableMove());
-	    }
-	    else
-	    // click Kingdom Summary
-	    if(le.MouseClickLeft(buttonKingdom))
-	    {
-	    }
-	    else
-	    // click Cast Spell
-	    if(le.MouseClickLeft(buttonSpell))
-	    {
-    		if(Game::Focus::HEROES == global_focus.Type()) {
-		    Spell::spell_t spell = global_focus.GetHeroes().GetSpellBook().Open(SpellBook::ADVN, true);
-		    // TODO cast selected spell
-		    Error::Verbose("spell selected: " + std::string(Spell::GetName(spell)));
-		}
-	    }
-	    else
-	    // click End Turn
-	    if(le.MouseClickLeft(buttonEndTur))
-	    {
-    		if(Game::Focus::HEROES == global_focus.Type())
-		    global_focus.GetHeroes().SetMove(false);
-
-		if(!myKingdom.HeroesMayStillMove() ||
-		    Dialog::YES == Dialog::Message("", _("One or more heroes may still move, are you sure you want to end your turn?"), Font::BIG, Dialog::YES | Dialog::NO))
-		    res = ENDTURN;
-
-		continue;
-	    }
-	    else
-    	    // click AdventureOptions
-	    if(le.MouseClickLeft(buttonAdventure))
-	    {
-		Mixer::Reduce();
-
-		switch(Dialog::AdventureOptions(Game::Focus::HEROES == global_focus.Type()))
-		{
-		    case Dialog::WORLD:	break;
-		    case Dialog::PUZZLE: myKingdom.PuzzleMaps().ShowMapsDialog(); break;
-		    case Dialog::INFO:	Dialog::GameInfo(); break;
-
-		    case Dialog::DIG:
-			DiggingForArtifacts(global_focus.GetHeroes());
-			// check game over for ultimate artifact
-			if(GameOver::COND_NONE != (cond = world.CheckKingdomWins(myKingdom)))
-			{
-			    conf.SetGameOverResult(cond);
-			    GameOver::DialogWins(cond);
-			    res = HIGHSCORES;
-			}
-			break;
-
-		    default: break;
-		}
-
-		Mixer::Enhance();
-    	    }
-	    else
-	    // click FileOptions
-	    if(le.MouseClickLeft(buttonFile))
-	    {
-		Mixer::Reduce();
-
-		Game::menu_t result = Dialog::FileOptions();
-		Mixer::Reset();
-
-		switch(result)
-		{
-		    case NEWGAME:
-			if(Dialog::YES == Dialog::Message("", _("Are you sure you want to restart? (Your current game will be lost)"), Font::BIG, Dialog::YES|Dialog::NO))
-			    res = NEWGAME;
-			break;
-
-		    case QUITGAME:
-			res = result;
-			break;
-
-		    case LOADGAME:
-			if(Dialog::YES == Dialog::Message("", _("Are you sure you want to load a new game? (Your current game will be lost)"), Font::BIG, Dialog::YES|Dialog::NO))
-			    res = LOADGAME;
-			break;
-
-		    case SAVEGAME:
-			if(Dialog::SelectFileSave(filename) && filename.size()) Game::Save(filename);
-			Dialog::Message("", _("Game saved successfully."), Font::BIG, Dialog::OK);
-			break;
-
-		    default:
-			break;
-		}
-
-		Mixer::Enhance();
-	    }
-	    else
-	    // click SystemOptions
-	    if(le.MouseClickLeft(buttonSystem))
-	    {
-		Mixer::Reduce();
-
-		// Change and save system settings
-		const u8 changes = Dialog::SystemOptions();
-		
-		if(0x02 & changes)
-		{
-		    Mixer::Volume(-1, conf.SoundVolume());
-		    Game::EnvironmentSoundMixer();
-		}
-		if(0x04 & changes)
-		{
-		    Music::Volume(conf.MusicVolume());
-		    Game::EnvironmentSoundMixer();
-		}
-		if(0x08 & changes)
-		{
-		    cursor.Hide();
-		    if(selectHeroes.isSelected()) selectHeroes.Unselect();
-		    if(selectCastle.isSelected()) selectCastle.Unselect();
-		    I.Draw();
-		    global_focus.Reset(Focus::HEROES);
-		    global_focus.Redraw();
-		    cursor.Show();
-		    display.Flip();
-		}
-
-		Mixer::Enhance();
-	    }
-	    else
-	    // click StatusWindow
-	    if(le.MouseClickLeft(statusWindow.GetRect()))
-	    {
-		cursor.Hide();
-		statusWindow.NextState();
-		statusWindow.Redraw();
-		cursor.Show();
-		display.Flip();
-	    }
-
-	    // right info
-	    if(le.MousePressRight(radar.GetRect())) Dialog::Message(_("World Map"), _("A miniature view of the known world. Left click to move viewing area."), Font::BIG);
-	    else
-	    if(le.MousePressRight(buttonNextHero)) Dialog::Message(_("Next Hero"), _("Select the next Hero."), Font::BIG);
-	    else
-	    if(le.MousePressRight(buttonMovement)) Dialog::Message(_("Continue Movement"), _("Continue the Hero's movement along the current path."), Font::BIG);
-	    else
-	    if(le.MousePressRight(buttonKingdom)) Dialog::Message(_("Kingdom Summary"), _("View a Summary of your Kingdom."), Font::BIG);
-	    else
-	    if(le.MousePressRight(buttonSpell)) Dialog::Message(_("Cast Spell"), _("Cast an adventure spell."), Font::BIG);
-	    else
-	    if(le.MousePressRight(buttonEndTur)) Dialog::Message(_("End Turn"), _("End your turn and left the computer take its turn."), Font::BIG);
-	    else
-	    if(le.MousePressRight(buttonAdventure)) Dialog::Message(_("Adventure Options"), _("Bring up the adventure options menu."), Font::BIG);
-	    else
-	    if(le.MousePressRight(buttonFile)) Dialog::Message(_("File Options"), _("Bring up the file options menu, alloving you to load menu, save etc."), Font::BIG);
-	    else
-	    if(le.MousePressRight(buttonSystem)) Dialog::Message(_("System Options"), _("Bring up the system options menu, alloving you to customize your game."), Font::BIG);
-	    else
-	    if(le.MousePressRight(statusWindow.GetRect())) Dialog::Message(_("Status Window"), _("This window provides information on the status of your hero or kingdom, and shows the date. Left click here to cycle throungh these windows."), Font::BIG);
-
-	// end cursor over left panel
+	    I.radar.QueueEventProcessing();
+	}
+	// cursor over icons panel
+	if(le.MouseCursor(I.iconsPanel.GetArea()))
+	{
+	    cursor.SetThemes(Cursor::POINTER);
+	    I.iconsPanel.QueueEventProcessing();
+	}
+	else
+	// cursor over buttons area
+	if(le.MouseCursor(I.buttonsArea.GetArea()))
+	{
+	    cursor.SetThemes(Cursor::POINTER);
+	    I.buttonsArea.QueueEventProcessing(res);
+	}
+	else
+	// cursor over buttons area
+	if(le.MouseCursor(I.statusWindow.GetArea()))
+	{
+	    cursor.SetThemes(Cursor::POINTER);
+	    I.statusWindow.QueueEventProcessing();
 	}
 
 	// animation
         if(Game::ShouldAnimateInfrequent(ticket, 1))
         {
-            if(scrollDir)
+            if(gamearea.NeedScroll())
             {
         	cursor.Hide();
-    		cursor.SetThemes(GameArea::ScrollToCursor(scrollDir));
-    		gamearea.Scroll(scrollDir);
+    		cursor.SetThemes(gamearea.GetScrollCursor());
+    		gamearea.Scroll();
 
     		// need stop hero
     		if(Game::Focus::HEROES == global_focus.Type() && global_focus.GetHeroes().isEnableMove())
     		    global_focus.GetHeroes().SetMove(false);
-
-        	scrollDir = GameArea::NONE;
 
 		gamearea.Redraw();
         	radar.RedrawCursor();
@@ -1658,27 +985,15 @@ Game::menu_t Game::HumanTurn(void)
         		cursor.Show();
         		display.Flip();
 		    }
-		    gamearea.Redraw();
-        	    cursor.Show();
-        	    display.Flip();
-
-		    // kingdom loss dialog
-		    CheckKingdomsLoss();
+		    else
+		    {
+			gamearea.Redraw();
+        		cursor.Show();
+        		display.Flip();
+		    }
 
 		    // check game over
-		    if(GameOver::COND_NONE != (cond = world.CheckKingdomLoss(myKingdom)))
-		    {
-			conf.SetGameOverResult(cond);
-		    	GameOver::DialogLoss(cond);
-			res = MAINMENU;
-		    }
-		    else
-		    if(GameOver::COND_NONE != (cond = world.CheckKingdomWins(myKingdom)))
-		    {
-			conf.SetGameOverResult(cond);
-		    	GameOver::DialogWins(cond);
-			res = HIGHSCORES;
-		    }
+		    CheckGameOver(res);
 		}
 		else
 		    hero.SetMove(false);
@@ -1715,7 +1030,7 @@ Game::menu_t Game::HumanTurn(void)
 
     if(ENDTURN == res && conf.Modes(Settings::AUTOSAVE))
     {
-	filename = conf.LocalDataPrefix() + SEPARATOR + "save" + SEPARATOR +  "autosave.sav";
+	std::string filename(conf.LocalDataPrefix() + SEPARATOR + "save" + SEPARATOR +  "autosave.sav");
 	Game::Save(filename);
     }
 
@@ -1751,7 +1066,7 @@ bool Game::DiggingForArtifacts(const Heroes & hero)
 	    Dialog::Message("", _("Nothing here. Where could it be?"), Font::BIG, Dialog::OK);
 
 	Cursor::Get().Hide();
-	Game::SelectBarHeroes::Get().Redraw(&hero);
+	Interface::IconsPanel::Get().GetHeroesBar().Redraw(&hero);
 	Cursor::Get().Show();
 	Display::Get().Flip();
     }
@@ -1775,4 +1090,583 @@ Game::menu_t Game::NetworkTurn(Kingdom & kingdom)
     cursor.Hide();
 
     return ENDTURN;
+}
+
+void Game::MouseCursorAreaClickLeft(u16 index_maps)
+{
+    Game::Focus & global_focus = Focus::Get();
+    switch(global_focus.Type())
+    {
+	case Focus::HEROES:	FocusHeroesClickLeftAction(global_focus.GetHeroes(), index_maps); break;
+	case Focus::CASTLE:	FocusCastleClickLeftAction(global_focus.GetCastle(), index_maps); break;
+	default: break;
+    }
+}
+
+void Game::FocusHeroesClickLeftAction(Heroes & from_hero, u16 index_maps)
+{
+    Display & display = Display::Get();
+    Cursor & cursor = Cursor::Get();
+    Game::Focus & global_focus = Focus::Get();
+    Maps::Tiles & tile = world.GetTiles(index_maps);
+
+    switch(tile.GetObject())
+    {
+	// from hero to castle
+	case MP2::OBJN_CASTLE:
+	{
+    	    const Castle *to_castle = world.GetCastle(index_maps);
+	    if(NULL == to_castle) break;
+	    else
+	    if(from_hero.GetColor() == to_castle->GetColor())
+	    {
+		cursor.Hide();
+		global_focus.Set(const_cast<Castle *>(to_castle));
+		global_focus.Redraw();
+		cursor.Show();
+		display.Flip();
+	    }
+	    else
+		ShowPathOrStartMoveHero(&from_hero, Maps::GetIndexFromAbsPoint(to_castle->GetCenter()));
+	}
+	break;
+
+    	// from hero to hero
+    	case MP2::OBJ_HEROES:
+	{
+	    const Heroes * to_hero = world.GetHeroes(index_maps);
+	    if(NULL == to_hero) break;
+	    else
+	    if(from_hero.GetCenter() == to_hero->GetCenter())
+		OpenHeroes(&from_hero);
+	    else
+		ShowPathOrStartMoveHero(&from_hero, index_maps);
+    	}
+	break;
+
+	default:
+	    if(tile.isPassable(&from_hero) || MP2::isActionObject(tile.GetObject(), from_hero.isShipMaster()))
+		ShowPathOrStartMoveHero(&from_hero, index_maps);
+	    break;
+    }
+}
+
+void Game::FocusCastleClickLeftAction(Castle & from_castle, u16 index_maps)
+{
+    Display & display = Display::Get();
+    Cursor & cursor = Cursor::Get();
+    Game::Focus & global_focus = Focus::Get();
+    Maps::Tiles & tile = world.GetTiles(index_maps);
+
+    switch(tile.GetObject())
+    {
+	// from castle to castle
+	case MP2::OBJN_CASTLE:
+	case MP2::OBJ_CASTLE:
+	{
+	    const Castle *to_castle = world.GetCastle(index_maps);
+	    if(NULL != to_castle &&
+		from_castle.GetColor() == to_castle->GetColor())
+    	    {
+		// is selected open dialog
+		if(from_castle.GetCenter() == to_castle->GetCenter())
+		    OpenCastle(&from_castle);
+		// select other castle
+		else
+		{
+		    cursor.Hide();
+		    global_focus.Set(const_cast<Castle *>(to_castle));
+		    global_focus.Redraw();
+		    cursor.Show();
+		    display.Flip();
+		}
+	    }
+	}
+	break;
+
+	// from castle to heroes
+	case MP2::OBJ_HEROES:
+	{
+	    const Heroes *to_hero = world.GetHeroes(index_maps);
+	    if(NULL != to_hero &&
+		from_castle.GetColor() == to_hero->GetColor())
+	    {
+		cursor.Hide();
+    		global_focus.Set(const_cast<Heroes *>(to_hero));
+    		global_focus.Redraw();
+    		cursor.Show();
+		display.Flip();
+    	    }
+	}
+	break;
+
+	default: break;
+    }
+}
+
+void Game::MouseCursorAreaPressRight(u16 index_maps)
+{
+    Settings & conf = Settings::Get();
+    Maps::Tiles & tile = world.GetTiles(index_maps);
+
+    if(conf.Debug()) tile.DebugInfo();
+
+    if(!conf.Debug() && tile.isFog(conf.MyColor()))
+	Dialog::QuickInfo(tile);
+    else
+    switch(tile.GetObject())
+    {
+	case MP2::OBJN_CASTLE:
+	case MP2::OBJ_CASTLE:
+	{
+    	    const Castle *castle = world.GetCastle(tile.GetIndex());
+	    if(castle) Dialog::QuickInfo(*castle);
+	}
+	break;
+
+	case MP2::OBJ_HEROES:
+    	{
+	    const Heroes *heroes = world.GetHeroes(tile.GetIndex());
+	    if(heroes) Dialog::QuickInfo(*heroes);
+	}
+	break;
+
+	default:
+	    Dialog::QuickInfo(tile);
+	break;
+    }
+}
+
+void Game::ButtonNextHero(void)
+{
+    Display & display = Display::Get();
+    Cursor & cursor = Cursor::Get();
+    Game::Focus & global_focus = Focus::Get();
+
+    const Kingdom & myKingdom = world.GetMyKingdom();
+    const std::vector<Heroes *> & myHeroes = myKingdom.GetHeroes();
+
+    if(myHeroes.empty()) return;
+
+    cursor.Hide();
+    if(Game::Focus::HEROES != global_focus.Type())
+    {
+	global_focus.Reset(Game::Focus::HEROES);
+    }
+    else
+    {
+	std::vector<Heroes *>::const_iterator it = std::find(myHeroes.begin(), myHeroes.end(), &global_focus.GetHeroes());
+	++it;
+	if(it == myHeroes.end()) it = myHeroes.begin();
+	global_focus.Set(*it);
+    }
+    global_focus.Redraw();
+    cursor.Show();
+    display.Flip();
+}
+
+void Game::ButtonMovement(void)
+{
+    Game::Focus & global_focus = Focus::Get();
+    if(Game::Focus::HEROES == global_focus.Type() &&
+	global_focus.GetHeroes().GetPath().isValid())
+	global_focus.GetHeroes().SetMove(!global_focus.GetHeroes().isEnableMove());
+}
+
+void Game::ButtonKingdom(void)
+{
+}
+
+void Game::ButtonSpell(void)
+{
+    Game::Focus & global_focus = Focus::Get();
+    if(Game::Focus::HEROES == global_focus.Type())
+    {
+	Spell::spell_t spell = global_focus.GetHeroes().GetSpellBook().Open(SpellBook::ADVN, true);
+	// TODO cast selected spell
+	Error::Verbose("spell selected: " + std::string(Spell::GetName(spell)));
+    }
+}
+
+void Game::ButtonEndTurn(Game::menu_t & ret)
+{
+    Game::Focus & global_focus = Focus::Get();
+    const Kingdom & myKingdom = world.GetMyKingdom();
+
+    if(Game::Focus::HEROES == global_focus.Type())
+	global_focus.GetHeroes().SetMove(false);
+
+    if(!myKingdom.HeroesMayStillMove() ||
+	Dialog::YES == Dialog::Message("", _("One or more heroes may still move, are you sure you want to end your turn?"), Font::BIG, Dialog::YES | Dialog::NO))
+	ret = ENDTURN;
+}
+
+void Game::ButtonAdventure(Game::menu_t & ret)
+{
+    Game::Focus & global_focus = Focus::Get();
+    Mixer::Reduce();
+    switch(Dialog::AdventureOptions(Game::Focus::HEROES == global_focus.Type()))
+    {
+	case Dialog::WORLD:
+	    break;
+
+	case Dialog::PUZZLE: 
+	    KeyPress_p();
+	    break;
+
+	case Dialog::INFO:
+	    KeyPress_i();
+	    break;
+
+	case Dialog::DIG:
+	    KeyPress_d(ret);
+	    break;
+
+	default: break;
+    }
+    Mixer::Enhance();
+}
+
+void Game::ButtonFile(Game::menu_t & ret)
+{
+    Mixer::Reduce();
+    Mixer::Reset();
+
+    switch(Dialog::FileOptions())
+    {
+	case NEWGAME:
+	    if(Dialog::YES == Dialog::Message("", _("Are you sure you want to restart? (Your current game will be lost)"), Font::BIG, Dialog::YES|Dialog::NO))
+		ret = NEWGAME;
+	    break;
+
+	case QUITGAME:
+	    ret = QUITGAME;
+	    break;
+
+	case LOADGAME:
+	    KeyPress_l(ret);
+	    break;
+
+	case SAVEGAME:
+	    KeyPress_s();
+	    break;
+
+	default:
+	break;
+    }
+
+    Mixer::Enhance();
+}
+
+void Game::ButtonSystem(void)
+{
+    Settings & conf = Settings::Get();
+
+    Mixer::Reduce();
+
+    // Change and save system settings
+    const u8 changes = Dialog::SystemOptions();
+		
+    if(0x02 & changes)
+    {
+        Mixer::Volume(-1, conf.SoundVolume());
+        Game::EnvironmentSoundMixer();
+    }
+    if(0x04 & changes)
+    {
+        Music::Volume(conf.MusicVolume());
+        Game::EnvironmentSoundMixer();
+    }
+    if(0x08 & changes)
+    {
+	Display & display = Display::Get();
+	Cursor & cursor = Cursor::Get();
+	Focus & global_focus = Focus::Get();
+	Interface::Basic & I = Interface::Basic::Get();
+	Interface::HeroesIcons & selectHeroes = I.iconsPanel.GetHeroesBar();
+        Interface::CastleIcons & selectCastle = I.iconsPanel.GetCastleBar();
+
+        cursor.Hide();
+        if(selectHeroes.isSelected()) selectHeroes.Unselect();
+        if(selectCastle.isSelected()) selectCastle.Unselect();
+        I.Redraw();
+        global_focus.Reset(Focus::HEROES);
+        global_focus.Redraw();
+        cursor.Show();
+        display.Flip();
+    }
+
+    Mixer::Enhance();
+}
+
+void Game::KeyPress_ESC(menu_t & ret)
+{
+    Focus & global_focus = Focus::Get();
+
+    // stop hero
+    if(Game::Focus::HEROES == global_focus.Type() && global_focus.GetHeroes().isEnableMove())
+	global_focus.GetHeroes().SetMove(false);
+    else
+	if(Dialog::YES & Dialog::Message("", _("Are you sure you want to quit?"), Font::BIG, Dialog::YES|Dialog::NO))
+	    ret = QUITGAME;
+}
+
+void Game::KeyPress_e(menu_t & ret)
+{
+    ButtonEndTurn(ret);
+}
+
+void Game::KeyPress_h(void)
+{
+    Kingdom & myKingdom = world.GetMyKingdom();
+    std::vector<Heroes *> & myHeroes = myKingdom.GetHeroes();
+
+    if(myHeroes.size())
+    {
+	Display & display = Display::Get();
+	Cursor & cursor = Cursor::Get();
+	Focus & global_focus = Focus::Get();
+
+        cursor.Hide();
+	if(Game::Focus::HEROES != global_focus.Type())
+	    global_focus.Reset(Game::Focus::HEROES);
+	else
+	{
+	    std::vector<Heroes *>::const_iterator it = std::find(myHeroes.begin(), myHeroes.end(), &global_focus.GetHeroes());
+    	    ++it;
+    	    if(it == myHeroes.end()) it = myHeroes.begin();
+	    global_focus.Set(*it);
+	}
+        global_focus.Redraw();
+        cursor.Show();
+        display.Flip();
+    }
+}
+
+void Game::KeyPress_t(void)
+{
+    Kingdom & myKingdom = world.GetMyKingdom();
+    std::vector<Castle *> & myCastles = myKingdom.GetCastles();
+
+    if(myCastles.size())
+    {
+	Display & display = Display::Get();
+	Cursor & cursor = Cursor::Get();
+	Focus & global_focus = Focus::Get();
+
+        cursor.Hide();
+	if(Game::Focus::CASTLE != global_focus.Type())
+	    global_focus.Reset(Game::Focus::CASTLE);
+	else
+	{
+	    std::vector<Castle *>::const_iterator it = std::find(myCastles.begin(), myCastles.end(), &global_focus.GetCastle());
+    	    ++it;
+    	    if(it == myCastles.end()) it = myCastles.begin();
+	    global_focus.Set(*it);
+        }
+        global_focus.Redraw();
+	cursor.Show();
+	display.Flip();
+    }
+}
+
+void Game::KeyPress_s(void)
+{
+    std::string filename;
+    if(Dialog::SelectFileSave(filename) && filename.size())
+    {
+	Game::Save(filename);
+	Dialog::Message("", _("Game saved successfully."), Font::BIG, Dialog::OK);
+    }
+}
+
+void Game::KeyPress_l(menu_t & ret)
+{
+    if(Settings::Get().Original())
+    {
+	if(Dialog::YES == Dialog::Message("", _("Are you sure you want to load a new game? (Your current game will be lost)"), Font::BIG, Dialog::YES|Dialog::NO))
+	ret = LOADGAME;
+    }
+    else
+    {
+	// fast load
+	std::string filename;
+	if(Dialog::SelectFileLoad(filename) && filename.size())
+	{
+	    Game::Load(filename);
+	    ret = STARTGAME;
+	}
+    }
+}
+
+void Game::KeyPress_p(void)
+{
+    world.GetMyKingdom().PuzzleMaps().ShowMapsDialog();
+}
+
+void Game::KeyPress_i(void)
+{
+    Dialog::GameInfo();
+}
+
+void Game::KeyPress_d(menu_t & ret)
+{
+    Focus & global_focus = Focus::Get();
+    if(Game::Focus::HEROES == global_focus.Type())
+    {
+	DiggingForArtifacts(global_focus.GetHeroes());
+	// check game over for ultimate artifact
+	CheckGameOver(ret);
+    }
+}
+
+void Game::KeyPress_SPACE(void)
+{
+    Focus & global_focus = Focus::Get();
+    if(Game::Focus::HEROES == global_focus.Type())
+    {
+	Display & display = Display::Get();
+	Cursor & cursor = Cursor::Get();
+	GameArea & gamearea = GameArea::Get();
+	Heroes & hero = global_focus.GetHeroes();
+	cursor.Hide();
+	hero.SetMove(false);
+	hero.GetPath().Reset();
+	gamearea.Redraw();
+	if(MP2::isActionObject(hero.GetUnderObject(), hero.isShipMaster()))
+	    hero.Action(hero.GetIndex());
+	if(MP2::OBJ_STONELIGHTS == hero.GetUnderObject() || MP2::OBJ_WHIRLPOOL == hero.GetUnderObject())
+	{
+	    cursor.Hide();
+	    hero.ApplyPenaltyMovement();
+	    Interface::IconsPanel::Get().GetHeroesBar().Redraw();
+	    cursor.Show();
+	    display.Flip();
+	}
+    }
+}
+
+void Game::KeyPress_RETURN(void)
+{
+    Focus & global_focus = Focus::Get();
+    if(Game::Focus::HEROES == global_focus.Type())
+    {
+	Heroes & hero = global_focus.GetHeroes();
+	OpenHeroes(&hero);
+    }
+    else
+    if(Game::Focus::CASTLE == global_focus.Type())
+    {
+	Castle & castl = global_focus.GetCastle();
+	OpenCastle(&castl);
+    }
+}
+
+void Game::KeyPress_LEFT(void)
+{
+    Focus & global_focus = Focus::Get();
+    GameArea & gamearea = GameArea::Get();
+    LocalEvent & le = LocalEvent::GetLocalEvent();
+    // scroll map
+    if((MOD_CTRL & le.KeyMod())) gamearea.SetScroll(SCROLL_LEFT);
+    else
+    // move hero
+    if(Focus::HEROES == global_focus.Type()) MoveHeroFromArrowKeys(global_focus.GetHeroes(), Direction::LEFT);
+}
+
+void Game::KeyPress_RIGHT(void)
+{
+    Focus & global_focus = Focus::Get();
+    GameArea & gamearea = GameArea::Get();
+    LocalEvent & le = LocalEvent::GetLocalEvent();
+    // scroll map
+    if((MOD_CTRL & le.KeyMod())) gamearea.SetScroll(SCROLL_RIGHT);
+    else
+    // move hero
+    if(Focus::HEROES == global_focus.Type()) MoveHeroFromArrowKeys(global_focus.GetHeroes(), Direction::RIGHT);
+}
+
+void Game::KeyPress_TOP(void)
+{
+    Focus & global_focus = Focus::Get();
+    GameArea & gamearea = GameArea::Get();
+    LocalEvent & le = LocalEvent::GetLocalEvent();
+    // scroll map
+    if((MOD_CTRL & le.KeyMod())) gamearea.SetScroll(SCROLL_TOP);
+    else
+    // move hero
+    if(Focus::HEROES == global_focus.Type()) MoveHeroFromArrowKeys(global_focus.GetHeroes(), Direction::TOP);
+}
+
+void Game::KeyPress_BOTTOM(void)
+{
+    Focus & global_focus = Focus::Get();
+    GameArea & gamearea = GameArea::Get();
+    LocalEvent & le = LocalEvent::GetLocalEvent();
+    // scroll map
+    if((MOD_CTRL & le.KeyMod())) gamearea.SetScroll(SCROLL_BOTTOM);
+    else
+    // move hero
+    if(Focus::HEROES == global_focus.Type()) MoveHeroFromArrowKeys(global_focus.GetHeroes(), Direction::BOTTOM);
+}
+
+void Game::NewWeekDialog(void)
+{
+    const Week::type_t name = world.GetWeekType();
+    std::string message = world.BeginMonth() ? _("Astrologers proclaim month of the %{name}.") : _("Astrologers proclaim week of the %{name}.");
+    AGG::PlayMusic(world.BeginMonth() ? MUS::WEEK2_MONTH1 : MUS::WEEK1, false);
+    String::Replace(message, "%{name}", Week::GetString(name));
+    message += "\n \n";
+    message += (name == Week::PLAGUE ? _(" All populations are halved.") : _(" All dwellings increase population."));
+    Dialog::Message("", message, Font::BIG, Dialog::OK);
+}
+
+void Game::ShowEventDay(void)
+{
+    Kingdom & myKingdom = world.GetMyKingdom();
+    std::vector<GameEvent::Day *> events;
+    events.reserve(5);
+    world.GetEventDay(myKingdom.GetColor(), events);
+    std::vector<GameEvent::Day *>::const_iterator it1 = events.begin();
+    std::vector<GameEvent::Day *>::const_iterator it2 = events.end();
+
+    for(; it1 != it2; ++it1) if(*it1)
+    {
+    	AGG::PlayMusic(MUS::NEWS, false);
+	if((*it1)->GetResource().GetValidItems())
+	    Dialog::ResourceInfo("", (*it1)->GetMessage(), (*it1)->GetResource());
+	else
+	if((*it1)->GetMessage().size())
+	    Dialog::Message("", (*it1)->GetMessage(), Font::BIG, Dialog::OK);
+    }
+}
+
+void Game::ShowWarningLostTowns(menu_t & ret)
+{
+    const Kingdom & myKingdom = world.GetMyKingdom();
+    Settings & conf = Settings::Get();
+    if(0 == myKingdom.GetLostTownDays())
+    {
+    	    AGG::PlayMusic(MUS::DEATH, false);
+	    std::string str = _("%{color} player, your heroes abandon you, and you are banished from this land.");
+	    String::Replace(str, "%{color}", Color::String(conf.MyColor()));
+	    DialogPlayers(conf.MyColor(), str);
+	    conf.SetGameOverResult(GameOver::LOSS_ALL);
+	    ret = MAINMENU;
+    }
+    else
+    if(1 == myKingdom.GetLostTownDays())
+    {
+	    std::string str = _("%{color} player, this is your last day to capture a town, or you will be banished from this land.");
+	    String::Replace(str, "%{color}", Color::String(conf.MyColor()));
+	    DialogPlayers(conf.MyColor(), str);
+    }
+    else
+    if(LOST_TOWN_DAYS >= myKingdom.GetLostTownDays())
+    {
+	    std::string str = _("%{color} player, you only have %{day} days left to capture a town, or you will be banished from this land.");
+	    String::Replace(str, "%{color}", Color::String(conf.MyColor()));
+	    String::Replace(str, "%{day}", myKingdom.GetLostTownDays());
+	    DialogPlayers(conf.MyColor(), str);
+    }
 }

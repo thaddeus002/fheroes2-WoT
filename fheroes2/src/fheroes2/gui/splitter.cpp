@@ -34,6 +34,14 @@ Splitter::Splitter(const Surface &sf, const Rect &rt, positions_t pos)
     SpriteCursor::Show();
 }
 
+void Splitter::SetArea(s16 rx, s16 ry, u16 rw, u16 rh)
+{
+    area.x = rx;
+    area.y = ry;
+    area.w = rw;
+    area.h = rh;
+}
+
 void Splitter::SetArea(const Rect & rt)
 {
     area = rt;

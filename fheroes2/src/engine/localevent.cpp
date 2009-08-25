@@ -24,10 +24,7 @@
 #include "display.h"
 #include "localevent.h"
 
-bool LocalEvent::keep_going = true;
-bool LocalEvent::mouse_motion = false;
-bool LocalEvent::mouse_pressed = false;
-bool LocalEvent::key_pressed = false;
+u8 LocalEvent::modes = MOUSE_REDRAW;
 u8 LocalEvent::mouse_state = 0;
 u8 LocalEvent::mouse_button = 0;
 Point LocalEvent::mouse_cu(-1, -1);
@@ -40,6 +37,21 @@ Point LocalEvent::mouse_rr(-1, -1);
 KeySym LocalEvent::key_value = KEY_NONE;
 std::string LocalEvent::screenshot_prefix("screenshot_");
 void (* LocalEvent::redraw_cursor_func)(u16, u16) = NULL;
+
+void LocalEvent::SetModes(flag_t f)
+{
+    modes |= f;
+}
+
+void LocalEvent::ResetModes(flag_t f)
+{
+    modes &= ~f;
+}
+
+void LocalEvent::SetMouseRedraw(bool f)
+{
+    f ? SetModes(MOUSE_REDRAW) : ResetModes(MOUSE_REDRAW);
+}
 
 static KeySym SDLToKeySym(SDLKey key)
 {
@@ -158,8 +170,8 @@ bool LocalEvent::HandleEvents(void)
 {
     SDL_Event event;
 
-    mouse_motion = false;
-    key_pressed = false;
+    ResetModes(MOUSE_MOTION);
+    ResetModes(KEY_PRESSED);
 
     while(SDL_PollEvent(&event))
     {
@@ -199,52 +211,52 @@ bool LocalEvent::HandleEvents(void)
 
 bool LocalEvent::MouseMotion(void) const
 {
-    return mouse_motion;
+    return modes & MOUSE_MOTION;
 }
 
 bool LocalEvent::MouseMotion(const Rect &rt) const
 {
-    return mouse_motion ? rt & mouse_cu : false;
+    return modes & MOUSE_MOTION ? rt & mouse_cu : false;
 }
 
 bool LocalEvent::MouseLeft(void) const
 {
-    return mouse_pressed && SDL_BUTTON_LEFT == mouse_button;
+    return (modes & MOUSE_PRESSED) && SDL_BUTTON_LEFT == mouse_button;
 }
 
 bool LocalEvent::MouseMiddle(void) const
 {
-    return mouse_pressed && SDL_BUTTON_MIDDLE  == mouse_button;
+    return (modes & MOUSE_PRESSED) && SDL_BUTTON_MIDDLE  == mouse_button;
 }
 
 bool LocalEvent::MouseRight(void) const
 {
-    return mouse_pressed && SDL_BUTTON_RIGHT == mouse_button;
+    return (modes & MOUSE_PRESSED) && SDL_BUTTON_RIGHT == mouse_button;
 }
 
 void LocalEvent::HandleKeyboardEvent(SDL_KeyboardEvent & event, bool pressed)
 {
-    key_pressed = pressed;
+    pressed ? SetModes(KEY_PRESSED) : ResetModes(KEY_PRESSED);
     key_value = SDLToKeySym(event.keysym.sym);
 }
 
 void LocalEvent::HandleMouseMotionEvent(const SDL_MouseMotionEvent & motion)
 {
     mouse_state = motion.state;
-    mouse_motion = true;
+    SetModes(MOUSE_MOTION);
     mouse_cu.x = motion.x;
     mouse_cu.y = motion.y;
 }
 
 void LocalEvent::HandleMouseButtonEvent(const SDL_MouseButtonEvent & button)
 {
-    mouse_pressed = (button.state == SDL_PRESSED);
+    button.state == SDL_PRESSED ? SetModes(MOUSE_PRESSED) : ResetModes(MOUSE_PRESSED);
     mouse_button = button.button;
 
     mouse_cu.x = button.x;
     mouse_cu.y = button.y;
     
-    if(mouse_pressed)
+    if(modes & MOUSE_PRESSED)
 	switch(button.button)
 	{
 	    case SDL_BUTTON_LEFT:
@@ -292,13 +304,13 @@ void LocalEvent::HandleMouseButtonEvent(const SDL_MouseButtonEvent & button)
 
 void LocalEvent::HandleMouseWheelEvent(const SDL_MouseButtonEvent & button)
 {
-    mouse_pressed = (button.state == SDL_PRESSED);
+    button.state == SDL_PRESSED ? SetModes(MOUSE_PRESSED) : ResetModes(MOUSE_PRESSED);
     mouse_button = button.button;
 
     mouse_cu.x = button.x;
     mouse_cu.y = button.y;
 
-    if(mouse_pressed)
+    if(modes & MOUSE_PRESSED)
     {
 	mouse_pm.x = button.x;
 	mouse_pm.y = button.y;
@@ -354,12 +366,12 @@ bool LocalEvent::MouseClickRight(const Rect &rt)
 
 bool LocalEvent::MouseWheelUp(void) const
 {
-    return mouse_pressed && SDL_BUTTON_WHEELUP == mouse_button;
+    return (modes & MOUSE_PRESSED) && SDL_BUTTON_WHEELUP == mouse_button;
 }
 
 bool LocalEvent::MouseWheelDn(void) const
 {
-    return mouse_pressed && SDL_BUTTON_WHEELDOWN == mouse_button;
+    return (modes & MOUSE_PRESSED) && SDL_BUTTON_WHEELDOWN == mouse_button;
 }
 
 bool LocalEvent::MousePressLeft(const Rect &rt) const
@@ -437,12 +449,12 @@ KeySym LocalEvent::KeyValue(void) const
 
 bool LocalEvent::KeyPress(void) const
 {
-    return key_pressed;
+    return modes & KEY_PRESSED;
 }
 
 bool LocalEvent::KeyPress(KeySym key) const
 {
-    return key == key_value && key_pressed;
+    return key == key_value && (modes & KEY_PRESSED);
 }
 
 void LocalEvent::SetGlobalFilterEvents(void (*pf)(u16, u16))
@@ -460,7 +472,7 @@ int LocalEvent::GlobalFilterEvents(const SDL_Event *event)
     if(SDL_MOUSEMOTION == event->type)
     {
         // redraw cursor
-        if(redraw_cursor_func)
+        if(redraw_cursor_func && (modes & MOUSE_REDRAW))
     	    (*redraw_cursor_func)(event->motion.x, event->motion.y);
 
         return 1;

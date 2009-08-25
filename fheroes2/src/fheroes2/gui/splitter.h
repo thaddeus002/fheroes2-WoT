@@ -34,6 +34,7 @@ public:
     void Backward(void);
     void Move(u16 pos);
 
+    void SetArea(s16, s16, u16, u16);
     void SetArea(const Rect & rt);
     void SetOrientation(positions_t ps);
     void SetRange(u16 smin, u16 smax);

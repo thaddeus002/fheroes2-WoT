@@ -22,37 +22,47 @@
 #define H2GAMEINTERFACE_H
 
 #include "gamedefs.h"
-#include "button.h"
-#include "game.h"
+#include "interface_border.h"
+#include "interface_radar.h"
+#include "interface_buttons.h"
+#include "interface_icons.h"
+#include "interface_status.h"
 
-namespace Game
+enum redraw_t
 {
-    class Interface
+    REDRAW_RADAR     = 0x01,
+    REDRAW_HEROES    = 0x02,
+    REDRAW_CASTLES   = 0x04,
+    REDRAW_BUTTONS   = 0x08,
+    REDRAW_STATUS    = 0x10,
+    REDRAW_BORDER    = 0x20,
+
+    REDRAW_ICONS     = REDRAW_HEROES | REDRAW_CASTLES,
+    REDRAW_ALL       = 0xFF
+};
+
+namespace Interface
+{
+
+    class Basic
     {
     public:
-    	static Interface & Get(void);
+    	static Basic & Get(void);
 
-	void	Draw(void);
-        void    DrawBorder(bool drawMiddle, bool useAlt);
-	u8	CountIcons(void);
+	bool    NeedRedraw(void) const;
+	void    SetRedraw(redraw_t f);
+    	void	Redraw(u8 f = 0);
 
-	Button	buttonScrollHeroesUp;
-	Button	buttonScrollCastleUp;
-	Button	buttonNextHero;
-	Button	buttonMovement;
-	Button	buttonKingdom;
-	Button	buttonSpell;
-	Button	buttonEndTur;
-	Button	buttonAdventure;
-	Button	buttonFile;
-	Button	buttonSystem;
-	Button	buttonScrollHeroesDown;
-	Button	buttonScrollCastleDown;
+	Radar & radar;
+	IconsPanel & iconsPanel;
+	ButtonsArea & buttonsArea;
+	StatusWindow & statusWindow;
+	BorderWindow & borderWindow;
 
     private:
-	Interface();
-	
-	u8 count_icons;
+	Basic();
+
+	u8 redraw;
     };
 };
 
