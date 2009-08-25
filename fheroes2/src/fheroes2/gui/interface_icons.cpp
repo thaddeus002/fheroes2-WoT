@@ -705,6 +705,22 @@ void Interface::IconsPanel::Redraw(void)
 
     Rect srcrt;
     Point dstpt;
+    const Heroes* select_heroes = NULL;
+    const Castle* select_castle = NULL;
+
+    if(heroesIcons.isSelected())
+    {
+	select_heroes = heroesIcons.Selected();
+	heroesIcons.Unselect();
+	heroesIcons.Reset();
+    }
+    else
+    if(castleIcons.isSelected())
+    {
+	select_castle = castleIcons.Selected();
+	castleIcons.Unselect();
+	castleIcons.Reset();
+    }
 
     // ICON PANEL
     const Sprite & icnadv = AGG::GetICN(Settings::Get().EvilInterface() ? ICN::ADVBORDE : ICN::ADVBORD, 0);
@@ -731,6 +747,12 @@ void Interface::IconsPanel::Redraw(void)
     buttonScrollCastleUp.Draw();
     buttonScrollHeroesDown.Draw();
     buttonScrollCastleDown.Draw();
+
+    if(select_heroes)
+	heroesIcons.Select(select_heroes);
+    else
+    if(select_castle)
+	castleIcons.Select(select_castle);
 
     heroesIcons.Redraw();
     castleIcons.Redraw();        

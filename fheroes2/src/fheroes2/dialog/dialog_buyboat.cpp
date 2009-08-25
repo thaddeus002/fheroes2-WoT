@@ -38,7 +38,7 @@ Dialog::answer_t Dialog::BuyBoat(bool enable)
     Cursor & cursor = Cursor::Get();
     cursor.Hide();
 
-    Dialog::Box box(100, true);
+    Dialog::Box box(120, true);
 
     const Rect & box_rt = box.GetArea();
     Point dst_pt;
@@ -59,7 +59,7 @@ Dialog::answer_t Dialog::BuyBoat(bool enable)
     dst_pt.y = box_rt.y + 35 + sprite.h();
     text.Blit(dst_pt);
 
-    const Rect src_rt(box_rt.x, box_rt.y + 40 + sprite.h(), box_rt.w, box_rt.h);
+    const Rect src_rt(box_rt.x, box_rt.y + 50 + sprite.h(), box_rt.w, box_rt.h);
 
     Resource::funds_t res;
     res.gold = BUY_BOAT_GOLD;

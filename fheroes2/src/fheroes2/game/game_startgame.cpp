@@ -1381,17 +1381,10 @@ void Game::ButtonSystem(void)
     {
 	Display & display = Display::Get();
 	Cursor & cursor = Cursor::Get();
-	Focus & global_focus = Focus::Get();
 	Interface::Basic & I = Interface::Basic::Get();
-	Interface::HeroesIcons & selectHeroes = I.iconsPanel.GetHeroesBar();
-        Interface::CastleIcons & selectCastle = I.iconsPanel.GetCastleBar();
 
         cursor.Hide();
-        if(selectHeroes.isSelected()) selectHeroes.Unselect();
-        if(selectCastle.isSelected()) selectCastle.Unselect();
-        I.Redraw();
-        global_focus.Reset(Focus::HEROES);
-        global_focus.Redraw();
+        I.Redraw(REDRAW_ICONS | REDRAW_BUTTONS | REDRAW_BORDER);
         cursor.Show();
         display.Flip();
     }

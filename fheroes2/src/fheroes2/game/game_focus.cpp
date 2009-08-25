@@ -209,11 +209,8 @@ void Game::Focus::Redraw(void)
     Interface::CastleIcons & castleBar = Interface::IconsPanel::Get().GetCastleBar();
     Interface::StatusWindow& statusWin = Interface::StatusWindow::Get();
 
-    if(! heroes && !castle)
-    {
-	castleBar.Reset();
-	heroesBar.Reset();
-    }
+    if(!heroes && heroesBar.isSelected()) heroesBar.Reset();
+    if(!castle && castleBar.isSelected()) castleBar.Reset();
 
     areaMaps.Redraw();
     radar.Redraw();
