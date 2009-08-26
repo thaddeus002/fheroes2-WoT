@@ -252,7 +252,7 @@ Game::menu_t Game::StartGame(void)
     Interface::StatusWindow& statusWin = I.statusWindow;
     radar.Build();
 
-    //I.Redraw();
+    I.Redraw(REDRAW_ICONS | REDRAW_BUTTONS | REDRAW_BORDER);
 
     Game::menu_t m = ENDTURN;
 
@@ -811,29 +811,19 @@ Game::menu_t Game::HumanTurn(void)
     const std::vector<Castle *> & myCastles = myKingdom.GetCastles();
     const std::vector<Heroes *> & myHeroes = myKingdom.GetHeroes();
 
-    global_focus.Reset();
 
-    I.Redraw(REDRAW_ICONS | REDRAW_BUTTONS | REDRAW_BORDER);
+    // set focus
+    if(Game::HOTSEAT == conf.GameType()) global_focus.Reset();
 
-    switch(global_focus.Type())
-    {
-	case Focus::UNSEL:
-    	    if(myHeroes.size())  global_focus.Set(myHeroes.front());
-    	    else
-	    if(myCastles.size()) global_focus.Set(myCastles.front());
-	    break;
-	case Focus::HEROES:
-	    if(conf.Original()) global_focus.Set(myHeroes.front());
-	    if(global_focus.GetHeroes().GetPath().isValid()) global_focus.GetHeroes().GetPath().Show();
-	    break;
-	case Focus::CASTLE:
-	    if(conf.Original()) global_focus.Set(myCastles.front());
-	    break;
-    }
+    if(conf.Original() && myHeroes.size())
+	global_focus.Set(myHeroes.front());
+    else
+	global_focus.Reset(Focus::HEROES);
+    if(Focus::HEROES == global_focus.Type() && global_focus.GetHeroes().GetPath().isValid()) global_focus.GetHeroes().GetPath().Show();
 
-    //Override whatever the focus set the window to show
     statusWindow.SetState(STATUS_DAY);
-    global_focus.Redraw();
+    gamearea.Redraw();
+    I.Redraw(REDRAW_RADAR | REDRAW_ICONS | REDRAW_BUTTONS | REDRAW_STATUS | REDRAW_BORDER);
 
     AGG::PlayMusic(MUS::FromGround(world.GetTiles(global_focus.Center()).GetGround()));
     Game::EnvironmentSoundMixer();
