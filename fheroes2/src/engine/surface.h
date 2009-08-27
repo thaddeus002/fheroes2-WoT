@@ -52,6 +52,7 @@ public:
     void Set(SDL_Surface * sf);
     void Set(u16 sw, u16 sh, bool alpha = false);
     void Set(u16 sw, u16 sh, u8 depth, u32 fl);
+    void Set(const void* pixels, unsigned int width, unsigned int height, unsigned char bytes_per_pixel, bool alpha);
 
     bool Load(const char*);
     bool Load(const std::string &);

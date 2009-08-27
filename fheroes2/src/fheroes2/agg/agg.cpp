@@ -509,7 +509,7 @@ void AGG::Cache::LoadTIL(const TIL::til_t til)
 
 		v.resize(4 * count, NULL);
 		for(u16 ii = 0; ii < count; ++ii)
-		    v[ii] = Surface(&body[6 + ii * tile_size], width, height, 1, false);
+		    v[ii].Set(&body[6 + ii * tile_size], width, height, 1, false);
 
 		return;
 	    }

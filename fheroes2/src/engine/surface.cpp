@@ -40,22 +40,19 @@ Surface::Surface() : surface(NULL)
 {
 }
 
-Surface::Surface(const void* pixels, unsigned int width, unsigned int height, unsigned char bytes_per_pixel, bool alpha)
+Surface::Surface(const void* pixels, unsigned int width, unsigned int height, unsigned char bytes_per_pixel, bool alpha) : surface(NULL)
 {
-    surface = SDL_CreateRGBSurfaceFrom(const_cast<void *>(pixels), width, height, bytes_per_pixel * 8, width * bytes_per_pixel,
-		RMASK32, GMASK32, BMASK32, alpha ? AMASK32 : 0);
+    Set(pixels, width, height, bytes_per_pixel, alpha);
 }
 
-Surface::Surface(u16 sw, u16 sh, u8 depth, u32 fl)
+Surface::Surface(u16 sw, u16 sh, u8 depth, u32 fl) : surface(NULL)
 {
-    CreateSurface(sw, sh, depth,  fl);
-    LoadPalette();
+    Set(sw, sh, depth, fl);
 }
 
-Surface::Surface(u16 sw, u16 sh, bool alpha)
+Surface::Surface(u16 sw, u16 sh, bool alpha) : surface(NULL)
 {
-    CreateSurface(sw, sh, default_depth, alpha ? SDL_SRCALPHA|SDL_SWSURFACE : SDL_SWSURFACE);
-    LoadPalette();
+    Set(sw, sh, alpha);
 }
 
 Surface::Surface(const Surface & bs) : surface(NULL)
@@ -78,10 +75,9 @@ Surface::Surface(const Surface & bs) : surface(NULL)
     }
 }
 
-Surface::Surface(SDL_Surface * sf)
+Surface::Surface(SDL_Surface* sf) : surface(NULL)
 {
-    surface = sf ? sf : NULL;
-    LoadPalette();
+    Set(sf);
 }
 
 Surface::~Surface()
@@ -157,6 +153,27 @@ void Surface::Set(u16 sw, u16 sh, u8 depth, u32 fl)
 
     CreateSurface(sw, sh, depth,  fl);
     LoadPalette();
+}
+
+void Surface::Set(const void* pixels, unsigned int width, unsigned int height, unsigned char bytes_per_pixel, bool alpha)
+{
+    if(surface) SDL_FreeSurface(surface);
+
+    switch(bytes_per_pixel)
+    {
+	case 1:
+	    Set(width, height, 8, SDL_SWSURFACE);
+	    Lock();
+	    memcpy(surface->pixels, pixels, width * height);
+	    Unlock();
+	    break;
+
+	default:
+	    surface = SDL_CreateRGBSurfaceFrom(const_cast<void *>(pixels), width, height, bytes_per_pixel * 8, width * bytes_per_pixel,
+		RMASK32, GMASK32, BMASK32, alpha ? AMASK32 : 0);
+	    //LoadPalette();
+	    break;
+    }
 }
 
 bool Surface::Load(const char* fn)
