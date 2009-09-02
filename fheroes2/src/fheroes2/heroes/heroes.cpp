@@ -448,7 +448,7 @@ void Heroes::LoadFromMP2(u16 map_index, const void *ptr, const Color::color_t cl
 
 	    if(Skill::Secondary::UNKNOWN != skill && Skill::Level::NONE != lvl) secondary_skills.push_back(Skill::Secondary(skill, lvl));
 	}
-	ptr8 += 15;
+	ptr8 += 16;
     }
     else
     {
