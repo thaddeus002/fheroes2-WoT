@@ -1350,23 +1350,9 @@ void Game::ButtonFile(Game::menu_t & ret)
 
 void Game::ButtonSystem(void)
 {
-    Settings & conf = Settings::Get();
-
-    Mixer::Reduce();
-
     // Change and save system settings
     const u8 changes = Dialog::SystemOptions();
 		
-    if(0x02 & changes)
-    {
-        Mixer::Volume(-1, conf.SoundVolume());
-        Game::EnvironmentSoundMixer();
-    }
-    if(0x04 & changes)
-    {
-        Music::Volume(conf.MusicVolume());
-        Game::EnvironmentSoundMixer();
-    }
     if(0x08 & changes)
     {
 	Display & display = Display::Get();
@@ -1378,8 +1364,6 @@ void Game::ButtonSystem(void)
         cursor.Show();
         display.Flip();
     }
-
-    Mixer::Enhance();
 }
 
 void Game::KeyPress_ESC(menu_t & ret)

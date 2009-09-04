@@ -96,24 +96,25 @@ u8 Dialog::SystemOptions(void)
         if(conf.Sound() && le.MouseClickLeft(rect1))
         {
     	    conf.SetSoundVolume(10 > conf.SoundVolume() ? conf.SoundVolume() + 1 : 0);
-    	    result |= 0x02;
     	    cursor.Hide();
     	    display.Blit(back2, rb);
 	    DrawSystemInfo(rb);
     	    cursor.Show();
     	    display.Flip();
+    	    Mixer::Volume(-1, conf.SoundVolume());
+    	    Game::EnvironmentSoundMixer();
     	}
 
         // set music volume
         if(conf.Music() && le.MouseClickLeft(rect2))
         {
     	    conf.SetMusicVolume(10 > conf.MusicVolume() ? conf.MusicVolume() + 1 : 0);
-    	    result |= 0x04;
     	    cursor.Hide();
     	    display.Blit(back2, rb);
 	    DrawSystemInfo(rb);
     	    cursor.Show();
     	    display.Flip();
+    	    Music::Volume(conf.MusicVolume());
     	}
 
         // set animation
