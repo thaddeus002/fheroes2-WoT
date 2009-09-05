@@ -341,7 +341,7 @@ void Interface::StatusWindow::QueueEventProcessing(void)
 {
     Display & display = Display::Get();
     Cursor & cursor = Cursor::Get();
-    LocalEvent & le = LocalEvent::GetLocalEvent();
+    LocalEvent & le = LocalEvent::Get();
 
     if(le.MouseClickLeft(*this))
     {

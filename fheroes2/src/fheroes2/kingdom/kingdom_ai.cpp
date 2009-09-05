@@ -221,7 +221,7 @@ void Kingdom::AIHeroesTurns(Heroes &hero)
 	    Display::Get().Flip();
 	}
 
-	while(LocalEvent::GetLocalEvent().HandleEvents())
+	while(LocalEvent::Get().HandleEvents())
 	{
 	    if(hero.isFreeman() || !hero.isEnableMove()) break;
 

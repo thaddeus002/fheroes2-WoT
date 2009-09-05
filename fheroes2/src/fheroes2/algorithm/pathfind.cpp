@@ -103,7 +103,7 @@ bool Algorithm::PathFind(std::list<Route::Step> *result, const u16 from, const u
 
     while(cur != to)
     {
-	LocalEvent::GetLocalEvent().HandleEvents();
+	LocalEvent::Get().HandleEvents();
 
 	for(direct = Direction::TOP_LEFT; direct != Direction::CENTER; ++direct)
 	{

@@ -61,7 +61,7 @@ u16 Dialog::SpriteInfo(const std::string &header, const std::string &message, co
     pos.x = box.GetArea().x + (pos.w - sprite.w()) / 2;
     display.Blit(sprite, pos.x, pos.y);
 
-    LocalEvent & le = LocalEvent::GetLocalEvent();
+    LocalEvent & le = LocalEvent::Get();
 
     Button *button1 = NULL;
     Button *button2 = NULL;
@@ -122,7 +122,7 @@ u16 Dialog::SpriteInfo(const std::string &header, const std::string &message, co
 
     while(le.HandleEvents())
     {
-        if(!buttons && !le.MouseRight()) break;
+        if(!buttons && !le.MousePressRight()) break;
 
 	if(button1) le.MousePressLeft(*button1) ? button1->PressDraw() : button1->ReleaseDraw();
         if(button2) le.MousePressLeft(*button2) ? button2->PressDraw() : button2->ReleaseDraw();

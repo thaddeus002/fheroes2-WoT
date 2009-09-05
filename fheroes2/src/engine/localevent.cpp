@@ -18,25 +18,14 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#include <sstream>
-#include <ctime>
 #include "error.h"
-#include "display.h"
 #include "localevent.h"
 
-u8 LocalEvent::modes = MOUSE_REDRAW;
-u8 LocalEvent::mouse_state = 0;
-u8 LocalEvent::mouse_button = 0;
-Point LocalEvent::mouse_cu(-1, -1);
-Point LocalEvent::mouse_pl(-1, -1);
-Point LocalEvent::mouse_pm(-1, -1);
-Point LocalEvent::mouse_pr(-1, -1);
-Point LocalEvent::mouse_rl(-1, -1);
-Point LocalEvent::mouse_rm(-1, -1);
-Point LocalEvent::mouse_rr(-1, -1);
-KeySym LocalEvent::key_value = KEY_NONE;
-std::string LocalEvent::screenshot_prefix("screenshot_");
-void (* LocalEvent::redraw_cursor_func)(u16, u16) = NULL;
+LocalEvent::LocalEvent() : modes(0), key_value(KEY_NONE), mouse_state(0),
+    mouse_button(0), redraw_cursor_func(NULL), keyboard_filter_func(NULL)
+{
+    SDL_SetEventFilter(GlobalFilterEvents);
+}
 
 void LocalEvent::SetModes(flag_t f)
 {
@@ -48,9 +37,9 @@ void LocalEvent::ResetModes(flag_t f)
     modes &= ~f;
 }
 
-void LocalEvent::SetMouseRedraw(bool f)
+void LocalEvent::SetGlobalFilter(bool f)
 {
-    f ? SetModes(MOUSE_REDRAW) : ResetModes(MOUSE_REDRAW);
+    f ? SetModes(GLOBAL_FILTER) : ResetModes(GLOBAL_FILTER);
 }
 
 static KeySym SDLToKeySym(SDLKey key)
@@ -155,11 +144,8 @@ static KeySym SDLToKeySym(SDLKey key)
     return KEY_NONE;
 };
 
-LocalEvent::LocalEvent()
-{
-}
 
-LocalEvent & LocalEvent::GetLocalEvent(void)
+LocalEvent & LocalEvent::Get(void)
 {
     static LocalEvent le;
 
@@ -219,17 +205,17 @@ bool LocalEvent::MouseMotion(const Rect &rt) const
     return modes & MOUSE_MOTION ? rt & mouse_cu : false;
 }
 
-bool LocalEvent::MouseLeft(void) const
+bool LocalEvent::MousePressLeft(void) const
 {
     return (modes & MOUSE_PRESSED) && SDL_BUTTON_LEFT == mouse_button;
 }
 
-bool LocalEvent::MouseMiddle(void) const
+bool LocalEvent::MousePressMiddle(void) const
 {
     return (modes & MOUSE_PRESSED) && SDL_BUTTON_MIDDLE  == mouse_button;
 }
 
-bool LocalEvent::MouseRight(void) const
+bool LocalEvent::MousePressRight(void) const
 {
     return (modes & MOUSE_PRESSED) && SDL_BUTTON_RIGHT == mouse_button;
 }
@@ -324,7 +310,7 @@ void LocalEvent::HandleMouseWheelEvent(const SDL_MouseButtonEvent & button)
 
 bool LocalEvent::MouseClickLeft(const Rect &rt)
 {
-    if(!MouseLeft() && (rt & mouse_pl) && (rt & mouse_rl))
+    if(!MousePressLeft() && (rt & mouse_pl) && (rt & mouse_rl))
     {
 	// reset cycle
 	mouse_pl.x = -1;
@@ -338,7 +324,7 @@ bool LocalEvent::MouseClickLeft(const Rect &rt)
 
 bool LocalEvent::MouseClickMiddle(const Rect &rt)
 {
-    if(!MouseMiddle() && (rt & mouse_pm) && (rt & mouse_rm))
+    if(!MousePressMiddle() && (rt & mouse_pm) && (rt & mouse_rm))
     {
 	// reset cycle
 	mouse_pm.x = -1;
@@ -352,7 +338,7 @@ bool LocalEvent::MouseClickMiddle(const Rect &rt)
 
 bool LocalEvent::MouseClickRight(const Rect &rt)
 {
-    if(!MouseRight() && (rt & mouse_pr) && (rt & mouse_rr))
+    if(!MousePressRight() && (rt & mouse_pr) && (rt & mouse_rr))
     {
 	// reset cycle
 	mouse_pr.x = -1;
@@ -376,37 +362,37 @@ bool LocalEvent::MouseWheelDn(void) const
 
 bool LocalEvent::MousePressLeft(const Rect &rt) const
 {
-    return MouseLeft() ? rt & mouse_pl : false;
+    return MousePressLeft() ? rt & mouse_pl : false;
 }
 
 bool LocalEvent::MousePressLeft(const Point &pt, u16 w, u16 h) const
 {
-    return MouseLeft() ? Rect(pt.x, pt.y, w, h) & mouse_pl : false;
+    return MousePressLeft() ? Rect(pt.x, pt.y, w, h) & mouse_pl : false;
 }
 
 bool LocalEvent::MousePressMiddle(const Rect &rt) const
 {
-    return MouseMiddle() ? rt & mouse_pm : false;
+    return MousePressMiddle() ? rt & mouse_pm : false;
 }
 
 bool LocalEvent::MousePressRight(const Rect &rt) const
 {
-    return MouseRight() ? rt & mouse_pr : false;
+    return MousePressRight() ? rt & mouse_pr : false;
 }
 
 bool LocalEvent::MouseReleaseLeft(const Rect &rt) const
 {
-    return MouseLeft() ? false : rt & mouse_rl;
+    return MousePressLeft() ? false : rt & mouse_rl;
 }
 
 bool LocalEvent::MouseReleaseMiddle(const Rect &rt) const
 {
-    return MouseMiddle() ? false : rt & mouse_rm;
+    return MousePressMiddle() ? false : rt & mouse_rm;
 }
 
 bool LocalEvent::MouseReleaseRight(const Rect &rt) const
 {
-    return MouseRight() ? false : rt & mouse_rr;
+    return MousePressRight() ? false : rt & mouse_rr;
 }
 
 bool LocalEvent::MouseWheelUp(const Rect &rt) const
@@ -424,7 +410,7 @@ bool LocalEvent::MouseCursor(const Rect &rt) const
     return rt & mouse_cu;
 }
 
-const Point & LocalEvent::MouseCursor(void)
+const Point & LocalEvent::GetMouseCursor(void)
 {
     int x, y;
 
@@ -457,49 +443,35 @@ bool LocalEvent::KeyPress(KeySym key) const
     return key == key_value && (modes & KEY_PRESSED);
 }
 
-void LocalEvent::SetGlobalFilterEvents(void (*pf)(u16, u16))
+void LocalEvent::SetGlobalFilterMouseEvents(void (*pf)(u16, u16))
 {
     redraw_cursor_func = pf;
+}
 
-    SDL_SetEventFilter(GlobalFilterEvents);
+void LocalEvent::SetGlobalFilterKeysEvents(void (*pf)(u16, u16))
+{
+    keyboard_filter_func = pf;
 }
 
 int LocalEvent::GlobalFilterEvents(const SDL_Event *event)
 {
-    Display & display = Display::Get();
+    LocalEvent & le = LocalEvent::Get();
 
     // motion
-    if(SDL_MOUSEMOTION == event->type)
+    if((le.modes & GLOBAL_FILTER) && SDL_MOUSEMOTION == event->type)
     {
         // redraw cursor
-        if(redraw_cursor_func && (modes & MOUSE_REDRAW))
-    	    (*redraw_cursor_func)(event->motion.x, event->motion.y);
-
-        return 1;
+        if(le.redraw_cursor_func)
+    	    (*(le.redraw_cursor_func))(event->motion.x, event->motion.y);
     }
 
     // key
-    if(SDL_KEYDOWN == event->type)
-	switch(event->key.keysym.sym)
-	{
-    	    case SDLK_F4:
-		display.FullScreen();
-		return 0;
+    if((le.modes & GLOBAL_FILTER) && SDL_KEYDOWN == event->type)
 
-	    case SDLK_PRINT:
-	    {
-		std::ostringstream stream;
-#ifndef WITH_IMAGE
-		stream << screenshot_prefix << std::time(0) << ".bmp";
-#else
-		stream << screenshot_prefix << std::time(0) << ".png";
-#endif
-            	if(display.Save(stream.str().c_str())) Error::Verbose("save: " + stream.str());
-	    }
-	    	return 0;
-
-	    default:
-		break;
+    {
+        // key event
+        if(le.keyboard_filter_func)
+    	    (*(le.keyboard_filter_func))(event->key.keysym.sym, event->key.keysym.mod);
     }
 
     return 1;
@@ -536,9 +508,4 @@ void LocalEvent::SetStateDefaults(void)
     SetState(SDL_SYSWMEVENT, false);
     SetState(SDL_VIDEORESIZE, false);
     SetState(SDL_VIDEOEXPOSE, false);
-}
-
-void LocalEvent::SetScreenshotPrefix(std::string & str)
-{
-    screenshot_prefix = str;
 }

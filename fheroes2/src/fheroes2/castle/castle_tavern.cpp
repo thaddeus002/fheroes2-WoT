@@ -86,7 +86,7 @@ void Castle::OpenTavern(void)
     cursor.Show();
     display.Flip();
 
-    LocalEvent & le = LocalEvent::GetLocalEvent();
+    LocalEvent & le = LocalEvent::Get();
 
     u32 speed = 0;
     u32 ticket = 0;

@@ -286,13 +286,13 @@ void Interface::Radar::QueueEventProcessing(void)
     Display & display = Display::Get();
     Cursor & cursor = Cursor::Get();
     GameArea & gamearea = GameArea::Get();
-    LocalEvent & le = LocalEvent::GetLocalEvent();
+    LocalEvent & le = LocalEvent::Get();
 
     if(le.MouseCursor(*this) &&
         (le.MouseClickLeft(*this) || le.MousePressLeft(*this)))
     {
         const Point prev(gamearea.GetRect());
-        const Point & pt = le.MouseCursor();
+        const Point & pt = le.GetMouseCursor();
 	gamearea.Center((pt.x - x) * world.w() / RADARWIDTH, (pt.y - y) * world.h() / RADARWIDTH);
         if(prev != gamearea.GetRect())
         {

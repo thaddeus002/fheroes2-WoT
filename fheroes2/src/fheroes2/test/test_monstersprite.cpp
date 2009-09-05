@@ -39,7 +39,7 @@ void TestMonsterSprite(void)
     Rect pos;
 
     Display & display = Display::Get();
-    LocalEvent & le = LocalEvent::GetLocalEvent();
+    LocalEvent & le = LocalEvent::Get();
 
     std::string str;
 

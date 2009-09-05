@@ -61,7 +61,7 @@ void Dialog::ResourceInfo(const std::string &header, const std::string &message,
     // draw resource
     Resource::AlignDraw(rs, pos);
 
-    LocalEvent & le = LocalEvent::GetLocalEvent();
+    LocalEvent & le = LocalEvent::Get();
 
     Point pt;
     

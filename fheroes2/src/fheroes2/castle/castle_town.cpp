@@ -91,7 +91,7 @@ Dialog::answer_t Castle::DialogBuyHero(const Heroes* hero)
     cursor.Hide();
     Dialog::Box box(200, true);
     const Rect & box_rt = box.GetArea();
-    LocalEvent & le = LocalEvent::GetLocalEvent();
+    LocalEvent & le = LocalEvent::Get();
     Point dst_pt;
     std::string str;
 
@@ -250,7 +250,7 @@ Dialog::answer_t Castle::DialogBuyBuilding(building_t build, bool buttons)
         default: return Dialog::CANCEL;
     }
 
-    LocalEvent & le = LocalEvent::GetLocalEvent();
+    LocalEvent & le = LocalEvent::Get();
 
     Point dst_pt;
 
@@ -351,7 +351,7 @@ Dialog::answer_t Castle::DialogBuyBuilding(building_t build, bool buttons)
     // message loop
     while(le.HandleEvents())
     {
-        if(!buttons && !le.MouseRight()) break;
+        if(!buttons && !le.MousePressRight()) break;
 
         le.MousePressLeft(button1) ? button1.PressDraw() : button1.ReleaseDraw();
         le.MousePressLeft(button2) ? button2.PressDraw() : button2.ReleaseDraw();
@@ -839,7 +839,7 @@ Castle::building_t Castle::OpenTown(void)
     cursor.Show();
     display.Flip();
 
-    LocalEvent & le = LocalEvent::GetLocalEvent();
+    LocalEvent & le = LocalEvent::Get();
 
     // message loop
     while(le.HandleEvents())

@@ -378,7 +378,7 @@ void Castle::RedrawAnimationBuilding(const Point & dst_pt, const building_t buil
 	sf.Blit(sprite2, sprite2.x() - sprite.x(), sprite2.y() - sprite.y());
     }
 
-    LocalEvent & le = LocalEvent::GetLocalEvent();
+    LocalEvent & le = LocalEvent::Get();
     u32 ticket = 0;
     u8 ii = 0;
 

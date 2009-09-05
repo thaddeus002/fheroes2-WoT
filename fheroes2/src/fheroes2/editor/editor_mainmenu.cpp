@@ -48,7 +48,7 @@ Game::menu_t Game::Editor::MainMenu(void)
     const Sprite &panel = AGG::GetICN(ICN::REDBACK, 0);
     display.Blit(panel, 405, 5);
 
-    LocalEvent & le = LocalEvent::GetLocalEvent();
+    LocalEvent & le = LocalEvent::Get();
 
     Button buttonNewMap(455, 45, ICN::BTNEMAIN, 0, 1);
     Button buttonLoadMap(455, 110, ICN::BTNEMAIN, 2, 3);

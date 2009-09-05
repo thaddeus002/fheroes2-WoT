@@ -109,7 +109,7 @@ Skill::Secondary::skill_t Dialog::LevelUpSelectSkill(const std::string & header,
 
     cursor.Show();
     display.Flip();
-    LocalEvent & le = LocalEvent::GetLocalEvent();
+    LocalEvent & le = LocalEvent::Get();
     Skill::Secondary::skill_t result = Skill::Secondary::UNKNOWN;
 
     // message loop

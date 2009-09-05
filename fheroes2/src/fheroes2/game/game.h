@@ -104,6 +104,8 @@ namespace Game
     u8  GetRating(void);
     u16 GetGameOverScores(void);
 
+    void KeyboardGlobalFilter(u16, u16);
+
     namespace Scenario
     {
 	void RedrawStaticInfo(const Point &);

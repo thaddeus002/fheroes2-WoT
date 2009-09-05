@@ -132,7 +132,7 @@ void Dialog::ThievesGuild(u8 count)
     cursor.Show();
     display.Flip();
 
-    LocalEvent & le = LocalEvent::GetLocalEvent();
+    LocalEvent & le = LocalEvent::Get();
    
     // message loop
     while(le.HandleEvents())

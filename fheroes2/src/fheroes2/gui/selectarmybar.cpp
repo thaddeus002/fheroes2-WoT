@@ -230,11 +230,11 @@ void SelectArmyBar::Select(u8 index)
 
 bool SelectArmyBar::QueueEventProcessing(SelectArmyBar & bar)
 {
-    LocalEvent & le = LocalEvent::GetLocalEvent();
+    LocalEvent & le = LocalEvent::Get();
 
     if(! bar.isValid()) return false;
 
-    const s8 index1 = bar.GetIndexFromCoord(le.MouseCursor());
+    const s8 index1 = bar.GetIndexFromCoord(le.GetMouseCursor());
     if(0 > index1 || ARMYMAXTROOPS <= index1) return false;
 
     bool change = false;
@@ -333,7 +333,7 @@ bool SelectArmyBar::QueueEventProcessing(SelectArmyBar & bar)
 
 bool SelectArmyBar::QueueEventProcessing(SelectArmyBar & bar1, SelectArmyBar & bar2)
 {
-    LocalEvent & le = LocalEvent::GetLocalEvent();
+    LocalEvent & le = LocalEvent::Get();
 
     if(!bar1.isValid() || !bar2.isValid()) return false;
     bool change = false;
@@ -346,7 +346,7 @@ bool SelectArmyBar::QueueEventProcessing(SelectArmyBar & bar1, SelectArmyBar & b
     else
     if(bar1.isSelected() && le.MouseCursor(bar2.GetArea()))
     {
-	const s8 index1 = bar2.GetIndexFromCoord(le.MouseCursor());
+	const s8 index1 = bar2.GetIndexFromCoord(le.GetMouseCursor());
 	if(0 > index1 || ARMYMAXTROOPS <= index1) return false;
 	const s8 index2 = bar1.Selected();
 
@@ -414,7 +414,7 @@ bool SelectArmyBar::QueueEventProcessing(SelectArmyBar & bar1, SelectArmyBar & b
     else
     if(bar2.isSelected() && le.MouseCursor(bar1.GetArea()))
     {
-	const s8 index1 = bar1.GetIndexFromCoord(le.MouseCursor());
+	const s8 index1 = bar1.GetIndexFromCoord(le.GetMouseCursor());
 	if(0 > index1 || ARMYMAXTROOPS <= index1) return false;
 	const s8 index2 = bar2.Selected();
 

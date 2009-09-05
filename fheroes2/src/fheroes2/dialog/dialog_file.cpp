@@ -49,7 +49,7 @@ Game::menu_t Dialog::FileOptions(void)
 
     display.Blit(box, rb.x, rb.y);
 
-    LocalEvent & le = LocalEvent::GetLocalEvent();
+    LocalEvent & le = LocalEvent::Get();
 
     Button buttonNew(rb.x + 62, rb.y + 31, cpanel, 0, 1);
     Button buttonLoad(rb.x + 195, rb.y + 31, cpanel, 2, 3);

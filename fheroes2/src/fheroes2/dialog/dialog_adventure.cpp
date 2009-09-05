@@ -51,7 +51,7 @@ Dialog::answer_t Dialog::AdventureOptions(const bool enabledig)
 
     display.Blit(box, rb.x, rb.y);
 
-    LocalEvent & le = LocalEvent::GetLocalEvent();
+    LocalEvent & le = LocalEvent::Get();
 
     Button buttonWorld(rb.x + 62, rb.y + 30, apanel, 0, 1);
     Button buttonPuzzle(rb.x + 195, rb.y + 30, apanel, 2, 3);

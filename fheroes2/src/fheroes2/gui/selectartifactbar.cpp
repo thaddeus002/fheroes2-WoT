@@ -212,11 +212,11 @@ void SelectArtifactsBar::Select(u8 index)
 
 bool SelectArtifactsBar::QueueEventProcessing(SelectArtifactsBar & bar)
 {
-    LocalEvent & le = LocalEvent::GetLocalEvent();
+    LocalEvent & le = LocalEvent::Get();
 
     if(! bar.isValid()) return false;
 
-    const s8 index1 = bar.GetIndexFromCoord(le.MouseCursor());
+    const s8 index1 = bar.GetIndexFromCoord(le.GetMouseCursor());
     if(0 > index1 || HEROESMAXARTIFACT <= index1) return false;
     BagArtifacts & arts = bar.hero.GetBagArtifacts();
 
@@ -269,7 +269,7 @@ bool SelectArtifactsBar::QueueEventProcessing(SelectArtifactsBar & bar)
 
 bool SelectArtifactsBar::QueueEventProcessing(SelectArtifactsBar & bar1, SelectArtifactsBar & bar2)
 {
-    LocalEvent & le = LocalEvent::GetLocalEvent();
+    LocalEvent & le = LocalEvent::Get();
     bool change = false;
 
     if(!bar1.isValid() || !bar2.isValid()) return false;
@@ -282,7 +282,7 @@ bool SelectArtifactsBar::QueueEventProcessing(SelectArtifactsBar & bar1, SelectA
     else
     if(bar1.isSelected() && le.MouseCursor(bar2.GetArea()))
     {
-	const s8 index1 = bar2.GetIndexFromCoord(le.MouseCursor());
+	const s8 index1 = bar2.GetIndexFromCoord(le.GetMouseCursor());
 	if(0 > index1 || HEROESMAXARTIFACT <= index1) return false;
 	const s8 index2 = bar1.Selected();
 
@@ -320,7 +320,7 @@ bool SelectArtifactsBar::QueueEventProcessing(SelectArtifactsBar & bar1, SelectA
     else
     if(bar2.isSelected() && le.MouseCursor(bar1.GetArea()))
     {
-	const s8 index1 = bar1.GetIndexFromCoord(le.MouseCursor());
+	const s8 index1 = bar1.GetIndexFromCoord(le.GetMouseCursor());
 	if(0 > index1 || HEROESMAXARTIFACT <= index1) return false;
 	const s8 index2 = bar2.Selected();
 

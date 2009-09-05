@@ -62,7 +62,7 @@ void Castle::OpenWell(void)
     cursor.Show();
     display.Flip();
 
-    LocalEvent & le = LocalEvent::GetLocalEvent();
+    LocalEvent & le = LocalEvent::Get();
 
     // loop
     while(le.HandleEvents())

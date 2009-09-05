@@ -95,7 +95,7 @@ bool Dialog::SelectGoldOrExp(const std::string &header, const std::string &messa
 
     cursor.Show();
     display.Flip();
-    LocalEvent & le = LocalEvent::GetLocalEvent();
+    LocalEvent & le = LocalEvent::Get();
     bool result = false;
 
     // message loop

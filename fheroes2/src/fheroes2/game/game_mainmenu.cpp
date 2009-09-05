@@ -53,7 +53,7 @@ Game::menu_t Game::MainMenu(void)
     const Sprite &sprite = AGG::GetICN(ICN::HEROES, 0);
     display.Blit(sprite);
 
-    LocalEvent & le = LocalEvent::GetLocalEvent();
+    LocalEvent & le = LocalEvent::Get();
 
     const Sprite & s1 = AGG::GetICN(ICN::BTNSHNGL, NEWGAME_DEFAULT);
     const Sprite & s2 = AGG::GetICN(ICN::BTNSHNGL, LOADGAME_DEFAULT);

@@ -798,7 +798,7 @@ Game::menu_t Game::HumanTurn(void)
     const Rect areaScrollBottom(0, display.h() - BORDERWIDTH, display.w(), BORDERWIDTH);
     const Rect areaLeftPanel(display.w() - 2 * BORDERWIDTH - RADARWIDTH, 0, BORDERWIDTH + RADARWIDTH, display.h());
 
-    LocalEvent & le = LocalEvent::GetLocalEvent();
+    LocalEvent & le = LocalEvent::Get();
     u32 ticket = 0;
     Game::menu_t res = CANCEL;
     int index_maps = 0;
@@ -895,7 +895,7 @@ Game::menu_t Game::HumanTurn(void)
 	// cursor over game area
 	if(le.MouseCursor(area_pos))
 	{
-	    const Point & mouse_coord = le.MouseCursor();
+	    const Point & mouse_coord = le.GetMouseCursor();
 	    index_maps = gamearea.GetIndexFromMousePoint(mouse_coord);
 	    if(0 > index_maps) continue;
 
@@ -971,7 +971,7 @@ Game::menu_t Game::HumanTurn(void)
             		global_focus.Reset(Focus::HEROES);
             		global_focus.Redraw();
 
-			cursor.SetThemes(GetCursor(world.GetTiles(gamearea.GetIndexFromMousePoint(le.MouseCursor()))));
+			cursor.SetThemes(GetCursor(world.GetTiles(gamearea.GetIndexFromMousePoint(le.GetMouseCursor()))));
         		cursor.Show();
         		display.Flip();
 		    }
@@ -1533,7 +1533,7 @@ void Game::KeyPress_LEFT(void)
 {
     Focus & global_focus = Focus::Get();
     GameArea & gamearea = GameArea::Get();
-    LocalEvent & le = LocalEvent::GetLocalEvent();
+    LocalEvent & le = LocalEvent::Get();
     // scroll map
     if((MOD_CTRL & le.KeyMod())) gamearea.SetScroll(SCROLL_LEFT);
     else
@@ -1545,7 +1545,7 @@ void Game::KeyPress_RIGHT(void)
 {
     Focus & global_focus = Focus::Get();
     GameArea & gamearea = GameArea::Get();
-    LocalEvent & le = LocalEvent::GetLocalEvent();
+    LocalEvent & le = LocalEvent::Get();
     // scroll map
     if((MOD_CTRL & le.KeyMod())) gamearea.SetScroll(SCROLL_RIGHT);
     else
@@ -1557,7 +1557,7 @@ void Game::KeyPress_TOP(void)
 {
     Focus & global_focus = Focus::Get();
     GameArea & gamearea = GameArea::Get();
-    LocalEvent & le = LocalEvent::GetLocalEvent();
+    LocalEvent & le = LocalEvent::Get();
     // scroll map
     if((MOD_CTRL & le.KeyMod())) gamearea.SetScroll(SCROLL_TOP);
     else
@@ -1569,7 +1569,7 @@ void Game::KeyPress_BOTTOM(void)
 {
     Focus & global_focus = Focus::Get();
     GameArea & gamearea = GameArea::Get();
-    LocalEvent & le = LocalEvent::GetLocalEvent();
+    LocalEvent & le = LocalEvent::Get();
     // scroll map
     if((MOD_CTRL & le.KeyMod())) gamearea.SetScroll(SCROLL_BOTTOM);
     else

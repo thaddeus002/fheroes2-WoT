@@ -69,7 +69,7 @@ void Dialog::SpellInfo(const std::string &header, const std::string &message, co
     pos.y = pos.y + sprite.h() + 10;
     text.Blit(pos);
 
-    LocalEvent & le = LocalEvent::GetLocalEvent();
+    LocalEvent & le = LocalEvent::Get();
 
     Button *button = NULL;
     Point pt;
@@ -89,7 +89,7 @@ void Dialog::SpellInfo(const std::string &header, const std::string &message, co
     // message loop
     while(le.HandleEvents())
     {
-        if(!ok_button && !le.MouseRight()) break;
+        if(!ok_button && !le.MousePressRight()) break;
 
 	if(button) le.MousePressLeft(*button) ? button->PressDraw() : button->ReleaseDraw();
 

@@ -272,7 +272,7 @@ Dialog::answer_t Dialog::ArmyInfo(const Army::BattleTroop & troop, u16 flags)
         buttonExit.Draw();
     }
 
-    LocalEvent & le = LocalEvent::GetLocalEvent();
+    LocalEvent & le = LocalEvent::Get();
     
     Dialog::answer_t result = Dialog::ZERO;
 
@@ -306,7 +306,7 @@ Dialog::answer_t Dialog::ArmyInfo(const Army::BattleTroop & troop, u16 flags)
         }
         else
         {
-            if(!le.MouseRight()) break;
+            if(!le.MousePressRight()) break;
         }
     }
 

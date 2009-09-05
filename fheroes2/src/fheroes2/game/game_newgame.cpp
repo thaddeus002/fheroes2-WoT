@@ -69,7 +69,7 @@ Game::menu_t Game::NewNetwork(void)
     const Sprite &panel = AGG::GetICN(ICN::REDBACK, 0);
     display.Blit(panel, 405, 5);
 
-    LocalEvent & le = LocalEvent::GetLocalEvent();
+    LocalEvent & le = LocalEvent::Get();
 
     Button buttonHost(455, 45, ICN::BTNNET, 0, 1);
     Button buttonGuest(455, 110, ICN::BTNNET, 2, 3);
@@ -127,7 +127,7 @@ Game::menu_t Game::NewGame(void)
     const Sprite &panel = AGG::GetICN(ICN::REDBACK, 0);
     display.Blit(panel, 405, 5);
 
-    LocalEvent & le = LocalEvent::GetLocalEvent();
+    LocalEvent & le = LocalEvent::Get();
 
     Button buttonStandartGame(455, 45, ICN::BTNNEWGM, 0, 1);
     Button buttonCampainGame(455, 110, ICN::BTNNEWGM, 2, 3);
@@ -190,7 +190,7 @@ Game::menu_t Game::NewMulti(void)
     const Sprite &panel = AGG::GetICN(ICN::REDBACK, 0);
     display.Blit(panel, 405, 5);
 
-    LocalEvent & le = LocalEvent::GetLocalEvent();
+    LocalEvent & le = LocalEvent::Get();
 
     Button buttonHotSeat(455, 45, ICN::BTNMP, 0, 1);
     Button buttonNetwork(455, 110, ICN::BTNMP, 2, 3);
@@ -245,7 +245,7 @@ u8 SelectCountPlayers(void)
     const Sprite &panel = AGG::GetICN(ICN::REDBACK, 0);
     display.Blit(panel, 405, 5);
 
-    LocalEvent & le = LocalEvent::GetLocalEvent();
+    LocalEvent & le = LocalEvent::Get();
 
     Button button2Players(455, 45, ICN::BTNHOTST, 0, 1);
     Button button3Players(455, 110, ICN::BTNHOTST, 2, 3);

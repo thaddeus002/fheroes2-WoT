@@ -274,7 +274,7 @@ void Dialog::Marketplace(bool fromTradingPost)
     cursor.Show();
     display.Flip();
 
-    LocalEvent & le = LocalEvent::GetLocalEvent();
+    LocalEvent & le = LocalEvent::Get();
    
     // message loop
     while(le.HandleEvents())
@@ -398,7 +398,7 @@ void Dialog::Marketplace(bool fromTradingPost)
         // move splitter
         if(buttonLeft.isEnable() && buttonRight.isEnable() && max_buy && le.MousePressLeft(splitter.GetRect()))
         {
-            u32 seek = (le.MouseCursor().x - splitter.GetRect().x) * 100 / splitter.GetStep();
+            u32 seek = (le.GetMouseCursor().x - splitter.GetRect().x) * 100 / splitter.GetStep();
             
             if(seek < splitter.Min()) seek = splitter.Min();
             else

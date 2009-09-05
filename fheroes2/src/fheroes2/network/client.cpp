@@ -35,7 +35,7 @@ bool FH2Client::IsConnected(void) const
 
 bool FH2Client::Wait(Network::Message & packet, u16 id, bool debug)
 {
-    while(LocalEvent::GetLocalEvent().HandleEvents())
+    while(LocalEvent::Get().HandleEvents())
     {
         if(Ready())
         {

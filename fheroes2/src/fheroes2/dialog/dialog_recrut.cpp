@@ -55,7 +55,7 @@ u16 Dialog::RecruitMonster(const Monster & monster, u16 available)
 
     display.Blit(box, pos.x, pos.y);
     
-    LocalEvent & le = LocalEvent::GetLocalEvent();
+    LocalEvent & le = LocalEvent::Get();
 
     Point dst_pt;
 
@@ -452,7 +452,7 @@ void Dialog::DwellingInfo(const Monster & monster, u16 available)
 
     display.Blit(box, pos.x, pos.y);
     
-    LocalEvent & le = LocalEvent::GetLocalEvent();
+    LocalEvent & le = LocalEvent::Get();
 
     Point dst_pt;
     Text text;
@@ -599,7 +599,7 @@ void Dialog::DwellingInfo(const Monster & monster, u16 available)
     display.Flip();
 
     //
-    while(le.HandleEvents() && le.MouseRight());
+    while(le.HandleEvents() && le.MousePressRight());
 
     cursor.Hide();
 

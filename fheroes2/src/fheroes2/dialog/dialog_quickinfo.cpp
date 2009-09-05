@@ -48,7 +48,9 @@ void Dialog::QuickInfo(const Maps::Tiles & tile)
     const Sprite &box = AGG::GetICN(qwikinfo, 0);
 
     const Rect ar(BORDERWIDTH, BORDERWIDTH, GameArea::w() * TILEWIDTH, GameArea::h() * TILEWIDTH);
-    const Point & mp = LocalEvent::MouseCursor();
+
+    LocalEvent & le = LocalEvent::Get();
+    const Point & mp = le.GetMouseCursor();
     
     Rect pos; 
     u16 mx = (mp.x - BORDERWIDTH) / TILEWIDTH;
@@ -183,13 +185,11 @@ void Dialog::QuickInfo(const Maps::Tiles & tile)
     TextBox text(name_object, Font::SMALL, 118);
     text.Blit(pos.x + BORDERWIDTH + (pos.w - BORDERWIDTH - text.w()) / 2, pos.y + (pos.h - BORDERWIDTH - text.h()) / 2);
 
-    LocalEvent & le = LocalEvent::GetLocalEvent();
-
     cursor.Show();
     display.Flip();
 
     // quick info loop
-    while(le.HandleEvents() && le.MouseRight());
+    while(le.HandleEvents() && le.MousePressRight());
 
     // restore background
     cursor.Hide();
@@ -212,7 +212,9 @@ void Dialog::QuickInfo(const Castle & castle)
     const Sprite &box = AGG::GetICN(qwiktown, 0);
 
     const Rect ar(BORDERWIDTH, BORDERWIDTH, GameArea::w() * TILEWIDTH, GameArea::h() * TILEWIDTH);
-    const Point & mp = LocalEvent::MouseCursor();
+
+    LocalEvent & le = LocalEvent::Get();
+    const Point & mp = le.GetMouseCursor();
     
     Rect cur_rt; 
     u16 mx = (mp.x - BORDERWIDTH) / TILEWIDTH;
@@ -307,13 +309,11 @@ void Dialog::QuickInfo(const Castle & castle)
     else
 	castle.GetArmy().DrawMons32Line(cur_rt.x - 5, cur_rt.y + 100, 192);
 
-    LocalEvent & le = LocalEvent::GetLocalEvent();
-
     cursor.Show();
     display.Flip();
 
     // quick info loop
-    while(le.HandleEvents() && le.MouseRight());
+    while(le.HandleEvents() && le.MousePressRight());
 
     // restore background
     cursor.Hide();
@@ -336,7 +336,9 @@ void Dialog::QuickInfo(const Heroes & hero)
     const Sprite &box = AGG::GetICN(qwikhero, 0);
 
     const Rect ar(BORDERWIDTH, BORDERWIDTH, GameArea::w() * TILEWIDTH, GameArea::h() * TILEWIDTH);
-    const Point & mp = LocalEvent::MouseCursor();
+
+    LocalEvent & le = LocalEvent::Get();
+    const Point & mp = le.GetMouseCursor();
     
     Rect cur_rt; 
     u16 mx = (mp.x - BORDERWIDTH) / TILEWIDTH;
@@ -478,13 +480,11 @@ void Dialog::QuickInfo(const Heroes & hero)
     // draw monster sprite in one string
     hero.GetArmy().DrawMons32Line(cur_rt.x - 5, cur_rt.y + 114, 160);
 
-    LocalEvent & le = LocalEvent::GetLocalEvent();
-
     cursor.Show();
     display.Flip();
 
     // quick info loop
-    while(le.HandleEvents() && le.MouseRight());
+    while(le.HandleEvents() && le.MousePressRight());
 
     // restore background
     cursor.Hide();

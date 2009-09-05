@@ -235,15 +235,15 @@ int main(int argc, char **argv)
 	    AGG::PreloadObject(ICN::ADVMCO);
 	    Cursor::Get().SetThemes(Cursor::POINTER);
 
+	    LocalEvent & le = LocalEvent::Get();
+
 	    // default events
-	    LocalEvent::SetStateDefaults();
+	    le.SetStateDefaults();
 
 	    // set global events
-	    LocalEvent::SetGlobalFilterEvents(Cursor::Redraw);
-
-	    // set prefix for store screenshot
-	    caption = conf.LocalDataPrefix() + SEPARATOR + "save" + SEPARATOR + "screenshot_";
-	    LocalEvent::SetScreenshotPrefix(caption);
+	    le.SetGlobalFilterMouseEvents(Cursor::Redraw);
+	    le.SetGlobalFilterKeysEvents(Game::KeyboardGlobalFilter);
+	    le.SetGlobalFilter(true);
 
 	    // goto main menu
 	    Game::menu_t rs = (test ? Game::TESTING : (conf.Editor() ? Game::EDITMAINMENU : Game::MAINMENU));

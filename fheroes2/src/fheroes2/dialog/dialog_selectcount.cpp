@@ -83,7 +83,7 @@ bool Dialog::SelectCount(const std::string &header, u16 min, u16 max, u16 & cur)
     pt.y = pos.y + pos.h + BUTTON_HEIGHT - AGG::GetICN(system, 3).h();
     Button buttonCancel(pt, system, 3, 4);
 
-    LocalEvent & le = LocalEvent::GetLocalEvent();
+    LocalEvent & le = LocalEvent::Get();
 
     buttonUp.Draw();
     buttonDn.Draw();
@@ -264,7 +264,7 @@ bool Dialog::InputString(const std::string &header, std::string &res)
     dst_pt.x = box_rt.x + (box_rt.w - sprite.w()) / 2;
     display.Blit(sprite, dst_pt);
 
-    LocalEvent & le = LocalEvent::GetLocalEvent();
+    LocalEvent & le = LocalEvent::Get();
 
     buttonOk.SetDisable(res.empty());
     buttonOk.Draw();

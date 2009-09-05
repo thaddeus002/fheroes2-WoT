@@ -64,7 +64,7 @@ Game::menu_t Game::LoadGame(void)
     const Sprite &panel = AGG::GetICN(ICN::REDBACK, 0);
     display.Blit(panel, 405, 5);
 
-    LocalEvent & le = LocalEvent::GetLocalEvent();
+    LocalEvent & le = LocalEvent::Get();
 
     Button buttonStandartGame(455, 45, ICN::BTNNEWGM, 0, 1);
     Button buttonCampainGame(455, 110, ICN::BTNNEWGM, 2, 3);

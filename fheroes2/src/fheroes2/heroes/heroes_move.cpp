@@ -618,7 +618,7 @@ void Heroes::FadeOut(void) const
 
     GameArea::SrcRectFixed(src_rt1, dst_pt1, sprite1.w(), sprite1.h());
 
-    LocalEvent & le = LocalEvent::GetLocalEvent();
+    LocalEvent & le = LocalEvent::Get();
     u32 ticket = 0;
     u8 alpha = 250;
 
@@ -681,7 +681,7 @@ void Heroes::FadeIn(void) const
 
     GameArea::SrcRectFixed(src_rt1, dst_pt1, sprite1.w(), sprite1.h());
 
-    LocalEvent & le = LocalEvent::GetLocalEvent();
+    LocalEvent & le = LocalEvent::Get();
     u32 ticket = 0;
     u8 alpha = 0;
 

@@ -84,7 +84,7 @@ void Dialog::SkillInfo(const std::string &header, const std::string &message, co
     pos.x = box.GetArea().x + (pos.w - text.w()) / 2;
     text.Blit(pos.x, pos.y + 55);
 
-    LocalEvent & le = LocalEvent::GetLocalEvent();
+    LocalEvent & le = LocalEvent::Get();
 
     Button *button = NULL;
     Point pt;
@@ -104,7 +104,7 @@ void Dialog::SkillInfo(const std::string &header, const std::string &message, co
     // message loop
     while(le.HandleEvents())
     {
-        if(!ok_button && !le.MouseRight()) break;
+        if(!ok_button && !le.MousePressRight()) break;
 
 	if(button) le.MousePressLeft(*button) ? button->PressDraw() : button->ReleaseDraw();
 
@@ -196,7 +196,7 @@ void Dialog::SkillInfo(const std::string &header, const std::string &message, co
     pos.x = box.GetArea().x + (pos.w - text.w()) / 2;
     text.Blit(pos.x, pos.y + 80);
 
-    LocalEvent & le = LocalEvent::GetLocalEvent();
+    LocalEvent & le = LocalEvent::Get();
 
     Point pt;
     

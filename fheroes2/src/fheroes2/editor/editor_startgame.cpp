@@ -86,7 +86,7 @@ Game::menu_t Game::Editor::StartGame()
     // Create radar cursor
     radar.RedrawCursor();
 
-    LocalEvent & le = LocalEvent::GetLocalEvent();
+    LocalEvent & le = LocalEvent::Get();
 
     Button &btnLeftTopScroll = I.btnLeftTopScroll;
     Button &btnRightTopScroll = I.btnRightTopScroll;
@@ -188,7 +188,7 @@ Game::menu_t Game::Editor::StartGame()
 		le.MousePressLeft(radar.GetArea())))
 	{
 	    const Point prev(areaMaps.GetRect());
-            const Point & pt = le.MouseCursor();
+            const Point & pt = le.GetMouseCursor();
             areaMaps.Center((pt.x - radar.GetArea().x) * world.w() / RADARWIDTH, (pt.y - radar.GetArea().y) * world.h() / RADARWIDTH);
 	    if(prev != areaMaps.GetRect())
 	    {
@@ -219,7 +219,7 @@ Game::menu_t Game::Editor::StartGame()
 	// cursor over game area
 	if(le.MouseCursor(area_pos))
 	{
-            const Point & mouse_coord = le.MouseCursor();
+            const Point & mouse_coord = le.GetMouseCursor();
             const u16 index_maps = areaMaps.GetIndexFromMousePoint(mouse_coord);
             Maps::Tiles & tile = world.GetTiles(index_maps);
             const Rect tile_pos(BORDERWIDTH + ((u16) (mouse_coord.x - BORDERWIDTH) / TILEWIDTH) * TILEWIDTH, BORDERWIDTH + ((u16) (mouse_coord.y - BORDERWIDTH) / TILEWIDTH) * TILEWIDTH, TILEWIDTH, TILEWIDTH);
@@ -243,7 +243,7 @@ Game::menu_t Game::Editor::StartGame()
 		display.Flip();
 	    }
 
-	    if(le.MouseLeft())
+	    if(le.MousePressLeft())
 	    {
 		cursor.Hide();
 		sizeCursor.Hide();
@@ -292,7 +292,7 @@ Game::menu_t Game::Editor::StartGame()
 		display.Flip();
 
 		// wait
-		while(le.HandleEvents() && le.MouseLeft());
+		while(le.HandleEvents() && le.MousePressLeft());
 
 		radar.Generate();
 		radar.RedrawArea();
@@ -300,7 +300,7 @@ Game::menu_t Game::Editor::StartGame()
 		display.Flip();
 	    }
 	    else
-	    if(le.MouseRight())
+	    if(le.MousePressRight())
 	    {
 		if(btnSelectInfo.isPressed())
 		{
@@ -319,7 +319,7 @@ Game::menu_t Game::Editor::StartGame()
 			if(Direction::LEFT & around) Error::Verbose("LEFT");
 
 			// wait
-			while(le.HandleEvents() && le.MouseRight());
+			while(le.HandleEvents() && le.MousePressRight());
 		    }
 		    else
 		    {

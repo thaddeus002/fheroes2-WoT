@@ -85,7 +85,7 @@ Spell::spell_t SpellBook::Open(filter_t filt, bool canselect) const
     cursor.Show();
     display.Flip();
 
-    LocalEvent & le = LocalEvent::GetLocalEvent();
+    LocalEvent & le = LocalEvent::Get();
 
     // message loop
     while(le.HandleEvents())
@@ -134,7 +134,7 @@ Spell::spell_t SpellBook::Open(filter_t filt, bool canselect) const
 	else
 	if(le.MouseClickLeft(pos))
 	{
-	    std::vector<Rect>::const_iterator it = std::find_if(coords.begin(), coords.end(), std::bind2nd(RectIncludePoint(), le.MouseCursor()));
+	    std::vector<Rect>::const_iterator it = std::find_if(coords.begin(), coords.end(), std::bind2nd(RectIncludePoint(), le.GetMouseCursor()));
 	    if(it != coords.end())
 	    {
 		Spell::spell_t spell = spells.at(it - coords.begin() + current_index);
@@ -173,7 +173,7 @@ Spell::spell_t SpellBook::Open(filter_t filt, bool canselect) const
 
 	if(le.MousePressRight(pos))
 	{
-	    std::vector<Rect>::const_iterator it = std::find_if(coords.begin(), coords.end(), std::bind2nd(RectIncludePoint(), le.MouseCursor()));
+	    std::vector<Rect>::const_iterator it = std::find_if(coords.begin(), coords.end(), std::bind2nd(RectIncludePoint(), le.GetMouseCursor()));
 	    if(it != coords.end())
 	    {
 		Spell::spell_t spell = spells.at(it - coords.begin() + current_index);

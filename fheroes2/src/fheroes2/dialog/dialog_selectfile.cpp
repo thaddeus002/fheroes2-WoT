@@ -136,7 +136,7 @@ bool SelectFileListSimple(const std::string & header, MapsFileInfoList & lists, 
     cursor.Show();
     display.Flip();
 
-    LocalEvent & le = LocalEvent::GetLocalEvent();
+    LocalEvent & le = LocalEvent::Get();
     bool redraw = false;
     bool edit_mode = false;
 
@@ -237,7 +237,7 @@ bool SelectFileListSimple(const std::string & header, MapsFileInfoList & lists, 
 	else
 	if(le.MousePressLeft(split.GetRect()) && (lists.size() > max_items))
 	{
-	    s16 seek = (le.MouseCursor().y - split.GetRect().y) * 100 / split.GetStep();
+	    s16 seek = (le.GetMouseCursor().y - split.GetRect().y) * 100 / split.GetStep();
 	    if(seek < split.Min()) seek = split.Min();
 	    else
 	    if(seek > split.Max()) seek = split.Max();
@@ -266,7 +266,7 @@ bool SelectFileListSimple(const std::string & header, MapsFileInfoList & lists, 
 
 	if(le.MouseClickLeft(list_rt) && lists.size())
 	{
-	    MapsFileInfoList::iterator cur2 = top + static_cast<size_t>((le.MouseReleaseLeft().y - list_rt.y) * max_items / static_cast<float>(list_rt.h));
+	    MapsFileInfoList::iterator cur2 = top + static_cast<size_t>((le.GetMouseReleaseLeft().y - list_rt.y) * max_items / static_cast<float>(list_rt.h));
 	    if(cur2 > (lists.end() - 1)) cur2 = lists.end() - 1;
 	    // double click
 	    if(cur2 == cur)
@@ -488,7 +488,7 @@ bool DialogSelectMapsFileList(MapsFileInfoList & lists, std::string & filename)
     cursor.Show();
     display.Flip();
 
-    LocalEvent & le = LocalEvent::GetLocalEvent();
+    LocalEvent & le = LocalEvent::Get();
     bool redraw = false;
     bool res = false;
 
@@ -564,7 +564,7 @@ bool DialogSelectMapsFileList(MapsFileInfoList & lists, std::string & filename)
 	else
 	if(le.MousePressLeft(split.GetRect()) && (curlist->size() > max_items))
 	{
-	    s16 seek = (le.MouseCursor().y - split.GetRect().y) * 100 / split.GetStep();
+	    s16 seek = (le.GetMouseCursor().y - split.GetRect().y) * 100 / split.GetStep();
 	    if(seek < split.Min()) seek = split.Min();
 	    else
 	    if(seek > split.Max()) seek = split.Max();
@@ -575,7 +575,7 @@ bool DialogSelectMapsFileList(MapsFileInfoList & lists, std::string & filename)
 	else
 	if(le.MouseClickLeft(list_rt) && curlist->size())
 	{
-	    MapsFileInfoList::iterator cur2 = top + static_cast<size_t>((le.MouseReleaseLeft().y - list_rt.y) * max_items / static_cast<float>(list_rt.h));
+	    MapsFileInfoList::iterator cur2 = top + static_cast<size_t>((le.GetMouseReleaseLeft().y - list_rt.y) * max_items / static_cast<float>(list_rt.h));
 	    if(cur2 > (curlist->end() - 1)) cur2 = curlist->end() - 1;
 	    // double click
 	    if(cur == cur2)

@@ -73,7 +73,7 @@ u8 Dialog::SystemOptions(void)
 
     DrawSystemInfo(rb);
 
-    LocalEvent & le = LocalEvent::GetLocalEvent();
+    LocalEvent & le = LocalEvent::Get();
 
     Button buttonOk(rb.x + 113, rb.y + 362, spanbtn, 0, 1);
 

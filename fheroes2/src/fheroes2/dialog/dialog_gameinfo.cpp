@@ -113,7 +113,7 @@ void Dialog::GameInfo(void)
     cursor.Show();
     display.Flip();
 
-    LocalEvent & le = LocalEvent::GetLocalEvent();
+    LocalEvent & le = LocalEvent::Get();
 
     // message loop
     while(le.HandleEvents())

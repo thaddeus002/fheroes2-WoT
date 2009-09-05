@@ -143,7 +143,7 @@ void ShowStandardDialog(const Puzzle & pzl, const Surface & sf)
 
     cursor.Show();
     display.Flip();
-    LocalEvent & le = LocalEvent::GetLocalEvent();
+    LocalEvent & le = LocalEvent::Get();
 
     while(le.HandleEvents())
     {
@@ -176,7 +176,7 @@ void ShowExtendedDialog(const Puzzle & pzl, const Surface & sf)
 
     cursor.Show();
     display.Flip();
-    LocalEvent & le = LocalEvent::GetLocalEvent();
+    LocalEvent & le = LocalEvent::Get();
 
     while(le.HandleEvents())
     {
@@ -192,7 +192,7 @@ void PuzzlesDraw(const Puzzle & pzl, const Surface & sf, s16 dstx, s16 dsty)
 
     u8 alpha = 250;
     u32 ticket = 0;
-    LocalEvent & le = LocalEvent::GetLocalEvent();
+    LocalEvent & le = LocalEvent::Get();
     while(le.HandleEvents() && 0 < alpha)
     {
         if(Game::ShouldAnimateInfrequent(ticket, 1))

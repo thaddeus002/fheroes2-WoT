@@ -88,7 +88,7 @@ Dialog::answer_t Dialog::BuyBoat(bool enable)
     cursor.Show();
     display.Flip();
 
-    LocalEvent & le = LocalEvent::GetLocalEvent();
+    LocalEvent & le = LocalEvent::Get();
 
     // message loop
     while(le.HandleEvents())

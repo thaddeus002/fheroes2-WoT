@@ -52,7 +52,7 @@ Game::menu_t Game::Editor::NewMaps(void)
     const Sprite &panel = AGG::GetICN(ICN::REDBACK, 0);
     display.Blit(panel, 405, 5);
 
-    LocalEvent & le = LocalEvent::GetLocalEvent();
+    LocalEvent & le = LocalEvent::Get();
 
     Button buttonSmall(455, 45, ICN::BTNESIZE, 0, 1);
     Button buttonMedium(455, 110, ICN::BTNESIZE, 2, 3);

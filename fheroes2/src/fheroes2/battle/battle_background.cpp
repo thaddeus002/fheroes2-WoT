@@ -10,7 +10,7 @@
 #include "captain.h"
 
 #define display Display::Get()
-#define le LocalEvent::GetLocalEvent()
+#define le LocalEvent::Get()
 
 namespace Battle
 {
@@ -631,7 +631,7 @@ namespace Battle
             display.Blit(sp, pos_rt);
             display.Flip();
             int animat = 0;
-            while(LocalEvent::GetLocalEvent().HandleEvents()) {
+            while(le.HandleEvents()) {
                 if(Game::ShouldAnimateInfrequent(++animat, 4)) break;
             }
             back.Restore();
@@ -686,7 +686,7 @@ namespace Battle
                     }
                     delta.x /= maxframe;
                     delta.y /= maxframe;
-                    while(LocalEvent::GetLocalEvent().HandleEvents()) {
+                    while(le.HandleEvents()) {
                         if(Game::ShouldAnimateInfrequent(animat++, 3)) {
                             back.Restore();
                             display.Blit(AGG::GetICN(icn, icnframe>=0? icnframe : frame, reflect), start);

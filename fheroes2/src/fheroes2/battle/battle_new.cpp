@@ -16,7 +16,7 @@
 #include "cursor.h"
 #include "button.h"
 
-#define le LocalEvent::GetLocalEvent()
+#define le LocalEvent::Get()
 #define cursor Cursor::Get()
 #define display Display::Get()
 
@@ -965,7 +965,7 @@ void Battle::BattleControl::PerformTowerAttack(const Point &attack, const Point 
         delta.x /= MISSFRAMES;
         delta.y /= MISSFRAMES;
 
-        while(LocalEvent::GetLocalEvent().HandleEvents())
+        while(le.HandleEvents())
         {
             int scale = state == MISSILE_FLIGHT ? 2 : 4;
             if(Game::ShouldAnimateInfrequent(animat++, scale))
@@ -1959,7 +1959,7 @@ namespace Battle
                 display.Flip();
             }
 
-            if(!(mouseMotion || le.MouseMotion() || le.MouseLeft() || le.MouseRight()))
+            if(!(mouseMotion || le.MouseMotion() || le.MousePressLeft() || le.MousePressRight()))
                 continue;
             else mouseMotion = true;
 
@@ -1972,11 +1972,11 @@ namespace Battle
 
             int t = -1;
             bool click;
-            cur_pt = Scr2Bf(le.MouseCursor());
+            cur_pt = Scr2Bf(le.GetMouseCursor());
 	    
-            if(!le.MouseLeft()
-            && cur_pt == Scr2Bf(le.MousePressLeft())
-            && cur_pt == Scr2Bf(le.MouseReleaseLeft()))
+            if(!le.MousePressLeft()
+            && cur_pt == Scr2Bf(le.GetMousePressLeft())
+            && cur_pt == Scr2Bf(le.GetMouseReleaseLeft()))
             {
                 click = true;
                 le.MouseClickLeft(Rect(0, 0, display.w(), display.h()));
@@ -1997,7 +1997,7 @@ namespace Battle
                         cursor.SetThemes(cursor.POINTER); 
                         Dialog::ArmyInfo((*m_ownArmy)[t], Dialog::BATTLE|Dialog::READONLY|Dialog::BUTTONS);
                     }
-                    if(le.MouseRight()) {
+                    if(le.MousePressRight()) {
                         Dialog::ArmyInfo((*m_ownArmy)[t], Dialog::BATTLE);
                     }
                 } else if(t = m_battlefield->FindTroop((*m_oppArmy), cur_pt), t >= 0 && (*m_oppArmy)[t].Count() > 0) {
@@ -2018,10 +2018,10 @@ namespace Battle
                         if(click) {
                             attack = cur_pt;
                             return GUI::NONE;
-                        } else if(le.MouseRight()) {
+                        } else if(le.MousePressRight()) {
                             Dialog::ArmyInfo((*m_oppArmy)[t], Dialog::BATTLE);
                         }
-                    } else if(mp = m_battlefield->CanAttack(myTroop, m_movePoints, (*m_oppArmy)[t], le.MouseCursor() - Bf2Scr(cur_pt)), mp >= 0) {
+                    } else if(mp = m_battlefield->CanAttack(myTroop, m_movePoints, (*m_oppArmy)[t], le.GetMouseCursor() - Bf2Scr(cur_pt)), mp >= 0) {
                         std::string str = _("Attack %{name}");
                         std::string name = (*m_oppArmy)[t].GetName();
                         String::Lower(name);
@@ -2040,7 +2040,7 @@ namespace Battle
                             move = m_movePoints[mp];
                             attack = cur_pt;
                             return GUI::NONE;
-                        } else if(le.MouseRight())
+                        } else if(le.MousePressRight())
                             Dialog::ArmyInfo((*m_oppArmy)[t], Dialog::BATTLE);
                     } else {
                         // attack
@@ -2054,7 +2054,7 @@ namespace Battle
                         if(click) {
                             cursor.SetThemes(cursor.POINTER);
                             Dialog::ArmyInfo((*m_oppArmy)[t], Dialog::BATTLE|Dialog::READONLY|Dialog::BUTTONS);
-                        } else if(le.MouseRight()) {
+                        } else if(le.MousePressRight()) {
                             Dialog::ArmyInfo((*m_oppArmy)[t], Dialog::BATTLE);
                         }
                     }
@@ -2107,7 +2107,7 @@ namespace Battle
         // select target
         while(le.HandleEvents())
         {
-            Point cur_pt = Scr2Bf(le.MouseCursor());
+            Point cur_pt = Scr2Bf(le.GetMouseCursor());
             int t;
             
             if(targetArmy)

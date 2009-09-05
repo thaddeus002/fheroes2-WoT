@@ -172,7 +172,7 @@ int FH2LocalClient::ScenarioInfoDialog(void)
     // draw info dialog
     Cursor & cursor = Cursor::Get();
     Display & display = Display::Get();
-    LocalEvent & le = LocalEvent::GetLocalEvent();
+    LocalEvent & le = LocalEvent::Get();
 
     const Point pointPanel(204, 32);
     const Point pointOpponentInfo(pointPanel.x + 24, pointPanel.y + 202);

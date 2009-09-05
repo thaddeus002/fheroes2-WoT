@@ -352,7 +352,7 @@ Dialog::answer_t Castle::OpenDialog(bool fade)
     Mixer::Reset();
     AGG::PlayMusic(MUS::FromRace(race));
     
-    LocalEvent & le = LocalEvent::GetLocalEvent();
+    LocalEvent & le = LocalEvent::Get();
 
     cursor.Show();
 
@@ -554,7 +554,7 @@ Dialog::answer_t Castle::OpenDialog(bool fade)
 		    AGG::PlaySound(M82::BUILDTWN);
 		    RedrawResourcePanel(cur_pt);
 
-		    LocalEvent & le = LocalEvent::GetLocalEvent();
+		    LocalEvent & le = LocalEvent::Get();
 		    u32 ticket = 0;
 		    u8 alpha = 0;
 
@@ -840,7 +840,7 @@ Dialog::answer_t Castle::OpenDialog(bool fade)
 	// status message over castle troops
 	if(le.MouseCursor(selectCaptainArmy.GetArea()))
 	{
-            const s8 index1 = selectCaptainArmy.GetIndexFromCoord(le.MouseCursor());
+            const s8 index1 = selectCaptainArmy.GetIndexFromCoord(le.GetMouseCursor());
             if(0 <= index1)
             {
 		const Army::Troop & troop1 = army.At(index1);
@@ -909,7 +909,7 @@ Dialog::answer_t Castle::OpenDialog(bool fade)
 	// status message over castle_heroes troops
 	if(castle_heroes && le.MouseCursor(selectHeroesArmy.GetArea()))
 	{
-            const s8 index1 = selectHeroesArmy.GetIndexFromCoord(le.MouseCursor());
+            const s8 index1 = selectHeroesArmy.GetIndexFromCoord(le.GetMouseCursor());
             if(0 <= index1)
             {
 		const Army::Troop & troop1 = castle_heroes->GetArmy().At(index1);

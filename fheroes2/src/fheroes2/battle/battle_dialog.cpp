@@ -15,7 +15,7 @@
 
 #define display Display::Get()
 #define cursor Cursor::Get()
-#define le LocalEvent::GetLocalEvent()
+#define le LocalEvent::Get()
 
 static void DrawArmySummary(const Army::BattleArmy_t &orig, const Army::BattleArmy_t &current, const Rect &draw)
 {
@@ -384,7 +384,7 @@ Army::battle_t Battle::HeroStatus(HeroBase &hero, StatusBar &statusBar, Spell::s
     {
         if(quickshow)
         {
-            if(le.MouseRight()) continue;
+            if(le.MousePressRight()) continue;
             else break;
         }
             

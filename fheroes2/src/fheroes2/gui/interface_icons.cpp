@@ -333,7 +333,7 @@ void Interface::HeroesIcons::SetTop(const u8 index)
 const Heroes * Interface::HeroesIcons::MouseClickLeft(void) const
 {
     std::vector<Heroes *> & heroes = world.GetMyKingdom().GetHeroes();
-    LocalEvent & le = LocalEvent::GetLocalEvent();
+    LocalEvent & le = LocalEvent::Get();
 
     std::vector<Heroes *>::const_iterator it = it_top;
     u8 ii = 0;
@@ -352,7 +352,7 @@ const Heroes * Interface::HeroesIcons::MouseClickLeft(void) const
 const Heroes * Interface::HeroesIcons::MousePressRight(void) const
 {
     std::vector<Heroes *> & heroes = world.GetMyKingdom().GetHeroes();
-    LocalEvent & le = LocalEvent::GetLocalEvent();
+    LocalEvent & le = LocalEvent::Get();
 
     std::vector<Heroes *>::const_iterator it = it_top;
     u8 ii = 0;
@@ -606,7 +606,7 @@ void Interface::CastleIcons::SetTop(const u8 index)
 const Castle * Interface::CastleIcons::MouseClickLeft(void) const
 {
     std::vector<Castle *> & castles = world.GetMyKingdom().GetCastles();
-    LocalEvent & le = LocalEvent::GetLocalEvent();
+    LocalEvent & le = LocalEvent::Get();
 
     std::vector<Castle *>::const_iterator it = it_top;
     u8 ii = 0;
@@ -625,7 +625,7 @@ const Castle * Interface::CastleIcons::MouseClickLeft(void) const
 const Castle * Interface::CastleIcons::MousePressRight(void) const
 {
     std::vector<Castle *> & castles = world.GetMyKingdom().GetCastles();
-    LocalEvent & le = LocalEvent::GetLocalEvent();
+    LocalEvent & le = LocalEvent::Get();
 
     std::vector<Castle *>::const_iterator it = it_top;
     u8 ii = 0;
@@ -763,7 +763,7 @@ void Interface::IconsPanel::QueueEventProcessing(void)
     Display & display = Display::Get();
     Cursor & cursor = Cursor::Get();
 
-    LocalEvent & le = LocalEvent::GetLocalEvent();
+    LocalEvent & le = LocalEvent::Get();
 
     Game::Focus & global_focus = Game::Focus::Get();
 
@@ -834,7 +834,7 @@ void Interface::IconsPanel::QueueEventProcessing(void)
     {
         if(0 != splitCastle.GetStep())
         {
-            u32 seek = (le.MouseCursor().y - splitCastle.GetRect().y) * 100 / splitCastle.GetStep();
+            u32 seek = (le.GetMouseCursor().y - splitCastle.GetRect().y) * 100 / splitCastle.GetStep();
             if(seek > myCastles.size() - count_icons) seek = myCastles.size() - count_icons;
 
             cursor.Hide();
@@ -852,7 +852,7 @@ void Interface::IconsPanel::QueueEventProcessing(void)
     {
         if(0 != splitHeroes.GetStep())
 	{
-            u32 seek = (le.MouseCursor().y - splitHeroes.GetRect().y) * 100 / splitHeroes.GetStep();
+            u32 seek = (le.GetMouseCursor().y - splitHeroes.GetRect().y) * 100 / splitHeroes.GetStep();
             if(seek > myHeroes.size() - count_icons) seek = myHeroes.size() - count_icons;
 
 	    cursor.Hide();

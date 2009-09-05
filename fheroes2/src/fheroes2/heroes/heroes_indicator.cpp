@@ -128,7 +128,7 @@ void LuckIndicator::Redraw(void)
 
 void LuckIndicator::QueueEventProcessing(LuckIndicator & indicator)
 {
-    LocalEvent & le = LocalEvent::GetLocalEvent();
+    LocalEvent & le = LocalEvent::Get();
 
     if(le.MouseClickLeft(indicator.area)) Dialog::Message(LuckString(indicator.luck), indicator.descriptions, Font::BIG, Dialog::OK);
     else
@@ -172,7 +172,7 @@ void MoraleIndicator::Redraw(void)
 
 void MoraleIndicator::QueueEventProcessing(MoraleIndicator & indicator)
 {
-    LocalEvent & le = LocalEvent::GetLocalEvent();
+    LocalEvent & le = LocalEvent::Get();
 
     if(le.MouseClickLeft(indicator.area)) Dialog::Message(MoraleString(indicator.morale), indicator.descriptions, Font::BIG, Dialog::OK);
     else

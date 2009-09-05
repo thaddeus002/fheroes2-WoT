@@ -285,7 +285,7 @@ void AnimationRemoveObject(const Maps::Tiles & tile)
 	sf.Blit(sprite, sprite.x(), sprite.y());
     }
 
-    LocalEvent & le = LocalEvent::GetLocalEvent();
+    LocalEvent & le = LocalEvent::Get();
     u32 ticket = 0;
     u8 alpha = 250;
 

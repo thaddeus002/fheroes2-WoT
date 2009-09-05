@@ -86,7 +86,7 @@ Skill::Primary::skill_t Dialog::SelectSkillFromArena(void)
     dst_pt.y = box_rt.y + box_rt.h + BUTTON_HEIGHT - AGG::GetICN(system, 1).h();
     Button buttonOk(dst_pt, system, 1, 2);
 
-    LocalEvent & le = LocalEvent::GetLocalEvent();
+    LocalEvent & le = LocalEvent::Get();
     bool redraw = false;
 
     buttonOk.Draw();

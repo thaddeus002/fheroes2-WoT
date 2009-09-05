@@ -20,7 +20,7 @@
 #ifndef H2LOCALEVENT_H
 #define H2LOCALEVENT_H
 
-#include <string>
+#include "rect.h"
 #include "types.h"
 
 class Point;
@@ -130,31 +130,29 @@ enum KeySym
 class LocalEvent
 {
 public:
-    static LocalEvent & GetLocalEvent(void);
+    static LocalEvent & Get(void);
 
-    static const Point & MouseCursor(void);
-    static void SetGlobalFilterEvents(void (*pf)(u16, u16));
+    void SetGlobalFilterMouseEvents(void (*pf)(u16, u16));
+    void SetGlobalFilterKeysEvents(void (*pf)(u16, u16));
+    void SetGlobalFilter(bool);
 
     static void SetStateDefaults(void);
     static void SetState(u8 type, bool enable);
     static u8   GetState(u8 type);
-    static void SetMouseRedraw(bool);
 
     bool HandleEvents(void);
 
     bool MouseMotion(void) const;
     bool MouseMotion(const Rect &rt) const;
-    bool MouseLeft(void) const;
-    bool MouseMiddle(void) const;
-    bool MouseRight(void) const;
 
-    const Point & MousePressLeft(void) const{ return mouse_pl; };
-    const Point & MousePressMiddle(void) const{ return mouse_pm; };
-    const Point & MousePressRight(void) const{ return mouse_pr; };
+    const Point & GetMouseCursor(void);
+    const Point & GetMousePressLeft(void) const{ return mouse_pl; };
+    const Point & GetMousePressMiddle(void) const{ return mouse_pm; };
+    const Point & GetMousePressRight(void) const{ return mouse_pr; };
 
-    const Point & MouseReleaseLeft(void) const{ return mouse_rl; };
-    const Point & MouseReleaseMiddle(void) const{ return mouse_rm; };
-    const Point & MouseReleaseRight(void) const{ return mouse_rr; };
+    const Point & GetMouseReleaseLeft(void) const{ return mouse_rl; };
+    const Point & GetMouseReleaseMiddle(void) const{ return mouse_rm; };
+    const Point & GetMouseReleaseRight(void) const{ return mouse_rr; };
 
     bool MouseClickLeft(const Rect &rt);
     bool MouseClickMiddle(const Rect &rt);
@@ -163,9 +161,12 @@ public:
     bool MouseWheelUp(void) const;
     bool MouseWheelDn(void) const;
 
+    bool MousePressLeft(void) const;
     bool MousePressLeft(const Rect &rt) const;
     bool MousePressLeft(const Point &pt, u16 w, u16 h) const;
+    bool MousePressMiddle(void) const;
     bool MousePressMiddle(const Rect &rt) const;
+    bool MousePressRight(void) const;
     bool MousePressRight(const Rect &rt) const;
 
     bool MouseReleaseLeft(const Rect &rt) const;
@@ -182,42 +183,38 @@ public:
     KeySym KeyValue(void) const;
     u16	   KeyMod(void) const;
 
-    static void SetScreenshotPrefix(std::string &);
-
 private:
     LocalEvent();
 
     void HandleMouseMotionEvent(const SDL_MouseMotionEvent & motion);
     void HandleMouseButtonEvent(const SDL_MouseButtonEvent & button);
     void HandleMouseWheelEvent(const SDL_MouseButtonEvent & button);
-
     void HandleKeyboardEvent(SDL_KeyboardEvent &, bool pressed);
 
     static int GlobalFilterEvents(const SDL_Event *event);
 
-    enum flag_t { KEY_PRESSED = 0x01, MOUSE_MOTION = 0x02, MOUSE_PRESSED = 0x04, MOUSE_REDRAW = 0x08, };
+    enum flag_t { KEY_PRESSED = 0x01, MOUSE_MOTION = 0x02, MOUSE_PRESSED = 0x04, GLOBAL_FILTER = 0x08 };
 
-    static void SetModes(flag_t);
-    static void ResetModes(flag_t);
+    void SetModes(flag_t);
+    void ResetModes(flag_t);
 
-    static u8     modes;
-    static KeySym key_value;
-    static u8     mouse_state;
-    static u8     mouse_button;
+    u8     modes;
+    KeySym key_value;
+    u8     mouse_state;
+    u8     mouse_button;
 
-    static Point mouse_pl;	// press left
-    static Point mouse_pm;	// press middle
-    static Point mouse_pr;	// press right
+    Point mouse_pl;	// press left
+    Point mouse_pm;	// press middle
+    Point mouse_pr;	// press right
 
-    static Point mouse_rl;	// release left
-    static Point mouse_rm;	// release middle
-    static Point mouse_rr;	// release right
+    Point mouse_rl;	// release left
+    Point mouse_rm;	// release middle
+    Point mouse_rr;	// release right
 
-    static Point mouse_cu;	// point cursor
+    Point mouse_cu;	// point cursor
 
-    static std::string screenshot_prefix;
-    
-    static void (*redraw_cursor_func)(u16, u16);
+    void (*redraw_cursor_func)(u16, u16);
+    void (*keyboard_filter_func)(u16, u16);
 };
 
 #endif

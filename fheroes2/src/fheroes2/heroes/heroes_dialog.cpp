@@ -350,7 +350,7 @@ Dialog::answer_t Heroes::OpenDialog(bool readonly, bool fade)
     dst_pt.y = cur_pt.y + 318;
     Button buttonExit(dst_pt, ICN::HSBTNS, 2, 3);
 
-    LocalEvent & le = LocalEvent::GetLocalEvent();
+    LocalEvent & le = LocalEvent::Get();
 
     if(2 > world.GetMyKingdom().GetHeroes().size())
     {
@@ -555,7 +555,7 @@ Dialog::answer_t Heroes::OpenDialog(bool readonly, bool fade)
 	// status message over artifact
 	if(le.MouseCursor(selectArtifacts.GetArea()))
 	{
-	    const s8 index = selectArtifacts.GetIndexFromCoord(le.MouseCursor());
+	    const s8 index = selectArtifacts.GetIndexFromCoord(le.GetMouseCursor());
 	    if(0 <= index && index < HEROESMAXARTIFACT && artifacts[index] != Artifact::UNKNOWN)
 	    {
 		std::string str = _("View %{art} Info");
@@ -589,7 +589,7 @@ Dialog::answer_t Heroes::OpenDialog(bool readonly, bool fade)
         // status message over troops
         if(le.MouseCursor(selectArmy.GetArea()))
         {
-            const s8 index1 = selectArmy.GetIndexFromCoord(le.MouseCursor());
+            const s8 index1 = selectArmy.GetIndexFromCoord(le.GetMouseCursor());
             if(0 <= index1)
             {
                 const Army::Troop & troop1 = army.At(index1);

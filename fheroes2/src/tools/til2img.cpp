@@ -18,13 +18,6 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#if defined(_WINDOWS) || defined(_WIN32) || defined(__WIN32__)
-#include <io.h>
-#define MKDIR(X)    mkdir(X)
-#else
-#define MKDIR(X)    mkdir(X, S_IRWXU)
-#endif
-
 #include <sys/stat.h>
 #include <sys/types.h>
 
@@ -116,7 +109,7 @@ int main(int argc, char **argv)
     		break;
         }
 
-#ifndef WITH_PNG
+#ifndef WITH_IMAGE
         dstfile += ".bmp";
 #else
         dstfile += ".png";

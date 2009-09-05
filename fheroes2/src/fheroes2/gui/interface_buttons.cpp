@@ -107,7 +107,7 @@ void Interface::ButtonsArea::Redraw(void)
 
 void Interface::ButtonsArea::QueueEventProcessing(Game::menu_t & ret)
 {
-    LocalEvent & le = LocalEvent::GetLocalEvent();
+    LocalEvent & le = LocalEvent::Get();
 
     le.MousePressLeft(buttonNextHero) ? buttonNextHero.PressDraw() : buttonNextHero.ReleaseDraw();
     le.MousePressLeft(buttonMovement) ? buttonMovement.PressDraw() : buttonMovement.ReleaseDraw();

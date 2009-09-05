@@ -59,7 +59,7 @@ Game::menu_t Game::ScenarioInfo(void)
     AGG::PreloadObject(ICN::NGHSBKG);
 
     menu_t result = QUITGAME;
-    LocalEvent & le = LocalEvent::GetLocalEvent();
+    LocalEvent & le = LocalEvent::Get();
 
     // cursor
     Cursor & cursor = Cursor::Get();

@@ -46,7 +46,7 @@ Game::menu_t Game::HighScores(void)
     const Sprite &back = AGG::GetICN(ICN::HSBKG, 0);
     display.Blit(back);
 
-    LocalEvent & le = LocalEvent::GetLocalEvent();
+    LocalEvent & le = LocalEvent::Get();
 
     Button buttonDismiss(9, 315, ICN::HISCORE, 0, 1);
     Button buttonExit(604, 315, ICN::HISCORE, 4, 5);
