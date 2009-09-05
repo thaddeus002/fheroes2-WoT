@@ -55,6 +55,22 @@ u8 Color::GetIndex(color_t color)
     return 6;
 }
 
+Color::color_t Color::GetFromIndex(u8 index)
+{
+    switch(index)
+    {
+        case 0:	return BLUE;
+        case 1:	return GREEN;
+        case 2:	return RED;
+        case 3:	return YELLOW;
+	case 4:	return ORANGE;
+	case 5:	return PURPLE;
+	default: break;
+    }
+
+    return GRAY;
+}
+
 Color::color_t Color::Get(u8 index)
 {
     switch(index)

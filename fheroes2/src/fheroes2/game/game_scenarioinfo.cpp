@@ -76,9 +76,17 @@ Game::menu_t Game::ScenarioInfo(void)
     const Point pointOpponentInfo(pointPanel.x + 24, pointPanel.y + 202);
     const Point pointClassInfo(pointPanel.x + 24, pointPanel.y + 282);
 
+    const Sprite &panel = AGG::GetICN(ICN::NGHSBKG, 0);
+    const Rect box(pointPanel, panel.w(), panel.h());
+
     Button buttonSelectMaps(pointPanel.x + 309, pointPanel.y + 45, ICN::NGEXTRA, 64, 65);
     Button buttonOk(pointPanel.x + 31, pointPanel.y + 380, ICN::NGEXTRA, 66, 67);
     Button buttonCancel(pointPanel.x + 287, pointPanel.y + 380, ICN::NGEXTRA, 68, 69);
+
+    std::vector<Rect>::iterator itr;
+
+    // vector coord difficulty
+    std::vector<Rect> coordDifficulty(5);
 
     // vector coord colors opponent
     std::vector<Rect> coordColors(KINGDOMMAX);
@@ -107,11 +115,12 @@ Game::menu_t Game::ScenarioInfo(void)
     levelCursor.Show(pointDifficultyNormal);
     conf.SetGameDifficulty(Difficulty::NORMAL);
 
-    const Rect rectDifficultyEs(pointPanel.x + 21, pointPanel.y + 92, levelCursor.w(), levelCursor.h());
-    const Rect rectDifficultyNr(pointDifficultyNormal.x, pointDifficultyNormal.y, levelCursor.w(), levelCursor.h());
-    const Rect rectDifficultyHd(pointPanel.x + 174, pointPanel.y + 92, levelCursor.w(), levelCursor.h());
-    const Rect rectDifficultyEx(pointPanel.x + 251, pointPanel.y + 92, levelCursor.w(), levelCursor.h());
-    const Rect rectDifficultyIm(pointPanel.x + 328, pointPanel.y + 92, levelCursor.w(), levelCursor.h());
+    coordDifficulty[0] = Rect(pointPanel.x + 21, pointPanel.y + 92,  levelCursor.w(), levelCursor.h());
+    coordDifficulty[1] = Rect(pointDifficultyNormal.x, pointDifficultyNormal.y,  levelCursor.w(), levelCursor.h());
+    coordDifficulty[2] = Rect(pointPanel.x + 174, pointPanel.y + 92, levelCursor.w(), levelCursor.h());
+    coordDifficulty[3] = Rect(pointPanel.x + 251, pointPanel.y + 92, levelCursor.w(), levelCursor.h());
+    coordDifficulty[4] = Rect(pointPanel.x + 328, pointPanel.y + 92, levelCursor.w(), levelCursor.h());
+
 
     TextSprite rating;
     rating.SetFont(Font::BIG);
@@ -125,106 +134,8 @@ Game::menu_t Game::ScenarioInfo(void)
     cursor.Show();
     display.Flip();
 
-    // newstandard loop
     while(le.HandleEvents())
     {
-	// select level easy
-	if(le.MouseClickLeft(rectDifficultyEs) ||
-	    le.MouseClickLeft(rectDifficultyNr) ||
-	    le.MouseClickLeft(rectDifficultyHd) ||
-	    le.MouseClickLeft(rectDifficultyEx) ||
-	    le.MouseClickLeft(rectDifficultyIm))
-	{
-	    cursor.Hide();
-
-	    if(le.MouseCursor(rectDifficultyEs))
-	    {
-		levelCursor.Move(rectDifficultyEs.x, rectDifficultyEs.y);
-		conf.SetGameDifficulty(Difficulty::EASY);
-	    }
-	    else
-	    if(le.MouseCursor(rectDifficultyNr))
-	    {
-		levelCursor.Move(rectDifficultyNr.x, rectDifficultyNr.y);
-		conf.SetGameDifficulty(Difficulty::NORMAL);
-	    }
-	    else
-	    if(le.MouseCursor(rectDifficultyHd))
-	    {
-		levelCursor.Move(rectDifficultyHd.x, rectDifficultyHd.y);
-		conf.SetGameDifficulty(Difficulty::HARD);
-	    }
-	    else
-	    if(le.MouseCursor(rectDifficultyEx))
-	    {
-		levelCursor.Move(rectDifficultyEx.x, rectDifficultyEx.y);
-		conf.SetGameDifficulty(Difficulty::EXPERT);
-	    }
-	    else
-	    if(le.MouseCursor(rectDifficultyIm))
-	    {
-		levelCursor.Move(rectDifficultyIm.x, rectDifficultyIm.y);
-		conf.SetGameDifficulty(Difficulty::IMPOSSIBLE);
-	    }
-
-	    RedrawRatingInfo(rating);
-	    cursor.Show();
-	    display.Flip();
-	}
-
-	// select color
-	for(Color::color_t color = Color::BLUE; color != Color::GRAY; ++color)
-	    if((conf.KingdomColors(color) && conf.AllowColors(color)) &&
-		le.MouseClickLeft(coordColors[Color::GetIndex(color)]))
-	{
-	    cursor.Hide();
-	    switch(conf.GameType())
-	    {
-		//case Game::NETWORK:
-		case Game::HOTSEAT:
-		    conf.SetPlayersColors(conf.PlayersColors() & color ? conf.PlayersColors() & ~color : conf.PlayersColors() | color);
-		    break;
-		default:
-		    conf.SetMyColor(color);
-		    conf.SetPlayersColors(conf.MyColor());
-	    	    break;
-	    }
-	    Scenario::RedrawOpponentsInfo(pointOpponentInfo);
-	    cursor.Show();
-	    display.Flip();
-	}
-
-	// select class
-	for(Color::color_t color = Color::BLUE; color != Color::GRAY; ++color)
-	    if(conf.AllowChangeRace(color) &&
-		le.MouseClickLeft(coordClass[Color::GetIndex(color)]))
-	    {
-		cursor.Hide();
-		u8 index = 0;
-		Race::race_t race = conf.KingdomRace(color);
-		switch(race)
-		{
-		    case Race::KNGT: index = 52; race = Race::BARB; break;
-		    case Race::BARB: index = 53; race = Race::SORC; break;
-		    case Race::SORC: index = 54; race = Race::WRLK; break;
-		    case Race::WRLK: index = 55; race = Race::WZRD; break;
-		    case Race::WZRD: index = 56; race = Race::NECR; break;
-		    case Race::NECR: index = 58; race = Race::RAND; break;
-		    case Race::RAND: index = 51; race = Race::KNGT; break;
-		    default: break;
-		}
-		conf.SetKingdomRace(color, race);
-
-		Scenario::RedrawStaticInfo(pointPanel);
-		levelCursor.Redraw();
-		Scenario::RedrawOpponentsInfo(pointOpponentInfo);
-		Scenario::RedrawClassInfo(pointClassInfo);
-		RedrawRatingInfo(rating);
-
-		cursor.Show();
-		display.Flip();
-	    }
-
 	// press button
 	le.MousePressLeft(buttonSelectMaps) ? buttonSelectMaps.PressDraw() : buttonSelectMaps.ReleaseDraw();
 	le.MousePressLeft(buttonOk) ? buttonOk.PressDraw() : buttonOk.ReleaseDraw();
@@ -235,13 +146,11 @@ Game::menu_t Game::ScenarioInfo(void)
 	{
 	    std::string filemaps;
 	    if(DialogSelectMapsFileList(lists, filemaps) && filemaps.size()) conf.LoadFileMaps(filemaps);
-
 	    cursor.Hide();
 	    levelCursor.Hide();
 	    // set first allow color
 	    conf.SetMyColor(conf.FirstAllowColor());
 	    conf.SetPlayersColors(conf.MyColor());
-
 	    Scenario::RedrawStaticInfo(pointPanel);
 	    UpdateCoordOpponentsInfo(pointOpponentInfo, coordColors);
 	    Scenario::RedrawOpponentsInfo(pointOpponentInfo);
@@ -269,37 +178,104 @@ Game::menu_t Game::ScenarioInfo(void)
 	    if(Settings::Get().Debug()) Error::Verbose("difficulty: " + Difficulty::String(conf.GameDifficulty()));
 	    conf.FixKingdomRandomRace();
 	    if(Settings::Get().Debug()) Error::Verbose("select color: " + Color::String(conf.MyColor()));
-
 	    result = STARTGAME;
 	    break;
 	}
+	else
+	if(le.MouseClickLeft(box))
+	{
+	    // select difficulty
+	    if(coordDifficulty.end() != (itr = std::find_if(coordDifficulty.begin(), coordDifficulty.end(), std::bind2nd(RectIncludePoint(), le.MouseCursor()))))
+	    {
+		cursor.Hide();
+		levelCursor.Move((*itr).x, (*itr).y);
+		conf.SetGameDifficulty(Difficulty::Get(itr - coordDifficulty.begin()));
+		RedrawRatingInfo(rating);
+		cursor.Show();
+		display.Flip();
+	    }
+	    else
+	    // select color
+	    if(coordColors.end() != (itr = std::find_if(coordColors.begin(), coordColors.end(), std::bind2nd(RectIncludePoint(), le.MouseCursor()))))
+	    {
+		Color::color_t color = Color::GetFromIndex(itr - coordColors.begin());
+		if(conf.KingdomColors(color) && conf.AllowColors(color))
+		{
+		    cursor.Hide();
+		    switch(conf.GameType())
+		    {
+			case Game::NETWORK:
+			case Game::HOTSEAT:
+			    conf.SetPlayersColors(conf.PlayersColors() & color ? conf.PlayersColors() & ~color : conf.PlayersColors() | color);
+			    break;
+			default:
+			    conf.SetMyColor(color);
+			    conf.SetPlayersColors(conf.MyColor());
+	    		    break;
+		    }
+		    Scenario::RedrawOpponentsInfo(pointOpponentInfo);
+		    cursor.Show();
+		    display.Flip();
+		}
+	    }
+	    else
+	    // select class
+	    if(coordClass.end() != (itr = std::find_if(coordClass.begin(), coordClass.end(), std::bind2nd(RectIncludePoint(), le.MouseCursor()))))
+	    {
+		Color::color_t color = Color::GetFromIndex(itr - coordClass.begin());
+		if(conf.AllowChangeRace(color))
+		{
+		    cursor.Hide();
+		    u8 index = 0;
+		    Race::race_t race = conf.KingdomRace(color);
+		    switch(race)
+		    {
+			case Race::KNGT: index = 52; race = Race::BARB; break;
+			case Race::BARB: index = 53; race = Race::SORC; break;
+			case Race::SORC: index = 54; race = Race::WRLK; break;
+			case Race::WRLK: index = 55; race = Race::WZRD; break;
+			case Race::WZRD: index = 56; race = Race::NECR; break;
+			case Race::NECR: index = 58; race = Race::RAND; break;
+			case Race::RAND: index = 51; race = Race::KNGT; break;
+			default: break;
+		    }
+		    conf.SetKingdomRace(color, race);
+		    Scenario::RedrawStaticInfo(pointPanel);
+		    levelCursor.Redraw();
+		    Scenario::RedrawOpponentsInfo(pointOpponentInfo);
+		    Scenario::RedrawClassInfo(pointClassInfo);
+		    RedrawRatingInfo(rating);
+		    cursor.Show();
+		    display.Flip();
+		}
+	    }
+	}
 	
-	// right info
-	if(le.MousePressRight(buttonSelectMaps)) Dialog::Message(_("Scenario"), _("Click here to select which scenario to play."), Font::BIG);
-
-	// difficulty
-	if(le.MousePressRight(rectDifficultyEs) ||
-	    le.MousePressRight(rectDifficultyNr) ||
-	    le.MousePressRight(rectDifficultyHd) ||
-	    le.MousePressRight(rectDifficultyEx) ||
-	    le.MousePressRight(rectDifficultyIm))
+	if(le.MousePressRight(box))
+	{
+	    // right info
+	    if(le.MousePressRight(buttonSelectMaps)) Dialog::Message(_("Scenario"), _("Click here to select which scenario to play."), Font::BIG);
+	    else
+	    // difficulty
+	    if(coordDifficulty.end() != (itr = std::find_if(coordDifficulty.begin(), coordDifficulty.end(), std::bind2nd(RectIncludePoint(), le.MouseCursor()))))
 		Dialog::Message(_("Game Difficulty"), _("This lets you change the starting difficulty at which you will play. Higher difficulty levels start you of with fewer resources, and at the higher settings, give extra resources to the computer."), Font::BIG);
-
-	// color
-	for(Color::color_t color = Color::BLUE; color != Color::GRAY; ++color)
-	    if(conf.KingdomColors(color) &&
-		le.MousePressRight(coordColors[Color::GetIndex(color)]))
+	    else
+	    // color
+	    if(coordColors.end() != (itr = std::find_if(coordColors.begin(), coordColors.end(), std::bind2nd(RectIncludePoint(), le.MouseCursor()))) &&
+		conf.KingdomColors(Color::GetFromIndex(itr - coordColors.begin())))
 		    Dialog::Message(_("Opponents"), _("This lets you change player starting positions and colors. A particular color will always start in a particular location. Some positions may only be played by a computer player or only by a human player."), Font::BIG);
-
-	// class
-	for(Color::color_t color = Color::BLUE; color != Color::GRAY; ++color)
-	    if(conf.KingdomColors(color) &&
-		le.MousePressRight(coordClass[Color::GetIndex(color)]))
+	    else
+	    // class
+	    if(coordClass.end() != (itr = std::find_if(coordClass.begin(), coordClass.end(), std::bind2nd(RectIncludePoint(), le.MouseCursor()))) &&
+		conf.KingdomColors(Color::GetFromIndex(itr - coordClass.begin())))
 		    Dialog::Message(_("Class"), _("This lets you change the class of a player. Classes are not always changeable. Depending on the scenario, a player may receive additional towns and/or heroes not of their primary alignment."), Font::BIG);
-
-	//if(le.MousePressRight(?)) Dialog::Message(_("Difficulty Rating"), _("The difficulty rating reflects a combination of various settings for your game. This number will be applied to your final score."), Font::BIG);
-	if(le.MousePressRight(buttonOk)) Dialog::Message(_("OK"), _("Click to accept these settings and start a new game."), Font::BIG);
-	if(le.MousePressRight(buttonCancel)) Dialog::Message(_("Cancel"), _("Click to return to the main menu."), Font::BIG);
+	    else
+	    if(le.MousePressRight(rating.GetRect())) Dialog::Message(_("Difficulty Rating"), _("The difficulty rating reflects a combination of various settings for your game. This number will be applied to your final score."), Font::BIG);
+	    else
+	    if(le.MousePressRight(buttonOk)) Dialog::Message(_("OK"), _("Click to accept these settings and start a new game."), Font::BIG);
+	    else
+	    if(le.MousePressRight(buttonCancel)) Dialog::Message(_("Cancel"), _("Click to return to the main menu."), Font::BIG);
+	}
     }
 
     cursor.Hide();
@@ -332,11 +308,7 @@ void UpdateCoordOpponentsInfo(const Point & dst, std::vector<Rect> & rects)
     u8 current = 0;
 
     for(Color::color_t color = Color::BLUE; color != Color::GRAY; ++color)
-	if(conf.KingdomColors(color))
-    	{
-	    rects[Color::GetIndex(color)] = Rect(dst.x + GetStepFor(current, sprite.w(), count), dst.y, sprite.w(), sprite.h());
-    	    ++current;
-	}
+	rects[Color::GetIndex(color)] = conf.KingdomColors(color) ? Rect(dst.x + GetStepFor(current++, sprite.w(), count), dst.y, sprite.w(), sprite.h()) : Rect();
 }
 
 void Game::Scenario::RedrawStaticInfo(const Point & pt)
@@ -345,8 +317,6 @@ void Game::Scenario::RedrawStaticInfo(const Point & pt)
     const Settings & conf = Settings::Get();
 
     // image panel
-    const Sprite &shadow = AGG::GetICN(ICN::NGHSBKG, 1);
-    display.Blit(shadow, pt.x - 8, pt.y + 8);
     const Sprite &panel = AGG::GetICN(ICN::NGHSBKG, 0);
     display.Blit(panel, pt);
 
