@@ -22,7 +22,7 @@
 #include "agg.h"
 #include "cursor.h"
 #include "settings.h"
-#include "interface_gamearea.h"
+#include "game_interface.h"
 #include "kingdom.h"
 #include "maps_tiles.h"
 #include "castle.h"
@@ -468,8 +468,7 @@ bool Heroes::MoveStep(bool fast)
 	u16 dst_index2 = MAXU16;
 	while(!isFreeman() && Maps::TileUnderProtection(index_to, &dst_index2))
         {
-	    Interface::GameArea::Get().Redraw();
-	    Display::Get().Flip();
+	    Interface::Basic::Get().SetRedraw(REDRAW_GAMEAREA);
 	    Action(dst_index2);
 	    SetMove(false);
 	}
