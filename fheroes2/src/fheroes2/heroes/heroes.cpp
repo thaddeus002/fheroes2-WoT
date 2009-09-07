@@ -31,7 +31,6 @@
 #include "monster.h"
 #include "payment.h"
 #include "cursor.h"
-#include "gamearea.h"
 #include "kingdom.h"
 #include "battle.h"
 #include "visit.h"

@@ -25,7 +25,6 @@
 
 FH2Client::FH2Client()
 {
-    players.reserve(6);
 }
 
 bool FH2Client::IsConnected(void) const
@@ -49,28 +48,35 @@ bool FH2Client::Wait(Network::Message & packet, u16 id, bool debug)
         }
 	DELAY(10);
     }
+    packet.Dump();
     return true;
 }
 
 bool FH2Client::Send(Network::Message & packet, bool debug)
 {
+    std::cerr << "Send: ";
     if(!packet.Send(*this))
     {
+	packet.Dump();
         Close();
         if(debug) std::cerr << "error" << std::endl;
         return false;
     }
+    packet.Dump();
     return true;
 }
 
 bool FH2Client::Recv(Network::Message & packet, bool debug)
 {
+    std::cerr << "Recv: ";
     if(!packet.Recv(*this, debug))
     {
+	packet.Dump();
         Close();
         if(debug) std::cerr << "error" << std::endl;
         return false;
     }
+    packet.Dump();
     return true;
 }
 

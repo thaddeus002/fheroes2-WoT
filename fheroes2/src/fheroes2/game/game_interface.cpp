@@ -24,13 +24,22 @@
 #include "dialog.h"
 #include "game_interface.h"
 
-Interface::Basic::Basic() : radar(Radar::Get()), iconsPanel(IconsPanel::Get()), buttonsArea(ButtonsArea::Get()),
+Interface::Basic::Basic() : gameArea(GameArea::Get()), radar(Radar::Get()),
+    iconsPanel(IconsPanel::Get()), buttonsArea(ButtonsArea::Get()),
     statusWindow(StatusWindow::Get()), borderWindow(BorderWindow::Get()), redraw(0)
 {
-    radar.SetPos(Display::Get().w() - BORDERWIDTH - RADARWIDTH, BORDERWIDTH);
-    iconsPanel.SetPos(Display::Get().w() - RADARWIDTH - BORDERWIDTH, RADARWIDTH + 2 * BORDERWIDTH);
-    buttonsArea.SetPos(iconsPanel.GetArea().x, iconsPanel.GetArea().y + iconsPanel.GetArea().h + BORDERWIDTH);
-    statusWindow.SetPos(buttonsArea.GetArea().x, buttonsArea.GetArea().y + buttonsArea.GetArea().h);
+    const Display & display = Display::Get();
+    const u16 & px = display.w() - BORDERWIDTH - RADARWIDTH;
+
+    radar.SetPos(px, BORDERWIDTH);
+    iconsPanel.SetPos(px, radar.GetArea().y + radar.GetArea().h + BORDERWIDTH);
+    buttonsArea.SetPos(px, iconsPanel.GetArea().y + iconsPanel.GetArea().h + BORDERWIDTH);
+    statusWindow.SetPos(px, buttonsArea.GetArea().y + buttonsArea.GetArea().h);
+
+    scrollLeft = Rect(0, 0, BORDERWIDTH, display.h());
+    scrollRight = Rect(display.w() - BORDERWIDTH, 0, BORDERWIDTH, display.h());
+    scrollTop = Rect(0, 0, display.w() - radar.GetArea().w, BORDERWIDTH);
+    scrollBottom = Rect(0, display.h() - BORDERWIDTH, display.w(), BORDERWIDTH);
 }
 
 Interface::Basic & Interface::Basic::Get(void)
@@ -39,29 +48,54 @@ Interface::Basic & Interface::Basic::Get(void)
     return basic;
 }
 
+const Rect & Interface::Basic::GetAreaScrollLeft(void) const
+{
+    return scrollLeft;
+}
+
+const Rect & Interface::Basic::GetAreaScrollRight(void) const
+{
+    return scrollRight;
+}
+
+const Rect & Interface::Basic::GetAreaScrollTop(void) const
+{
+    return scrollTop;
+}
+
+const Rect & Interface::Basic::GetAreaScrollBottom(void) const
+{
+    return scrollBottom;
+}
+
+
 bool Interface::Basic::NeedRedraw(void) const
 {
     return redraw;
 }
 
-void Interface::Basic::SetRedraw(redraw_t f)
+void Interface::Basic::SetRedraw(u8 f)
 {
     redraw |= f;
 }
 
 void Interface::Basic::Redraw(u8 force)
 {
-    if((redraw | force) & REDRAW_RADAR) radar.Redraw();
+    const Settings & conf = Settings::Get();
 
-    if((redraw | force) & REDRAW_ICONS) iconsPanel.Redraw();
+    if((redraw | force) & REDRAW_GAMEAREA) gameArea.Redraw();
+
+    if((conf.HideInterface() && conf.ShowRadar()) || ((redraw | force) & REDRAW_RADAR)) radar.Redraw();
+
+    if((conf.HideInterface() && conf.ShowIcons()) || ((redraw | force) & REDRAW_ICONS)) iconsPanel.Redraw();
     else
     if((redraw | force) & REDRAW_HEROES) iconsPanel.GetHeroesBar().Redraw();
     else
     if((redraw | force) & REDRAW_CASTLES) iconsPanel.GetCastleBar().Redraw();
 
-    if((redraw | force) & REDRAW_BUTTONS) buttonsArea.Redraw();
+    if((conf.HideInterface() && conf.ShowButtons()) || ((redraw | force) & REDRAW_BUTTONS)) buttonsArea.Redraw();
 
-    if((redraw | force) & REDRAW_STATUS) statusWindow.Redraw();
+    if((conf.HideInterface() && conf.ShowStatus()) || ((redraw | force) & REDRAW_STATUS)) statusWindow.Redraw();
 
     if((redraw | force) & REDRAW_BORDER) borderWindow.Redraw();
 

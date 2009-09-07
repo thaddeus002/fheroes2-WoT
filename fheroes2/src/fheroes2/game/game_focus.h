@@ -38,7 +38,7 @@ namespace Game
 
 	void		Set(const Heroes *hr);
 	void		Set(const Castle *cs);
-	void		Redraw(void);
+	void		SetRedraw(void);
 	void		Reset(const focus_t priority = UNSEL);
 
 	const Point &	Center(void) const;

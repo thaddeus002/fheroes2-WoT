@@ -24,7 +24,6 @@
 LocalEvent::LocalEvent() : modes(0), key_value(KEY_NONE), mouse_state(0),
     mouse_button(0), redraw_cursor_func(NULL), keyboard_filter_func(NULL)
 {
-    SDL_SetEventFilter(GlobalFilterEvents);
 }
 
 void LocalEvent::SetModes(flag_t f)
@@ -508,4 +507,6 @@ void LocalEvent::SetStateDefaults(void)
     SetState(SDL_SYSWMEVENT, false);
     SetState(SDL_VIDEORESIZE, false);
     SetState(SDL_VIDEOEXPOSE, false);
+
+    SDL_SetEventFilter(GlobalFilterEvents);
 }

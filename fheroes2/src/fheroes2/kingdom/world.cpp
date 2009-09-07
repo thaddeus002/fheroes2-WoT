@@ -175,13 +175,6 @@ void World::NewMaps(const u16 sw, const u16 sh)
     width = sw;
     height = sh;
 
-    Display & display = Display::Get();
-
-    // loading info
-    display.Fill(0, 0, 0);
-    TextBox(_("Maps Loading..."), Font::BIG, Rect(0, display.h()/2, display.w(), display.h()/2));
-    display.Flip();
-
     AGG::PreloadObject(TIL::GROUND32);
 
     vec_tiles.resize(width * height);
@@ -216,13 +209,6 @@ void World::LoadMaps(const std::string &filename)
 
     std::fstream fd(filename.c_str(), std::ios::in | std::ios::binary);
     if(! fd || fd.fail()) Error::Except("LoadMP2: " + filename + ", file not found.");
-
-    Display & display = Display::Get();
-
-    // loading info
-    display.Fill(0, 0, 0);
-    TextBox(_("Maps Loading..."), Font::BIG, Rect(0, display.h()/2, display.w(), display.h()/2));
-    display.Flip();
 
     AGG::PreloadObject(TIL::GROUND32);
 

@@ -19,6 +19,7 @@
  ***************************************************************************/
 
 #include <fstream>
+#include <bitset>
 #include "maps.h"
 #include "settings.h"
 
@@ -130,6 +131,14 @@ bool Settings::Read(const std::string & filename)
     debug = 0;
 #endif
 
+    if(Modes(HIDEINTERFACE))
+    {
+       SetModes(SHOWRADAR);
+       ResetModes(SHOWICONS);
+       ResetModes(SHOWBUTTONS);
+       ResetModes(SHOWSTATUS);
+    }
+
     return true;
 }
 
@@ -223,6 +232,9 @@ void Settings::LoadFileMaps(const std::string & file)
 
     // game difficulty
     game_difficulty = Difficulty::NORMAL;
+
+    std::bitset<8> b(current_maps_file.allow_colors);
+    preferably_count_players = b.count();
 }
 
 Maps::FileInfo & Settings::CurrentFileInfo(void)
@@ -288,6 +300,11 @@ bool Settings::FullScreen(void) const { return Modes(FULLSCREEN); }
 bool Settings::EvilInterface(void) const { return Modes(EVILINTERFACE); }
 
 bool Settings::HideInterface(void) const { return Modes(HIDEINTERFACE); }
+
+bool Settings::ShowRadar(void) const { return Modes(SHOWRADAR); }
+bool Settings::ShowIcons(void) const { return Modes(SHOWICONS); }
+bool Settings::ShowButtons(void) const { return Modes(SHOWBUTTONS); }
+bool Settings::ShowStatus(void) const { return Modes(SHOWSTATUS); }
 
 /* return shadow */
 bool Settings::Shadow(void) const { return Modes(SHADOW); }

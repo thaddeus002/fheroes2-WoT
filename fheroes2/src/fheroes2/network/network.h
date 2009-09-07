@@ -30,6 +30,7 @@
 #include "maps_fileinfo.h"
 
 typedef std::pair<Network::Message, u32> MessageID;
+class FH2RemoteClient;
 
 enum msg_t
 {
@@ -40,9 +41,21 @@ enum msg_t
         MSG_MESSAGE,
 
         MSG_HELLO,
-        MSG_PLAYERS,
         MSG_LOGOUT,
         MSG_SHUTDOWN,
+
+        MSG_MAPS_INFO,
+        MSG_MAPS_INFO_GET,
+        MSG_MAPS_INFO_SET,
+
+        MSG_MAPS_LOAD,
+        MSG_MAPS_LOAD_ERR,
+
+        MSG_MAPS_LIST,
+        MSG_MAPS_LIST_GET,
+
+        MSG_PLAYERS,
+        MSG_PLAYERS_GET,
 
         MSG_TURNS,
         MSG_HEROES,
@@ -60,13 +73,19 @@ namespace Network
     int			RunDedicatedServer(void);
     const char*         GetMsgString(u16);
     msg_t		GetMsg(u16);
+    bool		MsgIsBroadcast(u16);
+    void                Logout(void);
 
+    void		PacketPushMapsFileInfoList(Network::Message &, const MapsFileInfoList &);
+    void		PacketPopMapsFileInfoList(Network::Message &, MapsFileInfoList &);
     void		PacketPushMapsFileInfo(Network::Message &, const Maps::FileInfo &);
     void		PacketPopMapsFileInfo(Network::Message &, Maps::FileInfo &);
     void		PacketPushPlayersInfo(Network::Message &, const std::vector<Player> &);
+    void		PacketPushPlayersInfo(Network::Message &, const std::list<FH2RemoteClient> &, u32 exclude = 0);
     void		PacketPopPlayersInfo(Network::Message &, std::vector<Player> &);
 
     u8			GetPlayersColors(std::vector<Player> &);
+    u8			GetPlayersColors(std::list<FH2RemoteClient> &);
 };
 
 #endif

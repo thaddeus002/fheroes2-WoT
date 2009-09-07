@@ -58,7 +58,6 @@ namespace Interface
 	u32             Size(void) const;
 
         void            Redraw(void);
-        void            Redraw(const Heroes *hero);
 
         void            Reset(void);
         bool            Prev(void);
@@ -91,7 +90,6 @@ namespace Interface
 	u32             Size(void) const;
 
         void            Redraw(void);
-        void            Redraw(const Castle *castle);
 
         void            Reset(void);
         bool            Prev(void);

@@ -85,4 +85,6 @@ namespace Maps
 
 typedef std::vector<Maps::FileInfo> MapsFileInfoList;
 
+bool PrepareMapsFileInfoList(MapsFileInfoList &);
+
 #endif

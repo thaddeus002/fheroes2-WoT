@@ -78,6 +78,9 @@ void Interface::StatusWindow::SetState(info_t info)
 
 void Interface::StatusWindow::Redraw(void)
 {
+    const Settings & conf = Settings::Get();
+    if(conf.HideInterface() && !conf.ShowStatus()) return;
+
     // restore background
     DrawBackground();
 

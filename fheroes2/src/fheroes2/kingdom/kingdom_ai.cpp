@@ -23,7 +23,7 @@
 #include "game.h"
 #include "cursor.h"
 #include "engine.h"
-#include "gamearea.h"
+#include "interface_gamearea.h"
 #include "interface_status.h"
 #include "heroes.h"
 #include "castle.h"
@@ -215,8 +215,8 @@ void Kingdom::AIHeroesTurns(Heroes &hero)
 	if(hero.isShow(Settings::Get().MyColor()))
 	{
 	    Cursor::Get().Hide();
-	    GameArea::Get().Center(hero.GetCenter());
-	    GameArea::Get().Redraw();
+	    Interface::GameArea::Get().Center(hero.GetCenter());
+	    Interface::GameArea::Get().Redraw();
 	    Cursor::Get().Show();
 	    Display::Get().Flip();
 	}
@@ -235,8 +235,8 @@ void Kingdom::AIHeroesTurns(Heroes &hero)
 
     		if(Game::ShouldAnimateInfrequent(ticket, 12)) Maps::IncreaseAnimationTicket();
 
-		GameArea::Get().Center(hero.GetCenter());
-		GameArea::Get().Redraw();
+		Interface::GameArea::Get().Center(hero.GetCenter());
+		Interface::GameArea::Get().Redraw();
 		Cursor::Get().Show();
 		Display::Get().Flip();
 	    }

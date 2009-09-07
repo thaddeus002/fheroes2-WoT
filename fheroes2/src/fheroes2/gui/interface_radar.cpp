@@ -21,7 +21,7 @@
 #include "agg.h"
 #include "settings.h"
 #include "game.h"
-#include "gamearea.h"
+#include "interface_gamearea.h"
 #include "ground.h"
 #include "world.h"
 #include "castle.h"
@@ -100,9 +100,11 @@ void Interface::Radar::Build(void)
     if(sf_gray) delete sf_gray;
     if(sf_black) delete sf_black;
 
-    spriteArea = new Surface(RADARWIDTH, RADARWIDTH);
-    spriteCursor = new Surface(static_cast<u16>(GameArea::w() * (RADARWIDTH / static_cast<float>(world.w()))),
-                	static_cast<u16>(GameArea::h() * (RADARWIDTH / static_cast<float>(world.h()))));
+    spriteArea = new Surface(w, h);
+    const Size & sizeArea = Interface::GameArea::Get().GetRectMaps();
+    const u16 & sw = static_cast<u16>(sizeArea.w * (w / static_cast<float>(world.w())));
+    const u16 & sh = static_cast<u16>(sizeArea.h * (h / static_cast<float>(world.h())));
+    spriteCursor = new Surface(sw, sh);
     cursor = new SpriteCursor(*spriteCursor, x, y);
 
     const u8 n = world.w() == Maps::SMALL ? 4 : 2;
@@ -157,8 +159,8 @@ void Interface::Radar::Generate(void)
 	else
 	    continue;
 
-	float dstx = (index % world_w) * RADARWIDTH / world_w;
-	float dsty = (index / world_h) * RADARWIDTH / world_w;
+	float dstx = (index % world_w) * w / world_w;
+	float dsty = (index / world_h) * h / world_w;
 
 	spriteArea->Blit(tile_surface, static_cast<u16>(dstx), static_cast<u16>(dsty));
     }
@@ -166,6 +168,8 @@ void Interface::Radar::Generate(void)
 
 void Interface::Radar::HideArea(void)
 {
+    const Settings & conf = Settings::Get();
+    if(conf.HideInterface() && !conf.ShowRadar()) return;
     Display::Get().Blit(AGG::GetICN((Settings::Get().EvilInterface() ? ICN::HEROLOGE : ICN::HEROLOGO), 0), x, y);
 }
 
@@ -178,6 +182,8 @@ void Interface::Radar::Redraw(void)
 /* redraw radar area for color */
 void Interface::Radar::RedrawArea(const u8 color)
 {
+    const Settings & conf = Settings::Get();
+    if(conf.HideInterface() && !conf.ShowRadar()) return;
     Display & display = Display::Get();
 
     const u16 world_w = world.w();
@@ -228,8 +234,8 @@ void Interface::Radar::RedrawArea(const u8 color)
 
 	if(tile_surface)
 	{
-	    float dstx = (index % world_w) * RADARWIDTH / world_w;
-	    float dsty = (index / world_h) * RADARWIDTH / world_w;
+	    float dstx = (index % world_w) * w / world_w;
+	    float dsty = (index / world_h) * h / world_w;
 
 	    display.Blit(*tile_surface, x + static_cast<u16>(dstx), y + static_cast<u16>(dsty));
 	}
@@ -239,9 +245,13 @@ void Interface::Radar::RedrawArea(const u8 color)
 /* redraw radar cursor */
 void Interface::Radar::RedrawCursor(void)
 {
+    const Settings & conf = Settings::Get();
+    if(conf.HideInterface() && !conf.ShowRadar()) return;
+
+    const Point & posArea = Interface::GameArea::Get().GetRectMaps();
     cursor->Hide();
-    cursor->Move(x + GameArea::x() * RADARWIDTH / world.w(),
-                y + GameArea::y() * RADARWIDTH / world.h());
+    cursor->Move(x + posArea.x * w / world.w(),
+                y + posArea.y * h / world.h());
     cursor->Show();
 }
 
@@ -285,16 +295,16 @@ void Interface::Radar::QueueEventProcessing(void)
 {
     Display & display = Display::Get();
     Cursor & cursor = Cursor::Get();
-    GameArea & gamearea = GameArea::Get();
+    Interface::GameArea & gamearea = Interface::GameArea::Get();
     LocalEvent & le = LocalEvent::Get();
 
     if(le.MouseCursor(*this) &&
         (le.MouseClickLeft(*this) || le.MousePressLeft(*this)))
     {
-        const Point prev(gamearea.GetRect());
+        const Point prev(gamearea.GetRectMaps());
         const Point & pt = le.GetMouseCursor();
-	gamearea.Center((pt.x - x) * world.w() / RADARWIDTH, (pt.y - y) * world.h() / RADARWIDTH);
-        if(prev != gamearea.GetRect())
+	gamearea.Center((pt.x - x) * world.w() / w, (pt.y - y) * world.h() / h);
+        if(prev != gamearea.GetRectMaps())
         {
             cursor.Hide();
             RedrawCursor();

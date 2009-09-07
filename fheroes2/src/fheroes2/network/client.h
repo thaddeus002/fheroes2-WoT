@@ -36,6 +36,7 @@ enum status_t
     ST_ADMIN            = 0x0008,
     ST_SHUTDOWN         = 0x0010,
     ST_ALLOWPLAYERS     = 0x0020,
+    ST_LOCALSERVER      = 0x0040,
 };
 
 class FH2Client : public Network::Socket, public BitModes, public Player
@@ -53,7 +54,6 @@ public:
     bool Recv(Network::Message &, bool debug = false);
             
     Network::Message packet;
-    std::vector<Player> players;
 };
 
 #endif

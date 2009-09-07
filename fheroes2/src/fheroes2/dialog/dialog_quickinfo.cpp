@@ -24,7 +24,7 @@
 #include "heroes.h"
 #include "castle.h"
 #include "monster.h"
-#include "gamearea.h"
+#include "interface_gamearea.h"
 #include "cursor.h"
 #include "game_focus.h"
 #include "world.h"
@@ -46,8 +46,8 @@ void Dialog::QuickInfo(const Maps::Tiles & tile)
 
     // image box
     const Sprite &box = AGG::GetICN(qwikinfo, 0);
-
-    const Rect ar(BORDERWIDTH, BORDERWIDTH, GameArea::w() * TILEWIDTH, GameArea::h() * TILEWIDTH);
+    const Interface::GameArea & gamearea = Interface::GameArea::Get();
+    const Rect ar(BORDERWIDTH, BORDERWIDTH, gamearea.GetArea().w, gamearea.GetArea().h);
 
     LocalEvent & le = LocalEvent::Get();
     const Point & mp = le.GetMouseCursor();
@@ -210,8 +210,8 @@ void Dialog::QuickInfo(const Castle & castle)
 
     // image box
     const Sprite &box = AGG::GetICN(qwiktown, 0);
-
-    const Rect ar(BORDERWIDTH, BORDERWIDTH, GameArea::w() * TILEWIDTH, GameArea::h() * TILEWIDTH);
+    const Interface::GameArea & gamearea = Interface::GameArea::Get();
+    const Rect ar(BORDERWIDTH, BORDERWIDTH, gamearea.GetArea().w, gamearea.GetArea().h);
 
     LocalEvent & le = LocalEvent::Get();
     const Point & mp = le.GetMouseCursor();
@@ -334,8 +334,8 @@ void Dialog::QuickInfo(const Heroes & hero)
 
     // image box
     const Sprite &box = AGG::GetICN(qwikhero, 0);
-
-    const Rect ar(BORDERWIDTH, BORDERWIDTH, GameArea::w() * TILEWIDTH, GameArea::h() * TILEWIDTH);
+    const Interface::GameArea & gamearea = Interface::GameArea::Get();
+    const Rect ar(BORDERWIDTH, BORDERWIDTH, gamearea.GetArea().w, gamearea.GetArea().h);
 
     LocalEvent & le = LocalEvent::Get();
     const Point & mp = le.GetMouseCursor();

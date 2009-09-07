@@ -34,7 +34,7 @@ extern u8 SelectCountPlayers(void);
 
 void SendPacketToAllClients(std::list<FH2RemoteClient> & clients, Network::Message & msg, u32 owner)
 {
-    Network::Message ready(MSG_READY);
+    static Network::Message ready(MSG_READY);
 
     std::list<FH2RemoteClient>::iterator it = clients.begin();
     for(; it != clients.end(); ++it) if((*it).IsConnected())
@@ -43,6 +43,9 @@ void SendPacketToAllClients(std::list<FH2RemoteClient> & clients, Network::Messa
 
 FH2Server::FH2Server()
 {
+    if(!PrepareMapsFileInfoList(finfo_list)) Error::Warning("No maps available!");
+    else
+    Settings::Get().LoadFileMaps(finfo_list.front().file);
 }
 
 FH2Server::~FH2Server()
@@ -79,7 +82,6 @@ int FH2Server::ConnectionChat(void)
     std::list<FH2RemoteClient>::iterator it;
     Network::Message packet(MSG_UNKNOWN);
 
-    std::string str;
     exit = false;
 
     // wait players
@@ -97,9 +99,10 @@ int FH2Server::ConnectionChat(void)
     	    // check admin allow connect
     		((clients.end() != it && (*it).Modes(ST_CONNECT)) && !(*it).Modes(ST_ALLOWPLAYERS)))
 	    {
+		Error::Verbose("count player: ", conf.PreferablyCountPlayers());
 		Socket sct(csd);
 		// send message
-		std::cout << "false: close socket" << std::endl;
+		std::cout << "FH2Server::ConnectionChat: accept: close socket" << std::endl;
 		sct.Close();
 	    }
 	    else
@@ -132,70 +135,23 @@ int FH2Server::ConnectionChat(void)
     	    mutex.Lock();
 	    MessageID & msgid = queue.front();
     	    Network::Message & msg = msgid.first;
-	    u32 id = msgid.second;
 
-            it = std::find_if(clients.begin(), clients.end(), std::bind2nd(std::mem_fun_ref(&FH2RemoteClient::isID), id));
-
-            if(clients.end() != it) switch(msg.GetID())
+            switch(msg.GetID())
             {
-    		case MSG_PING:
-    		    if(2 < conf.Debug()) Error::Verbose("FH2Server::ConnectionChat: ping");
-                    packet.Reset();
-                    packet.SetID(MSG_PING);
-                    packet.Send(*it);
-                    break;
-
     		case MSG_SHUTDOWN:
-		    if(admin_id == id)
+		    if(admin_id == msgid.second)
 		    {
     			if(2 < conf.Debug()) Error::Verbose("FH2Server::ConnectionChat: admin shutdown");
     			exit = true;
                 	packet.Reset();
                 	packet.SetID(MSG_SHUTDOWN);
-			SendPacketToAllClients(clients, packet, id);
+			SendPacketToAllClients(clients, packet, msgid.second);
 		    }
 		    break;
 
-    		case MSG_LOGOUT:
-		{
-		    if(2 < conf.Debug()) Error::Verbose("FH2Server::ConnectionChat: client logout");
-		    // send message
-                    packet.Reset();
-                    packet.SetID(MSG_MESSAGE);
-                    str = "FH2Server::ConnectionChat: logout player: " + (*it).player_name;
-                    packet.Push(str);
-		    SendPacketToAllClients(clients, packet, id);
-                    // update players struct
-                    packet.Reset();
-                    packet.SetID(MSG_PLAYERS);
-                    std::vector<Player> players;
-		    StorePlayersInfo(players);
-		    std::vector<Player>::iterator itp = std::find_if(players.begin(), players.end(), std::bind2nd(std::mem_fun_ref(&Player::isID), id));
-		    if(itp != players.end()) players.erase(itp);
-		    Network::PacketPushPlayersInfo(packet, players);
-		    SendPacketToAllClients(clients, packet, id);
-		}
+		default:
+		    SendPacketToAllClients(clients, msg, msgid.second);
 		    break;
-
-		case MSG_PLAYERS:
-		    if(2 < conf.Debug()) Error::Verbose("FH2Server::ConnectionChat: send all msg players");
-		    SendPacketToAllClients(clients, msg, id);
-		    break;
-
-		case MSG_MESSAGE:
-                    msg.Pop(str);
-    		    if(2 < conf.Debug()) Error::Verbose("FH2Server::ConnectionChat: message: " + str);
-                    packet.Reset();
-                    packet.SetID(MSG_MESSAGE);
-                    packet.Push(str);
-		    SendPacketToAllClients(clients, packet, id);
-		    break;
-
-		case MSG_MAPS:
-		    SendPacketToAllClients(clients, msg, id);
-		    break;
-
-        	default: break;
             }
 
             queue.pop_front();
@@ -211,15 +167,6 @@ int FH2Server::ConnectionChat(void)
     return 0;
 }
 
-void FH2Server::StorePlayersInfo(std::vector<Player> & players)
-{
-    players.clear();
-
-    std::list<FH2RemoteClient>::const_iterator itc1 = clients.begin();
-    std::list<FH2RemoteClient>::const_iterator itc2 = clients.end();
-    for(; itc1 != itc2; ++itc1) if((*itc1).player_id) players.push_back(*itc1);
-}
-
 Game::menu_t Game::NetworkHost(void)
 {
     Settings & conf = Settings::Get();
@@ -231,6 +178,7 @@ Game::menu_t Game::NetworkHost(void)
 
     if(2 > max_players) return Game::MAINMENU;
     conf.SetPreferablyCountPlayers(max_players);
+    conf.SetGameType(Game::NETWORK);
 
     // clear background
     const Sprite &back = AGG::GetICN(ICN::HEROES, 0);
@@ -253,11 +201,12 @@ Game::menu_t Game::NetworkHost(void)
 
     // create local client
     const std::string localhost("127.0.0.1");
-    FH2LocalClient client;
+    FH2LocalClient & client = FH2LocalClient::Get();
 
     // connect to server
     if(client.Connect(localhost, conf.GetPort()))
     {
+	client.SetModes(ST_LOCALSERVER);
 	client.ConnectionChat();
     }
     else

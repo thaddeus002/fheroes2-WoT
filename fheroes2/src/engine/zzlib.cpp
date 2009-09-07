@@ -32,6 +32,16 @@ bool ZLib::UnCompress(std::vector<char> & dst, const char* src, size_t srcsz)
 	while(Z_BUF_ERROR == (res = uncompress(reinterpret_cast<Bytef*>(&dst[0]), &dstsz, reinterpret_cast<const Bytef*>(src), srcsz)))
 	{ dstsz = dst.size() * 2; dst.resize(dstsz); }
 	dst.resize(dstsz);
+	
+	switch(res)
+	{
+	    case Z_OK:  return true;
+	    case Z_MEM_ERROR: std::cerr << "Z_MEM_ERROR" << std::endl; return false;
+	    case Z_BUF_ERROR: std::cerr << "Z_BUF_ERROR" << std::endl; return false;
+	    case Z_DATA_ERROR: std::cerr << "Z_DATA_ERROR" << std::endl; return false;
+	    default: break;
+	}
+
         return Z_OK == res;
     }
     return false;

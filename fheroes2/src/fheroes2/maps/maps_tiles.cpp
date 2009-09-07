@@ -28,7 +28,7 @@
 #include "heroes.h"
 #include "castle.h"
 #include "maps.h"
-#include "gamearea.h"
+#include "interface_gamearea.h"
 #include "game_focus.h"
 #include "object.h"
 #include "objxloc.h"
@@ -266,13 +266,13 @@ void Maps::Tiles::Remove(u32 uniq)
 
 void Maps::Tiles::RedrawTile(void) const
 {
-    const Rect & area = GameArea::Get().GetRect();
+    const Interface::GameArea & area = Interface::GameArea::Get();
     const Point mp(maps_index % world.w(), maps_index / world.w());
 
-    if(area & mp)
+    if(area.GetRectMaps() & mp)
     {
-	const s16 dstx = BORDERWIDTH + TILEWIDTH * (mp.x - area.x);
-	const s16 dsty = BORDERWIDTH + TILEWIDTH * (mp.y - area.y);
+	const s16 dstx = area.GetArea().x + TILEWIDTH * (mp.x - area.GetRectMaps().x);
+	const s16 dsty = area.GetArea().y + TILEWIDTH * (mp.y - area.GetRectMaps().y);
 
 	Display::Get().Blit(GetTileSurface(), dstx, dsty);
     }
@@ -281,13 +281,13 @@ void Maps::Tiles::RedrawTile(void) const
 void Maps::Tiles::RedrawBottom(const TilesAddon * skip) const
 {
     Display & display = Display::Get();
-    const Rect & area = GameArea::Get().GetRect();
+    const Interface::GameArea & area = Interface::GameArea::Get();
     const Point mp(maps_index % world.w(), maps_index / world.w());
 
-    if(area & mp)
+    if(area.GetRectMaps() & mp)
     {
-	const s16 dstx = BORDERWIDTH + TILEWIDTH * (mp.x - area.x);
-	const s16 dsty = BORDERWIDTH + TILEWIDTH * (mp.y - area.y);
+	const s16 dstx = area.GetArea().x + TILEWIDTH * (mp.x - area.GetRectMaps().x);
+	const s16 dsty = area.GetArea().y + TILEWIDTH * (mp.y - area.GetRectMaps().y);
 
 	if(addons_level1.size())
 	{
@@ -322,13 +322,13 @@ void Maps::Tiles::RedrawBottom(const TilesAddon * skip) const
 void Maps::Tiles::RedrawTop(const TilesAddon * skip) const
 {
     Display & display = Display::Get();
-    const Rect & area = GameArea::Get().GetRect();
+    const Interface::GameArea & area = Interface::GameArea::Get();
     const Point mp(maps_index % world.w(), maps_index / world.w());
 
-    if(area & mp)
+    if(area.GetRectMaps() & mp)
     {
-	const s16 dstx = BORDERWIDTH + TILEWIDTH * (mp.x - area.x);
-	const s16 dsty = BORDERWIDTH + TILEWIDTH * (mp.y - area.y);
+	const s16 dstx = area.GetArea().x + TILEWIDTH * (mp.x - area.GetRectMaps().x);
+	const s16 dsty = area.GetArea().y + TILEWIDTH * (mp.y - area.GetRectMaps().y);
 
 	// fix for abandone mine
 	if(MP2::OBJ_ABANDONEDMINE == general)
@@ -336,7 +336,7 @@ void Maps::Tiles::RedrawTop(const TilesAddon * skip) const
 	    const Sprite & anime_sprite = AGG::GetICN(ICN::OBJNHAUN,  Maps::AnimationTicket() % 15);
 	    Rect rt;
 	    Point pt(dstx + anime_sprite.x(), dsty + anime_sprite.y());
-	    GameArea::SrcRectFixed(rt, pt, anime_sprite.w(), anime_sprite.h());
+	    area.SrcRectFixed(rt, pt, anime_sprite.w(), anime_sprite.h());
 	    display.Blit(anime_sprite, rt, pt);
 	}
 
@@ -362,7 +362,7 @@ void Maps::Tiles::RedrawTop(const TilesAddon * skip) const
 		    {
 			Rect rt;
 			Point pt(dstx + sprite.x(), dsty + sprite.y());
-			GameArea::SrcRectFixed(rt, pt, sprite.w(), sprite.h());
+			area.SrcRectFixed(rt, pt, sprite.w(), sprite.h());
 			display.Blit(sprite, rt, pt);
 		    }
 		    else

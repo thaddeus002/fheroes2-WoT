@@ -21,7 +21,6 @@
 #include <cstdlib>
 #include <algorithm>
 #include "world.h"
-#include "gamearea.h"
 #include "settings.h"
 #include "maps.h"
 #include "kingdom.h"

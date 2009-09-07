@@ -80,23 +80,30 @@ Game::menu_t Game::Editor::NewMaps(void)
 
 	if(le.MouseClickLeft(buttonSmall))
 	{
-		world.NewMaps(Maps::SMALL, Maps::SMALL);
-		return EDITSTART;
+	    Game::ShowLoadMapsText();
+    	    world.NewMaps(Maps::SMALL, Maps::SMALL);
+	    return EDITSTART;
 	}
+	else
 	if(le.MouseClickLeft(buttonMedium))
 	{
-		world.NewMaps(Maps::MEDIUM, Maps::MEDIUM);
-		return EDITSTART;
+	    Game::ShowLoadMapsText();
+	    world.NewMaps(Maps::MEDIUM, Maps::MEDIUM);
+	    return EDITSTART;
 	}
+	else
 	if(le.MouseClickLeft(buttonLarge))
 	{
-		world.NewMaps(Maps::LARGE, Maps::LARGE);
-		return EDITSTART;
+	    Game::ShowLoadMapsText();
+	    world.NewMaps(Maps::LARGE, Maps::LARGE);
+	    return EDITSTART;
 	}
+	else
 	if(le.MouseClickLeft(buttonXLarge))
 	{
-		world.NewMaps(Maps::XLARGE, Maps::XLARGE);
-		return EDITSTART;
+	    Game::ShowLoadMapsText();
+	    world.NewMaps(Maps::XLARGE, Maps::XLARGE);
+	    return EDITSTART;
 	}
 	if(le.MouseClickLeft(buttonCancel) || le.KeyPress(KEY_ESCAPE)) return EDITMAINMENU;
 

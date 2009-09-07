@@ -22,7 +22,7 @@
 #include "agg.h"
 #include "cursor.h"
 #include "settings.h"
-#include "gamearea.h"
+#include "interface_gamearea.h"
 #include "kingdom.h"
 #include "maps_tiles.h"
 #include "castle.h"
@@ -239,14 +239,14 @@ void Heroes::Redraw(bool with_shadow) const
 {
     Display & display = Display::Get();
 
-    const Rect & gamearea = GameArea::Get().GetRect();
+    const Interface::GameArea & gamearea = Interface::GameArea::Get();
 
-    if(!(gamearea & mp)) return;
+    if(!(gamearea.GetRectMaps() & mp)) return;
 
     bool reflect = ReflectSprite(direction);
 
-    s16 dx = BORDERWIDTH + TILEWIDTH * (mp.x - gamearea.x);
-    s16 dy = BORDERWIDTH + TILEWIDTH * (mp.y - gamearea.y);
+    s16 dx = gamearea.GetArea().x + TILEWIDTH * (mp.x - gamearea.GetRectMaps().x);
+    s16 dy = gamearea.GetArea().y + TILEWIDTH * (mp.y - gamearea.GetRectMaps().y);
 
     const Sprite & sprite1 = SpriteHero(*this, sprite_index, reflect);
     const Sprite & sprite2 = SpriteFlag(*this, sprite_index, reflect);
@@ -293,10 +293,10 @@ void Heroes::Redraw(bool with_shadow) const
     Rect src_rt3;
     Rect src_rt4;
 
-    GameArea::SrcRectFixed(src_rt1, dst_pt1, sprite1.w(), sprite1.h());
-    GameArea::SrcRectFixed(src_rt2, dst_pt2, sprite2.w(), sprite2.h());
-    GameArea::SrcRectFixed(src_rt3, dst_pt3, sprite3.w(), sprite3.h());
-    GameArea::SrcRectFixed(src_rt4, dst_pt4, sprite4.w(), sprite4.h());
+    gamearea.SrcRectFixed(src_rt1, dst_pt1, sprite1.w(), sprite1.h());
+    gamearea.SrcRectFixed(src_rt2, dst_pt2, sprite2.w(), sprite2.h());
+    gamearea.SrcRectFixed(src_rt3, dst_pt3, sprite3.w(), sprite3.h());
+    gamearea.SrcRectFixed(src_rt4, dst_pt4, sprite4.w(), sprite4.h());
 
     if(isShipMaster()) display.Blit(sprite4, src_rt4, dst_pt4);
 
@@ -468,7 +468,7 @@ bool Heroes::MoveStep(bool fast)
 	u16 dst_index2 = MAXU16;
 	while(!isFreeman() && Maps::TileUnderProtection(index_to, &dst_index2))
         {
-	    GameArea::Get().Redraw();
+	    Interface::GameArea::Get().Redraw();
 	    Display::Get().Flip();
 	    Action(dst_index2);
 	    SetMove(false);
@@ -598,14 +598,14 @@ void Heroes::AngleStep(const Direction::vector_t to_direct)
 
 void Heroes::FadeOut(void) const
 {
-    const Rect & gamearea = GameArea::Get().GetRect();
+    const Interface::GameArea & gamearea = Interface::GameArea::Get();
 
-    if(!(gamearea & mp)) return;
+    if(!(gamearea.GetRectMaps() & mp)) return;
 
     bool reflect = ReflectSprite(direction);
 
-    s16 dx = BORDERWIDTH + TILEWIDTH * (mp.x - gamearea.x);
-    s16 dy = BORDERWIDTH + TILEWIDTH * (mp.y - gamearea.y);
+    s16 dx = gamearea.GetArea().x + TILEWIDTH * (mp.x - gamearea.GetRectMaps().x);
+    s16 dy = gamearea.GetArea().y + TILEWIDTH * (mp.y - gamearea.GetRectMaps().y);
 
     const Sprite & sprite1 = SpriteHero(*this, sprite_index, reflect);
 
@@ -616,7 +616,7 @@ void Heroes::FadeOut(void) const
     Point dst_pt1(dx + (reflect ? TILEWIDTH - sprite1.x() - sprite1.w() : sprite1.x()), dy + sprite1.y() + TILEWIDTH);
     Rect src_rt1;
 
-    GameArea::SrcRectFixed(src_rt1, dst_pt1, sprite1.w(), sprite1.h());
+    gamearea.SrcRectFixed(src_rt1, dst_pt1, sprite1.w(), sprite1.h());
 
     LocalEvent & le = LocalEvent::Get();
     u32 ticket = 0;
@@ -661,14 +661,14 @@ void Heroes::FadeOut(void) const
 
 void Heroes::FadeIn(void) const
 {
-    const Rect & gamearea = GameArea::Get().GetRect();
+    const Interface::GameArea & gamearea = Interface::GameArea::Get();
 
-    if(!(gamearea & mp)) return;
+    if(!(gamearea.GetRectMaps() & mp)) return;
 
     bool reflect = ReflectSprite(direction);
 
-    s16 dx = BORDERWIDTH + TILEWIDTH * (mp.x - gamearea.x);
-    s16 dy = BORDERWIDTH + TILEWIDTH * (mp.y - gamearea.y);
+    s16 dx = gamearea.GetArea().x + TILEWIDTH * (mp.x - gamearea.GetRectMaps().x);
+    s16 dy = gamearea.GetArea().y + TILEWIDTH * (mp.y - gamearea.GetRectMaps().y);
 
     const Sprite & sprite1 = SpriteHero(*this, sprite_index, reflect);
 
@@ -679,7 +679,7 @@ void Heroes::FadeIn(void) const
     Point dst_pt1(dx + (reflect ? TILEWIDTH - sprite1.x() - sprite1.w() : sprite1.x()), dy + sprite1.y() + TILEWIDTH);
     Rect src_rt1;
 
-    GameArea::SrcRectFixed(src_rt1, dst_pt1, sprite1.w(), sprite1.h());
+    gamearea.SrcRectFixed(src_rt1, dst_pt1, sprite1.w(), sprite1.h());
 
     LocalEvent & le = LocalEvent::Get();
     u32 ticket = 0;

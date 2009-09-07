@@ -37,7 +37,6 @@
 #include "game.h"
 
 extern bool DialogSelectMapsFileList(MapsFileInfoList &, std::string &);
-extern bool PrepareMapsFileInfoList(MapsFileInfoList &);
 
 u16 GetStepFor(u16, u16, u16);
 void RedrawRatingInfo(TextSprite &);
@@ -51,7 +50,11 @@ Game::menu_t Game::ScenarioInfo(void)
     Settings & conf = Settings::Get();
 
     MapsFileInfoList lists;
-    if(!PrepareMapsFileInfoList(lists)) return MAINMENU;
+    if(!PrepareMapsFileInfoList(lists))
+    {
+	Dialog::Message(_("Warning"), _("No maps available!"), Font::BIG, Dialog::OK);
+        return MAINMENU;
+    }
 
     // preload
     AGG::PreloadObject(ICN::HEROES);
@@ -283,6 +286,7 @@ Game::menu_t Game::ScenarioInfo(void)
     if(result == STARTGAME)
     {
 	if(Settings::Get().Modes(Settings::FADE)) display.Fade();
+	Game::ShowLoadMapsText();
 	// Load maps
 	world.LoadMaps(conf.MapsFile());
     }

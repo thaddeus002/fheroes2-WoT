@@ -35,6 +35,9 @@ Interface::BorderWindow & Interface::BorderWindow::Get(void)
 
 void Interface::BorderWindow::Redraw(void)
 {
+    const Settings & conf = Settings::Get();
+    if(conf.HideInterface()) return;
+
     Display & display = Display::Get();
 
     const bool evil = Settings::Get().EvilInterface();

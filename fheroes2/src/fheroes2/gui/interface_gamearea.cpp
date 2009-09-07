@@ -25,142 +25,129 @@
 #include "game.h"
 #include "game_focus.h"
 #include "route.h"
-#include "gamearea.h"
+#include "interface_gamearea.h"
 
-void	RedrawBoat(const Maps::Tiles & tile, const Point & dst);
-void	RedrawHeroes(const Maps::Tiles & tile);
-void	RedrawMonster(const Maps::Tiles & tile, const Point & dst);
-void	RedrawClopOrClofSpriteFog(const u16 dst_index, const u8 ox, const u8 oy);
-
-GameArea & GameArea::Get(void)
+namespace Game
 {
-    static GameArea ga;
+    extern Cursor::themes_t GetCursor(const Maps::Tiles &);
+    extern void MouseCursorAreaClickLeft(u16);
+    extern void MouseCursorAreaPressRight(u16);
+};
 
+void	RedrawBoat(const Maps::Tiles &, s16, s16);
+void	RedrawHeroes(const Maps::Tiles &);
+void	RedrawMonster(const Maps::Tiles &, s16, s16);
+void	RedrawClopOrClofSpriteFog(const u16 dst_index, const Point & dst);
+
+Interface::GameArea & Interface::GameArea::Get(void)
+{
+    static Interface::GameArea ga;
     return ga;
 }
 
+Interface::GameArea::GameArea() : oldIndexPos(0)
+{
+}
+
+const Rect & Interface::GameArea::GetArea(void) const
+{ return rectArea; }
+
+const Rect & Interface::GameArea::GetRectMaps(void) const
+{ return rectMaps; }
+
 /* fixed src rect image */
-void GameArea::SrcRectFixed(Rect & src, Point & dst, const u16 rw, const u16 rh)
+void Interface::GameArea::SrcRectFixed(Rect & src, Point & dst, const u16 rw, const u16 rh)
 {
     src = Rect(0, 0, rw, rh);
+    const Rect & rectArea = Interface::GameArea::Get().GetArea();
 
-    if(dst.x < BORDERWIDTH)
+    if(dst.x < rectArea.x)
     {
-        src.x = BORDERWIDTH - dst.x;
-        dst.x = BORDERWIDTH;
+        src.x = rectArea.x - dst.x;
+        dst.x = rectArea.x;
     }
 
-    if(dst.y < BORDERWIDTH)
+    if(dst.y < rectArea.y)
     {
-        src.y = BORDERWIDTH - dst.y;
-        dst.y = BORDERWIDTH;
+        src.y = rectArea.y - dst.y;
+        dst.y = rectArea.y;
     }
 
-    if(dst.x + rw > BORDERWIDTH + TILEWIDTH * w())
+    if(dst.x + rw > rectArea.x + rectArea.w)
     {
-	src.w = BORDERWIDTH + TILEWIDTH * w() - dst.x;
+	src.w = rectArea.x + rectArea.w - dst.x;
     }
 
-    if(dst.y + rh > BORDERWIDTH + TILEWIDTH * h())
+    if(dst.y + rh > rectArea.y + rectArea.h)
     {
-	src.h = BORDERWIDTH + TILEWIDTH * h() - dst.y;
+	src.h = rectArea.y + rectArea.h - dst.y;
     }
 }
 
-GameArea::GameArea() : Rect(0, 0, 0, 0), gx(Rect::x), gy(Rect::y), gw(Rect::w), gh(Rect::h), max(0)
+void Interface::GameArea::Build(void)
 {
-}
-
-void GameArea::Build(void)
-{
-    gx = 0;
-    gy = 0;
 
     if(Settings::Get().HideInterface())
     {
-	gw = Display::Get().w() / TILEWIDTH;
-	gh = Display::Get().h() / TILEWIDTH;
+	rectArea.x = 0;
+	rectArea.y = 0;
+	rectArea.w = Display::Get().w();
+	rectArea.h = Display::Get().h();
     }
     else
     {
-	gw = (Display::Get().w() - RADARWIDTH - 3 * BORDERWIDTH) / TILEWIDTH;
-	gh = (Display::Get().h() - 2 * BORDERWIDTH) / TILEWIDTH;
+	rectArea.x = BORDERWIDTH;
+	rectArea.y = BORDERWIDTH;
+	rectArea.w = Display::Get().w() - RADARWIDTH - 3 * BORDERWIDTH;
+	rectArea.h = Display::Get().h() - 2 * BORDERWIDTH;
     }
 
-    max = world.w() * world.h() - 1;
+    rectMaps.x = 0;
+    rectMaps.y = 0;
+    rectMaps.w = rectArea.w / TILEWIDTH;
+    rectMaps.h = rectArea.h / TILEWIDTH;
 }
 
-/* convert area point to index maps */
-s16 GameArea::GetIndexFromMousePoint(const Point & pt)
-{
-    return GetIndexFromMousePoint(pt.x, pt.y);
-}
-
-s16 GameArea::GetIndexFromMousePoint(s16 px, s16 py)
-{
-    u16 result = (gy + (py - BORDERWIDTH) / TILEWIDTH) * world.w() + gx + (px - BORDERWIDTH) / TILEWIDTH;
-
-    return result > max || result < GetLeftTopIndexMaps() ? -1 : result;
-}
-
-u16 GameArea::GetLeftTopIndexMaps(void)
-{
-    return Maps::GetIndexFromAbsPoint(gx, gy);
-}
-
-/* readraw rect, default all */
-void GameArea::Redraw(const Rect & rt, bool drawFog) const
-{
-    Redraw(rt.x, rt.y, rt.w, rt.h, drawFog);
-}
-
-void GameArea::RedrawNoFog(void) const
-{
-    Redraw(0, 0, w(), h(), false);
-}
-
-void GameArea::Redraw(const s16 rx, const s16 ry, const u16 rw, const u16 rh, bool drawFog) const
+void Interface::GameArea::Redraw(bool drawFog) const
 {
     Display & display = Display::Get();
 
     // tile
-    for(u8 oy = ry; oy < ry + rh; ++oy)
-	for(u8 ox = rx; ox < rx + rw; ++ox)
-	    world.GetTiles(gx + ox, gy + oy).RedrawTile();
+    for(u8 oy = 0; oy < rectMaps.h; ++oy)
+	for(u8 ox = 0; ox < rectMaps.w; ++ox)
+	    world.GetTiles(rectMaps.x + ox, rectMaps.y + oy).RedrawTile();
 
     // bottom
-    for(u8 oy = ry; oy < ry + rh; ++oy)
-	for(u8 ox = rx; ox < rx + rw; ++ox)
-	    world.GetTiles(gx + ox, gy + oy).RedrawBottom();
+    for(u8 oy = 0; oy < rectMaps.h; ++oy)
+	for(u8 ox = 0; ox < rectMaps.w; ++ox)
+	    world.GetTiles(rectMaps.x + ox, rectMaps.y + oy).RedrawBottom();
 
     // ext object
-    for(u8 oy = ry; oy < ry + rh; ++oy)
-	for(u8 ox = rx; ox < rx + rw; ++ox) if(GetRect() & Point(gx + ox, gy + oy))
+    for(u8 oy = 0; oy < rectMaps.h; ++oy)
+	for(u8 ox = 0; ox < rectMaps.w; ++ox)
     {
-	const Maps::Tiles & tile = world.GetTiles(gx + ox, gy + oy);
-    	const Point dst(BORDERWIDTH + TILEWIDTH * ox, BORDERWIDTH + TILEWIDTH * oy);
+	const Maps::Tiles & tile = world.GetTiles(rectMaps.x + ox, rectMaps.y + oy);
 
 	switch(tile.GetObject())
 	{
     	    // boat
-    	    case MP2::OBJ_BOAT:		RedrawBoat(tile, dst); break;
+    	    case MP2::OBJ_BOAT:		RedrawBoat(tile, rectArea.x + TILEWIDTH * ox, rectArea.y + TILEWIDTH * oy); break;
     	    // monster
-    	    case MP2::OBJ_MONSTER:	RedrawMonster(tile, dst); break;
+    	    case MP2::OBJ_MONSTER:	RedrawMonster(tile, rectArea.x + TILEWIDTH * ox, rectArea.y + TILEWIDTH * oy); break;
     	    default: break;
 	}
     }
 
     // top
-    for(u8 oy = ry; oy < ry + rh; ++oy)
-	for(u8 ox = rx; ox < rx + rw; ++ox)
-	    world.GetTiles(gx + ox, gy + oy).RedrawTop();
+    for(u8 oy = 0; oy < rectMaps.h; ++oy)
+	for(u8 ox = 0; ox < rectMaps.w; ++ox)
+	    world.GetTiles(rectMaps.x + ox, rectMaps.y + oy).RedrawTop();
 
     // ext object
-    for(u8 oy = ry; oy < ry + rh; ++oy)
-	for(u8 ox = rx; ox < rx + rw; ++ox) if(GetRect() & Point(gx + ox, gy + oy))
+    for(u8 oy = 0; oy < rectMaps.h; ++oy)
+	for(u8 ox = 0; ox < rectMaps.w; ++ox)
     {
-	const Maps::Tiles & tile = world.GetTiles(gx + ox, gy + oy);
-    	const Point dst(BORDERWIDTH + TILEWIDTH * ox, BORDERWIDTH + TILEWIDTH * oy);
+	const Maps::Tiles & tile = world.GetTiles(rectMaps.x + ox, rectMaps.y + oy);
 
 	switch(tile.GetObject())
 	{
@@ -189,134 +176,131 @@ void GameArea::Redraw(const s16 rx, const s16 ry, const u16 rw, const u16 rh, bo
 	for(; it1 != it2; ++it1)
 	{
 	    from = Maps::GetDirectionIndex(from, (*it1).Direction());
-    	    const u16 tile_x = from % world.w();
-    	    const u16 tile_y = from / world.h();
+    	    Point pointPos(from % world.w(), from / world.h());
+
 	    ++it3;
 	    --green;
 
-            if(tile_x < gx + rx || tile_y < gy + ry || tile_x >= gx + rx + rw || tile_y >= gy + ry + rh) continue;
+            if(!(rectMaps & pointPos)) continue;
 	    if(it1 == hero.GetPath().begin() && skipfirst) continue;
 
 	    const u16 index = (it3 == it2 ? 0 : Route::Path::GetIndexSprite((*it1).Direction(), (*it3).Direction(), Maps::Ground::GetBasePenalty(from, hero.GetLevelSkill(Skill::Secondary::PATHFINDING))));
 
 	    const Sprite & sprite = AGG::GetICN(0 > green ? ICN::ROUTERED : ICN::ROUTE, index);
-    	    Point dst_pt(BORDERWIDTH + TILEWIDTH * (tile_x - gx) + sprite.x() - 14, BORDERWIDTH + TILEWIDTH * (tile_y - gy) + sprite.y());
-	    display.Blit(sprite, dst_pt);
+    	    pointPos.x = rectArea.x + TILEWIDTH * (pointPos.x - rectMaps.x) + sprite.x() - 14;
+    	    pointPos.y = rectArea.y + TILEWIDTH * (pointPos.y - rectMaps.y) + sprite.y();
+	    display.Blit(sprite, pointPos);
 	}
     }
-
 
     // redraw grid
     if(Settings::Get().Debug())
     {
 
-	for(u8 oy = ry; oy < ry + rh; ++oy)
-	    for(u8 ox = rx; ox < rx + rw; ++ox) if(GetRect() & Point(gx + ox, gy + oy))
+	for(u8 oy = 0; oy < rectMaps.h; ++oy)
+	    for(u8 ox = 0; ox < rectMaps.w; ++ox)
 	{
-    	    const s16 dstx = BORDERWIDTH + TILEWIDTH * ox;
-    	    const s16 dsty = BORDERWIDTH + TILEWIDTH * oy;
-
     	    display.Lock();
-    	    display.SetPixel(dstx, dsty, display.GetColor(0x40));
+    	    display.SetPixel(rectArea.x + TILEWIDTH * ox, rectArea.y + TILEWIDTH * oy, display.GetColor(0x40));
     	    display.Unlock();
 	}
     }
 
     // redraw fog
     if(drawFog)
-	for(u8 oy = ry; oy < ry + rh; ++oy)
-	    for(u8 ox = rx; ox < rx + rw; ++ox)
+	for(u8 oy = 0; oy < rectMaps.h; ++oy)
+	    for(u8 ox = 0; ox < rectMaps.w; ++ox)
     {
-	    const Maps::Tiles & tile = world.GetTiles(gx + ox, gy + oy);
-
-	    if(tile.isFog(Settings::Get().MyColor())) RedrawClopOrClofSpriteFog(tile.GetIndex(), ox, oy);
+	const Maps::Tiles & tile = world.GetTiles(rectMaps.x + ox, rectMaps.y + oy);
+    	const Point dst(rectArea.x + TILEWIDTH * ox, rectArea.y + TILEWIDTH * oy);
+	if(tile.isFog(Settings::Get().MyColor())) RedrawClopOrClofSpriteFog(tile.GetIndex(), dst);
     }
 }
 
 /* scroll area */
-void GameArea::Scroll(void)
+void Interface::GameArea::Scroll(void)
 {
-    if(scrolldir & SCROLL_LEFT && 0 < gx) --gx;
+    if(scrollDirection & SCROLL_LEFT && 0 < rectMaps.x) --rectMaps.x;
     else
-    if(scrolldir & SCROLL_RIGHT && world.w() - gw > gx) ++gx;
+    if(scrollDirection & SCROLL_RIGHT && world.w() - rectMaps.w > rectMaps.x) ++rectMaps.x;
 
-    if(scrolldir & SCROLL_TOP && 0 < gy) --gy;
+    if(scrollDirection & SCROLL_TOP && 0 < rectMaps.y) --rectMaps.y;
     else
-    if(scrolldir & SCROLL_BOTTOM && world.h() - gh > gy) ++gy;
+    if(scrollDirection & SCROLL_BOTTOM && world.h() - rectMaps.h > rectMaps.y) ++rectMaps.y;
 
-    scrolldir = 0;
+    scrollDirection = 0;
 }
 
 /* scroll area to center point maps */
-void GameArea::Center(const Point &pt)
+void Interface::GameArea::Center(const Point &pt)
 {
     Center(pt.x, pt.y);
 }
 
-void GameArea::Center(s16 px, s16 py)
+void Interface::GameArea::Center(s16 px, s16 py)
 {
     Point pos;
 
     // center
-    pos.x = (0 > px - gw / 2 ? 0 : px - gw / 2);
-    pos.y = (0 > py - gh / 2 ? 0 : py - gh / 2);
+    pos.x = (0 > px - rectMaps.w / 2 ? 0 : px - rectMaps.w / 2);
+    pos.y = (0 > py - rectMaps.h / 2 ? 0 : py - rectMaps.h / 2);
 
     // our of range
-    if(pos.y > world.h() - gh) pos.y = world.h() - gh;
-    if(pos.x > world.w() - gw) pos.x = world.w() - gw;
+    if(pos.y > world.h() - rectMaps.h) pos.y = world.h() - rectMaps.h;
+    if(pos.x > world.w() - rectMaps.w) pos.x = world.w() - rectMaps.w;
 
-    if(pos.x == gx && pos.y == gy) return;
+    if(pos.x == rectMaps.x && pos.y == rectMaps.y) return;
 
     // possible fast scroll
-    if(pos.y == gy && 1 == (pos.x - gx)) scrolldir |= SCROLL_RIGHT;
+    if(pos.y == rectMaps.y && 1 == (pos.x - rectMaps.x)) scrollDirection |= SCROLL_RIGHT;
     else
-    if(pos.y == gy && -1 == (pos.x - gx)) scrolldir |= SCROLL_LEFT;
+    if(pos.y == rectMaps.y && -1 == (pos.x - rectMaps.x)) scrollDirection |= SCROLL_LEFT;
     else
-    if(pos.x == gx && 1 == (pos.y - gy)) scrolldir |= SCROLL_BOTTOM;
+    if(pos.x == rectMaps.x && 1 == (pos.y - rectMaps.y)) scrollDirection |= SCROLL_BOTTOM;
     else
-    if(pos.x == gx && -1 == (pos.y - gy)) scrolldir |= SCROLL_TOP;
+    if(pos.x == rectMaps.x && -1 == (pos.y - rectMaps.y)) scrollDirection |= SCROLL_TOP;
     else
     // diagonal
-    if(-1 == (pos.y - gy) && 1 == (pos.x - gx))
+    if(-1 == (pos.y - rectMaps.y) && 1 == (pos.x - rectMaps.x))
     {
-	scrolldir |= SCROLL_TOP | SCROLL_RIGHT;
+	scrollDirection |= SCROLL_TOP | SCROLL_RIGHT;
     }
     else
-    if(-1 == (pos.y - gy) && -1 == (pos.x - gx))
+    if(-1 == (pos.y - rectMaps.y) && -1 == (pos.x - rectMaps.x))
     {
-	scrolldir |= SCROLL_TOP | SCROLL_LEFT;
+	scrollDirection |= SCROLL_TOP | SCROLL_LEFT;
     }
     else
-    if(1 == (pos.y - gy) && 1 == (pos.x - gx))
+    if(1 == (pos.y - rectMaps.y) && 1 == (pos.x - rectMaps.x))
     {
-	scrolldir |= SCROLL_BOTTOM | SCROLL_RIGHT;
+	scrollDirection |= SCROLL_BOTTOM | SCROLL_RIGHT;
     }
     else
-    if(1 == (pos.y - gy) && -1 == (pos.x - gx))
+    if(1 == (pos.y - rectMaps.y) && -1 == (pos.x - rectMaps.x))
     {
-	scrolldir |= SCROLL_BOTTOM | SCROLL_LEFT;
+	scrollDirection |= SCROLL_BOTTOM | SCROLL_LEFT;
     }
 
     else
     {
-	gx = pos.x;
-	gy = pos.y;
-	scrolldir = 0;
+	rectMaps.x = pos.x;
+	rectMaps.y = pos.y;
+	scrollDirection = 0;
     }
 
-    if(scrolldir) Scroll();
+    if(scrollDirection) Scroll();
 }
 
-void RedrawBoat(const Maps::Tiles & tile, const Point & dst)
+void RedrawBoat(const Maps::Tiles & tile, s16 px, s16 py)
 {
     if(Settings::Get().Editor())
-        Display::Get().Blit(AGG::GetICN(ICN::OBJNWAT2, 23), dst);
+        Display::Get().Blit(AGG::GetICN(ICN::OBJNWAT2, 23), px, py);
     else
     {
         const Sprite & sprite = AGG::GetICN(ICN::BOAT32, 18);
-        Point dst_pt(dst.x + sprite.x(), dst.y + sprite.y() + TILEWIDTH);
+        Point dst_pt(px + sprite.x(), py + sprite.y() + TILEWIDTH);
         Rect src_rt;
-        GameArea::SrcRectFixed(src_rt, dst_pt, sprite.w(), sprite.h());
+        Interface::GameArea::SrcRectFixed(src_rt, dst_pt, sprite.w(), sprite.h());
         Display::Get().Blit(sprite, src_rt, dst_pt);
     }
 }
@@ -331,7 +315,7 @@ void RedrawHeroes(const Maps::Tiles & tile)
     }
 }
 
-void RedrawMonster(const Maps::Tiles & tile, const Point & dst)
+void RedrawMonster(const Maps::Tiles & tile, s16 px, s16 py)
 {
     Display & display = Display::Get();
     const Monster monster(tile);
@@ -354,10 +338,10 @@ void RedrawMonster(const Maps::Tiles & tile, const Point & dst)
 
 	const Sprite & sprite_first = AGG::GetICN(ICN::MINIMON, monster.GetSpriteIndex() * 9 + (revert ? 8 : 7));
 
-	dst_pt.x = dst.x + sprite_first.x() + 16;
-	dst_pt.y = dst.y + TILEWIDTH + sprite_first.y();
+	dst_pt.x = px + sprite_first.x() + 16;
+	dst_pt.y = py + TILEWIDTH + sprite_first.y();
 
-	GameArea::SrcRectFixed(src_rt, dst_pt, sprite_first.w(), sprite_first.h());
+	Interface::GameArea::SrcRectFixed(src_rt, dst_pt, sprite_first.w(), sprite_first.h());
 	display.Blit(sprite_first, src_rt, dst_pt);
     }
     else
@@ -365,19 +349,19 @@ void RedrawMonster(const Maps::Tiles & tile, const Point & dst)
 	// draw first sprite
 	const Sprite & sprite_first = AGG::GetICN(ICN::MINIMON, monster.GetSpriteIndex() * 9);
 
-	dst_pt.x = dst.x + sprite_first.x() + 16;
-	dst_pt.y = dst.y + TILEWIDTH + sprite_first.y();
+	dst_pt.x = px + sprite_first.x() + 16;
+	dst_pt.y = py + TILEWIDTH + sprite_first.y();
 
-	GameArea::SrcRectFixed(src_rt, dst_pt, sprite_first.w(), sprite_first.h());
+	Interface::GameArea::SrcRectFixed(src_rt, dst_pt, sprite_first.w(), sprite_first.h());
 	display.Blit(sprite_first, src_rt, dst_pt);
 
 	// draw second sprite
 	const Sprite & sprite_next = AGG::GetICN(ICN::MINIMON, monster.GetSpriteIndex() * 9 + 1 + (Maps::AnimationTicket() % 6));
 
-	dst_pt.x = dst.x + sprite_next.x() + 16;
-	dst_pt.y = dst.y + TILEWIDTH + sprite_next.y();
+	dst_pt.x = px + sprite_next.x() + 16;
+	dst_pt.y = py + TILEWIDTH + sprite_next.y();
 
-	GameArea::SrcRectFixed(src_rt, dst_pt, sprite_next.w(), sprite_next.h());
+	Interface::GameArea::SrcRectFixed(src_rt, dst_pt, sprite_next.w(), sprite_next.h());
 	display.Blit(sprite_next, src_rt, dst_pt);
 
 	if(Maps::isValidDirection(tile.GetIndex(), Direction::BOTTOM))
@@ -385,16 +369,14 @@ void RedrawMonster(const Maps::Tiles & tile, const Point & dst)
     }
 }
 
-void RedrawClopOrClofSpriteFog(const u16 dst_index, const u8 ox, const u8 oy)
+void RedrawClopOrClofSpriteFog(const u16 dst_index, const Point & dst)
 {
-    const s16 dstx = BORDERWIDTH + TILEWIDTH * ox;
-    const s16 dsty = BORDERWIDTH + TILEWIDTH * oy;
     Display & display = Display::Get();
     const u16 around = Maps::GetDirectionAroundFog(dst_index, Settings::Get().MyColor());
 
     // TIL::CLOF32
     if(DIRECTION_ALL == around)
-	display.Blit(AGG::GetTIL(TIL::CLOF32, dst_index % 4, 0), dstx, dsty);
+	display.Blit(AGG::GetTIL(TIL::CLOF32, dst_index % 4, 0), dst.x, dst.y);
     else
     {
 	u8 index = 0;
@@ -593,69 +575,73 @@ void RedrawClopOrClofSpriteFog(const u16 dst_index, const u8 ox, const u8 oy)
 	// unknown
 	else
 	{
-	    display.Blit(AGG::GetTIL(TIL::CLOF32, dst_index % 4, 0), dstx, dsty);
+	    display.Blit(AGG::GetTIL(TIL::CLOF32, dst_index % 4, 0), dst.x, dst.y);
 	    return;
 	}
 
 	const Sprite & src = AGG::GetICN(ICN::CLOP32, index, revert);
-	display.Blit(src, revert ? dstx + src.x() + TILEWIDTH - src.w() : dstx + src.x(), dsty + src.y());
+	display.Blit(src, revert ? dst.x + src.x() + TILEWIDTH - src.w() : dst.x + src.x(), dst.y + src.y());
     }
 }
 
-void GameArea::GenerateUltimateArtifactAreaSurface(const u16 index, Surface & sf)
+void Interface::GameArea::GenerateUltimateArtifactAreaSurface(const u16 index, Surface & sf)
 {
     if(Maps::isValidAbsIndex(index))
     {
 	Display & display = Display::Get();
+	Interface::GameArea & gamearea = GameArea::Get();
+	const Rect & rectMaps = gamearea.GetRectMaps();
+	const Rect & rectArea = gamearea.GetArea();
 	Point pt(index % world.w(), index / world.h());
 
-        const Point reserved(*this);
-        Center(pt);
-	RedrawNoFog();
+        const Point reserved(rectMaps);
+        gamearea.Center(pt);
+	gamearea.Redraw(false);
 
 	// blit marker
-	for(u8 ii = 0; ii < h(); ++ii) if(index < Maps::GetIndexFromAbsPoint(gx + gw - 1, gy + ii))
+	for(u8 ii = 0; ii < rectMaps.h; ++ii) if(index < Maps::GetIndexFromAbsPoint(rectMaps.x + rectMaps.w - 1, rectMaps.y + ii))
 	{
 	    pt.y = ii;
 	    break;
 	}
-	for(u8 ii = 0; ii < w(); ++ii) if(index == Maps::GetIndexFromAbsPoint(gx + ii, gy + pt.y))
+	for(u8 ii = 0; ii < rectMaps.w; ++ii) if(index == Maps::GetIndexFromAbsPoint(rectMaps.x + ii, rectMaps.y + pt.y))
 	{
 	    pt.x = ii;
 	    break;
 	}
 	const Sprite & marker = AGG::GetICN(ICN::ROUTE, 0);
-	display.Blit(marker, BORDERWIDTH + pt.x * TILEWIDTH, BORDERWIDTH + pt.y * TILEWIDTH + 8);
+	const Point dst(rectArea.x + pt.x * TILEWIDTH, rectArea.y + pt.y * TILEWIDTH);
+	display.Blit(marker, dst.x, dst.y + 8);
 
-	Rect rt(BORDERWIDTH + pt.x * TILEWIDTH - sf.w() / 2, BORDERWIDTH + pt.y * TILEWIDTH - sf.h() / 2, sf.w(), sf.h());
+	Rect rt(dst.x - sf.w() / 2, dst.y - sf.h() / 2, sf.w(), sf.h());
 
 	// fix align
-	if(rt.x < BORDERWIDTH) rt.x = BORDERWIDTH;
+	if(rt.x < rectArea.x) rt.x = rectArea.x;
 	else
-	if(rt.x > BORDERWIDTH + TILEWIDTH * gw - rt.w) rt.x = BORDERWIDTH + TILEWIDTH * gw - rt.w;
-	if(rt.y < BORDERWIDTH) rt.y = BORDERWIDTH;
+	if(rt.x > rectArea.x + rectArea.w - rt.w) rt.x = rectArea.x + rectArea.w - rt.w;
+	if(rt.y < rectArea.y) rt.y = rectArea.y;
 	else
-	if(rt.y > BORDERWIDTH + TILEWIDTH * gh - rt.h) rt.y = BORDERWIDTH + TILEWIDTH * gh - rt.h;
+	if(rt.y > rectArea.y + rectArea.h - rt.h) rt.y = rectArea.y + rectArea.h - rt.h;
 
 	sf.Blit(display, rt, 0, 0);
 
         // restore position
-        gx = reserved.x;
-        gy = reserved.y;
-	Redraw();
+        gamearea.rectMaps.x = reserved.x;
+        gamearea.rectMaps.y = reserved.y;
+	gamearea.Redraw();
     }
     else
-    Error::Warning("GameArea::GenerateUltimateArtifactAreaSurface: artifact not found");
+    Error::Warning("Interface::GameArea::GenerateUltimateArtifactAreaSurface: artifact not found");
 }
 
-bool GameArea::NeedScroll(void) const
+bool Interface::GameArea::NeedScroll(void) const
 {
-    return scrolldir;
+    return scrollDirection;
 }
 
-Cursor::themes_t GameArea::GetScrollCursor(void) const
+Cursor::themes_t Interface::GameArea::GetScrollCursor(void) const
 {
-    switch(scrolldir)
+    switch(scrollDirection)
     {
 	case SCROLL_TOP:		  return Cursor::SCROLL_TOP;
 	case SCROLL_BOTTOM:		  return Cursor::SCROLL_BOTTOM;
@@ -672,14 +658,56 @@ Cursor::themes_t GameArea::GetScrollCursor(void) const
     return Cursor::NONE;
 }
 
-void GameArea::SetScroll(scroll_t direct)
+void Interface::GameArea::SetScroll(scroll_t direct)
 {
     switch(direct)
     {
-	case SCROLL_LEFT:	if(0 < gx)              scrolldir |= direct;	break;
-	case SCROLL_RIGHT:	if(world.w() - gw > gx) scrolldir |= direct;	break;
-	case SCROLL_TOP:	if(0 < gy)              scrolldir |= direct;	break;
-	case SCROLL_BOTTOM:	if(world.h() - gh > gy) scrolldir |= direct;	break;
+	case SCROLL_LEFT:	if(0 < rectMaps.x)                      scrollDirection |= direct;	break;
+	case SCROLL_RIGHT:	if(world.w() - rectMaps.w > rectMaps.x) scrollDirection |= direct;	break;
+	case SCROLL_TOP:	if(0 < rectMaps.y)                      scrollDirection |= direct;	break;
+	case SCROLL_BOTTOM:	if(world.h() - rectMaps.h > rectMaps.y) scrollDirection |= direct;	break;
 	default: break;
     }
+}
+
+/* convert area point to index maps */
+s16 Interface::GameArea::GetIndexFromMousePoint(const Point & pt) const
+{
+    s16 result = (rectMaps.y + (pt.y - rectArea.y) / TILEWIDTH) * world.w() + rectMaps.x + (pt.x - rectArea.x) / TILEWIDTH;
+    const u16 & max = world.w() * world.h() - 1;
+
+    return result > max || result < Maps::GetIndexFromAbsPoint(rectMaps.x, rectMaps.y) ? -1 : result;
+}
+
+
+void Interface::GameArea::QueueEventProcessing(void)
+{
+    Cursor & cursor = Cursor::Get();
+    LocalEvent & le = LocalEvent::Get();
+    const Point & mp = le.GetMouseCursor();
+
+
+    s16 index = (rectMaps.y + (mp.y - rectArea.y) / TILEWIDTH) * world.w() + rectMaps.x + (mp.x - rectArea.x) / TILEWIDTH;
+    const u16 & max = world.w() * world.h() - 1;
+    
+    // out of range
+    if(index > max || index < Maps::GetIndexFromAbsPoint(rectMaps.x, rectMaps.y)) return;
+
+    const Maps::Tiles & tile = world.GetTiles(index);
+    const Rect tile_pos(rectArea.x + ((u16) (mp.x - rectArea.x) / TILEWIDTH) * TILEWIDTH,
+	                rectArea.y + ((u16) (mp.y - rectArea.y) / TILEWIDTH) * TILEWIDTH,
+	                TILEWIDTH, TILEWIDTH);
+
+    // change cusor if need
+    if(index != oldIndexPos)
+    {
+	cursor.SetThemes(Game::GetCursor(tile));
+	oldIndexPos = index;
+    }
+
+    if(le.MouseClickLeft(tile_pos) && Cursor::POINTER != cursor.Themes())
+        Game::MouseCursorAreaClickLeft(index);
+    else
+    if(le.MousePressRight(tile_pos))
+        Game::MouseCursorAreaPressRight(index);
 }

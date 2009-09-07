@@ -17,8 +17,9 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef H2GAMEAREA_H
-#define H2GAMEAREA_H
+
+#ifndef H2INTERFACE_GAMEAREA_H
+#define H2INTERFACE_GAMEAREA_H
 
 #include "gamedefs.h"
 #include "cursor.h"
@@ -32,51 +33,41 @@ enum scroll_t
     SCROLL_BOTTOM = 0x08,
 };
 
-class GameArea : protected Rect
+namespace Interface
 {
-public:
-    static GameArea & Get(void);
-    void Build(void);
+    class GameArea
+    {
+    public:
+	static GameArea & Get(void);
+	void Build(void);
 
+	const Rect & GetArea(void) const;
+	const Rect & GetRectMaps(void) const;
 
-    const Rect & GetRect(void) const { return *this; };
+	Cursor::themes_t GetScrollCursor(void) const;
+	bool NeedScroll(void) const;
+	void Scroll(void);
+	void SetScroll(scroll_t);
 
-    static s16 x(void) { return Get().GetRect().x; };
-    static s16 y(void) { return Get().GetRect().y; };
-    static u16 w(void) { return Get().GetRect().w; };
-    static u16 h(void) { return Get().GetRect().h; };
+	void Center(s16, s16);
+	void Center(const Point &pt);
+	void Redraw(bool drawFog = true) const;
 
-    static void SrcRectFixed(Rect & src, Point & dst, const u16 rw, const u16 rh);
+        void QueueEventProcessing(void);
+        
+	s16 GetIndexFromMousePoint(const Point & pt) const;
 
-    Cursor::themes_t GetScrollCursor(void) const;
-    bool NeedScroll(void) const;
-    void Scroll(void);
-    void SetScroll(scroll_t);
+	static void GenerateUltimateArtifactAreaSurface(const u16, Surface &);
+	static void SrcRectFixed(Rect & src, Point & dst, const u16 rw, const u16 rh);
 
-    void Center(s16, s16);
-    void Center(const Point &pt);
+    private:
+	GameArea();
 
-    void Redraw(const s16 rx = 0, const s16 ry = 0, const u16 rw = w(), const u16 rh = h(), bool drawFog = true) const;
-    void Redraw(const Rect & rt, bool drawFog = true) const;
-    void RedrawNoFog(void) const;
-
-    u16 GetLeftTopIndexMaps(void);
-    s16 GetIndexFromMousePoint(const Point & pt);
-    s16 GetIndexFromMousePoint(s16 px, s16 py);
-
-    void GenerateUltimateArtifactAreaSurface(const u16, Surface &);
-
-private:
-    GameArea();
-
-    s16 & gx;
-    s16 & gy;
-    u16 & gw;
-    u16 & gh;
-
-    u16 max;
-    
-    u8 scrolldir;
+	Rect	rectArea;
+	Rect	rectMaps;
+	u16	oldIndexPos;
+	u8	scrollDirection;
+    };
 };
 
 #endif

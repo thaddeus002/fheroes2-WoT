@@ -181,33 +181,6 @@ void Interface::HeroesIcons::Redraw(void)
     splitter.Show();
 }
 
-void Interface::HeroesIcons::Redraw(const Heroes *hero)
-{
-    if(NULL == hero) return;
-
-    std::vector<Heroes *> & heroes = world.GetMyKingdom().GetHeroes();
-    std::vector<Heroes *>::const_iterator it = it_top;
-    u8 ii = 0;
-
-    while(it != heroes.end() && ii < coords.size())
-    {
-	if(*it && *it == hero)
-	{
-	    if(visible && it_cur == it) sp_cursor.Hide();
-
-	    RedrawIcon(**it, coords[ii]);
-
-	    // select current
-	    if(visible && it_cur == it) sp_cursor.Show(coords[ii].x - 5, coords[ii].y - 5);
-
-	    break;
-	}
-
-	if(*it) ++ii;
-	++it;
-    }
-}
-
 void Interface::HeroesIcons::Hide(void)
 {
     if(isSelected()) Unselect();
@@ -457,33 +430,6 @@ void Interface::CastleIcons::Redraw(void)
     splitter.Show();
 }
 
-void Interface::CastleIcons::Redraw(const Castle *castle)
-{
-    if(NULL == castle) return;
-
-    std::vector<Castle *> & castles = world.GetMyKingdom().GetCastles();
-    std::vector<Castle *>::const_iterator it = it_top;
-    u8 ii = 0;
-
-    while(it != castles.end() && ii < coords.size())
-    {
-	if(*it && *it == castle)
-	{
-	    if(visible && it_cur == it) sp_cursor.Hide();
-
-    	    RedrawIcon(**it, coords[ii]);
-
-	    // select current
-	    if(visible && it_cur == it) sp_cursor.Show(coords[ii].x - 5, coords[ii].y - 5);
-
-	    break;
-	}
-
-	if(*it) ++ii;
-	++it;
-    }
-}
-
 void Interface::CastleIcons::Hide(void)
 {
     if(isSelected()) Unselect();
@@ -695,6 +641,9 @@ void Interface::IconsPanel::SetPos(s16 ox, s16 oy)
 
 void Interface::IconsPanel::Redraw(void)
 {
+    const Settings & conf = Settings::Get();
+    if(conf.HideInterface() && !conf.ShowIcons()) return;
+
     Display & display = Display::Get();
     const ICN::icn_t icnscroll = Settings::Get().EvilInterface() ? ICN::SCROLLE : ICN::SCROLL;
 
@@ -871,11 +820,8 @@ void Interface::IconsPanel::QueueEventProcessing(void)
     	    Game::OpenHeroes(const_cast<Heroes *>(hero));
         else
         {
-    	    cursor.Hide();
             global_focus.Set(const_cast<Heroes *>(hero));
-            global_focus.Redraw();
-            cursor.Show();
-            display.Flip();
+            global_focus.SetRedraw();
         }
     }
     else
@@ -894,11 +840,8 @@ void Interface::IconsPanel::QueueEventProcessing(void)
     	    Game::OpenCastle(const_cast<Castle *>(cstl));
         else
         {
-            cursor.Hide();
             global_focus.Set(const_cast<Castle *>(cstl));
-            global_focus.Redraw();
-            cursor.Show();
-            display.Flip();
+            global_focus.SetRedraw();
         }
     }
     else

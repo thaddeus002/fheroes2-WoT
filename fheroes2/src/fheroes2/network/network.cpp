@@ -19,11 +19,15 @@
  ***************************************************************************/
 
 #include <cstdlib>
+#include <algorithm>
+#include <functional>
 
 #include "sdlnet.h"
 #include "settings.h"
 #include "server.h"
 #include "error.h"
+#include "remoteclient.h"
+#include "localclient.h"
 #include "network.h"
 
 #ifdef WITH_NET
@@ -39,9 +43,21 @@ const char* Network::GetMsgString(u16 msg)
         case MSG_MESSAGE:       return "MSG_MESSAGE";
 
         case MSG_HELLO:         return "MSG_HELLO";
-        case MSG_PLAYERS:       return "MSG_PLAYERS";
         case MSG_LOGOUT:        return "MSG_LOGOUT";
         case MSG_SHUTDOWN:      return "MSG_SHUTDOWN";
+
+        case MSG_MAPS_INFO:     return "MSG_MAPS_INFO";
+        case MSG_MAPS_INFO_GET: return "MSG_MAPS_INFO_GET";
+        case MSG_MAPS_INFO_SET:	return "MSG_MAPS_INFO_SET";
+
+        case MSG_MAPS_LOAD:	return "MSG_MAPS_LOAD";
+        case MSG_MAPS_LOAD_ERR:	return "MSG_MAPS_LOAD_ERR";
+
+        case MSG_MAPS_LIST:     return "MSG_MAPS_LIST";
+        case MSG_MAPS_LIST_GET: return "MSG_MAPS_LIST_GET";
+
+        case MSG_PLAYERS:       return "MSG_PLAYERS";
+        case MSG_PLAYERS_GET:   return "MSG_PLAYERS_GET";
 
         case MSG_TURNS:         return "MSG_TURNS";
         case MSG_HEROES:        return "MSG_HEROES";
@@ -60,6 +76,17 @@ const char* Network::GetMsgString(u16 msg)
 msg_t Network::GetMsg(u16 msg)
 {
     return msg < MSG_UNKNOWN ? static_cast<msg_t>(msg) : MSG_UNKNOWN;
+}
+
+bool Network::MsgIsBroadcast(u16 msg)
+{
+    switch(msg)
+    {
+	case MSG_SHUTDOWN:
+	case MSG_MESSAGE:
+	    return true;
+    }
+    return false;
 }
 
 int Network::RunDedicatedServer(void)
@@ -82,7 +109,7 @@ int Network::RunDedicatedServer(void)
         }
 
 	conf.SetModes(Settings::DEDICATEDSERVER);
-	conf.SetPreferablyCountPlayers(1);
+	conf.SetGameType(Game::NETWORK);
 
         return FH2Server::callbackCreateThread(&server);
     }
@@ -95,6 +122,43 @@ int Network::RunDedicatedServer(void)
     }
 
     return 0;
+}
+
+void Network::Logout(void)
+{
+    FH2LocalClient & client = FH2LocalClient::Get();
+    if(client.Modes(ST_LOCALSERVER))
+    {
+        client.Logout();
+        FH2Server & server = FH2Server::Get();
+        server.Exit();
+        DELAY(100);
+        server.Close();
+    }
+    else
+        client.Logout();
+}
+
+void Network::PacketPushMapsFileInfoList(Network::Message & packet, const MapsFileInfoList & flist)
+{
+    packet.Push(static_cast<u16>(flist.size()));
+    MapsFileInfoList::const_iterator it1 = flist.begin();
+    MapsFileInfoList::const_iterator it2 = flist.end();
+
+    for(; it1 != it2; ++it1) PacketPushMapsFileInfo(packet, *it1);
+}
+
+void Network::PacketPopMapsFileInfoList(Network::Message & packet, MapsFileInfoList & flist)
+{
+    flist.clear();
+    u16 count;
+    packet.Pop(count);
+    for(u16 ii = 0; ii < count; ++ii)
+    {
+	Maps::FileInfo fi;
+	PacketPopMapsFileInfo(packet, fi);
+	flist.push_back(fi);
+    }
 }
 
 void Network::PacketPushMapsFileInfo(Network::Message & packet, const Maps::FileInfo & fi)
@@ -158,17 +222,35 @@ void Network::PacketPopMapsFileInfo(Network::Message & packet, Maps::FileInfo & 
     fi.with_heroes = byte8;
 }
 
+void Network::PacketPushPlayersInfo(Network::Message & m, const std::list<FH2RemoteClient> & v, u32 exclude)
+{
+    u8 count = std::count_if(v.begin(), v.end(), std::not1(std::bind2nd(std::mem_fun_ref(&Player::isID), 0)));
+    m.Push(count);
+    
+    if(count)
+    {
+	std::list<FH2RemoteClient>::const_iterator itc1 = v.begin();
+	std::list<FH2RemoteClient>::const_iterator itc2 = v.end();
+	for(; itc1 != itc2; ++itc1) if((*itc1).player_id && (*itc1).player_id != exclude)
+	{
+	    m.Push((*itc1).player_color);
+	    m.Push((*itc1).player_race);
+    	    m.Push((*itc1).player_name);
+	    m.Push((*itc1).player_id);
+	}
+    }
+}
+
 void Network::PacketPushPlayersInfo(Network::Message & m, const std::vector<Player> & v)
 {
-    m.Push(static_cast<u8>(v.size()));
-    std::vector<Player>::const_iterator itp1 = v.begin();
-    std::vector<Player>::const_iterator itp2 = v.end();
-    for(; itp1 != itp2; ++itp1)
+    std::vector<Player>::const_iterator it1 = v.begin();
+    std::vector<Player>::const_iterator it2 = v.end();
+    for(; it1 != it2; ++it1) if((*it1).player_id)
     {
-	m.Push((*itp1).player_color);
-	m.Push((*itp1).player_race);
-        m.Push((*itp1).player_name);
-        m.Push((*itp1).player_id);
+	m.Push((*it1).player_color);
+	m.Push((*it1).player_race);
+    	m.Push((*it1).player_name);
+	m.Push((*it1).player_id);
     }
 }
 
@@ -195,6 +277,16 @@ u8 Network::GetPlayersColors(std::vector<Player> & v)
     std::vector<Player>::const_iterator it2 = v.end();
     for(; it1 != it2; ++it1) if((*it1).player_id && (*it1).player_color) res |= (*it1).player_color;
                 
+    return res;
+}
+
+u8 Network::GetPlayersColors(std::list<FH2RemoteClient> & v)
+{
+    u8 res = 0;
+    std::list<FH2RemoteClient>::const_iterator it1 = v.begin();
+    std::list<FH2RemoteClient>::const_iterator it2 = v.end();
+    for(; it1 != it2; ++it1) if((*it1).player_id && (*it1).player_color) res |= (*it1).player_color;
+
     return res;
 }
 

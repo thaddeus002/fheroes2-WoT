@@ -26,10 +26,8 @@
 #include "monster.h"
 #include "heroes.h"
 #include "battle.h"
-#include "gamearea.h"
 #include "game_focus.h"
-#include "interface_status.h"
-#include "interface_icons.h"
+#include "game_interface.h"
 #include "kingdom.h"
 #include "cursor.h"
 #include "algorithm.h"
@@ -214,7 +212,7 @@ void BattleLose(Heroes &hero, u8 reason, Color::color_t color = Color::GRAY)
     hero.SetKillerColor(color);
     hero.SetFreeman(reason);
     Game::Focus::Get().Reset(Game::Focus::HEROES);
-    Game::Focus::Get().Redraw();
+    Game::Focus::Get().SetRedraw();
 }
 
 void PlayPickupSound(void)
@@ -261,7 +259,7 @@ void AnimationRemoveObject(const Maps::Tiles & tile)
 
     if(NULL == addon) return;
 
-    const Rect & area = GameArea::Get().GetRect();
+    const Rect & area = Interface::GameArea::Get().GetRectMaps();
     const Point pos(tile.GetIndex() % world.w() - area.x, tile.GetIndex() / world.w() - area.y);
 
     const s16 dstx = BORDERWIDTH + TILEWIDTH * pos.x;
@@ -686,7 +684,7 @@ void ActionToCastle(Heroes &hero, const u8 obj, const u16 dst_index)
                 world.GetKingdom(castle->GetColor()).RemoveCastle(castle);
                 world.GetKingdom(hero.GetColor()).AddCastle(castle);
                 world.CaptureObject(dst_index, hero.GetColor());
-		Interface::IconsPanel::Get().GetCastleBar().Redraw();
+		Interface::Basic::Get().SetRedraw(REDRAW_CASTLES);
                 if(exp) hero.ActionAfterBattle();
                 // kill guardian hero
                 if(Heroes *other_hero = world.GetHeroes(dst_index))
@@ -789,9 +787,12 @@ void ActionToPickupResource(Heroes &hero, const u8 obj, const u16 dst_index)
             break;
 
         default:
-            Interface::StatusWindow::Get().SetResource(res, (Resource::GOLD == res ? 100 * count : count));
-            Interface::StatusWindow::Get().Redraw();
-            Display::Get().Flip();
+        {
+            Interface::Basic & I = Interface::Basic::Get();
+            I.statusWindow.SetResource(res, (Resource::GOLD == res ? 100 * count : count));
+            I.SetRedraw(REDRAW_STATUS);
+//            Display::Get().Flip();
+	}
             break;
     }
     world.GetKingdom(hero.GetColor()).AddFundsResource(resource);
@@ -1941,15 +1942,15 @@ void ActionToTeleports(Heroes &hero, const u16 index_from)
     hero.GetPath().Hide();
     hero.FadeOut();
 
-    Cursor::Get().Hide();
+    //Cursor::Get().Hide();
     hero.SetCenter(index_to);
     hero.Scoute();
 
     world.GetTiles(index_from).SetObject(MP2::OBJ_STONELIGHTS);
     world.GetTiles(index_to).SetObject(MP2::OBJ_HEROES);
 
-    Game::Focus::Get().Redraw();
-    Display::Get().Flip();
+    Game::Focus::Get().SetRedraw();
+    //Display::Get().Flip();
 
     AGG::PlaySound(M82::KILLFADE);
     hero.GetPath().Hide();
@@ -1976,15 +1977,15 @@ void ActionToWhirlpools(Heroes &hero, const u8 obj, const u16 index_from)
     hero.GetPath().Hide();
     hero.FadeOut();
 
-    Cursor::Get().Hide();
+//    Cursor::Get().Hide();
     hero.SetCenter(index_to);
     hero.Scoute();
 
     world.GetTiles(index_from).SetObject(MP2::OBJ_WHIRLPOOL);
     world.GetTiles(index_to).SetObject(MP2::OBJ_HEROES);
 
-    Game::Focus::Get().Redraw();
-    Display::Get().Flip();
+    Game::Focus::Get().SetRedraw();
+//    Display::Get().Flip();
 
     AGG::PlaySound(M82::KILLFADE);
     hero.GetPath().Hide();
@@ -2708,7 +2709,7 @@ void ActionToMagellanMaps(Heroes &hero, const u8 obj, const u16 dst_index)
 	if(Dialog::YES == Dialog::Message(MP2::StringObject(obj), _("A retired captain living on this refurbished fishing platform offers to sell you maps of the sea he made in his younger days for 1,000 gold. Do you wish to buy the maps?"), Font::BIG, Dialog::YES | Dialog::NO))
 	    world.ActionForMagellanMaps(hero.GetColor());
 
-	Game::Focus::Get().Redraw();
+	Game::Focus::Get().SetRedraw();
     }
 
     if(Settings::Get().Debug()) Error::Verbose("ActionToMagellanMaps: " + hero.GetName());

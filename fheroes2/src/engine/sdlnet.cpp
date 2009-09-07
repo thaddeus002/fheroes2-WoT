@@ -58,8 +58,8 @@ Network::Message::Message(const Message & msg) : type(msg.type), data(NULL), itd
     data = new char [dtsz + 1];
 
     std::memcpy(data, msg.data, dtsz);
-    itd1 = &data[msg.itd1 - msg.data];
-    itd2 = &data[msg.itd2 - msg.data];
+    itd1 = msg.itd1 > msg.data ? &data[msg.itd1 - msg.data] : data;
+    itd2 = msg.itd2 > msg.data ? &data[msg.itd2 - msg.data] : itd1;
 }
 
 Network::Message & Network::Message::operator= (const Message & msg)
@@ -69,8 +69,8 @@ Network::Message & Network::Message::operator= (const Message & msg)
     data = new char [dtsz + 1];
 
     std::memcpy(data, msg.data, dtsz);
-    itd1 = &data[msg.itd1 - msg.data];
-    itd2 = &data[msg.itd2 - msg.data];
+    itd1 = msg.itd1 > msg.data ? &data[msg.itd1 - msg.data] : data;
+    itd2 = msg.itd2 > msg.data ? &data[msg.itd2 - msg.data] : itd1;
 
     return *this;
 }
@@ -157,9 +157,8 @@ bool Network::Message::Recv(const Socket & csd, bool debug)
 	    {
 		delete [] data;
 		data = new char [size + 1];
-		dtsz = size;
+        	dtsz = size;
 	    }
-
 	    itd1 = data;
 	    itd2 = itd1 + size;
 
@@ -303,15 +302,12 @@ bool Network::Message::Pop(std::string & str)
 
 void Network::Message::Dump(std::ostream & stream) const
 {
-    stream << "Network::Message::Dump: type: 0x" << std::hex << type << ", size: " << std::dec << Size();
+    stream << "Network::Message::Dump: type: 0x" << std::hex << type << ", size: " << std::dec << DtSz();
 
-    if(dtsz)
-    {
-	stream << ", data:";
-	const char* cur = itd1;
-	u8 cast;
-	while(cur < itd2){ cast = *cur; stream << " 0x" << std::setw(2) << std::setfill('0') << std::hex << static_cast<int>(cast); ++cur; }
-    }
+    stream << ", data:";
+    const char* cur = itd1;
+    u8 cast;
+    while(cur < itd2){ cast = *cur; stream << " 0x" << std::setw(2) << std::setfill('0') << std::hex << static_cast<int>(cast); ++cur; }
 
     stream  << std::endl;
 }
@@ -392,16 +388,11 @@ bool Network::Socket::Recv(char *buf, size_t len) const
 	int rcv = 0;
 	while((rcv = SDLNet_TCP_Recv(sd, buf, len)) > 0 && rcv < static_cast<int>(len))
 	{
-	    if(rcv < 0)
-	    {
-		std::cerr << "Network::Socket::Recv: size: " << std::dec << len << ", receive: " << rcv << ", error: " << GetError() << std::endl;
-		return false;
-	    }
-
 	    buf += rcv;
 	    len -= rcv;
 	}
-	return 0 < rcv;
+	if(rcv == static_cast<int>(len)) return true;
+	std::cerr << "Network::Socket::Recv: size: " << std::dec << len << ", receive: " << rcv << ", error: " << GetError() << std::endl;
     }
     return false;
 }

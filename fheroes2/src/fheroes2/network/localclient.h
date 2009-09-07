@@ -30,13 +30,21 @@
 class FH2LocalClient : public FH2Client
 {
 public:
-    FH2LocalClient();
+    static FH2LocalClient & Get(void);
+
+    ~FH2LocalClient(){};
+
     bool Connect(const std::string &, u16);
 
+    int Logout(void);
     int ConnectionChat(void);
     int ScenarioInfoDialog(void);
 
     std::string server;
+    std::vector<Player> players;
+
+private:
+    FH2LocalClient();
 };
 
 #endif

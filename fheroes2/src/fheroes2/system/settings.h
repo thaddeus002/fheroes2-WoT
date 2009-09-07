@@ -111,6 +111,10 @@ public:
     bool CDMusic(void) const;
     bool FullScreen(void) const;
     bool HideInterface(void) const;
+    bool ShowRadar(void) const;
+    bool ShowIcons(void) const;
+    bool ShowButtons(void) const;
+    bool ShowStatus(void) const;
     bool EvilInterface(void) const;
     bool Shadow(void) const;
     bool Logo(void) const;

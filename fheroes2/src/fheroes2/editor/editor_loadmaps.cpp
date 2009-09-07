@@ -31,7 +31,9 @@ Game::menu_t Game::Editor::LoadMaps(void)
     if(Dialog::SelectMapsFile(filemaps))
     {
 	conf.LoadFileMaps(filemaps);
-	world.LoadMaps(filemaps);
+	Game::ShowLoadMapsText();
+    	//
+    	world.LoadMaps(filemaps);
 
 	return EDITSTART;
     }

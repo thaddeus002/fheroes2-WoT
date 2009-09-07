@@ -29,6 +29,7 @@
 #include <deque>
 #include "network.h"
 #include "remoteclient.h"
+#include "maps_fileinfo.h"
 
 class FH2Server : public Network::Server
 {
@@ -40,8 +41,6 @@ public:
 
     bool Bind(u16);
     void Exit(void);
-
-    void StorePlayersInfo(std::vector<Player> &);
 
 protected:
     friend class FH2RemoteClient;
@@ -55,6 +54,8 @@ protected:
     bool exit;
     u32 admin_id;
     std::string banner;
+    MapsFileInfoList finfo_list;
+    Network::Message packet_maps;
 };
 
 #endif

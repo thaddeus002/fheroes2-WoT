@@ -22,8 +22,8 @@
 #include "cursor.h"
 #include "settings.h"
 #include "agg.h"
-#include "gamearea.h"
 #include "button.h"
+#include "interface_gamearea.h"
 #include "interface_radar.h"
 #include "world.h"
 #include "puzzle.h"
@@ -88,7 +88,7 @@ void Puzzle::ShowMapsDialog(void) const
     back.Save();
 
     Surface sf(448, 448);
-    GameArea::Get().GenerateUltimateArtifactAreaSurface(world.GetUltimateArtifactIndex(), sf);
+    Interface::GameArea::GenerateUltimateArtifactAreaSurface(world.GetUltimateArtifactIndex(), sf);
     evil_interface ? sf.GrayScale() : sf.Sepia();
 
     if(display.w() == 640 && display.h() == 480)

@@ -329,3 +329,11 @@ void Game::KeyboardGlobalFilter(u16 sym, u16 mod)
 	    break;
     }
 }
+
+void Game::ShowLoadMapsText(void)
+{
+    Display & display = Display::Get();
+    display.Fill(0, 0, 0);
+    TextBox(_("Maps Loading..."), Font::BIG, Rect(0, display.h()/2, display.w(), display.h()/2));
+    display.Flip();
+}

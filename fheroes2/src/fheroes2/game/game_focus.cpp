@@ -22,10 +22,7 @@
 #include "heroes.h"
 #include "cursor.h"
 #include "settings.h"
-#include "gamearea.h"
-#include "interface_icons.h"
-#include "interface_status.h"
-#include "interface_radar.h"
+#include "game_interface.h"
 #include "agg.h"
 #include "world.h"
 #include "kingdom.h"
@@ -57,18 +54,19 @@ void Game::Focus::Set(const Heroes *hr)
 
     const_cast<Heroes *>(heroes)->ShowPath(true);
 
-    Interface::HeroesIcons & heroesBar = Interface::IconsPanel::Get().GetHeroesBar();
-    Interface::CastleIcons & castleBar = Interface::IconsPanel::Get().GetCastleBar();
+    Interface::Basic & I = Interface::Basic::Get();
+    Interface::HeroesIcons & heroesBar = I.iconsPanel.GetHeroesBar();
+    Interface::CastleIcons & castleBar = I.iconsPanel.GetCastleBar();
 
     castleBar.Unselect();
     heroesBar.Select(hr);
 
-    GameArea::Get().Center(heroes->GetCenter());
+    I.gameArea.Center(heroes->GetCenter());
 
     AGG::PlayMusic(MUS::FromGround(world.GetTiles(hr->GetCenter()).GetGround()));
     Game::EnvironmentSoundMixer();
     
-    Interface::StatusWindow::Get().SetState(STATUS_ARMY);
+    I.statusWindow.SetState(STATUS_ARMY);
 }
 
 void Game::Focus::Set(const Castle *cs)
@@ -84,26 +82,28 @@ void Game::Focus::Set(const Castle *cs)
     castle = cs;
     heroes = NULL;
 
-    Interface::HeroesIcons & heroesBar = Interface::IconsPanel::Get().GetHeroesBar();
-    Interface::CastleIcons & castleBar = Interface::IconsPanel::Get().GetCastleBar();
+    Interface::Basic & I = Interface::Basic::Get();
+    Interface::HeroesIcons & heroesBar = I.iconsPanel.GetHeroesBar();
+    Interface::CastleIcons & castleBar = I.iconsPanel.GetCastleBar();
 
     heroesBar.Unselect();
     castleBar.Select(cs);
 
-    GameArea::Get().Center(castle->GetCenter());
+    I.gameArea.Center(castle->GetCenter());
 
     AGG::PlayMusic(MUS::FromGround(world.GetTiles(cs->GetCenter()).GetGround()));
     Game::EnvironmentSoundMixer();
 
-    Interface::StatusWindow::Get().SetState(STATUS_FUNDS);
+    I.statusWindow.SetState(STATUS_FUNDS);
 }
 
 void Game::Focus::Reset(const focus_t priority)
 {
     Kingdom & myKingdom = world.GetMyKingdom();
 
-    Interface::HeroesIcons & heroesBar = Interface::IconsPanel::Get().GetHeroesBar();
-    Interface::CastleIcons & castleBar = Interface::IconsPanel::Get().GetCastleBar();
+    Interface::Basic & I = Interface::Basic::Get();
+    Interface::HeroesIcons & heroesBar = I.iconsPanel.GetHeroesBar();
+    Interface::CastleIcons & castleBar = I.iconsPanel.GetCastleBar();
 
     heroesBar.Reset();
     castleBar.Reset();
@@ -119,7 +119,7 @@ void Game::Focus::Reset(const focus_t priority)
 	    else
             if(myKingdom.GetCastles().size())
             {
-                heroesBar.Redraw();
+                I.SetRedraw(REDRAW_HEROES);
                 Set(myKingdom.GetCastles().front());
             }
             else
@@ -138,7 +138,7 @@ void Game::Focus::Reset(const focus_t priority)
 	    else
             if(myKingdom.GetHeroes().size())
             {
-                castleBar.Redraw();
+                I.SetRedraw(REDRAW_CASTLES);
                 Set(myKingdom.GetHeroes().front());
             }
             else
@@ -201,23 +201,20 @@ const Point & Game::Focus::Center(void) const
     return center;
 }
 
-void Game::Focus::Redraw(void)
+void Game::Focus::SetRedraw(void)
 {
-    Interface::Radar & radar = Interface::Radar::Get();
-    GameArea & areaMaps = GameArea::Get();
-    Interface::HeroesIcons & heroesBar = Interface::IconsPanel::Get().GetHeroesBar();
-    Interface::CastleIcons & castleBar = Interface::IconsPanel::Get().GetCastleBar();
-    Interface::StatusWindow& statusWin = Interface::StatusWindow::Get();
+    Interface::Basic & I = Interface::Basic::Get();
+    Interface::HeroesIcons & heroesBar = I.iconsPanel.GetHeroesBar();
+    Interface::CastleIcons & castleBar = I.iconsPanel.GetCastleBar();
 
     if(!heroes && heroesBar.isSelected()) heroesBar.Reset();
     if(!castle && castleBar.isSelected()) castleBar.Reset();
 
-    areaMaps.Redraw();
-    radar.Redraw();
+    I.SetRedraw(REDRAW_GAMEAREA | REDRAW_RADAR);
 
-    if(heroes) heroesBar.Redraw();
+    if(heroes) I.SetRedraw(REDRAW_HEROES);
     else
-    if(castle) castleBar.Redraw();
+    if(castle) I.SetRedraw(REDRAW_CASTLES);
 
-    statusWin.Redraw();
+    I.SetRedraw(REDRAW_STATUS);
 }

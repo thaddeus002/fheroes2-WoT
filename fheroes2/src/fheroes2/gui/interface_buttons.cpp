@@ -84,6 +84,9 @@ void Interface::ButtonsArea::SetPos(s16 ox, s16 oy)
 
 void Interface::ButtonsArea::Redraw(void)
 {
+    const Settings & conf = Settings::Get();
+    if(conf.HideInterface() && !conf.ShowButtons()) return;
+
     const ICN::icn_t icnbtn = Settings::Get().EvilInterface() ? ICN::ADVEBTNS : ICN::ADVBTNS;
 
     buttonNextHero.SetSprite(icnbtn, 0, 1);

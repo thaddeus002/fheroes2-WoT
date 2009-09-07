@@ -19,7 +19,6 @@
  ***************************************************************************/
 
 #include "maps.h"
-#include "gamearea.h"
 #include "cursor.h"
 #include "sizecursor.h"
 
@@ -45,13 +44,7 @@ void SizeCursor::ModifySize(const Size & sz)
 
 void SizeCursor::ModifySize(const u8 w, const u8 h)
 {
-    if(w > GameArea::w() || h > GameArea::h())
-    {
-    	Error::Warning("SizeCursor::SizeCursor: size out of range.");
-	ModifyCursor(1, 1);
-    }
-    else
-	ModifyCursor(w, h);
+    ModifyCursor(w, h);
 }
 
 void SizeCursor::ModifyCursor(const u8 w, const u8 h)

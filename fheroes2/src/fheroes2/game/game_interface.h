@@ -27,6 +27,7 @@
 #include "interface_buttons.h"
 #include "interface_icons.h"
 #include "interface_status.h"
+#include "interface_gamearea.h"
 
 enum redraw_t
 {
@@ -36,6 +37,7 @@ enum redraw_t
     REDRAW_BUTTONS   = 0x08,
     REDRAW_STATUS    = 0x10,
     REDRAW_BORDER    = 0x20,
+    REDRAW_GAMEAREA  = 0x40,
 
     REDRAW_ICONS     = REDRAW_HEROES | REDRAW_CASTLES,
     REDRAW_ALL       = 0xFF
@@ -50,9 +52,15 @@ namespace Interface
     	static Basic & Get(void);
 
 	bool    NeedRedraw(void) const;
-	void    SetRedraw(redraw_t f);
+	void    SetRedraw(u8);
     	void	Redraw(u8 f = 0);
 
+	const Rect & GetAreaScrollLeft(void) const;
+	const Rect & GetAreaScrollRight(void) const;
+	const Rect & GetAreaScrollTop(void) const;
+	const Rect & GetAreaScrollBottom(void) const;
+
+	GameArea & gameArea;
 	Radar & radar;
 	IconsPanel & iconsPanel;
 	ButtonsArea & buttonsArea;
@@ -63,6 +71,11 @@ namespace Interface
 	Basic();
 
 	u8 redraw;
+
+	Rect scrollLeft;
+	Rect scrollRight;
+	Rect scrollBottom;
+	Rect scrollTop;
     };
 };
 
