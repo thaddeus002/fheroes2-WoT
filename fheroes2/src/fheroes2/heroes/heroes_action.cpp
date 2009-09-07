@@ -259,11 +259,12 @@ void AnimationRemoveObject(const Maps::Tiles & tile)
 
     if(NULL == addon) return;
 
-    const Rect & area = Interface::GameArea::Get().GetRectMaps();
-    const Point pos(tile.GetIndex() % world.w() - area.x, tile.GetIndex() / world.w() - area.y);
+    const Rect & area = Interface::GameArea::Get().GetArea();
+    const Rect & rect = Interface::GameArea::Get().GetRectMaps();
+    const Point pos(tile.GetIndex() % world.w() - rect.x, tile.GetIndex() / world.w() - rect.y);
 
-    const s16 dstx = BORDERWIDTH + TILEWIDTH * pos.x;
-    const s16 dsty = BORDERWIDTH + TILEWIDTH * pos.y;
+    const s16 dstx = area.x + TILEWIDTH * pos.x;
+    const s16 dsty = area.y + TILEWIDTH * pos.y;
 
     Cursor & cursor = Cursor::Get();
     Display & display = Display::Get();

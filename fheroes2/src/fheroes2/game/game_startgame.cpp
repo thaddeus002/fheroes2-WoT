@@ -852,13 +852,13 @@ Game::menu_t Game::HumanTurn(void)
         else
 	// scroll area maps right
 	if(le.MouseCursor(I.GetAreaScrollRight())) I.gameArea.SetScroll(SCROLL_RIGHT);
-	
+	else
 	// scroll area maps top
 	if(le.MouseCursor(I.GetAreaScrollTop())) I.gameArea.SetScroll(SCROLL_TOP);
 	else
 	// scroll area maps bottom
 	if(le.MouseCursor(I.GetAreaScrollBottom())) I.gameArea.SetScroll(SCROLL_BOTTOM);
-
+	else
 	// cursor over game area
 	if(le.MouseCursor(I.gameArea.GetArea()))
 	{
