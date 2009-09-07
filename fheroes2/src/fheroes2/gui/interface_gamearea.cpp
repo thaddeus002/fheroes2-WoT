@@ -24,6 +24,7 @@
 #include "maps.h"
 #include "game.h"
 #include "game_focus.h"
+#include "game_interface.h"
 #include "route.h"
 #include "interface_gamearea.h"
 
@@ -45,7 +46,7 @@ Interface::GameArea & Interface::GameArea::Get(void)
     return ga;
 }
 
-Interface::GameArea::GameArea() : oldIndexPos(0)
+Interface::GameArea::GameArea() : oldIndexPos(0), updateCursor(false)
 {
 }
 
@@ -679,6 +680,10 @@ s16 Interface::GameArea::GetIndexFromMousePoint(const Point & pt) const
     return result > max || result < Maps::GetIndexFromAbsPoint(rectMaps.x, rectMaps.y) ? -1 : result;
 }
 
+void Interface::GameArea::SetUpdateCursor(void)
+{
+    updateCursor = true;
+}
 
 void Interface::GameArea::QueueEventProcessing(void)
 {
@@ -699,10 +704,12 @@ void Interface::GameArea::QueueEventProcessing(void)
 	                TILEWIDTH, TILEWIDTH);
 
     // change cusor if need
-    if(index != oldIndexPos)
+    if(updateCursor || index != oldIndexPos)
     {
 	cursor.SetThemes(Game::GetCursor(tile));
 	oldIndexPos = index;
+	updateCursor = false;
+	Interface::Basic::Get().SetRedraw(REDRAW_CURSOR);
     }
 
     if(le.MouseClickLeft(tile_pos) && Cursor::POINTER != cursor.Themes())

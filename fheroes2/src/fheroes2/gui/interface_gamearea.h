@@ -53,6 +53,7 @@ namespace Interface
 	void Center(const Point &pt);
 	void Redraw(bool drawFog = true) const;
 
+	void SetUpdateCursor(void);
         void QueueEventProcessing(void);
         
 	s16 GetIndexFromMousePoint(const Point & pt) const;
@@ -67,6 +68,7 @@ namespace Interface
 	Rect	rectMaps;
 	u16	oldIndexPos;
 	u8	scrollDirection;
+	bool    updateCursor;
     };
 };
 

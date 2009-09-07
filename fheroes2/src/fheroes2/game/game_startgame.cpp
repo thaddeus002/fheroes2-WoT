@@ -871,6 +871,7 @@ Game::menu_t Game::HumanTurn(void)
 	{
 	    cursor.SetThemes(Cursor::POINTER);
 	    I.radar.QueueEventProcessing();
+	    I.SetRedraw(REDRAW_CURSOR);
 	}
 	// cursor over icons panel
         if((!conf.HideInterface() || conf.ShowIcons()) &&
@@ -878,6 +879,7 @@ Game::menu_t Game::HumanTurn(void)
 	{
 	    cursor.SetThemes(Cursor::POINTER);
 	    I.iconsPanel.QueueEventProcessing();
+	    I.SetRedraw(REDRAW_CURSOR);
 	}
 	else
 	// cursor over buttons area
@@ -886,6 +888,7 @@ Game::menu_t Game::HumanTurn(void)
 	{
 	    cursor.SetThemes(Cursor::POINTER);
 	    I.buttonsArea.QueueEventProcessing(res);
+	    I.SetRedraw(REDRAW_CURSOR);
 	}
 	else
         // cursor over status area
@@ -894,6 +897,7 @@ Game::menu_t Game::HumanTurn(void)
 	{
 	    cursor.SetThemes(Cursor::POINTER);
 	    I.statusWindow.QueueEventProcessing();
+	    I.SetRedraw(REDRAW_CURSOR);
 	}
 
 	// animation
@@ -908,7 +912,7 @@ Game::menu_t Game::HumanTurn(void)
     		if(Game::Focus::HEROES == global_focus.Type() && global_focus.GetHeroes().isEnableMove())
     		    global_focus.GetHeroes().SetMove(false);
 
-		I.SetRedraw(REDRAW_GAMEAREA | REDRAW_RADAR);
+		I.SetRedraw(REDRAW_GAMEAREA | REDRAW_RADAR | REDRAW_CURSOR);
             }
 	    else
     	    if(Game::Focus::HEROES == global_focus.Type())
@@ -916,14 +920,14 @@ Game::menu_t Game::HumanTurn(void)
 		Heroes & hero = global_focus.GetHeroes();
 		if(hero.isEnableMove())
 		{
-        	    cursor.Hide();
 		    if(hero.Move())
 		    {
             		I.gameArea.Center(global_focus.Center());
             		global_focus.Reset(Focus::HEROES);
             		global_focus.SetRedraw();
 
-			cursor.SetThemes(GetCursor(world.GetTiles(I.gameArea.GetIndexFromMousePoint(le.GetMouseCursor()))));
+            		I.gameArea.SetUpdateCursor();
+			I.SetRedraw(REDRAW_CURSOR);
 		    }
 		    else
 		    {

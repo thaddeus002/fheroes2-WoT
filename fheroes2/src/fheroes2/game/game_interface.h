@@ -38,6 +38,7 @@ enum redraw_t
     REDRAW_STATUS    = 0x10,
     REDRAW_BORDER    = 0x20,
     REDRAW_GAMEAREA  = 0x40,
+    REDRAW_CURSOR    = 0x80,
 
     REDRAW_ICONS     = REDRAW_HEROES | REDRAW_CASTLES,
     REDRAW_ALL       = 0xFF
