@@ -21,7 +21,7 @@
 #include "agg.h"
 #include "settings.h"
 #include "game.h"
-#include "interface_gamearea.h"
+#include "game_interface.h"
 #include "ground.h"
 #include "world.h"
 #include "castle.h"
@@ -293,8 +293,6 @@ u32 GetPaletteIndexFromGround(const u16 ground)
 
 void Interface::Radar::QueueEventProcessing(void)
 {
-    Display & display = Display::Get();
-    Cursor & cursor = Cursor::Get();
     Interface::GameArea & gamearea = Interface::GameArea::Get();
     LocalEvent & le = LocalEvent::Get();
 
@@ -306,11 +304,8 @@ void Interface::Radar::QueueEventProcessing(void)
 	gamearea.Center((pt.x - x) * world.w() / w, (pt.y - y) * world.h() / h);
         if(prev != gamearea.GetRectMaps())
         {
-            cursor.Hide();
             RedrawCursor();
-            gamearea.Redraw();
-            cursor.Show();
-            display.Flip();
+            Interface::Basic::Get().SetRedraw(REDRAW_GAMEAREA);
         }
     }
 

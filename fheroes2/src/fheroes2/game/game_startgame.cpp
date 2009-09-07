@@ -220,8 +220,9 @@ Game::menu_t Game::StartGame(void)
     }
 
     // update starting resource
-    for(Color::color_t color = Color::BLUE; color != Color::GRAY; ++color) if(color & conf.PlayersColors())
-        world.GetKingdom(color).UpdateStartingResource();
+    if(!conf.Modes(Settings::LOADGAME))
+	for(Color::color_t color = Color::BLUE; color != Color::GRAY; ++color) if(color & conf.PlayersColors())
+    	    world.GetKingdom(color).UpdateStartingResource();
 
     // draw interface
     Interface::Basic & I = Interface::Basic::Get();
@@ -859,12 +860,6 @@ Game::menu_t Game::HumanTurn(void)
 	// scroll area maps bottom
 	if(le.MouseCursor(I.GetAreaScrollBottom())) I.gameArea.SetScroll(SCROLL_BOTTOM);
 	else
-	// cursor over game area
-	if(le.MouseCursor(I.gameArea.GetArea()))
-	{
-	    I.gameArea.QueueEventProcessing();
-	}
-	else
 	// cursor over radar
         if((!conf.HideInterface() || conf.ShowRadar()) &&
            le.MouseCursor(I.radar.GetArea()))
@@ -873,6 +868,7 @@ Game::menu_t Game::HumanTurn(void)
 	    I.radar.QueueEventProcessing();
 	    I.SetRedraw(REDRAW_CURSOR);
 	}
+	else
 	// cursor over icons panel
         if((!conf.HideInterface() || conf.ShowIcons()) &&
            le.MouseCursor(I.iconsPanel.GetArea()))
@@ -898,6 +894,12 @@ Game::menu_t Game::HumanTurn(void)
 	    cursor.SetThemes(Cursor::POINTER);
 	    I.statusWindow.QueueEventProcessing();
 	    I.SetRedraw(REDRAW_CURSOR);
+	}
+	else
+	// cursor over game area
+	if(le.MouseCursor(I.gameArea.GetArea()))
+	{
+	    I.gameArea.QueueEventProcessing();
 	}
 
 	// animation
