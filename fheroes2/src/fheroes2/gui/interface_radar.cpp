@@ -304,6 +304,7 @@ void Interface::Radar::QueueEventProcessing(void)
 	gamearea.Center((pt.x - x) * world.w() / w, (pt.y - y) * world.h() / h);
         if(prev != gamearea.GetRectMaps())
         {
+	    Cursor::Get().Hide();
             RedrawCursor();
             Interface::Basic::Get().SetRedraw(REDRAW_GAMEAREA);
         }

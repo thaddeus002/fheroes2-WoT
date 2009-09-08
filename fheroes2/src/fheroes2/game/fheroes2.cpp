@@ -231,7 +231,6 @@ int main(int argc, char **argv)
 	    }
 #endif
 
-Error::Verbose("1");
 	    // init cursor
 	    AGG::PreloadObject(ICN::ADVMCO);
 	    Cursor::Get().SetThemes(Cursor::POINTER);
