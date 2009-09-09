@@ -212,6 +212,10 @@ void Settings::Dump(std::ostream & stream) const
     stream << "unicode = " << (Modes(UNICODE) ? "on" : "off") << std::endl;
 #endif
 
+#ifndef WITH_MIXER
+    stream << "playmus command = " << playmus_command << std::endl;
+#endif
+
     stream << "autosave = " << (Modes(AUTOSAVE) ? "on" : "off") << std::endl;
     stream << "port = " << port << std::endl;
 
@@ -276,6 +280,8 @@ const ListMapsDirectory & Settings::GetListMapsDirectory(void) const { return li
 /* return path to locales directory */
 const std::string & Settings::LocalDataPrefix(void) const { return local_data_prefix; }
 
+const std::string & Settings::PlayMusCommand(void) const { return playmus_command; };
+
 /* return editor */
 bool Settings::Editor(void) const { return Modes(EDITOR); }
 
@@ -338,6 +344,8 @@ void Settings::Parse(const std::string & left, const std::string & right)
     // animation
     if(left == "animation") animation = String::ToInt(right);
     else
+    // playmus command
+    if(left == "playmus command") playmus_command = right;
     // port
     if(left == "port"){ port = String::ToInt(right); if(!port) port = DEFAULT_PORT; }
     else

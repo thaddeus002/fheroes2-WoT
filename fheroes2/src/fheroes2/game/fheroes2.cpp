@@ -284,7 +284,9 @@ int main(int argc, char **argv)
 	{
 	} catch(Error::Exception)
 	{
+#ifdef WITH_NET
             if(Game::NETWORK == conf.GameType()) Network::Logout();
+#endif
 	    conf.Dump();
 	}
 

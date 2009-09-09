@@ -44,10 +44,7 @@ bool SDL::Init(const u32 system)
 	return false;
     }
 
-#ifdef WITH_MIXER
     if(SDL_INIT_AUDIO & system) Mixer::Init();
-#endif
-
     if(SDL_INIT_CDROM & system) Cdrom::Open();
 
 #ifdef WITH_TTF
@@ -72,10 +69,7 @@ void SDL::Quit(void)
 #endif
 
     if(SubSystem(SDL_INIT_CDROM)) Cdrom::Close();
-
-#ifdef WITH_MIXER
     if(SubSystem(SDL_INIT_AUDIO)) Mixer::Quit();
-#endif
 
     SDL_Quit();
 }

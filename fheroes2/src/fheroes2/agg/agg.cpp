@@ -31,6 +31,8 @@
 #include "xmlccwrap.h"
 #include "string_util.h"
 
+void StoreMemToFile(const std::vector<u8> &, const std::string &);
+
 #define FATSIZENAME	15
 
 /*AGG::File constructor */
@@ -530,7 +532,7 @@ void AGG::Cache::LoadWAV(const M82::m82_t m82)
     if(! Mixer::isValid()) return;
 
     Audio::Spec wav_spec;
-    wav_spec.format = 8;
+    wav_spec.format = AUDIO_U8;
     wav_spec.channels = 1;
     wav_spec.freq = 22050;
 
@@ -1004,7 +1006,15 @@ void AGG::PlayMusic(const MUS::mus_t mus, bool loop)
 
     if(conf.Modes(Settings::MUSIC_EXT))
     {
-	if(MUS::UNUSED != mus && MUS::UNKNOWN != mus) Music::Play(AGG::Cache::Get().GetMUS(mus), loop);
+	if(MUS::UNUSED != mus && MUS::UNKNOWN != mus)
+	{
+#ifdef WITH_MIXER
+	    Music::Play(AGG::Cache::Get().GetMUS(mus), loop);
+#else
+	    const std::string run = conf.PlayMusCommand() + " " + conf.LocalDataPrefix() + SEPARATOR + "music" + SEPARATOR + MUS::GetString(mus);
+	    Music::Play(run.c_str(), loop);
+#endif
+	}
 	if(conf.Debug()) Error::Verbose("AGG::PlayMusic: " + MUS::GetString(mus));
     }
     else
@@ -1016,7 +1026,20 @@ void AGG::PlayMusic(const MUS::mus_t mus, bool loop)
     else
     {
 	XMI::xmi_t xmi = XMI::FromMUS(mus);
-	if(XMI::UNKNOWN != xmi) Music::Play(AGG::Cache::Get().GetMID(xmi), loop);
+	if(XMI::UNKNOWN != xmi)
+	{
+#ifdef WITH_MIXER
+	    Music::Play(AGG::Cache::Get().GetMID(xmi), loop);
+#else
+	    if(conf.PlayMusCommand().size())
+	    {
+		const std::string file = conf.LocalDataPrefix() + SEPARATOR + "cache" + SEPARATOR + XMI::GetString(xmi);
+		StoreMemToFile(AGG::Cache::Get().GetMID(xmi), file);
+		const std::string run = conf.PlayMusCommand() + " " + file;
+		Music::Play(run.c_str(), loop);
+	    }
+#endif
+	}
         else Music::Reset();
 	if(conf.Debug()) Error::Verbose("AGG::PlayMusic: ", XMI::GetString(xmi));
     }
@@ -1049,4 +1072,24 @@ const Surface & AGG::GetLetter(char ch, u8 ft)
     }
 
     return AGG::GetICN(ICN::SMALFONT, ch - 0x20);
+}
+
+void StoreMemToFile(const std::vector<u8> & data, const std::string & file)
+{
+    std::fstream fs;
+    
+    // check file
+    fs.open(file.c_str(), std::ios::in | std::ios::binary);
+    if(fs.is_open())
+    {
+	fs.close();
+	return;
+    }
+    fs.clear();
+    fs.open(file.c_str(), std::ios::out | std::ios::binary);
+    if(!fs.fail() && data.size())
+    {
+	fs.write(reinterpret_cast<const char*>(&data[0]), data.size());
+	fs.close();
+    }
 }

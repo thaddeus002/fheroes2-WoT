@@ -18,9 +18,11 @@
  ***************************************************************************/
 
 #include "error.h"
-#include "SDL_mixer.h"
 #include "audio_mixer.h"
 #include "audio_music.h"
+
+#ifdef WITH_MIXER
+#include "SDL_mixer.h"
 
 namespace Music
 {
@@ -43,6 +45,10 @@ void Music::Play(const std::vector<u8> & body, bool loop)
             Mix_PlayMusic(music, loop ? -1 : 0);
         }
     }
+}
+
+void Music::Play(const char*, bool)
+{
 }
 
 /* range 0 - 10 */
@@ -87,3 +93,78 @@ void Music::Reset(void)
         id = NULL;
     }
 }
+
+#else
+
+#include <cstdlib>
+#include "thread.h"
+
+struct info_t
+{
+    info_t() : run(NULL), loop(false){};
+    const char* run;
+    bool loop;
+};
+
+namespace Music
+{
+    Thread music;
+    info_t info;
+};
+
+int callbackPlayMusic(void *ptr)
+{
+    if(ptr && std::system(NULL))
+    {
+	info_t & info = *reinterpret_cast<info_t *>(ptr);
+	if(info.loop)
+	{
+	    while(1){ std::system(info.run); }
+	}
+	else
+	return std::system(info.run);
+    }
+    return -1;
+}
+
+void Music::Play(const std::vector<u8> &, bool)
+{
+}
+
+void Music::Play(const char* run, bool loop)
+{
+    info.run = run;
+    info.loop = loop;
+    if(music.IsRun()) music.Kill();
+    music.Create(callbackPlayMusic, &info);
+}
+
+u8 Music::Volume(int vol)
+{
+    return 0;
+}
+
+void Music::Pause(void)
+{
+}
+
+void Music::Resume(void)
+{
+}
+
+bool Music::isPlaying(void)
+{
+    return music.IsRun();
+}
+
+bool Music::isPaused(void)
+{
+    return false;
+}
+
+void Music::Reset(void)
+{
+    if(music.IsRun()) music.Kill();
+}
+
+#endif

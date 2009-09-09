@@ -93,6 +93,7 @@ public:
 
     const std::string & DataDirectory(void) const;
     const std::string & LocalDataPrefix(void) const;
+    const std::string & PlayMusCommand(void) const;
 
     const ListMapsDirectory & GetListMapsDirectory(void) const;
 
@@ -229,6 +230,8 @@ private:
     u8 preferably_count_players;
     u8 current_kingdom_colors;
     u16 game_over_result;
+
+    std::string playmus_command;
 
     u16 port;
 };

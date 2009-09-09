@@ -25,7 +25,8 @@
 
 namespace Music
 {
-    void	Play(const std::vector<u8> & body, bool loop);
+    void	Play(const std::vector<u8> &, bool);
+    void	Play(const char*, bool);
     u8		Volume(int);
     void	Pause(void);
     void	Resume(void);
