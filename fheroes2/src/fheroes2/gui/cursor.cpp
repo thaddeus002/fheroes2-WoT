@@ -43,6 +43,7 @@ Cursor::themes_t Cursor::Themes(void)
 /* set cursor theme */
 bool Cursor::SetThemes(const Cursor::themes_t name)
 {
+    if(isVisible()) Hide();
     if(theme != name)
     {
 	theme = name;
