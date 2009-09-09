@@ -32,6 +32,7 @@
 #include "string_util.h"
 
 void StoreMemToFile(const std::vector<u8> &, const std::string &);
+bool FilePresent(const std::string &);
 
 #define FATSIZENAME	15
 
@@ -1011,8 +1012,12 @@ void AGG::PlayMusic(const MUS::mus_t mus, bool loop)
 #ifdef WITH_MIXER
 	    Music::Play(AGG::Cache::Get().GetMUS(mus), loop);
 #else
-	    const std::string run = conf.PlayMusCommand() + " " + conf.LocalDataPrefix() + SEPARATOR + "music" + SEPARATOR + MUS::GetString(mus);
-	    Music::Play(run.c_str(), loop);
+	    const std::string file = conf.LocalDataPrefix() + SEPARATOR + "music" + SEPARATOR + MUS::GetString(mus);
+	    if(FilePresent(file))
+	    {
+		const std::string run = conf.PlayMusCommand() + " " + file;
+		Music::Play(run.c_str(), loop);
+	    }
 #endif
 	}
 	if(conf.Debug()) Error::Verbose("AGG::PlayMusic: " + MUS::GetString(mus));
@@ -1035,8 +1040,11 @@ void AGG::PlayMusic(const MUS::mus_t mus, bool loop)
 	    {
 		const std::string file = conf.LocalDataPrefix() + SEPARATOR + "cache" + SEPARATOR + XMI::GetString(xmi);
 		StoreMemToFile(AGG::Cache::Get().GetMID(xmi), file);
-		const std::string run = conf.PlayMusCommand() + " " + file;
-		Music::Play(run.c_str(), loop);
+		if(FilePresent(file))
+		{
+		    const std::string run = conf.PlayMusCommand() + " " + file;
+		    Music::Play(run.c_str(), loop);
+		}
 	    }
 #endif
 	}
@@ -1074,18 +1082,23 @@ const Surface & AGG::GetLetter(char ch, u8 ft)
     return AGG::GetICN(ICN::SMALFONT, ch - 0x20);
 }
 
-void StoreMemToFile(const std::vector<u8> & data, const std::string & file)
+bool FilePresent(const std::string & file)
 {
     std::fstream fs;
-    
     // check file
     fs.open(file.c_str(), std::ios::in | std::ios::binary);
     if(fs.is_open())
     {
 	fs.close();
-	return;
+	return true;
     }
-    fs.clear();
+    return false;
+}
+
+void StoreMemToFile(const std::vector<u8> & data, const std::string & file)
+{
+    if(FilePresent(file)) return;
+    std::fstream fs;
     fs.open(file.c_str(), std::ios::out | std::ios::binary);
     if(!fs.fail() && data.size())
     {
