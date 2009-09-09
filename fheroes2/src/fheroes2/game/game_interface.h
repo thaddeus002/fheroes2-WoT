@@ -46,7 +46,6 @@ enum redraw_t
 
 namespace Interface
 {
-
     class Basic
     {
     public:
@@ -77,6 +76,11 @@ namespace Interface
 	Rect scrollRight;
 	Rect scrollBottom;
 	Rect scrollTop;
+	
+	Rect controlRadar;
+	Rect controlIcons;
+	Rect controlButtons;
+	Rect controlStatus;
     };
 };
 

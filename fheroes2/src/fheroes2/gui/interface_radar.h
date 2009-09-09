@@ -21,6 +21,7 @@
 #ifndef H2INTERFACE_RADAR_H
 #define H2INTERFACE_RADAR_H
 
+#include "dialog.h"
 #include "gamedefs.h"
 
 namespace Interface
@@ -59,6 +60,8 @@ namespace Interface
 	Surface* sf_purple;
         Surface* sf_gray;
 	Surface* sf_black;
+
+	Dialog::FrameBorder border;
     };
 };
 

@@ -23,6 +23,7 @@
 
 #include "gamedefs.h"
 #include "button.h"
+#include "dialog.h"
 
 namespace Interface
 {
@@ -48,6 +49,8 @@ namespace Interface
 	Button	buttonAdventure;
 	Button	buttonFile;
 	Button	buttonSystem;
+
+	Dialog::FrameBorder border;
     };
 };
 

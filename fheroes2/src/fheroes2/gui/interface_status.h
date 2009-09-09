@@ -24,6 +24,7 @@
 #include "gamedefs.h"
 #include "thread.h"
 #include "resource.h"
+#include "dialog.h"
 
 class Surface;
 class Castle;
@@ -65,6 +66,8 @@ namespace Interface
 	Resource::resource_t lastResource;
 	u16                  countLastResource;
 	Timer                timerShowLastResource;
+	
+	Dialog::FrameBorder border;
     };
 };
 

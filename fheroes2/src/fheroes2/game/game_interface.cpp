@@ -31,10 +31,20 @@ Interface::Basic::Basic() : gameArea(GameArea::Get()), radar(Radar::Get()),
     const Display & display = Display::Get();
     const u16 & px = display.w() - BORDERWIDTH - RADARWIDTH;
 
-    radar.SetPos(px, BORDERWIDTH);
-    iconsPanel.SetPos(px, radar.GetArea().y + radar.GetArea().h + BORDERWIDTH);
-    buttonsArea.SetPos(px, iconsPanel.GetArea().y + iconsPanel.GetArea().h + BORDERWIDTH);
-    statusWindow.SetPos(px, buttonsArea.GetArea().y + buttonsArea.GetArea().h);
+    if(Settings::Get().HideInterface())
+    {
+	radar.SetPos(px - BORDERWIDTH, 0);
+	iconsPanel.SetPos(px - BORDERWIDTH, radar.GetArea().y + radar.GetArea().h);
+	buttonsArea.SetPos(px - BORDERWIDTH, iconsPanel.GetArea().y + iconsPanel.GetArea().h);
+	statusWindow.SetPos(px - BORDERWIDTH, buttonsArea.GetArea().y + buttonsArea.GetArea().h);
+    }
+    else
+    {
+	radar.SetPos(px, BORDERWIDTH);
+	iconsPanel.SetPos(px, radar.GetArea().y + radar.GetArea().h + BORDERWIDTH);
+	buttonsArea.SetPos(px, iconsPanel.GetArea().y + iconsPanel.GetArea().h + BORDERWIDTH);
+	statusWindow.SetPos(px, buttonsArea.GetArea().y + buttonsArea.GetArea().h);
+    }
 
     scrollLeft = Rect(0, 0, BORDERWIDTH, display.h());
     scrollRight = Rect(display.w() - BORDERWIDTH, 0, BORDERWIDTH, display.h());

@@ -76,13 +76,22 @@ Interface::Radar::~Radar()
 
 void Interface::Radar::SetPos(s16 px, s16 py)
 {
-    Rect::x = px;
-    Rect::y = py;
+    if(Settings::Get().HideInterface())
+    {
+	Rect::x = px + BORDERWIDTH;
+	Rect::y = py + BORDERWIDTH;
+	border.SetPosition(px, py, Rect::w, Rect::h);
+    }
+    else
+    {
+	Rect::x = px;
+	Rect::y = py;
+    }
 }
 
 const Rect & Interface::Radar::GetArea(void) const
 {
-    return *this;
+    return Settings::Get().HideInterface() ? border.GetRect() : *this;
 }
 
 /* construct gui */
@@ -177,6 +186,13 @@ void Interface::Radar::Redraw(void)
 {
     RedrawArea(Settings::Get().MyColor());
     RedrawCursor();
+
+    // redraw border
+    const Settings & conf = Settings::Get();
+    if(conf.HideInterface() && conf.ShowRadar())
+    {
+	border.Redraw();
+    }
 }
 
 /* redraw radar area for color */

@@ -23,6 +23,7 @@
 
 #include "gamedefs.h"
 #include "button.h"
+#include "dialog.h"
 #include "splitter.h"
 
 namespace Interface
@@ -138,6 +139,7 @@ namespace Interface
 	CastleIcons castleIcons;
 
 	u8      count_icons;
+	Dialog::FrameBorder border;
     };
 };
 

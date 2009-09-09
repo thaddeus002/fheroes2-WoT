@@ -153,7 +153,8 @@ public:
 
     void SetPosition(s16, s16, u16 = 0, u16 = 0);
     void Redraw(void);
-    const Rect & GetArea(void);
+    const Rect & GetRect(void) const;
+    const Rect & GetArea(void) const;
 
 private:
     Rect area;

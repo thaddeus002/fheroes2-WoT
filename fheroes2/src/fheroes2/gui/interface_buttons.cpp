@@ -50,13 +50,22 @@ Interface::ButtonsArea & Interface::ButtonsArea::Get(void)
 
 const Rect & Interface::ButtonsArea::GetArea(void)
 {
-    return *this;
+    return Settings::Get().HideInterface() ? border.GetRect() : *this;
 }
 
 void Interface::ButtonsArea::SetPos(s16 ox, s16 oy)
 {
-    Rect::x = ox;
-    Rect::y = oy;
+    if(Settings::Get().HideInterface())
+    {
+	Rect::x = ox + BORDERWIDTH;
+        Rect::y = oy + BORDERWIDTH;
+        border.SetPosition(ox, oy, Rect::w, Rect::h);
+    }
+    else
+    {
+	Rect::x = ox;
+	Rect::y = oy;
+    }
 
     const ICN::icn_t icnbtn = Settings::Get().EvilInterface() ? ICN::ADVEBTNS : ICN::ADVBTNS;
 
@@ -68,6 +77,9 @@ void Interface::ButtonsArea::SetPos(s16 ox, s16 oy)
     buttonAdventure.SetSprite(icnbtn, 10, 11);
     buttonFile.SetSprite(icnbtn, 12, 13);
     buttonSystem.SetSprite(icnbtn, 14, 15);
+
+    ox = Rect::x;
+    oy = Rect::y;
 
     buttonNextHero.SetPos(ox, oy);
     buttonMovement.SetPos(buttonNextHero.x + buttonNextHero.w, oy);
@@ -106,6 +118,9 @@ void Interface::ButtonsArea::Redraw(void)
     buttonAdventure.Draw();
     buttonFile.Draw();
     buttonSystem.Draw();
+
+    // redraw border
+    if(conf.HideInterface()) border.Redraw();
 }
 
 void Interface::ButtonsArea::QueueEventProcessing(Game::menu_t & ret)

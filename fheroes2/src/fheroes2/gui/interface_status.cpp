@@ -61,14 +61,24 @@ u32 Interface::StatusWindow::ResetResourceStatus(u32 tick, void *ptr)
 
 void Interface::StatusWindow::SetPos(s16 px, s16 py)
 {
-    Rect::x = px;
-    Rect::y = py;
-    Rect::h = Display::Get().h() - py - BORDERWIDTH;
+    if(Settings::Get().HideInterface())
+    {
+	Rect::x = px + BORDERWIDTH;
+	Rect::y = py + BORDERWIDTH;
+	Rect::h = Display::Get().h() - py - BORDERWIDTH;
+	border.SetPosition(px, py, Rect::w, Rect::h);
+    }
+    else
+    {
+	Rect::x = px;
+	Rect::y = py;
+	Rect::h = Display::Get().h() - py - BORDERWIDTH;
+    }
 }
 
 const Rect & Interface::StatusWindow::GetArea(void) const
 {
-    return *this;
+    return Settings::Get().HideInterface() ? border.GetRect() : *this;
 }
 
 void Interface::StatusWindow::SetState(info_t info)
@@ -105,6 +115,9 @@ void Interface::StatusWindow::Redraw(void)
         case STATUS_RESOURCE:   DrawResourceInfo();     break;
 	default: break;
     }
+    
+    // redraw border
+    if(conf.HideInterface()) border.Redraw();
 }
 
 void Interface::StatusWindow::NextState(void)

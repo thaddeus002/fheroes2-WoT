@@ -602,7 +602,7 @@ Interface::IconsPanel & Interface::IconsPanel::Get(void)
 
 const Rect & Interface::IconsPanel::GetArea(void) const
 {
-    return *this;
+    return Settings::Get().HideInterface() ? border.GetRect() : *this;
 }
 
 u8 Interface::IconsPanel::CountIcons(void) const
@@ -612,8 +612,20 @@ u8 Interface::IconsPanel::CountIcons(void) const
 
 void Interface::IconsPanel::SetPos(s16 ox, s16 oy)
 {
-    Rect::x = ox;
-    Rect::y = oy;
+    if(Settings::Get().HideInterface())
+    {
+        Rect::x = ox + BORDERWIDTH;
+        Rect::y = oy + BORDERWIDTH;
+        border.SetPosition(ox, oy, Rect::w, Rect::h);
+    }
+    else
+    {
+	Rect::x = ox;
+	Rect::y = oy;
+    }
+
+    ox = Rect::x;
+    oy = Rect::y;
 
     Display & display = Display::Get();
     const ICN::icn_t icnscroll = Settings::Get().EvilInterface() ? ICN::SCROLLE : ICN::SCROLL;
@@ -705,6 +717,9 @@ void Interface::IconsPanel::Redraw(void)
 
     heroesIcons.Redraw();
     castleIcons.Redraw();        
+
+    // redraw border
+    if(conf.HideInterface()) border.Redraw();
 }
 
 void Interface::IconsPanel::QueueEventProcessing(void)

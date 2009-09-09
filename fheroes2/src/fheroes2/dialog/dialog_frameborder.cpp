@@ -49,14 +49,19 @@ void Dialog::FrameBorder::SetPosition(s16 posx, s16 posy, u16 encw, u16 ench)
     area = Rect(posx + BORDERWIDTH, posy + BORDERWIDTH, encw - BORDERWIDTH * 2, ench - BORDERWIDTH * 2);
 }
 
-const Rect & Dialog::FrameBorder::GetArea(void)
+const Rect & Dialog::FrameBorder::GetRect(void) const
+{
+    return Background::GetRect();
+}
+
+const Rect & Dialog::FrameBorder::GetArea(void) const
 {
     return area;
 }
 
 void Dialog::FrameBorder::Redraw(void)
 {
-    DrawBorder(area.x - BORDERWIDTH, area.y - BORDERWIDTH, GetRect().w, GetRect().h, Display::Get());
+    DrawBorder(GetRect().x, GetRect().y, GetRect().w, GetRect().h, Display::Get());
 }
 
 Dialog::FrameBorder::~FrameBorder()
