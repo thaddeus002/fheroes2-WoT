@@ -140,7 +140,7 @@ public:
     static void SetState(u8 type, bool enable);
     static u8   GetState(u8 type);
 
-    bool HandleEvents(void);
+    bool HandleEvents(bool delay = true);
 
     bool MouseMotion(void) const;
     bool MouseMotion(const Rect &rt) const;

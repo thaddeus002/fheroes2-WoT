@@ -151,7 +151,7 @@ LocalEvent & LocalEvent::Get(void)
     return le;
 }
 
-bool LocalEvent::HandleEvents(void)
+bool LocalEvent::HandleEvents(bool delay)
 {
     SDL_Event event;
 
@@ -189,7 +189,7 @@ bool LocalEvent::HandleEvents(void)
 	if(SDL_QUIT == event.type){ Error::Except(" quit event: ok."); return false; }
     }
 
-    SDL_Delay(1);
+    if(delay) SDL_Delay(1);
 
     return true;
 }

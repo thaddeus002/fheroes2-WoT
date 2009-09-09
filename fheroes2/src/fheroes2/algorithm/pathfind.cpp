@@ -77,6 +77,14 @@ u16 PathGetApproximateDistance(const u16 index1, const u16 index2)
         std::abs(static_cast<s16>(index1 / world.w()) - static_cast<s16>(index2 / world.w()));
 }
 
+u16 GetCurrentLength(std::map<u16, cell_t> & list, u16 cur)
+{
+    u16 res = 0;
+    const cell_t* cell = &list[cur];
+    while(MAXU16 != cell->parent){ cell = &list[cell->parent]; ++res; };
+    return res;
+}
+
 bool Algorithm::PathFind(std::list<Route::Step> *result, const u16 from, const u16 to, const u16 limit, const Heroes *hero)
 {
     const u8 debug = Settings::Get().Debug();
@@ -97,13 +105,12 @@ bool Algorithm::PathFind(std::list<Route::Step> *result, const u16 from, const u
     list[cur].parent = MAXU16;
     list[cur].open   = false;
 
-    u32 itr = 0;
     u16 mons = 0;
     cell_t cell;
 
     while(cur != to)
     {
-	LocalEvent::Get().HandleEvents();
+	LocalEvent::Get().HandleEvents(false);
 
 	for(direct = Direction::TOP_LEFT; direct != Direction::CENTER; ++direct)
 	{
@@ -177,7 +184,7 @@ bool Algorithm::PathFind(std::list<Route::Step> *result, const u16 from, const u
 		direct = Direction::Get(cur, (*it1).first);
 		if(Direction::UNKNOWN != direct)
 		{
-		    std::cout << "  direct: " << Direction::String(Direction::Get(cur, (*it1).first));
+		    std::cout << "  direct: " << Direction::String(direct);
 		    std::cout << ", index: " << (*it1).first;
 		    std::cout << ", cost g: " << cell2.cost_g;
 		    std::cout << ", cost t: " << cell2.cost_t;
@@ -194,7 +201,7 @@ bool Algorithm::PathFind(std::list<Route::Step> *result, const u16 from, const u
 	}
 
 	// not found, and exception
-	if(MAXU16 == tmp || MAXU16 == alt || (limit && itr > limit)) break;
+	if(MAXU16 == tmp || MAXU16 == alt || (limit && GetCurrentLength(list, cur) > limit)) break;
 	else
 	if(3 <= debug)
 	{
@@ -202,7 +209,6 @@ bool Algorithm::PathFind(std::list<Route::Step> *result, const u16 from, const u
 	}
 
 	cur = alt;
-	++itr;
     }
 
     // save path

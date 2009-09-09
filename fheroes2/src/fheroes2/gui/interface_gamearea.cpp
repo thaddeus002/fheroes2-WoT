@@ -669,6 +669,7 @@ void Interface::GameArea::SetScroll(scroll_t direct)
 	case SCROLL_BOTTOM:	if(world.h() - rectMaps.h > rectMaps.y) scrollDirection |= direct;	break;
 	default: break;
     }
+    SetUpdateCursor();
 }
 
 /* convert area point to index maps */

@@ -1516,7 +1516,7 @@ void Heroes::SetCenter(const u16 index)
 u8 Heroes::GetRangeRouteDays(const u16 dst) const
 {
     const u32 max = GetMaxMovePoints();
-    const u16 limit = 1024;
+    const u16 limit = max * 5 / 100; // limit ~5 day
 
     // approximate distance, this restriction calculation
     if((4 * max / 100) < Maps::GetApproximateDistance(GetIndex(), dst))
