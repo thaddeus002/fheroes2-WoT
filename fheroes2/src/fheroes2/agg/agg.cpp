@@ -1016,7 +1016,7 @@ void AGG::PlayMusic(const MUS::mus_t mus, bool loop)
 	    if(FilePresent(file))
 	    {
 		const std::string run = conf.PlayMusCommand() + " " + file;
-		Music::Play(run.c_str(), loop);
+		Music::Play(run, loop);
 	    }
 #endif
 	}
@@ -1043,7 +1043,7 @@ void AGG::PlayMusic(const MUS::mus_t mus, bool loop)
 		if(FilePresent(file))
 		{
 		    const std::string run = conf.PlayMusCommand() + " " + file;
-		    Music::Play(run.c_str(), loop);
+		    Music::Play(run, loop);
 		}
 	    }
 #endif

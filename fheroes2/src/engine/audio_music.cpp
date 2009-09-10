@@ -101,8 +101,8 @@ void Music::Reset(void)
 
 struct info_t
 {
-    info_t() : run(NULL), loop(false){};
-    const char* run;
+    info_t() : loop(false){};
+    std::string run;
     bool loop;
 };
 
@@ -119,10 +119,10 @@ int callbackPlayMusic(void *ptr)
 	info_t & info = *reinterpret_cast<info_t *>(ptr);
 	if(info.loop)
 	{
-	    while(1){ std::system(info.run); }
+	    while(1){ std::system(info.run.c_str()); DELAY(10); }
 	}
 	else
-	return std::system(info.run);
+	return std::system(info.run.c_str());
     }
     return -1;
 }
@@ -130,13 +130,18 @@ int callbackPlayMusic(void *ptr)
 void Music::Play(const std::vector<u8> &, bool)
 {
 }
-
-void Music::Play(const char* run, bool loop)
+#include <iostream>
+void Music::Play(const std::string & run, bool loop)
 {
+    if(music.IsRun())
+    {
+	if(info.run == run) return;
+	music.Kill();
+    }
     info.run = run;
     info.loop = loop;
-    if(music.IsRun()) music.Kill();
     music.Create(callbackPlayMusic, &info);
+    std::cout << run << std::endl;
 }
 
 u8 Music::Volume(int vol)

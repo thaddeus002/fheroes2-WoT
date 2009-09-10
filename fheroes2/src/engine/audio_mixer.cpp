@@ -270,6 +270,8 @@ void Mixer::Enhance(void)
 
 #else
 
+#include <algorithm>
+
 enum { MIX_PLAY = 0x01, MIX_LOOP = 0x02, };
 
 struct chunk_t

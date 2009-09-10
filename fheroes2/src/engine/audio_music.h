@@ -21,12 +21,13 @@
 #define H2AUDIO_MUSIC_H
 
 #include <vector>
+#include <string>
 #include "types.h"
 
 namespace Music
 {
     void	Play(const std::vector<u8> &, bool);
-    void	Play(const char*, bool);
+    void	Play(const std::string &, bool);
     u8		Volume(int);
     void	Pause(void);
     void	Resume(void);
