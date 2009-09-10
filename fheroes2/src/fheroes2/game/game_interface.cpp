@@ -43,11 +43,12 @@ Interface::Basic::Basic() : gameArea(GameArea::Get()), radar(Radar::Get()),
     {
 	radar.SetPos(px, BORDERWIDTH);
 	iconsPanel.SetPos(px, radar.GetArea().y + radar.GetArea().h + BORDERWIDTH);
-	buttonsArea.SetPos(px, iconsPanel.GetArea().y + iconsPanel.GetArea().h + BORDERWIDTH);
-	statusWindow.SetPos(px, buttonsArea.GetArea().y + buttonsArea.GetArea().h);
 
         const u8 count_h = (display.h() - 480) / TILEWIDTH;
         iconsPanel.SetCount(count_h > 3 ? 8 : ( count_h < 3 ? 4 : 7));
+
+	buttonsArea.SetPos(px, iconsPanel.GetArea().y + iconsPanel.GetArea().h + BORDERWIDTH);
+	statusWindow.SetPos(px, buttonsArea.GetArea().y + buttonsArea.GetArea().h);
     }
 
     scrollLeft = Rect(0, 0, BORDERWIDTH, display.h());

@@ -440,15 +440,16 @@ void Settings::Parse(const std::string & left, const std::string & right)
 		possible_w *= TILEWIDTH;
 		possible_h *= TILEWIDTH;
 
-#ifdef BUILD_RELEASE
-		if(possible_w < 640) possible_w = 640;
-		if(possible_h < 480) possible_h = 480;
-
 		std::cout << "Settings: unknown videomode: " << video_mode.w << "x" << video_mode.h << ", approximate load: " << possible_w << "x" << possible_h << std::endl;
-#else
+
 		if(possible_w < 640 || possible_h < 480)
-		    std::cout << "Settings: experimantal videomode: " << possible_w << "x" << possible_h << std::endl;
-#endif
+		{
+		    SetModes(HIDEINTERFACE);
+    		    SetModes(SHOWRADAR);
+    		    ResetModes(SHOWICONS);
+    		    ResetModes(SHOWBUTTONS);
+    		    ResetModes(SHOWSTATUS);
+		}
 
 		video_mode.w = possible_w;
 		video_mode.h = possible_h;
