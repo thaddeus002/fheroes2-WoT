@@ -125,8 +125,19 @@ u16 Dialog::Message(const std::string &header, const std::string &message, Font:
         if(button2 && le.MouseClickLeft(*button2)){ result = result2; break; }
 
 	if(le.KeyPress(KEY_RETURN)){ result = result1; break; }
-	
+	else
 	if(le.KeyPress(KEY_ESCAPE)){ result = result2; break; }
+
+	if(buttons == (YES|NO))
+	{
+	    if(le.KeyPress(KEY_y)){ result = result1; break; }
+    	    if(le.KeyPress(KEY_n)){ result = result2; break; }
+	}
+	else
+	if( buttons == OK || buttons == CANCEL)
+	{
+	    if(le.KeyPress(KEY_SPACE)){ result = buttons; break; }
+	}
     }
 
     cursor.SetThemes(oldthemes);

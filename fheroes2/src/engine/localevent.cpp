@@ -48,6 +48,7 @@ static KeySym SDLToKeySym(SDLKey key)
 	default: break;
 	case SDLK_ESCAPE:	return KEY_ESCAPE;
 	case SDLK_RETURN:	return KEY_RETURN;
+	case SDLK_KP_ENTER:	return KEY_RETURN;
 	case SDLK_BACKSPACE:	return KEY_BACKSPACE;
 	case SDLK_EXCLAIM:    	return KEY_EXCLAIM;
 	case SDLK_QUOTEDBL:    	return KEY_QUOTEDBL;

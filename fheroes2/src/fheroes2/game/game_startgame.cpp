@@ -69,10 +69,10 @@ namespace Game
     void ButtonAdventure(Game::menu_t &);
     void ButtonFile(Game::menu_t &);
     void ButtonSystem(void);
+    void StartNewGame(Game::menu_t &);
 
     void KeyPress_ESC(menu_t &);
     void KeyPress_e(menu_t &);
-    void KeyPress_h(void);
     void KeyPress_t(void);
     void KeyPress_s(void);
     void KeyPress_l(menu_t &);
@@ -827,7 +827,7 @@ Game::menu_t Game::HumanTurn(void)
     	    // end turn
 	    case KEY_e:		KeyPress_e(res); break;
     	    // next hero
-	    case KEY_h:		KeyPress_h(); break;
+	    case KEY_h:		ButtonNextHero(); break;
     	    // next town
 	    case KEY_t:		KeyPress_t(); break;
 	    // save game
@@ -844,6 +844,12 @@ Game::menu_t Game::HumanTurn(void)
 	    case KEY_SPACE:	KeyPress_SPACE(); break;
 	    // hero/town dialog
 	    case KEY_RETURN:	KeyPress_RETURN(); break;
+	    // hero movement
+	    case KEY_m:		ButtonMovement(); break;
+	    // system options
+	    case KEY_o:		ButtonSystem(); break;
+	    // new game
+	    case KEY_n:		StartNewGame(res); break;
 	    // scroll
 	    case KEY_LEFT:	KeyPress_LEFT(); break;
 	    case KEY_RIGHT:	KeyPress_RIGHT(); break;
@@ -1272,6 +1278,12 @@ void Game::ButtonAdventure(Game::menu_t & ret)
     Mixer::Enhance();
 }
 
+void Game::StartNewGame(Game::menu_t & ret)
+{
+    if(Dialog::YES == Dialog::Message("", _("Are you sure you want to restart? (Your current game will be lost)"), Font::BIG, Dialog::YES|Dialog::NO))
+	ret = NEWGAME;
+}
+
 void Game::ButtonFile(Game::menu_t & ret)
 {
     Mixer::Reduce();
@@ -1280,8 +1292,7 @@ void Game::ButtonFile(Game::menu_t & ret)
     switch(Dialog::FileOptions())
     {
 	case NEWGAME:
-	    if(Dialog::YES == Dialog::Message("", _("Are you sure you want to restart? (Your current game will be lost)"), Font::BIG, Dialog::YES|Dialog::NO))
-		ret = NEWGAME;
+	    StartNewGame(ret);
 	    break;
 
 	case QUITGAME:
@@ -1331,28 +1342,6 @@ void Game::KeyPress_ESC(menu_t & ret)
 void Game::KeyPress_e(menu_t & ret)
 {
     ButtonEndTurn(ret);
-}
-
-void Game::KeyPress_h(void)
-{
-    Kingdom & myKingdom = world.GetMyKingdom();
-    std::vector<Heroes *> & myHeroes = myKingdom.GetHeroes();
-
-    if(myHeroes.size())
-    {
-	Focus & global_focus = Focus::Get();
-
-	if(Game::Focus::HEROES != global_focus.Type())
-	    global_focus.Reset(Game::Focus::HEROES);
-	else
-	{
-	    std::vector<Heroes *>::const_iterator it = std::find(myHeroes.begin(), myHeroes.end(), &global_focus.GetHeroes());
-    	    ++it;
-    	    if(it == myHeroes.end()) it = myHeroes.begin();
-	    global_focus.Set(*it);
-	}
-        global_focus.SetRedraw();
-    }
 }
 
 void Game::KeyPress_t(void)
