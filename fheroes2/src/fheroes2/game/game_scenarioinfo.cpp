@@ -48,6 +48,7 @@ Game::menu_t Game::ScenarioInfo(void)
     AGG::PlayMusic(MUS::MAINMENU);
 
     Settings & conf = Settings::Get();
+    conf.SetPreferablyCountPlayers(0);
 
     MapsFileInfoList lists;
     if(!PrepareMapsFileInfoList(lists))
