@@ -51,7 +51,7 @@
 u32 GetPaletteIndexFromGround(const u16 ground);
 
 /* constructor */
-Interface::Radar::Radar() : spriteArea(NULL), spriteCursor(NULL), cursor(NULL),
+Interface::Radar::Radar() : spriteArea(NULL), spriteCursor(NULL), cursorArea(NULL),
     sf_blue(NULL), sf_green(NULL), sf_red(NULL), sf_yellow(NULL),
     sf_orange(NULL), sf_purple(NULL), sf_gray(NULL), sf_black(NULL)
 {
@@ -61,7 +61,7 @@ Interface::Radar::Radar() : spriteArea(NULL), spriteCursor(NULL), cursor(NULL),
 
 Interface::Radar::~Radar()
 {
-    if(cursor) delete cursor;
+    if(cursorArea) delete cursorArea;
     if(spriteArea) delete spriteArea;
     if(spriteCursor) delete spriteCursor;
     if(sf_blue) delete sf_blue;
@@ -78,6 +78,11 @@ void Interface::Radar::SetPos(s16 px, s16 py)
 {
     if(Settings::Get().HideInterface())
     {
+	// fix out of range
+	Display & display = Display::Get();
+	if(px + Rect::w < 0 || px > display.w()) px = 0;
+	if(py + Rect::h < 0 || py > display.h()) py = 0;
+
 	Rect::x = px + BORDERWIDTH;
 	Rect::y = py + BORDERWIDTH;
 	border.SetPosition(px, py, Rect::w, Rect::h);
@@ -97,7 +102,7 @@ const Rect & Interface::Radar::GetArea(void) const
 /* construct gui */
 void Interface::Radar::Build(void)
 {
-    if(cursor) delete cursor;
+    if(cursorArea) delete cursorArea;
     if(spriteArea) delete spriteArea;
     if(spriteCursor) delete spriteCursor;
     if(sf_blue) delete sf_blue;
@@ -114,7 +119,7 @@ void Interface::Radar::Build(void)
     const u16 & sw = static_cast<u16>(sizeArea.w * (w / static_cast<float>(world.w())));
     const u16 & sh = static_cast<u16>(sizeArea.h * (h / static_cast<float>(world.h())));
     spriteCursor = new Surface(sw, sh);
-    cursor = new SpriteCursor(*spriteCursor, x, y);
+    cursorArea = new SpriteCursor(*spriteCursor, x, y);
 
     const u8 n = world.w() == Maps::SMALL ? 4 : 2;
     sf_blue = new Surface(n, n);
@@ -206,7 +211,7 @@ void Interface::Radar::RedrawArea(const u8 color)
     const u16 world_h = world.h();
     const Surface *tile_surface = NULL;
 
-    cursor->Hide();
+    cursorArea->Hide();
     display.Blit(*spriteArea, x, y);
 
     for(u16 index = 0; index < world_w * world_h; ++index)
@@ -265,10 +270,10 @@ void Interface::Radar::RedrawCursor(void)
     if(conf.HideInterface() && !conf.ShowRadar()) return;
 
     const Point & posArea = Interface::GameArea::Get().GetRectMaps();
-    cursor->Hide();
-    cursor->Move(x + posArea.x * w / world.w(),
+    cursorArea->Hide();
+    cursorArea->Move(x + posArea.x * w / world.w(),
                 y + posArea.y * h / world.h());
-    cursor->Show();
+    cursorArea->Show();
 }
 
 Surface* Interface::Radar::GetSurfaceFromColor(const u8 color)
@@ -310,21 +315,57 @@ u32 GetPaletteIndexFromGround(const u16 ground)
 void Interface::Radar::QueueEventProcessing(void)
 {
     Interface::GameArea & gamearea = Interface::GameArea::Get();
+    Display & display = Display::Get();
+    Cursor & cursor = Cursor::Get();
+    Settings & conf = Settings::Get();
     LocalEvent & le = LocalEvent::Get();
 
-    if(le.MouseCursor(*this) &&
-        (le.MouseClickLeft(*this) || le.MousePressLeft(*this)))
+    // move border
+    if(conf.HideInterface() && conf.ShowRadar() && le.MousePressLeft(border.GetTop()))
     {
-        const Point prev(gamearea.GetRectMaps());
-        const Point & pt = le.GetMouseCursor();
-	gamearea.Center((pt.x - x) * world.w() / w, (pt.y - y) * world.h() / h);
-        if(prev != gamearea.GetRectMaps())
-        {
-	    Cursor::Get().Hide();
-            RedrawCursor();
-            Interface::Basic::Get().SetRedraw(REDRAW_GAMEAREA);
-        }
+	Surface sf(border.GetRect().w, border.GetRect().h);
+        Cursor::DrawCursor(sf, 0x70);
+	const Point & mp = le.GetMouseCursor();
+	const s16 ox = mp.x - border.GetRect().x;
+	const s16 oy = mp.y - border.GetRect().y;
+        SpriteCursor sp(sf, border.GetRect().x, border.GetRect().y);
+	cursorArea->Hide();
+	cursor.Hide();
+        sp.Redraw();
+	cursor.Show();
+        display.Flip();
+	while(le.HandleEvents() && le.MousePressLeft())
+	{
+	    if(le.MouseMotion())
+	    {
+		cursor.Hide();
+		sp.Move(mp.x - ox, mp.y - oy);
+		cursor.Show();
+		display.Flip();
+	    }
+	}
+	cursor.Hide();
+	SetPos(mp.x - ox, mp.y - oy);
+	cursorArea->Show();
+    	Interface::Basic::Get().SetRedraw(REDRAW_GAMEAREA);
     }
-
-    if(le.MousePressRight(*this)) Dialog::Message(_("World Map"), _("A miniature view of the known world. Left click to move viewing area."), Font::BIG);
+    else
+    // move cursor
+    if(le.MouseCursor(*this))
+    {
+	if(le.MouseClickLeft(*this) || le.MousePressLeft(*this))
+	{
+    	    const Point prev(gamearea.GetRectMaps());
+    	    const Point & pt = le.GetMouseCursor();
+	    gamearea.Center((pt.x - x) * world.w() / w, (pt.y - y) * world.h() / h);
+    	    if(prev != gamearea.GetRectMaps())
+    	    {
+		Cursor::Get().Hide();
+        	RedrawCursor();
+        	Interface::Basic::Get().SetRedraw(REDRAW_GAMEAREA);
+    	    }
+	}
+	else
+	if(le.MousePressRight(*this)) Dialog::Message(_("World Map"), _("A miniature view of the known world. Left click to move viewing area."), Font::BIG);
+    }
 }

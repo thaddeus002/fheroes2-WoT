@@ -118,6 +118,7 @@ namespace Interface
 	static IconsPanel & Get(void);
     
 	void SetPos(s16, s16);
+	void SetCount(u8);
 	void Redraw(void);
 	void QueueEventProcessing(void);
 

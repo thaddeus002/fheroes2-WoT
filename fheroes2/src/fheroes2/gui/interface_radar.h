@@ -50,7 +50,7 @@ namespace Interface
 
         Surface *spriteArea;
 	Surface *spriteCursor;
-	SpriteCursor *cursor;
+	SpriteCursor *cursorArea;
 
         Surface* sf_blue;
 	Surface* sf_green;

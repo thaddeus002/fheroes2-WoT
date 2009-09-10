@@ -30,6 +30,7 @@
 #include "settings.h"
 #include "game_focus.h"
 #include "kingdom.h"
+#include "game_interface.h"
 #include "interface_icons.h"
 
 namespace Game
@@ -614,6 +615,11 @@ void Interface::IconsPanel::SetPos(s16 ox, s16 oy)
 {
     if(Settings::Get().HideInterface())
     {
+        // fix out of range
+        Display & display = Display::Get();
+        if(ox + Rect::w < 0 || ox > display.w()) ox = 0;
+        if(oy + Rect::h < 0 || oy > display.h()) oy = 0;
+
         Rect::x = ox + BORDERWIDTH;
         Rect::y = oy + BORDERWIDTH;
         border.SetPosition(ox, oy, Rect::w, Rect::h);
@@ -627,7 +633,6 @@ void Interface::IconsPanel::SetPos(s16 ox, s16 oy)
     ox = Rect::x;
     oy = Rect::y;
 
-    Display & display = Display::Get();
     const ICN::icn_t icnscroll = Settings::Get().EvilInterface() ? ICN::SCROLLE : ICN::SCROLL;
 
     buttonScrollHeroesUp.SetSprite(icnscroll, 0, 1);
@@ -635,20 +640,27 @@ void Interface::IconsPanel::SetPos(s16 ox, s16 oy)
     buttonScrollHeroesDown.SetSprite(icnscroll, 2, 3);
     buttonScrollCastleDown.SetSprite(icnscroll, 2, 3);
 
-    const u8 count_h = (display.h() - 480) / TILEWIDTH;
-    count_icons = count_h > 3 ? 8 : ( count_h < 3 ? 4 : 7);
-    Rect::h = count_icons * ICONS_CURSOR_HEIGHT;
-
     buttonScrollHeroesUp.SetPos(ox + ICONS_CURSOR_WIDTH + 1, oy + 1);
     buttonScrollCastleUp.SetPos(ox + 2 * ICONS_CURSOR_WIDTH + buttonScrollHeroesUp.w + 3, oy + 1);
-    buttonScrollHeroesDown.SetPos(ox + ICONS_CURSOR_WIDTH + 1, oy + count_icons * ICONS_CURSOR_HEIGHT - buttonScrollHeroesDown.h - 1);
-    buttonScrollCastleDown.SetPos(ox + 2 * ICONS_CURSOR_WIDTH + buttonScrollHeroesDown.w + 3, oy + count_icons * ICONS_CURSOR_HEIGHT - buttonScrollCastleDown.h - 1);
+
+    SetCount(count_icons);
+}
+
+void Interface::IconsPanel::SetCount(u8 count)
+{
+    count_icons = count;
+    Rect::h = count_icons * ICONS_CURSOR_HEIGHT;
+
+    buttonScrollHeroesDown.SetPos(x + ICONS_CURSOR_WIDTH + 1, y + count_icons * ICONS_CURSOR_HEIGHT - buttonScrollHeroesDown.h - 1);
+    buttonScrollCastleDown.SetPos(x + 2 * ICONS_CURSOR_WIDTH + buttonScrollHeroesDown.w + 3, y + count_icons * ICONS_CURSOR_HEIGHT - buttonScrollCastleDown.h - 1);
     
-    heroesIcons.SetPos(ox + 5, oy + 5);
+    heroesIcons.SetPos(x + 5, y + 5);
     heroesIcons.SetCount(count_icons);
 
-    castleIcons.SetPos(ox + 77, oy + 5);
+    castleIcons.SetPos(x + 77, y + 5);
     castleIcons.SetCount(count_icons);
+
+    border.SetPosition(border.GetRect().x, border.GetRect().y, w, h);
 }
 
 void Interface::IconsPanel::Redraw(void)
@@ -726,7 +738,7 @@ void Interface::IconsPanel::QueueEventProcessing(void)
 {
     Display & display = Display::Get();
     Cursor & cursor = Cursor::Get();
-
+    Settings & conf = Settings::Get();
     LocalEvent & le = LocalEvent::Get();
 
     Game::Focus & global_focus = Game::Focus::Get();
@@ -792,6 +804,42 @@ void Interface::IconsPanel::QueueEventProcessing(void)
         display.Flip();
     }
 
+    // move border
+    if(conf.HideInterface() && conf.ShowIcons() && le.MousePressLeft(border.GetTop()))
+    {
+        Surface sf(border.GetRect().w, border.GetRect().h);
+        Cursor::DrawCursor(sf, 0x70);
+        const Point & mp = le.GetMouseCursor();
+        const s16 ox = mp.x - border.GetRect().x;
+        const s16 oy = mp.y - border.GetRect().y;
+        SpriteCursor sp(sf, border.GetRect().x, border.GetRect().y);
+        const Castle* castle = NULL;
+        const Heroes* heroes = NULL;
+        if(heroesIcons.isSelected()){ heroes = heroesIcons.Selected(); heroesIcons.Unselect(); }
+        else
+        if(castleIcons.isSelected()){ castle = castleIcons.Selected(); castleIcons.Unselect(); }
+        cursor.Hide();
+        sp.Redraw();
+        cursor.Show();
+        display.Flip();
+        while(le.HandleEvents() && le.MousePressLeft())
+        {
+            if(le.MouseMotion())
+            {
+                cursor.Hide();
+                sp.Move(mp.x - ox, mp.y - oy);
+                cursor.Show();
+                display.Flip();
+            }
+        }
+        cursor.Hide();
+        SetPos(mp.x - ox, mp.y - oy);
+        if(heroes) heroesIcons.Select(heroes);
+        else
+        if(castle) castleIcons.Select(castle);
+	Interface::Basic::Get().SetRedraw(REDRAW_GAMEAREA);
+    }
+    else
     // move splitter cursor castle
     if(le.MousePressLeft(selectCastle.GetSplitter().GetRect()) &&
         myCastles.size() > count_icons)

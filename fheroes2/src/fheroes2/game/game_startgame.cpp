@@ -85,6 +85,10 @@ namespace Game
     void KeyPress_RIGHT(void);
     void KeyPress_TOP(void);
     void KeyPress_BOTTOM(void);
+    void KeyPress_r(void);
+    void KeyPress_b(void);
+    void KeyPress_w(void);
+    void KeyPress_c(void);
 
     void NewWeekDialog(void);
     void ShowEventDay(void);
@@ -845,6 +849,16 @@ Game::menu_t Game::HumanTurn(void)
 	    case KEY_RIGHT:	KeyPress_RIGHT(); break;
 	    case KEY_UP:	KeyPress_TOP(); break;
 	    case KEY_DOWN:	KeyPress_BOTTOM(); break;
+
+	    // hide/show radar
+	    case KEY_r:		KeyPress_r(); break;
+	    // hide/show buttons
+	    case KEY_b:		KeyPress_b(); break;
+	    // hide/show status window
+	    case KEY_w:		KeyPress_w(); break;
+	    // hide/show hero/town icons
+	    case KEY_c:		KeyPress_c(); break;
+	    
 	    default: break;
 	}
 
@@ -1551,5 +1565,81 @@ void Game::ShowWarningLostTowns(menu_t & ret)
 	    String::Replace(str, "%{color}", Color::String(conf.MyColor()));
 	    String::Replace(str, "%{day}", myKingdom.GetLostTownDays());
 	    DialogPlayers(conf.MyColor(), str);
+    }
+}
+
+void Game::KeyPress_r(void)
+{
+    Settings & conf = Settings::Get();
+
+    if(conf.HideInterface())
+    {
+	if(conf.ShowRadar())
+	{
+	    conf.ResetModes(Settings::SHOWRADAR);
+	    Interface::Basic::Get().SetRedraw(REDRAW_GAMEAREA);
+	}
+	else
+	{
+	    conf.SetModes(Settings::SHOWRADAR);
+	    Interface::Basic::Get().SetRedraw(REDRAW_RADAR);
+	}
+    }
+}
+
+void Game::KeyPress_b(void)
+{
+    Settings & conf = Settings::Get();
+
+    if(conf.HideInterface())
+    {
+	if(conf.ShowButtons())
+	{
+	    conf.ResetModes(Settings::SHOWBUTTONS);
+	    Interface::Basic::Get().SetRedraw(REDRAW_GAMEAREA);
+	}
+	else
+	{
+	    conf.SetModes(Settings::SHOWBUTTONS);
+	    Interface::Basic::Get().SetRedraw(REDRAW_BUTTONS);
+	}
+    }
+}
+
+void Game::KeyPress_w(void)
+{
+    Settings & conf = Settings::Get();
+
+    if(conf.HideInterface())
+    {
+	if(conf.ShowStatus())
+	{
+	    conf.ResetModes(Settings::SHOWSTATUS);
+	    Interface::Basic::Get().SetRedraw(REDRAW_GAMEAREA);
+	}
+	else
+	{
+	    conf.SetModes(Settings::SHOWSTATUS);
+	    Interface::Basic::Get().SetRedraw(REDRAW_STATUS);
+	}
+    }
+}
+
+void Game::KeyPress_c(void)
+{
+    Settings & conf = Settings::Get();
+
+    if(conf.HideInterface())
+    {
+	if(conf.ShowIcons())
+	{
+	    conf.ResetModes(Settings::SHOWICONS);
+	    Interface::Basic::Get().SetRedraw(REDRAW_GAMEAREA);
+	}
+	else
+	{
+	    conf.SetModes(Settings::SHOWICONS);
+	    Interface::Basic::Get().SetRedraw(REDRAW_ICONS);
+	}
     }
 }

@@ -47,6 +47,12 @@ void Dialog::FrameBorder::SetPosition(s16 posx, s16 posy, u16 encw, u16 ench)
 	Background::Save(posx, posy);
 
     area = Rect(posx + BORDERWIDTH, posy + BORDERWIDTH, encw - BORDERWIDTH * 2, ench - BORDERWIDTH * 2);
+    top = Rect(posx, posy, area.w, BORDERWIDTH);
+}
+
+const Rect & Dialog::FrameBorder::GetTop(void) const
+{
+    return top;
 }
 
 const Rect & Dialog::FrameBorder::GetRect(void) const

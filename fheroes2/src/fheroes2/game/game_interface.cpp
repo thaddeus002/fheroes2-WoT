@@ -37,6 +37,7 @@ Interface::Basic::Basic() : gameArea(GameArea::Get()), radar(Radar::Get()),
 	iconsPanel.SetPos(px - BORDERWIDTH, radar.GetArea().y + radar.GetArea().h);
 	buttonsArea.SetPos(px - BORDERWIDTH, iconsPanel.GetArea().y + iconsPanel.GetArea().h);
 	statusWindow.SetPos(px - BORDERWIDTH, buttonsArea.GetArea().y + buttonsArea.GetArea().h);
+        iconsPanel.SetCount(2);
     }
     else
     {
@@ -44,6 +45,9 @@ Interface::Basic::Basic() : gameArea(GameArea::Get()), radar(Radar::Get()),
 	iconsPanel.SetPos(px, radar.GetArea().y + radar.GetArea().h + BORDERWIDTH);
 	buttonsArea.SetPos(px, iconsPanel.GetArea().y + iconsPanel.GetArea().h + BORDERWIDTH);
 	statusWindow.SetPos(px, buttonsArea.GetArea().y + buttonsArea.GetArea().h);
+
+        const u8 count_h = (display.h() - 480) / TILEWIDTH;
+        iconsPanel.SetCount(count_h > 3 ? 8 : ( count_h < 3 ? 4 : 7));
     }
 
     scrollLeft = Rect(0, 0, BORDERWIDTH, display.h());

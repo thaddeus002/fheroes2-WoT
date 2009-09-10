@@ -692,7 +692,6 @@ void Interface::GameArea::QueueEventProcessing(void)
     LocalEvent & le = LocalEvent::Get();
     const Point & mp = le.GetMouseCursor();
 
-
     s16 index = (rectMaps.y + (mp.y - rectArea.y) / TILEWIDTH) * world.w() + rectMaps.x + (mp.x - rectArea.x) / TILEWIDTH;
     const u16 & max = world.w() * world.h() - 1;
     

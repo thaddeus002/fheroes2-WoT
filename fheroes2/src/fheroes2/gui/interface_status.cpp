@@ -29,6 +29,7 @@
 #include "heroes.h"
 #include "army.h"
 #include "game_focus.h"
+#include "game_interface.h"
 #include "interface_status.h"
 
 #define RESOURCE_WINDOW_EXPIRE 4000
@@ -63,9 +64,13 @@ void Interface::StatusWindow::SetPos(s16 px, s16 py)
 {
     if(Settings::Get().HideInterface())
     {
+        // fix out of range
+        Display & display = Display::Get();
+        if(px + Rect::w < 0 || px > display.w()) px = 0;
+        if(py + Rect::h < 0 || py > display.h()) py = 0;
+
 	Rect::x = px + BORDERWIDTH;
 	Rect::y = py + BORDERWIDTH;
-	Rect::h = Display::Get().h() - py - BORDERWIDTH;
 	border.SetPosition(px, py, Rect::w, Rect::h);
     }
     else
@@ -324,7 +329,7 @@ void Interface::StatusWindow::DrawBackground(void) const
     Display & display = Display::Get();
     const Sprite & icnston = AGG::GetICN(Settings::Get().EvilInterface() ? ICN::STONBAKE : ICN::STONBACK, 0);
 
-    if(display.h() - BORDERWIDTH - icnston.h() > y)
+    if(!Settings::Get().HideInterface() && display.h() - BORDERWIDTH - icnston.h() > y)
     {
         Rect srcrt;
 	Point dstpt(x, y);
@@ -357,8 +362,36 @@ void Interface::StatusWindow::QueueEventProcessing(void)
 {
     Display & display = Display::Get();
     Cursor & cursor = Cursor::Get();
+    Settings & conf = Settings::Get();
     LocalEvent & le = LocalEvent::Get();
 
+    if(conf.HideInterface() && conf.ShowStatus() && le.MousePressLeft(border.GetTop()))
+    {
+        Surface sf(border.GetRect().w, border.GetRect().h);
+        Cursor::DrawCursor(sf, 0x70);
+        const Point & mp = le.GetMouseCursor();
+        const s16 ox = mp.x - border.GetRect().x;
+        const s16 oy = mp.y - border.GetRect().y;
+        SpriteCursor sp(sf, border.GetRect().x, border.GetRect().y);
+        cursor.Hide();
+        sp.Redraw();
+        cursor.Show();
+        display.Flip();
+        while(le.HandleEvents() && le.MousePressLeft())
+        {
+    	    if(le.MouseMotion())
+            {
+		cursor.Hide();
+        	sp.Move(mp.x - ox, mp.y - oy);
+                cursor.Show();
+                display.Flip();
+            }
+        }
+        cursor.Hide();
+        SetPos(mp.x - ox, mp.y - oy);
+        Interface::Basic::Get().SetRedraw(REDRAW_GAMEAREA);
+    }
+    else
     if(le.MouseClickLeft(*this))
     {
         cursor.Hide();

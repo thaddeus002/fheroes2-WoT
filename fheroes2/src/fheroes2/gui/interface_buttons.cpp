@@ -22,6 +22,7 @@
 #include "settings.h"
 #include "dialog.h"
 #include "game.h"
+#include "game_interface.h"
 #include "interface_buttons.h"
 
 namespace Game
@@ -57,6 +58,11 @@ void Interface::ButtonsArea::SetPos(s16 ox, s16 oy)
 {
     if(Settings::Get().HideInterface())
     {
+        // fix out of range
+        Display & display = Display::Get();
+        if(ox + Rect::w < 0 || ox > display.w()) ox = 0;
+        if(oy + Rect::h < 0 || oy > display.h()) oy = 0;
+    
 	Rect::x = ox + BORDERWIDTH;
         Rect::y = oy + BORDERWIDTH;
         border.SetPosition(ox, oy, Rect::w, Rect::h);
@@ -125,6 +131,9 @@ void Interface::ButtonsArea::Redraw(void)
 
 void Interface::ButtonsArea::QueueEventProcessing(Game::menu_t & ret)
 {
+    Display & display = Display::Get();
+    Cursor & cursor = Cursor::Get();
+    Settings & conf = Settings::Get();
     LocalEvent & le = LocalEvent::Get();
 
     le.MousePressLeft(buttonNextHero) ? buttonNextHero.PressDraw() : buttonNextHero.ReleaseDraw();
@@ -136,6 +145,33 @@ void Interface::ButtonsArea::QueueEventProcessing(Game::menu_t & ret)
     le.MousePressLeft(buttonFile) ? buttonFile.PressDraw() : buttonFile.ReleaseDraw();
     le.MousePressLeft(buttonSystem) ? buttonSystem.PressDraw() : buttonSystem.ReleaseDraw();
 
+    if(conf.HideInterface() && conf.ShowButtons() && le.MousePressLeft(border.GetTop()))
+    {
+	Surface sf(border.GetRect().w, border.GetRect().h);
+        Cursor::DrawCursor(sf, 0x70);
+        const Point & mp = le.GetMouseCursor();
+        const s16 ox = mp.x - border.GetRect().x;
+        const s16 oy = mp.y - border.GetRect().y;
+        SpriteCursor sp(sf, border.GetRect().x, border.GetRect().y);
+        cursor.Hide();
+        sp.Redraw();
+        cursor.Show();
+        display.Flip();
+        while(le.HandleEvents() && le.MousePressLeft())
+        {
+    	    if(le.MouseMotion())
+            {
+                cursor.Hide();
+                sp.Move(mp.x - ox, mp.y - oy);
+                cursor.Show();
+                display.Flip();
+            }
+        }
+        cursor.Hide();
+        SetPos(mp.x - ox, mp.y - oy);
+        Interface::Basic::Get().SetRedraw(REDRAW_GAMEAREA);
+    }
+    else
     if(le.MouseClickLeft(buttonNextHero)) Game::ButtonNextHero();
     else
     if(le.MouseClickLeft(buttonMovement)) Game::ButtonMovement();

@@ -155,9 +155,11 @@ public:
     void Redraw(void);
     const Rect & GetRect(void) const;
     const Rect & GetArea(void) const;
+    const Rect & GetTop(void) const;
 
 private:
     Rect area;
+    Rect top;
 };
 
 class NetworkChat

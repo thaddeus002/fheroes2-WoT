@@ -40,7 +40,10 @@ p		- puzzle dialog
 d		- digging artifact for current hero
 space		- default action
 return 		- open dialog
-
+r		- show/hide radar (only for option: hide interface = on)
+w		- show/hide status window (only for option: hide interface = on)
+c		- show/hide hero/town icons (only for option: hide interface = on)
+b		- show/hide buttons (only for option: hide interface = on)
 Main menu:
 n		- new game
 s		- standard game
