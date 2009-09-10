@@ -47,7 +47,7 @@ void Music::Play(const std::vector<u8> & body, bool loop)
     }
 }
 
-void Music::Play(const char*, bool)
+void Music::Play(const std::string &, bool)
 {
 }
 
@@ -130,7 +130,7 @@ int callbackPlayMusic(void *ptr)
 void Music::Play(const std::vector<u8> &, bool)
 {
 }
-#include <iostream>
+
 void Music::Play(const std::string & run, bool loop)
 {
     if(music.IsRun())
@@ -141,7 +141,6 @@ void Music::Play(const std::string & run, bool loop)
     info.run = run;
     info.loop = loop;
     music.Create(callbackPlayMusic, &info);
-    std::cout << run << std::endl;
 }
 
 u8 Music::Volume(int vol)
