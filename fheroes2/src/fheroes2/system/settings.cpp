@@ -55,7 +55,7 @@ namespace
 
 /* constructor */
 Settings::Settings() : major_version(MAJOR_VERSION), minor_version(MINOR_VERSION), build_date(BUILD_DATE),
-    debug(0), video_mode(640, 480), game_difficulty(Difficulty::NORMAL),
+    debug(0), video_mode(640, 480), game_difficulty(Difficulty::NORMAL), path_data_directory("data"),
     my_color(Color::GRAY), cur_color(Color::GRAY),
     font_normal("dejavusans.ttf"), font_small("dejavusans.ttf"), size_normal(15), size_small(10),
     sound_volume(6), music_volume(6), animation(6), game_type(0), players_colors(0), preferably_count_players(0),
