@@ -1000,7 +1000,7 @@ Game::menu_t Game::HumanTurn(void)
 
     if(ENDTURN == res && conf.Modes(Settings::AUTOSAVE))
     {
-	std::string filename(conf.LocalDataPrefix() + SEPARATOR + "save" + SEPARATOR +  "autosave.sav");
+	std::string filename(conf.LocalPrefix() + SEPARATOR + "files" + SEPARATOR + "save" + SEPARATOR +  "autosave.sav");
 	Game::Save(filename);
     }
 

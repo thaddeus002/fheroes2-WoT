@@ -1,3 +1,7 @@
-LINK := g++
-SIMPLE_LINK_FLAGS := -shared -fPIC
-LINK_FLAGS := $(SIMPLE_LINK_FLAGS) $(LIBS)
+ifndef AR
+AR := ar
+endif
+
+ifndef CXX
+CXX := g++
+endif

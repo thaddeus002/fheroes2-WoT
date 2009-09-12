@@ -69,7 +69,7 @@ public:
         BATTLEGRID        = 0x08000000,
         BATTLEMOUSESHADOW = 0x10000000,
         BATTLEMOVESHADOW  = 0x20000000,
-        UNICODE           = 0x40000000,
+        USEUNICODE        = 0x40000000,
 	USECACHE          = 0x80000000,
 
 	MUSIC		= MUSIC_CD | MUSIC_EXT | MUSIC_MIDI,
@@ -92,7 +92,7 @@ public:
     u8 Animation(void) const;
 
     const std::string & DataDirectory(void) const;
-    const std::string & LocalDataPrefix(void) const;
+    const std::string & LocalPrefix(void) const;
     const std::string & PlayMusCommand(void) const;
 
     const ListMapsDirectory & GetListMapsDirectory(void) const;
@@ -148,7 +148,7 @@ public:
     u8   PreferablyCountPlayers(void) const;
     void SetPreferablyCountPlayers(u8 c);
 
-    void SetLocalDataPrefix(const std::string &);
+    void SetLocalPrefix(const std::string &);
 
     u16	GetPort(void) const;
 
@@ -210,7 +210,7 @@ private:
     Color::color_t cur_color;
 
     std::string path_data_directory;
-    std::string local_data_prefix;
+    std::string local_prefix;
 
     ListMapsDirectory list_maps_directory;
 

@@ -20,7 +20,10 @@
 
 #include <algorithm>
 #include <sstream>
+#include <cstring>
+#include <climits>
 #include "error.h"
+#include "types.h"
 #include "tools.h"
 
 /* trim left right space */
@@ -254,3 +257,35 @@ void String::AppendKey(std::string & res, KeySym sym, u16 mod)
         default: break;
     }
 }
+
+#ifdef __WIN32__ /* SDL_platform.h */
+const char *GetDirname(const char *path)
+{
+    static char buff[PATH_MAX];
+    strncpy(buff, path, PATH_MAX);
+    char *c = strrchr(buff, SEPARATOR);
+    if(!c) strcpy(buff, ".");
+    else *c = 0;
+    return buff;
+}
+
+const char *GetBasename(const char *path)
+{
+    static char buff[FILENAME_MAX];
+    const char *c = strrchr(path, SEPARATOR);
+    if(!c) strncpy(buff, path, FILENAME_MAX);
+    else strcpy(buff, c + 1);
+    return buff;
+}
+#else
+#include <libgen.h>
+const char *GetDirname(const char *path)
+{
+    return dirname(const_cast<char *>(path));
+}
+
+const char *GetBasename(const char *path)
+{
+    return basename(const_cast<char *>(path));
+}
+#endif

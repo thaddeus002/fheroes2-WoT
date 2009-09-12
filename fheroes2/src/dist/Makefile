@@ -11,8 +11,6 @@ LIBENGINE := ../engine/libengine.a ../xmlccwrap/libxmlccwrap.a
 LIBS := $(LIBENGINE) $(LIBS)
 CFLAGS := $(CFLAGS) -I../engine -I../xmlccwrap -I$(PREFIX)/include -DBUILD_DATE=$(BUILD_DATE)
 
-CC := g++
-
 SOURCEROOT := ../fheroes2
 SOURCEDIR  := $(shell ls $(SOURCEROOT))
 POT        := $(TARGET).pot
@@ -23,7 +21,7 @@ all: $(TARGET)
 
 $(TARGET): $(notdir $(patsubst %.cpp, %.o, $(wildcard $(SEARCH)))) $(LIBENGINE)
 	@echo "lnk: $@"
-	$(CC) $^ -o $@ $(LIBS)
+	$(CXX) $^ -o $@ $(LIBS)
 
 pot: $(wildcard $(SEARCH))
 	@echo "gen: $(POT)"
@@ -33,7 +31,7 @@ VPATH := $(addprefix $(SOURCEROOT)/, $(SOURCEDIR))
 
 %.o: %.cpp
 	@echo "cxx: $@"
-	@$(CC) -c -MD $(addprefix -I$(SOURCEROOT)/, $(SOURCEDIR)) $< $(CFLAGS)
+	@$(CXX) -c -MD $(addprefix -I$(SOURCEROOT)/, $(SOURCEDIR)) $< $(CFLAGS)
 
 include $(wildcard *.d)
 

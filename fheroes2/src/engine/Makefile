@@ -2,20 +2,15 @@
 # project: Free Heroes2
 # libSDL C++ wrapper engine
 
-TARGET := libengine
-CC := g++
+TARGET	:= libengine
 
-all: $(TARGET).a $(TARGET).so
-
-$(TARGET).so: $(patsubst %.cpp, %.o, $(wildcard *.cpp)) 
-	$(LINK) -o $@ $^ $(LINK_FLAGS)
+all: $(TARGET).a
 
 $(TARGET).a: $(patsubst %.cpp, %.o, $(wildcard *.cpp)) 
-	ar crvs $@ $^
-	ranlib $@
+	$(AR) crvs $@ $^
 
 %.o: %.cpp
-	$(CC) -c -fPIC -MD $< $(CFLAGS)
+	$(CXX) -c -MD $< $(CFLAGS)
 
 include $(wildcard *.d)
 

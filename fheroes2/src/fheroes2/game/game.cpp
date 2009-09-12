@@ -315,7 +315,7 @@ void Game::KeyboardGlobalFilter(u16 sym, u16 mod)
 	case SDLK_PRINT:
         {
             std::ostringstream stream;
-            stream << Settings::Get().LocalDataPrefix() << SEPARATOR << "save" << SEPARATOR << "screenshot_" << std::time(0);
+            stream << Settings::Get().LocalPrefix() << SEPARATOR << "files" << SEPARATOR << "save" << SEPARATOR << "screenshot_" << std::time(0);
 #ifndef WITH_IMAGE
                 stream << ".bmp";
 #else

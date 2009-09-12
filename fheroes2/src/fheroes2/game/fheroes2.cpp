@@ -20,7 +20,6 @@
 
 #include <iostream>
 #include <string>
-#include <climits>
 #include <cstdlib>
 
 #include "gamedefs.h"
@@ -35,7 +34,6 @@
 #include "image_logo.h"
 #include "image_icons.h"
 #include "network.h"
-#include "string_util.h"
 
 int PrintHelp(const char *basename)
 {
@@ -47,16 +45,13 @@ int PrintHelp(const char *basename)
 #ifdef WITH_NET
     std::cout << "  -s\tdedicated server" << std::endl;
 #endif
-    std::cout << "  -c\tpath to config file (default fheroes2.cfg)" << std::endl \
-	    << "  -h\tprint this help and exit" << std::endl;
+    std::cout << "  -h\tprint this help and exit" << std::endl;
 
     return EXIT_SUCCESS;
 }
 
 int main(int argc, char **argv)
 {
-	chdir(dirname_internal(argv[0]));
-
 	Settings & conf = Settings::Get();
 	int test = 0;
 
@@ -72,13 +67,21 @@ int main(int argc, char **argv)
 
 	std::cout << caption << std::endl;
 
+	// set data prefix
+	const char* prefix = GetDirname(argv[0]);
+#ifdef FHEROES2_DATA
+	prefix = FHEROES2_DATA;
+#endif
+	if(std::getenv("FHEROES2_DATA")) prefix = std::getenv("FHEROES2_DATA");
+	conf.SetLocalPrefix(prefix);
+
 	// load fheroes2.cfg
-	const std::string & fheroes2_cfg = "fheroes2.cfg";
+	const std::string fheroes2_cfg(std::string(prefix) + SEPARATOR + "fheroes2.cfg");
 	std::cout << "config: " << fheroes2_cfg << (conf.Read(fheroes2_cfg) ? " load" : " not found") << std::endl;
 
 	{
 	    int opt;
-	    while((opt = getopt(argc, argv, "hest:d:c:")) != -1)
+	    while((opt = getopt(argc, argv, "hest:d:")) != -1)
     		switch(opt)
                 {
                     case 'e':
@@ -110,10 +113,6 @@ int main(int argc, char **argv)
 #endif
                 	break;
 
-                    case 'c':
-                	std::cout << "config: " << optarg << (conf.Read(optarg) ? " load" : " not found") << std::endl;
-                	break;
-
                     case 's':
 #ifdef WITH_NET
                 	      return Network::RunDedicatedServer();
@@ -129,7 +128,7 @@ int main(int argc, char **argv)
 #ifdef WITH_TTF
 	if(conf.Unicode())
 	{
-	    const std::string localesdir(conf.LocalDataPrefix() + SEPARATOR + "lang");
+	    const std::string localesdir(conf.LocalPrefix() + SEPARATOR + "files" + SEPARATOR + "lang");
 	    setlocale(LC_ALL, "");
 	    bindtextdomain(GETTEXT_PACKAGE, localesdir.c_str());
 	    bind_textdomain_codeset(GETTEXT_PACKAGE, "UTF-8");
@@ -180,6 +179,7 @@ int main(int argc, char **argv)
     	    Dir dir;
     	
             dir.Read(conf.DataDirectory(), ".agg", false);
+            dir.Read(conf.LocalPrefix() + SEPARATOR + conf.DataDirectory(), ".agg", false);
 
 	    // not found agg, exit
 	    if(0 == dir.size()) Error::Except("AGG data files not found.");

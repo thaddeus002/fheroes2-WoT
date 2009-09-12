@@ -30,7 +30,7 @@
 #include "maps.h"
 #include "maps_fileinfo.h"
 #include "dialog.h"
-#include "string_util.h"
+#include "tools.h"
 
 
 bool SelectFileListSimple(const std::string &, MapsFileInfoList &, std::string &, bool);
@@ -40,7 +40,7 @@ bool DialogSelectMapsFileList(MapsFileInfoList &, std::string &);
 
 void ResizeToShortName(const std::string & str, std::string & res)
 {
-    res.assign(basename_internal(str.c_str()));
+    res.assign(GetBasename(str.c_str()));
     size_t it = res.find('.');
     if(std::string::npos != it) res.resize(it);
 }
@@ -48,7 +48,7 @@ void ResizeToShortName(const std::string & str, std::string & res)
 bool Dialog::SelectFileSave(std::string & file)
 {
     Dir dir;
-    const std::string store_dir(Settings::Get().LocalDataPrefix() + SEPARATOR + "save");
+    const std::string store_dir(Settings::Get().LocalPrefix() + SEPARATOR + "files" + SEPARATOR + "save");
     dir.Read(store_dir, ".sav", false);
 
     MapsFileInfoList lists(dir.size());
@@ -64,7 +64,7 @@ bool Dialog::SelectFileSave(std::string & file)
 bool Dialog::SelectFileLoad(std::string & file)
 {
     Dir dir;
-    const std::string store_dir(Settings::Get().LocalDataPrefix() + SEPARATOR + "save");
+    const std::string store_dir(Settings::Get().LocalPrefix() + SEPARATOR + "files" + SEPARATOR + "save");
     dir.Read(store_dir, ".sav", false);
 
     MapsFileInfoList lists(dir.size());
@@ -149,7 +149,7 @@ bool SelectFileListSimple(const std::string & header, MapsFileInfoList & lists, 
         if((le.MouseClickLeft(buttonOk) && buttonOk.isEnable()) || le.KeyPress(KEY_RETURN))
         {
     	    if(editor && filename.size())
-		result = Settings::Get().LocalDataPrefix() + SEPARATOR + "save" + SEPARATOR + filename + ".sav";
+		result = Settings::Get().LocalPrefix() + SEPARATOR + "files" + SEPARATOR + "save" + SEPARATOR + filename + ".sav";
     	    else
     	    if(cur != lists.end())
     		result = (*cur).file;
@@ -249,7 +249,7 @@ bool SelectFileListSimple(const std::string & header, MapsFileInfoList & lists, 
 	{
 	    std::string msg(_("Are you sure you want to delete file:"));
 	    msg.append("\n \n");
-	    msg.append(basename_internal((*cur).file.c_str()));
+	    msg.append(GetBasename((*cur).file.c_str()));
 	    if(Dialog::YES == Dialog::Message(_("Warning!"), msg, Font::BIG, Dialog::YES | Dialog::NO))
 	    {
 		unlink((*cur).file.c_str());
@@ -330,11 +330,11 @@ void RedrawFileListSimple(const Rect & dst, const std::string & header, const st
     {
 	const Maps::FileInfo & info = *ii;
 
-	const std::string name(basename_internal(info.file.c_str()));
+	const std::string name(GetBasename(info.file.c_str()));
 
 	std::strftime(short_date, 14, "%b %d, %H:%M", std::localtime(&info.localtime));
 
-	text.Set(basename_internal(info.file.c_str()), (cur == ii ? Font::YELLOW_BIG : Font::BIG));
+	text.Set(GetBasename(info.file.c_str()), (cur == ii ? Font::YELLOW_BIG : Font::BIG));
 	text.Blit(dst.x + 45, dst.y + oy);
 
 	text.Set(short_date, (cur == ii ? Font::YELLOW_BIG : Font::BIG));

@@ -535,8 +535,13 @@ bool PrepareMapsFileInfoList(MapsFileInfoList & lists)
     for(; it1 != it2; ++it1)
     {
         dir.Read(*it1, ".mp2", false);
+        dir.Read(conf.LocalPrefix() + SEPARATOR + *it1, ".mp2", false);
         // loyality version
-        if(conf.Modes(Settings::PRICELOYALTY)) dir.Read(*it1, ".mx2", false);
+        if(conf.Modes(Settings::PRICELOYALTY))
+        {
+    	    dir.Read(*it1, ".mx2", false);
+	    dir.Read(conf.LocalPrefix() + SEPARATOR + *it1, ".mx2", false);
+	}
     }
 
     if(dir.empty()) return false;

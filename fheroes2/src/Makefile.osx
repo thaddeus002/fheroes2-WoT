@@ -1,3 +1,5 @@
+AR := ar
+CXX := g++
 LINK := libtool
 SIMPLE_LINK_FLAGS := -dynamic -undefined suppress -flat_namespace
 

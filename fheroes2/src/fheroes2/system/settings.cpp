@@ -47,7 +47,7 @@ namespace
         { "battlegrid",        Settings::BATTLEGRID                  },
         { "battlemoveshadow",  Settings::BATTLEMOVESHADOW            },
         { "battlemouseshadow", Settings::BATTLEMOUSESHADOW           },
-        { "unicode",           Settings::UNICODE                     },
+        { "unicode",           Settings::USEUNICODE                  },
         { "autosave",          Settings::AUTOSAVE                    },
         { "use cache",         Settings::USECACHE                    },
     };
@@ -56,7 +56,7 @@ namespace
 /* constructor */
 Settings::Settings() : major_version(MAJOR_VERSION), minor_version(MINOR_VERSION), build_date(BUILD_DATE),
     debug(0), video_mode(640, 480), game_difficulty(Difficulty::NORMAL),
-    my_color(Color::GRAY), cur_color(Color::GRAY), path_data_directory("data"), local_data_prefix("files"),
+    my_color(Color::GRAY), cur_color(Color::GRAY),
     font_normal("dejavusans.ttf"), font_small("dejavusans.ttf"), size_normal(15), size_small(10),
     sound_volume(6), music_volume(6), animation(6), game_type(0), players_colors(0), preferably_count_players(0),
     current_kingdom_colors(0), game_over_result(GameOver::COND_NONE), port(DEFAULT_PORT)
@@ -122,10 +122,10 @@ bool Settings::Read(const std::string & filename)
     file.close();
 
 #ifndef WITH_TTF
-    ResetModes(UNICODE);
+    ResetModes(USEUNICODE);
 #endif
 
-    if(font_normal.empty() || font_small.empty()) ResetModes(UNICODE);
+    if(font_normal.empty() || font_small.empty()) ResetModes(USEUNICODE);
 
 #ifdef BUILD_RELEASE
     debug = 0;
@@ -172,7 +172,7 @@ void Settings::Dump(std::ostream & stream) const
     String::AddInt(str, build_date);
     stream <<", build " << str << std::endl;
 
-    stream << "data = " << path_data_directory << std::endl;
+    if(path_data_directory.size()) stream << "data = " << path_data_directory << std::endl;
 
     ListMapsDirectory::const_iterator it1 = list_maps_directory.begin();
     ListMapsDirectory::const_iterator it2 = list_maps_directory.end();
@@ -209,7 +209,7 @@ void Settings::Dump(std::ostream & stream) const
     stream << "fonts small = " << font_small << std::endl;
     stream << "fonts normal size = " << static_cast<int>(size_normal) << std::endl;
     stream << "fonts small size = " << static_cast<int>(size_small) << std::endl;
-    stream << "unicode = " << (Modes(UNICODE) ? "on" : "off") << std::endl;
+    stream << "unicode = " << (Modes(USEUNICODE) ? "on" : "off") << std::endl;
 #endif
 
 #ifndef WITH_MIXER
@@ -278,8 +278,7 @@ const std::string & Settings::DataDirectory(void) const { return path_data_direc
 const ListMapsDirectory & Settings::GetListMapsDirectory(void) const { return list_maps_directory; }
 
 /* return path to locales directory */
-const std::string & Settings::LocalDataPrefix(void) const { return local_data_prefix; }
-
+const std::string & Settings::LocalPrefix(void) const { return local_prefix; }
 const std::string & Settings::PlayMusCommand(void) const { return playmus_command; };
 
 /* return editor */
@@ -328,7 +327,7 @@ bool Settings::BattleMovementShaded(void) const { return Modes(BATTLEMOVESHADOW)
 bool Settings::BattleMouseShaded(void) const { return Modes(BATTLEMOUSESHADOW); }
 
 /* unicode support */
-bool Settings::Unicode(void) const { return Modes(UNICODE); }
+bool Settings::Unicode(void) const { return Modes(USEUNICODE); }
 
 /* get video mode */
 const Size & Settings::VideoMode(void) const { return video_mode; }
@@ -570,9 +569,9 @@ u8 Settings::PreferablyCountPlayers(void) const
     return preferably_count_players;
 }
 
-void Settings::SetLocalDataPrefix(const std::string & str)
+void Settings::SetLocalPrefix(const std::string & str)
 {
-    local_data_prefix = str;
+    local_prefix = str;
 }
 
 u16 Settings::GetPort(void) const

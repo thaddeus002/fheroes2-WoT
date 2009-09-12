@@ -3,19 +3,14 @@
 # http://www.sourceforge.net/projects/tinyxml
 
 TARGET	:= libxmlccwrap
-CC 	:= g++
 
-all: $(TARGET).so $(TARGET).a
-
-$(TARGET).so: $(patsubst %.cpp, %.o, $(wildcard *.cpp))
-	$(LINK) -o $@ $^ $(SIMPLE_LINK_FLAGS) -lz
+all: $(TARGET).a
 
 $(TARGET).a: $(patsubst %.cpp, %.o, $(wildcard *.cpp))
-	ar crvs $@ $^
-	ranlib $@
+	$(AR) crvs $@ $^
 
 %.o: %.cpp
-	$(CC) -c -fPIC -MD $< $(CFLAGS)
+	$(CXX) -c -MD $< $(CFLAGS)
 
 include $(wildcard *.d)
 

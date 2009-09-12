@@ -29,7 +29,6 @@
 #include "dir.h"
 #include "agg.h"
 #include "xmlccwrap.h"
-#include "string_util.h"
 
 void StoreMemToFile(const std::vector<u8> &, const std::string &);
 bool FilePresent(const std::string &);
@@ -163,13 +162,13 @@ AGG::Cache::Cache() : sprites_memory_size(0)
 {
 #ifdef WITH_TTF
     Settings & conf = Settings::Get();
-    const std::string font1(conf.LocalDataPrefix() + SEPARATOR + "fonts" + SEPARATOR + conf.FontsNormal());
-    const std::string font2(conf.LocalDataPrefix() + SEPARATOR + "fonts" + SEPARATOR + conf.FontsSmall());
+    const std::string font1(conf.LocalPrefix() + SEPARATOR + "files" + SEPARATOR + "fonts" + SEPARATOR + conf.FontsNormal());
+    const std::string font2(conf.LocalPrefix() + SEPARATOR + "files" + SEPARATOR + "fonts" + SEPARATOR + conf.FontsSmall());
 
     if(conf.Unicode())
     {
 	if(!font_medium.Open(font1, conf.FontsNormalSize()) ||
-	   !font_small.Open(font2, conf.FontsSmallSize())) conf.ResetModes(Settings::UNICODE);
+	   !font_small.Open(font2, conf.FontsSmallSize())) conf.ResetModes(Settings::USEUNICODE);
     }
 #endif
 }
@@ -371,7 +370,7 @@ void AGG::Cache::LoadICN(const ICN::icn_t icn, bool reflect)
     if(conf.Modes(Settings::USECACHE))
     {
 	Dir dir;
-	const std::string icn_folder(conf.LocalDataPrefix() + SEPARATOR + "cache" + SEPARATOR + ICN::GetString(icn));
+	const std::string icn_folder(conf.LocalPrefix() + SEPARATOR + "files" + SEPARATOR + "cache" + SEPARATOR + ICN::GetString(icn));
 	const std::string xml_spec(icn_folder + SEPARATOR + "spec.xml");
 
 	if(conf.Debug()) Error::Verbose("AGG::Cache::LoadICN: " + icn_folder);
@@ -619,7 +618,7 @@ void AGG::Cache::LoadMUS(const MUS::mus_t mus)
 {
     std::vector<u8> & v = mus_cache[mus];
     const Settings & conf = Settings::Get();
-    const std::string musname(conf.LocalDataPrefix() + SEPARATOR + "music" + SEPARATOR + MUS::GetString(mus));
+    const std::string musname(conf.LocalPrefix() + SEPARATOR + "files" + SEPARATOR + "music" + SEPARATOR + MUS::GetString(mus));
     if(v.size()) return;
 
     if(conf.Debug()) Error::Verbose("AGG::Cache::LoadMUS: " + musname);
@@ -1012,7 +1011,7 @@ void AGG::PlayMusic(const MUS::mus_t mus, bool loop)
 #ifdef WITH_MIXER
 	    Music::Play(AGG::Cache::Get().GetMUS(mus), loop);
 #else
-	    const std::string file = conf.LocalDataPrefix() + SEPARATOR + "music" + SEPARATOR + MUS::GetString(mus);
+	    const std::string file = conf.LocalPrefix() + SEPARATOR + "files" + SEPARATOR + "music" + SEPARATOR + MUS::GetString(mus);
 	    if(FilePresent(file))
 	    {
 		const std::string run = conf.PlayMusCommand() + " " + file;
@@ -1038,7 +1037,7 @@ void AGG::PlayMusic(const MUS::mus_t mus, bool loop)
 #else
 	    if(conf.PlayMusCommand().size())
 	    {
-		const std::string file = conf.LocalDataPrefix() + SEPARATOR + "cache" + SEPARATOR + XMI::GetString(xmi);
+		const std::string file = conf.LocalPrefix() + SEPARATOR + "files" + SEPARATOR + "cache" + SEPARATOR + XMI::GetString(xmi);
 		StoreMemToFile(AGG::Cache::Get().GetMID(xmi), file);
 		if(FilePresent(file))
 		{
