@@ -884,36 +884,48 @@ Game::menu_t Game::HumanTurn(void)
         if((!conf.HideInterface() || conf.ShowRadar()) &&
            le.MouseCursor(I.radar.GetArea()))
 	{
-	    cursor.SetThemes(Cursor::POINTER);
+	    if(Cursor::POINTER != cursor.Themes())
+	    {
+		cursor.SetThemes(Cursor::POINTER);
+		I.SetRedraw(REDRAW_CURSOR);
+	    }
 	    I.radar.QueueEventProcessing();
-	    I.SetRedraw(REDRAW_CURSOR);
 	}
 	else
 	// cursor over icons panel
         if((!conf.HideInterface() || conf.ShowIcons()) &&
            le.MouseCursor(I.iconsPanel.GetArea()))
 	{
-	    cursor.SetThemes(Cursor::POINTER);
+	    if(Cursor::POINTER != cursor.Themes())
+	    {
+		cursor.SetThemes(Cursor::POINTER);
+		I.SetRedraw(REDRAW_CURSOR);
+	    }
 	    I.iconsPanel.QueueEventProcessing();
-	    I.SetRedraw(REDRAW_CURSOR);
 	}
 	else
 	// cursor over buttons area
         if((!conf.HideInterface() || conf.ShowButtons()) &&
            le.MouseCursor(I.buttonsArea.GetArea()))
 	{
-	    cursor.SetThemes(Cursor::POINTER);
+	    if(Cursor::POINTER != cursor.Themes())
+	    {
+		cursor.SetThemes(Cursor::POINTER);
+		I.SetRedraw(REDRAW_CURSOR);
+	    }
 	    I.buttonsArea.QueueEventProcessing(res);
-	    I.SetRedraw(REDRAW_CURSOR);
 	}
 	else
         // cursor over status area
         if((!conf.HideInterface() || conf.ShowStatus()) &&
            le.MouseCursor(I.statusWindow.GetArea()))
 	{
-	    cursor.SetThemes(Cursor::POINTER);
+	    if(Cursor::POINTER != cursor.Themes())
+	    {
+		cursor.SetThemes(Cursor::POINTER);
+		I.SetRedraw(REDRAW_CURSOR);
+	    }
 	    I.statusWindow.QueueEventProcessing();
-	    I.SetRedraw(REDRAW_CURSOR);
 	}
 	else
 	// cursor over game area

@@ -40,6 +40,7 @@ namespace Interface
 	const std::vector<Rect> & GetCoords(void) const;
         const Rect &    GetArea(void) const;
         Splitter &      GetSplitter(void);
+        SpriteCursor &  GetCursor(void);
 
     protected:
 	std::vector<Rect> coords;
@@ -47,7 +48,7 @@ namespace Interface
         Surface           sf_cursor;
         SpriteCursor      sp_cursor;
         Splitter          splitter;
-        bool              visible;
+        bool              selected;
     };
 
     class HeroesIcons : public IconsBar

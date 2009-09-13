@@ -47,7 +47,7 @@ namespace Game
 #define ICONS_CURSOR_COLOR      0x98
 
 /* Interface::IconsBar */
-Interface::IconsBar::IconsBar() : visible(false)
+Interface::IconsBar::IconsBar() : selected(false)
 {
     area.w = ICONS_WIDTH;
 }
@@ -93,6 +93,11 @@ Splitter & Interface::IconsBar::GetSplitter(void)
     return splitter;
 }
 
+SpriteCursor & Interface::IconsBar::GetCursor(void)
+{
+    return sp_cursor;
+}
+
 
 /*Interface::HeroesIcons */
 Interface::HeroesIcons::HeroesIcons()
@@ -113,14 +118,13 @@ void Interface::HeroesIcons::SetPos(s16 px, s16 py)
     sp_cursor.SetSprite(sf_cursor);
 
     splitter.SetArea(px + 55, py + 13, 10, ICONS_CURSOR_HEIGHT * coords.size() - 35);
-
     std::vector<Heroes *> & heroes = world.GetMyKingdom().GetHeroes();
     splitter.SetRange(0, heroes.size() > coords.size() ? heroes.size() - coords.size() : 0);
 }
 
 const Heroes * Interface::HeroesIcons::Selected(void) const
 {
-    return Size() && visible ? *it_cur : NULL;
+    return Size() && selected ? *it_cur : NULL;
 }
 
 u32 Interface::HeroesIcons::Size(void) const
@@ -157,7 +161,7 @@ void Interface::HeroesIcons::Redraw(void)
 {
     std::vector<Heroes *> & heroes = world.GetMyKingdom().GetHeroes();
 
-    if(visible) sp_cursor.Hide();
+    if(selected) sp_cursor.Hide();
     splitter.Hide();
     splitter.SetSprite(AGG::GetICN(Settings::Get().EvilInterface() ? ICN::SCROLLE : ICN::SCROLL, 4));
 
@@ -173,7 +177,7 @@ void Interface::HeroesIcons::Redraw(void)
 	    RedrawIcon(**it, coords[ii]);
 
 	    // select current
-	    if(visible && it_cur == it) sp_cursor.Show(coords[ii].x - 5, coords[ii].y - 5);
+	    if(selected && it_cur == it) sp_cursor.Show(coords[ii].x - 5, coords[ii].y - 5);
 
 	    ++ii;
 	}
@@ -190,10 +194,10 @@ void Interface::HeroesIcons::Hide(void)
 
 void Interface::HeroesIcons::Unselect(void)
 {
-    if(visible)
+    if(selected)
     {
         sp_cursor.Hide();
-	visible = false;
+	selected = false;
     }
 }
 
@@ -240,12 +244,12 @@ void Interface::HeroesIcons::Select(const Heroes *hero)
 	splitter.Move(i2);
     }
 
-    visible = true;
+    selected = true;
 }
 
 bool Interface::HeroesIcons::isSelected(void) const
 {
-    return visible;
+    return selected;
 }
 
 void Interface::HeroesIcons::Reset(void)
@@ -256,7 +260,7 @@ void Interface::HeroesIcons::Reset(void)
 
     it_top = heroes.begin();
     it_cur = it_top;
-    visible = false;
+    selected = false;
 
     splitter.SetRange(0, heroes.size() > coords.size() ? heroes.size() - coords.size() : 0);
 }
@@ -369,7 +373,7 @@ void Interface::CastleIcons::SetPos(s16 px, s16 py)
 
 const Castle * Interface::CastleIcons::Selected(void) const
 {
-    return Size() && visible ? *it_cur : NULL;
+    return Size() && selected ? *it_cur : NULL;
 }
 
 u32 Interface::CastleIcons::Size(void) const
@@ -406,7 +410,7 @@ void Interface::CastleIcons::Redraw(void)
 {
     std::vector<Castle *> & castles = world.GetMyKingdom().GetCastles();
 
-    if(visible) sp_cursor.Hide();
+    if(selected) sp_cursor.Hide();
     splitter.Hide();
     splitter.SetSprite(AGG::GetICN(Settings::Get().EvilInterface() ? ICN::SCROLLE : ICN::SCROLL, 4));
 
@@ -422,7 +426,7 @@ void Interface::CastleIcons::Redraw(void)
     	    RedrawIcon(**it, coords[ii]);
 
 	    // select current
-	    if(visible && it_cur == it) sp_cursor.Show(coords[ii].x - 5, coords[ii].y - 5);
+	    if(selected && it_cur == it) sp_cursor.Show(coords[ii].x - 5, coords[ii].y - 5);
 
 	    ++ii;
 	}
@@ -439,10 +443,10 @@ void Interface::CastleIcons::Hide(void)
 
 void Interface::CastleIcons::Unselect(void)
 {
-    if(visible)
+    if(selected)
     {
         sp_cursor.Hide();
-	visible = false;
+	selected = false;
     }
 }
 
@@ -487,12 +491,12 @@ void Interface::CastleIcons::Select(const Castle *castle)
 	splitter.Move(i2);
     }
 
-    visible = true;
+    selected = true;
 }
 
 bool Interface::CastleIcons::isSelected(void) const
 {
-    return visible;
+    return selected;
 }
 
 void Interface::CastleIcons::Reset(void)
@@ -502,7 +506,7 @@ void Interface::CastleIcons::Reset(void)
 
     it_top = castles.begin();
     it_cur = it_top;
-    visible = false;
+    selected = false;
 
     splitter.SetRange(0, castles.size() > coords.size() ? castles.size() - coords.size() : 0);
 }
@@ -678,22 +682,12 @@ void Interface::IconsPanel::Redraw(void)
 
     Rect srcrt;
     Point dstpt;
-    const Heroes* select_heroes = NULL;
-    const Castle* select_castle = NULL;
 
-    if(heroesIcons.isSelected())
-    {
-	select_heroes = heroesIcons.Selected();
-	heroesIcons.Unselect();
-	heroesIcons.Reset();
-    }
+    if(heroesIcons.isSelected()) heroesIcons.GetCursor().Hide();
     else
-    if(castleIcons.isSelected())
-    {
-	select_castle = castleIcons.Selected();
-	castleIcons.Unselect();
-	castleIcons.Reset();
-    }
+    if(castleIcons.isSelected()) castleIcons.GetCursor().Hide();
+
+    display.FillRect(0, 0, 0, *this);
 
     // ICON PANEL
     const Sprite & icnadv = AGG::GetICN(Settings::Get().EvilInterface() ? ICN::ADVBORDE : ICN::ADVBORD, 0);
@@ -721,11 +715,9 @@ void Interface::IconsPanel::Redraw(void)
     buttonScrollHeroesDown.Draw();
     buttonScrollCastleDown.Draw();
 
-    if(select_heroes)
-	heroesIcons.Select(select_heroes);
+    if(heroesIcons.isSelected()) heroesIcons.GetCursor().Show();
     else
-    if(select_castle)
-	castleIcons.Select(select_castle);
+    if(castleIcons.isSelected()) castleIcons.GetCursor().Show();
 
     heroesIcons.Redraw();
     castleIcons.Redraw();        
@@ -813,12 +805,10 @@ void Interface::IconsPanel::QueueEventProcessing(void)
         const s16 ox = mp.x - border.GetRect().x;
         const s16 oy = mp.y - border.GetRect().y;
         SpriteCursor sp(sf, border.GetRect().x, border.GetRect().y);
-        const Castle* castle = NULL;
-        const Heroes* heroes = NULL;
-        if(heroesIcons.isSelected()){ heroes = heroesIcons.Selected(); heroesIcons.Unselect(); }
-        else
-        if(castleIcons.isSelected()){ castle = castleIcons.Selected(); castleIcons.Unselect(); }
         cursor.Hide();
+	if(heroesIcons.isSelected()) heroesIcons.GetCursor().Hide();
+	else
+	if(castleIcons.isSelected()) castleIcons.GetCursor().Hide();
         sp.Redraw();
         cursor.Show();
         display.Flip();
@@ -834,9 +824,9 @@ void Interface::IconsPanel::QueueEventProcessing(void)
         }
         cursor.Hide();
         SetPos(mp.x - ox, mp.y - oy);
-        if(heroes) heroesIcons.Select(heroes);
-        else
-        if(castle) castleIcons.Select(castle);
+	if(heroesIcons.isSelected()) heroesIcons.GetCursor().Show();
+	else
+	if(castleIcons.isSelected()) castleIcons.GetCursor().Show();
 	Interface::Basic::Get().SetRedraw(REDRAW_GAMEAREA);
     }
     else
