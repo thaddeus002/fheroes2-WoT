@@ -45,6 +45,7 @@ public:
 	LOADGAME          = 0x00000001,
 	AUTOSAVE          = 0x00000002,
 	DEDICATEDSERVER   = 0x00000004,
+	POCKETPC          = 0x00000008,
 
 	SHOWRADAR         = 0x00000200,
 	SHOWICONS         = 0x00000400,
@@ -91,6 +92,7 @@ public:
     u8 Debug(void) const;
     u8 Animation(void) const;
 
+    const std::string & BuildVersion(void) const;
     const std::string & DataDirectory(void) const;
     const std::string & LocalPrefix(void) const;
     const std::string & PlayMusCommand(void) const;
@@ -123,6 +125,7 @@ public:
     bool BattleMovementShaded(void) const;
     bool BattleMouseShaded(void) const;
     bool Unicode(void) const;
+    bool PocketPC(void) const;
 
     const Size & VideoMode(void) const;
 
@@ -209,6 +212,7 @@ private:
     Color::color_t my_color;
     Color::color_t cur_color;
 
+    std::string build_version;
     std::string path_data_directory;
     std::string local_prefix;
 

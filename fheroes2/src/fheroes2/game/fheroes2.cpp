@@ -55,16 +55,7 @@ int main(int argc, char **argv)
 	Settings & conf = Settings::Get();
 	int test = 0;
 
-	std::string caption("Free Heroes II, version: ");
-	String::AddInt(caption, conf.MajorVersion());
-	caption += ".";
-	String::AddInt(caption, conf.MinorVersion());
-
-#ifndef BUILD_RELEASE
-	caption += ", build: ";
-	String::AddInt(caption, conf.DateBuild());
-#endif
-
+	std::string caption("Free Heroes II, " + conf.BuildVersion());
 	std::cout << caption << std::endl;
 
 	// set data prefix
@@ -72,13 +63,19 @@ int main(int argc, char **argv)
 #ifdef FHEROES2_DATA
 	prefix = FHEROES2_DATA;
 #endif
+
+// getenv undefined for mingw32ce
+#ifndef POCKETPC
 	if(std::getenv("FHEROES2_DATA")) prefix = std::getenv("FHEROES2_DATA");
+#endif
 	conf.SetLocalPrefix(prefix);
 
 	// load fheroes2.cfg
 	const std::string fheroes2_cfg(std::string(prefix) + SEPARATOR + "fheroes2.cfg");
 	std::cout << "config: " << fheroes2_cfg << (conf.Read(fheroes2_cfg) ? " load" : " not found") << std::endl;
 
+// getopt undefined for mingw32ce
+#ifndef POCKETPC
 	{
 	    int opt;
 	    while((opt = getopt(argc, argv, "hest:d:")) != -1)
@@ -90,28 +87,18 @@ int main(int argc, char **argv)
 
 			std::cout << "start: editor mode." << std::endl;
 
-			caption = "Free Heroes II (Editor), version: ";
-			String::AddInt(caption, conf.MajorVersion());
-			caption += ".";
-			String::AddInt(caption, conf.MinorVersion());
-
-#ifdef BUILD_RELEASE
-			break;
-#else
-			caption += ", build: ";
-			String::AddInt(caption, conf.DateBuild());
+			caption = "Free Heroes II (Editor), " + conf.BuildVersion();
 			break;
 			
+#ifndef BUILD_RELEASE
                     case 't':
 			test = String::ToInt(optarg);
 			break;
-#endif
 
                     case 'd':
-#ifndef BUILD_RELEASE
                 	conf.SetDebug(optarg ? String::ToInt(optarg) : 0);
-#endif
                 	break;
+#endif
 
                     case 's':
 #ifdef WITH_NET
@@ -124,6 +111,7 @@ int main(int argc, char **argv)
 		}
 
 	}
+#endif
 
 #ifdef WITH_TTF
 	if(conf.Unicode())
@@ -270,6 +258,7 @@ int main(int argc, char **argv)
 	    		case Game::LOADCAMPAIN:    rs = Game::LoadCampain();		break;
 	    		case Game::LOADMULTI:      rs = Game::LoadMulti();		break;
 	    		case Game::SCENARIOINFO:   rs = Game::ScenarioInfo();		break;
+	    		case Game::SELECTSCENARIO: rs = Game::SelectScenario();		break;
 			case Game::STARTGAME:      rs = Game::StartGame();      	break;
 		        case Game::TESTING:        rs = Game::Testing(test);		break;
 

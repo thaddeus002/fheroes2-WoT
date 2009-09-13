@@ -44,6 +44,11 @@ endif
 CFLAGS := $(SDL_FLAGS) $(CFLAGS)
 LIBS := $(SDL_LIBS) $(LIBS)
 
+ifdef POCKETPC
+CFLAGS := $(CFLAGS) -O2 -DPOCKETPC -static
+LIBS := -Wl,-Bstatic $(LIBS) -lmmtimer
+endif
+
 ifeq ($(PLATFORM),)
 PLATFORM := unix
 endif

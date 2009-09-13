@@ -259,6 +259,9 @@ void String::AppendKey(std::string & res, KeySym sym, u16 mod)
 }
 
 #ifdef __WIN32__ /* SDL_platform.h */
+#ifdef POCKETPC
+#define PATH_MAX 255
+#endif
 const char *GetDirname(const char *path)
 {
     static char buff[PATH_MAX];

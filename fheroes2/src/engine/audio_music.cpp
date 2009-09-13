@@ -114,6 +114,7 @@ namespace Music
 
 int callbackPlayMusic(void *ptr)
 {
+#ifndef POCKETPC
     if(ptr && std::system(NULL))
     {
 	info_t & info = *reinterpret_cast<info_t *>(ptr);
@@ -124,6 +125,7 @@ int callbackPlayMusic(void *ptr)
 	else
 	return std::system(info.run.c_str());
     }
+#endif
     return -1;
 }
 

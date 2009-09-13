@@ -46,15 +46,7 @@ Game::menu_t Game::Credits(void)
 {
     const Settings & conf = Settings::Get();
 
-    std::string str("version: ");
-    String::AddInt(str, conf.MajorVersion());
-    str.append(".");
-    String::AddInt(str, conf.MinorVersion());
-
-#ifndef BUILD_RELEASE
-    str.append(", build: ");
-    String::AddInt(str, conf.DateBuild());
-#endif
+    std::string str = conf.BuildVersion();
 
     str.append("\n \n");
     str.append("Site project: https://sourceforge.net/projects/fheroes2");

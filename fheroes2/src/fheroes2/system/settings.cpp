@@ -37,6 +37,7 @@ namespace
         { "sound",             Settings::SOUND                       },
         { "music",             Settings::MUSIC_MIDI, Settings::MUSIC },
         { "fullscreen",        Settings::FULLSCREEN                  },
+        { "full screen",       Settings::FULLSCREEN                  },
         { "hide interface",    Settings::HIDEINTERFACE               },
         { "evil interface",    Settings::EVILINTERFACE               },
         { "evilinterface",     Settings::EVILINTERFACE               },
@@ -50,17 +51,33 @@ namespace
         { "unicode",           Settings::USEUNICODE                  },
         { "autosave",          Settings::AUTOSAVE                    },
         { "use cache",         Settings::USECACHE                    },
+        { "pocketpc",          Settings::POCKETPC                    },
+        { "pocket pc",         Settings::POCKETPC                    },
     };
 }
 
 /* constructor */
 Settings::Settings() : major_version(MAJOR_VERSION), minor_version(MINOR_VERSION), build_date(BUILD_DATE),
-    debug(0), video_mode(640, 480), game_difficulty(Difficulty::NORMAL), path_data_directory("data"),
-    my_color(Color::GRAY), cur_color(Color::GRAY),
+    debug(0), video_mode(640, 480), game_difficulty(Difficulty::NORMAL),
+    my_color(Color::GRAY), cur_color(Color::GRAY), path_data_directory("data"),
     font_normal("dejavusans.ttf"), font_small("dejavusans.ttf"), size_normal(15), size_small(10),
     sound_volume(6), music_volume(6), animation(6), game_type(0), players_colors(0), preferably_count_players(0),
     current_kingdom_colors(0), game_over_result(GameOver::COND_NONE), port(DEFAULT_PORT)
 {
+#ifdef POCKETPC
+    SetModes(POCKETPC);
+    build_version = "pocketpc version: ";
+#else
+    build_version = "version: ";
+#endif
+    String::AddInt(build_version, MAJOR_VERSION);
+    build_version += ".";
+    String::AddInt(build_version, MINOR_VERSION);
+#ifndef BUILD_RELEASE
+    build_version += ", build: ";
+    String::AddInt(build_version, BUILD_DATE);
+#endif
+
     // default maps dir
     list_maps_directory.push_back("maps");
 
@@ -271,6 +288,8 @@ u8 Settings::FontsNormalSize(void) const { return size_normal; }
 u8 Settings::FontsSmallSize(void) const { return size_small; }
 bool Settings::FontsRenderBlended(void) const { return Modes(FONTRENDERBLENDED); }
 
+const std::string & Settings::BuildVersion(void) const { return build_version; }
+
 /* return path to data directory */
 const std::string & Settings::DataDirectory(void) const { return path_data_directory; }
 
@@ -328,6 +347,8 @@ bool Settings::BattleMouseShaded(void) const { return Modes(BATTLEMOUSESHADOW); 
 
 /* unicode support */
 bool Settings::Unicode(void) const { return Modes(USEUNICODE); }
+
+bool Settings::PocketPC(void) const { return Modes(POCKETPC); }
 
 /* get video mode */
 const Size & Settings::VideoMode(void) const { return video_mode; }

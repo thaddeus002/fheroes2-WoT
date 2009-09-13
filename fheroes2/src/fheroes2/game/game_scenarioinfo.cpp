@@ -34,6 +34,7 @@
 #include "splitter.h"
 #include "world.h"
 #include "player.h"
+#include "pocketpc.h"
 #include "game.h"
 
 extern bool DialogSelectMapsFileList(MapsFileInfoList &, std::string &);
@@ -43,11 +44,19 @@ void RedrawRatingInfo(TextSprite &);
 void UpdateCoordOpponentsInfo(const Point &, std::vector<Rect> &);
 void UpdateCoordClassInfo(const Point &, std::vector<Rect> &);
 
+Game::menu_t Game::SelectScenario(void)
+{
+    Settings & conf = Settings::Get();
+    if(conf.PocketPC()) return PocketPC::SelectScenario();
+    return SCENARIOINFO;
+}
+
 Game::menu_t Game::ScenarioInfo(void)
 {
-    AGG::PlayMusic(MUS::MAINMENU);
-
     Settings & conf = Settings::Get();
+    if(conf.PocketPC()) return PocketPC::ScenarioInfo();
+
+    AGG::PlayMusic(MUS::MAINMENU);
     conf.SetPreferablyCountPlayers(0);
 
     MapsFileInfoList lists;

@@ -85,6 +85,7 @@ namespace Game
     menu_t LoadCampain(void);
     menu_t LoadMulti(void);
     menu_t ScenarioInfo(void);
+    menu_t SelectScenario(void);
     menu_t StartGame(void);
 
     menu_t NetworkHost(void);

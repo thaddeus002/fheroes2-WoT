@@ -23,6 +23,8 @@
 #include "cursor.h"
 #include "dialog.h"
 #include "button.h"
+#include "settings.h"
+#include "pocketpc.h"
 #include "game.h"
 
 #define NEWGAME_DEFAULT 1
@@ -33,6 +35,8 @@
 
 Game::menu_t Game::MainMenu(void)
 {
+    if(Settings::Get().PocketPC()) return PocketPC::MainMenu();
+
     Mixer::Pause();
     AGG::PlayMusic(MUS::MAINMENU);
 

@@ -280,6 +280,9 @@ void Interface::StatusWindow::DrawArmyInfo(const u8 oh) const
 
 void Interface::StatusWindow::RedrawAITurns(u8 color, u8 progress) const
 {
+    const Settings & conf = Settings::Get();
+    if(conf.HideInterface() && !conf.ShowStatus()) return;
+
     // restore background
     DrawBackground();
 
