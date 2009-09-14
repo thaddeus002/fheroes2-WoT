@@ -99,7 +99,9 @@ void WriteBE16(char *p, u16 x);
 
 #ifdef __MINGW32CE__
 #include <cstdlib>
+#ifndef PATH_MAX
 #define PATH_MAX 255
+#endif
 #define system(x) 0
 #define getenv(x) 0
 #define getopt(x, y, z) 0

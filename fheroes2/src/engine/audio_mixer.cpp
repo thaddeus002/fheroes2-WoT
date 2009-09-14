@@ -19,7 +19,6 @@
  ***************************************************************************/
 
 #include "error.h"
-#include "SDL_mixer.h"
 #include "engine.h"
 #include "audio.h"
 #include "audio_cdrom.h"
@@ -39,6 +38,7 @@ namespace Mixer
 };
 
 #ifdef WITH_MIXER
+#include "SDL_mixer.h"
 
 namespace Mixer
 {

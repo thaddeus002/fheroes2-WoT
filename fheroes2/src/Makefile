@@ -57,7 +57,6 @@ export CXX AR LINK CFLAGS LIBS PLATFORM
 .PHONY: clean
 
 all:
-	echo $(PLATFORM)
 	$(MAKE) -C xmlccwrap
 	$(MAKE) -C engine
 	$(MAKE) -C dist
