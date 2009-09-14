@@ -1,0 +1,4 @@
+AR := arm-mingw32ce-ar
+CXX := arm-mingw32ce-g++
+CFLAGS := $(CFLAGS) -O2 -DBUILD_POCKETPC -static
+LIBS := -Wl,-Bstatic $(LIBS) -lmmtimer

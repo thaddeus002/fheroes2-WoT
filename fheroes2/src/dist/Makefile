@@ -9,6 +9,7 @@ endif
 TARGET := fheroes2
 LIBENGINE := ../engine/libengine.a ../xmlccwrap/libxmlccwrap.a
 LIBS := $(LIBENGINE) $(LIBS)
+BUILD_DATE := $(shell date +%Y%m%d)
 CFLAGS := $(CFLAGS) -I../engine -I../xmlccwrap -I$(PREFIX)/include -DBUILD_DATE=$(BUILD_DATE)
 
 SOURCEROOT := ../fheroes2

@@ -1,7 +1,2 @@
-ifndef AR
 AR := ar
-endif
-
-ifndef CXX
 CXX := g++
-endif

@@ -20,7 +20,6 @@
 
 #include <iostream>
 #include <string>
-#include <cstdlib>
 
 #include "gamedefs.h"
 #include "engine.h"
@@ -63,19 +62,12 @@ int main(int argc, char **argv)
 #ifdef FHEROES2_DATA
 	prefix = FHEROES2_DATA;
 #endif
-
-// getenv undefined for mingw32ce
-#ifndef POCKETPC
-	if(std::getenv("FHEROES2_DATA")) prefix = std::getenv("FHEROES2_DATA");
-#endif
+	if(getenv("FHEROES2_DATA")) prefix = getenv("FHEROES2_DATA");
 	conf.SetLocalPrefix(prefix);
 
 	// load fheroes2.cfg
 	const std::string fheroes2_cfg(std::string(prefix) + SEPARATOR + "fheroes2.cfg");
 	std::cout << "config: " << fheroes2_cfg << (conf.Read(fheroes2_cfg) ? " load" : " not found") << std::endl;
-
-// getopt undefined for mingw32ce
-#ifndef POCKETPC
 	{
 	    int opt;
 	    while((opt = getopt(argc, argv, "hest:d:")) != -1)
@@ -111,7 +103,6 @@ int main(int argc, char **argv)
 		}
 
 	}
-#endif
 
 #ifdef WITH_TTF
 	if(conf.Unicode())

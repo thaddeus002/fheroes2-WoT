@@ -95,8 +95,6 @@ void Music::Reset(void)
 }
 
 #else
-
-#include <cstdlib>
 #include "thread.h"
 
 struct info_t
@@ -114,18 +112,16 @@ namespace Music
 
 int callbackPlayMusic(void *ptr)
 {
-#ifndef POCKETPC
-    if(ptr && std::system(NULL))
+    if(ptr && system(NULL))
     {
 	info_t & info = *reinterpret_cast<info_t *>(ptr);
 	if(info.loop)
 	{
-	    while(1){ std::system(info.run.c_str()); DELAY(10); }
+	    while(1){ system(info.run.c_str()); DELAY(10); }
 	}
 	else
-	return std::system(info.run.c_str());
+	return system(info.run.c_str());
     }
-#endif
     return -1;
 }
 

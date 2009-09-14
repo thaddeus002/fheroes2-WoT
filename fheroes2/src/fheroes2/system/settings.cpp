@@ -64,7 +64,7 @@ Settings::Settings() : major_version(MAJOR_VERSION), minor_version(MINOR_VERSION
     sound_volume(6), music_volume(6), animation(6), game_type(0), players_colors(0), preferably_count_players(0),
     current_kingdom_colors(0), game_over_result(GameOver::COND_NONE), port(DEFAULT_PORT)
 {
-#ifdef POCKETPC
+#ifdef BUILD_POCKETPC
     SetModes(POCKETPC);
     build_version = "pocketpc version: ";
 #else

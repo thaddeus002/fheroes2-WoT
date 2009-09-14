@@ -6,9 +6,7 @@ TARGET := fheroes2
 SDL_LIBS := $(shell sdl-config --libs)
 SDL_FLAGS := $(shell sdl-config --cflags)
 
-BUILD_DATE := $(shell date +%Y%m%d)
-
-CFLAGS := -Wall -fsigned-char -DTIXML_USE_STL
+CFLAGS := $(CFLAGS) -Wall -fsigned-char -DTIXML_USE_STL
 LIBS := -lz
 
 ifdef DEBUG
@@ -44,26 +42,22 @@ endif
 CFLAGS := $(SDL_FLAGS) $(CFLAGS)
 LIBS := $(SDL_LIBS) $(LIBS)
 
-ifdef POCKETPC
-CFLAGS := $(CFLAGS) -O2 -DPOCKETPC -static
-LIBS := -Wl,-Bstatic $(LIBS) -lmmtimer
-endif
-
 ifeq ($(PLATFORM),)
-PLATFORM := unix
-endif
-
 ifeq ($(OS),Windows_NT)
 PLATFORM := mingw
+else
+PLATFORM := unix
+endif
 endif
 
 include Makefile.$(PLATFORM)
 
-export BUILD_DATE CXX AR LINK CFLAGS LIBS PLATFORM
+export CXX AR LINK CFLAGS LIBS PLATFORM
 
 .PHONY: clean
 
 all:
+	echo $(PLATFORM)
 	$(MAKE) -C xmlccwrap
 	$(MAKE) -C engine
 	$(MAKE) -C dist

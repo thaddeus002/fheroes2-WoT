@@ -97,4 +97,15 @@ u16 ReadLE16(const u8 *p);
 void WriteBE32(char *p, u32 x);
 void WriteBE16(char *p, u16 x);
 
+#ifdef __MINGW32CE__
+#include <cstdlib>
+#define PATH_MAX 255
+#define system(x) 0
+#define getenv(x) 0
+#define getopt(x, y, z) 0
+#define optarg 0
+#else
+#include <cstdlib>
+#endif
+
 #endif

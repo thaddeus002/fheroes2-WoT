@@ -7,13 +7,11 @@ LIBENGINE := ../engine/libengine.a
 LIBS := $(LIBENGINE) $(LIBS)
 CFLAGS := $(CFLAGS) -I../engine
 
-CC := g++
-
 all: $(TARGETS)
 
 $(TARGETS): $(addsuffix .cpp, $(TARGETS)) $(LIBENGINE)
-	$(CC) -c $@.cpp $(CFLAGS)
-	$(CC) -o $@ $@.o $(LIBS)
+	$(CXX) -c $@.cpp $(CFLAGS)
+	$(CXX) -o $@ $@.o $(LIBS)
 
 .PHONY: clean
 
