@@ -928,6 +928,18 @@ Game::menu_t Game::HumanTurn(void)
 	    I.statusWindow.QueueEventProcessing();
 	}
 	else
+        // cursor over control panel
+        if(conf.HideInterface() && conf.ShowControlPanel() &&
+           le.MouseCursor(I.controlPanel.GetArea()))
+	{
+	    if(Cursor::POINTER != cursor.Themes())
+	    {
+		cursor.SetThemes(Cursor::POINTER);
+		I.SetRedraw(REDRAW_CURSOR);
+	    }
+	    I.controlPanel.QueueEventProcessing();
+	}
+	else
 	// cursor over game area
 	if(le.MouseCursor(I.gameArea.GetArea()))
 	{

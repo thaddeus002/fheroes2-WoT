@@ -47,6 +47,7 @@ public:
 	DEDICATEDSERVER   = 0x00000004,
 	POCKETPC          = 0x00000008,
 
+	SHOWCPANEL        = 0x00000100,
 	SHOWRADAR         = 0x00000200,
 	SHOWICONS         = 0x00000400,
 	SHOWBUTTONS       = 0x00000800,
@@ -114,6 +115,7 @@ public:
     bool CDMusic(void) const;
     bool FullScreen(void) const;
     bool HideInterface(void) const;
+    bool ShowControlPanel(void) const;
     bool ShowRadar(void) const;
     bool ShowIcons(void) const;
     bool ShowButtons(void) const;

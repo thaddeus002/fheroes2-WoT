@@ -66,6 +66,7 @@ Settings::Settings() : major_version(MAJOR_VERSION), minor_version(MINOR_VERSION
 {
 #ifdef BUILD_POCKETPC
     SetModes(POCKETPC);
+    SetModes(SHOWCPANEL);
     build_version = "pocketpc version: ";
 #else
     build_version = "version: ";
@@ -325,6 +326,7 @@ bool Settings::EvilInterface(void) const { return Modes(EVILINTERFACE); }
 
 bool Settings::HideInterface(void) const { return Modes(HIDEINTERFACE); }
 
+bool Settings::ShowControlPanel(void) const { return (Modes(POCKETPC) || Modes(SHOWCPANEL)); }
 bool Settings::ShowRadar(void) const { return Modes(SHOWRADAR); }
 bool Settings::ShowIcons(void) const { return Modes(SHOWICONS); }
 bool Settings::ShowButtons(void) const { return Modes(SHOWBUTTONS); }

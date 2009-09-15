@@ -26,7 +26,8 @@
 
 Interface::Basic::Basic() : gameArea(GameArea::Get()), radar(Radar::Get()),
     iconsPanel(IconsPanel::Get()), buttonsArea(ButtonsArea::Get()),
-    statusWindow(StatusWindow::Get()), borderWindow(BorderWindow::Get()), redraw(0)
+    statusWindow(StatusWindow::Get()), borderWindow(BorderWindow::Get()),
+    controlPanel(ControlPanel::Get()), redraw(0)
 {
     const Display & display = Display::Get();
     const u16 & px = display.w() - BORDERWIDTH - RADARWIDTH;
@@ -38,6 +39,7 @@ Interface::Basic::Basic() : gameArea(GameArea::Get()), radar(Radar::Get()),
 	buttonsArea.SetPos(px - BORDERWIDTH, iconsPanel.GetArea().y + iconsPanel.GetArea().h);
 	statusWindow.SetPos(px - BORDERWIDTH, buttonsArea.GetArea().y + buttonsArea.GetArea().h);
         iconsPanel.SetCount(2);
+	controlPanel.SetPos(display.w() - controlPanel.GetArea().w - 32, 0);
     }
     else
     {
@@ -111,6 +113,8 @@ void Interface::Basic::Redraw(u8 force)
     if((conf.HideInterface() && conf.ShowButtons()) || ((redraw | force) & REDRAW_BUTTONS)) buttonsArea.Redraw();
 
     if((conf.HideInterface() && conf.ShowStatus()) || ((redraw | force) & REDRAW_STATUS)) statusWindow.Redraw();
+
+    if(conf.HideInterface() && conf.ShowControlPanel() && (redraw & REDRAW_GAMEAREA)) controlPanel.Redraw();
 
     if((redraw | force) & REDRAW_BORDER) borderWindow.Redraw();
 

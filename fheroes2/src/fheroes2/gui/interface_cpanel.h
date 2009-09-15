@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2008 by Andrey Afletdinov                               *
+ *   Copyright (C) 2009 by Andrey Afletdinov                               *
  *   afletdinov@mail.dc.baikal.ru                                          *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -18,66 +18,33 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#ifndef H2GAMEINTERFACE_H
-#define H2GAMEINTERFACE_H
+#ifndef H2INTERFACE_CPANEL_H
+#define H2INTERFACE_CPANEL_H
 
 #include "gamedefs.h"
-#include "interface_border.h"
-#include "interface_radar.h"
-#include "interface_buttons.h"
-#include "interface_icons.h"
-#include "interface_status.h"
-#include "interface_gamearea.h"
-#include "interface_cpanel.h"
-
-enum redraw_t
-{
-    REDRAW_RADAR     = 0x01,
-    REDRAW_HEROES    = 0x02,
-    REDRAW_CASTLES   = 0x04,
-    REDRAW_BUTTONS   = 0x08,
-    REDRAW_STATUS    = 0x10,
-    REDRAW_BORDER    = 0x20,
-    REDRAW_GAMEAREA  = 0x40,
-    REDRAW_CURSOR    = 0x80,
-
-    REDRAW_ICONS     = REDRAW_HEROES | REDRAW_CASTLES,
-    REDRAW_ALL       = 0xFF
-};
 
 namespace Interface
 {
-    class Basic
+    class ControlPanel : protected Rect
     {
     public:
-    	static Basic & Get(void);
+    	static ControlPanel & Get(void);
 
-	bool    NeedRedraw(void) const;
-	void    SetRedraw(u8);
-    	void	Redraw(u8 f = 0);
+	void SetPos(s16, s16);
+	void Redraw(void);
+	void QueueEventProcessing(void);
 
-	const Rect & GetAreaScrollLeft(void) const;
-	const Rect & GetAreaScrollRight(void) const;
-	const Rect & GetAreaScrollTop(void) const;
-	const Rect & GetAreaScrollBottom(void) const;
-
-	GameArea & gameArea;
-	Radar & radar;
-	IconsPanel & iconsPanel;
-	ButtonsArea & buttonsArea;
-	StatusWindow & statusWindow;
-	BorderWindow & borderWindow;
-	ControlPanel & controlPanel;
+	const Rect & GetArea(void);
 
     private:
-	Basic();
+	ControlPanel();
 
-	u8 redraw;
+	Rect rt_radr;
+	Rect rt_icon;
+	Rect rt_bttn;
+	Rect rt_stat;
 
-	Rect scrollLeft;
-	Rect scrollRight;
-	Rect scrollBottom;
-	Rect scrollTop;
+	Surface sf_area;
     };
 };
 
