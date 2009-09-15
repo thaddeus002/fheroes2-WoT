@@ -59,23 +59,45 @@ int main(int argc, char **argv)
 	std::string caption("Free Heroes II, " + conf.BuildVersion());
 	std::cout << caption << std::endl;
 
-	// set data prefix
-	const char* prefix = GetDirname(argv[0]);
-#ifdef FHEROES2_DATA
-	prefix = FHEROES2_DATA;
-#endif
-	if(getenv("FHEROES2_DATA")) prefix = getenv("FHEROES2_DATA");
-	conf.SetLocalPrefix(prefix);
+	std::string fheroes2_cfg;
 
-	// load fheroes2.cfg
-	const std::string fheroes2_cfg(std::string(prefix) + SEPARATOR + "fheroes2.cfg");
-	if(FilePresent(fheroes2_cfg))
+	// prefix from build
+#ifdef CONFIGURE_FHEROES2_DATA
+	conf.SetLocalPrefix(CONFIGURE_FHEROES2_DATA);
+#endif
+	if(conf.LocalPrefix().size())
 	{
-	    std::cout << "config: " << fheroes2_cfg << " load." << std::endl;
-	    conf.Read(fheroes2_cfg);
+	    fheroes2_cfg = conf.LocalPrefix() + SEPARATOR + "fheroes2.cfg";
+	    if(FilePresent(fheroes2_cfg))
+	    {
+		std::cout << "config: " << fheroes2_cfg << " load." << std::endl;
+		conf.Read(fheroes2_cfg);
+	    }
 	}
-	else
-	    std::cout << "config: " << fheroes2_cfg << " not found" << std::endl;
+
+	// prefix from env
+	if(getenv("FHEROES2_DATA"))
+	{
+	    conf.SetLocalPrefix(getenv("FHEROES2_DATA"));
+	    fheroes2_cfg = conf.LocalPrefix() + SEPARATOR + "fheroes2.cfg";
+	    if(FilePresent(fheroes2_cfg))
+	    {
+		std::cout << "config: " << fheroes2_cfg << " load." << std::endl;
+		conf.Read(fheroes2_cfg);
+	    }
+	}
+
+	// prefix from dirname
+	if(conf.LocalPrefix().empty())
+	{
+	    conf.SetLocalPrefix(GetDirname(argv[0]));
+	    fheroes2_cfg = conf.LocalPrefix() + SEPARATOR + "fheroes2.cfg";
+	    if(FilePresent(fheroes2_cfg))
+	    {
+		std::cout << "config: " << fheroes2_cfg << " load." << std::endl;
+	    	conf.Read(fheroes2_cfg);
+	    }
+	}
 
 	// getopt
 	{

@@ -153,7 +153,7 @@ public:
     u8   PreferablyCountPlayers(void) const;
     void SetPreferablyCountPlayers(u8 c);
 
-    void SetLocalPrefix(const std::string &);
+    void SetLocalPrefix(const char*);
 
     u16	GetPort(void) const;
 

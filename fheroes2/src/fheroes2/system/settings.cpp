@@ -591,9 +591,9 @@ u8 Settings::PreferablyCountPlayers(void) const
     return preferably_count_players;
 }
 
-void Settings::SetLocalPrefix(const std::string & str)
+void Settings::SetLocalPrefix(const char* str)
 {
-    local_prefix = str;
+    if(str) local_prefix = str;
 }
 
 u16 Settings::GetPort(void) const
