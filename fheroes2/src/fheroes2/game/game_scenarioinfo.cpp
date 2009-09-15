@@ -47,6 +47,7 @@ void UpdateCoordClassInfo(const Point &, std::vector<Rect> &);
 Game::menu_t Game::SelectScenario(void)
 {
     Settings & conf = Settings::Get();
+    conf.SetPreferablyCountPlayers(0);
     if(conf.PocketPC()) return PocketPC::SelectScenario();
     return SCENARIOINFO;
 }
@@ -57,7 +58,6 @@ Game::menu_t Game::ScenarioInfo(void)
     if(conf.PocketPC()) return PocketPC::ScenarioInfo();
 
     AGG::PlayMusic(MUS::MAINMENU);
-    conf.SetPreferablyCountPlayers(0);
 
     MapsFileInfoList lists;
     if(!PrepareMapsFileInfoList(lists))
@@ -86,6 +86,7 @@ Game::menu_t Game::ScenarioInfo(void)
     conf.LoadFileMaps(lists.front().file);
 
     const Point pointPanel(204, 32);
+    const Point pointDifficultyInfo(pointPanel.x + 24, pointPanel.y + 93);
     const Point pointOpponentInfo(pointPanel.x + 24, pointPanel.y + 202);
     const Point pointClassInfo(pointPanel.x + 24, pointPanel.y + 282);
 
@@ -116,6 +117,8 @@ Game::menu_t Game::ScenarioInfo(void)
     display.Blit(back);
 
     Scenario::RedrawStaticInfo(pointPanel);
+
+    Scenario::RedrawDifficultyInfo(pointDifficultyInfo);
 
     UpdateCoordOpponentsInfo(pointOpponentInfo, coordColors);
     Scenario::RedrawOpponentsInfo(pointOpponentInfo);
@@ -346,18 +349,6 @@ void Game::Scenario::RedrawStaticInfo(const Point & pt)
     text.Set(_("Game Difficulty:"));
     text.Blit(pt.x + (panel.w() - text.w()) / 2, pt.y + 75);
 
-    //
-    text.Set(_("Easy"), Font::SMALL);
-    text.Blit(pt.x + 57 - text.w()/2, 196);
-    text.Set(_("Normal"));
-    text.Blit(pt.x + 134 - text.w()/2, 196);
-    text.Set(_("Hard"));
-    text.Blit(pt.x + 210 - text.w()/2, 196);
-    text.Set(_("Expert"));
-    text.Blit(pt.x + 287 - text.w()/2, 196);
-    text.Set(_("Impossible"));
-    text.Blit(pt.x + 364 - text.w()/2, 196);
-
     // text opponents
     text.Set(_("Opponents:"), Font::BIG);
     text.Blit(pt.x + (panel.w() - text.w()) / 2, pt.y + 181);
@@ -442,7 +433,7 @@ void Game::Scenario::RedrawOpponentsInfo(const Point & dst, const std::vector<Pl
     }
 }
 
-void Game::Scenario::RedrawClassInfo(const Point & dst)
+void Game::Scenario::RedrawClassInfo(const Point & dst, bool label)
 {
     Display & display = Display::Get();
     const Settings & conf = Settings::Get();
@@ -470,11 +461,34 @@ void Game::Scenario::RedrawClassInfo(const Point & dst)
     	    const Sprite &sprite = AGG::GetICN(ICN::NGEXTRA, index);
 	    display.Blit(sprite, dst.x + GetStepFor(current, sprite.w(), count), dst.y);
 
-	    const std::string & name = (Race::NECR == race ? _("Necroman") : Race::String(race));
-	    Text label(name, Font::SMALL);
-	    label.Blit(dst.x + GetStepFor(current, sprite.w(), count) + (sprite.w() - label.w()) / 2, dst.y + sprite.h() + 2);
+	    if(label)
+	    {
+		const std::string & name = (Race::NECR == race ? _("Necroman") : Race::String(race));
+		Text text(name, Font::SMALL);
+		text.Blit(dst.x + GetStepFor(current, sprite.w(), count) + (sprite.w() - text.w()) / 2, dst.y + sprite.h() + 2);
+	    }
 
     	    ++current;
+    }
+}
+
+void Game::Scenario::RedrawDifficultyInfo(const Point & dst, bool label)
+{
+    Display & display = Display::Get();
+
+    for(u8 current = Difficulty::EASY; current <= Difficulty::IMPOSSIBLE; ++current)
+    {
+    	const Sprite & sprite = AGG::GetICN(ICN::NGHSBKG, 0);
+    	Rect src_rt(24, 94, 65, 65);
+    	u16 offset = current * (src_rt.w + 12);
+    	src_rt.x = src_rt.x + offset;
+	display.Blit(sprite, src_rt, dst.x + offset, dst.y);
+
+	if(label)
+	{
+	    Text text(Difficulty::String(current), Font::SMALL);
+	    text.Blit(dst.x + offset + (src_rt.w - text.w()) / 2, dst.y + src_rt.h + 5);
+	}
     }
 }
 

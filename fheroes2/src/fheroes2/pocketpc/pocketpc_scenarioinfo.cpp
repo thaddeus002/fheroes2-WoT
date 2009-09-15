@@ -25,10 +25,13 @@
 #include "dialog.h"
 #include "button.h"
 #include "difficulty.h"
+#include "game.h"
 #include "world.h"
 #include "pocketpc.h"
 
 extern bool DialogSelectMapsFileList(MapsFileInfoList &, std::string &);
+extern void UpdateCoordOpponentsInfo(const Point &, std::vector<Rect> &);
+extern void UpdateCoordClassInfo(const Point &, std::vector<Rect> &);
 
 Game::menu_t PocketPC::SelectScenario(void)
 {
@@ -82,33 +85,53 @@ Game::menu_t PocketPC::ScenarioInfo(void)
     cursor.Hide();
     cursor.SetThemes(cursor.POINTER);
 
-    const Sprite &sprite = AGG::GetICN(ICN::STONEBAK, 0);
-    Rect src_rt((sprite.w() - display.w()) / 2, (sprite.h() - display.h()) / 2, display.w(), display.h());
-    display.Blit(sprite, src_rt, 0, 0);
+    const u16 window_w = 380;
+    const u16 window_h = 224;
+    
+    Dialog::FrameBorder frameborder;
+    frameborder.SetPosition((display.w() - window_w) / 2 - BORDERWIDTH, (display.h() - window_h) / 2 - BORDERWIDTH, window_w, window_h);
+    frameborder.Redraw();
 
-    Button buttonOk(display.w() / 2 - 140, display.h() - 35, ICN::NGEXTRA, 66, 67);
-    Button buttonCancel(display.w() / 2 + 40, display.h() - 35, ICN::NGEXTRA, 68, 69);
-/*
+    const Rect & dst_rt = frameborder.GetArea();
+    const Sprite & background = AGG::GetICN(ICN::STONEBAK, 0);
+    display.Blit(background, Rect(0, 0, window_w, window_h), dst_rt);
+
+    Button buttonOk(dst_rt.x + dst_rt.w / 2 - 160, dst_rt.y + dst_rt.h - 30, ICN::NGEXTRA, 66, 67);
+    Button buttonCancel(dst_rt.x + dst_rt.w / 2 + 60, dst_rt.y + dst_rt.h - 30, ICN::NGEXTRA, 68, 69);
+
     Text text;
+    text.Set(conf.CurrentFileInfo().name, Font::BIG);
+    text.Blit(dst_rt.x + (dst_rt.w - text.w()) / 2, dst_rt.y + 5);
 
-    text.Set(_("Free Heroes II"), Font::BIG);
-    text.Blit(dst_pt.x + (src_rt.w - text.w()) / 2, dst_pt.y + 10);
+    const Rect box(dst_rt.x + 4, dst_rt.y + 24, 372, 200);
+    const Point pointDifficultyInfo(dst_rt.x + 4, dst_rt.y + 24);
+    const Point pointOpponentInfo(dst_rt.x + 4, dst_rt.y + 94);
+    const Point pointClassInfo(dst_rt.x + 4, dst_rt.y + 144);
 
-    text.Set(conf.BuildVersion(), Font::SMALL);
-    text.Blit(dst_pt.x + (src_rt.w - text.w()) / 2, dst_pt.y + 148);
+    std::vector<Rect>::iterator itr;
+    std::vector<Rect> coordDifficulty(5);
+    std::vector<Rect> coordColors(KINGDOMMAX);
+    std::vector<Rect> coordClass(KINGDOMMAX);
 
-    text.Set(_("New Game"), Font::BIG);
-    const Rect rectNewGame(dst_pt.x + (src_rt.w - text.w()) / 2, dst_pt.y + 40, text.w(), text.h());
-    text.Blit(rectNewGame);
+    Game::Scenario::RedrawDifficultyInfo(pointDifficultyInfo, false);
 
-    text.Set(_("Load Game"));
-    const Rect rectLoadGame(dst_pt.x + (src_rt.w - text.w()) / 2, dst_pt.y + 70, text.w(), text.h());
-    text.Blit(rectLoadGame);
+    UpdateCoordOpponentsInfo(pointOpponentInfo, coordColors);
+    Game::Scenario::RedrawOpponentsInfo(pointOpponentInfo);
 
-    text.Set(_("Quit"));
-    const Rect rectQuitGame(dst_pt.x + (src_rt.w - text.w()) / 2, dst_pt.y + 100, text.w(), text.h());
-    text.Blit(rectQuitGame);
-*/
+    UpdateCoordClassInfo(pointClassInfo, coordClass);
+    Game::Scenario::RedrawClassInfo(pointClassInfo, false);
+
+    const Point pointDifficultyNormal(dst_rt.x + 78, dst_rt.y + 21);
+    SpriteCursor levelCursor(AGG::GetICN(ICN::NGEXTRA, 62), pointDifficultyNormal);
+    levelCursor.Show(pointDifficultyNormal);
+    conf.SetGameDifficulty(Difficulty::NORMAL);
+                
+    coordDifficulty[0] = Rect(dst_rt.x + 1, dst_rt.y + 21,  levelCursor.w(), levelCursor.h());
+    coordDifficulty[1] = Rect(pointDifficultyNormal.x, pointDifficultyNormal.y,  levelCursor.w(), levelCursor.h());
+    coordDifficulty[2] = Rect(dst_rt.x + 154, dst_rt.y + 21, levelCursor.w(), levelCursor.h());
+    coordDifficulty[3] = Rect(dst_rt.x + 231, dst_rt.y + 21, levelCursor.w(), levelCursor.h());
+    coordDifficulty[4] = Rect(dst_rt.x + 308, dst_rt.y + 21, levelCursor.w(), levelCursor.h());
+                                    
     buttonOk.Draw();
     buttonCancel.Draw();
 
@@ -128,7 +151,7 @@ Game::menu_t PocketPC::ScenarioInfo(void)
             return Game::MAINMENU;
             break;
         }
-            else
+        else
 	// click ok
         if(le.KeyPress(KEY_RETURN) || le.MouseClickLeft(buttonOk))
         {
@@ -141,6 +164,70 @@ Game::menu_t PocketPC::ScenarioInfo(void)
             return Game::STARTGAME;
             break;
         }
+	else
+	if(le.MouseClickLeft(box))
+	{
+	    // select difficulty
+	    if(coordDifficulty.end() != (itr = std::find_if(coordDifficulty.begin(), coordDifficulty.end(), std::bind2nd(RectIncludePoint(), le.GetMouseCursor()))))
+	    {
+		cursor.Hide();
+		levelCursor.Move((*itr).x, (*itr).y);
+		conf.SetGameDifficulty(Difficulty::Get(itr - coordDifficulty.begin()));
+		cursor.Show();
+		display.Flip();
+	    }
+	    else
+	    // select color
+	    if(coordColors.end() != (itr = std::find_if(coordColors.begin(), coordColors.end(), std::bind2nd(RectIncludePoint(), le.GetMouseCursor()))))
+	    {
+		Color::color_t color = Color::GetFromIndex(itr - coordColors.begin());
+		if(conf.KingdomColors(color) && conf.AllowColors(color))
+		{
+		    cursor.Hide();
+		    switch(conf.GameType())
+		    {
+			case Game::NETWORK:
+			case Game::HOTSEAT:
+			    conf.SetPlayersColors(conf.PlayersColors() & color ? conf.PlayersColors() & ~color : conf.PlayersColors() | color);
+			    break;
+			default:
+			    conf.SetMyColor(color);
+			    conf.SetPlayersColors(conf.MyColor());
+	    		    break;
+		    }
+		    Game::Scenario::RedrawOpponentsInfo(pointOpponentInfo);
+		    cursor.Show();
+		    display.Flip();
+		}
+	    }
+	    else
+	    // select class
+	    if(coordClass.end() != (itr = std::find_if(coordClass.begin(), coordClass.end(), std::bind2nd(RectIncludePoint(), le.GetMouseCursor()))))
+	    {
+		Color::color_t color = Color::GetFromIndex(itr - coordClass.begin());
+		if(conf.AllowChangeRace(color))
+		{
+		    cursor.Hide();
+		    u8 index = 0;
+		    Race::race_t race = conf.KingdomRace(color);
+		    switch(race)
+		    {
+			case Race::KNGT: index = 52; race = Race::BARB; break;
+			case Race::BARB: index = 53; race = Race::SORC; break;
+			case Race::SORC: index = 54; race = Race::WRLK; break;
+			case Race::WRLK: index = 55; race = Race::WZRD; break;
+			case Race::WZRD: index = 56; race = Race::NECR; break;
+			case Race::NECR: index = 58; race = Race::RAND; break;
+			case Race::RAND: index = 51; race = Race::KNGT; break;
+			default: break;
+		    }
+		    conf.SetKingdomRace(color, race);
+		    Game::Scenario::RedrawClassInfo(pointClassInfo, false);
+		    cursor.Show();
+		    display.Flip();
+		}
+	    }
+	}
     }
 
     return Game::QUITGAME;

@@ -49,7 +49,7 @@ Game::menu_t PocketPC::MainMenu(void)
 
     Text text;
     
-    text.Set(_("Free Heroes II"), Font::BIG);
+    text.Set("Free Heroes II", Font::BIG);
     text.Blit(dst_pt.x + (src_rt.w - text.w()) / 2, dst_pt.y + 10);
 
     text.Set(conf.BuildVersion(), Font::SMALL);
