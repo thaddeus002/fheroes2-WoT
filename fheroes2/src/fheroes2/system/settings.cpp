@@ -460,8 +460,6 @@ void Settings::Parse(const std::string & left, const std::string & right)
 		possible_w *= TILEWIDTH;
 		possible_h *= TILEWIDTH;
 
-		std::cout << "Settings: unknown videomode: " << video_mode.w << "x" << video_mode.h << ", approximate load: " << possible_w << "x" << possible_h << std::endl;
-
 		if(possible_w < 640 || possible_h < 480)
 		{
 		    SetModes(HIDEINTERFACE);
@@ -471,6 +469,7 @@ void Settings::Parse(const std::string & left, const std::string & right)
     		    ResetModes(SHOWSTATUS);
 		}
 
+		std::cout << "Settings: videomode: " << video_mode.w << "x" << video_mode.h << ", current: " << possible_w << "x" << possible_h << std::endl;
 		video_mode.w = possible_w;
 		video_mode.h = possible_h;
 	    }

@@ -34,6 +34,8 @@
 #include "image_icons.h"
 #include "network.h"
 
+extern bool FilePresent(const std::string &);
+
 int PrintHelp(const char *basename)
 {
     std::cout << "Usage: " << basename << " [OPTIONS]" << std::endl \
@@ -67,7 +69,15 @@ int main(int argc, char **argv)
 
 	// load fheroes2.cfg
 	const std::string fheroes2_cfg(std::string(prefix) + SEPARATOR + "fheroes2.cfg");
-	std::cout << "config: " << fheroes2_cfg << (conf.Read(fheroes2_cfg) ? " load" : " not found") << std::endl;
+	if(FilePresent(fheroes2_cfg))
+	{
+	    std::cout << "config: " << fheroes2_cfg << " load." << std::endl;
+	    conf.Read(fheroes2_cfg);
+	}
+	else
+	    std::cout << "config: " << fheroes2_cfg << " not found" << std::endl;
+
+	// getopt
 	{
 	    int opt;
 	    while((opt = getopt(argc, argv, "hest:d:")) != -1)
@@ -145,7 +155,10 @@ int main(int argc, char **argv)
 		conf.ResetModes(Settings::MUSIC);
 	    }
 
-	    Display::SetVideoMode(640, 480);
+	    if(conf.PocketPC())
+		Game::SetFixVideoMode();
+	    else
+		Display::SetVideoMode(640, 480);
 	    Display::HideCursor();
 	    Display::SetCaption(caption);
 
@@ -185,13 +198,14 @@ int main(int argc, char **argv)
     		logo.SetDisplayFormat();
 
 		const u32 black = logo.MapRGB(0, 0, 0);
+		const Point offset((display.w() - logo.w()) / 2, (display.h() - logo.h()) / 2);
 
 		u8 ii = 0;
 
 		while(ii < 250)
 		{
 		    logo.SetAlpha(ii);
-		    display.Blit(logo);
+		    display.Blit(logo, offset);
 		    display.Flip();
 		    display.Fill(black);
 		    ii += 10;
@@ -202,7 +216,7 @@ int main(int argc, char **argv)
 		while(ii > 0)
 		{
 		    logo.SetAlpha(ii);
-		    display.Blit(logo);
+		    display.Blit(logo, offset);
 		    display.Flip();
 		    display.Fill(black);
 		    ii -= 10;
