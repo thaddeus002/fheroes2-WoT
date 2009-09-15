@@ -104,7 +104,7 @@ void WriteBE16(char *p, u16 x);
 #endif
 #define system(x) 0
 #define getenv(x) 0
-#define getopt(x, y, z) 0
+#define getopt(x, y, z) -1
 #define optarg 0
 #else
 #include <cstdlib>
