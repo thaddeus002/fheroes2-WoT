@@ -69,7 +69,7 @@ Surface::Surface(const Surface & bs) : surface(NULL)
 	else
 	{
 	    surface = SDL_ConvertSurface(bs.surface, bs.surface->format, bs.surface->flags);
-	    if(!surface) Error::Warning("Surface: copy constructor, error: " + Error::SDLError());
+	    if(!surface) Error::Warning("Surface: copy constructor, error: ", SDL_GetError());
 	}
 	LoadPalette();
     }
@@ -103,7 +103,7 @@ Surface & Surface::operator= (const Surface & bs)
 	else
 	{
 	    surface = SDL_ConvertSurface(bs.surface, bs.surface->format, bs.surface->flags);
-	    if(!surface) Error::Warning("Surface: operator, error: " + Error::SDLError());
+	    if(!surface) Error::Warning("Surface: operator, error: ", SDL_GetError());
 	}
 	LoadPalette();
     }
@@ -270,7 +270,7 @@ void Surface::CreateSurface(u16 sw, u16 sh, u8 dp, u32 fl)
 
     surface = SDL_CreateRGBSurface(fl, sw, sh, dp, rmask, gmask, bmask, amask);
 
-    if(!surface) Error::Warning("Surface::CreateSurface: empty surface, error:" + Error::SDLError());
+    if(!surface) Error::Warning("Surface::CreateSurface: empty surface, error:", SDL_GetError());
 }
 
 void Surface::LoadPalette(void)

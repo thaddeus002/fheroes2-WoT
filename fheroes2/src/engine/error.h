@@ -38,6 +38,7 @@ public:
     static void Warning(const std::string & message, const char*);
     static void Warning(const std::string & message, int value);
     static void Except(const std::string & message);
+    static void Except(const std::string & message, const char*);
 
     static const std::string & SDLError(void);
 };

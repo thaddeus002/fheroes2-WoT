@@ -62,7 +62,7 @@ void Mixer::Init(void)
 
         if(0 != Mix_OpenAudio(hardware.freq, hardware.format, hardware.channels, hardware.samples))
         {
-            Error::Warning("Mixer: " + Error::SDLError());
+            Error::Warning("Mixer: ", SDL_GetError());
             valid = false;
         }
         else
@@ -311,7 +311,7 @@ void Mixer::Init(void)
 
 	if(0 > SDL_OpenAudio(&spec, &Audio::GetHardwareSpec()))
         {
-            Error::Warning("Mixer: " + Error::SDLError());
+            Error::Warning("Mixer: ", SDL_GetError());
             valid = false;
         }
         else

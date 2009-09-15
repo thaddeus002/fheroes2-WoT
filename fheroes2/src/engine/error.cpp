@@ -28,8 +28,13 @@
 /* exception */
 void Error::Except(const std::string & message)
 {
-    std::cerr << "error: " << message << std::endl;
+    std::cout << "error: " << message << std::endl;
+    throw Exception();
+}
 
+void Error::Except(const std::string & message, const char* cstr)
+{
+    std::cout << "error: " << message << cstr << std::endl;
     throw Exception();
 }
 
@@ -73,13 +78,4 @@ void Error::Verbose(const std::string & message, int value)
     str += stream.str();
 
     std::cout << message << str << std::endl;
-}
-
-const std::string & Error::SDLError(void)
-{
-    static std::string sdl_error;
-    
-    sdl_error = std::string(SDL_GetError());
-    
-    return sdl_error;
 }

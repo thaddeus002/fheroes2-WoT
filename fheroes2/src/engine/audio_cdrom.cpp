@@ -117,7 +117,7 @@ void Cdrom::Play(const u8 track, bool loop, bool force)
             else startTime = 0;
 
             if(SDL_CDStatus(cd) != CD_PLAYING)
-                Error::Warning("CD is not playing" + Error::SDLError());
+                Error::Warning("CD is not playing", SDL_GetError());
         }
         
         SDL_UnlockMutex(cdLock);

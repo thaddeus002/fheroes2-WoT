@@ -51,15 +51,9 @@ void Display::SetVideoMode(const u16 w, const u16 h, bool fullscreen)
     if(display.valid() && display.w() == w && display.h() == h) return;
 
     u32 videoflags = SDL_HWPALETTE|SDL_HWSURFACE|SDL_DOUBLEBUF|SDL_HWACCEL;
-
     if(fullscreen || (display.surface && (display.surface->flags & SDL_FULLSCREEN))) videoflags |= SDL_FULLSCREEN;
-
     if(!SDL_SetVideoMode(w, h, 0, videoflags))
-    {
-	SDL_SetVideoMode(640, 480, 0, videoflags);
-
-	Error::Warning(Error::SDLError());
-    }
+	Error::Except("SDL_SetVideoMode: ", SDL_GetError());
 }
 
 /* flip */

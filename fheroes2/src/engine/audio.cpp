@@ -67,7 +67,7 @@ bool Audio::CVT::Build(const Audio::Spec & src, const Audio::Spec & dst)
 {
     if(1 == SDL_BuildAudioCVT(this, src.format, src.channels, src.freq, dst.format, dst.channels, dst.freq)) return true;
 
-    Error::Warning("Audio::CVT::Build: " + Error::SDLError());
+    Error::Warning("Audio::CVT::Build: ", SDL_GetError());
 
     return false;
 }
@@ -76,7 +76,7 @@ bool Audio::CVT::Convert(void)
 {
     if(0 == SDL_ConvertAudio(this)) return true;
     
-    Error::Warning("Audio::CVT::Convert: " + Error::SDLError());
+    Error::Warning("Audio::CVT::Convert: ", SDL_GetError());
 
     return false;
 }
