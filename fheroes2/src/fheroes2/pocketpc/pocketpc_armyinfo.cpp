@@ -23,15 +23,18 @@
 #include "settings.h"
 #include "text.h"
 #include "button.h"
-#include "castle.h"
+#include "army.h"
 #include "selectarmybar.h"
+#include "army.h"
+#include "battle_troop.h"
 #include "pocketpc.h"
 
-Dialog::answer_t PocketPC::CastleOpenDialog(Castle & castle)
+extern void DrawMonsterStats(const Point &, const Army::BattleTroop &, bool);
+
+Dialog::answer_t PocketPC::DialogArmyInfo(const Army::BattleTroop & troops, u16 flags)
 {
     Cursor & cursor = Cursor::Get();
     Display & display = Display::Get();
-//    Settings & conf = Settings::Get();
     LocalEvent & le = LocalEvent::Get();
 
     cursor.Hide();
@@ -48,21 +51,69 @@ Dialog::answer_t PocketPC::CastleOpenDialog(Castle & castle)
     const Sprite & background = AGG::GetICN(ICN::STONEBAK, 0);
     display.Blit(background, Rect(0, 0, window_w, window_h), dst_rt);
 
-//    Text text;
-//    text.Set(conf.CurrentFileInfo().name, Font::BIG);
-//    text.Blit(dst_rt.x + (dst_rt.w - text.w()) / 2, dst_rt.y + 5);
+    // name
+    Text text;
+    text.Set(troops.GetName(), Font::BIG);
+    text.Blit(dst_rt.x + (dst_rt.w - text.w()) / 2, dst_rt.y + 10);
 
+    const Sprite & frame = AGG::GetICN(troops.ICNFile(), 1);
+    display.Blit(frame, dst_rt.x + 50 - frame.w() / 2, dst_rt.y + 145 - frame.h());
+
+    std::string message;
+    String::AddInt(message, troops.Count());
+    text.Set(message);
+    text.Blit(dst_rt.x + 50 - text.w() / 2, dst_rt.y + 150);
+
+    // stats
+    DrawMonsterStats(Point(dst_rt.x + 200, dst_rt.y + 40), Army::BattleTroop(troops), Dialog::BATTLE & flags);
+
+    Button buttonDismiss(dst_rt.x + dst_rt.w / 2 - 160, dst_rt.y + dst_rt.h - 30, ICN::VIEWARMY, 1, 2);
+    Button buttonUpgrade(dst_rt.x + dst_rt.w / 2 - 60, dst_rt.y + dst_rt.h - 30, ICN::VIEWARMY, 5, 6);
     Button buttonExit(dst_rt.x + dst_rt.w / 2 + 60, dst_rt.y + dst_rt.h - 30, ICN::VIEWARMY, 3, 4);
-    buttonExit.Draw();
+
+    const Monster & mons = troops;
+    if(Dialog::READONLY & flags)
+    {
+        buttonDismiss.Press();
+        buttonDismiss.SetDisable(true);
+    }
+
+    if(!(Dialog::BATTLE & flags) && mons.isAllowUpgrade())
+    {
+	if(Dialog::UPGRADE & flags)
+        {
+            buttonUpgrade.SetDisable(false);
+            buttonUpgrade.Draw();
+        }
+        else if(Dialog::READONLY & flags)
+        {
+            buttonUpgrade.Press();
+            buttonUpgrade.SetDisable(true);
+    	    buttonUpgrade.Draw();
+        }
+        else buttonUpgrade.SetDisable(true);
+    }
+    else buttonUpgrade.SetDisable(true);
+
+    if(!(Dialog::BATTLE & flags))
+    {
+	buttonDismiss.Draw();
+        buttonExit.Draw();
+    }
 
     cursor.Show();
     display.Flip();
 
     while(le.HandleEvents())
     {
-        le.MousePressLeft(buttonExit) ? buttonExit.PressDraw() : buttonExit.ReleaseDraw();
+        if(buttonUpgrade.isEnable()) le.MousePressLeft(buttonUpgrade) ? (buttonUpgrade).PressDraw() : (buttonUpgrade).ReleaseDraw();
+        if(buttonDismiss.isEnable()) le.MousePressLeft(buttonDismiss) ? (buttonDismiss).PressDraw() : (buttonDismiss).ReleaseDraw();
+        le.MousePressLeft(buttonExit) ? (buttonExit).PressDraw() : (buttonExit).ReleaseDraw();
 
-        // exit
+        if(buttonUpgrade.isEnable() && le.MouseClickLeft(buttonUpgrade)) return Dialog::UPGRADE;
+        else
+        if(buttonDismiss.isEnable() && le.MouseClickLeft(buttonDismiss)) return Dialog::DISMISS;
+        else
         if(le.MouseClickLeft(buttonExit) || le.KeyPress(KEY_ESCAPE)) return Dialog::CANCEL;
     }
 

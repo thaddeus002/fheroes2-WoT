@@ -34,6 +34,7 @@ namespace PocketPC
     bool		DialogSelectMapsFileList(MapsFileInfoList &, std::string &);
     Dialog::answer_t	HeroesOpenDialog(Heroes &, bool);
     Dialog::answer_t	CastleOpenDialog(Castle &);
+    Dialog::answer_t	DialogArmyInfo(const Army::BattleTroop &, u16);
 };
 
 #endif

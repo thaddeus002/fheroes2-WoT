@@ -31,6 +31,9 @@
 #include "dialog.h"
 #include "game.h"
 #include "battle_troop.h"
+#include "pocketpc.h"
+
+void DrawMonsterStats(const Point &, const Army::BattleTroop &, bool);
 
 Dialog::answer_t Dialog::ArmyInfo(const Army::Troop & troops, u16 flags)
 {
@@ -38,9 +41,10 @@ Dialog::answer_t Dialog::ArmyInfo(const Army::Troop & troops, u16 flags)
     return ArmyInfo(battroop, flags);
 }
 
-Dialog::answer_t Dialog::ArmyInfo(const Army::BattleTroop & troop, u16 flags)
+Dialog::answer_t Dialog::ArmyInfo(const Army::BattleTroop & battroop, u16 flags)
 {
-    Army::BattleTroop battroop(troop);
+    if(Settings::Get().PocketPC()) return PocketPC::DialogArmyInfo(battroop, flags);
+
     const bool battle = BATTLE & flags;
     Display & display = Display::Get();
 
@@ -49,7 +53,6 @@ Dialog::answer_t Dialog::ArmyInfo(const Army::BattleTroop & troop, u16 flags)
     const Surface & sprite_dialog = AGG::GetICN(viewarmy, 0);
 
     const Monster & mons = battroop;
-    const Skill::Primary *skills = battroop.MasterSkill();
 
     Rect pos_rt;
 
@@ -62,18 +65,20 @@ Dialog::answer_t Dialog::ArmyInfo(const Army::BattleTroop & troop, u16 flags)
     cursor.Hide();
 
     Background back(pos_rt);
-    
     back.Save();
-
     display.Blit(sprite_dialog, pos_rt.x, pos_rt.y);
 
-    Point dst_pt(pos_rt.x, pos_rt.y);
-    std::string message;
+    Point dst_pt;
     Text text;
+    std::string message;
+
+    dst_pt.x = pos_rt.x + 400;
+    dst_pt.y = pos_rt.y + 40;
+    DrawMonsterStats(dst_pt, battroop, flags & BATTLE);
 
     // name
     text.Set(mons.GetName(), Font::BIG);
-    dst_pt.x = pos_rt.x  + 140 - text.w() / 2;
+    dst_pt.x = pos_rt.x + 140 - text.w() / 2;
     dst_pt.y = pos_rt.y + 40;
     text.Blit(dst_pt);
     
@@ -83,149 +88,9 @@ Dialog::answer_t Dialog::ArmyInfo(const Army::BattleTroop & troop, u16 flags)
     dst_pt.x = pos_rt.x + 140 - text.w() / 2;
     dst_pt.y = pos_rt.y + 225;
     text.Blit(dst_pt);
-    
-    // attack
-    message = _("Attack");
-    message += ":";
-    text.Set(message);
-    dst_pt.x = pos_rt.x + 400 - text.w();
-    dst_pt.y = pos_rt.y + 40;
-    text.Blit(dst_pt);
 
-    message.clear();
-    String::AddInt(message, mons.GetAttack());
-
-    if(skills)
-    {
-	message += " (";
-	String::AddInt(message, mons.GetAttack() + (*skills).GetAttack());
-	message += ")";
-    }
-
-    text.Set(message);
-    dst_pt.x = pos_rt.x + 420;
-    text.Blit(dst_pt);
-
-    // defense
-    message = _("Defense");
-    message += ":";
-    text.Set(message);
-    dst_pt.x = pos_rt.x + 400 - text.w();
-    dst_pt.y += 18;
-    text.Blit(dst_pt);
-
-    message.clear();
-    String::AddInt(message, mons.GetDefense());
-
-    if(skills)
-    {
-	message += " (";
-	String::AddInt(message, mons.GetDefense() + (*skills).GetDefense());
-	message += ")";
-    }
-
-    text.Set(message);
-    dst_pt.x = pos_rt.x + 420;
-    text.Blit(dst_pt);
-
-    // shot
-    if(mons.isArchers())
-    {
-	message = _(battle ? "Shots Left" : "Shots");
-	message += ":";
-	text.Set(message);
-	dst_pt.x = pos_rt.x + 400 - text.w();
-	dst_pt.y += 18;
-	text.Blit(dst_pt);
-
-	message.clear();
-	String::AddInt(message, battle ? battroop.shots : mons.GetShots());
-	text.Set(message);
-	dst_pt.x = pos_rt.x + 420;
-	text.Blit(dst_pt);
-    }
-
-    // damage
-    message = _("Damage");
-    message += ":";
-    text.Set(message);
-    dst_pt.x = pos_rt.x + 400 - text.w();
-    dst_pt.y += 18;
-    text.Blit(dst_pt);
-
-    message.clear();
-    String::AddInt(message, mons.GetDamageMin());
-    message += " - ";
-    String::AddInt(message, mons.GetDamageMax());
-    text.Set(message);
-    dst_pt.x = pos_rt.x + 420;
-    text.Blit(dst_pt);
-
-    // hp
-    message = _("Hit Points");
-    message += ":";
-    text.Set(message);
-    dst_pt.x = pos_rt.x + 400 - text.w();
-    dst_pt.y += 18;
-    text.Blit(dst_pt);
-
-    message.clear();
-    String::AddInt(message, mons.GetHitPoints());
-    text.Set(message);
-    dst_pt.x = pos_rt.x + 420;
-    text.Blit(dst_pt);
-
-    if(battle)
-    {
-	message = _("Hit Points Left");
-	message += ":";
-	text.Set(message);
-	dst_pt.x = pos_rt.x + 400 - text.w();
-	dst_pt.y += 18;
-	text.Blit(dst_pt);
-	
-	message.clear();
-	String::AddInt(message, battroop.hp);
-	text.Set(message);
-	dst_pt.x = pos_rt.x + 420;
-	text.Blit(dst_pt);
-    }
-
-    // speed
-    message = _("Speed");
-    message += ":";
-    text.Set(message);
-    dst_pt.x = pos_rt.x + 400 - text.w();
-    dst_pt.y += 18;
-    text.Blit(dst_pt);
-
-    text.Set(Speed::String(mons.GetSpeed()));
-    dst_pt.x = pos_rt.x + 420;
-    text.Blit(dst_pt);
-
-    // morale
-    message = _("Morale");
-    message += ":";
-    text.Set(message);
-    dst_pt.x = pos_rt.x + 400 - text.w();
-    dst_pt.y += 18;
-    text.Blit(dst_pt);
-
-    text.Set(skills ? Morale::String((*skills).GetMorale()) : Morale::String(Morale::NORMAL));
-    dst_pt.x = pos_rt.x + 420;
-    text.Blit(dst_pt);
-
-    // luck
-    message = _("Luck");
-    message += ":";
-    text.Set(message);
-    dst_pt.x = pos_rt.x + 400 - text.w();
-    dst_pt.y += 18;
-    text.Blit(dst_pt);
-
-    text.Set(skills ? Luck::String((*skills).GetLuck()) : Luck::String(Luck::NORMAL));
-    dst_pt.x = pos_rt.x + 420;
-    text.Blit(dst_pt);
+    const Sprite & frame = AGG::GetICN(mons.ICNFile(), 1);
+    display.Blit(frame, pos_rt.x + (pos_rt.w / 2 - frame.w()) / 2, pos_rt.y + 180 - frame.h());
 
     // button upgrade
     dst_pt.x = pos_rt.x + 284;
@@ -273,15 +138,7 @@ Dialog::answer_t Dialog::ArmyInfo(const Army::BattleTroop & troop, u16 flags)
     }
 
     LocalEvent & le = LocalEvent::Get();
-    
     Dialog::answer_t result = Dialog::ZERO;
-
-    const Sprite & frame = AGG::GetICN(mons.ICNFile(), 0);
-    Point anim_rt(pos_rt.x + (pos_rt.w / 2 - frame.w()) / 2 , pos_rt.y + 180);
-    battroop.astate = Monster::AS_IDLE;
-    battroop.aframe = 0;
-    battroop.Animate();
-    battroop.Blit(anim_rt, battroop.IsReflected());
 
     cursor.Show();
     display.Flip();
@@ -313,4 +170,156 @@ Dialog::answer_t Dialog::ArmyInfo(const Army::BattleTroop & troop, u16 flags)
     cursor.Hide();
     back.Restore();
     return result;
+}
+
+void DrawMonsterStats(const Point & dst, const Army::BattleTroop & battroop, bool battle)
+{
+    Point dst_pt;
+    std::string message;
+    Text text;
+    const Monster & mons = battroop;
+    const Skill::Primary *skills = battroop.MasterSkill();
+
+    // attack
+    message = _("Attack");
+    message += ":";
+    text.Set(message);
+    dst_pt.x = dst.x - text.w();
+    dst_pt.y = dst.y;
+    text.Blit(dst_pt);
+
+    message.clear();
+    String::AddInt(message, mons.GetAttack());
+
+    if(skills)
+    {
+	message += " (";
+	String::AddInt(message, mons.GetAttack() + (*skills).GetAttack());
+	message += ")";
+    }
+
+    text.Set(message);
+    dst_pt.x = dst.x + 20;
+    text.Blit(dst_pt);
+
+    // defense
+    message = _("Defense");
+    message += ":";
+    text.Set(message);
+    dst_pt.x = dst.x + - text.w();
+    dst_pt.y += 18;
+    text.Blit(dst_pt);
+
+    message.clear();
+    String::AddInt(message, mons.GetDefense());
+
+    if(skills)
+    {
+	message += " (";
+	String::AddInt(message, mons.GetDefense() + (*skills).GetDefense());
+	message += ")";
+    }
+
+    text.Set(message);
+    dst_pt.x = dst.x + 20;
+    text.Blit(dst_pt);
+
+    // shot
+    if(mons.isArchers())
+    {
+	message = _(battle ? "Shots Left" : "Shots");
+	message += ":";
+	text.Set(message);
+	dst_pt.x = dst.x - text.w();
+	dst_pt.y += 18;
+	text.Blit(dst_pt);
+
+	message.clear();
+	String::AddInt(message, battle ? battroop.shots : mons.GetShots());
+	text.Set(message);
+	dst_pt.x = dst.x + 20;
+	text.Blit(dst_pt);
+    }
+
+    // damage
+    message = _("Damage");
+    message += ":";
+    text.Set(message);
+    dst_pt.x = dst.x - text.w();
+    dst_pt.y += 18;
+    text.Blit(dst_pt);
+
+    message.clear();
+    String::AddInt(message, mons.GetDamageMin());
+    message += " - ";
+    String::AddInt(message, mons.GetDamageMax());
+    text.Set(message);
+    dst_pt.x = dst.x + 20;
+    text.Blit(dst_pt);
+
+    // hp
+    message = _("Hit Points");
+    message += ":";
+    text.Set(message);
+    dst_pt.x = dst.x - text.w();
+    dst_pt.y += 18;
+    text.Blit(dst_pt);
+
+    message.clear();
+    String::AddInt(message, mons.GetHitPoints());
+    text.Set(message);
+    dst_pt.x = dst.x + 20;
+    text.Blit(dst_pt);
+
+    if(battle)
+    {
+	message = _("Hit Points Left");
+	message += ":";
+	text.Set(message);
+	dst_pt.x = dst.x - text.w();
+	dst_pt.y += 18;
+	text.Blit(dst_pt);
+	
+	message.clear();
+	String::AddInt(message, battroop.hp);
+	text.Set(message);
+	dst_pt.x = dst.x + 20;
+	text.Blit(dst_pt);
+    }
+
+    // speed
+    message = _("Speed");
+    message += ":";
+    text.Set(message);
+    dst_pt.x = dst.x - text.w();
+    dst_pt.y += 18;
+    text.Blit(dst_pt);
+
+    text.Set(Speed::String(mons.GetSpeed()));
+    dst_pt.x = dst.x + 20;
+    text.Blit(dst_pt);
+
+    // morale
+    message = _("Morale");
+    message += ":";
+    text.Set(message);
+    dst_pt.x = dst.x - text.w();
+    dst_pt.y += 18;
+    text.Blit(dst_pt);
+
+    text.Set(skills ? Morale::String((*skills).GetMorale()) : Morale::String(Morale::NORMAL));
+    dst_pt.x = dst.x + 20;
+    text.Blit(dst_pt);
+
+    // luck
+    message = _("Luck");
+    message += ":";
+    text.Set(message);
+    dst_pt.x = dst.x - text.w();
+    dst_pt.y += 18;
+    text.Blit(dst_pt);
+
+    text.Set(skills ? Luck::String((*skills).GetLuck()) : Luck::String(Luck::NORMAL));
+    dst_pt.x = dst.x + 20;
+    text.Blit(dst_pt);
 }
