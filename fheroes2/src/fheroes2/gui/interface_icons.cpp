@@ -607,7 +607,7 @@ Interface::IconsPanel & Interface::IconsPanel::Get(void)
 
 const Rect & Interface::IconsPanel::GetArea(void) const
 {
-    return Settings::Get().HideInterface() ? border.GetRect() : *this;
+    return Settings::Get().HideInterface() && border.isValid() ? border.GetRect() : *this;
 }
 
 u8 Interface::IconsPanel::CountIcons(void) const

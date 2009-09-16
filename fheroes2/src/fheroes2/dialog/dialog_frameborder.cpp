@@ -32,6 +32,11 @@ Dialog::FrameBorder::FrameBorder()
 {
 }
 
+bool Dialog::FrameBorder::isValid(void) const
+{
+    return Background::valid();
+}
+
 void Dialog::FrameBorder::SetPosition(s16 posx, s16 posy, u16 encw, u16 ench)
 {
     Display & display = Display::Get();

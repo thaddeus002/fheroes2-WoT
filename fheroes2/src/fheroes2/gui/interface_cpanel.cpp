@@ -29,15 +29,17 @@ namespace Game
     extern void KeyPress_b(void);
     extern void KeyPress_w(void);
     extern void KeyPress_c(void);
+    extern void KeyPress_ESC(menu_t &);
 };
 
 Interface::ControlPanel::ControlPanel()
 {
     sf_area = Surface(AGG::GetICN(ICN::CELLWIN, 11));
-    sf_area.Blit(AGG::GetICN(ICN::REQUESTS, 31),  3, 3);
-    sf_area.Blit(AGG::GetICN(ICN::REQUESTS, 32), 21, 3);
-    sf_area.Blit(AGG::GetICN(ICN::REQUESTS, 34), 39, 3);
-    sf_area.Blit(AGG::GetICN(ICN::REQUESTS, 35), 57, 3);
+    sf_area.Blit(AGG::GetICN(ICN::REQUESTS, 31),  2, 3);
+    sf_area.Blit(AGG::GetICN(ICN::REQUESTS, 32), 20, 3);
+    sf_area.Blit(AGG::GetICN(ICN::REQUESTS, 34), 38, 3);
+    sf_area.Blit(AGG::GetICN(ICN::REQUESTS, 35), 56, 3);
+    sf_area.Blit(AGG::GetICN(ICN::REQUESTS, 30), 74, 3);
     w = sf_area.w();
     h = sf_area.h();
     rt_radr.w = 17;
@@ -48,6 +50,8 @@ Interface::ControlPanel::ControlPanel()
     rt_bttn.h = 17;
     rt_stat.w = 17;
     rt_stat.h = 17;
+    rt_quit.w = 17;
+    rt_quit.h = 17;
     AGG::FreeObject(ICN::REQUESTS);
     AGG::FreeObject(ICN::CELLWIN);
 }
@@ -67,14 +71,16 @@ void Interface::ControlPanel::SetPos(s16 ox, s16 oy)
 {
     x = ox;
     y = oy;
-    rt_radr.x = x + 3;
+    rt_radr.x = x + 2;
     rt_radr.y = y + 3;
-    rt_icon.x = x + 21;
+    rt_icon.x = x + 20;
     rt_icon.y = y + 3;
-    rt_bttn.x = x + 39;
+    rt_bttn.x = x + 38;
     rt_bttn.y = y + 3;
-    rt_stat.x = x + 57;
+    rt_stat.x = x + 56;
     rt_stat.y = y + 3;
+    rt_quit.x = x + 74;
+    rt_quit.y = y + 3;
 }
 
 void Interface::ControlPanel::Redraw(void)
@@ -82,7 +88,7 @@ void Interface::ControlPanel::Redraw(void)
     Display::Get().Blit(sf_area, x, y);
 }
 
-void Interface::ControlPanel::QueueEventProcessing(void)
+void Interface::ControlPanel::QueueEventProcessing(Game::menu_t & ret)
 {
     LocalEvent & le = LocalEvent::Get();
 
@@ -93,4 +99,6 @@ void Interface::ControlPanel::QueueEventProcessing(void)
     if(le.MouseClickLeft(rt_bttn))	Game::KeyPress_b();
     else
     if(le.MouseClickLeft(rt_stat))	Game::KeyPress_w();
+    else
+    if(le.MouseClickLeft(rt_quit))	Game::KeyPress_ESC(ret);
 }

@@ -151,6 +151,8 @@ public:
     FrameBorder();
     ~FrameBorder();
 
+    bool isValid(void) const;
+
     void SetPosition(s16, s16, u16 = 0, u16 = 0);
     void Redraw(void);
     const Rect & GetRect(void) const;

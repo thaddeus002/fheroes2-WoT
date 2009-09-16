@@ -22,6 +22,7 @@
 #define H2INTERFACE_CPANEL_H
 
 #include "gamedefs.h"
+#include "game.h"
 
 namespace Interface
 {
@@ -32,7 +33,7 @@ namespace Interface
 
 	void SetPos(s16, s16);
 	void Redraw(void);
-	void QueueEventProcessing(void);
+	void QueueEventProcessing(Game::menu_t &);
 
 	const Rect & GetArea(void);
 
@@ -43,6 +44,7 @@ namespace Interface
 	Rect rt_icon;
 	Rect rt_bttn;
 	Rect rt_stat;
+	Rect rt_quit;
 
 	Surface sf_area;
     };

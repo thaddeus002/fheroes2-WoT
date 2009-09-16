@@ -83,7 +83,7 @@ void Interface::StatusWindow::SetPos(s16 px, s16 py)
 
 const Rect & Interface::StatusWindow::GetArea(void) const
 {
-    return Settings::Get().HideInterface() ? border.GetRect() : *this;
+    return Settings::Get().HideInterface() && border.isValid() ? border.GetRect() : *this;
 }
 
 void Interface::StatusWindow::SetState(info_t info)

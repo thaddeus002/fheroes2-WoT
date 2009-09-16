@@ -937,7 +937,7 @@ Game::menu_t Game::HumanTurn(void)
 		cursor.SetThemes(Cursor::POINTER);
 		I.SetRedraw(REDRAW_CURSOR);
 	    }
-	    I.controlPanel.QueueEventProcessing();
+	    I.controlPanel.QueueEventProcessing(res);
 	}
 	else
 	// cursor over game area
@@ -1002,6 +1002,14 @@ Game::menu_t Game::HumanTurn(void)
     	    display.Flip();
 	}
 
+/*
+	if(conf.PocketPC())
+	{
+    	    cursor.Hide();
+    	    cursor.Show();
+    	    display.Flip();
+	}
+*/
         ++ticket;
     }
 
@@ -1594,6 +1602,11 @@ void Game::KeyPress_r(void)
 	}
 	else
 	{
+	    if(conf.PocketPC() && conf.Modes(Settings::SHOWICONS | Settings::SHOWSTATUS | Settings::SHOWBUTTONS))
+	    {
+		conf.ResetModes(Settings::SHOWICONS | Settings::SHOWSTATUS | Settings::SHOWBUTTONS);
+		Interface::Basic::Get().SetRedraw(REDRAW_GAMEAREA);
+	    }
 	    conf.SetModes(Settings::SHOWRADAR);
 	    Interface::Basic::Get().SetRedraw(REDRAW_RADAR);
 	}
@@ -1613,6 +1626,11 @@ void Game::KeyPress_b(void)
 	}
 	else
 	{
+	    if(conf.PocketPC() && conf.Modes(Settings::SHOWRADAR | Settings::SHOWSTATUS | Settings::SHOWICONS))
+	    {
+		conf.ResetModes(Settings::SHOWRADAR | Settings::SHOWSTATUS | Settings::SHOWICONS);
+		Interface::Basic::Get().SetRedraw(REDRAW_GAMEAREA);
+	    }
 	    conf.SetModes(Settings::SHOWBUTTONS);
 	    Interface::Basic::Get().SetRedraw(REDRAW_BUTTONS);
 	}
@@ -1632,6 +1650,11 @@ void Game::KeyPress_w(void)
 	}
 	else
 	{
+	    if(conf.PocketPC() && conf.Modes(Settings::SHOWRADAR | Settings::SHOWICONS | Settings::SHOWBUTTONS))
+	    {
+		conf.ResetModes(Settings::SHOWRADAR | Settings::SHOWICONS | Settings::SHOWBUTTONS);
+		Interface::Basic::Get().SetRedraw(REDRAW_GAMEAREA);
+	    }
 	    conf.SetModes(Settings::SHOWSTATUS);
 	    Interface::Basic::Get().SetRedraw(REDRAW_STATUS);
 	}
@@ -1651,6 +1674,11 @@ void Game::KeyPress_c(void)
 	}
 	else
 	{
+	    if(conf.PocketPC() && conf.Modes(Settings::SHOWRADAR | Settings::SHOWSTATUS | Settings::SHOWBUTTONS))
+	    {
+		conf.ResetModes(Settings::SHOWRADAR | Settings::SHOWSTATUS | Settings::SHOWBUTTONS);
+		Interface::Basic::Get().SetRedraw(REDRAW_GAMEAREA);
+	    }
 	    conf.SetModes(Settings::SHOWICONS);
 	    Interface::Basic::Get().SetRedraw(REDRAW_ICONS);
 	}

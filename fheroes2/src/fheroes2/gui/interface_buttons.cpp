@@ -51,7 +51,7 @@ Interface::ButtonsArea & Interface::ButtonsArea::Get(void)
 
 const Rect & Interface::ButtonsArea::GetArea(void)
 {
-    return Settings::Get().HideInterface() ? border.GetRect() : *this;
+    return Settings::Get().HideInterface() && border.isValid() ? border.GetRect() : *this;
 }
 
 void Interface::ButtonsArea::SetPos(s16 ox, s16 oy)

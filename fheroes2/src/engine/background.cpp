@@ -34,7 +34,7 @@ Background::Background(const Point &pt, u16 w, u16 h) : Surface(), Rect(pt, w, h
 {
 }
 
-bool Background::valid(void)
+bool Background::valid(void) const
 {
     return Surface::valid();
 }
