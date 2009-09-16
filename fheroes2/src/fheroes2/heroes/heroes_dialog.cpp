@@ -36,13 +36,14 @@
 #include "selectarmybar.h"
 #include "statusbar.h"
 #include "selectartifactbar.h"
+#include "pocketpc.h"
 
 /* readonly: false, fade: false */
 Dialog::answer_t Heroes::OpenDialog(bool readonly, bool fade)
 {
-    Display & display = Display::Get();
+    if(Settings::Get().PocketPC()) return PocketPC::HeroesOpenDialog(*this, readonly);
 
-    // cursor
+    Display & display = Display::Get();
     Cursor & cursor = Cursor::Get();
     cursor.Hide();
     cursor.SetThemes(cursor.POINTER);

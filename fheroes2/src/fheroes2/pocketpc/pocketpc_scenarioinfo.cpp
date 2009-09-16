@@ -32,45 +32,6 @@ extern bool DialogSelectMapsFileList(MapsFileInfoList &, std::string &);
 extern void UpdateCoordOpponentsInfo(const Point &, std::vector<Rect> &);
 extern void UpdateCoordClassInfo(const Point &, std::vector<Rect> &);
 
-Game::menu_t PocketPC::SelectScenario(void)
-{
-    Game::SetFixVideoMode();
-    AGG::PlayMusic(MUS::MAINMENU);
-
-    Cursor & cursor = Cursor::Get();
-    Display & display = Display::Get();
-    Settings & conf = Settings::Get();
-
-    conf.SetGameType(Game::STANDARD);
-
-    cursor.Hide();
-    cursor.SetThemes(cursor.POINTER);
-
-    const Sprite &sprite = AGG::GetICN(ICN::HEROES, 0);
-    Rect src_rt((sprite.w() - display.w()) / 2, 0, display.w(), display.h());
-    display.Blit(sprite, src_rt, 0, 0);
-
-    MapsFileInfoList lists;
-    if(!PrepareMapsFileInfoList(lists))
-    {
-        Dialog::Message(_("Warning"), _("No maps available!"), Font::BIG, Dialog::OK);
-        return Game::MAINMENU;
-    }
-
-    std::string filemaps;
-    PocketPC::DialogSelectMapsFileList(lists, filemaps);
-
-    if(filemaps.size())
-    {
-	conf.LoadFileMaps(filemaps);
-	conf.SetMyColor(conf.FirstAllowColor());
-        conf.SetPlayersColors(conf.MyColor());
-	conf.SetGameDifficulty(Difficulty::NORMAL);
-    }
-
-    return Game::SCENARIOINFO;
-}
-
 Game::menu_t PocketPC::ScenarioInfo(void)
 {
     Game::SetFixVideoMode();

@@ -30,10 +30,8 @@
 
 extern void RedrawSecondarySkill(const Point &, const std::vector<Skill::Secondary> &);
 
-Dialog::answer_t PocketPC::HeroesOpenDialog(Heroes* hero, bool readonly)
+Dialog::answer_t PocketPC::HeroesOpenDialog(Heroes & hero, bool readonly)
 {
-    if(!hero) return Dialog::CANCEL;
-
     Cursor & cursor = Cursor::Get();
     Display & display = Display::Get();
     LocalEvent & le = LocalEvent::Get();
@@ -55,70 +53,70 @@ Dialog::answer_t PocketPC::HeroesOpenDialog(Heroes* hero, bool readonly)
 
     // portrait
     display.Blit(AGG::GetICN(ICN::BRCREST, 6), dst_rt.x + 8, dst_rt.y);
-    display.Blit(hero->GetPortrait50x46(), dst_rt.x + 12, dst_rt.y + 4);
+    display.Blit(hero.GetPortrait50x46(), dst_rt.x + 12, dst_rt.y + 4);
 
     // name
     std::string message = _("%{name} the %{race} ( Level %{level} )");
-    String::Replace(message, "%{name}", hero->GetName());
-    String::Replace(message, "%{race}", Race::String(hero->GetRace()));
-    String::Replace(message, "%{level}", hero->GetLevel());
+    String::Replace(message, "%{name}", hero.GetName());
+    String::Replace(message, "%{race}", Race::String(hero.GetRace()));
+    String::Replace(message, "%{level}", hero.GetLevel());
     Text text(message, Font::SMALL);
     text.Blit(dst_rt.x + 73, dst_rt.y + 1);
 
     // experience
     display.Blit(AGG::GetICN(ICN::HSICONS, 1), dst_rt.x + 206, dst_rt.y + 14);
     message.clear();
-    String::AddInt(message, hero->GetExperience());
+    String::AddInt(message, hero.GetExperience());
     text.Set(message);
     text.Blit(dst_rt.x + 223 - text.w() / 2, dst_rt.y + 37);
 
     // spell points
     display.Blit(AGG::GetICN(ICN::HSICONS, 8), dst_rt.x + 240, dst_rt.y + 16);
     message.clear();
-    String::AddInt(message, hero->GetSpellPoints());
+    String::AddInt(message, hero.GetSpellPoints());
     message += "/";
-    String::AddInt(message, hero->GetMaxSpellPoints());
+    String::AddInt(message, hero.GetMaxSpellPoints());
     text.Set(message);
     text.Blit(dst_rt.x + 256 - text.w() / 2, dst_rt.y + 37);
 
     // morale
-    MoraleIndicator moraleIndicator(*hero);
+    MoraleIndicator moraleIndicator(hero);
     moraleIndicator.SetPos(Point(dst_rt.x + 280, dst_rt.y + 20));
     moraleIndicator.Redraw();
 
     // luck
-    LuckIndicator luckIndicator(*hero);
+    LuckIndicator luckIndicator(hero);
     luckIndicator.SetPos(Point(dst_rt.x + 280, dst_rt.y + 60));
     luckIndicator.Redraw();
 
     // prim skill
     display.Blit(backSprite, Rect(216, 51, 34, 34),  dst_rt.x + 74, dst_rt.y + 14);
     message.clear();
-    String::AddInt(message, hero->GetAttack());
+    String::AddInt(message, hero.GetAttack());
     text.Set(message);
     text.Blit(dst_rt.x + 74 + (34 - text.w()) / 2, dst_rt.y + 47);
 
     display.Blit(backSprite, Rect(216, 84, 34, 34),  dst_rt.x + 107, dst_rt.y + 14);
     message.clear();
-    String::AddInt(message, hero->GetDefense());
+    String::AddInt(message, hero.GetDefense());
     text.Set(message);
     text.Blit(dst_rt.x + 107 + (34 - text.w()) / 2, dst_rt.y + 47);
 
     display.Blit(backSprite, Rect(216, 117, 34, 34), dst_rt.x + 140, dst_rt.y + 14);
     message.clear();
-    String::AddInt(message, hero->GetPower());
+    String::AddInt(message, hero.GetPower());
     text.Set(message);
     text.Blit(dst_rt.x + 140 + (34 - text.w()) / 2, dst_rt.y + 47);
 
     display.Blit(backSprite, Rect(216, 150, 34, 34), dst_rt.x + 173, dst_rt.y + 14);
     message.clear();
-    String::AddInt(message, hero->GetKnowledge());
+    String::AddInt(message, hero.GetKnowledge());
     text.Set(message);
     text.Blit(dst_rt.x + 173 + (34 - text.w()) / 2, dst_rt.y + 47);
 
     // sec skill
     display.Blit(backSprite, Rect(21, 198, 267, 36), dst_rt.x + 7, dst_rt.y + 57);
-    RedrawSecondarySkill(Point(dst_rt.x + 9, dst_rt.y + 59), hero->GetSecondarySkills());
+    RedrawSecondarySkill(Point(dst_rt.x + 9, dst_rt.y + 59), hero.GetSecondarySkills());
 
     // army bar
     const Rect rt1(36, 267, 43, 53);
@@ -128,7 +126,7 @@ Dialog::answer_t PocketPC::HeroesOpenDialog(Heroes* hero, bool readonly)
     Cursor::DrawCursor(sfc1, 0x10, true);
 
     SelectArmyBar selectArmy;
-    selectArmy.SetArmy(hero->GetArmy());
+    selectArmy.SetArmy(hero.GetArmy());
     selectArmy.SetPos(dst_rt.x + 50, dst_rt.y + 95);
     selectArmy.SetInterval(2);
     selectArmy.SetBackgroundSprite(sfb1);
@@ -136,7 +134,7 @@ Dialog::answer_t PocketPC::HeroesOpenDialog(Heroes* hero, bool readonly)
     selectArmy.SetUseMons32Sprite();
     selectArmy.SetSaveLastTroop();
     if(readonly) selectArmy.SetReadOnly();
-    const Castle* castle = hero->inCastle();
+    const Castle* castle = hero.inCastle();
     if(castle) selectArmy.SetCastle(*castle);
     selectArmy.Redraw();
             
@@ -147,7 +145,7 @@ Dialog::answer_t PocketPC::HeroesOpenDialog(Heroes* hero, bool readonly)
     Surface sfc2(rt2.w, rt2.h);
     Cursor::DrawCursor(sfc2, 0x10, true);
 
-    SelectArtifactsBar selectArtifacts(*hero);
+    SelectArtifactsBar selectArtifacts(hero);
     selectArtifacts.SetPos(dst_rt.x + 37, dst_rt.y + 150);
     selectArtifacts.SetInterval(2);
     selectArtifacts.SetBackgroundSprite(sfb2);
@@ -181,7 +179,7 @@ Dialog::answer_t PocketPC::HeroesOpenDialog(Heroes* hero, bool readonly)
 
         // dismiss
 	if(buttonDismiss.isEnable() && le.MouseClickLeft(buttonDismiss) &&
-	    Dialog::YES == Dialog::Message(hero->GetName(), _("Are you sure you want to dismiss this Hero?"), Font::BIG, Dialog::YES | Dialog::NO))
+	    Dialog::YES == Dialog::Message(hero.GetName(), _("Are you sure you want to dismiss this Hero?"), Font::BIG, Dialog::YES | Dialog::NO))
         { return Dialog::DISMISS; }
 
         // selector troops event

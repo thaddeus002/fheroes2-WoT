@@ -27,10 +27,8 @@
 #include "selectarmybar.h"
 #include "pocketpc.h"
 
-Dialog::answer_t PocketPC::CastleOpenDialog(Castle* castle)
+Dialog::answer_t PocketPC::CastleOpenDialog(Castle & castle)
 {
-    if(!castle) return Dialog::CANCEL;
-
     Cursor & cursor = Cursor::Get();
     Display & display = Display::Get();
     Settings & conf = Settings::Get();

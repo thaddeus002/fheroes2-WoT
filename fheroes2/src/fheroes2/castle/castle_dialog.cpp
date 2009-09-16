@@ -37,6 +37,7 @@
 #include "dialog.h"
 #include "statusbar.h"
 #include "selectarmybar.h"
+#include "pocketpc.h"
 
 void Castle::RedrawNameTown(const Point & src_pt)
 {
@@ -52,6 +53,8 @@ void Castle::RedrawNameTown(const Point & src_pt)
 
 Dialog::answer_t Castle::OpenDialog(bool fade)
 {
+    if(Settings::Get().PocketPC()) PocketPC::CastleOpenDialog(*this);
+
     Display & display = Display::Get();
     castle_heroes = const_cast<Heroes*>(world.GetHeroes(mp.x, mp.y));
     PresentBoat() ? SetModes(BOATPRESENT) : ResetModes(BOATPRESENT);
