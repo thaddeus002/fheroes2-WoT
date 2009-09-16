@@ -40,6 +40,7 @@
 #include "game_focus.h"
 #include "kingdom.h"
 #include "network.h"
+#include "pocketpc.h"
 
 extern u16 DialogWithArtifact(const std::string & hdr, const std::string & msg, const Artifact::artifact_t art, const u16 buttons = Dialog::OK);
 
@@ -331,6 +332,7 @@ void Game::OpenCastle(Castle *castle)
     Kingdom & myKingdom = world.GetMyKingdom();
     std::vector<Castle *> & myCastles = myKingdom.GetCastles();
     Display & display = Display::Get();
+    Settings & conf = Settings::Get();
     std::vector<Castle *>::const_iterator it = std::find(myCastles.begin(), myCastles.end(), castle);
     Game::Focus & globalfocus = Game::Focus::Get();
     Interface::StatusWindow::ResetTimer();
@@ -354,7 +356,7 @@ void Game::OpenCastle(Castle *castle)
 		DELAY(100);
 	    }
 
-	    result = (*it)->OpenDialog(need_fade);
+	    result = conf.PocketPC() ? PocketPC::CastleOpenDialog(*it) : (*it)->OpenDialog(need_fade);
 	    if(need_fade) need_fade = false;
 
 	    if(Dialog::PREV == result)
@@ -388,6 +390,7 @@ void Game::OpenHeroes(Heroes *hero)
     Kingdom & myKingdom = world.GetMyKingdom();
     std::vector<Heroes *> & myHeroes = myKingdom.GetHeroes();
     Display & display = Display::Get();
+    Settings & conf = Settings::Get();
     std::vector<Heroes *>::const_iterator it = std::find(myHeroes.begin(), myHeroes.end(), hero);
     Game::Focus & globalfocus = Game::Focus::Get();
     Interface::StatusWindow::ResetTimer();
@@ -412,7 +415,7 @@ void Game::OpenHeroes(Heroes *hero)
 		DELAY(100);
 	    }
 
-	    result = (*it)->OpenDialog(false, need_fade);
+	    result = conf.PocketPC() ? PocketPC::HeroesOpenDialog(*it, false) : (*it)->OpenDialog(false, need_fade);
 	    if(need_fade) need_fade = false;
 
 	    switch(result)

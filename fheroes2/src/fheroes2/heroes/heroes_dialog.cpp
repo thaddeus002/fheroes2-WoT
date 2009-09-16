@@ -361,7 +361,7 @@ Dialog::answer_t Heroes::OpenDialog(bool readonly, bool fade)
 	buttonNextHero.SetDisable(true);
     }
 
-    if(inCastle())
+    if(castle || readonly)
     {
 	buttonDismiss.Press();
 	buttonDismiss.SetDisable(true);

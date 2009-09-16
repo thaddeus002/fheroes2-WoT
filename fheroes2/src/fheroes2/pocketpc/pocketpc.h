@@ -22,6 +22,7 @@
 #define H2POCKETPC_H
 
 #include "game.h"
+#include "dialog.h"
 #include "maps_fileinfo.h"
 #include "gamedefs.h"
 
@@ -31,6 +32,8 @@ namespace PocketPC
     Game::menu_t	SelectScenario(void);
     Game::menu_t	ScenarioInfo(void);
     bool		DialogSelectMapsFileList(MapsFileInfoList &, std::string &);
+    Dialog::answer_t	HeroesOpenDialog(Heroes*, bool);
+    Dialog::answer_t	CastleOpenDialog(Castle*);
 };
 
 #endif

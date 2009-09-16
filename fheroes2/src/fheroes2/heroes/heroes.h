@@ -171,6 +171,7 @@ public:
     void LearnBasicSkill(const Skill::Secondary::skill_t skill);
     void LevelUpSkill(const Skill::Secondary::skill_t skill);
     void FindSkillsForLevelUp(Skill::Secondary & sec1, Skill::Secondary & sec2) const;
+    const std::vector<Skill::Secondary>	& GetSecondarySkills(void) const;
 
     bool PickupArtifact(const Artifact::artifact_t);
     bool HasArtifact(const Artifact::artifact_t) const;

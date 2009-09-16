@@ -1445,6 +1445,11 @@ void Heroes::SetShipMaster(bool f)
     f ? SetModes(SHIPMASTER) : ResetModes(SHIPMASTER);
 }
 
+const std::vector<Skill::Secondary> & Heroes::GetSecondarySkills(void) const
+{
+    return secondary_skills;
+}
+
 bool Heroes::HasSecondarySkill(const Skill::Secondary::skill_t skill) const
 {
     return Skill::Level::NONE != GetLevelSkill(skill);

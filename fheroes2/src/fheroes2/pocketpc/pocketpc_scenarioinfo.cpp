@@ -23,10 +23,8 @@
 #include "cursor.h"
 #include "settings.h"
 #include "text.h"
-#include "dialog.h"
 #include "button.h"
 #include "difficulty.h"
-#include "game.h"
 #include "world.h"
 #include "pocketpc.h"
 
