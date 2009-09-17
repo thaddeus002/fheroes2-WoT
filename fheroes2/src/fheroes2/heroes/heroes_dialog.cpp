@@ -78,8 +78,6 @@ Dialog::answer_t Heroes::OpenDialog(bool readonly, bool fade)
     Text text(message, Font::BIG);
     text.Blit(cur_pt.x + 320 - text.w() / 2, cur_pt.y + 1);
 
-    u8 index_sprite = 0;
-
     // attack
     message = _("Attack Skill");
     text.Set(message, Font::SMALL);
@@ -223,33 +221,10 @@ Dialog::answer_t Heroes::OpenDialog(bool readonly, bool fade)
     String::Replace(descriptionSpellPoints, "%{max}", GetMaxSpellPoints());
 
     // crest
-    if(Color::GRAY == color)
-	switch(GetColor())
-	{
-	    case Color::BLUE:	index_sprite = 0; break;
-	    case Color::GREEN:	index_sprite = 1; break;
-	    case Color::RED:	index_sprite = 2; break;
-	    case Color::YELLOW:	index_sprite = 3; break;
-	    case Color::ORANGE:	index_sprite = 4; break;
-	    case Color::PURPLE:	index_sprite = 5; break;
-	    default: break;
-	}
-    else    
-	switch(color)
-        {
-	    case Color::BLUE:	index_sprite = 0; break;
-	    case Color::GREEN:	index_sprite = 1; break;
-	    case Color::RED:	index_sprite = 2; break;
-	    case Color::YELLOW:	index_sprite = 3; break;
-	    case Color::ORANGE:	index_sprite = 4; break;
-	    case Color::PURPLE:	index_sprite = 5; break;
-	    default: break;
-	}
-
     dst_pt.x = cur_pt.x + 49;
     dst_pt.y = cur_pt.y + 130;
 
-    display.Blit(AGG::GetICN(ICN::CREST, index_sprite), dst_pt);
+    display.Blit(AGG::GetICN(ICN::CREST, Color::GetIndex(color)), dst_pt);
     
     // monster
     dst_pt.x = cur_pt.x + 156;
@@ -322,29 +297,20 @@ Dialog::answer_t Heroes::OpenDialog(bool readonly, bool fade)
     StatusBar statusBar;
     statusBar.SetCenter(dst_pt.x + bar.w() / 2, dst_pt.y + 11);
 
-    u16 index1 = readonly ? 5 : 4;
-    u16 index2 = 5;
-
     // button prev
     dst_pt.x = cur_pt.x + 1;
     dst_pt.y = cur_pt.y + 480 - 20;
-    Button buttonPrevHero(dst_pt, ICN::HSBTNS, index1, index2);
-
-    index1 = readonly ? 7 : 6;
-    index2 = 7;
+    Button buttonPrevHero(dst_pt, ICN::HSBTNS, 4, 5);
 
     // button next
     dst_pt.x = cur_pt.x + 640 - 23;
     dst_pt.y = cur_pt.y + 480 - 20;
-    Button buttonNextHero(dst_pt, ICN::HSBTNS, index1, index2);
+    Button buttonNextHero(dst_pt, ICN::HSBTNS, 6, 7);
     
-    index1 = readonly ? 1 : 0;
-    index2 = 1;
-
     // button dismiss
     dst_pt.x = cur_pt.x + 5;
     dst_pt.y = cur_pt.y + 318;
-    Button buttonDismiss(dst_pt, ICN::HSBTNS, index1, index2);
+    Button buttonDismiss(dst_pt, ICN::HSBTNS, 0, 1);
 
     // button exit
     dst_pt.x = cur_pt.x + 603;
@@ -353,19 +319,18 @@ Dialog::answer_t Heroes::OpenDialog(bool readonly, bool fade)
 
     LocalEvent & le = LocalEvent::Get();
 
-    if(2 > world.GetMyKingdom().GetHeroes().size())
-    {
-	buttonPrevHero.Press();
-	buttonPrevHero.SetDisable(true);
-
-	buttonNextHero.Press();
-	buttonNextHero.SetDisable(true);
-    }
-
     if(castle || readonly)
     {
 	buttonDismiss.Press();
 	buttonDismiss.SetDisable(true);
+    }
+
+    if(readonly || 2 > world.GetMyKingdom().GetHeroes().size())
+    {
+        buttonNextHero.Press();
+        buttonPrevHero.Press();
+        buttonNextHero.SetDisable(true);
+        buttonPrevHero.SetDisable(true);
     }
 
     buttonPrevHero.Draw();
@@ -424,23 +389,20 @@ Dialog::answer_t Heroes::OpenDialog(bool readonly, bool fade)
 
         // button click
 	le.MousePressLeft(buttonExit) ? buttonExit.PressDraw() : buttonExit.ReleaseDraw();
-        if(!readonly)
-	{
-	    if(buttonDismiss.isEnable()) le.MousePressLeft(buttonDismiss) ? buttonDismiss.PressDraw() : buttonDismiss.ReleaseDraw();
-    	    if(buttonPrevHero.isEnable()) le.MousePressLeft(buttonPrevHero) ? buttonPrevHero.PressDraw() : buttonPrevHero.ReleaseDraw();
-    	    if(buttonNextHero.isEnable()) le.MousePressLeft(buttonNextHero) ? buttonNextHero.PressDraw() : buttonNextHero.ReleaseDraw();
+	if(buttonDismiss.isEnable()) le.MousePressLeft(buttonDismiss) ? buttonDismiss.PressDraw() : buttonDismiss.ReleaseDraw();
+    	if(buttonPrevHero.isEnable()) le.MousePressLeft(buttonPrevHero) ? buttonPrevHero.PressDraw() : buttonPrevHero.ReleaseDraw();
+    	if(buttonNextHero.isEnable()) le.MousePressLeft(buttonNextHero) ? buttonNextHero.PressDraw() : buttonNextHero.ReleaseDraw();
 
-    	    // prev hero
-	    if(buttonPrevHero.isEnable() && le.MouseClickLeft(buttonPrevHero)){ return Dialog::PREV; }
+    	// prev hero
+	if(buttonPrevHero.isEnable() && le.MouseClickLeft(buttonPrevHero)){ return Dialog::PREV; }
 
-    	    // next hero
-    	    if(buttonNextHero.isEnable() && le.MouseClickLeft(buttonNextHero)){ return Dialog::NEXT; }
+    	// next hero
+    	if(buttonNextHero.isEnable() && le.MouseClickLeft(buttonNextHero)){ return Dialog::NEXT; }
     	    
-    	    // dismiss
-    	    if(buttonDismiss.isEnable() && le.MouseClickLeft(buttonDismiss) &&
+    	// dismiss
+    	if(buttonDismiss.isEnable() && le.MouseClickLeft(buttonDismiss) &&
     	      Dialog::YES == Dialog::Message(GetName(), _("Are you sure you want to dismiss this Hero?"), Font::BIG, Dialog::YES | Dialog::NO))
     	    { return Dialog::DISMISS; }
-	}
 
         if(le.MouseCursor(moraleIndicator.GetArea())) MoraleIndicator::QueueEventProcessing(moraleIndicator);
         else

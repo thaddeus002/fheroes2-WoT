@@ -45,14 +45,42 @@ Dialog::answer_t PocketPC::CastleOpenDialog(Castle & castle)
     frameborder.Redraw();
 
     const Rect & dst_rt = frameborder.GetArea();
+    const Sprite & backSprite = AGG::GetICN(ICN::SWAPWIN, 0);
     const Sprite & background = AGG::GetICN(ICN::STONEBAK, 0);
     display.Blit(background, Rect(0, 0, window_w, window_h), dst_rt);
 
-//    Text text;
-//    text.Set(conf.CurrentFileInfo().name, Font::BIG);
-//    text.Blit(dst_rt.x + (dst_rt.w - text.w()) / 2, dst_rt.y + 5);
+    Text text;
+    text.Set(castle.GetName(), Font::SMALL);
+    text.Blit(dst_rt.x + (dst_rt.w - text.w()) / 2, dst_rt.y + 3);
 
-    Button buttonExit(dst_rt.x + dst_rt.w / 2 + 60, dst_rt.y + dst_rt.h - 30, ICN::VIEWARMY, 3, 4);
+    text.Set("Under Construction", Font::BIG);
+    text.Blit(dst_rt.x + (dst_rt.w - text.w()) / 2, dst_rt.y + 60);
+    
+    // crest
+    display.Blit(AGG::GetICN(ICN::BRCREST, 6), dst_rt.x + 2, dst_rt.y + 112);
+    display.Blit(AGG::GetICN(ICN::BRCREST, Color::GetIndex(castle.GetColor())), dst_rt.x + 6, dst_rt.y + 116);
+
+    display.Blit(AGG::GetICN(ICN::BRCREST, 6), dst_rt.x + 2, dst_rt.y + 167);
+    display.Blit(AGG::GetICN(ICN::BRCREST, Color::GetIndex(castle.GetColor())), dst_rt.x + 6, dst_rt.y + 171);
+
+    // army bar1
+    const Rect rt1(36, 267, 43, 53);
+    Surface sfb1(rt1.w, rt1.h);
+    sfb1.Blit(backSprite, rt1, 0, 0);
+    Surface sfc1(rt1.w, rt1.h - 10);
+    Cursor::DrawCursor(sfc1, 0x10, true);
+                        
+    SelectArmyBar selectCastleArmy;
+    selectCastleArmy.SetArmy(castle.GetArmy());
+    selectCastleArmy.SetPos(dst_rt.x + 62, dst_rt.y + 112);
+    selectCastleArmy.SetInterval(2);
+    selectCastleArmy.SetBackgroundSprite(sfb1);
+    selectCastleArmy.SetCursorSprite(sfc1);
+    selectCastleArmy.SetUseMons32Sprite();
+    selectCastleArmy.SetCastle(castle);
+    selectCastleArmy.Redraw();
+
+    Button buttonExit(dst_rt.x + dst_rt.w / 2 + 130, dst_rt.y + dst_rt.h - 125, ICN::HSBTNS, 2, 3);
     buttonExit.Draw();
 
     cursor.Show();

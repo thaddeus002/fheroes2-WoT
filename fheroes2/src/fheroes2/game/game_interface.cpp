@@ -35,21 +35,21 @@ Interface::Basic::Basic() : gameArea(GameArea::Get()), radar(Radar::Get()),
 
     if(Settings::Get().PocketPC())
     {
+        iconsPanel.SetCount(2);
 	radar.SetPos(0, 0);
 	iconsPanel.SetPos(0, 0);
 	buttonsArea.SetPos(0, 0);
 	statusWindow.SetPos(0, 0);
-        iconsPanel.SetCount(2);
 	controlPanel.SetPos(display.w() - controlPanel.GetArea().w - 32, 0);
     }
     else
     if(Settings::Get().HideInterface())
     {
+        iconsPanel.SetCount(2);
 	radar.SetPos(px - BORDERWIDTH, 0);
 	iconsPanel.SetPos(px - BORDERWIDTH, radar.GetArea().y + radar.GetArea().h);
 	buttonsArea.SetPos(px - BORDERWIDTH, iconsPanel.GetArea().y + iconsPanel.GetArea().h);
 	statusWindow.SetPos(px - BORDERWIDTH, buttonsArea.GetArea().y + buttonsArea.GetArea().h);
-        iconsPanel.SetCount(2);
 	controlPanel.SetPos(display.w() - controlPanel.GetArea().w - scroll_width, 0);
     }
     else

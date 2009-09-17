@@ -26,6 +26,8 @@
 #include "heroes_indicator.h"
 #include "selectarmybar.h"
 #include "selectartifactbar.h"
+#include "world.h"
+#include "kingdom.h"
 #include "pocketpc.h"
 
 extern void RedrawSecondarySkill(const Point &, const std::vector<Skill::Secondary> &);
@@ -127,7 +129,7 @@ Dialog::answer_t PocketPC::HeroesOpenDialog(Heroes & hero, bool readonly)
 
     SelectArmyBar selectArmy;
     selectArmy.SetArmy(hero.GetArmy());
-    selectArmy.SetPos(dst_rt.x + 50, dst_rt.y + 95);
+    selectArmy.SetPos(dst_rt.x + 50, dst_rt.y + 170);
     selectArmy.SetInterval(2);
     selectArmy.SetBackgroundSprite(sfb1);
     selectArmy.SetCursorSprite(sfc1);
@@ -146,7 +148,7 @@ Dialog::answer_t PocketPC::HeroesOpenDialog(Heroes & hero, bool readonly)
     Cursor::DrawCursor(sfc2, 0x10, true);
 
     SelectArtifactsBar selectArtifacts(hero);
-    selectArtifacts.SetPos(dst_rt.x + 37, dst_rt.y + 150);
+    selectArtifacts.SetPos(dst_rt.x + 37, dst_rt.y + 95);
     selectArtifacts.SetInterval(2);
     selectArtifacts.SetBackgroundSprite(sfb2);
     selectArtifacts.SetCursorSprite(sfc2);
@@ -157,26 +159,45 @@ Dialog::answer_t PocketPC::HeroesOpenDialog(Heroes & hero, bool readonly)
     Button buttonDismiss(dst_rt.x + dst_rt.w / 2 - 160, dst_rt.y + dst_rt.h - 125, ICN::HSBTNS, 0, 1);
     Button buttonExit(dst_rt.x + dst_rt.w / 2 + 130, dst_rt.y + dst_rt.h - 125, ICN::HSBTNS, 2, 3);
 
+    Button buttonPrev(dst_rt.x + 34, dst_rt.y + 200, ICN::TRADPOST, 3, 4);
+    Button buttonNext(dst_rt.x + 275, dst_rt.y + 200, ICN::TRADPOST, 5, 6);
+
     if(castle || readonly)
     {
 	buttonDismiss.Press();
         buttonDismiss.SetDisable(true);
     }
 
+    if(readonly || 2 > world.GetMyKingdom().GetHeroes().size())
+    {
+	buttonNext.Press();
+	buttonPrev.Press();
+        buttonNext.SetDisable(true);
+        buttonPrev.SetDisable(true);
+    }
+
     buttonDismiss.Draw();
     buttonExit.Draw();
+    buttonNext.Draw();
+    buttonPrev.Draw();
 
     cursor.Show();
     display.Flip();
 
     while(le.HandleEvents())
     {
+        le.MousePressLeft(buttonNext) ? buttonNext.PressDraw() : buttonNext.ReleaseDraw();
+        le.MousePressLeft(buttonPrev) ? buttonPrev.PressDraw() : buttonPrev.ReleaseDraw();
         le.MousePressLeft(buttonExit) ? buttonExit.PressDraw() : buttonExit.ReleaseDraw();
         if(buttonDismiss.isEnable()) le.MousePressLeft(buttonDismiss) ? buttonDismiss.PressDraw() : buttonDismiss.ReleaseDraw();
 
+        if(buttonNext.isEnable() && le.MouseClickLeft(buttonNext)) return Dialog::NEXT;
+        else
+        if(buttonPrev.isEnable() && le.MouseClickLeft(buttonPrev)) return Dialog::PREV;
+	else
         // exit
         if(le.MouseClickLeft(buttonExit) || le.KeyPress(KEY_ESCAPE)) return Dialog::CANCEL;
-
+	else
         // dismiss
 	if(buttonDismiss.isEnable() && le.MouseClickLeft(buttonDismiss) &&
 	    Dialog::YES == Dialog::Message(hero.GetName(), _("Are you sure you want to dismiss this Hero?"), Font::BIG, Dialog::YES | Dialog::NO))

@@ -334,7 +334,7 @@ void Game::OpenCastle(Castle *castle)
     std::vector<Castle *>::const_iterator it = std::find(myCastles.begin(), myCastles.end(), castle);
     Game::Focus & globalfocus = Game::Focus::Get();
     Interface::StatusWindow::ResetTimer();
-    bool show_position = (640 != display.w() || 480 != display.h());
+    bool show_position = !Settings::Get().PocketPC() && (640 != display.w() || 480 != display.h());
     bool need_fade = !show_position;
     
     if(it != myCastles.end())
@@ -392,7 +392,7 @@ void Game::OpenHeroes(Heroes *hero)
     Game::Focus & globalfocus = Game::Focus::Get();
     Interface::StatusWindow::ResetTimer();
     Interface::Basic & I = Interface::Basic::Get();
-    bool show_position = (640 != display.w() || 480 != display.h());
+    bool show_position = !Settings::Get().PocketPC() && (640 != display.w() || 480 != display.h());
     bool need_fade = !show_position;
 
     if(it != myHeroes.end())
