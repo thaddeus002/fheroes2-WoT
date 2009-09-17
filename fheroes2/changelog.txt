@@ -1,4 +1,26 @@
-SVN - up to r1117
+SVN - up to r1195
+
+Sep, 17, 2009 - Development build, 1195
+
+Users
++ Added pocketpc version interface
++ Added load fheroes2.cfg and gamedata from FHEROES2_DATA environment
++ Added new options: "use fade = on/off", "hide interface = on/off"
++ Added add hot key: m - move hero, o - system dialog, n - start new game
++ Added new interface: hide interface
++ Fixed performance, (remove delay from pathfinding)
++ Fixed castle resource panel
++ Fixed visit obelisk
++ Fixed building for differences plathorm (OSX, mingw32, wince)
++ Fixed Abandoned Mine name, add extra text in quick info.
++ Added zlib support for xml save files
++ Update music readme with more specific information.
++ Update translation files from launchpad
+
+Developers
++ Added CONFIGURE_FHEROES2_DATA build defines for gamedata
++ Added WITHOUT_MIXER build option
++ Redistribute main loop game_startgame.cpp, move radar, buttons, status to interface gui, other small changes.
 
 May 30, 2009 - Development build r1117
 

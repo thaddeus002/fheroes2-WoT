@@ -33,6 +33,7 @@ Ctrl + Right	- scroll map right
 e		- end turn
 t		- next town
 h		- next hero
+m		- move hero
 s		- save game to fheroes2.sav
 l		- load game
 i		- game info
@@ -40,6 +41,8 @@ p		- puzzle dialog
 d		- digging artifact for current hero
 space		- default action
 return 		- open dialog
+o		- system dialog
+n		- new game
 r		- show/hide radar (only for option: hide interface = on)
 w		- show/hide status window (only for option: hide interface = on)
 c		- show/hide hero/town icons (only for option: hide interface = on)
