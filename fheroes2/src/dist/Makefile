@@ -9,8 +9,8 @@ endif
 TARGET := fheroes2
 LIBENGINE := ../engine/libengine.a ../xmlccwrap/libxmlccwrap.a
 LIBS := $(LIBENGINE) $(LIBS)
-BUILD_DATE := $(shell date +%Y%m%d)
-CFLAGS := $(CFLAGS) -I../engine -I../xmlccwrap -I$(PREFIX)/include -DBUILD_DATE=$(BUILD_DATE)
+SVN  := $(shell svnversion ..)
+CFLAGS := $(CFLAGS) -I../engine -I../xmlccwrap -I$(PREFIX)/include -DSVN_REVISION="\"$(SVN)\""
 
 SOURCEROOT := ../fheroes2
 SOURCEDIR  := $(shell ls $(SOURCEROOT))

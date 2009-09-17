@@ -57,7 +57,10 @@ namespace
 }
 
 /* constructor */
-Settings::Settings() : major_version(MAJOR_VERSION), minor_version(MINOR_VERSION), build_date(BUILD_DATE),
+Settings::Settings() : major_version(MAJOR_VERSION), minor_version(MINOR_VERSION),
+#ifdef SVN_REVISION
+    svn_version(SVN_REVISION),
+#endif
     debug(0), video_mode(640, 480), game_difficulty(Difficulty::NORMAL),
     my_color(Color::GRAY), cur_color(Color::GRAY), path_data_directory("data"),
     font_normal("dejavusans.ttf"), font_small("dejavusans.ttf"), size_normal(15), size_small(10),
@@ -74,10 +77,10 @@ Settings::Settings() : major_version(MAJOR_VERSION), minor_version(MINOR_VERSION
     String::AddInt(build_version, MAJOR_VERSION);
     build_version += ".";
     String::AddInt(build_version, MINOR_VERSION);
-#ifndef BUILD_RELEASE
-    build_version += ", build: ";
-    String::AddInt(build_version, BUILD_DATE);
-#endif
+    if(svn_version.size())
+    {
+	build_version += "." + svn_version;
+    }
 
     // default maps dir
     list_maps_directory.push_back("maps");
@@ -182,13 +185,10 @@ void Settings::Dump(std::ostream & stream) const
     String::AddInt(str, major_version);
     str += ".";
     String::AddInt(str, minor_version);
+    str += "." + svn_version;
     
     stream << std::endl;
     stream << "# fheroes2 dump config, version " << str;
-
-    str.clear();
-    String::AddInt(str, build_date);
-    stream <<", build " << str << std::endl;
 
     if(path_data_directory.size()) stream << "data = " << path_data_directory << std::endl;
 
@@ -269,9 +269,6 @@ u8 Settings::MajorVersion(void) const { return major_version; }
 
 /* return minor version */
 u8 Settings::MinorVersion(void) const { return minor_version; }
-
-/* return build date */
-u32 Settings::DateBuild(void) const { return build_date; }
 
 /* return debug */
 u8 Settings::Debug(void) const { return debug; }

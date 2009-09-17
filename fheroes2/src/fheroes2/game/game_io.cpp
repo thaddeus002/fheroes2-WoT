@@ -117,7 +117,7 @@ void Game::SaveXMLDoc(TiXmlDocument & doc)
     String::AddInt(str, conf.minor_version);
 
     root->SetAttribute("version", str.c_str());
-    root->SetAttribute("build", conf.build_date);
+    root->SetAttribute("svn", conf.svn_version);
     root->SetAttribute("time", std::time(NULL));
 
     doc.LinkEndChild(root);

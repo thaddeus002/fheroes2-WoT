@@ -89,7 +89,6 @@ public:
 
     u8 MajorVersion(void) const;
     u8 MinorVersion(void) const;
-    u32 DateBuild(void) const;
     u8 Debug(void) const;
     u8 Animation(void) const;
 
@@ -204,8 +203,7 @@ private:
 
     const u8 major_version;
     const u8 minor_version;
-    const u32 build_date;
-
+    const std::string svn_version;
     u8 debug;
 
     Size video_mode;
