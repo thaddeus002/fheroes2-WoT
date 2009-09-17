@@ -5,10 +5,13 @@ Prerequisites:
 You need to have these libraries (with equivalent devel versions) to build fHeroes2:
 
 - SDL
-- SDL_mixer (with OGG support)
-- SDL_image (with PNG support)
-- SDL_ttf
-- SDL_net
+
+optional library:
+- SDL_mixer (play music: internal midi or external ogg tracks) or build WITHOUT_MIXER
+- SDL_image (loading external sprites, create screenshot in png format) or build WITHOUT_IMAGE
+- SDL_ttf (unicode support) or build WITHOUT_UNICODE
+- SDL_net or build WITHOUT_NETWORK
+- libogg
 - libpng
 - gettext
 
