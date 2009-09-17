@@ -31,6 +31,7 @@
 #include "test.h"
 #include "sdlnet.h"
 #include "image_logo.h"
+#include "image_logo_small.h"
 #include "image_icons.h"
 #include "network.h"
 
@@ -215,8 +216,13 @@ int main(int argc, char **argv)
 	    {
 		Display & display = Display::Get();
 
-    		Surface logo(image_logo.pixel_data, image_logo.width, image_logo.height, image_logo.bytes_per_pixel, false);
-    		
+    		Surface logo;
+
+		if(conf.PocketPC())
+		    logo.Set(image_logo_small.pixel_data, image_logo_small.width, image_logo_small.height, image_logo_small.bytes_per_pixel, false);
+		else
+		    logo.Set(image_logo.pixel_data, image_logo.width, image_logo.height, image_logo.bytes_per_pixel, false);
+
     		logo.SetDisplayFormat();
 
 		const u32 black = logo.MapRGB(0, 0, 0);
