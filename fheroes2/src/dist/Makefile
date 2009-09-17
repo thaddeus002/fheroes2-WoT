@@ -9,7 +9,7 @@ endif
 TARGET := fheroes2
 LIBENGINE := ../engine/libengine.a ../xmlccwrap/libxmlccwrap.a
 LIBS := $(LIBENGINE) $(LIBS)
-SVN  := $(shell svnversion ..)
+SVN  := $(shell svnversions ..)
 CFLAGS := $(CFLAGS) -I../engine -I../xmlccwrap -I$(PREFIX)/include -DSVN_REVISION="\"$(SVN)\""
 
 SOURCEROOT := ../fheroes2
