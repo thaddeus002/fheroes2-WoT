@@ -66,8 +66,6 @@ void SpriteCursor::Move(const Point &pt)
 
 void SpriteCursor::Move(s16 ax, s16 ay)
 {
-    if(ax < 0 || ay < 0) return;
-    
     if(Background::x == ax && Background::y == ay) return;
 
     if(visible) Hide();

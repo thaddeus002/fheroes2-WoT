@@ -148,11 +148,6 @@ Rect & Rect::operator= (const Point & pt)
     return *this;
 }
 
-bool Rect::valid(void) const
-{
-    return !(x < 0 || y < 0 || w == 0 || h == 0);
-}
-
 bool Rect::operator== (const Rect & rt) const
 {
     return (x == rt.x && y == rt.y && w == rt.w && h == rt.h);

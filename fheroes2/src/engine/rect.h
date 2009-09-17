@@ -73,8 +73,6 @@ public:
 
     SDL_Rect* SDLRect(void);
 
-    bool valid(void) const;
-
     Rect & operator= (const Point & pt);
     bool operator== (const Rect & rt) const;
     bool operator!= (const Rect & rt) const;
