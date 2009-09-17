@@ -31,6 +31,7 @@ Interface::Basic::Basic() : gameArea(GameArea::Get()), radar(Radar::Get()),
 {
     const Display & display = Display::Get();
     const u16 & px = display.w() - BORDERWIDTH - RADARWIDTH;
+    const u8 scroll_width = Settings::Get().PocketPC() ? 8 : BORDERWIDTH;
 
     if(Settings::Get().PocketPC())
     {
@@ -49,7 +50,7 @@ Interface::Basic::Basic() : gameArea(GameArea::Get()), radar(Radar::Get()),
 	buttonsArea.SetPos(px - BORDERWIDTH, iconsPanel.GetArea().y + iconsPanel.GetArea().h);
 	statusWindow.SetPos(px - BORDERWIDTH, buttonsArea.GetArea().y + buttonsArea.GetArea().h);
         iconsPanel.SetCount(2);
-	controlPanel.SetPos(display.w() - controlPanel.GetArea().w - 32, 0);
+	controlPanel.SetPos(display.w() - controlPanel.GetArea().w - scroll_width, 0);
     }
     else
     {
@@ -63,10 +64,9 @@ Interface::Basic::Basic() : gameArea(GameArea::Get()), radar(Radar::Get()),
 	statusWindow.SetPos(px, buttonsArea.GetArea().y + buttonsArea.GetArea().h);
     }
 
-    const u8 scroll_width = Settings::Get().PocketPC() ? 8 : BORDERWIDTH;
     scrollLeft = Rect(0, 0, scroll_width, display.h());
     scrollRight = Rect(display.w() - scroll_width, 0, scroll_width, display.h());
-    scrollTop = Rect(0, 0, display.w() - radar.GetArea().w, scroll_width);
+    scrollTop = Settings::Get().PocketPC() ? Rect(0, 0, controlPanel.GetArea().x, scroll_width) : Rect(0, 0, display.w() - radar.GetArea().w, scroll_width);
     scrollBottom = Rect(0, display.h() - scroll_width, display.w(), scroll_width);
 }
 

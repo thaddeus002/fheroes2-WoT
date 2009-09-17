@@ -89,7 +89,7 @@ Dialog::answer_t Dialog::ArmyInfo(const Army::BattleTroop & battroop, u16 flags)
     dst_pt.y = pos_rt.y + 225;
     text.Blit(dst_pt);
 
-    const Sprite & frame = AGG::GetICN(mons.ICNFile(), 1);
+    const Sprite & frame = AGG::GetICN(mons.ICNMonh(), 0);
     display.Blit(frame, pos_rt.x + (pos_rt.w / 2 - frame.w()) / 2, pos_rt.y + 180 - frame.h());
 
     // button upgrade
