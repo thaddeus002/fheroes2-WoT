@@ -210,14 +210,29 @@ bool LocalEvent::MousePressLeft(void) const
     return (modes & MOUSE_PRESSED) && SDL_BUTTON_LEFT == mouse_button;
 }
 
+bool LocalEvent::MouseReleaseLeft(void) const
+{
+    return !(modes & MOUSE_PRESSED) && SDL_BUTTON_LEFT == mouse_button;
+}
+
 bool LocalEvent::MousePressMiddle(void) const
 {
     return (modes & MOUSE_PRESSED) && SDL_BUTTON_MIDDLE  == mouse_button;
 }
 
+bool LocalEvent::MouseReleaseMiddle(void) const
+{
+    return !(modes & MOUSE_PRESSED) && SDL_BUTTON_MIDDLE  == mouse_button;
+}
+
 bool LocalEvent::MousePressRight(void) const
 {
     return (modes & MOUSE_PRESSED) && SDL_BUTTON_RIGHT == mouse_button;
+}
+
+bool LocalEvent::MouseReleaseRight(void) const
+{
+    return !(modes & MOUSE_PRESSED) && SDL_BUTTON_RIGHT == mouse_button;
 }
 
 void LocalEvent::HandleKeyboardEvent(SDL_KeyboardEvent & event, bool pressed)
@@ -248,17 +263,20 @@ void LocalEvent::HandleMouseButtonEvent(const SDL_MouseButtonEvent & button)
 	    case SDL_BUTTON_LEFT:
 		mouse_pl.x = button.x;
 		mouse_pl.y = button.y;
+		SetModes(PRESS_LEFT);
 		break;
 
 	    case SDL_BUTTON_MIDDLE:
 		mouse_pm.x = button.x;
 		mouse_pm.y = button.y;
+		SetModes(PRESS_MIDDLE);
 		break;
 
 
 	    case SDL_BUTTON_RIGHT:
 		mouse_pr.x = button.x;
 		mouse_pr.y = button.y;
+		SetModes(PRESS_RIGHT);
 		break;
 
 	    default:
@@ -310,12 +328,9 @@ void LocalEvent::HandleMouseWheelEvent(const SDL_MouseButtonEvent & button)
 
 bool LocalEvent::MouseClickLeft(const Rect &rt)
 {
-    if(!MousePressLeft() && (rt & mouse_pl) && (rt & mouse_rl))
+    if(MouseReleaseLeft() && (rt & mouse_pl) && (rt & mouse_rl) && (PRESS_LEFT & modes))
     {
-	// reset cycle
-	mouse_pl.x = -1;
-	mouse_pl.y = -1;
-	
+	ResetModes(PRESS_LEFT);
 	return true;
     }
 
@@ -324,12 +339,9 @@ bool LocalEvent::MouseClickLeft(const Rect &rt)
 
 bool LocalEvent::MouseClickMiddle(const Rect &rt)
 {
-    if(!MousePressMiddle() && (rt & mouse_pm) && (rt & mouse_rm))
+    if(MouseReleaseMiddle() && (rt & mouse_pm) && (PRESS_MIDDLE & modes))
     {
-	// reset cycle
-	mouse_pm.x = -1;
-	mouse_pm.y = -1;
-	
+	ResetModes(PRESS_MIDDLE);
 	return true;
     }
 
@@ -338,12 +350,9 @@ bool LocalEvent::MouseClickMiddle(const Rect &rt)
 
 bool LocalEvent::MouseClickRight(const Rect &rt)
 {
-    if(!MousePressRight() && (rt & mouse_pr) && (rt & mouse_rr))
+    if(MouseReleaseRight() && (rt & mouse_pr) && (PRESS_RIGHT & modes))
     {
-	// reset cycle
-	mouse_pr.x = -1;
-	mouse_pr.y = -1;
-
+	ResetModes(PRESS_RIGHT);
 	return true;
     }
 
@@ -362,47 +371,83 @@ bool LocalEvent::MouseWheelDn(void) const
 
 bool LocalEvent::MousePressLeft(const Rect &rt) const
 {
-    return MousePressLeft() ? rt & mouse_pl : false;
+    return MousePressLeft() && (rt & mouse_pl);
 }
 
 bool LocalEvent::MousePressLeft(const Point &pt, u16 w, u16 h) const
 {
-    return MousePressLeft() ? Rect(pt.x, pt.y, w, h) & mouse_pl : false;
+    return MousePressLeft() && (Rect(pt.x, pt.y, w, h) & mouse_pl);
 }
 
 bool LocalEvent::MousePressMiddle(const Rect &rt) const
 {
-    return MousePressMiddle() ? rt & mouse_pm : false;
+    return MousePressMiddle() && (rt & mouse_pm);
 }
 
 bool LocalEvent::MousePressRight(const Rect &rt) const
 {
-    return MousePressRight() ? rt & mouse_pr : false;
+    return MousePressRight() && (rt & mouse_pr);
 }
 
 bool LocalEvent::MouseReleaseLeft(const Rect &rt) const
 {
-    return MousePressLeft() ? false : rt & mouse_rl;
+    return MouseReleaseLeft() && (rt & mouse_rl);
 }
 
 bool LocalEvent::MouseReleaseMiddle(const Rect &rt) const
 {
-    return MousePressMiddle() ? false : rt & mouse_rm;
+    return MouseReleaseMiddle() && (rt & mouse_rm);
 }
 
 bool LocalEvent::MouseReleaseRight(const Rect &rt) const
 {
-    return MousePressRight() ? false : rt & mouse_rr;
+    return MouseReleaseRight() && (rt & mouse_rr);
+}
+
+void LocalEvent::ResetPressLeft(void)
+{
+    mouse_pl.x = -1;
+    mouse_pl.y = -1;
+}
+
+void LocalEvent::ResetPressRight(void)
+{
+    mouse_pr.x = -1;
+    mouse_pr.y = -1;
+}
+
+void LocalEvent::ResetPressMiddle(void)
+{
+    mouse_pm.x = -1;
+    mouse_pm.y = -1;
+}
+
+void LocalEvent::ResetReleaseLeft(void)
+{
+    mouse_rl.x = -1;
+    mouse_rl.y = -1;
+}
+
+void LocalEvent::ResetReleaseRight(void)
+{
+    mouse_rr.x = -1;
+    mouse_rr.y = -1;
+}
+
+void LocalEvent::ResetReleaseMiddle(void)
+{
+    mouse_rm.x = -1;
+    mouse_rm.y = -1;
 }
 
 bool LocalEvent::MouseWheelUp(const Rect &rt) const
 {
-    return MouseWheelUp() ? rt & mouse_cu : false;
+    return MouseWheelUp() && (rt & mouse_cu);
 }
 
 bool LocalEvent::MouseWheelDn(const Rect &rt) const
 {
-    return MouseWheelDn() ? rt & mouse_cu : false;
+    return MouseWheelDn() && (rt & mouse_cu);
 }
 
 bool LocalEvent::MouseCursor(const Rect &rt) const

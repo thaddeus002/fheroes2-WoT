@@ -154,6 +154,14 @@ public:
     const Point & GetMouseReleaseMiddle(void) const{ return mouse_rm; };
     const Point & GetMouseReleaseRight(void) const{ return mouse_rr; };
 
+    void ResetPressLeft(void);
+    void ResetPressRight(void);
+    void ResetPressMiddle(void);
+
+    void ResetReleaseLeft(void);
+    void ResetReleaseRight(void);
+    void ResetReleaseMiddle(void);
+    
     bool MouseClickLeft(const Rect &rt);
     bool MouseClickMiddle(const Rect &rt);
     bool MouseClickRight(const Rect &rt);
@@ -169,8 +177,11 @@ public:
     bool MousePressRight(void) const;
     bool MousePressRight(const Rect &rt) const;
 
+    bool MouseReleaseLeft(void) const;
     bool MouseReleaseLeft(const Rect &rt) const;
+    bool MouseReleaseMiddle(void) const;
     bool MouseReleaseMiddle(const Rect &rt) const;
+    bool MouseReleaseRight(void) const;
     bool MouseReleaseRight(const Rect &rt) const;
 
     bool MouseWheelUp(const Rect &rt) const;
@@ -193,7 +204,7 @@ private:
 
     static int GlobalFilterEvents(const SDL_Event *event);
 
-    enum flag_t { KEY_PRESSED = 0x01, MOUSE_MOTION = 0x02, MOUSE_PRESSED = 0x04, GLOBAL_FILTER = 0x08 };
+    enum flag_t { KEY_PRESSED = 0x01, MOUSE_MOTION = 0x02, MOUSE_PRESSED = 0x04, GLOBAL_FILTER = 0x08, PRESS_LEFT = 0x10, PRESS_RIGHT = 0x20, PRESS_MIDDLE = 0x40 };
 
     void SetModes(flag_t);
     void ResetModes(flag_t);
