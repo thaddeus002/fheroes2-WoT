@@ -195,6 +195,7 @@ void SelectArtifactsBar::Redraw(Surface & display)
 void SelectArtifactsBar::Reset(void)
 {
     selected = -1;
+    if(Cursor::Get().isVisible()) Cursor::Get().Hide();
     spritecursor.Hide();
 }
 

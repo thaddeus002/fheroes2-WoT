@@ -83,6 +83,10 @@ bool Dialog::SelectCount(const std::string &header, u16 min, u16 max, u16 & cur)
     pt.y = pos.y + pos.h + BUTTON_HEIGHT - AGG::GetICN(system, 3).h();
     Button buttonCancel(pt, system, 3, 4);
 
+    text.Set("MAX", Font::SMALL);
+    const Rect rectMax(pos.x + 173, pos.y + 58, text.w(), text.h());
+    text.Blit(rectMax.x, rectMax.y);
+
     LocalEvent & le = LocalEvent::Get();
 
     buttonUp.Draw();
@@ -92,6 +96,7 @@ bool Dialog::SelectCount(const std::string &header, u16 min, u16 max, u16 & cur)
 
     bool zero = false;
     bool first = true;
+    bool redraw_count = false;
     cursor.Show();
     display.Flip();
 
@@ -115,20 +120,7 @@ bool Dialog::SelectCount(const std::string &header, u16 min, u16 max, u16 & cur)
 		    first = true;
 		}
 	    }
-
-	    cursor.Hide();
-	    pt.x = pos.x + 80;
-	    pt.y = pos.y + 55;
-	    display.Blit(sprite_edit, pt);
-
-	    message.clear();
-	    String::AddInt(message, cur);
-	    text.Set(message);
-	    pt.x = pos.x + 80 + (sprite_edit.w() - text.w()) / 2;
-	    pt.y = pos.y + 56;
-	    text.Blit(pt);
-	    cursor.Show();
-	    display.Flip();
+	    redraw_count = true;
 	}
 
 	if(le.KeyPress() && KEY_0 <= le.KeyValue() && KEY_9 >= le.KeyValue())
@@ -162,49 +154,34 @@ bool Dialog::SelectCount(const std::string &header, u16 min, u16 max, u16 & cur)
 		}
 		if(cur > max) cur = max;
 	    }
-
-	    cursor.Hide();
-	    pt.x = pos.x + 80;
-	    pt.y = pos.y + 55;
-	    display.Blit(sprite_edit, pt);
-
-	    message.clear();
-	    String::AddInt(message, cur);
-	    text.Set(message);
-	    pt.x = pos.x + 80 + (sprite_edit.w() - text.w()) / 2;
-	    pt.y = pos.y + 56;
-	    text.Blit(pt);
-	    cursor.Show();
-	    display.Flip();
+	    redraw_count = true;
 	}
 
+        // max
+        if(le.MouseClickLeft(rectMax))
+        {
+    	    cur = max;
+    	    redraw_count = true;
+        }
+	else
 	// up
 	if((le.MouseWheelUp(pos) ||
             le.MouseClickLeft(buttonUp)) && cur < max)
 	{
 	    ++cur;
-
-	    cursor.Hide();
-	    pt.x = pos.x + 80;
-	    pt.y = pos.y + 55;
-	    display.Blit(sprite_edit, pt);
-
-	    message.clear();
-	    String::AddInt(message, cur);
-	    text.Set(message);
-	    pt.x = pos.x + 80 + (sprite_edit.w() - text.w()) / 2;
-	    pt.y = pos.y + 56;
-	    text.Blit(pt);
-	    cursor.Show();
-	    display.Flip();
+    	    redraw_count = true;
 	}
-
+	else
 	// down
 	if((le.MouseWheelDn(pos) ||
             le.MouseClickLeft(buttonDn)) && min < cur)
 	{
 	    --cur;
+    	    redraw_count = true;
+	}
 
+	if(redraw_count)
+	{
 	    cursor.Hide();
 	    pt.x = pos.x + 80;
 	    pt.y = pos.y + 55;
@@ -212,15 +189,18 @@ bool Dialog::SelectCount(const std::string &header, u16 min, u16 max, u16 & cur)
 
 	    message.clear();
 	    String::AddInt(message, cur);
-	    text.Set(message);
+	    text.Set(message, Font::BIG);
 	    pt.x = pos.x + 80 + (sprite_edit.w() - text.w()) / 2;
 	    pt.y = pos.y + 56;
 	    text.Blit(pt);
 	    cursor.Show();
 	    display.Flip();
+
+	    redraw_count = false;
 	}
 
         if(le.KeyPress(KEY_RETURN) || le.MouseClickLeft(buttonOk)){ cursor.Hide(); return true; }
+	else
 	if(le.KeyPress(KEY_ESCAPE) || le.MouseClickLeft(buttonCancel)){ cur = 0;  break; }
     }
     cursor.Hide();

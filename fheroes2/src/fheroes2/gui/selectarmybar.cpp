@@ -31,6 +31,8 @@
 #include "castle.h"
 #include "selectarmybar.h"
 
+void DialogRedistributeArmy(Army::Troop &, Army::Troop &);
+
 enum
 {
     FLAGS_READONLY	= 0x01,
@@ -215,6 +217,7 @@ void SelectArmyBar::Redraw(Surface & display)
 void SelectArmyBar::Reset(void)
 {
     selected = -1;
+    if(Cursor::Get().isVisible()) Cursor::Get().Hide();
     spritecursor.Hide();
 }
 
@@ -241,6 +244,23 @@ bool SelectArmyBar::QueueEventProcessing(SelectArmyBar & bar)
     Army::Troop & troop1 = bar.army->At(index1);
     Cursor::Get().Hide();
 
+    const s8 index_p = bar.GetIndexFromCoord(le.GetMousePressLeft());
+
+    // drag drop - redistribute troops
+    if(0 <= index_p && ARMYMAXTROOPS > index_p &&
+       bar.army->At(index_p).isValid() && !troop1.isValid())
+    {
+	while(le.HandleEvents() && le.MousePressLeft()){ Cursor::Get().Show(); Display::Get().Flip(); DELAY(1); };
+	const s8 index_r = bar.GetIndexFromCoord(le.GetMouseReleaseLeft());
+	if(!bar.army->At(index_r).isValid())
+	{
+	    DialogRedistributeArmy(bar.army->At(index_p), bar.army->At(index_r));
+	    bar.Reset();
+	    bar.Redraw();
+	}
+	le.ResetPressLeft();
+    }
+    else
     // left click
     if(le.MouseClickLeft(bar.GetArea()))
     {
@@ -295,7 +315,10 @@ bool SelectArmyBar::QueueEventProcessing(SelectArmyBar & bar)
 	}
 	else
 	// select
-	if(!bar.ReadOnly() && troop1.isValid()) bar.Select(index1);
+	if(!bar.ReadOnly() && troop1.isValid())
+	{
+	    bar.Select(index1);
+	}
     }
     else
     // press right
@@ -313,12 +336,8 @@ bool SelectArmyBar::QueueEventProcessing(SelectArmyBar & bar)
 	{
 	    const s8 index2 = bar.Selected();
 	    Army::Troop & troop2 = bar.army->At(index2);
-	    u16 redistr_count = troop2.Count() / 2;
-	    if(Dialog::SelectCount(_("Move how many troops?"), 1, troop2.Count() - 1, redistr_count))
-	    {
-		troop1.Set(troop2, redistr_count);
-		troop2.SetCount(troop2.Count() - redistr_count);
-	    }
+
+	    DialogRedistributeArmy(troop2, troop1);
 
 	    bar.Reset();
 	    bar.Redraw();
@@ -392,13 +411,7 @@ bool SelectArmyBar::QueueEventProcessing(SelectArmyBar & bar1, SelectArmyBar & b
 	    else
 	    // empty troops - redistribute troops
 	    {
-		u16 redistr_count = troop2.Count() / 2;
-		if(Dialog::SelectCount(_("Move how many troops?"), 1, troop2.Count() - 1, redistr_count))
-		{
-		    troop1.Set(troop2, redistr_count);
-		    troop2.SetCount(troop2.Count() - redistr_count);
-		    change = true;
-		}
+		DialogRedistributeArmy(troop2, troop1);
 
 		bar1.Reset();
 		bar2.Reset();
@@ -460,13 +473,7 @@ bool SelectArmyBar::QueueEventProcessing(SelectArmyBar & bar1, SelectArmyBar & b
 	    else
 	    // empty troops - redistribute troops
 	    {
-		u16 redistr_count = troop2.Count() / 2;
-		if(Dialog::SelectCount(_("Move how many troops?"), 1, troop2.Count() - 1, redistr_count))
-		{
-		    troop1.Set(troop2, redistr_count);
-		    troop2.SetCount(troop2.Count() - redistr_count);
-		    change = true;
-		}
+		DialogRedistributeArmy(troop2, troop1);
 
 		bar1.Reset();
 		bar2.Reset();
@@ -481,4 +488,14 @@ bool SelectArmyBar::QueueEventProcessing(SelectArmyBar & bar1, SelectArmyBar & b
     }
 
     return change;
+}
+
+void DialogRedistributeArmy(Army::Troop & troop1, Army::Troop & troop2)
+{
+    u16 redistr_count = troop1.Count() / 2;
+    if(Dialog::SelectCount(_("Move how many troops?"), 1, troop1.Count(), redistr_count))
+    {
+	troop2.Set(troop1, redistr_count);
+	troop1.SetCount(troop1.Count() - redistr_count);
+    }
 }
