@@ -40,35 +40,27 @@ void Dialog::ResourceInfo(const std::string &header, const std::string &message,
 
     TextBox box1(header, Font::BIG, BOXAREA_WIDTH);
     TextBox box2(message, Font::BIG, BOXAREA_WIDTH);
-    const u8 extra = (4 > rs.GetValidItems() ? 50 : (6 > rs.GetValidItems() ? 100 : 160));
+    Resource::BoxSprite rbs(rs, BOXAREA_WIDTH);
 
-    Box box((header.size() ? box1.h() + 10 : 0) + (message.size() ? box2.h() + 10 : 0) + extra, Dialog::OK);
+    const u8 spacer = Settings::Get().PocketPC();
 
-    Rect pos = box.GetArea();
+    Box box(box1.h() + spacer + box2.h() + spacer + rbs.GetArea().h, true);
+    Point pos = box.GetArea();
 
-    if(header.size())
-    {
-	box1.Blit(pos);
-        pos.y += box1.h() + 10;
-    }
+    if(header.size()) box1.Blit(pos);
+    pos.y += box1.h() + spacer;
 
-    if(message.size())
-    {
-        box2.Blit(pos);
-        pos.y += box2.h() + 10;
-    }
+    if(message.size()) box2.Blit(pos);
+    pos.y += box2.h() + spacer;
 
-    // draw resource
-    Resource::AlignDraw(rs, pos);
+    rbs.SetPos(pos.x, pos.y);
+    rbs.Redraw();
 
     LocalEvent & le = LocalEvent::Get();
 
-    Point pt;
-    
-    pt.x = box.GetArea().x + (box.GetArea().w - AGG::GetICN(system, 1).w()) / 2;
-    pt.y = box.GetArea().y + box.GetArea().h + BUTTON_HEIGHT - AGG::GetICN(system, 1).h();
-    Button button(pt, system, 1, 2);
-
+    pos.x = box.GetArea().x + (box.GetArea().w - AGG::GetICN(system, 1).w()) / 2;
+    pos.y = box.GetArea().y + box.GetArea().h - AGG::GetICN(system, 1).h();
+    Button button(pos, system, 1, 2);
     button.Draw();
 
     cursor.Show();

@@ -29,6 +29,7 @@ namespace Game
     extern void KeyPress_b(void);
     extern void KeyPress_w(void);
     extern void KeyPress_c(void);
+    extern void KeyPress_e(menu_t &);
     extern void KeyPress_ESC(menu_t &);
 };
 
@@ -39,7 +40,7 @@ Interface::ControlPanel::ControlPanel()
     sf_area.Blit(AGG::GetICN(ICN::REQUESTS, 32), 20, 3);
     sf_area.Blit(AGG::GetICN(ICN::REQUESTS, 34), 38, 3);
     sf_area.Blit(AGG::GetICN(ICN::REQUESTS, 35), 56, 3);
-    sf_area.Blit(AGG::GetICN(ICN::REQUESTS, 30), 74, 3);
+    sf_area.Blit(AGG::GetICN(ICN::REQUESTS, 39), 74, 3);
     w = sf_area.w();
     h = sf_area.h();
     rt_radr.w = 17;
@@ -100,5 +101,6 @@ void Interface::ControlPanel::QueueEventProcessing(Game::menu_t & ret)
     else
     if(le.MouseClickLeft(rt_stat))	Game::KeyPress_w();
     else
-    if(le.MouseClickLeft(rt_quit))	Game::KeyPress_ESC(ret);
+    if(le.MouseClickLeft(rt_quit))	Game::KeyPress_e(ret);
+    //if(le.MouseClickLeft(rt_quit))	Game::KeyPress_ESC(ret);
 }

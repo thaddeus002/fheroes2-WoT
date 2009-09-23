@@ -36,22 +36,23 @@ Skill::Primary::skill_t Dialog::SelectSkillFromArena(void)
 
     // cursor
     Cursor & cursor = Cursor::Get();
+    Cursor::themes_t oldthemes = cursor.Themes();
     cursor.Hide();
+    cursor.SetThemes(cursor.POINTER);
 
     TextBox textbox(_("You enter the arena and face a pack of vicious lions. You handily defeat them, to the wild cheers of the crowd.  Impressed by your skill, the aged trainer of gladiators agrees to train you in a skill of your choice."), Font::BIG, BOXAREA_WIDTH);
-
-    Dialog::Box box(textbox.h() + 80, Dialog::OK);
-
     const Sprite & sprite = AGG::GetICN(ICN::XPRIMARY, 0);
+    const u8 spacer = Settings::Get().PocketPC() ? 5 : 10;
+
+    Dialog::Box box(textbox.h() + spacer + sprite.h() + 15, true);
+
     const Rect & box_rt = box.GetArea();
-    Point dst_pt(box_rt.x, box_rt.y + 10);
+    Point dst_pt = box_rt;
 
-    // text
     textbox.Blit(dst_pt);
+    dst_pt.y += textbox.h() + spacer;
 
-    dst_pt.y += textbox.h() + 20;
     Skill::Primary::skill_t  res = Skill::Primary::ATTACK;
-
     const Rect rect1(dst_pt.x + box_rt.w / 2 - 2 * sprite.w() - 30, dst_pt.y, sprite.w(), sprite.h());
     const Rect rect2(dst_pt.x + box_rt.w / 2 - sprite.w() - 10, dst_pt.y, sprite.w(), sprite.h());
     const Rect rect3(dst_pt.x + box_rt.w / 2 + 10, dst_pt.y, sprite.w(), sprite.h());
@@ -83,7 +84,7 @@ Skill::Primary::skill_t Dialog::SelectSkillFromArena(void)
 
     // buttons
     dst_pt.x = box_rt.x + (box_rt.w - AGG::GetICN(system, 1).w()) / 2;
-    dst_pt.y = box_rt.y + box_rt.h + BUTTON_HEIGHT - AGG::GetICN(system, 1).h();
+    dst_pt.y = box_rt.y + box_rt.h - AGG::GetICN(system, 1).h();
     Button buttonOk(dst_pt, system, 1, 2);
 
     LocalEvent & le = LocalEvent::Get();
@@ -148,6 +149,9 @@ Skill::Primary::skill_t Dialog::SelectSkillFromArena(void)
     }
 
     cursor.Hide();
+    cursor.SetThemes(oldthemes);
+    cursor.Show();
+
     return res;
 }
 

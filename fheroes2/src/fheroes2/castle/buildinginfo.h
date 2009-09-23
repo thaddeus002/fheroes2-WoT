@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2009 by Andrey Afletdinov                               *
+ *   Copyright (C) 2006 by Andrey Afletdinov                               *
  *   afletdinov@mail.dc.baikal.ru                                          *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -18,24 +18,38 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#ifndef H2POCKETPC_H
-#define H2POCKETPC_H
+#ifndef H2BUILDINGINFO_H
+#define H2BUILDINGINFO_H
 
-#include "game.h"
-#include "dialog.h"
-#include "maps_fileinfo.h"
-#include "gamedefs.h"
+#include "castle.h"
 
-namespace PocketPC
+class BuildingInfo
 {
-    Game::menu_t	MainMenu(void);
-    Game::menu_t	SelectScenario(void);
-    Game::menu_t	ScenarioInfo(void);
-    Game::menu_t	LoadGame(void);
-    bool		DialogSelectMapsFileList(MapsFileInfoList &, std::string &);
-    Dialog::answer_t	HeroesOpenDialog(Heroes &, bool);
-    Dialog::answer_t	CastleOpenDialog(Castle &);
-    Dialog::answer_t	DialogArmyInfo(const Army::BattleTroop &, u16);
+public:
+    BuildingInfo(const Castle &, Castle::building_t);
+
+    u32 operator() (void) const;
+
+    void SetPos(s16, s16);
+
+    const Rect & GetArea(void) const;
+    const std::string & GetName(void) const;
+    const std::string & GetDescription(void) const;
+
+    bool AllowBuy(void) const;
+    bool IsDwelling(void) const;
+    bool IsDisable(void) const;
+    
+    void Redraw(void);
+    bool QueueEventProcessing(void);
+    bool DialogBuyBuilding(bool buttons) const;
+
+private:
+    const Castle & castle;
+    u32 building;
+    std::string description;
+    Rect area;
+    bool disable;
 };
 
 #endif

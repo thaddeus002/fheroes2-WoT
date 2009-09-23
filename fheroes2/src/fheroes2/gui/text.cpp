@@ -23,6 +23,11 @@
 #include "settings.h"
 #include "text.h"
 
+TextInterface::TextInterface(Font::type_t ft) : font(ft)
+{
+    if(Settings::Get().PocketPC()) ft == Font::YELLOW_BIG ? font = Font::YELLOW_SMALL : font = Font::SMALL;
+}
+
 TextAscii::TextAscii(const std::string & msg, Font::type_t ft) : TextInterface(ft), message(msg)
 {
 }
@@ -34,6 +39,8 @@ void TextAscii::SetText(const std::string & msg)
 
 void TextAscii::SetFont(const Font::type_t & ft)
 {
+    if(Settings::Get().PocketPC()) ft == Font::YELLOW_BIG ? font = Font::YELLOW_SMALL : font = Font::SMALL;
+    else
     font = ft;
 }
 
@@ -219,6 +226,8 @@ void TextUnicode::SetText(const std::string & msg)
 
 void TextUnicode::SetFont(const Font::type_t & ft)
 {
+    if(Settings::Get().PocketPC()) ft == Font::YELLOW_BIG ? font = Font::YELLOW_SMALL : font = Font::SMALL;
+    else
     font = ft;
 }
 
@@ -535,6 +544,7 @@ void TextBox::Set(const std::string & msg, Font::type_t ft, u16 width)
 void TextBox::Append(const std::string & msg, Font::type_t ft, u16 width)
 {
     if(msg.empty()) return;
+    if(Settings::Get().PocketPC()) ft == Font::YELLOW_BIG ? ft = Font::YELLOW_SMALL : ft = Font::SMALL;
 
     u16 www = 0;
     Rect::w = width;
@@ -579,6 +589,7 @@ void TextBox::Append(const std::string & msg, Font::type_t ft, u16 width)
 void TextBox::Append(const std::vector<u16> & msg, Font::type_t ft, u16 width)
 {
     if(msg.empty()) return;
+    if(Settings::Get().PocketPC()) ft == Font::YELLOW_BIG ? ft = Font::YELLOW_SMALL : ft = Font::SMALL;
 
     u16 www = 0;
     Rect::w = width;

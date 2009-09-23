@@ -24,11 +24,30 @@
 #include "text.h"
 #include "pocketpc.h"
 
+Game::menu_t PocketPC::LoadGame(void)
+{
+    Cursor & cursor = Cursor::Get();
+    Display & display = Display::Get();
+    cursor.Hide();
+    cursor.SetThemes(cursor.POINTER);
+
+    const Sprite &sprite = AGG::GetICN(ICN::HEROES, 0);
+    Rect src_rt((sprite.w() - display.w()) / 2, 0, display.w(), display.h());
+    display.Blit(sprite, src_rt, 0, 0);
+
+    cursor.Show();
+    display.Flip();
+
+    std::string file;
+    if(!Dialog::SelectFileLoad(file) || file.empty()) return Game::MAINMENU;
+    Game::Load(file);
+
+    return Game::STARTGAME;
+}
+
 Game::menu_t PocketPC::MainMenu(void)
 {
-    Mixer::Pause();
     Game::SetFixVideoMode();
-    AGG::PlayMusic(MUS::MAINMENU);
 
     Cursor & cursor = Cursor::Get();
     Display & display = Display::Get();
@@ -74,8 +93,8 @@ Game::menu_t PocketPC::MainMenu(void)
     while(le.HandleEvents())
     {
 	if(le.KeyPress(KEY_n) || le.MouseClickLeft(rectNewGame)) return Game::SELECTSCENARIO;
-	//else
-	//if(le.KeyPress(KEY_l) || le.MouseClickLeft(rectLoadGame)) return Game::LOADGAME;
+	else
+	if(le.KeyPress(KEY_l) || le.MouseClickLeft(rectLoadGame)) return Game::LOADGAME;
 	else
 	if(le.KeyPress(KEY_q) || le.MouseClickLeft(rectQuitGame) || le.KeyPress(KEY_ESCAPE)) return Game::QUITGAME;
     }

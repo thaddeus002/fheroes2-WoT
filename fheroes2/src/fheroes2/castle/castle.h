@@ -124,7 +124,8 @@ public:
     const Army::army_t & GetActualArmy(void) const;
     Army::army_t & GetActualArmy(void);
     void MergeArmies(void);
-    u16 GetDwellingLivedCount(building_t dw);
+    u16 GetDwellingLivedCount(u32) const;
+    u32 GetActualDwelling(u32) const;
     void RecruitAllMonster(void);
 
     const Point & GetCenter(void) const;
@@ -144,15 +145,16 @@ public:
     s8 GetLuckWithModificators(std::string *strs = NULL) const;
 
     bool AllowBuild(void) const{ return Modes(ALLOWBUILD); };
-    bool AllowBuyBuilding(building_t build) const;
+    bool AllowBuyBuilding(u32) const;
     bool isBuild(u32 bd) const{ return building & bd; };
-    void BuyBuilding(building_t build);
+    void BuyBuilding(u32);
+    u32 GetBuildingRequires(u32) const;
 
-    static const std::string & GetStringBuilding(const building_t & build, const Race::race_t & race = Race::BOMG);
-    static const std::string & GetDescriptionBuilding(const building_t & build, const Race::race_t & race = Race::BOMG);
-    static ICN::icn_t GetICNBuilding(const building_t & build, const Race::race_t & race);
+    static const std::string & GetStringBuilding(u32, Race::race_t = Race::BOMG);
+    static const std::string & GetDescriptionBuilding(u32, Race::race_t = Race::BOMG);
+    static ICN::icn_t GetICNBuilding(u32, Race::race_t);
     static ICN::icn_t GetICNBoat(const Race::race_t & race);
-    static u32 GetUpgradeBuilding(const u32 build, const Race::race_t & race);
+    u32 GetUpgradeBuilding(u32) const;
     
     static bool PredicateIsCastle(const Castle *castle);
     static bool PredicateIsTown(const Castle *castle);
@@ -167,23 +169,21 @@ public:
 private:
     void RedrawResourcePanel(const Point &);
     void TownUpgradeToCastle(void);
-    u32 GetBuildingRequires(const building_t & build) const;
     Rect GetCoordBuilding(building_t building, const Point & pt);
     void RedrawAllBuilding(const Point & dst_pt, const std::vector<building_t> & orders);
-    void RedrawBuilding(const building_t build, const Point & dst_pt, const u32 ticket);
-    building_t OpenTown(void);
+    void RedrawBuilding(u32, const Point & dst_pt, const u32 ticket);
+    u32  OpenTown(void);
     void OpenTavern(void);
     void OpenThievesGuild(void);
     void OpenWell(void);
     void OpenMageGuild(void);
     void RedrawNameTown(const Point & src_pt);
     void WellRedrawInfoArea(const Point & cur_pt);
-    void RedrawAnimationBuilding(const Point & dst_pt, const building_t build);
+    void RedrawAnimationBuilding(const Point & dst_pt, u32 build);
 
     Dialog::answer_t DialogBuyHero(const Heroes*);
-    Dialog::answer_t DialogBuyBuilding(building_t build, bool fixed = true);
-
-    void PressRightAction(building_t b);
+    Dialog::answer_t DialogBuyCaptain(bool fixed = true) const;
+    Dialog::answer_t DialogBuyCastle(bool fixed = true) const;
 
 private:
     friend void Game::SaveXMLDoc(TiXmlDocument &);

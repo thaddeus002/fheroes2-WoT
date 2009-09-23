@@ -35,10 +35,10 @@
 
 Game::menu_t Game::MainMenu(void)
 {
-    if(Settings::Get().PocketPC()) return PocketPC::MainMenu();
-
     Mixer::Pause();
     AGG::PlayMusic(MUS::MAINMENU);
+
+    if(Settings::Get().PocketPC()) return PocketPC::MainMenu();
 
     // preload
     AGG::PreloadObject(ICN::HEROES);

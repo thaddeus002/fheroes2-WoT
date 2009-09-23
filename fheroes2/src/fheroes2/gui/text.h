@@ -33,7 +33,7 @@ namespace Font
 class TextInterface
 {
 public:
-    TextInterface(Font::type_t ft = Font::BIG) : font(ft){};
+    TextInterface(Font::type_t ft = Font::BIG);
     virtual ~TextInterface(){};
 
     virtual void SetText(const std::string &) = 0;

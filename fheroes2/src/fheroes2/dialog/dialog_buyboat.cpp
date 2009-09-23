@@ -38,42 +38,42 @@ Dialog::answer_t Dialog::BuyBoat(bool enable)
     Cursor & cursor = Cursor::Get();
     cursor.Hide();
 
-    Dialog::Box box(120, true);
+    Resource::funds_t res;
+    res.gold = BUY_BOAT_GOLD;
+    res.wood = BUY_BOAT_WOOD;
+    Resource::BoxSprite rbs(res, BOXAREA_WIDTH);
+
+    const Sprite & sprite = AGG::GetICN(ICN::BOATWIND, 0);
+    Text text(_("Build a new ship:"), Font::BIG);
+    const u8 spacer = Settings::Get().PocketPC() ? 5 : 10;
+
+    Dialog::Box box(text.h() + spacer + sprite.h() + spacer + text.h() + spacer + rbs.GetArea().h - 20, true);
 
     const Rect & box_rt = box.GetArea();
     Point dst_pt;
-    Text text;
-
-    text.Set(_("Build a new ship:"), Font::BIG);
     dst_pt.x = box_rt.x + (box_rt.w - text.w()) / 2;
     dst_pt.y = box_rt.y;
     text.Blit(dst_pt);
 
-    const Sprite & sprite = AGG::GetICN(ICN::BOATWIND, 0);
     dst_pt.x = box_rt.x + (box_rt.w - sprite.w()) / 2;
-    dst_pt.y = box_rt.y + 25;
+    dst_pt.y = box_rt.y + text.h() + spacer;
     display.Blit(sprite, dst_pt);
 
     text.Set(_("Resource cost:"), Font::BIG);
     dst_pt.x = box_rt.x + (box_rt.w - text.w()) / 2;
-    dst_pt.y = box_rt.y + 35 + sprite.h();
+    dst_pt.y = dst_pt.y + sprite.h() + spacer;
     text.Blit(dst_pt);
 
-    const Rect src_rt(box_rt.x, box_rt.y + 50 + sprite.h(), box_rt.w, box_rt.h);
-
-    Resource::funds_t res;
-    res.gold = BUY_BOAT_GOLD;
-    res.wood = BUY_BOAT_WOOD;
-
-    Resource::AlignDraw(res, src_rt);
+    rbs.SetPos(box_rt.x, dst_pt.y + spacer);
+    rbs.Redraw();
 
     // buttons
     dst_pt.x = box_rt.x;
-    dst_pt.y = box_rt.y + box_rt.h + BUTTON_HEIGHT - AGG::GetICN(system, 1).h();
+    dst_pt.y = box_rt.y + box_rt.h - AGG::GetICN(system, 1).h();
     Button button1(dst_pt, system, 1, 2);
 
     dst_pt.x = box_rt.x + box_rt.w - AGG::GetICN(system, 3).w();
-    dst_pt.y = box_rt.y + box_rt.h + BUTTON_HEIGHT - AGG::GetICN(system, 3).h();
+    dst_pt.y = box_rt.y + box_rt.h - AGG::GetICN(system, 3).h();
     Button button2(dst_pt, system, 3, 4);
 
     if(!enable)

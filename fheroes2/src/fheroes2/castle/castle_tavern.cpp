@@ -43,18 +43,18 @@ void Castle::OpenTavern(void)
 
     cursor.Hide();
 
+    Text text(tavern, Font::BIG);
     TextBox box1(header, Font::BIG, BOXAREA_WIDTH);
     TextBox box2(message, Font::BIG, BOXAREA_WIDTH);
+    const Sprite & s1 = AGG::GetICN(tavwin, 0);
 
-    Dialog::Box box(box1.h() + 130 + box2.h(), true);
+    Dialog::Box box(text.h() + 10 + box1.h() + 5 + s1.h() + 5 + box2.h(), true);
 
     const Rect & pos = box.GetArea();
     Point dst_pt(pos.x, pos.y);
 
-    Text text(tavern, Font::BIG);
     text.Blit(pos.x + (pos.w - text.w()) / 2, dst_pt.y);
 
-    const Sprite & s1 = AGG::GetICN(tavwin, 0);
     dst_pt.x = pos.x + (pos.w - s1.w()) / 2;
     dst_pt.y = pos.y + 30;
     display.Blit(s1, dst_pt);
@@ -79,7 +79,7 @@ void Castle::OpenTavern(void)
 
     // button yes
     const Sprite & s4 = AGG::GetICN(system, 5);
-    Button buttonYes(pos.x + (pos.w - s4.w()) / 2, pos.y + pos.h + BUTTON_HEIGHT - s4.h(), system, 5, 6);
+    Button buttonYes(pos.x + (pos.w - s4.w()) / 2, pos.y + pos.h - s4.h(), system, 5, 6);
 
     buttonYes.Draw();
 

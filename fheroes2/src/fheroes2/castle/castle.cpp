@@ -368,7 +368,7 @@ const MageGuild & Castle::GetMageGuild(void) const
     return mageguild;
 }
 
-const std::string & Castle::GetStringBuilding(const building_t & build, const Race::race_t & race)
+const std::string & Castle::GetStringBuilding(u32 build, Race::race_t race)
 {
     static const std::string str_build[] = { _("Thieves' Guild"), _("Tavern"), _("Shipyard"), _("Well"), _("Statue"), _("Left Turret"),
 	_("Right Turret"), _("Marketplace"), _("Moat"), _("Castle"), _("Tent"), _("Captain's Quarters"), _("Mage Guild, Level 1"), 
@@ -454,7 +454,7 @@ const std::string & Castle::GetStringBuilding(const building_t & build, const Ra
     return str_build[17];
 }
 
-const std::string & Castle::GetDescriptionBuilding(const building_t & build, const Race::race_t & race)
+const std::string & Castle::GetDescriptionBuilding(u32 build, Race::race_t race)
 {
     static const std::string desc_build[] = {
 	_("The Thieves' Guild provides information on enemy players. Thieves' Guilds can also provide scouting information on enemy towns."),
@@ -582,23 +582,23 @@ bool Castle::RecruitMonster(building_t dw, u16 count)
 	    dw_index = 0;
 	    break;
 	case DWELLING_MONSTER2:
-	    ms = Monster(race, building & DWELLING_UPGRADE2 ? DWELLING_UPGRADE2 : DWELLING_MONSTER2);
+	    ms = Monster(race, GetActualDwelling(DWELLING_MONSTER2));
 	    dw_index = 1;
 	    break;
 	case DWELLING_MONSTER3:
-	    ms = Monster(race, building & DWELLING_UPGRADE3 ? DWELLING_UPGRADE3 : DWELLING_MONSTER3);
+	    ms = Monster(race, GetActualDwelling(DWELLING_MONSTER3));
 	    dw_index = 2;
 	    break;
 	case DWELLING_MONSTER4:
-	    ms = Monster(race, building & DWELLING_UPGRADE4 ? DWELLING_UPGRADE4 : DWELLING_MONSTER4);
+	    ms = Monster(race, GetActualDwelling(DWELLING_MONSTER4));
 	    dw_index = 3;
 	    break;
 	case DWELLING_MONSTER5:
-	    ms = Monster(race, building & DWELLING_UPGRADE5 ? DWELLING_UPGRADE5 : DWELLING_MONSTER5);
+	    ms = Monster(race, GetActualDwelling(DWELLING_MONSTER5));
 	    dw_index = 4;
 	    break;
 	case DWELLING_MONSTER6:
-	    ms = Monster(race, building & DWELLING_UPGRADE7 ? DWELLING_UPGRADE7 : (building & DWELLING_UPGRADE6 ? DWELLING_UPGRADE6 : DWELLING_MONSTER6));
+	    ms = Monster(race, GetActualDwelling(DWELLING_MONSTER6));
 	    dw_index = 5;
 	    break;	
 	default: return false;
@@ -621,7 +621,7 @@ bool Castle::RecruitMonster(building_t dw, u16 count)
 }
 
 /* return current count monster in dwelling */
-u16 Castle::GetDwellingLivedCount(building_t dw)
+u16 Castle::GetDwellingLivedCount(u32 dw) const
 {
    switch(dw)
    {
@@ -645,7 +645,7 @@ u16 Castle::GetDwellingLivedCount(building_t dw)
 }
 
 /* return requires for building */
-u32 Castle::GetBuildingRequires(const building_t & build) const
+u32 Castle::GetBuildingRequires(u32 build) const
 {
     u32 requires = 0;
 
@@ -925,7 +925,7 @@ u32 Castle::GetBuildingRequires(const building_t & build) const
 }
 
 /* check allow buy building */
-bool Castle::AllowBuyBuilding(building_t build) const
+bool Castle::AllowBuyBuilding(u32 build) const
 {
     // check allow building
     if(!Modes(ALLOWBUILD) || build & building) return false;
@@ -973,7 +973,7 @@ bool Castle::AllowBuyBuilding(building_t build) const
 }
 
 /* buy building */
-void Castle::BuyBuilding(building_t build)
+void Castle::BuyBuilding(u32 build)
 {
 	if(! AllowBuyBuilding(build)) return;
 	
@@ -1116,7 +1116,7 @@ ICN::icn_t Castle::GetICNBoat(const Race::race_t & race)
 }
 
 /* get building name ICN */
-ICN::icn_t Castle::GetICNBuilding(const Castle::building_t & build, const Race::race_t & race)
+ICN::icn_t Castle::GetICNBuilding(u32 build, Race::race_t race)
 {
     if(Race::BARB == race)
     {
@@ -1364,7 +1364,22 @@ bool Castle::PresentBoat(void) const
     return 3 > Maps::GetApproximateDistance(GetIndex(), world.GetNearestObject(GetIndex(), MP2::OBJ_BOAT));
 }
 
-u32 Castle::GetUpgradeBuilding(const u32 build, const Race::race_t & race)
+u32 Castle::GetActualDwelling(u32 build) const
+{
+    switch(build)
+    {
+	case DWELLING_MONSTER2: return building & DWELLING_UPGRADE2 ? DWELLING_UPGRADE2 : build;
+	case DWELLING_MONSTER3: return building & DWELLING_UPGRADE3 ? DWELLING_UPGRADE3 : build;
+	case DWELLING_MONSTER4: return building & DWELLING_UPGRADE4 ? DWELLING_UPGRADE4 : build;
+	case DWELLING_MONSTER5: return building & DWELLING_UPGRADE5 ? DWELLING_UPGRADE5 : build;
+	case DWELLING_UPGRADE6: return building & DWELLING_UPGRADE7 ? DWELLING_UPGRADE7 : build;
+	case DWELLING_MONSTER6: return building & DWELLING_UPGRADE7 ? DWELLING_UPGRADE7 : (building & DWELLING_UPGRADE6 ? DWELLING_UPGRADE6 : build);
+	default: break;
+    }
+    return build;
+}
+
+u32 Castle::GetUpgradeBuilding(u32 build) const
 {
     switch(build)
     {

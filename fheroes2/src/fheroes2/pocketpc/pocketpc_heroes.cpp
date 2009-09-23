@@ -125,7 +125,7 @@ Dialog::answer_t PocketPC::HeroesOpenDialog(Heroes & hero, bool readonly)
     Surface sfb1(rt1.w, rt1.h);
     sfb1.Blit(backSprite, rt1, 0, 0);
     Surface sfc1(rt1.w, rt1.h - 10);
-    Cursor::DrawCursor(sfc1, 0x10, true);
+    Cursor::DrawCursor(sfc1, 0xd6, true);
 
     SelectArmyBar selectArmy;
     selectArmy.SetArmy(hero.GetArmy());
@@ -145,7 +145,7 @@ Dialog::answer_t PocketPC::HeroesOpenDialog(Heroes & hero, bool readonly)
     Surface sfb2(rt2.w, rt2.h);
     sfb2.Blit(backSprite, rt2, 0, 0);
     Surface sfc2(rt2.w, rt2.h);
-    Cursor::DrawCursor(sfc2, 0x10, true);
+    Cursor::DrawCursor(sfc2, 0xd6, true);
 
     SelectArtifactsBar selectArtifacts(hero);
     selectArtifacts.SetPos(dst_rt.x + 37, dst_rt.y + 95);

@@ -34,27 +34,18 @@ u16 Dialog::Message(const std::string &header, const std::string &message, Font:
 
     // cursor
     Cursor & cursor = Cursor::Get();
-    bool oldvisible = cursor.isVisible();
     Cursor::themes_t oldthemes = cursor.Themes();
     cursor.Hide();
     cursor.SetThemes(cursor.POINTER);
 
-    TextBox textbox1(header, ft == Font::BIG ? Font::YELLOW_BIG : Font::YELLOW_SMALL, BOXAREA_WIDTH);
+    TextBox textbox1(header, Font::YELLOW_BIG, BOXAREA_WIDTH);
     TextBox textbox2(message, ft, BOXAREA_WIDTH);
 
-    Box box((header.size() ? textbox1.h() + 10 : 10) + textbox2.h(), buttons);
-    Rect pos = box.GetArea();
+    Box box(10 + (header.size() ? textbox1.h() + 10 : 0) + textbox2.h(), buttons);
+    const Rect & pos = box.GetArea();
 
-    if(message.empty()) pos.y += 10;
-
-    if(header.size())
-    {
-        textbox1.Blit(pos.x, pos.y);
-        pos.y += textbox1.h();
-    }
-    pos.y += 10;
-
-    if(message.size()) textbox2.Blit(pos.x, pos.y);
+    if(header.size()) textbox1.Blit(pos.x, pos.y + 10);
+    if(message.size()) textbox2.Blit(pos.x, pos.y + 10 + (header.size() ? textbox1.h() : 0) + 10);
 
     LocalEvent & le = LocalEvent::Get();
 
@@ -64,39 +55,40 @@ u16 Dialog::Message(const std::string &header, const std::string &message, Font:
     answer_t result1 = Dialog::ZERO;
     answer_t result2 = Dialog::ZERO;
     
-    switch(buttons){
+    switch(buttons)
+    {
 	case YES|NO:
             pt.x = box.GetArea().x;
-            pt.y = box.GetArea().y + box.GetArea().h + BUTTON_HEIGHT - AGG::GetICN(system, 5).h();
+            pt.y = box.GetArea().y + box.GetArea().h - AGG::GetICN(system, 5).h();
 	    button1 = new Button(pt, system, 5, 6);
 	    result1 = YES;
             pt.x = box.GetArea().x + box.GetArea().w - AGG::GetICN(system, 7).w();
-            pt.y = box.GetArea().y + box.GetArea().h + BUTTON_HEIGHT - AGG::GetICN(system, 7).h();
+            pt.y = box.GetArea().y + box.GetArea().h - AGG::GetICN(system, 7).h();
 	    button2 = new Button(pt, system, 7, 8);
 	    result2 = NO;
 	    break;
 
 	case OK|CANCEL:
             pt.x = box.GetArea().x;
-            pt.y = box.GetArea().y + box.GetArea().h + BUTTON_HEIGHT - AGG::GetICN(system, 1).h();
+            pt.y = box.GetArea().y + box.GetArea().h - AGG::GetICN(system, 1).h();
 	    button1 = new Button(pt, system, 1, 2);
 	    result1 = OK;
             pt.x = box.GetArea().x + box.GetArea().w - AGG::GetICN(system, 3).w();
-            pt.y = box.GetArea().y + box.GetArea().h + BUTTON_HEIGHT - AGG::GetICN(system, 3).h();
+            pt.y = box.GetArea().y + box.GetArea().h - AGG::GetICN(system, 3).h();
 	    button2 = new Button(pt, system, 3, 4);
 	    result2 = CANCEL;
 	    break;
 
 	case OK:
             pt.x = box.GetArea().x + (box.GetArea().w - AGG::GetICN(system, 1).w()) / 2;
-            pt.y = box.GetArea().y + box.GetArea().h + BUTTON_HEIGHT - AGG::GetICN(system, 1).h();
+            pt.y = box.GetArea().y + box.GetArea().h - AGG::GetICN(system, 1).h();
 	    button1 = new Button(pt, system, 1, 2);
 	    result1 = OK;
 	    break;
 
 	case CANCEL:
             pt.x = box.GetArea().x + (box.GetArea().w - AGG::GetICN(system, 3).w()) / 2;
-            pt.y = box.GetArea().y + box.GetArea().h + BUTTON_HEIGHT - AGG::GetICN(system, 3).h();
+            pt.y = box.GetArea().y + box.GetArea().h - AGG::GetICN(system, 3).h();
 	    button2 = new Button(pt, system, 3, 4);
 	    result2 = CANCEL;
 	    break;
@@ -140,8 +132,9 @@ u16 Dialog::Message(const std::string &header, const std::string &message, Font:
 	}
     }
 
+    cursor.Hide();
     cursor.SetThemes(oldthemes);
-    if(!oldvisible) cursor.Hide();
+    cursor.Show();
 
     if(button1) delete button1;
     if(button2) delete button2;

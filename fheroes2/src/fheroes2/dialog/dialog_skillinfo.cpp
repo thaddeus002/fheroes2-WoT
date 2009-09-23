@@ -47,29 +47,22 @@ void Dialog::SkillInfo(const std::string &header, const std::string &message, co
 
     TextBox box1(header, Font::YELLOW_BIG, BOXAREA_WIDTH);
     TextBox box2(message, Font::BIG, BOXAREA_WIDTH);
+    const Sprite & border = AGG::GetICN(ICN::SECSKILL, 15);
+    const u8 spacer = Settings::Get().PocketPC() ? 5 : 10;
 
-    const Sprite & sprite = AGG::GetICN(ICN::SECSKILL, Skill::Secondary::GetIndexSprite1(skill));
-
-    Box box((header.size() ? box1.h() + 10 : 0) + (message.size() ? box2.h() + 10 : 0) + sprite.h(), ok_button ? Dialog::OK : 0);
-
+    Box box(box1.h() + spacer + box2.h() + spacer + border.h(), ok_button);
     Rect pos = box.GetArea();
 
-    if(header.size())
-    {
-	box1.Blit(pos);
-        pos.y += box1.h() + 10;
-    }
+    if(header.size()) box1.Blit(pos);
+    pos.y += box1.h() + spacer;
 
-    if(message.size())
-    {
-        box2.Blit(pos);
-        pos.y += box2.h() + 10;
-    }
+    if(message.size()) box2.Blit(pos);
+    pos.y += box2.h() + spacer;
 
     // blit sprite
-    const Sprite & border = AGG::GetICN(ICN::SECSKILL, 15);
     pos.x = box.GetArea().x + (pos.w - border.w()) / 2;
     display.Blit(border, pos.x, pos.y);
+    const Sprite & sprite = AGG::GetICN(ICN::SECSKILL, Skill::Secondary::GetIndexSprite1(skill));
     pos.x = box.GetArea().x + (pos.w - sprite.w()) / 2;
     display.Blit(sprite, pos.x, pos.y + 3);
 
@@ -92,7 +85,7 @@ void Dialog::SkillInfo(const std::string &header, const std::string &message, co
     if(ok_button)
     {
         pt.x = box.GetArea().x + (box.GetArea().w - AGG::GetICN(system, 1).w()) / 2;
-        pt.y = box.GetArea().y + box.GetArea().h + BUTTON_HEIGHT - AGG::GetICN(system, 1).h();
+        pt.y = box.GetArea().y + box.GetArea().h - AGG::GetICN(system, 1).h();
 	button = new Button(pt, system, 1, 2);
     }
 
@@ -158,31 +151,24 @@ void Dialog::SkillInfo(const std::string &header, const std::string &message, co
 
 	default: break;
     }
-    const Sprite & sprite = AGG::GetICN(ICN::PRIMSKIL, index);
 
     TextBox box1(header, Font::BIG, BOXAREA_WIDTH);
     TextBox box2(message, Font::BIG, BOXAREA_WIDTH);
+    const Sprite & border = AGG::GetICN(ICN::PRIMSKIL, 4);
+    const u8 spacer = Settings::Get().PocketPC() ? 5 : 10;
 
-    Box box((header.size() ? box1.h() + 10 : 0) + (message.size() ? box2.h() + 10 : 0) + sprite.h(), Dialog::OK);
-
+    Box box(box1.h() + spacer + box2.h() + spacer + border.h(), Dialog::OK);
     Rect pos = box.GetArea();
 
-    if(header.size())
-    {
-	box1.Blit(pos);
-        pos.y += box1.h() + 10;
-    }
+    if(header.size()) box1.Blit(pos);
+    pos.y += box1.h() + 10;
 
-    if(message.size())
-    {
-        box2.Blit(pos);
-        pos.y += box2.h() + 10;
-    }
+    if(message.size()) box2.Blit(pos);
 
     // blit sprite
-    const Sprite & border = AGG::GetICN(ICN::PRIMSKIL, 4);
     pos.x = box.GetArea().x + (pos.w - border.w()) / 2;
     display.Blit(border, pos.x, pos.y);
+    const Sprite & sprite = AGG::GetICN(ICN::PRIMSKIL, index);
     pos.x = box.GetArea().x + (pos.w - sprite.w()) / 2;
     display.Blit(sprite, pos.x, pos.y + 6);
 
@@ -201,7 +187,7 @@ void Dialog::SkillInfo(const std::string &header, const std::string &message, co
     Point pt;
     
     pt.x = box.GetArea().x + (box.GetArea().w - AGG::GetICN(system, 1).w()) / 2;
-    pt.y = box.GetArea().y + box.GetArea().h + BUTTON_HEIGHT - AGG::GetICN(system, 1).h();
+    pt.y = box.GetArea().y + box.GetArea().h - AGG::GetICN(system, 1).h();
     Button button(pt, system, 1, 2);
 
     button.Draw();

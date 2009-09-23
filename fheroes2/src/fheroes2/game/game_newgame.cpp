@@ -25,6 +25,7 @@
 #include "settings.h"
 #include "button.h"
 #include "network.h"
+#include "pocketpc.h"
 #include "game.h"
 
 u8 SelectCountPlayers(void);
@@ -107,6 +108,8 @@ Game::menu_t Game::NewGame(void)
     Mixer::Pause();
     AGG::PlayMusic(MUS::MAINMENU);
 
+    if(Settings::Get().PocketPC()) return PocketPC::SelectScenario();
+   
     // preload
     AGG::PreloadObject(ICN::HEROES);
     AGG::PreloadObject(ICN::BTNNEWGM);

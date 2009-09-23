@@ -86,7 +86,7 @@ void Castle::OpenWell(void)
     	    else
     	    if(building & DWELLING_MONSTER2 && le.MouseClickLeft(rectMonster2) &&
     		Castle::RecruitMonster(DWELLING_MONSTER2, Dialog::RecruitMonster(
-            	    Monster(race, building & DWELLING_UPGRADE2 ? DWELLING_UPGRADE2 : DWELLING_MONSTER2), dwelling[1])))
+            	    Monster(race, GetActualDwelling(DWELLING_MONSTER2)), dwelling[1])))
     	    {
         	cursor.Hide();
 		WellRedrawInfoArea(cur_pt);
@@ -96,7 +96,7 @@ void Castle::OpenWell(void)
     	    else
     	    if(building & DWELLING_MONSTER3 && le.MouseClickLeft(rectMonster3) &&
     		Castle::RecruitMonster(DWELLING_MONSTER3, Dialog::RecruitMonster(
-            	    Monster(race, building & DWELLING_UPGRADE3 ? DWELLING_UPGRADE3 : DWELLING_MONSTER3), dwelling[2])))
+            	    Monster(race, GetActualDwelling(DWELLING_MONSTER3)), dwelling[2])))
     	    {
         	cursor.Hide();
 		WellRedrawInfoArea(cur_pt);
@@ -106,7 +106,7 @@ void Castle::OpenWell(void)
     	    else
     	    if(building & DWELLING_MONSTER4 && le.MouseClickLeft(rectMonster4) &&
     		Castle::RecruitMonster(DWELLING_MONSTER4, Dialog::RecruitMonster(
-            	    Monster(race, building & DWELLING_UPGRADE4 ? DWELLING_UPGRADE4 : DWELLING_MONSTER4), dwelling[3])))
+            	    Monster(race, GetActualDwelling(DWELLING_MONSTER4)), dwelling[3])))
     	    {
         	cursor.Hide();
 		WellRedrawInfoArea(cur_pt);
@@ -116,7 +116,7 @@ void Castle::OpenWell(void)
     	    else
     	    if(building & DWELLING_MONSTER5 && le.MouseClickLeft(rectMonster5) &&
     		Castle::RecruitMonster(DWELLING_MONSTER5, Dialog::RecruitMonster(
-            	    Monster(race, building & DWELLING_UPGRADE5 ? DWELLING_UPGRADE5 : DWELLING_MONSTER5), dwelling[4])))
+            	    Monster(race, GetActualDwelling(DWELLING_MONSTER5)), dwelling[4])))
     	    {
         	cursor.Hide();
 		WellRedrawInfoArea(cur_pt);
@@ -126,7 +126,7 @@ void Castle::OpenWell(void)
     	    else
     	    if(building & DWELLING_MONSTER6 && le.MouseClickLeft(rectMonster6) &&
                 Castle::RecruitMonster(DWELLING_MONSTER6, Dialog::RecruitMonster(
-                    Monster(race, building & DWELLING_UPGRADE7 ? DWELLING_UPGRADE7 : (building & DWELLING_UPGRADE6 ? DWELLING_UPGRADE6 : DWELLING_MONSTER6)), dwelling[5])))
+                    Monster(race, GetActualDwelling(DWELLING_MONSTER6)), dwelling[5])))
     	    {
         	cursor.Hide();
 		WellRedrawInfoArea(cur_pt);
@@ -155,7 +155,7 @@ void Castle::WellRedrawInfoArea(const Point & cur_pt)
     while(dw <= DWELLING_MONSTER6)
     {
 	bool present = false;
-	building_t dw_orig = DWELLING_MONSTER1;
+	u32 dw_orig = DWELLING_MONSTER1;
 	u8 icnindex = 0;
 	u16 available = 0;
 
@@ -172,7 +172,7 @@ void Castle::WellRedrawInfoArea(const Point & cur_pt)
 		pt.x = cur_pt.x;
 		pt.y = cur_pt.y + 150;
 		present = DWELLING_MONSTER2 & building;
-		dw_orig = DWELLING_UPGRADE2 & building ? DWELLING_UPGRADE2 : DWELLING_MONSTER2;
+		dw_orig = GetActualDwelling(DWELLING_MONSTER2);
 		icnindex = DWELLING_UPGRADE2 & building ? 25 : 20;
 		available = dwelling[1];
 		break;
@@ -180,7 +180,7 @@ void Castle::WellRedrawInfoArea(const Point & cur_pt)
 		pt.x = cur_pt.x;
 		pt.y = cur_pt.y + 300;
 		present = DWELLING_MONSTER3 & building;
-		dw_orig = DWELLING_UPGRADE3 & building ? DWELLING_UPGRADE3 : DWELLING_MONSTER3;
+		dw_orig = GetActualDwelling(DWELLING_MONSTER3);
 		icnindex = DWELLING_UPGRADE3 & building ? 26 : 21;
 		available = dwelling[2];
 		break;
@@ -188,7 +188,7 @@ void Castle::WellRedrawInfoArea(const Point & cur_pt)
 		pt.x = cur_pt.x + 314;
 		pt.y = cur_pt.y + 1;
 		present = DWELLING_MONSTER4 & building;
-		dw_orig = DWELLING_UPGRADE4 & building ? DWELLING_UPGRADE4 : DWELLING_MONSTER4;
+		dw_orig = GetActualDwelling(DWELLING_MONSTER4);
 		icnindex = DWELLING_UPGRADE4 & building ? 27 : 22;
 		available = dwelling[3];
 		break;
@@ -196,7 +196,7 @@ void Castle::WellRedrawInfoArea(const Point & cur_pt)
 		pt.x = cur_pt.x + 314;
 		pt.y = cur_pt.y + 151;
 		present = DWELLING_MONSTER5 & building;
-		dw_orig = DWELLING_UPGRADE5 & building ? DWELLING_UPGRADE5 : DWELLING_MONSTER5;
+		dw_orig = GetActualDwelling(DWELLING_MONSTER5);
 		icnindex = DWELLING_UPGRADE5 & building ? 28 : 23;
 		available = dwelling[4];
 		break;
@@ -204,7 +204,7 @@ void Castle::WellRedrawInfoArea(const Point & cur_pt)
 		pt.x = cur_pt.x + 314;
 		pt.y = cur_pt.y + 301;
 		present = DWELLING_MONSTER6 & building;
-		dw_orig = DWELLING_UPGRADE7 & building ? DWELLING_UPGRADE7 : (DWELLING_UPGRADE6 & building ? DWELLING_UPGRADE6 : DWELLING_MONSTER6);
+		dw_orig = GetActualDwelling(DWELLING_MONSTER6);
 		icnindex = DWELLING_UPGRADE7 & building ? 30 : (DWELLING_UPGRADE6 & building ? 29 : 24);
 		available = dwelling[5];
 		break;

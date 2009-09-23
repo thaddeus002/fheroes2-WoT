@@ -40,22 +40,16 @@ u16 Dialog::SpriteInfo(const std::string &header, const std::string &message, co
 
     TextBox box1(header, Font::BIG, BOXAREA_WIDTH);
     TextBox box2(message, Font::BIG, BOXAREA_WIDTH);
+    const u8 spacer = Settings::Get().PocketPC() ? 5 : 10;
 
-    Box box((header.size() ? box1.h() + 10 : 0) + (message.size() ? box2.h() + 10 : 0) + sprite.h(), buttons);
-
+    Box box(box1.h() + spacer + box2.h() + spacer + sprite.h(), buttons);
     Rect pos = box.GetArea();
 
-    if(header.size())
-    {
-	box1.Blit(pos);
-        pos.y += box1.h() + 10;
-    }
+    if(header.size()) box1.Blit(pos);
+    pos.y += box1.h() + spacer;
 
-    if(message.size())
-    {
-        box2.Blit(pos);
-        pos.y += box2.h() + 10;
-    }
+    if(message.size()) box2.Blit(pos);
+    pos.y += box2.h() + spacer;
 
     // blit sprite
     pos.x = box.GetArea().x + (pos.w - sprite.w()) / 2;
@@ -73,36 +67,36 @@ u16 Dialog::SpriteInfo(const std::string &header, const std::string &message, co
     {
 	case YES|NO:
             pt.x = box.GetArea().x;
-            pt.y = box.GetArea().y + box.GetArea().h + BUTTON_HEIGHT - AGG::GetICN(system, 5).h();
+            pt.y = box.GetArea().y + box.GetArea().h - AGG::GetICN(system, 5).h();
 	    button1 = new Button(pt, system, 5, 6);
 	    result1 = YES;
             pt.x = box.GetArea().x + box.GetArea().w - AGG::GetICN(system, 7).w();
-            pt.y = box.GetArea().y + box.GetArea().h + BUTTON_HEIGHT - AGG::GetICN(system, 7).h();
+            pt.y = box.GetArea().y + box.GetArea().h - AGG::GetICN(system, 7).h();
 	    button2 = new Button(pt, system, 7, 8);
 	    result2 = NO;
 	    break;
 
 	case OK|CANCEL:
             pt.x = box.GetArea().x;
-            pt.y = box.GetArea().y + box.GetArea().h + BUTTON_HEIGHT - AGG::GetICN(system, 1).h();
+            pt.y = box.GetArea().y + box.GetArea().h - AGG::GetICN(system, 1).h();
 	    button1 = new Button(pt, system, 1, 2);
 	    result1 = OK;
             pt.x = box.GetArea().x + box.GetArea().w - AGG::GetICN(system, 3).w();
-            pt.y = box.GetArea().y + box.GetArea().h + BUTTON_HEIGHT - AGG::GetICN(system, 3).h();
+            pt.y = box.GetArea().y + box.GetArea().h - AGG::GetICN(system, 3).h();
 	    button2 = new Button(pt, system, 3, 4);
 	    result2 = CANCEL;
 	    break;
 
 	case OK:
             pt.x = box.GetArea().x + (box.GetArea().w - AGG::GetICN(system, 1).w()) / 2;
-            pt.y = box.GetArea().y + box.GetArea().h + BUTTON_HEIGHT - AGG::GetICN(system, 1).h();
+            pt.y = box.GetArea().y + box.GetArea().h - AGG::GetICN(system, 1).h();
 	    button1 = new Button(pt, system, 1, 2);
 	    result1 = OK;
 	    break;
 
 	case CANCEL:
             pt.x = box.GetArea().x + (box.GetArea().w - AGG::GetICN(system, 3).w()) / 2;
-            pt.y = box.GetArea().y + box.GetArea().h + BUTTON_HEIGHT - AGG::GetICN(system, 3).h();
+            pt.y = box.GetArea().y + box.GetArea().h - AGG::GetICN(system, 3).h();
 	    button1 = new Button(pt, system, 3, 4);
 	    result1 = CANCEL;
 	    break;

@@ -40,15 +40,16 @@ bool Dialog::SelectCount(const std::string &header, u16 min, u16 max, u16 & cur)
     Cursor & cursor = Cursor::Get();
     cursor.Hide();
 
-    Box box(60, OK|CANCEL);
+    Text text(header, Font::BIG);
+    const u8 spacer = Settings::Get().PocketPC() ? 5 : 10;
+
+    Box box(text.h() + spacer + 30, true);
 
     const Rect & pos = box.GetArea();
     Point pt;
     std::string message;
-    Text text;
 
     // text
-    text.Set(header, Font::BIG);
     pt.x = pos.x + (pos.w - text.w()) / 2;
     pt.y = pos.y;
     text.Blit(pt);
@@ -56,35 +57,35 @@ bool Dialog::SelectCount(const std::string &header, u16 min, u16 max, u16 & cur)
     // sprite edit
     const Surface & sprite_edit = AGG::GetICN(ICN::TOWNWIND, 4);
     pt.x = pos.x + 80;
-    pt.y = pos.y + 55;
+    pt.y = pos.y + 35;
     display.Blit(sprite_edit, pt);
 
     message.clear();
     String::AddInt(message, cur);
     text.Set(message);
     pt.x = pos.x + 80 + (sprite_edit.w() - text.w()) / 2;
-    pt.y = pos.y + 56;
+    pt.y = pos.y + 36;
     text.Blit(pt);
 
     // buttons
     pt.x = pos.x + 150;
-    pt.y = pos.y + 51;
+    pt.y = pos.y + 31;
     Button buttonUp(pt, ICN::TOWNWIND, 5, 6);
 
     pt.x = pos.x + 150;
-    pt.y = pos.y + 67;
+    pt.y = pos.y + 47;
     Button buttonDn(pt, ICN::TOWNWIND, 7, 8);
 
     pt.x = pos.x;
-    pt.y = pos.y + pos.h + BUTTON_HEIGHT - AGG::GetICN(system, 1).h();
+    pt.y = box.GetArea().y + box.GetArea().h - AGG::GetICN(system, 1).h();
     Button buttonOk(pt, system, 1, 2);
 
     pt.x = pos.x + pos.w - AGG::GetICN(system, 3).w();
-    pt.y = pos.y + pos.h + BUTTON_HEIGHT - AGG::GetICN(system, 3).h();
+    pt.y = box.GetArea().y + box.GetArea().h - AGG::GetICN(system, 3).h();
     Button buttonCancel(pt, system, 3, 4);
 
     text.Set("MAX", Font::SMALL);
-    const Rect rectMax(pos.x + 173, pos.y + 58, text.w(), text.h());
+    const Rect rectMax(pos.x + 173, pos.y + 38, text.w(), text.h());
     text.Blit(rectMax.x, rectMax.y);
 
     LocalEvent & le = LocalEvent::Get();
@@ -184,14 +185,14 @@ bool Dialog::SelectCount(const std::string &header, u16 min, u16 max, u16 & cur)
 	{
 	    cursor.Hide();
 	    pt.x = pos.x + 80;
-	    pt.y = pos.y + 55;
+	    pt.y = pos.y + 35;
 	    display.Blit(sprite_edit, pt);
 
 	    message.clear();
 	    String::AddInt(message, cur);
 	    text.Set(message, Font::BIG);
 	    pt.x = pos.x + 80 + (sprite_edit.w() - text.w()) / 2;
-	    pt.y = pos.y + 56;
+	    pt.y = pos.y + 36;
 	    text.Blit(pt);
 	    cursor.Show();
 	    display.Flip();
@@ -232,30 +233,31 @@ bool Dialog::InputString(const std::string &header, std::string &res)
     dst_pt.y = box_rt.y + 10;
     textbox.Blit(dst_pt);
 
-    dst_pt.x = box_rt.x;
-    dst_pt.y = box_rt.y + box_rt.h + BUTTON_HEIGHT - AGG::GetICN(system, 1).h();
-    Button buttonOk(dst_pt, system, 1, 2);
-
-    dst_pt.x = box_rt.x + box_rt.w - AGG::GetICN(system, 3).w();
-    dst_pt.y = box_rt.y + box_rt.h + BUTTON_HEIGHT - AGG::GetICN(system, 3).h();
-    Button buttonCancel(dst_pt, system, 3, 4);
-
     dst_pt.y = box_rt.y + 10 + textbox.h() + 10;
     dst_pt.x = box_rt.x + (box_rt.w - sprite.w()) / 2;
     display.Blit(sprite, dst_pt);
+    Point text_pt = dst_pt;
 
-    LocalEvent & le = LocalEvent::Get();
+    Text text("_", Font::BIG);
+    display.Blit(sprite, text_pt);
+    text.Blit(dst_pt.x + (sprite.w() - text.w()) / 2, dst_pt.y - 1);
+
+    dst_pt.x = box_rt.x;
+    dst_pt.y = box_rt.y + box_rt.h - AGG::GetICN(system, 1).h();
+    Button buttonOk(dst_pt, system, 1, 2);
+
+    dst_pt.x = box_rt.x + box_rt.w - AGG::GetICN(system, 3).w();
+    dst_pt.y = box_rt.y + box_rt.h - AGG::GetICN(system, 3).h();
+    Button buttonCancel(dst_pt, system, 3, 4);
 
     buttonOk.SetDisable(res.empty());
     buttonOk.Draw();
     buttonCancel.Draw();
 
-    Text text("_", Font::BIG);
-    display.Blit(sprite, dst_pt);
-    text.Blit(dst_pt.x + (sprite.w() - text.w()) / 2, dst_pt.y - 1);
-
     cursor.Show();
     display.Flip();
+
+    LocalEvent & le = LocalEvent::Get();
 
     // message loop
     while(le.HandleEvents())
@@ -278,8 +280,8 @@ bool Dialog::InputString(const std::string &header, std::string &res)
 	    if(text.w() < sprite.w() - 24)
 	    {
 		cursor.Hide();
-		display.Blit(sprite, dst_pt);
-		text.Blit(dst_pt.x + (sprite.w() - text.w()) / 2, dst_pt.y - 1);
+		display.Blit(sprite, text_pt);
+		text.Blit(text_pt.x + (sprite.w() - text.w()) / 2, text_pt.y - 1);
 		cursor.Show();
 		display.Flip();
 	    }

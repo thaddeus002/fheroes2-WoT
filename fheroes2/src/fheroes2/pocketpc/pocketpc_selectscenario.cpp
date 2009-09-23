@@ -36,7 +36,6 @@ void PocketPCRedrawMapsFileList(const Point &, const MapsFileInfoList &, MapsFil
 Game::menu_t PocketPC::SelectScenario(void)
 {
     Game::SetFixVideoMode();
-    AGG::PlayMusic(MUS::MAINMENU);
 
     Cursor & cursor = Cursor::Get();
     Display & display = Display::Get();
@@ -93,11 +92,10 @@ Game::menu_t PocketPC::SelectScenario(void)
     frameborder.SetPosition((display.w() - window_w) / 2 - BORDERWIDTH, (display.h() - window_h) / 2 - BORDERWIDTH, window_w, window_h);
     frameborder.Redraw();
 
-    const Rect & dst_rt = frameborder.GetArea();
-    const Sprite & background = AGG::GetICN(ICN::STONEBAK, 0);
-    display.Blit(background, Rect(0, 0, window_w, window_h), dst_rt);
-
     const Rect & rt = frameborder.GetArea();
+    const Sprite & background = AGG::GetICN(ICN::STONEBAK, 0);
+    display.Blit(background, Rect(0, 0, window_w, window_h), rt);
+
     const Rect list_rt(rt.x + 17, rt.y + 37, 266, 156);
 
     const Rect countPlayers(rt.x + 45, rt.y + 55, 20, 175);
@@ -346,7 +344,7 @@ void PocketPCRedrawMapsFileList(const Point & dst, const MapsFileInfoList & list
 	display.Blit(spriteSize, dst.x + 19 + spriteCount.w() + 2, dst.y + oy);
 
 	text.Set(info.name, (cur == ii ? Font::YELLOW_BIG : Font::BIG));
-	text.Blit(dst.x + 74, dst.y + oy);
+	text.Blit(dst.x + 74, dst.y + oy + 2);
 
 	index = 30 + info.conditions_wins;
 	const Sprite & spriteWins = AGG::GetICN(ICN::REQUESTS, index);
@@ -356,6 +354,6 @@ void PocketPCRedrawMapsFileList(const Point & dst, const MapsFileInfoList & list
 	const Sprite & spriteLoss = AGG::GetICN(ICN::REQUESTS, index);
 	display.Blit(spriteLoss, dst.x + 244 + spriteWins.w() + 2, dst.y + oy);
 
-	oy += text.h() + 2;
+	oy += 18;
     }
 }

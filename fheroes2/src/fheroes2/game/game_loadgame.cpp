@@ -24,6 +24,7 @@
 #include "button.h"
 #include "dialog.h"
 #include "settings.h"
+#include "pocketpc.h"
 #include "game.h"
 
 Game::menu_t Game::LoadCampain(void)
@@ -44,6 +45,8 @@ Game::menu_t Game::LoadGame(void)
     Mixer::Pause();
     AGG::PlayMusic(MUS::MAINMENU);
 
+    if(Settings::Get().PocketPC()) return PocketPC::LoadGame();
+    
     // preload
     AGG::PreloadObject(ICN::HEROES);
     AGG::PreloadObject(ICN::BTNNEWGM);

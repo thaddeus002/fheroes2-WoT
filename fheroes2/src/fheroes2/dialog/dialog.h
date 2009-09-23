@@ -32,9 +32,7 @@
 #include "game.h"
 
 #define	SHADOWWIDTH	16
-
 #define BOXAREA_WIDTH   245
-#define BUTTON_HEIGHT   50
 
 class Castle;
 class Heroes;
@@ -132,7 +130,7 @@ namespace Dialog
 
     void GameInfo(void);
 
-class Box
+class Box : protected Background
 {
 public:
     Box(u16 height, bool buttons = false);
@@ -141,7 +139,6 @@ public:
     const Rect & GetArea(void){ return area; };
 
 private:
-    Background back;
     Rect area;
 };
 
@@ -153,6 +150,7 @@ public:
 
     bool isValid(void) const;
 
+    void SetSize(u16, u16);
     void SetPosition(s16, s16, u16 = 0, u16 = 0);
     void Redraw(void);
     const Rect & GetRect(void) const;

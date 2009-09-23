@@ -37,21 +37,33 @@ bool Dialog::FrameBorder::isValid(void) const
     return Background::valid();
 }
 
-void Dialog::FrameBorder::SetPosition(s16 posx, s16 posy, u16 encw, u16 ench)
+void Dialog::FrameBorder::SetSize(u16 encw, u16 ench)
 {
     Display & display = Display::Get();
-
     if(display.w() < encw || display.h() < ench || encw < LIMITWIDTH || ench < LIMITWIDTH)
     Error::Warning("Dialog::FrameBorder: size out of range");
 
+    Rect::w = encw + 2 * BORDERWIDTH;
+    Rect::h = ench + 2 * BORDERWIDTH;
+    area.w = encw;
+    area.h = ench;
+}
+
+void Dialog::FrameBorder::SetPosition(s16 posx, s16 posy, u16 encw, u16 ench)
+{
     if(Background::valid()) Background::Restore();
 
     if(encw && ench)
-	Background::Save(posx, posy, encw + 2 * BORDERWIDTH, ench + 2 * BORDERWIDTH);
+    {
+    	Background::Save(posx, posy, encw + 2 * BORDERWIDTH, ench + 2 * BORDERWIDTH);
+	area.w = encw;
+	area.h = ench;
+    }
     else
-	Background::Save(posx, posy);
+    	Background::Save(posx, posy);
 
-    area = Rect(posx + BORDERWIDTH, posy + BORDERWIDTH, encw, ench);
+    area.x = posx + BORDERWIDTH;
+    area.y = posy + BORDERWIDTH;
     top = Rect(posx, posy, area.w, BORDERWIDTH);
 }
 

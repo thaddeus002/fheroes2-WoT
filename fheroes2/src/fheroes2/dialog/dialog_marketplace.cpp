@@ -194,7 +194,7 @@ void Dialog::Marketplace(bool fromTradingPost)
     cursor.Hide();
     cursor.SetThemes(cursor.POINTER);
 
-    Dialog::Box box(250, true);
+    Dialog::Box box(260, true);
 
     const Rect & pos_rt = box.GetArea();
     Point dst_pt(pos_rt.x, pos_rt.y);
@@ -236,7 +236,7 @@ void Dialog::Marketplace(bool fromTradingPost)
 
     Resource::funds_t fundsTo;
     u8 resourceTo = 0;
-    const Point pt2(130 + pos_rt.x, pos_rt.y + 190);
+    const Point pt2(138 + pos_rt.x, pos_rt.y + 190);
     std::vector<Rect> rectsTo(7);
     rectsTo[0] = Rect(pt2.x, pt2.y, 34, 34);		// wood
     rectsTo[1] = Rect(pt2.x + 37, pt2.y, 34, 34);	// mercury
@@ -266,7 +266,7 @@ void Dialog::Marketplace(bool fromTradingPost)
     // button exit
     const Sprite & sprite_exit = AGG::GetICN(tradpost, 17);
     dst_pt.x = pos_rt.x + (pos_rt.w - sprite_exit.w()) / 2;
-    dst_pt.y = pos_rt.y + pos_rt.h + BUTTON_HEIGHT - sprite_exit.h();
+    dst_pt.y = pos_rt.y + pos_rt.h - sprite_exit.h();
     Button buttonExit(dst_pt, tradpost, 17, 18);
 
     buttonExit.Draw();

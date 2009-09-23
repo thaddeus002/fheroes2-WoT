@@ -89,24 +89,28 @@ bool SelectFileListSimple(const std::string & header, MapsFileInfoList & lists, 
     cursor.Hide();
     cursor.SetThemes(cursor.POINTER);
 
-    const Sprite & panel = AGG::GetICN(ICN::REQBKG, 0);
-    Background back((display.w() - panel.w()) / 2, (display.h() - panel.h()) / 2, panel.w(), panel.h());
+    const Sprite & sprite = AGG::GetICN(ICN::REQBKG, 0);
+    Size panel(sprite.w(), sprite.h());
+    bool pocket = Settings::Get().PocketPC();
+    if(pocket) panel = Size(sprite.w(), 224);
+
+    Background back((display.w() - panel.w) / 2, (display.h() - panel.h) / 2, panel.w, panel.h);
     back.Save();
 
     const Rect & rt = back.GetRect();
-    const Rect list_rt(rt.x + 40, rt.y + 55, 265, 215);
-    const Rect enter_field(rt.x + 45, rt.y + 286, 260, 16);
+    const Rect list_rt(rt.x + 40, rt.y + 55, 265, (pocket ? 78 : 215));
+    const Rect enter_field(rt.x + 45, rt.y + (pocket ? 148 : 286), 260, 16);
 
-    Button buttonCancel(rt.x + 34, rt.y + 315, ICN::REQUEST, 3, 4);
-    Button buttonOk(rt.x + 244, rt.y + 315, ICN::REQUEST, 1, 2);
+    Button buttonCancel(rt.x + 34, rt.y + (pocket ? 176 : 315), ICN::REQUEST, 3, 4);
+    Button buttonOk(rt.x + 244, rt.y + (pocket ? 176 : 315), ICN::REQUEST, 1, 2);
     Button buttonPgUp(rt.x + 327, rt.y + 55, ICN::REQUEST, 5, 6);
-    Button buttonPgDn(rt.x + 327, rt.y + 257, ICN::REQUEST, 7, 8);
+    Button buttonPgDn(rt.x + 327, rt.y + (pocket ? 117 : 257), ICN::REQUEST, 7, 8);
 
-    const u8 max_items = 11;
+    const u8 max_items = pocket ? 5 : 11;
     MapsFileInfoList::iterator top = lists.begin();
     MapsFileInfoList::iterator cur = lists.begin();
 
-    Splitter split(AGG::GetICN(ICN::ESCROLL, 3), Rect(rt.x + 330, rt.y + 73, 12, 180), Splitter::VERTICAL);
+    Splitter split(AGG::GetICN(ICN::ESCROLL, 3), Rect(rt.x + 330, rt.y + 73, 12, (pocket ? 40 : 180)), Splitter::VERTICAL);
     split.SetRange(0, (max_items < lists.size() ? lists.size() - max_items : 0));
 
     std::string filename;
@@ -317,7 +321,14 @@ void RedrawFileListSimple(const Point & dst, const std::string & header, const s
 {
     Display & display = Display::Get();
     const Sprite & panel = AGG::GetICN(ICN::REQBKG, 0);
-    display.Blit(panel, dst);
+
+    if(Settings::Get().PocketPC())
+    {
+	display.Blit(panel, Rect(0, 0, panel.w(), 120), dst.x, dst.y);
+	display.Blit(panel, Rect(0, panel.h() - 120, panel.w(), 120), dst.x, dst.y + 224 - 120);
+    }
+    else
+	display.Blit(panel, dst);
 
     Text text(header, Font::BIG);
     text.Blit(dst.x + 175 - text.w() / 2, dst.y + 30);

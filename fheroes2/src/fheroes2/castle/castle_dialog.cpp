@@ -98,20 +98,8 @@ Dialog::answer_t Castle::OpenDialog(bool fade)
 
     display.Blit(AGG::GetICN(ICN::STRIP, 0), dst_pt);
 
-    u8 index_sprite = 0;
     // color crest
-    switch(color)
-    {
-	case Color::BLUE:	index_sprite = 0; break;
-	case Color::GREEN:	index_sprite = 1; break;
-	case Color::RED:	index_sprite = 2; break;
-	case Color::YELLOW:	index_sprite = 3; break;
-	case Color::ORANGE:	index_sprite = 4; break;
-	case Color::PURPLE:	index_sprite = 5; break;
-	default: Error::Warning("Dialog::OpenCastle: unknown color."); return Dialog::CANCEL;
-    }
-
-    const Sprite & crest = AGG::GetICN(ICN::CREST, index_sprite);
+    const Sprite & crest = AGG::GetICN(ICN::CREST, Color::GetIndex(color));
 
     dst_pt.x = cur_pt.x + 5;
     dst_pt.y = cur_pt.y + 262;
@@ -509,7 +497,7 @@ Dialog::answer_t Castle::OpenDialog(bool fade)
 	if(building & BUILD_CASTLE && le.MouseClickLeft(coordBuildingCastle))
 	{
 	    const Heroes * prev = castle_heroes;
-	    const building_t build = OpenTown();
+	    const u32 build = OpenTown();
 	    const bool buyhero = ((castle_heroes != prev) && (castle_heroes != NULL));
 
 	    if(Castle::BUILD_NOTHING != build)
@@ -597,7 +585,7 @@ Dialog::answer_t Castle::OpenDialog(bool fade)
 		Dialog::Message("Town", "This town may not be upgraded to a castle.", Font::BIG, Dialog::OK);
 	    }
 	    else
-	    if(Dialog::OK == DialogBuyBuilding(BUILD_CASTLE, true))
+	    if(Dialog::OK == DialogBuyCastle(true))
 	    {
 		cursor.Hide();
 		BuyBuilding(BUILD_CASTLE);
@@ -658,7 +646,7 @@ Dialog::answer_t Castle::OpenDialog(bool fade)
 	else
 	if(building & DWELLING_MONSTER2 && le.MouseClickLeft(coordDwellingMonster2) &&
 	    Castle::RecruitMonster(DWELLING_MONSTER2, Dialog::RecruitMonster(
-		Monster(race, building & DWELLING_UPGRADE2 ? DWELLING_UPGRADE2 : DWELLING_MONSTER2), dwelling[1])))
+		Monster(race, GetActualDwelling(DWELLING_MONSTER2)), dwelling[1])))
 	{
 	    cursor.Hide();
 	    selectCaptainArmy.Redraw();
@@ -673,7 +661,7 @@ Dialog::answer_t Castle::OpenDialog(bool fade)
 	else
 	if(building & DWELLING_MONSTER3 && le.MouseClickLeft(coordDwellingMonster3) &&
 	    Castle::RecruitMonster(DWELLING_MONSTER3, Dialog::RecruitMonster(
-		Monster(race, building & DWELLING_UPGRADE3 ? DWELLING_UPGRADE3 : DWELLING_MONSTER3), dwelling[2])))
+		Monster(race, GetActualDwelling(DWELLING_MONSTER3)), dwelling[2])))
 	{
 	    cursor.Hide();
 	    selectCaptainArmy.Redraw();
@@ -688,7 +676,7 @@ Dialog::answer_t Castle::OpenDialog(bool fade)
 	else
 	if(building & DWELLING_MONSTER4 && le.MouseClickLeft(coordDwellingMonster4) &&
 	    Castle::RecruitMonster(DWELLING_MONSTER4, Dialog::RecruitMonster(
-		Monster(race, building & DWELLING_UPGRADE4 ? DWELLING_UPGRADE4 : DWELLING_MONSTER4), dwelling[3])))
+		Monster(race, GetActualDwelling(DWELLING_MONSTER4)), dwelling[3])))
 	{
 	    cursor.Hide();
 	    selectCaptainArmy.Redraw();
@@ -703,7 +691,7 @@ Dialog::answer_t Castle::OpenDialog(bool fade)
 	else
 	if(building & DWELLING_MONSTER5 && le.MouseClickLeft(coordDwellingMonster5) &&
 	    Castle::RecruitMonster(DWELLING_MONSTER5, Dialog::RecruitMonster(
-		Monster(race, building & DWELLING_UPGRADE5 ? DWELLING_UPGRADE5 : DWELLING_MONSTER5), dwelling[4])))
+		Monster(race, GetActualDwelling(DWELLING_MONSTER5)), dwelling[4])))
 	{
 	    cursor.Hide();
 	    selectCaptainArmy.Redraw();
@@ -718,7 +706,7 @@ Dialog::answer_t Castle::OpenDialog(bool fade)
 	else
 	if(building & DWELLING_MONSTER6 && le.MouseClickLeft(coordDwellingMonster6) &&
 	    Castle::RecruitMonster(DWELLING_MONSTER6, Dialog::RecruitMonster(
-	    Monster(race, building & DWELLING_UPGRADE7 ? DWELLING_UPGRADE7 : (building & DWELLING_UPGRADE6 ? DWELLING_UPGRADE6 : DWELLING_MONSTER6)), dwelling[5])))
+	    Monster(race, GetActualDwelling(DWELLING_MONSTER6)), dwelling[5])))
 	{
 	    cursor.Hide();
 	    selectCaptainArmy.Redraw();
@@ -765,19 +753,19 @@ Dialog::answer_t Castle::OpenDialog(bool fade)
 	    Dialog::DwellingInfo(Monster(race, DWELLING_MONSTER1), dwelling[0]);
 	else
 	if(building & DWELLING_MONSTER2 && le.MousePressRight(coordDwellingMonster2))
-	    Dialog::DwellingInfo(Monster(race, building & DWELLING_UPGRADE2 ? DWELLING_UPGRADE2 : DWELLING_MONSTER2), dwelling[1]);
+	    Dialog::DwellingInfo(Monster(race, GetActualDwelling(DWELLING_MONSTER2)), dwelling[1]);
 	else
 	if(building & DWELLING_MONSTER3 && le.MousePressRight(coordDwellingMonster3))
-	    Dialog::DwellingInfo(Monster(race, building & DWELLING_UPGRADE3 ? DWELLING_UPGRADE3 : DWELLING_MONSTER3), dwelling[2]);
+	    Dialog::DwellingInfo(Monster(race, GetActualDwelling(DWELLING_MONSTER3)), dwelling[2]);
 	else
 	if(building & DWELLING_MONSTER4 && le.MousePressRight(coordDwellingMonster4))
-	    Dialog::DwellingInfo(Monster(race, building & DWELLING_UPGRADE4 ? DWELLING_UPGRADE4 : DWELLING_MONSTER4), dwelling[3]);
+	    Dialog::DwellingInfo(Monster(race, GetActualDwelling(DWELLING_MONSTER4)), dwelling[3]);
 	else
 	if(building & DWELLING_MONSTER5 && le.MousePressRight(coordDwellingMonster5))
-	    Dialog::DwellingInfo(Monster(race, building & DWELLING_UPGRADE5 ? DWELLING_UPGRADE5 : DWELLING_MONSTER5), dwelling[4]);
+	    Dialog::DwellingInfo(Monster(race, GetActualDwelling(DWELLING_MONSTER5)), dwelling[4]);
 	else
 	if(building & DWELLING_MONSTER6 && le.MousePressRight(coordDwellingMonster6))
-	    Dialog::DwellingInfo(Monster(race, building & DWELLING_UPGRADE7 ? DWELLING_UPGRADE7 : (building & DWELLING_UPGRADE6 ? DWELLING_UPGRADE6 : DWELLING_MONSTER6)), dwelling[5]);
+	    Dialog::DwellingInfo(Monster(race, GetActualDwelling(DWELLING_MONSTER6)), dwelling[5]);
 
 	// status message exit
 	if(le.MouseCursor(buttonExit)) statusBar.ShowMessage(isCastle() ? _("Exit castle") : _("Exit town"));

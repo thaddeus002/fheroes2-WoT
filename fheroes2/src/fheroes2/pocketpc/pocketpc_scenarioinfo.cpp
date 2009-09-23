@@ -35,7 +35,6 @@ extern void UpdateCoordClassInfo(const Point &, std::vector<Rect> &);
 Game::menu_t PocketPC::ScenarioInfo(void)
 {
     Game::SetFixVideoMode();
-    AGG::PlayMusic(MUS::MAINMENU);
 
     Cursor & cursor = Cursor::Get();
     Display & display = Display::Get();

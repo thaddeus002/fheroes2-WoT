@@ -78,7 +78,17 @@ namespace Resource
     /* return index sprite resource.icn */
     u8 GetIndexSprite2(resource_t resource);
 
-    void AlignDraw(const funds_t & rs, const Rect & dst_rt);
+    class BoxSprite : protected Rect
+    {
+    public:
+	BoxSprite(const funds_t &, u16);
+
+	const Rect & GetArea(void) const;
+	void SetPos(s16, s16);
+	void Redraw(void) const;
+
+	const funds_t & rs;
+    };
 };
 
 #endif

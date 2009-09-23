@@ -290,34 +290,49 @@ void Resource::funds_t::Reset(void)
     gold = 0;
 }
 
-void Resource::AlignDraw(const funds_t & rs, const Rect & dst_rt)
+Resource::BoxSprite::BoxSprite(const funds_t & f, u16 w) : Rect(0, 0, w, 0), rs(f)
+{
+    const u8 count = rs.GetValidItems();
+    h = 4 > count ? 45 : (7 > count ? 90 : 135);
+}
+
+const Rect & Resource::BoxSprite::GetArea(void) const
+{
+    return *this;
+}
+
+void Resource::BoxSprite::SetPos(s16 px, s16 py)
+{
+    x = px;
+    y = py;
+}
+
+void Resource::BoxSprite::Redraw(void) const
 {
     const u8 valid_resource = rs.GetValidItems();
-
     if(0 == valid_resource) return;
 
-    u16 index = 2 < valid_resource ? dst_rt.w / 3 : dst_rt.w / valid_resource;
+    u16 width = 2 < valid_resource ? w / 3 : w / valid_resource;
 
     u8 count = 0;
-    u8 offset = 40;
+    u8 offset = 35;
 
     std::string str;
     Point dst_pt;
-
     Display & display = Display::Get();
 
     if(rs.wood)
     {
 	const Sprite & sprite = AGG::GetICN(ICN::RESOURCE, 0);
-	dst_pt.x = dst_rt.x + index / 2 + count * index - sprite.w() / 2;
-	dst_pt.y = dst_rt.y - sprite.h() + offset;
+	dst_pt.x = x + width / 2 + count * width - sprite.w() / 2;
+	dst_pt.y = y - sprite.h() + offset;
 	display.Blit(sprite, dst_pt);
 
 	str.clear();
 	String::AddInt(str, rs.wood);
 	Text text(str, Font::SMALL);
-	dst_pt.x = dst_rt.x + index / 2 + count * index - text.w() / 2;
-	dst_pt.y = dst_rt.y + 2 + offset;
+	dst_pt.x = x + width / 2 + count * width - text.w() / 2;
+	dst_pt.y = y + 2 + offset;
 	text.Blit(dst_pt);
 
 	++count;
@@ -326,15 +341,15 @@ void Resource::AlignDraw(const funds_t & rs, const Rect & dst_rt)
     if(rs.ore)
     {
 	const Sprite & sprite = AGG::GetICN(ICN::RESOURCE, 2);
-	dst_pt.x = dst_rt.x + index / 2 + count * index - sprite.w() / 2;
-	dst_pt.y = dst_rt.y - sprite.h() + offset;
+	dst_pt.x = x + width / 2 + count * width - sprite.w() / 2;
+	dst_pt.y = y - sprite.h() + offset;
 	display.Blit(sprite, dst_pt);
 
 	str.clear();
 	String::AddInt(str, rs.ore);
 	Text text(str, Font::SMALL);
-	dst_pt.x = dst_rt.x + index / 2 + count * index - text.w() / 2;
-	dst_pt.y = dst_rt.y + 2 + offset;
+	dst_pt.x = x + width / 2 + count * width - text.w() / 2;
+	dst_pt.y = y + 2 + offset;
 	text.Blit(dst_pt);
 
 	++count;
@@ -343,89 +358,89 @@ void Resource::AlignDraw(const funds_t & rs, const Rect & dst_rt)
     if(rs.mercury)
     {
 	const Sprite & sprite = AGG::GetICN(ICN::RESOURCE, 1);
-	dst_pt.x = dst_rt.x + index / 2 + count * index - sprite.w() / 2;
-	dst_pt.y = dst_rt.y - sprite.h() + offset;
+	dst_pt.x = x + width / 2 + count * width - sprite.w() / 2;
+	dst_pt.y = y - sprite.h() + offset;
 	display.Blit(sprite, dst_pt);
 
 	str.clear();
 	String::AddInt(str, rs.mercury);
 	Text text(str, Font::SMALL);
-	dst_pt.x = dst_rt.x + index / 2 + count * index - text.w() / 2;
-	dst_pt.y = dst_rt.y + 2 + offset;
+	dst_pt.x = x + width / 2 + count * width - text.w() / 2;
+	dst_pt.y = y + 2 + offset;
 	text.Blit(dst_pt);
 
 	++count;
     }
 
-    if(2 < count){ count = 0; offset += 50; }
+    if(2 < count){ count = 0; offset += 45; }
 
     if(rs.sulfur)
     {
 	const Sprite & sprite = AGG::GetICN(ICN::RESOURCE, 3);
-	dst_pt.x = dst_rt.x + index / 2 + count * index - sprite.w() / 2;
-	dst_pt.y = dst_rt.y - sprite.h() + offset;
+	dst_pt.x = x + width / 2 + count * width - sprite.w() / 2;
+	dst_pt.y = y - sprite.h() + offset;
 	display.Blit(sprite, dst_pt);
 
 	str.clear();
 	String::AddInt(str, rs.sulfur);
 	Text text(str, Font::SMALL);
-	dst_pt.x = dst_rt.x + index / 2 + count * index - text.w() / 2;
-	dst_pt.y = dst_rt.y + 2 + offset;
+	dst_pt.x = x + width / 2 + count * width - text.w() / 2;
+	dst_pt.y = y + 2 + offset;
 	text.Blit(dst_pt);
 
 	++count;
     }
 
-    if(2 < count){ count = 0; offset += 50; }
+    if(2 < count){ count = 0; offset += 45; }
     if(rs.crystal)
     {
 	const Sprite & sprite = AGG::GetICN(ICN::RESOURCE, 4);
-	dst_pt.x = dst_rt.x + index / 2 + count * index - sprite.w() / 2;
-	dst_pt.y = dst_rt.y - sprite.h()  + offset;
+	dst_pt.x = x + width / 2 + count * width - sprite.w() / 2;
+	dst_pt.y = y - sprite.h()  + offset;
 	display.Blit(sprite, dst_pt);
 
 	str.clear();
 	String::AddInt(str, rs.crystal);
 	Text text(str, Font::SMALL);
-	dst_pt.x = dst_rt.x + index / 2 + count * index - text.w() / 2;
-	dst_pt.y = dst_rt.y + 2 + offset;
+	dst_pt.x = x + width / 2 + count * width - text.w() / 2;
+	dst_pt.y = y + 2 + offset;
 	text.Blit(dst_pt);
 
 	++count;
     }
 
-    if(2 < count){ count = 0; offset += 50; }
+    if(2 < count){ count = 0; offset += 45; }
     if(rs.gems)
     {
 	const Sprite & sprite = AGG::GetICN(ICN::RESOURCE, 5);
-	dst_pt.x = dst_rt.x + index / 2 + count * index - sprite.w() / 2;
-	dst_pt.y = dst_rt.y - sprite.h() + offset;
+	dst_pt.x = x + width / 2 + count * width - sprite.w() / 2;
+	dst_pt.y = y - sprite.h() + offset;
 	display.Blit(sprite, dst_pt);
 
 	str.clear();
 	String::AddInt(str, rs.gems);
 	Text text(str, Font::SMALL);
-	dst_pt.x = dst_rt.x + index / 2 + count * index - text.w() / 2;
-	dst_pt.y = dst_rt.y + 2 + offset;
+	dst_pt.x = x + width / 2 + count * width - text.w() / 2;
+	dst_pt.y = y + 2 + offset;
 	text.Blit(dst_pt);
 
 	++count;
     }
 
-    if(2 < count){ count = 0; offset += 50; }
+    if(2 < count){ count = 0; offset += 45; }
     if(rs.gold)
     {
 	const Sprite & sprite = AGG::GetICN(ICN::RESOURCE, 6);
-	if(! count) index = dst_rt.w;
-	dst_pt.x = dst_rt.x + index / 2 + count * index - sprite.w() / 2;
-	dst_pt.y = dst_rt.y - sprite.h() + offset;
+	if(! count) width = w;
+	dst_pt.x = x + width / 2 + count * width - sprite.w() / 2;
+	dst_pt.y = y - sprite.h() + offset;
 	display.Blit(sprite, dst_pt);
 
 	str.clear();
 	String::AddInt(str, rs.gold);
 	Text text(str, Font::SMALL);
-	dst_pt.x = dst_rt.x + index / 2 + count * index - text.w() / 2;
-	dst_pt.y = dst_rt.y + 2 + offset;
+	dst_pt.x = x + width / 2 + count * width - text.w() / 2;
+	dst_pt.y = y + 2 + offset;
 	text.Blit(dst_pt);
     }
 }

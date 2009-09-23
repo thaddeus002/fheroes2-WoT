@@ -51,33 +51,27 @@ Skill::Secondary::skill_t Dialog::LevelUpSelectSkill(const std::string & header,
 
     TextBox box1(header, Font::BIG, BOXAREA_WIDTH);
     TextBox box2(message, Font::BIG, BOXAREA_WIDTH);
+    const u8 spacer = Settings::Get().PocketPC() ? 5 : 10;
 
-    Box box((header.size() ? box1.h() + 10 : 0) + (message.size() ? box2.h() + 10 : 0) + sprite_frame.h(), true);
+    Box box(box1.h() + spacer + box2.h() + 10 + sprite_frame.h(), true);
 
     pt.x = box.GetArea().x + box.GetArea().w / 2 - AGG::GetICN(system, 9).w() - 20;
-    pt.y = box.GetArea().y + box.GetArea().h + BUTTON_HEIGHT - AGG::GetICN(system, 9).h();
+    pt.y = box.GetArea().y + box.GetArea().h - AGG::GetICN(system, 9).h();
     Button button_learn1(pt, system, 9, 10);
 
     pt.x = box.GetArea().x + box.GetArea().w / 2 + 20;
-    pt.y = box.GetArea().y + box.GetArea().h + BUTTON_HEIGHT - AGG::GetICN(system, 9).h();
+    pt.y = box.GetArea().y + box.GetArea().h - AGG::GetICN(system, 9).h();
     Button button_learn2(pt, system, 9, 10);
 
     Rect pos = box.GetArea();
 
-    if(header.size())
-    {
-	box1.Blit(pos);
-        pos.y += box1.h() + 10;
-    }
+    if(header.size()) box1.Blit(pos);
+    pos.y += box1.h() + spacer;
 
-    if(message.size())
-    {
-        box2.Blit(pos);
-        pos.y += box2.h() + 10;
-    }
+    if(message.size()) box2.Blit(pos);
+    pos.y += box2.h() + spacer;
 
     // sprite1
-    pos.y += 20;
     pos.x = box.GetArea().x + box.GetArea().w / 2 - sprite_frame.w() - 20;
     display.Blit(sprite_frame, pos);
     pos.x += 3;
@@ -85,7 +79,6 @@ Skill::Secondary::skill_t Dialog::LevelUpSelectSkill(const std::string & header,
     display.Blit(sprite_skill1, pos.x, pos.y + 3);
 
     Text text;
-
     // text
     text.Set(Skill::Secondary::String(sec1.Skill()), Font::SMALL);
     text.Blit(pos.x + (sprite_skill1.w() - text.w()) / 2, pos.y + 5);

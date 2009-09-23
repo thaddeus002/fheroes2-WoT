@@ -48,11 +48,11 @@ Dialog::answer_t Heroes::OpenDialog(bool readonly, bool fade)
     cursor.Hide();
     cursor.SetThemes(cursor.POINTER);
 
-    Dialog::FrameBorder frameborder;
-    frameborder.SetPosition((display.w() - 640 - BORDERWIDTH * 2) / 2, (display.h() - 480 - BORDERWIDTH * 2) / 2, 640, 480);
-    frameborder.Redraw();
+    Dialog::FrameBorder background;
+    background.SetPosition((display.w() - 640 - BORDERWIDTH * 2) / 2, (display.h() - 480 - BORDERWIDTH * 2) / 2, 640, 480);
+    background.Redraw();
 
-    const Point cur_pt(frameborder.GetArea().x, frameborder.GetArea().y);
+    const Point cur_pt(background.GetArea().x, background.GetArea().y);
     Point dst_pt(cur_pt);
 
     // fade
@@ -224,7 +224,7 @@ Dialog::answer_t Heroes::OpenDialog(bool readonly, bool fade)
     dst_pt.x = cur_pt.x + 49;
     dst_pt.y = cur_pt.y + 130;
 
-    display.Blit(AGG::GetICN(ICN::CREST, Color::GetIndex(color)), dst_pt);
+    display.Blit(AGG::GetICN(ICN::CREST, Color::GRAY == color ? Color::GetIndex(world.GetMyKingdom().GetColor()) : Color::GetIndex(color)), dst_pt);
     
     // monster
     dst_pt.x = cur_pt.x + 156;

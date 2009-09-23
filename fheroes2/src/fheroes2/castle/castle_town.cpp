@@ -32,6 +32,7 @@
 #include "text.h"
 #include "statusbar.h"
 #include "payment.h"
+#include "buildinginfo.h"
 #include "kingdom.h"
 
 void ShowBuildMessage(StatusBar & bar, bool isBuilt, const std::string & message, const Castle & castle, const u32 building)
@@ -89,46 +90,50 @@ Dialog::answer_t Castle::DialogBuyHero(const Heroes* hero)
     Cursor & cursor = Cursor::Get();
 
     cursor.Hide();
-    Dialog::Box box(200, true);
+
+    const u8 spacer = Settings::Get().PocketPC() ? 5 : 10;
+    const Sprite & portrait_frame = AGG::GetICN(ICN::SURRENDR, 4);
+
+    Text text(_("Recruit Hero"), Font::BIG);
+
+    std::string str = _("%{name} is a level %{value} %{race} with %{count} artifacts.");
+    String::Replace(str, "%{name}", hero->GetName());
+    String::Replace(str, "%{value}", hero->GetLevel());
+    String::Replace(str, "%{race}", Race::String(hero->GetRace()));
+    String::Replace(str, "%{count}", hero->GetCountArtifacts());
+
+    TextBox box2(str, Font::BIG, BOXAREA_WIDTH);
+
+    Resource::funds_t paymentCosts(Resource::GOLD, RECRUIT_HEROES_GOLD);
+    Resource::BoxSprite rbs(paymentCosts, BOXAREA_WIDTH);
+
+    Dialog::Box box(text.h() + spacer + portrait_frame.h() + spacer + box2.h() + spacer + rbs.GetArea().h, true);
     const Rect & box_rt = box.GetArea();
     LocalEvent & le = LocalEvent::Get();
     Point dst_pt;
-    std::string str;
 
-    str = _("Recruit Hero");
-    Text text(str, Font::BIG);
     dst_pt.x = box_rt.x + (box_rt.w - text.w()) / 2;
     dst_pt.y = box_rt.y;
     text.Blit(dst_pt);
 
     //portrait and frame
-    const Sprite & portrait_frame = AGG::GetICN(ICN::SURRENDR, 4);
     dst_pt.x = box_rt.x + (box_rt.w - portrait_frame.w()) / 2;
-    dst_pt.y = dst_pt.y + text.h() + 10;
+    dst_pt.y = dst_pt.y + text.h() + spacer;
     display.Blit(portrait_frame, dst_pt);
 
     dst_pt.x = dst_pt.x + 5;
     dst_pt.y = dst_pt.y + 5;
     display.Blit(hero->GetPortrait101x93(), dst_pt);
 
-    str = _("%{name} is a level %{value} %{race} with %{count} artifacts.");
-    String::Replace(str, "%{name}", hero->GetName());
-    String::Replace(str, "%{value}", hero->GetLevel());
-    String::Replace(str, "%{race}", Race::String(hero->GetRace()));
-    String::Replace(str, "%{count}", hero->GetCountArtifacts());
-
-    TextBox box2(str, Font::BIG, box_rt.w);
     dst_pt.x = box_rt.x;
-    dst_pt.y = dst_pt.y + portrait_frame.h() + 5;
+    dst_pt.y = dst_pt.y + portrait_frame.h() + spacer;
     box2.Blit(dst_pt);
 
-    Resource::funds_t paymentCosts(Resource::GOLD, RECRUIT_HEROES_GOLD);
-
-    const Rect src_rt(box_rt.x, dst_pt.y + box2.h() + 10, box_rt.w, 0);
-    Resource::AlignDraw(paymentCosts, src_rt);
+    rbs.SetPos(dst_pt.x, dst_pt.y + box2.h() + spacer);
+    rbs.Redraw();
 
     dst_pt.x = box_rt.x;
-    dst_pt.y = box_rt.y + box_rt.h + BUTTON_HEIGHT - AGG::GetICN(system, 1).h();
+    dst_pt.y = box_rt.y + box_rt.h - AGG::GetICN(system, 1).h();
     Button button1(dst_pt, system, 1, 2);
 
     if(! AllowBuyHero())
@@ -138,7 +143,7 @@ Dialog::answer_t Castle::DialogBuyHero(const Heroes* hero)
     }
 
     dst_pt.x = box_rt.x + box_rt.w - AGG::GetICN(system, 3).w();
-    dst_pt.y = box_rt.y + box_rt.h + BUTTON_HEIGHT - AGG::GetICN(system, 3).h();
+    dst_pt.y = box_rt.y + box_rt.h - AGG::GetICN(system, 3).h();
     Button button2(dst_pt, system, 3, 4);
 
     button1.Draw();
@@ -164,206 +169,16 @@ Dialog::answer_t Castle::DialogBuyHero(const Heroes* hero)
     return Dialog::CANCEL;
 }
 
-Dialog::answer_t Castle::DialogBuyBuilding(building_t build, bool buttons)
+Dialog::answer_t Castle::DialogBuyCastle(bool buttons) const
 {
-    Display & display = Display::Get();
+    BuildingInfo info(*this, BUILD_CASTLE);
+    return info.DialogBuyBuilding(buttons) ? Dialog::OK : Dialog::CANCEL;
+}
 
-    const ICN::icn_t system = (Settings::Get().EvilInterface() ? ICN::SYSTEME : ICN::SYSTEM);
-
-    Cursor & cursor = Cursor::Get();
-    cursor.Hide();
-
-    std::string str;
-
-    if((DWELLING_MONSTER1 |
-	DWELLING_MONSTER2 |
-	DWELLING_MONSTER3 |
-	DWELLING_MONSTER4 |
-	DWELLING_MONSTER5 |
-	DWELLING_MONSTER6 |
-	DWELLING_UPGRADE2 |
-	DWELLING_UPGRADE3 |
-	DWELLING_UPGRADE4 |
-	DWELLING_UPGRADE5 |
-	DWELLING_UPGRADE6 |
-	DWELLING_UPGRADE7) & build)
-    {
-        str = _("The %{building} produces %{monster}.");
-        String::Replace(str, "%{building}", GetStringBuilding(build, race));
-        std::string name = Monster(race, build).GetMultiName();
-        String::Lower(name);
-        String::Replace(str, "%{monster}", name);
-    }
-    else
-	str = GetDescriptionBuilding(build, race);
-
-    TextBox box1(str, Font::BIG, BOXAREA_WIDTH);
-
-    // prepare requires build string
-    std::bitset<32> requires(Castle::GetBuildingRequires(build));
-    std::bitset<32> building2(building);
-    str.clear();	
-    if(requires.any())
-    {
-	    u8 count = 0;
-
-	    for(u8 pos = 0; pos < requires.size(); ++pos)
-	    {
-		if(requires.test(pos))
-		{
-		    u32 value = 1;
-		    value <<= pos;
-		    
-		    ++count;
-
-		    if(! (building & value))
-		    {
-			str += GetStringBuilding(static_cast<building_t>(value), race);
-
-			if(count < requires.count()) str += ", ";
-		    }
-		}
-	    }
-    }
-
-    bool requires_true = str.size();
-    TextBox box2(str, Font::BIG, BOXAREA_WIDTH);
-
-    PaymentConditions::BuyBuilding paymentBuild(race, build);
-    const u8 extra = (4 > paymentBuild.GetValidItems() ? 50 : (6 > paymentBuild.GetValidItems() ? 100 : 160));
-    const Sprite & window_icons = AGG::GetICN(ICN::BLDGXTRA, 0);
-    
-    Dialog::Box box(10 + window_icons.h() + 10 + box1.h() + (requires_true ? 10 + box2.h() : 0) + 10 + extra, buttons);
-
-    const Rect & box_rt = box.GetArea();
-
-    ICN::icn_t cstl_icn = ICN::UNKNOWN;
-
-    switch(race)
-    {
-        case Race::KNGT: cstl_icn = ICN::CSTLKNGT; break;
-        case Race::BARB: cstl_icn = ICN::CSTLBARB; break;
-        case Race::SORC: cstl_icn = ICN::CSTLSORC; break;
-        case Race::WRLK: cstl_icn = ICN::CSTLWRLK; break;
-        case Race::WZRD: cstl_icn = ICN::CSTLWZRD; break;
-        case Race::NECR: cstl_icn = ICN::CSTLNECR; break;
-        default: return Dialog::CANCEL;
-    }
-
-    LocalEvent & le = LocalEvent::Get();
-
-    Point dst_pt;
-
-    dst_pt.x = box_rt.x;
-    dst_pt.y = box_rt.y + box_rt.h + BUTTON_HEIGHT - AGG::GetICN(system, 1).h();
-    Button button1(dst_pt, system, 1, 2);
-
-    dst_pt.x = box_rt.x + box_rt.w - AGG::GetICN(system, 3).w();
-    dst_pt.y = box_rt.y + box_rt.h + BUTTON_HEIGHT - AGG::GetICN(system, 3).h();
-    Button button2(dst_pt, system, 3, 4);
-
-    u8 index = 0;
-
-    // sprite
-    switch(build)
-    {
-		case BUILD_MAGEGUILD1:
-		case BUILD_MAGEGUILD2:
-		case BUILD_MAGEGUILD3:
-		case BUILD_MAGEGUILD4:
-		case BUILD_MAGEGUILD5:	index = 0; break;
-		case BUILD_THIEVESGUILD:index = 1; break;
-		case BUILD_TAVERN:	index = 2; break;
-		case BUILD_SHIPYARD:	index = 3; break;
-		case BUILD_WELL:	index = 4; break;
-		case BUILD_CASTLE:	index = 6; break;
-		case BUILD_STATUE:	index = 7; break;
-		case BUILD_LEFTTURRET:	index = 8; break;
-		case BUILD_RIGHTTURRET:	index = 9; break;
-		case BUILD_MARKETPLACE:	index = 10; break;
-		case BUILD_WEL2:	index = 11; break;
-		case BUILD_MOAT:	index = 12; break;
-		case BUILD_SPEC:	index = 13; break;
-		case BUILD_CAPTAIN:	index = 15; break;
-		case DWELLING_MONSTER1: index = 19; break;
-		case DWELLING_MONSTER2: index = 20; break;
-		case DWELLING_MONSTER3: index = 21; break;
-		case DWELLING_MONSTER4: index = 22; break;
-		case DWELLING_MONSTER5: index = 23; break;
-		case DWELLING_MONSTER6: index = 24; break;
-		case DWELLING_UPGRADE2: index = 25; break;
-		case DWELLING_UPGRADE3: index = 26; break;
-		case DWELLING_UPGRADE4: index = 27; break;
-		case DWELLING_UPGRADE5: index = 28; break;
-		case DWELLING_UPGRADE6: index = 29; break;
-		case DWELLING_UPGRADE7: index = 30; break;
-		default: return Dialog::CANCEL;
-    }
-
-    // sprite window_icons
-    dst_pt.x = box_rt.x + (box_rt.w - window_icons.w()) / 2;
-    dst_pt.y = box_rt.y + 10;
-    display.Blit(window_icons, dst_pt);
-
-    const Sprite & building_icons = AGG::GetICN(cstl_icn, index);
-    dst_pt.x = box_rt.x + (box_rt.w - building_icons.w()) / 2;
-    dst_pt.y += 1;
-    display.Blit(building_icons, dst_pt);
-
-    Text text;
-
-    text.Set(GetStringBuilding(build, race), Font::SMALL);
-    dst_pt.x = box_rt.x + (box_rt.w - text.w()) / 2;
-    dst_pt.y += 57;
-    text.Blit(dst_pt);
-
-    dst_pt.x = box_rt.x;
-    dst_pt.y = box_rt.y + 10 + window_icons.h() + 10;
-    box1.Blit(dst_pt);
-
-    dst_pt.y += box1.h() + 10;
-    if(requires_true)
-    {
-	text.Set(_("Requires:"), Font::BIG);
-	dst_pt.x = box_rt.x + (box_rt.w - text.w()) / 2;
-	text.Blit(dst_pt);
-
-	dst_pt.x = box_rt.x;
-	dst_pt.y += text.h();
-	box2.Blit(dst_pt);
-
-	dst_pt.y += + 10;
-    }
-
-    Resource::AlignDraw(paymentBuild, Rect(box_rt.x, dst_pt.y, BOXAREA_WIDTH, 0));
-
-    if(buttons)
-    {
-	if(!AllowBuyBuilding(build)) button1.SetDisable(true);
-
-	button1.Draw();
-	button2.Draw();
-    }
-	
-    cursor.Show();
-    display.Flip();
-
-    // message loop
-    while(le.HandleEvents())
-    {
-        if(!buttons && !le.MousePressRight()) break;
-
-        le.MousePressLeft(button1) ? button1.PressDraw() : button1.ReleaseDraw();
-        le.MousePressLeft(button2) ? button2.PressDraw() : button2.ReleaseDraw();
-
-        if(button1.isEnable() && (le.KeyPress(KEY_RETURN) ||
-    	    le.MouseClickLeft(button1))) return Dialog::OK;
-
-        if(le.KeyPress(KEY_ESCAPE) ||
-    	    le.MouseClickLeft(button2)) return Dialog::CANCEL;
-    }
-
-    return Dialog::ZERO;
+Dialog::answer_t Castle::DialogBuyCaptain(bool buttons) const
+{
+    BuildingInfo info(*this, BUILD_CAPTAIN);
+    return info.DialogBuyBuilding(buttons) ? Dialog::OK : Dialog::CANCEL;
 }
 
 void RedrawInfoDwelling(const Point & pt, const Castle & castle, const Castle::building_t & build)
@@ -416,7 +231,7 @@ void RedrawInfoDwelling(const Point & pt, const Castle & castle, const Castle::b
     }
 }
 
-Castle::building_t Castle::OpenTown(void)
+u32 Castle::OpenTown(void)
 {
     Display & display = Display::Get();
 
@@ -424,11 +239,11 @@ Castle::building_t Castle::OpenTown(void)
     Cursor & cursor = Cursor::Get();
     cursor.Hide();
 
-    Dialog::FrameBorder frameborder;
-    frameborder.SetPosition((display.w() - 640 - BORDERWIDTH * 2) / 2, (display.h() - 480 - BORDERWIDTH * 2) / 2, 640, 480);
-    frameborder.Redraw();
+    Dialog::FrameBorder background;
+    background.SetPosition((display.w() - 640 - BORDERWIDTH * 2) / 2, (display.h() - 480 - BORDERWIDTH * 2) / 2, 640, 480);
+    background.Redraw();
     
-    const Point cur_pt(frameborder.GetArea().x, frameborder.GetArea().y);
+    const Point cur_pt(background.GetArea().x, background.GetArea().y);
     Point dst_pt(cur_pt);
 
     display.Blit(AGG::GetICN(ICN::CASLWIND, 0), dst_pt);
@@ -464,233 +279,98 @@ Castle::building_t Castle::OpenTown(void)
 	default: return BUILD_NOTHING;
     }
 
-    u8 index = 0;
+    BuildingInfo dwelling1(*this, DWELLING_MONSTER1);
+    dwelling1.SetPos(cur_pt.x + 5, cur_pt.y + 2);
+    dwelling1.Redraw();
 
-    // dwelling 1
-    dst_pt.x = cur_pt.x + 6;
-    dst_pt.y = cur_pt.y + 3;
-    display.Blit(AGG::GetICN(icn, 19), dst_pt);
-    const Rect rectDwelling1(dst_pt, 135, 57);
-    const std::string & stringDwelling1 = GetStringBuilding(DWELLING_MONSTER1, race);
-    bool allowBuyBuildDwelling1 = AllowBuyBuilding(DWELLING_MONSTER1);
-    RedrawInfoDwelling(dst_pt, *this, DWELLING_MONSTER1);
+    BuildingInfo dwelling2(*this, DWELLING_MONSTER2);
+    dwelling2.SetPos(cur_pt.x + 149, cur_pt.y + 2);
+    dwelling2.Redraw();
 
-    // dwelling 2
-    dst_pt.x = cur_pt.x + 150;
-    dst_pt.y = cur_pt.y + 3;
-    bool allowUpgrade2 = Monster(race, DWELLING_MONSTER2).isAllowUpgrade() && building & DWELLING_MONSTER2;
-    index = allowUpgrade2  ? 25 : 20;
-    display.Blit(AGG::GetICN(icn, index), dst_pt);
-    const Rect rectDwelling2(dst_pt, 135, 57);
-    bool allowBuyBuildDwelling2 = (allowUpgrade2 && (DWELLING_MONSTER2 & building) ? AllowBuyBuilding(DWELLING_UPGRADE2) : AllowBuyBuilding(DWELLING_MONSTER2));
-    const std::string & stringDwelling2 = GetStringBuilding(allowUpgrade2 && (DWELLING_MONSTER2 & building) ? DWELLING_UPGRADE2 : DWELLING_MONSTER2, race);
-    RedrawInfoDwelling(dst_pt, *this, allowUpgrade2 && (DWELLING_MONSTER2 & building) ? DWELLING_UPGRADE2 : DWELLING_MONSTER2);
+    BuildingInfo dwelling3(*this, DWELLING_MONSTER3);
+    dwelling3.SetPos(cur_pt.x + 293, cur_pt.y + 2);
+    dwelling3.Redraw();
 
-    // dwelling 3
-    dst_pt.x = cur_pt.x + 294;
-    dst_pt.y = cur_pt.y + 3;
-    bool allowUpgrade3 = Monster(race, DWELLING_MONSTER3).isAllowUpgrade() && building & DWELLING_MONSTER3;
-    index = allowUpgrade3 ? 26 : 21;
-    display.Blit(AGG::GetICN(icn, index), dst_pt);
-    const Rect rectDwelling3(dst_pt, 135, 57);
-    bool allowBuyBuildDwelling3 = (allowUpgrade3 && (DWELLING_MONSTER3 & building) ? AllowBuyBuilding(DWELLING_UPGRADE3) : AllowBuyBuilding(DWELLING_MONSTER3));
-    const std::string & stringDwelling3 = GetStringBuilding(allowUpgrade3 && (DWELLING_MONSTER3 & building) ? DWELLING_UPGRADE3 : DWELLING_MONSTER3, race);
-    RedrawInfoDwelling(dst_pt, *this, allowUpgrade3 && (DWELLING_MONSTER3 & building) ? DWELLING_UPGRADE3 : DWELLING_MONSTER3);
+    BuildingInfo dwelling4(*this, DWELLING_MONSTER4);
+    dwelling4.SetPos(cur_pt.x + 5, cur_pt.y + 77);
+    dwelling4.Redraw();
 
-    // dwelling 4
-    dst_pt.x = cur_pt.x + 6;
-    dst_pt.y = cur_pt.y + 78;
-    bool allowUpgrade4 = Monster(race, DWELLING_MONSTER4).isAllowUpgrade() && building & DWELLING_MONSTER4;
-    index = allowUpgrade4 ? 27 : 22;
-    display.Blit(AGG::GetICN(icn, index), dst_pt);
-    const Rect rectDwelling4(dst_pt, 135, 57);
-    bool allowBuyBuildDwelling4 = (allowUpgrade4 && (DWELLING_MONSTER4 & building) ? AllowBuyBuilding(DWELLING_UPGRADE4) : AllowBuyBuilding(DWELLING_MONSTER4));
-    const std::string & stringDwelling4 = GetStringBuilding(allowUpgrade4 && (DWELLING_MONSTER4 & building) ? DWELLING_UPGRADE4 : DWELLING_MONSTER4, race);
-    RedrawInfoDwelling(dst_pt, *this, allowUpgrade4 && (DWELLING_MONSTER4 & building) ? DWELLING_UPGRADE4 : DWELLING_MONSTER4);
+    BuildingInfo dwelling5(*this, DWELLING_MONSTER5);
+    dwelling5.SetPos(cur_pt.x + 149, cur_pt.y + 77);
+    dwelling5.Redraw();
 
-    // dwelling 5
-    dst_pt.x = cur_pt.x + 150;
-    dst_pt.y = cur_pt.y + 78;
-    bool allowUpgrade5 = Monster(race, DWELLING_MONSTER5).isAllowUpgrade() && building & DWELLING_MONSTER5;
-    index = allowUpgrade5 ? 28 : 23;
-    display.Blit(AGG::GetICN(icn, index), dst_pt);
-    const Rect rectDwelling5(dst_pt, 135, 57);
-    bool allowBuyBuildDwelling5 = (allowUpgrade5 && (DWELLING_MONSTER5 & building) ? AllowBuyBuilding(DWELLING_UPGRADE5) : AllowBuyBuilding(DWELLING_MONSTER5));
-    const std::string & stringDwelling5 = GetStringBuilding(allowUpgrade5 && (DWELLING_MONSTER5 & building) ? DWELLING_UPGRADE5 : DWELLING_MONSTER5, race);
-    RedrawInfoDwelling(dst_pt, *this, allowUpgrade5 && (DWELLING_MONSTER5 & building) ? DWELLING_UPGRADE5 : DWELLING_MONSTER5);
-
-    // dwelling 6
-    dst_pt.x = cur_pt.x + 294;
-    dst_pt.y = cur_pt.y + 78;
-    bool allowUpgrade6 = Monster(race, DWELLING_MONSTER6).isAllowUpgrade() && building & DWELLING_MONSTER6;
-    bool allowUpgrade7 = Monster(race, DWELLING_UPGRADE6).isAllowUpgrade() && building & DWELLING_UPGRADE6;
-    index = allowUpgrade7 ? 30 :
-           (allowUpgrade6 ? 29 : 24);
-    display.Blit(AGG::GetICN(icn, index), dst_pt);
-    const Rect rectDwelling6(dst_pt, 135, 57);
-    bool allowBuyBuildDwelling6 = (allowUpgrade7 && (DWELLING_UPGRADE6 & building) ?
-	AllowBuyBuilding(DWELLING_UPGRADE7) :
-	(allowUpgrade6 && (DWELLING_MONSTER6 & building) ? AllowBuyBuilding(DWELLING_UPGRADE6) :
-	AllowBuyBuilding(DWELLING_MONSTER6)));
-    const std::string & stringDwelling6 = GetStringBuilding(
-	allowUpgrade7 && (DWELLING_UPGRADE6 & building) ? DWELLING_UPGRADE7 :
-	(allowUpgrade6 && (DWELLING_MONSTER6 & building) ? DWELLING_UPGRADE6 : DWELLING_MONSTER6), race);
-    RedrawInfoDwelling(dst_pt, *this, allowUpgrade7 && (DWELLING_UPGRADE6 & building) ? DWELLING_UPGRADE7 :
-	(allowUpgrade6 && (DWELLING_MONSTER6 & building) ? DWELLING_UPGRADE6 : DWELLING_MONSTER6));
+    BuildingInfo dwelling6(*this, DWELLING_MONSTER6);
+    dwelling6.SetPos(cur_pt.x + 293, cur_pt.y + 77);
+    dwelling6.Redraw();
 
     // mage guild
-    dst_pt.x = cur_pt.x + 6;
-    dst_pt.y = cur_pt.y + 158;
-    display.Blit(AGG::GetICN(icn, 0), dst_pt);
-    const Rect rectMageGuild(dst_pt, 135, 57);
-    std::string stringMageGuild;
-    bool allowBuyBuildMageGuild = false;
-    building_t nextLevelMageGuild = BUILD_MAGEGUILD1;
-    // status bar
+    building_t level = BUILD_NOTHING;
     switch(GetLevelMageGuild())
     {
-	case 0:
-		allowBuyBuildMageGuild = AllowBuyBuilding(BUILD_MAGEGUILD1);
-		stringMageGuild = GetStringBuilding(BUILD_MAGEGUILD1, race);
-		nextLevelMageGuild = BUILD_MAGEGUILD1;
-		RedrawInfoDwelling(dst_pt, *this, BUILD_MAGEGUILD1);
-		break;
-	case 1:
-		allowBuyBuildMageGuild = AllowBuyBuilding(BUILD_MAGEGUILD2);
-		stringMageGuild = GetStringBuilding(BUILD_MAGEGUILD2, race);
-		nextLevelMageGuild = BUILD_MAGEGUILD2;
-		RedrawInfoDwelling(dst_pt, *this, BUILD_MAGEGUILD2);
-		break;
-	case 2:
-		allowBuyBuildMageGuild = AllowBuyBuilding(BUILD_MAGEGUILD3);
-		stringMageGuild = GetStringBuilding(BUILD_MAGEGUILD3, race);
-		nextLevelMageGuild = BUILD_MAGEGUILD3;
-		RedrawInfoDwelling(dst_pt, *this, BUILD_MAGEGUILD3);
-		break;
-	case 3:
-		allowBuyBuildMageGuild = AllowBuyBuilding(BUILD_MAGEGUILD4);
-		stringMageGuild = GetStringBuilding(BUILD_MAGEGUILD4, race);
-		nextLevelMageGuild = BUILD_MAGEGUILD4;
-		RedrawInfoDwelling(dst_pt, *this, BUILD_MAGEGUILD4);
-		break;
-	case 4:
-		allowBuyBuildMageGuild = AllowBuyBuilding(BUILD_MAGEGUILD5);
-		stringMageGuild = GetStringBuilding(BUILD_MAGEGUILD5, race);
-		nextLevelMageGuild = BUILD_MAGEGUILD5;
-		RedrawInfoDwelling(dst_pt, *this, BUILD_MAGEGUILD5);
-		break;
-	case 5:
-		allowBuyBuildMageGuild = false;
-		stringMageGuild = GetStringBuilding(BUILD_MAGEGUILD5, race);
-		nextLevelMageGuild = BUILD_MAGEGUILD5;
-		RedrawInfoDwelling(dst_pt, *this, BUILD_MAGEGUILD5);
-		break;
-	default: break;
+	case 0: level = BUILD_MAGEGUILD1; break;
+	case 1: level = BUILD_MAGEGUILD2; break;
+	case 2: level = BUILD_MAGEGUILD3; break;
+	case 3: level = BUILD_MAGEGUILD4; break;
+	default:level = BUILD_MAGEGUILD5; break;
     }
+    BuildingInfo buildingMageGuild(*this, level);
+    buildingMageGuild.SetPos(cur_pt.x + 5, cur_pt.y + 157);
+    buildingMageGuild.Redraw();
 
     // tavern
-    dst_pt.x = cur_pt.x + 150;
-    dst_pt.y = cur_pt.y + 158;
-    const Rect rectTavern(dst_pt, 135, 57);
-    bool allowBuyBuildTavern = AllowBuyBuilding(BUILD_TAVERN);
-    const std::string & stringTavern = GetStringBuilding(BUILD_TAVERN, race);
-    if(Race::NECR == race && !Settings::Get().Modes(Settings::PRICELOYALTY))
-	display.FillRect(0, 0, 0, Rect(dst_pt, 135, 57));
-    else
-    {
-    	display.Blit(AGG::GetICN(icn, 2), dst_pt);
-	RedrawInfoDwelling(dst_pt, *this, BUILD_TAVERN);
-    }
+    BuildingInfo buildingTavern(*this, BUILD_TAVERN);
+    buildingTavern.SetPos(cur_pt.x + 149, cur_pt.y + 157);
+    buildingTavern.Redraw();
 
     // thieves guild
-    dst_pt.x = cur_pt.x + 294;
-    dst_pt.y = cur_pt.y + 158;
-    display.Blit(AGG::GetICN(icn, 1), dst_pt);
-    const Rect rectThievesGuild(dst_pt, 135, 57);
-    bool allowBuyBuildThievesGuild = AllowBuyBuilding(BUILD_THIEVESGUILD);
-    const std::string & stringThievesGuild = GetStringBuilding(BUILD_THIEVESGUILD, race);
-    RedrawInfoDwelling(dst_pt, *this, BUILD_THIEVESGUILD);
+    BuildingInfo buildingThievesGuild(*this, BUILD_THIEVESGUILD);
+    buildingThievesGuild.SetPos(cur_pt.x + 293, cur_pt.y + 157);
+    buildingThievesGuild.Redraw();
 
     // shipyard
-    dst_pt.x = cur_pt.x + 6;
-    dst_pt.y = cur_pt.y + 233;
-    display.Blit(AGG::GetICN(icn, 3), dst_pt);
-    const Rect rectShipyard(dst_pt, 135, 57);
-    bool allowBuyBuildShipyard = AllowBuyBuilding(BUILD_SHIPYARD);
-    const std::string & stringShipyard = GetStringBuilding(BUILD_SHIPYARD, race);
-    RedrawInfoDwelling(dst_pt, *this, BUILD_SHIPYARD);
+    BuildingInfo buildingShipyard(*this, BUILD_SHIPYARD);
+    buildingShipyard.SetPos(cur_pt.x + 5, cur_pt.y + 232);
+    buildingShipyard.Redraw();
 
     // statue
-    dst_pt.x = cur_pt.x + 150;
-    dst_pt.y = cur_pt.y + 233;
-    display.Blit(AGG::GetICN(icn, 7), dst_pt);
-    const Rect rectStatue(dst_pt, 135, 57);
-    bool allowBuyBuildStatue = AllowBuyBuilding(BUILD_STATUE);
-    const std::string & stringStatue = GetStringBuilding(BUILD_STATUE, race);
-    RedrawInfoDwelling(dst_pt, *this, BUILD_STATUE);
+    BuildingInfo buildingStatue(*this, BUILD_STATUE);
+    buildingStatue.SetPos(cur_pt.x + 149, cur_pt.y + 232);
+    buildingStatue.Redraw();
 
     // marketplace
-    dst_pt.x = cur_pt.x + 294;
-    dst_pt.y = cur_pt.y + 233;
-    display.Blit(AGG::GetICN(icn, 10), dst_pt);
-    const Rect rectMarketplace(dst_pt, 135, 57);
-    bool allowBuyBuildMarketplace = AllowBuyBuilding(BUILD_MARKETPLACE);
-    const std::string & stringMarketplace = GetStringBuilding(BUILD_MARKETPLACE, race);
-    RedrawInfoDwelling(dst_pt, *this, BUILD_MARKETPLACE);
+    BuildingInfo buildingMarketplace(*this, BUILD_MARKETPLACE);
+    buildingMarketplace.SetPos(cur_pt.x + 293, cur_pt.y + 232);
+    buildingMarketplace.Redraw();
 
     // well
-    dst_pt.x = cur_pt.x + 6;
-    dst_pt.y = cur_pt.y + 308;
-    display.Blit(AGG::GetICN(icn, 4), dst_pt);
-    const Rect rectWell(dst_pt, 135, 57);
-    bool allowBuyBuildWell = AllowBuyBuilding(BUILD_WELL);
-    const std::string & stringWell = GetStringBuilding(BUILD_WELL, race);
-    RedrawInfoDwelling(dst_pt, *this, BUILD_WELL);
+    BuildingInfo buildingWell(*this, BUILD_WELL);
+    buildingWell.SetPos(cur_pt.x + 5, cur_pt.y + 307);
+    buildingWell.Redraw();
 
     // wel2
-    dst_pt.x = cur_pt.x + 150;
-    dst_pt.y = cur_pt.y + 308;
-    display.Blit(AGG::GetICN(icn, 11), dst_pt);
-    const Rect rectWel2(dst_pt, 135, 57);
-    bool allowBuyBuildWel2 = AllowBuyBuilding(BUILD_WEL2);
-    const std::string & stringWel2 = GetStringBuilding(BUILD_WEL2, race);
-    RedrawInfoDwelling(dst_pt, *this, BUILD_WEL2);
+    BuildingInfo buildingWel2(*this, BUILD_WEL2);
+    buildingWel2.SetPos(cur_pt.x + 149, cur_pt.y + 307);
+    buildingWel2.Redraw();
 
     // spec
-    dst_pt.x = cur_pt.x + 294;
-    dst_pt.y = cur_pt.y + 308;
-    display.Blit(AGG::GetICN(icn, 13), dst_pt);
-    const Rect rectSpec(dst_pt, 135, 57);
-    bool allowBuyBuildSpec = AllowBuyBuilding(BUILD_SPEC);
-    const std::string & stringSpec = GetStringBuilding(BUILD_SPEC, race);
-    RedrawInfoDwelling(dst_pt, *this, BUILD_SPEC);
+    BuildingInfo buildingSpec(*this, BUILD_SPEC);
+    buildingSpec.SetPos(cur_pt.x + 293, cur_pt.y + 307);
+    buildingSpec.Redraw();
 
     // left turret
-    dst_pt.x = cur_pt.x + 6;
-    dst_pt.y = cur_pt.y + 388;
-    display.Blit(AGG::GetICN(icn, 8), dst_pt);
-    const Rect rectLTurret(dst_pt, 135, 57);
-    bool allowBuyBuildLTurret = AllowBuyBuilding(BUILD_LEFTTURRET);
-    const std::string & stringLTurret = GetStringBuilding(BUILD_LEFTTURRET, race);
-    RedrawInfoDwelling(dst_pt, *this, BUILD_LEFTTURRET);
+    BuildingInfo buildingLTurret(*this, BUILD_LEFTTURRET);
+    buildingLTurret.SetPos(cur_pt.x + 5, cur_pt.y + 387);
+    buildingLTurret.Redraw();
 
     // right turret
-    dst_pt.x = cur_pt.x + 150;
-    dst_pt.y = cur_pt.y + 388;
-    display.Blit(AGG::GetICN(icn, 9), dst_pt);
-    const Rect rectRTurret(dst_pt, 135, 57);
-    bool allowBuyBuildRTurret = AllowBuyBuilding(BUILD_RIGHTTURRET);
-    const std::string & stringRTurret = GetStringBuilding(BUILD_RIGHTTURRET, race);
-    RedrawInfoDwelling(dst_pt, *this, BUILD_RIGHTTURRET);
+    BuildingInfo buildingRTurret(*this, BUILD_RIGHTTURRET);
+    buildingRTurret.SetPos(cur_pt.x + 149, cur_pt.y + 387);
+    buildingRTurret.Redraw();
 
     // moat
-    dst_pt.x = cur_pt.x + 294;
-    dst_pt.y = cur_pt.y + 388;
-    display.Blit(AGG::GetICN(icn, 12), dst_pt);
-    const Rect rectMoat(dst_pt, 135, 57);
-    bool allowBuyBuildMoat = AllowBuyBuilding(BUILD_MOAT);
-    const std::string & stringMoat = GetStringBuilding(BUILD_MOAT, race);
-    RedrawInfoDwelling(dst_pt, *this, BUILD_MOAT);
+    BuildingInfo buildingMoat(*this, BUILD_MOAT);
+    buildingMoat.SetPos(cur_pt.x + 293, cur_pt.y + 387);
+    buildingMoat.Redraw();
 
     // captain
     switch(race)
@@ -705,7 +385,7 @@ Castle::building_t Castle::OpenTown(void)
     }
     dst_pt.x = cur_pt.x + 444;
     dst_pt.y = cur_pt.y + 165;
-    index = building & BUILD_CAPTAIN ? 1 : 0;
+    u8 index = building & BUILD_CAPTAIN ? 1 : 0;
     display.Blit(AGG::GetICN(icn, index), dst_pt);
     const Rect rectCaptain(dst_pt, AGG::GetICN(icn, index).w(), AGG::GetICN(icn, index).h());
     bool allowBuyBuildCaptain = AllowBuyBuilding(BUILD_CAPTAIN);
@@ -849,104 +529,43 @@ Castle::building_t Castle::OpenTown(void)
         if(le.MouseClickLeft(buttonExit) || le.KeyPress(KEY_RETURN) || le.KeyPress(KEY_ESCAPE)) break;
 
 	// click left
-	if(!(DWELLING_MONSTER1 & building) && le.MouseClickLeft(rectDwelling1) && allowBuyBuildDwelling1 &&
-		Dialog::OK == DialogBuyBuilding(DWELLING_MONSTER1, true))
-	{
-		return DWELLING_MONSTER1;
-	}
+        if(le.MouseCursor(dwelling1.GetArea()) && dwelling1.QueueEventProcessing()) { return dwelling1(); }
+        else
+        if(le.MouseCursor(dwelling2.GetArea()) && dwelling2.QueueEventProcessing()) { return dwelling2(); }
+        else
+        if(le.MouseCursor(dwelling3.GetArea()) && dwelling3.QueueEventProcessing()) { return dwelling3(); }
+        else
+        if(le.MouseCursor(dwelling4.GetArea()) && dwelling4.QueueEventProcessing()) { return dwelling4(); }
+        else
+        if(le.MouseCursor(dwelling5.GetArea()) && dwelling5.QueueEventProcessing()) { return dwelling5(); }
+        else
+        if(le.MouseCursor(dwelling6.GetArea()) && dwelling6.QueueEventProcessing()) { return dwelling6(); }
 	else
-	if(!((allowUpgrade2 ? DWELLING_UPGRADE2 : DWELLING_MONSTER2) & building) && le.MouseClickLeft(rectDwelling2) && allowBuyBuildDwelling2 &&
-		Dialog::OK == DialogBuyBuilding(allowUpgrade2 ? DWELLING_UPGRADE2 : DWELLING_MONSTER2, true))
-	{
-		return allowUpgrade2 ? DWELLING_UPGRADE2 : DWELLING_MONSTER2;
-	}
+        if(le.MouseCursor(buildingMageGuild.GetArea()) && buildingMageGuild.QueueEventProcessing()) { return buildingMageGuild(); }
 	else
-	if(!((allowUpgrade3 ? DWELLING_UPGRADE3 : DWELLING_MONSTER3) & building) && le.MouseClickLeft(rectDwelling3) && allowBuyBuildDwelling3 &&
-		Dialog::OK == DialogBuyBuilding(allowUpgrade3 ? DWELLING_UPGRADE3 : DWELLING_MONSTER3, true))
-	{
-		return allowUpgrade3 ? DWELLING_UPGRADE3 : DWELLING_MONSTER3;
-	}
+        if(le.MouseCursor(buildingTavern.GetArea()) && buildingTavern.QueueEventProcessing()) { return BUILD_TAVERN; }
 	else
-	if(!((allowUpgrade4 ? DWELLING_UPGRADE4 : DWELLING_MONSTER4) & building) && le.MouseClickLeft(rectDwelling4) && allowBuyBuildDwelling4 &&
-		Dialog::OK == DialogBuyBuilding(allowUpgrade4 ? DWELLING_UPGRADE4 : DWELLING_MONSTER4, true))
-	{
-		return allowUpgrade4 ? DWELLING_UPGRADE4 : DWELLING_MONSTER4;
-	}
+        if(le.MouseCursor(buildingThievesGuild.GetArea()) && buildingThievesGuild.QueueEventProcessing()) { return BUILD_THIEVESGUILD; }
 	else
-	if(!((allowUpgrade5 ? DWELLING_UPGRADE5 : DWELLING_MONSTER5) & building) && le.MouseClickLeft(rectDwelling5) && allowBuyBuildDwelling5 &&
-		Dialog::OK == DialogBuyBuilding(allowUpgrade5 ? DWELLING_UPGRADE5 : DWELLING_MONSTER5, true))
-	{
-		return allowUpgrade5 ? DWELLING_UPGRADE5 : DWELLING_MONSTER5;
-	}
+        if(le.MouseCursor(buildingShipyard.GetArea()) && buildingShipyard.QueueEventProcessing()) { return BUILD_SHIPYARD; }
 	else
-	if(!((allowUpgrade7 ? DWELLING_UPGRADE7 : (allowUpgrade6 ? DWELLING_UPGRADE6 : DWELLING_MONSTER6)) & building) && le.MouseClickLeft(rectDwelling6) && allowBuyBuildDwelling6 &&
-		Dialog::OK == DialogBuyBuilding(allowUpgrade7 ? DWELLING_UPGRADE7 : (allowUpgrade6 ? DWELLING_UPGRADE6 : DWELLING_MONSTER6), true))
-	{
-		return allowUpgrade7 ? DWELLING_UPGRADE7 : (allowUpgrade6 ? DWELLING_UPGRADE6 : DWELLING_MONSTER6);
-	}
+        if(le.MouseCursor(buildingStatue.GetArea()) && buildingStatue.QueueEventProcessing()) { return BUILD_STATUE; }
 	else
-	if(!(BUILD_MAGEGUILD5 & building) && le.MouseClickLeft(rectMageGuild) && allowBuyBuildMageGuild && Dialog::OK == DialogBuyBuilding(nextLevelMageGuild, true))
-	{
-		return nextLevelMageGuild;
-	}
+        if(le.MouseCursor(buildingMarketplace.GetArea()) && buildingMarketplace.QueueEventProcessing()) { return BUILD_MARKETPLACE; }
 	else
-	if(!(BUILD_TAVERN & building) && (Race::NECR != race || Settings::Get().Modes(Settings::PRICELOYALTY)) &&
-	    le.MouseClickLeft(rectTavern) && allowBuyBuildTavern && Dialog::OK == DialogBuyBuilding(BUILD_TAVERN, true))
-	{
-		return BUILD_TAVERN;
-	}
+        if(le.MouseCursor(buildingWell.GetArea()) && buildingWell.QueueEventProcessing()) { return BUILD_WELL; }
 	else
-	if(!(BUILD_THIEVESGUILD & building) && le.MouseClickLeft(rectThievesGuild) && allowBuyBuildThievesGuild && Dialog::OK == DialogBuyBuilding(BUILD_THIEVESGUILD, true))
-	{
-		return BUILD_THIEVESGUILD;
-	}
+        if(le.MouseCursor(buildingWel2.GetArea()) && buildingWel2.QueueEventProcessing()) { return BUILD_WEL2; }
 	else
-	if(!(BUILD_SHIPYARD & building) && le.MouseClickLeft(rectShipyard) && allowBuyBuildShipyard && Dialog::OK == DialogBuyBuilding(BUILD_SHIPYARD, true))
-	{
-		return BUILD_SHIPYARD;
-	}
+        if(le.MouseCursor(buildingSpec.GetArea()) && buildingSpec.QueueEventProcessing()) { return BUILD_SPEC; }
 	else
-	if(!(BUILD_STATUE & building) && le.MouseClickLeft(rectStatue) && allowBuyBuildStatue && Dialog::OK == DialogBuyBuilding(BUILD_STATUE, true))
-	{
-		return BUILD_STATUE;
-	}
+        if(le.MouseCursor(buildingLTurret.GetArea()) && buildingLTurret.QueueEventProcessing()) { return BUILD_LEFTTURRET; }
 	else
-	if(!(BUILD_MARKETPLACE & building) && le.MouseClickLeft(rectMarketplace) && allowBuyBuildMarketplace && Dialog::OK == DialogBuyBuilding(BUILD_MARKETPLACE, true))
-	{
-		return BUILD_MARKETPLACE;
-	}
+        if(le.MouseCursor(buildingRTurret.GetArea()) && buildingRTurret.QueueEventProcessing()) { return BUILD_RIGHTTURRET; }
 	else
-	if(!(BUILD_WELL & building) && le.MouseClickLeft(rectWell) && allowBuyBuildWell && Dialog::OK == DialogBuyBuilding(BUILD_WELL, true))
-	{
-		return BUILD_WELL;
-	}
+        if(le.MouseCursor(buildingMoat.GetArea()) && buildingMoat.QueueEventProcessing()) { return BUILD_MOAT; }
 	else
-	if(!(BUILD_WEL2 & building) && le.MouseClickLeft(rectWel2) && allowBuyBuildWel2 && Dialog::OK == DialogBuyBuilding(BUILD_WEL2, true))
-	{
-		return BUILD_WEL2;
-	}
-	else
-	if(!(BUILD_SPEC & building) && le.MouseClickLeft(rectSpec) && allowBuyBuildSpec && Dialog::OK == DialogBuyBuilding(BUILD_SPEC, true))
-	{
-		return BUILD_SPEC;
-	}
-	else
-	if(!(BUILD_LEFTTURRET & building) && le.MouseClickLeft(rectLTurret) && allowBuyBuildLTurret && Dialog::OK == DialogBuyBuilding(BUILD_LEFTTURRET, true))
-	{
-		return BUILD_LEFTTURRET;
-	}
-	else
-	if(!(BUILD_RIGHTTURRET & building) && le.MouseClickLeft(rectRTurret) && allowBuyBuildRTurret && Dialog::OK == DialogBuyBuilding(BUILD_RIGHTTURRET, true))
-	{
-		return BUILD_RIGHTTURRET;
-	}
-	else
-	if(!(BUILD_MOAT & building) && le.MouseClickLeft(rectMoat) && allowBuyBuildMoat && Dialog::OK == DialogBuyBuilding(BUILD_MOAT, true))
-	{
-		return BUILD_MOAT;
-	}
-	else
-	if(!(BUILD_CAPTAIN & building) && le.MouseClickLeft(rectCaptain) && allowBuyBuildCaptain && Dialog::OK == DialogBuyBuilding(BUILD_CAPTAIN, true))
+	if(!(BUILD_CAPTAIN & building) && le.MouseClickLeft(rectCaptain) && allowBuyBuildCaptain && Dialog::OK == DialogBuyCaptain(true))
 	{
 		return BUILD_CAPTAIN;
 	}
@@ -987,43 +606,13 @@ Castle::building_t Castle::OpenTown(void)
 
 
 	// right
-	if(le.MousePressRight(rectDwelling1)) PressRightAction(DWELLING_MONSTER1);
-	else
-	if(le.MousePressRight(rectDwelling2)) PressRightAction(allowUpgrade2 ? DWELLING_UPGRADE2 : DWELLING_MONSTER2);
-	else
-	if(le.MousePressRight(rectDwelling3)) PressRightAction(allowUpgrade3 ? DWELLING_UPGRADE3 : DWELLING_MONSTER3);
-	else
-	if(le.MousePressRight(rectDwelling4)) PressRightAction(allowUpgrade4 ? DWELLING_UPGRADE4 : DWELLING_MONSTER4);
-	else
-	if(le.MousePressRight(rectDwelling5)) PressRightAction(allowUpgrade5 ? DWELLING_UPGRADE5 : DWELLING_MONSTER5);
-	else
-	if(le.MousePressRight(rectDwelling6)) PressRightAction(allowUpgrade7 ? DWELLING_UPGRADE7 : (allowUpgrade6 ? DWELLING_UPGRADE6 : DWELLING_MONSTER6));
-	else
-	if(le.MousePressRight(rectMageGuild)) PressRightAction(nextLevelMageGuild);
-	else
-	if(le.MousePressRight(rectTavern)) PressRightAction(BUILD_TAVERN);
-	else
-	if(le.MousePressRight(rectThievesGuild)) PressRightAction(BUILD_THIEVESGUILD);
-	else
-	if(le.MousePressRight(rectShipyard)) PressRightAction(BUILD_SHIPYARD);
-	else
-	if(le.MousePressRight(rectStatue)) PressRightAction(BUILD_STATUE);
-	else
-	if(le.MousePressRight(rectMarketplace)) PressRightAction(BUILD_MARKETPLACE);
-	else
-	if(le.MousePressRight(rectWell)) PressRightAction(BUILD_WELL);
-	else
-	if(le.MousePressRight(rectWel2)) PressRightAction(BUILD_WEL2);
-	else
-	if(le.MousePressRight(rectSpec)) PressRightAction(BUILD_SPEC);
-	else
-	if(le.MousePressRight(rectLTurret)) PressRightAction(BUILD_LEFTTURRET);
-	else
-	if(le.MousePressRight(rectRTurret)) PressRightAction(BUILD_RIGHTTURRET);
-	else
-	if(le.MousePressRight(rectMoat)) PressRightAction(BUILD_MOAT);
-	else
-	if(le.MousePressRight(rectCaptain)) PressRightAction(BUILD_CAPTAIN);
+	if(le.MousePressRight(rectCaptain))
+	{
+	    if(BUILD_CAPTAIN & building)
+		Dialog::Message(GetStringBuilding(BUILD_CAPTAIN, race), GetDescriptionBuilding(BUILD_CAPTAIN, race), Font::BIG);
+	    else
+		DialogBuyCaptain(false);
+	}
         else
 	if(le.MousePressRight(rectSpreadArmyFormat)) Dialog::Message(_("Spread Formation"), descriptionSpreadArmyFormat, Font::BIG);
         else
@@ -1034,101 +623,59 @@ Castle::building_t Castle::OpenTown(void)
 	if(hero2 && le.MousePressRight(rectHero2)){ hero2->OpenDialog(true); cursor.Show(); display.Flip(); }
 
         // status info
-	if(le.MouseCursor(rectDwelling1))
-	    ShowBuildMessage(statusBar, DWELLING_MONSTER1 & building, stringDwelling1, *this, DWELLING_MONSTER1);
+	if(le.MouseCursor(dwelling1.GetArea()))
+	    ShowBuildMessage(statusBar, isBuild(dwelling1()), dwelling1.GetName(), *this, dwelling1());
 	else
-	if(le.MouseCursor(rectDwelling2))
-	{
-	    if(isBuild(DWELLING_MONSTER2) && allowUpgrade2)
-		ShowBuildMessage(statusBar, isBuild(DWELLING_UPGRADE2), stringDwelling2, *this, DWELLING_UPGRADE2);
-	    else
-		ShowBuildMessage(statusBar, isBuild(DWELLING_MONSTER2), stringDwelling2, *this, DWELLING_MONSTER2);
-	}
+	if(le.MouseCursor(dwelling2.GetArea()))
+	    ShowBuildMessage(statusBar, isBuild(dwelling2()), dwelling2.GetName(), *this, dwelling2());
 	else
-	if(le.MouseCursor(rectDwelling3))
-	{
-	    if(isBuild(DWELLING_MONSTER3) && allowUpgrade3)
-		ShowBuildMessage(statusBar, isBuild(DWELLING_UPGRADE3), stringDwelling3, *this, DWELLING_UPGRADE3);
-	    else
-		ShowBuildMessage(statusBar, isBuild(DWELLING_MONSTER3), stringDwelling3, *this, DWELLING_MONSTER3);
-	}
+	if(le.MouseCursor(dwelling3.GetArea()))
+	    ShowBuildMessage(statusBar, isBuild(dwelling3()), dwelling3.GetName(), *this, dwelling3());
 	else
-	if(le.MouseCursor(rectDwelling4))
-	{
-	    if(isBuild(DWELLING_MONSTER4) && allowUpgrade4)
-		ShowBuildMessage(statusBar, isBuild(DWELLING_UPGRADE4), stringDwelling4, *this, DWELLING_UPGRADE4);
-	    else
-		ShowBuildMessage(statusBar, isBuild(DWELLING_MONSTER4), stringDwelling4, *this, DWELLING_MONSTER4);
-	}
+	if(le.MouseCursor(dwelling4.GetArea()))
+	    ShowBuildMessage(statusBar, isBuild(dwelling4()), dwelling4.GetName(), *this, dwelling4());
 	else
-	if(le.MouseCursor(rectDwelling5))
-	{
-	    if(isBuild(DWELLING_MONSTER5) && allowUpgrade5)
-		ShowBuildMessage(statusBar, isBuild(DWELLING_UPGRADE5), stringDwelling5, *this, DWELLING_UPGRADE5);
-	    else
-		ShowBuildMessage(statusBar, isBuild(DWELLING_MONSTER5), stringDwelling5, *this, DWELLING_MONSTER5);
-	}
+	if(le.MouseCursor(dwelling5.GetArea()))
+	    ShowBuildMessage(statusBar, isBuild(dwelling5()), dwelling5.GetName(), *this, dwelling5());
 	else
-	if(le.MouseCursor(rectDwelling6))
-	{
-	    if(isBuild(DWELLING_MONSTER6) && allowUpgrade6)
-	    {
-		if(isBuild(DWELLING_UPGRADE6) && allowUpgrade7)
-		    ShowBuildMessage(statusBar, isBuild(DWELLING_UPGRADE7), stringDwelling6, *this, DWELLING_UPGRADE7);
-		else
-		    ShowBuildMessage(statusBar, isBuild(DWELLING_UPGRADE6), stringDwelling6, *this, DWELLING_UPGRADE6);
-	    }
-	    else
-		    ShowBuildMessage(statusBar, isBuild(DWELLING_MONSTER6), stringDwelling6, *this, DWELLING_MONSTER6);
-	}
+	if(le.MouseCursor(dwelling6.GetArea()))
+	    ShowBuildMessage(statusBar, isBuild(dwelling6()), dwelling6.GetName(), *this, dwelling6());
 	else
-	if(le.MouseCursor(rectMageGuild))
-	{
-	    switch(GetLevelMageGuild())
-	    {
-		case 0: ShowBuildMessage(statusBar, false, stringMageGuild, *this, BUILD_MAGEGUILD1); break;
-		case 1: ShowBuildMessage(statusBar, false, stringMageGuild, *this, BUILD_MAGEGUILD2); break;
-                case 2: ShowBuildMessage(statusBar, false, stringMageGuild, *this, BUILD_MAGEGUILD3); break;
-                case 3: ShowBuildMessage(statusBar, false, stringMageGuild, *this, BUILD_MAGEGUILD4); break;
-                case 4: ShowBuildMessage(statusBar, false, stringMageGuild, *this, BUILD_MAGEGUILD5); break;
-                case 5: ShowBuildMessage(statusBar, true,  stringMageGuild, *this, BUILD_MAGEGUILD5); break;
-
-		default: break;
-	    }
-	}
+	if(le.MouseCursor(buildingMageGuild.GetArea()))
+	    ShowBuildMessage(statusBar, isBuild(buildingMageGuild()), buildingMageGuild.GetName(), *this, buildingMageGuild());
 	else
-	if((Race::NECR != race || Settings::Get().Modes(Settings::PRICELOYALTY)) && le.MouseCursor(rectTavern))
-	    ShowBuildMessage(statusBar, BUILD_TAVERN & building, stringTavern, *this, BUILD_TAVERN);
+	if(le.MouseCursor(buildingTavern.GetArea()) && !buildingTavern.IsDisable())
+	    ShowBuildMessage(statusBar, isBuild(BUILD_TAVERN), buildingTavern.GetName(), *this, BUILD_TAVERN);
 	else
-	if(le.MouseCursor(rectThievesGuild))
-	    ShowBuildMessage(statusBar, BUILD_THIEVESGUILD & building, stringThievesGuild, *this, BUILD_THIEVESGUILD);
+	if(le.MouseCursor(buildingThievesGuild.GetArea()))
+	    ShowBuildMessage(statusBar, isBuild(BUILD_THIEVESGUILD), buildingThievesGuild.GetName(), *this, BUILD_THIEVESGUILD);
 	else
-	if(le.MouseCursor(rectShipyard))
-	    ShowBuildMessage(statusBar, BUILD_SHIPYARD & building, stringShipyard, *this, BUILD_SHIPYARD);
+	if(le.MouseCursor(buildingShipyard.GetArea()))
+	    ShowBuildMessage(statusBar, isBuild(BUILD_SHIPYARD), buildingTavern.GetName(), *this, BUILD_SHIPYARD);
 	else
-	if(le.MouseCursor(rectStatue))
-	    ShowBuildMessage(statusBar, BUILD_STATUE & building, stringStatue, *this, BUILD_STATUE);
+	if(le.MouseCursor(buildingStatue.GetArea()))
+	    ShowBuildMessage(statusBar, isBuild(BUILD_STATUE), buildingStatue.GetName(), *this, BUILD_STATUE);
 	else
-	if(le.MouseCursor(rectMarketplace))
-	    ShowBuildMessage(statusBar, BUILD_MARKETPLACE & building, stringMarketplace, *this, BUILD_MARKETPLACE);
+	if(le.MouseCursor(buildingMarketplace.GetArea()))
+	    ShowBuildMessage(statusBar, isBuild(BUILD_MARKETPLACE), buildingMarketplace.GetName(), *this, BUILD_MARKETPLACE);
 	else
-	if(le.MouseCursor(rectWell))
-	    ShowBuildMessage(statusBar, BUILD_WELL & building, stringWell, *this, BUILD_WELL);
+	if(le.MouseCursor(buildingWell.GetArea()))
+	    ShowBuildMessage(statusBar, isBuild(BUILD_WELL), buildingWell.GetName(), *this, BUILD_WELL);
 	else
-	if(le.MouseCursor(rectWel2))
-	    ShowBuildMessage(statusBar, BUILD_WEL2 & building, stringWel2, *this, BUILD_WEL2);
+	if(le.MouseCursor(buildingWel2.GetArea()))
+	    ShowBuildMessage(statusBar, isBuild(BUILD_WELL), buildingWel2.GetName(), *this, BUILD_WEL2);
 	else
-	if(le.MouseCursor(rectSpec))
-	    ShowBuildMessage(statusBar, BUILD_SPEC & building, stringSpec, *this, BUILD_SPEC);
+	if(le.MouseCursor(buildingSpec.GetArea()))
+	    ShowBuildMessage(statusBar, isBuild(BUILD_SPEC), buildingSpec.GetName(), *this, BUILD_SPEC);
 	else
-	if(le.MouseCursor(rectLTurret))
-	    ShowBuildMessage(statusBar, BUILD_LEFTTURRET & building, stringLTurret, *this, BUILD_LEFTTURRET);
+	if(le.MouseCursor(buildingLTurret.GetArea()))
+	    ShowBuildMessage(statusBar, isBuild(BUILD_LEFTTURRET), buildingLTurret.GetName(), *this, BUILD_LEFTTURRET);
 	else
-	if(le.MouseCursor(rectRTurret))
-	    ShowBuildMessage(statusBar, BUILD_RIGHTTURRET & building, stringRTurret, *this, BUILD_RIGHTTURRET);
+	if(le.MouseCursor(buildingRTurret.GetArea()))
+	    ShowBuildMessage(statusBar, isBuild(BUILD_RIGHTTURRET), buildingRTurret.GetName(), *this, BUILD_RIGHTTURRET);
 	else
-	if(le.MouseCursor(rectMoat))
-	    ShowBuildMessage(statusBar, BUILD_MOAT & building, stringMoat, *this, BUILD_MOAT);
+	if(le.MouseCursor(buildingMoat.GetArea()))
+	    ShowBuildMessage(statusBar, isBuild(BUILD_MOAT), buildingMoat.GetName(), *this, BUILD_MOAT);
 	else
 	if(le.MouseCursor(rectCaptain))
 	    ShowBuildMessage(statusBar, BUILD_CAPTAIN & building, stringCaptain, *this, BUILD_CAPTAIN);
@@ -1173,52 +720,4 @@ Castle::building_t Castle::OpenTown(void)
     }
 
     return BUILD_NOTHING;
-}
-
-void Castle::PressRightAction(building_t b)
-{
-    bool complete = true;
-
-    switch(b)
-    {
-	case BUILD_TAVERN:
-	    if(Race::NECR == race && !Settings::Get().Modes(Settings::PRICELOYALTY)) return;
-	    break;
-
-	case BUILD_MAGEGUILD1:
-	case BUILD_MAGEGUILD2:
-	case BUILD_MAGEGUILD3:
-	case BUILD_MAGEGUILD4:
-	    complete = false;
-	    break;
-
-	default: break;
-    }
-
-    std::string building_description;
-    
-    if((DWELLING_MONSTER1 |
-	DWELLING_MONSTER2 |
-	DWELLING_MONSTER3 |
-	DWELLING_MONSTER4 |
-	DWELLING_MONSTER5 |
-	DWELLING_MONSTER6 |
-	DWELLING_UPGRADE2 |
-	DWELLING_UPGRADE3 |
-	DWELLING_UPGRADE4 |
-	DWELLING_UPGRADE5 |
-	DWELLING_UPGRADE6 |
-	DWELLING_UPGRADE7) & b)
-    {
-	building_description = _("The %{building} produces %{monster}.");
-	String::Replace(building_description, "%{building}", GetStringBuilding(b, race));
-	String::Replace(building_description, "%{monster}", Monster(race, b).GetMultiName());
-    }
-    else
-	building_description = GetDescriptionBuilding(b, race);
-
-    if(b & building && complete)
-	Dialog::Message(GetStringBuilding(b, race), building_description, Font::BIG);
-    else
-	DialogBuyBuilding(b, false);
 }

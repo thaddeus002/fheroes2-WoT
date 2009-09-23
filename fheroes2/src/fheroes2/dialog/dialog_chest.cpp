@@ -45,40 +45,36 @@ bool Dialog::SelectGoldOrExp(const std::string &header, const std::string &messa
     TextBox box1(header, Font::BIG, BOXAREA_WIDTH);
     TextBox box2(message, Font::BIG, BOXAREA_WIDTH);
 
-    Box box((header.size() ? box1.h() + 10 : 0) + (message.size() ? box2.h() + 10 : 0) + sprite_expr.h(), true);
+    Text text;
+    std::string str;
+    String::AddInt(str, gold);
+    text.Set(str, Font::SMALL);
+
+    const u8 spacer = Settings::Get().PocketPC() ? 5 : 10;
+
+    Box box(box1.h() + spacer + box2.h() + spacer + sprite_expr.h() + 2 + text.h(), true);
 
     pt.x = box.GetArea().x + box.GetArea().w / 2 - AGG::GetICN(system, 9).w() - 20;
-    pt.y = box.GetArea().y + box.GetArea().h + BUTTON_HEIGHT - AGG::GetICN(system, 5).h();
+    pt.y = box.GetArea().y + box.GetArea().h - AGG::GetICN(system, 5).h();
     Button button_yes(pt, system, 5, 6);
 
     pt.x = box.GetArea().x + box.GetArea().w / 2 + 20;
-    pt.y = box.GetArea().y + box.GetArea().h + BUTTON_HEIGHT - AGG::GetICN(system, 7).h();
+    pt.y = box.GetArea().y + box.GetArea().h - AGG::GetICN(system, 7).h();
     Button button_no(pt, system, 7, 8);
 
     Rect pos = box.GetArea();
-    Text text;
-    std::string str;
 
-    if(header.size())
-    {
-	box1.Blit(pos);
-        pos.y += box1.h() + 20;
-    }
+    if(header.size()) box1.Blit(pos);
+    pos.y += box1.h() + spacer;
 
-    if(message.size())
-    {
-        box2.Blit(pos);
-        pos.y += box2.h() + 20;
-    }
+    if(message.size()) box2.Blit(pos);
+    pos.y += box2.h() + spacer;
 
     pos.y += sprite_expr.h();
     // sprite1
     pos.x = box.GetArea().x + box.GetArea().w / 2 - sprite_gold.w() - 30;
     display.Blit(sprite_gold, pos.x, pos.y - sprite_gold.h());
     // text
-    str.clear();
-    String::AddInt(str, gold);
-    text.Set(str, Font::SMALL);
     text.Blit(pos.x + (sprite_gold.w() - text.w()) / 2, pos.y + 2);
 
     // sprite2

@@ -341,7 +341,7 @@ Rect Castle::GetCoordBuilding(building_t building, const Point & pt)
 }
 
 /* animation building */
-void Castle::RedrawAnimationBuilding(const Point & dst_pt, const building_t build)
+void Castle::RedrawAnimationBuilding(const Point & dst_pt, u32 build)
 {
     Display & display = Display::Get();
     Cursor & cursor = Cursor::Get();
@@ -495,7 +495,7 @@ void Castle::RedrawAllBuilding(const Point & dst_pt, const std::vector<building_
     // redraw builds
     for(u8 ii = 0; ii < orders.size(); ++ii)
     {
-	const building_t & build = orders[ii];
+	const u32 & build = orders[ii];
 
 	if(! isBuild(build)) continue;
 
@@ -505,22 +505,18 @@ void Castle::RedrawAllBuilding(const Point & dst_pt, const std::vector<building_
     ++ticket;
 }
 
-void Castle::RedrawBuilding(const building_t build, const Point & dst_pt, const u32 ticket)
+void Castle::RedrawBuilding(u32 build2, const Point & dst_pt, const u32 ticket)
 {
     Display & display = Display::Get();
-
-    building_t build2 = build;
 
 	// correct build
 	switch(build2)
 	{
-	    case DWELLING_MONSTER2: if(DWELLING_UPGRADE2 & building) build2 = DWELLING_UPGRADE2; break;
-	    case DWELLING_MONSTER3: if(DWELLING_UPGRADE3 & building) build2 = DWELLING_UPGRADE3; break;
-	    case DWELLING_MONSTER4: if(DWELLING_UPGRADE4 & building) build2 = DWELLING_UPGRADE4; break;
-	    case DWELLING_MONSTER5: if(DWELLING_UPGRADE5 & building) build2 = DWELLING_UPGRADE5; break;
-	    case DWELLING_MONSTER6: if(DWELLING_UPGRADE7 & building) build2 = DWELLING_UPGRADE7;
-				    else
-				    if(DWELLING_UPGRADE6 & building) build2 = DWELLING_UPGRADE6; break;
+	    case DWELLING_MONSTER2:
+	    case DWELLING_MONSTER3:
+	    case DWELLING_MONSTER4:
+	    case DWELLING_MONSTER5:
+	    case DWELLING_MONSTER6: build2 = GetActualDwelling(build2); break;
 
             case BUILD_MAGEGUILD1:  if(BUILD_MAGEGUILD5 & building) build2 = BUILD_MAGEGUILD5;
         			    else
