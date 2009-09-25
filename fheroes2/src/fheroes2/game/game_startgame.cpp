@@ -89,6 +89,7 @@ namespace Game
     void KeyPress_b(void);
     void KeyPress_w(void);
     void KeyPress_c(void);
+    void KeyPress_a(void);
 
     void NewWeekDialog(void);
     void ShowEventDay(void);
@@ -824,6 +825,8 @@ Game::menu_t Game::HumanTurn(void)
 	{
 	    // exit
 	    case KEY_ESCAPE:	KeyPress_ESC(res); break;
+    	    // show/hide control panel
+	    case KEY_a:		KeyPress_a(); break;
     	    // end turn
 	    case KEY_e:		KeyPress_e(res); break;
     	    // next hero
@@ -1681,6 +1684,25 @@ void Game::KeyPress_c(void)
 	    }
 	    conf.SetModes(Settings::SHOWICONS);
 	    Interface::Basic::Get().SetRedraw(REDRAW_ICONS);
+	}
+    }
+}
+
+void Game::KeyPress_a(void)
+{
+    Settings & conf = Settings::Get();
+
+    if(conf.HideInterface())
+    {
+	if(conf.ShowControlPanel())
+	{
+	    conf.ResetModes(Settings::SHOWCPANEL);
+	    Interface::Basic::Get().SetRedraw(REDRAW_GAMEAREA);
+	}
+	else
+	{
+	    conf.SetModes(Settings::SHOWCPANEL);
+	    Interface::Basic::Get().SetRedraw(REDRAW_GAMEAREA);
 	}
     }
 }

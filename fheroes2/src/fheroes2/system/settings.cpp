@@ -158,11 +158,11 @@ bool Settings::Read(const std::string & filename)
     if(Modes(POCKETPC))
     {
 	SetModes(HIDEINTERFACE);
-	SetModes(SHOWCPANEL);
     }
 
     if(Modes(HIDEINTERFACE))
     {
+       SetModes(SHOWCPANEL);
        ResetModes(SHOWRADAR);
        ResetModes(SHOWICONS);
        ResetModes(SHOWBUTTONS);
@@ -332,7 +332,7 @@ bool Settings::EvilInterface(void) const { return Modes(EVILINTERFACE); }
 
 bool Settings::HideInterface(void) const { return Modes(HIDEINTERFACE); }
 
-bool Settings::ShowControlPanel(void) const { return (Modes(POCKETPC) || Modes(SHOWCPANEL)); }
+bool Settings::ShowControlPanel(void) const { return Modes(SHOWCPANEL); }
 bool Settings::ShowRadar(void) const { return Modes(SHOWRADAR); }
 bool Settings::ShowIcons(void) const { return Modes(SHOWICONS); }
 bool Settings::ShowButtons(void) const { return Modes(SHOWBUTTONS); }

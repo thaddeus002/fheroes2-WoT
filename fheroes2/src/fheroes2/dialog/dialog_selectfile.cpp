@@ -332,7 +332,7 @@ void RedrawFileListSimple(const Point & dst, const std::string & header, const s
 
     Text text(header, Font::BIG);
     text.Blit(dst.x + 175 - text.w() / 2, dst.y + 30);
-
+    
     u16 oy = 60;
     char short_date[15];
          short_date[14] = 0;
@@ -357,7 +357,7 @@ void RedrawFileListSimple(const Point & dst, const std::string & header, const s
     if(filename.size())
     {
 	text.Set(filename, Font::BIG);
-	text.Blit(dst.x + 175 - text.w() / 2, dst.y + 289);
+	text.Blit(dst.x + 175 - text.w() / 2, Settings::Get().PocketPC() ? dst.y + 148 : dst.y + 289);
     }
 }
 

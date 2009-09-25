@@ -46,7 +46,7 @@ Interface::Basic::Basic() : gameArea(GameArea::Get()), radar(Radar::Get()),
     if(Settings::Get().HideInterface())
     {
         iconsPanel.SetCount(2);
-	radar.SetPos(px - BORDERWIDTH, 0);
+	radar.SetPos(BORDERWIDTH, BORDERWIDTH);
 	iconsPanel.SetPos(px - BORDERWIDTH, radar.GetArea().y + radar.GetArea().h);
 	buttonsArea.SetPos(px - BORDERWIDTH, iconsPanel.GetArea().y + iconsPanel.GetArea().h);
 	statusWindow.SetPos(px - BORDERWIDTH, buttonsArea.GetArea().y + buttonsArea.GetArea().h);

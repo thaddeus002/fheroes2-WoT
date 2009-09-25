@@ -35,26 +35,51 @@ namespace Game
 
 Interface::ControlPanel::ControlPanel()
 {
-    sf_area = Surface(AGG::GetICN(ICN::CELLWIN, 11));
-    sf_area.Blit(AGG::GetICN(ICN::REQUESTS, 31),  2, 3);
-    sf_area.Blit(AGG::GetICN(ICN::REQUESTS, 32), 20, 3);
-    sf_area.Blit(AGG::GetICN(ICN::REQUESTS, 34), 38, 3);
-    sf_area.Blit(AGG::GetICN(ICN::REQUESTS, 35), 56, 3);
-    sf_area.Blit(AGG::GetICN(ICN::REQUESTS, 39), 74, 3);
-    w = sf_area.w();
-    h = sf_area.h();
-    rt_radr.w = 17;
-    rt_radr.h = 17;
-    rt_icon.w = 17;
-    rt_icon.h = 17;
-    rt_bttn.w = 17;
-    rt_bttn.h = 17;
-    rt_stat.w = 17;
-    rt_stat.h = 17;
-    rt_quit.w = 17;
-    rt_quit.h = 17;
-    AGG::FreeObject(ICN::REQUESTS);
-    AGG::FreeObject(ICN::CELLWIN);
+    if(Display::Get().h() > 240)
+    {
+	sf_area = Surface(180, 36);
+	ICN::icn_t icn = Settings::Get().EvilInterface() ? ICN::ADVEBTNS : ICN::ADVBTNS;
+	sf_area.Blit(AGG::GetICN(icn, 4),  0, 0);
+	sf_area.Blit(AGG::GetICN(icn, 0),  36, 0);
+	sf_area.Blit(AGG::GetICN(icn, 12), 72, 0);
+	sf_area.Blit(AGG::GetICN(icn, 10), 108, 0);
+	sf_area.Blit(AGG::GetICN(icn, 8),  144, 0);
+	w = sf_area.w();
+	h = sf_area.h();
+	rt_radr.w = 36;
+	rt_radr.h = 36;
+	rt_icon.w = 36;
+	rt_icon.h = 36;
+	rt_bttn.w = 36;
+	rt_bttn.h = 36;
+	rt_stat.w = 36;
+	rt_stat.h = 36;
+	rt_quit.w = 36;
+	rt_quit.h = 36;
+    }
+    else
+    {
+	sf_area = Surface(AGG::GetICN(ICN::CELLWIN, 11));
+	sf_area.Blit(AGG::GetICN(ICN::REQUESTS, 31),  2, 3);
+	sf_area.Blit(AGG::GetICN(ICN::REQUESTS, 32), 20, 3);
+	sf_area.Blit(AGG::GetICN(ICN::REQUESTS, 34), 38, 3);
+	sf_area.Blit(AGG::GetICN(ICN::REQUESTS, 35), 56, 3);
+	sf_area.Blit(AGG::GetICN(ICN::REQUESTS, 39), 74, 3);
+	w = sf_area.w();
+	h = sf_area.h();
+	rt_radr.w = 17;
+	rt_radr.h = 17;
+	rt_icon.w = 17;
+	rt_icon.h = 17;
+	rt_bttn.w = 17;
+	rt_bttn.h = 17;
+	rt_stat.w = 17;
+	rt_stat.h = 17;
+	rt_quit.w = 17;
+	rt_quit.h = 17;
+	AGG::FreeObject(ICN::REQUESTS);
+	AGG::FreeObject(ICN::CELLWIN);
+    }
 }
 
 Interface::ControlPanel & Interface::ControlPanel::Get(void)
@@ -72,16 +97,32 @@ void Interface::ControlPanel::SetPos(s16 ox, s16 oy)
 {
     x = ox;
     y = oy;
-    rt_radr.x = x + 2;
-    rt_radr.y = y + 3;
-    rt_icon.x = x + 20;
-    rt_icon.y = y + 3;
-    rt_bttn.x = x + 38;
-    rt_bttn.y = y + 3;
-    rt_stat.x = x + 56;
-    rt_stat.y = y + 3;
-    rt_quit.x = x + 74;
-    rt_quit.y = y + 3;
+    if(Display::Get().h() > 240)
+    {
+	rt_radr.x = x;
+	rt_radr.y = y;
+	rt_icon.x = x + 36;
+	rt_icon.y = y;
+	rt_bttn.x = x + 72;
+	rt_bttn.y = y;
+	rt_stat.x = x + 108;
+	rt_stat.y = y;
+	rt_quit.x = x + 144;
+	rt_quit.y = y;
+    }
+    else
+    {
+	rt_radr.x = x + 2;
+	rt_radr.y = y + 3;
+	rt_icon.x = x + 20;
+	rt_icon.y = y + 3;
+	rt_bttn.x = x + 38;
+	rt_bttn.y = y + 3;
+	rt_stat.x = x + 56;
+	rt_stat.y = y + 3;
+	rt_quit.x = x + 74;
+	rt_quit.y = y + 3;
+    }
 }
 
 void Interface::ControlPanel::Redraw(void)

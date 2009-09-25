@@ -32,6 +32,7 @@
 #include "world.h"
 #include "selectarmybar.h"
 #include "buildinginfo.h"
+#include "portrait.h"
 #include "pocketpc.h"
 
 class DwellingBar : protected Rect
@@ -261,7 +262,6 @@ screen_t CastleOpenDialog2(Castle & castle)
 {
     Cursor & cursor = Cursor::Get();
     Display & display = Display::Get();
-//    Settings & conf = Settings::Get();
     LocalEvent & le = LocalEvent::Get();
 
     cursor.Hide();
@@ -275,7 +275,6 @@ screen_t CastleOpenDialog2(Castle & castle)
     frameborder.Redraw();
 
     const Rect & dst_rt = frameborder.GetArea();
-    //const Sprite & backSprite = AGG::GetICN(ICN::SWAPWIN, 0);
     const Sprite & background = AGG::GetICN(ICN::STONEBAK, 0);
     display.Blit(background, Rect(0, 0, window_w, window_h), dst_rt);
 
@@ -358,7 +357,6 @@ screen_t CastleOpenDialog3(Castle & castle)
 {
     Cursor & cursor = Cursor::Get();
     Display & display = Display::Get();
-//    Settings & conf = Settings::Get();
     LocalEvent & le = LocalEvent::Get();
 
     cursor.Hide();
@@ -372,7 +370,6 @@ screen_t CastleOpenDialog3(Castle & castle)
     frameborder.Redraw();
 
     const Rect & dst_rt = frameborder.GetArea();
-    //const Sprite & backSprite = AGG::GetICN(ICN::SWAPWIN, 0);
     const Sprite & background = AGG::GetICN(ICN::STONEBAK, 0);
     display.Blit(background, Rect(0, 0, window_w, window_h), dst_rt);
 
@@ -465,7 +462,6 @@ screen_t CastleOpenDialog4(Castle & castle)
 {
     Cursor & cursor = Cursor::Get();
     Display & display = Display::Get();
-//    Settings & conf = Settings::Get();
     LocalEvent & le = LocalEvent::Get();
 
     cursor.Hide();
@@ -479,7 +475,6 @@ screen_t CastleOpenDialog4(Castle & castle)
     frameborder.Redraw();
 
     const Rect & dst_rt = frameborder.GetArea();
-    //const Sprite & backSprite = AGG::GetICN(ICN::SWAPWIN, 0);
     const Sprite & background = AGG::GetICN(ICN::STONEBAK, 0);
     display.Blit(background, Rect(0, 0, window_w, window_h), dst_rt);
 
@@ -562,7 +557,6 @@ screen_t CastleOpenDialog5(Castle & castle)
 {
     Cursor & cursor = Cursor::Get();
     Display & display = Display::Get();
-//    Settings & conf = Settings::Get();
     LocalEvent & le = LocalEvent::Get();
 
     cursor.Hide();
@@ -576,14 +570,47 @@ screen_t CastleOpenDialog5(Castle & castle)
     frameborder.Redraw();
 
     const Rect & dst_rt = frameborder.GetArea();
-    //const Sprite & backSprite = AGG::GetICN(ICN::SWAPWIN, 0);
     const Sprite & background = AGG::GetICN(ICN::STONEBAK, 0);
     display.Blit(background, Rect(0, 0, window_w, window_h), dst_rt);
 
+    // tavern
     Text text;
-    text.Set("5", Font::SMALL);
+    text.Set(castle.GetStringBuilding(Castle::BUILD_TAVERN), Font::SMALL);
     text.Blit(dst_rt.x + (dst_rt.w - text.w()) / 2, dst_rt.y + 3);
 
+    TextBox box1(_("A generous tip for the barkeep yields the following rumor:"), Font::SMALL, 186);
+    TextBox box2(world.GetRumors(), Font::SMALL, 186);
+
+    box1.Blit(dst_rt.x + 67, dst_rt.y + 120);
+    box2.Blit(dst_rt.x + 67, dst_rt.y + 130 + box1.h());
+
+    const Sprite & s1 = AGG::GetICN(ICN::TAVWIN, 0);
+    Point dst_pt(dst_rt.x + (dst_rt.w - s1.w()) / 2, dst_rt.y + 18);
+    display.Blit(s1, dst_pt);
+
+    const Sprite & s20 = AGG::GetICN(ICN::TAVWIN, 1);
+    display.Blit(s20, dst_pt.x + 3, dst_pt.y + 3);
+
+    // hero
+    const Sprite & crest = AGG::GetICN(ICN::BRCREST, 6);
+    const Rect rectRecruit1(dst_rt.x + 4, dst_rt.y + 18, crest.w(), crest.h());
+    const Rect rectRecruit2(dst_rt.x + 4, dst_rt.y + 77, crest.w(), crest.h());
+    const Rect rectCaptain(dst_rt.x + 4, dst_rt.y + 136, crest.w(), crest.h());
+
+    Heroes* hero1 = world.GetMyKingdom().GetRecruits().GetHero1();
+    Heroes* hero2 = world.GetMyKingdom().GetRecruits().GetHero2();
+
+    display.Blit(crest, rectRecruit1);
+    if(hero1) display.Blit(hero1->GetPortrait50x46(), rectRecruit1.x + 4, rectRecruit1.y + 4);
+
+    display.Blit(crest, rectRecruit2);
+    if(hero2) display.Blit(hero2->GetPortrait50x46(), rectRecruit2.x + 4, rectRecruit2.y + 4);
+
+    display.Blit(crest, rectCaptain);
+    const Surface & captain = Portrait::Captain(castle.GetRace(), Portrait::BIG);
+    display.Blit(captain, Rect((captain.w() - 50) / 2, 15, 50, 47), rectCaptain.x + 4, rectCaptain.y + 4);
+
+    // buttons
     const Rect rectExit(dst_rt.x + dst_rt.w - 21, dst_rt.y + 7, 25, 25);
     display.Blit(AGG::GetICN(ICN::TOWNWIND, 12), rectExit.x, rectExit.y);
 
@@ -602,6 +629,9 @@ screen_t CastleOpenDialog5(Castle & castle)
     const Rect rectScreen5(dst_rt.x + dst_rt.w - 22, dst_rt.y + 133, 25, 25);
     display.Blit(AGG::GetICN(ICN::REQUESTS, 24), rectScreen5.x, rectScreen5.y);
 
+    u32 ticket = 0;
+    u32 frame = 0;
+    
     cursor.Show();
     display.Flip();
 
@@ -619,7 +649,51 @@ screen_t CastleOpenDialog5(Castle & castle)
         //else
         // exit
         if(le.MouseClickLeft(rectExit) || le.KeyPress(KEY_ESCAPE)) break;
+	else
+	if(hero1 && le.MouseClickLeft(rectRecruit1) &&
+	    Dialog::OK == castle.DialogBuyHero(hero1))
+	{
+    	    castle.RecruitHero(hero1);
+	    return SCREEN1;
+        }
+	else
+	if(hero2 && le.MouseClickLeft(rectRecruit2) &&
+	    Dialog::OK == castle.DialogBuyHero(hero2))
+	{
+    	    castle.RecruitHero(hero2);
+	    return SCREEN1;
+        }
+	else
+	if(le.MouseClickLeft(rectCaptain))
+	{
+	    BuildingInfo b(castle, Castle::BUILD_CAPTAIN);
+	    if(castle.isBuild(Castle::BUILD_CAPTAIN))
+		Dialog::Message(b.GetName(), b.GetDescription(), Font::SMALL, Dialog::OK);
+	    else
+	    if(b.DialogBuyBuilding(true))
+	    {
+		castle.BuyBuilding(b());
+		return SCREEN1;
+	    }
+	}
+
+        // animation
+        if(Game::ShouldAnimateInfrequent(ticket, 15))
+        {
+            cursor.Hide();
+            display.Blit(s20, dst_pt.x + 3, dst_pt.y + 3);
+            if(const u16 index = ICN::AnimationFrame(ICN::TAVWIN, 0, frame++))
+            {
+        	const Sprite & s22 = AGG::GetICN(ICN::TAVWIN, index);
+                display.Blit(s22, dst_pt.x + s22.x() + 3, dst_pt.y + s22.y() + 3);
+            }
+    	    cursor.Show();
+    	    display.Flip();
+        }
+
+	++ticket;
     }
+
     return SCREENOUT;
 }
 

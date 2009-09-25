@@ -210,7 +210,10 @@ bool BuildingInfo::QueueEventProcessing(void)
     LocalEvent & le = LocalEvent::Get();
     if(le.MouseClickLeft(area))
     {
-	return !castle.isBuild(building) && DialogBuyBuilding(true);
+	if(castle.isBuild(building))
+	    Dialog::Message(GetName(), GetDescription(), Font::BIG, Dialog::OK);
+	else
+	    return DialogBuyBuilding(true);
     }
     else
     if(le.MousePressRight(area))
