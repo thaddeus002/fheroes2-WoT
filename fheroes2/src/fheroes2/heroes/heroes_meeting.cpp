@@ -30,6 +30,7 @@
 #include "selectarmybar.h"
 #include "selectartifactbar.h"
 #include "heroes_indicator.h"
+#include "pocketpc.h"
 #include "game_interface.h"
 
 void RedrawPrimarySkillInfo(const Point &, const Skill::Primary &, const Skill::Primary &);
@@ -37,6 +38,8 @@ void RedrawSecondarySkill(const Point &, const std::vector<Skill::Secondary> &);
 
 void Heroes::MeetingDialog(Heroes & heroes2)
 {
+    if(Settings::Get().PocketPC()) return PocketPC::HeroesMeeting(*this, heroes2);
+
     Display & display = Display::Get();
 
     // cursor

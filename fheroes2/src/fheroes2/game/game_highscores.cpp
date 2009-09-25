@@ -40,11 +40,11 @@ Game::menu_t Game::HighScores(void)
     cursor.SetThemes(cursor.POINTER);
 
     Display & display = Display::Get();
-    display.SetVideoMode(640, 480);
 
     // image background
     const Sprite &back = AGG::GetICN(ICN::HSBKG, 0);
-    display.Blit(back);
+    const Point top((display.w() - back.w()) / 2, (display.h() - back.h()) / 2);
+    display.Blit(back, top);
 
     LocalEvent & le = LocalEvent::Get();
 

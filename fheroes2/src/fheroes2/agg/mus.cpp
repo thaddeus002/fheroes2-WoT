@@ -81,10 +81,14 @@ namespace MUS
         { UNKNOWN,      "???"                 }
     };
     
-    const std::string GetString(const mus_t mus)
+    const std::string GetString(const mus_t mus, bool shortname)
     {
       std::stringstream sstream;
-      sstream << std::setw(2) << std::setfill('0') << (int)mus << " " << musmap[mus].string << ".ogg";
+      sstream << std::setw(2) << std::setfill('0') << (int)mus;
+      if(shortname)
+      sstream << ".ogg";
+      else
+      sstream << " " << musmap[mus].string << ".ogg";
       return sstream.str();
     }
 }

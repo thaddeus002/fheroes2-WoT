@@ -80,12 +80,16 @@ Game::menu_t Game::ScenarioInfo(void)
     cursor.SetThemes(cursor.POINTER);
 
     Display & display = Display::Get();
-    display.SetVideoMode(640, 480);
+
+    // image background
+    const Sprite &back = AGG::GetICN(ICN::HEROES, 0);
+    const Point top((display.w() - back.w()) / 2, (display.h() - back.h()) / 2);
+    display.Blit(back, top);
 
     // set first maps settings
     conf.LoadFileMaps(lists.front().file);
-
-    const Point pointPanel(204, 32);
+    
+    const Point pointPanel(top.x + 204, top.y + 32);
     const Point pointDifficultyInfo(pointPanel.x + 24, pointPanel.y + 93);
     const Point pointOpponentInfo(pointPanel.x + 24, pointPanel.y + 202);
     const Point pointClassInfo(pointPanel.x + 24, pointPanel.y + 282);
@@ -112,9 +116,6 @@ Game::menu_t Game::ScenarioInfo(void)
     conf.SetMyColor(conf.FirstAllowColor());
     conf.SetPlayersColors(conf.MyColor());
 
-    // image background
-    const Sprite &back = AGG::GetICN(ICN::HEROES, 0);
-    display.Blit(back);
 
     Scenario::RedrawStaticInfo(pointPanel);
 

@@ -51,11 +51,11 @@ Game::menu_t Game::MainMenu(void)
     cursor.SetThemes(cursor.POINTER);
 
     Display & display = Display::Get();
-    display.SetVideoMode(640, 480);
 
     // image background
     const Sprite &sprite = AGG::GetICN(ICN::HEROES, 0);
-    display.Blit(sprite);
+    const Point top((display.w() - sprite.w()) / 2, (display.h() - sprite.h()) / 2);
+    display.Blit(sprite, top);
 
     LocalEvent & le = LocalEvent::Get();
 
@@ -65,19 +65,19 @@ Game::menu_t Game::MainMenu(void)
     const Sprite & s4 = AGG::GetICN(ICN::BTNSHNGL, CREDITS_DEFAULT);
     const Sprite & s5 = AGG::GetICN(ICN::BTNSHNGL, QUIT_DEFAULT);
 
-    Button buttonNewGame(s1.x(), s1.y(), ICN::BTNSHNGL, NEWGAME_DEFAULT, NEWGAME_DEFAULT + 2);
-    Button buttonLoadGame(s2.x(), s2.y(), ICN::BTNSHNGL, LOADGAME_DEFAULT, LOADGAME_DEFAULT + 2);
-    Button buttonHighScores(s3.x(), s3.y(), ICN::BTNSHNGL, HIGHSCORES_DEFAULT, HIGHSCORES_DEFAULT + 2);
-    Button buttonCredits(s4.x(), s4.y(), ICN::BTNSHNGL, CREDITS_DEFAULT, CREDITS_DEFAULT + 2);
-    Button buttonQuit(s5.x(), s5.y(), ICN::BTNSHNGL, QUIT_DEFAULT, QUIT_DEFAULT + 2);
+    Button buttonNewGame(top.x + s1.x(), top.y + s1.y(), ICN::BTNSHNGL, NEWGAME_DEFAULT, NEWGAME_DEFAULT + 2);
+    Button buttonLoadGame(top.x + s2.x(), top.y + s2.y(), ICN::BTNSHNGL, LOADGAME_DEFAULT, LOADGAME_DEFAULT + 2);
+    Button buttonHighScores(top.x + s3.x(), top.y + s3.y(), ICN::BTNSHNGL, HIGHSCORES_DEFAULT, HIGHSCORES_DEFAULT + 2);
+    Button buttonCredits(top.x + s4.x(), top.y + s4.y(), ICN::BTNSHNGL, CREDITS_DEFAULT, CREDITS_DEFAULT + 2);
+    Button buttonQuit(top.x + s5.x(), top.y + s5.y(), ICN::BTNSHNGL, QUIT_DEFAULT, QUIT_DEFAULT + 2);
 
     const Point lt_pt(0, 0);
 
     const Sprite & lantern10 = AGG::GetICN(ICN::SHNGANIM, 0);
-    display.Blit(lantern10, lantern10.x(), lantern10.y());
+    display.Blit(lantern10, top.x + lantern10.x(), top.y + lantern10.y());
 
     const Sprite & lantern11 = AGG::GetICN(ICN::SHNGANIM, ICN::AnimationFrame(ICN::SHNGANIM, 0));
-    display.Blit(lantern11, lantern11.x(), lantern11.y());
+    display.Blit(lantern11, top.x + lantern11.x(), top.y + lantern11.y());
 
     buttonNewGame.Draw();
     buttonLoadGame.Draw();
@@ -109,7 +109,7 @@ Game::menu_t Game::MainMenu(void)
     {
         cursor.Hide();
         const Sprite & sprite = AGG::GetICN(ICN::BTNSHNGL, buttons[i].frame);
-        display.Blit(sprite, sprite.x(), sprite.y());
+        display.Blit(sprite, top.x + sprite.x(), top.y + sprite.y());
         cursor.Show();
     }
     
@@ -136,7 +136,7 @@ Game::menu_t Game::MainMenu(void)
                 
                 cursor.Hide();
                 const Sprite & sprite = AGG::GetICN(ICN::BTNSHNGL, frame);
-                display.Blit(sprite, sprite.x(), sprite.y());
+                display.Blit(sprite, top.x + sprite.x(), top.y + sprite.y());
                 cursor.Show();
             }
         }
@@ -168,7 +168,7 @@ Game::menu_t Game::MainMenu(void)
 	{
 	    cursor.Hide();
 	    const Sprite & lantern12 = AGG::GetICN(ICN::SHNGANIM, ICN::AnimationFrame(ICN::SHNGANIM, 0, lantern_frame++));
-	    display.Blit(lantern12, lantern12.x(), lantern12.y());
+	    display.Blit(lantern12, top.x + lantern12.x(), top.y + lantern12.y());
 	    cursor.Show();
 	    display.Flip();
 	}

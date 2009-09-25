@@ -74,7 +74,7 @@ namespace MUS
         UNKNOWN
     } mus_t;
 
-    const std::string GetString(const mus_t mus);
+    const std::string GetString(const mus_t mus, bool shortname = false);
 
     mus_t FromGround(const u16 ground);
     mus_t FromRace(const u8 race);

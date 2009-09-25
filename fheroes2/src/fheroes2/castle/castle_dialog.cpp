@@ -582,7 +582,7 @@ Dialog::answer_t Castle::OpenDialog(bool fade)
 	{
 	    if(!Modes(ALLOWCASTLE))
 	    {
-		Dialog::Message("Town", "This town may not be upgraded to a castle.", Font::BIG, Dialog::OK);
+		Dialog::Message(_("Town"), _("This town may not be upgraded to a castle."), Font::BIG, Dialog::OK);
 	    }
 	    else
 	    if(Dialog::OK == DialogBuyCastle(true))

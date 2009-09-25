@@ -56,11 +56,9 @@ int main(int argc, char **argv)
 {
 	Settings & conf = Settings::Get();
 	int test = 0;
+	std::string strtmp;
 
-	std::string caption("Free Heroes II, " + conf.BuildVersion());
-	std::cout << caption << std::endl;
-
-	std::string fheroes2_cfg;
+	std::cout << "Free Heroes II, " + conf.BuildVersion() << std::endl;
 
 	// prefix from build
 #ifdef CONFIGURE_FHEROES2_DATA
@@ -68,11 +66,11 @@ int main(int argc, char **argv)
 #endif
 	if(conf.LocalPrefix().size())
 	{
-	    fheroes2_cfg = conf.LocalPrefix() + SEPARATOR + "fheroes2.cfg";
-	    if(FilePresent(fheroes2_cfg))
+	    strtmp = conf.LocalPrefix() + SEPARATOR + "fheroes2.cfg";
+	    if(FilePresent(strtmp))
 	    {
-		std::cout << "config: " << fheroes2_cfg << " load." << std::endl;
-		conf.Read(fheroes2_cfg);
+		std::cout << "config: " << strtmp << " load." << std::endl;
+		conf.Read(strtmp);
 	    }
 	}
 
@@ -80,11 +78,11 @@ int main(int argc, char **argv)
 	if(getenv("FHEROES2_DATA"))
 	{
 	    conf.SetLocalPrefix(getenv("FHEROES2_DATA"));
-	    fheroes2_cfg = conf.LocalPrefix() + SEPARATOR + "fheroes2.cfg";
-	    if(FilePresent(fheroes2_cfg))
+	    strtmp = conf.LocalPrefix() + SEPARATOR + "fheroes2.cfg";
+	    if(FilePresent(strtmp))
 	    {
-		std::cout << "config: " << fheroes2_cfg << " load." << std::endl;
-		conf.Read(fheroes2_cfg);
+		std::cout << "config: " << strtmp << " load." << std::endl;
+		conf.Read(strtmp);
 	    }
 	}
 
@@ -92,11 +90,11 @@ int main(int argc, char **argv)
 	if(conf.LocalPrefix().empty())
 	{
 	    conf.SetLocalPrefix(GetDirname(argv[0]));
-	    fheroes2_cfg = conf.LocalPrefix() + SEPARATOR + "fheroes2.cfg";
-	    if(FilePresent(fheroes2_cfg))
+	    strtmp = conf.LocalPrefix() + SEPARATOR + "fheroes2.cfg";
+	    if(FilePresent(strtmp))
 	    {
-		std::cout << "config: " << fheroes2_cfg << " load." << std::endl;
-	    	conf.Read(fheroes2_cfg);
+		std::cout << "config: " << strtmp << " load." << std::endl;
+	    	conf.Read(strtmp);
 	    }
 	}
 
@@ -109,10 +107,7 @@ int main(int argc, char **argv)
                     case 'e':
 			conf.SetModes(Settings::EDITOR);
 			conf.SetDebug(3);
-
 			std::cout << "start: editor mode." << std::endl;
-
-			caption = "Free Heroes II (Editor), " + conf.BuildVersion();
 			break;
 			
 #ifndef BUILD_RELEASE
@@ -137,12 +132,20 @@ int main(int argc, char **argv)
 
 	}
 
+	// timidity path fix
+	strtmp = conf.LocalPrefix() + SEPARATOR + "files" + SEPARATOR + "timidity" + SEPARATOR + "timidity.cfg";
+	if(FilePresent(strtmp))
+	{
+	    strtmp = "TIMIDITY_PATH=" + conf.LocalPrefix() + SEPARATOR + "files" + SEPARATOR + "timidity";
+	    putenv(const_cast<char *>(strtmp.c_str()));
+	}
+
 #ifdef WITH_TTF
 	if(conf.Unicode())
 	{
-	    const std::string localesdir(conf.LocalPrefix() + SEPARATOR + "files" + SEPARATOR + "lang");
+	    strtmp = conf.LocalPrefix() + SEPARATOR + "files" + SEPARATOR + "lang";
 	    setlocale(LC_ALL, "");
-	    bindtextdomain(GETTEXT_PACKAGE, localesdir.c_str());
+	    bindtextdomain(GETTEXT_PACKAGE, strtmp.c_str());
 	    bind_textdomain_codeset(GETTEXT_PACKAGE, "UTF-8");
 	    textdomain(GETTEXT_PACKAGE);
 	}
@@ -178,12 +181,12 @@ int main(int argc, char **argv)
 		conf.ResetModes(Settings::MUSIC);
 	    }
 
-	    if(conf.PocketPC())
-		Game::SetFixVideoMode();
-	    else
-		Display::SetVideoMode(640, 480);
+	    strtmp = "Free Heroes II, " + conf.BuildVersion();
+
+            Display::SetVideoMode(conf.VideoMode().w, conf.VideoMode().h, conf.FullScreen());
+
 	    Display::HideCursor();
-	    Display::SetCaption(caption);
+	    Display::SetCaption(strtmp);
 
     	    Surface icons(image_icons.pixel_data, image_icons.width, image_icons.height, image_icons.bytes_per_pixel, true);
 	    Display::SetIcons(icons);
@@ -311,8 +314,6 @@ int main(int argc, char **argv)
 #endif
 	    conf.Dump();
 	}
-
-	std::cout << "Bye." << std::endl;
 	
 	return EXIT_SUCCESS;
 }

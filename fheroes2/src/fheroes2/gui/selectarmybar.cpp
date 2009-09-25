@@ -38,6 +38,7 @@ enum
     FLAGS_READONLY	= 0x01,
     FLAGS_USEMONS32	= 0x02,
     FLAGS_SAVELAST	= 0x04,
+    FLAGS_COUNT2SPRITE	= 0x08,
 };
 
 SelectArmyBar::SelectArmyBar() : army(NULL), interval(0), selected(-1), flags(0), background(NULL), castle(NULL)
@@ -138,6 +139,11 @@ void SelectArmyBar::SetUseMons32Sprite(void)
     flags |= FLAGS_USEMONS32;
 }
 
+void SelectArmyBar::SetCount2Sprite(void)
+{
+    flags |= FLAGS_COUNT2SPRITE;
+}
+
 void SelectArmyBar::SetCastle(const Castle & c)
 {
     castle = &c;
@@ -185,13 +191,20 @@ void SelectArmyBar::Redraw(Surface & display)
 
             if(flags & FLAGS_USEMONS32)
 	    {
-	    	display.Blit(mons32, pt.x + (background->w() - mons32.w()) / 2, pt.y + background->h() - mons32.h() - 11);
+        	if(flags & FLAGS_COUNT2SPRITE)
+	    	    display.Blit(mons32, pt.x + (background->w() - mons32.w()) / 2, pt.y + background->h() - mons32.h() - 1);
+	    	else
+	    	    display.Blit(mons32, pt.x + (background->w() - mons32.w()) / 2, pt.y + background->h() - mons32.h() - 11);
     
         	// draw count
         	std::string str;
         	String::AddInt(str, troop.Count());
         	Text text(str, Font::SMALL);
-		text.Blit(pt.x + (background->w() - text.w()) / 2, pt.y + background->h() - 11);
+
+        	if(flags & FLAGS_COUNT2SPRITE)
+		    text.Blit(pt.x + background->w() - text.w() - 3, pt.y + background->h() - text.h() - 2);
+		else
+		    text.Blit(pt.x + (background->w() - text.w()) / 2, pt.y + background->h() - 11);
             }
             else
 	    {
@@ -305,10 +318,14 @@ bool SelectArmyBar::QueueEventProcessing(SelectArmyBar & bar)
 	    {
 		troop1.SetCount(troop1.Count() + troop2.Count());
 		troop2.Reset();
+		change = true;
 	    }
 	    // exchange
 	    else
+	    {
 		Army::SwapTroops(troop1, troop2);
+		change = true;
+	    }
 
 	    bar.Reset();
 	    bar.Redraw();
@@ -318,6 +335,7 @@ bool SelectArmyBar::QueueEventProcessing(SelectArmyBar & bar)
 	if(!bar.ReadOnly() && troop1.isValid())
 	{
 	    bar.Select(index1);
+	    change = true;
 	}
     }
     else
@@ -358,10 +376,10 @@ bool SelectArmyBar::QueueEventProcessing(SelectArmyBar & bar1, SelectArmyBar & b
     bool change = false;
 
     if((bar1.isSelected() || (!bar1.isSelected() && !bar2.isSelected())) && le.MouseCursor(bar1.GetArea()))
-	    QueueEventProcessing(bar1);
+	    return QueueEventProcessing(bar1);
     else
     if((bar2.isSelected() || (!bar1.isSelected() && !bar2.isSelected())) && le.MouseCursor(bar2.GetArea()))
-	    QueueEventProcessing(bar2);
+	    return QueueEventProcessing(bar2);
     else
     if(bar1.isSelected() && le.MouseCursor(bar2.GetArea()))
     {

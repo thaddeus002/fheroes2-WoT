@@ -240,18 +240,24 @@ bool SelectArtifactsBar::QueueEventProcessing(SelectArtifactsBar & bar)
 		    bar.hero.GetSpellBook().Open(SpellBook::ALL, false);
 		else
 		Dialog::Message(art1.GetName(), art1.GetDescription(), Font::BIG, Dialog::OK);
-		//change = true;
 	    }
 	    // exchange
 	    else
-		std::swap(art1, art2);
+	    {
+	    	std::swap(art1, art2);
+		change = true;
+	    }
 
 	    bar.Reset();
 	    bar.Redraw();
 	}
 	else
 	// select
-	if(!bar.ReadOnly() && art1 != Artifact::UNKNOWN) bar.Select(index1);
+	if(!bar.ReadOnly() && art1 != Artifact::UNKNOWN)
+	{
+	    bar.Select(index1);
+	    change = true;
+	}
     }
     else
     // press right
@@ -276,10 +282,10 @@ bool SelectArtifactsBar::QueueEventProcessing(SelectArtifactsBar & bar1, SelectA
     if(!bar1.isValid() || !bar2.isValid()) return false;
 
     if((bar1.isSelected() || (!bar1.isSelected() && !bar2.isSelected())) && le.MouseCursor(bar1.GetArea()))
-	    QueueEventProcessing(bar1);
+	    return QueueEventProcessing(bar1);
     else
     if((bar2.isSelected() || (!bar1.isSelected() && !bar2.isSelected())) && le.MouseCursor(bar2.GetArea()))
-	    QueueEventProcessing(bar2);
+	    return QueueEventProcessing(bar2);
     else
     if(bar1.isSelected() && le.MouseCursor(bar2.GetArea()))
     {

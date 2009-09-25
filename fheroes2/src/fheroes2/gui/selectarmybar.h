@@ -55,6 +55,7 @@ public:
     void	SetReadOnly(void);
     void	SetSaveLastTroop(void);
     void 	SetUseMons32Sprite(void);	// second variant: for small sprite ICN::MONS32
+    void	SetCount2Sprite(void);
 
     void 	Redraw(Surface & display = Display::Get());
     void 	Reset(void);

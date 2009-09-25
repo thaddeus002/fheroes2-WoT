@@ -40,7 +40,7 @@ public:
     DwellingBar(const Point &, const Castle &);
     void Redraw(void) const;
     const Rect & GetArea(void) const;
-    void QueueEventProcessing(void);
+    bool QueueEventProcessing(void);
     static u32 GetDwellingFromIndex(u8);
 
 private:
@@ -48,6 +48,7 @@ private:
     std::vector<Rect> dw;
 };
 
+void RedrawTownSprite(const Rect &, const Castle &);
 void RedrawBackground(const Rect &, const Castle &);
 void RedrawResourceBar(const Point &, const Resource::funds_t &);
 
@@ -103,18 +104,9 @@ screen_t CastleOpenDialog1(Castle & castle)
     text.Blit(dst_rt.x + (dst_rt.w - text.w()) / 2, dst_rt.y + 3);
 
     // town icon
-    display.Blit(AGG::GetICN(ICN::LOCATORS, 23), dst_rt.x, dst_rt.y + 2);
-    switch(castle.GetRace())
-    {
-        case Race::KNGT: display.Blit(AGG::GetICN(ICN::LOCATORS, castle.isCastle() ?  9 : 15), dst_rt.x + 4, dst_rt.y + 6); break;
-        case Race::BARB: display.Blit(AGG::GetICN(ICN::LOCATORS, castle.isCastle() ?  10 : 16),  dst_rt.x + 4, dst_rt.y + 6); break;
-        case Race::SORC: display.Blit(AGG::GetICN(ICN::LOCATORS, castle.isCastle() ?  11 : 17),  dst_rt.x + 4, dst_rt.y + 6); break;
-        case Race::WRLK: display.Blit(AGG::GetICN(ICN::LOCATORS, castle.isCastle() ?  12 : 18),  dst_rt.x + 4, dst_rt.y + 6); break;
-        case Race::WZRD: display.Blit(AGG::GetICN(ICN::LOCATORS, castle.isCastle() ?  13 : 19),  dst_rt.x + 4, dst_rt.y + 6); break;
-        case Race::NECR: display.Blit(AGG::GetICN(ICN::LOCATORS, castle.isCastle() ?  14 : 20),  dst_rt.x + 4, dst_rt.y + 6); break;
-        default: break;
-    }
-    if(! castle.AllowBuild()) display.Blit(AGG::GetICN(ICN::LOCATORS, 24), dst_rt.x + 43, dst_rt.y + 7);
+    const Sprite & slock = AGG::GetICN(ICN::LOCATORS, 23);
+    const Rect rectTown(dst_rt.x, dst_rt.y + 2, slock.w(), slock.h());
+    RedrawTownSprite(rectTown, castle);
 
     // dwelling bar
     DwellingBar dwbar(Point(dst_rt.x + 2, dst_rt.y + 34), castle);
@@ -186,22 +178,22 @@ screen_t CastleOpenDialog1(Castle & castle)
     // resource bar
     RedrawResourceBar(Point(dst_rt.x + 4, dst_rt.y + 181), world.GetMyKingdom().GetFundsResource());
 
-    const Rect rectExit(dst_rt.x + dst_rt.w - 18, dst_rt.y + 2, 16, 16);
+    const Rect rectExit(dst_rt.x + dst_rt.w - 21, dst_rt.y + 7, 25, 25);
     display.Blit(AGG::GetICN(ICN::TOWNWIND, 12), rectExit.x, rectExit.y);
 
-    const Rect rectScreen1(dst_rt.x + dst_rt.w - 19, dst_rt.y + 22, 17, 17);
+    const Rect rectScreen1(dst_rt.x + dst_rt.w - 22, dst_rt.y + 32, 25, 25);
     display.Blit(AGG::GetICN(ICN::REQUESTS, 20), rectScreen1.x, rectScreen1.y);
 
-    const Rect rectScreen2(dst_rt.x + dst_rt.w - 19, dst_rt.y + 43, 17, 17);
+    const Rect rectScreen2(dst_rt.x + dst_rt.w - 22, dst_rt.y + 58, 25, 25);
     display.Blit(AGG::GetICN(ICN::REQUESTS, 21), rectScreen2.x, rectScreen2.y);
 
-    const Rect rectScreen3(dst_rt.x + dst_rt.w - 19, dst_rt.y + 64, 17, 17);
+    const Rect rectScreen3(dst_rt.x + dst_rt.w - 22, dst_rt.y + 83, 25, 25);
     display.Blit(AGG::GetICN(ICN::REQUESTS, 22), rectScreen3.x, rectScreen3.y);
 
-    const Rect rectScreen4(dst_rt.x + dst_rt.w - 19, dst_rt.y + 85, 17, 17);
+    const Rect rectScreen4(dst_rt.x + dst_rt.w - 22, dst_rt.y + 108, 25, 25);
     display.Blit(AGG::GetICN(ICN::REQUESTS, 23), rectScreen4.x, rectScreen4.y);
 
-    const Rect rectScreen5(dst_rt.x + dst_rt.w - 19, dst_rt.y + 106, 17, 17);
+    const Rect rectScreen5(dst_rt.x + dst_rt.w - 22, dst_rt.y + 133, 25, 25);
     display.Blit(AGG::GetICN(ICN::REQUESTS, 24), rectScreen5.x, rectScreen5.y);
 
     cursor.Show();
@@ -221,6 +213,34 @@ screen_t CastleOpenDialog1(Castle & castle)
         else
         // exit
         if(le.MouseClickLeft(rectExit) || le.KeyPress(KEY_ESCAPE)) break;
+	else
+	if(le.MouseClickLeft(rectTown))
+	{
+	    if(castle.isBuild(Castle::BUILD_CASTLE))
+		Dialog::Message(castle.GetStringBuilding(Castle::BUILD_CASTLE), castle.GetDescriptionBuilding(Castle::BUILD_CASTLE), Font::BIG, Dialog::OK);
+	    else
+	    if(!castle.Modes(Castle::ALLOWCASTLE))
+        	Dialog::Message(_("Town"), _("This town may not be upgraded to a castle."), Font::BIG, Dialog::OK);
+    	    else
+            if(Dialog::OK == castle.DialogBuyCastle(true))
+	    {
+                castle.BuyBuilding(Castle::BUILD_CASTLE);
+                cursor.Hide();
+                RedrawTownSprite(rectTown, castle);
+                cursor.Show();
+                display.Flip();
+            }
+	}
+	else
+	if(le.MouseClickLeft(dwbar.GetArea()) && dwbar.QueueEventProcessing())
+	{
+	    cursor.Hide();
+	    dwbar.Redraw();
+	    selectCastleArmy.Redraw();
+	    RedrawResourceBar(Point(dst_rt.x + 4, dst_rt.y + 181), world.GetMyKingdom().GetFundsResource());
+	    cursor.Show();
+	    display.Flip();
+	}
 
 	// troops event
         if(hero && selectHeroesArmy.isValid())
@@ -259,22 +279,22 @@ screen_t CastleOpenDialog2(Castle & castle)
     const Sprite & background = AGG::GetICN(ICN::STONEBAK, 0);
     display.Blit(background, Rect(0, 0, window_w, window_h), dst_rt);
 
-    const Rect rectExit(dst_rt.x + dst_rt.w - 18, dst_rt.y + 2, 16, 16);
+    const Rect rectExit(dst_rt.x + dst_rt.w - 21, dst_rt.y + 7, 25, 25);
     display.Blit(AGG::GetICN(ICN::TOWNWIND, 12), rectExit.x, rectExit.y);
 
-    const Rect rectScreen1(dst_rt.x + dst_rt.w - 19, dst_rt.y + 22, 17, 17);
+    const Rect rectScreen1(dst_rt.x + dst_rt.w - 22, dst_rt.y + 32, 25, 25);
     display.Blit(AGG::GetICN(ICN::REQUESTS, 20), rectScreen1.x, rectScreen1.y);
 
-    const Rect rectScreen2(dst_rt.x + dst_rt.w - 19, dst_rt.y + 43, 17, 17);
+    const Rect rectScreen2(dst_rt.x + dst_rt.w - 22, dst_rt.y + 58, 25, 25);
     display.Blit(AGG::GetICN(ICN::REQUESTS, 21), rectScreen2.x, rectScreen2.y);
 
-    const Rect rectScreen3(dst_rt.x + dst_rt.w - 19, dst_rt.y + 64, 17, 17);
+    const Rect rectScreen3(dst_rt.x + dst_rt.w - 22, dst_rt.y + 83, 25, 25);
     display.Blit(AGG::GetICN(ICN::REQUESTS, 22), rectScreen3.x, rectScreen3.y);
 
-    const Rect rectScreen4(dst_rt.x + dst_rt.w - 19, dst_rt.y + 85, 17, 17);
+    const Rect rectScreen4(dst_rt.x + dst_rt.w - 22, dst_rt.y + 108, 25, 25);
     display.Blit(AGG::GetICN(ICN::REQUESTS, 23), rectScreen4.x, rectScreen4.y);
 
-    const Rect rectScreen5(dst_rt.x + dst_rt.w - 19, dst_rt.y + 106, 17, 17);
+    const Rect rectScreen5(dst_rt.x + dst_rt.w - 22, dst_rt.y + 133, 25, 25);
     display.Blit(AGG::GetICN(ICN::REQUESTS, 24), rectScreen5.x, rectScreen5.y);
 
     BuildingInfo dwelling1(castle, Castle::DWELLING_MONSTER1);
@@ -356,22 +376,22 @@ screen_t CastleOpenDialog3(Castle & castle)
     const Sprite & background = AGG::GetICN(ICN::STONEBAK, 0);
     display.Blit(background, Rect(0, 0, window_w, window_h), dst_rt);
 
-    const Rect rectExit(dst_rt.x + dst_rt.w - 18, dst_rt.y + 2, 16, 16);
+    const Rect rectExit(dst_rt.x + dst_rt.w - 21, dst_rt.y + 7, 25, 25);
     display.Blit(AGG::GetICN(ICN::TOWNWIND, 12), rectExit.x, rectExit.y);
 
-    const Rect rectScreen1(dst_rt.x + dst_rt.w - 19, dst_rt.y + 22, 17, 17);
+    const Rect rectScreen1(dst_rt.x + dst_rt.w - 22, dst_rt.y + 32, 25, 25);
     display.Blit(AGG::GetICN(ICN::REQUESTS, 20), rectScreen1.x, rectScreen1.y);
 
-    const Rect rectScreen2(dst_rt.x + dst_rt.w - 19, dst_rt.y + 43, 17, 17);
+    const Rect rectScreen2(dst_rt.x + dst_rt.w - 22, dst_rt.y + 58, 25, 25);
     display.Blit(AGG::GetICN(ICN::REQUESTS, 21), rectScreen2.x, rectScreen2.y);
 
-    const Rect rectScreen3(dst_rt.x + dst_rt.w - 19, dst_rt.y + 64, 17, 17);
+    const Rect rectScreen3(dst_rt.x + dst_rt.w - 22, dst_rt.y + 83, 25, 25);
     display.Blit(AGG::GetICN(ICN::REQUESTS, 22), rectScreen3.x, rectScreen3.y);
 
-    const Rect rectScreen4(dst_rt.x + dst_rt.w - 19, dst_rt.y + 85, 17, 17);
+    const Rect rectScreen4(dst_rt.x + dst_rt.w - 22, dst_rt.y + 108, 25, 25);
     display.Blit(AGG::GetICN(ICN::REQUESTS, 23), rectScreen4.x, rectScreen4.y);
 
-    const Rect rectScreen5(dst_rt.x + dst_rt.w - 19, dst_rt.y + 106, 17, 17);
+    const Rect rectScreen5(dst_rt.x + dst_rt.w - 22, dst_rt.y + 133, 25, 25);
     display.Blit(AGG::GetICN(ICN::REQUESTS, 24), rectScreen5.x, rectScreen5.y);
 
     Castle::building_t level = Castle::BUILD_NOTHING;
@@ -463,22 +483,22 @@ screen_t CastleOpenDialog4(Castle & castle)
     const Sprite & background = AGG::GetICN(ICN::STONEBAK, 0);
     display.Blit(background, Rect(0, 0, window_w, window_h), dst_rt);
 
-    const Rect rectExit(dst_rt.x + dst_rt.w - 18, dst_rt.y + 2, 16, 16);
+    const Rect rectExit(dst_rt.x + dst_rt.w - 21, dst_rt.y + 7, 25, 25);
     display.Blit(AGG::GetICN(ICN::TOWNWIND, 12), rectExit.x, rectExit.y);
 
-    const Rect rectScreen1(dst_rt.x + dst_rt.w - 19, dst_rt.y + 22, 17, 17);
+    const Rect rectScreen1(dst_rt.x + dst_rt.w - 22, dst_rt.y + 32, 25, 25);
     display.Blit(AGG::GetICN(ICN::REQUESTS, 20), rectScreen1.x, rectScreen1.y);
 
-    const Rect rectScreen2(dst_rt.x + dst_rt.w - 19, dst_rt.y + 43, 17, 17);
+    const Rect rectScreen2(dst_rt.x + dst_rt.w - 22, dst_rt.y + 58, 25, 25);
     display.Blit(AGG::GetICN(ICN::REQUESTS, 21), rectScreen2.x, rectScreen2.y);
 
-    const Rect rectScreen3(dst_rt.x + dst_rt.w - 19, dst_rt.y + 64, 17, 17);
+    const Rect rectScreen3(dst_rt.x + dst_rt.w - 22, dst_rt.y + 83, 25, 25);
     display.Blit(AGG::GetICN(ICN::REQUESTS, 22), rectScreen3.x, rectScreen3.y);
 
-    const Rect rectScreen4(dst_rt.x + dst_rt.w - 19, dst_rt.y + 85, 17, 17);
+    const Rect rectScreen4(dst_rt.x + dst_rt.w - 22, dst_rt.y + 108, 25, 25);
     display.Blit(AGG::GetICN(ICN::REQUESTS, 23), rectScreen4.x, rectScreen4.y);
 
-    const Rect rectScreen5(dst_rt.x + dst_rt.w - 19, dst_rt.y + 106, 17, 17);
+    const Rect rectScreen5(dst_rt.x + dst_rt.w - 22, dst_rt.y + 133, 25, 25);
     display.Blit(AGG::GetICN(ICN::REQUESTS, 24), rectScreen5.x, rectScreen5.y);
 
     BuildingInfo building1(castle, Castle::BUILD_WELL);
@@ -564,22 +584,22 @@ screen_t CastleOpenDialog5(Castle & castle)
     text.Set("5", Font::SMALL);
     text.Blit(dst_rt.x + (dst_rt.w - text.w()) / 2, dst_rt.y + 3);
 
-    const Rect rectExit(dst_rt.x + dst_rt.w - 18, dst_rt.y + 2, 16, 16);
+    const Rect rectExit(dst_rt.x + dst_rt.w - 21, dst_rt.y + 7, 25, 25);
     display.Blit(AGG::GetICN(ICN::TOWNWIND, 12), rectExit.x, rectExit.y);
 
-    const Rect rectScreen1(dst_rt.x + dst_rt.w - 19, dst_rt.y + 22, 17, 17);
+    const Rect rectScreen1(dst_rt.x + dst_rt.w - 22, dst_rt.y + 32, 25, 25);
     display.Blit(AGG::GetICN(ICN::REQUESTS, 20), rectScreen1.x, rectScreen1.y);
 
-    const Rect rectScreen2(dst_rt.x + dst_rt.w - 19, dst_rt.y + 43, 17, 17);
+    const Rect rectScreen2(dst_rt.x + dst_rt.w - 22, dst_rt.y + 58, 25, 25);
     display.Blit(AGG::GetICN(ICN::REQUESTS, 21), rectScreen2.x, rectScreen2.y);
 
-    const Rect rectScreen3(dst_rt.x + dst_rt.w - 19, dst_rt.y + 64, 17, 17);
+    const Rect rectScreen3(dst_rt.x + dst_rt.w - 22, dst_rt.y + 83, 25, 25);
     display.Blit(AGG::GetICN(ICN::REQUESTS, 22), rectScreen3.x, rectScreen3.y);
 
-    const Rect rectScreen4(dst_rt.x + dst_rt.w - 19, dst_rt.y + 85, 17, 17);
+    const Rect rectScreen4(dst_rt.x + dst_rt.w - 22, dst_rt.y + 108, 25, 25);
     display.Blit(AGG::GetICN(ICN::REQUESTS, 23), rectScreen4.x, rectScreen4.y);
 
-    const Rect rectScreen5(dst_rt.x + dst_rt.w - 19, dst_rt.y + 106, 17, 17);
+    const Rect rectScreen5(dst_rt.x + dst_rt.w - 22, dst_rt.y + 133, 25, 25);
     display.Blit(AGG::GetICN(ICN::REQUESTS, 24), rectScreen5.x, rectScreen5.y);
 
     cursor.Show();
@@ -606,6 +626,7 @@ screen_t CastleOpenDialog5(Castle & castle)
 void RedrawResourceBar(const Point & dst, const Resource::funds_t & rs)
 {
     Display & display = Display::Get();
+    display.Blit(AGG::GetICN(ICN::STONEBAK, 0), Rect(0, 0, 312, 13), dst.x, dst.y + 30);
 
     const Sprite & ore = AGG::GetICN(ICN::RESOURCE, 2);
     const Sprite & wood = AGG::GetICN(ICN::RESOURCE, 0);
@@ -690,7 +711,10 @@ DwellingBar::DwellingBar(const Point & dst, const Castle & cst) : Rect(dst.x, ds
     for(u8 ii = 0; ii < dw.size(); ++ii)
 	dw[ii] = Rect(dst.x + ii * (43 + 2), dst.y, 43, 43);
 
-    static_cast<Rect>(*this) = Rect(dw);
+    const Rect max = Rect(dw);
+
+    w = max.w;
+    h = max.h;
 }
 
 u32 DwellingBar::GetDwellingFromIndex(u8 ii)
@@ -737,7 +761,7 @@ void DwellingBar::Redraw(void) const
     }
 }
 
-void DwellingBar::QueueEventProcessing(void)
+bool DwellingBar::QueueEventProcessing(void)
 {
     LocalEvent & le = LocalEvent::Get();
     std::vector<Rect>::const_iterator itr;
@@ -747,6 +771,27 @@ void DwellingBar::QueueEventProcessing(void)
 	const u32 dwelling = GetDwellingFromIndex(itr - dw.begin());
 	if(castle.isBuild(dwelling))
 	{
+	    const u16 recruit = Dialog::RecruitMonster(Monster(castle.GetRace(), castle.GetActualDwelling(dwelling)), castle.GetDwellingLivedCount(dwelling));
+            return const_cast<Castle &>(castle).RecruitMonster(dwelling, recruit);
 	}
     }
+    return false;
+}
+
+void RedrawTownSprite(const Rect & rt, const Castle & castle)
+{
+    Display & display = Display::Get();
+    const Sprite & slock = AGG::GetICN(ICN::LOCATORS, 23);
+    display.Blit(slock, rt.x, rt.y);
+    switch(castle.GetRace())
+    {
+        case Race::KNGT: display.Blit(AGG::GetICN(ICN::LOCATORS, castle.isCastle() ?  9 : 15),  rt.x + 4, rt.y + 4); break;
+        case Race::BARB: display.Blit(AGG::GetICN(ICN::LOCATORS, castle.isCastle() ?  10 : 16), rt.x + 4, rt.y + 4); break;
+        case Race::SORC: display.Blit(AGG::GetICN(ICN::LOCATORS, castle.isCastle() ?  11 : 17), rt.x + 4, rt.y + 4); break;
+        case Race::WRLK: display.Blit(AGG::GetICN(ICN::LOCATORS, castle.isCastle() ?  12 : 18), rt.x + 4, rt.y + 4); break;
+        case Race::WZRD: display.Blit(AGG::GetICN(ICN::LOCATORS, castle.isCastle() ?  13 : 19), rt.x + 4, rt.y + 4); break;
+        case Race::NECR: display.Blit(AGG::GetICN(ICN::LOCATORS, castle.isCastle() ?  14 : 20), rt.x + 4, rt.y + 4); break;
+        default: break;
+    }
+    if(! castle.AllowBuild()) display.Blit(AGG::GetICN(ICN::LOCATORS, 24), rt.x + 43, rt.y + 5);
 }

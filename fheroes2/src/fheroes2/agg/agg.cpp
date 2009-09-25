@@ -617,29 +617,38 @@ void AGG::Cache::LoadPAL(void)
 void AGG::Cache::LoadMUS(const MUS::mus_t mus)
 {
     std::vector<u8> & v = mus_cache[mus];
+    if(! Mixer::isValid() || v.size()) return;
+
     const Settings & conf = Settings::Get();
     const std::string musname(conf.LocalPrefix() + SEPARATOR + "files" + SEPARATOR + "music" + SEPARATOR + MUS::GetString(mus));
-    if(v.size()) return;
+    std::string shortname(conf.LocalPrefix() + SEPARATOR + "files" + SEPARATOR + "music" + SEPARATOR + MUS::GetString(mus, true));
+    const char* filename = NULL;
 
-    if(conf.Debug()) Error::Verbose("AGG::Cache::LoadMUS: " + musname);
-
-    if(! Mixer::isValid()) return;
-
-    std::fstream stream(musname.c_str(), std::ios::in | std::ios::binary);
-
-    if(stream.fail())
+    if(FilePresent(musname))   filename = musname.c_str();
+    else
+    if(FilePresent(shortname)) filename = shortname.c_str();
+    else
     {
+	String::Replace(shortname, ".ogg", ".mp3");
+	if(FilePresent(shortname)) filename = shortname.c_str();
+	else
 	Error::Warning("AGG::Cache::LoadMUS: error read file: " + musname + ", skipping...");
-	return;
     }
 
-    stream.seekg(0, std::ios_base::end);
-    const u32 size = stream.tellg();
-    stream.seekg(0, std::ios_base::beg);
-    v.resize(size);
+    std::fstream stream(filename, std::ios::in | std::ios::binary);
+
+    if(stream.good())
+    {
+	if(conf.Debug()) Error::Verbose("AGG::Cache::LoadMUS: ", filename);
+
+	stream.seekg(0, std::ios_base::end);
+	const u32 size = stream.tellg();
+	stream.seekg(0, std::ios_base::beg);
+	v.resize(size);
     
-    stream.read(reinterpret_cast<char *>(&v[0]), size);
-    stream.close();
+	stream.read(reinterpret_cast<char *>(&v[0]), size);
+	stream.close();
+    }
 }
 
 void AGG::Cache::LoadFNT(void)

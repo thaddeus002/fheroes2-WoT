@@ -103,7 +103,7 @@ public:
     bool isCapital(void) const{ return Modes(CAPITAL); };
     bool HaveNearlySea(void) const;
     bool PresentBoat(void) const;
-    bool RecruitMonster(building_t dw, u16 count);
+    bool RecruitMonster(u32 dw, u16 count);
     bool AllowBuyHero(void);
     bool ContainCoord(const u16 ax, const u16 ay) const;
 
@@ -166,6 +166,10 @@ public:
     void AIDefence(void);
     void AIDevelopment(void);
 
+    Dialog::answer_t DialogBuyHero(const Heroes*);
+    Dialog::answer_t DialogBuyCaptain(bool fixed = true) const;
+    Dialog::answer_t DialogBuyCastle(bool fixed = true) const;
+
 private:
     void RedrawResourcePanel(const Point &);
     void TownUpgradeToCastle(void);
@@ -180,10 +184,6 @@ private:
     void RedrawNameTown(const Point & src_pt);
     void WellRedrawInfoArea(const Point & cur_pt);
     void RedrawAnimationBuilding(const Point & dst_pt, u32 build);
-
-    Dialog::answer_t DialogBuyHero(const Heroes*);
-    Dialog::answer_t DialogBuyCaptain(bool fixed = true) const;
-    Dialog::answer_t DialogBuyCastle(bool fixed = true) const;
 
 private:
     friend void Game::SaveXMLDoc(TiXmlDocument &);

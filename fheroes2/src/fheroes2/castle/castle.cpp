@@ -569,40 +569,22 @@ void Castle::RecruitHero(Heroes* hero)
 }
 
 /* recruit monster from building to castle army */
-bool Castle::RecruitMonster(building_t dw, u16 count)
+bool Castle::RecruitMonster(u32 dw, u16 count)
 {
-    Monster ms;
-
     u8 dw_index = 0;
 
     switch(dw)
     {
-	case DWELLING_MONSTER1:
-	    ms = Monster(race, DWELLING_MONSTER1);
-	    dw_index = 0;
-	    break;
-	case DWELLING_MONSTER2:
-	    ms = Monster(race, GetActualDwelling(DWELLING_MONSTER2));
-	    dw_index = 1;
-	    break;
-	case DWELLING_MONSTER3:
-	    ms = Monster(race, GetActualDwelling(DWELLING_MONSTER3));
-	    dw_index = 2;
-	    break;
-	case DWELLING_MONSTER4:
-	    ms = Monster(race, GetActualDwelling(DWELLING_MONSTER4));
-	    dw_index = 3;
-	    break;
-	case DWELLING_MONSTER5:
-	    ms = Monster(race, GetActualDwelling(DWELLING_MONSTER5));
-	    dw_index = 4;
-	    break;
-	case DWELLING_MONSTER6:
-	    ms = Monster(race, GetActualDwelling(DWELLING_MONSTER6));
-	    dw_index = 5;
-	    break;	
+	case DWELLING_MONSTER1: dw_index = 0; break;
+	case DWELLING_MONSTER2: dw_index = 1; break;
+	case DWELLING_MONSTER3: dw_index = 2; break;
+	case DWELLING_MONSTER4: dw_index = 3; break;
+	case DWELLING_MONSTER5: dw_index = 4; break;
+	case DWELLING_MONSTER6: dw_index = 5; break;	
 	default: return false;
     }
+
+    Monster ms = Monster(race, GetActualDwelling(dw));
 
     // fix count
     if(dwelling[dw_index] < count) count = dwelling[dw_index];

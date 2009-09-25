@@ -58,21 +58,21 @@ Game::menu_t Game::LoadGame(void)
     cursor.SetThemes(cursor.POINTER);
 
     Display & display = Display::Get();
-    display.SetVideoMode(640, 480);
 
     // image background
     const Sprite &back = AGG::GetICN(ICN::HEROES, 0);
-    display.Blit(back);
+    const Point top((display.w() - back.w()) / 2, (display.h() - back.h()) / 2);
+    display.Blit(back, top);
 
     const Sprite &panel = AGG::GetICN(ICN::REDBACK, 0);
-    display.Blit(panel, 405, 5);
+    display.Blit(panel, top.x + 405, top.y + 5);
 
     LocalEvent & le = LocalEvent::Get();
 
-    Button buttonStandartGame(455, 45, ICN::BTNNEWGM, 0, 1);
-    Button buttonCampainGame(455, 110, ICN::BTNNEWGM, 2, 3);
-    Button buttonMultiGame(455, 175, ICN::BTNNEWGM, 4, 5);
-    Button buttonCancelGame(455, 375, ICN::BTNNEWGM, 6, 7);
+    Button buttonStandartGame(top.x + 455, top.y + 45, ICN::BTNNEWGM, 0, 1);
+    Button buttonCampainGame(top.x + 455, top.y + 110, ICN::BTNNEWGM, 2, 3);
+    Button buttonMultiGame(top.x + 455, top.y + 175, ICN::BTNNEWGM, 4, 5);
+    Button buttonCancelGame(top.x + 455, top.y + 375, ICN::BTNNEWGM, 6, 7);
 
     buttonStandartGame.Draw();
     buttonCampainGame.Draw();
@@ -112,11 +112,11 @@ Game::menu_t Game::LoadStandard(void)
     cursor.SetThemes(cursor.POINTER);
 
     Display & display = Display::Get();
-    display.SetVideoMode(640, 480);
 
     // image background
     const Sprite &back = AGG::GetICN(ICN::HEROES, 0);
-    display.Blit(back);
+    const Point top((display.w() - back.w()) / 2, (display.h() - back.h()) / 2);
+    display.Blit(back, top);
 
     cursor.Show();
     display.Flip();

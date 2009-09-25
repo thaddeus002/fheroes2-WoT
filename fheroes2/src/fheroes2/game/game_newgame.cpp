@@ -57,24 +57,23 @@ Game::menu_t Game::NewNetwork(void)
     cursor.SetThemes(cursor.POINTER);
 
     Display & display = Display::Get();
-    display.SetVideoMode(640, 480);
-
     Settings & conf = Settings::Get();
 
     conf.SetGameType(Game::NETWORK);
 
     // image background
     const Sprite &back = AGG::GetICN(ICN::HEROES, 0);
-    display.Blit(back);
+    const Point top((display.w() - back.w()) / 2, (display.h() - back.h()) / 2);
+    display.Blit(back, top);
 
     const Sprite &panel = AGG::GetICN(ICN::REDBACK, 0);
-    display.Blit(panel, 405, 5);
+    display.Blit(panel, top.x + 405, top.y + 5);
 
     LocalEvent & le = LocalEvent::Get();
 
-    Button buttonHost(455, 45, ICN::BTNNET, 0, 1);
-    Button buttonGuest(455, 110, ICN::BTNNET, 2, 3);
-    Button buttonCancelGame(455, 375, ICN::BTNMP, 8, 9);
+    Button buttonHost(top.x + 455, top.y + 45, ICN::BTNNET, 0, 1);
+    Button buttonGuest(top.x + 455, top.y + 110, ICN::BTNNET, 2, 3);
+    Button buttonCancelGame(top.x + 455, top.y + 375, ICN::BTNMP, 8, 9);
 
     buttonHost.Draw();
     buttonGuest.Draw();
@@ -121,21 +120,21 @@ Game::menu_t Game::NewGame(void)
     cursor.SetThemes(cursor.POINTER);
 
     Display & display = Display::Get();
-    display.SetVideoMode(640, 480);
 
     // image background
     const Sprite &back = AGG::GetICN(ICN::HEROES, 0);
-    display.Blit(back);
+    const Point top((display.w() - back.w()) / 2, (display.h() - back.h()) / 2);
+    display.Blit(back, top);
 
     const Sprite &panel = AGG::GetICN(ICN::REDBACK, 0);
-    display.Blit(panel, 405, 5);
+    display.Blit(panel, top.x + 405, top.y + 5);
 
     LocalEvent & le = LocalEvent::Get();
 
-    Button buttonStandartGame(455, 45, ICN::BTNNEWGM, 0, 1);
-    Button buttonCampainGame(455, 110, ICN::BTNNEWGM, 2, 3);
-    Button buttonMultiGame(455, 175, ICN::BTNNEWGM, 4, 5);
-    Button buttonCancelGame(455, 375, ICN::BTNNEWGM, 6, 7);
+    Button buttonStandartGame(top.x + 455, top.y + 45, ICN::BTNNEWGM, 0, 1);
+    Button buttonCampainGame(top.x + 455, top.y + 110, ICN::BTNNEWGM, 2, 3);
+    Button buttonMultiGame(top.x + 455, top.y + 175, ICN::BTNNEWGM, 4, 5);
+    Button buttonCancelGame(top.x + 455, top.y + 375, ICN::BTNNEWGM, 6, 7);
 
     buttonStandartGame.Draw();
     buttonCampainGame.Draw();
@@ -182,22 +181,21 @@ Game::menu_t Game::NewMulti(void)
     cursor.SetThemes(cursor.POINTER);
 
     Display & display = Display::Get();
-    display.SetVideoMode(640, 480);
-
     Settings & conf = Settings::Get();
 
     // image background
     const Sprite &back = AGG::GetICN(ICN::HEROES, 0);
-    display.Blit(back);
+    const Point top((display.w() - back.w()) / 2, (display.h() - back.h()) / 2);
+    display.Blit(back, top);
 
     const Sprite &panel = AGG::GetICN(ICN::REDBACK, 0);
-    display.Blit(panel, 405, 5);
+    display.Blit(panel, top.x + 405, top.y + 5);
 
     LocalEvent & le = LocalEvent::Get();
 
-    Button buttonHotSeat(455, 45, ICN::BTNMP, 0, 1);
-    Button buttonNetwork(455, 110, ICN::BTNMP, 2, 3);
-    Button buttonCancelGame(455, 375, ICN::BTNMP, 8, 9);
+    Button buttonHotSeat(top.x + 455, top.y + 45, ICN::BTNMP, 0, 1);
+    Button buttonNetwork(top.x + 455, top.y + 110, ICN::BTNMP, 2, 3);
+    Button buttonCancelGame(top.x + 455, top.y + 375, ICN::BTNMP, 8, 9);
 
     buttonHotSeat.Draw();
     buttonNetwork.Draw();
@@ -239,23 +237,23 @@ u8 SelectCountPlayers(void)
     cursor.SetThemes(cursor.POINTER);
 
     Display & display = Display::Get();
-    display.SetVideoMode(640, 480);
 
     // image background
     const Sprite &back = AGG::GetICN(ICN::HEROES, 0);
-    display.Blit(back);
+    const Point top((display.w() - back.w()) / 2, (display.h() - back.h()) / 2);
+    display.Blit(back, top);
 
     const Sprite &panel = AGG::GetICN(ICN::REDBACK, 0);
-    display.Blit(panel, 405, 5);
+    display.Blit(panel, top.x + 405, top.y + 5);
 
     LocalEvent & le = LocalEvent::Get();
 
-    Button button2Players(455, 45, ICN::BTNHOTST, 0, 1);
-    Button button3Players(455, 110, ICN::BTNHOTST, 2, 3);
-    Button button4Players(455, 175, ICN::BTNHOTST, 4, 5);
-    Button button5Players(455, 240, ICN::BTNHOTST, 6, 7);
-    Button button6Players(455, 305, ICN::BTNHOTST, 8, 9);
-    Button buttonCancel(455, 375, ICN::BTNNEWGM, 6, 7);
+    Button button2Players(top.x + 455, top.y + 45, ICN::BTNHOTST, 0, 1);
+    Button button3Players(top.x + 455, top.y + 110, ICN::BTNHOTST, 2, 3);
+    Button button4Players(top.x + 455, top.y + 175, ICN::BTNHOTST, 4, 5);
+    Button button5Players(top.x + 455, top.y + 240, ICN::BTNHOTST, 6, 7);
+    Button button6Players(top.x + 455, top.y + 305, ICN::BTNHOTST, 8, 9);
+    Button buttonCancel(top.x + 455, top.y + 375, ICN::BTNNEWGM, 6, 7);
 
     button2Players.Draw();
     button3Players.Draw();

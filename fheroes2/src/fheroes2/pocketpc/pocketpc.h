@@ -36,6 +36,7 @@ namespace PocketPC
     Dialog::answer_t	HeroesOpenDialog(Heroes &, bool);
     Dialog::answer_t	CastleOpenDialog(Castle &);
     Dialog::answer_t	DialogArmyInfo(const Army::BattleTroop &, u16);
+    void		HeroesMeeting(Heroes &, Heroes &);
 };
 
 #endif

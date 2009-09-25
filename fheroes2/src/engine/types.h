@@ -103,7 +103,8 @@ void WriteBE16(char *p, u16 x);
 #define PATH_MAX 255
 #endif
 #define system(x) 0
-#define getenv(x) 0
+#define putenv(x) SDL_putenv(x)
+#define getenv(x) SDL_getenv(x)
 #define getopt(x, y, z) -1
 #define optarg 0
 #else

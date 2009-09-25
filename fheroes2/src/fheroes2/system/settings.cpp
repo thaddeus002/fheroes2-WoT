@@ -197,7 +197,7 @@ void Settings::Dump(std::ostream & stream) const
     str += "." + svn_version;
     
     stream << std::endl;
-    stream << "# fheroes2 dump config, version " << str;
+    stream << "# fheroes2 dump config, version " << str << std::endl;
 
     if(path_data_directory.size()) stream << "data = " << path_data_directory << std::endl;
 
