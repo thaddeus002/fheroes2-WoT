@@ -33,17 +33,13 @@ void String::Trim(std::string & str)
 
     // left
     iter = str.begin();
-
     while(iter != str.end() && std::isspace(*iter)) ++iter;
-    
-    if(iter != str.begin()) str.replace(str.begin(), iter, "");
+    if(iter != str.begin()) str.erase(str.begin(), iter);
 
     // right
-    iter = str.end();
-
+    iter = str.end() - 1;
     while(iter != str.begin() && std::isspace(*iter)) --iter;
-
-    if(iter != str.end()) str.replace(iter, str.end(), "");
+    if(iter != str.end() - 1) str.erase(iter + 1, str.end());
 }
 
 /*true is comment */
