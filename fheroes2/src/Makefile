@@ -17,7 +17,7 @@ endif
 
 ifndef WITHOUT_MIXER
 CFLAGS := $(CFLAGS) -DWITH_MIXER
-SDL_LIBS := $(SDL_LIBS) -lSDL_mixer
+SDL_LIBS := -lSDL_mixer $(SDL_LIBS) -lmad -lvorbisfile -lvorbis -logg
 endif
 
 ifndef WITHOUT_IMAGE
@@ -60,13 +60,13 @@ all:
 	$(MAKE) -C xmlccwrap
 	$(MAKE) -C engine
 	$(MAKE) -C dist
-	$(MAKE) -C tools
+#	$(MAKE) -C tools
 ifndef WITHOUT_UNICODE
 	$(MAKE) -C dist pot
 endif
 
 clean:
 	$(MAKE) -C xmlccwrap clean
-	$(MAKE) -C tools clean
+#	$(MAKE) -C tools clean
 	$(MAKE) -C dist clean
 	$(MAKE) -C engine clean

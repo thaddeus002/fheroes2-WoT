@@ -1094,12 +1094,12 @@ namespace Battle
     class WalkAction : public MoveAction
     {
       public:
-        WalkAction(Battlefield &, const Point &, Army::BattleTroop &, PointList *);
+        WalkAction(Battlefield &, const Point &, Army::BattleTroop &, PointList &);
         ~WalkAction();
         bool Step();
 
       private:
-        PointList *m_path;
+        PointList &m_path;
         Battlefield &m_battlefield;
     };
 
@@ -1122,15 +1122,15 @@ Battle::MoveAction::MoveAction(Army::BattleTroop &troop)
 Battle::MoveAction::~MoveAction()
 {
 }
-    
-Battle::WalkAction::WalkAction(Battlefield &battlefield, const Point &start, Army::BattleTroop &myTroop, PointList *path)
+
+Battle::WalkAction::WalkAction(Battlefield &battlefield, const Point &start, Army::BattleTroop &myTroop, PointList &path)
 : Battle::MoveAction(myTroop)
 , m_path(path)
 , m_battlefield(battlefield)
 {
     if(BattleSettings::Get().Modes(BattleSettings::OPT_LOGICONLY))
     {
-        m_step = m_path->back() - myTroop.Position();
+        m_step = m_path.back() - myTroop.Position();
         myTroop.SetReflect(m_step.x < 0);
         if(myTroop.isWide() && myTroop.WasReflected() != myTroop.IsReflected())
             myTroop.SetPosition(myTroop.Position() + Point( myTroop.WasReflected() ? -1 : 1, 0 ));
@@ -1139,8 +1139,8 @@ Battle::WalkAction::WalkAction(Battlefield &battlefield, const Point &start, Arm
     {
         myTroop.SetScreenPosition(Bf2Scr(myTroop.Position()));
         myTroop.GetAnimFrames(Monster::AS_WALK, m_st, m_len);
-        m_step.x = (Bf2Scr(m_path->back()).x - myTroop.ScreenPosition().x) / m_len;
-        m_step.y = (Bf2Scr(m_path->back()).y - myTroop.ScreenPosition().y) / m_len;
+        m_step.x = (Bf2Scr(m_path.back()).x - myTroop.ScreenPosition().x) / m_len;
+        m_step.y = (Bf2Scr(m_path.back()).y - myTroop.ScreenPosition().y) / m_len;
         myTroop.SetReflect(m_step.x < 0);
         if(myTroop.isWide() && myTroop.WasReflected() != myTroop.IsReflected())
             myTroop.SetPosition(myTroop.Position() + Point( myTroop.WasReflected() ? -1 : 1, 0 ));
@@ -1152,8 +1152,8 @@ Battle::WalkAction::WalkAction(Battlefield &battlefield, const Point &start, Arm
     }
     
     if(m_battlefield.GetCastle()
-    && (std::find(m_path->begin(), m_path->end(), Point(6,4)) != m_path->end()
-    || std::find(m_path->begin(), m_path->end(), Point(5,4)) != m_path->end()))
+    && (std::find(m_path.begin(), m_path.end(), Point(6,4)) != m_path.end()
+    || std::find(m_path.begin(), m_path.end(), Point(5,4)) != m_path.end()))
     {
         m_battlefield.GetCastle()->OpenDrawbridge();
     }
@@ -1168,8 +1168,6 @@ Battle::WalkAction::~WalkAction()
     && m_battlefield.CellFree(Point(5,4), idx)
     && m_battlefield.CellFree(Point(6,4), idx))
         m_battlefield.GetCastle()->CloseDrawbridge();
-    
-    delete m_path;
 }
     
 bool Battle::WalkAction::Step()
@@ -1178,10 +1176,10 @@ bool Battle::WalkAction::Step()
 
     if(BattleSettings::Get().Modes(BattleSettings::OPT_LOGICONLY))
     {
-        myTroop.SetPosition(m_path->back());
-        m_path->pop_back();
-        m_step.x = m_path->back().x - myTroop.Position().x;
-        m_step.y = m_path->back().y - myTroop.Position().y;
+        myTroop.SetPosition(m_path.back());
+        m_path.pop_back();
+        m_step.x = m_path.back().x - myTroop.Position().x;
+        m_step.y = m_path.back().y - myTroop.Position().y;
         myTroop.SetReflect(m_step.x < 0);
         if(myTroop.isWide() && myTroop.IsReflected() != myTroop.OriginalReflection())
             myTroop.SetPosition(myTroop.Position() + Point( myTroop.IsReflected() ? 1 : -1, 0 ));
@@ -1189,17 +1187,17 @@ bool Battle::WalkAction::Step()
     else
     {
         myTroop.SetScreenPosition(myTroop.ScreenPosition() + m_step);
-        if(myTroop.astate != Monster::AS_WALK && m_path->size())
+        if(myTroop.astate != Monster::AS_WALK && m_path.size())
         {
-            if(m_path->size() > 1)
+            if(m_path.size() > 1)
                 AGG::PlaySound(myTroop.M82Move());
-            myTroop.SetPosition(m_path->back());
+            myTroop.SetPosition(m_path.back());
             myTroop.SetScreenPosition(Bf2Scr(myTroop.Position()));
-            m_path->pop_back();
-            if(!m_path->size())
+            m_path.pop_back();
+            if(!m_path.size())
                 return false;
-            m_step.x = (Bf2Scr(m_path->back()).x - myTroop.ScreenPosition().x) / m_len;
-            m_step.y = (Bf2Scr(m_path->back()).y - myTroop.ScreenPosition().y) / m_len;
+            m_step.x = (Bf2Scr(m_path.back()).x - myTroop.ScreenPosition().x) / m_len;
+            m_step.y = (Bf2Scr(m_path.back()).y - myTroop.ScreenPosition().y) / m_len;
             myTroop.SetReflect(m_step.x < 0);
             if(myTroop.isWide() && myTroop.IsReflected() != myTroop.OriginalReflection())
                 myTroop.SetPosition(myTroop.Position() + Point( myTroop.IsReflected() ? 1 : -1, 0 ));
@@ -1211,7 +1209,7 @@ bool Battle::WalkAction::Step()
         m_frame++;
     }
 
-    return !m_path->size();
+    return !m_path.size();
 }
 
 Battle::FlyAction::FlyAction(const Point &move, Army::BattleTroop &myTroop)
@@ -1293,7 +1291,7 @@ bool Battle::BattleControl::PerformMove(TroopIndex troopN, const Point &move, bo
     if(BfValid(move) && move != myTroop.Position())
     {
         PointList *path = NULL;
-        MoveAction *action;
+        MoveAction *action = NULL;
         
         if(myTroop.isFly())
             action = new FlyAction(move, myTroop);
@@ -1301,7 +1299,7 @@ bool Battle::BattleControl::PerformMove(TroopIndex troopN, const Point &move, bo
         {
             path = m_battlefield.FindPath(myTroop.Position(), move, myTroop.GetSpeed(), myTroop, troopN);
             if(path)
-                action = new WalkAction(m_battlefield, move, myTroop, path);
+                action = new WalkAction(m_battlefield, move, myTroop, *path);
             else
             {
                 //Dialog::Message(_("Error"), _("Path not found!"), Font::BIG, Dialog::OK);
@@ -1334,8 +1332,9 @@ bool Battle::BattleControl::PerformMove(TroopIndex troopN, const Point &move, bo
                 }
             }
         }
-        delete action;
-            
+        if(action) delete action;
+        if(path) delete path;
+
         myTroop.SetPosition(move);
         if(myTroop.isWide() && myTroop.IsReflected() != myTroop.OriginalReflection())
             myTroop.SetPosition(myTroop.Position() + Point( myTroop.IsReflected() ? 1 : -1, 0 ));
@@ -2708,10 +2707,12 @@ namespace Battle
                 if(d.x || d.y ) {
                     if(p.y % 2 && d.y && d.x > 0) continue;
                     if(!(p.y % 2) && d.y && d.x < 0) continue;
-                    if(tmpath = FindPath(p + d, end, moves - 1, troop, skip), tmpath) {
+                    tmpath = FindPath(p + d, end, moves - 1, troop, skip);
+                    if(tmpath) {
                         if(length < 0 || length > static_cast<int>(tmpath->size())) {
                             length = tmpath->size();
                             tmpath->push_back(p + d);
+                            if(path) delete path;
                             path = tmpath;
                             //printf("path has something\n");
                         } else delete tmpath;
