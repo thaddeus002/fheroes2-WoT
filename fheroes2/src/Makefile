@@ -17,7 +17,7 @@ endif
 
 ifndef WITHOUT_MIXER
 CFLAGS := $(CFLAGS) -DWITH_MIXER
-SDL_LIBS := -lSDL_mixer $(SDL_LIBS) -lmad -lvorbisfile -lvorbis -logg
+SDL_LIBS := $(SDL_LIBS) -lSDL_mixer
 endif
 
 ifndef WITHOUT_IMAGE
