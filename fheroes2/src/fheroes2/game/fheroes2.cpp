@@ -307,6 +307,7 @@ int main(int argc, char **argv)
 
 	} catch(std::bad_alloc)
 	{
+	    Error::Verbose("out of memory");
 	} catch(Error::Exception)
 	{
 #ifdef WITH_NET

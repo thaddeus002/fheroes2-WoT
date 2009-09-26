@@ -1213,7 +1213,6 @@ void AIToTreeKnowledge(Heroes &hero, const u8 obj, const u16 dst_index)
     	{
 	    if(payment.GetValidItems()) world.GetKingdom(hero.GetColor()).OddFundsResource(payment);
 	    hero.SetVisited(dst_index);
-	    Error::Verbose("level: ", hero.GetLevel());
 	    hero.IncreaseExperience(hero.GetExperienceFromLevel(hero.GetLevel()) - hero.GetExperience());
 	}
     }
