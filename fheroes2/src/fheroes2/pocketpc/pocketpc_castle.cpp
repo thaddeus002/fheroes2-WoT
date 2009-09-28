@@ -53,7 +53,7 @@ void RedrawTownSprite(const Rect &, const Castle &);
 void RedrawBackground(const Rect &, const Castle &);
 void RedrawResourceBar(const Point &, const Resource::funds_t &);
 
-enum screen_t { SCREENOUT, SCREEN1, SCREEN2, SCREEN3, SCREEN4, SCREEN5 };
+enum screen_t { SCREENOUT, SCREENOUT_PREV, SCREENOUT_NEXT, SCREEN1, SCREEN2, SCREEN3, SCREEN4, SCREEN5 };
 
 screen_t CastleOpenDialog1(Castle &);
 screen_t CastleOpenDialog2(Castle &);
@@ -63,6 +63,9 @@ screen_t CastleOpenDialog5(Castle &);
 
 Dialog::answer_t PocketPC::CastleOpenDialog(Castle & castle)
 {
+    Mixer::Reset();
+    AGG::PlayMusic(MUS::FromRace(castle.GetRace()));
+
     screen_t screen = CastleOpenDialog1(castle);
     while(SCREENOUT != screen)
 	switch(screen)
@@ -72,6 +75,8 @@ Dialog::answer_t PocketPC::CastleOpenDialog(Castle & castle)
 	    case SCREEN3: screen = CastleOpenDialog3(castle); break;
 	    case SCREEN4: screen = CastleOpenDialog4(castle); break;
 	    case SCREEN5: screen = CastleOpenDialog5(castle); break;
+	    case SCREENOUT_PREV: return Dialog::PREV;
+	    case SCREENOUT_NEXT: return Dialog::NEXT;
 	    default: break;
 	}
     return Dialog::CANCEL;
@@ -197,11 +202,26 @@ screen_t CastleOpenDialog1(Castle & castle)
     const Rect rectScreen5(dst_rt.x + dst_rt.w - 22, dst_rt.y + 133, 25, 25);
     display.Blit(AGG::GetICN(ICN::REQUESTS, 24), rectScreen5.x, rectScreen5.y);
 
+    Button buttonPrev(dst_rt.x + 64, dst_rt.y + 5, ICN::TRADPOST, 3, 4);
+    Button buttonNext(dst_rt.x + 245, dst_rt.y + 5, ICN::TRADPOST, 5, 6);
+    if(2 > world.GetMyKingdom().GetCastles().size())
+    {
+	buttonNext.Press();
+        buttonPrev.Press();
+	buttonNext.SetDisable(true);
+        buttonPrev.SetDisable(true);
+    }
+    buttonNext.Draw();
+    buttonPrev.Draw();
+
     cursor.Show();
     display.Flip();
 
     while(le.HandleEvents())
     {
+        le.MousePressLeft(buttonNext) ? buttonNext.PressDraw() : buttonNext.ReleaseDraw();
+        le.MousePressLeft(buttonPrev) ? buttonPrev.PressDraw() : buttonPrev.ReleaseDraw();
+
         //if(le.MouseClickLeft(rectScreen1)) return SCREEN1;
         //else
         if(le.MouseClickLeft(rectScreen2)) return SCREEN2;
@@ -215,6 +235,10 @@ screen_t CastleOpenDialog1(Castle & castle)
         // exit
         if(le.MouseClickLeft(rectExit) || le.KeyPress(KEY_ESCAPE)) break;
 	else
+        if(buttonNext.isEnable() && le.MouseClickLeft(buttonNext)) return SCREENOUT_NEXT;
+        else
+        if(buttonPrev.isEnable() && le.MouseClickLeft(buttonPrev)) return SCREENOUT_PREV;
+    	else
 	if(le.MouseClickLeft(rectTown))
 	{
 	    if(castle.isBuild(Castle::BUILD_CASTLE))

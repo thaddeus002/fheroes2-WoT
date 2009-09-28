@@ -97,6 +97,7 @@ bool Battle::BfValid(const Point & pt)
  */
 Army::battle_t Army::Battle(Heroes &h1, Heroes &h2, const Maps::Tiles &tile, u32 &exp)
 {
+    if(Settings::Get().PocketPC()) return Army::WIN;
     Battle::BattleControl battle(h1, h2, tile, exp);
     return battle.GetStatus();
 }
@@ -109,6 +110,7 @@ Army::battle_t Army::Battle(Heroes &h1, Heroes &h2, const Maps::Tiles &tile, u32
  */
 Army::battle_t Army::Battle(Heroes &h, Army::army_t &a, const Maps::Tiles &tile, u32 &exp)
 {
+    if(Settings::Get().PocketPC()) return Army::WIN;
     Battle::BattleControl battle(h, a, tile, exp);
     return battle.GetStatus();
 }
@@ -121,6 +123,7 @@ Army::battle_t Army::Battle(Heroes &h, Army::army_t &a, const Maps::Tiles &tile,
  */
 Army::battle_t Army::Battle(Heroes &h, Castle &c, const Maps::Tiles &tile, u32 &exp)
 {
+    if(Settings::Get().PocketPC()) return Army::WIN;
     Battle::BattleControl battle(h, c, tile, exp);
     return battle.GetStatus();
 }
