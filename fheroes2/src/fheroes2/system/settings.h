@@ -128,6 +128,7 @@ public:
     bool BattleMouseShaded(void) const;
     bool Unicode(void) const;
     bool PocketPC(void) const;
+    bool LowMemory(void) const;
 
     const Size & VideoMode(void) const;
 

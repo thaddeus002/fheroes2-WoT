@@ -1,4 +1,7 @@
-SVN - up to r1195
+SVN - up to r1211
+
+Sep, 28, 2009 - Development build, 1210
++ More updates for pocketpc version
 
 Sep, 17, 2009 - Development build, 1195
 

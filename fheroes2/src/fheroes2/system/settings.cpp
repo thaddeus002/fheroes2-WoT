@@ -53,6 +53,8 @@ namespace
         { "use cache",         Settings::USECACHE                    },
         { "pocketpc",          Settings::POCKETPC                    },
         { "pocket pc",         Settings::POCKETPC                    },
+        { "lowmemory",         Settings::LOWMEMORY                   },
+        { "low memory",        Settings::LOWMEMORY                   },
     };
 }
 
@@ -158,6 +160,7 @@ bool Settings::Read(const std::string & filename)
     if(Modes(POCKETPC))
     {
 	SetModes(HIDEINTERFACE);
+	SetModes(LOWMEMORY);
     }
 
     if(Modes(HIDEINTERFACE))
@@ -357,6 +360,7 @@ bool Settings::BattleMouseShaded(void) const { return Modes(BATTLEMOUSESHADOW); 
 bool Settings::Unicode(void) const { return Modes(USEUNICODE); }
 
 bool Settings::PocketPC(void) const { return Modes(POCKETPC); }
+bool Settings::LowMemory(void) const { return Modes(LOWMEMORY); }
 
 /* get video mode */
 const Size & Settings::VideoMode(void) const { return video_mode; }
