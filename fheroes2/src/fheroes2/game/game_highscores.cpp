@@ -48,8 +48,8 @@ Game::menu_t Game::HighScores(void)
 
     LocalEvent & le = LocalEvent::Get();
 
-    Button buttonDismiss(9, 315, ICN::HISCORE, 0, 1);
-    Button buttonExit(604, 315, ICN::HISCORE, 4, 5);
+    Button buttonDismiss(top.x + 9, top.y + 315, ICN::HISCORE, 0, 1);
+    Button buttonExit(top.x + 604, top.y + 315, ICN::HISCORE, 4, 5);
 
     buttonDismiss.Draw();
     buttonExit.Draw();

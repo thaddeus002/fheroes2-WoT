@@ -36,30 +36,33 @@ bool FilePresent(const std::string &);
 #define FATSIZENAME	15
 
 /*AGG::File constructor */
-AGG::File::File(const std::string & fname) : filename(fname), count_items(0), stream(NULL)
+AGG::File::File(void) : count_items(0), stream(NULL)
 {
+}
+
+bool AGG::File::Open(const std::string & fname)
+{
+    filename = fname;
     stream = new std::fstream(filename.c_str(), std::ios::in | std::ios::binary);
 
     if(!stream || stream->fail())
     {
 	Error::Warning("AGG::File: error read file: " + filename + ", skipping...");
-
-	return;
+	return false;
     }
 
     if(Settings::Get().Debug()) Error::Verbose("AGG::File: load: " + filename);
 
+    stream->read(reinterpret_cast<char *>(&count_items), sizeof(u16));
+    SwapLE16(count_items);
+
+    if(Settings::Get().Debug()) Error::Verbose("AGG::File: count items: ", count_items);
+
+    char buf[FATSIZENAME + 1];
+    buf[FATSIZENAME] = 0;
+
+    for(u16 ii = 0; ii < count_items; ++ii)
     {
-        stream->read(reinterpret_cast<char *>(&count_items), sizeof(u16));
-        SwapLE16(count_items);
-
-        if(Settings::Get().Debug()) Error::Verbose("AGG::File: count items: ", count_items);
-
-        char buf[FATSIZENAME + 1];
-        buf[FATSIZENAME] = 0;
-
-        for(u16 ii = 0; ii < count_items; ++ii)
-        {
             const u32 pos = stream->tellg();
 
             stream->seekg(-FATSIZENAME * (count_items - ii), std::ios_base::end);
@@ -79,8 +82,8 @@ AGG::File::File(const std::string & fname) : filename(fname), count_items(0), st
 
             stream->read(reinterpret_cast<char *>(&f.size), sizeof(u32));
             SwapLE32(f.size);
-        }
     }
+    return true;
 }
 
 AGG::File::~File()
@@ -88,7 +91,6 @@ AGG::File::~File()
     if(stream)
     {
 	stream->close();
-	
 	delete stream;
     }
 }
@@ -121,8 +123,6 @@ void AGG::FAT::Dump(const std::string & n) const
 bool AGG::File::Read(const std::string & key, std::vector<char> & body)
 {
     const FAT & f = fat[key];
-
-    body.clear();
 
     if(Settings::Get().Debug() > 3) f.Dump(key);
     
@@ -171,6 +171,7 @@ AGG::Cache::Cache() : sprites_memory_size(0)
 	   !font_small.Open(font2, conf.FontsSmallSize())) conf.ResetModes(Settings::USEUNICODE);
     }
 #endif
+    icn_cache = new icn_cache_t [ICN::UNKNOWN + 1];
 }
 
 AGG::Cache::~Cache()
@@ -180,6 +181,16 @@ AGG::Cache::~Cache()
     std::list<File *>::const_iterator agg_it2 = agg_cache.end();
 
     for(; agg_it1 != agg_it2; ++agg_it1) delete *agg_it1;
+    
+    if(icn_cache)
+    {
+	for(u16 ii = 0; ii < ICN::UNKNOWN + 1; ++ii)
+	{
+	    if(icn_cache[ii].sprites) delete [] icn_cache[ii].sprites;
+	    if(icn_cache[ii].reflect) delete [] icn_cache[ii].reflect;
+	}
+	delete [] icn_cache;
+    }
 }
 
 /* get AGG::Cache object */
@@ -217,9 +228,9 @@ bool AGG::Cache::AttachFile(const std::string & fname)
 
     if(std::string::npos != lower.find(".agg"))
     {
-	AGG::File *file = new File(fname);
+	AGG::File *file = new File();
     
-	if(! file->CountItems())
+	if(! file->Open(fname))
 	{
 	    delete file;
 	    return false;
@@ -245,13 +256,21 @@ bool AGG::Cache::AttachFile(const std::string & fname)
 }
 
 /* load manual ICN object */
-void AGG::Cache::LoadExtraICN(const ICN::icn_t icn, bool reflect)
+void AGG::Cache::LoadExtraICN(const ICN::icn_t icn, u16 index, bool reflect)
 {
-    std::vector<Sprite> & v = reflect ? reflect_icn_cache[icn] : icn_cache[icn];
+    icn_cache_t & v = icn_cache[icn];
 
-    if(v.size()) return;
+    if(reflect)
+    {
+	if(v.reflect && (index >= v.count || v.reflect[index].valid())) return;
+    }
+    else
+    {
+	if(v.sprites && (index >= v.count || v.sprites[index].valid())) return;
+    }
 
-    if(Settings::Get().Debug()) Error::Verbose("AGG::Cache::LoadICN: ", ICN::GetString(icn));
+    const Settings & conf = Settings::Get();
+    if(1 < conf.Debug()) std::cout << "AGG::Cache::LoadICN: " << ICN::GetString(icn) << ", " << index << std::endl;
 
     u8 count = 0;		// for animation sprite need update count for ICN::AnimationFrame
 
@@ -260,25 +279,26 @@ void AGG::Cache::LoadExtraICN(const ICN::icn_t icn, bool reflect)
     {
 	case ICN::TELEPORT1:
 	case ICN::TELEPORT2:
-	case ICN::TELEPORT3: LoadICN(ICN::OBJNMUL2); count = 8; break;
-
-	case ICN::FOUNTAIN:  LoadICN(ICN::OBJNMUL2); count = 2; break;
-
-	case ICN::TREASURE:  LoadICN(ICN::OBJNRSRC); count = 2; break;
-
-	case ICN::ROUTERED:  LoadICN(ICN::ROUTE); count = 145; break;
-
-	case ICN::YELLOW_FONT:  LoadICN(ICN::FONT); count = 96; break;
-	case ICN::YELLOW_SMALFONT: LoadICN(ICN::SMALFONT); count = 96; break;
+	case ICN::TELEPORT3: count = 8; break;
+	case ICN::FOUNTAIN:  count = 2; break;
+	case ICN::TREASURE:  count = 2; break;
+	case ICN::ROUTERED:  count = 145; break;
+	case ICN::YELLOW_FONT:
+	case ICN::YELLOW_SMALFONT: count = 96; break;
 
 	default: break;
     }
 
-    v.resize(count);
+    if(NULL == v.sprites)
+    {
+	v.sprites = new Sprite [count];
+	v.reflect = new Sprite [count];
+	v.count = count;
+    }
 
     for(u8 ii = 0; ii < count; ++ii)
     {
-	Sprite & sprite = v[ii];
+	Sprite & sprite = reflect ? v.reflect[ii] : v.sprites[ii];
 
 	switch(icn)
 	{
@@ -359,6 +379,63 @@ void AGG::Cache::LoadExtraICN(const ICN::icn_t icn, bool reflect)
 }
 
 /* load ICN object to AGG::Cache */
+void AGG::Cache::LoadICN(const ICN::icn_t icn, u16 index, bool reflect)
+{
+    icn_cache_t & v = icn_cache[icn];
+
+    if(reflect)
+    {
+	if(v.reflect && (index >= v.count || v.reflect[index].valid())) return;
+    }
+    else
+    {
+	if(v.sprites && (index >= v.count || v.sprites[index].valid())) return;
+    }
+
+    const Settings & conf = Settings::Get();
+    if(1 < conf.Debug()) std::cout << "AGG::Cache::LoadICN: " << ICN::GetString(icn) << ", " << index << std::endl;
+
+    std::vector<char> body;
+    std::list<File *>::const_iterator it1 = agg_cache.begin();
+    std::list<File *>::const_iterator it2 = agg_cache.end();
+
+    for(; it1 != it2; ++it1)
+    {
+	// read only first found
+	if((**it1).Read(ICN::GetString(icn), body))
+	{
+	    const u16 count_sprite = ReadLE16(reinterpret_cast<const u8*>(&body[0]));
+	    const u32 total_size = ReadLE32(reinterpret_cast<const u8*>(&body[2]));
+
+	    if(NULL == v.sprites)
+	    {
+		v.sprites = new Sprite [count_sprite];
+		v.reflect = new Sprite [count_sprite];
+		v.count = count_sprite;
+	    }
+		
+	    // out of range
+	    if(index >= v.count) return;
+
+	    ICN::Header header1, header2;
+
+    	    header1.Load(&body[6 + index * ICN::Header::SizeOf()]);
+	    if(index + 1 != count_sprite) header2.Load(&body[6 + (index + 1) * ICN::Header::SizeOf()]);
+
+	    const u32 size_data = (index + 1 != count_sprite ? header2.OffsetData() - header1.OffsetData() : total_size - header1.OffsetData());
+
+	    Sprite & sp = reflect ? v.reflect[index] : v.sprites[index];
+	    sp.Set(header1.Width(), header1.Height(), ICN::RequiresAlpha(icn));
+	    sp.SetOffset(header1.OffsetX(), header1.OffsetY());
+	    sp.LoadICN(&body[6 + header1.OffsetData()], size_data, reflect);
+	    sprites_memory_size += sp.GetSize();
+
+	    break;
+	}
+    }
+}
+
+/*
 void AGG::Cache::LoadICN(const ICN::icn_t icn, bool reflect)
 {
     std::vector<Sprite> & v = reflect ? reflect_icn_cache[icn] : icn_cache[icn];
@@ -470,6 +547,7 @@ void AGG::Cache::LoadICN(const ICN::icn_t icn, bool reflect)
 	Error::Warning("AGG::Cache::LoadICN: not found: ", ICN::GetString(icn));
     }
 }
+*/
 
 /* load TIL object to AGG::Cache */
 void AGG::Cache::LoadTIL(const TIL::til_t til)
@@ -730,20 +808,10 @@ void AGG::Cache::LoadFNT(u16 ch)
 }
 
 /* free ICN object in AGG::Cache */
-void AGG::Cache::FreeICN(const ICN::icn_t icn, bool reflect)
+void AGG::Cache::FreeICN(const ICN::icn_t icn)
 {
-    if(Settings::Get().Debug()) Error::Verbose("AGG::Cache::FreeICN: ", ICN::GetString(icn));
-
-    std::vector<Sprite> & v = reflect ? reflect_icn_cache[icn] : icn_cache[icn];
-
-    std::vector<Sprite>::const_iterator it1 = v.begin();
-    std::vector<Sprite>::const_iterator it2 = v.end();
-    for(; it1 != it2; ++it1) sprites_memory_size -= (*it1).GetSize();
-
-    if(2 < Settings::Get().Debug())
-	std::cout << "AGG::Cache::FreeICN: sprites count: " << v.size() << ", total size: " << sprites_memory_size << std::endl;
-
-    if(v.size()) v.clear();
+    if(icn_cache[icn].sprites){ delete [] icn_cache[icn].sprites; icn_cache[icn].sprites = NULL; }
+    if(icn_cache[icn].reflect){ delete [] icn_cache[icn].reflect; icn_cache[icn].reflect = NULL; }
 }
 
 /* free TIL object in AGG::Cache */
@@ -783,9 +851,6 @@ void AGG::Cache::FreeMID(const XMI::xmi_t xmi)
 /* return ICN sprite from AGG::Cache */
 const Sprite & AGG::Cache::GetICN(const ICN::icn_t icn, u16 index, bool reflect)
 {
-    const std::vector<Sprite> & v = reflect ? reflect_icn_cache[icn] : icn_cache[icn];
-
-    if(0 == v.size())
     switch(icn)
     {
 	case ICN::YELLOW_FONT:
@@ -795,39 +860,26 @@ const Sprite & AGG::Cache::GetICN(const ICN::icn_t icn, u16 index, bool reflect)
 	case ICN::TELEPORT2:
 	case ICN::TELEPORT3:
 	case ICN::FOUNTAIN:
-	case ICN::TREASURE:	LoadExtraICN(icn, reflect);	break;
+	case ICN::TREASURE:	LoadExtraICN(icn, index, reflect); break;
 
-	default:		LoadICN(icn, reflect);		break;
+	default:		LoadICN(icn, index, reflect);	break;
     }
 
-    if(index >= v.size())
+    icn_cache_t & v = icn_cache[icn];
+
+    if(index >= v.count)
     {
 	Error::Warning("AGG::GetICN: " + std::string(ICN::GetString(icn)) + ", index out of range: ", index);
-
 	index = 0;
     }
 
-    const Sprite & sprite = v[index];
-	
-    if(! sprite.valid())
-    {
-	Error::Warning("AGG::GetICN: icn: ", icn);
-	Error::Warning("AGG::GetICN: icn name: ", ICN::GetString(icn));
-	Error::Warning("AGG::GetICN: index: ", index);
-	Error::Except("AGG::GetICN: return is NULL");
-    }
-
-    return sprite;
+    return reflect ? v.sprites[index] : v.sprites[index];
 }
 
 /* return count of sprites from specific ICN */
 int AGG::Cache::GetICNCount(const ICN::icn_t icn)
 {
-    const std::vector<Sprite> & v = icn_cache[icn];
-
-    if(0 == v.size()) LoadICN(icn, false);
-
-    return v.size();
+    return icn_cache[icn].count;
 }
 
 /* return TIL surface from AGG::Cache */
@@ -942,7 +994,7 @@ bool AGG::Cache::isValidFonts(void) const
 // wrapper AGG::PreloadObject
 void AGG::PreloadObject(const ICN::icn_t icn, bool reflect)
 {
-    return AGG::Cache::Get().LoadICN(icn, reflect);
+//    return AGG::Cache::Get().LoadICN(icn, reflect);
 }
 
 void AGG::PreloadObject(const TIL::til_t til)
@@ -951,9 +1003,9 @@ void AGG::PreloadObject(const TIL::til_t til)
 }
 
 // wrapper AGG::FreeObject
-void AGG::FreeObject(const ICN::icn_t icn, bool reflect)
+void AGG::FreeObject(const ICN::icn_t icn)
 {
-    return AGG::Cache::Get().FreeICN(icn, reflect);
+    return AGG::Cache::Get().FreeICN(icn);
 }
 
 void AGG::FreeObject(const TIL::til_t til)
