@@ -55,6 +55,8 @@ namespace
         { "pocket pc",         Settings::POCKETPC                    },
         { "lowmemory",         Settings::LOWMEMORY                   },
         { "low memory",        Settings::LOWMEMORY                   },
+        { "tapmode",           Settings::TAPMODE                     },
+        { "tap mode",          Settings::TAPMODE                     },
     };
 }
 
@@ -361,6 +363,7 @@ bool Settings::Unicode(void) const { return Modes(USEUNICODE); }
 
 bool Settings::PocketPC(void) const { return Modes(POCKETPC); }
 bool Settings::LowMemory(void) const { return Modes(LOWMEMORY); }
+bool Settings::TapMode(void) const { return Modes(TAPMODE); }
 
 /* get video mode */
 const Size & Settings::VideoMode(void) const { return video_mode; }

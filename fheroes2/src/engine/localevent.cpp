@@ -26,6 +26,11 @@ LocalEvent::LocalEvent() : modes(0), key_value(KEY_NONE), mouse_state(0),
 {
 }
 
+void LocalEvent::SetTapMode(bool f)
+{
+    f ? SetModes(TAP_MODE) : ResetModes(TAP_MODE);
+}
+
 void LocalEvent::SetModes(flag_t f)
 {
     modes |= f;
@@ -328,7 +333,7 @@ void LocalEvent::HandleMouseWheelEvent(const SDL_MouseButtonEvent & button)
 
 bool LocalEvent::MouseClickLeft(const Rect &rt)
 {
-    if(MouseReleaseLeft() && (rt & mouse_pl) && (rt & mouse_rl) && (PRESS_LEFT & modes))
+    if(MouseReleaseLeft() && (rt & mouse_rl) && (PRESS_LEFT & modes) && ((modes & TAP_MODE) || (rt & mouse_pl)))
     {
 	ResetModes(PRESS_LEFT);
 	return true;
@@ -339,7 +344,7 @@ bool LocalEvent::MouseClickLeft(const Rect &rt)
 
 bool LocalEvent::MouseClickMiddle(const Rect &rt)
 {
-    if(MouseReleaseMiddle() && (rt & mouse_pm) && (PRESS_MIDDLE & modes))
+    if(MouseReleaseMiddle() && (rt & mouse_pm) && (rt & mouse_rm) && (PRESS_MIDDLE & modes))
     {
 	ResetModes(PRESS_MIDDLE);
 	return true;
@@ -350,7 +355,7 @@ bool LocalEvent::MouseClickMiddle(const Rect &rt)
 
 bool LocalEvent::MouseClickRight(const Rect &rt)
 {
-    if(MouseReleaseRight() && (rt & mouse_pr) && (PRESS_RIGHT & modes))
+    if(MouseReleaseRight() && (rt & mouse_pr) && (rt & mouse_rr) && (PRESS_RIGHT & modes))
     {
 	ResetModes(PRESS_RIGHT);
 	return true;

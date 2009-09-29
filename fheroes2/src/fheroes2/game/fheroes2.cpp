@@ -269,6 +269,8 @@ int main(int argc, char **argv)
 	    le.SetGlobalFilterKeysEvents(Game::KeyboardGlobalFilter);
 	    le.SetGlobalFilter(true);
 
+	    le.SetTapMode(conf.TapMode());
+
 	    // goto main menu
 	    Game::menu_t rs = (test ? Game::TESTING : (conf.Editor() ? Game::EDITMAINMENU : Game::MAINMENU));
 

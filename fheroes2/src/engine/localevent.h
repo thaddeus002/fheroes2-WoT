@@ -135,6 +135,7 @@ public:
     void SetGlobalFilterMouseEvents(void (*pf)(u16, u16));
     void SetGlobalFilterKeysEvents(void (*pf)(u16, u16));
     void SetGlobalFilter(bool);
+    void SetTapMode(bool);
 
     static void SetStateDefaults(void);
     static void SetState(u8 type, bool enable);
@@ -204,7 +205,7 @@ private:
 
     static int GlobalFilterEvents(const SDL_Event *event);
 
-    enum flag_t { KEY_PRESSED = 0x01, MOUSE_MOTION = 0x02, MOUSE_PRESSED = 0x04, GLOBAL_FILTER = 0x08, PRESS_LEFT = 0x10, PRESS_RIGHT = 0x20, PRESS_MIDDLE = 0x40 };
+    enum flag_t { KEY_PRESSED = 0x01, MOUSE_MOTION = 0x02, MOUSE_PRESSED = 0x04, GLOBAL_FILTER = 0x08, PRESS_LEFT = 0x10, PRESS_RIGHT = 0x20, PRESS_MIDDLE = 0x40, TAP_MODE = 0x80 };
 
     void SetModes(flag_t);
     void ResetModes(flag_t);

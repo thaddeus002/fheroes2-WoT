@@ -47,6 +47,7 @@ public:
 	DEDICATEDSERVER   = 0x00000004,
 	POCKETPC          = 0x00000008,
 	LOWMEMORY         = 0x00000010,
+	TAPMODE           = 0x00000020,
 
 	SHOWCPANEL        = 0x00000100,
 	SHOWRADAR         = 0x00000200,
@@ -129,6 +130,7 @@ public:
     bool Unicode(void) const;
     bool PocketPC(void) const;
     bool LowMemory(void) const;
+    bool TapMode(void) const;
 
     const Size & VideoMode(void) const;
 
