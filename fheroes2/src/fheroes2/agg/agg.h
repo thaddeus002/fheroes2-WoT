@@ -55,10 +55,9 @@ namespace AGG
     class File
     {
     public:
-	File();
+	File(const std::string &);
 	~File();
 
-	bool Open(const std::string &);
 	const std::string & Name(void) const;
 	const FAT & Fat(const std::string & key);
 	u16 CountItems(void);
@@ -68,18 +67,10 @@ namespace AGG
 	void Dump(void) const;
 
     private:
-	std::string filename;
+	const std::string filename;
 	std::map<std::string, FAT> fat;
 	u16 count_items;
 	std::fstream * stream;
-    };
-
-    struct icn_cache_t
-    {
-	icn_cache_t() : sprites(NULL), reflect(NULL), count(0) {};
-	Sprite *sprites;
-	Sprite *reflect;
-	u16 count;
     };
 
     class Cache
@@ -103,8 +94,8 @@ namespace AGG
 	const SDL::Font & GetSmallFont(void) const;
 #endif
 
-	void LoadExtraICN(const ICN::icn_t icn, u16 index, bool reflect = false);
-	void LoadICN(const ICN::icn_t icn, u16 index, bool reflect = false);
+	void LoadExtraICN(const ICN::icn_t icn, bool reflect = false);
+	void LoadICN(const ICN::icn_t icn, bool reflect = false);
 	void LoadTIL(const TIL::til_t til);
 	void LoadWAV(const M82::m82_t m82);
         void LoadMUS(const MUS::mus_t mus);
@@ -115,7 +106,7 @@ namespace AGG
 	void LoadFNT(u16);
 	bool isValidFonts(void) const;
 
-	void FreeICN(const ICN::icn_t icn);
+	void FreeICN(const ICN::icn_t icn, bool reflect = false);
 	void FreeTIL(const TIL::til_t til);
 	void FreeWAV(const M82::m82_t m82);
         void FreeMUS(const MUS::mus_t mus);
@@ -126,8 +117,8 @@ namespace AGG
 
 	std::list<File *> agg_cache;
 
-	icn_cache_t* icn_cache;
-
+	std::map<ICN::icn_t, std::vector<Sprite> > icn_cache;
+	std::map<ICN::icn_t, std::vector<Sprite> > reflect_icn_cache;
 	std::map<TIL::til_t, std::vector<Surface> > til_cache;
 	std::map<M82::m82_t, std::vector<u8> > wav_cache;
         std::map<MUS::mus_t, std::vector<u8> > mus_cache;
@@ -146,7 +137,7 @@ namespace AGG
     void PreloadObject(const TIL::til_t til);
 
     // wrapper AGG::FreeObject
-    void FreeObject(const ICN::icn_t icn);
+    void FreeObject(const ICN::icn_t icn, bool reflect = false);
     void FreeObject(const TIL::til_t til);
 
     // wrapper AGG::GetXXX
