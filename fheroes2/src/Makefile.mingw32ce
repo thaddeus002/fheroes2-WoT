@@ -1,3 +1,11 @@
+ifndef WITHOUT_MIXER
+LIBS := $(LIBS) -lSDL -lmad -lvorbisfile -lvorbis -logg
+endif
+
+ifndef WITHOUT_UNICODE
+LIBS := $(LIBS) -lintl -lfreetype
+endif
+
 AR := arm-mingw32ce-ar
 CXX := arm-mingw32ce-g++
 CFLAGS := $(CFLAGS) -static
