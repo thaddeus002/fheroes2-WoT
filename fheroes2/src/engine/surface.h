@@ -115,6 +115,7 @@ public:
     void MakeContour(Surface &, u32) const;
 
     void ChangeColor(u32, u32);
+    void ChangeColorIndex(u32, u32);
     void GrayScale(void);
     void Sepia(void);
     
@@ -127,6 +128,7 @@ public:
 
     static void SetDefaultDepth(u8);
     static u8   GetDefaultDepth(void);
+    static void FreeSurface(Surface &);
 
 protected:
 #ifdef WITH_TTF
@@ -136,7 +138,6 @@ protected:
 
     void CreateSurface(const Rect &sz, u8 dp, u32 fl){ CreateSurface(sz.w, sz.h, dp, fl); };
     void CreateSurface(u16 sw, u16 sh, u8 dp, u32 fl);
-    void FreeSurface(void);
     const SDL_PixelFormat *GetPixelFormat(void) const;
 
     SDL_Surface *surface;

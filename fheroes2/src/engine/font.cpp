@@ -74,7 +74,7 @@ void SDL::Font::SetStyle(u8 style)
 
 void SDL::Font::RenderText(Surface & dst, const std::string & msg, const Colors & clr, render_t render)
 {
-    if(dst.surface) SDL_FreeSurface(dst.surface);
+    if(dst.surface) Surface::FreeSurface(dst);
     if(fnt) switch(render)
     {
 	case BLENDED:	dst.surface = TTF_RenderUTF8_Blended(fnt, msg.c_str(), clr);	break;
@@ -87,7 +87,7 @@ void SDL::Font::RenderChar(Surface & dst, char ch, const Colors & clr, render_t 
     char buf[2] = { '\0', '\0' };
          buf[0] = ch;
 
-    if(dst.surface) SDL_FreeSurface(dst.surface);
+    if(dst.surface) Surface::FreeSurface(dst);
     if(fnt) switch(render)
     {
 	case BLENDED:	dst.surface = TTF_RenderUTF8_Blended(fnt, buf, clr);	break;
@@ -97,7 +97,7 @@ void SDL::Font::RenderChar(Surface & dst, char ch, const Colors & clr, render_t 
 
 void SDL::Font::RenderUnicodeText(Surface & dst, const u16 *msg, const Colors & clr, render_t render)
 {
-    if(dst.surface) SDL_FreeSurface(dst.surface);
+    if(dst.surface) Surface::FreeSurface(dst);
     if(fnt) switch(render)
     {
 	case BLENDED:	dst.surface = TTF_RenderUNICODE_Blended(fnt, msg, clr);	break;
@@ -110,7 +110,7 @@ void SDL::Font::RenderUnicodeChar(Surface & dst, u16 ch, const Colors & clr, ren
     u16 buf[2] = { L'\0', L'\0' };
         buf[0] = ch;
 
-    if(dst.surface) SDL_FreeSurface(dst.surface);
+    if(dst.surface) Surface::FreeSurface(dst);
     if(fnt) switch(render)
     {
 	case BLENDED:	dst.surface = TTF_RenderUNICODE_Blended(fnt, buf, clr);	break;

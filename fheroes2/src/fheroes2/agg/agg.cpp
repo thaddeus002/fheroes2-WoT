@@ -36,30 +36,33 @@ bool FilePresent(const std::string &);
 #define FATSIZENAME	15
 
 /*AGG::File constructor */
-AGG::File::File(const std::string & fname) : filename(fname), count_items(0), stream(NULL)
+AGG::File::File(void) : count_items(0), stream(NULL)
 {
+}
+
+bool AGG::File::Open(const std::string & fname)
+{
+    filename = fname;
     stream = new std::fstream(filename.c_str(), std::ios::in | std::ios::binary);
 
     if(!stream || stream->fail())
     {
 	Error::Warning("AGG::File: error read file: " + filename + ", skipping...");
-
-	return;
+	return false;
     }
 
     if(Settings::Get().Debug()) Error::Verbose("AGG::File: load: " + filename);
 
+    stream->read(reinterpret_cast<char *>(&count_items), sizeof(u16));
+    SwapLE16(count_items);
+
+    if(Settings::Get().Debug()) Error::Verbose("AGG::File: count items: ", count_items);
+
+    char buf[FATSIZENAME + 1];
+    buf[FATSIZENAME] = 0;
+
+    for(u16 ii = 0; ii < count_items; ++ii)
     {
-        stream->read(reinterpret_cast<char *>(&count_items), sizeof(u16));
-        SwapLE16(count_items);
-
-        if(Settings::Get().Debug()) Error::Verbose("AGG::File: count items: ", count_items);
-
-        char buf[FATSIZENAME + 1];
-        buf[FATSIZENAME] = 0;
-
-        for(u16 ii = 0; ii < count_items; ++ii)
-        {
             const u32 pos = stream->tellg();
 
             stream->seekg(-FATSIZENAME * (count_items - ii), std::ios_base::end);
@@ -79,8 +82,8 @@ AGG::File::File(const std::string & fname) : filename(fname), count_items(0), st
 
             stream->read(reinterpret_cast<char *>(&f.size), sizeof(u32));
             SwapLE32(f.size);
-        }
     }
+    return true;
 }
 
 AGG::File::~File()
@@ -88,9 +91,13 @@ AGG::File::~File()
     if(stream)
     {
 	stream->close();
-	
 	delete stream;
     }
+}
+
+bool AGG::File::isGood(void) const
+{
+    return stream && stream->good() && count_items;
 }
 
 /* get AGG file name */
@@ -121,8 +128,6 @@ void AGG::FAT::Dump(const std::string & n) const
 bool AGG::File::Read(const std::string & key, std::vector<char> & body)
 {
     const FAT & f = fat[key];
-
-    body.clear();
 
     if(Settings::Get().Debug() > 3) f.Dump(key);
     
@@ -158,7 +163,7 @@ void AGG::File::Dump(void) const
 }
 
 /* AGG::Cache constructor */
-AGG::Cache::Cache() : sprites_memory_size(0)
+AGG::Cache::Cache()
 {
 #ifdef WITH_TTF
     Settings & conf = Settings::Get();
@@ -171,15 +176,30 @@ AGG::Cache::Cache() : sprites_memory_size(0)
 	   !font_small.Open(font2, conf.FontsSmallSize())) conf.ResetModes(Settings::USEUNICODE);
     }
 #endif
+    icn_cache = new icn_cache_t [ICN::UNKNOWN + 1];
+    til_cache = new til_cache_t [TIL::UNKNOWN + 1];
 }
 
 AGG::Cache::~Cache()
 {
-    // free agg cache
-    std::list<File *>::const_iterator agg_it1 = agg_cache.begin();
-    std::list<File *>::const_iterator agg_it2 = agg_cache.end();
+    if(icn_cache)
+    {
+	for(u16 ii = 0; ii < ICN::UNKNOWN + 1; ++ii)
+	{
+	    if(icn_cache[ii].sprites) delete [] icn_cache[ii].sprites;
+	    if(icn_cache[ii].reflect) delete [] icn_cache[ii].reflect;
+	}
+	delete [] icn_cache;
+    }
 
-    for(; agg_it1 != agg_it2; ++agg_it1) delete *agg_it1;
+    if(til_cache)
+    {
+	for(u16 ii = 0; ii < TIL::UNKNOWN + 1; ++ii)
+	{
+	    if(til_cache[ii].sprites) delete [] til_cache[ii].sprites;
+	}
+	delete [] til_cache;
+    }
 }
 
 /* get AGG::Cache object */
@@ -190,167 +210,154 @@ AGG::Cache & AGG::Cache::Get(void)
     return agg_cache;
 }
 
-/* attach AGG::File to AGG::Cache */
-bool AGG::Cache::AttachFile(const std::string & fname)
+/* read data directory */
+bool AGG::Cache::ReadDataDir(void)
 {
-    std::string lower;
-    bool heroes2_agg = false;
-    std::list<File *>::const_iterator it1 = agg_cache.begin();
-    std::list<File *>::const_iterator it2 = agg_cache.end();
+    const Settings & conf = Settings::Get();
+    Dir dir;
 
-    for(; it1 != it2; ++it1)
+    dir.Read(conf.DataDirectory(), ".agg", false);
+    dir.Read(conf.LocalPrefix() + SEPARATOR + conf.DataDirectory(), ".agg", false);
+
+    // not found agg, exit
+    if(0 == dir.size()) return false;
+
+    // attach agg files
+    for(Dir::const_iterator itd = dir.begin(); itd != dir.end(); ++itd)
     {
-	const File & agg_file = **it1;
-	if(agg_file.Name() == fname)
-	{
-	    Error::Warning("AGG::Cache::AttachFile: already present: " + fname);
-	    return false;
-	}
-
-	lower = agg_file.Name();
+	std::string lower = *itd;
 	String::Lower(lower);
-	if(std::string::npos != lower.find("heroes2.agg")) heroes2_agg = true;
+	if(std::string::npos != lower.find("heroes2.agg") && !heroes2_agg.isGood()) heroes2_agg.Open(*itd);
+	if(std::string::npos != lower.find("heroes2x.agg") && !heroes2x_agg.isGood()) heroes2x_agg.Open(*itd);
     }
 
-    lower = fname;
-    String::Lower(lower);
+    if(heroes2x_agg.isGood()) Settings::Get().SetModes(Settings::PRICELOYALTY);
 
-    if(std::string::npos != lower.find(".agg"))
-    {
-	AGG::File *file = new File(fname);
-    
-	if(! file->CountItems())
-	{
-	    delete file;
-	    return false;
-	}
+    return heroes2_agg.isGood();
+}
 
-	if(std::string::npos != lower.find("heroes2.agg"))
-	    agg_cache.push_back(file);
-	else
-	if(std::string::npos != lower.find("heroes2x.agg"))
-	{
-	    if(heroes2_agg)
-		agg_cache.insert(--(agg_cache.end()), file);
-	    else
-		agg_cache.push_back(file);
+bool AGG::Cache::ReadChunk(const std::string & key, std::vector<char> & body)
+{
+    if(heroes2x_agg.isGood() && heroes2x_agg.Read(key, body)) return true;
 
-	    Settings::Get().SetModes(Settings::PRICELOYALTY);
-	}
-	else
-    	    agg_cache.push_front(file);
-    }
-
-    return true;
+    return heroes2_agg.isGood() && heroes2_agg.Read(key, body);
 }
 
 /* load manual ICN object */
-void AGG::Cache::LoadExtraICN(const ICN::icn_t icn, bool reflect)
+void AGG::Cache::LoadExtraICN(const ICN::icn_t icn, u16 index, bool reflect)
 {
-    std::vector<Sprite> & v = reflect ? reflect_icn_cache[icn] : icn_cache[icn];
+    icn_cache_t & v = icn_cache[icn];
 
-    if(v.size()) return;
+    if(reflect)
+    {
+	if(v.reflect && (index >= v.count || v.reflect[index].valid())) return;
+    }
+    else
+    {
+	if(v.sprites && (index >= v.count || v.sprites[index].valid())) return;
+    }
 
-    if(Settings::Get().Debug()) Error::Verbose("AGG::Cache::LoadICN: ", ICN::GetString(icn));
+    const Settings & conf = Settings::Get();
+    if(1 < conf.Debug()) std::cout << "AGG::Cache::LoadICN: " << ICN::GetString(icn) << ", " << index << std::endl;
 
     u8 count = 0;		// for animation sprite need update count for ICN::AnimationFrame
 
-    // Preload ICN
     switch(icn)
     {
 	case ICN::TELEPORT1:
 	case ICN::TELEPORT2:
-	case ICN::TELEPORT3: LoadICN(ICN::OBJNMUL2); count = 8; break;
-
-	case ICN::FOUNTAIN:  LoadICN(ICN::OBJNMUL2); count = 2; break;
-
-	case ICN::TREASURE:  LoadICN(ICN::OBJNRSRC); count = 2; break;
-
-	case ICN::ROUTERED:  LoadICN(ICN::ROUTE); count = 145; break;
-
-	case ICN::YELLOW_FONT:  LoadICN(ICN::FONT); count = 96; break;
-	case ICN::YELLOW_SMALFONT: LoadICN(ICN::SMALFONT); count = 96; break;
+	case ICN::TELEPORT3: count = 8; break;
+	case ICN::FOUNTAIN:  count = 2; break;
+	case ICN::TREASURE:  count = 2; break;
+	case ICN::ROUTERED:  count = 145; break;
+	case ICN::YELLOW_FONT:
+	case ICN::YELLOW_SMALFONT: count = 96; break;
 
 	default: break;
     }
 
-    v.resize(count);
+    if(NULL == v.sprites)
+    {
+	v.sprites = new Sprite [count];
+	v.reflect = new Sprite [count];
+	v.count = count;
+    }
 
     for(u8 ii = 0; ii < count; ++ii)
     {
-	Sprite & sprite = v[ii];
+	Sprite & sprite = reflect ? v.reflect[ii] : v.sprites[ii];
 
 	switch(icn)
 	{
 	    case ICN::TELEPORT1:
 		sprite = GetICN(ICN::OBJNMUL2, 116);
-		sprite.ChangeColor(sprite.GetColor(0xEE), sprite.GetColor(0xEE + ii / 2));
+		sprite.ChangeColorIndex(0xEE, 0xEE + ii / 2);
 		break;
 
 	    case ICN::TELEPORT2:
 		sprite = GetICN(ICN::OBJNMUL2, 119);
-		sprite.ChangeColor(sprite.GetColor(0xEE), sprite.GetColor(0xEE + ii));
+		sprite.ChangeColorIndex(0xEE, 0xEE + ii);
 		break;
 
 	    case ICN::TELEPORT3:
 		sprite = GetICN(ICN::OBJNMUL2, 122);
-		sprite.ChangeColor(sprite.GetColor(0xEE), sprite.GetColor(0xEE + ii));
+		sprite.ChangeColorIndex(0xEE, 0xEE + ii);
 		break;
 
 	    case ICN::FOUNTAIN:
 		sprite = GetICN(ICN::OBJNMUL2, 15);
-		sprite.ChangeColor(sprite.GetColor(0xE8), sprite.GetColor(0xE8 - ii));
-		sprite.ChangeColor(sprite.GetColor(0xE9), sprite.GetColor(0xE9 - ii));
-		sprite.ChangeColor(sprite.GetColor(0xEA), sprite.GetColor(0xEA - ii));
-		sprite.ChangeColor(sprite.GetColor(0xEB), sprite.GetColor(0xEB - ii));
-		sprite.ChangeColor(sprite.GetColor(0xEC), sprite.GetColor(0xEC - ii));
-		sprite.ChangeColor(sprite.GetColor(0xED), sprite.GetColor(0xED - ii));
-		sprite.ChangeColor(sprite.GetColor(0xEE), sprite.GetColor(0xEE - ii));
-		sprite.ChangeColor(sprite.GetColor(0xEF), sprite.GetColor(0xEF - ii));
+		sprite.ChangeColorIndex(0xE8, 0xE8 - ii);
+		sprite.ChangeColorIndex(0xE9, 0xE9 - ii);
+		sprite.ChangeColorIndex(0xEA, 0xEA - ii);
+		sprite.ChangeColorIndex(0xEB, 0xEB - ii);
+		sprite.ChangeColorIndex(0xEC, 0xEC - ii);
+		sprite.ChangeColorIndex(0xED, 0xED - ii);
+		sprite.ChangeColorIndex(0xEE, 0xEE - ii);
+		sprite.ChangeColorIndex(0xEF, 0xEF - ii);
 		break;
 
 	    case ICN::TREASURE:
 		sprite = GetICN(ICN::OBJNRSRC, 19);
-		sprite.ChangeColor(sprite.GetColor(0x0A), sprite.GetColor(ii ? 0x00 : 0x0A));
-		sprite.ChangeColor(sprite.GetColor(0xC2), sprite.GetColor(ii ? 0xD6 : 0xC2));
-		sprite.ChangeColor(sprite.GetColor(0x64), sprite.GetColor(ii ? 0xDA : 0x64));
+		sprite.ChangeColorIndex(0x0A, ii ? 0x00 : 0x0A);
+		sprite.ChangeColorIndex(0xC2, ii ? 0xD6 : 0xC2);
+		sprite.ChangeColorIndex(0x64, ii ? 0xDA : 0x64);
 		break;
 
 	    case ICN::ROUTERED:
 		sprite = GetICN(ICN::ROUTE, ii);
-		sprite.ChangeColor(sprite.GetColor(0x55), sprite.GetColor(0xB0));
-		sprite.ChangeColor(sprite.GetColor(0x5C), sprite.GetColor(0xB7));
-		sprite.ChangeColor(sprite.GetColor(0x60), sprite.GetColor(0xBB));
+		sprite.ChangeColorIndex(0x55, 0xB0);
+		sprite.ChangeColorIndex(0x5C, 0xB7);
+		sprite.ChangeColorIndex(0x60, 0xBB);
 		break;
 
 	    case ICN::YELLOW_FONT:
 		sprite = GetICN(ICN::FONT, ii);
-		sprite.ChangeColor(sprite.GetColor(0x0A), sprite.GetColor(0xDA));
-		sprite.ChangeColor(sprite.GetColor(0x0B), sprite.GetColor(0xDA));
-		sprite.ChangeColor(sprite.GetColor(0x0C), sprite.GetColor(0xDA));
-		sprite.ChangeColor(sprite.GetColor(0x0D), sprite.GetColor(0xDA));
-		sprite.ChangeColor(sprite.GetColor(0x0E), sprite.GetColor(0xDB));
-		sprite.ChangeColor(sprite.GetColor(0x0F), sprite.GetColor(0xDB));
-		sprite.ChangeColor(sprite.GetColor(0x10), sprite.GetColor(0xDB));
-		sprite.ChangeColor(sprite.GetColor(0x11), sprite.GetColor(0xDB));
-		sprite.ChangeColor(sprite.GetColor(0x12), sprite.GetColor(0xDB));
-		sprite.ChangeColor(sprite.GetColor(0x13), sprite.GetColor(0xDB));
-		sprite.ChangeColor(sprite.GetColor(0x14), sprite.GetColor(0xDB));
+		sprite.ChangeColorIndex(0x0A, 0xDA);
+		sprite.ChangeColorIndex(0x0B, 0xDA);
+		sprite.ChangeColorIndex(0x0C, 0xDA);
+		sprite.ChangeColorIndex(0x0D, 0xDA);
+		sprite.ChangeColorIndex(0x0E, 0xDB);
+		sprite.ChangeColorIndex(0x0F, 0xDB);
+		sprite.ChangeColorIndex(0x10, 0xDB);
+		sprite.ChangeColorIndex(0x11, 0xDB);
+		sprite.ChangeColorIndex(0x12, 0xDB);
+		sprite.ChangeColorIndex(0x13, 0xDB);
+		sprite.ChangeColorIndex(0x14, 0xDB);
 		break;
 
 	    case ICN::YELLOW_SMALFONT:
 		sprite = GetICN(ICN::SMALFONT, ii);
-		sprite.ChangeColor(sprite.GetColor(0x0A), sprite.GetColor(0xDA));
-		sprite.ChangeColor(sprite.GetColor(0x0B), sprite.GetColor(0xDA));
-		sprite.ChangeColor(sprite.GetColor(0x0C), sprite.GetColor(0xDA));
-		sprite.ChangeColor(sprite.GetColor(0x0D), sprite.GetColor(0xDA));
-		sprite.ChangeColor(sprite.GetColor(0x0E), sprite.GetColor(0xDB));
-		sprite.ChangeColor(sprite.GetColor(0x0F), sprite.GetColor(0xDB));
-		sprite.ChangeColor(sprite.GetColor(0x10), sprite.GetColor(0xDB));
-		sprite.ChangeColor(sprite.GetColor(0x11), sprite.GetColor(0xDB));
-		sprite.ChangeColor(sprite.GetColor(0x12), sprite.GetColor(0xDB));
-		sprite.ChangeColor(sprite.GetColor(0x13), sprite.GetColor(0xDB));
-		sprite.ChangeColor(sprite.GetColor(0x14), sprite.GetColor(0xDB));
+		sprite.ChangeColorIndex(0x0A, 0xDA);
+		sprite.ChangeColorIndex(0x0B, 0xDA);
+		sprite.ChangeColorIndex(0x0C, 0xDA);
+		sprite.ChangeColorIndex(0x0D, 0xDA);
+		sprite.ChangeColorIndex(0x0E, 0xDB);
+		sprite.ChangeColorIndex(0x0F, 0xDB);
+		sprite.ChangeColorIndex(0x10, 0xDB);
+		sprite.ChangeColorIndex(0x11, 0xDB);
+		sprite.ChangeColorIndex(0x12, 0xDB);
+		sprite.ChangeColorIndex(0x13, 0xDB);
+		sprite.ChangeColorIndex(0x14, 0xDB);
 		break;
 
 	    default: break;
@@ -359,11 +366,19 @@ void AGG::Cache::LoadExtraICN(const ICN::icn_t icn, bool reflect)
 }
 
 /* load ICN object to AGG::Cache */
-void AGG::Cache::LoadICN(const ICN::icn_t icn, bool reflect)
+void AGG::Cache::LoadICN(const ICN::icn_t icn, u16 index, bool reflect)
 {
-    std::vector<Sprite> & v = reflect ? reflect_icn_cache[icn] : icn_cache[icn];
+    icn_cache_t & v = icn_cache[icn];
 
-    if(v.size()) return;
+    if(reflect)
+    {
+	if(v.reflect && (index >= v.count || v.reflect[index].valid())) return;
+    }
+    else
+    {
+	if(v.sprites && (index >= v.count || v.sprites[index].valid())) return;
+    }
+
     const Settings & conf = Settings::Get();
 
     // load from image cache dir
@@ -384,139 +399,102 @@ void AGG::Cache::LoadICN(const ICN::icn_t icn, bool reflect)
 	    0 == std::strcmp("icn", xml_icn->Value()))
 	{
 	    int count, ox, oy;
-	    bool good_load = true;
 	    xml_icn->Attribute("count", &count);
-	    v.reserve(count);
 
-	    TiXmlElement *xml_sprite = xml_icn->FirstChildElement();
-	    for(; xml_sprite; xml_sprite = xml_sprite->NextSiblingElement())
+	    if(NULL == v.sprites)
 	    {
-		if(std::strcmp("sprite", xml_sprite->Value())) continue;
+		v.count = count;
+		v.sprites = new Sprite [v.count];
+		v.reflect = new Sprite [v.count];
+	    }
+
+	    // find current image
+	    TiXmlElement *xml_sprite = xml_icn->FirstChildElement();
+	    u16 ii = 0;
+	    for(; ii != index && xml_sprite; xml_sprite = xml_sprite->NextSiblingElement(), ++ii)
+		if(std::strcmp("sprite", xml_sprite->Value())) --ii;
+
+	    if(xml_sprite && ii == index)
+	    {
 		xml_sprite->Attribute("ox", &ox);
 		xml_sprite->Attribute("oy", &oy);
 		const std::string sprite_file(icn_folder + SEPARATOR + xml_sprite->Attribute("name"));
-    		v.push_back(Sprite());
-		Sprite & sp = v.back();
+		Sprite & sp = reflect ? v.reflect[index] : v.sprites[index];
+		// good load
 		if(sp.Load(sprite_file.c_str()) && sp.valid())
 		{
 		    sp.SetOffset(ox, oy);
-		    sprites_memory_size += sp.GetSize();
-		}
-		else
-		{
-		    Error::Warning("AGG::Cache::LoadICN: broken image file: " + sprite_file);
-		    good_load = false;
+		    if(1 < conf.Debug()) std::cout << "AGG::Cache::LoadICN: " << xml_spec << ", " << index << std::endl;
+
+		    return;
 		}
 	    }
-	    if(2 < conf.Debug()) std::cout << "AGG::Cache::LoadICN: sprites count: " << count << ", total size: " << sprites_memory_size << std::endl;
-
-	    // load ended
-	    if(good_load) return;
 	}
-	else
-	if(conf.Debug()) 
-    	    Error::Verbose("AGG::Cache::LoadICN: broken xml file: " + xml_spec);
+	if(conf.Debug()) Error::Verbose("AGG::Cache::LoadICN: broken xml file: " + xml_spec);
     }
 
-    if(conf.Debug()) Error::Verbose("AGG::Cache::LoadICN: ", ICN::GetString(icn));
+    // loading original
+    if(1 < conf.Debug()) std::cout << "AGG::Cache::LoadICN: " << ICN::GetString(icn) << ", " << index << std::endl;
 
-    // load from agg file
-    if(agg_cache.size())
+    std::vector<char> body;
+
+    if(ReadChunk(ICN::GetString(icn), body))
     {
-	std::vector<char> body;
+	if(NULL == v.sprites)
+	{
+	    v.count = ReadLE16(reinterpret_cast<const u8*>(&body[0]));
+	    v.sprites = new Sprite [v.count];
+	    v.reflect = new Sprite [v.count];
+	}
 
-	std::list<File *>::const_iterator it1 = agg_cache.begin();
-	std::list<File *>::const_iterator it2 = agg_cache.end();
+	ICN::Header header1, header2;
 
-	for(; it1 != it2; ++it1)
+	header1.Load(&body[6 + index * ICN::Header::SizeOf()]);
+	if(index + 1 != v.count) header2.Load(&body[6 + (index + 1) * ICN::Header::SizeOf()]);
 
-	    // read only first found
-	    if((**it1).Read(ICN::GetString(icn), body))
-	    {
-		u16 count_sprite;
-		u32 total_size;
+	const u32 size_data = (index + 1 != v.count ? header2.OffsetData() - header1.OffsetData() :
+				    // total size
+				    ReadLE32(reinterpret_cast<const u8*>(&body[2])) - header1.OffsetData());
 
-		count_sprite = ReadLE16(reinterpret_cast<const u8*>(&body[0]));
-		total_size = ReadLE32(reinterpret_cast<const u8*>(&body[2]));
-
-		v.resize(count_sprite);
-
-		std::vector<ICN::Header> icn_headers(count_sprite);
-
-		// read icn headers
-		for(u16 ii = 0; ii < count_sprite; ++ii)
-		    icn_headers[ii].Load(&body[6 + ii * ICN::Header::SizeOf()]);
-
-		std::vector<ICN::Header>::const_iterator it1 = icn_headers.begin();
-    		std::vector<ICN::Header>::const_iterator it2 = icn_headers.end();
-
-		// read icn data
-		for(u16 ii = 0; ii < count_sprite; ++ii)
-		{
-		    const ICN::Header & header = icn_headers[ii];
-		    const u32 size_data = (ii + 1 != count_sprite ? icn_headers[ii + 1].OffsetData() - header.OffsetData() : total_size - header.OffsetData());
-
-		    Sprite & sp = v[ii];
-		    sp.Set(header.Width(), header.Height(), ICN::RequiresAlpha(icn));
-		    sp.SetOffset(header.OffsetX(), header.OffsetY());
-		    sp.LoadICN(&body[6 + header.OffsetData()], size_data, reflect);
-		    sprites_memory_size += sp.GetSize();
-		}
-		if(2 < conf.Debug()) std::cout << "AGG::Cache::LoadICN: sprites count: " << count_sprite << ", total size: " << sprites_memory_size << std::endl;
-
-		return;
-	    }
-
-	Error::Warning("AGG::Cache::LoadICN: not found: ", ICN::GetString(icn));
+	Sprite & sp = reflect ? v.reflect[index] : v.sprites[index];
+	sp.Set(header1.Width(), header1.Height(), ICN::RequiresAlpha(icn));
+	sp.SetOffset(header1.OffsetX(), header1.OffsetY());
+	sp.LoadICN(&body[6 + header1.OffsetData()], size_data, reflect);
     }
 }
 
 /* load TIL object to AGG::Cache */
 void AGG::Cache::LoadTIL(const TIL::til_t til)
 {
-    std::vector<Surface> & v = til_cache[til];
+    til_cache_t & v = til_cache[til];
 
-    if(v.size()) return;
+    if(v.sprites) return;
 
     if(Settings::Get().Debug()) Error::Verbose("AGG::Cache::LoadTIL: ", TIL::GetString(til));
 
-    if(agg_cache.size())
+    std::vector<char> body;
+
+    if(ReadChunk(TIL::GetString(til), body))
     {
-	std::vector<char> body;
+	const u16 count = ReadLE16(reinterpret_cast<const u8*>(&body.at(0)));
+	const u16 width = ReadLE16(reinterpret_cast<const u8*>(&body.at(2)));
+	const u16 height= ReadLE16(reinterpret_cast<const u8*>(&body.at(4)));
 
-	std::list<File *>::const_iterator it1 = agg_cache.begin();
-	std::list<File *>::const_iterator it2 = agg_cache.end();
+	const u32 tile_size = width * height;
+	const u32 body_size = 6 + count * tile_size;
 
-	for(; it1 != it2; ++it1)
+	// check size
+	if(body.size() != body_size)
+	{
+	    Error::Warning("AGG::Cache::LoadTIL: size mismach, skipping...");
+	    return;
+	}
 
-	    // read only first found
-	    if((**it1).Read(TIL::GetString(til), body))
-	    {
-		u16 count, width, height;
+	v.count = count * 4;  // rezerve for rotate sprites
+	v.sprites = new Surface [v.count];
 
-		count = ReadLE16(reinterpret_cast<const u8*>(&body.at(0)));
-		width = ReadLE16(reinterpret_cast<const u8*>(&body.at(2)));
-		height= ReadLE16(reinterpret_cast<const u8*>(&body.at(4)));
-
-		const u32 tile_size = width * height;
-		const u32 body_size = 6 + count * tile_size;
-
-		// check size
-		if(body.size() != body_size)
-		{
-		    Error::Warning("AGG::Cache::LoadTIL: size mismach, skipping...");
-
-		    break;
-		}
-
-		v.resize(4 * count, NULL);
-		for(u16 ii = 0; ii < count; ++ii)
-		    v[ii].Set(&body[6 + ii * tile_size], width, height, 1, false);
-
-		return;
-	    }
-
-	Error::Warning("AGG::Cache::LoadTIL: not found: ", TIL::GetString(til));
+	for(u16 ii = 0; ii < count; ++ii)
+	    v.sprites[ii].Set(&body[6 + ii * tile_size], width, height, 1, false);
     }
 }
 
@@ -539,33 +517,24 @@ void AGG::Cache::LoadWAV(const M82::m82_t m82)
     const Audio::Spec & hardware = Audio::GetHardwareSpec();
 
     Audio::CVT cvt;
+    std::vector<char> body;
 
-    if(agg_cache.size() && cvt.Build(wav_spec, hardware))
+    if(cvt.Build(wav_spec, hardware) &&
+       ReadChunk(M82::GetString(m82), body))
     {
-	std::vector<char> body;
+	const u32 size = cvt.len_mult * body.size();
 
-	std::list<File *>::const_iterator it1 = agg_cache.begin();
-	std::list<File *>::const_iterator it2 = agg_cache.end();
+	cvt.buf = new u8[size];
+	cvt.len = body.size();
 
-	for(; it1 != it2; ++it1)
-	    if((**it1).Read(M82::GetString(m82), body))
-	    {
-		    const u32 size = cvt.len_mult * body.size();
+	memcpy(cvt.buf, &body[0], body.size());
 
-		    cvt.buf = new u8[size];
-		    cvt.len = body.size();
+	cvt.Convert();
 
-		    memcpy(cvt.buf, &body[0], body.size());
+	v.assign(cvt.buf, cvt.buf + size - 1);
 
-		    cvt.Convert();
-
-		    v.assign(cvt.buf, cvt.buf + size - 1);
-
-		    delete [] cvt.buf;
-		    cvt.buf = NULL;
-
-		    break;
-	    }
+	delete [] cvt.buf;
+	cvt.buf = NULL;
     }
 }
 
@@ -580,32 +549,21 @@ void AGG::Cache::LoadMID(const XMI::xmi_t xmi)
 
     if(! Mixer::isValid()) return;
 
-    if(agg_cache.size())
+    std::vector<char> body;
+
+    if(ReadChunk(XMI::GetString(xmi), body))
     {
-	std::vector<char> body;
+	MIDI::Xmi x;
+	MIDI::Mid m;
+	MIDI::MTrk track;
 
-	std::list<File *>::const_iterator it1 = agg_cache.begin();
-	std::list<File *>::const_iterator it2 = agg_cache.end();
+	x.Read(body);
+	track.ImportXmiEVNT(x.EVNT());
 
-	for(; it1 != it2; ++it1)
+	m.AddTrack(track);
+	m.SetPPQN(64);
 
-	    // read only first found
-	    if((**it1).Read(XMI::GetString(xmi), body))
-	    {
-		MIDI::Xmi x;
-		MIDI::Mid m;
-		MIDI::MTrk track;
-
-		x.Read(body);
-		track.ImportXmiEVNT(x.EVNT());
-
-		m.AddTrack(track);
-		m.SetPPQN(64);
-
-		m.Write(reinterpret_cast<std::vector<char> &>(v));
-
-		break;
-	    }
+	m.Write(reinterpret_cast<std::vector<char> &>(v));
     }
 }
 
@@ -730,30 +688,18 @@ void AGG::Cache::LoadFNT(u16 ch)
 }
 
 /* free ICN object in AGG::Cache */
-void AGG::Cache::FreeICN(const ICN::icn_t icn, bool reflect)
+void AGG::Cache::FreeICN(const ICN::icn_t icn)
 {
-    if(Settings::Get().Debug()) Error::Verbose("AGG::Cache::FreeICN: ", ICN::GetString(icn));
-
-    std::vector<Sprite> & v = reflect ? reflect_icn_cache[icn] : icn_cache[icn];
-
-    std::vector<Sprite>::const_iterator it1 = v.begin();
-    std::vector<Sprite>::const_iterator it2 = v.end();
-    for(; it1 != it2; ++it1) sprites_memory_size -= (*it1).GetSize();
-
-    if(2 < Settings::Get().Debug())
-	std::cout << "AGG::Cache::FreeICN: sprites count: " << v.size() << ", total size: " << sprites_memory_size << std::endl;
-
-    if(v.size()) v.clear();
+    if(icn_cache[icn].sprites){ delete [] icn_cache[icn].sprites; icn_cache[icn].sprites = NULL; }
+    if(icn_cache[icn].reflect){ delete [] icn_cache[icn].reflect; icn_cache[icn].reflect = NULL; }
+    icn_cache[icn].count = 0;
 }
 
 /* free TIL object in AGG::Cache */
 void AGG::Cache::FreeTIL(const TIL::til_t til)
 {
-    if(Settings::Get().Debug()) Error::Verbose("AGG::Cache::FreeTIL: ", TIL::GetString(til));
-
-    std::vector<Surface> & v = til_cache[til];
-
-    if(v.size()) v.clear();
+    if(til_cache[til].sprites){ delete [] til_cache[til].sprites; til_cache[til].sprites = NULL; }
+    til_cache[til].count = 0;
 }
 
 /* free 82M object in AGG::Cache */
@@ -783,59 +729,56 @@ void AGG::Cache::FreeMID(const XMI::xmi_t xmi)
 /* return ICN sprite from AGG::Cache */
 const Sprite & AGG::Cache::GetICN(const ICN::icn_t icn, u16 index, bool reflect)
 {
-    const std::vector<Sprite> & v = reflect ? reflect_icn_cache[icn] : icn_cache[icn];
+    icn_cache_t & v = icn_cache[icn];
 
-    if(0 == v.size())
-    switch(icn)
-    {
-	case ICN::YELLOW_FONT:
-	case ICN::YELLOW_SMALFONT:
-	case ICN::ROUTERED:
-	case ICN::TELEPORT1:
-	case ICN::TELEPORT2:
-	case ICN::TELEPORT3:
-	case ICN::FOUNTAIN:
-	case ICN::TREASURE:	LoadExtraICN(icn, reflect);	break;
-
-	default:		LoadICN(icn, reflect);		break;
-    }
-
-    if(index >= v.size())
+    // out of range?
+    if(v.count && index >= v.count)
     {
 	Error::Warning("AGG::GetICN: " + std::string(ICN::GetString(icn)) + ", index out of range: ", index);
-
 	index = 0;
     }
 
-    const Sprite & sprite = v[index];
-	
-    if(! sprite.valid())
+    // need load?
+    if(0 == v.count || ((reflect && !v.reflect[index].valid()) || !v.sprites[index].valid()))
     {
-	Error::Warning("AGG::GetICN: icn: ", icn);
-	Error::Warning("AGG::GetICN: icn name: ", ICN::GetString(icn));
-	Error::Warning("AGG::GetICN: index: ", index);
-	Error::Except("AGG::GetICN: return is NULL");
+	switch(icn)
+	{
+	    case ICN::YELLOW_FONT:
+	    case ICN::YELLOW_SMALFONT:
+	    case ICN::ROUTERED:
+	    case ICN::TELEPORT1:
+	    case ICN::TELEPORT2:
+	    case ICN::TELEPORT3:
+	    case ICN::FOUNTAIN:
+	    case ICN::TREASURE:	LoadExtraICN(icn, index, reflect); break;
+	    default:		LoadICN(icn, index, reflect); break;
+	}
     }
 
-    return sprite;
+    // invalid sprite?
+    if(Settings::Get().Debug() &&  ((reflect && !v.reflect[index].valid()) || !v.sprites[index].valid()))
+    {
+	Error::Verbose("AGG::Cache::GetICN: return invalid sprite: ", ICN::GetString(icn));
+	Error::Verbose("AGG::Cache::GetICN: index: ", index);
+	Error::Verbose("AGG::Cache::GetICN: reflect: ", (reflect ? "true" : "false"));
+    }
+
+    return reflect ? v.reflect[index] : v.sprites[index];
 }
 
 /* return count of sprites from specific ICN */
 int AGG::Cache::GetICNCount(const ICN::icn_t icn)
 {
-    const std::vector<Sprite> & v = icn_cache[icn];
-
-    if(0 == v.size()) LoadICN(icn, false);
-
-    return v.size();
+    return icn_cache[icn].count;
 }
 
 /* return TIL surface from AGG::Cache */
 const Surface & AGG::Cache::GetTIL(const TIL::til_t til, u16 index, u8 shape)
 {
-    std::vector<Surface> & v = til_cache[til];
+    til_cache_t & v = til_cache[til];
+//    std::vector<Surface> & v = til_cache[til];
 
-    if(0 == v.size()) LoadTIL(til);
+    if(0 == v.count) LoadTIL(til);
 
     u16 index2 = index;
 
@@ -843,24 +786,24 @@ const Surface & AGG::Cache::GetTIL(const TIL::til_t til, u16 index, u8 shape)
     {
 	switch(til)
 	{
-	    case TIL::STON: index2 += 36 * (shape % 4); break;
-	    case TIL::CLOF32: index2 += 4 * (shape % 4); break;
+	    case TIL::STON:     index2 += 36 * (shape % 4); break;
+	    case TIL::CLOF32:   index2 += 4 * (shape % 4); break;
 	    case TIL::GROUND32: index2 += 432 * (shape % 4); break;
 	    default: break;
 	}
     }
 
-    if(index2 >= v.size())
+    if(index2 >= v.count)
     {
 	Error::Warning("AGG::GetTIL: " + std::string(TIL::GetString(til)) + ", index out of range: ", index);
 	index2 = 0;
     }
 
-    Surface & surface = v[index2];
+    Surface & surface = v.sprites[index2];
 
     if(shape && ! surface.valid())
     {
-	const Surface & src = v[index];
+	const Surface & src = v.sprites[index];
 
 	if(src.valid())
 	{
@@ -873,9 +816,8 @@ const Surface & AGG::Cache::GetTIL(const TIL::til_t til, u16 index, u8 shape)
 
     if(! surface.valid())
     {
-	Error::Warning("AGG::GetTIL: icn name: ", TIL::GetString(til));
+	Error::Warning("AGG::GetTIL: invalid sprite: ", TIL::GetString(til));
 	Error::Warning("AGG::GetTIL: index: ", index);
-	Error::Except("AGG::GetTIL: return is NULL");
     }
 
     return surface;
@@ -942,7 +884,8 @@ bool AGG::Cache::isValidFonts(void) const
 // wrapper AGG::PreloadObject
 void AGG::PreloadObject(const ICN::icn_t icn, bool reflect)
 {
-    return AGG::Cache::Get().LoadICN(icn, reflect);
+    // deprecated
+    // or loading all sprites? AGG::Cache::Get().LoadICN(icn, index, reflect);
 }
 
 void AGG::PreloadObject(const TIL::til_t til)
@@ -951,9 +894,9 @@ void AGG::PreloadObject(const TIL::til_t til)
 }
 
 // wrapper AGG::FreeObject
-void AGG::FreeObject(const ICN::icn_t icn, bool reflect)
+void AGG::FreeObject(const ICN::icn_t icn)
 {
-    return AGG::Cache::Get().FreeICN(icn, reflect);
+    return AGG::Cache::Get().FreeICN(icn);
 }
 
 void AGG::FreeObject(const TIL::til_t til)

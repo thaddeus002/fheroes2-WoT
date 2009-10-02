@@ -35,6 +35,22 @@
 #endif
 
 static u8 default_depth = 16;
+static SDL_Color* pal_colors = NULL;
+#define pal_ncolors 255
+
+void SDLFreeSurface(SDL_Surface *sf)
+{
+    if(sf)
+    {
+	// clear static palette
+	if(sf->format && 8 == sf->format->BitsPerPixel && sf->format->palette && pal_colors == sf->format->palette->colors)
+        {
+    	    sf->format->palette->colors = NULL;
+            sf->format->palette->ncolors = 0;
+        }
+	SDL_FreeSurface(sf);
+    }
+}
 
 Surface::Surface() : surface(NULL)
 {
@@ -82,29 +98,18 @@ Surface::Surface(SDL_Surface* sf) : surface(NULL)
 
 Surface::~Surface()
 {
-    if(surface) SDL_FreeSurface(surface);
+    FreeSurface(*this);
 }
 
 /* operator = */
 Surface & Surface::operator= (const Surface & bs)
 {
-    if(surface) SDL_FreeSurface(surface);
-    surface = NULL;
+    FreeSurface(*this);
 
     if(bs.surface)
     {
-	if(8 == bs.depth())
-	{
-	    Set(bs.w(), bs.h(), 8, SDL_SWSURFACE);
-	    Lock();
-	    memcpy(surface->pixels, bs.surface->pixels, surface->w * surface->h);
-	    Unlock();
-	}
-	else
-	{
-	    surface = SDL_ConvertSurface(bs.surface, bs.surface->format, bs.surface->flags);
-	    if(!surface) Error::Warning("Surface: operator, error: ", SDL_GetError());
-	}
+	surface = SDL_ConvertSurface(bs.surface, bs.surface->format, bs.surface->flags);
+	if(!surface) Error::Warning("Surface: operator, error: ", SDL_GetError());
 	LoadPalette();
     }
     return *this;
@@ -133,7 +138,7 @@ u8 Surface::GetDefaultDepth(void)
 
 void Surface::Set(SDL_Surface* sf)
 {
-    if(surface) SDL_FreeSurface(surface);
+    FreeSurface(*this);
 
     surface = sf ? sf : NULL;
     LoadPalette();
@@ -141,7 +146,7 @@ void Surface::Set(SDL_Surface* sf)
 
 void Surface::Set(u16 sw, u16 sh, bool alpha)
 {
-    if(surface) SDL_FreeSurface(surface);
+    FreeSurface(*this);
 
     CreateSurface(sw, sh, default_depth, alpha ? SDL_SRCALPHA|SDL_SWSURFACE : SDL_SWSURFACE);
     LoadPalette();
@@ -149,7 +154,7 @@ void Surface::Set(u16 sw, u16 sh, bool alpha)
 
 void Surface::Set(u16 sw, u16 sh, u8 depth, u32 fl)
 {
-    if(surface) SDL_FreeSurface(surface);
+    FreeSurface(*this);
 
     CreateSurface(sw, sh, depth,  fl);
     LoadPalette();
@@ -157,7 +162,7 @@ void Surface::Set(u16 sw, u16 sh, u8 depth, u32 fl)
 
 void Surface::Set(const void* pixels, unsigned int width, unsigned int height, unsigned char bytes_per_pixel, bool alpha)
 {
-    if(surface) SDL_FreeSurface(surface);
+    FreeSurface(*this);
 
     switch(bytes_per_pixel)
     {
@@ -178,7 +183,7 @@ void Surface::Set(const void* pixels, unsigned int width, unsigned int height, u
 
 bool Surface::Load(const char* fn)
 {
-    if(surface) SDL_FreeSurface(surface);
+    FreeSurface(*this);
 
 #ifdef WITH_IMAGE
     if(fn) surface = IMG_Load(fn);
@@ -275,11 +280,21 @@ void Surface::CreateSurface(u16 sw, u16 sh, u8 dp, u32 fl)
 
 void Surface::LoadPalette(void)
 {
+    // only 8bit color
+    // load static palette (economize 1kb for each surface)
     if(surface && 8 == surface->format->BitsPerPixel)
     {
-	const SDL_Palette *pal = Palette::Get().SDLPalette();
+	if(!pal_colors)
+	{
+	    pal_colors = Palette::Get().SDLPalette()->colors;
+	}
 
-        if(pal) SDL_SetPalette(surface, SDL_LOGPAL|SDL_PHYSPAL, pal->colors, 0, pal->ncolors);
+	if(surface->format->palette)
+	{
+    	    if(surface->format->palette->colors && pal_colors != surface->format->palette->colors) SDL_free(surface->format->palette->colors);
+    	    surface->format->palette->colors = pal_colors;
+    	    surface->format->palette->ncolors = pal_ncolors;
+	}
     }
 }
 
@@ -288,7 +303,7 @@ void Surface::SetDisplayFormat(void)
 {
     SDL_Surface *osurface = surface;
     surface = (osurface->flags & SDL_SRCALPHA ? SDL_DisplayFormatAlpha(osurface) : SDL_DisplayFormat(osurface));
-    if(osurface) SDL_FreeSurface(osurface);
+    if(osurface) SDLFreeSurface(osurface);
 }
 
 u32 Surface::GetColor(u16 index) const
@@ -597,16 +612,32 @@ void Surface::Unlock(void) const
     if(SDL_MUSTLOCK(surface)) SDL_UnlockSurface(surface);
 }
 
-void Surface::FreeSurface(void)
+void Surface::FreeSurface(Surface & sf)
 {
-    if(surface)
-        SDL_FreeSurface(surface);
-    surface = NULL;
+    if(sf.surface)
+    {
+	SDLFreeSurface(sf.surface);
+	sf.surface = NULL;
+    }
 }
 
 const SDL_PixelFormat *Surface::GetPixelFormat(void) const
 {
     return surface ? surface->format : NULL;
+}
+
+void Surface::ChangeColorIndex(u32 fc, u32 tc)
+{
+    if(!surface) return;
+
+    if(8 != depth()) return ChangeColor(GetColor(fc), GetColor(tc));
+
+    Lock();
+    if(fc != tc)
+    for(u16 y = 0; y < surface->h; ++y)
+	for(u16 x = 0; x < surface->w; ++x)
+	    if(fc == GetPixel(x, y)) SetPixel(x, y, tc);
+    Unlock();
 }
 
 void Surface::ChangeColor(u32 fc, u32 tc)

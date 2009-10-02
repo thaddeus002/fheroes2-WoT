@@ -42,7 +42,7 @@ bool Background::valid(void) const
 void Background::Save(void)
 {
     // resize background
-    if(Surface::valid() && (Size::w != Surface::w() || Size::h != Surface::h())) FreeSurface();
+    if(Surface::valid() && (Size::w != Surface::w() || Size::h != Surface::h())) FreeSurface(*this);
 
     if(0 == Rect::w || 0 == Rect::h) return;
 

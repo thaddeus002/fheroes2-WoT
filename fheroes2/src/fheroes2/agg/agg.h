@@ -55,9 +55,11 @@ namespace AGG
     class File
     {
     public:
-	File(const std::string &);
+	File();
 	~File();
 
+	bool Open(const std::string &);
+	bool isGood(void) const;
 	const std::string & Name(void) const;
 	const FAT & Fat(const std::string & key);
 	u16 CountItems(void);
@@ -67,10 +69,25 @@ namespace AGG
 	void Dump(void) const;
 
     private:
-	const std::string filename;
+	std::string filename;
 	std::map<std::string, FAT> fat;
 	u16 count_items;
 	std::fstream * stream;
+    };
+
+    struct icn_cache_t
+    {
+	icn_cache_t() : sprites(NULL), reflect(NULL), count(0) {};
+	Sprite *sprites;
+	Sprite *reflect;
+	u16 count;
+    };
+
+    struct til_cache_t
+    {
+	til_cache_t() : sprites(NULL),  count(0) {};
+	Surface *sprites;
+	u16 count;
     };
 
     class Cache
@@ -80,7 +97,8 @@ namespace AGG
 
 	static Cache & Get(void);
 
-	bool AttachFile(const std::string & fname);
+	bool ReadDataDir(void);
+	bool ReadChunk(const std::string & key, std::vector<char> & body);
 
 	int GetICNCount(const ICN::icn_t icn);
 	const Sprite & GetICN(const ICN::icn_t icn, u16 index, bool reflect = false);
@@ -94,8 +112,8 @@ namespace AGG
 	const SDL::Font & GetSmallFont(void) const;
 #endif
 
-	void LoadExtraICN(const ICN::icn_t icn, bool reflect = false);
-	void LoadICN(const ICN::icn_t icn, bool reflect = false);
+	void LoadExtraICN(const ICN::icn_t icn, u16 index, bool reflect = false);
+	void LoadICN(const ICN::icn_t icn, u16 index, bool reflect = false);
 	void LoadTIL(const TIL::til_t til);
 	void LoadWAV(const M82::m82_t m82);
         void LoadMUS(const MUS::mus_t mus);
@@ -106,7 +124,7 @@ namespace AGG
 	void LoadFNT(u16);
 	bool isValidFonts(void) const;
 
-	void FreeICN(const ICN::icn_t icn, bool reflect = false);
+	void FreeICN(const ICN::icn_t icn);
 	void FreeTIL(const TIL::til_t til);
 	void FreeWAV(const M82::m82_t m82);
         void FreeMUS(const MUS::mus_t mus);
@@ -115,11 +133,12 @@ namespace AGG
     private:
 	Cache();
 
-	std::list<File *> agg_cache;
+	File heroes2_agg;
+	File heroes2x_agg;
 
-	std::map<ICN::icn_t, std::vector<Sprite> > icn_cache;
-	std::map<ICN::icn_t, std::vector<Sprite> > reflect_icn_cache;
-	std::map<TIL::til_t, std::vector<Surface> > til_cache;
+	icn_cache_t* icn_cache;
+	til_cache_t* til_cache;
+
 	std::map<M82::m82_t, std::vector<u8> > wav_cache;
         std::map<MUS::mus_t, std::vector<u8> > mus_cache;
 	std::map<XMI::xmi_t, std::vector<u8> > mid_cache;
@@ -129,7 +148,6 @@ namespace AGG
 	SDL::Font font_medium;
 	SDL::Font font_small;
 #endif
-	u32 sprites_memory_size;
     };
 
     // wrapper AGG::PreloadObject
@@ -137,7 +155,7 @@ namespace AGG
     void PreloadObject(const TIL::til_t til);
 
     // wrapper AGG::FreeObject
-    void FreeObject(const ICN::icn_t icn, bool reflect = false);
+    void FreeObject(const ICN::icn_t icn);
     void FreeObject(const TIL::til_t til);
 
     // wrapper AGG::GetXXX

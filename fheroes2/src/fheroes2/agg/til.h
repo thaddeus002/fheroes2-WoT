@@ -32,6 +32,8 @@ namespace TIL
 	CLOF32,
 	GROUND32,
 	STON,
+	
+	UNKNOWN
     };
 
     const char* GetString(const til_t til);

@@ -193,17 +193,8 @@ int main(int argc, char **argv)
 
 	    AGG::Cache & cache = AGG::Cache::Get();
 
-	    // read data directory
-    	    Dir dir;
-    	
-            dir.Read(conf.DataDirectory(), ".agg", false);
-            dir.Read(conf.LocalPrefix() + SEPARATOR + conf.DataDirectory(), ".agg", false);
-
-	    // not found agg, exit
-	    if(0 == dir.size()) Error::Except("AGG data files not found.");
-
-    	    // attach agg files
-    	    for(Dir::const_iterator itd = dir.begin(); itd != dir.end(); ++itd) cache.AttachFile(*itd);
+	    // read data dir
+	    if(! cache.ReadDataDir()) Error::Except("AGG data files not found.");
 
             if(conf.Debug()) conf.Dump();
             
