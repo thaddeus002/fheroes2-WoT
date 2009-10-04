@@ -463,8 +463,6 @@ void Dialog::Marketplace(bool fromTradingPost)
             display.Flip();            
         }
     }
-
-    cursor.Hide();
 }
 
 void RedrawFromResource(const Point & pt, const Resource::funds_t & rs)

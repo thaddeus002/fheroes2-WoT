@@ -473,11 +473,29 @@ screen_t CastleOpenDialog3(Castle & castle)
 	else
 	if(le.MouseCursor(building3.GetArea()) && building3.QueueEventProcessing()) { castle.BuyBuilding(building3()); return SCREEN1; }
 	else
-	if(le.MouseCursor(building4.GetArea()) && building4.QueueEventProcessing()) { castle.BuyBuilding(building4()); return SCREEN1; }
+	if(le.MouseCursor(building4.GetArea()))
+	{
+	    // buy boat
+	    if(castle.isBuild(Castle::BUILD_SHIPYARD))
+	    {
+		if(le.MouseClickLeft(building4.GetArea()) && Dialog::OK == Dialog::BuyBoat(castle.AllowBuyBoat())) castle.BuyBoat();
+	    }
+	    else
+	    if(building4.QueueEventProcessing()) { castle.BuyBuilding(building4()); return SCREEN1; }
+	}
 	else
 	if(le.MouseCursor(building5.GetArea()) && building5.QueueEventProcessing()) { castle.BuyBuilding(building5()); return SCREEN1; }
 	else
-	if(le.MouseCursor(building6.GetArea()) && building6.QueueEventProcessing()) { castle.BuyBuilding(building6()); return SCREEN1; }
+	if(le.MouseCursor(building6.GetArea()))
+	{
+	    // show marketplace
+	    if(castle.isBuild(Castle::BUILD_MARKETPLACE))
+	    {
+		if(le.MouseClickLeft(building6.GetArea())) Dialog::Marketplace();
+	    }
+	    else
+	    if(building6.QueueEventProcessing()) { castle.BuyBuilding(building6()); return SCREEN1; }
+	}
     }
     return SCREENOUT;
 }

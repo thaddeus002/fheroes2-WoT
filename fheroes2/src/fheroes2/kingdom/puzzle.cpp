@@ -75,6 +75,13 @@ void Puzzle::Update(u8 open_obelisk, u8 total_obelisk)
 
 void Puzzle::ShowMapsDialog(void) const
 {
+    // FIXME: QVGA version
+    if(Settings::Get().PocketPC())
+    {
+       Dialog::Message("", _("For the QVGA version is not available."), Font::SMALL, Dialog::OK);
+       return;
+    }
+
     Cursor & cursor = Cursor::Get();
     Display & display = Display::Get();
     cursor.Hide();
