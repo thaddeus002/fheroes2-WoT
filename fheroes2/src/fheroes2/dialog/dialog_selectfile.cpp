@@ -19,6 +19,8 @@
  ***************************************************************************/
 
 #include <algorithm>
+#include <ctime>
+#include <sstream>
 #include <string>
 #include "dir.h"
 #include "agg.h"
@@ -117,7 +119,14 @@ bool SelectFileListSimple(const std::string & header, MapsFileInfoList & lists, 
 
     if(editor)
     {
-	filename.assign("newgame");
+	if(Settings::Get().PocketPC())
+	{
+            std::ostringstream ss;
+	    ss << std::time(0);
+	    filename = ss.str();
+	}
+	else
+	    filename.assign("newgame");
 	cur = lists.end();
     }
     else
