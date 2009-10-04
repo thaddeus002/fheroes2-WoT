@@ -255,9 +255,9 @@ void Settings::Dump(std::ostream & stream) const
 }
 
 /* read maps info */
-void Settings::LoadFileMaps(const std::string & file)
+bool Settings::LoadFileMapsMP2(const std::string & file)
 {
-    if(! current_maps_file.Read(file)) return;
+    if(! current_maps_file.ReadMP2(file)) return false;
 
     // set my color
     for(Color::color_t color = Color::BLUE; color != Color::GRAY; ++color) if(current_maps_file.allow_colors & color)
@@ -271,6 +271,8 @@ void Settings::LoadFileMaps(const std::string & file)
 
     std::bitset<8> b(current_maps_file.allow_colors);
     preferably_count_players = b.count();
+    
+    return true;
 }
 
 Maps::FileInfo & Settings::CurrentFileInfo(void)

@@ -120,8 +120,8 @@ int main(int argc, char **argv)
                 	break;
 #endif
 
-                    case 's':
 #ifdef WITH_NET
+                    case 's':
                 	      return Network::RunDedicatedServer();
 #endif
                     case '?':

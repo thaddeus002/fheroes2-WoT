@@ -28,7 +28,10 @@
 #include "midi_mid.h"
 #include "dir.h"
 #include "agg.h"
+
+#ifdef WITH_XML
 #include "xmlccwrap.h"
+#endif
 
 void StoreMemToFile(const std::vector<u8> &, const std::string &);
 bool FilePresent(const std::string &);
@@ -381,6 +384,7 @@ void AGG::Cache::LoadICN(const ICN::icn_t icn, u16 index, bool reflect)
 
     const Settings & conf = Settings::Get();
 
+#ifdef WITH_XML
     // load from image cache dir
     if(conf.Modes(Settings::USECACHE))
     {
@@ -432,6 +436,7 @@ void AGG::Cache::LoadICN(const ICN::icn_t icn, u16 index, bool reflect)
 	}
 	if(conf.Debug()) Error::Verbose("AGG::Cache::LoadICN: broken xml file: " + xml_spec);
     }
+#endif
 
     // loading original
     if(1 < conf.Debug()) std::cout << "AGG::Cache::LoadICN: " << ICN::GetString(icn) << ", " << index << std::endl;
@@ -756,7 +761,7 @@ const Sprite & AGG::Cache::GetICN(const ICN::icn_t icn, u16 index, bool reflect)
     }
 
     // invalid sprite?
-    if(Settings::Get().Debug() &&  ((reflect && !v.reflect[index].valid()) || !v.sprites[index].valid()))
+    if(Settings::Get().Debug() &&  ((reflect && !v.reflect[index].valid()) || (!reflect && !v.sprites[index].valid())))
     {
 	Error::Verbose("AGG::Cache::GetICN: return invalid sprite: ", ICN::GetString(icn));
 	Error::Verbose("AGG::Cache::GetICN: index: ", index);

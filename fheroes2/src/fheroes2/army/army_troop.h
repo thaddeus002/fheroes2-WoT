@@ -41,7 +41,7 @@ namespace Army
     {
       public:
         Troop(monster_t m = Monster::UNKNOWN, u16 c = 0);
-	virtual ~Troop();
+	~Troop();
         
         void	Set(const Monster &, u16);
         void	Set(monster_t, u16);

@@ -49,8 +49,7 @@ public:
 	void Append(const Spell::spell_t sp, const u8 wisdom);
 
 protected:
-	friend void Game::SaveXMLDoc(TiXmlDocument &);
-	friend bool Game::LoadXMLDoc(const TiXmlDocument &);
+	friend class Game::IO;
 
 	std::list<Spell::spell_t>	spells_level1;
 	std::list<Spell::spell_t>	spells_level2;

@@ -36,10 +36,10 @@ Interface::Basic::Basic() : gameArea(GameArea::Get()), radar(Radar::Get()),
     if(Settings::Get().PocketPC())
     {
         iconsPanel.SetCount(2);
-	radar.SetPos(0, 0);
-	iconsPanel.SetPos(0, 0);
-	buttonsArea.SetPos(0, 0);
-	statusWindow.SetPos(0, 0);
+	radar.SetPos(BORDERWIDTH, BORDERWIDTH);
+	iconsPanel.SetPos(BORDERWIDTH, BORDERWIDTH);
+	buttonsArea.SetPos(BORDERWIDTH, BORDERWIDTH);
+	statusWindow.SetPos(BORDERWIDTH, BORDERWIDTH);
 	controlPanel.SetPos(display.w() - controlPanel.GetArea().w - 32, 0);
     }
     else

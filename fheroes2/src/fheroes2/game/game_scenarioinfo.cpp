@@ -87,7 +87,7 @@ Game::menu_t Game::ScenarioInfo(void)
     display.Blit(back, top);
 
     // set first maps settings
-    conf.LoadFileMaps(lists.front().file);
+    conf.LoadFileMapsMP2(lists.front().file);
     
     const Point pointPanel(top.x + 204, top.y + 32);
     const Point pointDifficultyInfo(pointPanel.x + 24, pointPanel.y + 93);
@@ -118,7 +118,6 @@ Game::menu_t Game::ScenarioInfo(void)
 
 
     Scenario::RedrawStaticInfo(pointPanel);
-
     Scenario::RedrawDifficultyInfo(pointDifficultyInfo);
 
     UpdateCoordOpponentsInfo(pointOpponentInfo, coordColors);
@@ -127,16 +126,16 @@ Game::menu_t Game::ScenarioInfo(void)
     UpdateCoordClassInfo(pointClassInfo, coordClass);
     Scenario::RedrawClassInfo(pointClassInfo);
 
-    const Point pointDifficultyNormal(pointPanel.x + 98, pointPanel.y + 92);
+    const Point pointDifficultyNormal(pointPanel.x + 98, pointPanel.y + 91);
     SpriteCursor levelCursor(AGG::GetICN(ICN::NGEXTRA, 62), pointDifficultyNormal);
     levelCursor.Show(pointDifficultyNormal);
     conf.SetGameDifficulty(Difficulty::NORMAL);
 
-    coordDifficulty[0] = Rect(pointPanel.x + 21, pointPanel.y + 92,  levelCursor.w(), levelCursor.h());
+    coordDifficulty[0] = Rect(pointPanel.x + 21, pointPanel.y + 91,  levelCursor.w(), levelCursor.h());
     coordDifficulty[1] = Rect(pointDifficultyNormal.x, pointDifficultyNormal.y,  levelCursor.w(), levelCursor.h());
-    coordDifficulty[2] = Rect(pointPanel.x + 174, pointPanel.y + 92, levelCursor.w(), levelCursor.h());
-    coordDifficulty[3] = Rect(pointPanel.x + 251, pointPanel.y + 92, levelCursor.w(), levelCursor.h());
-    coordDifficulty[4] = Rect(pointPanel.x + 328, pointPanel.y + 92, levelCursor.w(), levelCursor.h());
+    coordDifficulty[2] = Rect(pointPanel.x + 174, pointPanel.y + 91, levelCursor.w(), levelCursor.h());
+    coordDifficulty[3] = Rect(pointPanel.x + 251, pointPanel.y + 91, levelCursor.w(), levelCursor.h());
+    coordDifficulty[4] = Rect(pointPanel.x + 328, pointPanel.y + 91, levelCursor.w(), levelCursor.h());
 
 
     TextSprite rating;
@@ -162,22 +161,25 @@ Game::menu_t Game::ScenarioInfo(void)
 	if(le.KeyPress(KEY_s) || le.MouseClickLeft(buttonSelectMaps))
 	{
 	    std::string filemaps;
-	    if(DialogSelectMapsFileList(lists, filemaps) && filemaps.size()) conf.LoadFileMaps(filemaps);
-	    cursor.Hide();
-	    levelCursor.Hide();
-	    // set first allow color
-	    conf.SetMyColor(conf.FirstAllowColor());
-	    conf.SetPlayersColors(conf.MyColor());
-	    Scenario::RedrawStaticInfo(pointPanel);
-	    UpdateCoordOpponentsInfo(pointOpponentInfo, coordColors);
-	    Scenario::RedrawOpponentsInfo(pointOpponentInfo);
-	    UpdateCoordClassInfo(pointClassInfo, coordClass);
-	    Scenario::RedrawClassInfo(pointClassInfo);
-	    RedrawRatingInfo(rating);
-	    levelCursor.Move(pointDifficultyNormal);
-	    levelCursor.Show();
-	    cursor.Show();
-	    display.Flip();
+	    if(DialogSelectMapsFileList(lists, filemaps) && conf.LoadFileMapsMP2(filemaps))
+	    {
+		cursor.Hide();
+		levelCursor.Hide();
+		// set first allow color
+		conf.SetMyColor(conf.FirstAllowColor());
+		conf.SetPlayersColors(conf.MyColor());
+		Scenario::RedrawStaticInfo(pointPanel);
+		Scenario::RedrawDifficultyInfo(pointDifficultyInfo);
+		UpdateCoordOpponentsInfo(pointOpponentInfo, coordColors);
+		Scenario::RedrawOpponentsInfo(pointOpponentInfo);
+		UpdateCoordClassInfo(pointClassInfo, coordClass);
+		Scenario::RedrawClassInfo(pointClassInfo);
+		RedrawRatingInfo(rating);
+		levelCursor.Move(pointDifficultyNormal);
+		levelCursor.Show();
+		cursor.Show();
+		display.Flip();
+	    }
 	}
 	else
 	// click cancel

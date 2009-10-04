@@ -43,9 +43,8 @@ void SendPacketToAllClients(std::list<FH2RemoteClient> & clients, Network::Messa
 
 FH2Server::FH2Server()
 {
-    if(!PrepareMapsFileInfoList(finfo_list)) Error::Warning("No maps available!");
-    else
-    Settings::Get().LoadFileMaps(finfo_list.front().file);
+    if(!PrepareMapsFileInfoList(finfo_list) ||
+       !Settings::Get().LoadFileMapsMP2(finfo_list.front().file)) Error::Warning("No maps available!");
 }
 
 FH2Server::~FH2Server()

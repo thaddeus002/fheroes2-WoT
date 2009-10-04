@@ -161,9 +161,10 @@ void Dialog::SkillInfo(const std::string &header, const std::string &message, co
     Rect pos = box.GetArea();
 
     if(header.size()) box1.Blit(pos);
-    pos.y += box1.h() + 10;
+    pos.y += box1.h() + spacer;
 
     if(message.size()) box2.Blit(pos);
+    pos.y += box2.h() + spacer;
 
     // blit sprite
     pos.x = box.GetArea().x + (pos.w - border.w()) / 2;

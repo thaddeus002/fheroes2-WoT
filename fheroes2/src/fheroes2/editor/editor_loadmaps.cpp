@@ -28,9 +28,8 @@ Game::menu_t Game::Editor::LoadMaps(void)
     Settings & conf = Settings::Get();
     std::string filemaps;
 
-    if(Dialog::SelectMapsFile(filemaps))
+    if(Dialog::SelectMapsFile(filemaps) && conf.LoadFileMapsMP2(filemaps))
     {
-	conf.LoadFileMaps(filemaps);
 	Game::ShowLoadMapsText();
     	//
     	world.LoadMaps(filemaps);

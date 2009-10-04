@@ -301,9 +301,8 @@ Game::menu_t PocketPC::SelectScenario(void)
 
     filename = (*cur).file;
 
-    if(filename.size())
+    if(conf.LoadFileMapsMP2(filename))
     {
-        conf.LoadFileMaps(filename);
         conf.SetMyColor(conf.FirstAllowColor());
         conf.SetPlayersColors(conf.MyColor());
         conf.SetGameDifficulty(Difficulty::NORMAL);

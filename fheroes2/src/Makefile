@@ -6,8 +6,8 @@ TARGET := fheroes2
 SDL_LIBS := $(shell sdl-config --libs)
 SDL_FLAGS := $(shell sdl-config --cflags)
 
-CFLAGS := $(CFLAGS) -Wall -fsigned-char -DTIXML_USE_STL
-LIBS := -lz
+CFLAGS := $(CFLAGS) -Wall -fsigned-char
+LIBS :=
 
 ifdef DEBUG
 CFLAGS := $(CFLAGS) -O0 -g
@@ -21,8 +21,8 @@ SDL_LIBS := $(SDL_LIBS) -lSDL_mixer
 endif
 
 ifndef WITHOUT_IMAGE
-CFLAGS := $(CFLAGS) -DWITH_IMAGE $(shell libpng12-config --cflags)
-SDL_LIBS := $(SDL_LIBS) -lSDL_image $(shell libpng12-config --libs)
+CFLAGS := $(CFLAGS) -DWITH_IMAGE $(shell libpng12-config --cflags) -DWITH_ZLIB
+SDL_LIBS := $(SDL_LIBS) -lSDL_image $(shell libpng12-config --libs) -lz
 endif
 
 ifndef WITHOUT_UNICODE
@@ -33,6 +33,15 @@ endif
 ifndef WITHOUT_NETWORK
 CFLAGS := $(CFLAGS) -DWITH_NET
 SDL_LIBS := $(SDL_LIBS) -lSDL_net
+endif
+
+ifndef WITHOUT_XML
+CFLAGS := $(CFLAGS) -DWITH_XML
+endif
+
+ifndef WITHOUT_ZLIB
+CFLAGS := $(CFLAGS) -DWITH_ZLIB
+LIBS := $(LIBS) -lz
 endif
 
 ifdef RELEASE
@@ -57,16 +66,24 @@ export CXX AR LINK CFLAGS LIBS PLATFORM
 .PHONY: clean
 
 all:
+ifndef WITHOUT_XML
 	$(MAKE) -C xmlccwrap
+endif
 	$(MAKE) -C engine
 	$(MAKE) -C dist
-#	$(MAKE) -C tools
+ifdef WITH_TOOLS
+	$(MAKE) -C tools
+endif
 ifndef WITHOUT_UNICODE
 	$(MAKE) -C dist pot
 endif
 
 clean:
+ifndef WITHOUT_XML
 	$(MAKE) -C xmlccwrap clean
-#	$(MAKE) -C tools clean
+endif
+ifdef WITH_TOOLS
+	$(MAKE) -C tools clean
+endif
 	$(MAKE) -C dist clean
 	$(MAKE) -C engine clean

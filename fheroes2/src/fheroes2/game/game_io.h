@@ -22,21 +22,25 @@
 #define H2GAMEIO_H
 
 #include "game.h"
-#include "xmlccwrap.h"
+#include "sdlnet.h"
+#include "maps_fileinfo.h"
 
 namespace Game
 {
-    void Save(const std::string & fn);
-    void Load(const std::string & fn);
+    class IO : public QueueMessage
+    {
+    public:
+	IO(){};
 
-    bool SaveXML(const std::string &);
-    bool LoadXML(const std::string &);
+	bool LoadSAV(const std::string &);
 
-    bool SaveZXML(std::vector<char> &);
-    bool LoadZXML(const char*, size_t);
+	static bool SaveBIN(QueueMessage &);
+	static bool LoadBIN(QueueMessage &);
+    };
 
-    void SaveXMLDoc(TiXmlDocument &);
-    bool LoadXMLDoc(const TiXmlDocument &);
+    bool Save(const std::string &);
+    bool Load(const std::string &);
+    bool LoadSAV2FileInfo(const std::string &,  Maps::FileInfo &);
 };
 
 #endif

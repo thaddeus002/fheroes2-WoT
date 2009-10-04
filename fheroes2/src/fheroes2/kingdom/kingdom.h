@@ -110,8 +110,7 @@ public:
     void Dump(void) const;
 
 private:
-    friend void Game::SaveXMLDoc(TiXmlDocument &);
-    friend bool Game::LoadXMLDoc(const TiXmlDocument &);
+    friend class Game::IO;
 
     void UpdateRecruits(void);
     void LossPostActions(void);

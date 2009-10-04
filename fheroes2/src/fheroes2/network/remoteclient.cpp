@@ -208,12 +208,11 @@ int FH2RemoteClient::ConnectionChat(void)
 
     		case MSG_MAPS_INFO_SET:
 		    packet.Pop(str);
-		    if(Modes(ST_ADMIN) && str.size())
+		    if(Modes(ST_ADMIN) && Settings::Get().LoadFileMapsMP2(str))
 		    {
         		packet.Reset();
                 	packet.SetID(MSG_MAPS_INFO);
 			server.mutex.Lock();
-			Settings::Get().LoadFileMaps(str);
 			Network::PacketPushMapsFileInfo(packet, conf.CurrentFileInfo());
 			server.queue.push_back(std::make_pair(packet, player_id));
 	    		server.mutex.Unlock();
@@ -246,8 +245,6 @@ int FH2RemoteClient::ConnectionChat(void)
     		case MSG_MAPS_LOAD:
 		    if(Modes(ST_ADMIN))
 		    {
-			packet.Reset();
-			packet.SetID(MSG_MAPS_LOAD);
 			server.mutex.Lock();
 			//
 			conf.FixKingdomRandomRace();
@@ -255,11 +252,9 @@ int FH2RemoteClient::ConnectionChat(void)
 			conf.SetPlayersColors(Network::GetPlayersColors(server.clients));
 			//
 			World::Get().LoadMaps(conf.MapsFile());
-			std::vector<char> bufz;
-			Game::SaveZXML(bufz);
-			std::vector<char>::const_iterator it1 = bufz.begin();
-			std::vector<char>::const_iterator it2 = bufz.end();
-			for(; it1 != it2; ++it1) packet.Push(static_cast<u8>(*it1));
+			packet.Reset();
+			Game::IO::SaveBIN(packet);
+			packet.SetID(MSG_MAPS_LOAD);
 /*
 			{
 			        std::fstream fs("map.snd.z", std::ios::out | std::ios::binary);

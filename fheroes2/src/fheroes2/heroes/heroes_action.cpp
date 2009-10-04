@@ -2751,6 +2751,12 @@ void ActionToEvent(Heroes &hero, const u8 obj, const u16 dst_index)
 
 void ActionToObelisk(Heroes &hero, const u8 obj, const u16 dst_index)
 {
+    if(Settings::Get().PocketPC())
+    {
+	Dialog::Message(MP2::StringObject(obj), _("For the QVGA version is not available."), Font::SMALL, Dialog::OK);
+	return;
+    }
+
     Kingdom & kingdom = world.GetKingdom(hero.GetColor());
     if(!hero.isVisited(world.GetTiles(dst_index), Visit::GLOBAL))
     {
@@ -2827,6 +2833,12 @@ void ActionToTreeKnowledge(Heroes &hero, const u8 obj, const u16 dst_index)
 
 void ActionToOracle(Heroes &hero, const u8 obj, const u16 dst_index)
 {
+    if(Settings::Get().PocketPC())
+    {
+	Dialog::Message(MP2::StringObject(obj), _("For the QVGA version is not available."), Font::SMALL, Dialog::OK);
+	return;
+    }
+
     Dialog::ThievesGuild(0xFF);
     if(Settings::Get().Debug()) Error::Verbose("ActionToOracle: " + hero.GetName());
 }

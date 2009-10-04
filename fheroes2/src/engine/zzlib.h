@@ -21,18 +21,21 @@
 #ifndef H2ZLIB_H
 #define H2ZLIB_H
 
+#ifdef WITH_ZLIB
+
 #include <string>
 #include <vector>
 
 namespace ZLib
 {
-    bool	UnCompress(std::vector<char> &, const char*, size_t);
-    bool	UnCompress(std::vector<char> &, const std::vector<char> &);
-    bool	UnCompress(std::vector<char> &, const std::string &);
+    bool	UnCompress(std::vector<char> &, const char*, size_t, bool debug = false);
+    bool	UnCompress(std::vector<char> &, const std::vector<char> &, bool debug = false);
+    bool	UnCompress(std::vector<char> &, const std::string &, bool debug = false);
 
     bool	Compress(std::vector<char> &, const char*, size_t);
     bool	Compress(std::vector<char> &, const std::vector<char> &);
     bool	Compress(std::vector<char> &, const std::string &);
 };
 
+#endif
 #endif

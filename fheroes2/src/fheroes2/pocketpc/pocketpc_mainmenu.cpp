@@ -39,8 +39,7 @@ Game::menu_t PocketPC::LoadGame(void)
     display.Flip();
 
     std::string file;
-    if(!Dialog::SelectFileLoad(file) || file.empty()) return Game::MAINMENU;
-    Game::Load(file);
+    if(!Dialog::SelectFileLoad(file) || file.empty() || !Game::Load(file)) return Game::MAINMENU;
 
     return Game::STARTGAME;
 }
@@ -75,15 +74,15 @@ Game::menu_t PocketPC::MainMenu(void)
     text.Blit(dst_pt.x + (src_rt.w - text.w()) / 2, dst_pt.y + 148);
 
     text.Set(_("New Game"), Font::BIG);
-    const Rect rectNewGame(dst_pt.x + (src_rt.w - text.w()) / 2, dst_pt.y + 40, text.w(), text.h());
+    const Rect rectNewGame(dst_pt.x + (src_rt.w - text.w()) / 2 - 5, dst_pt.y + 40 + 5, text.w() + 10, text.h() + 10);
     text.Blit(rectNewGame);
 
     text.Set(_("Load Game"));
-    const Rect rectLoadGame(dst_pt.x + (src_rt.w - text.w()) / 2, dst_pt.y + 70, text.w(), text.h());
+    const Rect rectLoadGame(dst_pt.x + (src_rt.w - text.w()) / 2 - 5, dst_pt.y + 70 + 5, text.w() + 10, text.h() + 10);
     text.Blit(rectLoadGame);
 
     text.Set(_("Quit"));
-    const Rect rectQuitGame(dst_pt.x + (src_rt.w - text.w()) / 2, dst_pt.y + 100, text.w(), text.h());
+    const Rect rectQuitGame(dst_pt.x + (src_rt.w - text.w()) / 2 - 5, dst_pt.y + 100 + 5, text.w() + 10, text.h() + 10);
     text.Blit(rectQuitGame);
 
     cursor.Show();

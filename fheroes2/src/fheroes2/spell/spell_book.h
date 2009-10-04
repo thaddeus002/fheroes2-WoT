@@ -44,8 +44,7 @@ public:
 	bool isActive(void) const { return active; };
 
 private:
-	friend void Game::SaveXMLDoc(TiXmlDocument &);
-	friend bool Game::LoadXMLDoc(const TiXmlDocument &);
+	friend class Game::IO;
 
 	void SetFilter(std::vector<Spell::spell_t> & spells, filter_t filter) const;
 

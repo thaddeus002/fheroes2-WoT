@@ -7,10 +7,20 @@ PREFIX := /usr/local
 endif
 
 TARGET := fheroes2
-LIBENGINE := ../engine/libengine.a ../xmlccwrap/libxmlccwrap.a
-LIBS := $(LIBENGINE) $(LIBS)
+LIBENGINE := ../engine/libengine.a
+CFLAGS := $(CFLAGS) -I../engine
+
+ifndef WITHOUT_XML
+LIBENGINE := $(LIBENGINE) ../xmlccwrap/libxmlccwrap.a
+CFLAGS := $(CFLAGS) -I../xmlccwrap
+endif
+
+ifdef PREFIX
+CFLAGS := $(CFLAGS) -I$(PREFIX)/include
+endif
+
 SVN  := $(shell svnversions ..)
-CFLAGS := $(CFLAGS) -I../engine -I../xmlccwrap -I$(PREFIX)/include -DSVN_REVISION="\"$(SVN)\""
+CFLAGS := $(CFLAGS) -DSVN_REVISION="\"$(SVN)\""
 
 SOURCEROOT := ../fheroes2
 SOURCEDIR  := $(shell ls $(SOURCEROOT))

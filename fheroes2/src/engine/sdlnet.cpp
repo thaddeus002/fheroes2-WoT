@@ -18,7 +18,6 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#ifdef WITH_NET
 
 #include <iomanip>
 #include <algorithm>
@@ -27,17 +26,7 @@
 
 #define BUFSIZE 16
 
-namespace Network
-{
-    static u16 proto = 0xFF01;
-};
-
-void Network::SetProtocolVersion(u16 v)
-{
-    proto = v;
-}
-
-Network::Message::Message() : type(0), data(NULL), itd1(NULL), itd2(NULL), dtsz(BUFSIZE)
+QueueMessage::QueueMessage() : type(0), data(NULL), itd1(NULL), itd2(NULL), dtsz(BUFSIZE)
 {
     data = new char [dtsz + 1];
 
@@ -45,7 +34,7 @@ Network::Message::Message() : type(0), data(NULL), itd1(NULL), itd2(NULL), dtsz(
     itd2 = itd1;
 }
 
-Network::Message::Message(u16 id) : type(id), data(NULL), itd1(NULL), itd2(NULL), dtsz(BUFSIZE)
+QueueMessage::QueueMessage(u16 id) : type(id), data(NULL), itd1(NULL), itd2(NULL), dtsz(BUFSIZE)
 {
     data = new char [dtsz + 1];
 
@@ -53,7 +42,7 @@ Network::Message::Message(u16 id) : type(id), data(NULL), itd1(NULL), itd2(NULL)
     itd2 = itd1;
 }
 
-Network::Message::Message(const Message & msg) : type(msg.type), data(NULL), itd1(NULL), itd2(NULL), dtsz(msg.dtsz)
+QueueMessage::QueueMessage(const QueueMessage & msg) : type(msg.type), data(NULL), itd1(NULL), itd2(NULL), dtsz(msg.dtsz)
 {
     data = new char [dtsz + 1];
 
@@ -62,7 +51,7 @@ Network::Message::Message(const Message & msg) : type(msg.type), data(NULL), itd
     itd2 = msg.itd2 > msg.data ? &data[msg.itd2 - msg.data] : itd1;
 }
 
-Network::Message & Network::Message::operator= (const Message & msg)
+QueueMessage & QueueMessage::operator= (const QueueMessage & msg)
 {
     type = msg.type;
     dtsz = msg.dtsz;
@@ -75,12 +64,12 @@ Network::Message & Network::Message::operator= (const Message & msg)
     return *this;
 }
 
-Network::Message::~Message()
+QueueMessage::~QueueMessage()
 {
     if(data) delete [] data;
 }
 
-void Network::Message::Resize(size_t lack)
+void QueueMessage::Resize(size_t lack)
 {
     const size_t newsize = lack > dtsz ? dtsz + lack + 1 : 2 * dtsz + 1;
     char* dat2 = new char [newsize];
@@ -92,22 +81,32 @@ void Network::Message::Resize(size_t lack)
     data = dat2;
 }
 
-size_t Network::Message::Size(void) const
+size_t QueueMessage::Size(void) const
 {
     return itd2 - data;
 }
 
-u16 Network::Message::GetID(void) const
+u16 QueueMessage::GetID(void) const
 {
     return type;
 }
 
-void Network::Message::SetID(u16 id)
+void QueueMessage::SetID(u16 id)
 {
     type = id;
 }
 
-void Network::Message::Reset(void)
+void QueueMessage::Reserve(size_t size)
+{
+    delete [] data;
+    dtsz = size;
+    data = new char [dtsz + 1];
+    
+    itd1 = data;
+    itd2 = itd1;
+}
+
+void QueueMessage::Reset(void)
 {
     type = 0;
 
@@ -122,6 +121,163 @@ void Network::Message::Reset(void)
     itd2 = itd1;
 }
 
+
+void QueueMessage::Push(u8 byte8)
+{
+    if(data + dtsz < itd2 + 1) Resize(1);
+
+    *itd2 = byte8;
+    ++itd2;
+}
+
+void QueueMessage::Push(u16 byte16)
+{
+    if(data + dtsz < itd2 + 2) Resize(2);
+
+    *itd2 = 0x00FF & (byte16 >> 8);
+    ++itd2;
+
+    *itd2 = 0x00FF & byte16;
+    ++itd2;
+}
+
+void QueueMessage::Push(u32 byte32)
+{
+    if(data + dtsz < itd2 + 4) Resize(4);
+
+    *itd2 = 0x000000FF & (byte32 >> 24);
+    ++itd2;
+
+    *itd2 = 0x000000FF & (byte32 >> 16);
+    ++itd2;
+
+    *itd2 = 0x000000FF & (byte32 >> 8);
+    ++itd2;
+
+    *itd2 = 0x000000FF & byte32;
+    ++itd2;
+}
+
+void QueueMessage::Push(const std::string & str)
+{
+    Push(str.c_str());
+}
+
+void QueueMessage::Push(const char* str)
+{
+    const size_t len = std::strlen(str);
+    if(data + dtsz < itd2 + len + 1) Resize(len + 1);
+
+    while(*str) *itd2++ = *str++;
+
+    // end string
+    *itd2 = 0;
+    ++itd2;
+}
+
+bool QueueMessage::Pop(u8 & byte8)
+{
+    if(itd1 + 1 > itd2) return false;
+
+    byte8 = *itd1;
+    ++itd1;
+
+    return true;
+}
+
+bool QueueMessage::Pop(u16 & byte16)
+{
+    if(itd1 + 2 > itd2) return false;
+
+    byte16 = *itd1;
+    byte16 <<= 8;
+    ++itd1;
+
+    byte16 |= (0x00FF & *itd1);
+    ++itd1;
+
+    return true;
+}
+
+bool QueueMessage::Pop(u32 & byte32)
+{
+    if(itd1 + 4 > itd2) return false;
+
+    byte32 = *itd1;
+    byte32 <<= 8;
+    ++itd1;
+
+    byte32 |= (0x000000FF & *itd1);
+    byte32 <<= 8;
+    ++itd1;
+
+    byte32 |= (0x000000FF & *itd1);
+    byte32 <<= 8;
+    ++itd1;
+
+    byte32 |= (0x000000FF & *itd1);
+    ++itd1;
+
+    return true;
+}
+
+bool QueueMessage::Pop(std::string & str)
+{
+    if(itd1 >= itd2) return false;
+
+    // find end string
+    char* end = itd1;
+    while(*end && end < itd2) ++end;
+    if(end == itd2) return false;
+
+    str = itd1;
+    itd1 = end + 1;
+
+    return true;
+}
+
+void QueueMessage::Dump(std::ostream & stream) const
+{
+    stream << "Network::QueueMessage::Dump: type: 0x" << std::hex << type << ", size: " << std::dec << DtSz();
+
+    stream << ", data:";
+    const char* cur = itd1;
+    u8 cast;
+    while(cur < itd2){ cast = *cur; stream << " 0x" << std::setw(2) << std::setfill('0') << std::hex << static_cast<int>(cast); ++cur; }
+
+    stream  << std::endl;
+}
+
+const char* QueueMessage::DtPt(void) const
+{
+    return itd1;
+}
+
+size_t QueueMessage::DtSz(void) const
+{
+    return itd2 > itd1 ? itd2 - itd1 : 0;
+}
+
+#ifdef WITH_NET
+
+namespace Network
+{
+    static u16 proto = 0xFF01;
+};
+
+void Network::SetProtocolVersion(u16 v)
+{
+    proto = v;
+}
+
+Network::Message::Message()
+{
+}
+
+Network::Message::Message(u16 id) : QueueMessage(id)
+{
+}
+
 bool Network::Message::Recv(const Socket & csd, bool debug)
 {
     u16 head;
@@ -134,14 +290,14 @@ bool Network::Message::Recv(const Socket & csd, bool debug)
 	// check id
 	if((0xFF00 & proto) != (0xFF00 & head))
 	{
-	    if(debug) std::cerr << "Network::Message::Recv: unknown packet id: 0x" << std::hex << head << std::endl;
+	    if(debug) std::cerr << "Network::QueueMessage::Recv: unknown packet id: 0x" << std::hex << head << std::endl;
 	    return false;
 	}
 
 	// check ver
 	if((0x00FF & proto) > (0x00FF & head))
 	{
-	    if(debug) std::cerr << "Network::Message::Recv: obsolete protocol ver: 0x" << std::hex << (0x00FF & head) << std::endl;
+	    if(debug) std::cerr << "Network::QueueMessage::Recv: obsolete protocol ver: 0x" << std::hex << (0x00FF & head) << std::endl;
 	    return false;
 	}
 
@@ -159,6 +315,7 @@ bool Network::Message::Recv(const Socket & csd, bool debug)
 		data = new char [size + 1];
         	dtsz = size;
 	    }
+	    
 	    itd1 = data;
 	    itd2 = itd1 + size;
 
@@ -186,140 +343,6 @@ bool Network::Message::Send(const Socket & csd) const
            csd.Send(reinterpret_cast<const char *>(&sign), sizeof(sign)) &&
            csd.Send(reinterpret_cast<const char *>(&size), sizeof(size)) &&
            (size ? csd.Send(data, Size()) : true);
-}
-
-void Network::Message::Push(u8 byte8)
-{
-    if(data + dtsz < itd2 + 1) Resize(1);
-
-    *itd2 = byte8;
-    ++itd2;
-}
-
-void Network::Message::Push(u16 byte16)
-{
-    if(data + dtsz < itd2 + 2) Resize(2);
-
-    *itd2 = 0x00FF & (byte16 >> 8);
-    ++itd2;
-
-    *itd2 = 0x00FF & byte16;
-    ++itd2;
-}
-
-void Network::Message::Push(u32 byte32)
-{
-    if(data + dtsz < itd2 + 4) Resize(4);
-
-    *itd2 = 0x000000FF & (byte32 >> 24);
-    ++itd2;
-
-    *itd2 = 0x000000FF & (byte32 >> 16);
-    ++itd2;
-
-    *itd2 = 0x000000FF & (byte32 >> 8);
-    ++itd2;
-
-    *itd2 = 0x000000FF & byte32;
-    ++itd2;
-}
-
-void Network::Message::Push(const std::string & str)
-{
-    if(data + dtsz < itd2 + str.size() + 1) Resize(str.size() + 1);
-
-    if(str.size())
-    {
-	std::string::const_iterator it1 = str.begin();
-	std::string::const_iterator it2 = str.end();
-	for(; it1 != it2; ++it1, ++itd2) *itd2 = *it1;
-    }
-    // end string
-    *itd2 = 0;
-    ++itd2;
-}
-
-bool Network::Message::Pop(u8 & byte8)
-{
-    if(itd1 + 1 > itd2) return false;
-
-    byte8 = *itd1;
-    ++itd1;
-
-    return true;
-}
-
-bool Network::Message::Pop(u16 & byte16)
-{
-    if(itd1 + 2 > itd2) return false;
-
-    byte16 = *itd1;
-    byte16 <<= 8;
-    ++itd1;
-
-    byte16 |= (0x00FF & *itd1);
-    ++itd1;
-
-    return true;
-}
-
-bool Network::Message::Pop(u32 & byte32)
-{
-    if(itd1 + 4 > itd2) return false;
-
-    byte32 = *itd1;
-    byte32 <<= 8;
-    ++itd1;
-
-    byte32 |= (0x000000FF & *itd1);
-    byte32 <<= 8;
-    ++itd1;
-
-    byte32 |= (0x000000FF & *itd1);
-    byte32 <<= 8;
-    ++itd1;
-
-    byte32 |= (0x000000FF & *itd1);
-    ++itd1;
-
-    return true;
-}
-
-bool Network::Message::Pop(std::string & str)
-{
-    if(itd1 >= itd2) return false;
-
-    // find end string
-    char* end = itd1;
-    while(*end && end < itd2) ++end;
-    if(end == itd2) return false;
-
-    str = itd1;
-    itd1 = end + 1;
-
-    return true;
-}
-
-void Network::Message::Dump(std::ostream & stream) const
-{
-    stream << "Network::Message::Dump: type: 0x" << std::hex << type << ", size: " << std::dec << DtSz();
-
-    stream << ", data:";
-    const char* cur = itd1;
-    u8 cast;
-    while(cur < itd2){ cast = *cur; stream << " 0x" << std::setw(2) << std::setfill('0') << std::hex << static_cast<int>(cast); ++cur; }
-
-    stream  << std::endl;
-}
-
-const char* Network::Message::DtPt(void) const
-{
-    return itd1;
-}
-
-size_t Network::Message::DtSz(void) const
-{
-    return itd2 > itd1 ? itd2 - itd1 : 0;
 }
 
 Network::Socket::Socket() : sd(NULL), sdset(NULL)

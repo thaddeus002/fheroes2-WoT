@@ -172,21 +172,61 @@ void Interface::ButtonsArea::QueueEventProcessing(Game::menu_t & ret)
         Interface::Basic::Get().SetRedraw(REDRAW_GAMEAREA);
     }
     else
-    if(le.MouseClickLeft(buttonNextHero)) Game::ButtonNextHero();
+    if(le.MouseClickLeft(buttonNextHero))
+    {
+        // for QVGA: auto hide buttons after click
+        if(conf.PocketPC()) conf.ResetModes(Settings::SHOWBUTTONS);
+	Game::ButtonNextHero();
+    }
     else
-    if(le.MouseClickLeft(buttonMovement)) Game::ButtonMovement();
+    if(le.MouseClickLeft(buttonMovement))
+    {
+        // for QVGA: auto hide buttons after click
+        if(conf.PocketPC()) conf.ResetModes(Settings::SHOWBUTTONS);
+	Game::ButtonMovement();
+    }
     else
-    if(le.MouseClickLeft(buttonKingdom)) Game::ButtonKingdom();
+    if(le.MouseClickLeft(buttonKingdom))
+    {
+        // for QVGA: auto hide buttons after click
+        if(conf.PocketPC()) conf.ResetModes(Settings::SHOWBUTTONS);
+	Game::ButtonKingdom();
+    }
     else
-    if(le.MouseClickLeft(buttonSpell)) Game::ButtonSpell();
+    if(le.MouseClickLeft(buttonSpell))
+    {
+        // for QVGA: auto hide buttons after click
+        if(conf.PocketPC()) conf.ResetModes(Settings::SHOWBUTTONS);
+	Game::ButtonSpell();
+    }
     else
-    if(le.MouseClickLeft(buttonEndTur)) Game::ButtonEndTurn(ret);
+    if(le.MouseClickLeft(buttonEndTur))
+    {
+        // for QVGA: auto hide buttons after click
+        if(conf.PocketPC()) conf.ResetModes(Settings::SHOWBUTTONS);
+	Game::ButtonEndTurn(ret);
+    }
     else
-    if(le.MouseClickLeft(buttonAdventure)) Game::ButtonAdventure(ret);
+    if(le.MouseClickLeft(buttonAdventure))
+    {
+        // for QVGA: auto hide buttons after click
+        if(conf.PocketPC()) conf.ResetModes(Settings::SHOWBUTTONS);
+	Game::ButtonAdventure(ret);
+    }
     else
-    if(le.MouseClickLeft(buttonFile)) Game::ButtonFile(ret);
+    if(le.MouseClickLeft(buttonFile))
+    {
+        // for QVGA: auto hide buttons after click
+        if(conf.PocketPC()) conf.ResetModes(Settings::SHOWBUTTONS);
+	Game::ButtonFile(ret);
+    }
     else
-    if(le.MouseClickLeft(buttonSystem)) Game::ButtonSystem();
+    if(le.MouseClickLeft(buttonSystem))
+    {
+        // for QVGA: auto hide buttons after click
+        if(conf.PocketPC()) conf.ResetModes(Settings::SHOWBUTTONS);
+	Game::ButtonSystem();
+    }
 
     if(le.MousePressRight(buttonNextHero)) Dialog::Message(_("Next Hero"), _("Select the next Hero."), Font::BIG);
     else

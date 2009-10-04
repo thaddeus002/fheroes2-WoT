@@ -239,7 +239,7 @@ int FH2LocalClient::ScenarioInfoDialog(void)
                     fs.close();
                 }
 */
-		    if(Game::LoadZXML(packet.DtPt(), packet.DtSz()))
+		    if(Game::IO::LoadBIN(packet))
 		    {
 			conf.SetMyColor(Color::Get(player_color));
 			return Dialog::OK;

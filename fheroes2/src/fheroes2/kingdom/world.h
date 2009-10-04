@@ -160,8 +160,7 @@ private:
 
 private:
     friend class Radar;
-    friend void Game::SaveXMLDoc(TiXmlDocument &);
-    friend bool Game::LoadXMLDoc(const TiXmlDocument &);
+    friend class Game::IO;
 
     std::vector<Maps::Tiles *>          vec_tiles;
     std::vector<Kingdom *>              vec_kingdoms;

@@ -54,7 +54,7 @@ bool Dialog::SelectFileSave(std::string & file)
     MapsFileInfoList lists(dir.size());
     MapsFileInfoList::const_iterator res;
     int ii = 0;
-    for(Dir::const_iterator itd = dir.begin(); itd != dir.end(); ++itd, ++ii) if(!lists[ii].ReadXML(*itd)) --ii;
+    for(Dir::const_iterator itd = dir.begin(); itd != dir.end(); ++itd, ++ii) if(!lists[ii].ReadSAV(*itd)) --ii;
     if(static_cast<size_t>(ii) != lists.size()) lists.resize(ii);
     std::sort(lists.begin(), lists.end(), Maps::FileInfo::PredicateForSorting);
 
@@ -70,7 +70,7 @@ bool Dialog::SelectFileLoad(std::string & file)
     MapsFileInfoList lists(dir.size());
     MapsFileInfoList::const_iterator res;
     int ii = 0;
-    for(Dir::const_iterator itd = dir.begin(); itd != dir.end(); ++itd, ++ii) if(!lists[ii].ReadXML(*itd)) --ii;
+    for(Dir::const_iterator itd = dir.begin(); itd != dir.end(); ++itd, ++ii) if(!lists[ii].ReadSAV(*itd)) --ii;
     if(static_cast<size_t>(ii) != lists.size()) lists.resize(ii);
     std::sort(lists.begin(), lists.end(), Maps::FileInfo::PredicateForSorting);
 

@@ -123,9 +123,7 @@ Game::menu_t Game::LoadStandard(void)
 
     std::string file;
 
-    if(!Dialog::SelectFileLoad(file) || file.empty()) return MAINMENU;
-
-    Game::Load(file);
+    if(!Dialog::SelectFileLoad(file) || file.empty() || !Game::Load(file)) return MAINMENU;
 
     return STARTGAME;
 }

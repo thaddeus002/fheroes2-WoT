@@ -33,9 +33,8 @@ namespace Maps
     {
     FileInfo();
 
-    bool Read(const std::string &);
-    bool ReadBIN(const std::string &);
-    bool ReadXML(const std::string &);
+    bool ReadMP2(const std::string &);
+    bool ReadSAV(const std::string &);
 
     u8 AllowColorsCount(void) const;
     u8 KingdomColorsCount(void) const;

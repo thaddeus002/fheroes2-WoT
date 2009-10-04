@@ -876,6 +876,9 @@ void Interface::IconsPanel::QueueEventProcessing(void)
             global_focus.Set(const_cast<Heroes *>(hero));
             global_focus.SetRedraw();
         }
+
+        // for QVGA: auto hide icons after click
+        if(conf.PocketPC()) conf.ResetModes(Settings::SHOWICONS);
     }
     else
     if(const Heroes * hero = selectHeroes.MousePressRight())
@@ -896,6 +899,9 @@ void Interface::IconsPanel::QueueEventProcessing(void)
             global_focus.Set(const_cast<Castle *>(cstl));
             global_focus.SetRedraw();
         }
+
+        // for QVGA: auto hide icons after click
+        if(conf.PocketPC()) conf.ResetModes(Settings::SHOWICONS);
     }
     else
     if(const Castle * cstl = selectCastle.MousePressRight())

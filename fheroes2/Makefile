@@ -4,11 +4,12 @@
 # Options:
 # DEBUG: build in debug mode
 # RELEASE: build with addons extensions
-# DEVELOPMENT: build with development extensions
 #
-# WITHOUT_NETWORK: build without network support
+# WITHOUT_ZLIB: build without zlib (disable comressed save files)
+# WITHOUT_MIXER: build without SDL_mixer library
+# WITHOUT_NETWORK: build without SDL_net library
 # WITHOUT_UNICODE: build without unicode (disable translation and ttf font)
-# WITHOUT_PNG: build without png support (disable cache image, icn2png)
+# WITHOUT_IMAGE: build without SDL_image library (disable cache image, icn2png)
 
 TARGET := fheroes2
 

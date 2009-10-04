@@ -38,8 +38,7 @@
 class Settings : public BitModes
 {
 public:
-
-    typedef enum
+    enum settings_t
     {
 	NONE              = 0x00000000,
 	LOADGAME          = 0x00000001,
@@ -78,7 +77,7 @@ public:
 
 	MUSIC		= MUSIC_CD | MUSIC_EXT | MUSIC_MIDI,
 
-    } settings_t;
+    };
 
     static Settings & Get(void);
 
@@ -86,7 +85,7 @@ public:
     bool Save(const std::string & filename) const;
 
     void Dump(std::ostream & stream = std::cout) const;
-    void LoadFileMaps(const std::string & file);
+    bool LoadFileMapsMP2(const std::string & file);
     Maps::FileInfo & CurrentFileInfo(void);
 
     u8 MajorVersion(void) const;
@@ -200,8 +199,7 @@ protected:
     void ResetStrModes(const std::string & key);
 
 private:
-    friend void Game::SaveXMLDoc(TiXmlDocument &);
-    friend bool Game::LoadXMLDoc(const TiXmlDocument &);
+    friend class Game::IO;
 
     Settings();
 

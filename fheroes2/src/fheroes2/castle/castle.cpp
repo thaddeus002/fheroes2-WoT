@@ -31,8 +31,9 @@
 
 Castle::Castle(s16 cx, s16 cy, const Race::race_t rc) : mp(cx, cy), race(rc), captain(*this),
     color(Color::GRAY), building(0), mageguild(race),
-    dwelling(CASTLEMAXMONSTER, 0), army(&captain), castle_heroes(NULL)
+    army(&captain), castle_heroes(NULL)
 {
+    std::fill(dwelling, dwelling + CASTLEMAXMONSTER, 0);
     SetModes(ARMYSPREAD);
     SetModes(ALLOWBUILD);
 
@@ -345,9 +346,7 @@ void Castle::ActionNewMonth(void)
 {
     if(world.GetWeekType() == Week::PLAGUE)
     {
-	std::vector<u16>::iterator it1 = dwelling.begin();
-	std::vector<u16>::iterator it2 = dwelling.end();
-	for(; it1 != it2; ++it1) if(*it1) (*it1) = (*it1) / 2;
+	for(u8 ii = 0; ii < CASTLEMAXMONSTER; ++ii) if(dwelling[ii]) dwelling[ii] /= 2;
     }
 }
 
@@ -957,15 +956,15 @@ bool Castle::AllowBuyBuilding(u32 build) const
 /* buy building */
 void Castle::BuyBuilding(u32 build)
 {
-	if(! AllowBuyBuilding(build)) return;
+    if(! AllowBuyBuilding(build)) return;
 	
-	world.GetKingdom(color).OddFundsResource(PaymentConditions::BuyBuilding(race, build));
+    world.GetKingdom(color).OddFundsResource(PaymentConditions::BuyBuilding(race, build));
 
-	// add build
-	building |= build;
+    // add build
+    building |= build;
 
-	switch(build)
-	{
+    switch(build)
+    {
 	    case BUILD_CASTLE:
 		Maps::UpdateSpritesFromTownToCastle(GetCenter());
 		Maps::ClearFog(GetIndex(), CASTLE_SCOUTE, GetColor());
@@ -993,12 +992,19 @@ void Castle::BuyBuilding(u32 build)
 	    case DWELLING_MONSTER5: dwelling[4] = Monster(race, DWELLING_MONSTER5).GetGrown(); break;
 	    case DWELLING_MONSTER6: dwelling[5] = Monster(race, DWELLING_MONSTER6).GetGrown(); break;
 	    default: break;
-	}
+    }
 
-	// disable day build
-	ResetModes(ALLOWBUILD);
+    // disable day build
+    ResetModes(ALLOWBUILD);
 	
-	if(Settings::Get().Debug()) Error::Verbose("Castle::BuyBuilding: " + name + " build " + GetStringBuilding(build, race));
+
+    // play sound
+    if(Game::LOCAL == world.GetKingdom(color).Control())
+    {
+	AGG::PlaySound(M82::BUILDTWN);
+    }
+
+    if(Settings::Get().Debug()) Error::Verbose("Castle::BuyBuilding: " + name + " build " + GetStringBuilding(build, race));
 }
 
 /* draw image castle to position */
@@ -1558,4 +1564,27 @@ Army::army_t & Castle::GetActualArmy(void)
 {
     Heroes *heroes = GetHeroes();
     return heroes ? heroes->GetArmy() : army;
+}
+
+bool Castle::AllowBuyBoat(void) const
+{
+    // check payment and present other boat
+    Resource::funds_t res;
+    res.gold = BUY_BOAT_GOLD;
+    res.wood = BUY_BOAT_WOOD;
+    return world.GetMyKingdom().AllowPayment(res) && (false == Modes(BOATPRESENT));
+}
+
+void Castle::BuyBoat(void)
+{
+    if(Game::LOCAL == world.GetKingdom(color).Control())
+    {
+        AGG::PlaySound(M82::BUILDTWN);
+    }
+    Resource::funds_t res;
+    res.gold = BUY_BOAT_GOLD;
+    res.wood = BUY_BOAT_WOOD;
+    world.GetMyKingdom().OddFundsResource(res);
+    SetModes(BOATPRESENT);
+    world.CreateBoat(GetIndex(), true);
 }

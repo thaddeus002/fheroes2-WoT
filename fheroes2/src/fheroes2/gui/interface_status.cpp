@@ -47,6 +47,15 @@ Interface::StatusWindow & Interface::StatusWindow::Get(void)
     return wstatus;
 }
 
+void Interface::StatusWindow::Reset(void)
+{
+    state = STATUS_DAY;
+    oldState = STATUS_UNKNOWN;
+    lastResource = Resource::UNKNOWN;
+    countLastResource = 0;
+    ResetTimer();
+}
+
 u32 Interface::StatusWindow::ResetResourceStatus(u32 tick, void *ptr)
 {
     if(ptr && STATUS_RESOURCE == reinterpret_cast<Interface::StatusWindow*>(ptr)->state)

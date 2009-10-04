@@ -162,8 +162,7 @@ namespace Maps
 	void RemoveJailSprite(void);
 
     private:
-	friend void Game::SaveXMLDoc(TiXmlDocument &);
-	friend bool Game::LoadXMLDoc(const TiXmlDocument &);
+	friend class Game::IO;
 
         std::list<TilesAddon> addons_level1;
         std::list<TilesAddon> addons_level2;

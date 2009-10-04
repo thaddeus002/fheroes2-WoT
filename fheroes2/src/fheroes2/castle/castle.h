@@ -148,6 +148,8 @@ public:
     bool AllowBuyBuilding(u32) const;
     bool isBuild(u32 bd) const{ return building & bd; };
     void BuyBuilding(u32);
+    bool AllowBuyBoat(void) const;
+    void BuyBoat(void);
     u32 GetBuildingRequires(u32) const;
 
     static const std::string & GetStringBuilding(u32, Race::race_t = Race::BOMG);
@@ -186,8 +188,7 @@ private:
     void RedrawAnimationBuilding(const Point & dst_pt, u32 build);
 
 private:
-    friend void Game::SaveXMLDoc(TiXmlDocument &);
-    friend bool Game::LoadXMLDoc(const TiXmlDocument &);
+    friend class Game::IO;
 
     const Point		mp;
     Race::race_t	race;
@@ -198,7 +199,7 @@ private:
     u32			building;
 
     MageGuild		mageguild;
-    std::vector<u16>    dwelling;
+    u16			dwelling[CASTLEMAXMONSTER];
     Army::army_t        army;
     Heroes * 		castle_heroes;
 };

@@ -41,7 +41,8 @@ namespace Interface
 
 	void SetPos(s16, s16);
 	const Rect & GetArea(void) const;
-    
+	void Reset(void);
+	    
 	void Redraw(void);
 	void NextState(void);
 	void SetState(info_t info);

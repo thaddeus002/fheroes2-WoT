@@ -438,21 +438,10 @@ Dialog::answer_t Castle::OpenDialog(bool fade)
 	{
 	    cursor.Hide();
 
-	    // check payment and present other boat
-	    Resource::funds_t res;
-	    res.gold = BUY_BOAT_GOLD;
-	    res.wood = BUY_BOAT_WOOD;
-	    bool enable = world.GetMyKingdom().AllowPayment(res) && (false == Modes(BOATPRESENT));
-
-	    if(Dialog::OK == Dialog::BuyBoat(enable))
+	    if(Dialog::OK == Dialog::BuyBoat(AllowBuyBoat()))
 	    {
-		AGG::PlaySound(M82::BUILDTWN);
-		world.GetMyKingdom().OddFundsResource(res);
-		SetModes(BOATPRESENT);
-		world.CreateBoat(GetIndex(), true);
-
+		BuyBoat();
 		RedrawResourcePanel(cur_pt);
-
     		// RedrawResourcePanel destroy sprite buttonExit
 		if(buttonExit.isPressed()) buttonExit.Draw();
 	    }
@@ -506,9 +495,6 @@ Dialog::answer_t Castle::OpenDialog(bool fade)
 
                 if(selectCaptainArmy.isSelected()) selectCaptainArmy.Reset();
 		BuyBuilding(build);
-
-		// play sound
-		AGG::PlaySound(M82::BUILDTWN);
 		
 		RedrawAnimationBuilding(cur_pt, build);
 		RedrawResourcePanel(cur_pt);
@@ -589,9 +575,6 @@ Dialog::answer_t Castle::OpenDialog(bool fade)
 	    {
 		cursor.Hide();
 		BuyBuilding(BUILD_CASTLE);
-
-		// play sound
-		AGG::PlaySound(M82::BUILDTWN);
 
 		RedrawAnimationBuilding(cur_pt, BUILD_CASTLE);
 		RedrawResourcePanel(cur_pt);

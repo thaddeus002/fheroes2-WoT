@@ -30,6 +30,7 @@ u8 SpellStorage::Size(const u8 lvl) const
 {
     switch(lvl)
     {
+	case 0:	return Size1() + Size2() + Size3() + Size4() + Size5();
 	case 1:	return Size1();
 	case 2:	return Size2();
 	case 3:	return Size3();

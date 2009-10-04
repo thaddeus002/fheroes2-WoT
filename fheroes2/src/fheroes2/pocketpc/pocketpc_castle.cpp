@@ -184,22 +184,22 @@ screen_t CastleOpenDialog1(Castle & castle)
     // resource bar
     RedrawResourceBar(Point(dst_rt.x + 4, dst_rt.y + 181), world.GetMyKingdom().GetFundsResource());
 
-    const Rect rectExit(dst_rt.x + dst_rt.w - 21, dst_rt.y + 7, 25, 25);
+    const Rect rectExit(dst_rt.x + dst_rt.w - 26, dst_rt.y + 7, 25, 25);
     display.Blit(AGG::GetICN(ICN::TOWNWIND, 12), rectExit.x, rectExit.y);
 
-    const Rect rectScreen1(dst_rt.x + dst_rt.w - 22, dst_rt.y + 32, 25, 25);
+    const Rect rectScreen1(dst_rt.x + dst_rt.w - 27, dst_rt.y + 32, 25, 25);
     display.Blit(AGG::GetICN(ICN::REQUESTS, 20), rectScreen1.x, rectScreen1.y);
 
-    const Rect rectScreen2(dst_rt.x + dst_rt.w - 22, dst_rt.y + 58, 25, 25);
+    const Rect rectScreen2(dst_rt.x + dst_rt.w - 27, dst_rt.y + 58, 25, 25);
     display.Blit(AGG::GetICN(ICN::REQUESTS, 21), rectScreen2.x, rectScreen2.y);
 
-    const Rect rectScreen3(dst_rt.x + dst_rt.w - 22, dst_rt.y + 83, 25, 25);
+    const Rect rectScreen3(dst_rt.x + dst_rt.w - 27, dst_rt.y + 83, 25, 25);
     display.Blit(AGG::GetICN(ICN::REQUESTS, 22), rectScreen3.x, rectScreen3.y);
 
-    const Rect rectScreen4(dst_rt.x + dst_rt.w - 22, dst_rt.y + 108, 25, 25);
+    const Rect rectScreen4(dst_rt.x + dst_rt.w - 27, dst_rt.y + 108, 25, 25);
     display.Blit(AGG::GetICN(ICN::REQUESTS, 23), rectScreen4.x, rectScreen4.y);
 
-    const Rect rectScreen5(dst_rt.x + dst_rt.w - 22, dst_rt.y + 133, 25, 25);
+    const Rect rectScreen5(dst_rt.x + dst_rt.w - 27, dst_rt.y + 133, 25, 25);
     display.Blit(AGG::GetICN(ICN::REQUESTS, 24), rectScreen5.x, rectScreen5.y);
 
     Button buttonPrev(dst_rt.x + 64, dst_rt.y + 5, ICN::TRADPOST, 3, 4);
@@ -302,22 +302,22 @@ screen_t CastleOpenDialog2(Castle & castle)
     const Sprite & background = AGG::GetICN(ICN::STONEBAK, 0);
     display.Blit(background, Rect(0, 0, window_w, window_h), dst_rt);
 
-    const Rect rectExit(dst_rt.x + dst_rt.w - 21, dst_rt.y + 7, 25, 25);
+    const Rect rectExit(dst_rt.x + dst_rt.w - 26, dst_rt.y + 7, 25, 25);
     display.Blit(AGG::GetICN(ICN::TOWNWIND, 12), rectExit.x, rectExit.y);
 
-    const Rect rectScreen1(dst_rt.x + dst_rt.w - 22, dst_rt.y + 32, 25, 25);
+    const Rect rectScreen1(dst_rt.x + dst_rt.w - 27, dst_rt.y + 32, 25, 25);
     display.Blit(AGG::GetICN(ICN::REQUESTS, 20), rectScreen1.x, rectScreen1.y);
 
-    const Rect rectScreen2(dst_rt.x + dst_rt.w - 22, dst_rt.y + 58, 25, 25);
+    const Rect rectScreen2(dst_rt.x + dst_rt.w - 27, dst_rt.y + 58, 25, 25);
     display.Blit(AGG::GetICN(ICN::REQUESTS, 21), rectScreen2.x, rectScreen2.y);
 
-    const Rect rectScreen3(dst_rt.x + dst_rt.w - 22, dst_rt.y + 83, 25, 25);
+    const Rect rectScreen3(dst_rt.x + dst_rt.w - 27, dst_rt.y + 83, 25, 25);
     display.Blit(AGG::GetICN(ICN::REQUESTS, 22), rectScreen3.x, rectScreen3.y);
 
-    const Rect rectScreen4(dst_rt.x + dst_rt.w - 22, dst_rt.y + 108, 25, 25);
+    const Rect rectScreen4(dst_rt.x + dst_rt.w - 27, dst_rt.y + 108, 25, 25);
     display.Blit(AGG::GetICN(ICN::REQUESTS, 23), rectScreen4.x, rectScreen4.y);
 
-    const Rect rectScreen5(dst_rt.x + dst_rt.w - 22, dst_rt.y + 133, 25, 25);
+    const Rect rectScreen5(dst_rt.x + dst_rt.w - 27, dst_rt.y + 133, 25, 25);
     display.Blit(AGG::GetICN(ICN::REQUESTS, 24), rectScreen5.x, rectScreen5.y);
 
     BuildingInfo dwelling1(castle, Castle::DWELLING_MONSTER1);
@@ -397,22 +397,22 @@ screen_t CastleOpenDialog3(Castle & castle)
     const Sprite & background = AGG::GetICN(ICN::STONEBAK, 0);
     display.Blit(background, Rect(0, 0, window_w, window_h), dst_rt);
 
-    const Rect rectExit(dst_rt.x + dst_rt.w - 21, dst_rt.y + 7, 25, 25);
+    const Rect rectExit(dst_rt.x + dst_rt.w - 26, dst_rt.y + 7, 25, 25);
     display.Blit(AGG::GetICN(ICN::TOWNWIND, 12), rectExit.x, rectExit.y);
 
-    const Rect rectScreen1(dst_rt.x + dst_rt.w - 22, dst_rt.y + 32, 25, 25);
+    const Rect rectScreen1(dst_rt.x + dst_rt.w - 27, dst_rt.y + 32, 25, 25);
     display.Blit(AGG::GetICN(ICN::REQUESTS, 20), rectScreen1.x, rectScreen1.y);
 
-    const Rect rectScreen2(dst_rt.x + dst_rt.w - 22, dst_rt.y + 58, 25, 25);
+    const Rect rectScreen2(dst_rt.x + dst_rt.w - 27, dst_rt.y + 58, 25, 25);
     display.Blit(AGG::GetICN(ICN::REQUESTS, 21), rectScreen2.x, rectScreen2.y);
 
-    const Rect rectScreen3(dst_rt.x + dst_rt.w - 22, dst_rt.y + 83, 25, 25);
+    const Rect rectScreen3(dst_rt.x + dst_rt.w - 27, dst_rt.y + 83, 25, 25);
     display.Blit(AGG::GetICN(ICN::REQUESTS, 22), rectScreen3.x, rectScreen3.y);
 
-    const Rect rectScreen4(dst_rt.x + dst_rt.w - 22, dst_rt.y + 108, 25, 25);
+    const Rect rectScreen4(dst_rt.x + dst_rt.w - 27, dst_rt.y + 108, 25, 25);
     display.Blit(AGG::GetICN(ICN::REQUESTS, 23), rectScreen4.x, rectScreen4.y);
 
-    const Rect rectScreen5(dst_rt.x + dst_rt.w - 22, dst_rt.y + 133, 25, 25);
+    const Rect rectScreen5(dst_rt.x + dst_rt.w - 27, dst_rt.y + 133, 25, 25);
     display.Blit(AGG::GetICN(ICN::REQUESTS, 24), rectScreen5.x, rectScreen5.y);
 
     Castle::building_t level = Castle::BUILD_NOTHING;
@@ -502,22 +502,22 @@ screen_t CastleOpenDialog4(Castle & castle)
     const Sprite & background = AGG::GetICN(ICN::STONEBAK, 0);
     display.Blit(background, Rect(0, 0, window_w, window_h), dst_rt);
 
-    const Rect rectExit(dst_rt.x + dst_rt.w - 21, dst_rt.y + 7, 25, 25);
+    const Rect rectExit(dst_rt.x + dst_rt.w - 26, dst_rt.y + 7, 25, 25);
     display.Blit(AGG::GetICN(ICN::TOWNWIND, 12), rectExit.x, rectExit.y);
 
-    const Rect rectScreen1(dst_rt.x + dst_rt.w - 22, dst_rt.y + 32, 25, 25);
+    const Rect rectScreen1(dst_rt.x + dst_rt.w - 27, dst_rt.y + 32, 25, 25);
     display.Blit(AGG::GetICN(ICN::REQUESTS, 20), rectScreen1.x, rectScreen1.y);
 
-    const Rect rectScreen2(dst_rt.x + dst_rt.w - 22, dst_rt.y + 58, 25, 25);
+    const Rect rectScreen2(dst_rt.x + dst_rt.w - 27, dst_rt.y + 58, 25, 25);
     display.Blit(AGG::GetICN(ICN::REQUESTS, 21), rectScreen2.x, rectScreen2.y);
 
-    const Rect rectScreen3(dst_rt.x + dst_rt.w - 22, dst_rt.y + 83, 25, 25);
+    const Rect rectScreen3(dst_rt.x + dst_rt.w - 27, dst_rt.y + 83, 25, 25);
     display.Blit(AGG::GetICN(ICN::REQUESTS, 22), rectScreen3.x, rectScreen3.y);
 
-    const Rect rectScreen4(dst_rt.x + dst_rt.w - 22, dst_rt.y + 108, 25, 25);
+    const Rect rectScreen4(dst_rt.x + dst_rt.w - 27, dst_rt.y + 108, 25, 25);
     display.Blit(AGG::GetICN(ICN::REQUESTS, 23), rectScreen4.x, rectScreen4.y);
 
-    const Rect rectScreen5(dst_rt.x + dst_rt.w - 22, dst_rt.y + 133, 25, 25);
+    const Rect rectScreen5(dst_rt.x + dst_rt.w - 27, dst_rt.y + 133, 25, 25);
     display.Blit(AGG::GetICN(ICN::REQUESTS, 24), rectScreen5.x, rectScreen5.y);
 
     BuildingInfo building1(castle, Castle::BUILD_WELL);
@@ -635,22 +635,22 @@ screen_t CastleOpenDialog5(Castle & castle)
     display.Blit(captain, Rect((captain.w() - 50) / 2, 15, 50, 47), rectCaptain.x + 4, rectCaptain.y + 4);
 
     // buttons
-    const Rect rectExit(dst_rt.x + dst_rt.w - 21, dst_rt.y + 7, 25, 25);
+    const Rect rectExit(dst_rt.x + dst_rt.w - 26, dst_rt.y + 7, 25, 25);
     display.Blit(AGG::GetICN(ICN::TOWNWIND, 12), rectExit.x, rectExit.y);
 
-    const Rect rectScreen1(dst_rt.x + dst_rt.w - 22, dst_rt.y + 32, 25, 25);
+    const Rect rectScreen1(dst_rt.x + dst_rt.w - 27, dst_rt.y + 32, 25, 25);
     display.Blit(AGG::GetICN(ICN::REQUESTS, 20), rectScreen1.x, rectScreen1.y);
 
-    const Rect rectScreen2(dst_rt.x + dst_rt.w - 22, dst_rt.y + 58, 25, 25);
+    const Rect rectScreen2(dst_rt.x + dst_rt.w - 27, dst_rt.y + 58, 25, 25);
     display.Blit(AGG::GetICN(ICN::REQUESTS, 21), rectScreen2.x, rectScreen2.y);
 
-    const Rect rectScreen3(dst_rt.x + dst_rt.w - 22, dst_rt.y + 83, 25, 25);
+    const Rect rectScreen3(dst_rt.x + dst_rt.w - 27, dst_rt.y + 83, 25, 25);
     display.Blit(AGG::GetICN(ICN::REQUESTS, 22), rectScreen3.x, rectScreen3.y);
 
-    const Rect rectScreen4(dst_rt.x + dst_rt.w - 22, dst_rt.y + 108, 25, 25);
+    const Rect rectScreen4(dst_rt.x + dst_rt.w - 27, dst_rt.y + 108, 25, 25);
     display.Blit(AGG::GetICN(ICN::REQUESTS, 23), rectScreen4.x, rectScreen4.y);
 
-    const Rect rectScreen5(dst_rt.x + dst_rt.w - 22, dst_rt.y + 133, 25, 25);
+    const Rect rectScreen5(dst_rt.x + dst_rt.w - 27, dst_rt.y + 133, 25, 25);
     display.Blit(AGG::GetICN(ICN::REQUESTS, 24), rectScreen5.x, rectScreen5.y);
 
     u32 ticket = 0;

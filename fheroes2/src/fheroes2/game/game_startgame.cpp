@@ -786,6 +786,8 @@ Game::menu_t Game::HumanTurn(void)
     const std::vector<Heroes *> & myHeroes = myKingdom.GetHeroes();
 
 
+    bool autohide_status = conf.PocketPC();
+
     // set focus
     if(Game::HOTSEAT == conf.GameType()) global_focus.Reset();
 
@@ -795,7 +797,7 @@ Game::menu_t Game::HumanTurn(void)
 	global_focus.Reset(Focus::HEROES);
     if(Focus::HEROES == global_focus.Type() && global_focus.GetHeroes().GetPath().isValid()) global_focus.GetHeroes().GetPath().Show();
 
-    I.statusWindow.SetState(STATUS_DAY);
+    I.statusWindow.Reset();
     I.Redraw(REDRAW_GAMEAREA | REDRAW_RADAR | REDRAW_ICONS | REDRAW_BUTTONS | REDRAW_STATUS | REDRAW_BORDER);
 
     AGG::PlayMusic(MUS::FromGround(world.GetTiles(global_focus.Center()).GetGround()));
@@ -820,6 +822,13 @@ Game::menu_t Game::HumanTurn(void)
     // startgame loop
     while(CANCEL == res && le.HandleEvents())
     {
+	// for pocketpc: auto hide status if start turn
+	if(autohide_status && conf.ShowStatus() && ticket > 300)
+	{
+	    KeyPress_w();
+	    autohide_status = false;
+	}
+
 	// hot keys
 	if(le.KeyPress()) switch(le.KeyValue())
 	{
@@ -1024,19 +1033,31 @@ Game::menu_t Game::HumanTurn(void)
 	DialogPlayers(conf.MyColor(), str);
     }
 
-    cursor.Hide();
     if(Game::Focus::HEROES == global_focus.Type())
     {
 	global_focus.GetHeroes().ShowPath(false);
 	global_focus.SetRedraw();
-    	I.Redraw();
-        display.Flip();
     }
 
     if(ENDTURN == res && conf.Modes(Settings::AUTOSAVE))
     {
 	std::string filename(conf.LocalPrefix() + SEPARATOR + "files" + SEPARATOR + "save" + SEPARATOR +  "autosave.sav");
 	Game::Save(filename);
+    }
+
+    // for pocketpc: show status window if AI turn
+    if(ENDTURN == res && conf.PocketPC() && !conf.ShowStatus())
+    {
+	conf.SetModes(Settings::SHOWSTATUS);
+    	I.SetRedraw(REDRAW_STATUS);
+    }
+
+    if(I.NeedRedraw())
+    {
+    	cursor.Hide();
+    	I.Redraw();
+    	cursor.Show();
+    	display.Flip();
     }
 
     // reset sound
@@ -1321,9 +1342,6 @@ void Game::StartNewGame(Game::menu_t & ret)
 
 void Game::ButtonFile(Game::menu_t & ret)
 {
-    Mixer::Reduce();
-    Mixer::Reset();
-
     switch(Dialog::FileOptions())
     {
 	case NEWGAME:
@@ -1345,8 +1363,6 @@ void Game::ButtonFile(Game::menu_t & ret)
 	default:
 	break;
     }
-
-    Mixer::Enhance();
 }
 
 void Game::ButtonSystem(void)
@@ -1423,10 +1439,7 @@ void Game::KeyPress_l(menu_t & ret)
 	// fast load
 	std::string filename;
 	if(Dialog::SelectFileLoad(filename) && filename.size())
-	{
-	    Game::Load(filename);
-	    ret = STARTGAME;
-	}
+	    ret = Game::Load(filename) ? STARTGAME : MAINMENU;
     }
 }
 

@@ -229,7 +229,7 @@ GameEvent::Riddle::Riddle() : index_map(MAXU16), artifact(Artifact::UNKNOWN), qu
 {
 }
 
-GameEvent::Riddle::Riddle(u16 index, const void *ptr) : index_map(index)
+GameEvent::Riddle::Riddle(u16 index, const void *ptr) : index_map(index), quiet(true)
 {
     const u8  *ptr8  = static_cast<const u8 *>(ptr);
     u16 byte16 = 0;

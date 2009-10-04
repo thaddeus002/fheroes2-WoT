@@ -18,11 +18,13 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#include <zlib.h>
-#include <iostream>
 #include "zzlib.h"
 
-bool ZLib::UnCompress(std::vector<char> & dst, const char* src, size_t srcsz)
+#ifdef WITH_ZLIB
+#include <zlib.h>
+#include <iostream>
+
+bool ZLib::UnCompress(std::vector<char> & dst, const char* src, size_t srcsz, bool debug)
 {
     if(src && srcsz)
     {
@@ -36,9 +38,9 @@ bool ZLib::UnCompress(std::vector<char> & dst, const char* src, size_t srcsz)
 	switch(res)
 	{
 	    case Z_OK:  return true;
-	    case Z_MEM_ERROR: std::cerr << "Z_MEM_ERROR" << std::endl; return false;
-	    case Z_BUF_ERROR: std::cerr << "Z_BUF_ERROR" << std::endl; return false;
-	    case Z_DATA_ERROR: std::cerr << "Z_DATA_ERROR" << std::endl; return false;
+	    case Z_MEM_ERROR: if(debug) std::cerr << "ZLib::UnCompress: Z_MEM_ERROR" << std::endl; return false;
+	    case Z_BUF_ERROR: if(debug) std::cerr << "ZLib::UnCompress: Z_BUF_ERROR" << std::endl; return false;
+	    case Z_DATA_ERROR:if(debug) std::cerr << "ZLib::UnCompress: Z_DATA_ERROR"<< std::endl; return false;
 	    default: break;
 	}
 
@@ -47,14 +49,14 @@ bool ZLib::UnCompress(std::vector<char> & dst, const char* src, size_t srcsz)
     return false;
 }
 
-bool ZLib::UnCompress(std::vector<char> & dst, const std::vector<char> & src)
+bool ZLib::UnCompress(std::vector<char> & dst, const std::vector<char> & src, bool debug)
 {
-    return src.size() && UnCompress(dst, &src[0], src.size());
+    return src.size() && UnCompress(dst, &src[0], src.size(), debug);
 }
 
-bool ZLib::UnCompress(std::vector<char> & dst, const std::string & src)
+bool ZLib::UnCompress(std::vector<char> & dst, const std::string & src, bool debug)
 {
-    return src.size() && UnCompress(dst, src.c_str(), src.size());
+    return src.size() && UnCompress(dst, src.c_str(), src.size(), debug);
 }
 
 bool ZLib::Compress(std::vector<char> & dst, const char* src, size_t srcsz)
@@ -79,3 +81,4 @@ bool ZLib::Compress(std::vector<char> & dst, const std::string & src)
 {
     return src.size() && Compress(dst, src.c_str(), src.size());
 }
+#endif

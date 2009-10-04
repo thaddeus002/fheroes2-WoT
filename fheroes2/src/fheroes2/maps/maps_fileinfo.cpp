@@ -25,7 +25,6 @@
 #include "difficulty.h"
 #include "color.h"
 #include "race.h"
-#include "xmlccwrap.h"
 #include "world.h"
 #include "settings.h"
 #include "dir.h"
@@ -59,142 +58,15 @@ Maps::FileInfo::FileInfo() : difficulty(Difficulty::EASY),
     for(u8 ii = 0; ii < KINGDOMMAX; ++ii) races[ii] = Race::BOMG;
 }
 
-bool Maps::FileInfo::Read(const std::string &filename)
+bool Maps::FileInfo::ReadSAV(const std::string & filename)
 {
-    if(ReadBIN(filename)) return true;
-    else
-    if(ReadXML(filename)) return true;
-
-    return false;
+    return Game::LoadSAV2FileInfo(filename,  *this);
 }
 
-bool Maps::FileInfo::ReadXML(const std::string &filename)
+bool Maps::FileInfo::ReadMP2(const std::string & filename)
 {
-    igzstream gzin(filename.c_str());
-    if(gzin.fail())
-    {
-        Error::Warning("Maps::FileInfo::ReadXML: " + filename +", file not found.");
-        return false;
-    }
+    if(filename.empty()) return false;
 
-    std::vector<char> buf(1024, 0);
-    for(u16 ii = 0; ii < buf.size() - 1; ++ii) gzin.get(buf[ii]);
-    gzin.close();
-
-    const char* pred1 = "<game";
-    const char* pred2 = "</fheroes2>";
-    std::vector<char>::iterator it = std::search(buf.begin(), buf.end(), pred1, pred1 + std::strlen(pred1));
-
-    if(it == buf.end())
-    {
-        Error::Verbose("Maps::FileInfo::ReadXML: tag not found, broken file " + filename);
-        return false;
-    }
-
-    buf.resize(it - buf.begin() + std::strlen(pred2) + 1);
-    std::copy(pred2, pred2 + std::strlen(pred2) + 1, it);
-
-    TiXmlDocument doc;
-    // parse block
-    doc.Parse(&buf[0]);
-
-    if(doc.Error())
-    {
-        Error::Verbose("Maps::FileInfo::ReadXML: parse error");
-        return false;
-    }
-
-    TiXmlElement* root = doc.FirstChildElement();
-
-    if(!root || std::strcmp("fheroes2", root->Value()))
-    {
-        Error::Verbose("Maps::FileInfo::ReadXML: 1 broken file " + filename);
-        return false;
-    }
-
-    TiXmlElement *node;
-    TiXmlElement *maps = root->FirstChildElement("maps");
-
-    if(!maps)
-    {
-        Error::Verbose("Maps::FileInfo::ReadXML: 2 broken file " + filename);
-        return false;
-    }
-
-    int res;
-
-    // fheroes2 version
-    //str = root->Attribute("version");
-    // fheroes2 build
-    //root->Attribute("build", &res);
-
-    // locatime
-    root->Attribute("time", &res);
-    localtime = res;
-
-    // maps
-    maps->Attribute("width", &res);
-    size_w = res;
-    maps->Attribute("height", &res);
-    size_h = res;
-    //
-    file = filename;
-    //
-    node = maps->FirstChildElement("name");
-    if(node) name = node->GetText();
-    //
-    node = maps->FirstChildElement("description");
-    if(node) description = node->GetText();
-    //
-    node = maps->FirstChildElement("races");
-    if(node)
-    {
-        node->Attribute("blue", &res);
-        races[0] = res;
-        node->Attribute("green", &res);
-        races[1] = res;
-        node->Attribute("red", &res);
-        races[2] = res;
-        node->Attribute("yellow", &res);
-        races[3] = res;
-        node->Attribute("orange", &res);
-        races[4] = res;
-        node->Attribute("purple", &res);
-        races[5] = res;
-    }
-    //
-    maps->Attribute("difficulty", &res);
-    difficulty = res;
-    maps->Attribute("kingdom_colors", &res);
-    kingdom_colors = res;
-    maps->Attribute("allow_colors", &res);
-    allow_colors = res;
-    maps->Attribute("rnd_colors", &res);
-    rnd_colors = res;
-    maps->Attribute("rnd_races", &res);
-    rnd_races = res;
-    maps->Attribute("conditions_wins", &res);
-    conditions_wins = res;
-    maps->Attribute("wins1", &res);
-    wins1 = res;
-    maps->Attribute("wins2", &res);
-    wins2 = res;
-    maps->Attribute("wins3", &res);
-    wins3 = res;
-    maps->Attribute("wins4", &res);
-    wins4 = res;
-    maps->Attribute("conditions_loss", &res);
-    conditions_loss = res;
-    maps->Attribute("loss1", &res);
-    loss1 = res;
-    maps->Attribute("loss2", &res);
-    loss2 = res;
-
-    return true;
-}
-
-bool Maps::FileInfo::ReadBIN(const std::string & filename)
-{
     std::fstream fd(filename.c_str(), std::ios::in | std::ios::binary);
 
     if(! fd || fd.fail())
@@ -551,7 +423,7 @@ bool PrepareMapsFileInfoList(MapsFileInfoList & lists)
     int ii = 0;
 
     for(Dir::const_iterator itd = dir.begin(); itd != dir.end(); ++itd, ++ii)
-    if(lists[ii].ReadBIN(*itd))
+    if(lists[ii].ReadMP2(*itd))
     {
         if(conf.PreferablyCountPlayers() > lists[ii].AllowColorsCount()) --ii;
     }
