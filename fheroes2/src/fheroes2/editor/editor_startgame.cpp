@@ -18,6 +18,8 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
+#ifdef WITH_EDITOR
+
 #include <bitset>
 
 #include "gamedefs.h"
@@ -1086,3 +1088,5 @@ void Game::Editor::SetGroundToTile(Maps::Tiles & tile, const Maps::Ground::groun
 	    break;
     }
 }
+
+#endif

@@ -32,7 +32,6 @@
 #include "test.h"
 #include "sdlnet.h"
 #include "image_logo.h"
-#include "image_logo_small.h"
 #include "image_icons.h"
 #include "network.h"
 
@@ -40,8 +39,10 @@ extern bool FilePresent(const std::string &);
 
 int PrintHelp(const char *basename)
 {
-    std::cout << "Usage: " << basename << " [OPTIONS]" << std::endl \
-	    << "  -e\teditors mode" << std::endl;
+    std::cout << "Usage: " << basename << " [OPTIONS]" << std::endl;
+#ifdef WITH_EDITOR
+    std::cout << "  -e\teditors mode" << std::endl;
+#endif
 #ifndef BUILD_RELEASE
     std::cout << "  -d\tdebug mode" << std::endl;
 #endif
@@ -105,12 +106,13 @@ int main(int argc, char **argv)
 	    while((opt = getopt(argc, argv, "hest:d:")) != -1)
     		switch(opt)
                 {
+#ifdef WITH_EDITOR
                     case 'e':
 			conf.SetModes(Settings::EDITOR);
 			conf.SetDebug(3);
 			std::cout << "start: editor mode." << std::endl;
 			break;
-			
+#endif			
 #ifndef BUILD_RELEASE
                     case 't':
 			test = String::ToInt(optarg);
@@ -211,24 +213,31 @@ int main(int argc, char **argv)
 	    {
 		Display & display = Display::Get();
 
-    		Surface logo;
+    		Surface* logo = new Surface();
+		logo->Set(image_logo.pixel_data, image_logo.width, image_logo.height, image_logo.bytes_per_pixel, false);
 
+		// scale logo
 		if(conf.PocketPC())
-		    logo.Set(image_logo_small.pixel_data, image_logo_small.width, image_logo_small.height, image_logo_small.bytes_per_pixel, false);
-		else
-		    logo.Set(image_logo.pixel_data, image_logo.width, image_logo.height, image_logo.bytes_per_pixel, false);
+		{
+		    Surface* conv =  new Surface(logo->w(), logo->h());
+		    conv->Blit(*logo);
+		    delete logo;
+    		    Surface* small = new Surface();
+		    Surface::ScaleMinifyByTwo(*small, *conv);
+		    delete conv;
+		    logo = small;
+		}
+    		logo->SetDisplayFormat();
 
-    		logo.SetDisplayFormat();
-
-		const u32 black = logo.MapRGB(0, 0, 0);
-		const Point offset((display.w() - logo.w()) / 2, (display.h() - logo.h()) / 2);
+		const u32 black = logo->MapRGB(0, 0, 0);
+		const Point offset((display.w() - logo->w()) / 2, (display.h() - logo->h()) / 2);
 
 		u8 ii = 0;
 
 		while(ii < 250)
 		{
-		    logo.SetAlpha(ii);
-		    display.Blit(logo, offset);
+		    logo->SetAlpha(ii);
+		    display.Blit(*logo, offset);
 		    display.Flip();
 		    display.Fill(black);
 		    ii += 10;
@@ -238,12 +247,14 @@ int main(int argc, char **argv)
 
 		while(ii > 0)
 		{
-		    logo.SetAlpha(ii);
-		    display.Blit(logo, offset);
+		    logo->SetAlpha(ii);
+		    display.Blit(*logo, offset);
 		    display.Flip();
 		    display.Fill(black);
 		    ii -= 10;
 		}
+
+		delete logo;
 	    }
 #endif
 
@@ -264,16 +275,22 @@ int main(int argc, char **argv)
 	    le.SetTapMode(conf.TapMode());
 
 	    // goto main menu
+#ifdef WITH_EDITOR
 	    Game::menu_t rs = (test ? Game::TESTING : (conf.Editor() ? Game::EDITMAINMENU : Game::MAINMENU));
+#else
+	    Game::menu_t rs = (test ? Game::TESTING : Game::MAINMENU);
+#endif
 
 	    while(rs != Game::QUITGAME)
 	    {
 		switch(rs)
 		{
+#ifdef WITH_EDITOR
 	    		case Game::EDITMAINMENU:   rs = Game::Editor::MainMenu();	break;
 	    		case Game::EDITNEWMAP:     rs = Game::Editor::NewMaps();	break;
 	    		case Game::EDITLOADMAP:    rs = Game::Editor::LoadMaps();       break;
 	    		case Game::EDITSTART:      rs = Game::Editor::StartGame();      break;
+#endif
 	    		case Game::MAINMENU:       rs = Game::MainMenu();		break;
 	    		case Game::NEWGAME:        rs = Game::NewGame();		break;
 	    		case Game::LOADGAME:       rs = Game::LoadGame();		break;

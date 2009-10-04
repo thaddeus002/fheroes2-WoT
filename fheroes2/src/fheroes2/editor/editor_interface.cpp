@@ -18,6 +18,8 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
+#ifdef WITH_EDITOR
+
 #include "agg.h"
 #include "settings.h"
 #include "interface_gamearea.h"
@@ -396,3 +398,5 @@ void EditorInterface::DrawLeftNumberCell(void)
  	text.Blit(BORDERWIDTH / 2 - text.w() / 2 - 1, BORDERWIDTH + ii * TILEWIDTH + BORDERWIDTH - 5);
     }
 }
+
+#endif

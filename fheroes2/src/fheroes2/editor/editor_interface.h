@@ -21,6 +21,8 @@
 #ifndef H2EDITORINTERFACE_H
 #define H2EDITORINTERFACE_H
 
+#ifdef WITH_EDITOR
+
 #include "gamedefs.h"
 #include "button.h"
 #include "splitter.h"
@@ -70,5 +72,5 @@ public:
 private:
 	EditorInterface();
 };
-
+#endif
 #endif

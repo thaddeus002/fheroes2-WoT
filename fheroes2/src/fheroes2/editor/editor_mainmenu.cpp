@@ -18,6 +18,8 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
+#ifdef WITH_EDITOR
+
 #include "gamedefs.h"
 #include "agg.h"
 #include "dialog.h"
@@ -80,3 +82,5 @@ Game::menu_t Game::Editor::MainMenu(void)
 
     return QUITGAME;
 }
+
+#endif

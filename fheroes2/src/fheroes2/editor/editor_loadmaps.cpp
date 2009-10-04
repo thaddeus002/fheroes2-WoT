@@ -18,6 +18,8 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
+#ifdef WITH_EDITOR
+
 #include "gamedefs.h"
 #include "settings.h"
 #include "world.h"
@@ -39,3 +41,5 @@ Game::menu_t Game::Editor::LoadMaps(void)
 
     return MAINMENU;
 }
+
+#endif
