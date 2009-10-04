@@ -484,6 +484,11 @@ void Settings::Parse(const std::string & left, const std::string & right)
 	}
 	else Error::Warning("Settings: unknown video mode: " + right);
     }
+    // offset mouse
+    else
+    if(left == "pointer offset x") LocalEvent::Get().SetMouseOffsetX(String::ToInt(right));
+    else
+    if(left == "pointer offset y") LocalEvent::Get().SetMouseOffsetY(String::ToInt(right));
 }
 
 /* set level debug */

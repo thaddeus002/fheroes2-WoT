@@ -136,6 +136,8 @@ public:
     void SetGlobalFilterKeysEvents(void (*pf)(u16, u16));
     void SetGlobalFilter(bool);
     void SetTapMode(bool);
+    void SetMouseOffsetX(s16);
+    void SetMouseOffsetY(s16);
 
     static void SetStateDefaults(void);
     static void SetState(u8 type, bool enable);
@@ -205,15 +207,28 @@ private:
 
     static int GlobalFilterEvents(const SDL_Event *event);
 
-    enum flag_t { KEY_PRESSED = 0x01, MOUSE_MOTION = 0x02, MOUSE_PRESSED = 0x04, GLOBAL_FILTER = 0x08, PRESS_LEFT = 0x10, PRESS_RIGHT = 0x20, PRESS_MIDDLE = 0x40, TAP_MODE = 0x80 };
+    enum flag_t
+    {
+	KEY_PRESSED	= 0x0001,
+	MOUSE_MOTION	= 0x0002,
+	MOUSE_PRESSED	= 0x0004,
+	GLOBAL_FILTER	= 0x0008,
+	PRESS_LEFT	= 0x0010,
+	PRESS_RIGHT	= 0x0020,
+	PRESS_MIDDLE	= 0x0040,
+	TAP_MODE	= 0x0080,
+	MOUSE_OFFSET	= 0x0100,
+    };
 
     void SetModes(flag_t);
     void ResetModes(flag_t);
 
-    u8     modes;
+    u16    modes;
     KeySym key_value;
     u8     mouse_state;
     u8     mouse_button;
+
+    Point mouse_st;	// mouse offset for pocketpc
 
     Point mouse_pl;	// press left
     Point mouse_pm;	// press middle

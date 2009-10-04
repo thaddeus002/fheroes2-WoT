@@ -22,13 +22,25 @@
 #include "localevent.h"
 
 LocalEvent::LocalEvent() : modes(0), key_value(KEY_NONE), mouse_state(0),
-    mouse_button(0), redraw_cursor_func(NULL), keyboard_filter_func(NULL)
+    mouse_button(0), mouse_st(0, 0), redraw_cursor_func(NULL), keyboard_filter_func(NULL)
 {
 }
 
 void LocalEvent::SetTapMode(bool f)
 {
     f ? SetModes(TAP_MODE) : ResetModes(TAP_MODE);
+}
+
+void LocalEvent::SetMouseOffsetX(s16 x)
+{
+    SetModes(MOUSE_OFFSET);
+    mouse_st.x = x;
+}
+
+void LocalEvent::SetMouseOffsetY(s16 y)
+{
+    SetModes(MOUSE_OFFSET);
+    mouse_st.y = y;
 }
 
 void LocalEvent::SetModes(flag_t f)
@@ -252,6 +264,7 @@ void LocalEvent::HandleMouseMotionEvent(const SDL_MouseMotionEvent & motion)
     SetModes(MOUSE_MOTION);
     mouse_cu.x = motion.x;
     mouse_cu.y = motion.y;
+    if(modes & MOUSE_OFFSET) mouse_cu += mouse_st;
 }
 
 void LocalEvent::HandleMouseButtonEvent(const SDL_MouseButtonEvent & button)
@@ -261,26 +274,24 @@ void LocalEvent::HandleMouseButtonEvent(const SDL_MouseButtonEvent & button)
 
     mouse_cu.x = button.x;
     mouse_cu.y = button.y;
+    if(modes & MOUSE_OFFSET) mouse_cu += mouse_st;
     
     if(modes & MOUSE_PRESSED)
 	switch(button.button)
 	{
 	    case SDL_BUTTON_LEFT:
-		mouse_pl.x = button.x;
-		mouse_pl.y = button.y;
+		mouse_pl = mouse_cu;
 		SetModes(PRESS_LEFT);
 		break;
 
 	    case SDL_BUTTON_MIDDLE:
-		mouse_pm.x = button.x;
-		mouse_pm.y = button.y;
+		mouse_pm = mouse_cu;
 		SetModes(PRESS_MIDDLE);
 		break;
 
 
 	    case SDL_BUTTON_RIGHT:
-		mouse_pr.x = button.x;
-		mouse_pr.y = button.y;
+		mouse_pr = mouse_cu;
 		SetModes(PRESS_RIGHT);
 		break;
 
@@ -291,19 +302,16 @@ void LocalEvent::HandleMouseButtonEvent(const SDL_MouseButtonEvent & button)
 	switch(button.button)
 	{
 	    case SDL_BUTTON_LEFT:
-		mouse_rl.x = button.x;
-		mouse_rl.y = button.y;
+		mouse_rl = mouse_cu;
 		break;
 
 	    case SDL_BUTTON_MIDDLE:
-		mouse_rm.x = button.x;
-		mouse_rm.y = button.y;
+		mouse_rm = mouse_cu;
 		break;
 
 
 	    case SDL_BUTTON_RIGHT:
-		mouse_rr.x = button.x;
-		mouse_rr.y = button.y;
+		mouse_rr = mouse_cu;
 		break;
 
 	    default:
@@ -318,17 +326,12 @@ void LocalEvent::HandleMouseWheelEvent(const SDL_MouseButtonEvent & button)
 
     mouse_cu.x = button.x;
     mouse_cu.y = button.y;
+    if(modes & MOUSE_OFFSET) mouse_cu += mouse_st;
 
     if(modes & MOUSE_PRESSED)
-    {
-	mouse_pm.x = button.x;
-	mouse_pm.y = button.y;
-    }
+	mouse_pm = mouse_cu;
     else
-    {
-	mouse_rm.x = button.x;
-	mouse_rm.y = button.y;
-    }
+	mouse_rm = mouse_cu;
 }
 
 bool LocalEvent::MouseClickLeft(const Rect &rt)
@@ -469,6 +472,7 @@ const Point & LocalEvent::GetMouseCursor(void)
 
     mouse_cu.x = x;
     mouse_cu.y = y;
+    if(modes & MOUSE_OFFSET) mouse_cu += mouse_st;
 
     return mouse_cu;
 }
@@ -512,7 +516,12 @@ int LocalEvent::GlobalFilterEvents(const SDL_Event *event)
     {
         // redraw cursor
         if(le.redraw_cursor_func)
-    	    (*(le.redraw_cursor_func))(event->motion.x, event->motion.y);
+	{
+	    if(le.modes & MOUSE_OFFSET)
+    		(*(le.redraw_cursor_func))(event->motion.x + le.mouse_st.x, event->motion.y + le.mouse_st.y);
+    	    else
+		(*(le.redraw_cursor_func))(event->motion.x, event->motion.y);
+	}
     }
 
     // key
