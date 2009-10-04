@@ -510,86 +510,6 @@ void Surface::Blit(const Surface &src, const Rect &src_rt, s16 dst_ox, s16 dst_o
     SDL_BlitSurface(src.surface, const_cast<Rect &>(src_rt).SDLRect(), surface, dstrect.SDLRect());
 }
 
-/* scaled from surface */
-void Surface::ScaleFrom(const Surface & src)
-{
-    if(src.w() <= w() || src.h() <= h()) Error::Warning("Surface::ScaleFrom: incorrect size.");
-    
-    const u16 *p_src = NULL;
-    u16 *p_dst = NULL;
-
-    u16 width = 0;
-    u16 height = 0;
-
-    u8 count = 0;
-
-    src.Lock();
-    p_src = static_cast<u16 *>(src.surface->pixels);
-
-    // count min iteration    
-    width = src.w();
-    for(;;)
-    {
-	++count;
-	if((width >>= 1) <= w()) break;
-    }
-    width = src.w() / 2;
-    height = src.h() / 2;
-
-    bool first = true;
-
-    while(count)
-    {
-	p_dst = new u16[width * height];
-
-	// iteration 2х2 -> 1
-	u32 index = 0;
-	u16 width2 = 2 * width;
-
-	for(u16 dstY = 0; dstY < height; ++dstY)
-	    for(u16 dstX = 0; dstX < width; ++dstX)
-	    {
-		u16 dstX2 = dstX * 2;
-		u16 dstY2 = dstY * 2;
-
-		u16 color = 0;
-
-		if((color = p_src[width2 * dstY2 + dstX2]) == p_src[width2 * (dstY2 + 1) + dstX2 + 1] || 
-		    color == p_src[width2 * dstY2 + dstX2 + 1] || color == p_src[width2 * (dstY2 + 1) + dstX2])
-		    p_dst[index] = color;
-		else
-		if((color = p_src[width2 * dstY2 + dstX2 + 1]) == p_src[width2 * (dstY2 + 1) + dstX2 + 1] || 
-	    	    color == p_src[width2 * (dstY2 + 1) + dstX2])
-		    p_dst[index] = color;
-		else
-		if((color = p_src[width2 * (dstY2 + 1) + dstX2]) == p_src[width2 * (dstY2 + 1) + dstX2 + 1])
-		    p_dst[index] = color;
-		else
-		    p_dst[index] = p_src[width2 * (dstY2 + 1) + dstX2 + 1];
-
-		++index;
-	    }
-
-	if(!first && NULL != p_src) delete [] p_src;
-	first = false;
-	p_src = p_dst;
-	p_dst = NULL;
-
-	width = width / 2;
-	height = height / 2;
-
-	--count;
-    }
-
-    src.Unlock();
-
-    Lock();
-    memcpy(surface->pixels, p_src, sizeof(u16) * (width * 2) * (height * 2));
-    Unlock();
-
-    delete [] p_src;
-}
-
 void Surface::SetAlpha(u8 level)
 {
     if(!surface) return;
@@ -892,5 +812,46 @@ u32 Surface::GetSize(void) const
 	if(surface->format->palette) res += sizeof(SDL_Palette) + surface->format->palette->ncolors * sizeof(SDL_Color);
     }
 
-    return res;
+        return res;
+}
+
+inline u32 AVERAGE(SDL_PixelFormat* fm, u32 c1, u32 c2)
+{
+#define avr(a, b) ((a + b) >> 1)
+    u8 r1, g1, b1, a1;
+    SDL_GetRGBA(c1, fm, &r1, &g1, &b1, &a1);
+    u8 r2, g2, b2, a2;
+    SDL_GetRGBA(c2, fm, &r2, &g2, &b2, &a2);
+    return SDL_MapRGBA(fm, avr(r1, r2), avr(g1, g2), avr(b1, b2), avr(a1, a2));
+}
+
+/* scale surface */
+void Surface::ScaleMinifyByTwo(Surface & sf_dst, const Surface & sf_src, u8 mul)
+{
+    if(!sf_src.valid()) { Error::Verbose("Surface::ScaleMinifyByTwo: invalid surface"); return; };
+    if(0 == mul) mul = 1;
+
+    u16 x, y, x2, y2;
+
+    mul *= 2;
+    u16 w = sf_src.w() / mul;
+    u16 h = sf_src.h() / mul;
+
+    if(2 > w || 2 > h){ Error::Verbose("Surface::ScaleMinifyByTwo: small size"); return; };
+
+    sf_dst.Set(w, h);
+    sf_dst.Lock();
+
+    for(y = 0; y < h; y++)
+    {
+       y2 = mul * y;
+       for(x = 0; x < w; x++)
+       {
+	    x2 = mul * x;
+	    const u32 & p = AVERAGE(sf_src.surface->format, sf_src.GetPixel(x2, y2), sf_src.GetPixel(x2 + 1, y2));
+	    const u32 & q = AVERAGE(sf_src.surface->format, sf_src.GetPixel(x2, y2 + 1), sf_src.GetPixel(x2 + 1, y2 + 1));
+	    sf_dst.SetPixel(x, y, AVERAGE(sf_src.surface->format, p, q));
+       }
+    }
+    sf_dst.Unlock();
 }

@@ -75,8 +75,6 @@ public:
     void Blit(const Surface &src, const Rect &src_rt, s16 dst_ox, s16 dst_oy);
     void Blit(const Surface &src, const Rect &src_rt, const Point &dst_pt){ Blit(src, src_rt, dst_pt.x, dst_pt.y); };
 
-    void ScaleFrom(const Surface & bs);
-
 
     const SDL_Surface *GetSurface(void) const{ return surface; };
 
@@ -126,6 +124,7 @@ public:
 
     static void TILReflect(Surface & sf_dst, const Surface & sf_src, const u8 shape);
 
+    static void ScaleMinifyByTwo(Surface & sf_dst, const Surface & sf_src, u8 mul = 1);
     static void SetDefaultDepth(u8);
     static u8   GetDefaultDepth(void);
     static void FreeSurface(Surface &);
