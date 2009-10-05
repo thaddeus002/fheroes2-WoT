@@ -174,10 +174,39 @@ void Surface::Set(const void* pixels, unsigned int width, unsigned int height, u
 	    break;
 
 	default:
-	    surface = SDL_CreateRGBSurfaceFrom(const_cast<void *>(pixels), width, height, bytes_per_pixel * 8, width * bytes_per_pixel,
-		RMASK32, GMASK32, BMASK32, alpha ? AMASK32 : 0);
-	    //LoadPalette();
-	    break;
+	{
+	    u32 rmask = 0;
+	    u32 gmask = 0;
+	    u32 bmask = 0;
+	    u32 amask = 0;
+
+	    switch(bytes_per_pixel)
+	    {
+		case 4:
+		    rmask = RMASK32;
+		    gmask = GMASK32;
+		    bmask = BMASK32;
+		    amask = alpha ? AMASK32 : 0;
+		    break;
+		case 3:
+		    rmask = alpha ? RMASK24 : RMASK32;
+		    gmask = alpha ? GMASK24 : GMASK32;
+		    bmask = alpha ? BMASK24 : BMASK32;
+		    amask = alpha ? AMASK24 : 0;
+		    break;
+		case 2:
+		    rmask = RMASK16;
+		    gmask = GMASK16;
+		    bmask = BMASK16;
+		    amask = alpha ? AMASK16 : 0;
+		    break;
+		default: break;
+	    }
+
+	    surface = SDL_CreateRGBSurfaceFrom(const_cast<void *>(pixels), width, height, 8 * bytes_per_pixel, width * bytes_per_pixel,
+		rmask, gmask, bmask, amask);
+	}
+	break;
     }
 }
 
@@ -839,7 +868,7 @@ void Surface::ScaleMinifyByTwo(Surface & sf_dst, const Surface & sf_src, u8 mul)
 
     if(2 > w || 2 > h){ Error::Verbose("Surface::ScaleMinifyByTwo: small size"); return; };
 
-    sf_dst.Set(w, h);
+    sf_dst.Set(w, h, sf_src.depth(), SWSURFACE);
     sf_dst.Lock();
 
     for(y = 0; y < h; y++)

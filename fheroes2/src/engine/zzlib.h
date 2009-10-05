@@ -37,5 +37,19 @@ namespace ZLib
     bool	Compress(std::vector<char> &, const std::string &);
 };
 
+#include "types.h"
+#include "surface.h"
+
+class ZSurface : public Surface
+{
+public:
+    ZSurface(){};
+
+    bool Load(u16 w, u16 h, u8 b, const char* p, size_t s, bool a);
+
+private:
+    std::vector<char> buf;
+};
+
 #endif
 #endif

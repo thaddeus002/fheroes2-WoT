@@ -26,6 +26,7 @@
 #include "dialog.h"
 #include "heroes_base.h"
 #include "skill.h"
+#include "settings.h"
 
 #define SPELL_PER_PAGE	6
 
@@ -43,6 +44,13 @@ SpellBook::SpellBook(const HeroBase *p) : hero(p), active(false)
 Spell::spell_t SpellBook::Open(filter_t filt, bool canselect) const
 {
     if(!active) return Spell::NONE;
+
+    // FIXME: QVGA version
+    if(Settings::Get().PocketPC())
+    {
+       Dialog::Message("", _("For the QVGA version is not available."), Font::SMALL, Dialog::OK);
+       return Spell::NONE;
+    }
 
     Display & display = Display::Get();
     Cursor & cursor = Cursor::Get();

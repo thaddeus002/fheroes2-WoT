@@ -31,11 +31,13 @@
 #include "game.h"
 #include "test.h"
 #include "sdlnet.h"
-#include "image_logo.h"
-#include "image_icons.h"
+#include "images_pack.h"
 #include "network.h"
 
+#include "zzlib.h"
+
 extern bool FilePresent(const std::string &);
+void LoadZLogo(void);
 
 int PrintHelp(const char *basename)
 {
@@ -191,71 +193,25 @@ int main(int argc, char **argv)
 	    Display::HideCursor();
 	    Display::SetCaption(strtmp);
 
-    	    Surface icons(image_icons.pixel_data, image_icons.width, image_icons.height, image_icons.bytes_per_pixel, true);
-	    Display::SetIcons(icons);
-
+#ifdef WITH_ZLIB
+    	    ZSurface zicons;
+	    if(zicons.Load(FH2_ICONS_WIDTH, FH2_ICONS_HEIGHT, FH2_ICONS_BPP, fh2_icons_pack, FH2_ICONS_SIZE, true)) Display::SetIcons(zicons);
+#endif
 	    AGG::Cache & cache = AGG::Cache::Get();
 
 	    // read data dir
 	    if(! cache.ReadDataDir()) Error::Except("AGG data files not found.");
 
             if(conf.Debug()) conf.Dump();
-            
+
             // load palette
 	    cache.LoadPAL();
 
 	    // load font
 	    cache.LoadFNT();
 
-#ifdef BUILD_RELEASE
-	    // SDL logo
-	    if(conf.Logo())
-	    {
-		Display & display = Display::Get();
-
-    		Surface* logo = new Surface();
-		logo->Set(image_logo.pixel_data, image_logo.width, image_logo.height, image_logo.bytes_per_pixel, false);
-
-		// scale logo
-		if(conf.PocketPC())
-		{
-		    Surface* conv =  new Surface(logo->w(), logo->h());
-		    conv->Blit(*logo);
-		    delete logo;
-    		    Surface* small = new Surface();
-		    Surface::ScaleMinifyByTwo(*small, *conv);
-		    delete conv;
-		    logo = small;
-		}
-    		logo->SetDisplayFormat();
-
-		const u32 black = logo->MapRGB(0, 0, 0);
-		const Point offset((display.w() - logo->w()) / 2, (display.h() - logo->h()) / 2);
-
-		u8 ii = 0;
-
-		while(ii < 250)
-		{
-		    logo->SetAlpha(ii);
-		    display.Blit(*logo, offset);
-		    display.Flip();
-		    display.Fill(black);
-		    ii += 10;
-		}
-		
-		DELAY(500);
-
-		while(ii > 0)
-		{
-		    logo->SetAlpha(ii);
-		    display.Blit(*logo, offset);
-		    display.Flip();
-		    display.Fill(black);
-		    ii -= 10;
-		}
-
-		delete logo;
-	    }
+#ifdef WITH_ZLIB
+	    LoadZLogo();
 #endif
 
 	    // init cursor
@@ -328,4 +284,59 @@ int main(int argc, char **argv)
 	}
 	
 	return EXIT_SUCCESS;
+}
+
+void LoadZLogo(void)
+{
+#ifdef BUILD_RELEASE
+    // SDL logo
+    if(Settings::Get().Logo())
+    {
+	Display & display = Display::Get();
+
+    	ZSurface* zlogo = new ZSurface();
+	if(zlogo->Load(SDL_LOGO_WIDTH, SDL_LOGO_HEIGHT, SDL_LOGO_BPP, sdl_logo_data, SDL_LOGO_SIZE, false))
+	{
+	    zlogo->Save("zlogo.png");
+	    Surface* logo = zlogo;
+
+	    // scale logo
+	    if(Settings::Get().PocketPC())
+	    {
+    		Surface* small = new Surface();
+		Surface::ScaleMinifyByTwo(*small, *zlogo);
+		delete zlogo;
+		zlogo = NULL;
+		logo = small;
+	    }
+
+    	    logo->SetDisplayFormat();
+
+	    const u32 black = logo->MapRGB(0, 0, 0);
+	    const Point offset((display.w() - logo->w()) / 2, (display.h() - logo->h()) / 2);
+
+	    u8 ii = 0;
+
+	    while(ii < 250)
+	    {
+		logo->SetAlpha(ii);
+		display.Blit(*logo, offset);
+		display.Flip();
+		display.Fill(black);
+		ii += 10;
+	    }
+		
+	    DELAY(500);
+
+	    while(ii > 0)
+	    {
+		logo->SetAlpha(ii);
+		display.Blit(*logo, offset);
+		display.Flip();
+		display.Fill(black);
+		ii -= 10;
+	    }
+	}
+    }
+#endif
 }
