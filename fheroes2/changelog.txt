@@ -1,4 +1,13 @@
-SVN - up to r1211
+SVN - up to r1225
+
+Oct,  5, 2009 - Development build, 1225
++ added binary save format
++ few updates for pocketpc version
++ added buy boat and marketplace dialogue for pocketpc
++ added tap mode and offset pointer settings for pocketpc (one touch as mouse click)
+
+Developers
++ added WITHOUT_EDITOR, WITHOUT_ZLIB and WITHOUT_XML build options
 
 Sep, 28, 2009 - Development build, 1210
 + More updates for pocketpc version
