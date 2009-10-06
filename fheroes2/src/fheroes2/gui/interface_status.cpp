@@ -32,7 +32,7 @@
 #include "game_interface.h"
 #include "interface_status.h"
 
-#define RESOURCE_WINDOW_EXPIRE 4000
+#define RESOURCE_WINDOW_EXPIRE 2500
 
 Interface::StatusWindow::StatusWindow() : state(STATUS_UNKNOWN), oldState(STATUS_UNKNOWN)
 {
@@ -61,7 +61,7 @@ u32 Interface::StatusWindow::ResetResourceStatus(u32 tick, void *ptr)
     if(ptr && STATUS_RESOURCE == reinterpret_cast<Interface::StatusWindow*>(ptr)->state)
     {
 	reinterpret_cast<Interface::StatusWindow*>(ptr)->state = reinterpret_cast<Interface::StatusWindow*>(ptr)->oldState;
-	reinterpret_cast<Interface::StatusWindow*>(ptr)->Redraw();
+	Interface::Basic::Get().Redraw(REDRAW_STATUS);
     }
     else
 	Timer::Remove(reinterpret_cast<Interface::StatusWindow*>(ptr)->timerShowLastResource);

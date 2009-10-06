@@ -159,13 +159,13 @@ int main(int argc, char **argv)
 	// random init
 	Rand::Init();
 
-	u32 subsystem = INIT_VIDEO;
+	u32 subsystem = INIT_VIDEO | INIT_TIMER;
+
         if(conf.Sound() || conf.Music())
             subsystem |= INIT_AUDIO;
         if(conf.Modes(Settings::MUSIC_CD))
             subsystem |= INIT_CDROM | INIT_AUDIO;
 #ifdef WITH_NET
-        subsystem |= INIT_TIMER;
         Network::SetProtocolVersion(static_cast<u16>((conf.MajorVersion() << 8)) | conf.MinorVersion());
 #endif
 
