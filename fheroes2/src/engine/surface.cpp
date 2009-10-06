@@ -73,22 +73,7 @@ Surface::Surface(u16 sw, u16 sh, bool alpha) : surface(NULL)
 
 Surface::Surface(const Surface & bs) : surface(NULL)
 {
-    if(bs.surface)
-    {
-	if(8 == bs.depth())
-	{
-	    Set(bs.w(), bs.h(), 8, SDL_SWSURFACE);
-	    Lock();
-	    memcpy(surface->pixels, bs.surface->pixels, surface->w * surface->h);
-	    Unlock();
-	}
-	else
-	{
-	    surface = SDL_ConvertSurface(bs.surface, bs.surface->format, bs.surface->flags);
-	    if(!surface) Error::Warning("Surface: copy constructor, error: ", SDL_GetError());
-	}
-	LoadPalette();
-    }
+    Set(bs);
 }
 
 Surface::Surface(SDL_Surface* sf) : surface(NULL)
@@ -142,6 +127,28 @@ void Surface::Set(SDL_Surface* sf)
 
     surface = sf ? sf : NULL;
     LoadPalette();
+}
+
+void Surface::Set(const Surface & bs)
+{
+    FreeSurface(*this);
+
+    if(bs.surface)
+    {
+	if(8 == bs.depth())
+	{
+	    Set(bs.w(), bs.h(), 8, SDL_SWSURFACE);
+	    Lock();
+	    memcpy(surface->pixels, bs.surface->pixels, surface->w * surface->h);
+	    Unlock();
+	}
+	else
+	{
+	    surface = SDL_ConvertSurface(bs.surface, bs.surface->format, bs.surface->flags);
+	    if(!surface) Error::Warning("Surface: copy constructor, error: ", SDL_GetError());
+	}
+	LoadPalette();
+    }
 }
 
 void Surface::Set(u16 sw, u16 sh, bool alpha)
@@ -883,4 +890,9 @@ void Surface::ScaleMinifyByTwo(Surface & sf_dst, const Surface & sf_src, u8 mul)
        }
     }
     sf_dst.Unlock();
+}
+
+void Surface::Swap(Surface & sf1, Surface & sf2)
+{
+    std::swap(sf1.surface, sf2.surface);
 }

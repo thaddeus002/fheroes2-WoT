@@ -49,6 +49,7 @@ public:
     ~Surface();
 
     Surface & operator= (const Surface & bs);
+    void Set(const Surface &);
     void Set(SDL_Surface * sf);
     void Set(u16 sw, u16 sh, bool alpha = false);
     void Set(u16 sw, u16 sh, u8 depth, u32 fl);
@@ -128,7 +129,8 @@ public:
     static void SetDefaultDepth(u8);
     static u8   GetDefaultDepth(void);
     static void FreeSurface(Surface &);
-
+    static void Swap(Surface &, Surface &);
+    
 protected:
 #ifdef WITH_TTF
     friend class SDL::Font;
