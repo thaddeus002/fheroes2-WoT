@@ -111,7 +111,7 @@ void Interface::Basic::Redraw(u8 force)
 {
     const Settings & conf = Settings::Get();
 
-    if((redraw | force) & REDRAW_GAMEAREA) gameArea.Redraw();
+    if((redraw | force) & REDRAW_GAMEAREA) gameArea.Redraw(Display::Get());
 
     if((conf.HideInterface() && conf.ShowRadar()) || ((redraw | force) & REDRAW_RADAR)) radar.Redraw();
 

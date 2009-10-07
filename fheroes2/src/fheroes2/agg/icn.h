@@ -934,6 +934,8 @@ namespace ICN
     const char* GetString(const icn_t icn);
     u16 AnimationFrame(const icn_t icn, const u16 start, const u32 ticket = 0, const u8 quantity = 0);
     bool RequiresAlpha(const icn_t icn);
+    bool NeedMinify4PocketPC(icn_t, u16);
+    bool SkipForRedrawHeroes(icn_t, u16);
     icn_t PORTxxxx(u8);
     
     icn_t FromSpell(u8);

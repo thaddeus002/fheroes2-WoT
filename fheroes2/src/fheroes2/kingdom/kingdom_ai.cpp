@@ -216,7 +216,7 @@ void Kingdom::AIHeroesTurns(Heroes &hero)
 	{
 	    Cursor::Get().Hide();
 	    Interface::GameArea::Get().Center(hero.GetCenter());
-	    Interface::GameArea::Get().Redraw();
+	    Interface::GameArea::Get().Redraw(Display::Get());
 	    Cursor::Get().Show();
 	    Display::Get().Flip();
 	}
@@ -236,7 +236,7 @@ void Kingdom::AIHeroesTurns(Heroes &hero)
     		if(Game::ShouldAnimateInfrequent(ticket, 12)) Maps::IncreaseAnimationTicket();
 
 		Interface::GameArea::Get().Center(hero.GetCenter());
-		Interface::GameArea::Get().Redraw();
+		Interface::GameArea::Get().Redraw(Display::Get());
 		Cursor::Get().Show();
 		Display::Get().Flip();
 	    }

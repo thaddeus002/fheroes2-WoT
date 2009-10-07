@@ -33,12 +33,17 @@ enum scroll_t
     SCROLL_BOTTOM = 0x08,
 };
 
+namespace Maps { class Tiles; };
+
 namespace Interface
 {
     class GameArea
     {
     public:
+	enum redraw_t { REDRAW_TOP = 0x01, REDRAW_BOTTOM = 0x20, REDRAW_OBJECTS = 0x40, REDRAW_FOGS = 0x80, REDRAW_ALL = 0xFF };
+
 	static GameArea & Get(void);
+	void SetAreaSize(s16, s16, u16, u16);
 	void Build(void);
 
 	const Rect & GetArea(void) const;
@@ -51,7 +56,7 @@ namespace Interface
 
 	void Center(s16, s16);
 	void Center(const Point &pt);
-	void Redraw(bool drawFog = true) const;
+	void Redraw(Surface & dst, u8 = REDRAW_ALL) const;
 
 	void SetUpdateCursor(void);
         void QueueEventProcessing(void);
@@ -63,6 +68,8 @@ namespace Interface
 
     private:
 	GameArea();
+	void RedrawBoat(Surface &, s16, s16, const Maps::Tiles &) const;
+	void RedrawMonster(Surface &, s16, s16, const Maps::Tiles &) const;
 
 	Rect	rectArea;
 	Rect	rectMaps;

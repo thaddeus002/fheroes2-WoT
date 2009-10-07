@@ -33,6 +33,7 @@
 #include "text.h"
 #include "algorithm.h"
 #include "game_over.h"
+#include "interface_gamearea.h"
 #include "world.h"
 
 bool PredicateHeroesIsFreeman(const Heroes *h)
@@ -961,6 +962,8 @@ void World::LoadMaps(const std::string &filename)
 	    vec_tiles[pos]->SetQuantity1(Artifact::RandUltimate());
 	}
     }
+
+    Interface::GameArea::GenerateUltimateArtifactAreaSurface(ultimate_artifact, puzzle_surface);
 
     // update wins, loss conditions
     if(GameOver::WINS_HERO == Settings::Get().ConditionWins())
@@ -2014,4 +2017,9 @@ u16 World::CheckKingdomLoss(const Kingdom & kingdom) const
     }
 
     return GameOver::COND_NONE;
+}
+
+const Surface & World::GetPuzzleSurface(void) const
+{
+    return puzzle_surface;
 }

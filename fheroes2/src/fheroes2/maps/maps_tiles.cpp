@@ -271,109 +271,168 @@ void Maps::Tiles::RedrawTile(void) const
 
     if(area.GetRectMaps() & mp)
     {
-	const s16 dstx = area.GetArea().x + TILEWIDTH * (mp.x - area.GetRectMaps().x);
-	const s16 dsty = area.GetArea().y + TILEWIDTH * (mp.y - area.GetRectMaps().y);
+	const s16 & dstx = area.GetArea().x + TILEWIDTH * (mp.x - area.GetRectMaps().x);
+	const s16 & dsty = area.GetArea().y + TILEWIDTH * (mp.y - area.GetRectMaps().y);
 
-	Display::Get().Blit(GetTileSurface(), dstx, dsty);
+	RedrawTile(Display::Get(), dstx, dsty);
     }
 }
 
-void Maps::Tiles::RedrawBottom(const TilesAddon * skip) const
+void Maps::Tiles::RedrawTile(Surface & dst, s16 dstx, s16 dsty) const
 {
-    Display & display = Display::Get();
-    const Interface::GameArea & area = Interface::GameArea::Get();
+    dst.Blit(GetTileSurface(), dstx, dsty);
+}
+
+void Maps::Tiles::RedrawBottom(void) const
+{
+    RedrawBottom(Display::Get(), Interface::GameArea::Get());
+}
+
+void Maps::Tiles::RedrawBottom(Surface & dst, const Interface::GameArea & area) const
+{
     const Point mp(maps_index % world.w(), maps_index / world.w());
 
     if(area.GetRectMaps() & mp)
     {
-	const s16 dstx = area.GetArea().x + TILEWIDTH * (mp.x - area.GetRectMaps().x);
-	const s16 dsty = area.GetArea().y + TILEWIDTH * (mp.y - area.GetRectMaps().y);
+	const s16 & dstx = area.GetArea().x + TILEWIDTH * (mp.x - area.GetRectMaps().x);
+	const s16 & dsty = area.GetArea().y + TILEWIDTH * (mp.y - area.GetRectMaps().y);
 
-	if(addons_level1.size())
+	RedrawBottom(dst, dstx, dsty);
+    }
+}
+
+void Maps::Tiles::RedrawBottom(Surface & dst, s16 dstx, s16 dsty, const TilesAddon* skip) const
+{
+    if(addons_level1.size())
+    {
+	std::list<TilesAddon>::const_iterator it1 = addons_level1.begin();
+	std::list<TilesAddon>::const_iterator it2 = addons_level1.end();
+
+	for(; it1 != it2; ++it1)
 	{
-	    std::list<TilesAddon>::const_iterator it1 = addons_level1.begin();
-	    std::list<TilesAddon>::const_iterator it2 = addons_level1.end();
+	    if(skip && skip == &(*it1)) continue;
 
-	    for(; it1 != it2; ++it1)
+	    const u8 & object = (*it1).object;
+	    const u8 & index  = (*it1).index;
+	    const ICN::icn_t icn = MP2::GetICNObject(object);
+
+	    if(ICN::UNKNOWN != icn && ICN::MINIHERO != icn && ICN::MONS32 != icn)
 	    {
-		if(skip && skip == &(*it1)) continue;
+		const Sprite & sprite = AGG::GetICN(icn, index);
+		dst.Blit(sprite, dstx + sprite.x(), dsty + sprite.y());
 
-		const u8 & object = (*it1).object;
-	        const u8 & index  = (*it1).index;
-		const ICN::icn_t icn = MP2::GetICNObject(object);
-
-		if(ICN::UNKNOWN != icn && ICN::MINIHERO != icn && ICN::MONS32 != icn)
+		// possible anime
+		if(const u16 anime_index = ICN::AnimationFrame(icn, index, Maps::AnimationTicket(), quantity2))
 		{
-		    const Sprite & sprite = AGG::GetICN(icn, index);
-		    display.Blit(sprite, dstx + sprite.x(), dsty + sprite.y());
-
-		    // possible anime
-		    if(const u16 anime_index = ICN::AnimationFrame(icn, index, Maps::AnimationTicket(), quantity2))
-		    {
-			const Sprite & anime_sprite = AGG::GetICN(icn, anime_index);
-			display.Blit(anime_sprite, dstx + anime_sprite.x(), dsty + anime_sprite.y());
-		    }
+		    const Sprite & anime_sprite = AGG::GetICN(icn, anime_index);
+		    dst.Blit(anime_sprite, dstx + anime_sprite.x(), dsty + anime_sprite.y());
 		}
 	    }
 	}
     }
 }
 
-void Maps::Tiles::RedrawTop(const TilesAddon * skip) const
+void Maps::Tiles::RedrawBottom4Hero(Surface & dst, const Interface::GameArea & area) const
 {
-    Display & display = Display::Get();
-    const Interface::GameArea & area = Interface::GameArea::Get();
+    const Point mp(maps_index % world.w(), maps_index / world.w());
+
+    if(!(area.GetRectMaps() & mp)) return;
+
+    const s16 & dstx = area.GetArea().x + TILEWIDTH * (mp.x - area.GetRectMaps().x);
+    const s16 & dsty = area.GetArea().y + TILEWIDTH * (mp.y - area.GetRectMaps().y);
+
+    if(addons_level1.size())
+    {
+	std::list<TilesAddon>::const_iterator it1 = addons_level1.begin();
+	std::list<TilesAddon>::const_iterator it2 = addons_level1.end();
+
+	for(; it1 != it2; ++it1)
+	{
+	    const u8 & object = (*it1).object;
+	    const u8 & index  = (*it1).index;
+	    const ICN::icn_t icn = MP2::GetICNObject(object);
+
+	    if(SkipForRedrawHeroes(icn, index)) continue;
+
+	    if(ICN::UNKNOWN != icn && ICN::MINIHERO != icn && ICN::MONS32 != icn)
+	    {
+		const Sprite & sprite = AGG::GetICN(icn, index);
+		dst.Blit(sprite, dstx + sprite.x(), dsty + sprite.y());
+
+		// possible anime
+		if(const u16 anime_index = ICN::AnimationFrame(icn, index, Maps::AnimationTicket(), quantity2))
+		{
+		    const Sprite & anime_sprite = AGG::GetICN(icn, anime_index);
+		    dst.Blit(anime_sprite, dstx + anime_sprite.x(), dsty + anime_sprite.y());
+		}
+	    }
+	}
+    }
+}
+
+void Maps::Tiles::RedrawTop(void) const
+{
+    RedrawTop(Display::Get(), Interface::GameArea::Get());
+}
+
+void Maps::Tiles::RedrawTop(Surface & dst, const Interface::GameArea & area) const
+{
     const Point mp(maps_index % world.w(), maps_index / world.w());
 
     if(area.GetRectMaps() & mp)
     {
-	const s16 dstx = area.GetArea().x + TILEWIDTH * (mp.x - area.GetRectMaps().x);
-	const s16 dsty = area.GetArea().y + TILEWIDTH * (mp.y - area.GetRectMaps().y);
+	const s16 & dstx = area.GetArea().x + TILEWIDTH * (mp.x - area.GetRectMaps().x);
+	const s16 & dsty = area.GetArea().y + TILEWIDTH * (mp.y - area.GetRectMaps().y);
 
-	// fix for abandone mine
-	if(MP2::OBJ_ABANDONEDMINE == general)
+	RedrawTop(dst, dstx, dsty, area);
+    }
+}
+
+void Maps::Tiles::RedrawTop(Surface & dst, s16 dstx, s16 dsty, const Interface::GameArea & gamearea, const TilesAddon* skip) const
+{
+    // fix for abandone mine
+    if(MP2::OBJ_ABANDONEDMINE == general)
+    {
+	const Sprite & anime_sprite = AGG::GetICN(ICN::OBJNHAUN,  Maps::AnimationTicket() % 15);
+	Rect rt;
+	Point pt(dstx + anime_sprite.x(), dsty + anime_sprite.y());
+	gamearea.SrcRectFixed(rt, pt, anime_sprite.w(), anime_sprite.h());
+	dst.Blit(anime_sprite, rt, pt);
+    }
+
+    if(addons_level2.size())
+    {
+	std::list<TilesAddon>::const_iterator it1 = addons_level2.begin();
+	std::list<TilesAddon>::const_iterator it2 = addons_level2.end();
+
+	for(; it1 != it2; ++it1)
 	{
-	    const Sprite & anime_sprite = AGG::GetICN(ICN::OBJNHAUN,  Maps::AnimationTicket() % 15);
-	    Rect rt;
-	    Point pt(dstx + anime_sprite.x(), dsty + anime_sprite.y());
-	    area.SrcRectFixed(rt, pt, anime_sprite.w(), anime_sprite.h());
-	    display.Blit(anime_sprite, rt, pt);
-	}
+	    if(skip && skip == &(*it1)) continue;
 
-	if(addons_level2.size())
-	{
-	    std::list<TilesAddon>::const_iterator it1 = addons_level2.begin();
-	    std::list<TilesAddon>::const_iterator it2 = addons_level2.end();
+	    const u8 & object = (*it1).object;
+	    const u8 & index  = (*it1).index;
+	    const ICN::icn_t icn = MP2::GetICNObject(object);
 
-	    for(; it1 != it2; ++it1)
+	    if(ICN::UNKNOWN != icn && ICN::MINIHERO != icn && ICN::MONS32 != icn)
 	    {
-		if(skip && skip == &(*it1)) continue;
-
-		const u8 & object = (*it1).object;
-		const u8 & index  = (*it1).index;
-	        const ICN::icn_t icn = MP2::GetICNObject(object);
-
-		if(ICN::UNKNOWN != icn && ICN::MINIHERO != icn && ICN::MONS32 != icn)
-		{
-		    const Sprite & sprite = AGG::GetICN(icn, index);
+		const Sprite & sprite = AGG::GetICN(icn, index);
 		    
-		    // fix flags redraw
-		    if(ICN::FLAG32 == icn)
-		    {
-			Rect rt;
-			Point pt(dstx + sprite.x(), dsty + sprite.y());
-			area.SrcRectFixed(rt, pt, sprite.w(), sprite.h());
-			display.Blit(sprite, rt, pt);
-		    }
-		    else
-		    display.Blit(sprite, dstx + sprite.x(), dsty + sprite.y());
+		// fix flags redraw
+		if(ICN::FLAG32 == icn)
+		{
+		    Rect rt;
+		    Point pt(dstx + sprite.x(), dsty + sprite.y());
+		    gamearea.SrcRectFixed(rt, pt, sprite.w(), sprite.h());
+		    dst.Blit(sprite, rt, pt);
+		}
+		else
+		    dst.Blit(sprite, dstx + sprite.x(), dsty + sprite.y());
 
-		    // possible anime
-		    if(const u16 anime_index = ICN::AnimationFrame(icn, index, Maps::AnimationTicket()))
-		    {
-			const Sprite & anime_sprite = AGG::GetICN(icn, anime_index);
-			display.Blit(anime_sprite, dstx + anime_sprite.x(), dsty + anime_sprite.y());
-		    }
+		// possible anime
+		if(const u16 anime_index = ICN::AnimationFrame(icn, index, Maps::AnimationTicket()))
+		{
+		    const Sprite & anime_sprite = AGG::GetICN(icn, anime_index);
+		    dst.Blit(anime_sprite, dstx + anime_sprite.x(), dsty + anime_sprite.y());
 		}
 	    }
 	}

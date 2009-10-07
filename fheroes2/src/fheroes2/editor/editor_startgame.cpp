@@ -82,7 +82,7 @@ Game::menu_t Game::Editor::StartGame()
     Interface::Radar & radar = I.radar;
     radar.Build();
 
-    areaMaps.Redraw();
+    areaMaps.Redraw(display);
     radar.RedrawArea();
 
     // Create radar cursor
@@ -202,7 +202,7 @@ Game::menu_t Game::Editor::StartGame()
 		radar.RedrawCursor();
 		EditorInterface::DrawTopNumberCell();
 		EditorInterface::DrawLeftNumberCell();
-                areaMaps.Redraw();
+                areaMaps.Redraw(display);
 		cursor.Show();
 		display.Flip();
 	    }
@@ -898,7 +898,7 @@ Game::menu_t Game::Editor::StartGame()
 	    cursor.SetThemes(areaMaps.GetScrollCursor());
 	    areaMaps.Scroll();
 	    //I.Scroll(scrollDir);
-	    areaMaps.Redraw();
+	    areaMaps.Redraw(display);
 	    radar.RedrawCursor();
 	    cursor.Show();
 	    display.Flip();

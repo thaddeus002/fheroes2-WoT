@@ -259,8 +259,9 @@ void AnimationRemoveObject(const Maps::Tiles & tile)
 
     if(NULL == addon) return;
 
-    const Rect & area = Interface::GameArea::Get().GetArea();
-    const Rect & rect = Interface::GameArea::Get().GetRectMaps();
+    const Interface::GameArea & gamearea = Interface::GameArea::Get();
+    const Rect & area = gamearea.GetArea();
+    const Rect & rect = gamearea.GetRectMaps();
     const Point pos(tile.GetIndex() % world.w() - rect.x, tile.GetIndex() / world.w() - rect.y);
 
     const s16 dstx = area.x + TILEWIDTH * pos.x;
@@ -294,11 +295,12 @@ void AnimationRemoveObject(const Maps::Tiles & tile)
         {
 	    cursor.Hide();
 	    tile.RedrawTile();
-	    tile.RedrawBottom(addon);
+	    tile.RedrawBottom(display, dstx, dsty, addon);
             sf.SetAlpha(alpha);
 	    display.Blit(sf, dstx, dsty);
+	    if(hero) hero->Redraw(display, gamearea, false);
+	    else
 	    tile.RedrawTop();
-	    if(hero) hero->Redraw(false);
             cursor.Show();
             display.Flip();
             alpha -= 20;

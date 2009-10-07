@@ -38,7 +38,8 @@ public:
     operator Rect() const { return Rect(offsetX, offsetY, w(), h()); }
 
     u32 GetSize(void) const;
-
+    void ScaleMinifyByTwo(void);
+    
     static void DrawICN(Surface & sf, const char *buf, const u32 size, bool reflect);
 private:
 

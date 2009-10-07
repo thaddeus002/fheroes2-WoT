@@ -132,3 +132,12 @@ u32 Sprite::GetSize(void) const
 {
     return Surface::GetSize() + sizeof(offsetX) + sizeof(offsetY);
 }
+
+void Sprite::ScaleMinifyByTwo(void)
+{
+    Surface sf;
+    Surface::ScaleMinifyByTwo(sf, *this);
+    Surface::Swap(sf, *this);
+    offsetX /= 2;
+    offsetY /= 2;
+}

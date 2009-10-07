@@ -235,18 +235,19 @@ bool isNeedStayFrontObject(const Heroes & hero, const Maps::Tiles & next)
     return false;
 }
 
-void Heroes::Redraw(bool with_shadow) const
+void Heroes::Redraw(Surface & dst, const Interface::GameArea & gamearea, bool with_shadow) const
 {
-    Display & display = Display::Get();
+    s16 dx = gamearea.GetArea().x + TILEWIDTH * (mp.x - gamearea.GetRectMaps().x);
+    s16 dy = gamearea.GetArea().y + TILEWIDTH * (mp.y - gamearea.GetRectMaps().y);
 
-    const Interface::GameArea & gamearea = Interface::GameArea::Get();
+    Redraw(dst, dx, dy, gamearea, with_shadow);
+}
 
+void Heroes::Redraw(Surface & dst, const s16 dx, const s16 dy, const Interface::GameArea & gamearea, bool with_shadow) const
+{
     if(!(gamearea.GetRectMaps() & mp)) return;
 
     bool reflect = ReflectSprite(direction);
-
-    s16 dx = gamearea.GetArea().x + TILEWIDTH * (mp.x - gamearea.GetRectMaps().x);
-    s16 dy = gamearea.GetArea().y + TILEWIDTH * (mp.y - gamearea.GetRectMaps().y);
 
     const Sprite & sprite1 = SpriteHero(*this, sprite_index, reflect);
     const Sprite & sprite2 = SpriteFlag(*this, sprite_index, reflect);
@@ -298,20 +299,17 @@ void Heroes::Redraw(bool with_shadow) const
     gamearea.SrcRectFixed(src_rt3, dst_pt3, sprite3.w(), sprite3.h());
     gamearea.SrcRectFixed(src_rt4, dst_pt4, sprite4.w(), sprite4.h());
 
-    if(isShipMaster()) display.Blit(sprite4, src_rt4, dst_pt4);
+    if(isShipMaster()) dst.Blit(sprite4, src_rt4, dst_pt4);
 
     // redraw sprites for shadow
-    if(with_shadow) display.Blit(sprite3, src_rt3, dst_pt3);
+    if(with_shadow)
+    dst.Blit(sprite3, src_rt3, dst_pt3);
 
     // redraw sprites hero and flag
-    display.Blit(sprite1, src_rt1, dst_pt1);
-    display.Blit(sprite2, src_rt2, dst_pt2);
-    
-    RedrawDependencesTiles();
-}
+    dst.Blit(sprite1, src_rt1, dst_pt1);
+    dst.Blit(sprite2, src_rt2, dst_pt2);
 
-void Heroes::RedrawDependencesTiles(void) const
-{
+    // redraw dependences tiles
     const u16 center = GetIndex();
 
     world.GetTiles(center).RedrawTop();
@@ -319,62 +317,24 @@ void Heroes::RedrawDependencesTiles(void) const
     if(Maps::isValidDirection(center, Direction::BOTTOM))
     {
 	Maps::Tiles & tile_bottom = world.GetTiles(Maps::GetDirectionIndex(center, Direction::BOTTOM));
-	const Maps::TilesAddon * skip = NULL;
-	std::vector<const Maps::TilesAddon *> v;
-	v.reserve(3);
-
-	// skip always: ICN::OBJNTWBA
-	skip = tile_bottom.FindAddonICN1(ICN::OBJNTWBA);
-	if(skip) v.push_back(skip);
-	// skip only sprite: ICN::ROAD
-	skip = tile_bottom.FindAddonICN1(ICN::ROAD);
-	if(skip) v.push_back(skip);
-	// skip only sprite: ICN::STREAM
-	skip = tile_bottom.FindAddonICN1(ICN::STREAM);
-	if(skip) v.push_back(skip);
-	// add other sprite if incorrect draw hero
-
-	if(2 > v.size())
-	{
-	    tile_bottom.RedrawBottom(v.size() ? v.front() : NULL);
-	    tile_bottom.RedrawTop();
-	}
+	tile_bottom.RedrawBottom4Hero(dst, gamearea);
+	tile_bottom.RedrawTop(dst, gamearea);
     }
 
-    // skip if rotate
-    if(45 > GetSpriteIndex())
+    if(45 > GetSpriteIndex() &&
+	Direction::BOTTOM != direction &&
+	Direction::TOP != direction &&
+	Maps::isValidDirection(center, direction) &&
+	Maps::isValidDirection(Maps::GetDirectionIndex(center, direction), Direction::BOTTOM))
     {
-	if(Direction::BOTTOM != direction &&
-	    Direction::TOP != direction &&
-	    Maps::isValidDirection(center, direction) &&
-	    Maps::isValidDirection(Maps::GetDirectionIndex(center, direction), Direction::BOTTOM))
-	{
-	    Maps::Tiles & tile_dir_bottom = world.GetTiles(Maps::GetDirectionIndex(Maps::GetDirectionIndex(center, direction), Direction::BOTTOM));
-	    const Maps::TilesAddon * skip = NULL;
-	    std::vector<const Maps::TilesAddon *> v;
-	    v.reserve(3);
-
-	    // skip always: ICN::OBJNTWBA
-    	    skip = tile_dir_bottom.FindAddonICN1(ICN::OBJNTWBA);
-	    if(skip) v.push_back(skip);
-	    // skip only sprite: ICN::ROAD
-    	    skip = tile_dir_bottom.FindAddonICN1(ICN::ROAD);
-	    if(skip) v.push_back(skip);
-	    // skip only sprite: ICN::STREAM
-    	    skip = tile_dir_bottom.FindAddonICN1(ICN::STREAM);
-	    if(skip) v.push_back(skip);
-	    // add other sprite if incorrect draw hero
-
-	    if(2 > v.size())
-    	    {
-    		tile_dir_bottom.RedrawBottom(v.size() ? v.front() : NULL);
-    		tile_dir_bottom.RedrawTop();
-	    }
-	}
+	Maps::Tiles & tile_dir_bottom = world.GetTiles(Maps::GetDirectionIndex(Maps::GetDirectionIndex(center, direction), Direction::BOTTOM));
+    	tile_dir_bottom.RedrawBottom4Hero(dst, gamearea);
+	tile_dir_bottom.RedrawTop(dst, gamearea);
     }
-    
-    if(Maps::isValidDirection(center, direction)) world.GetTiles(Maps::GetDirectionIndex(center, direction)).RedrawTop();
+
+    if(Maps::isValidDirection(center, direction)) world.GetTiles(Maps::GetDirectionIndex(center, direction)).RedrawTop(dst, gamearea);
 }
+
 
 bool Heroes::MoveStep(bool fast)
 {

@@ -22,6 +22,13 @@
 #include "settings.h"
 #include "heroes.h"
 #include "spell.h"
+#include "objcrck.h"
+#include "objdirt.h"
+#include "objdsrt.h"
+#include "objgras.h"
+#include "objlava.h"
+#include "objsnow.h"
+#include "objswmp.h"
 #include "icn.h"
 
 namespace ICN
@@ -1654,4 +1661,38 @@ ICN::icn_t ICN::FromSpell(u8 spell)
     }
 
     return UNKNOWN;
+}
+
+bool ICN::NeedMinify4PocketPC(icn_t icn, u16 index)
+{
+    switch(icn)
+    {
+	case PUZZLE:
+	    return true;
+
+	default: break;
+    }
+    return false;
+}
+
+bool ICN::SkipForRedrawHeroes(icn_t icn, u16 index)
+{
+    switch(icn)
+    {
+	case ICN::OBJNTWBA:
+        case ICN::ROAD:
+        case ICN::STREAM:
+            return true;
+
+	case ICN::OBJNCRCK: return ObjWasteLand::isPassable(icn, index);
+	case ICN::OBJNDIRT: return ObjDirt::isPassable(icn, index);
+	case ICN::OBJNDSRT: return ObjDesert::isPassable(icn, index);
+	case ICN::OBJNGRA2:
+	case ICN::OBJNGRAS: return ObjGrass::isPassable(icn, index);
+	case ICN::OBJNLAVA: return ObjLava::isPassable(icn, index);
+	case ICN::OBJNSNOW: return ObjSnow::isPassable(icn, index);
+	case ICN::OBJNSWMP: return ObjSwamp::isPassable(icn, index);
+        default: break;
+    }
+    return false;
 }

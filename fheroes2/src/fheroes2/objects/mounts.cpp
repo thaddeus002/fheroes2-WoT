@@ -62,7 +62,7 @@ bool Mounts::isPassable(const u16 icn, const u8 index)
     	    else
     	    if((27 < index && index < 32) || (32 < index && index < 38) || (38 < index && index < 42)) return false;	// LARGE RIGHT
     	    else
-    	    if((47 < index && index < 51) || (53 < index && index < 57)) return false;				// MEDIUM LEFT
+    	    if((47 < index && index < 53) || (53 < index && index < 57)) return false;				// MEDIUM LEFT (51 and 52 for dirt need close)
     	    else
     	    if((64 < index && index < 68) || (68 < index && index < 72)) return false;				// MEDIUM RIGHT
     	    else

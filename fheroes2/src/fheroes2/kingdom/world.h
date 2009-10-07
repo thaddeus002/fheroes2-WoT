@@ -93,6 +93,7 @@ public:
     const Heroes * GetHeroesCondWins(void) const;
     const Heroes * GetHeroesCondLoss(void) const;
 
+    const Surface & GetPuzzleSurface(void) const;
     u16 GetUltimateArtifactIndex(void);
     Artifact::artifact_t GetUltimateArtifact(void) const;
     bool DiggingForUltimateArtifact(const Point & center);
@@ -189,6 +190,8 @@ private:
 
     Heroes::heroes_t heroes_cond_wins;
     Heroes::heroes_t heroes_cond_loss;
+
+    Surface puzzle_surface;
 
     static u32 uniq0;
 };

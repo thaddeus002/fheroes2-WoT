@@ -30,6 +30,7 @@
 #include "army.h"
 #include "world.h"
 #include "gameevent.h"
+#include "interface_gamearea.h"
 #include "tools.h"
 
 bool Game::Save(const std::string &fn)
@@ -1056,6 +1057,9 @@ bool Game::IO::LoadBIN(QueueMessage & msg)
     std::vector<Heroes *>::const_iterator ith2 = world.vec_heroes.end();
     for(; ith1 != ith2; ++ith1)
         if(*ith1) world.GetKingdom((*ith1)->GetColor()).AddHeroes(*ith1);
+
+    // regenerate puzzle surface
+    Interface::GameArea::GenerateUltimateArtifactAreaSurface(world.ultimate_artifact, world.puzzle_surface);
 
     return byte16 == 0xFFFF;
 }

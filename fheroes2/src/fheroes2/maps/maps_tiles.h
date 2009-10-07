@@ -30,6 +30,7 @@
 
 class Sprite;
 class Heroes;
+namespace Interface { class GameArea; };
 
 namespace Maps
 {
@@ -118,8 +119,14 @@ namespace Maps
 	void CaptureFlags32(const MP2::object_t obj, const Color::color_t col);
 
 	void RedrawTile(void) const;
-	void RedrawBottom(const TilesAddon * skip = NULL) const;
-	void RedrawTop(const TilesAddon * skip = NULL) const;
+	void RedrawTile(Surface &, s16, s16) const;
+	void RedrawBottom(void) const;
+	void RedrawBottom(Surface &, const Interface::GameArea &) const;
+	void RedrawBottom(Surface &, s16, s16, const TilesAddon* skip = NULL) const;
+	void RedrawBottom4Hero(Surface &, const Interface::GameArea &) const;
+	void RedrawTop(void) const;
+	void RedrawTop(Surface &, const Interface::GameArea &) const;
+	void RedrawTop(Surface &, s16, s16, const Interface::GameArea &, const TilesAddon* skip = NULL) const;
 
 	void AddonsPushLevel1(const MP2::mp2tile_t & mt);
 	void AddonsPushLevel1(const MP2::mp2addon_t & ma);

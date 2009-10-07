@@ -68,6 +68,8 @@
 #define DEFAULT_WZRD_KNOWLEDGE	2
 
 class Recruits;
+class Surface;
+namespace Interface { class GameArea; };
 
 class Heroes : public HeroBase
 {
@@ -225,8 +227,8 @@ public:
     void AIRescueWhereMove(u16 &);
     bool AIPriorityObject(u16, u8);
 
-    void Redraw(bool with_shadow = true) const;
-    void RedrawDependencesTiles(void) const;
+    void Redraw(Surface &, const Interface::GameArea &, bool) const;
+    void Redraw(Surface &, const s16, const s16, const Interface::GameArea &, bool) const;
     u8   GetSpriteIndex(void) const{ return sprite_index; };
     void FadeOut(void) const;
     void FadeIn(void) const;

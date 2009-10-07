@@ -23,6 +23,7 @@
 #include "settings.h"
 #include "agg.h"
 #include "button.h"
+#include "game_interface.h"
 #include "interface_gamearea.h"
 #include "interface_radar.h"
 #include "world.h"
@@ -75,28 +76,15 @@ void Puzzle::Update(u8 open_obelisk, u8 total_obelisk)
 
 void Puzzle::ShowMapsDialog(void) const
 {
-    // FIXME: QVGA version
-    if(Settings::Get().PocketPC())
-    {
-       Dialog::Message("", _("For the QVGA version is not available."), Font::SMALL, Dialog::OK);
-       return;
-    }
-
     Cursor & cursor = Cursor::Get();
     Display & display = Display::Get();
     cursor.Hide();
     Cursor::themes_t old_cursor = cursor.Themes();
     cursor.SetThemes(Cursor::POINTER);
-    bool evil_interface = Settings::Get().EvilInterface();
 
-    AGG::PlayMusic(MUS::PUZZLE);
+    //AGG::PlayMusic(MUS::PUZZLE);
 
-    Background back(BORDERWIDTH, BORDERWIDTH, display.w() - 2 * BORDERWIDTH, display.h() - 2 * BORDERWIDTH);
-    back.Save();
-
-    Surface sf(448, 448);
-    Interface::GameArea::GenerateUltimateArtifactAreaSurface(world.GetUltimateArtifactIndex(), sf);
-    evil_interface ? sf.GrayScale() : sf.Sepia();
+    const Surface & sf = world.GetPuzzleSurface();
 
     if(display.w() == 640 && display.h() == 480)
 	ShowStandardDialog(*this, sf);
@@ -105,7 +93,6 @@ void Puzzle::ShowMapsDialog(void) const
 
     cursor.Hide();
     cursor.SetThemes(old_cursor);
-    back.Restore();
 }
 
 bool ClosedTilesExists(const Puzzle & pzl, const u8* it1, const u8* it2)
@@ -139,6 +126,9 @@ void ShowStandardDialog(const Puzzle & pzl, const Surface & sf)
     const Rect & radar_pos = Interface::Radar::Get().GetArea();
     bool evil_interface = Settings::Get().EvilInterface();
 
+    Background back(BORDERWIDTH, BORDERWIDTH, sf.w(), sf.h());
+    back.Save();
+
     display.Blit(AGG::GetICN((evil_interface ? ICN::EVIWPUZL : ICN::VIEWPUZL), 0), radar_pos);
     display.Blit(sf, BORDERWIDTH, BORDERWIDTH);
 
@@ -157,6 +147,11 @@ void ShowStandardDialog(const Puzzle & pzl, const Surface & sf)
         le.MousePressLeft(buttonExit) ? buttonExit.PressDraw() : buttonExit.ReleaseDraw();
         if(le.MouseClickLeft(buttonExit) || le.KeyPress(KEY_RETURN) || le.KeyPress(KEY_ESCAPE)) break;
     }
+
+    Interface::Basic::Get().SetRedraw(REDRAW_RADAR);
+
+    cursor.Hide();
+    back.Restore();
 }
 
 void ShowExtendedDialog(const Puzzle & pzl, const Surface & sf)
@@ -166,7 +161,10 @@ void ShowExtendedDialog(const Puzzle & pzl, const Surface & sf)
     bool evil_interface = Settings::Get().EvilInterface();
 
     Dialog::FrameBorder frameborder;
-    frameborder.SetPosition((display.w() - BORDERWIDTH * 2 - sf.w()) / 2, (display.h() - sf.h() - BORDERWIDTH * 2 - 32) / 2, sf.w(), sf.h() + 32);
+    frameborder.SetPosition((display.w() - BORDERWIDTH * 2 - sf.w()) / 2,
+	    (display.h() - sf.h() - BORDERWIDTH * 2 - 32) / 2,
+	    sf.w(),
+	    sf.h() + (Settings::Get().PocketPC() ? 25 : 32));
     frameborder.Redraw();
 
     if(evil_interface)
@@ -175,8 +173,9 @@ void ShowExtendedDialog(const Puzzle & pzl, const Surface & sf)
 	display.FillRect(128, 64, 32, frameborder.GetArea());
     display.Blit(sf, frameborder.GetArea());
 
-    Point dst_pt(frameborder.GetArea().x + sf.w() / 2 - 40, frameborder.GetArea().y + sf.h() + 5);
-    Button buttonExit(dst_pt, (evil_interface ? ICN::LGNDXTRE : ICN::LGNDXTRA), 4, 5);
+    Button buttonExit(frameborder.GetArea().x + sf.w() / 2 - 40,
+	frameborder.GetArea().y + sf.h() + (Settings::Get().PocketPC() ? 0 : 5),
+	(evil_interface ? ICN::LGNDXTRE : ICN::LGNDXTRA), 4, 5);
 
     buttonExit.Draw();
     PuzzlesDraw(pzl, sf, frameborder.GetArea().x, frameborder.GetArea().y);
@@ -189,6 +188,7 @@ void ShowExtendedDialog(const Puzzle & pzl, const Surface & sf)
     {
         le.MousePressLeft(buttonExit) ? buttonExit.PressDraw() : buttonExit.ReleaseDraw();
         if(le.MouseClickLeft(buttonExit) || le.KeyPress(KEY_RETURN) || le.KeyPress(KEY_ESCAPE)) break;
+        if(Settings::Get().PocketPC() && le.MouseClickLeft(frameborder.GetArea())) break;
     }
 }
 
@@ -196,6 +196,9 @@ void PuzzlesDraw(const Puzzle & pzl, const Surface & sf, s16 dstx, s16 dsty)
 {
     Display & display = Display::Get();
     Cursor & cursor = Cursor::Get();
+
+    // show all for debug
+    if(1 < Settings::Get().Debug()) return;
 
     u8 alpha = 250;
     u32 ticket = 0;
@@ -209,16 +212,22 @@ void PuzzlesDraw(const Puzzle & pzl, const Surface & sf, s16 dstx, s16 dsty)
 	    for(size_t ii = 0; ii < pzl.size(); ++ii)
 	    {
     		const Sprite & piece = AGG::GetICN(ICN::PUZZLE, ii);
-		if(1 < Settings::Get().Debug() || pzl.test(ii))
+		if(pzl.test(ii))
 		{
 		    Surface fade(piece.w(), piece.h());
 		    fade.SetColorKey();
 		    fade.Blit(piece);
 		    fade.SetAlpha(alpha);
+		    if(Settings::Get().PocketPC())
+		    display.Blit(fade, dstx + 8 + piece.x() - BORDERWIDTH, dsty + 8 + piece.y() - BORDERWIDTH);
+		    else
 		    display.Blit(fade, dstx + piece.x() - BORDERWIDTH, dsty + piece.y() - BORDERWIDTH);
 		}
 		else
 		{
+		    if(Settings::Get().PocketPC())
+		    display.Blit(piece, dstx + 8 + piece.x() - BORDERWIDTH, dsty + 8 + piece.y() - BORDERWIDTH);
+		    else
 		    display.Blit(piece, dstx + piece.x() - BORDERWIDTH, dsty + piece.y() - BORDERWIDTH);
 		}
 	    }

@@ -35,9 +35,6 @@ namespace Game
     extern void MouseCursorAreaPressRight(u16);
 };
 
-void	RedrawBoat(const Maps::Tiles &, s16, s16);
-void	RedrawHeroes(const Maps::Tiles &);
-void	RedrawMonster(const Maps::Tiles &, s16, s16);
 void	RedrawClopOrClofSpriteFog(const u16 dst_index, const Point & dst);
 
 Interface::GameArea & Interface::GameArea::Get(void)
@@ -87,43 +84,44 @@ void Interface::GameArea::SrcRectFixed(Rect & src, Point & dst, const u16 rw, co
 
 void Interface::GameArea::Build(void)
 {
-
     if(Settings::Get().HideInterface())
-    {
-	rectArea.x = 0;
-	rectArea.y = 0;
-	rectArea.w = Display::Get().w();
-	rectArea.h = Display::Get().h();
-    }
+	SetAreaSize(0, 0,
+		    Display::Get().w(),
+		    Display::Get().h());
     else
-    {
-	rectArea.x = BORDERWIDTH;
-	rectArea.y = BORDERWIDTH;
-	rectArea.w = Display::Get().w() - RADARWIDTH - 3 * BORDERWIDTH;
-	rectArea.h = Display::Get().h() - 2 * BORDERWIDTH;
-    }
+	SetAreaSize(BORDERWIDTH, BORDERWIDTH,
+		    Display::Get().w() - RADARWIDTH - 3 * BORDERWIDTH,
+		    Display::Get().h() - 2 * BORDERWIDTH);
 
     rectMaps.x = 0;
     rectMaps.y = 0;
+}
+
+void Interface::GameArea::SetAreaSize(s16 x, s16 y, u16 w, u16 h)
+{
+    rectArea.x = x;
+    rectArea.y = y;
+    rectArea.w = w;
+    rectArea.h = h;
     rectMaps.w = rectArea.w / TILEWIDTH;
     rectMaps.h = rectArea.h / TILEWIDTH;
 }
 
-void Interface::GameArea::Redraw(bool drawFog) const
+void Interface::GameArea::Redraw(Surface & dst, u8 flag) const
 {
-    Display & display = Display::Get();
-
     // tile
     for(u8 oy = 0; oy < rectMaps.h; ++oy)
 	for(u8 ox = 0; ox < rectMaps.w; ++ox)
-	    world.GetTiles(rectMaps.x + ox, rectMaps.y + oy).RedrawTile();
+	    world.GetTiles(rectMaps.x + ox, rectMaps.y + oy).RedrawTile(dst, rectArea.x + TILEWIDTH * ox, rectArea.y + TILEWIDTH * oy);
 
     // bottom
+    if(flag & REDRAW_BOTTOM)
     for(u8 oy = 0; oy < rectMaps.h; ++oy)
 	for(u8 ox = 0; ox < rectMaps.w; ++ox)
-	    world.GetTiles(rectMaps.x + ox, rectMaps.y + oy).RedrawBottom();
+	    world.GetTiles(rectMaps.x + ox, rectMaps.y + oy).RedrawBottom(dst, rectArea.x + TILEWIDTH * ox, rectArea.y + TILEWIDTH * oy);
 
     // ext object
+    if(flag & REDRAW_OBJECTS)
     for(u8 oy = 0; oy < rectMaps.h; ++oy)
 	for(u8 ox = 0; ox < rectMaps.w; ++ox)
     {
@@ -132,19 +130,21 @@ void Interface::GameArea::Redraw(bool drawFog) const
 	switch(tile.GetObject())
 	{
     	    // boat
-    	    case MP2::OBJ_BOAT:		RedrawBoat(tile, rectArea.x + TILEWIDTH * ox, rectArea.y + TILEWIDTH * oy); break;
+    	    case MP2::OBJ_BOAT:		RedrawBoat(dst, rectArea.x + TILEWIDTH * ox, rectArea.y + TILEWIDTH * oy, tile); break;
     	    // monster
-    	    case MP2::OBJ_MONSTER:	RedrawMonster(tile, rectArea.x + TILEWIDTH * ox, rectArea.y + TILEWIDTH * oy); break;
+    	    case MP2::OBJ_MONSTER:	RedrawMonster(dst, rectArea.x + TILEWIDTH * ox, rectArea.y + TILEWIDTH * oy, tile); break;
     	    default: break;
 	}
     }
 
     // top
+    if(flag & REDRAW_TOP)
     for(u8 oy = 0; oy < rectMaps.h; ++oy)
 	for(u8 ox = 0; ox < rectMaps.w; ++ox)
-	    world.GetTiles(rectMaps.x + ox, rectMaps.y + oy).RedrawTop();
+	    world.GetTiles(rectMaps.x + ox, rectMaps.y + oy).RedrawTop(dst, rectArea.x + TILEWIDTH * ox, rectArea.y + TILEWIDTH * oy, *this);
 
     // ext object
+    if(flag & REDRAW_OBJECTS)
     for(u8 oy = 0; oy < rectMaps.h; ++oy)
 	for(u8 ox = 0; ox < rectMaps.w; ++ox)
     {
@@ -153,7 +153,13 @@ void Interface::GameArea::Redraw(bool drawFog) const
 	switch(tile.GetObject())
 	{
     	    // heroes
-    	    case MP2::OBJ_HEROES:	RedrawHeroes(tile); break;
+    	    case MP2::OBJ_HEROES:
+	    {
+		const Heroes *hero = world.GetHeroes(tile.GetIndex());
+		if(hero) hero->Redraw(dst, rectArea.x + TILEWIDTH * ox, rectArea.y + TILEWIDTH * oy, *this, true);
+		break;
+	    }
+
     	    default: break;
 	}
     }
@@ -161,7 +167,8 @@ void Interface::GameArea::Redraw(bool drawFog) const
     // route
     const Game::Focus & focus = Game::Focus::Get();
 
-    if(Game::Focus::HEROES == focus.Type() &&
+    if((flag & REDRAW_OBJECTS) &&
+	Game::Focus::HEROES == focus.Type() &&
 	focus.GetHeroes().GetPath().isShow())
     {
 	const Heroes & hero = focus.GetHeroes();
@@ -190,25 +197,25 @@ void Interface::GameArea::Redraw(bool drawFog) const
 	    const Sprite & sprite = AGG::GetICN(0 > green ? ICN::ROUTERED : ICN::ROUTE, index);
     	    pointPos.x = rectArea.x + TILEWIDTH * (pointPos.x - rectMaps.x) + sprite.x() - 14;
     	    pointPos.y = rectArea.y + TILEWIDTH * (pointPos.y - rectMaps.y) + sprite.y();
-	    display.Blit(sprite, pointPos);
+	    dst.Blit(sprite, pointPos);
 	}
     }
 
     // redraw grid
-    if(Settings::Get().Debug())
+    if((flag & REDRAW_ALL) && Settings::Get().Debug())
     {
 
 	for(u8 oy = 0; oy < rectMaps.h; ++oy)
 	    for(u8 ox = 0; ox < rectMaps.w; ++ox)
 	{
-    	    display.Lock();
-    	    display.SetPixel(rectArea.x + TILEWIDTH * ox, rectArea.y + TILEWIDTH * oy, display.GetColor(0x40));
-    	    display.Unlock();
+    	    dst.Lock();
+    	    dst.SetPixel(rectArea.x + TILEWIDTH * ox, rectArea.y + TILEWIDTH * oy, dst.GetColor(0x40));
+    	    dst.Unlock();
 	}
     }
 
     // redraw fog
-    if(drawFog)
+    if(flag & REDRAW_FOGS)
 	for(u8 oy = 0; oy < rectMaps.h; ++oy)
 	    for(u8 ox = 0; ox < rectMaps.w; ++ox)
     {
@@ -292,33 +299,23 @@ void Interface::GameArea::Center(s16 px, s16 py)
     if(scrollDirection) Scroll();
 }
 
-void RedrawBoat(const Maps::Tiles & tile, s16 px, s16 py)
+void Interface::GameArea::RedrawBoat(Surface & dst, s16 px, s16 py, const Maps::Tiles & tile) const
 {
     if(Settings::Get().Editor())
-        Display::Get().Blit(AGG::GetICN(ICN::OBJNWAT2, 23), px, py);
+        dst.Blit(AGG::GetICN(ICN::OBJNWAT2, 23), px, py);
     else
     {
+	// FIXME: restore direction from Maps::Tiles
         const Sprite & sprite = AGG::GetICN(ICN::BOAT32, 18);
         Point dst_pt(px + sprite.x(), py + sprite.y() + TILEWIDTH);
         Rect src_rt;
-        Interface::GameArea::SrcRectFixed(src_rt, dst_pt, sprite.w(), sprite.h());
-        Display::Get().Blit(sprite, src_rt, dst_pt);
+        SrcRectFixed(src_rt, dst_pt, sprite.w(), sprite.h());
+        dst.Blit(sprite, src_rt, dst_pt);
     }
 }
 
-void RedrawHeroes(const Maps::Tiles & tile)
+void Interface::GameArea::RedrawMonster(Surface & dst, s16 px, s16 py, const Maps::Tiles & tile) const
 {
-    const Heroes *hero = world.GetHeroes(tile.GetIndex());
-
-    if(hero)
-    {
-	hero->Redraw();
-    }
-}
-
-void RedrawMonster(const Maps::Tiles & tile, s16 px, s16 py)
-{
-    Display & display = Display::Get();
     const Monster monster(tile);
     Point dst_pt;
     Rect src_rt;
@@ -342,8 +339,8 @@ void RedrawMonster(const Maps::Tiles & tile, s16 px, s16 py)
 	dst_pt.x = px + sprite_first.x() + 16;
 	dst_pt.y = py + TILEWIDTH + sprite_first.y();
 
-	Interface::GameArea::SrcRectFixed(src_rt, dst_pt, sprite_first.w(), sprite_first.h());
-	display.Blit(sprite_first, src_rt, dst_pt);
+	SrcRectFixed(src_rt, dst_pt, sprite_first.w(), sprite_first.h());
+	dst.Blit(sprite_first, src_rt, dst_pt);
     }
     else
     {
@@ -353,8 +350,8 @@ void RedrawMonster(const Maps::Tiles & tile, s16 px, s16 py)
 	dst_pt.x = px + sprite_first.x() + 16;
 	dst_pt.y = py + TILEWIDTH + sprite_first.y();
 
-	Interface::GameArea::SrcRectFixed(src_rt, dst_pt, sprite_first.w(), sprite_first.h());
-	display.Blit(sprite_first, src_rt, dst_pt);
+	SrcRectFixed(src_rt, dst_pt, sprite_first.w(), sprite_first.h());
+	dst.Blit(sprite_first, src_rt, dst_pt);
 
 	// draw second sprite
 	const Sprite & sprite_next = AGG::GetICN(ICN::MINIMON, monster.GetSpriteIndex() * 9 + 1 + (Maps::AnimationTicket() % 6));
@@ -362,11 +359,11 @@ void RedrawMonster(const Maps::Tiles & tile, s16 px, s16 py)
 	dst_pt.x = px + sprite_next.x() + 16;
 	dst_pt.y = py + TILEWIDTH + sprite_next.y();
 
-	Interface::GameArea::SrcRectFixed(src_rt, dst_pt, sprite_next.w(), sprite_next.h());
-	display.Blit(sprite_next, src_rt, dst_pt);
+	SrcRectFixed(src_rt, dst_pt, sprite_next.w(), sprite_next.h());
+	dst.Blit(sprite_next, src_rt, dst_pt);
 
-	if(Maps::isValidDirection(tile.GetIndex(), Direction::BOTTOM))
-    	    world.GetTiles(Maps::GetDirectionIndex(tile.GetIndex(), Direction::BOTTOM)).RedrawTop();
+	//if(Maps::isValidDirection(tile.GetIndex(), Direction::BOTTOM))
+    	//    world.GetTiles(Maps::GetDirectionIndex(tile.GetIndex(), Direction::BOTTOM)).RedrawTop();
     }
 }
 
@@ -589,15 +586,17 @@ void Interface::GameArea::GenerateUltimateArtifactAreaSurface(const u16 index, S
 {
     if(Maps::isValidAbsIndex(index))
     {
-	Display & display = Display::Get();
-	Interface::GameArea & gamearea = GameArea::Get();
+	sf.Set(448, 448);
+
+	Interface::GameArea gamearea;
+	gamearea.SetAreaSize(0, 0, sf.w(), sf.h());
+
 	const Rect & rectMaps = gamearea.GetRectMaps();
 	const Rect & rectArea = gamearea.GetArea();
 	Point pt(index % world.w(), index / world.h());
 
-        const Point reserved(rectMaps);
         gamearea.Center(pt);
-	gamearea.Redraw(false);
+	gamearea.Redraw(sf, REDRAW_TOP | REDRAW_BOTTOM);
 
 	// blit marker
 	for(u8 ii = 0; ii < rectMaps.h; ++ii) if(index < Maps::GetIndexFromAbsPoint(rectMaps.x + rectMaps.w - 1, rectMaps.y + ii))
@@ -612,24 +611,16 @@ void Interface::GameArea::GenerateUltimateArtifactAreaSurface(const u16 index, S
 	}
 	const Sprite & marker = AGG::GetICN(ICN::ROUTE, 0);
 	const Point dst(rectArea.x + pt.x * TILEWIDTH, rectArea.y + pt.y * TILEWIDTH);
-	display.Blit(marker, dst.x, dst.y + 8);
+	sf.Blit(marker, dst.x, dst.y + 8);
 
-	Rect rt(dst.x - sf.w() / 2, dst.y - sf.h() / 2, sf.w(), sf.h());
+	Settings::Get().EvilInterface() ? sf.GrayScale() : sf.Sepia();
 
-	// fix align
-	if(rt.x < rectArea.x) rt.x = rectArea.x;
-	else
-	if(rt.x > rectArea.x + rectArea.w - rt.w) rt.x = rectArea.x + rectArea.w - rt.w;
-	if(rt.y < rectArea.y) rt.y = rectArea.y;
-	else
-	if(rt.y > rectArea.y + rectArea.h - rt.h) rt.y = rectArea.y + rectArea.h - rt.h;
-
-	sf.Blit(display, rt, 0, 0);
-
-        // restore position
-        gamearea.rectMaps.x = reserved.x;
-        gamearea.rectMaps.y = reserved.y;
-	gamearea.Redraw();
+	if(Settings::Get().PocketPC())
+	{
+    	    Surface sf2;
+    	    Surface::ScaleMinifyByTwo(sf2, sf);
+    	    Surface::Swap(sf, sf2);
+	}
     }
     else
     Error::Warning("Interface::GameArea::GenerateUltimateArtifactAreaSurface: artifact not found");

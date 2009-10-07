@@ -392,7 +392,7 @@ void AGG::Cache::LoadICN(const ICN::icn_t icn, u16 index, bool reflect)
 	const std::string icn_folder(conf.LocalPrefix() + SEPARATOR + "files" + SEPARATOR + "cache" + SEPARATOR + ICN::GetString(icn));
 	const std::string xml_spec(icn_folder + SEPARATOR + "spec.xml");
 
-	if(conf.Debug()) Error::Verbose("AGG::Cache::LoadICN: " + icn_folder);
+	if(3 < conf.Debug()) Error::Verbose("AGG::Cache::LoadICN: " + icn_folder);
 
 	// parse spec.xml
 	TiXmlDocument doc;
@@ -465,6 +465,9 @@ void AGG::Cache::LoadICN(const ICN::icn_t icn, u16 index, bool reflect)
 	sp.Set(header1.Width(), header1.Height(), ICN::RequiresAlpha(icn));
 	sp.SetOffset(header1.OffsetX(), header1.OffsetY());
 	sp.LoadICN(&body[6 + header1.OffsetData()], size_data, reflect);
+	
+	if(Settings::Get().PocketPC() && ICN::NeedMinify4PocketPC(icn, index)) 
+	    sp.ScaleMinifyByTwo();
     }
 }
 
