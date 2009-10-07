@@ -727,7 +727,6 @@ Army::battle_t Battle::BattleControl::RunBattle(HeroBase *hero1, HeroBase *hero2
     while(1)
     {
         status = GUI::NONE;
-        
         // Sanity check in case opposing army is killed via spells
         if(!Army::isArmyValid(m_battlefield.GetArmy(0)) || !Army::isArmyValid(m_battlefield.GetArmy(1)))
           break;
@@ -1920,8 +1919,8 @@ namespace Battle
 
         Army::BattleTroop &myTroop = troop;
 
-        cursor.SetThemes(cursor.WAR_POINTER);
         cursor.Hide();
+        cursor.SetThemes(cursor.WAR_POINTER);
         //m_battlefield->Redraw();
         //m_gui->Status("");
         m_gui->Redraw();
@@ -1935,6 +1934,8 @@ namespace Battle
         Point cur_pt(-1,-1);
 
         bool mouseMotion = false;
+
+        std::string str, name;
 
         while(le.HandleEvents())
         {
@@ -1973,30 +1974,21 @@ namespace Battle
                 return interaction;
 
             int t = -1;
-            bool click;
+            bool click = le.MouseClickLeft();
             cur_pt = Scr2Bf(le.GetMouseCursor());
-	    
-            if(!le.MousePressLeft()
-            && cur_pt == Scr2Bf(le.GetMousePressLeft())
-            && cur_pt == Scr2Bf(le.GetMouseReleaseLeft()))
-            {
-                click = true;
-                le.MouseClickLeft(Rect(0, 0, display.w(), display.h()));
-            } else click = false;
-	    
+
             if(!mouseActive && BfValid(cur_pt)) {
                 // cursor on the battle field
                 if(t = m_battlefield->FindTroop(*m_ownArmy, cur_pt), t >= 0 && (*m_ownArmy)[t].Count() > 0) {
                     // troop from my army
-                    std::string str = _("View %{name} info.");
-                    std::string name = (*m_ownArmy)[t].GetName();
+                    str = _("View %{name} info.");
+                    name = (*m_ownArmy)[t].GetName();
                     String::Lower(name);
                     String::Replace(str, "%{name}", name);
                     m_gui->Status(str, true);
                     m_gui->Redraw();
                     cursor.SetThemes(cursor.WAR_INFO);
                     if(click) {
-                        cursor.SetThemes(cursor.POINTER); 
                         Dialog::ArmyInfo((*m_ownArmy)[t], Dialog::BATTLE|Dialog::READONLY|Dialog::BUTTONS);
                     }
                     if(le.MousePressRight()) {
@@ -2006,8 +1998,8 @@ namespace Battle
                     // enemy troop
                     int mp;
                     if(myTroop.shots > 0 && !myTroop.Modes(Army::HANDFIGHTING)) {
-                        std::string str = _("Shoot %{name} (%{value} shot(s) left)");
-                        std::string name = (*m_oppArmy)[t].GetName();
+                        str = _("Shoot %{name} (%{value} shot(s) left)");
+                        name = (*m_oppArmy)[t].GetName();
                         String::Lower(name);
                         String::Replace(str, "%{name}", name);
                         String::Replace(str, "%{value}", myTroop.shots);
@@ -2024,8 +2016,8 @@ namespace Battle
                             Dialog::ArmyInfo((*m_oppArmy)[t], Dialog::BATTLE);
                         }
                     } else if(mp = m_battlefield->CanAttack(myTroop, m_movePoints, (*m_oppArmy)[t], le.GetMouseCursor() - Bf2Scr(cur_pt)), mp >= 0) {
-                        std::string str = _("Attack %{name}");
-                        std::string name = (*m_oppArmy)[t].GetName();
+                        str = _("Attack %{name}");
+                        name = (*m_oppArmy)[t].GetName();
                         String::Lower(name);
                         String::Replace(str, "%{name}", name);
                         m_gui->Status(str, true);
@@ -2041,20 +2033,20 @@ namespace Battle
                         if(click) {
                             move = m_movePoints[mp];
                             attack = cur_pt;
+                    	    cursor.SetThemes(cursor.WAR_NONE);
                             return GUI::NONE;
                         } else if(le.MousePressRight())
                             Dialog::ArmyInfo((*m_oppArmy)[t], Dialog::BATTLE);
                     } else {
                         // attack
-                        std::string str = _("View %{name} info.");
-                        std::string name = (*m_oppArmy)[t].GetName();
+                        str = _("View %{name} info.");
+                        name = (*m_oppArmy)[t].GetName();
                         String::Lower(name);
                         String::Replace(str, "%{name}", name);
                         m_gui->Status(str, true);
                         m_gui->Redraw();
                         cursor.SetThemes(cursor.WAR_INFO);
                         if(click) {
-                            cursor.SetThemes(cursor.POINTER);
                             Dialog::ArmyInfo((*m_oppArmy)[t], Dialog::BATTLE|Dialog::READONLY|Dialog::BUTTONS);
                         } else if(le.MousePressRight()) {
                             Dialog::ArmyInfo((*m_oppArmy)[t], Dialog::BATTLE);
@@ -2062,14 +2054,20 @@ namespace Battle
                     }
                 } else {
                     // empty cell
-                    bool canmove = std::find(m_movePoints.begin(), m_movePoints.end(), cur_pt) != m_movePoints.end();
-                    if(canmove) {
-                        std::string str2, str;
-                        if(myTroop.isFly()) cursor.SetThemes(cursor.WAR_FLIGHT), str2 = _("Fly");
-                        else cursor.SetThemes(cursor.WAR_MOVE), str2 = _("Move");
-                        str = _("%{move} %{name} here.");
-                        String::Replace(str, "%{move}", str2);
-                        std::string name = myTroop.GetName();
+                    // canmove
+                    if(std::find(m_movePoints.begin(), m_movePoints.end(), cur_pt) != m_movePoints.end())
+		    {
+                        if(myTroop.isFly())
+			{
+			    cursor.SetThemes(cursor.WAR_FLIGHT);
+                    	    str = _("Fly %{name} here.");
+			}
+                        else
+			{
+			    cursor.SetThemes(cursor.WAR_MOVE);
+                    	    str = _("Move %{name} here.");
+                        }
+                        name = myTroop.GetName();
                         String::Lower(name);
                         String::Replace(str, "%{name}", name);
                         m_gui->Status(str, true);
@@ -2089,6 +2087,12 @@ namespace Battle
                 m_gui->Redraw();
                 cursor.SetThemes(cursor.WAR_NONE);
             }
+
+	    if(!cursor.isVisible())
+	    {
+		cursor.Show();
+		display.Flip();
+	    }
         }
 
         
@@ -2139,6 +2143,12 @@ namespace Battle
             // exit
             if(le.KeyPress(KEY_ESCAPE)) return false;
             if(le.MousePressRight(Rect(0, 0, display.w(), display.h()))) return false;
+
+	    if(!cursor.isVisible())
+	    {
+		cursor.Show();
+		display.Flip();
+	    }
         }
         return true;
     }
@@ -2992,6 +3002,7 @@ namespace Battle
         m_skip = new Button(g_baseOffset.x + 640-48, g_baseOffset.y + 480-36, ICN::TEXTBAR, 0, 1);
         m_auto = new Button(g_baseOffset.x, g_baseOffset.y + 480-36, ICN::TEXTBAR, 4, 5);
         m_settings = new Button(g_baseOffset.x, g_baseOffset.y + 480-18, ICN::TEXTBAR, 6, 7);
+        cursor.Show();
     }
 
     GUI::~GUI()
@@ -3078,6 +3089,12 @@ namespace Battle
             cursor.SetThemes(cursor.WAR_INFO);
             mouseActive = true;
         }
+
+	    if(!cursor.isVisible())
+	    {
+		cursor.Show();
+		display.Flip();
+	    }
 
         return NONE;
     }

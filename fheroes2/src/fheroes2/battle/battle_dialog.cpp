@@ -253,6 +253,7 @@ void Battle::SettingsDialog()
     Background back(pos_rt);
     back.Save();
 
+    display.FillRect(0x00, 0x00, 0x00, back.GetRect());
     display.Blit(dialog, pos_rt.x, pos_rt.y);
     
     // 0-2 speed
@@ -273,8 +274,8 @@ void Battle::SettingsDialog()
     if(BattleSettings::Get().Modes(BattleSettings::OPT_MOVESHADOW)) optSM.PressDraw();
     if(BattleSettings::Get().Modes(BattleSettings::OPT_MOUSESHADOW)) optSC.PressDraw();
 
-    display.Flip();
     cursor.Show();
+    display.Flip();
 
     // dialog menu loop
     while(le.HandleEvents()) {
@@ -376,8 +377,8 @@ Army::battle_t Battle::HeroStatus(HeroBase &hero, StatusBar &statusBar, Spell::s
     buttonSur.Draw();
     buttonOK.Draw();
 
-    display.Flip();
     cursor.Show();
+    display.Flip();
 
     // dialog menu loop
     while(le.HandleEvents())

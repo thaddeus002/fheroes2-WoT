@@ -63,6 +63,7 @@ Dialog::answer_t Dialog::ArmyInfo(const Army::BattleTroop & battroop, u16 flags)
 
     Cursor & cursor = Cursor::Get();
     cursor.Hide();
+    cursor.SetThemes(cursor.POINTER);
 
     Background back(pos_rt);
     back.Save();

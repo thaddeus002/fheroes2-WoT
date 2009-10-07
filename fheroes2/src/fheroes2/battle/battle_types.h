@@ -218,7 +218,7 @@ namespace Battle
             void DrawGrid();
             void DrawOverBackground(const PointList &, const Army::BattleTroop &);
             void DrawCell(const Point&);
-            void DrawMark(const Point&, int animframe=0);
+            //void DrawMark(const Point&, int animframe=0);
             void DrawCursor(const Point &);
             void DrawShadow(const Point &);
             void DrawPath(const PointList &);
