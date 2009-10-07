@@ -538,11 +538,15 @@ Battle::BattleControl::~BattleControl()
 
 bool Battle::BattleControl::ShowLeftHeroResults(HeroBase &left, HeroBase *right, Army::battle_t result)
 {
-    if(world.GetKingdom(left.GetColor()).Control() == Game::LOCAL &&
-       world.GetMyKingdom().GetColor() == left.GetColor())
+    //If we reach this function, that means that the results are being displayed.
+    //Accordingly, at least one player has a vested interest in the results.
+    //So, the heuristic used is:
+    //- if the player on the left is human, show their results
+    //- if the player on the right is human show their results instead
+
+    if(world.GetKingdom(left.GetColor()).Control() == Game::LOCAL)
         return true;
-    else if(right && world.GetKingdom(right->GetColor()).Control() == Game::LOCAL &&
-       world.GetMyKingdom().GetColor() == right->GetColor())
+    else if(right && world.GetKingdom(right->GetColor()).Control() == Game::LOCAL)
         return false;
     else return true;
 }
