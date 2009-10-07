@@ -876,6 +876,7 @@ void Surface::ScaleMinifyByTwo(Surface & sf_dst, const Surface & sf_src, u8 mul)
     if(2 > w || 2 > h){ Error::Verbose("Surface::ScaleMinifyByTwo: small size"); return; };
 
     sf_dst.Set(w, h, sf_src.depth(), SWSURFACE);
+    sf_dst.SetColorKey();
     sf_dst.Lock();
 
     for(y = 0; y < h; y++)
