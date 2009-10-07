@@ -715,7 +715,8 @@ void Surface::MakeStencil(Surface & dst, u32 col) const
             // - 0x0F: full intensity
             // - 0x04: shadow
             // - 0x00: transparent (but not colorkeyed)
-            if(clkey != pixel && (pixel & surface->format->Amask) >> surface->format->Ashift == 0x0F)
+	    //         and skip for 8 bit
+            if(clkey != pixel && (depth() == 8 || ((pixel & surface->format->Amask) >> surface->format->Ashift == 0x0F))) 
             {
                 dst.SetPixel(x, y, col);
             }
