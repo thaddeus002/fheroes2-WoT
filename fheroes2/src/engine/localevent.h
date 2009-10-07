@@ -165,6 +165,10 @@ public:
     void ResetReleaseRight(void);
     void ResetReleaseMiddle(void);
     
+    bool MouseClickLeft(void);
+    bool MouseClickMiddle(void);
+    bool MouseClickRight(void);
+
     bool MouseClickLeft(const Rect &rt);
     bool MouseClickMiddle(const Rect &rt);
     bool MouseClickRight(const Rect &rt);

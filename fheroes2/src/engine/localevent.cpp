@@ -334,6 +334,17 @@ void LocalEvent::HandleMouseWheelEvent(const SDL_MouseButtonEvent & button)
 	mouse_rm = mouse_cu;
 }
 
+bool LocalEvent::MouseClickLeft(void)
+{
+    if(MouseReleaseLeft() && (PRESS_LEFT & modes) && (modes & TAP_MODE))
+    {
+	ResetModes(PRESS_LEFT);
+	return true;
+    }
+
+    return false;
+}
+
 bool LocalEvent::MouseClickLeft(const Rect &rt)
 {
     if(MouseReleaseLeft() && (rt & mouse_rl) && (PRESS_LEFT & modes) && ((modes & TAP_MODE) || (rt & mouse_pl)))
@@ -345,11 +356,33 @@ bool LocalEvent::MouseClickLeft(const Rect &rt)
     return false;
 }
 
+bool LocalEvent::MouseClickMiddle(void)
+{
+    if(MouseReleaseMiddle() && (PRESS_MIDDLE & modes))
+    {
+	ResetModes(PRESS_MIDDLE);
+	return true;
+    }
+
+    return false;
+}
+
 bool LocalEvent::MouseClickMiddle(const Rect &rt)
 {
     if(MouseReleaseMiddle() && (rt & mouse_pm) && (rt & mouse_rm) && (PRESS_MIDDLE & modes))
     {
 	ResetModes(PRESS_MIDDLE);
+	return true;
+    }
+
+    return false;
+}
+
+bool LocalEvent::MouseClickRight(void)
+{
+    if(MouseReleaseRight() && (PRESS_RIGHT & modes))
+    {
+	ResetModes(PRESS_RIGHT);
 	return true;
     }
 
