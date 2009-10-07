@@ -336,7 +336,7 @@ void LocalEvent::HandleMouseWheelEvent(const SDL_MouseButtonEvent & button)
 
 bool LocalEvent::MouseClickLeft(void)
 {
-    if(MouseReleaseLeft() && (PRESS_LEFT & modes) && (modes & TAP_MODE))
+    if(MouseReleaseLeft() && (PRESS_LEFT & modes))
     {
 	ResetModes(PRESS_LEFT);
 	return true;
