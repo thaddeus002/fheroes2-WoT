@@ -1,6 +1,8 @@
-SVN - up to r1225
+SVN - up to r1235
 
-Oct,  5, 2009 - Development build, 1225
+Oct,  7, 2009 - Development build, 1235
++ Fixed for Battle: DrawShadow and DrawCell support 8 bit for default depth, fast move cursor for battle scene, fix left click for move current troop, set cursor WAR_NONE after kick
++ added puzzle dialogue for pocketpc version, fix for redraw heroes move
 + added binary save format
 + few updates for pocketpc version
 + added buy boat and marketplace dialogue for pocketpc
