@@ -19,7 +19,7 @@ ifdef PREFIX
 CFLAGS := $(CFLAGS) -I$(PREFIX)/include
 endif
 
-SVN  := $(shell svnversions ..)
+SVN  := $(shell svnversion ..)
 CFLAGS := $(CFLAGS) -DSVN_REVISION="\"$(SVN)\""
 
 SOURCEROOT := ../fheroes2

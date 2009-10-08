@@ -1,4 +1,8 @@
-SVN - up to r1235
+SVN - up to r1237
+
++ Fixed incorrect battle results being displayed when battling AI.
++ Fixed trolls starting with much more health than they should in battle.
++ Fixed various problems in battle causing troops to attack from too far away.
 
 Oct,  7, 2009 - Development build, 1235
 + Fixed for Battle: DrawShadow and DrawCell support 8 bit for default depth, fast move cursor for battle scene, fix left click for move current troop, set cursor WAR_NONE after kick

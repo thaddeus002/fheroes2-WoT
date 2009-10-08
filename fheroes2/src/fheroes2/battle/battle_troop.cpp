@@ -338,7 +338,7 @@ void Army::BattleTroop::NewTurn(void)
     {
         case Monster::TROLL:
         case Monster::WAR_TROLL:
-            hp = Monster::GetHitPoints() * count;
+            hp = Monster::GetHitPoints();
             break;
             
         default: break;

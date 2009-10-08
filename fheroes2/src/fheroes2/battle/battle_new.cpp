@@ -493,7 +493,7 @@ Battle::BattleControl::BattleControl(Heroes &hero1, Heroes &hero2, const Maps::T
 Battle::BattleControl::BattleControl(Heroes &hero, Army::army_t& army, const Maps::Tiles &tile, u32 &exp)
 : m_battlefield(NULL, &hero, NULL, hero.GetArmy(), army, g_baseOffset, tile)
 {
-    Army::BattleArmy_t heroArmyOrig, oppArmy, oppArmyOrig;
+    Army::BattleArmy_t heroArmyOrig, oppArmyOrig;
     ArmyToBattleArmy(hero.GetArmy(), heroArmyOrig);
     ArmyToBattleArmy(army, oppArmyOrig);
     m_commanders[0] = hero.GetArmy().GetCommander();
@@ -2362,20 +2362,22 @@ namespace Battle
      *  \param attacker   Troop which is attacking
      *  \param target     Troop which is defending
      *  \param attackFrom Battlefield point from which to attack
+     *  \param adjustedResult Actual point which should be used
      */
-    bool ComputerTurn::CanAttackFrom(const Army::BattleTroop &attacker, const Army::BattleTroop &target, const Point &attackFrom)
+    bool ComputerTurn::CanAttackFrom(const Army::BattleTroop &attacker, const Army::BattleTroop &target, const Point &attackFrom, Point &adjustedResult)
     {
-        //FIXME: These calculations are based on current reflection state
+        bool reflectAttacker = target.Position().x < attacker.Position().x;
         std::vector<Point> from, to;
+        
         from.push_back(attackFrom);
         if(attacker.isWide())
-            from.push_back(attackFrom + Point( attacker.IsReflected() ? -1 : 1, 0 ));
+            from.push_back(attackFrom + Point( reflectAttacker ? -1 : 1, 0 ));
         to.push_back(target.Position());
         if(target.isWide())
             to.push_back(target.Position() + Point ( target.IsReflected() ? -1 : 1, 0 ));
 
         s8 minDX, maxDX;
-        if(target.Position().y % 2)
+        if(target.Position().y % 2 == 0)
         {
             minDX = 0;
             maxDX = 1;
@@ -2385,19 +2387,27 @@ namespace Battle
             minDX = -1;
             maxDX = 0;
         }
-    
+
         for(u16 i = 0; i < from.size(); i++)
+        {
             for(u16 j = 0; j < to.size(); j++)
             {
                 int dx = from[i].x - to[j].x;
                 int dy = from[i].y - to[j].y;
-                //printf("- %d,%d to %d,%d: %d,%d (%d-%d)\n", from[i].x, from[i].y, to[j].x, to[j].y, dx, dy, minDX, maxDX);
+                //printf("- %d,%d to %d,%d: %d,%d (%d - %d)\n", from[i].x, from[i].y, to[j].x, to[j].y, dx, dy, minDX, maxDX);
             
-                if(abs(dy) == 1 && dx >= minDX && dx <= maxDX)
+                if((abs(dy) == 1 && dx >= minDX && dx <= maxDX)
+                || (!dy && abs(dx) == 1))
+                {       
+                    adjustedResult = from[i];
+                    if(!dy && attacker.isWide())
+                        adjustedResult += Point( reflectAttacker ? 1 : 0, 0 );
                     return true;
-                else if(!dy && abs(dx) == 1)
-                    return true;
+                }
             }
+            minDX = 0;
+            maxDX = 0;
+        }
         return false;
     }
 
@@ -2410,7 +2420,7 @@ namespace Battle
      */
     Point ComputerTurn::GetReachableAttackCell(const Army::BattleTroop &target, const Army::BattleArmy_t &army1, const Army::BattleArmy_t &army2, TroopIndex troopN)
     {
-        const Army::BattleTroop &attacker = troopN >= 0 ? army1[troopN] : army2[-troopN - 1];
+        const Army::BattleTroop &attacker = m_battlefield->GetTroopFromIndex(troopN);
         bool targetWide = target.isWide();
         bool attackerWide = attacker.isWide();
         Point delta, p = target.Position();
@@ -2442,11 +2452,16 @@ namespace Battle
             for(delta.y = ystart; delta.y != yend; delta.y += yincr)
                 if((delta.x || delta.y) && BfValid(p + delta))
                 {
+                    Point adjusted(-1, -1);
+                    
                     // if(delta.x > 0 && delta.y) continue;
                     if(m_battlefield->CellFreeFor(p + delta, attacker, troopN)
                     && std::find(m_movePoints.begin(), m_movePoints.end(), p + delta) != m_movePoints.end()
-                    && CanAttackFrom(attacker, target, p + delta))
-                        return p + delta;
+                    && CanAttackFrom(attacker, target, p + delta, adjusted))
+                    {
+                        //printf("returning %d,%d\n", adjusted.x, adjusted.y);
+                        return adjusted;
+                    }
                 }
         return Point(-1, -1);
     }
