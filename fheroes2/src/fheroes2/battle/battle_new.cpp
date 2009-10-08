@@ -2015,6 +2015,7 @@ namespace Battle
                             cursor.SetThemes(cursor.WAR_ARROW);
                         if(click) {
                             attack = cur_pt;
+                    	    cursor.SetThemes(cursor.WAR_NONE);
                             return GUI::NONE;
                         } else if(le.MousePressRight()) {
                             Dialog::ArmyInfo((*m_oppArmy)[t], Dialog::BATTLE);
@@ -2078,6 +2079,7 @@ namespace Battle
                         m_gui->Redraw();
                         if(click) {
                             move = cur_pt;
+                    	    cursor.SetThemes(cursor.WAR_NONE);
                             return GUI::NONE;
                         }
                     } else {
