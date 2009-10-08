@@ -912,6 +912,9 @@ namespace ICN
 
 	{ UNKNOWN,	"UNKNOWN.ICN" },
     };
+
+    u8 missile9(double, double);
+    u8 missile7(double, double);
 };
 
 const char* ICN::GetString(const icn_t icn)
@@ -1695,4 +1698,58 @@ bool ICN::SkipBottomForRedrawHeroes(icn_t icn, u16 index)
         default: break;
     }
     return false;
+}
+
+u8 ICN::missile9(double dx, double dy)
+{
+    if(0 == dx)		return dy > 0 ? 0 : 9;
+    else
+    if(0 == dy)		return 4;
+
+    double tan = dy / dx;
+
+    // tan 30: 0 - 30
+    if(0.577 >= tan)	return dy > 0 ? 3 : 5;
+    else
+    // tan 60: 90 - 60
+    if(1.732 <= tan)	return dy > 0 ? 1 : 7;
+
+    // tan 45: 30 - 60
+    return dy > 0 ? 2 : 6;
+}
+
+u8 ICN::missile7(double dx, double dy)
+{
+    if(0 == dx)		return dy > 0 ? 0 : 6;
+    else
+    if(0 == dy)		return 3;
+
+    double tan = dy / dx;
+
+    // tan 45: 0 - 45
+    if(1 >= tan)	return dx > 0 ? 2 : 4;
+
+    // 45 - 90
+    return dx > 0 ? 1 : 5;
+}
+
+u8 ICN::GetMissIndex(icn_t icn, double dx, double dy)
+{
+    switch(icn)
+    {
+	case KEEP:
+        case ARCH_MSL:
+        case ORC__MSL: return missile9(dx, dy);
+
+        case ELF__MSL:
+        case DRUIDMSL:
+        case HALFLMSL:
+        case TITANMSL: return missile7(dx, dy);
+
+        case TROLLMSL:
+        case LICH_MSL:
+	default: break;
+    }
+
+    return 0;
 }

@@ -937,6 +937,7 @@ namespace ICN
     bool NeedMinify4PocketPC(icn_t, u16);
     bool SkipBottomForRedrawHeroes(icn_t, u16);
     icn_t PORTxxxx(u8);
+    u8   GetMissIndex(icn_t, double, double);
     
     icn_t FromSpell(u8);
 };
