@@ -193,6 +193,9 @@ int main(int argc, char **argv)
 	    Display::HideCursor();
 	    Display::SetCaption(strtmp);
 
+        //Ensure the mouse position is updated to prevent bad initial values.
+        LocalEvent::Get().GetMouseCursor();
+
 #ifdef WITH_ZLIB
     	    ZSurface zicons;
 	    if(zicons.Load(FH2_ICONS_WIDTH, FH2_ICONS_HEIGHT, FH2_ICONS_BPP, fh2_icons_pack, FH2_ICONS_SIZE, true)) Display::SetIcons(zicons);

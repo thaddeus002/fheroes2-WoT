@@ -776,6 +776,7 @@ Game::menu_t Game::HumanTurn(void)
     Settings & conf = Settings::Get();
 
     LocalEvent & le = LocalEvent::Get();
+    
     u32 ticket = 0;
     Game::menu_t res = CANCEL;
 
@@ -880,7 +881,7 @@ Game::menu_t Game::HumanTurn(void)
 	    default: break;
 	}
 
-	// scroll area maps left
+    // scroll area maps left
 	if(le.MouseCursor(I.GetAreaScrollLeft())) I.gameArea.SetScroll(SCROLL_LEFT);
         else
 	// scroll area maps right
@@ -951,13 +952,14 @@ Game::menu_t Game::HumanTurn(void)
 	    }
 	    I.controlPanel.QueueEventProcessing(res);
 	}
-	else
-	// cursor over game area
-	if(le.MouseCursor(I.gameArea.GetArea()))
-	{
-	    I.gameArea.QueueEventProcessing();
-	}
+    else
+    // cursor over game area
+    if(le.MouseCursor(I.gameArea.GetArea()))
+    {
+        I.gameArea.QueueEventProcessing();
+    }
 
+	
 	// animation
         if(Game::ShouldAnimateInfrequent(ticket, 1))
         {

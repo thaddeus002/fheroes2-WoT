@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2009-10-07 22:00-0400\n"
+"POT-Creation-Date: 2009-10-07 22:30-0400\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1532,7 +1532,7 @@ msgid "Cancel back to the main menu."
 msgstr ""
 
 #: ../fheroes2/editor/editor_startgame.cpp:173
-#: ../fheroes2/game/game_startgame.cpp:1389
+#: ../fheroes2/game/game_startgame.cpp:1391
 msgid "Are you sure you want to quit?"
 msgstr ""
 
@@ -2181,79 +2181,79 @@ msgstr ""
 msgid "%{color} player's turn"
 msgstr ""
 
-#: ../fheroes2/game/game_startgame.cpp:1031
+#: ../fheroes2/game/game_startgame.cpp:1033
 msgid ""
 "%{color} player, you have lost your last town. If you do not conquer another "
 "town in next week, you will be eliminated."
 msgstr ""
 
-#: ../fheroes2/game/game_startgame.cpp:1075
+#: ../fheroes2/game/game_startgame.cpp:1077
 msgid "Try searching on clear ground."
 msgstr ""
 
-#: ../fheroes2/game/game_startgame.cpp:1089
+#: ../fheroes2/game/game_startgame.cpp:1091
 msgid "Congratulations!"
 msgstr ""
 
-#: ../fheroes2/game/game_startgame.cpp:1089
+#: ../fheroes2/game/game_startgame.cpp:1091
 msgid "After spending many hours digging here, you have uncovered the "
 msgstr ""
 
-#: ../fheroes2/game/game_startgame.cpp:1092
+#: ../fheroes2/game/game_startgame.cpp:1094
 msgid "Nothing here. Where could it be?"
 msgstr ""
 
-#: ../fheroes2/game/game_startgame.cpp:1100
+#: ../fheroes2/game/game_startgame.cpp:1102
 msgid "Digging for artifacts requires a whole day, try again tomorrow."
 msgstr ""
 
-#: ../fheroes2/game/game_startgame.cpp:1307
+#: ../fheroes2/game/game_startgame.cpp:1309
 msgid ""
 "One or more heroes may still move, are you sure you want to end your turn?"
 msgstr ""
 
-#: ../fheroes2/game/game_startgame.cpp:1339
+#: ../fheroes2/game/game_startgame.cpp:1341
 msgid "Are you sure you want to restart? (Your current game will be lost)"
 msgstr ""
 
-#: ../fheroes2/game/game_startgame.cpp:1426
+#: ../fheroes2/game/game_startgame.cpp:1428
 msgid "Game saved successfully."
 msgstr ""
 
-#: ../fheroes2/game/game_startgame.cpp:1434
+#: ../fheroes2/game/game_startgame.cpp:1436
 msgid ""
 "Are you sure you want to load a new game? (Your current game will be lost)"
 msgstr ""
 
-#: ../fheroes2/game/game_startgame.cpp:1550
+#: ../fheroes2/game/game_startgame.cpp:1552
 msgid "Astrologers proclaim month of the %{name}."
 msgstr ""
 
-#: ../fheroes2/game/game_startgame.cpp:1550
+#: ../fheroes2/game/game_startgame.cpp:1552
 msgid "Astrologers proclaim week of the %{name}."
 msgstr ""
 
-#: ../fheroes2/game/game_startgame.cpp:1554
+#: ../fheroes2/game/game_startgame.cpp:1556
 msgid " All populations are halved."
 msgstr ""
 
-#: ../fheroes2/game/game_startgame.cpp:1554
+#: ../fheroes2/game/game_startgame.cpp:1556
 msgid " All dwellings increase population."
 msgstr ""
 
-#: ../fheroes2/game/game_startgame.cpp:1585
+#: ../fheroes2/game/game_startgame.cpp:1587
 msgid ""
 "%{color} player, your heroes abandon you, and you are banished from this "
 "land."
 msgstr ""
 
-#: ../fheroes2/game/game_startgame.cpp:1594
+#: ../fheroes2/game/game_startgame.cpp:1596
 msgid ""
 "%{color} player, this is your last day to capture a town, or you will be "
 "banished from this land."
 msgstr ""
 
-#: ../fheroes2/game/game_startgame.cpp:1601
+#: ../fheroes2/game/game_startgame.cpp:1603
 msgid ""
 "%{color} player, you only have %{day} days left to capture a town, or you "
 "will be banished from this land."
