@@ -1675,7 +1675,7 @@ bool ICN::NeedMinify4PocketPC(icn_t icn, u16 index)
     return false;
 }
 
-bool ICN::SkipForRedrawHeroes(icn_t icn, u16 index)
+bool ICN::SkipBottomForRedrawHeroes(icn_t icn, u16 index)
 {
     switch(icn)
     {

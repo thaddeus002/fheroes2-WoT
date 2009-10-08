@@ -127,6 +127,7 @@ namespace Maps
 	void RedrawTop(void) const;
 	void RedrawTop(Surface &, const Interface::GameArea &) const;
 	void RedrawTop(Surface &, s16, s16, const Interface::GameArea &, const TilesAddon* skip = NULL) const;
+	void RedrawTop4Hero(Surface &, const Interface::GameArea &) const;
 
 	void AddonsPushLevel1(const MP2::mp2tile_t & mt);
 	void AddonsPushLevel1(const MP2::mp2addon_t & ma);

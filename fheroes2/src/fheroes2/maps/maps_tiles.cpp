@@ -352,9 +352,9 @@ void Maps::Tiles::RedrawBottom4Hero(Surface & dst, const Interface::GameArea & a
 	    const u8 & index  = (*it1).index;
 	    const ICN::icn_t icn = MP2::GetICNObject(object);
 
-	    if(SkipForRedrawHeroes(icn, index)) continue;
+	    if(ICN::SkipBottomForRedrawHeroes(icn, index)) continue;
 
-	    if(ICN::UNKNOWN != icn && ICN::MINIHERO != icn && ICN::MONS32 != icn)
+	    if(ICN::UNKNOWN != icn)
 	    {
 		const Sprite & sprite = AGG::GetICN(icn, index);
 		dst.Blit(sprite, dstx + sprite.x(), dsty + sprite.y());
@@ -428,6 +428,41 @@ void Maps::Tiles::RedrawTop(Surface & dst, s16 dstx, s16 dsty, const Interface::
 		else
 		    dst.Blit(sprite, dstx + sprite.x(), dsty + sprite.y());
 
+		// possible anime
+		if(const u16 anime_index = ICN::AnimationFrame(icn, index, Maps::AnimationTicket()))
+		{
+		    const Sprite & anime_sprite = AGG::GetICN(icn, anime_index);
+		    dst.Blit(anime_sprite, dstx + anime_sprite.x(), dsty + anime_sprite.y());
+		}
+	    }
+	}
+    }
+}
+
+void Maps::Tiles::RedrawTop4Hero(Surface & dst, const Interface::GameArea & area) const
+{
+    const Point mp(maps_index % world.w(), maps_index / world.w());
+
+    if(!(area.GetRectMaps() & mp)) return;
+
+    const s16 & dstx = area.GetArea().x + TILEWIDTH * (mp.x - area.GetRectMaps().x);
+    const s16 & dsty = area.GetArea().y + TILEWIDTH * (mp.y - area.GetRectMaps().y);
+
+    if(addons_level2.size())
+    {
+	std::list<TilesAddon>::const_iterator it1 = addons_level2.begin();
+	std::list<TilesAddon>::const_iterator it2 = addons_level2.end();
+
+	for(; it1 != it2; ++it1)
+	{
+	    if(MP2::isGroundObject((*it1).object)) continue;
+
+	    const u8 & object = (*it1).object;
+	    const u8 & index  = (*it1).index;
+	    const ICN::icn_t icn = MP2::GetICNObject(object);
+
+	    if(ICN::UNKNOWN != icn)
+	    {
 		// possible anime
 		if(const u16 anime_index = ICN::AnimationFrame(icn, index, Maps::AnimationTicket()))
 		{
