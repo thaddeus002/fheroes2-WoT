@@ -52,7 +52,7 @@ void Battle::BattleSummary(HeroBase &hero, u32 exp, const Army::ArmyPairs &armie
     if(BattleSettings::Get().Modes(BattleSettings::OPT_LOGICONLY))
         return;
 
-    AGG::PlayMusic(status == Army::WIN ? MUS::BATTLEWIN : MUS::BATTLELOSE);
+    AGG::PlayMusic(status == Army::WIN ? MUS::BATTLEWIN : MUS::BATTLELOSE, false);
 
     const std::string &name = hero.GetName();
     ICN::icn_t interface = Settings::Get().EvilInterface() ? ICN::WINLOSEE : ICN::WINLOSE;
