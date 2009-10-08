@@ -354,7 +354,7 @@ void Maps::Tiles::RedrawBottom4Hero(Surface & dst, const Interface::GameArea & a
 
 	    if(ICN::SkipBottomForRedrawHeroes(icn, index)) continue;
 
-	    if(ICN::UNKNOWN != icn)
+	    if(ICN::UNKNOWN != icn && ICN::MINIHERO != icn && ICN::MONS32 != icn)
 	    {
 		const Sprite & sprite = AGG::GetICN(icn, index);
 		dst.Blit(sprite, dstx + sprite.x(), dsty + sprite.y());

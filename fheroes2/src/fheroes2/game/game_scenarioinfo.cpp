@@ -261,6 +261,7 @@ Game::menu_t Game::ScenarioInfo(void)
 		    conf.SetKingdomRace(color, race);
 		    Scenario::RedrawStaticInfo(pointPanel);
 		    levelCursor.Redraw();
+		    Scenario::RedrawDifficultyInfo(pointDifficultyInfo);
 		    Scenario::RedrawOpponentsInfo(pointOpponentInfo);
 		    Scenario::RedrawClassInfo(pointClassInfo);
 		    RedrawRatingInfo(rating);

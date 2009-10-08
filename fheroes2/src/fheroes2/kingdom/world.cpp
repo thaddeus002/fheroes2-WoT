@@ -1206,6 +1206,7 @@ void World::Reset(void)
     map_captureobj.clear();
 
     ultimate_artifact = 0xFFFF;
+    Surface::FreeSurface(puzzle_surface);
 
     day = 0;
     week = 0;
