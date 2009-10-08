@@ -1470,18 +1470,18 @@ void Battle::BattleControl::PerformAttackAnimation(Army::BattleTroop &attacker, 
         targetLen = std::max(currentTargetLen, targetLen);
     }
 
-    int state = PREATTACK, missframe = 0, missindex = 0;
+    int state = PREATTACK, missframe = 0;
     Point miss_start(attacker.Position().x + (attacker.isWide() ? (attacker.IsReflected() ? -1 : 1): 0), attacker.Position().y);
     miss_start = Bf2Scr(miss_start);
     Point miss_step(Bf2Scr(targets[0]->Position()));
     miss_step -= miss_start;
-    const int deltaX = abs(attacker.Position().x - targets[0]->Position().x);
-    const int deltaY = abs(attacker.Position().y - targets[0]->Position().y);
-    const int MISSFRAMES = std::max(std::max(deltaX, deltaY) * 2 / 3, 1); //avoid divide by zero
+    const int deltaX = attacker.Position().x - targets[0]->Position().x;
+    const int deltaY = attacker.Position().y - targets[0]->Position().y;
+    const int MISSFRAMES = std::max(std::max(abs(deltaX), abs(deltaY)) * 2 / 3, 1); //avoid divide by zero
     miss_step.x /= MISSFRAMES;
     miss_step.y /= MISSFRAMES;
     miss_start.y -= CELLH;
-        
+
     u8 mytrooptate;
     if(targets[0]->Position().y > attacker.Position().y)
         mytrooptate = Monster::AS_ATT3P;
@@ -1492,7 +1492,7 @@ void Battle::BattleControl::PerformAttackAnimation(Army::BattleTroop &attacker, 
         
     int delayFrames;
          
-    u8 start, prepLen, attackLen;
+    u8 start, prepLen, attackLen, missindex = 0;
     attacker.GetAnimFrames(mytrooptate & ~Monster::AS_ATTPREP, start, attackLen);
     attacker.GetAnimFrames(Monster::AS_ATTPREP, start, prepLen);
     attacker.attackRanged = ranged;
@@ -1503,11 +1503,12 @@ void Battle::BattleControl::PerformAttackAnimation(Army::BattleTroop &attacker, 
     } else {
         AGG::PlaySound(attacker.M82Shot());
         delayFrames = prepLen + attackLen + 3;
-        int maxind = AGG::GetICNCount(attacker.ICNMiss());
-        if(maxind > 1) {
-            double angle = M_PI_2 - atan2(-miss_step.y, miss_step.x);
-            missindex = (int)(angle/M_PI * maxind);
-        } else missindex = 0;
+        missindex = ICN::GetMissIndex(attacker.ICNMiss(), deltaX, deltaY);
+//        int maxind = AGG::GetICNCount(attacker.ICNMiss());
+//        if(maxind > 1) {
+//            double angle = M_PI_2 - atan2(-miss_step.y, miss_step.x);
+//            missindex = (int)(angle/M_PI * maxind);
+//        } else missindex = 0;
     }
     attacker.Animate(mytrooptate);
     while(le.HandleEvents())
@@ -1558,11 +1559,13 @@ void Battle::BattleControl::PerformAttackAnimation(Army::BattleTroop &attacker, 
         }
         m_battlefield.Redraw();
         m_gui->Redraw();
+	cursor.Hide();
         if(state == MISSILE_FLIGHT) {
-            display.Blit(AGG::GetICN(attacker.ICNMiss(), abs(missindex), missindex < 0), miss_start);
+            display.Blit(AGG::GetICN(attacker.ICNMiss(), missindex, deltaX > 0), miss_start);
             miss_start += miss_step;
             missframe ++;
         }
+	cursor.Show();
         display.Flip();
     }
 }
