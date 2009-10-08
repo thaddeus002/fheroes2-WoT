@@ -82,7 +82,7 @@ void Puzzle::ShowMapsDialog(void) const
     Cursor::themes_t old_cursor = cursor.Themes();
     cursor.SetThemes(Cursor::POINTER);
 
-    //AGG::PlayMusic(MUS::PUZZLE);
+    if(Settings::Get().Modes(Settings::MUSIC_CD)) AGG::PlayMusic(MUS::PUZZLE);
 
     const Surface & sf = world.GetPuzzleSurface();
 
