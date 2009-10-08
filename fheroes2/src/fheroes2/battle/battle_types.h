@@ -393,7 +393,7 @@ namespace Battle
         void MoveOrAttack(TroopIndex, Point &, Point &, bool);
         bool AttackRangedTroop(TroopIndex, Point &, Point &);
         bool AttackNonRangedTroop(TroopIndex, Point &, Point &);
-        bool CanAttackFrom(const Army::BattleTroop &, const Army::BattleTroop &, const Point &, Point &);
+        bool CanAttackFrom(const Army::BattleTroop &, const Army::BattleTroop &, const Point &);
         Point GetReachableAttackCell(const Army::BattleTroop &, const Army::BattleArmy_t &, const Army::BattleArmy_t &, TroopIndex);
     };
 }

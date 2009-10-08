@@ -1222,9 +1222,7 @@ Battle::FlyAction::FlyAction(const Point &move, Army::BattleTroop &myTroop)
 : Battle::MoveAction(myTroop)
 {
     const Point &start = Bf2Scr(myTroop.Position());
-    if(myTroop.isWide())
-        m_end = Bf2Scr(move + Point( move.x < myTroop.Position().x ? 1 : 0 ) );
-    else m_end = Bf2Scr(move);
+    m_end = Bf2Scr(move);
 
     myTroop.SetMoving(Army::IN_MOTION);
         
@@ -2367,9 +2365,8 @@ namespace Battle
      *  \param attacker   Troop which is attacking
      *  \param target     Troop which is defending
      *  \param attackFrom Battlefield point from which to attack
-     *  \param adjustedResult Actual point which should be used
      */
-    bool ComputerTurn::CanAttackFrom(const Army::BattleTroop &attacker, const Army::BattleTroop &target, const Point &attackFrom, Point &adjustedResult)
+    bool ComputerTurn::CanAttackFrom(const Army::BattleTroop &attacker, const Army::BattleTroop &target, const Point &attackFrom)
     {
         bool reflectAttacker = target.Position().x < attacker.Position().x;
         std::vector<Point> from, to;
@@ -2403,12 +2400,7 @@ namespace Battle
             
                 if((abs(dy) == 1 && dx >= minDX && dx <= maxDX)
                 || (!dy && abs(dx) == 1))
-                {       
-                    adjustedResult = from[i];
-                    if(!dy && attacker.isWide())
-                        adjustedResult += Point( reflectAttacker ? 1 : 0, 0 );
                     return true;
-                }
             }
             minDX = 0;
             maxDX = 0;
@@ -2443,13 +2435,11 @@ namespace Battle
         }
         if(targetWide)
         {
-            //WIDE-REVIEW
             xend += xincr;
             xstart -= xincr;
         }
         if(attackerWide)
         {
-            //WIDE-REVIEW
             xstart -= xincr;
             xend += xincr;
         }
@@ -2457,16 +2447,10 @@ namespace Battle
             for(delta.y = ystart; delta.y != yend; delta.y += yincr)
                 if((delta.x || delta.y) && BfValid(p + delta))
                 {
-                    Point adjusted(-1, -1);
-                    
-                    // if(delta.x > 0 && delta.y) continue;
                     if(m_battlefield->CellFreeFor(p + delta, attacker, troopN)
                     && std::find(m_movePoints.begin(), m_movePoints.end(), p + delta) != m_movePoints.end()
-                    && CanAttackFrom(attacker, target, p + delta, adjusted))
-                    {
-                        //printf("returning %d,%d\n", adjusted.x, adjusted.y);
-                        return adjusted;
-                    }
+                    && CanAttackFrom(attacker, target, p + delta))
+                        return p + delta;
                 }
         return Point(-1, -1);
     }
