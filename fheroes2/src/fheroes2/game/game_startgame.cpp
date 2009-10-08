@@ -242,6 +242,8 @@ Game::menu_t Game::StartGame(void)
     Interface::HeroesIcons & heroesBar = I.iconsPanel.GetHeroesBar();
     Interface::CastleIcons & castleBar = I.iconsPanel.GetCastleBar();
     Interface::StatusWindow& statusWin = I.statusWindow;
+    heroesBar.Reset();
+    castleBar.Reset();
     radar.Build();
 
     I.Redraw(REDRAW_ICONS | REDRAW_BUTTONS | REDRAW_BORDER);
@@ -881,7 +883,7 @@ Game::menu_t Game::HumanTurn(void)
 	    default: break;
 	}
 
-    // scroll area maps left
+	// scroll area maps left
 	if(le.MouseCursor(I.GetAreaScrollLeft())) I.gameArea.SetScroll(SCROLL_LEFT);
         else
 	// scroll area maps right
@@ -952,12 +954,12 @@ Game::menu_t Game::HumanTurn(void)
 	    }
 	    I.controlPanel.QueueEventProcessing(res);
 	}
-    else
-    // cursor over game area
-    if(le.MouseCursor(I.gameArea.GetArea()))
-    {
-        I.gameArea.QueueEventProcessing();
-    }
+	else
+	// cursor over game area
+	if(le.MouseCursor(I.gameArea.GetArea()))
+	{
+    	    I.gameArea.QueueEventProcessing();
+	}
 
 	
 	// animation
@@ -1016,50 +1018,45 @@ Game::menu_t Game::HumanTurn(void)
     	    display.Flip();
 	}
 
-/*
-	if(conf.PocketPC())
-	{
-    	    cursor.Hide();
-    	    cursor.Show();
-    	    display.Flip();
-	}
-*/
         ++ticket;
     }
 
-    // warning lost all town
-    if(ENDTURN == res && myHeroes.size() && myCastles.empty() && LOST_TOWN_DAYS < myKingdom.GetLostTownDays())
+    if(ENDTURN == res)
     {
-	std::string str = _("%{color} player, you have lost your last town. If you do not conquer another town in next week, you will be eliminated.");
-	String::Replace(str, "%{color}", Color::String(conf.MyColor()));
-	DialogPlayers(conf.MyColor(), str);
-    }
+	// warning lost all town
+	if(myHeroes.size() && myCastles.empty() && LOST_TOWN_DAYS < myKingdom.GetLostTownDays())
+	{
+	    std::string str = _("%{color} player, you have lost your last town. If you do not conquer another town in next week, you will be eliminated.");
+	    String::Replace(str, "%{color}", Color::String(conf.MyColor()));
+	    DialogPlayers(conf.MyColor(), str);
+	}
 
-    if(Game::Focus::HEROES == global_focus.Type())
-    {
-	global_focus.GetHeroes().ShowPath(false);
-	global_focus.SetRedraw();
-    }
+	if(Game::Focus::HEROES == global_focus.Type())
+	{
+	    global_focus.GetHeroes().ShowPath(false);
+	    global_focus.SetRedraw();
+	}
 
-    if(ENDTURN == res && conf.Modes(Settings::AUTOSAVE))
-    {
-	std::string filename(conf.LocalPrefix() + SEPARATOR + "files" + SEPARATOR + "save" + SEPARATOR +  "autosave.sav");
-	Game::Save(filename);
-    }
+	if(conf.Modes(Settings::AUTOSAVE))
+	{
+	    std::string filename(conf.LocalPrefix() + SEPARATOR + "files" + SEPARATOR + "save" + SEPARATOR +  "autosave.sav");
+	    Game::Save(filename);
+	}
 
-    // for pocketpc: show status window if AI turn
-    if(ENDTURN == res && conf.PocketPC() && !conf.ShowStatus())
-    {
-	conf.SetModes(Settings::SHOWSTATUS);
-    	I.SetRedraw(REDRAW_STATUS);
-    }
+	// for pocketpc: show status window if AI turn
+	if(conf.PocketPC() && !conf.ShowStatus())
+	{
+	    conf.SetModes(Settings::SHOWSTATUS);
+    	    I.SetRedraw(REDRAW_STATUS);
+	}
 
-    if(I.NeedRedraw())
-    {
-    	cursor.Hide();
-    	I.Redraw();
-    	cursor.Show();
-    	display.Flip();
+	if(I.NeedRedraw())
+	{
+    	    cursor.Hide();
+    	    I.Redraw();
+    	    cursor.Show();
+    	    display.Flip();
+	}
     }
 
     // reset sound
