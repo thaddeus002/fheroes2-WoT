@@ -735,13 +735,15 @@ bool Game::IO::LoadBIN(QueueMessage & msg)
 
 	u32 size;
 	// sec skills
-	std::fill(hero->secondary_skills.begin(), hero->secondary_skills.end(), Skill::Secondary());
+	hero->secondary_skills.clear();
+	hero->secondary_skills.reserve(HEROESMAXSKILL);
 	msg.Pop(size);
 	for(u32 jj = 0; jj < size; ++jj)
 	{
-	    Skill::Secondary & skill = hero->secondary_skills[jj];
+	    Skill::Secondary skill;
 	    msg.Pop(byte8); skill.SetSkill(Skill::Secondary::Skill(byte8));
 	    msg.Pop(byte8); skill.SetLevel(byte8);
+	    hero->secondary_skills.push_back(skill);
 	}
 
 	// artifacts
