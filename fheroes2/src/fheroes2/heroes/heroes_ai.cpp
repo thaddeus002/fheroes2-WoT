@@ -133,6 +133,8 @@ void Heroes::AIAction(const u16 dst_index)
 {
     const MP2::object_t object = (dst_index == GetIndex() ? GetUnderObject() : world.GetTiles(dst_index).GetObject());
 
+    if(MP2::isActionObject(object, isShipMaster())) SetModes(ACTION);
+
     switch(object)
     {
 	case MP2::OBJ_MONSTER:		AIToMonster(*this, object, dst_index); break;

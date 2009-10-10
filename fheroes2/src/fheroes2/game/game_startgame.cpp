@@ -996,8 +996,12 @@ Game::menu_t Game::HumanTurn(void)
 			I.SetRedraw(REDRAW_GAMEAREA);
 		    }
 
-		    // check game over
-		    CheckGameOver(res);
+		    if(hero.isAction())
+		    {
+			// check game over
+			CheckGameOver(res);
+			hero.ResetAction();
+		    }
 		}
 		else
 		    hero.SetMove(false);

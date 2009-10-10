@@ -365,7 +365,11 @@ bool Heroes::MoveStep(bool fast)
 	    ApplyPenaltyMovement();
 	    path.PopFront();
 
-	    if(MP2::OBJ_EVENT == save_maps_general) Action(index_to);
+	    if(MP2::OBJ_EVENT == save_maps_general)
+	    {
+		Action(index_to);
+		SetMove(false);
+	    }
 
 	    // check protection tile
 	    u16 dst_index2 = MAXU16;
@@ -422,7 +426,11 @@ bool Heroes::MoveStep(bool fast)
 	sprite_index -= 8;
 	path.PopFront();
 
-	if(MP2::OBJ_EVENT == save_maps_general) Action(index_to);
+	if(MP2::OBJ_EVENT == save_maps_general)
+	{
+	    Action(index_to);
+	    SetMove(false);
+	}
 
 	// check protection tile
 	u16 dst_index2 = MAXU16;
@@ -683,6 +691,8 @@ void Heroes::FadeIn(void) const
 
 bool Heroes::Move(bool fast)
 {
+    if(Modes(ACTION)) ResetModes(ACTION);
+
     // move hero
     if(path.isValid() &&
            (isEnableMove() || (GetSpriteIndex() < 45 && GetSpriteIndex() % 9) || GetSpriteIndex() >= 45))

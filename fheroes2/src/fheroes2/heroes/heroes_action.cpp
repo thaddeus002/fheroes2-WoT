@@ -320,6 +320,8 @@ void Heroes::Action(const u16 dst_index)
     if(MUS::FromMapObject(object) != MUS::UNKNOWN)
         AGG::PlayMusic(MUS::FromMapObject(object), false);
 
+    if(MP2::isActionObject(object, isShipMaster())) SetModes(ACTION);
+
     switch(object)
     {
 	case MP2::OBJ_MONSTER:	ActionToMonster(*this, object, dst_index); break;

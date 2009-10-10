@@ -31,7 +31,7 @@ Interface::Basic::Basic() : gameArea(GameArea::Get()), radar(Radar::Get()),
 {
     const Display & display = Display::Get();
     const u16 & px = display.w() - BORDERWIDTH - RADARWIDTH;
-    const u8 scroll_width = Settings::Get().PocketPC() ? 8 : BORDERWIDTH;
+    const u8 scroll_width = Settings::Get().PocketPC() ? 12 : BORDERWIDTH;
 
     if(Settings::Get().PocketPC())
     {

@@ -318,6 +318,9 @@ Heroes::Heroes(heroes_t ht, Race::race_t rc) : killer_color(Color::GRAY), experi
 
 void Heroes::LoadFromMP2(u16 map_index, const void *ptr, const Color::color_t cl)
 {
+    // reset modes
+    modes = 0;
+
     mp.x = map_index % world.w();
     mp.y = map_index / world.h();
 
@@ -1764,6 +1767,7 @@ void Heroes::SetFreeman(const u8 reason)
 
     color = Color::GRAY;
     world.GetTiles(mp).SetObject(save_maps_general);
+    modes = 0;
     mp.x = -1;
     mp.y = -1;
     path.Reset();

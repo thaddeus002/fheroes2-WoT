@@ -1043,7 +1043,7 @@ Castle * World::GetCastle(u8 ax, u8 ay) const
     for(; it1 != it2; ++it1)
         if(*it1 && (*it1)->ContainCoord(ax, ay)) return *it1;
 
-    std::cout << "warning: World::GetCastle: return NULL pointer, x: " << static_cast<int>(ax) << ", y: " << static_cast<int>(ay) << std::endl;
+    if(Settings::Get().Debug()) std::cout << "warning: World::GetCastle: return NULL pointer, x: " << static_cast<int>(ax) << ", y: " << static_cast<int>(ay) << std::endl;
 
     return NULL;
 }

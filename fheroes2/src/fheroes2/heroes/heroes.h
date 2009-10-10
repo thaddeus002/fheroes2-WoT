@@ -108,6 +108,7 @@ public:
 	SCOUTER		= 0x0020,
 	STUPID		= 0x0040,
 	JAIL		= 0x0080,
+	ACTION		= 0x0100,
     };
 
     Heroes(heroes_t ht, Race::race_t rc);
@@ -219,6 +220,8 @@ public:
     bool isShow(u8 color);
     bool isEnableMove(void) const;
     void SetMove(bool f);
+    bool isAction(void) const { return Modes(ACTION); };
+    void ResetAction(void) { ResetModes(ACTION); };
     void Action(const u16 dst_index);
     bool ApplyPenaltyMovement(void);
 

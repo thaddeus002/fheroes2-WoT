@@ -33,6 +33,13 @@ namespace Dialog
 /* return 0x02 - change sound, 0x04 - change music, 0x08 - change interface */
 u8 Dialog::SystemOptions(void)
 {
+    // FIXME: QVGA version
+    if(Settings::Get().PocketPC())
+    {
+       Dialog::Message("", _("For the QVGA version is not available."), Font::SMALL, Dialog::OK);
+       return 0;
+    }
+
     Display & display = Display::Get();
     Settings & conf = Settings::Get();
 
