@@ -628,29 +628,11 @@ void AGG::Cache::LoadFNT(void)
 
 	const char *letters = "!\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~";
 	const u8 letters_size = std::strlen(letters);
-        const Colors white = { 0xFF, 0xFF, 0xFF, 0x00 };
-
 	u16 *unicode = new u16[letters_size + 1];
 
 	String::UTF8_to_UNICODE(unicode, letters, letters_size);
 
-	// small
-	if(font_small.isValid())
-	{
-	    for(u8 ii = 0; ii < letters_size; ++ii)
-		font_small.RenderUnicodeChar(fnt_cache[unicode[ii]].second, unicode[ii], white, conf.FontsRenderBlended() ? SDL::Font::BLENDED : SDL::Font::SOLID);
-	}
-	else
-	    PreloadObject(ICN::SMALFONT);
-
-	// medium
-	if(font_medium.isValid())
-	{
-	    for(u8 ii = 0; ii < letters_size; ++ii)
-		font_medium.RenderUnicodeChar(fnt_cache[unicode[ii]].first, unicode[ii], white, conf.FontsRenderBlended() ? SDL::Font::BLENDED : SDL::Font::SOLID);
-	}
-	else
-	    PreloadObject(ICN::FONT);
+	for(u8 ii = 0; ii < letters_size; ++ii) LoadFNT(unicode[ii]);
 
 	delete [] unicode;
 
@@ -676,24 +658,31 @@ void AGG::Cache::LoadFNT(void)
     }
 }
 
+#ifdef WITH_TTF
 void AGG::Cache::LoadFNT(u16 ch)
 {
-#ifdef WITH_TTF
     const Settings & conf = Settings::Get();
 
     if(conf.Unicode())
     {
-	const Colors white = { 0xFF, 0xFF, 0xFF, 0x00 };
+        const Colors white = { 0xFF, 0xFF, 0xFF, 0x00 };
+        const Colors yellow= { 0xFF, 0xFF, 0x00, 0x00 };
 
 	// small
-	font_small.RenderUnicodeChar(fnt_cache[ch].second, ch, white, conf.FontsRenderBlended() ? SDL::Font::BLENDED : SDL::Font::SOLID);
+	font_small.RenderUnicodeChar(fnt_cache[ch].small_white, ch, white, conf.FontsRenderBlended() ? SDL::Font::BLENDED : SDL::Font::SOLID);
+	font_small.RenderUnicodeChar(fnt_cache[ch].small_yellow, ch, yellow, conf.FontsRenderBlended() ? SDL::Font::BLENDED : SDL::Font::SOLID);
+
 	// medium
-	font_medium.RenderUnicodeChar(fnt_cache[ch].first, ch, white, conf.FontsRenderBlended() ? SDL::Font::BLENDED : SDL::Font::SOLID);
+	if(!conf.PocketPC())
+	{
+	    font_medium.RenderUnicodeChar(fnt_cache[ch].medium_white, ch, white, conf.FontsRenderBlended() ? SDL::Font::BLENDED : SDL::Font::SOLID);
+	    font_medium.RenderUnicodeChar(fnt_cache[ch].medium_yellow, ch, yellow, conf.FontsRenderBlended() ? SDL::Font::BLENDED : SDL::Font::SOLID);
+	}
 
 	if(conf.Debug()) Error::Verbose("AGG::LoadChar: ", static_cast<int>(ch));
     }
-#endif
 }
+#endif
 
 /* free ICN object in AGG::Cache */
 void AGG::Cache::FreeICN(const ICN::icn_t icn)
@@ -784,7 +773,6 @@ int AGG::Cache::GetICNCount(const ICN::icn_t icn)
 const Surface & AGG::Cache::GetTIL(const TIL::til_t til, u16 index, u8 shape)
 {
     til_cache_t & v = til_cache[til];
-//    std::vector<Surface> & v = til_cache[til];
 
     if(0 == v.count) LoadTIL(til);
 
@@ -861,15 +849,23 @@ const std::vector<u8> & AGG::Cache::GetMUS(const MUS::mus_t mus)
     return v;
 }
 
+#ifdef WITH_TTF
 /* return FNT cache */
-const std::pair<Surface, Surface> & AGG::Cache::GetFNT(u16 c)
+const Surface & AGG::Cache::GetFNT(u16 c, u8 f)
 {
-    if(!fnt_cache[c].first.valid()) LoadFNT(c);
+    if(!fnt_cache[c].small_white.valid()) LoadFNT(c);
 
-    return fnt_cache[c];
+    switch(f)
+    {
+	case Font::YELLOW_SMALL: return fnt_cache[c].small_yellow;
+	case Font::BIG:		 return fnt_cache[c].medium_white;
+	case Font::YELLOW_BIG:	 return fnt_cache[c].medium_yellow;
+	default: break;
+    }
+
+    return fnt_cache[c].small_white;
 }
 
-#ifdef WITH_TTF
 const SDL::Font & AGG::Cache::GetMediumFont(void) const
 {
     return font_medium;
@@ -1012,17 +1008,16 @@ void AGG::PlayMusic(const MUS::mus_t mus, bool loop)
     }
 }
 
+#ifdef WITH_TTF
 /* return letter sprite */
 const Surface & AGG::GetUnicodeLetter(u16 ch, u8 ft)
 {
     if(AGG::Cache::Get().isValidFonts())
-    {
-	const std::pair<Surface, Surface> & fonts = AGG::Cache::Get().GetFNT(ch);
-	return (Font::SMALL | Font::YELLOW_SMALL) & ft ? fonts.second : fonts.first;
-    }
+	return AGG::Cache::Get().GetFNT(ch, ft);
     else
     return AGG::GetLetter(ch, ft);
 }
+#endif
 
 const Surface & AGG::GetLetter(char ch, u8 ft)
 {

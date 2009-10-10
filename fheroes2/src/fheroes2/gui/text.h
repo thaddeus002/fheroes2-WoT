@@ -74,6 +74,7 @@ private:
     std::string message;
 };
 
+#ifdef WITH_TTF
 class TextUnicode : public TextInterface
 {
 public:
@@ -101,13 +102,16 @@ public:
 private:
     std::vector<u16> message;
 };
+#endif
 
 class Text
 {
 public:
     Text();
     Text(const std::string &, Font::type_t ft = Font::BIG);
+#ifdef WITH_TTF
     Text(const u16 *, size_t, Font::type_t ft = Font::BIG);
+#endif
     Text(const Text &);
     ~Text();
 
@@ -181,7 +185,9 @@ public:
 
 private:
     void Append(const std::string &, Font::type_t, u16);
+#ifdef WITH_TTF
     void Append(const std::vector<u16> &, Font::type_t, u16);
+#endif
 
     std::list<Text> messages;
 };

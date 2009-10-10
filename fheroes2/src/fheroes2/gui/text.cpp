@@ -183,6 +183,7 @@ void TextAscii::Blit(u16 ax, u16 ay, Surface & dst)
     }
 }
 
+#ifdef WITH_TTF
 TextUnicode::TextUnicode(const std::string & msg, Font::type_t ft) : TextInterface(ft), message(2 * msg.size(), 0)
 {
     if(msg.size())
@@ -243,13 +244,9 @@ u8 TextUnicode::CharWidth(u16 c, Font::type_t f)
 
 u8 TextUnicode::CharHeight(Font::type_t f)
 {
-#ifdef WITH_TTF
     return Font::SMALL == f || Font::YELLOW_SMALL ?
         AGG::Cache::Get().GetSmallFont().Height() :
         AGG::Cache::Get().GetMediumFont().Height();
-#else
-    return TextAscii::CharHeight(f);
-#endif
 }
 
 u8 TextUnicode::CharAscent(Font::type_t f)
@@ -347,28 +344,33 @@ void TextUnicode::Blit(u16 ax, u16 ay, Surface & dst)
     }
 }
 
-
+#endif
 
 
 Text::Text() : message(NULL), gw(0), gh(0)
 {
+#ifdef WITH_TTF
     if(Settings::Get().Unicode())
 	message = static_cast<TextInterface *>(new TextUnicode());
     else
+#endif
 	message = static_cast<TextInterface *>(new TextAscii());
 }
 
 Text::Text(const std::string & msg, Font::type_t ft) : message(NULL), gw(0), gh(0)
 {
+#ifdef WITH_TTF
     if(Settings::Get().Unicode())
 	message = static_cast<TextInterface *>(new TextUnicode(msg, ft));
     else
+#endif
 	message = static_cast<TextInterface *>(new TextAscii(msg, ft));
 
     gw = message->w();
     gh = message->h();
 }
 
+#ifdef WITH_TTF
 Text::Text(const u16 *pt, size_t sz, Font::type_t ft) : message(NULL), gw(0), gh(0)
 {
     if(Settings::Get().Unicode() && pt)
@@ -379,6 +381,7 @@ Text::Text(const u16 *pt, size_t sz, Font::type_t ft) : message(NULL), gw(0), gh
 	gh = message->h();
     }
 }
+#endif
 
 Text::~Text()
 {
@@ -387,10 +390,13 @@ Text::~Text()
 
 Text::Text(const Text & t)
 {
+#ifdef WITH_TTF
     if(Settings::Get().Unicode())
 	message = static_cast<TextInterface *>(new TextUnicode(static_cast<TextUnicode &>(*t.message)));
     else
+#endif
 	message = static_cast<TextInterface *>(new TextAscii(static_cast<TextAscii &>(*t.message)));
+
     gw = t.gw;
     gh = t.gh;
 }
@@ -398,10 +404,13 @@ Text::Text(const Text & t)
 Text & Text::operator= (const Text & t)
 {
     delete message;
+#ifdef WITH_TTF
     if(Settings::Get().Unicode())
 	message = static_cast<TextInterface *>(new TextUnicode(static_cast<TextUnicode &>(*t.message)));
     else
+#endif
 	message = static_cast<TextInterface *>(new TextAscii(static_cast<TextAscii &>(*t.message)));
+
     gw = t.gw;
     gh = t.gh;
 
@@ -449,12 +458,14 @@ void Text::Blit(u16 ax, u16 ay, Surface & dst) const
 
 u16 Text::width(const std::string &str, Font::type_t ft, u16 start, u16 count)
 {
+#ifdef WITH_TTF
     if(Settings::Get().Unicode())
     {
 	TextUnicode text(str, ft);
 	return text.w(start, count);
     }
     else
+#endif
     {
 	TextAscii text(str, ft);
 	return text.w(start, count);
@@ -467,11 +478,13 @@ u16 Text::height(const std::string &str, Font::type_t ft, u16 width)
 {
     if(str.empty()) return 0;
 
+#ifdef WITH_TTF
     if(Settings::Get().Unicode())
     {
 	TextUnicode text(str, ft);
 	return text.h(width);
     }
+#endif
     else
     {
 	TextAscii text(str, ft);
@@ -497,6 +510,7 @@ void TextBox::Set(const std::string & msg, Font::type_t ft, u16 width)
     if(messages.size()) messages.clear();
     if(msg.empty()) return;
 
+#ifdef WITH_TTF
     if(Settings::Get().Unicode())
     {
 	std::vector<u16> unicode(2 * msg.size(), 0);
@@ -521,6 +535,7 @@ void TextBox::Set(const std::string & msg, Font::type_t ft, u16 width)
 	}
     }
     else
+#endif
     {
         const char sep = '\n';
         std::string substr;
@@ -586,6 +601,7 @@ void TextBox::Append(const std::string & msg, Font::type_t ft, u16 width)
     }
 }
 
+#ifdef WITH_TTF
 void TextBox::Append(const std::vector<u16> & msg, Font::type_t ft, u16 width)
 {
     if(msg.empty()) return;
@@ -630,6 +646,7 @@ void TextBox::Append(const std::vector<u16> & msg, Font::type_t ft, u16 width)
 	messages.push_back(Text(&msg.at(pos1 - msg.begin()), pos2 - pos1, ft));
     }
 }
+#endif
 
 void TextBox::Blit(u16 ax, u16 ay, Surface & sf)
 {

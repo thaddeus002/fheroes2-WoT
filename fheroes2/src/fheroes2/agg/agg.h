@@ -90,6 +90,15 @@ namespace AGG
 	u16 count;
     };
 
+    struct fnt_cache_t
+    {
+	fnt_cache_t() : medium_white(NULL), medium_yellow(NULL), small_white(NULL), small_yellow(NULL) {};
+	Surface medium_white;
+	Surface medium_yellow;
+	Surface small_white;
+	Surface small_yellow;
+    };
+
     class Cache
     {
     public:
@@ -106,10 +115,11 @@ namespace AGG
 	const std::vector<u8> & GetWAV(const M82::m82_t m82);
         const std::vector<u8> & GetMUS(const MUS::mus_t mus);
 	const std::vector<u8> & GetMID(const XMI::xmi_t xmi);
-	const std::pair<Surface, Surface> & GetFNT(u16);
 #ifdef WITH_TTF
+	const Surface & GetFNT(u16, u8);
 	const SDL::Font & GetMediumFont(void) const;
 	const SDL::Font & GetSmallFont(void) const;
+	void LoadFNT(u16);
 #endif
 
 	void LoadExtraICN(const ICN::icn_t icn, u16 index, bool reflect = false);
@@ -121,7 +131,6 @@ namespace AGG
 
 	void LoadPAL(void);
 	void LoadFNT(void);
-	void LoadFNT(u16);
 	bool isValidFonts(void) const;
 
 	void FreeICN(const ICN::icn_t icn);
@@ -142,9 +151,9 @@ namespace AGG
 	std::map<M82::m82_t, std::vector<u8> > wav_cache;
         std::map<MUS::mus_t, std::vector<u8> > mus_cache;
 	std::map<XMI::xmi_t, std::vector<u8> > mid_cache;
-	std::map<u16, std::pair<Surface, Surface> > fnt_cache;
 
 #ifdef WITH_TTF
+	std::map<u16, fnt_cache_t> fnt_cache;
 	SDL::Font font_medium;
 	SDL::Font font_small;
 #endif
@@ -167,8 +176,9 @@ namespace AGG
     const std::vector<u8> & GetMID(const XMI::xmi_t xmi);
 
     const Surface & GetLetter(char ch, u8 ft);
+#ifdef WITH_TTF
     const Surface & GetUnicodeLetter(u16 ch, u8 ft);
-
+#endif
     // wrapper Audio
     void PlaySound(const M82::m82_t m82);
     void PlayMusic(const MUS::mus_t mus, bool loop = true);
