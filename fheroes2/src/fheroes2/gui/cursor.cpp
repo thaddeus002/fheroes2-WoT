@@ -43,12 +43,10 @@ Cursor::themes_t Cursor::Themes(void)
 /* set cursor theme */
 bool Cursor::SetThemes(const Cursor::themes_t name)
 {
-    if(isVisible()) Hide();
     if(theme != name)
     {
+	if(isVisible()) Hide();
 	theme = name;
-	//    if(visible) Restore();
-	//    Save(Background::x, Background::y, sf.w(), sf.h());
 
 	switch(0xF000 & name)
 	{
