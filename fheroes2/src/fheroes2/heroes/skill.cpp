@@ -21,6 +21,10 @@
 #include <algorithm>
 #include "gamedefs.h"
 #include "race.h"
+#include "agg.h"
+#include "cursor.h"
+#include "dialog.h"
+#include "heroes.h"
 #include "skill.h"
 
 Skill::Primary::Primary() : attack(0), defence(0), power(0), knowledge(0)
@@ -825,4 +829,135 @@ Skill::Secondary::skill_t Skill::Secondary::PriorityFromRace(const u8 race)
 
     Error::Warning("Skill::Secondary::PriorityForRace: unknown result.");
     return UNKNOWN;
+}
+
+
+SecondarySkillBar::SecondarySkillBar() : skills(NULL), use_mini_sprite(false)
+{
+}
+
+const Rect & SecondarySkillBar::GetArea(void) const
+{
+    return pos;
+}
+
+void SecondarySkillBar::SetSkills(const std::vector<Skill::Secondary> & v)
+{
+    skills = &v;
+    CalcSize();
+}
+
+void SecondarySkillBar::SetUseMiniSprite(void)
+{
+    use_mini_sprite = true;
+}
+
+void SecondarySkillBar::SetInterval(u8 i)
+{
+    interval = i;
+    CalcSize();
+}
+
+void SecondarySkillBar::SetPos(s16 sx, s16 sy)
+{
+    pos.x = sx;
+    pos.y = sy;
+    CalcSize();
+}
+
+void SecondarySkillBar::CalcSize(void)
+{
+    pos.w = 0;
+    pos.h = 0;
+
+    if(skills)
+    {
+	const Sprite & sprite = AGG::GetICN((use_mini_sprite ? ICN::MINISS : ICN::SECSKILL), 0);
+	pos.h = sprite.h();
+	pos.w = HEROESMAXSKILL * (sprite.w() + interval);
+    }
+}
+
+void SecondarySkillBar::Redraw(void)
+{
+    Display & display = Display::Get();
+    Point dst_pt(pos);
+    std::string message;
+    Text text;
+    text.Set(Font::SMALL);
+
+    for(u8 ii = 0; ii < HEROESMAXSKILL; ++ii)
+    {
+        const Skill::Secondary::skill_t skill = ii < skills->size() ? skills->at(ii).Skill() : Skill::Secondary::UNKNOWN;
+        const Skill::Level::type_t level = ii < skills->size() ? skills->at(ii).Level() : Skill::Level::NONE;
+
+        if(Skill::Secondary::UNKNOWN != skill && Skill::Level::NONE != level)
+        {
+            const Sprite & sprite_skill = AGG::GetICN((use_mini_sprite ? ICN::MINISS : ICN::SECSKILL), (use_mini_sprite ? Skill::Secondary::GetIndexSprite2(skill) : Skill::Secondary::GetIndexSprite1(skill)));
+            display.Blit(sprite_skill, dst_pt);
+
+            if(use_mini_sprite)
+	    {
+		message.clear();
+		String::AddInt(message, level);
+        	text.Set(message);
+        	text.Blit(dst_pt.x + (sprite_skill.w() - text.w()) - 3, dst_pt.y + sprite_skill.h() - 12);
+	    }
+	    else
+	    {
+        	text.Set(Skill::Secondary::String(skill));
+        	text.Blit(dst_pt.x + (sprite_skill.w() - text.w()) / 2, dst_pt.y + 3);
+
+        	text.Set(Skill::Level::String(level));
+        	text.Blit(dst_pt.x + (sprite_skill.w() - text.w()) / 2, dst_pt.y + 50);
+	    }
+
+    	    dst_pt.x += (use_mini_sprite ? 32 : sprite_skill.w()) + interval;
+        }
+	else
+	{
+            const Sprite & sprite_skill = AGG::GetICN(ICN::SECSKILL, 0);
+
+	    if(use_mini_sprite)
+        	display.Blit(sprite_skill, Rect((sprite_skill.w() - 32) / 2, 0, 32, 32), dst_pt);
+	    else
+        	display.Blit(sprite_skill, dst_pt);
+
+    	    dst_pt.x += (use_mini_sprite ? 32 : sprite_skill.w()) + interval;
+	}
+    }
+}
+
+u8 SecondarySkillBar::GetIndexFromCoord(const Point & cu)
+{
+    const Sprite & sprite_skill = AGG::GetICN((use_mini_sprite ? ICN::MINISS : ICN::SECSKILL), 0);
+    return (pos & cu) ? (cu.x - pos.x) / (sprite_skill.w() + interval) : 0;
+}
+
+void SecondarySkillBar::QueueEventProcessing(void)
+{
+    Display & display = Display::Get();
+    Cursor & cursor = Cursor::Get();
+    LocalEvent & le = LocalEvent::Get();
+    const Point & cu = le.GetMouseCursor();
+
+    if(!(pos & cu) || !skills) return;
+
+    u8 ii = GetIndexFromCoord(cu);
+    const Sprite & sprite_skill = AGG::GetICN((use_mini_sprite ? ICN::MINISS : ICN::SECSKILL), 0);
+    const Rect tile(pos.x + (ii * (sprite_skill.w() + interval)), pos.y, sprite_skill.w(), sprite_skill.h());
+
+    if(ii < skills->size() && (le.MouseClickLeft(tile) || le.MousePressRight(tile)))
+    {
+	const Skill::Secondary::skill_t & skill = skills->at(ii).Skill();
+	const Skill::Level::type_t & level = skills->at(ii).Level();
+
+	if(Skill::Secondary::UNKNOWN != skill && Skill::Level::NONE != level)
+	{
+    	    cursor.Hide();
+    	    Dialog::SkillInfo(skill, level, !le.MousePressRight());
+    	    cursor.Show();
+    	    display.Flip();
+	}
+    }
 }

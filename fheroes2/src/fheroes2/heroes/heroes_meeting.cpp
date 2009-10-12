@@ -34,7 +34,6 @@
 #include "game_interface.h"
 
 void RedrawPrimarySkillInfo(const Point &, const Skill::Primary &, const Skill::Primary &);
-void RedrawSecondarySkill(const Point &, const std::vector<Skill::Secondary> &);
 
 void Heroes::MeetingDialog(Heroes & heroes2)
 {
@@ -107,13 +106,19 @@ void Heroes::MeetingDialog(Heroes & heroes2)
     RedrawPrimarySkillInfo(cur_pt, *this, heroes2);
 
     // secondary skill
-    dst_pt.x = cur_pt.x + 23;
-    dst_pt.y = cur_pt.y + 200;
-    RedrawSecondarySkill(dst_pt, secondary_skills);
+    SecondarySkillBar secskill_bar1;
+    secskill_bar1.SetPos(cur_pt.x + 23, cur_pt.y + 200);
+    secskill_bar1.SetUseMiniSprite();
+    secskill_bar1.SetInterval(1);
+    secskill_bar1.SetSkills(secondary_skills);
+    secskill_bar1.Redraw();
 
-    dst_pt.x = cur_pt.x + 354;
-    dst_pt.y = cur_pt.y + 200;
-    RedrawSecondarySkill(dst_pt, heroes2.secondary_skills);
+    SecondarySkillBar secskill_bar2;
+    secskill_bar2.SetPos(cur_pt.x + 354, cur_pt.y + 200);
+    secskill_bar2.SetUseMiniSprite();
+    secskill_bar2.SetInterval(1);
+    secskill_bar2.SetSkills(heroes2.secondary_skills);
+    secskill_bar2.Redraw();
 
     // army
     dst_pt.x = cur_pt.x + 36;
@@ -233,6 +238,9 @@ void Heroes::MeetingDialog(Heroes & heroes2)
 	    }
 	}
 
+        if(le.MouseCursor(secskill_bar1.GetArea())) secskill_bar1.QueueEventProcessing();
+        if(le.MouseCursor(secskill_bar2.GetArea())) secskill_bar2.QueueEventProcessing();
+
         if(le.MouseCursor(moraleIndicator1.GetArea())) MoraleIndicator::QueueEventProcessing(moraleIndicator1);
         else
         if(le.MouseCursor(moraleIndicator2.GetArea())) MoraleIndicator::QueueEventProcessing(moraleIndicator2);
@@ -311,30 +319,4 @@ void RedrawPrimarySkillInfo(const Point & cur_pt, const Skill::Primary & p1, con
     String::AddInt(message, p2.GetKnowledge());
     text.Set(message);
     text.Blit(cur_pt.x + 380 - text.w(), cur_pt.y + 160);
-}
-
-void RedrawSecondarySkill(const Point & pt, const std::vector<Skill::Secondary> & skills)
-{
-    Display & display = Display::Get();
-
-    Point dst_pt(pt);
-
-    for(u8 ii = 0; ii < HEROESMAXSKILL; ++ii)
-    {
-        const Skill::Secondary::skill_t skill = ii < skills.size() ? skills[ii].Skill() : Skill::Secondary::UNKNOWN;
-        const Skill::Level::type_t level = ii < skills.size() ? skills[ii].Level() : Skill::Level::NONE;
-
-        if(Skill::Secondary::UNKNOWN != skill && Skill::Level::NONE != level)
-        {
-    	    const Sprite & sprite_skill = AGG::GetICN(ICN::MINISS, Skill::Secondary::GetIndexSprite2(skill));
-    	    display.Blit(sprite_skill, dst_pt);
-
-            std::string message;
-            String::AddInt(message, level);
-            Text text(message, Font::SMALL);
-            text.Blit(dst_pt.x + (sprite_skill.w() - text.w()) - 3, dst_pt.y + sprite_skill.h() - 12);
-
-            dst_pt.x += sprite_skill.w() + 1;
-        }
-    }
 }

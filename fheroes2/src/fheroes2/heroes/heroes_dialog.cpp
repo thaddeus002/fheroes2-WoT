@@ -243,39 +243,11 @@ Dialog::answer_t Heroes::OpenDialog(bool readonly, bool fade)
     selectArmy.Redraw();
 
     // secskill
-    dst_pt.x = cur_pt.x + 3;
-    dst_pt.y = cur_pt.y + 233;
-    
-    std::vector<Rect> coordsSkill;
-
-    for(u8 ii = 0; ii < HEROESMAXSKILL; ++ii)
-    {
-	const Skill::Secondary::skill_t skill = ii < secondary_skills.size() ? secondary_skills[ii].Skill() : Skill::Secondary::UNKNOWN;
-	const Skill::Level::type_t level = ii < secondary_skills.size() ? secondary_skills[ii].Level() : Skill::Level::NONE;
-
-	const Sprite & sprite_skill = AGG::GetICN(ICN::SECSKILL, Skill::Secondary::GetIndexSprite1(skill));
-
-	display.Blit(sprite_skill, dst_pt);
-
-	if(Skill::Secondary::UNKNOWN != skill && Skill::Level::NONE != level)
-	{
-	    // string skill
-	    message = Skill::Secondary::String(skill);
-	    text.Set(message, Font::SMALL);
-	    text.Blit(dst_pt.x + (sprite_skill.w() - text.w()) / 2, dst_pt.y + 3);
-
-	    // string level
-	    message = Skill::Level::String(level);
-	    text.Set(message);
-	    text.Blit(dst_pt.x + (sprite_skill.w() - text.w()) / 2, dst_pt.y + 50);
-	}
-
-	coordsSkill.push_back(Rect(dst_pt.x, dst_pt.y, sprite_skill.w(), sprite_skill.h()));
-
-	dst_pt.x += sprite_skill.w() + 5;
-    }
-
-    const Rect rectMaxCoordsSkill(coordsSkill);
+    SecondarySkillBar secskill_bar;
+    secskill_bar.SetPos(cur_pt.x + 3, cur_pt.y + 233);
+    secskill_bar.SetInterval(5);
+    secskill_bar.SetSkills(secondary_skills);
+    secskill_bar.Redraw();
 
     dst_pt.x = cur_pt.x + 51;
     dst_pt.y = cur_pt.y + 308;
@@ -439,20 +411,7 @@ Dialog::answer_t Heroes::OpenDialog(bool readonly, bool fade)
     	    ResetModes(ARMYSPREAD);
         }
 
-	// left click skill
-	for(u8 ii = 0; ii < coordsSkill.size(); ++ii) if(le.MouseClickLeft(coordsSkill[ii]))
-	{
-	    const Skill::Secondary::skill_t skill = ii < secondary_skills.size() ? secondary_skills[ii].Skill() : Skill::Secondary::UNKNOWN;
-	    const Skill::Level::type_t level = ii < secondary_skills.size() ? secondary_skills[ii].Level() : Skill::Level::NONE;
-
-	    if(Skill::Secondary::UNKNOWN != skill && Skill::Level::NONE != level)
-	    {
-		cursor.Hide();
-		Dialog::SkillInfo(skill, level, true);
-		cursor.Show();
-		display.Flip();
-	    }
-	}
+	if(le.MouseCursor(secskill_bar.GetArea())) secskill_bar.QueueEventProcessing();
 
 	// right info
         if(le.MousePressRight(rectAttackSkill)) Dialog::Message(_("Attack Skill"), _("Your attack skill is a bonus added to each creature's attack skill."), Font::BIG);
@@ -470,21 +429,6 @@ Dialog::answer_t Heroes::OpenDialog(bool readonly, bool fade)
         if(le.MousePressRight(rectSpreadArmyFormat)) Dialog::Message(_("Spread Formation"), descriptionSpreadArmyFormat, Font::BIG);
         else
         if(le.MousePressRight(rectGroupedArmyFormat)) Dialog::Message(_("Grouped Formation"), descriptionGroupedArmyFormat, Font::BIG);
-
-	// right info skill
-	for(u8 ii = 0; ii < coordsSkill.size(); ++ii) if(le.MousePressRight(coordsSkill[ii]))
-	{
-	    const Skill::Secondary::skill_t skill = ii < secondary_skills.size() ? secondary_skills[ii].Skill() : Skill::Secondary::UNKNOWN;
-	    const Skill::Level::type_t level = ii < secondary_skills.size() ? secondary_skills[ii].Level() : Skill::Level::NONE;
-
-	    if(Skill::Secondary::UNKNOWN != skill && Skill::Level::NONE != level)
-	    {
-		cursor.Hide();
-		Dialog::SkillInfo(skill, level, false);
-		cursor.Show();
-		display.Flip();
-	    }
-	}
 
         // status message
 	if(le.MouseCursor(rectAttackSkill)) statusBar.ShowMessage(_("View Attack Skill Info"));
@@ -521,32 +465,30 @@ Dialog::answer_t Heroes::OpenDialog(bool readonly, bool fade)
 	    const s8 index = selectArtifacts.GetIndexFromCoord(le.GetMouseCursor());
 	    if(0 <= index && index < HEROESMAXARTIFACT && artifacts[index] != Artifact::UNKNOWN)
 	    {
-		std::string str = _("View %{art} Info");
-		String::Replace(str, "%{art}", artifacts[index].GetName());
-		statusBar.ShowMessage(str);
+		message = _("View %{art} Info");
+		String::Replace(message, "%{art}", artifacts[index].GetName());
+		statusBar.ShowMessage(message);
 	    }
 	    else
 		statusBar.ShowMessage(_("Hero Screen"));
 	}
 	else
 	// status message over skill
-	if(le.MouseCursor(rectMaxCoordsSkill))
+	if(le.MouseCursor(secskill_bar.GetArea()))
 	{
-	    for(u8 ii = 0; ii < coordsSkill.size(); ++ii) if(le.MouseCursor(coordsSkill[ii]))
-	    {
-		const Skill::Secondary::skill_t skill = ii < secondary_skills.size() ? secondary_skills[ii].Skill() : Skill::Secondary::UNKNOWN;
-		const Skill::Level::type_t level = ii < secondary_skills.size() ? secondary_skills[ii].Level() : Skill::Level::NONE;
+            const u8 ii = secskill_bar.GetIndexFromCoord(le.GetMouseCursor());
+	    const Skill::Secondary::skill_t skill = ii < secondary_skills.size() ? secondary_skills[ii].Skill() : Skill::Secondary::UNKNOWN;
+	    const Skill::Level::type_t level = ii < secondary_skills.size() ? secondary_skills[ii].Level() : Skill::Level::NONE;
 
-		if(Skill::Secondary::UNKNOWN != skill && Skill::Level::NONE != level)
-		{
-		    std::string str = _("View %{level} %{skill} Info");
-		    String::Replace(str, "%{level}", Skill::Level::String(level));
-		    String::Replace(str, "%{skill}", Skill::Secondary::String(skill));
-		    statusBar.ShowMessage(str);
-		}
-		else
-		    statusBar.ShowMessage(_("Hero Screen"));
+	    if(Skill::Secondary::UNKNOWN != skill && Skill::Level::NONE != level)
+	    {
+		message = _("View %{level} %{skill} Info");
+		String::Replace(message, "%{level}", Skill::Level::String(level));
+		String::Replace(message, "%{skill}", Skill::Secondary::String(skill));
+		statusBar.ShowMessage(message);
 	    }
+	    else
+		statusBar.ShowMessage(_("Hero Screen"));
 	}
 	else
         // status message over troops
@@ -557,7 +499,6 @@ Dialog::answer_t Heroes::OpenDialog(bool readonly, bool fade)
             {
                 const Army::Troop & troop1 = army.At(index1);
                 const std::string & monster1 = troop1.GetName();
-                std::string str;
 
                 if(selectArmy.isSelected())
                 {
@@ -567,32 +508,32 @@ Dialog::answer_t Heroes::OpenDialog(bool readonly, bool fade)
 
                     if(index1 == index2)
             	    {
-                	str = _("View %{monster}");
-                	String::Replace(str, "%{monster}", monster1);
+                	message = _("View %{monster}");
+                	String::Replace(message, "%{monster}", monster1);
             	    }
                     else
                     if(troop1.isValid() && troop2.isValid())
                     {
-                        str = troop1() == troop2() ? _("Combine %{monster1} armies") : _("Exchange %{monster2} with %{monster1}");
-                	String::Replace(str, "%{monster1}", monster1);
-                	String::Replace(str, "%{monster2}", monster2);
+                        message = troop1() == troop2() ? _("Combine %{monster1} armies") : _("Exchange %{monster2} with %{monster1}");
+                	String::Replace(message, "%{monster1}", monster1);
+                	String::Replace(message, "%{monster2}", monster2);
                     }
                     else
                     {
-                        str = _("Move and right click Redistribute %{monster}");
-                	String::Replace(str, "%{monster}", monster2);
+                        message = _("Move and right click Redistribute %{monster}");
+                	String::Replace(message, "%{monster}", monster2);
                     }
                 }
                 else
                 if(troop1.isValid())
                 {
-                    str = _("Select %{monster}");
-                    String::Replace(str, "%{monster}", monster1);
+                    message = _("Select %{monster}");
+                    String::Replace(message, "%{monster}", monster1);
                 }
                 else
-                    str = _("Empty");
+                    message = _("Empty");
 
-                statusBar.ShowMessage(str);
+                statusBar.ShowMessage(message);
             }
 	    else
 		statusBar.ShowMessage(_("Hero Screen"));

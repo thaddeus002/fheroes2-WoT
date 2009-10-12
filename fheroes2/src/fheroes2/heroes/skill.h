@@ -137,4 +137,29 @@ namespace Skill
 
 };
 
+class SecondarySkillBar
+{
+public:
+    SecondarySkillBar();
+
+    const Rect & GetArea(void) const;
+    u8 GetIndexFromCoord(const Point &);
+
+    void SetSkills(const std::vector<Skill::Secondary> &);
+    void SetUseMiniSprite(void);
+    void SetPos(s16, s16);
+    void SetInterval(u8);
+
+    void Redraw(void);
+    void QueueEventProcessing(void);
+
+private:
+    void CalcSize(void);
+
+    Rect pos;
+    const std::vector<Skill::Secondary> *skills;
+    u8 interval;
+    bool use_mini_sprite;
+};
+
 #endif

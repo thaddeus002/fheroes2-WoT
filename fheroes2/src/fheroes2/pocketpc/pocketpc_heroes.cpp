@@ -30,8 +30,6 @@
 #include "kingdom.h"
 #include "pocketpc.h"
 
-extern void RedrawSecondarySkill(const Point &, const std::vector<Skill::Secondary> &);
-
 Dialog::answer_t PocketPC::HeroesOpenDialog(Heroes & hero, bool readonly)
 {
     Cursor & cursor = Cursor::Get();
@@ -118,7 +116,13 @@ Dialog::answer_t PocketPC::HeroesOpenDialog(Heroes & hero, bool readonly)
 
     // sec skill
     display.Blit(backSprite, Rect(21, 198, 267, 36), dst_rt.x + 7, dst_rt.y + 57);
-    RedrawSecondarySkill(Point(dst_rt.x + 9, dst_rt.y + 59), hero.GetSecondarySkills());
+    // secondary skill
+    SecondarySkillBar secskill_bar;
+    secskill_bar.SetPos(dst_rt.x + 9, dst_rt.y + 59);
+    secskill_bar.SetUseMiniSprite();
+    secskill_bar.SetInterval(1);
+    secskill_bar.SetSkills(hero.GetSecondarySkills());
+    secskill_bar.Redraw();
 
     // army bar
     const Rect rt1(36, 267, 43, 53);
@@ -202,6 +206,8 @@ Dialog::answer_t PocketPC::HeroesOpenDialog(Heroes & hero, bool readonly)
 	if(buttonDismiss.isEnable() && le.MouseClickLeft(buttonDismiss) &&
 	    Dialog::YES == Dialog::Message(hero.GetName(), _("Are you sure you want to dismiss this Hero?"), Font::BIG, Dialog::YES | Dialog::NO))
         { return Dialog::DISMISS; }
+
+       if(le.MouseCursor(secskill_bar.GetArea())) secskill_bar.QueueEventProcessing();
 
         // selector troops event
         if(le.MouseCursor(selectArmy.GetArea()))
