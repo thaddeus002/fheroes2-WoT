@@ -239,6 +239,8 @@ void Settings::Dump(std::ostream & stream) const
 #ifdef WITH_TTF
     stream << "fonts normal = " << font_normal << std::endl;
     stream << "fonts small = " << font_small << std::endl;
+    if(force_lang.size())
+    stream << "force lang = " << force_lang << std::endl;
     stream << "fonts normal size = " << static_cast<int>(size_normal) << std::endl;
     stream << "fonts small size = " << static_cast<int>(size_small) << std::endl;
     stream << "unicode = " << (Modes(USEUNICODE) ? "on" : "off") << std::endl;
@@ -298,6 +300,7 @@ Color::color_t Settings::MyColor(void) const { return my_color; }
 /* return fontname */
 const std::string & Settings::FontsNormal(void) const { return font_normal; }
 const std::string & Settings::FontsSmall(void) const { return font_small; }
+const std::string & Settings::ForceLang(void) const { return force_lang; }
 u8 Settings::FontsNormalSize(void) const { return size_normal; }
 u8 Settings::FontsSmallSize(void) const { return size_small; }
 bool Settings::FontsRenderBlended(void) const { return Modes(FONTRENDERBLENDED); }
@@ -387,6 +390,8 @@ void Settings::Parse(const std::string & left, const std::string & right)
     if(left == "port"){ port = String::ToInt(right); if(!port) port = DEFAULT_PORT; }
     else
     // font name
+    if(left == "lang") force_lang = right;
+    else
     if(left == "fonts normal") font_normal = right;
     else
     if(left == "fonts small") font_small = right;

@@ -148,6 +148,11 @@ int main(int argc, char **argv)
 #ifdef WITH_TTF
 	if(conf.Unicode())
 	{
+	    if(conf.ForceLang().size())
+	    {
+		strtmp = "LANG=" + conf.ForceLang();
+		putenv(const_cast<char *>(strtmp.c_str()));
+	    }
 	    strtmp = conf.LocalPrefix() + SEPARATOR + "files" + SEPARATOR + "lang";
 	    setlocale(LC_ALL, "");
 	    bindtextdomain(GETTEXT_PACKAGE, strtmp.c_str());

@@ -102,6 +102,7 @@ void WriteBE16(char *p, u16 x);
 #ifndef PATH_MAX
 #define PATH_MAX 255
 #endif
+#define setlocale(x,y) 0
 #define system(x) 0
 #define putenv(x) SDL_putenv(x)
 #define getenv(x) SDL_getenv(x)

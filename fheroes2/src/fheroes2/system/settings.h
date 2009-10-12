@@ -102,6 +102,7 @@ public:
 
     Difficulty::difficulty_t GameDifficulty(void) const;
 
+    const std::string & ForceLang(void) const;
     const std::string & FontsNormal(void) const;
     const std::string & FontsSmall(void) const;
     u8 FontsNormalSize(void) const;
@@ -222,6 +223,7 @@ private:
 
     std::string font_normal;
     std::string font_small;
+    std::string force_lang;
     u8 size_normal;
     u8 size_small;
 
