@@ -696,6 +696,7 @@ void AGG::Cache::LoadFNT(u16 ch)
 /* free ICN object in AGG::Cache */
 void AGG::Cache::FreeICN(const ICN::icn_t icn)
 {
+    if(1 < Settings::Get().Debug()) Error::Verbose("AGG::Cache::FreeICN: ", ICN::GetString(icn));
     if(icn_cache[icn].sprites){ delete [] icn_cache[icn].sprites; icn_cache[icn].sprites = NULL; }
     if(icn_cache[icn].reflect){ delete [] icn_cache[icn].reflect; icn_cache[icn].reflect = NULL; }
     icn_cache[icn].count = 0;
