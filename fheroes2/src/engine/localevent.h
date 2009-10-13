@@ -21,6 +21,7 @@
 #define H2LOCALEVENT_H
 
 #include "rect.h"
+#include "thread.h"
 #include "types.h"
 
 class Point;
@@ -217,11 +218,12 @@ private:
 	MOUSE_MOTION	= 0x0002,
 	MOUSE_PRESSED	= 0x0004,
 	GLOBAL_FILTER	= 0x0008,
-	PRESS_LEFT	= 0x0010,
-	PRESS_RIGHT	= 0x0020,
-	PRESS_MIDDLE	= 0x0040,
+	CLICK_LEFT	= 0x0010,
+	CLICK_RIGHT	= 0x0020,
+	CLICK_MIDDLE	= 0x0040,
 	TAP_MODE	= 0x0080,
 	MOUSE_OFFSET	= 0x0100,
+	CLOCK_ON	= 0x0200,
     };
 
     void SetModes(flag_t);
@@ -246,6 +248,8 @@ private:
 
     void (*redraw_cursor_func)(u16, u16);
     void (*keyboard_filter_func)(u16, u16);
+
+    Time clock;
 };
 
 #endif

@@ -21,6 +21,7 @@
 #ifndef SDLTHREAD_H
 #define SDLTHREAD_H
 
+#include <sys/time.h>
 #include "SDL_thread.h"
 #include "types.h"
 
@@ -67,6 +68,21 @@ public:
 
 private:
     SDL_TimerID id;
+};
+
+class Time
+{
+public:
+    Time();
+
+    void Start(void);
+    void Stop(void);
+    double Get(void) const;
+    void Print(void) const;
+
+private:
+    struct timeval clock1;
+    struct timeval clock2;
 };
 
 #endif

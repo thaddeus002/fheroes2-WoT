@@ -21,21 +21,11 @@
 #ifndef _PERFORMANCE_H
 #define _PERFORMANCE_H
 
-#include <sys/time.h>
-#include <iostream>
-#include "types.h"
+#include "thread.h"
 
-struct Performance
+class Performance : public Time
 {
     Performance(){};
-
-    void Start(void){ gettimeofday(&clock1, NULL); };
-    void Stop(void){ gettimeofday(&clock2, NULL); };
-    double Get(void) const{ return ((clock2.tv_sec - clock1.tv_sec) * 1000 + (clock2.tv_usec - clock1.tv_usec) / 1000.0) + 0.5; };
-    void Print(void) const { std::cout << "Performance: " << Get() << " ms" << std::endl; };
-
-    struct timeval clock1;
-    struct timeval clock2;
 };
 
 #endif

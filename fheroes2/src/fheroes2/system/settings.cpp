@@ -253,6 +253,13 @@ void Settings::Dump(std::ostream & stream) const
     stream << "autosave = " << (Modes(AUTOSAVE) ? "on" : "off") << std::endl;
     stream << "port = " << port << std::endl;
 
+    if(Modes(TAPMODE))
+    stream << "tap mode = on" << std::endl;
+    if(Modes(LOWMEMORY))
+    stream << "low memory = on" << std::endl;
+    if(Modes(POCKETPC))
+    stream << "pocket pc = on" << std::endl;
+
     stream << std::endl;
 }
 

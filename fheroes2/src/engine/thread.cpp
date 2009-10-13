@@ -18,6 +18,7 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
+#include <iostream>
 #include "thread.h"
 
 Thread::Thread() : thread(NULL)
@@ -100,4 +101,28 @@ void Timer::Remove(Timer & timer)
 bool Timer::IsValid(void) const
 {
     return id;
+}
+
+Time::Time()
+{
+}
+
+void Time::Start(void)
+{
+    gettimeofday(&clock1, NULL);
+}
+
+void Time::Stop(void)
+{
+    gettimeofday(&clock2, NULL);
+}
+
+double Time::Get(void) const
+{
+    return ((clock2.tv_sec - clock1.tv_sec) * 1000 + (clock2.tv_usec - clock1.tv_usec) / 1000.0) + 0.5;
+}
+
+void Time::Print(void) const
+{
+    std::cout << "Performance: " << Get() << " ms" << std::endl;
 }
