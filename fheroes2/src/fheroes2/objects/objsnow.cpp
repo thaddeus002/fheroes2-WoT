@@ -72,7 +72,7 @@ bool ObjSnow::isPassable(const u16 icn, const u8 index)
 	    if(194 == index) return false;
 	    else
 	    // saw mill
-	    if((196 < index && index < 203)) return false;
+	    if((196 < index && index < 202)) return false;
 
 	    else return true;	    
 

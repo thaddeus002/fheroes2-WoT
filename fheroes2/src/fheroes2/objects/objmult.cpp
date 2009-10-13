@@ -75,7 +75,7 @@ bool ObjMulti::isPassable(const u16 icn, const u8 index)
 	    if(206 < index && index < 210) return false;
 	    else
 	    // saw mill
-	    if(211 < index && index < 218) return false;
+	    if(211 < index && index < 217) return false;
 
 	    else return true;
 

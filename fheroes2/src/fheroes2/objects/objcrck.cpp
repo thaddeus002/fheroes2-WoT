@@ -70,7 +70,7 @@ bool ObjWasteLand::isPassable(const u16 icn, const u8 index)
 	    if(238 == index) return false;
 	    else
 	    // saw mill
-	    if(240 < index && index < 247) return false;
+	    if(240 < index && index < 246) return false;
 
 	    else return true;
 

@@ -75,7 +75,7 @@ bool ObjDesert::isPassable(const u16 icn, const u8 index)
 	    if(120 < index && index < 123) return false;
 	    else
 	    // saw mill
-	    if(124 < index && index < 131) return false;
+	    if(124 < index && index < 130) return false;
 	    else return true;
 
 	default: break;

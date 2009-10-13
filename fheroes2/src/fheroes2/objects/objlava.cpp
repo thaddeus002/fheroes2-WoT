@@ -56,7 +56,7 @@ bool ObjLava::isPassable(const u16 icn, const u8 index)
 	    if(117 == index) return false;
 	    else
 	    // saw mill
-	    if(119 < index && index < 126) return false;
+	    if(119 < index && index < 125) return false;
 
 	    else return true;
 
