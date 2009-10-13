@@ -1,5 +1,12 @@
-SVN - up to r1237
+SVN - up to r1264
 
++ Added force lang options
++ Added translation for original map files (sign, rumors, events message, sphinx riddle)
++ Added emulation the right mouse button for tap mode
++ Added low memory actions
++ Update pocketpc dialogues
++ Fixed more problems with troops moving too close in battle.
++ Keep battle win/lose music from looping. Play the puzzle music when not using midi.
 + Fixed incorrect battle results being displayed when battling AI.
 + Fixed trolls starting with much more health than they should in battle.
 + Fixed various problems in battle causing troops to attack from too far away.
