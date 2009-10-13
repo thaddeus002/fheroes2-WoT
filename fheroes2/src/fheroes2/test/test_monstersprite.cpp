@@ -27,6 +27,8 @@
 #include "monster.h"
 #include "button.h"
 
+#ifndef BUILD_RELEASE
+
 void TestMonsterSprite(void)
 {
     // cursor
@@ -173,3 +175,5 @@ void TestMonsterSprite(void)
         ++ticket;
     }
 }
+
+#endif

@@ -21,9 +21,12 @@
 #ifndef H2TEST_H
 #define H2TEST_H
 
+#ifndef BUILD_RELEASE
+
 namespace Test
 {
     void Run(int);
 };
 
+#endif
 #endif

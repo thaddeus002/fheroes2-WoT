@@ -23,6 +23,8 @@
 #include "gamedefs.h"
 #include "test.h"
 
+#ifndef BUILD_RELEASE
+
 void RunTest1(void);
 void RunTest2(void);
 void RunTest3(void);
@@ -57,3 +59,5 @@ void RunTest3(void)
 {
     Error::Verbose("Run Test3");
 }
+
+#endif
