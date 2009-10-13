@@ -139,6 +139,9 @@ namespace AGG
         void FreeMUS(const MUS::mus_t mus);
 	void FreeMID(const XMI::xmi_t xmi);
 
+	void ICNRegistryEnable(bool);
+	void ICNRegistryFreeObjects(void);
+
     private:
 	Cache();
 
@@ -157,6 +160,8 @@ namespace AGG
 	SDL::Font font_medium;
 	SDL::Font font_small;
 #endif
+	std::vector<ICN::icn_t> icn_registry;
+	bool icn_registry_enable;
     };
 
     // wrapper AGG::PreloadObject
@@ -168,6 +173,8 @@ namespace AGG
     void FreeObject(const TIL::til_t til);
 
     // wrapper AGG::GetXXX
+    void ICNRegistryEnable(bool);
+    void ICNRegistryFreeObjects(void);
     int GetICNCount(const ICN::icn_t icn);
     const Sprite & GetICN(const ICN::icn_t icn, const u16 index, bool reflect = false);
     const Surface & GetTIL(const TIL::til_t til, const u16 index, const u8 shape);

@@ -181,6 +181,9 @@ AGG::Cache::Cache()
 #endif
     icn_cache = new icn_cache_t [ICN::UNKNOWN + 1];
     til_cache = new til_cache_t [TIL::UNKNOWN + 1];
+
+    icn_registry_enable = false;
+    icn_registry.reserve(250);
 }
 
 AGG::Cache::~Cache()
@@ -469,6 +472,11 @@ void AGG::Cache::LoadICN(const ICN::icn_t icn, u16 index, bool reflect)
 	if(Settings::Get().PocketPC() && ICN::NeedMinify4PocketPC(icn, index)) 
 	    sp.ScaleMinifyByTwo();
     }
+
+    // registry icn
+    if(icn_registry_enable &&
+	icn_registry.end() == std::find(icn_registry.begin(), icn_registry.end(), icn))
+	icn_registry.push_back(icn);
 }
 
 /* load TIL object to AGG::Cache */
@@ -885,6 +893,18 @@ bool AGG::Cache::isValidFonts(void) const
     return false;
 }
 
+void AGG::Cache::ICNRegistryEnable(bool f)
+{
+    icn_registry_enable = f;
+}
+
+void AGG::Cache::ICNRegistryFreeObjects(void)
+{
+    std::vector<ICN::icn_t>::const_iterator it1 = icn_registry.begin();
+    std::vector<ICN::icn_t>::const_iterator it2 = icn_registry.end();
+    for(; it1 != it2; ++it1) FreeICN(*it1);
+}
+
 // wrapper AGG::PreloadObject
 void AGG::PreloadObject(const ICN::icn_t icn, bool reflect)
 {
@@ -895,6 +915,16 @@ void AGG::PreloadObject(const ICN::icn_t icn, bool reflect)
 void AGG::PreloadObject(const TIL::til_t til)
 {
     return AGG::Cache::Get().LoadTIL(til);
+}
+
+void AGG::ICNRegistryEnable(bool f)
+{
+    AGG::Cache::Get().ICNRegistryEnable(f);
+}
+
+void AGG::ICNRegistryFreeObjects(void)
+{
+    AGG::Cache::Get().ICNRegistryFreeObjects();
 }
 
 // wrapper AGG::FreeObject

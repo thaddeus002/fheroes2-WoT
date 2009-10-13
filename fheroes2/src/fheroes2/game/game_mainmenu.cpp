@@ -38,6 +38,7 @@ Game::menu_t Game::MainMenu(void)
     Mixer::Pause();
     AGG::PlayMusic(MUS::MAINMENU);
 
+    if(Settings::Get().LowMemory()) AGG::ICNRegistryEnable(true);
     if(Settings::Get().PocketPC()) return PocketPC::MainMenu();
 
     // preload

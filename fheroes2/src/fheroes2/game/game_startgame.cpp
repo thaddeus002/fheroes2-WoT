@@ -201,6 +201,12 @@ Game::menu_t Game::StartGame(void)
     AGG::FreeObject(ICN::HSBKG);
     AGG::FreeObject(ICN::HISCORE);
 
+    if(Settings::Get().LowMemory())
+    {
+        AGG::ICNRegistryEnable(false);
+        AGG::ICNRegistryFreeObjects();
+    }
+
     // preload sounds
     Game::PreloadLOOPSounds();
     Mixer::Reset();
@@ -329,6 +335,7 @@ void Game::OpenCastle(Castle *castle)
     if(! castle) return;
 
     Mixer::Reduce();
+    if(Settings::Get().LowMemory()) AGG::ICNRegistryEnable(true);
 
     Cursor & cursor = Cursor::Get();
     Kingdom & myKingdom = world.GetMyKingdom();
@@ -377,6 +384,12 @@ void Game::OpenCastle(Castle *castle)
     if(it != myCastles.end()) globalfocus.Set(*it);
     if(Heroes *hero = const_cast<Heroes *>((*it)->GetHeroes())) globalfocus.Set(hero);
     globalfocus.SetRedraw();
+
+    if(Settings::Get().LowMemory())
+    {
+        AGG::ICNRegistryEnable(false);
+        AGG::ICNRegistryFreeObjects();
+    }
     Mixer::Enhance();
 }
 
@@ -386,6 +399,7 @@ void Game::OpenHeroes(Heroes *hero)
     if(! hero) return;
 
     Mixer::Reduce();
+    if(Settings::Get().LowMemory()) AGG::ICNRegistryEnable(true);
 
     Cursor & cursor = Cursor::Get();
     Kingdom & myKingdom = world.GetMyKingdom();
@@ -453,6 +467,12 @@ void Game::OpenHeroes(Heroes *hero)
     else
         globalfocus.Reset(Game::Focus::HEROES);
     globalfocus.SetRedraw();
+
+    if(Settings::Get().LowMemory())
+    {
+        AGG::ICNRegistryEnable(false);
+        AGG::ICNRegistryFreeObjects();
+    }
     Mixer::Enhance();
 }
 
