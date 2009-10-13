@@ -178,6 +178,7 @@ bool Object::AllowDirect(const u8 general, const u16 direct)
 	case MP2::OBJ_WATERWHEEL:
 	case MP2::OBJ_HILLFORT:
 	case MP2::OBJ_FREEMANFOUNDRY:
+	case MP2::OBJ_SAWMILL:
 	    return (direct & (Direction::RIGHT | DIRECTION_BOTTOM_ROW));
 
 	case MP2::OBJ_TREECITY:
@@ -188,7 +189,6 @@ bool Object::AllowDirect(const u8 general, const u16 direct)
 	case MP2::OBJ_FAERIERING:
 	case MP2::OBJ_BARROWMOUNDS:
 	case MP2::OBJ_STABLES:
-	case MP2::OBJ_SAWMILL:
 	    return (direct & (Direction::LEFT | DIRECTION_BOTTOM_ROW));
 
 	case MP2::OBJ_MINES:
