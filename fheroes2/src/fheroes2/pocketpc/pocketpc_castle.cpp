@@ -167,10 +167,11 @@ screen_t CastleOpenDialog1(Castle & castle)
     selectHeroesArmy.SetCastle(castle);
 
     display.Blit(AGG::GetICN(ICN::SWAPWIN, 0), Rect(36, 267, 43, 43), pt.x, pt.y);
+    const Rect heroSign(pt.x + 1, pt.y + 1, 41, 41);
     if(hero)
     {
 	const Surface & icon = Portrait::Hero(*hero, Portrait::MEDIUM);
-	display.Blit(icon, Rect((icon.w() - 41) / 2, (icon.h() - 41) / 2, 41, 41), pt.x + 1, pt.y + 1);
+	display.Blit(icon, Rect((icon.w() - 41) / 2, (icon.h() - 41) / 2, 41, 41), heroSign);
 
 	selectHeroesArmy.SetArmy(const_cast<Army::army_t &>(hero->GetArmy()));
 	selectHeroesArmy.Redraw();
@@ -178,7 +179,7 @@ screen_t CastleOpenDialog1(Castle & castle)
     else
     {
 	const Sprite & crest = AGG::GetICN(ICN::BRCREST, Color::GetIndex(castle.GetColor()));
-	display.Blit(crest, Rect((crest.w() - 41) / 2, (crest.h() - 41) / 2, 41, 41), pt.x + 1, pt.y + 1);
+	display.Blit(crest, Rect((crest.w() - 41) / 2, (crest.h() - 41) / 2, 41, 41), heroSign);
     }
 
     // resource bar
@@ -263,6 +264,14 @@ screen_t CastleOpenDialog1(Castle & castle)
 	    dwbar.Redraw();
 	    selectCastleArmy.Redraw();
 	    RedrawResourceBar(Point(dst_rt.x + 4, dst_rt.y + 181), world.GetMyKingdom().GetFundsResource());
+	    cursor.Show();
+	    display.Flip();
+	}
+	else
+	if(hero && le.MouseClickLeft(heroSign))
+	{
+	    cursor.Hide();
+	    const_cast<Heroes *>(hero)->OpenDialog(false, false);
 	    cursor.Show();
 	    display.Flip();
 	}
@@ -889,6 +898,15 @@ bool DwellingBar::QueueEventProcessing(void)
 	{
 	    const u16 recruit = Dialog::RecruitMonster(Monster(castle.GetRace(), castle.GetActualDwelling(dwelling)), castle.GetDwellingLivedCount(dwelling));
             return const_cast<Castle &>(castle).RecruitMonster(dwelling, recruit);
+	}
+	else
+	{
+	    BuildingInfo dwelling2(castle, static_cast<Castle::building_t>(dwelling));
+	    if(dwelling2.DialogBuyBuilding(true))
+	    {
+		const_cast<Castle &>(castle).BuyBuilding(dwelling);
+		return true;
+	    }
 	}
     }
     return false;
