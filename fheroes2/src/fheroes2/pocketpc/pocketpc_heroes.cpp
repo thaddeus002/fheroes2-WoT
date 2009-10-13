@@ -64,20 +64,14 @@ Dialog::answer_t PocketPC::HeroesOpenDialog(Heroes & hero, bool readonly)
     text.Blit(dst_rt.x + 73, dst_rt.y + 1);
 
     // experience
-    display.Blit(AGG::GetICN(ICN::HSICONS, 1), dst_rt.x + 206, dst_rt.y + 14);
-    message.clear();
-    String::AddInt(message, hero.GetExperience());
-    text.Set(message);
-    text.Blit(dst_rt.x + 223 - text.w() / 2, dst_rt.y + 37);
+    ExperienceIndicator experienceInfo(hero);
+    experienceInfo.SetPos(Point(dst_rt.x + 205, dst_rt.y + 14));
+    experienceInfo.Redraw();
 
     // spell points
-    display.Blit(AGG::GetICN(ICN::HSICONS, 8), dst_rt.x + 240, dst_rt.y + 16);
-    message.clear();
-    String::AddInt(message, hero.GetSpellPoints());
-    message += "/";
-    String::AddInt(message, hero.GetMaxSpellPoints());
-    text.Set(message);
-    text.Blit(dst_rt.x + 256 - text.w() / 2, dst_rt.y + 37);
+    SpellPointsIndicator spellPointsInfo(hero);
+    spellPointsInfo.SetPos(Point(dst_rt.x + 238, dst_rt.y + 16));
+    spellPointsInfo.Redraw();
 
     // morale
     MoraleIndicator moraleIndicator(hero);
@@ -233,6 +227,10 @@ Dialog::answer_t PocketPC::HeroesOpenDialog(Heroes & hero, bool readonly)
         if(le.MouseCursor(moraleIndicator.GetArea())) MoraleIndicator::QueueEventProcessing(moraleIndicator);
         else
         if(le.MouseCursor(luckIndicator.GetArea())) LuckIndicator::QueueEventProcessing(luckIndicator);
+        else
+	if(le.MouseCursor(experienceInfo.GetArea())) experienceInfo.QueueEventProcessing();
+        else
+	if(le.MouseCursor(spellPointsInfo.GetArea())) spellPointsInfo.QueueEventProcessing();
     }
 
     return Dialog::ZERO;

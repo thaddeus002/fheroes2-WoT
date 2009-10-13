@@ -65,4 +65,22 @@ private:
     s8 morale;
 };
 
+class ExperienceIndicator : public HeroesIndicator
+{
+public:
+    ExperienceIndicator(const Heroes &);
+
+    void Redraw(void);
+    void QueueEventProcessing(void);
+};
+
+class SpellPointsIndicator : public HeroesIndicator
+{
+public:
+    SpellPointsIndicator(const Heroes &);
+
+    void Redraw(void);
+    void QueueEventProcessing(void);
+};
+
 #endif

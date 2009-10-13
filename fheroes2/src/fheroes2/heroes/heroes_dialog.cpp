@@ -179,46 +179,14 @@ Dialog::answer_t Heroes::OpenDialog(bool readonly, bool fade)
     cursorFormat.Show(Modes(ARMYSPREAD) ? army1_pt : army2_pt);
 
     // experience
-    dst_pt.x = cur_pt.x + 512;
-    dst_pt.y = cur_pt.y + 85;
-    const Sprite & sprite3 = AGG::GetICN(ICN::HSICONS, 1);
-    const Rect rectExperienceInfo(dst_pt, sprite3.w(), sprite3.h());
-    display.Blit(sprite3, dst_pt);
-
-    message.clear();
-    String::AddInt(message, GetExperience());
-    dst_pt.x = cur_pt.x + 528;
-    dst_pt.y = cur_pt.y + 107;
-    text.Set(message, Font::SMALL);
-    text.Blit(dst_pt.x - text.w() / 2, dst_pt.y);
-    
-    std::string headerExperience = _("Level %{level}");
-    String::Replace(headerExperience, "%{level}", GetLevel());
-    
-    std::string descriptionExperience = _("Current experience %{exp1} Next level %{exp2}.");
-    String::Replace(descriptionExperience, "%{exp1}", GetExperience());
-    String::Replace(descriptionExperience, "%{exp2}", GetExperienceFromLevel(GetLevelFromExperience(experience)));
+    ExperienceIndicator experienceInfo(*this);
+    experienceInfo.SetPos(Point(cur_pt.x + 514, cur_pt.y + 85));
+    experienceInfo.Redraw();
 
     // spell points
-    dst_pt.x = cur_pt.x + 550;
-    dst_pt.y = cur_pt.y + 87;
-    const Sprite & sprite4 = AGG::GetICN(ICN::HSICONS, 8);
-    const Rect rectSpellPointsInfo(dst_pt, sprite4.w(), sprite4.h());
-    display.Blit(sprite4, dst_pt);
-
-    message.clear();
-    String::AddInt(message, GetSpellPoints());
-    message += "/";
-    String::AddInt(message, GetMaxSpellPoints());
-    dst_pt.x = cur_pt.x + 568;
-    dst_pt.y = cur_pt.y + 107;
-    text.Set(message, Font::SMALL);
-    text.Blit(dst_pt.x - text.w() / 2, dst_pt.y);
-
-    std::string descriptionSpellPoints = _("%{name} currently has %{point} spell points out of a maximum of %{max}. The maximum number of spell points is 10 times your knowledge. It is occasionally possible to have more than your maximum spell points via special events.");
-    String::Replace(descriptionSpellPoints, "%{name}", GetName());
-    String::Replace(descriptionSpellPoints, "%{point}", GetSpellPoints());
-    String::Replace(descriptionSpellPoints, "%{max}", GetMaxSpellPoints());
+    SpellPointsIndicator spellPointsInfo(*this);
+    spellPointsInfo.SetPos(Point(cur_pt.x + 549, cur_pt.y + 87));
+    spellPointsInfo.Redraw();
 
     // crest
     dst_pt.x = cur_pt.x + 49;
@@ -379,6 +347,10 @@ Dialog::answer_t Heroes::OpenDialog(bool readonly, bool fade)
         if(le.MouseCursor(moraleIndicator.GetArea())) MoraleIndicator::QueueEventProcessing(moraleIndicator);
         else
         if(le.MouseCursor(luckIndicator.GetArea())) LuckIndicator::QueueEventProcessing(luckIndicator);
+	else
+	if(le.MouseCursor(experienceInfo.GetArea())) experienceInfo.QueueEventProcessing();
+	else
+	if(le.MouseCursor(spellPointsInfo.GetArea())) spellPointsInfo.QueueEventProcessing();
 
 	// left click info
         if(le.MouseClickLeft(rectAttackSkill)) Dialog::Message(_("Attack Skill"), _("Your attack skill is a bonus added to each creature's attack skill."), Font::BIG, Dialog::OK);
@@ -388,10 +360,6 @@ Dialog::answer_t Heroes::OpenDialog(bool readonly, bool fade)
         if(le.MouseClickLeft(rectSpellSkill)) Dialog::Message(_("Spell Power"), _("Your spell power determines the length or power of a spell."), Font::BIG, Dialog::OK);
         else
         if(le.MouseClickLeft(rectKnowledgeSkill)) Dialog::Message(_("Knowledge"), _("Your knowledge determines how many spell points your hero may have. Under normal cirumstances, a hero is limited to 10 spell points per level of knowledge."), Font::BIG, Dialog::OK);
-	else
-        if(le.MouseClickLeft(rectExperienceInfo)) Dialog::Message(headerExperience, descriptionExperience, Font::BIG, Dialog::OK);
-        else
-        if(le.MouseClickLeft(rectSpellPointsInfo)) Dialog::Message(_("Spell Points"), descriptionSpellPoints, Font::BIG, Dialog::OK);
 	else
         if(!readonly && le.MouseClickLeft(rectSpreadArmyFormat) && !Modes(ARMYSPREAD))
         {
@@ -422,10 +390,6 @@ Dialog::answer_t Heroes::OpenDialog(bool readonly, bool fade)
         else
         if(le.MousePressRight(rectKnowledgeSkill)) Dialog::Message(_("Knowledge"), _("Your knowledge determines how many spell points your hero may have. Under normal cirumstances, a hero is limited to 10 spell points per level of knowledge."), Font::BIG);
 	else
-        if(le.MousePressRight(rectExperienceInfo)) Dialog::Message(headerExperience, descriptionExperience, Font::BIG);
-        else
-        if(le.MousePressRight(rectSpellPointsInfo)) Dialog::Message(_("Spell Points"), descriptionSpellPoints, Font::BIG);
-        else
         if(le.MousePressRight(rectSpreadArmyFormat)) Dialog::Message(_("Spread Formation"), descriptionSpreadArmyFormat, Font::BIG);
         else
         if(le.MousePressRight(rectGroupedArmyFormat)) Dialog::Message(_("Grouped Formation"), descriptionGroupedArmyFormat, Font::BIG);
@@ -443,9 +407,9 @@ Dialog::answer_t Heroes::OpenDialog(bool readonly, bool fade)
 	else
 	if(le.MouseCursor(luckIndicator.GetArea())) statusBar.ShowMessage(_("View Luck Info"));
 	else
-	if(le.MouseCursor(rectExperienceInfo)) statusBar.ShowMessage(_("View Experience Info"));
+	if(le.MouseCursor(experienceInfo.GetArea())) statusBar.ShowMessage(_("View Experience Info"));
 	else
-	if(le.MouseCursor(rectSpellPointsInfo)) statusBar.ShowMessage(_("View Spell Points Info"));
+	if(le.MouseCursor(spellPointsInfo.GetArea())) statusBar.ShowMessage(_("View Spell Points Info"));
 	else
 	if(le.MouseCursor(rectSpreadArmyFormat)) statusBar.ShowMessage(_("Set army combat formation to 'Spread'"));
 	else
