@@ -56,7 +56,7 @@ void Kingdom::AITurns(void)
 	return;
     }
     
-    AGG::PlayMusic(MUS::COMPUTER);
+    if(!Settings::Get().Modes(Settings::MUSIC_MIDI)) AGG::PlayMusic(MUS::COMPUTER);
 
     Cursor & cursor = Cursor::Get();
     Display & display = Display::Get();
