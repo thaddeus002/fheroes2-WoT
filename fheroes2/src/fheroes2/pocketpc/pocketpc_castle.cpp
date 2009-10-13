@@ -106,7 +106,7 @@ screen_t CastleOpenDialog1(Castle & castle)
     RedrawBackground(dst_rt, castle);
 
     Text text;
-    text.Set(castle.GetName(), Font::SMALL);
+    text.Set(castle.GetName(), Font::YELLOW_SMALL);
     text.Blit(dst_rt.x + (dst_rt.w - text.w()) / 2, dst_rt.y + 3);
 
     // town icon
