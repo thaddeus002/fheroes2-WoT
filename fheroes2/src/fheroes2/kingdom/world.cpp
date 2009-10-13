@@ -693,7 +693,7 @@ void World::LoadMaps(const std::string &filename)
 		case MP2::OBJ_BOTTLE:
 		    // add sign or buttle
 		    if(SIZEOFMP2SIGN - 1 < sizeblock && 0x01 == pblock[0])
-			map_sign[*it_index] = std::string(reinterpret_cast<char *>(&pblock[9]));
+			map_sign[*it_index] = std::string(_(reinterpret_cast<char *>(&pblock[9])));
 		    break;
 		case MP2::OBJ_EVENT:
 		    // add event maps
@@ -722,7 +722,7 @@ void World::LoadMaps(const std::string &filename)
 	    {
 		if(pblock[8])
 		{
-		    vec_rumors.push_back(reinterpret_cast<char *>(&pblock[8]));
+		    vec_rumors.push_back(_(reinterpret_cast<char *>(&pblock[8])));
 		    if(Settings::Get().Debug()) Error::Verbose("add Rumors: " + vec_rumors.back());
 		}
 	    }

@@ -125,7 +125,7 @@ GameEvent::Day::Day(const void *ptr)
     ++ptr8;
 
     // message
-    message = std::string(reinterpret_cast<const char *>(ptr8));
+    message = std::string(_(reinterpret_cast<const char *>(ptr8)));
 
     //if(SIZEMESSAGE < message.size()) Error::Warning("GameEvent::Day: long message, incorrect block?");
 
@@ -220,7 +220,7 @@ GameEvent::Coord::Coord(u16 index, const void *ptr) : index_map(index)
     ++ptr8;
 
     // message
-    message = std::string(reinterpret_cast<const char *>(ptr8));
+    message = std::string(_(reinterpret_cast<const char *>(ptr8)));
     
     if(Settings::Get().Debug()) Error::Verbose("GameEvent::Coord: add: " + message);
 }
@@ -288,12 +288,12 @@ GameEvent::Riddle::Riddle(u16 index, const void *ptr) : index_map(index), quiet(
     {
 	std::string str(reinterpret_cast<const char *>(ptr8));
 	String::Lower(str);
-	if(count-- && str.size()) answers.push_back(str);
+	if(count-- && str.size()){ answers.push_back(str); answers.push_back(_(reinterpret_cast<const char *>(ptr8))); };
 	ptr8 += 13;
     }
 
     // message
-    message = std::string(reinterpret_cast<const char *>(ptr8));
+    message = std::string(_(reinterpret_cast<const char *>(ptr8)));
     
     if(Settings::Get().Debug()) Error::Verbose("GameEvent::Riddle: add: " + message);
 }
