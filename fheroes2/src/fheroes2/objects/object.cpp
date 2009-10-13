@@ -188,11 +188,11 @@ bool Object::AllowDirect(const u8 general, const u16 direct)
 	case MP2::OBJ_FAERIERING:
 	case MP2::OBJ_BARROWMOUNDS:
 	case MP2::OBJ_STABLES:
+	case MP2::OBJ_SAWMILL:
 	    return (direct & (Direction::LEFT | DIRECTION_BOTTOM_ROW));
 
 	case MP2::OBJ_MINES:
 	case MP2::OBJ_ABANDONEDMINE:
-	case MP2::OBJ_SAWMILL:
 	case MP2::OBJ_ALCHEMYLAB:
 	case MP2::OBJ_CAVE:
 	case MP2::OBJ_CITYDEAD:
