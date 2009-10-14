@@ -1680,7 +1680,6 @@ void Maps::Tiles::UpdateAbandoneMineSprite(void)
 	    if(ICN::EXTRAOVR == MP2::GetICNObject(addon.object) && 5 == addon.index)
 	    {
 		addon.index = 4;
-		general = MP2::OBJ_MINES;
 		break;
 	    }
 	}

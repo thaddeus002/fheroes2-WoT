@@ -2030,6 +2030,7 @@ void ActionToAbandoneMine(Heroes &hero, const u8 obj, const u16 dst_index)
 		tile.SetQuantity1(0);
 		tile.UpdateAbandoneMineSprite();
 		world.CaptureObject(dst_index, hero.GetColor());
+		hero.SaveUnderObject(MP2::OBJ_MINES);
 		hero.ActionAfterBattle();
 		break;
 
@@ -2041,9 +2042,10 @@ void ActionToAbandoneMine(Heroes &hero, const u8 obj, const u16 dst_index)
         
     	    default: break;
 	}
+	if(Settings::Get().Debug()) Error::Verbose("ActionToAbandoneMine: " + hero.GetName() + " captured: " + std::string(MP2::StringObject(obj)));
     }
-
-    if(Settings::Get().Debug()) Error::Verbose("ActionToAbandoneMine: " + hero.GetName() + " captured: " + std::string(MP2::StringObject(obj)));
+    else
+    if(Settings::Get().Debug()) Error::Verbose("ActionToAbandoneMine: " + hero.GetName() + " skipped: " + std::string(MP2::StringObject(obj)));
 }
 
 /* capture color object */

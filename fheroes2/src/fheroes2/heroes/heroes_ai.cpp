@@ -64,6 +64,7 @@ void AIToDwellingJoinMonster(Heroes &hero, const u8 obj, const u16 dst_index);
 void AIToHeroes(Heroes &hero, const u8 obj, const u16 dst_index);
 void AIToDwellingRecruitMonster(Heroes &hero, const u8 obj, const u16 dst_index);
 void AIToStables(Heroes &hero, const u8 obj, const u16 dst_index);
+void AIToAbandoneMine(Heroes &hero, const u8 obj, const u16 dst_index);
 
 Skill::Primary::skill_t AISelectPrimarySkill(Heroes &hero)
 {
@@ -162,6 +163,7 @@ void Heroes::AIAction(const u16 dst_index)
         case MP2::OBJ_MINES:
 	case MP2::OBJ_SAWMILL:
         case MP2::OBJ_LIGHTHOUSE:	AIToCaptureObject(*this, object, dst_index); break;
+        case MP2::OBJ_ABANDONEDMINE:    AIToAbandoneMine(*this, object, dst_index); break;
 
 	// event
 	case MP2::OBJ_EVENT:		AIToEvent(*this, object, dst_index); break;
@@ -1313,6 +1315,40 @@ void AIToStables(Heroes &hero, const u8 obj, const u16 dst_index)
                                                                 
     if(Settings::Get().Debug()) Error::Verbose("AIToStables: " + hero.GetName());
 }
+
+void AIToAbandoneMine(Heroes &hero, const u8 obj, const u16 dst_index)
+{
+    Maps::Tiles & tile = world.GetTiles(dst_index);
+
+    Army::army_t army;
+    army.FromGuardian(tile);
+
+    u32 exp = 0;
+    const Army::battle_t b = Army::Battle(hero, army, tile, exp);
+
+    switch(b)
+    {
+	case Army::WIN:
+            hero.IncreaseExperience(exp);
+            tile.SetQuantity1(0);
+            tile.UpdateAbandoneMineSprite();
+            world.CaptureObject(dst_index, hero.GetColor());
+            hero.SaveUnderObject(MP2::OBJ_MINES);
+            hero.ActionAfterBattle();
+            break;
+
+        case Army::RETREAT:
+        case Army::SURRENDER:
+        case Army::LOSE:
+            AIBattleLose(hero, b);
+            break;
+
+        default: break;
+    }
+
+    if(Settings::Get().Debug()) Error::Verbose("AIToAbandoneMine: " + hero.GetName());
+}
+
 
 
 
