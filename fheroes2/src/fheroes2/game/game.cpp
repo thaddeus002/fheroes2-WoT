@@ -40,9 +40,15 @@ namespace Game
     static std::vector<u8> reserved_vols;
 };
 
+Game::menu_t Game::Testing(u8 t)
+{
 #ifndef BUILD_RELEASE
-Game::menu_t Game::Testing(u8 t){ Test::Run(t); return Game::QUITGAME; }
+    Test::Run(t);
+    return Game::QUITGAME;
+#else
+    return Game::MAINMENU;
 #endif
+}
 
 Game::menu_t Game::Credits(void)
 {
