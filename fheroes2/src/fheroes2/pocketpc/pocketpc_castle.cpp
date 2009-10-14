@@ -458,6 +458,17 @@ screen_t CastleOpenDialog3(Castle & castle)
     building6.SetPos(dst_rt.x + 141, dst_rt.y + 150);
     building6.Redraw();
 
+    // magic book sprite
+    const Heroes* hero = castle.GetHeroes();
+    bool need_buy_book = hero && !hero->HasArtifact(Artifact::MAGIC_BOOK) && castle.GetLevelMageGuild();
+    const Rect book_pos(building1.GetArea().x + 1, building1.GetArea().y + 1, 32, 32);
+    if(need_buy_book)
+    {
+	display.Blit(AGG::GetICN(ICN::ARTFX, 81), book_pos);
+	Text text(_("buy"), Font::SMALL);
+	text.Blit(book_pos.x + (book_pos.w - text.w()) / 2, book_pos.y + book_pos.h - 12);
+    }
+
     cursor.Show();
     display.Flip();
 
@@ -476,6 +487,8 @@ screen_t CastleOpenDialog3(Castle & castle)
         // exit
         if(le.MouseClickLeft(rectExit) || le.KeyPress(KEY_ESCAPE)) break;
 
+	if(need_buy_book && le.MouseClickLeft(book_pos)){ const_cast<Heroes *>(hero)->BuySpellBook(castle); return SCREEN1; }
+	else
 	if(le.MouseCursor(building1.GetArea()) && building1.QueueEventProcessing()) { castle.BuyBuilding(building1()); return SCREEN1; }
 	else
 	if(le.MouseCursor(building2.GetArea()) && building2.QueueEventProcessing()) { castle.BuyBuilding(building2()); return SCREEN1; }
