@@ -1076,7 +1076,7 @@ Game::menu_t Game::HumanTurn(void)
     }
 
     // reset sound
-    Mixer::Reset();
+    //Mixer::Reset();
 
     return res;
 }
