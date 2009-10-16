@@ -501,6 +501,9 @@ void Settings::Parse(const std::string & left, const std::string & right)
     if(left == "pointer offset x") LocalEvent::Get().SetMouseOffsetX(String::ToInt(right));
     else
     if(left == "pointer offset y") LocalEvent::Get().SetMouseOffsetY(String::ToInt(right));
+    // tap delay for right click emulation
+    else
+    if(left == "tap delay") LocalEvent::Get().SetTapDelayForRightClickEmulation(String::ToInt(right));
 }
 
 /* set level debug */

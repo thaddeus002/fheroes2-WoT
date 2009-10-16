@@ -1671,6 +1671,7 @@ bool ICN::NeedMinify4PocketPC(icn_t icn, u16 index)
     switch(icn)
     {
 	case PUZZLE:
+	case HSBKG:
 	    return true;
 
 	default: break;

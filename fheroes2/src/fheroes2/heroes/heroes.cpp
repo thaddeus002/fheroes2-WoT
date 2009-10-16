@@ -1163,6 +1163,8 @@ void Heroes::ActionAfterBattle(void)
 {
     // remove month visit object
     visit_object.remove_if(Visit::isBattleLife);
+    //
+    SetModes(ACTION);
 }
 
 u16 Heroes::FindPath(u16 dst_index)
@@ -1772,6 +1774,7 @@ void Heroes::SetFreeman(const u8 reason)
     mp.y = -1;
     path.Reset();
     SetMove(false);
+    SetModes(ACTION);
 }
 
 bool Heroes::isShow(u8 color)

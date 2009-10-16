@@ -81,6 +81,7 @@ bool Game::IO::LoadSAV(const std::string & fn)
 	delete [] data;
         data = new char [dtsz];
 	std::memcpy(data, &v[0], dtsz);
+	v.clear();
     }
 #endif
 

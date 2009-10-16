@@ -35,11 +35,13 @@ namespace GameOver
 	WINS_ARTIFACT	= 0x0008,
 	WINS_SIDE	= 0x0010,
 	WINS_GOLD	= 0x0020,
+	WINS            = WINS_ALL | WINS_TOWN | WINS_HERO | WINS_ARTIFACT | WINS_SIDE | WINS_GOLD,
 
 	LOSS_ALL	= 0x0100,
 	LOSS_TOWN	= 0x0200,
 	LOSS_HERO	= 0x0400,
-	LOSS_TIME	= 0x0800
+	LOSS_TIME	= 0x0800,
+	LOSS            = LOSS_ALL | LOSS_TOWN | LOSS_HERO | LOSS_TIME,
     };
 
     const std::string & GetString(conditions_t);

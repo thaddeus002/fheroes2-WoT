@@ -137,6 +137,7 @@ public:
     void SetGlobalFilterKeysEvents(void (*pf)(u16, u16));
     void SetGlobalFilter(bool);
     void SetTapMode(bool);
+    void SetTapDelayForRightClickEmulation(double);
     void SetMouseOffsetX(s16);
     void SetMouseOffsetY(s16);
 
@@ -250,6 +251,7 @@ private:
     void (*keyboard_filter_func)(u16, u16);
 
     Time clock;
+    double clock_delay;
 };
 
 #endif

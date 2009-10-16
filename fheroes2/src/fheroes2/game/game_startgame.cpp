@@ -318,14 +318,6 @@ Game::menu_t Game::StartGame(void)
 	DELAY(1);
     }
 
-    /* for testing: show score  */
-    if(HIGHSCORES == m)
-    {
-	std::string str;
-	String::AddInt(str, Game::GetGameOverScores());
-	Dialog::Message("Your Score:", str, Font::BIG, Dialog::OK);
-    }
-
     return m == ENDTURN ? QUITGAME : m;
 }
 

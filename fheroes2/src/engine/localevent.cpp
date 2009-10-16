@@ -21,16 +21,21 @@
 #include "error.h"
 #include "localevent.h"
 
-#define TAP_DELAY_EMULATE 1200
+#define TAP_DELAY_EMULATE 950
 
 LocalEvent::LocalEvent() : modes(0), key_value(KEY_NONE), mouse_state(0),
-    mouse_button(0), mouse_st(0, 0), redraw_cursor_func(NULL), keyboard_filter_func(NULL)
+    mouse_button(0), mouse_st(0, 0), redraw_cursor_func(NULL), keyboard_filter_func(NULL), clock_delay(TAP_DELAY_EMULATE)
 {
 }
 
 void LocalEvent::SetTapMode(bool f)
 {
     f ? SetModes(TAP_MODE) : ResetModes(TAP_MODE);
+}
+
+void LocalEvent::SetTapDelayForRightClickEmulation(double d)
+{
+    clock_delay = d < 200 ? TAP_DELAY_EMULATE : d;
 }
 
 void LocalEvent::SetMouseOffsetX(s16 x)
@@ -213,7 +218,7 @@ bool LocalEvent::HandleEvents(bool delay)
     if((modes & TAP_MODE) && (modes & CLOCK_ON))
     {
 	clock.Stop();
-	if(TAP_DELAY_EMULATE < clock.Get())
+	if(clock_delay < clock.Get())
 	{
 	    ResetModes(CLICK_LEFT);
 	    ResetModes(CLOCK_ON);

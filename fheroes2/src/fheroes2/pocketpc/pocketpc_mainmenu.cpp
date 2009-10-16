@@ -67,22 +67,26 @@ Game::menu_t PocketPC::MainMenu(void)
 
     Text text;
     
-    text.Set("Free Heroes II", Font::BIG);
+    text.Set("Free Heroes II", Font::YELLOW_SMALL);
     text.Blit(dst_pt.x + (src_rt.w - text.w()) / 2, dst_pt.y + 10);
 
-    text.Set(conf.BuildVersion(), Font::SMALL);
+    text.Set(conf.BuildVersion());
     text.Blit(dst_pt.x + (src_rt.w - text.w()) / 2, dst_pt.y + 148);
 
-    text.Set(_("New Game"), Font::BIG);
+    text.Set(_("New Game"), Font::SMALL);
     const Rect rectNewGame(dst_pt.x + (src_rt.w - text.w()) / 2 - 5, dst_pt.y + 40 + 5, text.w() + 10, text.h() + 10);
     text.Blit(rectNewGame);
 
     text.Set(_("Load Game"));
-    const Rect rectLoadGame(dst_pt.x + (src_rt.w - text.w()) / 2 - 5, dst_pt.y + 70 + 5, text.w() + 10, text.h() + 10);
+    const Rect rectLoadGame(dst_pt.x + (src_rt.w - text.w()) / 2 - 5, dst_pt.y + 65 + 5, text.w() + 10, text.h() + 10);
     text.Blit(rectLoadGame);
 
+    text.Set(_("High Scores"));
+    const Rect rectHighScores(dst_pt.x + (src_rt.w - text.w()) / 2 - 5, dst_pt.y + 90 + 5, text.w() + 10, text.h() + 10);
+    text.Blit(rectHighScores);
+
     text.Set(_("Quit"));
-    const Rect rectQuitGame(dst_pt.x + (src_rt.w - text.w()) / 2 - 5, dst_pt.y + 100 + 5, text.w() + 10, text.h() + 10);
+    const Rect rectQuitGame(dst_pt.x + (src_rt.w - text.w()) / 2 - 5, dst_pt.y + 115 + 5, text.w() + 10, text.h() + 10);
     text.Blit(rectQuitGame);
 
     cursor.Show();
@@ -94,6 +98,8 @@ Game::menu_t PocketPC::MainMenu(void)
 	if(le.KeyPress(KEY_n) || le.MouseClickLeft(rectNewGame)) return Game::SELECTSCENARIO;
 	else
 	if(le.KeyPress(KEY_l) || le.MouseClickLeft(rectLoadGame)) return Game::LOADGAME;
+	else
+	if(le.KeyPress(KEY_h) || le.MouseClickLeft(rectHighScores)) return Game::HIGHSCORES;
 	else
 	if(le.KeyPress(KEY_q) || le.MouseClickLeft(rectQuitGame) || le.KeyPress(KEY_ESCAPE)) return Game::QUITGAME;
     }
