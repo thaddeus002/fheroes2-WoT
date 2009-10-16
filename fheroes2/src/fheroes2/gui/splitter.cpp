@@ -19,6 +19,7 @@
  ***************************************************************************/
 
 #include <iostream>
+#include "cursor.h"
 #include "splitter.h"
 
 /* splitter constructor */
@@ -83,6 +84,7 @@ void Splitter::Move(u16 pos)
     // move center
     if(!max) Splitter::VERTICAL == position ? pt.y = area.y + (area.h - h()) / 2 : pt.x = area.x + (area.w - w());
 
+    if(Cursor::Get().isVisible()) Cursor::Get().Hide();
     SpriteCursor::Hide();
     SpriteCursor::Move(pt);
     SpriteCursor::Show();
