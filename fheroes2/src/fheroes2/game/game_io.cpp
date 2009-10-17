@@ -577,6 +577,9 @@ bool Game::IO::SaveBIN(QueueMessage & msg)
 	}
     }
 
+    // settings: original
+    msg.Push(static_cast<u8>(conf.Original()));
+
     msg.Push(static_cast<u16>(0xFFFF));
     return true;
 }
@@ -1063,6 +1066,10 @@ bool Game::IO::LoadBIN(QueueMessage & msg)
 
     // regenerate puzzle surface
     Interface::GameArea::GenerateUltimateArtifactAreaSurface(world.ultimate_artifact, world.puzzle_surface);
+
+    // settings: original
+    msg.Pop(byte8);
+    if(byte8) conf.SetModes(Settings::ORIGINAL);
 
     return byte16 == 0xFFFF;
 }

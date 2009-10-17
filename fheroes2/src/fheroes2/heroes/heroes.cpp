@@ -1121,23 +1121,33 @@ void Heroes::ActionNewDay(void)
     {
 	// possible visit arteian spring 2 * max
 	u16 prev = magic_point;
+	const Castle* castle = inCastle();
 
-	// everyday
-	++magic_point;
-
-	if(HasArtifact(Artifact::POWER_RING)) magic_point += 2;
-
-	// secondary skill
-	switch(GetLevelSkill(Skill::Secondary::MYSTICISM))
+	// in castle?
+	if(castle && castle->GetLevelMageGuild())
 	{
-	    case Skill::Level::BASIC:	magic_point += 1; break;
-	    case Skill::Level::ADVANCED:magic_point += 2; break;
-	    case Skill::Level::EXPERT:	magic_point += 3; break;
-
-	    default: break;
+	    //restore from mage guild
+	    if(prev < GetMaxSpellPoints()) magic_point = GetMaxSpellPoints();
 	}
+	else
+	{
+	    // everyday
+	    ++magic_point;
 
-	if((magic_point > GetMaxSpellPoints()) && (magic_point > prev)) magic_point = prev;
+	    if(HasArtifact(Artifact::POWER_RING)) magic_point += 2;
+
+	    // secondary skill
+	    switch(GetLevelSkill(Skill::Secondary::MYSTICISM))
+	    {
+		case Skill::Level::BASIC:	magic_point += 1; break;
+		case Skill::Level::ADVANCED:	magic_point += 2; break;
+		case Skill::Level::EXPERT:	magic_point += 3; break;
+
+		default: break;
+	    }
+
+	    if((magic_point > GetMaxSpellPoints()) && (magic_point > prev)) magic_point = prev;
+	}
     }
 
     // remove day visit object

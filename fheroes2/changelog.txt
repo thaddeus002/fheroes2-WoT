@@ -1,5 +1,6 @@
 SVN - up to r1264
 
++ Added store high scores and update high scores dialogue
 + Added force lang options
 + Added translation for original map files (sign, rumors, events message, sphinx riddle)
 + Added emulation the right mouse button for tap mode

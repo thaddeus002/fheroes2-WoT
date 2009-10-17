@@ -697,7 +697,7 @@ void RedrawMapsFileList(const Point & dst, const MapsFileInfoList & lists, MapsF
 	const Sprite & spriteLoss = AGG::GetICN(ICN::REQUESTS, index);
 	display.Blit(spriteLoss, dst.x + 270 + spriteWins.w() + 2, dst.y + oy);
 
-	oy += text.h() + 2;
+	oy += text.h() < 16 ? 18 : text.h() + 2;
     }
 
     index = 19 + (*cur).KingdomColorsCount();
