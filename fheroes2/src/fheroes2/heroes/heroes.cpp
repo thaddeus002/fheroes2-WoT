@@ -1056,12 +1056,16 @@ s8 Heroes::GetLuckWithModificators(std::string *strs) const
 /* recrut hero */
 void Heroes::Recruit(const Color::color_t & cl, const Point & pt)
 {
+    if(color != Color::GRAY) Error::Warning("Heroes::Recrut: hero not freeman!");
+
     color = cl;
     killer_color = Color::GRAY;
 
     mp = pt;
 
     Maps::Tiles & tiles = world.GetTiles(mp);
+
+    if(!army.isValid()) army.Reset(false);
 
     // save general object
     save_maps_general = tiles.GetObject();
