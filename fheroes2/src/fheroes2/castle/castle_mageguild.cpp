@@ -18,12 +18,113 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
+#include <algorithm>
+#include <vector>
 #include <string>
 #include "agg.h"
 #include "button.h"
 #include "cursor.h"
 #include "castle.h"
 #include "text.h"
+
+class RowSpells
+{
+public:
+    RowSpells(const Point &, const MageGuild &, u8);
+    void Redraw(void);
+    void QueueEventProcessing(void);
+
+private:
+    std::vector<Rect> coords;
+    std::vector<Spell::spell_t> spells;
+};
+
+RowSpells::RowSpells(const Point & pos, const MageGuild & guild, u8 lvl)
+{
+    bool hide = guild.GetLevel() < lvl;
+    const Sprite & roll_show = AGG::GetICN(ICN::TOWNWIND, 0);
+    const Sprite & roll_hide = AGG::GetICN(ICN::TOWNWIND, 1);
+    const Sprite & roll = (hide ? roll_hide : roll_show);
+
+    u8 count = 0;
+
+    switch(lvl)
+    {
+	case 1:
+	case 2: count = 3; break;
+	case 3:
+	case 4: count = 2; break;
+	case 5: count = 1; break;
+	default: break;
+    }
+
+    for(u8 ii = 0; ii < count; ++ii)
+	coords.push_back(Rect(pos.x + coords.size() * 110 - roll.w() / 2, pos.y, roll.w(), roll.h()));
+
+    if(guild.AllowUpgrade())
+	coords.push_back(Rect(pos.x + coords.size() * 110 - roll_hide.w() / 2, pos.y, roll_hide.w(), roll_hide.h()));
+
+    guild.GetSpells(spells, lvl);
+    spells.resize(coords.size(), Spell::NONE);
+};
+
+void RowSpells::Redraw(void)
+{
+    const Sprite & roll_show = AGG::GetICN(ICN::TOWNWIND, 0);
+    const Sprite & roll_hide = AGG::GetICN(ICN::TOWNWIND, 1);
+
+    Display & display = Display::Get();
+
+    std::vector<Rect>::const_iterator it1 = coords.begin();
+    std::vector<Rect>::const_iterator it2 = coords.end();
+
+    for(; it1 != it2; ++it1)
+    {
+	const Rect & dst = (*it1);
+	const Spell::spell_t & spell = spells[it1 - coords.begin()];
+
+	// roll hide
+	if(dst.w < roll_show.w() || Spell::NONE == spell)
+	{
+	    display.Blit(roll_hide, dst);
+	}
+	// roll show
+	else
+	{
+	    display.Blit(roll_show, dst);
+
+	    const Sprite & icon = AGG::GetICN(ICN::SPELLS, Spell::IndexSprite(spell));
+
+	    display.Blit(icon, dst.x + 5 + (dst.w - icon.w()) / 2, dst.y + 40 - icon.h() / 2);
+
+	    TextBox text(Spell::GetName(spell), Font::SMALL, 73);
+	    text.Blit(dst.x + 19, dst.y + 62);
+	}
+    }
+}
+
+void RowSpells::QueueEventProcessing(void)
+{
+    LocalEvent & le = LocalEvent::Get();
+    Display & display = Display::Get();
+    Cursor & cursor = Cursor::Get();
+
+    if(le.MouseClickLeft() || le.MousePressRight())
+    {
+	std::vector<Rect>::const_iterator it = std::find_if(coords.begin(), coords.end(), std::bind2nd(RectIncludePoint(), le.GetMouseCursor()));
+	if(it != coords.end())
+	{
+	    const Spell::spell_t & spell = spells[it - coords.begin()];
+	    if(Spell::NONE != spell)
+	    {
+    		cursor.Hide();
+    		Dialog::SpellInfo(Spell::GetName(spell), Spell::GetDescription(spell), spell, !le.MousePressRight());
+    		cursor.Show();
+    		display.Flip();
+	    }
+	}
+    }
+}
 
 void Castle::OpenMageGuild(void)
 {
@@ -75,199 +176,18 @@ void Castle::OpenMageGuild(void)
     dst_pt.y = cur_pt.y + 290 - sprite.h();
     display.Blit(sprite, dst_pt);
 
-    const Sprite & roll_hide = AGG::GetICN(ICN::TOWNWIND, 1);
-    const Sprite & roll_show = AGG::GetICN(ICN::TOWNWIND, 0);
+    RowSpells spells5(Point(cur_pt.x + 250, cur_pt.y +  10), mageguild, 5);
+    RowSpells spells4(Point(cur_pt.x + 250, cur_pt.y +  95), mageguild, 4);
+    RowSpells spells3(Point(cur_pt.x + 250, cur_pt.y + 180), mageguild, 3);
+    RowSpells spells2(Point(cur_pt.x + 250, cur_pt.y + 265), mageguild, 2);
+    RowSpells spells1(Point(cur_pt.x + 250, cur_pt.y + 350), mageguild, 1);
 
-    // level 5
-    std::vector<Rect> rectsLevel5;
-    const Sprite & roll5 = (4 < level ? roll_show : roll_hide);
-    u8 count = mageguild.isUpgrade() ? 2 : 1;
-    for(u8 ii = 0; ii < count; ++ii)
-    {
-	dst_pt.x = cur_pt.x + 250 + ii * 110;
-	dst_pt.y = cur_pt.y + 10;
-	display.Blit(roll5, dst_pt.x - roll5.w() / 2, dst_pt.y);
-
-	// spell icon
-	if(4 < level)
-	{
-	    const Spell::spell_t spell = mageguild.GetSpell(5, ii);
-	    const Sprite & icon = AGG::GetICN(ICN::SPELLS, Spell::IndexSprite(spell));
-
-	    display.Blit(icon, dst_pt.x + 5 - icon.w() / 2, dst_pt.y + 40 - icon.h() / 2);
-
-	    const std::string & str = Spell::GetName(spell);
-	    size_t pos;
-	    if(str.size() > 10 && std::string::npos != (pos = str.find(0x20)))
-	    {
-		Text t1(str.substr(0, pos), Font::SMALL);
-		Text t2(str.substr(pos), Font::SMALL);
-
-		t1.Blit(dst_pt.x + 5 - t1.w() / 2, dst_pt.y + 62);
-		t2.Blit(dst_pt.x + 5 - t2.w() / 2, dst_pt.y + 71);
-	    }
-	    else
-	    {
-		Text t1(str, Font::SMALL);
-		t1.Blit(dst_pt.x + 5 - t1.w() / 2, dst_pt.y + 65);
-	    }
-
-	    rectsLevel5.push_back(Rect(dst_pt.x - roll5.w() / 2, dst_pt.y, roll5.w(), roll5.h()));
-	}
-    }
-
-    // level 4
-    std::vector<Rect> rectsLevel4;
-    const Sprite & roll4 = (3 < level ? roll_show : roll_hide);
-    count = mageguild.isUpgrade() ? 3 : 2;
-    for(u8 ii = 0; ii < count; ++ii)
-    {
-	dst_pt.x = cur_pt.x + 250 + ii * 110;
-	dst_pt.y = cur_pt.y + 95;
-	display.Blit(roll4, dst_pt.x  - roll4.w() / 2, dst_pt.y);
-
-	// spell icon
-	if(3 < level)
-	{
-	    const Spell::spell_t spell = mageguild.GetSpell(4, ii);
-	    const Sprite & icon = AGG::GetICN(ICN::SPELLS, Spell::IndexSprite(spell));
-
-	    display.Blit(icon, dst_pt.x + 5 - icon.w() / 2, dst_pt.y + 40 - icon.h() / 2);
-
-	    const std::string & str = Spell::GetName(spell);
-	    size_t pos;
-	    if(str.size() > 10 && std::string::npos != (pos = str.find(0x20)))
-	    {
-		Text t1(str.substr(0, pos), Font::SMALL);
-		Text t2(str.substr(pos), Font::SMALL);
-
-		t1.Blit(dst_pt.x + 5 - t1.w() / 2, dst_pt.y + 62);
-		t2.Blit(dst_pt.x + 5 - t2.w() / 2, dst_pt.y + 71);
-	    }
-	    else
-	    {
-		Text t1(str, Font::SMALL);
-		t1.Blit(dst_pt.x + 5 - t1.w() / 2, dst_pt.y + 65);
-	    }
-
-	    rectsLevel4.push_back(Rect(dst_pt.x - roll4.w() / 2, dst_pt.y, roll4.w(), roll4.h()));
-	}
-    }
-
-    // level 3
-    std::vector<Rect> rectsLevel3;
-    const Sprite & roll3 = (2 < level ? roll_show : roll_hide);
-    count = mageguild.isUpgrade() ? 3 : 2;
-    for(u8 ii = 0; ii < count; ++ii)
-    {
-	dst_pt.x = cur_pt.x + 250 + ii * 110;
-	dst_pt.y = cur_pt.y + 180;
-	display.Blit(roll3, dst_pt.x  - roll3.w() / 2, dst_pt.y);
-
-	// spell icon
-	if(2 < level)
-	{
-	    const Spell::spell_t spell = mageguild.GetSpell(3, ii);
-	    const Sprite & icon = AGG::GetICN(ICN::SPELLS, Spell::IndexSprite(spell));
-
-	    display.Blit(icon, dst_pt.x + 5 - icon.w() / 2, dst_pt.y + 40 - icon.h() / 2);
-
-	    const std::string & str = Spell::GetName(spell);
-	    size_t pos;
-	    if(str.size() > 10 && std::string::npos != (pos = str.find(0x20)))
-	    {
-		Text t1(str.substr(0, pos), Font::SMALL);
-		Text t2(str.substr(pos), Font::SMALL);
-
-		t1.Blit(dst_pt.x + 5 - t1.w() / 2, dst_pt.y + 62);
-		t2.Blit(dst_pt.x + 5 - t2.w() / 2, dst_pt.y + 71);
-	    }
-	    else
-	    {
-		Text t1(str, Font::SMALL);
-		t1.Blit(dst_pt.x + 5 - t1.w() / 2, dst_pt.y + 65);
-	    }
-
-	    rectsLevel3.push_back(Rect(dst_pt.x - roll3.w() / 2, dst_pt.y, roll3.w(), roll3.h()));
-	}
-    }
-
-    // level 2
-    std::vector<Rect> rectsLevel2;
-    const Sprite & roll2 = (1 < level ? roll_show : roll_hide);
-    count = mageguild.isUpgrade() ? 4 : 3;
-    for(u8 ii = 0; ii < count; ++ii)
-    {
-	dst_pt.x = cur_pt.x + 250 + ii * 110;
-	dst_pt.y = cur_pt.y + 265;
-	display.Blit(roll2, dst_pt.x - roll2.w() / 2, dst_pt.y);
-	
-	// spell icon
-	if(1 < level)
-	{
-	    const Spell::spell_t spell = mageguild.GetSpell(2, ii);
-	    const Sprite & icon = AGG::GetICN(ICN::SPELLS, Spell::IndexSprite(spell));
-	    
-	    display.Blit(icon, dst_pt.x + 5 - icon.w() / 2, dst_pt.y + 40 - icon.h() / 2);
-
-	    const std::string & str = Spell::GetName(spell);
-	    size_t pos;
-	    if(str.size() > 10 && std::string::npos != (pos = str.find(0x20)))
-	    {
-		Text t1(str.substr(0, pos), Font::SMALL);
-		Text t2(str.substr(pos), Font::SMALL);
-
-		t1.Blit(dst_pt.x + 5 - t1.w() / 2, dst_pt.y + 62);
-		t2.Blit(dst_pt.x + 5 - t2.w() / 2, dst_pt.y + 71);
-	    }
-	    else
-	    {
-		Text t1(str, Font::SMALL);
-		t1.Blit(dst_pt.x + 5 - t1.w() / 2, dst_pt.y + 65);
-	    }
-
-	    rectsLevel2.push_back(Rect(dst_pt.x - roll2.w() / 2, dst_pt.y, roll2.w(), roll2.h()));
-	}
-    }
-
-    // show level 1 icon spell
-    std::vector<Rect> rectsLevel1;
-    const Sprite & roll1 = (level ? roll_show : roll_hide);
-    count = mageguild.isUpgrade() ? 4 : 3;
-    for(u8 ii = 0; ii < count; ++ii)
-    {
-	dst_pt.x = cur_pt.x + 250 + ii * 110;
-	dst_pt.y = cur_pt.y + 350;
-	display.Blit(roll1, dst_pt.x  - roll1.w() / 2, dst_pt.y);
-	
-	// spell icon
-	if(level)
-	{
-	    const Spell::spell_t spell = mageguild.GetSpell(1, ii);
-	    const Sprite & icon = AGG::GetICN(ICN::SPELLS, Spell::IndexSprite(spell));
-
-	    display.Blit(icon, dst_pt.x + 5 - icon.w() / 2, dst_pt.y + 40 - icon.h() / 2);
-
-	    const std::string & str = Spell::GetName(spell);
-	    size_t pos;
-	    if(str.size() > 10 && std::string::npos != (pos = str.find(0x20)))
-	    {
-		Text t1(str.substr(0, pos), Font::SMALL);
-		Text t2(str.substr(pos), Font::SMALL);
-
-		t1.Blit(dst_pt.x + 5 - t1.w() / 2, dst_pt.y + 62);
-		t2.Blit(dst_pt.x + 5 - t2.w() / 2, dst_pt.y + 71);
-	    }
-	    else
-	    {
-		Text t1(str, Font::SMALL);
-		t1.Blit(dst_pt.x + 5 - t1.w() / 2, dst_pt.y + 65);
-	    }
-
-	    rectsLevel1.push_back(Rect(dst_pt.x - roll1.w() / 2, dst_pt.y, roll1.w(), roll1.h()));
-	}
-    }
-
+    spells1.Redraw();
+    spells2.Redraw();
+    spells3.Redraw();
+    spells4.Redraw();
+    spells5.Redraw();
+    
     // button exit
     dst_pt.x = cur_pt.x + 578;
     dst_pt.y = cur_pt.y + 461;
@@ -286,131 +206,11 @@ void Castle::OpenMageGuild(void)
         le.MousePressLeft(buttonExit) ? buttonExit.PressDraw() : buttonExit.ReleaseDraw();
 
         if(le.MouseClickLeft(buttonExit) || le.KeyPress(KEY_RETURN) || le.KeyPress(KEY_ESCAPE)) break;
-        
-        // level 1
-        if(level)
-        {
-    	    for(u8 ii = 0; ii < rectsLevel1.size(); ++ii)
-    	    {
-    		const Spell::spell_t & spell = mageguild.GetSpell(1, ii);
 
-    		if(le.MouseClickLeft(rectsLevel1[ii]))
-    		{
-    		    cursor.Hide();
-    		    Dialog::SpellInfo(Spell::GetName(spell), Spell::GetDescription(spell), spell);
-    		    cursor.Show();
-    		    display.Flip();
-    		}
-    		else
-    		if(le.MousePressRight(rectsLevel1[ii]))
-    		{
-    		    cursor.Hide();
-    		    Dialog::SpellInfo(Spell::GetName(spell), Spell::GetDescription(spell), spell, false);
-    		    cursor.Show();
-    		    display.Flip();
-    		}
-    	    }
-        }
-
-        // level 2
-        if(1 < level)
-        {
-    	    for(u8 ii = 0; ii < rectsLevel2.size(); ++ii)
-    	    {
-    		const Spell::spell_t & spell = mageguild.GetSpell(2, ii);
-
-    		if(le.MouseClickLeft(rectsLevel2[ii]))
-    		{
-    		    cursor.Hide();
-    		    Dialog::SpellInfo(Spell::GetName(spell), Spell::GetDescription(spell), spell);
-    		    cursor.Show();
-    		    display.Flip();
-    		}
-    		else
-    		if(le.MousePressRight(rectsLevel2[ii]))
-    		{
-    		    cursor.Hide();
-    		    Dialog::SpellInfo(Spell::GetName(spell), Spell::GetDescription(spell), spell, false);
-    		    cursor.Show();
-    		    display.Flip();
-    		}
-    	    }
-        }
-
-        // level 3
-        if(2 < level)
-        {
-    	    for(u8 ii = 0; ii < rectsLevel3.size(); ++ii)
-    	    {
-    		const Spell::spell_t & spell = mageguild.GetSpell(3, ii);
-
-    		if(le.MouseClickLeft(rectsLevel3[ii]))
-    		{
-    		    cursor.Hide();
-    		    Dialog::SpellInfo(Spell::GetName(spell), Spell::GetDescription(spell), spell);
-    		    cursor.Show();
-    		    display.Flip();
-    		}
-    		else
-    		if(le.MousePressRight(rectsLevel3[ii]))
-    		{
-    		    cursor.Hide();
-    		    Dialog::SpellInfo(Spell::GetName(spell), Spell::GetDescription(spell), spell, false);
-    		    cursor.Show();
-    		    display.Flip();
-    		}
-    	    }
-        }
-
-        // level 4
-        if(3 < level)
-        {
-    	    for(u8 ii = 0; ii < rectsLevel4.size(); ++ii)
-    	    {
-    		const Spell::spell_t & spell = mageguild.GetSpell(4, ii);
-
-    		if(le.MouseClickLeft(rectsLevel4[ii]))
-    		{
-    		    cursor.Hide();
-    		    Dialog::SpellInfo(Spell::GetName(spell), Spell::GetDescription(spell), spell);
-    		    cursor.Show();
-    		    display.Flip();
-    		}
-    		else
-    		if(le.MousePressRight(rectsLevel4[ii]))
-    		{
-    		    cursor.Hide();
-    		    Dialog::SpellInfo(Spell::GetName(spell), Spell::GetDescription(spell), spell, false);
-    		    cursor.Show();
-    		    display.Flip();
-    		}
-    	    }
-        }
-
-        // level 5
-        if(4 < level)
-        {
-    	    for(u8 ii = 0; ii < rectsLevel5.size(); ++ii)
-    	    {
-    		const Spell::spell_t & spell = mageguild.GetSpell(5, ii);
-
-    		if(le.MouseClickLeft(rectsLevel5[ii]))
-    		{
-    		    cursor.Hide();
-    		    Dialog::SpellInfo(Spell::GetName(spell), Spell::GetDescription(spell), spell);
-    		    cursor.Show();
-    		    display.Flip();
-    		}
-    		else
-    		if(le.MousePressRight(rectsLevel5[ii]))
-    		{
-    		    cursor.Hide();
-    		    Dialog::SpellInfo(Spell::GetName(spell), Spell::GetDescription(spell), spell, false);
-    		    cursor.Show();
-    		    display.Flip();
-    		}
-    	    }
-        }
-
+        spells1.QueueEventProcessing();
+        spells2.QueueEventProcessing();
+        spells3.QueueEventProcessing();
+        spells4.QueueEventProcessing();
+        spells5.QueueEventProcessing();
     }
 }

@@ -22,155 +22,72 @@
 #include "skill.h"
 #include "spell_storage.h"
 
+struct SpellEqualLevel : std::binary_function<Spell::spell_t, u8, bool>
+{
+    bool operator() (Spell::spell_t s, u8 l) const { return Spell::Level(s) == l; };
+};
+
 SpellStorage::SpellStorage()
 {
+    spells.reserve(67);
 }
 
-u8 SpellStorage::Size(const u8 lvl) const
+u8 SpellStorage::Size(u8 lvl) const
 {
     switch(lvl)
     {
-	case 0:	return Size1() + Size2() + Size3() + Size4() + Size5();
-	case 1:	return Size1();
-	case 2:	return Size2();
-	case 3:	return Size3();
-	case 4:	return Size4();
-	case 5:	return Size5();
+	case 1:	return std::count_if(spells.begin(), spells.end(), std::bind2nd(SpellEqualLevel(), 1));
+	case 2:	return std::count_if(spells.begin(), spells.end(), std::bind2nd(SpellEqualLevel(), 2));
+	case 3:	return std::count_if(spells.begin(), spells.end(), std::bind2nd(SpellEqualLevel(), 3));
+	case 4:	return std::count_if(spells.begin(), spells.end(), std::bind2nd(SpellEqualLevel(), 4));
+	case 5:	return std::count_if(spells.begin(), spells.end(), std::bind2nd(SpellEqualLevel(), 5));
 
 	default: break;
     }
 
-    Error::Warning("SpellStorage::Size: unknown level: ", lvl);
-
-    return Size1();
+    return spells.size();
 }
 
-u8 SpellStorage::Size1(void) const
+const std::vector<Spell::spell_t> & SpellStorage::Spells(void) const
 {
-    return spells_level1.size();
+    return spells;
 }
 
-u8 SpellStorage::Size2(void) const
+void SpellStorage::GetSpells(std::vector<Spell::spell_t> & v, u8 lvl) const
 {
-    return spells_level2.size();
-}
-
-u8 SpellStorage::Size3(void) const
-{
-    return spells_level3.size();
-}
-
-u8 SpellStorage::Size4(void) const
-{
-    return spells_level4.size();
-}
-
-u8 SpellStorage::Size5(void) const
-{
-    return spells_level5.size();
-}
-
-const std::list<Spell::spell_t> & SpellStorage::Spells(const u8 lvl) const
-{
-    switch(lvl)
-    {
-	case 1:	return Spells1();
-	case 2:	return Spells2();
-	case 3:	return Spells3();
-	case 4:	return Spells4();
-	case 5:	return Spells5();
-	
-	default: break;
-    }
-    
-    Error::Warning("SpellStorage::Spells: unknown level: ", lvl);
-    
-    return Spells1();
-}
-
-const std::list<Spell::spell_t> & SpellStorage::Spells1(void) const
-{
-    return spells_level1;
-}
-
-const std::list<Spell::spell_t> & SpellStorage::Spells2(void) const
-{
-    return spells_level2;
-}
-
-const std::list<Spell::spell_t> & SpellStorage::Spells3(void) const
-{
-    return spells_level3;
-}
-
-const std::list<Spell::spell_t> & SpellStorage::Spells4(void) const
-{
-    return spells_level4;
-}
-
-const std::list<Spell::spell_t> & SpellStorage::Spells5(void) const
-{
-    return spells_level5;
+    std::vector<Spell::spell_t>::const_iterator it1 = spells.begin();
+    std::vector<Spell::spell_t>::const_iterator it2 = spells.end();
+    if(v.size()) v.clear();
+    for(; it1 != it2; ++it1) if(lvl == Spell::Level(*it1)) v.push_back(*it1);
 }
 
 void SpellStorage::Appends(const SpellStorage & st, const u8 wisdom)
 {
-    if(st.spells_level1.size())
-    {
-        spells_level1.insert(spells_level1.begin(), st.spells_level1.begin(), st.spells_level1.end());
-        spells_level1.sort();
-        spells_level1.unique();
-    }
+    std::vector<Spell::spell_t>::const_iterator it1 = st.spells.begin();
+    std::vector<Spell::spell_t>::const_iterator it2 = st.spells.end();
 
-    if(st.spells_level2.size())
+    for(; it1 != it2; ++it1) if(spells.end() == std::find(spells.begin(), spells.end(), *it1))
     {
-        spells_level2.insert(spells_level2.begin(), st.spells_level2.begin(), st.spells_level2.end());
-        spells_level2.sort();
-        spells_level2.unique();
-    }
-
-    if(st.spells_level3.size() && Skill::Level::BASIC <= wisdom)
-    {
-        spells_level3.insert(spells_level3.begin(), st.spells_level3.begin(), st.spells_level3.end());
-        spells_level3.sort();
-        spells_level3.unique();
-    }
-
-    if(st.spells_level4.size() && Skill::Level::ADVANCED <= wisdom)
-    {
-        spells_level4.insert(spells_level4.begin(), st.spells_level4.begin(), st.spells_level4.end());
-        spells_level4.sort();
-        spells_level4.unique();
-    }
-
-    if(st.spells_level5.size() && Skill::Level::EXPERT == wisdom)
-    {
-        spells_level5.insert(spells_level5.begin(), st.spells_level5.begin(), st.spells_level5.end());
-        spells_level5.sort();
-        spells_level5.unique();
+	switch(Spell::Level(*it1))
+	{
+	    case 3:  if(Skill::Level::BASIC <= wisdom)    spells.push_back(*it1); break;
+	    case 4:  if(Skill::Level::ADVANCED <= wisdom) spells.push_back(*it1); break;
+	    case 5:  if(Skill::Level::EXPERT == wisdom)   spells.push_back(*it1); break;
+	    default: spells.push_back(*it1); break;
+	}
     }
 }
 
 void SpellStorage::Append(const Spell::spell_t sp, const u8 wisdom)
 {
-    std::list<Spell::spell_t> *spells = NULL;
-
-    switch(Spell::Level(sp))
+    if(spells.end() == std::find(spells.begin(), spells.end(), sp))
     {
-        case 1:	spells = &spells_level1; break;
-        case 2:	spells = &spells_level2; break;
-        case 3:	if(Skill::Level::BASIC <= wisdom)    spells = &spells_level3; break;
-        case 4:	if(Skill::Level::ADVANCED <= wisdom) spells = &spells_level4; break;
-        case 5:	if(Skill::Level::EXPERT == wisdom)   spells = &spells_level5; break;
-	default: break;
-    }
-
-    if(spells)
-    {
-	if(spells->end() == std::find(spells->begin(), spells->end(), sp))
-        {
-            spells->push_back(sp);
-            spells->sort();
-        }
+	switch(Spell::Level(sp))
+	{
+	    case 3:  if(Skill::Level::BASIC <= wisdom)    spells.push_back(sp); break;
+	    case 4:  if(Skill::Level::ADVANCED <= wisdom) spells.push_back(sp); break;
+	    case 5:  if(Skill::Level::EXPERT == wisdom)   spells.push_back(sp); break;
+	    default: spells.push_back(sp); break;
+	}
     }
 }

@@ -21,7 +21,7 @@
 #ifndef H2SPELLSTORAGE_H
 #define H2SPELLSTORAGE_H
 
-#include <list>
+#include <vector>
 #include "spell.h"
 #include "game_io.h"
 #include "gamedefs.h"
@@ -31,19 +31,10 @@ class SpellStorage
 public:
 	SpellStorage();
 
-	u8 Size(const u8 lvl) const;
-	u8 Size1(void) const;
-	u8 Size2(void) const;
-	u8 Size3(void) const;
-	u8 Size4(void) const;
-	u8 Size5(void) const;
+	u8 Size(u8 lvl = 0) const;
 
-	const std::list<Spell::spell_t> & Spells(const u8 lvl) const;
-	const std::list<Spell::spell_t> & Spells1(void) const;
-	const std::list<Spell::spell_t> & Spells2(void) const;
-	const std::list<Spell::spell_t> & Spells3(void) const;
-	const std::list<Spell::spell_t> & Spells4(void) const;
-	const std::list<Spell::spell_t> & Spells5(void) const;
+	const std::vector<Spell::spell_t> & Spells(void) const;
+	void GetSpells(std::vector<Spell::spell_t> &, u8) const;
 
 	void Appends(const SpellStorage & st, const u8 wisdom);
 	void Append(const Spell::spell_t sp, const u8 wisdom);
@@ -51,11 +42,7 @@ public:
 protected:
 	friend class Game::IO;
 
-	std::list<Spell::spell_t>	spells_level1;
-	std::list<Spell::spell_t>	spells_level2;
-	std::list<Spell::spell_t>	spells_level3;
-	std::list<Spell::spell_t>	spells_level4;
-	std::list<Spell::spell_t>	spells_level5;
+	std::vector<Spell::spell_t> spells;
 };
 
 #endif

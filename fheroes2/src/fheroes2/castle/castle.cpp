@@ -254,7 +254,7 @@ void Castle::LoadFromMP2(const void *ptr)
     if(building & BUILD_MAGEGUILD3) mageguild.BuildNextLevel();
     if(building & BUILD_MAGEGUILD4) mageguild.BuildNextLevel();
     if(building & BUILD_MAGEGUILD5) mageguild.BuildNextLevel();
-    if(Race::WZRD == race && building & BUILD_SPEC) mageguild.UpgradeExt();
+    if(mageguild.AllowUpgrade() && building & BUILD_SPEC) mageguild.UpgradeExt();
 
     // fix upgrade dwelling dependend from race
     switch(race)
@@ -983,7 +983,7 @@ void Castle::BuyBuilding(u32 build)
 		break;
 
             // build library
-            case BUILD_SPEC: if(Race::WZRD == race) mageguild.UpgradeExt(); break;
+            case BUILD_SPEC: if(mageguild.AllowUpgrade()) mageguild.UpgradeExt(); break;
 
 	    case DWELLING_MONSTER1: dwelling[0] = Monster(race, DWELLING_MONSTER1).GetGrown(); break;
 	    case DWELLING_MONSTER2: dwelling[1] = Monster(race, DWELLING_MONSTER2).GetGrown(); break;

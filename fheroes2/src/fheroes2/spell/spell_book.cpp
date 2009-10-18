@@ -36,6 +36,7 @@ struct SpellFiltered : std::binary_function<Spell::spell_t, SpellBook::filter_t,
 };
 
 void SpellBookRedrawLists(const std::vector<Spell::spell_t> & spells, std::vector<Rect> & coords, const size_t cur, const Point & pt, const HeroBase *hero);
+void SpellBookRedrawMP(const Point &, u16);
 
 SpellBook::SpellBook(const HeroBase *p) : hero(p), active(false)
 {
@@ -205,31 +206,31 @@ Spell::spell_t SpellBook::Open(filter_t filt, bool canselect) const
     return curspell;
 }
 
-void SpellBook::SetFilter(std::vector<Spell::spell_t> & spells, filter_t filter) const
+void SpellBook::SetFilter(std::vector<Spell::spell_t> & v, filter_t filter) const
 {
-    spells.clear();
-    spells.resize(spells_level1.size() + spells_level2.size() + spells_level3.size() + spells_level4.size() + spells_level5.size(), Spell::NONE);
-    std::vector<Spell::spell_t>::iterator it = spells.begin();
-
-    if(spells_level1.size())
-    	it = std::copy(spells_level1.begin(), spells_level1.end(), it);
-
-    if(spells_level2.size())
-    	it = std::copy(spells_level2.begin(), spells_level2.end(), it);
-
-    if(spells_level3.size())
-    	it = std::copy(spells_level3.begin(), spells_level3.end(), it);
-
-    if(spells_level4.size())
-    	it = std::copy(spells_level4.begin(), spells_level4.end(), it);
-
-    if(spells_level5.size())
-    	it = std::copy(spells_level5.begin(), spells_level5.end(), it);
+    v = spells;
 
     if(filter != ALL)
     {
-	it = std::remove_if(spells.begin(), spells.end(), std::bind2nd(SpellFiltered(), filter));
-	if(spells.end() != it) spells.resize(it - spells.begin());
+	std::vector<Spell::spell_t>::iterator it = std::remove_if(v.begin(), v.end(), std::bind2nd(SpellFiltered(), filter));
+	if(v.end() != it) v.resize(it - v.begin());
+    }
+}
+
+void SpellBookRedrawMP(const Point & dst, u16 mp)
+{
+    if(mp)
+    {
+	Point tp(dst.x + 11, dst.y + 9);
+	std::string mps;
+	for(int i = 100; i >= 1; i /= 10) if(mp >= i)
+	{
+	    mps.clear();
+	    String::AddInt(mps, (mp % (i * 10)) / i);
+	    Text text(mps, Font::SMALL);
+	    text.Blit(tp.x - text.w() / 2, tp.y);
+	    tp.y += text.h();
+	}
     }
 }
 
@@ -260,23 +261,8 @@ void SpellBookRedrawLists(const std::vector<Spell::spell_t> & spells, std::vecto
     display.Blit(bookmark_clos, clos_rt);
 
     if(coords.size()) coords.clear();
-    
-    Point tp = info_rt;
-    tp += Point(9, 6);
-    int mp = hero ? hero->GetSpellPoints() : 0;
-    std::string mps;
-    for(int i=100; i>=1; i/=10)
-    {
-	mps = " ";
-	if(mp >= i)
-	{
-	    mps = "";
-	    String::AddInt(mps, (mp%(i*10))/i);
-	}
-	Text text(mps, Font::SMALL);
-	text.Blit(tp);
-	tp.y += text.h();
-    }
+
+    SpellBookRedrawMP(info_rt, hero ? hero->GetSpellPoints() : 0);
 
     u16 ox = 0;
     u16 oy = 0;
@@ -303,22 +289,10 @@ void SpellBookRedrawLists(const std::vector<Spell::spell_t> & spells, std::vecto
     	    str.append(" [");
 	    String::AddInt(str, Spell::Mana(spell));
 	    str.append("]");
-            size_t pos;
-            if(str.size() > 10 && std::string::npos != (pos = str.find(0x20)))
-            {
-                std::string str1 = str.substr(0, pos);
-        	std::string str2 = str.substr(pos);
+	    
+	    TextBox box(str, Font::SMALL, 80);
+	    box.Blit(pt.x + ox - 40, pt.y + oy + 25);
 
-                Text text(str1, Font::SMALL);
-                text.Blit(pt.x + ox - text.w() / 2, pt.y + oy + 22);
-                text.Set(str2);
-                text.Blit(pt.x + ox - text.w() / 2, pt.y + oy + 31);
-            }
-            else
-            {
-                Text text(str, Font::SMALL);
-                text.Blit(pt.x + ox - text.w() / 2, pt.y + oy + 25);
-	    }
     	    oy += 80;
 
     	    coords.push_back(rect);

@@ -32,9 +32,9 @@ class MageGuild : public SpellStorage
 	MageGuild(const Race::race_t & rc);
 
 	u8 GetLevel(void) const;
-	Spell::spell_t GetSpell(u8 level, u8 index) const;
 
 	void BuildNextLevel(void);
+	bool AllowUpgrade(void) const;
 	void UpgradeExt(void);
 	
 	bool isUpgrade(void) const{ return upgrade; };

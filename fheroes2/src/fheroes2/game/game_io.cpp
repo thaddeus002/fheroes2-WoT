@@ -330,24 +330,12 @@ bool Game::IO::SaveBIN(QueueMessage & msg)
 	// spell book
 	msg.Push(static_cast<u8>(hero.spell_book.active));
 	{
-	    std::list<Spell::spell_t>::const_iterator it1, it2;
+	    std::vector<Spell::spell_t>::const_iterator it1, it2;
 
-	    msg.Push(static_cast<u32>(hero.spell_book.Size(0)));
+	    msg.Push(static_cast<u32>(hero.spell_book.spells.size()));
 
-	    it1 = hero.spell_book.spells_level1.begin();
-	    it2 = hero.spell_book.spells_level1.end();
-	    for(; it1 != it2; ++it1) msg.Push(static_cast<u8>(*it1));
-	    it1 = hero.spell_book.spells_level2.begin();
-	    it2 = hero.spell_book.spells_level2.end();
-	    for(; it1 != it2; ++it1) msg.Push(static_cast<u8>(*it1));
-	    it1 = hero.spell_book.spells_level3.begin();
-	    it2 = hero.spell_book.spells_level3.end();
-	    for(; it1 != it2; ++it1) msg.Push(static_cast<u8>(*it1));
-	    it1 = hero.spell_book.spells_level4.begin();
-	    it2 = hero.spell_book.spells_level4.end();
-	    for(; it1 != it2; ++it1) msg.Push(static_cast<u8>(*it1));
-	    it1 = hero.spell_book.spells_level5.begin();
-	    it2 = hero.spell_book.spells_level5.end();
+	    it1 = hero.spell_book.spells.begin();
+	    it2 = hero.spell_book.spells.end();
 	    for(; it1 != it2; ++it1) msg.Push(static_cast<u8>(*it1));
     	}
 	
@@ -383,24 +371,12 @@ bool Game::IO::SaveBIN(QueueMessage & msg)
 	msg.Push(castle.mageguild.level);
 	msg.Push(static_cast<u8>(castle.mageguild.upgrade));
 	{
-	    std::list<Spell::spell_t>::const_iterator it1, it2;
+	    std::vector<Spell::spell_t>::const_iterator it1, it2;
 
-	    msg.Push(static_cast<u32>(castle.mageguild.Size(0)));
+	    msg.Push(static_cast<u32>(castle.mageguild.spells.size()));
 
-	    it1 = castle.mageguild.spells_level1.begin();
-	    it2 = castle.mageguild.spells_level1.end();
-	    for(; it1 != it2; ++it1) msg.Push(static_cast<u8>(*it1));
-	    it1 = castle.mageguild.spells_level2.begin();
-	    it2 = castle.mageguild.spells_level2.end();
-	    for(; it1 != it2; ++it1) msg.Push(static_cast<u8>(*it1));
-	    it1 = castle.mageguild.spells_level3.begin();
-	    it2 = castle.mageguild.spells_level3.end();
-	    for(; it1 != it2; ++it1) msg.Push(static_cast<u8>(*it1));
-	    it1 = castle.mageguild.spells_level4.begin();
-	    it2 = castle.mageguild.spells_level4.end();
-	    for(; it1 != it2; ++it1) msg.Push(static_cast<u8>(*it1));
-	    it1 = castle.mageguild.spells_level5.begin();
-	    it2 = castle.mageguild.spells_level5.end();
+	    it1 = castle.mageguild.spells.begin();
+	    it2 = castle.mageguild.spells.end();
 	    for(; it1 != it2; ++it1) msg.Push(static_cast<u8>(*it1));
 	}
 
@@ -648,7 +624,11 @@ bool Game::IO::LoadBIN(QueueMessage & msg)
     msg.Pop(conf.game_type);
     msg.Pop(conf.players_colors);
     msg.Pop(conf.preferably_count_players);
+#ifdef FORCE_DEBUG
+    msg.Pop(byte8);
+#else
     msg.Pop(conf.debug);
+#endif
     // world
     msg.Pop(byte16);
     if(byte16 != 0xFF05) Error::Warning("0xFF05");
@@ -679,6 +659,10 @@ bool Game::IO::LoadBIN(QueueMessage & msg)
 	msg.Pop(tile->quantity2);
 	msg.Pop(tile->fogs);
 	msg.Pop(tile->flags);
+
+#ifdef FORCE_DEBUG
+	tile->fogs &= ~conf.my_color;
+#endif
 
 	// addons 1
 	u32 size;
@@ -770,11 +754,7 @@ bool Game::IO::LoadBIN(QueueMessage & msg)
 	}
 
 	// spell book
-	hero->spell_book.spells_level1.clear();
-	hero->spell_book.spells_level2.clear();
-	hero->spell_book.spells_level3.clear();
-	hero->spell_book.spells_level4.clear();
-	hero->spell_book.spells_level5.clear();
+	hero->spell_book.spells.clear();
 	msg.Pop(byte8);
 	hero->spell_book.active = byte8;
 
@@ -782,16 +762,7 @@ bool Game::IO::LoadBIN(QueueMessage & msg)
 	for(u32 jj = 0; jj < size; ++jj)
 	{
 	    msg.Pop(byte8);
-	    const Spell::spell_t spell = Spell::FromInt(byte8);
-	    switch(Spell::Level(spell))
-	    {
-	        case 1:	hero->spell_book.spells_level1.push_back(spell); break;
-	        case 2:	hero->spell_book.spells_level2.push_back(spell); break;
-	        case 3:	hero->spell_book.spells_level3.push_back(spell); break;
-	        case 4:	hero->spell_book.spells_level4.push_back(spell); break;
-	        case 5:	hero->spell_book.spells_level5.push_back(spell); break;
-	        default: break;
-	    }
+	    hero->spell_book.spells.push_back(Spell::FromInt(byte8));
 	}
 
 	// visit objects
@@ -831,27 +802,14 @@ bool Game::IO::LoadBIN(QueueMessage & msg)
 	u32 size;
 
 	// mageguild
-	castle->mageguild.spells_level1.clear();
-	castle->mageguild.spells_level2.clear();
-	castle->mageguild.spells_level3.clear();
-	castle->mageguild.spells_level4.clear();
-	castle->mageguild.spells_level5.clear();
+	castle->mageguild.spells.clear();
 	msg.Pop(castle->mageguild.level);
 	msg.Pop(byte8); castle->mageguild.upgrade = byte8;
 	msg.Pop(size);
 	for(u32 jj = 0; jj < size; ++jj)
 	{
 	    msg.Pop(byte8);
-	    const Spell::spell_t spell = Spell::FromInt(byte8);
-	    switch(Spell::Level(spell))
-	    {
-	        case 1:	castle->mageguild.spells_level1.push_back(spell); break;
-	        case 2:	castle->mageguild.spells_level2.push_back(spell); break;
-	        case 3:	castle->mageguild.spells_level3.push_back(spell); break;
-	        case 4:	castle->mageguild.spells_level4.push_back(spell); break;
-	        case 5:	castle->mageguild.spells_level5.push_back(spell); break;
-	        default: break;
-	    }
+	    castle->mageguild.spells.push_back(Spell::FromInt(byte8));
 	}
 
 	// armies

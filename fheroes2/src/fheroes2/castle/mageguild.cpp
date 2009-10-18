@@ -34,62 +34,22 @@ void MageGuild::BuildNextLevel(void)
     PackSpells(level);
 }
 
+bool MageGuild::AllowUpgrade(void) const
+{
+    return race == Race::WZRD && !upgrade;
+}
+
 void MageGuild::UpgradeExt(void)
 {
-    if(upgrade) return;
+    if(!AllowUpgrade()) return;
 
     upgrade = true;
 
-    if(0 < level){ AddExtSpells(1); spells_level1.sort(); }
-    if(1 < level){ AddExtSpells(2); spells_level2.sort(); }
-    if(2 < level){ AddExtSpells(3); spells_level3.sort(); }
-    if(3 < level){ AddExtSpells(4); spells_level4.sort(); }
-    if(4 < level){ AddExtSpells(5); spells_level5.sort(); }
-}
-
-/* return level spell from orders */
-Spell::spell_t MageGuild::GetSpell(u8 level, u8 index) const
-{
-    if(0 == level || 5 < level) return Spell::NONE;
-
-    std::list<Spell::spell_t>::const_iterator it1;
-    std::list<Spell::spell_t>::const_iterator it2;
-
-    switch(level)
-    {
-	case 1:
-	    it1 = spells_level1.begin();
-	    it2 = spells_level1.end();
-	    break;
-
-	case 2:
-	    it1 = spells_level2.begin();
-	    it2 = spells_level2.end();
-	    break;
-
-	case 3:
-	    it1 = spells_level3.begin();
-	    it2 = spells_level3.end();
-	    break;
-
-	case 4:
-	    it1 = spells_level4.begin();
-	    it2 = spells_level4.end();
-	    break;
-
-	case 5:
-	    it1 = spells_level5.begin();
-	    it2 = spells_level5.end();
-	    break;
-
-	default: return Spell::NONE;
-    }
-
-    u8 order = 0;
-
-    for(; it1 != it2; ++it1) if(index == order++) return *it1;
-
-    return Spell::NONE;
+    if(0 < level){ AddExtSpells(1); }
+    if(1 < level){ AddExtSpells(2); }
+    if(2 < level){ AddExtSpells(3); }
+    if(3 < level){ AddExtSpells(4); }
+    if(4 < level){ AddExtSpells(5); }
 }
 
 u8 MageGuild::GetLevel(void) const
@@ -101,16 +61,10 @@ void MageGuild::PackSpells(const u8 lvl)
 {
     if(1 > lvl || 5 < lvl) return;
 
-    std::list<Spell::spell_t> & spells = (4 < lvl ? spells_level5 : (3 < lvl ? spells_level4 : (2 < lvl ? spells_level3 : (1 < lvl ? spells_level2 : spells_level1))));
-
-    Spell::spell_t spell = Spell::NONE;
-
-    if(spells.size()) return;
-
     // level 5
     if(4 < lvl)
     {
-	spell = GetSpellRace(race, lvl);
+	Spell::spell_t spell = GetSpellRace(race, lvl);
     	spells.push_back(spell);
     
         if(upgrade) AddExtSpells(lvl);
@@ -119,7 +73,7 @@ void MageGuild::PackSpells(const u8 lvl)
     // level 3, 4
     if(2 < lvl)
     {
-	spell = GetSpellRace(race, lvl);
+	Spell::spell_t spell = GetSpellRace(race, lvl);
         spells.push_back(spell);
     
         if(upgrade) AddExtSpells(lvl);
@@ -129,7 +83,7 @@ void MageGuild::PackSpells(const u8 lvl)
     else
     // level 1, 2
     {
-	spell = GetSpellRace(race, lvl);
+	Spell::spell_t spell = GetSpellRace(race, lvl);
         spells.push_back(spell);
 
         spell = GetSpellRace(race, lvl);
@@ -147,14 +101,7 @@ void MageGuild::AddExtSpells(const u8 lvl)
 {
     if(1 > lvl || 5 < lvl) return;
 
-    std::list<Spell::spell_t> & spells = (4 < lvl ? spells_level5 : (3 < lvl ? spells_level4 : (2 < lvl ? spells_level3 : (1 < lvl ? spells_level2 : spells_level1))));
-
-    Spell::spell_t spell = Spell::NONE;
-
-    if(spells.empty()) return;
-
-    spell = GetSpellRace(race, lvl);
-
+    Spell::spell_t spell = GetSpellRace(race, lvl);
     while(spells.end() != std::find(spells.begin(), spells.end(), spell)) spell = GetSpellRace(race, lvl);
     spells.push_back(spell);
 }
