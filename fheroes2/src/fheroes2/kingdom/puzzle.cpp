@@ -78,9 +78,15 @@ void Puzzle::ShowMapsDialog(void) const
 {
     Cursor & cursor = Cursor::Get();
     Display & display = Display::Get();
-    cursor.Hide();
     Cursor::themes_t old_cursor = cursor.Themes();
-    cursor.SetThemes(Cursor::POINTER);
+
+    if(Settings::Get().PocketPC())
+    {
+        // wait for long operation: Sprite::ScaleMinifyByTwo
+        cursor.SetThemes(cursor.WAIT);
+        cursor.Show();
+        display.Flip();
+    }
 
     if(!Settings::Get().Modes(Settings::MUSIC_MIDI)) AGG::PlayMusic(MUS::PUZZLE);
 
@@ -91,7 +97,6 @@ void Puzzle::ShowMapsDialog(void) const
     else
 	ShowExtendedDialog(*this, sf);
 
-    cursor.Hide();
     cursor.SetThemes(old_cursor);
 }
 
@@ -138,6 +143,7 @@ void ShowStandardDialog(const Puzzle & pzl, const Surface & sf)
     buttonExit.Draw();
     PuzzlesDraw(pzl, sf, BORDERWIDTH, BORDERWIDTH);
 
+    cursor.SetThemes(Cursor::POINTER);
     cursor.Show();
     display.Flip();
     LocalEvent & le = LocalEvent::Get();
@@ -180,6 +186,7 @@ void ShowExtendedDialog(const Puzzle & pzl, const Surface & sf)
     buttonExit.Draw();
     PuzzlesDraw(pzl, sf, frameborder.GetArea().x, frameborder.GetArea().y);
 
+    cursor.SetThemes(Cursor::POINTER);
     cursor.Show();
     display.Flip();
     LocalEvent & le = LocalEvent::Get();

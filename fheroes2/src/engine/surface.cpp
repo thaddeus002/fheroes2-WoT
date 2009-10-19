@@ -23,6 +23,7 @@
 #include "surface.h"
 #include "palette.h"
 #include "error.h"
+#include "localevent.h"
 #include "display.h"
 
 #ifdef WITH_TTF

@@ -241,20 +241,23 @@ Game::menu_t Game::HighScores(void)
     Mixer::Pause();
     AGG::PlayMusic(MUS::MAINMENU);
 
-    // preload
-    AGG::PreloadObject(ICN::HSBKG);
-    AGG::PreloadObject(ICN::HISCORE);
-
-    // cursor
     Cursor & cursor = Cursor::Get();
-    cursor.Hide();
-    cursor.SetThemes(cursor.POINTER);
-
     Display & display = Display::Get();
+
+    if(conf.PocketPC())
+    {
+	// wait for long operation: Sprite::ScaleMinifyByTwo
+	cursor.SetThemes(cursor.WAIT);
+	cursor.Show();
+	display.Flip();
+    }
+
+    const Sprite &back = AGG::GetICN(ICN::HSBKG, 0);
+
+    cursor.SetThemes(cursor.POINTER);
 
     display.Fill(0, 0, 0);
 
-    const Sprite &back = AGG::GetICN(ICN::HSBKG, 0);
     const Point top((display.w() - back.w()) / 2, (display.h() - back.h()) / 2);
 
     hgs.RedrawList(top.x, top.y);
