@@ -258,7 +258,7 @@ bool SelectFileListSimple(const std::string & header, MapsFileInfoList & lists, 
 	    redraw = true;
  	}
 	else
-	if(le.KeyPress(KEY_DELETE) && cur != lists.end())
+	if((le.KeyPress(KEY_DELETE) || (Settings::Get().PocketPC() && le.MousePressRight())) && cur != lists.end())
 	{
 	    std::string msg(_("Are you sure you want to delete file:"));
 	    msg.append("\n \n");
