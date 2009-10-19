@@ -553,7 +553,10 @@ bool Game::IO::SaveBIN(QueueMessage & msg)
 	}
     }
 
-    // settings: original
+    // latest save format version: svn 1277
+    msg.Push(static_cast<u16>(0x04FD));
+    
+    // added svn 1277: settings: original
     msg.Push(static_cast<u8>(conf.Original()));
 
     msg.Push(static_cast<u16>(0xFFFF));
@@ -1010,6 +1013,15 @@ bool Game::IO::LoadBIN(QueueMessage & msg)
 
     msg.Pop(byte16);
 
+    if(0xFFFF != byte16)
+    {
+	// added svn 1277: settings: original
+	msg.Pop(byte8);
+	if(byte8) conf.SetModes(Settings::ORIGINAL);
+
+	msg.Pop(byte16);
+    }
+
     // sort castles to kingdoms
     std::vector<Castle *>::const_iterator itc1 = world.vec_castles.begin();
     std::vector<Castle *>::const_iterator itc2 = world.vec_castles.end();
@@ -1024,10 +1036,6 @@ bool Game::IO::LoadBIN(QueueMessage & msg)
 
     // regenerate puzzle surface
     Interface::GameArea::GenerateUltimateArtifactAreaSurface(world.ultimate_artifact, world.puzzle_surface);
-
-    // settings: original
-    msg.Pop(byte8);
-    if(byte8) conf.SetModes(Settings::ORIGINAL);
 
     return byte16 == 0xFFFF;
 }
