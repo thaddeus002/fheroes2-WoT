@@ -1777,7 +1777,7 @@ void Heroes::SetFreeman(const u8 reason)
 
     if(Army::RETREAT == reason || Army::SURRENDER == reason) world.GetKingdom(color).GetRecruits().SetHero2(this);
 
-    if(Army::LOSE == reason || Army::RETREAT == reason) army.Reset();
+    if(!army.isValid() || Army::LOSE == reason || Army::RETREAT == reason) army.Reset(false);
     else
     if(Army::LOSE == reason) army.Reset(true);
 

@@ -210,6 +210,9 @@ bool BuildingInfo::QueueEventProcessing(void)
     LocalEvent & le = LocalEvent::Get();
     if(le.MouseClickLeft(area))
     {
+	if(!castle.isBuild(Castle::BUILD_CASTLE))
+	    Dialog::Message("", _("For this action it is necessary first to build a castle."), Font::BIG, Dialog::OK);
+	else
 	if(castle.isBuild(building))
 	    Dialog::Message(GetName(), GetDescription(), Font::BIG, Dialog::OK);
 	else
