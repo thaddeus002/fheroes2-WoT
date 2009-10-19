@@ -8,5 +8,5 @@ endif
 
 AR := arm-mingw32ce-ar
 CXX := arm-mingw32ce-g++
-CFLAGS := $(CFLAGS) -static
+CFLAGS := $(CFLAGS) -Os -static
 LIBS := -Wl,-Bstatic $(LIBS) -lmmtimer
