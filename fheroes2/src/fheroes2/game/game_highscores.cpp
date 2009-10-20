@@ -23,6 +23,7 @@
 #include <sstream>
 #include <vector>
 #include <string>
+#include <cstring>
 #include <ctime>
 #include "gamedefs.h"
 #include "agg.h"
