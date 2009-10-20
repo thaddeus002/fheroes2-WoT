@@ -21,7 +21,7 @@
 #include "error.h"
 #include "localevent.h"
 
-#define TAP_DELAY_EMULATE 950
+#define TAP_DELAY_EMULATE 1050
 
 LocalEvent::LocalEvent() : modes(0), key_value(KEY_NONE), mouse_state(0),
     mouse_button(0), mouse_st(0, 0), redraw_cursor_func(NULL), keyboard_filter_func(NULL), clock_delay(TAP_DELAY_EMULATE)

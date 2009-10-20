@@ -254,6 +254,7 @@ Game::menu_t Game::HighScores(void)
 
     const Sprite &back = AGG::GetICN(ICN::HSBKG, 0);
 
+    cursor.Hide();
     cursor.SetThemes(cursor.POINTER);
 
     display.Fill(0, 0, 0);

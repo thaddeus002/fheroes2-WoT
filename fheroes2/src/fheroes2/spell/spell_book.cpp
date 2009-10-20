@@ -28,14 +28,16 @@
 #include "skill.h"
 #include "settings.h"
 
-#define SPELL_PER_PAGE	6
+#define SPELL_PER_PAGE		6
+#define SPELL_PER_PAGE_SMALL	2
 
 struct SpellFiltered : std::binary_function<Spell::spell_t, SpellBook::filter_t, bool>
 {
     bool operator() (Spell::spell_t s, SpellBook::filter_t f) const { return ((SpellBook::ADVN & f) && Spell::isCombat(s)) || ((SpellBook::CMBT & f) && !Spell::isCombat(s)); };
 };
 
-void SpellBookRedrawLists(const std::vector<Spell::spell_t> & spells, std::vector<Rect> & coords, const size_t cur, const Point & pt, const HeroBase *hero);
+void SpellBookRedrawLists(const std::vector<Spell::spell_t> &, std::vector<Rect> &, const size_t, const Point &, const HeroBase *);
+void SpellBookRedrawSpells(const std::vector<Spell::spell_t> &, std::vector<Rect> &, const size_t, s16, s16);
 void SpellBookRedrawMP(const Point &, u16);
 
 SpellBook::SpellBook(const HeroBase *p) : hero(p), active(false)
@@ -46,17 +48,23 @@ Spell::spell_t SpellBook::Open(filter_t filt, bool canselect) const
 {
     if(!active) return Spell::NONE;
 
-    // FIXME: QVGA version
-    if(Settings::Get().PocketPC())
-    {
-       Dialog::Message("", _("For the QVGA version is not available."), Font::SMALL, Dialog::OK);
-       return Spell::NONE;
-    }
-
     Display & display = Display::Get();
     Cursor & cursor = Cursor::Get();
+    bool small = Settings::Get().PocketPC();
 
     const Cursor::themes_t oldcursor = cursor.Themes();
+
+    if(small)
+    {
+        // wait for long operation: Sprite::ScaleMinifyByTwo
+        cursor.SetThemes(cursor.WAIT);
+        cursor.Show();
+        display.Flip();
+    }
+
+    const Sprite & r_list = AGG::GetICN(ICN::BOOK, 0);
+    const Sprite & l_list = AGG::GetICN(ICN::BOOK, 0, true);
+
     cursor.Hide();
     cursor.SetThemes(Cursor::POINTER);
 
@@ -65,8 +73,6 @@ Spell::spell_t SpellBook::Open(filter_t filt, bool canselect) const
 
     size_t current_index = 0;
 
-    const Sprite & r_list = AGG::GetICN(ICN::BOOK, 0);
-    const Sprite & l_list = AGG::GetICN(ICN::BOOK, 0, true);
     const Sprite & bookmark_info = AGG::GetICN(ICN::BOOK, 6);
     const Sprite & bookmark_advn = AGG::GetICN(ICN::BOOK, 3);
     const Sprite & bookmark_cmbt = AGG::GetICN(ICN::BOOK, 4);
@@ -76,18 +82,18 @@ Spell::spell_t SpellBook::Open(filter_t filt, bool canselect) const
     Background back(pos);
     back.Save();
 
-    const Rect prev_list(pos.x + 30, pos.y + 8 ,30, 25);
-    const Rect next_list(pos.x + 410, pos.y + 8, 30, 25);
+    const Rect prev_list(pos.x + (small ? 15 : 30), pos.y + (small ? 4 : 8), (small ? 15 : 30), (small ? 12 : 25));
+    const Rect next_list(pos.x + (small ? 205 : 410), pos.y + (small ? 4: 8), (small ? 15 : 30), (small ? 12 :25));
 
-    const Rect info_rt(pos.x + 125, pos.y + 275, bookmark_info.w(), bookmark_info.h());
-    const Rect advn_rt(pos.x + 270, pos.y + 270, bookmark_advn.w(), bookmark_advn.h());
-    const Rect cmbt_rt(pos.x + 304, pos.y + 278, bookmark_cmbt.w(), bookmark_cmbt.h());
-    const Rect clos_rt(pos.x + 420, pos.y + 284, bookmark_clos.w(), bookmark_clos.h());
+    const Rect info_rt(pos.x + (small ? 64 : 125), pos.y + (small ? 137: 275), bookmark_info.w(), bookmark_info.h());
+    const Rect advn_rt(pos.x + (small ? 135: 270), pos.y + (small ? 135: 270), bookmark_advn.w(), bookmark_advn.h());
+    const Rect cmbt_rt(pos.x + (small ? 152: 304), pos.y + (small ? 138: 278), bookmark_cmbt.w(), bookmark_cmbt.h());
+    const Rect clos_rt(pos.x + (small ? 210: 420), pos.y + (small ? 142: 284), bookmark_clos.w(), bookmark_clos.h());
 
     Spell::spell_t curspell = Spell::NONE;
     
     std::vector<Rect> coords;
-    coords.reserve(SPELL_PER_PAGE * 2);
+    coords.reserve(small ? SPELL_PER_PAGE_SMALL * 2 : SPELL_PER_PAGE * 2);
 
     SpellBookRedrawLists(spells, coords, current_index, pos, hero);
 
@@ -101,14 +107,20 @@ Spell::spell_t SpellBook::Open(filter_t filt, bool canselect) const
     {
 	if(le.MouseClickLeft(prev_list) && current_index)
 	{
-	    current_index -= 2 * SPELL_PER_PAGE;
+	    cursor.Hide();
+	    current_index -= small ? SPELL_PER_PAGE_SMALL * 2 : SPELL_PER_PAGE * 2;
 	    SpellBookRedrawLists(spells, coords, current_index, pos, hero);
+	    cursor.Show();
+	    display.Flip();
 	}
 	else
-	if(le.MouseClickLeft(next_list) && spells.size() > (current_index + 2 * SPELL_PER_PAGE))
+	if(le.MouseClickLeft(next_list) && spells.size() > (current_index + (small ? SPELL_PER_PAGE_SMALL * 2 : SPELL_PER_PAGE * 2)))
 	{
-	    current_index += 2 * SPELL_PER_PAGE;
+	    cursor.Hide();
+	    current_index += small ? SPELL_PER_PAGE_SMALL * 2 : SPELL_PER_PAGE * 2;
 	    SpellBookRedrawLists(spells, coords, current_index, pos, hero);
+	    cursor.Show();
+	    display.Flip();
 	}
 	else
 	if((le.MouseClickLeft(info_rt) && hero) ||
@@ -125,18 +137,24 @@ Spell::spell_t SpellBook::Open(filter_t filt, bool canselect) const
 	else
 	if(le.MouseClickLeft(advn_rt) && filt != ADVN)
 	{
+	    cursor.Hide();
 	    filt = ADVN;
 	    current_index = 0;
 	    SetFilter(spells, filt);
 	    SpellBookRedrawLists(spells, coords, current_index, pos, hero);
+	    cursor.Show();
+	    display.Flip();
 	}
 	else
 	if(le.MouseClickLeft(cmbt_rt) && filt != CMBT)
 	{
+	    cursor.Hide();
 	    filt = CMBT;
 	    current_index = 0;
 	    SetFilter(spells, filt);
 	    SpellBookRedrawLists(spells, coords, current_index, pos, hero);
+	    cursor.Show();
+	    display.Flip();
 	}
 	else
 	if(le.MouseClickLeft(clos_rt) || le.KeyPress(KEY_ESCAPE)) break;
@@ -219,9 +237,10 @@ void SpellBook::SetFilter(std::vector<Spell::spell_t> & v, filter_t filter) cons
 
 void SpellBookRedrawMP(const Point & dst, u16 mp)
 {
+    bool small = Settings::Get().PocketPC();
     if(mp)
     {
-	Point tp(dst.x + 11, dst.y + 9);
+	Point tp(dst.x + (small ? 5 : 11), dst.y + (small ? 1 : 9));
 	std::string mps;
 	for(int i = 100; i >= 1; i /= 10) if(mp >= i)
 	{
@@ -229,7 +248,7 @@ void SpellBookRedrawMP(const Point & dst, u16 mp)
 	    String::AddInt(mps, (mp % (i * 10)) / i);
 	    Text text(mps, Font::SMALL);
 	    text.Blit(tp.x - text.w() / 2, tp.y);
-	    tp.y += text.h();
+	    tp.y += (small ? -2 : 0) + text.h();
 	}
     }
 }
@@ -237,9 +256,7 @@ void SpellBookRedrawMP(const Point & dst, u16 mp)
 void SpellBookRedrawLists(const std::vector<Spell::spell_t> & spells, std::vector<Rect> & coords, const size_t cur, const Point & pt, const HeroBase *hero)
 {
     Display & display = Display::Get();
-    Cursor & cursor = Cursor::Get();
-
-    cursor.Hide();
+    bool small = Settings::Get().PocketPC();
 
     const Sprite & r_list = AGG::GetICN(ICN::BOOK, 0);
     const Sprite & l_list = AGG::GetICN(ICN::BOOK, 0, true);
@@ -248,10 +265,10 @@ void SpellBookRedrawLists(const std::vector<Spell::spell_t> & spells, std::vecto
     const Sprite & bookmark_cmbt = AGG::GetICN(ICN::BOOK, 4);
     const Sprite & bookmark_clos = AGG::GetICN(ICN::BOOK, 5);
 
-    const Rect info_rt(pt.x + 125, pt.y + 275, bookmark_info.w(), bookmark_info.h());
-    const Rect advn_rt(pt.x + 270, pt.y + 270, bookmark_advn.w(), bookmark_advn.h());
-    const Rect cmbt_rt(pt.x + 304, pt.y + 278, bookmark_cmbt.w(), bookmark_cmbt.h());
-    const Rect clos_rt(pt.x + 420, pt.y + 284, bookmark_clos.w(), bookmark_clos.h());
+    const Rect info_rt(pt.x + (small ? 64 : 125), pt.y + (small ? 137: 275), bookmark_info.w(), bookmark_info.h());
+    const Rect advn_rt(pt.x + (small ? 135: 270), pt.y + (small ? 135: 270), bookmark_advn.w(), bookmark_advn.h());
+    const Rect cmbt_rt(pt.x + (small ? 152: 304), pt.y + (small ? 138: 278), bookmark_cmbt.w(), bookmark_cmbt.h());
+    const Rect clos_rt(pt.x + (small ? 210: 420), pt.y + (small ? 142: 284), bookmark_clos.w(), bookmark_clos.h());
 
     display.Blit(l_list, pt.x, pt.y);
     display.Blit(r_list, pt.x + l_list.w(), pt.y);
@@ -263,41 +280,53 @@ void SpellBookRedrawLists(const std::vector<Spell::spell_t> & spells, std::vecto
     if(coords.size()) coords.clear();
 
     SpellBookRedrawMP(info_rt, hero ? hero->GetSpellPoints() : 0);
+    SpellBookRedrawSpells(spells, coords, cur, pt.x, pt.y);
+    SpellBookRedrawSpells(spells, coords, cur + (small ? SPELL_PER_PAGE_SMALL : SPELL_PER_PAGE), pt.x + (small ? 110 : 220), pt.y);
+}
+
+void SpellBookRedrawSpells(const std::vector<Spell::spell_t> & spells, std::vector<Rect> & coords, const size_t cur, s16 px, s16 py)
+{
+    Display & display = Display::Get();
+    bool small = Settings::Get().PocketPC();
 
     u16 ox = 0;
     u16 oy = 0;
 
-    for(u8 ii = 0; ii < 2 * SPELL_PER_PAGE; ++ii)
+    for(u8 ii = 0; ii < (small ? SPELL_PER_PAGE_SMALL : SPELL_PER_PAGE); ++ii) if(spells.size() > cur + ii)
     {
-	if(spells.size() > cur + ii)
+	if(small)
 	{
-	    if(!(ii % 3))
+	    if(0 == (ii % SPELL_PER_PAGE_SMALL))
+	    {
+		oy = 25;
+		ox = 60;
+	    }
+	}
+	else
+	{
+	    if(0 == (ii % (SPELL_PER_PAGE / 2)))
 	    {
 		oy = 50;
 		ox += 80;
 	    }
-
-	    if(SPELL_PER_PAGE == ii) ox += 70;
-
-	    const Spell::spell_t & spell = spells.at(ii + cur);
-	    const Sprite & icon = AGG::GetICN(ICN::SPELLS, Spell::IndexSprite(spell));
-	    const Rect rect(pt.x + ox - icon.w() / 2, pt.y + oy - icon.h() / 2, icon.w(), icon.h() + 10);
-
-    	    display.Blit(icon, rect.x, rect.y);
-
-    	    std::string str(Spell::GetName(spell));
-    	    str.append(" [");
-	    String::AddInt(str, Spell::Mana(spell));
-	    str.append("]");
-	    
-	    TextBox box(str, Font::SMALL, 80);
-	    box.Blit(pt.x + ox - 40, pt.y + oy + 25);
-
-    	    oy += 80;
-
-    	    coords.push_back(rect);
 	}
+
+	const Spell::spell_t & spell = spells[ii + cur];
+	const Sprite & icon = AGG::GetICN(ICN::SPELLS, Spell::IndexSprite(spell));
+	const Rect rect(px + ox - icon.w() / 2, py + oy - icon.h() / 2, icon.w(), icon.h() + 10);
+
+    	display.Blit(icon, rect.x, rect.y);
+
+    	std::string str(Spell::GetName(spell));
+    	str.append(" [");
+	String::AddInt(str, Spell::Mana(spell));
+	str.append("]");
+	    
+	TextBox box(str, Font::SMALL, (small ? 94 : 80));
+	box.Blit(px + ox - (small ? 47 : 40), py + oy + (small ? 22 : 25));
+
+    	oy += small ? 65 : 80;
+
+	coords.push_back(rect);
     }
-    cursor.Show();
-    display.Flip();
 }

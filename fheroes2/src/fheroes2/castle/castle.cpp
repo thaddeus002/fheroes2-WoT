@@ -183,7 +183,7 @@ void Castle::LoadFromMP2(const void *ptr)
     
     // custom name
     ++ptr8;
-    name = std::string(reinterpret_cast<const char *>(ptr8));
+    name = std::string(_(reinterpret_cast<const char *>(ptr8)));
     ptr8 += 13;
 
     // race

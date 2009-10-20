@@ -466,7 +466,7 @@ void Heroes::LoadFromMP2(u16 map_index, const void *ptr, const Color::color_t cl
     ++ptr8;
 
     //name hero
-    if(*ptr8) name = std::string(reinterpret_cast<const char *>(ptr8));
+    if(*ptr8) name = std::string(_(reinterpret_cast<const char *>(ptr8)));
     
     ptr8 += 13;
     
