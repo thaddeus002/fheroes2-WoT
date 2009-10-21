@@ -20,9 +20,11 @@
 
 #include <functional>
 #include <algorithm>
+#include <deque>
 #include "game.h"
 #include "cursor.h"
 #include "engine.h"
+#include "game_interface.h"
 #include "interface_gamearea.h"
 #include "interface_status.h"
 #include "heroes.h"
@@ -31,6 +33,8 @@
 #include "settings.h"
 #include "kingdom.h"
 #include "agg.h"
+
+#define HERO_MAX_SHEDULED_TASK 7
 
 void RedrawAITurns(u8 color, u8 i)
 {
@@ -65,6 +69,8 @@ void Kingdom::AITurns(void)
     cursor.SetThemes(Cursor::WAIT);
     cursor.Show();
     display.Flip();
+
+    Interface::StatusWindow::Get().SetState(STATUS_AITURN);
 
     // turn indicator
     RedrawAITurns(color, 0);
@@ -148,19 +154,19 @@ void Kingdom::AITurns(void)
 
 	while(hero.MayStillMove())
 	{
-	RedrawAITurns(color, 6);
+	    RedrawAITurns(color, 6);
 
-	// prepare task for heroes
-	AIHeroesTask(hero);
+	    // get task for heroes
+	    AIHeroesGetTask(hero);
 
-	// turn indicator
-	RedrawAITurns(color, 7);
+	    // turn indicator
+	    RedrawAITurns(color, 7);
 
-	// heroes AI turn
-	AIHeroesTurns(hero);
+	    // heroes AI turn
+	    AIHeroesTurns(hero);
 
-	// turn indicator
-	RedrawAITurns(color, 8);
+	    // turn indicator
+	    RedrawAITurns(color, 8);
 	}
     }
 
@@ -208,17 +214,20 @@ void Kingdom::AIHeroesTurns(Heroes &hero)
         if(hero.GetPath().isValid()) hero.SetMove(true);
 	else return;
 
-	Cursor::Get().Hide();
+	Display & display = Display::Get();
+	Cursor & cursor = Cursor::Get();
+	Interface::Basic & I = Interface::Basic::Get();
 
+	cursor.Hide();
 	u32 ticket = 0;
 
 	if(hero.isShow(Settings::Get().MyColor()))
 	{
-	    Cursor::Get().Hide();
-	    Interface::GameArea::Get().Center(hero.GetCenter());
-	    Interface::GameArea::Get().Redraw(Display::Get());
-	    Cursor::Get().Show();
-	    Display::Get().Flip();
+	    cursor.Hide();
+	    I.gameArea.Center(hero.GetCenter());
+	    I.Redraw(REDRAW_GAMEAREA);
+	    cursor.Show();
+	    display.Flip();
 	}
 
 	while(LocalEvent::Get().HandleEvents())
@@ -230,15 +239,15 @@ void Kingdom::AIHeroesTurns(Heroes &hero)
 	    else
 	    if(Game::ShouldAnimateInfrequent(ticket, 1))
 	    {
-		Cursor::Get().Hide();
+		cursor.Hide();
 		hero.Move();
 
     		if(Game::ShouldAnimateInfrequent(ticket, 12)) Maps::IncreaseAnimationTicket();
 
-		Interface::GameArea::Get().Center(hero.GetCenter());
-		Interface::GameArea::Get().Redraw(Display::Get());
-		Cursor::Get().Show();
-		Display::Get().Flip();
+		I.gameArea.Center(hero.GetCenter());
+		I.Redraw(REDRAW_GAMEAREA);
+		cursor.Show();
+		display.Flip();
 	    }
 
 	    ++ticket;
@@ -248,120 +257,136 @@ void Kingdom::AIHeroesTurns(Heroes &hero)
 	if(!hero.isFreeman() && hero.isShow(Settings::Get().MyColor())) DELAY(200);
 }
 
-void Kingdom::AIHeroesTask(Heroes & hero)
+void Kingdom::AIHeroesGetTask(Heroes & hero)
 {
-	if(hero.GetPath().isValid()) return;
+    if(hero.GetPath().isValid()) return;
 
-	Castle *castle = hero.inCastle();
-	u16 index = MAXU16;
+    std::deque<u16> & task = hero.GetSheduledVisit();
 
-	// if hero in castle
-	if(castle)
-	{
-	    castle->RecruitAllMonster();
-	    hero.GetArmy().UpgradeTroops(*castle);
+    if(task.empty()) AIHeroesPrepareTask(hero);
 
-	    // recruit army
-	    if(hero.Modes(Heroes::HUNTER))
+    // find passable index
+    while(task.size() && !hero.GetPath().Calculate(task.front())){ task.pop_front(); }
+
+    // success
+    if(task.size())
+    {
+	const u16 index = task.front();
+	if(Settings::Get().Debug()) Error::Verbose("AI::HeroesTask: " + Color::String(color) + ", Hero "+ hero.GetName() + " say: go to object: " + MP2::StringObject(ai_objects[index]) + ", index: ", index);
+	task.pop_front();
+	ai_objects.erase(index);
+	if(2 < Settings::Get().Debug()) hero.GetPath().Dump();
+    }
+    else
+    {
+	hero.GetPath().Reset();
+	if(Settings::Get().Debug()) Error::Verbose("AI::HeroesTask: " + Color::String(color) + ", Hero "+ hero.GetName() + " say: unknown task., help my please..");
+	hero.SetModes(Heroes::STUPID);
+    }
+}
+
+void Kingdom::AIHeroesPrepareTask(Heroes & hero)
+{
+    if(hero.GetPath().isValid()) return;
+
+    Castle *castle = hero.inCastle();
+
+    // if hero in castle
+    if(castle)
+    {
+	castle->RecruitAllMonster();
+	hero.GetArmy().UpgradeTroops(*castle);
+
+	// recruit army
+	if(hero.Modes(Heroes::HUNTER))
 		hero.GetArmy().JoinStrongestFromArmy(castle->GetArmy());
-	    else
-	    if(hero.Modes(Heroes::SCOUTER))
+	else
+	if(hero.Modes(Heroes::SCOUTER))
 		hero.GetArmy().KeepOnlyWeakestTroops(castle->GetArmy());
-	}
+    }
 
-	// load minimal distance tasks
-	std::vector<IndexDistance>objs;
-	objs.reserve(ai_objects.size());
-	std::vector<IndexDistance>::const_reverse_iterator ito1 = objs.rbegin();
-	std::vector<IndexDistance>::const_reverse_iterator ito2 = objs.rend();
+    std::deque<u16> & task = hero.GetSheduledVisit();
 
-	std::map<u16, MP2::object_t>::const_iterator itm1 = ai_objects.begin();
-	std::map<u16, MP2::object_t>::const_iterator itm2 = ai_objects.end();
-	bool priority = false;
+    // load minimal distance tasks
+    std::vector<IndexDistance> objs;
+    objs.reserve(ai_objects.size());
+    std::vector<IndexDistance>::const_reverse_iterator ito1 = objs.rbegin();
+    std::vector<IndexDistance>::const_reverse_iterator ito2 = objs.rend();
 
-	for(; itm1 != itm2; ++itm1)
+    std::map<u16, MP2::object_t>::const_iterator itm1 = ai_objects.begin();
+    std::map<u16, MP2::object_t>::const_iterator itm2 = ai_objects.end();
+
+    for(; itm1 != itm2; ++itm1)
+    {
+	//std::cout << "AIHeroTask: obj: " << MP2::StringObject((*itm1).second) << ", index: " << (*itm1).first << std::endl;
+
+	if(hero.isShipMaster())
 	{
-	    //std::cout << "AIHeroTask: obj: " << MP2::StringObject((*itm1).second) << ", index: " << (*itm1).first << std::endl;
+	    if(MP2::isGroundObject((*itm1).second)) continue;
 
-	    if(hero.isShipMaster())
+	    if(hero.GetPath().Calculate((*itm1).first) &&
+		  hero.AIValidObject((*itm1).first, (*itm1).second))
 	    {
-		if(MP2::isGroundObject((*itm1).second)) continue;
-
-		if(hero.GetPath().Calculate((*itm1).first) &&
-		   hero.AIValidObject((*itm1).first, (*itm1).second)) objs.push_back(IndexDistance((*itm1).first, hero.GetPath().size()));
-	    }
-	    else
-	    {
-		if(MP2::isWaterObject((*itm1).second)) continue;
-
-		if(hero.GetPath().Calculate((*itm1).first) && hero.AIValidObject((*itm1).first, (*itm1).second))
-		{
-		    u16 pos = 0;
-		    // check monster on path
-		    if(hero.GetPath().isUnderProtection(pos))
-		    {
-			const Maps::Tiles & tile = world.GetTiles(pos);
-			Army::army_t enemy;
-			enemy.At(0).Set(Monster(tile), tile.GetCountMonster());
-
-			// can we will win battle
-			if(enemy.isValid() && ! hero.GetArmy().StrongerEnemyArmy(enemy)) continue;
-		    }
-
+		if(hero.AIPriorityObject((*itm1).first, (*itm1).second))
+		    task.push_front((*itm1).first);
+		else
 		    objs.push_back(IndexDistance((*itm1).first, hero.GetPath().size()));
 
-		    if(hero.AIPriorityObject((*itm1).first, (*itm1).second)){ std::swap(objs.front(), objs.back()); priority = true; }
-		}
+		if(objs.size() > HERO_MAX_SHEDULED_TASK) break;
 	    }
 	}
-
-	if(objs.size() && !priority) std::sort(objs.begin(), objs.end(), IndexDistance::Longest);
-	if(1 < Settings::Get().Debug()) Error::Verbose("Kingdom::AIHeroesTask: " + Color::String(color) + ", hero: " + hero.GetName() + ", unconfirmed tasks: ", objs.size());
-
-	// get random first obj
-	if(objs.size())
+	else
 	{
-	    ito1 = objs.rbegin();
-	    ito2 = objs.rend();
-	    while(ito1 != ito2 && MAXU16 == index)
-	    {
-		const u16 index1 = (*ito1).first;
-		++ito1;
-		const u16 index2 = (ito1 != ito2 ? (*ito1).first : MAXU16);
+	    if(MP2::isWaterObject((*itm1).second)) continue;
 
-		if(MAXU16 == index2)
+	    if(hero.GetPath().Calculate((*itm1).first) && hero.AIValidObject((*itm1).first, (*itm1).second))
+	    {
+		u16 pos = 0;
+		// check monster on path
+		if(hero.GetPath().isUnderProtection(pos))
 		{
-		    index = index1;
+		    const Maps::Tiles & tile = world.GetTiles(pos);
+		    Army::army_t enemy;
+		    enemy.At(0).Set(Monster(tile), tile.GetCountMonster());
+
+		    // can we will win battle
+		    if(enemy.isValid() && ! hero.GetArmy().StrongerEnemyArmy(enemy)) continue;
 		}
+
+		if(hero.AIPriorityObject((*itm1).first, (*itm1).second))
+		    task.push_front((*itm1).first);
 		else
-		if(!priority)
-		{
-		    index = Rand::Get(1) ? index1 : index2;
-		}
-	    }
-	}
-	else
-	    hero.AIRescueWhereMove(index);
+		    objs.push_back(IndexDistance((*itm1).first, hero.GetPath().size()));
 
-	// success
-	if(MAXU16 != index)
-	{
-	    if(Settings::Get().Debug()) Error::Verbose("AI::HeroesTask: " + Color::String(color) + ", Hero "+ hero.GetName() + " say: go to object: " + MP2::StringObject(ai_objects[index]) + ", index: ", index);
-	    ai_objects.erase(index);
-	    hero.GetPath().Calculate(index);
-	    if(1 < Settings::Get().Debug()) hero.GetPath().Dump();
-	}
-	else
-	{
-	    hero.GetPath().Reset();
-	    if(Settings::Get().Debug()) Error::Verbose("AI::HeroesTask: " + Color::String(color) + ", Hero "+ hero.GetName() + " say: unknown task...");
-	    if(1 < Settings::Get().Debug())
-	    {
-		ito1 = objs.rbegin();
-		ito2 = objs.rend();
-		for(; ito1 != ito2; ++ito1) AIDumpCacheObjects(*ito1);
+		if(objs.size() > HERO_MAX_SHEDULED_TASK) break;
 	    }
-	    if(Settings::Get().Debug()) Error::Verbose("AI::HeroesTask: " + Color::String(color) + ", Hero " + hero.GetName() + " say: I'm stupid, help my please..");
-	    hero.SetModes(Heroes::STUPID);
 	}
+    }
+
+    if(objs.size()) std::sort(objs.begin(), objs.end(), IndexDistance::Longest);
+    if(1 < Settings::Get().Debug()) Error::Verbose("Kingdom::AIHeroesTask: " + Color::String(color) + ", hero: " + hero.GetName() + ", unconfirmed tasks: ", objs.size());
+
+    // store random task
+    if(objs.size())
+    {
+	ito1 = objs.rbegin();
+	ito2 = objs.rend();
+
+	while(ito1 != ito2)
+	{
+	    const u16 index1 = (*ito1).first;
+	    ++ito1;
+	    const u16 index2 = (ito1 != ito2 ? (*ito1).first : MAXU16);
+
+	    if(MAXU16 == index2)
+		task.push_back(index1);
+	    else
+		task.push_back(Rand::Get(1) ? index1 : index2);
+	}
+    }
+    else
+	hero.AIRescueWhereMove();
+
+    // resize
+    if(task.size() > HERO_MAX_SHEDULED_TASK) task.resize(HERO_MAX_SHEDULED_TASK);
 }

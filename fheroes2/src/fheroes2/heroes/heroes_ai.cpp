@@ -1678,7 +1678,7 @@ bool Heroes::AIValidObject(u16 index, u8 obj)
     return false;
 }
 
-void Heroes::AIRescueWhereMove(u16 & to)
+void Heroes::AIRescueWhereMove(void)
 {
     u8 scoute = GetScoute();
 
@@ -1713,7 +1713,7 @@ void Heroes::AIRescueWhereMove(u16 & to)
                 world.GetTiles(res).isPassable(this, true) &&
 		GetPath().Calculate(res))
             {
-                to = res;
+                sheduled_visit.push_back(res);
                 return;
             }
         }

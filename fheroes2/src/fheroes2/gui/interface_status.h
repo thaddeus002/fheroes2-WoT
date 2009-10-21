@@ -30,7 +30,7 @@ class Surface;
 class Castle;
 class Heroes;
 
-typedef enum { STATUS_UNKNOWN, STATUS_DAY, STATUS_FUNDS, STATUS_ARMY, STATUS_RESOURCE } info_t;
+typedef enum { STATUS_UNKNOWN, STATUS_DAY, STATUS_FUNDS, STATUS_ARMY, STATUS_RESOURCE, STATUS_AITURN } info_t;
 
 namespace Interface
 {
@@ -47,7 +47,7 @@ namespace Interface
 	void NextState(void);
 	void SetState(info_t info);
 	void SetResource(Resource::resource_t, u16);
-	void RedrawAITurns(u8 color, u8 progress) const;
+	void RedrawAITurns(u8 color, u8 progress);
 	void QueueEventProcessing(void);
 
 	static void ResetTimer(void);
@@ -60,6 +60,7 @@ namespace Interface
 	void DrawArmyInfo(const u8 oh = 0) const;
 	void DrawResourceInfo(const u8 oh = 0) const;
 	void DrawBackground(void) const;
+	void DrawAITurns(void) const;
 	static u32 ResetResourceStatus(u32, void *);
 
 	info_t               state;
@@ -69,6 +70,9 @@ namespace Interface
 	Timer                timerShowLastResource;
 	
 	Dialog::FrameBorder border;
+
+	u8                   aiturn_color;
+	u8                   aiturn_progress;
     };
 };
 

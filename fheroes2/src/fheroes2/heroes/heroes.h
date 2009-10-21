@@ -23,6 +23,7 @@
 
 #include <string>
 #include <vector>
+#include <deque>
 #include <list>
 #include "spell.h"
 #include "mp2.h"
@@ -212,6 +213,7 @@ public:
     void SetVisited(const u16 index, const Visit::type_t type = Visit::LOCAL);
     bool isVisited(const u8 object, const Visit::type_t type = Visit::LOCAL) const;
     bool isVisited(const Maps::Tiles & tile, const Visit::type_t type = Visit::LOCAL) const;
+    std::deque<u16> & GetSheduledVisit(void) { return sheduled_visit; };
 
     void SetCenter(const Point& pt){ mp = pt; };
     void SetCenter(const u16 index);
@@ -227,7 +229,7 @@ public:
 
     void AIAction(const u16 dst_index);
     bool AIValidObject(u16, u8);
-    void AIRescueWhereMove(u16 &);
+    void AIRescueWhereMove(void);
     bool AIPriorityObject(u16, u8);
 
     void Redraw(Surface &, const Interface::GameArea &, bool) const;
@@ -288,6 +290,7 @@ private:
     u8			sprite_index;
 
     std::list<IndexObject> visit_object;
+    std::deque<u16> sheduled_visit;
 };
 
 #endif

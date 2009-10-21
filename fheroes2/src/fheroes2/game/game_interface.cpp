@@ -40,7 +40,7 @@ Interface::Basic::Basic() : gameArea(GameArea::Get()), radar(Radar::Get()),
 	iconsPanel.SetPos(BORDERWIDTH, BORDERWIDTH);
 	buttonsArea.SetPos(BORDERWIDTH, BORDERWIDTH);
 	statusWindow.SetPos(BORDERWIDTH, BORDERWIDTH);
-	controlPanel.SetPos(display.w() - controlPanel.GetArea().w - 32, 0);
+	controlPanel.SetPos(display.w() - controlPanel.GetArea().w - scroll_width, 0);
     }
     else
     if(Settings::Get().HideInterface())

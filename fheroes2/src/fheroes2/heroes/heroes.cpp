@@ -1860,4 +1860,10 @@ void Heroes::Dump(void) const
                                          (Modes(SCOUTER) ? "SCOUTER," : ",") <<
                                          (Modes(HUNTER) ? "HUNTER," : ",") <<
                                          (Modes(STUPID) ? "STUPID," : ",") << std::endl;
+
+    std::cout << "sheduled visit  : ";
+    std::deque<u16>::const_iterator it1 = sheduled_visit.begin();
+    std::deque<u16>::const_iterator it2 = sheduled_visit.end();
+    for(; it1 != it2; ++it1) std::cout << *it1 << "(" << MP2::StringObject(world.GetTiles(*it1).GetObject()) << "), ";
+    std::cout << std::endl;
 }

@@ -127,6 +127,7 @@ void Interface::StatusWindow::Redraw(void)
         case STATUS_FUNDS:	DrawKingdomInfo();	break;
         case STATUS_ARMY:	DrawArmyInfo();		break;
         case STATUS_RESOURCE:   DrawResourceInfo();     break;
+	case STATUS_AITURN:	DrawAITurns();		break;
 	default: break;
     }
     
@@ -287,7 +288,15 @@ void Interface::StatusWindow::DrawArmyInfo(const u8 oh) const
     }
 }
 
-void Interface::StatusWindow::RedrawAITurns(u8 color, u8 progress) const
+void Interface::StatusWindow::RedrawAITurns(u8 color, u8 progress)
+{
+    aiturn_color = color;
+    aiturn_progress = progress;
+
+    DrawAITurns();
+}
+
+void Interface::StatusWindow::DrawAITurns(void) const
 {
     const Settings & conf = Settings::Get();
     if(conf.HideInterface() && !conf.ShowStatus()) return;
@@ -305,7 +314,7 @@ void Interface::StatusWindow::RedrawAITurns(u8 color, u8 progress) const
 
     u8 color_index = 0;
 
-    switch(color)
+    switch(aiturn_color)
     {
 	case Color::BLUE:	color_index = 0; break;
 	case Color::GREEN:	color_index = 1; break;
@@ -323,7 +332,7 @@ void Interface::StatusWindow::RedrawAITurns(u8 color, u8 progress) const
 
     display.Blit(crest, dst_x, dst_y);
 
-    const Sprite & sand = AGG::GetICN(ICN::HOURGLAS, 1 + (progress % 10));
+    const Sprite & sand = AGG::GetICN(ICN::HOURGLAS, 1 + (aiturn_progress % 10));
 
     dst_x += (glass.w() - sand.w() - sand.x() - 3);
     dst_y += sand.y();
