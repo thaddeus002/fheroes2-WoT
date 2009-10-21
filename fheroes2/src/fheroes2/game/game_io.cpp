@@ -174,6 +174,8 @@ bool Game::IO::SaveBIN(QueueMessage & msg)
     msg.Reserve(world.w() > Maps::MEDIUM ? 600 * 1024 : 200 * 1024);
 
     msg.Push(static_cast<u16>(0xFF01));
+    // format version: svn 1293
+    msg.Push(static_cast<u16>(0x050D));
     // version
     msg.Push(conf.major_version);
     msg.Push(conf.minor_version);
@@ -221,6 +223,9 @@ bool Game::IO::SaveBIN(QueueMessage & msg)
     msg.Push(conf.players_colors);
     msg.Push(conf.preferably_count_players);
     msg.Push(conf.debug);
+    // added svn 1292: settings: original
+    msg.Push(static_cast<u8>(conf.Original()));
+
     // world
     msg.Push(static_cast<u16>(0xFF05));
     msg.Push(world.width);
@@ -553,12 +558,6 @@ bool Game::IO::SaveBIN(QueueMessage & msg)
 	}
     }
 
-    // latest save format version: svn 1277
-    msg.Push(static_cast<u16>(0x04FD));
-    
-    // added svn 1277: settings: original
-    msg.Push(static_cast<u8>(conf.Original()));
-
     msg.Push(static_cast<u16>(0xFFFF));
     return true;
 }
@@ -570,6 +569,7 @@ bool Game::IO::LoadBIN(QueueMessage & msg)
     u8 byte8;
     u16 byte16;
     u32 byte32;
+    u16 format;
     std::string str;
 
     // prepare World
@@ -577,10 +577,17 @@ bool Game::IO::LoadBIN(QueueMessage & msg)
 
     msg.Pop(byte16);
     if(byte16 != 0xFF01){ Error::Warning("0xFF01"); return false; }
-    // major version
-    msg.Pop(byte8);
-    // minor version
-    msg.Pop(byte8);
+
+    // format version
+    msg.Pop(format);
+    if(format > 0x50C)
+    {
+	// major version
+	msg.Pop(byte8);
+	// minor version
+	msg.Pop(byte8);
+    }
+
     // svn
     msg.Pop(str);
     // time
@@ -632,6 +639,12 @@ bool Game::IO::LoadBIN(QueueMessage & msg)
 #else
     msg.Pop(conf.debug);
 #endif
+    // added svn 1293: settings: original
+    if(format > 0x50C)
+    {
+	msg.Pop(byte8);
+	if(byte8) conf.SetModes(Settings::ORIGINAL);
+    }
     // world
     msg.Pop(byte16);
     if(byte16 != 0xFF05) Error::Warning("0xFF05");
@@ -1012,15 +1025,6 @@ bool Game::IO::LoadBIN(QueueMessage & msg)
     }
 
     msg.Pop(byte16);
-
-    if(0xFFFF != byte16)
-    {
-	// added svn 1277: settings: original
-	msg.Pop(byte8);
-	if(byte8) conf.SetModes(Settings::ORIGINAL);
-
-	msg.Pop(byte16);
-    }
 
     // sort castles to kingdoms
     std::vector<Castle *>::const_iterator itc1 = world.vec_castles.begin();
