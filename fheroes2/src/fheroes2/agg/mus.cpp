@@ -32,7 +32,7 @@ namespace MUS
     static const struct
     {
 	mus_t type;
-	std::string string;
+	const char* string;
     } musmap[] = {
         { UNUSED,       ""                    },
         { DATATRACK,    ""                    },
