@@ -79,7 +79,7 @@ bool HGSData::Load(const char* fn)
 {
     std::fstream fs(fn, std::ios::in | std::ios::binary);
 
-    if(fs.bad() || !fs.good()) return false;
+    if(fs.fail()) return false;
 
     fs.seekg(0, std::ios_base::end);
     dtsz = fs.tellg();
@@ -136,7 +136,7 @@ bool HGSData::Save(const char* fn)
 {
     std::fstream fs(fn, std::ios::out | std::ios::binary);
 
-    if(fs.bad() || !fs.good()) return false;
+    if(fs.fail()) return false;
 
     Reset();
 

@@ -1073,7 +1073,7 @@ bool FilePresent(const std::string & file)
     std::fstream fs;
     // check file
     fs.open(file.c_str(), std::ios::in | std::ios::binary);
-    if(fs.is_open())
+    if(fs.good())
     {
 	fs.close();
 	return true;
@@ -1086,7 +1086,7 @@ void StoreMemToFile(const std::vector<u8> & data, const std::string & file)
     if(FilePresent(file)) return;
     std::fstream fs;
     fs.open(file.c_str(), std::ios::out | std::ios::binary);
-    if(!fs.fail() && data.size())
+    if(fs.good() && data.size())
     {
 	fs.write(reinterpret_cast<const char*>(&data[0]), data.size());
 	fs.close();

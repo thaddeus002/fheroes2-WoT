@@ -42,7 +42,7 @@ bool Game::Save(const std::string &fn)
     if(! Game::IO::SaveBIN(msg)) return false;
 
     std::fstream fs(fn.c_str(), std::ios::out | std::ios::binary);
-    if(fs.bad()) return false;
+    if(fs.fail()) return false;
 
 #ifdef WITH_ZLIB
     std::vector<char> v;
@@ -61,7 +61,7 @@ bool Game::IO::LoadSAV(const std::string & fn)
     if(fn.empty()) return false;
 
     std::fstream fs(fn.c_str(), std::ios::in | std::ios::binary);
-    if(fs.bad()) return false;
+    if(fs.fail()) return false;
 
     fs.seekg(0, std::ios_base::end);
     dtsz = fs.tellg();
