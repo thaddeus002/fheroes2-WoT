@@ -67,13 +67,13 @@ Game::menu_t PocketPC::MainMenu(void)
 
     Text text;
     
-    text.Set("Free Heroes II", Font::YELLOW_SMALL);
-    text.Blit(dst_pt.x + (src_rt.w - text.w()) / 2, dst_pt.y + 10);
+    text.Set("Free Heroes II", Font::YELLOW_BIG);
+    text.Blit(dst_pt.x + (src_rt.w - text.w()) / 2, dst_pt.y + 12);
 
-    text.Set(conf.BuildVersion());
+    text.Set(conf.BuildVersion(), Font::YELLOW_SMALL);
     text.Blit(dst_pt.x + (src_rt.w - text.w()) / 2, dst_pt.y + 148);
 
-    text.Set(_("New Game"), Font::SMALL);
+    text.Set(_("New Game"), Font::BIG);
     const Rect rectNewGame(dst_pt.x + (src_rt.w - text.w()) / 2 - 5, dst_pt.y + 40 + 5, text.w() + 10, text.h() + 10);
     text.Blit(rectNewGame);
 

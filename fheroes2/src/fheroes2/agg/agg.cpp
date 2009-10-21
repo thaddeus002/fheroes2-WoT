@@ -682,7 +682,7 @@ void AGG::Cache::LoadFNT(u16 ch)
 	font_small.RenderUnicodeChar(fnt_cache[ch].small_yellow, ch, yellow, conf.FontsRenderBlended() ? SDL::Font::BLENDED : SDL::Font::SOLID);
 
 	// medium
-	if(!conf.PocketPC())
+	if(!(conf.PocketPC() && !conf.Unicode()))
 	{
 	    font_medium.RenderUnicodeChar(fnt_cache[ch].medium_white, ch, white, conf.FontsRenderBlended() ? SDL::Font::BLENDED : SDL::Font::SOLID);
 	    font_medium.RenderUnicodeChar(fnt_cache[ch].medium_yellow, ch, yellow, conf.FontsRenderBlended() ? SDL::Font::BLENDED : SDL::Font::SOLID);
