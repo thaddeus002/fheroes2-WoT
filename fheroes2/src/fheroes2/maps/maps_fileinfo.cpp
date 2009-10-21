@@ -272,14 +272,14 @@ bool Maps::FileInfo::ReadMP2(const std::string & filename)
     fd.seekg(0x3A, std::ios_base::beg);
     fd.read(bufname, LENGTHNAME);
     bufname[LENGTHNAME - 1] = 0;
-    name = bufname;
+    name = _(bufname);
 
     // description
     char bufdescription[LENGTHDESCRIPTION];
     fd.seekg(0x76, std::ios_base::beg);
     fd.read(bufdescription, LENGTHDESCRIPTION);
     bufdescription[LENGTHDESCRIPTION - 1] = 0;
-    description = bufdescription;
+    description = _(bufdescription);
 
     fd.close();
     
