@@ -1,5 +1,15 @@
-SVN - up to r1264
+SVN - up to r1295
 
+Oct,  21, 2009 - Development build, 1295
++ Updated save file format version
++ Updated AI move, fix redraw status window
++ Added support translation for name and description maps, maps messages
++ Fixed recruit hero with empty army
++ Fixed restore magic point for heroes
++ Added tap delay settings, update high scores dialogue
++ Added buy magic book for pocketpc version
++ Fixed capture abandoned mine, add AI action abandoned mine
++ Fixed AI move midi cd music
 + Added store high scores and update high scores dialogue
 + Added force lang options
 + Added translation for original map files (sign, rumors, events message, sphinx riddle)
