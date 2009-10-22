@@ -32,6 +32,23 @@
 #include "kingdom.h"
 #include "dialog.h"
 
+const char* ArmyGetSizeString(u32 count)
+{
+    switch(Army::GetSize(count))
+    {
+        default: break;
+        case Army::SEVERAL:     return _("Several\n%{monster}");
+        case Army::PACK:        return _("A pack of\n%{monster}");
+        case Army::LOTS:        return _("Lots of\n%{monster}");
+        case Army::HORDE:       return _("A horde of\n%{monster}");
+        case Army::THRONG:      return _("A throng of\n%{monster}");
+        case Army::SWARM:       return _("A swarm of\n%{monster}");
+        case Army::ZOUNDS:      return _("Zounds of\n%{monster}");
+        case Army::LEGION:      return _("A legion of\n%{monster}");
+    }
+    return _("A few\n%{monster}");
+}
+
 void Dialog::QuickInfo(const Maps::Tiles & tile)
 {
     Display & display = Display::Get();
@@ -88,7 +105,7 @@ void Dialog::QuickInfo(const Maps::Tiles & tile)
     {
         case MP2::OBJ_MONSTER:
     	{
-	    name_object = Army::GetSizeString(tile.GetCountMonster());
+	    name_object = ArmyGetSizeString(tile.GetCountMonster());
             std::string name = Monster(tile).GetMultiName();
             String::Lower(name);
             String::Replace(name_object, "%{monster}", name);

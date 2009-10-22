@@ -49,8 +49,7 @@ namespace Army
 	LEGION	= 1000
     };
 
-    const std::string & String(armysize_t);
-    const char* GetSizeString(u32);
+    const char* String(u32);
     armysize_t GetSize(u32);
 
     class army_t
