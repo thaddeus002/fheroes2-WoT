@@ -50,8 +50,9 @@ namespace Army
     };
 
     const std::string & String(armysize_t);
-    armysize_t GetSize(u16);
-    
+    const char* GetSizeString(u32);
+    armysize_t GetSize(u32);
+
     class army_t
     {
 	public:
@@ -70,7 +71,7 @@ namespace Army
 	    void	SetModes(u32);
 	    void	ResetModes(u32);
 
-	    void	DrawMons32Line(s16, s16, u8, u8 = 0, u8 = 0) const;
+	    void	DrawMons32Line(s16, s16, u8, u8 = 0, u8 = 0, bool = false) const;
 
 	    Troop &	FirstValid(void);
 	    Troop &	At(u8);

@@ -88,19 +88,7 @@ void Dialog::QuickInfo(const Maps::Tiles & tile)
     {
         case MP2::OBJ_MONSTER:
     	{
-    	    switch(Army::GetSize(tile.GetCountMonster()))
-    	    {
-		case Army::FEW:		name_object = _("A few\n%{monster}"); break;
-		case Army::SEVERAL:	name_object = _("Several\n%{monster}"); break;
-		case Army::PACK:	name_object = _("A pack of\n%{monster}"); break;
-		case Army::LOTS:	name_object = _("Lots of\n%{monster}"); break;
-		case Army::HORDE:	name_object = _("A horde of\n%{monster}"); break;
-		case Army::THRONG:	name_object = _("A throng of\n%{monster}"); break;
-		case Army::SWARM:	name_object = _("A swarm of\n%{monster}"); break;
-		case Army::ZOUNDS:	name_object = _("Zounds of\n%{monster}"); break;
-		case Army::LEGION:	name_object = _("A legion of\n%{monster}"); break;
-            }
-
+	    name_object = Army::GetSizeString(tile.GetCountMonster());
             std::string name = Monster(tile).GetMultiName();
             String::Lower(name);
             String::Replace(name_object, "%{monster}", name);
@@ -236,7 +224,12 @@ void Dialog::QuickInfo(const Castle & castle)
     else
     // bottom right
 	cur_rt = Rect(mx - box.w(), my - box.h(), box.w(), box.h());
-    
+
+    if(Settings::Get().PocketPC())
+    {
+	cur_rt = Rect((display.w() - box.w()) / 2, (display.h() - box.h()) / 2, box.w(), box.h());
+    }
+
     Background back(cur_rt);
     back.Save();
     display.Blit(box, cur_rt.x, cur_rt.y);
@@ -307,7 +300,7 @@ void Dialog::QuickInfo(const Castle & castle)
 	text.Blit(dst_pt);
     }
     else
-	castle.GetArmy().DrawMons32Line(cur_rt.x - 5, cur_rt.y + 100, 192);
+	castle.GetArmy().DrawMons32Line(cur_rt.x - 5, cur_rt.y + 100, 192, 0, 0, (Settings::Get().MyColor() != castle.GetColor()));
 
     cursor.Show();
     display.Flip();
@@ -360,6 +353,11 @@ void Dialog::QuickInfo(const Heroes & hero)
     else
     // bottom right
 	cur_rt = Rect(mx - box.w(), my - box.h(), box.w(), box.h());
+
+    if(Settings::Get().PocketPC())
+    {
+	cur_rt = Rect((display.w() - box.w()) / 2, (display.h() - box.h()) / 2, box.w(), box.h());
+    }
     
     Background back(cur_rt);
     back.Save();
@@ -478,7 +476,7 @@ void Dialog::QuickInfo(const Heroes & hero)
     text.Blit(dst_pt);
 
     // draw monster sprite in one string
-    hero.GetArmy().DrawMons32Line(cur_rt.x - 5, cur_rt.y + 114, 160);
+    hero.GetArmy().DrawMons32Line(cur_rt.x - 5, cur_rt.y + 114, 160, 0, 0, (Settings::Get().MyColor() != hero.GetColor()));
 
     cursor.Show();
     display.Flip();

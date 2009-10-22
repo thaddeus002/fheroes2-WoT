@@ -366,6 +366,6 @@ void Interface::Radar::QueueEventProcessing(void)
     	    }
 	}
 	else
-	if(le.MousePressRight(*this)) Dialog::Message(_("World Map"), _("A miniature view of the known world. Left click to move viewing area."), Font::BIG);
+	if(!conf.TapMode() && le.MousePressRight(*this)) Dialog::Message(_("World Map"), _("A miniature view of the known world. Left click to move viewing area."), Font::BIG);
     }
 }

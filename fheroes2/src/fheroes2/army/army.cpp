@@ -70,6 +70,23 @@ std::vector<Army::Troop>::const_iterator MinElement(std::vector<Army::Troop>::co
     return lowest;
 }
 
+const char* Army::GetSizeString(u32 count)
+{
+    switch(Army::GetSize(count))
+    {
+        default: break;
+        case Army::SEVERAL:     return _("Several\n%{monster}");
+        case Army::PACK:        return _("A pack of\n%{monster}");
+        case Army::LOTS:        return _("Lots of\n%{monster}");
+        case Army::HORDE:       return _("A horde of\n%{monster}");
+        case Army::THRONG:      return _("A throng of\n%{monster}");
+        case Army::SWARM:       return _("A swarm of\n%{monster}");
+        case Army::ZOUNDS:      return _("Zounds of\n%{monster}");
+        case Army::LEGION:      return _("A legion of\n%{monster}");
+    }
+    return _("A few\n%{monster}");
+}
+
 const std::string & Army::String(Army::armysize_t size)
 {
     static const std::string str_size[] = { _("Few"), _("Several"), _("Pack"), _("Lots"), _("Horde"), _("Throng"), _("Swarm"), _("Zounds"), _("Legion") };
@@ -90,7 +107,7 @@ const std::string & Army::String(Army::armysize_t size)
     return str_size[0];
 }
 
-Army::armysize_t Army::GetSize(u16 count)
+Army::armysize_t Army::GetSize(u32 count)
 {
     if(LEGION <= count)		return LEGION;
     else
@@ -541,7 +558,7 @@ const Army::Troop & Army::army_t::GetWeakestTroop(void) const
 }
 
 /* draw MONS32 sprite in line, first valid = 0, count = 0 */
-void Army::army_t::DrawMons32Line(s16 cx, s16 cy, u8 width, u8 first, u8 count) const
+void Army::army_t::DrawMons32Line(s16 cx, s16 cy, u8 width, u8 first, u8 count, bool hide) const
 {
     if(!isValid()) return;
 
@@ -553,8 +570,6 @@ void Army::army_t::DrawMons32Line(s16 cx, s16 cy, u8 width, u8 first, u8 count) 
     cx += chunk / 2;
 
     std::string str;
-    Text text;
-    text.Set(Font::SMALL);
 
     for(u8 ii = 0; ii < ARMYMAXTROOPS; ++ii)
     {
@@ -569,10 +584,21 @@ void Army::army_t::DrawMons32Line(s16 cx, s16 cy, u8 width, u8 first, u8 count) 
     		Display::Get().Blit(monster, cx - monster.w() / 2, cy + 30 - monster.h());
 
     		str.clear();
-    		String::AddInt(str, troop.Count());
-		text.Set(str);
-		text.Blit(cx - text.w() / 2, cy + 28);
-
+    		if(hide)
+		{
+		    str = GetSizeString(troop.Count());
+        	    std::string name = troop.GetMultiName();
+        	    String::Lower(name);
+        	    String::Replace(str, "%{monster}", name);
+		    TextBox text(str, Font::SMALL, 50);
+		    text.Blit(cx - 25, cy + 28);
+		}
+		else
+		{
+		    String::AddInt(str, troop.Count());
+		    Text text(str, Font::SMALL);
+		    text.Blit(cx - text.w() / 2, cy + 28);
+		}
 		cx += chunk;
 		--count;
 	    }
