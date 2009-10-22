@@ -907,6 +907,100 @@ void AGG::Cache::ICNRegistryFreeObjects(void)
     for(; it1 != it2; ++it1) FreeICN(*it1);
 }
 
+void AGG::Cache::Dump(void) const
+{
+    std::cout << "AGG::Cache::Dump:" << std::endl; 
+    u32 total1 = 0;
+    u32 total2 = 0;
+
+    if(icn_cache)
+    {
+	total1 = 0;
+        for(u16 ii = 0; ii < ICN::UNKNOWN; ++ii)
+        {
+	    total2 = 0;
+            if(icn_cache[ii].sprites)
+        	for(u16 jj = 0; jj < icn_cache[ii].count; ++jj)
+		    total2 += (icn_cache[ii].sprites[jj].GetSize() + icn_cache[ii].reflect[jj].GetSize());
+	    if(icn_cache[ii].count)
+		std::cout << "ICN: " << ICN::GetString((ICN::icn_t) ii) << ", count: " << icn_cache[ii].count << ", total: " << total2 << std::endl;
+	    total1 += total2;
+        }
+	std::cout << "ICN: " << " total: " << total1 << std::endl;
+    }
+
+    if(til_cache)
+    {
+	total1 = 0;
+        for(u16 ii = 0; ii < TIL::UNKNOWN; ++ii)
+        {
+	    total2 = 0;
+	    if(til_cache[ii].sprites)
+        	for(u16 jj = 0; jj < til_cache[ii].count; ++jj)
+        	    total2 += til_cache[ii].sprites[jj].GetSize();
+	    if(til_cache[ii].count)
+		std::cout << "TIL: " << TIL::GetString((TIL::til_t) ii) << ", count: " << til_cache[ii].count << ", total: " << total2 << std::endl;
+	    total1 += total2;
+        }
+	std::cout << "TIL: " << " total: " << total1 << std::endl;
+    }
+
+    if(wav_cache.size())
+    {
+	total1 = 0;
+	std::map<M82::m82_t, std::vector<u8> >::const_iterator it1 = wav_cache.begin();
+	std::map<M82::m82_t, std::vector<u8> >::const_iterator it2 = wav_cache.end();
+	for(; it1 != it2; ++it1)
+	{
+	    if((*it1).second.size())
+	    	std::cout << "M82: " << M82::GetString((*it1).first) << ", size: " << (*it1).second.size() << std::endl;
+	    total1 += (*it1).second.size();
+	}
+	std::cout << "M82: " << " total: " << total1 << std::endl;
+    }
+
+    if(mus_cache.size())
+    {
+	total1 = 0;
+	std::map<MUS::mus_t, std::vector<u8> >::const_iterator it1 = mus_cache.begin();
+	std::map<MUS::mus_t, std::vector<u8> >::const_iterator it2 = mus_cache.end();
+	for(; it1 != it2; ++it1)
+	{
+	    if((*it1).second.size())
+	    	std::cout << "MUS: " << MUS::GetString((*it1).first) << ", size: " << (*it1).second.size() << std::endl;
+	    total1 += (*it1).second.size();
+	}
+	std::cout << "MUS: " << " total: " << total1 << std::endl;
+    }
+
+    if(mid_cache.size())
+    {
+	total1 = 0;
+	std::map<XMI::xmi_t, std::vector<u8> >::const_iterator it1 = mid_cache.begin();
+	std::map<XMI::xmi_t, std::vector<u8> >::const_iterator it2 = mid_cache.end();
+	for(; it1 != it2; ++it1)
+	{
+	    if((*it1).second.size())
+	    	std::cout << "XMI: " << XMI::GetString((*it1).first) << ", size: " << (*it1).second.size() << std::endl;
+	    total1 += (*it1).second.size();
+	}
+	std::cout << "XMI: " << " total: " << total1 << std::endl;
+    }
+
+#ifdef WITH_TTF
+    if(fnt_cache.size())
+    {
+	total1 = 0;
+	std::map<u16, fnt_cache_t>::const_iterator it1 = fnt_cache.begin();
+	std::map<u16, fnt_cache_t>::const_iterator it2 = fnt_cache.end();
+	for(; it1 != it2; ++it1)
+	    total1 += ((*it1).second.medium_white.GetSize() + (*it1).second.medium_yellow.GetSize() + (*it1).second.small_white.GetSize() + (*it1).second.small_yellow.GetSize());
+
+	std::cout << "FNT: " << " total: " << total1 << std::endl;
+    }
+#endif
+}
+
 // wrapper AGG::PreloadObject
 void AGG::PreloadObject(const ICN::icn_t icn, bool reflect)
 {

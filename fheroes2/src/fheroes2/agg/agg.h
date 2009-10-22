@@ -142,6 +142,8 @@ namespace AGG
 	void ICNRegistryEnable(bool);
 	void ICNRegistryFreeObjects(void);
 
+	void Dump(void) const;
+
     private:
 	Cache();
 
