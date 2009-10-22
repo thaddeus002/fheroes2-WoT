@@ -1,6 +1,7 @@
-SVN - up to r1295
+SVN - up to r1300
 
-Oct,  21, 2009 - Development build, 1295
+Oct,  22, 2009 - Development build, 1299
++ Updated size army for heroes/castles info
 + Updated save file format version
 + Updated AI move, fix redraw status window
 + Added support translation for name and description maps, maps messages
