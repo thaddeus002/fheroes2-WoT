@@ -279,8 +279,8 @@ Game::menu_t Game::StartGame(void)
 		switch(kingdom.Control())
 		{
 	        case LOCAL:
-		    Mixer::Enhance();
-		    Mixer::Reset();
+		    //Mixer::Enhance();
+		    //Mixer::Reset();
 		    if(Game::HOTSEAT == conf.GameType())
 		    {
 			conf.SetMyColor(Color::GRAY);
@@ -297,7 +297,7 @@ Game::menu_t Game::StartGame(void)
 		    conf.SetMyColor(color);
 		    if(conf.Modes(Settings::LOADGAME)) conf.ResetModes(Settings::LOADGAME);
 		    m = HumanTurn();
-		    Mixer::Reduce();
+		    //Mixer::Reduce();
 		    break;
 
 	        case REMOTE:
@@ -1074,6 +1074,13 @@ Game::menu_t Game::HumanTurn(void)
     	    display.Flip();
 	}
     }
+    else
+    if(QUITGAME == res)
+    {
+#ifdef WITH_NET
+        if(Game::NETWORK == conf.GameType()) Network::Logout();
+#endif
+    }
 
     // reset sound
     //Mixer::Reset();
@@ -1401,8 +1408,8 @@ void Game::KeyPress_ESC(menu_t & ret)
     if(Game::Focus::HEROES == global_focus.Type() && global_focus.GetHeroes().isEnableMove())
 	global_focus.GetHeroes().SetMove(false);
     else
-	if(Dialog::YES & Dialog::Message("", _("Are you sure you want to quit?"), Font::BIG, Dialog::YES|Dialog::NO))
-	    ret = QUITGAME;
+    if(Dialog::YES & Dialog::Message("", _("Are you sure you want to quit?"), Font::BIG, Dialog::YES|Dialog::NO))
+	ret = QUITGAME;
 }
 
 void Game::KeyPress_e(menu_t & ret)

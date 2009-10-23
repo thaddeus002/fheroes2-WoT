@@ -48,13 +48,13 @@ bool FH2Client::Wait(Network::Message & packet, u16 id, bool debug)
         }
 	DELAY(10);
     }
-    packet.Dump();
+    if(debug) packet.Dump();
     return true;
 }
 
 bool FH2Client::Send(Network::Message & packet, bool debug)
 {
-    std::cerr << "Send: ";
+    if(debug) std::cerr << "Send: ";
     if(!packet.Send(*this))
     {
 	packet.Dump();
@@ -62,13 +62,13 @@ bool FH2Client::Send(Network::Message & packet, bool debug)
         if(debug) std::cerr << "error" << std::endl;
         return false;
     }
-    packet.Dump();
+    if(debug) packet.Dump();
     return true;
 }
 
 bool FH2Client::Recv(Network::Message & packet, bool debug)
 {
-    std::cerr << "Recv: ";
+    if(debug) std::cerr << "Recv: ";
     if(!packet.Recv(*this, debug))
     {
 	packet.Dump();
@@ -76,7 +76,7 @@ bool FH2Client::Recv(Network::Message & packet, bool debug)
         if(debug) std::cerr << "error" << std::endl;
         return false;
     }
-    packet.Dump();
+    if(debug) packet.Dump();
     return true;
 }
 

@@ -227,18 +227,11 @@ int FH2LocalClient::ScenarioInfoDialog(void)
 		    break;
 
 		case MSG_MAPS_LOAD:
-		    Error::Verbose("MSG_MAPS_LOAD: ", packet.DtSz());
 		    cursor.Hide();
         	    display.Fill(0, 0, 0);
             	    TextBox(_("Maps Loading..."), Font::BIG, Rect(0, display.h()/2, display.w(), display.h()/2));
                     display.Flip();
-/*
-                {
-                    std::fstream fs("map.rcv.z", std::ios::out | std::ios::binary);
-                    if(fs.good()) fs.write(packet.DtPt(), packet.DtSz());
-                    fs.close();
-                }
-*/
+
 		    if(Game::IO::LoadBIN(packet))
 		    {
 			conf.SetMyColor(Color::Get(player_color));
@@ -246,7 +239,6 @@ int FH2LocalClient::ScenarioInfoDialog(void)
 		    }
 
 		    packet.Reset();
-//		    return Dialog::CANCEL;
 		    packet.SetID(MSG_MAPS_LOAD_ERR);
 		    if(extdebug) std::cerr << "FH2LocalClient::ScenarioInfoDialog: send maps_load_err...";
 		    if(!Send(packet, extdebug)) return Dialog::CANCEL;

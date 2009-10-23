@@ -290,4 +290,41 @@ u8 Network::GetPlayersColors(std::list<FH2RemoteClient> & v)
     return res;
 }
 
+void Network::ResetPlayersColors(std::list<FH2RemoteClient> & v, u32 first_player)
+{
+    Settings & conf = Settings::Get();
+
+    std::list<FH2RemoteClient>::iterator it1 = v.begin();
+    std::list<FH2RemoteClient>::const_iterator it2 = v.end();
+    for(; it1 != it2; ++it1) (*it1).player_color = 0;
+    conf.SetPlayersColors(0);
+    u8 colors = 0;
+
+    it1 = std::find_if(v.begin(), v.end(), std::bind2nd(std::mem_fun_ref(&Player::isID), first_player));
+    if(it1 != v.end())
+    {
+	(*it1).player_color = Color::GetFirst(conf.CurrentFileInfo().allow_colors);
+	colors |= (*it1).player_color;
+    }
+
+    it1 = v.begin();
+    it2 = v.end();
+    for(; it1 != it2; ++it1) if(0 == (*it1).player_color)
+    {
+	const u8 color = Color::GetFirst(conf.CurrentFileInfo().allow_colors & (~colors));
+	if(color)
+	{
+	    (*it1).player_color = color;
+	    colors |= (*it1).player_color;
+	}
+	else
+	// no free colors, shutdown client
+	{
+	    (*it1).SetModes(ST_SHUTDOWN);
+	}
+    }
+
+    conf.SetPlayersColors(colors);
+}
+
 #endif

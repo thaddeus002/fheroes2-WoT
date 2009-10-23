@@ -27,6 +27,7 @@
 #include "settings.h"
 #include "server.h"
 #include "client.h"
+#include "kingdom.h"
 #include "remoteclient.h"
 #include "zzlib.h"
 
@@ -91,7 +92,7 @@ int FH2RemoteClient::ConnectionChat(void)
     bool extdebug = 2 < conf.Debug();
 
     player_color = 0;
-    player_race = 0;
+    player_race = Race::RAND;
     player_name.clear();
 
     // wait thread id
@@ -197,6 +198,7 @@ int FH2RemoteClient::ConnectionChat(void)
 		    server.queue.push_back(std::make_pair(packet, player_id));
 		    //
 		    conf.SetPlayersColors(Network::GetPlayersColors(server.clients) & (~player_color));
+		    world.GetKingdom(player_color).SetControl(Game::AI);
                     // send players
         	    packet.Reset();
                     packet.SetID(MSG_PLAYERS);
@@ -214,11 +216,24 @@ int FH2RemoteClient::ConnectionChat(void)
                 	packet.SetID(MSG_MAPS_INFO);
 			server.mutex.Lock();
 			Network::PacketPushMapsFileInfo(packet, conf.CurrentFileInfo());
-			server.queue.push_back(std::make_pair(packet, player_id));
+			server.queue.push_back(std::make_pair(packet, 0));
 	    		server.mutex.Unlock();
 			if(extdebug) std::cerr << "FH2RemoteClient::ConnectionChat send maps_info...";
 			if(!Send(packet, extdebug)) return Logout();
 			if(extdebug) std::cerr << "ok" << std::endl;
+
+			// reset players color
+			server.mutex.Lock();
+			Network::ResetPlayersColors(server.clients, player_id);
+			server.mutex.Unlock();
+
+			// send players
+			packet.Reset();
+			packet.SetID(MSG_PLAYERS);
+			server.mutex.Lock();
+                	Network::PacketPushPlayersInfo(packet, server.clients);
+			server.queue.push_back(std::make_pair(packet, 0));
+			server.mutex.Unlock();
 		    }
 		    break;
 
@@ -252,17 +267,10 @@ int FH2RemoteClient::ConnectionChat(void)
 			conf.SetPlayersColors(Network::GetPlayersColors(server.clients));
 			//
 			World::Get().LoadMaps(conf.MapsFile());
+			server.StartGame();
 			packet.Reset();
 			Game::IO::SaveBIN(packet);
 			packet.SetID(MSG_MAPS_LOAD);
-/*
-			{
-			        std::fstream fs("map.snd.z", std::ios::out | std::ios::binary);
-                    		if(fs.good()) fs.write(packet.DtPt(), packet.DtSz());
-                                fs.close();
-                        }
-                        server.packet_maps = packet;
-*/
 			//
 			server.queue.push_back(std::make_pair(packet, player_id));
 			server.mutex.Unlock();
@@ -270,6 +278,7 @@ int FH2RemoteClient::ConnectionChat(void)
 			if(!Send(packet, extdebug)) return Logout();
 			if(extdebug) std::cerr << "ok" << std::endl;
 			packet.Reset();
+			//
 		    }
     		    break;
 
@@ -327,6 +336,8 @@ int FH2RemoteClient::ConnectionChat(void)
     }
     
     Close();
+    player_id = 0;
+    player_color = 0;
     modes = 0;
 
     return 0;

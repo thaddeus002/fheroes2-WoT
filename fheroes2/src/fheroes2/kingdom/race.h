@@ -38,7 +38,7 @@ namespace Race
         BOMG    = 0x00
     } race_t;
 
-    const std::string & String(race_t race);
+    const std::string & String(u8);
     race_t Rand(void);
     race_t Get(u8);
 };

@@ -41,6 +41,7 @@ public:
 
     bool Bind(u16);
     void Exit(void);
+    void StartGame(void);
 
 protected:
     friend class FH2RemoteClient;

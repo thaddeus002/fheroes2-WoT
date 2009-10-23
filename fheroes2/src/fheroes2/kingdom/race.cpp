@@ -22,7 +22,7 @@
 #include "gamedefs.h"
 #include "race.h"
 
-const std::string & Race::String(Race::race_t race)
+const std::string & Race::String(u8 race)
 {
     static const std::string str_race[] = { _("Knight"), _("Barbarian"), _("Sorceress"),
 	_("Warlock"), _("Wizard"), _("Necromancer"), _("Multi"), "Random", "Neutral" };

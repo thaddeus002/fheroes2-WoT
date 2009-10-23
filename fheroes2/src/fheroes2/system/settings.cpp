@@ -268,12 +268,8 @@ bool Settings::LoadFileMapsMP2(const std::string & file)
 {
     if(! current_maps_file.ReadMP2(file)) return false;
 
-    // set my color
-    for(Color::color_t color = Color::BLUE; color != Color::GRAY; ++color) if(current_maps_file.allow_colors & color)
-    {
-	my_color = color;
-	break;
-    }
+    // get first color
+    my_color = Color::Get(Color::GetFirst(current_maps_file.allow_colors));
 
     // game difficulty
     game_difficulty = Difficulty::NORMAL;

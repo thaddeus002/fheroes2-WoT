@@ -26,6 +26,8 @@
 #include "settings.h"
 #include "cursor.h"
 #include "localclient.h"
+#include "world.h"
+#include "kingdom.h"
 #include "server.h"
 
 #ifdef WITH_NET
@@ -43,6 +45,9 @@ void SendPacketToAllClients(std::list<FH2RemoteClient> & clients, Network::Messa
 
 FH2Server::FH2Server()
 {
+    AGG::Cache & cache = AGG::Cache::Get();
+    if(! cache.ReadDataDir()) Error::Except("AGG data files not found.");
+
     if(!PrepareMapsFileInfoList(finfo_list) ||
        !Settings::Get().LoadFileMapsMP2(finfo_list.front().file)) Error::Warning("No maps available!");
 }
@@ -164,6 +169,20 @@ int FH2Server::ConnectionChat(void)
     Close();
 
     return 0;
+}
+
+void FH2Server::StartGame(void)
+{
+    Settings & conf = Settings::Get();
+
+    conf.SetGameOverResult(GameOver::COND_NONE);
+    conf.SetCurrentKingdomColors(conf.KingdomColors());
+
+    for(Color::color_t color = Color::BLUE; color != Color::GRAY; ++color) if(color & conf.PlayersColors())
+    {
+	world.GetKingdom(color).SetControl(Game::REMOTE);
+        world.GetKingdom(color).UpdateStartingResource();
+    }
 }
 
 Game::menu_t Game::NetworkHost(void)

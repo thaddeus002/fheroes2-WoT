@@ -198,8 +198,8 @@ int main(int argc, char **argv)
 	    Display::HideCursor();
 	    Display::SetCaption(strtmp);
 
-        //Ensure the mouse position is updated to prevent bad initial values.
-        LocalEvent::Get().GetMouseCursor();
+    	    //Ensure the mouse position is updated to prevent bad initial values.
+    	    LocalEvent::Get().GetMouseCursor();
 
 #ifdef WITH_ZLIB
     	    ZSurface zicons;
@@ -306,7 +306,6 @@ void LoadZLogo(void)
     	ZSurface* zlogo = new ZSurface();
 	if(zlogo->Load(SDL_LOGO_WIDTH, SDL_LOGO_HEIGHT, SDL_LOGO_BPP, sdl_logo_data, SDL_LOGO_SIZE, false))
 	{
-	    zlogo->Save("zlogo.png");
 	    Surface* logo = zlogo;
 
 	    // scale logo

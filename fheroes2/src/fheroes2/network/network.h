@@ -86,6 +86,7 @@ namespace Network
 
     u8			GetPlayersColors(std::vector<Player> &);
     u8			GetPlayersColors(std::list<FH2RemoteClient> &);
+    void		ResetPlayersColors(std::list<FH2RemoteClient> &, u32);
 };
 
 #endif
