@@ -39,6 +39,7 @@ public:
     int Logout(void);
     int ConnectionChat(void);
     int ScenarioInfoDialog(void);
+    int StartGame(void);
 
     std::string server;
     std::vector<Player> players;

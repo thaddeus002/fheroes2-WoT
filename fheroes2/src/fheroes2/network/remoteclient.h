@@ -35,10 +35,19 @@ public:
     FH2RemoteClient();
 
     int ConnectionChat(void);
+    int StartGame(void);
 
     int Logout(void);
     void RunThread(void);
     void ShutdownThread(void);
+
+    void MsgBroadcast(void);
+    void MsgPing(bool);
+    void MsgLogout(bool);
+    bool MsgMapsInfoSet(bool);
+    bool MsgMapsInfoGet(bool);
+    bool MsgMapsListGet(bool);
+    bool MsgPlayersGet(bool);
 
     static int callbackCreateThread(void *);
 

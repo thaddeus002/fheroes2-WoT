@@ -135,11 +135,7 @@ int FH2LocalClient::ConnectionChat(void)
     Network::PacketPopPlayersInfo(packet, players);
 
     // dialog scenario info
-    if(Dialog::OK != ScenarioInfoDialog())
-    {
-        Error::Verbose("CANCEL from Dialog");
-	return -1;
-    }
+    if(Dialog::OK != ScenarioInfoDialog()) return -1;
 
     Cursor::Get().Hide();
 
@@ -237,12 +233,11 @@ int FH2LocalClient::ScenarioInfoDialog(void)
 			conf.SetMyColor(Color::Get(player_color));
 			return Dialog::OK;
 		    }
-
-		    packet.Reset();
-		    packet.SetID(MSG_MAPS_LOAD_ERR);
-		    if(extdebug) std::cerr << "FH2LocalClient::ScenarioInfoDialog: send maps_load_err...";
-		    if(!Send(packet, extdebug)) return Dialog::CANCEL;
-		    if(extdebug) std::cerr << "ok" << std::endl;
+		    else
+		    {
+			if(extdebug) std::cerr << "FH2LocalClient::ScenarioInfoDialog: send maps_load_err...";
+			return Dialog::CANCEL;
+		    }
 		    break;
 
 		default: break;
@@ -363,7 +358,7 @@ Game::menu_t Game::NetworkGuest(void)
 
     if(0 < client.ConnectionChat())
     {
-	Game::StartGame();
+	StartGame();
     }
 
     client.Logout();

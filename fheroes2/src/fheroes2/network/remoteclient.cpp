@@ -35,8 +35,12 @@ int FH2RemoteClient::callbackCreateThread(void *data)
 {
     if(data)
     {
-	reinterpret_cast<FH2RemoteClient *>(data)->ConnectionChat();
-	reinterpret_cast<FH2RemoteClient *>(data)->thread.Wait();
+	FH2RemoteClient *rclient = reinterpret_cast<FH2RemoteClient *>(data);
+	if(0 < rclient->ConnectionChat())
+	{
+	    rclient->StartGame();
+	}
+	rclient->thread.Wait();
 	return 0;
     }
     return -1;
@@ -82,6 +86,8 @@ int FH2RemoteClient::Logout(void)
 
     Close();
     modes = 0;
+    player_id = 0;
+    player_color = 0;
     
     return -1;
 }
@@ -126,7 +132,6 @@ int FH2RemoteClient::ConnectionChat(void)
         std::cerr << "FH2RemoteClient::ConnectionChat: id: 0x" << std::hex << player_id << ", connected " << " player: " << player_name << ", host 0x" << std::hex << Host() << ":0x" << Port() << std::endl;
 
     FH2Server & server = FH2Server::Get();
-    std::string str;
 
     // check color
     server.mutex.Lock();
@@ -160,9 +165,12 @@ int FH2RemoteClient::ConnectionChat(void)
     if(Modes(ST_ADMIN)) SetModes(ST_ALLOWPLAYERS);
 
     if(extdebug) std::cerr << "FH2RemoteClient::ConnectionChat start queue" << std::endl;
-    while(1)
+
+    bool exit = false;
+
+    while(!exit)
     {
-        if(Modes(ST_SHUTDOWN)) break;
+        if(Modes(ST_SHUTDOWN)) return Logout();
 
 	if(Ready())
 	{
@@ -171,161 +179,38 @@ int FH2RemoteClient::ConnectionChat(void)
             if(extdebug) std::cerr << Network::GetMsgString(packet.GetID()) << std::endl;
 
 	    // msg put to queue
-	    if(MSG_UNKNOWN != Network::GetMsg(packet.GetID()) && Network::MsgIsBroadcast(packet.GetID()))
-	    {
-		server.mutex.Lock();
-		server.queue.push_back(std::make_pair(packet, player_id));
-	        server.mutex.Unlock();
-	    }
+	    MsgBroadcast();
 
     	    // msg processing
     	    switch(Network::GetMsg(packet.GetID()))
     	    {
     		case MSG_PING:
-		    if(extdebug) Error::Verbose("FH2RemoteClient::ConnectionChat: ping");
-		    packet.Reset();
-		    packet.SetID(MSG_PING);
-		    packet.Send(*this);
+		    MsgPing(extdebug);
 		    break;
 
         	case MSG_LOGOUT:
-                    // send message
-                    packet.Reset();
-                    packet.SetID(MSG_MESSAGE);
-                    str = "logout player: " + player_name;
-                    packet.Push(str);
-		    server.mutex.Lock();
-		    server.queue.push_back(std::make_pair(packet, player_id));
-		    //
-		    conf.SetPlayersColors(Network::GetPlayersColors(server.clients) & (~player_color));
-		    world.GetKingdom(player_color).SetControl(Game::AI);
-                    // send players
-        	    packet.Reset();
-                    packet.SetID(MSG_PLAYERS);
-                    Network::PacketPushPlayersInfo(packet, server.clients, player_id);
-		    server.queue.push_back(std::make_pair(packet, player_id));
-	    	    server.mutex.Unlock();
-		    if(extdebug) Error::Verbose("FH2RemoteClient::ConnectionChat: " + str);
+		    MsgLogout(extdebug);
 	    	    return Logout();
 
     		case MSG_MAPS_INFO_SET:
-		    packet.Pop(str);
-		    if(Modes(ST_ADMIN) && Settings::Get().LoadFileMapsMP2(str))
-		    {
-        		packet.Reset();
-                	packet.SetID(MSG_MAPS_INFO);
-			server.mutex.Lock();
-			Network::PacketPushMapsFileInfo(packet, conf.CurrentFileInfo());
-			server.queue.push_back(std::make_pair(packet, 0));
-	    		server.mutex.Unlock();
-			if(extdebug) std::cerr << "FH2RemoteClient::ConnectionChat send maps_info...";
-			if(!Send(packet, extdebug)) return Logout();
-			if(extdebug) std::cerr << "ok" << std::endl;
-
-			// reset players color
-			server.mutex.Lock();
-			Network::ResetPlayersColors(server.clients, player_id);
-			server.mutex.Unlock();
-
-			// send players
-			packet.Reset();
-			packet.SetID(MSG_PLAYERS);
-			server.mutex.Lock();
-                	Network::PacketPushPlayersInfo(packet, server.clients);
-			server.queue.push_back(std::make_pair(packet, 0));
-			server.mutex.Unlock();
-		    }
+		    if(!MsgMapsInfoSet(extdebug)) return Logout();
 		    break;
 
     		case MSG_MAPS_INFO_GET:
-		    packet.Reset();
-		    packet.SetID(MSG_MAPS_INFO);
-		    Network::PacketPushMapsFileInfo(packet, conf.CurrentFileInfo());
-		    if(extdebug) std::cerr << "FH2RemoteClient::ConnectionChat send maps_info...";
-		    if(!Send(packet, extdebug)) return Logout();
-		    if(extdebug) std::cerr << "ok" << std::endl;
+		    if(!MsgMapsInfoGet(extdebug)) return Logout();
 		    break;
 
     		case MSG_MAPS_LIST_GET:
-		    packet.Reset();
-		    packet.SetID(MSG_MAPS_LIST);
-		    server.mutex.Lock();
-		    Network::PacketPushMapsFileInfoList(packet, server.finfo_list);
-		    server.mutex.Unlock();
-		    if(extdebug) std::cerr << "FH2RemoteClient::ConnectionChat send list maps_info...";
-		    if(!Send(packet, extdebug)) return Logout();
-		    if(extdebug) std::cerr << "ok" << std::endl;
+		    if(!MsgMapsListGet(extdebug)) return Logout();
 		    break;
 
     		case MSG_MAPS_LOAD:
-		    if(Modes(ST_ADMIN))
-		    {
-			server.mutex.Lock();
-			//
-			conf.FixKingdomRandomRace();
-			std::for_each(server.clients.begin(), server.clients.end(), Player::FixRandomRace);
-			conf.SetPlayersColors(Network::GetPlayersColors(server.clients));
-			//
-			World::Get().LoadMaps(conf.MapsFile());
-			server.StartGame();
-			packet.Reset();
-			Game::IO::SaveBIN(packet);
-			packet.SetID(MSG_MAPS_LOAD);
-			//
-			server.queue.push_back(std::make_pair(packet, player_id));
-			server.mutex.Unlock();
-			if(extdebug) std::cerr << "FH2RemoteClient::ConnectionChat send all maps_load...";
-			if(!Send(packet, extdebug)) return Logout();
-			if(extdebug) std::cerr << "ok" << std::endl;
-			packet.Reset();
-			//
-		    }
-    		    break;
-
-    		case MSG_MAPS_LOAD_ERR:
-/*
-			server.mutex.Lock();
-			if(extdebug) std::cerr << "FH2RemoteClient::ConnectionChat send maps_load_err...";
-			if(!Send(server.packet_maps, extdebug)) return Logout();
-			if(extdebug) std::cerr << "ok" << std::endl;
-			server.mutex.Unlock();
-*/
+		    if(Modes(ST_ADMIN)) exit = true;
     		    break;
 
     		case MSG_PLAYERS_GET:
-		    packet.Reset();
-		    packet.SetID(MSG_PLAYERS);
-		    server.mutex.Lock();
-                    Network::PacketPushPlayersInfo(packet, server.clients);
-		    server.mutex.Unlock();
-		    if(extdebug) std::cerr << "FH2RemoteClient::ConnectionChat send players...";
-		    if(!Send(packet, extdebug)) return Logout();
-		    if(extdebug) std::cerr << "ok" << std::endl;
+		    if(!MsgPlayersGet(extdebug)) return Logout();
 		    break;
-/*
-    		case MSG_PLAYERS:
-		{
-		    std::vector<Player> players;
-		    Network::PacketPopPlayersInfo(packet, players);
-		    server.mutex.Lock();
-		    conf.SetPlayersColors(Network::GetPlayersColors(players));
-		    server.mutex.Unlock();
-		    std::vector<Player>::const_iterator itp = std::find_if(players.begin(), players.end(), std::bind2nd(std::mem_fun_ref(&Player::isID), player_id));
-		    if(itp != players.end())
-		    {
-			player_name = (*itp).player_name;
-		        player_color = (*itp).player_color;
-		        player_race = (*itp).player_race;
-		    }
-    		    break;
-    		}
-*/
-
-    		case MSG_MAPS:
-		{
-		    packet.Reset();
-		    break;
-		}
 
     		default:
     		    break;
@@ -334,13 +219,178 @@ int FH2RemoteClient::ConnectionChat(void)
 
         DELAY(10);
     }
-    
-    Close();
-    player_id = 0;
-    player_color = 0;
-    modes = 0;
 
-    return 0;
+    return 1;
+}
+
+int FH2RemoteClient::StartGame(void)
+{
+    Settings & conf = Settings::Get();
+    FH2Server & server = FH2Server::Get();
+    bool extdebug = 2 < conf.Debug();
+    bool exit = false;
+
+    server.mutex.Lock();
+    server.start_game = true;
+    server.mutex.Unlock();
+
+    while(!exit)
+    {
+        if(Modes(ST_SHUTDOWN)) return Logout();
+
+	if(Ready())
+	{
+            if(extdebug) std::cerr << "FH2RemoteClient::StartGame: recv: ";
+	    if(!Recv(packet, extdebug)) return Logout();
+            if(extdebug) std::cerr << Network::GetMsgString(packet.GetID()) << std::endl;
+
+	    // msg put to queue
+	    MsgBroadcast();
+
+    	    // msg processing
+    	    switch(Network::GetMsg(packet.GetID()))
+    	    {
+    		case MSG_PING:
+		    MsgPing(extdebug);
+		    break;
+
+        	case MSG_LOGOUT:
+		    MsgLogout(extdebug);
+	    	    return Logout();
+
+    		default:
+    		    break;
+    	    }
+	}
+
+        DELAY(10);
+    }
+
+    return 1;
+}
+
+void FH2RemoteClient::MsgBroadcast(void)
+{
+    if(MSG_UNKNOWN != Network::GetMsg(packet.GetID()) && Network::MsgIsBroadcast(packet.GetID()))
+    {
+	FH2Server & server = FH2Server::Get();
+
+	server.mutex.Lock();
+	server.queue.push_back(std::make_pair(packet, player_id));
+	server.mutex.Unlock();
+    }
+}
+
+void FH2RemoteClient::MsgPing(bool extdebug)
+{
+    if(extdebug) Error::Verbose("FH2RemoteClient::MsgPing:");
+    packet.Reset();
+    packet.SetID(MSG_PING);
+    packet.Send(*this);
+}
+
+void FH2RemoteClient::MsgLogout(bool extdebug)
+{
+    // send message
+    packet.Reset();
+    packet.SetID(MSG_MESSAGE);
+    std::string str = "logout player: " + player_name;
+    packet.Push(str);
+
+    FH2Server & server = FH2Server::Get();
+    Settings & conf = Settings::Get();
+
+    server.mutex.Lock();
+    server.queue.push_back(std::make_pair(packet, player_id));
+    //
+    conf.SetPlayersColors(Network::GetPlayersColors(server.clients) & (~player_color));
+    world.GetKingdom(player_color).SetControl(Game::AI);
+    // send players
+    packet.Reset();
+    packet.SetID(MSG_PLAYERS);
+    Network::PacketPushPlayersInfo(packet, server.clients, player_id);
+    server.queue.push_back(std::make_pair(packet, player_id));
+    server.mutex.Unlock();
+    if(extdebug) Error::Verbose("FH2RemoteClient::MsgLogout: ", str.c_str());
+}
+
+bool FH2RemoteClient::MsgMapsInfoSet(bool extdebug)
+{
+    FH2Server & server = FH2Server::Get();
+    Settings & conf = Settings::Get();
+    std::string str;
+
+    packet.Pop(str);
+    if(Modes(ST_ADMIN) && Settings::Get().LoadFileMapsMP2(str))
+    {
+	packet.Reset();
+        packet.SetID(MSG_MAPS_INFO);
+	server.mutex.Lock();
+	Network::PacketPushMapsFileInfo(packet, conf.CurrentFileInfo());
+	server.queue.push_back(std::make_pair(packet, 0));
+	server.mutex.Unlock();
+	if(extdebug) std::cerr << "FH2RemoteClient::MsgMapsInfoSet: ";
+	if(!Send(packet, extdebug)) return false;
+	if(extdebug) std::cerr << "ok" << std::endl;
+
+	// reset players color
+	server.mutex.Lock();
+	Network::ResetPlayersColors(server.clients, player_id);
+	server.mutex.Unlock();
+
+	// send players
+	packet.Reset();
+	packet.SetID(MSG_PLAYERS);
+	server.mutex.Lock();
+        Network::PacketPushPlayersInfo(packet, server.clients);
+	server.queue.push_back(std::make_pair(packet, 0));
+	server.mutex.Unlock();
+    }
+    return true;
+}
+
+bool FH2RemoteClient::MsgMapsInfoGet(bool extdebug)
+{
+    Settings & conf = Settings::Get();
+
+    packet.Reset();
+    packet.SetID(MSG_MAPS_INFO);
+    Network::PacketPushMapsFileInfo(packet, conf.CurrentFileInfo());
+    if(extdebug) std::cerr << "FH2RemoteClient::MsgMapsInfoGet: ";
+    if(!Send(packet, extdebug)) return false;
+    if(extdebug) std::cerr << "ok" << std::endl;
+    return true;
+}
+
+bool FH2RemoteClient::MsgMapsListGet(bool extdebug)
+{
+    FH2Server & server = FH2Server::Get();
+    //Settings & conf = Settings::Get();
+
+    packet.Reset();
+    packet.SetID(MSG_MAPS_LIST);
+    server.mutex.Lock();
+    Network::PacketPushMapsFileInfoList(packet, server.finfo_list);
+    server.mutex.Unlock();
+    if(extdebug) std::cerr << "FH2RemoteClient::MsgMapsListGet: ";
+    if(!Send(packet, extdebug)) return false;
+    if(extdebug) std::cerr << "ok" << std::endl;
+    return true;
+}
+
+bool FH2RemoteClient::MsgPlayersGet(bool extdebug)
+{
+    FH2Server & server = FH2Server::Get();
+
+    packet.Reset();
+    packet.SetID(MSG_PLAYERS);
+    server.mutex.Lock();
+    Network::PacketPushPlayersInfo(packet, server.clients);
+    server.mutex.Unlock();
+    if(extdebug) std::cerr << "FH2RemoteClient::MsgPlayersGet: ";
+    if(!Send(packet, extdebug)) return false;
+    if(extdebug) std::cerr << "ok" << std::endl;
+    return true;
 }
 
 #endif

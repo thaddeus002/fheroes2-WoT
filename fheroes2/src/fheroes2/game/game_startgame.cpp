@@ -40,6 +40,7 @@
 #include "game_focus.h"
 #include "kingdom.h"
 #include "network.h"
+#include "server.h"
 #include "localclient.h"
 
 extern u16 DialogWithArtifact(const std::string & hdr, const std::string & msg, const Artifact::artifact_t art, const u16 buttons = Dialog::OK);
@@ -51,9 +52,6 @@ namespace Game
     void OpenHeroes(Heroes *heroes);
     void ShowPathOrStartMoveHero(Heroes *hero, const u16 dst_index);
     menu_t HumanTurn(void);
-#ifdef WITH_NET
-    menu_t NetworkTurn(void);
-#endif
     bool DiggingForArtifacts(const Heroes & hero);
     void DialogPlayers(const Color::color_t, const std::string &);
     void MoveHeroFromArrowKeys(Heroes & hero, Direction::vector_t direct);
@@ -198,10 +196,8 @@ Game::menu_t Game::StartGame(void)
     castleBar.Hide();
     heroesBar.Hide();
 
-    cursor.Show();
-    display.Flip();
-
-    if(NETWORK == conf.GameType()) return NetworkTurn();
+    //cursor.Show();
+    //display.Flip();
 
     Game::menu_t m = ENDTURN;
 
@@ -246,13 +242,8 @@ Game::menu_t Game::StartGame(void)
 		    if(conf.Modes(Settings::LOADGAME)) conf.ResetModes(Settings::LOADGAME);
 		break;
 
-		case AI:
-        	    if(m == ENDTURN) kingdom.AITurns();
-		    break;
-
 		default:
-		    Error::Verbose("Game::StartGame: unknown control");
-		    m = QUITGAME;
+        	    if(m == ENDTURN) kingdom.AITurns();
 		    break;
 	    }
 
@@ -1064,16 +1055,155 @@ bool Game::DiggingForArtifacts(const Heroes & hero)
     return false;
 }
 
-extern void RedrawAITurns(u8, u8);
-
 #ifdef WITH_NET
-Game::menu_t Game::NetworkTurn(void)
-{
 
+extern void RedrawAITurns(u8, u8);
+extern void SendPacketToAllClients(std::list<FH2RemoteClient> &, Network::Message &, u32);
+
+int FH2Server::StartGame(void)
+{
     Settings & conf = Settings::Get();
+    int m = Game::ENDTURN;
+
+    conf.FixKingdomRandomRace();
+    std::for_each(clients.begin(), clients.end(), Player::FixRandomRace);
+    conf.SetPlayersColors(Network::GetPlayersColors(clients));
+
+    Network::Message packet;
+
+    // send maps
+    World::Get().LoadMaps(conf.MapsFile());
+    packet.Reset();
+    Game::IO::SaveBIN(packet);
+    packet.SetID(MSG_MAPS_LOAD);
+    SendPacketToAllClients(clients, packet, 0);
+
+    for(Color::color_t color = Color::BLUE; color != Color::GRAY; ++color) if(color & conf.PlayersColors())
+	world.GetKingdom(color).SetControl(Game::REMOTE);
+
+    GameOver::Result::Get().Reset();
+
+    while(m == Game::ENDTURN)
+    {
+	world.NewDay();
+
+	for(Color::color_t color = Color::BLUE; color != Color::GRAY; ++color)
+	{
+	    Kingdom & kingdom = world.GetKingdom(color);
+
+	    if(!kingdom.isPlay()) continue;
+
+	    conf.SetCurrentColor(color);
+	    world.ClearFog(color);
+
+	    // send turn
+	    mutex.Lock();
+	    packet.Reset();
+	    packet.SetID(MSG_TURNS);
+    	    packet.Push(Color::GetFirst(conf.KingdomColors()));
+	    packet.Push(static_cast<u8>(0));
+	    SendPacketToAllClients(clients, packet, 0);
+	    mutex.Unlock();
+
+	    switch(kingdom.Control())
+	    {
+		default:
+		    conf.SetMyColor(color);
+		    m = RemoteTurn(color);
+		    if(m == 0)
+		    {
+			kingdom.SetControl(Game::AI);
+			conf.SetPlayersColors(conf.PlayersColors() & (~color));
+			kingdom.AITurns();
+		    }
+		    break;
+
+		case Game::AI:
+        	    if(m == Game::ENDTURN) kingdom.AITurns();
+		    // FIXME: send kingdom, castles, heroes
+		    break;
+	    }
+
+	    if(m != Game::ENDTURN) break;
+	    if(0 == conf.PlayersColors()){ m = Game::QUITGAME; break; }
+	}
+
+	ScanQueue();
+
+	DELAY(10);
+    }
+
+    return m == Game::ENDTURN ? Game::QUITGAME : m;
+}
+
+int FH2Server::RemoteTurn(u8 color)
+{
+    // wait kingdoms, castles, heroes
+    return 1;
+}
+
+int FH2LocalClient::StartGame(void)
+{
+    Game::SetFixVideoMode();
+
+    // cursor
     Cursor & cursor = Cursor::Get();
+    Settings & conf = Settings::Get();
     Display & display = Display::Get();
-    Interface::StatusWindow & statusWindow = Interface::StatusWindow::Get();
+
+    GameOver::Result::Get().Reset();
+
+    cursor.Hide();
+
+    AGG::FreeObject(ICN::HEROES);
+    AGG::FreeObject(ICN::BTNSHNGL);
+    AGG::FreeObject(ICN::SHNGANIM);
+    AGG::FreeObject(ICN::BTNNEWGM);
+    AGG::FreeObject(ICN::REDBACK);
+    AGG::FreeObject(ICN::NGEXTRA);
+    AGG::FreeObject(ICN::NGHSBKG);
+    AGG::FreeObject(ICN::REQSBKG);
+    AGG::FreeObject(ICN::REQUEST);
+    AGG::FreeObject(ICN::REQUESTS);
+    AGG::FreeObject(ICN::ESCROLL);
+    AGG::FreeObject(ICN::HSBKG);
+    AGG::FreeObject(ICN::HISCORE);
+
+    if(Settings::Get().LowMemory())
+    {
+        AGG::ICNRegistryEnable(false);
+        AGG::ICNRegistryFreeObjects();
+    }
+
+    // preload sounds
+    Game::PreloadLOOPSounds();
+    Mixer::Reset();
+
+    // draw interface
+    Interface::Basic & I = Interface::Basic::Get();
+
+    Interface::GameArea & areaMaps = I.gameArea;
+    areaMaps.Build();
+
+    Game::Focus & global_focus = Game::Focus::Get();
+    global_focus.Reset();
+
+    Interface::Radar & radar = I.radar;
+    Interface::HeroesIcons & heroesBar = I.iconsPanel.GetHeroesBar();
+    Interface::CastleIcons & castleBar = I.iconsPanel.GetCastleBar();
+    Interface::StatusWindow& statusWin = I.statusWindow;
+    heroesBar.Reset();
+    castleBar.Reset();
+    radar.Build();
+
+    I.Redraw(REDRAW_ICONS | REDRAW_BUTTONS | REDRAW_BORDER);
+    castleBar.Hide();
+    heroesBar.Hide();
+
+    cursor.Show();
+    display.Flip();
+
+
     FH2LocalClient & client = FH2LocalClient::Get();
 
     bool extdebug = 2 < conf.Debug();
@@ -1095,7 +1225,7 @@ Game::menu_t Game::NetworkTurn(void)
 	    if(!client.Recv(packet, extdebug))
 	    {
 		Dialog::Message("Error", "Game::NetworkTurn: recv: error", Font::BIG, Dialog::OK);
-		return MAINMENU;
+		return Game::MAINMENU;
             }
 	    if(extdebug) std::cerr << Network::GetMsgString(packet.GetID()) << std::endl;
 
@@ -1109,11 +1239,11 @@ Game::menu_t Game::NetworkTurn(void)
 
 		    Error::Verbose("Game::NetworkGame: player: " + Color::String(color));
 
-		    if(conf.MyColor() == color) HumanTurn();
+		    if(conf.MyColor() == color) Game::HumanTurn();
 		    else
 		    {
-			statusWindow.Reset();
-			statusWindow.SetState(STATUS_AITURN);
+			statusWin.Reset();
+			statusWin.SetState(STATUS_AITURN);
 			RedrawAITurns(color, percent);
 		    }
 		}
@@ -1130,7 +1260,7 @@ Game::menu_t Game::NetworkTurn(void)
 
     Network::Logout();
 
-    return QUITGAME;
+    return Game::QUITGAME;
 }
 #endif
 

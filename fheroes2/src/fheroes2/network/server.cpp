@@ -43,7 +43,7 @@ void SendPacketToAllClients(std::list<FH2RemoteClient> & clients, Network::Messa
 	(*it).player_id != owner ? msg.Send(*it) : ready.Send(*it);
 }
 
-FH2Server::FH2Server()
+FH2Server::FH2Server() : start_game(false)
 {
     AGG::Cache & cache = AGG::Cache::Get();
     if(! cache.ReadDataDir()) Error::Except("AGG data files not found.");
@@ -89,7 +89,7 @@ int FH2Server::ConnectionChat(void)
     exit = false;
 
     // wait players
-    while(! exit)
+    while(! exit && !start_game)
     {
     	if(TCPsocket csd = Accept())
     	{
@@ -133,20 +133,38 @@ int FH2Server::ConnectionChat(void)
 	    }
 	}
 
-        // scan queue
-        if(queue.size())
-        {
-    	    mutex.Lock();
-	    MessageID & msgid = queue.front();
-    	    Network::Message & msg = msgid.first;
+	ScanQueue();
 
-            switch(msg.GetID())
-            {
+	DELAY(1);
+    }
+
+    StartGame();
+
+    std::for_each(clients.begin(), clients.end(), std::mem_fun_ref(&FH2RemoteClient::ShutdownThread));
+    Close();
+
+    return 0;
+}
+
+void FH2Server::ScanQueue(void)
+{
+    Settings & conf = Settings::Get();
+
+    // scan queue
+    if(queue.size())
+    {
+        mutex.Lock();
+        MessageID & msgid = queue.front();
+        Network::Message & msg = msgid.first;
+
+        switch(msg.GetID())
+        {
     		case MSG_SHUTDOWN:
 		    if(admin_id == msgid.second)
 		    {
     			if(2 < conf.Debug()) Error::Verbose("FH2Server::ConnectionChat: admin shutdown");
     			exit = true;
+			Network::Message packet;
                 	packet.Reset();
                 	packet.SetID(MSG_SHUTDOWN);
 			SendPacketToAllClients(clients, packet, msgid.second);
@@ -156,31 +174,11 @@ int FH2Server::ConnectionChat(void)
 		default:
 		    SendPacketToAllClients(clients, msg, msgid.second);
 		    break;
-            }
+        }
 
-            queue.pop_front();
-            mutex.Unlock();
-	}
-
-	DELAY(1);
+        queue.pop_front();
+        mutex.Unlock();
     }
-
-    std::for_each(clients.begin(), clients.end(), std::mem_fun_ref(&FH2RemoteClient::ShutdownThread));
-    Close();
-
-    return 0;
-}
-
-void FH2Server::StartGame(void)
-{
-//    Settings & conf = Settings::Get();
-//
-//    GameOver::Result::Get().Reset();
-//
-//    for(Color::color_t color = Color::BLUE; color != Color::GRAY; ++color) if(color & conf.PlayersColors())
-//    {
-//	world.GetKingdom(color).SetControl(Game::REMOTE);
-//    }
 }
 
 Game::menu_t Game::NetworkHost(void)

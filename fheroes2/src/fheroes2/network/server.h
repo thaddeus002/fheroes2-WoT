@@ -41,9 +41,12 @@ public:
 
     bool Bind(u16);
     void Exit(void);
-    void StartGame(void);
+    int StartGame(void);
+    int RemoteTurn(u8);
 
 protected:
+    void ScanQueue(void);
+
     friend class FH2RemoteClient;
 
     FH2Server();
@@ -53,6 +56,7 @@ protected:
     std::deque<MessageID> queue;
     std::list<FH2RemoteClient> clients;
     bool exit;
+    bool start_game;
     u32 admin_id;
     std::string banner;
     MapsFileInfoList finfo_list;
