@@ -43,6 +43,7 @@ public:
 	PLAY	= 0x0001,
     };
 
+    Kingdom();
     Kingdom(const Color::color_t cl);
 
     void SetModes(flags_t);
@@ -121,7 +122,7 @@ private:
     void AIHeroesPrepareTask(Heroes &);
     void AIDumpCacheObjects(const IndexDistance &) const;
 
-    const Color::color_t color;
+    Color::color_t color;
     Game::control_t control;
     Resource::funds_t resource;
 

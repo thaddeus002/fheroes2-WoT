@@ -112,6 +112,7 @@ public:
 	ACTION		= 0x0100,
     };
 
+    Heroes();
     Heroes(heroes_t ht, Race::race_t rc);
 
     bool isFreeman(void) const;
@@ -279,7 +280,7 @@ private:
     SpellBook		spell_book;
 
     heroes_t		portrait;
-    const Race::race_t	race;
+    Race::race_t	race;
 
     MP2::object_t	save_maps_general;
 

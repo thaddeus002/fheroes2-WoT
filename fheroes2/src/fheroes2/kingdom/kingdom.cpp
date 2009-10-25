@@ -32,6 +32,10 @@
 #include "kingdom_defines.h"
 #include "kingdom.h"
 
+Kingdom::Kingdom()
+{
+}
+
 Kingdom::Kingdom(const Color::color_t cl) : color(cl), control(Game::AI), flags(0), lost_town_days(LOST_TOWN_DAYS + 1), ai_capital(NULL)
 {
     const Settings & conf = Settings::Get();

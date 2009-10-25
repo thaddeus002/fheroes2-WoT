@@ -29,6 +29,10 @@
 #include "maps_tiles.h"
 #include "castle.h"
 
+Castle::Castle() : captain(*this), mageguild(race), army(&captain), castle_heroes(NULL)
+{
+}
+
 Castle::Castle(s16 cx, s16 cy, const Race::race_t rc) : mp(cx, cy), race(rc), captain(*this),
     color(Color::GRAY), building(0), mageguild(race),
     army(&captain), castle_heroes(NULL)

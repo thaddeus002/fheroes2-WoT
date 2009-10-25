@@ -94,6 +94,7 @@ public:
 	CAPITAL			= 0x0020,
     };
 
+    Castle();
     Castle(s16 cx, s16 cy, const Race::race_t rs);
     void LoadFromMP2(const void *ptr);
 
@@ -190,7 +191,7 @@ private:
 private:
     friend class Game::IO;
 
-    const Point		mp;
+    Point		mp;
     Race::race_t	race;
     Captain		captain;
 

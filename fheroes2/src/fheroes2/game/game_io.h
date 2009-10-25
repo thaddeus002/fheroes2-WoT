@@ -25,6 +25,10 @@
 #include "sdlnet.h"
 #include "maps_fileinfo.h"
 
+class Kingdom;
+class Castle;
+class Heroes;
+
 namespace Game
 {
     class IO : public QueueMessage
@@ -36,6 +40,14 @@ namespace Game
 
 	static bool SaveBIN(QueueMessage &);
 	static bool LoadBIN(QueueMessage &);
+
+	static void PackKingdom(QueueMessage &, const Kingdom &);
+	static void PackCastle(QueueMessage &, const Castle &);
+	static void PackHeroes(QueueMessage &, const Heroes &);
+
+	static void UnpackKingdom(QueueMessage &, Kingdom &);
+	static void UnpackCastle(QueueMessage &, Castle &);
+	static void UnpackHeroes(QueueMessage &, Heroes &);
     };
 
     bool Save(const std::string &);
