@@ -21,7 +21,6 @@
 #ifndef H2PALETTE_H
 #define H2PALETTE_H
 
-#include <vector>
 #include "types.h"
 
 struct SDL_Palette;
@@ -36,13 +35,12 @@ public:
 
     u16 Size(void) const;
     u32 GetColor(u16) const;
-    u32 GetAlphaColor(u16) const;
     const SDL_Palette * SDLPalette(void) const;
 
 private:
     Palette(); 
 
-    std::vector<u32> pal;
+    u32* pal;
     SDL_Palette *sdlpal;
 };
 

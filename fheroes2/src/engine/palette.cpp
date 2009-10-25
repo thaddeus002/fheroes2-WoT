@@ -24,23 +24,21 @@
 #include "palette_h2.h"
 #include "palette.h"
 
+#define PALETTE_SIZE 255
+
 Palette::Palette()
 {
-    const u16 size = 255;
-
     sdlpal = new SDL_Palette;
-    sdlpal->ncolors = size;
-    sdlpal->colors  = new SDL_Color[size];
+    sdlpal->ncolors = PALETTE_SIZE;
+    sdlpal->colors  = new SDL_Color[PALETTE_SIZE];
 
-    pal.resize(size);
+    pal = new u32 [PALETTE_SIZE];
 
     Surface sfa;
     sfa.CreateSurface(1, 1, Surface::GetDefaultDepth(), SDL_SWSURFACE|SDL_SRCALPHA);
-    sfa.SetAlpha(255);
-
     const unsigned char *p = kb_pal;
 
-    for(u16 ii = 0; ii < size; ++ii)
+    for(u16 ii = 0; ii < PALETTE_SIZE; ++ii)
     {
         sdlpal->colors[ii].r = *p++;
         sdlpal->colors[ii].g = *p++;
@@ -61,6 +59,7 @@ Palette::~Palette()
 	if(sdlpal->colors) delete [] sdlpal->colors;
 	delete sdlpal;
     }
+    if(pal) delete [] pal;
 }
 
 Palette & Palette::Get(void)
@@ -72,12 +71,12 @@ Palette & Palette::Get(void)
 
 u16 Palette::Size(void) const
 {
-    return pal.size();
+    return PALETTE_SIZE;
 }
 
 u32 Palette::GetColor(u16 index) const
 {
-    return index < pal.size() ? pal[index] : 0;
+    return index < PALETTE_SIZE ? pal[index] : 0;
 }
 
 const SDL_Palette * Palette::SDLPalette(void) const

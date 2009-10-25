@@ -90,14 +90,8 @@ Surface::~Surface()
 /* operator = */
 Surface & Surface::operator= (const Surface & bs)
 {
-    FreeSurface(*this);
+    Set(bs);
 
-    if(bs.surface)
-    {
-	surface = SDL_ConvertSurface(bs.surface, bs.surface->format, bs.surface->flags);
-	if(!surface) Error::Warning("Surface: operator, error: ", SDL_GetError());
-	LoadPalette();
-    }
     return *this;
 }
 
@@ -136,19 +130,8 @@ void Surface::Set(const Surface & bs)
 
     if(bs.surface)
     {
-	if(8 == bs.depth())
-	{
-	    Set(bs.w(), bs.h(), 8, SDL_SWSURFACE);
-	    Lock();
-	    memcpy(surface->pixels, bs.surface->pixels, surface->w * surface->h);
-	    Unlock();
-	}
-	else
-	{
 	    surface = SDL_ConvertSurface(bs.surface, bs.surface->format, bs.surface->flags);
 	    if(!surface) Error::Warning("Surface: copy constructor, error: ", SDL_GetError());
-	}
-	LoadPalette();
     }
 }
 
@@ -282,35 +265,21 @@ void Surface::GetRGB(u32 pixel, u8 *r, u8 *g, u8 *b, u8 *a) const
 /* create new surface */
 void Surface::CreateSurface(u16 sw, u16 sh, u8 dp, u32 fl)
 {
-    u32 rmask = 0;
-    u32 gmask = 0;
-    u32 bmask = 0;
-    u32 amask = 0;
-
     switch(dp)
     {
 	case 32:
-	    rmask = RMASK32;
-	    gmask = GMASK32;
-	    bmask = BMASK32;
-	    amask = SDL_SRCALPHA & fl ? AMASK32 : 0;
+	    surface = SDL_CreateRGBSurface(fl, sw, sh, dp, RMASK32, GMASK32, BMASK32, (SDL_SRCALPHA & fl ? AMASK32 : 0));
 	    break;
 	case 24:
-	    rmask = RMASK24;
-	    gmask = GMASK24;
-	    bmask = BMASK24;
-	    amask = SDL_SRCALPHA & fl ? AMASK24 : 0;
+	    surface = SDL_CreateRGBSurface(fl, sw, sh, dp, RMASK24, GMASK24, BMASK24, (SDL_SRCALPHA & fl ? AMASK24 : 0));
 	    break;
 	case 16:
-	    rmask = RMASK16;
-	    gmask = GMASK16;
-	    bmask = BMASK16;
-	    amask = SDL_SRCALPHA & fl ? AMASK16 : 0;
+	    surface = SDL_CreateRGBSurface(fl, sw, sh, dp, RMASK16, GMASK16, BMASK16, (SDL_SRCALPHA & fl ? AMASK16 : 0));
 	    break;
-	default: break;
+	default:
+	    surface = SDL_CreateRGBSurface(fl, sw, sh, dp, 0, 0, 0, 0);
+	    break;
     }
-
-    surface = SDL_CreateRGBSurface(fl, sw, sh, dp, rmask, gmask, bmask, amask);
 
     if(!surface) Error::Warning("Surface::CreateSurface: empty surface, error:", SDL_GetError());
 }
@@ -339,7 +308,7 @@ void Surface::LoadPalette(void)
 void Surface::SetDisplayFormat(void)
 {
     SDL_Surface *osurface = surface;
-    surface = (osurface->flags & SDL_SRCALPHA ? SDL_DisplayFormatAlpha(osurface) : SDL_DisplayFormat(osurface));
+    surface = SDL_DisplayFormatAlpha(osurface);
     if(osurface) SDLFreeSurface(osurface);
 }
 
@@ -353,9 +322,6 @@ u32 Surface::GetColor(u16 index) const
 u32 Surface::GetColorKey(void) const
 {
     if(! surface) return 0;
-
-//    return surface->flags & SDL_SRCALPHA ? SDL_MapRGBA(surface->format, 0xFF, 0x00, 0xFF, 0) :
-//			    SDL_MapRGB(surface->format, 0xFF, 0x00, 0xFF);
     return SDL_MapRGBA(surface->format, 0xFF, 0x00, 0xFF, 0);
 }
 

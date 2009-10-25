@@ -46,7 +46,7 @@ void Background::Save(void)
 
     if(0 == Rect::w || 0 == Rect::h) return;
 
-    if(! Surface::valid()) Set(Rect::w, Rect::h);
+    if(! Surface::valid()) Set(Rect::w, Rect::h, false);
 
     Blit(Display::Get(), *this, 0, 0);
     SetDisplayFormat();
