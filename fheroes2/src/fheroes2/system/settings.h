@@ -160,9 +160,6 @@ public:
 
     u16	GetPort(void) const;
 
-    u8 CurrentKingdomColors(void) const;
-    void SetCurrentKingdomColors(u8);
-
     // from maps info
     Race::race_t KingdomRace(u8) const;
     void SetKingdomRace(u8, u8);
@@ -176,6 +173,7 @@ public:
     Color::color_t FirstAllowColor(void) const;
     bool KingdomColors(u8) const;
     u8 KingdomColors(void) const;
+    void SetKingdomColors(u8);
     bool AllowChangeRace(u8) const;
     u8 AllowColorsCount(void) const;
     u8 KingdomColorsCount(void) const;
@@ -191,8 +189,6 @@ public:
     u32 WinsMapsIndexObject(void) const;
     u32 LossMapsIndexObject(void) const;
     u16 LossCountDays(void) const;
-    void SetGameOverResult(u16);
-    u16 GameOverResult(void) const;
 
 protected:
     void Parse(const std::string & left, const std::string & right);
@@ -236,8 +232,6 @@ private:
     u8 game_type;
     u8 players_colors;
     u8 preferably_count_players;
-    u8 current_kingdom_colors;
-    u16 game_over_result;
 
     std::string playmus_command;
 

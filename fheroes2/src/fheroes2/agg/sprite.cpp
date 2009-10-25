@@ -35,6 +35,7 @@ void Sprite::LoadICN(const char *buf, size_t size, bool reflect)
 {
     SetColorKey();
     DrawICN(*this, buf, size, reflect);
+    //if(!skipformat) SetDisplayFormat();
 }
 
 void Sprite::DrawICN(Surface & sf, const char *buf, const u32 size, bool reflect)
@@ -47,6 +48,8 @@ void Sprite::DrawICN(Surface & sf, const char *buf, const u32 size, bool reflect
     u8  c = 0;
     u16 x = reflect ? sf.w() - 1 : 0;
     u16 y = 0;
+
+    //const u32 color_key = sf.MapRGB(0xff, 0, 0xff, 0);
     const u32 shadow = sf.alpha() ? sf.MapRGB(0, 0, 0, 0x40) : sf.GetColorKey();
     bool alpha = false;
 
@@ -94,7 +97,7 @@ void Sprite::DrawICN(Surface & sf, const char *buf, const u32 size, bool reflect
 	{
 	    ++cur;
 	    c = *cur % 4 ? *cur % 4 : *(++cur);
-	    while(c--){ sf.SetPixel(x, y, shadow); alpha = true; reflect ? x-- : x++; }
+	    while(c--){ if(sf.alpha()) sf.SetPixel(x, y, shadow); alpha = true; reflect ? x-- : x++; }
 	    ++cur;
 	}
 	else
@@ -124,8 +127,6 @@ void Sprite::DrawICN(Surface & sf, const char *buf, const u32 size, bool reflect
 
     // unlock surface
     sf.Unlock();
-
-    if(! alpha) sf.ResetAlpha();
 }
 
 u32 Sprite::GetSize(void) const

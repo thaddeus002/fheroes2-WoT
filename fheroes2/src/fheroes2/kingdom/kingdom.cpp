@@ -32,15 +32,27 @@
 #include "kingdom_defines.h"
 #include "kingdom.h"
 
-Kingdom::Kingdom(const Color::color_t cl, const Game::control_t con) : color(cl), control(con), flags(0), lost_town_days(LOST_TOWN_DAYS + 1), ai_capital(NULL)
+Kingdom::Kingdom(const Color::color_t cl) : color(cl), control(Game::AI), flags(0), lost_town_days(LOST_TOWN_DAYS + 1), ai_capital(NULL)
 {
-    // set play
-    if(Settings::Get().KingdomColors(cl)) SetModes(PLAY);
+    const Settings & conf = Settings::Get();
 
-    UpdateStartingResource();
+    // set play
+    if(conf.KingdomColors(color)) SetModes(PLAY);
     
     heroes.reserve(KINGDOMMAXHEROES);
     castles.reserve(15);
+
+    // set control
+    if(color & conf.PlayersColors())
+    switch(Settings::Get().GameType())
+    {
+        default: control = Game::LOCAL; break;
+#ifdef WITH_NET
+        case Game::NETWORK: control = (color == conf.MyColor() ? Game::LOCAL : Game::REMOTE); break;
+#endif
+    }
+
+    UpdateStartingResource();
 }
 
 void Kingdom::UpdateStartingResource(void)

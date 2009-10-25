@@ -33,6 +33,18 @@ enum scroll_t
     SCROLL_BOTTOM = 0x08,
 };
 
+enum level_t
+{
+    LEVEL_BOTTOM  = 0x01,
+    LEVEL_TOP     = 0x02,
+    LEVEL_HEROES  = 0x04,
+    LEVEL_MONSTER = 0x08,
+    LEVEL_BOAT    = 0x10,
+    LEVEL_FOG     = 0x20,
+
+    LEVEL_ALL     = 0xFF,
+};
+
 namespace Maps { class Tiles; };
 
 namespace Interface
@@ -40,7 +52,6 @@ namespace Interface
     class GameArea
     {
     public:
-	enum redraw_t { REDRAW_TOP = 0x01, REDRAW_BOTTOM = 0x20, REDRAW_OBJECTS = 0x40, REDRAW_FOGS = 0x80, REDRAW_ALL = 0xFF };
 
 	static GameArea & Get(void);
 	void SetAreaSize(s16, s16, u16, u16);
@@ -56,7 +67,7 @@ namespace Interface
 
 	void Center(s16, s16);
 	void Center(const Point &pt);
-	void Redraw(Surface & dst, u8 = REDRAW_ALL) const;
+	void Redraw(Surface & dst, u8 = LEVEL_ALL) const;
 
 	void SetUpdateCursor(void);
         void QueueEventProcessing(void);

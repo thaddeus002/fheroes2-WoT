@@ -173,16 +173,14 @@ int FH2Server::ConnectionChat(void)
 
 void FH2Server::StartGame(void)
 {
-    Settings & conf = Settings::Get();
-
-    conf.SetGameOverResult(GameOver::COND_NONE);
-    conf.SetCurrentKingdomColors(conf.KingdomColors());
-
-    for(Color::color_t color = Color::BLUE; color != Color::GRAY; ++color) if(color & conf.PlayersColors())
-    {
-	world.GetKingdom(color).SetControl(Game::REMOTE);
-        world.GetKingdom(color).UpdateStartingResource();
-    }
+//    Settings & conf = Settings::Get();
+//
+//    GameOver::Result::Get().Reset();
+//
+//    for(Color::color_t color = Color::BLUE; color != Color::GRAY; ++color) if(color & conf.PlayersColors())
+//    {
+//	world.GetKingdom(color).SetControl(Game::REMOTE);
+//    }
 }
 
 Game::menu_t Game::NetworkHost(void)

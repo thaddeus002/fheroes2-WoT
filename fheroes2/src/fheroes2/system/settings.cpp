@@ -69,7 +69,7 @@ Settings::Settings() : major_version(MAJOR_VERSION), minor_version(MINOR_VERSION
     my_color(Color::GRAY), cur_color(Color::GRAY), path_data_directory("data"),
     font_normal("dejavusans.ttf"), font_small("dejavusans.ttf"), size_normal(15), size_small(10),
     sound_volume(6), music_volume(6), animation(6), game_type(0), players_colors(0), preferably_count_players(0),
-    current_kingdom_colors(0), game_over_result(GameOver::COND_NONE), port(DEFAULT_PORT)
+    port(DEFAULT_PORT)
 {
     build_version = "version: ";
     String::AddInt(build_version, MAJOR_VERSION);
@@ -682,6 +682,11 @@ bool Settings::AllowChangeRace(u8 f) const
     return current_maps_file.rnd_races & f;
 }
 
+void Settings::SetKingdomColors(u8 c)
+{
+    current_maps_file.kingdom_colors = c;
+}
+
 u8 Settings::KingdomColors(void) const
 {
     return current_maps_file.kingdom_colors;
@@ -760,26 +765,6 @@ u32 Settings::LossMapsIndexObject(void) const
 u16 Settings::LossCountDays(void) const
 {
     return current_maps_file.LossCountDays();
-}
-
-void Settings::SetGameOverResult(u16 f)
-{
-    game_over_result = f;
-}
-
-u16 Settings::GameOverResult(void) const
-{
-    return game_over_result;
-}
-
-u8 Settings::CurrentKingdomColors(void) const
-{
-    return current_kingdom_colors;
-}
-
-void Settings::SetCurrentKingdomColors(u8 c)
-{
-    current_kingdom_colors = c;
 }
 
 void Settings::FixKingdomRandomRace(void)

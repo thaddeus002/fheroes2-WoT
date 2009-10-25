@@ -80,6 +80,7 @@ Interface::ControlPanel::ControlPanel()
 	AGG::FreeObject(ICN::REQUESTS);
 	AGG::FreeObject(ICN::CELLWIN);
     }
+    sf_area.SetDisplayFormat();
 }
 
 Interface::ControlPanel & Interface::ControlPanel::Get(void)

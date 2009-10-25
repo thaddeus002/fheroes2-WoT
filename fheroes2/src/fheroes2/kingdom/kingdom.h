@@ -43,7 +43,7 @@ public:
 	PLAY	= 0x0001,
     };
 
-    Kingdom(const Color::color_t cl, const Game::control_t con = Game::AI);
+    Kingdom(const Color::color_t cl);
 
     void SetModes(flags_t);
     void ResetModes(flags_t);

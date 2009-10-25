@@ -21,6 +21,7 @@
 #include "gamedefs.h"
 #include "dialog.h"
 #include "world.h"
+#include "kingdom.h"
 #include "castle.h"
 #include "settings.h"
 #include "game_over.h"
@@ -157,4 +158,65 @@ void GameOver::DialogLoss(u16 cond)
     }
 
     if(body.size()) Dialog::Message("", body, Font::BIG, Dialog::OK);
+}
+
+GameOver::Result & GameOver::Result::Get(void)
+{
+    static Result gresult;
+    return gresult;
+}
+
+GameOver::Result::Result() : colors(0), result(0)
+{
+}
+
+void GameOver::Result::Reset(void)
+{
+    colors = Settings::Get().KingdomColors();
+    result = GameOver::COND_NONE;
+}
+
+void GameOver::Result::SetResult(u16 r)
+{
+    result = r;
+}
+
+u16  GameOver::Result::GetResult(void) const
+{
+    return result;
+}
+
+namespace Game
+{
+    void DialogPlayers(const Color::color_t, const std::string &);
+};
+
+bool GameOver::Result::CheckGameOver(Game::menu_t & res)
+{
+    for(Color::color_t c = Color::BLUE; c != Color::GRAY; ++c)
+        if(!world.GetKingdom(c).isPlay() && (colors & c))
+    {
+        std::string message(_("%{color} has been vanquished!"));
+        String::Replace(message, "%{color}", Color::String(c));
+        Game::DialogPlayers(c, message);
+        colors &= (~c);
+    }
+
+    const Kingdom & myKingdom = world.GetMyKingdom();
+
+    if(GameOver::COND_NONE != (result = world.CheckKingdomLoss(myKingdom)))
+    {
+        GameOver::DialogLoss(result);
+        res = Game::MAINMENU;
+        return true;
+    }
+    else
+    if(GameOver::COND_NONE != (result = world.CheckKingdomWins(myKingdom)))
+    {
+        GameOver::DialogWins(result);
+        res = Game::HIGHSCORES;
+        return true;
+    }
+
+    return false;
 }

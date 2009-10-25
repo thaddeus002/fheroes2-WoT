@@ -116,7 +116,6 @@ Game::menu_t Game::ScenarioInfo(void)
     conf.SetMyColor(conf.FirstAllowColor());
     conf.SetPlayersColors(conf.MyColor());
 
-
     Scenario::RedrawStaticInfo(pointPanel);
     Scenario::RedrawDifficultyInfo(pointDifficultyInfo);
 
@@ -165,9 +164,8 @@ Game::menu_t Game::ScenarioInfo(void)
 	    {
 		cursor.Hide();
 		levelCursor.Hide();
-		// set first allow color
 		conf.SetMyColor(conf.FirstAllowColor());
-		conf.SetPlayersColors(conf.MyColor());
+    		conf.SetPlayersColors(conf.MyColor());
 		Scenario::RedrawStaticInfo(pointPanel);
 		Scenario::RedrawDifficultyInfo(pointDifficultyInfo);
 		UpdateCoordOpponentsInfo(pointOpponentInfo, coordColors);
@@ -196,6 +194,9 @@ Game::menu_t Game::ScenarioInfo(void)
 	    if(Settings::Get().Debug()) Error::Verbose("select maps: " + conf.MapsFile());
 	    if(Settings::Get().Debug()) Error::Verbose("difficulty: " + Difficulty::String(conf.GameDifficulty()));
 	    conf.FixKingdomRandomRace();
+	    if(Game::HOTSEAT == conf.GameType())
+		conf.SetMyColor(Color::GRAY);
+	    else
 	    if(Settings::Get().Debug()) Error::Verbose("select color: " + Color::String(conf.MyColor()));
 	    result = STARTGAME;
 	    break;

@@ -115,13 +115,12 @@ void Interface::GameArea::Redraw(Surface & dst, u8 flag) const
 	    world.GetTiles(rectMaps.x + ox, rectMaps.y + oy).RedrawTile(dst, rectArea.x + TILEWIDTH * ox, rectArea.y + TILEWIDTH * oy);
 
     // bottom
-    if(flag & REDRAW_BOTTOM)
+    if(flag & LEVEL_BOTTOM)
     for(u8 oy = 0; oy < rectMaps.h; ++oy)
 	for(u8 ox = 0; ox < rectMaps.w; ++ox)
 	    world.GetTiles(rectMaps.x + ox, rectMaps.y + oy).RedrawBottom(dst, rectArea.x + TILEWIDTH * ox, rectArea.y + TILEWIDTH * oy);
 
     // ext object
-    if(flag & REDRAW_OBJECTS)
     for(u8 oy = 0; oy < rectMaps.h; ++oy)
 	for(u8 ox = 0; ox < rectMaps.w; ++ox)
     {
@@ -130,44 +129,40 @@ void Interface::GameArea::Redraw(Surface & dst, u8 flag) const
 	switch(tile.GetObject())
 	{
     	    // boat
-    	    case MP2::OBJ_BOAT:		RedrawBoat(dst, rectArea.x + TILEWIDTH * ox, rectArea.y + TILEWIDTH * oy, tile); break;
+    	    case MP2::OBJ_BOAT:	
+		if(flag & LEVEL_BOAT)
+		    RedrawBoat(dst, rectArea.x + TILEWIDTH * ox, rectArea.y + TILEWIDTH * oy, tile); break;
     	    // monster
-    	    case MP2::OBJ_MONSTER:	RedrawMonster(dst, rectArea.x + TILEWIDTH * ox, rectArea.y + TILEWIDTH * oy, tile); break;
+    	    case MP2::OBJ_MONSTER:
+		if(flag & LEVEL_MONSTER)
+		    RedrawMonster(dst, rectArea.x + TILEWIDTH * ox, rectArea.y + TILEWIDTH * oy, tile); break;
     	    default: break;
 	}
     }
 
     // top
-    if(flag & REDRAW_TOP)
+    if(flag & LEVEL_TOP)
     for(u8 oy = 0; oy < rectMaps.h; ++oy)
 	for(u8 ox = 0; ox < rectMaps.w; ++ox)
 	    world.GetTiles(rectMaps.x + ox, rectMaps.y + oy).RedrawTop(dst, rectArea.x + TILEWIDTH * ox, rectArea.y + TILEWIDTH * oy, *this);
 
-    // ext object
-    if(flag & REDRAW_OBJECTS)
+    // heroes
     for(u8 oy = 0; oy < rectMaps.h; ++oy)
 	for(u8 ox = 0; ox < rectMaps.w; ++ox)
     {
 	const Maps::Tiles & tile = world.GetTiles(rectMaps.x + ox, rectMaps.y + oy);
 
-	switch(tile.GetObject())
+	if(tile.GetObject() == MP2::OBJ_HEROES && (flag & LEVEL_HEROES))
 	{
-    	    // heroes
-    	    case MP2::OBJ_HEROES:
-	    {
-		const Heroes *hero = world.GetHeroes(tile.GetIndex());
-		if(hero) hero->Redraw(dst, rectArea.x + TILEWIDTH * ox, rectArea.y + TILEWIDTH * oy, *this, true);
-		break;
-	    }
-
-    	    default: break;
+	    const Heroes *hero = world.GetHeroes(tile.GetIndex());
+	    if(hero) hero->Redraw(dst, rectArea.x + TILEWIDTH * ox, rectArea.y + TILEWIDTH * oy, *this, true);
 	}
     }
 
     // route
     const Game::Focus & focus = Game::Focus::Get();
 
-    if((flag & REDRAW_OBJECTS) &&
+    if((flag & LEVEL_HEROES) &&
 	Game::Focus::HEROES == focus.Type() &&
 	focus.GetHeroes().GetPath().isShow())
     {
@@ -202,7 +197,7 @@ void Interface::GameArea::Redraw(Surface & dst, u8 flag) const
     }
 
     // redraw grid
-    if((flag & REDRAW_ALL) && Settings::Get().Debug())
+    if((flag & LEVEL_ALL) && Settings::Get().Debug())
     {
 
 	for(u8 oy = 0; oy < rectMaps.h; ++oy)
@@ -215,7 +210,7 @@ void Interface::GameArea::Redraw(Surface & dst, u8 flag) const
     }
 
     // redraw fog
-    if(flag & REDRAW_FOGS)
+    if(flag & LEVEL_FOG)
 	for(u8 oy = 0; oy < rectMaps.h; ++oy)
 	    for(u8 ox = 0; ox < rectMaps.w; ++ox)
     {
@@ -596,7 +591,7 @@ void Interface::GameArea::GenerateUltimateArtifactAreaSurface(const u16 index, S
 	Point pt(index % world.w(), index / world.h());
 
         gamearea.Center(pt);
-	gamearea.Redraw(sf, REDRAW_TOP | REDRAW_BOTTOM);
+	gamearea.Redraw(sf, LEVEL_BOTTOM | LEVEL_TOP);
 
 	// blit marker
 	for(u8 ii = 0; ii < rectMaps.h; ++ii) if(index < Maps::GetIndexFromAbsPoint(rectMaps.x + rectMaps.w - 1, rectMaps.y + ii))
@@ -700,7 +695,6 @@ void Interface::GameArea::QueueEventProcessing(void)
 	cursor.SetThemes(Game::GetCursor(tile));
 	oldIndexPos = index;
 	updateCursor = false;
-	Interface::Basic::Get().SetRedraw(REDRAW_CURSOR);
     }
 
     if(le.MouseClickLeft(tile_pos) && Cursor::POINTER != cursor.Themes())

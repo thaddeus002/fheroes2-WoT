@@ -40,6 +40,7 @@
 #include "game_focus.h"
 #include "kingdom.h"
 #include "network.h"
+#include "localclient.h"
 
 extern u16 DialogWithArtifact(const std::string & hdr, const std::string & msg, const Artifact::artifact_t art, const u16 buttons = Dialog::OK);
 
@@ -50,11 +51,12 @@ namespace Game
     void OpenHeroes(Heroes *heroes);
     void ShowPathOrStartMoveHero(Heroes *hero, const u16 dst_index);
     menu_t HumanTurn(void);
-    menu_t NetworkTurn(Kingdom &);
+#ifdef WITH_NET
+    menu_t NetworkTurn(void);
+#endif
     bool DiggingForArtifacts(const Heroes & hero);
     void DialogPlayers(const Color::color_t, const std::string &);
     void MoveHeroFromArrowKeys(Heroes & hero, Direction::vector_t direct);
-    bool CheckGameOver(Game::menu_t &);
 
     void MouseCursorAreaClickLeft(u16);
     void FocusHeroesClickLeftAction(Heroes &, u16);
@@ -95,41 +97,6 @@ namespace Game
     void ShowEventDay(void);
     void ShowWarningLostTowns(menu_t &);
 };
-
-bool Game::CheckGameOver(Game::menu_t & res)
-{
-    Settings & conf = Settings::Get();
-
-    for(Color::color_t c = Color::BLUE; c != Color::GRAY; ++c)
-        if(!world.GetKingdom(c).isPlay() && (c & conf.CurrentKingdomColors()))
-    {
-	std::string message(_("%{color} has been vanquished!"));
-	String::Replace(message, "%{color}", Color::String(c));
-	DialogPlayers(c, message);
-	conf.SetCurrentKingdomColors(conf.CurrentKingdomColors() & ~c);
-    }
-
-    u16 cond = GameOver::COND_NONE;
-    const Kingdom & myKingdom = world.GetMyKingdom();
-
-    if(GameOver::COND_NONE != (cond = world.CheckKingdomLoss(myKingdom)))
-    {
-	conf.SetGameOverResult(cond);
-	GameOver::DialogLoss(cond);
-	res = MAINMENU;
-	return true;
-    }
-    else
-    if(GameOver::COND_NONE != (cond = world.CheckKingdomWins(myKingdom)))
-    {
-	conf.SetGameOverResult(cond);
-    	GameOver::DialogWins(cond);
-	res = HIGHSCORES;
-	return true;
-    }
-
-    return false;
-}
 
 void Game::MoveHeroFromArrowKeys(Heroes & hero, Direction::vector_t direct)
 {
@@ -182,8 +149,7 @@ Game::menu_t Game::StartGame(void)
     Settings & conf = Settings::Get();
     Display & display = Display::Get();
 
-    conf.SetGameOverResult(GameOver::COND_NONE);
-    conf.SetCurrentKingdomColors(conf.KingdomColors());
+    GameOver::Result::Get().Reset();
 
     cursor.Hide();
 
@@ -211,30 +177,6 @@ Game::menu_t Game::StartGame(void)
     Game::PreloadLOOPSounds();
     Mixer::Reset();
 
-    // set controls type for players
-    switch(conf.GameType())
-    {
-    	case Game::HOTSEAT:
-	    for(Color::color_t color = Color::BLUE; color != Color::GRAY; ++color) if(color & conf.PlayersColors())
-        	world.GetKingdom(color).SetControl(LOCAL);
-    	    break;
-
-    	case Game::NETWORK:
-	    conf.ResetModes(Settings::LOADGAME);
-	    for(Color::color_t color = Color::BLUE; color != Color::GRAY; ++color) if(color & conf.PlayersColors())
-        	world.GetKingdom(color).SetControl(color == conf.MyColor() ? LOCAL : REMOTE);
-    	    break;
-
-    	default:
-    	    world.GetKingdom(conf.MyColor()).SetControl(LOCAL);
-    	    break;
-    }
-
-    // update starting resource
-    if(!conf.Modes(Settings::LOADGAME))
-	for(Color::color_t color = Color::BLUE; color != Color::GRAY; ++color) if(color & conf.PlayersColors())
-    	    world.GetKingdom(color).UpdateStartingResource();
-
     // draw interface
     Interface::Basic & I = Interface::Basic::Get();
 
@@ -253,40 +195,45 @@ Game::menu_t Game::StartGame(void)
     radar.Build();
 
     I.Redraw(REDRAW_ICONS | REDRAW_BUTTONS | REDRAW_BORDER);
+    castleBar.Hide();
+    heroesBar.Hide();
+
+    cursor.Show();
+    display.Flip();
+
+    if(NETWORK == conf.GameType()) return NetworkTurn();
 
     Game::menu_t m = ENDTURN;
 
     while(m == ENDTURN)
     {
-	// world new day (skip if load game)
-	if(! conf.Modes(Settings::LOADGAME)) world.NewDay();
+	if(!conf.Modes(Settings::LOADGAME))
+	world.NewDay();
 
 	for(Color::color_t color = Color::BLUE; color != Color::GRAY; ++color)
 	{
-	    // skip other player if loadgame
-	    if(conf.Modes(Settings::LOADGAME) && color != conf.MyColor()) continue;
-
 	    Kingdom & kingdom = world.GetKingdom(color);
-	    if(kingdom.isPlay())
+
+	    if(!kingdom.isPlay() ||
+	    (conf.Modes(Settings::LOADGAME) && color != conf.MyColor())) continue;
+
+	    if(1 < conf.Debug()) kingdom.Dump();
+
+	    radar.HideArea();
+	    conf.SetCurrentColor(color);
+	    world.ClearFog(color);
+    	    Mixer::PauseLoops();
+
+	    switch(kingdom.Control())
 	    {
-		if(1 < conf.Debug()) kingdom.Dump();
-
-		radar.HideArea();
-		conf.SetCurrentColor(color);
-		world.ClearFog(color);
-                Mixer::PauseLoops();
-
-		switch(kingdom.Control())
-		{
-	        case LOCAL:
-		    //Mixer::Enhance();
-		    //Mixer::Reset();
+		case LOCAL:
 		    if(Game::HOTSEAT == conf.GameType())
 		    {
+			cursor.Hide();
 			conf.SetMyColor(Color::GRAY);
 			castleBar.Hide();
 			heroesBar.Hide();
-			statusWin.SetState(STATUS_UNKNOWN);
+			statusWin.Reset();
 			I.SetRedraw(REDRAW_GAMEAREA | REDRAW_STATUS);
 			I.Redraw();
 			display.Flip();
@@ -295,27 +242,24 @@ Game::menu_t Game::StartGame(void)
 			DialogPlayers(color, str);
 		    }
 		    conf.SetMyColor(color);
-		    if(conf.Modes(Settings::LOADGAME)) conf.ResetModes(Settings::LOADGAME);
 		    m = HumanTurn();
-		    //Mixer::Reduce();
-		    break;
+		    if(conf.Modes(Settings::LOADGAME)) conf.ResetModes(Settings::LOADGAME);
+		break;
 
-	        case REMOTE:
-		    m = NetworkTurn(kingdom);
-		    break;
-
-	        case AI:
-            	    if(m == ENDTURN) kingdom.AITurns();
+		case AI:
+        	    if(m == ENDTURN) kingdom.AITurns();
 		    break;
 
 		default:
-		    Error::Verbose("Game::StartGame: unknown control, for player: " + Color::String(color));
+		    Error::Verbose("Game::StartGame: unknown control");
+		    m = QUITGAME;
 		    break;
-		}
 	    }
+
 	    if(m != ENDTURN) break;
 	}
-	DELAY(1);
+
+	DELAY(10);
     }
 
     return m == ENDTURN ? QUITGAME : m;
@@ -800,6 +744,7 @@ Game::menu_t Game::HumanTurn(void)
     const std::vector<Castle *> & myCastles = myKingdom.GetCastles();
     const std::vector<Heroes *> & myHeroes = myKingdom.GetHeroes();
 
+    GameOver::Result & gameResult = GameOver::Result::Get();
 
     bool autohide_status = conf.PocketPC();
 
@@ -829,7 +774,7 @@ Game::menu_t Game::HumanTurn(void)
     ShowEventDay();
 
     // check game over
-    CheckGameOver(res);
+    gameResult.CheckGameOver(res);
 
     // warning lost all town
     if(myCastles.empty()) ShowWarningLostTowns(res);
@@ -914,7 +859,6 @@ Game::menu_t Game::HumanTurn(void)
 	    if(Cursor::POINTER != cursor.Themes())
 	    {
 		cursor.SetThemes(Cursor::POINTER);
-		I.SetRedraw(REDRAW_CURSOR);
 	    }
 	    I.radar.QueueEventProcessing();
 	}
@@ -926,7 +870,6 @@ Game::menu_t Game::HumanTurn(void)
 	    if(Cursor::POINTER != cursor.Themes())
 	    {
 		cursor.SetThemes(Cursor::POINTER);
-		I.SetRedraw(REDRAW_CURSOR);
 	    }
 	    I.iconsPanel.QueueEventProcessing();
 	}
@@ -938,7 +881,6 @@ Game::menu_t Game::HumanTurn(void)
 	    if(Cursor::POINTER != cursor.Themes())
 	    {
 		cursor.SetThemes(Cursor::POINTER);
-		I.SetRedraw(REDRAW_CURSOR);
 	    }
 	    I.buttonsArea.QueueEventProcessing(res);
 	}
@@ -950,7 +892,6 @@ Game::menu_t Game::HumanTurn(void)
 	    if(Cursor::POINTER != cursor.Themes())
 	    {
 		cursor.SetThemes(Cursor::POINTER);
-		I.SetRedraw(REDRAW_CURSOR);
 	    }
 	    I.statusWindow.QueueEventProcessing();
 	}
@@ -962,7 +903,6 @@ Game::menu_t Game::HumanTurn(void)
 	    if(Cursor::POINTER != cursor.Themes())
 	    {
 		cursor.SetThemes(Cursor::POINTER);
-		I.SetRedraw(REDRAW_CURSOR);
 	    }
 	    I.controlPanel.QueueEventProcessing(res);
 	}
@@ -986,7 +926,7 @@ Game::menu_t Game::HumanTurn(void)
     		if(Game::Focus::HEROES == global_focus.Type() && global_focus.GetHeroes().isEnableMove())
     		    global_focus.GetHeroes().SetMove(false);
 
-		I.SetRedraw(REDRAW_GAMEAREA | REDRAW_RADAR | REDRAW_CURSOR);
+		I.SetRedraw(REDRAW_GAMEAREA | REDRAW_RADAR);
             }
 	    else
     	    if(Game::Focus::HEROES == global_focus.Type())
@@ -1001,7 +941,6 @@ Game::menu_t Game::HumanTurn(void)
             		global_focus.SetRedraw();
 
             		I.gameArea.SetUpdateCursor();
-			I.SetRedraw(REDRAW_CURSOR);
 		    }
 		    else
 		    {
@@ -1011,14 +950,16 @@ Game::menu_t Game::HumanTurn(void)
 		    if(hero.isAction())
 		    {
 			// check game over
-			CheckGameOver(res);
+			gameResult.CheckGameOver(res);
 			hero.ResetAction();
 		    }
 		}
 		else
+		{
 		    hero.SetMove(false);
-	    }
-        }
+		}
+    	    }
+	}
 
 	if(Game::ShouldAnimateInfrequent(ticket, 20))
 	{
@@ -1030,6 +971,12 @@ Game::menu_t Game::HumanTurn(void)
 	{
     	    cursor.Hide();
     	    I.Redraw();
+    	    cursor.Show();
+    	    display.Flip();
+	}
+	else
+	if(!cursor.isVisible())
+	{
     	    cursor.Show();
     	    display.Flip();
 	}
@@ -1074,13 +1021,6 @@ Game::menu_t Game::HumanTurn(void)
     	    display.Flip();
 	}
     }
-    else
-    if(QUITGAME == res)
-    {
-#ifdef WITH_NET
-        if(Game::NETWORK == conf.GameType()) Network::Logout();
-#endif
-    }
 
     // reset sound
     //Mixer::Reset();
@@ -1124,20 +1064,75 @@ bool Game::DiggingForArtifacts(const Heroes & hero)
     return false;
 }
 
-Game::menu_t Game::NetworkTurn(Kingdom & kingdom)
+extern void RedrawAITurns(u8, u8);
+
+#ifdef WITH_NET
+Game::menu_t Game::NetworkTurn(void)
 {
-    Error::Verbose("Game::NetworkGame: player: " + Color::String(kingdom.GetColor()));
 
-    Display & display = Display::Get();
+    Settings & conf = Settings::Get();
     Cursor & cursor = Cursor::Get();
+    Display & display = Display::Get();
+    Interface::StatusWindow & statusWindow = Interface::StatusWindow::Get();
+    FH2LocalClient & client = FH2LocalClient::Get();
 
+    bool extdebug = 2 < conf.Debug();
+
+    cursor.Hide();
+    cursor.SetThemes(Cursor::WAIT);
     cursor.Show();
     display.Flip();
 
-    cursor.Hide();
 
-    return ENDTURN;
+    Network::Message packet;
+    u32 ticket = 0;
+
+    while(LocalEvent::Get().HandleEvents())
+    {
+	if(client.Ready())
+        {
+            if(extdebug) std::cerr << "Game::NetworkTurn: recv: ";
+	    if(!client.Recv(packet, extdebug))
+	    {
+		Dialog::Message("Error", "Game::NetworkTurn: recv: error", Font::BIG, Dialog::OK);
+		return MAINMENU;
+            }
+	    if(extdebug) std::cerr << Network::GetMsgString(packet.GetID()) << std::endl;
+
+            switch(packet.GetID())
+            {
+		case MSG_TURNS:
+		{
+		    u8  color, percent;
+		    packet.Pop(color);
+		    packet.Pop(percent);
+
+		    Error::Verbose("Game::NetworkGame: player: " + Color::String(color));
+
+		    if(conf.MyColor() == color) HumanTurn();
+		    else
+		    {
+			statusWindow.Reset();
+			statusWindow.SetState(STATUS_AITURN);
+			RedrawAITurns(color, percent);
+		    }
+		}
+		break;
+
+		default: break;
+	    }
+	}
+	else
+	    DELAY(1);
+
+        ++ticket;
+    }
+
+    Network::Logout();
+
+    return QUITGAME;
 }
+#endif
 
 void Game::MouseCursorAreaClickLeft(u16 index_maps)
 {
@@ -1482,7 +1477,7 @@ void Game::KeyPress_d(menu_t & ret)
     {
 	DiggingForArtifacts(global_focus.GetHeroes());
 	// check game over for ultimate artifact
-	CheckGameOver(ret);
+	GameOver::Result::Get().CheckGameOver(ret);
     }
 }
 
@@ -1607,7 +1602,7 @@ void Game::ShowWarningLostTowns(menu_t & ret)
 	    std::string str = _("%{color} player, your heroes abandon you, and you are banished from this land.");
 	    String::Replace(str, "%{color}", Color::String(conf.MyColor()));
 	    DialogPlayers(conf.MyColor(), str);
-	    conf.SetGameOverResult(GameOver::LOSS_ALL);
+	    GameOver::Result::Get().SetResult(GameOver::LOSS_ALL);
 	    ret = MAINMENU;
     }
     else

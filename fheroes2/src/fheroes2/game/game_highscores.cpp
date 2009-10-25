@@ -277,8 +277,9 @@ Game::menu_t Game::HighScores(void)
 
     const u16 rating = GetGameOverScores();
     const u16 days = world.CountDay();
+    GameOver::Result & gameResult = GameOver::Result::Get();
 
-    if(rating && (conf.GameOverResult() & GameOver::WINS))
+    if(rating && (gameResult.GetResult() & GameOver::WINS))
     {
 	std::string player;
 	Dialog::InputString("Your Name", player);
@@ -291,7 +292,7 @@ Game::menu_t Game::HighScores(void)
 	buttonExit.Draw();
 	cursor.Show();
 	display.Flip();
-	conf.SetGameOverResult(GameOver::COND_NONE);
+	gameResult.Reset();
     }
 
     // highscores loop

@@ -22,6 +22,7 @@
 #define H2GAMEOVER_H
 
 #include <string>
+#include "game.h"
 
 namespace GameOver
 {
@@ -48,6 +49,23 @@ namespace GameOver
 
     void DialogWins(u16);
     void DialogLoss(u16);
+
+    class Result
+    {
+    public:
+	static Result & Get(void);
+
+	void Reset(void);
+	void SetResult(u16);
+	u16  GetResult(void) const;
+	bool CheckGameOver(Game::menu_t &);
+
+    private:
+	Result();
+
+	u8  colors;
+	u16 result;
+    };
 };
 
 #endif

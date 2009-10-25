@@ -854,9 +854,10 @@ bool Game::IO::LoadBIN(QueueMessage & msg)
     {
 	msg.Pop(byte8);
 	const Color::color_t color = Color::Get(byte8);
-	msg.Pop(byte8);
+	Kingdom* kingdom = new Kingdom(color);
 
-	Kingdom* kingdom = new Kingdom(color, Game::GetControl(byte8));
+	msg.Pop(byte8);
+	kingdom->control = Game::GetControl(byte8);
 
 	msg.Pop(kingdom->flags);
 	msg.Pop(kingdom->lost_town_days);
