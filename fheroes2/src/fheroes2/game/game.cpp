@@ -193,27 +193,27 @@ void Game::PreloadLOOPSounds(void)
 {
     if(! Settings::Get().Sound()) return;
 
-    Mixer::LoadRAW(AGG::Cache::Get().GetWAV(M82::LOOP0000), true, 0);
-    Mixer::LoadRAW(AGG::Cache::Get().GetWAV(M82::LOOP0001), true, 1);
-    Mixer::LoadRAW(AGG::Cache::Get().GetWAV(M82::LOOP0002), true, 2);
-    Mixer::LoadRAW(AGG::Cache::Get().GetWAV(M82::LOOP0003), true, 3);
-    Mixer::LoadRAW(AGG::Cache::Get().GetWAV(M82::LOOP0004), true, 4);
-    Mixer::LoadRAW(AGG::Cache::Get().GetWAV(M82::LOOP0006), true, 5);
-    Mixer::LoadRAW(AGG::Cache::Get().GetWAV(M82::LOOP0007), true, 6);
-    Mixer::LoadRAW(AGG::Cache::Get().GetWAV(M82::LOOP0009), true, 7);
-    Mixer::LoadRAW(AGG::Cache::Get().GetWAV(M82::LOOP0010), true, 8);
-    Mixer::LoadRAW(AGG::Cache::Get().GetWAV(M82::LOOP0011), true, 9);
-    Mixer::LoadRAW(AGG::Cache::Get().GetWAV(M82::LOOP0012), true, 10);
-    Mixer::LoadRAW(AGG::Cache::Get().GetWAV(M82::LOOP0013), true, 11);
-    Mixer::LoadRAW(AGG::Cache::Get().GetWAV(M82::LOOP0015), true, 12);
-    Mixer::LoadRAW(AGG::Cache::Get().GetWAV(M82::LOOP0016), true, 13);
-    Mixer::LoadRAW(AGG::Cache::Get().GetWAV(M82::LOOP0017), true, 14);
-    Mixer::LoadRAW(AGG::Cache::Get().GetWAV(M82::LOOP0018), true, 15);
-    Mixer::LoadRAW(AGG::Cache::Get().GetWAV(M82::LOOP0021), true, 16);
-    Mixer::LoadRAW(AGG::Cache::Get().GetWAV(M82::LOOP0022), true, 17);
-    Mixer::LoadRAW(AGG::Cache::Get().GetWAV(M82::LOOP0024), true, 18);
-    Mixer::LoadRAW(AGG::Cache::Get().GetWAV(M82::LOOP0025), true, 19);
-    Mixer::LoadRAW(AGG::Cache::Get().GetWAV(M82::LOOP0027), true, 20);
+    AGG::LoadLoopSound(M82::LOOP0000, 0);
+    AGG::LoadLoopSound(M82::LOOP0001, 1);
+    AGG::LoadLoopSound(M82::LOOP0002, 2);
+    AGG::LoadLoopSound(M82::LOOP0003, 3);
+    AGG::LoadLoopSound(M82::LOOP0004, 4);
+    AGG::LoadLoopSound(M82::LOOP0006, 5);
+    AGG::LoadLoopSound(M82::LOOP0007, 6);
+    AGG::LoadLoopSound(M82::LOOP0009, 7);
+    AGG::LoadLoopSound(M82::LOOP0010, 8);
+    AGG::LoadLoopSound(M82::LOOP0011, 9);
+    AGG::LoadLoopSound(M82::LOOP0012, 10);
+    AGG::LoadLoopSound(M82::LOOP0013, 11);
+    AGG::LoadLoopSound(M82::LOOP0015, 12);
+    AGG::LoadLoopSound(M82::LOOP0016, 13);
+    AGG::LoadLoopSound(M82::LOOP0017, 14);
+    AGG::LoadLoopSound(M82::LOOP0018, 15);
+    AGG::LoadLoopSound(M82::LOOP0021, 16);
+    AGG::LoadLoopSound(M82::LOOP0022, 17);
+    AGG::LoadLoopSound(M82::LOOP0024, 18);
+    AGG::LoadLoopSound(M82::LOOP0025, 19);
+    AGG::LoadLoopSound(M82::LOOP0027, 20);
 
     if(Settings::Get().Debug()) Error::Verbose("Game::PreloadLOOPSoundToMixer: done.");
 }

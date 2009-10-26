@@ -206,6 +206,29 @@ bool Mixer::isValid(void)
     return valid;
 }
 
+void Mixer::PlayRAW(const char* file, int ch)
+{
+    if(! valid) return;
+
+    if(ch == -1)
+        ch = Mix_GroupAvailable(0);
+    HaltChannel(ch, true);
+
+    if(file)
+    {
+        Mix_Chunk* chunk = Mix_LoadWAV(file);
+
+        if(chunks[ch] != NULL)
+            Error::Warning("Mixer::PlayRAW: Previous mix chunk was not freed");
+        chunks[ch] = chunk;
+
+        if(chunk)
+            Mix_PlayChannel(ch, chunk, 0);
+        else
+            Error::Warning(Mix_GetError());
+    }
+}
+
 void Mixer::PlayRAW(const std::vector<u8> & body, int ch)
 {
     if(! valid) return;
@@ -226,6 +249,35 @@ void Mixer::PlayRAW(const std::vector<u8> & body, int ch)
             Mix_PlayChannel(ch, chunk, 0);
         else
             Error::Warning(Mix_GetError());
+    }
+}
+
+void Mixer::LoadRAW(const char* file, bool loop, const u8 ch)
+{
+    if(! valid) return;
+
+    if(CHANNEL_RESERVED <= ch)
+    {
+        Error::Verbose("Mixer::LoadRAW: need reserved channel: ", ch);
+        return;
+    }
+
+    HaltChannel(ch, true);
+
+    if(file)
+    {
+        Mix_Chunk *chunk = Mix_LoadWAV(file);
+
+        if(chunks[ch] != NULL)
+            Error::Warning("Mixer::LoadRAW: Previous mix chunk was not freed");
+        chunks[ch] = chunk;
+
+        if(chunk)
+        {
+            Mix_PlayChannel(ch, chunk, loop ? -1 : 0);
+            Mix_Pause(ch);
+        }
+        else Error::Warning(Mix_GetError());
     }
 }
 

@@ -38,6 +38,11 @@ namespace Mixer
     void	LoadRAW(const std::vector<u8> & body, bool loop, const u8 ch);
     u8		CountChannelReserved(void);
 
+#ifdef WITH_MIXER
+    void	PlayRAW(const char* file, int ch = -1);
+    void	LoadRAW(const char* file, bool loop, const u8 ch);
+#endif
+
     void	Reduce(void);
     void	Enhance(void);
 }
