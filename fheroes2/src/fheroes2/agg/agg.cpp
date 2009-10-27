@@ -412,7 +412,7 @@ bool AGG::Cache::LoadAltICN(icn_cache_t & v, const std::string & spec, const u16
     return false;
 }
 
-void AGG::Cache::LoadOrgICN(Surface & sf, const ICN::icn_t icn, const u16 index, bool reflect)
+void AGG::Cache::LoadOrgICN(Sprite & sp, const ICN::icn_t icn, const u16 index, bool reflect)
 {
     std::vector<char> body;
 
@@ -431,9 +431,10 @@ void AGG::Cache::LoadOrgICN(Surface & sf, const ICN::icn_t icn, const u16 index,
 				    // total size
 				    ReadLE32(reinterpret_cast<const u8*>(&body[2])) - header1.OffsetData());
 
-	sf.Set(header1.Width(), header1.Height(), ICN::RequiresAlpha(icn));
-	sf.SetColorKey();
-	Sprite::DrawICN(sf, &body[6 + header1.OffsetData()], size_data, reflect);
+	sp.Set(header1.Width(), header1.Height(), ICN::RequiresAlpha(icn));
+	sp.SetOffset(header1.OffsetX(), header1.OffsetY());
+	sp.SetColorKey();
+	Sprite::DrawICN(sp, &body[6 + header1.OffsetData()], size_data, reflect);
     }
     else
 	Error::Except("AGG::Cache::LoadOrgICN: ReadChunk: ", ICN::GetString(icn));
@@ -441,36 +442,20 @@ void AGG::Cache::LoadOrgICN(Surface & sf, const ICN::icn_t icn, const u16 index,
 
 void AGG::Cache::LoadOrgICN(icn_cache_t & v, const ICN::icn_t icn, const u16 index, bool reflect)
 {
-    std::vector<char> body;
-
-    if(ReadChunk(ICN::GetString(icn), body))
+    if(NULL == v.sprites)
     {
-	// loading original
-	if(1 < Settings::Get().Debug()) std::cout << "AGG::Cache::LoadOrgICN: " << ICN::GetString(icn) << ", " << index << std::endl;
+	std::vector<char> body;
+	ReadChunk(ICN::GetString(icn), body);
 
-	if(NULL == v.sprites)
-	{
-	    v.count = ReadLE16(reinterpret_cast<const u8*>(&body[0]));
-	    v.sprites = new Sprite [v.count];
-	    v.reflect = new Sprite [v.count];
-	}
-
-	ICN::Header header1, header2;
-
-	header1.Load(&body[6 + index * ICN::Header::SizeOf()]);
-	if(index + 1 != v.count) header2.Load(&body[6 + (index + 1) * ICN::Header::SizeOf()]);
-
-	const u32 size_data = (index + 1 != v.count ? header2.OffsetData() - header1.OffsetData() :
-				    // total size
-				    ReadLE32(reinterpret_cast<const u8*>(&body[2])) - header1.OffsetData());
-
-	Sprite & sp = reflect ? v.reflect[index] : v.sprites[index];
-	sp.Set(header1.Width(), header1.Height(), ICN::RequiresAlpha(icn));
-	sp.SetOffset(header1.OffsetX(), header1.OffsetY());
-	sp.LoadICN(&body[6 + header1.OffsetData()], size_data, reflect);
+	v.count = ReadLE16(reinterpret_cast<const u8*>(&body[0]));
+	v.sprites = new Sprite [v.count];
+	v.reflect = new Sprite [v.count];
     }
-    else
-	Error::Except("AGG::Cache::LoadOrgICN: ReadChunk: ", ICN::GetString(icn));
+
+    Sprite & sp = reflect ? v.reflect[index] : v.sprites[index];
+
+    LoadOrgICN(sp, icn, index, reflect);
+    sp.SetDisplayFormat();
 }
 
 /* load ICN object to AGG::Cache */

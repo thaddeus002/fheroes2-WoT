@@ -28,7 +28,7 @@ public:
     Sprite();
 
     void SetOffset(s16, s16);
-    void LoadICN(const char *, size_t, bool);
+    //void LoadICN(const char *, size_t, bool);
 
     s16 x(void) const{ return offsetX; };
     s16 y(void) const{ return offsetY; };

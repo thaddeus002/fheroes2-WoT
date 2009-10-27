@@ -31,12 +31,14 @@ void Sprite::SetOffset(s16 ox, s16 oy)
     offsetY = oy;
 }
 
+/*
 void Sprite::LoadICN(const char *buf, size_t size, bool reflect)
 {
     SetColorKey();
     DrawICN(*this, buf, size, reflect);
     SetDisplayFormat();
 }
+*/
 
 void Sprite::DrawICN(Surface & sf, const char *buf, const u32 size, bool reflect)
 {

@@ -125,10 +125,13 @@ bool Game::LoadSAV2FileInfo(const std::string & fn,  Maps::FileInfo & maps_file)
     if(byte16 != 0xFF01) return false;
     // format version
     msg.Pop(byte16);
-    // major version
-    msg.Pop(byte8);
-    // minor version
-    msg.Pop(byte8);
+    if(byte16 > 0x50C)
+    {
+	// major version
+	msg.Pop(byte8);
+	// minor version
+	msg.Pop(byte8);
+    }
     // svn
     msg.Pop(str);
     // time
