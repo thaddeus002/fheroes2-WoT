@@ -252,21 +252,10 @@ bool AGG::Cache::ReadChunk(const std::string & key, std::vector<char> & body)
 }
 
 /* load manual ICN object */
-void AGG::Cache::LoadExtraICN(const ICN::icn_t icn, u16 index, bool reflect)
+void AGG::Cache::LoadExtICN(icn_cache_t & v, const ICN::icn_t icn, const u16 index, bool reflect)
 {
-    icn_cache_t & v = icn_cache[icn];
-
-    if(reflect)
-    {
-	if(v.reflect && (index >= v.count || v.reflect[index].valid())) return;
-    }
-    else
-    {
-	if(v.sprites && (index >= v.count || v.sprites[index].valid())) return;
-    }
-
     const Settings & conf = Settings::Get();
-    if(1 < conf.Debug()) std::cout << "AGG::Cache::LoadICN: " << ICN::GetString(icn) << ", " << index << std::endl;
+    if(1 < conf.Debug()) std::cout << "AGG::Cache::LoadExtICN: " << ICN::GetString(icn) << ", " << index << std::endl;
 
     u8 count = 0;		// for animation sprite need update count for ICN::AnimationFrame
 
@@ -298,22 +287,22 @@ void AGG::Cache::LoadExtraICN(const ICN::icn_t icn, u16 index, bool reflect)
 	switch(icn)
 	{
 	    case ICN::TELEPORT1:
-		sprite = GetICN(ICN::OBJNMUL2, 116);
+		LoadOrgICN(sprite, ICN::OBJNMUL2, 116, false);
 		sprite.ChangeColorIndex(0xEE, 0xEE + ii / 2);
 		break;
 
 	    case ICN::TELEPORT2:
-		sprite = GetICN(ICN::OBJNMUL2, 119);
+		LoadOrgICN(sprite, ICN::OBJNMUL2, 119, false);
 		sprite.ChangeColorIndex(0xEE, 0xEE + ii);
 		break;
 
 	    case ICN::TELEPORT3:
-		sprite = GetICN(ICN::OBJNMUL2, 122);
+		LoadOrgICN(sprite, ICN::OBJNMUL2, 122, false);
 		sprite.ChangeColorIndex(0xEE, 0xEE + ii);
 		break;
 
 	    case ICN::FOUNTAIN:
-		sprite = GetICN(ICN::OBJNMUL2, 15);
+		LoadOrgICN(sprite, ICN::OBJNMUL2, 15, false);
 		sprite.ChangeColorIndex(0xE8, 0xE8 - ii);
 		sprite.ChangeColorIndex(0xE9, 0xE9 - ii);
 		sprite.ChangeColorIndex(0xEA, 0xEA - ii);
@@ -325,21 +314,21 @@ void AGG::Cache::LoadExtraICN(const ICN::icn_t icn, u16 index, bool reflect)
 		break;
 
 	    case ICN::TREASURE:
-		sprite = GetICN(ICN::OBJNRSRC, 19);
+		LoadOrgICN(sprite, ICN::OBJNRSRC, 19, false);
 		sprite.ChangeColorIndex(0x0A, ii ? 0x00 : 0x0A);
 		sprite.ChangeColorIndex(0xC2, ii ? 0xD6 : 0xC2);
 		sprite.ChangeColorIndex(0x64, ii ? 0xDA : 0x64);
 		break;
 
 	    case ICN::ROUTERED:
-		sprite = GetICN(ICN::ROUTE, ii);
+		LoadOrgICN(sprite, ICN::ROUTE, ii, false);
 		sprite.ChangeColorIndex(0x55, 0xB0);
 		sprite.ChangeColorIndex(0x5C, 0xB7);
 		sprite.ChangeColorIndex(0x60, 0xBB);
 		break;
 
 	    case ICN::YELLOW_FONT:
-		sprite = GetICN(ICN::FONT, ii);
+		LoadOrgICN(sprite, ICN::FONT, ii, false);
 		sprite.ChangeColorIndex(0x0A, 0xDA);
 		sprite.ChangeColorIndex(0x0B, 0xDA);
 		sprite.ChangeColorIndex(0x0C, 0xDA);
@@ -354,7 +343,7 @@ void AGG::Cache::LoadExtraICN(const ICN::icn_t icn, u16 index, bool reflect)
 		break;
 
 	    case ICN::YELLOW_SMALFONT:
-		sprite = GetICN(ICN::SMALFONT, ii);
+		LoadOrgICN(sprite, ICN::SMALFONT, ii, false);
 		sprite.ChangeColorIndex(0x0A, 0xDA);
 		sprite.ChangeColorIndex(0x0B, 0xDA);
 		sprite.ChangeColorIndex(0x0C, 0xDA);
@@ -373,85 +362,92 @@ void AGG::Cache::LoadExtraICN(const ICN::icn_t icn, u16 index, bool reflect)
     }
 }
 
-/* load ICN object to AGG::Cache */
-void AGG::Cache::LoadICN(const ICN::icn_t icn, u16 index, bool reflect)
+bool AGG::Cache::LoadAltICN(icn_cache_t & v, const std::string & spec, const u16 index, bool reflect)
 {
-    icn_cache_t & v = icn_cache[icn];
-
-    if(reflect)
-    {
-	if(v.reflect && (index >= v.count || v.reflect[index].valid())) return;
-    }
-    else
-    {
-	if(v.sprites && (index >= v.count || v.sprites[index].valid())) return;
-    }
-
-    const Settings & conf = Settings::Get();
-
 #ifdef WITH_XML
-    // load from image cache dir
-    if(conf.Modes(Settings::ALTRESOURCE))
+    // parse spec.xml
+    TiXmlDocument doc;
+    TiXmlElement* xml_icn = NULL;
+
+    if(doc.LoadFile(spec.c_str()) &&
+	NULL != (xml_icn = doc.FirstChildElement()) &&
+	0 == std::strcmp("icn", xml_icn->Value()))
     {
-	Dir dir;
-	std::string name(ICN::GetString(icn));
-	String::Lower(name);
-	const std::string icn_folder(conf.LocalPrefix() + SEPARATOR + "files" + SEPARATOR + "images" + SEPARATOR + name);
-	const std::string xml_spec(icn_folder + SEPARATOR + "spec.xml");
+	int count, ox, oy;
+	xml_icn->Attribute("count", &count);
 
-	if(3 < conf.Debug()) Error::Verbose("AGG::Cache::LoadICN: " + icn_folder);
-
-	// parse spec.xml
-	TiXmlDocument doc;
-	TiXmlElement* xml_icn = NULL;
-
-	if(doc.LoadFile(xml_spec.c_str()) &&
-	    NULL != (xml_icn = doc.FirstChildElement()) &&
-	    0 == std::strcmp("icn", xml_icn->Value()))
+	if(NULL == v.sprites)
 	{
-	    int count, ox, oy;
-	    xml_icn->Attribute("count", &count);
+	    v.count = count;
+	    v.sprites = new Sprite [v.count];
+	    v.reflect = new Sprite [v.count];
+	}
 
-	    if(NULL == v.sprites)
+	// find current image
+	TiXmlElement *xml_sprite = xml_icn->FirstChildElement();
+	u16 ii = 0;
+	for(; ii != index && xml_sprite; xml_sprite = xml_sprite->NextSiblingElement(), ++ii)
+	    if(std::strcmp("sprite", xml_sprite->Value())) --ii;
+
+	if(xml_sprite && ii == index)
+	{
+	    xml_sprite->Attribute("ox", &ox);
+	    xml_sprite->Attribute("oy", &oy);
+	    std::string name(spec);
+	    String::Replace(name, "spec.xml", xml_sprite->Attribute("name"));
+	    Sprite & sp = reflect ? v.reflect[index] : v.sprites[index];
+	    // good load
+	    if(sp.Load(name.c_str()) && sp.valid())
 	    {
-		v.count = count;
-		v.sprites = new Sprite [v.count];
-		v.reflect = new Sprite [v.count];
-	    }
+		sp.SetOffset(ox, oy);
+		if(1 < conf.Debug()) std::cout << "AGG::Cache::LoadAltICN: " << spec << ", " << index << std::endl;
 
-	    // find current image
-	    TiXmlElement *xml_sprite = xml_icn->FirstChildElement();
-	    u16 ii = 0;
-	    for(; ii != index && xml_sprite; xml_sprite = xml_sprite->NextSiblingElement(), ++ii)
-		if(std::strcmp("sprite", xml_sprite->Value())) --ii;
-
-	    if(xml_sprite && ii == index)
-	    {
-		xml_sprite->Attribute("ox", &ox);
-		xml_sprite->Attribute("oy", &oy);
-		name = icn_folder + SEPARATOR + xml_sprite->Attribute("name");
-		Sprite & sp = reflect ? v.reflect[index] : v.sprites[index];
-		// good load
-		if(sp.Load(name.c_str()) && sp.valid())
-		{
-		    sp.SetOffset(ox, oy);
-		    if(1 < conf.Debug()) std::cout << "AGG::Cache::LoadICN: " << xml_spec << ", " << index << std::endl;
-
-		    return;
-		}
+		return true;
 	    }
 	}
-	if(conf.Debug()) Error::Verbose("AGG::Cache::LoadICN: broken xml file: " + xml_spec);
+	if(conf.Debug()) Error::Warning("AGG::Cache::LoadAltICN: broken xml file: ", spec.c_str());
     }
 #endif
 
-    // loading original
-    if(1 < conf.Debug()) std::cout << "AGG::Cache::LoadICN: " << ICN::GetString(icn) << ", " << index << std::endl;
+    return false;
+}
 
+void AGG::Cache::LoadOrgICN(Surface & sf, const ICN::icn_t icn, const u16 index, bool reflect)
+{
     std::vector<char> body;
 
     if(ReadChunk(ICN::GetString(icn), body))
     {
+	// loading original
+	if(1 < Settings::Get().Debug()) std::cout << "AGG::Cache::LoadOrgICN: " << ICN::GetString(icn) << ", " << index << std::endl;
+
+	const u16 count = ReadLE16(reinterpret_cast<const u8*>(&body[0]));
+	ICN::Header header1, header2;
+
+	header1.Load(&body[6 + index * ICN::Header::SizeOf()]);
+	if(index + 1 != count) header2.Load(&body[6 + (index + 1) * ICN::Header::SizeOf()]);
+
+	const u32 size_data = (index + 1 != count ? header2.OffsetData() - header1.OffsetData() :
+				    // total size
+				    ReadLE32(reinterpret_cast<const u8*>(&body[2])) - header1.OffsetData());
+
+	sf.Set(header1.Width(), header1.Height(), ICN::RequiresAlpha(icn));
+	sf.SetColorKey();
+	Sprite::DrawICN(sf, &body[6 + header1.OffsetData()], size_data, reflect);
+    }
+    else
+	Error::Except("AGG::Cache::LoadOrgICN: ReadChunk: ", ICN::GetString(icn));
+}
+
+void AGG::Cache::LoadOrgICN(icn_cache_t & v, const ICN::icn_t icn, const u16 index, bool reflect)
+{
+    std::vector<char> body;
+
+    if(ReadChunk(ICN::GetString(icn), body))
+    {
+	// loading original
+	if(1 < Settings::Get().Debug()) std::cout << "AGG::Cache::LoadOrgICN: " << ICN::GetString(icn) << ", " << index << std::endl;
+
 	if(NULL == v.sprites)
 	{
 	    v.count = ReadLE16(reinterpret_cast<const u8*>(&body[0]));
@@ -472,9 +468,55 @@ void AGG::Cache::LoadICN(const ICN::icn_t icn, u16 index, bool reflect)
 	sp.Set(header1.Width(), header1.Height(), ICN::RequiresAlpha(icn));
 	sp.SetOffset(header1.OffsetX(), header1.OffsetY());
 	sp.LoadICN(&body[6 + header1.OffsetData()], size_data, reflect);
-	
-	if(Settings::Get().PocketPC() && ICN::NeedMinify4PocketPC(icn, index)) 
-	    sp.ScaleMinifyByTwo();
+    }
+    else
+	Error::Except("AGG::Cache::LoadOrgICN: ReadChunk: ", ICN::GetString(icn));
+}
+
+/* load ICN object to AGG::Cache */
+void AGG::Cache::LoadICN(const ICN::icn_t icn, u16 index, bool reflect)
+{
+    icn_cache_t & v = icn_cache[icn];
+
+    if(reflect)
+    {
+	if(v.reflect && (index >= v.count || v.reflect[index].valid())) return;
+    }
+    else
+    {
+	if(v.sprites && (index >= v.count || v.sprites[index].valid())) return;
+    }
+
+    const Settings & conf = Settings::Get();
+    bool skip_origin = false;
+
+    // load modify sprite
+    if(ICN::isModifiedSprite(icn))
+    {
+	LoadExtICN(v, icn, index, reflect);
+	skip_origin = true;
+    }
+    else
+    // load from images dir
+    if(conf.Modes(Settings::ALTRESOURCE))
+    {
+	Dir dir;
+	std::string name(ICN::GetString(icn));
+	String::Lower(name);
+	const std::string xml_spec(conf.LocalPrefix() + SEPARATOR + "files" + SEPARATOR + "images" + SEPARATOR + name + SEPARATOR + "spec.xml");
+
+	if(FilePresent(xml_spec) &&
+	    LoadAltICN(v, xml_spec, index, reflect)) skip_origin = true;
+    }
+
+    //load origin sprite
+    if(!skip_origin) LoadOrgICN(v, icn, index, reflect);
+
+    // pocketpc: scale sprites
+    if(Settings::Get().PocketPC() && ICN::NeedMinify4PocketPC(icn, index))
+    {
+	Sprite & sp = reflect ? v.reflect[index] : v.sprites[index];
+	sp.ScaleMinifyByTwo();
     }
 
     // registry icn
@@ -751,20 +793,7 @@ const Sprite & AGG::Cache::GetICN(const ICN::icn_t icn, u16 index, bool reflect)
 
     // need load?
     if(0 == v.count || ((reflect && !v.reflect[index].valid()) || !v.sprites[index].valid()))
-    {
-	switch(icn)
-	{
-	    case ICN::YELLOW_FONT:
-	    case ICN::YELLOW_SMALFONT:
-	    case ICN::ROUTERED:
-	    case ICN::TELEPORT1:
-	    case ICN::TELEPORT2:
-	    case ICN::TELEPORT3:
-	    case ICN::FOUNTAIN:
-	    case ICN::TREASURE:	LoadExtraICN(icn, index, reflect); break;
-	    default:		LoadICN(icn, index, reflect); break;
-	}
-    }
+	LoadICN(icn, index, reflect);
 
     // invalid sprite?
     if(Settings::Get().Debug() &&  ((reflect && !v.reflect[index].valid()) || (!reflect && !v.sprites[index].valid())))

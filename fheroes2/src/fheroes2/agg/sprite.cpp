@@ -35,7 +35,7 @@ void Sprite::LoadICN(const char *buf, size_t size, bool reflect)
 {
     SetColorKey();
     DrawICN(*this, buf, size, reflect);
-    //if(!skipformat) SetDisplayFormat();
+    SetDisplayFormat();
 }
 
 void Sprite::DrawICN(Surface & sf, const char *buf, const u32 size, bool reflect)

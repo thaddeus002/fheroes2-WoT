@@ -1755,3 +1755,22 @@ u8 ICN::GetMissIndex(icn_t icn, double dx, double dy)
 
     return 0;
 }
+
+bool ICN::isModifiedSprite(const ICN::icn_t icn)
+{
+    switch(icn)
+    {
+	case YELLOW_FONT:
+        case YELLOW_SMALFONT:
+        case ROUTERED:
+        case TELEPORT1:
+        case TELEPORT2:
+        case TELEPORT3:
+        case FOUNTAIN:
+        case TREASURE:
+	    return true;
+
+	default: break;
+    }
+    return false;
+}

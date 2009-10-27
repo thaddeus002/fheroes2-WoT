@@ -122,7 +122,10 @@ namespace AGG
 	void LoadFNT(u16);
 #endif
 
-	void LoadExtraICN(const ICN::icn_t icn, u16 index, bool reflect = false);
+	void LoadExtICN(icn_cache_t &, const ICN::icn_t, const u16, bool);
+	bool LoadAltICN(icn_cache_t &, const std::string &, const u16, bool);
+	void LoadOrgICN(Surface &, const ICN::icn_t, const u16, bool);
+	void LoadOrgICN(icn_cache_t &, const ICN::icn_t, const u16, bool);
 	void LoadICN(const ICN::icn_t icn, u16 index, bool reflect = false);
 	void LoadTIL(const TIL::til_t til);
 	void LoadWAV(const M82::m82_t m82);
