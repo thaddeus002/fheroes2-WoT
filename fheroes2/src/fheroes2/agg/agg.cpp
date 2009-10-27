@@ -1179,7 +1179,7 @@ void AGG::PlayMusic(const MUS::mus_t mus, bool loop)
 #else
 	    if(conf.PlayMusCommand().size())
 	    {
-		const std::string file = conf.LocalPrefix() + SEPARATOR + "files" + SEPARATOR + "cache" + SEPARATOR + XMI::GetString(xmi);
+		const std::string file = conf.LocalPrefix() + SEPARATOR + "files" + SEPARATOR + "music" + SEPARATOR + XMI::GetString(xmi);
 		if(!FilePresent(file))
 		    StoreMemToFile(AGG::Cache::Get().GetMID(xmi), file);
 		else
