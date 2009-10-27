@@ -1,8 +1,0 @@
-Load alternative png images.
-To do this you need to define the parameter "use cache" in the configuration file.
-The approximate structure:
-NAME.ICN/001.png
-NAME.ICN/002.png
-NAME.ICN/003.png
-
-For more detail see log file.

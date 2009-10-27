@@ -50,7 +50,8 @@ namespace
         { "battlemouseshadow", Settings::BATTLEMOUSESHADOW           },
         { "unicode",           Settings::USEUNICODE                  },
         { "autosave",          Settings::AUTOSAVE                    },
-        { "use cache",         Settings::USECACHE                    },
+        { "alt resource",      Settings::ALTRESOURCE                 },
+        { "alternative resource", Settings::ALTRESOURCE              },
         { "pocketpc",          Settings::POCKETPC                    },
         { "pocket pc",         Settings::POCKETPC                    },
         { "lowmemory",         Settings::LOWMEMORY                   },
@@ -229,7 +230,7 @@ void Settings::Dump(std::ostream & stream) const
     stream << "fade = " << (Modes(FADE) ? "on"  : "off") << std::endl;
     stream << "shadow = " << (Modes(SHADOW) ? "on"  : "off") << std::endl;
     stream << "original = " << (Modes(ORIGINAL) ? "on"  : "off") << std::endl;
-    stream << "use cache = " << (Modes(USECACHE) ? "on"  : "off") << std::endl;
+    stream << "alt resource = " << (Modes(ALTRESOURCE) ? "on"  : "off") << std::endl;
     stream << "debug = " << (debug ? "on"  : "off") << std::endl;
 
     stream << "battle grid = " << (Modes(BATTLEGRID) ? "on" : "off") << std::endl;

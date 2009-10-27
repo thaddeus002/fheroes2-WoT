@@ -391,10 +391,12 @@ void AGG::Cache::LoadICN(const ICN::icn_t icn, u16 index, bool reflect)
 
 #ifdef WITH_XML
     // load from image cache dir
-    if(conf.Modes(Settings::USECACHE))
+    if(conf.Modes(Settings::ALTRESOURCE))
     {
 	Dir dir;
-	const std::string icn_folder(conf.LocalPrefix() + SEPARATOR + "files" + SEPARATOR + "cache" + SEPARATOR + ICN::GetString(icn));
+	std::string name(ICN::GetString(icn));
+	String::Lower(name);
+	const std::string icn_folder(conf.LocalPrefix() + SEPARATOR + "files" + SEPARATOR + "images" + SEPARATOR + name);
 	const std::string xml_spec(icn_folder + SEPARATOR + "spec.xml");
 
 	if(3 < conf.Debug()) Error::Verbose("AGG::Cache::LoadICN: " + icn_folder);
@@ -427,10 +429,10 @@ void AGG::Cache::LoadICN(const ICN::icn_t icn, u16 index, bool reflect)
 	    {
 		xml_sprite->Attribute("ox", &ox);
 		xml_sprite->Attribute("oy", &oy);
-		const std::string sprite_file(icn_folder + SEPARATOR + xml_sprite->Attribute("name"));
+		name = icn_folder + SEPARATOR + xml_sprite->Attribute("name");
 		Sprite & sp = reflect ? v.reflect[index] : v.sprites[index];
 		// good load
-		if(sp.Load(sprite_file.c_str()) && sp.valid())
+		if(sp.Load(name.c_str()) && sp.valid())
 		{
 		    sp.SetOffset(ox, oy);
 		    if(1 < conf.Debug()) std::cout << "AGG::Cache::LoadICN: " << xml_spec << ", " << index << std::endl;
@@ -1074,16 +1076,19 @@ void AGG::LoadLoopSound(const M82::m82_t m82, u8 ch)
     if(conf.Sound())
     {
 #ifdef WITH_MIXER
-	std::string name(M82::GetString(m82));
-	String::Lower(name);
-	String::Replace(name, ".82m", ".ogg");
-	const std::string sound(Settings::Get().LocalPrefix() + SEPARATOR + "files" + SEPARATOR + "sound" + SEPARATOR + name);
-
-	if(FilePresent(sound))
+	if(conf.Modes(Settings::ALTRESOURCE))
 	{
-	    if(Settings::Get().Debug()) Error::Verbose("AGG::LoadRAW: ", sound.c_str());
-	    Mixer::LoadRAW(sound.c_str(), true, ch);
-	    return;
+	    std::string name(M82::GetString(m82));
+	    String::Lower(name);
+	    String::Replace(name, ".82m", ".ogg");
+	    const std::string sound(Settings::Get().LocalPrefix() + SEPARATOR + "files" + SEPARATOR + "sounds" + SEPARATOR + name);
+
+	    if(FilePresent(sound))
+	    {
+		if(conf.Debug()) Error::Verbose("AGG::LoadRAW: ", sound.c_str());
+		Mixer::LoadRAW(sound.c_str(), true, ch);
+		return;
+	    }
 	}
 #endif
 	if(conf.Debug()) Error::Verbose("AGG::LoadRAW: ", M82::GetString(m82));
@@ -1099,19 +1104,21 @@ void AGG::PlaySound(const M82::m82_t m82)
     if(conf.Sound())
     {
 #ifdef WITH_MIXER
-	std::string name(M82::GetString(m82));
-	String::Lower(name);
-	String::Replace(name, ".82m", ".ogg");
-	const std::string sound(Settings::Get().LocalPrefix() + SEPARATOR + "files" + SEPARATOR + "sound" + SEPARATOR + name);
-
-	if(FilePresent(sound))
+	if(conf.Modes(Settings::ALTRESOURCE))
 	{
-	    if(Settings::Get().Debug()) Error::Verbose("AGG::PlaySound: ", sound.c_str());
-	    Mixer::PlayRAW(sound.c_str());
-	    return;
+	    std::string name(M82::GetString(m82));
+	    String::Lower(name);
+	    String::Replace(name, ".82m", ".ogg");
+	    const std::string sound(Settings::Get().LocalPrefix() + SEPARATOR + "files" + SEPARATOR + "sounds" + SEPARATOR + name);
+
+	    if(FilePresent(sound))
+	    {
+		if(conf.Debug()) Error::Verbose("AGG::PlaySound: ", sound.c_str());
+		Mixer::PlayRAW(sound.c_str());
+		return;
+	    }
 	}
 #endif
-
 	if(conf.Debug()) Error::Verbose("AGG::PlaySound: ", M82::GetString(m82));
 	Mixer::PlayRAW(AGG::Cache::Get().GetWAV(m82));
     }
