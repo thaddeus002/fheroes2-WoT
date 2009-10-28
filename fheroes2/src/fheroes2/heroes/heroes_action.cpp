@@ -41,6 +41,11 @@
 #define PlaySoundFailure	PlayMusicReplacement(M82::H2MINE)
 #define PlaySoundVisited	PlayMusicReplacement(M82::RSBRYFZL)
 
+namespace Game
+{
+    void OpenCastle(Castle *);
+};
+
 void ActionToCastle(Heroes &hero, const u8 obj, const u16 dst_index);
 void ActionToHeroes(Heroes &hero, const u8 obj, const u16 dst_index);
 void ActionToMonster(Heroes &hero, const u8 obj, const u16 dst_index);
@@ -663,7 +668,7 @@ void ActionToCastle(Heroes &hero, const u8 obj, const u16 dst_index)
         Mixer::Reduce();
 
         if(Settings::Get().Original()) hero.AppendSpellsToBook(castle->GetMageGuild());
-        castle->OpenDialog();
+        Game::OpenCastle(castle);
 
         Mixer::Enhance();
     }
