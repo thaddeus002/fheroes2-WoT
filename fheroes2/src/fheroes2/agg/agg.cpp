@@ -455,7 +455,7 @@ void AGG::Cache::LoadOrgICN(icn_cache_t & v, const ICN::icn_t icn, const u16 ind
     Sprite & sp = reflect ? v.reflect[index] : v.sprites[index];
 
     LoadOrgICN(sp, icn, index, reflect);
-    sp.SetDisplayFormat();
+    if(8 != sp.depth()) sp.SetDisplayFormat();
 }
 
 /* load ICN object to AGG::Cache */

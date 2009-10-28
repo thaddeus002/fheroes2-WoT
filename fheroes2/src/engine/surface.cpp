@@ -19,6 +19,7 @@
  ***************************************************************************/
 
 #include <algorithm>
+#include <iostream>
 #include <cstring>
 #include "surface.h"
 #include "palette.h"
@@ -281,7 +282,11 @@ void Surface::CreateSurface(u16 sw, u16 sh, u8 dp, u32 fl)
 	    break;
     }
 
-    if(!surface) Error::Warning("Surface::CreateSurface: empty surface, error:", SDL_GetError());
+    if(!surface)
+    {
+	std::cout << "w: " << sw << ", h: " << sh << std::endl;
+	Error::Except("Surface::CreateSurface: empty surface, error:", SDL_GetError());
+    }
 }
 
 void Surface::LoadPalette(void)
