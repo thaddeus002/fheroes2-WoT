@@ -102,7 +102,7 @@ void Puzzle::ShowMapsDialog(void) const
 
 bool ClosedTilesExists(const Puzzle & pzl, const u8* it1, const u8* it2)
 {
-    while(it1 && it2 && it1 < it2) if(! pzl.test(*it1++)) return true;
+    while(it1 && it2 && it1 <= it2) if(! pzl.test(*it1++)) return true;
     return false;
 }
 
@@ -116,7 +116,7 @@ void ZoneOpenRandomTiles(Puzzle & pzl, u8 & opens, const u8* it1, const u8* it2)
     {
 	values.clear();
 	it = it1;
-	while(it && it2 && it < it2){ if(! pzl.test(*it1)) values.push_back(*it); ++it; }
+	while(it && it2 && it <= it2){ if(! pzl.test(*it)) values.push_back(*it); ++it; }
 	if(values.empty()) break;
 	pzl.set(*Rand::Get(values));
 	--opens;
