@@ -213,7 +213,7 @@ void MTrk::ImportXmiEVNT(const Chunk & evnt)
     u32 delta = 0;
     bool end = false;
 
-    while(ptr && !end && ptr < (evnt.data  + evnt.size))
+    while(ptr && !end)
     {
 
 	const u8 status = *ptr;
@@ -324,6 +324,9 @@ void MTrk::ImportXmiEVNT(const Chunk & evnt)
 		fprintf(stderr, "unknown cmd: %hhX, len: %d\n", status, evnt.data + evnt.size - ptr);
 	    break;
 	}
+
+	// brocken data
+	if(ptr >= (evnt.data  + evnt.size)){ break; }
 
 	// read delta
 	while(0 < static_cast<s8>(*ptr))
