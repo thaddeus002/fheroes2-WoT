@@ -20,9 +20,9 @@
 
 #include "luck.h"
 
-const std::string & Luck::String(s8 luck)
+const char* Luck::String(s8 luck)
 {
-    static const std::string str_luck[] = { "Unknown", _("Cursed"), _("Awful"), _("Bad"), _("Normal"), _("Good"), _("Great"), _("Irish") };
+    const char* str_luck[] = { "Unknown", _("Cursed"), _("Awful"), _("Bad"), _("Normal"), _("Good"), _("Great"), _("Irish") };
 
     switch(luck)
     {
@@ -39,9 +39,9 @@ const std::string & Luck::String(s8 luck)
     return str_luck[0];
 }
 
-const std::string & Luck::Description(s8 luck)
+const char* Luck::Description(s8 luck)
 {
-    static const std::string str_desc_luck[] = { "Unknown",
+    const char* str_desc_luck[] = { "Unknown",
 	_("Bad luck sometimes falls on your armies in combat, causing their attacks to only do half damage."),
 	_("Neutral luck means your armies will never get lucky or unlucky attacks on the enemy."),
 	_("Good luck sometimes lets your armies get lucky attacks (double strength) in combat.") };

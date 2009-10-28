@@ -22,12 +22,13 @@
 #include "gamedefs.h"
 #include "race.h"
 
-const std::string & Race::String(u8 race)
+const char* Race::String(u8 race)
 {
-    static const std::string str_race[] = { _("Knight"), _("Barbarian"), _("Sorceress"),
+    const char* str_race[] = { _("Knight"), _("Barbarian"), _("Sorceress"),
 	_("Warlock"), _("Wizard"), _("Necromancer"), _("Multi"), "Random", "Neutral" };
 
-    switch(race){
+    switch(race)
+    {
         case Race::KNGT: return str_race[0];
         case Race::BARB: return str_race[1];
         case Race::SORC: return str_race[2];

@@ -153,8 +153,8 @@ public:
     void BuyBoat(void);
     u32 GetBuildingRequires(u32) const;
 
-    static const std::string & GetStringBuilding(u32, Race::race_t = Race::BOMG);
-    static const std::string & GetDescriptionBuilding(u32, Race::race_t = Race::BOMG);
+    static const char* GetStringBuilding(u32, Race::race_t = Race::BOMG);
+    static const char* GetDescriptionBuilding(u32, Race::race_t = Race::BOMG);
     static ICN::icn_t GetICNBuilding(u32, Race::race_t);
     static ICN::icn_t GetICNBoat(const Race::race_t & race);
     u32 GetUpgradeBuilding(u32) const;

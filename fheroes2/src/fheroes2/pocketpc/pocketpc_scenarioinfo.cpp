@@ -115,8 +115,8 @@ Game::menu_t PocketPC::ScenarioInfo(void)
         if(le.KeyPress(KEY_RETURN) || le.MouseClickLeft(buttonOk))
         {
             if(Settings::Get().Debug()) Error::Verbose("select maps: " + conf.MapsFile());
-            if(Settings::Get().Debug()) Error::Verbose("difficulty: " + Difficulty::String(conf.GameDifficulty()));
-            if(Settings::Get().Debug()) Error::Verbose("select color: " + Color::String(conf.MyColor()));
+            if(Settings::Get().Debug()) Error::Verbose("difficulty: ", Difficulty::String(conf.GameDifficulty()));
+            if(Settings::Get().Debug()) Error::Verbose("select color: ", Color::String(conf.MyColor()));
             conf.FixKingdomRandomRace();
     	    Game::ShowLoadMapsText();
             world.LoadMaps(conf.MapsFile());

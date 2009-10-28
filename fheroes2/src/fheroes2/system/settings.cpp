@@ -773,6 +773,6 @@ void Settings::FixKingdomRandomRace(void)
     for(Color::color_t color = Color::BLUE; color != Color::GRAY; ++color) if(KingdomColors(color))
     {
         if(Race::RAND == KingdomRace(color)) SetKingdomRace(color, Race::Rand());
-        if(Debug()) Error::Verbose(Color::String(color) + ": " + Race::String(KingdomRace(color)));
+        if(Debug()) std::cout << Color::String(color) << ": " << Race::String(KingdomRace(color)) << std::endl;
     }
 }

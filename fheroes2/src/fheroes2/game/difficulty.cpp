@@ -30,9 +30,9 @@ Difficulty::difficulty_t& Difficulty::operator-- (Difficulty::difficulty_t& diff
 { return difficulty = ( Difficulty::EASY == difficulty ? Difficulty::IMPOSSIBLE : Difficulty::difficulty_t(difficulty - 1)); };
 
 
-const std::string & Difficulty::String(u8 difficulty)
+const char* Difficulty::String(u8 difficulty)
 {
-    static const std::string str_difficulty[] = { _("Easy"), _("Normal"), _("Hard"), _("Expert"), _("Impossible") };
+    const char* str_difficulty[] = { _("Easy"), _("Normal"), _("Hard"), _("Expert"), _("Impossible"), "Unknown" };
 
     switch(difficulty)
     {
@@ -44,7 +44,7 @@ const std::string & Difficulty::String(u8 difficulty)
 	default: break;
     }
 
-    return str_difficulty[0];
+    return str_difficulty[5];
 }
 
 Difficulty::difficulty_t Difficulty::Get(u8 index)

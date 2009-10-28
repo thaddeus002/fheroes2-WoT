@@ -33,7 +33,7 @@ public:
     void SetPos(s16, s16);
 
     const Rect & GetArea(void) const;
-    const std::string & GetName(void) const;
+    const char* GetName(void) const;
     const std::string & GetDescription(void) const;
 
     bool AllowBuy(void) const;

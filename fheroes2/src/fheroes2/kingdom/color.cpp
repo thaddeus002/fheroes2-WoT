@@ -20,9 +20,9 @@
 
 #include "color.h"
 
-const std::string & Color::String(u8 color)
+const char* Color::String(u8 color)
 {
-    static const std::string str_color[] = { _("Blue"), _("Green"), _("Red"), _("Yellow"), _("Orange"), _("Purple"), _("Gray") };
+    const char* str_color[] = { _("Blue"), _("Green"), _("Red"), _("Yellow"), _("Orange"), _("Purple"), _("Gray"), "Unknown" };
 
     switch(color)
     {
@@ -35,7 +35,7 @@ const std::string & Color::String(u8 color)
 	case Color::GRAY: 	return str_color[6];
     }
 
-    return str_color[6];
+    return str_color[7];
 }
 
 u8 Color::GetIndex(color_t color)

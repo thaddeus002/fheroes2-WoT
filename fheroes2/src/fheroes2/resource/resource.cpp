@@ -210,9 +210,9 @@ bool Resource::funds_t::operator>= (const funds_t & pm) const
 }
 
 /* name resource */
-const std::string & Resource::String(resource_t resource)
+const char* Resource::String(resource_t resource)
 {
-    static const std::string res[] = { "Unknown", _("Wood"), _("Mercury"), _("Ore"), _("Sulfur"), _("Crystal"), _("Gems"), _("Gold") };
+    const char* res[] = { "Unknown", _("Wood"), _("Mercury"), _("Ore"), _("Sulfur"), _("Crystal"), _("Gems"), _("Gold") };
 
     switch(resource){
         case Resource::WOOD:	return res[1];

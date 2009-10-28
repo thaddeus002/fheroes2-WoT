@@ -41,7 +41,7 @@ extern void PlayPickupSound(void);
 
 const char* HeroesName(Heroes::heroes_t id)
 {
-    static const char* names[] = {
+    const char* names[] = {
 	// knight
 	_("Lord Kilburn"), _("Sir Gallanth"), _("Ector"), _("Gvenneth"), _("Tyro"), _("Ambrose"), _("Ruby"), _("Maximus"), _("Dimitry"),
 	// barbarian
@@ -848,9 +848,9 @@ s8 Heroes::GetMorale(void) const
     return GetMoraleWithModificators(NULL);
 }
 
-const std::string & StringModifiers(s8 mod)
+const char* StringModifiers(s8 mod)
 {
-    static const std::string mods[] = { " 0", " -3", " -2", " -1", " +1", " +2", " +3" };
+    const char* mods[] = { " 0", " -3", " -2", " -1", " +1", " +2", " +3" };
 
     switch(mod)
     {
@@ -914,8 +914,14 @@ s8 Heroes::GetMoraleWithModificators(std::string *strs) const
 
         result += modifiers[i].second;
         if(strs)
-            strs->append(Skill::Level::String(level) + " " + Skill::Secondary::String(Skill::Secondary::LEADERSHIP) + StringModifiers(modifiers[i].second) + "\n");
-        break;
+    	{
+	    strs->append(Skill::Level::String(level));
+	    strs->append(" ");
+	    strs->append(Skill::Secondary::String(Skill::Secondary::LEADERSHIP));
+	    strs->append(StringModifiers(modifiers[i].second));
+	    strs->append("\n");
+        }
+	break;
     }
 
     modifiers.clear();
@@ -936,7 +942,11 @@ s8 Heroes::GetMoraleWithModificators(std::string *strs) const
 
         result += modifiers[i].second;
         if(strs)
-            strs->append(MP2::StringObject(obj) + StringModifiers(modifiers[i].second) + "\n");
+        {
+	    strs->append(MP2::StringObject(obj));
+	    strs->append(StringModifiers(modifiers[i].second));
+	    strs->append("\n");
+	}
     }
     
     const Castle* castle = inCastle();
@@ -1013,7 +1023,13 @@ s8 Heroes::GetLuckWithModificators(std::string *strs) const
 
         result += modifiers[i].second;
         if(strs)
-            strs->append(Skill::Level::String(level) + " " + Skill::Secondary::String(Skill::Secondary::LUCK) + StringModifiers(modifiers[i].second) + "\n");
+        {
+	    strs->append(Skill::Level::String(level));
+	    strs->append(" ");
+	    strs->append(Skill::Secondary::String(Skill::Secondary::LUCK));
+	    strs->append(StringModifiers(modifiers[i].second));
+	    strs->append("\n");
+	}
     }
 
     modifiers.clear();
@@ -1032,7 +1048,11 @@ s8 Heroes::GetLuckWithModificators(std::string *strs) const
 
         result += modifiers[i].second;
         if(strs)
-            strs->append(MP2::StringObject(obj) + StringModifiers(modifiers[i].second) + "\n");
+        {
+	    strs->append(MP2::StringObject(obj));
+	    strs->append(StringModifiers(modifiers[i].second));
+	    strs->append("\n");
+	}
     }
     
     const Castle* castle = inCastle();
@@ -1644,7 +1664,7 @@ void Heroes::LevelUpSecondarySkill(const Skill::Primary::skill_t primary1, bool 
     Skill::Secondary sec2;
 
     FindSkillsForLevelUp(sec1, sec2);
-    if(1 < Settings::Get().Debug()) Error::Verbose("Heroes::LevelUp: " + Skill::Secondary::String(sec1.Skill()) + " or " + Skill::Secondary::String(sec2.Skill()));
+    if(1 < Settings::Get().Debug()) std::cout << "Heroes::LevelUp: " << Skill::Secondary::String(sec1.Skill()) << " or " << Skill::Secondary::String(sec2.Skill()) << std::endl;
 
     std::string header;
     std::string message;

@@ -371,17 +371,17 @@ const MageGuild & Castle::GetMageGuild(void) const
     return mageguild;
 }
 
-const std::string & Castle::GetStringBuilding(u32 build, Race::race_t race)
+const char* Castle::GetStringBuilding(u32 build, Race::race_t race)
 {
-    static const std::string str_build[] = { _("Thieves' Guild"), _("Tavern"), _("Shipyard"), _("Well"), _("Statue"), _("Left Turret"),
+    const char* str_build[] = { _("Thieves' Guild"), _("Tavern"), _("Shipyard"), _("Well"), _("Statue"), _("Left Turret"),
 	_("Right Turret"), _("Marketplace"), _("Moat"), _("Castle"), _("Tent"), _("Captain's Quarters"), _("Mage Guild, Level 1"), 
 	 _("Mage Guild, Level 2"), _("Mage Guild, Level 3"), _("Mage Guild, Level 4"), _("Mage Guild, Level 5"), "Unknown" };
 
-    static const std::string str_wel2[] = { _("Farm"), _("Garbage Heap"), _("Crystal Garden"), _("Waterfall"), _("Orchard"), _("Skull Pile") };
+    const char* str_wel2[] = { _("Farm"), _("Garbage Heap"), _("Crystal Garden"), _("Waterfall"), _("Orchard"), _("Skull Pile") };
 
-    static const std::string str_spec[] = { _("Fortifications"), _("Coliseum"), _("Rainbow"), _("Dungeon"), _("Library"), _("Storm") };
+    const char* str_spec[] = { _("Fortifications"), _("Coliseum"), _("Rainbow"), _("Dungeon"), _("Library"), _("Storm") };
 
-    static const std::string str_dwelling[] = {
+    const char* str_dwelling[] = {
 	_("Thatched Hut"), _("Hut"), _("Treehouse"), _("Cave"), _("Habitat"), _("Excavation"),
 	_("Archery Range"), _("Stick Hut"), _("Cottage"), _("Crypt"), _("Pen"), _("Graveyard"),
 	_("Blacksmith"), _("Den"), _("Archery Range"), _("Nest"), _("Foundry"), _("Pyramid"),
@@ -389,7 +389,7 @@ const std::string & Castle::GetStringBuilding(u32 build, Race::race_t race)
 	_("Jousting Arena"), _("Bridge"), _("Fenced Meadow"), _("Swamp"), _("Ivory Tower"), _("Mausoleum"),
 	_("Cathedral"), _("Pyramid"), _("Red Tower"), _("Green Tower"), _("Cloud Castle"), _("Laboratory") };
 
-    static const std::string str_upgrade[] = {
+    const char* str_upgrade[] = {
 	_("Upg. Archery Range"), _("Upg. Stick Hut"), _("Upg. Cottage"), _("Crypt"), _("Pen"), _("Upg. Graveyard"),
 	_("Upg. Blacksmith"), _("Den"), _("Upg. Archery Range"), _("Nest"), _("Upg. Foundry"), _("Upg. Pyramid"),
 	_("Upg. Armory"), _("Upg. Adobe"), _("Upg. Stonehenge"), _("Upg. Maze"), _("Cliff Nest"), _("Upg. Mansion"),
@@ -397,7 +397,7 @@ const std::string & Castle::GetStringBuilding(u32 build, Race::race_t race)
 	_("Upg. Cathedral"), _("Pyramid"), _("Red Tower"), _("Red Tower"), _("Upg. Cloud Castle"), _("Laboratory"),
 	"", "", "", _("Black Tower"), "", "" };
 
-    static const std::string shrine = _("Shrine");
+    const char* shrine = _("Shrine");
 
     u8 offset = 0;
 
@@ -457,9 +457,9 @@ const std::string & Castle::GetStringBuilding(u32 build, Race::race_t race)
     return str_build[17];
 }
 
-const std::string & Castle::GetDescriptionBuilding(u32 build, Race::race_t race)
+const char* Castle::GetDescriptionBuilding(u32 build, Race::race_t race)
 {
-    static const std::string desc_build[] = {
+    const char* desc_build[] = {
 	_("The Thieves' Guild provides information on enemy players. Thieves' Guilds can also provide scouting information on enemy towns."),
 	_("The Tavern increases morale for troops defending the castle."),
 	_("The Shipyard allows ships to be built."),
@@ -474,7 +474,7 @@ const std::string & Castle::GetDescriptionBuilding(u32 build, Race::race_t race)
 	_("The Captain's Quarters provides a captain to assist in the castle's defense when no hero is present."),
 	_("The Mage Guild allows heroes to learn spells and replenish their spell points."), "Unknown" };
 
-    static const std::string desc_wel2[] = {
+    const char* desc_wel2[] = {
 	_("The Farm increases production of Peasants by 8 per week."),
 	_("The Garbage Heap increases production of Goblins by 8 per week."),
 	_("The Crystal Garden increases production of Sprites by 8 per week."),
@@ -482,7 +482,7 @@ const std::string & Castle::GetDescriptionBuilding(u32 build, Race::race_t race)
 	_("The Orchard increases production of Halflings by 8 per week."),
 	_("The Skull Pile increases production of Skeletons by 8 per week.") };
 
-    static const std::string desc_spec[] = {
+    const char* desc_spec[] = {
 	_("The Fortifications increase the toughness of the walls, increasing the number of turns it takes to knock them down."),
 	_("The Coliseum provides inspiring spectacles to defending troops, raising their morale by two during combat."),
 	_("The Rainbow increases the luck of the defending units by two."),
@@ -490,7 +490,7 @@ const std::string & Castle::GetDescriptionBuilding(u32 build, Race::race_t race)
 	_("The Library increases the number of spells in the Guild by one for each level of the guild."),
 	_("The Storm adds +2 to the power of spells of a defending spell caster.") };
 
-    static const std::string shrine_descr = _("The Shrine increases the necromancy skill of all your necromancers by 10 percent.");
+    const char* shrine_descr = _("The Shrine increases the necromancy skill of all your necromancers by 10 percent.");
 
     u8 offset = 0;
 
@@ -1331,7 +1331,7 @@ ICN::icn_t Castle::GetICNBuilding(u32 build, Race::race_t race)
 	}
     }
 
-    Error::Warning("Castle::GetICNBuilding: return unknown, race: " + Race::String(race) + ", build: " + Castle::GetStringBuilding(build, race) + ", ", build);
+    std::cout << "Castle::GetICNBuilding: return unknown, race: " << Race::String(race) << ", build: " << Castle::GetStringBuilding(build, race) << ", " << build << std::endl;
 
     return ICN::UNKNOWN;
 }
@@ -1496,14 +1496,21 @@ s8 Castle::GetMoraleWithModificators(std::string *strs) const
     {
         result += 1;
         if(strs)
-    	    strs->append(GetStringBuilding(BUILD_TAVERN, race) + "+1\n");
+    	{
+	    strs->append(GetStringBuilding(BUILD_TAVERN, race));
+	    strs->append(" +1\n");
+	}
     }
 
     // and barbarian coliseum
     if(Race::BARB == race && isBuild(BUILD_SPEC))
     {
         result += 2;
-        if(strs) strs->append(GetStringBuilding(BUILD_SPEC, race) + "+2\n");
+        if(strs)
+	{
+	    strs->append(GetStringBuilding(BUILD_SPEC, race));
+	    strs->append(" +2\n");
+	}
     }
 
     return result;
@@ -1516,7 +1523,11 @@ s8 Castle::GetLuckWithModificators(std::string *strs) const
     if(Race::SORC == race && isBuild(BUILD_SPEC))
     {
         result += 2;
-        if(strs) strs->append(Castle::GetStringBuilding(BUILD_SPEC, race) + "+2\n");
+        if(strs)
+	{
+	    strs->append(Castle::GetStringBuilding(BUILD_SPEC, race));
+	    strs->append(" +2\n");
+	}
     }
 
     return result;

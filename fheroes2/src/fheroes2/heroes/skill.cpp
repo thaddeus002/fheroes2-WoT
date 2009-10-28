@@ -123,9 +123,9 @@ Skill::Primary::skill_t Skill::Primary::FromLevelUp(const u8 race, const u8 leve
     return UNKNOWN;
 }
 
-const std::string & Skill::Primary::String(const Skill::Primary::skill_t skill)
+const char* Skill::Primary::String(const Skill::Primary::skill_t skill)
 {
-    static const std::string str_skill[] = { _("Attack"), _("Defence"), _("Power"), _("Knowledge"), "Unknown" };
+    const char* str_skill[] = { _("Attack"), _("Defence"), _("Power"), _("Knowledge"), "Unknown" };
 
     switch(skill)
     {
@@ -153,9 +153,9 @@ Skill::Level::type_t Skill::Level::FromMP2(const u8 byte)
     return NONE;
 }
 
-const std::string & Skill::Level::String(const type_t level)
+const char* Skill::Level::String(const type_t level)
 {
-    static const std::string str_level[] = { "None", _("Basic"), _("Advanced"), _("Expert") };
+    const char* str_level[] = { "None", _("Basic"), _("Advanced"), _("Expert") };
 
     switch(level)
     {
@@ -349,9 +349,9 @@ u8 Skill::Secondary::GetIndexSprite2(const skill_t skill)
     return 0xff;
 }
 
-const std::string & Skill::Secondary::String(const skill_t skill)
+const char* Skill::Secondary::String(const skill_t skill)
 {
-    static const std::string str_skill[] = { _("Pathfinding"), _("Archery"), _("Logistics"), _("Scouting"), _("Diplomacy"), _("Navigation"), 
+    const char* str_skill[] = { _("Pathfinding"), _("Archery"), _("Logistics"), _("Scouting"), _("Diplomacy"), _("Navigation"), 
 	_("Leadership"), _("Wisdom"), _("Mysticism"), _("Luck"), _("Ballistics"), _("Eagle Eye"), _("Necromancy"), _("Estates"), "Unknown"  };
 
     switch(skill)
@@ -377,9 +377,9 @@ const std::string & Skill::Secondary::String(const skill_t skill)
     return str_skill[14];
 }
 
-const std::string & Skill::Secondary::Description(const skill_t skill, const Level::type_t level)
+const char* Skill::Secondary::Description(const skill_t skill, const Level::type_t level)
 {
-    static const std::string description_skill[] =
+    const char* description_skill[] =
     {
 	_("Basic Pathfinding reduces the movement penalty for rough terrain by 25 percent."),
 	_("Advanced Pathfinding reduces the movement penalty for rough terrain by 50 percent."),

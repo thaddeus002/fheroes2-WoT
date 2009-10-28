@@ -37,8 +37,8 @@ namespace Luck
         IRISH      = 3
     } luck_t;
 
-    const std::string & String(s8);
-    const std::string & Description(s8);
+    const char* String(s8);
+    const char* Description(s8);
 
     inline luck_t & operator++ (luck_t & luck){ return luck = IRISH == luck ? IRISH : luck_t(luck + 1); };
     inline luck_t & operator-- (luck_t & luck){ return luck = CURSED == luck ? CURSED : luck_t(luck - 1); };

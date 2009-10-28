@@ -31,9 +31,9 @@ namespace Maps
     static u32 animation_ticket = 0;
 };
 
-const std::string & Maps::SizeString(u8 s)
+const char* Maps::SizeString(u8 s)
 {
-    static const std::string mapsize[] = { _("Unknown"), _("Small"), _("Medium"), _("Large"), _("Extra Large") };
+    const char* mapsize[] = { "Unknown", _("Small"), _("Medium"), _("Large"), _("Extra Large") };
 
     switch(s)
     {

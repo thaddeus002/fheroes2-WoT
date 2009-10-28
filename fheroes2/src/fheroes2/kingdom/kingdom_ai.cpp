@@ -78,7 +78,7 @@ void Kingdom::AITurns(void)
     // scan map
     ai_objects.clear();
     world.StoreActionObject(GetColor(), ai_objects);
-    if(1 < Settings::Get().Debug()) Error::Verbose("Kingdom::AITurns: " + Color::String(color) + ", size cache objects: ", ai_objects.size());
+    if(1 < Settings::Get().Debug()) std::cout << "Kingdom::AITurns: " << Color::String(color) << ", size cache objects: " << ai_objects.size() << std::endl;
 
     // turn indicator
     RedrawAITurns(color, 1);
@@ -175,7 +175,7 @@ void Kingdom::AITurns(void)
 
     cursor.Hide();
 
-    if(Settings::Get().Debug()) Error::Verbose("Kingdom::AITurns: " + Color::String(color) + " moved");
+    if(Settings::Get().Debug()) std::cout << "Kingdom::AITurns: " << Color::String(color) << " moved" << std::endl;
 }
 
 void Kingdom::AICastlesTurns(void)
@@ -272,7 +272,7 @@ void Kingdom::AIHeroesGetTask(Heroes & hero)
     if(task.size())
     {
 	const u16 index = task.front();
-	if(Settings::Get().Debug()) Error::Verbose("AI::HeroesTask: " + Color::String(color) + ", Hero "+ hero.GetName() + " say: go to object: " + MP2::StringObject(ai_objects[index]) + ", index: ", index);
+	if(Settings::Get().Debug()) std::cout << "AI::HeroesTask: " << Color::String(color) << ", Hero " << hero.GetName() << " say: go to object: " << MP2::StringObject(ai_objects[index]) << ", index: " << index << std::endl;
 	task.pop_front();
 	ai_objects.erase(index);
 	if(2 < Settings::Get().Debug()) hero.GetPath().Dump();
@@ -280,7 +280,7 @@ void Kingdom::AIHeroesGetTask(Heroes & hero)
     else
     {
 	hero.GetPath().Reset();
-	if(Settings::Get().Debug()) Error::Verbose("AI::HeroesTask: " + Color::String(color) + ", Hero "+ hero.GetName() + " say: unknown task., help my please..");
+	if(Settings::Get().Debug()) std::cout << "AI::HeroesTask: " << Color::String(color) << ", Hero " << hero.GetName() << " say: unknown task., help my please.." << std::endl;
 	hero.SetModes(Heroes::STUPID);
     }
 }
@@ -364,7 +364,7 @@ void Kingdom::AIHeroesPrepareTask(Heroes & hero)
     }
 
     if(objs.size()) std::sort(objs.begin(), objs.end(), IndexDistance::Longest);
-    if(1 < Settings::Get().Debug()) Error::Verbose("Kingdom::AIHeroesTask: " + Color::String(color) + ", hero: " + hero.GetName() + ", unconfirmed tasks: ", objs.size());
+    if(1 < Settings::Get().Debug()) std::cout << "Kingdom::AIHeroesTask: " << Color::String(color) <<", hero: " << hero.GetName() << ", unconfirmed tasks: " << objs.size() << std::endl;
 
     // store random task
     if(objs.size())

@@ -21,9 +21,9 @@
 #include "maps.h"
 #include "direction.h"
 
-const std::string & Direction::String(vector_t direct)
+const char* Direction::String(vector_t direct)
 {
-   static const std::string str_direct[] = { "center", "top", "top right", "right", "bottom right", "bottom", "bottom left", "left", "top left", "unknown" };
+   const char* str_direct[] = { "center", "top", "top right", "right", "bottom right", "bottom", "bottom left", "left", "top left", "unknown" };
    
    switch(direct)
    {

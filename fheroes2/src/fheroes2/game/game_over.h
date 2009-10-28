@@ -45,7 +45,7 @@ namespace GameOver
 	LOSS            = LOSS_ALL | LOSS_TOWN | LOSS_HERO | LOSS_TIME,
     };
 
-    const std::string & GetString(conditions_t);
+    const char* GetString(conditions_t);
 
     void DialogWins(u16);
     void DialogLoss(u16);

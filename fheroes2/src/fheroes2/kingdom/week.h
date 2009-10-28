@@ -56,7 +56,7 @@ namespace Week
 	MONSTERS	// week of monsters game
     };
 
-    const std::string & GetString(type_t type);
+    const char* GetString(type_t type);
     type_t WeekRand(void);
     type_t MonthRand(void);
     type_t Get(u8);

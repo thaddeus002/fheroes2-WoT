@@ -26,7 +26,9 @@
 
 void Dialog::SkillInfo(const Skill::Secondary::skill_t skill, const Skill::Level::type_t level, const bool ok_button)
 {
-    const std::string header(Skill::Level::String(level) + " " + Skill::Secondary::String(skill));
+    std::string header(Skill::Level::String(level));
+    header.append(" ");
+    header.append(Skill::Secondary::String(skill));
     const std::string description(Skill::Secondary::Description(skill, level));
     SkillInfo(header, description, skill, level, ok_button);
 }

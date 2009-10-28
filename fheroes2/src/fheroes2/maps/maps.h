@@ -39,7 +39,7 @@ namespace Maps
         XLARGE	= 144
     } mapsize_t;
 
-    const std::string & SizeString(u8);
+    const char* SizeString(u8);
 
     u16 GetDirectionIndex(u16 from, Direction::vector_t vector);
     bool isValidDirection(u16 from, Direction::vector_t vector);

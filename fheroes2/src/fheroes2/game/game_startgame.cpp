@@ -1241,7 +1241,7 @@ int FH2LocalClient::StartGame(void)
 		    packet.Pop(color);
 		    packet.Pop(percent);
 
-		    Error::Verbose("Game::NetworkGame: player: " + Color::String(color));
+		    Error::Verbose("Game::NetworkGame: player: ", Color::String(color));
 
 		    if(conf.MyColor() == color) Game::HumanTurn();
 		    else

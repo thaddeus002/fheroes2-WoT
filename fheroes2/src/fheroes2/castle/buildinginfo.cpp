@@ -193,7 +193,7 @@ void BuildingInfo::Redraw(void)
 }
 
 
-const std::string & BuildingInfo::GetName(void) const
+const char* BuildingInfo::GetName(void) const
 {
     return Castle::GetStringBuilding(building, castle.GetRace());
 }

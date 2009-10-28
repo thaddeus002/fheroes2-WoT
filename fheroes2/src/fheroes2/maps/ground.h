@@ -45,7 +45,7 @@ namespace Maps
     	    WATER	= 0x0100,
         } ground_t;
 
-        const std::string & String(ground_t ground);
+        const char* String(u16);
         u16 GetBasePenalty(const u16 index, const u8 pathfinding);
         u16 GetPenalty(const u16 index, const Direction::vector_t direct, const u8 pathfinding);
     };

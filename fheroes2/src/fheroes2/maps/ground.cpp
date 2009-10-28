@@ -23,9 +23,9 @@
 #include "world.h"
 #include "ground.h"
 
-const std::string & Maps::Ground::String(Maps::Ground::ground_t ground)
+const char* Maps::Ground::String(u16 ground)
 {
-    static const std::string str_ground[] = { _("Desert"), _("Snow"), _("Swamp"), _("Wasteland"), _("Beach"), 
+    const char* str_ground[] = { _("Desert"), _("Snow"), _("Swamp"), _("Wasteland"), _("Beach"), 
 	_("Lava"), _("Dirt"), _("Grass"), _("Water"), "Unknown" };
 
     switch(ground)
@@ -42,7 +42,7 @@ const std::string & Maps::Ground::String(Maps::Ground::ground_t ground)
 	default: break;
     }
 
-    return str_ground[9];
+    return str_ground[8];
 }
 
 u16 Maps::Ground::GetBasePenalty(const u16 index, const u8 pathfinding)

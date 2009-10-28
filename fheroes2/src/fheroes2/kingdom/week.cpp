@@ -22,9 +22,9 @@
 #include "gamedefs.h"
 #include "week.h"
 
-const std::string & Week::GetString(type_t type)
+const char* Week::GetString(type_t type)
 {
-    static const std::string str_name[] = { "Unnamed", _("PLAGUE"),
+    const char* str_name[] = { "Unnamed", _("PLAGUE"),
 		_("Ant"), _("Grasshopper"), _("Dragonfly"), _("Spider"), _("Butterfly"), _("Bumblebee"),
 		_("Locust"), _("Earthworm"), _("Hornet"), _("Beetle"), _("Squirrel"), _("Rabbit"),
 		_("Gopher"), _("Badger"), _("Eagle"), _("Weasel"), _("Raven"), _("Mongoose"), _("Aardvark"),

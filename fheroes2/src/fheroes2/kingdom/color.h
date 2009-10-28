@@ -39,7 +39,7 @@ namespace Color
     inline color_t& operator++ (color_t& color){ return color = ( GRAY == color ? BLUE : color_t(color << 1)); };
     inline color_t& operator-- (color_t& color){ return color = ( BLUE == color ? GRAY : color_t(color >> 1)); };
 
-    const std::string & String(u8);
+    const char* String(u8);
     
     u8 GetIndex(color_t);
     color_t GetFromIndex(u8);

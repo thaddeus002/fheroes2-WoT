@@ -40,7 +40,7 @@ namespace Skill
 	
 	type_t FromMP2(const u8 byte);
 
-	const std::string & String(const type_t level);
+	const char* String(const type_t level);
     };
 
     class Secondary : private std::pair<u8, u8>
@@ -79,8 +79,8 @@ namespace Skill
 	static skill_t 	Skill(const u8);
 	static skill_t 	FromMP2(const u8 byte);
 	static skill_t 	RandForWitchsHut(void);
-	static const std::string & String(const skill_t skill);
-	static const std::string & Description(const skill_t skill, const Level::type_t level);
+	static const char* String(const skill_t skill);
+	static const char* Description(const skill_t skill, const Level::type_t level);
 	static skill_t PriorityFromRace(const u8 race, const std::vector<skill_t> & exclude);
 	static skill_t PriorityFromRace(const u8 race);
 
@@ -125,7 +125,7 @@ namespace Skill
 	virtual const std::string & GetName(void) const = 0;
 	virtual u8 GetType(void) const = 0;
 
-        static const std::string & String(const skill_t skill);
+        static const char* String(const skill_t skill);
 	static skill_t FromLevelUp(const u8 race, const u8 level);
 
 	protected:

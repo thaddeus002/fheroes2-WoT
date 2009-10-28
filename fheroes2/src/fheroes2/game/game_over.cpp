@@ -26,9 +26,9 @@
 #include "settings.h"
 #include "game_over.h"
 
-const std::string & GameOver::GetString(conditions_t cond)
+const char* GameOver::GetString(conditions_t cond)
 {
-    static const std::string cond_str[] = { "None", 
+    const char* cond_str[] = { "None", 
 	_("Defeat all enemy heroes and towns."), _("Capture a specific town."), _("Defeat a specific hero."), _("Find a specific artifact."), _("Your side defeats the opposing side."), _("Accumulate a large amount of gold."),
 	_("Lose all your heroes and towns."), _("Lose a specific town."), _("Lose a specific hero."), _("Run out of time. (Fail to win by a certain point.)") };
 

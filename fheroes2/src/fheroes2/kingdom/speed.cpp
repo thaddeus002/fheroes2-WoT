@@ -20,13 +20,14 @@
 
 #include "speed.h"
 
-const std::string & Speed::String(u8 speed)
+const char* Speed::String(u8 speed)
 {
-    static const std::string str_speed[] = { _("Standing"), _("Crawling"), _("Very Slow"), _("Slow"), _("Average"), _("Fast"),
-	_("Very Fast"), _("Ultra Fast"), _("Blazing"), _("Instant") };
+    const char* str_speed[] = { _("Standing"), _("Crawling"), _("Very Slow"), _("Slow"), _("Average"), _("Fast"),
+	_("Very Fast"), _("Ultra Fast"), _("Blazing"), _("Instant"), "Unknown" };
 
     switch(speed)
     {
+	case STANDING:	return str_speed[0];
 	case CRAWLING:	return str_speed[1];
         case VERYSLOW:	return str_speed[2];
         case SLOW:	return str_speed[3];
@@ -39,5 +40,5 @@ const std::string & Speed::String(u8 speed)
 	default: break;
     }
     
-    return str_speed[0];
+    return str_speed[10];
 }
