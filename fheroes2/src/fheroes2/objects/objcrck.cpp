@@ -52,7 +52,7 @@ bool ObjWasteLand::isPassable(const u16 icn, const u8 index)
 	    if(74 == index) return false;
 	    else
 	    // tar pit
-	    if((75 < index && index < 79) || 80 == index || 91 == index ||
+	    if(80 == index || 91 == index ||
 		102 == index || 113 == index || 124 == index ||
 		(134 < index && index < 138) || 148 == index || 159 == index ||
 		170 == index || 181 == index) return false;
