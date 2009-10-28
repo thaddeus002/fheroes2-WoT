@@ -2769,9 +2769,11 @@ void ActionToObelisk(Heroes &hero, const u8 obj, const u16 dst_index)
         kingdom.PuzzleMaps().Update(kingdom.CountVisitedObjects(MP2::OBJ_OBELISK), world.CountObeliskOnMaps());
         AGG::PlaySound(M82::EXPERNCE);
         Dialog::Message(MP2::StringObject(obj), _("You come upon an obelisk made from a type of stone you have never seen before. Staring at it intensely, the smooth surface suddenly changes to an inscription. The inscription is a piece of a lost ancient map. Quickly you copy down the piece and the inscription vanishes as abruptly as it appeared."), Font::BIG, Dialog::OK);
+	kingdom.PuzzleMaps().ShowMapsDialog();
     }
+    else
+        Dialog::Message(MP2::StringObject(obj), _("You have already been to this obelisk."), Font::BIG, Dialog::OK);
 
-    kingdom.PuzzleMaps().ShowMapsDialog();
     if(Settings::Get().Debug()) Error::Verbose("ActionToObelisk: " + hero.GetName());
 }
 
