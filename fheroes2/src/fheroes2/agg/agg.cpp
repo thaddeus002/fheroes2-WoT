@@ -455,7 +455,9 @@ void AGG::Cache::LoadOrgICN(icn_cache_t & v, const ICN::icn_t icn, const u16 ind
     Sprite & sp = reflect ? v.reflect[index] : v.sprites[index];
 
     LoadOrgICN(sp, icn, index, reflect);
-    if(8 != sp.depth()) sp.SetDisplayFormat();
+    // set display format
+    if(8 != sp.depth() &&
+       !(Settings::Get().PocketPC() && ICN::NeedMinify4PocketPC(icn, index))) sp.SetDisplayFormat();
 }
 
 /* load ICN object to AGG::Cache */
@@ -502,6 +504,7 @@ void AGG::Cache::LoadICN(const ICN::icn_t icn, u16 index, bool reflect)
     {
 	Sprite & sp = reflect ? v.reflect[index] : v.sprites[index];
 	sp.ScaleMinifyByTwo();
+	sp.SetDisplayFormat();
     }
 
     // registry icn
