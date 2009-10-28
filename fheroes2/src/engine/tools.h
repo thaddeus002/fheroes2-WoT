@@ -34,8 +34,8 @@ namespace String
     int  ToInt(const std::string &str);
     bool Compare(const std::string &str1, const std::string &str2, bool sensitive = true);
 
-    void Replace(std::string &, const std::string &, const std::string &);
-    void Replace(std::string &, const std::string &, int);
+    void Replace(std::string &, const char*, const std::string &);
+    void Replace(std::string &, const char*, int);
 
     void AppendKey(std::string &, KeySym, u16);
 

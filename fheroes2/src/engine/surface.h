@@ -110,8 +110,6 @@ public:
     void DrawLine(const Point &, const Point &, u32);
     void DrawLine(u16, u16, u16, u16, u32);
 
-    void MakeStencil(Surface &, u32) const;
-    void MakeContour(Surface &, u32) const;
 
     void ChangeColor(u32, u32);
     void ChangeColorIndex(u32, u32);
@@ -124,6 +122,9 @@ public:
     u32  GetSize(void) const;
 
     static void TILReflect(Surface & sf_dst, const Surface & sf_src, const u8 shape);
+
+    static void MakeStencil(Surface &, const Surface &, u32);
+    static void MakeContour(Surface &, const Surface &, u32);
 
     static void ScaleMinifyByTwo(Surface & sf_dst, const Surface & sf_src, u8 mul = 1);
     static void SetDefaultDepth(u8);

@@ -670,41 +670,47 @@ void Surface::DrawLine(u16 x1, u16 y1, u16 x2, u16 y2, u32 c)
     Unlock();
 }
 
-void Surface::MakeStencil(Surface & dst, u32 col) const
+void Surface::MakeStencil(Surface & dst, const Surface & src, u32 col)
 {
-    if(!surface) return;
+    if(!src.surface) return;
 
-    dst.Set(surface->w, surface->h);
+    dst.Set(src.surface->w, src.surface->h);
     dst.SetColorKey();
-    const u32 clkey = GetColorKey();
+    const u32 clkey = src.GetColorKey();
+    u8 r, g, b, a;
 
     dst.Lock();
-    for(u16 y = 0; y < surface->h; ++y)
-        for(u16 x = 0; x < surface->w; ++x)
+    for(u16 y = 0; y < src.surface->h; ++y)
+        for(u16 x = 0; x < src.surface->w; ++x)
         {
-            u32 pixel = GetPixel(x, y);
-            // We wish to ignore any shadows. The alpha mask seems to be split as follows:
-            // - 0x0F: full intensity
-            // - 0x04: shadow
-            // - 0x00: transparent (but not colorkeyed)
-	    //         and skip for 8 bit
-            if(clkey != pixel && (depth() == 8 || ((pixel & surface->format->Amask) >> surface->format->Ashift == 0x0F))) 
-            {
+            u32 pixel = src.GetPixel(x, y);
+            if(clkey != pixel)
+	    {
+		if(src.alpha())
+		{
+		    src.GetRGB(pixel, &r, &g, &b, &a);
+		    // skip shadow
+		    if(a < 200) continue;
+		}
+
                 dst.SetPixel(x, y, col);
             }
         }
+    std::cout << std::endl;
     dst.Unlock();
 }
 
-void Surface::MakeContour(Surface & dst, u32 col) const
+void Surface::MakeContour(Surface & dst, const Surface & src, u32 col)
 {
-    dst.Set(surface->w + 2, surface->h + 2);
+    if(!src.surface) return;
+
+    dst.Set(src.surface->w + 2, src.surface->h + 2);
     dst.SetColorKey();
 
     Surface trf;
-    u32 fake = MapRGB(0x00, 0xFF, 0xFF);
+    u32 fake = src.MapRGB(0x00, 0xFF, 0xFF);
 
-    MakeStencil(trf, fake);
+    MakeStencil(trf, src, fake);
     const u32 clkey = trf.GetColorKey();
     dst.Lock();
     for(u16 y = 0; y < trf.h(); ++y)

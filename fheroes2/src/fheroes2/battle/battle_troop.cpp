@@ -174,7 +174,7 @@ void Army::BattleTroop::LoadContours(bool inv)
             const Sprite & sprite = AGG::GetICN(ICNFile(), ii, inv);
             
             Surface *contour = new Surface();
-            sprite.MakeContour(*contour, sprite.GetColor(0xDA));
+	    Surface::MakeContour(*contour, sprite, sprite.GetColor(0xDA));
             
             contours.push_back(contour);
         }
