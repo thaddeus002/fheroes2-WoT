@@ -92,7 +92,7 @@ void Puzzle::ShowMapsDialog(void) const
 
     const Surface & sf = world.GetPuzzleSurface();
 
-    if(display.w() == 640 && display.h() == 480)
+    if(display.w() == 640 && display.h() == 480 && !Settings::Get().HideInterface())
 	ShowStandardDialog(*this, sf);
     else
 	ShowExtendedDialog(*this, sf);
