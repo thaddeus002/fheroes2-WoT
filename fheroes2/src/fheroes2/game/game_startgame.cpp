@@ -262,7 +262,6 @@ void Game::OpenCastle(Castle *castle)
     if(! castle) return;
 
     Mixer::Reduce();
-    if(Settings::Get().LowMemory()) AGG::ICNRegistryEnable(true);
 
     Cursor & cursor = Cursor::Get();
     Kingdom & myKingdom = world.GetMyKingdom();
@@ -291,8 +290,16 @@ void Game::OpenCastle(Castle *castle)
 		DELAY(100);
 	    }
 
+	    if(Settings::Get().LowMemory()) AGG::ICNRegistryEnable(true);
+
 	    result = (*it)->OpenDialog(need_fade);
 	    if(need_fade) need_fade = false;
+
+	    if(Settings::Get().LowMemory())
+	    {
+    		AGG::ICNRegistryEnable(false);
+    		AGG::ICNRegistryFreeObjects();
+	    }
 
 	    if(Dialog::PREV == result)
 	    {
@@ -312,11 +319,6 @@ void Game::OpenCastle(Castle *castle)
     if(Heroes *hero = const_cast<Heroes *>((*it)->GetHeroes())) globalfocus.Set(hero);
     globalfocus.SetRedraw();
 
-    if(Settings::Get().LowMemory())
-    {
-        AGG::ICNRegistryEnable(false);
-        AGG::ICNRegistryFreeObjects();
-    }
     Mixer::Enhance();
 }
 
@@ -326,7 +328,6 @@ void Game::OpenHeroes(Heroes *hero)
     if(! hero) return;
 
     Mixer::Reduce();
-    if(Settings::Get().LowMemory()) AGG::ICNRegistryEnable(true);
 
     Cursor & cursor = Cursor::Get();
     Kingdom & myKingdom = world.GetMyKingdom();
@@ -356,8 +357,16 @@ void Game::OpenHeroes(Heroes *hero)
 		DELAY(100);
 	    }
 
+	    if(Settings::Get().LowMemory()) AGG::ICNRegistryEnable(true);
+
 	    result = (*it)->OpenDialog(false, need_fade);
 	    if(need_fade) need_fade = false;
+
+	    if(Settings::Get().LowMemory())
+	    {
+    		AGG::ICNRegistryEnable(false);
+    		AGG::ICNRegistryFreeObjects();
+	    }
 
 	    switch(result)
 	    {
@@ -395,11 +404,6 @@ void Game::OpenHeroes(Heroes *hero)
         globalfocus.Reset(Game::Focus::HEROES);
     globalfocus.SetRedraw();
 
-    if(Settings::Get().LowMemory())
-    {
-        AGG::ICNRegistryEnable(false);
-        AGG::ICNRegistryFreeObjects();
-    }
     Mixer::Enhance();
 }
 
@@ -1633,6 +1637,18 @@ void Game::KeyPress_SPACE(void)
 
 void Game::KeyPress_RETURN(void)
 {
+#ifdef POCKETPC_DEBUG
+    // check memory available
+    char* ptrs[33];
+    for(u8 ii = 0; ii < 33; ++ii)
+    {
+    	ptrs[ii] = new char[1000000];
+        std::cout << "test malloc: " << static_cast<int>(ii) << " Mb available" << std::endl;
+    }
+    // wince: limit 32Mb
+    // exception: out of memory
+#endif
+
     Focus & global_focus = Focus::Get();
     if(Game::Focus::HEROES == global_focus.Type())
     {

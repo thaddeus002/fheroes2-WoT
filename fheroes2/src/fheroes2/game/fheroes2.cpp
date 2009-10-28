@@ -289,6 +289,7 @@ int main(int argc, char **argv)
 #ifdef WITH_NET
             if(Game::NETWORK == conf.GameType()) Network::Logout();
 #endif
+    	    AGG::Cache::Get().Dump();
 	    conf.Dump();
 	}
 	
