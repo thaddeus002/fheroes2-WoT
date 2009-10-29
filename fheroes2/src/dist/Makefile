@@ -19,8 +19,14 @@ ifdef PREFIX
 CFLAGS := $(CFLAGS) -I$(PREFIX)/include
 endif
 
-SVN  := $(shell svnversion ..)
-CFLAGS := $(CFLAGS) -DSVN_REVISION="\"$(SVN)\""
+RES	:=
+ICOFILE	:= ../../image/fheroes2_32x32.ico
+SVN	:= $(shell svnversion ..)
+CFLAGS	:= $(CFLAGS) -DSVN_REVISION="\"$(SVN)\""
+
+ifdef WITH_ICONS
+RES	:= $(TARGET).res
+endif
 
 SOURCEROOT := ../fheroes2
 SOURCEDIR  := $(shell ls $(SOURCEROOT))
@@ -30,13 +36,18 @@ SEARCH := $(addprefix $(SOURCEROOT)/, $(addsuffix /*.cpp, $(SOURCEDIR)))
 
 all: $(TARGET)
 
-$(TARGET): $(notdir $(patsubst %.cpp, %.o, $(wildcard $(SEARCH)))) $(LIBENGINE)
+$(TARGET): $(notdir $(patsubst %.cpp, %.o, $(wildcard $(SEARCH)))) $(LIBENGINE) $(RES)
 	@echo "lnk: $@"
-	$(CXX) $(CFLAGS) $^ $(LIBS) -o $@
+	$(CXX) $(CFLAGS) $^ $(RES) $(LIBS) -o $@
 
 pot: $(wildcard $(SEARCH))
 	@echo "gen: $(POT)"
 	@xgettext -d $(TARGET) -C -k_ -o $(POT) $(wildcard $(SEARCH))
+
+$(RES): $(ICOFILE)
+	@echo "gen: $(RES)"
+	@echo "id ICON \"$(ICOFILE)\"" > $(TARGET).rc
+	$(WINDRES) $(TARGET).rc -O coff -o $(TARGET).res
 
 VPATH := $(addprefix $(SOURCEROOT)/, $(SOURCEDIR))
 

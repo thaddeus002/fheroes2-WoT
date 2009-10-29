@@ -1,0 +1,17 @@
+ifndef WITHOUT_MIXER
+LIBS := $(LIBS) -lSDL -lmad -lvorbisfile -lvorbis -logg
+endif
+
+ifndef WITHOUT_IMAGE
+LIBS := $(LIBS) -lSDL -lpng -ljpeg
+endif
+
+ifndef WITHOUT_UNICODE
+LIBS := $(LIBS) -lintl -lfreetype
+endif
+
+AR := i686-pc-mingw32-ar
+CXX := i686-pc-mingw32-g++
+WINDRES := i686-pc-mingw32-windres
+CFLAGS := $(CFLAGS) -O2 -static
+LIBS := -Wl,-Bstatic $(LIBS) -lwinmm

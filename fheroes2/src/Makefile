@@ -65,7 +65,7 @@ endif
 
 include Makefile.$(PLATFORM)
 
-export CXX AR LINK CFLAGS LIBS PLATFORM
+export CXX AR LINK WINDRES CFLAGS LIBS PLATFORM
 
 .PHONY: clean
 
