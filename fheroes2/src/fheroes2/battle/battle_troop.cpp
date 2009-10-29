@@ -216,13 +216,16 @@ int Army::BattleTroop::ApplyDamage(long damage)
     {
         damage -= hp;
         hp = Monster::GetHitPoints();
-        count--;
-        perished++;
-        if(!count)
+        if(count)
+	{
+	    count--;
+    	    perished++;
+        }
+	else
         {
             hp = 0;
             damage = 0;
-            break;
+	    break;
         }
     }
     hp -= damage;
