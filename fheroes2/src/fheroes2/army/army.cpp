@@ -487,7 +487,7 @@ s8 Army::army_t::GetMoraleWithModificators(std::string *strs) const
     }
 
     // undead in life group
-    if(1 < uniq_count && (count_necr || ghost_present) && (count_kngt || count_barb || count_sorc || count_wrlk || count_wzrd || count_bomg) ||
+    if((1 < uniq_count && (count_necr || ghost_present) && (count_kngt || count_barb || count_sorc || count_wrlk || count_wzrd || count_bomg)) ||
     // or artifact Arm Martyr
 	(commander && commander->HasArtifact(Artifact::ARM_MARTYR)))
     {
