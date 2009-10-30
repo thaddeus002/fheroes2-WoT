@@ -738,7 +738,7 @@ void ActionToCoast(Heroes &hero, const u8 obj, const u16 dst_index)
 {
     if(! hero.isShipMaster()) return;
 
-    const u16 from_index = Maps::GetIndexFromAbsPoint(hero.GetCenter());
+    u16 from_index = Maps::GetIndexFromAbsPoint(hero.GetCenter());
 
     Maps::Tiles & tiles_from = world.GetTiles(from_index);
     Maps::Tiles & tiles_to = world.GetTiles(dst_index);
@@ -752,6 +752,17 @@ void ActionToCoast(Heroes &hero, const u8 obj, const u16 dst_index)
     AGG::PlaySound(M82::KILLFADE);
     hero.GetPath().Hide();
     hero.FadeIn();
+
+    if(Maps::TileUnderProtection(hero.GetIndex(), &from_index))
+    {
+	// redraw gamearea for monster action sprite
+	Interface::Basic & I = Interface::Basic::Get();
+	Game::Focus & F = Game::Focus::Get();
+	I.gameArea.Center(F.Center());
+	F.SetRedraw();
+	I.Redraw();
+	ActionToMonster(hero, MP2::OBJ_MONSTER, from_index);
+    }
 
     if(Settings::Get().Debug()) Error::Verbose("ActionToCoast: " + hero.GetName() + " to coast");
 }
@@ -1959,8 +1970,11 @@ void ActionToTeleports(Heroes &hero, const u16 index_from)
     world.GetTiles(index_from).SetObject(MP2::OBJ_STONELIGHTS);
     world.GetTiles(index_to).SetObject(MP2::OBJ_HEROES);
 
-    Game::Focus::Get().SetRedraw();
-    //Display::Get().Flip();
+    Interface::Basic & I = Interface::Basic::Get();
+    Game::Focus & F = Game::Focus::Get();
+    I.gameArea.Center(F.Center());
+    F.SetRedraw();
+    I.Redraw();
 
     AGG::PlaySound(M82::KILLFADE);
     hero.GetPath().Hide();
@@ -1994,8 +2008,11 @@ void ActionToWhirlpools(Heroes &hero, const u8 obj, const u16 index_from)
     world.GetTiles(index_from).SetObject(MP2::OBJ_WHIRLPOOL);
     world.GetTiles(index_to).SetObject(MP2::OBJ_HEROES);
 
-    Game::Focus::Get().SetRedraw();
-//    Display::Get().Flip();
+    Interface::Basic & I = Interface::Basic::Get();
+    Game::Focus & F = Game::Focus::Get();
+    I.gameArea.Center(F.Center());
+    F.SetRedraw();
+    I.Redraw();
 
     AGG::PlaySound(M82::KILLFADE);
     hero.GetPath().Hide();

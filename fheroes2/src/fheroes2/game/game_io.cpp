@@ -33,6 +33,8 @@
 #include "interface_gamearea.h"
 #include "tools.h"
 
+#define FORMAT_VERSION 0x50C
+
 bool Game::Save(const std::string &fn)
 {
     if(Settings::Get().Debug()) Error::Verbose("Game::Save: " + fn);
@@ -125,7 +127,7 @@ bool Game::LoadSAV2FileInfo(const std::string & fn,  Maps::FileInfo & maps_file)
     if(byte16 != 0xFF01) return false;
     // format version
     msg.Pop(byte16);
-    if(byte16 > 0x50C)
+    if(byte16 > FORMAT_VERSION)
     {
 	// major version
 	msg.Pop(byte8);
@@ -594,7 +596,7 @@ bool Game::IO::LoadBIN(QueueMessage & msg)
 
     // format version
     msg.Pop(format);
-    if(format > 0x50C)
+    if(format > FORMAT_VERSION)
     {
 	// major version
 	msg.Pop(byte8);
@@ -648,7 +650,7 @@ bool Game::IO::LoadBIN(QueueMessage & msg)
     msg.Pop(conf.game_type);
     msg.Pop(conf.players_colors);
     msg.Pop(conf.preferably_count_players);
-#ifdef FORCE_DEBUG
+#ifdef WITH_DEBUG
     msg.Pop(byte8);
 #else
     msg.Pop(conf.debug);
@@ -690,7 +692,7 @@ bool Game::IO::LoadBIN(QueueMessage & msg)
 	msg.Pop(tile->fogs);
 	msg.Pop(tile->flags);
 
-#ifdef FORCE_DEBUG
+#ifdef WITH_DEBUG
 	tile->fogs &= ~conf.my_color;
 #endif
 

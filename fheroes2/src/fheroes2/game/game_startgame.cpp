@@ -581,7 +581,8 @@ Cursor::themes_t Game::GetCursor(const Maps::Tiles & tile)
 		    {
 			const Heroes * to_hero = world.GetHeroes(tile.GetIndex());
 
-    			if(NULL != to_hero && !to_hero->isShipMaster())
+    			if(NULL != to_hero && (!to_hero->isShipMaster() ||
+			    from_hero.CanPassToShipMaster(*to_hero)))
     			{
 			    if(to_hero->GetCenter() == from_hero.GetCenter())
 				return Cursor::HEROES;
@@ -1637,7 +1638,7 @@ void Game::KeyPress_SPACE(void)
 
 void Game::KeyPress_RETURN(void)
 {
-#ifdef POCKETPC_DEBUG
+#ifdef WITH_DEBUG
     // check memory available
     char* ptrs[33];
     for(u8 ii = 0; ii < 33; ++ii)

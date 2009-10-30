@@ -281,7 +281,7 @@ Game::menu_t Game::HighScores(void)
 
     if(rating && (gameResult.GetResult() & GameOver::WINS))
     {
-	std::string player;
+	std::string player("Unknown Hero");
 	Dialog::InputString("Your Name", player);
 	cursor.Hide();
 	if(player.empty()) player = "Unknown Hero";

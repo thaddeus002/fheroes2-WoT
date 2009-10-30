@@ -205,7 +205,7 @@ public:
 
     const Route::Path & GetPath(void) const{ return path; };
     Route::Path & GetPath(void) { return path; };
-    u16 FindPath(u16 dst_index);
+    u16 FindPath(u16 dst_index) const;
     u8 GetRangeRouteDays(const u16 dst) const;
     void ShowPath(bool f){ f ? path.Show() : path.Hide(); };
 
@@ -242,6 +242,7 @@ public:
     u8   GetScoute(void) const;
 
     bool isShipMaster(void) const;
+    bool CanPassToShipMaster(const Heroes &) const;
     void SetShipMaster(bool f);
 
     void SaveUnderObject(MP2::object_t obj);

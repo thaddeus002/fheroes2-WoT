@@ -1205,9 +1205,11 @@ void Heroes::ActionAfterBattle(void)
     SetModes(ACTION);
 }
 
-u16 Heroes::FindPath(u16 dst_index)
+u16 Heroes::FindPath(u16 dst_index) const
 {
-    return path.Calculate(dst_index);
+    Route::Path route(*this);
+
+    return route.Calculate(dst_index);
 }
 
 /* if hero in castle */
@@ -1481,6 +1483,31 @@ MP2::object_t Heroes::GetUnderObject(void) const
 bool Heroes::isShipMaster(void) const
 {
     return Modes(SHIPMASTER);
+}
+
+bool Heroes::CanPassToShipMaster(const Heroes & hero) const
+{
+    if(hero.isShipMaster())
+    {
+	Route::Path route(*this);
+
+	const s16 & cx = hero.mp.x;
+	const s16 & cy = hero.mp.y;
+	const bool full = false;
+	u16 coast = 0;
+
+	for(s16 y = -1; y <= 1; ++y)
+    	    for(s16 x = -1; x <= 1; ++x)
+	{
+            if((!y && !x) || (y && x && !full)) continue;
+
+            coast = Maps::GetIndexFromAbsPoint(cx + x, cy + y);
+
+            if(Maps::isValidAbsPoint(cx + x, cy + y) &&
+                MP2::OBJ_COAST == world.GetTiles(coast).GetObject() && FindPath(coast)) return true;
+	}
+    }
+    return false;
 }
 
 void Heroes::SetShipMaster(bool f)
