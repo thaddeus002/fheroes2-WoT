@@ -555,12 +555,39 @@ void AGG::Cache::LoadWAV(const M82::m82_t m82)
 {
     std::vector<u8> & v = wav_cache[m82];
 
-    if(v.size()) return;
+    if(v.size() || !Mixer::isValid()) return;
+    const Settings & conf = Settings::Get();
 
+#ifdef WITH_MIXER
+    if(conf.Modes(Settings::ALTRESOURCE))
+    {
+       std::string name(M82::GetString(m82));
+       String::Lower(name);
+       // ogg
+       String::Replace(name, ".82m", ".ogg");
+       std::string sound = Settings::Get().LocalPrefix() + SEPARATOR + "files" + SEPARATOR + "sounds" + SEPARATOR + name;
 
-    if(! Mixer::isValid()) return;
+       if(FilePresent(sound))
+       {
+           if(conf.Debug()) Error::Verbose("AGG::Cache::LoadWAV: ", sound.c_str());
+           StoreFileToMem(v, sound);
+           return;
+       }
 
-    if(Settings::Get().Debug()) Error::Verbose("AGG::Cache::LoadWAV: ", M82::GetString(m82));
+       // mp3
+       String::Replace(name, ".82m", ".mp3");
+       sound = Settings::Get().LocalPrefix() + SEPARATOR + "files" + SEPARATOR + "sounds" + SEPARATOR + name;
+
+       if(FilePresent(sound))
+       {
+           if(conf.Debug()) Error::Verbose("AGG::Cache::LoadWAV: ", sound.c_str());
+           StoreFileToMem(v, sound);
+           return;
+       }
+    }
+#endif
+
+    if(conf.Debug()) Error::Verbose("AGG::Cache::LoadWAV: ", M82::GetString(m82));
 
     Audio::Spec wav_spec;
     wav_spec.format = AUDIO_U8;
@@ -646,20 +673,8 @@ void AGG::Cache::LoadMUS(const MUS::mus_t mus)
 	Error::Warning("AGG::Cache::LoadMUS: error read file: " + musname + ", skipping...");
     }
 
-    std::fstream stream(filename, std::ios::in | std::ios::binary);
-
-    if(stream.good())
-    {
-	if(conf.Debug()) Error::Verbose("AGG::Cache::LoadMUS: ", filename);
-
-	stream.seekg(0, std::ios_base::end);
-	const u32 size = stream.tellg();
-	stream.seekg(0, std::ios_base::beg);
-	v.resize(size);
-    
-	stream.read(reinterpret_cast<char *>(&v[0]), size);
-	stream.close();
-    }
+    if(conf.Debug()) Error::Verbose("AGG::Cache::LoadMUS: ", filename);
+    StoreFileToMem(v, filename);
 }
 
 void AGG::Cache::LoadFNT(void)
@@ -1122,22 +1137,6 @@ void AGG::PlaySound(const M82::m82_t m82)
 
     if(conf.Sound())
     {
-#ifdef WITH_MIXER
-	if(conf.Modes(Settings::ALTRESOURCE))
-	{
-	    std::string name(M82::GetString(m82));
-	    String::Lower(name);
-	    String::Replace(name, ".82m", ".ogg");
-	    const std::string sound(Settings::Get().LocalPrefix() + SEPARATOR + "files" + SEPARATOR + "sounds" + SEPARATOR + name);
-
-	    if(FilePresent(sound))
-	    {
-		if(conf.Debug()) Error::Verbose("AGG::PlaySound: ", sound.c_str());
-		Mixer::PlayRAW(sound.c_str());
-		return;
-	    }
-	}
-#endif
 	if(conf.Debug()) Error::Verbose("AGG::PlaySound: ", M82::GetString(m82));
 	Mixer::PlayRAW(AGG::Cache::Get().GetWAV(m82));
     }
