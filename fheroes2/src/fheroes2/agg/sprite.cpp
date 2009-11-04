@@ -31,11 +31,11 @@ void Sprite::SetOffset(s16 ox, s16 oy)
     offsetY = oy;
 }
 
-void Sprite::DrawICN(Surface & sf, const char *buf, const u32 size, bool reflect)
+void Sprite::DrawICN(Surface & sf, const u8* cur, const u32 size, bool reflect)
 {
-    if(NULL == buf || 0 == size) return;
+    if(NULL == cur || 0 == size) return;
 
-    const u8 *cur = (const u8 *) buf;
+    //const u8 *cur = (const u8 *) buf;
     const u8 *max = cur + size;
 
     u8  c = 0;

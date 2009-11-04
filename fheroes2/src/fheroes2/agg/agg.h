@@ -64,7 +64,7 @@ namespace AGG
 	const FAT & Fat(const std::string & key);
 	u16 CountItems(void);
 
-	bool Read(const std::string & key, std::vector<char> & body);
+	bool Read(const std::string & key, std::vector<u8> & body);
 
 	void Dump(void) const;
 
@@ -107,7 +107,7 @@ namespace AGG
 	static Cache & Get(void);
 
 	bool ReadDataDir(void);
-	bool ReadChunk(const std::string & key, std::vector<char> & body);
+	bool ReadChunk(const std::string & key, std::vector<u8> & body);
 
 	int GetICNCount(const ICN::icn_t icn);
 	const Sprite & GetICN(const ICN::icn_t icn, u16 index, bool reflect = false);

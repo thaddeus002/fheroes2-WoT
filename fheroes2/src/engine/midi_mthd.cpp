@@ -30,15 +30,15 @@ void MThd::Dump(void) const
 
 void MThd::SetFormat(const u16 f)
 {
-    WriteBE16(&data[0], f);
+    WriteBE16(reinterpret_cast<u8*>(&data[0]), f);
 }
 
 void MThd::SetTracks(const u16 t)
 {
-    WriteBE16(&data[2], t);
+    WriteBE16(reinterpret_cast<u8*>(&data[2]), t);
 }
 
 void MThd::SetPPQN(const u16 p)
 {
-    WriteBE16(&data[4], p);
+    WriteBE16(reinterpret_cast<u8*>(&data[4]), p);
 }

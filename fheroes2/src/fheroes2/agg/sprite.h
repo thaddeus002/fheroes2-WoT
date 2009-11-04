@@ -40,7 +40,7 @@ public:
     u32 GetSize(void) const;
     void ScaleMinifyByTwo(void);
     
-    static void DrawICN(Surface & sf, const char *buf, const u32 size, bool reflect);
+    static void DrawICN(Surface & sf, const u8* buf, const u32 size, bool reflect);
 private:
 
     s16		offsetX;

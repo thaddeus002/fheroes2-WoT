@@ -94,8 +94,10 @@ u32 ReadLE32(const u8 *p);
 u16 ReadBE16(const u8 *p);
 u16 ReadLE16(const u8 *p);
 
-void WriteBE32(char *p, u32 x);
-void WriteBE16(char *p, u16 x);
+void WriteBE32(u8 *p, u32 x);
+void WriteBE16(u8 *p, u16 x);
+void WriteLE32(u8 *p, u32 x);
+void WriteLE16(u8 *p, u16 x);
 
 #ifdef __MINGW32CE__
 #include <cstdlib>

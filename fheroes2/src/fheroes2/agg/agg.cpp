@@ -130,7 +130,7 @@ void AGG::FAT::Dump(const std::string & n) const
 }
 
 /* read element to body */
-bool AGG::File::Read(const std::string & key, std::vector<char> & body)
+bool AGG::File::Read(const std::string & key, std::vector<u8> & body)
 {
     const FAT & f = fat[key];
 
@@ -144,7 +144,7 @@ bool AGG::File::Read(const std::string & key, std::vector<char> & body)
 
 	stream->seekg(f.offset, std::ios_base::beg);
 
-	stream->read(& body.at(0), f.size);
+	stream->read(reinterpret_cast<char*>(&body[0]), f.size);
 
 	return true;
     }
@@ -244,7 +244,7 @@ bool AGG::Cache::ReadDataDir(void)
     return heroes2_agg.isGood();
 }
 
-bool AGG::Cache::ReadChunk(const std::string & key, std::vector<char> & body)
+bool AGG::Cache::ReadChunk(const std::string & key, std::vector<u8> & body)
 {
     if(heroes2x_agg.isGood() && heroes2x_agg.Read(key, body)) return true;
 
@@ -416,14 +416,14 @@ bool AGG::Cache::LoadAltICN(icn_cache_t & v, const std::string & spec, const u16
 
 void AGG::Cache::LoadOrgICN(Sprite & sp, const ICN::icn_t icn, const u16 index, bool reflect)
 {
-    std::vector<char> body;
+    std::vector<u8> body;
 
     if(ReadChunk(ICN::GetString(icn), body))
     {
 	// loading original
 	if(1 < Settings::Get().Debug()) std::cout << "AGG::Cache::LoadOrgICN: " << ICN::GetString(icn) << ", " << index << std::endl;
 
-	const u16 count = ReadLE16(reinterpret_cast<const u8*>(&body[0]));
+	const u16 count = ReadLE16(&body[0]);
 	ICN::Header header1, header2;
 
 	header1.Load(&body[6 + index * ICN::Header::SizeOf()]);
@@ -431,7 +431,7 @@ void AGG::Cache::LoadOrgICN(Sprite & sp, const ICN::icn_t icn, const u16 index, 
 
 	const u32 size_data = (index + 1 != count ? header2.OffsetData() - header1.OffsetData() :
 				    // total size
-				    ReadLE32(reinterpret_cast<const u8*>(&body[2])) - header1.OffsetData());
+				    ReadLE32(&body[2]) - header1.OffsetData());
 
 	sp.Set(header1.Width(), header1.Height(), ICN::RequiresAlpha(icn));
 	sp.SetOffset(header1.OffsetX(), header1.OffsetY());
@@ -446,10 +446,10 @@ void AGG::Cache::LoadOrgICN(icn_cache_t & v, const ICN::icn_t icn, const u16 ind
 {
     if(NULL == v.sprites)
     {
-	std::vector<char> body;
+	std::vector<u8> body;
 	ReadChunk(ICN::GetString(icn), body);
 
-	v.count = ReadLE16(reinterpret_cast<const u8*>(&body[0]));
+	v.count = ReadLE16(&body[0]);
 	v.sprites = new Sprite [v.count];
 	v.reflect = new Sprite [v.count];
     }
@@ -524,13 +524,13 @@ void AGG::Cache::LoadTIL(const TIL::til_t til)
 
     if(Settings::Get().Debug()) Error::Verbose("AGG::Cache::LoadTIL: ", TIL::GetString(til));
 
-    std::vector<char> body;
+    std::vector<u8> body;
 
     if(ReadChunk(TIL::GetString(til), body))
     {
-	const u16 count = ReadLE16(reinterpret_cast<const u8*>(&body.at(0)));
-	const u16 width = ReadLE16(reinterpret_cast<const u8*>(&body.at(2)));
-	const u16 height= ReadLE16(reinterpret_cast<const u8*>(&body.at(4)));
+	const u16 count = ReadLE16(&body.at(0));
+	const u16 width = ReadLE16(&body.at(2));
+	const u16 height= ReadLE16(&body.at(4));
 
 	const u32 tile_size = width * height;
 	const u32 body_size = 6 + count * tile_size;
@@ -588,7 +588,31 @@ void AGG::Cache::LoadWAV(const M82::m82_t m82)
 #endif
 
     if(conf.Debug()) Error::Verbose("AGG::Cache::LoadWAV: ", M82::GetString(m82));
+    std::vector<u8> body;
 
+#ifdef WITH_MIXER
+    if(ReadChunk(M82::GetString(m82), body))
+    {
+	// create WAV format
+	v.resize(body.size() + 44);
+
+	WriteLE32(&v[0], 0x46464952);		// RIFF
+	WriteLE32(&v[4], body.size() + 0x24);	// size
+	WriteLE32(&v[8], 0x45564157);		// WAVE
+	WriteLE32(&v[12], 0x20746D66);		// FMT
+	WriteLE32(&v[16], 0x10);		// size_t
+	WriteLE16(&v[20], 0x01);		// format
+	WriteLE16(&v[22], 0x01);		// channels
+	WriteLE32(&v[24], 22050);		// samples
+	WriteLE32(&v[28], 22050);		// byteper
+	WriteLE16(&v[32], 0x01);		// align
+	WriteLE16(&v[34], 0x08);		// bitsper
+	WriteLE32(&v[36], 0x61746164);		// DATA
+	WriteLE32(&v[40], body.size());		// size
+
+	std::copy(body.begin(), body.end(), &v[44]);
+    }
+#else
     Audio::Spec wav_spec;
     wav_spec.format = AUDIO_U8;
     wav_spec.channels = 1;
@@ -597,7 +621,6 @@ void AGG::Cache::LoadWAV(const M82::m82_t m82)
     const Audio::Spec & hardware = Audio::GetHardwareSpec();
 
     Audio::CVT cvt;
-    std::vector<char> body;
 
     if(cvt.Build(wav_spec, hardware) &&
        ReadChunk(M82::GetString(m82), body))
@@ -616,6 +639,7 @@ void AGG::Cache::LoadWAV(const M82::m82_t m82)
 	delete [] cvt.buf;
 	cvt.buf = NULL;
     }
+#endif
 }
 
 /* load XMI object to AGG::Cache */
@@ -629,7 +653,7 @@ void AGG::Cache::LoadMID(const XMI::xmi_t xmi)
 
     if(! Mixer::isValid()) return;
 
-    std::vector<char> body;
+    std::vector<u8> body;
 
     if(ReadChunk(XMI::GetString(xmi), body))
     {
@@ -637,7 +661,7 @@ void AGG::Cache::LoadMID(const XMI::xmi_t xmi)
 	MIDI::Mid m;
 	MIDI::MTrk track;
 
-	x.Read(body);
+	x.Read(reinterpret_cast<std::vector<char> &>(body));
 	track.ImportXmiEVNT(x.EVNT());
 
 	m.AddTrack(track);

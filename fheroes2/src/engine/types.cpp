@@ -40,16 +40,30 @@ u16 ReadLE16(const u8 *p)
     return((((u16) *(p + 1)) << 8) | ((u16) *p));
 }
 
-void WriteBE32(char *p, u32 x)
+void WriteBE32(u8 *p, u32 x)
 {
-    *p = static_cast<char>(x >> 24);
-    *(p + 1) = static_cast<char>((x & 0x00FF0000) >> 16);
-    *(p + 2) = static_cast<char>((x & 0x0000FF00) >> 8);
-    *(p + 3) = static_cast<char>(x & 0x000000FF);
+    *p = static_cast<u8>(x >> 24);
+    *(p + 1) = static_cast<u8>((x & 0x00FF0000) >> 16);
+    *(p + 2) = static_cast<u8>((x & 0x0000FF00) >> 8);
+    *(p + 3) = static_cast<u8>(x & 0x000000FF);
 }
 
-void WriteBE16(char *p, u16 x)
+void WriteBE16(u8 *p, u16 x)
 {
-    *p = static_cast<char>(x >> 8);
-    *(p + 1) = static_cast<char>(x & 0x00FF);
+    *p = static_cast<u8>(x >> 8);
+    *(p + 1) = static_cast<u8>(x & 0x00FF);
+}
+
+void WriteLE32(u8 *p, u32 x)
+{
+    *(p + 3) = static_cast<u8>(x >> 24);
+    *(p + 2) = static_cast<u8>((x & 0x00FF0000) >> 16);
+    *(p + 1) = static_cast<u8>((x & 0x0000FF00) >> 8);
+    *p = static_cast<u8>(x & 0x000000FF);
+}
+
+void WriteLE16(u8 *p, u16 x)
+{
+    *(p + 1) = static_cast<u8>(x >> 8);
+    *p = static_cast<u8>(x & 0x00FF);
 }

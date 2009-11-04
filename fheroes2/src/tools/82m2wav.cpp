@@ -26,7 +26,7 @@
 class wavhead
 {
     public:
-    wavhead(u32 sz) : riff(0x46464952), size(sz + 0x22),
+    wavhead(u32 sz) : riff(0x46464952), size(sz + 0x24),
 	wave(0x45564157), fmt(0x20746D66), size_t(0x10), format(0x01),
 	channels(0x01), samples(22050), byteper(channels * samples * 0x08 / 8),
 	align(channels * 0x08 / 8), bitsper(0x08), data(0x61746164), size_d(sz)

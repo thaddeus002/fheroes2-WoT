@@ -239,7 +239,8 @@ void Mixer::PlayRAW(const std::vector<u8> & body, int ch)
 
     if(body.size())
     {
-        Mix_Chunk* chunk = Mix_QuickLoad_RAW(const_cast<u8 *>(&body[0]), body.size());
+        Mix_Chunk* chunk = Mix_LoadWAV_RW(SDL_RWFromConstMem(&body[0], body.size()), 1);
+//        Mix_Chunk* chunk = Mix_QuickLoad_RAW(const_cast<u8 *>(&body[0]), body.size());
 
         if(chunks[ch] != NULL)
             Error::Warning("Mixer::PlayRAW: Previous mix chunk was not freed");
@@ -295,7 +296,8 @@ void Mixer::LoadRAW(const std::vector<u8> & body, bool loop, const u8 ch)
 
     if(body.size())
     {
-        Mix_Chunk *chunk = Mix_QuickLoad_RAW(const_cast<u8 *>(&body[0]), body.size());
+        Mix_Chunk* chunk = Mix_LoadWAV_RW(SDL_RWFromConstMem(&body[0], body.size()), 1);
+//        Mix_Chunk *chunk = Mix_QuickLoad_RAW(const_cast<u8 *>(&body[0]), body.size());
 
         if(chunks[ch] != NULL)
             Error::Warning("Mixer::LoadRAW: Previous mix chunk was not freed");

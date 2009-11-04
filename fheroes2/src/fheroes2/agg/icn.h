@@ -911,7 +911,7 @@ namespace ICN
 	public:
 	Header();
 	
-	void Load(const char * p);
+	void Load(const u8* p);
 
 	u16 OffsetX(void) const{ return offset_x; };
 	u16 OffsetY(void) const{ return offset_y; };

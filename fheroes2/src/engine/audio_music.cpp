@@ -41,7 +41,9 @@ void Music::Play(const std::vector<u8> & body, bool loop)
         if(body.size())
         {
             id = &body[0];
-            music = Mix_LoadMUS_RW(SDL_RWFromConstMem(&body[0], body.size()));
+            SDL_RWops *rwops = SDL_RWFromConstMem(&body[0], body.size());
+            music = Mix_LoadMUS_RW(rwops);
+            SDL_FreeRW(rwops);
             Mix_PlayMusic(music, loop ? -1 : 0);
         }
     }

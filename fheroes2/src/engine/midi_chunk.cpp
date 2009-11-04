@@ -170,7 +170,7 @@ bool Chunk::Write(char *p) const
 
     memcpy(p, id, 4);
 
-    WriteBE32(&p[4], size);
+    WriteBE32(reinterpret_cast<u8*>(&p[4]), size);
 
     if(size && data) memcpy(&p[8], data, size);
 
