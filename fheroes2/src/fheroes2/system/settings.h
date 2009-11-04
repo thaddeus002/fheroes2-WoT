@@ -48,6 +48,8 @@ public:
 	LOWMEMORY         = 0x00000010,
 	TAPMODE           = 0x00000020,
 
+	HIDEAIMOVE        = 0x00000080,
+
 	SHOWCPANEL        = 0x00000100,
 	SHOWRADAR         = 0x00000200,
 	SHOWICONS         = 0x00000400,
@@ -131,7 +133,8 @@ public:
     bool PocketPC(void) const;
     bool LowMemory(void) const;
     bool TapMode(void) const;
-
+    bool HideAIMove(void) const;
+    
     const Size & VideoMode(void) const;
 
     u8   SoundVolume(void) const;

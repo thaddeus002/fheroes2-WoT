@@ -221,7 +221,7 @@ void Kingdom::AIHeroesTurns(Heroes &hero)
 	cursor.Hide();
 	u32 ticket = 0;
 
-	if(hero.isShow(Settings::Get().MyColor()))
+	if(!Settings::Get().HideAIMove() && hero.isShow(Settings::Get().MyColor()))
 	{
 	    cursor.Hide();
 	    I.gameArea.Center(hero.GetCenter());
@@ -234,7 +234,8 @@ void Kingdom::AIHeroesTurns(Heroes &hero)
 	{
 	    if(hero.isFreeman() || !hero.isEnableMove()) break;
 
-	    if(0 == Settings::Get().Debug() && !hero.isShow(Settings::Get().MyColor()))
+	    if(Settings::Get().HideAIMove() ||
+	       (0 == Settings::Get().Debug() && !hero.isShow(Settings::Get().MyColor())))
 		hero.Move(true);
 	    else
 	    if(Game::ShouldAnimateInfrequent(ticket, 1))
@@ -254,7 +255,7 @@ void Kingdom::AIHeroesTurns(Heroes &hero)
 	}
 
 	// 0.2 sec delay for show enemy hero position
-	if(!hero.isFreeman() && hero.isShow(Settings::Get().MyColor())) DELAY(200);
+	if(!hero.isFreeman() && !Settings::Get().HideAIMove() && hero.isShow(Settings::Get().MyColor())) DELAY(200);
 }
 
 void Kingdom::AIHeroesGetTask(Heroes & hero)

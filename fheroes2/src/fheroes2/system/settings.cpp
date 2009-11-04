@@ -58,6 +58,7 @@ namespace
         { "low memory",        Settings::LOWMEMORY                   },
         { "tapmode",           Settings::TAPMODE                     },
         { "tap mode",          Settings::TAPMODE                     },
+        { "hide ai move",      Settings::HIDEAIMOVE                  },
     };
 }
 
@@ -237,6 +238,9 @@ void Settings::Dump(std::ostream & stream) const
     stream << "battle movement shadow = " << (Modes(BATTLEMOVESHADOW) ? "on" : "off") << std::endl;
     stream << "battle mouse shadow = " << (Modes(BATTLEMOUSESHADOW) ? "on" : "off") << std::endl;
 
+    if(Modes(HIDEAIMOVE))
+    stream << "hide ai move = on" << std::endl;
+
 #ifdef WITH_TTF
     stream << "fonts normal = " << font_normal << std::endl;
     stream << "fonts small = " << font_small << std::endl;
@@ -373,6 +377,7 @@ bool Settings::Unicode(void) const { return Modes(USEUNICODE); }
 bool Settings::PocketPC(void) const { return Modes(POCKETPC); }
 bool Settings::LowMemory(void) const { return Modes(LOWMEMORY); }
 bool Settings::TapMode(void) const { return Modes(TAPMODE); }
+bool Settings::HideAIMove(void) const { return Modes(HIDEAIMOVE); }
 
 /* get video mode */
 const Size & Settings::VideoMode(void) const { return video_mode; }
