@@ -21,9 +21,9 @@
 #include <iostream>
 #include "midi.h"
 
-u8 MIDI::UnpackDelta(const char *p, u32 & d)
+u8 MIDI::UnpackDelta(const u8 *p, u32 & d)
 {
-    const char *p2 = p;
+    const u8 *p2 = p;
     d = 0;
 
     while(*p2 & 0x80)
@@ -44,12 +44,12 @@ u8 MIDI::UnpackDelta(const char *p, u32 & d)
     return p2 - p + 1;
 }
 
-u8 MIDI::PackDelta(char *p, const u32 & d)
+u8 MIDI::PackDelta(u8 *p, const u32 & d)
 {
-    const char c1 = static_cast<char>(d & 0x0000007F);
-    const char c2 = static_cast<char>((d & 0x00003F80) >> 7);
-    const char c3 = static_cast<char>((d & 0x001FC000) >> 14);
-    const char c4 = static_cast<char>((d & 0x0FE00000) >> 21);
+    const u8 c1 = static_cast<char>(d & 0x0000007F);
+    const u8 c2 = static_cast<char>((d & 0x00003F80) >> 7);
+    const u8 c3 = static_cast<char>((d & 0x001FC000) >> 14);
+    const u8 c4 = static_cast<char>((d & 0x0FE00000) >> 21);
 
     if(c4)
     { p[0] = c4 | 0x80; p[1] = c3 | 0x80; p[2] = c2 | 0x80; p[3] = c1; }

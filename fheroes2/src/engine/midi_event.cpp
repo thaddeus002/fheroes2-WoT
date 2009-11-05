@@ -23,15 +23,65 @@
 
 using namespace MIDI;
 
-Event::Event::Event() : delta(0), status(0), sp(0)
+Event::Event() : delta(0), status(0), sp(0)
 {
 }
 
-Event::Event::Event(const u32 dl, const u8 st,  const u32 sz, const char *p) : delta(dl), status(st)
+Event::Event(const u32 dl, const u8 st,  const u32 sz, const u8 *p) : delta(dl), status(st), data(NULL)
 {
-    if(sz) data.assign(p , p + sz);
+    if(sz)
+    {
+	data = new u8 [sz];
+	size = sz;
+	memcpy(data, p, size);
+    }
 
     SetDelta(dl);
+}
+
+Event::Event(const Event & e)
+{
+    delta = e.delta;
+    status = e.status;
+
+    data = NULL;
+    size = e.size;
+
+    if(size)
+    {
+	data = new u8 [size];
+	memcpy(data, e.data, size);
+    }
+
+    memcpy(pack, e.pack, 4);
+    sp = e.sp;
+}
+
+Event::~Event()
+{
+    if(data) delete [] data;
+}
+
+Event & Event::operator= (const Event & e)
+{
+    if(data) delete [] data;
+
+    delta = e.delta;
+    status = e.status;
+
+    data = NULL;
+    size = e.size;
+
+    if(size)
+    {
+	data = new u8 [size];
+	memcpy(data, e.data, size);
+    }
+
+    memcpy(pack, e.pack, 4);
+    sp = e.sp;
+
+    return *this;
 }
 
 void Event::SetDelta(const u32 dl)
@@ -41,10 +91,10 @@ void Event::SetDelta(const u32 dl)
 
 u32 Event::Size(void) const
 {
-    return 1 + sp + data.size();
+    return 1 + sp + size;
 }
 
-bool Event::Write(char *p) const
+bool Event::Write(u8 *p) const
 {
     if(NULL == p) return false;
 
@@ -53,7 +103,7 @@ bool Event::Write(char *p) const
 
     *p = status;
 
-    if(data.size()) memcpy(p + 1, &data[0], data.size());
+    if(size) memcpy(p + 1, data, size);
 
     return true;
 }
@@ -62,9 +112,9 @@ bool Event::Write(std::ostream & o) const
 {
     if(o.fail()) return false;
 
-    o.write(pack, sp);
+    o.write(reinterpret_cast<const char*>(pack), sp);
     o.write(&status, 1);
-    if(data.size()) o.write(&data[0], data.size());
+    if(size) o.write(reinterpret_cast<const char*>(data), size);
 
     return true;
 }
@@ -73,7 +123,7 @@ void Event::Dump(void) const
 {
     printf("          [dl:%d:st:%hhX:dt", delta, status);
 
-    for(u32 ii = 0; ii < data.size(); ++ii) printf(":%hhX", data[ii]);
+    for(u32 ii = 0; ii < size; ++ii) printf(":%hhX", data[ii]);
 
     printf("]\n");
 }

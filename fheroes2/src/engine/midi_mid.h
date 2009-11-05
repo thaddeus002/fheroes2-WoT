@@ -39,10 +39,10 @@ namespace MIDI
 	Mid & operator= (const Mid & m);
 
 	bool Read(const std::string & filename);
-	bool Read(const std::vector<char> & body);
+	bool Read(const std::vector<u8> & body);
 
 	bool Write(const std::string & filename);
-	bool Write(std::vector<char> & body);
+	bool Write(std::vector<u8> & body);
 
 	u32 Size(void) const;
 

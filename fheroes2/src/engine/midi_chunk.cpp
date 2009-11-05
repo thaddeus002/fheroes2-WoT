@@ -29,13 +29,13 @@ Chunk::Chunk() : size(0), data(NULL)
     memset(id, '\0', 4);
 }
 
-Chunk::Chunk(const char *i, const u32 s, const char *p) : size(s), data(NULL)
+Chunk::Chunk(const char *i, const u32 s, const u8 *p) : size(s), data(NULL)
 {
     i ? memcpy(id, i, 4) : memset(id, '\0', 4);
 
     if(size)
     {
-	data = new char[size];
+	data = new u8[size];
 
 	if(p) memcpy(data, p, size); else memset(data, '\0', size);
     }
@@ -47,7 +47,7 @@ Chunk::Chunk(std::istream & i) : size(0), data(NULL)
     Read(i);
 }
 
-Chunk::Chunk(const char *p) : size(0), data(NULL)
+Chunk::Chunk(const u8 *p) : size(0), data(NULL)
 {
     memset(id, '\0', 4);
     Read(p);
@@ -59,7 +59,7 @@ Chunk::Chunk(const Chunk & c) : size(c.size), data(NULL)
 
     if(size)
     {
-	data = new char [size];
+	data = new u8 [size];
 	memcpy(data, c.data, size);
     }
 }
@@ -79,7 +79,7 @@ Chunk::Chunk & Chunk::operator= (const Chunk & c)
 
     if(size)
     {
-	data = new char [size];
+	data = new u8 [size];
 	memcpy(data, c.data, size);
     }
 
@@ -100,20 +100,20 @@ bool Chunk::Read(std::istream & i)
 
     if(size)
     {
-	data = new char [size];
-	i.read(data, size);
+	data = new u8 [size];
+	i.read(reinterpret_cast<char *>(data), size);
     }
 
     return true;
 }
 
-bool Chunk::Read(const std::vector<char> & b)
+bool Chunk::Read(const std::vector<u8> & b)
 {
     if(8 > b.size()) return false;
 
     memcpy(id, &b[0], 4);
 
-    size = ReadBE32(reinterpret_cast<const u8*>(&b[4]));
+    size = ReadBE32(&b[4]);
 
     if(data) delete [] data;
     data = NULL;
@@ -122,27 +122,27 @@ bool Chunk::Read(const std::vector<char> & b)
 
     if(size)
     {
-	data = new char [size];
+	data = new u8 [size];
 	memcpy(data, &b[8], size);
     }
 
     return true;
 }
 
-bool Chunk::Read(const char *p)
+bool Chunk::Read(const u8 *p)
 {
     if(NULL == p) return false;
 
     memcpy(id, p, 4);
 
-    size = ReadBE32(reinterpret_cast<const u8*>(&p[4]));
+    size = ReadBE32(&p[4]);
 
     if(data) delete [] data;
     data = NULL;
 
     if(size)
     {
-	data = new char [size];
+	data = new u8 [size];
 	memcpy(data, &p[8], size);
     }
 
@@ -159,18 +159,18 @@ bool Chunk::Write(std::ostream & o) const
     SwapBE32(x);
     o.write(reinterpret_cast<char *>(&x), 4);
 
-    if(size && data) o.write(data, size);
+    if(size && data) o.write(reinterpret_cast<char *>(data), size);
 
     return true;
 }
 
-bool Chunk::Write(char *p) const
+bool Chunk::Write(u8 *p) const
 {
     if(NULL == p) return false;
 
     memcpy(p, id, 4);
 
-    WriteBE32(reinterpret_cast<u8*>(&p[4]), size);
+    WriteBE32(&p[4], size);
 
     if(size && data) memcpy(&p[8], data, size);
 

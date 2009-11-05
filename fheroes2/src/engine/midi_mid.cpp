@@ -69,7 +69,7 @@ Mid & Mid::operator= (const Mid & m)
     return *this;
 }
 
-bool Mid::Read(const std::vector<char> & body)
+bool Mid::Read(const std::vector<u8> & body)
 {
     mthd.Read(body);
 
@@ -81,7 +81,7 @@ bool Mid::Read(const std::vector<char> & body)
     }
 
     const u32 count = mthd.Tracks();
-    const char *ptr = &body[mthd.Size()];
+    const u8 *ptr = &body[mthd.Size()];
 
     for(u16 ii = 0; ii < count; ++ii)
     {
@@ -160,10 +160,10 @@ u32 Mid::Size(void) const
     return total;
 }
 
-bool Mid::Write(std::vector<char> & body)
+bool Mid::Write(std::vector<u8> & body)
 {
     body.resize(Size());
-    char *ptr = &body[0];
+    u8 *ptr = &body[0];
 
     mthd.Write(ptr);
     ptr += mthd.Size();

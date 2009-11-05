@@ -21,7 +21,6 @@
 #ifndef MIDI_EVENT_H
 #define MIDI_EVENT_H
 
-#include <vector>
 #include <ostream>
 #include "midi.h"
 
@@ -31,25 +30,30 @@ namespace MIDI
     {
     public:
 	Event();
-	Event(const u32 dl, const u8 st, const u32 sz, const char *p);
+	Event(const u32 dl, const u8 st, const u32 sz, const u8 *p);
+	Event(const Event &);
+	~Event();
+
+	Event & operator= (const Event &);
 
 	u32	Size(void) const;
-	const std::vector<char> & Data(void) const{ return data; };
 	u32	Delta(void) const { return delta; };
 	u8	Status(void) const { return status; };
 
 	void	SetDelta(const u32 dl);
 
 	void	Dump(void) const;
-	bool	Write(char *p) const;
+	bool	Write(u8 *p) const;
 	bool	Write(std::ostream & o) const;
 
     protected:
 	u32	delta;
 	char	status;
-	std::vector<char> data;
 
-	char	pack[4];
+	u8*	data;
+	u32	size;
+
+	u8	pack[4];
 	u8	sp;
     };
 };

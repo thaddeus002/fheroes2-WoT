@@ -38,12 +38,12 @@ namespace MIDI
     {
     public:
 	MTrk() {};
-        MTrk(const char *p, const u32 s);
+        MTrk(const u8 *p, const u32 s);
         MTrk(const MTrk & t);
 	~MTrk();
 
 	bool Write(std::ostream & o) const;
-	bool Write(char *p) const;
+	bool Write(u8 *p) const;
 	u32 Size(void) const;
 
 	void AddEvent(const Event & e);

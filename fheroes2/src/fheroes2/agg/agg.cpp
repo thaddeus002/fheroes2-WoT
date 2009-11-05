@@ -661,13 +661,13 @@ void AGG::Cache::LoadMID(const XMI::xmi_t xmi)
 	MIDI::Mid m;
 	MIDI::MTrk track;
 
-	x.Read(reinterpret_cast<std::vector<char> &>(body));
+	x.Read(body);
 	track.ImportXmiEVNT(x.EVNT());
 
 	m.AddTrack(track);
 	m.SetPPQN(64);
 
-	m.Write(reinterpret_cast<std::vector<char> &>(v));
+	m.Write(v);
     }
 }
 

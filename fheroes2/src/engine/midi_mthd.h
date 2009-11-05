@@ -35,20 +35,20 @@ namespace MIDI
     {
     public:
 	MThd() : Chunk(ID_MTHD, 6) {};
-	MThd(const char *p, const u32 s) : Chunk(ID_MTHD, s, p) {};
+	MThd(const u8 *p, const u32 s) : Chunk(ID_MTHD, s, p) {};
 	MThd(std::istream & i) : Chunk(i) {};
 
 	bool isValid(void) const{ return 0 == memcmp(Chunk::id, ID_MTHD, 4); };
 	bool Read(std::istream & is){ return Chunk::Read(is); };
-	bool Read(const std::vector<char> & b){ return Chunk::Read(b); };
+	bool Read(const std::vector<u8> & b){ return Chunk::Read(b); };
 	bool Write(std::ostream & os) const{ return Chunk::Write(os); };
-	bool Write(char* b) const{ return Chunk::Write(b); };
+	bool Write(u8* b) const{ return Chunk::Write(b); };
 
 	void SetFormat(const u16 f);
 	void SetTracks(const u16 t);
 	void SetPPQN(const u16 p);
 
-	const char* Data(void) const{ return Chunk::data; };
+	const u8* Data(void) const{ return Chunk::data; };
 	u32 Size(void) const{ return 8 + size; };
 	u16 Format(void) const{ return ReadBE16(reinterpret_cast<const u8*>(&data[0])); };
 	u16 Tracks(void) const{ return ReadBE16(reinterpret_cast<const u8*>(&data[2])); };

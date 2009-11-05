@@ -33,23 +33,23 @@ namespace MIDI
 	public:
 	char		id[4];
 	u32		size;
-	char *		data;
+	u8*		data;
 
 	Chunk();
-	Chunk(const char *i, const u32 s, const char *p = NULL);
+	Chunk(const char *i, const u32 s, const u8 *p = NULL);
 	Chunk(std::istream & i);
-	Chunk(const char *p);
+	Chunk(const u8 *p);
 	Chunk(const Chunk & c);
 	~Chunk();
 
 	Chunk &	operator= (const Chunk & c);
 
 	bool Write(std::ostream & o) const;
-	bool Write(char *p) const;
+	bool Write(u8 *p) const;
 
 	bool Read(std::istream & i);
-	bool Read(const char *p);
-	bool Read(const std::vector<char> & b);
+	bool Read(const u8 *p);
+	bool Read(const std::vector<u8> & b);
 
 	void Dump(void) const;
     };

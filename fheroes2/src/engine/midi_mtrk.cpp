@@ -33,11 +33,11 @@ struct meta_t
     u8 duration;
 };
 
-MTrk::MTrk(const char *p, const u32 s)
+MTrk::MTrk(const u8 *p, const u32 s)
 {
-    const char *ptr = p;
+    const u8 *ptr = p;
     bool end = false;
-
+std::cout << "111111111" <<std::endl;
     while(ptr && !end && ptr < (p + s))
     {
 	u32 delta = 0;
@@ -154,7 +154,7 @@ bool MTrk::Write(std::ostream & o) const
     return true;
 }
 
-bool MTrk::Write(char *p) const
+bool MTrk::Write(u8 *p) const
 {
     if(NULL == p) return false;
 
@@ -167,8 +167,9 @@ bool MTrk::Write(char *p) const
     for(; it1 != it2; ++it1) if(*it1) size += (*it1)->Size();
 
     u32 x = size;
-    SwapBE32(x);
-    memcpy(p, reinterpret_cast<char *>(&x), 4);
+    //SwapBE32(x);
+    //memcpy(p, reinterpret_cast<u8 *>(&x), 4);
+    WriteBE32(p, x);
     p+= 4;
 
     if(events.size())
@@ -188,7 +189,7 @@ void MTrk::AddEvent(const Event & e)
 
 void MTrk::CloseEvents(void)
 {
-    events.push_back(new Event(0, 0xFF, 2, "\057\000"));
+    events.push_back(new Event(0, 0xFF, 2, reinterpret_cast<const u8*>("\057\000")));
 }
 
 void MTrk::Dump(void) const
@@ -206,9 +207,9 @@ void MTrk::Dump(void) const
 
 void MTrk::ImportXmiEVNT(const Chunk & evnt)
 {
-    const char *ptr = evnt.data;
+    const u8 *ptr = evnt.data;
     std::list<meta_t> notesoff;
-    char buf[2];
+    u8 buf[2];
 
     u32 delta = 0;
     bool end = false;

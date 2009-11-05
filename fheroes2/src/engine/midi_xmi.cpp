@@ -36,7 +36,7 @@ Xmi::Xmi()
 {
 }
 
-bool Xmi::Read(const std::vector<char> & body)
+bool Xmi::Read(const std::vector<u8> & body)
 {
     if(0 == body.size())
     {
@@ -44,7 +44,7 @@ bool Xmi::Read(const std::vector<char> & body)
         return false;
     }
 
-    const char *ptr = &body[0];
+    const u8 *ptr = &body[0];
 
     if(memcmp(ID_FORM, ptr, 4))
     {
@@ -121,8 +121,8 @@ bool Xmi::Read(const std::string & filename)
     const u32 size = fd.tellg();
     fd.seekg(0, std::ios_base::beg);
 
-    std::vector<char> body(size);
-    fd.read(&body[0], size);
+    std::vector<u8> body(size);
+    fd.read(reinterpret_cast<char*>(&body[0]), size);
     fd.close();
 
     return Read(body);
