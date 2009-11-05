@@ -792,12 +792,13 @@ bool MP2::isGroundObject(const u8 obj)
     	    case OBJ_MAGICGARDEN:
     	    case OBJ_OBSERVATIONTOWER:
     	    case OBJ_FREEMANFOUNDRY:
-    	    case OBJ_BARRIER:
     	    
     	    case OBJ_MONSTER:
     	    case OBJ_CASTLE:
     	    case OBJ_BOAT:
 
+	    case MP2::OBJ_BARRIER:
+	    case MP2::OBJ_TRAVELLERTENT:
 	    case MP2::OBJ_FIREALTAR:
 	    case MP2::OBJ_AIRALTAR:
 	    case MP2::OBJ_EARTHALTAR:

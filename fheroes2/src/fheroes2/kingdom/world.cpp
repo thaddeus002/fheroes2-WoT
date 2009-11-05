@@ -837,6 +837,8 @@ void World::LoadMaps(const std::string &filename)
             case MP2::OBJ_DAEMONCAVE:
             case MP2::OBJ_ABANDONEDMINE:
 	    case MP2::OBJ_TREEKNOWLEDGE:
+	    case MP2::OBJ_BARRIER:
+	    case MP2::OBJ_TRAVELLERTENT:
     		tile.UpdateQuantity();
 		break;
 

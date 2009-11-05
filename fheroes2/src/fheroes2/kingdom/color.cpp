@@ -94,3 +94,39 @@ u8 Color::GetFirst(u8 colors)
 
     return 0;
 }
+
+const char* Barrier::Color(u8 val)
+{
+    switch(val)
+    {
+        case 0x01:	return _("Aqua");
+        case 0x02:	return _("Blue");
+        case 0x04:	return _("Brown");
+        case 0x08:	return _("Gold");
+        case 0x10:	return _("Green");
+        case 0x20:	return _("Orange");
+        case 0x40:	return _("Purple");
+        case 0x80:	return _("Red");
+        default: break;
+    }
+
+    return "None";
+}
+
+Barrier::color_t Barrier::FromMP2(u8 val)
+{
+    switch(val)
+    {
+        case 0:	return AQUA;
+        case 8:	return BLUE;
+        case 16:return BROWN;
+        case 24:return GOLD;
+        case 32:return GREEN;
+        case 40:return ORANGE;
+        case 48:return PURPLE;
+        case 56:return RED;
+        default: break;
+    }
+
+    return NONE;
+}

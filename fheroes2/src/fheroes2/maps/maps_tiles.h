@@ -107,6 +107,7 @@ namespace Maps
 	TilesAddon * FindMonster(void);
 	const TilesAddon * FindMines(void) const;
 	TilesAddon * FindJail(void);
+	TilesAddon * FindBarrier(void);
 
 	void SetTile(const u16 index, const u8 shape);
 
@@ -168,6 +169,7 @@ namespace Maps
     private:
 	void CorrectFlags32(const u8 index);
 	void RemoveJailSprite(void);
+	void RemoveBarrierSprite(void);
 
     private:
 	friend class Game::IO;

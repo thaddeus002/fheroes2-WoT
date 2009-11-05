@@ -23,6 +23,25 @@
 #include <string>
 #include "gamedefs.h"
 
+namespace Barrier
+{
+    enum color_t
+    {
+	NONE	= 0x00,
+        AQUA	= 0x01,
+        BLUE	= 0x02,
+        BROWN	= 0x04,
+        GOLD	= 0x08,
+        GREEN	= 0x10,
+        ORANGE	= 0x20,
+        PURPLE	= 0x40,
+        RED	= 0x80,
+    };
+
+    const char* Color(u8);
+    color_t FromMP2(u8);
+};
+
 namespace Color
 {
     enum color_t
@@ -40,7 +59,7 @@ namespace Color
     inline color_t& operator-- (color_t& color){ return color = ( BLUE == color ? GRAY : color_t(color >> 1)); };
 
     const char* String(u8);
-    
+
     u8 GetIndex(color_t);
     color_t GetFromIndex(u8);
     u8 GetFirst(u8);

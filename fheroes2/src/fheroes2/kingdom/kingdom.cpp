@@ -36,7 +36,7 @@ Kingdom::Kingdom()
 {
 }
 
-Kingdom::Kingdom(const Color::color_t cl) : color(cl), control(Game::AI), flags(0), lost_town_days(LOST_TOWN_DAYS + 1), ai_capital(NULL)
+Kingdom::Kingdom(const Color::color_t cl) : color(cl), control(Game::AI), flags(0), lost_town_days(LOST_TOWN_DAYS + 1), ai_capital(NULL), visited_tents_colors(0)
 {
     const Settings & conf = Settings::Get();
 
@@ -435,4 +435,14 @@ const Puzzle & Kingdom::PuzzleMaps(void) const
 Puzzle & Kingdom::PuzzleMaps(void)
 {
     return puzzle_maps;
+}
+
+void Kingdom::SetVisitTravelersTent(u8 col)
+{
+    visited_tents_colors |= col;
+}
+
+bool Kingdom::IsVisitTravelersTent(u8 col)
+{
+    return visited_tents_colors & col;
 }

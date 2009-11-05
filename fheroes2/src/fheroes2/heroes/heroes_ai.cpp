@@ -65,6 +65,8 @@ void AIToHeroes(Heroes &hero, const u8 obj, const u16 dst_index);
 void AIToDwellingRecruitMonster(Heroes &hero, const u8 obj, const u16 dst_index);
 void AIToStables(Heroes &hero, const u8 obj, const u16 dst_index);
 void AIToAbandoneMine(Heroes &hero, const u8 obj, const u16 dst_index);
+void AIToBarrier(Heroes &hero, const u8 obj, const u16 dst_index);
+void AIToTravellersTent(Heroes &hero, const u8 obj, const u16 dst_index);
 
 Skill::Primary::skill_t AISelectPrimarySkill(Heroes &hero)
 {
@@ -261,6 +263,9 @@ void Heroes::AIAction(const u16 dst_index)
 
 	case MP2::OBJ_STABLES:		AIToStables(*this, object, dst_index); break;
 	case MP2::OBJ_ARENA:		AIToPrimarySkillObject(*this, object, dst_index); break;
+
+        case MP2::OBJ_BARRIER:          AIToBarrier(*this, object, dst_index); break;
+        case MP2::OBJ_TRAVELLERTENT:    AIToTravellersTent(*this, object, dst_index); break;
 
     	default: break;
     }
@@ -1349,6 +1354,29 @@ void AIToAbandoneMine(Heroes &hero, const u8 obj, const u16 dst_index)
     if(Settings::Get().Debug()) Error::Verbose("AIToAbandoneMine: " + hero.GetName());
 }
 
+void AIToBarrier(Heroes &hero, const u8 obj, const u16 dst_index)
+{
+    Maps::Tiles & tile = world.GetTiles(dst_index);
+    Kingdom & kingdom = world.GetKingdom(hero.GetColor());
+
+    if(kingdom.IsVisitTravelersTent(tile.GetQuantity1()))
+    {
+        tile.RemoveObjectSprite();
+        tile.SetObject(MP2::OBJ_ZERO);
+    }
+
+    if(Settings::Get().Debug()) Error::Verbose("AIToBarrier: " + hero.GetName());
+}
+
+void AIToTravellersTent(Heroes &hero, const u8 obj, const u16 dst_index)
+{
+    const Maps::Tiles & tile = world.GetTiles(dst_index);
+    Kingdom & kingdom = world.GetKingdom(hero.GetColor());
+
+    kingdom.SetVisitTravelersTent(tile.GetQuantity1());
+
+    if(Settings::Get().Debug()) Error::Verbose("AIToTravellersTent: " + hero.GetName());
+}
 
 
 
@@ -1434,6 +1462,14 @@ bool Heroes::AIValidObject(u16 index, u8 obj)
 	// obelisk
 	case MP2::OBJ_OBELISK:
 	    if(! isVisited(world.GetTiles(index), Visit::GLOBAL)) return true;
+	    break;
+
+        case MP2::OBJ_BARRIER:
+	    if(world.GetKingdom(GetColor()).IsVisitTravelersTent(world.GetTiles(index).GetQuantity1())) return true;
+	    break;
+
+        case MP2::OBJ_TRAVELLERTENT:
+	    if(!world.GetKingdom(GetColor()).IsVisitTravelersTent(world.GetTiles(index).GetQuantity1())) return true;
 	    break;
 
 	// new spell

@@ -33,7 +33,10 @@
 #include "interface_gamearea.h"
 #include "tools.h"
 
-#define FORMAT_VERSION 0x50C
+#define FORMAT_VERSION_1335 0x537
+#define FORMAT_VERSION_1293 0x50C
+
+#define CURRENT_FORMAT_VERSION FORMAT_VERSION_1335
 
 bool Game::Save(const std::string &fn)
 {
@@ -127,7 +130,7 @@ bool Game::LoadSAV2FileInfo(const std::string & fn,  Maps::FileInfo & maps_file)
     if(byte16 != 0xFF01) return false;
     // format version
     msg.Pop(byte16);
-    if(byte16 > FORMAT_VERSION)
+    if(byte16 >= FORMAT_VERSION_1293)
     {
 	// major version
 	msg.Pop(byte8);
@@ -181,8 +184,8 @@ bool Game::IO::SaveBIN(QueueMessage & msg)
     msg.Reserve(world.w() > Maps::MEDIUM ? 600 * 1024 : 200 * 1024);
 
     msg.Push(static_cast<u16>(0xFF01));
-    // format version: svn 1293
-    msg.Push(static_cast<u16>(0x050D));
+    // format version
+    msg.Push(static_cast<u16>(CURRENT_FORMAT_VERSION));
     // version
     msg.Push(conf.major_version);
     msg.Push(conf.minor_version);
@@ -230,7 +233,6 @@ bool Game::IO::SaveBIN(QueueMessage & msg)
     msg.Push(conf.players_colors);
     msg.Push(conf.preferably_count_players);
     msg.Push(conf.debug);
-    // added svn 1292: settings: original
     msg.Push(static_cast<u8>(conf.Original()));
 
     // world
@@ -471,6 +473,9 @@ void Game::IO::PackKingdom(QueueMessage & msg, const Kingdom & kingdom)
 
     // puzzle
     msg.Push(kingdom.puzzle_maps.to_string<char,std::char_traits<char>,std::allocator<char> >());
+
+    // tents colors
+    msg.Push(kingdom.visited_tents_colors);
 }
 
 void Game::IO::PackCastle(QueueMessage & msg, const Castle & castle)
@@ -596,7 +601,7 @@ bool Game::IO::LoadBIN(QueueMessage & msg)
 
     // format version
     msg.Pop(format);
-    if(format > FORMAT_VERSION)
+    if(format >= FORMAT_VERSION_1293)
     {
 	// major version
 	msg.Pop(byte8);
@@ -655,8 +660,8 @@ bool Game::IO::LoadBIN(QueueMessage & msg)
 #else
     msg.Pop(conf.debug);
 #endif
-    // added svn 1293: settings: original
-    if(format > 0x50C)
+    // settings: original
+    if(format >= FORMAT_VERSION_1293)
     {
 	msg.Pop(byte8);
 	if(byte8) conf.SetModes(Settings::ORIGINAL);
@@ -907,7 +912,7 @@ bool Game::IO::LoadBIN(QueueMessage & msg)
     return byte16 == 0xFFFF;
 }
 
-void Game::IO::UnpackKingdom(QueueMessage & msg, Kingdom & kingdom)
+void Game::IO::UnpackKingdom(QueueMessage & msg, Kingdom & kingdom, u16 check_version)
 {
     u8 byte8;
     u16 byte16;
@@ -954,9 +959,15 @@ void Game::IO::UnpackKingdom(QueueMessage & msg, Kingdom & kingdom)
     // puzzle
     msg.Pop(str);
     kingdom.puzzle_maps = str.c_str();
+
+    // visited tents
+    if(check_version && check_version >= FORMAT_VERSION_1335)
+    {
+	msg.Pop(kingdom.visited_tents_colors);
+    }
 }
 
-void Game::IO::UnpackCastle(QueueMessage & msg, Castle & castle)
+void Game::IO::UnpackCastle(QueueMessage & msg, Castle & castle, u16 check_version)
 {
     u8 byte8;
     u16 byte16;
@@ -998,7 +1009,7 @@ void Game::IO::UnpackCastle(QueueMessage & msg, Castle & castle)
     for(u32 jj = 0; jj < CASTLEMAXMONSTER; ++jj) msg.Pop(castle.dwelling[jj]);
 }
 
-void Game::IO::UnpackHeroes(QueueMessage & msg, Heroes & hero)
+void Game::IO::UnpackHeroes(QueueMessage & msg, Heroes & hero, u16 check_version)
 {
     u8 byte8;
     u16 byte16;

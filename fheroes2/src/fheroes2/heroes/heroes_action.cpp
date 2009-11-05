@@ -95,6 +95,8 @@ void ActionToJail(Heroes &hero, const u8 obj, const u16 dst_index);
 void ActionToHutMagi(Heroes &hero, const u8 obj, const u16 dst_index);
 void ActionToEyeMagi(Heroes &hero, const u8 obj, const u16 dst_index);
 void ActionToShinx(Heroes &hero, const u8 obj, const u16 dst_index);
+void ActionToBarrier(Heroes &hero, const u8 obj, const u16 dst_index);
+void ActionToTravellersTent(Heroes &hero, const u8 obj, const u16 dst_index);
 
 u16 DialogGoldWithExp(const std::string & hdr, const std::string & msg, const u16 count, const u16 exp, const u16 buttons = Dialog::OK)
 {
@@ -258,6 +260,8 @@ void AnimationRemoveObject(const Maps::Tiles & tile)
 	case MP2::OBJ_ARTIFACT:	addon = const_cast<Maps::Tiles &>(tile).FindArtifact(); break;
 	case MP2::OBJ_CAMPFIRE:	addon = const_cast<Maps::Tiles &>(tile).FindCampFire(); break;
 	case MP2::OBJ_MONSTER:  addon = const_cast<Maps::Tiles &>(tile).FindMonster(); break;
+
+	case MP2::OBJ_BARRIER:	addon = const_cast<Maps::Tiles &>(tile).FindBarrier(); break;
 
 	default: break;
     }
@@ -469,6 +473,9 @@ void Heroes::Action(const u16 dst_index)
         case MP2::OBJ_JAIL:		ActionToJail(*this, object, dst_index); break;
         case MP2::OBJ_HUTMAGI:		ActionToHutMagi(*this, object, dst_index); break;
         case MP2::OBJ_EYEMAGI:		ActionToEyeMagi(*this, object, dst_index); break;
+
+        case MP2::OBJ_BARRIER:		ActionToBarrier(*this, object, dst_index); break;
+        case MP2::OBJ_TRAVELLERTENT:	ActionToTravellersTent(*this, object, dst_index); break;
 
         // object
 	default: break;
@@ -3155,4 +3162,43 @@ void ActionToShinx(Heroes &hero, const u8 obj, const u16 dst_index)
 	Dialog::Message(MP2::StringObject(obj), _("You come across a giant Sphinx. The Sphinx remains strangely quiet."), Font::BIG, Dialog::OK);
 
     if(Settings::Get().Debug()) Error::Verbose("ActionToShinx: " + hero.GetName());
+}
+
+void ActionToBarrier(Heroes &hero, const u8 obj, const u16 dst_index)
+{
+    Maps::Tiles & tile = world.GetTiles(dst_index);
+    Kingdom & kingdom = world.GetKingdom(hero.GetColor());
+
+    if(kingdom.IsVisitTravelersTent(tile.GetQuantity1()))
+    {
+	Dialog::Message(MP2::StringObject(obj),
+	    _("A magical barrier stands tall before you, blocking your way. Runes on the arch read,\n\"Speak the key and you may pass.\"\nAs you speak the magic word, the glowing barrier dissolves into nothingness."),
+	    Font::BIG, Dialog::OK);
+
+        AnimationRemoveObject(tile);
+        tile.RemoveObjectSprite();
+        tile.SetObject(MP2::OBJ_ZERO);
+    }
+    else
+    {
+	Dialog::Message(MP2::StringObject(obj),
+	    _("A magical barrier stands tall before you, blocking your way. Runes on the arch read,\n\"Speak the key and you may pass.\"\nYou speak, and nothing happens."),
+	    Font::BIG, Dialog::OK);
+    }
+
+    if(Settings::Get().Debug()) Error::Verbose("ActionToBarrier: " + hero.GetName());
+}
+
+void ActionToTravellersTent(Heroes &hero, const u8 obj, const u16 dst_index)
+{
+    Dialog::Message(MP2::StringObject(obj),
+	    _("You enter the tent and see an old woman gazing into a magic gem. She looks up and says,\n\"In my travels, I have learned much in the way of arcane magic. A great oracle taught me his skill. I have the answer you seek.\""),
+	    Font::BIG, Dialog::OK);
+
+    const Maps::Tiles & tile = world.GetTiles(dst_index);
+    Kingdom & kingdom = world.GetKingdom(hero.GetColor());
+
+    kingdom.SetVisitTravelersTent(tile.GetQuantity1());
+
+    if(Settings::Get().Debug()) Error::Verbose("ActionToTravellersTent: " + hero.GetName());
 }

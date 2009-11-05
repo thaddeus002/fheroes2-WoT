@@ -45,9 +45,9 @@ namespace Game
 	static void PackCastle(QueueMessage &, const Castle &);
 	static void PackHeroes(QueueMessage &, const Heroes &);
 
-	static void UnpackKingdom(QueueMessage &, Kingdom &);
-	static void UnpackCastle(QueueMessage &, Castle &);
-	static void UnpackHeroes(QueueMessage &, Heroes &);
+	static void UnpackKingdom(QueueMessage &, Kingdom &, u16 = 0);
+	static void UnpackCastle(QueueMessage &, Castle &, u16 = 0);
+	static void UnpackHeroes(QueueMessage &, Heroes &, u16 = 0);
     };
 
     bool Save(const std::string &);

@@ -1082,6 +1082,32 @@ Maps::TilesAddon * Maps::Tiles::FindJail(void)
     return NULL;
 }
 
+Maps::TilesAddon * Maps::Tiles::FindBarrier(void)
+{
+    if(addons_level1.size())
+    {
+	std::list<TilesAddon>::iterator it1 = addons_level1.begin();
+	std::list<TilesAddon>::const_iterator it2 = addons_level1.end();
+
+	for(; it1 != it2; ++it1)
+	{
+	    TilesAddon & addon = *it1;
+
+	    if(ICN::X_LOC3 == MP2::GetICNObject(addon.object) && 
+		(60 == addon.index ||
+		66 == addon.index ||
+		72 == addon.index ||
+		78 == addon.index ||
+		84 == addon.index ||
+		90 == addon.index ||
+		96 == addon.index ||
+		102 == addon.index)) return &addon;
+	}
+    }
+
+    return NULL;
+}
+
 Maps::TilesAddon * Maps::Tiles::FindRNDMonster(void)
 {
     if(addons_level1.size())
@@ -1545,6 +1571,11 @@ void Maps::Tiles::UpdateQuantity(void)
 	    }
 	break;
 
+        case MP2::OBJ_BARRIER:
+        case MP2::OBJ_TRAVELLERTENT:
+	    quantity1 = Barrier::FromMP2(quantity1);
+	break;
+
 	default: break;
     }
 }
@@ -1577,6 +1608,8 @@ void Maps::Tiles::RemoveObjectSprite(void)
 
 	case MP2::OBJ_JAIL:		RemoveJailSprite(); return;
 
+	case MP2::OBJ_BARRIER:		RemoveBarrierSprite(); return;
+
 	default: return;
     }
     
@@ -1585,6 +1618,23 @@ void Maps::Tiles::RemoveObjectSprite(void)
         // remove shadow sprite from left cell
         if(Maps::isValidDirection(maps_index, Direction::LEFT))
     	    world.GetTiles(Maps::GetDirectionIndex(maps_index, Direction::LEFT)).Remove(addon->uniq);
+
+	Remove(addon->uniq);
+    }
+}
+
+void Maps::Tiles::RemoveBarrierSprite(void)
+{
+    const Maps::TilesAddon *addon = FindBarrier();
+
+    if(addon)
+    {
+        // remove left sprite
+        if(Maps::isValidDirection(maps_index, Direction::LEFT))
+    	{
+	    const u16 left = Maps::GetDirectionIndex(maps_index, Direction::LEFT);
+	    world.GetTiles(left).Remove(addon->uniq);
+	}
 
 	Remove(addon->uniq);
     }

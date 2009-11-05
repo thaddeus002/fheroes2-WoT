@@ -107,7 +107,10 @@ public:
 
     const Puzzle & PuzzleMaps(void) const;
     Puzzle & PuzzleMaps(void);
-    
+
+    void SetVisitTravelersTent(u8);
+    bool IsVisitTravelersTent(u8);
+
     void Dump(void) const;
 
 private:
@@ -140,6 +143,7 @@ private:
     std::list<IndexObject> visit_object;
 
     Puzzle puzzle_maps;
+    u8 visited_tents_colors;
 };
 
 #endif
