@@ -37,6 +37,8 @@
 
 namespace Game
 {
+    u8 GetMixerChannelFromObject(const Maps::Tiles &);
+
     static std::vector<u8> reserved_vols;
 };
 
@@ -122,59 +124,15 @@ void Game::EnvironmentSoundMixer(void)
 	    {
 		if(Maps::isValidAbsPoint(xx, yy))
 		{
-		    const Maps::Tiles & tile = world.GetTiles(xx, yy);
-		    
-    		    // calculation volume
-    		    const u8 length = std::max(std::abs(xx - abs_pt.x), std::abs(yy - abs_pt.y));
-		    const u8 volume = (2 < length ? 2 : (1 < length ? 5 : (0 < length ? 7 : 10))) * conf.SoundVolume() / 10;
-		    u8 channel = 0xFF;
-		    MP2::object_t object = tile.GetObject();
-		    
-		    if(MP2::OBJ_HEROES == object)
+		    const u8 channel = GetMixerChannelFromObject(world.GetTiles(xx, yy));
+    		    if(channel != 0xFF)
 		    {
-			const Heroes *hero = world.GetHeroes(xx, yy);
-			
-			if(hero) object = hero->GetUnderObject();
+			// calculation volume
+    			const u8 length = std::max(std::abs(xx - abs_pt.x), std::abs(yy - abs_pt.y));
+			const u8 volume = (2 < length ? 2 : (1 < length ? 5 : (0 < length ? 7 : 10))) * conf.SoundVolume() / 10;
+
+			if(volume > vols[channel] && channel < vols.size()) vols[channel] = volume;
 		    }
-
-		    // ext: stream
-		    if(tile.isStream() && volume > vols[11]) vols[11] = volume;
-
-		    switch(object)
-		    {
-			case MP2::OBJ_BUOY:		channel = 0; break;
-			case MP2::OBJ_SHIPWRECK:
-			case MP2::OBJ_DERELICTSHIP:	channel = 1; break;
-			case MP2::OBJ_COAST:		channel = 2; break;
-			case MP2::OBJ_ORACLE:		channel = 3; break;
-			case MP2::OBJ_STONELIGHTS:	channel = 4; break;
-			case MP2::OBJ_LAVAPOOL:		channel = 5; break;
-			case MP2::OBJ_ALCHEMYLAB:	channel = 6; break;
-			case MP2::OBJ_WATERWHEEL:	channel = 7; break;
-			case MP2::OBJ_CAMPFIRE:		channel = 8; break;
-			case MP2::OBJ_WINDMILL:		channel = 9; break;
-			case MP2::OBJ_ARTESIANSPRING:
-			case MP2::OBJ_FOUNTAIN:		channel = 10; break;
-			case MP2::OBJ_WATERLAKE:
-			case MP2::OBJ_WATERINGHOLE:	channel = 11; break;
-			case MP2::OBJ_MINES:		channel = 12; break;
-			case MP2::OBJ_SAWMILL:		channel = 13; break;
-			case MP2::OBJ_DAEMONCAVE:	channel = 14; break;
-			case MP2::OBJ_SHRINE1:
-			case MP2::OBJ_SHRINE2:
-			case MP2::OBJ_SHRINE3:		channel = 15; break;
-			case MP2::OBJ_TARPIT:		channel = 16; break;
-			case MP2::OBJ_TRADINGPOST:	channel = 17; break;
-			case MP2::OBJ_RUINS:		channel = 18; break;
-			case MP2::OBJ_PEASANTHUT:
-			case MP2::OBJ_DWARFCOTT:
-			case MP2::OBJ_ARCHERHOUSE:	channel = 19; break;
-			case MP2::OBJ_VOLCANO:		channel = 20; break;
-
-			default: continue;
-		    }
-
-		    if(volume > vols[channel] && channel < vols.size()) vols[channel] = volume;
 		}
 	    }
 	}
@@ -182,11 +140,61 @@ void Game::EnvironmentSoundMixer(void)
 	for(u8 ch = 0; ch < vols.size(); ++ch)
 	{
 	    Mixer::Volume(ch, vols[ch]);
+	    //PlaySound(M82::FromObject(obj), vols[ch], );
 	    vols[ch] = 0;
 	}
 
         Mixer::ResumeLoops();
     }
+}
+
+u8 Game::GetMixerChannelFromObject(const Maps::Tiles & tile)
+{
+    // force: check stream
+    if(tile.isStream()) return 11;
+
+    MP2::object_t object = tile.GetObject();
+    if(MP2::OBJ_HEROES == object)
+    {
+	const Heroes* hero = world.GetHeroes(tile.GetIndex());
+	object = hero->GetUnderObject();
+    }
+
+    switch(object)
+    {
+	case MP2::OBJ_BUOY:		return 0;
+	case MP2::OBJ_SHIPWRECK:
+	case MP2::OBJ_DERELICTSHIP:	return 1;
+	case MP2::OBJ_COAST:		return 2;
+	case MP2::OBJ_ORACLE:		return 3;
+	case MP2::OBJ_STONELIGHTS:	return 4;
+	case MP2::OBJ_LAVAPOOL:		return 5;
+	case MP2::OBJ_ALCHEMYLAB:	return 6;
+	case MP2::OBJ_WATERWHEEL:	return 7;
+	case MP2::OBJ_CAMPFIRE:		return 8;
+	case MP2::OBJ_WINDMILL:		return 9;
+	case MP2::OBJ_ARTESIANSPRING:
+	case MP2::OBJ_FOUNTAIN:		return 10;
+	case MP2::OBJ_WATERLAKE:
+	case MP2::OBJ_WATERINGHOLE:	return 11;
+	case MP2::OBJ_MINES:		return 12;
+	case MP2::OBJ_SAWMILL:		return 13;
+	case MP2::OBJ_DAEMONCAVE:	return 14;
+	case MP2::OBJ_SHRINE1:
+	case MP2::OBJ_SHRINE2:
+	case MP2::OBJ_SHRINE3:		return 15;
+	case MP2::OBJ_TARPIT:		return 16;
+	case MP2::OBJ_TRADINGPOST:	return 17;
+	case MP2::OBJ_RUINS:		return 18;
+	case MP2::OBJ_PEASANTHUT:
+	case MP2::OBJ_DWARFCOTT:
+	case MP2::OBJ_ARCHERHOUSE:	return 19;
+	case MP2::OBJ_VOLCANO:		return 20;
+
+	default: break;
+    }
+
+    return 0xFF;
 }
 
 void Game::PreloadLOOPSounds(void)

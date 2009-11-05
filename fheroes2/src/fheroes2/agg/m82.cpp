@@ -19,6 +19,7 @@
  ***************************************************************************/
 
 #include "spell.h"
+#include "mp2.h"
 #include "m82.h"
 
 namespace M82
@@ -397,6 +398,45 @@ M82::m82_t M82::FromSpell(u8 spell)
 	case Spell::EARTHQUAKE:		return ERTHQUAK;
 	case Spell::HAUNT:		return H2MINE;
 	case Spell::STONE:		return PARALIZE;
+
+	default: break;
+    }
+
+    return UNKNOWN;
+}
+
+M82::m82_t M82::FromObject(u8 obj)
+{
+    switch(obj)
+    {
+        case MP2::OBJ_BUOY:             return LOOP0000;
+        case MP2::OBJ_SHIPWRECK:
+        case MP2::OBJ_DERELICTSHIP:     return LOOP0001;
+        case MP2::OBJ_COAST:            return LOOP0002;
+        case MP2::OBJ_ORACLE:           return LOOP0003;
+        case MP2::OBJ_STONELIGHTS:      return LOOP0004;
+        case MP2::OBJ_LAVAPOOL:         return LOOP0005;
+        case MP2::OBJ_ALCHEMYLAB:       return LOOP0006;
+        case MP2::OBJ_WATERWHEEL:       return LOOP0009;
+        case MP2::OBJ_CAMPFIRE:         return LOOP0010;
+        case MP2::OBJ_WINDMILL:         return LOOP0011;
+        case MP2::OBJ_ARTESIANSPRING:
+        case MP2::OBJ_FOUNTAIN:         return LOOP0012;
+        case MP2::OBJ_WATERLAKE:
+        case MP2::OBJ_WATERINGHOLE:     return LOOP0013;
+        case MP2::OBJ_MINES:            return LOOP0015;
+        case MP2::OBJ_SAWMILL:          return LOOP0016;
+        case MP2::OBJ_DAEMONCAVE:       return LOOP0017;
+        case MP2::OBJ_SHRINE1:
+        case MP2::OBJ_SHRINE2:
+        case MP2::OBJ_SHRINE3:          return LOOP0018;
+        case MP2::OBJ_TARPIT:           return LOOP0021;
+        case MP2::OBJ_TRADINGPOST:      return LOOP0022;
+        case MP2::OBJ_RUINS:            return LOOP0024;
+        case MP2::OBJ_PEASANTHUT:
+        case MP2::OBJ_DWARFCOTT:
+        case MP2::OBJ_ARCHERHOUSE:      return LOOP0025;
+        case MP2::OBJ_VOLCANO:          return LOOP0027;
 
 	default: break;
     }

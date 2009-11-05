@@ -343,6 +343,7 @@ namespace M82
 
     const char* GetString(const m82_t m82);
     m82_t FromSpell(u8);
+    m82_t FromObject(u8);
 };
 
 #endif
