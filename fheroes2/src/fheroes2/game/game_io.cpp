@@ -601,6 +601,7 @@ bool Game::IO::LoadBIN(QueueMessage & msg)
 
     // format version
     msg.Pop(format);
+    if(conf.Debug()) Error::Verbose("Game::IO::LoadBIN: format: ", format);
     if(format >= FORMAT_VERSION_1293)
     {
 	// major version
@@ -737,7 +738,7 @@ bool Game::IO::LoadBIN(QueueMessage & msg)
     for(u32 ii = 0; ii < byte32; ++ii)
     {
 	Heroes* hero = new Heroes();
-	UnpackHeroes(msg, *hero);
+	UnpackHeroes(msg, *hero, format);
 	world.vec_heroes.push_back(hero);
     }
 
@@ -749,7 +750,7 @@ bool Game::IO::LoadBIN(QueueMessage & msg)
     for(u32 ii = 0; ii < byte32; ++ii)
     {
 	Castle* castle = new Castle();
-	UnpackCastle(msg, *castle);
+	UnpackCastle(msg, *castle, format);
 	world.vec_castles.push_back(castle);
     }
 
@@ -761,7 +762,7 @@ bool Game::IO::LoadBIN(QueueMessage & msg)
     for(u32 ii = 0; ii < byte32; ++ii)
     {
 	Kingdom* kingdom = new Kingdom();
-	UnpackKingdom(msg, *kingdom);
+	UnpackKingdom(msg, *kingdom, format);
 	world.vec_kingdoms.push_back(kingdom);
     }
 
