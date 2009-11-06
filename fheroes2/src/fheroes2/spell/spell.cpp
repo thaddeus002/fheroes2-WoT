@@ -101,14 +101,10 @@ static const struct
 
 Spell::Spell() : id(NONE)
 {
-    name = _(spells[id].name);
-    description = _(spells[id].description);
 }
 
 Spell::Spell(spell_t s) : id(s)
 {
-    name = _(spells[id].name);
-    description = _(spells[id].description);
 }
 
 bool Spell::operator== (spell_t s) const
@@ -134,18 +130,16 @@ Spell::spell_t Spell::GetID(void) const
 void Spell::Set(spell_t s)
 {
     id = s;
-    name = _(spells[id].name);
-    description = _(spells[id].description);
 }
 
-const std::string & Spell::GetName(void) const
+const char* Spell::GetName(void) const
 {
-    return name;
+    return GetName(id);
 }
 
-const std::string & Spell::GetDescription(void) const
+const char* Spell::GetDescription(void) const
 {
-    return description;
+    return GetDescription(id);
 }
 
 u8 Spell::GetMana(void) const

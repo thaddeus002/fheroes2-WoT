@@ -84,7 +84,7 @@ const Army::army_t* Army::Troop::GetArmy(void) const
     return army;
 }
 
-const std::string & Army::Troop::GetName(u32 amount /* = 0 */) const
+const char* Army::Troop::GetName(u32 amount /* = 0 */) const
 {
     u32 cmp = count;
     if(amount)

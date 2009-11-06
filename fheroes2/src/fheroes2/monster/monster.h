@@ -196,8 +196,8 @@ public:
     u16 GetRNDSize(void) const;
     u8  GetSpriteIndex(void) const;
 
-    const std::string & GetName(void) const;
-    const std::string & GetMultiName(void) const;
+    const char* GetName(void) const;
+    const char* GetMultiName(void) const;
 
     bool isElemental(void) const;
     bool isUndead(void) const;
@@ -241,8 +241,6 @@ public:
 
 protected:
     monster_t id;
-    std::string name;
-    std::string multiname;
 };
 
 #endif

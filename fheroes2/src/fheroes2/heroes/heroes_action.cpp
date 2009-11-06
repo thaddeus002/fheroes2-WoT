@@ -1735,7 +1735,9 @@ void ActionToArtifact(Heroes &hero, const u8 obj, const u16 dst_index)
 		if(hero.HasSecondarySkill(Skill::Secondary::WISDOM))
 		{
 		    PlaySoundSuccess;
-		    DialogWithArtifact(MP2::StringObject(obj), _("You've found the artifact: ") + art.GetName(), art(), Dialog::OK);
+		    std::string msg(_("You've found the artifact: "));
+		    msg.append(art.GetName());
+		    DialogWithArtifact(MP2::StringObject(obj), msg, art(), Dialog::OK);
 		    conditions = true;
 		}
 		else
@@ -1751,7 +1753,9 @@ void ActionToArtifact(Heroes &hero, const u8 obj, const u16 dst_index)
 		if(hero.HasSecondarySkill(Skill::Secondary::LEADERSHIP))
 		{
 		    PlaySoundSuccess;
-		    DialogWithArtifact(MP2::StringObject(obj), _("You've found the artifact: ") + art.GetName(), art(), Dialog::OK);
+		    std::string msg(_("You've found the artifact: "));
+		    msg.append(art.GetName());
+		    DialogWithArtifact(MP2::StringObject(obj), msg, art(), Dialog::OK);
 		    conditions = true;
 		}
 		else
@@ -1829,7 +1833,9 @@ void ActionToArtifact(Heroes &hero, const u8 obj, const u16 dst_index)
 
     	default:
 	    PlaySoundSuccess;
-	    DialogWithArtifact(MP2::StringObject(obj), _("You've found the artifact: ") + art.GetName(), art());
+	    std::string msg(_("You've found the artifact: "));
+	    msg.append(art.GetName());
+	    DialogWithArtifact(MP2::StringObject(obj), msg, art());
 	    conditions = true;
 	    break;
     }

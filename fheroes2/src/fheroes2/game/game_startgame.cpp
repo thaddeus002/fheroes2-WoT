@@ -1044,7 +1044,9 @@ bool Game::DiggingForArtifacts(const Heroes & hero)
 	    AGG::PlaySound(M82::TREASURE);
 	    // check returns
 	    const_cast<Heroes &>(hero).PickupArtifact(ultimate());
-	    DialogWithArtifact(_("Congratulations!"), _("After spending many hours digging here, you have uncovered the ") + ultimate.GetName(), ultimate());
+	    std::string msg(_("After spending many hours digging here, you have uncovered the "));
+	    msg.append(ultimate.GetName());
+	    DialogWithArtifact(_("Congratulations!"), msg, ultimate());
 	}
 	else
 	    Dialog::Message("", _("Nothing here. Where could it be?"), Font::BIG, Dialog::OK);

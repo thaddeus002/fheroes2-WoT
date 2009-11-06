@@ -232,20 +232,14 @@ Monster::Monster() : id(UNKNOWN)
 
 Monster::Monster(monster_t m) : id(m)
 {
-    name = _(monsters[id].name);
-    multiname = _(monsters[id].multiname);
 }
 
 Monster::Monster(const Maps::Tiles & t) : id(FromMaps(t))
 {
-    name = _(monsters[id].name);
-    multiname = _(monsters[id].multiname);
 }
 
 Monster::Monster(u8 race, u32 dwelling) : id(FromDwelling(race, dwelling))
 {
-    name = _(monsters[id].name);
-    multiname = _(monsters[id].multiname);
 }
 
 bool Monster::operator== (monster_t m) const
@@ -271,22 +265,16 @@ Monster::monster_t Monster::GetID(void) const
 void Monster::Set(const Monster & m)
 {
     id = m.id;
-    name = _(monsters[id].name);
-    multiname = _(monsters[id].multiname);
 }
 
 void Monster::Set(monster_t m)
 {
     id = m;
-    name = _(monsters[id].name);
-    multiname = _(monsters[id].multiname);
 }
 
 void Monster::Upgrade(void)
 {
     id = Upgrade(id);
-    name = _(monsters[id].name);
-    multiname = _(monsters[id].multiname);
 }
 
 u8 Monster::GetAttack(void) const
@@ -411,14 +399,14 @@ u8 Monster::GetSpriteIndex(void) const
     return UNKNOWN < id ? id - 1 : 0;
 }
 
-const std::string & Monster::GetName(void) const
+const char* Monster::GetName(void) const
 {
-    return name;
+    return GetName(id);
 }
 
-const std::string & Monster::GetMultiName(void) const
+const char* Monster::GetMultiName(void) const
 {
-    return multiname;
+    return GetMultiName(id);
 }
 
 bool Monster::isUndead(void) const

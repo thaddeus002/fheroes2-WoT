@@ -331,7 +331,7 @@ bool Army::army_t::JoinTroop(const Troop & troop)
     if(it != army.end())
     {
 	(*it).SetCount((*it).Count() + troop.Count());
-	if(2 < Settings::Get().Debug()) Error::Verbose("Army::JoinTroop: monster: " + troop.GetName() + ", count: ", troop.Count());
+	if(2 < Settings::Get().Debug()) Error::Verbose("Army::JoinTroop: monster: " + std::string(troop.GetName()) + ", count: ", troop.Count());
 	return true;
     }
 
@@ -339,7 +339,7 @@ bool Army::army_t::JoinTroop(const Troop & troop)
     if(it != army.end())
     {
 	(*it).Set(troop, troop.Count());
-	if(2 < Settings::Get().Debug()) Error::Verbose("Army::JoinTroop: monster: " + troop.GetName() + ", count: ", troop.Count());
+	if(2 < Settings::Get().Debug()) Error::Verbose("Army::JoinTroop: monster: " + std::string(troop.GetName()) + ", count: ", troop.Count());
 	return true;
     }
 

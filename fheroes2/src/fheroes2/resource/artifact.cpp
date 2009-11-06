@@ -148,15 +148,11 @@ Artifact::Artifact() : id(Artifact::UNKNOWN)
 
 Artifact::Artifact(artifact_t a) : id(a)
 {
-    name = _(artifacts[id].name);
-    description = _(artifacts[id].description);
 }
 
 void Artifact::Set(artifact_t a)
 {
     id = a;
-    name = _(artifacts[id].name);
-    description = _(artifacts[id].description);
 }
 
 bool Artifact::operator== (artifact_t a) const
@@ -179,14 +175,14 @@ Artifact::artifact_t Artifact::GetID(void) const
     return id;
 }
 
-const std::string & Artifact::GetName(void) const
+const char* Artifact::GetName(void) const
 {
-    return name;
+    return GetName(id);
 }
 
-const std::string & Artifact::GetDescription(void) const
+const char* Artifact::GetDescription(void) const
 {
-    return description;
+    return GetDescription(id);
 }
 
 bool Artifact::isUltimate(void) const

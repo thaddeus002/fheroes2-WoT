@@ -52,7 +52,7 @@ namespace Army
         
         const Skill::Primary* MasterSkill(void) const;
         const army_t*         GetArmy(void) const;
-	const std::string &   GetName(u32 amount = 0) const;
+	const char*           GetName(u32 amount = 0) const;
         
         u16 		Count(void) const;
         

@@ -145,10 +145,10 @@ public:
     artifact_t operator() (void) const;
     artifact_t GetID(void) const;
 
-    void Set(artifact_t);
+    const char* GetName(void) const;
+    const char* GetDescription(void) const;
 
-    const std::string & GetName(void) const;
-    const std::string & GetDescription(void) const;
+    void Set(artifact_t);
 
     bool isUltimate(void) const;
     bool isValid(void) const;
@@ -181,8 +181,6 @@ public:
 
 private:
     artifact_t id;
-    std::string name;
-    std::string description;
 };
 
 #endif

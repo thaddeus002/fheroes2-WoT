@@ -122,8 +122,8 @@ public:
 
     void Set(spell_t);
 
-    const std::string & GetName(void) const;
-    const std::string & GetDescription(void) const;
+    const char* GetName(void) const;
+    const char* GetDescription(void) const;
 
     u8 GetMana(void) const;
     u8 GetLevel(void) const;
@@ -163,8 +163,6 @@ public:
 
 private:
     spell_t id;
-    std::string name;
-    std::string description;
 };
 
 #endif

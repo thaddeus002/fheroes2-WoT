@@ -122,7 +122,6 @@ namespace Skill
 	virtual s8 GetMorale(void) const = 0;
 	virtual s8 GetLuck(void) const = 0;
 	virtual Race::race_t GetRace(void) const = 0;
-	virtual const std::string & GetName(void) const = 0;
 	virtual u8 GetType(void) const = 0;
 
         static const char* String(const skill_t skill);

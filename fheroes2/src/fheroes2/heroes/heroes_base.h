@@ -36,6 +36,7 @@ namespace Army { class army_t; };
 class HeroBase : public Skill::Primary, public BitModes
 {
   public:
+    virtual const std::string & GetName(void) const = 0;
     virtual const Army::army_t & GetArmy(void) const = 0;
     virtual Army::army_t & GetArmy(void) = 0;
     virtual bool HasArtifact(const Artifact::artifact_t) const = 0;
