@@ -294,17 +294,16 @@ namespace Battle
 
     void Battlefield::Background::DrawShadow(const Point &pt)
     {
-        const int delta = (int)(((double)CELLW)/6.928);
         static Surface shadow;
 
         if(!shadow.valid())
 	{
-	    shadow.Set(CELLW, CELLH + 2 * delta, 16, SWSURFACE);
+	    shadow.Set(CELLW, (u16) (CELLH + 2 * CELLWDELTA), 16, SWSURFACE);
 	    shadow.SetColorKey();
 
             Rect r(0, 0, shadow.w(), shadow.h());
-            r.y += 2*delta-1;
-            r.h -= 4*delta-2;
+            r.y += (s16) (2*CELLWDELTA-1);
+            r.h -= (u16) (4*CELLWDELTA-2);
             shadow.FillRect(0x00, 0x00, 0x00, r);
             r.x ++;
             r.w -= 2;
@@ -318,34 +317,33 @@ namespace Battle
         }
 
         Point p = Bf2Scr(pt);
-        p.y -= CELLH+delta;
+        p.y -= (s16)(CELLH+CELLWDELTA);
         p.x -= CELLW/2;
         display.Blit(shadow, p);
     }
 
     void Battlefield::Background::DrawCell(const Point&pt)
     {
-        const int delta = (int)(((double)CELLW)/6.928);
         static Surface shadow;
         if(!shadow.valid())
 	{
-	    shadow.Set(CELLW, CELLH + 2 * delta - 6);
+	    shadow.Set(CELLW, (u16)(CELLH + 2 * CELLWDELTA - 6));
 	    shadow.SetColorKey();
 	    const u32 color = shadow.GetColor(0xE1);
 //	    const u32 color = shadow.MapRGB(0,128,0, 128);
 
 	    // hexagon
-	    shadow.DrawLine(shadow.w() / 2, 0, 0, delta, color);
-	    shadow.DrawLine(shadow.w() / 2, 0, shadow.w() - 1, delta, color);
+	    shadow.DrawLine(shadow.w() / 2, 0, 0, (u16)(CELLWDELTA), color);
+	    shadow.DrawLine(shadow.w() / 2, 0, shadow.w() - 1, (u16)(CELLWDELTA), color);
 
-	    shadow.DrawLine(0, delta, 0, shadow.h() - 1 - delta, color);
-	    shadow.DrawLine(shadow.w() - 1, delta, shadow.w() - 1, shadow.h() - 1 - delta, color);
+	    shadow.DrawLine(0, (u16)(CELLWDELTA), 0, (u16)(shadow.h() - 1 - CELLWDELTA), color);
+	    shadow.DrawLine(shadow.w() - 1, (u16)(CELLWDELTA), shadow.w() - 1, (u16)(shadow.h() - 1 - CELLWDELTA), color);
 
-	    shadow.DrawLine(0, shadow.h() - 1 - delta, shadow.w() / 2, shadow.h() - 1, color);
-	    shadow.DrawLine(shadow.w() - 1, shadow.h() - 1 - delta, shadow.w() / 2, shadow.h() - 1, color);
+	    shadow.DrawLine(0, (u16)(shadow.h() - 1 - CELLWDELTA), shadow.w() / 2, shadow.h() - 1, color);
+	    shadow.DrawLine(shadow.w() - 1, (u16)(shadow.h() - 1 - CELLWDELTA), shadow.w() / 2, shadow.h() - 1, color);
         }
         Point p = Bf2Scr(pt);
-        p.y -= CELLH+delta;
+        p.y -= (s16)(CELLH+CELLWDELTA);
         p.x -= CELLW/2;
         display.Blit(shadow, p);
     }
@@ -411,8 +409,8 @@ namespace Battle
         ICN::icn_t icn;
         Rect rect, flagRect;
         if(hero.GetType() == Skill::Primary::CAPTAIN)
-            DrawCaptain(dynamic_cast<const Captain &>(hero), reflect, icn, rect, flagRect);
-        else DrawHero(dynamic_cast<const Heroes &>(hero),  reflect, icn, rect, flagRect);
+            DrawCaptain(hero, reflect, icn, rect, flagRect);
+        else DrawHero(hero,  reflect, icn, rect, flagRect);
 
         const Sprite &sp = AGG::GetICN(icn, animframe, reflect);
         display.Blit(sp, rect.x, rect.y);
@@ -432,7 +430,7 @@ namespace Battle
         return rect;
     }
 
-    void Battlefield::Background::DrawCaptain(const Captain &captain, bool reflect, ICN::icn_t &icn, Rect &rect, Rect &flagRect)
+    void Battlefield::Background::DrawCaptain(const HeroBase &captain, bool reflect, ICN::icn_t &icn, Rect &rect, Rect &flagRect)
     {
         switch(captain.GetRace()) {
             case Race::BARB: icn = ICN::CMBTCAPB; break;
@@ -453,7 +451,7 @@ namespace Battle
         flagRect.y = dst_pt.y + 50;
     }
     
-    void Battlefield::Background::DrawHero(const Heroes & hero, bool reflect, ICN::icn_t &icn, Rect &rect, Rect &flagRect)
+    void Battlefield::Background::DrawHero(const HeroBase &hero, bool reflect, ICN::icn_t &icn, Rect &rect, Rect &flagRect)
     {
         switch(hero.GetRace()) {
             case Race::BARB: icn = ICN::CMBTHROB; break;
@@ -470,7 +468,7 @@ namespace Battle
         rect.w = sp.w();
         rect.h = sp.h();
 
-        flagRect.x = dst_pt.x + (reflect ? 640 - sp.w() - 17 : 17);
+        flagRect.x = dst_pt.x + (reflect ? 640 - sp.w() + 17 : 17);
         flagRect.y = dst_pt.y + 80;
     }
     
@@ -590,7 +588,7 @@ namespace Battle
         // draw count
         if(troop.Count() == 0) return;
         int offset = wide ? CELLW : 0;
-        tp.x += reflect ? -30 - offset : 10 + offset;
+        tp.x += reflect ? -20 - offset : offset;
         tp.y -= 10;
         u16 ind = IndicatorFromStatus(troop);
         display.Blit(AGG::GetICN(ICN::TEXTBAR, ind), tp);

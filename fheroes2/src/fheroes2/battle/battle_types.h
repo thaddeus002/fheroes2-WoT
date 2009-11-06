@@ -7,6 +7,8 @@ typedef std::vector<TroopIndex> IndexList;
 
 #define CELLW 44
 #define CELLH 42
+// CELLW / 6.928
+#define CELLWDELTA 6.35
 #define BFX 86
 #define BFY 108
 #define BFW 11
@@ -232,8 +234,8 @@ namespace Battle
             void MagicAnimation(std::vector<Army::BattleTroop*> &, HeroBase *, HeroBase *, bool, Spell::spell_t);
             
           private:
-            void DrawCaptain(const Captain &, bool, ICN::icn_t &, Rect &, Rect &);
-            void DrawHero(const Heroes &, bool, ICN::icn_t &, Rect &, Rect &);
+            void DrawCaptain(const HeroBase &, bool, ICN::icn_t &, Rect &, Rect &);
+            void DrawHero(const HeroBase &, bool, ICN::icn_t &, Rect &, Rect &);
             
             enum Indicator_t {
                 BLUE   = 10,
