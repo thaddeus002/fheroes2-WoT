@@ -34,7 +34,7 @@
 #include "tools.h"
 
 #define FORMAT_VERSION_1335 0x537
-#define FORMAT_VERSION_1293 0x50C
+#define FORMAT_VERSION_1293 0x50D
 
 #define CURRENT_FORMAT_VERSION FORMAT_VERSION_1335
 
@@ -601,6 +601,8 @@ bool Game::IO::LoadBIN(QueueMessage & msg)
 
     // format version
     msg.Pop(format);
+    if(format > CURRENT_FORMAT_VERSION) Error::Warning("Game::IO::LoadBIN: unknown format: ", format);
+    else
     if(conf.Debug()) Error::Verbose("Game::IO::LoadBIN: format: ", format);
     if(format >= FORMAT_VERSION_1293)
     {
@@ -699,7 +701,7 @@ bool Game::IO::LoadBIN(QueueMessage & msg)
 	msg.Pop(tile->flags);
 
 #ifdef WITH_DEBUG
-	tile->fogs &= ~conf.my_color;
+	if(conf.debug) tile->fogs &= ~conf.my_color;
 #endif
 
 	// addons 1
