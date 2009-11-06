@@ -183,6 +183,7 @@ public:
     bool HasUltimateArtifact(void) const;
     u8 GetCountArtifacts(void) const;
     BagArtifacts & GetBagArtifacts(void);
+    bool IsFullBagArtifacts(void) const;
     void TakeArtifacts(Heroes &);
 
     u8 GetMobilityIndexSprite(void) const;

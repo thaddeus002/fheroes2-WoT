@@ -1318,6 +1318,11 @@ bool Heroes::HasUltimateArtifact(void) const
     return artifacts.end() != std::find_if(artifacts.begin(), artifacts.end(), std::mem_fun_ref(&Artifact::isUltimate));
 }
 
+bool Heroes::IsFullBagArtifacts(void) const
+{
+    return artifacts.end() == std::find(artifacts.begin(), artifacts.end(), Artifact::UNKNOWN);
+}
+
 bool Heroes::PickupArtifact(const Artifact::artifact_t art)
 {
     BagArtifacts::iterator it = std::find(artifacts.begin(), artifacts.end(), Artifact::UNKNOWN);
@@ -1327,7 +1332,7 @@ bool Heroes::PickupArtifact(const Artifact::artifact_t art)
 	if(Settings::Get().MyColor() == color)
 	{
 	    art == Artifact::MAGIC_BOOK ?
-	    Dialog::Message(_("You must purchase a spell book to use the mage guild, but you currently have no room for a spell book."), _("Try giving one of your artifacts to another hero."), Font::BIG, Dialog::OK) :
+	    Dialog::Message("", _("You must purchase a spell book to use the mage guild, but you currently have no room for a spell book. Try giving one of your artifacts to another hero."), Font::BIG, Dialog::OK) :
 	    Dialog::Message(Artifact::GetName(art), _("You have no room to carry another artifact!"), Font::BIG, Dialog::OK);
 	}
 	return false;

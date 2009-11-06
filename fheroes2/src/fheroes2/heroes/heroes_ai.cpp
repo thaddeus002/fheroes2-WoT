@@ -67,6 +67,7 @@ void AIToStables(Heroes &hero, const u8 obj, const u16 dst_index);
 void AIToAbandoneMine(Heroes &hero, const u8 obj, const u16 dst_index);
 void AIToBarrier(Heroes &hero, const u8 obj, const u16 dst_index);
 void AIToTravellersTent(Heroes &hero, const u8 obj, const u16 dst_index);
+void AIToShipwreckSurvivor(Heroes &hero, const u8 obj, const u16 dst_index);
 
 Skill::Primary::skill_t AISelectPrimarySkill(Heroes &hero)
 {
@@ -167,6 +168,8 @@ void Heroes::AIAction(const u16 dst_index)
         case MP2::OBJ_LIGHTHOUSE:	AIToCaptureObject(*this, object, dst_index); break;
         case MP2::OBJ_ABANDONEDMINE:    AIToAbandoneMine(*this, object, dst_index); break;
 
+	case MP2::OBJ_SHIPWRECKSURVIROR:AIToShipwreckSurvivor(*this, object, dst_index); break;
+
 	// event
 	case MP2::OBJ_EVENT:		AIToEvent(*this, object, dst_index); break;
 
@@ -266,6 +269,7 @@ void Heroes::AIAction(const u16 dst_index)
 
         case MP2::OBJ_BARRIER:          AIToBarrier(*this, object, dst_index); break;
         case MP2::OBJ_TRAVELLERTENT:    AIToTravellersTent(*this, object, dst_index); break;
+
 
     	default: break;
     }
@@ -1376,6 +1380,24 @@ void AIToTravellersTent(Heroes &hero, const u8 obj, const u16 dst_index)
     kingdom.SetVisitTravelersTent(tile.GetQuantity1());
 
     if(Settings::Get().Debug()) Error::Verbose("AIToTravellersTent: " + hero.GetName());
+}
+
+void AIToShipwreckSurvivor(Heroes &hero, const u8 obj, const u16 dst_index)
+{
+    Maps::Tiles & tile = world.GetTiles(dst_index);
+    const Artifact art(Artifact::FromInt(tile.GetQuantity1()));
+
+    if(!hero.PickupArtifact(art()))
+    {
+        Resource::funds_t prize(Resource::GOLD, 1500);
+	world.GetKingdom(hero.GetColor()).OddFundsResource(prize);
+    }
+
+    tile.RemoveObjectSprite();
+    tile.SetQuantity1(0);
+    tile.SetObject(MP2::OBJ_ZERO);
+
+    if(Settings::Get().Debug()) Error::Verbose("AIToShipwreckSurvivor: " + hero.GetName());
 }
 
 

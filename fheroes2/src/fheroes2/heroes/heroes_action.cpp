@@ -57,6 +57,7 @@ void ActionToResource(Heroes &hero, const u8 obj, const u16 dst_index);
 void ActionToPickupResource(Heroes &hero, const u8 obj, const u16 dst_index);
 void ActionToFlotSam(Heroes &hero, const u8 obj, const u16 dst_index);
 void ActionToArtifact(Heroes &hero, const u8 obj, const u16 dst_index);
+void ActionToShipwreckSurvivor(Heroes &hero, const u8 obj, const u16 dst_index);
 void ActionToShrine(Heroes &hero, const u8 obj, const u16 dst_index);
 void ActionToWitchsHut(Heroes &hero, const u8 obj, const u16 dst_index);
 void ActionToGoodLuckObject(Heroes &hero, const u8 obj, const u16 dst_index);
@@ -360,7 +361,7 @@ void Heroes::Action(const u16 dst_index)
         case MP2::OBJ_ANCIENTLAMP:	ActionToAncientLamp(*this, object, dst_index); break;
         case MP2::OBJ_FLOTSAM:		ActionToFlotSam(*this, object, dst_index); break;
 
-        case MP2::OBJ_SHIPWRECKSURVIROR:
+        case MP2::OBJ_SHIPWRECKSURVIROR:ActionToShipwreckSurvivor(*this, object, dst_index); break;
         case MP2::OBJ_ARTIFACT: 	ActionToArtifact(*this, object, dst_index); break;
 
         // shrine circle
@@ -1598,221 +1599,239 @@ void ActionToExperienceObject(Heroes &hero, const u8 obj, const u16 dst_index)
     if(Settings::Get().Debug()) Error::Verbose("ActionToExperienceObject: " + hero.GetName());
 }
 
+void ActionToShipwreckSurvivor(Heroes &hero, const u8 obj, const u16 dst_index)
+{
+    Maps::Tiles & tile = world.GetTiles(dst_index);
+    const Artifact art(Artifact::FromInt(tile.GetQuantity1()));
+
+    PlaySoundSuccess;
+    if(hero.PickupArtifact(art()))
+    {
+	std::string str = _("You've pulled a shipwreck survivor from certain death in an unforgiving ocean. Grateful, he rewards you for your act of kindness by giving you the %{art}.");
+	String::Replace(str, "%{art}", art.GetName());
+	DialogWithArtifact(MP2::StringObject(obj), str, art());
+    }
+    else
+    {
+	Resource::funds_t prize(Resource::GOLD, 1500);
+    	DialogWithGold(MP2::StringObject(obj),
+	    _("You've pulled a shipwreck survivor from certain death in an unforgiving ocean. Grateful, he says, \"I would give you an artifact as a reward, but you're all full.\""),
+	    prize.gold, Dialog::OK);
+	    world.GetKingdom(hero.GetColor()).OddFundsResource(prize);
+    }
+
+    AnimationRemoveObject(tile);
+
+    tile.RemoveObjectSprite();
+    tile.SetQuantity1(0);
+    tile.SetObject(MP2::OBJ_ZERO);
+
+    if(Settings::Get().Debug()) Error::Verbose("ActionToShipwreckSurvivor: " + hero.GetName());
+}
+
 void ActionToArtifact(Heroes &hero, const u8 obj, const u16 dst_index)
 {
     Maps::Tiles & tile = world.GetTiles(dst_index);
-
     const Artifact art(Artifact::FromInt(tile.GetQuantity1()));
+
+    if(hero.IsFullBagArtifacts())
+    {
+	Dialog::Message(Artifact::GetName(art()), _("You have no room to carry another artifact!"), Font::BIG, Dialog::OK);
+	return;
+    }
 
     bool conditions = false;
     const u8 c = 0x0f & tile.GetQuantity2();
 
-    switch(obj)
+    switch(c)
     {
-        case MP2::OBJ_SHIPWRECKSURVIROR:
-        {
-	    conditions = true;
-	    PlaySoundSuccess;
-	    std::string str = _("You've pulled a shipwreck survivor from certain death in an unforgiving ocean. Grateful, he rewards you for your act of kindness by giving you the %{art}.");
-	    String::Replace(str, "%{art}", art.GetName());
-	    DialogWithArtifact(MP2::StringObject(obj), str, art());
-	}
-	    break;
+	// 1,2,3 - 2000g, 2500g+3res,3000g+5res
+	case 1:
+	case 2:
+	case 3:
+	{
+	    u8 type = tile.GetQuantity2() >> 4;
+	    Resource::resource_t r = Resource::UNKNOWN;
 
-	case MP2::OBJ_ARTIFACT:
-	    switch(c)
+	    switch(type)
 	    {
-		// 1,2,3 - 2000g, 2500g+3res,3000g+5res
-		case 1:
-		case 2:
-		case 3:
-		{
-		    u8 type = tile.GetQuantity2() >> 4;
-		    Resource::resource_t r = Resource::UNKNOWN;
-
-		    switch(type)
-		    {
-			case 1: r = Resource::WOOD; break;
-        		case 2: r = Resource::MERCURY; break;
-        		case 3: r = Resource::ORE; break;
-        		case 4: r = Resource::SULFUR; break;
-        		case 5: r = Resource::CRYSTAL; break;
-        		case 6: r = Resource::GEMS; break;
-			default:
-			    r = Resource::Rand();
-			    // store variants
-			    switch(r)
-			    {
-				case Resource::WOOD: tile.SetQuantity2(0x10 + c); break;
-        			case Resource::MERCURY: tile.SetQuantity2(0x20 + c); break;
-        			case Resource::ORE: tile.SetQuantity2(0x30 + c); break;
-        			case Resource::SULFUR: tile.SetQuantity2(0x40 + c); break;
-        			case Resource::CRYSTAL: tile.SetQuantity2(0x50 + c); break;
-        			case Resource::GEMS: tile.SetQuantity2(0x60 + c); break;
-				default: break;
-			    }
-			    break;
-		    }
-
-		    std::string header;
-
-		    Resource::funds_t payment;
-		    if(1 == c)
-		    {
-			header = _("A leprechaun offers you the %{art} for the small price of %{gold} Gold.");
-			String::Replace(header, "%{gold}", 2000);
-			payment += Resource::funds_t(Resource::GOLD, 2000);
-		    }
-		    else
-		    if(2 == c)
-		    {
-			header = _("A leprechaun offers you the %{art} for the small price of %{gold} Gold and %{count} %{res}.");
-			String::Replace(header, "%{gold}", 2500);
-			String::Replace(header, "%{count}", 3);
-			String::Replace(header, "%{res}", Resource::String(r));
-			payment += Resource::funds_t(Resource::GOLD, 2500);
-			payment += Resource::funds_t(r, 3);
-		    }
-		    else
-		    {
-			header = _("A leprechaun offers you the %{art} for the small price of %{gold} Gold and %{count} %{res}.");
-			String::Replace(header, "%{gold}", 3000);
-			String::Replace(header, "%{count}", 5);
-			String::Replace(header, "%{res}", Resource::String(r));
-			payment += Resource::funds_t(Resource::GOLD, 3000);
-			payment += Resource::funds_t(r, 5);
-		    }
-		    String::Replace(header, "%{art}", art.GetName());
-
-		    PlaySoundWarning;
-		    if(Dialog::YES == DialogWithArtifact(header, _("Do you wish to buy this artifact?"), art(), Dialog::YES | Dialog::NO))
-		    {
-			if(world.GetKingdom(hero.GetColor()).AllowPayment(payment))
-			{
-		    	    conditions = true;
-		    	    world.GetKingdom(hero.GetColor()).OddFundsResource(payment);
-			}
-			else
-			{
-			    PlaySoundFailure;
-			    Dialog::Message(_("You try to pay the leprechaun, but realize that you can't afford it."), _("The leprechaun stamps his foot and ignores you."), Font::BIG, Dialog::OK);
-			}
-		    }
-		    else
-			Dialog::Message("", _("Insulted by your refusal of his generous offer, the leprechaun stamps his foot and ignores you."), Font::BIG, Dialog::OK);
-		    break;
-		}
-
-		// 4,5 - need have skill wisard or leadership,
-		case 4:
-		case 5:
-		{
-		    if(4 == c)
-		    {
-			if(hero.HasSecondarySkill(Skill::Secondary::WISDOM))
-			{
-			    PlaySoundSuccess;
-			    DialogWithArtifact(MP2::StringObject(obj), _("You've found the artifact: ") + art.GetName(), art(), Dialog::OK);
-			    conditions = true;
-			}
-			else
-			{
-			    PlaySoundFailure;
-			    std::string str = _("The hermit tells you that he is willing to give the %{art} to the first wise person he meets.");
-			    String::Replace(str, "%{art}", art.GetName());
-			    Dialog::Message(_("You've found the humble dwelling of a withered hermit."), str, Font::BIG, Dialog::OK);
-			}
-		    }
-		    else
-		    {
-			if(hero.HasSecondarySkill(Skill::Secondary::LEADERSHIP))
-			{
-			    PlaySoundSuccess;
-			    DialogWithArtifact(MP2::StringObject(obj), _("You've found the artifact: ") + art.GetName(), art(), Dialog::OK);
-			    conditions = true;
-			}
-			else
-			{
-			    PlaySoundFailure;
-			    std::string str = _("The soldier tells you that he is willing to pass on the %{art} to the first true leader he meets.");
-			    String::Replace(str, "%{art}", art.GetName());
-			    Dialog::Message(_("You've come across the spartan quarters of a retired soldier."), str, Font::BIG, Dialog::OK);
-			}
-		    }
-		    break;
-		}
-
-		// 6 - 50 rogues, 7 - 1 gin, 8,9,10,11,12,13 - 1 monster level4
-		case 6:
-		case 7:
-		case 8:
-		case 9:
-		case 10:
-		case 11:
-		case 12:
-		case 13:
-		{
-		    bool battle = true;
-		    Army::army_t army;
-		    army.FromGuardian(tile);
-		    const Army::Troop & troop = army.FirstValid();
-		    const std::string & monster = troop.GetName();
-
-		    PlaySoundWarning;
-
-		    if(6 == c)
-			Dialog::Message(_("You come upon an ancient artifact."), _("As you reach for it, a pack of Rogues leap out of the brush to guard their stolen loot."), Font::BIG, Dialog::OK);
-		    else
-		    {
-			std::string str = _("Unfortunately, it's guarded by a nearby %{monster}. Do you want to fight the %{monster} for the artifact?");
-			String::Replace(str, "%{monster}", monster);
-			battle = (Dialog::YES == Dialog::Message(_("Through a clearing you observe an ancient artifact."), str,	Font::BIG, Dialog::YES | Dialog::NO));
-		    }
-		    
-		    if(battle)
-		    {
-            		u32 exp = 0;
-            		const Army::battle_t b = Army::Battle(hero, army, tile, exp);
-			switch(b)
-			{
-			    case Army::WIN:
-			    {
-				hero.IncreaseExperience(exp);
-				conditions = true;
-				PlaySoundSuccess;
-				std::string str = _("Victorious, you take your prize, the %{art}.");
-				String::Replace(str, "%{art}", art.GetName());
-				DialogWithArtifact(MP2::StringObject(obj), str, art());
-				hero.ActionAfterBattle();
-			    }
-			    break;
-
-			    case Army::RETREAT:
-			    case Army::SURRENDER:
-			    case Army::LOSE:
-				BattleLose(hero, b);
-				break;
-        
-    			default: break;
-			}
-		    }
-		    else
-		    {
-			PlaySoundFailure;
-			Dialog::Message("", _("Discretion is the better part of valor, and you decide to avoid this fight for today."), Font::BIG, Dialog::OK);
-		    }
-		    break;
-		}
-
+		case 1: r = Resource::WOOD; break;
+        	case 2: r = Resource::MERCURY; break;
+        	case 3: r = Resource::ORE; break;
+        	case 4: r = Resource::SULFUR; break;
+        	case 5: r = Resource::CRYSTAL; break;
+        	case 6: r = Resource::GEMS; break;
 		default:
-		    PlaySoundSuccess;
-		    DialogWithArtifact(MP2::StringObject(obj), _("You've found the artifact: ") + art.GetName(), art());
-		    conditions = true;
+		    r = Resource::Rand();
+		    // store variants
+		    switch(r)
+		    {
+			case Resource::WOOD: tile.SetQuantity2(0x10 + c); break;
+        		case Resource::MERCURY: tile.SetQuantity2(0x20 + c); break;
+        		case Resource::ORE: tile.SetQuantity2(0x30 + c); break;
+        		case Resource::SULFUR: tile.SetQuantity2(0x40 + c); break;
+        		case Resource::CRYSTAL: tile.SetQuantity2(0x50 + c); break;
+        		case Resource::GEMS: tile.SetQuantity2(0x60 + c); break;
+			default: break;
+		    }
 		    break;
 	    }
-	break;
 
-	default: break;
+	    std::string header;
+
+	    Resource::funds_t payment;
+	    if(1 == c)
+	    {
+		header = _("A leprechaun offers you the %{art} for the small price of %{gold} Gold.");
+		String::Replace(header, "%{gold}", 2000);
+		payment += Resource::funds_t(Resource::GOLD, 2000);
+	    }
+	    else
+	    if(2 == c)
+	    {
+		header = _("A leprechaun offers you the %{art} for the small price of %{gold} Gold and %{count} %{res}.");
+		String::Replace(header, "%{gold}", 2500);
+		String::Replace(header, "%{count}", 3);
+		String::Replace(header, "%{res}", Resource::String(r));
+		payment += Resource::funds_t(Resource::GOLD, 2500);
+		payment += Resource::funds_t(r, 3);
+	    }
+	    else
+	    {
+		header = _("A leprechaun offers you the %{art} for the small price of %{gold} Gold and %{count} %{res}.");
+		String::Replace(header, "%{gold}", 3000);
+		String::Replace(header, "%{count}", 5);
+		String::Replace(header, "%{res}", Resource::String(r));
+		payment += Resource::funds_t(Resource::GOLD, 3000);
+		payment += Resource::funds_t(r, 5);
+	    }
+	    String::Replace(header, "%{art}", art.GetName());
+
+	    PlaySoundWarning;
+	    if(Dialog::YES == DialogWithArtifact(header, _("Do you wish to buy this artifact?"), art(), Dialog::YES | Dialog::NO))
+	    {
+		if(world.GetKingdom(hero.GetColor()).AllowPayment(payment))
+		{
+		    conditions = true;
+		    world.GetKingdom(hero.GetColor()).OddFundsResource(payment);
+		}
+		else
+		{
+		    PlaySoundFailure;
+		    Dialog::Message(_("You try to pay the leprechaun, but realize that you can't afford it."), _("The leprechaun stamps his foot and ignores you."), Font::BIG, Dialog::OK);
+		}
+	    }
+	    else
+		Dialog::Message("", _("Insulted by your refusal of his generous offer, the leprechaun stamps his foot and ignores you."), Font::BIG, Dialog::OK);
+	    break;
+	}
+
+	// 4,5 - need have skill wisard or leadership,
+	case 4:
+	case 5:
+	{
+	    if(4 == c)
+	    {
+		if(hero.HasSecondarySkill(Skill::Secondary::WISDOM))
+		{
+		    PlaySoundSuccess;
+		    DialogWithArtifact(MP2::StringObject(obj), _("You've found the artifact: ") + art.GetName(), art(), Dialog::OK);
+		    conditions = true;
+		}
+		else
+		{
+		    PlaySoundFailure;
+		    std::string str = _("The hermit tells you that he is willing to give the %{art} to the first wise person he meets.");
+		    String::Replace(str, "%{art}", art.GetName());
+		    Dialog::Message(_("You've found the humble dwelling of a withered hermit."), str, Font::BIG, Dialog::OK);
+		}
+	    }
+	    else
+	    {
+		if(hero.HasSecondarySkill(Skill::Secondary::LEADERSHIP))
+		{
+		    PlaySoundSuccess;
+		    DialogWithArtifact(MP2::StringObject(obj), _("You've found the artifact: ") + art.GetName(), art(), Dialog::OK);
+		    conditions = true;
+		}
+		else
+		{
+		    PlaySoundFailure;
+		    std::string str = _("The soldier tells you that he is willing to pass on the %{art} to the first true leader he meets.");
+		    String::Replace(str, "%{art}", art.GetName());
+		    Dialog::Message(_("You've come across the spartan quarters of a retired soldier."), str, Font::BIG, Dialog::OK);
+		}
+	    }
+	    break;
+	}
+
+	// 6 - 50 rogues, 7 - 1 gin, 8,9,10,11,12,13 - 1 monster level4
+	case 6:
+	case 7:
+	case 8:
+	case 9:
+	case 10:
+	case 11:
+	case 12:
+	case 13:
+	{
+	    bool battle = true;
+	    Army::army_t army;
+	    army.FromGuardian(tile);
+	    const Army::Troop & troop = army.FirstValid();
+	    const std::string & monster = troop.GetName();
+
+	    PlaySoundWarning;
+
+	    if(6 == c)
+		Dialog::Message(_("You come upon an ancient artifact."), _("As you reach for it, a pack of Rogues leap out of the brush to guard their stolen loot."), Font::BIG, Dialog::OK);
+	    else
+	    {
+		std::string str = _("Unfortunately, it's guarded by a nearby %{monster}. Do you want to fight the %{monster} for the artifact?");
+		String::Replace(str, "%{monster}", monster);
+		battle = (Dialog::YES == Dialog::Message(_("Through a clearing you observe an ancient artifact."), str,	Font::BIG, Dialog::YES | Dialog::NO));
+	    }
+		    
+	    if(battle)
+	    {
+        	u32 exp = 0;
+            	const Army::battle_t b = Army::Battle(hero, army, tile, exp);
+		switch(b)
+		{
+		    case Army::WIN:
+		    {
+			hero.IncreaseExperience(exp);
+			conditions = true;
+			PlaySoundSuccess;
+			std::string str = _("Victorious, you take your prize, the %{art}.");
+			String::Replace(str, "%{art}", art.GetName());
+			DialogWithArtifact(MP2::StringObject(obj), str, art());
+			hero.ActionAfterBattle();
+		    }
+		    break;
+
+		    case Army::RETREAT:
+		    case Army::SURRENDER:
+		    case Army::LOSE:
+			BattleLose(hero, b);
+			break;
+        
+    		    default: break;
+		}
+	    }
+	    else
+	    {
+		PlaySoundFailure;
+		Dialog::Message("", _("Discretion is the better part of valor, and you decide to avoid this fight for today."), Font::BIG, Dialog::OK);
+	    }
+	    break;
+	}
+
+    	default:
+	    PlaySoundSuccess;
+	    DialogWithArtifact(MP2::StringObject(obj), _("You've found the artifact: ") + art.GetName(), art());
+	    conditions = true;
+	    break;
     }
 
     if(conditions && hero.PickupArtifact(art()))
