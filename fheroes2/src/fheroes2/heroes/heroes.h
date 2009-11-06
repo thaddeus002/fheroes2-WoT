@@ -179,10 +179,12 @@ public:
     const std::vector<Skill::Secondary>	& GetSecondarySkills(void) const;
 
     bool PickupArtifact(const Artifact::artifact_t);
+    bool PickupArtifact(const Artifact &);
     bool HasArtifact(const Artifact::artifact_t) const;
     bool HasUltimateArtifact(void) const;
     u8 GetCountArtifacts(void) const;
     BagArtifacts & GetBagArtifacts(void);
+    const BagArtifacts & GetBagArtifacts(void) const;
     bool IsFullBagArtifacts(void) const;
     void TakeArtifacts(Heroes &);
 

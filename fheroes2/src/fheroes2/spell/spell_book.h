@@ -46,7 +46,7 @@ public:
 private:
 	friend class Game::IO;
 
-	void SetFilter(std::vector<Spell::spell_t> & spells, filter_t filter) const;
+	static void SetFilter(std::vector<Spell::spell_t> & v, filter_t filter);
 
 	const HeroBase *hero;
 	bool active;

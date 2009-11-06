@@ -33,10 +33,11 @@
 #include "interface_gamearea.h"
 #include "tools.h"
 
-#define FORMAT_VERSION_1335 0x537
-#define FORMAT_VERSION_1293 0x50D
+#define FORMAT_VERSION_1347 0x0543
+#define FORMAT_VERSION_1335 0x0537
+#define FORMAT_VERSION_1293 0x050D
 
-#define CURRENT_FORMAT_VERSION FORMAT_VERSION_1335
+#define CURRENT_FORMAT_VERSION FORMAT_VERSION_1347
 
 bool Game::Save(const std::string &fn)
 {
@@ -261,6 +262,8 @@ bool Game::IO::SaveBIN(QueueMessage & msg)
 	msg.Push(tile.general);
 	msg.Push(tile.quantity1);
 	msg.Push(tile.quantity2);
+	msg.Push(tile.quantity3);
+	msg.Push(tile.quantity4);
 	msg.Push(tile.fogs);
 	msg.Push(tile.flags);
 
@@ -549,7 +552,10 @@ void Game::IO::PackHeroes(QueueMessage & msg, const Heroes & hero)
     // artifacts
     msg.Push(static_cast<u32>(hero.artifacts.size()));
     for(u32 jj = 0; jj < hero.artifacts.size(); ++jj)
-    msg.Push(static_cast<u8>(hero.artifacts[jj].GetID()));
+    {
+	msg.Push(static_cast<u8>(hero.artifacts[jj].GetID()));
+	msg.Push(hero.artifacts[jj].GetExt());
+    }
 
     // armies
     msg.Push(static_cast<u32>(ARMYMAXTROOPS));
@@ -697,6 +703,11 @@ bool Game::IO::LoadBIN(QueueMessage & msg)
 	msg.Pop(tile->general);
 	msg.Pop(tile->quantity1);
 	msg.Pop(tile->quantity2);
+	if(format && format >= FORMAT_VERSION_1347)
+	{
+	    msg.Pop(tile->quantity3);
+	    msg.Pop(tile->quantity4);
+	}
 	msg.Pop(tile->fogs);
 	msg.Pop(tile->flags);
 
@@ -1056,6 +1067,12 @@ void Game::IO::UnpackHeroes(QueueMessage & msg, Heroes & hero, u16 check_version
     {
 	msg.Pop(byte8);
 	hero.artifacts[jj].Set(Artifact::FromInt(byte8));
+
+	if(check_version && check_version >= FORMAT_VERSION_1347)
+	{
+	    msg.Pop(byte8);
+	    hero.artifacts[jj].SetExt(byte8);
+	}
     }
 
     // armies

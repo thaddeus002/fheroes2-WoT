@@ -52,6 +52,7 @@ class Captain : public HeroBase
     Army::army_t & GetArmy(void);
     bool HasArtifact(const Artifact::artifact_t) const;
     BagArtifacts & GetBagArtifacts(void);
+    const BagArtifacts & GetBagArtifacts(void) const;
     void TakeArtifacts(Heroes &);
     u16 GetMaxSpellPoints(void) const;
     void SetSpellPoints(const u16 point);

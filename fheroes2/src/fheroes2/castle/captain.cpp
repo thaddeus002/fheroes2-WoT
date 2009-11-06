@@ -208,6 +208,11 @@ bool Captain::HasArtifact(const Artifact::artifact_t art) const
     return false;
 }
 
+const BagArtifacts & Captain::GetBagArtifacts(void) const
+{
+    return artifacts;
+}
+
 BagArtifacts & Captain::GetBagArtifacts(void)
 {
     return artifacts;

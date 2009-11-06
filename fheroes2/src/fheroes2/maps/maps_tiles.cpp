@@ -145,7 +145,7 @@ Maps::Tiles::Tiles(u16 index) : maps_index(index), tile_index(0),
 
 Maps::Tiles::Tiles(u16 mi, const MP2::mp2tile_t & mp2tile) : maps_index(mi), tile_index(mp2tile.tileIndex),
     shape(mp2tile.shape), general(mp2tile.generalObject), quantity1(mp2tile.quantity1), quantity2(mp2tile.quantity2),
-    fogs(0xFF), flags(REDRAW)
+    quantity3(0), quantity4(0), fogs(0xFF), flags(REDRAW)
 {
     AddonsPushLevel1(mp2tile);
     AddonsPushLevel2(mp2tile);
@@ -586,14 +586,24 @@ void Maps::Tiles::DebugInfo(void) const
     value.clear();
     
     String::AddInt(value, quantity1);
-    
     std::cout << "quantity 1      : " << value << std::endl;
 
     value.clear();
     
     String::AddInt(value, quantity2);
-    
     std::cout << "quantity 2      : " << value << std::endl;
+
+    value.clear();
+
+    String::AddInt(value, quantity3);
+    std::cout << "quantity 3      : " << value << std::endl;
+
+    value.clear();
+
+    String::AddInt(value, quantity4);
+    std::cout << "quantity 4      : " << value << std::endl;
+
+    value.clear();
 
     if(addons_level1.size())
     {
@@ -1383,7 +1393,13 @@ void Maps::Tiles::UpdateQuantity(void)
 	    addon = FindArtifact();
 	    if(addon)
 	    {
-		quantity1 = Artifact::FromIndexSprite(addon->index);
+		Artifact::artifact_t art = Artifact::FromIndexSprite(addon->index);
+		if(Artifact::SPELL_SCROLL == art)
+		{
+		    Spell::spell_t spell = Spell::FromInt(1 + (quantity2 * 256 + quantity1) / 8);
+		    quantity3 = spell;
+		}
+		quantity1 = art;
 		quantity2 = Rand::Get(1, 18);
 	    }
 	break;

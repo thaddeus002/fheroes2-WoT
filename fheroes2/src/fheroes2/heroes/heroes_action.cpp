@@ -1632,7 +1632,13 @@ void ActionToShipwreckSurvivor(Heroes &hero, const u8 obj, const u16 dst_index)
 void ActionToArtifact(Heroes &hero, const u8 obj, const u16 dst_index)
 {
     Maps::Tiles & tile = world.GetTiles(dst_index);
-    const Artifact art(Artifact::FromInt(tile.GetQuantity1()));
+    Artifact art(Artifact::FromInt(tile.GetQuantity1()));
+
+    // update scroll artifact
+    if(art.GetID() == Artifact::SPELL_SCROLL)
+    {
+	art.SetExt(tile.GetQuantity3());
+    }
 
     if(hero.IsFullBagArtifacts())
     {
@@ -1840,7 +1846,7 @@ void ActionToArtifact(Heroes &hero, const u8 obj, const u16 dst_index)
 	    break;
     }
 
-    if(conditions && hero.PickupArtifact(art()))
+    if(conditions && hero.PickupArtifact(art))
     {
 	PlayPickupSound();
 	AnimationRemoveObject(tile);
@@ -1848,6 +1854,8 @@ void ActionToArtifact(Heroes &hero, const u8 obj, const u16 dst_index)
 	tile.RemoveObjectSprite();
 	tile.SetQuantity1(0);
 	tile.SetQuantity2(0);
+	tile.SetQuantity3(0);
+	tile.SetQuantity4(0);
 	tile.SetObject(MP2::OBJ_ZERO);
     }
 

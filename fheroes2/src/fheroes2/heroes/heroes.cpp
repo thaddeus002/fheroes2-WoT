@@ -1325,6 +1325,11 @@ bool Heroes::IsFullBagArtifacts(void) const
 
 bool Heroes::PickupArtifact(const Artifact::artifact_t art)
 {
+    return PickupArtifact(Artifact(art));
+}
+
+bool Heroes::PickupArtifact(const Artifact & art)
+{
     BagArtifacts::iterator it = std::find(artifacts.begin(), artifacts.end(), Artifact::UNKNOWN);
 
     if(artifacts.end() == it)
@@ -1333,7 +1338,7 @@ bool Heroes::PickupArtifact(const Artifact::artifact_t art)
 	{
 	    art == Artifact::MAGIC_BOOK ?
 	    Dialog::Message("", _("You must purchase a spell book to use the mage guild, but you currently have no room for a spell book. Try giving one of your artifacts to another hero."), Font::BIG, Dialog::OK) :
-	    Dialog::Message(Artifact::GetName(art), _("You have no room to carry another artifact!"), Font::BIG, Dialog::OK);
+	    Dialog::Message(art.GetName(), _("You have no room to carry another artifact!"), Font::BIG, Dialog::OK);
 	}
 	return false;
     }
@@ -1341,6 +1346,11 @@ bool Heroes::PickupArtifact(const Artifact::artifact_t art)
     *it = art;
 
     return true;
+}
+
+const BagArtifacts & Heroes::GetBagArtifacts(void) const
+{
+    return artifacts;
 }
 
 BagArtifacts & Heroes::GetBagArtifacts(void)

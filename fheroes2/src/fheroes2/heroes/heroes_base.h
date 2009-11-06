@@ -41,6 +41,7 @@ class HeroBase : public Skill::Primary, public BitModes
     virtual Army::army_t & GetArmy(void) = 0;
     virtual bool HasArtifact(const Artifact::artifact_t) const = 0;
     virtual BagArtifacts & GetBagArtifacts(void) = 0;
+    virtual const BagArtifacts & GetBagArtifacts(void) const = 0;
     virtual void TakeArtifacts(Heroes &) = 0;
     virtual u16 GetMaxSpellPoints(void) const = 0;
     virtual void SetSpellPoints(const u16 point) = 0;

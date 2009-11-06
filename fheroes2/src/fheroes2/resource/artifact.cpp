@@ -142,11 +142,11 @@ static struct
 	{ "Unknown", "Unknown" },
 };
 
-Artifact::Artifact() : id(Artifact::UNKNOWN)
+Artifact::Artifact() : id(Artifact::UNKNOWN), ext(0)
 {
 }
 
-Artifact::Artifact(artifact_t a) : id(a)
+Artifact::Artifact(artifact_t a) : id(a), ext(0)
 {
 }
 
@@ -627,4 +627,14 @@ u8 Artifact::IndexSprite32(Artifact::artifact_t a)
 u8 Artifact::IndexSprite64(Artifact::artifact_t a)
 {
     return a + 1;
+}
+
+void Artifact::SetExt(u8 v)
+{
+    ext = v;
+}
+
+u8 Artifact::GetExt(void) const
+{
+    return ext;
 }

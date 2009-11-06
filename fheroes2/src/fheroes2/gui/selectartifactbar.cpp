@@ -239,7 +239,14 @@ bool SelectArtifactsBar::QueueEventProcessing(SelectArtifactsBar & bar)
 		if(art1 == Artifact::MAGIC_BOOK)
 		    bar.hero.GetSpellBook().Open(SpellBook::ALL, false);
 		else
-		Dialog::Message(art1.GetName(), art1.GetDescription(), Font::BIG, Dialog::OK);
+		if(art1 == Artifact::SPELL_SCROLL)
+		{
+		    std::string msg = art1.GetDescription();
+		    String::Replace(msg, "%{spell}", Spell::GetName(Spell::FromInt(art1.GetExt())));
+		    Dialog::Message(art1.GetName(), msg, Font::BIG, Dialog::OK);
+		}
+		else
+		    Dialog::Message(art1.GetName(), art1.GetDescription(), Font::BIG, Dialog::OK);
 	    }
 	    // exchange
 	    else
@@ -265,7 +272,17 @@ bool SelectArtifactsBar::QueueEventProcessing(SelectArtifactsBar & bar)
     {
         bar.Reset();
 	// show quick info
-	if(art1 != Artifact::UNKNOWN) Dialog::Message(art1.GetName(), art1.GetDescription(), Font::BIG);
+	if(art1 != Artifact::UNKNOWN)
+	{
+    	    if(art1 == Artifact::SPELL_SCROLL)
+            {
+                std::string msg = art1.GetDescription();
+                String::Replace(msg, "%{spell}", Spell::GetName(Spell::FromInt(art1.GetExt())));
+                Dialog::Message(art1.GetName(), msg, Font::BIG);
+            }
+	    else
+		Dialog::Message(art1.GetName(), art1.GetDescription(), Font::BIG);
+	}
     }
 
     Cursor::Get().Show();
@@ -318,7 +335,14 @@ bool SelectArtifactsBar::QueueEventProcessing(SelectArtifactsBar & bar1, SelectA
 	if(le.MousePressRight(bar2.GetArea()))
 	{
 	    bar1.Reset();
-	    Dialog::Message(art2.GetName(), art2.GetDescription(), Font::BIG);
+            if(art2 == Artifact::SPELL_SCROLL)
+            {
+                std::string msg = art2.GetDescription();
+                String::Replace(msg, "%{spell}", Spell::GetName(Spell::FromInt(art2.GetExt())));
+                Dialog::Message(art2.GetName(), msg, Font::BIG);
+            }
+	    else
+		Dialog::Message(art2.GetName(), art2.GetDescription(), Font::BIG);
 	}
 
 	Cursor::Get().Show();
@@ -356,7 +380,14 @@ bool SelectArtifactsBar::QueueEventProcessing(SelectArtifactsBar & bar1, SelectA
 	if(le.MousePressRight(bar1.GetArea()))
 	{
 	    bar2.Reset();
-	    Dialog::Message(art1.GetName(), art1.GetDescription(), Font::BIG);
+            if(art1 == Artifact::SPELL_SCROLL)
+            {
+                std::string msg = art1.GetDescription();
+                String::Replace(msg, "%{spell}", Spell::GetName(Spell::FromInt(art1.GetExt())));
+                Dialog::Message(art1.GetName(), msg, Font::BIG);
+            }
+	    else
+		Dialog::Message(art1.GetName(), art1.GetDescription(), Font::BIG);
 	}
 
 	Cursor::Get().Show();

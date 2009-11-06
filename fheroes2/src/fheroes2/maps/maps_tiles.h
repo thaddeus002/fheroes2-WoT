@@ -73,6 +73,8 @@ namespace Maps
 	MP2::object_t GetObject(void) const;
 	u8 GetQuantity1(void) const{ return quantity1; };
 	u8 GetQuantity2(void) const{ return quantity2; };
+	u8 GetQuantity3(void) const{ return quantity3; };
+	u8 GetQuantity4(void) const{ return quantity4; };
 	Ground::ground_t GetGround(void) const;
 	const Surface & GetTileSurface(void) const;
 	u32 GetUniq1(void) const{ return addons_level1.size() ? addons_level1.front().uniq : 0; };
@@ -113,6 +115,8 @@ namespace Maps
 
 	void SetQuantity1(u8 val){ quantity1 = val; };
 	void SetQuantity2(u8 val){ quantity2 = val; };
+	void SetQuantity3(u8 val){ quantity3 = val; };
+	void SetQuantity4(u8 val){ quantity4 = val; };
 	void SetObject(MP2::object_t object){ general = object; };
 
 	void UpdateQuantity(void);
@@ -184,6 +188,8 @@ namespace Maps
         u8      general;
         u8      quantity1;
         u8      quantity2;
+	u8	quantity3;
+	u8	quantity4;	/* memory align */
         u8	fogs;
 	u8	flags;
     };

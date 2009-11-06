@@ -159,7 +159,10 @@ public:
     u8 GetIndexSprite32(void) const;
     /* artifact.icn */
     u8 GetIndexSprite64(void) const;
-                    
+
+    void SetExt(u8);
+    u8 GetExt(void) const;
+
     static artifact_t RandUltimate(void);
     static artifact_t Rand(bool uniq = true);
     static artifact_t Rand1(bool uniq = true);
@@ -181,6 +184,7 @@ public:
 
 private:
     artifact_t id;
+    u8 ext; /* spell for scrolls, and other */
 };
 
 #endif
