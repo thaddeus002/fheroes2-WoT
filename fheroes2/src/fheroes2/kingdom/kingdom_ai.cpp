@@ -344,7 +344,7 @@ void Kingdom::AIHeroesPrepareTask(Heroes & hero)
 	    {
 		u16 pos = 0;
 		// check monster on path
-		if(hero.GetPath().isUnderProtection(pos))
+		if(hero.GetPath().isUnderProtection(&pos))
 		{
 		    const Maps::Tiles & tile = world.GetTiles(pos);
 		    Army::army_t enemy;

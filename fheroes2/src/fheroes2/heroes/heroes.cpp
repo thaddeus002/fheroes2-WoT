@@ -1215,7 +1215,11 @@ u16 Heroes::FindPath(u16 dst_index) const
 void Heroes::RescanPath(void)
 {
     if(path.isValid())
-	path.Calculate(path.GetDestinationIndex());
+    {
+	u16 obstacle;
+	if(path.hasObstacle(&obstacle) ||
+	   path.isUnderProtection(&obstacle)) path.Calculate(obstacle);
+    }
 }
 
 /* if hero in castle */

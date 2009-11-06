@@ -154,6 +154,8 @@ void Kingdom::LossPostActions(void)
 
 void Kingdom::ActionNewDay(void)
 {
+    Settings::Get().SetCurrentColor(color);
+
     if(isLoss() || 0 == lost_town_days)
     {
 	LossPostActions();

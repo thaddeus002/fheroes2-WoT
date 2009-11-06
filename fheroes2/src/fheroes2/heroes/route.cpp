@@ -255,7 +255,7 @@ void Route::Path::Dump(void) const
     for(; it1 != it2; ++it1) std::cout << "Path::Dump: " << Direction::String((*it1).Direction()) << ", " << (*it1).Penalty() << std::endl;
 }
 
-bool Route::Path::isUnderProtection(u16 & res) const
+bool Route::Path::isUnderProtection(u16* res) const
 {
     const_iterator it1 = begin();
     const_iterator it2 = end();
@@ -267,25 +267,33 @@ bool Route::Path::isUnderProtection(u16 & res) const
 	if(Maps::isValidDirection(next, (*it1).Direction()))
 	    next = Maps::GetDirectionIndex(next, (*it1).Direction());
 
-	if(Maps::TileUnderProtection(next, &res))  return true;
+	if(Maps::TileUnderProtection(next, res))  return true;
     }
 
     return false;
 }
 
-bool Route::Path::isUnderProtection(void) const
+bool Route::Path::hasObstacle(u16* res) const
 {
     const_iterator it1 = begin();
     const_iterator it2 = end();
 
-    u16 next = dst;
+    u16 next = hero.GetIndex();
 
     for(; it1 != it2; ++it1)
     {
 	if(Maps::isValidDirection(next, (*it1).Direction()))
 	    next = Maps::GetDirectionIndex(next, (*it1).Direction());
 
-	if(Maps::TileUnderProtection(next)) return true;
+	switch(world.GetTiles(next).GetObject())
+	{
+	    case MP2::OBJ_HEROES:
+	    case MP2::OBJ_MONSTER:
+		if(res) *res = next;
+		return true;
+
+	    default: break;
+	}
     }
 
     return false;
