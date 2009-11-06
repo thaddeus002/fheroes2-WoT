@@ -1212,6 +1212,16 @@ u16 Heroes::FindPath(u16 dst_index) const
     return route.Calculate(dst_index);
 }
 
+void Heroes::RescanPath(void)
+{
+    if(path.isValid())
+    {
+	Error::Verbose("2222: ", path.GetDestinationIndex());
+	Error::Verbose("3333: ", 
+	path.Calculate(path.GetDestinationIndex()));
+    }
+}
+
 /* if hero in castle */
 const Castle* Heroes::inCastle(void) const
 {

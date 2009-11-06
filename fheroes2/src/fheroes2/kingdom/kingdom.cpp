@@ -167,12 +167,10 @@ void Kingdom::ActionNewDay(void)
     if(1 < world.CountDay())
     {
         // castle New Day
-	std::vector<Castle *>::const_iterator itc = castles.begin();
-        for(; itc != castles.end(); ++itc) if(*itc) (**itc).ActionNewDay();
+	std::for_each(castles.begin(), castles.end(), std::mem_fun(&Castle::ActionNewDay));
 
 	// heroes New Day
-        std::vector<Heroes *>::const_iterator ith = heroes.begin();
-	for(; ith != heroes.end(); ++ith) if(*ith) (**ith).ActionNewDay();
+	std::for_each(heroes.begin(), heroes.end(), std::mem_fun(&Heroes::ActionNewDay));
 
 	// captured object
 	resource.wood += DAY_PROFIT_WOOD * world.CountCapturedObject(MP2::OBJ_SAWMILL, color);
@@ -184,11 +182,9 @@ void Kingdom::ActionNewDay(void)
 	resource.gold += DAY_PROFIT_GOLD * world.CountCapturedMines(Resource::GOLD, color);
 
 	// funds
-	itc = castles.begin();
-	for(; itc != castles.end(); ++itc)
+	std::vector<Castle*>::const_iterator itc = castles.begin();
+	for(; itc != castles.end(); ++itc) if(*itc)
 	{
-	    if(*itc)
-	    {
 		const Castle & castle = **itc;
 
 		// castle or town profit
@@ -199,7 +195,6 @@ void Kingdom::ActionNewDay(void)
 
 		// dungeon for warlock
 		resource.gold += (castle.isBuild(Castle::BUILD_SPEC) && Race::WRLK == castle.GetRace() ? INCOME_DUNGEON_GOLD : 0);
-	    }
 	}
     }
 
@@ -211,6 +206,9 @@ void Kingdom::ActionNewDay(void)
     std::vector<GameEvent::Day *>::const_iterator it2 = events.end();
 
     for(; it1 != it2; ++it1) if(*it1) AddFundsResource((*it1)->GetResource());
+
+    // rescan heroes path
+    std::for_each(heroes.begin(), heroes.end(), std::mem_fun(&Heroes::RescanPath));
 }
 
 void Kingdom::ActionNewWeek(void)
@@ -219,12 +217,10 @@ void Kingdom::ActionNewWeek(void)
     if(1 < world.CountDay())
     {
 	// castle New Week
-	std::vector<Castle *>::const_iterator itc = castles.begin();
-	for(; itc != castles.end(); ++itc) if(*itc) (**itc).ActionNewWeek();
+	std::for_each(castles.begin(), castles.end(), std::mem_fun(&Castle::ActionNewWeek));
 
 	// heroes New Week
-	std::vector<Heroes *>::const_iterator ith = heroes.begin();
-	for(; ith != heroes.end(); ++ith) if(*ith) (**ith).ActionNewWeek();
+	std::for_each(heroes.begin(), heroes.end(), std::mem_fun(&Heroes::ActionNewWeek));
 
 	// debug an gift
 	if(Settings::Get().Debug() && Game::LOCAL == Control())
@@ -250,12 +246,10 @@ void Kingdom::ActionNewMonth(void)
     if(1 < world.CountDay())
     {
 	// castle New Month
-	std::vector<Castle *>::const_iterator itc = castles.begin();
-	for(; itc != castles.end(); ++itc) if(*itc) (**itc).ActionNewMonth();
+	std::for_each(castles.begin(), castles.end(), std::mem_fun(&Castle::ActionNewMonth));
 
 	// heroes New Month
-	std::vector<Heroes *>::const_iterator ith = heroes.begin();
-	for(; ith != heroes.end(); ++ith) if(*ith) (**ith).ActionNewMonth();
+	std::for_each(heroes.begin(), heroes.end(), std::mem_fun(&Heroes::ActionNewMonth));
     }
 }
 

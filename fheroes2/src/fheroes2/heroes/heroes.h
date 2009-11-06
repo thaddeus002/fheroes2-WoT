@@ -208,6 +208,7 @@ public:
     u16 FindPath(u16 dst_index) const;
     u8 GetRangeRouteDays(const u16 dst) const;
     void ShowPath(bool f){ f ? path.Show() : path.Hide(); };
+    void RescanPath(void);
 
     Direction::vector_t GetDirection(void) const{ return direction; };
 
