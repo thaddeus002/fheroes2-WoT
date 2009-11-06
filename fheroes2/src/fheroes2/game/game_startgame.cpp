@@ -170,6 +170,7 @@ Game::menu_t Game::StartGame(void)
         AGG::ICNRegistryEnable(false);
         AGG::ICNRegistryFreeObjects();
     }
+    if(conf.Debug() && conf.PocketPC()) MemoryInfoDump("Game::StartGame:");
 
     // preload sounds
     Game::PreloadLOOPSounds();
@@ -272,7 +273,9 @@ void Game::OpenCastle(Castle *castle)
     Interface::StatusWindow::ResetTimer();
     bool show_position = !Settings::Get().PocketPC() && (640 != display.w() || 480 != display.h());
     bool need_fade = !show_position;
-    
+
+    if(Settings::Get().Debug() && Settings::Get().PocketPC()) MemoryInfoDump("Game::OpenCastle:");
+
     if(it != myCastles.end())
     {
 	Dialog::answer_t result = Dialog::ZERO;
@@ -339,6 +342,8 @@ void Game::OpenHeroes(Heroes *hero)
     Interface::Basic & I = Interface::Basic::Get();
     bool show_position = !Settings::Get().PocketPC() && (640 != display.w() || 480 != display.h());
     bool need_fade = !show_position;
+
+    if(Settings::Get().Debug() && Settings::Get().PocketPC()) MemoryInfoDump("Game::OpenHeroes:");
 
     if(it != myHeroes.end())
     {
@@ -1640,17 +1645,7 @@ void Game::KeyPress_SPACE(void)
 
 void Game::KeyPress_RETURN(void)
 {
-#ifdef WITH_DEBUG
-    // check memory available
-    char* ptrs[33];
-    for(u8 ii = 0; ii < 33; ++ii)
-    {
-    	ptrs[ii] = new char[1000000];
-        std::cout << "test malloc: " << static_cast<int>(ii) << " Mb available" << std::endl;
-    }
-    // wince: limit 32Mb
-    // exception: out of memory
-#endif
+    if(Settings::Get().Debug() && Settings::Get().PocketPC()) MemoryInfoDump("Game::RETURN:");
 
     Focus & global_focus = Focus::Get();
     if(Game::Focus::HEROES == global_focus.Type())

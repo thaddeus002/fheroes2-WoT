@@ -20,6 +20,7 @@
 
 #include <algorithm>
 #include <sstream>
+#include <iostream>
 #include <cstring>
 #include <climits>
 #include "error.h"
@@ -283,5 +284,25 @@ const char *GetDirname(const char *path)
 const char *GetBasename(const char *path)
 {
     return basename(const_cast<char *>(path));
+}
+#endif
+
+#ifdef _WIN32_WCE
+#include "windows.h"
+
+void MemoryInfoDump(const char* mark)
+{
+    MEMORYSTATUS ms;
+    ZeroMemory(&ms, sizeof(ms));
+    ms.dwLength = sizeof(MEMORYSTATUS);
+    GlobalMemoryStatus(&ms);
+    int available = ms.dwAvailVirtual / 1024;
+    int total = ms.dwTotalVirtual / 1024;
+    std::cout << mark << " memory available " << available << " from " << total << " Kb" << std::endl;
+}
+#else
+
+void MemoryInfoDump(const char* mark)
+{
 }
 #endif

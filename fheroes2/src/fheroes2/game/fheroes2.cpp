@@ -102,6 +102,8 @@ int main(int argc, char **argv)
 	    }
 	}
 
+	if(conf.PocketPC()) MemoryInfoDump("FHeroes2::Main:");
+
 	// getopt
 	{
 	    int opt;
@@ -282,10 +284,12 @@ int main(int argc, char **argv)
 
 	} catch(std::bad_alloc)
 	{
+	    MemoryInfoDump("std::bad_alloc:");
 	    Error::Verbose("out of memory");
     	    AGG::Cache::Get().Dump();
 	} catch(Error::Exception)
 	{
+	    MemoryInfoDump("Error::Exception:");
 #ifdef WITH_NET
             if(Game::NETWORK == conf.GameType()) Network::Logout();
 #endif
