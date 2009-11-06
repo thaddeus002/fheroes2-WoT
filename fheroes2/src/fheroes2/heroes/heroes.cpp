@@ -1217,11 +1217,11 @@ void Heroes::RescanPath(void)
     if(path.isValid())
     {
 	u16 obstacle;
-	if(path.isUnderProtection(&obstacle))
-	    path.Calculate(obstacle);
-	else
-	if(path.hasObstacle(&obstacle) && 0 == path.Calculate(path.GetDestinationIndex()))
-	    path.Calculate(obstacle);
+	if(path.isUnderProtection(&obstacle) ||
+	   (path.hasObstacle(&obstacle) && 0 == path.Calculate(path.GetDestinationIndex())))
+	{
+	    if(path.isValid()) path.Calculate(path.GetNextToLastIndex());
+	}
     }
 }
 

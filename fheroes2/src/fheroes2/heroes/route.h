@@ -44,6 +44,7 @@ namespace Route
 	    Path(const Heroes & h);
 
 	    u16		GetDestinationIndex(void) const{ return dst; };
+	    u16		GetNextToLastIndex(void) const;
 	    Direction::vector_t GetFrontDirection(void) const;
 	    u16		GetFrontPenalty(void) const;
 	    u16		Calculate(const u16 dst_index, const u16 limit = MAXU16);

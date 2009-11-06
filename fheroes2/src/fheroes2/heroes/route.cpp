@@ -298,3 +298,14 @@ bool Route::Path::hasObstacle(u16* res) const
 
     return false;
 }
+
+u16 Route::Path::GetNextToLastIndex(void) const
+{
+    if(size())
+    {
+	if(Maps::isValidDirection(dst, Direction::Reflect(back().Direction())))
+	    return Maps::GetDirectionIndex(dst, Direction::Reflect(back().Direction()));
+    }
+
+    return 0;
+}
