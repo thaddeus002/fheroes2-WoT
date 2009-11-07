@@ -1,4 +1,18 @@
-SVN - up to r1300
+SVN - up to r1350
+
+Nov, 7, 2009
++ added options alt resource, support ogg sounds
++ added options hide ai move
++ fixed obelisk action, updated open puzzle algorithm
++ added builtin icon (mingw32, mingw32ce)
++ update artifact Arm of the Martyr
++ added artifact Spell Scroll
++ fixed heroes action (meetings/battle) with other heroes (shipmaster)
++ added rescan path for heroes with new day
++ added check full bag artifacts for heroes;
++ added ActionToTravelersTent and ActionToBarrier
++ fixed battle: fix flag, fix count troop visible
++ fixed 65k count for battle troop
 
 Oct,  22, 2009 - Development build, 1299
 + Updated size army for heroes/castles info
