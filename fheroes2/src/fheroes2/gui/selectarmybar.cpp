@@ -510,10 +510,17 @@ bool SelectArmyBar::QueueEventProcessing(SelectArmyBar & bar1, SelectArmyBar & b
 
 void DialogRedistributeArmy(Army::Troop & troop1, Army::Troop & troop2)
 {
-    u16 redistr_count = troop1.Count() / 2;
-    if(Dialog::SelectCount(_("Move how many troops?"), 1, troop1.Count(), redistr_count))
+    if(2 > troop1.Count())
     {
-	troop2.Set(troop1, redistr_count);
-	troop1.SetCount(troop1.Count() - redistr_count);
+	Army::SwapTroops(troop1, troop2);
+    }
+    else
+    {
+	u16 redistr_count = troop1.Count() / 2;
+	if(Dialog::SelectCount(_("Move how many troops?"), 1, troop1.Count(), redistr_count))
+	{
+	    troop2.Set(troop1, redistr_count);
+	    troop1.SetCount(troop1.Count() - redistr_count);
+	}
     }
 }
