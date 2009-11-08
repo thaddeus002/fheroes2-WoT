@@ -1143,9 +1143,7 @@ void AGG::PlaySound(const M82::m82_t m82)
     {
 	if(conf.Debug()) Error::Verbose("AGG::PlaySound: ", M82::GetString(m82));
 	const std::vector<u8> & v = AGG::Cache::Get().GetWAV(m82);
-	const int channel = 0;
-	if(Mixer::isPlaying(channel)) Mixer::Stop(channel);
-	Mixer::Play(&v[0], v.size(), channel, false);
+	Mixer::Play(&v[0], v.size(), -1, false);
     }
 }
 

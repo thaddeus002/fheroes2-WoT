@@ -234,6 +234,9 @@ void Battle::BattleSummary(HeroBase &hero, u32 exp, const Army::ArmyPairs &armie
             }
         }
     }
+
+    if(!Settings::Get().CDMusic())
+        Music::Reset();
 }
 
 void Battle::SettingsDialog()
