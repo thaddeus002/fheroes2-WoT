@@ -99,7 +99,6 @@ namespace Game
     bool ShouldAnimateInfrequent(u32 ticket, u32 modifier);
     void SetFixVideoMode(void);
     
-    void PreloadLOOPSounds(void);
     void EnvironmentSoundMixer(void);
 
     u8  GetRating(void);

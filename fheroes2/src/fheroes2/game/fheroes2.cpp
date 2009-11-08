@@ -183,8 +183,10 @@ int main(int argc, char **argv)
 
 	    if(Mixer::isValid())
 	    {
+		Mixer::SetChannels(8);
                 Mixer::Volume(-1, conf.SoundVolume());
                 Music::Volume(conf.MusicVolume());
+                if(conf.Music()) Music::SetFadeIn(3000);
 	    }
 	    else
 	    if(conf.Sound() || conf.Music())

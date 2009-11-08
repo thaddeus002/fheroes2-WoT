@@ -60,4 +60,4 @@ include $(wildcard *.d)
 .PHONY: clean
 
 clean:
-	rm -f *.pot *.o *.d *.exe $(TARGET)
+	rm -f *.pot *.o *.d *.rc *.res *.exe $(TARGET)

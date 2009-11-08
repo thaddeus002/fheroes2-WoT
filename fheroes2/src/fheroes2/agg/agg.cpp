@@ -676,31 +676,6 @@ void AGG::Cache::LoadPAL(void)
     if(Settings::Get().Debug()) Error::Verbose("AGG::Cache::LoadPAL: ", Palette::Get().Size());
 }
 
-void AGG::Cache::LoadMUS(const MUS::mus_t mus)
-{
-    std::vector<u8> & v = mus_cache[mus];
-    if(! Mixer::isValid() || v.size()) return;
-
-    const Settings & conf = Settings::Get();
-    const std::string musname(conf.LocalPrefix() + SEPARATOR + "files" + SEPARATOR + "music" + SEPARATOR + MUS::GetString(mus));
-    std::string shortname(conf.LocalPrefix() + SEPARATOR + "files" + SEPARATOR + "music" + SEPARATOR + MUS::GetString(mus, true));
-    const char* filename = NULL;
-
-    if(FilePresent(musname))   filename = musname.c_str();
-    else
-    if(FilePresent(shortname)) filename = shortname.c_str();
-    else
-    {
-	String::Replace(shortname, ".ogg", ".mp3");
-	if(FilePresent(shortname)) filename = shortname.c_str();
-	else
-	Error::Warning("AGG::Cache::LoadMUS: error read file: " + musname + ", skipping...");
-    }
-
-    if(conf.Debug()) Error::Verbose("AGG::Cache::LoadMUS: ", filename);
-    StoreFileToMem(v, filename);
-}
-
 void AGG::Cache::LoadFNT(void)
 {
     const Settings & conf = Settings::Get();
@@ -788,14 +763,6 @@ void AGG::Cache::FreeTIL(const TIL::til_t til)
 void AGG::Cache::FreeWAV(const M82::m82_t m82)
 {
     std::vector<u8> & v = wav_cache[m82];
-
-    if(v.size()) v.clear();
-}
-
-/* free music object in AGG::Cache */
-void AGG::Cache::FreeMUS(const MUS::mus_t mus)
-{
-    std::vector<u8> & v = mus_cache[mus];
 
     if(v.size()) v.clear();
 }
@@ -911,16 +878,6 @@ const std::vector<u8> & AGG::Cache::GetMID(const XMI::xmi_t xmi)
     return v;
 }
 
-/* return CVT from AGG::Cache */
-const std::vector<u8> & AGG::Cache::GetMUS(const MUS::mus_t mus)
-{
-    const std::vector<u8> & v = mus_cache[mus];
-
-    if(v.empty()) LoadMUS(mus);
-
-    return v;
-}
-
 #ifdef WITH_TTF
 /* return FNT cache */
 const Surface & AGG::Cache::GetFNT(u16 c, u8 f)
@@ -1021,20 +978,6 @@ void AGG::Cache::Dump(void) const
 	std::cout << "M82: " << " total: " << total1 << std::endl;
     }
 
-    if(mus_cache.size())
-    {
-	total1 = 0;
-	std::map<MUS::mus_t, std::vector<u8> >::const_iterator it1 = mus_cache.begin();
-	std::map<MUS::mus_t, std::vector<u8> >::const_iterator it2 = mus_cache.end();
-	for(; it1 != it2; ++it1)
-	{
-	    if((*it1).second.size())
-	    	std::cout << "MUS: " << MUS::GetString((*it1).first) << ", size: " << (*it1).second.size() << std::endl;
-	    total1 += (*it1).second.size();
-	}
-	std::cout << "MUS: " << " total: " << total1 << std::endl;
-    }
-
     if(mid_cache.size())
     {
 	total1 = 0;
@@ -1112,45 +1055,82 @@ const Surface & AGG::GetTIL(const TIL::til_t til, const u16 index, const u8 shap
     return AGG::Cache::Get().GetTIL(til, index, shape);
 }
 
-const std::vector<u8> & AGG::GetWAV(const M82::m82_t m82)
+void AGG::Cache::ResetMixer(void)
 {
-    return AGG::Cache::Get().GetWAV(m82);
+    Mixer::Reset();
+    loop_sounds.clear();
+    loop_sounds.reserve(7);
 }
 
-const std::vector<u8> & AGG::GetMUS(const MUS::mus_t mus)
-{
-    return AGG::Cache::Get().GetMUS(mus);
-}
-
-const std::vector<u8> & AGG::GetMID(const XMI::xmi_t xmi)
-{
-    return AGG::Cache::Get().GetMID(xmi);
-}
-
-void AGG::LoadLoopSound(const M82::m82_t m82, u8 ch)
+void AGG::Cache::LoadLOOPXXSounds(const std::vector<u8> & vols)
 {
     const Settings & conf = Settings::Get();
 
     if(conf.Sound())
     {
-#ifdef WITH_MIXER
-	if(conf.Modes(Settings::ALTRESOURCE))
-	{
-	    std::string name(M82::GetString(m82));
-	    String::Lower(name);
-	    String::Replace(name, ".82m", ".ogg");
-	    const std::string sound(Settings::Get().LocalPrefix() + SEPARATOR + "files" + SEPARATOR + "sounds" + SEPARATOR + name);
+	std::vector<u8>::const_iterator vol = vols.begin();
 
-	    if(FilePresent(sound))
+	// set volume loop sounds
+	for(; vol != vols.end(); ++vol)
+	{
+	    M82::m82_t m82 = M82::GetLOOP00XX(vol - vols.begin());
+	    if(M82::UNKNOWN == m82) continue;
+
+	    // find loops
+	    std::vector<loop_sound_t>::iterator it = std::find_if(loop_sounds.begin(), loop_sounds.end(),
+		    std::bind2nd(std::mem_fun_ref(&loop_sound_t::isM82), m82));
+
+	    if(it != loop_sounds.end())
 	    {
-		if(conf.Debug()) Error::Verbose("AGG::LoadRAW: ", sound.c_str());
-		Mixer::LoadRAW(sound.c_str(), true, ch);
-		return;
+		// unused and free
+		if(0 == (*vol))
+		{
+		    (*it).sound = M82::UNKNOWN;
+		    if(Mixer::isPlaying((*it).channel))
+		    {
+			Mixer::Pause((*it).channel);
+			Mixer::Volume((*it).channel, conf.SoundVolume());
+			Mixer::Stop((*it).channel);
+		    }
+		}
+		// used and set vols
+		else
+		if(Mixer::isPlaying((*it).channel))
+		{
+		    Mixer::Pause((*it).channel);
+		    Mixer::Volume((*it).channel, *vol);
+		    Mixer::Resume((*it).channel);
+		}
+	    }
+	    else
+	    // new sound
+	    if(0 != (*vol))
+	    {
+    		const std::vector<u8> & v = AGG::Cache::Get().GetWAV(m82);
+		int channel = Mixer::Play(&v[0], v.size(), -1, true);
+
+		if(0 <= channel)
+		{
+		    // find unused
+		    std::vector<loop_sound_t>::iterator it = std::find_if(loop_sounds.begin(), loop_sounds.end(),
+			    std::bind2nd(std::mem_fun_ref(&loop_sound_t::isM82), M82::UNKNOWN));
+
+		    if(it != loop_sounds.end())
+		    {
+			(*it).sound = m82;
+			(*it).channel = channel;
+		    }
+		    else
+			loop_sounds.push_back(loop_sound_t(m82, channel));
+
+		    Mixer::Pause(channel);
+		    Mixer::Volume(channel, *vol);
+		    Mixer::Resume(channel);
+
+		    if(conf.Debug()) Error::Verbose("AGG::PlayLOOPSound: ", M82::GetString(m82));
+		}
 	    }
 	}
-#endif
-	if(conf.Debug()) Error::Verbose("AGG::LoadRAW: ", M82::GetString(m82));
-	Mixer::LoadRAW(AGG::Cache::Get().GetWAV(m82), true, ch);
     }
 }
 
@@ -1162,39 +1142,56 @@ void AGG::PlaySound(const M82::m82_t m82)
     if(conf.Sound())
     {
 	if(conf.Debug()) Error::Verbose("AGG::PlaySound: ", M82::GetString(m82));
-	Mixer::PlayRAW(AGG::Cache::Get().GetWAV(m82));
+	const std::vector<u8> & v = AGG::Cache::Get().GetWAV(m82);
+	const int channel = 0;
+	if(Mixer::isPlaying(channel)) Mixer::Stop(channel);
+	Mixer::Play(&v[0], v.size(), channel, false);
     }
 }
 
 /* wrapper Audio::Play */
 void AGG::PlayMusic(const MUS::mus_t mus, bool loop)
 {
+    static MUS::mus_t old = MUS::UNKNOWN;
     const Settings & conf = Settings::Get();
 
-    if(!conf.Music()) return;
+    if(!conf.Music() || MUS::UNUSED == mus || MUS::UNKNOWN == mus || (old == mus && Music::isPlaying())) return;
 
+    old = mus;
 
     if(conf.Modes(Settings::MUSIC_EXT))
     {
-	if(MUS::UNUSED != mus && MUS::UNKNOWN != mus)
-	{
 #ifdef WITH_MIXER
-	    Music::Play(AGG::Cache::Get().GetMUS(mus), loop);
-#else
-	    const std::string file = conf.LocalPrefix() + SEPARATOR + "files" + SEPARATOR + "music" + SEPARATOR + MUS::GetString(mus);
-	    if(FilePresent(file))
-	    {
-		const std::string run = conf.PlayMusCommand() + " " + file;
-		Music::Play(run, loop);
-	    }
-#endif
+	const std::string musname(conf.LocalPrefix() + SEPARATOR + "files" + SEPARATOR + "music" + SEPARATOR + MUS::GetString(mus));
+	std::string shortname(conf.LocalPrefix() + SEPARATOR + "files" + SEPARATOR + "music" + SEPARATOR + MUS::GetString(mus, true));
+	const char* filename = NULL;
+
+	if(FilePresent(musname))   filename = musname.c_str();
+	else
+	if(FilePresent(shortname)) filename = shortname.c_str();
+	else
+	{
+	    String::Replace(shortname, ".ogg", ".mp3");
+	    if(FilePresent(shortname)) filename = shortname.c_str();
+	    else
+		Error::Warning("AGG::PlayMusic: error read file: " + musname + ", skipping...");
 	}
+
+	if(filename) Music::Play(filename, loop);
+#else
+	const std::string file = conf.LocalPrefix() + SEPARATOR + "files" + SEPARATOR + "music" + SEPARATOR + MUS::GetString(mus);
+	if(FilePresent(file) && conf.PlayMusCommand().size())
+	{
+	    const std::string run = conf.PlayMusCommand() + " " + file;
+	    Music::Play(run.c_str(), loop);
+	}	    
+#endif
 	if(conf.Debug()) Error::Verbose("AGG::PlayMusic: " + MUS::GetString(mus));
     }
     else
     if(conf.Modes(Settings::MUSIC_CD) && Cdrom::isValid())
     {
-	if(MUS::UNUSED != mus && MUS::UNKNOWN != mus) Cdrom::Play(mus, loop);
+	Cdrom::Play(mus, loop);
 	if(conf.Debug()) Error::Verbose("AGG::PlayMusic: cd track ", mus);
     }
     else
@@ -1203,7 +1200,8 @@ void AGG::PlayMusic(const MUS::mus_t mus, bool loop)
 	if(XMI::UNKNOWN != xmi)
 	{
 #ifdef WITH_MIXER
-	    Music::Play(AGG::Cache::Get().GetMID(xmi), loop);
+	    const std::vector<u8> & v = AGG::Cache::Get().GetMID(xmi);
+	    if(v.size()) Music::Play(&v[0], v.size(), loop);
 #else
 	    if(conf.PlayMusCommand().size())
 	    {
@@ -1213,12 +1211,11 @@ void AGG::PlayMusic(const MUS::mus_t mus, bool loop)
 		else
 		{
 		    const std::string run = conf.PlayMusCommand() + " " + file;
-		    Music::Play(run, loop);
+		    Music::Play(run.c_str(), loop);
 		}
 	    }
 #endif
 	}
-        else Music::Reset();
 	if(conf.Debug()) Error::Verbose("AGG::PlayMusic: ", XMI::GetString(xmi));
     }
 }

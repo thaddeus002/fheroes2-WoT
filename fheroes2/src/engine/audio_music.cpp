@@ -26,35 +26,66 @@
 
 namespace Music
 {
+    void Play(bool);
+
     static Mix_Music * music	= NULL;
-    static const void * id	= NULL;
+    static u16 fadein  = 0;
+    static u16 fadeout = 0;
 }
 
-void Music::Play(const std::vector<u8> & body, bool loop)
+void Music::Play(bool loop)
 {
-    if(! Mixer::isValid()) return;
-
-    if(id != &body[0])
+    if(fadein)
     {
-        Reset();
-
-        if(body.size())
-        {
-            id = &body[0];
-            SDL_RWops *rwops = SDL_RWFromConstMem(&body[0], body.size());
-            music = Mix_LoadMUS_RW(rwops);
-            SDL_FreeRW(rwops);
-            Mix_PlayMusic(music, loop ? -1 : 0);
-        }
+	if(music && Mix_FadeInMusic(music, loop ? -1 : 0, fadein) == -1)
+    	    Error::Verbose("Music::Play: ", Mix_GetError());
+    }
+    else
+    {
+	if(music && Mix_PlayMusic(music, loop ? -1 : 0) == -1)
+    	    Error::Verbose("Music::Play: ", Mix_GetError());
     }
 }
 
-void Music::Play(const std::string &, bool)
+void Music::Play(const u8* ptr, u32 size, bool loop)
 {
+    if(! Mixer::isValid()) return;
+
+    if(ptr && size)
+    {
+	Reset();
+
+    	SDL_RWops *rwops = SDL_RWFromConstMem(ptr, size);
+    	music = Mix_LoadMUS_RW(rwops);
+    	SDL_FreeRW(rwops);
+    	Music::Play(loop);
+    }
+}
+
+void Music::Play(const char* file, bool loop)
+{
+    if(! Mixer::isValid()) return;
+
+    music = Mix_LoadMUS(file);
+
+    if(! music)
+    	Error::Verbose("Music::Play: ", Mix_GetError());
+    else
+	Music::Play(loop);
+}
+
+void Music::SetFadeIn(u16 f)
+{
+    fadein = f;
+}
+
+void Music::SetFadeOut(u16 f)
+{
+    fadeout = f;
 }
 
 /* range 0 - 10 */
-u8 Music::Volume(int vol)
+u8 Music::Volume(s8 vol)
 {
     if(Mixer::isValid())
     {
@@ -67,12 +98,26 @@ u8 Music::Volume(int vol)
 
 void Music::Pause(void)
 {
-    if(Mixer::isValid() && music) Mix_PauseMusic();
+    if(! Mixer::isValid() && music) Mix_PauseMusic();
 }
 
 void Music::Resume(void)
 {
     if(Mixer::isValid() && music) Mix_ResumeMusic();
+}
+
+void Music::Reset(void)
+{
+    if(Mixer::isValid() && music)
+    {
+        if(fadeout)
+    	    while(!Mix_FadeOutMusic(fadeout) && Mix_PlayingMusic()) SDL_Delay(50);
+        else
+    	Mix_HaltMusic();
+
+        Mix_FreeMusic(music);
+        music = NULL;
+    }
 }
 
 bool Music::isPlaying(void)
@@ -83,17 +128,6 @@ bool Music::isPlaying(void)
 bool Music::isPaused(void)
 {
     return Mixer::isValid() && Mix_PausedMusic();
-}
-
-void Music::Reset(void)
-{
-    if(Mixer::isValid() && music)
-    {
-        Mix_HaltMusic();
-        Mix_FreeMusic(music);
-        music = NULL;
-        id = NULL;
-    }
 }
 
 #else
@@ -127,11 +161,11 @@ int callbackPlayMusic(void *ptr)
     return -1;
 }
 
-void Music::Play(const std::vector<u8> &, bool)
+void Music::Play(const u8* ptr, u32 size, bool loop)
 {
 }
 
-void Music::Play(const std::string & run, bool loop)
+void Music::Play(const char* run, bool loop)
 {
     if(music.IsRun())
     {
@@ -143,7 +177,15 @@ void Music::Play(const std::string & run, bool loop)
     music.Create(callbackPlayMusic, &info);
 }
 
-u8 Music::Volume(int vol)
+void Music::SetFadeIn(u16 f)
+{
+}
+
+void Music::SetFadeOut(u16 f)
+{
+}
+
+u8 Music::Volume(s8 vol)
 {
     return 0;
 }

@@ -405,39 +405,77 @@ M82::m82_t M82::FromSpell(u8 spell)
     return UNKNOWN;
 }
 
-M82::m82_t M82::FromObject(u8 obj)
+u8 M82::GetIndexLOOP00XXFromObject(u8 obj)
 {
     switch(obj)
     {
-        case MP2::OBJ_BUOY:             return LOOP0000;
+        case MP2::OBJ_BUOY:             return 0;
         case MP2::OBJ_SHIPWRECK:
-        case MP2::OBJ_DERELICTSHIP:     return LOOP0001;
-        case MP2::OBJ_COAST:            return LOOP0002;
-        case MP2::OBJ_ORACLE:           return LOOP0003;
-        case MP2::OBJ_STONELIGHTS:      return LOOP0004;
-        case MP2::OBJ_LAVAPOOL:         return LOOP0005;
-        case MP2::OBJ_ALCHEMYLAB:       return LOOP0006;
-        case MP2::OBJ_WATERWHEEL:       return LOOP0009;
-        case MP2::OBJ_CAMPFIRE:         return LOOP0010;
-        case MP2::OBJ_WINDMILL:         return LOOP0011;
+        case MP2::OBJ_DERELICTSHIP:     return 1;
+        case MP2::OBJ_COAST:            return 2;
+        case MP2::OBJ_ORACLE:           return 3;
+        case MP2::OBJ_STONELIGHTS:      return 4;
+        case MP2::OBJ_LAVAPOOL:         return 5;
+        case MP2::OBJ_ALCHEMYLAB:       return 6;
+        case MP2::OBJ_WATERWHEEL:       return 9;
+        case MP2::OBJ_CAMPFIRE:         return 10;
+        case MP2::OBJ_WINDMILL:         return 11;
         case MP2::OBJ_ARTESIANSPRING:
-        case MP2::OBJ_FOUNTAIN:         return LOOP0012;
+        case MP2::OBJ_FOUNTAIN:         return 12;
         case MP2::OBJ_WATERLAKE:
-        case MP2::OBJ_WATERINGHOLE:     return LOOP0013;
-        case MP2::OBJ_MINES:            return LOOP0015;
-        case MP2::OBJ_SAWMILL:          return LOOP0016;
-        case MP2::OBJ_DAEMONCAVE:       return LOOP0017;
+        case MP2::OBJ_WATERINGHOLE:     return 13;
+        case MP2::OBJ_MINES:            return 15;
+        case MP2::OBJ_SAWMILL:          return 16;
+        case MP2::OBJ_DAEMONCAVE:       return 17;
         case MP2::OBJ_SHRINE1:
         case MP2::OBJ_SHRINE2:
-        case MP2::OBJ_SHRINE3:          return LOOP0018;
-        case MP2::OBJ_TARPIT:           return LOOP0021;
-        case MP2::OBJ_TRADINGPOST:      return LOOP0022;
-        case MP2::OBJ_RUINS:            return LOOP0024;
+        case MP2::OBJ_SHRINE3:          return 18;
+        case MP2::OBJ_TARPIT:           return 21;
+        case MP2::OBJ_TRADINGPOST:      return 22;
+        case MP2::OBJ_RUINS:            return 24;
         case MP2::OBJ_PEASANTHUT:
         case MP2::OBJ_DWARFCOTT:
-        case MP2::OBJ_ARCHERHOUSE:      return LOOP0025;
-        case MP2::OBJ_VOLCANO:          return LOOP0027;
+        case MP2::OBJ_ARCHERHOUSE:      return 25;
+        case MP2::OBJ_VOLCANO:          return 27;
 
+	default: break;
+    }
+
+    return 0xFF;
+}
+
+M82::m82_t M82::GetLOOP00XX(u8 index)
+{
+    switch(index)
+    {
+        case 0:             return LOOP0000;
+        case 1:             return LOOP0001;
+        case 2:             return LOOP0002;
+        case 3:             return LOOP0003;
+        case 4:             return LOOP0004;
+        case 5:             return LOOP0005;
+        case 6:             return LOOP0006;
+        case 7:             return LOOP0007;
+        case 8:             return LOOP0008;
+        case 9:             return LOOP0009;
+        case 10:            return LOOP0010;
+        case 11:            return LOOP0011;
+        case 12:            return LOOP0012;
+        case 13:            return LOOP0013;
+        case 14:            return LOOP0014;
+        case 15:            return LOOP0015;
+        case 16:            return LOOP0016;
+        case 17:            return LOOP0017;
+        case 18:            return LOOP0018;
+        case 19:            return LOOP0019;
+        case 20:            return LOOP0020;
+        case 21:            return LOOP0021;
+        case 22:            return LOOP0022;
+        case 23:            return LOOP0023;
+        case 24:            return LOOP0024;
+        case 25:            return LOOP0025;
+        case 26:            return LOOP0026;
+        case 27:            return LOOP0027;
 	default: break;
     }
 

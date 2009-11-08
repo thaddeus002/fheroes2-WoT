@@ -23,25 +23,35 @@
 #include <vector>
 #include "types.h"
 
+#ifdef WITH_MIXER
+struct Mix_Chunk;
+#endif
+
 namespace Mixer
 {
-    bool	isValid(void);
-    u8		Volume(const int ch, int vol = -1);
-    void	Pause(const int ch = -1);
-    void	PauseLoops(void);
-    void	Resume(const int ch = -1);
-    void	ResumeLoops(void);
-    void	Reset(const int ch = -1);
-    u8		isPlaying(const int ch);
-    u8		isPaused(const int ch);
-    void	PlayRAW(const std::vector<u8> & body, int ch = -1);
-    void	LoadRAW(const std::vector<u8> & body, bool loop, const u8 ch);
-    u8		CountChannelReserved(void);
-
 #ifdef WITH_MIXER
-    void	PlayRAW(const char* file, int ch = -1);
-    void	LoadRAW(const char* file, bool loop, const u8 ch);
+    typedef Mix_Chunk chunk_t;
+
+    void	FreeChunk(chunk_t*);
+    chunk_t*	LoadWAV(const char*);
+    chunk_t*	LoadWAV(const u8*, u32);
+
+    int		Play(chunk_t*, int, bool);
+    int		Play(const char*, int = -1, bool = false);
 #endif
+    int		Play(const u8*, u32, int = -1, bool = false);
+
+    void	SetChannels(u8);
+    u8		Volume(int ch, s8 = -1);
+
+    void	Pause(int ch = -1);
+    void	Resume(int ch = -1);
+    void	Stop(int ch = -1);
+    void	Reset(void);
+
+    u8		isPlaying(int);
+    u8		isPaused(int);
+    bool	isValid(void);
 
     void	Reduce(void);
     void	Enhance(void);

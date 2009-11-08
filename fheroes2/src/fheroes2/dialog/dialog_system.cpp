@@ -108,7 +108,6 @@ u8 Dialog::SystemOptions(void)
 	    DrawSystemInfo(rb);
     	    cursor.Show();
     	    display.Flip();
-    	    Mixer::Volume(-1, conf.SoundVolume());
     	    Game::EnvironmentSoundMixer();
     	}
 

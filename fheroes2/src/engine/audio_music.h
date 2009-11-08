@@ -20,15 +20,15 @@
 #ifndef H2AUDIO_MUSIC_H
 #define H2AUDIO_MUSIC_H
 
-#include <vector>
-#include <string>
 #include "types.h"
 
 namespace Music
 {
-    void	Play(const std::vector<u8> &, bool);
-    void	Play(const std::string &, bool);
-    u8		Volume(int);
+    void	Play(const u8* ptr, u32 size, bool loop);
+    void	Play(const char* file, bool loop);
+    u8		Volume(s8 vol);
+    void	SetFadeIn(u16);
+    void	SetFadeOut(u16);
     void	Pause(void);
     void	Resume(void);
     void	Reset(void);

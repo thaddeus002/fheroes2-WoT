@@ -39,7 +39,7 @@ namespace Game
 {
     u8 GetMixerChannelFromObject(const Maps::Tiles &);
 
-    static std::vector<u8> reserved_vols;
+    static std::vector<u8> reserved_vols(LOOPXX_COUNT, 0);
 };
 
 Game::menu_t Game::Testing(u8 t)
@@ -111,12 +111,8 @@ void Game::EnvironmentSoundMixer(void)
     if(conf.Sound())
     {
 	std::vector<u8> & vols = reserved_vols;
+	std::fill(vols.begin(), vols.end(), 0);
 
-	if(vols.empty())
-	    vols.resize(Mixer::CountChannelReserved(), 0);
-
-        Mixer::PauseLoops();
-        
         // scan 4x4 square from focus
         for(s16 yy = abs_pt.y - 3; yy <= abs_pt.y + 3; ++yy)
     	{
@@ -125,33 +121,26 @@ void Game::EnvironmentSoundMixer(void)
 		if(Maps::isValidAbsPoint(xx, yy))
 		{
 		    const u8 channel = GetMixerChannelFromObject(world.GetTiles(xx, yy));
-    		    if(channel != 0xFF)
+    		    if(channel < vols.size())
 		    {
 			// calculation volume
     			const u8 length = std::max(std::abs(xx - abs_pt.x), std::abs(yy - abs_pt.y));
 			const u8 volume = (2 < length ? 2 : (1 < length ? 5 : (0 < length ? 7 : 10))) * conf.SoundVolume() / 10;
 
-			if(volume > vols[channel] && channel < vols.size()) vols[channel] = volume;
+			if(volume > vols[channel]) vols[channel] = volume;
 		    }
 		}
 	    }
 	}
 
-	for(u8 ch = 0; ch < vols.size(); ++ch)
-	{
-	    Mixer::Volume(ch, vols[ch]);
-	    //PlaySound(M82::FromObject(obj), vols[ch], );
-	    vols[ch] = 0;
-	}
-
-        Mixer::ResumeLoops();
+	AGG::Cache::Get().LoadLOOPXXSounds(vols);
     }
 }
 
 u8 Game::GetMixerChannelFromObject(const Maps::Tiles & tile)
 {
     // force: check stream
-    if(tile.isStream()) return 11;
+    if(tile.isStream()) return 13;
 
     MP2::object_t object = tile.GetObject();
     if(MP2::OBJ_HEROES == object)
@@ -160,70 +149,7 @@ u8 Game::GetMixerChannelFromObject(const Maps::Tiles & tile)
 	object = hero->GetUnderObject();
     }
 
-    switch(object)
-    {
-	case MP2::OBJ_BUOY:		return 0;
-	case MP2::OBJ_SHIPWRECK:
-	case MP2::OBJ_DERELICTSHIP:	return 1;
-	case MP2::OBJ_COAST:		return 2;
-	case MP2::OBJ_ORACLE:		return 3;
-	case MP2::OBJ_STONELIGHTS:	return 4;
-	case MP2::OBJ_LAVAPOOL:		return 5;
-	case MP2::OBJ_ALCHEMYLAB:	return 6;
-	case MP2::OBJ_WATERWHEEL:	return 7;
-	case MP2::OBJ_CAMPFIRE:		return 8;
-	case MP2::OBJ_WINDMILL:		return 9;
-	case MP2::OBJ_ARTESIANSPRING:
-	case MP2::OBJ_FOUNTAIN:		return 10;
-	case MP2::OBJ_WATERLAKE:
-	case MP2::OBJ_WATERINGHOLE:	return 11;
-	case MP2::OBJ_MINES:		return 12;
-	case MP2::OBJ_SAWMILL:		return 13;
-	case MP2::OBJ_DAEMONCAVE:	return 14;
-	case MP2::OBJ_SHRINE1:
-	case MP2::OBJ_SHRINE2:
-	case MP2::OBJ_SHRINE3:		return 15;
-	case MP2::OBJ_TARPIT:		return 16;
-	case MP2::OBJ_TRADINGPOST:	return 17;
-	case MP2::OBJ_RUINS:		return 18;
-	case MP2::OBJ_PEASANTHUT:
-	case MP2::OBJ_DWARFCOTT:
-	case MP2::OBJ_ARCHERHOUSE:	return 19;
-	case MP2::OBJ_VOLCANO:		return 20;
-
-	default: break;
-    }
-
-    return 0xFF;
-}
-
-void Game::PreloadLOOPSounds(void)
-{
-    if(! Settings::Get().Sound()) return;
-
-    AGG::LoadLoopSound(M82::LOOP0000, 0);
-    AGG::LoadLoopSound(M82::LOOP0001, 1);
-    AGG::LoadLoopSound(M82::LOOP0002, 2);
-    AGG::LoadLoopSound(M82::LOOP0003, 3);
-    AGG::LoadLoopSound(M82::LOOP0004, 4);
-    AGG::LoadLoopSound(M82::LOOP0006, 5);
-    AGG::LoadLoopSound(M82::LOOP0007, 6);
-    AGG::LoadLoopSound(M82::LOOP0009, 7);
-    AGG::LoadLoopSound(M82::LOOP0010, 8);
-    AGG::LoadLoopSound(M82::LOOP0011, 9);
-    AGG::LoadLoopSound(M82::LOOP0012, 10);
-    AGG::LoadLoopSound(M82::LOOP0013, 11);
-    AGG::LoadLoopSound(M82::LOOP0015, 12);
-    AGG::LoadLoopSound(M82::LOOP0016, 13);
-    AGG::LoadLoopSound(M82::LOOP0017, 14);
-    AGG::LoadLoopSound(M82::LOOP0018, 15);
-    AGG::LoadLoopSound(M82::LOOP0021, 16);
-    AGG::LoadLoopSound(M82::LOOP0022, 17);
-    AGG::LoadLoopSound(M82::LOOP0024, 18);
-    AGG::LoadLoopSound(M82::LOOP0025, 19);
-    AGG::LoadLoopSound(M82::LOOP0027, 20);
-
-    if(Settings::Get().Debug()) Error::Verbose("Game::PreloadLOOPSoundToMixer: done.");
+    return M82::GetIndexLOOP00XXFromObject(object);
 }
 
 Game::control_t Game::GetControl(u8 index)

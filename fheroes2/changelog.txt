@@ -1,6 +1,7 @@
-SVN - up to r1350
+SVN - up to r1351
 
-Nov, 7, 2009
+Nov, 8, 2009
++ update mixer
 + added options alt resource, support ogg sounds
 + added options hide ai move
 + fixed obelisk action, updated open puzzle algorithm

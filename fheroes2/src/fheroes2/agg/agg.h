@@ -99,6 +99,15 @@ namespace AGG
 	Surface small_yellow;
     };
 
+    struct loop_sound_t
+    {
+	loop_sound_t(M82::m82_t w, int c) : sound(w), channel(c) {};
+	bool isM82(const M82::m82_t wav) const{ return wav == sound; };
+
+	M82::m82_t sound;
+	int        channel;
+    };
+
     class Cache
     {
     public:
@@ -113,7 +122,6 @@ namespace AGG
 	const Sprite & GetICN(const ICN::icn_t icn, u16 index, bool reflect = false);
 	const Surface & GetTIL(const TIL::til_t til, u16 index, u8 shape);
 	const std::vector<u8> & GetWAV(const M82::m82_t m82);
-        const std::vector<u8> & GetMUS(const MUS::mus_t mus);
 	const std::vector<u8> & GetMID(const XMI::xmi_t xmi);
 #ifdef WITH_TTF
 	const Surface & GetFNT(u16, u8);
@@ -129,9 +137,11 @@ namespace AGG
 	void LoadICN(const ICN::icn_t icn, u16 index, bool reflect = false);
 	void LoadTIL(const TIL::til_t til);
 	void LoadWAV(const M82::m82_t m82);
-        void LoadMUS(const MUS::mus_t mus);
 	void LoadMID(const XMI::xmi_t xmi);
 
+	void LoadLOOPXXSounds(const std::vector<u8> &);
+	void ResetMixer(void);
+	
 	void LoadPAL(void);
 	void LoadFNT(void);
 	bool isValidFonts(void) const;
@@ -139,7 +149,6 @@ namespace AGG
 	void FreeICN(const ICN::icn_t icn);
 	void FreeTIL(const TIL::til_t til);
 	void FreeWAV(const M82::m82_t m82);
-        void FreeMUS(const MUS::mus_t mus);
 	void FreeMID(const XMI::xmi_t xmi);
 
 	void ICNRegistryEnable(bool);
@@ -156,8 +165,8 @@ namespace AGG
 	icn_cache_t* icn_cache;
 	til_cache_t* til_cache;
 
+	std::vector<loop_sound_t> loop_sounds;
 	std::map<M82::m82_t, std::vector<u8> > wav_cache;
-        std::map<MUS::mus_t, std::vector<u8> > mus_cache;
 	std::map<XMI::xmi_t, std::vector<u8> > mid_cache;
 
 #ifdef WITH_TTF
@@ -183,9 +192,6 @@ namespace AGG
     int GetICNCount(const ICN::icn_t icn);
     const Sprite & GetICN(const ICN::icn_t icn, const u16 index, bool reflect = false);
     const Surface & GetTIL(const TIL::til_t til, const u16 index, const u8 shape);
-    const std::vector<u8> & GetWAV(const M82::m82_t m82);
-    const std::vector<u8> & GetMUS(const MUS::mus_t mus);
-    const std::vector<u8> & GetMID(const XMI::xmi_t xmi);
 
     const Surface & GetLetter(char ch, u8 ft);
 #ifdef WITH_TTF
@@ -194,7 +200,6 @@ namespace AGG
     // wrapper Audio
     void PlaySound(const M82::m82_t m82);
     void PlayMusic(const MUS::mus_t mus, bool loop = true);
-    void LoadLoopSound(const M82::m82_t m82, u8 ch);
 };
 
 #endif

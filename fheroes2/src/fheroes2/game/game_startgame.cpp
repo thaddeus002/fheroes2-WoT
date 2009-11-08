@@ -172,9 +172,7 @@ Game::menu_t Game::StartGame(void)
     }
     if(conf.Debug() && conf.PocketPC()) MemoryInfoDump("Game::StartGame:");
 
-    // preload sounds
-    Game::PreloadLOOPSounds();
-    Mixer::Reset();
+    AGG::Cache::Get().ResetMixer();
 
     // draw interface
     Interface::Basic & I = Interface::Basic::Get();
@@ -219,7 +217,6 @@ Game::menu_t Game::StartGame(void)
 	    radar.HideArea();
 	    conf.SetCurrentColor(color);
 	    world.ClearFog(color);
-    	    Mixer::PauseLoops();
 
 	    switch(kingdom.Control())
 	    {
@@ -1188,7 +1185,6 @@ int FH2LocalClient::StartGame(void)
     }
 
     // preload sounds
-    Game::PreloadLOOPSounds();
     Mixer::Reset();
 
     // draw interface
