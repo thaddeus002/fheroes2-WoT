@@ -2812,7 +2812,7 @@ void ActionToEvent(Heroes &hero, const u8 obj, const u16 dst_index)
 	}
     }
 
-    world.GetTiles(dst_index).SetObject(MP2::OBJ_ZERO);
+    hero.SaveUnderObject(MP2::OBJ_ZERO);
 
     if(Settings::Get().Debug()) Error::Verbose("ActionToEvent: " + hero.GetName());
 }
