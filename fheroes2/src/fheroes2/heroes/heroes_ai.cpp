@@ -965,7 +965,8 @@ void AIToEvent(Heroes &hero, const u8 obj, const u16 dst_index)
 	if(Artifact::UNKNOWN != event_maps->GetArtifact())
 	    hero.PickupArtifact(event_maps->GetArtifact());
     }
-    world.GetTiles(dst_index).SetObject(MP2::OBJ_ZERO);
+
+    hero.SaveUnderObject(MP2::OBJ_ZERO);
 
     if(Settings::Get().Debug()) Error::Verbose("AIToEvent: " + hero.GetName());
 }
