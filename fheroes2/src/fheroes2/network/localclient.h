@@ -35,17 +35,21 @@ public:
     ~FH2LocalClient(){};
 
     bool Connect(const std::string &, u16);
-
-    int Logout(void);
-    int ConnectionChat(void);
-    int ScenarioInfoDialog(void);
-    int StartGame(void);
-
-    std::string server;
-    std::vector<Player> players;
+    int Main(void);
+    void Logout(void);
 
 private:
     FH2LocalClient();
+
+    bool ConnectionChat(void);
+    bool ScenarioInfoDialog(void);
+    bool StartGame(void);
+
+    u8 GetPlayersColors(void) const;
+    void PopPlayersInfo(Network::Message &);
+
+    std::string server;
+    std::vector<Player> players;
 };
 
 #endif

@@ -26,24 +26,16 @@
 #include "engine.h"
 #include "game_interface.h"
 #include "interface_gamearea.h"
-#include "interface_status.h"
 #include "heroes.h"
 #include "castle.h"
 #include "world.h"
 #include "settings.h"
 #include "kingdom.h"
+#include "network.h"
+#include "server.h"
 #include "agg.h"
 
 #define HERO_MAX_SHEDULED_TASK 7
-
-void RedrawAITurns(u8 color, u8 i)
-{
-    Cursor::Get().Hide();
-    Interface::StatusWindow::Get().RedrawAITurns(color, i);
-    Cursor::Get().Show();
-    Display::Get().Flip();
-}
-
 
 void Kingdom::AIDumpCacheObjects(const IndexDistance & id) const
 {
@@ -62,18 +54,8 @@ void Kingdom::AITurns(void)
     
     if(!Settings::Get().Modes(Settings::MUSIC_MIDI)) AGG::PlayMusic(MUS::COMPUTER);
 
-    Cursor & cursor = Cursor::Get();
-    Display & display = Display::Get();
-
-    cursor.Hide();
-    cursor.SetThemes(Cursor::WAIT);
-    cursor.Show();
-    display.Flip();
-
-    Interface::StatusWindow::Get().SetState(STATUS_AITURN);
-
     // turn indicator
-    RedrawAITurns(color, 0);
+    Game::SetAIProgress(0);
 
     // scan map
     ai_objects.clear();
@@ -81,7 +63,7 @@ void Kingdom::AITurns(void)
     if(1 < Settings::Get().Debug()) std::cout << "Kingdom::AITurns: " << Color::String(color) << ", size cache objects: " << ai_objects.size() << std::endl;
 
     // turn indicator
-    RedrawAITurns(color, 1);
+    Game::SetAIProgress(1);
 
     // set capital
     if(NULL == ai_capital && castles.size())
@@ -105,13 +87,13 @@ void Kingdom::AITurns(void)
     }
 
     // turn indicator
-    RedrawAITurns(color, 2);
+    Game::SetAIProgress(2);
 
     // castle AI turn
     AICastlesTurns();
 
     // turn indicator
-    RedrawAITurns(color, 3);
+    Game::SetAIProgress(3);
         
     // update roles
     if(heroes.size()) std::for_each(heroes.begin(), heroes.end(), std::bind2nd(std::mem_fun(&Heroes::SetModes), Heroes::SCOUTER|Heroes::HUNTER));
@@ -135,14 +117,13 @@ void Kingdom::AITurns(void)
     }
 
     // turn indicator
-    RedrawAITurns(color, 4);
+    Game::SetAIProgress(4);
     
     // push stupid heroes
     std::for_each(heroes.begin(), heroes.end(), std::mem_fun(&Heroes::ResetStupidFlag));
 
     // turn indicator
-    RedrawAITurns(color, 5);
-
+    Game::SetAIProgress(5);
 
     // heroes turns
     std::vector<Heroes *>::const_iterator ith1 = heroes.begin();
@@ -154,26 +135,24 @@ void Kingdom::AITurns(void)
 
 	while(hero.MayStillMove())
 	{
-	    RedrawAITurns(color, 6);
+	    Game::SetAIProgress(6);
 
 	    // get task for heroes
 	    AIHeroesGetTask(hero);
 
 	    // turn indicator
-	    RedrawAITurns(color, 7);
+	    Game::SetAIProgress(7);
 
 	    // heroes AI turn
 	    AIHeroesTurns(hero);
 
 	    // turn indicator
-	    RedrawAITurns(color, 8);
+	    Game::SetAIProgress(8);
 	}
     }
 
     // turn indicator
-    RedrawAITurns(color, 9);
-
-    cursor.Hide();
+    Game::SetAIProgress(9);
 
     if(Settings::Get().Debug()) std::cout << "Kingdom::AITurns: " << Color::String(color) << " moved" << std::endl;
 }
@@ -211,32 +190,58 @@ void Kingdom::AICastlesTurns(void)
 
 void Kingdom::AIHeroesTurns(Heroes &hero)
 {
-        if(hero.GetPath().isValid()) hero.SetMove(true);
-	else return;
+    if(hero.GetPath().isValid()) hero.SetMove(true);
+    else return;
 
-	Display & display = Display::Get();
-	Cursor & cursor = Cursor::Get();
-	Interface::Basic & I = Interface::Basic::Get();
+    const Settings & conf = Settings::Get();
+    Display & display = Display::Get();
+    Cursor & cursor = Cursor::Get();
+    Interface::Basic & I = Interface::Basic::Get();
 
-	cursor.Hide();
-	u32 ticket = 0;
+    cursor.Hide();
+    u32 ticket = 0;
 
-	if(!Settings::Get().HideAIMove() && hero.isShow(Settings::Get().MyColor()))
-	{
+    if(!Settings::Get().HideAIMove() && hero.isShow(Settings::Get().MyColor()))
+    {
 	    cursor.Hide();
 	    I.gameArea.Center(hero.GetCenter());
 	    I.Redraw(REDRAW_GAMEAREA);
 	    cursor.Show();
 	    display.Flip();
-	}
+    }
 
-	while(LocalEvent::Get().HandleEvents())
-	{
+    bool hide_move = conf.HideAIMove() ||
+	    Game::NETWORK == Settings::Get().GameType() ||
+	    (0 == Settings::Get().Debug() && !hero.isShow(Settings::Get().MyColor()));
+
+#ifdef WITH_NET
+    FH2Server & server = FH2Server::Get();
+    Network::Message msg;
+#endif
+
+    while(LocalEvent::Get().HandleEvents())
+    {
 	    if(hero.isFreeman() || !hero.isEnableMove()) break;
 
-	    if(Settings::Get().HideAIMove() ||
-	       (0 == Settings::Get().Debug() && !hero.isShow(Settings::Get().MyColor())))
+	    if(hide_move)
+	    {
+#ifdef WITH_NET
+		msg.Reset();
+		msg.SetID(MSG_HEROES_MOVE);
+		msg.Push(static_cast<u8>(hero.GetID()));
+		msg.Push(static_cast<u16>(hero.GetIndex()));
+#endif
 		hero.Move(true);
+
+#ifdef WITH_NET
+		msg.Push(static_cast<u16>(hero.GetIndex()));
+		msg.Push(static_cast<u8>(hero.isFreeman()));
+
+		server.Lock();
+		server.PrepareSending(msg);
+		server.Unlock();
+#endif
+	    }
 	    else
 	    if(Game::ShouldAnimateInfrequent(ticket, 1))
 	    {
@@ -252,10 +257,10 @@ void Kingdom::AIHeroesTurns(Heroes &hero)
 	    }
 
 	    ++ticket;
-	}
+    }
 
-	// 0.2 sec delay for show enemy hero position
-	if(!hero.isFreeman() && !Settings::Get().HideAIMove() && hero.isShow(Settings::Get().MyColor())) DELAY(200);
+    // 0.2 sec delay for show enemy hero position
+    if(!hero.isFreeman() && !hide_move) DELAY(200);
 }
 
 void Kingdom::AIHeroesGetTask(Heroes & hero)

@@ -57,7 +57,11 @@ enum msg_t
         MSG_PLAYERS,
         MSG_PLAYERS_GET,
 
-        MSG_TURNS,
+        MSG_YOUR_TURN,
+        MSG_END_TURN,
+
+	MSG_HEROES_MOVE,
+
         MSG_HEROES,
         MSG_CASTLE,
         MSG_SPELL,
@@ -74,19 +78,13 @@ namespace Network
     const char*         GetMsgString(u16);
     msg_t		GetMsg(u16);
     bool		MsgIsBroadcast(u16);
-    void                Logout(void);
 
-    void		PacketPushMapsFileInfoList(Network::Message &, const MapsFileInfoList &);
     void		PacketPopMapsFileInfoList(Network::Message &, MapsFileInfoList &);
     void		PacketPushMapsFileInfo(Network::Message &, const Maps::FileInfo &);
     void		PacketPopMapsFileInfo(Network::Message &, Maps::FileInfo &);
-    void		PacketPushPlayersInfo(Network::Message &, const std::vector<Player> &);
-    void		PacketPushPlayersInfo(Network::Message &, const std::list<FH2RemoteClient> &, u32 exclude = 0);
-    void		PacketPopPlayersInfo(Network::Message &, std::vector<Player> &);
+    void		PacketPushPlayersInfo(Network::Message &, const std::vector<FH2RemoteClient> &, u32 exclude = 0);
 
-    u8			GetPlayersColors(std::vector<Player> &);
-    u8			GetPlayersColors(std::list<FH2RemoteClient> &);
-    void		ResetPlayersColors(std::list<FH2RemoteClient> &, u32);
+    u8			GetPlayersColors(const std::vector<FH2RemoteClient> &);
 };
 
 #endif

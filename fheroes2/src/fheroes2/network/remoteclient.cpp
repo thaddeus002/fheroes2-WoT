@@ -33,17 +33,7 @@
 
 int FH2RemoteClient::callbackCreateThread(void *data)
 {
-    if(data)
-    {
-	FH2RemoteClient *rclient = reinterpret_cast<FH2RemoteClient *>(data);
-	if(0 < rclient->ConnectionChat())
-	{
-	    rclient->StartGame();
-	}
-	rclient->thread.Wait();
-	return 0;
-    }
-    return -1;
+    return data ? reinterpret_cast<FH2RemoteClient *>(data)->Main() : -1;
 }
 
 FH2RemoteClient::FH2RemoteClient()
@@ -73,26 +63,46 @@ void FH2RemoteClient::ShutdownThread(void)
     SetModes(0);
 }
 
-int FH2RemoteClient::Logout(void)
+void FH2RemoteClient::Logout(const std::string & str)
 {
     packet.Reset();
     packet.SetID(MSG_LOGOUT);
-    packet.Push(std::string("logout: lost connection"));
+    packet.Push(std::string("FH2RemoteClient::Logout: " + str));
 
     FH2Server & server = FH2Server::Get();
-    server.mutex.Lock();
-    server.queue.push_back(std::make_pair(packet, player_id));
-    server.mutex.Unlock();
+    server.Lock();
+    server.PrepareSending(packet, player_id);
+    server.Unlock();
 
     Close();
+
     modes = 0;
     player_id = 0;
     player_color = 0;
-    
-    return -1;
 }
 
-int FH2RemoteClient::ConnectionChat(void)
+int FH2RemoteClient::Main(void)
+{
+    std::string error;
+
+    if(ConnectionChat())
+    {
+	if(StartGame())
+	{
+	    // may be also
+	}
+	else
+	    error = "StartGame: lost connection";
+    }
+    else
+	error = "ConnectionChat: lost connection";
+
+    Logout(error);
+
+    return 1;
+}
+
+bool FH2RemoteClient::ConnectionChat(void)
 {
     Settings & conf = Settings::Get();
     bool extdebug = 2 < conf.Debug();
@@ -119,12 +129,12 @@ int FH2RemoteClient::ConnectionChat(void)
 
     // send ready
     if(extdebug) std::cerr << "FH2RemoteClient::ConnectionChat: id: 0x" << std::hex << player_id << ", send ready...";
-    if(!Send(packet, extdebug)) return Logout();
+    if(!Send(packet, extdebug)) return false;
     if(extdebug) std::cerr << "ok" << std::endl;
 
     // recv hello
     if(extdebug) std::cerr << "FH2RemoteClient::ConnectionChat: id: 0x" << std::hex << player_id << ", recv hello...";
-    if(!Wait(packet, MSG_HELLO, extdebug)) return Logout();
+    if(!Wait(packet, MSG_HELLO, extdebug)) return false;
     if(extdebug) std::cerr << "ok" << std::endl;
 
     packet.Pop(player_name);
@@ -134,22 +144,22 @@ int FH2RemoteClient::ConnectionChat(void)
     FH2Server & server = FH2Server::Get();
 
     // check color
-    server.mutex.Lock();
+    server.Lock();
     player_color = Color::GetFirst(conf.CurrentFileInfo().allow_colors & (~conf.PlayersColors()));
-    conf.SetPlayersColors(Network::GetPlayersColors(server.clients));
-    server.mutex.Unlock();
+    conf.SetPlayersColors(server.GetPlayersColors());
+    server.Unlock();
     if(0 == player_color)
     {
 	if(extdebug) std::cerr << "FH2RemoteClient::ConnectionChat: id: 0x" << std::hex << player_id << ", player_color = 0, logout" << std::endl;
-	return Logout();
+	return false;
     }
     // send update players
     packet.Reset();
     packet.SetID(MSG_PLAYERS);
-    server.mutex.Lock();
-    Network::PacketPushPlayersInfo(packet, server.clients);
-    server.queue.push_back(std::make_pair(packet, player_id));
-    server.mutex.Unlock();
+    server.Lock();
+    server.PushPlayersInfo(packet);
+    server.PrepareSending(packet, player_id);
+    server.Unlock();
 
     // send hello, modes, id, color
     packet.Reset();
@@ -158,7 +168,7 @@ int FH2RemoteClient::ConnectionChat(void)
     packet.Push(player_id);
     packet.Push(player_color);
     if(extdebug) std::cerr << "FH2RemoteClient::ConnectionChat: id: 0x" << std::hex << player_id << ", send hello...";
-    if(!Send(packet, extdebug)) return Logout();
+    if(!Send(packet, extdebug)) return false;
     if(extdebug) std::cerr << "ok" << std::endl;
     if(extdebug) std::cerr << "FH2RemoteClient::ConnectionChat: " << (Modes(ST_ADMIN) ? "admin" : "client") << " mode" << std::endl;
 
@@ -170,15 +180,15 @@ int FH2RemoteClient::ConnectionChat(void)
 
     while(!exit)
     {
-        if(Modes(ST_SHUTDOWN)) return Logout();
+        if(Modes(ST_SHUTDOWN)) return false;
 
 	if(Ready())
 	{
             if(extdebug) std::cerr << "FH2RemoteClient::ConnectionChat: recv: ";
-	    if(!Recv(packet, extdebug)) return Logout();
+	    if(!Recv(packet, extdebug)) return false;
             if(extdebug) std::cerr << Network::GetMsgString(packet.GetID()) << std::endl;
 
-	    // msg put to queue
+	    // check broadcast
 	    MsgBroadcast();
 
     	    // msg processing
@@ -190,26 +200,32 @@ int FH2RemoteClient::ConnectionChat(void)
 
         	case MSG_LOGOUT:
 		    MsgLogout(extdebug);
-	    	    return Logout();
+	    	    return false;
 
     		case MSG_MAPS_INFO_SET:
-		    if(!MsgMapsInfoSet(extdebug)) return Logout();
+		    if(!MsgMapsInfoSet(extdebug)) return false;
 		    break;
 
     		case MSG_MAPS_INFO_GET:
-		    if(!MsgMapsInfoGet(extdebug)) return Logout();
+		    if(!MsgMapsInfoGet(extdebug)) return false;
 		    break;
 
     		case MSG_MAPS_LIST_GET:
-		    if(!MsgMapsListGet(extdebug)) return Logout();
+		    if(!MsgMapsListGet(extdebug)) return false;
 		    break;
 
     		case MSG_MAPS_LOAD:
-		    if(Modes(ST_ADMIN)) exit = true;
+		    if(Modes(ST_ADMIN))
+		    {
+			server.Lock();
+			server.SetStartGame();
+			server.Unlock();
+			exit = true;
+		    }
     		    break;
 
     		case MSG_PLAYERS_GET:
-		    if(!MsgPlayersGet(extdebug)) return Logout();
+		    if(!MsgPlayersGet(extdebug)) return false;
 		    break;
 
     		default:
@@ -217,34 +233,30 @@ int FH2RemoteClient::ConnectionChat(void)
     	    }
 	}
 
-        DELAY(10);
+        DELAY(100);
     }
 
-    return 1;
+    return true;
 }
 
-int FH2RemoteClient::StartGame(void)
+bool FH2RemoteClient::StartGame(void)
 {
     Settings & conf = Settings::Get();
-    FH2Server & server = FH2Server::Get();
+    //FH2Server & server = FH2Server::Get();
     bool extdebug = 2 < conf.Debug();
     bool exit = false;
 
-    server.mutex.Lock();
-    server.start_game = true;
-    server.mutex.Unlock();
-
     while(!exit)
     {
-        if(Modes(ST_SHUTDOWN)) return Logout();
+        if(Modes(ST_SHUTDOWN)) return false;
 
 	if(Ready())
 	{
             if(extdebug) std::cerr << "FH2RemoteClient::StartGame: recv: ";
-	    if(!Recv(packet, extdebug)) return Logout();
+	    if(!Recv(packet, extdebug)) return false;
             if(extdebug) std::cerr << Network::GetMsgString(packet.GetID()) << std::endl;
 
-	    // msg put to queue
+	    // check broadcast
 	    MsgBroadcast();
 
     	    // msg processing
@@ -256,17 +268,17 @@ int FH2RemoteClient::StartGame(void)
 
         	case MSG_LOGOUT:
 		    MsgLogout(extdebug);
-	    	    return Logout();
+	    	    return false;
 
     		default:
     		    break;
     	    }
 	}
 
-        DELAY(10);
+        DELAY(100);
     }
 
-    return 1;
+    return true;
 }
 
 void FH2RemoteClient::MsgBroadcast(void)
@@ -275,9 +287,9 @@ void FH2RemoteClient::MsgBroadcast(void)
     {
 	FH2Server & server = FH2Server::Get();
 
-	server.mutex.Lock();
-	server.queue.push_back(std::make_pair(packet, player_id));
-	server.mutex.Unlock();
+	server.Lock();
+	server.PrepareSending(packet, player_id);
+	server.Unlock();
     }
 }
 
@@ -300,17 +312,17 @@ void FH2RemoteClient::MsgLogout(bool extdebug)
     FH2Server & server = FH2Server::Get();
     Settings & conf = Settings::Get();
 
-    server.mutex.Lock();
-    server.queue.push_back(std::make_pair(packet, player_id));
+    server.Lock();
+    server.PrepareSending(packet, player_id);
     //
-    conf.SetPlayersColors(Network::GetPlayersColors(server.clients) & (~player_color));
+    conf.SetPlayersColors(server.GetPlayersColors() & (~player_color));
     world.GetKingdom(player_color).SetControl(Game::AI);
     // send players
     packet.Reset();
     packet.SetID(MSG_PLAYERS);
-    Network::PacketPushPlayersInfo(packet, server.clients, player_id);
-    server.queue.push_back(std::make_pair(packet, player_id));
-    server.mutex.Unlock();
+    server.PushPlayersInfo(packet, player_id);
+    server.PrepareSending(packet, player_id);
+    server.Unlock();
     if(extdebug) Error::Verbose("FH2RemoteClient::MsgLogout: ", str.c_str());
 }
 
@@ -325,26 +337,26 @@ bool FH2RemoteClient::MsgMapsInfoSet(bool extdebug)
     {
 	packet.Reset();
         packet.SetID(MSG_MAPS_INFO);
-	server.mutex.Lock();
+	server.Lock();
 	Network::PacketPushMapsFileInfo(packet, conf.CurrentFileInfo());
-	server.queue.push_back(std::make_pair(packet, 0));
-	server.mutex.Unlock();
+	server.PrepareSending(packet, 0);
+	server.Unlock();
 	if(extdebug) std::cerr << "FH2RemoteClient::MsgMapsInfoSet: ";
 	if(!Send(packet, extdebug)) return false;
 	if(extdebug) std::cerr << "ok" << std::endl;
 
-	// reset players color
-	server.mutex.Lock();
-	Network::ResetPlayersColors(server.clients, player_id);
-	server.mutex.Unlock();
+	// reset players
+	server.Lock();
+	server.ResetPlayers(player_id);
+	server.Unlock();
 
 	// send players
 	packet.Reset();
 	packet.SetID(MSG_PLAYERS);
-	server.mutex.Lock();
-        Network::PacketPushPlayersInfo(packet, server.clients);
-	server.queue.push_back(std::make_pair(packet, 0));
-	server.mutex.Unlock();
+	server.Lock();
+        server.PushPlayersInfo(packet);
+	server.PrepareSending(packet, 0);
+	server.Unlock();
     }
     return true;
 }
@@ -369,9 +381,9 @@ bool FH2RemoteClient::MsgMapsListGet(bool extdebug)
 
     packet.Reset();
     packet.SetID(MSG_MAPS_LIST);
-    server.mutex.Lock();
-    Network::PacketPushMapsFileInfoList(packet, server.finfo_list);
-    server.mutex.Unlock();
+    server.Lock();
+    server.PushMapsFileInfoList(packet);
+    server.Unlock();
     if(extdebug) std::cerr << "FH2RemoteClient::MsgMapsListGet: ";
     if(!Send(packet, extdebug)) return false;
     if(extdebug) std::cerr << "ok" << std::endl;
@@ -384,9 +396,9 @@ bool FH2RemoteClient::MsgPlayersGet(bool extdebug)
 
     packet.Reset();
     packet.SetID(MSG_PLAYERS);
-    server.mutex.Lock();
-    Network::PacketPushPlayersInfo(packet, server.clients);
-    server.mutex.Unlock();
+    server.Lock();
+    server.PushPlayersInfo(packet);
+    server.Unlock();
     if(extdebug) std::cerr << "FH2RemoteClient::MsgPlayersGet: ";
     if(!Send(packet, extdebug)) return false;
     if(extdebug) std::cerr << "ok" << std::endl;

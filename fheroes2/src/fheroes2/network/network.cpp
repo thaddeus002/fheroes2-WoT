@@ -59,7 +59,9 @@ const char* Network::GetMsgString(u16 msg)
         case MSG_PLAYERS:       return "MSG_PLAYERS";
         case MSG_PLAYERS_GET:   return "MSG_PLAYERS_GET";
 
-        case MSG_TURNS:         return "MSG_TURNS";
+        case MSG_YOUR_TURN:     return "MSG_YOUR_TURN";
+        case MSG_END_TURN:      return "MSG_END_TURN";
+        case MSG_HEROES_MOVE:   return "MSG_HEROES_MOVE";
         case MSG_HEROES:        return "MSG_HEROES";
         case MSG_CASTLE:        return "MSG_CASTLE";
         case MSG_SPELL:         return "MSG_SPELL";
@@ -122,30 +124,6 @@ int Network::RunDedicatedServer(void)
     }
 
     return 0;
-}
-
-void Network::Logout(void)
-{
-    FH2LocalClient & client = FH2LocalClient::Get();
-    if(client.Modes(ST_LOCALSERVER))
-    {
-        client.Logout();
-        FH2Server & server = FH2Server::Get();
-        server.Exit();
-        DELAY(100);
-        server.Close();
-    }
-    else
-        client.Logout();
-}
-
-void Network::PacketPushMapsFileInfoList(Network::Message & packet, const MapsFileInfoList & flist)
-{
-    packet.Push(static_cast<u16>(flist.size()));
-    MapsFileInfoList::const_iterator it1 = flist.begin();
-    MapsFileInfoList::const_iterator it2 = flist.end();
-
-    for(; it1 != it2; ++it1) PacketPushMapsFileInfo(packet, *it1);
 }
 
 void Network::PacketPopMapsFileInfoList(Network::Message & packet, MapsFileInfoList & flist)
@@ -222,15 +200,15 @@ void Network::PacketPopMapsFileInfo(Network::Message & packet, Maps::FileInfo & 
     fi.with_heroes = byte8;
 }
 
-void Network::PacketPushPlayersInfo(Network::Message & m, const std::list<FH2RemoteClient> & v, u32 exclude)
+void Network::PacketPushPlayersInfo(Network::Message & m, const std::vector<FH2RemoteClient> & v, u32 exclude)
 {
     u8 count = std::count_if(v.begin(), v.end(), std::not1(std::bind2nd(std::mem_fun_ref(&Player::isID), 0)));
     m.Push(count);
     
     if(count)
     {
-	std::list<FH2RemoteClient>::const_iterator itc1 = v.begin();
-	std::list<FH2RemoteClient>::const_iterator itc2 = v.end();
+	std::vector<FH2RemoteClient>::const_iterator itc1 = v.begin();
+	std::vector<FH2RemoteClient>::const_iterator itc2 = v.end();
 	for(; itc1 != itc2; ++itc1) if((*itc1).player_id && (*itc1).player_id != exclude)
 	{
 	    m.Push((*itc1).player_color);
@@ -241,90 +219,14 @@ void Network::PacketPushPlayersInfo(Network::Message & m, const std::list<FH2Rem
     }
 }
 
-void Network::PacketPushPlayersInfo(Network::Message & m, const std::vector<Player> & v)
-{
-    std::vector<Player>::const_iterator it1 = v.begin();
-    std::vector<Player>::const_iterator it2 = v.end();
-    for(; it1 != it2; ++it1) if((*it1).player_id)
-    {
-	m.Push((*it1).player_color);
-	m.Push((*it1).player_race);
-    	m.Push((*it1).player_name);
-	m.Push((*it1).player_id);
-    }
-}
-
-void Network::PacketPopPlayersInfo(Network::Message & m, std::vector<Player> & v)
-{
-    Player cur;
-    u8 size;
-    v.clear();
-    m.Pop(size);
-    for(u8 ii = 0; ii < size; ++ii)
-    {
-	m.Pop(cur.player_color);
-	m.Pop(cur.player_race);
-	m.Pop(cur.player_name);
-        m.Pop(cur.player_id);
-        if(cur.player_id) v.push_back(cur);
-    }
-}
-
-u8 Network::GetPlayersColors(std::vector<Player> & v)
+u8 Network::GetPlayersColors(const std::vector<FH2RemoteClient> & v)
 {
     u8 res = 0;
-    std::vector<Player>::const_iterator it1 = v.begin();
-    std::vector<Player>::const_iterator it2 = v.end();
+    std::vector<FH2RemoteClient>::const_iterator it1 = v.begin();
+    std::vector<FH2RemoteClient>::const_iterator it2 = v.end();
     for(; it1 != it2; ++it1) if((*it1).player_id && (*it1).player_color) res |= (*it1).player_color;
                 
     return res;
-}
-
-u8 Network::GetPlayersColors(std::list<FH2RemoteClient> & v)
-{
-    u8 res = 0;
-    std::list<FH2RemoteClient>::const_iterator it1 = v.begin();
-    std::list<FH2RemoteClient>::const_iterator it2 = v.end();
-    for(; it1 != it2; ++it1) if((*it1).player_id && (*it1).player_color) res |= (*it1).player_color;
-
-    return res;
-}
-
-void Network::ResetPlayersColors(std::list<FH2RemoteClient> & v, u32 first_player)
-{
-    Settings & conf = Settings::Get();
-
-    std::list<FH2RemoteClient>::iterator it1 = v.begin();
-    std::list<FH2RemoteClient>::const_iterator it2 = v.end();
-    for(; it1 != it2; ++it1) (*it1).player_color = 0;
-    conf.SetPlayersColors(0);
-    u8 colors = 0;
-
-    it1 = std::find_if(v.begin(), v.end(), std::bind2nd(std::mem_fun_ref(&Player::isID), first_player));
-    if(it1 != v.end())
-    {
-	(*it1).player_color = Color::GetFirst(conf.CurrentFileInfo().allow_colors);
-	colors |= (*it1).player_color;
-    }
-
-    it1 = v.begin();
-    it2 = v.end();
-    for(; it1 != it2; ++it1) if(0 == (*it1).player_color)
-    {
-	const u8 color = Color::GetFirst(conf.CurrentFileInfo().allow_colors & (~colors));
-	if(color)
-	{
-	    (*it1).player_color = color;
-	    colors |= (*it1).player_color;
-	}
-	else
-	// no free colors, shutdown client
-	{
-	    (*it1).SetModes(ST_SHUTDOWN);
-	}
-    }
-
-    conf.SetPlayersColors(colors);
 }
 
 #endif

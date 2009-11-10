@@ -34,10 +34,11 @@ class FH2RemoteClient : public FH2Client
 public:
     FH2RemoteClient();
 
-    int ConnectionChat(void);
-    int StartGame(void);
+    int Main(void);
+    void Logout(const std::string &);
+    bool ConnectionChat(void);
+    bool StartGame(void);
 
-    int Logout(void);
     void RunThread(void);
     void ShutdownThread(void);
 

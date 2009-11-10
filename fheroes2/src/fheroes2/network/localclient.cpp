@@ -30,6 +30,7 @@
 #include "world.h"
 #include "agg.h"
 #include "zzlib.h"
+#include "server.h"
 
 extern bool DialogSelectMapsFileList(MapsFileInfoList &, std::string &);
 
@@ -46,7 +47,7 @@ FH2LocalClient::FH2LocalClient()
 {
     players.reserve(6);
 }
-    
+
 bool FH2LocalClient::Connect(const std::string & srv, u16 port)
 {
     server = srv;
@@ -54,7 +55,51 @@ bool FH2LocalClient::Connect(const std::string & srv, u16 port)
     return Network::ResolveHost(ip, srv.c_str(), port) && Open(ip);
 }
 
-int FH2LocalClient::Logout(void)
+u8 FH2LocalClient::GetPlayersColors(void) const
+{
+    u8 res = 0;
+    std::vector<Player>::const_iterator it1 = players.begin();
+    std::vector<Player>::const_iterator it2 = players.end();
+    for(; it1 != it2; ++it1) if((*it1).player_id && (*it1).player_color) res |= (*it1).player_color;
+
+    return res;
+}
+
+void FH2LocalClient::PopPlayersInfo(Network::Message & msg)
+{
+    Player cur;
+    u8 size;
+    players.clear();
+    msg.Pop(size);
+    for(u8 ii = 0; ii < size; ++ii)
+    {
+        msg.Pop(cur.player_color);
+        msg.Pop(cur.player_race);
+        msg.Pop(cur.player_name);
+        msg.Pop(cur.player_id);
+        if(cur.player_id) players.push_back(cur);
+    }
+}
+
+int FH2LocalClient::Main(void)
+{
+    if(ConnectionChat())
+    {
+	if(ScenarioInfoDialog())
+	{
+    	    if(StartGame())
+    	    {
+        	// may be also
+    	    }
+	}
+    }
+
+    Logout();
+
+    return 1;
+}
+
+void FH2LocalClient::Logout(void)
 {
     packet.Reset();
     packet.SetID(MSG_LOGOUT);
@@ -63,10 +108,19 @@ int FH2LocalClient::Logout(void)
     DELAY(100);
     Close();
     modes = 0;
-    return -1;
+
+    if(Modes(ST_LOCALSERVER))
+    {
+        FH2Server & server = FH2Server::Get();
+        if(server.IsRun())
+	{
+	    server.SetExit();
+    	    DELAY(100);
+	}
+    }
 }
 
-int FH2LocalClient::ConnectionChat(void)
+bool FH2LocalClient::ConnectionChat(void)
 {
     Settings & conf = Settings::Get();
     bool extdebug = 2 < conf.Debug();
@@ -78,7 +132,7 @@ int FH2LocalClient::ConnectionChat(void)
 
     // recv ready, banner
     if(extdebug) std::cerr << "FH2LocalClient::ConnectionChat: recv ready...";
-    if(!Wait(packet, MSG_READY, extdebug)) return -1;
+    if(!Wait(packet, MSG_READY, extdebug)) return false;
     if(extdebug) std::cerr << "ok" << std::endl;
 
     // get banner
@@ -87,19 +141,19 @@ int FH2LocalClient::ConnectionChat(void)
 
     // dialog: input name
     if(!Dialog::InputString("Connected to " + server + "\n \n" + str + "\n \nEnter player name:", player_name))
-	return -1;
+	return false;
 
     // send hello
     packet.Reset();
     packet.SetID(MSG_HELLO);
     packet.Push(player_name);
     if(extdebug) std::cerr << "FH2LocalClient::ConnectionChat send hello...";
-    if(!Send(packet, extdebug)) return -1;
+    if(!Send(packet, extdebug)) return false;
     if(extdebug) std::cerr << "ok" << std::endl;
 
     // recv hello, modes, player_id
     if(extdebug) std::cerr << "FH2LocalClient::ConnectionChat: recv hello...";
-    if(!Wait(packet, MSG_HELLO, extdebug)) return -1;
+    if(!Wait(packet, MSG_HELLO, extdebug)) return false;
     if(extdebug) std::cerr << "ok" << std::endl;
     packet.Pop(modes);
     packet.Pop(player_id);
@@ -111,12 +165,12 @@ int FH2LocalClient::ConnectionChat(void)
     packet.Reset();
     packet.SetID(MSG_MAPS_INFO_GET);
     if(extdebug) std::cerr << "FH2LocalClient::ConnectionChat send get_maps_info...";
-    if(!Send(packet, extdebug)) return -1;
+    if(!Send(packet, extdebug)) return false;
     if(extdebug) std::cerr << "ok" << std::endl;
 
     // recv maps
     if(extdebug) std::cerr << "FH2LocalClient::ConnectionChat: recv maps_info...";
-    if(!Wait(packet, MSG_MAPS_INFO, extdebug)) return -1;
+    if(!Wait(packet, MSG_MAPS_INFO, extdebug)) return false;
     if(extdebug) std::cerr << "ok" << std::endl;
 
     Network::PacketPopMapsFileInfo(packet, conf.CurrentFileInfo());
@@ -125,24 +179,19 @@ int FH2LocalClient::ConnectionChat(void)
     packet.Reset();
     packet.SetID(MSG_PLAYERS_GET);
     if(extdebug) std::cerr << "FH2LocalClient::ConnectionChat send get_players...";
-    if(!Send(packet, extdebug)) return -1;
+    if(!Send(packet, extdebug)) return false;
     if(extdebug) std::cerr << "ok" << std::endl;
 
     // recv players
     if(extdebug) std::cerr << "FH2LocalClient::ConnectionChat: recv players...";
-    if(!Wait(packet, MSG_PLAYERS, extdebug)) return -1;
+    if(!Wait(packet, MSG_PLAYERS, extdebug)) return false;
     if(extdebug) std::cerr << "ok" << std::endl;
-    Network::PacketPopPlayersInfo(packet, players);
+    PopPlayersInfo(packet);
 
-    // dialog scenario info
-    if(Dialog::OK != ScenarioInfoDialog()) return -1;
-
-    Cursor::Get().Hide();
-
-    return 1;
+    return true;
 }
 
-int FH2LocalClient::ScenarioInfoDialog(void)
+bool FH2LocalClient::ScenarioInfoDialog(void)
 {
     Settings & conf = Settings::Get();
     bool extdebug = 2 < conf.Debug();
@@ -188,7 +237,7 @@ int FH2LocalClient::ScenarioInfoDialog(void)
         if(Ready())
 	{
 	    if(extdebug) std::cerr << "FH2LocalClient::ScenarioInfoDialog: recv: ";
-	    if(!Recv(packet, extdebug)) return Dialog::CANCEL;
+	    if(!Recv(packet, extdebug)) return false;
 	    if(extdebug) std::cerr << Network::GetMsgString(packet.GetID()) << std::endl;
 
 	    switch(packet.GetID())
@@ -198,8 +247,8 @@ int FH2LocalClient::ScenarioInfoDialog(void)
 
 		case MSG_PLAYERS:
 		{
-		    Network::PacketPopPlayersInfo(packet, players);
-		    conf.SetPlayersColors(Network::GetPlayersColors(players));
+		    PopPlayersInfo(packet);
+		    conf.SetPlayersColors(GetPlayersColors());
 		    std::vector<Player>::iterator itp = std::find_if(players.begin(), players.end(), std::bind2nd(std::mem_fun_ref(&Player::isID), player_id));
 		    if(itp != players.end())
 		    {
@@ -231,12 +280,13 @@ int FH2LocalClient::ScenarioInfoDialog(void)
 		    if(Game::IO::LoadBIN(packet))
 		    {
 			conf.SetMyColor(Color::Get(player_color));
-			return Dialog::OK;
+			cursor.Hide();
+			return true;
 		    }
 		    else
 		    {
 			if(extdebug) std::cerr << "FH2LocalClient::ScenarioInfoDialog: send maps_load_err...";
-			return Dialog::CANCEL;
+			return false;
 		    }
 		    break;
 
@@ -287,11 +337,11 @@ int FH2LocalClient::ScenarioInfoDialog(void)
 	    packet.Reset();
 	    packet.SetID(MSG_MAPS_LIST_GET);
 	    if(extdebug) std::cerr << "FH2LocalClient::ScenarioInfoDialog: send get_maps_list...";
-	    if(!Send(packet, extdebug)) return Dialog::CANCEL;
+	    if(!Send(packet, extdebug)) return false;
 	    if(extdebug) std::cerr << "ok" << std::endl;
 
 	    if(extdebug) std::cerr << "FH2LocalClient::ScenarioInfoDialog: recv maps_list...";
-	    if(!Wait(packet, MSG_MAPS_LIST, extdebug)) return Dialog::CANCEL;
+	    if(!Wait(packet, MSG_MAPS_LIST, extdebug)) return false;
 	    if(extdebug) std::cerr << "ok" << std::endl;
 
 	    MapsFileInfoList lists;
@@ -305,7 +355,7 @@ int FH2LocalClient::ScenarioInfoDialog(void)
 		packet.SetID(MSG_MAPS_INFO_SET);
 	        packet.Push(filemaps);
 		if(extdebug) std::cerr << "FH2LocalClient::ScenarioInfoDialog: send maps_info...";
-	        if(!Send(packet, extdebug)) return Dialog::CANCEL;
+	        if(!Send(packet, extdebug)) return false;
 		if(extdebug) std::cerr << "ok" << std::endl;
 	    }
 	    update_info = true;
@@ -313,7 +363,7 @@ int FH2LocalClient::ScenarioInfoDialog(void)
 	else
 	// click cancel
         if(le.MouseClickLeft(buttonCancel) || le.KeyPress(KEY_ESCAPE))
-    	    return Dialog::CANCEL;
+    	    return false;
         else
         // click ok
         if(le.KeyPress(KEY_RETURN) || (buttonOk.isEnable() && le.MouseClickLeft(buttonOk)))
@@ -321,14 +371,14 @@ int FH2LocalClient::ScenarioInfoDialog(void)
            packet.Reset();
            packet.SetID(MSG_MAPS_LOAD);
            if(extdebug) std::cerr << "FH2LocalClient::ScenarioInfoDialog: send maps_load...";
-           if(!Send(packet, extdebug)) return Dialog::CANCEL;
+           if(!Send(packet, extdebug)) return false;
            if(extdebug) std::cerr << "ok" << std::endl;
 	}
 
         DELAY(10);
     }
 
-    return Dialog::CANCEL;
+    return false;
 }
 
 Game::menu_t Game::NetworkGuest(void)
@@ -356,12 +406,8 @@ Game::menu_t Game::NetworkGuest(void)
     }
     conf.SetGameType(Game::NETWORK);
 
-    if(0 < client.ConnectionChat())
-    {
-	StartGame();
-    }
-
-    client.Logout();
+    // main procedure
+    client.Main();
 
     return QUITGAME;
 }

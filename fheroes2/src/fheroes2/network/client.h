@@ -37,6 +37,7 @@ enum status_t
     ST_SHUTDOWN         = 0x0010,
     ST_ALLOWPLAYERS     = 0x0020,
     ST_LOCALSERVER      = 0x0040,
+    ST_TURN		= 0x0080,
 };
 
 class FH2Client : public Network::Socket, public BitModes, public Player
@@ -45,14 +46,13 @@ public:
     FH2Client();
 
     virtual ~FH2Client(){};
-    virtual int ConnectionChat(void) = 0;
 
     bool IsConnected(void) const;
 
     bool Wait(Network::Message &, u16, bool debug = false);
     bool Send(Network::Message &, bool debug = false);
     bool Recv(Network::Message &, bool debug = false);
-            
+
     Network::Message packet;
 };
 

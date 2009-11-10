@@ -32,7 +32,7 @@
 #include "test.h"
 #include "sdlnet.h"
 #include "images_pack.h"
-#include "network.h"
+#include "localclient.h"
 
 #include "zzlib.h"
 
@@ -293,7 +293,7 @@ int main(int argc, char **argv)
 	{
 	    MemoryInfoDump("Error::Exception:");
 #ifdef WITH_NET
-            if(Game::NETWORK == conf.GameType()) Network::Logout();
+            if(Game::NETWORK == conf.GameType()) FH2LocalClient::Get().Logout();
 #endif
     	    AGG::Cache::Get().Dump();
 	    conf.Dump();

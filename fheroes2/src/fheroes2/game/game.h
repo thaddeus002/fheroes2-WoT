@@ -104,6 +104,9 @@ namespace Game
     u8  GetRating(void);
     u16 GetGameOverScores(void);
 
+    u8   GetAIProgress(void);
+    void SetAIProgress(u8);
+
     void KeyboardGlobalFilter(u16, u16);
     void ShowLoadMapsText(void);
 

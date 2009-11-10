@@ -39,8 +39,6 @@
 #include "route.h"
 #include "game_focus.h"
 #include "kingdom.h"
-#include "network.h"
-#include "server.h"
 #include "localclient.h"
 
 extern u16 DialogWithArtifact(const std::string & hdr, const std::string & msg, const Artifact::artifact_t art, const u16 buttons = Dialog::OK);
@@ -195,9 +193,6 @@ Game::menu_t Game::StartGame(void)
     castleBar.Hide();
     heroesBar.Hide();
 
-    //cursor.Show();
-    //display.Flip();
-
     Game::menu_t m = ENDTURN;
 
     while(m == ENDTURN)
@@ -240,9 +235,30 @@ Game::menu_t Game::StartGame(void)
 		    if(conf.Modes(Settings::LOADGAME)) conf.ResetModes(Settings::LOADGAME);
 		break;
 
+		// AI turn
 		default:
-        	    if(m == ENDTURN) kingdom.AITurns();
-		    break;
+        	    if(m == ENDTURN)
+		    {
+			statusWin.Reset();
+			statusWin.SetState(STATUS_AITURN);
+
+			// for pocketpc: show status window
+			if(conf.PocketPC() && !conf.ShowStatus())
+			{
+			    conf.SetModes(Settings::SHOWSTATUS);
+			    I.SetRedraw(REDRAW_STATUS);
+			}
+
+			cursor.Hide();
+			cursor.SetThemes(Cursor::WAIT);
+			I.Redraw();
+			cursor.Show();
+			statusWin.SetAITurnRedraw();
+			display.Flip();
+
+			kingdom.AITurns();
+		    }
+		break;
 	    }
 
 	    if(m != ENDTURN) break;
@@ -736,6 +752,7 @@ Game::menu_t Game::HumanTurn(void)
     u32 ticket = 0;
     Game::menu_t res = CANCEL;
 
+    cursor.Hide();
     Interface::Basic & I = Interface::Basic::Get();
 
     const Kingdom & myKingdom = world.GetMyKingdom();
@@ -1003,25 +1020,7 @@ Game::menu_t Game::HumanTurn(void)
 	    std::string filename(conf.LocalPrefix() + SEPARATOR + "files" + SEPARATOR + "save" + SEPARATOR +  "autosave.sav");
 	    Game::Save(filename);
 	}
-
-	// for pocketpc: show status window if AI turn
-	if(conf.PocketPC() && !conf.ShowStatus())
-	{
-	    conf.SetModes(Settings::SHOWSTATUS);
-    	    I.SetRedraw(REDRAW_STATUS);
-	}
-
-	if(I.NeedRedraw())
-	{
-    	    cursor.Hide();
-    	    I.Redraw();
-    	    cursor.Show();
-    	    display.Flip();
-	}
     }
-
-    // reset sound
-    //Mixer::Reset();
 
     return res;
 }
@@ -1063,214 +1062,6 @@ bool Game::DiggingForArtifacts(const Heroes & hero)
 
     return false;
 }
-
-#ifdef WITH_NET
-
-extern void RedrawAITurns(u8, u8);
-extern void SendPacketToAllClients(std::list<FH2RemoteClient> &, Network::Message &, u32);
-
-int FH2Server::StartGame(void)
-{
-    Settings & conf = Settings::Get();
-    int m = Game::ENDTURN;
-
-    conf.FixKingdomRandomRace();
-    std::for_each(clients.begin(), clients.end(), Player::FixRandomRace);
-    conf.SetPlayersColors(Network::GetPlayersColors(clients));
-
-    Network::Message packet;
-
-    // send maps
-    World::Get().LoadMaps(conf.MapsFile());
-    packet.Reset();
-    Game::IO::SaveBIN(packet);
-    packet.SetID(MSG_MAPS_LOAD);
-    SendPacketToAllClients(clients, packet, 0);
-
-    for(Color::color_t color = Color::BLUE; color != Color::GRAY; ++color) if(color & conf.PlayersColors())
-	world.GetKingdom(color).SetControl(Game::REMOTE);
-
-    GameOver::Result::Get().Reset();
-
-    while(m == Game::ENDTURN)
-    {
-	world.NewDay();
-
-	for(Color::color_t color = Color::BLUE; color != Color::GRAY; ++color)
-	{
-	    Kingdom & kingdom = world.GetKingdom(color);
-
-	    if(!kingdom.isPlay()) continue;
-
-	    conf.SetCurrentColor(color);
-	    world.ClearFog(color);
-
-	    // send turn
-	    mutex.Lock();
-	    packet.Reset();
-	    packet.SetID(MSG_TURNS);
-    	    packet.Push(Color::GetFirst(conf.KingdomColors()));
-	    packet.Push(static_cast<u8>(0));
-	    SendPacketToAllClients(clients, packet, 0);
-	    mutex.Unlock();
-
-	    switch(kingdom.Control())
-	    {
-		default:
-		    conf.SetMyColor(color);
-		    m = RemoteTurn(color);
-		    if(m == 0)
-		    {
-			kingdom.SetControl(Game::AI);
-			conf.SetPlayersColors(conf.PlayersColors() & (~color));
-			kingdom.AITurns();
-		    }
-		    break;
-
-		case Game::AI:
-        	    if(m == Game::ENDTURN) kingdom.AITurns();
-		    // FIXME: send kingdom, castles, heroes
-		    break;
-	    }
-
-	    if(m != Game::ENDTURN) break;
-	    if(0 == conf.PlayersColors()){ m = Game::QUITGAME; break; }
-	}
-
-	ScanQueue();
-
-	DELAY(10);
-    }
-
-    return m == Game::ENDTURN ? Game::QUITGAME : m;
-}
-
-int FH2Server::RemoteTurn(u8 color)
-{
-    // wait kingdoms, castles, heroes
-    return 1;
-}
-
-int FH2LocalClient::StartGame(void)
-{
-    Game::SetFixVideoMode();
-
-    // cursor
-    Cursor & cursor = Cursor::Get();
-    Settings & conf = Settings::Get();
-    Display & display = Display::Get();
-
-    GameOver::Result::Get().Reset();
-
-    cursor.Hide();
-
-    AGG::FreeObject(ICN::HEROES);
-    AGG::FreeObject(ICN::BTNSHNGL);
-    AGG::FreeObject(ICN::SHNGANIM);
-    AGG::FreeObject(ICN::BTNNEWGM);
-    AGG::FreeObject(ICN::REDBACK);
-    AGG::FreeObject(ICN::NGEXTRA);
-    AGG::FreeObject(ICN::NGHSBKG);
-    AGG::FreeObject(ICN::REQSBKG);
-    AGG::FreeObject(ICN::REQUEST);
-    AGG::FreeObject(ICN::REQUESTS);
-    AGG::FreeObject(ICN::ESCROLL);
-    AGG::FreeObject(ICN::HSBKG);
-    AGG::FreeObject(ICN::HISCORE);
-
-    if(Settings::Get().LowMemory())
-    {
-        AGG::ICNRegistryEnable(false);
-        AGG::ICNRegistryFreeObjects();
-    }
-
-    // preload sounds
-    Mixer::Reset();
-
-    // draw interface
-    Interface::Basic & I = Interface::Basic::Get();
-
-    Interface::GameArea & areaMaps = I.gameArea;
-    areaMaps.Build();
-
-    Game::Focus & global_focus = Game::Focus::Get();
-    global_focus.Reset();
-
-    Interface::Radar & radar = I.radar;
-    Interface::HeroesIcons & heroesBar = I.iconsPanel.GetHeroesBar();
-    Interface::CastleIcons & castleBar = I.iconsPanel.GetCastleBar();
-    Interface::StatusWindow& statusWin = I.statusWindow;
-    heroesBar.Reset();
-    castleBar.Reset();
-    radar.Build();
-
-    I.Redraw(REDRAW_ICONS | REDRAW_BUTTONS | REDRAW_BORDER);
-    castleBar.Hide();
-    heroesBar.Hide();
-
-    cursor.Show();
-    display.Flip();
-
-
-    FH2LocalClient & client = FH2LocalClient::Get();
-
-    bool extdebug = 2 < conf.Debug();
-
-    cursor.Hide();
-    cursor.SetThemes(Cursor::WAIT);
-    cursor.Show();
-    display.Flip();
-
-
-    Network::Message packet;
-    u32 ticket = 0;
-
-    while(LocalEvent::Get().HandleEvents())
-    {
-	if(client.Ready())
-        {
-            if(extdebug) std::cerr << "Game::NetworkTurn: recv: ";
-	    if(!client.Recv(packet, extdebug))
-	    {
-		Dialog::Message("Error", "Game::NetworkTurn: recv: error", Font::BIG, Dialog::OK);
-		return Game::MAINMENU;
-            }
-	    if(extdebug) std::cerr << Network::GetMsgString(packet.GetID()) << std::endl;
-
-            switch(packet.GetID())
-            {
-		case MSG_TURNS:
-		{
-		    u8  color, percent;
-		    packet.Pop(color);
-		    packet.Pop(percent);
-
-		    Error::Verbose("Game::NetworkGame: player: ", Color::String(color));
-
-		    if(conf.MyColor() == color) Game::HumanTurn();
-		    else
-		    {
-			statusWin.Reset();
-			statusWin.SetState(STATUS_AITURN);
-			RedrawAITurns(color, percent);
-		    }
-		}
-		break;
-
-		default: break;
-	    }
-	}
-	else
-	    DELAY(1);
-
-        ++ticket;
-    }
-
-    Network::Logout();
-
-    return Game::QUITGAME;
-}
-#endif
 
 void Game::MouseCursorAreaClickLeft(u16 index_maps)
 {

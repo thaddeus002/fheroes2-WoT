@@ -25,7 +25,7 @@
 
 #ifdef WITH_NET
 
-#include <list>
+#include <vector>
 #include <deque>
 #include "network.h"
 #include "remoteclient.h"
@@ -40,27 +40,37 @@ public:
     ~FH2Server();
 
     bool Bind(u16);
-    void Exit(void);
-    int StartGame(void);
-    int RemoteTurn(u8);
+
+    bool IsRun(void) const;
+    void Lock(void);
+    void Unlock(void);
+    void PushMapsFileInfoList(Network::Message &) const;
+    void PushPlayersInfo(Network::Message &, u32 exclude = 0) const;
+    void PopMapsFileInfoList(Network::Message &);
+    u8 GetPlayersColors(void) const;
+    void ResetPlayers(u32 first_player);
+    void PrepareSending(const Network::Message &, u32 = 0);
+
+    void SetExit(void);
+    void SetStartGame(void);
 
 protected:
     void ScanQueue(void);
 
-    friend class FH2RemoteClient;
-
     FH2Server();
-    int ConnectionChat(void);
+    static u32 TimerScanQueue(u32, void *);
+    int Main(void);
+    void WaitClients(void);
+    void StartGame(void);
 
     Mutex mutex;
+    Timer timer;
     std::deque<MessageID> queue;
-    std::list<FH2RemoteClient> clients;
+    std::vector<FH2RemoteClient> clients;
     bool exit;
     bool start_game;
     u32 admin_id;
-    std::string banner;
     MapsFileInfoList finfo_list;
-    Network::Message packet_maps;
 };
 
 #endif

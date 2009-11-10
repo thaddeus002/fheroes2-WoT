@@ -32,9 +32,10 @@
 #include "game_interface.h"
 #include "interface_status.h"
 
+#define AITURN_REDRAW_EXPIRE 20
 #define RESOURCE_WINDOW_EXPIRE 2500
 
-Interface::StatusWindow::StatusWindow() : state(STATUS_UNKNOWN), oldState(STATUS_UNKNOWN)
+Interface::StatusWindow::StatusWindow() : state(STATUS_UNKNOWN), oldState(STATUS_UNKNOWN), aiturn_color(0xFF), aiturn_progress(0xFF)
 {
     const Sprite & ston = AGG::GetICN(Settings::Get().EvilInterface() ? ICN::STONBAKE : ICN::STONBACK, 0);
     Rect::w = ston.w();
@@ -49,6 +50,8 @@ Interface::StatusWindow & Interface::StatusWindow::Get(void)
 
 void Interface::StatusWindow::Reset(void)
 {
+    aiturn_color =0xFF;
+    aiturn_progress = 0xFF;
     state = STATUS_DAY;
     oldState = STATUS_UNKNOWN;
     lastResource = Resource::UNKNOWN;
@@ -56,15 +59,24 @@ void Interface::StatusWindow::Reset(void)
     ResetTimer();
 }
 
+info_t Interface::StatusWindow::GetState(void) const
+{
+    return state;
+}
+
 u32 Interface::StatusWindow::ResetResourceStatus(u32 tick, void *ptr)
 {
-    if(ptr && STATUS_RESOURCE == reinterpret_cast<Interface::StatusWindow*>(ptr)->state)
+    if(ptr)
     {
-	reinterpret_cast<Interface::StatusWindow*>(ptr)->state = reinterpret_cast<Interface::StatusWindow*>(ptr)->oldState;
-	Interface::Basic::Get().Redraw(REDRAW_STATUS);
+	Interface::StatusWindow* status = reinterpret_cast<Interface::StatusWindow*>(ptr);
+	if(STATUS_RESOURCE == status->state)
+	{
+	    status->state = status->oldState;
+	    Interface::Basic::Get().Redraw(REDRAW_STATUS);
+	}
+	else
+	    Timer::Remove(status->timerShowLastResource);
     }
-    else
-	Timer::Remove(reinterpret_cast<Interface::StatusWindow*>(ptr)->timerShowLastResource);
 
     return tick;
 }
@@ -243,6 +255,10 @@ void Interface::StatusWindow::ResetTimer(void)
 	Timer::Remove(window.timerShowLastResource);
 	ResetResourceStatus(0, &window);
     }
+    if(window.timerRedrawAIStatus.IsValid())
+    {
+	Timer::Remove(window.timerRedrawAIStatus);
+    }
 }
 
 void Interface::StatusWindow::DrawResourceInfo(const u8 oh) const
@@ -288,12 +304,34 @@ void Interface::StatusWindow::DrawArmyInfo(const u8 oh) const
     }
 }
 
-void Interface::StatusWindow::RedrawAITurns(u8 color, u8 progress)
+u32 Interface::StatusWindow::RedrawAIStatus(u32 tick, void *ptr)
 {
-    aiturn_color = color;
-    aiturn_progress = progress;
+    if(ptr)
+    {
+	Interface::StatusWindow* status = reinterpret_cast<Interface::StatusWindow*>(ptr);
+	if(STATUS_AITURN == status->state)
+	{
+	    if(status->aiturn_color != Settings::Get().CurrentColor() || status->aiturn_progress != Game::GetAIProgress())
+	    {
+		status->aiturn_color = Settings::Get().CurrentColor();
+		status->aiturn_progress = Game::GetAIProgress();
+		Cursor::Get().Hide();
+		Interface::Basic::Get().Redraw(REDRAW_STATUS);
+		Cursor::Get().Show();
+		Display::Get().Flip();
+	    }
+	}
+	else
+	    Timer::Remove(status->timerRedrawAIStatus);
+    }
 
-    DrawAITurns();
+    return tick;
+}
+
+void Interface::StatusWindow::SetAITurnRedraw(void)
+{
+    if(! timerRedrawAIStatus.IsValid())
+	Timer::Run(timerRedrawAIStatus, AITURN_REDRAW_EXPIRE, RedrawAIStatus, this);
 }
 
 void Interface::StatusWindow::DrawAITurns(void) const

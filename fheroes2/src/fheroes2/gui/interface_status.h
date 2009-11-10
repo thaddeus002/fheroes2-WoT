@@ -45,9 +45,10 @@ namespace Interface
 	    
 	void Redraw(void);
 	void NextState(void);
+	info_t GetState(void) const;
 	void SetState(info_t info);
 	void SetResource(Resource::resource_t, u16);
-	void RedrawAITurns(u8 color, u8 progress);
+	void SetAITurnRedraw(void);
 	void QueueEventProcessing(void);
 
 	static void ResetTimer(void);
@@ -62,17 +63,18 @@ namespace Interface
 	void DrawBackground(void) const;
 	void DrawAITurns(void) const;
 	static u32 ResetResourceStatus(u32, void *);
+	static u32 RedrawAIStatus(u32, void *);
 
 	info_t               state;
 	info_t               oldState;
 	Resource::resource_t lastResource;
 	u16                  countLastResource;
 	Timer                timerShowLastResource;
-	
+	Timer                timerRedrawAIStatus;
 	Dialog::FrameBorder border;
 
-	u8                   aiturn_color;
-	u8                   aiturn_progress;
+	u8 aiturn_color;
+	u8 aiturn_progress;
     };
 };
 
