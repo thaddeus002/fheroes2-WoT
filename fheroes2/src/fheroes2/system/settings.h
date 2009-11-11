@@ -155,7 +155,8 @@ public:
     bool LowMemory(void) const;
     bool TapMode(void) const;
     bool HideAIMove(void) const;
-    
+    bool NoGUI(void) const;
+
     const Size & VideoMode(void) const;
 
     u8   SoundVolume(void) const;

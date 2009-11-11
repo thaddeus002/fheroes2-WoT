@@ -33,11 +33,12 @@
 #include "interface_gamearea.h"
 #include "tools.h"
 
+#define FORMAT_VERSION_1357 0x054D
 #define FORMAT_VERSION_1347 0x0543
 #define FORMAT_VERSION_1335 0x0537
 #define FORMAT_VERSION_1293 0x050D
 
-#define CURRENT_FORMAT_VERSION FORMAT_VERSION_1347
+#define CURRENT_FORMAT_VERSION FORMAT_VERSION_1357
 
 bool Game::Save(const std::string &fn)
 {
@@ -607,9 +608,15 @@ bool Game::IO::LoadBIN(QueueMessage & msg)
 
     // format version
     msg.Pop(format);
-    if(format > CURRENT_FORMAT_VERSION) DEBUG(DBG_GAME , DBG_WARN, "Game::IO::LoadBIN: unknown format: 0x" << std::hex << format);
+    if(format > CURRENT_FORMAT_VERSION)
+    {
+    	DEBUG(DBG_GAME , DBG_WARN, "Game::IO::LoadBIN: unknown format: 0x" << std::hex << format);
+    }
     else
-    DEBUG(DBG_GAME , DBG_INFO, "Game::IO::LoadBIN: format: " << format);
+    {
+    	DEBUG(DBG_GAME , DBG_INFO, "Game::IO::LoadBIN: format: " << format);
+    }
+
     if(format >= FORMAT_VERSION_1293)
     {
 	// major version
@@ -667,7 +674,10 @@ bool Game::IO::LoadBIN(QueueMessage & msg)
 #ifdef WITH_DEBUG
     msg.Pop(byte8);
 #else
-    msg.Pop(conf.debug);
+    if(format >= FORMAT_VERSION_1357)
+	msg.Pop(conf.debug);
+    else
+	msg.Pop(byte8);
 #endif
     // settings: original
     if(format >= FORMAT_VERSION_1293)

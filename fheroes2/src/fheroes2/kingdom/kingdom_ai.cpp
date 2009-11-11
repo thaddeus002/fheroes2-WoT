@@ -144,7 +144,10 @@ void Kingdom::AITurns(void)
 	    Game::SetAIProgress(7);
 
 	    // heroes AI turn
-	    AIHeroesTurns(hero);
+	    if(Settings::Get().NoGUI())
+		AIHeroesNoGUITurns(hero);
+	    else
+		AIHeroesTurns(hero);
 
 	    // turn indicator
 	    Game::SetAIProgress(8);
@@ -211,56 +214,68 @@ void Kingdom::AIHeroesTurns(Heroes &hero)
     }
 
     bool hide_move = conf.HideAIMove() ||
-	    Game::NETWORK == Settings::Get().GameType() ||
 	    (! IS_DEVEL() && !hero.isShow(Settings::Get().MyColor()));
+
+    while(LocalEvent::Get().HandleEvents())
+    {
+	if(hero.isFreeman() || !hero.isEnableMove()) break;
+
+	if(hide_move)
+	{
+	    hero.Move(true);
+	}
+	else
+	if(Game::ShouldAnimateInfrequent(ticket, 1))
+	{
+	    cursor.Hide();
+	    hero.Move();
+
+    	    if(Game::ShouldAnimateInfrequent(ticket, 12)) Maps::IncreaseAnimationTicket();
+
+	    I.gameArea.Center(hero.GetCenter());
+	    I.Redraw(REDRAW_GAMEAREA);
+	    cursor.Show();
+	    display.Flip();
+	}
+
+	++ticket;
+    }
+
+    // 0.2 sec delay for show enemy hero position
+    if(!hero.isFreeman() && !hide_move) DELAY(200);
+}
+
+void Kingdom::AIHeroesNoGUITurns(Heroes &hero)
+{
+    if(hero.GetPath().isValid()) hero.SetMove(true);
+    else return;
 
 #ifdef WITH_NET
     FH2Server & server = FH2Server::Get();
     Network::Message msg;
 #endif
-
-    while(LocalEvent::Get().HandleEvents())
+    while(1)
     {
-	    if(hero.isFreeman() || !hero.isEnableMove()) break;
-
-	    if(hide_move)
-	    {
-#ifdef WITH_NET
-		msg.Reset();
-		msg.SetID(MSG_HEROES_MOVE);
-		msg.Push(static_cast<u8>(hero.GetID()));
-		msg.Push(static_cast<u16>(hero.GetIndex()));
-#endif
-		hero.Move(true);
+	if(hero.isFreeman() || !hero.isEnableMove()) break;
 
 #ifdef WITH_NET
-		msg.Push(static_cast<u16>(hero.GetIndex()));
-		msg.Push(static_cast<u8>(hero.isFreeman()));
-
-		server.Lock();
-		server.PrepareSending(msg);
-		server.Unlock();
+	msg.Reset();
+	msg.SetID(MSG_HEROES_MOVE);
+	msg.Push(static_cast<u8>(hero.GetID()));
+	msg.Push(static_cast<u16>(hero.GetIndex()));
 #endif
-	    }
-	    else
-	    if(Game::ShouldAnimateInfrequent(ticket, 1))
-	    {
-		cursor.Hide();
-		hero.Move();
+	hero.Move(true);
 
-    		if(Game::ShouldAnimateInfrequent(ticket, 12)) Maps::IncreaseAnimationTicket();
+#ifdef WITH_NET
+	msg.Push(static_cast<u16>(hero.GetIndex()));
+	msg.Push(static_cast<u8>(hero.isFreeman()));
 
-		I.gameArea.Center(hero.GetCenter());
-		I.Redraw(REDRAW_GAMEAREA);
-		cursor.Show();
-		display.Flip();
-	    }
-
-	    ++ticket;
+	server.Lock();
+	server.PrepareSending(msg);
+	server.Unlock();
+#endif
+	DELAY(1);
     }
-
-    // 0.2 sec delay for show enemy hero position
-    if(!hero.isFreeman() && !hide_move) DELAY(200);
 }
 
 void Kingdom::AIHeroesGetTask(Heroes & hero)

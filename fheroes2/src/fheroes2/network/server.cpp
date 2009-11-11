@@ -341,6 +341,7 @@ void FH2Server::StartGame(void)
 		    if(it == clients.end()) break;
 
 		    (*it).SetModes(ST_TURN);
+		    DEBUG(DBG_NETWORK, DBG_INFO, "Server: Player turn: " << Color::String(color));
 		    // wait turn
 		    while(!exit && (*it).Modes(ST_TURN)) DELAY(100);
 		    // lost connection
@@ -354,6 +355,7 @@ void FH2Server::StartGame(void)
 		    break;
 
 		case Game::AI:
+		    DEBUG(DBG_NETWORK, DBG_INFO, "Server: AI turn: " << Color::String(color));
         	    kingdom.AITurns();
 		    // FIXME: send kingdom, castles, heroes
 		    break;

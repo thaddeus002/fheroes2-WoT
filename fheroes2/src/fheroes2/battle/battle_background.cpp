@@ -565,7 +565,9 @@ namespace Battle
                 outline = troop.GetContour(troop.aframe - start + 1);
             else outline = troop.GetContour(troop.aframe - start);
             if(!outline)
+            {
                 DEBUG(DBG_BATTLE , DBG_WARN, "Background::DrawTroop: invalid contour " << troop.aframe);
+            }
             else
             {
                 const_cast<Surface *>(outline)->SetAlpha(abs((frame%21)-10)*20+55);

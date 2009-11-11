@@ -121,6 +121,7 @@ private:
 
     void AICastlesTurns(void);
     void AIHeroesTurns(Heroes &);
+    void AIHeroesNoGUITurns(Heroes &);
     void AIHeroesGetTask(Heroes &);
     void AIHeroesPrepareTask(Heroes &);
     void AIDumpCacheObjects(const IndexDistance &) const;

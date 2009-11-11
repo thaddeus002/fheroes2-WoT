@@ -378,6 +378,7 @@ bool Settings::PocketPC(void) const { return Modes(POCKETPC); }
 bool Settings::LowMemory(void) const { return Modes(LOWMEMORY); }
 bool Settings::TapMode(void) const { return Modes(TAPMODE); }
 bool Settings::HideAIMove(void) const { return Modes(HIDEAIMOVE); }
+bool Settings::NoGUI(void) const { return Modes(DEDICATEDSERVER); }
 
 /* get video mode */
 const Size & Settings::VideoMode(void) const { return video_mode; }

@@ -565,7 +565,10 @@ void World::LoadMaps(const std::string &filename)
 	    {
 		case MP2::OBJ_CASTLE:
 		    // add castle
-		    if(SIZEOFMP2CASTLE != sizeblock) DEBUG(DBG_GAME , DBG_WARN, "World::World: read castle: incorrect size block. " << sizeblock);
+		    if(SIZEOFMP2CASTLE != sizeblock)
+		    {
+			DEBUG(DBG_GAME , DBG_WARN, "World::World: read castle: incorrect size block. " << sizeblock);
+		    }
 		    else
 		    {
 			Castle *castle = GetCastle(*it_index);
@@ -576,13 +579,18 @@ void World::LoadMaps(const std::string &filename)
 			    map_captureobj[tile.GetIndex()].second = castle->GetColor();
 			}
 			else
-			DEBUG(DBG_GAME , DBG_WARN, "World::World: load castle: not found, index: " << *it_index);
+			{
+			    DEBUG(DBG_GAME , DBG_WARN, "World::World: load castle: not found, index: " << *it_index);
+			}
 		    }
 		    break;
 		case MP2::OBJ_RNDTOWN:
 		case MP2::OBJ_RNDCASTLE:
 		    // add rnd castle
-		    if(SIZEOFMP2CASTLE != sizeblock) DEBUG(DBG_GAME , DBG_WARN, "World::World: read castle: incorrect size block. " << sizeblock);
+		    if(SIZEOFMP2CASTLE != sizeblock)
+		    {
+			DEBUG(DBG_GAME , DBG_WARN, "World::World: read castle: incorrect size block. " << sizeblock);
+		    }
 		    else
 		    {
 			Castle *castle = GetCastle(*it_index);
@@ -594,12 +602,17 @@ void World::LoadMaps(const std::string &filename)
 			    map_captureobj[tile.GetIndex()].second = castle->GetColor();
 			}
 			else
-			DEBUG(DBG_GAME , DBG_WARN, "World::World: load castle: not found, index: " << *it_index);
+			{
+			    DEBUG(DBG_GAME , DBG_WARN, "World::World: load castle: not found, index: " << *it_index);
+			}
 		    }
 		    break;
 		case MP2::OBJ_JAIL:
 		    // add jail
-		    if(SIZEOFMP2HEROES != sizeblock) DEBUG(DBG_GAME , DBG_WARN, "World::World: read heroes: incorrect size block. " << sizeblock);
+		    if(SIZEOFMP2HEROES != sizeblock)
+		    {
+			DEBUG(DBG_GAME , DBG_WARN, "World::World: read heroes: incorrect size block. " << sizeblock);
+		    }
 		    else
 		    {
 			Race::race_t race = Race::KNGT;
@@ -624,7 +637,10 @@ void World::LoadMaps(const std::string &filename)
 		    break;
 		case MP2::OBJ_HEROES:
 		    // add heroes
-		    if(SIZEOFMP2HEROES != sizeblock) DEBUG(DBG_GAME , DBG_WARN, "World::World: read heroes: incorrect size block. " << sizeblock);
+		    if(SIZEOFMP2HEROES != sizeblock)
+		    {
+			DEBUG(DBG_GAME , DBG_WARN, "World::World: read heroes: incorrect size block. " << sizeblock);
+		    }
 		    else
 		    if(NULL != (addon = tile.FindMiniHero()))
 		    {
@@ -683,7 +699,9 @@ void World::LoadMaps(const std::string &filename)
 			    }
 			}
 			else
+			{
 			    DEBUG(DBG_GAME , DBG_WARN, "World::LoadMaps: load heroes maximum");
+			}
 		    }
 		    break;
 		case MP2::OBJ_SIGN:
@@ -725,7 +743,10 @@ void World::LoadMaps(const std::string &filename)
 	    }
 	}
 	// debug
-	else DEBUG(DBG_GAME , DBG_WARN, "World::World: read maps: unknown block addons, size: " << sizeblock);
+	else
+	{
+	    DEBUG(DBG_GAME , DBG_WARN, "World::World: read maps: unknown block addons, size: " << sizeblock);
+	}
 
 	delete [] pblock;
     }

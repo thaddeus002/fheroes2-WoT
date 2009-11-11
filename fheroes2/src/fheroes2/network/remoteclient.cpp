@@ -261,6 +261,11 @@ bool FH2RemoteClient::StartGame(void)
 		    MsgLogout();
 	    	    return false;
 
+		case MSG_END_TURN:
+		    VERBOSE("recv: END_TURN");
+		    ResetModes(ST_TURN);
+		    break;
+
     		default:
     		    break;
     	    }

@@ -91,6 +91,7 @@ bool FH2LocalClient::StartGame(void)
     Interface::StatusWindow& statusWin = I.statusWindow;
     heroesBar.Reset();
     castleBar.Reset();
+
     radar.Build();
 
     I.Redraw(REDRAW_ICONS | REDRAW_BUTTONS | REDRAW_BORDER);
@@ -99,8 +100,6 @@ bool FH2LocalClient::StartGame(void)
 
     cursor.Show();
     display.Flip();
-
-    FH2LocalClient & client = FH2LocalClient::Get();
 
     cursor.Hide();
     cursor.SetThemes(Cursor::WAIT);
@@ -112,9 +111,9 @@ bool FH2LocalClient::StartGame(void)
 
     while(LocalEvent::Get().HandleEvents())
     {
-	if(client.Ready())
+	if(Ready())
         {
-	    if(!client.Recv(packet))
+	    if(!Recv(packet))
 	    {
 		Dialog::Message("Error", "FH2LocalClient::StartGame: recv: error", Font::BIG, Dialog::OK);
 		return false;
@@ -128,6 +127,8 @@ bool FH2LocalClient::StartGame(void)
 		    if(Game::IO::LoadBIN(packet))
 		    {
 			conf.SetMyColor(Color::Get(player_color));
+			heroesBar.Reset();
+			castleBar.Reset();
 		    }
             	    else
             		DEBUG(DBG_NETWORK , DBG_WARN, "FH2LocalClient::StartGame: MSG_MAPS_LOAD error");
@@ -140,6 +141,7 @@ bool FH2LocalClient::StartGame(void)
 		    packet.Pop(color);
 		    packet.Pop(percent);
 
+		    radar.HideArea();
 		    conf.SetCurrentColor(Color::Get(color));
 		    Game::SetAIProgress(percent);
 
@@ -148,30 +150,39 @@ bool FH2LocalClient::StartGame(void)
 
 		    if(conf.MyColor() == color)
             	    {
-		        statusWin.Reset();
-			Game::HumanTurn();
+			packet.Reset();
+			if(Game::ENDTURN != Game::HumanTurn())
+			    packet.SetID(MSG_LOGOUT);
+			else
+			    packet.SetID(MSG_END_TURN);
+
+			DEBUG(DBG_NETWORK, DBG_INFO, "FH2LocalClient::StartGame: send end turn");
+			if(!Send(packet)) return false;
 		    }
 		    else
 		    {
-                        // for pocketpc: show status window
-                        if(conf.PocketPC() && !conf.ShowStatus())
-                        {
-                            conf.SetModes(Settings::SHOWSTATUS);
-                            I.SetRedraw(REDRAW_STATUS);
-                        }
-
 			if(STATUS_AITURN != statusWin.GetState())
 			{
+                    	    // for pocketpc: show status window
+                    	    if(conf.PocketPC() && !conf.ShowStatus())
+                    	    {
+                        	conf.SetModes(Settings::SHOWSTATUS);
+                    	    }
+
+                    	    cursor.Hide();
+
 			    statusWin.Reset();
                     	    statusWin.SetState(STATUS_AITURN);
                     	    statusWin.SetAITurnRedraw();
+
+                    	    I.SetRedraw(REDRAW_GAMEAREA | REDRAW_STATUS);
+
+                    	    cursor.SetThemes(Cursor::WAIT);
+                    	    I.Redraw();
+                    	    cursor.Show();
+                    	    display.Flip();
 			}
 
-                        cursor.Hide();
-                        cursor.SetThemes(Cursor::WAIT);
-                        I.Redraw();
-                        cursor.Show();
-                        display.Flip();
 		    }
 		}
 		break;
@@ -199,7 +210,7 @@ bool FH2LocalClient::StartGame(void)
     }
 
     // logout
-    client.Logout();
+    Logout();
 
     return false;
 }
