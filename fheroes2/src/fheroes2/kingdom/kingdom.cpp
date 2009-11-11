@@ -225,9 +225,9 @@ void Kingdom::ActionNewWeek(void)
 	std::for_each(heroes.begin(), heroes.end(), std::mem_fun(&Heroes::ActionNewWeek));
 
 	// debug an gift
-	if(Settings::Get().Debug() && Game::LOCAL == Control())
+	if(IS_DEVEL() && Game::LOCAL == Control())
 	{
-	    Error::Verbose("Kingdom::ActionNewWeek: for the best debugging, God has sent you a gift.");
+	    DEBUG(DBG_GAME , DBG_INFO, "Kingdom::ActionNewWeek: for the best debugging, God has sent you a gift.");
 
 	    resource.wood += 20;
 	    resource.ore += 20;

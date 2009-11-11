@@ -768,7 +768,7 @@ Army::battle_t Battle::BattleControl::RunBattle(HeroBase *hero1, HeroBase *hero2
         {
             if(!validMove) //HACK for termination if battle is halted after full turn
             {
-                Error::Warning("Battle ended due to faulty AI.");
+                DEBUG(DBG_BATTLE , DBG_WARN, "Battle ended due to faulty AI.");
                 break;
             }
             else validMove = false;
@@ -831,7 +831,7 @@ Army::battle_t Battle::BattleControl::RunBattle(HeroBase *hero1, HeroBase *hero2
 
         if(!PerformMove(troopIdx, move, !BfValid(attack)) && !BfValid(attack))
         {
-            Error::Warning("Battle: invalid move attempted");
+            DEBUG(DBG_BATTLE , DBG_WARN, "Battle: invalid move attempted");
             continue;
         }
         else validMove = true;
@@ -912,7 +912,7 @@ Battle::BattleTurn *Battle::BattleControl::CreateTurn(const HeroBase *hero, Army
 
 void Battle::BattleControl::NewTurn()
 {
-    //Error::Warning("Battle::NewTurn");
+    //DEBUG(DBG_BATTLE , DBG_WARN, "Battle::NewTurn");
     
     Army::NewTurn(m_battlefield.GetArmy(0));
     Army::NewTurn(m_battlefield.GetArmy(1));
@@ -1334,7 +1334,7 @@ bool Battle::BattleControl::PerformMove(TroopIndex troopN, const Point &move, bo
             else
             {
                 //Dialog::Message(_("Error"), _("Path not found!"), Font::BIG, Dialog::OK);
-                Error::Warning("Path not found!");
+                DEBUG(DBG_BATTLE , DBG_WARN, "BattleControl::PerformMove: path not found!");
                 return false;
             }
         }
@@ -1971,7 +1971,7 @@ namespace Battle
 
         while(le.HandleEvents())
         {
-            if(Settings::Get().Debug())
+            if(IS_DEVEL())
             {
     	      if(le.KeyPress(KEY_RETURN)) {
                 for(u16 i = 0; i < army2.size(); i++)

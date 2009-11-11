@@ -297,7 +297,7 @@ u8 Settings::MajorVersion(void) const { return major_version; }
 u8 Settings::MinorVersion(void) const { return minor_version; }
 
 /* return debug */
-u8 Settings::Debug(void) const { return debug; }
+u16 Settings::Debug(void) const { return debug; }
 
 /* return game difficulty */
 Difficulty::difficulty_t Settings::GameDifficulty(void) const { return game_difficulty; }
@@ -491,12 +491,12 @@ void Settings::Parse(const std::string & left, const std::string & right)
 		possible_w *= TILEWIDTH;
 		possible_h *= TILEWIDTH;
 
-		std::cout << "Settings: videomode: " << video_mode.w << "x" << video_mode.h << ", current: " << possible_w << "x" << possible_h << std::endl;
+		DEBUG(DBG_ENGINE , DBG_INFO, "Settings::Parse: videomode: " << video_mode.w << "x" << video_mode.h << ", current: " << possible_w << "x" << possible_h);
 		video_mode.w = possible_w;
 		video_mode.h = possible_h;
 	    }
 	}
-	else Error::Warning("Settings: unknown video mode: " + right);
+	else DEBUG(DBG_ENGINE , DBG_WARN, "Settings::Parse: unknown video mode: " << right);
     }
     // offset mouse
     else
@@ -509,7 +509,7 @@ void Settings::Parse(const std::string & left, const std::string & right)
 }
 
 /* set level debug */
-void Settings::SetDebug(const u8 d)
+void Settings::SetDebug(const u16 d)
 {
     debug = d;
 }
@@ -524,7 +524,7 @@ void Settings::SetMyColor(const Color::color_t c) { my_color = c; }
 void Settings::SetStrModes(const std::string & key)
 {
     // debug
-    if(key == "debug")		debug = 1;
+    if(key == "debug")		debug = DBG_ENGINE | DBG_GAME | DBG_BATTLE | DBG_AI | DBG_NETWORK | DBG_WARN;
     else
     {
         for(u16 i = 0; i < sizeof(modeSettings) / sizeof(modeSettings[0]); i++)
@@ -778,6 +778,6 @@ void Settings::FixKingdomRandomRace(void)
     for(Color::color_t color = Color::BLUE; color != Color::GRAY; ++color) if(KingdomColors(color))
     {
         if(Race::RAND == KingdomRace(color)) SetKingdomRace(color, Race::Rand());
-        if(Debug()) std::cout << Color::String(color) << ": " << Race::String(KingdomRace(color)) << std::endl;
+        DEBUG(DBG_GAME , DBG_INFO, "Settings::FixKingdomRandomRace: " << Color::String(color) << ": " << Race::String(KingdomRace(color)));
     }
 }

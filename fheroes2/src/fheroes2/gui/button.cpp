@@ -20,6 +20,7 @@
 
 #include "agg.h"
 #include "cursor.h"
+#include "settings.h"
 #include "button.h"
 
 Button::Button() : sprite1(NULL), sprite2(NULL), pressed(false), disable(false)
@@ -31,7 +32,7 @@ Button::Button(const Point &pt, const ICN::icn_t icn, u16 index1, u16 index2)
 {
     SetPos(pt);
 
-    if(!sprite1 || !sprite2) Error::Warning("Button::Button: sprite is NULL");
+    if(!sprite1 || !sprite2) DEBUG(DBG_ENGINE , DBG_WARN, "Button::Button: sprite is NULL");
 
     if(sprite1)
     {
@@ -45,7 +46,7 @@ Button::Button(u16 ox, u16 oy, const ICN::icn_t icn, u16 index1, u16 index2)
 {
     SetPos(ox, oy);
 
-    if(!sprite1 || !sprite2) Error::Warning("Button::Button: sprite is NULL");
+    if(!sprite1 || !sprite2) DEBUG(DBG_ENGINE , DBG_WARN, "Button::Button: sprite is NULL");
 
     if(sprite1)
     {
@@ -70,7 +71,7 @@ void Button::SetSprite(const ICN::icn_t icn, const u16 index1, const u16 index2)
     sprite1 = &AGG::GetICN(icn, index1);
     sprite2 = &AGG::GetICN(icn, index2);
 
-    if(!sprite1 || !sprite2) Error::Warning("Button::SetSprite: sprite is NULL");
+    if(!sprite1 || !sprite2) DEBUG(DBG_ENGINE , DBG_WARN, "Button::SetSprite: sprite is NULL");
 
     if(sprite1)
     {

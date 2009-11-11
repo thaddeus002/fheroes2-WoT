@@ -150,7 +150,7 @@ Maps::Tiles::Tiles(u16 mi, const MP2::mp2tile_t & mp2tile) : maps_index(mi), til
     AddonsPushLevel1(mp2tile);
     AddonsPushLevel2(mp2tile);
 
-    if(Settings::Get().Debug()) ClearFog(Settings::Get().MyColor());
+    if(IS_DEVEL()) ClearFog(Settings::Get().MyColor());
 }
 
 void Maps::Tiles::SetTile(const u16 index, const u8 sh)
@@ -1327,7 +1327,7 @@ void Maps::Tiles::FixLoyaltyVersion(void)
 		}
 	    }
 
-	    if(Settings::Get().Debug()) Error::Warning("Maps::Tiles::FixLoyaltyVersion: index: ", maps_index);
+	    DEBUG(DBG_GAME , DBG_WARN, "Maps::Tiles::FixLoyaltyVersion: index: " << maps_index);
 
 	} break;
 
@@ -1719,7 +1719,7 @@ void Maps::Tiles::UpdateRNDMonsterSprite(void)
     	    case MP2::OBJ_RNDMONSTER3:      index = Monster::Rand(Monster::LEVEL3);break;
     	    case MP2::OBJ_RNDMONSTER4:      index = Monster::Rand(Monster::LEVEL4);break;
 
-	    default: Error::Warning("Maps::Tiles::UpdateRNDMonsterSprite: unknown object, index: ", maps_index); return;
+	    default: DEBUG(DBG_GAME , DBG_WARN, "Maps::Tiles::UpdateRNDMonsterSprite: unknown object, index: " << maps_index); return;
 	}
 
         addon->index = index;
@@ -1729,7 +1729,7 @@ void Maps::Tiles::UpdateRNDMonsterSprite(void)
             flags |= JOINER;
     }
     else
-        Error::Warning("Maps::Tiles::UpdateRNDMonsterSprite: FindRNDMonster return is NULL, index: ", maps_index);
+        DEBUG(DBG_GAME , DBG_WARN, "Maps::Tiles::UpdateRNDMonsterSprite: FindRNDMonster return is NULL, index: " << maps_index);
 }
 
 void Maps::Tiles::UpdateAbandoneMineSprite(void)

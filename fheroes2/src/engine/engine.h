@@ -22,8 +22,8 @@
 
 #include "background.h"
 #include "display.h"
-#include "error.h"
 #include "localevent.h"
+#include "error.h"
 #include "rect.h"
 #include "spritecursor.h"
 #include "surface.h"

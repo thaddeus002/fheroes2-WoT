@@ -20,6 +20,7 @@
 
 #include <iostream>
 #include "cursor.h"
+#include "settings.h"
 #include "splitter.h"
 
 /* splitter constructor */
@@ -70,7 +71,7 @@ void Splitter::Move(u16 pos)
 {
     if(pos && cur == pos) return;
 
-    if(pos > max || pos < min){ Error::Warning("Splitter::Move: out of range."); Dump(); return; }
+    if(pos > max || pos < min){ DEBUG(DBG_ENGINE , DBG_WARN, "Splitter::Move: out of range. min: " << min << ", max: " << max << ", cur: " << cur << ", step: " << step); return; }
 
     Point pt(GetRect().x, GetRect().y);
 
@@ -126,9 +127,4 @@ void Splitter::Backward(void)
     SpriteCursor::Hide();
     SpriteCursor::Move(pt);
     SpriteCursor::Show();
-}
-
-void Splitter::Dump(void)
-{
-    std::cout << "Splitter::Dump min: " << min << ", max: " << max << ", cur: " << cur << ", step: " << step << std::endl;
 }

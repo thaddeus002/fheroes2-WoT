@@ -211,7 +211,7 @@ bool LocalEvent::HandleEvents(bool delay)
 	}
 
 	// exit
-	if(SDL_QUIT == event.type){ Error::Except(" quit event: ok."); return false; }
+	if(SDL_QUIT == event.type){ Error::Except("LocalEvent::HandleEvents: ", "quit event: ok."); return false; }
     }
 
     // emulate press right

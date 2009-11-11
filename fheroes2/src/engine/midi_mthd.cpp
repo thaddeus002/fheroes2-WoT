@@ -25,7 +25,7 @@ using namespace MIDI;
 
 void MThd::Dump(void) const
 {
-    std::cout << "[MThd]    format: " << Format() << ", tracks: " << Tracks() << ", ppqn: " << PPQN() << std::endl;
+    std::cerr << "[MThd]    format: " << Format() << ", tracks: " << Tracks() << ", ppqn: " << PPQN() << std::endl;
 }
 
 void MThd::SetFormat(const u16 f)

@@ -24,6 +24,7 @@
 #include <string>
 #include <list>
 #include <iostream>
+#include <iomanip>
 #include "gamedefs.h"
 #include "difficulty.h"
 #include "race.h"
@@ -34,6 +35,26 @@
 #include "bitmodes.h"
 
 #define ListMapsDirectory std::list<std::string>
+
+enum
+{
+    DBG_ENGINE	= 0x0001,
+    DBG_GAME	= 0x0002,
+    DBG_BATTLE	= 0x0004,
+    DBG_AI	= 0x0008,
+    DBG_NETWORK	= 0x0010,
+
+    DBG_WARN	= 0x0020,
+    DBG_INFO	= 0x0040,
+    DBG_TRACE	= 0x0080,
+
+    DBG_DEVEL	= 0x8000,
+};
+
+#define VERBOSE(x) std::cout << x << std::endl
+#define IS_DEVEL() (DBG_DEVEL & Settings::Get().Debug())
+#define IS_DEBUG(x, y) (((x) & Settings::Get().Debug()) && ((y) & Settings::Get().Debug()))
+#define DEBUG(x, y, z) if(IS_DEBUG((x), (y))) VERBOSE(z)
 
 class Settings : public BitModes
 {
@@ -92,7 +113,7 @@ public:
 
     u8 MajorVersion(void) const;
     u8 MinorVersion(void) const;
-    u8 Debug(void) const;
+    u16 Debug(void) const;
     u8 Animation(void) const;
 
     const std::string & BuildVersion(void) const;
@@ -140,7 +161,7 @@ public:
     u8   SoundVolume(void) const;
     u8   MusicVolume(void) const;
 
-    void SetDebug(const u8 d);
+    void SetDebug(const u16 d);
     void SetGameDifficulty(const Difficulty::difficulty_t d);
 
     void SetSoundVolume(const u8 v);
@@ -206,7 +227,7 @@ private:
     const u8 major_version;
     const u8 minor_version;
     const std::string svn_version;
-    u8 debug;
+    u16 debug;
 
     Size video_mode;
 

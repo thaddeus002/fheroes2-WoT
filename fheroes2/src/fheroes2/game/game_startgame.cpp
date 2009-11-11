@@ -168,7 +168,7 @@ Game::menu_t Game::StartGame(void)
         AGG::ICNRegistryEnable(false);
         AGG::ICNRegistryFreeObjects();
     }
-    if(conf.Debug() && conf.PocketPC()) MemoryInfoDump("Game::StartGame:");
+    if(IS_DEBUG(DBG_GAME, DBG_INFO) && conf.PocketPC()) MemoryInfoDump("Game::StartGame:");
 
     AGG::Cache::Get().ResetMixer();
 
@@ -207,7 +207,7 @@ Game::menu_t Game::StartGame(void)
 	    if(!kingdom.isPlay() ||
 	    (conf.Modes(Settings::LOADGAME) && color != conf.MyColor())) continue;
 
-	    if(1 < conf.Debug()) kingdom.Dump();
+	    if(IS_DEBUG(DBG_GAME, DBG_INFO)) kingdom.Dump();
 
 	    radar.HideArea();
 	    conf.SetCurrentColor(color);
@@ -287,7 +287,7 @@ void Game::OpenCastle(Castle *castle)
     bool show_position = !Settings::Get().PocketPC() && (640 != display.w() || 480 != display.h());
     bool need_fade = !show_position;
 
-    if(Settings::Get().Debug() && Settings::Get().PocketPC()) MemoryInfoDump("Game::OpenCastle:");
+    if(IS_DEBUG(DBG_GAME, DBG_INFO) && Settings::Get().PocketPC()) MemoryInfoDump("Game::OpenCastle:");
 
     if(it != myCastles.end())
     {
@@ -356,7 +356,7 @@ void Game::OpenHeroes(Heroes *hero)
     bool show_position = !Settings::Get().PocketPC() && (640 != display.w() || 480 != display.h());
     bool need_fade = !show_position;
 
-    if(Settings::Get().Debug() && Settings::Get().PocketPC()) MemoryInfoDump("Game::OpenHeroes:");
+    if(IS_DEBUG(DBG_GAME, DBG_INFO) && Settings::Get().PocketPC()) MemoryInfoDump("Game::OpenHeroes:");
 
     if(it != myHeroes.end())
     {
@@ -428,7 +428,7 @@ void Game::OpenHeroes(Heroes *hero)
 /* return changee cursor */
 Cursor::themes_t Game::GetCursor(const Maps::Tiles & tile)
 {
-    if(0 == Settings::Get().Debug() && tile.isFog(Settings::Get().MyColor())) return Cursor::POINTER;
+    if(tile.isFog(Settings::Get().MyColor())) return Cursor::POINTER;
 
     const Game::Focus & focus = Game::Focus::Get();
 
@@ -714,7 +714,7 @@ void Game::ShowPathOrStartMoveHero(Heroes *hero, const u16 dst_index)
     {
         hero->SetMove(false);
 	path.Calculate(dst_index);
-        if(1 < Settings::Get().Debug()) path.Dump();
+        if(IS_DEBUG(DBG_GAME, DBG_TRACE)) path.Dump();
         path.Show();
 	I.SetRedraw(REDRAW_GAMEAREA);
     }
@@ -1167,9 +1167,9 @@ void Game::MouseCursorAreaPressRight(u16 index_maps)
     Settings & conf = Settings::Get();
     Maps::Tiles & tile = world.GetTiles(index_maps);
 
-    if(conf.Debug()) tile.DebugInfo();
+    if(IS_DEVEL()) tile.DebugInfo();
 
-    if(!conf.Debug() && tile.isFog(conf.MyColor()))
+    if(!IS_DEVEL() && tile.isFog(conf.MyColor()))
 	Dialog::QuickInfo(tile);
     else
     switch(tile.GetObject())
@@ -1237,7 +1237,7 @@ void Game::ButtonSpell(void)
     {
 	Spell::spell_t spell = global_focus.GetHeroes().GetSpellBook().Open(SpellBook::ADVN, true);
 	// TODO cast selected spell
-	Error::Verbose("spell selected: " + std::string(Spell::GetName(spell)));
+	VERBOSE("spell selected: " << Spell::GetName(spell));
     }
 }
 
@@ -1432,7 +1432,7 @@ void Game::KeyPress_SPACE(void)
 
 void Game::KeyPress_RETURN(void)
 {
-    if(Settings::Get().Debug() && Settings::Get().PocketPC()) MemoryInfoDump("Game::RETURN:");
+    if(IS_DEBUG(DBG_GAME, DBG_INFO) && Settings::Get().PocketPC()) MemoryInfoDump("Game::RETURN:");
 
     Focus & global_focus = Focus::Get();
     if(Game::Focus::HEROES == global_focus.Type())

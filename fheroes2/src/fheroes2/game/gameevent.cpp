@@ -39,7 +39,7 @@ GameEvent::Day::Day(const void *ptr)
     // id
     if(0x00 != *ptr8)
     {
-	Error::Warning("GameEvent::Day: unknown magic id");
+	DEBUG(DBG_GAME , DBG_WARN, "GameEvent::Day: unknown magic id");
 	return;
     }
     ++ptr8;
@@ -127,9 +127,9 @@ GameEvent::Day::Day(const void *ptr)
     // message
     message = std::string(_(reinterpret_cast<const char *>(ptr8)));
 
-    //if(SIZEMESSAGE < message.size()) Error::Warning("GameEvent::Day: long message, incorrect block?");
+    //if(SIZEMESSAGE < message.size()) DEBUG(DBG_GAME , DBG_WARN, "GameEvent::Day: long message, incorrect block?");
 
-    if(Settings::Get().Debug()) Error::Verbose("GameEvent::Day: add: " + message);
+    DEBUG(DBG_GAME , DBG_INFO, "GameEvent::Day: add: " << message);
 }
 
 GameEvent::Coord::Coord() : index_map(0), artifact(Artifact::UNKNOWN), computer(false), cancel(true), colors(0)
@@ -145,7 +145,7 @@ GameEvent::Coord::Coord(u16 index, const void *ptr) : index_map(index)
     // id
     if(0x01 != *ptr8)
     {
-	Error::Warning("GameEvent::Coord: unknown magic id");
+	DEBUG(DBG_GAME , DBG_WARN, "GameEvent::Coord: unknown magic id");
 	return;
     }
     ++ptr8;
@@ -222,7 +222,7 @@ GameEvent::Coord::Coord(u16 index, const void *ptr) : index_map(index)
     // message
     message = std::string(_(reinterpret_cast<const char *>(ptr8)));
     
-    if(Settings::Get().Debug()) Error::Verbose("GameEvent::Coord: add: " + message);
+    DEBUG(DBG_GAME , DBG_INFO, "GameEvent::Coord: add: " << message);
 }
 
 GameEvent::Riddle::Riddle() : index_map(MAXU16), artifact(Artifact::UNKNOWN), quiet(true)
@@ -239,7 +239,7 @@ GameEvent::Riddle::Riddle(u16 index, const void *ptr) : index_map(index), quiet(
     // id
     if(0x00 != *ptr8)
     {
-	Error::Warning("GameEvent::Day: unknown magic id");
+	DEBUG(DBG_GAME , DBG_WARN, "GameEvent::Day: unknown magic id");
 	return;
     }
     ++ptr8;
@@ -295,7 +295,7 @@ GameEvent::Riddle::Riddle(u16 index, const void *ptr) : index_map(index), quiet(
     // message
     message = std::string(_(reinterpret_cast<const char *>(ptr8)));
     
-    if(Settings::Get().Debug()) Error::Verbose("GameEvent::Riddle: add: " + message);
+    DEBUG(DBG_GAME , DBG_INFO, "GameEvent::Riddle: add: " << message);
 }
 
 bool GameEvent::Riddle::AnswerCorrect(const std::string & answer)

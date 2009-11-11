@@ -124,5 +124,5 @@ double Time::Get(void) const
 
 void Time::Print(void) const
 {
-    std::cout << "Performance: " << Get() << " ms" << std::endl;
+    std::cerr << "Performance: " << Get() << " ms" << std::endl;
 }

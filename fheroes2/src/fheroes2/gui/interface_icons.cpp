@@ -396,7 +396,7 @@ void Interface::CastleIcons::RedrawIcon(const Castle & castle, const Rect & dst)
         case Race::WRLK: index_sprite = castle.isCastle() ? 12 : 18; break;
         case Race::WZRD: index_sprite = castle.isCastle() ? 13 : 19; break;
         case Race::NECR: index_sprite = castle.isCastle() ? 14 : 20; break;
-        default: Error::Warning("Interface::CastleIcons::Redraw: unknown race.");
+        default: DEBUG(DBG_ENGINE , DBG_WARN, "Interface::CastleIcons::Redraw: unknown race.");
     }
 
     display.Blit(AGG::GetICN(interface ? ICN::LOCATORE : ICN::LOCATORS, index_sprite), dst.x, dst.y);

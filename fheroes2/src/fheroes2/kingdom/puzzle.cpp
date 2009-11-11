@@ -205,7 +205,7 @@ void PuzzlesDraw(const Puzzle & pzl, const Surface & sf, s16 dstx, s16 dsty)
     Cursor & cursor = Cursor::Get();
 
     // show all for debug
-    if(1 < Settings::Get().Debug()) return;
+    if(IS_DEVEL()) return;
 
     u8 alpha = 250;
     u32 ticket = 0;

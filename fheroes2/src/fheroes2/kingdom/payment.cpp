@@ -135,7 +135,7 @@ PaymentConditions::BuyMonster::BuyMonster(u8 monster)
 	    gems = BUY_GENIE_GEMS;
 	    break;
 
-	default: Error::Warning("PaymentConditions::BuyMonster: unknown monster."); break;
+	default: DEBUG(DBG_GAME , DBG_WARN, "PaymentConditions::BuyMonster: unknown monster."); break;
     }
 }
 
@@ -712,6 +712,6 @@ PaymentConditions::BuyBuilding::BuyBuilding(const u8 race, const u32 build)
 	    }
 	    break;
 																						
-	default: Error::Warning("PaymentConditions::BuyBuilding: unknown building."); break;
+	default: DEBUG(DBG_GAME , DBG_WARN, "PaymentConditions::BuyBuilding: unknown building."); break;
     }
 }

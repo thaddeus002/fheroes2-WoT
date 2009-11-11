@@ -102,8 +102,6 @@ bool FH2LocalClient::StartGame(void)
 
     FH2LocalClient & client = FH2LocalClient::Get();
 
-    bool extdebug = 2 < conf.Debug();
-
     cursor.Hide();
     cursor.SetThemes(Cursor::WAIT);
     cursor.Show();
@@ -116,13 +114,12 @@ bool FH2LocalClient::StartGame(void)
     {
 	if(client.Ready())
         {
-	    if(extdebug) std::cerr << "FH2LocalClient::StartGame: recv: ";
-	    if(!client.Recv(packet, extdebug))
+	    if(!client.Recv(packet))
 	    {
 		Dialog::Message("Error", "FH2LocalClient::StartGame: recv: error", Font::BIG, Dialog::OK);
 		return false;
             }
-	    if(extdebug) std::cerr << Network::GetMsgString(packet.GetID()) << std::endl;
+	    DEBUG(DBG_NETWORK , DBG_INFO, "FH2LocalClient::StartGame: recv: " << Network::GetMsgString(packet.GetID()));
 
             switch(packet.GetID())
             {
@@ -133,7 +130,7 @@ bool FH2LocalClient::StartGame(void)
 			conf.SetMyColor(Color::Get(player_color));
 		    }
             	    else
-            		Error::Verbose("FH2LocalClient::StartGame: MSG_MAPS_LOAD error");
+            		DEBUG(DBG_NETWORK , DBG_WARN, "FH2LocalClient::StartGame: MSG_MAPS_LOAD error");
 		}
 		break;
 
@@ -146,7 +143,7 @@ bool FH2LocalClient::StartGame(void)
 		    conf.SetCurrentColor(Color::Get(color));
 		    Game::SetAIProgress(percent);
 
-		    Error::Verbose("FH2LocalClient::StartGame: player: ", Color::String(color));
+		    DEBUG(DBG_NETWORK , DBG_INFO, "FH2LocalClient::StartGame: player: " << Color::String(color));
 		    world.ClearFog(color);
 
 		    if(conf.MyColor() == color)
@@ -181,7 +178,7 @@ bool FH2LocalClient::StartGame(void)
 
 		case MSG_HEROES_MOVE:
 		{
-		    Error::Verbose("recv MSG_HEROES_MOVE");
+		    VERBOSE("recv MSG_HEROES_MOVE");
 		    u8 hero_id, is_dead;
 		    u16 move_from, move_to;
 

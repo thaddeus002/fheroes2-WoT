@@ -52,16 +52,16 @@ bool AGG::File::Open(const std::string & fname)
 
     if(!stream || stream->fail())
     {
-	Error::Warning("AGG::File: error read file: " + filename + ", skipping...");
+	DEBUG(DBG_ENGINE , DBG_WARN, "AGG::File: error read file: " << filename << ", skipping...");
 	return false;
     }
 
-    if(Settings::Get().Debug()) Error::Verbose("AGG::File: load: " + filename);
+    DEBUG(DBG_ENGINE , DBG_INFO, "AGG::File: load: " << filename);
 
     stream->read(reinterpret_cast<char *>(&count_items), sizeof(u16));
     SwapLE16(count_items);
 
-    if(Settings::Get().Debug()) Error::Verbose("AGG::File: count items: ", count_items);
+    DEBUG(DBG_ENGINE , DBG_INFO, "AGG::File: count items: " << count_items);
 
     char buf[FATSIZENAME + 1];
     buf[FATSIZENAME] = 0;
@@ -134,11 +134,11 @@ bool AGG::File::Read(const std::string & key, std::vector<u8> & body)
 {
     const FAT & f = fat[key];
 
-    if(Settings::Get().Debug() > 3) f.Dump(key);
+    if(IS_DEBUG(DBG_ENGINE, DBG_TRACE)) f.Dump(key);
     
     if(f.size)
     {
-	if(2 < Settings::Get().Debug()) Error::Verbose("AGG::File::Read: " + key);
+	DEBUG(DBG_ENGINE , DBG_TRACE, "AGG::File::Read: " << key);
 
 	body.resize(f.size);
 
@@ -254,8 +254,7 @@ bool AGG::Cache::ReadChunk(const std::string & key, std::vector<u8> & body)
 /* load manual ICN object */
 void AGG::Cache::LoadExtICN(icn_cache_t & v, const ICN::icn_t icn, const u16 index, bool reflect)
 {
-    const Settings & conf = Settings::Get();
-    if(1 < conf.Debug()) std::cout << "AGG::Cache::LoadExtICN: " << ICN::GetString(icn) << ", " << index << std::endl;
+    DEBUG(DBG_ENGINE, DBG_TRACE, "AGG::Cache::LoadExtICN: " << ICN::GetString(icn) << ", " << index);
 
     u8 count = 0;		// for animation sprite need update count for ICN::AnimationFrame
 
@@ -402,12 +401,12 @@ bool AGG::Cache::LoadAltICN(icn_cache_t & v, const std::string & spec, const u16
 	    if(sp.Load(name.c_str()) && sp.valid())
 	    {
 		sp.SetOffset(ox, oy);
-		if(1 < conf.Debug()) std::cout << "AGG::Cache::LoadAltICN: " << spec << ", " << index << std::endl;
+		DEBUG(DBG_ENGINE, DBG_TRACE, "AGG::Cache::LoadAltICN: " << spec << ", " << index);
 
 		return true;
 	    }
 	}
-	if(conf.Debug()) Error::Warning("AGG::Cache::LoadAltICN: broken xml file: ", spec.c_str());
+	DEBUG(DBG_ENGINE , DBG_WARN, "AGG::Cache::LoadAltICN: broken xml file: " <<  spec);
     }
 #endif
 
@@ -421,7 +420,7 @@ void AGG::Cache::LoadOrgICN(Sprite & sp, const ICN::icn_t icn, const u16 index, 
     if(ReadChunk(ICN::GetString(icn), body))
     {
 	// loading original
-	if(1 < Settings::Get().Debug()) std::cout << "AGG::Cache::LoadOrgICN: " << ICN::GetString(icn) << ", " << index << std::endl;
+	DEBUG(DBG_ENGINE, DBG_TRACE, "AGG::Cache::LoadOrgICN: " << ICN::GetString(icn) << ", " << index);
 
 	const u16 count = ReadLE16(&body[0]);
 	ICN::Header header1, header2;
@@ -522,7 +521,7 @@ void AGG::Cache::LoadTIL(const TIL::til_t til)
 
     if(v.sprites) return;
 
-    if(Settings::Get().Debug()) Error::Verbose("AGG::Cache::LoadTIL: ", TIL::GetString(til));
+    DEBUG(DBG_ENGINE , DBG_INFO, "AGG::Cache::LoadTIL: " << TIL::GetString(til));
 
     std::vector<u8> body;
 
@@ -538,7 +537,7 @@ void AGG::Cache::LoadTIL(const TIL::til_t til)
 	// check size
 	if(body.size() != body_size)
 	{
-	    Error::Warning("AGG::Cache::LoadTIL: size mismach, skipping...");
+	    DEBUG(DBG_ENGINE , DBG_WARN, "AGG::Cache::LoadTIL: size mismach, skipping...");
 	    return;
 	}
 
@@ -569,7 +568,7 @@ void AGG::Cache::LoadWAV(const M82::m82_t m82)
 
        if(FilePresent(sound))
        {
-           if(conf.Debug()) Error::Verbose("AGG::Cache::LoadWAV: ", sound.c_str());
+           DEBUG(DBG_ENGINE , DBG_INFO, "AGG::Cache::LoadWAV: " << sound);
            StoreFileToMem(v, sound);
            return;
        }
@@ -580,14 +579,14 @@ void AGG::Cache::LoadWAV(const M82::m82_t m82)
 
        if(FilePresent(sound))
        {
-           if(conf.Debug()) Error::Verbose("AGG::Cache::LoadWAV: ", sound.c_str());
+           DEBUG(DBG_ENGINE , DBG_INFO, "AGG::Cache::LoadWAV: " << sound);
            StoreFileToMem(v, sound);
            return;
        }
     }
 #endif
 
-    if(conf.Debug()) Error::Verbose("AGG::Cache::LoadWAV: ", M82::GetString(m82));
+    DEBUG(DBG_ENGINE , DBG_INFO, "AGG::Cache::LoadWAV: " << M82::GetString(m82));
     std::vector<u8> body;
 
 #ifdef WITH_MIXER
@@ -649,7 +648,7 @@ void AGG::Cache::LoadMID(const XMI::xmi_t xmi)
 
     if(v.size()) return;
 
-    if(Settings::Get().Debug()) Error::Verbose("AGG::Cache::LoadMID: ", XMI::GetString(xmi));
+    DEBUG(DBG_ENGINE , DBG_INFO, "AGG::Cache::LoadMID: " << XMI::GetString(xmi));
 
     if(! Mixer::isValid()) return;
 
@@ -673,7 +672,7 @@ void AGG::Cache::LoadMID(const XMI::xmi_t xmi)
 
 void AGG::Cache::LoadPAL(void)
 {
-    if(Settings::Get().Debug()) Error::Verbose("AGG::Cache::LoadPAL: ", Palette::Get().Size());
+    DEBUG(DBG_ENGINE , DBG_INFO, "AGG::Cache::LoadPAL: " << Palette::Get().Size());
 }
 
 void AGG::Cache::LoadFNT(void)
@@ -695,17 +694,14 @@ void AGG::Cache::LoadFNT(void)
 
 	delete [] unicode;
 
-	if(conf.Debug())
+	if(fnt_cache.size())
 	{
-	    if(fnt_cache.size())
-	    {
-    		Error::Verbose("AGG::LoadFonts: normal fonts " + conf.FontsNormal());
-    	        Error::Verbose("AGG::LoadFonts:  small fonts " + conf.FontsSmall());
-    		Error::Verbose("AGG::LoadFonts: preload english charsets");
-	    }
-	    else
-		Error::Verbose("AGG::LoadFonts: internal.");
+    	    DEBUG(DBG_ENGINE , DBG_INFO, "AGG::LoadFonts: normal fonts " << conf.FontsNormal());
+    	    DEBUG(DBG_ENGINE , DBG_INFO, "AGG::LoadFonts:  small fonts " << conf.FontsSmall());
+    	    DEBUG(DBG_ENGINE , DBG_INFO, "AGG::LoadFonts: preload english charsets");
 	}
+	else
+	    DEBUG(DBG_ENGINE , DBG_INFO, "AGG::LoadFonts: internal.");
     }
     else
 #endif
@@ -713,7 +709,7 @@ void AGG::Cache::LoadFNT(void)
 	PreloadObject(ICN::SMALFONT);
 	PreloadObject(ICN::FONT);
 
-	if(conf.Debug()) Error::Verbose("AGG::LoadFonts: internal.");
+	DEBUG(DBG_ENGINE , DBG_INFO, "AGG::LoadFonts: internal.");
     }
 }
 
@@ -738,7 +734,7 @@ void AGG::Cache::LoadFNT(u16 ch)
 	    font_medium.RenderUnicodeChar(fnt_cache[ch].medium_yellow, ch, yellow, conf.FontsRenderBlended() ? SDL::Font::BLENDED : SDL::Font::SOLID);
 	}
 
-	if(conf.Debug()) Error::Verbose("AGG::LoadChar: ", static_cast<int>(ch));
+	DEBUG(DBG_ENGINE , DBG_TRACE, "AGG::LoadChar: 0x" << std::hex << static_cast<int>(ch));
     }
 }
 #endif
@@ -746,7 +742,7 @@ void AGG::Cache::LoadFNT(u16 ch)
 /* free ICN object in AGG::Cache */
 void AGG::Cache::FreeICN(const ICN::icn_t icn)
 {
-    if(1 < Settings::Get().Debug()) Error::Verbose("AGG::Cache::FreeICN: ", ICN::GetString(icn));
+    DEBUG(DBG_ENGINE , DBG_INFO, "AGG::Cache::FreeICN: " << ICN::GetString(icn));
     if(icn_cache[icn].sprites){ delete [] icn_cache[icn].sprites; icn_cache[icn].sprites = NULL; }
     if(icn_cache[icn].reflect){ delete [] icn_cache[icn].reflect; icn_cache[icn].reflect = NULL; }
     icn_cache[icn].count = 0;
@@ -783,7 +779,7 @@ const Sprite & AGG::Cache::GetICN(const ICN::icn_t icn, u16 index, bool reflect)
     // out of range?
     if(v.count && index >= v.count)
     {
-	Error::Warning("AGG::GetICN: " + std::string(ICN::GetString(icn)) + ", index out of range: ", index);
+	DEBUG(DBG_ENGINE , DBG_WARN, "AGG::GetICN: " << ICN::GetString(icn) << ", index out of range: " << index);
 	index = 0;
     }
 
@@ -792,11 +788,9 @@ const Sprite & AGG::Cache::GetICN(const ICN::icn_t icn, u16 index, bool reflect)
 	LoadICN(icn, index, reflect);
 
     // invalid sprite?
-    if(Settings::Get().Debug() &&  ((reflect && !v.reflect[index].valid()) || (!reflect && !v.sprites[index].valid())))
+    if((reflect && !v.reflect[index].valid()) || (!reflect && !v.sprites[index].valid()))
     {
-	Error::Verbose("AGG::Cache::GetICN: return invalid sprite: ", ICN::GetString(icn));
-	Error::Verbose("AGG::Cache::GetICN: index: ", index);
-	Error::Verbose("AGG::Cache::GetICN: reflect: ", (reflect ? "true" : "false"));
+	DEBUG(DBG_ENGINE , DBG_INFO, "AGG::Cache::GetICN: return invalid sprite: " << ICN::GetString(icn) << ", index: " << index << ", reflect: " << (reflect ? "true" : "false"));
     }
 
     return reflect ? v.reflect[index] : v.sprites[index];
@@ -830,7 +824,7 @@ const Surface & AGG::Cache::GetTIL(const TIL::til_t til, u16 index, u8 shape)
 
     if(index2 >= v.count)
     {
-	Error::Warning("AGG::GetTIL: " + std::string(TIL::GetString(til)) + ", index out of range: ", index);
+	DEBUG(DBG_ENGINE , DBG_WARN, "AGG::GetTIL: "  << TIL::GetString(til) << ", index out of range: " << index);
 	index2 = 0;
     }
 
@@ -846,13 +840,12 @@ const Surface & AGG::Cache::GetTIL(const TIL::til_t til, u16 index, u8 shape)
 	    TIL::Reflect(surface, src, shape);
 	}
 	else
-	Error::Warning("AGG::GetTIL: src surface is NULL");
+	DEBUG(DBG_ENGINE , DBG_WARN, "AGG::GetTIL: src surface is NULL");
     }
 
     if(! surface.valid())
     {
-	Error::Warning("AGG::GetTIL: invalid sprite: ", TIL::GetString(til));
-	Error::Warning("AGG::GetTIL: index: ", index);
+	DEBUG(DBG_ENGINE , DBG_WARN, "AGG::GetTIL: invalid sprite: " << TIL::GetString(til) << ", index: " << index);
     }
 
     return surface;
@@ -1127,7 +1120,7 @@ void AGG::Cache::LoadLOOPXXSounds(const std::vector<u8> & vols)
 		    Mixer::Volume(channel, *vol);
 		    Mixer::Resume(channel);
 
-		    if(conf.Debug()) Error::Verbose("AGG::PlayLOOPSound: ", M82::GetString(m82));
+		    DEBUG(DBG_ENGINE , DBG_INFO, "AGG::PlayLOOPSound: " << M82::GetString(m82));
 		}
 	    }
 	}
@@ -1141,7 +1134,7 @@ void AGG::PlaySound(const M82::m82_t m82)
 
     if(conf.Sound())
     {
-	if(conf.Debug()) Error::Verbose("AGG::PlaySound: ", M82::GetString(m82));
+	DEBUG(DBG_ENGINE , DBG_INFO, "AGG::PlaySound: " << M82::GetString(m82));
 	const std::vector<u8> & v = AGG::Cache::Get().GetWAV(m82);
 	Mixer::Play(&v[0], v.size(), -1, false);
     }
@@ -1172,7 +1165,7 @@ void AGG::PlayMusic(const MUS::mus_t mus, bool loop)
 	    String::Replace(shortname, ".ogg", ".mp3");
 	    if(FilePresent(shortname)) filename = shortname.c_str();
 	    else
-		Error::Warning("AGG::PlayMusic: error read file: " + musname + ", skipping...");
+		DEBUG(DBG_ENGINE , DBG_WARN, "AGG::PlayMusic: error read file: " << musname << ", skipping...");
 	}
 
 	if(filename) Music::Play(filename, loop);
@@ -1184,13 +1177,13 @@ void AGG::PlayMusic(const MUS::mus_t mus, bool loop)
 	    Music::Play(run.c_str(), loop);
 	}	    
 #endif
-	if(conf.Debug()) Error::Verbose("AGG::PlayMusic: " + MUS::GetString(mus));
+	DEBUG(DBG_ENGINE , DBG_INFO, "AGG::PlayMusic: " << MUS::GetString(mus));
     }
     else
     if(conf.Modes(Settings::MUSIC_CD) && Cdrom::isValid())
     {
 	Cdrom::Play(mus, loop);
-	if(conf.Debug()) Error::Verbose("AGG::PlayMusic: cd track ", mus);
+	DEBUG(DBG_ENGINE , DBG_INFO, "AGG::PlayMusic: cd track " << static_cast<int>(mus));
     }
     else
     {
@@ -1214,7 +1207,7 @@ void AGG::PlayMusic(const MUS::mus_t mus, bool loop)
 	    }
 #endif
 	}
-	if(conf.Debug()) Error::Verbose("AGG::PlayMusic: ", XMI::GetString(xmi));
+	DEBUG(DBG_ENGINE , DBG_INFO, "AGG::PlayMusic: " << XMI::GetString(xmi));
     }
 }
 
@@ -1231,7 +1224,7 @@ const Surface & AGG::GetUnicodeLetter(u16 ch, u8 ft)
 
 const Surface & AGG::GetLetter(char ch, u8 ft)
 {
-    if(ch < 0x21) Error::Warning("AGG::GetLetter: unknown letter");
+    if(ch < 0x21) DEBUG(DBG_ENGINE , DBG_WARN, "AGG::GetLetter: unknown letter");
 
     switch(ft)
     {

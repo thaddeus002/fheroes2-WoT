@@ -191,13 +191,13 @@ Game::menu_t Game::ScenarioInfo(void)
 	// click ok
 	if(le.KeyPress(KEY_RETURN) || le.MouseClickLeft(buttonOk))
 	{
-	    if(Settings::Get().Debug()) Error::Verbose("select maps: " + conf.MapsFile());
-	    if(Settings::Get().Debug()) Error::Verbose("difficulty: ", Difficulty::String(conf.GameDifficulty()));
+	    DEBUG(DBG_GAME , DBG_INFO, "Game::ScenarioInfo: select maps: " << conf.MapsFile() << \
+		    ", difficulty: " << Difficulty::String(conf.GameDifficulty()));
 	    conf.FixKingdomRandomRace();
 	    if(Game::HOTSEAT == conf.GameType())
 		conf.SetMyColor(Color::GRAY);
 	    else
-	    if(Settings::Get().Debug()) Error::Verbose("select color: ", Color::String(conf.MyColor()));
+	    DEBUG(DBG_GAME , DBG_INFO, "Game::ScenarioInfo: select color: " << Color::String(conf.MyColor()));
 	    result = STARTGAME;
 	    break;
 	}

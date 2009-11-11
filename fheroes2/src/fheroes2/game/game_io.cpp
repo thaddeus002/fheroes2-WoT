@@ -41,7 +41,7 @@
 
 bool Game::Save(const std::string &fn)
 {
-    if(Settings::Get().Debug()) Error::Verbose("Game::Save: " + fn);
+    DEBUG(DBG_GAME , DBG_INFO, "Game::Save: " << fn);
 
     Game::IO msg;
 
@@ -99,7 +99,7 @@ bool Game::IO::LoadSAV(const std::string & fn)
 
 bool Game::Load(const std::string & fn)
 {
-    if(Settings::Get().Debug()) Error::Verbose("Game::Load: " + fn);
+    DEBUG(DBG_GAME , DBG_INFO, "Game::Load: " << fn);
 
     // loading info
     Display & display = Display::Get();
@@ -254,7 +254,7 @@ bool Game::IO::SaveBIN(QueueMessage & msg)
     msg.Push(static_cast<u32>(world.vec_tiles.size()));
     for(u32 ii = 0; ii < world.vec_tiles.size(); ++ii)
     {
-	if(NULL == world.vec_tiles[ii]){ Error::Warning("Game::IO::SaveBIN: tiles is NULL"); return false; }
+	if(NULL == world.vec_tiles[ii]){ DEBUG(DBG_GAME , DBG_WARN, "Game::IO::SaveBIN: tiles is NULL"); return false; }
 	const Maps::Tiles & tile = *world.vec_tiles[ii];
 
 	msg.Push(tile.tile_index);
@@ -299,7 +299,7 @@ bool Game::IO::SaveBIN(QueueMessage & msg)
     msg.Push(static_cast<u32>(world.vec_heroes.size()));
     for(u32 ii = 0; ii < world.vec_heroes.size(); ++ii)
     {
-	if(NULL == world.vec_heroes[ii]){ Error::Warning("Game::IO::SaveBIN: heroes is NULL"); return false; }
+	if(NULL == world.vec_heroes[ii]){ DEBUG(DBG_GAME , DBG_WARN, "Game::IO::SaveBIN: heroes is NULL"); return false; }
 	PackHeroes(msg, *world.vec_heroes[ii]);
     }
 
@@ -308,7 +308,7 @@ bool Game::IO::SaveBIN(QueueMessage & msg)
     msg.Push(static_cast<u32>(world.vec_castles.size()));
     for(u32 ii = 0; ii < world.vec_castles.size(); ++ii)
     {
-	if(NULL == world.vec_castles[ii]){ Error::Warning("Game::IO::SaveBIN: castles is NULL"); return false; }
+	if(NULL == world.vec_castles[ii]){ DEBUG(DBG_GAME , DBG_WARN, "Game::IO::SaveBIN: castles is NULL"); return false; }
 	PackCastle(msg, *world.vec_castles[ii]);
     }
 
@@ -317,7 +317,7 @@ bool Game::IO::SaveBIN(QueueMessage & msg)
     msg.Push(static_cast<u32>(world.vec_kingdoms.size()));
     for(u32 ii = 0; ii < world.vec_kingdoms.size(); ++ii)
     {
-	if(NULL == world.vec_kingdoms[ii]){ Error::Warning("Game::IO::SaveBIN: kingdoms is NULL"); return false; }
+	if(NULL == world.vec_kingdoms[ii]){ DEBUG(DBG_GAME , DBG_WARN, "Game::IO::SaveBIN: kingdoms is NULL"); return false; }
 	PackKingdom(msg, *world.vec_kingdoms[ii]);
     }
 
@@ -365,7 +365,7 @@ bool Game::IO::SaveBIN(QueueMessage & msg)
 	std::vector<GameEvent::Day *>::const_iterator it2 = world.vec_eventsday.end();
 	for(; it1 != it2; ++it1)
 	{
-	    if(NULL == *it1){ Error::Warning("Game::IO::SaveBIN: eventday is NULL"); return false; }
+	    if(NULL == *it1){ DEBUG(DBG_GAME , DBG_WARN, "Game::IO::SaveBIN: eventday is NULL"); return false; }
 
 	    msg.Push(static_cast<u32>((*it1)->resource.wood));
 	    msg.Push(static_cast<u32>((*it1)->resource.mercury));
@@ -390,7 +390,7 @@ bool Game::IO::SaveBIN(QueueMessage & msg)
 	std::vector<GameEvent::Coord *>::const_iterator it2 = world.vec_eventsmap.end();
 	for(; it1 != it2; ++it1)
 	{
-	    if(NULL == *it1){ Error::Warning("Game::IO::SaveBIN: eventmaps is NULL"); return false; }
+	    if(NULL == *it1){ DEBUG(DBG_GAME , DBG_WARN, "Game::IO::SaveBIN: eventmaps is NULL"); return false; }
 
 	    msg.Push((*it1)->index_map);
 	    msg.Push(static_cast<u32>((*it1)->resource.wood));
@@ -416,7 +416,7 @@ bool Game::IO::SaveBIN(QueueMessage & msg)
 	std::vector<GameEvent::Riddle *>::const_iterator it2 = world.vec_riddles.end();
 	for(; it1 != it2; ++it1)
 	{
-	    if(NULL == *it1){ Error::Warning("Game::IO::SaveBIN: riddles is NULL"); return false; }
+	    if(NULL == *it1){ DEBUG(DBG_GAME , DBG_WARN, "Game::IO::SaveBIN: riddles is NULL"); return false; }
 
 	    msg.Push((*it1)->index_map);
 	    msg.Push(static_cast<u32>((*it1)->resource.wood));
@@ -603,13 +603,13 @@ bool Game::IO::LoadBIN(QueueMessage & msg)
     world.Reset();
 
     msg.Pop(byte16);
-    if(byte16 != 0xFF01){ Error::Warning("0xFF01"); return false; }
+    if(byte16 != 0xFF01){ DEBUG(DBG_GAME , DBG_WARN, "Game::IO::LoadBIN: 0xFF01"); return false; }
 
     // format version
     msg.Pop(format);
-    if(format > CURRENT_FORMAT_VERSION) Error::Warning("Game::IO::LoadBIN: unknown format: ", format);
+    if(format > CURRENT_FORMAT_VERSION) DEBUG(DBG_GAME , DBG_WARN, "Game::IO::LoadBIN: unknown format: 0x" << std::hex << format);
     else
-    if(conf.Debug()) Error::Verbose("Game::IO::LoadBIN: format: ", format);
+    DEBUG(DBG_GAME , DBG_INFO, "Game::IO::LoadBIN: format: " << format);
     if(format >= FORMAT_VERSION_1293)
     {
 	// major version
@@ -625,7 +625,7 @@ bool Game::IO::LoadBIN(QueueMessage & msg)
 
     // maps
     msg.Pop(byte16);
-    if(byte16 != 0xFF02) Error::Warning("0xFF02");
+    if(byte16 != 0xFF02) DEBUG(DBG_GAME , DBG_WARN, "Game::IO::LoadBIN: 0xFF02");
     msg.Pop(conf.current_maps_file.size_w);
     msg.Pop(conf.current_maps_file.size_h);
     msg.Pop(conf.current_maps_file.file);
@@ -644,7 +644,7 @@ bool Game::IO::LoadBIN(QueueMessage & msg)
     msg.Pop(conf.current_maps_file.loss2);
     // races
     msg.Pop(byte16);
-    if(byte16 != 0xFF03) Error::Warning("0xFF03");
+    if(byte16 != 0xFF03) DEBUG(DBG_GAME , DBG_WARN, "Game::IO::LoadBIN: 0xFF03");
     msg.Pop(byte8); conf.current_maps_file.races[0] = byte8;
     msg.Pop(byte8); conf.current_maps_file.races[1] = byte8;
     msg.Pop(byte8); conf.current_maps_file.races[2] = byte8;
@@ -657,7 +657,7 @@ bool Game::IO::LoadBIN(QueueMessage & msg)
     msg.Pop(conf.current_maps_file.description);
     // game
     msg.Pop(byte16);
-    if(byte16 != 0xFF04) Error::Warning("0xFF04");
+    if(byte16 != 0xFF04) DEBUG(DBG_GAME , DBG_WARN, "Game::IO::LoadBIN: 0xFF04");
     msg.Pop(byte8); conf.game_difficulty = Difficulty::Get(byte8);
     msg.Pop(byte8); conf.my_color = Color::Get(byte8);
     msg.Pop(byte8); conf.cur_color = Color::Get(byte8);
@@ -677,7 +677,7 @@ bool Game::IO::LoadBIN(QueueMessage & msg)
     }
     // world
     msg.Pop(byte16);
-    if(byte16 != 0xFF05) Error::Warning("0xFF05");
+    if(byte16 != 0xFF05) DEBUG(DBG_GAME , DBG_WARN, "Game::IO::LoadBIN: 0xFF05");
     msg.Pop(world.width);
     msg.Pop(world.height);
     msg.Pop(world.ultimate_artifact);
@@ -691,7 +691,7 @@ bool Game::IO::LoadBIN(QueueMessage & msg)
 
     // tiles
     msg.Pop(byte16);
-    if(byte16 != 0xFF06) Error::Warning("0xFF06");
+    if(byte16 != 0xFF06) DEBUG(DBG_GAME , DBG_WARN, "Game::IO::LoadBIN: 0xFF06");
     msg.Pop(byte32);
     world.vec_tiles.reserve(byte32);
     for(u32 maps_index = 0; maps_index < byte32; ++maps_index)
@@ -745,7 +745,7 @@ bool Game::IO::LoadBIN(QueueMessage & msg)
 
     // heroes
     msg.Pop(byte16);
-    if(byte16 != 0xFF07) Error::Warning("0xFF07");
+    if(byte16 != 0xFF07) DEBUG(DBG_GAME , DBG_WARN, "Game::IO::LoadBIN: 0xFF07");
     msg.Pop(byte32);
     world.vec_heroes.reserve(byte32);
     for(u32 ii = 0; ii < byte32; ++ii)
@@ -757,7 +757,7 @@ bool Game::IO::LoadBIN(QueueMessage & msg)
 
     // castles
     msg.Pop(byte16);
-    if(byte16 != 0xFF08) Error::Warning("0xFF08");
+    if(byte16 != 0xFF08) DEBUG(DBG_GAME , DBG_WARN, "Game::IO::LoadBIN: 0xFF08");
     msg.Pop(byte32);
     world.vec_castles.reserve(byte32);
     for(u32 ii = 0; ii < byte32; ++ii)
@@ -769,7 +769,7 @@ bool Game::IO::LoadBIN(QueueMessage & msg)
 
     // kingdoms
     msg.Pop(byte16);
-    if(byte16 != 0xFF09) Error::Warning("0xFF09");
+    if(byte16 != 0xFF09) DEBUG(DBG_GAME , DBG_WARN, "Game::IO::LoadBIN: 0xFF09");
     msg.Pop(byte32);
     world.vec_kingdoms.reserve(byte32);
     for(u32 ii = 0; ii < byte32; ++ii)
@@ -781,7 +781,7 @@ bool Game::IO::LoadBIN(QueueMessage & msg)
 
     // signs
     msg.Pop(byte16);
-    if(byte16 != 0xFF0A) Error::Warning("0xFF0A");
+    if(byte16 != 0xFF0A) DEBUG(DBG_GAME , DBG_WARN, "Game::IO::LoadBIN: 0xFF0A");
     msg.Pop(byte32);
     world.map_sign.clear();
     for(u32 ii = 0; ii < byte32; ++ii)
@@ -793,7 +793,7 @@ bool Game::IO::LoadBIN(QueueMessage & msg)
 
     // captured object
     msg.Pop(byte16);
-    if(byte16 != 0xFF0B) Error::Warning("0xFF0B");
+    if(byte16 != 0xFF0B) DEBUG(DBG_GAME , DBG_WARN, "Game::IO::LoadBIN: 0xFF0B");
     msg.Pop(byte32);
     world.map_captureobj.clear();
     for(u32 ii = 0; ii < byte32; ++ii)
@@ -806,7 +806,7 @@ bool Game::IO::LoadBIN(QueueMessage & msg)
 
     // rumors
     msg.Pop(byte16);
-    if(byte16 != 0xFF0C) Error::Warning("0xFF0C");
+    if(byte16 != 0xFF0C) DEBUG(DBG_GAME , DBG_WARN, "Game::IO::LoadBIN: 0xFF0C");
     msg.Pop(byte32);
     world.vec_rumors.clear();
     world.vec_rumors.reserve(byte32);
@@ -818,7 +818,7 @@ bool Game::IO::LoadBIN(QueueMessage & msg)
 
     // day events
     msg.Pop(byte16);
-    if(byte16 != 0xFF0D) Error::Warning("0xFF0D");
+    if(byte16 != 0xFF0D) DEBUG(DBG_GAME , DBG_WARN, "Game::IO::LoadBIN: 0xFF0D");
     msg.Pop(byte32);
     world.vec_eventsday.clear();
     world.vec_eventsday.reserve(byte32);
@@ -845,7 +845,7 @@ bool Game::IO::LoadBIN(QueueMessage & msg)
 
     // coord events
     msg.Pop(byte16);
-    if(byte16 != 0xFF0E) Error::Warning("0xFF0E");
+    if(byte16 != 0xFF0E) DEBUG(DBG_GAME , DBG_WARN, "Game::IO::LoadBIN: 0xFF0E");
     msg.Pop(byte32);
     world.vec_eventsmap.clear();
     world.vec_eventsmap.reserve(byte32);
@@ -874,7 +874,7 @@ bool Game::IO::LoadBIN(QueueMessage & msg)
     
     // sphinx riddles
     msg.Pop(byte16);
-    if(byte16 != 0xFF0F) Error::Warning("0xFF0F");
+    if(byte16 != 0xFF0F) DEBUG(DBG_GAME , DBG_WARN, "Game::IO::LoadBIN: 0xFF0F");
     msg.Pop(byte32);
     world.vec_riddles.clear();
     world.vec_riddles.reserve(byte32);

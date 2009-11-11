@@ -21,7 +21,7 @@ static void DrawArmySummary(const Army::BattleArmy_t &orig, const Army::BattleAr
 {
     if(orig.size() != current.size())
     {
-        Error::Warning("except: orig.size() != current.size()");
+        DEBUG(DBG_BATTLE , DBG_WARN, "DrawArmySummary: orig.size() != current.size()");
         return;
     }
 

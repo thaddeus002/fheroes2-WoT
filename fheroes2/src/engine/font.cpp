@@ -20,8 +20,8 @@
 
 #ifdef WITH_TTF
 
+#include <iostream>
 #include "font.h"
-#include "error.h"
 #include "engine.h"
 #include "surface.h"
 #include "SDL_ttf.h"
@@ -39,7 +39,7 @@ SDL::Font::~Font()
 
 void SDL::Font::Init(void)
 {
-    if(0 != TTF_Init()) Error::Verbose("Font::Init: error");
+    if(0 != TTF_Init()) std::cerr << "Font::Init: error" << std::endl;
     else init = true;
 }
 
@@ -62,7 +62,7 @@ bool SDL::Font::Open(const std::string & filename, u8 size)
 
 	fnt = TTF_OpenFont(filename.c_str(), size);
 
-	if(!fnt) Error::Warning("Font::Open: error open: " + filename);
+	if(!fnt) std::cerr << "Font::Open: error open: " << filename << std::endl;
     }
     return fnt;
 }

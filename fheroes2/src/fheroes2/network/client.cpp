@@ -20,6 +20,7 @@
 
 #ifdef WITH_NET
 
+#include "settings.h"
 #include "localevent.h"
 #include "client.h"
 
@@ -32,7 +33,7 @@ bool FH2Client::IsConnected(void) const
     return Modes(ST_CONNECT) && sd;
 }
 
-bool FH2Client::Wait(Network::Message & packet, u16 id, bool debug)
+bool FH2Client::Wait(Network::Message & packet, u16 id)
 {
     while(LocalEvent::Get().HandleEvents())
     {
@@ -41,42 +42,37 @@ bool FH2Client::Wait(Network::Message & packet, u16 id, bool debug)
             if(!packet.Recv(*this))
             {
                 Close();
-                if(debug) std::cerr << "error" << std::endl;
+		DEBUG(DBG_NETWORK , DBG_TRACE, "FH2Client::Wait: error");
                 return false;
             }
             if(id == packet.GetID()) break;
         }
 	DELAY(10);
     }
-    if(debug) packet.Dump();
     return true;
 }
 
-bool FH2Client::Send(Network::Message & packet, bool debug)
+bool FH2Client::Send(Network::Message & packet)
 {
-    if(debug) std::cerr << "Send: ";
     if(!packet.Send(*this))
     {
 	packet.Dump();
         Close();
-        if(debug) std::cerr << "error" << std::endl;
+	DEBUG(DBG_NETWORK , DBG_TRACE, "FH2Client::Send: error");
         return false;
     }
-    if(debug) packet.Dump();
     return true;
 }
 
-bool FH2Client::Recv(Network::Message & packet, bool debug)
+bool FH2Client::Recv(Network::Message & packet)
 {
-    if(debug) std::cerr << "Recv: ";
-    if(!packet.Recv(*this, debug))
+    if(!packet.Recv(*this))
     {
 	packet.Dump();
         Close();
-        if(debug) std::cerr << "error" << std::endl;
+	DEBUG(DBG_NETWORK , DBG_TRACE, "FH2Client::Recv: error");
         return false;
     }
-    if(debug) packet.Dump();
     return true;
 }
 

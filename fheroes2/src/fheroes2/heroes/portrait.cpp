@@ -22,6 +22,7 @@
 #include "gamedefs.h"
 #include "race.h"
 #include "heroes.h"
+#include "settings.h"
 #include "portrait.h"
 
 const Surface & Portrait::Get(const HeroBase &hero, const Portrait::size_t sz)
@@ -63,7 +64,7 @@ const Surface & Portrait::Captain(const Race::race_t rc, const Portrait::size_t 
 	    break;
     }
 
-    Error::Warning("Portrait::Captain: unknown race.");
+    DEBUG(DBG_GAME , DBG_WARN, "Portrait::Captain: unknown race.");
 
     return AGG::GetICN(ICN::PORT0090, 0);
 }

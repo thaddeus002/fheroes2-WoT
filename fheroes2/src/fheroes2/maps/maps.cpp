@@ -412,7 +412,7 @@ castle size: T and B - sprite, S - shadow, XX - center
 	    break;
 	
 	default:
-	    Error::Warning("Maps::UpdateRNDSpriteForCastle: correct only RND town and castle. index: ", GetIndexFromAbsPoint(center.x, center.y));
+	    DEBUG(DBG_GAME , DBG_WARN, "Maps::UpdateRNDSpriteForCastle: correct only RND town and castle. index: " << GetIndexFromAbsPoint(center.x, center.y));
 	    return;
     }
 

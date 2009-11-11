@@ -179,7 +179,7 @@ bool Chunk::Write(u8 *p) const
 
 void Chunk::Dump(void) const
 {
-    std::cout << "id:   ";
-    std::cout.write(id, 4);
-    std::cout << std::endl << "size: " << size << std::endl << "data: " << (data ? "[binary]" : "NULL" ) << std::endl;
+    std::cerr << "id:   ";
+    std::cerr.write(id, 4);
+    std::cerr << std::endl << "size: " << size << std::endl << "data: " << (data ? "[binary]" : "NULL" ) << std::endl;
 }

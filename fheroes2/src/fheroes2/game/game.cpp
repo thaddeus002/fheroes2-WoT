@@ -64,7 +64,7 @@ Game::menu_t Game::Credits(void)
 
     Dialog::Message("Free Heroes II Engine", str, Font::SMALL, Dialog::OK);
 
-    //Error::Verbose("Credits: under construction.");
+    //VERBOSE("Credits: under construction.");
 
     return Game::MAINMENU;
 }
@@ -256,7 +256,7 @@ void Game::KeyboardGlobalFilter(u16 sym, u16 mod)
 #else
                 stream << ".png";
 #endif
-	    if(display.Save(stream.str().c_str())) Error::Verbose("save: " + stream.str());
+	    if(display.Save(stream.str().c_str())) DEBUG(DBG_GAME , DBG_INFO, "Game::KeyboardGlobalFilter: save: " << stream.str());
         }
 	    break;
 

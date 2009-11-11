@@ -106,7 +106,7 @@ int Network::RunDedicatedServer(void)
 
         if(! server.Bind(conf.GetPort()))
         {
-            Error::Warning(Network::GetError());
+            DEBUG(DBG_NETWORK , DBG_WARN, "Network::RunDedicatedServer: " << Network::GetError());
             return -1;
         }
 

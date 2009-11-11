@@ -30,17 +30,7 @@ public:
     ~Error(){};
 
     class Exception{};
-
-    static void Verbose(const std::string & message);
-    static void Verbose(const std::string & message, const char*);
-    static void Verbose(const std::string & message, int value);
-    static void Warning(const std::string & message);
-    static void Warning(const std::string & message, const char*);
-    static void Warning(const std::string & message, int value);
-    static void Except(const std::string & message);
-    static void Except(const std::string & message, const char*);
-
-    static const std::string & SDLError(void);
+    static void Except(const char*, const char*);
 };
 
 #endif

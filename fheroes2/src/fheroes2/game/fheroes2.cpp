@@ -113,7 +113,7 @@ int main(int argc, char **argv)
 #ifdef WITH_EDITOR
                     case 'e':
 			conf.SetModes(Settings::EDITOR);
-			conf.SetDebug(3);
+			conf.SetDebug(DBG_GAME | DBG_INFO);
 			std::cout << "start: editor mode." << std::endl;
 			break;
 #endif			
@@ -212,9 +212,9 @@ int main(int argc, char **argv)
 	    AGG::Cache & cache = AGG::Cache::Get();
 
 	    // read data dir
-	    if(! cache.ReadDataDir()) Error::Except("AGG data files not found.");
+	    if(! cache.ReadDataDir()) Error::Except("FHeroes2: ", "AGG data files not found.");
 
-            if(conf.Debug()) conf.Dump();
+            if(IS_DEBUG(DBG_GAME, DBG_INFO)) conf.Dump();
 
             // load palette
 	    cache.LoadPAL();
@@ -286,8 +286,7 @@ int main(int argc, char **argv)
 
 	} catch(std::bad_alloc)
 	{
-	    MemoryInfoDump("std::bad_alloc:");
-	    Error::Verbose("out of memory");
+	    MemoryInfoDump("FHeroes2: out of memory:");
     	    AGG::Cache::Get().Dump();
 	} catch(Error::Exception)
 	{

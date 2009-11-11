@@ -20,62 +20,11 @@
 
 #include <stdexcept>
 #include <iostream>
-#include <sstream>
-#include "SDL.h"
-#include "types.h"
 #include "error.h"
 
 /* exception */
-void Error::Except(const std::string & message)
+void Error::Except(const char* message, const char* cstr)
 {
-    std::cout << "error: " << message << std::endl;
+    std::cerr << "Error::Except: " << message << cstr << std::endl;
     throw Exception();
-}
-
-void Error::Except(const std::string & message, const char* cstr)
-{
-    std::cout << "error: " << message << cstr << std::endl;
-    throw Exception();
-}
-
-void Error::Warning(const std::string & message)
-{
-    std::cout << "warning: " << message << std::endl;
-}
-
-void Error::Warning(const std::string & message, const char* cstr)
-{
-    std::cout << "warning: " << message << cstr << std::endl;
-}
-
-void Error::Warning(const std::string & message, int value)
-{
-    std::string str;
-
-    std::ostringstream stream;
-    stream << value;
-    str += stream.str();
-
-    std::cout << "warning: " << message << str << std::endl;
-}
-
-void Error::Verbose(const std::string & message)
-{
-    std::cout << message << std::endl;
-}
-
-void Error::Verbose(const std::string & message, const char* cstr)
-{
-    std::cout << message << cstr << std::endl;
-}
-
-void Error::Verbose(const std::string & message, int value)
-{
-    std::string str;
-
-    std::ostringstream stream;
-    stream << value;
-    str += stream.str();
-
-    std::cout << message << str << std::endl;
 }

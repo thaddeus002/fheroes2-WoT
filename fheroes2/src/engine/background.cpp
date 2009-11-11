@@ -20,7 +20,6 @@
 
 #include "background.h"
 #include "display.h"
-#include "error.h"
 
 Background::Background(const Rect &rt) : Surface(),Rect(rt)
 {

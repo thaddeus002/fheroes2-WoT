@@ -30,13 +30,13 @@
 Game::menu_t Game::LoadCampain(void)
 {
     Settings::Get().SetGameType(Game::CAMPAIGN);
-    Error::Verbose("Load Campain Game: under construction.");
+    VERBOSE("Load Campain Game: under construction.");
     return Game::LOADGAME;
 }
 
 Game::menu_t Game::LoadMulti(void)
 {
-    Error::Verbose("Load Multi Game: under construction.");
+    VERBOSE("Load Multi Game: under construction.");
     return Game::LOADGAME;
 }
 

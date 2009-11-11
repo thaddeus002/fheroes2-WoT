@@ -499,7 +499,7 @@ void ActionToMonster(Heroes &hero, const u8 obj, const u16 dst_index)
 
     if(ext_conditions && ownRatio / otherRatio >= 2)
     {
-        if(Settings::Get().Debug()) Error::Verbose("ActionToMonster: possible " + hero.GetName() + " join monster " + monster.GetName());
+        DEBUG(DBG_GAME , DBG_INFO, "ActionToMonster: possible " << hero.GetName() << " join monster " << monster.GetName());
         
         if(tile.IsJoiner())
         {
@@ -572,7 +572,7 @@ void ActionToMonster(Heroes &hero, const u8 obj, const u16 dst_index)
         }
     }
     
-    if(Settings::Get().Debug()) Error::Verbose("ActionToMonster: " + hero.GetName() + " attack monster " + monster.GetName());
+    DEBUG(DBG_GAME , DBG_INFO, "ActionToMonster: " << hero.GetName() << " attack monster " << monster.GetName());
 
     u32 exp = 0;
     const Army::battle_t b = avoidBattle ? Army::WIN : Army::Battle(hero, army, tile, exp);
@@ -624,7 +624,7 @@ void ActionToHeroes(Heroes &hero, const u8 obj, const u16 dst_index)
 
     if(hero.GetColor() == other_hero->GetColor())
     {
-        if(Settings::Get().Debug()) Error::Verbose("ActionToHeroes: " + hero.GetName() + " meeting " + other_hero->GetName());
+        DEBUG(DBG_GAME , DBG_INFO, "ActionToHeroes: " << hero.GetName() << " meeting " << other_hero->GetName());
 
         hero.MeetingDialog(*other_hero);
     }
@@ -636,7 +636,7 @@ void ActionToHeroes(Heroes &hero, const u8 obj, const u16 dst_index)
 	    return;
 	}
 
-        if(Settings::Get().Debug()) Error::Verbose("ActionToHeroes: " + hero.GetName() + " attack enemy hero " + other_hero->GetName());
+        DEBUG(DBG_GAME , DBG_INFO, "ActionToHeroes: " << hero.GetName() << " attack enemy hero " << other_hero->GetName());
 
         Army::battle_t b;
         u32 exp = 0;
@@ -671,7 +671,7 @@ void ActionToCastle(Heroes &hero, const u8 obj, const u16 dst_index)
 
     if(hero.GetColor() == castle->GetColor())
     {
-        if(Settings::Get().Debug()) Error::Verbose("ActionToCastle: " + hero.GetName() + " goto castle " + castle->GetName());
+        DEBUG(DBG_GAME , DBG_INFO, "ActionToCastle: " << hero.GetName() << " goto castle " << castle->GetName());
 
         Mixer::Reduce();
 
@@ -682,7 +682,7 @@ void ActionToCastle(Heroes &hero, const u8 obj, const u16 dst_index)
     }
     else
     {
-        if(Settings::Get().Debug()) Error::Verbose("ActionToCastle: " + hero.GetName() + " attack enemy castle " + castle->GetName());
+        DEBUG(DBG_GAME , DBG_INFO, "ActionToCastle: " << hero.GetName() << " attack enemy castle " << castle->GetName());
         
         u32 exp = 0;
 
@@ -739,7 +739,7 @@ void ActionToBoat(Heroes &hero, const u8 obj, const u16 dst_index)
     tiles_to.SetObject(MP2::OBJ_HEROES);
     hero.SaveUnderObject(MP2::OBJ_ZERO);
 
-    if(Settings::Get().Debug()) Error::Verbose("ActionToBoat: " + hero.GetName() + " to boat");
+    DEBUG(DBG_GAME , DBG_INFO, "ActionToBoat: " << hero.GetName());
 }
 
 void ActionToCoast(Heroes &hero, const u8 obj, const u16 dst_index)
@@ -772,7 +772,7 @@ void ActionToCoast(Heroes &hero, const u8 obj, const u16 dst_index)
 	ActionToMonster(hero, MP2::OBJ_MONSTER, from_index);
     }
 
-    if(Settings::Get().Debug()) Error::Verbose("ActionToCoast: " + hero.GetName() + " to coast");
+    DEBUG(DBG_GAME , DBG_INFO, "ActionToCoast: " << hero.GetName());
 }
 
 void ActionToPickupResource(Heroes &hero, const u8 obj, const u16 dst_index)
@@ -827,7 +827,7 @@ void ActionToPickupResource(Heroes &hero, const u8 obj, const u16 dst_index)
     world.GetKingdom(hero.GetColor()).AddFundsResource(resource);
     tile.SetObject(MP2::OBJ_ZERO);
 
-    if(Settings::Get().Debug()) Error::Verbose("ActionToPickupResource: " + hero.GetName() + " pickup small resource");
+    DEBUG(DBG_GAME , DBG_INFO, "ActionToPickupResource: " << hero.GetName());
 }
 
 void ActionToResource(Heroes &hero, const u8 obj, const u16 dst_index)
@@ -892,7 +892,7 @@ void ActionToResource(Heroes &hero, const u8 obj, const u16 dst_index)
     tile.SetQuantity1(0);
     tile.SetQuantity2(0);
 
-    if(Settings::Get().Debug()) Error::Verbose("ActionToResource: " + hero.GetName() + " pickup small resource");
+    DEBUG(DBG_GAME , DBG_INFO, "ActionToResource: " << hero.GetName());
 }
 
 void ActionToSkeleton(Heroes &hero, const u8 obj, const u16 dst_index)
@@ -919,7 +919,7 @@ void ActionToSkeleton(Heroes &hero, const u8 obj, const u16 dst_index)
 	Dialog::Message("", _("You come upon the remains of an unfortunate adventurer.\nSearching through the tattered clothing, you find nothing."), Font::BIG, Dialog::OK);
     }
 
-    if(Settings::Get().Debug()) Error::Verbose("ActionToSkeleton: " + hero.GetName());
+    DEBUG(DBG_GAME , DBG_INFO, "ActionToSkeleton: " << hero.GetName());
 }
 
 void ActionToWagon(Heroes &hero, const u8 obj, const u16 dst_index)
@@ -972,7 +972,7 @@ void ActionToWagon(Heroes &hero, const u8 obj, const u16 dst_index)
 	Dialog::Message("", _("You come across an old wagon left by a trader who didn't quite make it to safe terrain.\nUnfortunately, others have found it first, and the wagon is empty."), Font::BIG, Dialog::OK);
     }
 
-    if(Settings::Get().Debug()) Error::Verbose("ActionToWagon: " + hero.GetName());
+    DEBUG(DBG_GAME , DBG_INFO, "ActionToWagon: " << hero.GetName());
 }
 
 void ActionToFlotSam(Heroes &hero, const u8 obj, const u16 dst_index)
@@ -1010,7 +1010,7 @@ void ActionToFlotSam(Heroes &hero, const u8 obj, const u16 dst_index)
     tile.RemoveObjectSprite();
     tile.SetObject(MP2::OBJ_ZERO);
 
-    if(Settings::Get().Debug()) Error::Verbose("ActionToFlotSam: " + hero.GetName() + " pickup small resource");
+    DEBUG(DBG_GAME , DBG_INFO, "ActionToFlotSam: " << hero.GetName());
 }
 
 void ActionToShrine(Heroes &hero, const u8 obj, const u16 dst_index)
@@ -1064,7 +1064,7 @@ void ActionToShrine(Heroes &hero, const u8 obj, const u16 dst_index)
     hero.SetVisited(dst_index, Settings::Get().Original() ? Visit::LOCAL : Visit::GLOBAL); // see dialog_quickinfo
     Dialog::SpellInfo(spell_name, body, spell());
 
-    if(Settings::Get().Debug()) Error::Verbose("ActionToShrine: " + hero.GetName());
+    DEBUG(DBG_GAME , DBG_INFO, "ActionToShrine: " << hero.GetName());
 }
 
 void ActionToWitchsHut(Heroes &hero, const u8 obj, const u16 dst_index)
@@ -1097,7 +1097,7 @@ void ActionToWitchsHut(Heroes &hero, const u8 obj, const u16 dst_index)
     String::Replace(body, "%{skill}", skill_name);
     Dialog::SkillInfo(head, body, skill, Skill::Level::BASIC);
 
-    if(Settings::Get().Debug()) Error::Verbose("ActionToWitchsHut: " + hero.GetName());
+    DEBUG(DBG_GAME , DBG_INFO, "ActionToWitchsHut: " << hero.GetName());
 }
 
 void ActionToGoodLuckObject(Heroes &hero, const u8 obj, const u16 dst_index)
@@ -1144,7 +1144,7 @@ void ActionToGoodLuckObject(Heroes &hero, const u8 obj, const u16 dst_index)
 	DialogLuck(MP2::StringObject(obj), body_true, true, 1);
     }
 
-    if(Settings::Get().Debug()) Error::Verbose("ActionToGoodLuckObject: " + hero.GetName());
+    DEBUG(DBG_GAME , DBG_INFO, "ActionToGoodLuckObject: " << hero.GetName());
 }
 
 void ActionToPoorLuckObject(Heroes &hero, const u8 obj, const u16 dst_index)
@@ -1223,14 +1223,14 @@ void ActionToPoorLuckObject(Heroes &hero, const u8 obj, const u16 dst_index)
 	DialogLuck(MP2::StringObject(obj), body, false, 2);
     }
 
-    if(Settings::Get().Debug()) Error::Verbose("ActionToPoorLuckObject: " + hero.GetName());
+    DEBUG(DBG_GAME , DBG_INFO, "ActionToPoorLuckObject: " << hero.GetName());
 }
 
 void ActionToSign(Heroes &hero, const u8 obj, const u16 dst_index)
 {
     PlaySoundWarning;
     Dialog::Message("Sign", world.MessageSign(dst_index), Font::BIG, Dialog::OK);
-    if(Settings::Get().Debug()) Error::Verbose("ActionToSign: " + hero.GetName());
+    DEBUG(DBG_GAME , DBG_INFO, "ActionToSign: " << hero.GetName());
 }
 
 void ActionToMagicWell(Heroes &hero, const u8 obj, const u16 dst_index)
@@ -1257,14 +1257,14 @@ void ActionToMagicWell(Heroes &hero, const u8 obj, const u16 dst_index)
 	Dialog::Message(MP2::StringObject(MP2::OBJ_MAGICWELL), _("A drink from the well has restored your spell points to maximum."), Font::BIG, Dialog::OK);
     }
 
-    if(Settings::Get().Debug()) Error::Verbose("ActionToMagicWell: " + hero.GetName());
+    DEBUG(DBG_GAME , DBG_INFO, "ActionToMagicWell: " << hero.GetName());
 }
 
 void ActionToTradingPost(Heroes &hero, const u8 obj)
 {
     PlaySoundSuccess;
     Dialog::Marketplace(true);
-    if(Settings::Get().Debug()) Error::Verbose("ActionToTradingPost: " + hero.GetName());
+    DEBUG(DBG_GAME , DBG_INFO, "ActionToTradingPost: " << hero.GetName());
 }
 
 void ActionToPrimarySkillObject(Heroes &hero, const u8 obj, const u16 dst_index)
@@ -1328,7 +1328,7 @@ void ActionToPrimarySkillObject(Heroes &hero, const u8 obj, const u16 dst_index)
 	}
     }
 
-    if(Settings::Get().Debug()) Error::Verbose("ActionToPrimarySkillObject: " + hero.GetName());
+    DEBUG(DBG_GAME , DBG_INFO, "ActionToPrimarySkillObject: " << hero.GetName());
 }
 
 void ActionToPoorMoraleObject(Heroes &hero, const u8 obj, const u16 dst_index)
@@ -1399,7 +1399,7 @@ void ActionToPoorMoraleObject(Heroes &hero, const u8 obj, const u16 dst_index)
                 	case 15: resource.gold = 2000; break;
                 	case 25: resource.gold = 5000; break;
                 	case 50: resource.gold = 2000; art = Artifact::FromInt(tile.GetQuantity1()); break;
-                	default: Error::Warning("ActionToPoorMoraleObject: unknown variant for ShipWreck, index: ", dst_index); break;
+                	default: DEBUG(DBG_GAME , DBG_WARN, "ActionToPoorMoraleObject: unknown variant for ShipWreck, index: " << dst_index); break;
                     }
 
 		    // battle
@@ -1494,7 +1494,7 @@ void ActionToPoorMoraleObject(Heroes &hero, const u8 obj, const u16 dst_index)
 	DialogMorale(MP2::StringObject(obj), body, false, 1);
     }
 
-    if(Settings::Get().Debug()) Error::Verbose("ActionToPoorMoraleObject: " + hero.GetName());
+    DEBUG(DBG_GAME , DBG_INFO, "ActionToPoorMoraleObject: " << hero.GetName());
 }
 
 void ActionToGoodMoraleObject(Heroes &hero, const u8 obj, const u16 dst_index)
@@ -1556,7 +1556,7 @@ void ActionToGoodMoraleObject(Heroes &hero, const u8 obj, const u16 dst_index)
 	}
     }
 
-    if(Settings::Get().Debug()) Error::Verbose("ActionToGoodMoraleObject: " + hero.GetName());
+    DEBUG(DBG_GAME , DBG_INFO, "ActionToGoodMoraleObject: " << hero.GetName());
 }
 
 
@@ -1596,7 +1596,7 @@ void ActionToExperienceObject(Heroes &hero, const u8 obj, const u16 dst_index)
 	hero.IncreaseExperience(exp);
     }
 
-    if(Settings::Get().Debug()) Error::Verbose("ActionToExperienceObject: " + hero.GetName());
+    DEBUG(DBG_GAME , DBG_INFO, "ActionToExperienceObject: " << hero.GetName());
 }
 
 void ActionToShipwreckSurvivor(Heroes &hero, const u8 obj, const u16 dst_index)
@@ -1626,7 +1626,7 @@ void ActionToShipwreckSurvivor(Heroes &hero, const u8 obj, const u16 dst_index)
     tile.SetQuantity1(0);
     tile.SetObject(MP2::OBJ_ZERO);
 
-    if(Settings::Get().Debug()) Error::Verbose("ActionToShipwreckSurvivor: " + hero.GetName());
+    DEBUG(DBG_GAME , DBG_INFO, "ActionToShipwreckSurvivor: " << hero.GetName());
 }
 
 void ActionToArtifact(Heroes &hero, const u8 obj, const u16 dst_index)
@@ -1859,7 +1859,7 @@ void ActionToArtifact(Heroes &hero, const u8 obj, const u16 dst_index)
 	tile.SetObject(MP2::OBJ_ZERO);
     }
 
-    if(Settings::Get().Debug()) Error::Verbose("ActionToArtifact: " + hero.GetName() + " pickup artifact");
+    DEBUG(DBG_GAME , DBG_INFO, "ActionToArtifact: " << hero.GetName());
 }
 
 void ActionToTreasureChest(Heroes &hero, const u8 obj, const u16 dst_index)
@@ -1949,7 +1949,7 @@ void ActionToTreasureChest(Heroes &hero, const u8 obj, const u16 dst_index)
     tile.RemoveObjectSprite();
     tile.SetObject(MP2::OBJ_ZERO);
 
-    if(Settings::Get().Debug()) Error::Verbose("ActionToTreasureChest: " + hero.GetName() + " pickup chest");
+    DEBUG(DBG_GAME , DBG_INFO, "ActionToTreasureChest: " << hero.GetName());
 }
 
 void ActionToAncientLamp(Heroes &hero, const u8 obj, const u16 dst_index)
@@ -1984,7 +1984,7 @@ void ActionToAncientLamp(Heroes &hero, const u8 obj, const u16 dst_index)
 	}
     }
 
-    if(Settings::Get().Debug()) Error::Verbose("ActionToAncientLamp: " + hero.GetName() + " pickup chest");
+    DEBUG(DBG_GAME , DBG_INFO, "ActionToAncientLamp: " << hero.GetName());
 }
 
 void ActionToTeleports(Heroes &hero, const u16 index_from)
@@ -1995,7 +1995,7 @@ void ActionToTeleports(Heroes &hero, const u16 index_from)
     if(index_from == index_to)
     {
 	AGG::PlaySound(M82::RSBRYFZL);
-	Error::Warning("ActionToTeleports: action unsuccessfully...");
+	DEBUG(DBG_GAME , DBG_WARN, "ActionToTeleports: action unsuccessfully...");
 	return;
     }
 
@@ -2022,7 +2022,7 @@ void ActionToTeleports(Heroes &hero, const u16 index_from)
 
     if(Maps::TileUnderProtection(hero.GetIndex(), &index_to)) ActionToMonster(hero, MP2::OBJ_MONSTER, index_to);
 
-    if(Settings::Get().Debug()) Error::Verbose("ActionToStoneLights: " + hero.GetName());
+    DEBUG(DBG_GAME , DBG_INFO, "ActionToStoneLights: " << hero.GetName());
 }
 
 void ActionToWhirlpools(Heroes &hero, const u8 obj, const u16 index_from)
@@ -2033,7 +2033,7 @@ void ActionToWhirlpools(Heroes &hero, const u8 obj, const u16 index_from)
     if(index_from == index_to)
     {
 	AGG::PlaySound(M82::RSBRYFZL);
-	Error::Warning("ActionToWhirlpools: action unsuccessfully...");
+	DEBUG(DBG_GAME , DBG_WARN, "ActionToWhirlpools: action unsuccessfully...");
 	return;
     }
 
@@ -2067,7 +2067,7 @@ void ActionToWhirlpools(Heroes &hero, const u8 obj, const u16 index_from)
 	troops.SetCount(c ? c : 1);
     }
 
-    if(Settings::Get().Debug()) Error::Verbose("ActionToWhirlpools: " + hero.GetName());
+    DEBUG(DBG_GAME , DBG_INFO, "ActionToWhirlpools: " << hero.GetName());
 }
 
 void ActionToAbandoneMine(Heroes &hero, const u8 obj, const u16 dst_index)
@@ -2104,10 +2104,8 @@ void ActionToAbandoneMine(Heroes &hero, const u8 obj, const u16 dst_index)
         
     	    default: break;
 	}
-	if(Settings::Get().Debug()) Error::Verbose("ActionToAbandoneMine: " + hero.GetName() + " captured: " + std::string(MP2::StringObject(obj)));
+	DEBUG(DBG_GAME , DBG_INFO, "ActionToAbandoneMine: " << hero.GetName());
     }
-    else
-    if(Settings::Get().Debug()) Error::Verbose("ActionToAbandoneMine: " + hero.GetName() + " skipped: " + std::string(MP2::StringObject(obj)));
 }
 
 /* capture color object */
@@ -2250,7 +2248,7 @@ void ActionToCaptureObject(Heroes &hero, const u8 obj, const u16 dst_index)
 	    break;
 
         default:
-    	    Error::Warning("ActionToCaptureObject: unknown captured: " + std::string(MP2::StringObject(obj)));
+    	    DEBUG(DBG_GAME , DBG_WARN, "ActionToCaptureObject: unknown captured: " << MP2::StringObject(obj));
     	    return;
     }
 
@@ -2264,7 +2262,7 @@ void ActionToCaptureObject(Heroes &hero, const u8 obj, const u16 dst_index)
     }
 
     if(sf) delete sf;
-    if(Settings::Get().Debug()) Error::Verbose("ActionToCaptureObject: " + hero.GetName() + " captured: " + std::string(MP2::StringObject(obj)));
+    DEBUG(DBG_GAME , DBG_INFO, "ActionToCaptureObject: " << hero.GetName() << " captured: " << MP2::StringObject(obj));
 }
 
 void ActionToDwellingJoinMonster(Heroes &hero, const u8 obj, const u16 dst_index)
@@ -2293,7 +2291,7 @@ void ActionToDwellingJoinMonster(Heroes &hero, const u8 obj, const u16 dst_index
 	Dialog::Message("", _("As you approach the dwelling, you notice that there is no one here."), Font::BIG, Dialog::OK);
     }
 
-    if(Settings::Get().Debug()) Error::Verbose("ActionToDwellingJoinMonster: " + hero.GetName() + ", object: " + std::string(MP2::StringObject(obj)));
+    DEBUG(DBG_GAME , DBG_INFO, "ActionToDwellingJoinMonster: " << hero.GetName() << ", object: " << MP2::StringObject(obj));
 }
 
 void ActionToDwellingRecruitMonster(Heroes &hero, const u8 obj, const u16 dst_index)
@@ -2379,7 +2377,7 @@ void ActionToDwellingRecruitMonster(Heroes &hero, const u8 obj, const u16 dst_in
 	Dialog::Message(name_object, msg_void, Font::BIG, Dialog::OK);
     }
 
-    if(Settings::Get().Debug()) Error::Verbose("ActionToDwellingRecruitMonster: " + hero.GetName() + ", object: " + name_object);
+    DEBUG(DBG_GAME , DBG_INFO, "ActionToDwellingRecruitMonster: " << hero.GetName() << ", object: " << name_object);
 }
 
 void ActionToDwellingBattleMonster(Heroes &hero, const u8 obj, const u16 dst_index)
@@ -2557,7 +2555,7 @@ void ActionToDwellingBattleMonster(Heroes &hero, const u8 obj, const u16 dst_ind
     	}
     }
 
-    if(Settings::Get().Debug()) Error::Verbose("ActionToDwellingBattleMonster: " + hero.GetName() + ", object: " + std::string(MP2::StringObject(obj)));
+    DEBUG(DBG_GAME , DBG_INFO, "ActionToDwellingBattleMonster: " << hero.GetName() << ", object: " << MP2::StringObject(obj));
 }
 
 void ActionToObservationTower(Heroes &hero, const u8 obj, const u16 dst_index)
@@ -2601,7 +2599,7 @@ void ActionToArtesianSpring(Heroes &hero, const u8 obj, const u16 dst_index)
 	}
     }
 
-    if(Settings::Get().Debug()) Error::Verbose("ActionToArtesianSpring: " + hero.GetName());
+    DEBUG(DBG_GAME , DBG_INFO, "ActionToArtesianSpring: " << hero.GetName());
 }
 
 void ActionToXanadu(Heroes &hero, const u8 obj, const u16 dst_index)
@@ -2645,7 +2643,7 @@ void ActionToXanadu(Heroes &hero, const u8 obj, const u16 dst_index)
 	}
     }
 
-    if(Settings::Get().Debug()) Error::Verbose("ActionToXanadu: " + hero.GetName());
+    DEBUG(DBG_GAME , DBG_INFO, "ActionToXanadu: " << hero.GetName());
 }
 
 void ActionToUpgradeArmyObject(Heroes &hero, const u8 obj, const u16 dst_index)
@@ -2762,7 +2760,7 @@ void ActionToUpgradeArmyObject(Heroes &hero, const u8 obj, const u16 dst_index)
 	Dialog::Message(MP2::StringObject(obj), msg2, Font::BIG, Dialog::OK);
     }
 
-    if(Settings::Get().Debug()) Error::Verbose("ActionToUpgradeArmyObject: " + hero.GetName());
+    DEBUG(DBG_GAME , DBG_INFO, "ActionToUpgradeArmyObject: " << hero.GetName());
 }
 
 void ActionToMagellanMaps(Heroes &hero, const u8 obj, const u16 dst_index)
@@ -2781,7 +2779,7 @@ void ActionToMagellanMaps(Heroes &hero, const u8 obj, const u16 dst_index)
 	Game::Focus::Get().SetRedraw();
     }
 
-    if(Settings::Get().Debug()) Error::Verbose("ActionToMagellanMaps: " + hero.GetName());
+    DEBUG(DBG_GAME , DBG_INFO, "ActionToMagellanMaps: " << hero.GetName());
 }
 
 void ActionToEvent(Heroes &hero, const u8 obj, const u16 dst_index)
@@ -2814,7 +2812,7 @@ void ActionToEvent(Heroes &hero, const u8 obj, const u16 dst_index)
 
     hero.SaveUnderObject(MP2::OBJ_ZERO);
 
-    if(Settings::Get().Debug()) Error::Verbose("ActionToEvent: " + hero.GetName());
+    DEBUG(DBG_GAME , DBG_INFO, "ActionToEvent: " << hero.GetName());
 }
 
 void ActionToObelisk(Heroes &hero, const u8 obj, const u16 dst_index)
@@ -2831,7 +2829,7 @@ void ActionToObelisk(Heroes &hero, const u8 obj, const u16 dst_index)
     else
         Dialog::Message(MP2::StringObject(obj), _("You have already been to this obelisk."), Font::BIG, Dialog::OK);
 
-    if(Settings::Get().Debug()) Error::Verbose("ActionToObelisk: " + hero.GetName());
+    DEBUG(DBG_GAME , DBG_INFO, "ActionToObelisk: " << hero.GetName());
 }
 
 void ActionToTreeKnowledge(Heroes &hero, const u8 obj, const u16 dst_index)
@@ -2892,13 +2890,13 @@ void ActionToTreeKnowledge(Heroes &hero, const u8 obj, const u16 dst_index)
 	}
     }
 
-    if(Settings::Get().Debug()) Error::Verbose("ActionToTreeKnowledge: " + hero.GetName());
+    DEBUG(DBG_GAME , DBG_INFO, "ActionToTreeKnowledge: " << hero.GetName());
 }
 
 void ActionToOracle(Heroes &hero, const u8 obj, const u16 dst_index)
 {
     Dialog::ThievesGuild(0xFF);
-    if(Settings::Get().Debug()) Error::Verbose("ActionToOracle: " + hero.GetName());
+    DEBUG(DBG_GAME , DBG_INFO, "ActionToOracle: " << hero.GetName());
 }
 
 void ActionToDaemonCave(Heroes &hero, const u8 obj, const u16 dst_index)
@@ -2999,7 +2997,7 @@ void ActionToDaemonCave(Heroes &hero, const u8 obj, const u16 dst_index)
 	    Dialog::Message("", _("Except for evidence of a terrible battle, the cave is empty."), Font::BIG, Dialog::OK);
     }
 
-    if(Settings::Get().Debug()) Error::Verbose("ActionToDaemonCave: " + hero.GetName());
+    DEBUG(DBG_GAME , DBG_INFO, "ActionToDaemonCave: " << hero.GetName());
 }
 
 void ActionToAlchemistsTower(Heroes &hero, const u8 obj, const u16 dst_index)
@@ -3014,7 +3012,7 @@ You hear a voice from high above in the tower, "Go away! I can't help you!"
 */
     Dialog::Message("", _("You hear a voice from high above in the tower, \"Go away! I can't help you!\""), Font::BIG, Dialog::OK);
 
-    if(Settings::Get().Debug()) Error::Verbose("ActionToAlchemistsTower: " + hero.GetName());
+    DEBUG(DBG_GAME , DBG_INFO, "ActionToAlchemistsTower: " << hero.GetName());
 }
 
 void ActionToStables(Heroes &hero, const u8 obj, const u16 dst_index)
@@ -3052,7 +3050,7 @@ void ActionToStables(Heroes &hero, const u8 obj, const u16 dst_index)
 
     Dialog::Message("", body, Font::BIG, Dialog::OK);
 
-    if(Settings::Get().Debug()) Error::Verbose("ActionToStables: " + hero.GetName());
+    DEBUG(DBG_GAME , DBG_INFO, "ActionToStables: " << hero.GetName());
 }
 
 void ActionToArena(Heroes &hero, const u8 obj, const u16 dst_index)
@@ -3069,7 +3067,7 @@ void ActionToArena(Heroes &hero, const u8 obj, const u16 dst_index)
 	hero.IncreasePrimarySkill(Dialog::SelectSkillFromArena());
     }
 
-    if(Settings::Get().Debug()) Error::Verbose("ActionToArena: " + hero.GetName());
+    DEBUG(DBG_GAME , DBG_INFO, "ActionToArena: " << hero.GetName());
 }
 
 void ActionToSirens(Heroes &hero, const u8 obj, const u16 dst_index)
@@ -3091,7 +3089,7 @@ void ActionToSirens(Heroes &hero, const u8 obj, const u16 dst_index)
 	hero.IncreaseExperience(exp);
     }
 
-    if(Settings::Get().Debug()) Error::Verbose("ActionToSirens: " + hero.GetName());
+    DEBUG(DBG_GAME , DBG_INFO, "ActionToSirens: " << hero.GetName());
 }
 
 void ActionToJail(Heroes &hero, const u8 obj, const u16 dst_index)
@@ -3126,7 +3124,7 @@ void ActionToJail(Heroes &hero, const u8 obj, const u16 dst_index)
 	Dialog::Message(MP2::StringObject(obj), str, Font::BIG, Dialog::OK);
     }
 
-    if(Settings::Get().Debug()) Error::Verbose("ActionToJail: " + hero.GetName());
+    DEBUG(DBG_GAME , DBG_INFO, "ActionToJail: " << hero.GetName());
 }
 
 void ActionToHutMagi(Heroes &hero, const u8 obj, const u16 dst_index)
@@ -3139,14 +3137,14 @@ void ActionToHutMagi(Heroes &hero, const u8 obj, const u16 dst_index)
 	world.ActionToEyeMagi(hero.GetColor());
     }
 
-    if(Settings::Get().Debug()) Error::Verbose("ActionToHutMagi: " + hero.GetName());
+    DEBUG(DBG_GAME , DBG_INFO, "ActionToHutMagi: " << hero.GetName());
 }
 
 void ActionToEyeMagi(Heroes &hero, const u8 obj, const u16 dst_index)
 {
     Dialog::Message(MP2::StringObject(obj), _("This eye seems to be intently studying its surroundings."), Font::BIG, Dialog::OK);
 
-    if(Settings::Get().Debug()) Error::Verbose("ActionToEyeMagi: " + hero.GetName());
+    DEBUG(DBG_GAME , DBG_INFO, "ActionToEyeMagi: " << hero.GetName());
 }
 
 void ActionToShinx(Heroes &hero, const u8 obj, const u16 dst_index)
@@ -3194,7 +3192,7 @@ void ActionToShinx(Heroes &hero, const u8 obj, const u16 dst_index)
     else
 	Dialog::Message(MP2::StringObject(obj), _("You come across a giant Sphinx. The Sphinx remains strangely quiet."), Font::BIG, Dialog::OK);
 
-    if(Settings::Get().Debug()) Error::Verbose("ActionToShinx: " + hero.GetName());
+    DEBUG(DBG_GAME , DBG_INFO, "ActionToShinx: " << hero.GetName());
 }
 
 void ActionToBarrier(Heroes &hero, const u8 obj, const u16 dst_index)
@@ -3219,7 +3217,7 @@ void ActionToBarrier(Heroes &hero, const u8 obj, const u16 dst_index)
 	    Font::BIG, Dialog::OK);
     }
 
-    if(Settings::Get().Debug()) Error::Verbose("ActionToBarrier: " + hero.GetName());
+    DEBUG(DBG_GAME , DBG_INFO, "ActionToBarrier: " << hero.GetName());
 }
 
 void ActionToTravellersTent(Heroes &hero, const u8 obj, const u16 dst_index)
@@ -3233,5 +3231,5 @@ void ActionToTravellersTent(Heroes &hero, const u8 obj, const u16 dst_index)
 
     kingdom.SetVisitTravelersTent(tile.GetQuantity1());
 
-    if(Settings::Get().Debug()) Error::Verbose("ActionToTravellersTent: " + hero.GetName());
+    DEBUG(DBG_GAME , DBG_INFO, "ActionToTravellersTent: " << hero.GetName());
 }

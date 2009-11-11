@@ -282,8 +282,8 @@ void AIToHeroes(Heroes &hero, const u8 obj, const u16 dst_index)
 
     if(hero.GetColor() == other_hero->GetColor())
     {
-        if(Settings::Get().Debug()) Error::Verbose("AIToHeroes: " + hero.GetName() + " meeting " + other_hero->GetName());
-        Error::Verbose("FIX: AI hero meeting");
+        DEBUG(DBG_AI , DBG_INFO, "AIToHeroes: " << hero.GetName() << " meeting " << other_hero->GetName());
+        VERBOSE("FIX: AI hero meeting");
         //hero.MeetingDialog(const_cast<Heroes &>(*other_hero));
     }
     else
@@ -294,7 +294,7 @@ void AIToHeroes(Heroes &hero, const u8 obj, const u16 dst_index)
     	    return;
     	}
 
-        if(Settings::Get().Debug()) Error::Verbose("AIToHeroes: " + hero.GetName() + " attack enemy hero " + other_hero->GetName());
+        DEBUG(DBG_AI , DBG_INFO, "AIToHeroes: " << hero.GetName() << " attack enemy hero " << other_hero->GetName());
 
         u32 exp = 0;
         Army::battle_t b;
@@ -329,12 +329,12 @@ void AIToCastle(Heroes &hero, const u8 obj, const u16 dst_index)
 
     if(hero.GetColor() == castle->GetColor())
     {
-        if(Settings::Get().Debug()) Error::Verbose("AIToCastle: " + hero.GetName() + " goto castle " + castle->GetName());
+        DEBUG(DBG_AI , DBG_INFO, "AIToCastle: " << hero.GetName() << " goto castle " << castle->GetName());
         if(Settings::Get().Original()) hero.AppendSpellsToBook(castle->GetMageGuild());
     }
     else
     {
-        if(Settings::Get().Debug()) Error::Verbose("AIToCastle: " + hero.GetName() + " attack enemy castle " + castle->GetName());
+        DEBUG(DBG_AI , DBG_INFO, "AIToCastle: " << hero.GetName() << " attack enemy castle " << castle->GetName());
 
         u32 exp = 0;
 
@@ -387,7 +387,7 @@ void AIToMonster(Heroes &hero, const u8 obj, const u16 dst_index)
 
     if(ext_conditions && ownRatio / otherRatio >= 2)
     {
-        if(Settings::Get().Debug()) Error::Verbose("AIToMonster: possible " + hero.GetName() + " join monster " + monster.GetName());
+        DEBUG(DBG_AI , DBG_INFO, "AIToMonster: possible " << hero.GetName() << " join monster " << monster.GetName());
 
         if(tile.IsJoiner())
         {
@@ -398,7 +398,7 @@ void AIToMonster(Heroes &hero, const u8 obj, const u16 dst_index)
                 avoidBattle = true;
             }
             else
-                if(Settings::Get().Debug()) Error::Verbose("AIToMonster: condition is not fulfilled");
+                DEBUG(DBG_AI , DBG_WARN, "AIToMonster: condition is not fulfilled");
         }
         else if(hero.HasSecondarySkill(Skill::Secondary::DIPLOMACY))
         {
@@ -424,7 +424,7 @@ void AIToMonster(Heroes &hero, const u8 obj, const u16 dst_index)
                 }
             }
             else
-                if(Settings::Get().Debug()) Error::Verbose("AIToMonster: condition is not fulfilled");
+                DEBUG(DBG_AI , DBG_WARN, "AIToMonster: condition is not fulfilled");
         }
         else if(ownRatio / otherRatio >= 5)
         {
@@ -432,7 +432,7 @@ void AIToMonster(Heroes &hero, const u8 obj, const u16 dst_index)
         }
     }
 
-    if(Settings::Get().Debug()) Error::Verbose("AIToMonster: " + hero.GetName() + " attack monster " + monster.GetName());
+    DEBUG(DBG_AI , DBG_INFO, "AIToMonster: " << hero.GetName() << " attack monster " << monster.GetName());
 
     u32 exp = 0;
     const Army::battle_t b = avoidBattle ? Army::WIN : Army::Battle(hero, army, tile, exp);
@@ -508,7 +508,7 @@ void AIToPickupResource(Heroes &hero, const u8 obj, const u16 dst_index)
     hero.GetPath().Reset();
 
     tile.SetObject(MP2::OBJ_ZERO);
-    if(Settings::Get().Debug()) Error::Verbose("AIToPickupResource: " + hero.GetName() + " pickup small resource");
+    DEBUG(DBG_AI , DBG_INFO, "AIToPickupResource: " << hero.GetName() << " pickup small resource");
 }
 
 void AIToTreasureChest(Heroes &hero, const u8 obj, const u16 dst_index)
@@ -553,7 +553,7 @@ void AIToTreasureChest(Heroes &hero, const u8 obj, const u16 dst_index)
     tile.RemoveObjectSprite();
     tile.SetObject(MP2::OBJ_ZERO);
 
-    if(Settings::Get().Debug()) Error::Verbose("AIToTreasureChest: " + hero.GetName() + " pickup chest");
+    DEBUG(DBG_AI , DBG_INFO, "AIToTreasureChest: " << hero.GetName());
 }
 
 void AIToResource(Heroes &hero, const u8 obj, const u16 dst_index)
@@ -581,7 +581,7 @@ void AIToResource(Heroes &hero, const u8 obj, const u16 dst_index)
     tile.SetQuantity1(0);
     tile.SetQuantity2(0);
 
-    if(Settings::Get().Debug()) Error::Verbose("AIToResource: " + hero.GetName() + " pickup small resource");
+    DEBUG(DBG_AI , DBG_INFO, "AIToResource: " << hero.GetName());
 }
 
 void AIToSkeleton(Heroes &hero, const u8 obj, const u16 dst_index)
@@ -600,7 +600,7 @@ void AIToSkeleton(Heroes &hero, const u8 obj, const u16 dst_index)
 	}
     }
 
-    if(Settings::Get().Debug()) Error::Verbose("AIToSkeleton: " + hero.GetName());
+    DEBUG(DBG_AI , DBG_INFO, "AIToSkeleton: " << hero.GetName());
 }
 
 void AIToWagon(Heroes &hero, const u8 obj, const u16 dst_index)
@@ -639,7 +639,7 @@ void AIToWagon(Heroes &hero, const u8 obj, const u16 dst_index)
 	tile.SetQuantity2(0);
     }
 
-    if(Settings::Get().Debug()) Error::Verbose("AIToWagon: " + hero.GetName());
+    DEBUG(DBG_AI , DBG_INFO, "AIToWagon: " << hero.GetName());
 }
 
 void AIToCaptureObject(Heroes &hero, const u8 obj, const u16 dst_index)
@@ -675,7 +675,7 @@ void AIToCaptureObject(Heroes &hero, const u8 obj, const u16 dst_index)
     // capture object
     if(hero.GetColor() != world.ColorCapturedObject(dst_index))
 	world.CaptureObject(dst_index, hero.GetColor());
-    if(Settings::Get().Debug()) Error::Verbose("AIToCaptureObject: " + hero.GetName() + " captured: " + std::string(MP2::StringObject(obj)));
+    DEBUG(DBG_AI , DBG_INFO, "AIToCaptureObject: " << hero.GetName() << " captured: " << MP2::StringObject(obj));
 }
 
 void AIToFlotSam(Heroes &hero, const u8 obj, const u16 dst_index)
@@ -691,20 +691,20 @@ void AIToFlotSam(Heroes &hero, const u8 obj, const u16 dst_index)
     tile.RemoveObjectSprite();
     tile.SetObject(MP2::OBJ_ZERO);
 
-    if(Settings::Get().Debug()) Error::Verbose("AIToFlotSam: " + hero.GetName() + " pickup small resource");
+    DEBUG(DBG_AI , DBG_INFO, "AIToFlotSam: " << hero.GetName());
 }
 
 void AIToSign(Heroes &hero, const u8 obj, const u16 dst_index)
 {
     hero.SetVisited(dst_index, Visit::LOCAL);
-    if(Settings::Get().Debug()) Error::Verbose("AIToSign: " + hero.GetName());
+    DEBUG(DBG_AI , DBG_INFO, "AIToSign: " << hero.GetName());
 }
 
 void AIToObservationTower(Heroes &hero, const u8 obj, const u16 dst_index)
 {
     Maps::ClearFog(dst_index, OBSERVATIONTOWERSCOUTE, hero.GetColor());
     hero.SetVisited(dst_index, Visit::GLOBAL);
-    if(Settings::Get().Debug()) Error::Verbose("AIToObservationTower: " + hero.GetName());
+    DEBUG(DBG_AI , DBG_INFO, "AIToObservationTower: " << hero.GetName());
 }
 
 void AIToMagellanMaps(Heroes &hero, const u8 obj, const u16 dst_index)
@@ -715,7 +715,7 @@ void AIToMagellanMaps(Heroes &hero, const u8 obj, const u16 dst_index)
 	world.ActionForMagellanMaps(hero.GetColor());
     }
 
-    if(Settings::Get().Debug()) Error::Verbose("AIToMagellanMaps: " + hero.GetName());
+    DEBUG(DBG_AI , DBG_INFO, "AIToMagellanMaps: " << hero.GetName());
 }
 
 void AIToTeleports(Heroes &hero, const u16 index_from)
@@ -725,7 +725,7 @@ void AIToTeleports(Heroes &hero, const u16 index_from)
 
     if(index_from == index_to)
     {
-	Error::Warning("AIToTeleports: action unsuccessfully...");
+	DEBUG(DBG_AI , DBG_WARN, "AIToTeleports: action unsuccessfully...");
 	return;
     }
 
@@ -737,7 +737,7 @@ void AIToTeleports(Heroes &hero, const u16 index_from)
 
     if(Maps::TileUnderProtection(hero.GetIndex(), &index_to)) AIToMonster(hero, MP2::OBJ_MONSTER, index_to);
 
-    if(Settings::Get().Debug()) Error::Verbose("AIToStoneLights: " + hero.GetName());
+    DEBUG(DBG_AI , DBG_INFO, "AIToStoneLights: " << hero.GetName());
 }
 
 void AIToWhirlpools(Heroes &hero, const u16 index_from)
@@ -747,7 +747,7 @@ void AIToWhirlpools(Heroes &hero, const u16 index_from)
 
     if(index_from == index_to)
     {
-	Error::Warning("AIToWhirlpools: action unsuccessfully...");
+	DEBUG(DBG_AI , DBG_WARN, "AIToWhirlpools: action unsuccessfully...");
 	return;
     }
 
@@ -764,7 +764,7 @@ void AIToWhirlpools(Heroes &hero, const u16 index_from)
 	troops.SetCount(c ? c : 1);
     }
 
-    if(Settings::Get().Debug()) Error::Verbose("AIToWhirlpools: " + hero.GetName());
+    DEBUG(DBG_AI , DBG_INFO, "AIToWhirlpools: " << hero.GetName());
 }
 
 void AIToPrimarySkillObject(Heroes &hero, const u8 obj, const u16 dst_index)
@@ -800,7 +800,7 @@ void AIToPrimarySkillObject(Heroes &hero, const u8 obj, const u16 dst_index)
         }
     }
 
-    if(Settings::Get().Debug()) Error::Verbose("AIToPrimarySkillObject: " + hero.GetName());
+    DEBUG(DBG_AI , DBG_INFO, "AIToPrimarySkillObject: " << hero.GetName());
 }
 
 void AIToExperienceObject(Heroes &hero, const u8 obj, const u16 dst_index)
@@ -822,7 +822,7 @@ void AIToExperienceObject(Heroes &hero, const u8 obj, const u16 dst_index)
 	hero.IncreaseExperience(exp);
     }
 
-    if(Settings::Get().Debug()) Error::Verbose("AIToExperienceObject: " + hero.GetName());
+    DEBUG(DBG_AI , DBG_INFO, "AIToExperienceObject: " << hero.GetName());
 }
 
 void AIToWitchsHut(Heroes &hero, const u8 obj, const u16 dst_index)
@@ -834,7 +834,7 @@ void AIToWitchsHut(Heroes &hero, const u8 obj, const u16 dst_index)
 	hero.LearnBasicSkill(skill);
 
     hero.SetVisited(dst_index);
-    if(Settings::Get().Debug()) Error::Verbose("AIToWitchsHut: " + hero.GetName());
+    DEBUG(DBG_AI , DBG_INFO, "AIToWitchsHut: " << hero.GetName());
 }
 
 void AIToShrine(Heroes &hero, const u8 obj, const u16 dst_index)
@@ -850,14 +850,14 @@ void AIToShrine(Heroes &hero, const u8 obj, const u16 dst_index)
 	hero.AppendSpellToBook(spell);
 	hero.SetVisited(dst_index);
     }
-    if(Settings::Get().Debug()) Error::Verbose("AIToShrine: " + hero.GetName());
+    DEBUG(DBG_AI , DBG_INFO, "AIToShrine: " << hero.GetName());
 }
 
 void AIToGoodLuckObject(Heroes &hero, const u8 obj, const u16 dst_index)
 {
     // check already visited
     if(!hero.isVisited(obj)) hero.SetVisited(dst_index);
-    if(Settings::Get().Debug()) Error::Verbose("AIToGoodLuckObject: " + hero.GetName());
+    DEBUG(DBG_AI , DBG_INFO, "AIToGoodLuckObject: " << hero.GetName());
 }
 
 void AIToGoodMoraleObject(Heroes &hero, const u8 obj, const u16 dst_index)
@@ -890,7 +890,7 @@ void AIToGoodMoraleObject(Heroes &hero, const u8 obj, const u16 dst_index)
         }
     }
 
-    if(Settings::Get().Debug()) Error::Verbose("AIToGoodMoraleObject: " + hero.GetName());
+    DEBUG(DBG_AI , DBG_INFO, "AIToGoodMoraleObject: " << hero.GetName());
 }
 
 void AIToMagicWell(Heroes &hero, const u8 obj, const u16 dst_index)
@@ -905,7 +905,7 @@ void AIToMagicWell(Heroes &hero, const u8 obj, const u16 dst_index)
 	hero.SetSpellPoints(max);
     }
 
-    if(Settings::Get().Debug()) Error::Verbose("AIToMagicWell: " + hero.GetName());
+    DEBUG(DBG_AI , DBG_INFO, "AIToMagicWell: " << hero.GetName());
 }
 
 void AIToArtesianSpring(Heroes &hero, const u8 obj, const u16 dst_index)
@@ -929,7 +929,7 @@ void AIToArtesianSpring(Heroes &hero, const u8 obj, const u16 dst_index)
         }
     }
 
-    if(Settings::Get().Debug()) Error::Verbose("AIToArtesianSpring: " + hero.GetName());
+    DEBUG(DBG_AI , DBG_INFO, "AIToArtesianSpring: " << hero.GetName());
 }
 
 void AIToXanadu(Heroes &hero, const u8 obj, const u16 dst_index)
@@ -951,7 +951,7 @@ void AIToXanadu(Heroes &hero, const u8 obj, const u16 dst_index)
 	hero.SetVisited(dst_index);
     }
 
-    if(Settings::Get().Debug()) Error::Verbose("AIToXanadu: " + hero.GetName());
+    DEBUG(DBG_AI , DBG_INFO, "AIToXanadu: " << hero.GetName());
 }
 
 void AIToEvent(Heroes &hero, const u8 obj, const u16 dst_index)
@@ -968,7 +968,7 @@ void AIToEvent(Heroes &hero, const u8 obj, const u16 dst_index)
 
     hero.SaveUnderObject(MP2::OBJ_ZERO);
 
-    if(Settings::Get().Debug()) Error::Verbose("AIToEvent: " + hero.GetName());
+    DEBUG(DBG_AI , DBG_INFO, "AIToEvent: " << hero.GetName());
 }
 
 void AIToUpgradeArmyObject(Heroes &hero, const u8 obj, const u16 dst_index)
@@ -996,7 +996,7 @@ void AIToUpgradeArmyObject(Heroes &hero, const u8 obj, const u16 dst_index)
 	default: break;
     }
 
-    if(Settings::Get().Debug()) Error::Verbose("AIToUpgradeArmyObject: " + hero.GetName());
+    DEBUG(DBG_AI , DBG_INFO, "AIToUpgradeArmyObject: " << hero.GetName());
 }
 
 void AIToPoorMoraleObject(Heroes &hero, const u8 obj, const u16 dst_index)
@@ -1055,7 +1055,7 @@ void AIToPoorMoraleObject(Heroes &hero, const u8 obj, const u16 dst_index)
             	    case 15: resource.gold = 2000; break;
             	    case 25: resource.gold = 5000; break;
             	    case 50: resource.gold = 2000; art = Artifact::FromInt(tile.GetQuantity1()); break;
-            	    default: Error::Warning("ActionToPoorMoraleObject: unknown variant for ShipWreck, index: ", dst_index); break;
+            	    default: DEBUG(DBG_AI , DBG_WARN, "ActionToPoorMoraleObject: unknown variant for ShipWreck, index: " << dst_index); break;
                 }
 
 		// battle
@@ -1130,7 +1130,7 @@ void AIToPoorMoraleObject(Heroes &hero, const u8 obj, const u16 dst_index)
 	hero.SetVisited(dst_index);
     }
 
-    if(Settings::Get().Debug()) Error::Verbose("AIToPoorMoraleObject: " + hero.GetName());
+    DEBUG(DBG_AI , DBG_INFO, "AIToPoorMoraleObject: " << hero.GetName());
 }
 
 void AIToPoorLuckObject(Heroes &hero, const u8 obj, const u16 dst_index)
@@ -1194,7 +1194,7 @@ void AIToPoorLuckObject(Heroes &hero, const u8 obj, const u16 dst_index)
         hero.SetVisited(dst_index);
     }
 
-    if(Settings::Get().Debug()) Error::Verbose("AIToPoorLuckObject: " + hero.GetName());
+    DEBUG(DBG_AI , DBG_INFO, "AIToPoorLuckObject: " << hero.GetName());
 }
 
 void AIToObelisk(Heroes &hero, const u8 obj, const u16 dst_index)
@@ -1206,7 +1206,7 @@ void AIToObelisk(Heroes &hero, const u8 obj, const u16 dst_index)
         kingdom.PuzzleMaps().Update(kingdom.CountVisitedObjects(MP2::OBJ_OBELISK), world.CountObeliskOnMaps());
     }
 
-    if(Settings::Get().Debug()) Error::Verbose("AIToObelisk: " + hero.GetName());
+    DEBUG(DBG_AI , DBG_INFO, "AIToObelisk: " << hero.GetName());
 }
 
 void AIToTreeKnowledge(Heroes &hero, const u8 obj, const u16 dst_index)
@@ -1231,7 +1231,7 @@ void AIToTreeKnowledge(Heroes &hero, const u8 obj, const u16 dst_index)
 	}
     }
 
-    if(Settings::Get().Debug()) Error::Verbose("AIToTreeKnowledge: " + hero.GetName());
+    DEBUG(DBG_AI , DBG_INFO, "AIToTreeKnowledge: " << hero.GetName());
 }
 
 
@@ -1270,7 +1270,7 @@ void AIToDaemonCave(Heroes &hero, const u8 obj, const u16 dst_index)
 	}
     }
 
-    if(Settings::Get().Debug()) Error::Verbose("AIToDaemonCave: " + hero.GetName());
+    DEBUG(DBG_AI , DBG_INFO, "AIToDaemonCave: " << hero.GetName());
 }
 
 void AIToDwellingJoinMonster(Heroes &hero, const u8 obj, const u16 dst_index)
@@ -1280,7 +1280,7 @@ void AIToDwellingJoinMonster(Heroes &hero, const u8 obj, const u16 dst_index)
 
     if(count && hero.GetArmy().JoinTroop(Monster(Monster::FromObject(obj)), count)) tile.SetCountMonster(0);
 
-    if(Settings::Get().Debug()) Error::Verbose("AIToDwellingJoinMonster: " + hero.GetName());
+    DEBUG(DBG_AI , DBG_INFO, "AIToDwellingJoinMonster: " << hero.GetName());
 }
 
 void AIToDwellingRecruitMonster(Heroes &hero, const u8 obj, const u16 dst_index)
@@ -1309,7 +1309,7 @@ void AIToDwellingRecruitMonster(Heroes &hero, const u8 obj, const u16 dst_index)
 	}
     }
 
-    if(Settings::Get().Debug()) Error::Verbose("AIToDwellingJoinMonster: " + hero.GetName());
+    DEBUG(DBG_AI , DBG_INFO, "AIToDwellingJoinMonster: " << hero.GetName());
 }
 
 void AIToStables(Heroes &hero, const u8 obj, const u16 dst_index)
@@ -1323,7 +1323,7 @@ void AIToStables(Heroes &hero, const u8 obj, const u16 dst_index)
 
     if(hero.GetArmy().HasMonster(Monster::CAVALRY)) hero.GetArmy().UpgradeMonsters(Monster::CAVALRY);
                                                                 
-    if(Settings::Get().Debug()) Error::Verbose("AIToStables: " + hero.GetName());
+    DEBUG(DBG_AI , DBG_INFO, "AIToStables: " << hero.GetName());
 }
 
 void AIToAbandoneMine(Heroes &hero, const u8 obj, const u16 dst_index)
@@ -1356,7 +1356,7 @@ void AIToAbandoneMine(Heroes &hero, const u8 obj, const u16 dst_index)
         default: break;
     }
 
-    if(Settings::Get().Debug()) Error::Verbose("AIToAbandoneMine: " + hero.GetName());
+    DEBUG(DBG_AI , DBG_INFO, "AIToAbandoneMine: " << hero.GetName());
 }
 
 void AIToBarrier(Heroes &hero, const u8 obj, const u16 dst_index)
@@ -1370,7 +1370,7 @@ void AIToBarrier(Heroes &hero, const u8 obj, const u16 dst_index)
         tile.SetObject(MP2::OBJ_ZERO);
     }
 
-    if(Settings::Get().Debug()) Error::Verbose("AIToBarrier: " + hero.GetName());
+    DEBUG(DBG_AI , DBG_INFO, "AIToBarrier: " << hero.GetName());
 }
 
 void AIToTravellersTent(Heroes &hero, const u8 obj, const u16 dst_index)
@@ -1380,7 +1380,7 @@ void AIToTravellersTent(Heroes &hero, const u8 obj, const u16 dst_index)
 
     kingdom.SetVisitTravelersTent(tile.GetQuantity1());
 
-    if(Settings::Get().Debug()) Error::Verbose("AIToTravellersTent: " + hero.GetName());
+    DEBUG(DBG_AI , DBG_INFO, "AIToTravellersTent: " << hero.GetName());
 }
 
 void AIToShipwreckSurvivor(Heroes &hero, const u8 obj, const u16 dst_index)
@@ -1398,7 +1398,7 @@ void AIToShipwreckSurvivor(Heroes &hero, const u8 obj, const u16 dst_index)
     tile.SetQuantity1(0);
     tile.SetObject(MP2::OBJ_ZERO);
 
-    if(Settings::Get().Debug()) Error::Verbose("AIToShipwreckSurvivor: " + hero.GetName());
+    DEBUG(DBG_AI , DBG_INFO, "AIToShipwreckSurvivor: " << hero.GetName());
 }
 
 

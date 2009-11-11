@@ -132,7 +132,7 @@ void Surface::Set(const Surface & bs)
     if(bs.surface)
     {
 	    surface = SDL_ConvertSurface(bs.surface, bs.surface->format, bs.surface->flags);
-	    if(!surface) Error::Warning("Surface: copy constructor, error: ", SDL_GetError());
+	    if(!surface) std::cerr << "Surface: copy constructor, error: " << SDL_GetError() << std::endl;
     }
 }
 
@@ -284,7 +284,7 @@ void Surface::CreateSurface(u16 sw, u16 sh, u8 dp, u32 fl)
 
     if(!surface)
     {
-	std::cout << "w: " << sw << ", h: " << sh << std::endl;
+	std::cerr << "w: " << sw << ", h: " << sh << std::endl;
 	Error::Except("Surface::CreateSurface: empty surface, error:", SDL_GetError());
     }
 }
@@ -696,7 +696,7 @@ void Surface::MakeStencil(Surface & dst, const Surface & src, u32 col)
                 dst.SetPixel(x, y, col);
             }
         }
-    std::cout << std::endl;
+    std::cerr << std::endl;
     dst.Unlock();
 }
 
@@ -739,13 +739,13 @@ void Surface::TILReflect(Surface & sf_dst, const Surface & sf_src, const u8 shap
     // valid sf_src
     if(!sf_src.surface || sf_src.w() != sf_src.h())
     {
-	Error::Warning("Surface::TILReflect: incorrect size");
+	std::cerr << "Surface::TILReflect: incorrect size" << std::endl;
 	return;
     }
 
     if(sf_src.depth() != 8)
     {
-	Error::Warning("Surface::TILReflect: use only 8 bpp");
+	std::cerr << "Surface::TILReflect: incorrect depth, use only 8 bpp" << std::endl;
 	return;
     }
 
@@ -843,7 +843,7 @@ inline u32 AVERAGE(SDL_PixelFormat* fm, u32 c1, u32 c2)
 /* scale surface */
 void Surface::ScaleMinifyByTwo(Surface & sf_dst, const Surface & sf_src, u8 mul)
 {
-    if(!sf_src.valid()) { Error::Verbose("Surface::ScaleMinifyByTwo: invalid surface"); return; };
+    if(!sf_src.valid()) { std::cerr << "Surface::ScaleMinifyByTwo: invalid surface" << std::endl; return; };
     if(0 == mul) mul = 1;
 
     u16 x, y, x2, y2;
@@ -852,7 +852,7 @@ void Surface::ScaleMinifyByTwo(Surface & sf_dst, const Surface & sf_src, u8 mul)
     u16 w = sf_src.w() / mul;
     u16 h = sf_src.h() / mul;
 
-    if(2 > w || 2 > h){ Error::Verbose("Surface::ScaleMinifyByTwo: small size"); return; };
+    if(2 > w || 2 > h){ std::cerr << "Surface::ScaleMinifyByTwo: small size" << std::endl; return; };
 
     sf_dst.Set(w, h, sf_src.depth(), SWSURFACE);
     sf_dst.SetColorKey();

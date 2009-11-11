@@ -98,7 +98,7 @@ void Dialog::QuickInfo(const Maps::Tiles & tile)
     std::string name_object;
     const Settings & settings = Settings::Get();
 
-    if(!settings.Debug() && tile.isFog(settings.MyColor()))
+    if(tile.isFog(settings.MyColor()))
 	name_object = _("Unchartered Territory");
     else
     switch(tile.GetObject())
@@ -292,7 +292,7 @@ void Dialog::QuickInfo(const Castle & castle)
 	case Race::WRLK: index = (castle.isCastle() ? 12 : 18); break;
 	case Race::WZRD: index = (castle.isCastle() ? 13 : 19); break;
 	case Race::NECR: index = (castle.isCastle() ? 14 : 20); break;
-	default: Error::Warning(": unknown race."); return;
+	default: DEBUG(DBG_GAME , DBG_WARN, "Dialog::QuickInfo: unknown race."); return;
     }
     
     // castle icon

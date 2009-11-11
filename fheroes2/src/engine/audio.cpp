@@ -19,7 +19,7 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#include "error.h"
+#include <iostream>
 #include "audio.h"
 
 namespace Audio
@@ -67,8 +67,7 @@ bool Audio::CVT::Build(const Audio::Spec & src, const Audio::Spec & dst)
 {
     if(1 == SDL_BuildAudioCVT(this, src.format, src.channels, src.freq, dst.format, dst.channels, dst.freq)) return true;
 
-    Error::Warning("Audio::CVT::Build: ", SDL_GetError());
-
+    std::cerr << "Audio::CVT::Build: " << SDL_GetError() << std::endl;
     return false;
 }
 
@@ -76,8 +75,7 @@ bool Audio::CVT::Convert(void)
 {
     if(0 == SDL_ConvertAudio(this)) return true;
     
-    Error::Warning("Audio::CVT::Convert: ", SDL_GetError());
-
+    std::cerr << "Audio::CVT::Convert: " << SDL_GetError() << std::endl;
     return false;
 }
 

@@ -41,23 +41,23 @@ void Test::Run(int num)
 
 	case 9: TestMonsterSprite(); break;
 
-	default: Error::Warning("Test::Run: unknown test."); break;
+	default: DEBUG(DBG_ENGINE , DBG_WARN, "Test::Run: unknown test."); break;
     }
 }
 
 void RunTest1(void)
 {
-    Error::Verbose("Run Test1");
+    VERBOSE("Run Test1");
 }
 
 void RunTest2(void)
 {
-    Error::Verbose("Run Test3");
+    VERBOSE("Run Test3");
 }
 
 void RunTest3(void)
 {
-    Error::Verbose("Run Test3");
+    VERBOSE("Run Test3");
 }
 
 #endif

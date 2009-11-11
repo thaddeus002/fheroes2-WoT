@@ -43,12 +43,12 @@ public:
     void ShutdownThread(void);
 
     void MsgBroadcast(void);
-    void MsgPing(bool);
-    void MsgLogout(bool);
-    bool MsgMapsInfoSet(bool);
-    bool MsgMapsInfoGet(bool);
-    bool MsgMapsListGet(bool);
-    bool MsgPlayersGet(bool);
+    void MsgPing(void);
+    void MsgLogout(void);
+    bool MsgMapsInfoSet(void);
+    bool MsgMapsInfoGet(void);
+    bool MsgMapsListGet(void);
+    bool MsgPlayersGet(void);
 
     static int callbackCreateThread(void *);
 

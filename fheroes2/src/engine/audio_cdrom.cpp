@@ -17,9 +17,9 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
+#include <iostream>
 #include "audio_mixer.h"
 #include "audio_cdrom.h"
-#include "error.h"
 
 namespace Cdrom
 {
@@ -64,7 +64,7 @@ void Cdrom::Open(void)
         cdLock = SDL_CreateMutex();
     }
 
-    Error::Verbose("Cdrom: " + std::string(cd ? "found CD audio device." : "no CDROM devices available."));
+    std::cerr << "Cdrom::Open: "  << (cd ? "found CD audio device." : "no CDROM devices available.") << std::endl;
 }
 
 void Cdrom::Close(void)
@@ -106,7 +106,7 @@ void Cdrom::Play(const u8 track, bool loop, bool force)
         if(currentTrack != track || force)
         {
             if(SDL_CDPlayTracks(cd, track, 0, 1, 0) < 0)
-                Error::Verbose("Couldn't play track ", track);
+                std::cerr << "Cdrom::Play: Couldn't play track " << static_cast<int>(track) << std::endl;
             
             currentTrack = track;
             if(loop)
@@ -117,7 +117,7 @@ void Cdrom::Play(const u8 track, bool loop, bool force)
             else startTime = 0;
 
             if(SDL_CDStatus(cd) != CD_PLAYING)
-                Error::Warning("CD is not playing", SDL_GetError());
+                std::cerr << "Cdrom::Play: CD is not playing" << SDL_GetError() << std::endl;
         }
         
         SDL_UnlockMutex(cdLock);

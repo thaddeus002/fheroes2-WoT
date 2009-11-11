@@ -37,7 +37,7 @@ MTrk::MTrk(const u8 *p, const u32 s)
 {
     const u8 *ptr = p;
     bool end = false;
-std::cout << "111111111" <<std::endl;
+
     while(ptr && !end && ptr < (p + s))
     {
 	u32 delta = 0;
@@ -194,7 +194,7 @@ void MTrk::CloseEvents(void)
 
 void MTrk::Dump(void) const
 {
-    std::cout << "[MTrk]\n";
+    std::cerr << "[MTrk]\n";
 
     if(events.size())
     {
@@ -202,7 +202,7 @@ void MTrk::Dump(void) const
         std::list<Event *>::const_iterator it2 = events.end();
 	for(; it1 != it2; ++it1) if(*it1) (*it1)->Dump();
     }
-    std::cout << std::endl;
+    std::cerr << std::endl;
 }
 
 void MTrk::ImportXmiEVNT(const Chunk & evnt)

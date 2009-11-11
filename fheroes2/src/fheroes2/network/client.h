@@ -49,9 +49,9 @@ public:
 
     bool IsConnected(void) const;
 
-    bool Wait(Network::Message &, u16, bool debug = false);
-    bool Send(Network::Message &, bool debug = false);
-    bool Recv(Network::Message &, bool debug = false);
+    bool Wait(Network::Message &, u16);
+    bool Send(Network::Message &);
+    bool Recv(Network::Message &);
 
     Network::Message packet;
 };

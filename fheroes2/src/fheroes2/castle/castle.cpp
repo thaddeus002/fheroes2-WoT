@@ -278,7 +278,7 @@ void Castle::LoadFromMP2(const void *ptr)
     	building &= ~BUILD_TAVERN;
 
     // end
-    if(Settings::Get().Debug()) Error::Verbose((building & BUILD_CASTLE ? "Castle::LoadFromMP2: castle: " : "Castle::LoadFromMP2: town: ") + name + ", color: " + Color::String(color) + ", race: " + Race::String(race));
+    DEBUG(DBG_GAME , DBG_INFO, "Castle::LoadFromMP2: " << (building & BUILD_CASTLE ? "castle" : "town") << ": " << name << ", color: " << Color::String(color) << ", race: " << Race::String(race));
 }
 
 u32 Castle::CountBuildings(void) const
@@ -601,7 +601,7 @@ bool Castle::RecruitMonster(u32 dw, u16 count)
     kingdom.OddFundsResource(paymentCosts);
     dwelling[dw_index] -= count;
 
-    if(Settings::Get().Debug()) Error::Verbose("Castle::RecruitMonster: " + name);
+    DEBUG(DBG_GAME , DBG_INFO, "Castle::RecruitMonster: " << name);
     return true;
 }
 
@@ -1008,7 +1008,7 @@ void Castle::BuyBuilding(u32 build)
 	AGG::PlaySound(M82::BUILDTWN);
     }
 
-    if(Settings::Get().Debug()) Error::Verbose("Castle::BuyBuilding: " + name + " build " + GetStringBuilding(build, race));
+    DEBUG(DBG_GAME , DBG_INFO, "Castle::BuyBuilding: " << name << " build " << GetStringBuilding(build, race));
 }
 
 /* draw image castle to position */
@@ -1103,7 +1103,7 @@ ICN::icn_t Castle::GetICNBoat(const Race::race_t & race)
 	default: break;
     }
 
-    Error::Warning("Castle::GetICNBoat: return unknown");
+    DEBUG(DBG_GAME , DBG_WARN, "Castle::GetICNBoat: return unknown");
     return ICN::UNKNOWN;
 }
 

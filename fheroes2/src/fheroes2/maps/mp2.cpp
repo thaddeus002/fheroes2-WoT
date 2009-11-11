@@ -343,12 +343,12 @@ ICN::icn_t MP2::GetICNObject(const u8 type)
 	    break;
     }
 
-    if(Settings::Get().Debug()) Error::Warning("MP2::GetICNObject: unknown type: ", type);
+    DEBUG(DBG_GAME , DBG_WARN, "MP2::GetICNObject: unknown type: " << static_cast<int>(type));
 
     return ICN::UNKNOWN;
 }
 
-const char * MP2::StringObject(u8 object)
+const char* MP2::StringObject(u8 object)
 {
     switch(object)
     {
@@ -612,11 +612,11 @@ const char * MP2::StringObject(u8 object)
 	case MP2::OBJ_UNKNW_FA:		return "OBJ_UNKNW_FA";
 
 	default:
-	    Error::Warning("MP2::Object: unknown, ", object);
+	    DEBUG(DBG_GAME , DBG_WARN, "MP2::Object: unknown, " << static_cast<int>(object));
 	    break;
     }
     
-    return "";
+    return NULL;
 }
 
 bool MP2::isDayLife(const u8 obj)

@@ -218,7 +218,7 @@ void Interface::Radar::RedrawArea(const u8 color)
     {
 	const Maps::Tiles & tile = world.GetTiles(index);
 
-	if(!Settings::Get().Debug() && tile.isFog(color))
+	if(!IS_DEVEL() && tile.isFog(color))
 	    tile_surface = sf_black;
 	else
 	    switch(tile.GetObject())

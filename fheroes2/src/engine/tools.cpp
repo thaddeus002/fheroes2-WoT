@@ -298,7 +298,7 @@ void MemoryInfoDump(const char* mark)
     GlobalMemoryStatus(&ms);
     int available = ms.dwAvailVirtual / 1024;
     int total = ms.dwTotalVirtual / 1024;
-    std::cout << mark << " memory available " << available << " from " << total << " Kb" << std::endl;
+    std::cerr << mark << " memory available " << available << " from " << total << " Kb" << std::endl;
 }
 #else
 

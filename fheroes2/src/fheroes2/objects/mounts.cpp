@@ -18,6 +18,7 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
+#include "settings.h"
 #include "mounts.h"
 
 Mounts::Mounts(const ICN::icn_t icn) : Object(MP2::OBJ_MOUNTS, icn)
@@ -33,7 +34,7 @@ Mounts::Mounts(const ICN::icn_t icn) : Object(MP2::OBJ_MOUNTS, icn)
         case ICN::MTNMULT:
         case ICN::MTNGRAS: break;
 
-        default: Error::Warning("Mounts::Mounts: unknown type: ", icn); break;
+        default: DEBUG(DBG_GAME , DBG_WARN, "Mounts::Mounts: unknown type"); break;
     }
 }
 

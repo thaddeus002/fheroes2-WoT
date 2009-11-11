@@ -197,7 +197,7 @@ void Interface::GameArea::Redraw(Surface & dst, u8 flag) const
     }
 
     // redraw grid
-    if((flag & LEVEL_ALL) && Settings::Get().Debug())
+    if((flag & LEVEL_ALL) && IS_DEVEL())
     {
 
 	for(u8 oy = 0; oy < rectMaps.h; ++oy)
@@ -618,7 +618,7 @@ void Interface::GameArea::GenerateUltimateArtifactAreaSurface(const u16 index, S
 	}
     }
     else
-    Error::Warning("Interface::GameArea::GenerateUltimateArtifactAreaSurface: artifact not found");
+    DEBUG(DBG_ENGINE , DBG_WARN, "Interface::GameArea::GenerateUltimateArtifactAreaSurface: artifact not found");
 }
 
 bool Interface::GameArea::NeedScroll(void) const

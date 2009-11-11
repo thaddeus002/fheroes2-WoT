@@ -17,7 +17,7 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#include "error.h"
+#include <iostream>
 #include "audio_mixer.h"
 #include "audio_music.h"
 
@@ -38,12 +38,12 @@ void Music::Play(bool loop)
     if(fadein)
     {
 	if(music && Mix_FadeInMusic(music, loop ? -1 : 0, fadein) == -1)
-    	    Error::Verbose("Music::Play: ", Mix_GetError());
+    	    std::cerr << "Music::Play: " << Mix_GetError() << std::endl;
     }
     else
     {
 	if(music && Mix_PlayMusic(music, loop ? -1 : 0) == -1)
-    	    Error::Verbose("Music::Play: ", Mix_GetError());
+    	    std::cerr << "Music::Play: " << Mix_GetError() << std::endl;
     }
 }
 
@@ -69,7 +69,7 @@ void Music::Play(const char* file, bool loop)
     music = Mix_LoadMUS(file);
 
     if(! music)
-    	Error::Verbose("Music::Play: ", Mix_GetError());
+    	std::cerr << "Music::Play: " << Mix_GetError() << std::endl;
     else
 	Music::Play(loop);
 }

@@ -46,10 +46,10 @@ void SendPacketToAllClients(std::vector<FH2RemoteClient> & clients, const Networ
 FH2Server::FH2Server()
 {
     AGG::Cache & cache = AGG::Cache::Get();
-    if(! cache.ReadDataDir()) Error::Except("AGG data files not found.");
+    if(! cache.ReadDataDir()) Error::Except("FH2Server::FH2Server: ", "AGG data files not found.");
 
     if(!PrepareMapsFileInfoList(finfo_list) ||
-       !Settings::Get().LoadFileMapsMP2(finfo_list.front().file)) Error::Warning("No maps available!");
+       !Settings::Get().LoadFileMapsMP2(finfo_list.front().file)) DEBUG(DBG_NETWORK , DBG_WARN, "FH2Server::FH2Server: No maps available!");
 }
 
 FH2Server::~FH2Server()
@@ -181,7 +181,7 @@ u32 FH2Server::TimerScanQueue(u32 tick, void *ptr)
     		case MSG_SHUTDOWN:
 		    if(server.admin_id == msgid.second)
 		    {
-    			if(2 < Settings::Get().Debug()) Error::Verbose("FH2Server::TimerScanQueue: admin shutdown");
+    			DEBUG(DBG_NETWORK , DBG_INFO, "FH2Server::TimerScanQueue: admin shutdown");
     			server.exit = true;
 			Network::Message packet;
                 	packet.Reset();
@@ -251,10 +251,9 @@ void FH2Server::WaitClients(void)
     	    // check admin allow connect
     		((clients.end() != it && (*it).Modes(ST_CONNECT)) && !(*it).Modes(ST_ALLOWPLAYERS)))
 	    {
-		Error::Verbose("count player: ", conf.PreferablyCountPlayers());
+		DEBUG(DBG_NETWORK , DBG_INFO, "FH2Server::WaitClients: max players, current: " << static_cast<int>(conf.PreferablyCountPlayers()));
 		Socket sct(csd);
 		// send message
-		std::cout << "FH2Server::WaitClients: accept: close socket" << std::endl;
 		sct.Close();
 	    }
 	    else

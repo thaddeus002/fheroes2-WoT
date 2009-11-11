@@ -90,7 +90,7 @@ const Sprite & SpriteHero(const Heroes & hero, const u8 index, const bool reflec
         case Race::WZRD: icn_hero = ICN::WZRD32; break;
         case Race::NECR: icn_hero = ICN::NECR32; break;
 
-        default: Error::Warning("Heroes::SpriteHero: unknown race"); break;
+        default: DEBUG(DBG_GAME , DBG_WARN, "Heroes::SpriteHero: unknown race"); break;
     }
 
     if(rotate)				index_sprite = 45;
@@ -106,7 +106,7 @@ const Sprite & SpriteHero(const Heroes & hero, const u8 index, const bool reflec
         case Direction::LEFT:           index_sprite = 18; break;
         case Direction::TOP_LEFT:       index_sprite =  9; break;
 
-        default: Error::Warning("Heroes::SpriteHero: unknown direction"); break;
+        default: DEBUG(DBG_GAME , DBG_WARN, "Heroes::SpriteHero: unknown direction"); break;
     }
 
     return AGG::GetICN(icn_hero, index_sprite + (index % 9), reflect);
@@ -126,7 +126,7 @@ const Sprite & SpriteFlag(const Heroes & hero, const u8 index, const bool reflec
         case Color::ORANGE:     icn_flag = hero.isShipMaster() ? ICN::O_BFLG32 : ICN::O_FLAG32; break;
         case Color::PURPLE:     icn_flag = hero.isShipMaster() ? ICN::P_BFLG32 : ICN::P_FLAG32; break;
 
-        default: Error::Warning("Heroes::SpriteFlag: unknown color hero"); break;
+        default: DEBUG(DBG_GAME , DBG_WARN, "Heroes::SpriteFlag: unknown color hero"); break;
     }
 
     if(rotate)				index_sprite = 45;
@@ -142,7 +142,7 @@ const Sprite & SpriteFlag(const Heroes & hero, const u8 index, const bool reflec
         case Direction::LEFT:           index_sprite = 18; break;
         case Direction::TOP_LEFT:       index_sprite =  9; break;
 
-        default: Error::Warning("Heroes::SpriteFlag: unknown direction"); break;
+        default: DEBUG(DBG_GAME , DBG_WARN, "Heroes::SpriteFlag: unknown direction"); break;
     }
 
     return AGG::GetICN(icn_flag, index_sprite + (index % 9), reflect);
@@ -164,7 +164,7 @@ const Sprite & SpriteShad(const Heroes & hero, const u8 index)
         case Direction::LEFT:           index_sprite = 54; break;
         case Direction::TOP_LEFT:       index_sprite = 63; break;
 
-        default: Error::Warning("Heroes::SpriteShadow: unknown direction"); break;
+        default: DEBUG(DBG_GAME , DBG_WARN, "Heroes::SpriteShadow: unknown direction"); break;
     }
 
     return AGG::GetICN(icn_shad, index_sprite + (index % 9));
@@ -185,7 +185,7 @@ const Sprite & SpriteFroth(const Heroes & hero, const u8 index, const bool refle
         case Direction::LEFT:           index_sprite = 18; break;
         case Direction::TOP_LEFT:       index_sprite =  9; break;
 
-        default: Error::Warning("Heroes::SpriteFroth: unknown direction"); break;
+        default: DEBUG(DBG_GAME , DBG_WARN, "Heroes::SpriteFroth: unknown direction"); break;
     }
 
     return AGG::GetICN(ICN::FROTH, index_sprite + (index % 9), reflect);

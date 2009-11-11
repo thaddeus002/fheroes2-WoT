@@ -21,6 +21,7 @@
 #include "mp2.h"
 #include "world.h"
 #include "agg.h"
+#include "settings.h"
 #include "resource.h"
 
 Resource::funds_t::funds_t(u8 rs, u32 count) : wood(0), mercury(0), ore(0), sulfur(0), crystal(0), gems(0), gold(0)
@@ -35,7 +36,7 @@ Resource::funds_t::funds_t(u8 rs, u32 count) : wood(0), mercury(0), ore(0), sulf
 	case CRYSTAL:	crystal = count;break;
 	case GOLD:	gold = count;	break;
 
-	default:	Error::Warning("Resource::funds_t::funds_t: unknown resource, ", rs); break;
+	default:	DEBUG(DBG_GAME , DBG_WARN, "Resource::funds_t::funds_t: unknown resource"); break;
     }
 }
 
@@ -240,7 +241,7 @@ u8 Resource::GetIndexSprite(Resource::resource_t resource)
         case Resource::GEMS:	return  11;
 	case Resource::GOLD:	return  13;
         default: 
-	    Error::Warning("Resource::GetIndexSprite: unknown");
+	    DEBUG(DBG_GAME , DBG_WARN, "Resource::GetIndexSprite: unknown resource");
     }
 
     return 0;
@@ -258,7 +259,7 @@ u8 Resource::GetIndexSprite2(Resource::resource_t resource)
         case Resource::GEMS:	return  5;
 	case Resource::GOLD:	return  6;
         default: 
-	    Error::Warning("Resource::GetIndexSprite2: unknown");
+	    DEBUG(DBG_GAME , DBG_WARN, "Resource::GetIndexSprite2: unknown resource");
     }
 
     return 0;

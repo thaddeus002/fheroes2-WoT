@@ -113,7 +113,7 @@ void Sprite::DrawICN(Surface & sf, const u8* cur, const u32 size, bool reflect)
 
 	if(cur >= max)
 	{
-	    if(Settings::Get().Debug()) Error::Warning("Sprite: index out of range");
+	    DEBUG(DBG_ENGINE , DBG_WARN, "Sprite: index out of range");
 	    break;
 	}
     }

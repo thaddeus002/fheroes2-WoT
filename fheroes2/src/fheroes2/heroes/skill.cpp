@@ -25,6 +25,7 @@
 #include "cursor.h"
 #include "dialog.h"
 #include "heroes.h"
+#include "settings.h"
 #include "skill.h"
 
 Skill::Primary::Primary() : attack(0), defence(0), power(0), knowledge(0)
@@ -106,7 +107,7 @@ Skill::Primary::skill_t Skill::Primary::FromLevelUp(const u8 race, const u8 leve
 	    break;
 
 	default:
-	    Error::Warning("Skill::Primary::LevelUp: unknown race."); return UNKNOWN;
+	    DEBUG(DBG_GAME , DBG_WARN, "Skill::Primary::LevelUp: unknown race."); return UNKNOWN;
     }
 
     switch(percents.Get())
@@ -119,7 +120,7 @@ Skill::Primary::skill_t Skill::Primary::FromLevelUp(const u8 race, const u8 leve
 	default: break;
     }
 
-    Error::Warning("Skill::Primary::LevelUp: unknown result.");
+    DEBUG(DBG_GAME , DBG_WARN, "Skill::Primary::LevelUp: unknown result.");
     return UNKNOWN;
 }
 
@@ -344,7 +345,7 @@ u8 Skill::Secondary::GetIndexSprite2(const skill_t skill)
         default: break;
     }
 
-    Error::Warning("Skill::Secondary::GetIndexSprite2: unknown skill, index out of range");
+    DEBUG(DBG_GAME , DBG_WARN, "Skill::Secondary::GetIndexSprite2: unknown skill, index out of range");
 
     return 0xff;
 }
@@ -583,7 +584,7 @@ Skill::Secondary::skill_t Skill::Secondary::PriorityFromRace(const u8 race, cons
 	    break;
 
 	default:
-	    Error::Warning("Skill::Secondary::PriorityForRace: unknown race."); return UNKNOWN;
+	    DEBUG(DBG_GAME , DBG_WARN, "Skill::Secondary::PriorityForRace: unknown race."); return UNKNOWN;
     }
 
     switch(parts.Get())
@@ -606,7 +607,7 @@ Skill::Secondary::skill_t Skill::Secondary::PriorityFromRace(const u8 race, cons
 	default: break;
     }
 
-    Error::Warning("Skill::Secondary::PriorityForRace: unknown result.");
+    DEBUG(DBG_GAME , DBG_WARN, "Skill::Secondary::PriorityForRace: unknown result.");
     return UNKNOWN;
 }
 
@@ -804,7 +805,7 @@ Skill::Secondary::skill_t Skill::Secondary::PriorityFromRace(const u8 race)
 	    break;
 
 	default:
-	    Error::Warning("Skill::Secondary::PriorityForRace: unknown race."); return UNKNOWN;
+	    DEBUG(DBG_GAME , DBG_WARN, "Skill::Secondary::PriorityForRace: unknown race."); return UNKNOWN;
     }
 
     switch(parts.Get())
@@ -827,7 +828,7 @@ Skill::Secondary::skill_t Skill::Secondary::PriorityFromRace(const u8 race)
 	default: break;
     }
 
-    Error::Warning("Skill::Secondary::PriorityForRace: unknown result.");
+    DEBUG(DBG_GAME , DBG_WARN, "Skill::Secondary::PriorityForRace: unknown result.");
     return UNKNOWN;
 }
 

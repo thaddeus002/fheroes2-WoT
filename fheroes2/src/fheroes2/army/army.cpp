@@ -260,7 +260,7 @@ Army::Troop & Army::army_t::FirstValid(void)
 
     if(it == army.end())
     {
-	Error::Warning("Army::FirstValid: not found, return first invalid..");
+	DEBUG(DBG_GAME , DBG_WARN, "Army::FirstValid: not found, return first invalid..");
 	it = army.begin();
     }
 
@@ -331,7 +331,7 @@ bool Army::army_t::JoinTroop(const Troop & troop)
     if(it != army.end())
     {
 	(*it).SetCount((*it).Count() + troop.Count());
-	if(2 < Settings::Get().Debug()) Error::Verbose("Army::JoinTroop: monster: " + std::string(troop.GetName()) + ", count: ", troop.Count());
+	DEBUG(DBG_GAME , DBG_INFO, "Army::JoinTroop: monster: " << troop.GetName() << ", count: " << troop.Count());
 	return true;
     }
 
@@ -339,7 +339,7 @@ bool Army::army_t::JoinTroop(const Troop & troop)
     if(it != army.end())
     {
 	(*it).Set(troop, troop.Count());
-	if(2 < Settings::Get().Debug()) Error::Verbose("Army::JoinTroop: monster: " + std::string(troop.GetName()) + ", count: ", troop.Count());
+	DEBUG(DBG_GAME , DBG_INFO, "Army::JoinTroop: monster: " << troop.GetName() << ", count: " << troop.Count());
 	return true;
     }
 
@@ -378,7 +378,7 @@ Race::race_t Army::army_t::GetRace(void) const
 
     if(races.empty())
     {
-        Error::Warning("Army::GetRaceArmy: empty");
+        DEBUG(DBG_GAME , DBG_WARN, "Army::GetRaceArmy: empty");
         return Race::MULT;
     }
 

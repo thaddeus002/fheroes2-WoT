@@ -41,7 +41,7 @@ void Kingdom::AIDumpCacheObjects(const IndexDistance & id) const
 {
     std::map<u16, MP2::object_t>::const_iterator it = ai_objects.find(id.first);
     if(it != ai_objects.end())
-    std::cout << "AIDumpCacheObjects: " << MP2::StringObject((*it).second) << ", maps index: " << id.first << ", dist: " << id.second << std::endl;
+    DEBUG(DBG_AI , DBG_TRACE, "AIDumpCacheObjects: " << MP2::StringObject((*it).second) << ", maps index: " << id.first << ", dist: " << id.second);
 }
 
 void Kingdom::AITurns(void)
@@ -60,7 +60,7 @@ void Kingdom::AITurns(void)
     // scan map
     ai_objects.clear();
     world.StoreActionObject(GetColor(), ai_objects);
-    if(1 < Settings::Get().Debug()) std::cout << "Kingdom::AITurns: " << Color::String(color) << ", size cache objects: " << ai_objects.size() << std::endl;
+    DEBUG(DBG_AI , DBG_INFO, "Kingdom::AITurns: " << Color::String(color) << ", size cache objects: " << ai_objects.size());
 
     // turn indicator
     Game::SetAIProgress(1);
@@ -154,7 +154,7 @@ void Kingdom::AITurns(void)
     // turn indicator
     Game::SetAIProgress(9);
 
-    if(Settings::Get().Debug()) std::cout << "Kingdom::AITurns: " << Color::String(color) << " moved" << std::endl;
+    DEBUG(DBG_AI , DBG_INFO, "Kingdom::AITurns: " << Color::String(color) << " moved");
 }
 
 void Kingdom::AICastlesTurns(void)
@@ -212,7 +212,7 @@ void Kingdom::AIHeroesTurns(Heroes &hero)
 
     bool hide_move = conf.HideAIMove() ||
 	    Game::NETWORK == Settings::Get().GameType() ||
-	    (0 == Settings::Get().Debug() && !hero.isShow(Settings::Get().MyColor()));
+	    (! IS_DEVEL() && !hero.isShow(Settings::Get().MyColor()));
 
 #ifdef WITH_NET
     FH2Server & server = FH2Server::Get();
@@ -278,15 +278,15 @@ void Kingdom::AIHeroesGetTask(Heroes & hero)
     if(task.size())
     {
 	const u16 index = task.front();
-	if(Settings::Get().Debug()) std::cout << "AI::HeroesTask: " << Color::String(color) << ", Hero " << hero.GetName() << " say: go to object: " << MP2::StringObject(ai_objects[index]) << ", index: " << index << std::endl;
+	DEBUG(DBG_AI , DBG_INFO, "AI::HeroesTask: " << Color::String(color) << ", Hero " << hero.GetName() << " say: go to object: " << MP2::StringObject(ai_objects[index]) << ", index: " << index);
 	task.pop_front();
 	ai_objects.erase(index);
-	if(2 < Settings::Get().Debug()) hero.GetPath().Dump();
+	if(IS_DEBUG(DBG_AI, DBG_TRACE)) hero.GetPath().Dump();
     }
     else
     {
 	hero.GetPath().Reset();
-	if(Settings::Get().Debug()) std::cout << "AI::HeroesTask: " << Color::String(color) << ", Hero " << hero.GetName() << " say: unknown task., help my please.." << std::endl;
+	DEBUG(DBG_AI , DBG_INFO, "AI::HeroesTask: " << Color::String(color) << ", Hero " << hero.GetName() << " say: unknown task., help my please..");
 	hero.SetModes(Heroes::STUPID);
     }
 }
@@ -370,7 +370,7 @@ void Kingdom::AIHeroesPrepareTask(Heroes & hero)
     }
 
     if(objs.size()) std::sort(objs.begin(), objs.end(), IndexDistance::Longest);
-    if(1 < Settings::Get().Debug()) std::cout << "Kingdom::AIHeroesTask: " << Color::String(color) <<", hero: " << hero.GetName() << ", unconfirmed tasks: " << objs.size() << std::endl;
+    DEBUG(DBG_AI , DBG_INFO, "Kingdom::AIHeroesTask: " << Color::String(color) <<", hero: " << hero.GetName() << ", unconfirmed tasks: " << objs.size());
 
     // store random task
     if(objs.size())

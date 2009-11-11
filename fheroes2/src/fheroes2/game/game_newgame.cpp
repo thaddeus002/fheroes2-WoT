@@ -45,7 +45,7 @@ Game::menu_t Game::NewHotSeat(void)
 Game::menu_t Game::NewCampain(void)
 {
     Settings::Get().SetGameType(Game::CAMPAIGN);
-    Error::Verbose("New Campain Game: under construction.");
+    VERBOSE("New Campain Game: under construction.");
     return Game::NEWGAME;
 }
 

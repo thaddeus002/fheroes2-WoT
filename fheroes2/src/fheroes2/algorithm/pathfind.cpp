@@ -87,8 +87,6 @@ u16 GetCurrentLength(std::map<u16, cell_t> & list, u16 cur)
 
 bool Algorithm::PathFind(std::list<Route::Step> *result, const u16 from, const u16 to, const u16 limit, const Heroes *hero)
 {
-    const u8 debug = Settings::Get().Debug();
-
     const u8 pathfinding = (hero ? hero->GetLevelSkill(Skill::Secondary::PATHFINDING) : Skill::Level::NONE);
     const u8 under = (hero ? hero->GetUnderObject() : MP2::OBJ_ZERO);
 
@@ -166,10 +164,7 @@ bool Algorithm::PathFind(std::list<Route::Step> *result, const u16 from, const u
 	else
 	list[cur].open = false;
 
-	if(3 <= debug)
-	{
-	    std::cout << "route, from: " << cur << std::endl;
-	}
+	DEBUG(DBG_GAME , DBG_TRACE, "Algorithm::PathFind: route, from: " << cur);
 
 	it1 = list.begin();
 	alt = tmp = MAXU16;
@@ -179,7 +174,7 @@ bool Algorithm::PathFind(std::list<Route::Step> *result, const u16 from, const u
 	{
 	    const cell_t & cell2 = (*it1).second;
 
-	    if(3 <= debug && cell2.cost_g != MAXU16)
+	    if(IS_DEBUG(DBG_GAME, DBG_TRACE) && cell2.cost_g != MAXU16)
 	    {
 		direct = Direction::Get(cur, (*it1).first);
 		if(Direction::UNKNOWN != direct)
@@ -203,10 +198,7 @@ bool Algorithm::PathFind(std::list<Route::Step> *result, const u16 from, const u
 	// not found, and exception
 	if(MAXU16 == tmp || MAXU16 == alt || (limit && GetCurrentLength(list, cur) > limit)) break;
 	else
-	if(3 <= debug)
-	{
-		std::cout << "  select: " << alt << std::endl << std::endl;
-	}
+	DEBUG(DBG_GAME , DBG_TRACE, "Algorithm::PathFind: select: " << alt);
 
 	cur = alt;
     }
@@ -224,7 +216,7 @@ bool Algorithm::PathFind(std::list<Route::Step> *result, const u16 from, const u
         return true;
     }
 
-    if(1 < debug) std::cout << "Algorithm::PathFind: not found, from:" << from << ", to: " << to << std::endl;
+    DEBUG(DBG_GAME , DBG_TRACE, "Algorithm::PathFind: not found, from:" << from << ", to: " << to);
     list.clear();
 
     return false;

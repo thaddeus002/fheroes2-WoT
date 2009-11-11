@@ -38,7 +38,7 @@ void Dir::Read(const std::string &path, const std::string &filter, bool sensitiv
 
     dp = opendir(path.c_str());
 
-    if(Settings::Get().Debug()) Error::Verbose("Dir::open: " + (filter.size() ? path + " (" + filter + ")" : path));
+    DEBUG(DBG_ENGINE , DBG_INFO, "Dir::Read: " << (filter.size() ? path + " (" + filter + ")" : path));
 
     if(dp)
     {

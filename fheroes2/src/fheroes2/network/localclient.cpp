@@ -123,7 +123,6 @@ void FH2LocalClient::Logout(void)
 bool FH2LocalClient::ConnectionChat(void)
 {
     Settings & conf = Settings::Get();
-    bool extdebug = 2 < conf.Debug();
 
     player_color = 0;
     player_race = 0;
@@ -131,9 +130,8 @@ bool FH2LocalClient::ConnectionChat(void)
     player_id = 0;
 
     // recv ready, banner
-    if(extdebug) std::cerr << "FH2LocalClient::ConnectionChat: recv ready...";
-    if(!Wait(packet, MSG_READY, extdebug)) return false;
-    if(extdebug) std::cerr << "ok" << std::endl;
+    DEBUG(DBG_NETWORK , DBG_INFO, "FH2LocalClient::ConnectionChat: wait ready");
+    if(!Wait(packet, MSG_READY)) return false;
 
     // get banner
     std::string str;
@@ -147,45 +145,39 @@ bool FH2LocalClient::ConnectionChat(void)
     packet.Reset();
     packet.SetID(MSG_HELLO);
     packet.Push(player_name);
-    if(extdebug) std::cerr << "FH2LocalClient::ConnectionChat send hello...";
-    if(!Send(packet, extdebug)) return false;
-    if(extdebug) std::cerr << "ok" << std::endl;
+    DEBUG(DBG_NETWORK , DBG_INFO, "FH2LocalClient::ConnectionChat send hello");
+    if(!Send(packet)) return false;
 
     // recv hello, modes, player_id
-    if(extdebug) std::cerr << "FH2LocalClient::ConnectionChat: recv hello...";
-    if(!Wait(packet, MSG_HELLO, extdebug)) return false;
-    if(extdebug) std::cerr << "ok" << std::endl;
+    DEBUG(DBG_NETWORK , DBG_INFO, "FH2LocalClient::ConnectionChat: wait hello");
+    if(!Wait(packet, MSG_HELLO)) return false;
     packet.Pop(modes);
     packet.Pop(player_id);
     packet.Pop(player_color);
-    if(0 == player_id || 0 == player_color) Error::Warning("FH2LocalClient::ConnectionChat: player zero values");
-    if(extdebug) std::cerr << "FH2LocalClient::ConnectionChat: " << (Modes(ST_ADMIN) ? "admin" : "client") << " mode" << std::endl;
+    if(0 == player_id || 0 == player_color) DEBUG(DBG_NETWORK , DBG_WARN, "FH2LocalClient::ConnectionChat: player zero values");
+    DEBUG(DBG_NETWORK , DBG_INFO, "FH2LocalClient::ConnectionChat: " << (Modes(ST_ADMIN) ? "admin" : "client") << " mode");
     
     // send get maps info
     packet.Reset();
     packet.SetID(MSG_MAPS_INFO_GET);
-    if(extdebug) std::cerr << "FH2LocalClient::ConnectionChat send get_maps_info...";
-    if(!Send(packet, extdebug)) return false;
-    if(extdebug) std::cerr << "ok" << std::endl;
+    DEBUG(DBG_NETWORK , DBG_INFO,  "FH2LocalClient::ConnectionChat send get_maps_info");
+    if(!Send(packet)) return false;
 
     // recv maps
-    if(extdebug) std::cerr << "FH2LocalClient::ConnectionChat: recv maps_info...";
-    if(!Wait(packet, MSG_MAPS_INFO, extdebug)) return false;
-    if(extdebug) std::cerr << "ok" << std::endl;
+    DEBUG(DBG_NETWORK , DBG_INFO, "FH2LocalClient::ConnectionChat: wait maps_info");
+    if(!Wait(packet, MSG_MAPS_INFO)) return false;
 
     Network::PacketPopMapsFileInfo(packet, conf.CurrentFileInfo());
 
     // send get players
     packet.Reset();
     packet.SetID(MSG_PLAYERS_GET);
-    if(extdebug) std::cerr << "FH2LocalClient::ConnectionChat send get_players...";
-    if(!Send(packet, extdebug)) return false;
-    if(extdebug) std::cerr << "ok" << std::endl;
+    DEBUG(DBG_NETWORK , DBG_INFO, "FH2LocalClient::ConnectionChat send get_players");
+    if(!Send(packet)) return false;
 
     // recv players
-    if(extdebug) std::cerr << "FH2LocalClient::ConnectionChat: recv players...";
-    if(!Wait(packet, MSG_PLAYERS, extdebug)) return false;
-    if(extdebug) std::cerr << "ok" << std::endl;
+    DEBUG(DBG_NETWORK , DBG_INFO,  "FH2LocalClient::ConnectionChat: wait players");
+    if(!Wait(packet, MSG_PLAYERS)) return false;
     PopPlayersInfo(packet);
 
     return true;
@@ -194,7 +186,6 @@ bool FH2LocalClient::ConnectionChat(void)
 bool FH2LocalClient::ScenarioInfoDialog(void)
 {
     Settings & conf = Settings::Get();
-    bool extdebug = 2 < conf.Debug();
     bool change_players = false;
     bool update_info    = false;
 
@@ -230,15 +221,14 @@ bool FH2LocalClient::ScenarioInfoDialog(void)
     display.Flip();
 
     bool exit = false;
-    if(extdebug) std::cerr << "FH2LocalClient::ScenarioInfoDialog: start queue" << std::endl;
+    DEBUG(DBG_NETWORK , DBG_INFO, "FH2LocalClient::ScenarioInfoDialog: start queue");
 
     while(!exit && le.HandleEvents())
     {
         if(Ready())
 	{
-	    if(extdebug) std::cerr << "FH2LocalClient::ScenarioInfoDialog: recv: ";
-	    if(!Recv(packet, extdebug)) return false;
-	    if(extdebug) std::cerr << Network::GetMsgString(packet.GetID()) << std::endl;
+	    if(!Recv(packet)) return false;
+	    DEBUG(DBG_NETWORK , DBG_INFO, "FH2LocalClient::ScenarioInfoDialog: recv: " << Network::GetMsgString(packet.GetID()));
 
 	    switch(packet.GetID())
     	    {
@@ -285,7 +275,6 @@ bool FH2LocalClient::ScenarioInfoDialog(void)
 		    }
 		    else
 		    {
-			if(extdebug) std::cerr << "FH2LocalClient::ScenarioInfoDialog: send maps_load_err...";
 			return false;
 		    }
 		    break;
@@ -315,9 +304,8 @@ bool FH2LocalClient::ScenarioInfoDialog(void)
 	    packet.SetID(MSG_PLAYERS);
 	    Network::PacketPushPlayersInfo(packet, players);
 
-	    if(extdebug) std::cerr << "FH2LocalClient::ScenarioInfoDialog: send players...";
-	    if(!Send(packet, extdebug)) return Dialog::CANCEL;
-	    if(extdebug) std::cerr << "ok" << std::endl;
+	    DEBUG(DBG_NETWORK , DBG_INFO, "FH2LocalClient::ScenarioInfoDialog: send players";
+	    if(!Send(packet)) return Dialog::CANCEL;
 
 	    conf.SetPlayersColors(Network::GetPlayersColors(players));
 	*/
@@ -336,13 +324,11 @@ bool FH2LocalClient::ScenarioInfoDialog(void)
 	    // recv maps_info_list
 	    packet.Reset();
 	    packet.SetID(MSG_MAPS_LIST_GET);
-	    if(extdebug) std::cerr << "FH2LocalClient::ScenarioInfoDialog: send get_maps_list...";
-	    if(!Send(packet, extdebug)) return false;
-	    if(extdebug) std::cerr << "ok" << std::endl;
+	    DEBUG(DBG_NETWORK , DBG_INFO, "FH2LocalClient::ScenarioInfoDialog: send get_maps_list");
+	    if(!Send(packet)) return false;
 
-	    if(extdebug) std::cerr << "FH2LocalClient::ScenarioInfoDialog: recv maps_list...";
-	    if(!Wait(packet, MSG_MAPS_LIST, extdebug)) return false;
-	    if(extdebug) std::cerr << "ok" << std::endl;
+	    DEBUG(DBG_NETWORK , DBG_INFO,  "FH2LocalClient::ScenarioInfoDialog: wait maps_list");
+	    if(!Wait(packet, MSG_MAPS_LIST)) return false;
 
 	    MapsFileInfoList lists;
 	    PacketPopMapsFileInfoList(packet, lists);
@@ -354,9 +340,8 @@ bool FH2LocalClient::ScenarioInfoDialog(void)
 	        packet.Reset();
 		packet.SetID(MSG_MAPS_INFO_SET);
 	        packet.Push(filemaps);
-		if(extdebug) std::cerr << "FH2LocalClient::ScenarioInfoDialog: send maps_info...";
-	        if(!Send(packet, extdebug)) return false;
-		if(extdebug) std::cerr << "ok" << std::endl;
+		DEBUG(DBG_NETWORK , DBG_INFO, "FH2LocalClient::ScenarioInfoDialog: send maps_info");
+	        if(!Send(packet)) return false;
 	    }
 	    update_info = true;
 	}
@@ -370,9 +355,8 @@ bool FH2LocalClient::ScenarioInfoDialog(void)
     	{
            packet.Reset();
            packet.SetID(MSG_MAPS_LOAD);
-           if(extdebug) std::cerr << "FH2LocalClient::ScenarioInfoDialog: send maps_load...";
-           if(!Send(packet, extdebug)) return false;
-           if(extdebug) std::cerr << "ok" << std::endl;
+           DEBUG(DBG_NETWORK , DBG_INFO, "FH2LocalClient::ScenarioInfoDialog: send maps_load");
+           if(!Send(packet)) return false;
 	}
 
         DELAY(10);
