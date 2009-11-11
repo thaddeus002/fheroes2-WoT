@@ -38,15 +38,16 @@
 
 enum
 {
-    DBG_ENGINE	= 0x0001,
-    DBG_GAME	= 0x0002,
-    DBG_BATTLE	= 0x0004,
-    DBG_AI	= 0x0008,
-    DBG_NETWORK	= 0x0010,
+    DBG_WARN	= 0x0001,
+    DBG_INFO	= 0x0002,
+    DBG_TRACE	= 0x0004,
 
-    DBG_WARN	= 0x0020,
-    DBG_INFO	= 0x0040,
-    DBG_TRACE	= 0x0080,
+    DBG_ENGINE	= 0x0010,
+    DBG_GAME	= 0x0020,
+    DBG_BATTLE	= 0x0040,
+    DBG_AI	= 0x0080,
+    DBG_NETWORK	= 0x0100,
+
 
     DBG_DEVEL	= 0x8000,
 };

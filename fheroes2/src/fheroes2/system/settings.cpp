@@ -24,7 +24,7 @@
 #include "settings.h"
 
 #define DEFAULT_PORT	5154
-
+#define DEFAULT_DEBUG	(DBG_ENGINE | DBG_GAME | DBG_BATTLE | DBG_AI | DBG_NETWORK | DBG_WARN)
 namespace
 {
     struct ModeSetting
@@ -67,7 +67,7 @@ Settings::Settings() : major_version(MAJOR_VERSION), minor_version(MINOR_VERSION
 #ifdef SVN_REVISION
     svn_version(SVN_REVISION),
 #endif
-    debug(0), video_mode(640, 480), game_difficulty(Difficulty::NORMAL),
+    debug(DEFAULT_DEBUG), video_mode(640, 480), game_difficulty(Difficulty::NORMAL),
     my_color(Color::GRAY), cur_color(Color::GRAY), path_data_directory("data"),
     font_normal("dejavusans.ttf"), font_small("dejavusans.ttf"), size_normal(15), size_small(10),
     sound_volume(6), music_volume(6), animation(6), game_type(0), players_colors(0), preferably_count_players(0),
@@ -149,7 +149,7 @@ bool Settings::Read(const std::string & filename)
     if(font_normal.empty() || font_small.empty()) ResetModes(USEUNICODE);
 
 #ifdef BUILD_RELEASE
-    debug = 0;
+    debug &= 0x0FFF;
 #endif
 
     if(video_mode.w < 640 || video_mode.h < 480)
@@ -525,7 +525,7 @@ void Settings::SetMyColor(const Color::color_t c) { my_color = c; }
 void Settings::SetStrModes(const std::string & key)
 {
     // debug
-    if(key == "debug")		debug = DBG_ENGINE | DBG_GAME | DBG_BATTLE | DBG_AI | DBG_NETWORK | DBG_WARN;
+    if(key == "debug") debug = DEFAULT_DEBUG;
     else
     {
         for(u16 i = 0; i < sizeof(modeSettings) / sizeof(modeSettings[0]); i++)
