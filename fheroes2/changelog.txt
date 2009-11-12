@@ -1,6 +1,8 @@
 SVN - up to r1351
 
 Nov, 8, 2009
++ fixed heroes fadein/fadeout
++ fixed multiple maps event
 + update mixer
 + added options alt resource, support ogg sounds
 + added options hide ai move
