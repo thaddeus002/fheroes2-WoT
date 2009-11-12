@@ -592,6 +592,7 @@ void Game::IO::PackHeroes(QueueMessage & msg, const Heroes & hero)
 
 bool Game::IO::LoadBIN(QueueMessage & msg)
 {
+VERBOSE("game load start");
     Settings & conf = Settings::Get();
 
     u8 byte8;
@@ -672,7 +673,7 @@ bool Game::IO::LoadBIN(QueueMessage & msg)
     msg.Pop(conf.players_colors);
     msg.Pop(conf.preferably_count_players);
 #ifdef WITH_DEBUG
-    msg.Pop(byte8);
+    msg.Pop(byte16);
 #else
     if(format >= FORMAT_VERSION_1357)
 	msg.Pop(conf.debug);
@@ -722,7 +723,7 @@ bool Game::IO::LoadBIN(QueueMessage & msg)
 	msg.Pop(tile->flags);
 
 #ifdef WITH_DEBUG
-	if(conf.debug) tile->fogs &= ~conf.my_color;
+	if(IS_DEVEL()) tile->fogs &= ~conf.my_color;
 #endif
 
 	// addons 1
@@ -933,6 +934,7 @@ bool Game::IO::LoadBIN(QueueMessage & msg)
     // regenerate puzzle surface
     Interface::GameArea::GenerateUltimateArtifactAreaSurface(world.ultimate_artifact, world.puzzle_surface);
 
+VERBOSE("game load end");
     return byte16 == 0xFFFF;
 }
 

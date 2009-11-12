@@ -107,7 +107,6 @@ bool FH2LocalClient::StartGame(void)
     display.Flip();
 
     Network::Message packet;
-    u32 ticket = 0;
 
     while(LocalEvent::Get().HandleEvents())
     {
@@ -150,14 +149,15 @@ bool FH2LocalClient::StartGame(void)
 
 		    if(conf.MyColor() == color)
             	    {
-			packet.Reset();
-			if(Game::ENDTURN != Game::HumanTurn())
-			    packet.SetID(MSG_LOGOUT);
-			else
+			if(Game::ENDTURN == Game::HumanTurn())
+			{
+			    packet.Reset();
 			    packet.SetID(MSG_END_TURN);
-
-			DEBUG(DBG_NETWORK, DBG_INFO, "FH2LocalClient::StartGame: send end turn");
-			if(!Send(packet)) return false;
+			    DEBUG(DBG_NETWORK, DBG_INFO, "FH2LocalClient::StartGame: send end turn");
+			    if(!Send(packet)) return false;
+			}
+			else
+			    return true;
 		    }
 		    else
 		    {
@@ -203,16 +203,9 @@ bool FH2LocalClient::StartGame(void)
 		default: break;
 	    }
 	}
-	else
-	    DELAY(1);
-
-        ++ticket;
     }
 
-    // logout
-    Logout();
-
-    return false;
+    return true;
 }
 
 #endif
