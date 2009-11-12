@@ -332,6 +332,101 @@ void Maps::Tiles::RedrawBottom(Surface & dst, s16 dstx, s16 dsty, const TilesAdd
     }
 }
 
+void Maps::Tiles::RedrawObjects(void) const
+{
+    const Point mp(maps_index % world.w(), maps_index / world.w());
+    const Interface::GameArea & area = Interface::GameArea::Get();
+
+    if(area.GetRectMaps() & mp)
+    {
+	const s16 & dstx = area.GetArea().x + TILEWIDTH * (mp.x - area.GetRectMaps().x);
+	const s16 & dsty = area.GetArea().y + TILEWIDTH * (mp.y - area.GetRectMaps().y);
+
+	RedrawObjects(Display::Get(), dstx, dsty, area);
+    }
+}
+
+void Maps::Tiles::RedrawObjects(Surface & dst, s16 px, s16 py, const Interface::GameArea & area) const
+{
+    switch(GetObject())
+    {
+        // boat
+        case MP2::OBJ_BOAT:	RedrawBoat(dst, px, py, area); break;
+        // monster
+        case MP2::OBJ_MONSTER:	RedrawMonster(dst, px, py, area); break;
+	//
+	default: break;
+    }
+}
+
+void Maps::Tiles::RedrawMonster(Surface & dst, s16 px, s16 py, const Interface::GameArea & area) const
+{
+    const Monster monster(*this);
+    Point dst_pt;
+    Rect src_rt;
+    u16 dst_index = MAXU16;
+
+    // draw attack sprite
+    if(Maps::ScanAroundObject(maps_index, MP2::OBJ_HEROES, Settings::Get().Original(), &dst_index))
+    {
+	bool revert = false;
+
+	switch(Direction::Get(maps_index, dst_index))
+	{
+	    case Direction::TOP_LEFT:
+	    case Direction::LEFT:
+	    case Direction::BOTTOM_LEFT:	revert = true;
+	    default: break;
+	}
+
+	const Sprite & sprite_first = AGG::GetICN(ICN::MINIMON, monster.GetSpriteIndex() * 9 + (revert ? 8 : 7));
+
+	dst_pt.x = px + sprite_first.x() + 16;
+	dst_pt.y = py + TILEWIDTH + sprite_first.y();
+
+	area.SrcRectFixed(src_rt, dst_pt, sprite_first.w(), sprite_first.h());
+	dst.Blit(sprite_first, src_rt, dst_pt);
+    }
+    else
+    {
+	// draw first sprite
+	const Sprite & sprite_first = AGG::GetICN(ICN::MINIMON, monster.GetSpriteIndex() * 9);
+
+	dst_pt.x = px + sprite_first.x() + 16;
+	dst_pt.y = py + TILEWIDTH + sprite_first.y();
+
+	area.SrcRectFixed(src_rt, dst_pt, sprite_first.w(), sprite_first.h());
+	dst.Blit(sprite_first, src_rt, dst_pt);
+
+	// draw second sprite
+	const Sprite & sprite_next = AGG::GetICN(ICN::MINIMON, monster.GetSpriteIndex() * 9 + 1 + (Maps::AnimationTicket() % 6));
+
+	dst_pt.x = px + sprite_next.x() + 16;
+	dst_pt.y = py + TILEWIDTH + sprite_next.y();
+
+	area.SrcRectFixed(src_rt, dst_pt, sprite_next.w(), sprite_next.h());
+	dst.Blit(sprite_next, src_rt, dst_pt);
+
+	//if(Maps::isValidDirection(tile.GetIndex(), Direction::BOTTOM))
+    	//    world.GetTiles(Maps::GetDirectionIndex(tile.GetIndex(), Direction::BOTTOM)).RedrawTop();
+    }
+}
+
+void Maps::Tiles::RedrawBoat(Surface & dst, s16 px, s16 py, const Interface::GameArea & area) const
+{
+    if(Settings::Get().Editor())
+        dst.Blit(AGG::GetICN(ICN::OBJNWAT2, 23), px, py);
+    else
+    {
+        // FIXME: restore direction from Maps::Tiles
+        const Sprite & sprite = AGG::GetICN(ICN::BOAT32, 18);
+        Point dst_pt(px + sprite.x(), py + sprite.y() + TILEWIDTH);
+        Rect src_rt;
+        area.SrcRectFixed(src_rt, dst_pt, sprite.w(), sprite.h());
+        dst.Blit(sprite, src_rt, dst_pt);
+    }
+}
+
 void Maps::Tiles::RedrawBottom4Hero(Surface & dst, const Interface::GameArea & area) const
 {
     const Point mp(maps_index % world.w(), maps_index / world.w());

@@ -38,8 +38,7 @@ enum level_t
     LEVEL_BOTTOM  = 0x01,
     LEVEL_TOP     = 0x02,
     LEVEL_HEROES  = 0x04,
-    LEVEL_MONSTER = 0x08,
-    LEVEL_BOAT    = 0x10,
+    LEVEL_OBJECTS = 0x08,
     LEVEL_FOG     = 0x20,
 
     LEVEL_ALL     = 0xFF,
@@ -79,8 +78,6 @@ namespace Interface
 
     private:
 	GameArea();
-	void RedrawBoat(Surface &, s16, s16, const Maps::Tiles &) const;
-	void RedrawMonster(Surface &, s16, s16, const Maps::Tiles &) const;
 
 	Rect	rectArea;
 	Rect	rectMaps;

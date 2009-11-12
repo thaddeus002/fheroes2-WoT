@@ -603,6 +603,7 @@ void Heroes::FadeOut(void) const
 
         	tile.RedrawTile();
         	tile.RedrawBottom();
+        	tile.RedrawObjects();
     	    }
 
     	    sf.SetAlpha(alpha);
@@ -666,6 +667,7 @@ void Heroes::FadeIn(void) const
 
         	tile.RedrawTile();
         	tile.RedrawBottom();
+        	tile.RedrawObjects();
     	    }
 
     	    sf.SetAlpha(alpha);

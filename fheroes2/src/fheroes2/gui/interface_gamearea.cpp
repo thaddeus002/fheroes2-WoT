@@ -121,24 +121,10 @@ void Interface::GameArea::Redraw(Surface & dst, u8 flag) const
 	    world.GetTiles(rectMaps.x + ox, rectMaps.y + oy).RedrawBottom(dst, rectArea.x + TILEWIDTH * ox, rectArea.y + TILEWIDTH * oy);
 
     // ext object
+    if(flag & LEVEL_OBJECTS)
     for(u8 oy = 0; oy < rectMaps.h; ++oy)
 	for(u8 ox = 0; ox < rectMaps.w; ++ox)
-    {
-	const Maps::Tiles & tile = world.GetTiles(rectMaps.x + ox, rectMaps.y + oy);
-
-	switch(tile.GetObject())
-	{
-    	    // boat
-    	    case MP2::OBJ_BOAT:	
-		if(flag & LEVEL_BOAT)
-		    RedrawBoat(dst, rectArea.x + TILEWIDTH * ox, rectArea.y + TILEWIDTH * oy, tile); break;
-    	    // monster
-    	    case MP2::OBJ_MONSTER:
-		if(flag & LEVEL_MONSTER)
-		    RedrawMonster(dst, rectArea.x + TILEWIDTH * ox, rectArea.y + TILEWIDTH * oy, tile); break;
-    	    default: break;
-	}
-    }
+	    world.GetTiles(rectMaps.x + ox, rectMaps.y + oy).RedrawObjects(dst, rectArea.x + TILEWIDTH * ox, rectArea.y + TILEWIDTH * oy, *this);
 
     // top
     if(flag & LEVEL_TOP)
@@ -292,74 +278,6 @@ void Interface::GameArea::Center(s16 px, s16 py)
     }
 
     if(scrollDirection) Scroll();
-}
-
-void Interface::GameArea::RedrawBoat(Surface & dst, s16 px, s16 py, const Maps::Tiles & tile) const
-{
-    if(Settings::Get().Editor())
-        dst.Blit(AGG::GetICN(ICN::OBJNWAT2, 23), px, py);
-    else
-    {
-	// FIXME: restore direction from Maps::Tiles
-        const Sprite & sprite = AGG::GetICN(ICN::BOAT32, 18);
-        Point dst_pt(px + sprite.x(), py + sprite.y() + TILEWIDTH);
-        Rect src_rt;
-        SrcRectFixed(src_rt, dst_pt, sprite.w(), sprite.h());
-        dst.Blit(sprite, src_rt, dst_pt);
-    }
-}
-
-void Interface::GameArea::RedrawMonster(Surface & dst, s16 px, s16 py, const Maps::Tiles & tile) const
-{
-    const Monster monster(tile);
-    Point dst_pt;
-    Rect src_rt;
-    u16 dst_index = MAXU16;
-
-    // draw attack sprite
-    if(Maps::ScanAroundObject(tile.GetIndex(), MP2::OBJ_HEROES, Settings::Get().Original(), &dst_index))
-    {
-	bool revert = false;
-
-	switch(Direction::Get(tile.GetIndex(), dst_index))
-	{
-	    case Direction::TOP_LEFT:
-	    case Direction::LEFT:
-	    case Direction::BOTTOM_LEFT:	revert = true;
-	    default: break;
-	}
-
-	const Sprite & sprite_first = AGG::GetICN(ICN::MINIMON, monster.GetSpriteIndex() * 9 + (revert ? 8 : 7));
-
-	dst_pt.x = px + sprite_first.x() + 16;
-	dst_pt.y = py + TILEWIDTH + sprite_first.y();
-
-	SrcRectFixed(src_rt, dst_pt, sprite_first.w(), sprite_first.h());
-	dst.Blit(sprite_first, src_rt, dst_pt);
-    }
-    else
-    {
-	// draw first sprite
-	const Sprite & sprite_first = AGG::GetICN(ICN::MINIMON, monster.GetSpriteIndex() * 9);
-
-	dst_pt.x = px + sprite_first.x() + 16;
-	dst_pt.y = py + TILEWIDTH + sprite_first.y();
-
-	SrcRectFixed(src_rt, dst_pt, sprite_first.w(), sprite_first.h());
-	dst.Blit(sprite_first, src_rt, dst_pt);
-
-	// draw second sprite
-	const Sprite & sprite_next = AGG::GetICN(ICN::MINIMON, monster.GetSpriteIndex() * 9 + 1 + (Maps::AnimationTicket() % 6));
-
-	dst_pt.x = px + sprite_next.x() + 16;
-	dst_pt.y = py + TILEWIDTH + sprite_next.y();
-
-	SrcRectFixed(src_rt, dst_pt, sprite_next.w(), sprite_next.h());
-	dst.Blit(sprite_next, src_rt, dst_pt);
-
-	//if(Maps::isValidDirection(tile.GetIndex(), Direction::BOTTOM))
-    	//    world.GetTiles(Maps::GetDirectionIndex(tile.GetIndex(), Direction::BOTTOM)).RedrawTop();
-    }
 }
 
 void RedrawClopOrClofSpriteFog(const u16 dst_index, const Point & dst)
