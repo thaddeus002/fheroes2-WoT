@@ -54,7 +54,7 @@ enum
 
 #define VERBOSE(x) std::cout << x << std::endl
 #define IS_DEVEL() (DBG_DEVEL & Settings::Get().Debug())
-#define IS_DEBUG(x, y) (((x) & Settings::Get().Debug()) && ((y) & Settings::Get().Debug()))
+#define IS_DEBUG(x, y) (((x) & Settings::Get().Debug()) && ((0x000F & (y)) <= (0x000F & Settings::Get().Debug())))
 #define DEBUG(x, y, z) if(IS_DEBUG((x), (y))) VERBOSE(z)
 
 class Settings : public BitModes

@@ -85,7 +85,10 @@ int String::ToInt(const std::string &str)
     std::istringstream stream(str);
     int res;
 
-    stream >> res;
+    if(std::string::npos == str.find('x'))
+	stream >> res;
+    else
+	stream >> std::hex >> res;
 
     return res;
 }
