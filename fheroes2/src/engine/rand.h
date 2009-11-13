@@ -22,6 +22,7 @@
 
 #include <vector>
 #include <list>
+#include <utility>
 #include "types.h"
 
 namespace Rand
@@ -49,17 +50,17 @@ namespace Rand
         return & (*it);
     };
 
-    class Queue : private std::vector<u8>
+    typedef std::pair<s32, u32> ValuePercent;
+
+    class Queue : private std::vector<ValuePercent>
     {
     public:
-	Queue(const u8 size = 0);
+	Queue(u32 size = 0);
 
 	void Reset(void);
-	void Push(const u8 quote);
-	size_t Get(void) const;
-
-    private:
-	u16 max;
+	void Push(s32, u32);
+	size_t Size(void) const;
+	s32 Get(void);
     };
 };
    

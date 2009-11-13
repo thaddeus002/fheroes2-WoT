@@ -43,66 +43,66 @@ Skill::Primary::skill_t Skill::Primary::FromLevelUp(const u8 race, const u8 leve
 	case Race::BARB:
 	    if(10 > level)
 	    {
-		percents.Push(55); percents.Push(35); percents.Push(5); percents.Push(5);
+		percents.Push(ATTACK, 55); percents.Push(DEFENCE, 35); percents.Push(POWER, 5); percents.Push(KNOWLEDGE, 5);
 	    }
 	    else
 	    {
-		percents.Push(30); percents.Push(30); percents.Push(20); percents.Push(20);
+		percents.Push(ATTACK, 30); percents.Push(DEFENCE, 30); percents.Push(POWER, 20); percents.Push(KNOWLEDGE, 20);
 	    }
 	    break;
 
 	case Race::KNGT:
 	    if(10 > level)
 	    {
-		percents.Push(35); percents.Push(45); percents.Push(10); percents.Push(10);
+		percents.Push(ATTACK, 35); percents.Push(DEFENCE, 45); percents.Push(POWER, 10); percents.Push(KNOWLEDGE, 10);
 	    }
 	    else
 	    {
-		percents.Push(25); percents.Push(25); percents.Push(25); percents.Push(25);
+		percents.Push(ATTACK, 25); percents.Push(DEFENCE, 25); percents.Push(POWER, 25); percents.Push(KNOWLEDGE, 25);
 	    }
 	    break;
 
 	case Race::NECR:
 	    if(10 > level)
 	    {
-		percents.Push(15); percents.Push(15); percents.Push(35); percents.Push(35);
+		percents.Push(ATTACK, 15); percents.Push(DEFENCE, 15); percents.Push(POWER, 35); percents.Push(KNOWLEDGE, 35);
 	    }
 	    else
 	    {
-		percents.Push(25); percents.Push(25); percents.Push(25); percents.Push(25);
+		percents.Push(ATTACK, 25); percents.Push(DEFENCE, 25); percents.Push(POWER, 25); percents.Push(KNOWLEDGE, 25);
 	    }
 	    break;
 
 	case Race::SORC:
 	    if(10 > level)
 	    {
-		percents.Push(10); percents.Push(10); percents.Push(30); percents.Push(50);
+		percents.Push(ATTACK, 10); percents.Push(DEFENCE, 10); percents.Push(POWER, 30); percents.Push(KNOWLEDGE, 50);
 	    }
 	    else
 	    {
-		percents.Push(20); percents.Push(20); percents.Push(30); percents.Push(30);
+		percents.Push(ATTACK, 20); percents.Push(DEFENCE, 20); percents.Push(POWER, 30); percents.Push(KNOWLEDGE, 30);
 	    }
 	    break;
 
 	case Race::WRLK:
 	    if(10 > level)
 	    {
-		percents.Push(10); percents.Push(10); percents.Push(50); percents.Push(30);
+		percents.Push(ATTACK, 10); percents.Push(DEFENCE, 10); percents.Push(POWER, 50); percents.Push(KNOWLEDGE, 30);
 	    }
 	    else
 	    {
-		percents.Push(20); percents.Push(20); percents.Push(30); percents.Push(30);
+		percents.Push(ATTACK, 20); percents.Push(DEFENCE, 20); percents.Push(POWER, 30); percents.Push(KNOWLEDGE, 30);
 	    }
 	    break;
 
 	case Race::WZRD:
 	    if(10 > level)
 	    {
-		percents.Push(10); percents.Push(10); percents.Push(40); percents.Push(40);
+		percents.Push(ATTACK, 10); percents.Push(DEFENCE, 10); percents.Push(POWER, 40); percents.Push(KNOWLEDGE, 40);
 	    }
 	    else
 	    {
-		percents.Push(20); percents.Push(20); percents.Push(30); percents.Push(30);
+		percents.Push(ATTACK, 20); percents.Push(DEFENCE, 20); percents.Push(POWER, 30); percents.Push(KNOWLEDGE, 30);
 	    }
 	    break;
 
@@ -110,13 +110,13 @@ Skill::Primary::skill_t Skill::Primary::FromLevelUp(const u8 race, const u8 leve
 	    DEBUG(DBG_GAME , DBG_WARN, "Skill::Primary::LevelUp: unknown race."); return UNKNOWN;
     }
 
+    if(percents.Size())
     switch(percents.Get())
     {
-	case 0:	return ATTACK;
-	case 1: return DEFENCE;
-	case 2: return POWER;
-	case 3: return KNOWLEDGE;
-
+	case ATTACK:	return ATTACK;
+	case DEFENCE:	return DEFENCE;
+	case POWER:	return POWER;
+	case KNOWLEDGE:	return KNOWLEDGE;
 	default: break;
     }
 
@@ -208,39 +208,22 @@ void Skill::Secondary::NextLevel(void)
 
 Skill::Level::type_t Skill::Secondary::Level(void) const
 {
-    switch(second)
-    {
-	case Level::BASIC:	return Level::BASIC;
-	case Level::ADVANCED:	return Level::ADVANCED;
-	case Level::EXPERT:	return Level::EXPERT;
-        default: break;
-    }
-
-    return Level::NONE;
+    return second > Level::EXPERT ? Level::NONE : static_cast<Level::type_t>(second);
 }
 
 Skill::Secondary::skill_t Skill::Secondary::Skill(void) const
 {
-    switch(first)
-    {
-	case PATHFINDING:return PATHFINDING;
-        case ARCHERY:	return ARCHERY;
-        case LOGISTICS:	return LOGISTICS;
-        case SCOUTING:	return SCOUTING;
-        case DIPLOMACY:	return DIPLOMACY;
-        case NAVIGATION:return NAVIGATION;
-        case LEADERSHIP:return LEADERSHIP;
-        case WISDOM:	return WISDOM;
-        case MYSTICISM:	return MYSTICISM;
-        case LUCK:	return LUCK;
-        case BALLISTICS:return BALLISTICS;
-        case EAGLEEYE:	return EAGLEEYE;
-        case NECROMANCY:return NECROMANCY;
-        case ESTATES:	return ESTATES;
-        default: break;
-    }
+    return Skill(first);
+}
 
-    return UNKNOWN;
+bool Skill::Secondary::isLevel(u8 level) const
+{
+    return level == second;
+}
+
+bool Skill::Secondary::isSkill(u8 skill) const
+{
+    return skill == first;
 }
 
 Skill::Secondary::skill_t Skill::Secondary::Skill(const u8 index)
@@ -470,368 +453,153 @@ const char* Skill::Secondary::Description(const skill_t skill, const Level::type
     return description_skill[index];
 }
 
-Skill::Secondary::skill_t Skill::Secondary::PriorityFromRace(const u8 race, const std::vector<skill_t> &exclude)
+void Skill::Secondary::FillStandard(std::vector<skill_t> & v)
 {
-    if(exclude.empty()) return PriorityFromRace(race);
-    
-    std::vector<skill_t>::const_iterator it1 = exclude.begin();
-    std::vector<skill_t>::const_iterator it2 = exclude.end();
-    Rand::Queue parts(MAXSECONDARYSKILL);
+    v.clear();
+    v.reserve(MAXSECONDARYSKILL);
+    v.push_back(PATHFINDING);
+    v.push_back(ARCHERY);
+    v.push_back(LOGISTICS);
+    v.push_back(SCOUTING);
+    v.push_back(DIPLOMACY);
+    v.push_back(NAVIGATION);
+    v.push_back(LEADERSHIP);
+    v.push_back(WISDOM);
+    v.push_back(MYSTICISM);
+    v.push_back(LUCK);
+    v.push_back(BALLISTICS);
+    v.push_back(EAGLEEYE);
+    v.push_back(NECROMANCY);
+    v.push_back(ESTATES);
+}
 
-    // primary skill
+u8 Skill::Secondary::GetWeightSkillFromRace(u8 race, u8 skill)
+{
     switch(race)
     {
 	case Race::BARB:
-	    if(it2 == std::find(it1, it2, PATHFINDING))	parts.Push(4);	else	parts.Push(0);
-	    if(it2 == std::find(it1, it2, ARCHERY))	parts.Push(3);	else	parts.Push(0);
-	    if(it2 == std::find(it1, it2, LOGISTICS))	parts.Push(3);	else	parts.Push(0);
-	    if(it2 == std::find(it1, it2, SCOUTING))	parts.Push(4);	else	parts.Push(0);
-	    if(it2 == std::find(it1, it2, DIPLOMACY))	parts.Push(2);	else	parts.Push(0);
-	    if(it2 == std::find(it1, it2, NAVIGATION))	parts.Push(3);	else	parts.Push(0);
-	    if(it2 == std::find(it1, it2, LEADERSHIP))	parts.Push(3);	else	parts.Push(0);
-	    if(it2 == std::find(it1, it2, WISDOM))	parts.Push(1);	else	parts.Push(0);
-	    if(it2 == std::find(it1, it2, MYSTICISM))	parts.Push(1);	else	parts.Push(0);
-	    if(it2 == std::find(it1, it2, LUCK))	parts.Push(2);	else	parts.Push(0);
-	    if(it2 == std::find(it1, it2, BALLISTICS))	parts.Push(3);	else	parts.Push(0);
-	    if(it2 == std::find(it1, it2, EAGLEEYE))	parts.Push(1);	else	parts.Push(0);
-	    if(it2 == std::find(it1, it2, NECROMANCY))	parts.Push(0);	else	parts.Push(0);
-	    if(it2 == std::find(it1, it2, ESTATES))	parts.Push(2);	else	parts.Push(0);
+	    if(skill == PATHFINDING)	return 4;
+	    if(skill == ARCHERY)	return 3;
+	    if(skill == LOGISTICS)	return 3;
+	    if(skill == SCOUTING)	return 4;
+	    if(skill == DIPLOMACY)	return 2;
+	    if(skill == NAVIGATION)	return 3;
+	    if(skill == LEADERSHIP)	return 3;
+	    if(skill == WISDOM)		return 1;
+	    if(skill == MYSTICISM)	return 1;
+	    if(skill == LUCK)		return 2;
+	    if(skill == BALLISTICS)	return 3;
+	    if(skill == EAGLEEYE)	return 1;
+	    if(skill == NECROMANCY)	return 0;
+	    if(skill == ESTATES)	return 2;
     	break;
 
 	case Race::KNGT:
-	    if(it2 == std::find(it1, it2, PATHFINDING))	parts.Push(3);	else	parts.Push(0);
-	    if(it2 == std::find(it1, it2, ARCHERY))	parts.Push(2);	else	parts.Push(0);
-	    if(it2 == std::find(it1, it2, LOGISTICS))	parts.Push(3);	else	parts.Push(0);
-	    if(it2 == std::find(it1, it2, SCOUTING))	parts.Push(2);	else	parts.Push(0);
-	    if(it2 == std::find(it1, it2, DIPLOMACY))	parts.Push(3);	else	parts.Push(0);
-	    if(it2 == std::find(it1, it2, NAVIGATION))	parts.Push(2);	else	parts.Push(0);
-	    if(it2 == std::find(it1, it2, LEADERSHIP))	parts.Push(5);	else	parts.Push(0);
-	    if(it2 == std::find(it1, it2, WISDOM))	parts.Push(2);	else	parts.Push(0);
-	    if(it2 == std::find(it1, it2, MYSTICISM))	parts.Push(1);	else	parts.Push(0);
-	    if(it2 == std::find(it1, it2, LUCK))	parts.Push(1);	else	parts.Push(0);
-	    if(it2 == std::find(it1, it2, BALLISTICS))	parts.Push(4);	else	parts.Push(0);
-	    if(it2 == std::find(it1, it2, EAGLEEYE))	parts.Push(1);	else	parts.Push(0);
-	    if(it2 == std::find(it1, it2, NECROMANCY))	parts.Push(0);	else	parts.Push(0);
-	    if(it2 == std::find(it1, it2, ESTATES))	parts.Push(3);	else	parts.Push(0);
+	    if(skill == PATHFINDING)	return 3;
+	    if(skill == ARCHERY)	return 2;
+	    if(skill == LOGISTICS)	return 3;
+	    if(skill == SCOUTING)	return 2;
+	    if(skill == DIPLOMACY)	return 3;
+	    if(skill == NAVIGATION)	return 2;
+	    if(skill == LEADERSHIP)	return 5;
+	    if(skill == WISDOM)		return 2;
+	    if(skill == MYSTICISM)	return 1;
+	    if(skill == LUCK)		return 1;
+	    if(skill == BALLISTICS)	return 4;
+	    if(skill == EAGLEEYE)	return 1;
+	    if(skill == NECROMANCY)	return 0;
+	    if(skill == ESTATES)	return 3;
 	    break;
 
 	case Race::NECR:
-	    if(it2 == std::find(it1, it2, PATHFINDING))	parts.Push(3);	else	parts.Push(0);
-	    if(it2 == std::find(it1, it2, ARCHERY))	parts.Push(1);	else	parts.Push(0);
-	    if(it2 == std::find(it1, it2, LOGISTICS))	parts.Push(2);	else	parts.Push(0);
-	    if(it2 == std::find(it1, it2, SCOUTING))	parts.Push(1);	else	parts.Push(0);
-	    if(it2 == std::find(it1, it2, DIPLOMACY))	parts.Push(2);	else	parts.Push(0);
-	    if(it2 == std::find(it1, it2, NAVIGATION))	parts.Push(2);	else	parts.Push(0);
-	    if(it2 == std::find(it1, it2, LEADERSHIP))	parts.Push(0);	else	parts.Push(0);
-	    if(it2 == std::find(it1, it2, WISDOM))	parts.Push(4);	else	parts.Push(0);
-	    if(it2 == std::find(it1, it2, MYSTICISM))	parts.Push(3);	else	parts.Push(0);
-	    if(it2 == std::find(it1, it2, LUCK))	parts.Push(1);	else	parts.Push(0);
-	    if(it2 == std::find(it1, it2, BALLISTICS))	parts.Push(3);	else	parts.Push(0);
-	    if(it2 == std::find(it1, it2, EAGLEEYE))	parts.Push(3);	else	parts.Push(0);
-	    if(it2 == std::find(it1, it2, NECROMANCY))	parts.Push(5);	else	parts.Push(0);
-	    if(it2 == std::find(it1, it2, ESTATES))	parts.Push(2);	else	parts.Push(0);
+	    if(skill == PATHFINDING)	return 3;
+	    if(skill == ARCHERY)	return 1;
+	    if(skill == LOGISTICS)	return 2;
+	    if(skill == SCOUTING)	return 1;
+	    if(skill == DIPLOMACY)	return 2;
+	    if(skill == NAVIGATION)	return 2;
+	    if(skill == LEADERSHIP)	return 0;
+	    if(skill == WISDOM)		return 4;
+	    if(skill == MYSTICISM)	return 3;
+	    if(skill == LUCK)		return 1;
+	    if(skill == BALLISTICS)	return 3;
+	    if(skill == EAGLEEYE)	return 3;
+	    if(skill == NECROMANCY)	return 5;
+	    if(skill == ESTATES)	return 2;
 	    break;
 
 	case Race::SORC:
-	    if(it2 == std::find(it1, it2, PATHFINDING))	parts.Push(2);	else	parts.Push(0);
-	    if(it2 == std::find(it1, it2, ARCHERY))	parts.Push(3);	else	parts.Push(0);
-	    if(it2 == std::find(it1, it2, LOGISTICS))	parts.Push(2);	else	parts.Push(0);
-	    if(it2 == std::find(it1, it2, SCOUTING))	parts.Push(1);	else	parts.Push(0);
-	    if(it2 == std::find(it1, it2, DIPLOMACY))	parts.Push(2);	else	parts.Push(0);
-	    if(it2 == std::find(it1, it2, NAVIGATION))	parts.Push(4);	else	parts.Push(0);
-	    if(it2 == std::find(it1, it2, LEADERSHIP))	parts.Push(1);	else	parts.Push(0);
-	    if(it2 == std::find(it1, it2, WISDOM))	parts.Push(4);	else	parts.Push(0);
-	    if(it2 == std::find(it1, it2, MYSTICISM))	parts.Push(3);	else	parts.Push(0);
-	    if(it2 == std::find(it1, it2, LUCK))	parts.Push(3);	else	parts.Push(0);
-	    if(it2 == std::find(it1, it2, BALLISTICS))	parts.Push(3);	else	parts.Push(0);
-	    if(it2 == std::find(it1, it2, EAGLEEYE))	parts.Push(2);	else	parts.Push(0);
-	    if(it2 == std::find(it1, it2, NECROMANCY))	parts.Push(0);	else	parts.Push(0);
-	    if(it2 == std::find(it1, it2, ESTATES))	parts.Push(2);	else	parts.Push(0);
+	    if(skill == PATHFINDING)	return 2;
+	    if(skill == ARCHERY)	return 3;
+	    if(skill == LOGISTICS)	return 2;
+	    if(skill == SCOUTING)	return 1;
+	    if(skill == DIPLOMACY)	return 2;
+	    if(skill == NAVIGATION)	return 4;
+	    if(skill == LEADERSHIP)	return 1;
+	    if(skill == WISDOM)		return 4;
+	    if(skill == MYSTICISM)	return 3;
+	    if(skill == LUCK)		return 3;
+	    if(skill == BALLISTICS)	return 3;
+	    if(skill == EAGLEEYE)	return 3;
+	    if(skill == NECROMANCY)	return 0;
+	    if(skill == ESTATES)	return 2;
 	    break;
 
 	case Race::WRLK:
-	    if(it2 == std::find(it1, it2, PATHFINDING))	parts.Push(4);	else	parts.Push(0);
-	    if(it2 == std::find(it1, it2, ARCHERY))	parts.Push(1);	else	parts.Push(0);
-	    if(it2 == std::find(it1, it2, LOGISTICS))	parts.Push(2);	else	parts.Push(0);
-	    if(it2 == std::find(it1, it2, SCOUTING))	parts.Push(4);	else	parts.Push(0);
-	    if(it2 == std::find(it1, it2, DIPLOMACY))	parts.Push(2);	else	parts.Push(0);
-	    if(it2 == std::find(it1, it2, NAVIGATION))	parts.Push(2);	else	parts.Push(0);
-	    if(it2 == std::find(it1, it2, LEADERSHIP))	parts.Push(1);	else	parts.Push(0);
-	    if(it2 == std::find(it1, it2, WISDOM))	parts.Push(5);	else	parts.Push(0);
-	    if(it2 == std::find(it1, it2, MYSTICISM))	parts.Push(3);	else	parts.Push(0);
-	    if(it2 == std::find(it1, it2, LUCK))	parts.Push(1);	else	parts.Push(0);
-	    if(it2 == std::find(it1, it2, BALLISTICS))	parts.Push(3);	else	parts.Push(0);
-	    if(it2 == std::find(it1, it2, EAGLEEYE))	parts.Push(3);	else	parts.Push(0);
-	    if(it2 == std::find(it1, it2, NECROMANCY))	parts.Push(1);	else	parts.Push(0);
-	    if(it2 == std::find(it1, it2, ESTATES))	parts.Push(2);	else	parts.Push(0);
+	    if(skill == PATHFINDING)	return 4;
+	    if(skill == ARCHERY)	return 1;
+	    if(skill == LOGISTICS)	return 2;
+	    if(skill == SCOUTING)	return 4;
+	    if(skill == DIPLOMACY)	return 2;
+	    if(skill == NAVIGATION)	return 2;
+	    if(skill == LEADERSHIP)	return 1;
+	    if(skill == WISDOM)		return 5;
+	    if(skill == MYSTICISM)	return 3;
+	    if(skill == LUCK)		return 1;
+	    if(skill == BALLISTICS)	return 3;
+	    if(skill == EAGLEEYE)	return 3;
+	    if(skill == NECROMANCY)	return 1;
+	    if(skill == ESTATES)	return 2;
 	    break;
 
 	case Race::WZRD:
-	    if(it2 == std::find(it1, it2, PATHFINDING))	parts.Push(2);	else	parts.Push(0);
-	    if(it2 == std::find(it1, it2, ARCHERY))	parts.Push(1);	else	parts.Push(0);
-	    if(it2 == std::find(it1, it2, LOGISTICS))	parts.Push(2);	else	parts.Push(0);
-	    if(it2 == std::find(it1, it2, SCOUTING))	parts.Push(2);	else	parts.Push(0);
-	    if(it2 == std::find(it1, it2, DIPLOMACY))	parts.Push(2);	else	parts.Push(0);
-	    if(it2 == std::find(it1, it2, NAVIGATION))	parts.Push(2);	else	parts.Push(0);
-	    if(it2 == std::find(it1, it2, LEADERSHIP))	parts.Push(2);	else	parts.Push(0);
-	    if(it2 == std::find(it1, it2, WISDOM))	parts.Push(5);	else	parts.Push(0);
-	    if(it2 == std::find(it1, it2, MYSTICISM))	parts.Push(4);	else	parts.Push(0);
-	    if(it2 == std::find(it1, it2, LUCK))	parts.Push(2);	else	parts.Push(0);
-	    if(it2 == std::find(it1, it2, BALLISTICS))	parts.Push(3);	else	parts.Push(0);
-	    if(it2 == std::find(it1, it2, EAGLEEYE))	parts.Push(3);	else	parts.Push(0);
-	    if(it2 == std::find(it1, it2, NECROMANCY))	parts.Push(0);	else	parts.Push(0);
-	    if(it2 == std::find(it1, it2, ESTATES))	parts.Push(2);	else	parts.Push(0);
+	    if(skill == PATHFINDING)	return 2;
+	    if(skill == ARCHERY)	return 1;
+	    if(skill == LOGISTICS)	return 2;
+	    if(skill == SCOUTING)	return 2;
+	    if(skill == DIPLOMACY)	return 2;
+	    if(skill == NAVIGATION)	return 2;
+	    if(skill == LEADERSHIP)	return 2;
+	    if(skill == WISDOM)		return 5;
+	    if(skill == MYSTICISM)	return 4;
+	    if(skill == LUCK)		return 2;
+	    if(skill == BALLISTICS)	return 3;
+	    if(skill == EAGLEEYE)	return 3;
+	    if(skill == NECROMANCY)	return 0;
+	    if(skill == ESTATES)	return 2;
 	    break;
-
-	default:
-	    DEBUG(DBG_GAME , DBG_WARN, "Skill::Secondary::PriorityForRace: unknown race."); return UNKNOWN;
-    }
-
-    switch(parts.Get())
-    {
-	case 0: return PATHFINDING;
-	case 1: return ARCHERY;
-	case 2: return LOGISTICS;
-	case 3: return SCOUTING;
-	case 4: return DIPLOMACY;
-	case 5: return NAVIGATION;
-	case 6: return LEADERSHIP;
-	case 7: return WISDOM;
-	case 8: return MYSTICISM;
-	case 9: return LUCK;
-	case 10: return BALLISTICS;
-	case 11: return EAGLEEYE;
-	case 12: return NECROMANCY;
-	case 13: return ESTATES;
 
 	default: break;
     }
-
-    DEBUG(DBG_GAME , DBG_WARN, "Skill::Secondary::PriorityForRace: unknown result.");
-    return UNKNOWN;
+    return 0;
 }
 
-Skill::Secondary::skill_t Skill::Secondary::PriorityFromRace(const u8 race)
+Skill::Secondary::skill_t Skill::Secondary::PriorityFromRace(u8 race, const std::vector<skill_t>& exclude)
 {
     Rand::Queue parts(MAXSECONDARYSKILL);
 
-    // primary skill
-    switch(race)
-    {
-	case Race::BARB:
-	    // pathfinding
-	    parts.Push(4);
-	    // archery
-	    parts.Push(3);
-	    // logistics
-	    parts.Push(3);
-	    // scouting
-	    parts.Push(4);
-	    // diplomacy
-	    parts.Push(2);
-	    // navigation
-	    parts.Push(3);
-	    // leadership
-	    parts.Push(3);
-	    // wisdom
-	    parts.Push(1);
-	    // mysticism
-	    parts.Push(1);
-	    // luck
-	    parts.Push(2);
-	    // ballistics
-	    parts.Push(3);
-	    // eagleeye
-	    parts.Push(1);
-	    // necromancy
-	    parts.Push(0);
-	    // estates
-	    parts.Push(2);
-    	break;
+    std::vector<skill_t> skills;
+    FillStandard(skills);
 
-	case Race::KNGT:
-	    // pathfinding
-	    parts.Push(3);
-	    // archery
-	    parts.Push(2);
-	    // logistics
-	    parts.Push(3);
-	    // scouting
-	    parts.Push(2);
-	    // diplomacy
-	    parts.Push(3);
-	    // navigation
-	    parts.Push(2);
-	    // leadership
-	    parts.Push(5);
-	    // wisdom
-	    parts.Push(2);
-	    // mysticism
-	    parts.Push(1);
-	    // luck
-	    parts.Push(1);
-	    // ballistics
-	    parts.Push(4);
-	    // eagleeye
-	    parts.Push(1);
-	    // necromancy
-	    parts.Push(0);
-	    // estates
-	    parts.Push(3);
-	    break;
+    std::vector<skill_t>::const_iterator it1 = skills.begin();
+    std::vector<skill_t>::const_iterator it2 = skills.end();
 
-	case Race::NECR:
-	    // pathfinding
-	    parts.Push(3);
-	    // archery
-	    parts.Push(1);
-	    // logistics
-	    parts.Push(2);
-	    // scouting
-	    parts.Push(1);
-	    // diplomacy
-	    parts.Push(2);
-	    // navigation
-	    parts.Push(2);
-	    // leadership
-	    parts.Push(0);
-	    // wisdom
-	    parts.Push(4);
-	    // mysticism
-	    parts.Push(3);
-	    // luck
-	    parts.Push(1);
-	    // ballistics
-	    parts.Push(3);
-	    // eagleeye
-	    parts.Push(3);
-	    // necromancy
-	    parts.Push(5);
-	    // estates
-	    parts.Push(2);
-	    break;
+    for(; it1 != it2; ++it1)
+	if(exclude.empty() || exclude.end() == std::find(exclude.begin(), exclude.end(), *it1))
+	    parts.Push(*it1, GetWeightSkillFromRace(race, *it1));
 
-	case Race::SORC:
-	    // pathfinding
-	    parts.Push(2);
-	    // archery
-	    parts.Push(3);
-	    // logistics
-	    parts.Push(2);
-	    // scouting
-	    parts.Push(1);
-	    // diplomacy
-	    parts.Push(2);
-	    // navigation
-	    parts.Push(4);
-	    // leadership
-	    parts.Push(1);
-	    // wisdom
-	    parts.Push(4);
-	    // mysticism
-	    parts.Push(3);
-	    // luck
-	    parts.Push(3);
-	    // ballistics
-	    parts.Push(3);
-	    // eagleeye
-	    parts.Push(2);
-	    // necromancy
-	    parts.Push(0);
-	    // estates
-	    parts.Push(2);
-	    break;
-
-	case Race::WRLK:
-	    // pathfinding
-	    parts.Push(2);
-	    // archery
-	    parts.Push(1);
-	    // logistics
-	    parts.Push(2);
-	    // scouting
-	    parts.Push(4);
-	    // diplomacy
-	    parts.Push(2);
-	    // navigation
-	    parts.Push(2);
-	    // leadership
-	    parts.Push(1);
-	    // wisdom
-	    parts.Push(5);
-	    // mysticism
-	    parts.Push(3);
-	    // luck
-	    parts.Push(1);
-	    // ballistics
-	    parts.Push(3);
-	    // eagleeye
-	    parts.Push(3);
-	    // necromancy
-	    parts.Push(1);
-	    // estates
-	    parts.Push(2);
-	    break;
-
-	case Race::WZRD:
-	    // pathfinding
-	    parts.Push(2);
-	    // archery
-	    parts.Push(1);
-	    // logistics
-	    parts.Push(2);
-	    // scouting
-	    parts.Push(2);
-	    // diplomacy
-	    parts.Push(2);
-	    // navigation
-	    parts.Push(2);
-	    // leadership
-	    parts.Push(2);
-	    // wisdom
-	    parts.Push(5);
-	    // mysticism
-	    parts.Push(4);
-	    // luck
-	    parts.Push(2);
-	    // ballistics
-	    parts.Push(3);
-	    // eagleeye
-	    parts.Push(3);
-	    // necromancy
-	    parts.Push(0);
-	    // estates
-	    parts.Push(2);
-	    break;
-
-	default:
-	    DEBUG(DBG_GAME , DBG_WARN, "Skill::Secondary::PriorityForRace: unknown race."); return UNKNOWN;
-    }
-
-    switch(parts.Get())
-    {
-	case 0: return PATHFINDING;
-	case 1: return ARCHERY;
-	case 2: return LOGISTICS;
-	case 3: return SCOUTING;
-	case 4: return DIPLOMACY;
-	case 5: return NAVIGATION;
-	case 6: return LEADERSHIP;
-	case 7: return WISDOM;
-	case 8: return MYSTICISM;
-	case 9: return LUCK;
-	case 10: return BALLISTICS;
-	case 11: return EAGLEEYE;
-	case 12: return NECROMANCY;
-	case 13: return ESTATES;
-
-	default: break;
-    }
-
-    DEBUG(DBG_GAME , DBG_WARN, "Skill::Secondary::PriorityForRace: unknown result.");
-    return UNKNOWN;
+    return parts.Size() ? Skill(parts.Get()) : UNKNOWN;
 }
-
 
 SecondarySkillBar::SecondarySkillBar() : skills(NULL), use_mini_sprite(false)
 {

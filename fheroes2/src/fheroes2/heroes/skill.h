@@ -76,13 +76,17 @@ namespace Skill
 	Level::type_t	Level(void) const;
 	skill_t		Skill(void) const;
 
+	bool		isLevel(u8) const;
+	bool		isSkill(u8) const;
+
 	static skill_t 	Skill(const u8);
 	static skill_t 	FromMP2(const u8 byte);
 	static skill_t 	RandForWitchsHut(void);
 	static const char* String(const skill_t skill);
 	static const char* Description(const skill_t skill, const Level::type_t level);
-	static skill_t PriorityFromRace(const u8 race, const std::vector<skill_t> & exclude);
-	static skill_t PriorityFromRace(const u8 race);
+	static skill_t PriorityFromRace(const u8 race, const std::vector<skill_t>& exclude);
+	static void FillStandard(std::vector<skill_t> &);
+	static u8 GetWeightSkillFromRace(u8 race, u8 skill);
 
 	/* index sprite from SECSKILL */
 	static u8 GetIndexSprite1(const skill_t skill);

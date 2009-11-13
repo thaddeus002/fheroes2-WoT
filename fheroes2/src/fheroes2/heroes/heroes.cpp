@@ -299,7 +299,12 @@ Heroes::Heroes(heroes_t ht, Race::race_t rc) : killer_color(Color::GRAY), experi
 	    secondary_skills.clear();
 	    secondary_skills.push_back(Skill::Secondary(Skill::Secondary::PATHFINDING, Skill::Level::EXPERT));
 	    secondary_skills.push_back(Skill::Secondary(Skill::Secondary::LOGISTICS, Skill::Level::EXPERT));
+	    secondary_skills.push_back(Skill::Secondary(Skill::Secondary::ARCHERY, Skill::Level::EXPERT));
 	    secondary_skills.push_back(Skill::Secondary(Skill::Secondary::SCOUTING, Skill::Level::BASIC));
+	    secondary_skills.push_back(Skill::Secondary(Skill::Secondary::WISDOM, Skill::Level::EXPERT));
+	    secondary_skills.push_back(Skill::Secondary(Skill::Secondary::MYSTICISM, Skill::Level::EXPERT));
+	    secondary_skills.push_back(Skill::Secondary(Skill::Secondary::ESTATES, Skill::Level::EXPERT));
+	    secondary_skills.push_back(Skill::Secondary(Skill::Secondary::BALLISTICS, Skill::Level::EXPERT));
 
 	    PickupArtifact(Artifact::STEALTH_SHIELD);
 	    PickupArtifact(Artifact::DRAGON_SWORD);
@@ -1560,39 +1565,36 @@ u8 Heroes::CountSecondarySkill(void) const
 
 u8 Heroes::GetLevelSkill(const Skill::Secondary::skill_t skill) const
 {
-    std::vector<Skill::Secondary>::const_iterator it1 = secondary_skills.begin();
-    std::vector<Skill::Secondary>::const_iterator it2 = secondary_skills.end();
-    
-    for(; it1 != it2; ++it1)
-	if((*it1).Skill() == skill) return (*it1).Level();
+    std::vector<Skill::Secondary>::const_iterator it;
 
-    return Skill::Level::NONE;
+    it = std::find_if(secondary_skills.begin(), secondary_skills.end(), 
+			std::bind2nd(std::mem_fun_ref(&Skill::Secondary::isSkill), skill));
+
+    return it == secondary_skills.end() ? Skill::Level::NONE : (*it).Level();
 }
 
 void Heroes::LearnBasicSkill(const Skill::Secondary::skill_t skill)
 {
-    std::vector<Skill::Secondary>::iterator it1 = secondary_skills.begin();
-    std::vector<Skill::Secondary>::const_iterator it2 = secondary_skills.end();
+    std::vector<Skill::Secondary>::iterator it;
 
-    // find_if
-    for(; it1 != it2; ++it1) if((*it1).Skill() == skill) break;
+    it = std::find_if(secondary_skills.begin(), secondary_skills.end(), 
+			std::bind2nd(std::mem_fun_ref(&Skill::Secondary::isSkill), skill));
 
-    if(it1 != it2)
-	(*it1).SetLevel(Skill::Level::BASIC);
+    if(it != secondary_skills.end())
+	(*it).SetLevel(Skill::Level::BASIC);
     else
 	secondary_skills.push_back(Skill::Secondary(skill, Skill::Level::BASIC));
 }
 
 void Heroes::LevelUpSkill(const Skill::Secondary::skill_t skill)
 {
-    std::vector<Skill::Secondary>::iterator it1 = secondary_skills.begin();
-    std::vector<Skill::Secondary>::const_iterator it2 = secondary_skills.end();
+    std::vector<Skill::Secondary>::iterator it;
 
-    // find_if
-    for(; it1 != it2; ++it1) if((*it1).Skill() == skill) break;
+    it = std::find_if(secondary_skills.begin(), secondary_skills.end(), 
+			std::bind2nd(std::mem_fun_ref(&Skill::Secondary::isSkill), skill));
 
-    if(it1 != it2)
-	(*it1).NextLevel();
+    if(it != secondary_skills.end())
+	(*it).NextLevel();
     else
 	secondary_skills.push_back(Skill::Secondary(skill, Skill::Level::BASIC));
 }
@@ -1653,29 +1655,26 @@ u8 Heroes::GetRangeRouteDays(const u16 dst) const
 void Heroes::FindSkillsForLevelUp(Skill::Secondary & sec1, Skill::Secondary & sec2) const
 {
     std::vector<Skill::Secondary::skill_t> exclude_skills;
-    exclude_skills.reserve(MAXSECONDARYSKILL);
+    exclude_skills.reserve(MAXSECONDARYSKILL + HEROESMAXSKILL);
 
-    std::vector<Skill::Secondary>::const_iterator it1 = secondary_skills.begin();
-    std::vector<Skill::Secondary>::const_iterator it2 = secondary_skills.end();
-    for(; it1 != it2; ++it1) if((*it1).Level() == Skill::Level::EXPERT) exclude_skills.push_back((*it1).Skill());
+    // exclude for expert
+    {
+	std::vector<Skill::Secondary>::const_iterator it1 = secondary_skills.begin();
+	std::vector<Skill::Secondary>::const_iterator it2 = secondary_skills.end();
+	for(; it1 != it2; ++it1) if((*it1).Level() == Skill::Level::EXPERT) exclude_skills.push_back((*it1).Skill());
+    }
 
-    // is full, add other.
+    // exclude is full, add other.
     if(HEROESMAXSKILL <= secondary_skills.size())
     {
-	if(Skill::Level::NONE == GetLevelSkill(Skill::Secondary::PATHFINDING)) exclude_skills.push_back(Skill::Secondary::PATHFINDING);
-	if(Skill::Level::NONE == GetLevelSkill(Skill::Secondary::ARCHERY)) exclude_skills.push_back(Skill::Secondary::ARCHERY);
-	if(Skill::Level::NONE == GetLevelSkill(Skill::Secondary::LOGISTICS)) exclude_skills.push_back(Skill::Secondary::LOGISTICS);
-	if(Skill::Level::NONE == GetLevelSkill(Skill::Secondary::SCOUTING)) exclude_skills.push_back(Skill::Secondary::SCOUTING);
-	if(Skill::Level::NONE == GetLevelSkill(Skill::Secondary::DIPLOMACY)) exclude_skills.push_back(Skill::Secondary::DIPLOMACY);
-	if(Skill::Level::NONE == GetLevelSkill(Skill::Secondary::NAVIGATION)) exclude_skills.push_back(Skill::Secondary::NAVIGATION);
-	if(Skill::Level::NONE == GetLevelSkill(Skill::Secondary::LEADERSHIP)) exclude_skills.push_back(Skill::Secondary::LEADERSHIP);
-	if(Skill::Level::NONE == GetLevelSkill(Skill::Secondary::WISDOM)) exclude_skills.push_back(Skill::Secondary::WISDOM);
-	if(Skill::Level::NONE == GetLevelSkill(Skill::Secondary::MYSTICISM)) exclude_skills.push_back(Skill::Secondary::MYSTICISM);
-	if(Skill::Level::NONE == GetLevelSkill(Skill::Secondary::LUCK)) exclude_skills.push_back(Skill::Secondary::LUCK);
-	if(Skill::Level::NONE == GetLevelSkill(Skill::Secondary::BALLISTICS)) exclude_skills.push_back(Skill::Secondary::BALLISTICS);
-	if(Skill::Level::NONE == GetLevelSkill(Skill::Secondary::EAGLEEYE)) exclude_skills.push_back(Skill::Secondary::EAGLEEYE);
-	if(Skill::Level::NONE == GetLevelSkill(Skill::Secondary::NECROMANCY)) exclude_skills.push_back(Skill::Secondary::NECROMANCY);
-	if(Skill::Level::NONE == GetLevelSkill(Skill::Secondary::ESTATES)) exclude_skills.push_back(Skill::Secondary::ESTATES);
+	std::vector<Skill::Secondary::skill_t> skills;
+	Skill::Secondary::FillStandard(skills);
+
+	std::vector<Skill::Secondary::skill_t>::const_iterator it1 = skills.begin();
+	std::vector<Skill::Secondary::skill_t>::const_iterator it2 = skills.end();
+
+	for(; it1 != it2; ++it1)
+	    if(Skill::Level::NONE == GetLevelSkill(*it1)) exclude_skills.push_back(*it1);
     }
 
     sec1.SetSkill(Skill::Secondary::PriorityFromRace(GetRace(), exclude_skills));
@@ -1708,7 +1707,7 @@ Skill::Primary::skill_t Heroes::LevelUpPrimarySkill(void)
 	case Skill::Primary::KNOWLEDGE:	++knowledge; break;
 	default: break;
     }
-    DEBUG(DBG_GAME , DBG_INFO, "Heroes::LevelUpPrimarySkill: for " << GetName());
+    DEBUG(DBG_GAME , DBG_INFO, "Heroes::LevelUpPrimarySkill: for " << GetName() << ", up " << Skill::Primary::String(primary1));
 
     return primary1;
 }
@@ -1719,7 +1718,7 @@ void Heroes::LevelUpSecondarySkill(const Skill::Primary::skill_t primary1, bool 
     Skill::Secondary sec2;
 
     FindSkillsForLevelUp(sec1, sec2);
-    DEBUG(DBG_GAME, DBG_INFO, "Heroes::LevelUp: " << Skill::Secondary::String(sec1.Skill()) << " or " << Skill::Secondary::String(sec2.Skill()));
+    DEBUG(DBG_GAME, DBG_INFO, "Heroes::LevelUpSecondarySkill: " << GetName() << " select " << Skill::Secondary::String(sec1.Skill()) << " or " << Skill::Secondary::String(sec2.Skill()));
 
     std::string header;
     std::string message;
@@ -1737,8 +1736,10 @@ void Heroes::LevelUpSecondarySkill(const Skill::Primary::skill_t primary1, bool 
 	}
     }
     else
-    if(Skill::Secondary::UNKNOWN == sec1.Skill())
+    if(Skill::Secondary::UNKNOWN == sec1.Skill() || Skill::Secondary::UNKNOWN == sec2.Skill())
     {
+	Skill::Secondary* sec = Skill::Secondary::UNKNOWN == sec2.Skill() ? &sec1 : &sec2;
+
 	if(!autoselect && GetColor() == Settings::Get().MyColor())
 	{
 	    AGG::PlaySound(M82::NWHEROLV);
@@ -1746,57 +1747,26 @@ void Heroes::LevelUpSecondarySkill(const Skill::Primary::skill_t primary1, bool 
 	    String::Replace(header, "%{name}", name);
 	    String::Replace(header, "%{skill}", Skill::Primary::String(primary1));
     	    message = _("You have learned %{level} %{skill}.");
-	    String::Replace(message, "%{level}", Skill::Level::String(sec2.Level()));
-	    String::Replace(message, "%{skill}", Skill::Secondary::String(sec2.Skill()));
+	    String::Replace(message, "%{level}", Skill::Level::String(sec->Level()));
+	    String::Replace(message, "%{skill}", Skill::Secondary::String(sec->Skill()));
 
 	    const Sprite & sprite_frame = AGG::GetICN(ICN::SECSKILL, 15);
     	    Surface sf(sprite_frame.w(), sprite_frame.h());
     	    sf.Blit(sprite_frame);
 	    // sprite
-	    const Sprite & sprite_skill = AGG::GetICN(ICN::SECSKILL, Skill::Secondary::GetIndexSprite1(sec2.Skill()));
+	    const Sprite & sprite_skill = AGG::GetICN(ICN::SECSKILL, Skill::Secondary::GetIndexSprite1(sec->Skill()));
 	    sf.Blit(sprite_skill, 3, 3);
 	    // text
-	    const std::string &name_skill = Skill::Secondary::String(sec2.Skill());
+	    const std::string &name_skill = Skill::Secondary::String(sec->Skill());
 	    Text text_skill(name_skill, Font::SMALL);
 	    text_skill.Blit(3 + (sprite_skill.w() - text_skill.w()) / 2, 6, sf);
-	    const std::string &name_level = Skill::Level::String(sec2.Level());
+	    const std::string &name_level = Skill::Level::String(sec->Level());
 	    Text text_level(name_level, Font::SMALL);
 	    text_level.Blit(3 + (sprite_skill.w() - text_level.w()) / 2, sprite_skill.h() - 12, sf);
 
 	    Dialog::SpriteInfo(header, message, sf);
 	}
-	LevelUpSkill(sec2.Skill());
-    }
-    else
-    if(Skill::Secondary::UNKNOWN == sec2.Skill())
-    {
-	if(!autoselect && GetColor() == Settings::Get().MyColor())
-	{
-	    AGG::PlaySound(M82::NWHEROLV);
-	    header = _("%{name} has gained a level. %{skill} Skill +1");
-	    String::Replace(header, "%{name}", name);
-	    String::Replace(header, "%{skill}", Skill::Primary::String(primary1));
-    	    message = _("You have learned %{level} %{skill}.");
-	    String::Replace(message, "%{level}", Skill::Level::String(sec1.Level()));
-	    String::Replace(message, "%{skill}", Skill::Secondary::String(sec1.Skill()));
-
-	    const Sprite & sprite_frame = AGG::GetICN(ICN::SECSKILL, 15);
-    	    Surface sf(sprite_frame.w(), sprite_frame.h());
-    	    sf.Blit(sprite_frame);
-	    // sprite
-	    const Sprite & sprite_skill = AGG::GetICN(ICN::SECSKILL, Skill::Secondary::GetIndexSprite1(sec1.Skill()));
-	    sf.Blit(sprite_skill, 3, 3);
-	    // text
-	    const std::string &name_skill = Skill::Secondary::String(sec1.Skill());
-	    Text text_skill(name_skill, Font::SMALL);
-	    text_skill.Blit(3 + (sprite_skill.w() - text_skill.w()) / 2, 6, sf);
-	    const std::string &name_level = Skill::Level::String(sec1.Level());
-	    Text text_level(name_level, Font::SMALL);
-	    text_level.Blit(3 + (sprite_skill.w() - text_level.w()) / 2, sprite_skill.h() - 12, sf);
-
-	    Dialog::SpriteInfo(header, message, sf);
-	}
-	LevelUpSkill(sec1.Skill());
+	LevelUpSkill(sec->Skill());
     }
     else
     {
@@ -1818,8 +1788,6 @@ void Heroes::LevelUpSecondarySkill(const Skill::Primary::skill_t primary1, bool 
 
 	LevelUpSkill(skill_select);
     }
-
-    DEBUG(DBG_GAME , DBG_WARN, "Heroes::LevelUpSecondarySkill: for " << GetName());
 }
 
 /* apply penalty */

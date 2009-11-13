@@ -20,6 +20,7 @@
 
 #include <cstdlib>
 #include <ctime>
+#include <iostream>
 #include <iterator>
 #include "rand.h"
 
@@ -28,36 +29,49 @@ void Rand::Init(void){ std::srand((u32) std::time(0)); }
 
 u32 Rand::Get(u32 min, u32 max){ return max ? min + (std::rand() % (max - min + 1)) : std::rand() % (min + 1); }
 
-Rand::Queue::Queue(const u8 size) : max(0)
+Rand::Queue::Queue(u32 size)
 {
     reserve(size);
 }
 
 void Rand::Queue::Reset(void)
 {
-    max = 0;
     clear();
 }
 
-void Rand::Queue::Push(const u8 quote)
+void Rand::Queue::Push(s32 value, u32 percent)
 {
-    push_back(quote);
-    max += quote;
+    push_back(std::make_pair(value, percent));
 }
 
-size_t Rand::Queue::Get(void) const
+size_t Rand::Queue::Size(void) const
 {
-    const u8 value = Rand::Get(1, max);
+    return size();
+}
+
+s32 Rand::Queue::Get(void)
+{
+    std::vector<ValuePercent>::iterator it;
+
+    // get max
+    it = begin();
+    u32 max = 0;
+    for(; it != end(); ++it) max += (*it).second;
+
+    // set weight (from 100)
+    it = begin();
+    for(; it != end(); ++it) (*it).second = 100 * (*it).second / max;
+
+    u8 rand = Rand::Get(0, 99);
     u8 amount = 0;
 
-    const_iterator it1 = begin();
-    const_iterator it2 = end();
-
-    for(; it1 != it2; ++it1)
+    it = begin();
+    for(; it != end(); ++it)
     {
-        amount += *it1;
-        if(value <= amount) break;
+        amount += (*it).second;
+        if(rand <= amount) return (*it).first;
     }
 
-    return std::distance(begin(), it1);
+    std::cerr << "Rand::Queue::Get: weight not found, return 0" << std::endl;
+    return 0;
 }
