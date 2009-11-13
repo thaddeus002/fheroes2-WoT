@@ -62,7 +62,12 @@ s32 Rand::Queue::Get(void)
     it = begin();
     for(; it != end(); ++it) (*it).second = 100 * (*it).second / max;
 
-    u8 rand = Rand::Get(0, 99);
+    // get max
+    max = 0;
+    it = begin();
+    for(; it != end(); ++it) max += (*it).second;
+
+    u8 rand = Rand::Get(max);
     u8 amount = 0;
 
     it = begin();
