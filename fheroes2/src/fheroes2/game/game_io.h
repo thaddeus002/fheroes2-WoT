@@ -25,6 +25,7 @@
 #include "sdlnet.h"
 #include "maps_fileinfo.h"
 
+namespace Maps {class Tiles; };
 class Kingdom;
 class Castle;
 class Heroes;
@@ -41,10 +42,12 @@ namespace Game
 	static bool SaveBIN(QueueMessage &);
 	static bool LoadBIN(QueueMessage &);
 
+	static void PackTile(QueueMessage &, const Maps::Tiles &);
 	static void PackKingdom(QueueMessage &, const Kingdom &);
 	static void PackCastle(QueueMessage &, const Castle &);
 	static void PackHeroes(QueueMessage &, const Heroes &);
 
+	static void UnpackTile(QueueMessage &, Maps::Tiles &, u16 = 0);
 	static void UnpackKingdom(QueueMessage &, Kingdom &, u16 = 0);
 	static void UnpackCastle(QueueMessage &, Castle &, u16 = 0);
 	static void UnpackHeroes(QueueMessage &, Heroes &, u16 = 0);

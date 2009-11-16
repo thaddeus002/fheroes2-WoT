@@ -256,43 +256,7 @@ bool Game::IO::SaveBIN(QueueMessage & msg)
     for(u32 ii = 0; ii < world.vec_tiles.size(); ++ii)
     {
 	if(NULL == world.vec_tiles[ii]){ DEBUG(DBG_GAME , DBG_WARN, "Game::IO::SaveBIN: tiles is NULL"); return false; }
-	const Maps::Tiles & tile = *world.vec_tiles[ii];
-
-	msg.Push(tile.tile_index);
-	msg.Push(tile.shape);
-	msg.Push(tile.general);
-	msg.Push(tile.quantity1);
-	msg.Push(tile.quantity2);
-	msg.Push(tile.quantity3);
-	msg.Push(tile.quantity4);
-	msg.Push(tile.fogs);
-	msg.Push(tile.flags);
-
-	// addons 1
-	msg.Push(static_cast<u32>(tile.addons_level1.size()));
-	std::list<Maps::TilesAddon>::const_iterator it1 = tile.addons_level1.begin();
-	std::list<Maps::TilesAddon>::const_iterator it2 = tile.addons_level1.end();
-	for(; it1 != it2; ++it1)
-	{
-	    const Maps::TilesAddon & addon = *it1;
-	    msg.Push(addon.level);
-	    msg.Push(addon.uniq);
-	    msg.Push(addon.object);
-	    msg.Push(addon.index);
-	}
-
-	// addons 2
-	msg.Push(static_cast<u32>(tile.addons_level2.size()));
-	it1 = tile.addons_level2.begin();
-	it2 = tile.addons_level2.end();
-	for(; it1 != it2; ++it1)
-	{
-	    const Maps::TilesAddon & addon = *it1;
-	    msg.Push(addon.level);
-	    msg.Push(addon.uniq);
-	    msg.Push(addon.object);
-	    msg.Push(addon.index);
-	}
+	PackTile(msg, *world.vec_tiles[ii]);
     }
 
     // heroes
@@ -441,6 +405,45 @@ bool Game::IO::SaveBIN(QueueMessage & msg)
 
     msg.Push(static_cast<u16>(0xFFFF));
     return true;
+}
+
+void Game::IO::PackTile(QueueMessage & msg, const Maps::Tiles & tile)
+{
+    msg.Push(tile.tile_index);
+    msg.Push(tile.shape);
+    msg.Push(tile.general);
+    msg.Push(tile.quantity1);
+    msg.Push(tile.quantity2);
+    msg.Push(tile.quantity3);
+    msg.Push(tile.quantity4);
+    msg.Push(tile.fogs);
+    msg.Push(tile.flags);
+
+    // addons 1
+    msg.Push(static_cast<u32>(tile.addons_level1.size()));
+    std::list<Maps::TilesAddon>::const_iterator it1 = tile.addons_level1.begin();
+    std::list<Maps::TilesAddon>::const_iterator it2 = tile.addons_level1.end();
+    for(; it1 != it2; ++it1)
+    {
+	const Maps::TilesAddon & addon = *it1;
+	msg.Push(addon.level);
+	msg.Push(addon.uniq);
+	msg.Push(addon.object);
+	msg.Push(addon.index);
+    }
+
+    // addons 2
+    msg.Push(static_cast<u32>(tile.addons_level2.size()));
+    it1 = tile.addons_level2.begin();
+    it2 = tile.addons_level2.end();
+    for(; it1 != it2; ++it1)
+    {
+	const Maps::TilesAddon & addon = *it1;
+	msg.Push(addon.level);
+	msg.Push(addon.uniq);
+	msg.Push(addon.object);
+	msg.Push(addon.index);
+    }
 }
 
 void Game::IO::PackKingdom(QueueMessage & msg, const Kingdom & kingdom)
@@ -592,7 +595,6 @@ void Game::IO::PackHeroes(QueueMessage & msg, const Heroes & hero)
 
 bool Game::IO::LoadBIN(QueueMessage & msg)
 {
-VERBOSE("game load start");
     Settings & conf = Settings::Get();
 
     u8 byte8;
@@ -672,14 +674,14 @@ VERBOSE("game load start");
     msg.Pop(conf.game_type);
     msg.Pop(conf.players_colors);
     msg.Pop(conf.preferably_count_players);
+    if(format >= FORMAT_VERSION_1357)
 #ifdef WITH_DEBUG
     msg.Pop(byte16);
 #else
-    if(format >= FORMAT_VERSION_1357)
-	msg.Pop(conf.debug);
+    msg.Pop(conf.debug);
+#endif
     else
 	msg.Pop(byte8);
-#endif
     // settings: original
     if(format >= FORMAT_VERSION_1293)
     {
@@ -708,49 +710,7 @@ VERBOSE("game load start");
     for(u32 maps_index = 0; maps_index < byte32; ++maps_index)
     {
 	Maps::Tiles *tile = new Maps::Tiles(maps_index);
-
-	msg.Pop(tile->tile_index);
-	msg.Pop(tile->shape);
-	msg.Pop(tile->general);
-	msg.Pop(tile->quantity1);
-	msg.Pop(tile->quantity2);
-	if(format && format >= FORMAT_VERSION_1347)
-	{
-	    msg.Pop(tile->quantity3);
-	    msg.Pop(tile->quantity4);
-	}
-	msg.Pop(tile->fogs);
-	msg.Pop(tile->flags);
-
-#ifdef WITH_DEBUG
-	if(IS_DEVEL()) tile->fogs &= ~conf.my_color;
-#endif
-
-	// addons 1
-	u32 size;
-	msg.Pop(size);
-	for(u32 ii = 0; ii < size; ++ii)
-	{
-	    Maps::TilesAddon addon;
-	    msg.Pop(addon.level);
-	    msg.Pop(addon.uniq);
-	    msg.Pop(addon.object);
-	    msg.Pop(addon.index);
-	    tile->addons_level1.push_back(addon);
-	}
-
-	// addons 2
-	msg.Pop(size);
-	for(u32 ii = 0; ii < size; ++ii)
-	{
-	    Maps::TilesAddon addon;
-	    msg.Pop(addon.level);
-	    msg.Pop(addon.uniq);
-	    msg.Pop(addon.object);
-	    msg.Pop(addon.index);
-	    tile->addons_level2.push_back(addon);
-	}
-
+	UnpackTile(msg, *tile, format);
 	world.vec_tiles.push_back(tile);
     }
 
@@ -934,8 +894,52 @@ VERBOSE("game load start");
     // regenerate puzzle surface
     Interface::GameArea::GenerateUltimateArtifactAreaSurface(world.ultimate_artifact, world.puzzle_surface);
 
-VERBOSE("game load end");
     return byte16 == 0xFFFF;
+}
+
+void Game::IO::UnpackTile(QueueMessage & msg, Maps::Tiles & tile, u16 check_version)
+{
+    msg.Pop(tile.tile_index);
+    msg.Pop(tile.shape);
+    msg.Pop(tile.general);
+    msg.Pop(tile.quantity1);
+    msg.Pop(tile.quantity2);
+    if(check_version && check_version >= FORMAT_VERSION_1347)
+    {
+	msg.Pop(tile.quantity3);
+	msg.Pop(tile.quantity4);
+    }
+    msg.Pop(tile.fogs);
+    msg.Pop(tile.flags);
+
+#ifdef WITH_DEBUG
+    if(IS_DEVEL()) tile.fogs &= ~Settings::Get().MyColor();
+#endif
+
+    // addons 1
+    u32 size;
+    msg.Pop(size);
+    for(u32 ii = 0; ii < size; ++ii)
+    {
+	Maps::TilesAddon addon;
+	msg.Pop(addon.level);
+	msg.Pop(addon.uniq);
+	msg.Pop(addon.object);
+	msg.Pop(addon.index);
+	tile.addons_level1.push_back(addon);
+    }
+
+    // addons 2
+    msg.Pop(size);
+    for(u32 ii = 0; ii < size; ++ii)
+    {
+	Maps::TilesAddon addon;
+	msg.Pop(addon.level);
+	msg.Pop(addon.uniq);
+	msg.Pop(addon.object);
+	msg.Pop(addon.index);
+	tile.addons_level2.push_back(addon);
+    }
 }
 
 void Game::IO::UnpackKingdom(QueueMessage & msg, Kingdom & kingdom, u16 check_version)
