@@ -702,6 +702,7 @@ bool Heroes::Move(bool fast)
 	// fast move for hide AI
 	if(fast)
 	{
+	    direction = path.GetFrontDirection();
     	    MoveStep(true);
 	}
 	else
