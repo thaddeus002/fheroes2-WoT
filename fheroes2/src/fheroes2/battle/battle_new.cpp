@@ -1037,8 +1037,8 @@ void Battle::BattleControl::PerformTowerAttack(const Point &attack, const Point 
                             else String::Replace(message, "%{perish}", _("perishes"));
                         }
                         if(piece == BattleCastle::TOWER_KEEP)
-                            String::Replace(message, "%{tower}", "Garrison");
-                        else String::Replace(message, "%{tower}", "Tower");
+                            String::Replace(message, "%{tower}", _("Garrison"));
+                        else String::Replace(message, "%{tower}", _("Tower"));
                         m_gui->Status(message);
                         frame++;
                     }
