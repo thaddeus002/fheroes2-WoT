@@ -142,7 +142,9 @@ void Interface::Basic::Redraw(u8 force)
 void Interface::Basic::RedrawSystemInfo(s16 cx, s16 cy)
 {
     std::string str = "fps: %{fps}, usage memory: %{memory}Kb";
+    mutex.Lock();
     String::Replace(str, "%{fps}", fps);
+    mutex.Unlock();
     String::Replace(str, "%{memory}", GetMemoryUsage());
     system_info.Set(str);
     system_info.Blit(cx, cy);
@@ -150,5 +152,7 @@ void Interface::Basic::RedrawSystemInfo(s16 cx, s16 cy)
 
 void Interface::Basic::SetFPS(u16 f)
 {
+    mutex.Lock();
     fps = f;
+    mutex.Unlock();
 }

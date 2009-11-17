@@ -83,6 +83,7 @@ namespace Interface
 	Rect scrollTop;
 	
 	Text system_info;
+	Mutex mutex;
 	u16 fps;
     };
 };
