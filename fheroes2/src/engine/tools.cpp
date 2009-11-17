@@ -20,6 +20,7 @@
 
 #include <algorithm>
 #include <sstream>
+#include <fstream>
 #include <iostream>
 #include <cstring>
 #include <climits>
@@ -290,22 +291,40 @@ const char *GetBasename(const char *path)
 }
 #endif
 
-#ifdef _WIN32_WCE
+#ifdef __WIN32__
 #include "windows.h"
-
-void MemoryInfoDump(const char* mark)
+u32 GetMemoryUsage(void)
 {
-    MEMORYSTATUS ms;
+    static MEMORYSTATUS ms;
     ZeroMemory(&ms, sizeof(ms));
     ms.dwLength = sizeof(MEMORYSTATUS);
     GlobalMemoryStatus(&ms);
-    int available = ms.dwAvailVirtual / 1024;
-    int total = ms.dwTotalVirtual / 1024;
-    std::cerr << mark << " memory available " << available << " from " << total << " Kb" << std::endl;
+    return (ms.dwTotalVirtual - ms.dwAvailVirtual) / 1024;
 }
 #else
 
-void MemoryInfoDump(const char* mark)
+#ifdef __LINUX__
+#include "unistd.h"
+u32 GetMemoryUsage(void)
 {
+    unsigned int size = 0;
+    std::ostringstream os;
+    os << "/proc/" << getpid() << "/statm";
+
+    std::fstream fs(os.str().c_str(), std::ios::in);
+    if(fs.good())
+    {
+	fs >> size;
+        fs.close();
+    }
+
+    return size * getpagesize() / 1024;
 }
+#else
+u32 GetMemoryUsage(void)
+{
+    return 0;
+}
+#endif
+
 #endif

@@ -1521,9 +1521,6 @@ u16 ICN::AnimationFrame(const icn_t icn, const u16 start, const u32 ticket, cons
 
 bool ICN::RequiresAlpha(const ICN::icn_t icn)
 {
-    if(!Settings::Get().Shadow())
-        return false;
-
     switch(icn)
     {
         case ICN::SYSTEM:

@@ -47,6 +47,6 @@ namespace String
 
 const char* GetDirname(const char *);
 const char* GetBasename(const char *);
-void MemoryInfoDump(const char*);
+u32 GetMemoryUsage(void);
 
 #endif

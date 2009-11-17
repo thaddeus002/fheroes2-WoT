@@ -140,7 +140,7 @@ void Surface::Set(u16 sw, u16 sh, bool alpha)
 {
     FreeSurface(*this);
 
-    CreateSurface(sw, sh, default_depth, alpha ? SDL_SRCALPHA|SDL_SWSURFACE : SDL_SWSURFACE);
+    CreateSurface(sw, sh, default_depth, 8 < default_depth && alpha ? SDL_SRCALPHA|SDL_SWSURFACE : SDL_SWSURFACE);
     LoadPalette();
 }
 

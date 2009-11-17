@@ -42,7 +42,6 @@ namespace
         { "evil interface",    Settings::EVILINTERFACE               },
         { "evilinterface",     Settings::EVILINTERFACE               },
         { "fade",              Settings::FADE                        },
-        { "shadow",            Settings::SHADOW                      },
         { "original",          Settings::ORIGINAL                    },
         { "logo",              Settings::LOGO                        },
         { "battlegrid",        Settings::BATTLEGRID                  },
@@ -85,7 +84,6 @@ Settings::Settings() : major_version(MAJOR_VERSION), minor_version(MINOR_VERSION
     // default maps dir
     list_maps_directory.push_back("maps");
 
-    SetModes(SHADOW);
     SetModes(ORIGINAL);
     SetModes(FADE);
     SetModes(LOGO);
@@ -229,7 +227,6 @@ void Settings::Dump(std::ostream & stream) const
     stream << "hide interface = " << (Modes(HIDEINTERFACE) ? "on"  : "off") << std::endl;
     stream << "evil interface = " << (Modes(EVILINTERFACE) ? "on"  : "off") << std::endl;
     stream << "fade = " << (Modes(FADE) ? "on"  : "off") << std::endl;
-    stream << "shadow = " << (Modes(SHADOW) ? "on"  : "off") << std::endl;
     stream << "original = " << (Modes(ORIGINAL) ? "on"  : "off") << std::endl;
     stream << "alt resource = " << (Modes(ALTRESOURCE) ? "on"  : "off") << std::endl;
     stream << "debug = " << (debug ? "on"  : "off") << std::endl;
@@ -355,9 +352,6 @@ bool Settings::ShowRadar(void) const { return Modes(SHOWRADAR); }
 bool Settings::ShowIcons(void) const { return Modes(SHOWICONS); }
 bool Settings::ShowButtons(void) const { return Modes(SHOWBUTTONS); }
 bool Settings::ShowStatus(void) const { return Modes(SHOWSTATUS); }
-
-/* return shadow */
-bool Settings::Shadow(void) const { return Modes(SHADOW); }
 
 /* get show logo */
 bool Settings::Logo(void) const { return Modes(LOGO); }

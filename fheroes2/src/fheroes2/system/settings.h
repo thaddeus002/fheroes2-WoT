@@ -92,7 +92,7 @@ public:
         ORIGINAL          = 0x00800000,
         PRICELOYALTY      = 0x01000000,
         EVILINTERFACE     = 0x02000000,
-        SHADOW            = 0x04000000,
+        //SHADOW            = 0x04000000,	// deprecated (default depth 8)
         BATTLEGRID        = 0x08000000,
         BATTLEMOUSESHADOW = 0x10000000,
         BATTLEMOVESHADOW  = 0x20000000,
@@ -146,7 +146,6 @@ public:
     bool ShowButtons(void) const;
     bool ShowStatus(void) const;
     bool EvilInterface(void) const;
-    bool Shadow(void) const;
     bool Logo(void) const;
     bool BattleGrid(void) const;
     bool BattleMovementShaded(void) const;

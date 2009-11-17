@@ -68,6 +68,8 @@ Interface::Basic::Basic() : gameArea(GameArea::Get()), radar(Radar::Get()),
     scrollRight = Rect(display.w() - scroll_width, 0, scroll_width, display.h());
     scrollTop = Settings::Get().PocketPC() ? Rect(0, 0, controlPanel.GetArea().x, scroll_width) : Rect(0, 0, display.w() - radar.GetArea().w, scroll_width);
     scrollBottom = Rect(0, display.h() - scroll_width, display.w(), scroll_width);
+    
+    system_info.Set(Font::YELLOW_SMALL);
 }
 
 Interface::Basic & Interface::Basic::Get(void)
@@ -127,7 +129,26 @@ void Interface::Basic::Redraw(u8 force)
 
     if(conf.HideInterface() && conf.ShowControlPanel() && (redraw & REDRAW_GAMEAREA)) controlPanel.Redraw();
 
+    // show system info
+    if((0x000F & conf.Debug()) >= DBG_INFO)
+	RedrawSystemInfo((conf.HideInterface() ? 10 : 26), Display::Get().h() - (conf.HideInterface() ? 14 : 30));
+
+
     if((redraw | force) & REDRAW_BORDER) borderWindow.Redraw();
 
     redraw = 0;
+}
+
+void Interface::Basic::RedrawSystemInfo(s16 cx, s16 cy)
+{
+    std::string str = "fps: %{fps}, usage memory: %{memory}Kb";
+    String::Replace(str, "%{fps}", fps);
+    String::Replace(str, "%{memory}", GetMemoryUsage());
+    system_info.Set(str);
+    system_info.Blit(cx, cy);
+}
+
+void Interface::Basic::SetFPS(u16 f)
+{
+    fps = f;
 }

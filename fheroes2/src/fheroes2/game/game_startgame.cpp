@@ -92,6 +92,8 @@ namespace Game
     void NewWeekDialog(void);
     void ShowEventDay(void);
     void ShowWarningLostTowns(menu_t &);
+
+    u32 UpdateFPS(u32, void *);
 };
 
 void Game::MoveHeroFromArrowKeys(Heroes & hero, Direction::vector_t direct)
@@ -168,7 +170,6 @@ Game::menu_t Game::StartGame(void)
         AGG::ICNRegistryEnable(false);
         AGG::ICNRegistryFreeObjects();
     }
-    if(IS_DEBUG(DBG_GAME, DBG_INFO) && conf.PocketPC()) MemoryInfoDump("Game::StartGame:");
 
     AGG::Cache::Get().ResetMixer();
 
@@ -287,8 +288,6 @@ void Game::OpenCastle(Castle *castle)
     bool show_position = !Settings::Get().PocketPC() && (640 != display.w() || 480 != display.h());
     bool need_fade = !show_position;
 
-    if(IS_DEBUG(DBG_GAME, DBG_INFO) && Settings::Get().PocketPC()) MemoryInfoDump("Game::OpenCastle:");
-
     if(it != myCastles.end())
     {
 	Dialog::answer_t result = Dialog::ZERO;
@@ -305,8 +304,6 @@ void Game::OpenCastle(Castle *castle)
 		display.Flip();
 		DELAY(100);
 	    }
-
-	    if(Settings::Get().LowMemory()) AGG::ICNRegistryEnable(true);
 
 	    result = (*it)->OpenDialog(need_fade);
 	    if(need_fade) need_fade = false;
@@ -355,8 +352,6 @@ void Game::OpenHeroes(Heroes *hero)
     Interface::Basic & I = Interface::Basic::Get();
     bool show_position = !Settings::Get().PocketPC() && (640 != display.w() || 480 != display.h());
     bool need_fade = !show_position;
-
-    if(IS_DEBUG(DBG_GAME, DBG_INFO) && Settings::Get().PocketPC()) MemoryInfoDump("Game::OpenHeroes:");
 
     if(it != myHeroes.end())
     {
@@ -739,6 +734,17 @@ bool Game::ShouldAnimateInfrequent(u32 ticket, u32 modifier)
     return !(ticket % (1 < modifier ? (ANIMATION_SPEED - (2 * Settings::Get().Animation())) * modifier : ANIMATION_SPEED - (2 * Settings::Get().Animation())));
 }
 
+u32 Game::UpdateFPS(u32 tick, void *ptr)
+{
+    if(ptr)
+    {
+	u16* fps = reinterpret_cast<u16 *>(ptr);
+	Interface::Basic::Get().SetFPS(*fps);
+	*fps = 0;
+    }
+
+    return tick;
+}
 Game::menu_t Game::HumanTurn(void)
 {
     Game::Focus & global_focus = Focus::Get();
@@ -793,6 +799,11 @@ Game::menu_t Game::HumanTurn(void)
 
     // warning lost all town
     if(myCastles.empty()) ShowWarningLostTowns(res);
+
+    Timer timerFPS;
+    u16 fps = 0;
+    // show system info
+    if((0x000F & conf.Debug()) >= DBG_INFO) Timer::Run(timerFPS, 1000, UpdateFPS, &fps);
 
     // startgame loop
     while(CANCEL == res && le.HandleEvents())
@@ -997,7 +1008,10 @@ Game::menu_t Game::HumanTurn(void)
 	}
 
         ++ticket;
+        ++fps;
     }
+
+    if(timerFPS.IsValid()) Timer::Remove(timerFPS);
 
     if(ENDTURN == res)
     {
@@ -1432,8 +1446,6 @@ void Game::KeyPress_SPACE(void)
 
 void Game::KeyPress_RETURN(void)
 {
-    if(IS_DEBUG(DBG_GAME, DBG_INFO) && Settings::Get().PocketPC()) MemoryInfoDump("Game::RETURN:");
-
     Focus & global_focus = Focus::Get();
     if(Game::Focus::HEROES == global_focus.Type())
     {
