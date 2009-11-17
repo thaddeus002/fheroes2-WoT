@@ -364,7 +364,7 @@ void AGG::Cache::LoadExtICN(icn_cache_t & v, const ICN::icn_t icn, const u16 ind
 bool AGG::Cache::LoadAltICN(icn_cache_t & v, const std::string & spec, const u16 index, bool reflect)
 {
 #ifdef WITH_XML
-    const Settings & conf = Settings::Get();
+    //const Settings & conf = Settings::Get();
 
     // parse spec.xml
     TiXmlDocument doc;

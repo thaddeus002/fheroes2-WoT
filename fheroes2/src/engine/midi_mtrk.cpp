@@ -18,6 +18,7 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
+#include <iomanip>
 #include <iostream>
 #include <string.h>
 #include "midi_mtrk.h"
@@ -92,7 +93,7 @@ MTrk::MTrk(const u8 *p, const u32 s)
 	    default:
 		end = true;
 		CloseEvents();
-		fprintf(stderr, "unkn st: %hhX, l: %d\n", status, p + s - ptr);
+		std::cerr << "unknown st: 0x" << std::setw(2) << std::setfill('0') << std::hex << static_cast<int>(status) << ", ln: " << static_cast<int>(p + s - ptr) << std::endl;
 	    break;
 	}
     }
@@ -322,7 +323,7 @@ void MTrk::ImportXmiEVNT(const Chunk & evnt)
 	    default:
 		end = true;
 		CloseEvents();
-		fprintf(stderr, "unknown cmd: %hhX, len: %d\n", status, evnt.data + evnt.size - ptr);
+		std::cerr << "unknown st: 0x" << std::setw(2) << std::setfill('0') << std::hex << static_cast<int>(status) << ", ln: " << static_cast<int>(evnt.data + evnt.size - ptr) << std::endl;
 	    break;
 	}
 
