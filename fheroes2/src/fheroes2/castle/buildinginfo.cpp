@@ -72,6 +72,8 @@ BuildingInfo::BuildingInfo(const Castle & c, Castle::building_t b) : castle(c), 
     if(IsDwelling()) building = castle.GetActualDwelling(b);
 
     building = castle.isBuild(b) ? castle.GetUpgradeBuilding(b) : b;
+    // check upgrade 7
+    building = castle.isBuild(building) ? castle.GetUpgradeBuilding(building) : building;
 
     if(IsDwelling())
     {
