@@ -69,8 +69,6 @@ namespace Interface
 	BorderWindow & borderWindow;
 	ControlPanel & controlPanel;
 
-	void SetFPS(u16);
-
     private:
 	Basic();
 	void RedrawSystemInfo(s16, s16);
@@ -81,10 +79,8 @@ namespace Interface
 	Rect scrollRight;
 	Rect scrollBottom;
 	Rect scrollTop;
-	
+
 	Text system_info;
-	Mutex mutex;
-	u16 fps;
     };
 };
 

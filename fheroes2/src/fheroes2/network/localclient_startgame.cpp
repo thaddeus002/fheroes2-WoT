@@ -142,7 +142,7 @@ bool FH2LocalClient::StartGame(void)
 
 		    radar.HideArea();
 		    conf.SetCurrentColor(Color::Get(color));
-		    Game::SetAIProgress(percent);
+		    //Interface::Basic::SetTurnProgress(percent);
 
 		    DEBUG(DBG_NETWORK , DBG_INFO, "FH2LocalClient::StartGame: player: " << Color::String(color));
 		    world.ClearFog(color);
@@ -173,7 +173,6 @@ bool FH2LocalClient::StartGame(void)
 
 			    statusWin.Reset();
                     	    statusWin.SetState(STATUS_AITURN);
-                    	    statusWin.SetAITurnRedraw();
 
                     	    I.SetRedraw(REDRAW_GAMEAREA | REDRAW_STATUS);
 

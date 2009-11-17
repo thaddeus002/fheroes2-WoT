@@ -40,7 +40,6 @@ namespace Game
     u8 GetMixerChannelFromObject(const Maps::Tiles &);
 
     static std::vector<u8> reserved_vols(LOOPXX_COUNT, 0);
-    static u8 ai_turn_progress;
 };
 
 Game::menu_t Game::Testing(u8 t)
@@ -271,14 +270,4 @@ void Game::ShowLoadMapsText(void)
     display.Fill(0, 0, 0);
     TextBox(_("Maps Loading..."), Font::BIG, Rect(0, display.h()/2, display.w(), display.h()/2));
     display.Flip();
-}
-
-void Game::SetAIProgress(u8 v)
-{
-    ai_turn_progress = v;
-}
-
-u8 Game::GetAIProgress(void)
-{
-    return ai_turn_progress;
 }

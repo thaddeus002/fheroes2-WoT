@@ -35,7 +35,7 @@
 #define AITURN_REDRAW_EXPIRE 20
 #define RESOURCE_WINDOW_EXPIRE 2500
 
-Interface::StatusWindow::StatusWindow() : state(STATUS_UNKNOWN), oldState(STATUS_UNKNOWN), aiturn_color(0xFF), aiturn_progress(0xFF)
+Interface::StatusWindow::StatusWindow() : state(STATUS_UNKNOWN), oldState(STATUS_UNKNOWN)
 {
     const Sprite & ston = AGG::GetICN(Settings::Get().EvilInterface() ? ICN::STONBAKE : ICN::STONBACK, 0);
     Rect::w = ston.w();
@@ -50,8 +50,6 @@ Interface::StatusWindow & Interface::StatusWindow::Get(void)
 
 void Interface::StatusWindow::Reset(void)
 {
-    aiturn_color =0xFF;
-    aiturn_progress = 0xFF;
     state = STATUS_DAY;
     oldState = STATUS_UNKNOWN;
     lastResource = Resource::UNKNOWN;
@@ -255,10 +253,6 @@ void Interface::StatusWindow::ResetTimer(void)
 	Timer::Remove(window.timerShowLastResource);
 	ResetResourceStatus(0, &window);
     }
-    if(window.timerRedrawAIStatus.IsValid())
-    {
-	Timer::Remove(window.timerRedrawAIStatus);
-    }
 }
 
 void Interface::StatusWindow::DrawResourceInfo(const u8 oh) const
@@ -304,36 +298,6 @@ void Interface::StatusWindow::DrawArmyInfo(const u8 oh) const
     }
 }
 
-u32 Interface::StatusWindow::RedrawAIStatus(u32 tick, void *ptr)
-{
-    if(ptr)
-    {
-	Interface::StatusWindow* status = reinterpret_cast<Interface::StatusWindow*>(ptr);
-	if(STATUS_AITURN == status->state)
-	{
-	    if(status->aiturn_color != Settings::Get().CurrentColor() || status->aiturn_progress != Game::GetAIProgress())
-	    {
-		status->aiturn_color = Settings::Get().CurrentColor();
-		status->aiturn_progress = Game::GetAIProgress();
-		Cursor::Get().Hide();
-		Interface::Basic::Get().Redraw(REDRAW_STATUS);
-		Cursor::Get().Show();
-		Display::Get().Flip();
-	    }
-	}
-	else
-	    Timer::Remove(status->timerRedrawAIStatus);
-    }
-
-    return tick;
-}
-
-void Interface::StatusWindow::SetAITurnRedraw(void)
-{
-    if(! timerRedrawAIStatus.IsValid())
-	Timer::Run(timerRedrawAIStatus, AITURN_REDRAW_EXPIRE, RedrawAIStatus, this);
-}
-
 void Interface::StatusWindow::DrawAITurns(void) const
 {
     const Settings & conf = Settings::Get();
@@ -352,7 +316,7 @@ void Interface::StatusWindow::DrawAITurns(void) const
 
     u8 color_index = 0;
 
-    switch(aiturn_color)
+    switch(conf.CurrentColor())
     {
 	case Color::BLUE:	color_index = 0; break;
 	case Color::GREEN:	color_index = 1; break;
@@ -370,7 +334,7 @@ void Interface::StatusWindow::DrawAITurns(void) const
 
     display.Blit(crest, dst_x, dst_y);
 
-    const Sprite & sand = AGG::GetICN(ICN::HOURGLAS, 1 + (aiturn_progress % 10));
+    const Sprite & sand = AGG::GetICN(ICN::HOURGLAS, 1 + (turn_progress % 10));
 
     dst_x += (glass.w() - sand.w() - sand.x() - 3);
     dst_y += sand.y();
@@ -460,4 +424,16 @@ void Interface::StatusWindow::QueueEventProcessing(void)
         display.Flip();
     }
     if(le.MousePressRight(*this)) Dialog::Message(_("Status Window"), _("This window provides information on the status of your hero or kingdom, and shows the date. Left click here to cycle throungh these windows."), Font::BIG);
+}
+
+void Interface::StatusWindow::RedrawTurnProgress(u8 v)
+{
+    turn_progress = v;
+    Interface::Basic & I = Interface::Basic::Get();
+    I.SetRedraw(REDRAW_STATUS);
+
+    Cursor::Get().Hide();
+    I.Redraw();
+    Cursor::Get().Show();
+    Display::Get().Flip();
 }

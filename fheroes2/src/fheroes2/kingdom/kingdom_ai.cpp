@@ -54,16 +54,15 @@ void Kingdom::AITurns(void)
     
     if(!Settings::Get().Modes(Settings::MUSIC_MIDI)) AGG::PlayMusic(MUS::COMPUTER);
 
+    Interface::StatusWindow *status = Settings::Get().NoGUI() ? NULL : &Interface::StatusWindow::Get();
+
     // turn indicator
-    Game::SetAIProgress(0);
+    if(status) status->RedrawTurnProgress(0);
 
     // scan map
     ai_objects.clear();
     world.StoreActionObject(GetColor(), ai_objects);
     DEBUG(DBG_AI , DBG_INFO, "Kingdom::AITurns: " << Color::String(color) << ", size cache objects: " << ai_objects.size());
-
-    // turn indicator
-    Game::SetAIProgress(1);
 
     // set capital
     if(NULL == ai_capital && castles.size())
@@ -87,14 +86,11 @@ void Kingdom::AITurns(void)
     }
 
     // turn indicator
-    Game::SetAIProgress(2);
+    if(status) status->RedrawTurnProgress(1);
 
     // castle AI turn
     AICastlesTurns();
 
-    // turn indicator
-    Game::SetAIProgress(3);
-        
     // update roles
     if(heroes.size()) std::for_each(heroes.begin(), heroes.end(), std::bind2nd(std::mem_fun(&Heroes::SetModes), Heroes::SCOUTER|Heroes::HUNTER));
 
@@ -116,14 +112,11 @@ void Kingdom::AITurns(void)
 	}
     }
 
-    // turn indicator
-    Game::SetAIProgress(4);
-    
     // push stupid heroes
     std::for_each(heroes.begin(), heroes.end(), std::mem_fun(&Heroes::ResetStupidFlag));
 
     // turn indicator
-    Game::SetAIProgress(5);
+    if(status) status->RedrawTurnProgress(2);
 
     // heroes turns
     std::vector<Heroes *>::const_iterator ith1 = heroes.begin();
@@ -135,13 +128,16 @@ void Kingdom::AITurns(void)
 
 	while(hero.MayStillMove())
 	{
-	    Game::SetAIProgress(6);
+	    // turn indicator
+	    if(status) status->RedrawTurnProgress(3);
+	    //if(status) status->RedrawTurnProgress(4);
 
 	    // get task for heroes
 	    AIHeroesGetTask(hero);
 
 	    // turn indicator
-	    Game::SetAIProgress(7);
+	    if(status) status->RedrawTurnProgress(5);
+	    //if(status) status->RedrawTurnProgress(6);
 
 	    // heroes AI turn
 	    if(Settings::Get().NoGUI())
@@ -150,12 +146,13 @@ void Kingdom::AITurns(void)
 		AIHeroesTurns(hero);
 
 	    // turn indicator
-	    Game::SetAIProgress(8);
+	    if(status) status->RedrawTurnProgress(7);
+	    //if(status) status->RedrawTurnProgress(8);
 	}
     }
 
     // turn indicator
-    Game::SetAIProgress(9);
+    if(status) status->RedrawTurnProgress(9);
 
     DEBUG(DBG_AI , DBG_INFO, "Kingdom::AITurns: " << Color::String(color) << " moved");
 }

@@ -48,7 +48,7 @@ namespace Interface
 	info_t GetState(void) const;
 	void SetState(info_t info);
 	void SetResource(Resource::resource_t, u16);
-	void SetAITurnRedraw(void);
+	void RedrawTurnProgress(u8);
 	void QueueEventProcessing(void);
 
 	static void ResetTimer(void);
@@ -73,8 +73,7 @@ namespace Interface
 	Timer                timerRedrawAIStatus;
 	Dialog::FrameBorder border;
 
-	u8 aiturn_color;
-	u8 aiturn_progress;
+	u8 turn_progress;
     };
 };
 

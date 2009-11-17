@@ -18,6 +18,7 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
+#include <sstream>
 #include "agg.h"
 #include "settings.h"
 #include "maps.h"
@@ -133,7 +134,6 @@ void Interface::Basic::Redraw(u8 force)
     if((0x000F & conf.Debug()) >= DBG_INFO)
 	RedrawSystemInfo((conf.HideInterface() ? 10 : 26), Display::Get().h() - (conf.HideInterface() ? 14 : 30));
 
-
     if((redraw | force) & REDRAW_BORDER) borderWindow.Redraw();
 
     redraw = 0;
@@ -141,18 +141,8 @@ void Interface::Basic::Redraw(u8 force)
 
 void Interface::Basic::RedrawSystemInfo(s16 cx, s16 cy)
 {
-    std::string str = "fps: %{fps}, usage memory: %{memory}Kb";
-    mutex.Lock();
-    String::Replace(str, "%{fps}", fps);
-    mutex.Unlock();
-    String::Replace(str, "%{memory}", GetMemoryUsage());
-    system_info.Set(str);
+    std::ostringstream os;
+    os << "fps: " << 0 << ", usage memory: " << GetMemoryUsage() << "Kb";
+    system_info.Set(os.str());
     system_info.Blit(cx, cy);
-}
-
-void Interface::Basic::SetFPS(u16 f)
-{
-    mutex.Lock();
-    fps = f;
-    mutex.Unlock();
 }

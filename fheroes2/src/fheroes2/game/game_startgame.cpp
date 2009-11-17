@@ -254,7 +254,6 @@ Game::menu_t Game::StartGame(void)
 			cursor.SetThemes(Cursor::WAIT);
 			I.Redraw();
 			cursor.Show();
-			statusWin.SetAITurnRedraw();
 			display.Flip();
 
 			kingdom.AITurns();
@@ -734,17 +733,6 @@ bool Game::ShouldAnimateInfrequent(u32 ticket, u32 modifier)
     return !(ticket % (1 < modifier ? (ANIMATION_SPEED - (2 * Settings::Get().Animation())) * modifier : ANIMATION_SPEED - (2 * Settings::Get().Animation())));
 }
 
-u32 Game::UpdateFPS(u32 tick, void *ptr)
-{
-    if(ptr)
-    {
-	u16* fps = reinterpret_cast<u16 *>(ptr);
-	Interface::Basic::Get().SetFPS(*fps);
-	*fps = 0;
-    }
-
-    return tick;
-}
 Game::menu_t Game::HumanTurn(void)
 {
     Game::Focus & global_focus = Focus::Get();
@@ -799,11 +787,6 @@ Game::menu_t Game::HumanTurn(void)
 
     // warning lost all town
     if(myCastles.empty()) ShowWarningLostTowns(res);
-
-    Timer timerFPS;
-    u16 fps = 0;
-    // show system info
-    if((0x000F & conf.Debug()) >= DBG_INFO) Timer::Run(timerFPS, 1000, UpdateFPS, &fps);
 
     // startgame loop
     while(CANCEL == res && le.HandleEvents())
@@ -1008,10 +991,7 @@ Game::menu_t Game::HumanTurn(void)
 	}
 
         ++ticket;
-        ++fps;
     }
-
-    if(timerFPS.IsValid()) Timer::Remove(timerFPS);
 
     if(ENDTURN == res)
     {
