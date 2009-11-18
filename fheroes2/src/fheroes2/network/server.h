@@ -49,7 +49,7 @@ public:
     void PopMapsFileInfoList(Network::Message &);
     u8 GetPlayersColors(void) const;
     void ResetPlayers(u32 first_player);
-    void PrepareSending(const Network::Message &, u32 = 0);
+    void SendToAllClients(const Network::Message &, u32 = 0);
 
     void SetExit(void);
     void SetStartGame(void);
@@ -58,7 +58,6 @@ protected:
     void ScanQueue(void);
 
     FH2Server();
-    static u32 TimerScanQueue(u32, void *);
     int Main(void);
     void WaitClients(void);
     void StartGame(void);

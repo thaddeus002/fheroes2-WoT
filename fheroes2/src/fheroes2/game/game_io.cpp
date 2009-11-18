@@ -904,7 +904,7 @@ void Game::IO::UnpackTile(QueueMessage & msg, Maps::Tiles & tile, u16 check_vers
     msg.Pop(tile.general);
     msg.Pop(tile.quantity1);
     msg.Pop(tile.quantity2);
-    if(check_version && check_version >= FORMAT_VERSION_1347)
+    if(!check_version || check_version >= FORMAT_VERSION_1347)
     {
 	msg.Pop(tile.quantity3);
 	msg.Pop(tile.quantity4);
@@ -918,6 +918,7 @@ void Game::IO::UnpackTile(QueueMessage & msg, Maps::Tiles & tile, u16 check_vers
 
     // addons 1
     u32 size;
+    tile.addons_level1.clear();
     msg.Pop(size);
     for(u32 ii = 0; ii < size; ++ii)
     {
@@ -930,6 +931,7 @@ void Game::IO::UnpackTile(QueueMessage & msg, Maps::Tiles & tile, u16 check_vers
     }
 
     // addons 2
+    tile.addons_level2.clear();
     msg.Pop(size);
     for(u32 ii = 0; ii < size; ++ii)
     {
@@ -991,7 +993,7 @@ void Game::IO::UnpackKingdom(QueueMessage & msg, Kingdom & kingdom, u16 check_ve
     kingdom.puzzle_maps = str.c_str();
 
     // visited tents
-    if(check_version && check_version >= FORMAT_VERSION_1335)
+    if(!check_version || check_version >= FORMAT_VERSION_1335)
     {
 	msg.Pop(kingdom.visited_tents_colors);
     }
@@ -1084,7 +1086,7 @@ void Game::IO::UnpackHeroes(QueueMessage & msg, Heroes & hero, u16 check_version
 	msg.Pop(byte8);
 	hero.artifacts[jj].Set(Artifact::FromInt(byte8));
 
-	if(check_version && check_version >= FORMAT_VERSION_1347)
+	if(!check_version || check_version >= FORMAT_VERSION_1347)
 	{
 	    msg.Pop(byte8);
 	    hero.artifacts[jj].SetExt(byte8);

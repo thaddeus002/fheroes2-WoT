@@ -100,6 +100,8 @@ bool FH2LocalClient::StartGame(void)
 
     cursor.Show();
     display.Flip();
+    
+    Kingdom & kingdom = world.GetMyKingdom();
 
     cursor.Hide();
     cursor.SetThemes(Cursor::WAIT);
@@ -151,9 +153,37 @@ bool FH2LocalClient::StartGame(void)
             	    {
 			if(Game::ENDTURN == Game::HumanTurn())
 			{
+			    /*
+			    Network::PackKingdom(packet, kingdom);
+			    DEBUG(DBG_NETWORK, DBG_INFO, "FH2LocalClient::StartGame: send MSG_KINGDOM");
+			    if(!Send(packet)) return false;
+			    
+			    // send all heroes
+			    const std::vector<Heroes *> & heroes = kingdom.GetHeroes();
+			    std::vector<Heroes *>::const_iterator ith1 = heroes.begin();
+			    std::vector<Heroes *>::const_iterator ith2 = heroes.end();
+			    for(; ith1 != ith2; ++ith1) if(*ith1)
+			    {
+				Network::PackHero(packet, **ith1);
+				DEBUG(DBG_NETWORK, DBG_INFO, "FH2LocalClient::StartGame: send MSG_HEROES");
+				if(!Send(packet)) return false;
+			    }
+
+			    // send all castles
+			    const std::vector<Castle *> & castles = kingdom.GetCastles();
+			    std::vector<Castle *>::const_iterator itc1 = castles.begin();
+			    std::vector<Castle *>::const_iterator itc2 = castles.end();
+			    for(; itc1 != itc2; ++itc1) if(*itc1)
+			    {
+				Network::PackCastle(packet, **itc1);
+				DEBUG(DBG_NETWORK, DBG_INFO, "FH2LocalClient::StartGame: send MSG_CASTLE");
+				if(!Send(packet)) return false;
+			    }
+			    */
+
 			    packet.Reset();
 			    packet.SetID(MSG_END_TURN);
-			    DEBUG(DBG_NETWORK, DBG_INFO, "FH2LocalClient::StartGame: send end turn");
+			    DEBUG(DBG_NETWORK, DBG_INFO, "FH2LocalClient::StartGame: send MSG_END_TURN");
 			    if(!Send(packet)) return false;
 			}
 			else
@@ -186,18 +216,23 @@ bool FH2LocalClient::StartGame(void)
 		}
 		break;
 
-		case MSG_HEROES_MOVE:
-		{
-		    VERBOSE("recv MSG_HEROES_MOVE");
-		    u8 hero_id, is_dead;
-		    u16 move_from, move_to;
-
-            	    packet.Pop(hero_id);
-            	    packet.Pop(move_from);
-            	    packet.Pop(move_to);
-            	    packet.Pop(is_dead);
-		}
-		break;
+		//case MSG_KINGDOM:
+		//{
+		//    Network::UnpackKingdom(packet);
+		//}
+		//break;
+		//
+		//case MSG_TILES:
+		//{
+		//    Network::UnpackTile(packet);
+		//}
+		//break;
+		//
+		//case MSG_HEROES:
+		//{
+		//    Network::unpackHero(packet);
+		//}
+		//break;
 
 		default: break;
 	    }

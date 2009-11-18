@@ -31,8 +31,6 @@
 #include "world.h"
 #include "settings.h"
 #include "kingdom.h"
-#include "network.h"
-#include "server.h"
 #include "agg.h"
 
 #define HERO_MAX_SHEDULED_TASK 7
@@ -247,31 +245,13 @@ void Kingdom::AIHeroesNoGUITurns(Heroes &hero)
     if(hero.GetPath().isValid()) hero.SetMove(true);
     else return;
 
-#ifdef WITH_NET
-    FH2Server & server = FH2Server::Get();
-    Network::Message msg;
-#endif
     while(1)
     {
 	if(hero.isFreeman() || !hero.isEnableMove()) break;
 
-#ifdef WITH_NET
-	msg.Reset();
-	msg.SetID(MSG_HEROES_MOVE);
-	msg.Push(static_cast<u8>(hero.GetID()));
-	msg.Push(static_cast<u16>(hero.GetIndex()));
-#endif
 	hero.Move(true);
 
-#ifdef WITH_NET
-	msg.Push(static_cast<u16>(hero.GetIndex()));
-	msg.Push(static_cast<u8>(hero.isFreeman()));
-
-	server.Lock();
-	server.PrepareSending(msg);
-	server.Unlock();
-#endif
-	DELAY(1);
+	DELAY(10);
     }
 }
 

@@ -28,6 +28,12 @@
 #include "error.h"
 #include "remoteclient.h"
 #include "localclient.h"
+#include "kingdom.h"
+#include "castle.h"
+#include "heroes.h"
+#include "game_io.h"
+#include "maps_tiles.h"
+#include "world.h"
 #include "network.h"
 
 #ifdef WITH_NET
@@ -61,7 +67,7 @@ const char* Network::GetMsgString(u16 msg)
 
         case MSG_YOUR_TURN:     return "MSG_YOUR_TURN";
         case MSG_END_TURN:      return "MSG_END_TURN";
-        case MSG_HEROES_MOVE:   return "MSG_HEROES_MOVE";
+        case MSG_TILES:         return "MSG_TILES";
         case MSG_HEROES:        return "MSG_HEROES";
         case MSG_CASTLE:        return "MSG_CASTLE";
         case MSG_SPELL:         return "MSG_SPELL";
@@ -227,6 +233,76 @@ u8 Network::GetPlayersColors(const std::vector<FH2RemoteClient> & v)
     for(; it1 != it2; ++it1) if((*it1).player_id && (*it1).player_color) res |= (*it1).player_color;
                 
     return res;
+}
+
+void Network::PackKingdom(Network::Message & msg, const Kingdom & kingdom)
+{
+    msg.Reset();
+    msg.SetID(MSG_KINGDOM);
+    msg.Push(static_cast<u8>(kingdom.GetColor()));
+    Game::IO::PackKingdom(msg, kingdom);
+}
+
+void Network::UnpackKingdom(Network::Message & msg)
+{
+    u8 kingdom_color;
+    msg.Pop(kingdom_color);
+    Kingdom & kingdom = world.GetKingdom(kingdom_color);
+    Game::IO::UnpackKingdom(msg, kingdom);
+}
+
+void Network::PackHero(Network::Message & msg, const Heroes & hero)
+{
+    msg.Reset();
+    msg.SetID(MSG_HEROES);
+    msg.Push(static_cast<u8>(hero.GetID()));
+    Game::IO::PackHeroes(msg, hero);
+}
+
+void Network::UnpackHero(Network::Message & msg)
+{
+    u8 hero_id;
+    msg.Pop(hero_id);
+    Heroes *hero = world.GetHeroes(Heroes::ConvertID(hero_id));
+    if(hero)
+	Game::IO::UnpackHeroes(msg, *hero);
+    else
+	DEBUG(DBG_NETWORK, DBG_WARN, "Network::UnpackHero: unknown hero id");
+}
+
+void Network::PackTile(Network::Message & msg, const Maps::Tiles & tile)
+{
+    msg.Reset();
+    msg.SetID(MSG_TILES);
+    msg.Push(tile.GetIndex());
+    Game::IO::PackTile(msg, tile);
+}
+
+void Network::UnpackTile(Network::Message & msg)
+{
+    u16 tile_index;
+    msg.Pop(tile_index);
+    Maps::Tiles & tile = world.GetTiles(tile_index);
+    Game::IO::UnpackTile(msg, tile);
+}
+
+void Network::PackCastle(Network::Message & msg, const Castle & castle)
+{
+    msg.Reset();
+    msg.SetID(MSG_CASTLE);
+    msg.Push(castle.GetIndex());
+    Game::IO::PackCastle(msg, castle);
+}
+
+void Network::UnpackCastle(Network::Message & msg)
+{
+    u16 castle_index;
+    msg.Pop(castle_index);
+    Castle *castle = world.GetCastle(castle_index);
+    if(castle)
+	Game::IO::UnpackCastle(msg, *castle);
+    else
+	DEBUG(DBG_NETWORK, DBG_WARN, "Network::UnpackCastle: unknown index id");
 }
 
 #endif

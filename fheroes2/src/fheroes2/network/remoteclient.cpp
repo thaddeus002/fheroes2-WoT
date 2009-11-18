@@ -71,7 +71,7 @@ void FH2RemoteClient::Logout(const std::string & str)
 
     FH2Server & server = FH2Server::Get();
     server.Lock();
-    server.PrepareSending(packet, player_id);
+    server.SendToAllClients(packet, player_id);
     server.Unlock();
 
     Close();
@@ -153,7 +153,7 @@ bool FH2RemoteClient::ConnectionChat(void)
     packet.SetID(MSG_PLAYERS);
     server.Lock();
     server.PushPlayersInfo(packet);
-    server.PrepareSending(packet, player_id);
+    server.SendToAllClients(packet, player_id);
     server.Unlock();
 
     // send hello, modes, id, color
@@ -244,8 +244,8 @@ bool FH2RemoteClient::StartGame(void)
 
 	if(Ready())
 	{
-            DEBUG(DBG_NETWORK , DBG_INFO, "FH2RemoteClient::StartGame: recv");
 	    if(!Recv(packet)) return false;
+            DEBUG(DBG_NETWORK , DBG_INFO, "FH2RemoteClient::StartGame: recv: " << Network::GetMsgString(packet.GetID()));
 
 	    // check broadcast
 	    MsgBroadcast();
@@ -261,8 +261,24 @@ bool FH2RemoteClient::StartGame(void)
 		    MsgLogout();
 	    	    return false;
 
+		case MSG_TILES:
+		    Network::UnpackTile(packet);
+		    break;
+
+		case MSG_CASTLE:
+		    Network::UnpackCastle(packet);
+		    break;
+
+		case MSG_HEROES:
+		    Network::UnpackHero(packet);
+		    break;
+
+		case MSG_KINGDOM:
+		    Network::UnpackKingdom(packet);
+		    break;
+
 		case MSG_END_TURN:
-		    VERBOSE("recv: END_TURN");
+		    // FIX FIX: check heroes and castles for current kingdom
 		    ResetModes(ST_TURN);
 		    break;
 
@@ -284,7 +300,7 @@ void FH2RemoteClient::MsgBroadcast(void)
 	FH2Server & server = FH2Server::Get();
 
 	server.Lock();
-	server.PrepareSending(packet, player_id);
+	server.SendToAllClients(packet, player_id);
 	server.Unlock();
     }
 }
@@ -309,7 +325,7 @@ void FH2RemoteClient::MsgLogout(void)
     Settings & conf = Settings::Get();
 
     server.Lock();
-    server.PrepareSending(packet, player_id);
+    server.SendToAllClients(packet, player_id);
     //
     conf.SetPlayersColors(server.GetPlayersColors() & (~player_color));
     world.GetKingdom(player_color).SetControl(Game::AI);
@@ -317,7 +333,7 @@ void FH2RemoteClient::MsgLogout(void)
     packet.Reset();
     packet.SetID(MSG_PLAYERS);
     server.PushPlayersInfo(packet, player_id);
-    server.PrepareSending(packet, player_id);
+    server.SendToAllClients(packet, player_id);
     server.Unlock();
     DEBUG(DBG_NETWORK , DBG_INFO, "FH2RemoteClient::MsgLogout: " << str);
 }
@@ -335,7 +351,7 @@ bool FH2RemoteClient::MsgMapsInfoSet(void)
         packet.SetID(MSG_MAPS_INFO);
 	server.Lock();
 	Network::PacketPushMapsFileInfo(packet, conf.CurrentFileInfo());
-	server.PrepareSending(packet, 0);
+	server.SendToAllClients(packet, 0);
 	server.Unlock();
 	DEBUG(DBG_NETWORK , DBG_INFO, "FH2RemoteClient::MsgMapsInfoSet: send");
 	if(!Send(packet)) return false;
@@ -350,7 +366,7 @@ bool FH2RemoteClient::MsgMapsInfoSet(void)
 	packet.SetID(MSG_PLAYERS);
 	server.Lock();
         server.PushPlayersInfo(packet);
-	server.PrepareSending(packet, 0);
+	server.SendToAllClients(packet, 0);
 	server.Unlock();
     }
     return true;

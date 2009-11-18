@@ -95,9 +95,10 @@ void FH2Server::SetStartGame(void)
     start_game = true;
 }
 
-void FH2Server::PrepareSending(const Network::Message & msg, u32 id)
+void FH2Server::SendToAllClients(const Network::Message & msg, u32 id)
 {
-    queue.push_back(std::make_pair(msg, id));
+    DEBUG(DBG_NETWORK , DBG_INFO, "FH2Server::PrepareSending: send msg: " << Network::GetMsgString(msg.GetID()));
+    SendPacketToAllClients(clients, msg, id);
 }
 
 void FH2Server::PushMapsFileInfoList(Network::Message & msg) const
@@ -164,54 +165,16 @@ void FH2Server::ResetPlayers(u32 first_player)
     conf.SetPlayersColors(colors);
 }
 
-u32 FH2Server::TimerScanQueue(u32 tick, void *ptr)
-{
-    if(ptr)
-    {
-	FH2Server & server = *reinterpret_cast<FH2Server *>(ptr);
-
-        server.mutex.Lock();
-	if(server.queue.size())
-	{
-    	    MessageID & msgid = server.queue.front();
-    	    Network::Message & msg = msgid.first;
-
-    	    switch(msg.GetID())
-    	    {
-    		case MSG_SHUTDOWN:
-		    if(server.admin_id == msgid.second)
-		    {
-    			DEBUG(DBG_NETWORK , DBG_INFO, "FH2Server::TimerScanQueue: admin shutdown");
-    			server.exit = true;
-			Network::Message packet;
-                	packet.Reset();
-                	packet.SetID(MSG_SHUTDOWN);
-			SendPacketToAllClients(server.clients, packet, msgid.second);
-		    }
-		    break;
-
-		default:
-		    SendPacketToAllClients(server.clients, msg, msgid.second);
-		    break;
-    	    }
-    	    server.queue.pop_front();
-	}
-        server.mutex.Unlock();
-    }
-
-    return tick;
-}
-
 int FH2Server::Main(void)
 {
     // start scan queue
-    Timer::Run(timer, 100, TimerScanQueue, this);
+    //Timer::Run(timer, 5, TimerScanQueue, this);
 
     WaitClients();
     StartGame();
 
     // stop scan queue
-    Timer::Remove(timer);
+    //Timer::Remove(timer);
 
     // close clients
     std::for_each(clients.begin(), clients.end(), std::mem_fun_ref(&FH2RemoteClient::ShutdownThread));
@@ -357,7 +320,16 @@ void FH2Server::StartGame(void)
 		case Game::AI:
 		    DEBUG(DBG_NETWORK, DBG_INFO, "Server: AI turn: " << Color::String(color));
         	    kingdom.AITurns();
-		    // FIXME: send kingdom, castles, heroes
+
+/*
+        	    packet.Reset();
+        	    packet.SetID(MSG_KINGDOM);
+        	    packet.Push(static_cast<u8>(kingdom.GetColor()));
+        	    Game::IO::PackKingdom(packet, kingdom);
+        	    Lock();
+        	    SendToAllClients(packet);
+        	    Unlock();
+*/
 		    break;
 	    }
 	}

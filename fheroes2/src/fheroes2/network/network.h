@@ -31,6 +31,10 @@
 
 typedef std::pair<Network::Message, u32> MessageID;
 class FH2RemoteClient;
+class Kingdom;
+class Heroes;
+class Castle;
+namespace Maps { class Tiles; };
 
 enum msg_t
 {
@@ -60,8 +64,7 @@ enum msg_t
         MSG_YOUR_TURN,
         MSG_END_TURN,
 
-	MSG_HEROES_MOVE,
-
+        MSG_TILES,
         MSG_HEROES,
         MSG_CASTLE,
         MSG_SPELL,
@@ -85,6 +88,18 @@ namespace Network
     void		PacketPushPlayersInfo(Network::Message &, const std::vector<FH2RemoteClient> &, u32 exclude = 0);
 
     u8			GetPlayersColors(const std::vector<FH2RemoteClient> &);
+    
+    void		PackKingdom(Network::Message &, const Kingdom &);
+    void		UnpackKingdom(Network::Message &);
+
+    void		PackTile(Network::Message &, const Maps::Tiles &);
+    void		UnpackTile(Network::Message &);
+
+    void		PackHero(Network::Message &, const Heroes &);
+    void		UnpackHero(Network::Message &);
+
+    void		PackCastle(Network::Message &, const Castle &);
+    void		UnpackCastle(Network::Message &);
 };
 
 #endif
