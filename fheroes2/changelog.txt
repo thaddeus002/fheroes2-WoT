@@ -1,4 +1,9 @@
-SVN - up to r1351
+SVN - up to r1374
+
+Nov, 27, 2009
++ fixed multiple pickup maps event
++ fixed sounds in battle being clipped. Stop battle music at end of battle summary.
++ added new mixer code, alternative sound load update code, reduce memory usage
 
 Nov, 8, 2009
 + fixed heroes fadein/fadeout
