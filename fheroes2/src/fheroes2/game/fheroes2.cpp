@@ -38,6 +38,10 @@
 
 extern bool FilePresent(const std::string &);
 void LoadZLogo(void);
+void SetTimidityEnvPath(const Settings &);
+void SetLangEnvPath(const Settings &);
+void ReadConfigFile(Settings &);
+void LoadConfigFiles(Settings &, const char* dirname);
 
 int PrintHelp(const char *basename)
 {
@@ -60,47 +64,10 @@ int main(int argc, char **argv)
 {
 	Settings & conf = Settings::Get();
 	int test = 0;
-	std::string strtmp;
 
 	std::cout << "Free Heroes II, " + conf.BuildVersion() << std::endl;
 
-	// prefix from build
-#ifdef CONFIGURE_FHEROES2_DATA
-	conf.SetLocalPrefix(CONFIGURE_FHEROES2_DATA);
-#endif
-	if(conf.LocalPrefix().size())
-	{
-	    strtmp = conf.LocalPrefix() + SEPARATOR + "fheroes2.cfg";
-	    if(FilePresent(strtmp))
-	    {
-		std::cout << "config: " << strtmp << " load." << std::endl;
-		conf.Read(strtmp);
-	    }
-	}
-
-	// prefix from env
-	if(getenv("FHEROES2_DATA"))
-	{
-	    conf.SetLocalPrefix(getenv("FHEROES2_DATA"));
-	    strtmp = conf.LocalPrefix() + SEPARATOR + "fheroes2.cfg";
-	    if(FilePresent(strtmp))
-	    {
-		std::cout << "config: " << strtmp << " load." << std::endl;
-		conf.Read(strtmp);
-	    }
-	}
-
-	// prefix from dirname
-	if(conf.LocalPrefix().empty())
-	{
-	    conf.SetLocalPrefix(GetDirname(argv[0]));
-	    strtmp = conf.LocalPrefix() + SEPARATOR + "fheroes2.cfg";
-	    if(FilePresent(strtmp))
-	    {
-		std::cout << "config: " << strtmp << " load." << std::endl;
-	    	conf.Read(strtmp);
-	    }
-	}
+	LoadConfigFiles(conf, GetDirname(argv[0]));
 
 	// getopt
 	{
@@ -137,30 +104,6 @@ int main(int argc, char **argv)
 
 	}
 
-	// timidity path fix
-	strtmp = conf.LocalPrefix() + SEPARATOR + "files" + SEPARATOR + "timidity" + SEPARATOR + "timidity.cfg";
-	if(FilePresent(strtmp))
-	{
-	    strtmp = "TIMIDITY_PATH=" + conf.LocalPrefix() + SEPARATOR + "files" + SEPARATOR + "timidity";
-	    putenv(const_cast<char *>(strtmp.c_str()));
-	}
-
-#ifdef WITH_TTF
-	if(conf.Unicode())
-	{
-	    if(conf.ForceLang().size())
-	    {
-		strtmp = "LANG=" + conf.ForceLang();
-		putenv(const_cast<char *>(strtmp.c_str()));
-	    }
-	    strtmp = conf.LocalPrefix() + SEPARATOR + "files" + SEPARATOR + "lang";
-	    setlocale(LC_ALL, "");
-	    bindtextdomain(GETTEXT_PACKAGE, strtmp.c_str());
-	    bind_textdomain_codeset(GETTEXT_PACKAGE, "UTF-8");
-	    textdomain(GETTEXT_PACKAGE);
-	}
-#endif
-
 	// random init
 	Rand::Init();
 
@@ -179,12 +122,18 @@ int main(int argc, char **argv)
 	{
 	    std::atexit(SDL::Quit);
 
+	    if(conf.Unicode()) SetLangEnvPath(conf);
+
 	    if(Mixer::isValid())
 	    {
 		Mixer::SetChannels(8);
                 Mixer::Volume(-1, conf.SoundVolume());
                 Music::Volume(conf.MusicVolume());
-                if(conf.Music()) Music::SetFadeIn(3000);
+                if(conf.Music())
+		{
+		    SetTimidityEnvPath(conf);
+		    Music::SetFadeIn(3000);
+		}
 	    }
 	    else
 	    if(conf.Sound() || conf.Music())
@@ -193,7 +142,7 @@ int main(int argc, char **argv)
 		conf.ResetModes(Settings::MUSIC);
 	    }
 
-	    strtmp = "Free Heroes II, " + conf.BuildVersion();
+	    std::string strtmp = "Free Heroes II, " + conf.BuildVersion();
 
             Display::SetVideoMode(conf.VideoMode().w, conf.VideoMode().h, conf.FullScreen());
 
@@ -351,4 +300,64 @@ void LoadZLogo(void)
 	}
     }
 #endif
+}
+
+void SetTimidityEnvPath(const Settings & conf)
+{
+    std::string strtmp = conf.LocalPrefix() + SEPARATOR + "files" + SEPARATOR + "timidity" + SEPARATOR + "timidity.cfg";
+    if(FilePresent(strtmp))
+    {
+	strtmp = "TIMIDITY_PATH=" + conf.LocalPrefix() + SEPARATOR + "files" + SEPARATOR + "timidity";
+	putenv(const_cast<char *>(strtmp.c_str()));
+    }
+}
+
+void SetLangEnvPath(const Settings & conf)
+{
+#ifdef WITH_TTF
+    std::string strtmp;
+    if(conf.ForceLang().size())
+    {
+	strtmp = "LANG=" + conf.ForceLang();
+	putenv(const_cast<char *>(strtmp.c_str()));
+    }
+    strtmp = conf.LocalPrefix() + SEPARATOR + "files" + SEPARATOR + "lang";
+    setlocale(LC_ALL, "");
+    bindtextdomain(GETTEXT_PACKAGE, strtmp.c_str());
+    bind_textdomain_codeset(GETTEXT_PACKAGE, "UTF-8");
+    textdomain(GETTEXT_PACKAGE);
+#endif
+}
+
+void ReadConfigFile(Settings & conf)
+{
+    std::string strtmp = conf.LocalPrefix() + SEPARATOR + "fheroes2.cfg";
+    if(FilePresent(strtmp))
+    {
+	std::cout << "config: " << strtmp << " load." << std::endl;
+	conf.Read(strtmp);
+    }
+}
+
+void LoadConfigFiles(Settings & conf, const char* dirname)
+{
+    // prefix from build
+#ifdef CONFIGURE_FHEROES2_DATA
+    conf.SetLocalPrefix(CONFIGURE_FHEROES2_DATA);
+    if(conf.LocalPrefix().size()) ReadConfigFile(conf);
+#endif
+
+    // prefix from env
+    if(getenv("FHEROES2_DATA"))
+    {
+	conf.SetLocalPrefix(getenv("FHEROES2_DATA"));
+	ReadConfigFile(conf);
+    }
+
+    // prefix from dirname
+    if(conf.LocalPrefix().empty())
+    {
+	conf.SetLocalPrefix(dirname);
+	ReadConfigFile(conf);
+    }
 }
