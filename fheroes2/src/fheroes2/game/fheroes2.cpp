@@ -106,6 +106,7 @@ int main(int argc, char **argv)
 
 	// random init
 	Rand::Init();
+        if(conf.Music()) SetTimidityEnvPath(conf);
 
 	u32 subsystem = INIT_VIDEO | INIT_TIMER;
 
@@ -131,7 +132,6 @@ int main(int argc, char **argv)
                 Music::Volume(conf.MusicVolume());
                 if(conf.Music())
 		{
-		    SetTimidityEnvPath(conf);
 		    Music::SetFadeIn(3000);
 		}
 	    }
