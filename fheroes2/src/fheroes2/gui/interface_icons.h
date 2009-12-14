@@ -66,6 +66,7 @@ namespace Interface
         bool            Next(void);
         void            SetTop(const u8 index);
         void            Hide(void);
+        void            Show(void);
         void            Unselect(void);
         bool            isSelected(void) const;
 
@@ -80,6 +81,7 @@ namespace Interface
         static void RedrawIcon(const Heroes & hero, const Rect & dst);
         std::vector<Heroes *>::const_iterator it_top;
         std::vector<Heroes *>::const_iterator it_cur;
+	bool hide;
     };
 
 
@@ -98,6 +100,7 @@ namespace Interface
         bool            Next(void);
         void            SetTop(const u8 index);
         void            Hide(void);
+        void            Show(void);
         void            Unselect(void);
         bool            isSelected(void) const;
 
@@ -111,6 +114,7 @@ namespace Interface
         static void RedrawIcon(const Castle & castle, const Rect & dst);
         std::vector<Castle *>::const_iterator it_top;
         std::vector<Castle *>::const_iterator it_cur;
+	bool hide;
     };
 
     class IconsPanel : protected Rect

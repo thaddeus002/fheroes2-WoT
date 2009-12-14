@@ -167,21 +167,22 @@ void Interface::HeroesIcons::Redraw(void)
 
     IconsBar::Redraw();
 
-    std::vector<Heroes *>::const_iterator it = it_top;
-    u8 ii = 0;
-
-    while(it != heroes.end() && ii < coords.size())
+    if(!hide)
     {
-	if(*it)
+	std::vector<Heroes *>::const_iterator it = it_top;
+	u8 ii = 0;
+
+	while(it != heroes.end() && ii < coords.size())
 	{
-	    RedrawIcon(**it, coords[ii]);
-
-	    // select current
-	    if(selected && it_cur == it) sp_cursor.Show(coords[ii].x - 5, coords[ii].y - 5);
-
-	    ++ii;
+	    if(*it)
+	    {
+		RedrawIcon(**it, coords[ii]);
+		// select current
+		if(selected && it_cur == it) sp_cursor.Show(coords[ii].x - 5, coords[ii].y - 5);
+		++ii;
+	    }
+	    ++it;
 	}
-	++it;
     }
     splitter.Show();
 }
@@ -190,6 +191,12 @@ void Interface::HeroesIcons::Hide(void)
 {
     if(isSelected()) Unselect();
     IconsBar::Redraw();
+    hide = true;
+}
+
+void Interface::HeroesIcons::Show(void)
+{
+    hide = false;
 }
 
 void Interface::HeroesIcons::Unselect(void)
@@ -416,21 +423,22 @@ void Interface::CastleIcons::Redraw(void)
 
     IconsBar::Redraw();
 
-    std::vector<Castle *>::const_iterator it = it_top;
-    u8 ii = 0;
-
-    while(it != castles.end() && ii < coords.size())
+    if(!hide)
     {
-	if(*it)
+	std::vector<Castle *>::const_iterator it = it_top;
+	u8 ii = 0;
+
+	while(it != castles.end() && ii < coords.size())
 	{
-    	    RedrawIcon(**it, coords[ii]);
-
-	    // select current
-	    if(selected && it_cur == it) sp_cursor.Show(coords[ii].x - 5, coords[ii].y - 5);
-
-	    ++ii;
+	    if(*it)
+	    {
+    		RedrawIcon(**it, coords[ii]);
+		// select current
+		if(selected && it_cur == it) sp_cursor.Show(coords[ii].x - 5, coords[ii].y - 5);
+		++ii;
+	    }
+	    ++it;
 	}
-	++it;
     }
     splitter.Show();
 }
@@ -439,6 +447,12 @@ void Interface::CastleIcons::Hide(void)
 {
     if(isSelected()) Unselect();
     IconsBar::Redraw();
+    hide = true;
+}
+
+void Interface::CastleIcons::Show(void)
+{
+    hide = false;
 }
 
 void Interface::CastleIcons::Unselect(void)
