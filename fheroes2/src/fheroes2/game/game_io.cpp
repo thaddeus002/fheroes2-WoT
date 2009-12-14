@@ -33,12 +33,11 @@
 #include "interface_gamearea.h"
 #include "tools.h"
 
+#define FORMAT_VERSION_1377 0x0561
 #define FORMAT_VERSION_1357 0x054D
 #define FORMAT_VERSION_1347 0x0543
-#define FORMAT_VERSION_1335 0x0537
-#define FORMAT_VERSION_1293 0x050D
 
-#define CURRENT_FORMAT_VERSION FORMAT_VERSION_1357
+#define CURRENT_FORMAT_VERSION FORMAT_VERSION_1377
 
 bool Game::Save(const std::string &fn)
 {
@@ -132,13 +131,10 @@ bool Game::LoadSAV2FileInfo(const std::string & fn,  Maps::FileInfo & maps_file)
     if(byte16 != 0xFF01) return false;
     // format version
     msg.Pop(byte16);
-    if(byte16 >= FORMAT_VERSION_1293)
-    {
-	// major version
-	msg.Pop(byte8);
-	// minor version
-	msg.Pop(byte8);
-    }
+    // major version
+    msg.Pop(byte8);
+    // minor version
+    msg.Pop(byte8);
     // svn
     msg.Pop(str);
     // time
@@ -591,6 +587,18 @@ void Game::IO::PackHeroes(QueueMessage & msg, const Heroes & hero)
 	msg.Push((*it1).first);
 	msg.Push(static_cast<u8>((*it1).second));
     }
+
+    // route path
+    msg.Push(hero.path.dst);
+    msg.Push(static_cast<u8>(hero.path.hide));
+    msg.Push(static_cast<u32>(hero.path.size()));
+    Route::Path::const_iterator ip1 = hero.path.begin();
+    Route::Path::const_iterator ip2 = hero.path.end();
+    for(; ip1 != ip2; ++ip1)
+    {
+	msg.Push(static_cast<u16>((*ip1).Direction()));
+	msg.Push((*ip1).Penalty());
+    }
 }
 
 bool Game::IO::LoadBIN(QueueMessage & msg)
@@ -620,13 +628,10 @@ bool Game::IO::LoadBIN(QueueMessage & msg)
     	DEBUG(DBG_GAME , DBG_INFO, "Game::IO::LoadBIN: format: " << format);
     }
 
-    if(format >= FORMAT_VERSION_1293)
-    {
-	// major version
-	msg.Pop(byte8);
-	// minor version
-	msg.Pop(byte8);
-    }
+    // major version
+    msg.Pop(byte8);
+    // minor version
+    msg.Pop(byte8);
 
     // svn
     msg.Pop(str);
@@ -683,11 +688,8 @@ bool Game::IO::LoadBIN(QueueMessage & msg)
     else
 	msg.Pop(byte8);
     // settings: original
-    if(format >= FORMAT_VERSION_1293)
-    {
-	msg.Pop(byte8);
-	if(byte8) conf.SetModes(Settings::ORIGINAL);
-    }
+    msg.Pop(byte8);
+    if(byte8) conf.SetModes(Settings::ORIGINAL);
     // world
     msg.Pop(byte16);
     if(byte16 != 0xFF05) DEBUG(DBG_GAME , DBG_WARN, "Game::IO::LoadBIN: 0xFF05");
@@ -993,10 +995,7 @@ void Game::IO::UnpackKingdom(QueueMessage & msg, Kingdom & kingdom, u16 check_ve
     kingdom.puzzle_maps = str.c_str();
 
     // visited tents
-    if(!check_version || check_version >= FORMAT_VERSION_1335)
-    {
-	msg.Pop(kingdom.visited_tents_colors);
-    }
+    msg.Pop(kingdom.visited_tents_colors);
 }
 
 void Game::IO::UnpackCastle(QueueMessage & msg, Castle & castle, u16 check_version)
@@ -1109,6 +1108,7 @@ void Game::IO::UnpackHeroes(QueueMessage & msg, Heroes & hero, u16 check_version
     hero.spell_book.active = byte8;
 
     msg.Pop(byte32);
+    hero.spell_book.spells.reserve(byte32);
     for(u32 jj = 0; jj < byte32; ++jj)
     {
 	msg.Pop(byte8);
@@ -1125,5 +1125,23 @@ void Game::IO::UnpackHeroes(QueueMessage & msg, Heroes & hero, u16 check_version
 	msg.Pop(byte8);
 	io.second = static_cast<MP2::object_t>(byte8);
 	hero.visit_object.push_back(io);
+    }
+
+    if(check_version >= FORMAT_VERSION_1377)
+    {
+	// route path
+	msg.Pop(hero.path.dst);
+	msg.Pop(byte8);
+	hero.path.hide = byte8;
+	msg.Pop(byte32);
+	hero.path.clear();
+	for(u32 jj = 0; jj < byte32; ++jj)
+	{
+	    Route::Step step;
+	    msg.Pop(byte16);
+	    step.first = Direction::FromInt(byte16);
+	    msg.Pop(step.second);
+	    hero.path.push_back(step);
+	}
     }
 }

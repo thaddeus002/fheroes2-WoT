@@ -23,12 +23,13 @@
 #include <list>
 #include "gamedefs.h"
 #include "direction.h"
+#include "game_io.h"
 
 class Heroes;
 
 namespace Route
 {
-    class Step : private std::pair<Direction::vector_t, u16>
+    class Step : public std::pair<Direction::vector_t, u16>
     {
 	public:
 	Step() : std::pair<Direction::vector_t, u16>(Direction::CENTER, 0) {};
@@ -70,6 +71,7 @@ namespace Route
     	    static u16	GetIndexSprite(const Direction::vector_t & from, const Direction::vector_t & to, u8 mod);
 
 	private:
+	    friend class Game::IO;
 	    const Heroes & hero;
 	    u16		dst;
 	    bool	hide;
