@@ -1,6 +1,9 @@
 /*
  * message strings
  * from original maps files
+ *
+ * Part of the Free Heroes2 Engine:
+ * http://sourceforge.net/projects/fheroes2
  */
 
 #include "gamedefs.h"

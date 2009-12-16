@@ -1,6 +1,8 @@
 /***************************************************************************
- *   Copyright (C) 2008 by Andrey Afletdinov                               *
- *   afletdinov@mail.dc.baikal.ru                                          *
+ *   Copyright (C) 2008 by Andrey Afletdinov <fheroes2@gmail.com>          *
+ *                                                                         *
+ *   Part of the Free Heroes2 Engine:                                      *
+ *   http://sourceforge.net/projects/fheroes2                              *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
