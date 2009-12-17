@@ -232,9 +232,9 @@ Game::menu_t Game::StartGame(void)
 			std::string str = _("%{color} player's turn");
 			String::Replace(str, "%{color}", Color::String(color));
 			DialogPlayers(color, str);
-			castleBar.Show();
-			heroesBar.Show();
 		    }
+		    castleBar.Show();
+		    heroesBar.Show();
 		    conf.SetMyColor(color);
 		    m = HumanTurn();
 		    if(conf.Modes(Settings::LOADGAME)) conf.ResetModes(Settings::LOADGAME);
