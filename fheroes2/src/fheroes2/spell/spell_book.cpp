@@ -50,6 +50,9 @@ Spell::spell_t SpellBook::Open(filter_t filt, bool canselect) const
 {
     if(!active) return Spell::NONE;
 
+    std::vector<Spell::spell_t> spells2;
+    spells2.reserve(spells.size());
+/*
     std::vector<Spell::spell_t> spells2(spells);
 
     if(hero)
@@ -65,6 +68,7 @@ Spell::spell_t SpellBook::Open(filter_t filt, bool canselect) const
 		    spells2.push_back(scroll);
 	    }
     }
+*/
 
     Display & display = Display::Get();
     Cursor & cursor = Cursor::Get();
@@ -241,8 +245,25 @@ Spell::spell_t SpellBook::Open(filter_t filt, bool canselect) const
     return curspell;
 }
 
-void SpellBook::SetFilter(std::vector<Spell::spell_t> & v, filter_t filter)
+void SpellBook::SetFilter(std::vector<Spell::spell_t> & v, filter_t filter) const
 {
+    v = spells;
+
+    // added heroes spell scrolls
+    if(hero)
+    {
+	const BagArtifacts & bag = hero->GetBagArtifacts();
+	BagArtifacts::const_iterator it1 = bag.begin();
+	BagArtifacts::const_iterator it2 = bag.end();
+	for(; it1 != it2; ++it1)
+	    if(*it1 == Artifact::SPELL_SCROLL)
+	    {
+		const Spell::spell_t scroll = Spell::FromInt((*it1).GetExt());
+		if(Spell::NONE != scroll && v.end() == std::find(v.begin(), v.end(), scroll))
+		    v.push_back(scroll);
+	    }
+    }
+
     if(filter != ALL)
     {
 	std::vector<Spell::spell_t>::iterator it = std::remove_if(v.begin(), v.end(), std::bind2nd(SpellFiltered(), filter));
