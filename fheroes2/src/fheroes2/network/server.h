@@ -28,7 +28,6 @@
 #ifdef WITH_NET
 
 #include <vector>
-#include <deque>
 #include "network.h"
 #include "remoteclient.h"
 #include "maps_fileinfo.h"
@@ -66,7 +65,6 @@ protected:
 
     Mutex mutex;
     Timer timer;
-    std::deque<MessageID> queue;
     std::vector<FH2RemoteClient> clients;
     bool exit;
     bool start_game;
