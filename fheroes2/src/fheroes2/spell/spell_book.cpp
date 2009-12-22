@@ -52,23 +52,6 @@ Spell::spell_t SpellBook::Open(filter_t filt, bool canselect) const
 
     std::vector<Spell::spell_t> spells2;
     spells2.reserve(spells.size());
-/*
-    std::vector<Spell::spell_t> spells2(spells);
-
-    if(hero)
-    {
-	const BagArtifacts & bag = hero->GetBagArtifacts();
-	BagArtifacts::const_iterator it1 = bag.begin();
-	BagArtifacts::const_iterator it2 = bag.end();
-	for(; it1 != it2; ++it1)
-	    if(*it1 == Artifact::SPELL_SCROLL)
-	    {
-		const Spell::spell_t scroll = Spell::FromInt((*it1).GetExt());
-		if(Spell::NONE != scroll && spells2.end() == std::find(spells2.begin(), spells2.end(), scroll))
-		    spells2.push_back(scroll);
-	    }
-    }
-*/
 
     Display & display = Display::Get();
     Cursor & cursor = Cursor::Get();
