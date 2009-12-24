@@ -320,12 +320,6 @@ void Army::BattleTroop::RemoveSpellEffect(Spell::spell_t spell)
             ResetModes(SP_DRAGONSLAYER);
             break;
 
-        case Spell::DISRUPTINGRAY:
-            ResetModes(SP_DISRUPTINGRAY);
-            if (disruptingray > 0)
-                --disruptingray;
-            break;
-
         default:
             break;
     }
