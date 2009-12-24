@@ -3,6 +3,10 @@ SVN - up to r1375
 + Fixed spells lasting past the end of a battle
 + Fixed spells lasting indefinitely in battle
 + Fixed monsters casting spells on dead units
++ Added heroes path store
++ Fixed hot seat crash
++ Fixed redistribute army
++ Fixed spell book filter
 
 Nov, 27, 2009
 + fixed multiple pickup maps event
