@@ -915,8 +915,18 @@ Army::battle_t Battle::BattleControl::RunBattle(HeroBase *hero1, HeroBase *hero2
         battle_status = Army::SURRENDER;
 
     for(u8 i = 0; i < 2; i++)
+    {
         if(m_battlefield.GetHero(i))
             m_battlefield.GetHero(i)->ResetModes(Heroes::SPELLCASTED);
+        Army::BattleArmy_t &army = m_battlefield.GetArmy(i);;
+        if(Army::isArmyValid(army))
+        {
+            Army::BattleArmy_t::iterator it = army.begin();
+            Army::BattleArmy_t::iterator end = army.end();
+            for(; it != end; ++it)
+                it->ClearMagic();
+        }
+    }
 
     delete turn[0];
     delete turn[1];
@@ -1689,7 +1699,7 @@ bool Battle::BattleControl::PerformAttack(TroopIndex troopN, const Point &attack
         display.Flip();
     }
 
-    if(!ranged)
+    if(!ranged && targets[0]->Count())
     {
         std::vector<Army::BattleTroop*> affected;
         affected.push_back(targets[0]);

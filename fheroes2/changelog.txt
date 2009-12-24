@@ -1,4 +1,8 @@
-SVN - up to r1374
+SVN - up to r1375
+
++ Fixed spells lasting past the end of a battle
++ Fixed spells lasting indefinitely in battle
++ Fixed monsters casting spells on dead units
 
 Nov, 27, 2009
 + fixed multiple pickup maps event

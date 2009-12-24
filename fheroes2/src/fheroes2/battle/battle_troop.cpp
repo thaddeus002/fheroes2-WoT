@@ -241,6 +241,96 @@ void Army::BattleTroop::SetMagic(Battle::magic_t &magic)
     magics.push_back(magic);
 }
 
+void Army::BattleTroop::RemoveSpellEffect(Spell::spell_t spell)
+{
+    switch (spell)
+    {
+        case Spell::CURE:
+        case Spell::MASSCURE:
+            ResetModes(SP_CURE);
+            break;
+
+        case Spell::DISPEL:
+        case Spell::MASSDISPEL:
+            ResetModes(SP_DISPEL);
+            break;
+            
+        case Spell::BLESS:
+        case Spell::MASSBLESS:
+            ResetModes(SP_BLESS);
+            break;
+
+        case Spell::BLOODLUST:
+            ResetModes(SP_BLODLUST);
+            break;
+
+        case Spell::CURSE:
+        case Spell::MASSCURSE:
+            ResetModes(SP_CURSE);
+            break;
+
+        case Spell::HASTE:
+        case Spell::MASSHASTE:
+            ResetModes(SP_HASTE);
+            break;
+
+        case Spell::SHIELD:
+        case Spell::MASSSHIELD:
+            ResetModes(SP_SHIELD);
+            break;
+
+        case Spell::SLOW:
+        case Spell::MASSSLOW:
+            ResetModes(SP_SLOW);
+            break;
+
+        case Spell::STONESKIN:
+            ResetModes(SP_STONESKIN);
+            break;
+
+        case Spell::STEELSKIN:
+            ResetModes(SP_STEELSKIN);
+            break;
+
+        case Spell::ANTIMAGIC:
+            ResetModes(SP_ANTIMAGIC);
+            break;
+
+        case Spell::BLIND:
+            ResetModes(SP_BLIND);
+            break;
+
+        case Spell::PARALYZE:
+            ResetModes(SP_PARALYZE);
+            break;
+
+        case Spell::BERZERKER:
+            ResetModes(SP_BERZERKER);
+            break;
+
+        case Spell::HYPNOTIZE:
+            ResetModes(SP_HYPNOTIZE);
+            break;
+
+        case Spell::STONE:
+            ResetModes(SP_STONE);
+            break;
+
+        case Spell::DRAGONSLAYER:
+            ResetModes(SP_DRAGONSLAYER);
+            break;
+
+        case Spell::DISRUPTINGRAY:
+            ResetModes(SP_DISRUPTINGRAY);
+            if (disruptingray > 0)
+                --disruptingray;
+            break;
+
+        default:
+            break;
+    }
+}
+
 bool Army::BattleTroop::FindMagic(Spell::spell_t spell) const
 {
     for(u16 i=0; i<magics.size(); i++) {
@@ -253,6 +343,7 @@ void Army::BattleTroop::RemoveMagic(Spell::spell_t spell)
 {
     for(u16 i=0; i<magics.size(); i++) {
         if(spell == magics[i].spell) {
+            RemoveSpellEffect(spell);
             magics.erase(magics.begin()+i);
             i--;
         }
@@ -261,6 +352,8 @@ void Army::BattleTroop::RemoveMagic(Spell::spell_t spell)
 
 void Army::BattleTroop::ClearMagic()
 {
+    for(u16 i = 0; i < magics.size(); i++)
+        RemoveSpellEffect(magics[i].spell);
     magics.clear();
 }
 
@@ -269,6 +362,7 @@ void Army::BattleTroop::ProceedMagic()
     for(u16 i=0; i<magics.size(); i++) {
         magics[i].duration --;
         if(magics[i].duration <= 0) {
+            RemoveSpellEffect(magics[i].spell);
             magics.erase(magics.begin()+i);
             i--;
         }
@@ -332,8 +426,13 @@ bool Army::BattleTroop::ApplySpell(Spell::spell_t spell, u8 sp)
         case Spell::DRAGONSLAYER: SetModes(SP_DRAGONSLAYER); break;
         case Spell::DISRUPTINGRAY: SetModes(SP_DISRUPTINGRAY); break;
 
-        default: break;
+        default: return true;
     }
+
+    Battle::magic_t magic;
+    magic.spell = spell;
+    magic.duration = sp;
+    SetMagic(magic);
 
     return true;
 }
@@ -350,6 +449,7 @@ void Army::BattleTroop::NewTurn(void)
         default: break;
     }
     
+    ProceedMagic();
     ResetModes(Army::ATTACKED);
     ResetModes(Army::RETALIATED);
     ResetModes(Army::HANDFIGHTING);

@@ -146,6 +146,8 @@ namespace Army
         long                    damageToApply;
         
       private:
+        void RemoveSpellEffect(Spell::spell_t);
+
         Point                   pos;
         Point                   screenPos;
         Background bg;
