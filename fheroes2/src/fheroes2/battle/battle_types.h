@@ -194,24 +194,27 @@ namespace Battle
         ~Battlefield();
 
         void InitializeArmies();
-        Army::BattleArmy_t &GetArmy(u8);
+        Army::BattleArmy_t &GetArmy(u8) const;
         void SetArmy(u8, Army::army_t &);
-        HeroBase *GetHero(u8);
+        HeroBase *GetHero(u8) const;
         void SetHero(u8, HeroBase *);
-        TroopIndex GetIndexFromTroop(const Army::BattleTroop &);
-        Army::BattleTroop &GetTroopFromIndex(TroopIndex);
-        void GetTroopOrdering(IndexList &);
+        TroopIndex GetIndexFromTroop(const Army::BattleTroop &) const;
+        Army::BattleTroop &GetTroopFromIndex(TroopIndex) const;
+        void GetTroopOrdering(IndexList &) const;
         static TroopIndex ApplyIndexModifier(TroopIndex);
-        u8 GetSideFromIndex(TroopIndex);
+        u8 GetSideFromIndex(TroopIndex) const;
 
         static Point PointToAttack(const Army::BattleTroop &, const Army::BattleTroop &);
         static TroopIndex FindTroop(const Army::BattleArmy_t &, const Point &);
         static TroopIndex FindTroop(const std::vector<Army::BattleTroop*> &, const Point &);
         static TroopIndex FindTroopExact(const Army::BattleArmy_t &, const Point &);
+        Army::BattleTroop *GetTroopFromPoint(const Point &p) const;
         static bool IsTroopAt(const Army::BattleTroop &, const Point &);
-        bool CellFree(const Point &, TroopIndex skip=99);
-        bool CellFreeFor(const Point &, const Army::BattleTroop &, TroopIndex skip=99);
-        PointList *FindPath(const Point& , const Point &, int , const Army::BattleTroop &, TroopIndex);
+        bool CellFree(const Point &, TroopIndex skip=99) const;
+        bool CellFreeFor(const Point &, const Army::BattleTroop &, TroopIndex skip=99) const;
+
+        typedef std::vector<std::pair<Point, int> > WeightedPointList;
+        PointList *FindPath(const Point& , const Point &, const WeightedPointList &);
 
         bool IsRangedAttackBlocked(const Army::BattleTroop &, const Army::BattleTroop &);
         int CanAttack(const Army::BattleTroop &, const PointList &, const Army::BattleTroop &, const Point &);
@@ -225,11 +228,10 @@ namespace Battle
         void RedrawBackground(const PointList * = NULL, const Army::BattleTroop * = NULL);
 
         void AnimateMorale(bool, const Army::BattleTroop &);
-        void AnimateMagic(std::vector<Army::BattleTroop*> &, HeroBase *, HeroBase *, bool, Spell::spell_t);
 
-        Rect &GetHeroRect(u8 num) { return m_heroRect[num]; }
-        BattleCastle *GetCastle() { return m_castle; }
-        Catapult *GetCatapult() { return m_catapult; }
+        const Rect &GetHeroRect(u8 num) const { return m_heroRect[num]; }
+        BattleCastle *GetCastle() const { return m_castle; }
+        Catapult *GetCatapult() const { return m_catapult; }
         
       private:
         void InitArmyPosition(Army::BattleArmy_t &, bool, bool);
@@ -253,8 +255,7 @@ namespace Battle
             void AddBody(const Army::BattleTroop &);
             void GetBlockedCells(PointList &) const;
             void DrawMorale(bool, const Army::BattleTroop &);
-            void MagicAnimation(std::vector<Army::BattleTroop*> &, HeroBase *, HeroBase *, bool, Spell::spell_t);
-            
+
           private:
             void DrawCaptain(const HeroBase &, bool, ICN::icn_t &, Rect &, Rect &);
             void DrawHero(const HeroBase &, bool, ICN::icn_t &, Rect &, Rect &);
@@ -345,13 +346,13 @@ namespace Battle
         u32 BattleSummaryVsHero(HeroBase &, const Army::BattleArmy_t &, HeroBase &, const Army::BattleArmy_t &);
         BattleTurn *CreateTurn(const HeroBase *, Army::BattleArmy_t &, Army::BattleArmy_t &, bool forceComputer = false);
         Army::BattleTroop &NextValidTroop(s8 &, IndexList &);
-        bool PerformMove(TroopIndex, const Point &, bool);
+        bool PerformMove(TroopIndex, const Point &, const Battlefield::WeightedPointList &movePoints, bool);
         bool PerformAttack(TroopIndex, const Point &);
         void PerformAttackPreLogic(Army::BattleTroop &, const std::vector<Army::BattleTroop *> &, bool);
         bool PerformAttackLogic(Army::BattleTroop &, const std::vector<Army::BattleTroop *> &, bool, long &, u16 &);
         void PerformAttackAnimation(Army::BattleTroop &, const std::vector<Army::BattleTroop *> &, bool);
-        bool PerformMagic(std::vector<Army::BattleTroop*> &, HeroBase *, Spell::spell_t);
-        void PerformMagicAnimation(std::vector<Army::BattleTroop*> &, Spell::spell_t, HeroBase *);
+        bool PerformMagic(PointList &, HeroBase *, Spell::spell_t);
+        void PerformMagicAnimation(std::vector<Army::BattleTroop*> &, const Point &, Spell::spell_t, HeroBase *);
 
         long CalculateDamage(const Army::BattleTroop &, const Army::BattleTroop &);
         void ActOnGoodMorale(const Army::BattleTroop &, s8 &, bool &);
@@ -372,26 +373,28 @@ namespace Battle
         BattleTurn(Battlefield *, GUI *, HeroBase *, Army::BattleArmy_t &, Army::BattleArmy_t &);
         virtual ~BattleTurn() {}
         virtual GUI::interaction_t Run(Army::BattleTroop &, TroopIndex, Point &, Point &);
-        virtual bool MagicSelectTarget(std::vector<Army::BattleTroop *> &, const Spell::spell_t &);
+        virtual bool MagicSelectTarget(PointList &, Spell::spell_t &);
         Army::BattleArmy_t &GetOwnArmy() const { return *m_ownArmy; }
         Army::BattleArmy_t &GetOppArmy() const { return *m_oppArmy; }
         HeroBase *GetHero() { return m_hero[0]; }
         HeroBase *GetOppHero() { return m_hero[1]; }
         Spell::spell_t GetSpell() { return m_spell; }
-        std::vector<Army::BattleTroop *> &GetSpellTargets() { return m_targets; }
+        PointList &GetSpellTargets() { return m_targets; }
+        const Battlefield::WeightedPointList &GetMovePoints() { return m_exhaustedPoints; }
 
       private:
         void PrepMovePoints(TroopIndex);
-        void PrepMovePointsInt(const Army::BattleTroop &, const Point &, int, int);
+        void PrepMovePointsInt(Battlefield::WeightedPointList &, PointList &, const Army::BattleTroop &, const Point &, int, int);
 
       protected:
         Battlefield *m_battlefield;
         GUI *m_gui;
         PointList m_movePoints;
+        Battlefield::WeightedPointList m_exhaustedPoints;
         Army::BattleArmy_t *m_ownArmy, *m_oppArmy;
         HeroBase *m_hero[2];
         Spell::spell_t m_spell;
-        std::vector<Army::BattleTroop *> m_targets;
+        PointList m_targets;
     };
 
     class HumanTurn : public BattleTurn
@@ -399,7 +402,7 @@ namespace Battle
       public:
         HumanTurn(Battlefield *, GUI *, HeroBase *, Army::BattleArmy_t &, Army::BattleArmy_t &);
         GUI::interaction_t Run(Army::BattleTroop &, TroopIndex, Point &, Point &);
-        bool MagicSelectTarget(std::vector<Army::BattleTroop *> &, const Spell::spell_t &);
+        bool MagicSelectTarget(PointList &, Spell::spell_t &);
     };
 
     class ComputerTurn : public BattleTurn
@@ -407,7 +410,7 @@ namespace Battle
       public:
         ComputerTurn(Battlefield *, GUI *, HeroBase *, Army::BattleArmy_t &, Army::BattleArmy_t &);
         GUI::interaction_t Run(Army::BattleTroop &, TroopIndex, Point &, Point &);
-        bool MagicSelectTarget(std::vector<Army::BattleTroop *> &, const Spell::spell_t &);
+        bool MagicSelectTarget(PointList &, Spell::spell_t &);
         Point GetMostDangerousOpposingUnit();
 
       private:

@@ -582,7 +582,7 @@ namespace Battle
             frame -= animframe;
             u8 start, count;
             troop.GetAnimFrames(troop.astate, start, count, false);
-            const Surface *outline;
+            Surface *outline;
             if(troop.astate != Monster::AS_NONE)
                 outline = troop.GetContour(troop.aframe - start + 1);
             else outline = troop.GetContour(troop.aframe - start);
@@ -592,7 +592,7 @@ namespace Battle
             }
             else
             {
-                const_cast<Surface *>(outline)->SetAlpha(abs((frame%21)-10)*20+55);
+                outline->SetAlpha(abs((frame%21)-10)*20+55);
                 Point offset(troop.GetBlitOffset(troop.aframe, troop.IsReflected()));
                 display.Blit(*outline, tp + offset);
             }
@@ -655,82 +655,6 @@ namespace Battle
                 if(Game::ShouldAnimateInfrequent(++animat, 4)) break;
             }
             back.Restore();
-        }
-    }
-
-    void Battlefield::Background::MagicAnimation(std::vector<Army::BattleTroop*> &affected, HeroBase *hero1, HeroBase *hero2, bool reflect, Spell::spell_t spell)
-    {
-        ::Background back(Rect(g_baseOffset.x, g_baseOffset.y, 640, 480));
-        back.Save();
-        ICN::icn_t icn = ICN::UNKNOWN;
-        int maxframe = 0, icnframe=-1;
-        switch(spell) {
-            case Spell::COLDRAY:
-            case Spell::DISRUPTINGRAY:
-            case Spell::ARROW:
-                if(affected.size() == 1) {
-                    Point start, end;
-                    if(reflect && hero2) {
-                        Rect hrect = DrawHeroObject(*hero2, 1, reflect);
-                        start = hrect + Point(hrect.w, hrect.h/2);
-                        end = Bf2Scr(affected[0]->Position());
-                    } else if(!reflect && hero1) {
-                        Rect hrect = DrawHeroObject(*hero1, 1, reflect);
-                        start = hrect + Point(0, hrect.h/2);
-                        end = Bf2Scr(affected[0]->Position());
-                    } else break;
-                    int animat = 0;
-                    int frame = 0;
-                    Point delta = end - start;
-                    switch(spell) {
-                        case Spell::COLDRAY:
-                            icn = ICN::COLDRAY;
-                            maxframe = AGG::GetICNCount(icn);
-                            break;
-                        case Spell::DISRUPTINGRAY:
-                            icn = ICN::DISRRAY;
-                            maxframe = AGG::GetICNCount(icn);
-                            break;
-                        case Spell::ARROW: {
-                            icn = ICN::KEEP;
-                            maxframe = 8;
-                            int maxind = AGG::GetICNCount(icn);
-                            if(maxind > 1) {
-                                double angle = M_PI_2 - atan2(-delta.y, delta.x);
-                                icnframe = (int)(angle/M_PI * maxind);
-                            } else icnframe = 0;
-                            break;
-                        }
-                        default:
-                            break;
-                    }
-                    delta.x /= maxframe;
-                    delta.y /= maxframe;
-                    while(le.HandleEvents()) {
-                        if(Game::ShouldAnimateInfrequent(animat++, 3)) {
-                            back.Restore();
-                            display.Blit(AGG::GetICN(icn, icnframe>=0? icnframe : frame, reflect), start);
-                            display.Flip();
-                            start += delta;
-                            frame ++;
-                            if(frame >= maxframe) break;
-                        }
-                    }
-                }
-                break;
-            case Spell::LIGHTNINGBOLT:
-            case Spell::CHAINLIGHTNING:
-            case Spell::HOLYWORD:
-            case Spell::HOLYSHOUT:
-            case Spell::ARMAGEDDON:
-            case Spell::ELEMENTALSTORM:
-            case Spell::METEORSHOWER:
-            case Spell::DEATHRIPPLE:
-            case Spell::DEATHWAVE:
-            case Spell::EARTHQUAKE:
-                // TODO
-            default:
-                break;
         }
     }
 

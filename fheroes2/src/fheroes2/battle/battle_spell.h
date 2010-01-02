@@ -27,23 +27,124 @@
 #include "spell.h"
 #include "monster.h"
 #include "gamedefs.h"
+#include "sprite.h"
 
 namespace Army { class BattleTroop; };
 
-namespace Battle	// or move to BattleTroop
+namespace Battle
 {
+    class Battlefield;
+    class GUI;
+    
     struct magic_t
     {
-	magic_t() : spell(Spell::NONE), duration(0) {};
+        magic_t() : spell(Spell::NONE), duration(0) {};
 
-	Spell::spell_t spell;
-	u8 duration;
+        Spell::spell_t spell;
+        u8 duration;
     };
 
     bool AllowSpell(Spell::spell_t spell, const Army::BattleTroop &troop);
     void ApplySpell(int spower, Spell::spell_t spell, Army::BattleTroop &troop);
-    bool isTroopAffectedBySpell(Spell::spell_t spell, const Army::BattleTroop &troop);
+    bool isTroopAffectedBySpell(Spell::spell_t spell, const Army::BattleTroop &troop, bool deteterministic);
     u16 GetInflictDamageVersus(Spell::spell_t spell, u8 sp, const Army::BattleTroop &);
+
+    class BasicSpell;
+    BasicSpell *CreateSpell(Spell::spell_t spell, const Battle::Battlefield &battlefield, const Rect &rect, HeroBase *hero, std::vector<Army::BattleTroop*> &affected, const Point &targetPoint);
+
+    class BasicSpell
+    {
+      public:
+        BasicSpell(Spell::spell_t spell);
+        virtual void PreHit();
+        virtual void OnHit(std::vector<Army::BattleTroop*> &affected, u8 spellPower, bool reflect, Battlefield &battlefield, GUI &gui);
+
+        static Point TargetFromTroop(const Army::BattleTroop &troop);
+        
+      protected:
+        void TriggerSound();
+        virtual Point SpriteOffset(const Sprite &troop, const Sprite &effect);
+        virtual void DrawSprite(std::vector<Army::BattleTroop*> &affected, ICN::icn_t icn, int frame);
+        Background back;
+        
+      private:
+        M82::m82_t sound;
+        Spell::spell_t spell;
+    };
+
+    class Projectile : public BasicSpell
+    {
+      public:
+        Projectile(Spell::spell_t spell, bool reflect, const Rect &hrect, const Point &target);
+        void PreHit();
+        
+      protected:
+        virtual int FrameModifier(int frame) { return frame; }
+        
+        Point start, end, delta;
+        int maxFrames;
+        ICN::icn_t icon;
+        bool reflect;
+    };
+
+    class SplashDamage
+    {
+      public:
+        SplashDamage(std::vector<Army::BattleTroop*> &affected, const Point &targetPoint, const Battlefield &battlefield);
+
+      protected:
+        const Point &target;
+    };
+
+    class Splash : public BasicSpell, public SplashDamage
+    {
+      public:
+        Splash(Spell::spell_t spell, std::vector<Army::BattleTroop*> &affected, const Point &targetPoint, const Battlefield &battlefield);
+      protected:
+        void DrawSprite(std::vector<Army::BattleTroop*> &affected, ICN::icn_t icn, int frame);
+    };
+
+    class Hover : public BasicSpell
+    {
+      public:
+        Hover(Spell::spell_t spell);
+
+      protected:
+        virtual Point SpriteOffset(const Sprite &troop, const Sprite &effect);
+    };
+
+    class Offsetless : public BasicSpell
+    {
+      public:
+        Offsetless(Spell::spell_t spell);
+
+      protected:
+        virtual Point SpriteOffset(const Sprite &troop, const Sprite &effect);
+    };
+
+    class MagicArrow : public Projectile
+    {
+      public:
+        MagicArrow(bool reflect, const Rect &hrect, const Point &target);
+      private:
+        int FrameModifier(int frame) { return index; }
+        int index;
+    };
+
+    class Bloodlust : public BasicSpell
+    {
+      public:
+        Bloodlust(const Army::BattleTroop &troop);
+        void OnHit(std::vector<Army::BattleTroop*> &affected, u8 spellPower, bool reflect, Battlefield &battlefield, GUI &gui);
+    };
+
+    class ColdRing : public Projectile, public SplashDamage
+    {
+      public:
+        ColdRing(std::vector<Army::BattleTroop*> &affected, const Point &targetPoint, const Battlefield &battlefield, bool reflect, const Rect &hrect);
+      protected:
+        void DrawSprite(std::vector<Army::BattleTroop*> &affected, ICN::icn_t icn, int frame);
+    };
 };
 
 #endif

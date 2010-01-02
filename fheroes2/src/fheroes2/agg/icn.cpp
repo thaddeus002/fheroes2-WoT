@@ -1529,6 +1529,7 @@ bool ICN::RequiresAlpha(const ICN::icn_t icn)
         case ICN::SYSTEME:
         case ICN::BUYBUILD:
         case ICN::BUYBUILE:
+        case ICN::BOOK:
             return false;
         default:
             break;
@@ -1622,42 +1623,58 @@ ICN::icn_t ICN::PORTxxxx(u8 id)
     return ICN::UNKNOWN;
 }
 
-ICN::icn_t ICN::FromSpell(u8 spell)
+ICN::icn_t ICN::PreImpactFromSpell(u8 spell)
 {
     switch(spell)
     {
-	case Spell::FIREBALL:		return FIREBALL;
-	case Spell::FIREBLAST:		return FIREBAL2;
-	case Spell::LIGHTNINGBOLT:	return SPARKS;
-	case Spell::CHAINLIGHTNING:	return SPARKS;
-	case Spell::CURE:		return MAGIC01;
-	case Spell::MASSCURE:		return MAGIC01;
-	case Spell::HASTE:		return HASTE;
-	case Spell::MASSHASTE:		return HASTE;
-	case Spell::SLOW:		return MAGIC02;
-	case Spell::MASSSLOW:		return MAGIC02;
-	case Spell::BLIND:		return BLIND;
-	case Spell::BLESS:		return BLESS;
-	case Spell::MASSBLESS:		return BLESS;
-	case Spell::STONESKIN:		return STONSKIN;
-	case Spell::STEELSKIN:		return STELSKIN;
-	case Spell::CURSE:		return CURSE;
-	case Spell::MASSCURSE:		return CURSE;
-	case Spell::ANTIMAGIC:		return MAGIC06;
-	case Spell::DISPEL:		return MAGIC07;
-	case Spell::MASSDISPEL:		return MAGIC07;
-	case Spell::ELEMENTALSTORM:	return STORM;
-	case Spell::METEORSHOWER:	return METEOR;
-	case Spell::PARALYZE:		return PARALYZE;
-	case Spell::HYPNOTIZE:		return HYPNOTIZ;
-	case Spell::COLDRAY:		return ICECLOUD; /* TODO:: check ICN::COLDRAY */
-	case Spell::COLDRING:		return COLDRING;
-	case Spell::DISRUPTINGRAY:	return DISRRAY;
-	case Spell::DEATHRIPPLE:	return REDDEATH;
-	case Spell::DEATHWAVE:		return REDDEATH;
-	case Spell::DRAGONSLAYER:	return DRAGSLAY;
-	case Spell::SHIELD:		return SHIELD;
-	case Spell::MASSSHIELD:		return SHIELD;
+        case Spell::ARROW:          return KEEP;
+        case Spell::COLDRAY:
+        case Spell::COLDRING:       return COLDRAY;
+        case Spell::DISRUPTINGRAY:	return DISRRAY;
+
+
+        default: return UNKNOWN;
+    }
+}
+
+ICN::icn_t ICN::ImpactFromSpell(u8 spell)
+{
+    switch(spell)
+    {
+        case Spell::FIREBALL:		return FIREBALL;
+        case Spell::FIREBLAST:		return FIREBAL2;
+        case Spell::LIGHTNINGBOLT:	return SPARKS;
+        case Spell::CHAINLIGHTNING:	return SPARKS;
+        case Spell::CURE:		return MAGIC01;
+        case Spell::MASSCURE:		return MAGIC01;
+        case Spell::HASTE:		return HASTE;
+        case Spell::MASSHASTE:		return HASTE;
+        case Spell::SLOW:		return MAGIC02;
+        case Spell::MASSSLOW:		return MAGIC02;
+        case Spell::BLIND:		return BLIND;
+        case Spell::BLESS:		return BLESS;
+        case Spell::MASSBLESS:		return BLESS;
+        case Spell::STONESKIN:		return STONSKIN;
+        case Spell::STEELSKIN:		return STELSKIN;
+        case Spell::CURSE:		return CURSE;
+        case Spell::MASSCURSE:		return CURSE;
+        case Spell::ANTIMAGIC:		return MAGIC06;
+        case Spell::DISPEL:		return MAGIC07;
+        case Spell::MASSDISPEL:		return MAGIC07;
+        case Spell::ELEMENTALSTORM:	return STORM;
+        case Spell::METEORSHOWER:	return METEOR;
+        case Spell::PARALYZE:		return PARALYZE;
+        case Spell::HYPNOTIZE:		return HYPNOTIZ;
+        case Spell::COLDRAY:		return ICECLOUD;
+        case Spell::COLDRING:		return COLDRING;
+        case Spell::DEATHRIPPLE:	return REDDEATH;
+        case Spell::DEATHWAVE:		return REDDEATH;
+        case Spell::HOLYWORD:       return REDDEATH;
+        case Spell::HOLYSHOUT:      return REDDEATH;
+        case Spell::DRAGONSLAYER:	return DRAGSLAY;
+        case Spell::SHIELD:		return SHIELD;
+        case Spell::MASSSHIELD:		return SHIELD;
+        case Spell::BERZERKER:      return BERZERK;
 
 	default: break;
     }

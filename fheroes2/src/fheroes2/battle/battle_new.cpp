@@ -20,6 +20,7 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
+#include <cassert>
 #include <cmath>
 #include <algorithm>
 #include "engine.h"
@@ -795,21 +796,21 @@ Army::battle_t Battle::BattleControl::RunBattle(HeroBase *hero1, HeroBase *hero2
             }
             else validMove = false;
         }
+        
+        Army::BattleTroop &troop = NextValidTroop(currentTroop, troopOrder);
+        TroopIndex troopIdx = troopOrder[currentTroop - 1];
+        u8 currentTurn = m_battlefield.GetSideFromIndex(troopIdx);
+
+        AdjustMorale(turn[currentTurn]->GetHero(), troop);
 
         for(u16 idx = 0; idx < troopOrder.size(); idx++)
         {
             Army::BattleTroop &troop = m_battlefield.GetTroopFromIndex(troopOrder[idx]);
             troop.SetMoving(Army::NOT_MOVING);
         }
-        
-        Army::BattleTroop &troop = NextValidTroop(currentTroop, troopOrder);
-        TroopIndex troopIdx = troopOrder[currentTroop - 1];
-        u8 currentTurn = m_battlefield.GetSideFromIndex(troopIdx);
-        
+
         troop.ResetModes(Army::ATTACKED);
         troop.SetMoving(Army::SELECTED);
-
-        AdjustMorale(turn[currentTurn]->GetHero(), troop);
         
         if(troop.Modes(Army::MORALE_BAD))
         {
@@ -829,7 +830,9 @@ Army::battle_t Battle::BattleControl::RunBattle(HeroBase *hero1, HeroBase *hero2
         status = turn[currentTurn]->Run(troop, troopIdx, move, attack);
         if(status == GUI::SPELL)
         {
+            troop.SetMoving(Army::NOT_MOVING);
             PerformMagic(turn[currentTurn]->GetSpellTargets(), m_battlefield.GetHero(currentTurn), turn[currentTurn]->GetSpell());
+            troop.SetMoving(Army::SELECTED);
             currentTroop--;
             continue;
         }
@@ -851,7 +854,7 @@ Army::battle_t Battle::BattleControl::RunBattle(HeroBase *hero1, HeroBase *hero2
         else if(status != GUI::NONE)
             break;
 
-        if(!PerformMove(troopIdx, move, !BfValid(attack)) && !BfValid(attack))
+        if(!PerformMove(troopIdx, move, turn[currentTurn]->GetMovePoints(), !BfValid(attack)) && !BfValid(attack))
         {
             DEBUG(DBG_BATTLE , DBG_WARN, "Battle: invalid move attempted");
             continue;
@@ -1032,7 +1035,7 @@ void Battle::BattleControl::PerformTowerAttack(const Point &attack, const Point 
 
         while(le.HandleEvents())
         {
-            int scale = state == MISSILE_FLIGHT ? 2 : 4;
+            int scale = state == MISSILE_FLIGHT ? 2 : 5;
             if(Game::ShouldAnimateInfrequent(animat++, scale))
             {
                 m_battlefield.Redraw();
@@ -1127,7 +1130,7 @@ void Battle::BattleControl::ActOnGoodMorale(const Army::BattleTroop &troop, s8 &
 
 void Battle::BattleControl::AdjustMorale(HeroBase *hero, Army::BattleTroop &troop)
 {
-    if(!troop.isAffectedByMorale())
+    if(!troop.isAffectedByMorale() || troop.isMoving() == Army::SELECTED)
         return;
     
     int m = Rand::Get(1, MORALEBOUND);
@@ -1346,7 +1349,7 @@ bool Battle::FlyAction::Step()
     }
 }
     
-bool Battle::BattleControl::PerformMove(TroopIndex troopN, const Point &move, bool resetReflection)
+bool Battle::BattleControl::PerformMove(TroopIndex troopN, const Point &move, const Battlefield::WeightedPointList &movePoints, bool resetReflection)
 {
     Army::BattleTroop &myTroop = m_battlefield.GetTroopFromIndex(troopN);
     u16 animat = 0;
@@ -1360,12 +1363,11 @@ bool Battle::BattleControl::PerformMove(TroopIndex troopN, const Point &move, bo
             action = new FlyAction(move, myTroop);
         else
         {
-            path = m_battlefield.FindPath(myTroop.Position(), move, myTroop.GetSpeed(), myTroop, troopN);
+            path = m_battlefield.FindPath(myTroop.Position(), move, movePoints);
             if(path)
                 action = new WalkAction(m_battlefield, move, myTroop, *path);
             else
             {
-                //Dialog::Message(_("Error"), _("Path not found!"), Font::BIG, Dialog::OK);
                 DEBUG(DBG_BATTLE , DBG_WARN, "BattleControl::PerformMove: path not found!");
                 return false;
             }
@@ -1378,13 +1380,12 @@ bool Battle::BattleControl::PerformMove(TroopIndex troopN, const Point &move, bo
                 shouldAnimate = true;
             else
             {
-                if(myTroop.isFly())
-                    shouldAnimate = Game::ShouldAnimateInfrequent(++animat, 4);
-                else
-                    shouldAnimate = Game::ShouldAnimateInfrequent(++animat, 2);
+                int speed = myTroop.Modes(Army::SP_HASTE) ? 3 : myTroop.Modes(Army::SP_SLOW) ? 5 : 4;
+                shouldAnimate = Game::ShouldAnimateInfrequent(++animat, speed);
             }
             
-            if(shouldAnimate) {
+            if(shouldAnimate)
+            {
                 if(action->Step())
                     break;
                 if(!BattleSettings::Get().Modes(BattleSettings::OPT_LOGICONLY))
@@ -1395,8 +1396,8 @@ bool Battle::BattleControl::PerformMove(TroopIndex troopN, const Point &move, bo
                 }
             }
         }
-        if(action) delete action;
-        if(path) delete path;
+        delete action;
+        delete path;
 
         myTroop.SetPosition(move);
         if(myTroop.isWide() && myTroop.IsReflected() != myTroop.OriginalReflection())
@@ -1574,7 +1575,7 @@ void Battle::BattleControl::PerformAttackAnimation(Army::BattleTroop &attacker, 
         if(ranged && state == MISSILE_FLIGHT)
             shouldAnimate = Game::ShouldAnimateInfrequent(++animat, 2);
         else
-            shouldAnimate = Game::ShouldAnimateInfrequent(++animat, 4);
+            shouldAnimate = Game::ShouldAnimateInfrequent(++animat, 5);
 
         if(!shouldAnimate)
             continue;
@@ -1701,86 +1702,51 @@ bool Battle::BattleControl::PerformAttack(TroopIndex troopN, const Point &attack
 
     if(!ranged && targets[0]->Count())
     {
-        std::vector<Army::BattleTroop*> affected;
-        affected.push_back(targets[0]);
+        PointList affected;
+        affected.push_back(targets[0]->Position());
         PerformMagic(affected, NULL, Spell::TroopAttack(myTroop()));
     }
     
     return retaliate;
 }
 
-void Battle::BattleControl::PerformMagicAnimation(std::vector<Army::BattleTroop*> &affected, Spell::spell_t spell, HeroBase *hero)
+void Battle::BattleControl::PerformMagicAnimation(std::vector<Army::BattleTroop*> &affected, const Point &targetPoint, Spell::spell_t spell, HeroBase *hero)
 {
-    AGG::PlaySound(M82::FromSpell(spell));
-
     u8 spellPower = hero ? hero->GetPower() : 1;
     bool reflect = hero == m_battlefield.GetHero(1);
-    m_battlefield.AnimateMagic(affected, m_battlefield.GetHero(0), m_battlefield.GetHero(1), reflect, spell);
 
-    if(!Spell::isBad(spell))
-        return;
-    
-    for(u16 i = 0; i < affected.size(); i++) {
-        u16 damage = Battle::GetInflictDamageVersus(spell, spellPower, affected[i]->GetID());
-        if(!affected[i]->IsDamageFatal(damage))
-            affected[i]->Animate(Monster::AS_PAIN);
-        else
-            affected[i]->Animate(Monster::AS_DIE);
-    }
-    
-    int animat = 0;
-    u16 frame = 0, mframe = AGG::GetICNCount(ICN::FromSpell(spell));
-    while(le.HandleEvents())
-    {
-        if(Game::ShouldAnimateInfrequent(animat++, 3))
-        {
-            m_battlefield.Redraw();
-            m_gui->Redraw();
-
-            if(ICN::FromSpell(spell) != ICN::UNKNOWN)
-            {
-                const Sprite & spr = AGG::GetICN(ICN::FromSpell(spell), frame);
-                for(u16 i = 0; i < affected.size(); i++)
-                    display.Blit(spr, Bf2Scr(affected[i]->Position()) + spr);
-            }
-            
-            display.Flip();
-            if(frame >= mframe)
-            {
-                bool br = true;
-                for(u16 i = 0; i < affected.size(); i++)
-                    if(affected[i]->astate != Monster::AS_NONE)
-                    {
-                        u8 strt=0, len=0;
-                        affected[i]->GetAnimFrames(Monster::AS_DIE, strt, len, false);
-                        if(affected[i]->astate != Monster::AS_DIE || affected[i]->aframe < strt+len-1)
-                            br = false;
-                    }
-                if(br) break;
-            }
-            frame ++;
-        }
-    }
+    const Rect &rect = m_battlefield.GetHeroRect(hero == m_battlefield.GetHero(1));
+    BasicSpell *spellObj = CreateSpell(spell, m_battlefield, rect, hero, affected, targetPoint);
+    spellObj->PreHit();
+    spellObj->OnHit(affected, spellPower, reflect, m_battlefield, *m_gui);
+    delete spellObj;    
 }
 
-bool Battle::BattleControl::PerformMagic(std::vector<Army::BattleTroop*> &affected, HeroBase *hero, Spell::spell_t spell)
+bool Battle::BattleControl::PerformMagic(PointList &affected_points, HeroBase *hero, Spell::spell_t spell)
 {
     if(spell == Spell::NONE) return false;
-    if(!affected.size()) {
+    if(!affected_points.size()) {
         Dialog::Message("", _("That spell will affect no one!"), Font::BIG, Dialog::OK);
         return false;
     }
 
     u8 spellpower = hero ? hero->GetPower() : 1 ;
-    if(hero)
+    if(hero && !IS_DEVEL())
     {
         hero->SetModes(Heroes::SPELLCASTED);
         hero->SetSpellPoints(hero->GetSpellPoints() - Spell::Mana(spell));
     }
 
+    std::vector<Army::BattleTroop*> affected;
+    for(u16 i = 0; i < affected_points.size(); i++)
+    {
+        Army::BattleTroop *troop = m_battlefield.GetTroopFromPoint(affected_points[i]);
+        if(troop) affected.push_back(troop);
+    }
+
     if(!BattleSettings::Get().Modes(BattleSettings::OPT_LOGICONLY))
     {
-        u16 damage = Battle::GetInflictDamageVersus(spell, spellpower, affected[0]->GetID());
+        u16 damage = affected.size() ? Battle::GetInflictDamageVersus(spell, spellpower, affected[0]->GetID()) : 0;
         if(damage)
         {
             std::string str;
@@ -1804,12 +1770,28 @@ bool Battle::BattleControl::PerformMagic(std::vector<Army::BattleTroop*> &affect
             m_gui->Redraw();
         }
 
-        PerformMagicAnimation(affected, spell, hero);
+        PerformMagicAnimation(affected, affected_points[0], spell, hero);
+    }
+
+    bool targetAffected;
+    for(u16 i = 0; i < affected.size(); i++)
+    {
+        bool result = affected[i]->ApplySpell(spell, spellpower);
+        if(i == 0)
+            targetAffected = result;
+    }
+
+    if(Spell::Target(spell) == Spell::ONEENEMY && targetAffected)
+    {
+        std::string str = _("The %{monster} resist the spell!"); //todo: plurals
+        std::string name = affected[0]->GetName();
+        String::Lower(name);
+        String::Replace(str, "%{monster}", name);
+        m_gui->Status(str);
+        m_gui->Status("");
+        m_gui->Redraw();
     }
     
-    //TODO: message if spell is resisted by single unit?
-    for(u16 i = 0; i < affected.size(); i++)
-        affected[i]->ApplySpell(spell, spellpower);
     m_battlefield.CleanupBodies();
     
     return true;
@@ -1878,6 +1860,7 @@ namespace Battle
     void BattleTurn::PrepMovePoints(TroopIndex troopN)
     {
         m_movePoints.clear();
+        m_exhaustedPoints.clear();
         Point p;
         const Army::BattleTroop &troop = m_battlefield->GetTroopFromIndex(troopN);
         if(troop.isFly())
@@ -1889,45 +1872,68 @@ namespace Battle
         }
         else
         {
-            Point p = troop.Position();
+            p = troop.Position();
             m_movePoints.push_back(p);
-            PrepMovePointsInt(troop, p, troop.GetSpeed() + 1, troopN);
+            PrepMovePointsInt(m_exhaustedPoints, m_movePoints, troop, p, troop.GetSpeed() + 1, troopN);
         }
     }
 
     /** Populate the movement vector with any free cells in range of the given point.
-     * \param troop   Troop to prepare
-     * \param p       Starting point
-     * \param move    Movement speed
-     * \param skip    Troop id to ignore if found
+     * \param[out] weightedPoints
+     * \param[out] movePoints Movement point vector
+     * \param[in] troop   Troop to prepare
+     * \param[in] p       Starting point
+     * \param[in] move    Movement speed
+     * \param[in] skip    Troop id to ignore if found
      */
-    void BattleTurn::PrepMovePointsInt(const Army::BattleTroop &troop, const Point &p, int move, int skip)
+    void BattleTurn::PrepMovePointsInt(Battlefield::WeightedPointList &weightedPoints, PointList &movePoints, const Army::BattleTroop &troop, const Point &p, int move, int skip)
     {
-        if(BfValid(p) && m_battlefield->CellFreeFor(p, troop, skip) && move > 0)
-        {
-            if(std::find(m_movePoints.begin(), m_movePoints.end(), p) == m_movePoints.end())
-                m_movePoints.push_back(p);
+        // Sanity checks - only valid, empty, and reachable points are desired
+        if(!BfValid(p) || !m_battlefield->CellFreeFor(p, troop, skip) || move == 0)
+            return;
 
-            if(m_battlefield->GetCastle()
-            && m_battlefield->GetCastle()->IsCellInMoat(p)
-            && troop.Position() != p)
-            {
-                if(p != Point(6,4) && p != Point(5, 4))
-                    return;
-                else if(m_battlefield->GetSideFromIndex(m_battlefield->GetIndexFromTroop(troop)) != 1)
-                    return;
+        // All searched points are stored with their shortest distance.
+        // It's only worth continuing the current path if the current distance
+        // is a shorter one.
+        s16 old_idx = -1;
+        for(u16 i = 0; i < weightedPoints.size(); i++)
+            if(weightedPoints[i].first == p) {
+                old_idx = i;
+                if(weightedPoints[i].second >= move) return;
+                else break;
             }
-            
-            Point d;
-            for(d.x = -1; d.x <= 1; d.x++)
-                for(d.y = -1; d.y <= 1; d.y++) 
-                    if(d.x || d.y )
-                    {
-                        if(p.y%2 && d.y && d.x>0) continue;
-                        if(!(p.y%2) && d.y && d.x<0) continue;
-                        PrepMovePointsInt(troop, p+d, move - 1, skip);
-                    }
+
+        // Update/add the current point/distance pair
+        if(old_idx == -1)
+            weightedPoints.push_back(std::make_pair(p, move));
+        else weightedPoints[old_idx].second = move;
+
+        // Keep it unique
+        if(std::find(movePoints.begin(), movePoints.end(), p) == movePoints.end())
+            movePoints.push_back(p);
+
+        // Enemy units are cannot move through a castle moat in one turn
+        if(m_battlefield->GetCastle()
+           && m_battlefield->GetCastle()->IsCellInMoat(p)
+           && troop.Position() != p)
+        {
+            // Drawbridge (spans two cells when down)
+            if(p != Point(6,4) && p != Point(5, 4))
+                return;
+            else if(m_battlefield->GetSideFromIndex(m_battlefield->GetIndexFromTroop(troop)) != 1)
+                return;
         }
+
+        // Recurse on all cells surrounding current point
+        Point d;
+        for(d.x = -1; d.x <= 1; d.x++)
+            for(d.y = -1; d.y <= 1; d.y++) 
+                if(d.x || d.y )
+                {
+                    if(p.y%2 && d.y && d.x>0) continue;
+                    if(!(p.y%2) && d.y && d.x<0) continue;
+                    PrepMovePointsInt(weightedPoints, movePoints, troop, p+d, move - 1, skip);
+                }
     }
 
     /** Populate a given vector with predetermined targets for certain classes of spells.
@@ -1935,35 +1941,48 @@ namespace Battle
      *  \param[in]  spell    Spell being cast.
      *  \return true if further selection is needed, false otherwise.
      */
-    bool BattleTurn::MagicSelectTarget(std::vector<Army::BattleTroop*> &targets, const Spell::spell_t &spell)
+    bool BattleTurn::MagicSelectTarget(PointList &targets, Spell::spell_t &spell)
     {
         targets.clear();
-        switch(Spell::Target(spell))
+        Spell::target_t target = Spell::Target(spell);
+        switch(target)
         {
-            case Spell::ONEFRIEND:
-            case Spell::ONEENEMY:
             case Spell::FREECELL:
                 return true;
-            case Spell::ALLFRIEND:
-                for(u16 i = 0; i < m_ownArmy->size(); i++)
-                    if(Battle::AllowSpell(spell, (*m_ownArmy)[i]))
-                        targets.push_back(&(*m_ownArmy)[i]);
-                return false;
+                
+            case Spell::ONEENEMY:
             case Spell::ALLENEMY:
-                for(u16 i = 0; i < m_oppArmy->size(); i++)
-                    if(Battle::AllowSpell(spell, (*m_oppArmy)[i]))
-                        targets.push_back(&(*m_oppArmy)[i]);
+            case Spell::ONEFRIEND:
+            case Spell::ALLFRIEND:
+            {
+                Army::BattleArmy_t &army = (target == Spell::ONEENEMY || target == Spell::ALLENEMY) ? *m_oppArmy : *m_ownArmy;
+                for(u16 i = 0; i < army.size(); i++) {
+                    Army::BattleTroop &troop = army[i];
+                    if(troop.isValid() && Battle::AllowSpell(spell, troop))
+                    {
+                        if(target == Spell::ONEENEMY || target == Spell::ONEFRIEND)
+                            return true;
+                        else
+                            targets.push_back(troop.Position());
+                    }
+                }
                 return false;
+            }
+                
             case Spell::ALLLIVE:
             case Spell::ALLDEAD:
             case Spell::ALL:
-                for(u16 i = 0; i < m_ownArmy->size(); i++)
-                    if(Battle::AllowSpell(spell, (*m_ownArmy)[i]))
-                        targets.push_back(&(*m_ownArmy)[i]);
-                for(u16 i = 0; i< m_oppArmy->size(); i++)
-                    if(Battle::AllowSpell(spell, (*m_oppArmy)[i]))
-                        targets.push_back(&(*m_oppArmy)[i]);
+            {
+                Army::BattleArmy_t *armies[2] = { m_ownArmy, m_oppArmy };
+                for(u16 j = 0; j < 2; j++)
+                    for(u16 i = 0; i < armies[j]->size(); i++) {
+                        Army::BattleTroop &troop = (*armies[j])[i];
+                        if(troop.isValid() && Battle::AllowSpell(spell, troop))
+                            targets.push_back(troop.Position());
+                    }
                 return false;
+            }
+                
             case Spell::NOTARGET:
                 return false;
         }
@@ -2020,7 +2039,7 @@ namespace Battle
             {
                 m_battlefield->GetCatapult()->Fire(*m_battlefield, *m_battlefield->GetCastle());
             }
-            if(Game::ShouldAnimateInfrequent(++animat, 3)) {
+            if(Game::ShouldAnimateInfrequent(++animat, 5)) {
                 m_battlefield->Redraw(&m_movePoints, &cur_pt, &myTroop);
                 m_gui->Redraw();
                 display.Flip();
@@ -2165,16 +2184,20 @@ namespace Battle
         return GUI::NONE;
     }
 
-    bool HumanTurn::MagicSelectTarget(std::vector<Army::BattleTroop *> &targets, const Spell::spell_t &spell)
+    bool HumanTurn::MagicSelectTarget(PointList &targets, Spell::spell_t &spell)
     {
         if(!BattleTurn::MagicSelectTarget(targets, spell)) // No selection necessary for given spell
-            return true;
+            return targets.size() != 0;
         
         Army::BattleArmy_t *targetArmy = NULL;
         if(Spell::Target(spell) == Spell::ONEFRIEND)
             targetArmy = m_ownArmy;
         else if(Spell::Target(spell) == Spell::ONEENEMY)
             targetArmy = m_oppArmy;
+
+        m_battlefield->Redraw();
+        m_gui->Redraw();
+        display.Flip();
         
         // select target
         while(le.HandleEvents())
@@ -2186,12 +2209,12 @@ namespace Battle
             {
                 if(t = m_battlefield->FindTroop(*targetArmy, cur_pt), t >= 0
                 && /*Spell::AllowSpell(spell, (*targetArmy)[t])*/
-                   Battle::isTroopAffectedBySpell(spell, (*targetArmy)[t]))
+                   Battle::isTroopAffectedBySpell(spell, (*targetArmy)[t], true))
                 {
                     cursor.SetThemes((Cursor::themes_t)(cursor.SPELLNONE + Spell::IndexSprite(spell)));
                     if(le.MouseClickLeft(Rect(0, 0, display.w(), display.h())))
                     {
-                        targets.push_back(&(*targetArmy)[t]);
+                        targets.push_back((*targetArmy)[t].Position());
                         break;
                     }
                 } else cursor.SetThemes(cursor.SPELLNONE);
@@ -2200,22 +2223,32 @@ namespace Battle
             {
                 if(m_battlefield->CellFree(cur_pt)) {
                     cursor.SetThemes((Cursor::themes_t)(cursor.SPELLNONE + Spell::IndexSprite(spell)));
-                    // TODO COLDRING & SUMMON
+                    if(le.MouseClickLeft(Rect(0, 0, display.w(), display.h())))
+                    {
+                        targets.push_back(cur_pt);
+                        break;
+                    }
                 } else 
                     cursor.SetThemes(cursor.SPELLNONE);
             } else {
                 cursor.SetThemes(cursor.SPELLNONE);
             }
             // exit
-            if(le.KeyPress(KEY_ESCAPE)) return false;
-            if(le.MousePressRight(Rect(0, 0, display.w(), display.h()))) return false;
+            if(le.KeyPress(KEY_ESCAPE) ||
+               le.MousePressRight(Rect(0, 0, display.w(), display.h())))
+            {
+                spell = Spell::NONE;
+                return false;
+            }
 
-	    if(!cursor.isVisible())
-	    {
-		cursor.Show();
-		display.Flip();
-	    }
+            if(!cursor.isVisible())
+            {
+                cursor.Show();
+                display.Flip();
+            }
         }
+
+        cursor.SetThemes(cursor.WAR_POINTER);
         return true;
     }
     
@@ -2514,7 +2547,7 @@ namespace Battle
         return Point(-1, -1);
     }
 
-    bool ComputerTurn::MagicSelectTarget(std::vector<Army::BattleTroop *> &targets, const Spell::spell_t &spell)
+    bool ComputerTurn::MagicSelectTarget(PointList &targets, Spell::spell_t &spell)
     {
         //TODO
         return true;
@@ -2559,9 +2592,10 @@ namespace Battle
 
     void Battlefield::InitializeArmies()
     {
-        //TODO: Derive compact parameter from hero screen settings
-        InitArmyPosition(*m_army[0], false, false);
-        InitArmyPosition(*m_army[1], false, true);
+        HeroBase *h1 = GetHero(0);
+        HeroBase *h2 = GetHero(1);
+        InitArmyPosition(*m_army[0], h1 ? !h1->Modes(Heroes::ARMYSPREAD) : false, false);
+        InitArmyPosition(*m_army[1], h2 ? !h2->Modes(Heroes::ARMYSPREAD) : false, true);
     }
 
     /** Remove any units from the battle that are dead.
@@ -2603,7 +2637,7 @@ namespace Battle
         }
     }
 
-    Army::BattleArmy_t &Battlefield::GetArmy(u8 num)
+    Army::BattleArmy_t &Battlefield::GetArmy(u8 num) const
     {
         return *m_army[num];
     }
@@ -2615,7 +2649,7 @@ namespace Battle
         Army::ArmyToBattleArmy(army, *m_army[num]);
     }
 
-    HeroBase *Battlefield::GetHero(u8 num)
+    HeroBase *Battlefield::GetHero(u8 num) const
     {
         return m_hero[num];
     }
@@ -2625,7 +2659,7 @@ namespace Battle
         m_hero[num] = hero;
     }
 
-    s8 Battlefield::GetIndexFromTroop(const Army::BattleTroop &troop)
+    s8 Battlefield::GetIndexFromTroop(const Army::BattleTroop &troop) const
     {
         for(u16 i = 0; i < m_army[0]->size(); i++)
             if(&(*m_army[0])[i] == &troop)
@@ -2637,12 +2671,12 @@ namespace Battle
         return 0xFF;
     }
 
-    u8 Battlefield::GetSideFromIndex(s8 idx)
+    u8 Battlefield::GetSideFromIndex(s8 idx) const
     {
         return idx < 0;
     }
 
-    Army::BattleTroop &Battlefield::GetTroopFromIndex(s8 idx)
+    Army::BattleTroop &Battlefield::GetTroopFromIndex(s8 idx) const
     {
         if(idx >= 0)
             return (*m_army[0])[idx];
@@ -2654,7 +2688,7 @@ namespace Battle
         return -idx - 1;
     }
 
-    void Battlefield::GetTroopOrdering(IndexList &order)
+    void Battlefield::GetTroopOrdering(IndexList &order) const
     {
         for(u8 speed = Speed::INSTANT; speed != Speed::STANDING; speed--)
         {
@@ -2719,11 +2753,21 @@ namespace Battle
         return -1;
     }
 
+    Army::BattleTroop *Battlefield::GetTroopFromPoint(const Point &p) const
+    {
+        for(int i = 0; i < 2; i++) {
+            Army::BattleArmy_t &army = GetArmy(i);
+            TroopIndex idx = FindTroop(army, p);
+            if(idx >= 0) return &army[idx];
+        }
+        return NULL;
+    }
+
     /** Determine if a cell is free of obstruction (monsters and background)
      *  \param p      Battlefield cell
      *  \param skip   Troop id to ignore
      */
-    bool Battlefield::CellFree(const Point &p, TroopIndex skip)
+    bool Battlefield::CellFree(const Point &p, TroopIndex skip) const
     {
         int t;
         if(!BfValid(p)) return false;
@@ -2756,7 +2800,7 @@ namespace Battle
      *  \param troop  Troop to consider
      *  \param skip   Troop ID to ignore
      */
-    bool Battlefield::CellFreeFor(const Point &p, const Army::BattleTroop &troop, TroopIndex skip)
+    bool Battlefield::CellFreeFor(const Point &p, const Army::BattleTroop &troop, TroopIndex skip) const
     {
         bool isFree = CellFree(p, skip);
         if(isFree && troop.isWide())
@@ -2767,38 +2811,61 @@ namespace Battle
     /** Find a path from one point to another for a given troop.
      * \param start   Starting point
      * \param end     End point
-     * \param moves   Maximum length of path
-     * \param troop   Troop for which to find path
-     * \param skip    Troop id to ignore if found
      * \return A #Point vector containing the path
      */
-    PointList *Battlefield::FindPath(const Point& start, const Point &end, int moves, const Army::BattleTroop &troop, TroopIndex skip)
+    PointList *Battlefield::FindPath(const Point& start, const Point &end, const WeightedPointList &movePoints)
     {
-        if(moves < 0 || !BfValid(start) || !CellFreeFor(start, troop, skip))
-            return 0;
+        // Ensure starting and ending points are present in weighted list
+        bool foundStart = false, foundEnd = false;
+        for(u16 i = 0; i < movePoints.size() && (!foundStart || !foundEnd); i++) {
+            if(movePoints[i].first == end)
+                foundEnd = true;
+            else if(movePoints[i].first == start)
+                foundStart = true;
+        }
+        assert(foundStart);
+        assert(foundEnd);
+        if(!foundStart || !foundEnd)
+            return NULL;
 
-        if(start == end) return new std::vector<Point>();
-        Point p = start;
-        Point d;
-        std::vector<Point> *path = 0, *tmpath = 0;
-        int length = -1;
-        for(d.x = -1; d.x <= 1; d.x++)
-            for(d.y = -1; d.y <= 1; d.y++) 
-                if(d.x || d.y ) {
-                    if(p.y % 2 && d.y && d.x > 0) continue;
-                    if(!(p.y % 2) && d.y && d.x < 0) continue;
-                    tmpath = FindPath(p + d, end, moves - 1, troop, skip);
-                    if(tmpath) {
-                        if(length < 0 || length > static_cast<int>(tmpath->size())) {
-                            length = tmpath->size();
-                            tmpath->push_back(p + d);
-                            if(path) delete path;
-                            path = tmpath;
-                            //printf("path has something\n");
-                        } else delete tmpath;
+        //printf("path to: %d,%d\n", end.x, end.y);
+        PointList *path = new PointList;
+        path->push_back(end);
+        Point p = end;
+        int bestV;
+        while(p != start) // Run backwards from destination to start
+        {
+            // Check weights of all surrounding points of current
+            Point delta, bestP(-1, -1);
+            for(delta.x = -1; delta.x <= 1; delta.x++)
+                for(delta.y = -1; delta.y <= 1; delta.y++)
+                {
+                    // Skip invalid points
+                    if(!delta.x && !delta.y) continue;
+                    if(p.y % 2 && delta.y && delta.x > 0) continue;
+                    if(!(p.y % 2) && delta.y && delta.x < 0) continue;
+                    for(u16 i = 0; i < movePoints.size(); i++)
+                    {
+                        if(movePoints[i].first != p + delta)
+                            continue;
+                        //printf("consider: %d,%d : %d\n", movePoints[i].first.x, movePoints[i].first.y, movePoints[i].second);
+                        // Choose the best weight for the shortest path - any point is reachable
+                        if(!BfValid(bestP) || movePoints[i].second > bestV)
+                        {
+                            bestP = p + delta;
+                            bestV = movePoints[i].second;
+                        }
                     }
                 }
-        return path;
+            
+            assert(BfValid(bestP)); // Sanity check
+            if(bestP != start)
+                path->push_back(bestP);
+            p = bestP; // Repeat for the just-added point
+            //printf("pushed %d,%d\n", bestP.x, bestP.y);
+        }
+
+        return path;        
     }
 
     /** Determine if a troop can attack an enemy from the given screen point
@@ -2883,8 +2950,7 @@ namespace Battle
      */
     void Battlefield::GetTargets(std::vector<Army::BattleTroop *> &targets, Army::BattleTroop &attacker, const Point &attack)
     {
-        int t;
-        Army::BattleTroop &mainTarget = (t = FindTroop(*m_army[0], attack), t >= 0 ? (*m_army[0])[t] : (*m_army[1])[FindTroop(*m_army[1], attack)]);
+        Army::BattleTroop &mainTarget = *GetTroopFromPoint(attack);
 
         if(attack.y % 2 == 0)
             attacker.SetReflect(attack.x < attacker.Position().x);
@@ -2910,15 +2976,9 @@ namespace Battle
                 /*printf("pos: %d, %d\n", attacker.Front().x, attacker.Front().y);
                 printf("attack: %d, %d\n", attack.x, attack.y);
                 printf("incr: %d, %d\n", incr.x, incr.y);*/
-                int t;
-                if((t = FindTroop(*m_army[0], nextcell)) >= 0
-                   && &(*m_army[0])[t] != &attacker
-                   && &(*m_army[0])[t] != &mainTarget)
-                    targets.push_back(&(*m_army[0])[t]);
-                else if((t = FindTroop(*m_army[1], nextcell)) >= 0
-                        && &(*m_army[1])[t] != &attacker
-                        && &(*m_army[1])[t] != &mainTarget)
-                    targets.push_back(&(*m_army[1])[t]);
+                Army::BattleTroop *troop = GetTroopFromPoint(nextcell);
+                if(troop && troop != &attacker && troop != &mainTarget)
+                    targets.push_back(troop);
                 break;
             }
         
@@ -2936,21 +2996,10 @@ namespace Battle
                     {
                         if(x == -1 && y) continue;
                         if(!x && !y) continue;
-                        int t;
-                        if((t = FindTroop(*m_army[0], base + Point(x, y))) >= 0
-                           && &(*m_army[0])[t] != &attacker
-                           && &(*m_army[0])[t] != &mainTarget)
-                        {
-                            targets.push_back(&(*m_army[0])[t]);
-                        }
-                        else
-                            if((t = FindTroop(*m_army[1], base + Point(x, y))) >= 0
-                               && &(*m_army[1])[t] != &attacker
-                               && &(*m_army[1])[t] != &mainTarget)
-                            {
-                                targets.push_back(&(*m_army[1])[t]);
-                            }
-                        }
+                        Army::BattleTroop *troop = GetTroopFromPoint(base + Point(x, y));
+                        if(troop && troop != &attacker && troop != &mainTarget)
+                            targets.push_back(troop);
+                    }
                     break;
             }
         
@@ -3021,11 +3070,6 @@ namespace Battle
         m_background.DrawMorale(morale, troop);
     }
 
-    void Battlefield::AnimateMagic(std::vector<Army::BattleTroop*> &aff, HeroBase *h1, HeroBase *h2, bool reflect, Spell::spell_t spell)
-    {
-        m_background.MagicAnimation(aff, h1, h2, reflect, spell);
-    }
-
 ///////////////////////////////////////////////////////////////////////////////////    
 
     GUI::GUI(HeroBase *hero1, HeroBase *hero2)
@@ -3038,9 +3082,10 @@ namespace Battle
         display.FillRect(0, 0, 0, Rect(g_baseOffset, 640, 480));
 
         Mixer::Reset();
-        //FIXME: The music currently plays underneath the sound effect
         int track = ((int)MUS::BATTLE1 + Rand::Get(0, 2));
+        Music::SetFadeIn(20000);
         AGG::PlayMusic((MUS::mus_t)track);
+        Music::SetFadeIn(0);
         
         AGG::PlaySound(M82::PREBATTL);
         cursor.SetThemes(cursor.WAR_POINTER);

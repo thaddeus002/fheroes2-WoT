@@ -384,7 +384,6 @@ Spell::target_t Spell::Target(spell_t spell)
 	case RESURRECTTRUE:
 	case HASTE:
 	case BLESS:
-	case MASSBLESS:
 	case STONESKIN:
 	case STEELSKIN:
 	case ANTIMAGIC:
@@ -395,6 +394,7 @@ Spell::target_t Spell::Target(spell_t spell)
 	case MIRRORIMAGE:
 	case SHIELD:		return ONEFRIEND;
 
+    case MASSBLESS:
 	case MASSCURE:
 	case MASSHASTE:
 	case MASSSHIELD:	return ALLFRIEND;

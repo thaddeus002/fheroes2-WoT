@@ -134,7 +134,9 @@ namespace Army
         int     ApplyDamage(long);
 
         void    LoadContours(bool);
-        const Surface* GetContour(u8);
+        Surface* GetContour(u8);
+
+        const Sprite &GetCurrentSprite() const;
 
         u8                      astate;
         u16                     aframe;

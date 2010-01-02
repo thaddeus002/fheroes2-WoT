@@ -23,6 +23,7 @@
 #include "agg.h"
 #include "settings.h"
 #include "cursor.h"
+#include "sprite.h"
 
 /* constructor */
 Cursor::Cursor() : theme(NONE), offset_x(0), offset_y(0)
@@ -53,25 +54,25 @@ bool Cursor::SetThemes(const Cursor::themes_t name)
 	switch(0xF000 & name)
 	{
 	    case 0x3000:
-		SetSprite(AGG::GetICN(ICN::SPELCO, 0xFF & name));
+            SetSprite(AGG::GetICN(ICN::SPELCO, 0xFF & name));
 		DEBUG(DBG_ENGINE , DBG_TRACE, "Cursor::Set: SPELCO.ICN, " << static_cast<int>(0xFF & name));
 		break;
 	    
 	    case 0x2000:
-		SetSprite(AGG::GetICN(ICN::CMSECO, 0xFF & name));
+            SetSprite(AGG::GetICN(ICN::CMSECO, 0xFF & name));
 		DEBUG(DBG_ENGINE , DBG_TRACE, "Cursor::Set: CMSECO.ICN, " << static_cast<int>(0xFF & name));
 		break;
 	    
 	    case 0x1000:
-		SetSprite(AGG::GetICN(ICN::ADVMCO, 0xFF & name));
+            SetSprite(AGG::GetICN(ICN::ADVMCO, 0xFF & name));
 		DEBUG(DBG_ENGINE , DBG_TRACE, "Cursor::Set: ADVMCO.ICN, " << static_cast<int>(0xFF & name));
 		break;
 
 	    default:
 		// default Cursor::POINTER
-		SetSprite(AGG::GetICN(ICN::ADVMCO, 0));
+            SetSprite(AGG::GetICN(ICN::ADVMCO, 0));
 		break;
-	}
+    }
 
 	SetOffset(name);
 	
@@ -169,6 +170,52 @@ void Cursor::SetOffset(const themes_t name)
                 offset_x = -7;
                 offset_y = -7;
                 break;
+
+        case Cursor::SPELLNONE:
+        case Cursor::SLOW:
+        case Cursor::MASSCURE:
+        case Cursor::CURSE:
+        case Cursor::LIGHTNINGBOLT:
+        case Cursor::CHAINLIGHTNING:
+        case Cursor::CURE:
+        case Cursor::BLESS:
+        case Cursor::FIREBALL:
+        case Cursor::FIREBLAST:
+        case Cursor::TELEPORT:
+        case Cursor::ELEMENTALSTORM:
+        case Cursor::RESURRECT:
+        case Cursor::RESURRECTTRUE:
+        case Cursor::HASTLE:
+        case Cursor::SHIELD:
+        case Cursor::ARMAGEDON:
+        case Cursor::ANTIMAGIC:
+        case Cursor::DISPELMAGIC:
+        case Cursor::BERZERKER:
+        case Cursor::PARALIZE:
+        case Cursor::BLIND:
+        case Cursor::HOLYWORLD:
+        case Cursor::HOLYSHOUT:
+        case Cursor::METEORSHOWER:
+        case Cursor::ANIMATEDEAD:
+        case Cursor::MIRRORIMAGE:
+        case Cursor::BLOODLUST:
+        case Cursor::DEATHRIPPLE:
+        case Cursor::DEATHWAVE:
+        case Cursor::STELSKIN:
+        case Cursor::STONSKIN:
+        case Cursor::DRAGONSLAYER:
+        case Cursor::EARTHQUAKE:
+        case Cursor::DISRUPTINGRAY:
+        case Cursor::COLDRING:
+        case Cursor::COLDRAY:
+        case Cursor::HIPNOTIZE:
+        case Cursor::MAGICARROW:
+        {
+            const ::Sprite &spr = AGG::GetICN(ICN::SPELCO, 0xFF & name);
+            offset_x = -spr.w() / 2;
+            offset_y = -spr.h() / 2;
+            break;
+        }
 
 	    default:
 		offset_x = 0;

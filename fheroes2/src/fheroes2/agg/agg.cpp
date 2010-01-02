@@ -801,6 +801,9 @@ const Sprite & AGG::Cache::GetICN(const ICN::icn_t icn, u16 index, bool reflect)
 /* return count of sprites from specific ICN */
 int AGG::Cache::GetICNCount(const ICN::icn_t icn)
 {
+    icn_cache_t & v = icn_cache[icn];
+    if(icn != ICN::UNKNOWN && v.count == 0)
+        LoadICN(icn, 0, false);
     return icn_cache[icn].count;
 }
 

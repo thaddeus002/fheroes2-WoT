@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2009-12-23 17:35-0800\n"
+"POT-Creation-Date: 2010-01-02 02:03+1300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -220,147 +220,151 @@ msgid "Return to the battle."
 msgstr ""
 
 #: ../fheroes2/battle/battle_dialog.cpp:434
-#: ../fheroes2/battle/battle_new.cpp:3151
+#: ../fheroes2/battle/battle_new.cpp:3196
 msgid "Hero's Options"
 msgstr ""
 
-#: ../fheroes2/battle/battle_new.cpp:818
+#: ../fheroes2/battle/battle_new.cpp:819
 msgid "Low morale causes the %{name} to freeze in panic."
 msgstr ""
 
-#: ../fheroes2/battle/battle_new.cpp:1058
+#: ../fheroes2/battle/battle_new.cpp:1061
 msgid "%{tower} does %{dmg} damage."
 msgstr ""
 
-#: ../fheroes2/battle/battle_new.cpp:1064
+#: ../fheroes2/battle/battle_new.cpp:1067
 msgid "  %{perished} %{creature} %{perish}."
 msgstr ""
 
-#: ../fheroes2/battle/battle_new.cpp:1068
-#: ../fheroes2/battle/battle_new.cpp:1689
+#: ../fheroes2/battle/battle_new.cpp:1071
+#: ../fheroes2/battle/battle_new.cpp:1690
 msgid "perish"
 msgstr ""
 
-#: ../fheroes2/battle/battle_new.cpp:1069
-#: ../fheroes2/battle/battle_new.cpp:1688
+#: ../fheroes2/battle/battle_new.cpp:1072
+#: ../fheroes2/battle/battle_new.cpp:1689
 msgid "perishes"
 msgstr ""
 
-#: ../fheroes2/battle/battle_new.cpp:1072
+#: ../fheroes2/battle/battle_new.cpp:1075
 msgid "Garrison"
 msgstr ""
 
-#: ../fheroes2/battle/battle_new.cpp:1073
+#: ../fheroes2/battle/battle_new.cpp:1076
 msgid "Tower"
 msgstr ""
 
-#: ../fheroes2/battle/battle_new.cpp:1116
+#: ../fheroes2/battle/battle_new.cpp:1119
 msgid "High morale enables the %{name} to attack again."
 msgstr ""
 
-#: ../fheroes2/battle/battle_new.cpp:1668
+#: ../fheroes2/battle/battle_new.cpp:1669
 msgid "%{name} %{destroys} half the enemy troops!"
 msgstr ""
 
-#: ../fheroes2/battle/battle_new.cpp:1670
+#: ../fheroes2/battle/battle_new.cpp:1671
 msgid "destroys"
 msgstr ""
 
-#: ../fheroes2/battle/battle_new.cpp:1671
+#: ../fheroes2/battle/battle_new.cpp:1672
 msgid "destroy"
 msgstr ""
 
-#: ../fheroes2/battle/battle_new.cpp:1676
+#: ../fheroes2/battle/battle_new.cpp:1677
 msgid "%{name} %{does} %{value} damage."
 msgstr ""
 
-#: ../fheroes2/battle/battle_new.cpp:1678
+#: ../fheroes2/battle/battle_new.cpp:1679
 msgid "does"
 msgstr ""
 
-#: ../fheroes2/battle/battle_new.cpp:1679
+#: ../fheroes2/battle/battle_new.cpp:1680
 msgid "do"
 msgstr ""
 
-#: ../fheroes2/battle/battle_new.cpp:1686
+#: ../fheroes2/battle/battle_new.cpp:1687
 msgid " %{value} %{name} %{perishes}."
 msgstr ""
 
-#: ../fheroes2/battle/battle_new.cpp:1770
+#: ../fheroes2/battle/battle_new.cpp:1729
 msgid "That spell will affect no one!"
 msgstr ""
 
-#: ../fheroes2/battle/battle_new.cpp:1789
+#: ../fheroes2/battle/battle_new.cpp:1755
 msgid "The %{spell} does %{value} damage."
 msgstr ""
 
-#: ../fheroes2/battle/battle_new.cpp:1795
+#: ../fheroes2/battle/battle_new.cpp:1761
 msgid "The %{spell} does %{value} damage to the %{name}."
 msgstr ""
 
-#: ../fheroes2/battle/battle_new.cpp:2048
-#: ../fheroes2/battle/battle_new.cpp:2107
+#: ../fheroes2/battle/battle_new.cpp:1786
+msgid "The %{monster} resist the spell!"
+msgstr ""
+
+#: ../fheroes2/battle/battle_new.cpp:2067
+#: ../fheroes2/battle/battle_new.cpp:2126
 msgid "View %{name} info."
 msgstr ""
 
-#: ../fheroes2/battle/battle_new.cpp:2065
+#: ../fheroes2/battle/battle_new.cpp:2084
 msgid "Shoot %{name} (%{value} shot(s) left)"
 msgstr ""
 
-#: ../fheroes2/battle/battle_new.cpp:2084
+#: ../fheroes2/battle/battle_new.cpp:2103
 msgid "Attack %{name}"
 msgstr ""
 
-#: ../fheroes2/battle/battle_new.cpp:2128
+#: ../fheroes2/battle/battle_new.cpp:2147
 msgid "Fly %{name} here."
 msgstr ""
 
-#: ../fheroes2/battle/battle_new.cpp:2133
+#: ../fheroes2/battle/battle_new.cpp:2152
 msgid "Move %{name} here."
 msgstr ""
 
-#: ../fheroes2/battle/battle_new.cpp:3118
+#: ../fheroes2/battle/battle_new.cpp:3163
 msgid "Skip"
 msgstr ""
 
-#: ../fheroes2/battle/battle_new.cpp:3118
+#: ../fheroes2/battle/battle_new.cpp:3163
 msgid ""
 "Skip the current creature. The current creature loses its turn and does not "
 "get to go again until the next round."
 msgstr ""
 
-#: ../fheroes2/battle/battle_new.cpp:3119
-#: ../fheroes2/battle/battle_new.cpp:3143
+#: ../fheroes2/battle/battle_new.cpp:3164
+#: ../fheroes2/battle/battle_new.cpp:3188
 msgid "Auto Combat"
 msgstr ""
 
-#: ../fheroes2/battle/battle_new.cpp:3119
+#: ../fheroes2/battle/battle_new.cpp:3164
 msgid "Allows the computer to fight out the battle for you."
 msgstr ""
 
-#: ../fheroes2/battle/battle_new.cpp:3120
+#: ../fheroes2/battle/battle_new.cpp:3165
 #: ../fheroes2/editor/editor_startgame.cpp:807
 #: ../fheroes2/gui/interface_buttons.cpp:247
 msgid "System Options"
 msgstr ""
 
-#: ../fheroes2/battle/battle_new.cpp:3120
+#: ../fheroes2/battle/battle_new.cpp:3165
 msgid "Allows you to customize the combat screen."
 msgstr ""
 
-#: ../fheroes2/battle/battle_new.cpp:3127
+#: ../fheroes2/battle/battle_new.cpp:3172
 msgid "Are you sure you want to retreat?"
 msgstr ""
 
-#: ../fheroes2/battle/battle_new.cpp:3139
+#: ../fheroes2/battle/battle_new.cpp:3184
 msgid "Skip this unit"
 msgstr ""
 
-#: ../fheroes2/battle/battle_new.cpp:3147
+#: ../fheroes2/battle/battle_new.cpp:3192
 msgid "Customize system options"
 msgstr ""
 
-#: ../fheroes2/battle/battle_new.cpp:3155
+#: ../fheroes2/battle/battle_new.cpp:3200
 msgid "View Opposing Hero"
 msgstr ""
 
@@ -2857,7 +2861,7 @@ msgid ""
 msgstr ""
 
 #: ../fheroes2/heroes/heroes_action.cpp:1647
-#: ../fheroes2/heroes/heroes.cpp:1343
+#: ../fheroes2/heroes/heroes.cpp:1346
 msgid "You have no room to carry another artifact!"
 msgstr ""
 
@@ -3882,37 +3886,37 @@ msgstr ""
 msgid "Jarkonas"
 msgstr ""
 
-#: ../fheroes2/heroes/heroes.cpp:1342
+#: ../fheroes2/heroes/heroes.cpp:1345
 msgid ""
 "You must purchase a spell book to use the mage guild, but you currently have "
 "no room for a spell book. Try giving one of your artifacts to another hero."
 msgstr ""
 
-#: ../fheroes2/heroes/heroes.cpp:1427
+#: ../fheroes2/heroes/heroes.cpp:1430
 msgid "To cast spells, you must first buy a spell book for %{gold} gold"
 msgstr ""
 
-#: ../fheroes2/heroes/heroes.cpp:1433
+#: ../fheroes2/heroes/heroes.cpp:1436
 msgid "Unfortunately, you seem to be a little short of cash at the moment."
 msgstr ""
 
-#: ../fheroes2/heroes/heroes.cpp:1445
+#: ../fheroes2/heroes/heroes.cpp:1448
 msgid "Do you wish to buy one?"
 msgstr ""
 
-#: ../fheroes2/heroes/heroes.cpp:1728
+#: ../fheroes2/heroes/heroes.cpp:1731
 msgid "%{name} has gained a level."
 msgstr ""
 
-#: ../fheroes2/heroes/heroes.cpp:1730
+#: ../fheroes2/heroes/heroes.cpp:1733
 msgid "%{skill} Skill +1"
 msgstr ""
 
-#: ../fheroes2/heroes/heroes.cpp:1743 ../fheroes2/heroes/heroes.cpp:1775
+#: ../fheroes2/heroes/heroes.cpp:1746 ../fheroes2/heroes/heroes.cpp:1778
 msgid "%{name} has gained a level. %{skill} Skill +1"
 msgstr ""
 
-#: ../fheroes2/heroes/heroes.cpp:1746
+#: ../fheroes2/heroes/heroes.cpp:1749
 msgid "You have learned %{level} %{skill}."
 msgstr ""
 

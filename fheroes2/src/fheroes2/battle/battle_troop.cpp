@@ -144,7 +144,7 @@ void Army::BattleTroop::Blit(const Point& dst_pt, bool reflect, int frame)
     display.Blit(sp, p);
 }
 
-const Surface* Army::BattleTroop::GetContour(u8 index)
+Surface* Army::BattleTroop::GetContour(u8 index)
 {
     if(contours.empty())
         LoadContours(IsReflected());
@@ -367,7 +367,7 @@ bool Army::BattleTroop::ApplySpell(Spell::spell_t spell, u8 sp)
 {
     //TODO: Artifacts that affect spell damage (holy pendant, etc)
 
-    if(!Battle::isTroopAffectedBySpell(spell, *this))
+    if(!Battle::isTroopAffectedBySpell(spell, *this, false))
         return false;
 
     u16 dmg = Battle::GetInflictDamageVersus(spell, sp, id);
@@ -644,6 +644,11 @@ u8 Army::BattleTroop::GetSpeed(void) const
     if(Modes(SP_SLOW)) return (Speed::SLOW > Monster::GetSpeed() ? Speed::CRAWLING : Monster::GetSpeed() - 2);
 
     return Troop::GetSpeed();
+}
+
+const Sprite &Army::BattleTroop::GetCurrentSprite() const
+{
+    return AGG::GetICN(ICNFile(), aframe, IsReflected());
 }
 
 //////////////////////////////////////////////////////////////////////////////////////

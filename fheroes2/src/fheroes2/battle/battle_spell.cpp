@@ -21,8 +21,12 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
+#include "battle.h"
 #include "battle_troop.h"
 #include "battle_spell.h"
+#include "battle_types.h"
+#include "agg.h"
+#include <cmath>
 
 bool Battle::AllowSpell(Spell::spell_t spell, const Army::BattleTroop &troop)
 {
@@ -149,12 +153,18 @@ void Battle::ApplySpell(int spower, Spell::spell_t spell, Army::BattleTroop &tro
                 break;
             case Spell::MASSSLOW:
                 magic.spell = Spell::SLOW;
+            case Spell::SLOW:
+                troop.RemoveMagic(Spell::HASTE);
+                troop.RemoveMagic(Spell::MASSHASTE);
                 break;
             case Spell::MASSSHIELD:
                 magic.spell = Spell::SHIELD;
                 break;
             case Spell::MASSHASTE:
                 magic.spell = Spell::HASTE;
+            case Spell::HASTE:
+                troop.RemoveMagic(Spell::SLOW);
+                troop.RemoveMagic(Spell::MASSSLOW);
                 break;
                 // 	Spell::BLIND,
                 // 	Spell::SHIELD,
@@ -233,7 +243,7 @@ void Battle::ApplySpell(int spower, Spell::spell_t spell, Army::BattleTroop &tro
     }
 }
 
-bool Battle::isTroopAffectedBySpell(Spell::spell_t spell, const Army::BattleTroop &troop)
+bool Battle::isTroopAffectedBySpell(Spell::spell_t spell, const Army::BattleTroop &troop, bool deterministic)
 {
     const Monster::monster_t id = troop.GetID();
     switch(id)
@@ -295,7 +305,7 @@ bool Battle::isTroopAffectedBySpell(Spell::spell_t spell, const Army::BattleTroo
 
             case Monster::DWARF:
             case Monster::BATTLE_DWARF:
-                if(3 == Rand::Get(1,4)) return false;
+                if(!deterministic && 3 == Rand::Get(1,4)) return false;
                 break;
 
             case Monster::GIANT:
@@ -331,7 +341,7 @@ u16 Battle::GetInflictDamageVersus(Spell::spell_t spell, u8 spellPower, const Ar
 {
     u16 dmg = Spell::InflictDamage(spell, spellPower);
 
-    if(!isTroopAffectedBySpell(spell, troop))
+    if(!isTroopAffectedBySpell(spell, troop, false))
         return 0;
     
     if((troop.isUndead() && (spell == Spell::DEATHRIPPLE || spell == Spell::DEATHWAVE))
@@ -371,4 +381,319 @@ u16 Battle::GetInflictDamageVersus(Spell::spell_t spell, u8 spellPower, const Ar
     }
 
     return dmg;
+}
+
+Battle::BasicSpell *Battle::CreateSpell(Spell::spell_t spell, const Battle::Battlefield &battlefield, const Rect &rect, HeroBase *hero, std::vector<Army::BattleTroop*> &affected, const Point &targetPoint)
+{
+    bool reflect = battlefield.GetHero(1) == hero;
+    const Army::BattleTroop *target = affected.size() ? affected[0] : NULL;
+    switch(spell)
+    {
+        //case Spell::FIREBALL:
+        //case Spell::LIGHTNINGBOLT:
+        //case Spell::CHAINLIGHTNING:
+        case Spell::CURE:
+        case Spell::MASSCURE:
+        case Spell::BLESS:
+        case Spell::MASSBLESS:
+        case Spell::CURSE:
+        case Spell::MASSCURSE:
+        case Spell::DRAGONSLAYER:
+        case Spell::PARALYZE:
+        case Spell::BERZERKER:
+        case Spell::BLIND:
+        case Spell::ELEMENTALSTORM:
+            return new Hover(spell);
+            
+        //case Spell::BLIND:
+        //case Spell::ANTIMAGIC:
+        //case Spell::DISPEL:
+        //case Spell::MASSDISPEL:
+
+        case Spell::STONESKIN:
+        case Spell::STEELSKIN:
+            return new Offsetless(spell);
+            
+        //case Spell::HYPNOTIZE:
+
+        case Spell::COLDRAY:
+        case Spell::DISRUPTINGRAY:
+            return new Projectile(spell, reflect, rect, target->Front());
+
+        case Spell::ARROW:
+            return new MagicArrow(reflect, rect, target->Front());
+
+        case Spell::BLOODLUST:
+            return new Bloodlust(*target);
+
+        case Spell::COLDRING:
+            return new ColdRing(affected, targetPoint, battlefield, reflect, rect);
+
+        case Spell::FIREBLAST:
+            return new Splash(spell, affected, targetPoint, battlefield);
+            
+            //case Spell::TELEPORT:
+            
+        //case Spell::DEATHRIPPLE:
+        //case Spell::DEATHWAVE:
+        //case Spell::SHIELD:
+        //case Spell::MASSSHIELD:
+            
+        default:
+            return new BasicSpell(spell);
+    }
+}
+    
+Battle::BasicSpell::BasicSpell(Spell::spell_t spell)
+: back(Rect(g_baseOffset.x, g_baseOffset.y, 640, 480)),
+  sound(M82::FromSpell(spell)),
+  spell(spell)
+{
+}
+
+void Battle::BasicSpell::TriggerSound()
+{
+    if(sound != M82::UNKNOWN)
+    {
+        AGG::PlaySound(sound);
+        sound = M82::UNKNOWN;
+    }
+}
+
+void Battle::BasicSpell::PreHit()
+{
+    back.Save();
+}
+
+void Battle::BasicSpell::OnHit(std::vector<Army::BattleTroop*> &affected, u8 spellPower, bool reflect, Battle::Battlefield &battlefield, Battle::GUI &gui)
+{
+    Display &display = Display::Get();
+    
+    TriggerSound();
+    
+    u16 totalDamage = 0;
+    for(u16 i = 0; i < affected.size(); i++)
+    {
+        u16 damage = Battle::GetInflictDamageVersus(spell, spellPower, affected[i]->GetID());
+        if(affected[i]->IsDamageFatal(damage)) {
+            affected[i]->Animate(Monster::AS_DIE);
+            AGG::PlaySound(affected[i]->M82Kill());
+        } else if(damage) {
+            affected[i]->Animate(Monster::AS_PAIN);
+            AGG::PlaySound(affected[i]->M82Wnce());
+        }
+        totalDamage += damage;
+    }
+    
+    int animat = 0;
+    u16 frame = 0, mframe = AGG::GetICNCount(ICN::ImpactFromSpell(spell));
+    while(LocalEvent::Get().HandleEvents())
+    {
+        if(!Game::ShouldAnimateInfrequent(animat++, 5))
+            continue;
+        
+        battlefield.Redraw();
+        gui.Redraw();
+
+        if(ICN::ImpactFromSpell(spell) != ICN::UNKNOWN && frame < mframe)
+            DrawSprite(affected, ICN::ImpactFromSpell(spell), frame);
+            
+        display.Flip();
+        if(frame >= mframe)
+        {
+            if(!totalDamage)
+                break;
+            
+            bool br = true;
+            for(u16 i = 0; i < affected.size(); i++)
+                if(affected[i]->astate != Monster::AS_NONE)
+                {
+                    u8 strt = 0, len = 0;
+                    affected[i]->GetAnimFrames(Monster::AS_DIE, strt, len, false);
+                    if(affected[i]->astate != Monster::AS_DIE || affected[i]->aframe < strt + len - 1)
+                        br = false;
+                }
+            if(br) break;
+        }
+        frame ++;
+    }
+}
+
+void Battle::BasicSpell::DrawSprite(std::vector<Army::BattleTroop*> &affected, ICN::icn_t icn, int frame)
+{
+    const Sprite &spr = AGG::GetICN(icn, frame);
+    for(u16 i = 0; i < affected.size(); i++)
+        Display::Get().Blit(spr, Bf2Scr(affected[i]->Front()) + spr + SpriteOffset(affected[i]->GetCurrentSprite(), spr));
+}
+
+Point Battle::BasicSpell::SpriteOffset(const Sprite &troop, const Sprite &effect)
+{
+    return Point(0, -troop.h() / 2);
+}
+
+Battle::Offsetless::Offsetless(Spell::spell_t spell)
+: BasicSpell(spell)
+{
+}
+
+Point Battle::Offsetless::SpriteOffset(const Sprite &troop, const Sprite &effect)
+{
+    return Point(0, 0);
+}
+
+Battle::Projectile::Projectile(Spell::spell_t spell, bool reflect, const Rect &hrect, const Point &target)
+: BasicSpell(spell)
+, icon(ICN::PreImpactFromSpell(spell))
+, reflect(reflect)
+{
+    if(reflect)
+    {
+        start = hrect + Point(hrect.w, hrect.h / 2);
+        end = Bf2Scr(target);
+    }
+    else
+    {
+        start = hrect + Point(0, hrect.h / 2);
+        end = Bf2Scr(target);
+    }
+
+    maxFrames = AGG::GetICNCount(icon);
+    delta = end - start;
+}
+
+void Battle::Projectile::PreHit()
+{
+    BasicSpell::PreHit();
+    
+    TriggerSound();
+    
+    delta.x /= maxFrames;
+    delta.y /= maxFrames;
+
+    int animat = 0, frame = 0;
+    Display &display = Display::Get();
+    while(LocalEvent::Get().HandleEvents() && frame < maxFrames)
+    {
+        if(!Game::ShouldAnimateInfrequent(animat++, 3))
+            continue;
+
+        back.Restore();
+        const Sprite &spr = AGG::GetICN(icon, FrameModifier(frame), reflect);
+        display.Blit(spr, start);
+        display.Flip();
+        start += delta - Point(0, spr.h() / (maxFrames - frame));
+        frame ++;
+    }
+}
+
+Battle::MagicArrow::MagicArrow(bool reflect, const Rect &hrect, const Point &target)
+: Projectile(Spell::ARROW, reflect, hrect, target)
+{
+    maxFrames = 8;
+    double angle = M_PI_2 - atan2(-delta.y, delta.x);
+    index = (int)(angle/M_PI * AGG::GetICNCount(icon));
+}
+
+Battle::Hover::Hover(Spell::spell_t spell)
+: BasicSpell(spell)
+{
+}
+
+Point Battle::Hover::SpriteOffset(const Sprite &troop, const Sprite &effect)
+{
+    return Point(0, -troop.h());
+}
+
+Battle::Bloodlust::Bloodlust(const Army::BattleTroop &troop)
+: BasicSpell(Spell::BLOODLUST)
+{
+}
+
+void Battle::Bloodlust::OnHit(std::vector<Army::BattleTroop*> &affected, u8 spellPower, bool reflect, Battlefield &battlefield, GUI &gui)
+{
+    TriggerSound();
+
+    std::vector<Surface*> stencils;
+    for(unsigned int i = 0; i < affected.size(); i++) {
+        const Sprite &spr = affected[i]->GetCurrentSprite();
+        Surface *stencil = new Surface;
+        stencil->Set(spr.w(), spr.h());
+        Surface::MakeStencil(*stencil, spr, stencil->MapRGB(150, 0, 0));
+        stencils.push_back(stencil);
+    }
+
+    const int maxFrames = 20;
+    const int maxAlpha = 170;
+    const int half = maxFrames / 2;
+    const int step = maxAlpha / half;
+    int frame = 0, animat = 0;
+
+    while(LocalEvent::Get().HandleEvents() && frame < maxFrames)
+    {
+        if(!Game::ShouldAnimateInfrequent(animat++, 4))
+            continue;
+        
+        battlefield.Redraw();
+        gui.Redraw();
+
+        for(unsigned int i = 0; i < affected.size(); i++) {
+            stencils[i]->SetAlpha(frame < half ? frame * step : maxAlpha - (frame - half) * step);
+            Army::BattleTroop &troop = *affected[i];
+            Display::Get().Blit(*stencils[i], Bf2Scr(troop.Position()) + troop.GetBlitOffset(troop.aframe, troop.IsReflected()));
+        }
+
+        Display::Get().Flip();
+        frame ++;
+    }
+
+    for(unsigned int i = 0; i < stencils.size(); i++)
+        delete stencils[i];
+}
+
+Battle::SplashDamage::SplashDamage(std::vector<Army::BattleTroop*> &affected, const Point &targetPoint, const Battlefield &battlefield)
+: target(targetPoint)
+{
+    Point delta;
+    for(delta.x = -1; delta.x <= 1; delta.x++)
+        for(delta.y = -1; delta.y <= 1; delta.y++)
+        {
+            if(!delta.x && !delta.y) continue;
+            if(targetPoint.y % 2 && delta.y && delta.x > 0) continue;
+            if(!(targetPoint.y % 2) && delta.y && delta.x < 0) continue;
+            Army::BattleTroop *troop = battlefield.GetTroopFromPoint(targetPoint + delta);
+            if(!troop) continue;
+            std::vector<Army::BattleTroop*>::iterator begin = affected.begin();
+            std::vector<Army::BattleTroop*>::iterator end = affected.end();
+            for(; begin != end; begin++)
+                if(*begin == troop) break;
+            if(begin == end) affected.push_back(troop);
+        }
+}
+
+Battle::Splash::Splash(Spell::spell_t spell, std::vector<Army::BattleTroop*> &affected, const Point &targetPoint, const Battlefield &battlefield)
+: BasicSpell(spell)
+, SplashDamage(affected, targetPoint, battlefield)
+{
+}
+
+void Battle::Splash::DrawSprite(std::vector<Army::BattleTroop*> &affected, ICN::icn_t icn, int frame)
+{
+    const Sprite &spr = AGG::GetICN(icn, frame);
+    Display::Get().Blit(spr, Bf2Scr(target) + spr + SpriteOffset(affected[0]->GetCurrentSprite(), spr));
+
+}
+
+
+Battle::ColdRing::ColdRing(std::vector<Army::BattleTroop*> &affected, const Point &targetPoint, const Battlefield &battlefield, bool reflect, const Rect &hrect)
+: Projectile(Spell::COLDRING, reflect, hrect, targetPoint)
+, SplashDamage(affected, targetPoint, battlefield)
+{
+}
+
+void Battle::ColdRing::DrawSprite(std::vector<Army::BattleTroop*> &affected, ICN::icn_t icn, int frame)
+{
+    const Sprite &spr = AGG::GetICN(icn, frame);
+    const Sprite &reflected = AGG::GetICN(icn, frame, true);
+    Display::Get().Blit(spr, Bf2Scr(target) + spr - Point(0, spr.h() / 4));
+    Display::Get().Blit(reflected, Bf2Scr(target) + spr - Point(reflected.w(), spr.h() / 4));
 }

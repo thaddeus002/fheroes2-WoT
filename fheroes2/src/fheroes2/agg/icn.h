@@ -941,8 +941,9 @@ namespace ICN
     bool SkipBottomForRedrawHeroes(icn_t, u16);
     icn_t PORTxxxx(u8);
     u8   GetMissIndex(icn_t, double, double);
-    
-    icn_t FromSpell(u8);
+
+    icn_t PreImpactFromSpell(u8);
+    icn_t ImpactFromSpell(u8);
 };
 
 #endif
