@@ -35,11 +35,10 @@
 #include "interface_gamearea.h"
 #include "tools.h"
 
+#define FORMAT_VERSION_1389 0x056D
 #define FORMAT_VERSION_1377 0x0561
-#define FORMAT_VERSION_1357 0x054D
-#define FORMAT_VERSION_1347 0x0543
 
-#define CURRENT_FORMAT_VERSION FORMAT_VERSION_1377
+#define CURRENT_FORMAT_VERSION FORMAT_VERSION_1389
 
 bool Game::Save(const std::string &fn)
 {
@@ -681,14 +680,11 @@ bool Game::IO::LoadBIN(QueueMessage & msg)
     msg.Pop(conf.game_type);
     msg.Pop(conf.players_colors);
     msg.Pop(conf.preferably_count_players);
-    if(format >= FORMAT_VERSION_1357)
 #ifdef WITH_DEBUG
     msg.Pop(byte16);
 #else
     msg.Pop(conf.debug);
 #endif
-    else
-	msg.Pop(byte8);
     // settings: original
     msg.Pop(byte8);
     if(byte8) conf.SetModes(Settings::ORIGINAL);
@@ -908,11 +904,8 @@ void Game::IO::UnpackTile(QueueMessage & msg, Maps::Tiles & tile, u16 check_vers
     msg.Pop(tile.general);
     msg.Pop(tile.quantity1);
     msg.Pop(tile.quantity2);
-    if(!check_version || check_version >= FORMAT_VERSION_1347)
-    {
-	msg.Pop(tile.quantity3);
-	msg.Pop(tile.quantity4);
-    }
+    msg.Pop(tile.quantity3);
+    msg.Pop(tile.quantity4);
     msg.Pop(tile.fogs);
     msg.Pop(tile.flags);
 
@@ -1033,10 +1026,17 @@ void Game::IO::UnpackCastle(QueueMessage & msg, Castle & castle, u16 check_versi
     {
 	msg.Pop(byte8);
 	castle.army.At(jj).SetMonster(Monster::FromInt(byte8));
-	msg.Pop(byte16);
-	castle.army.At(jj).SetCount(byte16);
+	if(!check_version || check_version >= FORMAT_VERSION_1389)
+	{
+	    msg.Pop(byte32);
+	    castle.army.At(jj).SetCount(byte32);
+	}
+	else
+	{
+	    msg.Pop(byte16);
+	    castle.army.At(jj).SetCount(byte16);
+	}
     }
-
     // dwelling
     msg.Pop(byte32);
     for(u32 jj = 0; jj < CASTLEMAXMONSTER; ++jj) msg.Pop(castle.dwelling[jj]);
@@ -1087,11 +1087,8 @@ void Game::IO::UnpackHeroes(QueueMessage & msg, Heroes & hero, u16 check_version
 	msg.Pop(byte8);
 	hero.artifacts[jj].Set(Artifact::FromInt(byte8));
 
-	if(!check_version || check_version >= FORMAT_VERSION_1347)
-	{
-	    msg.Pop(byte8);
-	    hero.artifacts[jj].SetExt(byte8);
-	}
+	msg.Pop(byte8);
+	hero.artifacts[jj].SetExt(byte8);
     }
 
     // armies
@@ -1100,8 +1097,16 @@ void Game::IO::UnpackHeroes(QueueMessage & msg, Heroes & hero, u16 check_version
     {
 	msg.Pop(byte8);
 	hero.army.At(jj).SetMonster(Monster::FromInt(byte8));
-	msg.Pop(byte16);
-	hero.army.At(jj).SetCount(byte16);
+	if(!check_version || check_version >= FORMAT_VERSION_1389)
+	{
+	    msg.Pop(byte32);
+	    hero.army.At(jj).SetCount(byte32);
+	}
+	else
+	{
+	    msg.Pop(byte16);
+	    hero.army.At(jj).SetCount(byte16);
+	}
     }
 
     // spell book
@@ -1129,7 +1134,7 @@ void Game::IO::UnpackHeroes(QueueMessage & msg, Heroes & hero, u16 check_version
 	hero.visit_object.push_back(io);
     }
 
-    if(check_version >= FORMAT_VERSION_1377)
+    if(!check_version || check_version >= FORMAT_VERSION_1377)
     {
 	// route path
 	msg.Pop(hero.path.dst);
