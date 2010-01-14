@@ -63,7 +63,7 @@ void ShowBuildMessage(StatusBar & bar, bool isBuilt, const std::string & message
         else
         if(Castle::BUILD_SHIPYARD == building && !castle.HaveNearlySea())
         {
-            str = _("Cannot build %{name} because castle is to far from water.");
+            str = _("Cannot build %{name} because castle is too far from water.");
     	    String::Replace(str, "%{name}", message);
         }
         else
@@ -98,11 +98,22 @@ Dialog::answer_t Castle::DialogBuyHero(const Heroes* hero)
 
     Text text(_("Recruit Hero"), Font::BIG);
 
-    std::string str = _("%{name} is a level %{value} %{race} with %{count} artifacts.");
+    u8 count = hero->GetCountArtifacts();
+    if(hero->HasArtifact(Artifact::MAGIC_BOOK)) count--;
+
+    std::string str = _("%{name} is a level %{value} %{race}");
+
+    // FIXME: It is necessary to consider locale features for numerals (with getext).
+    if(count)
+    {
+	str += " ";
+	str += count > 1 ? _(" with %{count} artifacts") : _(" with one artifact");
+    }
+
     String::Replace(str, "%{name}", hero->GetName());
     String::Replace(str, "%{value}", hero->GetLevel());
     String::Replace(str, "%{race}", Race::String(hero->GetRace()));
-    String::Replace(str, "%{count}", hero->GetCountArtifacts());
+    String::Replace(str, "%{count}", count);
 
     TextBox box2(str, Font::BIG, BOXAREA_WIDTH);
 
