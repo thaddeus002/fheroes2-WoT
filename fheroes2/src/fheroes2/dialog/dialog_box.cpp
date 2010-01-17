@@ -104,6 +104,7 @@ void BoxRedraw(s16 posx, s16 posy, u8 count)
 
 	// right middle sprite
 	pt.x += sl.w();
+	if(!Settings::Get().EvilInterface()) pt.x -= 1;
 	const Sprite & sr = AGG::GetICN(buybuild, 1);
 	display.Blit(sr, Rect(0, 10, sr.w(), BOXAREA_MIDDLE), pt);
 	pt.y += BOXAREA_MIDDLE;
