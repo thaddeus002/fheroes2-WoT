@@ -687,10 +687,10 @@ void SecondarySkillBar::Redraw(void)
         }
 	else
 	{
-            const Sprite & sprite_skill = AGG::GetICN(ICN::SECSKILL, 0);
+            const Sprite & sprite_skill = AGG::GetICN((use_mini_sprite ? ICN::HSICONS : ICN::SECSKILL), 0);
 
 	    if(use_mini_sprite)
-        	display.Blit(sprite_skill, Rect((sprite_skill.w() - 32) / 2, 0, 32, 32), dst_pt);
+        	display.Blit(sprite_skill, Rect((sprite_skill.w() - 32) / 2, 20, 32, 32), dst_pt);
 	    else
         	display.Blit(sprite_skill, dst_pt);
 

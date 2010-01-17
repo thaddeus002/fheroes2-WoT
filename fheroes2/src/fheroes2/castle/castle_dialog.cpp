@@ -105,6 +105,11 @@ Dialog::answer_t Castle::OpenDialog(bool fade)
 
     dst_pt.x = cur_pt.x + 5;
     dst_pt.y = cur_pt.y + 262;
+    const Rect rectSign(dst_pt, crest.w(), crest.h());
+    std::string str_date = _("Month: %{month}, Week: %{week}, Day: %{day}");
+    String::Replace(str_date, "%{month}", world.GetMonth());
+    String::Replace(str_date, "%{week}", world.GetWeek());
+    String::Replace(str_date, "%{day}", world.GetDay());
 
     display.Blit(crest, dst_pt);
 
@@ -125,7 +130,7 @@ Dialog::answer_t Castle::OpenDialog(bool fade)
     dst_pt.x = cur_pt.x + 5;
     dst_pt.y = cur_pt.y + 361;
     
-    Rect rectHeroPortrait(dst_pt.x, dst_pt.y, 100, 92);
+    const Rect rectHeroPortrait(dst_pt.x, dst_pt.y, 100, 92);
 
     if(castle_heroes)
 	display.Blit(Portrait::Hero((*castle_heroes), Portrait::BIG), dst_pt);
@@ -760,6 +765,9 @@ Dialog::answer_t Castle::OpenDialog(bool fade)
 	else
 	// status message next castle
 	if(le.MouseCursor(buttonNextCastle)) statusBar.ShowMessage(_("Show next town"));
+	else
+	// status message over sign
+	if(castle_heroes && le.MouseCursor(rectSign)) statusBar.ShowMessage(str_date);
 	else
 	// status message view hero
 	if(castle_heroes && le.MouseCursor(rectHeroPortrait)) statusBar.ShowMessage(_("View Hero"));

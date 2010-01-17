@@ -1162,34 +1162,42 @@ void Game::FocusCastleClickLeftAction(Castle & from_castle, u16 index_maps)
 
 void Game::MouseCursorAreaPressRight(u16 index_maps)
 {
-    Settings & conf = Settings::Get();
-    Maps::Tiles & tile = world.GetTiles(index_maps);
+    Focus & global_focus = Focus::Get();
 
-    if(IS_DEVEL()) tile.DebugInfo();
-
-    if(!IS_DEVEL() && tile.isFog(conf.MyColor()))
-	Dialog::QuickInfo(tile);
+    // stop hero
+    if(Game::Focus::HEROES == global_focus.Type() && global_focus.GetHeroes().isEnableMove())
+	global_focus.GetHeroes().SetMove(false);
     else
-    switch(tile.GetObject())
     {
-	case MP2::OBJN_CASTLE:
-	case MP2::OBJ_CASTLE:
-	{
-    	    const Castle *castle = world.GetCastle(tile.GetIndex());
-	    if(castle) Dialog::QuickInfo(*castle);
-	}
-	break;
+	Settings & conf = Settings::Get();
+	Maps::Tiles & tile = world.GetTiles(index_maps);
 
-	case MP2::OBJ_HEROES:
-    	{
-	    const Heroes *heroes = world.GetHeroes(tile.GetIndex());
-	    if(heroes) Dialog::QuickInfo(*heroes);
-	}
-	break;
+	if(IS_DEVEL()) tile.DebugInfo();
 
-	default:
+	if(!IS_DEVEL() && tile.isFog(conf.MyColor()))
 	    Dialog::QuickInfo(tile);
-	break;
+	else
+	switch(tile.GetObject())
+	{
+	    case MP2::OBJN_CASTLE:
+	    case MP2::OBJ_CASTLE:
+	    {
+    		const Castle *castle = world.GetCastle(tile.GetIndex());
+		if(castle) Dialog::QuickInfo(*castle);
+	    }
+	    break;
+
+	    case MP2::OBJ_HEROES:
+    	    {
+		const Heroes *heroes = world.GetHeroes(tile.GetIndex());
+		if(heroes) Dialog::QuickInfo(*heroes);
+	    }
+	    break;
+
+	    default:
+		Dialog::QuickInfo(tile);
+	    break;
+	}
     }
 }
 
