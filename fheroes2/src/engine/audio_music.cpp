@@ -69,6 +69,7 @@ void Music::Play(const char* file, bool loop)
 {
     if(! Mixer::isValid()) return;
 
+    Reset();
     music = Mix_LoadMUS(file);
 
     if(! music)
