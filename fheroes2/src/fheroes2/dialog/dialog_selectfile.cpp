@@ -355,8 +355,15 @@ void RedrawFileListSimple(const Point & dst, const std::string & header, const s
 	const std::string name(GetBasename(info.file.c_str()));
 
 	std::strftime(short_date, 14, "%b %d, %H:%M", std::localtime(&info.localtime));
+	std::string savname(GetBasename(info.file.c_str()));
+	if(savname.empty()) continue;
 
-	text.Set(GetBasename(info.file.c_str()), (cur == ii ? Font::YELLOW_BIG : Font::BIG));
+	const size_t dotpos = savname.size() - 4;
+	std::string ext = savname.substr(dotpos);
+	String::Lower(ext);
+    	if(ext == ".sav") savname.erase(dotpos);
+
+	text.Set(savname, (cur == ii ? Font::YELLOW_BIG : Font::BIG));
 	text.Blit(dst.x + 45, dst.y + oy);
 
 	text.Set(short_date, (cur == ii ? Font::YELLOW_BIG : Font::BIG));
