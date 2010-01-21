@@ -287,7 +287,7 @@ namespace Battle
     {
         if(BattleSettings::Get().Modes(BattleSettings::OPT_GRID))
         {
-            Point p(0,0);
+            Point p(0, 0);
             for(p.x = 0; p.x < BFW; p.x++)
                 for(p.y = 0; p.y < BFH; p.y++)
                     DrawCell(p);
@@ -318,23 +318,23 @@ namespace Battle
     void Battlefield::Background::DrawShadow(const Point &pt)
     {
         static Surface shadow;
-
         if(!shadow.valid())
 	{
-	    shadow.Set(CELLW, (u16) (CELLH + 2 * CELLWDELTA), 16, SWSURFACE);
+	    shadow.Set(CELLW, (u16) (CELLH + 2 * CELLWDELTA - 6), 16, SWSURFACE);
 	    shadow.SetColorKey();
 
             Rect r(0, 0, shadow.w(), shadow.h());
-            r.y += (s16) (2*CELLWDELTA-1);
-            r.h -= (u16) (4*CELLWDELTA-2);
+            r.y += (s16) (CELLWDELTA - 1);
+            r.h -= (u16) (2*CELLWDELTA - 2);
             shadow.FillRect(0x00, 0x00, 0x00, r);
-            r.x ++;
-            r.w -= 2;
-            for(int i=1; i<CELLW/2; i+=2) {
-                r.y--, r.h +=2;
+            r.x += 3;
+            r.w -= 6;
+            for(int i=1; i< CELLW/4; i+=3) {
+                r.y -- ;
+		r.h += 2;
                 shadow.FillRect(0x00, 0x00, 0x00, r);
-                r.x += 2;
-                r.w -= 4;
+                r.x += 3;
+                r.w -= 6;
             }
 	    shadow.SetAlpha(0x30);
         }
@@ -347,67 +347,29 @@ namespace Battle
 
     void Battlefield::Background::DrawCell(const Point&pt)
     {
-        static Surface shadow;
-        if(!shadow.valid())
+        static Surface cell;
+        if(!cell.valid())
 	{
-	    shadow.Set(CELLW, (u16)(CELLH + 2 * CELLWDELTA - 6));
-	    shadow.SetColorKey();
-	    const u32 color = shadow.GetColor(0xE1);
-//	    const u32 color = shadow.MapRGB(0,128,0, 128);
+	    cell.Set(CELLW, (u16)(CELLH + 2 * CELLWDELTA - 6));
+	    cell.SetColorKey();
+	    const u32 color = cell.GetColor(0xE1);
 
 	    // hexagon
-	    shadow.DrawLine(shadow.w() / 2, 0, 0, (u16)(CELLWDELTA), color);
-	    shadow.DrawLine(shadow.w() / 2, 0, shadow.w() - 1, (u16)(CELLWDELTA), color);
+	    cell.DrawLine(cell.w() / 2, 0, 0, (u16)(CELLWDELTA), color);
+	    cell.DrawLine(cell.w() / 2, 0, cell.w() - 1, (u16)(CELLWDELTA), color);
 
-	    shadow.DrawLine(0, (u16)(CELLWDELTA), 0, (u16)(shadow.h() - 1 - CELLWDELTA), color);
-	    shadow.DrawLine(shadow.w() - 1, (u16)(CELLWDELTA), shadow.w() - 1, (u16)(shadow.h() - 1 - CELLWDELTA), color);
+	    cell.DrawLine(0, (u16)(CELLWDELTA), 0, (u16)(cell.h() - CELLWDELTA), color);
+	    cell.DrawLine(cell.w() - 1, (u16)(CELLWDELTA), cell.w() - 1, (u16)(cell.h() - CELLWDELTA), color);
 
-	    shadow.DrawLine(0, (u16)(shadow.h() - 1 - CELLWDELTA), shadow.w() / 2, shadow.h() - 1, color);
-	    shadow.DrawLine(shadow.w() - 1, (u16)(shadow.h() - 1 - CELLWDELTA), shadow.w() / 2, shadow.h() - 1, color);
+	    cell.DrawLine(0, (u16)(cell.h() - CELLWDELTA), cell.w() / 2, cell.h() -1, color);
+	    cell.DrawLine(cell.w() - 1, (u16)(cell.h() - CELLWDELTA), cell.w() / 2, cell.h() - 1, color);
         }
         Point p = Bf2Scr(pt);
         p.y -= (s16)(CELLH+CELLWDELTA);
         p.x -= CELLW/2;
-        display.Blit(shadow, p);
+        display.Blit(cell, p);
     }
 
-    /* it is not used */
-/*
-    void Battlefield::Background::DrawMark(const Point&pt, int animframe)
-    {
-        static int frame = 0;
-        const int delta = (int)(((double)CELLW)/6.928);
-        static Surface shadow(CELLW, CELLH+2*delta, true);
-        static bool prep = true;
-        frame += animframe;
-        //if(prep)
-	 {
-            prep = false;
-            u32 gr = shadow.MapRGB(255,255,0, abs((frame%21)-10)*20+55);
-            //u32 tr = shadow.MapRGB(255,255,255, 1);
-            Rect r(0,0,shadow.w(), shadow.h());
-            //shadow.FillRect(tr, r);
-            r.y += 2*delta-1;
-            r.h -= 4*delta-2;
-            for(int i=r.y; i<r.y+r.h; i++) shadow.SetPixel(r.x, i, gr), shadow.SetPixel(r.x+r.w-1, i, gr);
-            //shadow.FillRect(gr, r);
-            r.x ++;
-            r.w -= 2;
-            //shadow.FillRect(tr, r);
-            for(; r.x<CELLW/2; r.x++, r.w-=2) {
-                if(r.x%2) r.y--, r.h +=2;
-                for(int x = r.x; x < r.x+r.w; x += r.w-1)
-                    for(int y = r.y; y < r.y+r.h; y += r.h-1)
-                        shadow.SetPixel(x, y, gr);
-                //shadow.FillRect(gr, r);
-            }
-        }
-        Point p = Bf2Scr(pt);
-        p.y -= CELLH+delta;
-        p.x -= CELLW/2;
-        display.Blit(shadow, p);
-    }
-*/
     void Battlefield::Background::DrawPath(const PointList &path)
     {
         for(u16 i = 0; i < path.size(); i++)
