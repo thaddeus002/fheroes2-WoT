@@ -565,7 +565,7 @@ namespace Battle
             (wide && castle->IsCellInMoat(pos + Point(reflect ? -1 : 1, 0)))))
         {
             const Sprite &moat = AGG::GetICN(ICN::MOATPART, pos.y);
-            display.Blit(moat, Point(moat.x(), moat.y()));
+            display.Blit(moat, moat.x() + g_baseOffset.x, moat.y() + g_baseOffset.y);
         }
 
         // No count if troop is in motion
@@ -633,7 +633,7 @@ namespace Battle
         if(hasMoat())
         {   
             const Sprite &moat = AGG::GetICN(ICN::MOATWHOL, 0);
-            display.Blit(moat, Point(moat.x(), moat.y()));
+            display.Blit(moat, Point(moat.x() + g_baseOffset.x, moat.y() + g_baseOffset.y));
         }
     }
 
