@@ -589,7 +589,6 @@ namespace Battle
             String::AddInt(str, count / 1000000), str += "M";
         Text text(str, Font::SMALL);
         tp.x += 10 - text.w() / 2;
-        tp.y -= 1;
         text.Blit(tp);
     }
 
