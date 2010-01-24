@@ -382,7 +382,7 @@ namespace Battle
             if(m_terrainObjects[i].bf == pt)
             {
                 const Sprite &spr = AGG::GetICN(m_terrainObjects[i].icn, 0);
-                display.Blit(spr, g_baseOffset.x + m_terrainObjects[i].scr.x + spr.x(), g_baseOffset.y + m_terrainObjects[i].scr.y + spr.y());
+                display.Blit(spr, m_terrainObjects[i].scr.x + spr.x(), m_terrainObjects[i].scr.y + spr.y());
                 break;
             }
     }
