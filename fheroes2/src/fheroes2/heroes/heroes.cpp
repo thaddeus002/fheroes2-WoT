@@ -295,7 +295,7 @@ Heroes::Heroes(heroes_t ht, Race::race_t rc) : killer_color(Color::GRAY), experi
 
     	case SANDYSANDY:
 	    army.Clear();
-	    //army.JoinTroop(Monster::BLACK_DRAGON, 2);
+	    army.JoinTroop(Monster::BLACK_DRAGON, 2);
     	//    army.JoinTroop(Monster::RED_DRAGON, 3);
         army.JoinTroop(Monster::GOBLIN, 50);
         army.JoinTroop(Monster::PEASANT, 50);

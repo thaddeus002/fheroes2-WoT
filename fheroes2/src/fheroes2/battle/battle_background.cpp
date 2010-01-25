@@ -259,7 +259,6 @@ namespace Battle
                       break;
               }
               cobj.bf = p;
-              cobj.scr = Bf2Scr(p);
               m_terrainObjects.push_back(cobj);
           }
     }
@@ -382,7 +381,8 @@ namespace Battle
             if(m_terrainObjects[i].bf == pt)
             {
                 const Sprite &spr = AGG::GetICN(m_terrainObjects[i].icn, 0);
-                display.Blit(spr, m_terrainObjects[i].scr.x + spr.x(), m_terrainObjects[i].scr.y + spr.y());
+                Point scr = Bf2Scr(m_terrainObjects[i].bf);
+                display.Blit(spr, scr.x + spr.x(), scr.y + spr.y());
                 break;
             }
     }

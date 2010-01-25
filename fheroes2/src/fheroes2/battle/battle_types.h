@@ -277,7 +277,7 @@ namespace Battle
             struct TerrainObject
             {
                 ICN::icn_t icn;
-                Point bf, scr;
+                Point bf;
                 bool wide;
             };
             
