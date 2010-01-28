@@ -31,6 +31,7 @@
 #include "heroes.h"
 #include "artifact.h"
 #include "selectartifactbar.h"
+#include "localclient.h"
 
 #define MAXARTIFACTLINE		7
 
@@ -255,6 +256,9 @@ bool SelectArtifactsBar::QueueEventProcessing(SelectArtifactsBar & bar)
 	    {
 	    	std::swap(art1, art2);
 		change = true;
+#ifdef WITH_NET
+	    	FH2LocalClient::SendHeroesSwapArtifacts(bar.hero, index1, bar.hero, index2);
+#endif
 	    }
 
 	    bar.Reset();
@@ -323,14 +327,21 @@ bool SelectArtifactsBar::QueueEventProcessing(SelectArtifactsBar & bar1, SelectA
 	// left click
 	if(le.MouseClickLeft(bar2.GetArea()))
 	{
-	    if(art1 != Artifact::MAGIC_BOOK && art2 != Artifact::MAGIC_BOOK) std::swap(art1, art2);
-	    change = true;
+	    if(art1 != Artifact::MAGIC_BOOK && art2 != Artifact::MAGIC_BOOK)
+	    {
+		std::swap(art1, art2);
+		change = true;
 
-	    bar1.Reset();
-	    bar2.Reset();
+#ifdef WITH_NET
+	    	FH2LocalClient::SendHeroesSwapArtifacts(bar1.hero, index2, bar2.hero, index1);
+#endif
 
-	    bar1.Redraw();
-	    bar2.Redraw();
+		bar1.Reset();
+		bar2.Reset();
+
+		bar1.Redraw();
+		bar2.Redraw();
+	    }
 	}
 	else
 	// press right
@@ -368,14 +379,21 @@ bool SelectArtifactsBar::QueueEventProcessing(SelectArtifactsBar & bar1, SelectA
 	// left click
 	if(le.MouseClickLeft(bar1.GetArea()))
 	{
-	    if(art1 != Artifact::MAGIC_BOOK && art2 != Artifact::MAGIC_BOOK) std::swap(art1, art2);
-	    change = true;
+	    if(art1 != Artifact::MAGIC_BOOK && art2 != Artifact::MAGIC_BOOK)
+	    {
+		std::swap(art1, art2);
+		change = true;
 
-	    bar1.Reset();
-	    bar2.Reset();
+#ifdef WITH_NET
+	    	FH2LocalClient::SendHeroesSwapArtifacts(bar1.hero, index1, bar2.hero, index2);
+#endif
 
-	    bar1.Redraw();
-	    bar2.Redraw();
+		bar1.Reset();
+		bar2.Reset();
+
+		bar1.Redraw();
+		bar2.Redraw();
+	    }
 	}
 	else
 	// press right

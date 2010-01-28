@@ -31,7 +31,7 @@
 #include "client.h"
 #include "maps_fileinfo.h"
 
-typedef std::pair<Network::Message, u32> MessageID;
+typedef std::pair<QueueMessage, u32> MessageID;
 class FH2RemoteClient;
 class Kingdom;
 class Heroes;
@@ -66,6 +66,24 @@ enum msg_t
         MSG_YOUR_TURN,
         MSG_END_TURN,
 
+        MSG_CASTLE_BUILD,
+        MSG_CASTLE_RECRUIT_HERO,
+        MSG_CASTLE_BUY_BOAT,
+        MSG_CASTLE_RECRUIT_MONSTER,
+
+	MSG_MARKET_SELL_RESOURCE,
+	MSG_MARKET_BUY_RESOURCE,
+
+	MSG_HEROES_BUY_MAGICBOOK,
+	MSG_HEROES_SWAP_ARTIFACTS,
+
+	MSG_ARMY_UPGRADE_TROOP,
+	MSG_ARMY_DISMISS_TROOP,
+	MSG_ARMY_SWAP_TROOPS,
+	MSG_ARMY_JOIN_TROOP,
+	MSG_ARMY_SPLIT_TROOP,
+	MSG_ARMY_COMBAT_FORMATION,
+
         MSG_TILES,
         MSG_HEROES,
         MSG_CASTLE,
@@ -84,24 +102,24 @@ namespace Network
     msg_t		GetMsg(u16);
     bool		MsgIsBroadcast(u16);
 
-    void		PacketPopMapsFileInfoList(Network::Message &, MapsFileInfoList &);
-    void		PacketPushMapsFileInfo(Network::Message &, const Maps::FileInfo &);
-    void		PacketPopMapsFileInfo(Network::Message &, Maps::FileInfo &);
-    void		PacketPushPlayersInfo(Network::Message &, const std::vector<FH2RemoteClient> &, u32 exclude = 0);
+    void		PacketPopMapsFileInfoList(QueueMessage &, MapsFileInfoList &);
+    void		PacketPushMapsFileInfo(QueueMessage &, const Maps::FileInfo &);
+    void		PacketPopMapsFileInfo(QueueMessage &, Maps::FileInfo &);
+    void		PacketPushPlayersInfo(QueueMessage &, const std::vector<FH2RemoteClient> &, u32 exclude = 0);
 
     u8			GetPlayersColors(const std::vector<FH2RemoteClient> &);
     
-    void		PackKingdom(Network::Message &, const Kingdom &);
-    void		UnpackKingdom(Network::Message &);
+    void		PackKingdom(QueueMessage &, const Kingdom &);
+    void		UnpackKingdom(QueueMessage &);
 
-    void		PackTile(Network::Message &, const Maps::Tiles &);
-    void		UnpackTile(Network::Message &);
+    void		PackTile(QueueMessage &, const Maps::Tiles &);
+    void		UnpackTile(QueueMessage &);
 
-    void		PackHero(Network::Message &, const Heroes &);
-    void		UnpackHero(Network::Message &);
+    void		PackHero(QueueMessage &, const Heroes &);
+    void		UnpackHero(QueueMessage &);
 
-    void		PackCastle(Network::Message &, const Castle &);
-    void		UnpackCastle(Network::Message &);
+    void		PackCastle(QueueMessage &, const Castle &);
+    void		UnpackCastle(QueueMessage &);
 };
 
 #endif

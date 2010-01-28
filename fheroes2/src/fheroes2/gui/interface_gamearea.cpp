@@ -497,7 +497,7 @@ void RedrawClopOrClofSpriteFog(const u16 dst_index, const Point & dst)
     }
 }
 
-void Interface::GameArea::GenerateUltimateArtifactAreaSurface(const u16 index, Surface & sf)
+void Interface::GameArea::GenerateUltimateArtifactAreaSurface(const u16 index, Sprite & sf)
 {
     if(Settings::Get().NoGUI()) return;
 
@@ -533,11 +533,7 @@ void Interface::GameArea::GenerateUltimateArtifactAreaSurface(const u16 index, S
 	Settings::Get().EvilInterface() ? sf.GrayScale() : sf.Sepia();
 
 	if(Settings::Get().PocketPC())
-	{
-    	    Surface sf2;
-    	    Surface::ScaleMinifyByTwo(sf2, sf);
-    	    Surface::Swap(sf, sf2);
-	}
+    	    sf.ScaleMinifyByTwo();
     }
     else
     DEBUG(DBG_ENGINE , DBG_WARN, "Interface::GameArea::GenerateUltimateArtifactAreaSurface: artifact not found");

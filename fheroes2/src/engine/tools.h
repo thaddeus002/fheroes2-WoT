@@ -44,8 +44,10 @@ namespace String
     // from SDL_ttf
     void UTF8_to_UNICODE(u16 *unicode, const char *utf8, int len);
     void UNICODE_to_UTF8(std::string & utf8, const u16 *unicode, size_t len);
-    
+
 };
+
+int Sign(int);
 
 const char* GetDirname(const char *);
 const char* GetBasename(const char *);

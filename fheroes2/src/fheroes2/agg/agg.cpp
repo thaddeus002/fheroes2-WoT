@@ -438,6 +438,7 @@ void AGG::Cache::LoadOrgICN(Sprite & sp, const ICN::icn_t icn, const u16 index, 
 	sp.SetOffset(header1.OffsetX(), header1.OffsetY());
 	sp.SetColorKey();
 	Sprite::DrawICN(sp, &body[6 + header1.OffsetData()], size_data, reflect);
+	Sprite::AddonExtensionModify(sp, icn, index);
     }
     else
 	Error::Except("AGG::Cache::LoadOrgICN: ReadChunk: ", ICN::GetString(icn));
@@ -507,7 +508,7 @@ void AGG::Cache::LoadICN(const ICN::icn_t icn, u16 index, bool reflect)
     {
 	Sprite & sp = reflect ? v.reflect[index] : v.sprites[index];
 	sp.ScaleMinifyByTwo();
-	sp.SetDisplayFormat();
+	//sp.SetDisplayFormat();
     }
 
     // registry icn
@@ -679,9 +680,9 @@ void AGG::Cache::LoadPAL(void)
 
 void AGG::Cache::LoadFNT(void)
 {
+#ifdef WITH_TTF
     const Settings & conf = Settings::Get();
 
-#ifdef WITH_TTF
     if(conf.Unicode())
     {
 	if(fnt_cache.size()) return;
@@ -801,9 +802,7 @@ const Sprite & AGG::Cache::GetICN(const ICN::icn_t icn, u16 index, bool reflect)
 /* return count of sprites from specific ICN */
 int AGG::Cache::GetICNCount(const ICN::icn_t icn)
 {
-    icn_cache_t & v = icn_cache[icn];
-    if(icn != ICN::UNKNOWN && v.count == 0)
-        LoadICN(icn, 0, false);
+    if(icn_cache[icn].count == 0) AGG::GetICN(icn, 0);
     return icn_cache[icn].count;
 }
 
@@ -921,7 +920,7 @@ void AGG::Cache::ICNRegistryFreeObjects(void)
 {
     std::vector<ICN::icn_t>::const_iterator it1 = icn_registry.begin();
     std::vector<ICN::icn_t>::const_iterator it2 = icn_registry.end();
-    for(; it1 != it2; ++it1) FreeICN(*it1);
+    for(; it1 != it2; ++it1) if(!ICN::SkipRegistryFree(*it1)) FreeICN(*it1);
 }
 
 void AGG::Cache::Dump(void) const
@@ -1157,8 +1156,8 @@ void AGG::PlayMusic(const MUS::mus_t mus, bool loop)
 
     if(conf.Modes(Settings::MUSIC_EXT))
     {
-#ifdef WITH_MIXER
 	const std::string musname(conf.LocalPrefix() + SEPARATOR + "files" + SEPARATOR + "music" + SEPARATOR + MUS::GetString(mus));
+#ifdef WITH_MIXER
 	std::string shortname(conf.LocalPrefix() + SEPARATOR + "files" + SEPARATOR + "music" + SEPARATOR + MUS::GetString(mus, true));
 	const char* filename = NULL;
 
@@ -1175,12 +1174,11 @@ void AGG::PlayMusic(const MUS::mus_t mus, bool loop)
 
 	if(filename) Music::Play(filename, loop);
 #else
-	const std::string file = conf.LocalPrefix() + SEPARATOR + "files" + SEPARATOR + "music" + SEPARATOR + MUS::GetString(mus);
-	if(FilePresent(file) && conf.PlayMusCommand().size())
+	if(FilePresent(musname) && conf.PlayMusCommand().size())
 	{
-	    const std::string run = conf.PlayMusCommand() + " " + file;
+	    const std::string run = conf.PlayMusCommand() + " " + musname;
 	    Music::Play(run.c_str(), loop);
-	}	    
+	}
 #endif
 	DEBUG(DBG_ENGINE , DBG_INFO, "AGG::PlayMusic: " << MUS::GetString(mus));
     }

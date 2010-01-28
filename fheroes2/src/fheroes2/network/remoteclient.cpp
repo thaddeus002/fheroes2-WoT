@@ -59,7 +59,7 @@ void FH2RemoteClient::ShutdownThread(void)
     {
         packet.Reset();
 	packet.SetID(MSG_SHUTDOWN);
-	packet.Send(*this);
+	Network::SendMessage(*this, packet);
         Close();
     }
     SetModes(0);
@@ -312,7 +312,7 @@ void FH2RemoteClient::MsgPing(void)
     DEBUG(DBG_NETWORK , DBG_INFO, "FH2RemoteClient::MsgPing:");
     packet.Reset();
     packet.SetID(MSG_PING);
-    packet.Send(*this);
+    Network::SendMessage(*this, packet);
 }
 
 void FH2RemoteClient::MsgLogout(void)

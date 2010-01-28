@@ -20,6 +20,7 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
+#include <cmath>
 #include "agg.h"
 #include "settings.h"
 #include "heroes.h"
@@ -915,8 +916,8 @@ namespace ICN
 	{ UNKNOWN,	"UNKNOWN.ICN" },
     };
 
-    u8 missile9(double, double);
-    u8 missile7(double, double);
+    u8 missile9(float, float);
+    u8 missile7(float, float);
 };
 
 const char* ICN::GetString(const icn_t icn)
@@ -1043,6 +1044,9 @@ u16 ICN::AnimationFrame(const icn_t icn, const u16 start, const u32 ticket, cons
 	case CMBTLOS1:	return 1 + ticket % 30;
 	case CMBTLOS2:	return 1 + ticket % 29;
 	case CMBTLOS3:	return 1 + ticket % 22;
+	case CMBTFLE1:	return 1 + ticket % 43;
+	case CMBTFLE2:	return 1 + ticket % 26;
+	case CMBTFLE3:	return 1 + ticket % 25;
 	case CMBTSURR:	return 1 + ticket % 20;
 
 	case WINCMBT:	return 1 + ticket % 20;
@@ -1623,6 +1627,7 @@ ICN::icn_t ICN::PORTxxxx(u8 id)
     return ICN::UNKNOWN;
 }
 
+#ifdef WITH_BATTLE1
 ICN::icn_t ICN::PreImpactFromSpell(u8 spell)
 {
     switch(spell)
@@ -1674,13 +1679,14 @@ ICN::icn_t ICN::ImpactFromSpell(u8 spell)
         case Spell::DRAGONSLAYER:	return DRAGSLAY;
         case Spell::SHIELD:		return SHIELD;
         case Spell::MASSSHIELD:		return SHIELD;
-        case Spell::BERZERKER:      return BERZERK;
+        case Spell::BERSERKER:      return BERZERK;
 
 	default: break;
     }
 
     return UNKNOWN;
 }
+#endif
 
 bool ICN::NeedMinify4PocketPC(icn_t icn, u16 index)
 {
@@ -1690,10 +1696,152 @@ bool ICN::NeedMinify4PocketPC(icn_t icn, u16 index)
 	case HSBKG:
 	case BOOK:
 	case STONEBAK:
+	// battle
+	case CBKGDSRT:
+	case CBKGSNTR:
+	case CBKGSNMT:
+	case CBKGSWMP:
+	case CBKGCRCK:
+	case CBKGBEAC:
+	case CBKGLAVA:
+	case CBKGDITR:
+	case CBKGDIMT:
+	case CBKGGRTR:
+	case CBKGGRMT:
+	case CBKGWATR:
+	case CBKGGRAV:
+
+	// missile
+        case ARCH_MSL:
+        case ORC__MSL:
+        case TROLLMSL:
+        case ELF__MSL:
+        case DRUIDMSL:
+        case HALFLMSL:
+        case TITANMSL:
+        case LICH_MSL:
+	case LICHCLOD:
+	case KEEP:
+
+	//catapult
+	case BOULDER:
+	case CATAPULT:
+	case SMALCLOD:
+
+	// spells
+        case FIREBALL:
+        case FIREBAL2:
+        case SPARKS:
+        case MAGIC01:
+        case HASTE:
+        case MAGIC02:
+        case BLIND:
+        case BLESS:
+        case STONSKIN:
+        case STELSKIN:
+        case CURSE:
+        case MAGIC06:
+        case MAGIC07:
+        case STORM:
+        case METEOR:
+        case PARALYZE:
+        case HYPNOTIZ:
+        case ICECLOUD:
+        case COLDRING:
+        case REDDEATH:
+        case DRAGSLAY:
+        case SHIELD:
+        case BERZERK:
+        case COLDRAY:
+        case DISRRAY:
+	case MORALEG:
+	case MORALEB:
+
+	// castle
+        case CASTBKGB:
+        case CASTBKGK:
+        case CASTBKGN:
+        case CASTBKGS:
+        case CASTBKGW:
+        case CASTBKGZ:
+        case CASTLEB:
+        case CASTLEK:
+        case CASTLEN:
+        case CASTLES:
+        case CASTLEW:
+        case CASTLEZ:
+	case MOATWHOL:
+
+	// objects
+	case COVR0001:
+	case COVR0002:
+	case COVR0003:
+	case COVR0004:
+	case COVR0005:
+	case COVR0006:
+	case COVR0007:
+	case COVR0008:
+	case COVR0009:
+	case COVR0010:
+	case COVR0011:
+	case COVR0012:
+	case COVR0013:
+	case COVR0014:
+	case COVR0015:
+	case COVR0016:
+	case COVR0017:
+	case COVR0018:
+	case COVR0019:
+	case COVR0020:
+	case COVR0021:
+	case COVR0022:
+	case COVR0023:
+	case COVR0024:
+
+	case COBJ0000:
+	case COBJ0001:
+	case COBJ0002:
+	case COBJ0003:
+	case COBJ0004:
+	case COBJ0005:
+	case COBJ0006:
+	case COBJ0007:
+	case COBJ0008:
+	case COBJ0009:
+	case COBJ0010:
+	case COBJ0011:
+	case COBJ0012:
+	case COBJ0013:
+	case COBJ0014:
+	case COBJ0015:
+	case COBJ0016:
+	case COBJ0017:
+	case COBJ0018:
+	case COBJ0019:
+	case COBJ0020:
+	case COBJ0021:
+	case COBJ0022:
+	case COBJ0023:
+	case COBJ0024:
+	case COBJ0025:
+	case COBJ0026:
+	case COBJ0027:
+	case COBJ0028:
+	case COBJ0029:
+	case COBJ0030:
+	case COBJ0031:
+
 	    return true;
+
+	case TEXTBAR:
+	    if(index < 10) return true;
+	    break;
 
 	default: break;
     }
+
+    if(isBattleMonsterICN(icn)) return true;
+
     return false;
 }
 
@@ -1719,13 +1867,13 @@ bool ICN::SkipBottomForRedrawHeroes(icn_t icn, u16 index)
     return false;
 }
 
-u8 ICN::missile9(double dx, double dy)
+u8 ICN::missile9(float dx, float dy)
 {
-    if(0 == dx)		return dy > 0 ? 0 : 9;
+    if(0 == dx)		return dy > 0 ? 0 : 8;
     else
     if(0 == dy)		return 4;
 
-    double tan = dy / dx;
+    const float tan = std::fabs(dy / dx);
 
     // tan 30: 0 - 30
     if(0.577 >= tan)	return dy > 0 ? 3 : 5;
@@ -1737,22 +1885,22 @@ u8 ICN::missile9(double dx, double dy)
     return dy > 0 ? 2 : 6;
 }
 
-u8 ICN::missile7(double dx, double dy)
+u8 ICN::missile7(float dx, float dy)
 {
     if(0 == dx)		return dy > 0 ? 0 : 6;
     else
     if(0 == dy)		return 3;
 
-    double tan = dy / dx;
+    const float tan = std::fabs(dy / dx);
 
     // tan 45: 0 - 45
-    if(1 >= tan)	return dx > 0 ? 2 : 4;
+    if(1 >= tan)	return dy > 0 ? 2 : 4;
 
     // 45 - 90
-    return dx > 0 ? 1 : 5;
+    return dy > 0 ? 1 : 5;
 }
 
-u8 ICN::GetMissIndex(icn_t icn, double dx, double dy)
+u8 ICN::GetMissIndex(icn_t icn, s16 dx, s16 dy)
 {
     switch(icn)
     {
@@ -1789,5 +1937,98 @@ bool ICN::isModifiedSprite(const ICN::icn_t icn)
 
 	default: break;
     }
+    return false;
+}
+
+bool ICN::isBattleMonsterICN(u16 icn)
+{
+    switch(icn)
+    {
+	case PEASANT:
+	case ARCHER:
+	case ARCHER2:
+	case PIKEMAN:
+	case PIKEMAN2:
+	case SWORDSMN:
+	case SWORDSM2:
+	case CAVALRYR:
+	case CAVALRYB:
+	case PALADIN:
+	case PALADIN2:
+	case GOBLIN:
+	case ORC:
+	case ORC2:
+	case WOLF:
+	case OGRE:
+	case OGRE2:
+	case TROLL:
+	case TROLL2:
+	case CYCLOPS:
+	case SPRITE:
+	case DWARF:
+	case DWARF2:
+	case ELF:
+	case ELF2:
+	case DRUID:
+	case DRUID2:
+	case UNICORN:
+	case PHOENIX:
+	case CENTAUR:
+	case GARGOYLE:
+	case GRIFFIN:
+	case MINOTAUR:
+	case MINOTAU2:
+	case HYDRA:
+	case DRAGGREE:
+	case DRAGRED:
+	case DRAGBLAK:
+	case HALFLING:
+	case BOAR:
+	case GOLEM:
+	case GOLEM2:
+	case ROC:
+	case MAGE1:
+	case MAGE2:
+	case TITANBLU:
+	case TITANBLA:
+	case SKELETON:
+	case ZOMBIE:
+	case ZOMBIE2:
+	case MUMMYW:
+	case MUMMY2:
+	case VAMPIRE:
+	case VAMPIRE2:
+	case LICH:
+	case LICH2:
+	case DRAGBONE:
+	case ROGUE:
+	case NOMAD:
+	case GHOST:
+	case GENIE:
+	case MEDUSA:
+	case EELEM:
+	case AELEM:
+	case FELEM:
+	case WELEM:
+	    return true;
+
+	default: break;
+    }
+
+    return false;
+}
+
+bool ICN::SkipRegistryFree(ICN::icn_t icn)
+{
+    switch(icn)
+    {
+	case SPELCO:
+	case CMSECO:
+	case ADVMCO:
+	    return true;
+
+	default: break;
+    }
+
     return false;
 }

@@ -20,6 +20,8 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
+#ifdef WITH_BATTLE1
+
 #include <cassert>
 #include <cmath>
 #include <algorithm>
@@ -1704,7 +1706,7 @@ bool Battle::BattleControl::PerformAttack(TroopIndex troopN, const Point &attack
     {
         PointList affected;
         affected.push_back(targets[0]->Position());
-        PerformMagic(affected, NULL, Spell::TroopAttack(myTroop()));
+        PerformMagic(affected, NULL, SpellTroopAttack(myTroop()));
     }
     
     return retaliate;
@@ -1734,7 +1736,7 @@ bool Battle::BattleControl::PerformMagic(PointList &affected_points, HeroBase *h
     if(hero && !IS_DEVEL())
     {
         hero->SetModes(Heroes::SPELLCASTED);
-        hero->SetSpellPoints(hero->GetSpellPoints() - Spell::Mana(spell));
+        hero->SetSpellPoints(hero->GetSpellPoints() - Spell::CostManaPoints(spell));
     }
 
     std::vector<Army::BattleTroop*> affected;
@@ -1781,7 +1783,7 @@ bool Battle::BattleControl::PerformMagic(PointList &affected_points, HeroBase *h
             targetAffected = result;
     }
 
-    if(Spell::Target(spell) == Spell::ONEENEMY && targetAffected)
+    if(SpellTarget(spell) == ONEENEMY && targetAffected)
     {
         std::string str = _("The %{monster} resist the spell!"); //todo: plurals
         std::string name = affected[0]->GetName();
@@ -1944,23 +1946,23 @@ namespace Battle
     bool BattleTurn::MagicSelectTarget(PointList &targets, Spell::spell_t &spell)
     {
         targets.clear();
-        Spell::target_t target = Spell::Target(spell);
+        u8 target = SpellTarget(spell);
         switch(target)
         {
-            case Spell::FREECELL:
+            case FREECELL:
                 return true;
                 
-            case Spell::ONEENEMY:
-            case Spell::ALLENEMY:
-            case Spell::ONEFRIEND:
-            case Spell::ALLFRIEND:
+            case ONEENEMY:
+            case ALLENEMY:
+            case ONEFRIEND:
+            case ALLFRIEND:
             {
-                Army::BattleArmy_t &army = (target == Spell::ONEENEMY || target == Spell::ALLENEMY) ? *m_oppArmy : *m_ownArmy;
+                Army::BattleArmy_t &army = (target == ONEENEMY || target == ALLENEMY) ? *m_oppArmy : *m_ownArmy;
                 for(u16 i = 0; i < army.size(); i++) {
                     Army::BattleTroop &troop = army[i];
                     if(troop.isValid() && Battle::AllowSpell(spell, troop))
                     {
-                        if(target == Spell::ONEENEMY || target == Spell::ONEFRIEND)
+                        if(target == ONEENEMY || target == ONEFRIEND)
                             return true;
                         else
                             targets.push_back(troop.Position());
@@ -1969,9 +1971,9 @@ namespace Battle
                 return false;
             }
                 
-            case Spell::ALLLIVE:
-            case Spell::ALLDEAD:
-            case Spell::ALL:
+            case ALLLIVE:
+            case ALLDEAD:
+            case ALL:
             {
                 Army::BattleArmy_t *armies[2] = { m_ownArmy, m_oppArmy };
                 for(u16 j = 0; j < 2; j++)
@@ -1983,7 +1985,7 @@ namespace Battle
                 return false;
             }
                 
-            case Spell::NOTARGET:
+            case NOTARGET:
                 return false;
         }
         return false;
@@ -2107,13 +2109,13 @@ namespace Battle
                         m_gui->Status(str, true);
                         m_gui->Redraw();
                         Point p1 = Bf2ScrNoOffset(m_movePoints[mp]), p2 = Bf2ScrNoOffset(cur_pt);
-                        if(p1.x > p2.x && p1.y > p2.y) cursor.SetThemes(cursor.SWORD_TOPRIGHT);
-                        else if(p1.x < p2.x && p1.y > p2.y) cursor.SetThemes(cursor.SWORD_TOPLEFT);
-                        else if(p1.x > p2.x && p1.y < p2.y) cursor.SetThemes(cursor.SWORD_BOTTOMRIGHT);
-                        else if(p1.x < p2.x && p1.y < p2.y) cursor.SetThemes(cursor.SWORD_BOTTOMLEFT);
-                        else if(p1.x > p2.x) cursor.SetThemes(cursor.SWORD_RIGHT);
-                        else if(p1.x < p2.x) cursor.SetThemes(cursor.SWORD_LEFT);
-                        //cursor.SetThemes(cursor.SWORD_TOPLEFT); // TODO
+                        if(p1.x > p2.x && p1.y > p2.y) cursor.SetThemes(cursor.SWORD_TOPLEFT);
+                        else if(p1.x < p2.x && p1.y > p2.y) cursor.SetThemes(cursor.SWORD_TOPRIGHT);
+                        else if(p1.x > p2.x && p1.y < p2.y) cursor.SetThemes(cursor.SWORD_BOTTOMLEFT);
+                        else if(p1.x < p2.x && p1.y < p2.y) cursor.SetThemes(cursor.SWORD_BOTTOMRIGHT);
+                        else if(p1.x > p2.x) cursor.SetThemes(cursor.SWORD_LEFT);
+                        else if(p1.x < p2.x) cursor.SetThemes(cursor.SWORD_RIGHT);
+                        //cursor.SetThemes(cursor.SWORD_TOPRIGHT); // TODO
                         if(click) {
                             move = m_movePoints[mp];
                             attack = cur_pt;
@@ -2143,7 +2145,7 @@ namespace Battle
 		    {
                         if(myTroop.isFly())
 			{
-			    cursor.SetThemes(cursor.WAR_FLIGHT);
+			    cursor.SetThemes(cursor.WAR_FLY);
                     	    str = _("Fly %{name} here.");
 			}
                         else
@@ -2190,9 +2192,9 @@ namespace Battle
             return targets.size() != 0;
         
         Army::BattleArmy_t *targetArmy = NULL;
-        if(Spell::Target(spell) == Spell::ONEFRIEND)
+        if(SpellTarget(spell) == ONEFRIEND)
             targetArmy = m_ownArmy;
-        else if(Spell::Target(spell) == Spell::ONEENEMY)
+        else if(SpellTarget(spell) == ONEENEMY)
             targetArmy = m_oppArmy;
 
         m_battlefield->Redraw();
@@ -2211,27 +2213,27 @@ namespace Battle
                 && /*Spell::AllowSpell(spell, (*targetArmy)[t])*/
                    Battle::isTroopAffectedBySpell(spell, (*targetArmy)[t], true))
                 {
-                    cursor.SetThemes((Cursor::themes_t)(cursor.SPELLNONE + Spell::IndexSprite(spell)));
+                    cursor.SetThemes((Cursor::themes_t)(cursor.SP_NONE + Spell::IndexSprite(spell)));
                     if(le.MouseClickLeft(Rect(0, 0, display.w(), display.h())))
                     {
                         targets.push_back((*targetArmy)[t].Position());
                         break;
                     }
-                } else cursor.SetThemes(cursor.SPELLNONE);
+                } else cursor.SetThemes(cursor.SP_NONE);
             }
-            else if(Spell::Target(spell) == Spell::FREECELL)
+            else if(SpellTarget(spell) == FREECELL)
             {
                 if(m_battlefield->CellFree(cur_pt)) {
-                    cursor.SetThemes((Cursor::themes_t)(cursor.SPELLNONE + Spell::IndexSprite(spell)));
+                    cursor.SetThemes((Cursor::themes_t)(cursor.SP_NONE + Spell::IndexSprite(spell)));
                     if(le.MouseClickLeft(Rect(0, 0, display.w(), display.h())))
                     {
                         targets.push_back(cur_pt);
                         break;
                     }
                 } else 
-                    cursor.SetThemes(cursor.SPELLNONE);
+                    cursor.SetThemes(cursor.SP_NONE);
             } else {
-                cursor.SetThemes(cursor.SPELLNONE);
+                cursor.SetThemes(cursor.SP_NONE);
             }
             // exit
             if(le.KeyPress(KEY_ESCAPE) ||
@@ -3194,7 +3196,7 @@ namespace Battle
             mouseActive = true;
         } else if(le.MouseCursor(troopN >= 0 ? battlefield.GetHeroRect(0) : battlefield.GetHeroRect(1))) {
             m_statusBar[1]->ShowMessage(_("Hero's Options"));
-            cursor.SetThemes(cursor.WAR_HELMET);
+            cursor.SetThemes(cursor.WAR_HERO);
             mouseActive = true;
         } else if(le.MouseCursor(troopN >= 0 ? battlefield.GetHeroRect(1) : battlefield.GetHeroRect(0))) {
             m_statusBar[1]->ShowMessage(_("View Opposing Hero"));
@@ -3211,3 +3213,5 @@ namespace Battle
         return NONE;
     }
 }
+
+#endif

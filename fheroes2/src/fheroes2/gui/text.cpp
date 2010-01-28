@@ -53,6 +53,11 @@ void TextAscii::Clear(void)
     message.clear();
 }
 
+size_t TextAscii::Size(void) const
+{
+    return message.size();
+}
+
 u8 TextAscii::CharWidth(char c, Font::type_t f)
 {
     return (c < 0x21 ? (Font::SMALL == f || Font::YELLOW_SMALL == f ? 4 : 6) : AGG::GetLetter(c, f).w());
@@ -240,6 +245,11 @@ void TextUnicode::SetFont(const Font::type_t & ft)
 void TextUnicode::Clear(void)
 {
     message.clear();
+}
+
+size_t TextUnicode::Size(void) const
+{
+    return message.size();
 }
 
 u8 TextUnicode::CharWidth(u16 c, Font::type_t f)
@@ -449,6 +459,11 @@ void Text::Clear(void)
     message->Clear();
     gw = 0;
     gh = 0;
+}
+
+size_t Text::Size(void) const
+{
+    return message->Size();
 }
 
 void Text::Blit(const Point & dst_pt, Surface & dst) const

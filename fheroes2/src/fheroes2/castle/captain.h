@@ -45,6 +45,7 @@ class Captain : public HeroBase
     Color::color_t GetColor(void) const;
     const std::string & GetName(void) const;
     u8 GetType(void) const;
+    u8 GetControl(void) const;
     u16 GetSpellPoints(void) const;
     const SpellBook & GetSpellBook(void) const;
     SpellBook & GetSpellBook(void);
@@ -55,9 +56,11 @@ class Captain : public HeroBase
     bool HasArtifact(const Artifact::artifact_t) const;
     BagArtifacts & GetBagArtifacts(void);
     const BagArtifacts & GetBagArtifacts(void) const;
-    void TakeArtifacts(Heroes &);
     u16 GetMaxSpellPoints(void) const;
     void SetSpellPoints(const u16 point);
+    u16 GetIndex(void) const;
+
+    bool CanBattleRetreat(void) const;
 
   private:
     const Castle & home;

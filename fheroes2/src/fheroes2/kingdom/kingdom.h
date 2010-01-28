@@ -52,7 +52,7 @@ public:
     void ResetModes(flags_t);
     bool Modes(flags_t) const;
 
-    Game::control_t Control() const{ return control; };
+    Game::control_t Control(void) const{ return control; };
     void SetControl(const Game::control_t con) { control = con; };
     void UpdateStartingResource(void);
     bool isPlay(void) const{ return Modes(PLAY); };
@@ -79,6 +79,7 @@ public:
     u8 GetCountMarketplace(void) const;
     u8 GetCountCapital(void) const;
     u8 GetLostTownDays(void) const;
+    u8 GetCountNecromancyShrineBuild(void) const;
 
     Recruits & GetRecruits(void);
 

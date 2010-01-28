@@ -261,6 +261,11 @@ void String::AppendKey(std::string & res, KeySym sym, u16 mod)
     }
 }
 
+int Sign(int s)
+{
+    return (s < 0 ? -1 : (s > 0 ? 1 : 0));
+}
+
 #ifdef __WIN32__ /* SDL_platform.h */
 const char *GetDirname(const char *path)
 {

@@ -39,6 +39,7 @@
 #include "statusbar.h"
 #include "selectartifactbar.h"
 #include "pocketpc.h"
+#include "localclient.h"
 
 /* readonly: false, fade: false */
 Dialog::answer_t Heroes::OpenDialog(bool readonly, bool fade)
@@ -157,6 +158,7 @@ Dialog::answer_t Heroes::OpenDialog(bool readonly, bool fade)
     luckIndicator.Redraw();
 
     // army format spread
+    const bool combat_format = (Army::FORMAT_SPREAD == army.GetCombatFormat());
     dst_pt.x = cur_pt.x + 515;
     dst_pt.y = cur_pt.y + 63;
     const Sprite & sprite1 = AGG::GetICN(ICN::HSICONS, 9);
@@ -177,8 +179,8 @@ Dialog::answer_t Heroes::OpenDialog(bool readonly, bool fade)
     const Point army2_pt(dst_pt.x - 1, dst_pt.y - 1);
 
     // cursor format
-    SpriteCursor cursorFormat(AGG::GetICN(ICN::HSICONS, 11), Modes(ARMYSPREAD) ? army1_pt : army2_pt);
-    cursorFormat.Show(Modes(ARMYSPREAD) ? army1_pt : army2_pt);
+    SpriteCursor cursorFormat(AGG::GetICN(ICN::HSICONS, 11), combat_format ? army1_pt : army2_pt);
+    cursorFormat.Show(combat_format ? army1_pt : army2_pt);
 
     // experience
     ExperienceIndicator experienceInfo(*this);
@@ -363,22 +365,28 @@ Dialog::answer_t Heroes::OpenDialog(bool readonly, bool fade)
         else
         if(le.MouseClickLeft(rectKnowledgeSkill)) Dialog::Message(_("Knowledge"), _("Your knowledge determines how many spell points your hero may have. Under normal cirumstances, a hero is limited to 10 spell points per level of knowledge."), Font::BIG, Dialog::OK);
 	else
-        if(!readonly && le.MouseClickLeft(rectSpreadArmyFormat) && !Modes(ARMYSPREAD))
+        if(!readonly && le.MouseClickLeft(rectSpreadArmyFormat) && !combat_format)
         {
 	    cursor.Hide();
 	    cursorFormat.Move(army1_pt);
 	    cursor.Show();
 	    display.Flip();
-    	    SetModes(ARMYSPREAD);
+    	    army.SetCombatFormat(Army::FORMAT_SPREAD);
+#ifdef WITH_NET
+            FH2LocalClient::SendArmyCombatFormation(army);
+#endif
         }
 	else
-        if(!readonly && le.MouseClickLeft(rectGroupedArmyFormat) && Modes(ARMYSPREAD))
+        if(!readonly && le.MouseClickLeft(rectGroupedArmyFormat) && combat_format)
         {
 	    cursor.Hide();
 	    cursorFormat.Move(army2_pt);
 	    cursor.Show();
 	    display.Flip();
-    	    ResetModes(ARMYSPREAD);
+    	    army.SetCombatFormat(Army::FORMAT_GROUPED);
+#ifdef WITH_NET
+            FH2LocalClient::SendArmyCombatFormation(army);
+#endif
         }
 
 	if(le.MouseCursor(secskill_bar.GetArea())) secskill_bar.QueueEventProcessing();

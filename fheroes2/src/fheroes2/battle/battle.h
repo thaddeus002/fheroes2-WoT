@@ -21,6 +21,13 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
+namespace Army
+{    
+    typedef enum { WIN, LOSE, RETREAT, SURRENDER, NONE } battle_t;
+};
+
+#ifdef WITH_BATTLE1
+
 #ifndef BATTLE_H
 #define BATTLE_H
 
@@ -44,8 +51,6 @@ namespace Maps { class Tiles; };
 
 namespace Army
 {    
-    typedef enum { WIN, LOSE, RETREAT, SURRENDER, NONE } battle_t;
-    
     class army_t;
     class BattleTroop;
 
@@ -58,4 +63,6 @@ namespace Army
     void ArmyToBattleArmy(const army_t &, BattleArmy_t &);
     void BattleArmyToArmy(const BattleArmy_t &, army_t &);
 }
+#endif
+
 #endif

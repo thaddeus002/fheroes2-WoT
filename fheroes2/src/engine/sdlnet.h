@@ -27,50 +27,10 @@
 #include <string>
 #include "types.h"
 
-class QueueMessage
-{
-public:
-    QueueMessage();
-    QueueMessage(u16);
-    QueueMessage(const QueueMessage &);
-    ~QueueMessage();
-
-    QueueMessage & operator= (const QueueMessage &);
-
-    u16		GetID(void) const;
-    void	SetID(u16);
-
-    void	Push(u8);
-    void	Push(u16);
-    void	Push(u32);
-    void	Push(const std::string &);
-    void	Push(const char*);
-
-    bool	Pop(u8 &);
-    bool	Pop(u16 &);
-    bool	Pop(u32 &);
-    bool	Pop(std::string &);
-
-    void	Reset(void);
-    void	Reserve(size_t);
-    void	Dump(std::ostream & = std::cerr) const;
-
-    const char*	DtPt(void) const;
-    size_t      DtSz(void) const;
-
-protected:
-    void	Resize(size_t);
-    size_t	Size(void) const;
-
-    u16		type;
-    char*		data;
-    char*		itd1;
-    char*		itd2;
-    size_t		dtsz;
-};
-
 #ifdef WITH_NET
 #include "SDL_net.h"
+
+class QueueMessage;
 
 namespace Network
 {
@@ -109,16 +69,6 @@ namespace Network
 	SDLNet_SocketSet sdset;
     };
 
-    class Message : public QueueMessage
-    {
-    public:
-	Message();
-	Message(u16);
-
-	bool	Recv(const Socket &, bool = false);
-	bool	Send(const Socket &) const;
-    };
-
     class Server : public Socket
     {
     public:
@@ -126,6 +76,57 @@ namespace Network
 
 	TCPsocket	Accept(void);
     };
+
+    bool		RecvMessage(const Network::Socket &, QueueMessage &, bool = false);
+    bool		SendMessage(const Network::Socket &, const QueueMessage &);
 };
 #endif
+
+class QueueMessage
+{
+public:
+    QueueMessage();
+    QueueMessage(u16);
+    QueueMessage(const QueueMessage &);
+    ~QueueMessage();
+
+    QueueMessage & operator= (const QueueMessage &);
+
+    u16		GetID(void) const;
+    void	SetID(u16);
+
+    void	Push(u8);
+    void	Push(u16);
+    void	Push(u32);
+    void	Push(const std::string &);
+    void	Push(const char*);
+
+    bool	Pop(u8 &);
+    bool	Pop(u16 &);
+    bool	Pop(u32 &);
+    bool	Pop(std::string &);
+
+    void	SoftReset(void);
+    void	Reset(void);
+    void	Reserve(size_t);
+    void	Dump(std::ostream & = std::cerr) const;
+
+    const char*	DtPt(void) const;
+    size_t      DtSz(void) const;
+
+protected:
+#ifdef WITH_NET
+    friend bool Network::RecvMessage(const Network::Socket &, QueueMessage &, bool);
+    friend bool Network::SendMessage(const Network::Socket &, const QueueMessage &);
+#endif
+
+    void	Resize(size_t);
+    size_t	Size(void) const;
+
+    u16		type;
+    char*	data;
+    char*	itd1;
+    char*	itd2;
+    size_t	dtsz;
+};
 #endif

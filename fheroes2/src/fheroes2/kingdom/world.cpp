@@ -1660,7 +1660,7 @@ u16 World::GetNearestObject(const u16 center, const MP2::object_t obj)
 }
 
 // create boat: with option build or summon
-bool World::CreateBoat(const u16 center, bool build)
+bool World::CreateBoat(const u16 center, bool build, u16* dst)
 {
     // scan 3x3
     const s16 cx = center % world.w();
@@ -1690,6 +1690,7 @@ bool World::CreateBoat(const u16 center, bool build)
     		    {
     			world.GetTiles(boat).SetObject(MP2::OBJ_ZERO);
     			tile.SetObject(MP2::OBJ_BOAT);
+    			if(dst) *dst = tile.GetIndex();
     			return true;
     		    }
     		}

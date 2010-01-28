@@ -28,12 +28,13 @@
 #include "army.h"
 #include "selectarmybar.h"
 #include "army.h"
-#include "battle_troop.h"
+#include "battle_stats.h"
 #include "pocketpc.h"
 
-extern void DrawMonsterStats(const Point &, const Army::BattleTroop &, bool);
+extern void DrawMonsterStats(const Point &, const Army::Troop &);
+extern void DrawBattleStats(const Point &, const Battle2::Stats &);
 
-Dialog::answer_t PocketPC::DialogArmyInfo(const Army::BattleTroop & troops, u16 flags)
+Dialog::answer_t PocketPC::DialogArmyInfo(const Army::Troop & troop, u16 flags)
 {
     Cursor & cursor = Cursor::Get();
     Display & display = Display::Get();
@@ -49,31 +50,36 @@ Dialog::answer_t PocketPC::DialogArmyInfo(const Army::BattleTroop & troops, u16 
     frameborder.SetPosition((display.w() - window_w) / 2 - BORDERWIDTH, (display.h() - window_h) / 2 - BORDERWIDTH, window_w, window_h);
     frameborder.Redraw();
 
+    const Monster & mons = troop;
+    const Battle2::Stats* battle = troop.GetBattleStats();
+
     const Rect & dst_rt = frameborder.GetArea();
     const Sprite & background = AGG::GetICN(ICN::STONEBAK, 0);
     display.Blit(background, Rect(0, 0, window_w, window_h), dst_rt);
 
     // name
     Text text;
-    text.Set(troops.GetName(), Font::BIG);
+    text.Set(mons.GetName(), Font::BIG);
     text.Blit(dst_rt.x + (dst_rt.w - text.w()) / 2, dst_rt.y + 10);
 
-    const Sprite & frame = AGG::GetICN(troops.ICNMonh(), 0);
+    const Sprite & frame = AGG::GetICN(troop.ICNMonh(), 0);
     display.Blit(frame, dst_rt.x + 50 - frame.w() / 2, dst_rt.y + 145 - frame.h());
 
     std::string message;
-    String::AddInt(message, troops.Count());
+    String::AddInt(message, (battle ? battle->GetCount() : troop.GetCount()));
     text.Set(message);
     text.Blit(dst_rt.x + 50 - text.w() / 2, dst_rt.y + 150);
 
     // stats
-    DrawMonsterStats(Point(dst_rt.x + 200, dst_rt.y + 40), Army::BattleTroop(troops), Dialog::BATTLE & flags);
+    DrawMonsterStats(Point(dst_rt.x + 200, dst_rt.y + 40), troop);
+
+    if(battle)
+        DrawBattleStats(Point(dst_rt.x + 160, dst_rt.y + 160), *battle);
 
     Button buttonDismiss(dst_rt.x + dst_rt.w / 2 - 160, dst_rt.y + dst_rt.h - 30, ICN::VIEWARMY, 1, 2);
     Button buttonUpgrade(dst_rt.x + dst_rt.w / 2 - 60, dst_rt.y + dst_rt.h - 30, ICN::VIEWARMY, 5, 6);
     Button buttonExit(dst_rt.x + dst_rt.w / 2 + 60, dst_rt.y + dst_rt.h - 30, ICN::VIEWARMY, 3, 4);
 
-    const Monster & mons = troops;
     if(Dialog::READONLY & flags)
     {
         buttonDismiss.Press();

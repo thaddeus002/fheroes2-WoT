@@ -48,9 +48,7 @@ void UpdateCoordClassInfo(const Point &, std::vector<Rect> &);
 
 Game::menu_t Game::SelectScenario(void)
 {
-    Settings & conf = Settings::Get();
-    conf.SetPreferablyCountPlayers(0);
-    if(conf.PocketPC()) return PocketPC::SelectScenario();
+    if(Settings::Get().PocketPC()) return PocketPC::SelectScenario();
     return SCENARIOINFO;
 }
 

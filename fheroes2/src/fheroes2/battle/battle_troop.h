@@ -21,6 +21,8 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
+#ifdef WITH_BATTLE1
+
 #ifndef H2BATTLE_TROOPS_H
 #define H2BATTLE_TROOPS_H
 
@@ -74,7 +76,7 @@ namespace Army
         IS_MAGIC        = 0x7FFFC000,
     };
     
-    class BattleTroop : public Troop
+    class BattleTroop : public Troop, public BitModes
     {
       public:
         BattleTroop(Monster::monster_t m = Monster::UNKNOWN, u16 c = 0);
@@ -168,5 +170,7 @@ namespace Army
     void NewTurn(BattleArmy_t &);
     void LoadContours(BattleArmy_t &, bool);
 };
+
+#endif
 
 #endif

@@ -45,12 +45,12 @@ public:
     bool IsRun(void) const;
     void Lock(void);
     void Unlock(void);
-    void PushMapsFileInfoList(Network::Message &) const;
-    void PushPlayersInfo(Network::Message &, u32 exclude = 0) const;
-    void PopMapsFileInfoList(Network::Message &);
+    void PushMapsFileInfoList(QueueMessage &) const;
+    void PushPlayersInfo(QueueMessage &, u32 exclude = 0) const;
+    void PopMapsFileInfoList(QueueMessage &);
     u8 GetPlayersColors(void) const;
     void ResetPlayers(u32 first_player);
-    void SendToAllClients(const Network::Message &, u32 = 0);
+    void SendToAllClients(const QueueMessage &, u32 = 0);
 
     void SetExit(void);
     void SetStartGame(void);

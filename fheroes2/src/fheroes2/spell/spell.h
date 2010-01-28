@@ -25,12 +25,14 @@
 #include <string>
 #include "gamedefs.h"
 
+class HeroBase;
+
 class Spell
 {
 public:
     enum spell_t
     {
-	NONE,
+	NONE		= 0,
 	FIREBALL,
 	FIREBLAST,
 	LIGHTNINGBOLT,
@@ -57,7 +59,7 @@ public:
 	DISPEL,
 	MASSDISPEL,
 	ARROW,
-	BERZERKER,
+	BERSERKER,
 	ARMAGEDDON,
 	ELEMENTALSTORM,
 	METEORSHOWER,
@@ -100,25 +102,12 @@ public:
 	STONE,
     };
 
-    enum target_t
-    {
-	NOTARGET,
-	ONEFRIEND,
-	ONEENEMY,
-	ALLFRIEND,
-	ALLENEMY,
-	ALLLIVE,
-	ALLDEAD,
-	ALL,
-	//ANYCELL,
-	FREECELL
-    };
-
     Spell();
     Spell(spell_t);
+    Spell(u8);
 
-    bool operator== (spell_t) const;
-    bool operator!= (spell_t) const;
+    bool operator== (u8) const;
+    bool operator!= (u8) const;
     spell_t operator() (void) const;
     spell_t GetID(void) const;
 
@@ -127,44 +116,54 @@ public:
     const char* GetName(void) const;
     const char* GetDescription(void) const;
 
-    u8 GetMana(void) const;
+    u8 GetCostManaPoints(void) const;
     u8 GetLevel(void) const;
+    u8 GetDamage(void) const;
     bool isCombat(void) const;
-    bool isBad(void) const;
-    target_t GetTarget(void) const;
-    u8 GetPower(void) const;
-    u16 GetInflictDamage(u8) const;
+    bool isAdventure(void) const;
+    bool isDamage(void) const;
+    bool isMindInfluence(void) const;
 
     /* return index sprite spells.icn */
     u8 GetIndexSprite(void) const;
     /* return index in spellinl.icn */
     u8 GetInlIndexSprite(void) const;
 
-
     static spell_t FromInt(u8);
-    static u8 Mana(spell_t);
-    static u8 Level(spell_t);
-    static bool isCombat(spell_t);
-    static bool isBad(spell_t);
-    static target_t Target(spell_t);
-    static u8 Power(spell_t);
+    static u8 Level(u8);
+    static bool isCombat(u8);
+    static u8 Damage(u8);
+    static u8 Restore(u8);
+    static u8 Resurrect(u8);
+    static bool isDamage(u8);
+    static bool isRestore(u8);
+    static bool isResurrect(u8);
+    static bool isMindInfluence(u8);
+    static bool isUndeadOnly(u8);
+    static bool isALiveOnly(u8);
+    static bool isSummon(u8);
+
+    static bool isApplyWithoutFocusObject(u8);
+    static bool isApplyToAnyTroops(u8);
+    static bool isApplyToFriends(u8);
+    static bool isApplyToEnemies(u8);
+    static bool isMassActions(u8);
 
     /* return index sprite spells.icn */
     static u8 IndexSprite(spell_t);
     /* return index in spellinl.icn */
-    static u8 InlIndexSprite(spell_t);
+    static u8 InlIndexSprite(u8);
 
+    static u8 CostManaPoints(spell_t, const HeroBase* hero = NULL);
     static const char* GetName(spell_t);
     static const char* GetDescription(spell_t);
 
     static spell_t RandCombat(u8);
     static spell_t RandAdventure(u8);
-    static spell_t TroopAttack(u8);
-
-    static u16 InflictDamage(spell_t, u8);
 
 private:
     spell_t id;
 };
 
 #endif
+

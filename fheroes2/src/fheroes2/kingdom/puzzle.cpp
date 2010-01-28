@@ -82,17 +82,11 @@ void Puzzle::ShowMapsDialog(void) const
     Display & display = Display::Get();
     Cursor::themes_t old_cursor = cursor.Themes();
 
-    if(Settings::Get().PocketPC())
-    {
-        // wait for long operation: Sprite::ScaleMinifyByTwo
-        cursor.SetThemes(cursor.WAIT);
-        cursor.Show();
-        display.Flip();
-    }
-
     if(!Settings::Get().Modes(Settings::MUSIC_MIDI)) AGG::PlayMusic(MUS::PUZZLE);
 
     const Surface & sf = world.GetPuzzleSurface();
+
+    cursor.Hide();
 
     if(display.w() == 640 && display.h() == 480 && !Settings::Get().HideInterface())
 	ShowStandardDialog(*this, sf);

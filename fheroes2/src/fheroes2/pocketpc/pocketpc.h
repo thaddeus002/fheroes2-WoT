@@ -31,13 +31,15 @@
 namespace PocketPC
 {
     Game::menu_t	MainMenu(void);
+    Game::menu_t	NewGame(void);
+    Game::menu_t	NewMulti(void);
     Game::menu_t	SelectScenario(void);
     Game::menu_t	ScenarioInfo(void);
     Game::menu_t	LoadGame(void);
     bool		DialogSelectMapsFileList(MapsFileInfoList &, std::string &);
     Dialog::answer_t	HeroesOpenDialog(Heroes &, bool);
     Dialog::answer_t	CastleOpenDialog(Castle &);
-    Dialog::answer_t	DialogArmyInfo(const Army::BattleTroop &, u16);
+    Dialog::answer_t	DialogArmyInfo(const Army::Troop &, u16);
     void		HeroesMeeting(Heroes &, Heroes &);
 };
 

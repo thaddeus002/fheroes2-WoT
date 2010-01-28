@@ -36,6 +36,7 @@
 #include "payment.h"
 #include "buildinginfo.h"
 #include "kingdom.h"
+#include "localclient.h"
 
 void ShowBuildMessage(StatusBar & bar, bool isBuilt, const std::string & message, const Castle & castle, const u32 building)
 {
@@ -405,6 +406,8 @@ u32 Castle::OpenTown(void)
     const std::string & stringCaptain = GetStringBuilding(BUILD_CAPTAIN, race);
     RedrawInfoDwelling(dst_pt, *this, BUILD_CAPTAIN);
 
+    // combat format
+    const bool combat_format = (Army::FORMAT_SPREAD == army.GetCombatFormat());
     const Sprite & spriteSpreadArmyFormat = AGG::GetICN(ICN::HSICONS, 9);
     const Sprite & spriteGroupedArmyFormat = AGG::GetICN(ICN::HSICONS, 10);
     const Rect rectSpreadArmyFormat(cur_pt.x + 550, cur_pt.y + 220, spriteSpreadArmyFormat.w(), spriteSpreadArmyFormat.h());
@@ -413,7 +416,7 @@ u32 Castle::OpenTown(void)
     const std::string descriptionGroupedArmyFormat(_("'Grouped' combat formation bunches your army toget her in the center of your side of the battlefield."));
     const Point pointSpreadArmyFormat(rectSpreadArmyFormat.x - 1, rectSpreadArmyFormat.y - 1);
     const Point pointGroupedArmyFormat(rectGroupedArmyFormat.x - 1, rectGroupedArmyFormat.y - 1);
-    SpriteCursor cursorFormat(AGG::GetICN(ICN::HSICONS, 11), Modes(ARMYSPREAD) ? pointSpreadArmyFormat : pointGroupedArmyFormat);
+    SpriteCursor cursorFormat(AGG::GetICN(ICN::HSICONS, 11), combat_format ? pointSpreadArmyFormat : pointGroupedArmyFormat);
     if(BUILD_CAPTAIN &building)
     {
 	Text text(_("Attack Skill") + std::string(" "), Font::SMALL);
@@ -463,7 +466,7 @@ u32 Castle::OpenTown(void)
 	display.Blit(spriteSpreadArmyFormat, rectSpreadArmyFormat.x, rectSpreadArmyFormat.y);
 	display.Blit(spriteGroupedArmyFormat, rectGroupedArmyFormat.x, rectGroupedArmyFormat.y);
 
-	cursorFormat.Show(Modes(ARMYSPREAD) ? pointSpreadArmyFormat : pointGroupedArmyFormat);
+	cursorFormat.Show(combat_format ? pointSpreadArmyFormat : pointGroupedArmyFormat);
     }
 
     Kingdom & kingdom = world.GetMyKingdom();
@@ -583,22 +586,28 @@ u32 Castle::OpenTown(void)
 		return BUILD_CAPTAIN;
 	}
         else
-	if((BUILD_CAPTAIN && building) && le.MouseClickLeft(rectSpreadArmyFormat) && !Modes(ARMYSPREAD))
+	if((BUILD_CAPTAIN && building) && le.MouseClickLeft(rectSpreadArmyFormat) && !combat_format)
         {
             cursor.Hide();
             cursorFormat.Move(pointSpreadArmyFormat);
             cursor.Show();
             display.Flip();
-            SetModes(ARMYSPREAD);
+            army.SetCombatFormat(Army::FORMAT_SPREAD);
+#ifdef WITH_NET
+            FH2LocalClient::SendArmyCombatFormation(army);
+#endif
         }
 	else
-        if((BUILD_CAPTAIN && building) && le.MouseClickLeft(rectGroupedArmyFormat) && Modes(ARMYSPREAD))
+        if((BUILD_CAPTAIN && building) && le.MouseClickLeft(rectGroupedArmyFormat) && combat_format)
         {
             cursor.Hide();
             cursorFormat.Move(pointGroupedArmyFormat);
             cursor.Show();
             display.Flip();
-            ResetModes(ARMYSPREAD);
+            army.SetCombatFormat(Army::FORMAT_GROUPED);
+#ifdef WITH_NET
+            FH2LocalClient::SendArmyCombatFormation(army);
+#endif
         }
 	else
 	if(hero1 && le.MouseClickLeft(rectHero1) &&

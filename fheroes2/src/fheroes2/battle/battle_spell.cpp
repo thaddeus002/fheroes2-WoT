@@ -21,6 +21,8 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
+#ifdef WITH_BATTLE1
+
 #include "battle.h"
 #include "battle_troop.h"
 #include "battle_spell.h"
@@ -30,11 +32,11 @@
 
 bool Battle::AllowSpell(Spell::spell_t spell, const Army::BattleTroop &troop)
 {
-    Spell::target_t target = Spell::Target(spell);
+    u8 target = SpellTarget(spell);
     if(troop == Monster::DWARF || troop == Monster::BATTLE_DWARF) {
-        if(!Rand::Get(0,3) && target != Spell::ONEFRIEND && target != Spell::ALLFRIEND) return false;
+        if(!Rand::Get(0,3) && target != ONEFRIEND && target != ALLFRIEND) return false;
     }
-    if(troop.FindMagic(Spell::ANTIMAGIC) && target != Spell::ONEFRIEND && target != Spell::ALLFRIEND)
+    if(troop.FindMagic(Spell::ANTIMAGIC) && target != ONEFRIEND && target != ALLFRIEND)
         return false;
     if(spell == Spell::ANTIMAGIC && troop.summoned) return false;
     switch(troop()) {
@@ -48,7 +50,7 @@ bool Battle::AllowSpell(Spell::spell_t spell, const Army::BattleTroop &troop)
                 case Spell::MASSBLESS:
                 case Spell::CURSE:
                 case Spell::MASSCURSE:
-                case Spell::BERZERKER:
+                case Spell::BERSERKER:
                 case Spell::BLIND:
                 case Spell::PARALYZE:
                 case Spell::HYPNOTIZE:
@@ -115,7 +117,7 @@ void Battle::ApplySpell(int spower, Spell::spell_t spell, Army::BattleTroop &tro
     magic_t magic;
     magic.spell = spell;
     magic.duration = spower;
-    if(!Spell::Power(spell)) {
+    if(!Spell::Damage(spell)) {
         switch(spell) {
             case Spell::MASSDISPEL:
             case Spell::DISPEL:
@@ -123,7 +125,7 @@ void Battle::ApplySpell(int spower, Spell::spell_t spell, Army::BattleTroop &tro
                 return;
                 // 	Spell::TELEPORT,
                 // 	Spell::MIRRORIMAGE,
-                // 	Spell::BERZERKER,
+                // 	Spell::BERSERKER,
                 // 	Spell::HYPNOTIZE,
                 // 	Spell::DISRUPTINGRAY,
                 // 	Spell::EARTHQUAKE,
@@ -131,7 +133,7 @@ void Battle::ApplySpell(int spower, Spell::spell_t spell, Army::BattleTroop &tro
                 break;
                 // TODO
         }
-    } else if(Spell::Power(spell) == 1) {
+    } else if(Spell::Damage(spell) == 1) {
         switch(spell) {
             case Spell::MASSBLESS:
                 magic.spell = Spell::BLESS;
@@ -178,7 +180,7 @@ void Battle::ApplySpell(int spower, Spell::spell_t spell, Army::BattleTroop &tro
         }
         troop.SetMagic(magic);
     } else {
-        int damage = spower * Spell::Power(spell);
+        int damage = spower * Spell::Damage(spell);
         switch(spell) {
             case Spell::MASSCURE:
                 spell = Spell::CURE;
@@ -266,7 +268,7 @@ bool Battle::isTroopAffectedBySpell(Spell::spell_t spell, const Army::BattleTroo
             case Spell::BLIND:
             case Spell::PARALYZE:
             case Spell::HYPNOTIZE:
-            case Spell::BERZERKER: return false;
+            case Spell::BERSERKER: return false;
             default: break;
         }
 
@@ -276,11 +278,11 @@ bool Battle::isTroopAffectedBySpell(Spell::spell_t spell, const Army::BattleTroo
             case Spell::BLIND:
             case Spell::PARALYZE:
             case Spell::HYPNOTIZE:
-            case Spell::BERZERKER: return false;
+            case Spell::BERSERKER: return false;
             default: break;
         }
 
-    if(Spell::isBad(spell))
+    if(isBadSpell(spell))
         switch(id)
         {
             case Monster::EARTH_ELEMENT:
@@ -312,7 +314,7 @@ bool Battle::isTroopAffectedBySpell(Spell::spell_t spell, const Army::BattleTroo
             case Monster::TITAN:
                 if(Spell::BLIND == spell ||
                    Spell::PARALYZE == spell ||
-                   Spell::BERZERKER == spell ||
+                   Spell::BERSERKER == spell ||
                    Spell::HYPNOTIZE == spell) return false;
                 break;
 
@@ -339,7 +341,7 @@ bool Battle::isTroopAffectedBySpell(Spell::spell_t spell, const Army::BattleTroo
 
 u16 Battle::GetInflictDamageVersus(Spell::spell_t spell, u8 spellPower, const Army::BattleTroop &troop)
 {
-    u16 dmg = Spell::InflictDamage(spell, spellPower);
+    u16 dmg = SpellInflictDamage(spell, spellPower);
 
     if(!isTroopAffectedBySpell(spell, troop, false))
         return 0;
@@ -400,7 +402,7 @@ Battle::BasicSpell *Battle::CreateSpell(Spell::spell_t spell, const Battle::Batt
         case Spell::MASSCURSE:
         case Spell::DRAGONSLAYER:
         case Spell::PARALYZE:
-        case Spell::BERZERKER:
+        case Spell::BERSERKER:
         case Spell::BLIND:
         case Spell::ELEMENTALSTORM:
             return new Hover(spell);
@@ -697,3 +699,154 @@ void Battle::ColdRing::DrawSprite(std::vector<Army::BattleTroop*> &affected, ICN
     Display::Get().Blit(spr, Bf2Scr(target) + spr - Point(0, spr.h() / 4));
     Display::Get().Blit(reflected, Bf2Scr(target) + spr - Point(reflected.w(), spr.h() / 4));
 }
+
+bool Battle::isBadSpell(u8 spell)
+{
+    switch(spell)
+    {
+        case Spell::FIREBALL:
+        case Spell::FIREBLAST:
+        case Spell::LIGHTNINGBOLT:
+        case Spell::CHAINLIGHTNING:
+        case Spell::SLOW:
+        case Spell::MASSSLOW:
+        case Spell::BLIND:
+        case Spell::CURSE:
+        case Spell::MASSCURSE:
+        case Spell::HOLYWORD:
+        case Spell::HOLYSHOUT:
+        case Spell::ARROW:
+        case Spell::BERSERKER:
+        case Spell::ARMAGEDDON:
+        case Spell::ELEMENTALSTORM:
+	case Spell::METEORSHOWER:
+        case Spell::PARALYZE:
+        case Spell::HYPNOTIZE:
+        case Spell::COLDRAY:
+        case Spell::COLDRING:
+        case Spell::DISRUPTINGRAY:
+        case Spell::DEATHRIPPLE:
+        case Spell::DEATHWAVE:
+            return true;
+        default: break;
+    }
+    return false;
+}
+
+Spell::spell_t Battle::SpellTroopAttack(u8 monster)
+{
+    switch(monster)
+    {
+        case Monster::CYCLOPS:
+        if(!Rand::Get(0, 4)) return Spell::PARALYZE;
+        break;
+        case Monster::UNICORN:
+        if(!Rand::Get(0, 4)) return Spell::BLIND;
+        break;
+        case Monster::MUMMY:
+        if(!Rand::Get(0, 4)) return Spell::CURSE;
+        break;
+        case Monster::ROYAL_MUMMY:
+        if(!Rand::Get(0, 3)) return Spell::CURSE;
+        break;
+	case Monster::MEDUSA:
+        if(!Rand::Get(0, 4)) return Spell::PARALYZE;
+        break;
+        case Monster::ARCHMAGE:
+	if(!Rand::Get(0, 4)) return Spell::DISPEL;
+        break;
+        default: break;
+    }
+    return Spell::NONE;
+}
+
+u16 Battle::SpellInflictDamage(u8 spell, u8 sp)
+{
+    switch(spell)
+    {
+	case Spell::DEATHRIPPLE:        return 5 * sp;
+        case Spell::ARROW:
+        case Spell::COLDRING:
+        case Spell::DEATHWAVE:
+        case Spell::FIREBALL:
+        case Spell::HOLYWORD:
+        case Spell::FIREBLAST:          return 10 * sp;
+        case Spell::COLDRAY:
+        case Spell::HOLYSHOUT:          return 20 * sp;
+        case Spell::LIGHTNINGBOLT:
+        case Spell::ELEMENTALSTORM:
+        case Spell::METEORSHOWER:       return 25 * sp;
+        case Spell::CHAINLIGHTNING:     return 40 * sp;
+        case Spell::ARMAGEDDON:         return 50 * sp;
+        default: break;
+    }
+    return 0;
+}
+
+u8 Battle::SpellTarget(u8 spell)
+{
+    switch(spell)
+    {
+        case Spell::HOLYWORD:
+        case Spell::HOLYSHOUT:         return ALLDEAD;
+
+        case Spell::FIREBALL:
+        case Spell::FIREBLAST:
+	case Spell::LIGHTNINGBOLT:
+        case Spell::CHAINLIGHTNING:
+        case Spell::SLOW:
+        case Spell::BLIND:
+        case Spell::CURSE:
+        case Spell::ARROW:
+        case Spell::BERSERKER:
+        case Spell::PARALYZE:
+        case Spell::HYPNOTIZE:
+        case Spell::COLDRAY:
+        case Spell::DISRUPTINGRAY:     return ONEENEMY;
+
+        case Spell::MASSSLOW:
+        case Spell::MASSCURSE:         return ALLENEMY;
+
+	case Spell::DEATHRIPPLE:
+        case Spell::DEATHWAVE:         return ALLLIVE;
+
+        case Spell::TELEPORT:
+        case Spell::CURE:
+	case Spell::RESURRECT:
+        case Spell::RESURRECTTRUE:
+        case Spell::HASTE:
+        case Spell::BLESS:
+        case Spell::STONESKIN:
+        case Spell::STEELSKIN:
+        case Spell::ANTIMAGIC:
+        case Spell::DISPEL:
+        case Spell::DRAGONSLAYER:
+        case Spell::BLOODLUST:
+        case Spell::ANIMATEDEAD:
+        case Spell::MIRRORIMAGE:
+        case Spell::SHIELD:            return ONEFRIEND;
+
+        case Spell::MASSBLESS:
+        case Spell::MASSCURE:
+        case Spell::MASSHASTE:
+        case Spell::MASSSHIELD:        return ALLFRIEND;
+
+	case Spell::COLDRING:
+	case Spell::SUMMONEELEMENT:
+        case Spell::SUMMONAELEMENT:
+        case Spell::SUMMONFELEMENT:
+        case Spell::SUMMONWELEMENT:    return FREECELL;
+
+        case Spell::MASSDISPEL:
+        case Spell::ARMAGEDDON:
+	case Spell::ELEMENTALSTORM:
+        case Spell::METEORSHOWER:
+        case Spell::EARTHQUAKE:        return ALL;
+
+	default: break;
+    }
+    
+    return NOTARGET;
+}
+
+#endif

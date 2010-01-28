@@ -940,10 +940,16 @@ namespace ICN
     bool NeedMinify4PocketPC(icn_t, u16);
     bool SkipBottomForRedrawHeroes(icn_t, u16);
     icn_t PORTxxxx(u8);
-    u8   GetMissIndex(icn_t, double, double);
+    u8   GetMissIndex(icn_t, s16, s16);
 
+    bool isBattleMonsterICN(u16);
+
+    bool SkipRegistryFree(icn_t);
+
+#ifdef WITH_BATTLE1
     icn_t PreImpactFromSpell(u8);
     icn_t ImpactFromSpell(u8);
+#endif
 };
 
 #endif

@@ -27,6 +27,12 @@
 #include "bitmodes.h"
 #include "monster.h"
 
+namespace Battle2
+{
+    class Arena;
+    class Stats;
+};
+
 namespace Army
 {
     class army_t;
@@ -39,49 +45,69 @@ namespace Army
     bool FastestTroop(const Troop & t1, const Troop & t2);
     void SwapTroops(Troop & t1, Troop & t2);
 
-    class Troop : public Monster, public BitModes
+    class Troop : public Monster
     {
       public:
-        Troop(monster_t m = Monster::UNKNOWN, u16 c = 0);
+        Troop(monster_t m = Monster::UNKNOWN, u32 c = 0);
+        Troop(const Troop &);
 	~Troop();
         
-        void	Set(const Monster &, u16);
-        void	Set(monster_t, u16);
+        Troop & operator= (const Troop &);
+
+        void	Set(const Monster &, u32);
+        void	Set(monster_t, u32);
         void	SetMonster(const Monster &);
         void	SetMonster(monster_t);
-        void	SetCount(u16);
+        void	SetCount(u32);
         void	Reset(void);
         
         const Skill::Primary* MasterSkill(void) const;
-        const army_t*         GetArmy(void) const;
-	const char*           GetName(u32 amount = 0) const;
-        
-        u16 		Count(void) const;
+        army_t*         GetArmy(void);
+        const army_t*   GetArmy(void) const;
+	const char*     GetName(u32 amount = 0) const;
+
+        u32 		Count(void) const { return GetCount(); };
+        u32 		GetCount(void) const;
         
 	virtual u8	GetAttack(void) const;
 	virtual u8	GetDefense(void) const;
 	virtual u32	GetHitPoints(void) const;
 
-        u16		GetDamageMin(void) const;
-	u16		GetDamageMax(void) const;
 	Color::color_t	GetColor(void) const;
         virtual u8	GetSpeed(void) const;
+
+	const Battle2::Stats*	GetBattleStats(void) const;
+	Battle2::Stats*	GetBattleStats(void);
+        u32		GetDamageMin(void) const;
+	u32		GetDamageMax(void) const;
 
         s8		GetMorale(void) const;
 	s8		GetLuck(void) const;
 
-        
         bool		isValid(void) const;
         bool    	isAffectedByMorale(void) const;
 	bool		HasMonster(monster_t) const;
-        
+
+	bool		BattleInit(void);
+	void		BattleQuit(void);
+	void		BattleNewTurn(void);
+	void		BattleSetModes(u32);
+	void		BattleResetModes(u32);
+	bool		BattleFindModes(u32) const;
+	u32		BattleKilled(void) const;
+	s8		GetArmyIndex(void) const;
+
       protected:
         friend class army_t;
-        u16		count;
-	const army_t*	army;
+        friend class Battle2::Stats;
+        friend class Battle2::Arena;
 
-        
+        u32		count;
+	army_t*		army;
+	Battle2::Stats*	battle;
+#ifdef WITH_BATTLE1
 	u32		hp;
+#endif
     };
 };
 

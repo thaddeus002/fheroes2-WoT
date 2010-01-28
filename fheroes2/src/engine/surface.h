@@ -128,7 +128,7 @@ public:
     static void MakeStencil(Surface &, const Surface &, u32);
     static void MakeContour(Surface &, const Surface &, u32);
 
-    static void ScaleMinifyByTwo(Surface & sf_dst, const Surface & sf_src, u8 mul = 1);
+    static void ScaleMinifyByTwo(Surface & sf_dst, const Surface & sf_src, bool event = false);
     static void SetDefaultDepth(u8);
     static u8   GetDefaultDepth(void);
     static void FreeSurface(Surface &);

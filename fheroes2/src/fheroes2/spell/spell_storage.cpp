@@ -93,3 +93,14 @@ void SpellStorage::Append(const Spell::spell_t sp, const u8 wisdom)
 	}
     }
 }
+
+void SpellStorage::AppendWithoutWisdom(const Spell::spell_t sp)
+{
+    if(spells.end() == std::find(spells.begin(), spells.end(), sp))
+	spells.push_back(sp);
+}
+
+bool SpellStorage::isPresentSpell(Spell::spell_t spell) const
+{
+    return spells.end() != std::find(spells.begin(), spells.end(), spell);
+}

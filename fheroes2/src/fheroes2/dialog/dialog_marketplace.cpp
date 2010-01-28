@@ -32,6 +32,7 @@
 #include "splitter.h"
 #include "marketplace.h"
 #include "dialog.h"
+#include "localclient.h"
 
 void RedrawFromResource(const Point & pt, const Resource::funds_t & rs);
 void RedrawToResource(const Point & pt, bool showcost, bool tradingPost, u8 from_resource = 0);
@@ -421,7 +422,10 @@ void Dialog::Marketplace(bool fromTradingPost)
         {
             kingdom.OddFundsResource(Resource::funds_t(static_cast<Resource::resource_t>(resourceFrom), count_sell));
             kingdom.AddFundsResource(Resource::funds_t(static_cast<Resource::resource_t>(resourceTo), count_buy));
-            
+#ifdef WITH_NET
+	    FH2LocalClient::SendMarketSellResource(kingdom, resourceFrom, count_sell, fromTradingPost);
+	    FH2LocalClient::SendMarketBuyResource(kingdom, resourceTo, count_buy, fromTradingPost);
+#endif            
             resourceTo = resourceFrom = Resource::UNKNOWN;
             gui.ShowTradeArea(resourceFrom, resourceTo, 0, 0, 0, 0, fromTradingPost);
 

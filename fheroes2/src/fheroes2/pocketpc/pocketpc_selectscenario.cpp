@@ -43,8 +43,6 @@ Game::menu_t PocketPC::SelectScenario(void)
     Display & display = Display::Get();
     Settings & conf = Settings::Get();
 
-    conf.SetGameType(Game::STANDARD);
-
     cursor.Hide();
     cursor.SetThemes(cursor.POINTER);
 

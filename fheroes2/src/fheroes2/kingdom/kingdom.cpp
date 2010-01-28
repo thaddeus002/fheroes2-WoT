@@ -308,6 +308,11 @@ u8 Kingdom::GetCountMarketplace(void) const
     return std::count_if(castles.begin(), castles.end(), Castle::PredicateIsBuildMarketplace);
 }
 
+u8 Kingdom::GetCountNecromancyShrineBuild(void) const
+{
+    return std::count_if(castles.begin(), castles.end(), std::mem_fun(&Castle::isNecromancyShrineBuild));
+}
+
 Race::race_t Kingdom::GetRace(void) const
 {
     return Settings::Get().KingdomRace(color);

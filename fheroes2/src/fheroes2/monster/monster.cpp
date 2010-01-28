@@ -133,6 +133,7 @@ static const struct
 
 };
 
+#ifdef WITH_BATTLE1
 #define ANIMATTNONE {1,1,1,1,1,1,1,1}
 #define ANIM_NONE {1,1,1,1,1,1,1,1,ANIMATTNONE,ANIMATTNONE}
 
@@ -227,6 +228,7 @@ static const struct
     { ICN::UNKNOWN , ICN::UNKNOWN, ANIM_NONE, M82::UNKNOWN, M82::UNKNOWN, M82::UNKNOWN, M82::UNKNOWN },
     { ICN::UNKNOWN , ICN::UNKNOWN, ANIM_NONE, M82::UNKNOWN, M82::UNKNOWN, M82::UNKNOWN, M82::UNKNOWN },
 };
+#endif
 
 Monster::Monster() : id(UNKNOWN)
 {
@@ -443,6 +445,21 @@ bool Monster::isElemental(void) const
         case WATER_ELEMENT: return true;
 
 	default: break;
+    }
+
+    return false;
+}
+
+bool Monster::isDragons(void) const
+{
+    switch(id)
+    {
+       case GREEN_DRAGON:
+       case RED_DRAGON:
+       case BLACK_DRAGON:
+       case BONE_DRAGON: return true;
+
+       default: break;
     }
 
     return false;
@@ -1099,16 +1116,18 @@ u32 Monster::GetDwelling(Monster & m)
     return GetDwelling(m.id);
 }
 
+ICN::icn_t Monster::ICNMonh(void) const
+{
 
+    return id >= PEASANT && id <= WATER_ELEMENT ? static_cast<ICN::icn_t>(ICN::MONH0000 + id - PEASANT) : ICN::UNKNOWN;
+}
+
+#ifdef WITH_BATTLE1
 ICN::icn_t Monster::ICNFile(void) const
 {
     return animonsters[id].icn_file;
 }
 
-ICN::icn_t Monster::ICNMonh(void) const
-{
-    return animonsters[id].icn_monh;
-}
 
 ICN::icn_t Monster::ICNMiss(void) const
 {
@@ -1257,3 +1276,5 @@ void Monster::GetAnimFrames(u8 anim, u8 & start, u8 & length, bool attranged) co
 	    break;
     }
 }
+#endif
+

@@ -40,11 +40,11 @@ Cursor & Cursor::Get(void)
 /* get theme cursor */
 Cursor::themes_t Cursor::Themes(void)
 {
-    return theme;
+    return SP_ARROW >= theme ? static_cast<themes_t>(theme) : NONE;
 }
 
 /* set cursor theme */
-bool Cursor::SetThemes(const Cursor::themes_t name)
+bool Cursor::SetThemes(const u16 name)
 {
     if(theme != name)
     {
@@ -102,7 +102,7 @@ void Cursor::Move(u16 x, u16 y)
 }
 
 /* set offset big cursor */
-void Cursor::SetOffset(const themes_t name)
+void Cursor::SetOffset(u16 name)
 {
     switch(name)
     {
@@ -152,64 +152,89 @@ void Cursor::SetOffset(const themes_t name)
 		break;
             
             case Cursor::SCROLL_BOTTOMRIGHT:
-                offset_x = -15;
-                offset_y = -15;
+            case Cursor::SWORD_BOTTOMRIGHT:
+                offset_x = -20;
+                offset_y = -20;
+                break;
+
+            case Cursor::SWORD_BOTTOMLEFT:
+                offset_x = -5;
+                offset_y = -20;
+                break;
+
+            case Cursor::SWORD_TOPLEFT:
+                offset_x = -5;
+                offset_y = -5;
+                break;
+
+            case Cursor::SWORD_TOPRIGHT:
+                offset_x = -20;
+                offset_y = -5;
+                break;
+
+            case Cursor::SWORD_LEFT:
+                offset_x = -5;
+                offset_y = -7;
+                break;
+
+            case Cursor::SWORD_RIGHT:
+                offset_x = -25;
+                offset_y = -7;
+                break;
+
+            case Cursor::WAR_MOVE:
+            case Cursor::WAR_FLY:
+                offset_x = -7;
+                offset_y = -14;
                 break;
             
             case Cursor::WAR_NONE:
-            case Cursor::WAR_MOVE:
-            case Cursor::WAR_HELMET:
-            case Cursor::WAR_FLIGHT:
+            case Cursor::WAR_HERO:
             case Cursor::WAR_ARROW:
             case Cursor::WAR_INFO:
-            case Cursor::SWORD_TOPLEFT:
-            case Cursor::SWORD_LEFT:
-            case Cursor::SWORD_BOTTOMLEFT:
             case Cursor::WAR_BROKENARROW:
-            case Cursor::SWORD_TOPRIGHT:
                 offset_x = -7;
                 offset_y = -7;
                 break;
 
-        case Cursor::SPELLNONE:
-        case Cursor::SLOW:
-        case Cursor::MASSCURE:
-        case Cursor::CURSE:
-        case Cursor::LIGHTNINGBOLT:
-        case Cursor::CHAINLIGHTNING:
-        case Cursor::CURE:
-        case Cursor::BLESS:
-        case Cursor::FIREBALL:
-        case Cursor::FIREBLAST:
-        case Cursor::TELEPORT:
-        case Cursor::ELEMENTALSTORM:
-        case Cursor::RESURRECT:
-        case Cursor::RESURRECTTRUE:
-        case Cursor::HASTLE:
-        case Cursor::SHIELD:
-        case Cursor::ARMAGEDON:
-        case Cursor::ANTIMAGIC:
-        case Cursor::DISPELMAGIC:
-        case Cursor::BERZERKER:
-        case Cursor::PARALIZE:
-        case Cursor::BLIND:
-        case Cursor::HOLYWORLD:
-        case Cursor::HOLYSHOUT:
-        case Cursor::METEORSHOWER:
-        case Cursor::ANIMATEDEAD:
-        case Cursor::MIRRORIMAGE:
-        case Cursor::BLOODLUST:
-        case Cursor::DEATHRIPPLE:
-        case Cursor::DEATHWAVE:
-        case Cursor::STELSKIN:
-        case Cursor::STONSKIN:
-        case Cursor::DRAGONSLAYER:
-        case Cursor::EARTHQUAKE:
-        case Cursor::DISRUPTINGRAY:
-        case Cursor::COLDRING:
-        case Cursor::COLDRAY:
-        case Cursor::HIPNOTIZE:
-        case Cursor::MAGICARROW:
+        case Cursor::SP_SLOW:
+        case Cursor::SP_UNKNOWN:
+        case Cursor::SP_CURSE:
+        case Cursor::SP_LIGHTNINGBOLT:
+        case Cursor::SP_CHAINLIGHTNING:
+        case Cursor::SP_CURE:
+        case Cursor::SP_BLESS:
+        case Cursor::SP_FIREBALL:
+        case Cursor::SP_FIREBLAST:
+        case Cursor::SP_TELEPORT:
+        case Cursor::SP_ELEMENTALSTORM:
+        case Cursor::SP_RESURRECT:
+        case Cursor::SP_RESURRECTTRUE:
+        case Cursor::SP_HASTE:
+        case Cursor::SP_SHIELD:
+        case Cursor::SP_ARMAGEDDON:
+        case Cursor::SP_ANTIMAGIC:
+        case Cursor::SP_DISPEL:
+        case Cursor::SP_BERSERKER:
+        case Cursor::SP_PARALYZE:
+        case Cursor::SP_BLIND:
+        case Cursor::SP_HOLYWORD:
+        case Cursor::SP_HOLYSHOUT:
+        case Cursor::SP_METEORSHOWER:
+        case Cursor::SP_ANIMATEDEAD:
+        case Cursor::SP_MIRRORIMAGE:
+        case Cursor::SP_BLOODLUST:
+        case Cursor::SP_DEATHRIPPLE:
+        case Cursor::SP_DEATHWAVE:
+        case Cursor::SP_STEELSKIN:
+        case Cursor::SP_STONESKIN:
+        case Cursor::SP_DRAGONSLAYER:
+        case Cursor::SP_EARTHQUAKE:
+        case Cursor::SP_DISRUPTINGRAY:
+        case Cursor::SP_COLDRING:
+        case Cursor::SP_COLDRAY:
+        case Cursor::SP_HYPNOTIZE:
+        case Cursor::SP_ARROW:
         {
             const ::Sprite &spr = AGG::GetICN(ICN::SPELCO, 0xFF & name);
             offset_x = -spr.w() / 2;

@@ -29,6 +29,11 @@
 
 #include "network.h"
 
+class heroes;
+class Castle;
+class Kingdom;
+namespace Army { class army_t; };
+
 class FH2LocalClient : public FH2Client
 {
 public:
@@ -36,9 +41,27 @@ public:
 
     ~FH2LocalClient(){};
 
-    bool Connect(const std::string &, u16);
     int Main(void);
+    bool Connect(const std::string &, u16);
     void Logout(void);
+
+    static void SendCastleBuyBuilding(const Castle &, u32);
+    static void SendCastleRecruitHero(const Castle &, const Heroes &);
+    static void SendCastleBuyBoat(const Castle &, u16);
+    static void SendCastleRecruitMonster(const Castle &, u32, u16);
+
+    static void SendMarketSellResource(const Kingdom &, u8, u32, bool);
+    static void SendMarketBuyResource(const Kingdom &, u8, u32, bool);
+
+    static void SendHeroesBuyMagicBook(const Heroes &);
+    static void SendHeroesSwapArtifacts(const Heroes &, u8, const Heroes &, u8);
+
+    static void SendArmyUpgradeTroop(const Army::army_t &, u8);
+    static void SendArmyDismissTroop(const Army::army_t &, u8);
+    static void SendArmySwapTroops(const Army::army_t &, u8, const Army::army_t &, u8);
+    static void SendArmySplitTroop(const Army::army_t &, u8, const Army::army_t &, u8, u16);
+    static void SendArmyJoinTroops(const Army::army_t &, u8, const Army::army_t &, u8);
+    static void SendArmyCombatFormation(const Army::army_t &);
 
 private:
     FH2LocalClient();
@@ -48,7 +71,7 @@ private:
     bool StartGame(void);
 
     u8 GetPlayersColors(void) const;
-    void PopPlayersInfo(Network::Message &);
+    void PopPlayersInfo(QueueMessage &);
 
     std::string server;
     std::vector<Player> players;

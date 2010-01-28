@@ -38,7 +38,7 @@ struct SpellFiltered : std::binary_function<Spell::spell_t, SpellBook::filter_t,
     bool operator() (Spell::spell_t s, SpellBook::filter_t f) const { return ((SpellBook::ADVN & f) && Spell::isCombat(s)) || ((SpellBook::CMBT & f) && !Spell::isCombat(s)); };
 };
 
-void SpellBookRedrawLists(const std::vector<Spell::spell_t> &, std::vector<Rect> &, const size_t, const Point &, const HeroBase *);
+void SpellBookRedrawLists(const std::vector<Spell::spell_t> &, std::vector<Rect> &, const size_t, const Point &, const HeroBase *, const SpellBook::filter_t only);
 void SpellBookRedrawSpells(const std::vector<Spell::spell_t> &, std::vector<Rect> &, const size_t, s16, s16);
 void SpellBookRedrawMP(const Point &, u16);
 
@@ -46,7 +46,7 @@ SpellBook::SpellBook(const HeroBase *p) : hero(p), active(false)
 {
 }
 
-Spell::spell_t SpellBook::Open(filter_t filt, bool canselect) const
+Spell::spell_t SpellBook::Open(const filter_t filt, bool canselect) const
 {
     if(!active) return Spell::NONE;
 
@@ -58,22 +58,15 @@ Spell::spell_t SpellBook::Open(filter_t filt, bool canselect) const
     bool small = Settings::Get().PocketPC();
 
     const Cursor::themes_t oldcursor = cursor.Themes();
-
-    if(small)
-    {
-        // wait for long operation: Sprite::ScaleMinifyByTwo
-        cursor.SetThemes(cursor.WAIT);
-        cursor.Show();
-        display.Flip();
-    }
+    cursor.SetThemes(Cursor::POINTER);
 
     const Sprite & r_list = AGG::GetICN(ICN::BOOK, 0);
     const Sprite & l_list = AGG::GetICN(ICN::BOOK, 0, true);
 
     cursor.Hide();
-    cursor.SetThemes(Cursor::POINTER);
 
-    SetFilter(spells2, filt);
+    filter_t filter = filt;
+    SetFilter(spells2, filter);
 
     size_t current_index = 0;
 
@@ -99,7 +92,7 @@ Spell::spell_t SpellBook::Open(filter_t filt, bool canselect) const
     std::vector<Rect> coords;
     coords.reserve(small ? SPELL_PER_PAGE_SMALL * 2 : SPELL_PER_PAGE * 2);
 
-    SpellBookRedrawLists(spells2, coords, current_index, pos, hero);
+    SpellBookRedrawLists(spells2, coords, current_index, pos, hero, filt);
 
     cursor.Show();
     display.Flip();
@@ -113,7 +106,7 @@ Spell::spell_t SpellBook::Open(filter_t filt, bool canselect) const
 	{
 	    cursor.Hide();
 	    current_index -= small ? SPELL_PER_PAGE_SMALL * 2 : SPELL_PER_PAGE * 2;
-	    SpellBookRedrawLists(spells2, coords, current_index, pos, hero);
+	    SpellBookRedrawLists(spells2, coords, current_index, pos, hero, filt);
 	    cursor.Show();
 	    display.Flip();
 	}
@@ -122,7 +115,7 @@ Spell::spell_t SpellBook::Open(filter_t filt, bool canselect) const
 	{
 	    cursor.Hide();
 	    current_index += small ? SPELL_PER_PAGE_SMALL * 2 : SPELL_PER_PAGE * 2;
-	    SpellBookRedrawLists(spells2, coords, current_index, pos, hero);
+	    SpellBookRedrawLists(spells2, coords, current_index, pos, hero, filt);
 	    cursor.Show();
 	    display.Flip();
 	}
@@ -139,24 +132,24 @@ Spell::spell_t SpellBook::Open(filter_t filt, bool canselect) const
 	    display.Flip();
 	}
 	else
-	if(le.MouseClickLeft(advn_rt) && filt != ADVN)
+	if(le.MouseClickLeft(advn_rt) && filter != ADVN && filt != CMBT)
 	{
 	    cursor.Hide();
-	    filt = ADVN;
+	    filter = ADVN;
 	    current_index = 0;
-	    SetFilter(spells2, filt);
-	    SpellBookRedrawLists(spells2, coords, current_index, pos, hero);
+	    SetFilter(spells2, filter);
+	    SpellBookRedrawLists(spells2, coords, current_index, pos, hero, filt);
 	    cursor.Show();
 	    display.Flip();
 	}
 	else
-	if(le.MouseClickLeft(cmbt_rt) && filt != CMBT)
+	if(le.MouseClickLeft(cmbt_rt) && filter != CMBT && filt != ADVN)
 	{
 	    cursor.Hide();
-	    filt = CMBT;
+	    filter = CMBT;
 	    current_index = 0;
-	    SetFilter(spells2, filt);
-	    SpellBookRedrawLists(spells2, coords, current_index, pos, hero);
+	    SetFilter(spells2, filter);
+	    SpellBookRedrawLists(spells2, coords, current_index, pos, hero, filt);
 	    cursor.Show();
 	    display.Flip();
 	}
@@ -174,7 +167,7 @@ Spell::spell_t SpellBook::Open(filter_t filt, bool canselect) const
 		{
 		    if(spell != Spell::NONE && hero)
 		    {
-			if(hero->GetSpellPoints() >= Spell::Mana(spell))
+			if(hero->GetSpellPoints() >= Spell::CostManaPoints(spell))
 			{
 			    curspell = spell;
 			    break;
@@ -183,7 +176,7 @@ Spell::spell_t SpellBook::Open(filter_t filt, bool canselect) const
 			{
 			    cursor.Hide();
 			    std::string str = _("That spell costs %{mana} mana. You only have %{point} mana, so you can't cast the spell.");
-			    String::Replace(str, "%{mana}", Spell::Mana(spell));
+			    String::Replace(str, "%{mana}", Spell::CostManaPoints(spell));
 			    String::Replace(str, "%{point}", hero->GetSpellPoints());
 			    Dialog::Message("", str, Font::BIG, Dialog::OK);
 			    cursor.Show();
@@ -272,7 +265,7 @@ void SpellBookRedrawMP(const Point & dst, u16 mp)
     }
 }
 
-void SpellBookRedrawLists(const std::vector<Spell::spell_t> & spells, std::vector<Rect> & coords, const size_t cur, const Point & pt, const HeroBase *hero)
+void SpellBookRedrawLists(const std::vector<Spell::spell_t> & spells, std::vector<Rect> & coords, const size_t cur, const Point & pt, const HeroBase *hero, const SpellBook::filter_t only)
 {
     Display & display = Display::Get();
     bool small = Settings::Get().PocketPC();
@@ -292,8 +285,10 @@ void SpellBookRedrawLists(const std::vector<Spell::spell_t> & spells, std::vecto
     display.Blit(l_list, pt.x, pt.y);
     display.Blit(r_list, pt.x + l_list.w(), pt.y);
     display.Blit(bookmark_info, info_rt);
-    display.Blit(bookmark_advn, advn_rt);
-    display.Blit(bookmark_cmbt, cmbt_rt);
+    if(SpellBook::CMBT != only)
+	display.Blit(bookmark_advn, advn_rt);
+    if(SpellBook::ADVN != only)
+	display.Blit(bookmark_cmbt, cmbt_rt);
     display.Blit(bookmark_clos, clos_rt);
 
     if(coords.size()) coords.clear();
@@ -338,7 +333,7 @@ void SpellBookRedrawSpells(const std::vector<Spell::spell_t> & spells, std::vect
 
     	std::string str(Spell::GetName(spell));
     	str.append(" [");
-	String::AddInt(str, Spell::Mana(spell));
+	String::AddInt(str, Spell::CostManaPoints(spell));
 	str.append("]");
 	    
 	TextBox box(str, Font::SMALL, (small ? 94 : 80));

@@ -220,11 +220,6 @@ BagArtifacts & Captain::GetBagArtifacts(void)
     return artifacts;
 }
 
-void Captain::TakeArtifacts(Heroes &hero)
-{
-    hero.GetBagArtifacts().clear();
-}
-
 u16 Captain::GetMaxSpellPoints(void) const
 {
     return 10;
@@ -233,4 +228,19 @@ u16 Captain::GetMaxSpellPoints(void) const
 void Captain::SetSpellPoints(const u16 point)
 {
     spellPoints = point;
+}
+
+u8 Captain::GetControl(void) const
+{
+    return home.GetControl();
+}
+
+bool Captain::CanBattleRetreat(void) const
+{
+    return false;
+}
+
+u16 Captain::GetIndex(void) const
+{
+    return home.GetIndex();
 }

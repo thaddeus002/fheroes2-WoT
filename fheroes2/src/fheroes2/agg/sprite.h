@@ -43,6 +43,8 @@ public:
     void ScaleMinifyByTwo(void);
     
     static void DrawICN(Surface & sf, const u8* buf, const u32 size, bool reflect);
+    static void AddonExtensionModify(Sprite & sp, u16 icn, u16 index);
+
 private:
 
     s16		offsetX;

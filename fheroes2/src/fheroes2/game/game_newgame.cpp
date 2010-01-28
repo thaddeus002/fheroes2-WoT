@@ -34,14 +34,18 @@ u8 SelectCountPlayers(void);
 
 Game::menu_t Game::NewStandard(void)
 {
-    Settings::Get().SetGameType(Game::STANDARD);
-    return Game::SCENARIOINFO;
+    Settings & conf = Settings::Get();
+    conf.SetGameType(Game::STANDARD);
+    conf.SetPreferablyCountPlayers(0);
+    return Game::SELECTSCENARIO;
 }
 
 Game::menu_t Game::NewHotSeat(void)
 {
-    Settings::Get().SetGameType(Game::HOTSEAT);
-    return Game::SCENARIOINFO;
+    Settings & conf = Settings::Get();
+    conf.SetGameType(Game::HOTSEAT);
+    conf.SetPreferablyCountPlayers(conf.PocketPC() ? 2 : SelectCountPlayers());
+    return Game::SELECTSCENARIO;
 }
 
 Game::menu_t Game::NewCampain(void)
@@ -109,7 +113,7 @@ Game::menu_t Game::NewGame(void)
     Mixer::Pause();
     AGG::PlayMusic(MUS::MAINMENU);
 
-    if(Settings::Get().PocketPC()) return PocketPC::SelectScenario();
+    if(Settings::Get().PocketPC()) return PocketPC::NewGame();
    
     // preload
     AGG::PreloadObject(ICN::HEROES);
@@ -172,6 +176,8 @@ Game::menu_t Game::NewGame(void)
 
 Game::menu_t Game::NewMulti(void)
 {
+    if(Settings::Get().PocketPC()) return PocketPC::NewMulti();
+
     // preload
     AGG::PreloadObject(ICN::HEROES);
     AGG::PreloadObject(ICN::BTNHOTST);
@@ -183,7 +189,6 @@ Game::menu_t Game::NewMulti(void)
     cursor.SetThemes(cursor.POINTER);
 
     Display & display = Display::Get();
-    Settings & conf = Settings::Get();
 
     // image background
     const Sprite &back = AGG::GetICN(ICN::HEROES, 0);
@@ -213,11 +218,7 @@ Game::menu_t Game::NewMulti(void)
 	le.MousePressLeft(buttonNetwork) ? buttonNetwork.PressDraw() : buttonNetwork.ReleaseDraw();
 	le.MousePressLeft(buttonCancelGame) ? buttonCancelGame.PressDraw() : buttonCancelGame.ReleaseDraw();
 
-	if(le.MouseClickLeft(buttonHotSeat) || le.KeyPress(KEY_h))
-	{
-	    conf.SetPreferablyCountPlayers(SelectCountPlayers());
-	    return conf.PreferablyCountPlayers() ? NEWHOTSEAT : MAINMENU;
-	}
+	if(le.MouseClickLeft(buttonHotSeat) || le.KeyPress(KEY_h)) return NEWHOTSEAT;
 	if(le.MouseClickLeft(buttonNetwork) || le.KeyPress(KEY_n)) return NEWNETWORK;
 	if(le.MouseClickLeft(buttonCancelGame) || le.KeyPress(KEY_ESCAPE)) return MAINMENU;
 

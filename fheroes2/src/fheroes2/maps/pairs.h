@@ -32,6 +32,7 @@ class IndexDistance : public std::pair<u16, u16>
     IndexDistance() : std::pair<u16, u16>(MAXU16, 0) {};
     IndexDistance(u16 i, u16 d) : std::pair<u16, u16>(i, d) {};
 
+    static bool Shortest(const IndexDistance & id1, const IndexDistance & id2){ return id1.second < id2.second; };
     static bool Longest(const IndexDistance & id1, const IndexDistance & id2){ return id1.second > id2.second; };
 };
 

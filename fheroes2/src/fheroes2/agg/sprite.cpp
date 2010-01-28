@@ -21,6 +21,9 @@
  ***************************************************************************/
 
 #include "settings.h"
+#include "icn.h"
+#include "cursor.h"
+#include "display.h"
 #include "sprite.h"
 
 Sprite::Sprite() : offsetX(0), offsetY(0)
@@ -46,7 +49,6 @@ void Sprite::DrawICN(Surface & sf, const u8* cur, const u32 size, bool reflect)
 
     //const u32 color_key = sf.MapRGB(0xff, 0, 0xff, 0);
     const u32 shadow = sf.alpha() ? sf.MapRGB(0, 0, 0, 0x40) : sf.GetColorKey();
-    bool alpha = false;
 
     // lock surface
     sf.Lock();
@@ -92,7 +94,7 @@ void Sprite::DrawICN(Surface & sf, const u8* cur, const u32 size, bool reflect)
 	{
 	    ++cur;
 	    c = *cur % 4 ? *cur % 4 : *(++cur);
-	    while(c--){ if(sf.alpha()) sf.SetPixel(x, y, shadow); alpha = true; reflect ? x-- : x++; }
+	    while(c--){ if(sf.alpha()) sf.SetPixel(x, y, shadow); reflect ? x-- : x++; }
 	    ++cur;
 	}
 	else
@@ -131,9 +133,49 @@ u32 Sprite::GetSize(void) const
 
 void Sprite::ScaleMinifyByTwo(void)
 {
-    Surface sf;
-    Surface::ScaleMinifyByTwo(sf, *this);
-    Surface::Swap(sf, *this);
+    Cursor & cursor = Cursor::Get();
+    Display & display = Display::Get();
+
+    if(w() > 3 && h() > 3)
+    {
+	u16 theme = 0;
+	if(cursor.isVisible() && Cursor::WAIT != cursor.Themes())
+	{
+	    theme = cursor.Themes();
+	    cursor.SetThemes(Cursor::WAIT);
+	    cursor.Show();
+	    display.Flip();
+	}
+
+	Surface sf;
+	Surface::ScaleMinifyByTwo(sf, *this, cursor.isVisible());
+	Surface::Swap(sf, *this);
+
+	if(theme)
+	{
+	    cursor.SetThemes(theme);
+	    cursor.Show();
+	    display.Flip();
+	}
+    }
+
     offsetX /= 2;
     offsetY /= 2;
+}
+
+void Sprite::AddonExtensionModify(Sprite & sp, u16 icn, u16 index)
+{
+    switch(icn)
+    {
+	case ICN::AELEM:
+	    if(sp.w() > 3 && sp.h() > 3)
+	    {
+		Surface sf;
+		Surface::MakeContour(sf, sp, sp.GetColor(0xEF));
+		sp.Blit(sf, -1, -1);
+	    }
+	    break;
+
+	default: break;
+    }
 }

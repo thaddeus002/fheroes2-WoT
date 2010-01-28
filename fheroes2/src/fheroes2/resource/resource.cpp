@@ -213,7 +213,7 @@ bool Resource::funds_t::operator>= (const funds_t & pm) const
 }
 
 /* name resource */
-const char* Resource::String(resource_t resource)
+const char* Resource::String(u8 resource)
 {
     const char* res[] = { "Unknown", _("Wood"), _("Mercury"), _("Ore"), _("Sulfur"), _("Crystal"), _("Gems"), _("Gold") };
 

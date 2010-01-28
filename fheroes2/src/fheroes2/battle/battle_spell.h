@@ -21,6 +21,8 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
+#ifdef WITH_BATTLE1
+
 #ifndef H2BATTLE_SPELL_H
 #define H2BATTLE_SPELL_H
 
@@ -44,6 +46,12 @@ namespace Battle
         u8 duration;
     };
 
+    enum target_t { NOTARGET, ONEFRIEND, ONEENEMY, ALLFRIEND, ALLENEMY, ALLLIVE, ALLDEAD, ALL, FREECELL };
+
+    bool isBadSpell(u8);
+    u8 SpellTarget(u8 spell);
+    Spell::spell_t SpellTroopAttack(u8 monster);
+    u16 SpellInflictDamage(u8 spell, u8 sp);
     bool AllowSpell(Spell::spell_t spell, const Army::BattleTroop &troop);
     void ApplySpell(int spower, Spell::spell_t spell, Army::BattleTroop &troop);
     bool isTroopAffectedBySpell(Spell::spell_t spell, const Army::BattleTroop &troop, bool deteterministic);
@@ -146,5 +154,7 @@ namespace Battle
         void DrawSprite(std::vector<Army::BattleTroop*> &affected, ICN::icn_t icn, int frame);
     };
 };
+
+#endif
 
 #endif

@@ -37,6 +37,7 @@
 #include "battle.h"
 #include "visit.h"
 #include "heroes.h"
+#include "localclient.h"
 
 extern u16 DialogWithArtifact(const std::string & hdr, const std::string & msg, const Artifact::artifact_t art, const u16 buttons = Dialog::OK);
 extern void PlayPickupSound(void);
@@ -80,8 +81,6 @@ Heroes::Heroes(heroes_t ht, Race::race_t rc) : killer_color(Color::GRAY), experi
     save_maps_general(MP2::OBJ_ZERO), path(*this), direction(Direction::RIGHT), sprite_index(18)
 {
     name = _(HeroesName(ht));
-
-    SetModes(ARMYSPREAD);
 
     secondary_skills.reserve(HEROESMAXSKILL);
 
@@ -296,10 +295,7 @@ Heroes::Heroes(heroes_t ht, Race::race_t rc) : killer_color(Color::GRAY), experi
     	case SANDYSANDY:
 	    army.Clear();
 	    army.JoinTroop(Monster::BLACK_DRAGON, 2);
-    	//    army.JoinTroop(Monster::RED_DRAGON, 3);
-        army.JoinTroop(Monster::GOBLIN, 50);
-        army.JoinTroop(Monster::PEASANT, 50);
-        army.JoinTroop(Monster::BOAR, 50);
+	    army.JoinTroop(Monster::RED_DRAGON, 3);
 
 	    secondary_skills.clear();
 	    secondary_skills.push_back(Skill::Secondary(Skill::Secondary::PATHFINDING, Skill::Level::ADVANCED));
@@ -1294,19 +1290,6 @@ void Heroes::SetVisited(const u16 index, const Visit::type_t type)
     if(MP2::OBJ_ZERO != object) visit_object.push_front(IndexObject(index, object));
 }
 
-void Heroes::TakeArtifacts(Heroes & hero2)
-{
-    for(u8 ii = 0; ii < HEROESMAXARTIFACT; ++ii)
-    {
-        const Artifact & art = hero2.artifacts[ii];
-        if(art != Artifact::UNKNOWN && art != Artifact::MAGIC_BOOK)
-        {
-            if(PickupArtifact(art()))
-            hero2.artifacts[ii].Set(Artifact::UNKNOWN);
-        }
-    }
-}
-
 u8 Heroes::GetCountArtifacts(void) const
 {
     return std::count_if(artifacts.begin(), artifacts.end(), std::mem_fun_ref(&Artifact::isValid));
@@ -1454,6 +1437,9 @@ bool Heroes::BuySpellBook(const Castle & castle)
 	spell_book.Activate();
 	// add all spell to book
 	AppendSpellsToBook(castle.GetMageGuild());
+#ifdef WITH_NET
+	FH2LocalClient::SendHeroesBuyMagicBook(*this);
+#endif
 	return true;
     }
 
@@ -1887,6 +1873,16 @@ void Heroes::SetKillerColor(Color::color_t c)
 Color::color_t Heroes::GetKillerColor(void) const
 {
     return killer_color;
+}
+
+u8 Heroes::GetControl(void) const
+{
+    return world.GetKingdom(color).Control();
+}
+
+bool Heroes::CanBattleRetreat(void) const
+{
+    return NULL == inCastle();
 }
 
 void Heroes::Dump(void) const

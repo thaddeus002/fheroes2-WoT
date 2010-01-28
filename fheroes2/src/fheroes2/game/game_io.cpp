@@ -507,14 +507,14 @@ void Game::IO::PackCastle(QueueMessage & msg, const Castle & castle)
     }
 
     // armies
-    msg.Push(static_cast<u32>(ARMYMAXTROOPS));
-    for(u32 jj = 0; jj < ARMYMAXTROOPS; ++jj)
+    msg.Push(static_cast<u32>(castle.army.Size()));
+    for(u32 jj = 0; jj < castle.army.Size(); ++jj)
     {
 	const Army::Troop & troop = castle.army.At(jj);
 	msg.Push(static_cast<u8>(troop()));
-	msg.Push(troop.Count());
+	msg.Push(troop.GetCount());
     }
-	
+
     // dwelling
     msg.Push(static_cast<u32>(CASTLEMAXMONSTER));
     for(u32 jj = 0; jj < CASTLEMAXMONSTER; ++jj) msg.Push(castle.dwelling[jj]);
@@ -559,12 +559,12 @@ void Game::IO::PackHeroes(QueueMessage & msg, const Heroes & hero)
     }
 
     // armies
-    msg.Push(static_cast<u32>(ARMYMAXTROOPS));
-    for(u32 jj = 0; jj < ARMYMAXTROOPS; ++jj)
+    msg.Push(static_cast<u32>(hero.army.Size()));
+    for(u32 jj = 0; jj < hero.army.Size(); ++jj)
     {
 	const Army::Troop & troop = hero.army.At(jj);
 	msg.Push(static_cast<u8>(troop()));
-	msg.Push(troop.Count());
+	msg.Push(troop.GetCount());
     }
 	
     // spell book
@@ -1022,7 +1022,7 @@ void Game::IO::UnpackCastle(QueueMessage & msg, Castle & castle, u16 check_versi
 
     // armies
     msg.Pop(byte32);
-    for(u32 jj = 0; jj < ARMYMAXTROOPS; ++jj)
+    for(u32 jj = 0; jj < castle.army.Size(); ++jj)
     {
 	msg.Pop(byte8);
 	castle.army.At(jj).SetMonster(Monster::FromInt(byte8));
@@ -1093,7 +1093,7 @@ void Game::IO::UnpackHeroes(QueueMessage & msg, Heroes & hero, u16 check_version
 
     // armies
     msg.Pop(byte32);
-    for(u32 jj = 0; jj < ARMYMAXTROOPS; ++jj)
+    for(u32 jj = 0; jj < hero.army.Size(); ++jj)
     {
 	msg.Pop(byte8);
 	hero.army.At(jj).SetMonster(Monster::FromInt(byte8));

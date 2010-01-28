@@ -81,6 +81,8 @@ namespace MUS
     mus_t FromGround(const u16 ground);
     mus_t FromRace(const u8 race);
     mus_t FromMapObject(u8 object);
+
+    mus_t GetBattleRandom(void);
 };
 
 #endif

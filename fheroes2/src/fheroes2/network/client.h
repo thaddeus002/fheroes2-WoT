@@ -51,11 +51,11 @@ public:
 
     bool IsConnected(void) const;
 
-    bool Wait(Network::Message &, u16);
-    bool Send(Network::Message &);
-    bool Recv(Network::Message &);
+    bool Wait(QueueMessage &, u16);
+    bool Send(QueueMessage &);
+    bool Recv(QueueMessage &);
 
-    Network::Message packet;
+    QueueMessage packet;
 };
 
 #endif

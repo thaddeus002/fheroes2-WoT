@@ -27,6 +27,7 @@
 #include <vector>
 #include <utility>
 #include "race.h"
+#include "color.h"
 #include "gamedefs.h"
 
 #define MAXPRIMARYSKILL		4

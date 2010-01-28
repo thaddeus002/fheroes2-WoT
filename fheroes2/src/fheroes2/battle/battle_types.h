@@ -20,6 +20,8 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
+#ifdef WITH_BATTLE1
+
 #ifndef H2BATTLE_TYPES_H
 #define H2BATTLE_TYPES_H
 
@@ -364,7 +366,7 @@ namespace Battle
         u32 m_experience[2];
         u32 m_perished;
         std::vector<Spell::spell_t> m_spellsCast;
-        const HeroBase* m_commanders[2];
+        HeroBase* m_commanders[2];
     };
 
     class BattleTurn
@@ -424,5 +426,7 @@ namespace Battle
         Point GetReachableAttackCell(const Army::BattleTroop &, const Army::BattleArmy_t &, const Army::BattleArmy_t &, TroopIndex);
     };
 }
+
+#endif
 
 #endif

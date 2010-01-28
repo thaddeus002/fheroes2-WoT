@@ -75,7 +75,7 @@ namespace Interface
         
 	s16 GetIndexFromMousePoint(const Point & pt) const;
 
-	static void GenerateUltimateArtifactAreaSurface(const u16, Surface &);
+	static void GenerateUltimateArtifactAreaSurface(const u16, Sprite &);
 	static void SrcRectFixed(Rect & src, Point & dst, const u16 rw, const u16 rh);
 
     private:

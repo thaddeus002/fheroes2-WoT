@@ -25,6 +25,7 @@
 #include "game.h"
 #include "dialog.h"
 #include "settings.h"
+#include "network.h"
 #include "remoteclient.h"
 #include "localclient.h"
 #include "cursor.h"
@@ -67,7 +68,7 @@ u8 FH2LocalClient::GetPlayersColors(void) const
     return res;
 }
 
-void FH2LocalClient::PopPlayersInfo(Network::Message & msg)
+void FH2LocalClient::PopPlayersInfo(QueueMessage & msg)
 {
     Player cur;
     u8 size;
@@ -333,7 +334,7 @@ bool FH2LocalClient::ScenarioInfoDialog(void)
 	    if(!Wait(packet, MSG_MAPS_LIST)) return false;
 
 	    MapsFileInfoList lists;
-	    PacketPopMapsFileInfoList(packet, lists);
+	    Network::PacketPopMapsFileInfoList(packet, lists);
 
             std::string filemaps;
             if(DialogSelectMapsFileList(lists, filemaps) && filemaps.size())

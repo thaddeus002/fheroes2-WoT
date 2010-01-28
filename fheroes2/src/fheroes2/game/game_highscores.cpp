@@ -239,29 +239,18 @@ Game::menu_t Game::HighScores(void)
     std::ostringstream stream;
     stream << conf.LocalPrefix() << SEPARATOR << "files" << SEPARATOR << "save" << SEPARATOR << "fheroes2.hgs";
 
-    hgs.Load(stream.str().c_str());
-
-    Mixer::Pause();
-    AGG::PlayMusic(MUS::MAINMENU);
-
     Cursor & cursor = Cursor::Get();
     Display & display = Display::Get();
 
-    if(conf.PocketPC())
-    {
-	// wait for long operation: Sprite::ScaleMinifyByTwo
-	cursor.SetThemes(cursor.WAIT);
-	cursor.Show();
-	display.Flip();
-    }
+    cursor.SetThemes(cursor.POINTER);
+    Mixer::Pause();
+    AGG::PlayMusic(MUS::MAINMENU);
+    hgs.Load(stream.str().c_str());
 
     const Sprite &back = AGG::GetICN(ICN::HSBKG, 0);
 
     cursor.Hide();
-    cursor.SetThemes(cursor.POINTER);
-
     display.Fill(0, 0, 0);
-
     const Point top((display.w() - back.w()) / 2, (display.h() - back.h()) / 2);
 
     hgs.RedrawList(top.x, top.y);

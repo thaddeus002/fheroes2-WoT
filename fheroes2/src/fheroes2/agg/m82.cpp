@@ -377,7 +377,7 @@ M82::m82_t M82::FromSpell(u8 spell)
 	case Spell::DISPEL:		return DIPMAGK;
 	case Spell::MASSDISPEL:		return DIPMAGK;
 	case Spell::ARROW:		return MAGCAROW;
-	case Spell::BERZERKER:		return BERZERK;
+	case Spell::BERSERKER:		return BERZERK;
 	case Spell::ARMAGEDDON:		return ARMGEDN;
 	case Spell::ELEMENTALSTORM:	return STORM;
 	case Spell::METEORSHOWER:	return METEOR;

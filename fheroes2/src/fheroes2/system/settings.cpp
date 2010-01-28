@@ -46,9 +46,14 @@ namespace
         { "fade",              Settings::FADE                        },
         { "original",          Settings::ORIGINAL                    },
         { "logo",              Settings::LOGO                        },
+        { "battleauto",        Settings::BATTLEAUTO                  },
+        { "battle auto",       Settings::BATTLEAUTO                  },
         { "battlegrid",        Settings::BATTLEGRID                  },
+        { "battle grid",       Settings::BATTLEGRID                  },
         { "battlemoveshadow",  Settings::BATTLEMOVESHADOW            },
+        { "battle move shadow", Settings::BATTLEMOVESHADOW           },
         { "battlemouseshadow", Settings::BATTLEMOUSESHADOW           },
+        { "battle mouse shadow", Settings::BATTLEMOUSESHADOW         },
         { "unicode",           Settings::USEUNICODE                  },
         { "autosave",          Settings::AUTOSAVE                    },
         { "alt resource",      Settings::ALTRESOURCE                 },
@@ -165,6 +170,9 @@ bool Settings::Read(const std::string & filename)
     {
 	SetModes(HIDEINTERFACE);
 	SetModes(LOWMEMORY);
+	SetModes(BATTLEGRID);
+	SetModes(BATTLEMOUSESHADOW);
+	SetModes(BATTLEMOVESHADOW);
     }
 
     if(Modes(HIDEINTERFACE))
@@ -233,6 +241,7 @@ void Settings::Dump(std::ostream & stream) const
     stream << "alt resource = " << (Modes(ALTRESOURCE) ? "on"  : "off") << std::endl;
     stream << "debug = " << (debug ? "on"  : "off") << std::endl;
 
+    stream << "battle auto = " << (Modes(BATTLEAUTO) ? "on" : "off") << std::endl;
     stream << "battle grid = " << (Modes(BATTLEGRID) ? "on" : "off") << std::endl;
     stream << "battle movement shadow = " << (Modes(BATTLEMOVESHADOW) ? "on" : "off") << std::endl;
     stream << "battle mouse shadow = " << (Modes(BATTLEMOUSESHADOW) ? "on" : "off") << std::endl;
@@ -357,6 +366,8 @@ bool Settings::ShowStatus(void) const { return Modes(SHOWSTATUS); }
 
 /* get show logo */
 bool Settings::Logo(void) const { return Modes(LOGO); }
+
+bool Settings::BattleAuto(void) const { return Modes(BATTLEAUTO); }
 
 /* battle grid */
 bool Settings::BattleGrid(void) const { return Modes(BATTLEGRID); }

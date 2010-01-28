@@ -104,7 +104,7 @@ public:
     enum flags_t
     {
 	SHIPMASTER	= 0x0001,
-	ARMYSPREAD	= 0x0002,
+	//		= 0x0002,
 	SPELLCASTED	= 0x0004,
 	ENABLEMOVE	= 0x0008,
 	HUNTER		= 0x0010,
@@ -131,6 +131,7 @@ public:
     Race::race_t GetRace(void) const{ return race; };
     const std::string & GetName(void) const{ return name; };
     u8 GetType(void) const { return Skill::Primary::HEROES; };
+    u8 GetControl(void) const;
 
     const SpellBook & GetSpellBook(void) const { return spell_book; };
     SpellBook & GetSpellBook(void) { return spell_book; };
@@ -188,7 +189,6 @@ public:
     BagArtifacts & GetBagArtifacts(void);
     const BagArtifacts & GetBagArtifacts(void) const;
     bool IsFullBagArtifacts(void) const;
-    void TakeArtifacts(Heroes &);
 
     u8 GetMobilityIndexSprite(void) const;
     u8 GetManaIndexSprite(void) const;
@@ -253,6 +253,8 @@ public:
 
     void SaveUnderObject(MP2::object_t obj);
     MP2::object_t GetUnderObject(void) const;
+
+    bool CanBattleRetreat(void) const;
 
     u32 GetExperience(void) const;
     void IncreaseExperience(const u32 exp);

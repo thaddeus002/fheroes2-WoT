@@ -44,6 +44,7 @@ public:
 
     virtual u16 w(void) const = 0;
     virtual u16 h(void) const = 0;
+    virtual size_t Size(void) const = 0;
 
     virtual void Blit(u16 ax, u16 ay, Surface & sf = Display::Get()) = 0;
 
@@ -65,6 +66,7 @@ public:
     u16 w(u16, u16) const;
     u16 h(void) const;
     u16 h(const u16) const;
+    size_t Size(void) const;
 
     void Blit(u16 ax, u16 ay, Surface & sf = Display::Get());
     static u8 CharWidth(char, Font::type_t);
@@ -92,6 +94,7 @@ public:
     u16 w(u16, u16) const;
     u16 h(void) const;
     u16 h(const u16) const;
+    size_t Size(void) const;
 
     void Blit(u16 ax, u16 ay, Surface & sf = Display::Get());
 
@@ -124,6 +127,7 @@ public:
     void Set(Font::type_t);
 
     void Clear(void);
+    size_t Size(void) const;
 
     u16 w(void) const{ return gw; };
     u16 h(void) const{ return gh; };

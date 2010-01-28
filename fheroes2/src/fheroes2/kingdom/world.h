@@ -32,6 +32,7 @@
 #include "heroes.h"
 #include "week.h"
 #include "color.h"
+#include "sprite.h"
 #include "game_io.h"
 
 class Heroes;
@@ -135,7 +136,7 @@ public:
 
     u16 CountObeliskOnMaps(void);
 
-    bool CreateBoat(const u16 center, bool build);
+    bool CreateBoat(const u16 center, bool build, u16* dst = NULL);
     void ClearFog(const u8 color);
 
     u16  CheckKingdomWins(const Kingdom &) const;
@@ -193,7 +194,7 @@ private:
     Heroes::heroes_t heroes_cond_wins;
     Heroes::heroes_t heroes_cond_loss;
 
-    Surface puzzle_surface;
+    Sprite puzzle_surface;
 
     static u32 uniq0;
 };

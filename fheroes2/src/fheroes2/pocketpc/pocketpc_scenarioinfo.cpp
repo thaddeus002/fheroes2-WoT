@@ -120,6 +120,7 @@ Game::menu_t PocketPC::ScenarioInfo(void)
 		    << ", difficulty: " << Difficulty::String(conf.GameDifficulty()) << ", select color: " << Color::String(conf.MyColor()));
             conf.FixKingdomRandomRace();
     	    Game::ShowLoadMapsText();
+	    cursor.Hide();
             world.LoadMaps(conf.MapsFile());
             return Game::STARTGAME;
             break;

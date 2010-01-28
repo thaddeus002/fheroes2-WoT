@@ -38,6 +38,12 @@ namespace Army
 {
     class BattleTroop;
 
+    enum format_t
+    {
+	FORMAT_GROUPED = 0,
+	FORMAT_SPREAD  = 1,
+    };
+
     enum armysize_t
     {
 	FEW	= 1,
@@ -57,22 +63,32 @@ namespace Army
     class army_t
     {
 	public:
-	    army_t(const HeroBase* s = NULL);
-
-	    army_t & operator= (const army_t &);		// deprecated, will be removed!
+	    army_t(HeroBase* s = NULL);
+	    army_t(const army_t &);
+	    army_t & operator= (const army_t &);
 
 	    void	FromGuardian(const Maps::Tiles &);
+	    void	Import(army_t &);
 	    void	Import(const std::vector<Troop> &);
+#ifdef WITH_BATTLE1
 	    void	Import(const std::vector<BattleTroop> &);
+#endif
 	    void	UpgradeMonsters(const Monster &);
 	    void	UpgradeMonsters(const Monster::monster_t);
 	    void	Clear(void);
 	    void	Reset(bool = false);	// reset: soft or hard
 
-	    void	SetModes(u32);
-	    void	ResetModes(u32);
+	    void	BattleExportKilled(army_t &) const;
+	    void	BattleSetModes(u32);
+	    void	BattleResetModes(u32);
+	    Troop*      BattleFindModes(u32);
+	    const Troop*BattleFindModes(u32) const;
+	    void	BattleInit(void);
+	    void	BattleQuit(void);
+	    void	BattleNewTurn(void);
+	    Troop &     BattleNewTroop(Monster::monster_t, u32);
 
-	    void	DrawMons32Line(s16, s16, u8, u8 = 0, u8 = 0, bool = false) const;
+	    void	DrawMons32Line(s16, s16, u16, u8 = 0, u8 = 0, bool = false) const;
 
 	    Troop &	FirstValid(void);
 	    Troop &	At(u8);
@@ -81,26 +97,28 @@ namespace Army
 	    Troop &	GetStrongestTroop(void);
 	    Troop &	GetWeakestTroop(void);
 
-	    const Troop&At(u8) const;
-	    const Troop&GetSlowestTroop(void) const;
-	    const Troop&GetFastestTroop(void) const;
-	    const Troop&GetStrongestTroop(void) const;
-	    const Troop&GetWeakestTroop(void) const;
+	    const Troop &	At(u8) const;
+	    const Troop &	GetSlowestTroop(void) const;
+	    const Troop &	GetFastestTroop(void) const;
+	    const Troop &	GetStrongestTroop(void) const;
+	    const Troop &	GetWeakestTroop(void) const;
 
 	    Race::race_t   GetRace(void) const;
 	    Color::color_t GetColor(void) const;
+	    u8             GetControl(void) const;
 
 	    u8		Size(void) const;
 	    u8		GetCount(void) const;
 	    u8		GetUniqCount(void) const;
-	    u16		GetCountMonsters(const Monster &) const;
-	    u16		GetCountMonsters(const Monster::monster_t) const;
+	    u32		GetCountMonsters(const Monster &) const;
+	    u32		GetCountMonsters(const Monster::monster_t) const;
 	    s8		GetMorale(void) const;
 	    s8		GetLuck(void) const;
 	    s8		GetMoraleWithModificators(std::string *strs = NULL) const;
 	    s8		GetLuckWithModificators(std::string *strs = NULL) const;
 	    u32		CalculateExperience(void) const;
 	    u32		ActionToSirens(void);
+	    u32		GetSurrenderCost(void) const;
 
 	    u16		GetAttack(void) const;
 	    u16		GetDefense(void) const;
@@ -112,10 +130,10 @@ namespace Army
 	    bool	HasMonster(const Monster &) const;
 	    bool	HasMonster(const Monster::monster_t) const;
 	    bool	JoinTroop(const Troop & troop);
-	    bool	JoinTroop(const Monster::monster_t mon, const u16 count);
-	    bool	JoinTroop(const Monster & mon, const u16 count);
+	    bool	JoinTroop(const Monster::monster_t mon, const u32 count);
+	    bool	JoinTroop(const Monster & mon, const u32 count);
 	    bool	StrongerEnemyArmy(const army_t &);
-        void    CalculateForceRatiosVersus(const army_t &a, u32 &own, u32 &other);
+	    void	CalculateForceRatiosVersus(const army_t &a, u32 &own, u32 &other);
 
 	    void	JoinStrongestFromArmy(army_t &);
             void	KeepOnlyWeakestTroops(army_t &);
@@ -125,12 +143,18 @@ namespace Army
 	    void	Dump(void) const;
 
 	    const HeroBase* GetCommander(void) const;
+	    HeroBase* GetCommander(void);
+
+	    void        SetCombatFormat(format_t);
+	    u8          GetCombatFormat(void) const;
 
 	protected:
 	    friend class Troop;
+	    s8		GetTroopIndex(const Troop &) const;
 
-	    std::vector<Troop>	army;
-	    const HeroBase* commander;
+	    std::vector<Troop> army;
+	    HeroBase*    commander;
+	    u8 combat_format;
     };
 };
 

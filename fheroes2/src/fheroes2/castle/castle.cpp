@@ -30,6 +30,7 @@
 #include "kingdom.h"
 #include "maps_tiles.h"
 #include "castle.h"
+#include "localclient.h"
 
 Castle::Castle() : captain(*this), mageguild(race), army(&captain), castle_heroes(NULL)
 {
@@ -40,7 +41,6 @@ Castle::Castle(s16 cx, s16 cy, const Race::race_t rc) : mp(cx, cy), race(rc), ca
     army(&captain), castle_heroes(NULL)
 {
     std::fill(dwelling, dwelling + CASTLEMAXMONSTER, 0);
-    SetModes(ARMYSPREAD);
     SetModes(ALLOWBUILD);
 
     if(3 > Maps::GetApproximateDistance(GetIndex(), world.GetNearestObject(GetIndex(), MP2::OBJ_COAST))) SetModes(NEARLYSEA);
@@ -555,9 +555,9 @@ bool Castle::AllowBuyHero(void)
     return true;
 }
 
-void Castle::RecruitHero(Heroes* hero)
+bool Castle::RecruitHero(Heroes* hero)
 {
-    if(! AllowBuyHero() && !hero) return;
+    if(! AllowBuyHero() && !hero) return false;
 
     Kingdom & kingdom = world.GetKingdom(color);
 
@@ -571,6 +571,16 @@ void Castle::RecruitHero(Heroes* hero)
     kingdom.AddHeroes(hero);
     
     castle_heroes = hero;
+
+    // update spell book
+    if(GetLevelMageGuild()) castle_heroes->AppendSpellsToBook(mageguild);
+
+    DEBUG(DBG_GAME , DBG_INFO, "Castle::RecruitHero: " << name << ", recruit: " << castle_heroes->GetName());
+
+#ifdef WITH_NET
+    FH2LocalClient::SendCastleRecruitHero(*this, *castle_heroes);
+#endif
+    return true;
 }
 
 /* recruit monster from building to castle army */
@@ -604,6 +614,11 @@ bool Castle::RecruitMonster(u32 dw, u16 count)
     dwelling[dw_index] -= count;
 
     DEBUG(DBG_GAME , DBG_INFO, "Castle::RecruitMonster: " << name);
+
+#ifdef WITH_NET
+    FH2LocalClient::SendCastleRecruitMonster(*this, dw, count);
+#endif
+
     return true;
 }
 
@@ -960,10 +975,14 @@ bool Castle::AllowBuyBuilding(u32 build) const
 }
 
 /* buy building */
-void Castle::BuyBuilding(u32 build)
+bool Castle::BuyBuilding(u32 build)
 {
-    if(! AllowBuyBuilding(build)) return;
-	
+    if(! AllowBuyBuilding(build)) return false;
+
+#ifdef WITH_NET
+    FH2LocalClient::SendCastleBuyBuilding(*this, build);
+#endif
+
     world.GetKingdom(color).OddFundsResource(PaymentConditions::BuyBuilding(race, build));
 
     // add build
@@ -1011,6 +1030,7 @@ void Castle::BuyBuilding(u32 build)
     }
 
     DEBUG(DBG_GAME , DBG_INFO, "Castle::BuyBuilding: " << name << " build " << GetStringBuilding(build, race));
+    return true;
 }
 
 /* draw image castle to position */
@@ -1561,13 +1581,11 @@ void Castle::MergeArmies(void)
     if(!hero)
         return;
 
-    u8 idx = 0;
-    while(idx < ARMYMAXTROOPS)
+    for(u8 idx = 0; idx < GetArmy().Size(); ++idx)
     {
         Army::Troop &troop = GetArmy().At(idx);
         if(hero->GetArmy().JoinTroop(troop))
             troop.SetCount(0);
-        idx++;
     }
 }
 
@@ -1592,16 +1610,32 @@ bool Castle::AllowBuyBoat(void) const
     return world.GetMyKingdom().AllowPayment(res) && (false == Modes(BOATPRESENT));
 }
 
-void Castle::BuyBoat(void)
+bool Castle::BuyBoat(void)
 {
-    if(Game::LOCAL == world.GetKingdom(color).Control())
-    {
-        AGG::PlaySound(M82::BUILDTWN);
-    }
     Resource::funds_t res;
     res.gold = BUY_BOAT_GOLD;
     res.wood = BUY_BOAT_WOOD;
+    if(!AllowBuyBoat()) return false;
+    if(Game::LOCAL == world.GetKingdom(color).Control()) AGG::PlaySound(M82::BUILDTWN);
     world.GetMyKingdom().OddFundsResource(res);
     SetModes(BOATPRESENT);
+#ifndef WITH_NET
     world.CreateBoat(GetIndex(), true);
+#else
+    u16 index;
+    if(world.CreateBoat(GetIndex(), true, &index))
+	FH2LocalClient::SendCastleBuyBoat(*this, index);
+#endif
+    return true;
+}
+
+u8 Castle::GetControl(void) const
+{
+    return world.GetKingdom(color).Control();
+}
+
+bool Castle::isNecromancyShrineBuild(void) const
+{
+    return Settings::Get().Modes(Settings::PRICELOYALTY) &&
+	race == Race::NECR && (BUILD_TAVERN & building);
 }

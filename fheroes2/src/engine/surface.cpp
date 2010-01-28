@@ -345,12 +345,12 @@ void Surface::SetColorKey(void)
 
 void Surface::SetColorKey(u8 r, u8 g, u8 b)
 {
-    SDL_SetColorKey(surface, SDL_SRCCOLORKEY, MapRGB(r, g, b));
+    SDL_SetColorKey(surface, SDL_SRCCOLORKEY | SDL_RLEACCEL, MapRGB(r, g, b));
 }
 
 void Surface::SetColorKey(u32 color)
 {
-    SDL_SetColorKey(surface, SDL_SRCCOLORKEY, color);
+    SDL_SetColorKey(surface, SDL_SRCCOLORKEY | SDL_RLEACCEL, color);
 }
 
 /* draw u32 pixel */
@@ -586,18 +586,23 @@ void Surface::GrayScale(void)
 {
     if(!surface) return;
 
-    u8 r, g, b, z;
-    
+    u8 a, r, g, b, z;
+
+    const u32 colkey = GetColorKey();
+    u32 color = 0;
+
     Lock();
     for(u16 y = 0; y < surface->h; ++y)
 	for(u16 x = 0; x < surface->w; ++x)
     {
-	GetRGB(GetPixel(x, y), &r, &g, &b);
+	color = GetPixel(x, y);
+	if(color == colkey) continue;
+	GetRGB(color, &r, &g, &b, &a);
 	z = static_cast<u8>(0.299 * r + 0.587 * g + 0.114 * b);
 	r = z;
 	g = z;
 	b = z;
-	SetPixel(x, y, MapRGB(r, g, b));
+	SetPixel(x, y, MapRGB(r, g, b, a));
     }
     Unlock();
 }
@@ -698,7 +703,6 @@ void Surface::MakeStencil(Surface & dst, const Surface & src, u32 col)
                 dst.SetPixel(x, y, col);
             }
         }
-    std::cerr << std::endl;
     dst.Unlock();
 }
 
@@ -832,8 +836,12 @@ u32 Surface::GetSize(void) const
         return res;
 }
 
-inline u32 AVERAGE(SDL_PixelFormat* fm, u32 c1, u32 c2)
+u32 AVERAGE(SDL_PixelFormat* fm, u32 c1, u32 c2)
 {
+    if(c1 == c2) return c1;
+    if(c1 == SDL_MapRGBA(fm, 0xFF, 0x00, 0xFF, 0)) c1 = 0;
+    if(c2 == SDL_MapRGBA(fm, 0xFF, 0x00, 0xFF, 0)) c2 = 0;
+
 #define avr(a, b) ((a + b) >> 1)
     u8 r1, g1, b1, a1;
     SDL_GetRGBA(c1, fm, &r1, &g1, &b1, &a1);
@@ -843,14 +851,12 @@ inline u32 AVERAGE(SDL_PixelFormat* fm, u32 c1, u32 c2)
 }
 
 /* scale surface */
-void Surface::ScaleMinifyByTwo(Surface & sf_dst, const Surface & sf_src, u8 mul)
+void Surface::ScaleMinifyByTwo(Surface & sf_dst, const Surface & sf_src, bool event)
 {
     if(!sf_src.valid()) { std::cerr << "Surface::ScaleMinifyByTwo: invalid surface" << std::endl; return; };
-    if(0 == mul) mul = 1;
-
     u16 x, y, x2, y2;
 
-    mul *= 2;
+    u8 mul = 2;
     u16 w = sf_src.w() / mul;
     u16 h = sf_src.h() / mul;
 
@@ -869,6 +875,7 @@ void Surface::ScaleMinifyByTwo(Surface & sf_dst, const Surface & sf_src, u8 mul)
 	    const u32 & p = AVERAGE(sf_src.surface->format, sf_src.GetPixel(x2, y2), sf_src.GetPixel(x2 + 1, y2));
 	    const u32 & q = AVERAGE(sf_src.surface->format, sf_src.GetPixel(x2, y2 + 1), sf_src.GetPixel(x2 + 1, y2 + 1));
 	    sf_dst.SetPixel(x, y, AVERAGE(sf_src.surface->format, p, q));
+	    if(event) LocalEvent::Get().HandleEvents(false);
        }
     }
     sf_dst.Unlock();

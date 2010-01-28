@@ -26,7 +26,7 @@
 #include "button.h"
 #include "dialog.h"
 
-bool Dialog::SelectCount(const std::string &header, u16 min, u16 max, u16 & cur)
+bool Dialog::SelectCount(const std::string &header, u32 min, u32 max, u32 & cur)
 {
     Display & display = Display::Get();
 

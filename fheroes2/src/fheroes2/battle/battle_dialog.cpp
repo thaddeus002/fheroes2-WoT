@@ -20,6 +20,8 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
+#ifdef WITH_BATTLE1
+
 #include <string>
 #include <algorithm>
 #include <cassert>
@@ -436,3 +438,5 @@ Army::battle_t Battle::HeroStatus(HeroBase &hero, StatusBar &statusBar, Spell::s
     }
     return Army::NONE;
 }
+
+#endif

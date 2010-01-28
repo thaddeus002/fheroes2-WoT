@@ -35,13 +35,13 @@ bool FH2Client::IsConnected(void) const
     return Modes(ST_CONNECT) && sd;
 }
 
-bool FH2Client::Wait(Network::Message & packet, u16 id)
+bool FH2Client::Wait(QueueMessage & packet, u16 id)
 {
     while(LocalEvent::Get().HandleEvents())
     {
         if(Ready())
         {
-            if(!packet.Recv(*this))
+            if(!Network::RecvMessage(*this, packet))
             {
                 Close();
 		DEBUG(DBG_NETWORK , DBG_TRACE, "FH2Client::Wait: error");
@@ -54,9 +54,9 @@ bool FH2Client::Wait(Network::Message & packet, u16 id)
     return true;
 }
 
-bool FH2Client::Send(Network::Message & packet)
+bool FH2Client::Send(QueueMessage & packet)
 {
-    if(!packet.Send(*this))
+    if(!Network::SendMessage(*this, packet))
     {
 	packet.Dump();
         Close();
@@ -66,9 +66,9 @@ bool FH2Client::Send(Network::Message & packet)
     return true;
 }
 
-bool FH2Client::Recv(Network::Message & packet)
+bool FH2Client::Recv(QueueMessage & packet)
 {
-    if(!packet.Recv(*this))
+    if(!Network::RecvMessage(*this, packet))
     {
 	packet.Dump();
         Close();

@@ -560,9 +560,6 @@ Dialog::answer_t Castle::OpenDialog(bool fade)
             	    display.Blit(AGG::GetICN(ICN::STRIP, 0), cur_pt.x, cur_pt.y + 256);
             	    display.Blit(Portrait::Hero((*castle_heroes), Portrait::BIG), cur_pt.x + 5, cur_pt.y + 361);
             	    selectHeroesArmy.Redraw();
-
-	    	    // update spell book
-		    if(castle_heroes && GetLevelMageGuild()) (*castle_heroes).AppendSpellsToBook(mageguild);
 		}
 
 		cursor.Show();

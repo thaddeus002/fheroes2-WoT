@@ -67,6 +67,24 @@ const char* Network::GetMsgString(u16 msg)
         case MSG_PLAYERS:       return "MSG_PLAYERS";
         case MSG_PLAYERS_GET:   return "MSG_PLAYERS_GET";
 
+        case MSG_CASTLE_BUILD:		return "MSG_CASTLE_BUILD";
+        case MSG_CASTLE_RECRUIT_HERO:	return "MSG_CASTLE_RECRUIT_HERO";
+        case MSG_CASTLE_BUY_BOAT:	return "MSG_CASTLE_BUY_BOAT";
+        case MSG_CASTLE_RECRUIT_MONSTER:return "MSG_CASTLE_RECRUIT_MONSTER";
+
+        case MSG_MARKET_SELL_RESOURCE:	return "MSG_MARKET_SELL_RESOURCE";
+        case MSG_MARKET_BUY_RESOURCE:	return "MSG_MARKET_BUY_RESOURCE";
+
+        case MSG_HEROES_BUY_MAGICBOOK:	return "MSG_HEROES_BUY_MAGICBOOK";
+        case MSG_HEROES_SWAP_ARTIFACTS:	return "MSG_HEROES_SWAP_ARTIFACTS";
+
+	case MSG_ARMY_UPGRADE_TROOP:	return "MSG_ARMY_UPGRADE_TROOP";
+	case MSG_ARMY_DISMISS_TROOP:	return "MSG_ARMY_DISMISS_TROOP";
+	case MSG_ARMY_SWAP_TROOPS:	return "MSG_ARMY_SWAP_TROOPS";
+	case MSG_ARMY_SPLIT_TROOP:	return "MSG_ARMY_SPLIT_TROOP";
+	case MSG_ARMY_JOIN_TROOP:	return "MSG_ARMY_JOIN_TROOP";
+        case MSG_ARMY_COMBAT_FORMATION: return "MSG_ARMY_COMBAT_FORMATION";
+
         case MSG_YOUR_TURN:     return "MSG_YOUR_TURN";
         case MSG_END_TURN:      return "MSG_END_TURN";
         case MSG_TILES:         return "MSG_TILES";
@@ -134,7 +152,7 @@ int Network::RunDedicatedServer(void)
     return 0;
 }
 
-void Network::PacketPopMapsFileInfoList(Network::Message & packet, MapsFileInfoList & flist)
+void Network::PacketPopMapsFileInfoList(QueueMessage & packet, MapsFileInfoList & flist)
 {
     flist.clear();
     u16 count;
@@ -147,7 +165,7 @@ void Network::PacketPopMapsFileInfoList(Network::Message & packet, MapsFileInfoL
     }
 }
 
-void Network::PacketPushMapsFileInfo(Network::Message & packet, const Maps::FileInfo & fi)
+void Network::PacketPushMapsFileInfo(QueueMessage & packet, const Maps::FileInfo & fi)
 {
     packet.Push(fi.file);
     packet.Push(fi.name);
@@ -175,7 +193,7 @@ void Network::PacketPushMapsFileInfo(Network::Message & packet, const Maps::File
     packet.Push(static_cast<u8>(fi.with_heroes));
 }
 
-void Network::PacketPopMapsFileInfo(Network::Message & packet, Maps::FileInfo & fi)
+void Network::PacketPopMapsFileInfo(QueueMessage & packet, Maps::FileInfo & fi)
 {
     u8 byte8, race;
     u32 byte32;
@@ -208,7 +226,7 @@ void Network::PacketPopMapsFileInfo(Network::Message & packet, Maps::FileInfo & 
     fi.with_heroes = byte8;
 }
 
-void Network::PacketPushPlayersInfo(Network::Message & m, const std::vector<FH2RemoteClient> & v, u32 exclude)
+void Network::PacketPushPlayersInfo(QueueMessage & m, const std::vector<FH2RemoteClient> & v, u32 exclude)
 {
     u8 count = std::count_if(v.begin(), v.end(), std::not1(std::bind2nd(std::mem_fun_ref(&Player::isID), 0)));
     m.Push(count);
@@ -237,7 +255,7 @@ u8 Network::GetPlayersColors(const std::vector<FH2RemoteClient> & v)
     return res;
 }
 
-void Network::PackKingdom(Network::Message & msg, const Kingdom & kingdom)
+void Network::PackKingdom(QueueMessage & msg, const Kingdom & kingdom)
 {
     msg.Reset();
     msg.SetID(MSG_KINGDOM);
@@ -245,7 +263,7 @@ void Network::PackKingdom(Network::Message & msg, const Kingdom & kingdom)
     Game::IO::PackKingdom(msg, kingdom);
 }
 
-void Network::UnpackKingdom(Network::Message & msg)
+void Network::UnpackKingdom(QueueMessage & msg)
 {
     u8 kingdom_color;
     msg.Pop(kingdom_color);
@@ -253,7 +271,7 @@ void Network::UnpackKingdom(Network::Message & msg)
     Game::IO::UnpackKingdom(msg, kingdom);
 }
 
-void Network::PackHero(Network::Message & msg, const Heroes & hero)
+void Network::PackHero(QueueMessage & msg, const Heroes & hero)
 {
     msg.Reset();
     msg.SetID(MSG_HEROES);
@@ -261,7 +279,7 @@ void Network::PackHero(Network::Message & msg, const Heroes & hero)
     Game::IO::PackHeroes(msg, hero);
 }
 
-void Network::UnpackHero(Network::Message & msg)
+void Network::UnpackHero(QueueMessage & msg)
 {
     u8 hero_id;
     msg.Pop(hero_id);
@@ -272,7 +290,7 @@ void Network::UnpackHero(Network::Message & msg)
 	DEBUG(DBG_NETWORK, DBG_WARN, "Network::UnpackHero: unknown hero id");
 }
 
-void Network::PackTile(Network::Message & msg, const Maps::Tiles & tile)
+void Network::PackTile(QueueMessage & msg, const Maps::Tiles & tile)
 {
     msg.Reset();
     msg.SetID(MSG_TILES);
@@ -280,7 +298,7 @@ void Network::PackTile(Network::Message & msg, const Maps::Tiles & tile)
     Game::IO::PackTile(msg, tile);
 }
 
-void Network::UnpackTile(Network::Message & msg)
+void Network::UnpackTile(QueueMessage & msg)
 {
     u16 tile_index;
     msg.Pop(tile_index);
@@ -288,7 +306,7 @@ void Network::UnpackTile(Network::Message & msg)
     Game::IO::UnpackTile(msg, tile);
 }
 
-void Network::PackCastle(Network::Message & msg, const Castle & castle)
+void Network::PackCastle(QueueMessage & msg, const Castle & castle)
 {
     msg.Reset();
     msg.SetID(MSG_CASTLE);
@@ -296,7 +314,7 @@ void Network::PackCastle(Network::Message & msg, const Castle & castle)
     Game::IO::PackCastle(msg, castle);
 }
 
-void Network::UnpackCastle(Network::Message & msg)
+void Network::UnpackCastle(QueueMessage & msg)
 {
     u16 castle_index;
     msg.Pop(castle_index);

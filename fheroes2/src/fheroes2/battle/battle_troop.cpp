@@ -21,6 +21,8 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
+#ifdef WITH_BATTLE1
+
 #include <algorithm>
 #include "battle.h"
 #include "battle_troop.h"
@@ -304,7 +306,7 @@ void Army::BattleTroop::RemoveSpellEffect(Spell::spell_t spell)
             ResetModes(SP_PARALYZE);
             break;
 
-        case Spell::BERZERKER:
+        case Spell::BERSERKER:
             ResetModes(SP_BERZERKER);
             break;
 
@@ -412,7 +414,7 @@ bool Army::BattleTroop::ApplySpell(Spell::spell_t spell, u8 sp)
 
         case Spell::BLIND: SetModes(SP_BLIND); break;
         case Spell::PARALYZE: SetModes(SP_PARALYZE); break;
-        case Spell::BERZERKER: SetModes(SP_BERZERKER); break;
+        case Spell::BERSERKER: SetModes(SP_BERZERKER); break;
         case Spell::HYPNOTIZE: SetModes(SP_HYPNOTIZE); break;
 
         case Spell::STONE: SetModes(SP_STONE); break;
@@ -526,8 +528,6 @@ void Army::BattleTroop::SetModes(u32 f)
         default:
             break;
     }
-
-    Troop::SetModes(f);
 }
 
 u8 Army::BattleTroop::GetAttack(void) const
@@ -684,3 +684,4 @@ void Army::LoadContours(BattleArmy_t &army, bool inv)
     std::for_each(army.begin(), army.end(), std::bind2nd(std::mem_fun_ref(&BattleTroop::LoadContours), inv));
 }
 
+#endif

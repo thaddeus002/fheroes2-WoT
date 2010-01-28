@@ -122,6 +122,7 @@ public:
 	MONSTER_RND,
     };
 
+#ifdef WITH_BATTLE1
     struct animattack_t
     {
 	u8 attprep_start;
@@ -163,6 +164,7 @@ public:
 	AS_ATT2P	= 16+4,
 	AS_ATT3P	= 16+5
     };
+#endif
 
     Monster();
     Monster(monster_t);
@@ -208,9 +210,12 @@ public:
     bool isArchers(void) const;
     bool isAllowUpgrade(void) const;
     bool isTwiceAttack(void) const;
+    bool isDragons(void) const;
 
-    ICN::icn_t ICNFile(void) const;
     ICN::icn_t ICNMonh(void) const;
+
+#ifdef WITH_BATTLE1
+    ICN::icn_t ICNFile(void) const;
     ICN::icn_t ICNMiss(void) const;
 
     M82::m82_t M82Attk(void) const;
@@ -222,6 +227,7 @@ public:
 
     const anim_t & Animation(void) const;
     void GetAnimFrames(u8 anim, u8 & start, u8 & length, bool attranged = false) const;
+#endif
 
     static monster_t Upgrade(Monster &);
     static u16 GetRNDSize(Monster &);

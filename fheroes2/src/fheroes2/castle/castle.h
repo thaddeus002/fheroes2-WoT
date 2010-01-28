@@ -90,7 +90,7 @@ public:
     {
 	NEARLYSEA		= 0x0001,
 	ALLOWCASTLE		= 0x0002,
-	ARMYSPREAD		= 0x0004,
+	//			= 0x0004,
 	ALLOWBUILD		= 0x0008,
 	BOATPRESENT		= 0x0010,
 	CAPITAL			= 0x0020,
@@ -109,16 +109,18 @@ public:
     bool RecruitMonster(u32 dw, u16 count);
     bool AllowBuyHero(void);
     bool ContainCoord(const u16 ax, const u16 ay) const;
+    bool isNecromancyShrineBuild(void) const;
 
     u32 CountBuildings(void) const;
 
-    void RecruitHero(Heroes*);
+    bool RecruitHero(Heroes*);
     const Heroes* GetHeroes(void) const;
     Heroes* GetHeroes(void);
 
     Race::race_t GetRace(void) const{ return race; };
     Color::color_t GetColor(void) const{ return color; };
     const std::string & GetName(void) const{ return name; };
+    u8 GetControl(void) const;
     u8 GetLevelMageGuild(void) const;
     const MageGuild & GetMageGuild(void) const;
 
@@ -150,9 +152,9 @@ public:
     bool AllowBuild(void) const{ return Modes(ALLOWBUILD); };
     bool AllowBuyBuilding(u32) const;
     bool isBuild(u32 bd) const{ return building & bd; };
-    void BuyBuilding(u32);
+    bool BuyBuilding(u32);
     bool AllowBuyBoat(void) const;
-    void BuyBoat(void);
+    bool BuyBoat(void);
     u32 GetBuildingRequires(u32) const;
 
     static const char* GetStringBuilding(u32, Race::race_t = Race::BOMG);

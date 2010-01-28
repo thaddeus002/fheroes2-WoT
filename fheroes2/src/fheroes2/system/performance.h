@@ -27,6 +27,7 @@
 
 class Performance : public Time
 {
+public:
     Performance(){};
 };
 

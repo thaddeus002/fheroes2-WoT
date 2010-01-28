@@ -36,13 +36,13 @@
 
 extern u8 SelectCountPlayers(void);
 
-void SendPacketToAllClients(std::vector<FH2RemoteClient> & clients, const Network::Message & msg, u32 owner)
+void SendPacketToAllClients(std::vector<FH2RemoteClient> & clients, const QueueMessage & msg, u32 owner)
 {
-    static const Network::Message ready(MSG_READY);
+    static const QueueMessage ready(MSG_READY);
 
     std::vector<FH2RemoteClient>::iterator it = clients.begin();
     for(; it != clients.end(); ++it) if((*it).IsConnected())
-	(*it).player_id != owner ? msg.Send(*it) : ready.Send(*it);
+	(*it).player_id != owner ? Network::SendMessage(*it, msg) : Network::SendMessage(*it, ready);
 }
 
 FH2Server::FH2Server()
@@ -97,13 +97,13 @@ void FH2Server::SetStartGame(void)
     start_game = true;
 }
 
-void FH2Server::SendToAllClients(const Network::Message & msg, u32 id)
+void FH2Server::SendToAllClients(const QueueMessage & msg, u32 id)
 {
     DEBUG(DBG_NETWORK , DBG_INFO, "FH2Server::PrepareSending: send msg: " << Network::GetMsgString(msg.GetID()));
     SendPacketToAllClients(clients, msg, id);
 }
 
-void FH2Server::PushMapsFileInfoList(Network::Message & msg) const
+void FH2Server::PushMapsFileInfoList(QueueMessage & msg) const
 {
     msg.Push(static_cast<u16>(finfo_list.size()));
     MapsFileInfoList::const_iterator it1 = finfo_list.begin();
@@ -112,12 +112,12 @@ void FH2Server::PushMapsFileInfoList(Network::Message & msg) const
     for(; it1 != it2; ++it1) Network::PacketPushMapsFileInfo(msg, *it1);
 }
 
-void FH2Server::PushPlayersInfo(Network::Message & msg, u32 exclude) const
+void FH2Server::PushPlayersInfo(QueueMessage & msg, u32 exclude) const
 {
     Network::PacketPushPlayersInfo(msg, clients, exclude);
 }
 
-void FH2Server::PopMapsFileInfoList(Network::Message & msg)
+void FH2Server::PopMapsFileInfoList(QueueMessage & msg)
 {
     Network::PacketPopMapsFileInfoList(msg, finfo_list);
 }
@@ -195,7 +195,7 @@ void FH2Server::WaitClients(void)
 {
     Settings & conf = Settings::Get();
     std::vector<FH2RemoteClient>::iterator it;
-    Network::Message packet(MSG_UNKNOWN);
+    QueueMessage packet(MSG_UNKNOWN);
 
     clients.reserve(8);
     exit = false;
@@ -257,7 +257,7 @@ void FH2Server::StartGame(void)
     std::for_each(clients.begin(), clients.end(), Player::FixRandomRace);
     conf.SetPlayersColors(Network::GetPlayersColors(clients));
 
-    Network::Message packet;
+    QueueMessage packet;
 
     world.LoadMaps(conf.MapsFile());
 
@@ -279,6 +279,9 @@ void FH2Server::StartGame(void)
 	SendPacketToAllClients(clients, packet, 0);
 	mutex.Unlock();
 
+	// send all tiles
+	// send action new day
+	
 	for(Color::color_t color = Color::BLUE; color != Color::GRAY && !exit; ++color)
 	{
 	    Kingdom & kingdom = world.GetKingdom(color);

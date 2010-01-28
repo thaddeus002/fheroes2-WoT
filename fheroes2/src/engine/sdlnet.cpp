@@ -123,6 +123,10 @@ void QueueMessage::Reset(void)
     itd2 = itd1;
 }
 
+void QueueMessage::SoftReset(void)
+{
+    itd1 = data;
+}
 
 void QueueMessage::Push(u8 byte8)
 {
@@ -272,32 +276,24 @@ void Network::SetProtocolVersion(u16 v)
     proto = v;
 }
 
-Network::Message::Message()
-{
-}
-
-Network::Message::Message(u16 id) : QueueMessage(id)
-{
-}
-
-bool Network::Message::Recv(const Socket & csd, bool debug)
+bool Network::RecvMessage(const Network::Socket & csd, QueueMessage & msg, bool debug)
 {
     u16 head;
-    type = 0;
+    msg.type = 0;
 
     if(csd.Recv(reinterpret_cast<char *>(&head), sizeof(head)))
     {
 	SwapBE16(head);
 
 	// check id
-	if((0xFF00 & proto) != (0xFF00 & head))
+	if((0xFF00 & Network::proto) != (0xFF00 & head))
 	{
 	    if(debug) std::cerr << "Network::QueueMessage::Recv: unknown packet id: 0x" << std::hex << head << std::endl;
 	    return false;
 	}
 
 	// check ver
-	if((0x00FF & proto) > (0x00FF & head))
+	if((0x00FF & Network::proto) > (0x00FF & head))
 	{
 	    if(debug) std::cerr << "Network::QueueMessage::Recv: obsolete protocol ver: 0x" << std::hex << (0x00FF & head) << std::endl;
 	    return false;
@@ -305,37 +301,37 @@ bool Network::Message::Recv(const Socket & csd, bool debug)
 
 	u32 size;
 
-	if(csd.Recv(reinterpret_cast<char *>(&type), sizeof(type)) &&
+	if(csd.Recv(reinterpret_cast<char *>(&msg.type), sizeof(msg.type)) &&
 	   csd.Recv(reinterpret_cast<char *>(&size), sizeof(size)))
 	{
-	    type = SDL_SwapBE16(type);
+	    msg.type = SDL_SwapBE16(msg.type);
 	    size = SDL_SwapBE32(size);
 
-	    if(size > dtsz)
+	    if(size > msg.dtsz)
 	    {
-		delete [] data;
-		data = new char [size + 1];
-        	dtsz = size;
+		delete [] msg.data;
+		msg.data = new char [size + 1];
+        	msg.dtsz = size;
 	    }
-	    
-	    itd1 = data;
-	    itd2 = itd1 + size;
 
-	    return size ? csd.Recv(data, size) : true;
+	    msg.itd1 = msg.data;
+	    msg.itd2 = msg.itd1 + size;
+
+	    return size ? csd.Recv(msg.data, size) : true;
 	}
     }
     return false;
 }
 
-bool Network::Message::Send(const Socket & csd) const
+bool Network::SendMessage(const Network::Socket & csd, const QueueMessage & msg)
 {
     // raw data
-    if(0 == type)
-	return Size() ? csd.Send(reinterpret_cast<const char *>(data), Size()) : false;
+    if(0 == msg.type)
+	return msg.Size() ? csd.Send(reinterpret_cast<const char *>(msg.data), msg.Size()) : false;
 
-    u16 head = proto;
-    u16 sign = type;
-    u32 size = Size();
+    u16 head = Network::proto;
+    u16 sign = msg.type;
+    u32 size = msg.Size();
 
     SwapBE16(head);
     SwapBE16(sign);
@@ -344,7 +340,7 @@ bool Network::Message::Send(const Socket & csd) const
     return csd.Send(reinterpret_cast<const char *>(&head), sizeof(head)) &&
            csd.Send(reinterpret_cast<const char *>(&sign), sizeof(sign)) &&
            csd.Send(reinterpret_cast<const char *>(&size), sizeof(size)) &&
-           (size ? csd.Send(data, Size()) : true);
+           (size ? csd.Send(msg.data, msg.Size()) : true);
 }
 
 Network::Socket::Socket() : sd(NULL), sdset(NULL)

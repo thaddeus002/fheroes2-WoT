@@ -31,9 +31,10 @@
 #include "army.h"
 #include "tools.h"
 #include "castle.h"
+#include "localclient.h"
 #include "selectarmybar.h"
 
-void DialogRedistributeArmy(Army::Troop &, Army::Troop &);
+void DialogRedistributeArmy(Army::army_t &, u8, Army::army_t &, u8);
 
 enum
 {
@@ -168,7 +169,7 @@ void SelectArmyBar::Redraw(Surface & display)
     spritecursor.Hide();
     Point pt(pos);
 
-    for(u8 ii = 0; ii < ARMYMAXTROOPS; ++ii)
+    for(u8 ii = 0; ii < army->Size(); ++ii)
     {
 	const Army::Troop & troop = army->At(ii);
 	if(troop.isValid())
@@ -200,7 +201,7 @@ void SelectArmyBar::Redraw(Surface & display)
     
         	// draw count
         	std::string str;
-        	String::AddInt(str, troop.Count());
+        	String::AddInt(str, troop.GetCount());
         	Text text(str, Font::SMALL);
 
         	if(flags & FLAGS_COUNT2SPRITE)
@@ -214,7 +215,7 @@ void SelectArmyBar::Redraw(Surface & display)
     
         	// draw count
         	std::string str;
-        	String::AddInt(str, troop.Count());
+        	String::AddInt(str, troop.GetCount());
         	Text text(str, Font::SMALL);
 		text.Blit(pt.x + background->w() - text.w() - 3, pt.y + background->h() - 13);
 	    }
@@ -269,7 +270,7 @@ bool SelectArmyBar::QueueEventProcessing(SelectArmyBar & bar)
 	const s8 index_r = bar.GetIndexFromCoord(le.GetMouseReleaseLeft());
 	if(!bar.army->At(index_r).isValid())
 	{
-	    DialogRedistributeArmy(bar.army->At(index_p), bar.army->At(index_r));
+	    DialogRedistributeArmy(*bar.army, index_p, *bar.army, index_r);
 	    bar.Reset();
 	    bar.Redraw();
 	}
@@ -289,7 +290,7 @@ bool SelectArmyBar::QueueEventProcessing(SelectArmyBar & bar)
 	    {
 		u16 flags = (bar.ReadOnly() || bar.SaveLastTroop() ? Dialog::READONLY | Dialog::BUTTONS : Dialog::BUTTONS);
 		PaymentConditions::UpgradeMonster payment(troop1());
-		payment *= troop1.Count();
+		payment *= troop1.GetCount();
 
 		if(troop1.isAllowUpgrade() &&
 		    bar.castle &&
@@ -304,11 +305,17 @@ bool SelectArmyBar::QueueEventProcessing(SelectArmyBar & bar)
             		world.GetMyKingdom().OddFundsResource(payment);
             		troop1.Upgrade();
 			change = true;
+#ifdef WITH_NET
+			FH2LocalClient::SendArmyUpgradeTroop(*bar.army, index1);
+#endif
             	    break;
 
         	    case Dialog::DISMISS:
                 	troop1.Reset();
 			change = true;
+#ifdef WITH_NET
+			FH2LocalClient::SendArmyDismissTroop(*bar.army, index1);
+#endif
                 	break;
 
 		    default: break;
@@ -318,15 +325,21 @@ bool SelectArmyBar::QueueEventProcessing(SelectArmyBar & bar)
 	    // combine
 	    if(troop1() == troop2())
 	    {
-		troop1.SetCount(troop1.Count() + troop2.Count());
+		troop1.SetCount(troop1.GetCount() + troop2.GetCount());
 		troop2.Reset();
 		change = true;
+#ifdef WITH_NET
+		FH2LocalClient::SendArmyJoinTroops(*bar.army, index1, *bar.army, index2);
+#endif
 	    }
 	    // exchange
 	    else
 	    {
 		Army::SwapTroops(troop1, troop2);
 		change = true;
+#ifdef WITH_NET
+		FH2LocalClient::SendArmySwapTroops(*bar.army, index1, *bar.army, index2);
+#endif
 	    }
 
 	    bar.Reset();
@@ -355,9 +368,9 @@ bool SelectArmyBar::QueueEventProcessing(SelectArmyBar & bar)
 	if(bar.isSelected())
 	{
 	    const s8 index2 = bar.Selected();
-	    Army::Troop & troop2 = bar.army->At(index2);
+	    //Army::Troop & troop2 = bar.army->At(index2);
 
-	    DialogRedistributeArmy(troop2, troop1);
+	    DialogRedistributeArmy(*bar.army, index2, *bar.army, index1);
 
 	    bar.Reset();
 	    bar.Redraw();
@@ -400,9 +413,12 @@ bool SelectArmyBar::QueueEventProcessing(SelectArmyBar & bar1, SelectArmyBar & b
 	    // combine
 	    if(!bar1.SaveLastTroop() && troop1() == troop2())
 	    {
-		troop1.SetCount(troop1.Count() + troop2.Count());
+		troop1.SetCount(troop1.GetCount() + troop2.GetCount());
 		troop2.Reset();
 		change = true;
+#ifdef WITH_NET
+		FH2LocalClient::SendArmyJoinTroops(*bar2.army, index1, *bar1.army, index2);
+#endif
 	    }
 	    // exchange
 	    else
@@ -410,6 +426,9 @@ bool SelectArmyBar::QueueEventProcessing(SelectArmyBar & bar1, SelectArmyBar & b
 	    {
 	    	Army::SwapTroops(troop1, troop2);
 		change = true;
+#ifdef WITH_NET
+		FH2LocalClient::SendArmySwapTroops(*bar2.army, index1, *bar1.army, index1);
+#endif
 	    }
 
 	    bar1.Reset();
@@ -431,7 +450,7 @@ bool SelectArmyBar::QueueEventProcessing(SelectArmyBar & bar1, SelectArmyBar & b
 	    else
 	    // empty troops - redistribute troops
 	    {
-		DialogRedistributeArmy(troop2, troop1);
+		DialogRedistributeArmy(*bar1.army, index2, *bar2.army, index1);
 
 		bar1.Reset();
 		bar2.Reset();
@@ -462,9 +481,12 @@ bool SelectArmyBar::QueueEventProcessing(SelectArmyBar & bar1, SelectArmyBar & b
 	    // combine
 	    if(!bar2.SaveLastTroop() && troop1() == troop2())
 	    {
-		troop1.SetCount(troop1.Count() + troop2.Count());
+		troop1.SetCount(troop1.GetCount() + troop2.GetCount());
 		troop2.Reset();
 		change = true;
+#ifdef WITH_NET
+		FH2LocalClient::SendArmyJoinTroops(*bar1.army, index1, *bar2.army, index2);
+#endif
 	    }
 	    // exchange
 	    else
@@ -472,6 +494,9 @@ bool SelectArmyBar::QueueEventProcessing(SelectArmyBar & bar1, SelectArmyBar & b
 	    {
 		Army::SwapTroops(troop1, troop2);
 		change = true;
+#ifdef WITH_NET
+		FH2LocalClient::SendArmySwapTroops(*bar1.army, index1, *bar2.army, index2);
+#endif
 	    }
 
 	    bar1.Reset();
@@ -493,7 +518,7 @@ bool SelectArmyBar::QueueEventProcessing(SelectArmyBar & bar1, SelectArmyBar & b
 	    else
 	    // empty troops - redistribute troops
 	    {
-		DialogRedistributeArmy(troop2, troop1);
+		DialogRedistributeArmy(*bar2.army, index2, *bar1.army, index1);
 
 		bar1.Reset();
 		bar2.Reset();
@@ -510,22 +535,30 @@ bool SelectArmyBar::QueueEventProcessing(SelectArmyBar & bar1, SelectArmyBar & b
     return change;
 }
 
-void DialogRedistributeArmy(Army::Troop & troop1, Army::Troop & troop2)
+void DialogRedistributeArmy(Army::army_t & army1, u8 index1, Army::army_t & army2, u8 index2)
 {
+    Army::Troop & troop1 = army1.At(index1);
+    Army::Troop & troop2 = army2.At(index2);
     const bool last = (1 == troop1.GetArmy()->GetCount());
 
     if(2 > troop1.Count())
     {
 	if(!last || troop2.isValid())
 	    Army::SwapTroops(troop1, troop2);
+#ifdef WITH_NET
+	    FH2LocalClient::SendArmySwapTroops(army1, index1, army2, index2);
+#endif
     }
     else
     {
-	u16 redistr_count = troop1.Count() / 2;
+	u32 redistr_count = troop1.Count() / 2;
 	if(Dialog::SelectCount(_("Move how many troops?"), 1, (last ? troop1.Count() - 1 : troop1.Count()), redistr_count))
 	{
 	    troop2.Set(troop1, redistr_count);
 	    troop1.SetCount(troop1.Count() - redistr_count);
+#ifdef WITH_NET
+	FH2LocalClient::SendArmySplitTroop(army1, index1, army2, index2, redistr_count);
+#endif
 	}
     }
 }

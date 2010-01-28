@@ -173,3 +173,15 @@ MUS::mus_t MUS::FromMapObject(u8 object)
             return MUS::UNKNOWN;
     }
 }
+
+MUS::mus_t MUS::GetBattleRandom(void)
+{
+    switch(Rand::Get(1, 3))
+    {
+	case 1:	return BATTLE1;
+	case 2:	return BATTLE2;
+	case 3:	return BATTLE3;
+	default: break;
+    }
+    return UNKNOWN;
+}

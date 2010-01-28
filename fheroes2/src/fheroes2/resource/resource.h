@@ -69,7 +69,7 @@ namespace Resource
         s32 gold;
     };
 
-    const char* String(resource_t resource);
+    const char* String(u8 resource);
 
     resource_t Rand(void);
     resource_t FromIndexSprite(u8 index);
