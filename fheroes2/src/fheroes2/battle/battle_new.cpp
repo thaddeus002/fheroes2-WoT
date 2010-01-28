@@ -2596,8 +2596,8 @@ namespace Battle
     {
         HeroBase *h1 = GetHero(0);
         HeroBase *h2 = GetHero(1);
-        InitArmyPosition(*m_army[0], h1 ? !h1->Modes(Heroes::ARMYSPREAD) : false, false);
-        InitArmyPosition(*m_army[1], h2 ? !h2->Modes(Heroes::ARMYSPREAD) : false, true);
+        InitArmyPosition(*m_army[0], h1 ? Army::FORMAT_SPREAD != h1->GetArmy().GetCombatFormat() : false, false);
+        InitArmyPosition(*m_army[1], h2 ? Army::FORMAT_SPREAD != h2->GetArmy().GetCombatFormat() : false, true);
     }
 
     /** Remove any units from the battle that are dead.
