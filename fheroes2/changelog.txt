@@ -1,5 +1,5 @@
-SVN - up to r1375
-
+SVN - up to r1402
++ Added new battle engine, QVGA support
 + Fixed spells lasting past the end of a battle
 + Fixed spells lasting indefinitely in battle
 + Fixed monsters casting spells on dead units
