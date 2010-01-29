@@ -1849,7 +1849,7 @@ void Battle2::Interface::RedrawActionAttackPart1(Stats & attacker, Stats & defen
     }
 
     // check archers
-    const bool archer = attacker.isArchers() && attacker.isHandFighting();
+    const bool archer = attacker.isArchers() && !attacker.isHandFighting();
 
     if(archer)
     {
