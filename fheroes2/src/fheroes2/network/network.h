@@ -102,6 +102,9 @@ namespace Network
     msg_t		GetMsg(u16);
     bool		MsgIsBroadcast(u16);
 
+    bool		isLocalClient(void);
+    bool		isRemoteClient(void);
+
     void		PacketPopMapsFileInfoList(QueueMessage &, MapsFileInfoList &);
     void		PacketPushMapsFileInfo(QueueMessage &, const Maps::FileInfo &);
     void		PacketPopMapsFileInfo(QueueMessage &, Maps::FileInfo &);

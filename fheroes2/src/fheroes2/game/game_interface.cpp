@@ -20,12 +20,20 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
+#include <ctime>
 #include <sstream>
 #include "agg.h"
 #include "settings.h"
 #include "maps.h"
 #include "dialog.h"
 #include "game_interface.h"
+
+bool Interface::NoGUI(void)
+{
+    const Settings & conf = Settings::Get();
+
+    return conf.NetworkDedicatedServer();
+}
 
 Interface::Basic::Basic() : gameArea(GameArea::Get()), radar(Radar::Get()),
     iconsPanel(IconsPanel::Get()), buttonsArea(ButtonsArea::Get()),
@@ -144,7 +152,22 @@ void Interface::Basic::Redraw(u8 force)
 void Interface::Basic::RedrawSystemInfo(s16 cx, s16 cy)
 {
     std::ostringstream os;
-    os << "fps: " << 0 << ", usage memory: " << GetMemoryUsage() << "Kb";
+    os << "memory usage: " << GetMemoryUsage() << "Kb" << ", current time: ";
+
+    time_t rawtime;
+    std::time(&rawtime);
+    // strtime format: Www Mmm dd hh:mm:ss yyyy
+    const char* strtime = std::ctime(&rawtime);
+
+    // get time only
+    u8 space = 0;
+    while(strtime && *strtime && space < 3){ if(std::isspace(*strtime)) ++space; ++strtime; }
+
+    space = 0;
+    while(strtime && *(strtime + space) && !std::isspace(*(strtime + space))) ++space;
+
+    // draw info
+    os << std::string(strtime, space);
     system_info.Set(os.str());
     system_info.Blit(cx, cy);
 }

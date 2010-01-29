@@ -67,10 +67,12 @@ public:
 	NONE              = 0x00000000,
 	LOADGAME          = 0x00000001,
 	AUTOSAVE          = 0x00000002,
-	DEDICATEDSERVER   = 0x00000004,
-	POCKETPC          = 0x00000008,
-	LOWMEMORY         = 0x00000010,
-	TAPMODE           = 0x00000020,
+	POCKETPC          = 0x00000004,
+	LOWMEMORY         = 0x00000008,
+	TAPMODE           = 0x00000010,
+
+	DEDICATEDSERVER   = 0x00000020,
+	LOCALCLIENT       = 0x00000040,
 
 	HIDEAIMOVE        = 0x00000080,
 
@@ -158,7 +160,9 @@ public:
     bool LowMemory(void) const;
     bool TapMode(void) const;
     bool HideAIMove(void) const;
-    bool NoGUI(void) const;
+
+    bool NetworkDedicatedServer(void) const;
+    bool NetworkLocalClient(void) const;
 
     const Size & VideoMode(void) const;
 

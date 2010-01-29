@@ -54,7 +54,7 @@ void Kingdom::AITurns(void)
     
     if(!Settings::Get().Modes(Settings::MUSIC_MIDI)) AGG::PlayMusic(MUS::COMPUTER);
 
-    Interface::StatusWindow *status = Settings::Get().NoGUI() ? NULL : &Interface::StatusWindow::Get();
+    Interface::StatusWindow *status = Interface::NoGUI() ? NULL : &Interface::StatusWindow::Get();
 
     // turn indicator
     if(status) status->RedrawTurnProgress(0);
@@ -140,7 +140,7 @@ void Kingdom::AITurns(void)
 	    //if(status) status->RedrawTurnProgress(6);
 
 	    // heroes AI turn
-	    if(Settings::Get().NoGUI())
+	    if(Interface::NoGUI())
 		AIHeroesNoGUITurns(hero);
 	    else
 		AIHeroesTurns(hero);

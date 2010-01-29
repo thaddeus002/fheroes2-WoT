@@ -499,7 +499,7 @@ void RedrawClopOrClofSpriteFog(const u16 dst_index, const Point & dst)
 
 void Interface::GameArea::GenerateUltimateArtifactAreaSurface(const u16 index, Sprite & sf)
 {
-    if(Settings::Get().NoGUI()) return;
+    if(Interface::NoGUI()) return;
 
     if(Maps::isValidAbsIndex(index))
     {

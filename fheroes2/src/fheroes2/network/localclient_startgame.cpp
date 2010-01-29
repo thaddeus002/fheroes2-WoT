@@ -247,9 +247,9 @@ bool FH2LocalClient::StartGame(void)
 
 void FH2LocalClient::SendCastleBuyBuilding(const Castle & castle, u32 build)
 {
-    FH2LocalClient & client = FH2LocalClient::Get();
-    if(Game::NETWORK != Settings::Get().GameType() || !client.IsConnected()) return;
+    if(!Network::isLocalClient()) return;
 
+    FH2LocalClient & client = FH2LocalClient::Get();
     QueueMessage packet;
 
     packet.SetID(MSG_CASTLE_BUILD);
@@ -262,9 +262,9 @@ void FH2LocalClient::SendCastleBuyBuilding(const Castle & castle, u32 build)
 
 void FH2LocalClient::SendCastleRecruitHero(const Castle & castle, const Heroes & hero)
 {
-    FH2LocalClient & client = FH2LocalClient::Get();
-    if(Game::NETWORK != Settings::Get().GameType() || !client.IsConnected()) return;
+    if(!Network::isLocalClient()) return;
 
+    FH2LocalClient & client = FH2LocalClient::Get();
     QueueMessage packet;
 
     packet.SetID(MSG_CASTLE_RECRUIT_HERO);
@@ -277,9 +277,9 @@ void FH2LocalClient::SendCastleRecruitHero(const Castle & castle, const Heroes &
 
 void FH2LocalClient::SendCastleBuyBoat(const Castle & castle, u16 index)
 {
-    FH2LocalClient & client = FH2LocalClient::Get();
-    if(Game::NETWORK != Settings::Get().GameType() || !client.IsConnected()) return;
+    if(!Network::isLocalClient()) return;
 
+    FH2LocalClient & client = FH2LocalClient::Get();
     QueueMessage packet;
 
     packet.SetID(MSG_CASTLE_BUY_BOAT);
@@ -292,9 +292,9 @@ void FH2LocalClient::SendCastleBuyBoat(const Castle & castle, u16 index)
 
 void FH2LocalClient::SendCastleRecruitMonster(const Castle & castle, u32 dwelling, u16 count)
 {
-    FH2LocalClient & client = FH2LocalClient::Get();
-    if(Game::NETWORK != Settings::Get().GameType() || !client.IsConnected()) return;
+    if(!Network::isLocalClient()) return;
 
+    FH2LocalClient & client = FH2LocalClient::Get();
     QueueMessage packet;
 
     packet.SetID(MSG_CASTLE_RECRUIT_MONSTER);
@@ -308,9 +308,9 @@ void FH2LocalClient::SendCastleRecruitMonster(const Castle & castle, u32 dwellin
 
 void FH2LocalClient::SendMarketSellResource(const Kingdom & kingdom, u8 resource, u32 count, bool tradingPost)
 {
-    FH2LocalClient & client = FH2LocalClient::Get();
-    if(Game::NETWORK != Settings::Get().GameType() || !client.IsConnected()) return;
+    if(!Network::isLocalClient()) return;
 
+    FH2LocalClient & client = FH2LocalClient::Get();
     QueueMessage packet;
 
     packet.SetID(MSG_MARKET_SELL_RESOURCE);
@@ -325,9 +325,9 @@ void FH2LocalClient::SendMarketSellResource(const Kingdom & kingdom, u8 resource
 
 void FH2LocalClient::SendMarketBuyResource(const Kingdom & kingdom, u8 resource, u32 count, bool tradingPost)
 {
-    FH2LocalClient & client = FH2LocalClient::Get();
-    if(Game::NETWORK != Settings::Get().GameType() || !client.IsConnected()) return;
+    if(!Network::isLocalClient()) return;
 
+    FH2LocalClient & client = FH2LocalClient::Get();
     QueueMessage packet;
 
     packet.SetID(MSG_MARKET_BUY_RESOURCE);
@@ -342,9 +342,9 @@ void FH2LocalClient::SendMarketBuyResource(const Kingdom & kingdom, u8 resource,
 
 void FH2LocalClient::SendHeroesBuyMagicBook(const Heroes & hero)
 {
-    FH2LocalClient & client = FH2LocalClient::Get();
-    if(Game::NETWORK != Settings::Get().GameType() || !client.IsConnected()) return;
+    if(!Network::isLocalClient()) return;
 
+    FH2LocalClient & client = FH2LocalClient::Get();
     QueueMessage packet;
 
     packet.SetID(MSG_HEROES_BUY_MAGICBOOK);
@@ -356,9 +356,9 @@ void FH2LocalClient::SendHeroesBuyMagicBook(const Heroes & hero)
 
 void FH2LocalClient::SendHeroesSwapArtifacts(const Heroes & hero1, u8 index1, const Heroes & hero2, u8 index2)
 {
-    FH2LocalClient & client = FH2LocalClient::Get();
-    if(Game::NETWORK != Settings::Get().GameType() || !client.IsConnected()) return;
+    if(!Network::isLocalClient()) return;
 
+    FH2LocalClient & client = FH2LocalClient::Get();
     QueueMessage packet;
 
     packet.SetID(MSG_HEROES_SWAP_ARTIFACTS);
@@ -373,11 +373,10 @@ void FH2LocalClient::SendHeroesSwapArtifacts(const Heroes & hero1, u8 index1, co
 
 void FH2LocalClient::SendArmyUpgradeTroop(const Army::army_t & army, u8 index)
 {
-    FH2LocalClient & client = FH2LocalClient::Get();
     const HeroBase* commander = army.GetCommander();
+    if(!Network::isLocalClient() || !commander) return;
 
-    if(Game::NETWORK != Settings::Get().GameType() || !client.IsConnected() || !commander) return;
-
+    FH2LocalClient & client = FH2LocalClient::Get();
     QueueMessage packet;
 
     packet.SetID(MSG_ARMY_UPGRADE_TROOP);
@@ -391,11 +390,10 @@ void FH2LocalClient::SendArmyUpgradeTroop(const Army::army_t & army, u8 index)
 
 void FH2LocalClient::SendArmyDismissTroop(const Army::army_t & army, u8 index)
 {
-    FH2LocalClient & client = FH2LocalClient::Get();
     const HeroBase* commander = army.GetCommander();
+    if(!Network::isLocalClient() || !commander) return;
 
-    if(Game::NETWORK != Settings::Get().GameType() || !client.IsConnected() || !commander) return;
-
+    FH2LocalClient & client = FH2LocalClient::Get();
     QueueMessage packet;
 
     packet.SetID(MSG_ARMY_DISMISS_TROOP);
@@ -409,12 +407,11 @@ void FH2LocalClient::SendArmyDismissTroop(const Army::army_t & army, u8 index)
 
 void FH2LocalClient::SendArmySwapTroops(const Army::army_t & army1, u8 index1, const Army::army_t & army2, u8 index2)
 {
-    FH2LocalClient & client = FH2LocalClient::Get();
     const HeroBase* commander1 = army1.GetCommander();
     const HeroBase* commander2 = army2.GetCommander();
+    if(!Network::isLocalClient() || !commander1 || !commander2) return;
 
-    if(Game::NETWORK != Settings::Get().GameType() || !client.IsConnected() || !commander1 || !commander2) return;
-
+    FH2LocalClient & client = FH2LocalClient::Get();
     QueueMessage packet;
 
     packet.SetID(MSG_ARMY_SWAP_TROOPS);
@@ -431,12 +428,11 @@ void FH2LocalClient::SendArmySwapTroops(const Army::army_t & army1, u8 index1, c
 
 void FH2LocalClient::SendArmySplitTroop(const Army::army_t & army1, u8 index1, const Army::army_t & army2, u8 index2, u16 count)
 {
-    FH2LocalClient & client = FH2LocalClient::Get();
     const HeroBase* commander1 = army1.GetCommander();
     const HeroBase* commander2 = army2.GetCommander();
+    if(!Network::isLocalClient() || !commander1 || !commander2) return;
 
-    if(Game::NETWORK != Settings::Get().GameType() || !client.IsConnected()|| !commander1 || !commander2) return;
-
+    FH2LocalClient & client = FH2LocalClient::Get();
     QueueMessage packet;
 
     packet.SetID(MSG_ARMY_SPLIT_TROOP);
@@ -454,12 +450,11 @@ void FH2LocalClient::SendArmySplitTroop(const Army::army_t & army1, u8 index1, c
 
 void FH2LocalClient::SendArmyJoinTroops(const Army::army_t & army1, u8 index1, const Army::army_t & army2, u8 index2)
 {
-    FH2LocalClient & client = FH2LocalClient::Get();
     const HeroBase* commander1 = army1.GetCommander();
     const HeroBase* commander2 = army2.GetCommander();
+    if(!Network::isLocalClient() || !commander1 || !commander2) return;
 
-    if(Game::NETWORK != Settings::Get().GameType() || !client.IsConnected() || !commander1 || !commander2) return;
-
+    FH2LocalClient & client = FH2LocalClient::Get();
     QueueMessage packet;
 
     packet.SetID(MSG_ARMY_JOIN_TROOP);
@@ -476,11 +471,10 @@ void FH2LocalClient::SendArmyJoinTroops(const Army::army_t & army1, u8 index1, c
 
 void FH2LocalClient::SendArmyCombatFormation(const Army::army_t & army)
 {
-    FH2LocalClient & client = FH2LocalClient::Get();
     const HeroBase* commander = army.GetCommander();
+    if(!Network::isLocalClient() || !commander) return;
 
-    if(Game::NETWORK != Settings::Get().GameType() || !client.IsConnected() || !commander) return;
-
+    FH2LocalClient & client = FH2LocalClient::Get();
     QueueMessage packet;
 
     packet.SetID(MSG_ARMY_COMBAT_FORMATION);

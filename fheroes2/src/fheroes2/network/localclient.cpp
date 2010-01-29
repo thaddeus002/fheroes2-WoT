@@ -55,7 +55,12 @@ bool FH2LocalClient::Connect(const std::string & srv, u16 port)
 {
     server = srv;
     IPaddress ip;
-    return Network::ResolveHost(ip, srv.c_str(), port) && Open(ip);
+    if(Network::ResolveHost(ip, srv.c_str(), port) && Open(ip))
+    {
+	Settings::Get().SetModes(Settings::LOCALCLIENT);
+	return true;
+    }
+    return false;
 }
 
 u8 FH2LocalClient::GetPlayersColors(void) const

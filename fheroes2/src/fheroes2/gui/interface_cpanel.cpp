@@ -39,15 +39,8 @@ Interface::ControlPanel::ControlPanel()
 {
     if(Display::Get().h() > 240)
     {
-	sf_area = Surface(180, 36);
-	ICN::icn_t icn = Settings::Get().EvilInterface() ? ICN::ADVEBTNS : ICN::ADVBTNS;
-	sf_area.Blit(AGG::GetICN(icn, 4),  0, 0);
-	sf_area.Blit(AGG::GetICN(icn, 0),  36, 0);
-	sf_area.Blit(AGG::GetICN(icn, 12), 72, 0);
-	sf_area.Blit(AGG::GetICN(icn, 10), 108, 0);
-	sf_area.Blit(AGG::GetICN(icn, 8),  144, 0);
-	w = sf_area.w();
-	h = sf_area.h();
+	w = 180;
+	h = 36;
 	rt_radr.w = 36;
 	rt_radr.h = 36;
 	rt_icon.w = 36;
@@ -61,14 +54,9 @@ Interface::ControlPanel::ControlPanel()
     }
     else
     {
-	sf_area = Surface(AGG::GetICN(ICN::CELLWIN, 11));
-	sf_area.Blit(AGG::GetICN(ICN::REQUESTS, 31),  2, 3);
-	sf_area.Blit(AGG::GetICN(ICN::REQUESTS, 32), 20, 3);
-	sf_area.Blit(AGG::GetICN(ICN::REQUESTS, 34), 38, 3);
-	sf_area.Blit(AGG::GetICN(ICN::REQUESTS, 35), 56, 3);
-	sf_area.Blit(AGG::GetICN(ICN::REQUESTS, 39), 74, 3);
-	w = sf_area.w();
-	h = sf_area.h();
+	const Sprite & sf = AGG::GetICN(ICN::CELLWIN, 11);
+	w = sf.w();
+	h = sf.h();
 	rt_radr.w = 17;
 	rt_radr.h = 17;
 	rt_icon.w = 17;
@@ -79,10 +67,7 @@ Interface::ControlPanel::ControlPanel()
 	rt_stat.h = 17;
 	rt_quit.w = 17;
 	rt_quit.h = 17;
-	AGG::FreeObject(ICN::REQUESTS);
-	AGG::FreeObject(ICN::CELLWIN);
     }
-    sf_area.SetDisplayFormat();
 }
 
 Interface::ControlPanel & Interface::ControlPanel::Get(void)
@@ -130,7 +115,27 @@ void Interface::ControlPanel::SetPos(s16 ox, s16 oy)
 
 void Interface::ControlPanel::Redraw(void)
 {
-    Display::Get().Blit(sf_area, x, y);
+    Display & display = Display::Get();
+
+    if(Display::Get().h() > 240)
+    {
+	ICN::icn_t icn = Settings::Get().EvilInterface() ? ICN::ADVEBTNS : ICN::ADVBTNS;
+	display.Blit(AGG::GetICN(icn, 4),  x, y);
+	display.Blit(AGG::GetICN(icn, 0),  x + 36, y);
+	display.Blit(AGG::GetICN(icn, 12), x + 72, y);
+	display.Blit(AGG::GetICN(icn, 10), x + 108, y);
+	display.Blit(AGG::GetICN(icn, 8),  x + 144, y);
+    }
+    else
+    {
+	const Sprite & sf = AGG::GetICN(ICN::CELLWIN, 11);
+	display.Blit(sf, x, y);
+	display.Blit(AGG::GetICN(ICN::REQUESTS, 31), x + 2, y + 3);
+	display.Blit(AGG::GetICN(ICN::REQUESTS, 32), x + 20, y + 3);
+	display.Blit(AGG::GetICN(ICN::REQUESTS, 34), x + 38, y + 3);
+	display.Blit(AGG::GetICN(ICN::REQUESTS, 35), x + 56, y + 3);
+	display.Blit(AGG::GetICN(ICN::REQUESTS, 39), x + 74, y + 3);
+    }
 }
 
 void Interface::ControlPanel::QueueEventProcessing(Game::menu_t & ret)

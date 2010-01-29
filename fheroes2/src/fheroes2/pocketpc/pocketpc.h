@@ -41,6 +41,7 @@ namespace PocketPC
     Dialog::answer_t	CastleOpenDialog(Castle &);
     Dialog::answer_t	DialogArmyInfo(const Army::Troop &, u16);
     void		HeroesMeeting(Heroes &, Heroes &);
+    void		KeyboardDialog(std::string &);
 };
 
 #endif

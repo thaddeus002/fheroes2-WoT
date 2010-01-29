@@ -47,8 +47,6 @@ namespace Interface
 	Rect rt_bttn;
 	Rect rt_stat;
 	Rect rt_quit;
-
-	Surface sf_area;
     };
 };
 

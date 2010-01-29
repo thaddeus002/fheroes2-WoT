@@ -572,7 +572,8 @@ void Battle2::GraveyardTroop::RemoveTroopID(u16 id)
 }
 
 Battle2::Arena::Arena(Army::army_t & a1, Army::army_t & a2, u16 index, bool local) :
-	army1(a1), army2(a2), castle(NULL), current_commander(NULL), catapult(NULL), interface(NULL), result_game(NULL), graveyard(*this), icn_covr(ICN::UNKNOWN)
+	army1(a1), army2(a2), castle(NULL), current_commander(NULL), catapult(NULL), interface(NULL), result_game(NULL), graveyard(*this),
+	icn_covr(ICN::UNKNOWN)
 {
     const Settings & conf = Settings::Get();
     usage_spells.reserve(10);

@@ -44,8 +44,8 @@ namespace Battle2
 
 	// icn_file      idle     move     fly1     fly2     fly3     shot0    shot1    shot2    shot3    attk0    attk1    attk2    attk3    wcne     kill     m82_attk       m82_kill       m82_move       m82_wnce
 	{ ICN::PEASANT , { 1, 4}, { 5, 8}, { 0, 0}, { 0, 0}, { 0, 0}, { 0, 0}, { 0, 0}, { 0, 0}, { 0, 0}, { 0, 0}, {16, 6}, {22, 6}, {28, 6}, {13, 3}, {34, 4}, M82::PSNTATTK, M82::PSNTKILL, M82::PSNTMOVE, M82::PSNTWNCE },
-	{ ICN::ARCHER  , { 1, 4}, { 5, 8}, { 0, 0}, { 0, 0}, { 0, 0}, {16, 4}, {20, 4}, {24, 4}, {28, 4}, {32, 4}, {36, 6}, {39, 3}, {42, 3}, {13, 3}, {45, 6}, M82::ARCHATTK, M82::ARCHKILL, M82::ARCHMOVE, M82::ARCHWNCE },
-	{ ICN::ARCHER2 , { 1, 4}, { 5, 8}, { 0, 0}, { 0, 0}, { 0, 0}, {16, 4}, {20, 4}, {24, 4}, {28, 4}, {32, 4}, {36, 6}, {39, 3}, {42, 3}, {13, 3}, {45, 6}, M82::ARCHATTK, M82::ARCHKILL, M82::ARCHMOVE, M82::ARCHWNCE },
+	{ ICN::ARCHER  , { 1, 4}, { 5, 8}, { 0, 0}, { 0, 0}, { 0, 0}, {16, 4}, {20, 4}, {24, 4}, {28, 4}, {32, 4}, {36, 3}, {39, 3}, {42, 3}, {13, 3}, {45, 6}, M82::ARCHATTK, M82::ARCHKILL, M82::ARCHMOVE, M82::ARCHWNCE },
+	{ ICN::ARCHER2 , { 1, 4}, { 5, 8}, { 0, 0}, { 0, 0}, { 0, 0}, {16, 4}, {20, 4}, {24, 4}, {28, 4}, {32, 4}, {36, 3}, {39, 3}, {42, 3}, {13, 3}, {45, 6}, M82::ARCHATTK, M82::ARCHKILL, M82::ARCHMOVE, M82::ARCHWNCE },
 	{ ICN::PIKEMAN , { 1, 4}, { 5, 8}, { 0, 0}, { 0, 0}, { 0, 0}, { 0, 0}, { 0, 0}, { 0, 0}, { 0, 0}, { 0, 0}, {17, 3}, {20, 4}, {24, 6}, {13, 4}, {30, 6}, M82::PIKEATTK, M82::PIKEKILL, M82::PIKEMOVE, M82::PIKEWNCE },
 	{ ICN::PIKEMAN2, { 1, 4}, { 5, 8}, { 0, 0}, { 0, 0}, { 0, 0}, { 0, 0}, { 0, 0}, { 0, 0}, { 0, 0}, { 0, 0}, {17, 3}, {20, 4}, {24, 6}, {13, 4}, {30, 6}, M82::PIKEATTK, M82::PIKEKILL, M82::PIKEMOVE, M82::PIKEWNCE },
 	{ ICN::SWORDSMN, {39, 6}, { 2, 8}, { 0, 0}, { 0, 0}, { 0, 0}, { 0, 0}, { 0, 0}, { 0, 0}, { 0, 0}, {12, 2}, {19, 5}, {14, 5}, {24, 5}, {36, 3}, {29, 7}, M82::SWDMATTK, M82::SWDMKILL, M82::SWDMMOVE, M82::SWDMWNCE },
@@ -346,6 +346,9 @@ bool Battle2::Stats::isCastleWallDefensed(const Stats & attacker) const
     // check golden bow artifact
     const HeroBase* enemy = arena->army1.GetCommander();
     if(enemy && enemy->HasArtifact(Artifact::GOLDEN_BOW)) return false;
+
+    // archery skill
+    if(enemy && Skill::Level::NONE != enemy->GetLevelSkill(Skill::Secondary::ARCHERY)) return false;
 
     // check out of walls
     if((position <=  8) ||

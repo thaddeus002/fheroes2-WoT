@@ -49,6 +49,8 @@ enum redraw_t
 
 namespace Interface
 {
+    bool NoGUI(void);
+
     class Basic
     {
     public:
