@@ -568,6 +568,21 @@ Battle2::Interface::Interface(Arena & a, u16 center) : arena(a), icn_cbkg(ICN::U
     const Settings & conf = Settings::Get();
     bool pda = conf.PocketPC();
 
+    switch(conf.Animation())
+    {
+	case 10:
+	case 9:  animation_delay = 1; break;
+	case 8:
+	case 7:  animation_delay = 2; break;
+	case 6:
+	case 5:  animation_delay = 3; break;  
+	case 4:
+	case 3:  animation_delay = 4; break;  
+	case 2:
+	case 1:  animation_delay = 5; break;
+	default: break;
+    }
+
     // border
     Display & display = Display::Get();
     const u16 arenaw = pda ? 320 : 640;
@@ -2142,22 +2157,27 @@ void Battle2::Interface::RedrawActionFly(Stats & b, u16 dst)
     std::vector<Point> points;
     std::vector<Point>::const_iterator pnt;
 
-    cursor.SetThemes(Cursor::WAR_NONE);
+    const Point pt1(pos1.x, pos1.y);
+    const Point pt2(pos2.x + (b.isWide() ? (b.isReflect() ? -pos2.w : pos2.w) : 0), pos2.y);
 
-    GetLinePoints(pos1, pos2, Settings::Get().PocketPC() ? 20 : 40, points);
+    cursor.SetThemes(Cursor::WAR_NONE);
+    const u8 step = b.isWide() ? 80 : 40;
+    GetLinePoints(pt1, pt2, Settings::Get().PocketPC() ? step / 2 : step, points);
+
+    pnt = points.begin();
 
     // jump up
     b_current = NULL;
-    b_move = &b;
-    p_move = pos1;
+    b_move = NULL;
+    p_move = pnt != points.end() ? *pnt : pt1;
+    b_fly = &b;
+    p_fly = pt1;
+
     b.ResetAnimFrame(AS_FLY1);
     RedrawTroopFrameAnimation(b);
 
-    // fly
-    pnt = points.begin();
-    b_move = NULL;
-    b_fly = &b;
-    p_fly = pos1;
+    p_fly = p_move;
+    if(pnt != points.end()) ++pnt;
 
     while(pnt != points.end())
     {
@@ -2172,16 +2192,14 @@ void Battle2::Interface::RedrawActionFly(Stats & b, u16 dst)
     }
 
     // jump down
-    b_fly = NULL;
-    b_move = &b;
-    p_move = pos2;
+    p_move = pt2;
     b.position = dst;
 
     b.ResetAnimFrame(AS_FLY3);
     RedrawTroopFrameAnimation(b);
 
     // restore
-    b_move = NULL;
+    b_fly = NULL;
     b.ResetAnimFrame(AS_IDLE);
 }
 
