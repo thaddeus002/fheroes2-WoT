@@ -30,6 +30,8 @@
 #include "server.h"
 #include "client.h"
 #include "kingdom.h"
+#include "battle2.h"
+#include "battle_stats.h"
 #include "remoteclient.h"
 #include "zzlib.h"
 
@@ -89,17 +91,17 @@ int FH2RemoteClient::Main(void)
 
     if(ConnectionChat())
     {
-	if(StartGame())
+//	if(StartGame())
 	{
 	    // may be also
 	}
-	else
+//	else
 	    error = "StartGame: lost connection";
     }
     else
 	error = "ConnectionChat: lost connection";
 
-    Logout(error);
+//    Logout(error);
 
     return 1;
 }

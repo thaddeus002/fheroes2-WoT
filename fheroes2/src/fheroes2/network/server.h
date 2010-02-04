@@ -52,6 +52,8 @@ public:
     void ResetPlayers(u32 first_player);
     void SendToAllClients(const QueueMessage &, u32 = 0);
 
+    FH2RemoteClient* GetRemoteClient(u8);
+
     void SetExit(void);
     void SetStartGame(void);
 
@@ -61,6 +63,7 @@ protected:
     FH2Server();
     int Main(void);
     void WaitClients(void);
+    void CloseClients(void);
     void StartGame(void);
 
     Mutex mutex;

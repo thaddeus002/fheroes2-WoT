@@ -30,6 +30,7 @@
 #include "localclient.h"
 #include "world.h"
 #include "kingdom.h"
+#include "battle2.h"
 #include "server.h"
 
 #ifdef WITH_NET
@@ -167,6 +168,11 @@ void FH2Server::ResetPlayers(u32 first_player)
     conf.SetPlayersColors(colors);
 }
 
+void FH2Server::CloseClients(void)
+{
+    std::for_each(clients.begin(), clients.end(), std::mem_fun_ref(&FH2RemoteClient::ShutdownThread));
+}
+
 int FH2Server::Main(void)
 {
     // start scan queue
@@ -178,8 +184,7 @@ int FH2Server::Main(void)
     // stop scan queue
     //Timer::Remove(timer);
 
-    // close clients
-    std::for_each(clients.begin(), clients.end(), std::mem_fun_ref(&FH2RemoteClient::ShutdownThread));
+    CloseClients();
 
     Close();
 
@@ -267,6 +272,7 @@ void FH2Server::StartGame(void)
     GameOver::Result::Get().Reset();
     std::vector<FH2RemoteClient>::iterator it;
 
+/*
     while(!exit && conf.PlayersColors())
     {
 	world.NewDay();
@@ -278,7 +284,58 @@ void FH2Server::StartGame(void)
 	packet.SetID(MSG_MAPS_LOAD);
 	SendPacketToAllClients(clients, packet, 0);
 	mutex.Unlock();
+*/
 
+    // TEST BATTLE NETWORK
+    it = std::find_if(clients.begin(), clients.end(), std::bind2nd(std::mem_fun_ref(&FH2RemoteClient::Modes), ST_ADMIN));
+    Kingdom & kingdom = world.GetKingdom((*it).player_color);
+
+    Heroes & hero1 = *world.GetHeroes(Heroes::SANDYSANDY);
+    Heroes & hero2 = *world.GetHeroes(Heroes::RIALDO);
+
+    hero1.SetSpellPoints(150);
+    hero1.Recruit(kingdom.GetColor(), Point(20, 20));
+    hero2.Recruit(Color::GRAY, Point(20, 21));
+
+    Army::army_t & army1 = hero1.GetArmy();
+    Army::army_t & army2 = hero2.GetArmy();
+
+    army1.Clear();
+    army1.JoinTroop(Monster::PHOENIX, 10);
+    army1.JoinTroop(Monster::RANGER, 80);
+
+    army2.Clear();
+    army2.At(0) = Army::Troop(Monster::SKELETON, 400);
+    army2.At(2) = Army::Troop(Monster::SKELETON, 400);
+    army2.At(4) = Army::Troop(Monster::SKELETON, 400);
+
+    // sync world
+    mutex.Lock();
+    packet.Reset();
+    Game::IO::SaveBIN(packet);
+    packet.SetID(MSG_MAPS_LOAD);
+    SendPacketToAllClients(clients, packet, 0);
+    mutex.Unlock();
+
+    const u16 index = 33;
+
+    packet.Reset();
+    packet.SetID(MSG_BATTLE);
+    // attacker monster oor hero
+    packet.Push(static_cast<u8>(1));
+    packet.Push(hero1.GetIndex());
+    // defender monster, hero or castle
+    packet.Push(static_cast<u8>(1));
+    packet.Push(hero2.GetIndex());
+    packet.Push(index);
+
+    Lock();
+    SendToAllClients(packet);
+    Unlock();
+
+    Battle2::Loader(army1, army2, index);
+
+/*
 	// send all tiles
 	// send action new day
 	
@@ -326,21 +383,29 @@ void FH2Server::StartGame(void)
 		    DEBUG(DBG_NETWORK, DBG_INFO, "Server: AI turn: " << Color::String(color));
         	    kingdom.AITurns();
 
-/*
-        	    packet.Reset();
-        	    packet.SetID(MSG_KINGDOM);
-        	    packet.Push(static_cast<u8>(kingdom.GetColor()));
-        	    Game::IO::PackKingdom(packet, kingdom);
-        	    Lock();
-        	    SendToAllClients(packet);
-        	    Unlock();
-*/
+        	    //packet.Reset();
+        	    //packet.SetID(MSG_KINGDOM);
+        	    //packet.Push(static_cast<u8>(kingdom.GetColor()));
+        	    //Game::IO::PackKingdom(packet, kingdom);
+        	    //Lock();
+        	    //SendToAllClients(packet);
+        	    //Unlock();
 		    break;
 	    }
 	}
 
 	DELAY(100);
     }
+*/
+}
+
+
+FH2RemoteClient* FH2Server::GetRemoteClient(u8 color)
+{
+    std::vector<FH2RemoteClient>::iterator it;
+    it = std::find_if(clients.begin(), clients.end(), std::bind2nd(std::mem_fun_ref(&FH2RemoteClient::isColor), color));
+
+    return it != clients.end() ? &(*it) : NULL;
 }
 
 Game::menu_t Game::NetworkHost(void)

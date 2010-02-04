@@ -30,6 +30,14 @@
 #include "network.h"
 
 class FH2Server;
+namespace Battle2
+{
+    class Actions;
+    class Arena;
+    class Stats;
+    struct Result;
+    struct TargetInfo;
+};
 
 class FH2RemoteClient : public FH2Client
 {
@@ -51,6 +59,16 @@ public:
     bool MsgMapsInfoGet(void);
     bool MsgMapsListGet(void);
     bool MsgPlayersGet(void);
+
+    bool RecvBattleHumanTurn(const Battle2::Stats &, Battle2::Actions &);
+
+    static bool SendBattleAction(u8, QueueMessage &);
+    static bool SendBattleResult(u8, const Battle2::Result &);
+    static bool SendBattleAttack(u8, u16, const std::vector<Battle2::TargetInfo> &);
+    static bool SendBattleBoard(u8, const Battle2::Arena &);
+    static bool SendBattleSpell(u8, u8, u8, const std::vector<Battle2::TargetInfo> &);
+    static bool SendBattleTeleportSpell(u8, u16, u16);
+    static bool SendBattleEarthQuakeSpell(u8, const std::vector<u8> &);
 
     static int callbackCreateThread(void *);
 

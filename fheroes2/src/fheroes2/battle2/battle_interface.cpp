@@ -639,7 +639,7 @@ Battle2::Interface::~Interface()
 {
     if(opponent1) delete opponent1;
     if(opponent2) delete opponent2;
-    if(Settings::Get().Modes(Settings::BATTLEAUTO)) Settings::Get().ResetModes(Settings::BATTLEAUTO);
+    if(Settings::Get().BattleAuto()) Settings::Get().SetBattleAuto(false);
 }
 
 const Rect & Battle2::Interface::GetArea(void) const
@@ -809,16 +809,15 @@ void Battle2::Interface::RedrawTroopSprite(const Stats & b, const Rect & rt) con
 	// fly offset
 	if(b_fly == &b)
 	{
-	    const animframe_t & frm = b_fly->GetFrameState(AS_FLY2);
 	    const Point & pos = b_fly->GetCellPosition();
 
-	    if(frm.count)
+	    if(b_fly->GetFrameCount())
 	    {
 		const s16 cx = p_fly.x - pos.x;
 		const s16 cy = p_fly.y - pos.y;
 
-		sx += cx + Sign(cx) * (b_fly->animframe - frm.start) * std::abs((p_fly.x - p_move.x) / frm.count);
-		sy += cy + Sign(cy) * (b_fly->animframe - frm.start) * std::abs((p_fly.y - p_move.y) / frm.count);
+		sx += cx + Sign(cx) * b_fly->GetFrameOffset() * std::abs((p_fly.x - p_move.x) / b_fly->GetFrameCount());
+		sy += cy + Sign(cy) * b_fly->GetFrameOffset() * std::abs((p_fly.y - p_move.y) / b_fly->GetFrameCount());
 	    }
 	}
 	// sprite monster
@@ -906,7 +905,7 @@ void Battle2::Interface::RedrawCover(void)
     if(arena.castle) RedrawCastle1();
 
     // shadow
-    if(!b_move && conf.Modes(Settings::BATTLEMOVESHADOW))
+    if(!b_move && conf.BattleMovementShaded())
     {
 	Board::const_iterator it1 = arena.board.begin();
 	Board::const_iterator it2 = arena.board.end();
@@ -916,7 +915,7 @@ void Battle2::Interface::RedrawCover(void)
     }
 
     // grid
-    if(conf.Modes(Settings::BATTLEGRID))
+    if(conf.BattleGrid())
     {
 	Board::const_iterator it1 = arena.board.begin();
 	Board::const_iterator it2 = arena.board.end();
@@ -926,7 +925,7 @@ void Battle2::Interface::RedrawCover(void)
     }
 
     // cursor
-    if(conf.Modes(Settings::BATTLEMOUSESHADOW) && 0 <= cursor && b_current && Cursor::Get().Themes() != Cursor::WAR_NONE)
+    if(conf.BattleMouseShaded() && 0 <= cursor && b_current && Cursor::Get().Themes() != Cursor::WAR_NONE)
 	display.Blit(sf_cursor, arena.board[cursor].GetPos());
 
     RedrawKilled();
@@ -1649,7 +1648,7 @@ u8 Battle2::GetIndexIndicator(const Stats & b)
 
 void Battle2::Interface::SetAutoBattle(const Stats & b, Actions & a)
 {
-    Settings::Get().SetModes(Settings::BATTLEAUTO);
+    Settings::Get().SetBattleAuto(true);
     Cursor::Get().SetThemes(Cursor::WAR_NONE);
     status.SetMessage(_("Set auto battle on"), true);
     arena.AITurn(b, a);
@@ -1659,7 +1658,7 @@ void Battle2::Interface::SetAutoBattle(const Stats & b, Actions & a)
 
 void Battle2::Interface::ResetAutoBattle(void)
 {
-    Settings::Get().ResetModes(Settings::BATTLEAUTO);
+    Settings::Get().SetBattleAuto(false);
     status.SetMessage(_("Set auto battle off"), true);
     humanturn_redraw = true;
 }
@@ -1675,7 +1674,7 @@ void Battle2::Interface::KeyPress_o(void)
 void Battle2::Interface::KeyPress_a(const Stats & b, Actions & a)
 {
     btn_auto.PressDraw();
-    if(Settings::Get().Modes(Settings::BATTLEAUTO))
+    if(Settings::Get().BattleAuto())
 	ResetAutoBattle();
     else
 	SetAutoBattle(b, a);
@@ -1690,7 +1689,7 @@ void Battle2::Interface::ButtonAutoAction(const Stats & b, Actions & a)
 
     if(le.MouseClickLeft(btn_auto))
     {
-	if(Settings::Get().Modes(Settings::BATTLEAUTO))
+	if(Settings::Get().BattleAuto())
 	    ResetAutoBattle();
 	else
 	    SetAutoBattle(b, a);
@@ -1957,12 +1956,23 @@ void Battle2::Interface::RedrawActionAttackPart2(Stats & attacker, std::vector<T
 	TargetInfo & target = targets.front();
 	std::string msg = _("%{attacker} do %{damage} damage.");
 	String::Replace(msg, "%{attacker}", attacker.GetName());
-	String::Replace(msg, "%{damage}", target.damage_killed.first);
-	if(target.damage_killed.second)
+	String::Replace(msg, "%{damage}", target.damage);
+	if(1 < targets.size())
+	{
+	    u32 count = 0;
+	    std::vector<TargetInfo>::const_iterator it1 = targets.begin();
+	    std::vector<TargetInfo>::const_iterator it2 = targets.end();
+	    for(; it1 != it2; ++it1) count += (*it1).killed;
+	    msg.append(" ");
+	    msg.append(_("%{count} creatures perished."));
+    	    String::Replace(msg, "%{count}", count);
+	}
+	else
+	if(target.killed)
 	{
 	    msg.append(" ");
 	    msg.append(_("%{count} %{defender} perish."));
-    	    String::Replace(msg, "%{count}", target.damage_killed.second);
+    	    String::Replace(msg, "%{count}", target.killed);
     	    String::Replace(msg, "%{defender}", target.defender->GetName());
 	}
 	status.SetMessage(msg, true);
@@ -2007,7 +2017,7 @@ void Battle2::Interface::RedrawActionWinces(std::vector<TargetInfo> & targets)
 
     for(; it != targets.end(); ++it) if((*it).defender)
     {
-	if((*it).damage_killed.first)
+	if((*it).damage)
 	{
 	    TargetInfo & target = *it;
 	    // wnce animation
@@ -2039,10 +2049,10 @@ void Battle2::Interface::RedrawActionWinces(std::vector<TargetInfo> & targets)
 		Redraw();
 
 		// extended damage info
-		if(!conf.Original() && target.damage_killed.second)
+		if(!conf.OriginalVersion() && target.killed)
 		{
 		    msg = "-";
-		    String::AddInt(msg, target.damage_killed.second);
+		    String::AddInt(msg, target.killed);
 		    Text txt(msg, Font::YELLOW_SMALL);
 		    txt.Blit(pos.x + (target.defender->isWide() ? 0 : (pos.w - txt.w()) / 2), pos.y - py);
 		}
@@ -2157,11 +2167,11 @@ void Battle2::Interface::RedrawActionFly(Stats & b, u16 dst)
     std::vector<Point> points;
     std::vector<Point>::const_iterator pnt;
 
-    const Point pt1(pos1.x, pos1.y);
-    const Point pt2(pos2.x + (b.isWide() ? (b.isReflect() ? -pos2.w : pos2.w) : 0), pos2.y);
+    Point pt1(pos1.x, pos1.y);
+    Point pt2(pos2.x, pos2.y);
 
     cursor.SetThemes(Cursor::WAR_NONE);
-    const u8 step = b.isWide() ? 80 : 40;
+    const u8 step = b.isWide() ? 80 : 30;
     GetLinePoints(pt1, pt2, Settings::Get().PocketPC() ? step / 2 : step, points);
 
     pnt = points.begin();
@@ -2193,10 +2203,11 @@ void Battle2::Interface::RedrawActionFly(Stats & b, u16 dst)
 
     // jump down
     p_move = pt2;
-    b.position = dst;
 
     b.ResetAnimFrame(AS_FLY3);
     RedrawTroopFrameAnimation(b);
+
+    b.position = dst;
 
     // restore
     b_fly = NULL;
@@ -2231,19 +2242,19 @@ void Battle2::Interface::RedrawActionSpellCastPart1(u8 spell2, u16 dst, const st
     	    case Spell::METEORSHOWER:	RedrawTargetsWithFrameAnimation(dst, targets, ICN::METEOR, M82::FromSpell(spell)); break;
     	    case Spell::COLDRING:   	RedrawActionColdRingSpell(dst, targets); break;
 
-    	    case Spell::MASSSHIELD:	RedrawTargetsWithFrameAnimation(targets, ICN::SHIELD, M82::FromSpell(spell)); break;
-    	    case Spell::MASSCURE:	RedrawTargetsWithFrameAnimation(targets, ICN::MAGIC01, M82::FromSpell(spell)); break;
-    	    case Spell::MASSHASTE:	RedrawTargetsWithFrameAnimation(targets, ICN::HASTE, M82::FromSpell(spell)); break;
-    	    case Spell::MASSSLOW:	RedrawTargetsWithFrameAnimation(targets, ICN::MAGIC02, M82::FromSpell(spell)); break;
-    	    case Spell::MASSBLESS:	RedrawTargetsWithFrameAnimation(targets, ICN::BLESS, M82::FromSpell(spell)); break;
-    	    case Spell::MASSCURSE:	RedrawTargetsWithFrameAnimation(targets, ICN::CURSE, M82::FromSpell(spell)); break;
-    	    case Spell::MASSDISPEL:	RedrawTargetsWithFrameAnimation(targets, ICN::MAGIC07, M82::FromSpell(spell)); break;
+    	    case Spell::MASSSHIELD:	RedrawTargetsWithFrameAnimation(targets, ICN::SHIELD, M82::FromSpell(spell), false); break;
+    	    case Spell::MASSCURE:	RedrawTargetsWithFrameAnimation(targets, ICN::MAGIC01, M82::FromSpell(spell), false); break;
+    	    case Spell::MASSHASTE:	RedrawTargetsWithFrameAnimation(targets, ICN::HASTE, M82::FromSpell(spell), false); break;
+    	    case Spell::MASSSLOW:	RedrawTargetsWithFrameAnimation(targets, ICN::MAGIC02, M82::FromSpell(spell), false); break;
+    	    case Spell::MASSBLESS:	RedrawTargetsWithFrameAnimation(targets, ICN::BLESS, M82::FromSpell(spell), false); break;
+    	    case Spell::MASSCURSE:	RedrawTargetsWithFrameAnimation(targets, ICN::CURSE, M82::FromSpell(spell), false); break;
+    	    case Spell::MASSDISPEL:	RedrawTargetsWithFrameAnimation(targets, ICN::MAGIC07, M82::FromSpell(spell), false); break;
 
     	    case Spell::DEATHRIPPLE:
-    	    case Spell::DEATHWAVE:	RedrawTargetsWithFrameAnimation(targets, ICN::REDDEATH, M82::FromSpell(spell)); break;
+    	    case Spell::DEATHWAVE:	RedrawTargetsWithFrameAnimation(targets, ICN::REDDEATH, M82::FromSpell(spell), true); break;
 
     	    case Spell::HOLYWORD:
-    	    case Spell::HOLYSHOUT:	RedrawTargetsWithFrameAnimation(targets, ICN::BLUEFIRE, M82::FromSpell(spell)); break;
+    	    case Spell::HOLYSHOUT:	RedrawTargetsWithFrameAnimation(targets, ICN::BLUEFIRE, M82::FromSpell(spell), true); break;
 
 	    case Spell::ELEMENTALSTORM:	RedrawActionElementalStormSpell(targets); break;
 	    case Spell::ARMAGEDDON:	RedrawActionArmageddonSpell(targets); break;
@@ -2296,12 +2307,12 @@ void Battle2::Interface::RedrawActionSpellCastPart2(u8 spell, std::vector<Target
 	RedrawActionWinces(targets);
 
 	// draw status for first defender
-	if(targets.size() && targets.front().damage_killed.first)
+	if(targets.size() && targets.front().damage)
 	{
 	    TargetInfo & target = targets.front();
 	    std::string msg = _("The %{spell} does %{damage} damage.");
 	    String::Replace(msg, "%{spell}", Spell::GetName(Spell::FromInt(spell)));
-	    String::Replace(msg, "%{damage}", target.damage_killed.first);
+	    String::Replace(msg, "%{damage}", target.damage);
 	    status.SetMessage(msg, true);
 	    status.SetMessage("", false);
 	}
@@ -2399,12 +2410,12 @@ void Battle2::Interface::RedrawActionTowerPart2(Tower & tower, TargetInfo & targ
 
     // draw status for first defender
     std::string msg = _("Tower do %{damage} damage.");
-    String::Replace(msg, "%{damage}", target.damage_killed.first);
-    if(target.damage_killed.second)
+    String::Replace(msg, "%{damage}", target.damage);
+    if(target.killed)
     {
 	msg.append(" ");
 	msg.append(_("%{count} %{defender} perish."));
-    	String::Replace(msg, "%{count}", target.damage_killed.second);
+    	String::Replace(msg, "%{count}", target.killed);
     	String::Replace(msg, "%{defender}", target.defender->GetName());
     }
     status.SetMessage(msg, true);
@@ -3032,7 +3043,7 @@ void Battle2::Interface::RedrawActionColdRingSpell(const u16 dst, const std::vec
     // set WNCE
     b_current = NULL;
     for(it = targets.begin(); it != targets.end(); ++it)
-	if((*it).defender && (*it).damage_killed.first) (*it).defender->ResetAnimFrame(AS_WNCE);
+	if((*it).defender && (*it).damage) (*it).defender->ResetAnimFrame(AS_WNCE);
 
     if(M82::UNKNOWN != m82) AGG::PlaySound(m82);
 
@@ -3052,7 +3063,7 @@ void Battle2::Interface::RedrawActionColdRingSpell(const u16 dst, const std::vec
 	    cursor.Show();
 	    display.Flip();
 
-	    for(it = targets.begin(); it != targets.end(); ++it) if((*it).defender && (*it).damage_killed.first)
+	    for(it = targets.begin(); it != targets.end(); ++it) if((*it).defender && (*it).damage)
 		(*it).defender->IncreaseAnimFrame(false);
 	    ++frame;
 	}
@@ -3087,7 +3098,7 @@ void Battle2::Interface::RedrawActionElementalStormSpell(const std::vector<Targe
 
     b_current = NULL;
     for(it = targets.begin(); it != targets.end(); ++it)
-	if((*it).defender && (*it).damage_killed.first) (*it).defender->ResetAnimFrame(AS_WNCE);
+	if((*it).defender && (*it).damage) (*it).defender->ResetAnimFrame(AS_WNCE);
 
     if(M82::UNKNOWN != m82) AGG::PlaySound(m82);
 
@@ -3109,7 +3120,7 @@ void Battle2::Interface::RedrawActionElementalStormSpell(const std::vector<Targe
 	    cursor.Show();
 	    display.Flip();
 
-	    for(it = targets.begin(); it != targets.end(); ++it) if((*it).defender && (*it).damage_killed.first)
+	    for(it = targets.begin(); it != targets.end(); ++it) if((*it).defender && (*it).damage)
 		(*it).defender->IncreaseAnimFrame(false);
 	    ++frame;
 
@@ -3341,7 +3352,7 @@ void Battle2::Interface::RedrawTargetsWithFrameAnimation(const u16 dst, const st
 
     b_current = NULL;
     for(it = targets.begin(); it != targets.end(); ++it)
-	if((*it).defender && (*it).damage_killed.first) (*it).defender->ResetAnimFrame(AS_WNCE);
+	if((*it).defender && (*it).damage) (*it).defender->ResetAnimFrame(AS_WNCE);
 
     if(M82::UNKNOWN != m82) AGG::PlaySound(m82);
 
@@ -3359,7 +3370,7 @@ void Battle2::Interface::RedrawTargetsWithFrameAnimation(const u16 dst, const st
 	    cursor.Show();
 	    display.Flip();
 
-	    for(it = targets.begin(); it != targets.end(); ++it) if((*it).defender && (*it).damage_killed.first)
+	    for(it = targets.begin(); it != targets.end(); ++it) if((*it).defender && (*it).damage)
 		(*it).defender->IncreaseAnimFrame(false);
 	    ++frame;
 	}
@@ -3373,7 +3384,7 @@ void Battle2::Interface::RedrawTargetsWithFrameAnimation(const u16 dst, const st
     }
 }
 
-void Battle2::Interface::RedrawTargetsWithFrameAnimation(const std::vector<TargetInfo> & targets, ICN::icn_t icn, M82::m82_t m82)
+void Battle2::Interface::RedrawTargetsWithFrameAnimation(const std::vector<TargetInfo> & targets, ICN::icn_t icn, M82::m82_t m82, bool wnce)
 {
     Display & display = Display::Get();
     Cursor & cursor = Cursor::Get();
@@ -3386,8 +3397,10 @@ void Battle2::Interface::RedrawTargetsWithFrameAnimation(const std::vector<Targe
     cursor.SetThemes(Cursor::WAR_NONE);
 
     b_current = NULL;
+
+    if(wnce)
     for(it = targets.begin(); it != targets.end(); ++it)
-	if((*it).defender && (*it).damage_killed.first) (*it).defender->ResetAnimFrame(AS_WNCE);
+	if((*it).defender && (*it).damage) (*it).defender->ResetAnimFrame(AS_WNCE);
 
     if(M82::UNKNOWN != m82) AGG::PlaySound(m82);
 
@@ -3409,14 +3422,15 @@ void Battle2::Interface::RedrawTargetsWithFrameAnimation(const std::vector<Targe
 	    cursor.Show();
 	    display.Flip();
 
-	    for(it = targets.begin(); it != targets.end(); ++it) if((*it).defender && (*it).damage_killed.first)
+	    if(wnce)
+	    for(it = targets.begin(); it != targets.end(); ++it) if((*it).defender && (*it).damage)
 		(*it).defender->IncreaseAnimFrame(false);
 	    ++frame;
 	}
 	++ticket;
     }
 
-
+    if(wnce)
     for(it = targets.begin(); it != targets.end(); ++it) if((*it).defender)
     {
         (*it).defender->ResetAnimFrame(AS_IDLE);
@@ -3544,7 +3558,7 @@ bool Battle2::Interface::IdleTroopsAnimation(u32 ticket)
 void Battle2::Interface::CheckGlobalEvents(LocalEvent & le, u32 ticket)
 {
     // reset auto battle
-    if(le.KeyPress() && Settings::Get().Modes(Settings::BATTLEAUTO)) ResetAutoBattle();
+    if(le.KeyPress() && Settings::Get().BattleAuto()) ResetAutoBattle();
 
     // animation opponents
     if(Game::ShouldAnimateInfrequent(ticket, animation_delay * 2))

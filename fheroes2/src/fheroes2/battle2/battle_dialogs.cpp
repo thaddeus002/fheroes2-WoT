@@ -66,9 +66,9 @@ void Battle2::DialogBattleSettings(void)
 
     btn_ok.Draw();
 
-    if(conf.Modes(Settings::BATTLEGRID)) opt_grid.Press();
-    if(conf.Modes(Settings::BATTLEMOVESHADOW)) opt_shadow_movement.Press();
-    if(conf.Modes(Settings::BATTLEMOUSESHADOW)) opt_shadow_cursor.Press();
+    if(conf.BattleGrid()) opt_grid.Press();
+    if(conf.BattleMovementShaded()) opt_shadow_movement.Press();
+    if(conf.BattleMouseShaded()) opt_shadow_cursor.Press();
 
     opt_grid.Draw();
     opt_shadow_movement.Draw();
@@ -84,7 +84,7 @@ void Battle2::DialogBattleSettings(void)
 
 	if(le.MouseClickLeft(opt_grid))
 	{
-	    conf.Modes(Settings::BATTLEGRID) ? conf.ResetModes(Settings::BATTLEGRID) : conf.SetModes(Settings::BATTLEGRID);
+	    conf.SetBattleGrid(!conf.BattleGrid());
 	    cursor.Hide();
 	    opt_grid.isPressed() ? opt_grid.Release() : opt_grid.Press();
 	    opt_grid.Draw();
@@ -94,7 +94,7 @@ void Battle2::DialogBattleSettings(void)
 
 	if(le.MouseClickLeft(opt_shadow_movement))
 	{
-	    conf.Modes(Settings::BATTLEMOVESHADOW) ? conf.ResetModes(Settings::BATTLEMOVESHADOW) : conf.SetModes(Settings::BATTLEMOVESHADOW);
+	    conf.SetBattleMovementShaded(!conf.BattleMovementShaded());
 	    cursor.Hide();
 	    opt_shadow_movement.isPressed() ? opt_shadow_movement.Release() : opt_shadow_movement.Press();
 	    opt_shadow_movement.Draw();
@@ -104,7 +104,7 @@ void Battle2::DialogBattleSettings(void)
 
 	if(le.MouseClickLeft(opt_shadow_cursor))
 	{
-	    conf.Modes(Settings::BATTLEMOUSESHADOW) ? conf.ResetModes(Settings::BATTLEMOUSESHADOW) : conf.SetModes(Settings::BATTLEMOUSESHADOW);
+	    conf.SetBattleMouseShaded(!conf.BattleMouseShaded());
 	    cursor.Hide();
 	    opt_shadow_cursor.isPressed() ? opt_shadow_cursor.Release() : opt_shadow_cursor.Press();
 	    opt_shadow_cursor.Draw();
@@ -182,16 +182,16 @@ void Battle2::Arena::DialogBattleSummary(const Result & res) const
     std::string msg;
     ICN::icn_t icn_anim = ICN::UNKNOWN;
 
-    if((res.army1 & RESULT_WINS) && army1.GetCommander() && Game::LOCAL == army1.GetCommander()->GetControl())
+    if((res.army1 & RESULT_WINS) && army1.GetCommander() && Game::AI != army1.GetCommander()->GetControl())
 	GetSummaryParams(res.army1, res.army2, army1.GetCommander()->GetName(), res.exp, icn_anim, msg);
     else
-    if((res.army2 & RESULT_WINS) && army2.GetCommander() && Game::LOCAL == army2.GetCommander()->GetControl())
+    if((res.army2 & RESULT_WINS) && army2.GetCommander() && Game::AI != army2.GetCommander()->GetControl())
 	GetSummaryParams(res.army2, res.army1, army2.GetCommander()->GetName(), res.exp, icn_anim, msg);
     else
-    if(army1.GetCommander() && Game::LOCAL == army1.GetCommander()->GetControl())
+    if(army1.GetCommander() && Game::AI != army1.GetCommander()->GetControl())
 	GetSummaryParams(res.army1, res.army2, army1.GetCommander()->GetName(), res.exp, icn_anim, msg);
     else
-    if(army2.GetCommander() && Game::LOCAL == army2.GetCommander()->GetControl())
+    if(army2.GetCommander() && Game::AI != army2.GetCommander()->GetControl())
 	GetSummaryParams(res.army2, res.army1, army2.GetCommander()->GetName(), res.exp, icn_anim, msg);
 
     const Sprite & dialog = AGG::GetICN((conf.EvilInterface() ? ICN::WINLOSEE : ICN::WINLOSE), 0);

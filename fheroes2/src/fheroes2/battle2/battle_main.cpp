@@ -32,6 +32,8 @@
 #include "agg.h"
 #include "world.h"
 #include "kingdom.h"
+#include "remoteclient.h"
+#include "localclient.h"
 #include "battle2.h"
 #include "battle.h"
 
@@ -61,7 +63,10 @@ Battle2::Result Battle2::Loader(Army::army_t & army1, Army::army_t & army2, u16 
     }
 
     Mixer::Reset();
-    const bool local = Game::LOCAL == army1.GetControl() || Game::LOCAL == army2.GetControl();
+    bool local = Game::LOCAL == army1.GetControl() || Game::LOCAL == army2.GetControl();
+#ifdef WITH_NET
+    if(Network::isLocalClient()) local = true;
+#endif
 
     Arena arena(army1, army2, mapsindex, local);
 
@@ -69,6 +74,11 @@ Battle2::Result Battle2::Loader(Army::army_t & army1, Army::army_t & army2, u16 
 
     Result result;
 
+#ifdef WITH_NET
+    if(Network::isLocalClient())
+	FH2LocalClient::Get().BattleLoop(arena, result);
+else
+#endif
     while(1)
     {
 	arena.Turns(turn, result);
@@ -78,6 +88,13 @@ Battle2::Result Battle2::Loader(Army::army_t & army1, Army::army_t & army2, u16 
 	++turn;
     }
 
+#ifdef WITH_NET
+    if(Network::isRemoteClient())
+    {
+        if(Game::REMOTE == army1.GetControl()) FH2RemoteClient::SendBattleResult(army1.GetColor(), result);
+        if(Game::REMOTE == army2.GetControl()) FH2RemoteClient::SendBattleResult(army2.GetColor(), result);
+    }
+#endif
 
     if(conf.Music()) Mixer::Reset();
     conf.SetMyColor(mycolor);

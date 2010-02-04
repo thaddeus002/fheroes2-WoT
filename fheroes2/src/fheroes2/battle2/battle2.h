@@ -25,7 +25,7 @@
 
 #include <vector>
 #include <utility>
-#include "sdlnet.h"
+#include "network.h"
 #include "icn.h"
 #include "m82.h"
 #include "gamedefs.h"
@@ -74,24 +74,6 @@ namespace Battle2
 
     inline direction_t & operator++ (direction_t & d){ return d = ( CENTER == d ? TOP_LEFT : direction_t(d << 1)); };
     inline direction_t & operator-- (direction_t & d){ return d = ( TOP_LEFT == d ? CENTER : direction_t(d >> 1)); };
-
-    enum action_t
-    {
-        ACT_NONE,
-        ACT_MOVE,
-        ACT_ATTACK,
-        ACT_DEFENCE,
-        ACT_DAMAGE,
-        ACT_CAST,
-        ACT_SKIP,
-        ACT_MORALE,
-        ACT_LUCK,
-        ACT_CATAPULT,
-        ACT_TOWER,
-        ACT_END,
-        ACT_RETREAT,
-        ACT_SURRENDER,
-    };
 
     enum tower_t { TWR_LEFT, TWR_CENTER, TWR_RIGHT };
 
@@ -150,14 +132,13 @@ namespace Battle2
     struct TargetInfo
     {
         Stats* defender;
-        std::pair<u32, u32> damage_killed;
+	u32 damage;
+	u32 killed;
 
         bool isFinishAnimFrame(void) const;
     };
 
-    struct Action : public QueueMessage
-    {
-    };
+    typedef QueueMessage Action;
 };
 
 #endif

@@ -57,7 +57,7 @@ bool FH2LocalClient::Connect(const std::string & srv, u16 port)
     IPaddress ip;
     if(Network::ResolveHost(ip, srv.c_str(), port) && Open(ip))
     {
-	Settings::Get().SetModes(Settings::LOCALCLIENT);
+	Settings::Get().SetNetworkLocalClient(true);
 	return true;
     }
     return false;

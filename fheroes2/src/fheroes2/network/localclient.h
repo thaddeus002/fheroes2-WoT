@@ -33,6 +33,7 @@ class heroes;
 class Castle;
 class Kingdom;
 namespace Army { class army_t; };
+namespace Battle2 { class Arena; class Result; };
 
 class FH2LocalClient : public FH2Client
 {
@@ -44,6 +45,8 @@ public:
     int Main(void);
     bool Connect(const std::string &, u16);
     void Logout(void);
+
+    bool BattleLoop(Battle2::Arena &, Battle2::Result &);
 
     static void SendCastleBuyBuilding(const Castle &, u32);
     static void SendCastleRecruitHero(const Castle &, const Heroes &);

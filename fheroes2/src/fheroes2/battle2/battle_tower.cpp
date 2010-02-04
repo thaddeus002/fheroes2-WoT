@@ -105,7 +105,7 @@ void Battle2::Tower::Action(void) const
     if(enemy)
     {
 	Battle2::Action action;
-	action.SetID(ACT_TOWER);
+	action.SetID(MSG_BATTLE_TOWER);
 	action.Push(type);
 	action.Push(enemy->id);
 	arena.ApplyAction(action);

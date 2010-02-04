@@ -62,39 +62,34 @@ u8 Battle2::Catapult::GetShots(void) const
     return cat_shots;
 }
 
-void Battle2::Catapult::ApplyDamage(u8 target)
+u8 Battle2::Catapult::GetDamage(u8 target)
 {
-    u8* wall = NULL;
+    u8 value = arena.GetCastleTargetValue(target);
 
     switch(target)
     {
-	case CAT_WALL1:	wall = &arena.board[8].object; break;
-	case CAT_WALL2:	wall = &arena.board[29].object; break;
-	case CAT_WALL3:	wall = &arena.board[73].object; break;
-	case CAT_WALL4:	wall = &arena.board[96].object; break;
+	case CAT_WALL1:
+	case CAT_WALL2:
+	case CAT_WALL3:
+	case CAT_WALL4:
+	    if(value)
+	    {
+		if(cat_first == 100 || cat_first >= Rand::Get(1, 100))
+		{
+		    // value = value;
+		    DEBUG(DBG_BATTLE, DBG_TRACE, "Battle2::Catapult::GetDamage: " << "from one blow capability");
+		}
+		else
+		    value = 1;
+	    }
+	    break;
 
-	case CAT_TOWER1:if(arena.towers[0] && arena.towers[0]->isValid()) arena.towers[0]->SetDestroy(); break;
-	case CAT_TOWER2:if(arena.towers[2] && arena.towers[2]->isValid()) arena.towers[2]->SetDestroy(); break;
-	case CAT_TOWER3:if(arena.towers[1] && arena.towers[1]->isValid()) arena.towers[1]->SetDestroy(); break;
-
-	case CAT_MOAT:	if(arena.board[50].object) --arena.board[50].object; break;
-
-	case CAT_MISS: DEBUG(DBG_BATTLE, DBG_TRACE, "Battle2::Catapult::ApplyDamage: " << " miss!"); break;
+	case CAT_MISS: DEBUG(DBG_BATTLE, DBG_TRACE, "Battle2::Catapult::GetDamage: " << " miss!"); break;
 
 	default: break;
     }
 
-    if(wall)
-    {
-	if(cat_first == 100 ||
-	   cat_first >= Rand::Get(1, 100))
-	{
-	    *wall = 0;
-	    DEBUG(DBG_BATTLE, DBG_TRACE, "Battle2::Catapult::ApplyDamage: " << "from one blow capability");
-	}
-	else
-	    *wall -= 1;
-    }
+    return value;
 }
 
 Point Battle2::Catapult::GetTargetPosition(u8 target) const
@@ -155,6 +150,15 @@ u8 Battle2::Catapult::GetTarget(void) const
 void Battle2::Catapult::Action(void)
 {
     Battle2::Action action;
-    action.SetID(ACT_CATAPULT);
+    action.SetID(MSG_BATTLE_CATAPULT);
+
+    u8 shots = GetShots();
+    action.Push(shots);
+    while(shots--)
+    {
+	u8 target = GetTarget();
+	action.Push(target);
+	action.Push(GetDamage(target));
+    }
     arena.ApplyAction(action);
 }

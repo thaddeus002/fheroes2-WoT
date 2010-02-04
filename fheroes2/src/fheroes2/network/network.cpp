@@ -85,10 +85,28 @@ const char* Network::GetMsgString(u16 msg)
 	case MSG_ARMY_JOIN_TROOP:	return "MSG_ARMY_JOIN_TROOP";
         case MSG_ARMY_COMBAT_FORMATION: return "MSG_ARMY_COMBAT_FORMATION";
 
+        case MSG_BATTLE_BOARD:		return "MSG_BATTLE_BOARD";
+        case MSG_BATTLE_MOVE:		return "MSG_BATTLE_MOVE";
+        case MSG_BATTLE_ATTACK:		return "MSG_BATTLE_ATTACK";
+        case MSG_BATTLE_DEFENCE:	return "MSG_BATTLE_DEFENCE";
+        case MSG_BATTLE_DAMAGE:		return "MSG_BATTLE_DAMAGE";
+        case MSG_BATTLE_CAST:		return "MSG_BATTLE_CAST";
+        case MSG_BATTLE_SKIP:		return "MSG_BATTLE_SKIP";
+        case MSG_BATTLE_MORALE:		return "MSG_BATTLE_MORALE";
+        case MSG_BATTLE_LUCK:		return "MSG_BATTLE_LUCK";
+        case MSG_BATTLE_CATAPULT:	return "MSG_BATTLE_CATAPULT";
+        case MSG_BATTLE_TOWER:		return "MSG_BATTLE_TOWER";
+        case MSG_BATTLE_END_TURN:	return "MSG_BATTLE_END_TURN";
+        case MSG_BATTLE_RETREAT:	return "MSG_BATTLE_RETREAT";
+        case MSG_BATTLE_SURRENDER:	return "MSG_BATTLE_SURRENDER";
+        case MSG_BATTLE_TURN:		return "MSG_BATTLE_TURN";
+        case MSG_BATTLE_RESULT:		return "MSG_BATTLE_RESULT";
+
         case MSG_YOUR_TURN:     return "MSG_YOUR_TURN";
         case MSG_END_TURN:      return "MSG_END_TURN";
         case MSG_TILES:         return "MSG_TILES";
         case MSG_HEROES:        return "MSG_HEROES";
+        case MSG_BATTLE:        return "MSG_BATTLE";
         case MSG_CASTLE:        return "MSG_CASTLE";
         case MSG_SPELL:         return "MSG_SPELL";
         case MSG_MAPS:          return "MSG_MAPS";
@@ -115,7 +133,7 @@ bool Network::isLocalClient(void)
 bool Network::isRemoteClient(void)
 {
     Settings & conf = Settings::Get();
-    return conf.GameType() == Game::NETWORK && !conf.NetworkLocalClient() && !conf.NetworkDedicatedServer();
+    return conf.GameType() == Game::NETWORK && !isLocalClient();
 }
 
 bool Network::MsgIsBroadcast(u16 msg)
@@ -148,7 +166,7 @@ int Network::RunDedicatedServer(void)
             return -1;
         }
 
-	conf.SetModes(Settings::DEDICATEDSERVER);
+	conf.SetNetworkDedicatedServer(true);
 	conf.SetGameType(Game::NETWORK);
 
         return FH2Server::callbackCreateThread(&server);

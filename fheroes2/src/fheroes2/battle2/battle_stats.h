@@ -127,6 +127,8 @@ namespace Battle2
 	void	Dump(void) const;
 
 
+	u16	GetID(void) const;
+
 	u32	GetCount(void) const;
 	s32	GetExtraQuality(s32) const;
 	u16	GetTailIndex(void) const;
@@ -143,13 +145,13 @@ namespace Battle2
 	u32	GetHitPoints(void) const;
 	u8	GetShots(void) const;
 	u16	GetPosition(void) const;
-	void	ApplyDamage(Stats &, std::pair<u32, u32>* res = NULL);
+	u32	ApplyDamage(Stats &, u32);
 	u32	ApplyDamage(u32);
-	bool	ApplySpell(u8, const HeroBase* hero, std::pair<u32, u32>* res = NULL);
+	bool	ApplySpell(u8, const HeroBase* hero, TargetInfo &);
 	bool	AllowApplySpell(u8, const HeroBase* hero, std::string* msg = NULL) const;
 	void	PostAttackAction(Stats &);
 	void	SpellModesAction(u8, u8, const HeroBase*);
-	void	SpellApplyDamage(u8, u8, const HeroBase*, std::pair<u32, u32>* res = NULL);
+	void	SpellApplyDamage(u8, u8, const HeroBase*, TargetInfo &);
 	void	SpellRestoreAction(u8, u8, const HeroBase*);
 	u16	Resurrect(u32, bool);
 
@@ -161,7 +163,9 @@ namespace Battle2
 	void	IncreaseAnimFrame(bool loop = false);
 	bool    isStartAnimFrame(void) const;
 	bool    isFinishAnimFrame(void) const;
+	u8      GetFrameOffset(void) const;
 	u8      GetFrameStart(void) const;
+	u8      GetFrameCount(void) const;
 
 	s8 GetStartMissileOffset(u8) const;
 

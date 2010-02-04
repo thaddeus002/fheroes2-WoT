@@ -208,6 +208,11 @@ Battle2::Stats::~Stats()
     if(contours[3]) delete contours[3];
 }
 
+u16 Battle2::Stats::GetID(void) const
+{
+    return id;
+}
+
 const Battle2::MonsterInfo & Battle2::Stats::GetMonsterInfo(void) const
 {
     return monsters_info[troop.GetID()];
@@ -700,9 +705,8 @@ u16 Battle2::Stats::Resurrect(u32 points, bool check_original)
     return count - old;
 }
 
-void Battle2::Stats::ApplyDamage(Stats & enemy, std::pair<u32, u32>* res)
+u32 Battle2::Stats::ApplyDamage(Stats & enemy, u32 dmg)
 {
-    const u32 dmg = enemy.GetDamage(*this);
     const u32 killed = ApplyDamage(dmg);
 
     if(killed) switch(enemy.troop())
@@ -721,12 +725,7 @@ void Battle2::Stats::ApplyDamage(Stats & enemy, std::pair<u32, u32>* res)
 
 	default: break;
     }
-
-    if(res)
-    {
-	res->first = dmg;
-	res->second = killed;
-    }
+    return killed;
 }
 
 bool Battle2::Stats::AllowApplySpell(u8 spell, const HeroBase* hero, std::string *msg) const
@@ -736,16 +735,15 @@ bool Battle2::Stats::AllowApplySpell(u8 spell, const HeroBase* hero, std::string
     if(Modes(CAP_MIRRORIMAGE) &&
 	(spell == Spell::ANTIMAGIC || spell == Spell::MIRRORIMAGE)) return false;
 
-    const HeroBase* myhero = GetCommander();
-
-    if(!myhero) return true;
-
     // check global
     // if(arena->DisableCastSpell(spell, msg)) return false; // disable - recursion!
 
     if(Spell::isApplyToFriends(spell) && GetColor() != hero->GetColor()) return false;
     if(Spell::isApplyToEnemies(spell) && GetColor() == hero->GetColor()) return false;
     if(isMagicDefence(spell)) return false;
+
+    const HeroBase* myhero = GetCommander();
+    if(!myhero) return true;
 
     // check artifact
     Artifact::artifact_t guard_art = Artifact::UNKNOWN;
@@ -780,7 +778,7 @@ bool Battle2::Stats::AllowApplySpell(u8 spell, const HeroBase* hero, std::string
     return true;
 }
 
-bool Battle2::Stats::ApplySpell(u8 spell, const HeroBase* hero, std::pair<u32, u32>* res)
+bool Battle2::Stats::ApplySpell(u8 spell, const HeroBase* hero, TargetInfo & target)
 {
     if(! AllowApplySpell(spell, hero)) return false;
 
@@ -812,7 +810,7 @@ bool Battle2::Stats::ApplySpell(u8 spell, const HeroBase* hero, std::pair<u32, u
 	    default: break;
 	}
 
-	SpellApplyDamage(spell, spoint, hero, res);
+	SpellApplyDamage(spell, spoint, hero, target);
     }
     else
     if(Spell::isRestore(spell))
@@ -1128,7 +1126,7 @@ void Battle2::Stats::SpellModesAction(u8 spell, u8 duration, const HeroBase* her
     }
 }
 
-void Battle2::Stats::SpellApplyDamage(u8 spell, u8 spoint, const HeroBase* hero, std::pair<u32, u32>* res)
+void Battle2::Stats::SpellApplyDamage(u8 spell, u8 spoint, const HeroBase* hero, TargetInfo & target)
 {
     u32 dmg = Spell::Damage(spell) * spoint;
 
@@ -1229,16 +1227,13 @@ void Battle2::Stats::SpellApplyDamage(u8 spell, u8 spoint, const HeroBase* hero,
 		// -50%
     		if(myhero && myhero->HasArtifact(Artifact::LIGHTNING_HELM)) dmg /= 2;
 		// update orders damage
-		if(res)
+		switch(target.damage)
 		{
-		    switch(res->first)
-		    {
-			case 0: break;
-			case 1:	dmg /= 2; break;
-			case 2:	dmg /= 4; break;
-			case 3:	dmg /= 8; break;
-			default: break;
-		    }
+		    case 0: 	break;
+		    case 1:	dmg /= 2; break;
+		    case 2:	dmg /= 4; break;
+		    case 3:	dmg /= 8; break;
+		    default: break;
 		}
     		break;
 
@@ -1255,14 +1250,8 @@ void Battle2::Stats::SpellApplyDamage(u8 spell, u8 spoint, const HeroBase* hero,
     // apply damage
     if(dmg)
     {
-	const u32 killed = ApplyDamage(dmg);
-
-	// store res
-	if(res)
-	{
-    	    res->first = dmg;
-    	    res->second = killed;
-	}
+	target.damage = dmg;
+	target.killed = ApplyDamage(dmg);
     }
 }
 
@@ -1558,7 +1547,17 @@ bool Battle2::Stats::isHaveDamage(void) const
 
 u8 Battle2::Stats::GetFrameStart(void) const
 {
-    return Sign(animstep) < 0 ? GetFrameState().start + GetFrameState().count - 1 : GetFrameState().start;
+    return animstep < 0 ? GetFrameState().start + GetFrameState().count - 1 : GetFrameState().start;
+}
+
+u8 Battle2::Stats::GetFrameOffset(void) const
+{
+    return animframe - GetFrameStart();
+}
+
+u8 Battle2::Stats::GetFrameCount(void) const
+{
+    return GetFrameState().count;
 }
 
 void Battle2::Stats::IncreaseAnimFrame(bool loop)
@@ -1580,10 +1579,10 @@ bool Battle2::Stats::isFinishAnimFrame(void) const
     if(0 == GetFrameState().count)
 	return true;
     else
-    if(Sign(animstep) < 0)
+    if(animstep < 0)
 	return animframe <= GetFrameState().start;
     else
-    if(Sign(animstep) > 0)
+    if(animstep > 0)
 	return animframe >= GetFrameState().start + GetFrameState().count - 1;
 
     return true;

@@ -29,6 +29,8 @@
 #include "world.h"
 #include "agg.h"
 #include "army_troop.h"
+#include "server.h"
+#include "remoteclient.h"
 #include "battle_arena.h"
 #include "battle_cell.h"
 #include "battle_stats.h"
@@ -659,6 +661,14 @@ Battle2::Arena::Arena(Army::army_t & a1, Army::army_t & a2, u16 index, bool loca
     board.SetCovrObjects(icn_covr);
     if(icn_covr == ICN::UNKNOWN) board.SetCobjObjects(index);
 
+#ifdef WITH_NET
+    if(Network::isRemoteClient())
+    {
+        if(Game::REMOTE == army1.GetControl()) FH2RemoteClient::SendBattleBoard(army1.GetColor(), *this);
+        if(Game::REMOTE == army2.GetControl()) FH2RemoteClient::SendBattleBoard(army2.GetColor(), *this);
+    }
+#endif
+
     //
     if(interface)
     {
@@ -666,7 +676,7 @@ Battle2::Arena::Arena(Army::army_t & a1, Army::army_t & a2, u16 index, bool loca
 	Display & display = Display::Get();
 
 	cursor.Hide();
-	if(conf.Modes(Settings::FADE)) display.Fade();
+	if(conf.UseFade()) display.Fade();
 	cursor.SetThemes(Cursor::WAR_NONE);
 	interface->Redraw();
 	cursor.Show();
@@ -686,6 +696,11 @@ Battle2::Arena::~Arena()
 
     if(catapult) delete catapult;
     if(interface) delete interface;
+}
+
+Battle2::Interface* Battle2::Arena::GetInterface(void)
+{
+    return interface;
 }
 
 void Battle2::Arena::Turns(u16 turn, Result & result)
@@ -766,16 +781,15 @@ void Battle2::Arena::Turns(u16 turn, Result & result)
 	// turn opponents
 	switch(current_troop->GetControl())
 	{
-    	    case Game::REMOTE:  RemoteTurn(*current_troop, actions); break;
+    	    case Game::REMOTE:	RemoteTurn(*current_troop, actions); break;
     	    case Game::LOCAL:   HumanTurn(*current_troop, actions); break;
-    	    case Game::AI:      AITurn(*current_troop, actions); break;
-    	    default: break;
+    	    default:		AITurn(*current_troop, actions); break;
 	}
 
 	// apply task
 	while(actions.size())
 	{
-	    bool check_morale = (ACT_END == actions.front().GetID());
+	    bool check_morale = (MSG_BATTLE_END_TURN == actions.front().GetID());
 
 	    ApplyAction(actions.front());
 	    actions.pop_front();
@@ -802,13 +816,35 @@ void Battle2::Arena::Turns(u16 turn, Result & result)
     }
 }
 
+void Battle2::Arena::RemoteTurn(const Stats & b, Actions & a)
+{
+#ifdef WITH_NET
+    if(current_commander)
+    {
+	FH2RemoteClient* remote = FH2Server::Get().GetRemoteClient(current_commander->GetColor());
+	if(remote)
+	{
+	    remote->RecvBattleHumanTurn(b, a);
+	    return;
+	}
+	DEBUG(DBG_BATTLE, DBG_WARN, "Battle2::Arena::RemoteTurn: " << "remote client is NULL");
+    }
+    else
+    {
+	DEBUG(DBG_BATTLE, DBG_WARN, "Battle2::Arena::RemoteTurn: " << "current commander is NULL");
+    }
+#endif
+    DEBUG(DBG_BATTLE, DBG_WARN, "Battle2::Arena::RemoteTurn: " << "AI turn");
+    AITurn(b, a);
+}
+
 void Battle2::Arena::HumanTurn(const Stats & b, Actions & a)
 {
     Settings & conf = Settings::Get();
 
     conf.SetMyColor(Color::Get(b.GetColor()));
 
-    if(conf.Modes(Settings::BATTLEAUTO))
+    if(conf.BattleAuto())
         AITurn(b, a);
     else
     if(interface)
@@ -1334,4 +1370,85 @@ bool Battle2::Arena::isAllowResurrectFromGraveyard(u8 spell, u16 cell) const
 	}
     }
     return false;
+}
+
+void Battle2::Arena::SetCastleTargetValue(u8 target, u8 value)
+{
+    switch(target)
+    {
+        case CAT_WALL1: board[8].object = value; break;
+        case CAT_WALL2: board[29].object = value; break;
+        case CAT_WALL3: board[73].object = value; break;
+        case CAT_WALL4: board[96].object = value; break;
+
+        case CAT_TOWER1:if(towers[0] && towers[0]->isValid()) towers[0]->SetDestroy(); break;
+        case CAT_TOWER2:if(towers[2] && towers[2]->isValid()) towers[2]->SetDestroy(); break;
+        case CAT_TOWER3:if(towers[1] && towers[1]->isValid()) towers[1]->SetDestroy(); break;
+
+        case CAT_MOAT: board[50].object = value; break;
+
+        default: break;
+    }
+}
+
+u8 Battle2::Arena::GetCastleTargetValue(u8 target) const
+{
+    switch(target)
+    {
+        case CAT_WALL1: return board[8].object;
+        case CAT_WALL2: return board[29].object;
+        case CAT_WALL3: return board[73].object;
+        case CAT_WALL4: return board[96].object;
+
+        case CAT_TOWER1:return towers[0] && towers[0]->isValid();
+        case CAT_TOWER2:return towers[2] && towers[2]->isValid();
+        case CAT_TOWER3:return towers[1] && towers[1]->isValid();
+
+        case CAT_MOAT:  return board[50].object;
+
+        default: break;
+    }
+    return 0;
+}
+
+Battle2::Tower* Battle2::Arena::GetTower(u8 type)
+{
+    switch(type)
+    {
+        case TWR_LEFT:  return towers[0];
+        case TWR_CENTER:return towers[1];
+        case TWR_RIGHT: return towers[2];
+        default: break;
+    }
+    return NULL;
+}
+
+void Battle2::Arena::PackBoard(Action & msg) const
+{
+    msg.Push(static_cast<u32>(board.size()));
+
+    Board::const_iterator it = board.begin();
+    while(it != board.end())
+    {
+        msg.Push((*it).object);
+        ++it;
+    }
+}
+
+void Battle2::Arena::UnpackBoard(Action & msg)
+{
+    u32 size;
+    msg.Pop(size);
+
+    if(size == board.size())
+    {
+	Board::iterator it = board.begin();
+        while(it != board.end())
+        {
+            msg.Pop((*it).object);
+            ++it;
+        }
+    }
+    else
+	DEBUG(DBG_BATTLE, DBG_WARN, "Battle2::Arena::UnpackBoard: " << "incorrect param");
 }

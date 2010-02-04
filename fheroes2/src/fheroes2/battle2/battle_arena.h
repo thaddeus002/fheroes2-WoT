@@ -105,6 +105,8 @@ namespace Battle2
 	~Arena();
 
 	void Turns(u16, Result &);
+	void RemoteTurn(const Stats &, Actions &);
+	void HumanTurn(const Stats &, Actions &);
 
 	const Cell* GetCell(u16, direction_t = CENTER) const;
 	Cell* GetCell(u16, direction_t = CENTER);
@@ -140,20 +142,27 @@ namespace Battle2
 	u16  GetPath(const Stats &, u16, std::vector<u16> &);
 	void DumpBoard(void) const;
 
-    protected:
-	friend class Interface;
-	friend class Cell;
-	friend class Stats;
-	friend class Tower;
-	friend class Catapult;
+	Interface* GetInterface(void);
+	Tower* GetTower(u8);
+
+	void ApplyAction(Action &);
+
+	void GetTargetsForDamage(Stats &, Stats &, std::vector<TargetInfo> &);
+	void TargetsApplyDamage(Stats &, Stats &, std::vector<TargetInfo> &);
+
+	void GetTargetsForSpells(const HeroBase*, const u8, const u16, std::vector<TargetInfo> &);
+	void TargetsApplySpell(const HeroBase*, const u8, std::vector<TargetInfo> &);
+
+	void UnpackBoard(Action &);
+	void PackBoard(Action &) const;
+
+        u8 GetCastleTargetValue(u8) const;
+        void SetCastleTargetValue(u8, u8);
 
 	bool isDisableCastSpell(u8 spell, std::string *msg) const;
 	bool isAllowResurrectFromGraveyard(u8, u16) const;
 
 	u8 GetOppositeColor(u8) const;
-
-	void RemoteTurn(const Stats &, Actions &);
-	void HumanTurn(const Stats &, Actions &);
 
 	void TowerAction(void);
 	void CatapultAction(void);
@@ -178,7 +187,6 @@ namespace Battle2
 	void AIMagicAction(const Stats &, Actions &, const Stats*);
 
 	// battle_action
-	void ApplyAction(Action &);
 	void ApplyActionRetreat(Action &);
 	void ApplyActionSurrender(Action &);
 	void ApplyActionAttack(Action &);
@@ -192,11 +200,12 @@ namespace Battle2
 	void ApplyActionCatapult(Action &);
 	void BattleProcess(Stats &, Stats &);
 
-	void GetTargetsForDamage(Stats &, Stats &, std::vector<TargetInfo> &);
-	void TargetsApplyDamage(Stats &, Stats &, std::vector<TargetInfo> &);
-
-	void GetTargetsForSpells(const HeroBase*, const u8, const u16, std::vector<TargetInfo> &);
-	void TargetsApplySpell(const HeroBase*, const u8, std::vector<TargetInfo> &);
+    protected:
+	friend class Interface;
+	friend class Cell;
+	friend class Stats;
+	friend class Tower;
+	friend class Catapult;
 
 	Army::army_t & army1;
         Army::army_t & army2;

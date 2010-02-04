@@ -37,7 +37,7 @@ namespace Battle2
 	Point GetTargetPosition(u8) const;
 	u8 GetShots(void) const;
 	u8 GetTarget(void) const;
-	void ApplyDamage(u8);
+	u8 GetDamage(u8);
 	void Action(void);
 
     private:

@@ -35,10 +35,11 @@ namespace Battle2
 {
     class Arena;
     class Stats;
-    class Action;
+    class QueueMessage;
     class Actions;
     class Tower;
     struct TargetInfo;
+    struct Result;
 
     void DialogBattleSettings(void);
     bool DialogBattleSurrender(const HeroBase &, u32);
@@ -152,7 +153,7 @@ namespace Battle2
 	void RedrawTroopFrameAnimation(Stats &);
 	void RedrawTroopWithFrameAnimation(Stats &, ICN::icn_t, M82::m82_t, bool);
 	void RedrawTargetsWithFrameAnimation(const u16, const std::vector<TargetInfo> &, ICN::icn_t, M82::m82_t);
-	void RedrawTargetsWithFrameAnimation(const std::vector<TargetInfo> &, ICN::icn_t, M82::m82_t);
+	void RedrawTargetsWithFrameAnimation(const std::vector<TargetInfo> &, ICN::icn_t, M82::m82_t, bool);
 
 	bool IdleTroopsAnimation(u32);
 	void CheckGlobalEvents(LocalEvent &, u32);
