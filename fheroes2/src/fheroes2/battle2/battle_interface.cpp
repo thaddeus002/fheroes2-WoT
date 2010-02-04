@@ -1953,28 +1953,40 @@ void Battle2::Interface::RedrawActionAttackPart2(Stats & attacker, std::vector<T
     // draw status for first defender
     if(targets.size())
     {
-	TargetInfo & target = targets.front();
 	std::string msg = _("%{attacker} do %{damage} damage.");
 	String::Replace(msg, "%{attacker}", attacker.GetName());
-	String::Replace(msg, "%{damage}", target.damage);
+
 	if(1 < targets.size())
 	{
-	    u32 count = 0;
+	    u32 killed = 0;
+	    u32 damage = 0;
 	    std::vector<TargetInfo>::const_iterator it1 = targets.begin();
 	    std::vector<TargetInfo>::const_iterator it2 = targets.end();
-	    for(; it1 != it2; ++it1) count += (*it1).killed;
-	    msg.append(" ");
-	    msg.append(_("%{count} creatures perished."));
-    	    String::Replace(msg, "%{count}", count);
+	    for(; it1 != it2; ++it1){ killed += (*it1).killed; damage += (*it1).damage; }
+
+	    String::Replace(msg, "%{damage}", damage);
+
+	    if(killed)
+	    {
+	        msg.append(" ");
+		msg.append(_("%{count} creatures perished."));
+    		String::Replace(msg, "%{count}", killed);
+	    }
 	}
 	else
-	if(target.killed)
 	{
-	    msg.append(" ");
-	    msg.append(_("%{count} %{defender} perish."));
-    	    String::Replace(msg, "%{count}", target.killed);
-    	    String::Replace(msg, "%{defender}", target.defender->GetName());
+	    TargetInfo & target = targets.front();
+	    String::Replace(msg, "%{damage}", target.damage);
+
+	    if(target.killed)
+	    {
+		msg.append(" ");
+		msg.append(_("%{count} %{defender} perish."));
+    		String::Replace(msg, "%{count}", target.killed);
+    		String::Replace(msg, "%{defender}", target.defender->GetName());
+	    }
 	}
+
 	status.SetMessage(msg, true);
 	status.SetMessage("", false);
     }
@@ -2306,13 +2318,26 @@ void Battle2::Interface::RedrawActionSpellCastPart2(u8 spell, std::vector<Target
         // targets damage animation
 	RedrawActionWinces(targets);
 
+	u32 killed = 0;
+	u32 damage = 0;
+	std::vector<TargetInfo>::const_iterator it1 = targets.begin();
+	std::vector<TargetInfo>::const_iterator it2 = targets.end();
+	for(; it1 != it2; ++it1){ killed += (*it1).killed; damage += (*it1).damage; }
+
 	// draw status for first defender
-	if(targets.size() && targets.front().damage)
+	if(damage)
 	{
-	    TargetInfo & target = targets.front();
 	    std::string msg = _("The %{spell} does %{damage} damage.");
 	    String::Replace(msg, "%{spell}", Spell::GetName(Spell::FromInt(spell)));
-	    String::Replace(msg, "%{damage}", target.damage);
+	    String::Replace(msg, "%{damage}", damage);
+
+	    if(killed)
+	    {
+		msg.append(" ");
+		msg.append(_("%{count} creatures perished."));
+    		String::Replace(msg, "%{count}", killed);
+	    }
+
 	    status.SetMessage(msg, true);
 	    status.SetMessage("", false);
 	}
