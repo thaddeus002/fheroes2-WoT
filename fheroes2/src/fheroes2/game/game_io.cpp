@@ -111,7 +111,7 @@ bool Game::Load(const std::string & fn)
     Game::IO msg;
     if(!msg.LoadSAV(fn) || !Game::IO::LoadBIN(msg)) return false;
 
-    Settings::Get().SetModes(Settings::LOADGAME);
+    Settings::Get().SetLoadedGameVersion(true);
     return true;
 }
 
@@ -232,7 +232,7 @@ bool Game::IO::SaveBIN(QueueMessage & msg)
     msg.Push(conf.players_colors);
     msg.Push(conf.preferably_count_players);
     msg.Push(conf.debug);
-    msg.Push(static_cast<u8>(conf.Original()));
+    msg.Push(static_cast<u8>(conf.OriginalVersion()));
 
     // world
     msg.Push(static_cast<u16>(0xFF05));
@@ -687,7 +687,7 @@ bool Game::IO::LoadBIN(QueueMessage & msg)
 #endif
     // settings: original
     msg.Pop(byte8);
-    if(byte8) conf.SetModes(Settings::ORIGINAL);
+    if(byte8) conf.SetOriginalVersion();
     // world
     msg.Pop(byte16);
     if(byte16 != 0xFF05) DEBUG(DBG_GAME , DBG_WARN, "Game::IO::LoadBIN: 0xFF05");

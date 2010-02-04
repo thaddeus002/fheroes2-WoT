@@ -140,7 +140,7 @@ u8 Dialog::SystemOptions(void)
         // set interface
         if(le.MouseClickLeft(rect7))
         {
-    	    conf.EvilInterface() ? conf.ResetModes(Settings::EVILINTERFACE) : conf.SetModes(Settings::EVILINTERFACE);
+    	    conf.SetEvilInterface(!conf.EvilInterface());
     	    result |= 0x08;
     	    cursor.Hide();
     	    display.Blit(back2, rb);

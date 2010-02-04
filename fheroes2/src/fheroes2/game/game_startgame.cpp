@@ -200,7 +200,7 @@ Game::menu_t Game::StartGame(void)
 
     while(m == ENDTURN)
     {
-	if(!conf.Modes(Settings::LOADGAME))
+	if(!conf.LoadedGameVersion())
 	world.NewDay();
 
 	for(Color::color_t color = Color::BLUE; color != Color::GRAY; ++color)
@@ -208,7 +208,7 @@ Game::menu_t Game::StartGame(void)
 	    Kingdom & kingdom = world.GetKingdom(color);
 
 	    if(!kingdom.isPlay() ||
-	    (conf.Modes(Settings::LOADGAME) && color != conf.MyColor())) continue;
+	    (conf.LoadedGameVersion() && color != conf.MyColor())) continue;
 
 	    if(IS_DEBUG(DBG_GAME, DBG_INFO)) kingdom.Dump();
 
@@ -237,7 +237,7 @@ Game::menu_t Game::StartGame(void)
 		    heroesBar.Show();
 		    conf.SetMyColor(color);
 		    m = HumanTurn();
-		    if(conf.Modes(Settings::LOADGAME)) conf.ResetModes(Settings::LOADGAME);
+		    if(conf.LoadedGameVersion()) conf.SetLoadedGameVersion(false);
 		break;
 
 		// AI turn
@@ -250,7 +250,7 @@ Game::menu_t Game::StartGame(void)
 			// for pocketpc: show status window
 			if(conf.PocketPC() && !conf.ShowStatus())
 			{
-			    conf.SetModes(Settings::SHOWSTATUS);
+			    conf.SetShowStatus(true);
 			    I.SetRedraw(REDRAW_STATUS);
 			}
 
@@ -764,7 +764,7 @@ Game::menu_t Game::HumanTurn(void)
     // set focus
     if(Game::HOTSEAT == conf.GameType()) global_focus.Reset();
 
-    if(conf.Original() && myHeroes.size())
+    if(conf.OriginalVersion() && myHeroes.size())
 	global_focus.Set(myHeroes.front());
     else
 	global_focus.Reset(Focus::HEROES);
@@ -1013,7 +1013,7 @@ Game::menu_t Game::HumanTurn(void)
 	    global_focus.SetRedraw();
 	}
 
-	if(conf.Modes(Settings::AUTOSAVE))
+	if(conf.AutoSave())
 	{
 	    std::string filename(conf.LocalPrefix() + SEPARATOR + "files" + SEPARATOR + "save" + SEPARATOR +  "autosave.sav");
 	    Game::Save(filename);
@@ -1381,7 +1381,7 @@ void Game::KeyPress_s(void)
 
 void Game::KeyPress_l(menu_t & ret)
 {
-    if(Settings::Get().Original())
+    if(Settings::Get().OriginalVersion())
     {
 	if(Dialog::YES == Dialog::Message("", _("Are you sure you want to load a new game? (Your current game will be lost)"), Font::BIG, Dialog::YES|Dialog::NO))
 	ret = LOADGAME;
@@ -1565,17 +1565,19 @@ void Game::KeyPress_r(void)
     {
 	if(conf.ShowRadar())
 	{
-	    conf.ResetModes(Settings::SHOWRADAR);
+	    conf.SetShowRadar(false);
 	    Interface::Basic::Get().SetRedraw(REDRAW_GAMEAREA);
 	}
 	else
 	{
-	    if(conf.PocketPC() && conf.Modes(Settings::SHOWICONS | Settings::SHOWSTATUS | Settings::SHOWBUTTONS))
+	    if(conf.PocketPC() && (conf.ShowIcons() || conf.ShowStatus() || conf.ShowButtons()))
 	    {
-		conf.ResetModes(Settings::SHOWICONS | Settings::SHOWSTATUS | Settings::SHOWBUTTONS);
+		conf.SetShowIcons(false);
+		conf.SetShowStatus(false);
+		conf.SetShowButtons(false);
 		Interface::Basic::Get().SetRedraw(REDRAW_GAMEAREA);
 	    }
-	    conf.SetModes(Settings::SHOWRADAR);
+	    conf.SetShowRadar(true);
 	    Interface::Basic::Get().SetRedraw(REDRAW_RADAR);
 	}
     }
@@ -1589,17 +1591,19 @@ void Game::KeyPress_b(void)
     {
 	if(conf.ShowButtons())
 	{
-	    conf.ResetModes(Settings::SHOWBUTTONS);
+	    conf.SetShowButtons(false);
 	    Interface::Basic::Get().SetRedraw(REDRAW_GAMEAREA);
 	}
 	else
 	{
-	    if(conf.PocketPC() && conf.Modes(Settings::SHOWRADAR | Settings::SHOWSTATUS | Settings::SHOWICONS))
+	    if(conf.PocketPC() && (conf.ShowRadar() || conf.ShowStatus() || conf.ShowIcons()))
 	    {
-		conf.ResetModes(Settings::SHOWRADAR | Settings::SHOWSTATUS | Settings::SHOWICONS);
+		conf.SetShowIcons(false);
+		conf.SetShowStatus(false);
+		conf.SetShowRadar(false);
 		Interface::Basic::Get().SetRedraw(REDRAW_GAMEAREA);
 	    }
-	    conf.SetModes(Settings::SHOWBUTTONS);
+	    conf.SetShowButtons(true);
 	    Interface::Basic::Get().SetRedraw(REDRAW_BUTTONS);
 	}
     }
@@ -1613,17 +1617,19 @@ void Game::KeyPress_w(void)
     {
 	if(conf.ShowStatus())
 	{
-	    conf.ResetModes(Settings::SHOWSTATUS);
+	    conf.SetShowStatus(false);
 	    Interface::Basic::Get().SetRedraw(REDRAW_GAMEAREA);
 	}
 	else
 	{
-	    if(conf.PocketPC() && conf.Modes(Settings::SHOWRADAR | Settings::SHOWICONS | Settings::SHOWBUTTONS))
+	    if(conf.PocketPC() && (conf.ShowRadar() || conf.ShowIcons() || conf.ShowButtons()))
 	    {
-		conf.ResetModes(Settings::SHOWRADAR | Settings::SHOWICONS | Settings::SHOWBUTTONS);
+		conf.SetShowIcons(false);
+		conf.SetShowButtons(false);
+		conf.SetShowRadar(false);
 		Interface::Basic::Get().SetRedraw(REDRAW_GAMEAREA);
 	    }
-	    conf.SetModes(Settings::SHOWSTATUS);
+	    conf.SetShowStatus(true);
 	    Interface::Basic::Get().SetRedraw(REDRAW_STATUS);
 	}
     }
@@ -1637,17 +1643,19 @@ void Game::KeyPress_c(void)
     {
 	if(conf.ShowIcons())
 	{
-	    conf.ResetModes(Settings::SHOWICONS);
+	    conf.SetShowIcons(false);
 	    Interface::Basic::Get().SetRedraw(REDRAW_GAMEAREA);
 	}
 	else
 	{
-	    if(conf.PocketPC() && conf.Modes(Settings::SHOWRADAR | Settings::SHOWSTATUS | Settings::SHOWBUTTONS))
+	    if(conf.PocketPC() && (conf.ShowRadar() || conf.ShowStatus() || conf.ShowButtons()))
 	    {
-		conf.ResetModes(Settings::SHOWRADAR | Settings::SHOWSTATUS | Settings::SHOWBUTTONS);
+		conf.SetShowButtons(false);
+		conf.SetShowRadar(false);
+		conf.SetShowStatus(false);
 		Interface::Basic::Get().SetRedraw(REDRAW_GAMEAREA);
 	    }
-	    conf.SetModes(Settings::SHOWICONS);
+	    conf.SetShowIcons(true);
 	    Interface::Basic::Get().SetRedraw(REDRAW_ICONS);
 	}
     }
@@ -1659,15 +1667,7 @@ void Game::KeyPress_a(void)
 
     if(conf.HideInterface())
     {
-	if(conf.ShowControlPanel())
-	{
-	    conf.ResetModes(Settings::SHOWCPANEL);
-	    Interface::Basic::Get().SetRedraw(REDRAW_GAMEAREA);
-	}
-	else
-	{
-	    conf.SetModes(Settings::SHOWCPANEL);
-	    Interface::Basic::Get().SetRedraw(REDRAW_GAMEAREA);
-	}
+	conf.SetShowPanel(!conf.ShowControlPanel());
+	Interface::Basic::Get().SetRedraw(REDRAW_GAMEAREA);
     }
 }

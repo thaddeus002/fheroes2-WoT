@@ -79,7 +79,7 @@ int main(int argc, char **argv)
                 {
 #ifdef WITH_EDITOR
                     case 'e':
-			conf.SetModes(Settings::EDITOR);
+			conf.SetEditor();
 			conf.SetDebug(DBG_GAME | DBG_INFO);
 			std::cout << "start: editor mode." << std::endl;
 			break;
@@ -114,7 +114,7 @@ int main(int argc, char **argv)
 
         if(conf.Sound() || conf.Music())
             subsystem |= INIT_AUDIO;
-        if(conf.Modes(Settings::MUSIC_CD))
+        if(Settings::MUSIC_CD == conf.GetMusicType())
             subsystem |= INIT_CDROM | INIT_AUDIO;
 #ifdef WITH_NET
         Network::SetProtocolVersion(static_cast<u16>((conf.MajorVersion() << 8)) | conf.MinorVersion());
@@ -140,8 +140,8 @@ int main(int argc, char **argv)
 	    else
 	    if(conf.Sound() || conf.Music())
 	    {
-		conf.ResetModes(Settings::SOUND);
-		conf.ResetModes(Settings::MUSIC);
+		conf.ResetSound();
+		conf.ResetMusic();
 	    }
 
 	    std::string strtmp = "Free Heroes II, " + conf.BuildVersion();
@@ -231,7 +231,7 @@ int main(int argc, char **argv)
 	    }
 
 	    Display::ShowCursor();
-	    if(Settings::Get().Modes(Settings::FADE)) Display::Fade();
+	    if(Settings::Get().UseFade()) Display::Fade();
 
 	} catch(std::bad_alloc)
 	{

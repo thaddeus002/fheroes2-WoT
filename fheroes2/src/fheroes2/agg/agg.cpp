@@ -180,7 +180,7 @@ AGG::Cache::Cache()
     if(conf.Unicode())
     {
 	if(!font_medium.Open(font1, conf.FontsNormalSize()) ||
-	   !font_small.Open(font2, conf.FontsSmallSize())) conf.ResetModes(Settings::USEUNICODE);
+	   !font_small.Open(font2, conf.FontsSmallSize())) conf.SetUnicode(false);
     }
 #endif
     icn_cache = new icn_cache_t [ICN::UNKNOWN + 1];
@@ -241,7 +241,7 @@ bool AGG::Cache::ReadDataDir(void)
 	if(std::string::npos != lower.find("heroes2x.agg") && !heroes2x_agg.isGood()) heroes2x_agg.Open(*itd);
     }
 
-    if(heroes2x_agg.isGood()) Settings::Get().SetModes(Settings::PRICELOYALTY);
+    if(heroes2x_agg.isGood()) Settings::Get().SetPriceLoyaltyVersion();
 
     return heroes2_agg.isGood();
 }
@@ -489,7 +489,7 @@ void AGG::Cache::LoadICN(const ICN::icn_t icn, u16 index, bool reflect)
     }
     else
     // load from images dir
-    if(conf.Modes(Settings::ALTRESOURCE))
+    if(conf.UseAltResource())
     {
 	Dir dir;
 	std::string name(ICN::GetString(icn));
@@ -561,7 +561,7 @@ void AGG::Cache::LoadWAV(const M82::m82_t m82)
     const Settings & conf = Settings::Get();
 
 #ifdef WITH_MIXER
-    if(conf.Modes(Settings::ALTRESOURCE))
+    if(conf.UseAltResource())
     {
        std::string name(M82::GetString(m82));
        String::Lower(name);
@@ -1153,8 +1153,8 @@ void AGG::PlayMusic(const MUS::mus_t mus, bool loop)
     if(!conf.Music() || MUS::UNUSED == mus || MUS::UNKNOWN == mus || (old == mus && Music::isPlaying())) return;
 
     old = mus;
-
-    if(conf.Modes(Settings::MUSIC_EXT))
+    
+    if(Settings::MUSIC_EXT == conf.GetMusicType())
     {
 	const std::string musname(conf.LocalPrefix() + SEPARATOR + "files" + SEPARATOR + "music" + SEPARATOR + MUS::GetString(mus));
 #ifdef WITH_MIXER
@@ -1183,12 +1183,13 @@ void AGG::PlayMusic(const MUS::mus_t mus, bool loop)
 	DEBUG(DBG_ENGINE , DBG_INFO, "AGG::PlayMusic: " << MUS::GetString(mus));
     }
     else
-    if(conf.Modes(Settings::MUSIC_CD) && Cdrom::isValid())
+    if((Settings::MUSIC_CD == conf.GetMusicType()) && Cdrom::isValid())
     {
 	Cdrom::Play(mus, loop);
 	DEBUG(DBG_ENGINE , DBG_INFO, "AGG::PlayMusic: cd track " << static_cast<int>(mus));
     }
     else
+    if(Settings::MUSIC_MIDI == conf.GetMusicType())
     {
 	XMI::xmi_t xmi = XMI::FromMUS(mus);
 	if(XMI::UNKNOWN != xmi)

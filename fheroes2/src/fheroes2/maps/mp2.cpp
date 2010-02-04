@@ -322,7 +322,7 @@ ICN::icn_t MP2::GetICNObject(const u8 type)
 	case 0xF5:
 	case 0xF6:
 	case 0xF7:
-	    if(Settings::Get().Modes(Settings::PRICELOYALTY)) return ICN::X_LOC1;
+	    if(Settings::Get().PriceLoyaltyVersion()) return ICN::X_LOC1;
 	    break;
 
 	// extra objects for loyalty version
@@ -330,7 +330,7 @@ ICN::icn_t MP2::GetICNObject(const u8 type)
 	case 0xF9:
 	case 0xFA:
 	case 0xFB:
-	    if(Settings::Get().Modes(Settings::PRICELOYALTY)) return ICN::X_LOC2;
+	    if(Settings::Get().PriceLoyaltyVersion()) return ICN::X_LOC2;
 	    break;
 
 	// extra objects for loyalty version
@@ -338,7 +338,7 @@ ICN::icn_t MP2::GetICNObject(const u8 type)
 	case 0xFD:
 	case 0xFE:
 	case 0xFF:
-	    if(Settings::Get().Modes(Settings::PRICELOYALTY)) return ICN::X_LOC3;
+	    if(Settings::Get().PriceLoyaltyVersion()) return ICN::X_LOC3;
 	    break;
 
 	default:

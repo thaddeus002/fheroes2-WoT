@@ -3080,7 +3080,7 @@ namespace Battle
         m_frameborder->SetPosition((Display::Get().w() - 640 - BORDERWIDTH * 2) / 2, (Display::Get().h() - 480 - BORDERWIDTH * 2) / 2, 640, 480);
         m_frameborder->Redraw();
         g_baseOffset = Point(m_frameborder->GetArea().x, m_frameborder->GetArea().y);
-        if(Settings::Get().Modes(Settings::FADE)) display.Fade();
+        if(Settings::Get().UseFade()) display.Fade();
         display.FillRect(0, 0, 0, Rect(g_baseOffset, 640, 480));
 
         Mixer::Reset();

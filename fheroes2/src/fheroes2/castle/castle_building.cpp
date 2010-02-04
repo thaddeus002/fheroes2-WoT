@@ -52,7 +52,7 @@ Rect Castle::GetCoordBuilding(building_t building, const Point & pt)
 		case Race::WRLK:	return Rect(pt.x + 479, pt.y + 100, 39, 52);
 		case Race::WZRD:	return Rect(pt.x, pt.y + 160, 118, 50);
 		// shrine
-		case Race::NECR:	if(Settings::Get().Modes(Settings::PRICELOYALTY)) return Rect(pt.x + 453, pt.y + 36, 55, 96);
+		case Race::NECR:	if(Settings::Get().PriceLoyaltyVersion()) return Rect(pt.x + 453, pt.y + 36, 55, 96);
 		default: break;
 	    }
 	    break;

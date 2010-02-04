@@ -897,7 +897,7 @@ u16 Monster::GetRNDSize(monster_t m)
 {
     u16 factor = 100;
 
-    if(!Settings::Get().Original())
+    if(!Settings::Get().OriginalVersion())
     switch(Settings::Get().GameDifficulty()) 	 
     { 	 
 	case Difficulty::EASY:      factor = 80; break;

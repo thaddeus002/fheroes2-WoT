@@ -488,5 +488,5 @@ void Maps::UpdateSpritesFromTownToCastle(const Point & center)
 
 bool Maps::TileUnderProtection(const u16 index, u16 *res)
 {
-    return Maps::ScanAroundObject(index, MP2::OBJ_MONSTER, Settings::Get().Original(), res);
+    return Maps::ScanAroundObject(index, MP2::OBJ_MONSTER, Settings::Get().OriginalVersion(), res);
 }

@@ -411,7 +411,7 @@ bool PrepareMapsFileInfoList(MapsFileInfoList & lists)
         dir.Read(*it1, ".mp2", false);
         dir.Read(conf.LocalPrefix() + SEPARATOR + *it1, ".mp2", false);
         // loyality version
-        if(conf.Modes(Settings::PRICELOYALTY))
+        if(conf.PriceLoyaltyVersion())
         {
     	    dir.Read(*it1, ".mx2", false);
 	    dir.Read(conf.LocalPrefix() + SEPARATOR + *it1, ".mx2", false);

@@ -141,7 +141,7 @@ void Interface::Basic::Redraw(u8 force)
     if(conf.HideInterface() && conf.ShowControlPanel() && (redraw & REDRAW_GAMEAREA)) controlPanel.Redraw();
 
     // show system info
-    if((0x000F & conf.Debug()) >= DBG_INFO)
+    if(conf.ShowSystem())
 	RedrawSystemInfo((conf.HideInterface() ? 10 : 26), Display::Get().h() - (conf.HideInterface() ? 14 : 30));
 
     if((redraw | force) & REDRAW_BORDER) borderWindow.Redraw();
@@ -161,7 +161,7 @@ void Interface::Basic::RedrawSystemInfo(s16 cx, s16 cy)
 
     // get time only
     u8 space = 0;
-    while(strtime && *strtime && space < 3){ if(std::isspace(*strtime)) ++space; ++strtime; }
+    while(strtime && *strtime && space < 4){ if(std::isspace(*strtime)) ++space; ++strtime; }
 
     space = 0;
     while(strtime && *(strtime + space) && !std::isspace(*(strtime + space))) ++space;

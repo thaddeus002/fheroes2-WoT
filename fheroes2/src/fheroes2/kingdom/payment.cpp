@@ -178,7 +178,7 @@ PaymentConditions::BuyBuilding::BuyBuilding(const u8 race, const u32 build)
             break;
 
         case Castle::BUILD_TAVERN:
-            if(Race::NECR == race && Settings::Get().Modes(Settings::PRICELOYALTY))
+            if(Race::NECR == race && Settings::Get().PriceLoyaltyVersion())
             {
 		gold = BUILD_SHRINE_GOLD;
 		wood = BUILD_SHRINE_WOOD;

@@ -89,7 +89,7 @@ BuildingInfo::BuildingInfo(const Castle & c, Castle::building_t b) : castle(c), 
 	description = Castle::GetDescriptionBuilding(building, castle.GetRace());
 
     // necr and tavern check
-    if(Race::NECR == castle.GetRace() && Castle::BUILD_TAVERN == building && !Settings::Get().Modes(Settings::PRICELOYALTY))
+    if(Race::NECR == castle.GetRace() && Castle::BUILD_TAVERN == building && !Settings::Get().PriceLoyaltyVersion())
 	disable = true;
 }
 

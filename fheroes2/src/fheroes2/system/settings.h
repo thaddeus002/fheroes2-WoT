@@ -59,17 +59,34 @@ enum
 #define IS_DEBUG(x, y) (((x) & Settings::Get().Debug()) && ((0x000F & (y)) <= (0x000F & Settings::Get().Debug())))
 #define DEBUG(x, y, z) if(IS_DEBUG((x), (y))) VERBOSE(z)
 
-class Settings : public BitModes
+class Settings
 {
 public:
-    enum settings_t
+    // ns: battle
+    enum
     {
-	NONE              = 0x00000000,
+        BATTLEAUTO	  = 0x00000001,
+        BATTLEGRID        = 0x00000002,
+        BATTLEMOUSESHADOW = 0x00000004,
+        BATTLEMOVESHADOW  = 0x00000008,
+    };
+
+    // ns: pocketpc
+    enum
+    {
+	POCKETPC          = 0x00000001,
+	LOWMEMORY         = 0x00000002,
+	TAPMODE           = 0x00000004,
+    };
+
+    // ns: global
+    enum
+    {
 	LOADGAME          = 0x00000001,
-	AUTOSAVE          = 0x00000002,
-	POCKETPC          = 0x00000004,
-	LOWMEMORY         = 0x00000008,
-	TAPMODE           = 0x00000010,
+        ORIGINAL          = 0x00000002,
+        PRICELOYALTY      = 0x00000004,
+
+	AUTOSAVE          = 0x00000010,
 
 	DEDICATEDSERVER   = 0x00000020,
 	LOCALCLIENT       = 0x00000040,
@@ -81,25 +98,22 @@ public:
 	SHOWICONS         = 0x00000400,
 	SHOWBUTTONS       = 0x00000800,
 	SHOWSTATUS        = 0x00001000,
-        HIDEINTERFACE     = 0x00002000,
+	SHOWSYSTEM        = 0x00002000,
+        HIDEINTERFACE     = 0x00004000,
 
-	FADE              = 0x00004000,
-        FONTRENDERBLENDED = 0x00008000,
+	FADE              = 0x00008000,
+        EVILINTERFACE     = 0x00010000,
+        FONTRENDERBLENDED = 0x00020000,
 
-        SOUND             = 0x00010000,
-        FULLSCREEN        = 0x00020000,
-        LOGO              = 0x00040000,
-        EDITOR            = 0x00080000,
-        MUSIC_EXT         = 0x00100000,
-        MUSIC_CD          = 0x00200000,
-        MUSIC_MIDI        = 0x00400000,
-        ORIGINAL          = 0x00800000,
-        PRICELOYALTY      = 0x01000000,
-        EVILINTERFACE     = 0x02000000,
-        BATTLEAUTO	  = 0x04000000,
-        BATTLEGRID        = 0x08000000,
-        BATTLEMOUSESHADOW = 0x10000000,
-        BATTLEMOVESHADOW  = 0x20000000,
+        FULLSCREEN        = 0x00400000,
+        LOGO              = 0x00800000,
+
+        SOUND             = 0x01000000,
+        MUSIC_EXT         = 0x02000000,
+        MUSIC_CD          = 0x04000000,
+        MUSIC_MIDI        = 0x08000000,
+
+        EDITOR            = 0x20000000,
         USEUNICODE        = 0x40000000,
 	ALTRESOURCE       = 0x80000000,
 
@@ -138,7 +152,6 @@ public:
     bool FontsRenderBlended(void) const;
 
     bool Editor(void) const;
-    bool Original(void) const;
     bool Sound(void) const;
     bool Music(void) const;
     bool CDMusic(void) const;
@@ -149,6 +162,7 @@ public:
     bool ShowIcons(void) const;
     bool ShowButtons(void) const;
     bool ShowStatus(void) const;
+    bool ShowSystem(void) const;
     bool EvilInterface(void) const;
     bool Logo(void) const;
     bool BattleAuto(void) const;
@@ -160,6 +174,12 @@ public:
     bool LowMemory(void) const;
     bool TapMode(void) const;
     bool HideAIMove(void) const;
+    bool UseAltResource(void) const;
+    bool OriginalVersion(void) const;
+    bool PriceLoyaltyVersion(void) const;
+    bool LoadedGameVersion(void) const;
+    bool UseFade(void) const;
+    bool AutoSave(void) const;
 
     bool NetworkDedicatedServer(void) const;
     bool NetworkLocalClient(void) const;
@@ -168,12 +188,32 @@ public:
 
     u8   SoundVolume(void) const;
     u8   MusicVolume(void) const;
+    u32  GetMusicType(void) const;
 
     void SetDebug(const u16 d);
+    void SetEditor(void);
+    void SetUnicode(bool);
+    void SetOriginalVersion(void);
+    void SetPriceLoyaltyVersion(void);
     void SetGameDifficulty(const Difficulty::difficulty_t d);
+    void SetEvilInterface(bool);
+    void SetBattleAuto(bool);
+    void SetBattleGrid(bool);
+    void SetBattleMovementShaded(bool);
+    void SetBattleMouseShaded(bool);
+    void SetLoadedGameVersion(bool);
+    void SetShowPanel(bool);
+    void SetShowRadar(bool);
+    void SetShowIcons(bool);
+    void SetShowButtons(bool);
+    void SetShowStatus(bool);
+    void SetNetworkLocalClient(bool);
+    void SetNetworkDedicatedServer(bool);
 
     void SetSoundVolume(const u8 v);
     void SetMusicVolume(const u8 v);
+    void ResetSound(void);
+    void ResetMusic(void);
     void SetAnimation(const u8 s);
     
     u8   GameType(void) const;
@@ -231,6 +271,10 @@ private:
     friend class Game::IO;
 
     Settings();
+
+    BitModes opt_global;
+    BitModes opt_battle;
+    BitModes opt_pocket;
 
     const u8 major_version;
     const u8 minor_version;

@@ -1434,7 +1434,7 @@ u16 ICN::AnimationFrame(const icn_t icn, const u16 start, const u32 ticket, cons
 	// extra objects for loyalty version
 	case X_LOC1:
 
-	    if(Settings::Get().Modes(Settings::PRICELOYALTY))
+	    if(Settings::Get().PriceLoyaltyVersion())
 		switch(start)
 		{
 		    // alchemist tower
@@ -1460,7 +1460,7 @@ u16 ICN::AnimationFrame(const icn_t icn, const u16 start, const u32 ticket, cons
 	// extra objects for loyalty version
 	case X_LOC2:
 
-	    if(Settings::Get().Modes(Settings::PRICELOYALTY))
+	    if(Settings::Get().PriceLoyaltyVersion())
 		switch(start)
 		{
 		    // mermaid
@@ -1486,7 +1486,7 @@ u16 ICN::AnimationFrame(const icn_t icn, const u16 start, const u32 ticket, cons
 	// extra objects for loyalty version
 	case X_LOC3:
 
-	    if(Settings::Get().Modes(Settings::PRICELOYALTY))
+	    if(Settings::Get().PriceLoyaltyVersion())
 		switch(start)
 	        {
 		    // hut magi

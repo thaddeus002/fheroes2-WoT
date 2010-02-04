@@ -135,7 +135,7 @@ void World::Defaults(void)
     vec_heroes[58] = new Heroes(Heroes::HALTON, Race::KNGT);
     vec_heroes[59] = new Heroes(Heroes::BAX, Race::NECR);
 
-    if(Settings::Get().Modes(Settings::PRICELOYALTY))
+    if(Settings::Get().PriceLoyaltyVersion())
     {
 	vec_heroes[60] = new Heroes(Heroes::SOLMYR, Race::WZRD);
 	vec_heroes[61] = new Heroes(Heroes::DAINWIN, Race::WRLK);
@@ -769,7 +769,7 @@ void World::LoadMaps(const std::string &filename)
 	const Maps::TilesAddon *addon = NULL;
 
 	// fix loyalty version objects
-	if(Settings::Get().Modes(Settings::PRICELOYALTY)) tile.FixLoyaltyVersion();
+	if(Settings::Get().PriceLoyaltyVersion()) tile.FixLoyaltyVersion();
 
 	//
 	switch(tile.GetObject())

@@ -359,7 +359,7 @@ void AIToCastle(Heroes &hero, const u8 obj, const u16 dst_index)
     if(hero.GetColor() == castle->GetColor())
     {
         DEBUG(DBG_AI , DBG_INFO, "AIToCastle: " << hero.GetName() << " goto castle " << castle->GetName());
-        if(Settings::Get().Original()) hero.AppendSpellsToBook(castle->GetMageGuild());
+        if(Settings::Get().OriginalVersion()) hero.AppendSpellsToBook(castle->GetMageGuild());
     }
     else
     {
@@ -513,7 +513,7 @@ void AIToMonster(Heroes &hero, const u8 obj, const u16 dst_index)
         else
         {
             AIBattleLose(hero, res.AttackerOldResult());
-            if(!Settings::Get().Original())
+            if(!Settings::Get().OriginalVersion())
             {
                 tile.SetCountMonster(army.GetCountMonsters(monster));
             }
@@ -535,7 +535,7 @@ void AIToMonster(Heroes &hero, const u8 obj, const u16 dst_index)
     	    case Army::SURRENDER:
     	    case Army::LOSE:
             AIBattleLose(hero, b);
-            if(!Settings::Get().Original())
+            if(!Settings::Get().OriginalVersion())
             {
                 tile.SetCountMonster(army.GetCountMonsters(monster));
             }

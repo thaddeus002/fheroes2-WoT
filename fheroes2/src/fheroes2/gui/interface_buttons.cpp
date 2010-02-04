@@ -177,56 +177,56 @@ void Interface::ButtonsArea::QueueEventProcessing(Game::menu_t & ret)
     if(le.MouseClickLeft(buttonNextHero))
     {
         // for QVGA: auto hide buttons after click
-        if(conf.PocketPC()) conf.ResetModes(Settings::SHOWBUTTONS);
+        if(conf.PocketPC()) conf.SetShowButtons(false);
 	Game::ButtonNextHero();
     }
     else
     if(le.MouseClickLeft(buttonMovement))
     {
         // for QVGA: auto hide buttons after click
-        if(conf.PocketPC()) conf.ResetModes(Settings::SHOWBUTTONS);
+        if(conf.PocketPC()) conf.SetShowButtons(false);
 	Game::ButtonMovement();
     }
     else
     if(le.MouseClickLeft(buttonKingdom))
     {
         // for QVGA: auto hide buttons after click
-        if(conf.PocketPC()) conf.ResetModes(Settings::SHOWBUTTONS);
+        if(conf.PocketPC()) conf.SetShowButtons(false);
 	Game::ButtonKingdom();
     }
     else
     if(le.MouseClickLeft(buttonSpell))
     {
         // for QVGA: auto hide buttons after click
-        if(conf.PocketPC()) conf.ResetModes(Settings::SHOWBUTTONS);
+        if(conf.PocketPC()) conf.SetShowButtons(false);
 	Game::ButtonSpell();
     }
     else
     if(le.MouseClickLeft(buttonEndTur))
     {
         // for QVGA: auto hide buttons after click
-        if(conf.PocketPC()) conf.ResetModes(Settings::SHOWBUTTONS);
+        if(conf.PocketPC()) conf.SetShowButtons(false);
 	Game::ButtonEndTurn(ret);
     }
     else
     if(le.MouseClickLeft(buttonAdventure))
     {
         // for QVGA: auto hide buttons after click
-        if(conf.PocketPC()) conf.ResetModes(Settings::SHOWBUTTONS);
+        if(conf.PocketPC()) conf.SetShowButtons(false);
 	Game::ButtonAdventure(ret);
     }
     else
     if(le.MouseClickLeft(buttonFile))
     {
         // for QVGA: auto hide buttons after click
-        if(conf.PocketPC()) conf.ResetModes(Settings::SHOWBUTTONS);
+        if(conf.PocketPC()) conf.SetShowButtons(false);
 	Game::ButtonFile(ret);
     }
     else
     if(le.MouseClickLeft(buttonSystem))
     {
         // for QVGA: auto hide buttons after click
-        if(conf.PocketPC()) conf.ResetModes(Settings::SHOWBUTTONS);
+        if(conf.PocketPC()) conf.SetShowButtons(false);
 	Game::ButtonSystem();
     }
 

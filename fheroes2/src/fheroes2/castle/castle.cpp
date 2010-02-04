@@ -276,7 +276,7 @@ void Castle::LoadFromMP2(const void *ptr)
     if(!HaveNearlySea()) building &= ~(BUILD_SHIPYARD);
 
     // remove tavern from necromancer castle
-    if(Race::NECR == race && !Settings::Get().Modes(Settings::PRICELOYALTY))
+    if(Race::NECR == race && !Settings::Get().PriceLoyaltyVersion())
     	building &= ~BUILD_TAVERN;
 
     // end
@@ -414,7 +414,7 @@ const char* Castle::GetStringBuilding(u32 build, Race::race_t race)
 	default: break;
     }
 
-    if(Settings::Get().Modes(Settings::PRICELOYALTY) && race == Race::NECR && build == BUILD_TAVERN) return shrine;
+    if(Settings::Get().PriceLoyaltyVersion() && race == Race::NECR && build == BUILD_TAVERN) return shrine;
 
     switch(build)
     {
@@ -507,7 +507,7 @@ const char* Castle::GetDescriptionBuilding(u32 build, Race::race_t race)
 	default: break;
     }
 
-    if(Settings::Get().Modes(Settings::PRICELOYALTY) && race == Race::NECR && build == BUILD_TAVERN) return shrine_descr;
+    if(Settings::Get().PriceLoyaltyVersion() && race == Race::NECR && build == BUILD_TAVERN) return shrine_descr;
     
     switch(build)
     {
@@ -1221,7 +1221,7 @@ ICN::icn_t Castle::GetICNBuilding(u32 build, Race::race_t race)
 	case BUILD_MARKETPLACE:	return ICN::TWNNMARK;
 	case BUILD_THIEVESGUILD:return ICN::TWNNTHIE;
 	// shrine
-	case BUILD_TAVERN:	if(Settings::Get().Modes(Settings::PRICELOYALTY)) return ICN::TWNNTVRN;
+	case BUILD_TAVERN:	if(Settings::Get().PriceLoyaltyVersion()) return ICN::TWNNTVRN;
 				break;
 	case BUILD_WELL:	return ICN::TWNNWELL;
 	case BUILD_STATUE:	return ICN::TWNNSTAT;
@@ -1636,6 +1636,6 @@ u8 Castle::GetControl(void) const
 
 bool Castle::isNecromancyShrineBuild(void) const
 {
-    return Settings::Get().Modes(Settings::PRICELOYALTY) &&
+    return Settings::Get().PriceLoyaltyVersion() &&
 	race == Race::NECR && (BUILD_TAVERN & building);
 }

@@ -473,7 +473,7 @@ Artifact::artifact_t Artifact::FromIndexSprite(u8 index)
 {
     if(0x10 < index && 0xA2 > index) return Artifact::FromInt((index - 1)/2);
     else
-    if(Settings::Get().Modes(Settings::PRICELOYALTY) && 0xAB < index && 0xCE > index) return Artifact::FromInt((index - 1)/2);
+    if(Settings::Get().PriceLoyaltyVersion() && 0xAB < index && 0xCE > index) return Artifact::FromInt((index - 1)/2);
     else
     if(0xA3 == index) return Artifact::Rand();
     else
@@ -591,7 +591,7 @@ u8 Artifact::IndexSprite(Artifact::artifact_t a)
 	default: break;
     }
 
-    if(Settings::Get().Modes(Settings::PRICELOYALTY))
+    if(Settings::Get().PriceLoyaltyVersion())
     switch(a)
     {
 	case SPELL_SCROLL:			return 0xAD;

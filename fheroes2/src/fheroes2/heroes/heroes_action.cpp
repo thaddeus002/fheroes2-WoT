@@ -597,7 +597,7 @@ void ActionToMonster(Heroes &hero, const u8 obj, const u16 dst_index)
 	else
 	{
     	    BattleLose(hero, res.AttackerOldResult());
-    	    if(!Settings::Get().Original())
+    	    if(!Settings::Get().OriginalVersion())
     	    {
         	tile.SetCountMonster(army.GetCountMonsters(monster));
     	    }
@@ -619,7 +619,7 @@ void ActionToMonster(Heroes &hero, const u8 obj, const u16 dst_index)
     	    case Army::SURRENDER:
     	    case Army::LOSE:
             BattleLose(hero, b);
-            if(!Settings::Get().Original())
+            if(!Settings::Get().OriginalVersion())
             {
                 tile.SetCountMonster(army.GetCountMonsters(monster));
             }
@@ -732,7 +732,7 @@ void ActionToCastle(Heroes &hero, const u8 obj, const u16 dst_index)
 
         Mixer::Reduce();
 
-        if(Settings::Get().Original()) hero.AppendSpellsToBook(castle->GetMageGuild());
+        if(Settings::Get().OriginalVersion()) hero.AppendSpellsToBook(castle->GetMageGuild());
         Game::OpenCastle(castle);
 
         Mixer::Enhance();
@@ -1154,7 +1154,7 @@ void ActionToShrine(Heroes &hero, const u8 obj, const u16 dst_index)
 
     PlaySoundSuccess;
     hero.AppendSpellToBook(spell());
-    hero.SetVisited(dst_index, Settings::Get().Original() ? Visit::LOCAL : Visit::GLOBAL); // see dialog_quickinfo
+    hero.SetVisited(dst_index, Settings::Get().OriginalVersion() ? Visit::LOCAL : Visit::GLOBAL); // see dialog_quickinfo
     Dialog::SpellInfo(spell_name, body, spell());
 
     DEBUG(DBG_GAME , DBG_INFO, "ActionToShrine: " << hero.GetName());
@@ -1184,7 +1184,7 @@ void ActionToWitchsHut(Heroes &hero, const u8 obj, const u16 dst_index)
     }
 
     hero.LearnBasicSkill(skill);
-    hero.SetVisited(dst_index, Settings::Get().Original() ? Visit::LOCAL : Visit::GLOBAL); // see dialog_quickinfo
+    hero.SetVisited(dst_index, Settings::Get().OriginalVersion() ? Visit::LOCAL : Visit::GLOBAL); // see dialog_quickinfo
 
     body = _("An ancient and immortal witch living in a hut with bird's legs for stilts teaches you %{skill} for her own inscrutable purposes.");
     String::Replace(body, "%{skill}", skill_name);

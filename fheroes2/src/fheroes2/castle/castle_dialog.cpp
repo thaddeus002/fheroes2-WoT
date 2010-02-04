@@ -72,7 +72,7 @@ Dialog::answer_t Castle::OpenDialog(bool fade)
     background.Redraw();
 
     // fade
-    if(Settings::Get().Modes(Settings::FADE)) display.Fade();
+    if(Settings::Get().UseFade()) display.Fade();
         
     const Point cur_pt(background.GetArea().x, background.GetArea().y);
     Point dst_pt(cur_pt);
@@ -306,7 +306,7 @@ Dialog::answer_t Castle::OpenDialog(bool fade)
 	    break;
 	case Race::NECR:
 	    orders_building.push_back(BUILD_SPEC);
-	    if(Settings::Get().Modes(Settings::PRICELOYALTY)) orders_building.push_back(BUILD_TAVERN); // shrine
+	    if(Settings::Get().PriceLoyaltyVersion()) orders_building.push_back(BUILD_TAVERN); // shrine
 	    orders_building.push_back(BUILD_CASTLE);
 	    orders_building.push_back(BUILD_CAPTAIN);
 	    orders_building.push_back(BUILD_LEFTTURRET);
@@ -436,7 +436,7 @@ Dialog::answer_t Castle::OpenDialog(bool fade)
 	else
 	if(building & BUILD_TAVERN && le.MouseClickLeft(coordBuildingTavern))
 	{
-	    if(Race::NECR == race && Settings::Get().Modes(Settings::PRICELOYALTY))
+	    if(Race::NECR == race && Settings::Get().PriceLoyaltyVersion())
 		Dialog::Message(GetStringBuilding(BUILD_TAVERN, race), GetDescriptionBuilding(BUILD_TAVERN, race), Font::BIG, Dialog::OK);
 	    else
 		OpenTavern();

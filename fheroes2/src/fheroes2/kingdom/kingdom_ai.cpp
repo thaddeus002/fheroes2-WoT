@@ -52,7 +52,7 @@ void Kingdom::AITurns(void)
 	return;
     }
     
-    if(!Settings::Get().Modes(Settings::MUSIC_MIDI)) AGG::PlayMusic(MUS::COMPUTER);
+    if(Settings::MUSIC_MIDI != Settings::Get().GetMusicType()) AGG::PlayMusic(MUS::COMPUTER);
 
     Interface::StatusWindow *status = Interface::NoGUI() ? NULL : &Interface::StatusWindow::Get();
 

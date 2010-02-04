@@ -369,7 +369,7 @@ void Maps::Tiles::RedrawMonster(Surface & dst, s16 px, s16 py, const Interface::
     u16 dst_index = MAXU16;
 
     // draw attack sprite
-    if(Maps::ScanAroundObject(maps_index, MP2::OBJ_HEROES, Settings::Get().Original(), &dst_index))
+    if(Maps::ScanAroundObject(maps_index, MP2::OBJ_HEROES, Settings::Get().OriginalVersion(), &dst_index))
     {
 	bool revert = false;
 
