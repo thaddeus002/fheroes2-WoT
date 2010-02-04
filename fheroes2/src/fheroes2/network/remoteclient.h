@@ -60,7 +60,7 @@ public:
     bool MsgMapsListGet(void);
     bool MsgPlayersGet(void);
 
-    bool RecvBattleHumanTurn(const Battle2::Stats &, Battle2::Actions &);
+    bool RecvBattleHumanTurn(const Battle2::Stats &, const Battle2::Arena & arena, Battle2::Actions &);
 
     static bool SendBattleAction(u8, QueueMessage &);
     static bool SendBattleResult(u8, const Battle2::Result &);

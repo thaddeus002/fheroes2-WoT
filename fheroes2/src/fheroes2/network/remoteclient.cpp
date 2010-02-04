@@ -91,6 +91,7 @@ int FH2RemoteClient::Main(void)
 
     if(ConnectionChat())
     {
+// TEST BATTLE NETWORK
 //	if(StartGame())
 	{
 	    // may be also

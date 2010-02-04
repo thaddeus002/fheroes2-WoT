@@ -2324,7 +2324,6 @@ void Battle2::Interface::RedrawActionSpellCastPart2(u8 spell, std::vector<Target
 	std::vector<TargetInfo>::const_iterator it2 = targets.end();
 	for(; it1 != it2; ++it1){ killed += (*it1).killed; damage += (*it1).damage; }
 
-	// draw status for first defender
 	if(damage)
 	{
 	    std::string msg = _("The %{spell} does %{damage} damage.");

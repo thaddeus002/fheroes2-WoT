@@ -78,7 +78,7 @@ bool FH2LocalClient::BattleLoop(Battle2::Arena & arena, Battle2::Result & result
 		Dialog::Message("Error", "FH2LocalClient::BattleLoop: recv: error", Font::BIG, Dialog::OK);
 		return false;
             }
-	    DEBUG(DBG_NETWORK , DBG_INFO, "FH2LocalClient::BattleLoop: recv: " << Network::GetMsgString(packet.GetID()));
+	    DEBUG(DBG_NETWORK , DBG_INFO, "FH2LocalClient::BattleLoop: " << "recv: " << Network::GetMsgString(packet.GetID()));
 
             switch(packet.GetID())
             {
@@ -124,6 +124,8 @@ bool FH2LocalClient::BattleLoop(Battle2::Arena & arena, Battle2::Result & result
 
 			default:
 			{
+			    DEBUG(DBG_NETWORK, DBG_INFO, "FH2LocalClient::BattleLoop: " << "cast spell: " << Spell::GetName(Spell::FromInt(spell)));
+
 			    u8 color;
 			    u16 id;
 			    u32 size;
@@ -134,6 +136,7 @@ bool FH2LocalClient::BattleLoop(Battle2::Arena & arena, Battle2::Result & result
 			    std::vector<Battle2::TargetInfo> targets;
 			    Battle2::TargetInfo target;
 
+			    DEBUG(DBG_NETWORK, DBG_INFO, "FH2LocalClient::BattleLoop: " << " targets size0: " << size);
 			    while(size--)
 			    {
 				packet.Pop(id);
@@ -142,6 +145,7 @@ bool FH2LocalClient::BattleLoop(Battle2::Arena & arena, Battle2::Result & result
 				target.defender = arena.GetTroopID(id);
 				targets.push_back(target);
 			    }
+			    DEBUG(DBG_NETWORK, DBG_INFO, "FH2LocalClient::BattleLoop: " << " targets size: " << targets.size());
 
 			    const HeroBase* hero = arena.GetArmy(color) ? arena.GetArmy(color)->GetCommander() : NULL;
 

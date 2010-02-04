@@ -75,11 +75,11 @@ namespace Battle2
 	void GetAbroadPositions(u16, u8, std::vector<u16> &) const;
 	bool isMoatIndex(u16) const;
 
-	static direction_t GetReflectDirection(direction_t);
+	static direction_t GetReflectDirection(u8);
 	static direction_t GetDirection(u16, u16);
 	static u16 GetDistance(u16, u16);
-	static bool isValidDirection(u16, direction_t);
-	static u16 GetIndexDirection(u16, direction_t);
+	static bool isValidDirection(u16, u8);
+	static u16 GetIndexDirection(u16, u8);
     };
 
     class GraveyardTroop

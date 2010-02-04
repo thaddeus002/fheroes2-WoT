@@ -51,7 +51,7 @@ namespace Battle2
 	u16 index;
 	Rect pos;
 	u8 object;
-	direction_t direction;
+	u8 direction;
 	s32 quality;
 	Arena* arena;
     };

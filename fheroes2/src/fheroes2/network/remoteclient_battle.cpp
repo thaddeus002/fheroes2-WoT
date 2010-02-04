@@ -88,9 +88,10 @@ bool FH2RemoteClient::SendBattleSpell(u8 color, u8 spell, u8 hero_color, const s
 	std::vector<Battle2::TargetInfo>::const_iterator it1 = targets.begin();
 	std::vector<Battle2::TargetInfo>::const_iterator it2 = targets.end();
 
-	for(; it1 != it2; ++it1) if((*it1).defender)
+	for(; it1 != it2; ++it1)
 	{
-	    remote->packet.Push((*it1).defender->GetID());
+	    const u16 id = (*it1).defender ? (*it1).defender->GetID() : 0;
+	    remote->packet.Push(id);
 	    remote->packet.Push((*it1).damage);
 	    remote->packet.Push((*it1).killed);
 	}
@@ -173,9 +174,10 @@ bool FH2RemoteClient::SendBattleAttack(u8 color, u16 id, const std::vector<Battl
 	std::vector<Battle2::TargetInfo>::const_iterator it1 = targets.begin();
 	std::vector<Battle2::TargetInfo>::const_iterator it2 = targets.end();
 
-	for(; it1 != it2; ++it1) if((*it1).defender)
+	for(; it1 != it2; ++it1)
 	{
-	    remote->packet.Push((*it1).defender->GetID());
+	    const u16 id = (*it1).defender ? (*it1).defender->GetID() : 0;
+	    remote->packet.Push(id);
 	    remote->packet.Push((*it1).damage);
 	    remote->packet.Push((*it1).killed);
 	}
@@ -187,7 +189,7 @@ bool FH2RemoteClient::SendBattleAttack(u8 color, u16 id, const std::vector<Battl
     return false;
 }
 
-bool FH2RemoteClient::RecvBattleHumanTurn(const Battle2::Stats & b, Battle2::Actions & a)
+bool FH2RemoteClient::RecvBattleHumanTurn(const Battle2::Stats & b, const Battle2::Arena & arena, Battle2::Actions & a)
 {
     bool exit = false;
 
@@ -198,6 +200,9 @@ bool FH2RemoteClient::RecvBattleHumanTurn(const Battle2::Stats & b, Battle2::Act
     // send battle turn
     DEBUG(DBG_NETWORK, DBG_INFO, "FH2RemoteClient::BattleHumanTurn: id: 0x" << b.GetID() << ", send battle turn");
     if(!Send(packet)) return false;
+
+    DEBUG(DBG_NETWORK, DBG_INFO, "FH2RemoteClient::BattleHumanTurn: id: 0x" << b.GetID() << ", send battle board");
+    if(!SendBattleBoard(player_color, arena)) return false;
 
     while(!exit)
     {
@@ -214,6 +219,8 @@ bool FH2RemoteClient::RecvBattleHumanTurn(const Battle2::Stats & b, Battle2::Act
     	    // msg processing
     	    switch(Network::GetMsg(packet.GetID()))
     	    {
+		case MSG_BATTLE_CAST:
+		case MSG_BATTLE_SKIP:
 		case MSG_BATTLE_END_TURN:
 		    exit = 1;
 		    a.push_back(packet);
@@ -223,8 +230,6 @@ bool FH2RemoteClient::RecvBattleHumanTurn(const Battle2::Stats & b, Battle2::Act
 		case MSG_BATTLE_ATTACK:
 		case MSG_BATTLE_DEFENCE:
 		case MSG_BATTLE_DAMAGE:
-		case MSG_BATTLE_CAST:
-		case MSG_BATTLE_SKIP:
 		case MSG_BATTLE_MORALE:
 		case MSG_BATTLE_LUCK:
 		case MSG_BATTLE_CATAPULT:

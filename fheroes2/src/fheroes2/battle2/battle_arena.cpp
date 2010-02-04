@@ -135,7 +135,7 @@ Battle2::direction_t Battle2::Board::GetDirection(u16 from, u16 to)
     return UNKNOWN;
 }
 
-Battle2::direction_t Battle2::Board::GetReflectDirection(direction_t d)
+Battle2::direction_t Battle2::Board::GetReflectDirection(u8 d)
 {
     switch(d)
     {
@@ -151,7 +151,7 @@ Battle2::direction_t Battle2::Board::GetReflectDirection(direction_t d)
     return UNKNOWN;
 }
 
-bool Battle2::Board::isValidDirection(u16 i, direction_t d)
+bool Battle2::Board::isValidDirection(u16 i, u8 d)
 {
     const u16 x = i % ARENAW;
     const u16 y = i / ARENAW;
@@ -171,7 +171,7 @@ bool Battle2::Board::isValidDirection(u16 i, direction_t d)
     return true;
 }
 
-u16 Battle2::Board::GetIndexDirection(u16 i, direction_t d)
+u16 Battle2::Board::GetIndexDirection(u16 i, u8 d)
 {
     const u16 y = i / ARENAW;
 
@@ -824,7 +824,7 @@ void Battle2::Arena::RemoteTurn(const Stats & b, Actions & a)
 	FH2RemoteClient* remote = FH2Server::Get().GetRemoteClient(current_commander->GetColor());
 	if(remote)
 	{
-	    remote->RecvBattleHumanTurn(b, a);
+	    remote->RecvBattleHumanTurn(b, *this, a);
 	    return;
 	}
 	DEBUG(DBG_BATTLE, DBG_WARN, "Battle2::Arena::RemoteTurn: " << "remote client is NULL");
@@ -1431,6 +1431,8 @@ void Battle2::Arena::PackBoard(Action & msg) const
     while(it != board.end())
     {
         msg.Push((*it).object);
+        msg.Push((*it).direction);
+        msg.Push(static_cast<u32>((*it).quality));
         ++it;
     }
 }
@@ -1445,7 +1447,11 @@ void Battle2::Arena::UnpackBoard(Action & msg)
 	Board::iterator it = board.begin();
         while(it != board.end())
         {
+	    u32 byte32;
             msg.Pop((*it).object);
+    	    msg.Pop((*it).direction);
+    	    msg.Pop(byte32);
+	    (*it).quality = byte32;
             ++it;
         }
     }
