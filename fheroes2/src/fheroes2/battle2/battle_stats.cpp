@@ -75,7 +75,7 @@ namespace Battle2
 	{ ICN::DRUID   , {46, 4}, { 3,11}, { 0, 0}, { 0, 0}, { 0, 0}, {14, 8}, {35, 4}, {22, 4}, {39, 5}, {14, 8}, {35, 4}, {22, 4}, {39, 4}, {44, 2}, {26, 9}, M82::DRUIATTK, M82::DRUIKILL, M82::DRUIMOVE, M82::DRUIWNCE },
         { ICN::DRUID2  , {46, 4}, { 3,11}, { 0, 0}, { 0, 0}, { 0, 0}, {14, 8}, {35, 4}, {22, 4}, {39, 5}, {14, 8}, {35, 4}, {22, 4}, {39, 4}, {44, 2}, {26, 9}, M82::DRUIATTK, M82::DRUIKILL, M82::DRUIMOVE, M82::DRUIWNCE },
         { ICN::UNICORN , { 1, 9}, {10, 8}, { 0, 0}, { 0, 0}, { 0, 0}, { 0, 0}, { 0, 0}, { 0, 0}, { 0, 0}, { 0, 0}, {18, 9}, {27, 7}, {34, 7}, {41, 4}, {45, 7}, M82::UNICATTK, M82::UNICKILL, M82::UNICMOVE, M82::UNICWNCE },
-        { ICN::PHOENIX , {30, 5}, { 0, 0}, { 1, 3}, { 4, 6}, { 0, 0}, { 0, 0}, {25, 3}, {23, 2}, {28, 2}, { 0, 0}, {13, 4}, {10, 4}, {17, 4}, {21, 2}, {35,13}, M82::PHOEATTK, M82::PHOEKILL, M82::PHOEMOVE, M82::PHOEWNCE },
+        { ICN::PHOENIX , {30, 5}, { 0, 0}, { 1, 3}, { 4, 6}, { 0, 0}, { 0, 0}, {25, 3}, {23, 2}, {28, 2}, { 0, 0}, {13, 4}, {10, 4}, {17, 4}, {35, 2}, {37,11}, M82::PHOEATTK, M82::PHOEKILL, M82::PHOEMOVE, M82::PHOEWNCE },
 
 	// icn_file      idle     move     fly1     fly2     fly3     shot0    shot1    shot2    shot3    attk0    attk1    attk2    attk3    wcne     kill     m82_attk       m82_kill       m82_move       m82_wnce
         { ICN::CENTAUR , {65, 6}, { 2, 6}, { 0, 0}, { 0, 0}, { 0, 0}, {18, 4}, {27, 3}, {22, 5}, {30, 3}, {33, 1}, {38, 4}, {34, 4}, {42, 4}, {46, 2}, {48, 7}, M82::CNTRATTK, M82::CNTRKILL, M82::CNTRMOVE, M82::CNTRWNCE },

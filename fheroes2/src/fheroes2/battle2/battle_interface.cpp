@@ -822,7 +822,6 @@ void Battle2::Interface::RedrawTroopSprite(const Stats & b, const Rect & rt) con
 	}
 	// sprite monster
 	display.Blit(*spmon1, sx, sy);
-
 	// contour
 	if(spmon2) display.Blit(*spmon2, sx - 1, sy - 1);
     }
@@ -2169,7 +2168,9 @@ void Battle2::Interface::RedrawActionMove(Stats & b, const std::vector<u16> & pa
     }
 
     // restore
+    b_fly = NULL;
     b_move = NULL;
+    b_current = NULL;
     b.ResetAnimFrame(AS_IDLE);
 }
 
@@ -2194,12 +2195,15 @@ void Battle2::Interface::RedrawActionFly(Stats & b, u16 dst)
     b_current = NULL;
     b_move = NULL;
     p_move = pnt != points.end() ? *pnt : pt1;
-    b_fly = &b;
+    b_fly = NULL;
+    b_move = &b;
     p_fly = pt1;
 
     b.ResetAnimFrame(AS_FLY1);
     RedrawTroopFrameAnimation(b);
 
+    b_move = NULL;
+    b_fly = &b;
     p_fly = p_move;
     if(pnt != points.end()) ++pnt;
 
@@ -2215,16 +2219,18 @@ void Battle2::Interface::RedrawActionFly(Stats & b, u16 dst)
 	++pnt;
     }
 
-    // jump down
-    p_move = pt2;
+    b.position = dst;
+    b.UpdateDirection();
 
+    // jump down
+    b_fly = NULL;
+    b_move = &b;
+    p_move = pt2;
     b.ResetAnimFrame(AS_FLY3);
     RedrawTroopFrameAnimation(b);
 
-    b.position = dst;
-
     // restore
-    b_fly = NULL;
+    b_move = NULL;
     b.ResetAnimFrame(AS_IDLE);
 }
 
