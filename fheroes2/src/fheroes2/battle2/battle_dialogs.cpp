@@ -382,6 +382,7 @@ u8 Battle2::Arena::DialogBattleHero(const HeroBase & hero) const
     Button btnRetreat(pos_rt.x + 89, pos_rt.y + 148, ICN::VIEWGEN, 11, 12);
     Button btnSurrender(pos_rt.x + 148, pos_rt.y + 148, ICN::VIEWGEN, 13, 14);
     Button btnClose(pos_rt.x + 207, pos_rt.y + 148, ICN::VIEWGEN, 15, 16);
+
     btnCast.SetDisable(readonly || !hero.GetSpellBook().isActive() || hero.Modes(Heroes::SPELLCASTED));
     btnRetreat.SetDisable(readonly || !CanRetreatOpponent(hero.GetColor()));
     btnSurrender.SetDisable(readonly || !CanSurrenderOpponent(hero.GetColor()));
@@ -390,6 +391,16 @@ u8 Battle2::Arena::DialogBattleHero(const HeroBase & hero) const
     btnRetreat.Draw();
     btnSurrender.Draw();
     btnClose.Draw();
+
+    if(!conf.PocketPC())
+    {
+	Surface shadow(btnCast.w, btnCast.h);
+	shadow.Fill(0, 0, 0);
+	shadow.SetAlpha(80);
+	if(btnCast.isDisable()) display.Blit(shadow, btnCast);
+	if(btnRetreat.isDisable()) display.Blit(shadow, btnRetreat);
+	if(btnSurrender.isDisable()) display.Blit(shadow, btnSurrender);
+    }
 
     u8 result = 0;
 
