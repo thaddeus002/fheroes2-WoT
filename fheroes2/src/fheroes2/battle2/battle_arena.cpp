@@ -197,7 +197,7 @@ s16 Battle2::Board::GetIndexAbsPosition(const Point & pt) const
     return it1 != it2 ? (*it1).GetIndex() : -1;
 }
 
-bool Battle2::Board::isMoatIndex(u16 ii) const
+bool Battle2::Board::isMoatIndex(u16 ii)
 {
     switch(ii)
     {
@@ -205,14 +205,12 @@ bool Battle2::Board::isMoatIndex(u16 ii) const
 	case 18:
 	case 28:
 	case 39:
+	case 49:
 	case 61:
 	case 72:
 	case 84:
 	case 95:
 	    return true;
-
-	case 49:
-	    return at(50).object;
 
 	default: break;
     }
@@ -656,16 +654,18 @@ Battle2::Arena::Arena(Army::army_t & a1, Army::army_t & a2, u16 index, bool loca
 
 	icn_covr = ICN::UNKNOWN;
     }
-
-    // set obstacles
-    board.SetCovrObjects(icn_covr);
-    if(icn_covr == ICN::UNKNOWN) board.SetCobjObjects(index);
+    else
+    {
+	// set obstacles
+	board.SetCovrObjects(icn_covr);
+	if(icn_covr == ICN::UNKNOWN) board.SetCobjObjects(index);
+    }
 
 #ifdef WITH_NET
     if(Network::isRemoteClient())
     {
-        if(Game::REMOTE == army1.GetControl()) FH2RemoteClient::SendBattleBoard(army1.GetColor(), *this);
-        if(Game::REMOTE == army2.GetControl()) FH2RemoteClient::SendBattleBoard(army2.GetColor(), *this);
+    	if(Game::REMOTE == army1.GetControl()) FH2RemoteClient::SendBattleBoard(army1.GetColor(), *this);
+	if(Game::REMOTE == army2.GetControl()) FH2RemoteClient::SendBattleBoard(army2.GetColor(), *this);
     }
 #endif
 
@@ -906,14 +906,20 @@ void Battle2::Arena::ScanPassabilityBoard(const Stats & b, bool skip_speed)
 	while(v1.size() && max_turn)
 	{
 	    for(it = v1.begin(); it != v1.end(); ++it) board[*it].SetPassabilityAbroad(b, v2);
-	    v1.clear();
 
-	    for(it = v2.begin(); it != v2.end(); ++it)
+	    // check moat positions
+	    if(!skip_speed && castle && castle->isBuild(Castle::BUILD_MOAT))
 	    {
-		// check moat positions
-		if(!skip_speed && board.isMoatIndex(*it)) continue;
-		v1.push_back(*it);
+		v1.clear();
+		for(it = v2.begin(); it != v2.end(); ++it)
+		{
+		    if(Board::isMoatIndex(*it)) continue;
+		    v1.push_back(*it);
+		}
 	    }
+	    else
+		v1 = v2;
+
 	    v2.clear();
 
 	    --max_turn;
@@ -958,6 +964,13 @@ u16 Battle2::Arena::GetPath(const Stats & b, u16 to, std::vector<u16> & v)
 
     // correct distance movement
     if(v.size() > b.GetSpeed()) v.resize(b.GetSpeed());
+
+    // correct moat present
+    if(castle && castle->isBuild(Castle::BUILD_MOAT))
+    {
+	std::vector<u16>::iterator it = std::find_if(v.begin(), v.end(), Board::isMoatIndex);
+	if(it != v.end()) v.resize(std::distance(v.begin(), it) + 1);
+    }
 
     if(IS_DEBUG(DBG_BATTLE, DBG_TRACE))
     {

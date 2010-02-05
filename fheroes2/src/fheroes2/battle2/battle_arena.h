@@ -73,8 +73,8 @@ namespace Battle2
 	void SetCovrObjects(u16);
 
 	void GetAbroadPositions(u16, u8, std::vector<u16> &) const;
-	bool isMoatIndex(u16) const;
 
+	static bool isMoatIndex(u16);
 	static direction_t GetReflectDirection(u8);
 	static direction_t GetDirection(u16, u16);
 	static u16 GetDistance(u16, u16);
