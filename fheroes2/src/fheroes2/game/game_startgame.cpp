@@ -974,6 +974,7 @@ Game::menu_t Game::HumanTurn(void)
 		else
 		{
 		    hero.SetMove(false);
+		    if(Cursor::WAIT == cursor.Themes()) cursor.SetThemes(Cursor::POINTER);
 		}
     	    }
 	}
