@@ -141,12 +141,15 @@ bool Settings::Read(const std::string & filename)
 	    String::Trim(left);
 	    String::Trim(right);
 
+	    std::string lower_right(right);
+
 	    String::Lower(left);
+	    String::Lower(lower_right);
 	    
-	    if(right == "on")
+	    if(lower_right == "on")
 		SetStrModes(left);
 	    else
-	    if(right == "off")
+	    if(lower_right == "off")
 		ResetStrModes(left);
 	    else
 		Parse(left, right);
