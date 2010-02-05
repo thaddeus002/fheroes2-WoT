@@ -746,7 +746,6 @@ void Battle2::Arena::GetTargetsForSpells(const HeroBase* hero, const u8 spell, c
 		Battle2::Stats* target = GetTroopBoard((*it1).index);
 		if(target && target->GetPosition() != dst && target->AllowApplySpell(spell, hero))
 		{
-		    VERBOSE("allow " << target->GetName());
 		    res.defender = target;
 		    targets.push_back(res);
 		}

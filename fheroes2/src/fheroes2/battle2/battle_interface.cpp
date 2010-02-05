@@ -1879,15 +1879,16 @@ void Battle2::Interface::RedrawActionAttackPart1(Stats & attacker, Stats & defen
 
     AGG::PlaySound(attacker.M82Attk());
 
+    // redraw attack animation
     attacker.ResetAnimFrame(action0);
     RedrawTroopFrameAnimation(attacker);
-
 
     if(attacker.GetFrameState(action1).count)
     {
 	attacker.ResetAnimFrame(action1);
 	RedrawTroopFrameAnimation(attacker);
     }
+    DELAY(animation_delay * 50);
 
     // draw missile animation
     if(archer)
@@ -1949,6 +1950,7 @@ void Battle2::Interface::RedrawActionAttackPart2(Stats & attacker, std::vector<T
 {
     // targets damage animation
     RedrawActionWinces(targets);
+    DELAY(animation_delay * 50);
 
     // draw status for first defender
     if(targets.size())

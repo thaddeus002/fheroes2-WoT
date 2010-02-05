@@ -152,7 +152,7 @@ void Interface::Basic::Redraw(u8 force)
 void Interface::Basic::RedrawSystemInfo(s16 cx, s16 cy)
 {
     std::ostringstream os;
-    os << "memory usage: " << GetMemoryUsage() << "Kb" << ", current time: ";
+    os << "mem. usage: " << GetMemoryUsage() << "Kb" << ", cur. time: ";
 
     time_t rawtime;
     std::time(&rawtime);

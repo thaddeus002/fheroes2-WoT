@@ -32,7 +32,7 @@
 
 namespace Game
 {
-    extern Cursor::themes_t GetCursor(const Maps::Tiles &);
+    extern Cursor::themes_t GetCursor(u16);
     extern void MouseCursorAreaClickLeft(u16);
     extern void MouseCursorAreaPressRight(u16);
 };
@@ -602,7 +602,6 @@ void Interface::GameArea::QueueEventProcessing(void)
     // out of range
     if(index > max || index < Maps::GetIndexFromAbsPoint(rectMaps.x, rectMaps.y)) return;
 
-    const Maps::Tiles & tile = world.GetTiles(index);
     const Rect tile_pos(rectArea.x + ((u16) (mp.x - rectArea.x) / TILEWIDTH) * TILEWIDTH,
 	                rectArea.y + ((u16) (mp.y - rectArea.y) / TILEWIDTH) * TILEWIDTH,
 	                TILEWIDTH, TILEWIDTH);
@@ -610,7 +609,7 @@ void Interface::GameArea::QueueEventProcessing(void)
     // change cusor if need
     if(updateCursor || index != oldIndexPos)
     {
-	cursor.SetThemes(Game::GetCursor(tile));
+	cursor.SetThemes(Game::GetCursor(index));
 	oldIndexPos = index;
 	updateCursor = false;
     }
