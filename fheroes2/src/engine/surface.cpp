@@ -686,6 +686,7 @@ void Surface::MakeStencil(Surface & dst, const Surface & src, u32 col)
     const u32 clkey = src.GetColorKey();
     u8 r, g, b, a;
 
+    src.Lock();
     dst.Lock();
     for(u16 y = 0; y < src.surface->h; ++y)
         for(u16 x = 0; x < src.surface->w; ++x)
@@ -704,6 +705,7 @@ void Surface::MakeStencil(Surface & dst, const Surface & src, u32 col)
             }
         }
     dst.Unlock();
+    src.Unlock();
 }
 
 void Surface::MakeContour(Surface & dst, const Surface & src, u32 col)
@@ -718,6 +720,7 @@ void Surface::MakeContour(Surface & dst, const Surface & src, u32 col)
 
     MakeStencil(trf, src, fake);
     const u32 clkey = trf.GetColorKey();
+    trf.Lock();
     dst.Lock();
     for(u16 y = 0; y < trf.h(); ++y)
         for(u16 x = 0; x < trf.w(); ++x)
@@ -737,6 +740,7 @@ void Surface::MakeContour(Surface & dst, const Surface & src, u32 col)
                 }
             }
         }
+    trf.Unlock();
     dst.Unlock();
 }
 
@@ -865,7 +869,7 @@ void Surface::ScaleMinifyByTwo(Surface & sf_dst, const Surface & sf_src, bool ev
     sf_dst.Set(w, h, sf_src.depth(), SWSURFACE);
     sf_dst.SetColorKey();
     sf_dst.Lock();
-
+    sf_src.Lock();
     for(y = 0; y < h; y++)
     {
        y2 = mul * y;
@@ -878,6 +882,7 @@ void Surface::ScaleMinifyByTwo(Surface & sf_dst, const Surface & sf_src, bool ev
 	    if(event) LocalEvent::Get().HandleEvents(false);
        }
     }
+    sf_src.Unlock();
     sf_dst.Unlock();
 }
 
