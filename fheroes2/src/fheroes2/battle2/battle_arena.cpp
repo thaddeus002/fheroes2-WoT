@@ -913,7 +913,8 @@ void Battle2::Arena::ScanPassabilityBoard(const Stats & b, bool skip_speed)
 		v1.clear();
 		for(it = v2.begin(); it != v2.end(); ++it)
 		{
-		    if(Board::isMoatIndex(*it)) continue;
+		    //                            check bridge
+		    if(Board::isMoatIndex(*it) && (*it != 49 || board[50].object)) continue;
 		    v1.push_back(*it);
 		}
 	    }
@@ -969,7 +970,8 @@ u16 Battle2::Arena::GetPath(const Stats & b, u16 to, std::vector<u16> & v)
     if(castle && castle->isBuild(Castle::BUILD_MOAT))
     {
 	std::vector<u16>::iterator it = std::find_if(v.begin(), v.end(), Board::isMoatIndex);
-	if(it != v.end()) v.resize(std::distance(v.begin(), it) + 1);
+	//                  check bridge
+	if(it != v.end() && (*it != 49 || board[50].object)) v.resize(std::distance(v.begin(), it) + 1);
     }
 
     if(IS_DEBUG(DBG_BATTLE, DBG_TRACE))
