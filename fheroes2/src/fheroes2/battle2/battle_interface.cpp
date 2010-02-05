@@ -2531,7 +2531,7 @@ void Battle2::Interface::RedrawActionCatapult(u8 target)
 
 	if(Game::ShouldAnimateInfrequent(ticket, animation_delay))
 	{
-	    if(catapult_frame < 10) ++catapult_frame;
+	    if(catapult_frame < 9) ++catapult_frame;
 
 	    cursor.Hide();
 	    Redraw();
@@ -2555,7 +2555,7 @@ void Battle2::Interface::RedrawActionCatapult(u8 target)
 
 	if(Game::ShouldAnimateInfrequent(ticket, animation_delay))
     	{
-	    if(catapult_frame < 10) ++catapult_frame;
+	    if(catapult_frame < 9) ++catapult_frame;
 
 	    cursor.Hide();
 	    Redraw();
