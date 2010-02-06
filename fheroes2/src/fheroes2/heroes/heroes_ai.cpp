@@ -369,6 +369,8 @@ void AIToCastle(Heroes &hero, const u8 obj, const u16 dst_index)
         Army::army_t & army = castle->GetActualArmy();
 
 #ifndef WITH_BATTLE1
+    if(army.isValid())
+    {
             // new battle2
             Battle2::Result res = Battle2::Loader(hero.GetArmy(), army, dst_index);
             Heroes *other_hero = world.GetHeroes(dst_index);
@@ -398,6 +400,13 @@ void AIToCastle(Heroes &hero, const u8 obj, const u16 dst_index)
                 other_hero->IncreaseExperience(res.GetExperience());
                 other_hero->ActionAfterBattle();
             }
+    }
+    else
+    {
+        world.GetKingdom(castle->GetColor()).RemoveCastle(castle);
+        world.GetKingdom(hero.GetColor()).AddCastle(castle);
+        world.CaptureObject(dst_index, hero.GetColor());
+    }
 #else
         u32 exp = 0;
 
