@@ -778,6 +778,13 @@ void ActionToCastle(Heroes &hero, const u8 obj, const u16 dst_index)
         	other_hero->ActionAfterBattle();
 	    }
 	}
+	else
+	{
+    	    world.GetKingdom(castle->GetColor()).RemoveCastle(castle);
+            world.GetKingdom(hero.GetColor()).AddCastle(castle);
+            world.CaptureObject(dst_index, hero.GetColor());
+	    Interface::Basic::Get().SetRedraw(REDRAW_CASTLES);
+	}
 #else
         u32 exp = 0;
 
