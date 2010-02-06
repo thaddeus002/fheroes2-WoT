@@ -1025,16 +1025,8 @@ void Game::IO::UnpackCastle(QueueMessage & msg, Castle & castle, u16 check_versi
     {
 	msg.Pop(byte8);
 	castle.army.At(jj).SetMonster(Monster::FromInt(byte8));
-	if(!check_version || check_version >= FORMAT_VERSION_1389)
-	{
-	    msg.Pop(byte32);
-	    castle.army.At(jj).SetCount(byte32);
-	}
-	else
-	{
-	    msg.Pop(byte16);
-	    castle.army.At(jj).SetCount(byte16);
-	}
+        msg.Pop(byte32);
+        castle.army.At(jj).SetCount(byte32);
     }
     // dwelling
     msg.Pop(byte32);
@@ -1096,16 +1088,8 @@ void Game::IO::UnpackHeroes(QueueMessage & msg, Heroes & hero, u16 check_version
     {
 	msg.Pop(byte8);
 	hero.army.At(jj).SetMonster(Monster::FromInt(byte8));
-	if(!check_version || check_version >= FORMAT_VERSION_1389)
-	{
-	    msg.Pop(byte32);
-	    hero.army.At(jj).SetCount(byte32);
-	}
-	else
-	{
-	    msg.Pop(byte16);
-	    hero.army.At(jj).SetCount(byte16);
-	}
+        msg.Pop(byte32);
+        hero.army.At(jj).SetCount(byte32);
     }
 
     // spell book
