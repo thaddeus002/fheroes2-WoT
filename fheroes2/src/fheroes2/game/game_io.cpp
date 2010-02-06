@@ -36,7 +36,6 @@
 #include "tools.h"
 
 #define FORMAT_VERSION_1389 0x056D
-#define FORMAT_VERSION_1377 0x0561
 
 #define CURRENT_FORMAT_VERSION FORMAT_VERSION_1389
 
@@ -1134,21 +1133,18 @@ void Game::IO::UnpackHeroes(QueueMessage & msg, Heroes & hero, u16 check_version
 	hero.visit_object.push_back(io);
     }
 
-    if(!check_version || check_version >= FORMAT_VERSION_1377)
+    // route path
+    msg.Pop(hero.path.dst);
+    msg.Pop(byte8);
+    hero.path.hide = byte8;
+    msg.Pop(byte32);
+    hero.path.clear();
+    for(u32 jj = 0; jj < byte32; ++jj)
     {
-	// route path
-	msg.Pop(hero.path.dst);
-	msg.Pop(byte8);
-	hero.path.hide = byte8;
-	msg.Pop(byte32);
-	hero.path.clear();
-	for(u32 jj = 0; jj < byte32; ++jj)
-	{
-	    Route::Step step;
-	    msg.Pop(byte16);
-	    step.first = Direction::FromInt(byte16);
-	    msg.Pop(step.second);
-	    hero.path.push_back(step);
-	}
+	Route::Step step;
+	msg.Pop(byte16);
+	step.first = Direction::FromInt(byte16);
+	msg.Pop(step.second);
+	hero.path.push_back(step);
     }
 }
