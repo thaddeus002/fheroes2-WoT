@@ -1067,7 +1067,7 @@ Castle * World::GetCastle(u8 ax, u8 ay) const
     for(; it1 != it2; ++it1)
         if(*it1 && (*it1)->ContainCoord(ax, ay)) return *it1;
 
-    DEBUG(DBG_GAME, DBG_WARN, "World::GetCastle: return NULL pointer, x: " << static_cast<int>(ax) << ", y: " << static_cast<int>(ay));
+    DEBUG(DBG_GAME, DBG_TRACE, "World::GetCastle: return NULL pointer, x: " << static_cast<int>(ax) << ", y: " << static_cast<int>(ay));
 
     return NULL;
 }
