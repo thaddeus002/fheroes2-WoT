@@ -561,10 +561,10 @@ void Settings::SetStrModes(const std::string & key)
 
 	switch(ptr->ns)
         {
-	    case NS_BATTLE:   opt_battle.SetModes(ptr->value);
-	    case NS_NETWORK:  opt_global.SetModes(ptr->value);
-	    case NS_POCKETPC: opt_pocket.SetModes(ptr->value);
-	    case NS_GLOBAL:   opt_global.SetModes(ptr->value);
+	    case NS_BATTLE:   opt_battle.SetModes(ptr->value); break;
+	    case NS_NETWORK:  opt_global.SetModes(ptr->value); break;
+	    case NS_POCKETPC: opt_pocket.SetModes(ptr->value); break;
+	    case NS_GLOBAL:   opt_global.SetModes(ptr->value); break;
 	    default: break;
 	}
     }
@@ -581,10 +581,10 @@ void Settings::ResetStrModes(const std::string & key)
 
 	switch(ptr->ns)
         {
-	    case NS_BATTLE:   opt_battle.ResetModes(ptr->value);
-	    case NS_NETWORK:  opt_global.ResetModes(ptr->value);
-	    case NS_POCKETPC: opt_pocket.ResetModes(ptr->value);
-	    case NS_GLOBAL:   opt_global.ResetModes(ptr->value);
+	    case NS_BATTLE:   opt_battle.ResetModes(ptr->value); break;
+	    case NS_NETWORK:  opt_global.ResetModes(ptr->value); break;
+	    case NS_POCKETPC: opt_pocket.ResetModes(ptr->value); break;
+	    case NS_GLOBAL:   opt_global.ResetModes(ptr->value); break;
 	    default: break;
 	}
     }
