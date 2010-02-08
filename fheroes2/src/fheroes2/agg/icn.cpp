@@ -2038,6 +2038,6 @@ bool ICN::SkipRegistryFree(ICN::icn_t icn)
 ICN::icn_t ICN::FromString(const char* str)
 {
     const icnmap_t* ptr = &icnmap[0];
-    while(ptr->type != ICN::UNKNOWN && 0 != std::strcmp(ptr->string, str)) ++ptr;
+    while(ptr->type != ICN::UNKNOWN && str && 0 != std::strcmp(str, ptr->string)) ++ptr;
     return ptr->type;
 }

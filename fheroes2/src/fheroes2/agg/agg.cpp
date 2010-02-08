@@ -366,15 +366,12 @@ void AGG::Cache::LoadExtICN(icn_cache_t & v, const ICN::icn_t icn, const u16 ind
 bool AGG::Cache::LoadAltICN(icn_cache_t & v, const std::string & spec, const u16 index, bool reflect)
 {
 #ifdef WITH_XML
-    //const Settings & conf = Settings::Get();
-
     // parse spec.xml
     TiXmlDocument doc;
-    TiXmlElement* xml_icn = NULL;
+    const TiXmlElement* xml_icn = NULL;
 
     if(doc.LoadFile(spec.c_str()) &&
-	NULL != (xml_icn = doc.FirstChildElement()) &&
-	0 == std::strcmp("icn", xml_icn->Value()))
+	NULL != (xml_icn = doc.FirstChildElement("icn")))
     {
 	int count, ox, oy;
 	xml_icn->Attribute("count", &count);
@@ -387,10 +384,9 @@ bool AGG::Cache::LoadAltICN(icn_cache_t & v, const std::string & spec, const u16
 	}
 
 	// find current image
-	TiXmlElement *xml_sprite = xml_icn->FirstChildElement();
+	const TiXmlElement *xml_sprite = xml_icn->FirstChildElement("sprite");
 	u16 ii = 0;
-	for(; ii != index && xml_sprite; xml_sprite = xml_sprite->NextSiblingElement(), ++ii)
-	    if(std::strcmp("sprite", xml_sprite->Value())) --ii;
+	for(; ii != index && xml_sprite; xml_sprite = xml_sprite->NextSiblingElement("sprite"), ++ii);
 
 	if(xml_sprite && ii == index)
 	{

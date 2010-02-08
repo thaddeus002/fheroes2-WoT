@@ -139,75 +139,68 @@ void Battle2::UpdateMonsterInfoAnimation(const std::string & spec)
 #ifdef WITH_XML
     // parse battle.xml
     TiXmlDocument doc;
-    TiXmlElement* xml_battle = NULL;
+    const TiXmlElement* xml_battle = NULL;
 
     if(doc.LoadFile(spec.c_str()) &&
-        NULL != (xml_battle = doc.FirstChildElement()) &&
-        0 == std::strcmp("battle", xml_battle->Value()))
+        NULL != (xml_battle = doc.FirstChildElement("battle")))
     {
-        TiXmlElement *xml_icn = xml_battle->FirstChildElement();
-        while(xml_icn)
+        const TiXmlElement* xml_icn = xml_battle->FirstChildElement("icn");
+        for(; xml_icn; xml_icn = xml_icn->NextSiblingElement("icn"))
 	{
-	    if(0 == std::strcmp("icn", xml_icn->Value()))
+	    std::string icn_name(xml_icn->Attribute("name"));
+	    String::Upper(icn_name);
+	    // find icn name
+	    ICN::icn_t icn = ICN::FromString(icn_name.c_str());
+	    if(icn == ICN::UNKNOWN) continue;
+
+	    // find monster info position
+	    MonsterInfo* ptr = &monsters_info[1];
+	    while(ptr->icn_file != ICN::UNKNOWN && icn != ptr->icn_file) ++ptr;
+	    if(ptr->icn_file == ICN::UNKNOWN) continue;
+
+    	    const TiXmlElement *xml_anim = xml_icn->FirstChildElement("animation");
+	    int start, count;
+	    const char* state;
+
+	    for(; xml_anim; xml_anim = xml_anim->NextSiblingElement("animation"))
 	    {
-		// find icn name
-		ICN::icn_t icn = ICN::FromString(xml_icn->Attribute("name"));
-		if(icn == ICN::UNKNOWN) continue;
+		state = xml_anim->Attribute("state");
+		xml_anim->Attribute("start", &start);
+		xml_anim->Attribute("count", &count);
+		animframe_t frm;
+		frm.start = start;
+		frm.count = count;
 
-		// find monster info position
-		MonsterInfo* ptr = &monsters_info[1];
-		while(ptr->icn_file != ICN::UNKNOWN && icn != ptr->icn_file) ++ptr;
-		if(ptr->icn_file == ICN::UNKNOWN) continue;
-
-		TiXmlElement *xml_anim = xml_icn->FirstChildElement();
-		int start, count;
-		const char* state;
-
-    		while(xml_anim)
-		{
-		    if(0 == std::strcmp("animation", xml_anim->Value()))
-		    {
-			state = xml_anim->Attribute("state");
-			xml_anim->Attribute("start", &start);
-			xml_anim->Attribute("count", &count);
-			animframe_t frm;
-			frm.start = start;
-			frm.count = count;
-
-			if(0 == std::strcmp("idle", state)) ptr->frm_idle = frm;
-			else
-			if(0 == std::strcmp("move", state)) ptr->frm_move = frm;
-			else
-			if(0 == std::strcmp("fly1", state)) ptr->frm_fly1 = frm;
-			else
-			if(0 == std::strcmp("fly2", state)) ptr->frm_fly2 = frm;
-			else
-			if(0 == std::strcmp("fly3", state)) ptr->frm_fly3 = frm;
-			else
-			if(0 == std::strcmp("shot0", state)) ptr->frm_shot0 = frm;
-			else
-			if(0 == std::strcmp("shot1", state)) ptr->frm_shot1 = frm;
-			else
-			if(0 == std::strcmp("shot2", state)) ptr->frm_shot2 = frm;
-			else
-			if(0 == std::strcmp("shot3", state)) ptr->frm_shot3 = frm;
-			else
-			if(0 == std::strcmp("attk0", state)) ptr->frm_attk0 = frm;
-			else
-			if(0 == std::strcmp("attk1", state)) ptr->frm_attk1 = frm;
-			else
-			if(0 == std::strcmp("attk2", state)) ptr->frm_attk2 = frm;
-			else
-			if(0 == std::strcmp("attk3", state)) ptr->frm_attk3 = frm;
-			else
-			if(0 == std::strcmp("wnce", state)) ptr->frm_wnce = frm;
-			else
-			if(0 == std::strcmp("kill", state)) ptr->frm_kill = frm;
-		    }
-		    xml_anim = xml_anim->NextSiblingElement();
-		}
+		if(0 == std::strcmp("idle", state)) ptr->frm_idle = frm;
+		else
+		if(0 == std::strcmp("move", state)) ptr->frm_move = frm;
+		else
+		if(0 == std::strcmp("fly1", state)) ptr->frm_fly1 = frm;
+		else
+		if(0 == std::strcmp("fly2", state)) ptr->frm_fly2 = frm;
+		else
+		if(0 == std::strcmp("fly3", state)) ptr->frm_fly3 = frm;
+		else
+		if(0 == std::strcmp("shot0", state)) ptr->frm_shot0 = frm;
+		else
+		if(0 == std::strcmp("shot1", state)) ptr->frm_shot1 = frm;
+		else
+		if(0 == std::strcmp("shot2", state)) ptr->frm_shot2 = frm;
+		else
+		if(0 == std::strcmp("shot3", state)) ptr->frm_shot3 = frm;
+		else
+		if(0 == std::strcmp("attk0", state)) ptr->frm_attk0 = frm;
+		else
+		if(0 == std::strcmp("attk1", state)) ptr->frm_attk1 = frm;
+		else
+		if(0 == std::strcmp("attk2", state)) ptr->frm_attk2 = frm;
+		else
+		if(0 == std::strcmp("attk3", state)) ptr->frm_attk3 = frm;
+		else
+		if(0 == std::strcmp("wnce", state)) ptr->frm_wnce = frm;
+		else
+		if(0 == std::strcmp("kill", state)) ptr->frm_kill = frm;
 	    }
-	    xml_icn = xml_icn->NextSiblingElement();
 	}
     }
 #endif
