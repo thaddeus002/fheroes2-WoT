@@ -152,16 +152,14 @@ void Battle2::Catapult::Action(void)
     Battle2::Action action;
     action.SetID(MSG_BATTLE_CATAPULT);
 
-    bool send = false;
     u8 shots = GetShots();
     action.Push(shots);
     while(shots--)
     {
 	u8 target = GetTarget();
-	if(target) send = true;
 	action.Push(target);
 	action.Push(GetDamage(target));
     }
 
-    if(send) arena.ApplyAction(action);
+    arena.ApplyAction(action);
 }
