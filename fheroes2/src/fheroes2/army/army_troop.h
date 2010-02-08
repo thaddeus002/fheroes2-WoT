@@ -94,6 +94,8 @@ namespace Army
 	void		BattleSetModes(u32);
 	void		BattleResetModes(u32);
 	bool		BattleFindModes(u32) const;
+	bool		BattleIsDragons(void) const;
+	bool		BattleIsArchers(void) const;
 	u32		BattleKilled(void) const;
 	s8		GetArmyIndex(void) const;
 

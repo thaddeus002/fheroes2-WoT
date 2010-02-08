@@ -156,6 +156,16 @@ void Army::Troop::BattleResetModes(u32 f)
     if(battle) battle->ResetModes(f);
 }
 
+bool Army::Troop::BattleIsDragons(void) const
+{
+    return battle && battle->isValid() && isDragons();
+}
+
+bool Army::Troop::BattleIsArchers(void) const
+{
+    return battle && battle->isValid() && battle->isArchers();
+}
+
 const Skill::Primary* Army::Troop::MasterSkill(void) const
 {
     return army ? army->commander : NULL;

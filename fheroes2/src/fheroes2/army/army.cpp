@@ -777,6 +777,16 @@ Army::Troop & Army::army_t::BattleNewTroop(Monster::monster_t id, u32 count)
     return *it;
 }
 
+bool Army::army_t::BattleArchersPresent(void) const
+{
+    return army.end() != std::find_if(army.begin(), army.end(), std::mem_fun_ref(&Troop::BattleIsArchers));
+}
+
+bool Army::army_t::BattleDragonsPresent(void) const
+{
+    return army.end() != std::find_if(army.begin(), army.end(), std::mem_fun_ref(&Troop::BattleIsDragons));
+}
+
 void Army::army_t::Clear(void)
 {
     std::for_each(army.begin(), army.end(), std::mem_fun_ref(&Troop::Reset));
