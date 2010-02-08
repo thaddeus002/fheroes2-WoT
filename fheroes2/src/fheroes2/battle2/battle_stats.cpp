@@ -267,11 +267,10 @@ Monster Battle2::Stats::GetMonster(void) const
 
 void Battle2::Stats::SetReflection(bool r)
 {
-    reflect = r;
+    if(isWide() && reflect != r)
+	position = GetTailIndex();
 
-    if(isWide() &&
-	Board::isValidDirection(position, reflect ? LEFT : RIGHT))
-    	position = Board::GetIndexDirection(position, reflect ? LEFT : RIGHT);
+    reflect = r;
 }
 
 u8 Battle2::Stats::GetShots(void) const

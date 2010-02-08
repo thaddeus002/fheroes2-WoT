@@ -24,6 +24,7 @@
 #include <functional>
 #include "settings.h"
 #include "heroes.h"
+#include "castle.h"
 #include "battle_arena.h"
 #include "battle_cell.h"
 #include "battle_stats.h"
@@ -140,16 +141,27 @@ void Battle2::Arena::AIMagicAction(const Stats & b, Actions & a, const Stats* en
 	if(enemy->Modes(IS_GOOD_MAGIC) && isApplySpell(Spell::DISPEL, *enemy, *hero, a)) return;
     }
 
+    // enemy scan - find archers
+    if((NULL != (army = GetArmy(GetOppositeColor(b.GetColor()))) && army->BattleArchersPresent()) ||
+	// or archers tower
+	(castle && castle->GetColor() != b.GetColor() && castle->isBuild(Castle::BUILD_CASTLE)))
+    {
+	if(!b.Modes(SP_SHIELD) && isApplySpell(Spell::SHIELD, b, *hero, a)) return;
+    }
+
     // my army blessing
     if(b.isArchers() || enemy)
     {
 	if(enemy->troop.isDragons() && !b.Modes(SP_DRAGONSLAYER) && isApplySpell(Spell::DRAGONSLAYER, b, *hero, a)) return;
 	if(!b.Modes(SP_BLESS) && isApplySpell(Spell::BLESS, b, *hero, a)) return;
 	if(!b.Modes(SP_BLOODLUST) && isApplySpell(Spell::BLOODLUST, b, *hero, a)) return;
+	if(!b.Modes(SP_HASTE) && isApplySpell(Spell::HASTE, b, *hero, a)) return;
+    }
+
+    if(enemy)
+    {
 	if(!b.Modes(SP_STEELSKIN) && !b.Modes(SP_STONESKIN) && isApplySpell(Spell::STEELSKIN, b, *hero, a)) return;
 	if(!b.Modes(SP_STONESKIN) && !b.Modes(SP_STEELSKIN) && isApplySpell(Spell::STONESKIN, b, *hero, a)) return;
-
-	// FIX: Battle2::Arena::AIMagicAction: Spell::HASTE and Spell::SHIELD
     }
 
     // my army scan - clean
@@ -175,6 +187,7 @@ void Battle2::Arena::AIMagicAction(const Stats & b, Actions & a, const Stats* en
     }
 
     // FIX: Battle2::Arena::AIMagicAction: enemy army - damage spell
+    // find monster
 }
 
 bool Battle2::isApplySpell(const Spell::spell_t spell, const Stats & b, const HeroBase & hero, Actions & a)

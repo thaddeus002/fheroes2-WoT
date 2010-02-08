@@ -595,7 +595,7 @@ Battle2::Arena::Arena(Army::army_t & a1, Army::army_t & a2, u16 index, bool loca
 	if(troop1.isValid() && troop1.BattleInit())
 	{
 	    Stats* stats = troop1.GetBattleStats();
-	    stats->SetPosition(index1);
+	    stats->SetPosition(troop1.isWide() ? index1 + 1 : index1);
 	    stats->SetArena(this);
 	    stats->SetReflection(false);
 	    if(interface) stats->InitContours();
@@ -610,7 +610,7 @@ Battle2::Arena::Arena(Army::army_t & a1, Army::army_t & a2, u16 index, bool loca
 	if(troop2.isValid() && troop2.BattleInit())
 	{
 	    Stats* stats = troop2.GetBattleStats();
-	    stats->SetPosition(index2);
+	    stats->SetPosition(troop2.isWide() ? index2 - 1 : index2);
 	    stats->SetArena(this);
 	    stats->SetReflection(true);
 	    if(interface) stats->InitContours();

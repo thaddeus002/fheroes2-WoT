@@ -2220,7 +2220,6 @@ void Battle2::Interface::RedrawActionFly(Stats & b, u16 dst)
     }
 
     b.position = dst;
-    b.UpdateDirection();
 
     // jump down
     b_fly = NULL;
