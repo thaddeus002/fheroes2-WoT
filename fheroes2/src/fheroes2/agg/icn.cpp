@@ -36,11 +36,13 @@
 
 namespace ICN
 {
-    static const struct
+    struct icnmap_t
     {
         icn_t type;
         const char* string;
-    } icnmap[] = {
+    };
+
+    static const icnmap_t icnmap[] = {
 	{ ADVBORDE,	"ADVBORDE.ICN" },
 	{ ADVBORD,	"ADVBORD.ICN" },
 	{ ADVBTNS,	"ADVBTNS.ICN" },
@@ -2031,4 +2033,11 @@ bool ICN::SkipRegistryFree(ICN::icn_t icn)
     }
 
     return false;
+}
+
+ICN::icn_t ICN::FromString(const char* str)
+{
+    const icnmap_t* ptr = &icnmap[0];
+    while(ptr->type != ICN::UNKNOWN && 0 != std::strcmp(ptr->string, str)) ++ptr;
+    return ptr->type;
 }

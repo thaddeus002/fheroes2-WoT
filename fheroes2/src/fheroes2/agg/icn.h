@@ -934,6 +934,7 @@ namespace ICN
     };
 
     const char* GetString(const icn_t icn);
+    icn_t FromString(const char*);
     u16 AnimationFrame(const icn_t icn, const u16 start, const u32 ticket = 0, const u8 quantity = 0);
     bool RequiresAlpha(const icn_t icn);
     bool isModifiedSprite(const icn_t icn);

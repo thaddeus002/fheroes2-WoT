@@ -35,6 +35,7 @@
 #include "sdlnet.h"
 #include "images_pack.h"
 #include "localclient.h"
+#include "battle2.h"
 
 #include "zzlib.h"
 
@@ -44,6 +45,7 @@ void SetTimidityEnvPath(const Settings &);
 void SetLangEnvPath(const Settings &);
 void ReadConfigFile(Settings &);
 void LoadConfigFiles(Settings &, const char* dirname);
+void UpdateBattleAnimation(const Settings &);
 
 int PrintHelp(const char *basename)
 {
@@ -170,6 +172,8 @@ int main(int argc, char **argv)
 
 	    // load font
 	    cache.LoadFNT();
+
+	    if(conf.UseAltResource()) UpdateBattleAnimation(conf);
 
 #ifdef WITH_ZLIB
 	    LoadZLogo();
@@ -362,4 +366,12 @@ void LoadConfigFiles(Settings & conf, const char* dirname)
 	conf.SetLocalPrefix(dirname);
 	ReadConfigFile(conf);
     }
+}
+
+void UpdateBattleAnimation(const Settings & conf)
+{
+    const std::string battle_spec(conf.LocalPrefix() + SEPARATOR + "files" + SEPARATOR + "images" + SEPARATOR + "battle.xml");
+
+    if(FilePresent(battle_spec))
+	Battle2::UpdateMonsterInfoAnimation(battle_spec);
 }
