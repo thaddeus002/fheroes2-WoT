@@ -197,7 +197,7 @@ public:
     u8  GetSpeed(void) const;
     u8  GetGrown(void) const;
     u8  GetLevel(void) const;
-    u16 GetRNDSize(void) const;
+    u16 GetRNDSize(bool skip) const;
     u8  GetSpriteIndex(void) const;
 
     const char* GetName(void) const;
@@ -230,14 +230,12 @@ public:
 #endif
 
     static monster_t Upgrade(Monster &);
-    static u16 GetRNDSize(Monster &);
     static u8  GetLevel(Monster &);
     static u32 GetDwelling(Monster &);
 
     static const char* GetName(monster_t);
     static const char* GetMultiName(monster_t);
     static monster_t Upgrade(monster_t);
-    static u16 GetRNDSize(monster_t);
     static u8  GetLevel(monster_t);
     static u32 GetDwelling(monster_t);
 

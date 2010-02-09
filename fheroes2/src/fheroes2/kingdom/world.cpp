@@ -864,7 +864,7 @@ void World::LoadMaps(const std::string &filename)
 
 	    case MP2::OBJ_MONSTER:
 		if(0 == tile.GetQuantity1() && 0 == tile.GetQuantity2())
-		    tile.SetCountMonster(Monster(tile).GetRNDSize());
+		    tile.SetCountMonster(Monster(tile).GetRNDSize(false));
 		else
 		    // old format
 		    tile.SetCountMonster(((static_cast<u16>(tile.GetQuantity2()) << 8) | tile.GetQuantity1()) >> 3);
@@ -878,13 +878,17 @@ void World::LoadMaps(const std::string &filename)
 		// modify rnd monster sprite
 		tile.UpdateRNDMonsterSprite();
 		if(0 == tile.GetQuantity1() && 0 == tile.GetQuantity2())
-		    tile.SetCountMonster(Monster(tile).GetRNDSize());
+		    tile.SetCountMonster(Monster(tile).GetRNDSize(false));
 		else
 		    // old format
 		    tile.SetCountMonster(((static_cast<u16>(tile.GetQuantity2()) << 8) | tile.GetQuantity1()) >> 3);
 		break;
 
 	    // join dwelling
+	    case MP2::OBJ_ANCIENTLAMP:
+		    tile.SetCountMonster(Monster(Monster::FromObject(tile.GetObject())).GetRNDSize(true));
+		break;
+
     	    case MP2::OBJ_WATCHTOWER:
             case MP2::OBJ_EXCAVATION:
             case MP2::OBJ_CAVE:
@@ -895,7 +899,6 @@ void World::LoadMaps(const std::string &filename)
             case MP2::OBJ_HALFLINGHOLE:
             case MP2::OBJ_PEASANTHUT:
             case MP2::OBJ_THATCHEDHUT:
-	    case MP2::OBJ_ANCIENTLAMP:
 	    // recruit dwelling
 	    case MP2::OBJ_RUINS:
             case MP2::OBJ_TREECITY:
@@ -910,7 +913,7 @@ void World::LoadMaps(const std::string &filename)
     	    case MP2::OBJ_EARTHALTAR:
 	    case MP2::OBJ_BARROWMOUNDS:
 		    // initial update dwelling population
-		    tile.SetCountMonster(Monster(Monster::FromObject(tile.GetObject())).GetRNDSize());
+		    tile.SetCountMonster(2 * Monster(Monster::FromObject(tile.GetObject())).GetRNDSize(true));
 		break;
 
 	//
@@ -1597,7 +1600,7 @@ void World::UpdateMonsterPopulation(void)
 	const u16 count = tile.GetCountMonster();
 
 	if(0 == count)
-	    tile.SetCountMonster(Monster(tile).GetRNDSize());
+	    tile.SetCountMonster(Monster(tile).GetRNDSize(false));
 	else
 	    tile.SetCountMonster(count * 8 / 7);
     }

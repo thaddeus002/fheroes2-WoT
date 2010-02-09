@@ -393,9 +393,29 @@ u8  Monster::GetLevel(void) const
     return GetLevel(id);
 }
 
-u16 Monster::GetRNDSize(void) const
+u16 Monster::GetRNDSize(bool skip_factor) const
 {
-    return GetRNDSize(id);
+    u8 grown = GetGrown();
+    u16 res = Rand::Get((1 < grown ? grown - 1 : grown), grown + grown / 2);
+
+    if(!skip_factor)
+    {
+	u16 factor = 100;
+
+	switch(Settings::Get().GameDifficulty()) 	 
+	{
+	    case Difficulty::EASY:      factor = 80; break;
+	    case Difficulty::NORMAL:    factor = 100; break;
+	    case Difficulty::HARD:      factor = 140; break;
+	    case Difficulty::EXPERT:    factor = 180; break;
+	    case Difficulty::IMPOSSIBLE:factor = 220; break;
+	    default: break;
+	}
+
+	res *= (5 * factor / 100);
+    }
+
+    return res;
 }
 
 u8 Monster::GetSpriteIndex(void) const
@@ -892,27 +912,6 @@ Monster::monster_t Monster::Rand(level_t level)
     return UNKNOWN;
 }
 
-
-u16 Monster::GetRNDSize(monster_t m)
-{
-    u16 factor = 100;
-
-    if(!Settings::Get().OriginalVersion())
-    switch(Settings::Get().GameDifficulty()) 	 
-    { 	 
-	case Difficulty::EASY:      factor = 80; break;
-	case Difficulty::NORMAL:    factor = 100; break;
-	case Difficulty::HARD:      factor = 140; break;
-	case Difficulty::EXPERT:    factor = 180; break;
-	case Difficulty::IMPOSSIBLE:factor = 220; break;
-	default: break;
-     }
-
-    const u8 grown = Monster(m).GetGrown();
-
-    return 4 * Rand::Get(factor * grown / 100, factor * (grown + grown / 2) / 100);
-}
-
 u8 Monster::GetLevel(monster_t m)
 {
     switch(m)
@@ -1099,11 +1098,6 @@ const char* Monster::GetMultiName(monster_t m)
 Monster::monster_t Monster::Upgrade(Monster & m)
 {
     return Upgrade(m.id);
-}
-
-u16 Monster::GetRNDSize(Monster & m)
-{
-    return GetRNDSize(m.id);
 }
 
 u8 Monster::GetLevel(Monster & m)
