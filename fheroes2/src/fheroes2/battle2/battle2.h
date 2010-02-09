@@ -49,8 +49,6 @@ namespace Battle2
 	bool DefenderWins(void) const;
 	u8   AttackerResult(void) const;
 	u8   DefenderResult(void) const;
-	u8   AttackerOldResult(void) const;
-	u8   DefenderOldResult(void) const;
 	u32  GetExperience(void) const;
 
 	u8 army1;

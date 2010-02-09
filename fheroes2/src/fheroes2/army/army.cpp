@@ -36,10 +36,6 @@
 #include "battle_stats.h"
 #include "army.h"
 
-#ifdef WITH_BATTLE1
-#include "battle_troop.h"
-#endif
-
 std::vector<Army::Troop>::iterator MaxElement(std::vector<Army::Troop>::iterator first, std::vector<Army::Troop>::iterator last, bool (*pf)(const Army::Troop &, const Army::Troop &))
 {
     while(first != last) if(Army::isValidTroop(*first)) break; else ++first;
@@ -254,19 +250,6 @@ void Army::army_t::Import(const std::vector<Troop> & v)
 	    army[ii].Reset();
     }
 }
-
-#ifdef WITH_BATTLE1
-void Army::army_t::Import(const std::vector<BattleTroop> & v)
-{
-    for(u8 ii = 0; ii < Size(); ++ii)
-    {
-	if(ii < v.size())
-	    army[ii] = v[ii];
-	else
-	    army[ii].Reset();
-    }
-}
-#endif
 
 void Army::army_t::UpgradeMonsters(const Monster & m)
 {

@@ -23,7 +23,6 @@
 #include "agg.h"
 #include "settings.h"
 #include "gamedefs.h"
-#include "battle.h"
 #include "battle2.h"
 #include "world.h"
 #include "army.h"
@@ -62,36 +61,6 @@ void RunTest1(void)
 void RunTest2(void)
 {
     VERBOSE("Run Test2");
-
-#ifdef WITH_BATTLE1
-    Settings & conf = Settings::Get();
-    world.LoadMaps("/home/fheroes2/src/fh2/maps/beltway.mp2");
-
-    Heroes & hero1 = *world.GetHeroes(Heroes::SANDYSANDY);
-    Kingdom & kingdom1 = world.GetKingdom(Color::RED);
-    Kingdom & kingdom2 = world.GetKingdom(Color::YELLOW);
-
-    conf.SetMyColor(Color::RED);
-
-    kingdom1.SetControl(Game::LOCAL);
-    kingdom2.SetControl(Game::AI);
-
-    if(kingdom1.GetCastles().size())
-    hero1.Recruit(*kingdom1.GetCastles().at(0));
-
-    Army::army_t & army1 = hero1.GetArmy();
-    Army::army_t & army2 = kingdom2.GetCastles().at(0)->GetArmy();
-
-    army1.Clear();
-    army1.JoinTroop(Monster::EARTH_ELEMENT, 400);
-    army1.JoinTroop(Monster::AIR_ELEMENT, 400);
-
-    army2.Clear();
-    army2.JoinTroop(Monster::PEASANT, 10000);
-
-    u32 exp;
-    Army::Battle(hero1, army2, world.GetTiles(kingdom2.GetCastles().at(0)->GetIndex()), exp);
-#endif
 }
 
 void RunTest3(void)

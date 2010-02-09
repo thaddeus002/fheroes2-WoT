@@ -1874,7 +1874,23 @@ void Battle2::Interface::RedrawActionAttackPart1(Stats & attacker, Stats & defen
     }
 
     // redraw luck animation
-    if(attacker.Modes(LUCK_GOOD)) RedrawTroopWithFrameAnimation(attacker, ICN::BLESS, M82::FromSpell(Spell::BLESS), false);
+    if(attacker.Modes(LUCK_GOOD))
+    {
+	std::string msg = _("Good luck shines on the  %{attacker}");
+	String::Replace(msg, "%{attacker}", attacker.GetName());
+	status.SetMessage(msg, true);
+	status.SetMessage("", false);
+
+	RedrawTroopWithFrameAnimation(attacker, ICN::BLESS, M82::FromSpell(Spell::BLESS), false);
+    }
+    else
+    if(attacker.Modes(LUCK_BAD))
+    {
+	std::string msg = _("Bad luck descends on the %{attacker}");
+	String::Replace(msg, "%{attacker}", attacker.GetName());
+	status.SetMessage(msg, true);
+	status.SetMessage("", false);
+    }
 
     AGG::PlaySound(attacker.M82Attk());
 

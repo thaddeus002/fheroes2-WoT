@@ -116,9 +116,6 @@ namespace Dialog
 
     // army info
     answer_t ArmyInfo(const Army::Troop & troop, u16 flags);
-#ifdef WITH_BATTLE1
-    answer_t ArmyInfo(const Army::BattleTroop & troop, u16 flags);
-#endif
     // dialog marketplace
     void Marketplace(bool fromTradingPost = false);
 

@@ -68,11 +68,6 @@ namespace Army
 	    army_t & operator= (const army_t &);
 
 	    void	FromGuardian(const Maps::Tiles &);
-	    void	Import(army_t &);
-	    void	Import(const std::vector<Troop> &);
-#ifdef WITH_BATTLE1
-	    void	Import(const std::vector<BattleTroop> &);
-#endif
 	    void	UpgradeMonsters(const Monster &);
 	    void	UpgradeMonsters(const Monster::monster_t);
 	    void	Clear(void);
@@ -152,6 +147,8 @@ namespace Army
 
 	protected:
 	    friend class Troop;
+	    void	Import(army_t &);
+	    void	Import(const std::vector<Troop> &);
 	    s8		GetTroopIndex(const Troop &) const;
 
 	    std::vector<Troop> army;

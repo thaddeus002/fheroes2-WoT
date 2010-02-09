@@ -34,8 +34,8 @@
 #include "payment.h"
 #include "cursor.h"
 #include "kingdom.h"
-#include "battle.h"
 #include "visit.h"
+#include "battle2.h"
 #include "heroes.h"
 #include "localclient.h"
 
@@ -1829,11 +1829,11 @@ void Heroes::SetFreeman(const u8 reason)
 {
     if(isFreeman()) return;
 
-    if(Army::RETREAT == reason || Army::SURRENDER == reason) world.GetKingdom(color).GetRecruits().SetHero2(this);
+    if((Battle2::RESULT_RETREAT | Battle2::RESULT_SURRENDER) & reason) world.GetKingdom(color).GetRecruits().SetHero2(this);
 
-    if(!army.isValid() || Army::LOSE == reason || Army::RETREAT == reason) army.Reset(false);
+    if(!army.isValid() || (Battle2::RESULT_RETREAT & reason)) army.Reset(false);
     else
-    if(Army::LOSE == reason) army.Reset(true);
+    if((Battle2::RESULT_LOSS & reason) && !(Battle2::RESULT_SURRENDER & reason)) army.Reset(true);
 
     color = Color::GRAY;
     world.GetTiles(mp).SetObject(save_maps_general);

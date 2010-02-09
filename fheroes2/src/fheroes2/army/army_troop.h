@@ -69,12 +69,12 @@ namespace Army
         u32 		Count(void) const { return GetCount(); };
         u32 		GetCount(void) const;
         
-	virtual u8	GetAttack(void) const;
-	virtual u8	GetDefense(void) const;
-	virtual u32	GetHitPoints(void) const;
+	u8		GetAttack(void) const;
+	u8		GetDefense(void) const;
+	u32		GetHitPoints(void) const;
 
 	Color::color_t	GetColor(void) const;
-        virtual u8	GetSpeed(void) const;
+        u8		GetSpeed(void) const;
 
 	const Battle2::Stats*	GetBattleStats(void) const;
 	Battle2::Stats*	GetBattleStats(void);
@@ -107,9 +107,6 @@ namespace Army
         u32		count;
 	army_t*		army;
 	Battle2::Stats*	battle;
-#ifdef WITH_BATTLE1
-	u32		hp;
-#endif
     };
 };
 

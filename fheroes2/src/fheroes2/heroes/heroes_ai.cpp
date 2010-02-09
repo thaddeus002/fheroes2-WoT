@@ -24,7 +24,6 @@
 #include "kingdom.h"
 #include "castle.h"
 #include "army.h"
-#include "battle.h"
 #include "battle2.h"
 #include "luck.h"
 #include "morale.h"
@@ -299,17 +298,16 @@ void AIToHeroes(Heroes &hero, const u8 obj, const u16 dst_index)
 
         DEBUG(DBG_AI , DBG_INFO, "AIToHeroes: " << hero.GetName() << " attack enemy hero " << other_hero->GetName());
 
-#ifndef WITH_BATTLE1
             // new battle2
             Battle2::Result res = Battle2::Loader(hero.GetArmy(), other_hero->GetArmy(), dst_index);
 
             // loss defender
             if(!res.DefenderWins())
-               AIBattleLose(*other_hero, res.DefenderOldResult(), hero.GetColor());
+               AIBattleLose(*other_hero, res.DefenderResult(), hero.GetColor());
 
             // loss attacker
             if(!res.AttackerWins())
-                AIBattleLose(hero, res.AttackerOldResult(), other_hero->GetColor());
+                AIBattleLose(hero, res.AttackerResult(), other_hero->GetColor());
 
             // wins attacker
             if(res.AttackerWins())
@@ -324,29 +322,6 @@ void AIToHeroes(Heroes &hero, const u8 obj, const u16 dst_index)
                 other_hero->IncreaseExperience(res.GetExperience());
                 other_hero->ActionAfterBattle();
             }
-#else
-    	    u32 exp = 0;
-    	    Army::battle_t b;
-
-    	    b = Army::Battle(hero, *other_hero, world.GetTiles(dst_index), exp);
-
-    	    switch(b)
-    	    {
-        	case Army::WIN:
-                hero.IncreaseExperience(exp);
-                AIBattleLose(*other_hero, b, hero.GetColor());
-                hero.ActionAfterBattle();
-                break;
-
-        	case Army::LOSE:
-        	case Army::RETREAT:
-        	case Army::SURRENDER:
-                AIBattleLose(hero, b, other_hero->GetColor());
-                break;
-
-    		default: break;
-    	    }
-#endif
     }
 }
 
@@ -368,20 +343,19 @@ void AIToCastle(Heroes &hero, const u8 obj, const u16 dst_index)
     	castle->MergeArmies();
         Army::army_t & army = castle->GetActualArmy();
 
-#ifndef WITH_BATTLE1
-    if(army.isValid())
-    {
+	if(army.isValid())
+	{
             // new battle2
             Battle2::Result res = Battle2::Loader(hero.GetArmy(), army, dst_index);
             Heroes *other_hero = world.GetHeroes(dst_index);
 
             // loss defender
             if(!res.DefenderWins() && other_hero)
-               AIBattleLose(*other_hero, res.DefenderOldResult(), hero.GetColor());
+               AIBattleLose(*other_hero, res.DefenderResult(), hero.GetColor());
 
             // loss attacker
             if(!res.AttackerWins())
-                AIBattleLose(hero, res.AttackerOldResult(), castle->GetColor());
+                AIBattleLose(hero, res.AttackerResult(), castle->GetColor());
 
             // wins attacker
             if(res.AttackerWins())
@@ -402,44 +376,13 @@ void AIToCastle(Heroes &hero, const u8 obj, const u16 dst_index)
                 other_hero->IncreaseExperience(res.GetExperience());
                 other_hero->ActionAfterBattle();
             }
-    }
-    else
-    {
-        world.GetKingdom(castle->GetColor()).RemoveCastle(castle);
-        world.GetKingdom(hero.GetColor()).AddCastle(castle);
-        world.CaptureObject(dst_index, hero.GetColor());
-    }
-#else
-        u32 exp = 0;
-
-    	    Army::battle_t b = army.isValid() ?
-    		(castle->isCastle() ?
-    		    Army::Battle(hero, *castle, world.GetTiles(dst_index), exp) :
-    		    Army::Battle(hero, army, world.GetTiles(dst_index), exp)) :
-    		    Army::WIN;
-
-    	    switch(b)
-    	    {
-        	case Army::WIN:
-                if(exp) hero.IncreaseExperience(exp);
-                world.GetKingdom(castle->GetColor()).RemoveCastle(castle);
-                world.GetKingdom(hero.GetColor()).AddCastle(castle);
-                world.CaptureObject(dst_index, hero.GetColor());
-                if(exp) hero.ActionAfterBattle();
-                // kill guardian hero
-                if(Heroes *other_hero = world.GetHeroes(dst_index))
-                    AIBattleLose(*other_hero, b, hero.GetColor());
-                break;
-
-        	case Army::LOSE:
-        	case Army::RETREAT:
-        	case Army::SURRENDER:
-                AIBattleLose(hero, b, castle->GetColor());
-                break;
-
-        	default: break;
-    	    }
-#endif
+	}
+	else
+	{
+    	    world.GetKingdom(castle->GetColor()).RemoveCastle(castle);
+	    world.GetKingdom(hero.GetColor()).AddCastle(castle);
+    	    world.CaptureObject(dst_index, hero.GetColor());
+	}
     }
 }
 
@@ -509,7 +452,6 @@ void AIToMonster(Heroes &hero, const u8 obj, const u16 dst_index)
 
     DEBUG(DBG_AI , DBG_INFO, "AIToMonster: " << hero.GetName() << " attack monster " << monster.GetName());
 
-#ifndef WITH_BATTLE1
     if(!avoidBattle)
     {
         // new battle2
@@ -523,38 +465,13 @@ void AIToMonster(Heroes &hero, const u8 obj, const u16 dst_index)
         }
         else
         {
-            AIBattleLose(hero, res.AttackerOldResult());
+            AIBattleLose(hero, res.AttackerResult());
             if(!Settings::Get().OriginalVersion())
             {
                 tile.SetCountMonster(army.GetCountMonsters(monster));
             }
         }
     }
-#else
-	u32 exp = 0;
-	const Army::battle_t b = avoidBattle ? Army::WIN : Army::Battle(hero, army, tile, exp);
-
-	switch(b)
-	{
-    	    case Army::WIN:
-            hero.IncreaseExperience(exp);
-            destroyTile = true;
-            hero.ActionAfterBattle();
-            break;
-
-    	    case Army::RETREAT:
-    	    case Army::SURRENDER:
-    	    case Army::LOSE:
-            AIBattleLose(hero, b);
-            if(!Settings::Get().OriginalVersion())
-            {
-                tile.SetCountMonster(army.GetCountMonsters(monster));
-            }
-            break;
-        
-        default: break;
-	}
-#endif
 
     if(destroyTile)
     {
@@ -1112,7 +1029,6 @@ void AIToPoorMoraleObject(Heroes &hero, const u8 obj, const u16 dst_index)
 	    Army::army_t army;
 	    army.FromGuardian(tile);
 
-#ifndef WITH_BATTLE1
     		// new battle2
     		Battle2::Result res = Battle2::Loader(hero.GetArmy(), army, dst_index);
 
@@ -1129,34 +1045,8 @@ void AIToPoorMoraleObject(Heroes &hero, const u8 obj, const u16 dst_index)
 		}
 		else
 		{
-	    	    AIBattleLose(hero, res.AttackerOldResult());
+	    	    AIBattleLose(hero, res.AttackerResult());
 		}
-#else
-		u32 exp = 0;
-		const Army::battle_t b = Army::Battle(hero, army, tile, exp);
-		switch(b)
-		{
-		    case Army::WIN:
-		    {
-	    	    hero.IncreaseExperience(exp);
-	    	    complete = true;
-	    	    const Artifact art(Artifact::FromInt(tile.GetQuantity1()));
-	    	    Resource::funds_t resource;
-	    	    resource.gold = tile.GetQuantity2() * 100;
-	    	    hero.PickupArtifact(art());
-	    	    world.GetKingdom(hero.GetColor()).AddFundsResource(resource);
-	    	    hero.ActionAfterBattle();
-	    	    break;
-		    }
-		    case Army::RETREAT:
-		    case Army::SURRENDER:
-		    case Army::LOSE:
-	    	    AIBattleLose(hero, b);
-	    	    break;
-        
-		    default: break;
-		}
-#endif
 	}
 	break;
 
@@ -1176,7 +1066,6 @@ void AIToPoorMoraleObject(Heroes &hero, const u8 obj, const u16 dst_index)
             	    default: DEBUG(DBG_AI , DBG_WARN, "ActionToPoorMoraleObject: unknown variant for ShipWreck, index: " << dst_index); break;
                 }
 
-#ifndef WITH_BATTLE1
     		    // new battle2
     		    Battle2::Result res = Battle2::Loader(hero.GetArmy(), army, dst_index);
 
@@ -1190,31 +1079,8 @@ void AIToPoorMoraleObject(Heroes &hero, const u8 obj, const u16 dst_index)
 		    }
 		    else
 		    {
-	    		AIBattleLose(hero, res.AttackerOldResult());
+	    		AIBattleLose(hero, res.AttackerResult());
 		    }
-#else
-            	    u32 exp = 0;
-            	    const Army::battle_t b = Army::Battle(hero, army, tile, exp);
-		    switch(b)
-		    {
-			case Army::WIN:
-			{
-	    		hero.IncreaseExperience(exp);
-	    		complete = true;
-			hero.PickupArtifact(art);
-	    		world.GetKingdom(hero.GetColor()).AddFundsResource(resource);
-	    		hero.ActionAfterBattle();
-	    		break;
-			}
-			case Army::RETREAT:
-			case Army::SURRENDER:
-			case Army::LOSE:
-	    		AIBattleLose(hero, b);
-	    		break;
-        
-			default: break;
-		    }
-#endif
 	    }
 	    break;
 
@@ -1224,7 +1090,6 @@ void AIToPoorMoraleObject(Heroes &hero, const u8 obj, const u16 dst_index)
 	    Army::army_t army;
 	    army.FromGuardian(tile);
 
-#ifndef WITH_BATTLE1
     		// new battle2
     		Battle2::Result res = Battle2::Loader(hero.GetArmy(), army, dst_index);
 
@@ -1239,33 +1104,8 @@ void AIToPoorMoraleObject(Heroes &hero, const u8 obj, const u16 dst_index)
 		}
 		else
 		{
-	    	    AIBattleLose(hero, res.AttackerOldResult());
+	    	    AIBattleLose(hero, res.AttackerResult());
 		}
-#else
-		u32 exp = 0;
-		const Army::battle_t b = Army::Battle(hero, army, tile, exp);
-		switch(b)
-		{
-		    case Army::WIN:
-		    {
-	    	    hero.IncreaseExperience(exp);
-	    	    complete = true;
-	    	    Resource::funds_t resource;
-	    	    resource.gold = tile.GetQuantity2() * 100;
-	    	    world.GetKingdom(hero.GetColor()).AddFundsResource(resource);
-	    	    hero.ActionAfterBattle();
-	    	    break;
-		    }
-
-		    case Army::RETREAT:
-		    case Army::SURRENDER:
-		    case Army::LOSE:
-	    	    AIBattleLose(hero, b);
-	    	    break;
-        
-		    default: break;
-		}
-#endif
 	}
 	break;
 
@@ -1302,7 +1142,6 @@ void AIToPoorLuckObject(Heroes &hero, const u8 obj, const u16 dst_index)
             Army::army_t army;
             army.FromGuardian(tile);
 
-#ifndef WITH_BATTLE1
     		// new battle2
     		Battle2::Result res = Battle2::Loader(hero.GetArmy(), army, dst_index);
 
@@ -1322,38 +1161,8 @@ void AIToPoorLuckObject(Heroes &hero, const u8 obj, const u16 dst_index)
 		}
 		else
 		{
-		    AIBattleLose(hero, res.AttackerOldResult());
+		    AIBattleLose(hero, res.AttackerResult());
 		}
-#else
-		u32 exp = 0;
-		const Army::battle_t b = Army::Battle(hero, army, tile, exp);
-		switch(b)
-		{
-		    case Army::WIN:
-		    {
-		    hero.IncreaseExperience(exp);
-		    complete = true;
-		    const Spell::spell_t spell(static_cast<Spell::spell_t>(tile.GetQuantity1()));
-		    // check magick book
-		    if(hero.HasArtifact(Artifact::MAGIC_BOOK) &&
-		    // check skill level for wisdom
-			Skill::Level::EXPERT == hero.GetLevelSkill(Skill::Secondary::WISDOM))
-		    {
-			hero.AppendSpellToBook(spell);
-		    }
-		    hero.ActionAfterBattle();
-		    break;
-		    }
-
-		    case Army::RETREAT:
-		    case Army::SURRENDER:
-		    case Army::LOSE:
-		    AIBattleLose(hero, b);
-		    break;
-        
-    		    default: break;
-		}
-#endif
 	}
     	break;
 
@@ -1511,7 +1320,6 @@ void AIToAbandoneMine(Heroes &hero, const u8 obj, const u16 dst_index)
     Army::army_t army;
     army.FromGuardian(tile);
 
-#ifndef WITH_BATTLE1
     	// new battle2
     	Battle2::Result res = Battle2::Loader(hero.GetArmy(), army, dst_index);
 
@@ -1526,32 +1334,8 @@ void AIToAbandoneMine(Heroes &hero, const u8 obj, const u16 dst_index)
         }
 	else
 	{
-	    AIBattleLose(hero, res.AttackerOldResult());
+	    AIBattleLose(hero, res.AttackerResult());
 	}
-#else
-	u32 exp = 0;
-	const Army::battle_t b = Army::Battle(hero, army, tile, exp);
-
-	switch(b)
-	{
-	    case Army::WIN:
-            hero.IncreaseExperience(exp);
-            tile.SetQuantity1(0);
-            tile.UpdateAbandoneMineSprite();
-            world.CaptureObject(dst_index, hero.GetColor());
-            hero.SaveUnderObject(MP2::OBJ_MINES);
-            hero.ActionAfterBattle();
-            break;
-
-    	    case Army::RETREAT:
-    	    case Army::SURRENDER:
-    	    case Army::LOSE:
-            AIBattleLose(hero, b);
-            break;
-
-    	    default: break;
-	}
-#endif
 
     DEBUG(DBG_AI , DBG_INFO, "AIToAbandoneMine: " << hero.GetName());
 }

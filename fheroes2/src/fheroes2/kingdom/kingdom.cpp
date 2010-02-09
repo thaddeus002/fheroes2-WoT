@@ -30,7 +30,7 @@
 #include "payment.h"
 #include "world.h"
 #include "visit.h"
-#include "battle.h"
+#include "battle2.h"
 #include "kingdom_defines.h"
 #include "kingdom.h"
 
@@ -146,7 +146,7 @@ void Kingdom::LossPostActions(void)
 	ResetModes(PLAY);
 	if(heroes.size())
 	{
-	    std::for_each(heroes.begin(), heroes.end(), std::bind2nd(std::mem_fun(&Heroes::SetFreeman), Army::SURRENDER));
+	    std::for_each(heroes.begin(), heroes.end(), std::bind2nd(std::mem_fun(&Heroes::SetFreeman), static_cast<u8>(Battle2::RESULT_LOSS)));
 	    heroes.clear();
 	}
 	if(castles.size()) castles.clear();

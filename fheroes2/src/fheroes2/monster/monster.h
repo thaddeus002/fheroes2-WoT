@@ -122,50 +122,6 @@ public:
 	MONSTER_RND,
     };
 
-#ifdef WITH_BATTLE1
-    struct animattack_t
-    {
-	u8 attprep_start;
-	u8 attprep_count;
-	u8 attack1_start;
-	u8 attack1_count;
-	u8 attack2_start;
-	u8 attack2_count;
-	u8 attack3_start;
-	u8 attack3_count;
-    };
-
-    struct anim_t
-    {
-	u8 walk_start;
-	u8 walk_count;
-	u8 idle_start;
-	u8 idle_count;
-	u8 pain_start;
-	u8 pain_count;
-	u8 die_start;
-	u8 die_count;
-	animattack_t a;
-	animattack_t ar;
-    };
-
-    enum animstate_t
-    { 
-	AS_NONE		= 0,
-	AS_IDLE		= 1,
-	AS_WALK		= 2,
-	AS_ATT1		= 3,
-	AS_ATT2		= 4,
-	AS_ATT3		= 5,
-	AS_PAIN		= 6,
-	AS_DIE		= 7,
-	AS_ATTPREP	= 16,
-	AS_ATT1P	= 16+3,
-	AS_ATT2P	= 16+4,
-	AS_ATT3P	= 16+5
-    };
-#endif
-
     Monster();
     Monster(monster_t);
     Monster(const Maps::Tiles &);
@@ -213,21 +169,6 @@ public:
     bool isDragons(void) const;
 
     ICN::icn_t ICNMonh(void) const;
-
-#ifdef WITH_BATTLE1
-    ICN::icn_t ICNFile(void) const;
-    ICN::icn_t ICNMiss(void) const;
-
-    M82::m82_t M82Attk(void) const;
-    M82::m82_t M82Expl(void) const;
-    M82::m82_t M82Kill(void) const;
-    M82::m82_t M82Move(void) const;
-    M82::m82_t M82Shot(void) const;
-    M82::m82_t M82Wnce(void) const;
-
-    const anim_t & Animation(void) const;
-    void GetAnimFrames(u8 anim, u8 & start, u8 & length, bool attranged = false) const;
-#endif
 
     static monster_t Upgrade(Monster &);
     static u8  GetLevel(Monster &);

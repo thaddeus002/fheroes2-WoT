@@ -35,7 +35,6 @@
 #include "remoteclient.h"
 #include "localclient.h"
 #include "battle2.h"
-#include "battle.h"
 
 u16 DialogWithArtifact(const std::string &, const std::string &, const Artifact::artifact_t, const u16 = Dialog::OK);
 void PlayPickupSound(void);
@@ -307,19 +306,6 @@ u8 Battle2::Result::AttackerResult(void) const
     return 0;
 }
 
-u8 Battle2::Result::AttackerOldResult(void) const
-{
-    if(RESULT_SURRENDER & army1) return Army::SURRENDER;
-    else
-    if(RESULT_RETREAT & army1) return Army::RETREAT;
-    else
-    if(RESULT_LOSS & army1) return Army::LOSE;
-    else
-    if(RESULT_WINS & army1) return Army::WIN;
-
-    return 0;
-}
-
 u8 Battle2::Result::DefenderResult(void) const
 {
     if(RESULT_SURRENDER & army2) return RESULT_SURRENDER;
@@ -329,19 +315,6 @@ u8 Battle2::Result::DefenderResult(void) const
     if(RESULT_LOSS & army2) return RESULT_LOSS;
     else
     if(RESULT_WINS & army2) return RESULT_WINS;
-
-    return 0;
-}
-
-u8 Battle2::Result::DefenderOldResult(void) const
-{
-    if(RESULT_SURRENDER & army2) return Army::SURRENDER;
-    else
-    if(RESULT_RETREAT & army2) return Army::RETREAT;
-    else
-    if(RESULT_LOSS & army2) return Army::LOSE;
-    else
-    if(RESULT_WINS & army2) return Army::WIN;
 
     return 0;
 }
