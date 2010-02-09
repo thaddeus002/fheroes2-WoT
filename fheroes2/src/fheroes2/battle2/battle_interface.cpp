@@ -1633,11 +1633,11 @@ void Battle2::Interface::FadeArena(void)
 
 u8 Battle2::GetIndexIndicator(const Stats & b)
 {
+    // yellow
+    if(b.Modes(IS_GREEN_STATUS) && b.Modes(IS_RED_STATUS)) return 13;
+    else
     // green
     if(b.Modes(IS_GREEN_STATUS))	return 12;
-    else
-    // yellow
-    if(b.Modes(IS_YELLOW_STATUS))	return 13;
     else
     // red
     if(b.Modes(IS_RED_STATUS))		return 14;
@@ -3046,6 +3046,7 @@ void Battle2::Interface::RedrawActionDisruptingRaySpell(Stats & target)
 
     // part 2
     frame = 0;
+    const Stats* old_current = b_current;
     b_current = &target;
     b_current_sprite = &sprite2;
     p_move = Point(0, 0);
@@ -3068,7 +3069,8 @@ void Battle2::Interface::RedrawActionDisruptingRaySpell(Stats & target)
 	++ticket;
     }
 
-    b_current = NULL;
+    b_current = old_current;
+    b_current_sprite = NULL;
 }
 
 void Battle2::Interface::RedrawActionColdRingSpell(const u16 dst, const std::vector<TargetInfo> & targets)
