@@ -579,7 +579,6 @@ Battle2::Arena::Arena(Army::army_t & a1, Army::army_t & a2, u16 index, bool loca
     usage_spells.reserve(10);
 
     interface = local && !Settings::Get().BattleAuto() ? new Interface(*this, index) : NULL;
-    if(Maps::ScanAroundObject(index, MP2::OBJ_CRATER, false)) icn_covr = GetCovr(world.GetTiles(index).GetGround());
 
     if(interface && conf.Sound())
 	AGG::PlaySound(M82::PREBATTL);
@@ -651,14 +650,16 @@ Battle2::Arena::Arena(Army::army_t & a1, Army::army_t & a2, u16 index, bool loca
 
 	// moat (1, 0)
 	board[50].object = 1;
-
-	icn_covr = ICN::UNKNOWN;
     }
     else
+    // set obstacles
     {
-	// set obstacles
-	board.SetCovrObjects(icn_covr);
-	if(icn_covr == ICN::UNKNOWN) board.SetCobjObjects(index);
+	icn_covr = Maps::ScanAroundObject(index, MP2::OBJ_CRATER, false) ? GetCovr(world.GetTiles(index).GetGround()) : ICN::UNKNOWN;
+
+	if(icn_covr != ICN::UNKNOWN)
+	    board.SetCovrObjects(icn_covr);
+	else
+	    board.SetCobjObjects(index);
     }
 
 #ifdef WITH_NET
