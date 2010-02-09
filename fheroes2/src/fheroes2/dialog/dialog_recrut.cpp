@@ -66,7 +66,7 @@ u16 Dialog::RecruitMonster(const Monster & monster, u16 available)
 
     // text recruit monster
     str = _("Recruit %{name}");
-    String::Replace(str, "%{name}", monster.GetName());
+    String::Replace(str, "%{name}", monster.GetMultiName());
     text.Set(str, Font::BIG);
     dst_pt.x = pos.x + (pos.w - text.w()) / 2;
     dst_pt.y = pos.y + 25;

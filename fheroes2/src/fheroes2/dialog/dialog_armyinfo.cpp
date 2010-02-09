@@ -85,7 +85,7 @@ Dialog::answer_t Dialog::ArmyInfo(const Army::Troop & troop, u16 flags)
     }
 
     // name
-    text.Set(mons.GetName(), Font::BIG);
+    text.Set(troop.GetName(), Font::BIG);
     dst_pt.x = pos_rt.x + 140 - text.w() / 2;
     dst_pt.y = pos_rt.y + 40;
     text.Blit(dst_pt);
