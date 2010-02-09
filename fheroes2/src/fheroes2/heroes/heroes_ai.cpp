@@ -386,6 +386,8 @@ void AIToCastle(Heroes &hero, const u8 obj, const u16 dst_index)
             // wins attacker
             if(res.AttackerWins())
             {
+		castle->GetArmy().Clear();
+
                 world.GetKingdom(castle->GetColor()).RemoveCastle(castle);
                 world.GetKingdom(hero.GetColor()).AddCastle(castle);
                 world.CaptureObject(dst_index, hero.GetColor());

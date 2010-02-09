@@ -1578,15 +1578,9 @@ Army::army_t & Castle::GetArmy(void)
 void Castle::MergeArmies(void)
 {
     Heroes *hero = GetHeroes();
-    if(!hero)
-        return;
 
-    for(u8 idx = 0; idx < GetArmy().Size(); ++idx)
-    {
-        Army::Troop &troop = GetArmy().At(idx);
-        if(hero->GetArmy().JoinTroop(troop))
-            troop.SetCount(0);
-    }
+    if(hero)
+	hero->GetArmy().JoinStrongestFromArmy(army);
 }
 
 const Army::army_t & Castle::GetActualArmy(void) const

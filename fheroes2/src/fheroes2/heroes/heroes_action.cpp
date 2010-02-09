@@ -742,7 +742,7 @@ void ActionToCastle(Heroes &hero, const u8 obj, const u16 dst_index)
         DEBUG(DBG_GAME , DBG_INFO, "ActionToCastle: " << hero.GetName() << " attack enemy castle " << castle->GetName());
         
     	castle->MergeArmies();
-        Army::army_t army = castle->GetActualArmy();
+        Army::army_t & army = castle->GetActualArmy();
         
 #ifndef WITH_BATTLE1
 	if(army.isValid())
@@ -762,6 +762,8 @@ void ActionToCastle(Heroes &hero, const u8 obj, const u16 dst_index)
 	    // wins attacker
 	    if(res.AttackerWins())
 	    {
+		castle->GetArmy().Clear();
+
                 world.GetKingdom(castle->GetColor()).RemoveCastle(castle);
                 world.GetKingdom(hero.GetColor()).AddCastle(castle);
                 world.CaptureObject(dst_index, hero.GetColor());
