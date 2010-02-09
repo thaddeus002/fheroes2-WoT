@@ -158,6 +158,10 @@ bool Settings::Read(const std::string & filename)
 
     file.close();
 
+    // remove dublicate dir
+    list_maps_directory.sort();
+    list_maps_directory.unique();
+
 #ifndef WITH_TTF
     opt_global.ResetModes(USEUNICODE);
 #endif
