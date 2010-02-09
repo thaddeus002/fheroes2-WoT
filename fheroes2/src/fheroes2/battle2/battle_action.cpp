@@ -927,7 +927,13 @@ void Battle2::Arena::SpellActionMirrorImage(Stats & b)
     for(; it1 != it2; ++it1)
     {
     	const Cell* cell = GetCell(*it1);
-    	if(cell && cell->isPassable(b, true)) break;
+    	if(cell && cell->isPassable(b, true))
+	{
+	    if(b.isWide() && (b.position + 1 == *it1))
+		continue;
+	    else
+		break;
+	}
     }
 
     if(it1 != v.end())
