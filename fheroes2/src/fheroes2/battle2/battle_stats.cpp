@@ -769,7 +769,8 @@ u16 Battle2::Stats::Resurrect(u32 points, bool check_original)
     const u16 old = count;
 
     hp += points;
-    if(count * mhp > hp) count += 1;
+    count = hp / mhp;
+    if(count * mhp < hp) count += 1;
 
     if(check_original && count > troop.count)
     {
@@ -788,13 +789,13 @@ u32 Battle2::Stats::ApplyDamage(Stats & enemy, u32 dmg)
     {
 	case Monster::GHOST:
 	    // grow troop
-	    enemy.Resurrect(killed * enemy.GetMonster().GetHitPoints(), false);
+	    enemy.Resurrect(killed * GetMonster().GetHitPoints(), false);
 	    DEBUG(DBG_BATTLE, DBG_TRACE, "Battle2::Stats::ApplyDamage: " << enemy.GetName() << " capability");
 	    break;
 
 	case Monster::LORD_VAMPIRE:
 	    // restore hit points
-	    enemy.Resurrect(killed * enemy.GetMonster().GetHitPoints(), true);
+	    enemy.Resurrect(killed * GetMonster().GetHitPoints(), true);
 	    DEBUG(DBG_BATTLE, DBG_TRACE, "Battle2::Stats::ApplyDamage: " << enemy.GetName() << " capability");
 	    break;
 
