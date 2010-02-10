@@ -617,7 +617,7 @@ Battle2::Arena::Arena(Army::army_t & a1, Army::army_t & a2, u16 index, bool loca
     }
 
     castle = world.GetCastle(index);
-    if(castle && !castle->isCastle()) castle = NULL;
+    if(castle && (castle->GetIndex() != index || !castle->isCastle())) castle = NULL;
     towers[0] = NULL;
     towers[1] = NULL;
     towers[2] = NULL;
