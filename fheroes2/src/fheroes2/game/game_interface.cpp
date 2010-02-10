@@ -159,15 +159,9 @@ void Interface::Basic::RedrawSystemInfo(s16 cx, s16 cy)
     // strtime format: Www Mmm dd hh:mm:ss yyyy
     const char* strtime = std::ctime(&rawtime);
 
-    // get time only
-    u8 space = 0;
-    while(strtime && *strtime && space < 3){ if(std::isspace(*strtime)) ++space; ++strtime; }
-
-    space = 0;
-    while(strtime && *(strtime + space) && !std::isspace(*(strtime + space))) ++space;
-
     // draw info
-    os << std::string(strtime, space);
+    os << std::string(&strtime[11], 8);
+
     system_info.Set(os.str());
     system_info.Blit(cx, cy);
 }
