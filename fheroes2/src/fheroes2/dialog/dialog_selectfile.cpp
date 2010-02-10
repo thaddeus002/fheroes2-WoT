@@ -60,7 +60,7 @@ bool Dialog::SelectFileSave(std::string & file)
     int ii = 0;
     for(Dir::const_iterator itd = dir.begin(); itd != dir.end(); ++itd, ++ii) if(!lists[ii].ReadSAV(*itd)) --ii;
     if(static_cast<size_t>(ii) != lists.size()) lists.resize(ii);
-    std::sort(lists.begin(), lists.end(), Maps::FileInfo::PredicateForSorting);
+    std::sort(lists.begin(), lists.end());
 
     return SelectFileListSimple(_("File to Save:"), lists, file, true);
 }
@@ -76,7 +76,7 @@ bool Dialog::SelectFileLoad(std::string & file)
     int ii = 0;
     for(Dir::const_iterator itd = dir.begin(); itd != dir.end(); ++itd, ++ii) if(!lists[ii].ReadSAV(*itd)) --ii;
     if(static_cast<size_t>(ii) != lists.size()) lists.resize(ii);
-    std::sort(lists.begin(), lists.end(), Maps::FileInfo::PredicateForSorting);
+    std::sort(lists.begin(), lists.end());
 
     return SelectFileListSimple(_("File to Load:"), lists, file, false);
 }

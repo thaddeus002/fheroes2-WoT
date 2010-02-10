@@ -38,6 +38,9 @@ namespace Maps
     bool ReadMP2(const std::string &);
     bool ReadSAV(const std::string &);
 
+    bool operator<  (const FileInfo &) const;
+    bool operator== (const FileInfo &) const;
+
     u8 AllowColorsCount(void) const;
     u8 KingdomColorsCount(void) const;
     u8 KingdomRace(u8) const;
@@ -53,8 +56,6 @@ namespace Maps
     u32 WinsMapsIndexObject(void) const;
     u32 LossMapsIndexObject(void) const;
     u16 LossCountDays(void) const;
-
-    static bool PredicateForSorting(const FileInfo &, const FileInfo &);
 
     std::string file;
     std::string name;

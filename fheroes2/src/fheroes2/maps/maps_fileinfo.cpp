@@ -288,11 +288,14 @@ bool Maps::FileInfo::ReadMP2(const std::string & filename)
     return true;
 }
 
-bool Maps::FileInfo::PredicateForSorting(const FileInfo & fi1, const FileInfo & fi2)
+bool Maps::FileInfo::operator< (const FileInfo & second) const
 {
-    if(fi1.name.empty() || fi2.name.empty()) return false;
+    return std::tolower(name[0]) < std::tolower(second.name[0]);
+}
 
-    return std::tolower(fi1.name[0]) < std::tolower(fi2.name[0]);
+bool Maps::FileInfo::operator== (const FileInfo & second) const
+{
+    return name == second.name;
 }
 
 u8 Maps::FileInfo::AllowColorsCount(void) const
@@ -432,7 +435,9 @@ bool PrepareMapsFileInfoList(MapsFileInfoList & lists)
     else --ii;
     if(static_cast<size_t>(ii) != lists.size()) lists.resize(ii);
 
-    std::sort(lists.begin(), lists.end(), Maps::FileInfo::PredicateForSorting);
+    std::sort(lists.begin(), lists.end());
+    MapsFileInfoList::const_iterator itm = std::unique(lists.begin(), lists.end());
+    lists.resize(itm - lists.begin());
 
     return true;
 }
