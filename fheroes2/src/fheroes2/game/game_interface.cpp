@@ -161,7 +161,7 @@ void Interface::Basic::RedrawSystemInfo(s16 cx, s16 cy)
 
     // get time only
     u8 space = 0;
-    while(strtime && *strtime && space < 4){ if(std::isspace(*strtime)) ++space; ++strtime; }
+    while(strtime && *strtime && space < 3){ if(std::isspace(*strtime)) ++space; ++strtime; }
 
     space = 0;
     while(strtime && *(strtime + space) && !std::isspace(*(strtime + space))) ++space;
