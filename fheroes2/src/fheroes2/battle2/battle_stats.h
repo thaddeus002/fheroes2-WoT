@@ -180,6 +180,8 @@ namespace Battle2
 	s32	     GetCellQuality(void) const;
 	const Rect & GetCellPosition(void) const;
 
+	u32	HowMuchWillKilled(u32) const;
+
 	void	SetResponse(void);
 	void	ResetAnimFrame(u8);
 	void	UpdateDirection(void);

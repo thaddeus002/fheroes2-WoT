@@ -676,6 +676,26 @@ u32 Battle2::Stats::GetDamage(const Stats & enemy) const
     return dmg < 1 ? 1 : dmg;
 }
 
+u32 Battle2::Stats::HowMuchWillKilled(u32 dmg) const
+{
+    const u16 mhp = GetMonster().GetHitPoints();
+    u32 killed = 0;
+
+    if(dmg >= hp)
+	killed = count;
+    else
+    if(dmg >= mhp)
+    {
+	killed = dmg / mhp;
+	if(dmg - killed * mhp >= hp - (count - 1) * mhp) killed += 1;
+    }
+    else
+    if(dmg >= hp - (count - 1) * mhp)
+	killed = 1;
+
+    return killed;
+}
+
 u32 Battle2::Stats::ApplyDamage(u32 dmg)
 {
     // clean paralize magic
@@ -688,20 +708,7 @@ u32 Battle2::Stats::ApplyDamage(u32 dmg)
 
     if(dmg && count)
     {
-	u32 killed = 0;
-	const u16 mhp = GetMonster().GetHitPoints();
-
-	if(dmg >= hp)
-	    killed = count;
-	else
-	if(dmg >= mhp)
-	{
-	    killed = dmg / mhp;
-	    if(dmg - killed * mhp >= hp - (count - 1) * mhp) killed += 1;
-	}
-	else
-	if(dmg >= hp - (count - 1) * mhp)
-	    killed = 1;
+	u32 killed = HowMuchWillKilled(dmg);
 
 	// kill mirror image (slave)
 	if(Modes(CAP_MIRRORIMAGE) && owner)
@@ -789,7 +796,7 @@ u32 Battle2::Stats::ApplyDamage(Stats & enemy, u32 dmg)
     {
 	case Monster::GHOST:
 	    // grow troop
-	    enemy.Resurrect(killed * GetMonster().GetHitPoints(), false);
+	    enemy.Resurrect(killed * enemy.GetMonster().GetHitPoints(), false);
 	    DEBUG(DBG_BATTLE, DBG_TRACE, "Battle2::Stats::ApplyDamage: " << enemy.GetName() << " capability");
 	    break;
 
@@ -907,18 +914,6 @@ void Battle2::Stats::Dump(void) const
 			    ", pos: " << position << ", reflect: " << (reflect ? "true" : "false") << ", count: " << count << ", cell quality: " << GetCellQuality() << ")");
 }
 
-s32 Battle2::Stats::GetExtraQuality(s32 quality) const
-{
-    s32 res = 0;
-
-    if(Modes(TR_RESPONSED)) res += quality / 2;
-    if(Modes(LUCK_BAD)) res += quality / 2;
-    if(Modes(LUCK_GOOD)) res -= quality / 2;
-    if(Modes(CAP_MIRRORIMAGE)) res += quality;
-
-    return res;
-}
-
 bool Battle2::Stats::AllowResponse(void) const
 {
     return (isAlwayResponse() || (!Modes(TR_RESPONSED) && !Modes(SP_PARALYZE) && !Modes(SP_STONE)));
@@ -1025,8 +1020,14 @@ u16 Battle2::Stats::GetScoreQuality(const Stats & enemy) const
     if(isHideAttack()) res += res * 4 / 10;
     if(isAlwayResponse()) res -= res * 4 / 10;
 
+    // attacker
     switch(enemy.GetMonster().GetID())
     {
+	case Monster::GHOST:
+	    // priority: from killed only
+	    res = 1;
+	    break;
+
 	case Monster::LORD_VAMPIRE:
 	    if(enemy.isHaveDamage())
 	    {
@@ -1038,7 +1039,19 @@ u16 Battle2::Stats::GetScoreQuality(const Stats & enemy) const
 	default: break;
     }
 
-    return res ? res * count : 1;
+    return res ? res : 1;
+}
+
+s32 Battle2::Stats::GetExtraQuality(s32 quality) const
+{
+    s32 res = 0;
+
+    if(Modes(TR_RESPONSED)) res += quality / 2;
+    if(Modes(LUCK_BAD)) res += quality / 2;
+    if(Modes(LUCK_GOOD)) res -= quality / 2;
+    if(Modes(CAP_MIRRORIMAGE)) res += quality;
+
+    return res;
 }
 
 u32 Battle2::Stats::GetHitPoints(void) const
