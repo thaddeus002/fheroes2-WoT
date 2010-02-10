@@ -175,9 +175,9 @@ Game::menu_t Game::ScenarioInfo(void)
 		RedrawRatingInfo(rating);
 		levelCursor.Move(pointDifficultyNormal);
 		levelCursor.Show();
-		cursor.Show();
-		display.Flip();
 	    }
+	    cursor.Show();
+	    display.Flip();
 	}
 	else
 	// click cancel
