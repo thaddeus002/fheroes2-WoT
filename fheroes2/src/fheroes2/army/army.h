@@ -141,6 +141,7 @@ namespace Army
 
 	    const HeroBase* GetCommander(void) const;
 	    HeroBase* GetCommander(void);
+	    void        SetCommander(HeroBase*);
 
 	    void        SetCombatFormat(format_t);
 	    u8          GetCombatFormat(void) const;

@@ -722,7 +722,7 @@ void Battle2::Interface::RedrawOpponentsFlags(void) const
     	    case Color::YELLOW:     icn = ICN::HEROFL03; break;
     	    case Color::ORANGE:     icn = ICN::HEROFL04; break;
     	    case Color::PURPLE:     icn = ICN::HEROFL05; break;
-    	    default: return;
+    	    default:                icn = ICN::HEROFL06; break;
 	}
 
 	const Sprite & flag = AGG::GetICN(icn, ICN::AnimationFrame(icn, 0, animation_frame), false);
@@ -741,7 +741,7 @@ void Battle2::Interface::RedrawOpponentsFlags(void) const
     	    case Color::YELLOW:     icn = ICN::HEROFL03; break;
     	    case Color::ORANGE:     icn = ICN::HEROFL04; break;
     	    case Color::PURPLE:     icn = ICN::HEROFL05; break;
-    	    default: return;
+    	    default:                icn = ICN::HEROFL06; break;
 	}
 
 	const Sprite & flag = AGG::GetICN(icn, ICN::AnimationFrame(icn, 0, animation_frame), true);

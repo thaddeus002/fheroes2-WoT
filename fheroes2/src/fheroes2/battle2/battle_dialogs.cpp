@@ -321,7 +321,9 @@ u8 Battle2::Arena::DialogBattleHero(const HeroBase & hero) const
 
     display.Blit(dialog, pos_rt.x, pos_rt.y);
     display.Blit(Portrait::Get(hero, Portrait::BIG), pos_rt.x + 27, pos_rt.y + 42);
-    display.Blit(AGG::GetICN(ICN::VIEWGEN, Color::GetIndex(hero.GetColor()) + 1), pos_rt.x + 148, pos_rt.y + 36);
+
+    u8 col = (Color::GRAY == hero.GetColor() ? 1 : Color::GetIndex(hero.GetColor()) + 1);
+    display.Blit(AGG::GetICN(ICN::VIEWGEN, col), pos_rt.x + 148, pos_rt.y + 36);
 
     Point tp(pos_rt);
 

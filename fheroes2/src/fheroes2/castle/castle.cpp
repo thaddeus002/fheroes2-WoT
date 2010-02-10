@@ -38,7 +38,7 @@ Castle::Castle() : captain(*this), mageguild(race), army(&captain), castle_heroe
 
 Castle::Castle(s16 cx, s16 cy, const Race::race_t rc) : mp(cx, cy), race(rc), captain(*this),
     color(Color::GRAY), building(0), mageguild(race),
-    army(&captain), castle_heroes(NULL)
+    army(NULL), castle_heroes(NULL)
 {
     std::fill(dwelling, dwelling + CASTLEMAXMONSTER, 0);
     SetModes(ALLOWBUILD);
@@ -216,13 +216,22 @@ void Castle::LoadFromMP2(const void *ptr)
     // unknown 29 byte
     //
 
+    if(building & BUILD_CAPTAIN) army.SetCommander(&captain);
 
     // troops auto pack
     if(!custom_troops)
     {
 	const Monster mon1(race, Castle::DWELLING_MONSTER1);
 	const Monster mon2(race, Castle::DWELLING_MONSTER2);
+	const Monster mon3(race, Castle::DWELLING_MONSTER3);
 
+	if(Game::AI == GetControl())
+	{
+    	    army.At(0).Set(mon1, mon1.GetRNDSize(false) * 2);
+    	    army.At(1).Set(mon2, mon2.GetRNDSize(false));
+    	    army.At(2).Set(mon3, mon3.GetRNDSize(false) * 2 / 3);
+	}
+	else
 	switch(Settings::Get().GameDifficulty())
 	{
     	    case Difficulty::EASY:
@@ -1005,6 +1014,10 @@ bool Castle::BuyBuilding(u32 build)
         	captain.GetSpellBook().Appends(mageguild, captain.GetLevelSkill(Skill::Secondary::WISDOM));
 
 		if(castle_heroes) castle_heroes->AppendSpellsToBook(mageguild);
+		break;
+
+	    case BUILD_CAPTAIN:
+		army.SetCommander(&captain);
 		break;
 
             // build library

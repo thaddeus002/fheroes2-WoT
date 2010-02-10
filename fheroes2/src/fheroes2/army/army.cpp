@@ -1079,6 +1079,11 @@ bool Army::army_t::StrongerEnemyArmy(const army_t & a)
     return true;
 }
 
+void Army::army_t::SetCommander(HeroBase* c)
+{
+    commander = c;
+}
+
 HeroBase* Army::army_t::GetCommander(void)
 {
     return commander;
