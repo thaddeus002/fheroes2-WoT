@@ -290,7 +290,7 @@ bool Maps::FileInfo::ReadMP2(const std::string & filename)
 
 bool Maps::FileInfo::operator< (const FileInfo & second) const
 {
-    return std::tolower(name[0]) < std::tolower(second.name[0]);
+    return name < second.name;
 }
 
 bool Maps::FileInfo::operator== (const FileInfo & second) const
@@ -423,21 +423,19 @@ bool PrepareMapsFileInfoList(MapsFileInfoList & lists)
 
     if(dir.empty()) return false;
 
-    lists.resize(dir.size());
-    MapsFileInfoList::const_iterator res;
-    int ii = 0;
+    dir.sort();
+    dir.unique();
 
-    for(Dir::const_iterator itd = dir.begin(); itd != dir.end(); ++itd, ++ii)
-    if(lists[ii].ReadMP2(*itd))
+    lists.reserve(dir.size());
+
+    for(Dir::const_iterator itd = dir.begin(); itd != dir.end(); ++itd)
     {
-        if(conf.PreferablyCountPlayers() > lists[ii].AllowColorsCount()) --ii;
+	Maps::FileInfo fi;
+	if(fi.ReadMP2(*itd)) lists.push_back(fi);
     }
-    else --ii;
-    if(static_cast<size_t>(ii) != lists.size()) lists.resize(ii);
 
     std::sort(lists.begin(), lists.end());
-    MapsFileInfoList::const_iterator itm = std::unique(lists.begin(), lists.end());
-    lists.resize(itm - lists.begin());
+    lists.resize(std::unique(lists.begin(), lists.end()) - lists.begin());
 
     return true;
 }
