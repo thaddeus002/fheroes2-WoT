@@ -1178,7 +1178,7 @@ void ActionToPoorLuckObject(Heroes &hero, const u8 obj, const u16 dst_index)
     	    if(battle)
     	    {
 		PlaySoundWarning;
-		if(Dialog::YES == Dialog::Message("", _("You come upon the pyramid of a great and ancient king.\nYou are tempted to search it for treasure, but all the old stories warn of fearful curses and undead guardians.\nWill you search?"), Font::BIG, Dialog::OK))
+		if(Dialog::YES == Dialog::Message("", _("You come upon the pyramid of a great and ancient king.\nYou are tempted to search it for treasure, but all the old stories warn of fearful curses and undead guardians.\nWill you search?"), Font::BIG, Dialog::YES|Dialog::NO))
 		{
 		    // battle
 		    Army::army_t army;
