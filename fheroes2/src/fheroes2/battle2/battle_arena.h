@@ -172,7 +172,7 @@ namespace Battle2
 
 	void ResetBoard(void);
 	void ScanPassabilityBoard(const Stats &, bool skip_speed = false);
-	u16 GetShortDistance(u16, const std::vector<u16> &);
+	static u16 GetShortDistance(u16, const std::vector<u16> &);
 	void GetPassableQualityPositions(const Stats &, std::vector<u16> &);
 	u16 GetFreePositionNearHero(u8) const;
 

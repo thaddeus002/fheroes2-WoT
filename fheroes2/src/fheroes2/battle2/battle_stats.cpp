@@ -1960,3 +1960,30 @@ HeroBase* Battle2::Stats::GetCommander(void)
 {
     return troop.GetArmy() ? troop.GetArmy()->GetCommander() : NULL;
 }
+
+u16 Battle2::Stats::AIGetAttackPosition(const std::vector<u16> & positions) const
+{
+    u16 res = 0;
+
+    switch(GetMonster().GetID())
+    {
+	case Monster::HYDRA:
+	{
+	    u16 largest = MAXU16;
+	    std::vector<u16>::const_iterator it1 = positions.begin();
+	    std::vector<u16>::const_iterator it2 = positions.end();
+	    for(; it1 != it2; ++it1)
+		if(largest == MAXU16 ||
+		   arena->GetCell(largest)->quality < arena->GetCell(*it1)->quality) largest = *it1;
+
+	    res = largest != MAXU16 ? largest : Arena::GetShortDistance(position, positions);
+	}
+	    break;
+
+	default:
+	    res = Arena::GetShortDistance(position, positions);
+	    break;
+    }
+
+    return res;
+}

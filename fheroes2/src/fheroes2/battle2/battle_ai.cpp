@@ -79,7 +79,7 @@ void Battle2::Arena::AITurn(const Stats & b, Actions & a)
 
 	if(positions.size())
 	{
-	    const u16 move = GetShortDistance(b.position, positions);
+	    const u16 move = b.AIGetAttackPosition(positions);
 
 	    if(b.isFly())
 	    {

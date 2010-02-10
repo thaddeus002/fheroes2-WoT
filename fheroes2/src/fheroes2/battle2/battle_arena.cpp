@@ -1141,13 +1141,13 @@ Battle2::Stats* Battle2::Arena::GetEnemyAbroadMaxQuality(const Stats & b)
 
 const Battle2::Stats* Battle2::Arena::GetEnemyMaxQuality(u8 my_color) const
 {
-    const Battle2::Stats* res = NULL;
+    const Stats* res = NULL;
     s32 quality = 0;
     Board::const_iterator it1 = board.begin();
     Board::const_iterator it2 = board.end();
     for(; it1 != it2; ++it1)
     {
-	const Battle2::Stats* enemy = GetTroopBoard((*it1).index);
+	const Stats* enemy = GetTroopBoard((*it1).index);
         if(enemy && enemy->isWide() && enemy->GetTailIndex() == (*it1).index) continue;
         if(enemy && enemy->GetColor() != my_color && quality < (*it1).quality)
         {
@@ -1160,13 +1160,13 @@ const Battle2::Stats* Battle2::Arena::GetEnemyMaxQuality(u8 my_color) const
 
 Battle2::Stats* Battle2::Arena::GetEnemyMaxQuality(u8 my_color)
 {
-    Battle2::Stats* res = NULL;
+    Stats* res = NULL;
     s32 quality = 0;
     Board::iterator it1 = board.begin();
     Board::iterator it2 = board.end();
     for(; it1 != it2; ++it1)
     {
-	Battle2::Stats* enemy = GetTroopBoard((*it1).index);
+	Stats* enemy = GetTroopBoard((*it1).index);
         if(enemy && enemy->isWide() && enemy->GetTailIndex() == (*it1).index) continue;
         if(enemy && enemy->GetColor() != my_color && quality < (*it1).quality)
         {
