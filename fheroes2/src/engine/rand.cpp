@@ -29,7 +29,7 @@
 
 void Rand::Init(void){ std::srand((u32) std::time(0)); }
 
-u32 Rand::Get(u32 min, u32 max){ return max ? min + (std::rand() % (max - min + 1)) : std::rand() % (min + 1); }
+u32 Rand::Get(u32 min, u32 max){ return max ? min + Get(max - min) : static_cast<u32>((min + 1) * (std::rand() / (RAND_MAX + 1.0))); }
 
 Rand::Queue::Queue(u32 size)
 {
