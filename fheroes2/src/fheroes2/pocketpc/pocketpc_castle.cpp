@@ -191,19 +191,20 @@ screen_t CastleOpenDialog1(Castle & castle)
     display.Blit(AGG::GetICN(ICN::TOWNWIND, 12), rectExit.x, rectExit.y);
 
     const Rect rectScreen1(dst_rt.x + dst_rt.w - 27, dst_rt.y + 32, 25, 25);
+    const Rect rectScreen2(dst_rt.x + dst_rt.w - 27, dst_rt.y + 58, 25, 25);
+    const Rect rectScreen3(dst_rt.x + dst_rt.w - 27, dst_rt.y + 83, 25, 25);
+    const Rect rectScreen4(dst_rt.x + dst_rt.w - 27, dst_rt.y + 108, 25, 25);
+    const Rect rectScreen5(dst_rt.x + dst_rt.w - 27, dst_rt.y + 133, 25, 25);
+
     display.Blit(AGG::GetICN(ICN::REQUESTS, 20), rectScreen1.x, rectScreen1.y);
 
-    const Rect rectScreen2(dst_rt.x + dst_rt.w - 27, dst_rt.y + 58, 25, 25);
-    display.Blit(AGG::GetICN(ICN::REQUESTS, 21), rectScreen2.x, rectScreen2.y);
-
-    const Rect rectScreen3(dst_rt.x + dst_rt.w - 27, dst_rt.y + 83, 25, 25);
-    display.Blit(AGG::GetICN(ICN::REQUESTS, 22), rectScreen3.x, rectScreen3.y);
-
-    const Rect rectScreen4(dst_rt.x + dst_rt.w - 27, dst_rt.y + 108, 25, 25);
-    display.Blit(AGG::GetICN(ICN::REQUESTS, 23), rectScreen4.x, rectScreen4.y);
-
-    const Rect rectScreen5(dst_rt.x + dst_rt.w - 27, dst_rt.y + 133, 25, 25);
-    display.Blit(AGG::GetICN(ICN::REQUESTS, 24), rectScreen5.x, rectScreen5.y);
+    if(castle.isBuild(Castle::BUILD_CASTLE))
+    {
+	display.Blit(AGG::GetICN(ICN::REQUESTS, 21), rectScreen2.x, rectScreen2.y);
+	display.Blit(AGG::GetICN(ICN::REQUESTS, 22), rectScreen3.x, rectScreen3.y);
+	display.Blit(AGG::GetICN(ICN::REQUESTS, 23), rectScreen4.x, rectScreen4.y);
+	display.Blit(AGG::GetICN(ICN::REQUESTS, 24), rectScreen5.x, rectScreen5.y);
+    }
 
     Button buttonPrev(dst_rt.x + 64, dst_rt.y + 5, ICN::TRADPOST, 3, 4);
     Button buttonNext(dst_rt.x + 245, dst_rt.y + 5, ICN::TRADPOST, 5, 6);
@@ -227,13 +228,13 @@ screen_t CastleOpenDialog1(Castle & castle)
 
         //if(le.MouseClickLeft(rectScreen1)) return SCREEN1;
         //else
-        if(le.MouseClickLeft(rectScreen2)) return SCREEN2;
+        if(castle.isBuild(Castle::BUILD_CASTLE) && le.MouseClickLeft(rectScreen2)) return SCREEN2;
         else
-        if(le.MouseClickLeft(rectScreen3)) return SCREEN3;
+        if(castle.isBuild(Castle::BUILD_CASTLE) && le.MouseClickLeft(rectScreen3)) return SCREEN3;
         else
-        if(le.MouseClickLeft(rectScreen4)) return SCREEN4;
+        if(castle.isBuild(Castle::BUILD_CASTLE) && le.MouseClickLeft(rectScreen4)) return SCREEN4;
         else
-        if(le.MouseClickLeft(rectScreen5)) return SCREEN5;
+        if(castle.isBuild(Castle::BUILD_CASTLE) && le.MouseClickLeft(rectScreen5)) return SCREEN5;
         else
         // exit
         if(le.MouseClickLeft(rectExit) || le.KeyPress(KEY_ESCAPE)) break;

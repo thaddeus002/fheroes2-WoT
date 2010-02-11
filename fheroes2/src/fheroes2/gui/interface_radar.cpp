@@ -355,17 +355,20 @@ void Interface::Radar::QueueEventProcessing(void)
     // move cursor
     if(le.MouseCursor(*this))
     {
-	if(le.MouseClickLeft(*this) || le.MousePressLeft(*this))
+	if(le.MouseClickLeft() || le.MousePressLeft())
 	{
     	    const Point prev(gamearea.GetRectMaps());
     	    const Point & pt = le.GetMouseCursor();
-	    gamearea.Center((pt.x - x) * world.w() / w, (pt.y - y) * world.h() / h);
-    	    if(prev != gamearea.GetRectMaps())
-    	    {
-		Cursor::Get().Hide();
-        	RedrawCursor();
-        	Interface::Basic::Get().SetRedraw(REDRAW_GAMEAREA);
-    	    }
+	    if(*this & pt)
+	    {
+		gamearea.Center((pt.x - x) * world.w() / w, (pt.y - y) * world.h() / h);
+    		if(prev != gamearea.GetRectMaps())
+    		{
+		    Cursor::Get().Hide();
+        	    RedrawCursor();
+        	    Interface::Basic::Get().SetRedraw(REDRAW_GAMEAREA);
+    		}
+	    }
 	}
 	else
 	if(!conf.TapMode() && le.MousePressRight(*this)) Dialog::Message(_("World Map"), _("A miniature view of the known world. Left click to move viewing area."), Font::BIG);
