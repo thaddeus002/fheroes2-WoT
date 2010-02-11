@@ -2202,7 +2202,7 @@ void Battle2::Interface::RedrawActionFly(Stats & b, u16 dst)
     Point pt2(pos2.x, pos2.y);
 
     cursor.SetThemes(Cursor::WAR_NONE);
-    const u8 step = b.isWide() ? 80 : 30;
+    const u8 step = b.isWide() ? 80 : 40;
     GetLinePoints(pt1, pt2, Settings::Get().PocketPC() ? step / 2 : step, points);
 
     pnt = points.begin();
