@@ -134,7 +134,7 @@ namespace Maps
 	void RedrawTop(void) const;
 	void RedrawTop(Surface &, const Interface::GameArea &) const;
 	void RedrawTop(Surface &, s16, s16, const Interface::GameArea &, const TilesAddon* skip = NULL) const;
-	void RedrawTop4Hero(Surface &, const Interface::GameArea &) const;
+	void RedrawTop4Hero(Surface &, const Interface::GameArea &, bool skip_ground) const;
 	void RedrawObjects(void) const;
 	void RedrawObjects(Surface &, s16, s16, const Interface::GameArea &) const;
 

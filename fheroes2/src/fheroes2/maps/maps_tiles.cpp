@@ -536,7 +536,7 @@ void Maps::Tiles::RedrawTop(Surface & dst, s16 dstx, s16 dsty, const Interface::
     }
 }
 
-void Maps::Tiles::RedrawTop4Hero(Surface & dst, const Interface::GameArea & area) const
+void Maps::Tiles::RedrawTop4Hero(Surface & dst, const Interface::GameArea & area, bool skip_ground) const
 {
     const Point mp(maps_index % world.w(), maps_index / world.w());
 
@@ -552,7 +552,7 @@ void Maps::Tiles::RedrawTop4Hero(Surface & dst, const Interface::GameArea & area
 
 	for(; it1 != it2; ++it1)
 	{
-	    if(MP2::isGroundObject((*it1).object)) continue;
+	    if(skip_ground && MP2::isGroundObject((*it1).object)) continue;
 
 	    const u8 & object = (*it1).object;
 	    const u8 & index  = (*it1).index;
@@ -560,6 +560,9 @@ void Maps::Tiles::RedrawTop4Hero(Surface & dst, const Interface::GameArea & area
 
 	    if(ICN::UNKNOWN != icn)
 	    {
+		const Sprite & sprite = AGG::GetICN(icn, index);
+		dst.Blit(sprite, dstx + sprite.x(), dsty + sprite.y());
+
 		// possible anime
 		if(const u16 anime_index = ICN::AnimationFrame(icn, index, Maps::AnimationTicket()))
 		{
