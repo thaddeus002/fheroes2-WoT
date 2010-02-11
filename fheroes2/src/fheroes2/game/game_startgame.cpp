@@ -783,15 +783,18 @@ Game::menu_t Game::HumanTurn(void)
     cursor.Show();
     display.Flip();
 
-    // new week dialog
-    if(1 < world.CountWeek() && world.BeginWeek())
-	NewWeekDialog();
+    if(!conf.LoadedGameVersion())
+    {
+	// new week dialog
+	if(1 < world.CountWeek() && world.BeginWeek())
+	    NewWeekDialog();
 
-    // show event day
-    ShowEventDay();
+	// show event day
+	 ShowEventDay();
 
-    // check game over
-    gameResult.CheckGameOver(res);
+	// check game over
+	gameResult.CheckGameOver(res);
+    }
 
     // warning lost all town
     if(myCastles.empty()) ShowWarningLostTowns(res);
