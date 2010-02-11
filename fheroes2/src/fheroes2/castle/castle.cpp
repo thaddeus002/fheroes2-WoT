@@ -221,33 +221,10 @@ void Castle::LoadFromMP2(const void *ptr)
     // troops auto pack
     if(!custom_troops)
     {
-	const Monster mon1(race, Castle::DWELLING_MONSTER1);
-	const Monster mon2(race, Castle::DWELLING_MONSTER2);
-	const Monster mon3(race, Castle::DWELLING_MONSTER3);
-
 	if(Game::AI == GetControl())
-	{
-    	    army.At(0).Set(mon1, mon1.GetRNDSize(false) * 2);
-    	    army.At(1).Set(mon2, mon2.GetRNDSize(false));
-    	    army.At(2).Set(mon3, mon3.GetRNDSize(false) * 2 / 3);
-	}
+	    AIJoinRNDArmy();
 	else
-	switch(Settings::Get().GameDifficulty())
-	{
-    	    case Difficulty::EASY:
-        	army.At(0).Set(mon1, mon1.GetGrown() * 2);
-        	army.At(1).Set(mon2, mon2.GetGrown() * 2);
-        	break;
-
-    	    case Difficulty::NORMAL:
-        	army.At(0).Set(mon1, mon1.GetGrown());
-        	break;
-
-    	    case Difficulty::HARD:
-    	    case Difficulty::EXPERT:
-    	    case Difficulty::IMPOSSIBLE:
-        	break;
-	}
+	    SetStartArmy();
     }
     // dwelling pack
     if(building & DWELLING_MONSTER1) dwelling[0]  = Monster(race, DWELLING_MONSTER1).GetGrown();
@@ -290,6 +267,29 @@ void Castle::LoadFromMP2(const void *ptr)
 
     // end
     DEBUG(DBG_GAME , DBG_INFO, "Castle::LoadFromMP2: " << (building & BUILD_CASTLE ? "castle" : "town") << ": " << name << ", color: " << Color::String(color) << ", race: " << Race::String(race));
+}
+
+void Castle::SetStartArmy(void)
+{
+    const Monster mon1(race, Castle::DWELLING_MONSTER1);
+    const Monster mon2(race, Castle::DWELLING_MONSTER2);
+    const Monster mon3(race, Castle::DWELLING_MONSTER3);
+
+    army.Clear();
+
+    switch(Settings::Get().GameDifficulty())
+    {
+    	case Difficulty::EASY:
+    	    army.At(0).Set(mon1, mon1.GetRNDSize(false) * 2);
+    	    army.At(1).Set(mon2, mon2.GetRNDSize(false));
+    	    break;
+
+    	case Difficulty::NORMAL:
+    	    army.At(0).Set(mon1, mon1.GetRNDSize(false));
+    	    break;
+
+	default: break;
+    }
 }
 
 u32 Castle::CountBuildings(void) const

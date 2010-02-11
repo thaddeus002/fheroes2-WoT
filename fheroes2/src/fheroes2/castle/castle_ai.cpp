@@ -25,6 +25,37 @@
 #include "heroes.h"
 #include "castle.h"
 
+void Castle::AIJoinRNDArmy(void)
+{
+    const Monster mon1(race, Castle::DWELLING_MONSTER1);
+    const Monster mon2(race, Castle::DWELLING_MONSTER2);
+    const Monster mon3(race, Castle::DWELLING_MONSTER3);
+
+    switch(Rand::Get(1, 4))
+    {
+        case 1:
+            army.JoinTroop(mon1, mon1.GetRNDSize(false) * 3);
+            army.JoinTroop(mon2, mon2.GetRNDSize(false));
+            break;
+
+        case 2:
+            army.JoinTroop(mon1, mon1.GetRNDSize(false) * 2);
+            army.JoinTroop(mon2, mon2.GetRNDSize(false) * 2);
+            break;
+
+        case 3:
+            army.JoinTroop(mon1, mon1.GetRNDSize(false) * 2);
+            army.JoinTroop(mon2, mon2.GetRNDSize(false));
+            army.JoinTroop(mon3, mon3.GetRNDSize(false) * 2 / 3);
+            break;
+
+	default:
+	    army.JoinTroop(mon1, mon1.GetRNDSize(false));
+            army.JoinTroop(mon3, mon3.GetRNDSize(false));
+            break;
+    }
+}
+
 void Castle::AIDefence(void)
 {
     if(isCastle())

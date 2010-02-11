@@ -172,6 +172,7 @@ public:
 
     void AIDefence(void);
     void AIDevelopment(void);
+    void AIJoinRNDArmy(void);
 
     Dialog::answer_t DialogBuyHero(const Heroes*);
     Dialog::answer_t DialogBuyCaptain(bool fixed = true) const;
@@ -191,6 +192,7 @@ private:
     void RedrawNameTown(const Point & src_pt);
     void WellRedrawInfoArea(const Point & cur_pt);
     void RedrawAnimationBuilding(const Point & dst_pt, u32 build);
+    void SetStartArmy(void);
 
 private:
     friend class Game::IO;

@@ -1153,6 +1153,10 @@ void World::NewWeek(void)
     // update week type
     week_name = BeginMonth() ? Week::MonthRand() : Week::WeekRand();
 
+    // added army for gray castle
+    std::vector<Castle *>::const_iterator itc = vec_castles.begin();
+    for(; itc != vec_castles.end(); ++itc) if(*itc && Color::GRAY == (*itc)->GetColor()) (*itc)->AIJoinRNDArmy();
+
     // TODO:: action for week type: PLAGUE and MONSTERS
 }
 
