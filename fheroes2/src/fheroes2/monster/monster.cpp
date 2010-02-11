@@ -309,9 +309,9 @@ u16 Monster::GetRNDSize(bool skip_factor) const
 	{
 	    case Difficulty::EASY:      factor = 80; break;
 	    case Difficulty::NORMAL:    factor = 100; break;
-	    case Difficulty::HARD:      factor = 140; break;
-	    case Difficulty::EXPERT:    factor = 180; break;
-	    case Difficulty::IMPOSSIBLE:factor = 220; break;
+	    case Difficulty::HARD:      factor = 130; break;
+	    case Difficulty::EXPERT:    factor = 160; break;
+	    case Difficulty::IMPOSSIBLE:factor = 190; break;
 	    default: break;
 	}
 
