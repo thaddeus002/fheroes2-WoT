@@ -198,7 +198,7 @@ bool Battle2::isApplySpell(const Spell::spell_t spell, const Stats & b, const He
         case Spell::HASTE:	if(isApplySpell(Spell::MASSHASTE, b, hero, a)) return true; break;
         case Spell::SLOW:	if(isApplySpell(Spell::MASSSLOW, b, hero, a)) return true; break;
         case Spell::BLESS:	if(isApplySpell(Spell::MASSBLESS, b, hero, a)) return true; break;
-        case Spell::CURSE:	if(isApplySpell(Spell::MASSCURE, b, hero, a)) return true; break;
+        case Spell::CURSE:	if(isApplySpell(Spell::MASSCURSE, b, hero, a)) return true; break;
         case Spell::DISPEL:	if(isApplySpell(Spell::MASSDISPEL, b, hero, a)) return true; break;
         case Spell::SHIELD:	if(isApplySpell(Spell::MASSSHIELD, b, hero, a)) return true; break;
 
