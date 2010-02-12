@@ -1412,7 +1412,7 @@ void Battle2::Interface::HumanBattleTurn(const Stats & b, Actions & a, std::stri
 
 	    // skip
     	    case KEY_SPACE:	a.AddedSkipAction(b); humanturn_exit = true; break;
-	    case KEY_s:		a.AddedEndAction(b);  humanturn_exit = true; break;
+	    case KEY_s:		a.AddedSkipAction(b); a.AddedEndAction(b);  humanturn_exit = true; break;
 
 	    // options
 	    case KEY_o:		KeyPress_o(); break;
@@ -1717,6 +1717,7 @@ void Battle2::Interface::ButtonSkipAction(Actions & a)
 
     if(le.MouseClickLeft(btn_skip) && b_current)
     {
+	a.AddedSkipAction(*b_current); 
 	a.AddedEndAction(*b_current);
 	humanturn_exit = true;
     }
