@@ -186,6 +186,10 @@ AGG::Cache::Cache()
     icn_cache = new icn_cache_t [ICN::UNKNOWN + 1];
     til_cache = new til_cache_t [TIL::UNKNOWN + 1];
 
+    icn_cache[ICN::UNKNOWN].count = 1;
+    icn_cache[ICN::UNKNOWN].sprites = new Sprite [1];
+    icn_cache[ICN::UNKNOWN].reflect = new Sprite [1];
+
     icn_registry_enable = false;
     icn_registry.reserve(250);
 }
