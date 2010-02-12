@@ -1955,7 +1955,7 @@ void ActionToAncientLamp(Heroes &hero, const u8 obj, const u16 dst_index)
 		else
 		    tile.SetCountMonster(count - recruit);
 
-    		PaymentConditions::payment_t paymentCosts(PaymentConditions::BuyMonster(Monster::GENIE) * recruit);
+    		const payment_t paymentCosts(PaymentConditions::BuyMonster(Monster::GENIE) * recruit);
                 world.GetKingdom(hero.GetColor()).OddFundsResource(paymentCosts);
 	    }
 	    else
@@ -2340,7 +2340,7 @@ void ActionToDwellingRecruitMonster(Heroes &hero, const u8 obj, const u16 dst_in
 		else
 		    tile.SetCountMonster(count - recruit);
 
-		PaymentConditions::payment_t paymentCosts(PaymentConditions::BuyMonster(monster()) * recruit);
+		const payment_t paymentCosts(PaymentConditions::BuyMonster(monster()) * recruit);
 		world.GetKingdom(hero.GetColor()).OddFundsResource(paymentCosts);
 	    }
 	}
@@ -2502,7 +2502,7 @@ void ActionToDwellingBattleMonster(Heroes &hero, const u8 obj, const u16 dst_ind
     	    else
     		tile.SetCountMonster(count - recruit);
 
-    	    PaymentConditions::payment_t paymentCosts(PaymentConditions::BuyMonster(monster()) * recruit);
+    	    const payment_t paymentCosts(PaymentConditions::BuyMonster(monster()) * recruit);
     	    world.GetKingdom(hero.GetColor()).OddFundsResource(paymentCosts);
     	}
     }

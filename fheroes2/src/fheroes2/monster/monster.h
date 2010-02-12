@@ -27,6 +27,7 @@
 #include "skill.h"
 #include "icn.h"
 #include "m82.h"
+#include "payment.h"
 #include "gamedefs.h"
 
 namespace Maps { class Tiles; };
@@ -180,11 +181,16 @@ public:
     static u8  GetLevel(monster_t);
     static u32 GetDwelling(monster_t);
 
+    static void GetCost(u8, payment_t &);
+    static void GetUpgradeCost(u8, payment_t &);
+
     static monster_t FromInt(u8);
     static monster_t FromDwelling(u8, u32);
     static monster_t FromObject(u8);
     static monster_t FromMaps(const Maps::Tiles &);
     static monster_t Rand(level_t = LEVEL0);
+
+    static void UpdateStats(const std::string &);
 
 protected:
     monster_t id;

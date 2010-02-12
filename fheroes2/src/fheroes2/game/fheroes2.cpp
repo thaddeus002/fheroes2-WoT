@@ -35,6 +35,7 @@
 #include "sdlnet.h"
 #include "images_pack.h"
 #include "localclient.h"
+#include "monster.h"
 #include "battle2.h"
 
 #include "zzlib.h"
@@ -45,7 +46,7 @@ void SetTimidityEnvPath(const Settings &);
 void SetLangEnvPath(const Settings &);
 void ReadConfigFile(Settings &);
 void LoadConfigFiles(Settings &, const char* dirname);
-void UpdateBattleAnimation(const Settings &);
+void LoadExternalResource(const Settings &);
 
 int PrintHelp(const char *basename)
 {
@@ -173,7 +174,7 @@ int main(int argc, char **argv)
 	    // load font
 	    cache.LoadFNT();
 
-	    if(conf.UseAltResource()) UpdateBattleAnimation(conf);
+	    if(conf.UseAltResource()) LoadExternalResource(conf);
 
 #ifdef WITH_ZLIB
 	    LoadZLogo();
@@ -368,10 +369,15 @@ void LoadConfigFiles(Settings & conf, const char* dirname)
     }
 }
 
-void UpdateBattleAnimation(const Settings & conf)
+void LoadExternalResource(const Settings & conf)
 {
-    const std::string battle_spec(conf.LocalPrefix() + SEPARATOR + "files" + SEPARATOR + "images" + SEPARATOR + "battle.xml");
+    std::string spec = conf.LocalPrefix() + SEPARATOR + "files" + SEPARATOR + "stats" + SEPARATOR + "battle.xml";
 
-    if(FilePresent(battle_spec))
-	Battle2::UpdateMonsterInfoAnimation(battle_spec);
+    if(FilePresent(spec))
+	Battle2::UpdateMonsterInfoAnimation(spec);
+
+    spec = conf.LocalPrefix() + SEPARATOR + "files" + SEPARATOR + "stats" + SEPARATOR + "monsters.xml";
+
+    if(FilePresent(spec))
+	Monster::UpdateStats(spec);
 }

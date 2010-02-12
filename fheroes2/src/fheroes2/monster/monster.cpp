@@ -28,9 +28,25 @@
 #include "settings.h"
 #include "luck.h"
 #include "morale.h"
+#include "payment.h"
 #include "monster.h"
 
-static const struct
+#ifdef WITH_XML
+#include "xmlccwrap.h"
+#endif
+
+struct cost_t
+{
+    u16 gold;
+    u8 wood;
+    u8 mercury;
+    u8 ore;
+    u8 sulfur;
+    u8 crystal;
+    u8 gems;
+};
+
+struct monstats_t
 {
     u8 attack;
     u8 defence;
@@ -39,99 +55,143 @@ static const struct
     u16 hp;
     Speed::speed_t speed;
     u8 grown;
+    u8 shots;
     const char* name;
     const char* multiname;
-
-} monsters[] = {
-	{     0,   0,   0,   0,   0,  Speed::VERYSLOW,   0, "Unknown Monster", "Unknown Monsters" },
-
-	// atck dfnc  min  max   hp             speed grwn  name               multiname
-	{     1,   1,   1,   1,   1,  Speed::VERYSLOW,  12, _("Peasant")        , _("Peasants") },
-	{     5,   3,   2,   3,  10,  Speed::VERYSLOW,   8, _("Archer")         , _("Archers") },
-	{     5,   3,   2,   3,  10,   Speed::AVERAGE,   8, _("Ranger")         , _("Rangers") },
-	{     5,   9,   3,   4,  15,   Speed::AVERAGE,   5, _("Pikeman")        , _("Pikemen") },
-	{     5,   9,   3,   4,  20,      Speed::FAST,   5, _("Veteran Pikeman"), _("Veteran Pikemen") },
-	{     7,   9,   4,   6,  25,   Speed::AVERAGE,   4, _("Swordsman")      , _("Swordsmen") },
-	{     7,   9,   4,   6,  30,      Speed::FAST,   4, _("Master Swordman"), _("Master Swordmen") },
-	{    10,   9,   5,   9,  30,  Speed::VERYFAST,   3, _("Cavalry")        , _("Cavalries") },
-	{    10,   9,   5,  10,  40, Speed::ULTRAFAST,   3, _("Champion")       , _("Champions") },
-	{    11,  12,  10,  20,  50,      Speed::FAST,   2, _("Paladin")        , _("Paladins") },
-	{    11,  12,  10,  20,  65,  Speed::VERYFAST,   2, _("Crusader")       , _("Crusaders") },
-
-	// atck dfnc  min  max   hp             speed grwn  name               multiname
-	{     3,   1,   1,   2,   3,   Speed::AVERAGE,  10, _("Goblin")         , _("Goblins") },
-	{     3,   4,   2,   3,  10,  Speed::VERYSLOW,   8, _("Orc")            , _("Orcs") },
-	{     3,   4,   3,   4,  15,      Speed::SLOW,   8, _("Orc Chief")      , _("Orc Chiefs") },
-	{     6,   2,   3,   5,  20,  Speed::VERYFAST,   5, _("Wolf")           , _("Wolves") },
-	{     9,   5,   4,   6,  40,  Speed::VERYSLOW,   4, _("Ogre")           , _("Ogres") },
-	{     9,   5,   5,   7,  60,   Speed::AVERAGE,   4, _("Ogre Lord")      , _("Ogre Lords") },
-	{    10,   5,   5,   7,  40,   Speed::AVERAGE,   3, _("Troll")          , _("Trolls") },
-	{    10,   5,   7,   9,  40,      Speed::FAST,   3, _("War Troll")      , _("War Trolls") },
-	{    12,   9,  12,  24,  80,      Speed::FAST,   2, _("Cyclops")        , _("Cyclopes") },
-
-	// atck dfnc  min  max   hp             speed grwn  name               multiname
-	{     4,   2,   1,   2,   2,   Speed::AVERAGE,   8, _("Sprite")         , _("Sprites") },
-	{     6,   5,   2,   4,  20,  Speed::VERYSLOW,   6, _("Dwarf")          , _("Dwarves") },
-	{     6,   6,   2,   4,  20,   Speed::AVERAGE,   6, _("Battle Dwarf")   , _("Battle Dwarves") },
-	{     4,   3,   2,   3,  15,   Speed::AVERAGE,   4, _("Elf")            , _("Elves") },
-	{     5,   5,   2,   3,  15,  Speed::VERYFAST,   4, _("Grand Elf")      , _("Grand Elves") },
-	{     7,   5,   5,   8,  25,      Speed::FAST,   3, _("Druid")          , _("Druids") },
-	{     7,   7,   5,   8,  25,  Speed::VERYFAST,   3, _("Greater Druid")  , _("Greater Druids") },
-	{    10,   9,   7,  14,  40,      Speed::FAST,   2, _("Unicorn")        , _("Unicorns") },
-	{    12,  10,  20,  40, 100, Speed::ULTRAFAST,   1, _("Phoenix")        , _("Phoenix") },
-
-	// atck dfnc  min  max   hp             speed grwn  name               multiname
-	{     3,   1,   1,   2,   5,   Speed::AVERAGE,   8, _("Centaur")        , _("Centaurs") },
-	{     4,   7,   2,   3,  15,  Speed::VERYFAST,   6, _("Gargoyle")       , _("Gargoyles") },
-	{     6,   6,   3,   5,  25,   Speed::AVERAGE,   4, _("Griffin")        , _("Griffins") },
-	{     9,   8,   5,  10,  35,   Speed::AVERAGE,   3, _("Minotaur")       , _("Minotaurs") },
-	{     9,   8,   5,  10,  45,  Speed::VERYFAST,   3, _("Minotaur King")  , _("Minotaur Kings") },
-	{     8,   9,   6,  12,  75,  Speed::VERYSLOW,   2, _("Hydra")          , _("Hydras") },
-	{    12,  12,  25,  50, 200,   Speed::AVERAGE,   1, _("Green Dragon")   , _("Green Dragons") },
-	{    13,  13,  25,  50, 250,      Speed::FAST,   1, _("Red Dragon")     , _("Red Dragons") }, 
-	{    14,  14,  25,  50, 300,  Speed::VERYFAST,   1, _("Black Dragon")   , _("Black Dragons") },
-
-	// atck dfnc  min  max   hp             speed grwn  name               multiname
-	{     2,   1,   1,   3,   3,      Speed::SLOW,   8, _("Halfling")       , _("Halflings") },
-	{     5,   4,   2,   3,  15,  Speed::VERYFAST,   6, _("Boar")           , _("Boars") },
-	{     5,  10,   4,   5,  30,  Speed::VERYSLOW,   4, _("Iron Golem")     , _("Iron Golems") },
-	{     7,  10,   4,   5,  35,      Speed::SLOW,   4, _("Steel Golem")    , _("Steel Golems") },
-	{     7,   7,   4,   8,  40,   Speed::AVERAGE,   3, _("Roc")            , _("Rocs") },
-	{    11,   7,   7,   9,  30,      Speed::FAST,   2, _("Magi")           , _("Magi") },
-	{    12,   8,   7,   9,  35,  Speed::VERYFAST,   2, _("Archmagi")       , _("Archmagi") },
-	{    13,  10,  20,  30, 150,   Speed::AVERAGE,   1, _("Giant")          , _("Giants") },
-	{    15,  15,  20,  30, 300,  Speed::VERYFAST,   1, _("Titan")          , _("Titans") },
-
-	// atck dfnc  min  max   hp             speed grwn  name               multiname
-	{     4,   3,   2,   3,   4,   Speed::AVERAGE,   8, _("Skeleton")       , _("Skeletons") },
-	{     5,   2,   2,   3,  15,  Speed::VERYSLOW,   6, _("Zombie")         , _("Zombies") },
-	{     5,   2,   2,   3,  25,   Speed::AVERAGE,   6, _("Mutant Zombie")  , _("Mutant Zombies") },
-	{     6,   6,   3,   4,  25,   Speed::AVERAGE,   4, _("Mummy")          , _("Mummies") },
-	{     6,   6,   3,   4,  30,      Speed::FAST,   4, _("Royal Mummy")    , _("Royal Mummies") },
-	{     8,   6,   5,   7,  30,   Speed::AVERAGE,   3, _("Vampire")        , _("Vampires") },
-	{     8,   6,   5,   7,  40,      Speed::FAST,   3, _("Vampire Lord")   , _("Vampire Lords") },
-	{     7,  12,   8,  10,  25,      Speed::FAST,   2, _("Lich")           , _("Liches") },
-	{     7,  13,   8,  10,  35,  Speed::VERYFAST,   2, _("Power Lich")     , _("Power Liches") }, 
-	{    11,   9,  25,  45, 150,   Speed::AVERAGE,   1, _("Bone Dragon")    , _("Bone Dragons") },
-
-        // atck dfnc  min  max   hp             speed grwn  name               multiname
-	{     6,   1,   1,   2,   4,      Speed::FAST,   4, _("Rogue")          , _("Rogues") },
-	{     7,   6,   2,   5,  20,  Speed::VERYFAST,   4, _("Nomad")          , _("Nomads") },
-	{     8,   7,   4,   6,  20,      Speed::FAST,   4, _("Ghost")          , _("Ghosts") },
-	{    10,   9,  20,  30,  50,  Speed::VERYFAST,   4, _("Genie")          , _("Genies") },
-	{     8,   9,   6,  10,  35,   Speed::AVERAGE,   4, _("Medusa")         , _("Medusas") },
-	{     8,   8,   4,   5,  50,      Speed::SLOW,   4, _("Earth Elemental")  , _("Earth Elementals") },
-	{     7,   7,   2,   8,  35,  Speed::VERYFAST,   4, _("Air Elemental")    , _("Air Elementals") },
-	{     8,   6,   4,   6,  40,      Speed::FAST,   4, _("Fire Elemental")   , _("Fire Elementals") },
-	{     6,   8,   3,   7,  45,   Speed::AVERAGE,   4, _("Water Elemental")  , _("Water Elementals") },
-
-	{     0,   0,   0,   0,   0,  Speed::VERYSLOW,   0, "Random Monster"  , "Random Monsters" },
-	{     0,   0,   0,   0,   0,  Speed::VERYSLOW,   0, "Random Monster 1", "Random Monsters 3" },
-	{     0,   0,   0,   0,   0,  Speed::VERYSLOW,   0, "Random Monster 2", "Random Monsters 2" },
-	{     0,   0,   0,   0,   0,  Speed::VERYSLOW,   0, "Random Monster 3", "Random Monsters 3" },
-	{     0,   0,   0,   0,   0,  Speed::VERYSLOW,   0, "Random Monster 4", "Random Monsters 4" },
-
+    cost_t cost;
 };
+
+namespace
+{
+    static monstats_t monsters[] = {
+	{     0,   0,   0,   0,   0,  Speed::VERYSLOW,   0,     0,    "Unknown Monster", "Unknown Monsters" , { 0, 0, 0, 0, 0, 0, 0} },
+
+	// atck dfnc  min  max   hp             speed grwn  shots  name                  multiname             cost
+	{     1,   1,   1,   1,   1,  Speed::VERYSLOW,  12,     0, _("Peasant")        , _("Peasants")       , { 20, 0, 0, 0, 0, 0, 0} },
+	{     5,   3,   2,   3,  10,  Speed::VERYSLOW,   8,    12, _("Archer")         , _("Archers")        , { 150, 0, 0, 0, 0, 0, 0} },
+	{     5,   3,   2,   3,  10,   Speed::AVERAGE,   8,    24, _("Ranger")         , _("Rangers")        , { 200, 0, 0, 0, 0, 0, 0} },
+	{     5,   9,   3,   4,  15,   Speed::AVERAGE,   5,     0, _("Pikeman")        , _("Pikemen")        , { 200, 0, 0, 0, 0, 0, 0} },
+	{     5,   9,   3,   4,  20,      Speed::FAST,   5,     0, _("Veteran Pikeman"), _("Veteran Pikemen"), { 250, 0, 0, 0, 0, 0, 0} },
+	{     7,   9,   4,   6,  25,   Speed::AVERAGE,   4,     0, _("Swordsman")      , _("Swordsmen")      , { 250, 0, 0, 0, 0, 0, 0} },
+	{     7,   9,   4,   6,  30,      Speed::FAST,   4,     0, _("Master Swordman"), _("Master Swordmen"), { 300, 0, 0, 0, 0, 0, 0} },
+	{    10,   9,   5,  10,  30,  Speed::VERYFAST,   3,     0, _("Cavalry")        , _("Cavalries")      , { 300, 0, 0, 0, 0, 0, 0} },
+	{    10,   9,   5,  10,  40, Speed::ULTRAFAST,   3,     0, _("Champion")       , _("Champions")      , { 375, 0, 0, 0, 0, 0, 0} },
+	{    11,  12,  10,  20,  50,      Speed::FAST,   2,     0, _("Paladin")        , _("Paladins")       , { 600, 0, 0, 0, 0, 0, 0} },
+	{    11,  12,  10,  20,  65,  Speed::VERYFAST,   2,     0, _("Crusader")       , _("Crusaders")      , { 1000, 0, 0, 0, 0, 0, 0} },
+
+	// atck dfnc  min  max   hp             speed grwn  shots  name                  multiname            cost
+	{     3,   1,   1,   2,   3,   Speed::AVERAGE,  10,     0, _("Goblin")         , _("Goblins")       , { 40, 0, 0, 0, 0, 0, 0} },
+	{     3,   4,   2,   3,  10,  Speed::VERYSLOW,   8,     8, _("Orc")            , _("Orcs")          , { 140, 0, 0, 0, 0, 0, 0} },
+	{     3,   4,   3,   4,  15,      Speed::SLOW,   8,    16, _("Orc Chief")      , _("Orc Chiefs")    , { 175, 0, 0, 0, 0, 0, 0} },
+	{     6,   2,   3,   5,  20,  Speed::VERYFAST,   5,     0, _("Wolf")           , _("Wolves")        , { 200, 0, 0, 0, 0, 0, 0} },
+	{     9,   5,   4,   6,  40,  Speed::VERYSLOW,   4,     0, _("Ogre")           , _("Ogres")         , { 300, 0, 0, 0, 0, 0, 0} },
+	{     9,   5,   5,   7,  60,   Speed::AVERAGE,   4,     0, _("Ogre Lord")      , _("Ogre Lords")    , { 500, 0, 0, 0, 0, 0, 0} },
+	{    10,   5,   5,   7,  40,   Speed::AVERAGE,   3,     8, _("Troll")          , _("Trolls")        , { 600, 0, 0, 0, 0, 0, 0} },
+	{    10,   5,   7,   9,  40,      Speed::FAST,   3,    16, _("War Troll")      , _("War Trolls")    , { 700, 0, 0, 0, 0, 0, 0} },
+	{    12,   9,  12,  24,  80,      Speed::FAST,   2,     0, _("Cyclops")        , _("Cyclopes")      , { 750, 0, 0, 0, 0, 1, 0} },
+
+	// atck dfnc  min  max   hp             speed grwn  shots  name                  multiname            cost
+	{     4,   2,   1,   2,   2,   Speed::AVERAGE,   8,     0, _("Sprite")         , _("Sprites")       , { 50, 0, 0, 0, 0, 0, 0} },
+	{     6,   5,   2,   4,  20,  Speed::VERYSLOW,   6,     0, _("Dwarf")          , _("Dwarves")       , { 200, 0, 0, 0, 0, 0, 0} },
+	{     6,   6,   2,   4,  20,   Speed::AVERAGE,   6,     0, _("Battle Dwarf")   , _("Battle Dwarves"), { 250, 0, 0, 0, 0, 0, 0} },
+	{     4,   3,   2,   3,  15,   Speed::AVERAGE,   4,    24, _("Elf")            , _("Elves")         , { 250, 0, 0, 0, 0, 0, 0} },
+	{     5,   5,   2,   3,  15,  Speed::VERYFAST,   4,    24, _("Grand Elf")      , _("Grand Elves")   , { 300, 0, 0, 0, 0, 0, 0} },
+	{     7,   5,   5,   8,  25,      Speed::FAST,   3,     8, _("Druid")          , _("Druids")        , { 350, 0, 0, 0, 0, 0, 0} },
+	{     7,   7,   5,   8,  25,  Speed::VERYFAST,   3,    16, _("Greater Druid")  , _("Greater Druids"), { 400, 0, 0, 0, 0, 0, 0} },
+	{    10,   9,   7,  14,  40,      Speed::FAST,   2,     0, _("Unicorn")        , _("Unicorns")      , { 500, 0, 0, 0, 0, 0, 0} },
+	{    12,  10,  20,  40, 100, Speed::ULTRAFAST,   1,     0, _("Phoenix")        , _("Phoenix")       , { 1500, 0, 1, 0, 0, 0, 0} },
+
+	// atck dfnc  min  max   hp             speed grwn  shots  name                  multiname            cost
+	{     3,   1,   1,   2,   5,   Speed::AVERAGE,   8,     8, _("Centaur")        , _("Centaurs")      , { 60, 0, 0, 0, 0, 0, 0} },
+	{     4,   7,   2,   3,  15,  Speed::VERYFAST,   6,     0, _("Gargoyle")       , _("Gargoyles")     , { 200, 0, 0, 0, 0, 0, 0} },
+	{     6,   6,   3,   5,  25,   Speed::AVERAGE,   4,     0, _("Griffin")        , _("Griffins")      , { 300, 0, 0, 0, 0, 0, 0} },
+	{     9,   8,   5,  10,  35,   Speed::AVERAGE,   3,     0, _("Minotaur")       , _("Minotaurs")     , { 400, 0, 0, 0, 0, 0, 0} },
+	{     9,   8,   5,  10,  45,  Speed::VERYFAST,   3,     0, _("Minotaur King")  , _("Minotaur Kings"), { 500, 0, 0, 0, 0, 0, 0} },
+	{     8,   9,   6,  12,  75,  Speed::VERYSLOW,   2,     0, _("Hydra")          , _("Hydras")        , { 800, 0, 0, 0, 0, 0, 0} },
+	{    12,  12,  25,  50, 200,   Speed::AVERAGE,   1,     0, _("Green Dragon")   , _("Green Dragons") , { 3000, 0, 0, 0, 1, 0, 0} },
+	{    13,  13,  25,  50, 250,      Speed::FAST,   1,     0, _("Red Dragon")     , _("Red Dragons")   , { 3500, 0, 0, 0, 1, 0, 0} }, 
+	{    14,  14,  25,  50, 300,  Speed::VERYFAST,   1,     0, _("Black Dragon")   , _("Black Dragons") , { 4000, 0, 0, 0, 2, 0, 0} },
+
+	// atck dfnc  min  max   hp             speed grwn  shots  name                  multiname            cost
+	{     2,   1,   1,   3,   3,      Speed::SLOW,   8,    12, _("Halfling")       , _("Halflings")     , { 50, 0, 0, 0, 0, 0, 0} },
+	{     5,   4,   2,   3,  15,  Speed::VERYFAST,   6,     0, _("Boar")           , _("Boars")         , { 150, 0, 0, 0, 0, 0, 0} },
+	{     5,  10,   4,   5,  30,  Speed::VERYSLOW,   4,     0, _("Iron Golem")     , _("Iron Golems")   , { 300, 0, 0, 0, 0, 0, 0} },
+	{     7,  10,   4,   5,  35,      Speed::SLOW,   4,     0, _("Steel Golem")    , _("Steel Golems")  , { 350, 0, 0, 0, 0, 0, 0} },
+	{     7,   7,   4,   8,  40,   Speed::AVERAGE,   3,     0, _("Roc")            , _("Rocs")          , { 400, 0, 0, 0, 0, 0, 0} },
+	{    11,   7,   7,   9,  30,      Speed::FAST,   2,    12, _("Magi")           , _("Magi")          , { 600, 0, 0, 0, 0, 0, 0} },
+	{    12,   8,   7,   9,  35,  Speed::VERYFAST,   2,    24, _("Archmagi")       , _("Archmagi")      , { 700, 0, 0, 0, 0, 0, 0} },
+	{    13,  10,  20,  30, 150,   Speed::AVERAGE,   1,     0, _("Giant")          , _("Giants")        , { 2000, 0, 0, 0, 0, 0, 1} },
+	{    15,  15,  20,  30, 300,  Speed::VERYFAST,   1,    24, _("Titan")          , _("Titans")        , { 5000, 0, 0, 0, 0, 0, 2} },
+
+	// atck dfnc  min  max   hp             speed grwn  shots  name                  multiname            cost
+	{     4,   3,   2,   3,   4,   Speed::AVERAGE,   8,     0, _("Skeleton")       , _("Skeletons")     , { 75, 0, 0, 0, 0, 0, 0} },
+	{     5,   2,   2,   3,  15,  Speed::VERYSLOW,   6,     0, _("Zombie")         , _("Zombies")       , { 150, 0, 0, 0, 0, 0, 0} },
+	{     5,   2,   2,   3,  25,   Speed::AVERAGE,   6,     0, _("Mutant Zombie")  , _("Mutant Zombies"), { 200, 0, 0, 0, 0, 0, 0} },
+	{     6,   6,   3,   4,  25,   Speed::AVERAGE,   4,     0, _("Mummy")          , _("Mummies")       , { 250, 0, 0, 0, 0, 0, 0} },
+	{     6,   6,   3,   4,  30,      Speed::FAST,   4,     0, _("Royal Mummy")    , _("Royal Mummies") , { 300, 0, 0, 0, 0, 0, 0} },
+	{     8,   6,   5,   7,  30,   Speed::AVERAGE,   3,     0, _("Vampire")        , _("Vampires")      , { 500, 0, 0, 0, 0, 0, 0} },
+	{     8,   6,   5,   7,  40,      Speed::FAST,   3,     0, _("Vampire Lord")   , _("Vampire Lords") , { 650, 0, 0, 0, 0, 0, 0} },
+	{     7,  12,   8,  10,  25,      Speed::FAST,   2,    12, _("Lich")           , _("Liches")        , { 750, 0, 0, 0, 0, 0, 0} },
+	{     7,  13,   8,  10,  35,  Speed::VERYFAST,   2,    24, _("Power Lich")     , _("Power Liches")  , { 900, 0, 0, 0, 0, 0, 0} }, 
+	{    11,   9,  25,  45, 150,   Speed::AVERAGE,   1,     0, _("Bone Dragon")    , _("Bone Dragons")  , { 1500, 0, 0, 0, 0, 0, 0} },
+
+        // atck dfnc  min  max   hp             speed grwn  shots  name                  multiname                cost
+	{     6,   1,   1,   2,   4,      Speed::FAST,   4,     0, _("Rogue")          , _("Rogues")            , { 50, 0, 0, 0, 0, 0, 0} },
+	{     7,   6,   2,   5,  20,  Speed::VERYFAST,   4,     0, _("Nomad")          , _("Nomads")            , { 200, 0, 0, 0, 0, 0, 0} },
+	{     8,   7,   4,   6,  20,      Speed::FAST,   4,     0, _("Ghost")          , _("Ghosts")            , { 1000, 0, 0, 0, 0, 0, 0} },
+	{    10,   9,  20,  30,  50,  Speed::VERYFAST,   4,     0, _("Genie")          , _("Genies")            , { 650, 0, 0, 0, 0, 0, 1} },
+	{     8,   9,   6,  10,  35,   Speed::AVERAGE,   4,     0, _("Medusa")         , _("Medusas")           , { 500, 0, 0, 0, 0, 0, 0} },
+	{     8,   8,   4,   5,  50,      Speed::SLOW,   4,     0, _("Earth Elemental")  , _("Earth Elementals"), { 500, 0, 0, 0, 0, 0, 0} },
+	{     7,   7,   2,   8,  35,  Speed::VERYFAST,   4,     0, _("Air Elemental")    , _("Air Elementals")  , { 500, 0, 0, 0, 0, 0, 0} },
+	{     8,   6,   4,   6,  40,      Speed::FAST,   4,     0, _("Fire Elemental")   , _("Fire Elementals") , { 500, 0, 0, 0, 0, 0, 0} },
+	{     6,   8,   3,   7,  45,   Speed::AVERAGE,   4,     0, _("Water Elemental")  , _("Water Elementals"), { 500, 0, 0, 0, 0, 0, 0} },
+
+	{     0,   0,   0,   0,   0,  Speed::VERYSLOW,   0,     0, "Random Monster"  , "Random Monsters"  , { 0, 0, 0, 0, 0, 0, 0} },
+	{     0,   0,   0,   0,   0,  Speed::VERYSLOW,   0,     0, "Random Monster 1", "Random Monsters 3", { 0, 0, 0, 0, 0, 0, 0} },
+	{     0,   0,   0,   0,   0,  Speed::VERYSLOW,   0,     0, "Random Monster 2", "Random Monsters 2", { 0, 0, 0, 0, 0, 0, 0} },
+	{     0,   0,   0,   0,   0,  Speed::VERYSLOW,   0,     0, "Random Monster 3", "Random Monsters 3", { 0, 0, 0, 0, 0, 0, 0} },
+	{     0,   0,   0,   0,   0,  Speed::VERYSLOW,   0,     0, "Random Monster 4", "Random Monsters 4", { 0, 0, 0, 0, 0, 0, 0} },
+    };
+};
+
+void Monster::UpdateStats(const std::string & spec)
+{
+#ifdef WITH_XML
+    // parse battle.xml
+    TiXmlDocument doc;
+    const TiXmlElement* xml_monsters = NULL;
+    monstats_t* ptr = &monsters[0];
+
+    if(doc.LoadFile(spec.c_str()) &&
+        NULL != (xml_monsters = doc.FirstChildElement("monsters")))
+    {
+        const TiXmlElement* xml_monster = xml_monsters->FirstChildElement("monster");
+        for(; xml_monster; xml_monster = xml_monster->NextSiblingElement("monster"))
+        {
+	    cost_t & cost = ptr->cost;
+            int value;
+
+    	    xml_monster->Attribute("attack", &value); ptr->attack = value;
+    	    xml_monster->Attribute("defence", &value); ptr->defence = value;
+    	    xml_monster->Attribute("damage_min", &value); ptr->damageMin = value;
+    	    xml_monster->Attribute("damage_max", &value); ptr->damageMax = value;
+    	    xml_monster->Attribute("hp", &value); ptr->hp = value;
+    	    xml_monster->Attribute("speed", &value); ptr->speed = Speed::INSTANT < value ? Speed::INSTANT : (Speed::STANDING > value ? Speed::STANDING : static_cast<Speed::speed_t>(value));
+    	    xml_monster->Attribute("grown", &value); ptr->grown = value;
+    	    xml_monster->Attribute("shots", &value); ptr->shots = value;
+    	    xml_monster->Attribute("gold", &value); cost.gold = value;
+    	    xml_monster->Attribute("wood", &value); cost.wood = value;
+    	    xml_monster->Attribute("mercury", &value); cost.mercury = value;
+    	    xml_monster->Attribute("ore", &value); cost.ore = value;
+    	    xml_monster->Attribute("sulfur", &value); cost.sulfur = value;
+    	    xml_monster->Attribute("crystal", &value); cost.crystal = value;
+    	    xml_monster->Attribute("gems", &value); cost.gems = value;
+
+	    ++ptr;
+        }
+    }
+#endif
+}
 
 Monster::Monster() : id(UNKNOWN)
 {
@@ -250,30 +310,7 @@ u8  Monster::GetDamageMax(void) const
 
 u8  Monster::GetShots(void) const
 {
-    switch(id)
-    {
-	case ARCHER:		return 12;
-	case RANGER:		return 24;
-	case ORC:		return 8;
-	case CHIEF_ORC:		return 16;
-	case TROLL:		return 8;
-	case WAR_TROLL:		return 16;
-	case ELF:		return 24;
-	case GRAND_ELF:		return 24;
-	case DRUID:		return 8;
-	case GREATER_DRUID:	return 16;
-	case CENTAUR:		return 8;
-	case HALFLING:		return 12;
-	case MAGE:		return 12;
-	case ARCHMAGE:		return 24;
-	case TITAN:		return 24;
-	case LICH:		return 12;
-	case POWER_LICH:	return 24;
-
-	default: break;
-    }
-
-    return 0;
+    return monsters[id].shots;
 }
 
 u16 Monster::GetHitPoints(void) const
@@ -1017,4 +1054,34 @@ ICN::icn_t Monster::ICNMonh(void) const
 {
 
     return id >= PEASANT && id <= WATER_ELEMENT ? static_cast<ICN::icn_t>(ICN::MONH0000 + id - PEASANT) : ICN::UNKNOWN;
+}
+
+void Monster::GetCost(u8 id, payment_t & payment)
+{
+    cost_t & cost = monsters[FromInt(id)].cost;
+
+    payment.gold = cost.gold;
+    payment.wood = cost.wood;
+    payment.mercury = cost.mercury;
+    payment.ore = cost.ore;
+    payment.sulfur = cost.sulfur;
+    payment.crystal = cost.crystal;
+    payment.gems = cost.gems;
+}
+
+void Monster::GetUpgradeCost(u8 id, payment_t & payment)
+{
+    monster_t m1 = FromInt(id);
+    monster_t m2 = Upgrade(m1);
+
+    if(m1 != m2)
+    {
+	payment_t payment2;
+	payment_t payment1;
+	GetCost(m2, payment2);
+	GetCost(m1, payment1);
+	payment = payment2 - payment1;
+    }
+    else
+	GetCost(m1, payment);
 }

@@ -1279,7 +1279,7 @@ void AIToDwellingRecruitMonster(Heroes &hero, const u8 obj, const u16 dst_index)
     {
         Kingdom & kingdom = world.GetKingdom(hero.GetColor());
         const Monster monster(Monster::FromObject(obj));
-	const PaymentConditions::payment_t paymentCosts(PaymentConditions::BuyMonster(monster()) * count);
+	const payment_t paymentCosts(PaymentConditions::BuyMonster(monster()) * count);
 	const Resource::funds_t & kingdomResource = kingdom.GetFundsResource();
 
         if(paymentCosts <= kingdomResource && hero.GetArmy().JoinTroop(monster, count))
@@ -1586,7 +1586,7 @@ bool Heroes::AIValidObject(u16 index, u8 obj)
 	{
 	    const u32 count = world.GetTiles(index).GetCountMonster();
     	    const Monster monster(Monster::FromObject(obj));
-	    const PaymentConditions::payment_t paymentCosts(PaymentConditions::BuyMonster(monster()) * count);
+	    const payment_t paymentCosts(PaymentConditions::BuyMonster(monster()) * count);
 	    const Resource::funds_t & kingdomResource = world.GetKingdom(GetColor()).GetFundsResource();
 
 	    if(count && paymentCosts <= kingdomResource &&
@@ -1603,7 +1603,7 @@ bool Heroes::AIValidObject(u16 index, u8 obj)
     	    const bool battle = (Color::GRAY == world.ColorCapturedObject(index));
 	    const u32 count = world.GetTiles(index).GetCountMonster();
     	    const Monster monster(Monster::FromObject(obj));
-	    const PaymentConditions::payment_t paymentCosts(PaymentConditions::BuyMonster(monster()) * count);
+	    const payment_t paymentCosts(PaymentConditions::BuyMonster(monster()) * count);
 	    const Resource::funds_t & kingdomResource = world.GetKingdom(GetColor()).GetFundsResource();
 
 	    if(!battle && count && paymentCosts <= kingdomResource &&
@@ -1616,7 +1616,7 @@ bool Heroes::AIValidObject(u16 index, u8 obj)
 	case MP2::OBJ_ANCIENTLAMP:
 	{
 	    const u32 count = world.GetTiles(index).GetCountMonster();
-	    const PaymentConditions::payment_t paymentCosts(PaymentConditions::BuyMonster(Monster::GENIE) * count);
+	    const payment_t paymentCosts(PaymentConditions::BuyMonster(Monster::GENIE) * count);
 	    const Resource::funds_t & kingdomResource = world.GetKingdom(GetColor()).GetFundsResource();
 
 	    if(count && paymentCosts <= kingdomResource &&

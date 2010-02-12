@@ -39,9 +39,8 @@ namespace Resource
         GOLD	= 0x40,
     } resource_t;
 
-    class funds_t
+    struct funds_t
     {
-    public:
 	funds_t() : wood(0), mercury(0), ore(0), sulfur(0), crystal(0), gems(0), gold(0) {};
 	funds_t(u8 rs, u32 count);
 

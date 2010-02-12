@@ -268,91 +268,15 @@
 #define UPGRADE_BLACKDRAGON_ORE		5
 #define UPGRADE_BLACKDRAGON_SULFUR	10
 
-// monster
-#define BUY_PEASANT_GOLD 		20
-#define BUY_ARCHER_GOLD 		150
-#define BUY_RANGER_GOLD 		200
-#define BUY_PIKEMAN_GOLD 		200
-#define BUY_VETERAN_PIKEMAN_GOLD 	250
-#define BUY_SWORDSMAN_GOLD 		250
-#define BUY_MASTER_SWORDSMAN_GOLD 	300
-#define BUY_CAVALIRY_GOLD 		300
-#define BUY_CHAMPION_GOLD 		375
-#define BUY_PALADIN_GOLD 		600
-#define BUY_CRUSADER_GOLD 		1000
-#define BUY_GOBLIN_GOLD 		40
-#define BUY_ORC_GOLD 			140
-#define BUY_CHIEF_ORC_GOLD 		175
-#define BUY_WOLF_GOLD 			200
-#define BUY_OGRE_GOLD 			300
-#define BUY_LORD_OGRE_GOLD 		500
-#define BUY_TROLL_GOLD 			600
-#define BUY_WAR_TROLL_GOLD 		700
-#define BUY_CYCLOPS_GOLD 		750
-#define BUY_CYCLOPS_CRYSTAL     	1 
-#define BUY_SPRITE_GOLD 		50
-#define BUY_DWARF_GOLD 			200
-#define BUY_BATTLE_DWARF_GOLD 		250
-#define BUY_ELF_GOLD 			250
-#define BUY_GRAND_ELF_GOLD 		300
-#define BUY_DRUID_GOLD 			350
-#define BUY_GREATER_DRUID_GOLD 		400
-#define BUY_UNICORN_GOLD 		500
-#define BUY_PHOENIX_GOLD 		1500
-#define BUY_PHOENIX_MERCURY     	1 
-#define BUY_CENTAUR_GOLD 		60
-#define BUY_GARGOYLE_GOLD 		200
-#define BUY_GRIFFIN_GOLD 		300
-#define BUY_MINOTAUR_GOLD 		400
-#define BUY_KNIGHT_MINOTAUR_GOLD 	500
-#define BUY_HIDRA_GOLD 			800
-#define BUY_GREEN_DRAGON_GOLD 		3000
-#define BUY_GREEN_DRAGON_SULFUR  	1
-#define BUY_RED_DRAGON_GOLD 		3500
-#define BUY_RED_DRAGON_SULFUR    	1
-#define BUY_BLACK_DRAGON_GOLD 		4000
-#define BUY_BLACK_DRAGON_SULFUR  	2
-#define BUY_HALFLING_GOLD 		50
-#define BUY_BOAR_GOLD 			150
-#define BUY_IRON_GOLEM_GOLD 		300
-#define BUY_STEEL_GOLEM_GOLD 		350
-#define BUY_ROC_GOLD 			400
-#define BUY_MAGE_GOLD 			600
-#define BUY_ARCHMAGE_GOLD 		700
-#define BUY_GIANT_GOLD 			2000
-#define BUY_GIANT_GEMS          	1 
-#define BUY_TITAN_GOLD 			5000
-#define BUY_TITAN_GEMS          	2 
-#define BUY_SKELETON_GOLD 		75
-#define BUY_ZOMBIE_GOLD 		150
-#define BUY_MUTANT_ZOMBIE_GOLD 		200
-#define BUY_MUMMY_GOLD 			250
-#define BUY_ROYAL_MUMMY_GOLD 		300
-#define BUY_VAMPIRE_GOLD 		500
-#define BUY_LORD_VAMPIRE_GOLD 		650
-#define BUY_LICH_GOLD 			750
-#define BUY_POWER_LICH_GOLD 		900
-#define BUY_BONE_DRAGON_GOLD 		1500
-#define BUY_ROGUE_GOLD 			50
-#define BUY_NOMAD_GOLD 			200
-#define BUY_GHOST_GOLD 			1000
-#define BUY_GENIE_GOLD 			650
-#define BUY_GENIE_GEMS          	1 
-#define BUY_MEDUSA_GOLD 		500
-#define BUY_EARTH_ELEMENT_GOLD 		500
-#define BUY_AIR_ELEMENT_GOLD 		500
-#define BUY_FIRE_ELEMENT_GOLD 		500
-#define BUY_WATER_ELEMENT_GOLD 		500
-
 #define BUY_SPELL_BOOK_GOLD		500
 
 #define BUY_BOAT_GOLD			1000
 #define BUY_BOAT_WOOD			10
 
+typedef Resource::funds_t payment_t;
+
 namespace PaymentConditions
 {
-    typedef Resource::funds_t payment_t;
-
     class BuyBuilding : public payment_t
     {
     public:
