@@ -188,6 +188,9 @@ void Monster::UpdateStats(const std::string & spec)
     	    xml_monster->Attribute("gems", &value); cost.gems = value;
 
 	    ++ptr;
+
+	    // out of range
+	    if((ptr - &monsters[0]) >= MONSTER_RND1) break;
         }
     }
 #endif
