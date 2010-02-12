@@ -15,7 +15,7 @@
  -->
 
  <!-- first: unknown monster -->
- <monster attack="0" defence="0" damage_min="0" damage_max="0" hp="0" speed="0" grown="0" shots="0" gold="0" wood="0" mercury="0" ore="0" sulfur="0" crystal="0" gems="0" />
+ <monster skip="0" attack="0" defence="0" damage_min="0" damage_max="0" hp="0" speed="0" grown="0" shots="0" gold="0" wood="0" mercury="0" ore="0" sulfur="0" crystal="0" gems="0" />
 
  <!-- peasant -->
  <monster attack="1" defence="1" damage_min="1" damage_max="1" hp="1" speed="2" grown="12" gold="20" />

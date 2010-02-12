@@ -171,21 +171,25 @@ void Monster::UpdateStats(const std::string & spec)
 	    cost_t & cost = ptr->cost;
             int value;
 
-    	    xml_monster->Attribute("attack", &value); ptr->attack = value;
-    	    xml_monster->Attribute("defence", &value); ptr->defence = value;
-    	    xml_monster->Attribute("damage_min", &value); ptr->damageMin = value;
-    	    xml_monster->Attribute("damage_max", &value); ptr->damageMax = value;
-    	    xml_monster->Attribute("hp", &value); ptr->hp = value;
-    	    xml_monster->Attribute("speed", &value); ptr->speed = Speed::INSTANT < value ? Speed::INSTANT : (Speed::STANDING > value ? Speed::STANDING : static_cast<Speed::speed_t>(value));
-    	    xml_monster->Attribute("grown", &value); ptr->grown = value;
-    	    xml_monster->Attribute("shots", &value); ptr->shots = value;
-    	    xml_monster->Attribute("gold", &value); cost.gold = value;
-    	    xml_monster->Attribute("wood", &value); cost.wood = value;
-    	    xml_monster->Attribute("mercury", &value); cost.mercury = value;
-    	    xml_monster->Attribute("ore", &value); cost.ore = value;
-    	    xml_monster->Attribute("sulfur", &value); cost.sulfur = value;
-    	    xml_monster->Attribute("crystal", &value); cost.crystal = value;
-    	    xml_monster->Attribute("gems", &value); cost.gems = value;
+    	    xml_monster->Attribute("skip", &value);
+	    if(0 == value)
+	    {
+    		xml_monster->Attribute("attack", &value); ptr->attack = value;
+    		xml_monster->Attribute("defence", &value); ptr->defence = value;
+    		xml_monster->Attribute("damage_min", &value); ptr->damageMin = value;
+    		xml_monster->Attribute("damage_max", &value); ptr->damageMax = value;
+    		xml_monster->Attribute("hp", &value); ptr->hp = value;
+    		xml_monster->Attribute("speed", &value); ptr->speed = Speed::INSTANT < value ? Speed::INSTANT : (Speed::STANDING > value ? Speed::STANDING : static_cast<Speed::speed_t>(value));
+    		xml_monster->Attribute("grown", &value); ptr->grown = value;
+    		xml_monster->Attribute("shots", &value); ptr->shots = value;
+    		xml_monster->Attribute("gold", &value); cost.gold = value;
+    		xml_monster->Attribute("wood", &value); cost.wood = value;
+    		xml_monster->Attribute("mercury", &value); cost.mercury = value;
+    		xml_monster->Attribute("ore", &value); cost.ore = value;
+    		xml_monster->Attribute("sulfur", &value); cost.sulfur = value;
+    		xml_monster->Attribute("crystal", &value); cost.crystal = value;
+    		xml_monster->Attribute("gems", &value); cost.gems = value;
+	    }
 
 	    ++ptr;
 

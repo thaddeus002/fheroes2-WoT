@@ -286,7 +286,9 @@ void AnimationRemoveObject(const Maps::Tiles & tile)
     const Heroes *hero = NULL;
     if(Maps::ScanDistanceObject(tile.GetIndex(), MP2::OBJ_HEROES, 1, &index)) hero = world.GetHeroes(index);
 
-    Surface sf(tile.GetTileSurface());
+    const Surface & st = tile.GetTileSurface();
+    Surface sf(st.w(), st.h());
+    sf.Blit(st);
     const Sprite & sprite = AGG::GetICN(MP2::GetICNObject(addon->object), addon->index);
     sf.Blit(sprite, sprite.x(), sprite.y());
 
