@@ -45,7 +45,7 @@ Dialog::answer_t Dialog::ArmyInfo(const Army::Troop & troop, u16 flags)
 
     const ICN::icn_t viewarmy = Settings::Get().EvilInterface() ? ICN::VIEWARME : ICN::VIEWARMY;
     const Surface & sprite_dialog = AGG::GetICN(viewarmy, 0);
-    const Monster & mons = troop;
+    const Monster & mons = static_cast<Monster>(troop);
     const Battle2::Stats* battle = troop.GetBattleStats();
     Rect pos_rt;
 
@@ -180,7 +180,7 @@ void DrawMonsterStats(const Point & dst, const Army::Troop & troop)
     Point dst_pt;
     std::string message;
     Text text;
-    const Monster & mons = troop;
+    const Monster & mons = static_cast<Monster>(troop);
     const Battle2::Stats* battle = troop.GetBattleStats();
     bool commander = troop.MasterSkill();
     bool pda = Settings::Get().PocketPC();
