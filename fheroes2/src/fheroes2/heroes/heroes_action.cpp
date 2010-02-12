@@ -501,7 +501,7 @@ void ActionToMonster(Heroes &hero, const u8 obj, const u16 dst_index)
 
     bool ext_conditions = (hero.GetArmy().GetCount() < hero.GetArmy().Size() || hero.GetArmy().HasMonster(monster));
 
-    if(ext_conditions && ownRatio / otherRatio >= 2)
+    if(ext_conditions && (ownRatio / otherRatio) >= 2)
     {
         DEBUG(DBG_GAME , DBG_INFO, "ActionToMonster: possible " << hero.GetName() << " join monster " << monster.GetName());
         
@@ -566,7 +566,7 @@ void ActionToMonster(Heroes &hero, const u8 obj, const u16 dst_index)
                 }
             }	
         }
-        else if(ownRatio / otherRatio >= 5)
+        else if((ownRatio / otherRatio) >= 5)
         {
             std::string message = _("The %{monster}, awed by the power of your forces, begin to scatter.\nDo you wish to pursue and engage them?");
             std::string monst = monster.GetMultiName();

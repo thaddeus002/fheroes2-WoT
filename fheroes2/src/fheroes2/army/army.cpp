@@ -1063,6 +1063,9 @@ void Army::army_t::CalculateForceRatiosVersus(const army_t &a, u32 &own, u32 &ot
         other = static_cast<u32>((m2 + x2) / 2 * (1 + 0.1 * std::min(a2 - d1, 20)));
     else
         other = static_cast<u32>((m2 + x2) / 2 * (1 + 0.05 * std::min(d1 - a2, 14)));
+
+    if(0 == own) own = 1;
+    if(0 == other) other = 1;
 }
 
 bool Army::army_t::StrongerEnemyArmy(const army_t & a)
