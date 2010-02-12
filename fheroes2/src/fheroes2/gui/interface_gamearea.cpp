@@ -592,6 +592,7 @@ void Interface::GameArea::SetUpdateCursor(void)
 
 void Interface::GameArea::QueueEventProcessing(void)
 {
+    const Settings & conf = Settings::Get();
     Cursor & cursor = Cursor::Get();
     LocalEvent & le = LocalEvent::Get();
     const Point & mp = le.GetMouseCursor();
@@ -613,6 +614,9 @@ void Interface::GameArea::QueueEventProcessing(void)
 	oldIndexPos = index;
 	updateCursor = false;
     }
+
+    // fixed pocket pc tap mode
+    if(conf.HideInterface() && conf.ShowControlPanel() && le.MouseCursor(Interface::ControlPanel::Get().GetArea())) return;
 
     if(le.MouseClickLeft(tile_pos) && Cursor::POINTER != cursor.Themes())
         Game::MouseCursorAreaClickLeft(index);
