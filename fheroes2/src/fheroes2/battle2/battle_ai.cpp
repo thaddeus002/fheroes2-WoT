@@ -136,7 +136,7 @@ void Battle2::Arena::AIMagicAction(const Stats & b, Actions & a, const Stats* en
     if(enemy)
     {
 	// curse
-	if(!b.Modes(SP_CURSE) && isApplySpell(Spell::CURSE, *enemy, *hero, a)) return;
+	if(!enemy->Modes(SP_CURSE) && isApplySpell(Spell::CURSE, *enemy, *hero, a)) return;
 	// enemy good spell - clean
 	if(enemy->Modes(IS_GOOD_MAGIC) && isApplySpell(Spell::DISPEL, *enemy, *hero, a)) return;
     }
