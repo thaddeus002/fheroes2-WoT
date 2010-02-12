@@ -313,6 +313,12 @@ void Battle2::Arena::ApplyActionAttack(Action & action)
 		b1->GetName() << "(color: " << Color::String(b1->GetColor()) << ", pos: " << b1->position << ") to " << \
 		b2->GetName() << "(color: " << Color::String(b2->GetColor()) << ", pos: " << b2->position << ")");
 	}
+
+	if(Settings::Get().OriginalVersion())
+	{
+	    b1->UpdateDirection();
+	    b2->UpdateDirection();
+	}
     }
     else
     	DEBUG(DBG_BATTLE, DBG_WARN, "Battle2::Arena::ApplyActionAttack: " << "incorrect param: " << "id1: " << id1 << ", id2: " << id2);
