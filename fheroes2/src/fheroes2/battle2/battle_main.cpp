@@ -271,8 +271,8 @@ void Battle2::NecromancySkillAction(Army::army_t & army1, Army::army_t & army2, 
     for(u8 ii = 0; ii < army2.Size(); ++ii) count += army2.At(ii).GetCount();
 
     count = count * percent / 100;
-    if(count == 0) count = 1;
-    
+    if(count == 0) return;
+
     Monster mons(Monster::SKELETON);
     army1.JoinTroop(mons, count);
 
