@@ -359,7 +359,7 @@ u16 Monster::GetRNDSize(bool skip_factor) const
 	    default: break;
 	}
 
-	res *= (factor / 100);
+	res = (res * factor / 100);
     }
 
     return res;

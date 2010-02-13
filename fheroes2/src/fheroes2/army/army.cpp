@@ -346,18 +346,15 @@ bool Army::army_t::JoinTroop(const Troop & troop)
     std::vector<Troop>::iterator it;
     it = std::find_if(army.begin(), army.end(), std::bind2nd(std::mem_fun_ref(&Troop::HasMonster), troop()));
 
-    if(it != army.end())
-    {
-	(*it).SetCount((*it).GetCount() + troop.GetCount());
-	DEBUG(DBG_GAME , DBG_INFO, "Army::JoinTroop: monster: " << troop.GetName() << ", count: " << std::dec << troop.GetCount());
-	return true;
-    }
+    if(it == army.end()) it = std::find_if(army.begin(), army.end(), std::not1(std::mem_fun_ref(&Troop::isValid)));
 
-    it = std::find_if(army.begin(), army.end(), std::not1(std::mem_fun_ref(&Troop::isValid)));
     if(it != army.end())
     {
-	(*it).Set(troop, troop.GetCount());
-	DEBUG(DBG_GAME , DBG_INFO, "Army::JoinTroop: monster: " << troop.GetName() << ", count: " << std::dec << troop.GetCount());
+	if((*it).isValid())
+	    (*it).SetCount((*it).GetCount() + troop.GetCount());
+	else
+	    (*it).Set(troop, troop.GetCount());
+	DEBUG(DBG_GAME , DBG_INFO, "Army::JoinTroop: monster: " << troop.GetName() << ", count: " << std::dec << troop.GetCount() << ", commander: " << (commander ? commander->GetName() : "unknown"));
 	return true;
     }
 
@@ -964,7 +961,7 @@ void Army::army_t::UpgradeTroops(const Castle & castle)
 	   castle.isBuild(Monster::GetDwelling(Monster::Upgrade(troop))) &&
 	   payment <= world.GetKingdom(castle.GetColor()).GetFundsResource())
 	{
-    	    world.GetMyKingdom().OddFundsResource(payment);
+    	    world.GetKingdom(castle.GetColor()).OddFundsResource(payment);
             troop.Upgrade();
 	}
     }
