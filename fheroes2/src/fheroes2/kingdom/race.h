@@ -37,7 +37,8 @@ namespace Race
         NECR    = 0x20,
         MULT    = 0x40,
         RAND    = 0x80,
-        BOMG    = 0x00
+        BOMG    = 0x00,
+	ALL	= KNGT | BARB | SORC | WRLK | WZRD | NECR
     } race_t;
 
     const char* String(u8);

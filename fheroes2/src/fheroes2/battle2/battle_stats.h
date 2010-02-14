@@ -154,7 +154,7 @@ namespace Battle2
 	void	SpellRestoreAction(u8, u8, const HeroBase*);
 	u16	Resurrect(u32, bool);
 
-	Monster GetMonster(void) const;
+	const Monster & GetMonster(void) const;
 	const MonsterInfo & GetMonsterInfo(void) const;
 
 	const animframe_t & GetFrameState(void) const;

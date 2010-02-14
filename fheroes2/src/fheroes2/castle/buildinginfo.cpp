@@ -29,47 +29,214 @@
 #include "payment.h"
 #include "buildinginfo.h"
 
+#ifdef WITH_XML
+#include "xmlccwrap.h"
+#endif
+
+struct buildstats_t
+{
+    const char* id1;
+    const u32   id2;
+    const u8    race;
+    cost_t      cost;
+};
+
+static buildstats_t _builds[] = {
+    // id                                             gold wood mercury ore sulfur crystal gems
+    { "thieves_guild", BUILD_THIEVESGUILD, Race::ALL, { 750, 5, 0, 0, 0, 0, 0 } },
+    { "tavern",        BUILD_TAVERN,       Race::ALL, { 500, 5, 0, 0, 0, 0, 0 } },
+    { "shipyard",      BUILD_SHIPYARD,     Race::ALL, {2000,20, 0, 0, 0, 0, 0 } },
+    { "well",          BUILD_WELL,         Race::ALL, { 500, 0, 0, 0, 0, 0, 0 } },
+    { "statue",        BUILD_STATUE,       Race::ALL, {1250, 0, 0, 5, 0, 0, 0 } },
+    { "left_turret",   BUILD_LEFTTURRET,   Race::ALL, {1500, 0, 0, 5, 0, 0, 0 } },
+    { "right_turret",  BUILD_RIGHTTURRET,  Race::ALL, {1500, 0, 0, 5, 0, 0, 0 } },
+    { "marketplace",   BUILD_MARKETPLACE,  Race::ALL, { 500, 5, 0, 0, 0, 0, 0 } },
+    { "moat",          BUILD_MOAT,         Race::ALL, { 750, 0, 0, 0, 0, 0, 0 } },
+    { "castle",        BUILD_CASTLE,       Race::ALL, {5000,20, 0,20, 0, 0, 0 } },
+    { "captain",       BUILD_CAPTAIN,      Race::ALL, { 500, 0, 0, 0, 0, 0, 0 } },
+    { "mage_guild1",   BUILD_MAGEGUILD1,   Race::ALL, {2000, 5, 0, 5, 0, 0, 0 } },
+    { "mage_guild2",   BUILD_MAGEGUILD2,   Race::ALL, {1000, 5, 4, 5, 4, 4, 4 } },
+    { "mage_guild3",   BUILD_MAGEGUILD3,   Race::ALL, {1000, 5, 6, 5, 6, 6, 6 } },
+    { "mage_guild4",   BUILD_MAGEGUILD4,   Race::ALL, {1000, 5, 8, 5, 8, 8, 8 } },
+    { "mage_guild5",   BUILD_MAGEGUILD5,   Race::ALL, {1000, 5,10, 5,10,10,10 } },
+
+    { "farm",        BUILD_WEL2, Race::KNGT, {1000, 0, 0, 0, 0, 0, 0 } },
+    { "garbage_he",  BUILD_WEL2, Race::BARB, {1000, 0, 0, 0, 0, 0, 0 } },
+    { "crystal_gar", BUILD_WEL2, Race::SORC, {1000, 0, 0, 0, 0, 0, 0 } },
+    { "waterfall",   BUILD_WEL2, Race::WRLK, {1000, 0, 0, 0, 0, 0, 0 } },
+    { "orchard",     BUILD_WEL2, Race::WZRD, {1000, 0, 0, 0, 0, 0, 0 } },
+    { "skull_pile",  BUILD_WEL2, Race::NECR, {1000, 0, 0, 0, 0, 0, 0 } },
+
+    { "fortification", BUILD_SPEC, Race::KNGT, {1500, 5, 0,15, 0, 0, 0 } },
+    { "coliseum",      BUILD_SPEC, Race::BARB, {2000,10, 0,10, 0, 0, 0 } },
+    { "rainbow",       BUILD_SPEC, Race::SORC, {1500, 0, 0, 0, 0,10, 0 } },
+    { "dungeon",       BUILD_SPEC, Race::WRLK, {3000, 5, 0,10, 0, 0, 0 } },
+    { "library",       BUILD_SPEC, Race::WZRD, {1500, 5, 5, 5, 5, 5, 5 } },
+    { "storm",         BUILD_SPEC, Race::NECR, {1000, 0,10, 0,10, 0, 0 } },
+
+    { "shrine", BUILD_SHRINE, Race::NECR, {4000,10, 0, 0, 0,10, 0 } },
+
+    { "thatched_hut",       DWELLING_MONSTER1, Race::KNGT, { 200, 0, 0, 0, 0, 0, 0 } },
+    { "archery_range",      DWELLING_MONSTER2, Race::KNGT, {1000, 0, 0, 0, 0, 0, 0 } },
+    { "upg_archery_range",  DWELLING_UPGRADE2, Race::KNGT, {1500, 5, 0, 0, 0, 0, 0 } },
+    { "blacksmith",         DWELLING_MONSTER3, Race::KNGT, {1000, 0, 0, 5, 0, 0, 0 } },
+    { "upg_blacksmith",     DWELLING_UPGRADE3, Race::KNGT, {1500, 0, 0, 5, 0, 0, 0 } },
+    { "armory",             DWELLING_MONSTER4, Race::KNGT, {2000,10, 0,10, 0, 0, 0 } },
+    { "upg_armory",         DWELLING_UPGRADE4, Race::KNGT, {2000, 5, 0, 5, 0, 0, 0 } },
+    { "jousting_arena",     DWELLING_MONSTER5, Race::KNGT, {3000,20, 0, 0, 0, 0, 0 } },
+    { "upg_jousting_arena", DWELLING_UPGRADE5, Race::KNGT, {3000,10, 0, 0, 0, 0, 0 } },
+    { "cathedral",          DWELLING_MONSTER6, Race::KNGT, {5000,20, 0, 0, 0,20, 0 } },
+    { "upg_cathedral",      DWELLING_UPGRADE6, Race::KNGT, {5000,10, 0, 0, 0,10, 0 } },
+
+    { "hut",            DWELLING_MONSTER1, Race::BARB, { 300, 0, 0, 0, 0, 0, 0 } },
+    { "stick_hut",      DWELLING_MONSTER2, Race::BARB, { 800, 5, 0, 0, 0, 0, 0 } },
+    { "upg_stick_hut",  DWELLING_UPGRADE2, Race::BARB, {1200, 5, 0, 0, 0, 0, 0 } },
+    { "den",            DWELLING_MONSTER3, Race::BARB, {1000, 0, 0, 0, 0, 0, 0 } },
+    { "adobe",          DWELLING_MONSTER4, Race::BARB, {2000,10, 0,10, 0, 0, 0 } },
+    { "upg_adobe",      DWELLING_UPGRADE4, Race::BARB, {3000, 5, 0, 5, 0, 0, 0 } },
+    { "bridge",         DWELLING_MONSTER5, Race::BARB, {4000, 0, 0,20, 0, 0, 0 } },
+    { "upg_bridge",     DWELLING_UPGRADE5, Race::BARB, {2000, 0, 0,10, 0, 0, 0 } },
+    { "cyclop_pyramid", DWELLING_MONSTER6, Race::BARB, {6000, 0, 0,20, 0,20, 0 } },
+
+    { "treehouse",               DWELLING_MONSTER1, Race::SORC, { 500, 5, 0, 0, 0, 0, 0 } },
+    { "cottage",                 DWELLING_MONSTER2, Race::SORC, {1000, 5, 0, 0, 0, 0, 0 } },
+    { "upg_cottage",             DWELLING_UPGRADE2, Race::SORC, {1500, 5, 0, 0, 0, 0, 0 } },
+    { "elves_arhery_range",      DWELLING_MONSTER3, Race::SORC, {1500, 0, 0, 0, 0, 0, 0 } },
+    { "upg_elves_archery_range", DWELLING_UPGRADE3, Race::SORC, {1500, 5, 0, 0, 0, 0, 0 } },
+    { "stonehenge",              DWELLING_MONSTER4, Race::SORC, {1500, 0, 0,10, 0, 0, 0 } },
+    { "upd_stonehenge",          DWELLING_UPGRADE4, Race::SORC, {1500, 0, 5, 0, 0, 0, 0 } },
+    { "fenced_meadow",           DWELLING_MONSTER5, Race::SORC, {3000,10, 0, 0, 0, 0,10 } },
+    { "phoenix_red_tower",       DWELLING_MONSTER6, Race::SORC, {10000, 0,20,30, 0, 0, 0 } },
+
+    { "cave",        DWELLING_MONSTER1, Race::WRLK, { 500, 0, 0, 0, 0, 0, 0 } },
+    { "crypt",       DWELLING_MONSTER2, Race::WRLK, {1000, 0, 0,10, 0, 0, 0 } },
+    { "nest",        DWELLING_MONSTER3, Race::WRLK, {2000, 0, 0, 0, 0, 0, 0 } },
+    { "maze",        DWELLING_MONSTER4, Race::WRLK, {3000, 0, 0, 0, 0, 0,10 } },
+    { "upg_maze",    DWELLING_UPGRADE4, Race::WRLK, {2000, 0, 0, 0, 0, 0, 5 } },
+    { "swamp",       DWELLING_MONSTER5, Race::WRLK, {4000, 0, 0, 0,10, 0, 0 } },
+    { "green_tower", DWELLING_MONSTER6, Race::WRLK, {15000,0, 0,30,20, 0, 0 } },
+    { "red_tower",   DWELLING_UPGRADE6, Race::WRLK, {5000, 0, 0, 5,10, 0, 0 } },
+    { "black_tower", DWELLING_UPGRADE7, Race::WRLK, {5000, 0, 0, 5,10, 0, 0 } },
+
+    { "habitat",          DWELLING_MONSTER1, Race::WZRD, { 400, 0, 0, 0, 0, 0, 0 } },
+    { "pen",              DWELLING_MONSTER2, Race::WZRD, { 800, 0, 0, 0, 0, 0, 0 } },
+    { "foundry",          DWELLING_MONSTER3, Race::WZRD, {1500, 5, 0, 5, 0, 0, 0 } },
+    { "upg_foundry",      DWELLING_UPGRADE3, Race::WZRD, {1500, 0, 5, 0, 0, 0, 0 } },
+    { "cliff_nest",       DWELLING_MONSTER4, Race::WZRD, {3000, 5, 0, 0, 0, 0, 0 } },
+    { "ivory_tower",      DWELLING_MONSTER5, Race::WZRD, {3500, 5, 5, 5, 5, 5, 5 } },
+    { "upg_ivory_tower",  DWELLING_UPGRADE5, Race::WZRD, {4000, 5, 0, 5, 0, 0, 0 } },
+    { "cloud_castle",     DWELLING_MONSTER6, Race::WZRD, {12500,5, 0, 5, 0, 0,20 } },
+    { "upg_cloud_castle", DWELLING_UPGRADE6, Race::WZRD, {12500,5, 0, 5, 0, 0,20 } },
+
+    { "excavation",    DWELLING_MONSTER1, Race::NECR, { 400, 0, 0, 0, 0, 0, 0 } },
+    { "graveyard",     DWELLING_MONSTER2, Race::NECR, {1000, 0, 0, 0, 0, 0, 0 } },
+    { "upg_graveyard", DWELLING_UPGRADE2, Race::NECR, {1000, 0, 0, 0, 0, 0, 0 } },
+    { "pyramid",       DWELLING_MONSTER3, Race::NECR, {1500, 0, 0,10, 0, 0, 0 } },
+    { "upg_pyramid",   DWELLING_UPGRADE3, Race::NECR, {1500, 0, 0, 5, 0, 0, 0 } },
+    { "mansion",       DWELLING_MONSTER4, Race::NECR, {3000,10, 0, 0, 0, 0, 0 } },
+    { "upg_mansion",   DWELLING_UPGRADE4, Race::NECR, {4000, 5, 0, 0, 0,10,10 } },
+    { "mausoleum",     DWELLING_MONSTER5, Race::NECR, {4000,10, 0, 0,10, 0, 0 } },
+    { "upg_mausoleum", DWELLING_UPGRADE5, Race::NECR, {3000, 0, 0, 5, 0, 5, 0 } },
+    { "laboratory",    DWELLING_MONSTER6, Race::NECR, {10000,10,5,10, 5, 5, 5 } },
+
+    // end
+    { NULL, BUILD_NOTHING, Race::BOMG, { 0, 0, 0, 0, 0, 0, 0 } },
+};
+
+void BuildingInfo::UpdateCosts(const std::string & spec)
+{
+#ifdef WITH_XML
+    // parse buildings.xml
+    TiXmlDocument doc;
+    const TiXmlElement* xml_buildings = NULL;
+    buildstats_t* ptr = &_builds[0];
+
+    if(doc.LoadFile(spec.c_str()) &&
+        NULL != (xml_buildings = doc.FirstChildElement("buildings")))
+    {
+	while(ptr->id1)
+	{
+	    const TiXmlElement* xml_building = xml_buildings->FirstChildElement(ptr->id1);
+
+	    if(xml_building)
+	    {
+    		cost_t & cost = ptr->cost;
+		int value;
+
+                xml_building->Attribute("gold", &value); cost.gold = value;
+                xml_building->Attribute("wood", &value); cost.wood = value;
+                xml_building->Attribute("mercury", &value); cost.mercury = value;
+                xml_building->Attribute("ore", &value); cost.ore = value;
+                xml_building->Attribute("sulfur", &value); cost.sulfur = value;
+                xml_building->Attribute("crystal", &value); cost.crystal = value;
+                xml_building->Attribute("gems", &value); cost.gems = value;
+	    }
+
+	    ++ptr;
+	}
+    }
+#endif
+}
+
+void BuildingInfo::GetCost(u32 build, u8 race, payment_t & payment)
+{
+    const buildstats_t* ptr = &_builds[0];
+
+    while(ptr->id1 && !(ptr->id2 == build && (!race || (race & ptr->race)))) ++ptr;
+
+    if(ptr)
+    {
+	payment.gold = ptr->cost.gold;
+	payment.wood = ptr->cost.wood;
+	payment.mercury = ptr->cost.mercury;
+	payment.ore = ptr->cost.ore;
+	payment.sulfur = ptr->cost.sulfur;
+	payment.crystal = ptr->cost.crystal;
+	payment.gems = ptr->cost.gems;
+    }
+}
+
 u8 GetIndexBuildingSprite(u32 build)
 {
     switch(build)
     {
-	case Castle::DWELLING_MONSTER1:	return 19;
-	case Castle::DWELLING_MONSTER2: return 20;
-	case Castle::DWELLING_MONSTER3: return 21;
-	case Castle::DWELLING_MONSTER4: return 22;
-	case Castle::DWELLING_MONSTER5: return 23; 
-	case Castle::DWELLING_MONSTER6: return 24;
-	case Castle::DWELLING_UPGRADE2: return 25;
-	case Castle::DWELLING_UPGRADE3: return 26;
-	case Castle::DWELLING_UPGRADE4: return 27;
-	case Castle::DWELLING_UPGRADE5: return 28;
-	case Castle::DWELLING_UPGRADE6: return 29;
-	case Castle::DWELLING_UPGRADE7: return 30;
-	case Castle::BUILD_MAGEGUILD1:
-	case Castle::BUILD_MAGEGUILD2:
-	case Castle::BUILD_MAGEGUILD3:
-	case Castle::BUILD_MAGEGUILD4:
-	case Castle::BUILD_MAGEGUILD5:	return 0;
-	case Castle::BUILD_THIEVESGUILD:return 1;
-	case Castle::BUILD_TAVERN:	return 2;
-	case Castle::BUILD_SHIPYARD:	return 3;
-	case Castle::BUILD_WELL:	return 4;
-	case Castle::BUILD_CASTLE:	return 6;
-	case Castle::BUILD_STATUE:	return 7;
-	case Castle::BUILD_LEFTTURRET:	return 8;
-	case Castle::BUILD_RIGHTTURRET:	return 9;
-	case Castle::BUILD_MARKETPLACE:	return 10;
-	case Castle::BUILD_WEL2:	return 11;
-	case Castle::BUILD_MOAT:	return 12;
-	case Castle::BUILD_SPEC:	return 13;
-	case Castle::BUILD_CAPTAIN:	return 15;
+	case DWELLING_MONSTER1:	return 19;
+	case DWELLING_MONSTER2: return 20;
+	case DWELLING_MONSTER3: return 21;
+	case DWELLING_MONSTER4: return 22;
+	case DWELLING_MONSTER5: return 23; 
+	case DWELLING_MONSTER6: return 24;
+	case DWELLING_UPGRADE2: return 25;
+	case DWELLING_UPGRADE3: return 26;
+	case DWELLING_UPGRADE4: return 27;
+	case DWELLING_UPGRADE5: return 28;
+	case DWELLING_UPGRADE6: return 29;
+	case DWELLING_UPGRADE7: return 30;
+	case BUILD_MAGEGUILD1:
+	case BUILD_MAGEGUILD2:
+	case BUILD_MAGEGUILD3:
+	case BUILD_MAGEGUILD4:
+	case BUILD_MAGEGUILD5:	return 0;
+	case BUILD_THIEVESGUILD:return 1;
+	case BUILD_TAVERN:	return 2;
+	case BUILD_SHIPYARD:	return 3;
+	case BUILD_WELL:	return 4;
+	case BUILD_CASTLE:	return 6;
+	case BUILD_STATUE:	return 7;
+	case BUILD_LEFTTURRET:	return 8;
+	case BUILD_RIGHTTURRET:	return 9;
+	case BUILD_MARKETPLACE:	return 10;
+	case BUILD_WEL2:	return 11;
+	case BUILD_MOAT:	return 12;
+	case BUILD_SPEC:	return 13;
+	case BUILD_CAPTAIN:	return 15;
 	default: break;
     }
 
     return 0;
 }
 
-BuildingInfo::BuildingInfo(const Castle & c, Castle::building_t b) : castle(c), building(b), area(0, 0, 135, 57), disable(false)
+BuildingInfo::BuildingInfo(const Castle & c, building_t b) : castle(c), building(b), area(0, 0, 135, 57), disable(false)
 {
     if(IsDwelling()) building = castle.GetActualDwelling(b);
 
@@ -89,7 +256,7 @@ BuildingInfo::BuildingInfo(const Castle & c, Castle::building_t b) : castle(c), 
 	description = Castle::GetDescriptionBuilding(building, castle.GetRace());
 
     // necr and tavern check
-    if(Race::NECR == castle.GetRace() && Castle::BUILD_TAVERN == building && !Settings::Get().PriceLoyaltyVersion())
+    if(Race::NECR == castle.GetRace() && BUILD_TAVERN == building && !Settings::Get().PriceLoyaltyVersion())
 	disable = true;
 }
 
@@ -123,18 +290,18 @@ bool BuildingInfo::IsDwelling(void) const
 {
     switch(building)
     {
-	case Castle::DWELLING_MONSTER1:
-	case Castle::DWELLING_MONSTER2:
-	case Castle::DWELLING_MONSTER3:
-	case Castle::DWELLING_MONSTER4:
-	case Castle::DWELLING_MONSTER5:
-	case Castle::DWELLING_MONSTER6:
-	case Castle::DWELLING_UPGRADE2:
-	case Castle::DWELLING_UPGRADE3:
-	case Castle::DWELLING_UPGRADE4:
-	case Castle::DWELLING_UPGRADE5:
-	case Castle::DWELLING_UPGRADE6:
-	case Castle::DWELLING_UPGRADE7:
+	case DWELLING_MONSTER1:
+	case DWELLING_MONSTER2:
+	case DWELLING_MONSTER3:
+	case DWELLING_MONSTER4:
+	case DWELLING_MONSTER5:
+	case DWELLING_MONSTER6:
+	case DWELLING_UPGRADE2:
+	case DWELLING_UPGRADE3:
+	case DWELLING_UPGRADE4:
+	case DWELLING_UPGRADE5:
+	case DWELLING_UPGRADE6:
+	case DWELLING_UPGRADE7:
 	    return true;
 	default: break;
     }
@@ -171,7 +338,6 @@ void BuildingInfo::Redraw(void)
     Point dst_pt;
 
     bool allow_buy = AllowBuy();
-    PaymentConditions::BuyBuilding paymentBuild(castle.GetRace(), building);
 
     // indicator
     dst_pt.x = area.x + 115;
@@ -179,7 +345,11 @@ void BuildingInfo::Redraw(void)
     if(castle.isBuild(building)) display.Blit(sprite_allow, dst_pt);
     else
     if(! allow_buy)
-	(1 == paymentBuild.GetValidItems() && paymentBuild.gold && castle.AllowBuild()) ? display.Blit(sprite_money, dst_pt) : display.Blit(sprite_deny, dst_pt);
+    {
+	payment_t payment;
+	GetCost(building, castle.GetRace(), payment);
+	(1 == payment.GetValidItems() && payment.gold && castle.AllowBuild()) ? display.Blit(sprite_money, dst_pt) : display.Blit(sprite_deny, dst_pt);
+    }
 
     // status bar
     if(!castle.isBuild(building))
@@ -214,7 +384,7 @@ bool BuildingInfo::QueueEventProcessing(void)
     LocalEvent & le = LocalEvent::Get();
     if(le.MouseClickLeft(area))
     {
-	if(!castle.isBuild(Castle::BUILD_CASTLE))
+	if(!castle.isBuild(BUILD_CASTLE))
 	    Dialog::Message("", _("For this action it is necessary first to build a castle."), Font::BIG, Dialog::OK);
 	else
 	if(castle.isBuild(building))
@@ -261,7 +431,7 @@ bool BuildingInfo::DialogBuyBuilding(bool buttons) const
 
 		if(! castle.isBuild(value))
 		{
-		    str += Castle::GetStringBuilding(static_cast<Castle::building_t>(value), castle.GetRace());
+		    str += Castle::GetStringBuilding(static_cast<building_t>(value), castle.GetRace());
 		    if(count < requires.count()) str += ", ";
 		}
 	    }
@@ -272,8 +442,7 @@ bool BuildingInfo::DialogBuyBuilding(bool buttons) const
     Text requires_text(_("Requires:"), Font::BIG);
     TextBox box2(str, Font::BIG, BOXAREA_WIDTH);
 
-    PaymentConditions::BuyBuilding paymentBuild(castle.GetRace(), building);
-    Resource::BoxSprite rbs(paymentBuild, BOXAREA_WIDTH);
+    Resource::BoxSprite rbs(PaymentConditions::BuyBuilding(castle.GetRace(), building), BOXAREA_WIDTH);
 
     const Sprite & window_icons = AGG::GetICN(ICN::BLDGXTRA, 0);
     const u8 space = Settings::Get().PocketPC() ? 5 : 10;

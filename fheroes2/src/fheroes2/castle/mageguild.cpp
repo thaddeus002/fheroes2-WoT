@@ -29,11 +29,11 @@ MageGuild::MageGuild(const Race::race_t & rc) : race(rc), level(0), upgrade(fals
 
 void MageGuild::BuildNextLevel(void)
 {
-    if(5 < level) return;
-
-    ++level;
-    
-    PackSpells(level);
+    if(5 > level)
+    {
+	++level;
+    	PackSpells(level);
+    }
 }
 
 bool MageGuild::AllowUpgrade(void) const

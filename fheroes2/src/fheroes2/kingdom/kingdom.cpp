@@ -28,6 +28,7 @@
 #include "difficulty.h"
 #include "gameevent.h"
 #include "payment.h"
+#include "profit.h"
 #include "world.h"
 #include "visit.h"
 #include "battle2.h"
@@ -177,28 +178,30 @@ void Kingdom::ActionNewDay(void)
 	std::for_each(heroes.begin(), heroes.end(), std::mem_fun(&Heroes::ActionNewDay));
 
 	// captured object
-	resource.wood += DAY_PROFIT_WOOD * world.CountCapturedObject(MP2::OBJ_SAWMILL, color);
-	resource.ore += DAY_PROFIT_ORE * world.CountCapturedMines(Resource::ORE, color);
-	resource.mercury += DAY_PROFIT_MERCURY * world.CountCapturedObject(MP2::OBJ_ALCHEMYLAB, color);
-	resource.sulfur += DAY_PROFIT_SULFUR * world.CountCapturedMines(Resource::SULFUR, color);
-	resource.crystal += DAY_PROFIT_CRYSTAL * world.CountCapturedMines(Resource::CRYSTAL, color);
-	resource.gems += DAY_PROFIT_GEMS * world.CountCapturedMines(Resource::GEMS, color);
-	resource.gold += DAY_PROFIT_GOLD * world.CountCapturedMines(Resource::GOLD, color);
+	resource += ProfitConditions::FromMine(Resource::WOOD) * world.CountCapturedObject(MP2::OBJ_SAWMILL, color);
+	resource += ProfitConditions::FromMine(Resource::ORE) * world.CountCapturedMines(Resource::ORE, color);
+	resource += ProfitConditions::FromMine(Resource::MERCURY) * world.CountCapturedObject(MP2::OBJ_ALCHEMYLAB, color);
+	resource += ProfitConditions::FromMine(Resource::SULFUR) * world.CountCapturedMines(Resource::SULFUR, color);
+	resource += ProfitConditions::FromMine(Resource::CRYSTAL) * world.CountCapturedMines(Resource::CRYSTAL, color);
+	resource += ProfitConditions::FromMine(Resource::GEMS) * world.CountCapturedMines(Resource::GEMS, color);
+	resource += ProfitConditions::FromMine(Resource::GOLD) * world.CountCapturedMines(Resource::GOLD, color);
 
 	// funds
 	std::vector<Castle*>::const_iterator itc = castles.begin();
 	for(; itc != castles.end(); ++itc) if(*itc)
 	{
-		const Castle & castle = **itc;
+	    const Castle & castle = **itc;
 
-		// castle or town profit
-		resource.gold += (castle.isCastle() ? INCOME_CASTLE_GOLD : INCOME_TOWN_GOLD);
+	    // castle or town profit
+	    resource += ProfitConditions::FromBuilding((castle.isCastle() ? BUILD_CASTLE : BUILD_TENT), 0);
 
-		// statue
-		resource.gold += (castle.isBuild(Castle::BUILD_STATUE) ? INCOME_STATUE_GOLD : 0);
+	    // statue
+	    if(castle.isBuild(BUILD_STATUE))
+		resource += ProfitConditions::FromBuilding(BUILD_CASTLE, 0);
 
-		// dungeon for warlock
-		resource.gold += (castle.isBuild(Castle::BUILD_SPEC) && Race::WRLK == castle.GetRace() ? INCOME_DUNGEON_GOLD : 0);
+	    // dungeon for warlock
+	    if(castle.isBuild(BUILD_SPEC) && Race::WRLK == castle.GetRace())
+		resource += ProfitConditions::FromBuilding(BUILD_SPEC, Race::WRLK);
 	}
     }
 

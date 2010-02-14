@@ -1,5 +1,5 @@
 /*************************************************************************** 
- *   Copyright (C) 2009 by Andrey Afletdinov <fheroes2@gmail.com>          *
+ *   Copyright (C) 2010 by Andrey Afletdinov <fheroes2@gmail.com>          *
  *                                                                         *
  *   Part of the Free Heroes2 Engine:                                      *
  *   http://sourceforge.net/projects/fheroes2                              *
@@ -20,71 +20,29 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             * 
  ***************************************************************************/
 
-#ifndef H2PAYMENT_H
-#define H2PAYMENT_H
+#ifndef H2PROFIT_H
+#define H2PROFIT_H
 
-#include "resource.h"
+#include "payment.h"
 
-// profit
-#define INCOME_ENDLESS_SACK_GOLD	1000
-#define INCOME_ENDLESS_BAG_GOLD		750
-#define INCOME_ENDLESS_PURSE_GOLD	500
-#define INCOME_ENDLESS_POUCH_SULFUR	1
-#define INCOME_ENDLESS_VIAL_MERCURY	1
-#define INCOME_ENDLESS_POUCH_GEMS	1
-#define INCOME_ENDLESS_CORD_WOOD	2
-#define INCOME_ENDLESS_CART_ORE		2
-#define INCOME_ENDLESS_POUCH_CRYSTAL	1
-
-struct cost_t
+namespace ProfitConditions
 {
-    u16 gold;
-    u8 wood;
-    u8 mercury;
-    u8 ore;
-    u8 sulfur;
-    u8 crystal;
-    u8 gems;
-};
-
-typedef Resource::funds_t payment_t;
-
-namespace PaymentConditions
-{
-    class BuyBuilding : public payment_t
+    class FromBuilding : public payment_t
     {
     public:
-	BuyBuilding(u8 race, u32 build);
+	FromBuilding(u32, u8);
     };
 
-    class BuyMonster : public payment_t
+    class FromArtifact : public payment_t
     {
     public:
-	BuyMonster(u8 monster);
+	FromArtifact(u8);
     };
     
-    class UpgradeMonster : public payment_t
+    class FromMine : public payment_t
     {
     public:
-	UpgradeMonster(u8 monster);
-    };
-
-    class BuyBoat : public payment_t
-    {
-    public:
-	BuyBoat();
-    };
-
-    class BuySpellBook : public payment_t
-    {
-    public:
-	BuySpellBook();
-    };
-
-    class RecruitHero : public payment_t
-    {
-    public:
-	RecruitHero();
+	FromMine(u8);
     };
 
     void UpdateCosts(const std::string &);

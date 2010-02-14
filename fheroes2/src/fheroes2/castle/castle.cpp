@@ -271,9 +271,9 @@ void Castle::LoadFromMP2(const void *ptr)
 
 void Castle::SetStartArmy(void)
 {
-    const Monster mon1(race, Castle::DWELLING_MONSTER1);
-    const Monster mon2(race, Castle::DWELLING_MONSTER2);
-    const Monster mon3(race, Castle::DWELLING_MONSTER3);
+    const Monster mon1(race, DWELLING_MONSTER1);
+    const Monster mon2(race, DWELLING_MONSTER2);
+    const Monster mon3(race, DWELLING_MONSTER3);
 
     army.Clear();
 
@@ -556,10 +556,7 @@ bool Castle::AllowBuyHero(void)
     const Kingdom & kingdom = world.GetKingdom(color);
 
     if(kingdom.GetHeroes().size() >= KINGDOMMAXHEROES) return false;
-
-    const Resource::funds_t paymentCosts(Resource::GOLD, RECRUIT_HEROES_GOLD);
-
-    if(! kingdom.AllowPayment(paymentCosts)) return false;
+    if(! kingdom.AllowPayment(PaymentConditions::RecruitHero())) return false;
 
     return true;
 }
@@ -569,10 +566,7 @@ bool Castle::RecruitHero(Heroes* hero)
     if(! AllowBuyHero() && !hero) return false;
 
     Kingdom & kingdom = world.GetKingdom(color);
-
-    const Resource::funds_t paymentCosts(Resource::GOLD, RECRUIT_HEROES_GOLD);
-
-    kingdom.OddFundsResource(paymentCosts);
+    kingdom.OddFundsResource(PaymentConditions::RecruitHero());
 
     hero->SetCenter(GetCenter());
     hero->Recruit(*this);
@@ -1507,7 +1501,7 @@ bool Castle::PredicateIsTown(const Castle* castle)
 
 bool Castle::PredicateIsBuildMarketplace(const Castle* castle)
 {
-    return castle && castle->isBuild(Castle::BUILD_MARKETPLACE);
+    return castle && castle->isBuild(BUILD_MARKETPLACE);
 }
 
 void Castle::Dump(void) const
@@ -1611,20 +1605,14 @@ Army::army_t & Castle::GetActualArmy(void)
 bool Castle::AllowBuyBoat(void) const
 {
     // check payment and present other boat
-    Resource::funds_t res;
-    res.gold = BUY_BOAT_GOLD;
-    res.wood = BUY_BOAT_WOOD;
-    return world.GetMyKingdom().AllowPayment(res) && (false == Modes(BOATPRESENT));
+    return world.GetMyKingdom().AllowPayment(PaymentConditions::BuyBoat()) && (false == Modes(BOATPRESENT));
 }
 
 bool Castle::BuyBoat(void)
 {
-    Resource::funds_t res;
-    res.gold = BUY_BOAT_GOLD;
-    res.wood = BUY_BOAT_WOOD;
     if(!AllowBuyBoat()) return false;
     if(Game::LOCAL == world.GetKingdom(color).Control()) AGG::PlaySound(M82::BUILDTWN);
-    world.GetMyKingdom().OddFundsResource(res);
+    world.GetMyKingdom().OddFundsResource(PaymentConditions::BuyBoat());
     SetModes(BOATPRESENT);
 #ifndef WITH_NET
     world.CreateBoat(GetIndex(), true);

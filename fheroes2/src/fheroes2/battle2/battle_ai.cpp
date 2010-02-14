@@ -144,7 +144,7 @@ void Battle2::Arena::AIMagicAction(const Stats & b, Actions & a, const Stats* en
     // enemy scan - find archers
     if((NULL != (army = GetArmy(GetOppositeColor(b.GetColor()))) && army->BattleArchersPresent()) ||
 	// or archers tower
-	(castle && castle->GetColor() != b.GetColor() && castle->isBuild(Castle::BUILD_CASTLE)))
+	(castle && castle->GetColor() != b.GetColor() && castle->isCastle()))
     {
 	if(!b.Modes(SP_SHIELD) && isApplySpell(Spell::SHIELD, b, *hero, a)) return;
     }

@@ -37,6 +37,9 @@
 #include "localclient.h"
 #include "monster.h"
 #include "battle2.h"
+#include "payment.h"
+#include "profit.h"
+#include "buildinginfo.h"
 
 #include "zzlib.h"
 
@@ -371,13 +374,33 @@ void LoadConfigFiles(Settings & conf, const char* dirname)
 
 void LoadExternalResource(const Settings & conf)
 {
+    // battle.xml
     std::string spec = conf.LocalPrefix() + SEPARATOR + "files" + SEPARATOR + "stats" + SEPARATOR + "battle.xml";
 
     if(FilePresent(spec))
 	Battle2::UpdateMonsterInfoAnimation(spec);
 
+    // monsters.xml
     spec = conf.LocalPrefix() + SEPARATOR + "files" + SEPARATOR + "stats" + SEPARATOR + "monsters.xml";
 
     if(FilePresent(spec))
 	Monster::UpdateStats(spec);
+
+    // buildings.xml
+    spec = conf.LocalPrefix() + SEPARATOR + "files" + SEPARATOR + "stats" + SEPARATOR + "buildings.xml";
+
+    if(FilePresent(spec))
+	BuildingInfo::UpdateCosts(spec);
+
+    // payments.xml
+    spec = conf.LocalPrefix() + SEPARATOR + "files" + SEPARATOR + "stats" + SEPARATOR + "payments.xml";
+
+    if(FilePresent(spec))
+	PaymentConditions::UpdateCosts(spec);
+
+    // profits.xml
+    spec = conf.LocalPrefix() + SEPARATOR + "files" + SEPARATOR + "stats" + SEPARATOR + "profits.xml";
+
+    if(FilePresent(spec))
+	ProfitConditions::UpdateCosts(spec);
 }

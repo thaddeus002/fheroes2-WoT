@@ -32,7 +32,7 @@ Captain::Captain(const Castle & c) : home(c), spell_book(this)
 
 bool Captain::isValid(void) const
 {
-    return home.isBuild(Castle::BUILD_CAPTAIN);
+    return home.isBuild(BUILD_CAPTAIN);
 }
 
 u8 Captain::GetAttack(void) const

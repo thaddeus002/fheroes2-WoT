@@ -40,10 +40,7 @@ Dialog::answer_t Dialog::BuyBoat(bool enable)
     Cursor & cursor = Cursor::Get();
     cursor.Hide();
 
-    Resource::funds_t res;
-    res.gold = BUY_BOAT_GOLD;
-    res.wood = BUY_BOAT_WOOD;
-    Resource::BoxSprite rbs(res, BOXAREA_WIDTH);
+    Resource::BoxSprite rbs(PaymentConditions::BuyBoat(), BOXAREA_WIDTH);
 
     const Sprite & sprite = AGG::GetICN(ICN::BOATWIND, 0);
     Text text(_("Build a new ship:"), Font::BIG);

@@ -49,7 +49,7 @@ void ShowBuildMessage(StatusBar & bar, bool isBuilt, const std::string & message
     }
     else
     {
-        const PaymentConditions::BuyBuilding paymentBuild(castle.GetRace(), static_cast<Castle::building_t>(building));
+        const PaymentConditions::BuyBuilding paymentBuild(castle.GetRace(), static_cast<building_t>(building));
 
         if(!castle.AllowBuild())
 	{
@@ -62,13 +62,13 @@ void ShowBuildMessage(StatusBar & bar, bool isBuilt, const std::string & message
     	    String::Replace(str, "%{name}", message);
         }
         else
-        if(Castle::BUILD_SHIPYARD == building && !castle.HaveNearlySea())
+        if(BUILD_SHIPYARD == building && !castle.HaveNearlySea())
         {
             str = _("Cannot build %{name} because castle is too far from water.");
     	    String::Replace(str, "%{name}", message);
         }
         else
-        if(!castle.AllowBuyBuilding(static_cast<Castle::building_t>(building)))
+        if(!castle.AllowBuyBuilding(static_cast<building_t>(building)))
         {
             str = _("Cannot build %{name}");
     	    String::Replace(str, "%{name}", message);
@@ -118,8 +118,7 @@ Dialog::answer_t Castle::DialogBuyHero(const Heroes* hero)
 
     TextBox box2(str, Font::BIG, BOXAREA_WIDTH);
 
-    Resource::funds_t paymentCosts(Resource::GOLD, RECRUIT_HEROES_GOLD);
-    Resource::BoxSprite rbs(paymentCosts, BOXAREA_WIDTH);
+    Resource::BoxSprite rbs(PaymentConditions::RecruitHero(), BOXAREA_WIDTH);
 
     Dialog::Box box(text.h() + spacer + portrait_frame.h() + spacer + box2.h() + spacer + rbs.GetArea().h, true);
     const Rect & box_rt = box.GetArea();
@@ -195,7 +194,7 @@ Dialog::answer_t Castle::DialogBuyCaptain(bool buttons) const
     return info.DialogBuyBuilding(buttons) ? Dialog::OK : Dialog::CANCEL;
 }
 
-void RedrawInfoDwelling(const Point & pt, const Castle & castle, const Castle::building_t & build)
+void RedrawInfoDwelling(const Point & pt, const Castle & castle, const building_t build)
 {
     Display & display = Display::Get();
 
@@ -209,7 +208,7 @@ void RedrawInfoDwelling(const Point & pt, const Castle & castle, const Castle::b
 
     PaymentConditions::BuyBuilding paymentBuild(castle.GetRace(), build);
 
-    if(Castle::BUILD_CAPTAIN & build)
+    if(BUILD_CAPTAIN & build)
     {
 	// indicator
 	dst_pt.x = pt.x + 65;

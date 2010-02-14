@@ -934,7 +934,7 @@ void Battle2::Interface::RedrawCastle1(void) const
 {
     Display & display = Display::Get();
     const Point & topleft = border.GetArea();
-    const bool fortification = arena.castle && (Race::KNGT == arena.castle->GetRace()) && arena.castle->isBuild(Castle::BUILD_SPEC);
+    const bool fortification = arena.castle && (Race::KNGT == arena.castle->GetRace()) && arena.castle->isBuild(BUILD_SPEC);
 
     ICN::icn_t icn_castbkg = ICN::UNKNOWN;
     ICN::icn_t icn_castle  = ICN::UNKNOWN;
@@ -966,7 +966,7 @@ void Battle2::Interface::RedrawCastle1(void) const
     display.Blit(sprite1, sprite1.x() + topleft.x, sprite1.y() + topleft.y);
 
     // moat
-    if(arena.castle->isBuild(Castle::BUILD_MOAT))
+    if(arena.castle->isBuild(BUILD_MOAT))
     {
         const Sprite & sprite = AGG::GetICN(ICN::MOATWHOL, 0);
         display.Blit(sprite, sprite.x() + topleft.x, sprite.y() + topleft.y);
@@ -1021,7 +1021,7 @@ void Battle2::Interface::RedrawCastle2(const u16 cell_index) const
     if(8 == cell_index || 29 == cell_index || 73 == cell_index || 96 == cell_index)
     {
         u8 index = 0;
-	const bool fortification = arena.castle && (Race::KNGT == arena.castle->GetRace()) && arena.castle->isBuild(Castle::BUILD_SPEC);
+	const bool fortification = arena.castle && (Race::KNGT == arena.castle->GetRace()) && arena.castle->isBuild(BUILD_SPEC);
 
         switch(cell_index)
         {
@@ -1063,7 +1063,7 @@ void Battle2::Interface::RedrawCastle2(const u16 cell_index) const
     {
 	u8 index = 17;
 
-	if(arena.castle->isBuild(Castle::BUILD_LEFTTURRET))
+	if(arena.castle->isBuild(BUILD_LEFTTURRET))
 	{
 	    index = (arena.towers[0] && arena.towers[0]->isValid() ? 18 : 19);
     	}
@@ -1075,7 +1075,7 @@ void Battle2::Interface::RedrawCastle2(const u16 cell_index) const
     {
 	u8 index = 17;
 
-	if(arena.castle->isBuild(Castle::BUILD_RIGHTTURRET))
+	if(arena.castle->isBuild(BUILD_RIGHTTURRET))
 	{
 	    index = ( arena.towers[2] && arena.towers[2]->isValid() ? 18 : 19);
     	}

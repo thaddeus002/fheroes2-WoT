@@ -135,7 +135,7 @@ Dialog::answer_t Castle::OpenDialog(bool fade)
     if(castle_heroes)
 	display.Blit(Portrait::Hero((*castle_heroes), Portrait::BIG), dst_pt);
     else
-    if(isBuild(Castle::BUILD_CAPTAIN))
+    if(isBuild(BUILD_CAPTAIN))
 	display.Blit(Portrait::Captain(race, Portrait::BIG), dst_pt);
     else
     	display.Blit(AGG::GetICN(ICN::STRIP, 3), dst_pt);
@@ -496,7 +496,7 @@ Dialog::answer_t Castle::OpenDialog(bool fade)
 	    const u32 build = OpenTown();
 	    const bool buyhero = ((castle_heroes != prev) && (castle_heroes != NULL));
 
-	    if(Castle::BUILD_NOTHING != build)
+	    if(BUILD_NOTHING != build)
 	    {
 		cursor.Hide();
 
@@ -506,7 +506,7 @@ Dialog::answer_t Castle::OpenDialog(bool fade)
 		RedrawAnimationBuilding(cur_pt, build);
 		RedrawResourcePanel(cur_pt);
 
-		if(Castle::BUILD_CAPTAIN == build && ! castle_heroes)
+		if(BUILD_CAPTAIN == build && ! castle_heroes)
 		    display.Blit(Portrait::Captain(race, Portrait::BIG), cur_pt.x + 5, cur_pt.y + 361);
 
     		// RedrawResourcePanel destroy sprite buttonExit

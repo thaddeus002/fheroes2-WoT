@@ -27,9 +27,9 @@
 
 void Castle::AIJoinRNDArmy(void)
 {
-    const Monster mon1(race, Castle::DWELLING_MONSTER1);
-    const Monster mon2(race, Castle::DWELLING_MONSTER2);
-    const Monster mon3(race, Castle::DWELLING_MONSTER3);
+    const Monster mon1(race, DWELLING_MONSTER1);
+    const Monster mon2(race, DWELLING_MONSTER2);
+    const Monster mon3(race, DWELLING_MONSTER3);
 
     switch(Rand::Get(1, 4))
     {

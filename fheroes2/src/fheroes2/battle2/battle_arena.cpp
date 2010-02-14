@@ -625,10 +625,10 @@ Battle2::Arena::Arena(Army::army_t & a1, Army::army_t & a2, u16 index, bool loca
     if(castle)
     {
 	// init
-	towers[0] = castle->isBuild(Castle::BUILD_LEFTTURRET) ? new Tower(*castle, TWR_LEFT, *this) : NULL;
+	towers[0] = castle->isBuild(BUILD_LEFTTURRET) ? new Tower(*castle, TWR_LEFT, *this) : NULL;
 	towers[1] = new Tower(*castle, TWR_CENTER, *this);
-	towers[2] = castle->isBuild(Castle::BUILD_RIGHTTURRET) ? new Tower(*castle, TWR_RIGHT, *this) : NULL;
-	bool fortification = (Race::KNGT == castle->GetRace()) && castle->isBuild(Castle::BUILD_SPEC);
+	towers[2] = castle->isBuild(BUILD_RIGHTTURRET) ? new Tower(*castle, TWR_RIGHT, *this) : NULL;
+	bool fortification = (Race::KNGT == castle->GetRace()) && castle->isBuild(BUILD_SPEC);
 	catapult = army1.GetCommander() ? new Catapult(*army1.GetCommander(), fortification, *this) : NULL;
 
 	// catapult
@@ -909,7 +909,7 @@ void Battle2::Arena::ScanPassabilityBoard(const Stats & b, bool skip_speed)
 	    for(it = v1.begin(); it != v1.end(); ++it) board[*it].SetPassabilityAbroad(b, v2);
 
 	    // check moat positions
-	    if(!skip_speed && castle && castle->isBuild(Castle::BUILD_MOAT))
+	    if(!skip_speed && castle && castle->isBuild(BUILD_MOAT))
 	    {
 		v1.clear();
 		for(it = v2.begin(); it != v2.end(); ++it)
@@ -968,7 +968,7 @@ u16 Battle2::Arena::GetPath(const Stats & b, u16 to, std::vector<u16> & v)
     if(v.size() > b.GetSpeed()) v.resize(b.GetSpeed());
 
     // correct moat present
-    if(castle && castle->isBuild(Castle::BUILD_MOAT))
+    if(castle && castle->isBuild(BUILD_MOAT))
     {
 	std::vector<u16>::iterator it = std::find_if(v.begin(), v.end(), Board::isMoatIndex);
 	//                  check bridge

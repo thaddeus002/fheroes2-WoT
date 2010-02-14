@@ -35,17 +35,6 @@
 #include "xmlccwrap.h"
 #endif
 
-struct cost_t
-{
-    u16 gold;
-    u8 wood;
-    u8 mercury;
-    u8 ore;
-    u8 sulfur;
-    u8 crystal;
-    u8 gems;
-};
-
 struct monstats_t
 {
     u8 attack;
@@ -551,7 +540,7 @@ Monster::monster_t Monster::FromDwelling(u8 race, u32 dwelling)
 {
     switch(dwelling)
     {
-        case Castle::DWELLING_MONSTER1:
+        case DWELLING_MONSTER1:
         switch(race)
         {
 	case Race::KNGT: return PEASANT;
@@ -564,7 +553,7 @@ Monster::monster_t Monster::FromDwelling(u8 race, u32 dwelling)
         }
         break;
 
-        case Castle::DWELLING_MONSTER2:
+        case DWELLING_MONSTER2:
         switch(race)
         {
 	case Race::KNGT: return ARCHER;
@@ -577,7 +566,7 @@ Monster::monster_t Monster::FromDwelling(u8 race, u32 dwelling)
         }
         break;
 
-        case Castle::DWELLING_UPGRADE2:
+        case DWELLING_UPGRADE2:
         switch(race)
         {
 	case Race::KNGT: return RANGER;
@@ -590,7 +579,7 @@ Monster::monster_t Monster::FromDwelling(u8 race, u32 dwelling)
         }
         break;
 
-        case Castle::DWELLING_MONSTER3:
+        case DWELLING_MONSTER3:
         switch(race)
         {
 	case Race::KNGT: return PIKEMAN;
@@ -603,7 +592,7 @@ Monster::monster_t Monster::FromDwelling(u8 race, u32 dwelling)
         }
         break;
 
-        case Castle::DWELLING_UPGRADE3:
+        case DWELLING_UPGRADE3:
         switch(race)
         {
 	case Race::KNGT: return VETERAN_PIKEMAN;
@@ -616,7 +605,7 @@ Monster::monster_t Monster::FromDwelling(u8 race, u32 dwelling)
         }
         break;
 
-        case Castle::DWELLING_MONSTER4:
+        case DWELLING_MONSTER4:
         switch(race)
         {
 	case Race::KNGT: return SWORDSMAN;
@@ -629,7 +618,7 @@ Monster::monster_t Monster::FromDwelling(u8 race, u32 dwelling)
         }
         break;
 
-        case Castle::DWELLING_UPGRADE4:
+        case DWELLING_UPGRADE4:
         switch(race)
         {
 	case Race::KNGT: return MASTER_SWORDSMAN;
@@ -642,7 +631,7 @@ Monster::monster_t Monster::FromDwelling(u8 race, u32 dwelling)
         }
         break;
 
-        case Castle::DWELLING_MONSTER5:
+        case DWELLING_MONSTER5:
         switch(race)
         {
 	case Race::KNGT: return CAVALRY;
@@ -655,7 +644,7 @@ Monster::monster_t Monster::FromDwelling(u8 race, u32 dwelling)
         }
         break;
 
-        case Castle::DWELLING_UPGRADE5:
+        case DWELLING_UPGRADE5:
         switch(race)
         {
 	case Race::KNGT: return CHAMPION;
@@ -668,7 +657,7 @@ Monster::monster_t Monster::FromDwelling(u8 race, u32 dwelling)
         }
         break;
 
-	case Castle::DWELLING_MONSTER6:
+	case DWELLING_MONSTER6:
         switch(race)
         {
 	case Race::KNGT: return PALADIN;
@@ -681,7 +670,7 @@ Monster::monster_t Monster::FromDwelling(u8 race, u32 dwelling)
         }
         break;
 
-        case Castle::DWELLING_UPGRADE6:
+        case DWELLING_UPGRADE6:
         switch(race)
         {
 	case Race::KNGT: return CRUSADER;
@@ -694,7 +683,7 @@ Monster::monster_t Monster::FromDwelling(u8 race, u32 dwelling)
         }
         break;
 
-        case Castle::DWELLING_UPGRADE7:
+        case DWELLING_UPGRADE7:
         switch(race)
         {
 	case Race::KNGT: return CRUSADER;
@@ -962,69 +951,69 @@ u32 Monster::GetDwelling(monster_t m)
 	case SPRITE:
 	case CENTAUR:
 	case HALFLING:
-	case SKELETON:		return Castle::DWELLING_MONSTER1;
+	case SKELETON:		return DWELLING_MONSTER1;
 
 	case ARCHER:
 	case ORC:
 	case ZOMBIE:
 	case DWARF:
 	case GARGOYLE:
-	case BOAR:		return Castle::DWELLING_MONSTER2;
+	case BOAR:		return DWELLING_MONSTER2;
 
 	case RANGER:
 	case CHIEF_ORC:
 	case BATTLE_DWARF:
-	case MUTANT_ZOMBIE:	return Castle::DWELLING_UPGRADE2;
+	case MUTANT_ZOMBIE:	return DWELLING_UPGRADE2;
 
 	case PIKEMAN:
 	case WOLF:
 	case ELF:
 	case IRON_GOLEM:
 	case MUMMY:
-	case GRIFFIN:		return Castle::DWELLING_MONSTER3;
+	case GRIFFIN:		return DWELLING_MONSTER3;
 
 	case VETERAN_PIKEMAN:
 	case GRAND_ELF:
 	case STEEL_GOLEM:
-	case ROYAL_MUMMY:	return Castle::DWELLING_UPGRADE3;
+	case ROYAL_MUMMY:	return DWELLING_UPGRADE3;
 
 	case SWORDSMAN:
 	case OGRE:
 	case DRUID:
 	case MINOTAUR:
 	case ROC:
-	case VAMPIRE:		return Castle::DWELLING_MONSTER4;
+	case VAMPIRE:		return DWELLING_MONSTER4;
 
 	case MASTER_SWORDSMAN:
 	case LORD_OGRE:
 	case GREATER_DRUID:
 	case KNIGHT_MINOTAUR:
-	case LORD_VAMPIRE:	return Castle::DWELLING_UPGRADE4;
+	case LORD_VAMPIRE:	return DWELLING_UPGRADE4;
 
 	case CAVALRY:
 	case TROLL:
 	case MAGE:
 	case LICH:
 	case UNICORN:
-	case HYDRA:		return Castle::DWELLING_MONSTER5;
+	case HYDRA:		return DWELLING_MONSTER5;
 
 	case CHAMPION:
 	case WAR_TROLL:
 	case ARCHMAGE:
-	case POWER_LICH:	return Castle::DWELLING_UPGRADE5;
+	case POWER_LICH:	return DWELLING_UPGRADE5;
 
 	case PALADIN:
 	case CYCLOPS:
 	case PHOENIX:
 	case GREEN_DRAGON:
 	case GIANT:
-	case BONE_DRAGON:	return Castle::DWELLING_MONSTER6;
+	case BONE_DRAGON:	return DWELLING_MONSTER6;
 
 	case CRUSADER:
 	case RED_DRAGON:
-	case TITAN:		return Castle::DWELLING_UPGRADE6;
+	case TITAN:		return DWELLING_UPGRADE6;
 
-	case BLACK_DRAGON:	return Castle::DWELLING_UPGRADE7;
+	case BLACK_DRAGON:	return DWELLING_UPGRADE7;
     
 	default: break;
     }

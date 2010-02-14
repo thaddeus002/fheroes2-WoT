@@ -127,7 +127,7 @@ screen_t CastleOpenDialog1(Castle & castle)
     pt.y = dst_rt.y + 79;
 
     display.Blit(AGG::GetICN(ICN::SWAPWIN, 0), Rect(36, 267, 43, 43), pt.x, pt.y);
-    if(castle.isBuild(Castle::BUILD_CAPTAIN))
+    if(castle.isBuild(BUILD_CAPTAIN))
     {
 	const Surface & icon = Portrait::Captain(castle.GetRace(), Portrait::BIG);
 	display.Blit(icon, Rect((icon.w() - 41) / 2, 15, 41, 41), pt.x + 1, pt.y + 1);
@@ -198,7 +198,7 @@ screen_t CastleOpenDialog1(Castle & castle)
 
     display.Blit(AGG::GetICN(ICN::REQUESTS, 20), rectScreen1.x, rectScreen1.y);
 
-    if(castle.isBuild(Castle::BUILD_CASTLE))
+    if(castle.isBuild(BUILD_CASTLE))
     {
 	display.Blit(AGG::GetICN(ICN::REQUESTS, 21), rectScreen2.x, rectScreen2.y);
 	display.Blit(AGG::GetICN(ICN::REQUESTS, 22), rectScreen3.x, rectScreen3.y);
@@ -228,13 +228,13 @@ screen_t CastleOpenDialog1(Castle & castle)
 
         //if(le.MouseClickLeft(rectScreen1)) return SCREEN1;
         //else
-        if(castle.isBuild(Castle::BUILD_CASTLE) && le.MouseClickLeft(rectScreen2)) return SCREEN2;
+        if(castle.isBuild(BUILD_CASTLE) && le.MouseClickLeft(rectScreen2)) return SCREEN2;
         else
-        if(castle.isBuild(Castle::BUILD_CASTLE) && le.MouseClickLeft(rectScreen3)) return SCREEN3;
+        if(castle.isBuild(BUILD_CASTLE) && le.MouseClickLeft(rectScreen3)) return SCREEN3;
         else
-        if(castle.isBuild(Castle::BUILD_CASTLE) && le.MouseClickLeft(rectScreen4)) return SCREEN4;
+        if(castle.isBuild(BUILD_CASTLE) && le.MouseClickLeft(rectScreen4)) return SCREEN4;
         else
-        if(castle.isBuild(Castle::BUILD_CASTLE) && le.MouseClickLeft(rectScreen5)) return SCREEN5;
+        if(castle.isBuild(BUILD_CASTLE) && le.MouseClickLeft(rectScreen5)) return SCREEN5;
         else
         // exit
         if(le.MouseClickLeft(rectExit) || le.KeyPress(KEY_ESCAPE)) break;
@@ -245,15 +245,15 @@ screen_t CastleOpenDialog1(Castle & castle)
     	else
 	if(le.MouseClickLeft(rectTown))
 	{
-	    if(castle.isBuild(Castle::BUILD_CASTLE))
-		Dialog::Message(castle.GetStringBuilding(Castle::BUILD_CASTLE), castle.GetDescriptionBuilding(Castle::BUILD_CASTLE), Font::BIG, Dialog::OK);
+	    if(castle.isBuild(BUILD_CASTLE))
+		Dialog::Message(castle.GetStringBuilding(BUILD_CASTLE), castle.GetDescriptionBuilding(BUILD_CASTLE), Font::BIG, Dialog::OK);
 	    else
 	    if(!castle.Modes(Castle::ALLOWCASTLE))
         	Dialog::Message(_("Town"), _("This town may not be upgraded to a castle."), Font::BIG, Dialog::OK);
     	    else
             if(Dialog::OK == castle.DialogBuyCastle(true))
 	    {
-                castle.BuyBuilding(Castle::BUILD_CASTLE);
+                castle.BuyBuilding(BUILD_CASTLE);
                 cursor.Hide();
                 RedrawTownSprite(rectTown, castle);
                 cursor.Show();
@@ -332,27 +332,27 @@ screen_t CastleOpenDialog2(Castle & castle)
     const Rect rectScreen5(dst_rt.x + dst_rt.w - 27, dst_rt.y + 133, 25, 25);
     display.Blit(AGG::GetICN(ICN::REQUESTS, 24), rectScreen5.x, rectScreen5.y);
 
-    BuildingInfo dwelling1(castle, Castle::DWELLING_MONSTER1);
+    BuildingInfo dwelling1(castle, DWELLING_MONSTER1);
     dwelling1.SetPos(dst_rt.x + 2, dst_rt.y + 2);
     dwelling1.Redraw();
 
-    BuildingInfo dwelling2(castle, Castle::DWELLING_MONSTER2);
+    BuildingInfo dwelling2(castle, DWELLING_MONSTER2);
     dwelling2.SetPos(dst_rt.x + 141, dst_rt.y + 2);
     dwelling2.Redraw();
 
-    BuildingInfo dwelling3(castle, Castle::DWELLING_MONSTER3);
+    BuildingInfo dwelling3(castle, DWELLING_MONSTER3);
     dwelling3.SetPos(dst_rt.x + 2, dst_rt.y + 76);
     dwelling3.Redraw();
 
-    BuildingInfo dwelling4(castle, Castle::DWELLING_MONSTER4);
+    BuildingInfo dwelling4(castle, DWELLING_MONSTER4);
     dwelling4.SetPos(dst_rt.x + 141, dst_rt.y + 76);
     dwelling4.Redraw();
 
-    BuildingInfo dwelling5(castle, Castle::DWELLING_MONSTER5);
+    BuildingInfo dwelling5(castle, DWELLING_MONSTER5);
     dwelling5.SetPos(dst_rt.x + 2, dst_rt.y + 150);
     dwelling5.Redraw();
 
-    BuildingInfo dwelling6(castle, Castle::DWELLING_MONSTER6);
+    BuildingInfo dwelling6(castle, DWELLING_MONSTER6);
     dwelling6.SetPos(dst_rt.x + 141, dst_rt.y + 150);
     dwelling6.Redraw();
 
@@ -427,37 +427,37 @@ screen_t CastleOpenDialog3(Castle & castle)
     const Rect rectScreen5(dst_rt.x + dst_rt.w - 27, dst_rt.y + 133, 25, 25);
     display.Blit(AGG::GetICN(ICN::REQUESTS, 24), rectScreen5.x, rectScreen5.y);
 
-    Castle::building_t level = Castle::BUILD_NOTHING;
+    building_t level = BUILD_NOTHING;
     switch(castle.GetLevelMageGuild())
     {
-        case 0: level = Castle::BUILD_MAGEGUILD1; break;
-        case 1: level = Castle::BUILD_MAGEGUILD2; break;
-        case 2: level = Castle::BUILD_MAGEGUILD3; break;
-        case 3: level = Castle::BUILD_MAGEGUILD4; break;
-        default:level = Castle::BUILD_MAGEGUILD5; break;
+        case 0: level = BUILD_MAGEGUILD1; break;
+        case 1: level = BUILD_MAGEGUILD2; break;
+        case 2: level = BUILD_MAGEGUILD3; break;
+        case 3: level = BUILD_MAGEGUILD4; break;
+        default:level = BUILD_MAGEGUILD5; break;
     }
 
     BuildingInfo building1(castle, level);
     building1.SetPos(dst_rt.x + 2, dst_rt.y + 2);
     building1.Redraw();
 
-    BuildingInfo building2(castle, Castle::BUILD_TAVERN);
+    BuildingInfo building2(castle, BUILD_TAVERN);
     building2.SetPos(dst_rt.x + 141, dst_rt.y + 2);
     building2.Redraw();
 
-    BuildingInfo building3(castle, Castle::BUILD_THIEVESGUILD);
+    BuildingInfo building3(castle, BUILD_THIEVESGUILD);
     building3.SetPos(dst_rt.x + 2, dst_rt.y + 76);
     building3.Redraw();
 
-    BuildingInfo building4(castle, Castle::BUILD_SHIPYARD);
+    BuildingInfo building4(castle, BUILD_SHIPYARD);
     building4.SetPos(dst_rt.x + 141, dst_rt.y + 76);
     building4.Redraw();
 
-    BuildingInfo building5(castle, Castle::BUILD_STATUE);
+    BuildingInfo building5(castle, BUILD_STATUE);
     building5.SetPos(dst_rt.x + 2, dst_rt.y + 150);
     building5.Redraw();
 
-    BuildingInfo building6(castle, Castle::BUILD_MARKETPLACE);
+    BuildingInfo building6(castle, BUILD_MARKETPLACE);
     building6.SetPos(dst_rt.x + 141, dst_rt.y + 150);
     building6.Redraw();
 
@@ -501,7 +501,7 @@ screen_t CastleOpenDialog3(Castle & castle)
 	if(le.MouseCursor(building4.GetArea()))
 	{
 	    // buy boat
-	    if(castle.isBuild(Castle::BUILD_SHIPYARD))
+	    if(castle.isBuild(BUILD_SHIPYARD))
 	    {
 		if(le.MouseClickLeft(building4.GetArea()) && Dialog::OK == Dialog::BuyBoat(castle.AllowBuyBoat())) castle.BuyBoat();
 	    }
@@ -514,7 +514,7 @@ screen_t CastleOpenDialog3(Castle & castle)
 	if(le.MouseCursor(building6.GetArea()))
 	{
 	    // show marketplace
-	    if(castle.isBuild(Castle::BUILD_MARKETPLACE))
+	    if(castle.isBuild(BUILD_MARKETPLACE))
 	    {
 		if(le.MouseClickLeft(building6.GetArea())) Dialog::Marketplace();
 	    }
@@ -563,27 +563,27 @@ screen_t CastleOpenDialog4(Castle & castle)
     const Rect rectScreen5(dst_rt.x + dst_rt.w - 27, dst_rt.y + 133, 25, 25);
     display.Blit(AGG::GetICN(ICN::REQUESTS, 24), rectScreen5.x, rectScreen5.y);
 
-    BuildingInfo building1(castle, Castle::BUILD_WELL);
+    BuildingInfo building1(castle, BUILD_WELL);
     building1.SetPos(dst_rt.x + 2, dst_rt.y + 2);
     building1.Redraw();
 
-    BuildingInfo building2(castle, Castle::BUILD_WEL2);
+    BuildingInfo building2(castle, BUILD_WEL2);
     building2.SetPos(dst_rt.x + 141, dst_rt.y + 2);
     building2.Redraw();
 
-    BuildingInfo building3(castle, Castle::BUILD_SPEC);
+    BuildingInfo building3(castle, BUILD_SPEC);
     building3.SetPos(dst_rt.x + 2, dst_rt.y + 76);
     building3.Redraw();
 
-    BuildingInfo building4(castle, Castle::BUILD_LEFTTURRET);
+    BuildingInfo building4(castle, BUILD_LEFTTURRET);
     building4.SetPos(dst_rt.x + 141, dst_rt.y + 76);
     building4.Redraw();
 
-    BuildingInfo building5(castle, Castle::BUILD_RIGHTTURRET);
+    BuildingInfo building5(castle, BUILD_RIGHTTURRET);
     building5.SetPos(dst_rt.x + 2, dst_rt.y + 150);
     building5.Redraw();
 
-    BuildingInfo building6(castle, Castle::BUILD_MOAT);
+    BuildingInfo building6(castle, BUILD_MOAT);
     building6.SetPos(dst_rt.x + 141, dst_rt.y + 150);
     building6.Redraw();
 
@@ -642,7 +642,7 @@ screen_t CastleOpenDialog5(Castle & castle)
 
     // tavern
     Text text;
-    text.Set(castle.GetStringBuilding(Castle::BUILD_TAVERN), Font::SMALL);
+    text.Set(castle.GetStringBuilding(BUILD_TAVERN), Font::SMALL);
     text.Blit(dst_rt.x + (dst_rt.w - text.w()) / 2, dst_rt.y + 3);
 
     TextBox box1(_("A generous tip for the barkeep yields the following rumor:"), Font::SMALL, 186);
@@ -733,8 +733,8 @@ screen_t CastleOpenDialog5(Castle & castle)
 	else
 	if(le.MouseClickLeft(rectCaptain))
 	{
-	    BuildingInfo b(castle, Castle::BUILD_CAPTAIN);
-	    if(castle.isBuild(Castle::BUILD_CAPTAIN))
+	    BuildingInfo b(castle, BUILD_CAPTAIN);
+	    if(castle.isBuild(BUILD_CAPTAIN))
 		Dialog::Message(b.GetName(), b.GetDescription(), Font::SMALL, Dialog::OK);
 	    else
 	    if(b.DialogBuyBuilding(true))
@@ -862,12 +862,12 @@ u32 DwellingBar::GetDwellingFromIndex(u8 ii)
 {
     switch(ii)
     {
-	case 0: return Castle::DWELLING_MONSTER1;
-	case 1: return Castle::DWELLING_MONSTER2;
-	case 2: return Castle::DWELLING_MONSTER3;
-	case 3: return Castle::DWELLING_MONSTER4;
-	case 4: return Castle::DWELLING_MONSTER5;
-	case 5: return Castle::DWELLING_MONSTER6;
+	case 0: return DWELLING_MONSTER1;
+	case 1: return DWELLING_MONSTER2;
+	case 2: return DWELLING_MONSTER3;
+	case 3: return DWELLING_MONSTER4;
+	case 4: return DWELLING_MONSTER5;
+	case 5: return DWELLING_MONSTER6;
 	default: break;
     }
     return 0;
@@ -917,7 +917,7 @@ bool DwellingBar::QueueEventProcessing(void)
 	}
 	else
 	{
-	    BuildingInfo dwelling2(castle, static_cast<Castle::building_t>(dwelling));
+	    BuildingInfo dwelling2(castle, static_cast<building_t>(dwelling));
 	    if(dwelling2.DialogBuyBuilding(true))
 	    {
 		const_cast<Castle &>(castle).BuyBuilding(dwelling);

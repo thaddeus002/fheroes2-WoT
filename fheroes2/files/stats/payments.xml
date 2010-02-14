@@ -1,0 +1,10 @@
+<?xml version="1.0" ?>
+<payments>
+
+ <!-- <payment gold="0" wood="0" mercury="0" ore="0" sulfur="0" crystal="0" gems="0" /> -->
+
+ <buy_boat gold="1000" wood="10" />
+ <buy_spell_book gold="500" />
+ <recruit_hero gold="2500" />
+
+</payments>

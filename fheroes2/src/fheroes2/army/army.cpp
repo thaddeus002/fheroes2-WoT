@@ -791,11 +791,11 @@ void Army::army_t::Reset(bool soft)
 
     if(commander)
     {
-    	const Monster mons1(commander->GetRace(), Castle::DWELLING_MONSTER1);
+    	const Monster mons1(commander->GetRace(), DWELLING_MONSTER1);
 
 	if(soft)
 	{
-    	    const Monster mons2(commander->GetRace(), Castle::DWELLING_MONSTER2);
+    	    const Monster mons2(commander->GetRace(), DWELLING_MONSTER2);
 
 	    switch(Rand::Get(1, 3))
 	    {

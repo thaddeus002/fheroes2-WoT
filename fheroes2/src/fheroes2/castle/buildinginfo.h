@@ -28,7 +28,7 @@
 class BuildingInfo
 {
 public:
-    BuildingInfo(const Castle &, Castle::building_t);
+    BuildingInfo(const Castle &, building_t);
 
     u32 operator() (void) const;
 
@@ -45,6 +45,9 @@ public:
     void Redraw(void);
     bool QueueEventProcessing(void);
     bool DialogBuyBuilding(bool buttons) const;
+
+    static void UpdateCosts(const std::string &);
+    static void GetCost(u32, u8, payment_t &);
 
 private:
     const Castle & castle;

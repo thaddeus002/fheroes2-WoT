@@ -1428,11 +1428,11 @@ bool Heroes::BuySpellBook(const Castle & castle)
 {
     if(spell_book.isActive() || Color::GRAY == color) return false;
 
-    Resource::funds_t payment(Resource::GOLD, BUY_SPELL_BOOK_GOLD);
+    const payment_t payment = PaymentConditions::BuySpellBook();
     Kingdom & kingdom = world.GetKingdom(color);
 
     std::string header = _("To cast spells, you must first buy a spell book for %{gold} gold");
-    String::Replace(header, "%{gold}", BUY_SPELL_BOOK_GOLD);
+    String::Replace(header, "%{gold}", payment.gold);
 
     if( ! kingdom.AllowPayment(payment))
     {

@@ -337,9 +337,9 @@ void Battle2::Stats::SetArena(Arena* a)
     arena = a;
 }
 
-Monster Battle2::Stats::GetMonster(void) const
+const Monster & Battle2::Stats::GetMonster(void) const
 {
-    return static_cast<Monster>(troop);
+    return static_cast<Monster &>(troop);
 }
 
 void Battle2::Stats::SetReflection(bool r)
