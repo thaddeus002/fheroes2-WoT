@@ -34,6 +34,7 @@
 #include "cursor.h"
 #include "algorithm.h"
 #include "payment.h"
+#include "profit.h"
 #include "gameevent.h"
 
 #define PlayMusicReplacement(m82) if(MUS::FromMapObject((MP2::object_t)obj) == MUS::UNKNOWN) \
@@ -2101,11 +2102,12 @@ void ActionToCaptureObject(Heroes &hero, const u8 obj, const u16 dst_index)
 	    sf = new Surface(sprite.w(), sprite.h() + 14);
 	    sf->SetColorKey();
 	    sf->Blit(sprite);
-	    body = "1 / day";
+
+	    res = Resource::MERCURY;
+	    ProfitConditions::FromMine::GetPerDayString(res, body);
     	    Text text(body, Font::SMALL);
     	    text.Blit((sf->w() - text.w()) / 2, sf->h() - 12, *sf);
 
-	    res = Resource::MERCURY;
 	    header = MP2::StringObject(obj);
 	    body = _("You have taken control of the local Alchemist shop. It will provide you with one unit of Mercury per day.");
 	}
@@ -2122,11 +2124,12 @@ void ActionToCaptureObject(Heroes &hero, const u8 obj, const u16 dst_index)
 		sf = new Surface(sprite.w(), sprite.h() + 14);
 		sf->SetColorKey();
 		sf->Blit(sprite);
-		body = "2 / day";
+
+		res = Resource::ORE;
+		ProfitConditions::FromMine::GetPerDayString(res, body);
     		Text text(body, Font::SMALL);
     		text.Blit((sf->w() - text.w()) / 2, sf->h() - 12, *sf); // Here is pink fringing, becose letter sprite use shadow. Wiil fix later...
 
-        	res = Resource::ORE;
         	header = _("Ore Mine");
         	body = _("You gain control of an ore mine. It will provide you with two units of ore per day.");
             }
@@ -2139,11 +2142,12 @@ void ActionToCaptureObject(Heroes &hero, const u8 obj, const u16 dst_index)
 		sf = new Surface(sprite.w(), sprite.h() + 14);
 		sf->SetColorKey();
 		sf->Blit(sprite);
-		body = "1 / day";
+
+		res = Resource::SULFUR;
+		ProfitConditions::FromMine::GetPerDayString(res, body);
     		Text text(body, Font::SMALL);
     		text.Blit((sf->w() - text.w()) / 2, sf->h() - 12, *sf);
 
-        	res = Resource::SULFUR;
         	header = _("Sulfur Mine");
 		body = _("You gain control of a sulfur mine. It will provide you with one unit of sulfur per day.");
             }
@@ -2156,11 +2160,12 @@ void ActionToCaptureObject(Heroes &hero, const u8 obj, const u16 dst_index)
 		sf = new Surface(sprite.w(), sprite.h() + 14);
 		sf->SetColorKey();
 		sf->Blit(sprite);
-		body = "1 / day";
+
+		res = Resource::CRYSTAL;
+		ProfitConditions::FromMine::GetPerDayString(res, body);
     		Text text(body, Font::SMALL);
     		text.Blit((sf->w() - text.w()) / 2, sf->h() - 12, *sf);
 
-        	res = Resource::CRYSTAL;
         	header = _("Crystal Mine");
 		body = _("You gain control of a crystal mine. It will provide you with one unit of crystal per day.");
             }
@@ -2173,11 +2178,12 @@ void ActionToCaptureObject(Heroes &hero, const u8 obj, const u16 dst_index)
 		sf = new Surface(sprite.w(), sprite.h() + 14);
 		sf->SetColorKey();
 		sf->Blit(sprite);
-		body = "1 / day";
+
+		res = Resource::GEMS;
+		ProfitConditions::FromMine::GetPerDayString(res, body);
     		Text text(body, Font::SMALL);
     		text.Blit((sf->w() - text.w()) / 2, sf->h() - 12, *sf);
 
-        	res = Resource::GEMS;
         	header = _("Gems Mine");
 		body = _("You gain control of a gem mine. It will provide you with one unit of gems per day.");
             }
@@ -2190,11 +2196,12 @@ void ActionToCaptureObject(Heroes &hero, const u8 obj, const u16 dst_index)
 		sf = new Surface(sprite.w(), sprite.h() + 14);
 		sf->SetColorKey();
 		sf->Blit(sprite);
-		body = "1000 / day";
+
+		res = Resource::GOLD;
+		ProfitConditions::FromMine::GetPerDayString(res, body);
     		Text text(body, Font::SMALL);
     		text.Blit((sf->w() - text.w()) / 2, sf->h() - 12, *sf);
 
-        	res = Resource::GOLD;
         	header = _("Gold Mine");
 		body = _("You gain control of a gold mine. It will provide you with 1000 gold per day.");
             }

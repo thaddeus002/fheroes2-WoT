@@ -43,6 +43,8 @@ namespace ProfitConditions
     {
     public:
 	FromMine(u8);
+
+	static void GetPerDayString(u8, std::string &);
     };
 
     void UpdateCosts(const std::string &);

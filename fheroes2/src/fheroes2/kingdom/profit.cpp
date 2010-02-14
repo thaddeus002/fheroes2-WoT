@@ -189,3 +189,40 @@ ProfitConditions::FromMine::FromMine(u8 type)
         gems = ptr->cost.gems;
     }
 }
+
+void ProfitConditions::FromMine::GetPerDayString(u8 type, std::string & str)
+{
+    const char* id = NULL;
+
+    switch(type)
+    {
+	case Resource::ORE: id = "mine_ore"; break;
+	case Resource::WOOD: id = "sawmill"; break;
+	case Resource::MERCURY: id = "alchemylab"; break;
+	case Resource::SULFUR: id = "mine_sulfur"; break;
+	case Resource::CRYSTAL: id = "mine_crystal"; break;
+	case Resource::GEMS: id = "mine_gems"; break;
+	case Resource::GOLD: id = "mine_gold"; break;
+	default: break;
+    }
+
+    profitstats_t* ptr = &_profits[0];
+    while(ptr->id && id && std::strcmp(id, ptr->id)) ++ptr;
+
+    if(ptr)
+    {
+	str = _("%{count} / day");
+
+	switch(type)
+	{
+	    case Resource::ORE:     String::Replace(str, "%{count}", ptr->cost.ore); break;
+	    case Resource::WOOD:    String::Replace(str, "%{count}", ptr->cost.wood); break;
+	    case Resource::MERCURY: String::Replace(str, "%{count}", ptr->cost.mercury); break;
+	    case Resource::SULFUR:  String::Replace(str, "%{count}", ptr->cost.sulfur); break;
+	    case Resource::CRYSTAL: String::Replace(str, "%{count}", ptr->cost.crystal); break;
+	    case Resource::GEMS:    String::Replace(str, "%{count}", ptr->cost.gems); break;
+	    case Resource::GOLD:    String::Replace(str, "%{count}", ptr->cost.gold); break;
+	    default: break;
+	}
+    }
+}
