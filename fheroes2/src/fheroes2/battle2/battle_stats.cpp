@@ -1387,9 +1387,12 @@ bool Battle2::Stats::isTwiceAttack(void) const
         case Monster::WOLF:
         case Monster::PALADIN:
         case Monster::CRUSADER:
+	    return true;
+
         case Monster::ELF:
         case Monster::GRAND_ELF:
-        case Monster::RANGER: return true;
+        case Monster::RANGER:
+	    return ! isHandFighting();
 
         default: break;
     }
