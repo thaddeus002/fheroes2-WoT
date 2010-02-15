@@ -47,6 +47,12 @@ namespace ProfitConditions
 	static void GetPerDayString(u8, std::string &);
     };
 
+    class FromSkillEstates : public payment_t
+    {
+    public:
+	FromSkillEstates(u8);
+    };
+
     void UpdateCosts(const std::string &);
 };
 

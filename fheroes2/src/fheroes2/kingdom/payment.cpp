@@ -45,6 +45,17 @@ static paymentstats_t _payments[] = {
     { NULL, { 0, 0, 0, 0, 0, 0, 0 } },
 };
 
+void PaymentLoadCost(payment_t & payment, const cost_t & cost)
+{
+    payment.gold = cost.gold;
+    payment.wood = cost.wood;
+    payment.mercury = cost.mercury;
+    payment.ore = cost.ore;
+    payment.sulfur = cost.sulfur;
+    payment.crystal = cost.crystal;
+    payment.gems = cost.gems;
+}
+
 void PaymentConditions::UpdateCosts(const std::string & spec)
 {
 #ifdef WITH_XML
@@ -102,16 +113,7 @@ PaymentConditions::BuyBoat::BuyBoat()
 
     while(ptr->id && std::strcmp("buy_boat", ptr->id)) ++ptr;
 
-    if(ptr)
-    {
-	gold = ptr->cost.gold;
-	wood = ptr->cost.wood;
-	mercury = ptr->cost.mercury;
-	ore = ptr->cost.ore;
-	sulfur = ptr->cost.sulfur;
-	crystal = ptr->cost.crystal;
-	gems = ptr->cost.gems;
-    }
+    if(ptr) PaymentLoadCost(*this, ptr->cost);
 }
 
 PaymentConditions::BuySpellBook::BuySpellBook()
@@ -120,16 +122,7 @@ PaymentConditions::BuySpellBook::BuySpellBook()
 
     while(ptr->id && std::strcmp("buy_spell_book", ptr->id)) ++ptr;
 
-    if(ptr)
-    {
-	gold = ptr->cost.gold;
-	wood = ptr->cost.wood;
-	mercury = ptr->cost.mercury;
-	ore = ptr->cost.ore;
-	sulfur = ptr->cost.sulfur;
-	crystal = ptr->cost.crystal;
-	gems = ptr->cost.gems;
-    }
+    if(ptr) PaymentLoadCost(*this, ptr->cost);
 }
 
 PaymentConditions::RecruitHero::RecruitHero()
@@ -138,14 +131,5 @@ PaymentConditions::RecruitHero::RecruitHero()
 
     while(ptr->id && std::strcmp("recruit_hero", ptr->id)) ++ptr;
 
-    if(ptr)
-    {
-	gold = ptr->cost.gold;
-	wood = ptr->cost.wood;
-	mercury = ptr->cost.mercury;
-	ore = ptr->cost.ore;
-	sulfur = ptr->cost.sulfur;
-	crystal = ptr->cost.crystal;
-	gems = ptr->cost.gems;
-    }
+    if(ptr) PaymentLoadCost(*this, ptr->cost);
 }

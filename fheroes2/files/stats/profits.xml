@@ -16,6 +16,7 @@
  <mine_gems gems="1" />
  <mine_gold gold="1000" />
 
+ <ultimate_golden_goose gold="10000" />
  <endless_sack_gold gold="1000" />
  <endless_bag_gold gold="750" />
  <endless_purse_gold gold="500" />
@@ -25,5 +26,9 @@
  <endless_pouch_sulfur sulfur="1" />
  <endless_pouch_crystal crystal="1" />
  <endless_pouch_gems gems="1" />
+
+ <estates_basic gold="100" />
+ <estates_advanced gold="250" />
+ <estates_expert gold="500" />
 
 </profits>

@@ -23,6 +23,7 @@
 #include <cstring>
 #include "castle.h"
 #include "artifact.h"
+#include "skill.h"
 #include "profit.h"
 
 #ifdef WITH_XML
@@ -49,6 +50,7 @@ static profitstats_t _profits[] = {
     { "mine_gems",    { 0, 0, 0, 0, 0, 0, 1 } },
     { "mine_gold",    {1000, 0, 0, 0, 0, 0, 0 } },
 
+    { "ultimate_golden_goose", {10000, 0, 0, 0, 0, 0, 0 } },
     { "endless_sack_gold",     {1000, 0, 0, 0, 0, 0, 0 } },
     { "endless_bag_gold",      { 750, 0, 0, 0, 0, 0, 0 } },
     { "endless_purse_gold",    { 500, 0, 0, 0, 0, 0, 0 } },
@@ -58,6 +60,10 @@ static profitstats_t _profits[] = {
     { "endless_pouch_sulfur",  { 0, 0, 0, 0, 1, 0, 0 } },
     { "endless_pouch_crystal", { 0, 0, 0, 0, 0, 1, 0 } },
     { "endless_pouch_gems",    { 0, 0, 0, 0, 0, 0, 1 } },
+
+    { "estates_basic",         {100, 0, 0, 0, 0, 0, 0 } },
+    { "estates_advanced",      {250, 0, 0, 0, 0, 0, 0 } },
+    { "estates_expert",        {500, 0, 0, 0, 0, 0, 0 } },
 
     { NULL, { 0, 0, 0, 0, 0, 0, 0 } },
 };
@@ -114,16 +120,7 @@ ProfitConditions::FromBuilding::FromBuilding(u32 building, u8 race)
     profitstats_t* ptr = &_profits[0];
     while(ptr->id && id && std::strcmp(id, ptr->id)) ++ptr;
 
-    if(ptr)
-    {
-        gold = ptr->cost.gold;
-        wood = ptr->cost.wood;
-        mercury = ptr->cost.mercury;
-        ore = ptr->cost.ore;
-        sulfur = ptr->cost.sulfur;
-        crystal = ptr->cost.crystal;
-        gems = ptr->cost.gems;
-    }
+    if(ptr) PaymentLoadCost(*this, ptr->cost);
 }
 
 ProfitConditions::FromArtifact::FromArtifact(u8 artifact)
@@ -132,6 +129,7 @@ ProfitConditions::FromArtifact::FromArtifact(u8 artifact)
 
     switch(artifact)
     {
+	case Artifact::GOLDEN_GOOSE: id = "ultimate_golden_goose"; break;
 	case Artifact::ENDLESS_SACK_GOLD: id = "endless_sack_gold"; break;
 	case Artifact::ENDLESS_BAG_GOLD: id = "endless_bag_gold"; break;
 	case Artifact::ENDLESS_PURSE_GOLD: id = "endless_purse_gold"; break;
@@ -147,16 +145,7 @@ ProfitConditions::FromArtifact::FromArtifact(u8 artifact)
     profitstats_t* ptr = &_profits[0];
     while(ptr->id && id && std::strcmp(id, ptr->id)) ++ptr;
 
-    if(ptr)
-    {
-        gold = ptr->cost.gold;
-        wood = ptr->cost.wood;
-        mercury = ptr->cost.mercury;
-        ore = ptr->cost.ore;
-        sulfur = ptr->cost.sulfur;
-        crystal = ptr->cost.crystal;
-        gems = ptr->cost.gems;
-    }
+    if(ptr) PaymentLoadCost(*this, ptr->cost);
 }
 
 ProfitConditions::FromMine::FromMine(u8 type)
@@ -178,16 +167,7 @@ ProfitConditions::FromMine::FromMine(u8 type)
     profitstats_t* ptr = &_profits[0];
     while(ptr->id && id && std::strcmp(id, ptr->id)) ++ptr;
 
-    if(ptr)
-    {
-        gold = ptr->cost.gold;
-        wood = ptr->cost.wood;
-        mercury = ptr->cost.mercury;
-        ore = ptr->cost.ore;
-        sulfur = ptr->cost.sulfur;
-        crystal = ptr->cost.crystal;
-        gems = ptr->cost.gems;
-    }
+    if(ptr) PaymentLoadCost(*this, ptr->cost);
 }
 
 void ProfitConditions::FromMine::GetPerDayString(u8 type, std::string & str)
@@ -225,4 +205,22 @@ void ProfitConditions::FromMine::GetPerDayString(u8 type, std::string & str)
 	    default: break;
 	}
     }
+}
+
+ProfitConditions::FromSkillEstates::FromSkillEstates(u8 level)
+{
+    const char* id = NULL;
+
+    switch(level)
+    {
+	case Skill::Level::BASIC:    id = "estates_basic"; break;
+	case Skill::Level::ADVANCED: id = "estates_advanced"; break;
+	case Skill::Level::EXPERT:   id = "estates_expert"; break;
+	default: break;
+    }
+
+    profitstats_t* ptr = &_profits[0];
+    while(ptr->id && id && std::strcmp(id, ptr->id)) ++ptr;
+
+    if(ptr) PaymentLoadCost(*this, ptr->cost);
 }

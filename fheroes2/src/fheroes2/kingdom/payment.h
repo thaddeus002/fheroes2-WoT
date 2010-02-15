@@ -25,17 +25,6 @@
 
 #include "resource.h"
 
-// profit
-#define INCOME_ENDLESS_SACK_GOLD	1000
-#define INCOME_ENDLESS_BAG_GOLD		750
-#define INCOME_ENDLESS_PURSE_GOLD	500
-#define INCOME_ENDLESS_POUCH_SULFUR	1
-#define INCOME_ENDLESS_VIAL_MERCURY	1
-#define INCOME_ENDLESS_POUCH_GEMS	1
-#define INCOME_ENDLESS_CORD_WOOD	2
-#define INCOME_ENDLESS_CART_ORE		2
-#define INCOME_ENDLESS_POUCH_CRYSTAL	1
-
 struct cost_t
 {
     u16 gold;
@@ -48,6 +37,7 @@ struct cost_t
 };
 
 typedef Resource::funds_t payment_t;
+void PaymentLoadCost(payment_t &, const cost_t &);
 
 namespace PaymentConditions
 {

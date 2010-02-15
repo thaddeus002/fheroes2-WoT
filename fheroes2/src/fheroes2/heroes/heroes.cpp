@@ -32,6 +32,7 @@
 #include "morale.h"
 #include "monster.h"
 #include "payment.h"
+#include "profit.h"
 #include "cursor.h"
 #include "kingdom.h"
 #include "visit.h"
@@ -1111,26 +1112,21 @@ void Heroes::ActionNewDay(void)
     Resource::funds_t resource;
 
     // skip incomes for first day
-    if(HasArtifact(Artifact::ENDLESS_SACK_GOLD))      resource.gold += INCOME_ENDLESS_SACK_GOLD;
-    if(HasArtifact(Artifact::ENDLESS_BAG_GOLD))       resource.gold += INCOME_ENDLESS_BAG_GOLD;
-    if(HasArtifact(Artifact::ENDLESS_PURSE_GOLD))     resource.gold += INCOME_ENDLESS_PURSE_GOLD;
-    if(HasArtifact(Artifact::ENDLESS_POUCH_SULFUR))   resource.sulfur += INCOME_ENDLESS_POUCH_SULFUR;
-    if(HasArtifact(Artifact::ENDLESS_VIAL_MERCURY))   resource.mercury += INCOME_ENDLESS_VIAL_MERCURY;
-    if(HasArtifact(Artifact::ENDLESS_POUCH_GEMS))     resource.gems += INCOME_ENDLESS_POUCH_GEMS;
-    if(HasArtifact(Artifact::ENDLESS_CORD_WOOD))      resource.wood += INCOME_ENDLESS_CORD_WOOD;
-    if(HasArtifact(Artifact::ENDLESS_CART_ORE))       resource.ore += INCOME_ENDLESS_CART_ORE;
-    if(HasArtifact(Artifact::ENDLESS_POUCH_CRYSTAL))  resource.crystal += INCOME_ENDLESS_POUCH_CRYSTAL;
+    if(HasArtifact(Artifact::GOLDEN_GOOSE))           resource += ProfitConditions::FromArtifact(Artifact::GOLDEN_GOOSE);
+    if(HasArtifact(Artifact::ENDLESS_SACK_GOLD))      resource += ProfitConditions::FromArtifact(Artifact::ENDLESS_SACK_GOLD);
+    if(HasArtifact(Artifact::ENDLESS_BAG_GOLD))       resource += ProfitConditions::FromArtifact(Artifact::ENDLESS_BAG_GOLD);
+    if(HasArtifact(Artifact::ENDLESS_PURSE_GOLD))     resource += ProfitConditions::FromArtifact(Artifact::ENDLESS_PURSE_GOLD);
+    if(HasArtifact(Artifact::ENDLESS_POUCH_SULFUR))   resource += ProfitConditions::FromArtifact(Artifact::ENDLESS_POUCH_SULFUR);
+    if(HasArtifact(Artifact::ENDLESS_VIAL_MERCURY))   resource += ProfitConditions::FromArtifact(Artifact::ENDLESS_VIAL_MERCURY);
+    if(HasArtifact(Artifact::ENDLESS_POUCH_GEMS))     resource += ProfitConditions::FromArtifact(Artifact::ENDLESS_POUCH_GEMS);
+    if(HasArtifact(Artifact::ENDLESS_CORD_WOOD))      resource += ProfitConditions::FromArtifact(Artifact::ENDLESS_CORD_WOOD);
+    if(HasArtifact(Artifact::ENDLESS_CART_ORE))       resource += ProfitConditions::FromArtifact(Artifact::ENDLESS_CART_ORE);
+    if(HasArtifact(Artifact::ENDLESS_POUCH_CRYSTAL))  resource += ProfitConditions::FromArtifact(Artifact::ENDLESS_POUCH_CRYSTAL);
 
     // estates skill bonus
-    switch(GetLevelSkill(Skill::Secondary::ESTATES))
-    {
-    	case Skill::Level::BASIC:       resource.gold += 100; break;
-    	case Skill::Level::ADVANCED:    resource.gold += 250; break;
-    	case Skill::Level::EXPERT:      resource.gold += 500; break;
+    resource += ProfitConditions::FromSkillEstates(GetLevelSkill(Skill::Secondary::ESTATES));
 
-    	default: break;
-    }
-
+    // added
     if(resource.GetValidItems()) world.GetKingdom(GetColor()).AddFundsResource(resource);
 
     if(HasArtifact(Artifact::TAX_LIEN))
