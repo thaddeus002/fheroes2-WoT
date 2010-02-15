@@ -96,11 +96,15 @@ void Battle2::Arena::AITurn(const Stats & b, Actions & a)
 		    enemy = GetEnemyAbroadMaxQuality(path.back(), b.GetColor());
 		    if(enemy) AIMagicAction(b, a, enemy);
 	    	    a.AddedMoveAction(b, path);
+
+		    // archers move and short attack only
+		    //if(.b.isArchers() && enemy && !Stats::isHandFighting(b, *enemy)) enemy = GetEnemyAbroadMaxQuality(b);
 		}
 	    }
 	}
+	else
+	    enemy = GetEnemyAbroadMaxQuality(b);
 
-	if(!enemy) enemy = GetEnemyAbroadMaxQuality(b);
 	AIMagicAction(b, a, enemy);
     }
 
@@ -188,6 +192,9 @@ void Battle2::Arena::AIMagicAction(const Stats & b, Actions & a, const Stats* en
 
     // FIX: Battle2::Arena::AIMagicAction: enemy army - damage spell
     // find monster
+    if(enemy)
+    {
+    }
 }
 
 bool Battle2::isApplySpell(const Spell::spell_t spell, const Stats & b, const HeroBase & hero, Actions & a)
