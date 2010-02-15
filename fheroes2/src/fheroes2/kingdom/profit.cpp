@@ -120,7 +120,7 @@ ProfitConditions::FromBuilding::FromBuilding(u32 building, u8 race)
     profitstats_t* ptr = &_profits[0];
     while(ptr->id && id && std::strcmp(id, ptr->id)) ++ptr;
 
-    if(ptr) PaymentLoadCost(*this, ptr->cost);
+    if(ptr && id) PaymentLoadCost(*this, ptr->cost);
 }
 
 ProfitConditions::FromArtifact::FromArtifact(u8 artifact)
@@ -145,7 +145,7 @@ ProfitConditions::FromArtifact::FromArtifact(u8 artifact)
     profitstats_t* ptr = &_profits[0];
     while(ptr->id && id && std::strcmp(id, ptr->id)) ++ptr;
 
-    if(ptr) PaymentLoadCost(*this, ptr->cost);
+    if(ptr && id) PaymentLoadCost(*this, ptr->cost);
 }
 
 ProfitConditions::FromMine::FromMine(u8 type)
@@ -167,7 +167,7 @@ ProfitConditions::FromMine::FromMine(u8 type)
     profitstats_t* ptr = &_profits[0];
     while(ptr->id && id && std::strcmp(id, ptr->id)) ++ptr;
 
-    if(ptr) PaymentLoadCost(*this, ptr->cost);
+    if(ptr && id) PaymentLoadCost(*this, ptr->cost);
 }
 
 void ProfitConditions::FromMine::GetPerDayString(u8 type, std::string & str)
@@ -189,7 +189,7 @@ void ProfitConditions::FromMine::GetPerDayString(u8 type, std::string & str)
     profitstats_t* ptr = &_profits[0];
     while(ptr->id && id && std::strcmp(id, ptr->id)) ++ptr;
 
-    if(ptr)
+    if(ptr && id)
     {
 	str = _("%{count} / day");
 
@@ -222,5 +222,5 @@ ProfitConditions::FromSkillEstates::FromSkillEstates(u8 level)
     profitstats_t* ptr = &_profits[0];
     while(ptr->id && id && std::strcmp(id, ptr->id)) ++ptr;
 
-    if(ptr) PaymentLoadCost(*this, ptr->cost);
+    if(ptr && id) PaymentLoadCost(*this, ptr->cost);
 }
