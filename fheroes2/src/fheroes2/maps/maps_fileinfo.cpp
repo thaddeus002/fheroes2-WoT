@@ -240,6 +240,7 @@ bool Maps::FileInfo::ReadMP2(const std::string & filename)
     SwapLE16(byte16);
     loss1 = byte16;
     // data loss
+    fd.seekg(0x2e, std::ios_base::beg);
     fd.read(reinterpret_cast<char *>(&byte16), 2);
     SwapLE16(byte16);
     loss2 = byte16;
