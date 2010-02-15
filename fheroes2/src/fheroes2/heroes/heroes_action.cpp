@@ -2095,134 +2095,52 @@ void ActionToCaptureObject(Heroes &hero, const u8 obj, const u16 dst_index)
 
     switch(obj)
     {
-	case MP2::OBJ_ALCHEMYLAB:
-	{
-	    const Sprite & sprite = AGG::GetICN(ICN::RESOURCE, 1);
-
-	    sf = new Surface(sprite.w(), sprite.h() + 14);
-	    sf->SetColorKey();
-	    sf->Blit(sprite);
-
+        case MP2::OBJ_ALCHEMYLAB:
 	    res = Resource::MERCURY;
-	    ProfitConditions::FromMine::GetPerDayString(res, body);
-    	    Text text(body, Font::SMALL);
-    	    text.Blit((sf->w() - text.w()) / 2, sf->h() - 12, *sf);
-
 	    header = MP2::StringObject(obj);
 	    body = _("You have taken control of the local Alchemist shop. It will provide you with one unit of Mercury per day.");
-	}
 	    break;
-        case MP2::OBJ_MINES:
-    	{
-    	    const Maps::TilesAddon * taddon = world.GetTiles(dst_index).FindMines();
 
-            // ore
-            if(0 == taddon->index)
-            {
-		const Sprite & sprite = AGG::GetICN(ICN::RESOURCE, 2);
-
-		sf = new Surface(sprite.w(), sprite.h() + 14);
-		sf->SetColorKey();
-		sf->Blit(sprite);
-
-		res = Resource::ORE;
-		ProfitConditions::FromMine::GetPerDayString(res, body);
-    		Text text(body, Font::SMALL);
-    		text.Blit((sf->w() - text.w()) / 2, sf->h() - 12, *sf); // Here is pink fringing, becose letter sprite use shadow. Wiil fix later...
-
-        	header = _("Ore Mine");
-        	body = _("You gain control of an ore mine. It will provide you with two units of ore per day.");
-            }
-            else
-            // sulfur
-            if(1 == taddon->index)
-            {
-		const Sprite & sprite = AGG::GetICN(ICN::RESOURCE, 3);
-
-		sf = new Surface(sprite.w(), sprite.h() + 14);
-		sf->SetColorKey();
-		sf->Blit(sprite);
-
-		res = Resource::SULFUR;
-		ProfitConditions::FromMine::GetPerDayString(res, body);
-    		Text text(body, Font::SMALL);
-    		text.Blit((sf->w() - text.w()) / 2, sf->h() - 12, *sf);
-
-        	header = _("Sulfur Mine");
-		body = _("You gain control of a sulfur mine. It will provide you with one unit of sulfur per day.");
-            }
-            else
-            // crystal
-            if(2 == taddon->index)
-            {
-		const Sprite & sprite = AGG::GetICN(ICN::RESOURCE, 4);
-
-		sf = new Surface(sprite.w(), sprite.h() + 14);
-		sf->SetColorKey();
-		sf->Blit(sprite);
-
-		res = Resource::CRYSTAL;
-		ProfitConditions::FromMine::GetPerDayString(res, body);
-    		Text text(body, Font::SMALL);
-    		text.Blit((sf->w() - text.w()) / 2, sf->h() - 12, *sf);
-
-        	header = _("Crystal Mine");
-		body = _("You gain control of a crystal mine. It will provide you with one unit of crystal per day.");
-            }
-            else
-            // gems
-            if(3 == taddon->index)
-            {
-		const Sprite & sprite = AGG::GetICN(ICN::RESOURCE, 5);
-
-		sf = new Surface(sprite.w(), sprite.h() + 14);
-		sf->SetColorKey();
-		sf->Blit(sprite);
-
-		res = Resource::GEMS;
-		ProfitConditions::FromMine::GetPerDayString(res, body);
-    		Text text(body, Font::SMALL);
-    		text.Blit((sf->w() - text.w()) / 2, sf->h() - 12, *sf);
-
-        	header = _("Gems Mine");
-		body = _("You gain control of a gem mine. It will provide you with one unit of gems per day.");
-            }
-            else
-            // gold
-            if(4 == taddon->index)
-            {
-		const Sprite & sprite = AGG::GetICN(ICN::RESOURCE, 6);
-
-		sf = new Surface(sprite.w(), sprite.h() + 14);
-		sf->SetColorKey();
-		sf->Blit(sprite);
-
-		res = Resource::GOLD;
-		ProfitConditions::FromMine::GetPerDayString(res, body);
-    		Text text(body, Font::SMALL);
-    		text.Blit((sf->w() - text.w()) / 2, sf->h() - 12, *sf);
-
-        	header = _("Gold Mine");
-		body = _("You gain control of a gold mine. It will provide you with 1000 gold per day.");
-            }
-    	}
-    	    break;
-	case MP2::OBJ_SAWMILL:
-	{
-	    const Sprite & sprite = AGG::GetICN(ICN::RESOURCE, 0);
-
-	    sf = new Surface(sprite.w(), sprite.h() + 12);
-	    sf->SetColorKey();
-	    sf->Blit(sprite);
-	    body = "2 / day";
-    	    Text text(body, Font::SMALL);
-    	    text.Blit((sf->w() - text.w()) / 2, sf->h() - 12, *sf);
-
-    	    res = Resource::WOOD;
+        case MP2::OBJ_SAWMILL:    
+            res = Resource::WOOD;
 	    header = MP2::StringObject(obj);
 	    body = _("You gain control of a sawmill. It will provide you with two units of wood per day.");
+            break;
+
+        case MP2::OBJ_MINES:
+	{
+    	    const Maps::TilesAddon * taddon = world.GetTiles(dst_index).FindMines();
+    	    if(taddon) switch(taddon->index)
+    	    {
+        	case 0:
+		    res = Resource::ORE;
+        	    header = _("Ore Mine");
+        	    body = _("You gain control of an ore mine. It will provide you with two units of ore per day.");
+		    break;
+            	case 1:
+		    res = Resource::SULFUR;
+        	    header = _("Sulfur Mine");
+		    body = _("You gain control of a sulfur mine. It will provide you with one unit of sulfur per day.");
+		    break;
+            	case 2:
+		    res = Resource::CRYSTAL;
+        	    header = _("Crystal Mine");
+		    body = _("You gain control of a crystal mine. It will provide you with one unit of crystal per day.");
+		    break;
+            	case 3:
+		    res = Resource::GEMS;
+        	    header = _("Gems Mine");
+		    body = _("You gain control of a gem mine. It will provide you with one unit of gems per day.");
+		    break;
+            	case 4:
+		    res = Resource::GOLD;
+        	    header = _("Gold Mine");
+		    body = _("You gain control of a gold mine. It will provide you with 1000 gold per day.");
+		    break;
+            	default: break;
+    	    }
 	}
-	    break;
+    	break;
 
         case MP2::OBJ_LIGHTHOUSE:
 	    header = MP2::StringObject(obj);
@@ -2234,11 +2152,25 @@ void ActionToCaptureObject(Heroes &hero, const u8 obj, const u16 dst_index)
     	    return;
     }
 
+    // sprite resource with x / day test
+    if(res != Resource::UNKNOWN)
+    {
+	const Sprite & sprite = AGG::GetICN(ICN::RESOURCE, Resource::GetIndexSprite2(res));
+
+	sf = new Surface(sprite.w(), sprite.h() + 14);
+	sf->SetColorKey();
+	sf->Blit(sprite);
+
+	std::string perday;
+	ProfitConditions::FromMine::GetPerDayString(res, perday);
+    	Text text(perday, Font::SMALL);
+    	text.Blit((sf->w() - text.w()) / 2, sf->h() - 12, *sf);
+    }
+
     // capture object
     if(hero.GetColor() != world.ColorCapturedObject(dst_index))
     {
 	world.CaptureObject(dst_index, hero.GetColor());
-
 	if(sf) Dialog::SpriteInfo(header, body, *sf);
 	else Dialog::Message(header, body, Font::BIG, Dialog::OK);
     }

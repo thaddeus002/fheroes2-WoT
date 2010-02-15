@@ -668,20 +668,15 @@ void AIToCaptureObject(Heroes &hero, const u8 obj, const u16 dst_index)
         case MP2::OBJ_MINES:
     	{
     	    const Maps::TilesAddon * taddon = world.GetTiles(dst_index).FindMines();
-            // ore
-            if(0 == taddon->index)	res = Resource::ORE;
-            else
-            // sulfur
-            if(1 == taddon->index)	res = Resource::SULFUR;
-            else
-            // crystal
-            if(2 == taddon->index)	res = Resource::CRYSTAL;
-            else
-            // gems
-            if(3 == taddon->index)	res = Resource::GEMS;
-            else
-            // gold
-            if(4 == taddon->index)	res = Resource::GOLD;
+            if(taddon) switch(taddon->index)
+            {
+                case 0: res = Resource::ORE; break;
+                case 1: res = Resource::SULFUR; break;
+                case 2: res = Resource::CRYSTAL; break;
+                case 3: res = Resource::GEMS; break;
+                case 4: res = Resource::GOLD; break;
+                default: break;
+            }
     	}
     	break;
         default: break;
