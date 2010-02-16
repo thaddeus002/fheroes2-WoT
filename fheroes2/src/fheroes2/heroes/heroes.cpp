@@ -1028,6 +1028,9 @@ void Heroes::Recruit(const Color::color_t & cl, const Point & pt)
     // save general object
     save_maps_general = tiles.GetObject();
     tiles.SetObject(MP2::OBJ_HEROES);
+
+    magic_point = GetMaxSpellPoints();
+    move_point = GetMaxMovePoints();
 }
 
 void Heroes::Recruit(const Castle & castle)
