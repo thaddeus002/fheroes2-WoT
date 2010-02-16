@@ -1940,6 +1940,7 @@ u16 World::CheckKingdomWins(const Kingdom & kingdom) const
     if(((GameOver::WINS_TOWN | GameOver::WINS_GOLD) & conf.ConditionWins()) &&
 	!conf.WinsCompAlsoWins() && Game::AI == kingdom.Control()) return GameOver::COND_NONE;
 
+
     switch(conf.ConditionWins())
     {
         case GameOver::WINS_ALL:
@@ -1985,12 +1986,15 @@ u16 World::CheckKingdomWins(const Kingdom & kingdom) const
 	    }
 	    // check normal victory
 	    if(conf.WinsAllowNormalVictory() && CheckKingdomNormalVictory(kingdom))
-		    return GameOver::WINS_ARTIFACT;
+		    return GameOver::WINS_ALL;
 	    break;
 	}
 
         case GameOver::WINS_SIDE:
         {
+	    if(CheckKingdomNormalVictory(kingdom))
+		return GameOver::WINS_ALL;
+
             // TODO:: FIX side wins conditions
 	    break;
         }
