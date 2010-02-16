@@ -215,6 +215,7 @@ Game::menu_t Game::StartGame(void)
 	    radar.HideArea();
 	    conf.SetCurrentColor(color);
 	    world.ClearFog(color);
+	    kingdom.ActionBeforeTurn();
 
 	    switch(kingdom.Control())
 	    {

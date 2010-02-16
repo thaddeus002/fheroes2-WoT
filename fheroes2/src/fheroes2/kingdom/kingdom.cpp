@@ -155,6 +155,12 @@ void Kingdom::LossPostActions(void)
     }
 }
 
+void Kingdom::ActionBeforeTurn(void)
+{
+    // rescan heroes path
+    std::for_each(heroes.begin(), heroes.end(), std::mem_fun(&Heroes::RescanPath));
+}
+
 void Kingdom::ActionNewDay(void)
 {
     Settings::Get().SetCurrentColor(color);
@@ -213,9 +219,6 @@ void Kingdom::ActionNewDay(void)
     std::vector<GameEvent::Day *>::const_iterator it2 = events.end();
 
     for(; it1 != it2; ++it1) if(*it1) AddFundsResource((*it1)->GetResource());
-
-    // rescan heroes path
-    std::for_each(heroes.begin(), heroes.end(), std::mem_fun(&Heroes::RescanPath));
 }
 
 void Kingdom::ActionNewWeek(void)

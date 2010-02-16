@@ -96,6 +96,7 @@ public:
     void RemoveCastle(const Castle *castle);
     
     void AITurns(void);
+    void ActionBeforeTurn(void);
     void ActionNewDay(void);
     void ActionNewWeek(void);
     void ActionNewMonth(void);

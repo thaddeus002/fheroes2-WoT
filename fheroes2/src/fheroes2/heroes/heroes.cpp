@@ -1213,11 +1213,13 @@ void Heroes::RescanPath(void)
 {
     if(path.isValid())
     {
-	u16 obstacle;
-	if(path.isUnderProtection(&obstacle) ||
-	   (path.hasObstacle(&obstacle) && 0 == path.Calculate(path.GetDestinationIndex())))
+	if(Game::AI == GetControl())
 	{
-	    if(path.isValid()) path.Calculate(path.GetNextToLastIndex());
+	    if(path.hasObstacle()) path.Reset();
+	}
+	else
+	{
+	    path.ScanObstacleAndReduce();
 	}
     }
 }

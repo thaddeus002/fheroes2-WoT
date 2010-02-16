@@ -47,7 +47,6 @@ namespace Route
 	    Path(const Heroes & h);
 
 	    u16		GetDestinationIndex(void) const{ return dst; };
-	    u16		GetNextToLastIndex(void) const;
 	    Direction::vector_t GetFrontDirection(void) const;
 	    u16		GetFrontPenalty(void) const;
 	    u16		Calculate(const u16 dst_index, const u16 limit = MAXU16);
@@ -55,7 +54,9 @@ namespace Route
 	    void	Show(void){ hide = false; };
 	    void	Hide(void){ hide = true; };
 	    void	Reset(void);
+	    void	Resize(u16);
 	    void	PopFront(void);
+	    void	ScanObstacleAndReduce(void);
 
 	    bool	isValid(void) const { return size(); };
 	    bool	isShow(void) const { return !hide; };

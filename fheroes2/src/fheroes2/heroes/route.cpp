@@ -259,15 +259,13 @@ void Route::Path::Dump(void) const
 
 bool Route::Path::isUnderProtection(u16* res) const
 {
-    const_iterator it1 = begin();
-    const_iterator it2 = end();
-
+    const_iterator it = begin();
     u16 next = hero.GetIndex();
 
-    for(; it1 != it2; ++it1)
+    for(; it != end(); ++it)
     {
-	if(Maps::isValidDirection(next, (*it1).Direction()))
-	    next = Maps::GetDirectionIndex(next, (*it1).Direction());
+	if(Maps::isValidDirection(next, (*it).Direction()))
+	    next = Maps::GetDirectionIndex(next, (*it).Direction());
 
 	if(Maps::TileUnderProtection(next, res))  return true;
     }
@@ -277,15 +275,13 @@ bool Route::Path::isUnderProtection(u16* res) const
 
 bool Route::Path::hasObstacle(u16* res) const
 {
-    const_iterator it1 = begin();
-    const_iterator it2 = end();
-
+    const_iterator it = begin();
     u16 next = hero.GetIndex();
 
-    for(; it1 != it2; ++it1)
+    for(; it != end(); ++it)
     {
-	if(Maps::isValidDirection(next, (*it1).Direction()))
-	    next = Maps::GetDirectionIndex(next, (*it1).Direction());
+	if(Maps::isValidDirection(next, (*it).Direction()))
+	    next = Maps::GetDirectionIndex(next, (*it).Direction());
 
 	switch(world.GetTiles(next).GetObject())
 	{
@@ -301,13 +297,36 @@ bool Route::Path::hasObstacle(u16* res) const
     return false;
 }
 
-u16 Route::Path::GetNextToLastIndex(void) const
+void Route::Path::ScanObstacleAndReduce(void)
 {
-    if(size())
-    {
-	if(Maps::isValidDirection(dst, Direction::Reflect(back().Direction())))
-	    return Maps::GetDirectionIndex(dst, Direction::Reflect(back().Direction()));
-    }
+    iterator it = begin();
 
-    return 0;
+    u16 next1 = hero.GetIndex();
+    u16 next2 = next1;
+    bool exit = false;
+    
+    for(; it != end() && !exit; ++it)
+    {
+	if(Maps::isValidDirection(next1, (*it).Direction()))
+	    next2 = Maps::GetDirectionIndex(next1, (*it).Direction());
+
+	if(Maps::TileUnderProtection(next2)) exit = true;
+
+	switch(world.GetTiles(next2).GetObject())
+	{
+	    case MP2::OBJ_HEROES:
+	    case MP2::OBJ_MONSTER: exit = true; break;
+	    default: break;
+	}
+
+	if(exit)
+	{
+	    --it;
+	    dst = next1;
+	}
+
+	next1 = next2;
+    }
+    
+    if(it != end())  erase(it, end());
 }
