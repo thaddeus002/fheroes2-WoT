@@ -40,6 +40,7 @@
 #include "payment.h"
 #include "profit.h"
 #include "buildinginfo.h"
+#include "skill.h"
 
 #include "zzlib.h"
 
@@ -403,4 +404,10 @@ void LoadExternalResource(const Settings & conf)
 
     if(FilePresent(spec))
 	ProfitConditions::UpdateCosts(spec);
+
+    // skills.xml
+    spec = conf.LocalPrefix() + SEPARATOR + "files" + SEPARATOR + "stats" + SEPARATOR + "skills.xml";
+
+    if(FilePresent(spec))
+	Skill::UpdateStats(spec);
 }

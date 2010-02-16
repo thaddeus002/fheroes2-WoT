@@ -30,6 +30,164 @@
 #include "settings.h"
 #include "skill.h"
 
+#ifdef WITH_XML
+#include "xmlccwrap.h"
+#endif
+
+struct primary_t
+{
+    u8 attack;
+    u8 defence;
+    u8 power;
+    u8 knowledge;
+};
+
+struct secondary_t
+{
+    u8 archery;
+    u8 ballistics;
+    u8 diplomacy;
+    u8 eagleeye;
+    u8 estates;
+    u8 leadership;
+    u8 logistics;
+    u8 luck;
+    u8 mysticism;
+    u8 navigation;
+    u8 necromancy;
+    u8 pathfinding;
+    u8 scouting;
+    u8 wisdom;
+};
+
+struct skillstats_t
+{
+    const char* id;
+    primary_t   initial_primary;
+    u8          initial_book;
+    u8          initial_spell;
+    secondary_t initial_secondary;
+    u8		over_level;
+    primary_t   mature_primary_under;
+    primary_t   mature_primary_over;
+    secondary_t mature_secondary;
+};
+
+static skillstats_t _skillstats[] = {
+    { "knight",      { 2, 2, 1, 1 }, 0, 0, { 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0 }, 10, { 0, 0, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 } },
+    { "barbarian",   { 3, 1, 1, 1 }, 0, 0, { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0 }, 10, { 0, 0, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 } },
+    { "sorceress",   { 0, 0, 2, 3 }, 1,15, { 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 1 }, 10, { 0, 0, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 } },
+    { "warlock",     { 0, 0, 3, 2 }, 1,19, { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 1 }, 10, { 0, 0, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 } },
+    { "wizard",      { 0, 1, 2, 2 }, 1,17, { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2 }, 10, { 0, 0, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 } },
+    { "necromancer", { 1, 0, 2, 2 }, 1,10, { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1 }, 10, { 0, 0, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 } },
+    { NULL,          { 0, 0, 0, 0 }, 0, 0, { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }, 10, { 0, 0, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 } }
+};
+
+const skillstats_t* GetSkillStats(u8 race)
+{
+    const char* id = NULL;
+
+    switch(race)
+    {
+	case Race::KNGT:	id = "knight"; break;
+	case Race::BARB:	id = "barbarian"; break;
+	case Race::SORC:	id = "sorceress"; break;
+	case Race::WRLK:	id = "warlock"; break;
+	case Race::WZRD:	id = "wizard"; break;
+	case Race::NECR:	id = "necromancer"; break;
+	default: break;
+    }
+
+    const skillstats_t* ptr = &_skillstats[0];
+    while(ptr->id && id && std::strcmp(id, ptr->id)) ++ptr;
+
+    return id ? ptr : NULL;
+}
+
+#ifdef WITH_XML
+void LoadPrimarySection(const TiXmlElement* xml, primary_t & skill)
+{
+    if(!xml) return;
+    int value;
+    xml->Attribute("attack", &value);    skill.attack = value;
+    xml->Attribute("defence", &value);   skill.defence = value;
+    xml->Attribute("power", &value);     skill.power = value;
+    xml->Attribute("knowledge", &value); skill.knowledge = value;
+}
+
+void LoadSecondarySection(const TiXmlElement* xml, secondary_t & sec)
+{
+    if(!xml) return;
+    int value;
+    xml->Attribute("archery", &value);     sec.archery = Skill::Level::NONE > value || Skill::Level::EXPERT < value ? Skill::Level::NONE : value;
+    xml->Attribute("ballistics", &value);  sec.ballistics = Skill::Level::NONE > value || Skill::Level::EXPERT < value ? Skill::Level::NONE : value;
+    xml->Attribute("diplomacy", &value);   sec.diplomacy = Skill::Level::NONE > value || Skill::Level::EXPERT < value ? Skill::Level::NONE : value;
+    xml->Attribute("eagleeye", &value);    sec.eagleeye = Skill::Level::NONE > value || Skill::Level::EXPERT < value ? Skill::Level::NONE : value;
+    xml->Attribute("estates", &value);     sec.estates = Skill::Level::NONE > value || Skill::Level::EXPERT < value ? Skill::Level::NONE : value;
+    xml->Attribute("leadership", &value);  sec.leadership = Skill::Level::NONE > value || Skill::Level::EXPERT < value ? Skill::Level::NONE : value;
+    xml->Attribute("logistics", &value);   sec.logistics = Skill::Level::NONE > value || Skill::Level::EXPERT < value ? Skill::Level::NONE : value;
+    xml->Attribute("luck", &value);        sec.luck = Skill::Level::NONE > value || Skill::Level::EXPERT < value ? Skill::Level::NONE : value;
+    xml->Attribute("mysticism", &value);   sec.mysticism = Skill::Level::NONE > value || Skill::Level::EXPERT < value ? Skill::Level::NONE : value;
+    xml->Attribute("navigation", &value);  sec.navigation = Skill::Level::NONE > value || Skill::Level::EXPERT < value ? Skill::Level::NONE : value;
+    xml->Attribute("necromancy", &value);  sec.necromancy = Skill::Level::NONE > value || Skill::Level::EXPERT < value ? Skill::Level::NONE : value;
+    xml->Attribute("pathfinding", &value); sec.pathfinding = Skill::Level::NONE > value || Skill::Level::EXPERT < value ? Skill::Level::NONE : value;
+    xml->Attribute("scouting", &value);    sec.scouting = Skill::Level::NONE > value || Skill::Level::EXPERT < value ? Skill::Level::NONE : value;
+    xml->Attribute("wisdom", &value);      sec.wisdom = Skill::Level::NONE > value || Skill::Level::EXPERT < value ? Skill::Level::NONE : value;
+}
+#endif
+
+void Skill::UpdateStats(const std::string & spec)
+{
+#ifdef WITH_XML
+    // parse skills.xml
+    TiXmlDocument doc;
+    const TiXmlElement* xml_skills = NULL;
+                
+    if(doc.LoadFile(spec.c_str()) &&
+	NULL != (xml_skills = doc.FirstChildElement("skills")))
+    {
+	const TiXmlElement* xml_initial = xml_skills->FirstChildElement("initial");
+	const TiXmlElement* xml_maturity = xml_skills->FirstChildElement("maturity");
+	const TiXmlElement* xml_secondary = xml_maturity ? xml_maturity->FirstChildElement("secondary") : NULL;
+	const TiXmlElement* xml_primary = xml_maturity ? xml_maturity->FirstChildElement("primary") : NULL;
+	const TiXmlElement* xml_under = xml_primary ? xml_primary->FirstChildElement("under") : NULL;
+	const TiXmlElement* xml_over = xml_primary ? xml_primary->FirstChildElement("over") : NULL;
+	skillstats_t *ptr = &_skillstats[0];
+	int value;
+
+	while(ptr->id)
+	{
+	    const TiXmlElement* initial_race = xml_initial ? xml_initial->FirstChildElement(ptr->id) : NULL;
+
+	    if(initial_race)
+	    {
+		LoadPrimarySection(initial_race, ptr->initial_primary);
+		LoadSecondarySection(initial_race, ptr->initial_secondary);
+
+		initial_race->Attribute("book", &value);  ptr->initial_book = value;
+		initial_race->Attribute("spell", &value); ptr->initial_spell = value;
+	    }
+
+	    const TiXmlElement* under_race = xml_under ? xml_under->FirstChildElement(ptr->id) : NULL;
+	    if(under_race) LoadPrimarySection(under_race, ptr->mature_primary_under);
+
+	    const TiXmlElement* over_race = xml_over ? xml_over->FirstChildElement(ptr->id) : NULL;
+	    if(over_race)
+	    {
+		LoadPrimarySection(over_race, ptr->mature_primary_over);
+		over_race->Attribute("level", &value);
+		if(value) ptr->over_level = value;
+	    }
+	    
+	    const TiXmlElement* secondary_race = xml_secondary ? xml_secondary->FirstChildElement(ptr->id) : NULL;
+	    if(secondary_race) LoadSecondarySection(secondary_race, ptr->mature_secondary);
+
+	    ++ptr;
+	}
+    }
+#endif
+}
+
 Skill::Primary::Primary() : attack(0), defence(0), power(0), knowledge(0)
 {
 }
@@ -39,77 +197,23 @@ Skill::Primary::skill_t Skill::Primary::FromLevelUp(const u8 race, const u8 leve
 {
     Rand::Queue percents(MAXPRIMARYSKILL);
 
-    // primary skill
-    switch(race)
+    const skillstats_t* ptr = GetSkillStats(race);
+    if(ptr)
     {
-	case Race::BARB:
-	    if(10 > level)
-	    {
-		percents.Push(ATTACK, 55); percents.Push(DEFENCE, 35); percents.Push(POWER, 5); percents.Push(KNOWLEDGE, 5);
-	    }
-	    else
-	    {
-		percents.Push(ATTACK, 30); percents.Push(DEFENCE, 30); percents.Push(POWER, 20); percents.Push(KNOWLEDGE, 20);
-	    }
-	    break;
-
-	case Race::KNGT:
-	    if(10 > level)
-	    {
-		percents.Push(ATTACK, 35); percents.Push(DEFENCE, 45); percents.Push(POWER, 10); percents.Push(KNOWLEDGE, 10);
-	    }
-	    else
-	    {
-		percents.Push(ATTACK, 25); percents.Push(DEFENCE, 25); percents.Push(POWER, 25); percents.Push(KNOWLEDGE, 25);
-	    }
-	    break;
-
-	case Race::NECR:
-	    if(10 > level)
-	    {
-		percents.Push(ATTACK, 15); percents.Push(DEFENCE, 15); percents.Push(POWER, 35); percents.Push(KNOWLEDGE, 35);
-	    }
-	    else
-	    {
-		percents.Push(ATTACK, 25); percents.Push(DEFENCE, 25); percents.Push(POWER, 25); percents.Push(KNOWLEDGE, 25);
-	    }
-	    break;
-
-	case Race::SORC:
-	    if(10 > level)
-	    {
-		percents.Push(ATTACK, 10); percents.Push(DEFENCE, 10); percents.Push(POWER, 30); percents.Push(KNOWLEDGE, 50);
-	    }
-	    else
-	    {
-		percents.Push(ATTACK, 20); percents.Push(DEFENCE, 20); percents.Push(POWER, 30); percents.Push(KNOWLEDGE, 30);
-	    }
-	    break;
-
-	case Race::WRLK:
-	    if(10 > level)
-	    {
-		percents.Push(ATTACK, 10); percents.Push(DEFENCE, 10); percents.Push(POWER, 50); percents.Push(KNOWLEDGE, 30);
-	    }
-	    else
-	    {
-		percents.Push(ATTACK, 20); percents.Push(DEFENCE, 20); percents.Push(POWER, 30); percents.Push(KNOWLEDGE, 30);
-	    }
-	    break;
-
-	case Race::WZRD:
-	    if(10 > level)
-	    {
-		percents.Push(ATTACK, 10); percents.Push(DEFENCE, 10); percents.Push(POWER, 40); percents.Push(KNOWLEDGE, 40);
-	    }
-	    else
-	    {
-		percents.Push(ATTACK, 20); percents.Push(DEFENCE, 20); percents.Push(POWER, 30); percents.Push(KNOWLEDGE, 30);
-	    }
-	    break;
-
-	default:
-	    DEBUG(DBG_GAME , DBG_WARN, "Skill::Primary::LevelUp: unknown race."); return UNKNOWN;
+	if(ptr->over_level > level)
+	{
+	    percents.Push(ATTACK, ptr->mature_primary_under.attack);
+	    percents.Push(DEFENCE, ptr->mature_primary_under.defence);
+	    percents.Push(POWER, ptr->mature_primary_under.power);
+	    percents.Push(KNOWLEDGE, ptr->mature_primary_under.knowledge);
+	}
+	else
+	{
+	    percents.Push(ATTACK, ptr->mature_primary_over.attack);
+	    percents.Push(DEFENCE, ptr->mature_primary_over.defence);
+	    percents.Push(POWER, ptr->mature_primary_over.power);
+	    percents.Push(KNOWLEDGE, ptr->mature_primary_over.knowledge);
+	}
     }
 
     if(percents.Size())
@@ -175,7 +279,7 @@ Skill::Secondary::Secondary() : std::pair<u8, u8>(Skill::Secondary::UNKNOWN, Ski
 {
 }
 
-Skill::Secondary::Secondary(const skill_t & s, const Level::type_t & t) : std::pair<u8, u8>(s, t)
+Skill::Secondary::Secondary(const skill_t s, const Level::type_t t) : std::pair<u8, u8>(s, t)
 {
 }
 
@@ -477,112 +581,26 @@ void Skill::Secondary::FillStandard(std::vector<skill_t> & v)
 
 u8 Skill::Secondary::GetWeightSkillFromRace(u8 race, u8 skill)
 {
-    switch(race)
+    const skillstats_t* ptr = GetSkillStats(race);
+    if(ptr)
     {
-	case Race::BARB:
-	    if(skill == PATHFINDING)	return 4;
-	    if(skill == ARCHERY)	return 3;
-	    if(skill == LOGISTICS)	return 3;
-	    if(skill == SCOUTING)	return 4;
-	    if(skill == DIPLOMACY)	return 2;
-	    if(skill == NAVIGATION)	return 3;
-	    if(skill == LEADERSHIP)	return 3;
-	    if(skill == WISDOM)		return 1;
-	    if(skill == MYSTICISM)	return 1;
-	    if(skill == LUCK)		return 2;
-	    if(skill == BALLISTICS)	return 3;
-	    if(skill == EAGLEEYE)	return 1;
-	    if(skill == NECROMANCY)	return 0;
-	    if(skill == ESTATES)	return 2;
-    	break;
-
-	case Race::KNGT:
-	    if(skill == PATHFINDING)	return 3;
-	    if(skill == ARCHERY)	return 2;
-	    if(skill == LOGISTICS)	return 3;
-	    if(skill == SCOUTING)	return 2;
-	    if(skill == DIPLOMACY)	return 3;
-	    if(skill == NAVIGATION)	return 2;
-	    if(skill == LEADERSHIP)	return 5;
-	    if(skill == WISDOM)		return 2;
-	    if(skill == MYSTICISM)	return 1;
-	    if(skill == LUCK)		return 1;
-	    if(skill == BALLISTICS)	return 4;
-	    if(skill == EAGLEEYE)	return 1;
-	    if(skill == NECROMANCY)	return 0;
-	    if(skill == ESTATES)	return 3;
-	    break;
-
-	case Race::NECR:
-	    if(skill == PATHFINDING)	return 3;
-	    if(skill == ARCHERY)	return 1;
-	    if(skill == LOGISTICS)	return 2;
-	    if(skill == SCOUTING)	return 1;
-	    if(skill == DIPLOMACY)	return 2;
-	    if(skill == NAVIGATION)	return 2;
-	    if(skill == LEADERSHIP)	return 0;
-	    if(skill == WISDOM)		return 4;
-	    if(skill == MYSTICISM)	return 3;
-	    if(skill == LUCK)		return 1;
-	    if(skill == BALLISTICS)	return 3;
-	    if(skill == EAGLEEYE)	return 3;
-	    if(skill == NECROMANCY)	return 5;
-	    if(skill == ESTATES)	return 2;
-	    break;
-
-	case Race::SORC:
-	    if(skill == PATHFINDING)	return 2;
-	    if(skill == ARCHERY)	return 3;
-	    if(skill == LOGISTICS)	return 2;
-	    if(skill == SCOUTING)	return 1;
-	    if(skill == DIPLOMACY)	return 2;
-	    if(skill == NAVIGATION)	return 4;
-	    if(skill == LEADERSHIP)	return 1;
-	    if(skill == WISDOM)		return 4;
-	    if(skill == MYSTICISM)	return 3;
-	    if(skill == LUCK)		return 3;
-	    if(skill == BALLISTICS)	return 3;
-	    if(skill == EAGLEEYE)	return 3;
-	    if(skill == NECROMANCY)	return 0;
-	    if(skill == ESTATES)	return 2;
-	    break;
-
-	case Race::WRLK:
-	    if(skill == PATHFINDING)	return 4;
-	    if(skill == ARCHERY)	return 1;
-	    if(skill == LOGISTICS)	return 2;
-	    if(skill == SCOUTING)	return 4;
-	    if(skill == DIPLOMACY)	return 2;
-	    if(skill == NAVIGATION)	return 2;
-	    if(skill == LEADERSHIP)	return 1;
-	    if(skill == WISDOM)		return 5;
-	    if(skill == MYSTICISM)	return 3;
-	    if(skill == LUCK)		return 1;
-	    if(skill == BALLISTICS)	return 3;
-	    if(skill == EAGLEEYE)	return 3;
-	    if(skill == NECROMANCY)	return 1;
-	    if(skill == ESTATES)	return 2;
-	    break;
-
-	case Race::WZRD:
-	    if(skill == PATHFINDING)	return 2;
-	    if(skill == ARCHERY)	return 1;
-	    if(skill == LOGISTICS)	return 2;
-	    if(skill == SCOUTING)	return 2;
-	    if(skill == DIPLOMACY)	return 2;
-	    if(skill == NAVIGATION)	return 2;
-	    if(skill == LEADERSHIP)	return 2;
-	    if(skill == WISDOM)		return 5;
-	    if(skill == MYSTICISM)	return 4;
-	    if(skill == LUCK)		return 2;
-	    if(skill == BALLISTICS)	return 3;
-	    if(skill == EAGLEEYE)	return 3;
-	    if(skill == NECROMANCY)	return 0;
-	    if(skill == ESTATES)	return 2;
-	    break;
-
-	default: break;
+	
+	if(skill == PATHFINDING)	return ptr->mature_secondary.pathfinding;
+	if(skill == ARCHERY)		return ptr->mature_secondary.archery;
+	if(skill == LOGISTICS)		return ptr->mature_secondary.logistics;
+	if(skill == SCOUTING)		return ptr->mature_secondary.scouting;
+	if(skill == DIPLOMACY)		return ptr->mature_secondary.diplomacy;
+	if(skill == NAVIGATION)		return ptr->mature_secondary.navigation;
+	if(skill == LEADERSHIP)		return ptr->mature_secondary.leadership;
+	if(skill == WISDOM)		return ptr->mature_secondary.wisdom;
+	if(skill == MYSTICISM)		return ptr->mature_secondary.mysticism;
+	if(skill == LUCK)		return ptr->mature_secondary.luck;
+	if(skill == BALLISTICS)		return ptr->mature_secondary.ballistics;
+	if(skill == EAGLEEYE)		return ptr->mature_secondary.eagleeye;
+	if(skill == NECROMANCY)		return ptr->mature_secondary.necromancy;
+	if(skill == ESTATES)		return ptr->mature_secondary.estates;
     }
+
     return 0;
 }
 
@@ -730,5 +748,43 @@ void SecondarySkillBar::QueueEventProcessing(void)
     	    cursor.Show();
     	    display.Flip();
 	}
+    }
+}
+
+void Skill::Primary::LoadDefaults(u8 race, Primary & skill, u8 & book, u8 & spell)
+{
+    const skillstats_t* ptr = GetSkillStats(race);
+
+    if(ptr)
+    {
+	skill.attack = ptr->initial_primary.attack;
+	skill.defence = ptr->initial_primary.defence;
+	skill.power = ptr->initial_primary.power;
+	skill.knowledge = ptr->initial_primary.knowledge;
+	book = ptr->initial_book;
+	spell = ptr->initial_spell;
+    }
+}
+
+void Skill::Secondary::LoadDefaults(u8 race, std::vector<Secondary> & skills)
+{
+    const skillstats_t* ptr = GetSkillStats(race);
+
+    if(ptr)
+    {
+	if(ptr->initial_secondary.archery)	skills.push_back(Secondary(ARCHERY, static_cast<Skill::Level::type_t>(ptr->initial_secondary.archery)));
+	if(ptr->initial_secondary.ballistics)	skills.push_back(Secondary(BALLISTICS, static_cast<Skill::Level::type_t>(ptr->initial_secondary.ballistics)));
+	if(ptr->initial_secondary.diplomacy)	skills.push_back(Secondary(DIPLOMACY, static_cast<Skill::Level::type_t>(ptr->initial_secondary.diplomacy)));
+	if(ptr->initial_secondary.eagleeye)	skills.push_back(Secondary(EAGLEEYE, static_cast<Skill::Level::type_t>(ptr->initial_secondary.eagleeye)));
+	if(ptr->initial_secondary.estates)	skills.push_back(Secondary(ESTATES, static_cast<Skill::Level::type_t>(ptr->initial_secondary.estates)));
+	if(ptr->initial_secondary.leadership)	skills.push_back(Secondary(LEADERSHIP, static_cast<Skill::Level::type_t>(ptr->initial_secondary.leadership)));
+	if(ptr->initial_secondary.logistics)	skills.push_back(Secondary(LOGISTICS, static_cast<Skill::Level::type_t>(ptr->initial_secondary.logistics)));
+	if(ptr->initial_secondary.luck)		skills.push_back(Secondary(LUCK, static_cast<Skill::Level::type_t>(ptr->initial_secondary.luck)));
+	if(ptr->initial_secondary.mysticism)	skills.push_back(Secondary(MYSTICISM, static_cast<Skill::Level::type_t>(ptr->initial_secondary.mysticism)));
+	if(ptr->initial_secondary.navigation)	skills.push_back(Secondary(NAVIGATION, static_cast<Skill::Level::type_t>(ptr->initial_secondary.navigation)));
+	if(ptr->initial_secondary.necromancy)	skills.push_back(Secondary(NECROMANCY, static_cast<Skill::Level::type_t>(ptr->initial_secondary.necromancy)));
+	if(ptr->initial_secondary.pathfinding)	skills.push_back(Secondary(PATHFINDING, static_cast<Skill::Level::type_t>(ptr->initial_secondary.pathfinding)));
+	if(ptr->initial_secondary.scouting)	skills.push_back(Secondary(SCOUTING, static_cast<Skill::Level::type_t>(ptr->initial_secondary.scouting)));
+	if(ptr->initial_secondary.wisdom)	skills.push_back(Secondary(WISDOM, static_cast<Skill::Level::type_t>(ptr->initial_secondary.wisdom)));
     }
 }

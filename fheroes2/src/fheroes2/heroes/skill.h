@@ -35,12 +35,12 @@
 
 namespace Skill
 {
-
+    void UpdateStats(const std::string &);
 
     namespace Level
     {
 	typedef enum { NONE=0, BASIC=1, ADVANCED=2, EXPERT=3 } type_t;
-	
+
 	type_t FromMP2(const u8 byte);
 
 	const char* String(const type_t level);
@@ -70,7 +70,7 @@ namespace Skill
 	} skill_t;
 
 	Secondary();
-	Secondary(const skill_t & s, const Level::type_t & t);
+	Secondary(const skill_t s, const Level::type_t t);
 
 	void		SetSkill(const skill_t s);
 	void		SetLevel(const u8 level);
@@ -90,6 +90,7 @@ namespace Skill
 	static skill_t PriorityFromRace(const u8 race, const std::vector<skill_t>& exclude);
 	static void FillStandard(std::vector<skill_t> &);
 	static u8 GetWeightSkillFromRace(u8 race, u8 skill);
+	static void LoadDefaults(u8, std::vector<Secondary> &);
 
 	/* index sprite from SECSKILL */
 	static u8 GetIndexSprite1(const skill_t skill);
@@ -133,6 +134,7 @@ namespace Skill
 
         static const char* String(const skill_t skill);
 	static skill_t FromLevelUp(const u8 race, const u8 level);
+	static void LoadDefaults(u8, Primary &, u8 &, u8 &);
 
 	protected:
 	u8			attack;

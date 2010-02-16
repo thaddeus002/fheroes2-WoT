@@ -83,90 +83,22 @@ Heroes::Heroes(heroes_t ht, Race::race_t rc) : killer_color(Color::GRAY), experi
 {
     name = _(HeroesName(ht));
 
+    u8 book, spell;
+    Skill::Primary::LoadDefaults(race, *this, book, spell);
+
     secondary_skills.reserve(HEROESMAXSKILL);
+    Skill::Secondary::LoadDefaults(race, secondary_skills);
+
+    if(book)
+    {
+        spell_book.Activate();
+        spell_book.Append(Spell::FromInt(spell), GetLevelSkill(Skill::Secondary::WISDOM));
+        PickupArtifact(Artifact::MAGIC_BOOK);
+    }
 
     // hero is freeman
     color = Color::GRAY;
 
-    switch(race)
-    {
-	case Race::KNGT:
-            attack      = DEFAULT_KNGT_ATTACK;
-            defence     = DEFAULT_KNGT_DEFENCE;
-            power       = DEFAULT_KNGT_POWER;
-            knowledge   = DEFAULT_KNGT_KNOWLEDGE;
-
-	    secondary_skills.push_back(Skill::Secondary(Skill::Secondary::LEADERSHIP, Skill::Level::BASIC));
-	    secondary_skills.push_back(Skill::Secondary(Skill::Secondary::BALLISTICS, Skill::Level::BASIC));
-	    break;
-	    
-	case Race::BARB:
-            attack              = DEFAULT_BARB_ATTACK;
-            defence             = DEFAULT_BARB_DEFENCE;
-            power               = DEFAULT_BARB_POWER;
-            knowledge           = DEFAULT_BARB_KNOWLEDGE;
-
-	    secondary_skills.push_back(Skill::Secondary(Skill::Secondary::PATHFINDING, Skill::Level::ADVANCED));
-	    break;
-	    
-	case Race::SORC:
-            attack              = DEFAULT_SORC_ATTACK;
-            defence             = DEFAULT_SORC_DEFENCE;
-            power               = DEFAULT_SORC_POWER;
-            knowledge           = DEFAULT_SORC_KNOWLEDGE;
-
-	    secondary_skills.push_back(Skill::Secondary(Skill::Secondary::NAVIGATION, Skill::Level::ADVANCED));
-	    secondary_skills.push_back(Skill::Secondary(Skill::Secondary::WISDOM, Skill::Level::BASIC));
-
-	    spell_book.Activate();
-	    spell_book.Append(Spell::BLESS, Skill::Level::BASIC);
-	    PickupArtifact(Artifact::MAGIC_BOOK);
-	    break;
-	    
-	case Race::WRLK:
-            attack              = DEFAULT_WRLK_ATTACK;
-            defence             = DEFAULT_WRLK_DEFENCE;
-            power               = DEFAULT_WRLK_POWER;
-            knowledge           = DEFAULT_WRLK_KNOWLEDGE;
-
-	    secondary_skills.push_back(Skill::Secondary(Skill::Secondary::SCOUTING, Skill::Level::ADVANCED));
-	    secondary_skills.push_back(Skill::Secondary(Skill::Secondary::WISDOM, Skill::Level::BASIC));
-
-	    spell_book.Activate();
-	    spell_book.Append(Spell::CURSE, Skill::Level::BASIC);
-	    PickupArtifact(Artifact::MAGIC_BOOK);
-	    break;
-	    
-	case Race::WZRD:
-            attack              = DEFAULT_WZRD_ATTACK;
-            defence             = DEFAULT_WZRD_DEFENCE;
-            power               = DEFAULT_WZRD_POWER;
-            knowledge           = DEFAULT_WZRD_KNOWLEDGE;
-
-	    secondary_skills.push_back(Skill::Secondary(Skill::Secondary::WISDOM, Skill::Level::ADVANCED));
-
-	    spell_book.Activate();
-	    spell_book.Append(Spell::STONESKIN, Skill::Level::ADVANCED);
-	    PickupArtifact(Artifact::MAGIC_BOOK);
-	    break;
-	    
-	case Race::NECR:
-            attack              = DEFAULT_NECR_ATTACK;
-            defence             = DEFAULT_NECR_DEFENCE;
-            power               = DEFAULT_NECR_POWER;
-            knowledge           = DEFAULT_NECR_KNOWLEDGE;
-
-	    secondary_skills.push_back(Skill::Secondary(Skill::Secondary::NECROMANCY, Skill::Level::BASIC));
-	    secondary_skills.push_back(Skill::Secondary(Skill::Secondary::WISDOM, Skill::Level::BASIC));
-
-	    spell_book.Activate();
-	    spell_book.Append(Spell::HASTE, Skill::Level::BASIC);
-	    PickupArtifact(Artifact::MAGIC_BOOK);
-	    break;
-	    
-	default: DEBUG(DBG_GAME , DBG_WARN, "Heroes::Heroes: unknown race."); break;
-    }
-    
     // set default army
     army.Reset(true);
 
