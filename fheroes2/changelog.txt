@@ -1,10 +1,24 @@
+SVN - up to r1490
++ Added customizing skill heroes
++ Added customizing buildings, payments costs and profits
++ Added customizing monster stats
++ Added load alternative animation sprite for battle
++ Fixed battle morale
++ Fixed dublicate maps directory
++ Updated grown monsters on maps, fixed genie initial count
++ Fixed pyramid action
++ Fixed distrupting ray spell animation, fixed battle yellow status
++ Fixed start dialogues for loaded game
++ Fixed battle morale with skip turn
++ Fixed battle archers
+
 SVN - up to r1430
 + Fixed catapult animation
 + Added battle ai mass spell action
 + Fixed moat path restriction
 + Updates speed animations
 + Added system info (free memory, time for pocketpc)
-+ Fixer config read
++ Fixed config read
 + Updated new battle logic
 
 Jan, 29, 2010
