@@ -40,7 +40,7 @@ void Captain::LoadDefaults(void)
 	if(home.isBuild(BUILD_MAGEGUILD1))
 	{
 	    spell_book.Activate();
-	    captain.GetSpellBook().Appends(mageguild, captain.GetLevelSkill(Skill::Secondary::WISDOM));
+	    GetSpellBook().Appends(home.GetMageGuild(), GetLevelSkill(Skill::Secondary::WISDOM));
 	}
     }
 }
