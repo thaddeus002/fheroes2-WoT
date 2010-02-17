@@ -87,8 +87,11 @@ void RunTest3(void)
     //hero1.Recruit(*kingdom1.GetCastles().at(0));
 
     Army::army_t & army1 = hero1.GetArmy();
-    Army::army_t army2;
-    //Army::army_t & army2 = kingdom2.GetCastles().at(0)->GetArmy();
+
+    Castle* castle = kingdom2.GetCastles().at(0);
+    castle->BuyBuilding(BUILD_CAPTAIN);
+    //Army::army_t army2;
+    Army::army_t & army2 = castle->GetArmy();
 
     army1.Clear();
     army1.JoinTroop(Monster::PHOENIX, 10);
@@ -108,7 +111,9 @@ void RunTest3(void)
 //    army2.JoinTroop(static_cast<Monster::monster_t>(6), 10);
 //    army2.JoinTroop(static_cast<Monster::monster_t>(8), 10);
 
-    Battle2::Loader(army1, army2, 33); //kingdom2.GetCastles().at(0)->GetIndex());
+    kingdom2.Dump();
+    
+    Battle2::Loader(army1, army2, castle->GetIndex());
 }
 
 #endif

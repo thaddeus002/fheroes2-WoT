@@ -193,6 +193,7 @@ void Castle::LoadFromMP2(const void *ptr)
     ptr8 += 13;
 
     // race
+    const Race::race_t kingdom_race = Settings::Get().KingdomRace(color);
     switch(*ptr8)
     { 	 
 	case 0x00: race = Race::KNGT; break; 	 
@@ -201,7 +202,7 @@ void Castle::LoadFromMP2(const void *ptr)
 	case 0x03: race = Race::WRLK; break; 	 
 	case 0x04: race = Race::WZRD; break; 	 
         case 0x05: race = Race::NECR; break; 	 
-        default: race = (Color::GRAY != color ? Settings::Get().KingdomRace(color) : Race::Rand()); break; 	 
+        default: race = (Color::GRAY != color && (Race::ALL & kingdom_race) ? kingdom_race : Race::Rand()); break;
     }
     ++ptr8;
 
@@ -216,7 +217,11 @@ void Castle::LoadFromMP2(const void *ptr)
     // unknown 29 byte
     //
 
-    if(building & BUILD_CAPTAIN) army.SetCommander(&captain);
+    if(building & BUILD_CAPTAIN)
+    {
+	captain.LoadDefaults();
+	army.SetCommander(&captain);
+    }
 
     // troops auto pack
     if(!custom_troops)
@@ -1004,13 +1009,13 @@ bool Castle::BuyBuilding(u32 build)
 	    case BUILD_MAGEGUILD4:
 	    case BUILD_MAGEGUILD5:
         	mageguild.BuildNextLevel();
-        	captain.GetSpellBook().Activate();
-        	captain.GetSpellBook().Appends(mageguild, captain.GetLevelSkill(Skill::Secondary::WISDOM));
-
+        	// for captain allow spell only level1 and level2
+        	if((BUILD_MAGEGUILD1 | BUILD_MAGEGUILD2) & build) captain.GetSpellBook().Appends(mageguild, captain.GetLevelSkill(Skill::Secondary::WISDOM));
 		if(castle_heroes) castle_heroes->AppendSpellsToBook(mageguild);
 		break;
 
 	    case BUILD_CAPTAIN:
+		captain.LoadDefaults();
 		army.SetCommander(&captain);
 		break;
 

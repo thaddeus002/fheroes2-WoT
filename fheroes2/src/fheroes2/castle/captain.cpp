@@ -24,10 +24,21 @@
 #include "luck.h"
 #include "morale.h"
 #include "captain.h"
+#include "settings.h"
 
-Captain::Captain(const Castle & c) : home(c), spell_book(this)
+Captain::Captain(const Castle & c) : home(c), spell_book(this), spellPoints(0)
 {
-    spellPoints = 10;
+    LoadDefaults();
+}
+
+void Captain::LoadDefaults(void)
+{
+    if(Race::ALL & home.GetRace())
+    {
+	u8 book, spell;
+	Skill::Primary::LoadDefaults(home.GetRace(), *this, book, spell);
+	if(book) spell_book.Activate();
+    }
 }
 
 bool Captain::isValid(void) const
@@ -37,70 +48,22 @@ bool Captain::isValid(void) const
 
 u8 Captain::GetAttack(void) const
 {
-    if(isValid())
-    switch(home.GetRace())
-    {
-	case Race::KNGT:
-	case Race::BARB:	return 1;
-	case Race::SORC:
-	case Race::WRLK:
-	case Race::WZRD:
-	case Race::NECR:	return 0;
-	default: break;
-    }
-
-    return 0;
+    return attack;
 }
 
 u8 Captain::GetDefense(void) const
 {
-    if(isValid())
-    switch(home.GetRace())
-    {
-	case Race::KNGT:
-	case Race::BARB:	return 1;
-	case Race::SORC:
-	case Race::WRLK:
-	case Race::WZRD:
-	case Race::NECR:	return 0;
-	default: break;
-    }
-
-    return 0;
+    return Race::BARB == home.GetRace() && home.isBuild(BUILD_SPEC) ?  defence + 2 : defence;
 }
 
 u8 Captain::GetPower(void) const
 {
-    if(isValid())
-    switch(home.GetRace())
-    {
-	case Race::KNGT:
-	case Race::BARB:	return 1;
-	case Race::SORC:
-	case Race::WRLK:
-	case Race::WZRD:
-	case Race::NECR:	return 2;
-	default: break;
-    }
-
-    return 0;
+   return Race::NECR == home.GetRace() && home.isBuild(BUILD_SPEC) ? power + 2 : power;
 }
 
 u8 Captain::GetKnowledge(void) const
 {
-    if(isValid())
-    switch(home.GetRace())
-    {
-	case Race::KNGT:
-	case Race::BARB:	return 1;
-	case Race::SORC:
-	case Race::WRLK:
-	case Race::WZRD:
-	case Race::NECR:	return 2;
-	default: break;
-    }
-
-    return 0;
+    return knowledge;
 }
 
 s8 Captain::GetMorale(void) const
@@ -243,4 +206,9 @@ bool Captain::CanBattleRetreat(void) const
 u16 Captain::GetIndex(void) const
 {
     return home.GetIndex();
+}
+
+void Captain::PreBattleAction(void)
+{
+    spellPoints = GetMaxSpellPoints();
 }

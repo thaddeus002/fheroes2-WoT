@@ -234,7 +234,7 @@ public:
     u32 GetExperience(void) const;
     void IncreaseExperience(const u32 exp);
 
-    void PostBattle(void);
+    void PreBattleAction(void);
     void Dump(void) const;
 
     static u8 GetLevelFromExperience(u32 exp);

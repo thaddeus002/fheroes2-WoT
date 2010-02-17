@@ -54,6 +54,7 @@ class HeroBase : public Skill::Primary, public BitModes
     virtual u8 GetControl(void) const = 0;
     virtual u16 GetIndex(void) const = 0;
     virtual bool CanBattleRetreat(void) const = 0;
+    virtual void PreBattleAction(void) = 0;
 };
 
 #endif

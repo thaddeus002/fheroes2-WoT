@@ -63,6 +63,7 @@ struct secondary_t
 struct skillstats_t
 {
     const char* id;
+    primary_t   captain_primary;
     primary_t   initial_primary;
     u8          initial_book;
     u8          initial_spell;
@@ -74,13 +75,13 @@ struct skillstats_t
 };
 
 static skillstats_t _skillstats[] = {
-    { "knight",      { 2, 2, 1, 1 }, 0, 0, { 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0 }, 10, {35,45,10,10 }, {25,25,25,25 }, { 2, 4, 3, 1, 3, 5, 3, 1, 1, 2, 0, 3, 2, 2 } },
-    { "barbarian",   { 3, 1, 1, 1 }, 0, 0, { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0 }, 10, {55,35, 5, 5 }, {30,30,20,20 }, { 3, 3, 2, 1, 2, 3, 3, 2, 1, 3, 0, 4, 4, 1 } },
-    { "sorceress",   { 0, 0, 2, 3 }, 1,15, { 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 1 }, 10, {10,10,30,50 }, {20,20,30,30 }, { 3, 3, 2, 2, 2, 1, 2, 3, 3, 4, 0, 2, 1, 4 } },
-    { "warlock",     { 0, 0, 3, 2 }, 1,19, { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 1 }, 10, {10,10,50,30 }, {20,20,30,30 }, { 1, 3, 2, 3, 2, 1, 2, 1, 3, 2, 1, 2, 4, 5 } },
-    { "wizard",      { 0, 1, 2, 2 }, 1,17, { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2 }, 10, {10,10,40,40 }, {20,20,30,30 }, { 1, 3, 2, 3, 2, 2, 2, 2, 4, 2, 0, 2, 2, 5 } },
-    { "necromancer", { 1, 0, 2, 2 }, 1,10, { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1 }, 10, {15,15,35,35 }, {25,25,25,25 }, { 1, 3, 2, 3, 2, 0, 2, 1, 3, 2, 5, 3, 1, 4 } },
-    { NULL,          { 0, 0, 0, 0 }, 0, 0, { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }, 10, { 0, 0, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 } }
+    { "knight",      { 1, 1, 1, 1 }, { 2, 2, 1, 1 }, 0, 0, { 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0 }, 10, {35,45,10,10 }, {25,25,25,25 }, { 2, 4, 3, 1, 3, 5, 3, 1, 1, 2, 0, 3, 2, 2 } },
+    { "barbarian",   { 1, 1, 1, 1 }, { 3, 1, 1, 1 }, 0, 0, { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0 }, 10, {55,35, 5, 5 }, {30,30,20,20 }, { 3, 3, 2, 1, 2, 3, 3, 2, 1, 3, 0, 4, 4, 1 } },
+    { "sorceress",   { 0, 0, 2, 2 }, { 0, 0, 2, 3 }, 1,15, { 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 1 }, 10, {10,10,30,50 }, {20,20,30,30 }, { 3, 3, 2, 2, 2, 1, 2, 3, 3, 4, 0, 2, 1, 4 } },
+    { "warlock",     { 0, 0, 2, 2 }, { 0, 0, 3, 2 }, 1,19, { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 1 }, 10, {10,10,50,30 }, {20,20,30,30 }, { 1, 3, 2, 3, 2, 1, 2, 1, 3, 2, 1, 2, 4, 5 } },
+    { "wizard",      { 0, 0, 2, 2 }, { 0, 1, 2, 2 }, 1,17, { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2 }, 10, {10,10,40,40 }, {20,20,30,30 }, { 1, 3, 2, 3, 2, 2, 2, 2, 4, 2, 0, 2, 2, 5 } },
+    { "necromancer", { 0, 0, 2, 2 }, { 1, 0, 2, 2 }, 1,10, { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1 }, 10, {15,15,35,35 }, {25,25,25,25 }, { 1, 3, 2, 3, 2, 0, 2, 1, 3, 2, 5, 3, 1, 4 } },
+    { NULL,          { 0, 0, 0, 0 }, { 0, 0, 0, 0 }, 0, 0, { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }, 10, { 0, 0, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 } }
 };
 
 const skillstats_t* GetSkillStats(u8 race)
@@ -757,12 +758,25 @@ void Skill::Primary::LoadDefaults(u8 race, Primary & skill, u8 & book, u8 & spel
 
     if(ptr)
     {
-	skill.attack = ptr->initial_primary.attack;
-	skill.defence = ptr->initial_primary.defence;
-	skill.power = ptr->initial_primary.power;
-	skill.knowledge = ptr->initial_primary.knowledge;
-	book = ptr->initial_book;
-	spell = ptr->initial_spell;
+	if(CAPTAIN == skill.GetType())
+	{
+	    skill.attack = ptr->captain_primary.attack;
+	    skill.defence = ptr->captain_primary.defence;
+	    skill.power = ptr->captain_primary.power;
+	    skill.knowledge = ptr->captain_primary.knowledge;
+	    book = ptr->initial_book;
+	    spell = 0;
+	}
+	else
+	if(HEROES == skill.GetType())
+	{
+	    skill.attack = ptr->initial_primary.attack;
+	    skill.defence = ptr->initial_primary.defence;
+	    skill.power = ptr->initial_primary.power;
+	    skill.knowledge = ptr->initial_primary.knowledge;
+	    book = ptr->initial_book;
+	    spell = ptr->initial_spell;
+	}
     }
 }
 

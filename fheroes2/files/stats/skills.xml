@@ -7,6 +7,15 @@
    spells: see spell.h
  -->
 
+ <captain>
+  <knight      attack="2" defence="2" power="1" knowledge="1" />
+  <barbarian   attack="3" defence="1" power="1" knowledge="1" />
+  <sorceress   attack="0" defence="0" power="2" knowledge="3" />
+  <warlock     attack="0" defence="0" power="3" knowledge="2" />
+  <wizard      attack="0" defence="1" power="2" knowledge="2" />
+  <necromancer attack="1" defence="0" power="2" knowledge="2" />
+ </captain>
+
  <initial>
   <knight      attack="2" defence="2" power="1" knowledge="1" ballistics="1" leadership="1" />
   <barbarian   attack="3" defence="1" power="1" knowledge="1" pathfinding="2" />

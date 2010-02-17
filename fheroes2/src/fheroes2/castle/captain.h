@@ -34,6 +34,7 @@ class Captain : public HeroBase
   public:
     Captain(const Castle &);
 
+    void LoadDefaults(void);
     bool isValid(void) const;
     u8 GetAttack(void) const;
     u8 GetDefense(void) const;
@@ -61,6 +62,7 @@ class Captain : public HeroBase
     u16 GetIndex(void) const;
 
     bool CanBattleRetreat(void) const;
+    void PreBattleAction(void);
 
   private:
     const Castle & home;

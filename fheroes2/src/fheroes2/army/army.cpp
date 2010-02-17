@@ -700,7 +700,11 @@ u32 Army::army_t::CalculateExperience(void) const
 void Army::army_t::BattleInit(void)
 {
     // reserve ARMYMAXTROOPS for summons and mirrors spell
-    if(commander) army.reserve(ARMYMAXTROOPS * 2);
+    if(commander)
+    {
+	army.reserve(ARMYMAXTROOPS * 2);
+	commander->PreBattleAction();
+    }
 }
 
 void Army::army_t::BattleQuit(void)

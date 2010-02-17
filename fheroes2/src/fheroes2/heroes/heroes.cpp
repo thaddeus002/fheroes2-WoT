@@ -562,6 +562,10 @@ u8 Heroes::GetDefense(void) const
                 break;
 	}
 
+    // check coliseum
+    const Castle* castle = inCastle();
+    if(castle && Race::BARB == castle->GetRace() && castle->isBuild(BUILD_SPEC)) result +=2;
+
     return result;
 }
 
@@ -617,6 +621,10 @@ u8 Heroes::GetPower(void) const
             default:
                 break;
 	}
+
+    // check storm
+    const Castle* castle = inCastle();
+    if(castle && Race::NECR == castle->GetRace() && castle->isBuild(BUILD_SPEC)) result +=2;
 
     return result < 0 ? 0 : result;
 }
@@ -1837,6 +1845,10 @@ u8 Heroes::GetControl(void) const
 bool Heroes::CanBattleRetreat(void) const
 {
     return NULL == inCastle();
+}
+
+void Heroes::PreBattleAction(void)
+{
 }
 
 void Heroes::Dump(void) const
