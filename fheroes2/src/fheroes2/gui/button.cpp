@@ -23,6 +23,7 @@
 #include "agg.h"
 #include "cursor.h"
 #include "settings.h"
+#include "dialog.h"
 #include "button.h"
 
 Button::Button() : sprite1(NULL), sprite2(NULL), pressed(false), disable(false)
@@ -127,4 +128,92 @@ void Button::Draw(void)
     Display::Get().Blit(pressed ? *sprite2 : *sprite1, x, y);
 
     if(localcursor) cursor.Show();
+}
+
+ButtonGroups::ButtonGroups(const Rect & pos, u16 btns) : button1(NULL), button2(NULL), result1(Dialog::ZERO), result2(Dialog::ZERO), buttons(btns)
+{
+    Point pt;
+    const ICN::icn_t system = Settings::Get().EvilInterface() ? ICN::SYSTEME : ICN::SYSTEM;
+
+    switch(buttons)
+    {
+	case Dialog::YES|Dialog::NO:
+            pt.x = pos.x;
+            pt.y = pos.y + pos.h - AGG::GetICN(system, 5).h();
+	    button1 = new Button(pt, system, 5, 6);
+	    result1 = Dialog::YES;
+            pt.x = pos.x + pos.w - AGG::GetICN(system, 7).w();
+            pt.y = pos.y + pos.h - AGG::GetICN(system, 7).h();
+	    button2 = new Button(pt, system, 7, 8);
+	    result2 = Dialog::NO;
+	    break;
+
+	case Dialog::OK|Dialog::CANCEL:
+            pt.x = pos.x;
+            pt.y = pos.y + pos.h - AGG::GetICN(system, 1).h();
+	    button1 = new Button(pt, system, 1, 2);
+	    result1 = Dialog::OK;
+            pt.x = pos.x + pos.w - AGG::GetICN(system, 3).w();
+            pt.y = pos.y + pos.h - AGG::GetICN(system, 3).h();
+	    button2 = new Button(pt, system, 3, 4);
+	    result2 = Dialog::CANCEL;
+	    break;
+
+	case Dialog::OK:
+            pt.x = pos.x + (pos.w - AGG::GetICN(system, 1).w()) / 2;
+            pt.y = pos.y + pos.h - AGG::GetICN(system, 1).h();
+	    button1 = new Button(pt, system, 1, 2);
+	    result1 = Dialog::OK;
+	    break;
+
+	case Dialog::CANCEL:
+            pt.x = pos.x + (pos.w - AGG::GetICN(system, 3).w()) / 2;
+            pt.y = pos.y + pos.h - AGG::GetICN(system, 3).h();
+	    button2 = new Button(pt, system, 3, 4);
+	    result2 = Dialog::CANCEL;
+	    break;
+
+	default:
+	    break;
+    }
+}
+
+ButtonGroups::~ButtonGroups()
+{
+    if(button1) delete button1;
+    if(button2) delete button2;
+}
+
+void ButtonGroups::Draw(void)
+{
+    if(button1) (*button1).Draw();
+    if(button2) (*button2).Draw();
+}
+
+u16 ButtonGroups::QueueEventProcessing(void)
+{
+    LocalEvent & le = LocalEvent::Get();
+
+    if(button1) le.MousePressLeft(*button1) ? button1->PressDraw() : button1->ReleaseDraw();
+    if(button2) le.MousePressLeft(*button2) ? button2->PressDraw() : button2->ReleaseDraw();
+
+    if(button1 && le.MouseClickLeft(*button1)) return result1;
+    if(button2 && le.MouseClickLeft(*button2)) return result2;
+
+    if(le.KeyPress(KEY_RETURN)) return result1;
+    else
+    if(le.KeyPress(KEY_ESCAPE)) return result2;
+
+    if(buttons == (Dialog::YES|Dialog::NO))
+    {
+	if(le.KeyPress(KEY_y)) return result1;
+    	if(le.KeyPress(KEY_n)) return result2;
+    }
+    else
+    if( buttons == Dialog::OK || buttons == Dialog::CANCEL)
+    {
+	if(le.KeyPress(KEY_SPACE)) return buttons;
+    }
+
+    return Dialog::ZERO;
 }

@@ -57,4 +57,21 @@ private:
     bool disable;
 };
 
+class ButtonGroups
+{
+public:
+    ButtonGroups(const Rect &, u16);
+    ~ButtonGroups();
+    
+    void Draw(void);
+    u16 QueueEventProcessing(void);
+
+private:
+    Button *button1;
+    Button *button2;
+    u16 result1;
+    u16 result2;
+    u16 buttons;
+};
+
 #endif

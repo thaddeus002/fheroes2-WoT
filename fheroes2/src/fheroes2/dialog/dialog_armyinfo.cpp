@@ -33,6 +33,7 @@
 #include "dialog.h"
 #include "game.h"
 #include "battle_stats.h"
+#include "payment.h"
 #include "pocketpc.h"
 
 void DrawMonsterStats(const Point &, const Army::Troop &);
@@ -155,10 +156,24 @@ Dialog::answer_t Dialog::ArmyInfo(const Army::Troop & troop, u16 flags)
     	    le.MousePressLeft(buttonExit) ? (buttonExit).PressDraw() : (buttonExit).ReleaseDraw();
             
             // upgrade
-            if(buttonUpgrade.isEnable() && le.MouseClickLeft(buttonUpgrade)){ result = Dialog::UPGRADE; break; }
+            if(buttonUpgrade.isEnable() && le.MouseClickLeft(buttonUpgrade))
+            {
+        	PaymentConditions::UpgradeMonster payment(troop());
+                payment *= troop.GetCount();
+        	if(Dialog::YES == Dialog::ResourceInfo("", _("Your troops can be upgraded, but it will cost you dearly. Do you wish to upgrade them?"), payment, Dialog::YES|Dialog::NO))
+		{
+		    result = Dialog::UPGRADE;
+        	    break;
+        	}
+    	    }
     	    else
 	    // dismiss
-            if(buttonDismiss.isEnable() && le.MouseClickLeft(buttonDismiss)){ result = Dialog::DISMISS; break; }
+            if(buttonDismiss.isEnable() && le.MouseClickLeft(buttonDismiss) &&
+        	Dialog::YES == Dialog::Message("", _("Are you sure you want to dismiss this army?"), Font::BIG, Dialog::YES | Dialog::NO))
+            {
+        	result = Dialog::DISMISS;
+        	break;
+    	    }
     	    else
 	    // exit
     	    if(le.MouseClickLeft(buttonExit) || le.KeyPress(KEY_ESCAPE)){ result = Dialog::CANCEL; break; }

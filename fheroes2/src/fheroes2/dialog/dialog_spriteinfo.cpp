@@ -59,56 +59,8 @@ u16 Dialog::SpriteInfo(const std::string &header, const std::string &message, co
 
     LocalEvent & le = LocalEvent::Get();
 
-    Button *button1 = NULL;
-    Button *button2 = NULL;
-    Point pt;
-    answer_t result1 = Dialog::ZERO;
-    answer_t result2 = Dialog::ZERO;
-    
-    switch(buttons)
-    {
-	case YES|NO:
-            pt.x = box.GetArea().x;
-            pt.y = box.GetArea().y + box.GetArea().h - AGG::GetICN(system, 5).h();
-	    button1 = new Button(pt, system, 5, 6);
-	    result1 = YES;
-            pt.x = box.GetArea().x + box.GetArea().w - AGG::GetICN(system, 7).w();
-            pt.y = box.GetArea().y + box.GetArea().h - AGG::GetICN(system, 7).h();
-	    button2 = new Button(pt, system, 7, 8);
-	    result2 = NO;
-	    break;
-
-	case OK|CANCEL:
-            pt.x = box.GetArea().x;
-            pt.y = box.GetArea().y + box.GetArea().h - AGG::GetICN(system, 1).h();
-	    button1 = new Button(pt, system, 1, 2);
-	    result1 = OK;
-            pt.x = box.GetArea().x + box.GetArea().w - AGG::GetICN(system, 3).w();
-            pt.y = box.GetArea().y + box.GetArea().h - AGG::GetICN(system, 3).h();
-	    button2 = new Button(pt, system, 3, 4);
-	    result2 = CANCEL;
-	    break;
-
-	case OK:
-            pt.x = box.GetArea().x + (box.GetArea().w - AGG::GetICN(system, 1).w()) / 2;
-            pt.y = box.GetArea().y + box.GetArea().h - AGG::GetICN(system, 1).h();
-	    button1 = new Button(pt, system, 1, 2);
-	    result1 = OK;
-	    break;
-
-	case CANCEL:
-            pt.x = box.GetArea().x + (box.GetArea().w - AGG::GetICN(system, 3).w()) / 2;
-            pt.y = box.GetArea().y + box.GetArea().h - AGG::GetICN(system, 3).h();
-	    button1 = new Button(pt, system, 3, 4);
-	    result1 = CANCEL;
-	    break;
-
-	default:
-	    break;
-    }
-
-    if(button1) (*button1).Draw();
-    if(button2) (*button2).Draw();
+    ButtonGroups btnGroups(box.GetArea(), buttons);
+    btnGroups.Draw();
 
     cursor.Show();
     display.Flip();
@@ -116,25 +68,14 @@ u16 Dialog::SpriteInfo(const std::string &header, const std::string &message, co
     // message loop
     u16 result = Dialog::ZERO;
 
-    while(le.HandleEvents())
+    while(result == Dialog::ZERO && le.HandleEvents())
     {
         if(!buttons && !le.MousePressRight()) break;
 
-	if(button1) le.MousePressLeft(*button1) ? button1->PressDraw() : button1->ReleaseDraw();
-        if(button2) le.MousePressLeft(*button2) ? button2->PressDraw() : button2->ReleaseDraw();
-
-        if(button1 && le.MouseClickLeft(*button1)){ result = result1; break; }
-        if(button2 && le.MouseClickLeft(*button2)){ result = result2; break; }
-
-	if(le.KeyPress(KEY_RETURN)){ result = Dialog::YES | Dialog::OK; break; }
-	
-	if(le.KeyPress(KEY_ESCAPE)){ result = Dialog::NO | Dialog::CANCEL; break; }
+        result = btnGroups.QueueEventProcessing();
     }
 
     cursor.Hide();
-
-    if(button1) delete button1;
-    if(button2) delete button2;
 
     return result;
 }

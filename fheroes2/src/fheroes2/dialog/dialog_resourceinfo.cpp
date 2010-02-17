@@ -26,7 +26,7 @@
 #include "button.h"
 #include "dialog.h"
 
-void Dialog::ResourceInfo(const std::string &header, const std::string &message, const Resource::funds_t &rs)
+u16 Dialog::ResourceInfo(const std::string &header, const std::string &message, const Resource::funds_t & rs, u16 buttons)
 {
     Display & display = Display::Get();
     const ICN::icn_t system = Settings::Get().EvilInterface() ? ICN::SYSTEME : ICN::SYSTEM;
@@ -60,23 +60,19 @@ void Dialog::ResourceInfo(const std::string &header, const std::string &message,
 
     LocalEvent & le = LocalEvent::Get();
 
-    pos.x = box.GetArea().x + (box.GetArea().w - AGG::GetICN(system, 1).w()) / 2;
-    pos.y = box.GetArea().y + box.GetArea().h - AGG::GetICN(system, 1).h();
-    Button button(pos, system, 1, 2);
-    button.Draw();
+    ButtonGroups btnGroups(box.GetArea(), buttons);
+    btnGroups.Draw();
 
     cursor.Show();
     display.Flip();
 
-    // message loop
-    while(le.HandleEvents())
+    u16 result = Dialog::ZERO;
+
+    while(result == Dialog::ZERO && le.HandleEvents())
     {
-	le.MousePressLeft(button) ? button.PressDraw() : button.ReleaseDraw();
-
-        if(le.MouseClickLeft(button)){ break; }
-
-	if(le.KeyPress(KEY_RETURN) || le.KeyPress(KEY_ESCAPE)){ break; }
+        if(!buttons && !le.MousePressRight()) break;
+        result = btnGroups.QueueEventProcessing();
     }
 
-    cursor.Hide();
+    return result;
 }
