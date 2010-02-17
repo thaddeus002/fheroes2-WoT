@@ -1,5 +1,9 @@
-SVN - up to r1490
-+ Added customizing skill heroes
+SVN - up to r1498
++ Fixed Coliseum and Storm building ability
++ Added dismiss troop warning and update troop total cost info
++ Fixed game over result for wins_side
++ Fixed move point and spell point for recruit hero
++ Added customizing skill heroes and captain
 + Added customizing buildings, payments costs and profits
 + Added customizing monster stats
 + Added load alternative animation sprite for battle
@@ -12,7 +16,7 @@ SVN - up to r1490
 + Fixed battle morale with skip turn
 + Fixed battle archers
 
-SVN - up to r1430
+Feb, 8, 2010
 + Fixed catapult animation
 + Added battle ai mass spell action
 + Fixed moat path restriction

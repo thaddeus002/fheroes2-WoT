@@ -147,6 +147,7 @@ void Skill::UpdateStats(const std::string & spec)
     if(doc.LoadFile(spec.c_str()) &&
 	NULL != (xml_skills = doc.FirstChildElement("skills")))
     {
+	const TiXmlElement* xml_captain = xml_skills->FirstChildElement("captain");
 	const TiXmlElement* xml_initial = xml_skills->FirstChildElement("initial");
 	const TiXmlElement* xml_maturity = xml_skills->FirstChildElement("maturity");
 	const TiXmlElement* xml_secondary = xml_maturity ? xml_maturity->FirstChildElement("secondary") : NULL;
@@ -168,6 +169,9 @@ void Skill::UpdateStats(const std::string & spec)
 		initial_race->Attribute("book", &value);  ptr->initial_book = value;
 		initial_race->Attribute("spell", &value); ptr->initial_spell = value;
 	    }
+
+	    const TiXmlElement* captain_race = xml_captain ? xml_captain->FirstChildElement(ptr->id) : NULL;
+	    if(captain_race) LoadPrimarySection(captain_race, ptr->captain_primary);
 
 	    const TiXmlElement* under_race = xml_under ? xml_under->FirstChildElement(ptr->id) : NULL;
 	    if(under_race) LoadPrimarySection(under_race, ptr->mature_primary_under);
