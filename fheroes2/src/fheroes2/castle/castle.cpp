@@ -217,20 +217,6 @@ void Castle::LoadFromMP2(const void *ptr)
     // unknown 29 byte
     //
 
-    if(building & BUILD_CAPTAIN)
-    {
-	captain.LoadDefaults();
-	army.SetCommander(&captain);
-    }
-
-    // troops auto pack
-    if(!custom_troops)
-    {
-	if(Game::AI == GetControl())
-	    AIJoinRNDArmy();
-	else
-	    SetStartArmy();
-    }
     // dwelling pack
     if(building & DWELLING_MONSTER1) dwelling[0]  = Monster(race, DWELLING_MONSTER1).GetGrown();
     if(building & DWELLING_MONSTER2) dwelling[1]  = Monster(race, DWELLING_MONSTER2).GetGrown();
@@ -263,6 +249,23 @@ void Castle::LoadFromMP2(const void *ptr)
         case Race::NECR: building &= ~(DWELLING_UPGRADE6); break;
         default: break;
     }
+
+    // fix captain
+    if(building & BUILD_CAPTAIN)
+    {
+	captain.LoadDefaults();
+	army.SetCommander(&captain);
+    }
+
+    // troops auto pack
+    if(!custom_troops)
+    {
+	if(Game::AI == GetControl())
+	    AIJoinRNDArmy();
+	else
+	    SetStartArmy();
+    }
+
     // fix shipyard
     if(!HaveNearlySea()) building &= ~(BUILD_SHIPYARD);
 
@@ -1009,8 +1012,7 @@ bool Castle::BuyBuilding(u32 build)
 	    case BUILD_MAGEGUILD4:
 	    case BUILD_MAGEGUILD5:
         	mageguild.BuildNextLevel();
-        	// for captain allow spell only level1 and level2
-        	if((BUILD_MAGEGUILD1 | BUILD_MAGEGUILD2) & build) captain.GetSpellBook().Appends(mageguild, captain.GetLevelSkill(Skill::Secondary::WISDOM));
+        	captain.GetSpellBook().Appends(mageguild, captain.GetLevelSkill(Skill::Secondary::WISDOM));
 		if(castle_heroes) castle_heroes->AppendSpellsToBook(mageguild);
 		break;
 

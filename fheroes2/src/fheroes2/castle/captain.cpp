@@ -37,7 +37,11 @@ void Captain::LoadDefaults(void)
     {
 	u8 book, spell;
 	Skill::Primary::LoadDefaults(home.GetRace(), *this, book, spell);
-	if(book) spell_book.Activate();
+	if(home.isBuild(BUILD_MAGEGUILD1))
+	{
+	    spell_book.Activate();
+	    captain.GetSpellBook().Appends(mageguild, captain.GetLevelSkill(Skill::Secondary::WISDOM));
+	}
     }
 }
 
@@ -185,7 +189,7 @@ BagArtifacts & Captain::GetBagArtifacts(void)
 
 u16 Captain::GetMaxSpellPoints(void) const
 {
-    return 10;
+    return knowledge * 10;
 }
 
 void Captain::SetSpellPoints(const u16 point)
