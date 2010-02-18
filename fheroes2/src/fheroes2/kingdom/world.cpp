@@ -1556,6 +1556,7 @@ void World::UpdateDwellingPopulation(void)
 	const MP2::object_t & obj = tile.GetObject();
 	switch(obj)
 	{
+    	    // join monsters
     	    case MP2::OBJ_WATCHTOWER:
             case MP2::OBJ_EXCAVATION:
             case MP2::OBJ_CAVE:
@@ -1566,25 +1567,30 @@ void World::UpdateDwellingPopulation(void)
             case MP2::OBJ_HALFLINGHOLE:
             case MP2::OBJ_PEASANTHUT:
             case MP2::OBJ_THATCHEDHUT:
-	    {
-		tile.SetCountMonster(tile.GetCountMonster() + Monster(Monster::FromObject(obj)).GetGrown());
-		break;
-	    }
 
+	    // buy monsters
 	    case MP2::OBJ_RUINS:
-            case MP2::OBJ_TREECITY:
             case MP2::OBJ_WAGONCAMP:
             case MP2::OBJ_DESERTTENT:
             case MP2::OBJ_TROLLBRIDGE:
             case MP2::OBJ_DRAGONCITY:
-            case MP2::OBJ_CITYDEAD:
             case MP2::OBJ_WATERALTAR:
             case MP2::OBJ_AIRALTAR:
             case MP2::OBJ_FIREALTAR:
             case MP2::OBJ_EARTHALTAR:
 	    case MP2::OBJ_BARROWMOUNDS:
+	    {
+		const Monster m(Monster::FromObject(obj));
+		tile.SetCountMonster(tile.GetCountMonster() + (1 < day ? m.GetGrown() : m.GetRNDSize(true)));
+		break;
+	    }
+
+            case MP2::OBJ_CITYDEAD:
+            case MP2::OBJ_TREECITY:
             {
-		tile.SetCountMonster(tile.GetCountMonster() + Monster(Monster::FromObject(obj)).GetGrown());
+            
+		const Monster m(Monster::FromObject(obj));
+		tile.SetCountMonster(tile.GetCountMonster() + 2 * (1 < day ? m.GetGrown() : m.GetRNDSize(true)));
         	break;
 	    }
 
