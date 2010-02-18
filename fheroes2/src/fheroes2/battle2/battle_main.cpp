@@ -76,7 +76,7 @@ Battle2::Result Battle2::Loader(Army::army_t & army1, Army::army_t & army2, u16 
 #ifdef WITH_NET
     if(Network::isLocalClient())
 	FH2LocalClient::Get().BattleLoop(arena, result);
-else
+    else
 #endif
     while(1)
     {
@@ -159,7 +159,7 @@ else
 
     if(IS_DEBUG(DBG_BATTLE , DBG_INFO))
     {
-	VERBOSE("Battle2::Loader: start, army1(" << Color::String(army1.GetColor()) << "), army2(" << Color::String(army2.GetColor()) << ")");
+	VERBOSE("Battle2::Loader: end, army1(" << Color::String(army1.GetColor()) << "), army2(" << Color::String(army2.GetColor()) << ")");
 	army1.Dump();
 	army2.Dump();
     }

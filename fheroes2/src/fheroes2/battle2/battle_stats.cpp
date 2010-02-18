@@ -574,7 +574,7 @@ u8 Battle2::Stats::GetSpeed(void) const
 {
     if(!count) return Speed::STANDING;
 
-    if(Modes(TR_SKIPMOVE | SP_BLIND | SP_PARALYZE | SP_STONE)) return Speed::STANDING;
+    if(Modes(TR_SKIPMOVE | SP_BLIND | IS_PARALYZE_MAGIC)) return Speed::STANDING;
 
     if(Modes(TR_MOVED)) return Speed::STANDING;
 
@@ -705,12 +705,12 @@ u32 Battle2::Stats::HowMuchWillKilled(u32 dmg) const
 
 u32 Battle2::Stats::ApplyDamage(u32 dmg)
 {
-    // clean paralize magic
-    if(Modes(IS_PARALIZE_MAGIC))
+    // clean paralyze magic
+    if(Modes(IS_PARALYZE_MAGIC))
     {
-	if(Modes(SP_PARALYZE) || Modes(SP_STONE)) SetModes(TR_RESPONSED);
-        ResetModes(IS_PARALIZE_MAGIC);
-        affected.RemoveMode(IS_PARALIZE_MAGIC);
+	SetModes(TR_RESPONSED);
+        ResetModes(IS_PARALYZE_MAGIC);
+        affected.RemoveMode(IS_PARALYZE_MAGIC);
     }
 
     if(dmg && count)
@@ -924,7 +924,7 @@ void Battle2::Stats::Dump(void) const
 
 bool Battle2::Stats::AllowResponse(void) const
 {
-    return (isAlwayResponse() || (!Modes(TR_RESPONSED) && !Modes(SP_PARALYZE) && !Modes(SP_STONE)));
+    return (isAlwayResponse() || (!Modes(TR_RESPONSED) && !Modes(IS_PARALYZE_MAGIC)));
 }
 
 void Battle2::Stats::SetResponse(void)
@@ -1608,7 +1608,7 @@ u8 Battle2::Stats::GetSpellMagic(bool force) const
             break;
 
         case Monster::CYCLOPS:
-            // 20% paralize
+            // 20% paralyze
             if(force || 3 > Rand::Get(1, 10)) return Spell::PARALYZE;
             break;
 
