@@ -729,10 +729,10 @@ Monster::monster_t Monster::FromObject(u8 obj)
         case MP2::OBJ_ANCIENTLAMP:	return GENIE;
 
         // loyalty version
-	case MP2::OBJ_WATERALTAR:	return EARTH_ELEMENT;
+	case MP2::OBJ_WATERALTAR:	return WATER_ELEMENT;
         case MP2::OBJ_AIRALTAR:		return AIR_ELEMENT;
         case MP2::OBJ_FIREALTAR:	return FIRE_ELEMENT;
-        case MP2::OBJ_EARTHALTAR:	return WATER_ELEMENT;
+        case MP2::OBJ_EARTHALTAR:	return EARTH_ELEMENT;
 	case MP2::OBJ_BARROWMOUNDS:	return GHOST;
 
         default: break;
