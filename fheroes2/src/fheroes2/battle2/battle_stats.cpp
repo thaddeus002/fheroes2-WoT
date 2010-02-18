@@ -547,7 +547,7 @@ void Battle2::Stats::NewTurn(void)
 	ResetModes(mode);
 
 	// cancel mirror image
-	if(mode == CAP_MIRROROWNER)
+	if(mode == CAP_MIRRORIMAGE)
 	{
     	    if(arena->interface) arena->interface->RedrawActionRemoveMirrorImage(*mirror);
 	    Army::Troop & mirror_troop = mirror->troop;
