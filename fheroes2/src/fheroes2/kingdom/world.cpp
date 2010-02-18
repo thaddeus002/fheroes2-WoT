@@ -1584,7 +1584,7 @@ void World::UpdateDwellingPopulation(void)
             case MP2::OBJ_EARTHALTAR:
 	    case MP2::OBJ_BARROWMOUNDS:
             {
-		if(0 == tile.GetCountMonster()) tile.SetCountMonster(tile.GetCountMonster() + Monster(Monster::FromObject(obj)).GetGrown());
+		tile.SetCountMonster(tile.GetCountMonster() + Monster(Monster::FromObject(obj)).GetGrown());
         	break;
 	    }
 
