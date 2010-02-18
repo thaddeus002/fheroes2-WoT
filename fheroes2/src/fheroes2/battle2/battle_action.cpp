@@ -950,6 +950,8 @@ void Battle2::Arena::SpellActionMirrorImage(Stats & b)
     	Stats* image = b.GetArmy()->BattleNewTroop(b.troop(), b.count).GetBattleStats();
 
     	b.mirror = image;
+    	b.owner = NULL;
+    	image->mirror = NULL;
     	image->position = *it1;
     	image->arena = this;
     	image->owner = &b;

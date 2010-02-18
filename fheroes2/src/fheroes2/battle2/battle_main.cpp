@@ -157,6 +157,13 @@ else
     army1.BattleQuit();
     army2.BattleQuit();
 
+    if(IS_DEBUG(DBG_BATTLE , DBG_INFO))
+    {
+	VERBOSE("Battle2::Loader: start, army1(" << Color::String(army1.GetColor()) << "), army2(" << Color::String(army2.GetColor()) << ")");
+	army1.Dump();
+	army2.Dump();
+    }
+
     DEBUG(DBG_BATTLE, DBG_INFO, "Battle2::Result: army1: " << (result.army1 & RESULT_WINS ? "wins" : "loss") << ", army2: " << (result.army2 & RESULT_WINS ? "wins" : "loss"));
 
     return result;

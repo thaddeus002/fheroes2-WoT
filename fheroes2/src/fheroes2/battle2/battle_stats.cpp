@@ -283,6 +283,12 @@ Battle2::Stats::~Stats()
     if(contours[1]) delete contours[1];
     if(contours[2]) delete contours[2];
     if(contours[3]) delete contours[3];
+    
+    // reset summon elemental and mirror image
+    if(Modes(CAP_SUMMONELEM) || (Modes(CAP_MIRRORIMAGE) && owner))
+    {
+	troop.count = 0;
+    }
 }
 
 u16 Battle2::Stats::GetID(void) const
