@@ -263,7 +263,7 @@ u32 Battle2::ModesAffected::FindZeroDuration(void) const
 
 Battle2::Stats::Stats(Army::Troop & t)
     : troop(t), arena(NULL), id(0), position(0), hp(0), count(0), dead(0), shots(t.GetShots()), disruptingray(0),
-    reflect(false), mirror(NULL), owner(NULL), animstate(0), animframe(0), animstep(1)
+    reflect(false), mirror(NULL), animstate(0), animframe(0), animstep(1)
 {
     id = (troop.GetColor() << 8) | troop.GetArmyIndex();
     count = troop.count;
@@ -285,7 +285,7 @@ Battle2::Stats::~Stats()
     if(contours[3]) delete contours[3];
     
     // reset summon elemental and mirror image
-    if(Modes(CAP_SUMMONELEM) || (Modes(CAP_MIRRORIMAGE) && owner))
+    if(Modes(CAP_SUMMONELEM) || Modes(CAP_MIRRORIMAGE))
     {
 	troop.count = 0;
     }
@@ -547,7 +547,7 @@ void Battle2::Stats::NewTurn(void)
 	ResetModes(mode);
 
 	// cancel mirror image
-	if(mode == CAP_MIRRORIMAGE && mirror)
+	if(mode == CAP_MIRROROWNER)
 	{
     	    if(arena->interface) arena->interface->RedrawActionRemoveMirrorImage(*mirror);
 	    Army::Troop & mirror_troop = mirror->troop;
@@ -718,13 +718,13 @@ u32 Battle2::Stats::ApplyDamage(u32 dmg)
 	u32 killed = HowMuchWillKilled(dmg);
 
 	// kill mirror image (slave)
-	if(Modes(CAP_MIRRORIMAGE) && owner)
+	if(Modes(CAP_MIRRORIMAGE))
 	{
     	    if(arena->interface) arena->interface->RedrawActionRemoveMirrorImage(*this);
-    	    owner->ResetModes(CAP_MIRRORIMAGE);
+    	    mirror->ResetModes(CAP_MIRROROWNER);
 	    dmg = hp;
     	    killed = count;
-    	    owner = NULL;
+    	    mirror = NULL;
 	}
 
 	DEBUG(DBG_BATTLE, DBG_TRACE, "Battle2::Stats::ApplyDamage: " << \
@@ -746,16 +746,17 @@ u32 Battle2::Stats::ApplyDamage(u32 dmg)
 void Battle2::Stats::PostKilledAction(void)
 {
     // kill mirror image (master)
-    if(Modes(CAP_MIRRORIMAGE) && mirror)
+    if(Modes(CAP_MIRROROWNER))
     {
     	if(arena->interface) arena->interface->RedrawActionRemoveMirrorImage(*mirror);
         modes = 0;
 	mirror->hp = 0;
 	mirror->count = 0;
-	mirror->owner = NULL;
+	mirror->mirror = NULL;
         mirror->animstate = 0;
         mirror->animframe = 0;
 	mirror = NULL;
+	ResetModes(CAP_MIRROROWNER);
     }
 
     ResetModes(IS_MAGIC);
@@ -822,7 +823,7 @@ bool Battle2::Stats::AllowApplySpell(u8 spell, const HeroBase* hero, std::string
 {
     if(!hero || Modes(SP_ANTIMAGIC)) return false;
 
-    if(Modes(CAP_MIRRORIMAGE) &&
+    if((Modes(CAP_MIRRORIMAGE) || Modes(CAP_MIRROROWNER)) &&
 	(spell == Spell::ANTIMAGIC || spell == Spell::MIRRORIMAGE)) return false;
 
     // check global

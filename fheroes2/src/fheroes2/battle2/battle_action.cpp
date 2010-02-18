@@ -950,15 +950,13 @@ void Battle2::Arena::SpellActionMirrorImage(Stats & b)
     	Stats* image = b.GetArmy()->BattleNewTroop(b.troop(), b.count).GetBattleStats();
 
     	b.mirror = image;
-    	b.owner = NULL;
-    	image->mirror = NULL;
     	image->position = *it1;
     	image->arena = this;
-    	image->owner = &b;
+    	image->mirror = &b;
     	image->SetReflection(b.reflect);
     	image->SetModes(CAP_MIRRORIMAGE);
     	if(interface) image->InitContours();
-    	b.SetModes(CAP_MIRRORIMAGE);
+    	b.SetModes(CAP_MIRROROWNER);
     }
     else
         DEBUG(DBG_BATTLE, DBG_WARN, "Battle2::Arena::SpellCreateMirrorImage: " << "new position not found!");

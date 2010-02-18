@@ -32,7 +32,7 @@
 
 namespace Battle2
 {
-    bool isApplySpell(const Spell::spell_t, const Stats &, const HeroBase &, Actions &);
+    bool isApplySpell(const Spell::spell_t, const Stats*, const HeroBase &, Actions &);
 };
 
 void Battle2::Arena::AITurn(const Stats & b, Actions & a)
@@ -133,39 +133,43 @@ void Battle2::Arena::AIMagicAction(const Stats & b, Actions & a, const Stats* en
     // troop bad spell - clean
     if(b.Modes(IS_BAD_MAGIC))
     {
-	if(isApplySpell(Spell::DISPEL, b, *hero, a)) return;
-	if(isApplySpell(Spell::CURE, b, *hero, a)) return;
+	if(isApplySpell(Spell::DISPEL, &b, *hero, a)) return;
+	if(isApplySpell(Spell::CURE, &b, *hero, a)) return;
     }
 
     if(enemy)
     {
 	// curse
-	if(!enemy->Modes(SP_CURSE) && isApplySpell(Spell::CURSE, *enemy, *hero, a)) return;
+	if(!enemy->Modes(SP_CURSE) && isApplySpell(Spell::CURSE, enemy, *hero, a)) return;
 	// enemy good spell - clean
-	if(enemy->Modes(IS_GOOD_MAGIC) && isApplySpell(Spell::DISPEL, *enemy, *hero, a)) return;
+	if(enemy->Modes(IS_GOOD_MAGIC) && isApplySpell(Spell::DISPEL, enemy, *hero, a)) return;
     }
 
-    // enemy scan - find archers
-    if((NULL != (army = GetArmy(GetOppositeColor(b.GetColor()))) && army->BattleArchersPresent()) ||
-	// or archers tower
-	(castle && castle->GetColor() != b.GetColor() && castle->isCastle()))
+    // enemy army scan 1
+    if(NULL != (army = GetArmy(GetOppositeColor(b.GetColor()))))
     {
-	if(!b.Modes(SP_SHIELD) && isApplySpell(Spell::SHIELD, b, *hero, a)) return;
+	// find archers
+	if(army->BattleArchersPresent() ||
+	// or archers tower
+	    (castle && castle->GetColor() != b.GetColor() && castle->isCastle()))
+	{
+	    if(!b.Modes(SP_SHIELD) && isApplySpell(Spell::SHIELD, &b, *hero, a)) return;
+	}
     }
 
     // my army blessing
     if(b.isArchers() || enemy)
     {
-	if(enemy->troop.isDragons() && !b.Modes(SP_DRAGONSLAYER) && isApplySpell(Spell::DRAGONSLAYER, b, *hero, a)) return;
-	if(!b.Modes(SP_BLESS) && isApplySpell(Spell::BLESS, b, *hero, a)) return;
-	if(!b.Modes(SP_BLOODLUST) && isApplySpell(Spell::BLOODLUST, b, *hero, a)) return;
-	if(!b.Modes(SP_HASTE) && isApplySpell(Spell::HASTE, b, *hero, a)) return;
+	if(enemy->troop.isDragons() && !b.Modes(SP_DRAGONSLAYER) && isApplySpell(Spell::DRAGONSLAYER, &b, *hero, a)) return;
+	if(!b.Modes(SP_BLESS) && isApplySpell(Spell::BLESS, &b, *hero, a)) return;
+	if(!b.Modes(SP_BLOODLUST) && isApplySpell(Spell::BLOODLUST, &b, *hero, a)) return;
+	if(!b.Modes(SP_HASTE) && isApplySpell(Spell::HASTE, &b, *hero, a)) return;
     }
 
     if(enemy)
     {
-	if(!b.Modes(SP_STEELSKIN) && !b.Modes(SP_STONESKIN) && isApplySpell(Spell::STEELSKIN, b, *hero, a)) return;
-	if(!b.Modes(SP_STONESKIN) && !b.Modes(SP_STEELSKIN) && isApplySpell(Spell::STONESKIN, b, *hero, a)) return;
+	if(!b.Modes(SP_STEELSKIN) && !b.Modes(SP_STONESKIN) && isApplySpell(Spell::STEELSKIN, &b, *hero, a)) return;
+	if(!b.Modes(SP_STONESKIN) && !b.Modes(SP_STEELSKIN) && isApplySpell(Spell::STONESKIN, &b, *hero, a)) return;
     }
 
     // my army scan - clean
@@ -173,31 +177,57 @@ void Battle2::Arena::AIMagicAction(const Stats & b, Actions & a, const Stats* en
     {
 	if(NULL != (enemy = troop->GetBattleStats()))
 	{
-	    if(isApplySpell(Spell::DISPEL, *enemy, *hero, a)) return;
-	    if(isApplySpell(Spell::CURE, *enemy, *hero, a)) return;
+	    if(isApplySpell(Spell::DISPEL, enemy, *hero, a)) return;
+	    if(isApplySpell(Spell::CURE, enemy, *hero, a)) return;
 	}
     }
 
-    // enemy army scan - clean
-    if(NULL != (army = GetArmy(GetOppositeColor(b.GetColor()))) && NULL != (troop = army->BattleFindModes(IS_GOOD_MAGIC)))
+    // enemy army scan 2
+    if(NULL != (army = GetArmy(GetOppositeColor(b.GetColor()))))
     {
-	if(NULL != (enemy = troop->GetBattleStats()))
+	// find mirror image or summon elem
+	if(NULL != (troop = army->BattleFindModes(CAP_MIRRORIMAGE | CAP_SUMMONELEM)) && NULL != (enemy = troop->GetBattleStats()))
 	{
+	    if(isApplySpell(Spell::ARROW, enemy, *hero, a)) return;
+	    if(isApplySpell(Spell::COLDRAY, enemy, *hero, a)) return;
+	    if(isApplySpell(Spell::FIREBALL, enemy, *hero, a)) return;
+	    if(isApplySpell(Spell::LIGHTNINGBOLT, enemy, *hero, a)) return;
+	}
+
+	// find good magic
+	if(NULL != (troop = army->BattleFindModes(IS_GOOD_MAGIC)) && NULL != (enemy = troop->GetBattleStats()))
+	{
+	    // slow
+	    if(enemy->Modes(SP_HASTE) && isApplySpell(Spell::SLOW, enemy, *hero, a)) return;
 	    // curse
-	    if(!enemy->Modes(SP_CURSE) && isApplySpell(Spell::CURSE, *enemy, *hero, a)) return;
+	    if(!enemy->Modes(SP_CURSE) && isApplySpell(Spell::CURSE, enemy, *hero, a)) return;
 	    //
-	    if(isApplySpell(Spell::DISPEL, *enemy, *hero, a)) return;
+	    if(isApplySpell(Spell::DISPEL, enemy, *hero, a)) return;
 	}
     }
 
-    // FIX: Battle2::Arena::AIMagicAction: enemy army - damage spell
-    // find monster
-    if(enemy)
-    {
-    }
+    /* FIX: Battle2::Arena: AIMagicAction:Damage Spell:
+    Spell::ARROW
+    Spell::COLDRAY
+    Spell::FIREBALL
+    Spell::LIGHTNINGBOLT
+
+    Spell::FIREBLAST
+    Spell::COLDRING
+    Spell::CHAINLIGHTNING
+    Spell::METEORSHOWER
+
+    Spell::DEATHWAVE
+    Spell::HOLYWORD
+    Spell::HOLYSHOUT
+    Spell::DEATHRIPPLE
+    */
+
+    if(isApplySpell(Spell::ARMAGEDDON, NULL, *hero, a)) return;
+    if(isApplySpell(Spell::ELEMENTALSTORM, NULL, *hero, a)) return;
 }
 
-bool Battle2::isApplySpell(const Spell::spell_t spell, const Stats & b, const HeroBase & hero, Actions & a)
+bool Battle2::isApplySpell(const Spell::spell_t spell, const Stats* b, const HeroBase & hero, Actions & a)
 {
     switch(spell)
     {
@@ -212,9 +242,9 @@ bool Battle2::isApplySpell(const Spell::spell_t spell, const Stats & b, const He
 	default: break;
     }
 
-    if(hero.GetSpellBook().isPresentSpell(spell) && hero.GetSpellPoints() >= Spell::CostManaPoints(spell) && b.AllowApplySpell(spell, &hero))
+    if(hero.GetSpellBook().isPresentSpell(spell) && hero.GetSpellPoints() >= Spell::CostManaPoints(spell) && (!b || b->AllowApplySpell(spell, &hero)))
     {
-	a.AddedCastAction(spell, b.GetPosition());
+	a.AddedCastAction(spell, (b ? b->GetPosition() : MAXU16));
 	return true;
     }
 

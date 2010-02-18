@@ -45,8 +45,9 @@ namespace Battle2
         MORALE_GOOD     = 0x00000400,
         MORALE_BAD      = 0x00000800,
 
-	CAP_TOWER	= 0x00002000,
-	CAP_SUMMONELEM	= 0x00004000,
+	CAP_TOWER	= 0x00001000,
+	CAP_SUMMONELEM	= 0x00002000,
+	CAP_MIRROROWNER	= 0x00004000,
 	CAP_MIRRORIMAGE	= 0x00008000,
 
 	SP_BLOODLUST    = 0x00020000,
@@ -224,7 +225,6 @@ namespace Battle2
 	bool	reflect;
 
 	Stats*	mirror;
-	Stats*	owner;
 
 	u8	animstate;
 	u8	animframe;
