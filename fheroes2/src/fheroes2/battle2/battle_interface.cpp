@@ -34,6 +34,7 @@
 #include "battle_cell.h"
 #include "battle_stats.h"
 #include "battle_tower.h"
+#include "battle_bridge.h"
 #include "battle_catapult.h"
 #include "battle_interface.h"
 
@@ -976,10 +977,10 @@ void Battle2::Interface::RedrawCastle1(void) const
     const Sprite & sprite2 = AGG::GetICN(icn_castbkg, fortification ? 4 : 3);
     display.Blit(sprite2, sprite2.x() + topleft.x, sprite2.y() + topleft.y);
 
-    // broken bridge
-    if(0 == arena.board[50].object)
+    // bridge
+    if(arena.bridge->isDown())
     {
-    	const Sprite & sprite3 = AGG::GetICN(icn_castle, 24);
+    	const Sprite & sprite3 = AGG::GetICN(icn_castle, arena.bridge->isDestroy() ? 24 : 21);
     	display.Blit(sprite3, sprite3.x() + topleft.x, sprite3.y() + topleft.y);
     }
 }
@@ -2171,6 +2172,21 @@ void Battle2::Interface::RedrawActionMove(Stats & b, const std::vector<u16> & pa
 	const Cell & cell = arena.board[*dst];
 	p_move = cell.pos;
     
+	if(arena.bridge)
+	{
+	    if(!arena.bridge->isDown() && arena.bridge->NeedDown(b, *dst))
+	    {
+		RedrawBridgeAnimation(true);
+		arena.bridge->SetDown(true);
+	    }
+	    else
+	    if(arena.bridge->isDown() && arena.bridge->AllowUp())
+	    {
+		RedrawBridgeAnimation(false);
+		arena.bridge->SetDown(false);
+	    }
+	}
+
 	if(b.isWide() && b.GetTailIndex() == *dst)
 	    b.UpdateDirection(cell);
 	else
@@ -3533,6 +3549,62 @@ void Battle2::Interface::RedrawTroopWithFrameAnimation(Stats & b, ICN::icn_t icn
     {
         b.ResetAnimFrame(AS_IDLE);
 	b_current = NULL;
+    }
+}
+
+void Battle2::Interface::RedrawBridgeAnimation(bool down)
+{
+    Display & display = Display::Get();
+    Cursor & cursor = Cursor::Get();
+    LocalEvent & le = LocalEvent::Get();
+    const Point & topleft = border.GetArea();
+
+    ICN::icn_t icn_castle  = ICN::UNKNOWN;
+    u32 ticket = 0;
+
+    switch(arena.castle->GetRace())
+    {
+        default:
+        case Race::BARB: icn_castle = ICN::CASTLEB; break;
+        case Race::KNGT: icn_castle = ICN::CASTLEK; break;
+        case Race::NECR: icn_castle = ICN::CASTLEN; break;
+        case Race::SORC: icn_castle = ICN::CASTLES; break;
+        case Race::WRLK: icn_castle = ICN::CASTLEW; break;
+        case Race::WZRD: icn_castle = ICN::CASTLEZ; break;
+    }
+
+    u8 frame = down ? 23 : 21;
+
+    if(down) AGG::PlaySound(M82::DRAWBRG);
+
+    while(le.HandleEvents())
+    {
+	if(down)
+	{
+	    if(frame < 21) break;
+	}
+	else
+	{
+	    if(frame > 23) break;
+	}
+
+	CheckGlobalEvents(le, ticket);
+
+	if(Game::ShouldAnimateInfrequent(ticket, animation_delay))
+    	{
+	    cursor.Hide();
+	    Redraw();
+    	    const Sprite & sprite = AGG::GetICN(icn_castle, frame);
+    	    display.Blit(sprite, sprite.x() + topleft.x, sprite.y() + topleft.y);
+	    cursor.Show();
+	    display.Flip();
+
+	    if(down)
+		--frame;
+	    else
+		++frame;
+	}
+	++ticket;
     }
 }
 

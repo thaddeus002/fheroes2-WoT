@@ -76,7 +76,7 @@ namespace Battle2
 
     enum tower_t { TWR_LEFT, TWR_CENTER, TWR_RIGHT };
 
-    enum catapult_t { CAT_WALL1 = 1, CAT_WALL2 = 2, CAT_WALL3 = 3, CAT_WALL4 = 4, CAT_TOWER1 = 5, CAT_TOWER2 = 6, CAT_MOAT = 7, CAT_TOWER3 = 8, CAT_MISS = 9 };
+    enum catapult_t { CAT_WALL1 = 1, CAT_WALL2 = 2, CAT_WALL3 = 3, CAT_WALL4 = 4, CAT_TOWER1 = 5, CAT_TOWER2 = 6, CAT_BRIDGE = 7, CAT_TOWER3 = 8, CAT_MISS = 9 };
 
     enum animstate_t
     {

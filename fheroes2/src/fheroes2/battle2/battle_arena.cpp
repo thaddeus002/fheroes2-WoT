@@ -36,6 +36,7 @@
 #include "battle_stats.h"
 #include "battle_tower.h"
 #include "battle_catapult.h"
+#include "battle_bridge.h"
 #include "battle_interface.h"
 
 ICN::icn_t GetCovr(u16 ground)
@@ -197,6 +198,19 @@ s16 Battle2::Board::GetIndexAbsPosition(const Point & pt) const
     return it1 != it2 ? (*it1).GetIndex() : -1;
 }
 
+bool Battle2::Board::inCastle(u16 ii)
+{
+ return((8 < ii && ii <= 10) ||
+       (19 < ii && ii <= 21) ||
+       (29 < ii && ii <= 32) ||
+       (40 < ii && ii <= 43) ||
+       (50 < ii && ii <= 54) ||
+       (62 < ii && ii <= 65) ||
+       (73 < ii && ii <= 76) ||
+       (85 < ii && ii <= 87) ||
+       (96 < ii && ii <= 98));
+}
+
 bool Battle2::Board::isMoatIndex(u16 ii)
 {
     switch(ii)
@@ -205,7 +219,6 @@ bool Battle2::Board::isMoatIndex(u16 ii)
 	case 18:
 	case 28:
 	case 39:
-	case 49:
 	case 61:
 	case 72:
 	case 84:
@@ -630,8 +643,9 @@ Battle2::Arena::Arena(Army::army_t & a1, Army::army_t & a2, u16 index, bool loca
 	towers[2] = castle->isBuild(BUILD_RIGHTTURRET) ? new Tower(*castle, TWR_RIGHT, *this) : NULL;
 	bool fortification = (Race::KNGT == castle->GetRace()) && castle->isBuild(BUILD_SPEC);
 	catapult = army1.GetCommander() ? new Catapult(*army1.GetCommander(), fortification, *this) : NULL;
+	bridge = new Bridge(*this);
 
-	// catapult
+	// catapult cell
 	board[77].object = 1;
 
 	// wall (3,2,1,0)
@@ -640,15 +654,16 @@ Battle2::Arena::Arena(Army::army_t & a1, Army::army_t & a2, u16 index, bool loca
 	board[73].object = fortification ? 3 : 2;
 	board[96].object = fortification ? 3 : 2;
 
-	// archer tower (2, 1)
-	board[19].object = 2;
-	board[85].object = 2;
-
 	// tower
 	board[40].object = 2;
 	board[62].object = 2;
 
-	// moat (1, 0)
+	// archers tower
+	board[19].object = 2;
+        board[85].object = 2;
+
+	// bridge
+	board[49].object = 1;
 	board[50].object = 1;
     }
     else
@@ -772,6 +787,9 @@ void Battle2::Arena::Turns(u16 turn, Result & result)
 
 	current_troop = (speed1 >= speed2 ? btroop1 : btroop2);
 	current_commander = (speed1 >= speed2 ? army1.GetCommander() : army2.GetCommander());
+
+	// set bridge passable
+	if(bridge && bridge->isValid() && !bridge->isDown()) bridge->SetPassable(*current_troop);
 
 	// bad morale
 	if(!current_troop->Modes(TR_MOVED) && current_troop->Modes(MORALE_BAD))
@@ -908,20 +926,18 @@ void Battle2::Arena::ScanPassabilityBoard(const Stats & b, bool skip_speed)
 	{
 	    for(it = v1.begin(); it != v1.end(); ++it) board[*it].SetPassabilityAbroad(b, v2);
 
-	    // check moat positions
-	    if(!skip_speed && castle && castle->isBuild(BUILD_MOAT))
+	    v1.clear();
+	    for(it = v2.begin(); it != v2.end(); ++it)
 	    {
-		v1.clear();
-		for(it = v2.begin(); it != v2.end(); ++it)
+		if(!skip_speed && castle)
 		{
-		    //                            check bridge
-		    if(Board::isMoatIndex(*it) && (*it != 49 || board[50].object)) continue;
-		    v1.push_back(*it);
+		    // skip moat positions
+		    if((castle->isBuild(BUILD_MOAT) && Board::isMoatIndex(*it)) ||
+		    // skip bridge position
+		       (Bridge::isIndex(*it) && !bridge->isPassable(b.GetColor()))) continue;
 		}
+		v1.push_back(*it);
 	    }
-	    else
-		v1 = v2;
-
 	    v2.clear();
 
 	    --max_turn;
@@ -971,8 +987,7 @@ u16 Battle2::Arena::GetPath(const Stats & b, u16 to, std::vector<u16> & v)
     if(castle && castle->isBuild(BUILD_MOAT))
     {
 	std::vector<u16>::iterator it = std::find_if(v.begin(), v.end(), Board::isMoatIndex);
-	//                  check bridge
-	if(it != v.end() && (*it != 49 || board[50].object)) v.resize(std::distance(v.begin(), it) + 1);
+	if(it != v.end()) v.resize(std::distance(v.begin(), it) + 1);
     }
 
     if(IS_DEBUG(DBG_BATTLE, DBG_TRACE))
@@ -1401,7 +1416,7 @@ void Battle2::Arena::SetCastleTargetValue(u8 target, u8 value)
         case CAT_TOWER2:if(towers[2] && towers[2]->isValid()) towers[2]->SetDestroy(); break;
         case CAT_TOWER3:if(towers[1] && towers[1]->isValid()) towers[1]->SetDestroy(); break;
 
-        case CAT_MOAT: board[50].object = value; break;
+        case CAT_BRIDGE:if(bridge->isValid()) bridge->SetDestroy(); break;
 
         default: break;
     }
@@ -1420,7 +1435,7 @@ u8 Battle2::Arena::GetCastleTargetValue(u8 target) const
         case CAT_TOWER2:return towers[2] && towers[2]->isValid();
         case CAT_TOWER3:return towers[1] && towers[1]->isValid();
 
-        case CAT_MOAT:  return board[50].object;
+        case CAT_BRIDGE:return bridge->isValid();
 
         default: break;
     }

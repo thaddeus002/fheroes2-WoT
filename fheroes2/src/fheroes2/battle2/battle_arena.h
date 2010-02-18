@@ -44,6 +44,7 @@ namespace Battle2
     class Stats;
     class Tower;
     class Catapult;
+    class Bridge;
     class Interface;
 
     struct Actions : public std::list<Action>
@@ -74,6 +75,7 @@ namespace Battle2
 
 	void GetAbroadPositions(u16, u8, std::vector<u16> &) const;
 
+	static bool inCastle(u16);
 	static bool isMoatIndex(u16);
 	static direction_t GetReflectDirection(u8);
 	static direction_t GetDirection(u16, u16);
@@ -205,6 +207,7 @@ namespace Battle2
 	friend class Cell;
 	friend class Stats;
 	friend class Tower;
+	friend class Bridge;
 	friend class Catapult;
 
 	Army::army_t & army1;
@@ -215,6 +218,7 @@ namespace Battle2
 
 	Tower* towers[3];
 	Catapult* catapult;
+	Bridge* bridge;
 
 	Interface* interface;
 	Result *result_game;

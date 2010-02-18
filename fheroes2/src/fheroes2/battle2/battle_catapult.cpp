@@ -28,6 +28,7 @@
 #include "battle_arena.h"
 #include "battle_cell.h"
 #include "battle_tower.h"
+#include "battle_bridge.h"
 #include "battle_catapult.h"
 
 Battle2::Catapult::Catapult(const HeroBase & hero, bool fortification, Arena & a) : arena(a), cat_shots(1), cat_first(20), cat_miss(true), cat_fort(fortification)
@@ -105,7 +106,7 @@ Point Battle2::Catapult::GetTargetPosition(u8 target) const
 	case CAT_TOWER1:res = Point(430, 40); break;
 	case CAT_TOWER2:res = Point(430, 300); break;
 	case CAT_TOWER3:res = Point(580, 160); break;
-	case CAT_MOAT:	res = Point(400, 195); break;
+	case CAT_BRIDGE:res = Point(400, 195); break;
 	case CAT_MISS:	res = Point(610, 320); break;
 
 	default: break;
@@ -129,8 +130,8 @@ u8 Battle2::Catapult::GetTarget(void) const
     if(arena.towers[0] && arena.towers[0]->isValid()) targets.push_back(CAT_TOWER1);
     if(arena.towers[2] && arena.towers[2]->isValid()) targets.push_back(CAT_TOWER2);
 
-    // check moat
-    if(0 != arena.board[50].object) targets.push_back(CAT_MOAT);
+    // check bridge
+    if(arena.bridge->isValid()) targets.push_back(CAT_BRIDGE);
 
     // check general tower
     if(arena.towers[1] && arena.towers[1]->isValid()) targets.push_back(CAT_TOWER3);
