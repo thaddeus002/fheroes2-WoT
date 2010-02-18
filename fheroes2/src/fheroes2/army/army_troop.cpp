@@ -284,7 +284,7 @@ bool Army::WeakestTroop(const Troop & t1, const Troop & t2)
 
 bool Army::SlowestTroop(const Troop & t1, const Troop & t2)
 {
-    return t1.GetSpeed() < t2.GetSpeed();
+    return t1.GetSpeed() && t1.GetSpeed() < t2.GetSpeed();
 }
 
 bool Army::FastestTroop(const Troop & t1, const Troop & t2)

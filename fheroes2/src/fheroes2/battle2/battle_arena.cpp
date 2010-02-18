@@ -743,8 +743,8 @@ void Battle2::Arena::Turns(u16 turn, Result & result)
 
 	actions.clear();
 
-	Battle2::Stats* btroop1 = army1.GetFastestTroop().GetBattleStats();
-	Battle2::Stats* btroop2 = army2.GetFastestTroop().GetBattleStats();
+	Battle2::Stats* btroop1 = check_skip1 ? army1.GetSlowestTroop().GetBattleStats() : army1.GetFastestTroop().GetBattleStats();
+	Battle2::Stats* btroop2 = check_skip2 ? army2.GetSlowestTroop().GetBattleStats() : army2.GetFastestTroop().GetBattleStats();
 
 	if(!btroop1 || !btroop2)
 	{
