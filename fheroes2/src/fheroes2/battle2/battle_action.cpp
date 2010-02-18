@@ -28,6 +28,7 @@
 #include "battle_stats.h"
 #include "battle_arena.h"
 #include "battle_tower.h"
+#include "battle_bridge.h"
 #include "battle_catapult.h"
 #include "battle_interface.h"
 #include "remoteclient.h"
@@ -375,6 +376,15 @@ void Battle2::Arena::ApplyActionMove(Action & action)
 	    }
 
 	    if(interface) interface->RedrawActionMove(*b, path);
+	    else
+    	    if(bridge)
+    	    {
+        	if(!bridge->isDown() && bridge->NeedDown(*b, dst))
+        	    bridge->SetDown(true);
+        	else
+        	if(bridge->isDown() && bridge->AllowUp())
+    		    bridge->SetDown(false);
+	    }
 	}
 
 	b->position = dst;

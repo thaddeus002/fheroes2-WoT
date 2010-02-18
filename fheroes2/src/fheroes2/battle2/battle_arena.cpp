@@ -1416,7 +1416,14 @@ void Battle2::Arena::SetCastleTargetValue(u8 target, u8 value)
         case CAT_TOWER2:if(towers[2] && towers[2]->isValid()) towers[2]->SetDestroy(); break;
         case CAT_TOWER3:if(towers[1] && towers[1]->isValid()) towers[1]->SetDestroy(); break;
 
-        case CAT_BRIDGE:if(bridge->isValid()) bridge->SetDestroy(); break;
+        case CAT_BRIDGE:
+	    if(bridge->isValid())
+	    {
+                if(interface) interface->RedrawBridgeAnimation(true);
+		bridge->SetDown(true);
+		bridge->SetDestroy();
+	    }
+	    break;
 
         default: break;
     }
