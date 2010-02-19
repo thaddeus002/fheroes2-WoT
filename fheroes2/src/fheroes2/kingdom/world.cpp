@@ -912,8 +912,7 @@ void World::LoadMaps(const std::string &filename)
     	    case MP2::OBJ_FIREALTAR:
     	    case MP2::OBJ_EARTHALTAR:
 	    case MP2::OBJ_BARROWMOUNDS:
-		    // initial update dwelling population
-		    tile.SetCountMonster(2 * Monster(Monster::FromObject(tile.GetObject())).GetRNDSize(true));
+		    tile.SetCountMonster(0);
 		break;
 
 	//
@@ -1554,21 +1553,35 @@ void World::UpdateDwellingPopulation(void)
     {
 	Maps::Tiles & tile = **it1;
 	const MP2::object_t & obj = tile.GetObject();
+	float count = 0;
+
 	switch(obj)
 	{
     	    // join monsters
-    	    case MP2::OBJ_WATCHTOWER:
-            case MP2::OBJ_EXCAVATION:
-            case MP2::OBJ_CAVE:
-            case MP2::OBJ_TREEHOUSE:
-            case MP2::OBJ_ARCHERHOUSE:
-            case MP2::OBJ_GOBLINHUT:
-            case MP2::OBJ_DWARFCOTT:
             case MP2::OBJ_HALFLINGHOLE:
             case MP2::OBJ_PEASANTHUT:
             case MP2::OBJ_THATCHEDHUT:
+            case MP2::OBJ_EXCAVATION:
+            case MP2::OBJ_CAVE:
+            case MP2::OBJ_TREEHOUSE:
+            case MP2::OBJ_GOBLINHUT:
+	    {
+		const Monster m(Monster::FromObject(obj));
+		count = m.GetRNDSize(true) * 3 / 2;
+		break;
+	    }
 
-	    // buy monsters
+            case MP2::OBJ_TREECITY:
+	    {
+		const Monster m(Monster::FromObject(obj));
+		count = 2 * m.GetRNDSize(true);
+		break;
+	    }
+	    
+    	    case MP2::OBJ_WATCHTOWER:
+            case MP2::OBJ_ARCHERHOUSE:
+            case MP2::OBJ_DWARFCOTT:
+	    //
 	    case MP2::OBJ_RUINS:
             case MP2::OBJ_WAGONCAMP:
             case MP2::OBJ_DESERTTENT:
@@ -1579,23 +1592,17 @@ void World::UpdateDwellingPopulation(void)
             case MP2::OBJ_FIREALTAR:
             case MP2::OBJ_EARTHALTAR:
 	    case MP2::OBJ_BARROWMOUNDS:
+            case MP2::OBJ_CITYDEAD:
 	    {
 		const Monster m(Monster::FromObject(obj));
-		tile.SetCountMonster(tile.GetCountMonster() + (1 < day ? m.GetGrown() : m.GetRNDSize(true)));
+		count = m.GetRNDSize(true);
 		break;
 	    }
 
-            case MP2::OBJ_CITYDEAD:
-            case MP2::OBJ_TREECITY:
-            {
-            
-		const Monster m(Monster::FromObject(obj));
-		tile.SetCountMonster(tile.GetCountMonster() + 2 * (1 < day ? m.GetGrown() : m.GetRNDSize(true)));
-        	break;
-	    }
-
-	    default: break;;
+	    default: break;
 	}
+
+	if(count) tile.SetCountMonster(tile.GetCountMonster() + static_cast<u16>(1 < day ? count : count * 3 / 2));
     }
 }
 
