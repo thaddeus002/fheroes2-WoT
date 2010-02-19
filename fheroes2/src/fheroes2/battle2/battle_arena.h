@@ -200,7 +200,7 @@ namespace Battle2
 	void ApplyActionSpellCast(Action &);
 	void ApplyActionTower(Action &);
 	void ApplyActionCatapult(Action &);
-	void BattleProcess(Stats &, Stats &, bool);
+	void BattleProcess(Stats &, Stats &);
 
     protected:
 	friend class Interface;

@@ -131,7 +131,7 @@ void Battle2::Actions::AddedMoraleAction(const Stats & b, u8 state)
     push_back(action);
 }
 
-void Battle2::Arena::BattleProcess(Stats & attacker, Stats & defender, bool is_attack)
+void Battle2::Arena::BattleProcess(Stats & attacker, Stats & defender)
 {
     std::vector<TargetInfo> targets;
 
@@ -141,8 +141,8 @@ void Battle2::Arena::BattleProcess(Stats & attacker, Stats & defender, bool is_a
     TargetsApplyDamage(attacker, defender, targets);
     if(interface) interface->RedrawActionAttackPart2(attacker, targets);
 
-    // magic attack only for defence
-    if(defender.isValid() && attacker.isMagicAttack() && !is_attack)
+    // magic attack
+    if(defender.isValid() && attacker.isMagicAttack() && !defender.AllowResponse())
     {
 	const u8 spell = attacker.GetSpellMagic();
 	if(Spell::NONE != spell)
@@ -291,7 +291,7 @@ void Battle2::Arena::ApplyActionAttack(Action & action)
 	    b2->UpdateDirection(*b1);
 
 	    // attack
-	    BattleProcess(*b1, *b2, true);
+	    BattleProcess(*b1, *b2);
 
 	    if(b2->isValid())
 	    {
@@ -299,13 +299,13 @@ void Battle2::Arena::ApplyActionAttack(Action & action)
 		if(Stats::isHandFighting(*b1, *b2) &&
 		!b1->isHideAttack() && b2->AllowResponse())
 		{
-		    BattleProcess(*b2, *b1, false);
+		    BattleProcess(*b2, *b1);
 		    b2->SetResponse();
 		}
 
 		// twice attack
 		if(b1->isValid() && b1->isTwiceAttack())
-		    BattleProcess(*b1, *b2, true);
+		    BattleProcess(*b1, *b2);
 	    }
 	}
 	else
