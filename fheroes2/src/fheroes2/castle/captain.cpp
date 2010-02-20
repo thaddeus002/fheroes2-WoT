@@ -28,7 +28,6 @@
 
 Captain::Captain(const Castle & c) : home(c), spell_book(this), spellPoints(0)
 {
-    LoadDefaults();
 }
 
 void Captain::LoadDefaults(void)
