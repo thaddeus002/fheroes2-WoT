@@ -462,7 +462,7 @@ void Dialog::DwellingInfo(const Monster & monster, u16 available)
 
     // text recruit monster
     str = _("Recruit %{name}");
-    String::Replace(str, "%{name}", monster.GetName());
+    String::Replace(str, "%{name}", monster.GetMultiName());
     text.Set(str, Font::BIG);
     text.Blit(pos.x + (pos.w - text.w()) / 2, pos.y + 25);
 

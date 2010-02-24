@@ -331,6 +331,7 @@ u8  Monster::GetLevel(void) const
 
 u16 Monster::GetRNDSize(bool skip_factor) const
 {
+/*
     u8 grown = GetGrown();
     u16 res = Rand::Get((1 < grown ? grown - 1 : grown), grown + grown / 2);
 
@@ -349,9 +350,33 @@ u16 Monster::GetRNDSize(bool skip_factor) const
 	}
 
 	res = (res * factor / 100);
+	
+	if(res < 1) res = 1;
     }
 
     return res;
+*/
+    const u32 hps = GetGrown() * GetHitPoints();
+    u32 res = Rand::Get(hps, hps + hps / 2);
+
+    if(!skip_factor)
+    {
+	u16 factor = 100;
+
+	switch(Settings::Get().GameDifficulty()) 	 
+	{
+	    case Difficulty::EASY:      factor = 80; break;
+	    case Difficulty::NORMAL:    factor = 100; break;
+	    case Difficulty::HARD:      factor = 130; break;
+	    case Difficulty::EXPERT:    factor = 160; break;
+	    case Difficulty::IMPOSSIBLE:factor = 190; break;
+	    default: break;
+	}
+
+	res = (res * factor / 100);
+    }
+
+    return GetCountFromHitPoints(id, res);
 }
 
 u8 Monster::GetSpriteIndex(void) const
@@ -1080,4 +1105,16 @@ void Monster::GetUpgradeCost(u8 id, payment_t & payment)
     }
     else
 	GetCost(m1, payment);
+}
+
+u32 Monster::GetCountFromHitPoints(monster_t m, u32 hp)
+{
+    if(hp)
+    {
+	const u16 hp1 = monsters[m].hp;
+	const u32 count = hp / hp1;
+	return (count * hp1) < hp ? count + 1 : count;
+    }
+
+    return 0;
 }

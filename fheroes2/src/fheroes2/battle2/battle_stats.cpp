@@ -685,6 +685,8 @@ u32 Battle2::Stats::GetDamage(const Stats & enemy) const
 
 u32 Battle2::Stats::HowMuchWillKilled(u32 dmg) const
 {
+    return dmg >= hp ? count : count - Monster::GetCountFromHitPoints(troop(), hp - dmg);
+/*
     const u16 mhp = GetMonster().GetHitPoints();
     u32 killed = 0;
 
@@ -701,6 +703,7 @@ u32 Battle2::Stats::HowMuchWillKilled(u32 dmg) const
 	killed = 1;
 
     return killed;
+*/
 }
 
 u32 Battle2::Stats::ApplyDamage(u32 dmg)
@@ -778,19 +781,17 @@ void Battle2::Stats::PostKilledAction(void)
     // possible also..
 }
 
-u16 Battle2::Stats::Resurrect(u32 points, bool check_original)
+u32 Battle2::Stats::Resurrect(u32 points, bool check_original)
 {
-    const u16 mhp = GetMonster().GetHitPoints();
-    const u16 old = count;
+    const u32 old = count;
 
     hp += points;
-    count = hp / mhp;
-    if(count * mhp < hp) count += 1;
+    count = Monster::GetCountFromHitPoints(troop(), hp);
 
     if(check_original && count > troop.count)
     {
 	count = troop.count;
-	hp = count * mhp;
+	hp = count * GetMonster().GetHitPoints();
     }
 
     return count - old;

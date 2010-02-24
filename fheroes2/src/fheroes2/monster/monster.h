@@ -180,6 +180,7 @@ public:
     static monster_t Upgrade(monster_t);
     static u8  GetLevel(monster_t);
     static u32 GetDwelling(monster_t);
+    static u32 GetCountFromHitPoints(monster_t, u32);
 
     static void GetCost(u8, payment_t &);
     static void GetUpgradeCost(u8, payment_t &);
