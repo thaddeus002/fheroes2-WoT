@@ -148,6 +148,7 @@ public:
     static bool isApplyToFriends(u8);
     static bool isApplyToEnemies(u8);
     static bool isMassActions(u8);
+    static bool isRaceCompatible(u8 spell, u8 race);
 
     /* return index sprite spells.icn */
     static u8 IndexSprite(spell_t);

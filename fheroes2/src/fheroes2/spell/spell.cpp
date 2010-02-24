@@ -790,3 +790,29 @@ bool Spell::isApplyToEnemies(u8 spell)
 
     return false;
 }
+
+bool Spell::isRaceCompatible(u8 spell, u8 race)
+{
+    switch(spell)
+    {
+	case MASSCURE:
+	case MASSBLESS:
+	case HOLYSHOUT:
+	case HOLYWORD:
+	case BLESS:
+	case CURE:
+	    if(Race::NECR == race) return false;
+	    break;
+
+	case DEATHWAVE:
+	case DEATHRIPPLE:
+	case ANIMATEDEAD:
+	    if(Race::NECR != race) return false;
+	    break;
+
+	default:
+	    break;
+    }
+
+    return true;
+}

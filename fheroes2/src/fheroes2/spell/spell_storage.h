@@ -40,7 +40,7 @@ public:
 
 	void Appends(const SpellStorage & st, const u8 wisdom);
 	void Append(const Spell::spell_t sp, const u8 wisdom);
-	void AppendWithoutWisdom(const Spell::spell_t);
+	void Append(const Spell::spell_t);
 
 	bool isPresentSpell(Spell::spell_t) const;
 

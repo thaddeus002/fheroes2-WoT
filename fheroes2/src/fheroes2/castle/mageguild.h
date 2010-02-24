@@ -45,8 +45,6 @@ class MageGuild : public SpellStorage
 	void PackSpells(const u8 lvl);
 	void AddExtSpells(const u8 lvl);
 
-	static Spell::spell_t GetSpellRace(const Race::race_t rc, const u8 lvl);
-
     private:
 	friend class Game::IO;
 
