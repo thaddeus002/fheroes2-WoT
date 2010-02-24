@@ -97,7 +97,8 @@ const skillstats_t* GetSkillStats(u8 race)
 	case Race::WRLK:	id = "warlock"; break;
 	case Race::WZRD:	id = "wizard"; break;
 	case Race::NECR:	id = "necromancer"; break;
-	default: break;
+	default:
+	    DEBUG(DBG_GAME, DBG_WARN, "GetSkillStats:: return is NULL"); break;
     }
 
     const skillstats_t* ptr = &_skillstats[0];
@@ -121,20 +122,20 @@ void LoadSecondarySection(const TiXmlElement* xml, secondary_t & sec)
 {
     if(!xml) return;
     int value;
-    xml->Attribute("archery", &value);     sec.archery = Skill::Level::NONE > value || Skill::Level::EXPERT < value ? Skill::Level::NONE : value;
-    xml->Attribute("ballistics", &value);  sec.ballistics = Skill::Level::NONE > value || Skill::Level::EXPERT < value ? Skill::Level::NONE : value;
-    xml->Attribute("diplomacy", &value);   sec.diplomacy = Skill::Level::NONE > value || Skill::Level::EXPERT < value ? Skill::Level::NONE : value;
-    xml->Attribute("eagleeye", &value);    sec.eagleeye = Skill::Level::NONE > value || Skill::Level::EXPERT < value ? Skill::Level::NONE : value;
-    xml->Attribute("estates", &value);     sec.estates = Skill::Level::NONE > value || Skill::Level::EXPERT < value ? Skill::Level::NONE : value;
-    xml->Attribute("leadership", &value);  sec.leadership = Skill::Level::NONE > value || Skill::Level::EXPERT < value ? Skill::Level::NONE : value;
-    xml->Attribute("logistics", &value);   sec.logistics = Skill::Level::NONE > value || Skill::Level::EXPERT < value ? Skill::Level::NONE : value;
-    xml->Attribute("luck", &value);        sec.luck = Skill::Level::NONE > value || Skill::Level::EXPERT < value ? Skill::Level::NONE : value;
-    xml->Attribute("mysticism", &value);   sec.mysticism = Skill::Level::NONE > value || Skill::Level::EXPERT < value ? Skill::Level::NONE : value;
-    xml->Attribute("navigation", &value);  sec.navigation = Skill::Level::NONE > value || Skill::Level::EXPERT < value ? Skill::Level::NONE : value;
-    xml->Attribute("necromancy", &value);  sec.necromancy = Skill::Level::NONE > value || Skill::Level::EXPERT < value ? Skill::Level::NONE : value;
-    xml->Attribute("pathfinding", &value); sec.pathfinding = Skill::Level::NONE > value || Skill::Level::EXPERT < value ? Skill::Level::NONE : value;
-    xml->Attribute("scouting", &value);    sec.scouting = Skill::Level::NONE > value || Skill::Level::EXPERT < value ? Skill::Level::NONE : value;
-    xml->Attribute("wisdom", &value);      sec.wisdom = Skill::Level::NONE > value || Skill::Level::EXPERT < value ? Skill::Level::NONE : value;
+    xml->Attribute("archery", &value);     sec.archery = value;
+    xml->Attribute("ballistics", &value);  sec.ballistics = value;
+    xml->Attribute("diplomacy", &value);   sec.diplomacy = value;
+    xml->Attribute("eagleeye", &value);    sec.eagleeye = value;
+    xml->Attribute("estates", &value);     sec.estates = value;
+    xml->Attribute("leadership", &value);  sec.leadership = value;
+    xml->Attribute("logistics", &value);   sec.logistics = value;
+    xml->Attribute("luck", &value);        sec.luck = value;
+    xml->Attribute("mysticism", &value);   sec.mysticism = value;
+    xml->Attribute("navigation", &value);  sec.navigation = value;
+    xml->Attribute("necromancy", &value);  sec.necromancy = value;
+    xml->Attribute("pathfinding", &value); sec.pathfinding = value;
+    xml->Attribute("scouting", &value);    sec.scouting = value;
+    xml->Attribute("wisdom", &value);      sec.wisdom = value;
 }
 #endif
 
@@ -184,7 +185,7 @@ void Skill::UpdateStats(const std::string & spec)
 		over_race->Attribute("level", &value);
 		if(value) ptr->over_level = value;
 	    }
-	    
+
 	    const TiXmlElement* secondary_race = xml_secondary ? xml_secondary->FirstChildElement(ptr->id) : NULL;
 	    if(secondary_race) LoadSecondarySection(secondary_race, ptr->mature_secondary);
 
@@ -588,9 +589,9 @@ void Skill::Secondary::FillStandard(std::vector<skill_t> & v)
 u8 Skill::Secondary::GetWeightSkillFromRace(u8 race, u8 skill)
 {
     const skillstats_t* ptr = GetSkillStats(race);
+
     if(ptr)
     {
-	
 	if(skill == PATHFINDING)	return ptr->mature_secondary.pathfinding;
 	if(skill == ARCHERY)		return ptr->mature_secondary.archery;
 	if(skill == LOGISTICS)		return ptr->mature_secondary.logistics;
