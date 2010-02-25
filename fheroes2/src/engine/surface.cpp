@@ -345,12 +345,20 @@ void Surface::SetColorKey(void)
 
 void Surface::SetColorKey(u8 r, u8 g, u8 b)
 {
+#ifdef _WIN32_WCE
+    SDL_SetColorKey(surface, SDL_SRCCOLORKEY, MapRGB(r, g, b));
+#else
     SDL_SetColorKey(surface, SDL_SRCCOLORKEY | SDL_RLEACCEL, MapRGB(r, g, b));
+#endif
 }
 
 void Surface::SetColorKey(u32 color)
 {
+#ifdef _WIN32_WCE
+    SDL_SetColorKey(surface, SDL_SRCCOLORKEY, color);
+#else
     SDL_SetColorKey(surface, SDL_SRCCOLORKEY | SDL_RLEACCEL, color);
+#endif
 }
 
 /* draw u32 pixel */
