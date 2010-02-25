@@ -63,12 +63,12 @@ RowSpells::RowSpells(const Point & pos, const MageGuild & guild, u8 lvl)
     for(u8 ii = 0; ii < count; ++ii)
 	coords.push_back(Rect(pos.x + coords.size() * 110 - roll.w() / 2, pos.y, roll.w(), roll.h()));
 
-    if(guild.AllowUpgrade())
+    if(guild.HaveLibraryCapability())
 	coords.push_back(Rect(pos.x + coords.size() * 110 - roll_hide.w() / 2, pos.y, roll_hide.w(), roll_hide.h()));
 
     guild.GetSpells(spells, lvl);
     spells.resize(coords.size(), Spell::NONE);
-};
+}
 
 void RowSpells::Redraw(void)
 {

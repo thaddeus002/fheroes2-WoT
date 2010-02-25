@@ -21,92 +21,101 @@
  ***************************************************************************/
 
 #include <algorithm>
+#include "castle.h"
+#include "heroes_base.h"
+#include "settings.h"
 #include "mageguild.h"
 
+Spell::spell_t GetUniqueCombatSpellCompatibility(const std::vector<Spell::spell_t> &, u8 race, u8 level);
 Spell::spell_t GetCombatSpellCompatibility(u8 race, u8 level);
 
-MageGuild::MageGuild(const Race::race_t & rc) : race(rc), level(0), upgrade(false)
+MageGuild::MageGuild(const Castle & cstl) : home(cstl)
 {
 }
 
-void MageGuild::BuildNextLevel(void)
+void MageGuild::Builds(void)
 {
-    if(5 > level)
+    general.spells.clear();
+    library.spells.clear();
+
+    // level 5
+    general.Append(7 > Rand::Get(1, 10) ? Spell::RandCombat(5) : Spell::RandAdventure(5));
+
+    // level 4
+    general.Append(GetCombatSpellCompatibility(home.GetRace(), 4));
+    general.Append(Spell::RandAdventure(4));
+
+    // level 3
+    general.Append(GetCombatSpellCompatibility(home.GetRace(), 3));
+    general.Append(Spell::RandAdventure(3));
+
+    // level 2
+    general.Append(GetCombatSpellCompatibility(home.GetRace(), 2));
+    general.Append(GetUniqueCombatSpellCompatibility(general.spells, home.GetRace(), 2));
+    general.Append(Spell::RandAdventure(2));
+
+    // level 1
+    general.Append(GetCombatSpellCompatibility(home.GetRace(), 1));
+    general.Append(GetUniqueCombatSpellCompatibility(general.spells, home.GetRace(), 1));
+    general.Append(Spell::RandAdventure(1));
+
+    if(HaveLibraryCapability())
     {
-	++level;
-    	PackSpells(level);
+	library.Append(GetUniqueCombatSpellCompatibility(general.spells, home.GetRace(), 1));
+	library.Append(GetUniqueCombatSpellCompatibility(general.spells, home.GetRace(), 2));
+	library.Append(GetUniqueCombatSpellCompatibility(general.spells, home.GetRace(), 3));
+	library.Append(GetUniqueCombatSpellCompatibility(general.spells, home.GetRace(), 4));
+	library.Append(GetUniqueCombatSpellCompatibility(general.spells, home.GetRace(), 5));
     }
 }
 
-bool MageGuild::AllowUpgrade(void) const
+bool MageGuild::isLibraryBuild(void) const
 {
-    return race == Race::WZRD && !upgrade;
+    return home.GetRace() == Race::WZRD && home.isBuild(BUILD_SPEC);
 }
 
-void MageGuild::UpgradeExt(void)
+bool MageGuild::HaveLibraryCapability(void) const
 {
-    if(!AllowUpgrade()) return;
-
-    upgrade = true;
-
-    if(0 < level){ AddExtSpells(1); }
-    if(1 < level){ AddExtSpells(2); }
-    if(2 < level){ AddExtSpells(3); }
-    if(3 < level){ AddExtSpells(4); }
-    if(4 < level){ AddExtSpells(5); }
+    return home.GetRace() == Race::WZRD;
 }
 
 u8 MageGuild::GetLevel(void) const
 {
-    return level;
+    return home.GetLevelMageGuild();
 }
 
-void MageGuild::PackSpells(const u8 lvl)
+void MageGuild::GetSpells(std::vector<Spell::spell_t> & spells, u8 level) const
 {
-    if(1 > lvl || 5 < lvl) return;
-
-    // level 5
-    if(4 < lvl)
+    if(home.GetLevelMageGuild() >= level)
     {
-    	spells.push_back(7 > Rand::Get(1, 10) ? Spell::RandCombat(lvl) : Spell::RandAdventure(lvl));
-    
-        if(upgrade) AddExtSpells(lvl);
-    }
-    else
-    // level 3, 4
-    if(2 < lvl)
-    {
-	Spell::spell_t spell = GetCombatSpellCompatibility(race, lvl);
-        spells.push_back(spell);
-    
-        if(upgrade) AddExtSpells(lvl);
-
-	spells.push_back(Spell::RandAdventure(lvl));
-    }
-    else
-    // level 1, 2
-    {
-	Spell::spell_t spell = GetCombatSpellCompatibility(race, lvl);
-        spells.push_back(spell);
-
-        spell = GetCombatSpellCompatibility(race, lvl);
-
-        while(spells.end() != std::find(spells.begin(), spells.end(), spell)) spell = GetCombatSpellCompatibility(race, lvl);
-    	spells.push_back(spell);
-
-        if(upgrade) AddExtSpells(lvl);
-
-	spells.push_back(Spell::RandAdventure(lvl));
+	general.GetSpells(spells, level);
+	if(isLibraryBuild()) library.GetSpells(spells, level);
     }
 }
 
-void MageGuild::AddExtSpells(const u8 lvl)
+void MageGuild::EducateHero(HeroBase & hero) const
 {
-    if(1 > lvl || 5 < lvl) return;
+    if(hero.GetSpellBook().isActive() && home.GetLevelMageGuild())
+    {
+	std::vector<Spell::spell_t> spells;
 
+	for(u8 level = 1; level <= 5; ++level) if(level <= home.GetLevelMageGuild())
+	{
+	    general.GetSpells(spells, level);
+	    if(isLibraryBuild()) library.GetSpells(spells, level);
+	}
+
+	std::vector<Spell::spell_t>::const_iterator it1 = spells.begin();
+	std::vector<Spell::spell_t>::const_iterator it2 = spells.end();
+	for(; it1 != it2; ++it1) hero.GetSpellBook().Append(*it1, hero.GetLevelSkill(Skill::Secondary::WISDOM));
+    }
+}
+
+Spell::spell_t GetUniqueCombatSpellCompatibility(const std::vector<Spell::spell_t> & spells, u8 race, u8 lvl)
+{
     Spell::spell_t spell = GetCombatSpellCompatibility(race, lvl);
     while(spells.end() != std::find(spells.begin(), spells.end(), spell)) spell = GetCombatSpellCompatibility(race, lvl);
-    spells.push_back(spell);
+    return spell;
 }
 
 Spell::spell_t GetCombatSpellCompatibility(u8 race, u8 lvl)

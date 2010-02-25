@@ -50,37 +50,14 @@ u8 SpellStorage::Size(u8 lvl) const
     return spells.size();
 }
 
-const std::vector<Spell::spell_t> & SpellStorage::Spells(void) const
-{
-    return spells;
-}
-
 void SpellStorage::GetSpells(std::vector<Spell::spell_t> & v, u8 lvl) const
 {
     std::vector<Spell::spell_t>::const_iterator it1 = spells.begin();
     std::vector<Spell::spell_t>::const_iterator it2 = spells.end();
-    if(v.size()) v.clear();
     for(; it1 != it2; ++it1) if(lvl == Spell::Level(*it1)) v.push_back(*it1);
 }
 
-void SpellStorage::Appends(const SpellStorage & st, const u8 wisdom)
-{
-    std::vector<Spell::spell_t>::const_iterator it1 = st.spells.begin();
-    std::vector<Spell::spell_t>::const_iterator it2 = st.spells.end();
-
-    for(; it1 != it2; ++it1) if(spells.end() == std::find(spells.begin(), spells.end(), *it1))
-    {
-	switch(Spell::Level(*it1))
-	{
-	    case 3:  if(Skill::Level::BASIC <= wisdom)    spells.push_back(*it1); break;
-	    case 4:  if(Skill::Level::ADVANCED <= wisdom) spells.push_back(*it1); break;
-	    case 5:  if(Skill::Level::EXPERT == wisdom)   spells.push_back(*it1); break;
-	    default: spells.push_back(*it1); break;
-	}
-    }
-}
-
-void SpellStorage::Append(const Spell::spell_t sp, const u8 wisdom)
+void SpellStorage::Append(const Spell::spell_t sp, u8 wisdom)
 {
     if(spells.end() == std::find(spells.begin(), spells.end(), sp))
     {
@@ -92,6 +69,12 @@ void SpellStorage::Append(const Spell::spell_t sp, const u8 wisdom)
 	    default: spells.push_back(sp); break;
 	}
     }
+}
+
+void SpellStorage::Append(const Spell::spell_t sp)
+{
+    if(spells.end() == std::find(spells.begin(), spells.end(), sp))
+	spells.push_back(sp);
 }
 
 bool SpellStorage::isPresentSpell(Spell::spell_t spell) const

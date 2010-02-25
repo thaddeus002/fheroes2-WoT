@@ -35,9 +35,10 @@
 #include "interface_gamearea.h"
 #include "tools.h"
 
+#define FORMAT_VERSION_1520 0x05F0
 #define FORMAT_VERSION_1389 0x056D
 
-#define CURRENT_FORMAT_VERSION FORMAT_VERSION_1389
+#define CURRENT_FORMAT_VERSION FORMAT_VERSION_1520
 
 bool Game::Save(const std::string &fn)
 {
@@ -493,15 +494,19 @@ void Game::IO::PackCastle(QueueMessage & msg, const Castle & castle)
     msg.Push(castle.building);
 	
     // mageguild
-    msg.Push(castle.mageguild.level);
-    msg.Push(static_cast<u8>(castle.mageguild.upgrade));
     {
 	std::vector<Spell::spell_t>::const_iterator it1, it2;
 
-	msg.Push(static_cast<u32>(castle.mageguild.spells.size()));
+	msg.Push(static_cast<u32>(castle.mageguild.general.spells.size()));
 
-	it1 = castle.mageguild.spells.begin();
-	it2 = castle.mageguild.spells.end();
+	it1 = castle.mageguild.general.spells.begin();
+	it2 = castle.mageguild.general.spells.end();
+	for(; it1 != it2; ++it1) msg.Push(static_cast<u8>(*it1));
+
+	msg.Push(static_cast<u32>(castle.mageguild.library.spells.size()));
+
+	it1 = castle.mageguild.library.spells.begin();
+	it2 = castle.mageguild.library.spells.end();
 	for(; it1 != it2; ++it1) msg.Push(static_cast<u8>(*it1));
     }
 
@@ -1009,14 +1014,34 @@ void Game::IO::UnpackCastle(QueueMessage & msg, Castle & castle, u16 check_versi
     msg.Pop(castle.building);
 
     // mageguild
-    castle.mageguild.spells.clear();
-    msg.Pop(castle.mageguild.level);
-    msg.Pop(byte8); castle.mageguild.upgrade = byte8;
-    msg.Pop(byte32);
-    for(u32 jj = 0; jj < byte32; ++jj)
+    if(check_version && check_version < FORMAT_VERSION_1520)
     {
 	msg.Pop(byte8);
-	castle.mageguild.spells.push_back(Spell::FromInt(byte8));
+	msg.Pop(byte8);
+	msg.Pop(byte32);
+	for(u32 jj = 0; jj < byte32; ++jj) msg.Pop(byte8);
+	castle.mageguild.Builds();
+    }
+    else
+    {
+	// general
+	msg.Pop(byte32);
+	castle.mageguild.general.spells.clear();
+	castle.mageguild.general.spells.reserve(byte32);
+	for(u32 jj = 0; jj < byte32; ++jj)
+	{
+	    msg.Pop(byte8);
+	    castle.mageguild.general.spells.push_back(Spell::FromInt(byte8));
+	}
+	// library
+	msg.Pop(byte32);
+	castle.mageguild.library.spells.clear();
+	castle.mageguild.library.spells.reserve(byte32);
+	for(u32 jj = 0; jj < byte32; ++jj)
+	{
+	    msg.Pop(byte8);
+	    castle.mageguild.library.spells.push_back(Spell::FromInt(byte8));
+	}
     }
 
     // armies

@@ -684,7 +684,7 @@ void ActionToCastle(Heroes &hero, const u8 obj, const u16 dst_index)
 
         Mixer::Reduce();
 
-        if(Settings::Get().OriginalVersion()) hero.AppendSpellsToBook(castle->GetMageGuild());
+        if(Settings::Get().OriginalVersion()) castle->GetMageGuild().EducateHero(hero);
         Game::OpenCastle(castle);
 
         Mixer::Enhance();

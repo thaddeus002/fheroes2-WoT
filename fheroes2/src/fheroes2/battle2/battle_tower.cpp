@@ -28,29 +28,9 @@
 
 Battle2::Tower::Tower(const Castle & castle, u8 twr, Arena & a) : Army::Troop(Monster::ARCHER), arena(a), type(twr), valid(true)
 {
-    if(castle.isBuild(BUILD_THIEVESGUILD)) ++count;
-    if(castle.isBuild(BUILD_TAVERN)) ++count;
-    if(castle.isBuild(BUILD_SHIPYARD)) ++count;
-    if(castle.isBuild(BUILD_WELL)) ++count;
-    if(castle.isBuild(BUILD_STATUE)) ++count;
-    if(castle.isBuild(BUILD_LEFTTURRET)) ++count;
-    if(castle.isBuild(BUILD_RIGHTTURRET)) ++count;
-    if(castle.isBuild(BUILD_MARKETPLACE)) ++count;
-    if(castle.isBuild(BUILD_WEL2)) ++count;
-    if(castle.isBuild(BUILD_MOAT)) ++count;
-    if(castle.isBuild(BUILD_SPEC)) ++count;
-    if(castle.isBuild(BUILD_CASTLE)) ++count;
-    if(castle.isBuild(BUILD_CAPTAIN)) ++count;
+    count += castle.CountBuildings();
+    count += castle.GetLevelMageGuild() - 1;
 
-    count += castle.GetLevelMageGuild();
-
-    if(castle.isBuild(DWELLING_MONSTER1)) ++count;
-    if(castle.isBuild(DWELLING_MONSTER2)) ++count;
-    if(castle.isBuild(DWELLING_MONSTER3)) ++count;
-    if(castle.isBuild(DWELLING_MONSTER4)) ++count;
-    if(castle.isBuild(DWELLING_MONSTER5)) ++count;
-    if(castle.isBuild(DWELLING_MONSTER6)) ++count;
-    
     if(count > 20) count = 20;
     if(TWR_CENTER != type) count /= 2;
     if(count == 0) count = 1;

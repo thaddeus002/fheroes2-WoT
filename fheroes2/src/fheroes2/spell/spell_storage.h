@@ -35,16 +35,12 @@ public:
 
 	u8 Size(u8 lvl = 0) const;
 
-	const std::vector<Spell::spell_t> & Spells(void) const;
 	void GetSpells(std::vector<Spell::spell_t> &, u8) const;
-
-	void Appends(const SpellStorage & st, const u8 wisdom);
-	void Append(const Spell::spell_t sp, const u8 wisdom);
-	void Append(const Spell::spell_t);
-
+	void Append(const Spell::spell_t sp, u8 wisdom);
+	void Append(const Spell::spell_t sp);
 	bool isPresentSpell(Spell::spell_t) const;
 
-protected:
+/* protected: */
 	friend class Game::IO;
 
 	std::vector<Spell::spell_t> spells;

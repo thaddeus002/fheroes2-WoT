@@ -180,7 +180,6 @@ public:
     void ActionAfterBattle(void);
 
     bool BuySpellBook(const Castle &);
-    void AppendSpellsToBook(const SpellStorage & spells);
     void AppendSpellToBook(const Spell::spell_t spell);
 
     const Route::Path & GetPath(void) const{ return path; };

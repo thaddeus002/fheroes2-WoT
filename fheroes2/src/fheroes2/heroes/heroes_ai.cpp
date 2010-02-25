@@ -334,7 +334,7 @@ void AIToCastle(Heroes &hero, const u8 obj, const u16 dst_index)
     if(hero.GetColor() == castle->GetColor())
     {
         DEBUG(DBG_AI , DBG_INFO, "AIToCastle: " << hero.GetName() << " goto castle " << castle->GetName());
-        if(Settings::Get().OriginalVersion()) hero.AppendSpellsToBook(castle->GetMageGuild());
+	castle->GetMageGuild().EducateHero(hero);
     }
     else
     {

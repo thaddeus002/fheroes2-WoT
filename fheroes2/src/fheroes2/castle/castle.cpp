@@ -32,16 +32,18 @@
 #include "castle.h"
 #include "localclient.h"
 
-Castle::Castle() : captain(*this), mageguild(race), army(&captain), castle_heroes(NULL)
+Castle::Castle() : captain(*this), mageguild(*this), army(&captain), castle_heroes(NULL)
 {
 }
 
 Castle::Castle(s16 cx, s16 cy, const Race::race_t rc) : mp(cx, cy), race(rc), captain(*this),
-    color(Color::GRAY), building(0), mageguild(race),
+    color(Color::GRAY), building(0), mageguild(*this),
     army(NULL), castle_heroes(NULL)
 {
     std::fill(dwelling, dwelling + CASTLEMAXMONSTER, 0);
     SetModes(ALLOWBUILD);
+
+    mageguild.Builds();
 
     if(3 > Maps::GetApproximateDistance(GetIndex(), world.GetNearestObject(GetIndex(), MP2::OBJ_COAST))) SetModes(NEARLYSEA);
 }
@@ -232,12 +234,8 @@ void Castle::LoadFromMP2(const void *ptr)
     if(building & DWELLING_UPGRADE7) dwelling[5]  = Monster(race, DWELLING_UPGRADE7).GetGrown();
 
     // MageGuild
-    if(building & BUILD_MAGEGUILD1) mageguild.BuildNextLevel();
-    if(building & BUILD_MAGEGUILD2) mageguild.BuildNextLevel();
-    if(building & BUILD_MAGEGUILD3) mageguild.BuildNextLevel();
-    if(building & BUILD_MAGEGUILD4) mageguild.BuildNextLevel();
-    if(building & BUILD_MAGEGUILD5) mageguild.BuildNextLevel();
-    if(mageguild.AllowUpgrade() && building & BUILD_SPEC) mageguild.UpgradeExt();
+    mageguild.Builds();
+    if(captain.isValid()) mageguild.EducateHero(captain);
 
     // fix upgrade dwelling dependend from race
     switch(race)
@@ -329,7 +327,7 @@ void Castle::ActionNewDay(void)
 
     // for learns new spells need 1 day
     if(castle_heroes &&
-	GetLevelMageGuild()) castle_heroes->AppendSpellsToBook(mageguild);
+	GetLevelMageGuild()) mageguild.EducateHero(*castle_heroes);
 
     SetModes(ALLOWBUILD);
 }
@@ -382,7 +380,17 @@ void Castle::ChangeColor(Color::color_t cl)
 // return mage guild level
 u8 Castle::GetLevelMageGuild(void) const
 {
-    return mageguild.GetLevel();
+    if(building & BUILD_MAGEGUILD5) return 5;
+    else
+    if(building & BUILD_MAGEGUILD4) return 4;
+    else
+    if(building & BUILD_MAGEGUILD3) return 3;
+    else
+    if(building & BUILD_MAGEGUILD2) return 2;
+    else
+    if(building & BUILD_MAGEGUILD1) return 1;
+
+    return 0;
 }
 
 const MageGuild & Castle::GetMageGuild(void) const
@@ -584,7 +592,7 @@ bool Castle::RecruitHero(Heroes* hero)
     castle_heroes = hero;
 
     // update spell book
-    if(GetLevelMageGuild()) castle_heroes->AppendSpellsToBook(mageguild);
+    if(GetLevelMageGuild()) mageguild.EducateHero(*castle_heroes);
 
     DEBUG(DBG_GAME , DBG_INFO, "Castle::RecruitHero: " << name << ", recruit: " << castle_heroes->GetName());
 
@@ -1011,9 +1019,8 @@ bool Castle::BuyBuilding(u32 build)
 	    case BUILD_MAGEGUILD3:
 	    case BUILD_MAGEGUILD4:
 	    case BUILD_MAGEGUILD5:
-        	mageguild.BuildNextLevel();
-        	captain.GetSpellBook().Appends(mageguild, captain.GetLevelSkill(Skill::Secondary::WISDOM));
-		if(castle_heroes) castle_heroes->AppendSpellsToBook(mageguild);
+		if(captain.isValid()) mageguild.EducateHero(captain);
+		if(castle_heroes) mageguild.EducateHero(*castle_heroes);
 		break;
 
 	    case BUILD_CAPTAIN:
@@ -1021,8 +1028,14 @@ bool Castle::BuyBuilding(u32 build)
 		army.SetCommander(&captain);
 		break;
 
-            // build library
-            case BUILD_SPEC: if(mageguild.AllowUpgrade()) mageguild.UpgradeExt(); break;
+            case BUILD_SPEC:
+        	// build library
+		if(mageguild.HaveLibraryCapability())
+		{
+		    if(captain.isValid()) mageguild.EducateHero(captain);
+		    if(castle_heroes) mageguild.EducateHero(*castle_heroes);
+		}
+		break;
 
 	    case DWELLING_MONSTER1: dwelling[0] = Monster(race, DWELLING_MONSTER1).GetGrown(); break;
 	    case DWELLING_MONSTER2: dwelling[1] = Monster(race, DWELLING_MONSTER2).GetGrown(); break;
@@ -1035,7 +1048,6 @@ bool Castle::BuyBuilding(u32 build)
 
     // disable day build
     ResetModes(ALLOWBUILD);
-	
 
     // play sound
     if(Game::LOCAL == world.GetKingdom(color).Control())

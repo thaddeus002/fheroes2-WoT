@@ -1046,7 +1046,7 @@ void Heroes::Recruit(const Castle & castle)
     Recruit(castle.GetColor(), castle.GetCenter());
 
     // learn spell
-    if(castle.GetLevelMageGuild()) AppendSpellsToBook(castle.GetMageGuild());
+    castle.GetMageGuild().EducateHero(*this);
 }
 
 void Heroes::ActionNewDay(void)
@@ -1398,7 +1398,7 @@ bool Heroes::BuySpellBook(const Castle & castle)
 	kingdom.OddFundsResource(payment);
 	spell_book.Activate();
 	// add all spell to book
-	AppendSpellsToBook(castle.GetMageGuild());
+	castle.GetMageGuild().EducateHero(*this);
 #ifdef WITH_NET
 	FH2LocalClient::SendHeroesBuyMagicBook(*this);
 #endif
@@ -1409,12 +1409,6 @@ bool Heroes::BuySpellBook(const Castle & castle)
 }
 
 /* add new spell to book from storage */
-void Heroes::AppendSpellsToBook(const SpellStorage & spells)
-{
-    if(spell_book.isActive())
-    spell_book.Appends(spells, GetLevelSkill(Skill::Secondary::WISDOM));
-}
-
 void Heroes::AppendSpellToBook(const Spell::spell_t spell)
 {
     spell_book.Append(spell, GetLevelSkill(Skill::Secondary::WISDOM));

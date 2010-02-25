@@ -247,7 +247,7 @@ void Battle2::EagleEyeSkillAction(HeroBase & hero, const std::vector<u8> & spell
 	    PlayPickupSound();
 	    Dialog::SpellInfo("", msg, *it);
 	}
-	book.Append(*it, 0);
+	book.Append(*it);
     }
 }
 

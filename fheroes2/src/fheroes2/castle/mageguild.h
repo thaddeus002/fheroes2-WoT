@@ -19,38 +19,37 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
+
 #ifndef H2MAGEGUILD_H
 #define H2MAGEGUILD_H
 
-#include <vector>
 #include "gamedefs.h"
 #include "game_io.h"
-#include "race.h"
 #include "spell_storage.h"
 
-class MageGuild : public SpellStorage
+class Castle;
+class HeroBase;
+
+class MageGuild
 {
     public:
-	MageGuild(const Race::race_t & rc);
+	MageGuild(const Castle &);
 
-	u8 GetLevel(void) const;
+	void Builds(void);
+	void EducateHero(HeroBase &) const;
 
-	void BuildNextLevel(void);
-	bool AllowUpgrade(void) const;
-	void UpgradeExt(void);
-	
-	bool isUpgrade(void) const{ return upgrade; };
-	
-    protected:
-	void PackSpells(const u8 lvl);
-	void AddExtSpells(const u8 lvl);
+	bool isLibraryBuild(void) const;
+	bool HaveLibraryCapability(void) const;
+	u8   GetLevel(void) const;
+	void GetSpells(std::vector<Spell::spell_t> &, u8) const;
 
     private:
 	friend class Game::IO;
 
-	const Race::race_t &	race;
-	u8			level;
-	bool			upgrade;
+	const Castle & home;
+
+	SpellStorage general;
+	SpellStorage library;
 };
 
 #endif
