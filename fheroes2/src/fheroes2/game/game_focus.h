@@ -56,8 +56,8 @@ namespace Game
     private:
 	Focus();
 
-	const Castle *	castle;
-	const Heroes *	heroes;
+	Castle *	castle;
+	Heroes *	heroes;
 	Point		center;
     };
 };

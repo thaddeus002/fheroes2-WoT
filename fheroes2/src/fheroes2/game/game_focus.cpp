@@ -47,14 +47,15 @@ void Game::Focus::Set(const Heroes *hr)
 
     if(heroes && hr != heroes)
     {
-	const_cast<Heroes *>(heroes)->SetMove(false);
-        const_cast<Heroes *>(heroes)->ShowPath(false);
+	heroes->SetMove(false);
+        heroes->ShowPath(false);
     }
 
-    heroes = hr;
+    heroes = const_cast<Heroes *>(hr);
     castle = NULL;
 
-    const_cast<Heroes *>(heroes)->ShowPath(true);
+    heroes->RescanPath();
+    heroes->ShowPath(true);
 
     Interface::Basic & I = Interface::Basic::Get();
     Interface::HeroesIcons & heroesBar = I.iconsPanel.GetHeroesBar();
@@ -77,11 +78,11 @@ void Game::Focus::Set(const Castle *cs)
 
     if(heroes)
     {
-	const_cast<Heroes *>(heroes)->SetMove(false);
-        const_cast<Heroes *>(heroes)->ShowPath(false);
+	heroes->SetMove(false);
+        heroes->ShowPath(false);
     }
 
-    castle = cs;
+    castle = const_cast<Castle *>(cs);
     heroes = NULL;
 
     Interface::Basic & I = Interface::Basic::Get();
@@ -177,7 +178,7 @@ Castle & Game::Focus::GetCastle(void)
 {
     if(NULL == castle) DEBUG(DBG_GAME , DBG_WARN, "Game::Focus::GetCastle: is NULL");
 
-    return *const_cast<Castle *>(castle);
+    return *castle;
 }
 
 const Heroes & Game::Focus::GetHeroes(void) const
@@ -191,7 +192,7 @@ Heroes & Game::Focus::GetHeroes(void)
 {
     if(NULL == heroes) DEBUG(DBG_GAME , DBG_WARN, "Game::Focus::GetHeroes: is NULL");
 
-    return *const_cast<Heroes *>(heroes);
+    return *heroes;
 }
 
 const Point & Game::Focus::Center(void) const
