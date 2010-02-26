@@ -761,6 +761,15 @@ Army::Troop & Army::army_t::BattleNewTroop(Monster::monster_t id, u32 count)
     return *it;
 }
 
+u32 Army::army_t::BattleKilled(void) const
+{
+    u32 res = 0;
+    std::vector<Troop>::const_iterator it = army.begin();
+    for(; it != army.end(); ++it) res += (*it).BattleKilled();
+
+    return res;
+}
+
 bool Army::army_t::BattleArchersPresent(void) const
 {
     return army.end() != std::find_if(army.begin(), army.end(), std::mem_fun_ref(&Troop::BattleIsArchers));

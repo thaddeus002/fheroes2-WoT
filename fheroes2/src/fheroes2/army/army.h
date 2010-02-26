@@ -84,6 +84,7 @@ namespace Army
 	    Troop &     BattleNewTroop(Monster::monster_t, u32);
 	    bool	BattleArchersPresent(void) const;
 	    bool	BattleDragonsPresent(void) const;
+	    u32		BattleKilled(void) const;
 
 	    void	DrawMons32Line(s16, s16, u16, u8 = 0, u8 = 0, bool = false) const;
 

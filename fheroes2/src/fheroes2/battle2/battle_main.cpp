@@ -253,7 +253,9 @@ void Battle2::EagleEyeSkillAction(HeroBase & hero, const std::vector<u8> & spell
 
 void Battle2::NecromancySkillAction(Army::army_t & army1, Army::army_t & army2, bool local)
 {
-    if(army1.GetCount() == army1.Size() && !army1.HasMonster(Monster::SKELETON)) return;
+    const u32 killed = army2.BattleKilled();
+    if(0 == killed ||
+	(army1.GetCount() == army1.Size() && !army1.HasMonster(Monster::SKELETON))) return;
 
     const HeroBase* hero = army1.GetCommander();
 
@@ -268,28 +270,23 @@ void Battle2::NecromancySkillAction(Army::army_t & army1, Army::army_t & army2, 
 
     switch(hero->GetLevelSkill(Skill::Secondary::NECROMANCY))
     {
-	case Skill::Level::BASIC: percent += 10;
-	case Skill::Level::ADVANCED: percent += 20;
-	case Skill::Level::EXPERT: percent += 30;
+	case Skill::Level::BASIC: percent += 10; break;
+	case Skill::Level::ADVANCED: percent += 20; break;
+	case Skill::Level::EXPERT: percent += 30; break;
 	default: break;
     }
 
-    u32 count = 0;
-    for(u8 ii = 0; ii < army2.Size(); ++ii) count += army2.At(ii).GetCount();
-
-    count = count * percent / 100;
-    if(count == 0) return;
-
-    Monster mons(Monster::SKELETON);
-    army1.JoinTroop(mons, count);
+    const Monster skeleton(Monster::SKELETON);
+    const u32 count = Monster::GetCountFromHitPoints(Monster::SKELETON, skeleton.GetHitPoints() * killed * percent / 100);
+    army1.JoinTroop(skeleton, count);
 
     if(local)
     {
 	std::string msg = _("Practicing the dark arts of necromancy, you are able to raise %{count} of the enemy's dead to return under your service as %{monster}");
 	String::Replace(msg, "%{count}", count);
-	String::Replace(msg, "%{monster}", mons.GetMultiName());
+	String::Replace(msg, "%{monster}", skeleton.GetMultiName());
 	Surface sf1(40, 45);
-	const Sprite & sf2 = AGG::GetICN(ICN::MONS32, mons.GetSpriteIndex());
+	const Sprite & sf2 = AGG::GetICN(ICN::MONS32, skeleton.GetSpriteIndex());
 	sf1.SetColorKey();
 	sf1.Blit(sf2, (sf1.w() - sf2.w()) / 2, 0);
 	std::string str;
