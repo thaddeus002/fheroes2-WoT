@@ -570,6 +570,13 @@ void Battle2::GraveyardTroop::AddTroopID(u16 id)
 	std::vector<u16> & v = map[b->position];
 	if(v.empty()) v.reserve(3);
 	v.push_back(id);
+
+	if(b->isWide())
+	{
+	    std::vector<u16> & v2 = map[b->GetTailIndex()];
+	    if(v2.empty()) v2.reserve(3);
+	    v2.push_back(id);
+	}
     }
 }
 
@@ -581,6 +588,13 @@ void Battle2::GraveyardTroop::RemoveTroopID(u16 id)
 	std::vector<u16> & v = map[b->position];
 	std::vector<u16>::iterator it = std::find(v.begin(), v.end(), id);
 	if(it != v.end()) v.erase(it);
+
+	if(b->isWide())
+	{
+	    std::vector<u16> & v2 = map[b->GetTailIndex()];
+	    std::vector<u16>::iterator it = std::find(v2.begin(), v2.end(), id);
+	    if(it != v2.end()) v2.erase(it);
+	}
     }
 }
 

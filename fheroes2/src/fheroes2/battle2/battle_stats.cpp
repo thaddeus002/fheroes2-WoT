@@ -1386,6 +1386,7 @@ void Battle2::Stats::SpellRestoreAction(u8 spell, u8 spoint, const HeroBase* her
 
 	    const u16 res = Resurrect(restore, true);
 
+	    // Spell::RESURRECT it is not full resurrect
 	    if(Spell::RESURRECT == spell) dead += res;
 	    
 	    if(arena->interface)
