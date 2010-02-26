@@ -879,7 +879,10 @@ void Battle2::Arena::SpellActionSummonElemental(const HeroBase* hero, u8 type)
 	}
     }
     else
+    {
+    	if(interface) interface->SetStatus(_("Summon Elemental spell failed!"), true);
 	DEBUG(DBG_BATTLE, DBG_WARN, "Battle2::Arena::SpellActionSummonElemental: " << "incorrect param");
+    }
 }
 
 void Battle2::Arena::SpellActionTeleport(u16 src, u16 dst)
@@ -972,6 +975,9 @@ void Battle2::Arena::SpellActionMirrorImage(Stats & b)
     	b.SetModes(CAP_MIRROROWNER);
     }
     else
+    {
+    	if(interface) interface->SetStatus(_("Mirror Image spell failed!"), true);
         DEBUG(DBG_BATTLE, DBG_WARN, "Battle2::Arena::SpellCreateMirrorImage: " << "new position not found!");
+    }
 }
 

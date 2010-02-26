@@ -100,7 +100,7 @@ namespace Battle2
 
 	const Rect & GetArea(void) const;
 
-	void SetStatus(const std::string &);
+	void SetStatus(const std::string &, bool = false);
 	void FadeArena(void);
 
         void RedrawActionAttackPart1(Stats &, Stats &, const std::vector<TargetInfo> &);

@@ -648,9 +648,17 @@ const Rect & Battle2::Interface::GetArea(void) const
     return border.GetArea();
 }
 
-void Battle2::Interface::SetStatus(const std::string & msg)
+void Battle2::Interface::SetStatus(const std::string & msg, bool top)
 {
-    status.SetMessage(msg);
+    if(top)
+    {
+        status.SetMessage(msg, true);
+        status.SetMessage("", false);
+    }
+    else
+    {
+	status.SetMessage(msg);
+    }
     humanturn_redraw = true;
 }
 
@@ -2366,7 +2374,14 @@ void Battle2::Interface::RedrawActionSpellCastPart2(u8 spell, std::vector<Target
 
 	if(damage)
 	{
-	    std::string msg = _("The %{spell} does %{damage} damage.");
+	    std::string msg;
+	    if(Spell::isUndeadOnly(spell))
+		msg = _("The %{spell} spell does %{damage} damage to all undead creatures.");
+	    else
+	    if(Spell::isALiveOnly(spell))
+		msg = _("The %{spell} spell does %{damage} damage to all living creatures.");
+	    else
+		msg = _("The %{spell} does %{damage} damage.");
 	    String::Replace(msg, "%{spell}", Spell::GetName(Spell::FromInt(spell)));
 	    String::Replace(msg, "%{damage}", damage);
 

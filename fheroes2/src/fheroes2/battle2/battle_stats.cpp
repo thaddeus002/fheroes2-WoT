@@ -1387,6 +1387,14 @@ void Battle2::Stats::SpellRestoreAction(u8 spell, u8 spoint, const HeroBase* her
 	    const u16 res = Resurrect(restore, true);
 
 	    if(Spell::RESURRECT == spell) dead += res;
+	    
+	    if(arena->interface)
+	    {
+		std::string str(_("%{count} %{name} rise(s) from the dead!"));
+		String::Replace(str, "%{count}", res);
+		String::Replace(str, "%{name}", GetName());
+		arena->interface->SetStatus(str, true);
+	    }
 	}
         break;
 
