@@ -684,13 +684,13 @@ void Battle2::Interface::RedrawInterface(void)
 
 void Battle2::Interface::RedrawArmies(void) const
 {
-    for(u8 ii = 0; ii < arena.board.size(); ++ii)
+    for(u16 ii = 0; ii < arena.board.size(); ++ii)
     {
         if(arena.castle) RedrawCastle2(ii);
 	RedrawObjects(ii);
 
 	const Stats* b = arena.GetTroopBoard(ii);
-	if(!b || ii == b->GetTailIndex()) continue;
+	if(!b || (b->isWide() && ii == b->GetTailIndex())) continue;
 
 	const Cell & cell = arena.board[ii];
 
@@ -829,6 +829,7 @@ void Battle2::Interface::RedrawTroopSprite(const Stats & b, const Rect & rt) con
 		sy += cy + Sign(cy) * b_fly->GetFrameOffset() * std::abs((p_fly.y - p_move.y) / b_fly->GetFrameCount());
 	    }
 	}
+
 	// sprite monster
 	display.Blit(*spmon1, sx, sy);
 	// contour
@@ -1189,7 +1190,10 @@ void Battle2::Interface::RedrawKilled(void)
 	    {
 		const Stats* b = arena.GetTroopID(id_killed);
 		if(b)
+		{
+		    if(b->isWide() && *it == b->GetTailIndex()) continue;
 		    RedrawTroopSprite(*b, arena.board[*it].pos);
+		}
 	    }
 	}
     }
@@ -2056,7 +2060,7 @@ void Battle2::Interface::RedrawActionWinces(std::vector<TargetInfo> & targets)
 
     for(; it != targets.end(); ++it) if((*it).defender)
     {
-	if((*it).damage && (*it).result)
+	if((*it).damage && !(*it).defender->Modes(MAGIC_DEFENCED))
 	{
 	    TargetInfo & target = *it;
 	    // wnce animation
@@ -2079,7 +2083,7 @@ void Battle2::Interface::RedrawActionWinces(std::vector<TargetInfo> & targets)
 	if(Game::ShouldAnimateInfrequent(ticket, animation_delay))
     	{
 	    it = targets.begin();
-	    for(; it != targets.end(); ++it) if((*it).defender)
+	    for(; it != targets.end(); ++it) if((*it).defender && !(*it).defender->Modes(MAGIC_DEFENCED))
 	    {
 		TargetInfo & target = *it;
 		const Rect & pos = target.defender->GetCellPosition();
@@ -2433,7 +2437,7 @@ void Battle2::Interface::RedrawActionMonsterSpellCastStatus(const Stats & attack
 	default: break;
     }
 
-    if(msg && target.result)
+    if(msg && !target.defender->Modes(MAGIC_DEFENCED))
     {
 	std::string str(msg);
 	String::Replace(str, "%{name}", target.defender->GetName());

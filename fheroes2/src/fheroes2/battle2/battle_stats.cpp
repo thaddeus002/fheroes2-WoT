@@ -531,6 +531,7 @@ void Battle2::Stats::NewTurn(void)
     ResetModes(TR_RESPONSED);
     ResetModes(TR_MOVED);
     ResetModes(TR_SKIPMOVE);
+    ResetModes(MAGIC_DEFENCED);
     ResetModes(MORALE_BAD);
     ResetModes(MORALE_GOOD);
     ResetModes(LUCK_BAD);
@@ -773,6 +774,7 @@ void Battle2::Stats::PostKilledAction(void)
     ResetModes(TR_SKIPMOVE);
     ResetModes(LUCK_GOOD);
     ResetModes(LUCK_BAD);
+    ResetModes(MAGIC_DEFENCED);
     ResetModes(MORALE_GOOD);
     ResetModes(MORALE_BAD);
 
@@ -882,6 +884,8 @@ bool Battle2::Stats::ApplySpell(u8 spell, const HeroBase* hero, TargetInfo & tar
 
     DEBUG(DBG_BATTLE, DBG_TRACE, "Battle2::Stats::ApplySpell: " << Spell::GetName(Spell::FromInt(spell)));
 
+    ResetModes(MAGIC_DEFENCED);
+
     // save spell for "eagle eye" capability
     arena->AddSpell(spell);
 
@@ -903,7 +907,12 @@ bool Battle2::Stats::ApplySpell(u8 spell, const HeroBase* hero, TargetInfo & tar
 	    // 25% unfortunatly
 	    case Monster::DWARF:
 	    case Monster::BATTLE_DWARF:
-		if(5 > Rand::Get(1, 16)) return false; break;
+		if(5 > Rand::Get(1, 16))
+		{
+		    SetModes(MAGIC_DEFENCED);
+		    return false;
+		}
+		break;
 
 	    default: break;
 	}

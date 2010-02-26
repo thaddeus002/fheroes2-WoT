@@ -542,7 +542,6 @@ void Battle2::Arena::TargetsApplyDamage(Stats & attacker, Stats & defender, std:
     {
 	TargetInfo & target = *it;
 	if(target.defender) target.killed = target.defender->ApplyDamage(attacker, target.damage);
-	target.result = true;
     }
 }
 
@@ -638,7 +637,7 @@ void Battle2::Arena::TargetsApplySpell(const HeroBase* hero, const u8 spell, std
 	for(; it != targets.end(); ++it)
 	{
 	    TargetInfo & target = *it;
-	    if(target.defender) target.result = target.defender->ApplySpell(spell, hero, target);
+	    if(target.defender) target.defender->ApplySpell(spell, hero, target);
 	}
     }
 }

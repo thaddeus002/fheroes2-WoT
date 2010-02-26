@@ -133,7 +133,6 @@ namespace Battle2
         Stats* defender;
 	u32 damage;
 	u32 killed;
-	bool result;
 
         bool isFinishAnimFrame(void) const;
     };
