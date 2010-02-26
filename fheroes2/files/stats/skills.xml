@@ -22,7 +22,7 @@
   <sorceress   attack="0" defence="0" power="2" knowledge="3" book="1" spell="15" wisdom="1" navigation="2" />
   <warlock     attack="0" defence="0" power="3" knowledge="2" book="1" spell="19" wisdom="1" scouting="2" />
   <wizard      attack="0" defence="1" power="2" knowledge="2" book="1" spell="17" wisdom="2" />
-  <necromancer attack="1" defence="0" power="2" knowledge="2" book="1" spell="10" wisdom="1" necromancer="1" />
+  <necromancer attack="1" defence="0" power="2" knowledge="2" book="1" spell="10" wisdom="1" necromancy="1" />
  </initial>
 
  <maturity>
