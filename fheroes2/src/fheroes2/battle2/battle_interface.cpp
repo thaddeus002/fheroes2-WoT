@@ -2048,7 +2048,7 @@ void Battle2::Interface::RedrawActionWinces(std::vector<TargetInfo> & targets)
 
     for(; it != targets.end(); ++it) if((*it).defender)
     {
-	if((*it).damage)
+	if((*it).damage && (*it).result)
 	{
 	    TargetInfo & target = *it;
 	    // wnce animation
@@ -2401,6 +2401,31 @@ void Battle2::Interface::RedrawActionSpellCastPart2(u8 spell, std::vector<Target
     if(opponent1) opponent1->ResetAnimFrame(OP_IDLE);
     if(opponent2) opponent2->ResetAnimFrame(OP_IDLE);
     b_move = NULL;
+}
+
+void Battle2::Interface::RedrawActionMonsterSpellCastStatus(const Stats & attacker, const TargetInfo & target)
+{
+    const char* msg = NULL;
+
+    switch(attacker.troop())
+    {
+	case Monster::UNICORN:		msg = _("The Unicorns attack blinds the %{name}!"); break;
+	case Monster::MEDUSA:		msg = _("The Medusas gaze turns the %{name} to stone!"); break;
+	case Monster::ROYAL_MUMMY:
+	case Monster::MUMMY:		msg = _("The Mummies' curse falls upon the %{name}!"); break;
+	case Monster::CYCLOPS:		msg = _("The %{name} are paralyzed by the Cyclopes!"); break;
+	case Monster::ARCHMAGE:		msg = _("The Archmages dispel all good spells on your %{name}!"); break;
+	default: break;
+    }
+
+    if(msg && target.result)
+    {
+	std::string str(msg);
+	String::Replace(str, "%{name}", target.defender->GetName());
+
+	status.SetMessage(str, true);
+	status.SetMessage("", false);
+    }
 }
 
 void Battle2::Interface::RedrawActionMorale(Stats & b, bool good)
@@ -3606,6 +3631,8 @@ void Battle2::Interface::RedrawBridgeAnimation(bool down)
 	}
 	++ticket;
     }
+
+    if(!down) AGG::PlaySound(M82::DRAWBRG);
 }
 
 bool Battle2::ArmySetIdleAnimation(Army::army_t & army)

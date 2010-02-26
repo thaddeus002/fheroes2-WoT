@@ -107,6 +107,7 @@ namespace Battle2
         void RedrawActionAttackPart2(Stats &, std::vector<TargetInfo> &);
         void RedrawActionSpellCastPart1(u8, u16, const std::string & name, const std::vector<TargetInfo> &);
         void RedrawActionSpellCastPart2(u8, std::vector<TargetInfo> &);
+        void RedrawActionMonsterSpellCastStatus(const Stats &, const TargetInfo &);
         void RedrawActionMove(Stats &, const std::vector<u16> &);
         void RedrawActionFly(Stats &, u16);
         void RedrawActionMorale(Stats &, bool);

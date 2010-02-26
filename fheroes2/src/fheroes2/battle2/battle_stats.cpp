@@ -716,6 +716,12 @@ u32 Battle2::Stats::ApplyDamage(u32 dmg)
         affected.RemoveMode(IS_PARALYZE_MAGIC);
     }
 
+    // skip move
+    if(Modes(SP_BLIND))
+    {
+    	SetModes(TR_RESPONSED);
+    }
+
     if(dmg && count)
     {
 	u32 killed = HowMuchWillKilled(dmg);
@@ -890,7 +896,7 @@ bool Battle2::Stats::ApplySpell(u8 spell, const HeroBase* hero, TargetInfo & tar
 	if(myhero->HasArtifact(Artifact::ENCHANTED_HOURGLASS)) spoint += 2;
     }
 
-    if(Spell::isDamage(spell))
+    if(Spell::isDamage(spell) || Spell::isApplyToEnemies(spell))
     {
 	switch(troop())
 	{
@@ -939,7 +945,7 @@ void Battle2::Stats::PostAttackAction(Stats & enemy)
     {
 	case Monster::ARCHMAGE:
 	    // 20% clean magic state
-	    if(enemy.isValid() && enemy.Modes(IS_MAGIC) && 3 > Rand::Get(1, 10)) enemy.ResetModes(IS_MAGIC);
+	    if(enemy.isValid() && enemy.Modes(IS_GOOD_MAGIC) && 3 > Rand::Get(1, 10)) enemy.ResetModes(IS_GOOD_MAGIC);
 	    break;
 
 	default: break;
