@@ -244,7 +244,7 @@ void Castle::WellRedrawInfoArea(const Point & cur_pt)
 	dst_pt.y = pt.y + 124 - smonster.h();
 	display.Blit(smonster, dst_pt);
 	// name
-	text.Set(monster.GetName());
+	text.Set(monster.GetMultiName());
 	dst_pt.x = pt.x + 122 - text.w() / 2;
 	dst_pt.y = pt.y + 16;
 	text.Blit(dst_pt);
