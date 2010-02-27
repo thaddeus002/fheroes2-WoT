@@ -1586,7 +1586,6 @@ void World::UpdateDwellingPopulation(void)
             case MP2::OBJ_WAGONCAMP:
             case MP2::OBJ_DESERTTENT:
             case MP2::OBJ_TROLLBRIDGE:
-            case MP2::OBJ_DRAGONCITY:
             case MP2::OBJ_WATERALTAR:
             case MP2::OBJ_AIRALTAR:
             case MP2::OBJ_FIREALTAR:
@@ -1598,6 +1597,10 @@ void World::UpdateDwellingPopulation(void)
 		count = m.GetRNDSize(true);
 		break;
 	    }
+
+            case MP2::OBJ_DRAGONCITY:
+        	count = 1;
+        	break;
 
 	    default: break;
 	}
