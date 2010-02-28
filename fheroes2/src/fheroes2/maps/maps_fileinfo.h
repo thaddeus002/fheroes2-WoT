@@ -40,6 +40,7 @@ namespace Maps
 
     bool operator<  (const FileInfo &) const;
     bool operator== (const FileInfo &) const;
+    bool isAllowColorsCount(u8) const;
 
     u8 AllowColorsCount(void) const;
     u8 KingdomColorsCount(void) const;
@@ -56,6 +57,8 @@ namespace Maps
     u32 WinsMapsIndexObject(void) const;
     u32 LossMapsIndexObject(void) const;
     u16 LossCountDays(void) const;
+
+    void Dump(void) const;
 
     std::string file;
     std::string name;

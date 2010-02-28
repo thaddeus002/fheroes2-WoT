@@ -402,9 +402,23 @@ u16 Maps::FileInfo::LossCountDays(void) const
     return loss1;
 }
 
+bool Maps::FileInfo::isAllowColorsCount(u8 colors) const
+{
+    return AllowColorsCount() >= colors;
+}
+
+void Maps::FileInfo::Dump(void) const
+{
+    VERBOSE("Maps::FileInfo::Dump: " << "file: " << file << ", name: " << name << ", kingdom colors: " << static_cast<int>(kingdom_colors) << \
+	", allow colors: " << static_cast<int>(allow_colors) << "(" << static_cast<int>(AllowColorsCount()) << ")" << ", rnd colors: " << static_cast<int>(rnd_colors) << ", rnd races: " << \
+	static_cast<int>(rnd_races) << ", conditions wins: " << static_cast<int>(conditions_wins) << ", wins1: " << static_cast<int>(wins1) << \
+	", wins2: " << static_cast<int>(wins2) << ", wins3: " << wins3 << ", wins4: " << wins4 << ", conditions loss: " << static_cast<int>(conditions_loss) << \
+        ", loss1: " << loss1 << ", loss2: " << loss2);
+}
+
 bool PrepareMapsFileInfoList(MapsFileInfoList & lists)
 {
-    Settings & conf = Settings::Get();
+    const Settings & conf = Settings::Get();
     Dir dir;
 
     ListMapsDirectory::const_iterator it1 = conf.GetListMapsDirectory().begin();
@@ -438,6 +452,12 @@ bool PrepareMapsFileInfoList(MapsFileInfoList & lists)
     std::sort(lists.begin(), lists.end());
     lists.resize(std::unique(lists.begin(), lists.end()) - lists.begin());
 
+    // set preferably count filter
+    if(conf.PreferablyCountPlayers())
+    {
+	MapsFileInfoList::iterator it = std::remove_if(lists.begin(), lists.end(), std::not1(std::bind2nd(std::mem_fun_ref(&Maps::FileInfo::isAllowColorsCount), conf.PreferablyCountPlayers())));
+	lists.resize(std::distance(lists.begin(), it));
+    }
+
     return true;
 }
-
