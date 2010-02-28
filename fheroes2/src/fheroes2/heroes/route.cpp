@@ -283,6 +283,9 @@ bool Route::Path::hasObstacle(u16* res) const
 	if(Maps::isValidDirection(next, (*it).Direction()))
 	    next = Maps::GetDirectionIndex(next, (*it).Direction());
 
+	// skip end point
+	if(next == dst) return false;
+
 	switch(world.GetTiles(next).GetObject())
 	{
 	    case MP2::OBJ_HEROES:
@@ -300,33 +303,25 @@ bool Route::Path::hasObstacle(u16* res) const
 void Route::Path::ScanObstacleAndReduce(void)
 {
     iterator it = begin();
-
-    u16 next1 = hero.GetIndex();
-    u16 next2 = next1;
-    bool exit = false;
+    u16 next = hero.GetIndex();
     
-    for(; it != end() && !exit; ++it)
+    for(; it != end(); ++it)
     {
-	if(Maps::isValidDirection(next1, (*it).Direction()))
-	    next2 = Maps::GetDirectionIndex(next1, (*it).Direction());
+	if(Maps::isValidDirection(next, (*it).Direction()))
+	    next = Maps::GetDirectionIndex(next, (*it).Direction());
 
-	if(Maps::TileUnderProtection(next2)) exit = true;
+	// skip end point
+	if(next == dst) return;
 
-	switch(world.GetTiles(next2).GetObject())
+	switch(world.GetTiles(next).GetObject())
 	{
 	    case MP2::OBJ_HEROES:
-	    case MP2::OBJ_MONSTER: exit = true; break;
+	    case MP2::OBJ_MONSTER:
+		dst = Maps::GetDirectionIndex(next, Direction::Reflect((*it).Direction()));
+		erase(it, end());
+		return;
+
 	    default: break;
 	}
-
-	if(exit)
-	{
-	    --it;
-	    dst = next1;
-	}
-
-	next1 = next2;
     }
-    
-    if(it != end())  erase(it, end());
 }
