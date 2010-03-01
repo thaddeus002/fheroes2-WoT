@@ -47,7 +47,7 @@ const char* HeroesName(Heroes::heroes_t id)
 {
     const char* names[] = {
 	// knight
-	_("Lord Kilburn"), _("Sir Gallanth"), _("Ector"), _("Gvenneth"), _("Tyro"), _("Ambrose"), _("Ruby"), _("Maximus"), _("Dimitry"),
+	_("Lord Kilburn"), _("Sir Gallanth"), _("Ector"), _("Gwenneth"), _("Tyro"), _("Ambrose"), _("Ruby"), _("Maximus"), _("Dimitry"),
 	// barbarian
 	_("Thundax"), _("Fineous"), _("Jojosh"), _("Crag Hack"), _("Jezebel"), _("Jaclyn"), _("Ergon"), _("Tsabu"), _("Atlas"),
 	// sorceress
