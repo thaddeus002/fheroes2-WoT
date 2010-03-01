@@ -75,7 +75,7 @@ Dialog::answer_t Dialog::ArmyInfo(const Army::Troop & troop, u16 flags)
     if(battle)
     {
 	dst_pt.x = pos_rt.x + 400;
-	dst_pt.y = pos_rt.y + 190;
+	dst_pt.y = pos_rt.y + 210;
 
 	DrawBattleStats(dst_pt, *battle);
     }
