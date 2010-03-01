@@ -1698,7 +1698,7 @@ bool ICN::NeedMinify4PocketPC(icn_t icn, u16 index)
 	case PUZZLE:
 	case HSBKG:
 	case BOOK:
-	case STONEBAK:
+	//case STONEBAK:
 	// battle
 	case CBKGDSRT:
 	case CBKGSNTR:
