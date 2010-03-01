@@ -28,6 +28,7 @@
 #include "castle.h"
 #include "world.h"
 #include "agg.h"
+#include "speed.h"
 #include "army_troop.h"
 #include "server.h"
 #include "remoteclient.h"
@@ -742,24 +743,10 @@ void Battle2::Arena::Turns(u16 turn, Result & result)
     army1.BattleNewTurn();
     army2.BattleNewTurn();
 
-    bool check_skip1 = false;
-    bool check_skip2 = false;
-
     Actions actions;
     Stats* current_troop = NULL;
-
-    // pre turn: castle and catapult action
-    if(castle)
-    {
-	if(towers[0] && towers[0]->isValid()) towers[0]->Action();
-	if(towers[1] && towers[1]->isValid()) towers[1]->Action();
-	if(towers[2] && towers[2]->isValid()) towers[2]->Action();
-	if(catapult) catapult->Action();
-    }
-
-    // reset modes
-    if(army1.GetCommander()) army1.GetCommander()->ResetModes(Heroes::SPELLCASTED);
-    if(army2.GetCommander()) army2.GetCommander()->ResetModes(Heroes::SPELLCASTED);
+    bool tower_moved = false;
+    bool catapult_moved = false;
 
     // turn
     while(1)
@@ -772,41 +759,60 @@ void Battle2::Arena::Turns(u16 turn, Result & result)
 
 	actions.clear();
 
-	Battle2::Stats* btroop1 = check_skip1 ? army1.GetSlowestTroop().GetBattleStats() : army1.GetFastestTroop().GetBattleStats();
-	Battle2::Stats* btroop2 = check_skip2 ? army2.GetSlowestTroop().GetBattleStats() : army2.GetFastestTroop().GetBattleStats();
+	Battle2::Stats* btroop1 = army1.BattleFastestTroop(false);
+	Battle2::Stats* btroop2 = army2.BattleFastestTroop(false);
 
-	if(!btroop1 || !btroop2)
+	if(btroop1 && btroop2)
+	    current_troop = (btroop1->GetSpeed() >= btroop2->GetSpeed() ? btroop1 : btroop2);
+	else
+	if(btroop1 || btroop2)
+	    current_troop = btroop1 ? btroop1 : btroop2;
+	else
 	{
-	    DEBUG(DBG_BATTLE , DBG_WARN, "Battle2::Arena::Turns: GetBattleStats is NULL");
+	    btroop1 = army1.BattleSlowestTroop(true);
+	    btroop2 = army2.BattleSlowestTroop(true);
 
+	    if(btroop1 && btroop2)
+		current_troop = (btroop1->GetSpeed() >= btroop2->GetSpeed() ? btroop1 : btroop2);
+	    else
+	    if(btroop1 || btroop2)
+		current_troop = btroop1 ? btroop1 : btroop2;
+	}
+
+	if(!current_troop)
+	{
+	    DEBUG(DBG_BATTLE, DBG_WARN, "Battle2::Arena::Turns: " << "current troop is NULL");
 	    break;
 	}
 
-	const u8 speed1 = btroop1->GetSpeed();
-	const u8 speed2 = btroop2->GetSpeed();
+	DEBUG(DBG_BATTLE , DBG_TRACE, "Battle2::Arena::Turns: " << current_troop->GetName() << ", color: " << \
+	    Color::String(current_troop->GetColor()) << ", speed: " << Speed::String(current_troop->GetSpeed()) << "(" << static_cast<int>(current_troop->GetSpeed()) << ")");
 
-	if(0 == speed1 && 0 == speed2)
+	current_commander = current_troop->GetCommander();
+
+	// first turn: castle and catapult action
+	if(castle)
 	{
-	    // end turn
-	    if(check_skip1 && check_skip2) break;
+	    if(!catapult_moved && current_troop->GetColor() == army1.GetColor())
+	    {
+		catapult->Action();
+		catapult_moved = true;
+	    }
 
-	    if(0 == speed1 && false == check_skip1){ army1.BattleResetModes(TR_SKIPMOVE); check_skip1 = true; }
-	    if(0 == speed2 && false == check_skip2){ army2.BattleResetModes(TR_SKIPMOVE); check_skip2 = true; }
-	    
-	    continue;
+	    if(!tower_moved && current_troop->GetColor() == army2.GetColor())
+	    {
+		if(towers[0] && towers[0]->isValid()) towers[0]->Action();
+		if(towers[1] && towers[1]->isValid()) towers[1]->Action();
+		if(towers[2] && towers[2]->isValid()) towers[2]->Action();
+		tower_moved = true;
+	    }
 	}
-
-	DEBUG(DBG_BATTLE , DBG_TRACE, "Battle2::Arena::Turns: " << \
-		"speed: " << Color::String(army1.GetColor()) << "(" << static_cast<int>(speed1) << "), " << Color::String(army2.GetColor()) << "(" << static_cast<int>(speed2) << ")");
-
-	current_troop = (speed1 >= speed2 ? btroop1 : btroop2);
-	current_commander = (speed1 >= speed2 ? army1.GetCommander() : army2.GetCommander());
 
 	// set bridge passable
 	if(bridge && bridge->isValid() && !bridge->isDown()) bridge->SetPassable(*current_troop);
 
 	// bad morale
-	if(!current_troop->Modes(TR_MOVED) && current_troop->Modes(MORALE_BAD))
+	if(current_troop->Modes(MORALE_BAD))
 	{
     	    actions.AddedMoraleAction(*current_troop, false);
 	}

@@ -575,9 +575,7 @@ u8 Battle2::Stats::GetSpeed(void) const
 {
     if(!count) return Speed::STANDING;
 
-    if(Modes(TR_SKIPMOVE | SP_BLIND | IS_PARALYZE_MAGIC)) return Speed::STANDING;
-
-    if(Modes(TR_MOVED)) return Speed::STANDING;
+    if(Modes(TR_MOVED | SP_BLIND | IS_PARALYZE_MAGIC)) return Speed::STANDING;
 
     const u8 speed = GetMonster().GetSpeed();
 

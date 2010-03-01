@@ -39,10 +39,9 @@ namespace Army
     class Troop;
 
     bool isValidTroop(const Troop & troop);
-    bool StrongestTroop(const Troop & t1, const Troop & t2);
     bool WeakestTroop(const Troop & t1, const Troop & t2);
+    bool StrongestTroop(const Troop & t1, const Troop & t2);
     bool SlowestTroop(const Troop & t1, const Troop & t2);
-    bool FastestTroop(const Troop & t1, const Troop & t2);
     void SwapTroops(Troop & t1, Troop & t2);
 
     class Troop : public Monster

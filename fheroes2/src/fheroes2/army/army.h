@@ -31,6 +31,7 @@
 
 class Castle;
 namespace Maps { class Tiles; };
+namespace Battle2 { class Stats; };
 
 #define	ARMYMAXTROOPS		5
 
@@ -85,21 +86,17 @@ namespace Army
 	    bool	BattleArchersPresent(void) const;
 	    bool	BattleDragonsPresent(void) const;
 	    u32		BattleKilled(void) const;
+	    Battle2::Stats* BattleSlowestTroop(bool skipmove);
+	    Battle2::Stats* BattleFastestTroop(bool skipmove);
 
 	    void	DrawMons32Line(s16, s16, u16, u8 = 0, u8 = 0, bool = false) const;
 
 	    Troop &	FirstValid(void);
 	    Troop &	At(u8);
-	    Troop &	GetSlowestTroop(void);
-	    Troop &	GetFastestTroop(void);
-	    Troop &	GetStrongestTroop(void);
 	    Troop &	GetWeakestTroop(void);
 
 	    const Troop &	At(u8) const;
 	    const Troop &	GetSlowestTroop(void) const;
-	    const Troop &	GetFastestTroop(void) const;
-	    const Troop &	GetStrongestTroop(void) const;
-	    const Troop &	GetWeakestTroop(void) const;
 
 	    Race::race_t   GetRace(void) const;
 	    Color::color_t GetColor(void) const;

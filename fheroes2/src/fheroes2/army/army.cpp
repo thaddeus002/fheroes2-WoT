@@ -517,21 +517,6 @@ s8 Army::army_t::GetMoraleWithModificators(std::string *strs) const
     return result;
 }
 
-Army::Troop & Army::army_t::GetSlowestTroop(void)
-{
-    return *MinElement(army.begin(), army.end(), SlowestTroop);
-}
-
-Army::Troop & Army::army_t::GetFastestTroop(void)
-{
-    return *MaxElement(army.begin(), army.end(), FastestTroop);
-}
-
-Army::Troop & Army::army_t::GetStrongestTroop(void)
-{
-    return *MaxElement(army.begin(), army.end(), StrongestTroop);
-}
-
 Army::Troop & Army::army_t::GetWeakestTroop(void)
 {
     return *MinElement(army.begin(), army.end(), WeakestTroop);
@@ -540,21 +525,6 @@ Army::Troop & Army::army_t::GetWeakestTroop(void)
 const Army::Troop & Army::army_t::GetSlowestTroop(void) const
 {
     return *MinElement(army.begin(), army.end(), SlowestTroop);
-}
-
-const Army::Troop & Army::army_t::GetFastestTroop(void) const
-{
-    return *MaxElement(army.begin(), army.end(), FastestTroop);
-}
-
-const Army::Troop & Army::army_t::GetStrongestTroop(void) const
-{
-    return *MaxElement(army.begin(), army.end(), StrongestTroop);
-}
-
-const Army::Troop & Army::army_t::GetWeakestTroop(void) const
-{
-    return *MinElement(army.begin(), army.end(), WeakestTroop);
 }
 
 /* draw MONS32 sprite in line, first valid = 0, count = 0 */
@@ -716,6 +686,7 @@ void Army::army_t::BattleQuit(void)
 void Army::army_t::BattleNewTurn(void)
 {
     std::for_each(army.begin(), army.end(), std::mem_fun_ref(&Troop::BattleNewTurn));
+    if(commander) commander->ResetModes(Heroes::SPELLCASTED);
 }
 
 void Army::army_t::BattleSetModes(u32 f)
@@ -778,6 +749,42 @@ bool Army::army_t::BattleArchersPresent(void) const
 bool Army::army_t::BattleDragonsPresent(void) const
 {
     return army.end() != std::find_if(army.begin(), army.end(), std::mem_fun_ref(&Troop::BattleIsDragons));
+}
+
+Battle2::Stats* Army::army_t::BattleFastestTroop(bool skipmove)
+{
+    std::vector<Troop>::iterator it = army.begin();
+    Battle2::Stats* cur = NULL;
+
+    for(; it != army.end(); ++it) if((*it).isValid())
+    {
+	Battle2::Stats* b = (*it).GetBattleStats();
+
+	if(b && !b->Modes(Battle2::TR_MOVED) &&
+	   ((skipmove && b->Modes(Battle2::TR_SKIPMOVE)) ||
+	    (!skipmove && !b->Modes(Battle2::TR_SKIPMOVE))) &&
+	   (NULL == cur || b->GetSpeed() > cur->GetSpeed())) cur = b;
+    }
+
+    return cur;
+}
+
+Battle2::Stats* Army::army_t::BattleSlowestTroop(bool skipmove)
+{
+    std::vector<Troop>::iterator it = army.begin();
+    Battle2::Stats* cur = NULL;
+
+    for(; it != army.end(); ++it) if((*it).isValid())
+    {
+	Battle2::Stats* b = (*it).GetBattleStats();
+
+	if(b && !b->Modes(Battle2::TR_MOVED) &&
+	   ((skipmove && b->Modes(Battle2::TR_SKIPMOVE)) ||
+	    (!skipmove && !b->Modes(Battle2::TR_SKIPMOVE))) &&
+	   (NULL == cur || b->GetSpeed() < cur->GetSpeed())) cur = b;
+    }
+
+    return cur;
 }
 
 void Army::army_t::Clear(void)
