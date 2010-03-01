@@ -755,8 +755,6 @@ void Battle2::Arena::Turns(u16 turn, Result & result)
 	// check exit
     	if(!army1.isValid() || !army2.isValid() || result.army1 || result.army2) break;
 
-	actions.clear();
-
 	if(NULL == current_troop)
 	{
 	    Battle2::Stats* btroop1 = army1.BattleFastestTroop(false);
@@ -847,7 +845,7 @@ void Battle2::Arena::Turns(u16 turn, Result & result)
 
 	    ApplyAction(actions.front());
 	    actions.pop_front();
-        
+
 	    // good morale
 	    if(check_morale && !current_troop->Modes(TR_SKIPMOVE) && current_troop->Modes(TR_MOVED) && current_troop->Modes(MORALE_GOOD) && army1.isValid() && army2.isValid())
 		actions.AddedMoraleAction(*current_troop, true);

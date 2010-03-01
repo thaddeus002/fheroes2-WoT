@@ -898,34 +898,29 @@ bool Battle2::Stats::ApplySpell(u8 spell, const HeroBase* hero, TargetInfo & tar
 	if(myhero->HasArtifact(Artifact::ENCHANTED_HOURGLASS)) spoint += 2;
     }
 
-    if(Spell::isDamage(spell) || Spell::isApplyToEnemies(spell))
+    // magic defenced
+    switch(troop())
     {
-	switch(troop())
-	{
-	    // 25% unfortunatly
-	    case Monster::DWARF:
-	    case Monster::BATTLE_DWARF:
-		if(5 > Rand::Get(1, 16))
-		{
-		    SetModes(MAGIC_DEFENCED);
-		    return false;
-		}
-		break;
+	// 25% unfortunatly
+	case Monster::DWARF:
+	case Monster::BATTLE_DWARF:
+	    if(5 > Rand::Get(1, 16) && (Spell::isDamage(spell) || Spell::isApplyToEnemies(spell)))
+	    {
+		SetModes(MAGIC_DEFENCED);
+		return false;
+	    }
+	    break;
 
-	    default: break;
-	}
-
-	SpellApplyDamage(spell, spoint, hero, target);
+	default: break;
     }
+
+    if(Spell::isDamage(spell))
+	SpellApplyDamage(spell, spoint, hero, target);
     else
     if(Spell::isRestore(spell))
-    {
 	SpellRestoreAction(spell, spoint, hero);
-    }
     else
-    {
     	SpellModesAction(spell, spoint, hero);
-    }
 
     return true;
 }
