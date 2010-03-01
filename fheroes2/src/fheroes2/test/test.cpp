@@ -94,8 +94,11 @@ void RunTest3(void)
     Army::army_t & army2 = castle->GetArmy();
 
     army1.Clear();
-    army1.JoinTroop(Monster::PHOENIX, 10);
-    army1.JoinTroop(Monster::RANGER, 80);
+    //army1.JoinTroop(Monster::PHOENIX, 10);
+    //army1.JoinTroop(Monster::RANGER, 80);
+    army1.At(0) = Army::Troop(Monster::SKELETON, 400);
+    army1.At(2) = Army::Troop(Monster::SKELETON, 400);
+    army1.At(4) = Army::Troop(Monster::SKELETON, 400);
     //army1.JoinTroop(Monster::GARGOYLE, 100);
 
     //army1.JoinTroop(Monster::Rand(Monster::LEVEL1), 30);
@@ -113,7 +116,7 @@ void RunTest3(void)
 
     kingdom2.Dump();
     
-    Battle2::Loader(army1, army2, castle->GetIndex());
+    Battle2::Loader(army1, army2, 34); //castle->GetIndex());
 }
 
 #endif
