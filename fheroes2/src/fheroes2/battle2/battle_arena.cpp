@@ -752,41 +752,22 @@ void Battle2::Arena::Turns(u16 turn, Result & result)
     // turn
     while(1)
     {
-	current_troop = NULL;
-	current_commander = NULL;
-
 	// check exit
     	if(!army1.isValid() || !army2.isValid() || result.army1 || result.army2) break;
 
 	actions.clear();
 
-	Battle2::Stats* btroop1 = army1.BattleFastestTroop(false);
-	Battle2::Stats* btroop2 = army2.BattleFastestTroop(false);
-
-	if(btroop1 && btroop2)
+	if(NULL == current_troop)
 	{
-	    if(btroop1->GetSpeed() > btroop2->GetSpeed())
-		current_troop = btroop1;
-	    else
-	    if(btroop1->GetSpeed() < btroop2->GetSpeed())
-		current_troop = btroop2;
-	    else
-		current_troop = (current_color == btroop1->GetColor() ? btroop2 : btroop1);
-	}
-	else
-	if(btroop1 || btroop2)
-	    current_troop = btroop1 ? btroop1 : btroop2;
-	else
-	{
-	    btroop1 = army1.BattleSlowestTroop(true);
-	    btroop2 = army2.BattleSlowestTroop(true);
+	    Battle2::Stats* btroop1 = army1.BattleFastestTroop(false);
+	    Battle2::Stats* btroop2 = army2.BattleFastestTroop(false);
 
 	    if(btroop1 && btroop2)
 	    {
-		if(btroop1->GetSpeed() < btroop2->GetSpeed())
+		if(btroop1->GetSpeed() > btroop2->GetSpeed())
 		    current_troop = btroop1;
 		else
-		if(btroop1->GetSpeed() > btroop2->GetSpeed())
+		if(btroop1->GetSpeed() < btroop2->GetSpeed())
 		    current_troop = btroop2;
 		else
 		    current_troop = (current_color == btroop1->GetColor() ? btroop2 : btroop1);
@@ -794,10 +775,29 @@ void Battle2::Arena::Turns(u16 turn, Result & result)
 	    else
 	    if(btroop1 || btroop2)
 		current_troop = btroop1 ? btroop1 : btroop2;
-	}
+	    else
+	    {
+		btroop1 = army1.BattleSlowestTroop(true);
+		btroop2 = army2.BattleSlowestTroop(true);
 
-	// end turns
-	if(!current_troop) break;
+		if(btroop1 && btroop2)
+		{
+		    if(btroop1->GetSpeed() < btroop2->GetSpeed())
+			current_troop = btroop1;
+		    else
+		    if(btroop1->GetSpeed() > btroop2->GetSpeed())
+			current_troop = btroop2;
+		    else
+			current_troop = (current_color == btroop1->GetColor() ? btroop2 : btroop1);
+		}
+		else
+		if(btroop1 || btroop2)
+		    current_troop = btroop1 ? btroop1 : btroop2;
+	    }
+
+	    // end turns
+	    if(!current_troop) break;
+	}
 
 	DEBUG(DBG_BATTLE , DBG_TRACE, "Battle2::Arena::Turns: " << current_troop->GetName() << ", color: " << \
 	    Color::String(current_troop->GetColor()) << ", speed: " << Speed::String(current_troop->GetSpeed()) << "(" << static_cast<int>(current_troop->GetSpeed()) << ")");
@@ -852,6 +852,9 @@ void Battle2::Arena::Turns(u16 turn, Result & result)
 	    if(check_morale && !current_troop->Modes(TR_SKIPMOVE) && current_troop->Modes(TR_MOVED) && current_troop->Modes(MORALE_GOOD) && army1.isValid() && army2.isValid())
 		actions.AddedMoraleAction(*current_troop, true);
 	}
+
+	// current troop moved!
+	if(current_troop->Modes(TR_SKIPMOVE | TR_MOVED)) current_troop = NULL;
 
 	DELAY(10);
     }
