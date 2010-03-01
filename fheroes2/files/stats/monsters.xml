@@ -26,7 +26,7 @@
  <!-- pikeman -->
  <monster attack="5" defence="9" damage_min="3" damage_max="4" hp="15" speed="4" grown="5" gold="200" />
  <!-- veteran pikeman -->
- <monster attack="5" defence="9" damage_min="3" damage_max="4" hp="20" speed="4" grown="5" gold="250" />
+ <monster attack="5" defence="9" damage_min="3" damage_max="4" hp="20" speed="5" grown="5" gold="250" />
  <!-- swordsman -->
  <monster attack="7" defence="9" damage_min="4" damage_max="6" hp="25" speed="4" grown="4" gold="250" />
  <!-- master swordsman -->
@@ -38,7 +38,7 @@
  <!-- paladin -->
  <monster attack="11" defence="12" damage_min="10" damage_max="20" hp="50" speed="5" grown="2" gold="600" />
  <!-- crusader -->
- <monster attack="11" defence="12" damage_min="10" damage_max="20" hp="65" speed="5" grown="2" gold="1000" />
+ <monster attack="11" defence="12" damage_min="10" damage_max="20" hp="65" speed="6" grown="2" gold="1000" />
 
  <!-- goblin -->
  <monster attack="3" defence="1" damage_min="1" damage_max="2" hp="3" speed="4" grown="10" gold="40" />
