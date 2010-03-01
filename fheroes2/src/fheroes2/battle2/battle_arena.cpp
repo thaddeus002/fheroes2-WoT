@@ -745,6 +745,7 @@ void Battle2::Arena::Turns(u16 turn, Result & result)
 
     Actions actions;
     Stats* current_troop = NULL;
+    u8 current_color = 0;
     bool tower_moved = false;
     bool catapult_moved = false;
 
@@ -763,7 +764,15 @@ void Battle2::Arena::Turns(u16 turn, Result & result)
 	Battle2::Stats* btroop2 = army2.BattleFastestTroop(false);
 
 	if(btroop1 && btroop2)
-	    current_troop = (btroop1->GetSpeed() >= btroop2->GetSpeed() ? btroop1 : btroop2);
+	{
+	    if(btroop1->GetSpeed() > btroop2->GetSpeed())
+		current_troop = btroop1;
+	    else
+	    if(btroop1->GetSpeed() < btroop2->GetSpeed())
+		current_troop = btroop2;
+	    else
+		current_troop = (current_color == btroop1->GetColor() ? btroop2 : btroop1);
+	}
 	else
 	if(btroop1 || btroop2)
 	    current_troop = btroop1 ? btroop1 : btroop2;
@@ -773,33 +782,39 @@ void Battle2::Arena::Turns(u16 turn, Result & result)
 	    btroop2 = army2.BattleSlowestTroop(true);
 
 	    if(btroop1 && btroop2)
-		current_troop = (btroop1->GetSpeed() >= btroop2->GetSpeed() ? btroop1 : btroop2);
+	    {
+		if(btroop1->GetSpeed() < btroop2->GetSpeed())
+		    current_troop = btroop1;
+		else
+		if(btroop1->GetSpeed() > btroop2->GetSpeed())
+		    current_troop = btroop2;
+		else
+		    current_troop = (current_color == btroop1->GetColor() ? btroop2 : btroop1);
+	    }
 	    else
 	    if(btroop1 || btroop2)
 		current_troop = btroop1 ? btroop1 : btroop2;
 	}
 
-	if(!current_troop)
-	{
-	    DEBUG(DBG_BATTLE, DBG_WARN, "Battle2::Arena::Turns: " << "current troop is NULL");
-	    break;
-	}
+	// end turns
+	if(!current_troop) break;
 
 	DEBUG(DBG_BATTLE , DBG_TRACE, "Battle2::Arena::Turns: " << current_troop->GetName() << ", color: " << \
 	    Color::String(current_troop->GetColor()) << ", speed: " << Speed::String(current_troop->GetSpeed()) << "(" << static_cast<int>(current_troop->GetSpeed()) << ")");
 
 	current_commander = current_troop->GetCommander();
-
+	current_color = current_troop->GetColor();
+	
 	// first turn: castle and catapult action
 	if(castle)
 	{
-	    if(!catapult_moved && current_troop->GetColor() == army1.GetColor())
+	    if(!catapult_moved && current_color == army1.GetColor())
 	    {
 		catapult->Action();
 		catapult_moved = true;
 	    }
 
-	    if(!tower_moved && current_troop->GetColor() == army2.GetColor())
+	    if(!tower_moved && current_color == army2.GetColor())
 	    {
 		if(towers[0] && towers[0]->isValid()) towers[0]->Action();
 		if(towers[1] && towers[1]->isValid()) towers[1]->Action();
