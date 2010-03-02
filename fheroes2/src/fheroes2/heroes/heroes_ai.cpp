@@ -35,6 +35,7 @@
 void AIToMonster(Heroes &hero, const u8 obj, const u16 dst_index);
 void AIToPickupResource(Heroes &hero, const u8 obj, const u16 dst_index);
 void AIToTreasureChest(Heroes &hero, const u8 obj, const u16 dst_index);
+void AIToArtifact(Heroes &hero, const u8 obj, const u16 dst_index);
 void AIToResource(Heroes &hero, const u8 obj, const u16 dst_index);
 void AIToWagon(Heroes &hero, const u8 obj, const u16 dst_index);
 void AIToSkeleton(Heroes &hero, const u8 obj, const u16 dst_index);
@@ -154,6 +155,7 @@ void Heroes::AIAction(const u16 dst_index)
 
         case MP2::OBJ_WATERCHEST:
         case MP2::OBJ_TREASURECHEST:	AIToTreasureChest(*this, object, dst_index); break;
+	case MP2::OBJ_ARTIFACT:		AIToArtifact(*this, object, dst_index); break;
 
         case MP2::OBJ_MAGICGARDEN:
         case MP2::OBJ_LEANTO:
@@ -553,7 +555,7 @@ void AIToTreasureChest(Heroes &hero, const u8 obj, const u16 dst_index)
 	    world.GetKingdom(hero.GetColor()).AddFundsResource(resource);
 	}
 	else
-	if(resource.gold >= 500)
+	if(resource.gold >= 1000)
 	{
 	    const u16 expr = resource.gold - 500;
 
@@ -1376,6 +1378,101 @@ void AIToShipwreckSurvivor(Heroes &hero, const u8 obj, const u16 dst_index)
     DEBUG(DBG_AI , DBG_INFO, "AIToShipwreckSurvivor: " << hero.GetName());
 }
 
+void AIToArtifact(Heroes &hero, const u8 obj, const u16 dst_index)
+{
+    if(hero.IsFullBagArtifacts()) return;
+
+    Maps::Tiles & tile = world.GetTiles(dst_index);
+    Artifact art(Artifact::FromInt(tile.GetQuantity1()));
+
+    // update scroll artifact
+    if(art.GetID() == Artifact::SPELL_SCROLL)
+	art.SetExt(tile.GetQuantity3());
+
+    bool conditions = false;
+
+    switch(tile.GetQuantity2())
+    {
+	// 1,2,3 - 2000g, 2500g+3res,3000g+5res
+	case 1:
+	case 2:
+	case 3:
+	{
+	    Resource::funds_t payment;
+
+	    if(1 == tile.GetQuantity2())
+		payment += Resource::funds_t(Resource::GOLD, 2000);
+	    else
+	    if(2 == tile.GetQuantity2())
+	    {
+		payment += Resource::funds_t(Resource::GOLD, 2500);
+		payment += Resource::funds_t(tile.GetQuantity4(), 3);
+	    }
+	    else
+	    {
+		payment += Resource::funds_t(Resource::GOLD, 3000);
+		payment += Resource::funds_t(tile.GetQuantity4(), 5);
+	    }
+
+	    if(world.GetKingdom(hero.GetColor()).AllowPayment(payment))
+	    {
+		conditions = true;
+		world.GetKingdom(hero.GetColor()).OddFundsResource(payment);
+	    }
+	    break;
+	}
+
+	// 4,5 - need have skill wisard or leadership,
+	case 4:
+	case 5:
+	{
+	    conditions = hero.HasSecondarySkill(4 == tile.GetQuantity2() ? Skill::Secondary::WISDOM : Skill::Secondary::LEADERSHIP);
+	    break;
+	}
+
+	// 6 - 50 rogues, 7 - 1 gin, 8,9,10,11,12,13 - 1 monster level4
+	case 6:
+	case 7:
+	case 8:
+	case 9:
+	case 10:
+	case 11:
+	case 12:
+	case 13:
+	{
+	    Army::army_t army;
+	    army.FromGuardian(tile);
+
+	    // new battle2
+	    Battle2::Result res = Battle2::Loader(hero.GetArmy(), army, dst_index);
+    	    if(res.AttackerWins())
+    	    {
+		hero.IncreaseExperience(res.GetExperience());
+		conditions = true;
+		hero.ActionAfterBattle();
+	    }
+	    else
+	    {
+		AIBattleLose(hero, res.AttackerResult());
+	    }
+	    break;
+	}
+
+    	default:
+	    conditions = true;
+	    break;
+    }
+
+    if(conditions && hero.PickupArtifact(art))
+    {
+	tile.RemoveObjectSprite();
+	tile.SetObject(MP2::OBJ_ZERO);
+	tile.ResetQuantity();
+    }
+
+    DEBUG(DBG_AI , DBG_INFO, "AIToArtifact: " << hero.GetName());
+}
+
 
 
 
@@ -1406,6 +1503,19 @@ bool Heroes::AIPriorityObject(u16 index, u8 obj)
 	    if(hero && GetColor() != hero->GetColor()) return true;
 	    break;
 	}
+
+	// resource
+	case MP2::OBJ_RESOURCE:
+	case MP2::OBJ_CAMPFIRE:
+	case MP2::OBJ_TREASURECHEST:
+	    return true;
+
+	// free mines
+	case MP2::OBJ_SAWMILL:
+	case MP2::OBJ_MINES:
+	case MP2::OBJ_ALCHEMYLAB:
+	    if(world.ColorCapturedObject(index) != GetColor()) return true;
+	    break;
 
 	default: break;
     }
@@ -1454,6 +1564,49 @@ bool Heroes::AIValidObject(u16 index, u8 obj)
 	case MP2::OBJ_CAMPFIRE:
 	case MP2::OBJ_TREASURECHEST:
 	    return true;
+
+	case MP2::OBJ_ARTIFACT:
+	{
+	    if(IsFullBagArtifacts()) return false;
+	    Maps::Tiles & tile = world.GetTiles(index);
+
+	    // 1,2,3 - 2000g, 2500g+3res, 3000g+5res
+	    if(1 <= tile.GetQuantity2() && 3 >= tile.GetQuantity2())
+	    {
+		Resource::funds_t payment;
+		if(1 == tile.GetQuantity2())
+		    payment += Resource::funds_t(Resource::GOLD, 2000);
+		else
+		if(2 == tile.GetQuantity2())
+		{
+		    payment += Resource::funds_t(Resource::GOLD, 2500);
+		    payment += Resource::funds_t(tile.GetQuantity4(), 3);
+		}
+		else
+		{
+		    payment += Resource::funds_t(Resource::GOLD, 3000);
+		    payment += Resource::funds_t(tile.GetQuantity4(), 5);
+		}
+		return world.GetKingdom(GetColor()).AllowPayment(payment);
+	    }
+	    else
+	    // 4,5 - need have skill wisard or leadership,
+	    if(3 < tile.GetQuantity2() && 6 > tile.GetQuantity2())
+	    {
+		return HasSecondarySkill(4 == tile.GetQuantity2() ? Skill::Secondary::WISDOM : Skill::Secondary::LEADERSHIP);
+	    }
+	    else
+	    // 6 - 50 rogues, 7 - 1 gin, 8,9,10,11,12,13 - 1 monster level4
+	    if(5 < tile.GetQuantity2() && 14 > tile.GetQuantity2())
+	    {
+		Army::army_t enemy;
+		enemy.FromGuardian(tile);
+        	return (enemy.isValid() && GetArmy().StrongerEnemyArmy(enemy));
+	    }
+	    else
+		return true;
+	}
+	break;
 
 	// increase view
 	case MP2::OBJ_OBSERVATIONTOWER:

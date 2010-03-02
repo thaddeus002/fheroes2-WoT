@@ -1459,30 +1459,48 @@ void Maps::Tiles::UpdateQuantity(void)
             break;
 
 	case MP2::OBJ_SKELETON:
-	    switch(Rand::Get(1, 2))
+	{
+	    Rand::Queue percents(2);
+	    // 80%: empty
+	    percents.Push(0, 80);
+	    // 20%: artifact 1 or 2 or 3
+	    percents.Push(1, 20);
+	    
+	    if(percents.Get())
 	    {
-		case 1:
-		    quantity2 = Rand::Get(1, 3);
-            	    quantity1 = (1 == quantity2 ? Artifact::Rand1() : (2 == quantity2 ? Artifact::Rand2() : Artifact::Rand3()));
-		    quantity2 = 0;
-		break;
-		default: break;
+		switch(Rand::Get(1, 3))
+		{
+		    case 1: quantity1 = Artifact::Rand1(); break;
+		    case 2: quantity1 = Artifact::Rand2();  break;
+		    case 3: quantity1 = Artifact::Rand3(); break;
+		    default: break;
+		}
 	    }
+	}
 	break;
 
 	case MP2::OBJ_WAGON:
-	    switch(Rand::Get(1, 3))
+	{
+	    Rand::Queue percents(3);
+	    // 20%: empty
+	    percents.Push(0, 20);
+	    // 10%: artifact 1 or 2
+	    percents.Push(1, 10);
+	    // 50%: resource
+	    percents.Push(2, 50);
+
+	    switch(percents.Get())
 	    {
 		case 1:
             	    quantity1 = (1 == Rand::Get(1, 2) ? Artifact::Rand1() : Artifact::Rand2());
-		    quantity2 = 0;
-		break;
+		    break;
 		case 2:
 		    quantity1 = Resource::Rand();
 		    quantity2 = Rand::Get(2, 5);
-		break;
+		    break;
 		default: break;
 	    }
+	}
 	break;
 
 	case MP2::OBJ_ARTIFACT:
@@ -1496,11 +1514,16 @@ void Maps::Tiles::UpdateQuantity(void)
 		Artifact::artifact_t art = Artifact::FromIndexSprite(addon->index);
 		if(Artifact::SPELL_SCROLL == art)
 		{
+		    // spell from origin mp2
 		    Spell::spell_t spell = Spell::FromInt(1 + (quantity2 * 256 + quantity1) / 8);
 		    quantity3 = spell;
 		}
 		quantity1 = art;
-		quantity2 = Rand::Get(1, 18);
+		// conditions: 70% empty
+		quantity2 = Rand::Get(1, 10) < 4 ? Rand::Get(1, 13) : 0;
+		//  added resource
+		if(quantity2 == 2 || quantity2 == 3)
+		    quantity4 = Resource::Rand();
 	    }
 	break;
 
@@ -1554,82 +1577,91 @@ void Maps::Tiles::UpdateQuantity(void)
 	break;
 
 	case MP2::OBJ_FLOTSAM:
-	    switch(Rand::Get(1, 4))
+	{
+	    Rand::Queue percents(3);
+	    // 25%: empty
+	    percents.Push(0, 25);
+	    // 25%: 500 gold + 10 wood
+	    percents.Push(1, 25);
+	    // 25%: 200 gold + 5 wood
+	    percents.Push(2, 25);
+	    // 25%: 5 wood
+	    percents.Push(3, 25);
+	    
+	    // variant
+	    switch(percents.Get())
 	    {
-		// 25%: 500 gold + 10 wood
-		case 1:
-		    quantity1 = 5;
-		    quantity2 = 10;
-		break;
-		// 25%: 200 gold + 5 wood
-		case 2:
-		    quantity1 = 2;
-		    quantity2 = 5;
-		break;
-		// 25%: 5 wood
-		case 3:
-		    quantity2 = 5;
-		break;
+		case 1: quantity1 = 5; quantity2 = 10; break;
+		case 2: quantity1 = 2; quantity2 = 5;  break;
+		case 3: quantity2 = 5; break;
 		default: break;
 	    }
+	}
 	break;
 
 	case MP2::OBJ_SHIPWRECKSURVIROR:
-	    // artifact
-	    quantity2 = Rand::Get(1, 3);
-            quantity1 = (1 == quantity2 ? Artifact::Rand1() : (2 == quantity2 ? Artifact::Rand2() : Artifact::Rand3()));
-	    quantity2 = 0;
+	{
+	    Rand::Queue percents(3);
+	    // 55%: artifact 1
+	    percents.Push(1, 55);
+	    // 30%: artifact 2
+	    percents.Push(1, 30);
+	    // 15%: artifact 3
+	    percents.Push(1, 15);
+	    
+	    // variant
+	    switch(percents.Get())
+	    {
+		case 1: quantity1 = Artifact::Rand1(); break;
+		case 2: quantity1 = Artifact::Rand2();  break;
+		case 3: quantity1 = Artifact::Rand3(); break;
+		default: break;
+	    }
+	}
 	break;
 
 	case MP2::OBJ_WATERCHEST:
-	    switch(Rand::Get(1, 10))
+	{
+	    Rand::Queue percents(3);
+            // 20% - empty
+	    percents.Push(0, 20);
+            // 70% - 1500 gold
+	    percents.Push(1, 70);
+            // 10% - 1000 gold + art
+	    percents.Push(2, 10);
+
+	    // variant
+	    switch(percents.Get())
 	    {
-            	// 70% - 1500 gold
-                default:
-            	    quantity2 = 15;
-            	break;
-                // 20% - empty
-                case 7:
-		case 8:
-            	break;
-                // 10% - 1000 gold + art
-		case 10:
-            	    quantity1 = Artifact::Rand1();
-		    quantity2 = 10;
-		break;
+		case 1: quantity2 = 15; break;
+		case 2: quantity2 = 10; quantity1 = Artifact::Rand1(); break;
+		default: break;
 	    }
+	}
 	break;
 
 	case MP2::OBJ_TREASURECHEST:
-	    switch(Rand::Get(1, 20))
+	{
+	    Rand::Queue percents(4);
+	    // 31% - 2000 gold or 1500 exp
+	    percents.Push(1, 31);
+	    // 32% - 1500 gold or 1000 exp
+	    percents.Push(2, 32);
+	    // 32% - 1000 gold or 500 exp
+	    percents.Push(3, 32);
+	    // 5% - art
+	    percents.Push(4,  5);
+	    
+	    // variant
+	    switch(percents.Get())
 	    {
-		// 35% - 2000 gold or 1500 exp
-		default:
-		    quantity2 = 20;
-		break;
-		// 30% - 1500 gold or 1000 exp
-		case 2:
-		case 5:
-		case 8:
-		case 11:
-		case 14:
-		case 17:
-		    quantity2 = 15;
-		break;
-		// 30% - 1000 gold or 500 exp
-		case 3:
-		case 6:
-		case 9:
-		case 12:
-		case 15:
-		case 18:
-		    quantity2 = 10;
-		break;
-		// 5% - art
-		case 20:
-		    quantity1 = Artifact::Rand1();
-		break;
+		case 1: quantity2 = 20; break;
+		case 2: quantity2 = 15; break;
+		case 3: quantity2 = 10; break;
+		case 4: quantity1 = Artifact::Rand1(); break;
+		default: break;
 	    }
+	}
 	break;
 
 	case MP2::OBJ_DERELICTSHIP:
@@ -2005,4 +2037,12 @@ bool Maps::Tiles::IsJoiner(void) const
 void Maps::Tiles::SetRedraw(bool f)
 {
     f ? flags |= REDRAW : flags &= ~REDRAW;
+}
+
+void Maps::Tiles::ResetQuantity(void)
+{
+    quantity1 = 0;
+    quantity2 = 0;
+    quantity3 = 0;
+    quantity4 = 0;
 }

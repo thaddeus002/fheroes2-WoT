@@ -1637,69 +1637,41 @@ void ActionToArtifact(Heroes &hero, const u8 obj, const u16 dst_index)
     }
 
     bool conditions = false;
-    const u8 c = 0x0f & tile.GetQuantity2();
 
-    switch(c)
+    switch(tile.GetQuantity2())
     {
 	// 1,2,3 - 2000g, 2500g+3res,3000g+5res
 	case 1:
 	case 2:
 	case 3:
 	{
-	    u8 type = tile.GetQuantity2() >> 4;
-	    Resource::resource_t r = Resource::UNKNOWN;
-
-	    switch(type)
-	    {
-		case 1: r = Resource::WOOD; break;
-        	case 2: r = Resource::MERCURY; break;
-        	case 3: r = Resource::ORE; break;
-        	case 4: r = Resource::SULFUR; break;
-        	case 5: r = Resource::CRYSTAL; break;
-        	case 6: r = Resource::GEMS; break;
-		default:
-		    r = Resource::Rand();
-		    // store variants
-		    switch(r)
-		    {
-			case Resource::WOOD: tile.SetQuantity2(0x10 + c); break;
-        		case Resource::MERCURY: tile.SetQuantity2(0x20 + c); break;
-        		case Resource::ORE: tile.SetQuantity2(0x30 + c); break;
-        		case Resource::SULFUR: tile.SetQuantity2(0x40 + c); break;
-        		case Resource::CRYSTAL: tile.SetQuantity2(0x50 + c); break;
-        		case Resource::GEMS: tile.SetQuantity2(0x60 + c); break;
-			default: break;
-		    }
-		    break;
-	    }
-
 	    std::string header;
-
 	    Resource::funds_t payment;
-	    if(1 == c)
+
+	    if(1 == tile.GetQuantity2())
 	    {
 		header = _("A leprechaun offers you the %{art} for the small price of %{gold} Gold.");
 		String::Replace(header, "%{gold}", 2000);
 		payment += Resource::funds_t(Resource::GOLD, 2000);
 	    }
 	    else
-	    if(2 == c)
+	    if(2 == tile.GetQuantity2())
 	    {
 		header = _("A leprechaun offers you the %{art} for the small price of %{gold} Gold and %{count} %{res}.");
 		String::Replace(header, "%{gold}", 2500);
 		String::Replace(header, "%{count}", 3);
-		String::Replace(header, "%{res}", Resource::String(r));
+		String::Replace(header, "%{res}", Resource::String(tile.GetQuantity4()));
 		payment += Resource::funds_t(Resource::GOLD, 2500);
-		payment += Resource::funds_t(r, 3);
+		payment += Resource::funds_t(tile.GetQuantity4(), 3);
 	    }
 	    else
 	    {
 		header = _("A leprechaun offers you the %{art} for the small price of %{gold} Gold and %{count} %{res}.");
 		String::Replace(header, "%{gold}", 3000);
 		String::Replace(header, "%{count}", 5);
-		String::Replace(header, "%{res}", Resource::String(r));
+		String::Replace(header, "%{res}", Resource::String(tile.GetQuantity4()));
 		payment += Resource::funds_t(Resource::GOLD, 3000);
-		payment += Resource::funds_t(r, 5);
+		payment += Resource::funds_t(tile.GetQuantity4(), 5);
 	    }
 	    String::Replace(header, "%{art}", art.GetName());
 
@@ -1726,37 +1698,25 @@ void ActionToArtifact(Heroes &hero, const u8 obj, const u16 dst_index)
 	case 4:
 	case 5:
 	{
-	    if(4 == c)
+	    if(hero.HasSecondarySkill(4 == tile.GetQuantity2() ? Skill::Secondary::WISDOM : Skill::Secondary::LEADERSHIP))
 	    {
-		if(hero.HasSecondarySkill(Skill::Secondary::WISDOM))
+		PlaySoundSuccess;
+		std::string msg(_("You've found the artifact: "));
+		msg.append(art.GetName());
+		DialogWithArtifact(MP2::StringObject(obj), msg, art(), Dialog::OK);
+		conditions = true;
+	    }
+	    else
+	    {
+		PlaySoundFailure;
+		if(4 == tile.GetQuantity2())
 		{
-		    PlaySoundSuccess;
-		    std::string msg(_("You've found the artifact: "));
-		    msg.append(art.GetName());
-		    DialogWithArtifact(MP2::StringObject(obj), msg, art(), Dialog::OK);
-		    conditions = true;
-		}
-		else
-		{
-		    PlaySoundFailure;
 		    std::string str = _("The hermit tells you that he is willing to give the %{art} to the first wise person he meets.");
 		    String::Replace(str, "%{art}", art.GetName());
 		    Dialog::Message(_("You've found the humble dwelling of a withered hermit."), str, Font::BIG, Dialog::OK);
 		}
-	    }
-	    else
-	    {
-		if(hero.HasSecondarySkill(Skill::Secondary::LEADERSHIP))
-		{
-		    PlaySoundSuccess;
-		    std::string msg(_("You've found the artifact: "));
-		    msg.append(art.GetName());
-		    DialogWithArtifact(MP2::StringObject(obj), msg, art(), Dialog::OK);
-		    conditions = true;
-		}
 		else
 		{
-		    PlaySoundFailure;
 		    std::string str = _("The soldier tells you that he is willing to pass on the %{art} to the first true leader he meets.");
 		    String::Replace(str, "%{art}", art.GetName());
 		    Dialog::Message(_("You've come across the spartan quarters of a retired soldier."), str, Font::BIG, Dialog::OK);
@@ -1783,7 +1743,7 @@ void ActionToArtifact(Heroes &hero, const u8 obj, const u16 dst_index)
 
 	    PlaySoundWarning;
 
-	    if(6 == c)
+	    if(6 == tile.GetQuantity2())
 		Dialog::Message(_("You come upon an ancient artifact."), _("As you reach for it, a pack of Rogues leap out of the brush to guard their stolen loot."), Font::BIG, Dialog::OK);
 	    else
 	    {
@@ -1794,22 +1754,22 @@ void ActionToArtifact(Heroes &hero, const u8 obj, const u16 dst_index)
 		    
 	    if(battle)
 	    {
-		    // new battle2
-		    Battle2::Result res = Battle2::Loader(hero.GetArmy(), army, dst_index);
-    		    if(res.AttackerWins())
-    		    {
-			hero.IncreaseExperience(res.GetExperience());
-			conditions = true;
-			PlaySoundSuccess;
-			std::string str = _("Victorious, you take your prize, the %{art}.");
-			String::Replace(str, "%{art}", art.GetName());
-			DialogWithArtifact(MP2::StringObject(obj), str, art());
-			hero.ActionAfterBattle();
-		    }
-		    else
-		    {
-			BattleLose(hero, res.AttackerResult());
-		    }
+		// new battle2
+		Battle2::Result res = Battle2::Loader(hero.GetArmy(), army, dst_index);
+    		if(res.AttackerWins())
+    		{
+		    hero.IncreaseExperience(res.GetExperience());
+		    conditions = true;
+		    PlaySoundSuccess;
+		    std::string str = _("Victorious, you take your prize, the %{art}.");
+		    String::Replace(str, "%{art}", art.GetName());
+		    DialogWithArtifact(MP2::StringObject(obj), str, art());
+		    hero.ActionAfterBattle();
+		}
+		else
+		{
+		    BattleLose(hero, res.AttackerResult());
+		}
 	    }
 	    else
 	    {
@@ -1834,11 +1794,8 @@ void ActionToArtifact(Heroes &hero, const u8 obj, const u16 dst_index)
 	AnimationRemoveObject(tile);
 
 	tile.RemoveObjectSprite();
-	tile.SetQuantity1(0);
-	tile.SetQuantity2(0);
-	tile.SetQuantity3(0);
-	tile.SetQuantity4(0);
 	tile.SetObject(MP2::OBJ_ZERO);
+	tile.ResetQuantity();
     }
 
     DEBUG(DBG_GAME , DBG_INFO, "ActionToArtifact: " << hero.GetName());
@@ -1858,11 +1815,7 @@ void ActionToTreasureChest(Heroes &hero, const u8 obj, const u16 dst_index)
     {
 	std::string message;
 
-	if(0 == resource.gold)
-	{
-	    Dialog::Message("Chest", _("After spending hours trying to fish the chest out of the sea, you open it, only to find it empty."), Font::BIG, Dialog::OK);
-	}
-	else
+	// artifact
 	if(tile.GetQuantity1())
 	{
 	    const Artifact art(Artifact::FromInt(tile.GetQuantity1()));
@@ -1884,12 +1837,18 @@ void ActionToTreasureChest(Heroes &hero, const u8 obj, const u16 dst_index)
 	    world.GetKingdom(hero.GetColor()).AddFundsResource(resource);
 	}
 	else
+	// resource
+	if(resource.gold)
 	{
 	    message = _("After spending hours trying to fish the chest out of the sea, you open it and find %{gold} gold pieces.");
 	    String::Replace(message, "%{gold}", resource.gold);
 	    DialogWithGold("Chest", message, resource.gold);
 
 	    world.GetKingdom(hero.GetColor()).AddFundsResource(resource);
+	}
+	else
+	{
+	    Dialog::Message("Chest", _("After spending hours trying to fish the chest out of the sea, you open it, only to find it empty."), Font::BIG, Dialog::OK);
 	}
     }
     else
@@ -1916,7 +1875,7 @@ void ActionToTreasureChest(Heroes &hero, const u8 obj, const u16 dst_index)
 	    world.GetKingdom(hero.GetColor()).AddFundsResource(resource);
 	}
 	else
-	if(resource.gold >= 500)
+	if(resource.gold >= 1000)
 	{
 	    const u16 expr = resource.gold - 500;
 	    message = _("After scouring the area, you fall upon a hidden treasure cache. You may take the gold or distribute the gold to the peasants for experience. Do you wish to keep the gold?");
@@ -1930,6 +1889,7 @@ void ActionToTreasureChest(Heroes &hero, const u8 obj, const u16 dst_index)
 
     tile.RemoveObjectSprite();
     tile.SetObject(MP2::OBJ_ZERO);
+    tile.ResetQuantity();
 
     DEBUG(DBG_GAME , DBG_INFO, "ActionToTreasureChest: " << hero.GetName());
 }

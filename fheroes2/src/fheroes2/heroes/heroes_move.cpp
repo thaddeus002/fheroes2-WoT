@@ -454,6 +454,13 @@ bool Heroes::MoveStep(bool fast)
 	    SetMove(false);
 	}
 
+	// AI: force scan resource around
+	if(GetControl() == Game::AI)
+	{
+	    while(Maps::ScanAroundObject(index_to, MP2::OBJ_RESOURCE, true, &dst_index2))
+		Action(dst_index2);
+	}
+
 	// possible hero is die
 	if(!isFreeman())
 	{
