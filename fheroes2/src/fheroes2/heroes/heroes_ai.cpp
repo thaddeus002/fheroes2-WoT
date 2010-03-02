@@ -71,6 +71,8 @@ void AIToAbandoneMine(Heroes &hero, const u8 obj, const u16 dst_index);
 void AIToBarrier(Heroes &hero, const u8 obj, const u16 dst_index);
 void AIToTravellersTent(Heroes &hero, const u8 obj, const u16 dst_index);
 void AIToShipwreckSurvivor(Heroes &hero, const u8 obj, const u16 dst_index);
+void AIToBoat(Heroes &hero, const u8 obj, const u16 dst_index);
+void AIToCoast(Heroes &hero, const u8 obj, const u16 dst_index);
 
 Skill::Primary::skill_t AISelectPrimarySkill(Heroes &hero)
 {
@@ -144,7 +146,10 @@ void Heroes::AIAction(const u16 dst_index)
 
     switch(object)
     {
-	case MP2::OBJ_MONSTER:		AIToMonster(*this, object, dst_index); break;
+        case MP2::OBJ_BOAT:		AIToBoat(*this, object, dst_index); break;
+        case MP2::OBJ_COAST:		AIToCoast(*this, object, dst_index); break;
+
+    	case MP2::OBJ_MONSTER:		AIToMonster(*this, object, dst_index); break;
 	case MP2::OBJ_HEROES:		AIToHeroes(*this, object, dst_index); break;
 	case MP2::OBJ_CASTLE:		AIToCastle(*this, object, dst_index); break;
 
@@ -1473,6 +1478,49 @@ void AIToArtifact(Heroes &hero, const u8 obj, const u16 dst_index)
     DEBUG(DBG_AI , DBG_INFO, "AIToArtifact: " << hero.GetName());
 }
 
+void AIToBoat(Heroes &hero, const u8 obj, const u16 dst_index)
+{
+    if(hero.isShipMaster()) return;
+
+    const u16 from_index = Maps::GetIndexFromAbsPoint(hero.GetCenter());
+
+    Maps::Tiles & tiles_from = world.GetTiles(from_index);
+    Maps::Tiles & tiles_to = world.GetTiles(dst_index);
+                
+    hero.ResetMovePoints();
+    tiles_from.SetObject(MP2::OBJ_COAST);
+    hero.SetCenter(dst_index);
+    hero.SetShipMaster(true);
+    tiles_to.SetObject(MP2::OBJ_HEROES);
+    hero.SaveUnderObject(MP2::OBJ_ZERO);
+
+    DEBUG(DBG_AI, DBG_INFO, "AIToBoat: " << hero.GetName());
+}
+
+void AIToCoast(Heroes &hero, const u8 obj, const u16 dst_index)
+{
+    if(! hero.isShipMaster()) return;
+
+    u16 from_index = Maps::GetIndexFromAbsPoint(hero.GetCenter());
+
+    Maps::Tiles & tiles_from = world.GetTiles(from_index);
+    Maps::Tiles & tiles_to = world.GetTiles(dst_index);
+
+    hero.ResetMovePoints();
+    tiles_from.SetObject(MP2::OBJ_BOAT);
+    hero.SetCenter(dst_index);
+    hero.SetShipMaster(false);
+    tiles_to.SetObject(MP2::OBJ_HEROES);
+    hero.SaveUnderObject(MP2::OBJ_ZERO);
+
+    if(Maps::TileUnderProtection(hero.GetIndex(), &from_index))
+        AIToMonster(hero, MP2::OBJ_MONSTER, from_index);
+
+    DEBUG(DBG_AI, DBG_INFO, "AIToCoast: " << hero.GetName());
+}
+
+
+                                                        
 
 
 
