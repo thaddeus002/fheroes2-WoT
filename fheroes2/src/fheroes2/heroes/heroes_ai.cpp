@@ -774,11 +774,10 @@ void AIToWhirlpools(Heroes &hero, const u16 index_from)
     world.GetTiles(index_from).SetObject(MP2::OBJ_WHIRLPOOL);
     world.GetTiles(index_to).SetObject(MP2::OBJ_HEROES);
 
-    if(Rand::Get(1))
-    {
-	Army::Troop & troops = hero.GetArmy().GetWeakestTroop();
-	troops.SetCount(Monster::GetCountFromHitPoints(troops(), troops.GetCount() * troops.GetHitPoints() / 2));
-    }
+    Army::Troop & troops = hero.GetArmy().GetWeakestTroop();
+
+    if(Rand::Get(1) && 1 < troops.GetCount())
+	troops.SetCount(Monster::GetCountFromHitPoints(troops(), troops.GetHitPoints() / 2));
 
     DEBUG(DBG_AI , DBG_INFO, "AIToWhirlpools: " << hero.GetName());
 }

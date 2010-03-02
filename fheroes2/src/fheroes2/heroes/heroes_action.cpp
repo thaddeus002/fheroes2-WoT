@@ -1983,7 +1983,7 @@ void ActionToWhirlpools(Heroes &hero, const u8 obj, const u16 index_from)
     hero.GetPath().Hide();
     hero.FadeOut();
 
-//    Cursor::Get().Hide();
+    Cursor::Get().Hide();
     hero.SetCenter(index_to);
     hero.Scoute();
 
@@ -2000,12 +2000,13 @@ void ActionToWhirlpools(Heroes &hero, const u8 obj, const u16 index_from)
     hero.GetPath().Hide();
     hero.FadeIn();
 
-    if(Rand::Get(1))
+    Army::Troop & troops = hero.GetArmy().GetWeakestTroop();
+
+    if(Rand::Get(1) && 1 < troops.GetCount())
     {
 	PlaySoundWarning;
 	Dialog::Message(_("A whirlpool engulfs your ship."), _("Some of your army has fallen overboard."), Font::BIG, Dialog::OK);
-	Army::Troop & troops = hero.GetArmy().GetWeakestTroop();
-	troops.SetCount(Monster::GetCountFromHitPoints(troops(), troops.GetCount() * troops.GetHitPoints() / 2));
+	troops.SetCount(Monster::GetCountFromHitPoints(troops(), troops.GetHitPoints() / 2));
     }
 
     DEBUG(DBG_GAME , DBG_INFO, "ActionToWhirlpools: " << hero.GetName());
