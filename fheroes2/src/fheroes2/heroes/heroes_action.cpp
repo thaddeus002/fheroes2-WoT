@@ -1945,7 +1945,7 @@ void ActionToTeleports(Heroes &hero, const u16 index_from)
     hero.GetPath().Hide();
     hero.FadeOut();
 
-    //Cursor::Get().Hide();
+    Cursor::Get().Hide();
     hero.SetCenter(index_to);
     hero.Scoute();
 
