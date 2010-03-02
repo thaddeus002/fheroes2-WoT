@@ -127,8 +127,11 @@ void Battle2::Arena::AIMagicAction(const Stats & b, Actions & a, const Stats* en
 
     if(b.Modes(SP_BERSERKER) || !hero || hero->Modes(Heroes::SPELLCASTED) || !hero->GetSpellBook().isActive()) return;
 
-    const Army::army_t* army = NULL;
+    const Army::army_t* my_army = b.GetArmy();
+    const Army::army_t* enemy_army = GetArmy(GetOppositeColor(b.GetColor()));
+
     const Army::Troop* troop = NULL;
+    const Stats* stats = NULL;
 
     // troop bad spell - clean
     if(b.Modes(IS_BAD_MAGIC))
@@ -143,18 +146,10 @@ void Battle2::Arena::AIMagicAction(const Stats & b, Actions & a, const Stats* en
 	if(!enemy->Modes(SP_CURSE) && isApplySpell(Spell::CURSE, enemy, *hero, a)) return;
 	// enemy good spell - clean
 	if(enemy->Modes(IS_GOOD_MAGIC) && isApplySpell(Spell::DISPEL, enemy, *hero, a)) return;
-    }
 
-    // enemy army scan 1
-    if(NULL != (army = GetArmy(GetOppositeColor(b.GetColor()))))
-    {
-	// find archers
-	if(army->BattleArchersPresent() ||
-	// or archers tower
-	    (castle && castle->GetColor() != b.GetColor() && castle->isCastle()))
-	{
-	    if(!b.Modes(SP_SHIELD) && isApplySpell(Spell::SHIELD, &b, *hero, a)) return;
-	}
+	// up defence
+	if(!b.Modes(SP_STEELSKIN) && !b.Modes(SP_STONESKIN) && isApplySpell(Spell::STEELSKIN, &b, *hero, a)) return;
+	if(!b.Modes(SP_STONESKIN) && !b.Modes(SP_STEELSKIN) && isApplySpell(Spell::STONESKIN, &b, *hero, a)) return;
     }
 
     // my army blessing
@@ -166,62 +161,79 @@ void Battle2::Arena::AIMagicAction(const Stats & b, Actions & a, const Stats* en
 	if(!b.Modes(SP_HASTE) && isApplySpell(Spell::HASTE, &b, *hero, a)) return;
     }
 
-    if(enemy)
+    // shield spell conditions
+    if(NULL != enemy_army)
     {
-	if(!b.Modes(SP_STEELSKIN) && !b.Modes(SP_STONESKIN) && isApplySpell(Spell::STEELSKIN, &b, *hero, a)) return;
-	if(!b.Modes(SP_STONESKIN) && !b.Modes(SP_STEELSKIN) && isApplySpell(Spell::STONESKIN, &b, *hero, a)) return;
+	// find archers
+	if(enemy_army->BattleArchersPresent() ||
+	// or archers tower
+	    (castle && castle->GetColor() != b.GetColor() && castle->isCastle()))
+	{
+	    if(!b.Modes(SP_SHIELD) && isApplySpell(Spell::SHIELD, &b, *hero, a)) return;
+	}
     }
 
     // my army scan - clean
-    if(NULL != (army = b.GetArmy()) && NULL != (troop = army->BattleFindModes(IS_BAD_MAGIC)))
+    if(NULL != my_army && NULL != (troop = my_army->BattleFindModes(IS_BAD_MAGIC)))
     {
-	if(NULL != (enemy = troop->GetBattleStats()))
+	if(NULL != (stats = troop->GetBattleStats()))
 	{
-	    if(isApplySpell(Spell::DISPEL, enemy, *hero, a)) return;
-	    if(isApplySpell(Spell::CURE, enemy, *hero, a)) return;
+	    if(isApplySpell(Spell::DISPEL, stats, *hero, a)) return;
+	    if(isApplySpell(Spell::CURE, stats, *hero, a)) return;
 	}
     }
 
-    // enemy army scan 2
-    if(NULL != (army = GetArmy(GetOppositeColor(b.GetColor()))))
+    // enemy army spell
+    if(NULL != enemy_army)
     {
 	// find mirror image or summon elem
-	if(NULL != (troop = army->BattleFindModes(CAP_MIRRORIMAGE | CAP_SUMMONELEM)) && NULL != (enemy = troop->GetBattleStats()))
+	if(NULL != (troop = enemy_army->BattleFindModes(CAP_MIRRORIMAGE | CAP_SUMMONELEM)) && NULL != (stats = troop->GetBattleStats()))
 	{
-	    if(isApplySpell(Spell::ARROW, enemy, *hero, a)) return;
-	    if(isApplySpell(Spell::COLDRAY, enemy, *hero, a)) return;
-	    if(isApplySpell(Spell::FIREBALL, enemy, *hero, a)) return;
-	    if(isApplySpell(Spell::LIGHTNINGBOLT, enemy, *hero, a)) return;
+	    if(isApplySpell(Spell::ARROW, stats, *hero, a)) return;
+	    if(isApplySpell(Spell::COLDRAY, stats, *hero, a)) return;
+	    if(isApplySpell(Spell::FIREBALL, stats, *hero, a)) return;
+	    if(isApplySpell(Spell::LIGHTNINGBOLT, stats, *hero, a)) return;
 	}
 
 	// find good magic
-	if(NULL != (troop = army->BattleFindModes(IS_GOOD_MAGIC)) && NULL != (enemy = troop->GetBattleStats()))
+	if(NULL != (troop = enemy_army->BattleFindModes(IS_GOOD_MAGIC)) && NULL != (stats = troop->GetBattleStats()))
 	{
 	    // slow
-	    if(enemy->Modes(SP_HASTE) && isApplySpell(Spell::SLOW, enemy, *hero, a)) return;
+	    if(enemy->Modes(SP_HASTE) && isApplySpell(Spell::SLOW, stats, *hero, a)) return;
 	    // curse
-	    if(!enemy->Modes(SP_CURSE) && isApplySpell(Spell::CURSE, enemy, *hero, a)) return;
+	    if(!enemy->Modes(SP_CURSE) && isApplySpell(Spell::CURSE, stats, *hero, a)) return;
 	    //
-	    if(isApplySpell(Spell::DISPEL, enemy, *hero, a)) return;
+	    if(isApplySpell(Spell::DISPEL, stats, *hero, a)) return;
 	}
+
+	// check undead
+	if(my_army->BattleUndeadTroopCount() < enemy_army->BattleUndeadTroopCount())
+	{
+	    if(isApplySpell(Spell::HOLYSHOUT, NULL, *hero, a)) return;
+	    if(isApplySpell(Spell::HOLYWORD, NULL, *hero, a)) return;
+	}
+
+	// check alife
+	if(my_army->BattleLifeTroopCount() < enemy_army->BattleLifeTroopCount())
+	{
+	    if(isApplySpell(Spell::DEATHRIPPLE, NULL, *hero, a)) return;
+	    if(isApplySpell(Spell::DEATHWAVE, NULL, *hero, a)) return;
+	}
+
+	stats = enemy_army->BattleRandomTroop();
+
+	if(isApplySpell(Spell::LIGHTNINGBOLT, stats, *hero, a)) return;
+	if(isApplySpell(Spell::FIREBALL, stats, *hero, a)) return;
+	if(isApplySpell(Spell::COLDRAY, stats, *hero, a)) return;
+	if(isApplySpell(Spell::ARROW, stats, *hero, a)) return;
     }
 
-    /* FIX: Battle2::Arena: AIMagicAction:Damage Spell:
-    Spell::ARROW
-    Spell::COLDRAY
-    Spell::FIREBALL
-    Spell::LIGHTNINGBOLT
-
+/* FIX: Battle2::Arena: AIMagicAction:Damage Spell:
     Spell::FIREBLAST
     Spell::COLDRING
     Spell::CHAINLIGHTNING
     Spell::METEORSHOWER
-
-    Spell::DEATHWAVE
-    Spell::HOLYWORD
-    Spell::HOLYSHOUT
-    Spell::DEATHRIPPLE
-    */
+*/
 
     if(isApplySpell(Spell::ARMAGEDDON, NULL, *hero, a)) return;
     if(isApplySpell(Spell::ELEMENTALSTORM, NULL, *hero, a)) return;

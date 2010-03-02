@@ -86,6 +86,9 @@ namespace Army
 	    bool	BattleArchersPresent(void) const;
 	    bool	BattleDragonsPresent(void) const;
 	    u32		BattleKilled(void) const;
+	    u8		BattleUndeadTroopCount(void) const;
+	    u8		BattleLifeTroopCount(void) const;
+	    const Battle2::Stats* BattleRandomTroop(void) const;
 	    Battle2::Stats* BattleSlowestTroop(bool skipmove);
 	    Battle2::Stats* BattleFastestTroop(bool skipmove);
 

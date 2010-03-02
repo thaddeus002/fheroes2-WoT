@@ -741,6 +741,28 @@ u32 Army::army_t::BattleKilled(void) const
     return res;
 }
 
+u8 Army::army_t::BattleUndeadTroopCount(void) const
+{
+    return std::count_if(army.begin(), army.end(), std::mem_fun_ref(&Troop::isUndead));
+}
+
+u8 Army::army_t::BattleLifeTroopCount(void) const
+{
+    return GetCount() - std::count_if(army.begin(), army.end(), std::mem_fun_ref(&Troop::isUndead)) -
+	std::count_if(army.begin(), army.end(), std::mem_fun_ref(&Troop::isElemental));
+}
+
+const Battle2::Stats* Army::army_t::BattleRandomTroop(void) const
+{
+    std::vector<const Battle2::Stats*> v;
+
+    std::vector<Troop>::const_iterator it = army.begin();
+    for(; it != army.end(); ++it) if((*it).isValid())
+	v.push_back((*it).GetBattleStats());
+
+    return v.size() ? *Rand::Get(v) : NULL;
+}
+
 bool Army::army_t::BattleArchersPresent(void) const
 {
     return army.end() != std::find_if(army.begin(), army.end(), std::mem_fun_ref(&Troop::BattleIsArchers));

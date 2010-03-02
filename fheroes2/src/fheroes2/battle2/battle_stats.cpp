@@ -101,7 +101,7 @@ namespace Battle2
         { ICN::ROC     , {18, 7}, { 0, 0}, { 1, 3}, { 4, 3}, { 7, 1}, { 0, 0}, { 0, 0}, { 0, 0}, { 0, 0}, { 0, 0}, {14, 3}, { 8, 3}, {11, 3}, {17, 1}, {25, 9}, M82::ROC_ATTK, M82::ROC_KILL, M82::ROC_MOVE, M82::ROC_WNCE },
         { ICN::MAGE1   , { 1, 7}, {43, 8}, { 0, 0}, { 0, 0}, { 0, 0}, {18, 1}, {21, 2}, {19, 2}, {23, 4}, {27, 1}, {34, 3}, {28, 6}, {37, 6}, { 8, 3}, {11, 8}, M82::MAGEATTK, M82::MAGEKILL, M82::MAGEMOVE, M82::MAGEWNCE },
         { ICN::MAGE2   , { 1, 7}, {43, 8}, { 0, 0}, { 0, 0}, { 0, 0}, {18, 1}, {21, 2}, {19, 2}, {23, 4}, {27, 1}, {34, 3}, {28, 6}, {37, 6}, { 8, 3}, {11, 8}, M82::MAGEATTK, M82::MAGEKILL, M82::MAGEMOVE, M82::MAGEWNCE },
-        { ICN::TITANBLU, { 1, 6}, { 7, 7}, { 0, 0}, { 0, 0}, { 0, 0}, { 0, 0}, { 0, 0}, { 0, 0}, { 0, 0}, { 0, 0}, {19, 5}, {14, 5}, {24, 5}, {29, 2}, {31, 8}, M82::TITNATTK, M82::TITNKILL, M82::TITNMOVE, M82::TITNWNCE },
+        { ICN::TITANBLU, { 1, 6}, { 7, 7}, { 0, 0}, { 0, 0}, { 0, 0}, { 0, 0}, { 0, 0}, { 0, 0}, { 0, 0}, { 0, 0}, {19, 5}, {14, 5}, {24, 5}, {29, 2}, {31, 7}, M82::TITNATTK, M82::TITNKILL, M82::TITNMOVE, M82::TITNWNCE },
         { ICN::TITANBLA, { 1, 6}, { 7, 7}, { 0, 0}, { 0, 0}, { 0, 0}, { 0, 0}, {45, 5}, {38, 5}, {50, 5}, { 0, 0}, {19, 5}, {14, 5}, {24, 5}, {29, 2}, {31, 7}, M82::TITNATTK, M82::TITNKILL, M82::TITNMOVE, M82::TITNWNCE },
 
 	// icn_file      idle     move     fly1     fly2     fly3     shot0    shot1    shot2    shot3    attk0    attk1    attk2    attk3    wcne     kill     m82_attk       m82_kill       m82_move       m82_wnce
