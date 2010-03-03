@@ -31,8 +31,8 @@ Left		- move hero left
 Right		- move hero right
 Ctrl + Up	- scroll map top    (alt. key ';')
 Ctrl + Down 	- scroll map bottom (alt. key '/')
-Ctrl + Left	- scroll map left   (alt. key '.')
-Ctrl + Right	- scroll map right  (alt. key ',')
+Ctrl + Left	- scroll map left   (alt. key ',')
+Ctrl + Right	- scroll map right  (alt. key '.')
 e		- end turn
 t		- next town
 h		- next hero
