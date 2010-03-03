@@ -621,6 +621,6 @@ void Interface::GameArea::QueueEventProcessing(void)
     if(le.MouseClickLeft(tile_pos) && Cursor::POINTER != cursor.Themes())
         Game::MouseCursorAreaClickLeft(index);
     else
-    if(le.MousePressRight(tile_pos))
+    if(le.MousePressRight(tile_pos) && !NeedScroll())
         Game::MouseCursorAreaPressRight(index);
 }

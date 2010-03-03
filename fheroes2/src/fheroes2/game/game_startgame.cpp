@@ -842,15 +842,16 @@ Game::menu_t Game::HumanTurn(void)
 	    case KEY_m:		ButtonMovement(); break;
 	    // system options
 	    case KEY_o:		ButtonSystem(); break;
-	    // scroll
-    	    case KEY_LESS:
-	    case KEY_LEFT:	KeyPress_LEFT(); break;
-    	    case KEY_GREATER:
+	    // scroll or move
+    	    case KEY_LEFT:	KeyPress_LEFT(); break;
 	    case KEY_RIGHT:	KeyPress_RIGHT(); break;
-    	    case KEY_CARET:
 	    case KEY_UP:	KeyPress_TOP(); break;
-    	    case KEY_UNDERSCORE:
 	    case KEY_DOWN:	KeyPress_BOTTOM(); break;
+	    // scroll
+	    case KEY_COMMA:	I.gameArea.SetScroll(SCROLL_LEFT); break;
+    	    case KEY_PERIOD:	I.gameArea.SetScroll(SCROLL_RIGHT); break;
+    	    case KEY_SEMICOLON:	I.gameArea.SetScroll(SCROLL_TOP); break;
+    	    case KEY_SLASH:	I.gameArea.SetScroll(SCROLL_BOTTOM); break;
 
     	    // show/hide control panel
 	    case KEY_1:		SwitchShowControlPanel(); break;
