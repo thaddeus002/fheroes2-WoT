@@ -784,8 +784,8 @@ Battle2::Stats* Army::army_t::BattleFastestTroop(bool skipmove)
 	Battle2::Stats* b = (*it).GetBattleStats();
 
 	if(b && !b->Modes(Battle2::TR_MOVED) &&
-	   ((skipmove && b->Modes(Battle2::TR_SKIPMOVE)) ||
-	    (!skipmove && !b->Modes(Battle2::TR_SKIPMOVE)) && Speed::STANDING < b->GetSpeed()) &&
+	   ((skipmove && b->Modes(Battle2::TR_SKIPMOVE)) || (!skipmove && !b->Modes(Battle2::TR_SKIPMOVE))) &&
+	   Speed::STANDING < b->GetSpeed() &&
 	   (NULL == cur || b->GetSpeed() > cur->GetSpeed())) cur = b;
     }
 
@@ -802,8 +802,8 @@ Battle2::Stats* Army::army_t::BattleSlowestTroop(bool skipmove)
 	Battle2::Stats* b = (*it).GetBattleStats();
 
 	if(b && !b->Modes(Battle2::TR_MOVED) &&
-	   ((skipmove && b->Modes(Battle2::TR_SKIPMOVE)) ||
-	    (!skipmove && !b->Modes(Battle2::TR_SKIPMOVE)) && Speed::STANDING < b->GetSpeed()) &&
+	   ((skipmove && b->Modes(Battle2::TR_SKIPMOVE)) ||(!skipmove && !b->Modes(Battle2::TR_SKIPMOVE))) &&
+	   Speed::STANDING < b->GetSpeed() &&
 	   (NULL == cur || b->GetSpeed() < cur->GetSpeed())) cur = b;
     }
 
