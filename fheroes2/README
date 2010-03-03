@@ -29,10 +29,10 @@ Up		- move hero top
 Down		- move hero bottom
 Left		- move hero left
 Right		- move hero right
-Ctrl + Up	- scroll map top
-Ctrl + Down	- scroll map bottom
-Ctrl + Left	- scroll map left
-Ctrl + Right	- scroll map right
+Ctrl + Up	- scroll map top    (alt. key '^')
+Ctrl + Down 	- scroll map bottom (alt. key '_')
+Ctrl + Left	- scroll map left   (alt. key '<')
+Ctrl + Right	- scroll map right  (alt. key '>')
 e		- end turn
 t		- next town
 h		- next hero
@@ -42,14 +42,15 @@ l		- load game
 i		- game info
 p		- puzzle dialog
 d		- digging artifact for current hero
-space		- default action
-return 		- open dialog
+space or a	- default action
+return or n	- open dialog
 o		- system dialog
-n		- new game
-r		- show/hide radar (only for option: hide interface = on)
-w		- show/hide status window (only for option: hide interface = on)
-c		- show/hide hero/town icons (only for option: hide interface = on)
-b		- show/hide buttons (only for option: hide interface = on)
+
+1		- show/hide control panel
+2		- show/hide radar (only for option: hide interface = on)
+3		- show/hide buttons (only for option: hide interface = on)
+4		- show/hide status window (only for option: hide interface = on)
+5		- show/hide hero/town icons (only for option: hide interface = on)
 
 Main menu:
 n		- new game

@@ -25,6 +25,17 @@
 
 #define TAP_DELAY_EMULATE 1050
 
+namespace
+{
+#ifdef _WIN32_WCE
+    static KeySym _hw_buttons[] = { 
+	KEY_HW01, KEY_HW02, KEY_HW03, KEY_HW04, KEY_HW05,
+	KEY_HW06, KEY_HW07, KEY_HW08, KEY_HW09, KEY_HW10,
+	KEY_HW11, KEY_HW12, KEY_HW13, KEY_HW14, KEY_HW15,
+	KEY_LEFT, KEY_RIGHT,KEY_UP,   KEY_DOWN, KEY_RETURN, KEY_NONE };
+#endif
+};
+
 LocalEvent::LocalEvent() : modes(0), key_value(KEY_NONE), mouse_state(0),
     mouse_button(0), mouse_st(0, 0), redraw_cursor_func(NULL), keyboard_filter_func(NULL), clock_delay(TAP_DELAY_EMULATE)
 {
@@ -67,13 +78,28 @@ void LocalEvent::SetGlobalFilter(bool f)
     f ? SetModes(GLOBAL_FILTER) : ResetModes(GLOBAL_FILTER);
 }
 
-static KeySym SDLToKeySym(SDLKey key)
+KeySym SDLToKeySym(SDLKey key)
 {
+
     switch(key)
     {
 	default: break;
-	case SDLK_ESCAPE:	return KEY_ESCAPE;
+
+#ifdef _WIN32_WCE
+	case SDLK_RETURN:	return _hw_buttons[19];
+	case SDLK_LEFT:		return _hw_buttons[15];
+	case SDLK_RIGHT:	return _hw_buttons[16];
+	case SDLK_UP:		return _hw_buttons[17];
+	case SDLK_DOWN:		return _hw_buttons[18];
+#else
 	case SDLK_RETURN:	return KEY_RETURN;
+	case SDLK_LEFT:		return KEY_LEFT;
+	case SDLK_RIGHT:	return KEY_RIGHT;
+	case SDLK_UP:		return KEY_UP;
+	case SDLK_DOWN:		return KEY_DOWN;
+#endif
+
+	case SDLK_ESCAPE:	return KEY_ESCAPE;
 	case SDLK_KP_ENTER:	return KEY_RETURN;
 	case SDLK_BACKSPACE:	return KEY_BACKSPACE;
 	case SDLK_EXCLAIM:    	return KEY_EXCLAIM;
@@ -125,10 +151,6 @@ static KeySym SDLToKeySym(SDLKey key)
 	case SDLK_F11:		return KEY_F11;
 	case SDLK_F12:		return KEY_F12;
 	case SDLK_PRINT:	return KEY_PRINT;
-	case SDLK_LEFT:		return KEY_LEFT;
-	case SDLK_RIGHT:	return KEY_RIGHT;
-	case SDLK_UP:		return KEY_UP;
-	case SDLK_DOWN:		return KEY_DOWN;
 	case SDLK_0:		return KEY_0;
 	case SDLK_1:		return KEY_1;
 	case SDLK_2:		return KEY_2;
@@ -165,6 +187,24 @@ static KeySym SDLToKeySym(SDLKey key)
 	case SDLK_x:		return KEY_x;
 	case SDLK_y:		return KEY_y;
 	case SDLK_z:		return KEY_z;
+
+#ifdef _WIN32_WCE
+	case SDLK_WORLD_33:	return _hw_buttons[0];
+	case SDLK_WORLD_34:	return _hw_buttons[1];
+	case SDLK_WORLD_35:	return _hw_buttons[2];
+	case SDLK_WORLD_36:	return _hw_buttons[3];
+	case SDLK_WORLD_37:	return _hw_buttons[4];
+	case SDLK_WORLD_38:	return _hw_buttons[5];
+	case SDLK_WORLD_39:	return _hw_buttons[6];
+	case SDLK_WORLD_40:	return _hw_buttons[7];
+	case SDLK_WORLD_41:	return _hw_buttons[8];
+	case SDLK_WORLD_42:	return _hw_buttons[9];
+	case SDLK_WORLD_43:	return _hw_buttons[10];
+	case SDLK_WORLD_44:	return _hw_buttons[11];
+	case SDLK_WORLD_45:	return _hw_buttons[12];
+	case SDLK_WORLD_46:	return _hw_buttons[13];
+	case SDLK_WORLD_47:	return _hw_buttons[14];
+#endif
     }
 
     return KEY_NONE;
@@ -177,6 +217,38 @@ LocalEvent & LocalEvent::Get(void)
 
     return le;
 }
+
+#ifdef _WIN32_WCE
+void LocalEvent::SetHardwareButton(KeySym a, KeySym b)
+{
+    switch(a)
+    {
+	case KEY_HW01:	_hw_buttons[0] = b; break;
+	case KEY_HW02:	_hw_buttons[1] = b; break;
+	case KEY_HW03:	_hw_buttons[2] = b; break;
+	case KEY_HW04:	_hw_buttons[3] = b; break;
+	case KEY_HW05:	_hw_buttons[4] = b; break;
+	case KEY_HW06:	_hw_buttons[5] = b; break;
+	case KEY_HW07:	_hw_buttons[6] = b; break;
+	case KEY_HW08:	_hw_buttons[7] = b; break;
+	case KEY_HW09:	_hw_buttons[8] = b; break;
+	case KEY_HW10:	_hw_buttons[9] = b; break;
+	case KEY_HW11:	_hw_buttons[10] = b; break;
+	case KEY_HW12:	_hw_buttons[11] = b; break;
+	case KEY_HW13:	_hw_buttons[12] = b; break;
+	case KEY_HW14:	_hw_buttons[13] = b; break;
+	case KEY_HW15:	_hw_buttons[14] = b; break;
+
+	case KEY_LEFT:	_hw_buttons[15] = b; break;
+	case KEY_RIGHT:	_hw_buttons[16] = b; break;
+	case KEY_UP:	_hw_buttons[17] = b; break;
+	case KEY_DOWN:	_hw_buttons[18] = b; break;
+	case KEY_RETURN:_hw_buttons[19] = b; break;
+
+	default: break;
+    }
+}
+#endif
 
 bool LocalEvent::HandleEvents(bool delay)
 {

@@ -539,6 +539,48 @@ void Settings::Parse(const std::string & left, const std::string & right)
     // tap delay for right click emulation
     else
     if(left == "tap delay") LocalEvent::Get().SetTapDelayForRightClickEmulation(String::ToInt(right));
+#ifdef _WIN32_WCE
+    else
+    if(left == "key_hw01") LocalEvent::Get().SetHardwareButton(KEY_HW01, KeySymFromChar(right[0]));
+    else
+    if(left == "key_hw02") LocalEvent::Get().SetHardwareButton(KEY_HW02, KeySymFromChar(right[0]));
+    else
+    if(left == "key_hw03") LocalEvent::Get().SetHardwareButton(KEY_HW03, KeySymFromChar(right[0]));
+    else
+    if(left == "key_hw04") LocalEvent::Get().SetHardwareButton(KEY_HW04, KeySymFromChar(right[0]));
+    else
+    if(left == "key_hw05") LocalEvent::Get().SetHardwareButton(KEY_HW05, KeySymFromChar(right[0]));
+    else
+    if(left == "key_hw06") LocalEvent::Get().SetHardwareButton(KEY_HW06, KeySymFromChar(right[0]));
+    else
+    if(left == "key_hw07") LocalEvent::Get().SetHardwareButton(KEY_HW07, KeySymFromChar(right[0]));
+    else
+    if(left == "key_hw08") LocalEvent::Get().SetHardwareButton(KEY_HW08, KeySymFromChar(right[0]));
+    else
+    if(left == "key_hw09") LocalEvent::Get().SetHardwareButton(KEY_HW09, KeySymFromChar(right[0]));
+    else
+    if(left == "key_hw10") LocalEvent::Get().SetHardwareButton(KEY_HW10, KeySymFromChar(right[0]));
+    else
+    if(left == "key_hw11") LocalEvent::Get().SetHardwareButton(KEY_HW11, KeySymFromChar(right[0]));
+    else
+    if(left == "key_hw12") LocalEvent::Get().SetHardwareButton(KEY_HW12, KeySymFromChar(right[0]));
+    else
+    if(left == "key_hw13") LocalEvent::Get().SetHardwareButton(KEY_HW13, KeySymFromChar(right[0]));
+    else
+    if(left == "key_hw14") LocalEvent::Get().SetHardwareButton(KEY_HW14, KeySymFromChar(right[0]));
+    else
+    if(left == "key_hw15") LocalEvent::Get().SetHardwareButton(KEY_HW15, KeySymFromChar(right[0]));
+    else
+    if(left == "key_left") LocalEvent::Get().SetHardwareButton(KEY_LEFT, KeySymFromChar(right[0]));
+    else
+    if(left == "key_right") LocalEvent::Get().SetHardwareButton(KEY_RIGHT, KeySymFromChar(right[0]));
+    else
+    if(left == "key_up") LocalEvent::Get().SetHardwareButton(KEY_UP, KeySymFromChar(right[0]));
+    else
+    if(left == "key_down") LocalEvent::Get().SetHardwareButton(KEY_DOWN, KeySymFromChar(right[0]));
+    else
+    if(left == "key_return") LocalEvent::Get().SetHardwareButton(KEY_RETURN, KeySymFromChar(right[0]));
+#endif
 }
 
 /* set level debug */

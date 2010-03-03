@@ -48,6 +48,7 @@ namespace String
 };
 
 int Sign(int);
+KeySym KeySymFromChar(char);
 
 const char* GetDirname(const char *);
 const char* GetBasename(const char *);

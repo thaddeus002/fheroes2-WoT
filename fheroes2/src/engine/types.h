@@ -37,7 +37,7 @@ typedef SDL_Color Colors;
 #define MAXU16   0xFFFF
 #define MAXU32   0xFFFFFFFF
 
-#if defined(__WIN32__)
+#ifdef __WIN32__
 #include <io.h>
 #define MKDIR(X)    mkdir(X)
 #define SEPARATOR       '\\'

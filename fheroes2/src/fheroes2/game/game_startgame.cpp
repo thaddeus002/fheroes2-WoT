@@ -85,11 +85,12 @@ namespace Game
     void KeyPress_RIGHT(void);
     void KeyPress_TOP(void);
     void KeyPress_BOTTOM(void);
-    void KeyPress_r(void);
-    void KeyPress_b(void);
-    void KeyPress_w(void);
-    void KeyPress_c(void);
-    void KeyPress_a(void);
+
+    void SwitchShowRadar(void);
+    void SwitchShowStatus(void);
+    void SwitchShowButtons(void);
+    void SwitchShowIcons(void);
+    void SwitchShowControlPanel(void);
 
     void NewWeekDialog(void);
     void ShowEventDay(void);
@@ -806,7 +807,7 @@ Game::menu_t Game::HumanTurn(void)
 	// for pocketpc: auto hide status if start turn
 	if(autohide_status && conf.ShowStatus() && ticket > 300)
 	{
-	    KeyPress_w();
+	    SwitchShowStatus();
 	    autohide_status = false;
 	}
 
@@ -815,8 +816,6 @@ Game::menu_t Game::HumanTurn(void)
 	{
 	    // exit
 	    case KEY_ESCAPE:	KeyPress_ESC(res); break;
-    	    // show/hide control panel
-	    case KEY_a:		KeyPress_a(); break;
     	    // end turn
 	    case KEY_e:		KeyPress_e(res); break;
     	    // next hero
@@ -834,29 +833,35 @@ Game::menu_t Game::HumanTurn(void)
 	    // dig artifact
 	    case KEY_d:		KeyPress_d(res); break;
 	    // default action
+	    case KEY_a:
 	    case KEY_SPACE:	KeyPress_SPACE(); break;
 	    // hero/town dialog
+	    case KEY_n:
 	    case KEY_RETURN:	KeyPress_RETURN(); break;
 	    // hero movement
 	    case KEY_m:		ButtonMovement(); break;
 	    // system options
 	    case KEY_o:		ButtonSystem(); break;
-	    // new game
-	    case KEY_n:		StartNewGame(res); break;
 	    // scroll
+    	    case KEY_LESS:
 	    case KEY_LEFT:	KeyPress_LEFT(); break;
+    	    case KEY_GREATER:
 	    case KEY_RIGHT:	KeyPress_RIGHT(); break;
+    	    case KEY_CARET:
 	    case KEY_UP:	KeyPress_TOP(); break;
+    	    case KEY_UNDERSCORE:
 	    case KEY_DOWN:	KeyPress_BOTTOM(); break;
 
+    	    // show/hide control panel
+	    case KEY_1:		SwitchShowControlPanel(); break;
 	    // hide/show radar
-	    case KEY_r:		KeyPress_r(); break;
+	    case KEY_2:		SwitchShowRadar(); break;
 	    // hide/show buttons
-	    case KEY_b:		KeyPress_b(); break;
+	    case KEY_3:		SwitchShowButtons(); break;
 	    // hide/show status window
-	    case KEY_w:		KeyPress_w(); break;
+	    case KEY_4:		SwitchShowStatus(); break;
 	    // hide/show hero/town icons
-	    case KEY_c:		KeyPress_c(); break;
+	    case KEY_5:		SwitchShowIcons(); break;
 	    
 	    default: break;
 	}
@@ -1569,7 +1574,7 @@ void Game::ShowWarningLostTowns(menu_t & ret)
     }
 }
 
-void Game::KeyPress_r(void)
+void Game::SwitchShowRadar(void)
 {
     Settings & conf = Settings::Get();
 
@@ -1595,7 +1600,7 @@ void Game::KeyPress_r(void)
     }
 }
 
-void Game::KeyPress_b(void)
+void Game::SwitchShowButtons(void)
 {
     Settings & conf = Settings::Get();
 
@@ -1621,7 +1626,7 @@ void Game::KeyPress_b(void)
     }
 }
 
-void Game::KeyPress_w(void)
+void Game::SwitchShowStatus(void)
 {
     Settings & conf = Settings::Get();
 
@@ -1647,7 +1652,7 @@ void Game::KeyPress_w(void)
     }
 }
 
-void Game::KeyPress_c(void)
+void Game::SwitchShowIcons(void)
 {
     Settings & conf = Settings::Get();
 
@@ -1673,7 +1678,7 @@ void Game::KeyPress_c(void)
     }
 }
 
-void Game::KeyPress_a(void)
+void Game::SwitchShowControlPanel(void)
 {
     Settings & conf = Settings::Get();
 

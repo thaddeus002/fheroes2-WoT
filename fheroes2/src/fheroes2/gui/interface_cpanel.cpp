@@ -27,10 +27,10 @@
 
 namespace Game
 {
-    extern void KeyPress_r(void);
-    extern void KeyPress_b(void);
-    extern void KeyPress_w(void);
-    extern void KeyPress_c(void);
+    extern void SwitchShowRadar(void);
+    extern void SwitchShowStatus(void);
+    extern void SwitchShowButtons(void);
+    extern void SwitchShowIcons(void);
     extern void KeyPress_e(menu_t &);
     extern void KeyPress_ESC(menu_t &);
 };
@@ -142,13 +142,13 @@ void Interface::ControlPanel::QueueEventProcessing(Game::menu_t & ret)
 {
     LocalEvent & le = LocalEvent::Get();
 
-    if(le.MouseClickLeft(rt_radr))	Game::KeyPress_r();
+    if(le.MouseClickLeft(rt_radr))	Game::SwitchShowRadar();
     else
-    if(le.MouseClickLeft(rt_icon))	Game::KeyPress_c();
+    if(le.MouseClickLeft(rt_icon))	Game::SwitchShowIcons();
     else
-    if(le.MouseClickLeft(rt_bttn))	Game::KeyPress_b();
+    if(le.MouseClickLeft(rt_bttn))	Game::SwitchShowButtons();
     else
-    if(le.MouseClickLeft(rt_stat))	Game::KeyPress_w();
+    if(le.MouseClickLeft(rt_stat))	Game::SwitchShowStatus();
     else
     if(le.MouseClickLeft(rt_quit))	Game::KeyPress_e(ret);
     //if(le.MouseClickLeft(rt_quit))	Game::KeyPress_ESC(ret);
