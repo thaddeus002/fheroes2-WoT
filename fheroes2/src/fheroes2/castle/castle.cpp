@@ -1662,7 +1662,7 @@ bool Castle::BuyBoat(void)
 
     const u16 index = GetIndex() + world.w() * 2;
     Maps::Tiles & left = world.GetTiles(index - 1);
-    Maps::Tiles & left = world.GetTiles(index - 1);
+    Maps::Tiles & right = world.GetTiles(index + 1);
     Maps::Tiles & center = world.GetTiles(index);
 
     if(MP2::OBJ_ZERO == left.GetObject())
