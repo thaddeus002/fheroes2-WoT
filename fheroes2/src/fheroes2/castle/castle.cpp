@@ -115,13 +115,8 @@ void Castle::LoadFromMP2(const void *ptr)
     {
 	ptr8 += 6;
 
-	// default building
-        building |= BUILD_TAVERN;
+        // default building
         building |= DWELLING_MONSTER1;
-        building |= DWELLING_MONSTER2;
-
-	// default dwelling
-	// default magic tower
     }
 
     // custom troops
