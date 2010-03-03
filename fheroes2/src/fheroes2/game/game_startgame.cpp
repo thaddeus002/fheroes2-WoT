@@ -866,6 +866,19 @@ Game::menu_t Game::HumanTurn(void)
 	    default: break;
 	}
 
+#ifdef _WIN32_WCE
+	// scroll area maps left
+	if(le.MousePressRight(I.GetAreaScrollLeft())) I.gameArea.SetScroll(SCROLL_LEFT);
+        else
+	// scroll area maps right
+	if(le.MousePressRight(I.GetAreaScrollRight())) I.gameArea.SetScroll(SCROLL_RIGHT);
+	else
+	// scroll area maps top
+	if(le.MousePressRight(I.GetAreaScrollTop())) I.gameArea.SetScroll(SCROLL_TOP);
+	else
+	// scroll area maps bottom
+	if(le.MousePressRight(I.GetAreaScrollBottom())) I.gameArea.SetScroll(SCROLL_BOTTOM);
+#else
 	// scroll area maps left
 	if(le.MouseCursor(I.GetAreaScrollLeft())) I.gameArea.SetScroll(SCROLL_LEFT);
         else
@@ -877,6 +890,7 @@ Game::menu_t Game::HumanTurn(void)
 	else
 	// scroll area maps bottom
 	if(le.MouseCursor(I.GetAreaScrollBottom())) I.gameArea.SetScroll(SCROLL_BOTTOM);
+#endif
 	else
 	// cursor over radar
         if((!conf.HideInterface() || conf.ShowRadar()) &&
