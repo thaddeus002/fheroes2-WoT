@@ -136,7 +136,7 @@ public:
 
     u16 CountObeliskOnMaps(void);
 
-    bool CreateBoat(const u16 center, bool build, u16* dst = NULL);
+    //bool CreateBoat(const u16 center, bool build, u16* dst = NULL);
     void ClearFog(const u8 color);
 
     u16  CheckKingdomWins(const Kingdom &) const;

@@ -1399,9 +1399,26 @@ bool Castle::HaveNearlySea(void) const
     return Modes(NEARLYSEA);
 }
 
+bool TilePresentBoat(const Maps::Tiles & tile)
+{
+    return (Maps::Ground::WATER == tile.GetGround() &&
+	(tile.GetObject() == MP2::OBJ_BOAT || tile.GetObject() == MP2::OBJ_HEROES));
+}
+
 bool Castle::PresentBoat(void) const
 {
-    return 3 > Maps::GetApproximateDistance(GetIndex(), world.GetNearestObject(GetIndex(), MP2::OBJ_BOAT));
+    // 2 cell down
+    const u16 index = GetIndex() + world.w() * 2;
+    const u16 max = world.w() * world.h();
+
+    if(index + 1 < max)
+    {
+	const Maps::Tiles & left = world.GetTiles(index - 1);
+	const Maps::Tiles & right = world.GetTiles(index + 1);
+
+	if(TilePresentBoat(left) || TilePresentBoat(right)) return true;
+    }
+    return false;
 }
 
 u32 Castle::GetActualDwelling(u32 build) const
@@ -1624,22 +1641,45 @@ Army::army_t & Castle::GetActualArmy(void)
 bool Castle::AllowBuyBoat(void) const
 {
     // check payment and present other boat
-    return world.GetMyKingdom().AllowPayment(PaymentConditions::BuyBoat()) && (false == Modes(BOATPRESENT));
+    if(world.GetMyKingdom().AllowPayment(PaymentConditions::BuyBoat()) && (! PresentBoat()))
+    {
+	const u16 index = GetIndex() + world.w() * 2;
+	const Maps::Tiles & left = world.GetTiles(index - 1);
+	const Maps::Tiles & right = world.GetTiles(index + 1);
+	return (MP2::OBJ_ZERO == left.GetObject() || MP2::OBJ_ZERO == right.GetObject());
+    }
+    return false;
 }
 
 bool Castle::BuyBoat(void)
 {
     if(!AllowBuyBoat()) return false;
     if(Game::LOCAL == world.GetKingdom(color).Control()) AGG::PlaySound(M82::BUILDTWN);
-    world.GetMyKingdom().OddFundsResource(PaymentConditions::BuyBoat());
-    SetModes(BOATPRESENT);
-#ifndef WITH_NET
-    world.CreateBoat(GetIndex(), true);
-#else
-    u16 index;
-    if(world.CreateBoat(GetIndex(), true, &index))
-	FH2LocalClient::SendCastleBuyBoat(*this, index);
+
+    const u16 index = GetIndex() + world.w() * 2;
+    Maps::Tiles & left = world.GetTiles(index - 1);
+    Maps::Tiles & right = world.GetTiles(index + 1);
+
+    if(MP2::OBJ_ZERO == left.GetObject())
+    {
+	world.GetMyKingdom().OddFundsResource(PaymentConditions::BuyBoat());
+
+    	left.SetObject(MP2::OBJ_BOAT);
+#ifdef WITH_NET
+	FH2LocalClient::SendCastleBuyBoat(*this, left.GetIndex());
 #endif
+    }
+    else
+    if(MP2::OBJ_COAST == right.GetObject())
+    {
+	world.GetMyKingdom().OddFundsResource(PaymentConditions::BuyBoat());
+
+    	right.SetObject(MP2::OBJ_BOAT);
+#ifdef WITH_NET
+	FH2LocalClient::SendCastleBuyBoat(*this, right.GetIndex());
+#endif
+    }
+
     return true;
 }
 

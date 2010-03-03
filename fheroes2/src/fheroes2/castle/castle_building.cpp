@@ -560,7 +560,7 @@ void Castle::RedrawBuilding(u32 build2, const Point & dst_pt, const u32 ticket)
 	if(BUILD_SHIPYARD == build2)
     	{
 	    // boat
-	    if(Modes(BOATPRESENT))
+	    if(PresentBoat())
 	    {
 		const ICN::icn_t icn2 = GetICNBoat(race);
 

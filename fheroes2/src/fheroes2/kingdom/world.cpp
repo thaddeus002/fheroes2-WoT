@@ -1683,6 +1683,7 @@ u16 World::GetNearestObject(const u16 center, const MP2::object_t obj)
 }
 
 // create boat: with option build or summon
+/*
 bool World::CreateBoat(const u16 center, bool build, u16* dst)
 {
     // scan 3x3
@@ -1725,6 +1726,7 @@ bool World::CreateBoat(const u16 center, bool build, u16* dst)
     DEBUG(DBG_GAME , DBG_WARN, "World::CreateBoat: failed");
     return false;
 }
+*/
 
 void  World::GetEventDay(const Color::color_t c, std::vector<GameEvent::Day *> & v) const
 {

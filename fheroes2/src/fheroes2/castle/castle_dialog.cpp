@@ -59,7 +59,6 @@ Dialog::answer_t Castle::OpenDialog(bool fade)
 
     Display & display = Display::Get();
     castle_heroes = const_cast<Heroes*>(world.GetHeroes(mp.x, mp.y));
-    PresentBoat() ? SetModes(BOATPRESENT) : ResetModes(BOATPRESENT);
 
     // cursor
     Cursor & cursor = Cursor::Get();
