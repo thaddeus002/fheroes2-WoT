@@ -30,6 +30,7 @@
 #include "world.h"
 #include "castle.h"
 #include "settings.h"
+#include "pocketpc.h"
 #include "battle_arena.h"
 #include "battle_cell.h"
 #include "battle_stats.h"
@@ -1572,7 +1573,7 @@ void Battle2::Interface::HumanBattleTurn(const Stats & b, Actions & a, std::stri
 	    MouseLeftClickBoardAction(themes, arena.board.GetIndexAbsPosition(le.GetMouseCursor()), a);
 	else
 	if(le.MousePressRight())
-	    MousePressRightBoardAction(themes, arena.board.GetIndexAbsPosition(le.GetMouseCursor()));
+	    MousePressRightBoardAction(themes, arena.board.GetIndexAbsPosition(le.GetMouseCursor()), a);
     }
     else
     {
@@ -1744,14 +1745,53 @@ void Battle2::Interface::ButtonSkipAction(Actions & a)
     }
 }
 
-void Battle2::Interface::MousePressRightBoardAction(u16 themes, s16 index)
+u8 Battle2::Interface::GetAllowSwordDirection(u16 index)
+{
+    u8 res = 0;
+
+    if(b_current)
+    {
+	for(direction_t dir = TOP_LEFT; dir < CENTER; ++dir)
+	{
+	    if(Board::isValidDirection(index, dir))
+	    {
+    		const u16 from = Board::GetIndexDirection(index, dir);
+
+    		if(UNKNOWN != arena.board[from].GetDirection() ||
+            	    from == b_current->GetPosition() ||
+            	    (b_current->isWide() && from == b_current->GetTailIndex()))
+		{
+		    res |= dir;
+		}
+	    }
+	}
+    }
+
+    return res;
+}
+
+void Battle2::Interface::MousePressRightBoardAction(u16 themes, s16 index, Actions & a)
 {
     if(index >= 0)
     {
 	const Stats* b = arena.GetTroopBoard(index);
 	if(b)
 	{
-	    Dialog::ArmyInfo(b->troop, Dialog::READONLY);
+	    const u8 allow = GetAllowSwordDirection(index);
+	    if(!Settings::Get().TapMode() || !allow)
+		Dialog::ArmyInfo(b->troop, Dialog::READONLY);
+	    else
+	    switch(PocketPC::GetCursorAttackDialog(b->GetCellPosition(), allow))
+	    {
+		case Cursor::SWORD_TOPLEFT:     MouseLeftClickBoardAction(Cursor::SWORD_TOPLEFT, index, a); break;
+		case Cursor::SWORD_TOPRIGHT:    MouseLeftClickBoardAction(Cursor::SWORD_TOPRIGHT, index, a); break;
+		case Cursor::SWORD_RIGHT:       MouseLeftClickBoardAction(Cursor::SWORD_RIGHT, index, a); break;
+		case Cursor::SWORD_BOTTOMRIGHT: MouseLeftClickBoardAction(Cursor::SWORD_BOTTOMRIGHT, index, a); break;
+		case Cursor::SWORD_BOTTOMLEFT:  MouseLeftClickBoardAction(Cursor::SWORD_BOTTOMLEFT, index, a); break;
+		case Cursor::SWORD_LEFT:        MouseLeftClickBoardAction(Cursor::SWORD_LEFT, index, a); break;
+	
+		default: Dialog::ArmyInfo(b->troop, Dialog::READONLY); break;
+	    }
 	}
     }
 }

@@ -21,8 +21,77 @@
 #include "agg.h"
 #include "engine.h"
 #include "cursor.h"
+#include "battle2.h"
 #include "text.h"
+#include "settings.h"
 #include "pocketpc.h"
+
+u16 PocketPC::GetCursorAttackDialog(const Point & dst, u8 allow)
+{
+    Display & display = Display::Get();
+    LocalEvent & le = LocalEvent::Get();
+
+    const Rect rt(dst.x - 24, dst.y - 24, 70, 70);
+
+    const Sprite & sp_info = AGG::GetICN(ICN::CMSECO, 5);
+    const Sprite & sp_bleft = AGG::GetICN(ICN::CMSECO, 10);
+    const Sprite & sp_left = AGG::GetICN(ICN::CMSECO, 11);
+    const Sprite & sp_tleft = AGG::GetICN(ICN::CMSECO, 12);
+    const Sprite & sp_tright = AGG::GetICN(ICN::CMSECO, 7);
+    const Sprite & sp_right = AGG::GetICN(ICN::CMSECO, 8);
+    const Sprite & sp_bright = AGG::GetICN(ICN::CMSECO, 9);
+
+    Surface shadow(rt.w, rt.h);
+    shadow.SetAlpha(170);
+    Background back(rt);
+    back.Save();
+
+    Cursor & cursor = Cursor::Get();
+    cursor.Hide();
+    cursor.SetThemes(Cursor::POINTER);
+
+    display.Blit(shadow, rt.x, rt.y);
+
+    const Rect rt_info(rt.x + (rt.w - sp_info.w()) / 2, rt.y + (rt.h - sp_info.h()) / 2, sp_info.w(), sp_info.h());
+    display.Blit(sp_info, rt_info.x, rt_info.y);
+
+    const Rect rt_tright(rt.x + 1, rt.y + rt.h - 1 - sp_tright.h(), sp_tright.w(), sp_tright.h());
+    if(allow & Battle2::BOTTOM_LEFT) display.Blit(sp_tright, rt_tright.x, rt_tright.y);
+
+    const Rect rt_right(rt.x + 1, rt.y + (rt.h - sp_right.h()) / 2, sp_right.w(), sp_right.h());
+    if(allow & Battle2::LEFT) display.Blit(sp_right, rt_right.x, rt_right.y);
+
+    const Rect rt_bright(rt.x + 1, rt.y + 1, sp_bright.w(), sp_bright.h());
+    if(allow & Battle2::TOP_LEFT) display.Blit(sp_bright, rt_bright.x, rt_bright.y);
+
+    const Rect rt_tleft(rt.x + rt.w - 1 - sp_tleft.w(), rt.y + rt.h - 1 - sp_tleft.h(), sp_tleft.w(), sp_tleft.h());
+    if(allow & Battle2::BOTTOM_RIGHT) display.Blit(sp_tleft, rt_tleft.x, rt_tleft.y);
+
+    const Rect rt_left(rt.x + rt.w - 1 - sp_left.w(), rt.y + (rt.h - sp_left.h()) / 2, sp_left.w(), sp_left.h());
+    if(allow & Battle2::RIGHT) display.Blit(sp_left, rt_left.x, rt_left.y);
+
+    const Rect rt_bleft(rt.x + rt.w - 1 - sp_bleft.w(), rt.y + 1, sp_bleft.w(), sp_bleft.h());
+    if(allow & Battle2::TOP_RIGHT) display.Blit(sp_bleft, rt_bleft.x, rt_bleft.y);
+
+    cursor.Show();
+    display.Flip();
+
+    while(le.HandleEvents() && !le.MouseClickLeft());
+
+    if((allow & Battle2::BOTTOM_LEFT) && (rt_tright & le.GetMouseCursor()))	return Cursor::SWORD_TOPRIGHT;
+    else
+    if((allow & Battle2::LEFT) && (rt_right & le.GetMouseCursor()))		return Cursor::SWORD_RIGHT;
+    else
+    if((allow & Battle2::TOP_LEFT) && (rt_bright & le.GetMouseCursor()))	return Cursor::SWORD_BOTTOMRIGHT;
+    else
+    if((allow & Battle2::BOTTOM_RIGHT) && (rt_tleft & le.GetMouseCursor()))	return Cursor::SWORD_TOPLEFT;
+    else
+    if((allow & Battle2::RIGHT) && (rt_left & le.GetMouseCursor()))		return Cursor::SWORD_LEFT;
+    else
+    if((allow & Battle2::TOP_RIGHT) && (rt_bleft & le.GetMouseCursor()))	return Cursor::SWORD_BOTTOMLEFT;
+
+    return Cursor::WAR_INFO;
+}
 
 void PocketPC::KeyboardDialog(std::string & str)
 {

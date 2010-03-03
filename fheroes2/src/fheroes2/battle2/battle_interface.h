@@ -170,10 +170,11 @@ namespace Battle2
 	void ButtonSettingsAction(void);
 	void ButtonSkipAction(Actions &);
 	void MouseLeftClickBoardAction(u16, s16, Actions &);
-	void MousePressRightBoardAction(u16, s16);
+	void MousePressRightBoardAction(u16, s16, Actions &);
 
 	u16 GetBattleCursor(const Point &, std::string &);
 	u16 GetBattleSpellCursor(const Point &, std::string &);
+	u8 GetAllowSwordDirection(u16);
 
     protected:
 	Arena & arena;

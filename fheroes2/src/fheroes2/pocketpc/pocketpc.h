@@ -42,6 +42,7 @@ namespace PocketPC
     Dialog::answer_t	DialogArmyInfo(const Army::Troop &, u16);
     void		HeroesMeeting(Heroes &, Heroes &);
     void		KeyboardDialog(std::string &);
+    u16			GetCursorAttackDialog(const Point &, u8);
 };
 
 #endif
