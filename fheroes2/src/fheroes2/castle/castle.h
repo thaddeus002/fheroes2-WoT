@@ -192,7 +192,6 @@ private:
     void RedrawNameTown(const Point & src_pt);
     void WellRedrawInfoArea(const Point & cur_pt);
     void RedrawAnimationBuilding(const Point & dst_pt, u32 build);
-    void SetStartArmy(void);
 
 private:
     friend class Game::IO;

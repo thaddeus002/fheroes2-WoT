@@ -250,14 +250,9 @@ void Castle::LoadFromMP2(const void *ptr)
 	army.SetCommander(&captain);
     }
 
-    // troops auto pack
-    if(!custom_troops)
-    {
-	if(Game::AI == GetControl())
-	    AIJoinRNDArmy();
-	else
-	    SetStartArmy();
-    }
+    // AI troops auto pack
+    if(!custom_troops && Game::AI == GetControl())
+	AIJoinRNDArmy();
 
     // fix shipyard
     if(!HaveNearlySea()) building &= ~(BUILD_SHIPYARD);
@@ -268,29 +263,6 @@ void Castle::LoadFromMP2(const void *ptr)
 
     // end
     DEBUG(DBG_GAME , DBG_INFO, "Castle::LoadFromMP2: " << (building & BUILD_CASTLE ? "castle" : "town") << ": " << name << ", color: " << Color::String(color) << ", race: " << Race::String(race));
-}
-
-void Castle::SetStartArmy(void)
-{
-    const Monster mon1(race, DWELLING_MONSTER1);
-    const Monster mon2(race, DWELLING_MONSTER2);
-    const Monster mon3(race, DWELLING_MONSTER3);
-
-    army.Clear();
-
-    switch(Settings::Get().GameDifficulty())
-    {
-    	case Difficulty::EASY:
-    	    army.At(0).Set(mon1, mon1.GetRNDSize(false) * 2);
-    	    army.At(1).Set(mon2, mon2.GetRNDSize(false));
-    	    break;
-
-    	case Difficulty::NORMAL:
-    	    army.At(0).Set(mon1, mon1.GetRNDSize(false));
-    	    break;
-
-	default: break;
-    }
 }
 
 u32 Castle::CountBuildings(void) const
