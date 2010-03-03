@@ -1591,6 +1591,7 @@ bool Battle2::Stats::isMagicDefence(u8 spell) const
     {
 	case Spell::CURE:
 	case Spell::MASSCURE:
+	    if(troop.isUndead()) return true;
 	    if(!isHaveDamage() && !(modes & IS_MAGIC)) return true;
 	    break;
 
