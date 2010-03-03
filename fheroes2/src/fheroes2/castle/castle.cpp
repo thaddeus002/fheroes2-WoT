@@ -1415,8 +1415,9 @@ bool Castle::PresentBoat(void) const
     {
 	const Maps::Tiles & left = world.GetTiles(index - 1);
 	const Maps::Tiles & right = world.GetTiles(index + 1);
+	const Maps::Tiles & center = world.GetTiles(index);
 
-	if(TilePresentBoat(left) || TilePresentBoat(right)) return true;
+	if(TilePresentBoat(left) || TilePresentBoat(right) || TilePresentBoat(center)) return true;
     }
     return false;
 }
@@ -1646,7 +1647,10 @@ bool Castle::AllowBuyBoat(void) const
 	const u16 index = GetIndex() + world.w() * 2;
 	const Maps::Tiles & left = world.GetTiles(index - 1);
 	const Maps::Tiles & right = world.GetTiles(index + 1);
-	return (MP2::OBJ_ZERO == left.GetObject() || MP2::OBJ_ZERO == right.GetObject());
+	const Maps::Tiles & center = world.GetTiles(index);
+	return (MP2::OBJ_ZERO == left.GetObject() ||
+		MP2::OBJ_ZERO == right.GetObject() ||
+		MP2::OBJ_ZERO == center.GetObject());
     }
     return false;
 }
@@ -1658,7 +1662,8 @@ bool Castle::BuyBoat(void)
 
     const u16 index = GetIndex() + world.w() * 2;
     Maps::Tiles & left = world.GetTiles(index - 1);
-    Maps::Tiles & right = world.GetTiles(index + 1);
+    Maps::Tiles & left = world.GetTiles(index - 1);
+    Maps::Tiles & center = world.GetTiles(index);
 
     if(MP2::OBJ_ZERO == left.GetObject())
     {
@@ -1670,7 +1675,7 @@ bool Castle::BuyBoat(void)
 #endif
     }
     else
-    if(MP2::OBJ_COAST == right.GetObject())
+    if(MP2::OBJ_ZERO == right.GetObject())
     {
 	world.GetMyKingdom().OddFundsResource(PaymentConditions::BuyBoat());
 
@@ -1679,7 +1684,17 @@ bool Castle::BuyBoat(void)
 	FH2LocalClient::SendCastleBuyBoat(*this, right.GetIndex());
 #endif
     }
+    else
+    if(MP2::OBJ_ZERO == center.GetObject())
+    {
+	world.GetMyKingdom().OddFundsResource(PaymentConditions::BuyBoat());
 
+    	center.SetObject(MP2::OBJ_BOAT);
+#ifdef WITH_NET
+	FH2LocalClient::SendCastleBuyBoat(*this, center.GetIndex());
+#endif
+    }
+    
     return true;
 }
 
