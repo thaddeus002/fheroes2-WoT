@@ -79,8 +79,6 @@ void LocalEvent::SetGlobalFilter(bool f)
 #include <iostream>
 KeySym SDLToKeySym(SDLKey key)
 {
-    std::cout << SDL_GetKeyName(key) << std::endl;
-
     switch(key)
     {
 	default: break;
