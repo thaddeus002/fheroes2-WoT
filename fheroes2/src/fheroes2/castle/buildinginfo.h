@@ -25,6 +25,8 @@
 
 #include "castle.h"
 
+class StatusBar;
+
 class BuildingInfo
 {
 public:
@@ -37,6 +39,7 @@ public:
     const Rect & GetArea(void) const;
     const char* GetName(void) const;
     const std::string & GetDescription(void) const;
+    void SetStatusMessage(StatusBar &) const;
 
     bool AllowBuy(void) const;
     bool IsDwelling(void) const;
@@ -50,6 +53,8 @@ public:
     static void GetCost(u32, u8, payment_t &);
 
 private:
+    void RedrawCaptain(void);
+
     const Castle & castle;
     u32 building;
     std::string description;

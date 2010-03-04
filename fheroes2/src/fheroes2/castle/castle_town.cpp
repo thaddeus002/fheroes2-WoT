@@ -38,51 +38,6 @@
 #include "kingdom.h"
 #include "localclient.h"
 
-void ShowBuildMessage(StatusBar & bar, bool isBuilt, const std::string & message, const Castle & castle, const u32 building)
-{
-    std::string str;
-    
-    if(isBuilt)
-    {
-        str = _("%{name} is already built");
-        String::Replace(str, "%{name}", message);
-    }
-    else
-    {
-        const PaymentConditions::BuyBuilding paymentBuild(castle.GetRace(), static_cast<building_t>(building));
-
-        if(!castle.AllowBuild())
-	{
-	    str = _("Cannot build. Already built here this turn.");
-        }
-        else
-        if(castle.AllowBuild() && ! world.GetMyKingdom().AllowPayment(paymentBuild))
-	{
-	    str = _("Cannot afford %{name}");
-    	    String::Replace(str, "%{name}", message);
-        }
-        else
-        if(BUILD_SHIPYARD == building && !castle.HaveNearlySea())
-        {
-            str = _("Cannot build %{name} because castle is too far from water.");
-    	    String::Replace(str, "%{name}", message);
-        }
-        else
-        if(!castle.AllowBuyBuilding(static_cast<building_t>(building)))
-        {
-            str = _("Cannot build %{name}");
-    	    String::Replace(str, "%{name}", message);
-        }
-        else
-	{
-	    str = _("Build %{name}");
-    	    String::Replace(str, "%{name}", message);
-        }
-    }
-
-    bar.ShowMessage(str);
-}
-
 Dialog::answer_t Castle::DialogBuyHero(const Heroes* hero)
 {
     if(!hero) return Dialog::CANCEL;
@@ -186,62 +141,6 @@ Dialog::answer_t Castle::DialogBuyCastle(bool buttons) const
 {
     BuildingInfo info(*this, BUILD_CASTLE);
     return info.DialogBuyBuilding(buttons) ? Dialog::OK : Dialog::CANCEL;
-}
-
-Dialog::answer_t Castle::DialogBuyCaptain(bool buttons) const
-{
-    BuildingInfo info(*this, BUILD_CAPTAIN);
-    return info.DialogBuyBuilding(buttons) ? Dialog::OK : Dialog::CANCEL;
-}
-
-void RedrawInfoDwelling(const Point & pt, const Castle & castle, const building_t build)
-{
-    Display & display = Display::Get();
-
-    const Sprite & sprite_allow = AGG::GetICN(ICN::TOWNWIND, 11);
-    const Sprite & sprite_deny  = AGG::GetICN(ICN::TOWNWIND, 12);
-    const Sprite & sprite_money = AGG::GetICN(ICN::TOWNWIND, 13);
-    
-    Point dst_pt(pt);
-
-    bool allowBuyBuilding = castle.AllowBuyBuilding(build);
-
-    PaymentConditions::BuyBuilding paymentBuild(castle.GetRace(), build);
-
-    if(BUILD_CAPTAIN & build)
-    {
-	// indicator
-	dst_pt.x = pt.x + 65;
-	dst_pt.y = pt.y + 60;
-	if(castle.isBuild(build)) display.Blit(sprite_allow, dst_pt);
-	else
-	if(! allowBuyBuilding)
-	    (1 == paymentBuild.GetValidItems() && paymentBuild.gold && castle.AllowBuild()) ? display.Blit(sprite_money, dst_pt) : display.Blit(sprite_deny, dst_pt);
-    }
-    else
-    {
-	// indicator
-	dst_pt.x = pt.x + 115;
-	dst_pt.y = pt.y + 40;
-	if(castle.isBuild(build)) display.Blit(sprite_allow, dst_pt);
-	else
-	if(! allowBuyBuilding)
-	    (1 == paymentBuild.GetValidItems() && paymentBuild.gold && castle.AllowBuild()) ? display.Blit(sprite_money, dst_pt) : display.Blit(sprite_deny, dst_pt);
-
-	// status bar
-	if(!castle.isBuild(build))
-	{
-	    dst_pt.x = pt.x - 1;
-	    dst_pt.y = pt.y + 57;
-	    display.Blit(AGG::GetICN(ICN::CASLXTRA, allowBuyBuilding ? 1 : 2), dst_pt);
-	}
-
-	// name
-	Text text(Castle::GetStringBuilding(build, castle.GetRace()), Font::SMALL);
-        dst_pt.x = pt.x + 68 - text.w() / 2;
-	dst_pt.y = pt.y + 58;
-	text.Blit(dst_pt);
-    }
 }
 
 u32 Castle::OpenTown(void)
@@ -386,27 +285,11 @@ u32 Castle::OpenTown(void)
     buildingMoat.Redraw();
 
     // captain
-    switch(race)
-    {
-        case Race::BARB: icn = ICN::CSTLCAPB; break;
-        case Race::KNGT: icn = ICN::CSTLCAPK; break;
-        case Race::NECR: icn = ICN::CSTLCAPN; break;
-        case Race::SORC: icn = ICN::CSTLCAPS; break;
-        case Race::WRLK: icn = ICN::CSTLCAPW; break;
-        case Race::WZRD: icn = ICN::CSTLCAPZ; break;
-	default: return BUILD_NOTHING;
-    }
-    dst_pt.x = cur_pt.x + 444;
-    dst_pt.y = cur_pt.y + 165;
-    u8 index = building & BUILD_CAPTAIN ? 1 : 0;
-    display.Blit(AGG::GetICN(icn, index), dst_pt);
-    const Rect rectCaptain(dst_pt, AGG::GetICN(icn, index).w(), AGG::GetICN(icn, index).h());
-    bool allowBuyBuildCaptain = AllowBuyBuilding(BUILD_CAPTAIN);
-    const std::string & stringCaptain = GetStringBuilding(BUILD_CAPTAIN, race);
-    RedrawInfoDwelling(dst_pt, *this, BUILD_CAPTAIN);
+    BuildingInfo buildingCaptain(*this, BUILD_CAPTAIN);
+    buildingCaptain.SetPos(cur_pt.x + 444, cur_pt.y + 165);
+    buildingCaptain.Redraw();
 
     // combat format
-    const bool combat_format = (Army::FORMAT_SPREAD == army.GetCombatFormat());
     const Sprite & spriteSpreadArmyFormat = AGG::GetICN(ICN::HSICONS, 9);
     const Sprite & spriteGroupedArmyFormat = AGG::GetICN(ICN::HSICONS, 10);
     const Rect rectSpreadArmyFormat(cur_pt.x + 550, cur_pt.y + 220, spriteSpreadArmyFormat.w(), spriteSpreadArmyFormat.h());
@@ -415,8 +298,8 @@ u32 Castle::OpenTown(void)
     const std::string descriptionGroupedArmyFormat(_("'Grouped' combat formation bunches your army toget her in the center of your side of the battlefield."));
     const Point pointSpreadArmyFormat(rectSpreadArmyFormat.x - 1, rectSpreadArmyFormat.y - 1);
     const Point pointGroupedArmyFormat(rectGroupedArmyFormat.x - 1, rectGroupedArmyFormat.y - 1);
-    SpriteCursor cursorFormat(AGG::GetICN(ICN::HSICONS, 11), combat_format ? pointSpreadArmyFormat : pointGroupedArmyFormat);
-    if(BUILD_CAPTAIN &building)
+    SpriteCursor cursorFormat(AGG::GetICN(ICN::HSICONS, 11), Army::FORMAT_SPREAD == army.GetCombatFormat() ? pointSpreadArmyFormat : pointGroupedArmyFormat);
+    if(isBuild(BUILD_CAPTAIN))
     {
 	Text text(_("Attack Skill") + std::string(" "), Font::SMALL);
 	dst_pt.x = cur_pt.x + 535;
@@ -465,7 +348,7 @@ u32 Castle::OpenTown(void)
 	display.Blit(spriteSpreadArmyFormat, rectSpreadArmyFormat.x, rectSpreadArmyFormat.y);
 	display.Blit(spriteGroupedArmyFormat, rectGroupedArmyFormat.x, rectGroupedArmyFormat.y);
 
-	cursorFormat.Show(combat_format ? pointSpreadArmyFormat : pointGroupedArmyFormat);
+	cursorFormat.Show(Army::FORMAT_SPREAD == army.GetCombatFormat() ? pointSpreadArmyFormat : pointGroupedArmyFormat);
     }
 
     Kingdom & kingdom = world.GetMyKingdom();
@@ -544,70 +427,70 @@ u32 Castle::OpenTown(void)
         if(le.MouseClickLeft(buttonExit) || le.KeyPress(KEY_RETURN) || le.KeyPress(KEY_ESCAPE)) break;
 
 	// click left
-        if(le.MouseCursor(dwelling1.GetArea()) && dwelling1.QueueEventProcessing()) { return dwelling1(); }
+        if(le.MouseCursor(dwelling1.GetArea()) && dwelling1.QueueEventProcessing()) return dwelling1();
         else
-        if(le.MouseCursor(dwelling2.GetArea()) && dwelling2.QueueEventProcessing()) { return dwelling2(); }
+        if(le.MouseCursor(dwelling2.GetArea()) && dwelling2.QueueEventProcessing()) return dwelling2();
         else
-        if(le.MouseCursor(dwelling3.GetArea()) && dwelling3.QueueEventProcessing()) { return dwelling3(); }
+        if(le.MouseCursor(dwelling3.GetArea()) && dwelling3.QueueEventProcessing()) return dwelling3();
         else
-        if(le.MouseCursor(dwelling4.GetArea()) && dwelling4.QueueEventProcessing()) { return dwelling4(); }
+        if(le.MouseCursor(dwelling4.GetArea()) && dwelling4.QueueEventProcessing()) return dwelling4();
         else
-        if(le.MouseCursor(dwelling5.GetArea()) && dwelling5.QueueEventProcessing()) { return dwelling5(); }
+        if(le.MouseCursor(dwelling5.GetArea()) && dwelling5.QueueEventProcessing()) return dwelling5();
         else
-        if(le.MouseCursor(dwelling6.GetArea()) && dwelling6.QueueEventProcessing()) { return dwelling6(); }
+        if(le.MouseCursor(dwelling6.GetArea()) && dwelling6.QueueEventProcessing()) return dwelling6();
 	else
-        if(le.MouseCursor(buildingMageGuild.GetArea()) && buildingMageGuild.QueueEventProcessing()) { return buildingMageGuild(); }
+        if(le.MouseCursor(buildingMageGuild.GetArea()) && buildingMageGuild.QueueEventProcessing()) return buildingMageGuild();
 	else
-        if(le.MouseCursor(buildingTavern.GetArea()) && buildingTavern.QueueEventProcessing()) { return BUILD_TAVERN; }
+        if(le.MouseCursor(buildingTavern.GetArea()) && buildingTavern.QueueEventProcessing()) return BUILD_TAVERN;
 	else
-        if(le.MouseCursor(buildingThievesGuild.GetArea()) && buildingThievesGuild.QueueEventProcessing()) { return BUILD_THIEVESGUILD; }
+        if(le.MouseCursor(buildingThievesGuild.GetArea()) && buildingThievesGuild.QueueEventProcessing()) return BUILD_THIEVESGUILD;
 	else
-        if(le.MouseCursor(buildingShipyard.GetArea()) && buildingShipyard.QueueEventProcessing()) { return BUILD_SHIPYARD; }
+        if(le.MouseCursor(buildingShipyard.GetArea()) && buildingShipyard.QueueEventProcessing()) return BUILD_SHIPYARD;
 	else
-        if(le.MouseCursor(buildingStatue.GetArea()) && buildingStatue.QueueEventProcessing()) { return BUILD_STATUE; }
+        if(le.MouseCursor(buildingStatue.GetArea()) && buildingStatue.QueueEventProcessing()) return BUILD_STATUE;
 	else
-        if(le.MouseCursor(buildingMarketplace.GetArea()) && buildingMarketplace.QueueEventProcessing()) { return BUILD_MARKETPLACE; }
+        if(le.MouseCursor(buildingMarketplace.GetArea()) && buildingMarketplace.QueueEventProcessing()) return BUILD_MARKETPLACE;
 	else
-        if(le.MouseCursor(buildingWell.GetArea()) && buildingWell.QueueEventProcessing()) { return BUILD_WELL; }
+        if(le.MouseCursor(buildingWell.GetArea()) && buildingWell.QueueEventProcessing()) return BUILD_WELL;
 	else
-        if(le.MouseCursor(buildingWel2.GetArea()) && buildingWel2.QueueEventProcessing()) { return BUILD_WEL2; }
+        if(le.MouseCursor(buildingWel2.GetArea()) && buildingWel2.QueueEventProcessing()) return BUILD_WEL2;
 	else
-        if(le.MouseCursor(buildingSpec.GetArea()) && buildingSpec.QueueEventProcessing()) { return BUILD_SPEC; }
+        if(le.MouseCursor(buildingSpec.GetArea()) && buildingSpec.QueueEventProcessing()) return BUILD_SPEC;
 	else
-        if(le.MouseCursor(buildingLTurret.GetArea()) && buildingLTurret.QueueEventProcessing()) { return BUILD_LEFTTURRET; }
+        if(le.MouseCursor(buildingLTurret.GetArea()) && buildingLTurret.QueueEventProcessing()) return BUILD_LEFTTURRET;
 	else
-        if(le.MouseCursor(buildingRTurret.GetArea()) && buildingRTurret.QueueEventProcessing()) { return BUILD_RIGHTTURRET; }
+        if(le.MouseCursor(buildingRTurret.GetArea()) && buildingRTurret.QueueEventProcessing()) return BUILD_RIGHTTURRET;
 	else
-        if(le.MouseCursor(buildingMoat.GetArea()) && buildingMoat.QueueEventProcessing()) { return BUILD_MOAT; }
+        if(le.MouseCursor(buildingMoat.GetArea()) && buildingMoat.QueueEventProcessing()) return BUILD_MOAT;
 	else
-	if(!(BUILD_CAPTAIN & building) && le.MouseClickLeft(rectCaptain) && allowBuyBuildCaptain && Dialog::OK == DialogBuyCaptain(true))
+	if(le.MouseCursor(buildingCaptain.GetArea()) && buildingCaptain.QueueEventProcessing()) return BUILD_CAPTAIN;
+	else
+	if(isBuild(BUILD_CAPTAIN))
 	{
-		return BUILD_CAPTAIN;
+	    if(le.MouseClickLeft(rectSpreadArmyFormat) && Army::FORMAT_SPREAD != army.GetCombatFormat())
+    	    {
+        	cursor.Hide();
+        	cursorFormat.Move(pointSpreadArmyFormat);
+        	cursor.Show();
+        	display.Flip();
+        	army.SetCombatFormat(Army::FORMAT_SPREAD);
+#ifdef WITH_NET
+        	FH2LocalClient::SendArmyCombatFormation(army);
+#endif
+    	    }
+	    else
+    	    if(le.MouseClickLeft(rectGroupedArmyFormat) && Army::FORMAT_SPREAD == army.GetCombatFormat())
+    	    {
+        	cursor.Hide();
+        	cursorFormat.Move(pointGroupedArmyFormat);
+        	cursor.Show();
+        	display.Flip();
+        	army.SetCombatFormat(Army::FORMAT_GROUPED);
+#ifdef WITH_NET
+        	FH2LocalClient::SendArmyCombatFormation(army);
+#endif
+    	    }
 	}
-        else
-	if((BUILD_CAPTAIN && building) && le.MouseClickLeft(rectSpreadArmyFormat) && !combat_format)
-        {
-            cursor.Hide();
-            cursorFormat.Move(pointSpreadArmyFormat);
-            cursor.Show();
-            display.Flip();
-            army.SetCombatFormat(Army::FORMAT_SPREAD);
-#ifdef WITH_NET
-            FH2LocalClient::SendArmyCombatFormation(army);
-#endif
-        }
-	else
-        if((BUILD_CAPTAIN && building) && le.MouseClickLeft(rectGroupedArmyFormat) && combat_format)
-        {
-            cursor.Hide();
-            cursorFormat.Move(pointGroupedArmyFormat);
-            cursor.Show();
-            display.Flip();
-            army.SetCombatFormat(Army::FORMAT_GROUPED);
-#ifdef WITH_NET
-            FH2LocalClient::SendArmyCombatFormation(army);
-#endif
-        }
 	else
 	if(hero1 && le.MouseClickLeft(rectHero1) &&
 	    Dialog::OK == DialogBuyHero(hero1))
@@ -627,14 +510,6 @@ u32 Castle::OpenTown(void)
 
 
 	// right
-	if(le.MousePressRight(rectCaptain))
-	{
-	    if(BUILD_CAPTAIN & building)
-		Dialog::Message(GetStringBuilding(BUILD_CAPTAIN, race), GetDescriptionBuilding(BUILD_CAPTAIN, race), Font::BIG);
-	    else
-		DialogBuyCaptain(false);
-	}
-        else
 	if(le.MousePressRight(rectSpreadArmyFormat)) Dialog::Message(_("Spread Formation"), descriptionSpreadArmyFormat, Font::BIG);
         else
 	if(le.MousePressRight(rectGroupedArmyFormat)) Dialog::Message(_("Grouped Formation"), descriptionGroupedArmyFormat, Font::BIG);
@@ -644,62 +519,43 @@ u32 Castle::OpenTown(void)
 	if(hero2 && le.MousePressRight(rectHero2)){ hero2->OpenDialog(true); cursor.Show(); display.Flip(); }
 
         // status info
-	if(le.MouseCursor(dwelling1.GetArea()))
-	    ShowBuildMessage(statusBar, isBuild(dwelling1()), dwelling1.GetName(), *this, dwelling1());
+	if(le.MouseCursor(dwelling1.GetArea())) dwelling1.SetStatusMessage(statusBar);
 	else
-	if(le.MouseCursor(dwelling2.GetArea()))
-	    ShowBuildMessage(statusBar, isBuild(dwelling2()), dwelling2.GetName(), *this, dwelling2());
+	if(le.MouseCursor(dwelling2.GetArea())) dwelling2.SetStatusMessage(statusBar);
 	else
-	if(le.MouseCursor(dwelling3.GetArea()))
-	    ShowBuildMessage(statusBar, isBuild(dwelling3()), dwelling3.GetName(), *this, dwelling3());
+	if(le.MouseCursor(dwelling3.GetArea())) dwelling3.SetStatusMessage(statusBar);
 	else
-	if(le.MouseCursor(dwelling4.GetArea()))
-	    ShowBuildMessage(statusBar, isBuild(dwelling4()), dwelling4.GetName(), *this, dwelling4());
+	if(le.MouseCursor(dwelling4.GetArea())) dwelling4.SetStatusMessage(statusBar);
 	else
-	if(le.MouseCursor(dwelling5.GetArea()))
-	    ShowBuildMessage(statusBar, isBuild(dwelling5()), dwelling5.GetName(), *this, dwelling5());
+	if(le.MouseCursor(dwelling5.GetArea())) dwelling5.SetStatusMessage(statusBar);
 	else
-	if(le.MouseCursor(dwelling6.GetArea()))
-	    ShowBuildMessage(statusBar, isBuild(dwelling6()), dwelling6.GetName(), *this, dwelling6());
+	if(le.MouseCursor(dwelling6.GetArea())) dwelling6.SetStatusMessage(statusBar);
 	else
-	if(le.MouseCursor(buildingMageGuild.GetArea()))
-	    ShowBuildMessage(statusBar, isBuild(buildingMageGuild()), buildingMageGuild.GetName(), *this, buildingMageGuild());
+	if(le.MouseCursor(buildingMageGuild.GetArea())) buildingMageGuild.SetStatusMessage(statusBar);
 	else
-	if(le.MouseCursor(buildingTavern.GetArea()) && !buildingTavern.IsDisable())
-	    ShowBuildMessage(statusBar, isBuild(BUILD_TAVERN), buildingTavern.GetName(), *this, BUILD_TAVERN);
+	if(le.MouseCursor(buildingTavern.GetArea()) && !buildingTavern.IsDisable()) buildingTavern.SetStatusMessage(statusBar);
 	else
-	if(le.MouseCursor(buildingThievesGuild.GetArea()))
-	    ShowBuildMessage(statusBar, isBuild(BUILD_THIEVESGUILD), buildingThievesGuild.GetName(), *this, BUILD_THIEVESGUILD);
+	if(le.MouseCursor(buildingThievesGuild.GetArea())) buildingThievesGuild.SetStatusMessage(statusBar);
 	else
-	if(le.MouseCursor(buildingShipyard.GetArea()))
-	    ShowBuildMessage(statusBar, isBuild(BUILD_SHIPYARD), buildingTavern.GetName(), *this, BUILD_SHIPYARD);
+	if(le.MouseCursor(buildingShipyard.GetArea())) buildingShipyard.SetStatusMessage(statusBar);
 	else
-	if(le.MouseCursor(buildingStatue.GetArea()))
-	    ShowBuildMessage(statusBar, isBuild(BUILD_STATUE), buildingStatue.GetName(), *this, BUILD_STATUE);
+	if(le.MouseCursor(buildingStatue.GetArea())) buildingStatue.SetStatusMessage(statusBar);
 	else
-	if(le.MouseCursor(buildingMarketplace.GetArea()))
-	    ShowBuildMessage(statusBar, isBuild(BUILD_MARKETPLACE), buildingMarketplace.GetName(), *this, BUILD_MARKETPLACE);
+	if(le.MouseCursor(buildingMarketplace.GetArea())) buildingMarketplace.SetStatusMessage(statusBar);
 	else
-	if(le.MouseCursor(buildingWell.GetArea()))
-	    ShowBuildMessage(statusBar, isBuild(BUILD_WELL), buildingWell.GetName(), *this, BUILD_WELL);
+	if(le.MouseCursor(buildingWell.GetArea())) buildingWell.SetStatusMessage(statusBar);
 	else
-	if(le.MouseCursor(buildingWel2.GetArea()))
-	    ShowBuildMessage(statusBar, isBuild(BUILD_WELL), buildingWel2.GetName(), *this, BUILD_WEL2);
+	if(le.MouseCursor(buildingWel2.GetArea())) buildingWel2.SetStatusMessage(statusBar);
 	else
-	if(le.MouseCursor(buildingSpec.GetArea()))
-	    ShowBuildMessage(statusBar, isBuild(BUILD_SPEC), buildingSpec.GetName(), *this, BUILD_SPEC);
+	if(le.MouseCursor(buildingSpec.GetArea())) buildingSpec.SetStatusMessage(statusBar);
 	else
-	if(le.MouseCursor(buildingLTurret.GetArea()))
-	    ShowBuildMessage(statusBar, isBuild(BUILD_LEFTTURRET), buildingLTurret.GetName(), *this, BUILD_LEFTTURRET);
+	if(le.MouseCursor(buildingLTurret.GetArea())) buildingLTurret.SetStatusMessage(statusBar);
 	else
-	if(le.MouseCursor(buildingRTurret.GetArea()))
-	    ShowBuildMessage(statusBar, isBuild(BUILD_RIGHTTURRET), buildingRTurret.GetName(), *this, BUILD_RIGHTTURRET);
+	if(le.MouseCursor(buildingRTurret.GetArea())) buildingRTurret.SetStatusMessage(statusBar);
 	else
-	if(le.MouseCursor(buildingMoat.GetArea()))
-	    ShowBuildMessage(statusBar, isBuild(BUILD_MOAT), buildingMoat.GetName(), *this, BUILD_MOAT);
+	if(le.MouseCursor(buildingMoat.GetArea())) buildingMoat.SetStatusMessage(statusBar);
 	else
-	if(le.MouseCursor(rectCaptain))
-	    ShowBuildMessage(statusBar, BUILD_CAPTAIN & building, stringCaptain, *this, BUILD_CAPTAIN);
+	if(le.MouseCursor(buildingCaptain.GetArea())) buildingCaptain.SetStatusMessage(statusBar);
 	else
 	if((hero1 && le.MouseCursor(rectHero1)) ||
 	   (hero2 && le.MouseCursor(rectHero2)))

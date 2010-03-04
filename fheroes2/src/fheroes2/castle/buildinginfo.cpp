@@ -26,7 +26,10 @@
 #include "settings.h"
 #include "cursor.h"
 #include "button.h"
+#include "world.h"
+#include "kingdom.h"
 #include "payment.h"
+#include "statusbar.h"
 #include "buildinginfo.h"
 
 #ifdef WITH_XML
@@ -258,6 +261,24 @@ BuildingInfo::BuildingInfo(const Castle & c, building_t b) : castle(c), building
     // necr and tavern check
     if(Race::NECR == castle.GetRace() && BUILD_TAVERN == building && !Settings::Get().PriceLoyaltyVersion())
 	disable = true;
+
+    if(b == BUILD_CAPTAIN)
+    {
+	ICN::icn_t icn = ICN::UNKNOWN;
+	switch(castle.GetRace())
+	{
+    	    case Race::BARB: icn = ICN::CSTLCAPB; break;
+    	    case Race::KNGT: icn = ICN::CSTLCAPK; break;
+    	    case Race::NECR: icn = ICN::CSTLCAPN; break;
+    	    case Race::SORC: icn = ICN::CSTLCAPS; break;
+    	    case Race::WRLK: icn = ICN::CSTLCAPW; break;
+    	    case Race::WZRD: icn = ICN::CSTLCAPZ; break;
+    	    default: break;
+	}
+	const Sprite & sprite = AGG::GetICN(icn, (building & BUILD_CAPTAIN ? 1 : 0));
+	area.w = sprite.w();
+	area.h = sprite.h();
+    }
 }
 
 u32 BuildingInfo::operator() (void) const
@@ -308,8 +329,49 @@ bool BuildingInfo::IsDwelling(void) const
     return false;
 }
 
+void BuildingInfo::RedrawCaptain(void)
+{
+    Display & display = Display::Get();
+
+    switch(castle.GetRace())
+    {
+        case Race::BARB: display.Blit(AGG::GetICN(ICN::CSTLCAPB, (building & BUILD_CAPTAIN ? 1 : 0)), area.x, area.y); break;
+        case Race::KNGT: display.Blit(AGG::GetICN(ICN::CSTLCAPK, (building & BUILD_CAPTAIN ? 1 : 0)), area.x, area.y); break;
+        case Race::NECR: display.Blit(AGG::GetICN(ICN::CSTLCAPN, (building & BUILD_CAPTAIN ? 1 : 0)), area.x, area.y); break;
+        case Race::SORC: display.Blit(AGG::GetICN(ICN::CSTLCAPS, (building & BUILD_CAPTAIN ? 1 : 0)), area.x, area.y); break;
+        case Race::WRLK: display.Blit(AGG::GetICN(ICN::CSTLCAPW, (building & BUILD_CAPTAIN ? 1 : 0)), area.x, area.y); break;
+        case Race::WZRD: display.Blit(AGG::GetICN(ICN::CSTLCAPZ, (building & BUILD_CAPTAIN ? 1 : 0)), area.x, area.y); break;
+        default: break;
+    }
+
+    const Sprite & sprite_allow = AGG::GetICN(ICN::TOWNWIND, 11);
+    const Sprite & sprite_deny  = AGG::GetICN(ICN::TOWNWIND, 12);
+    const Sprite & sprite_money = AGG::GetICN(ICN::TOWNWIND, 13);
+    Point dst_pt;
+
+    bool allow_buy = AllowBuy();
+
+    // indicator
+    dst_pt.x = area.x + 65;
+    dst_pt.y = area.y + 60;
+    if(castle.isBuild(building)) display.Blit(sprite_allow, dst_pt);
+    else
+    if(! allow_buy)
+    {
+	payment_t payment;
+	GetCost(building, castle.GetRace(), payment);
+	(1 == payment.GetValidItems() && payment.gold && castle.AllowBuild()) ? display.Blit(sprite_money, dst_pt) : display.Blit(sprite_deny, dst_pt);
+    }
+}
+
 void BuildingInfo::Redraw(void)
 {
+    if(BUILD_CAPTAIN == building)
+    {
+	RedrawCaptain();
+	return;
+    }
+
     u8 index = GetIndexBuildingSprite(building);
     Display & display = Display::Get();
 
@@ -534,4 +596,50 @@ bool BuildingInfo::DialogBuyBuilding(bool buttons) const
     }
 
     return false;
+}
+
+void BuildingInfo::SetStatusMessage(StatusBar & bar) const
+{
+    std::string str;
+    const char* name = GetName();
+
+    if(castle.isBuild(building))
+    {
+        str = _("%{name} is already built");
+        String::Replace(str, "%{name}", name);
+    }
+    else
+    {
+        const PaymentConditions::BuyBuilding paymentBuild(castle.GetRace(), building);
+
+        if(!castle.AllowBuild())
+        {
+            str = _("Cannot build. Already built here this turn.");
+        }
+        else
+        if(castle.AllowBuild() && ! world.GetMyKingdom().AllowPayment(paymentBuild))
+        {
+            str = _("Cannot afford %{name}");
+            String::Replace(str, "%{name}", name);
+        }
+        else
+        if(BUILD_SHIPYARD == building && !castle.HaveNearlySea())
+        {
+            str = _("Cannot build %{name} because castle is too far from water.");
+            String::Replace(str, "%{name}", name);
+        }
+        else
+        if(!castle.AllowBuyBuilding(building))
+        {
+            str = _("Cannot build %{name}");
+            String::Replace(str, "%{name}", name);
+        }
+        else
+        {
+            str = _("Build %{name}");
+            String::Replace(str, "%{name}", name);
+        }
+    }
+
+    bar.ShowMessage(str);
 }
