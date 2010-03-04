@@ -131,21 +131,12 @@ enum KeySym
     KEY_z,
 
 #ifdef _WIN32_WCE
-    KEY_HW01,
-    KEY_HW02,
-    KEY_HW03,
-    KEY_HW04,
-    KEY_HW05,
-    KEY_HW06,
-    KEY_HW07,
-    KEY_HW08,
-    KEY_HW09,
-    KEY_HW10,
-    KEY_HW11,
-    KEY_HW12,
-    KEY_HW13,
-    KEY_HW14,
-    KEY_HW15,
+    KEY_APP1,
+    KEY_APP2,
+    KEY_APP3,
+    KEY_APP4,
+    KEY_APP5,
+    KEY_APP6,
 #endif
 };
 

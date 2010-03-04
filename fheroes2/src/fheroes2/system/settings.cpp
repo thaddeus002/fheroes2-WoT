@@ -541,35 +541,17 @@ void Settings::Parse(const std::string & left, const std::string & right)
     if(left == "tap delay") LocalEvent::Get().SetTapDelayForRightClickEmulation(String::ToInt(right));
 #ifdef _WIN32_WCE
     else
-    if(left == "key_hw01" && 1 < right.size()) LocalEvent::Get().SetHardwareButton(KEY_HW01, KeySymFromChar(right[1]));
+    if(left == "key_hw1" && 1 < right.size()) LocalEvent::Get().SetHardwareButton(KEY_APP1, KeySymFromChar(right[1]));
     else
-    if(left == "key_hw02" && 1 < right.size()) LocalEvent::Get().SetHardwareButton(KEY_HW02, KeySymFromChar(right[1]));
+    if(left == "key_hw2" && 1 < right.size()) LocalEvent::Get().SetHardwareButton(KEY_APP2, KeySymFromChar(right[1]));
     else
-    if(left == "key_hw03" && 1 < right.size()) LocalEvent::Get().SetHardwareButton(KEY_HW03, KeySymFromChar(right[1]));
+    if(left == "key_hw3" && 1 < right.size()) LocalEvent::Get().SetHardwareButton(KEY_APP3, KeySymFromChar(right[1]));
     else
-    if(left == "key_hw04" && 1 < right.size()) LocalEvent::Get().SetHardwareButton(KEY_HW04, KeySymFromChar(right[1]));
+    if(left == "key_hw4" && 1 < right.size()) LocalEvent::Get().SetHardwareButton(KEY_APP4, KeySymFromChar(right[1]));
     else
-    if(left == "key_hw05" && 1 < right.size()) LocalEvent::Get().SetHardwareButton(KEY_HW05, KeySymFromChar(right[1]));
+    if(left == "key_hw5" && 1 < right.size()) LocalEvent::Get().SetHardwareButton(KEY_APP5, KeySymFromChar(right[1]));
     else
-    if(left == "key_hw06" && 1 < right.size()) LocalEvent::Get().SetHardwareButton(KEY_HW06, KeySymFromChar(right[1]));
-    else
-    if(left == "key_hw07" && 1 < right.size()) LocalEvent::Get().SetHardwareButton(KEY_HW07, KeySymFromChar(right[1]));
-    else
-    if(left == "key_hw08" && 1 < right.size()) LocalEvent::Get().SetHardwareButton(KEY_HW08, KeySymFromChar(right[1]));
-    else
-    if(left == "key_hw09" && 1 < right.size()) LocalEvent::Get().SetHardwareButton(KEY_HW09, KeySymFromChar(right[1]));
-    else
-    if(left == "key_hw10" && 1 < right.size()) LocalEvent::Get().SetHardwareButton(KEY_HW10, KeySymFromChar(right[1]));
-    else
-    if(left == "key_hw11" && 1 < right.size()) LocalEvent::Get().SetHardwareButton(KEY_HW11, KeySymFromChar(right[1]));
-    else
-    if(left == "key_hw12" && 1 < right.size()) LocalEvent::Get().SetHardwareButton(KEY_HW12, KeySymFromChar(right[1]));
-    else
-    if(left == "key_hw13" && 1 < right.size()) LocalEvent::Get().SetHardwareButton(KEY_HW13, KeySymFromChar(right[1]));
-    else
-    if(left == "key_hw14" && 1 < right.size()) LocalEvent::Get().SetHardwareButton(KEY_HW14, KeySymFromChar(right[1]));
-    else
-    if(left == "key_hw15" && 1 < right.size()) LocalEvent::Get().SetHardwareButton(KEY_HW15, KeySymFromChar(right[1]));
+    if(left == "key_hw6" && 1 < right.size()) LocalEvent::Get().SetHardwareButton(KEY_APP6, KeySymFromChar(right[1]));
     else
     if(left == "key_left" && 1 < right.size()) LocalEvent::Get().SetHardwareButton(KEY_LEFT, KeySymFromChar(right[1]));
     else

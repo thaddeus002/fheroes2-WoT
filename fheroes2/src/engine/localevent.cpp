@@ -29,10 +29,8 @@ namespace
 {
 #ifdef _WIN32_WCE
     static KeySym _hw_buttons[] = { 
-	KEY_HW01, KEY_HW02, KEY_HW03, KEY_HW04, KEY_HW05,
-	KEY_HW06, KEY_HW07, KEY_HW08, KEY_HW09, KEY_HW10,
-	KEY_HW11, KEY_HW12, KEY_HW13, KEY_HW14, KEY_HW15,
-	KEY_LEFT, KEY_RIGHT,KEY_UP,   KEY_DOWN, KEY_RETURN, KEY_NONE };
+	KEY_RETURN, KEY_LEFT, KEY_RIGHT, KEY_UP, KEY_DOWN,
+	KEY_APP1, KEY_APP2, KEY_APP3, KEY_APP4, KEY_APP5, KEY_APP6, };
 #endif
 };
 
@@ -78,19 +76,21 @@ void LocalEvent::SetGlobalFilter(bool f)
     f ? SetModes(GLOBAL_FILTER) : ResetModes(GLOBAL_FILTER);
 }
 
+#include <iostream>
 KeySym SDLToKeySym(SDLKey key)
 {
+    std::cout << SDL_GetKeyName(key) << std::endl;
 
     switch(key)
     {
 	default: break;
 
 #ifdef _WIN32_WCE
-	case SDLK_RETURN:	return _hw_buttons[19];
-	case SDLK_LEFT:		return _hw_buttons[15];
-	case SDLK_RIGHT:	return _hw_buttons[16];
-	case SDLK_UP:		return _hw_buttons[17];
-	case SDLK_DOWN:		return _hw_buttons[18];
+	case SDLK_RETURN:	return _hw_buttons[0];
+	case SDLK_LEFT:		return _hw_buttons[1];
+	case SDLK_RIGHT:	return _hw_buttons[2];
+	case SDLK_UP:		return _hw_buttons[3];
+	case SDLK_DOWN:		return _hw_buttons[4];
 #else
 	case SDLK_RETURN:	return KEY_RETURN;
 	case SDLK_LEFT:		return KEY_LEFT;
@@ -189,21 +189,12 @@ KeySym SDLToKeySym(SDLKey key)
 	case SDLK_z:		return KEY_z;
 
 #ifdef _WIN32_WCE
-	case SDLK_WORLD_33:	return _hw_buttons[0];
-	case SDLK_WORLD_34:	return _hw_buttons[1];
-	case SDLK_WORLD_35:	return _hw_buttons[2];
-	case SDLK_WORLD_36:	return _hw_buttons[3];
-	case SDLK_WORLD_37:	return _hw_buttons[4];
-	case SDLK_WORLD_38:	return _hw_buttons[5];
-	case SDLK_WORLD_39:	return _hw_buttons[6];
-	case SDLK_WORLD_40:	return _hw_buttons[7];
-	case SDLK_WORLD_41:	return _hw_buttons[8];
-	case SDLK_WORLD_42:	return _hw_buttons[9];
-	case SDLK_WORLD_43:	return _hw_buttons[10];
-	case SDLK_WORLD_44:	return _hw_buttons[11];
-	case SDLK_WORLD_45:	return _hw_buttons[12];
-	case SDLK_WORLD_46:	return _hw_buttons[13];
-	case SDLK_WORLD_47:	return _hw_buttons[14];
+	case SDLK_APP1:		return _hw_buttons[5];
+	case SDLK_APP2:		return _hw_buttons[6];
+	case SDLK_APP3:		return _hw_buttons[7];
+	case SDLK_APP4:		return _hw_buttons[8];
+	case SDLK_APP5:		return _hw_buttons[9];
+	case SDLK_APP6:		return _hw_buttons[10];
 #endif
     }
 
@@ -223,27 +214,18 @@ void LocalEvent::SetHardwareButton(KeySym a, KeySym b)
 {
     switch(a)
     {
-	case KEY_HW01:	_hw_buttons[0] = b; break;
-	case KEY_HW02:	_hw_buttons[1] = b; break;
-	case KEY_HW03:	_hw_buttons[2] = b; break;
-	case KEY_HW04:	_hw_buttons[3] = b; break;
-	case KEY_HW05:	_hw_buttons[4] = b; break;
-	case KEY_HW06:	_hw_buttons[5] = b; break;
-	case KEY_HW07:	_hw_buttons[6] = b; break;
-	case KEY_HW08:	_hw_buttons[7] = b; break;
-	case KEY_HW09:	_hw_buttons[8] = b; break;
-	case KEY_HW10:	_hw_buttons[9] = b; break;
-	case KEY_HW11:	_hw_buttons[10] = b; break;
-	case KEY_HW12:	_hw_buttons[11] = b; break;
-	case KEY_HW13:	_hw_buttons[12] = b; break;
-	case KEY_HW14:	_hw_buttons[13] = b; break;
-	case KEY_HW15:	_hw_buttons[14] = b; break;
+	case KEY_APP1:	_hw_buttons[5] = b; break;
+	case KEY_APP2:	_hw_buttons[6] = b; break;
+	case KEY_APP3:	_hw_buttons[7] = b; break;
+	case KEY_APP4:	_hw_buttons[8] = b; break;
+	case KEY_APP5:	_hw_buttons[9] = b; break;
+	case KEY_APP6:	_hw_buttons[10] = b; break;
 
-	case KEY_LEFT:	_hw_buttons[15] = b; break;
-	case KEY_RIGHT:	_hw_buttons[16] = b; break;
-	case KEY_UP:	_hw_buttons[17] = b; break;
-	case KEY_DOWN:	_hw_buttons[18] = b; break;
-	case KEY_RETURN:_hw_buttons[19] = b; break;
+	case KEY_RETURN:_hw_buttons[0] = b; break;
+	case KEY_LEFT:	_hw_buttons[1] = b; break;
+	case KEY_RIGHT:	_hw_buttons[2] = b; break;
+	case KEY_UP:	_hw_buttons[3] = b; break;
+	case KEY_DOWN:	_hw_buttons[4] = b; break;
 
 	default: break;
     }
