@@ -135,7 +135,7 @@ bool Settings::Read(const std::string & filename)
 
 	if(std::string::npos != pos)
 	{
-	    std::string left(str.substr(0, pos - 1));
+	    std::string left(str.substr(0, pos));
 	    std::string right(str.substr(pos + 1, str.length() - pos - 1));
 
 	    String::Trim(left);
