@@ -31,6 +31,7 @@
 #include "game_focus.h"
 #include "game_interface.h"
 #include "kingdom.h"
+#include "morale.h"
 #include "cursor.h"
 #include "algorithm.h"
 #include "payment.h"
@@ -500,13 +501,14 @@ void ActionToMonster(Heroes &hero, const u8 obj, const u16 dst_index)
     u32 ownRatio, otherRatio;
     hero.GetArmy().CalculateForceRatiosVersus(army, ownRatio, otherRatio);
 
-    bool ext_conditions = (hero.GetArmy().GetCount() < hero.GetArmy().Size() || hero.GetArmy().HasMonster(monster));
-
-    if(ext_conditions && (ownRatio / otherRatio) >= 2)
+    const bool check_free_stack = (hero.GetArmy().GetCount() < hero.GetArmy().Size() || hero.GetArmy().HasMonster(monster));
+    const bool check_extra_condition = Morale::NORMAL <= hero.GetMorale();
+    
+    if(check_free_stack && check_extra_condition && (ownRatio / otherRatio) >= 2)
     {
         DEBUG(DBG_GAME , DBG_INFO, "ActionToMonster: possible " << hero.GetName() << " join monster " << monster.GetName());
-        
-        if(tile.IsJoiner())
+
+        if(tile.GetQuantity4())
         {
             std::string message = _("A group of %{monster} with a desire for greater glory wish to join you.\nDo you accept?");
             std::string monst = monster.GetMultiName();
@@ -520,66 +522,67 @@ void ActionToMonster(Heroes &hero, const u8 obj, const u16 dst_index)
             }
             else Dialog::Message("", _("Insulted by your refusal of their offer, the monsters attack!"), Font::BIG, Dialog::OK);
         }
-        else if(hero.HasSecondarySkill(Skill::Secondary::DIPLOMACY))
+        else
+        if(hero.HasSecondarySkill(Skill::Secondary::DIPLOMACY))
         {
             u32 toJoin = tile.GetCountMonster();
-            PaymentConditions::BuyMonster cost(monster());
-    	    u32 toBuy = toJoin * cost.gold;
 
-    	    if(world.GetKingdom(hero.GetColor()).GetFundsGold() >= toBuy)
+            switch(hero.GetLevelSkill(Skill::Secondary::DIPLOMACY))
             {
-                switch(hero.GetLevelSkill(Skill::Secondary::DIPLOMACY))
-                {
-            	    case Skill::Level::BASIC:   toJoin = toJoin * 25 / 100; break;
-            	    case Skill::Level::ADVANCED:toJoin = toJoin * 50 / 100; break;
-            	    default: break;
-                }
+        	case Skill::Level::BASIC:   toJoin = Monster::GetCountFromHitPoints(monster(), monster.GetHitPoints() * 25 / 100); break;
+            	case Skill::Level::ADVANCED:toJoin = Monster::GetCountFromHitPoints(monster(), monster.GetHitPoints() * 50 / 100); break;
+            	default: break;
+            }
+
+	    Kingdom & kingdom = world.GetKingdom(hero.GetColor());
+            PaymentConditions::BuyMonster cost(monster());
+    	    cost *= toJoin;
+
+    	    if(toJoin && kingdom.AllowPayment(cost))
+            {
                 std::string message;
                 if(tile.GetCountMonster() == 1)
-                    message = _("The creature is swayed by your diplomatic tongue, and offers to join "
-                                "your army for the sum of %{gold} gold.\nDo you accept?");
+                    message = _("The creature is swayed by your diplomatic tongue, and offers to join your army for the sum of %{gold} gold.\nDo you accept?");
                 else
                 {
                     message = _("The creatures are swayed by your diplomatic\ntongue, and make you an offer:\n \n");
                     if(toJoin != tile.GetCountMonster())
-                        message += _("%{offer} of the %{total} %{monster} will join your army, and the rest will leave "
-                                     "you alone, for the sum of %{gold} gold.\nDo you accept?");
-                    else message += _("All %{offer} of the %{monster} will join your army for the sum of "
-                                      "%{gold} gold.\nDo you accept?");
+                        message += _("%{offer} of the %{total} %{monster} will join your army, and the rest will leave you alone, for the sum of %{gold} gold.\nDo you accept?");
+                    else
+                	message += _("All %{offer} of the %{monster} will join your army for the sum of %{gold} gold.\nDo you accept?");
                 }
                 String::Replace(message, "%{offer}", toJoin);
                 String::Replace(message, "%{total}", tile.GetCountMonster());
                 std::string monst = monster.GetMultiName();
                 String::Lower(monst);
                 String::Replace(message, "%{monster}", monst);
-                String::Replace(message, "%{gold}", toBuy);
+                String::Replace(message, "%{gold}", cost.gold);
 
-                if(toJoin)
+                if(Dialog::YES == Dialog::ResourceInfo("", message, cost, Dialog::YES | Dialog::NO))
                 {
-                    if(Dialog::YES == DialogWithGold("", message, toBuy, Dialog::YES | Dialog::NO))
-                    {
-                        hero.GetArmy().JoinTroop(monster, toJoin);
-                        world.GetKingdom(hero.GetColor()).OddFundsResource(Resource::funds_t(Resource::GOLD, toBuy));
-                        avoidBattle = true;
-        		destroyTile = true;
-                    }
-                    else Dialog::Message("", _("Insulted by your refusal of their offer, the monsters attack!"), Font::BIG, Dialog::OK);
+                    hero.GetArmy().JoinTroop(monster, toJoin);
+                    kingdom.OddFundsResource(cost);
+                    avoidBattle = true;
+        	    destroyTile = true;
                 }
-            }	
+                else
+            	    Dialog::Message("", _("Insulted by your refusal of their offer, the monsters attack!"), Font::BIG, Dialog::OK);
+            }
         }
-        else if((ownRatio / otherRatio) >= 5)
-        {
-            std::string message = _("The %{monster}, awed by the power of your forces, begin to scatter.\nDo you wish to pursue and engage them?");
-            std::string monst = monster.GetMultiName();
-            String::Lower(monst);
-            String::Replace(message, "%{monster}", monst);
+    }
 
-            if(Dialog::Message("", message, Font::BIG, Dialog::YES | Dialog::NO) == Dialog::NO)
-            {
-	        avoidBattle = true;
-        	destroyTile = true;
-	    }
-        }
+    if(!avoidBattle && (ownRatio / otherRatio) >= 5)
+    {
+	std::string message = _("The %{monster}, awed by the power of your forces, begin to scatter.\nDo you wish to pursue and engage them?");
+        std::string monst = monster.GetMultiName();
+        String::Lower(monst);
+        String::Replace(message, "%{monster}", monst);
+
+        if(Dialog::Message("", message, Font::BIG, Dialog::YES | Dialog::NO) == Dialog::NO)
+        {
+	    avoidBattle = true;
+    	    destroyTile = true;
+	}
     }
     
     DEBUG(DBG_GAME , DBG_INFO, "ActionToMonster: " << hero.GetName() << " attack monster " << monster.GetName());
@@ -601,6 +604,8 @@ void ActionToMonster(Heroes &hero, const u8 obj, const u16 dst_index)
     	    if(!Settings::Get().OriginalVersion())
     	    {
         	tile.SetCountMonster(army.GetCountMonsters(monster));
+        	// reset "can join"
+        	tile.SetQuantity4(0);
     	    }
 	}
     }

@@ -864,10 +864,18 @@ void World::LoadMaps(const std::string &filename)
 
 	    case MP2::OBJ_MONSTER:
 		if(0 == tile.GetQuantity1() && 0 == tile.GetQuantity2())
+		{
 		    tile.SetCountMonster(4 * Monster(tile).GetRNDSize(false));
+		    // 20% chance of joining
+		    tile.SetQuantity4(3 > Rand::Get(1, 10));
+		}
 		else
+		{
 		    // old format
 		    tile.SetCountMonster(((static_cast<u16>(tile.GetQuantity2()) << 8) | tile.GetQuantity1()) >> 3);
+		    // disable loaly
+		    tile.SetQuantity4(0);
+		}
 		break;
 
 	    case MP2::OBJ_RNDMONSTER:
@@ -878,10 +886,18 @@ void World::LoadMaps(const std::string &filename)
 		// modify rnd monster sprite
 		tile.UpdateRNDMonsterSprite();
 		if(0 == tile.GetQuantity1() && 0 == tile.GetQuantity2())
+		{
 		    tile.SetCountMonster(4 * Monster(tile).GetRNDSize(false));
+		    // 20% chance of joining
+		    tile.SetQuantity4(3 > Rand::Get(1, 10));
+		}
 		else
+		{
 		    // old format
 		    tile.SetCountMonster(((static_cast<u16>(tile.GetQuantity2()) << 8) | tile.GetQuantity1()) >> 3);
+		    // disable loaly
+		    tile.SetQuantity4(0);
+		}
 		break;
 
 	    // join dwelling

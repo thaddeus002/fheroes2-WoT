@@ -405,13 +405,14 @@ void AIToMonster(Heroes &hero, const u8 obj, const u16 dst_index)
     u32 ownRatio, otherRatio;
     hero.GetArmy().CalculateForceRatiosVersus(army, ownRatio, otherRatio);
 
-    bool ext_conditions = (hero.GetArmy().GetCount() < hero.GetArmy().Size() || hero.GetArmy().HasMonster(monster));
-
-    if(ext_conditions && ownRatio / otherRatio >= 2)
+    const bool check_free_stack = (hero.GetArmy().GetCount() < hero.GetArmy().Size() || hero.GetArmy().HasMonster(monster));
+    const bool check_extra_condition = Morale::NORMAL <= hero.GetMorale();
+    
+    if(check_free_stack && check_extra_condition && ownRatio / otherRatio >= 2)
     {
         DEBUG(DBG_AI , DBG_INFO, "AIToMonster: possible " << hero.GetName() << " join monster " << monster.GetName());
 
-        if(tile.IsJoiner())
+        if(tile.GetQuantity4())
         {
             // join if ranged or flying monsters present
             if(hero.GetArmy().HasMonster(monster) || monster.isArchers() || monster.isFly())
@@ -423,26 +424,29 @@ void AIToMonster(Heroes &hero, const u8 obj, const u16 dst_index)
             else
                 DEBUG(DBG_AI , DBG_WARN, "AIToMonster: condition is not fulfilled");
         }
-        else if(hero.HasSecondarySkill(Skill::Secondary::DIPLOMACY))
+        else
+        if(hero.HasSecondarySkill(Skill::Secondary::DIPLOMACY))
         {
             u32 toJoin = tile.GetCountMonster();
-            PaymentConditions::BuyMonster cost(monster());
-            u32 toBuy = toJoin * cost.gold;
-
+    
             switch(hero.GetLevelSkill(Skill::Secondary::DIPLOMACY))
             {
-                case Skill::Level::BASIC:   toJoin = toJoin * 25 / 100; break;
-                case Skill::Level::ADVANCED:toJoin = toJoin * 50 / 100; break;
+                case Skill::Level::BASIC:   toJoin = Monster::GetCountFromHitPoints(monster(), monster.GetHitPoints() * 25 / 100); break;
+                case Skill::Level::ADVANCED:toJoin = Monster::GetCountFromHitPoints(monster(), monster.GetHitPoints() * 50 / 100); break;
                 default: break;
             }
 
-            if(world.GetKingdom(hero.GetColor()).GetFundsGold() >= toBuy)
+	    Kingdom & kingdom = world.GetKingdom(hero.GetColor());
+            PaymentConditions::BuyMonster cost(monster());
+            cost *= toJoin;
+
+            if(toJoin && kingdom.AllowPayment(cost))
             {
                 // join if archers or fly or present
                 if(hero.GetArmy().HasMonster(monster) || monster.isArchers() || monster.isFly())
                 {
                     hero.GetArmy().JoinTroop(monster, toJoin);
-                    world.GetKingdom(hero.GetColor()).OddFundsResource(Resource::funds_t(Resource::GOLD, toBuy));
+                    kingdom.OddFundsResource(cost);
                     avoidBattle = true;
 		    destroyTile = true;
                 }
@@ -450,11 +454,12 @@ void AIToMonster(Heroes &hero, const u8 obj, const u16 dst_index)
             else
                 DEBUG(DBG_AI , DBG_WARN, "AIToMonster: condition is not fulfilled");
         }
-        else if(ownRatio / otherRatio >= 5)
-        {
-            avoidBattle = Rand::Get(0, 10) < 5;
-	    if(avoidBattle) destroyTile = true;
-        }
+    }
+
+    if(!avoidBattle && ownRatio / otherRatio >= 5)
+    {
+	avoidBattle = Rand::Get(0, 10) < 5;
+	if(avoidBattle) destroyTile = true;
     }
 
     DEBUG(DBG_AI , DBG_INFO, "AIToMonster: " << hero.GetName() << " attack monster " << monster.GetName());
@@ -476,6 +481,7 @@ void AIToMonster(Heroes &hero, const u8 obj, const u16 dst_index)
             if(!Settings::Get().OriginalVersion())
             {
                 tile.SetCountMonster(army.GetCountMonsters(monster));
+                tile.SetQuantity4(0);
             }
         }
     }
