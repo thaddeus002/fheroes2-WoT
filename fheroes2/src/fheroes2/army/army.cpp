@@ -1129,12 +1129,12 @@ void Army::army_t::SetCommander(HeroBase* c)
 
 HeroBase* Army::army_t::GetCommander(void)
 {
-    return commander;
+    return (!commander || (Skill::Primary::CAPTAIN == commander->GetType() && !commander->isValid()) ? NULL : commander);
 }
 
 const HeroBase* Army::army_t::GetCommander(void) const
 {
-    return commander;
+    return (!commander || (Skill::Primary::CAPTAIN == commander->GetType() && !commander->isValid()) ? NULL : commander);
 }
 
 u32 Army::army_t::ActionToSirens(void)

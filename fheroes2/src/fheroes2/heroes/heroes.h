@@ -92,6 +92,7 @@ public:
     Heroes();
     Heroes(heroes_t ht, Race::race_t rc);
 
+    bool isValid(void) const;
     bool isFreeman(void) const;
     void SetFreeman(const u8 reason);
 

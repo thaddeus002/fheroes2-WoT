@@ -1755,6 +1755,11 @@ bool Heroes::MayStillMove(void) const
     return move_point >= Maps::Ground::GetPenalty(Maps::GetIndexFromAbsPoint(mp), Direction::CENTER, GetLevelSkill(Skill::Secondary::PATHFINDING));
 }
 
+bool Heroes::isValid(void) const
+{
+    return true;
+}
+
 bool Heroes::isFreeman(void) const
 {
     return Color::GRAY == color && !Modes(JAIL);

@@ -2027,7 +2027,6 @@ void Battle2::Interface::RedrawActionAttackPart2(Stats & attacker, std::vector<T
 {
     // targets damage animation
     RedrawActionWinces(targets);
-    DELAY(animation_delay * 50);
 
     // draw status for first defender
     if(targets.size())
@@ -2156,6 +2155,8 @@ void Battle2::Interface::RedrawActionWinces(std::vector<TargetInfo> & targets)
 	}
 	++ticket;
     }
+
+    DELAY(animation_delay * 50);
 }
 
 void Battle2::Interface::RedrawActionKills(std::vector<TargetInfo> & targets)
