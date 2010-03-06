@@ -870,16 +870,16 @@ Game::menu_t Game::HumanTurn(void)
 	if(conf.TapMode())
 	{
 	    // scroll area maps left
-	    if(le.MousePressRight(I.GetAreaScrollLeft())) I.gameArea.SetScroll(SCROLL_LEFT);
+	    if(le.MouseCursor(I.GetAreaScrollLeft()) && le.MousePressLeft()) I.gameArea.SetScroll(SCROLL_LEFT);
     	    else
 	    // scroll area maps right
-	    if(le.MousePressRight(I.GetAreaScrollRight())) I.gameArea.SetScroll(SCROLL_RIGHT);
+	    if(le.MouseCursor(I.GetAreaScrollRight()) && le.MousePressLeft()) I.gameArea.SetScroll(SCROLL_RIGHT);
 	    else
 	    // scroll area maps top
-	    if(le.MousePressRight(I.GetAreaScrollTop())) I.gameArea.SetScroll(SCROLL_TOP);
+	    if(le.MouseCursor(I.GetAreaScrollTop()) && le.MousePressLeft()) I.gameArea.SetScroll(SCROLL_TOP);
 	    else
 	    // scroll area maps bottom
-	    if(le.MousePressRight(I.GetAreaScrollBottom())) I.gameArea.SetScroll(SCROLL_BOTTOM);
+	    if(le.MouseCursor(I.GetAreaScrollBottom()) && le.MousePressLeft()) I.gameArea.SetScroll(SCROLL_BOTTOM);
 	}
 	else
 	{
@@ -952,7 +952,7 @@ Game::menu_t Game::HumanTurn(void)
 	}
 	else
 	// cursor over game area
-	if(le.MouseCursor(I.gameArea.GetArea()))
+	if(le.MouseCursor(I.gameArea.GetArea()) && !I.gameArea.NeedScroll())
 	{
     	    I.gameArea.QueueEventProcessing();
 	}
@@ -963,7 +963,12 @@ Game::menu_t Game::HumanTurn(void)
         {
             if(I.gameArea.NeedScroll())
             {
-    		cursor.SetThemes(I.gameArea.GetScrollCursor());
+		if(le.MouseCursor(I.GetAreaScrollLeft()) ||
+		   le.MouseCursor(I.GetAreaScrollRight()) ||
+		   le.MouseCursor(I.GetAreaScrollTop()) ||
+		   le.MouseCursor(I.GetAreaScrollBottom()))
+    		    cursor.SetThemes(I.gameArea.GetScrollCursor());
+
     		I.gameArea.Scroll();
 
     		// need stop hero
