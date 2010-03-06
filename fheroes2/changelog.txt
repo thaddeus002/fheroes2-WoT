@@ -1,4 +1,18 @@
-SVN - up to r1498
+SVN - up to r1573
++ Fixed joined monster
++ Fixed battle animations
++ Added status message for resurrect spells and death spells
++ Fixed battle necromancy ability
++ Fixed monster magick attack
++ Added bridge animation for battle
++ Fixed battle order speed troop
++ Updated spell action for Battle AI
++ Fixed battle wins/loss music
++ Fixed "mirror image" and "summon elemental" spell for battle
++ Fixed update dwelling population
++ Fixed recruit monster from "water altar " and "eath altar"
+
+Feb, 17, 2010
 + Fixed Coliseum and Storm building ability
 + Added dismiss troop warning and update troop total cost info
 + Fixed game over result for wins_side
