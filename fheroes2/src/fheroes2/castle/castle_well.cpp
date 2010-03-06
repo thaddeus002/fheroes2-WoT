@@ -299,7 +299,7 @@ void Castle::WellRedrawInfoArea(const Point & cur_pt)
 	{
 	    u8 grown = monster.GetGrown();
 	    grown += building & BUILD_WELL ? GROWN_WELL : 0;
-	    if(DWELLING_MONSTER1 & building) grown += building & BUILD_WEL2 ? GROWN_WEL2 : 0;
+	    if(DWELLING_MONSTER1 & dw) grown += building & BUILD_WEL2 ? GROWN_WEL2 : 0;
 
     	    text.Set(_("Growth"));
 	    dst_pt.x = pt.x + 268 - text.w() / 2;
