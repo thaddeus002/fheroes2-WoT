@@ -402,13 +402,12 @@ void AIToMonster(Heroes &hero, const u8 obj, const u16 dst_index)
     army.JoinTroop(monster, tile.GetCountMonster());
     army.ArrangeForBattle();
 
-    u32 ownRatio, otherRatio;
-    hero.GetArmy().CalculateForceRatiosVersus(army, ownRatio, otherRatio);
+    const float ratios = Army::CalculateForceRatiosVersus(hero.GetArmy(), army);
 
     const bool check_free_stack = (hero.GetArmy().GetCount() < hero.GetArmy().Size() || hero.GetArmy().HasMonster(monster));
     const bool check_extra_condition = Morale::NORMAL <= hero.GetMorale();
     
-    if(check_free_stack && check_extra_condition && ownRatio / otherRatio >= 2)
+    if(check_free_stack && check_extra_condition && ratios >= 2)
     {
         DEBUG(DBG_AI , DBG_INFO, "AIToMonster: possible " << hero.GetName() << " join monster " << monster.GetName());
 
@@ -456,7 +455,7 @@ void AIToMonster(Heroes &hero, const u8 obj, const u16 dst_index)
         }
     }
 
-    if(!avoidBattle && ownRatio / otherRatio >= 5)
+    if(!avoidBattle && ratios >= 5)
     {
 	avoidBattle = Rand::Get(0, 10) < 5;
 	if(avoidBattle) destroyTile = true;

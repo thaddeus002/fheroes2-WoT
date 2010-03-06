@@ -1081,45 +1081,33 @@ u32 Army::army_t::GetDamageMax(void) const
     return count ? res / count : 0;
 }
 
-void Army::army_t::CalculateForceRatiosVersus(const army_t &a, u32 &own, u32 &other)
+float Army::CalculateForceRatiosVersus(const army_t & army1, const army_t & army2)
 {
-    u16 a1 = GetAttack();
-    u16 d1 = GetDefense();
-    u32 m1 = GetDamageMin();
-    u32 x1 = GetDamageMax();
+    const u16 a1 = army1.GetAttack();
+    const u16 d1 = army1.GetDefense();
+    float r1 = 0;
 
-    u16 a2 = a.GetAttack();
-    u16 d2 = a.GetDefense();
-    u32 m2 = a.GetDamageMin();
-    u32 x2 = a.GetDamageMax();
+    const u16 a2 = army2.GetAttack();
+    const u16 d2 = army2.GetDefense();
+    float r2 = 0;
 
     // total damage: from FAQ
     if(a1 > d2)
-        own = static_cast<u32>((m1 + x1) / 2 * (1 + 0.1 * std::min(a1 - d2, 20)));
+        r1 = army1.GetHitPoints() * (army1.GetDamageMin() + army1.GetDamageMax()) / 2 * (1 + 0.1 * std::min(a1 - d2, 20));
     else
-        own = static_cast<u32>((m1 + x1) / 2 * (1 + 0.05 * std::min(d2 - a1, 14)));
+        r1 = army1.GetHitPoints() * (army1.GetDamageMin() + army1.GetDamageMax()) / 2 * (1 + 0.05 * std::min(d2 - a1, 14));
 
     if(a2 > d1)
-        other = static_cast<u32>((m2 + x2) / 2 * (1 + 0.1 * std::min(a2 - d1, 20)));
+        r2 = army2.GetHitPoints() * (army2.GetDamageMin() + army2.GetDamageMax()) / 2 * (1 + 0.1 * std::min(a2 - d1, 20));
     else
-        other = static_cast<u32>((m2 + x2) / 2 * (1 + 0.05 * std::min(d1 - a2, 14)));
+        r2 = army2.GetHitPoints() * (army2.GetDamageMin() + army2.GetDamageMax()) / 2 * (1 + 0.05 * std::min(d1 - a2, 14));
 
-    if(0 == own) own = 1;
-    if(0 == other) other = 1;
+    return 0 == r2 ? 1 : r1 / r2;
 }
 
 bool Army::army_t::StrongerEnemyArmy(const army_t & a)
 {
-    if(a.isValid())
-    {
-	u32 h1 = GetHitPoints();
-	u32 h2 = a.GetHitPoints();
-	u32 r1 = 0, r2 = 0;
-	CalculateForceRatiosVersus(a, r1, r2);
-
-	return h1 / r2 > h2 / r1;
-    }
-    return true;
+    return 1 <= CalculateForceRatiosVersus(*this, a);
 }
 
 void Army::army_t::SetCommander(HeroBase* c)

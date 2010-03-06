@@ -60,6 +60,7 @@ namespace Army
 
     const char* String(u32);
     armysize_t GetSize(u32);
+    float CalculateForceRatiosVersus(const army_t & a1, const army_t & a2);
 
     class army_t
     {
@@ -131,7 +132,6 @@ namespace Army
 	    bool	JoinTroop(const Monster::monster_t mon, const u32 count);
 	    bool	JoinTroop(const Monster & mon, const u32 count);
 	    bool	StrongerEnemyArmy(const army_t &);
-	    void	CalculateForceRatiosVersus(const army_t &a, u32 &own, u32 &other);
 
 	    void	JoinStrongestFromArmy(army_t &);
             void	KeepOnlyWeakestTroops(army_t &);
