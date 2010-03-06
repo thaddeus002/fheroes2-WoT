@@ -60,7 +60,6 @@ namespace Army
 
     const char* String(u32);
     armysize_t GetSize(u32);
-    float CalculateForceRatiosVersus(const army_t & a1, const army_t & a2);
 
     class army_t
     {

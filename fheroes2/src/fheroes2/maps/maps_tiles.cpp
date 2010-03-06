@@ -1835,6 +1835,46 @@ void Maps::Tiles::SetCountMonster(const u16 count)
     quantity2 = count / 0xFF;
 }
 
+void Maps::Tiles::UpdateMonsterInfo(void)
+{
+    switch(general)
+    {
+	case MP2::OBJ_RNDMONSTER:
+        case MP2::OBJ_RNDMONSTER1:
+        case MP2::OBJ_RNDMONSTER2:
+        case MP2::OBJ_RNDMONSTER3:
+        case MP2::OBJ_RNDMONSTER4:
+	    UpdateRNDMonsterSprite(); break;
+	default: break;
+    }
+
+    const Monster m = Monster(*this);
+    bool fixed = false;
+
+    // update random count
+    if(0 == quantity1 && 0 == quantity2)
+        SetCountMonster(4 * m.GetRNDSize(false));
+    // update fixed count (mp2 format)
+    else
+    {
+	u16 count = quantity2;
+	    count <<= 8;
+	    count |= (quantity1 >> 3);
+        SetCountMonster(count);
+	fixed = true;
+    }
+
+    if(m() == Monster::GHOST || m.isElemental())
+	quantity4 = 0;
+    else
+    if(fixed)
+	// for money
+	quantity4 = 1;
+    else
+	// 20% chance of joining
+        quantity4 = (3 > Rand::Get(1, 10) ? 2 : 1);
+}
+
 void Maps::Tiles::UpdateRNDMonsterSprite(void)
 {
     Maps::TilesAddon *addon = FindRNDMonster();

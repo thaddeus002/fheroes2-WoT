@@ -163,6 +163,7 @@ namespace Maps
 	u16 GetCountMonster(void) const;
 	void SetCountMonster(const u16 count);
 	void UpdateRNDMonsterSprite(void);
+	void UpdateMonsterInfo(void);
 
 	void UpdateRNDArtifactSprite(void);
 	void UpdateRNDResourceSprite(void);

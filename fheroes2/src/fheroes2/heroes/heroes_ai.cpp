@@ -402,16 +402,16 @@ void AIToMonster(Heroes &hero, const u8 obj, const u16 dst_index)
     army.JoinTroop(monster, tile.GetCountMonster());
     army.ArrangeForBattle();
 
-    const float ratios = Army::CalculateForceRatiosVersus(hero.GetArmy(), army);
+    const float ratios = hero.GetArmy().GetHitPoints() / army.GetHitPoints();
 
     const bool check_free_stack = (hero.GetArmy().GetCount() < hero.GetArmy().Size() || hero.GetArmy().HasMonster(monster));
     const bool check_extra_condition = Morale::NORMAL <= hero.GetMorale();
     
-    if(check_free_stack && check_extra_condition && ratios >= 2)
+    if(tile.GetQuantity4() && check_free_stack && check_extra_condition && ratios >= 2)
     {
         DEBUG(DBG_AI , DBG_INFO, "AIToMonster: possible " << hero.GetName() << " join monster " << monster.GetName());
 
-        if(tile.GetQuantity4())
+        if(2 == tile.GetQuantity4())
         {
             // join if ranged or flying monsters present
             if(hero.GetArmy().HasMonster(monster) || monster.isArchers() || monster.isFly())
@@ -427,17 +427,17 @@ void AIToMonster(Heroes &hero, const u8 obj, const u16 dst_index)
         if(hero.HasSecondarySkill(Skill::Secondary::DIPLOMACY))
         {
             u32 toJoin = tile.GetCountMonster();
-    
-            switch(hero.GetLevelSkill(Skill::Secondary::DIPLOMACY))
-            {
-                case Skill::Level::BASIC:   toJoin = Monster::GetCountFromHitPoints(monster(), monster.GetHitPoints() * 25 / 100); break;
-                case Skill::Level::ADVANCED:toJoin = Monster::GetCountFromHitPoints(monster(), monster.GetHitPoints() * 50 / 100); break;
-                default: break;
-            }
 
 	    Kingdom & kingdom = world.GetKingdom(hero.GetColor());
             PaymentConditions::BuyMonster cost(monster());
             cost *= toJoin;
+    
+            switch(hero.GetLevelSkill(Skill::Secondary::DIPLOMACY))
+            {
+                case Skill::Level::BASIC:   toJoin = Monster::GetCountFromHitPoints(monster(), toJoin * monster.GetHitPoints() / 4); break;
+                case Skill::Level::ADVANCED:toJoin = Monster::GetCountFromHitPoints(monster(), toJoin * monster.GetHitPoints() / 2); break;
+                default: break;
+            }
 
             if(toJoin && kingdom.AllowPayment(cost))
             {
@@ -480,7 +480,7 @@ void AIToMonster(Heroes &hero, const u8 obj, const u16 dst_index)
             if(!Settings::Get().OriginalVersion())
             {
                 tile.SetCountMonster(army.GetCountMonsters(monster));
-                tile.SetQuantity4(0);
+                if(2 == tile.GetQuantity4()) tile.SetQuantity4(1);
             }
         }
     }
