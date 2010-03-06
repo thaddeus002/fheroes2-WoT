@@ -52,4 +52,16 @@ class MageGuild
 	SpellStorage library;
 };
 
+class RowSpells
+{
+public:
+    RowSpells(const Point &, const MageGuild &, u8);
+    void Redraw(void);
+    void QueueEventProcessing(void);
+
+private:
+    std::vector<Rect> coords;
+    std::vector<Spell::spell_t> spells;
+};
+
 #endif

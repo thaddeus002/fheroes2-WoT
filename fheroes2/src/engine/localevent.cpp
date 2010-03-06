@@ -76,7 +76,6 @@ void LocalEvent::SetGlobalFilter(bool f)
     f ? SetModes(GLOBAL_FILTER) : ResetModes(GLOBAL_FILTER);
 }
 
-#include <iostream>
 KeySym SDLToKeySym(SDLKey key)
 {
     switch(key)
@@ -240,10 +239,10 @@ bool LocalEvent::HandleEvents(bool delay)
     while(SDL_PollEvent(&event))
     {
 	// keyboard
-	if(SDL_KEYDOWN == event.type)
+	if(SDL_KEYDOWN == event.type && KEY_NONE != SDLToKeySym(event.key.keysym.sym))
 	    HandleKeyboardEvent(event.key, true);
 	else
-	if(SDL_KEYUP == event.type)
+	if(SDL_KEYUP == event.type && KEY_NONE != SDLToKeySym(event.key.keysym.sym))
 	    HandleKeyboardEvent(event.key, false);
 
 	// mouse motion

@@ -27,19 +27,9 @@
 #include "button.h"
 #include "cursor.h"
 #include "castle.h"
+#include "settings.h"
+#include "mageguild.h"
 #include "text.h"
-
-class RowSpells
-{
-public:
-    RowSpells(const Point &, const MageGuild &, u8);
-    void Redraw(void);
-    void QueueEventProcessing(void);
-
-private:
-    std::vector<Rect> coords;
-    std::vector<Spell::spell_t> spells;
-};
 
 RowSpells::RowSpells(const Point & pos, const MageGuild & guild, u8 lvl)
 {
@@ -61,10 +51,15 @@ RowSpells::RowSpells(const Point & pos, const MageGuild & guild, u8 lvl)
     }
 
     for(u8 ii = 0; ii < count; ++ii)
-	coords.push_back(Rect(pos.x + coords.size() * 110 - roll.w() / 2, pos.y, roll.w(), roll.h()));
+	coords.push_back(Rect(pos.x + coords.size() * (Settings::Get().PocketPC() ? 72 : 110) - roll.w() / 2, pos.y, roll.w(), roll.h()));
 
     if(guild.HaveLibraryCapability())
-	coords.push_back(Rect(pos.x + coords.size() * 110 - roll_hide.w() / 2, pos.y, roll_hide.w(), roll_hide.h()));
+    {
+	if(! hide && guild.isLibraryBuild())
+	    coords.push_back(Rect(pos.x + coords.size() * (Settings::Get().PocketPC() ? 72 : 110) - roll_show.w() / 2, pos.y, roll_show.w(), roll_show.h()));
+	else
+	    coords.push_back(Rect(pos.x + coords.size() * (Settings::Get().PocketPC() ? 72 : 110) - roll_hide.w() / 2, pos.y, roll_hide.w(), roll_hide.h()));
+    }
 
     guild.GetSpells(spells, lvl);
     spells.resize(coords.size(), Spell::NONE);
@@ -97,10 +92,17 @@ void RowSpells::Redraw(void)
 
 	    const Sprite & icon = AGG::GetICN(ICN::SPELLS, Spell::IndexSprite(spell));
 
-	    display.Blit(icon, dst.x + 5 + (dst.w - icon.w()) / 2, dst.y + 40 - icon.h() / 2);
+	    if(Settings::Get().PocketPC())
+	    {
+		display.Blit(icon, dst.x + 2 + (dst.w - icon.w()) / 2, dst.y + 20 - icon.h() / 2);
+	    }
+	    else
+	    {
+		display.Blit(icon, dst.x + 5 + (dst.w - icon.w()) / 2, dst.y + 40 - icon.h() / 2);
 
-	    TextBox text(Spell::GetName(spell), Font::SMALL, 73);
-	    text.Blit(dst.x + 19, dst.y + 62);
+		TextBox text(Spell::GetName(spell), Font::SMALL, 73);
+		text.Blit(dst.x + 19, dst.y + 62);
+	    }
 	}
     }
 }

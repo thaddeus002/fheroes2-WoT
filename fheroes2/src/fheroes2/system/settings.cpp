@@ -185,7 +185,7 @@ bool Settings::Read(const std::string & filename)
     {
 	opt_global.SetModes(HIDEINTERFACE);
 	opt_pocket.SetModes(TAPMODE);
-	opt_pocket.SetModes(LOWMEMORY);
+	//opt_pocket.SetModes(LOWMEMORY);
 	opt_battle.SetModes(BATTLEGRID);
 	opt_battle.SetModes(BATTLEMOUSESHADOW);
 	opt_battle.SetModes(BATTLEMOVESHADOW);
@@ -541,17 +541,17 @@ void Settings::Parse(const std::string & left, const std::string & right)
     if(left == "tap delay") LocalEvent::Get().SetTapDelayForRightClickEmulation(String::ToInt(right));
 #ifdef _WIN32_WCE
     else
-    if(left == "key_hw1" && 1 < right.size()) LocalEvent::Get().SetHardwareButton(KEY_APP1, KeySymFromChar(right[1]));
+    if(left == "key_hw01" && 1 < right.size()) LocalEvent::Get().SetHardwareButton(KEY_APP1, KeySymFromChar(right[1]));
     else
-    if(left == "key_hw2" && 1 < right.size()) LocalEvent::Get().SetHardwareButton(KEY_APP2, KeySymFromChar(right[1]));
+    if(left == "key_hw02" && 1 < right.size()) LocalEvent::Get().SetHardwareButton(KEY_APP2, KeySymFromChar(right[1]));
     else
-    if(left == "key_hw3" && 1 < right.size()) LocalEvent::Get().SetHardwareButton(KEY_APP3, KeySymFromChar(right[1]));
+    if(left == "key_hw03" && 1 < right.size()) LocalEvent::Get().SetHardwareButton(KEY_APP3, KeySymFromChar(right[1]));
     else
-    if(left == "key_hw4" && 1 < right.size()) LocalEvent::Get().SetHardwareButton(KEY_APP4, KeySymFromChar(right[1]));
+    if(left == "key_hw04" && 1 < right.size()) LocalEvent::Get().SetHardwareButton(KEY_APP4, KeySymFromChar(right[1]));
     else
-    if(left == "key_hw5" && 1 < right.size()) LocalEvent::Get().SetHardwareButton(KEY_APP5, KeySymFromChar(right[1]));
+    if(left == "key_hw05" && 1 < right.size()) LocalEvent::Get().SetHardwareButton(KEY_APP5, KeySymFromChar(right[1]));
     else
-    if(left == "key_hw6" && 1 < right.size()) LocalEvent::Get().SetHardwareButton(KEY_APP6, KeySymFromChar(right[1]));
+    if(left == "key_hw06" && 1 < right.size()) LocalEvent::Get().SetHardwareButton(KEY_APP6, KeySymFromChar(right[1]));
     else
     if(left == "key_left" && 1 < right.size()) LocalEvent::Get().SetHardwareButton(KEY_LEFT, KeySymFromChar(right[1]));
     else

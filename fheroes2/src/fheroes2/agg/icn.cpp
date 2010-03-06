@@ -1695,6 +1695,9 @@ bool ICN::NeedMinify4PocketPC(icn_t icn, u16 index)
 {
     switch(icn)
     {
+	case TOWNWIND:
+	    return index == 0 || index == 1;
+	//
 	case PUZZLE:
 	case HSBKG:
 	case BOOK:

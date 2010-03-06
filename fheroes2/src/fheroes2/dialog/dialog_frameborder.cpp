@@ -147,7 +147,7 @@ void DrawBorder(s16 posx, s16 posy, u16 posw, u16 posh, Surface & sf)
     // left bar
     src_rt = Rect(SHADOWWIDTH, ANGLEWIDTH, BORDERWIDTH, BORDERWIDTH * 2);
     dst_pt = Point(posx, posy + ANGLEWIDTH);
-    while(dst_pt.y < posy + posh - BORDERWIDTH * 2)
+    while(dst_pt.y < posy + posh - BORDERWIDTH * 3)
     {
 	sf.Blit(surdbkg, src_rt, dst_pt);
 	dst_pt.y += src_rt.h;
@@ -166,7 +166,7 @@ void DrawBorder(s16 posx, s16 posy, u16 posw, u16 posh, Surface & sf)
     // right bar
     src_rt = Rect(surdbkg.w() - BORDERWIDTH, ANGLEWIDTH, BORDERWIDTH, ANGLEWIDTH);
     dst_pt = Point(posx + posw - src_rt.w, posy + ANGLEWIDTH);
-    while(dst_pt.y < posy + posh - BORDERWIDTH * 2)
+    while(dst_pt.y < posy + posh - BORDERWIDTH * 3)
     {
 	sf.Blit(surdbkg, src_rt, dst_pt);
 	dst_pt.y += src_rt.h;
