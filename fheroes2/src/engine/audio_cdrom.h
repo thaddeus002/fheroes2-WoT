@@ -23,6 +23,7 @@
 #ifndef H2AUDIO_CDROM_H
 #define H2AUDIO_CDROM_H
 
+#ifdef WITH_AUDIOCD
 #include "types.h"
 
 namespace Cdrom
@@ -32,4 +33,5 @@ namespace Cdrom
     void	Pause(void);
 }
 
+#endif
 #endif

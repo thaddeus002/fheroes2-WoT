@@ -31,11 +31,13 @@ namespace Mixer
     void Quit(void);
 }
 
+#ifdef WITH_AUDIOCD
 namespace Cdrom
 {
     void Open(void);
     void Close(void);
 }
+#endif
 
 bool SDL::Init(const u32 system)
 {
@@ -46,8 +48,9 @@ bool SDL::Init(const u32 system)
     }
 
     if(SDL_INIT_AUDIO & system) Mixer::Init();
+#ifdef WITH_AUDIOCD
     if(SDL_INIT_CDROM & system) Cdrom::Open();
-
+#endif
 #ifdef WITH_TTF
     SDL::Font::Init();
 #endif
@@ -68,8 +71,9 @@ void SDL::Quit(void)
 #ifdef WITH_TTF
     SDL::Font::Quit();
 #endif
-
+#ifdef WITH_AUDIOCD
     if(SubSystem(SDL_INIT_CDROM)) Cdrom::Close();
+#endif
     if(SubSystem(SDL_INIT_AUDIO)) Mixer::Quit();
 
     SDL_Quit();

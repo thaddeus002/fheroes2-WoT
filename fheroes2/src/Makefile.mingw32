@@ -10,6 +10,10 @@ ifndef WITHOUT_UNICODE
 LIBS := $(LIBS) -lintl -lfreetype
 endif
 
+ifndef WITHOUT_AUDIOCD
+CFLAGS := $(CFLAGS) -DWITH_AUDIOCD
+endif
+
 AR := i686-pc-mingw32-ar
 CXX := i686-pc-mingw32-g++
 WINDRES := i686-pc-mingw32-windres

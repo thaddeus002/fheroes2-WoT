@@ -176,7 +176,9 @@ void Mixer::Stop(int channel)
 void Mixer::Reset(void)
 {
     Music::Reset();
+#ifdef WITH_AUDIOCD
     if(Cdrom::isValid()) Cdrom::Pause();
+#endif
     Mix_HaltChannel(-1);
 }
 
@@ -433,7 +435,9 @@ void Mixer::Stop(int ch)
 void Mixer::Reset(void)
 {
     Music::Reset();
+#ifdef WITH_AUDIOCD
     if(Cdrom::isValid()) Cdrom::Pause();
+#endif
     Pause(-1);
 }
 

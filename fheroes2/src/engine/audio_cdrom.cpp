@@ -20,6 +20,7 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
+#ifdef WITH_AUDIOCD
 #include <iostream>
 #include "audio_mixer.h"
 #include "audio_cdrom.h"
@@ -131,3 +132,4 @@ void Cdrom::Pause(void)
 {
     if(cd) SDL_CDPause(cd);
 }
+#endif

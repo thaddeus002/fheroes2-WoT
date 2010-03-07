@@ -1183,12 +1183,14 @@ void AGG::PlayMusic(const MUS::mus_t mus, bool loop)
 	DEBUG(DBG_ENGINE , DBG_INFO, "AGG::PlayMusic: " << MUS::GetString(mus));
     }
     else
+#ifdef WITH_AUDIOCD
     if((Settings::MUSIC_CD == conf.GetMusicType()) && Cdrom::isValid())
     {
 	Cdrom::Play(mus, loop);
 	DEBUG(DBG_ENGINE , DBG_INFO, "AGG::PlayMusic: cd track " << static_cast<int>(mus));
     }
     else
+#endif
     if(Settings::MUSIC_MIDI == conf.GetMusicType())
     {
 	XMI::xmi_t xmi = XMI::FromMUS(mus);
