@@ -25,18 +25,12 @@
 
 #define TAP_DELAY_EMULATE 1050
 
-namespace
-{
-#ifdef _WIN32_WCE
-    static KeySym _hw_buttons[] = { 
-	KEY_RETURN, KEY_LEFT, KEY_RIGHT, KEY_UP, KEY_DOWN,
-	KEY_APP1, KEY_APP2, KEY_APP3, KEY_APP4, KEY_APP5, KEY_APP6, };
-#endif
-};
-
 LocalEvent::LocalEvent() : modes(0), key_value(KEY_NONE), mouse_state(0),
     mouse_button(0), mouse_st(0, 0), redraw_cursor_func(NULL), keyboard_filter_func(NULL), clock_delay(TAP_DELAY_EMULATE)
 {
+#ifdef WITH_KEYMAPPING
+    vkey.reserve(12);
+#endif
 }
 
 void LocalEvent::SetTapMode(bool f)
@@ -82,19 +76,11 @@ KeySym SDLToKeySym(SDLKey key)
     {
 	default: break;
 
-#ifdef _WIN32_WCE
-	case SDLK_RETURN:	return _hw_buttons[0];
-	case SDLK_LEFT:		return _hw_buttons[1];
-	case SDLK_RIGHT:	return _hw_buttons[2];
-	case SDLK_UP:		return _hw_buttons[3];
-	case SDLK_DOWN:		return _hw_buttons[4];
-#else
 	case SDLK_RETURN:	return KEY_RETURN;
 	case SDLK_LEFT:		return KEY_LEFT;
 	case SDLK_RIGHT:	return KEY_RIGHT;
 	case SDLK_UP:		return KEY_UP;
 	case SDLK_DOWN:		return KEY_DOWN;
-#endif
 
 	case SDLK_ESCAPE:	return KEY_ESCAPE;
 	case SDLK_KP_ENTER:	return KEY_RETURN;
@@ -186,18 +172,44 @@ KeySym SDLToKeySym(SDLKey key)
 	case SDLK_z:		return KEY_z;
 
 #ifdef _WIN32_WCE
-	case SDLK_APP1:		return _hw_buttons[5];
-	case SDLK_APP2:		return _hw_buttons[6];
-	case SDLK_APP3:		return _hw_buttons[7];
-	case SDLK_APP4:		return _hw_buttons[8];
-	case SDLK_APP5:		return _hw_buttons[9];
-	case SDLK_APP6:		return _hw_buttons[10];
+	case 0xC1: return KEY_APP01;
+	case 0xC2: return KEY_APP02;
+	case 0xC3: return KEY_APP03;
+	case 0xC4: return KEY_APP04;
+	case 0xC5: return KEY_APP05;
+	case 0xC6: return KEY_APP06;
+	case 0xC7: return KEY_APP07;
+	case 0xC8: return KEY_APP08;
+	case 0xC9: return KEY_APP09;
+	case 0xCA: return KEY_APP10;
+	case 0xCB: return KEY_APP11;
+	case 0xCC: return KEY_APP12;
+	case 0xCD: return KEY_APP13;
+	case 0xCE: return KEY_APP14;
+	case 0xCF: return KEY_APP15;
 #endif
     }
 
     return KEY_NONE;
 };
 
+#ifdef WITH_KEYMAPPING
+#include <algorithm>
+void LocalEvent::SetVirtualKey(int sym1, KeySym sym2)
+{
+    std::vector<KeyMap>::iterator it = std::find_if(vkey.begin(), vkey.end(), std::bind2nd(std::mem_fun_ref(&KeyMap::isKey), sym1));
+    if(vkey.end() != it)
+	(*it).second = sym2;
+    else
+	vkey.push_back(KeyMap(sym1, sym2));
+}
+
+KeySym LocalEvent::GetVirtualKey(KeySym sym) const
+{
+    std::vector<KeyMap>::const_iterator it = std::find_if(vkey.begin(), vkey.end(), std::bind2nd(std::mem_fun_ref(&KeyMap::isKey), sym));
+    return vkey.end() == it ? sym : (*it).second;
+}
+#endif
 
 LocalEvent & LocalEvent::Get(void)
 {
@@ -205,29 +217,6 @@ LocalEvent & LocalEvent::Get(void)
 
     return le;
 }
-
-#ifdef _WIN32_WCE
-void LocalEvent::SetHardwareButton(KeySym a, KeySym b)
-{
-    switch(a)
-    {
-	case KEY_APP1:	_hw_buttons[5] = b; break;
-	case KEY_APP2:	_hw_buttons[6] = b; break;
-	case KEY_APP3:	_hw_buttons[7] = b; break;
-	case KEY_APP4:	_hw_buttons[8] = b; break;
-	case KEY_APP5:	_hw_buttons[9] = b; break;
-	case KEY_APP6:	_hw_buttons[10] = b; break;
-
-	case KEY_RETURN:_hw_buttons[0] = b; break;
-	case KEY_LEFT:	_hw_buttons[1] = b; break;
-	case KEY_RIGHT:	_hw_buttons[2] = b; break;
-	case KEY_UP:	_hw_buttons[3] = b; break;
-	case KEY_DOWN:	_hw_buttons[4] = b; break;
-
-	default: break;
-    }
-}
-#endif
 
 bool LocalEvent::HandleEvents(bool delay)
 {
@@ -238,33 +227,33 @@ bool LocalEvent::HandleEvents(bool delay)
 
     while(SDL_PollEvent(&event))
     {
-	// keyboard
-	if(SDL_KEYDOWN == event.type && KEY_NONE != SDLToKeySym(event.key.keysym.sym))
-	    HandleKeyboardEvent(event.key, true);
-	else
-	if(SDL_KEYUP == event.type && KEY_NONE != SDLToKeySym(event.key.keysym.sym))
-	    HandleKeyboardEvent(event.key, false);
-
-	// mouse motion
-	if(SDL_MOUSEMOTION == event.type)
-	    HandleMouseMotionEvent(event.motion);
-
-	// mouse button
-	if(SDL_MOUSEBUTTONDOWN == event.type || SDL_MOUSEBUTTONUP == event.type)
+	switch(event.type)
 	{
-	    // mouse wheel
-	    if(SDL_BUTTON_WHEELDOWN == event.button.button || SDL_BUTTON_WHEELUP == event.button.button)
-	    {
-		HandleMouseWheelEvent(event.button);
-		
+	    // keyboard
+	    case SDL_KEYDOWN:
+	    case SDL_KEYUP:
+		HandleKeyboardEvent(event.key);
 		break;
-	    }
-	    else
-		HandleMouseButtonEvent(event.button);
-	}
 
-	// exit
-	if(SDL_QUIT == event.type){ Error::Except("LocalEvent::HandleEvents: ", "quit event: ok."); return false; }
+	    // mouse motion
+	    case SDL_MOUSEMOTION:
+		HandleMouseMotionEvent(event.motion);
+		break;
+
+	    // mouse button
+	    case SDL_MOUSEBUTTONDOWN:
+	    case SDL_MOUSEBUTTONUP:
+		HandleMouseButtonEvent(event.button);
+		break;
+	
+	    // exit
+	    case SDL_QUIT:
+		Error::Except("LocalEvent::HandleEvents: ", "quit event: ok.");
+		return false;
+
+	    default:
+		break;
+	}
     }
 
     // emulate press right
@@ -326,10 +315,16 @@ bool LocalEvent::MouseReleaseRight(void) const
     return !(modes & MOUSE_PRESSED) && SDL_BUTTON_RIGHT == mouse_button;
 }
 
-void LocalEvent::HandleKeyboardEvent(SDL_KeyboardEvent & event, bool pressed)
+void LocalEvent::HandleKeyboardEvent(SDL_KeyboardEvent & event)
 {
-    pressed ? SetModes(KEY_PRESSED) : ResetModes(KEY_PRESSED);
-    key_value = SDLToKeySym(event.keysym.sym);
+    if(KEY_NONE != SDLToKeySym(event.keysym.sym))
+    {
+	(event.type == SDL_KEYDOWN) ? SetModes(KEY_PRESSED) : ResetModes(KEY_PRESSED);
+	key_value = SDLToKeySym(event.keysym.sym);
+#ifdef WITH_KEYMAPPING
+	key_value = GetVirtualKey(key_value);
+#endif
+    }
 }
 
 void LocalEvent::HandleMouseMotionEvent(const SDL_MouseMotionEvent & motion)
@@ -349,10 +344,15 @@ void LocalEvent::HandleMouseButtonEvent(const SDL_MouseButtonEvent & button)
     mouse_cu.x = button.x;
     mouse_cu.y = button.y;
     if(modes & MOUSE_OFFSET) mouse_cu += mouse_st;
-    
+
     if(modes & MOUSE_PRESSED)
 	switch(button.button)
 	{
+	    case SDL_BUTTON_WHEELDOWN:
+	    case SDL_BUTTON_WHEELUP:
+		mouse_pm = mouse_cu;
+		break;
+
 	    case SDL_BUTTON_LEFT:
 		mouse_pl = mouse_cu;
 		SetModes(CLICK_LEFT);
@@ -378,6 +378,11 @@ void LocalEvent::HandleMouseButtonEvent(const SDL_MouseButtonEvent & button)
     else
 	switch(button.button)
 	{
+	    case SDL_BUTTON_WHEELDOWN:
+	    case SDL_BUTTON_WHEELUP:
+		mouse_rm = mouse_cu;
+		break;
+
 	    case SDL_BUTTON_LEFT:
 		mouse_rl = mouse_cu;
 
@@ -397,21 +402,6 @@ void LocalEvent::HandleMouseButtonEvent(const SDL_MouseButtonEvent & button)
 	    default:
 		break;
 	}
-}
-
-void LocalEvent::HandleMouseWheelEvent(const SDL_MouseButtonEvent & button)
-{
-    button.state == SDL_PRESSED ? SetModes(MOUSE_PRESSED) : ResetModes(MOUSE_PRESSED);
-    mouse_button = button.button;
-
-    mouse_cu.x = button.x;
-    mouse_cu.y = button.y;
-    if(modes & MOUSE_OFFSET) mouse_cu += mouse_st;
-
-    if(modes & MOUSE_PRESSED)
-	mouse_pm = mouse_cu;
-    else
-	mouse_rm = mouse_cu;
 }
 
 bool LocalEvent::MouseClickLeft(void)

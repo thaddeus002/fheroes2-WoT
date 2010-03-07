@@ -39,106 +39,129 @@ enum KeyMod { MOD_NONE = KMOD_NONE, MOD_CTRL = KMOD_CTRL, MOD_SHIFT = KMOD_SHIFT
 
 enum KeySym
 {
-    KEY_NONE,
-    KEY_BACKSPACE,
-    KEY_RETURN,
-    KEY_ESCAPE,
-    KEY_SPACE,
-    KEY_EXCLAIM,
-    KEY_QUOTEDBL,
-    KEY_HASH,
-    KEY_DOLLAR,
-    KEY_AMPERSAND,
-    KEY_QUOTE,
-    KEY_LEFTPAREN,
-    KEY_RIGHTPAREN,
-    KEY_ASTERISK,
-    KEY_PLUS,
-    KEY_COMMA,
-    KEY_MINUS,
-    KEY_PERIOD,
-    KEY_SLASH,
-    KEY_COLON,
-    KEY_SEMICOLON,
-    KEY_LESS,
-    KEY_EQUALS,
-    KEY_GREATER,
-    KEY_QUESTION,
-    KEY_AT,
-    KEY_LEFTBRACKET,
-    KEY_BACKSLASH,
-    KEY_RIGHTBRACKET,
-    KEY_CARET,
-    KEY_UNDERSCORE,
-    KEY_ALT,
-    KEY_CONTROL,
-    KEY_SHIFT,
-    KEY_DELETE,
-    KEY_PAGEUP,
-    KEY_PAGEDOWN,
-    KEY_F1,
-    KEY_F2,
-    KEY_F3,
-    KEY_F4,
-    KEY_F5,
-    KEY_F6,
-    KEY_F7,
-    KEY_F8,
-    KEY_F9,
-    KEY_F10,
-    KEY_F11,
-    KEY_F12,
-    KEY_PRINT,
-    KEY_LEFT,
-    KEY_RIGHT,
-    KEY_UP,
-    KEY_DOWN,
-    KEY_0,
-    KEY_1,
-    KEY_2,
-    KEY_3,
-    KEY_4,
-    KEY_5,
-    KEY_6,
-    KEY_7,
-    KEY_8,
-    KEY_9,
-    KEY_a,
-    KEY_b,
-    KEY_c,
-    KEY_d,
-    KEY_e,
-    KEY_f,
-    KEY_g,
-    KEY_h,
-    KEY_i,
-    KEY_j,
-    KEY_k,
-    KEY_l,
-    KEY_m,
-    KEY_n,
-    KEY_o,
-    KEY_p,
-    KEY_q,
-    KEY_r,
-    KEY_s,
-    KEY_t,
-    KEY_u,
-    KEY_v,
-    KEY_w,
-    KEY_x,
-    KEY_y,
-    KEY_z,
+    KEY_NONE		= SDLK_UNKNOWN,
+
+    KEY_BACKSPACE	= SDLK_BACKSPACE,
+    KEY_RETURN		= SDLK_RETURN,
+    KEY_ESCAPE		= SDLK_ESCAPE,
+    KEY_SPACE		= SDLK_SPACE,
+    KEY_EXCLAIM		= SDLK_EXCLAIM,
+    KEY_QUOTEDBL	= SDLK_QUOTEDBL,
+    KEY_HASH		= SDLK_HASH,
+    KEY_DOLLAR		= SDLK_DOLLAR,
+    KEY_AMPERSAND	= SDLK_AMPERSAND,
+    KEY_QUOTE		= SDLK_QUOTE,
+    KEY_LEFTPAREN	= SDLK_LEFTPAREN,
+    KEY_RIGHTPAREN	= SDLK_RIGHTPAREN,
+    KEY_ASTERISK	= SDLK_ASTERISK,
+    KEY_PLUS		= SDLK_PLUS,
+    KEY_COMMA		= SDLK_COMMA,
+    KEY_MINUS		= SDLK_MINUS,
+    KEY_PERIOD		= SDLK_PERIOD,
+    KEY_SLASH		= SDLK_SLASH,
+    KEY_COLON		= SDLK_COLON,
+    KEY_SEMICOLON	= SDLK_SEMICOLON,
+    KEY_LESS		= SDLK_LESS,
+    KEY_EQUALS		= SDLK_EQUALS,
+    KEY_GREATER		= SDLK_GREATER,
+    KEY_QUESTION	= SDLK_QUESTION,
+    KEY_AT		= SDLK_AT,
+    KEY_LEFTBRACKET	= SDLK_LEFTBRACKET,
+    KEY_BACKSLASH	= SDLK_BACKSLASH,
+    KEY_RIGHTBRACKET	= SDLK_RIGHTBRACKET,
+    KEY_CARET		= SDLK_CARET,
+    KEY_UNDERSCORE	= SDLK_UNDERSCORE,
+    KEY_ALT		= SDLK_LALT,
+    KEY_CONTROL		= SDLK_LCTRL,
+    KEY_SHIFT		= SDLK_LSHIFT,
+    KEY_DELETE		= SDLK_DELETE,
+    KEY_PAGEUP		= SDLK_PAGEUP,
+    KEY_PAGEDOWN	= SDLK_PAGEDOWN,
+    KEY_F1		= SDLK_F1,
+    KEY_F2		= SDLK_F2,
+    KEY_F3		= SDLK_F3,
+    KEY_F4		= SDLK_F4,
+    KEY_F5		= SDLK_F5,
+    KEY_F6		= SDLK_F6,
+    KEY_F7		= SDLK_F7,
+    KEY_F8		= SDLK_F8,
+    KEY_F9		= SDLK_F9,
+    KEY_F10		= SDLK_F10,
+    KEY_F11		= SDLK_F11,
+    KEY_F12		= SDLK_F12,
+    KEY_PRINT		= SDLK_PRINT,
+    KEY_LEFT		= SDLK_LEFT,
+    KEY_RIGHT		= SDLK_RIGHT,
+    KEY_UP		= SDLK_UP,
+    KEY_DOWN		= SDLK_DOWN,
+    KEY_0		= SDLK_0,
+    KEY_1		= SDLK_1,
+    KEY_2		= SDLK_2,
+    KEY_3		= SDLK_3,
+    KEY_4		= SDLK_4,
+    KEY_5		= SDLK_5,
+    KEY_6		= SDLK_6,
+    KEY_7		= SDLK_7,
+    KEY_8		= SDLK_8,
+    KEY_9		= SDLK_9,
+    KEY_a		= SDLK_a,
+    KEY_b		= SDLK_b,
+    KEY_c		= SDLK_c,
+    KEY_d		= SDLK_d,
+    KEY_e		= SDLK_e,
+    KEY_f		= SDLK_f,
+    KEY_g		= SDLK_g,
+    KEY_h		= SDLK_h,
+    KEY_i		= SDLK_i,
+    KEY_j		= SDLK_j,
+    KEY_k		= SDLK_k,
+    KEY_l		= SDLK_l,
+    KEY_m		= SDLK_m,
+    KEY_n		= SDLK_n,
+    KEY_o		= SDLK_o,
+    KEY_p		= SDLK_p,
+    KEY_q		= SDLK_q,
+    KEY_r		= SDLK_r,
+    KEY_s		= SDLK_s,
+    KEY_t		= SDLK_t,
+    KEY_u		= SDLK_u,
+    KEY_v		= SDLK_v,
+    KEY_w		= SDLK_w,
+    KEY_x		= SDLK_x,
+    KEY_y		= SDLK_y,
+    KEY_z		= SDLK_z,
 
 #ifdef _WIN32_WCE
-    KEY_APP1,
-    KEY_APP2,
-    KEY_APP3,
-    KEY_APP4,
-    KEY_APP5,
-    KEY_APP6,
+    KEY_APP01		= 0xC1,
+    KEY_APP02		= 0xC2,
+    KEY_APP03		= 0xC3,
+    KEY_APP04		= 0xC4,
+    KEY_APP05		= 0xC5,
+    KEY_APP06		= 0xC6,
+    KEY_APP07		= 0xC7,
+    KEY_APP08		= 0xC8,
+    KEY_APP09		= 0xC9,
+    KEY_APP10		= 0xCA,
+    KEY_APP11		= 0xCB,
+    KEY_APP12		= 0xCC,
+    KEY_APP13		= 0xCD,
+    KEY_APP14		= 0xCE,
+    KEY_APP15		= 0xCF,
 #endif
+
+    KEY_LAST		= SDLK_LAST
 };
+
+#ifdef WITH_KEYMAPPING
+#include <vector>
+#include <utility>
+
+struct KeyMap : std::pair<int, KeySym>
+{
+    KeyMap(int i = 0, KeySym s = KEY_NONE) : std::pair<int, KeySym>(i, s){};
+    bool isKey(int k) const{ return first == k; };
+};
+#endif
 
 class LocalEvent
 {
@@ -153,8 +176,9 @@ public:
     void SetMouseOffsetX(s16);
     void SetMouseOffsetY(s16);
 
-#ifdef _WIN32_WCE
-    static void SetHardwareButton(KeySym, KeySym);
+#ifdef WITH_KEYMAPPING
+    void   SetVirtualKey(int, KeySym);
+    KeySym GetVirtualKey(KeySym) const;
 #endif
 
     static void SetStateDefaults(void);
@@ -224,8 +248,7 @@ private:
 
     void HandleMouseMotionEvent(const SDL_MouseMotionEvent & motion);
     void HandleMouseButtonEvent(const SDL_MouseButtonEvent & button);
-    void HandleMouseWheelEvent(const SDL_MouseButtonEvent & button);
-    void HandleKeyboardEvent(SDL_KeyboardEvent &, bool pressed);
+    void HandleKeyboardEvent(SDL_KeyboardEvent &);
 
     static int GlobalFilterEvents(const SDL_Event *event);
 
@@ -268,6 +291,10 @@ private:
 
     Time clock;
     double clock_delay;
+
+#ifdef WITH_KEYMAPPING
+    std::vector<KeyMap> vkey;
+#endif
 };
 
 #endif

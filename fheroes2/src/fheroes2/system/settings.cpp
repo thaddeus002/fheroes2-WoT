@@ -169,7 +169,8 @@ bool Settings::Read(const std::string & filename)
     if(font_normal.empty() || font_small.empty()) opt_global.ResetModes(USEUNICODE);
 
 #ifdef BUILD_RELEASE
-    debug &= 0x0FFF;
+    debug &= 0x000F;
+    debug |= (DBG_ENGINE | DBG_GAME | DBG_BATTLE | DBG_AI | DBG_NETWORK);
 #endif
 
     if(video_mode.w < 640 || video_mode.h < 480)
@@ -539,29 +540,15 @@ void Settings::Parse(const std::string & left, const std::string & right)
     // tap delay for right click emulation
     else
     if(left == "tap delay") LocalEvent::Get().SetTapDelayForRightClickEmulation(String::ToInt(right));
-#ifdef _WIN32_WCE
+#ifdef WITH_KEYMAPPING
     else
-    if(left == "key_hw01" && 1 < right.size()) LocalEvent::Get().SetHardwareButton(KEY_APP1, KeySymFromChar(right[1]));
-    else
-    if(left == "key_hw02" && 1 < right.size()) LocalEvent::Get().SetHardwareButton(KEY_APP2, KeySymFromChar(right[1]));
-    else
-    if(left == "key_hw03" && 1 < right.size()) LocalEvent::Get().SetHardwareButton(KEY_APP3, KeySymFromChar(right[1]));
-    else
-    if(left == "key_hw04" && 1 < right.size()) LocalEvent::Get().SetHardwareButton(KEY_APP4, KeySymFromChar(right[1]));
-    else
-    if(left == "key_hw05" && 1 < right.size()) LocalEvent::Get().SetHardwareButton(KEY_APP5, KeySymFromChar(right[1]));
-    else
-    if(left == "key_hw06" && 1 < right.size()) LocalEvent::Get().SetHardwareButton(KEY_APP6, KeySymFromChar(right[1]));
-    else
-    if(left == "key_left" && 1 < right.size()) LocalEvent::Get().SetHardwareButton(KEY_LEFT, KeySymFromChar(right[1]));
-    else
-    if(left == "key_right" && 1 < right.size()) LocalEvent::Get().SetHardwareButton(KEY_RIGHT, KeySymFromChar(right[1]));
-    else
-    if(left == "key_up" && 1 < right.size()) LocalEvent::Get().SetHardwareButton(KEY_UP, KeySymFromChar(right[1]));
-    else
-    if(left == "key_down" && 1 < right.size()) LocalEvent::Get().SetHardwareButton(KEY_DOWN, KeySymFromChar(right[1]));
-    else
-    if(left == "key_return" && 1 < right.size()) LocalEvent::Get().SetHardwareButton(KEY_RETURN, KeySymFromChar(right[1]));
+    // load virtual key map
+    if(4 < left.size() && 1 < right.size() && left.substr(0, 4) == "key_")
+    {
+	int code = String::ToInt(left.substr(4));
+	DEBUG(DBG_ENGINE, DBG_INFO, "Settings::Parse: " << left << ", set virtual key: " << code << ", to: " << KeySymFromChar(right[1]));
+	LocalEvent::Get().SetVirtualKey(code, KeySymFromChar(right[1]));
+    }
 #endif
 }
 

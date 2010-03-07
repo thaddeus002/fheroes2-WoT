@@ -1,4 +1,7 @@
-SVN - up to r1573
+SVN - up to r1575
++ Added pocketpc hardware buttons support
+
+Mar, 7, 2010
 + Fixed joined monster
 + Fixed battle animations
 + Added status message for resurrect spells and death spells

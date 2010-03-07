@@ -233,7 +233,7 @@ void HGSData::RedrawList(s16 ox, s16 oy)
 
 Game::menu_t Game::HighScores(void)
 {
-    Settings & conf = Settings::Get();
+    const Settings & conf = Settings::Get();
     HGSData hgs;
 
     std::ostringstream stream;
@@ -289,6 +289,13 @@ Game::menu_t Game::HighScores(void)
     // highscores loop
     while(le.HandleEvents())
     {
+	// key code info
+        if(IS_DEBUG(DBG_ENGINE, DBG_INFO) && le.KeyPress())
+        {
+            std::string str;
+            String::AddInt(str, le.KeyValue());
+            Dialog::Message("Key Press:", str, Font::SMALL, Dialog::OK);
+        }
 	le.MousePressLeft(buttonCampain) ? buttonCampain.PressDraw() : buttonCampain.ReleaseDraw();
 	le.MousePressLeft(buttonExit) ? buttonExit.PressDraw() : buttonExit.ReleaseDraw();
 
