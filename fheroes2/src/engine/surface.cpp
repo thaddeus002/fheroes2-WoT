@@ -730,7 +730,7 @@ void Surface::MakeStencil(Surface & dst, const Surface & src, u32 col)
             u32 pixel = src.GetPixel(x, y);
             if(clkey != pixel)
 	    {
-		if(src.GetAlpha())
+		if(src.isAlpha())
 		{
 		    src.GetRGB(pixel, &r, &g, &b, &a);
 		    // skip shadow
