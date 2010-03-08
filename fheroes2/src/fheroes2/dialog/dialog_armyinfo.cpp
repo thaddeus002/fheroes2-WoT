@@ -315,7 +315,7 @@ void DrawMonsterStats(const Point & dst, const Army::Troop & troop)
     dst_pt.y += (pda ? 14 : 18);
     text.Blit(dst_pt);
 
-    text.Set(Speed::String(battle ? battle->GetSpeed() : mons.GetSpeed()));
+    text.Set(Speed::String(battle ? battle->GetSpeed(true) : mons.GetSpeed()));
     dst_pt.x = dst.x + 20;
     text.Blit(dst_pt);
 

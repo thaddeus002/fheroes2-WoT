@@ -137,7 +137,7 @@ namespace Battle2
 	u16	GetAttack(void) const;
 	u16	GetDefense(void) const;
 	u8	GetColor(void) const;
-	u8	GetSpeed(void) const;
+	u8	GetSpeed(bool skip_standing_check = false) const;
 	const char* GetName(void) const;
 	u8	GetControl(void) const;
 	u32	GetDamage(const Stats &) const;

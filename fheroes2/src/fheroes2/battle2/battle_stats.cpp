@@ -571,11 +571,9 @@ u8 Battle2::Stats::GetColor(void) const
     return (Modes(SP_BERSERKER) ? 0 : Modes(SP_HYPNOTIZE) ? arena->GetOppositeColor(troop.GetColor()) : troop.GetColor());
 }
 
-u8 Battle2::Stats::GetSpeed(void) const
+u8 Battle2::Stats::GetSpeed(bool skip_standing_check) const
 {
-    if(!count) return Speed::STANDING;
-
-    if(Modes(TR_MOVED | SP_BLIND | IS_PARALYZE_MAGIC)) return Speed::STANDING;
+    if(!skip_standing_check && (!count || Modes(TR_MOVED | SP_BLIND | IS_PARALYZE_MAGIC))) return Speed::STANDING;
 
     const u8 speed = GetMonster().GetSpeed();
 
