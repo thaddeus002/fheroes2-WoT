@@ -118,7 +118,7 @@ Point Battle2::Catapult::GetTargetPosition(u8 target) const
 u8 Battle2::Catapult::GetTarget(void) const
 {
     std::vector<u8> targets;
-    targets.reserve(8);
+    targets.reserve(4);
 
     // check walls
     if(0 != arena.board[8].object)  targets.push_back(CAT_WALL1);
@@ -127,20 +127,28 @@ u8 Battle2::Catapult::GetTarget(void) const
     if(0 != arena.board[96].object) targets.push_back(CAT_WALL4);
 
     // check right/left towers
-    if(arena.towers[0] && arena.towers[0]->isValid()) targets.push_back(CAT_TOWER1);
-    if(arena.towers[2] && arena.towers[2]->isValid()) targets.push_back(CAT_TOWER2);
+    if(targets.empty())
+    {
+	if(arena.towers[0] && arena.towers[0]->isValid()) targets.push_back(CAT_TOWER1);
+	if(arena.towers[2] && arena.towers[2]->isValid()) targets.push_back(CAT_TOWER2);
+    }
 
     // check bridge
-    if(arena.bridge->isValid()) targets.push_back(CAT_BRIDGE);
+    if(targets.empty())
+    {
+	if(arena.bridge->isValid()) targets.push_back(CAT_BRIDGE);
+    }
 
     // check general tower
-    if(arena.towers[1] && arena.towers[1]->isValid()) targets.push_back(CAT_TOWER3);
+    if(targets.empty())
+    {
+	if(arena.towers[1] && arena.towers[1]->isValid()) targets.push_back(CAT_TOWER3);
+    }
 
     if(targets.size())
     {
-	if(targets.size() > 3) targets.resize(3);
 	// miss for 30%
-	return cat_miss && 7 > Rand::Get(1, 20) ? CAT_MISS : *Rand::Get(targets);
+	return cat_miss && 7 > Rand::Get(1, 20) ? CAT_MISS : (1 < targets.size() ? *Rand::Get(targets) : targets.front());
     }
 
     DEBUG(DBG_BATTLE, DBG_TRACE, "Battle2::Catapult::ApplyDamage: " << "target not found..");
