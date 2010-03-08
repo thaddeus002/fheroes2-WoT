@@ -33,7 +33,7 @@ public:
     Background(s16 x, s16 y, u16 w, u16 h);
     Background(const Point &pt, u16 w, u16 h);
 
-    bool valid(void) const;
+    bool isValid(void) const;
 
     void Save(void);
     void Save(s16 ax, s16 ay);

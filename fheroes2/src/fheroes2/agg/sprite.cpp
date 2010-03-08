@@ -40,15 +40,13 @@ void Sprite::DrawICN(Surface & sf, const u8* cur, const u32 size, bool reflect)
 {
     if(NULL == cur || 0 == size) return;
 
-    //const u8 *cur = (const u8 *) buf;
     const u8 *max = cur + size;
 
     u8  c = 0;
     u16 x = reflect ? sf.w() - 1 : 0;
     u16 y = 0;
 
-    //const u32 color_key = sf.MapRGB(0xff, 0, 0xff, 0);
-    const u32 shadow = sf.alpha() ? sf.MapRGB(0, 0, 0, 0x40) : sf.GetColorKey();
+    const u32 shadow = sf.isAlpha() ? sf.MapRGB(0, 0, 0, 0x40) : sf.GetColorKey();
 
     // lock surface
     sf.Lock();
@@ -94,7 +92,7 @@ void Sprite::DrawICN(Surface & sf, const u8* cur, const u32 size, bool reflect)
 	{
 	    ++cur;
 	    c = *cur % 4 ? *cur % 4 : *(++cur);
-	    while(c--){ if(sf.alpha()) sf.SetPixel(x, y, shadow); reflect ? x-- : x++; }
+	    while(c--){ if(sf.isAlpha()) sf.SetPixel(x, y, shadow); reflect ? x-- : x++; }
 	    ++cur;
 	}
 	else

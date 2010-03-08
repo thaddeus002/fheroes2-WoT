@@ -252,7 +252,7 @@ void Cursor::SetOffset(u16 name)
 /* draw simple cursor */
 void Cursor::DrawCursor(Surface &surface, const u8 indexcolor, bool solid)
 {
-    if(! surface.valid()) return;
+    if(! surface.isValid()) return;
 
     surface.SetColorKey();
 

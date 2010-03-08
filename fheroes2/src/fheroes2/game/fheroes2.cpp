@@ -121,8 +121,10 @@ int main(int argc, char **argv)
 
         if(conf.Sound() || conf.Music())
             subsystem |= INIT_AUDIO;
+#ifdef WITH_AUDIOCD
         if(Settings::MUSIC_CD == conf.GetMusicType())
             subsystem |= INIT_CDROM | INIT_AUDIO;
+#endif
 #ifdef WITH_NET
         Network::SetProtocolVersion(static_cast<u16>((conf.MajorVersion() << 8)) | conf.MinorVersion());
 #endif

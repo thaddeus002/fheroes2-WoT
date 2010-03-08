@@ -250,9 +250,20 @@ u8 Surface::depth(void) const
     return surface ? surface->format->BitsPerPixel : 0;
 }
 
-bool Surface::alpha(void) const
+bool Surface::isAlpha(void) const
 {
     return SDL_SRCALPHA & surface->flags;
+}
+
+u8 Surface::GetAlpha(void) const
+{
+#if SDL_VERSION_ATLEAST(1, 3, 0)
+    u8 alpha = 0;
+    if(surface) SDL_GetSurfaceAlphaMod(surface, &alpha);
+    return alpha;
+#else
+    return surface->format->alpha;
+#endif
 }
 
 u32 Surface::MapRGB(u8 r, u8 g, u8 b, u8 a) const
@@ -495,15 +506,16 @@ u32 Surface::GetPixel(u16 x, u16 y) const
 /* fill colors surface */
 void Surface::Fill(u32 color)
 {
-    Rect dstrect(0, 0, surface->w, surface->h);
+    SDL_Rect dstrect = {0, 0, surface->w, surface->h};
 
-    SDL_FillRect(surface, dstrect.SDLRect(), color);
+    SDL_FillRect(surface, &dstrect, color);
 }
 
 /* rect fill colors surface */
-void Surface::FillRect(u32 color, const Rect & src)
+void Surface::FillRect(u32 color, const Rect & rect)
 {
-    SDL_FillRect(surface, const_cast<Rect &>(src).SDLRect(), color);
+    SDL_Rect dstrect = {rect.x, rect.y, rect.w, rect.h};
+    SDL_FillRect(surface, &dstrect, color);
 }
 
 /* blit */
@@ -515,23 +527,39 @@ void Surface::Blit(const Surface &src)
 /* blit */
 void Surface::Blit(const Surface &src, s16 dst_ox, s16 dst_oy)
 {
-    Rect dstrect(dst_ox, dst_oy, surface->w, surface->h);
+    SDL_Rect dstrect = {dst_ox, dst_oy, surface->w, surface->h};
 
-    SDL_BlitSurface(src.surface, NULL, surface, dstrect.SDLRect());
+    SDL_BlitSurface(src.surface, NULL, surface, &dstrect);
 }
 
 /* blit */
 void Surface::Blit(const Surface &src, const Rect &src_rt, s16 dst_ox, s16 dst_oy)
 {
-    Rect dstrect(dst_ox, dst_oy, src_rt.w, src_rt.h);
+    SDL_Rect dstrect = {dst_ox, dst_oy, src_rt.w, src_rt.h};
+    SDL_Rect srcrect = {src_rt.x, src_rt.y, src_rt.w, src_rt.h};
 
-    SDL_BlitSurface(src.surface, const_cast<Rect &>(src_rt).SDLRect(), surface, dstrect.SDLRect());
+    SDL_BlitSurface(src.surface, &srcrect, surface, & dstrect);
+}
+
+void Surface::Blit(const Surface &src, const Point &dst_pt)
+{
+    Blit(src, dst_pt.x, dst_pt.y);
+}
+
+void Surface::Blit(const Surface &src, const Rect &src_rt, const Point &dst_pt)
+{
+    Blit(src, src_rt, dst_pt.x, dst_pt.y);
 }
 
 void Surface::SetAlpha(u8 level)
 {
-    if(!surface) return;
-    SDL_SetAlpha(surface, SDL_SRCALPHA, level);
+#if SDL_VERSION_ATLEAST(1, 3, 0)
+    if(surface)
+	SDL_SetSurfaceAlphaMod(surface, level);
+#else
+    if(surface)
+	SDL_SetAlpha(surface, SDL_SRCALPHA, level);
+#endif
 }
 
 void Surface::ResetAlpha(void)
@@ -702,7 +730,7 @@ void Surface::MakeStencil(Surface & dst, const Surface & src, u32 col)
             u32 pixel = src.GetPixel(x, y);
             if(clkey != pixel)
 	    {
-		if(src.alpha())
+		if(src.GetAlpha())
 		{
 		    src.GetRGB(pixel, &r, &g, &b, &a);
 		    // skip shadow
@@ -865,7 +893,7 @@ u32 AVERAGE(SDL_PixelFormat* fm, u32 c1, u32 c2)
 /* scale surface */
 void Surface::ScaleMinifyByTwo(Surface & sf_dst, const Surface & sf_src, bool event)
 {
-    if(!sf_src.valid()) { std::cerr << "Surface::ScaleMinifyByTwo: invalid surface" << std::endl; return; };
+    if(!sf_src.isValid()) { std::cerr << "Surface::ScaleMinifyByTwo: invalid surface" << std::endl; return; };
     u16 x, y, x2, y2;
 
     u8 mul = 2;

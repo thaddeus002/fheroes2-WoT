@@ -20,8 +20,6 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#include <cmath>
-#include "SDL.h"
 #include "rect.h"
 
 Point::Point(s16 px, s16 py) : x(px), y(py)
@@ -54,13 +52,6 @@ Point & Point::operator-=(const Point & pt)
     return *this;
 }
 
-double Point::distance(const Point & pt) const
-{
-    int dX = x - pt.x;
-    int dY = y - pt.y;
-    return sqrt(dX * dX + dY * dY);
-}
-
 Point operator+(const Point& pt1, const Point& pt2)
 {
     return Point(pt1.x + pt2.x, pt1.y + pt2.y);
@@ -85,9 +76,9 @@ bool Size::operator!= (const Size & sz) const
     return !(*this == sz);
 }
 
-bool Size::valid(void) const
+bool Size::isEmpty(void) const
 {
-    return w & h;
+    return 0 == w && 0 == h;
 }
 
 Rect::Rect(s16 rx, s16 ry, u16 rw, u16 rh) : Point(rx, ry), Size(rw, rh)
@@ -135,11 +126,6 @@ Rect::Rect(const std::vector<Rect> & vect)
     y = y1;
     w = x2 - x1;
     h = y2 - y1;
-}
-
-SDL_Rect* Rect::SDLRect(void)
-{
-    return reinterpret_cast<SDL_Rect *>(this);
 }
 
 Rect & Rect::operator= (const Point & pt)

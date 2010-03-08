@@ -154,7 +154,7 @@ void TextAscii::Blit(u16 ax, u16 ay, Surface & dst)
 	}
 
 	const Surface & sprite = AGG::GetLetter(*it, font);
-	if(!sprite.valid()) return;
+	if(!sprite.isValid()) return;
 
         // valign
 	switch(*it)
@@ -352,7 +352,7 @@ void TextUnicode::Blit(u16 ax, u16 ay, Surface & dst)
 	}
 
 	const Surface & sprite = AGG::GetUnicodeLetter(*it, font);
-	if(!sprite.valid()) return;
+	if(!sprite.isValid()) return;
 
 	dst.Blit(sprite, ax, ay);
 	ax += sprite.w();

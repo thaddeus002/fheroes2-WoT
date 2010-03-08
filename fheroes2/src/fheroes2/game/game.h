@@ -106,7 +106,7 @@ namespace Game
     u8  GetRating(void);
     u16 GetGameOverScores(void);
 
-    void KeyboardGlobalFilter(u16, u16);
+    void KeyboardGlobalFilter(u32, u16);
     void ShowLoadMapsText(void);
 
     namespace Scenario

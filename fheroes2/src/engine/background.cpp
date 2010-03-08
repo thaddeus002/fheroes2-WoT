@@ -23,7 +23,7 @@
 #include "background.h"
 #include "display.h"
 
-Background::Background(const Rect &rt) : Surface(),Rect(rt)
+Background::Background(const Rect &rt) : Surface(), Rect(rt)
 {
 }
 
@@ -35,19 +35,19 @@ Background::Background(const Point &pt, u16 w, u16 h) : Surface(), Rect(pt, w, h
 {
 }
 
-bool Background::valid(void) const
+bool Background::isValid(void) const
 {
-    return Surface::valid();
+    return Surface::isValid();
 }
 
 void Background::Save(void)
 {
     // resize background
-    if(Surface::valid() && (Size::w != Surface::w() || Size::h != Surface::h())) FreeSurface(*this);
+    if(Surface::isValid() && (Size::w != Surface::w() || Size::h != Surface::h())) FreeSurface(*this);
 
     if(0 == Rect::w || 0 == Rect::h) return;
 
-    if(! Surface::valid()) Set(Rect::w, Rect::h, false);
+    if(! Surface::isValid()) Set(Rect::w, Rect::h, false);
 
     Blit(Display::Get(), *this, 0, 0);
     SetDisplayFormat();

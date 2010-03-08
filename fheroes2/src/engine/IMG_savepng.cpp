@@ -20,6 +20,10 @@
   "Philip D. Bober" <wildfire1138@mchsi.com>
 */
 
+ /* 2010 - support: sdl 1.3 - fheroes2 team */
+ /* 2009 - changed: save 16bpp, 24bpp - fheroes2 team */
+ /* 2008 - changed: default color - fheroes2 team */
+
 /**
  * 4/17/04 - IMG_SavePNG & IMG_SavePNG_RW - Philip D. Bober
  * 11/08/2004 - Compr fix, levels -1,1-7 now work - Tyler Montbriand
@@ -56,8 +60,9 @@ int IMG_SavePNG_RW(SDL_RWops *src, SDL_Surface *surf,int compression){
 	png_infop info_ptr;
 	SDL_PixelFormat *fmt=NULL;
 	SDL_Surface *tempsurf=NULL;
-	int ret,funky_format,used_alpha;
-	unsigned int i,temp_alpha;
+	int ret,funky_format;
+	unsigned int i;
+	Uint8 used_alpha, temp_alpha;
 	png_colorp palette;
 	Uint8 *palette_alpha=NULL;
 	png_byte **row_pointers=NULL;
@@ -123,30 +128,26 @@ int IMG_SavePNG_RW(SDL_RWops *src, SDL_Surface *surf,int compression){
 		}
 		png_set_PLTE(png_ptr,info_ptr,palette,fmt->palette->ncolors);
 		if (surf->flags&SDL_SRCCOLORKEY) {
-			palette_alpha=(Uint8 *)malloc((fmt->colorkey+1)*sizeof(Uint8));
+			Uint32 colorkey = 0;
+#if SDL_VERSION_ATLEAST(1, 3, 0)
+			SDL_GetColorKey(surf, &colorkey);
+#else
+			colorkey = fmt->colorkey + 1;
+#endif
+			palette_alpha=(Uint8 *)malloc((colorkey+1)*sizeof(Uint8));
 			if (!palette_alpha) {
 				SDL_SetError("Couldn't create memory for palette transparency");
 				goto savedone;
 			}
-			/* FIXME: memset? */
-			for (i=0;i<(fmt->colorkey+1);i++) {
-				palette_alpha[i]=255;
-			}
-			palette_alpha[fmt->colorkey]=0;
-			png_set_tRNS(png_ptr,info_ptr,palette_alpha,fmt->colorkey+1,NULL);
+			memset(palette_alpha, 0, (colorkey+1)*sizeof(Uint8));
+			palette_alpha[colorkey]=0;
+			png_set_tRNS(png_ptr,info_ptr,palette_alpha,(colorkey+1),NULL);
 		}
 	}else{ /* Truecolor */
-//		if (fmt->Amask) {
 			png_set_IHDR(png_ptr,info_ptr,
 				surf->w,surf->h,8,PNG_COLOR_TYPE_RGB_ALPHA,
 				PNG_INTERLACE_NONE,PNG_COMPRESSION_TYPE_DEFAULT,
 				PNG_FILTER_TYPE_DEFAULT);
-//		} else {
-//			png_set_IHDR(png_ptr,info_ptr,
-//				surf->w,surf->h,8,PNG_COLOR_TYPE_RGB,
-//				PNG_INTERLACE_NONE,PNG_COMPRESSION_TYPE_DEFAULT,
-//				PNG_FILTER_TYPE_DEFAULT);
-//		}
 	}
 	png_write_info(png_ptr, info_ptr);
 
@@ -203,7 +204,6 @@ int IMG_SavePNG_RW(SDL_RWops *src, SDL_Surface *surf,int compression){
 		}
 		if (funky_format) {
 			/* Allocate non-funky format, and copy pixeldata in*/
-//			if(fmt->Amask){
 #if SDL_BYTEORDER == SDL_BIG_ENDIAN
 				tempsurf = SDL_CreateRGBSurface(SDL_SWSURFACE, surf->w, surf->h, 32,
 										0xff000000, 0x00ff0000, 0x0000ff00, 0x000000ff);
@@ -211,21 +211,17 @@ int IMG_SavePNG_RW(SDL_RWops *src, SDL_Surface *surf,int compression){
 				tempsurf = SDL_CreateRGBSurface(SDL_SWSURFACE, surf->w, surf->h, 32,
 										0x000000ff, 0x0000ff00, 0x00ff0000, 0xff000000);
 #endif
-//			}else{
-//#if SDL_BYTEORDER == SDL_BIG_ENDIAN
-//				tempsurf = SDL_CreateRGBSurface(SDL_SWSURFACE, surf->w, surf->h, 32,
-//										0xff000000, 0x00ff0000, 0x0000ff00, 0x00000000);
-//#else
-//				tempsurf = SDL_CreateRGBSurface(SDL_SWSURFACE, surf->w, surf->h, 32,
-//										0x000000ff, 0x0000ff00, 0x00ff0000, 0x00000000);
-//#endif
-//			}
 			if(!tempsurf){
 				SDL_SetError("Couldn't allocate temp surface");
 				goto savedone;
 			}
 			if(surf->flags&SDL_SRCALPHA){
+#if SDL_VERSION_ATLEAST(1, 3, 0)
+				SDL_GetSurfaceAlphaMod(surf, &temp_alpha);
+#else
+
 				temp_alpha=fmt->alpha;
+#endif
 				used_alpha=1;
 				SDL_SetAlpha(surf,0,255); /* Set for an opaque blit */
 			}else{

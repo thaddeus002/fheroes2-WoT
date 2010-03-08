@@ -400,7 +400,7 @@ bool AGG::Cache::LoadAltICN(icn_cache_t & v, const std::string & spec, const u16
 	    String::Replace(name, "spec.xml", xml_sprite->Attribute("name"));
 	    Sprite & sp = reflect ? v.reflect[index] : v.sprites[index];
 	    // good load
-	    if(sp.Load(name.c_str()) && sp.valid())
+	    if(sp.Load(name.c_str()) && sp.isValid())
 	    {
 		sp.SetOffset(ox, oy);
 		DEBUG(DBG_ENGINE, DBG_TRACE, "AGG::Cache::LoadAltICN: " << spec << ", " << index);
@@ -471,11 +471,11 @@ void AGG::Cache::LoadICN(const ICN::icn_t icn, u16 index, bool reflect)
 
     if(reflect)
     {
-	if(v.reflect && (index >= v.count || v.reflect[index].valid())) return;
+	if(v.reflect && (index >= v.count || v.reflect[index].isValid())) return;
     }
     else
     {
-	if(v.sprites && (index >= v.count || v.sprites[index].valid())) return;
+	if(v.sprites && (index >= v.count || v.sprites[index].isValid())) return;
     }
 
     const Settings & conf = Settings::Get();
@@ -787,11 +787,11 @@ const Sprite & AGG::Cache::GetICN(const ICN::icn_t icn, u16 index, bool reflect)
     }
 
     // need load?
-    if(0 == v.count || ((reflect && !v.reflect[index].valid()) || !v.sprites[index].valid()))
+    if(0 == v.count || ((reflect && !v.reflect[index].isValid()) || !v.sprites[index].isValid()))
 	LoadICN(icn, index, reflect);
 
     // invalid sprite?
-    if((reflect && !v.reflect[index].valid()) || (!reflect && !v.sprites[index].valid()))
+    if((reflect && !v.reflect[index].isValid()) || (!reflect && !v.sprites[index].isValid()))
     {
 	DEBUG(DBG_ENGINE , DBG_INFO, "AGG::Cache::GetICN: return invalid sprite: " << ICN::GetString(icn) << ", index: " << index << ", reflect: " << (reflect ? "true" : "false"));
     }
@@ -834,11 +834,11 @@ const Surface & AGG::Cache::GetTIL(const TIL::til_t til, u16 index, u8 shape)
 
     Surface & surface = v.sprites[index2];
 
-    if(shape && ! surface.valid())
+    if(shape && ! surface.isValid())
     {
 	const Surface & src = v.sprites[index];
 
-	if(src.valid())
+	if(src.isValid())
 	{
 	    surface.Set(src.w(), src.h(), 8, SDL_SWSURFACE);
 	    TIL::Reflect(surface, src, shape);
@@ -847,7 +847,7 @@ const Surface & AGG::Cache::GetTIL(const TIL::til_t til, u16 index, u8 shape)
 	DEBUG(DBG_ENGINE , DBG_WARN, "AGG::GetTIL: src surface is NULL");
     }
 
-    if(! surface.valid())
+    if(! surface.isValid())
     {
 	DEBUG(DBG_ENGINE , DBG_WARN, "AGG::GetTIL: invalid sprite: " << TIL::GetString(til) << ", index: " << index);
     }
@@ -879,7 +879,7 @@ const std::vector<u8> & AGG::Cache::GetMID(const XMI::xmi_t xmi)
 /* return FNT cache */
 const Surface & AGG::Cache::GetFNT(u16 c, u8 f)
 {
-    if(!fnt_cache[c].small_white.valid()) LoadFNT(c);
+    if(!fnt_cache[c].small_white.isValid()) LoadFNT(c);
 
     switch(f)
     {

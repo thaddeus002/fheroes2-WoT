@@ -148,8 +148,6 @@ enum KeySym
     KEY_APP14		= 0xCE,
     KEY_APP15		= 0xCF,
 #endif
-
-    KEY_LAST		= SDLK_LAST
 };
 
 #ifdef WITH_KEYMAPPING
@@ -169,7 +167,7 @@ public:
     static LocalEvent & Get(void);
 
     void SetGlobalFilterMouseEvents(void (*pf)(u16, u16));
-    void SetGlobalFilterKeysEvents(void (*pf)(u16, u16));
+    void SetGlobalFilterKeysEvents(void (*pf)(u32, u16));
     void SetGlobalFilter(bool);
     void SetTapMode(bool);
     void SetTapDelayForRightClickEmulation(double);
@@ -250,7 +248,11 @@ private:
     void HandleMouseButtonEvent(const SDL_MouseButtonEvent & button);
     void HandleKeyboardEvent(SDL_KeyboardEvent &);
 
+#if SDL_VERSION_ATLEAST(1, 3, 0)
+    static int GlobalFilterEvents(void *userdata, SDL_Event *event);
+#else
     static int GlobalFilterEvents(const SDL_Event *event);
+#endif
 
     enum flag_t
     {
@@ -287,7 +289,7 @@ private:
     Point mouse_cu;	// point cursor
 
     void (*redraw_cursor_func)(u16, u16);
-    void (*keyboard_filter_func)(u16, u16);
+    void (*keyboard_filter_func)(u32, u16);
 
     Time clock;
     double clock_delay;

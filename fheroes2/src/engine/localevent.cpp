@@ -605,12 +605,16 @@ void LocalEvent::SetGlobalFilterMouseEvents(void (*pf)(u16, u16))
     redraw_cursor_func = pf;
 }
 
-void LocalEvent::SetGlobalFilterKeysEvents(void (*pf)(u16, u16))
+void LocalEvent::SetGlobalFilterKeysEvents(void (*pf)(u32, u16))
 {
     keyboard_filter_func = pf;
 }
 
+#if SDL_VERSION_ATLEAST(1, 3, 0)
+int LocalEvent::GlobalFilterEvents(void *userdata, SDL_Event *event)
+#else
 int LocalEvent::GlobalFilterEvents(const SDL_Event *event)
+#endif
 {
     LocalEvent & le = LocalEvent::Get();
 
@@ -671,5 +675,9 @@ void LocalEvent::SetStateDefaults(void)
     SetState(SDL_VIDEORESIZE, false);
     SetState(SDL_VIDEOEXPOSE, false);
 
+#if SDL_VERSION_ATLEAST(1, 3, 0)
+    SDL_SetEventFilter(GlobalFilterEvents, NULL);
+#else
     SDL_SetEventFilter(GlobalFilterEvents);
+#endif
 }

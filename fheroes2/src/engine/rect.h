@@ -26,13 +26,9 @@
 #include <functional>
 #include "types.h"
 
-class SDL_Rect;
-
-class Point
+struct Point
 {
-public:
-    s16 x;
-    s16 y;
+    s16 x, y;
 
     Point(s16 px = 0, s16 py = 0);
 
@@ -41,39 +37,32 @@ public:
 
     Point & operator+=(const Point & pt);
     Point & operator-=(const Point & pt);
-    
-    double distance(const Point & pt) const;
 };
 
 Point operator+(const Point& pt1, const Point& pt2);
 
 Point operator-(const Point& pt1, const Point& pt2);
 
-class Size
+struct Size
 {
-public:
-    u16 w;
-    u16 h;
+    u16 w, h;
 
     Size(u16 sw = 0, u16 sh = 0);
 
-    bool valid(void) const;
+    bool isEmpty(void) const;
 
     bool operator== (const Size & sz) const;
     bool operator!= (const Size & sz) const;
 };
 
-class Rect : public Point, public Size
+struct Rect : Point, Size
 {
-public:
     Rect(s16 rx = -1, s16 ry = -1, u16 rw = 0, u16 rh = 0);
     Rect(const SDL_Rect & rt);
     Rect(const Point & pt, u16 rw, u16 rh);
     Rect(const Point & pt, const Size & sz);
     Rect(const Rect & rt1, const Rect & rt2);
     Rect(const std::vector<Rect> & vect);
-
-    SDL_Rect* SDLRect(void);
 
     Rect & operator= (const Point & pt);
     bool operator== (const Rect & rt) const;

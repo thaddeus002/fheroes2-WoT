@@ -36,7 +36,7 @@ Dialog::FrameBorder::FrameBorder()
 
 bool Dialog::FrameBorder::isValid(void) const
 {
-    return Background::valid();
+    return Background::isValid();
 }
 
 void Dialog::FrameBorder::SetSize(u16 encw, u16 ench)
@@ -53,7 +53,7 @@ void Dialog::FrameBorder::SetSize(u16 encw, u16 ench)
 
 void Dialog::FrameBorder::SetPosition(s16 posx, s16 posy, u16 encw, u16 ench)
 {
-    if(Background::valid()) Background::Restore();
+    if(Background::isValid()) Background::Restore();
 
     if(encw && ench)
     {

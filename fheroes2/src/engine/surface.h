@@ -67,16 +67,17 @@ public:
     u16 h(void) const;
     u8  depth(void) const;
 
-    bool valid(void) const{ return surface ? true : false; };
-    bool alpha(void) const;
+    bool isValid(void) const{ return surface ? true : false; };
+    bool isAlpha(void) const;
+    u8  GetAlpha(void) const;
     u32 MapRGB(u8 r, u8 g, u8 b, u8 a = 0) const;
     void GetRGB(u32 pixel, u8 *r, u8 *g, u8 *b, u8 *a = NULL) const;
 
     void Blit(const Surface &src);
     void Blit(const Surface &src, s16 dst_ox, s16 dst_oy);
-    void Blit(const Surface &src, const Point &dst_pt){ Blit(src, dst_pt.x, dst_pt.y); };
+    void Blit(const Surface &src, const Point &dst_pt);
     void Blit(const Surface &src, const Rect &src_rt, s16 dst_ox, s16 dst_oy);
-    void Blit(const Surface &src, const Rect &src_rt, const Point &dst_pt){ Blit(src, src_rt, dst_pt.x, dst_pt.y); };
+    void Blit(const Surface &src, const Rect &src_rt, const Point &dst_pt);
 
 
     const SDL_Surface *GetSurface(void) const{ return surface; };

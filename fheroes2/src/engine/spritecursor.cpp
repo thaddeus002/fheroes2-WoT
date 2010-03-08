@@ -58,7 +58,7 @@ void SpriteCursor::SetSprite(const Surface & sf)
 
 const Surface* SpriteCursor::Sprite(void)
 {
-    return sprite && sprite->valid() ? sprite : NULL;
+    return sprite && sprite->isValid() ? sprite : NULL;
 }
 
 void SpriteCursor::Move(const Point &pt)

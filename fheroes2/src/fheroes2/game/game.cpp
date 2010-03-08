@@ -238,7 +238,7 @@ u16 Game::GetGameOverScores(void)
     return GetRating() * (200 - nk) / 100;
 }
 
-void Game::KeyboardGlobalFilter(u16 sym, u16 mod)
+void Game::KeyboardGlobalFilter(u32 sym, u16 mod)
 {
     Display & display = Display::Get();
 

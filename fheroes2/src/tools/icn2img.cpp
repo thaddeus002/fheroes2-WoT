@@ -196,7 +196,7 @@ void DrawICN(Surface & sf, u32 size, const u8 *vdata, bool rledebug)
     u16 y = 0;
     u32 index = 0;
 
-    u32 shadow = sf.alpha() ? sf.MapRGB(0, 0, 0, 0x40) : sf.GetColorKey();
+    u32 shadow = sf.GetAlpha() ? sf.MapRGB(0, 0, 0, 0x40) : sf.GetColorKey();
 
     if(rledebug) printf("START RLE DEBUG\n");
 

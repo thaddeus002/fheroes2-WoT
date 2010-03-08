@@ -30,14 +30,9 @@ public:
     Sprite();
 
     void SetOffset(s16, s16);
-    //void LoadICN(const char *, size_t, bool);
 
     s16 x(void) const{ return offsetX; };
     s16 y(void) const{ return offsetY; };
-
-    operator Point() const { return Point(offsetX, offsetY); }
-    operator Size() const { return Size(w(), h()); }
-    operator Rect() const { return Rect(offsetX, offsetY, w(), h()); }
 
     u32 GetSize(void) const;
     void ScaleMinifyByTwo(void);

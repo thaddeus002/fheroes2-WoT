@@ -50,7 +50,7 @@ void Display::SetVideoMode(const u16 w, const u16 h, bool fullscreen)
 {
     Display & display = Display::Get();
 
-    if(display.valid() && display.w() == w && display.h() == h) return;
+    if(display.isValid() && display.w() == w && display.h() == h) return;
 
     u32 videoflags = SDL_HWPALETTE|SDL_HWSURFACE|SDL_DOUBLEBUF|SDL_HWACCEL;
     if(fullscreen || (display.surface && (display.surface->flags & SDL_FULLSCREEN))) videoflags |= SDL_FULLSCREEN;
@@ -99,7 +99,7 @@ void Display::ShowCursor(void)
 bool Display::Fade(u8 fadeTo)
 {
     Display & display = Display::Get();
-    u8 alpha = display.surface->format->alpha;
+    u8 alpha = display.GetAlpha();
 
     if(alpha == fadeTo) return false;
     else
@@ -127,7 +127,7 @@ bool Display::Fade(u8 fadeTo)
 bool Display::Rise(u8 riseTo)
 {
     Display & display = Display::Get();
-    u8 alpha = display.surface->format->alpha;
+    u8 alpha = display.GetAlpha();
 
     if(alpha == riseTo) return false;
     else
