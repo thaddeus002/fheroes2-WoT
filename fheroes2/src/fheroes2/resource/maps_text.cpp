@@ -1,6 +1,7 @@
 /*
  * message strings
- * from original maps files
+ * from original maps files! (do not edit this)
+
  *
  * Part of the Free Heroes2 Engine:
  * http://sourceforge.net/projects/fheroes2
@@ -8,7 +9,7 @@
 
 #include "gamedefs.h"
 
-#ifdef MAPS_MESSAGES
+#ifdef 0
 
 const char* maps_messages[] = {
 _("425 bottles of beer on the wall, 425 bottles of beer! If one of those bottles should happen to fall, there'll be..."),
