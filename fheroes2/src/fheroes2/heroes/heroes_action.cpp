@@ -2063,13 +2063,13 @@ void ActionToCaptureObject(Heroes &hero, const u8 obj, const u16 dst_index)
         case MP2::OBJ_ALCHEMYLAB:
 	    res = Resource::MERCURY;
 	    header = MP2::StringObject(obj);
-	    body = _("You have taken control of the local Alchemist shop. It will provide you with one unit of Mercury per day.");
+	    body = _("You have taken control of the local Alchemist shop. It will provide you with %{count} unit of Mercury per day.");
 	    break;
 
         case MP2::OBJ_SAWMILL:    
             res = Resource::WOOD;
 	    header = MP2::StringObject(obj);
-	    body = _("You gain control of a sawmill. It will provide you with two units of wood per day.");
+	    body = _("You gain control of a sawmill. It will provide you with %{count} units of wood per day.");
             break;
 
         case MP2::OBJ_MINES:
@@ -2080,27 +2080,27 @@ void ActionToCaptureObject(Heroes &hero, const u8 obj, const u16 dst_index)
         	case 0:
 		    res = Resource::ORE;
         	    header = _("Ore Mine");
-        	    body = _("You gain control of an ore mine. It will provide you with two units of ore per day.");
+        	    body = _("You gain control of an ore mine. It will provide you with %{count} units of ore per day.");
 		    break;
             	case 1:
 		    res = Resource::SULFUR;
         	    header = _("Sulfur Mine");
-		    body = _("You gain control of a sulfur mine. It will provide you with one unit of sulfur per day.");
+		    body = _("You gain control of a sulfur mine. It will provide you with %{count} unit of sulfur per day.");
 		    break;
             	case 2:
 		    res = Resource::CRYSTAL;
         	    header = _("Crystal Mine");
-		    body = _("You gain control of a crystal mine. It will provide you with one unit of crystal per day.");
+		    body = _("You gain control of a crystal mine. It will provide you with %{count} unit of crystal per day.");
 		    break;
             	case 3:
 		    res = Resource::GEMS;
         	    header = _("Gems Mine");
-		    body = _("You gain control of a gem mine. It will provide you with one unit of gems per day.");
+		    body = _("You gain control of a gem mine. It will provide you with %{count} unit of gems per day.");
 		    break;
             	case 4:
 		    res = Resource::GOLD;
         	    header = _("Gold Mine");
-		    body = _("You gain control of a gold mine. It will provide you with 1000 gold per day.");
+		    body = _("You gain control of a gold mine. It will provide you with %{count} gold per day.");
 		    break;
             	default: break;
     	    }
@@ -2130,16 +2130,41 @@ void ActionToCaptureObject(Heroes &hero, const u8 obj, const u16 dst_index)
 	ProfitConditions::FromMine::GetPerDayString(res, perday);
     	Text text(perday, Font::SMALL);
     	text.Blit((sf->w() - text.w()) / 2, sf->h() - 12, *sf);
-    }
 
-    // capture object
-    if(hero.GetColor() != world.ColorCapturedObject(dst_index))
-    {
-	world.CaptureObject(dst_index, hero.GetColor());
-	if(sf) Dialog::SpriteInfo(header, body, *sf);
-	else Dialog::Message(header, body, Font::BIG, Dialog::OK);
-    }
+	// capture object
+	if(hero.GetColor() != world.ColorCapturedObject(dst_index))
+        {
+	    payment_t info = ProfitConditions::FromMine(res);
+	    s32* current = NULL;
+	    
+	    switch(res)
+	    {
+		case Resource::MERCURY:	current = &info.mercury; break;
+		case Resource::WOOD:	current = &info.wood; break;
+		case Resource::ORE:	current = &info.ore; break;
+		case Resource::SULFUR:	current = &info.sulfur; break;
+		case Resource::CRYSTAL:	current = &info.crystal; break;
+		case Resource::GEMS:	current = &info.gems; break;
+		case Resource::GOLD:	current = &info.gold; break;
+		default: break;
+	    }
 
+	    if(current)
+	    {
+		switch(*current)
+		{
+		    case 1:  String::Replace(body, "%{count}", "one"); break;
+		    case 2:  String::Replace(body, "%{count}", "two"); break;
+		    default: String::Replace(body, "%{count}", *current); break;
+		}
+	    }
+
+	    world.CaptureObject(dst_index, hero.GetColor());
+	    if(sf) Dialog::SpriteInfo(header, body, *sf);
+	    else Dialog::Message(header, body, Font::BIG, Dialog::OK);
+	}
+    }
+    
     if(sf) delete sf;
     DEBUG(DBG_GAME , DBG_INFO, "ActionToCaptureObject: " << hero.GetName() << " captured: " << MP2::StringObject(obj));
 }
