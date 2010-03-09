@@ -278,7 +278,7 @@ private:
 
     const u8 major_version;
     const u8 minor_version;
-    const std::string svn_version;
+    std::string svn_version;
     u16 debug;
 
     Size video_mode;

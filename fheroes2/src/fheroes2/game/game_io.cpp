@@ -639,7 +639,7 @@ bool Game::IO::LoadBIN(QueueMessage & msg)
     msg.Pop(byte8);
 
     // svn
-    msg.Pop(str);
+    msg.Pop(conf.svn_version);
     // time
     msg.Pop(byte32);
 
