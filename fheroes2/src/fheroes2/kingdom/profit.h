@@ -43,8 +43,6 @@ namespace ProfitConditions
     {
     public:
 	FromMine(u8);
-
-	static void GetPerDayString(u8, std::string &);
     };
 
     class FromSkillEstates : public payment_t

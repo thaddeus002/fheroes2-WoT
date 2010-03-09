@@ -2031,9 +2031,10 @@ void ActionToAbandoneMine(Heroes &hero, const u8 obj, const u16 dst_index)
 	    Battle2::Result res = Battle2::Loader(hero.GetArmy(), army, dst_index);
     	    if(res.AttackerWins())
     	    {
+    		payment_t info = ProfitConditions::FromMine(Resource::GOLD);
 		hero.IncreaseExperience(res.GetExperience());
 		PlaySoundSuccess;
-		DialogWithGold(MP2::StringObject(obj), _("You beat the Ghosts and are able to restore the mine to production."), 1000);
+		DialogWithGold(MP2::StringObject(obj), _("You beat the Ghosts and are able to restore the mine to production."), info.gold);
 		tile.SetQuantity1(0);
 		tile.UpdateAbandoneMineSprite();
 		hero.SaveUnderObject(MP2::OBJ_MINES);
@@ -2056,7 +2057,6 @@ void ActionToCaptureObject(Heroes &hero, const u8 obj, const u16 dst_index)
     std::string body;
 
     Resource::resource_t res = Resource::UNKNOWN;
-    Surface *sf = NULL;
 
     switch(obj)
     {
@@ -2117,29 +2117,23 @@ void ActionToCaptureObject(Heroes &hero, const u8 obj, const u16 dst_index)
     	    return;
     }
 
-    // sprite resource with x / day test
-    if(res != Resource::UNKNOWN)
+    // capture object
+    if(res != Resource::UNKNOWN && hero.GetColor() != world.ColorCapturedObject(dst_index))
     {
 	const Sprite & sprite = AGG::GetICN(ICN::RESOURCE, Resource::GetIndexSprite2(res));
 
-	sf = new Surface(sprite.w(), sprite.h() + 14);
+	// sprite resource with x / day test
+	Surface *sf = new Surface(sprite.w(), sprite.h() + 14);
 	sf->SetColorKey();
 	sf->Blit(sprite);
 
-	std::string perday;
-	ProfitConditions::FromMine::GetPerDayString(res, perday);
-    	Text text(perday, Font::SMALL);
-    	text.Blit((sf->w() - text.w()) / 2, sf->h() - 12, *sf);
+	std::string perday = _("%{count} / day");
+	payment_t info = ProfitConditions::FromMine(res);
+	s32* current = NULL;
 
-	// capture object
-	if(hero.GetColor() != world.ColorCapturedObject(dst_index))
-        {
-	    payment_t info = ProfitConditions::FromMine(res);
-	    s32* current = NULL;
-	    
-	    switch(res)
-	    {
-		case Resource::MERCURY:	current = &info.mercury; break;
+	switch(res)
+	{
+		case Resource::MERCURY:	current = &info.mercury;  break;
 		case Resource::WOOD:	current = &info.wood; break;
 		case Resource::ORE:	current = &info.ore; break;
 		case Resource::SULFUR:	current = &info.sulfur; break;
@@ -2147,25 +2141,34 @@ void ActionToCaptureObject(Heroes &hero, const u8 obj, const u16 dst_index)
 		case Resource::GEMS:	current = &info.gems; break;
 		case Resource::GOLD:	current = &info.gold; break;
 		default: break;
-	    }
-
-	    if(current)
-	    {
-		switch(*current)
-		{
-		    case 1:  String::Replace(body, "%{count}", "one"); break;
-		    case 2:  String::Replace(body, "%{count}", "two"); break;
-		    default: String::Replace(body, "%{count}", *current); break;
-		}
-	    }
-
-	    world.CaptureObject(dst_index, hero.GetColor());
-	    if(sf) Dialog::SpriteInfo(header, body, *sf);
-	    else Dialog::Message(header, body, Font::BIG, Dialog::OK);
 	}
+
+	if(current)
+	{
+	    String::Replace(perday, "%{count}", *current);
+
+	    switch(*current)
+	    {
+		    case 1:  String::Replace(body, "%{count}", _("one")); break;
+		    case 2:  String::Replace(body, "%{count}", _("two")); break;
+		    default: String::Replace(body, "%{count}", *current); break;
+	    }
+	}
+
+    	Text text(perday, Font::SMALL);
+    	text.Blit((sf->w() - text.w()) / 2, sf->h() - 12, *sf);
+
+	world.CaptureObject(dst_index, hero.GetColor());
+
+	if(sf)
+	{
+	    Dialog::SpriteInfo(header, body, *sf);
+	    delete sf;
+	}
+	else
+	    Dialog::Message(header, body, Font::BIG, Dialog::OK);
     }
     
-    if(sf) delete sf;
     DEBUG(DBG_GAME , DBG_INFO, "ActionToCaptureObject: " << hero.GetName() << " captured: " << MP2::StringObject(obj));
 }
 
