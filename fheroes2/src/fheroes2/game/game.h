@@ -23,6 +23,7 @@
 #ifndef H2GAME_H
 #define H2GAME_H
 
+#include <string>
 #include "rect.h"
 #include "types.h"
 
