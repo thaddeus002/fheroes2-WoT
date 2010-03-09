@@ -1864,6 +1864,7 @@ void Maps::Tiles::UpdateMonsterInfo(void)
 	fixed = true;
     }
 
+    // skip join
     if(m() == Monster::GHOST || m.isElemental())
 	quantity4 = 0;
     else
@@ -1881,21 +1882,21 @@ void Maps::Tiles::UpdateRNDMonsterSprite(void)
 
     if(addon)
     {
-	u8 index = 0;
-
 	switch(general)
 	{
-    	    case MP2::OBJ_RNDMONSTER:       index = Monster::Rand(); break;
-    	    case MP2::OBJ_RNDMONSTER1:      index = Monster::Rand(Monster::LEVEL1);break;
-    	    case MP2::OBJ_RNDMONSTER2:      index = Monster::Rand(Monster::LEVEL2);break;
-    	    case MP2::OBJ_RNDMONSTER3:      index = Monster::Rand(Monster::LEVEL3);break;
-    	    case MP2::OBJ_RNDMONSTER4:      index = Monster::Rand(Monster::LEVEL4);break;
+    	    case MP2::OBJ_RNDMONSTER:       addon->index = Monster::Rand(); break;
+    	    case MP2::OBJ_RNDMONSTER1:      addon->index = Monster::Rand(Monster::LEVEL1); break;
+    	    case MP2::OBJ_RNDMONSTER2:      addon->index = Monster::Rand(Monster::LEVEL2); break;
+    	    case MP2::OBJ_RNDMONSTER3:      addon->index = Monster::Rand(Monster::LEVEL3); break;
+    	    case MP2::OBJ_RNDMONSTER4:      addon->index = Monster::Rand(Monster::LEVEL4); break;
 
 	    default: DEBUG(DBG_GAME , DBG_WARN, "Maps::Tiles::UpdateRNDMonsterSprite: unknown object, index: " << maps_index); return;
 	}
 
-        addon->index = index;
-        general = MP2::OBJ_MONSTER;
+	// ICN::MONS32 start from PEASANT
+        addon->index = addon->index - 1;
+
+	general = MP2::OBJ_MONSTER;
     }
     else
         DEBUG(DBG_GAME , DBG_WARN, "Maps::Tiles::UpdateRNDMonsterSprite: FindRNDMonster return is NULL, index: " << maps_index);

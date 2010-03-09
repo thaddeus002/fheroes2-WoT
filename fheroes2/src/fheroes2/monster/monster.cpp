@@ -331,31 +331,6 @@ u8  Monster::GetLevel(void) const
 
 u16 Monster::GetRNDSize(bool skip_factor) const
 {
-/*
-    u8 grown = GetGrown();
-    u16 res = Rand::Get((1 < grown ? grown - 1 : grown), grown + grown / 2);
-
-    if(!skip_factor)
-    {
-	u16 factor = 100;
-
-	switch(Settings::Get().GameDifficulty()) 	 
-	{
-	    case Difficulty::EASY:      factor = 80; break;
-	    case Difficulty::NORMAL:    factor = 100; break;
-	    case Difficulty::HARD:      factor = 130; break;
-	    case Difficulty::EXPERT:    factor = 160; break;
-	    case Difficulty::IMPOSSIBLE:factor = 190; break;
-	    default: break;
-	}
-
-	res = (res * factor / 100);
-	
-	if(res < 1) res = 1;
-    }
-
-    return res;
-*/
     const u32 hps = GetGrown() * GetHitPoints();
     u32 res = Rand::Get(hps, hps + hps / 2);
 

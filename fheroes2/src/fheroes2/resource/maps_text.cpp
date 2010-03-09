@@ -9,7 +9,7 @@
 
 #include "gamedefs.h"
 
-#ifdef 0
+#ifdef MAPS_MESSAGES
 
 const char* maps_messages[] = {
 _("425 bottles of beer on the wall, 425 bottles of beer! If one of those bottles should happen to fall, there'll be..."),

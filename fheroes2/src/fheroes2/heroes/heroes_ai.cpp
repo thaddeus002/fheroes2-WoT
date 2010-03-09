@@ -493,6 +493,7 @@ void AIToMonster(Heroes &hero, const u8 obj, const u16 dst_index)
             const u32 uniq = addon->uniq;
             tile.Remove(uniq);
             tile.SetObject(MP2::OBJ_ZERO);
+    	    tile.SetCountMonster(0);
                 
             // remove shadow from left cell
             if(Maps::isValidDirection(dst_index, Direction::LEFT))
