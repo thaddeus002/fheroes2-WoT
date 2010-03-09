@@ -402,7 +402,7 @@ void AIToMonster(Heroes &hero, const u8 obj, const u16 dst_index)
     army.JoinTroop(monster, tile.GetCountMonster());
     army.ArrangeForBattle();
 
-    const float ratios = hero.GetArmy().GetHitPoints() / army.GetHitPoints();
+    const float ratios = army.isValid() ? hero.GetArmy().GetHitPoints() / army.GetHitPoints() : 0;
 
     const bool check_free_stack = (hero.GetArmy().GetCount() < hero.GetArmy().Size() || hero.GetArmy().HasMonster(monster));
     const bool check_extra_condition = Morale::NORMAL <= hero.GetMorale();
@@ -421,7 +421,7 @@ void AIToMonster(Heroes &hero, const u8 obj, const u16 dst_index)
 		destroyTile = true;
             }
             else
-                DEBUG(DBG_AI , DBG_WARN, "AIToMonster: condition is not fulfilled");
+                DEBUG(DBG_AI , DBG_WARN, "AIToMonster: " << "condition is not fulfilled");
         }
         else
         if(hero.HasSecondarySkill(Skill::Secondary::DIPLOMACY))
@@ -451,8 +451,15 @@ void AIToMonster(Heroes &hero, const u8 obj, const u16 dst_index)
                 }
             }
             else
-                DEBUG(DBG_AI , DBG_WARN, "AIToMonster: condition is not fulfilled");
+                DEBUG(DBG_AI , DBG_WARN, "AIToMonster: " << "condition is not fulfilled");
         }
+    }
+
+    if(!army.isValid())
+    {
+	avoidBattle = true;
+        destroyTile = true;
+        DEBUG(DBG_AI , DBG_WARN, "AIToMonster: " << "skip empty army!");
     }
 
     if(!avoidBattle && ratios >= 5)

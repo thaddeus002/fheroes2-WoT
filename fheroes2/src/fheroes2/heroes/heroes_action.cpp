@@ -499,7 +499,7 @@ void ActionToMonster(Heroes &hero, const u8 obj, const u16 dst_index)
     army.JoinTroop(monster, tile.GetCountMonster());
     army.ArrangeForBattle();
 
-    const float ratios = hero.GetArmy().GetHitPoints() / army.GetHitPoints();
+    const float ratios = army.isValid() ? hero.GetArmy().GetHitPoints() / army.GetHitPoints() : 0;
 
     const bool check_free_stack = (hero.GetArmy().GetCount() < hero.GetArmy().Size() || hero.GetArmy().HasMonster(monster));
     const bool check_extra_condition = Morale::NORMAL <= hero.GetMorale();
@@ -572,6 +572,13 @@ void ActionToMonster(Heroes &hero, const u8 obj, const u16 dst_index)
             	    Dialog::Message("", _("Insulted by your refusal of their offer, the monsters attack!"), Font::BIG, Dialog::OK);
             }
         }
+    }
+
+    if(!army.isValid())
+    {
+	avoidBattle = true;
+    	destroyTile = true;
+	DEBUG(DBG_GAME, DBG_WARN, "ActionToMonster: " << "skip empty army!");
     }
 
     if(!avoidBattle && ratios >= 5)
