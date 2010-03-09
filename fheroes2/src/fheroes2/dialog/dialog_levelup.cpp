@@ -116,13 +116,13 @@ Skill::Secondary::skill_t Dialog::LevelUpSelectSkill(const std::string & header,
         if(le.MouseClickLeft(button_learn1)){ result = sec1.Skill(); break; }
         if(le.MouseClickLeft(button_learn2)){ result = sec2.Skill(); break; }
 
-	if(le.MouseClickLeft(rect_image1)){ cursor.Hide(); SkillInfo(sec1.Skill(), sec1.Level()); cursor.Show(); display.Flip(); }
+	if(le.MouseClickLeft(rect_image1)){ cursor.Hide(); SecondarySkillInfo(sec1.Skill(), sec1.Level()); cursor.Show(); display.Flip(); }
 	else
-	if(le.MouseClickLeft(rect_image2)){ cursor.Hide(); SkillInfo(sec2.Skill(), sec2.Level()); cursor.Show(); display.Flip(); }
+	if(le.MouseClickLeft(rect_image2)){ cursor.Hide(); SecondarySkillInfo(sec2.Skill(), sec2.Level()); cursor.Show(); display.Flip(); }
 
-	if(le.MousePressRight(rect_image1)){ cursor.Hide(); SkillInfo(sec1.Skill(), sec1.Level(), false); cursor.Show(); display.Flip(); }
+	if(le.MousePressRight(rect_image1)){ cursor.Hide(); SecondarySkillInfo(sec1.Skill(), sec1.Level(), false); cursor.Show(); display.Flip(); }
 	else
-	if(le.MousePressRight(rect_image2)){ cursor.Hide(); SkillInfo(sec2.Skill(), sec2.Level(), false); cursor.Show(); display.Flip(); }
+	if(le.MousePressRight(rect_image2)){ cursor.Hide(); SecondarySkillInfo(sec2.Skill(), sec2.Level(), false); cursor.Show(); display.Flip(); }
     }
 
     cursor.Hide();

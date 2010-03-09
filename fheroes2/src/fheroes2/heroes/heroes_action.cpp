@@ -1121,7 +1121,7 @@ void ActionToWitchsHut(Heroes &hero, const u8 obj, const u16 dst_index)
 
     body = _("An ancient and immortal witch living in a hut with bird's legs for stilts teaches you %{skill} for her own inscrutable purposes.");
     String::Replace(body, "%{skill}", skill_name);
-    Dialog::SkillInfo(head, body, skill, Skill::Level::BASIC);
+    Dialog::SecondarySkillInfo(head, body, skill, Skill::Level::BASIC);
 
     DEBUG(DBG_GAME , DBG_INFO, "ActionToWitchsHut: " << hero.GetName());
 }
@@ -1334,7 +1334,7 @@ void ActionToPrimarySkillObject(Heroes &hero, const u8 obj, const u16 dst_index)
 	// increase skill
 	hero.IncreasePrimarySkill(skill);
 	hero.SetVisited(dst_index);
-	Dialog::SkillInfo(MP2::StringObject(obj), body_true, skill);
+	Dialog::PrimarySkillInfo(MP2::StringObject(obj), body_true, skill);
 
 	// fix double action tile
 	if(obj == MP2::OBJ_STANDINGSTONES)

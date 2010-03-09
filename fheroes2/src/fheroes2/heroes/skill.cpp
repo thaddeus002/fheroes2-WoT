@@ -751,7 +751,7 @@ void SecondarySkillBar::QueueEventProcessing(void)
 	if(Skill::Secondary::UNKNOWN != skill && Skill::Level::NONE != level)
 	{
     	    cursor.Hide();
-    	    Dialog::SkillInfo(skill, level, !le.MousePressRight());
+    	    Dialog::SecondarySkillInfo(skill, level, !le.MousePressRight());
     	    cursor.Show();
     	    display.Flip();
 	}

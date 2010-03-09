@@ -23,19 +23,24 @@
 #include "agg.h"
 #include "settings.h"
 #include "cursor.h"
+#include "profit.h"
 #include "button.h"
 #include "dialog.h"
 
-void Dialog::SkillInfo(const Skill::Secondary::skill_t skill, const Skill::Level::type_t level, const bool ok_button)
+void Dialog::SecondarySkillInfo(const Skill::Secondary::skill_t skill, const Skill::Level::type_t level, const bool ok_button)
 {
     std::string header(Skill::Level::String(level));
     header.append(" ");
     header.append(Skill::Secondary::String(skill));
-    const std::string description(Skill::Secondary::Description(skill, level));
-    SkillInfo(header, description, skill, level, ok_button);
+
+    std::string description(Skill::Secondary::Description(skill, level));
+    payment_t info = ProfitConditions::FromSkillEstates(level);
+    String::Replace(description, "%{count}", info.gold);
+
+    SecondarySkillInfo(header, description, skill, level, ok_button);
 }
 
-void Dialog::SkillInfo(const std::string &header, const std::string &message, const Skill::Secondary::skill_t skill, const Skill::Level::type_t level, const bool ok_button)
+void Dialog::SecondarySkillInfo(const std::string &header, const std::string &message, const Skill::Secondary::skill_t skill, const Skill::Level::type_t level, const bool ok_button)
 {
     Display & display = Display::Get();
     const ICN::icn_t system = Settings::Get().EvilInterface() ? ICN::SYSTEME : ICN::SYSTEM;
@@ -114,7 +119,7 @@ void Dialog::SkillInfo(const std::string &header, const std::string &message, co
     if(button) delete button;
 }
 
-void Dialog::SkillInfo(const std::string &header, const std::string &message, const Skill::Primary::skill_t skill)
+void Dialog::PrimarySkillInfo(const std::string &header, const std::string &message, const Skill::Primary::skill_t skill)
 {
     Display & display = Display::Get();
     const ICN::icn_t system = Settings::Get().EvilInterface() ? ICN::SYSTEME : ICN::SYSTEM;

@@ -97,12 +97,12 @@ namespace Dialog
     Skill::Secondary::skill_t LevelUpSelectSkill(const std::string &header, const Skill::Secondary & sec1, const Skill::Secondary & sec2);
     bool SelectGoldOrExp(const std::string &header, const std::string &message, const u16 gold, const u16 expr);
 
-    void SpellInfo(const std::string &header, const std::string &message, const Spell::spell_t spell, const bool ok_button = true);
-    void SkillInfo(const Skill::Secondary::skill_t skill, const Skill::Level::type_t level, const bool ok_button = true);
-    void SkillInfo(const std::string &header, const std::string &message, const Skill::Secondary::skill_t skill, const Skill::Level::type_t level, const bool ok_button = true);
-    void SkillInfo(const std::string &header, const std::string &message, const Skill::Primary::skill_t skill);
-    u16  SpriteInfo(const std::string &header, const std::string &message, const Surface & sprite, u16 buttons = Dialog::OK);
-    u16  ResourceInfo(const std::string &header, const std::string &message, const Resource::funds_t & rs, u16 buttons = Dialog::OK);
+    void SpellInfo(const std::string &, const std::string &, const Spell::spell_t, const bool ok_button = true);
+    void SecondarySkillInfo(const Skill::Secondary::skill_t, const Skill::Level::type_t, const bool ok_button = true);
+    void SecondarySkillInfo(const std::string &, const std::string &, const Skill::Secondary::skill_t, const Skill::Level::type_t, const bool ok_button = true);
+    void PrimarySkillInfo(const std::string &, const std::string &, const Skill::Primary::skill_t);
+    u16  SpriteInfo(const std::string &, const std::string &, const Surface &, u16 buttons = Dialog::OK);
+    u16  ResourceInfo(const std::string &, const std::string &, const Resource::funds_t &, u16 buttons = Dialog::OK);
 
     Skill::Primary::skill_t SelectSkillFromArena(void);
 
