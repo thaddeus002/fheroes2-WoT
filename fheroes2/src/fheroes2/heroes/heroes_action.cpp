@@ -495,17 +495,8 @@ void ActionToMonster(Heroes &hero, const u8 obj, const u16 dst_index)
     Maps::Tiles & tile = world.GetTiles(dst_index);
     const Monster monster(tile);
     Army::army_t army;
-    u32 count = tile.GetCountMonster();
 
-    // fix bug:: old save format (remove later)
-    if(count == 0)
-    {
-	count = 4 * monster.GetRNDSize(false);
-	tile.SetCountMonster(count);
-	VERBOSE("ActionToMonster:: Empty Monster: possible load old format ?!");
-    }
-
-    army.JoinTroop(monster, count);
+    army.JoinTroop(monster, tile.GetCountMonster());
     army.ArrangeForBattle();
 
     const float ratios = hero.GetArmy().GetHitPoints() / army.GetHitPoints();

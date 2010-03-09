@@ -399,7 +399,7 @@ void AIToMonster(Heroes &hero, const u8 obj, const u16 dst_index)
     Maps::Tiles & tile = world.GetTiles(dst_index);
     const Monster monster(tile);
     Army::army_t army;
-    army.JoinTroop(monster, tile.GetCountMonster() ? tile.GetCountMonster() : 1);
+    army.JoinTroop(monster, tile.GetCountMonster());
     army.ArrangeForBattle();
 
     const float ratios = hero.GetArmy().GetHitPoints() / army.GetHitPoints();
