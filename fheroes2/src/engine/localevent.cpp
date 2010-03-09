@@ -229,6 +229,7 @@ bool LocalEvent::HandleEvents(bool delay)
     {
 	switch(event.type)
 	{
+
 	    // keyboard
 	    case SDL_KEYDOWN:
 	    case SDL_KEYUP:
@@ -254,6 +255,9 @@ bool LocalEvent::HandleEvents(bool delay)
 	    default:
 		break;
 	}
+
+        // need for wheel up/down delay
+        if(SDL_BUTTON_WHEELDOWN == event.button.button || SDL_BUTTON_WHEELUP == event.button.button) break;
     }
 
     // emulate press right
