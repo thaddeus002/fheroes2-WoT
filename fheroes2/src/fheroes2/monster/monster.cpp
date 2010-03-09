@@ -163,13 +163,13 @@ void Monster::UpdateStats(const std::string & spec)
     	    xml_monster->Attribute("skip", &value);
 	    if(0 == value)
 	    {
-    		xml_monster->Attribute("attack", &value); ptr->attack = value;
-    		xml_monster->Attribute("defence", &value); ptr->defence = value;
-    		xml_monster->Attribute("damage_min", &value); ptr->damageMin = value;
-    		xml_monster->Attribute("damage_max", &value); ptr->damageMax = value;
-    		xml_monster->Attribute("hp", &value); ptr->hp = value;
-    		xml_monster->Attribute("speed", &value); ptr->speed = Speed::INSTANT < value ? Speed::INSTANT : (Speed::STANDING > value ? Speed::STANDING : static_cast<Speed::speed_t>(value));
-    		xml_monster->Attribute("grown", &value); ptr->grown = value;
+    		xml_monster->Attribute("attack", &value); if(value) ptr->attack = value;
+    		xml_monster->Attribute("defence", &value); if(value) ptr->defence = value;
+    		xml_monster->Attribute("damage_min", &value); if(value) ptr->damageMin = value;
+    		xml_monster->Attribute("damage_max", &value); if(value) ptr->damageMax = value;
+    		xml_monster->Attribute("hp", &value); if(value) ptr->hp = value;
+    		xml_monster->Attribute("speed", &value); ptr->speed = Speed::INSTANT < value ? Speed::INSTANT : (Speed::CRAWLING > value ? Speed::CRAWLING : static_cast<Speed::speed_t>(value));
+    		xml_monster->Attribute("grown", &value); if(value) ptr->grown = value;
     		xml_monster->Attribute("shots", &value); ptr->shots = value;
     		xml_monster->Attribute("gold", &value); cost.gold = value;
     		xml_monster->Attribute("wood", &value); cost.wood = value;
