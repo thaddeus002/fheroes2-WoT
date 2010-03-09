@@ -503,13 +503,15 @@ void ActionToMonster(Heroes &hero, const u8 obj, const u16 dst_index)
 
     const bool check_free_stack = (hero.GetArmy().GetCount() < hero.GetArmy().Size() || hero.GetArmy().HasMonster(monster));
     const bool check_extra_condition = Morale::NORMAL <= hero.GetMorale();
-    
-    if(tile.GetQuantity4() && check_free_stack && check_extra_condition && ratios >= 2)
+    // force join for campain and others...
+    const bool force_join = (5 == tile.GetQuantity4() && hero.GetColor() == tile.GetQuantity3());
+
+    if(tile.GetQuantity4() && check_free_stack && ((check_extra_condition && ratios >= 2) || force_join))
     {
         DEBUG(DBG_GAME , DBG_INFO, "ActionToMonster: possible " << hero.GetName() << " join monster " << monster.GetName());
 
         // free join
-	if(2 == tile.GetQuantity4())
+	if(2 == tile.GetQuantity4() || force_join)
         {
             std::string message = _("A group of %{monster} with a desire for greater glory wish to join you.\nDo you accept?");
             std::string monst = monster.GetMultiName();

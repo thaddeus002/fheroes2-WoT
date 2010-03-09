@@ -349,6 +349,8 @@ u16 Monster::GetRNDSize(bool skip_factor) const
 	}
 
 	res = (res * factor / 100);
+	// force minimal
+	if(res == 0) res = 1;
     }
 
     return GetCountFromHitPoints(id, res);
