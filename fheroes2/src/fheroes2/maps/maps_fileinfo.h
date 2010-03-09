@@ -25,7 +25,6 @@
 #include <ctime>
 #include <vector>
 #include "gamedefs.h"
-#include "kingdom_defines.h"
 #include "game_over.h"
 #include "artifact.h"
 

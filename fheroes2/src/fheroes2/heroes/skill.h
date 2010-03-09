@@ -30,9 +30,6 @@
 #include "color.h"
 #include "gamedefs.h"
 
-#define MAXPRIMARYSKILL		4
-#define MAXSECONDARYSKILL	14
-
 namespace Skill
 {
     void UpdateStats(const std::string &);

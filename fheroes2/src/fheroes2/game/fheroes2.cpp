@@ -377,8 +377,16 @@ void LoadConfigFiles(Settings & conf, const char* dirname)
 
 void LoadExternalResource(const Settings & conf)
 {
+    std::string spec;
+
+    // globals.xml
+    spec = conf.LocalPrefix() + SEPARATOR + "files" + SEPARATOR + "stats" + SEPARATOR + "globals.xml";
+
+    if(FilePresent(spec))
+	Game::UpdateGlobalDefines(spec);
+    
     // battle.xml
-    std::string spec = conf.LocalPrefix() + SEPARATOR + "files" + SEPARATOR + "stats" + SEPARATOR + "battle.xml";
+    spec = conf.LocalPrefix() + SEPARATOR + "files" + SEPARATOR + "stats" + SEPARATOR + "battle.xml";
 
     if(FilePresent(spec))
 	Battle2::UpdateMonsterInfoAnimation(spec);

@@ -187,6 +187,8 @@ void BuildingInfo::GetCost(u32 build, u8 race, payment_t & payment)
 
     while(ptr->id1 && !(ptr->id2 == build && (!race || (race & ptr->race)))) ++ptr;
 
+    payment.Reset();
+
     if(ptr)
     {
 	payment.gold = ptr->cost.gold;

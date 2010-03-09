@@ -32,6 +32,7 @@
 #include "castle.h"
 #include "heroes.h"
 #include "payment.h"
+#include "profit.h"
 #include "kingdom.h"
 #include "tools.h"
 #include "text.h"
@@ -187,7 +188,6 @@ Dialog::answer_t Castle::OpenDialog(bool fade)
     const Rect coordDwellingMonster5(GetCoordBuilding(DWELLING_MONSTER5, cur_pt));
     const Rect coordDwellingMonster6(GetCoordBuilding(DWELLING_MONSTER6, cur_pt));
 
-
     // orders draw building
     std::vector<building_t> orders_building;
     orders_building.reserve(32);
@@ -329,6 +329,22 @@ Dialog::answer_t Castle::OpenDialog(bool fade)
 	default: break;
     }
 
+    // update extra description
+    payment_t profit;
+    std::string description_well = GetDescriptionBuilding(BUILD_WELL, race);
+    std::string description_wel2 = GetDescriptionBuilding(BUILD_WEL2, race);
+    std::string description_castle = GetDescriptionBuilding(BUILD_CASTLE, race);
+    std::string description_statue = GetDescriptionBuilding(BUILD_STATUE, race);
+    std::string description_spec = GetDescriptionBuilding(BUILD_SPEC, race);
+    String::Replace(description_well, "%{count}", grown_well);
+    String::Replace(description_wel2, "%{count}", grown_wel2);
+    profit = ProfitConditions::FromBuilding(BUILD_CASTLE, race);
+    String::Replace(description_castle, "%{count}", profit.gold);
+    profit = ProfitConditions::FromBuilding(BUILD_STATUE, race);
+    String::Replace(description_statue, "%{count}", profit.gold);
+    profit = ProfitConditions::FromBuilding(BUILD_SPEC, race);
+    String::Replace(description_spec, "%{count}", profit.gold);
+
     // draw building
     RedrawAllBuilding(cur_pt, orders_building);
     RedrawNameTown(cur_pt);
@@ -468,7 +484,7 @@ Dialog::answer_t Castle::OpenDialog(bool fade)
 	    display.Flip();
 	}
 	else
-	if(building & BUILD_STATUE && le.MouseClickLeft(coordBuildingStatue)) Dialog::Message(GetStringBuilding(BUILD_STATUE), GetDescriptionBuilding(BUILD_STATUE), Font::BIG, Dialog::OK);
+	if(building & BUILD_STATUE && le.MouseClickLeft(coordBuildingStatue)) Dialog::Message(GetStringBuilding(BUILD_STATUE), description_statue, Font::BIG, Dialog::OK);
 	else
 	if(building & BUILD_MARKETPLACE && le.MouseClickLeft(coordBuildingMarketplace))
 	{
@@ -483,11 +499,11 @@ Dialog::answer_t Castle::OpenDialog(bool fade)
 	    if(buttonExit.isPressed()) buttonExit.Draw();
 	}
 	else
-	if(building & BUILD_WEL2 && le.MouseClickLeft(coordBuildingWel2)) Dialog::Message(GetStringBuilding(BUILD_WEL2, race), GetDescriptionBuilding(BUILD_WEL2, race), Font::BIG, Dialog::OK);
+	if(building & BUILD_WEL2 && le.MouseClickLeft(coordBuildingWel2)) Dialog::Message(GetStringBuilding(BUILD_WEL2, race), description_wel2, Font::BIG, Dialog::OK);
 	else
 	if(building & BUILD_MOAT && le.MouseClickLeft(coordBuildingMoat)) Dialog::Message(GetStringBuilding(BUILD_MOAT), GetDescriptionBuilding(BUILD_MOAT), Font::BIG, Dialog::OK);
 	else
-	if(building & BUILD_SPEC && le.MouseClickLeft(coordBuildingSpec)) Dialog::Message(GetStringBuilding(BUILD_SPEC, race), GetDescriptionBuilding(BUILD_SPEC, race), Font::BIG, Dialog::OK);
+	if(building & BUILD_SPEC && le.MouseClickLeft(coordBuildingSpec)) Dialog::Message(GetStringBuilding(BUILD_SPEC, race), description_spec, Font::BIG, Dialog::OK);
 	else
 	if(building & BUILD_CASTLE && le.MouseClickLeft(coordBuildingCastle))
 	{
@@ -712,19 +728,19 @@ Dialog::answer_t Castle::OpenDialog(bool fade)
 	else
 	if(building & BUILD_SHIPYARD && le.MousePressRight(coordBuildingShipyard)) Dialog::Message(GetStringBuilding(BUILD_SHIPYARD), GetDescriptionBuilding(BUILD_SHIPYARD), Font::BIG);
 	else
-	if(building & BUILD_WELL && le.MousePressRight(coordBuildingWell)) Dialog::Message(GetStringBuilding(BUILD_WELL), GetDescriptionBuilding(BUILD_WELL), Font::BIG);
+	if(building & BUILD_WELL && le.MousePressRight(coordBuildingWell)) Dialog::Message(GetStringBuilding(BUILD_WELL), description_well, Font::BIG);
 	else
-	if(building & BUILD_STATUE && le.MousePressRight(coordBuildingStatue)) Dialog::Message(GetStringBuilding(BUILD_STATUE), GetDescriptionBuilding(BUILD_STATUE), Font::BIG);
+	if(building & BUILD_STATUE && le.MousePressRight(coordBuildingStatue)) Dialog::Message(GetStringBuilding(BUILD_STATUE), description_statue, Font::BIG);
 	else
 	if(building & BUILD_MARKETPLACE && le.MousePressRight(coordBuildingMarketplace)) Dialog::Message(GetStringBuilding(BUILD_MARKETPLACE), GetDescriptionBuilding(BUILD_MARKETPLACE), Font::BIG);
 	else
-	if(building & BUILD_WEL2 && le.MousePressRight(coordBuildingWel2)) Dialog::Message(GetStringBuilding(BUILD_WEL2, race), GetDescriptionBuilding(BUILD_WEL2, race), Font::BIG);
+	if(building & BUILD_WEL2 && le.MousePressRight(coordBuildingWel2)) Dialog::Message(GetStringBuilding(BUILD_WEL2, race), description_wel2, Font::BIG);
 	else
 	if(building & BUILD_MOAT && le.MousePressRight(coordBuildingMoat)) Dialog::Message(GetStringBuilding(BUILD_MOAT), GetDescriptionBuilding(BUILD_MOAT), Font::BIG);
 	else
-	if(building & BUILD_SPEC && le.MousePressRight(coordBuildingSpec)) Dialog::Message(GetStringBuilding(BUILD_SPEC, race), GetDescriptionBuilding(BUILD_SPEC, race), Font::BIG);
+	if(building & BUILD_SPEC && le.MousePressRight(coordBuildingSpec)) Dialog::Message(GetStringBuilding(BUILD_SPEC, race), description_spec, Font::BIG);
 	else
-	if(building & BUILD_CASTLE && le.MousePressRight(coordBuildingCastle)) Dialog::Message(GetStringBuilding(BUILD_CASTLE), GetDescriptionBuilding(BUILD_CASTLE), Font::BIG);
+	if(building & BUILD_CASTLE && le.MousePressRight(coordBuildingCastle)) Dialog::Message(GetStringBuilding(BUILD_CASTLE), description_castle, Font::BIG);
 	else
 	if(!(building & BUILD_CASTLE) && le.MousePressRight(coordBuildingTent)) Dialog::Message(GetStringBuilding(BUILD_TENT), GetDescriptionBuilding(BUILD_TENT), Font::BIG);
 	else

@@ -165,7 +165,7 @@ void Kingdom::AICastlesTurns(void)
     for(; itc1 != itc2; ++itc1) if(*itc1)
     {
 	Castle & castle = **itc1;
-	const s8 range = castle.isCastle() ? CASTLE_SCOUTE : TOWN_SCOUTE;
+	const s8 range = Game::GetViewDistance(castle.isCastle() ? Game::VIEW_CASTLE : Game::VIEW_TOWN);
 	bool defence = false;
 
 	// find enemy hero

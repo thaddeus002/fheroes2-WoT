@@ -39,12 +39,6 @@
 #include "army.h"
 #include "gamedefs.h"
 
-#define HEROESMAXARTIFACT	14
-#define HEROESMAXSKILL		8
-#define HEROESMAXCOUNT		71
-
-#define SCOUTINGBASE		4
-
 class Recruits;
 class Surface;
 namespace Interface { class GameArea; };

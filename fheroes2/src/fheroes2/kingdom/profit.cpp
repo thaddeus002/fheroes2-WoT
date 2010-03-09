@@ -85,18 +85,7 @@ void ProfitConditions::UpdateCosts(const std::string & spec)
             const TiXmlElement* xml_profit = xml_profits->FirstChildElement(ptr->id);
 
             if(xml_profit)
-            {
-                cost_t & cost = ptr->cost;
-                int value;
-
-                xml_profit->Attribute("gold", &value); cost.gold = value;
-                xml_profit->Attribute("wood", &value); cost.wood = value;
-                xml_profit->Attribute("mercury", &value); cost.mercury = value;
-                xml_profit->Attribute("ore", &value); cost.ore = value;
-                xml_profit->Attribute("sulfur", &value); cost.sulfur = value;
-                xml_profit->Attribute("crystal", &value); cost.crystal = value;
-                xml_profit->Attribute("gems", &value); cost.gems = value;
-            }
+        	LoadCostFromXMLElement(ptr->cost, *xml_profit);
 
             ++ptr;
         }

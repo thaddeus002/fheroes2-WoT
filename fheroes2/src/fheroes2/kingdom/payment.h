@@ -38,6 +38,10 @@ struct cost_t
 
 typedef Resource::funds_t payment_t;
 void PaymentLoadCost(payment_t &, const cost_t &);
+#ifdef WITH_XML
+struct TiXmlElement;
+void LoadCostFromXMLElement(cost_t &, const TiXmlElement &);
+#endif
 
 namespace PaymentConditions
 {

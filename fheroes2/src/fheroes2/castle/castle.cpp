@@ -32,6 +32,9 @@
 #include "castle.h"
 #include "localclient.h"
 
+u8 Castle::grown_well(2);
+u8 Castle::grown_wel2(8);
+
 Castle::Castle() : captain(*this), mageguild(*this), army(&captain), castle_heroes(NULL)
 {
 }
@@ -301,8 +304,8 @@ void Castle::ActionNewDay(void)
 
 void Castle::ActionNewWeek(void)
 {
-    u8 well = building & BUILD_WELL ? GROWN_WELL : 0;
-    u8 wel2 = building & BUILD_WEL2 ? GROWN_WEL2 : 0;
+    u8 well = building & BUILD_WELL ? grown_well : 0;
+    u8 wel2 = building & BUILD_WEL2 ? grown_wel2 : 0;
 
     // dw 1
     if(building & DWELLING_MONSTER1) dwelling[0]  += Monster(race, DWELLING_MONSTER1).GetGrown() + well + wel2;
@@ -457,30 +460,30 @@ const char* Castle::GetDescriptionBuilding(u32 build, Race::race_t race)
 	_("The Thieves' Guild provides information on enemy players. Thieves' Guilds can also provide scouting information on enemy towns."),
 	_("The Tavern increases morale for troops defending the castle."),
 	_("The Shipyard allows ships to be built."),
-	_("The Well increases the growth rate of all dwellings by 2 creatures per week."),
-	_("The Statue increases your town's income by 250 per day."),
+	_("The Well increases the growth rate of all dwellings by %{count} creatures per week."),
+	_("The Statue increases your town's income by %{count} per day."),
 	_("The Left Turret provides extra firepower during castle combat."),
 	_("The Right Turret provides extra firepower during castle combat."),
 	_("The Marketplace can be used to convert one type of resource into another. The more marketplaces you control, the better the exchange rate."),
 	_("The Moat slows attacking units. Any unit entering the moat must end its turn there and becomes more vulnerable to attack."),
-	_("The Castle improves town defense and increases income to 1000 gold per day."),
+	_("The Castle improves town defense and increases income to %{count} gold per day."),
 	_("The Tent provides workers to build a castle, provided the materials and the gold are available."),
 	_("The Captain's Quarters provides a captain to assist in the castle's defense when no hero is present."),
 	_("The Mage Guild allows heroes to learn spells and replenish their spell points."), "Unknown" };
 
     const char* desc_wel2[] = {
-	_("The Farm increases production of Peasants by 8 per week."),
-	_("The Garbage Heap increases production of Goblins by 8 per week."),
-	_("The Crystal Garden increases production of Sprites by 8 per week."),
-	_("The Waterfall increases production of Centaurs by 8 per week."),
-	_("The Orchard increases production of Halflings by 8 per week."),
-	_("The Skull Pile increases production of Skeletons by 8 per week.") };
+	_("The Farm increases production of Peasants by %{count} per week."),
+	_("The Garbage Heap increases production of Goblins by %{count} per week."),
+	_("The Crystal Garden increases production of Sprites by %{count} per week."),
+	_("The Waterfall increases production of Centaurs by %{count} per week."),
+	_("The Orchard increases production of Halflings by %{count} per week."),
+	_("The Skull Pile increases production of Skeletons by %{count} per week.") };
 
     const char* desc_spec[] = {
 	_("The Fortifications increase the toughness of the walls, increasing the number of turns it takes to knock them down."),
 	_("The Coliseum provides inspiring spectacles to defending troops, raising their morale by two during combat."),
 	_("The Rainbow increases the luck of the defending units by two."),
-	_("The Dungeon increases the income of the town by 500 / day."),
+	_("The Dungeon increases the income of the town by %{count} / day."),
 	_("The Library increases the number of spells in the Guild by one for each level of the guild."),
 	_("The Storm adds +2 to the power of spells of a defending spell caster.") };
 
@@ -978,7 +981,7 @@ bool Castle::BuyBuilding(u32 build)
     {
 	    case BUILD_CASTLE:
 		Maps::UpdateSpritesFromTownToCastle(GetCenter());
-		Maps::ClearFog(GetIndex(), CASTLE_SCOUTE, GetColor());
+		Maps::ClearFog(GetIndex(), Game::GetViewDistance(Game::VIEW_CASTLE), GetColor());
 		break;
 
 	    case BUILD_MAGEGUILD1:
@@ -1675,3 +1678,27 @@ bool Castle::isNecromancyShrineBuild(void) const
     return Settings::Get().PriceLoyaltyVersion() &&
 	race == Race::NECR && (BUILD_TAVERN & building);
 }
+
+u8 Castle::GetGrownWell(void)
+{
+    return grown_well;
+}
+
+u8 Castle::GetGrownWel2(void)
+{
+    return grown_wel2;
+}
+
+#ifdef WITH_XML
+#include "xmlccwrap.h"
+
+void Castle::UpdateExtraGrowth(const TiXmlElement* xml)
+{
+    int value;
+    xml->Attribute("well", &value);
+    grown_well = value;
+
+    xml->Attribute("wel", &value);
+    grown_wel2 = value;
+}
+#endif

@@ -1548,9 +1548,9 @@ void Heroes::Scoute(void)
 
 u8 Heroes::GetScoute(void) const
 {
-    return (HasArtifact(Artifact::TELESCOPE) ? 1 : 0) + SCOUTINGBASE + GetLevelSkill(Skill::Secondary::SCOUTING);
+    return (HasArtifact(Artifact::TELESCOPE) ? Game::GetViewDistance(Game::VIEW_TELESCOPE) : 0) +
+	Game::GetViewDistance(Game::VIEW_SCOUTING_NONE) + GetLevelSkill(Skill::Secondary::SCOUTING);
 }
-
 
 /* set cente from index maps */
 void Heroes::SetCenter(const u16 index)

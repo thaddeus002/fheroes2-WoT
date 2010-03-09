@@ -998,8 +998,8 @@ void DwellingBar::Redraw(void) const
 
 	    // grown
 	    u8 grown = m.GetGrown();
-	    if(castle.isBuild(BUILD_WELL)) grown += GROWN_WELL;
-	    if(castle.isBuild(BUILD_WEL2) && DWELLING_MONSTER1 == dwelling) grown += GROWN_WEL2;
+	    if(castle.isBuild(BUILD_WELL)) grown += Castle::GetGrownWell();
+	    if(castle.isBuild(BUILD_WEL2) && DWELLING_MONSTER1 == dwelling) grown += Castle::GetGrownWel2();
 	    str = "+";
     	    String::AddInt(str, grown);
     	    text.Set(str, Font::YELLOW_SMALL);

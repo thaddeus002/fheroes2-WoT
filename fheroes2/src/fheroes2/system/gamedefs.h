@@ -42,4 +42,32 @@
 
 #define GETTEXT_PACKAGE "fheroes2"
 
+// hardcore defines: kingdom
+#define KINGDOMMAX			6
+#define KINGDOMMAXHEROES		8
+
+// hardcore defines: world
+#define MAXCASTLES			72
+#define DAYOFWEEK			7
+#define WEEKOFMONTH			4
+
+// hardcore defines: castle
+#define CASTLEMAXMONSTER		6
+
+// hardcore defines: heroes
+#define HEROESMAXARTIFACT		14
+#define HEROESMAXSKILL			8
+#define HEROESMAXCOUNT			71
+
+// hardcore defines: skill
+#define MAXPRIMARYSKILL			4
+#define MAXSECONDARYSKILL		14
+
+// hardcore defines: army
+#define ARMYMAXTROOPS			5
+
+// hardcore defines: interface
+#define RADARWIDTH			144
+#define BORDERWIDTH			16
+
 #endif

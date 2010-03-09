@@ -1496,7 +1496,8 @@ void World::ClearFog(const u8 color)
         std::vector<Castle *>::const_iterator it1 = vec_castles.begin();
         std::vector<Castle *>::const_iterator it2 = vec_castles.end();
 
-        for(; it1 != it2; ++it1) if(*it1 && color & (**it1).GetColor()) Maps::ClearFog((**it1).GetIndex(), ((**it1).isCastle() ? CASTLE_SCOUTE : TOWN_SCOUTE), color);
+        for(; it1 != it2; ++it1) if(*it1 && color & (**it1).GetColor())
+    	    Maps::ClearFog((**it1).GetIndex(), Game::GetViewDistance((**it1).isCastle() ? Game::VIEW_CASTLE : Game::VIEW_TOWN), color);
     }
 
     // clear adboar heroes
@@ -1867,7 +1868,7 @@ void World::ActionToEyeMagi(const Color::color_t color) const
 	std::vector<u16>::const_iterator it1 = vec_eyes.begin();
 	std::vector<u16>::const_iterator it2 = vec_eyes.end();
 
-	for(; it1 != it2; ++it1) Maps::ClearFog(*it1, MAGIEYESCOUTE, color);
+	for(; it1 != it2; ++it1) Maps::ClearFog(*it1, Game::GetViewDistance(Game::VIEW_MAGI_EYES), color);
     }
 }
 

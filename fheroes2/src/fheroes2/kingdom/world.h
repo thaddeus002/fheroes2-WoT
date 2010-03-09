@@ -48,13 +48,6 @@ namespace GameEvent
     class Riddle;
 };
 
-#define DAYOFWEEK       7 
-#define WEEKOFMONTH     4 
-#define MAXCASTLES	72
-
-#define OBSERVATIONTOWERSCOUTE 10
-#define MAGIEYESCOUTE 9
-
 class World : protected Size
 {
 public:

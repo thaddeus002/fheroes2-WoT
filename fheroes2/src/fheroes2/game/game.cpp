@@ -32,16 +32,26 @@
 #include "maps_tiles.h"
 #include "ground.h"
 #include "world.h"
+#include "kingdom.h"
+#include "castle.h"
 #include "mp2.h"
 #include "agg.h"
 #include "test.h"
 #include "game.h"
 
+#ifdef WITH_XML
+#include "xmlccwrap.h"
+#endif
+
 namespace Game
 {
     u8 GetMixerChannelFromObject(const Maps::Tiles &);
 
+    static u8 lost_town_days(7);
     static std::vector<u8> reserved_vols(LOOPXX_COUNT, 0);
+
+    // town, castle, scouting_none, scouting_basic, scouting_advanced, scouting_expert, artifact_telescope, object_observation_tower, object_magi_eyes
+    static u8 view_distance[] = { 4, 5, 4, 5, 6, 7, 1, 10, 9 };
 };
 
 Game::menu_t Game::Testing(u8 t)
@@ -272,4 +282,80 @@ void Game::ShowLoadMapsText(void)
     display.Fill(0, 0, 0);
     TextBox(_("Maps Loading..."), Font::BIG, Rect(0, display.h()/2, display.w(), display.h()/2));
     display.Flip();
+}
+
+u8 Game::GetLostTownDays(void)
+{
+    return lost_town_days;
+}
+
+u8 Game::GetViewDistance(distance_t d)
+{
+    return view_distance[d];
+}
+
+void Game::UpdateGlobalDefines(const std::string & spec)
+{
+#ifdef WITH_XML
+    // parse profits.xml
+    TiXmlDocument doc;
+    const TiXmlElement* xml_globals = NULL;
+
+    if(doc.LoadFile(spec.c_str()) &&
+	NULL != (xml_globals = doc.FirstChildElement("globals")))
+    {
+	const TiXmlElement* xml_element;
+
+	// starting_resource
+	xml_element = xml_globals->FirstChildElement("starting_resource");
+	if(xml_element)
+	    Kingdom::UpdateStartingResource(xml_element);
+
+	// view_distance
+	xml_element = xml_globals->FirstChildElement("view_distance");
+	if(xml_element)
+	{
+	    int value;
+	    xml_element->Attribute("town", &value);
+	    view_distance[0] = value;
+
+	    xml_element->Attribute("castle", &value);
+	    view_distance[1] = value;
+
+	    xml_element->Attribute("scouting_none", &value);
+	    view_distance[2] = value;
+
+	    xml_element->Attribute("scouting_basic", &value);
+	    view_distance[3] = value;
+
+	    xml_element->Attribute("scouting_advanced", &value);
+	    view_distance[4] = value;
+
+	    xml_element->Attribute("scouting_expert", &value);
+	    view_distance[5] = value;
+
+	    xml_element->Attribute("artifact_telescope", &value);
+	    view_distance[6] = value;
+
+	    xml_element->Attribute("object_observation_tower", &value);
+	    view_distance[7] = value;
+
+	    xml_element->Attribute("object_magi_eyes", &value);
+	    view_distance[8] = value;
+	}
+
+	// game_over
+	xml_element = xml_globals->FirstChildElement("game_over");
+	if(xml_element)
+	{
+	    int value;
+	    xml_element->Attribute("lost_towns_days", &value);
+	    lost_town_days = value;
+	}
+
+	// castle_extra_growth 
+	xml_element = xml_globals->FirstChildElement("castle_extra_growth ");
+	if(xml_element) Castle::UpdateExtraGrowth(xml_element);
+    }
+#endif
 }

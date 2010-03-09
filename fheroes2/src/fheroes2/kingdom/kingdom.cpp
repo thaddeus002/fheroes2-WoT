@@ -27,21 +27,77 @@
 #include "heroes.h"
 #include "difficulty.h"
 #include "gameevent.h"
-#include "payment.h"
 #include "profit.h"
 #include "world.h"
 #include "visit.h"
 #include "battle2.h"
-#include "kingdom_defines.h"
 #include "kingdom.h"
+
+cost_t Kingdom::starting_resource[] = {
+    { 10000, 30, 10, 30, 10, 10, 10 },
+    { 7500, 20, 5, 20, 5, 5, 5 },
+    { 5000, 10, 2, 10, 2, 2, 2 },
+    { 2500, 5, 0, 5, 0, 0, 0 },
+    { 0, 0, 0, 0, 0, 0, 0 },
+    // ai resource
+    { 10000, 30, 10, 30, 10, 10, 10 },
+};
+
+#ifdef WITH_XML
+#include "xmlccwrap.h"
+
+void Kingdom::UpdateStartingResource(const TiXmlElement* xml_resource)
+{
+    const TiXmlElement* xml_difficult;
+    const char* ai_always = xml_resource->Attribute("ai_always");
+    const char* level;
+
+    level = "easy";
+    if(NULL != (xml_difficult = xml_resource->FirstChildElement(level)))
+    {
+        LoadCostFromXMLElement(Kingdom::starting_resource[0], *xml_difficult);
+        if(ai_always && 0 == std::strcmp(ai_always, level)) LoadCostFromXMLElement(Kingdom::starting_resource[5], *xml_difficult);
+    }
+
+    level = "normal";
+    if(NULL != (xml_difficult = xml_resource->FirstChildElement(level)))
+    {
+	LoadCostFromXMLElement(Kingdom::starting_resource[1], *xml_difficult);
+        if(ai_always && 0 == std::strcmp(ai_always, level)) LoadCostFromXMLElement(Kingdom::starting_resource[5], *xml_difficult);
+    }
+    
+    level = "hard";
+    if(NULL != (xml_difficult = xml_resource->FirstChildElement(level)))
+    {
+	LoadCostFromXMLElement(Kingdom::starting_resource[2], *xml_difficult);
+        if(ai_always && 0 == std::strcmp(ai_always, level)) LoadCostFromXMLElement(Kingdom::starting_resource[5], *xml_difficult);
+    }
+
+    level = "expert";
+    if(NULL != (xml_difficult = xml_resource->FirstChildElement(level)))
+    {
+	LoadCostFromXMLElement(Kingdom::starting_resource[3], *xml_difficult);
+        if(ai_always && 0 == std::strcmp(ai_always, level)) LoadCostFromXMLElement(Kingdom::starting_resource[5], *xml_difficult);
+    }
+
+    level = "impossible";
+    if(NULL != (xml_difficult = xml_resource->FirstChildElement(level)))
+    {
+	LoadCostFromXMLElement(Kingdom::starting_resource[4], *xml_difficult);
+        if(ai_always && 0 == std::strcmp(ai_always, level)) LoadCostFromXMLElement(Kingdom::starting_resource[5], *xml_difficult);
+    }
+}
+#endif
 
 Kingdom::Kingdom()
 {
 }
 
-Kingdom::Kingdom(const Color::color_t cl) : color(cl), control(Game::AI), flags(0), lost_town_days(LOST_TOWN_DAYS + 1), ai_capital(NULL), visited_tents_colors(0)
+Kingdom::Kingdom(const Color::color_t cl) : color(cl), control(Game::AI), flags(0), lost_town_days(0), ai_capital(NULL), visited_tents_colors(0)
 {
     const Settings & conf = Settings::Get();
+
+    lost_town_days = Game::GetLostTownDays() + 1;
 
     // set play
     if(conf.KingdomColors(color)) SetModes(PLAY);
@@ -64,61 +120,21 @@ Kingdom::Kingdom(const Color::color_t cl) : color(cl), control(Game::AI), flags(
 
 void Kingdom::UpdateStartingResource(void)
 {
-    u8 difficulty = Settings::Get().GameDifficulty();
+    cost_t* sres = NULL;
 
-    if(Game::AI == control && Difficulty::EASY < difficulty) difficulty = Difficulty::NORMAL;
-
-    switch(difficulty)
+    switch(Settings::Get().GameDifficulty())
     {
-	case Difficulty::EASY:
-	    resource.wood	= START_EASY_WOOD;
-	    resource.ore	= START_EASY_ORE;
-	    resource.mercury	= START_EASY_MERCURY;
-	    resource.sulfur	= START_EASY_SULFUR;
-	    resource.crystal	= START_EASY_CRYSTAL;
-	    resource.gems	= START_EASY_GEMS;
-	    resource.gold	= START_EASY_GOLD;
-	    break;
-	case Difficulty::NORMAL:
-	    resource.wood	= START_NORMAL_WOOD;
-	    resource.ore	= START_NORMAL_ORE;
-	    resource.mercury	= START_NORMAL_MERCURY;
-	    resource.sulfur	= START_NORMAL_SULFUR;
-	    resource.crystal	= START_NORMAL_CRYSTAL;
-	    resource.gems	= START_NORMAL_GEMS;
-	    resource.gold	= START_NORMAL_GOLD;
-	    break;
-	case Difficulty::HARD:
-	    resource.wood	= START_HARD_WOOD;
-	    resource.ore	= START_HARD_ORE;
-	    resource.mercury	= START_HARD_MERCURY;
-	    resource.sulfur	= START_HARD_SULFUR;
-	    resource.crystal	= START_HARD_CRYSTAL;
-	    resource.gems	= START_HARD_GEMS;
-	    resource.gold	= START_HARD_GOLD;
-	    break;
-	case Difficulty::EXPERT:
-	    resource.wood	= START_EXPERT_WOOD;
-	    resource.ore	= START_EXPERT_ORE;
-	    resource.mercury	= START_EXPERT_MERCURY;
-	    resource.sulfur	= START_EXPERT_SULFUR;
-	    resource.crystal	= START_EXPERT_CRYSTAL;
-	    resource.gems	= START_EXPERT_GEMS;
-	    resource.gold	= START_EXPERT_GOLD;
-	    break;
-	case Difficulty::IMPOSSIBLE:
-	    resource.wood	= START_IMPOSSIBLE_WOOD;
-	    resource.ore	= START_IMPOSSIBLE_ORE;
-	    resource.mercury	= START_IMPOSSIBLE_MERCURY;
-	    resource.sulfur	= START_IMPOSSIBLE_SULFUR;
-	    resource.crystal	= START_IMPOSSIBLE_CRYSTAL;
-	    resource.gems	= START_IMPOSSIBLE_GEMS;
-	    resource.gold	= START_IMPOSSIBLE_GOLD;
-	    break;
+	case Difficulty::EASY:       sres = &starting_resource[0]; break;
+	case Difficulty::NORMAL:     sres = &starting_resource[1]; break;
+	case Difficulty::HARD:       sres = &starting_resource[2]; break;
+	case Difficulty::EXPERT:     sres = &starting_resource[3]; break;
+	case Difficulty::IMPOSSIBLE: sres = &starting_resource[4]; break;
 	default: break;
     }
-}
 
+    if(Game::AI == control) sres = &starting_resource[5];
+    if(sres) PaymentLoadCost(resource, *sres);
+}
 
 void Kingdom::SetModes(flags_t f)
 {
@@ -203,7 +219,7 @@ void Kingdom::ActionNewDay(void)
 
 	    // statue
 	    if(castle.isBuild(BUILD_STATUE))
-		resource += ProfitConditions::FromBuilding(BUILD_CASTLE, 0);
+		resource += ProfitConditions::FromBuilding(BUILD_STATUE, 0);
 
 	    // dungeon for warlock
 	    if(castle.isBuild(BUILD_SPEC) && Race::WRLK == castle.GetRace())
@@ -282,7 +298,7 @@ void Kingdom::AddCastle(const Castle *castle)
     if(castle && castles.end() == std::find(castles.begin(), castles.end(), castle))
 	castles.push_back(const_cast<Castle *>(castle));
 
-    lost_town_days = LOST_TOWN_DAYS + 1;
+    lost_town_days = Game::GetLostTownDays() + 1;
 }
 
 void Kingdom::RemoveCastle(const Castle *castle)

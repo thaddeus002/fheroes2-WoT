@@ -56,6 +56,21 @@ void PaymentLoadCost(payment_t & payment, const cost_t & cost)
     payment.gems = cost.gems;
 }
 
+#ifdef WITH_XML
+void LoadCostFromXMLElement(cost_t & cost, const TiXmlElement & element)
+{
+    int value;
+
+    element.Attribute("gold", &value); cost.gold = value;
+    element.Attribute("wood", &value); cost.wood = value;
+    element.Attribute("mercury", &value); cost.mercury = value;
+    element.Attribute("ore", &value); cost.ore = value;
+    element.Attribute("sulfur", &value); cost.sulfur = value;
+    element.Attribute("crystal", &value); cost.crystal = value;
+    element.Attribute("gems", &value); cost.gems = value;
+}
+#endif
+
 void PaymentConditions::UpdateCosts(const std::string & spec)
 {
 #ifdef WITH_XML
@@ -73,18 +88,7 @@ void PaymentConditions::UpdateCosts(const std::string & spec)
             const TiXmlElement* xml_payment = xml_payments->FirstChildElement(ptr->id);
 
             if(xml_payment)
-            {
-                cost_t & cost = ptr->cost;
-                int value;
-
-                xml_payment->Attribute("gold", &value); cost.gold = value;
-                xml_payment->Attribute("wood", &value); cost.wood = value;
-                xml_payment->Attribute("mercury", &value); cost.mercury = value;
-                xml_payment->Attribute("ore", &value); cost.ore = value;
-                xml_payment->Attribute("sulfur", &value); cost.sulfur = value;
-                xml_payment->Attribute("crystal", &value); cost.crystal = value;
-                xml_payment->Attribute("gems", &value); cost.gems = value;
-            }
+        	LoadCostFromXMLElement(ptr->cost, *xml_payment);
 
             ++ptr;
         }

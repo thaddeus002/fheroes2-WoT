@@ -33,8 +33,6 @@ class Castle;
 namespace Maps { class Tiles; };
 namespace Battle2 { class Stats; };
 
-#define	ARMYMAXTROOPS		5
-
 namespace Army
 {
     class BattleTroop;

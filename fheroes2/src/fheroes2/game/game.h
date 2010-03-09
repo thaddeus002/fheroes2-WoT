@@ -26,9 +26,6 @@
 #include "rect.h"
 #include "types.h"
 
-#define RADARWIDTH	144
-#define BORDERWIDTH	16
-
 class Heroes;
 class Castle;
 class Surface;
@@ -67,8 +64,9 @@ namespace Game
 	TESTING,
     } menu_t;
 
-    typedef enum { UNKNOWN = 0, STANDARD = 1, CAMPAIGN = 2, HOTSEAT = 4, NETWORK = 8, MULTI = HOTSEAT | NETWORK } type_t;
-    typedef enum { NONE = 0, LOCAL = 1, REMOTE = 2, AI = 4 } control_t;
+    enum type_t { UNKNOWN = 0, STANDARD = 1, CAMPAIGN = 2, HOTSEAT = 4, NETWORK = 8, MULTI = HOTSEAT | NETWORK };
+    enum control_t { NONE = 0, LOCAL = 1, REMOTE = 2, AI = 4 };
+    enum distance_t { VIEW_TOWN  = 0, VIEW_CASTLE = 1, VIEW_SCOUTING_NONE = 2, VIEW_SCOUTING_BASIC = 3, VIEW_SCOUTING_ADVANCED = 4, VIEW_SCOUTING_EXPERT = 5, VIEW_TELESCOPE = 6, VIEW_OBSERVATION_TOWER = 7, VIEW_MAGI_EYES = 8 };
 
     control_t GetControl(u8);
     type_t GetType(u8);
@@ -105,6 +103,10 @@ namespace Game
 
     u8  GetRating(void);
     u16 GetGameOverScores(void);
+    u8  GetLostTownDays(void);
+    u8  GetViewDistance(distance_t);
+
+    void UpdateGlobalDefines(const std::string &);
 
     void KeyboardGlobalFilter(u32, u16);
     void ShowLoadMapsText(void);

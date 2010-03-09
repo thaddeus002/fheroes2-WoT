@@ -26,7 +26,7 @@
 #include <map>
 #include "race.h"
 #include "color.h"
-#include "resource.h"
+#include "payment.h"
 #include "puzzle.h"
 #include "game.h"
 #include "mp2.h"
@@ -117,6 +117,10 @@ public:
 
     void Dump(void) const;
 
+#ifdef WITH_XML
+    static void UpdateStartingResource(const TiXmlElement*);
+#endif
+
 private:
     friend class Game::IO;
 
@@ -149,6 +153,8 @@ private:
 
     Puzzle puzzle_maps;
     u8 visited_tents_colors;
+
+    static cost_t starting_resource[];
 };
 
 #endif

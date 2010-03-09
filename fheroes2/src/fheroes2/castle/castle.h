@@ -36,13 +36,6 @@
 #include "heroes.h"
 #include "game_io.h"
 
-#define CASTLEMAXMONSTER        6 
-#define TOWN_SCOUTE		4
-#define CASTLE_SCOUTE		5
-
-#define GROWN_WELL		2
-#define GROWN_WEL2		8
-
 class Heroes;
 namespace Maps { class Tiles; };
 
@@ -168,6 +161,12 @@ public:
     static bool PredicateIsBuildMarketplace(const Castle *castle);
     static bool PredicateIsCapital(const Castle *castle);
 
+    static u8 GetGrownWell(void);
+    static u8 GetGrownWel2(void);
+#ifdef WITH_XML
+    static void UpdateExtraGrowth(const TiXmlElement*);
+#endif
+
     void Dump(void) const;
 
     void AIDefence(void);
@@ -208,6 +207,9 @@ private:
     u16			dwelling[CASTLEMAXMONSTER];
     Army::army_t        army;
     Heroes * 		castle_heroes;
+    
+    static u8 grown_well;
+    static u8 grown_wel2;
 };
 
 #endif

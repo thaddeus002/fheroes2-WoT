@@ -2420,7 +2420,7 @@ void ActionToObservationTower(Heroes &hero, const u8 obj, const u16 dst_index)
 {
     PlaySoundWarning;
     Dialog::Message(MP2::StringObject(obj), _("From the observation tower, you are able to see distant lands."), Font::BIG, Dialog::OK);
-    Maps::ClearFog(dst_index, OBSERVATIONTOWERSCOUTE, hero.GetColor());
+    Maps::ClearFog(dst_index, Game::GetViewDistance(Game::VIEW_OBSERVATION_TOWER), hero.GetColor());
 }
 
 void ActionToArtesianSpring(Heroes &hero, const u8 obj, const u16 dst_index)
