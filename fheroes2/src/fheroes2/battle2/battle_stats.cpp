@@ -887,15 +887,6 @@ bool Battle2::Stats::ApplySpell(u8 spell, const HeroBase* hero, TargetInfo & tar
 
     u16 spoint = hero ? hero->GetPower() : (Settings::Get().OriginalVersion() ? 2 : 3);
 
-    const HeroBase* myhero = GetCommander();
-
-    // artifact
-    if(myhero)
-    {
-	if(myhero->HasArtifact(Artifact::WIZARD_HAT)) spoint += 10;
-	if(myhero->HasArtifact(Artifact::ENCHANTED_HOURGLASS)) spoint += 2;
-    }
-
     // magic defenced
     switch(troop())
     {
@@ -918,7 +909,9 @@ bool Battle2::Stats::ApplySpell(u8 spell, const HeroBase* hero, TargetInfo & tar
     if(Spell::isRestore(spell))
 	SpellRestoreAction(spell, spoint, hero);
     else
+    {
     	SpellModesAction(spell, spoint, hero);
+    }
 
     return true;
 }
@@ -1087,6 +1080,12 @@ bool Battle2::Stats::isArchers(void) const
 
 void Battle2::Stats::SpellModesAction(u8 spell, u8 duration, const HeroBase* hero)
 {
+    if(hero)
+    {
+	if(hero->HasArtifact(Artifact::WIZARD_HAT)) duration += 10;
+	if(hero->HasArtifact(Artifact::ENCHANTED_HOURGLASS)) duration += 2;
+    }
+
     switch(spell)
     {
 	case Spell::BLESS:
