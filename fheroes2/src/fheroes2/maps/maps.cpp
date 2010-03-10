@@ -269,6 +269,28 @@ void Maps::ClearFog(u16 index, u8 scoute, const u8 color)
                 world.GetTiles(GetIndexFromAbsPoint(x, y)).ClearFog(color);
 }
 
+bool Maps::ScanAroundObject(const u16 center, const u8 obj, bool full, std::vector<u16> & res)
+{
+    const s16 cx = center % world.w();
+    const s16 cy = center / world.w();
+    u16 res2 = 0;
+
+    if(res.size()) res.clear();
+
+    for(s16 y = -1; y <= 1; ++y)
+        for(s16 x = -1; x <= 1; ++x)
+    {
+            if((!y && !x) || (y && x && !full)) continue;
+
+	    res2 = GetIndexFromAbsPoint(cx + x, cy + y);
+
+	    if(isValidAbsPoint(cx + x, cy + y) &&
+		obj == world.GetTiles(res2).GetObject()) res.push_back(res2);
+    }
+
+    return res.size();
+}
+
 bool Maps::ScanAroundObject(const u16 center, const u8 obj, bool full, u16 *res)
 {
     const s16 cx = center % world.w();

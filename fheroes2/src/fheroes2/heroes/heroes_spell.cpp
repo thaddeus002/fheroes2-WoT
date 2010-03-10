@@ -21,6 +21,8 @@
  ***************************************************************************/
 
 #include "monster.h"
+#include "dialog.h"
+#include "world.h"
 #include "spell.h"
 #include "settings.h"
 #include "heroes.h"
@@ -104,6 +106,53 @@ bool ActionSpellIdentifyHero(Heroes & hero)
 
 bool ActionSpellSummonBoat(Heroes & hero)
 {
+    u8 chance = 0;
+
+    switch(hero.GetLevelSkill(Skill::Secondary::WISDOM))
+    {
+	case Skill::Level::BASIC:	chance = 50; break;
+	case Skill::Level::ADVANCED:	chance = 75; break;
+	case Skill::Level::EXPERT:	chance = 100; break;
+	default: chance = 30; break;
+    }
+
+    const Spell::spell_t spell = Spell::SUMMONBOAT;
+    const u8 cost = Spell::CostManaPoints(spell, &hero);
+    const u16 points = hero.GetSpellPoints();
+    const u16 center = hero.GetIndex();
+
+    // apply cast
+    if(points >= cost)
+    {
+    	hero.SetSpellPoints(points - cost);
+
+	// find water
+	std::vector<u16> v;
+	std::vector<u16>::const_iterator dst;
+	if(Maps::ScanAroundObject(center, MP2::OBJ_ZERO, true, v))
+        {
+            dst = v.begin();
+            // find_if water
+            for(; dst != v.end(); ++dst) if(Maps::Ground::WATER == world.GetTiles(*dst).GetGround()) break;
+        }
+
+	// find boat
+	const u16 src = world.GetNearestObject(center, MP2::OBJ_BOAT);
+
+	if(Rand::Get(1, 100) <= chance && MAXU16 != src && dst != v.end())
+        {
+	    world.GetTiles(src).SetObject(MP2::OBJ_ZERO);
+	    world.GetTiles(*dst).SetObject(MP2::OBJ_BOAT);
+        }
+	else
+	// failed
+	{
+	    std::string str = "%{spell} failed!!!";
+	    String::Replace(str, "%{spell}", Spell::GetName(spell));
+	    Dialog::Message("", str, Font::BIG, Dialog::OK);
+	}
+    }
+
     return false;
 }
 
