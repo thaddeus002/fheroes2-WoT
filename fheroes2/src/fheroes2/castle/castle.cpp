@@ -1609,9 +1609,9 @@ bool Castle::AllowBuyBoat(void) const
 	const Maps::Tiles & left = world.GetTiles(index - 1);
 	const Maps::Tiles & right = world.GetTiles(index + 1);
 	const Maps::Tiles & center = world.GetTiles(index);
-	return (MP2::OBJ_ZERO == left.GetObject() ||
-		MP2::OBJ_ZERO == right.GetObject() ||
-		MP2::OBJ_ZERO == center.GetObject());
+	return ((MP2::OBJ_ZERO == left.GetObject() && Maps::Ground::WATER == left.GetGround()) ||
+		(MP2::OBJ_ZERO == right.GetObject() && Maps::Ground::WATER == right.GetGround()) ||
+		(MP2::OBJ_ZERO == center.GetObject() && Maps::Ground::WATER == center.GetGround()));
     }
     return false;
 }
@@ -1626,7 +1626,7 @@ bool Castle::BuyBoat(void)
     Maps::Tiles & right = world.GetTiles(index + 1);
     Maps::Tiles & center = world.GetTiles(index);
 
-    if(MP2::OBJ_ZERO == left.GetObject())
+    if(MP2::OBJ_ZERO == left.GetObject() && Maps::Ground::WATER == left.GetGround())
     {
 	world.GetMyKingdom().OddFundsResource(PaymentConditions::BuyBoat());
 
@@ -1636,7 +1636,7 @@ bool Castle::BuyBoat(void)
 #endif
     }
     else
-    if(MP2::OBJ_ZERO == right.GetObject())
+    if(MP2::OBJ_ZERO == right.GetObject() && Maps::Ground::WATER == right.GetGround())
     {
 	world.GetMyKingdom().OddFundsResource(PaymentConditions::BuyBoat());
 
@@ -1646,7 +1646,7 @@ bool Castle::BuyBoat(void)
 #endif
     }
     else
-    if(MP2::OBJ_ZERO == center.GetObject())
+    if(MP2::OBJ_ZERO == center.GetObject() && Maps::Ground::WATER == center.GetGround())
     {
 	world.GetMyKingdom().OddFundsResource(PaymentConditions::BuyBoat());
 
