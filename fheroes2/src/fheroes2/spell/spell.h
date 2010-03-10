@@ -162,6 +162,8 @@ public:
     static spell_t RandCombat(u8);
     static spell_t RandAdventure(u8);
 
+    static void UpdateStats(const std::string &);
+
 private:
     spell_t id;
 };

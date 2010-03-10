@@ -1,0 +1,138 @@
+<?xml version="1.0" ?>
+<spells>
+
+ <!-- first: unknown spell -->
+ <spell skip="0" cost="1" />
+
+ <!-- Fireball -->
+ <spell cost="9" />
+ <!-- Fireblast -->
+ <spell cost="15" />
+ <!-- Lightning Bolt -->
+ <spell cost="7" />
+ <!-- Chain Lightning -->
+ <spell cost="15" />
+ <!-- Teleport -->
+ <spell cost="9" />
+ <!-- Cure -->
+ <spell cost="6" />
+ <!-- Mass Cure -->
+ <spell cost="15" />
+ <!-- Resurrect -->
+ <spell cost="12" />
+ <!-- Resurrect True -->
+ <spell cost="15" />
+ <!-- Haste -->
+ <spell cost="3" />
+ <!-- Mass Haste -->
+ <spell cost="10" />
+ <!-- Slow -->
+ <spell cost="3" />
+ <!-- Mass Slow -->
+ <spell cost="15" />
+ <!-- Blind  -->
+ <spell cost="6" />
+ <!-- Bless -->
+ <spell cost="3" />
+ <!-- Mass Bless -->
+ <spell cost="12" />
+ <!-- Stoneskin -->
+ <spell cost="3" />
+ <!-- Steelskin -->
+ <spell cost="6" />
+ <!-- Curse -->
+ <spell cost="3" />
+ <!-- Mass Curse -->
+ <spell cost="12" />
+ <!-- Holy Word -->
+ <spell cost="9" />
+ <!-- Holy Shout -->
+ <spell cost="12" />
+ <!-- Anti-Magic -->
+ <spell cost="7" />
+ <!-- Dispel Magic -->
+ <spell cost="5" />
+ <!-- Mass Dispel -->
+ <spell cost="12" />
+ <!-- Magic Arrow -->
+ <spell cost="3" />
+ <!-- Berserker -->
+ <spell cost="12" />
+ <!-- Armageddon -->
+ <spell cost="20" />
+ <!-- Elemental Storm -->
+ <spell cost="15" />
+ <!-- Meteor Shower -->
+ <spell cost="15" />
+ <!-- Paralyze -->
+ <spell cost="9" />
+ <!-- Hypnotize -->
+ <spell cost="15" />
+ <!-- Cold Ray -->
+ <spell cost="6" />
+ <!-- Cold Ring -->
+ <spell cost="9" />
+ <!-- Disrupting Ray -->
+ <spell cost="7" />
+ <!-- Death Ripple -->
+ <spell cost="6" />
+ <!-- Death Wave -->
+ <spell cost="10" />
+ <!-- Dragon Slayer -->
+ <spell cost="6" />
+ <!-- Blood Lust -->
+ <spell cost="3" />
+ <!-- Animate Dead -->
+ <spell cost="10" />
+ <!-- Mirror Image -->
+ <spell cost="25" />
+ <!-- Shield -->
+ <spell cost="3" />
+ <!-- Mass Shield -->
+ <spell cost="7" />
+ <!-- Summon Earth Elemental -->
+ <spell cost="25" />
+ <!-- Summon Air Elemental -->
+ <spell cost="25" />
+ <!-- Summon Fire Elemental -->
+ <spell cost="25" />
+ <!-- Summon Water Elemental -->
+ <spell cost="25" />
+ <!-- Earthquake -->
+ <spell cost="15" />
+ <!-- View Mines -->
+ <spell cost="1" />
+ <!-- View Resources -->
+ <spell cost="1" />
+ <!-- View Artifacts -->
+ <spell cost="2" />
+ <!-- View Towns -->
+ <spell cost="2" />
+ <!-- View Heroes -->
+ <spell cost="2" />
+ <!-- View All -->
+ <spell cost="3" />
+ <!-- Identify Hero -->
+ <spell cost="3" />
+ <!-- Summon Boat -->
+ <spell cost="5" />
+ <!-- Dimension Door -->
+ <spell cost="10" />
+ <!-- Town Gate -->
+ <spell cost="10" />
+ <!-- Town Portal -->
+ <spell cost="20" />
+ <!-- Visions -->
+ <spell cost="6" />
+ <!-- Haunt -->
+ <spell cost="8" />
+ <!-- Set Earth Guardian -->
+ <spell cost="15" />
+ <!-- Set Air Guardian -->
+ <spell cost="15" />
+ <!-- Set Fire Guardian -->
+ <spell cost="15" />
+ <!-- Set Water Guardian -->
+ <spell cost="15" />
+
+</spells>

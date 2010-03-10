@@ -25,13 +25,19 @@
 #include "spell.h"
 #include "army.h"
 
-static const struct
+#ifdef WITH_XML
+#include "xmlccwrap.h"
+#endif
+
+struct spellstats_t
 {
         const char* name;
         u8 mana;
         u8 sprite;
         const char* description;
-} spells[] = {
+};
+
+static spellstats_t spells[] = {
 	//  name                      mana spr description
 	{ "Unknown",                    0,  0, "Unknown spell." },
 	{ _("Fireball"),                9,  8, _("Causes a giant fireball to strike the selected area, damaging all nearby creatures.") },
@@ -101,6 +107,37 @@ static const struct
 	{ _("Set Water Guardian"),     15, 55, _("Sets Water Elementals to guard a mine against enemy armies.") },
 	{ _("Stone"),  		        0,  0, _("Stone spell from Medusa.") },
 };
+
+void Spell::UpdateStats(const std::string & spec)
+{
+#ifdef WITH_XML
+    // parse spells.xml
+    TiXmlDocument doc;
+    const TiXmlElement* xml_spells = NULL;
+    spellstats_t* ptr = &spells[0];
+
+    if(doc.LoadFile(spec.c_str()) &&
+        NULL != (xml_spells = doc.FirstChildElement("spells")))
+    {
+        const TiXmlElement* xml_spell = xml_spells->FirstChildElement("spell");
+        for(; xml_spell; xml_spell = xml_spell->NextSiblingElement("spell"))
+        {
+            int value;
+
+            xml_spell->Attribute("skip", &value);
+            if(0 == value)
+            {
+		xml_spell->Attribute("cost", &value); if(value) ptr->mana = value;
+	    }
+
+	    ++ptr;
+
+            // out of range
+            if((ptr - &spells[0]) >= STONE) break;
+	}
+    }
+#endif
+}
 
 Spell::Spell() : id(NONE)
 {

@@ -36,6 +36,7 @@
 #include "images_pack.h"
 #include "localclient.h"
 #include "monster.h"
+#include "spell.h"
 #include "battle2.h"
 #include "payment.h"
 #include "profit.h"
@@ -396,6 +397,12 @@ void LoadExternalResource(const Settings & conf)
 
     if(FilePresent(spec))
 	Monster::UpdateStats(spec);
+
+    // spells.xml
+    spec = conf.LocalPrefix() + SEPARATOR + "files" + SEPARATOR + "stats" + SEPARATOR + "spells.xml";
+
+    if(FilePresent(spec))
+	Spell::UpdateStats(spec);
 
     // buildings.xml
     spec = conf.LocalPrefix() + SEPARATOR + "files" + SEPARATOR + "stats" + SEPARATOR + "buildings.xml";
