@@ -761,7 +761,7 @@ u8 Settings::KingdomColorsCount(void) const
     return current_maps_file.KingdomColorsCount();
 }
 
-bool Settings::MapsWithHeroes(void) const
+bool Settings::GameStartWithHeroes(void) const
 {
     return current_maps_file.with_heroes;
 }

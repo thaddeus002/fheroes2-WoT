@@ -535,16 +535,7 @@ const char* Castle::GetDescriptionBuilding(u32 build, Race::race_t race)
 
 bool Castle::AllowBuyHero(void)
 {
-    castle_heroes = GetHeroes();
-
-    if(castle_heroes) return false;
-
-    const Kingdom & kingdom = world.GetKingdom(color);
-
-    if(kingdom.GetHeroes().size() >= KINGDOMMAXHEROES) return false;
-    if(! kingdom.AllowPayment(PaymentConditions::RecruitHero())) return false;
-
-    return true;
+    return !GetHeroes() && world.GetKingdom(color).AllowRecruitHero(true);
 }
 
 bool Castle::RecruitHero(Heroes* hero)

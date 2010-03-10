@@ -472,3 +472,23 @@ bool Kingdom::IsVisitTravelersTent(u8 col)
 {
     return visited_tents_colors & col;
 }
+
+bool Kingdom::AllowRecruitHero(bool check_payment) const
+{
+	return (heroes.size() < KINGDOMMAXHEROES) && (!check_payment || AllowPayment(PaymentConditions::RecruitHero()));
+}
+
+void Kingdom::ApplyPlayWithStartingHero(void)
+{
+    if(isPlay() && castles.size())
+    {
+	// get first castle
+	std::vector<Castle*>::const_iterator it = std::find_if(castles.begin(), castles.end(), std::mem_fun(&Castle::isCastle));
+	if(it == castles.end()) it = castles.begin();
+
+        Heroes *hero = world.GetFreemanHeroes((*it)->GetRace());
+
+	if(hero && AllowRecruitHero(false) && hero->Recruit(**it))
+	    AddHeroes(hero);
+    }
+}

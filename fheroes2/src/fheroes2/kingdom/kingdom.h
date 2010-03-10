@@ -58,6 +58,7 @@ public:
     bool isPlay(void) const{ return Modes(PLAY); };
     bool isLoss(void) const;
     bool AllowPayment(const Resource::funds_t & funds) const;
+    bool AllowRecruitHero(bool check_payment) const;
 
     Color::color_t GetColor(void) const{ return color; };
     Race::race_t GetRace(void) const;
@@ -91,6 +92,7 @@ public:
 
     void AddHeroes(const Heroes *hero);
     void RemoveHeroes(const Heroes *hero);
+    void ApplyPlayWithStartingHero(void);
 
     void AddCastle(const Castle *castle);
     void RemoveCastle(const Castle *castle);

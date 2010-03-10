@@ -683,7 +683,7 @@ void World::LoadMaps(const std::string &filename)
 			}
 
 			// check heroes max count
-			if(kingdom.GetHeroes().size() < KINGDOMMAXHEROES)
+			if(kingdom.AllowRecruitHero(false))
 			{
 			    const Heroes * hero = NULL;
 
@@ -924,36 +924,20 @@ void World::LoadMaps(const std::string &filename)
 	if(kingdom.GetCastles().size())
 	{
 	    const Castle & castle = *(kingdom.GetCastles().at(0));
-	    const Heroes *hero = vec_heroes[Heroes::SANDYSANDY];
+	    Heroes* hero = vec_heroes[Heroes::SANDYSANDY];
 
-	    // place hero
-	    if(hero && (*hero).isFreeman())
+	    if(hero)
 	    {
-		const_cast<Heroes &>(*hero).Recruit(castle);
-
-		kingdom.AddHeroes(const_cast<Heroes *>(hero));
+		hero->Recruit(castle);
+		kingdom.AddHeroes(hero);
 	    }
 	}
     }
-    else
+
     // play with hero
-    if(Settings::Get().MapsWithHeroes())
-	for(u8 ii = 0; ii < vec_kingdoms.size(); ++ii)
-	    if((*vec_kingdoms[ii]).isPlay() && (*vec_kingdoms[ii]).GetCastles().size())
-	    {
-		// get first castle position
-		Kingdom & kingdom = *(vec_kingdoms[ii]);
-		const Castle & castle = *(kingdom.GetCastles().at(0));
+    if(Settings::Get().GameStartWithHeroes())
+	std::for_each(vec_kingdoms.begin(), vec_kingdoms.end(), std::mem_fun(&Kingdom::ApplyPlayWithStartingHero));
 
-		// place hero
-		if(const Heroes *hero = GetFreemanHeroes(castle.GetRace()))
-		{
-		    const_cast<Heroes &>(*hero).Recruit(castle);
-
-		    kingdom.AddHeroes(const_cast<Heroes *>(hero));
-		}
-	    }
-    
     // generate position for ultimate
     if(MAXU16 == ultimate_artifact)
     {

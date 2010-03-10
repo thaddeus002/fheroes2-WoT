@@ -1041,12 +1041,28 @@ void Heroes::Recruit(const Color::color_t & cl, const Point & pt)
     move_point = GetMaxMovePoints();
 }
 
-void Heroes::Recruit(const Castle & castle)
+bool Heroes::Recruit(const Castle & castle)
 {
-    Recruit(castle.GetColor(), castle.GetCenter());
-
-    // learn spell
-    castle.GetMageGuild().EducateHero(*this);
+    if(Settings::Get().OriginalVersion())
+    {
+	const Point newPos(castle.GetCenter().x, castle.GetCenter().y + 1);
+	const Maps::Tiles & tile = world.GetTiles(newPos);
+	if(tile.GetObject() != MP2::OBJ_ZERO) return false;
+    	Recruit(castle.GetColor(), newPos);
+    }
+    else
+    {
+	const Heroes* hero = castle.GetHeroes();
+	if(NULL == hero || hero->isFreeman())
+	{
+    	    Recruit(castle.GetColor(), castle.GetCenter());
+	    // learn spell
+	    castle.GetMageGuild().EducateHero(*this);
+	}
+	else
+	    return false;
+    }
+    return true;
 }
 
 void Heroes::ActionNewDay(void)

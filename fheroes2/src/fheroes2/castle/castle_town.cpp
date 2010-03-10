@@ -353,7 +353,7 @@ u32 Castle::OpenTown(void)
 
     Kingdom & kingdom = world.GetMyKingdom();
 
-    const bool many_hero = kingdom.GetHeroes().size() == KINGDOMMAXHEROES;
+    const bool many_hero = kingdom.AllowRecruitHero(false);
     const bool allow_buy_hero = AllowBuyHero();
 
     Heroes* hero1 = kingdom.GetRecruits().GetHero1();

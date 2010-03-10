@@ -167,7 +167,7 @@ public:
     void MeetingDialog(Heroes & heroes2);
 
     void Recruit(const Color::color_t & cl, const Point & pt);
-    void Recruit(const Castle & castle);
+    bool Recruit(const Castle & castle);
 
     void ActionNewDay(void);
     void ActionNewWeek(void);

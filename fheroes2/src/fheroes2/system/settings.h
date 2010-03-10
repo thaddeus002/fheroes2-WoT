@@ -249,7 +249,7 @@ public:
     bool AllowChangeRace(u8) const;
     u8 AllowColorsCount(void) const;
     u8 KingdomColorsCount(void) const;
-    bool MapsWithHeroes(void) const;
+    bool GameStartWithHeroes(void) const;
     GameOver::conditions_t ConditionWins(void) const;
     GameOver::conditions_t ConditionLoss(void) const;
     bool WinsCompAlsoWins(void) const;

@@ -2986,7 +2986,7 @@ void ActionToJail(Heroes &hero, const u8 obj, const u16 dst_index)
 {
     Kingdom & kingdom = world.GetKingdom(hero.GetColor());
 
-    if(kingdom.GetHeroes().size() < KINGDOMMAXHEROES)
+    if(kingdom.AllowRecruitHero(false))
     {
 	Maps::Tiles & tile = world.GetTiles(dst_index);
 	PlaySoundSuccess;
