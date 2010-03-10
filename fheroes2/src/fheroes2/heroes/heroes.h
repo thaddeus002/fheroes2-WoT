@@ -202,6 +202,7 @@ public:
     void ResetAction(void) { ResetModes(ACTION); };
     void Action(const u16 dst_index);
     bool ApplyPenaltyMovement(void);
+    bool ActionSpellCast(Spell::spell_t);
 
     void AIAction(const u16 dst_index);
     bool AIValidObject(u16, u8);

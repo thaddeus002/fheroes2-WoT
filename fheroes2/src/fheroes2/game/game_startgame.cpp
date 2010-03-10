@@ -832,8 +832,9 @@ Game::menu_t Game::HumanTurn(void)
 	    case KEY_i:		KeyPress_i(); break;
 	    // dig artifact
 	    case KEY_d:		KeyPress_d(res); break;
+	    // cast spell
+	    case KEY_a:		ButtonSpell(); break;
 	    // default action
-	    case KEY_a:
 	    case KEY_SPACE:	KeyPress_SPACE(); break;
 	    // hero/town dialog
 	    case KEY_n:
@@ -1281,9 +1282,9 @@ void Game::ButtonSpell(void)
     Game::Focus & global_focus = Focus::Get();
     if(Game::Focus::HEROES == global_focus.Type())
     {
-	Spell::spell_t spell = global_focus.GetHeroes().GetSpellBook().Open(SpellBook::ADVN, true);
-	// TODO cast selected spell
-	VERBOSE("spell selected: " << Spell::GetName(spell));
+	Heroes & hero = global_focus.GetHeroes();
+	Spell::spell_t spell = hero.GetSpellBook().Open(SpellBook::ADVN, true);
+	hero.ActionSpellCast(spell);
     }
 }
 
