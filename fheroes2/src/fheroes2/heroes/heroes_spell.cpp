@@ -157,17 +157,7 @@ bool ActionSpellSummonBoat(Heroes & hero)
 
 bool ActionSpellDimensionDoor(Heroes & hero)
 {
-    u8 distance = 14;
-
-    if(!Settings::Get().OriginalVersion())
-    switch(hero.GetLevelSkill(Skill::Secondary::WISDOM))
-    {
-	case Skill::Level::BASIC:	distance = 12; break;
-	case Skill::Level::ADVANCED:	distance = 16; break;
-	case Skill::Level::EXPERT:	distance = 20; break;
-	default: distance = 8; break;
-    }
-
+    const u8 distance = 14;
     const u8 cost = Spell::CostManaPoints(Spell::DIMENSIONDOOR, &hero);
     const u16 points = hero.GetSpellPoints();
 
