@@ -3828,7 +3828,7 @@ void Battle2::Interface::ProcessingHeroDialogResult(u8 res, Actions & a)
 			if(arena.isDisableCastSpell(spell, &msg))
 			    Dialog::Message("", msg, Font::BIG, Dialog::OK);
 			else
-			if(hero->GetSpellPoints() >= Spell::CostManaPoints(spell))
+			if(hero->GetSpellPoints() >= Spell::CostManaPoints(spell, hero))
 			{
 			    if(Spell::isApplyWithoutFocusObject(spell))
 			    {
