@@ -25,6 +25,8 @@
 #include "world.h"
 #include "agg.h"
 #include "cursor.h"
+#include "kingdom.h"
+#include "castle.h"
 #include "spell.h"
 #include "settings.h"
 #include "game_focus.h"
@@ -219,6 +221,74 @@ bool ActionSpellDimensionDoor(Heroes & hero)
 
 bool ActionSpellTownGate(Heroes & hero)
 {
+    const u8 cost = Spell::CostManaPoints(Spell::DIMENSIONDOOR, &hero);
+    const u16 points = hero.GetSpellPoints();
+
+    // apply cast
+    if(points >= cost)
+    {
+	const u16 center = hero.GetIndex();
+	const Kingdom & kingdom = world.GetKingdom(hero.GetColor());
+	const std::vector<Castle *> & castles = kingdom.GetCastles();
+	std::vector<Castle*>::const_iterator it;
+	u16 min = MAXU16;
+	const Castle* castle = NULL;
+
+	// find the nearest castle
+	for(it = castles.begin(); it != castles.end(); ++it)
+	{
+	    const u16 min2 = Maps::GetApproximateDistance(center, (*it)->GetIndex());
+	    if(min2 < min)
+	    {
+		min = min2;
+		castle = *it;
+	    }
+	}
+
+	Interface::Basic & I = Interface::Basic::Get();
+	Game::Focus & F = Game::Focus::Get();
+	Cursor & cursor = Cursor::Get();
+
+	hero.SetSpellPoints(points - cost);
+
+	// center hero
+	cursor.Hide();
+	I.gameArea.Center(F.Center());
+	F.SetRedraw();
+	I.Redraw();
+
+	if(castle)
+	{
+	    const u16 src = hero.GetIndex();
+	    const u16 dst = castle->GetIndex();
+
+	    AGG::PlaySound(M82::KILLFADE);
+	    hero.GetPath().Hide();
+	    hero.FadeOut();
+
+	    cursor.Hide();
+	    hero.SetCenter(dst);
+	    hero.Scoute();
+
+	    world.GetTiles(src).SetObject(hero.GetUnderObject());
+	    hero.SaveUnderObject(world.GetTiles(dst).GetObject());
+	    world.GetTiles(dst).SetObject(MP2::OBJ_HEROES);
+
+	    I.gameArea.Center(F.Center());
+	    F.SetRedraw();
+	    I.Redraw();
+
+	    AGG::PlaySound(M82::KILLFADE);
+	    hero.GetPath().Hide();
+	    hero.FadeIn();
+
+	    // educate spells
+	    if(Settings::Get().OriginalVersion()) castle->GetMageGuild().EducateHero(hero);
+
+	    return true;
+	}
+    }
+
     return false;
 }
 
