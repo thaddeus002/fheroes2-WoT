@@ -1859,7 +1859,9 @@ void Maps::Tiles::UpdateMonsterInfo(void)
     {
 	u16 count = quantity2;
 	    count <<= 8;
-	    count |= (quantity1 >> 3);
+	    count |= quantity1;
+	    count >>= 3;
+
         SetCountMonster(count);
 	fixed = true;
     }
