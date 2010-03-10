@@ -597,11 +597,10 @@ void Interface::GameArea::QueueEventProcessing(void)
     LocalEvent & le = LocalEvent::Get();
     const Point & mp = le.GetMouseCursor();
 
-    s16 index = (rectMaps.y + (mp.y - rectArea.y) / TILEWIDTH) * world.w() + rectMaps.x + (mp.x - rectArea.x) / TILEWIDTH;
-    const u16 & max = world.w() * world.h() - 1;
+    s16 index = GetIndexFromMousePoint(mp);
     
     // out of range
-    if(index > max || index < Maps::GetIndexFromAbsPoint(rectMaps.x, rectMaps.y)) return;
+    if(index < 0) return;
 
     const Rect tile_pos(rectArea.x + ((u16) (mp.x - rectArea.x) / TILEWIDTH) * TILEWIDTH,
 	                rectArea.y + ((u16) (mp.y - rectArea.y) / TILEWIDTH) * TILEWIDTH,

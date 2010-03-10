@@ -1284,7 +1284,14 @@ void Game::ButtonSpell(void)
     {
 	Heroes & hero = global_focus.GetHeroes();
 	Spell::spell_t spell = hero.GetSpellBook().Open(SpellBook::ADVN, true);
-	hero.ActionSpellCast(spell);
+	// apply cast spell
+	if(Spell::NONE != spell && !hero.ActionSpellCast(spell))
+	{
+	    // failed
+	    std::string str = "%{spell} failed!!!";
+	    String::Replace(str, "%{spell}", Spell::GetName(spell));
+	    Dialog::Message("", str, Font::BIG, Dialog::OK);
+	}
     }
 }
 

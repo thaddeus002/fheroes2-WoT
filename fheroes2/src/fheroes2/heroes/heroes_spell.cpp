@@ -23,8 +23,12 @@
 #include "monster.h"
 #include "dialog.h"
 #include "world.h"
+#include "agg.h"
+#include "cursor.h"
 #include "spell.h"
 #include "settings.h"
+#include "game_focus.h"
+#include "game_interface.h"
 #include "heroes.h"
 
 bool ActionSpellViewMines(Heroes &);
@@ -116,14 +120,13 @@ bool ActionSpellSummonBoat(Heroes & hero)
 	default: chance = 30; break;
     }
 
-    const Spell::spell_t spell = Spell::SUMMONBOAT;
-    const u8 cost = Spell::CostManaPoints(spell, &hero);
+    const u8 cost = Spell::CostManaPoints(Spell::SUMMONBOAT, &hero);
     const u16 points = hero.GetSpellPoints();
-    const u16 center = hero.GetIndex();
 
     // apply cast
     if(points >= cost)
     {
+	const u16 center = hero.GetIndex();
     	hero.SetSpellPoints(points - cost);
 
 	// find water
@@ -143,14 +146,8 @@ bool ActionSpellSummonBoat(Heroes & hero)
         {
 	    world.GetTiles(src).SetObject(MP2::OBJ_ZERO);
 	    world.GetTiles(*dst).SetObject(MP2::OBJ_BOAT);
+	    return true;
         }
-	else
-	// failed
-	{
-	    std::string str = "%{spell} failed!!!";
-	    String::Replace(str, "%{spell}", Spell::GetName(spell));
-	    Dialog::Message("", str, Font::BIG, Dialog::OK);
-	}
     }
 
     return false;
@@ -158,6 +155,65 @@ bool ActionSpellSummonBoat(Heroes & hero)
 
 bool ActionSpellDimensionDoor(Heroes & hero)
 {
+    u8 distance = 14;
+
+    if(!Settings::Get().OriginalVersion())
+    switch(hero.GetLevelSkill(Skill::Secondary::WISDOM))
+    {
+	case Skill::Level::BASIC:	distance = 12; break;
+	case Skill::Level::ADVANCED:	distance = 16; break;
+	case Skill::Level::EXPERT:	distance = 20; break;
+	default: distance = 8; break;
+    }
+
+    const u8 cost = Spell::CostManaPoints(Spell::DIMENSIONDOOR, &hero);
+    const u16 points = hero.GetSpellPoints();
+
+    // apply cast
+    if(points >= cost)
+    {
+	Interface::Basic & I = Interface::Basic::Get();
+	Game::Focus & F = Game::Focus::Get();
+	Cursor & cursor = Cursor::Get();
+
+	// center hero
+	cursor.Hide();
+	I.gameArea.Center(F.Center());
+	F.SetRedraw();
+	I.Redraw();
+
+	const u16 src = hero.GetIndex();
+	// get destination
+	s16 dst = I.GetDimensionDoorDestination(src, distance);
+
+	if(dst >= 0)
+	{
+	    AGG::PlaySound(M82::KILLFADE);
+	    hero.GetPath().Hide();
+	    hero.FadeOut();
+
+	    cursor.Hide();
+	    hero.SetCenter(dst);
+	    hero.Scoute();
+
+	    world.GetTiles(src).SetObject(hero.GetUnderObject());
+	    hero.SaveUnderObject(world.GetTiles(dst).GetObject());
+	    world.GetTiles(dst).SetObject(MP2::OBJ_HEROES);
+
+	    hero.SetSpellPoints(points - cost);
+
+	    I.gameArea.Center(F.Center());
+	    F.SetRedraw();
+	    I.Redraw();
+
+	    AGG::PlaySound(M82::KILLFADE);
+	    hero.GetPath().Hide();
+	    hero.FadeIn();
+
+	    return true;
+	}
+    }
+
     return false;
 }
 

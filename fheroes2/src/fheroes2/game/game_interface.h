@@ -65,6 +65,8 @@ namespace Interface
 	const Rect & GetAreaScrollTop(void) const;
 	const Rect & GetAreaScrollBottom(void) const;
 
+	s16 GetDimensionDoorDestination(const u16, const u8) const;
+
 	GameArea & gameArea;
 	Radar & radar;
 	IconsPanel & iconsPanel;

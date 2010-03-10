@@ -25,6 +25,8 @@
 #include "agg.h"
 #include "settings.h"
 #include "maps.h"
+#include "mp2.h"
+#include "world.h"
 #include "dialog.h"
 #include "game_interface.h"
 
@@ -164,4 +166,40 @@ void Interface::Basic::RedrawSystemInfo(s16 cx, s16 cy)
 
     system_info.Set(os.str());
     system_info.Blit(cx, cy);
+}
+
+s16 Interface::Basic::GetDimensionDoorDestination(const u16 from, const u8 distance) const
+{
+    Cursor & cursor = Cursor::Get();
+    Display & display = Display::Get();
+    LocalEvent & le = LocalEvent::Get();
+    s16 dst = -1;
+
+    while(le.HandleEvents())
+    {
+	const Point & mp = le.GetMouseCursor();
+	dst = gameArea.GetIndexFromMousePoint(mp);
+
+	const bool valid = ((gameArea.GetArea() & mp) &&
+			dst >= 0 &&
+			MP2::OBJ_ZERO == world.GetTiles(dst).GetObject() &&
+			Maps::Ground::WATER != world.GetTiles(dst).GetGround() &&
+			distance >= Maps::GetApproximateDistance(from, dst));
+
+	cursor.SetThemes(valid ? Cursor::MOVE : Cursor::WAR_NONE);
+
+	// exit
+	if(le.MousePressRight()) break;
+	else
+	if(Cursor::MOVE == cursor.Themes() && le.MouseClickLeft()) return dst;
+
+	// redraw cursor
+        if(!cursor.isVisible())
+	{
+    	    cursor.Show();
+	    display.Flip();
+        }
+    }
+
+    return -1;
 }
