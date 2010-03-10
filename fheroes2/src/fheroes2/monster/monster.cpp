@@ -146,7 +146,7 @@ namespace
 void Monster::UpdateStats(const std::string & spec)
 {
 #ifdef WITH_XML
-    // parse battle.xml
+    // parse monsters.xml
     TiXmlDocument doc;
     const TiXmlElement* xml_monsters = NULL;
     monstats_t* ptr = &monsters[0];
