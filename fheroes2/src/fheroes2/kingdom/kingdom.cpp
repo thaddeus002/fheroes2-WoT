@@ -486,9 +486,14 @@ void Kingdom::ApplyPlayWithStartingHero(void)
 	std::vector<Castle*>::const_iterator it = std::find_if(castles.begin(), castles.end(), std::mem_fun(&Castle::isCastle));
 	if(it == castles.end()) it = castles.begin();
 
-        Heroes *hero = world.GetFreemanHeroes((*it)->GetRace());
+	// check manual set hero (castle position + point(0, 1))?
+	const Point & cp = (*it)->GetCenter();
+	if(world.GetTiles(cp.x, cp.y + 1).GetObject() != MP2::OBJ_HEROES)
+	{
+    	    Heroes *hero = world.GetFreemanHeroes((*it)->GetRace());
 
-	if(hero && AllowRecruitHero(false) && hero->Recruit(**it))
-	    AddHeroes(hero);
+	    if(hero && AllowRecruitHero(false) && hero->Recruit(**it))
+		AddHeroes(hero);
+	}
     }
 }

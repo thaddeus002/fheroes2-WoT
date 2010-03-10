@@ -923,12 +923,13 @@ void World::LoadMaps(const std::string &filename)
 
 	if(kingdom.GetCastles().size())
 	{
-	    const Castle & castle = *(kingdom.GetCastles().at(0));
+	    const Castle* castle = kingdom.GetCastles().front();
 	    Heroes* hero = vec_heroes[Heroes::SANDYSANDY];
 
 	    if(hero)
 	    {
-		hero->Recruit(castle);
+		const Point & cp = castle->GetCenter();
+		hero->Recruit(castle->GetColor(), Point(cp.x, cp.y + 1));
 		kingdom.AddHeroes(hero);
 	    }
 	}

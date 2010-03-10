@@ -1043,26 +1043,16 @@ void Heroes::Recruit(const Color::color_t & cl, const Point & pt)
 
 bool Heroes::Recruit(const Castle & castle)
 {
-    if(Settings::Get().OriginalVersion())
+    const Heroes* hero = castle.GetHeroes();
+    if(NULL == hero || hero->isFreeman())
     {
-	const Point newPos(castle.GetCenter().x, castle.GetCenter().y + 1);
-	const Maps::Tiles & tile = world.GetTiles(newPos);
-	if(tile.GetObject() != MP2::OBJ_ZERO) return false;
-    	Recruit(castle.GetColor(), newPos);
+	Recruit(castle.GetColor(), castle.GetCenter());
+	// learn spell
+	castle.GetMageGuild().EducateHero(*this);
+	return true;
     }
-    else
-    {
-	const Heroes* hero = castle.GetHeroes();
-	if(NULL == hero || hero->isFreeman())
-	{
-    	    Recruit(castle.GetColor(), castle.GetCenter());
-	    // learn spell
-	    castle.GetMageGuild().EducateHero(*this);
-	}
-	else
-	    return false;
-    }
-    return true;
+
+    return false;
 }
 
 void Heroes::ActionNewDay(void)
