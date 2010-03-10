@@ -888,3 +888,17 @@ bool MP2::isPickupObject(const u8 obj)
 
     return false;
 }
+
+bool MP2::isClearGroundObject(const u8 obj)
+{
+    switch(obj)
+    {
+	case MP2::OBJ_ZERO:
+	case MP2::OBJ_COAST:
+	    return true;
+
+	default: break;
+    }
+
+    return false;
+}

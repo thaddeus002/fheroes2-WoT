@@ -182,7 +182,7 @@ s16 Interface::Basic::GetDimensionDoorDestination(const u16 from, const u8 dista
 
 	const bool valid = ((gameArea.GetArea() & mp) &&
 			dst >= 0 &&
-			MP2::OBJ_ZERO == world.GetTiles(dst).GetObject() &&
+			MP2::isClearGroundObject(world.GetTiles(dst).GetObject()) &&
 			Maps::Ground::WATER != world.GetTiles(dst).GetGround() &&
 			distance >= Maps::GetApproximateDistance(from, dst));
 

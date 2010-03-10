@@ -538,6 +538,8 @@ namespace MP2
     bool isCaptureObject(const u8 obj);
     bool isPickupObject(const u8 obj);
 
+    bool isClearGroundObject(const u8 obj);
+
     bool isDayLife(const u8 obj);
     bool isWeekLife(const u8 obj);
     bool isMonthLife(const u8 obj);
