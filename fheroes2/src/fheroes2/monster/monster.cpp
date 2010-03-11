@@ -169,7 +169,7 @@ void Monster::UpdateStats(const std::string & spec)
     		xml_monster->Attribute("damage_max", &value); if(value) ptr->damageMax = value;
     		xml_monster->Attribute("hp", &value); if(value) ptr->hp = value;
     		xml_monster->Attribute("speed", &value); ptr->speed = Speed::INSTANT < value ? Speed::INSTANT : (Speed::CRAWLING > value ? Speed::CRAWLING : static_cast<Speed::speed_t>(value));
-    		xml_monster->Attribute("grown", &value); if(value) ptr->grown = value;
+    		xml_monster->Attribute("grown", &value); ptr->grown = value;
     		xml_monster->Attribute("shots", &value); ptr->shots = value;
     		xml_monster->Attribute("gold", &value); cost.gold = value;
     		xml_monster->Attribute("wood", &value); cost.wood = value;
@@ -331,7 +331,7 @@ u8  Monster::GetLevel(void) const
 
 u16 Monster::GetRNDSize(bool skip_factor) const
 {
-    const u32 hps = GetGrown() * GetHitPoints();
+    const u32 hps = (GetGrown() ? GetGrown() : 1) * GetHitPoints();
     u32 res = Rand::Get(hps, hps + hps / 2);
 
     if(!skip_factor)
