@@ -38,6 +38,10 @@ struct spellstats_t
         const char* description;
 };
 
+u16 Spell::dd_distance = 0;
+u16 Spell::dd_sp = 0;
+u16 Spell::dd_hp = 0;
+
 static spellstats_t spells[] = {
 	//  name                      mana spr value description
 	{ "Unknown",                    0,  0,     0, "Unknown spell." },
@@ -131,6 +135,14 @@ void Spell::UpdateStats(const std::string & spec)
 		xml_spell->Attribute("cost", &value); if(value) ptr->mana = value;
 		xml_spell->Attribute("extra", &value); if(value) ptr->extra = value;
 	    }
+
+            // load dimension door params
+            if((ptr - &spells[0]) == DIMENSIONDOOR)
+            {
+		xml_spell->Attribute("distance", &value); dd_distance = value;
+		xml_spell->Attribute("sp", &value); dd_sp = value;
+		xml_spell->Attribute("hp", &value); dd_hp = value;
+            }
 
 	    ++ptr;
 
@@ -849,4 +861,15 @@ bool Spell::isRaceCompatible(u8 spell, u8 race)
     }
 
     return true;
+}
+
+u8 Spell::CalculateDimensionDoorDistance(u8 current_sp, u32 total_hp)
+{
+    if(dd_distance && dd_hp && dd_sp && total_hp)
+    {
+	const u16 res = (dd_distance * current_sp * dd_hp) / (dd_sp * total_hp);
+	return res ? (res < 255 ? res : 255) : 1;
+    }
+    // original h2 variant
+    return 14;
 }

@@ -164,9 +164,14 @@ public:
     static spell_t RandAdventure(u8);
 
     static void UpdateStats(const std::string &);
+    static u8 CalculateDimensionDoorDistance(u8 current_sp, u32 total_hp);
 
 private:
     spell_t id;
+    
+    static u16 dd_distance;
+    static u16 dd_sp;
+    static u16 dd_hp;
 };
 
 #endif

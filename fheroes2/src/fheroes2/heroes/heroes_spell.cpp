@@ -157,7 +157,7 @@ bool ActionSpellSummonBoat(Heroes & hero)
 
 bool ActionSpellDimensionDoor(Heroes & hero)
 {
-    const u8 distance = 14;
+    const u8 distance = Spell::CalculateDimensionDoorDistance(hero.GetPower(), hero.GetArmy().GetHitPoints());
     const u8 cost = Spell::CostManaPoints(Spell::DIMENSIONDOOR, &hero);
     const u16 points = hero.GetSpellPoints();
 
