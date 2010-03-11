@@ -201,7 +201,7 @@ namespace Battle2
 	bool	isMultiCellAttack(void) const;
 	bool	isHideAttack(void) const;
 	bool	isAlwayResponse(void) const;
-	bool	isMagicDefence(u8) const;
+	bool	isMagicDefence(u8, u8) const;
 	bool	isMagicAttack(void) const;
 	u8	GetSpellMagic(bool force = false) const;
 	bool	isHaveDamage(void) const;

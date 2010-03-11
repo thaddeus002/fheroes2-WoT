@@ -156,6 +156,7 @@ public:
     static u8 InlIndexSprite(u8);
 
     static u8 CostManaPoints(spell_t, const HeroBase* hero = NULL);
+    static u8 GetExtraValue(spell_t);
     static const char* GetName(spell_t);
     static const char* GetDescription(spell_t);
 

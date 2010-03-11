@@ -683,24 +683,6 @@ u32 Battle2::Stats::GetDamage(const Stats & enemy) const
 u32 Battle2::Stats::HowMuchWillKilled(u32 dmg) const
 {
     return dmg >= hp ? count : count - Monster::GetCountFromHitPoints(troop(), hp - dmg);
-/*
-    const u16 mhp = GetMonster().GetHitPoints();
-    u32 killed = 0;
-
-    if(dmg >= hp)
-	killed = count;
-    else
-    if(dmg >= mhp)
-    {
-	killed = dmg / mhp;
-	if(dmg - killed * mhp >= hp - (count - 1) * mhp) killed += 1;
-    }
-    else
-    if(dmg >= hp - (count - 1) * mhp)
-	killed = 1;
-
-    return killed;
-*/
 }
 
 u32 Battle2::Stats::ApplyDamage(u32 dmg)
@@ -836,7 +818,7 @@ bool Battle2::Stats::AllowApplySpell(u8 spell, const HeroBase* hero, std::string
 
     if(Spell::isApplyToFriends(spell) && GetColor() != hero->GetColor()) return false;
     if(Spell::isApplyToEnemies(spell) && GetColor() == hero->GetColor()) return false;
-    if(isMagicDefence(spell)) return false;
+    if(isMagicDefence(spell, (hero ? hero->GetPower() : 0))) return false;
 
     const HeroBase* myhero = GetCommander();
     if(!myhero) return true;
@@ -1360,13 +1342,12 @@ void Battle2::Stats::SpellApplyDamage(u8 spell, u8 spoint, const HeroBase* hero,
 
 void Battle2::Stats::SpellRestoreAction(u8 spell, u8 spoint, const HeroBase* hero)
 {
-    u32 restore = Spell::Restore(spell) * spoint;
-
     switch(spell)
     {
 	case Spell::CURE:
 	case Spell::MASSCURE:
-	    hp += restore;
+	    // restore
+	    hp += (Spell::Restore(spell) * spoint);
 	    if(hp > count * GetMonster().GetHitPoints()) hp = count * GetMonster().GetHitPoints();
 	    break;
 
@@ -1374,6 +1355,7 @@ void Battle2::Stats::SpellRestoreAction(u8 spell, u8 spoint, const HeroBase* her
 	case Spell::ANIMATEDEAD:
         case Spell::RESURRECTTRUE:
 	{
+	    u32 restore = Spell::Resurrect(spell) * spoint;
 	    // remove from graveyard
 	    if(!isValid())
 	    {
@@ -1497,7 +1479,7 @@ bool Battle2::Stats::isAlwayResponse(void) const
     return false;
 }
 
-bool Battle2::Stats::isMagicDefence(u8 spell) const
+bool Battle2::Stats::isMagicDefence(u8 spell, u8 spower) const
 {
     if(Spell::isMindInfluence(spell) &&
         (troop.isUndead() || troop() == Monster::GIANT || troop() == Monster::TITAN)) return true;
@@ -1600,6 +1582,10 @@ bool Battle2::Stats::isMagicDefence(u8 spell) const
 
 	case Spell::DISPEL:
 	    if(! (modes & IS_MAGIC)) return true;
+	    break;
+
+	case Spell::HYPNOTIZE:
+	    if(Spell::GetExtraValue(Spell::FromInt(spell)) * spower < hp) return true;
 	    break;
 
 	default: break;

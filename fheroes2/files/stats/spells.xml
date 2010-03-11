@@ -5,23 +5,23 @@
  <spell skip="0" cost="1" />
 
  <!-- Fireball -->
- <spell cost="9" />
+ <spell cost="9" extra="10" />
  <!-- Fireblast -->
- <spell cost="15" />
+ <spell cost="15" extra="10" />
  <!-- Lightning Bolt -->
- <spell cost="7" />
+ <spell cost="7" extra="10" />
  <!-- Chain Lightning -->
- <spell cost="15" />
+ <spell cost="15" extra="40" />
  <!-- Teleport -->
  <spell cost="9" />
  <!-- Cure -->
- <spell cost="6" />
+ <spell cost="6" extra="5" />
  <!-- Mass Cure -->
- <spell cost="15" />
+ <spell cost="15" extra="5" />
  <!-- Resurrect -->
- <spell cost="12" />
+ <spell cost="12" extra="50" />
  <!-- Resurrect True -->
- <spell cost="15" />
+ <spell cost="15" extra="50" />
  <!-- Haste -->
  <spell cost="3" />
  <!-- Mass Haste -->
@@ -45,9 +45,9 @@
  <!-- Mass Curse -->
  <spell cost="12" />
  <!-- Holy Word -->
- <spell cost="9" />
+ <spell cost="9" extra="10" />
  <!-- Holy Shout -->
- <spell cost="12" />
+ <spell cost="12" extra="20" />
  <!-- Anti-Magic -->
  <spell cost="7" />
  <!-- Dispel Magic -->
@@ -55,35 +55,35 @@
  <!-- Mass Dispel -->
  <spell cost="12" />
  <!-- Magic Arrow -->
- <spell cost="3" />
+ <spell cost="3" extra="10" />
  <!-- Berserker -->
  <spell cost="12" />
  <!-- Armageddon -->
- <spell cost="20" />
+ <spell cost="20" extra="50" />
  <!-- Elemental Storm -->
- <spell cost="15" />
+ <spell cost="15" extra="25" />
  <!-- Meteor Shower -->
- <spell cost="15" />
+ <spell cost="15" extra="25" />
  <!-- Paralyze -->
  <spell cost="9" />
  <!-- Hypnotize -->
- <spell cost="15" />
+ <spell cost="15" extra="25" />
  <!-- Cold Ray -->
- <spell cost="6" />
+ <spell cost="6" extra="20" />
  <!-- Cold Ring -->
- <spell cost="9" />
+ <spell cost="9" extra="10" />
  <!-- Disrupting Ray -->
  <spell cost="7" />
  <!-- Death Ripple -->
- <spell cost="6" />
+ <spell cost="6" extra="5" />
  <!-- Death Wave -->
- <spell cost="10" />
+ <spell cost="10" extra="10" />
  <!-- Dragon Slayer -->
  <spell cost="6" />
  <!-- Blood Lust -->
  <spell cost="3" />
  <!-- Animate Dead -->
- <spell cost="10" />
+ <spell cost="10" extra="50" />
  <!-- Mirror Image -->
  <spell cost="25" />
  <!-- Shield -->
@@ -91,13 +91,13 @@
  <!-- Mass Shield -->
  <spell cost="7" />
  <!-- Summon Earth Elemental -->
- <spell cost="25" />
+ <spell cost="25" extra="3" />
  <!-- Summon Air Elemental -->
- <spell cost="25" />
+ <spell cost="25" extra="3" />
  <!-- Summon Fire Elemental -->
- <spell cost="25" />
+ <spell cost="25" extra="3" />
  <!-- Summon Water Elemental -->
- <spell cost="25" />
+ <spell cost="25" extra="3" />
  <!-- Earthquake -->
  <spell cost="15" />
  <!-- View Mines -->

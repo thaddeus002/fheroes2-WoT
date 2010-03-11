@@ -1402,7 +1402,6 @@ bool Battle2::Arena::isDisableCastSpell(u8 spell, std::string* msg) const
 		// check graveyard
 		if(isAllowResurrectFromGraveyard(spell, (*it1).index))
 			return false;
-
 	    }
 	    *msg = _("That spell will affect no one!");
 	    return true;
