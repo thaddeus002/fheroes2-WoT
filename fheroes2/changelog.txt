@@ -1,4 +1,9 @@
-SVN - up to r1609
+SVN - up to r1618
++ Added customizing 'Dimension Door' spell
++ Added spells customizing (spell cost and damage and others params)
++ Fixed casting spell from scroll artifact
++ Fixed Mage and ArchMage battle animation
++ Fixed battle 'Hypnotize' spell and Resurrect Spells apply
 + Fixed battle artifact 'Wizard's Hat' and 'Hourglass'
 + Fixed catapult order destroy objects
 + Added SDL-1.3 build support
