@@ -596,7 +596,7 @@ u32 Battle2::Stats::GetDamageMax(void) const
 
 u32 Battle2::Stats::GetDamage(const Stats & enemy) const
 {
-    u32 dmg = 0;
+    double dmg = 0;
 
     if(Modes(SP_BLESS))
 	dmg = GetDamageMax();
@@ -627,9 +627,9 @@ u32 Battle2::Stats::GetDamage(const Stats & enemy) const
             {
                 switch(GetCommander()->GetLevelSkill(Skill::Secondary::ARCHERY))
                 {
-                    case Skill::Level::BASIC:   dmg += (dmg * 10) / 100; break;
-                    case Skill::Level::ADVANCED:dmg += (dmg * 25) / 100; break;
-                    case Skill::Level::EXPERT:  dmg += (dmg * 50) / 100; break;
+                    case Skill::Level::BASIC:   dmg += dmg * 0.1; break;
+                    case Skill::Level::ADVANCED:dmg += dmg * 0.25; break;
+                    case Skill::Level::EXPERT:  dmg += dmg * 0.5; break;
                     default: break;
             	}
 	    }
@@ -666,18 +666,14 @@ u32 Battle2::Stats::GetDamage(const Stats & enemy) const
 	default: break;
     }
 
-
     // approximate.. from faq
     int r = GetAttack() - enemy.GetDefense();
 
     if(enemy.troop.isDragons() && Modes(SP_DRAGONSLAYER)) r+= 5;
 
-    if(0 < r)
-	dmg *= (1 + 10 * std::min(r,  20) / 100);
-    else
-	dmg *= (1 + 5 * std::max(r, -14) / 100);
+    dmg *= 1 + (0 < r ? 0.1 * std::min(r,  20) : 0.05 * std::max(r, -15));
 
-    return dmg < 1 ? 1 : dmg;
+    return dmg < 1 ? 1 : static_cast<u32>(dmg);
 }
 
 u32 Battle2::Stats::HowMuchWillKilled(u32 dmg) const
