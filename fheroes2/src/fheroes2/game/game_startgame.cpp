@@ -717,6 +717,7 @@ void Game::ShowPathOrStartMoveHero(Heroes *hero, const u16 dst_index)
         hero->SetMove(false);
 	path.Calculate(dst_index);
         if(IS_DEBUG(DBG_GAME, DBG_TRACE)) path.Dump();
+        path.ScanObstacleAndReduce();
         path.Show();
 	I.SetRedraw(REDRAW_GAMEAREA);
 	cursor.SetThemes(Game::GetCursor(dst_index));

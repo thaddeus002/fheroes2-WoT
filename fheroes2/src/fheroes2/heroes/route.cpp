@@ -310,12 +310,13 @@ void Route::Path::ScanObstacleAndReduce(void)
 	if(Maps::isValidDirection(next, (*it).Direction()))
 	    next = Maps::GetDirectionIndex(next, (*it).Direction());
 
-	// skip end point
-	if(next == dst) return;
 
 	switch(world.GetTiles(next).GetObject())
 	{
 	    case MP2::OBJ_HEROES:
+		// skip end point
+		if(next == dst) return;
+
 	    case MP2::OBJ_MONSTER:
 		dst = Maps::GetDirectionIndex(next, Direction::Reflect((*it).Direction()));
 		erase(it, end());
