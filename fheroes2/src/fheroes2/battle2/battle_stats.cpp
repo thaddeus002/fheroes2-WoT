@@ -1086,15 +1086,6 @@ void Battle2::Stats::SpellModesAction(u8 spell, u8 duration, const HeroBase* her
 	    affected.AddMode(SP_BLOODLUST, 3);
 	    break;
 
-	case Spell::CURE:
-	case Spell::MASSCURE:
-	    if(Modes(IS_BAD_MAGIC))
-	    {
-		ResetModes(IS_BAD_MAGIC);
-		affected.RemoveMode(IS_BAD_MAGIC);
-	    }
-	    break;
-
 	case Spell::CURSE:
 	case Spell::MASSCURSE:
 	    if(Modes(SP_BLESS))
@@ -1346,6 +1337,12 @@ void Battle2::Stats::SpellRestoreAction(u8 spell, u8 spoint, const HeroBase* her
     {
 	case Spell::CURE:
 	case Spell::MASSCURE:
+	    // clear bad magic
+	    if(Modes(IS_BAD_MAGIC))
+	    {
+		ResetModes(IS_BAD_MAGIC);
+		affected.RemoveMode(IS_BAD_MAGIC);
+	    }
 	    // restore
 	    hp += (Spell::Restore(spell) * spoint);
 	    if(hp > count * GetMonster().GetHitPoints()) hp = count * GetMonster().GetHitPoints();
