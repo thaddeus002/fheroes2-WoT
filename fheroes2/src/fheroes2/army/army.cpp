@@ -464,17 +464,28 @@ s8 Army::army_t::GetMoraleWithModificators(std::string *strs) const
         case 2:
         case 0: break;
         case 1:
-    	    if(0 == count_necr && !ghost_present && 1 < uniq_count)
+    	    if(0 == count_necr && !ghost_present)
             {
-                ++result;
-                if(strs)
+		if(1 < uniq_count)
                 {
-            	    std::string str = _("All %{race} troops +1");
-            	    String::Replace(str, "%{race}", Race::String(r));
-            	    strs->append(str);
+		    ++result;
+            	    if(strs)
+            	    {
+            		std::string str = _("All %{race} troops +1");
+            		String::Replace(str, "%{race}", Race::String(r));
+            		strs->append(str);
+            		strs->append("\n");
+            	    }
+		}
+            }
+	    else
+            {
+	        if(strs)
+                {
+            	    strs->append(_("Entire unit is undead, so morale does not apply."));
             	    strs->append("\n");
             	}
-            }
+	    }
             break;
         case 3:
             result -= 1;

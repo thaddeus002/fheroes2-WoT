@@ -293,6 +293,7 @@ void Battle2::NecromancySkillAction(Army::army_t & army1, Army::army_t & army2, 
 	String::AddInt(str, count);
 	Text text(str, Font::SMALL);
 	text.Blit((sf1.w() - text.w()) / 2, sf2.h() + 3, sf1);
+	PlayPickupSound();
 	Dialog::SpriteInfo("", msg, sf1);
     }
 }
