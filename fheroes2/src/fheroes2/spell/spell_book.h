@@ -44,6 +44,7 @@ public:
 	Spell::spell_t Open(filter_t filt, bool canselect) const;
 	void Activate(void) { active = true; };
 	bool isActive(void) const { return active; };
+        bool isPresentSpell(Spell::spell_t) const;
 
 private:
 	friend class Game::IO;

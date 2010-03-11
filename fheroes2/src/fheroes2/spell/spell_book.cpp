@@ -344,3 +344,19 @@ void SpellBookRedrawSpells(const std::vector<Spell::spell_t> & spells, std::vect
 	coords.push_back(rect);
     }
 }
+
+bool SpellBook::isPresentSpell(Spell::spell_t spell) const
+{
+    if(hero)
+    {
+	const BagArtifacts & bag = hero->GetBagArtifacts();
+	BagArtifacts::const_iterator it1 = bag.begin();
+	BagArtifacts::const_iterator it2 = bag.end();
+	for(; it1 != it2; ++it1) if(*it1 == Artifact::SPELL_SCROLL)
+	{
+	    if(spell == Spell::FromInt((*it1).GetExt())) return true;
+        }
+    }
+
+    return SpellStorage::isPresentSpell(spell);
+}
