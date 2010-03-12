@@ -1100,6 +1100,18 @@ Army::army_t* Battle2::Arena::GetArmy(u8 color)
     return NULL;
 }
 
+void Battle2::Arena::GetArmyPositions(u8 color, std::vector<u16> & res) const
+{
+    if(res.size()) res.clear();
+
+    const Army::army_t* army = GetArmy(color);
+    if(army)
+    {
+	for(u8 ii = 0; ii < army->Size(); ++ii)
+	    if(army->At(ii).isValid()) res.push_back(army->At(ii).GetBattleStats()->GetPosition());
+    }
+}
+
 Battle2::Stats* Battle2::Arena::GetTroopID(u16 id)
 {
     Army::army_t* army = GetArmy(id >> 8);
@@ -1128,6 +1140,21 @@ const Battle2::Stats* Battle2::Arena::GetEnemyAbroadMaxQuality(u16 position, u8 
             res = enemy;
             quality = cell->quality;
         }
+    }
+
+    return res;
+}
+
+u16 Battle2::Arena::GetMaxQualityPosition(const std::vector<u16> & positions) const
+{
+    std::vector<u16>::const_iterator it1 = positions.begin();
+    std::vector<u16>::const_iterator it2 = positions.end();
+    u16 res = MAXU16;
+
+    for(; it1 != it2; ++it1) if(board.size() > *it1)
+    {
+	if(res == MAXU16 ||
+	    board[res].quality < board[*it1].quality) res = *it1;
     }
 
     return res;

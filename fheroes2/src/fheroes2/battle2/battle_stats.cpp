@@ -1968,27 +1968,63 @@ HeroBase* Battle2::Stats::GetCommander(void)
 
 u16 Battle2::Stats::AIGetAttackPosition(const std::vector<u16> & positions) const
 {
-    u16 res = 0;
+    u16 res = MAXU16;
 
-    switch(GetMonster().GetID())
+    if(isMultiCellAttack())
     {
-	case Monster::HYDRA:
+	res = arena->GetMaxQualityPosition(positions);
+    }
+    else
+    if(isDoubleCellAttack())
+    {
+	std::vector<u16> enemies, results;
+
+	enemies.reserve(6);
+	results.reserve(12);
+
+	arena->GetArmyPositions(arena->GetOppositeColor(GetColor()), enemies);
+
+	// get actual coord if enemy troop near placed
+	while(1 < enemies.size())
 	{
-	    u16 largest = MAXU16;
-	    std::vector<u16>::const_iterator it1 = positions.begin();
-	    std::vector<u16>::const_iterator it2 = positions.end();
+	    const u16 cur = enemies.back();
+	    enemies.pop_back();
+
+	    std::vector<u16>::const_iterator it1 = enemies.begin();
+	    std::vector<u16>::const_iterator it2 = enemies.end();
 	    for(; it1 != it2; ++it1)
-		if(largest == MAXU16 ||
-		   arena->GetCell(largest)->quality < arena->GetCell(*it1)->quality) largest = *it1;
+	    {
+		// get near placed enemies
+		const direction_t dir = Board::GetDirection(cur, *it1);
 
-	    res = largest != MAXU16 ? largest : Arena::GetShortDistance(position, positions);
+		if(UNKNOWN != dir)
+		{
+		    if(Board::isValidDirection(cur, Board::GetReflectDirection(dir)))
+			results.push_back(Board::GetIndexDirection(cur, Board::GetReflectDirection(dir)));
+		    if(Board::isValidDirection(*it1, dir))
+			results.push_back(Board::GetIndexDirection(*it1, dir));
+		}
+	    }
 	}
-	    break;
 
-	default:
-	    res = Arena::GetShortDistance(position, positions);
-	    break;
+	if(results.size())
+	{
+	    // find passable results
+	    std::vector<u16> passable;
+	    arena->GetPassableQualityPositions(*this, passable);
+
+	    std::vector<u16>::iterator it = results.begin();
+	    for(; it != results.end(); ++it)
+		if(passable.end() == std::find(passable.begin(), passable.end(), *it))
+		    results.erase(it);
+	
+	    // get max quality
+	    if(results.size())
+	    {
+		res = arena->GetMaxQualityPosition(results);
+	    }
+	}
     }
 
-    return res;
+    return res != MAXU16 ? res : Arena::GetShortDistance(position, positions);
 }

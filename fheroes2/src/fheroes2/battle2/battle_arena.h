@@ -130,7 +130,9 @@ namespace Battle2
 
 	Army::army_t* GetArmy(u8);
 	const Army::army_t* GetArmy(u8) const;
-
+	
+	void GetArmyPositions(u8, std::vector<u16> &) const;
+	u16 GetMaxQualityPosition(const std::vector<u16> &) const;
 	u16 GetNearestTroops(u16, std::vector<u16> &, const std::vector<u16>* black = NULL) const;
 
 	void DialogBattleSummary(const Result &) const;
