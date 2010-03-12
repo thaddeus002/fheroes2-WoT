@@ -577,9 +577,9 @@ u8 Battle2::Stats::GetSpeed(bool skip_standing_check) const
 
     const u8 speed = GetMonster().GetSpeed();
 
-    if(Modes(SP_HASTE)) return (Speed::ULTRAFAST < speed ? Speed::INSTANT : speed + 2);
+    if(Modes(SP_HASTE)) return (Speed::ULTRAFAST < speed ? Speed::INSTANT : speed + Spell::GetExtraValue(Spell::HASTE));
     else
-    if(Modes(SP_SLOW)) return (Speed::SLOW > speed ? Speed::CRAWLING : speed - 2);
+    if(Modes(SP_SLOW)) return (Speed::SLOW > speed ? Speed::CRAWLING : speed - Spell::GetExtraValue(Spell::SLOW));
     
     return speed;
 }
@@ -638,7 +638,7 @@ u32 Battle2::Stats::GetDamage(const Stats & enemy) const
 	    if(enemy.isCastleWallDefensed(*this)) dmg /= 2;
 
 	    // check spell shield
-	    if(enemy.Modes(SP_SHIELD)) dmg /= 2;
+	    if(enemy.Modes(SP_SHIELD)) dmg /= Spell::GetExtraValue(Spell::SHIELD);
 	}
     }
 
@@ -669,7 +669,7 @@ u32 Battle2::Stats::GetDamage(const Stats & enemy) const
     // approximate.. from faq
     int r = GetAttack() - enemy.GetDefense();
 
-    if(enemy.troop.isDragons() && Modes(SP_DRAGONSLAYER)) r+= 5;
+    if(enemy.troop.isDragons() && Modes(SP_DRAGONSLAYER)) r+= Spell::GetExtraValue(Spell::DRAGONSLAYER);
 
     dmg *= 1 + (0 < r ? 0.1 * std::min(r,  20) : 0.05 * std::max(r, -15));
 
@@ -959,7 +959,7 @@ u16 Battle2::Stats::GetAttack(void) const
     u16 res = GetMonster().GetAttack() +
 	(GetCommander() ? GetCommander()->GetAttack() : 0);
 
-    if(Modes(SP_BLOODLUST)) res += 3;
+    if(Modes(SP_BLOODLUST)) res += Spell::GetExtraValue(Spell::BLOODLUST);
 
     return res;
 }
@@ -969,12 +969,12 @@ u16 Battle2::Stats::GetDefense(void) const
     s16 res = GetMonster().GetDefense() +
 	(GetCommander() ? GetCommander()->GetDefense() : 0);
 
-    if(Modes(SP_STONESKIN)) res += 3;
+    if(Modes(SP_STONESKIN)) res += Spell::GetExtraValue(Spell::STONESKIN);
     else
-    if(Modes(SP_STEELSKIN)) res += 5;
+    if(Modes(SP_STEELSKIN)) res += Spell::GetExtraValue(Spell::STEELSKIN);
 
     // disrupting ray accumulate effect
-    if(disruptingray) res -= disruptingray * 3;
+    if(disruptingray) res -= disruptingray * Spell::GetExtraValue(Spell::DISRUPTINGRAY);
     if(0 > res) res = 1;
 
     return res;

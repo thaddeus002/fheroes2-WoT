@@ -23,11 +23,11 @@
  <!-- Resurrect True -->
  <spell cost="15" extra="50" />
  <!-- Haste -->
- <spell cost="3" />
+ <spell cost="3" extra="2" />
  <!-- Mass Haste -->
  <spell cost="10" />
  <!-- Slow -->
- <spell cost="3" />
+ <spell cost="3" extra="2" />
  <!-- Mass Slow -->
  <spell cost="15" />
  <!-- Blind  -->
@@ -37,9 +37,9 @@
  <!-- Mass Bless -->
  <spell cost="12" />
  <!-- Stoneskin -->
- <spell cost="3" />
+ <spell cost="3" extra="3" />
  <!-- Steelskin -->
- <spell cost="6" />
+ <spell cost="6" extra="5" />
  <!-- Curse -->
  <spell cost="3" />
  <!-- Mass Curse -->
@@ -73,21 +73,21 @@
  <!-- Cold Ring -->
  <spell cost="9" extra="10" />
  <!-- Disrupting Ray -->
- <spell cost="7" />
+ <spell cost="7" extra="3" />
  <!-- Death Ripple -->
  <spell cost="6" extra="5" />
  <!-- Death Wave -->
  <spell cost="10" extra="10" />
  <!-- Dragon Slayer -->
- <spell cost="6" />
+ <spell cost="6" extra="5" />
  <!-- Blood Lust -->
- <spell cost="3" />
+ <spell cost="3" extra="3" />
  <!-- Animate Dead -->
  <spell cost="10" extra="50" />
  <!-- Mirror Image -->
  <spell cost="25" />
  <!-- Shield -->
- <spell cost="3" />
+ <spell cost="3" extra="2" />
  <!-- Mass Shield -->
  <spell cost="7" />
  <!-- Summon Earth Elemental -->
