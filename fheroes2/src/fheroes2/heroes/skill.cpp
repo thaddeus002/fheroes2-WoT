@@ -267,7 +267,7 @@ Skill::Level::type_t Skill::Level::FromMP2(const u8 byte)
     return NONE;
 }
 
-const char* Skill::Level::String(const type_t level)
+const char* Skill::Level::String(u8 level)
 {
     const char* str_level[] = { "None", _("Basic"), _("Advanced"), _("Expert") };
 
@@ -807,4 +807,57 @@ void Skill::Secondary::LoadDefaults(u8 race, std::vector<Secondary> & skills)
 	if(ptr->initial_secondary.scouting)	skills.push_back(Secondary(SCOUTING, static_cast<Skill::Level::type_t>(ptr->initial_secondary.scouting)));
 	if(ptr->initial_secondary.wisdom)	skills.push_back(Secondary(WISDOM, static_cast<Skill::Level::type_t>(ptr->initial_secondary.wisdom)));
     }
+}
+
+void StringAppendModifiers(std::string & str, s8 value)
+{
+    if(value < 0) str.append(" -");
+    else
+    if(value > 0) str.append(" +");
+
+    String::AddInt(str, value);
+}
+
+s8 Skill::GetLeadershipModifiers(u8 level, std::string* strs = NULL)
+{
+    if(level && strs)
+    {
+        strs->append(Level::String(level));
+        strs->append(" ");
+        strs->append(Secondary::String(Secondary::LEADERSHIP));
+        StringAppendModifiers(*strs, level);
+        strs->append("\n");
+    }
+
+    switch(level)
+    {
+	case Level::BASIC:	return 1;
+	case Level::ADVANCED:	return 2;
+	case Level::EXPERT:	return 3;
+	default: break;
+    }
+
+    return 0;
+}
+
+s8 Skill::GetLuckModifiers(u8 level, std::string* strs = NULL)
+{
+    if(level && strs)
+    {
+        strs->append(Level::String(level));
+        strs->append(" ");
+        strs->append(Secondary::String(Secondary::LUCK));
+        StringAppendModifiers(*strs, level);
+        strs->append("\n");
+    }
+
+    switch(level)
+    {
+	case Level::BASIC:	return 1;
+	case Level::ADVANCED:	return 2;
+	case Level::EXPERT:	return 3;
+	default: break;
+    }
+
+    return 0;
 }

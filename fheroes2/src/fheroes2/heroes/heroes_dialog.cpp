@@ -95,6 +95,17 @@ Dialog::answer_t Heroes::OpenDialog(bool readonly, bool fade)
     text.Blit(dst_pt.x - text.w() / 2, dst_pt.y);
     
     const Rect rectAttackSkill(cur_pt.x + 156, cur_pt.y + 30, 80, 92);
+    std::string attackDescription(_("Your attack skill is a bonus added to each creature's attack skill."));
+
+    message.clear();
+    GetAttack(&message);
+    if(message.size())
+    {
+	attackDescription.append("\n \n");
+	attackDescription.append(_("Current Modifiers:"));
+	attackDescription.append("\n \n");
+	attackDescription.append(message);
+    }
 
     // defense
     message = _("Defense Skill");
@@ -110,6 +121,17 @@ Dialog::answer_t Heroes::OpenDialog(bool readonly, bool fade)
     text.Blit(dst_pt.x - text.w() / 2, dst_pt.y);
 
     const Rect rectDefenseSkill(cur_pt.x + 156 + 88, cur_pt.y + 30, 80, 92);
+    std::string defenseDescription(_("Your defense skill is a bonus added to each creature's defense skill."));
+
+    message.clear();
+    GetDefense(&message);
+    if(message.size())
+    {
+	defenseDescription.append("\n \n");
+	defenseDescription.append(_("Current Modifiers:"));
+	defenseDescription.append("\n \n");
+	defenseDescription.append(message);
+    }
     
     // spell
     message = _("Spell Power");
@@ -125,6 +147,17 @@ Dialog::answer_t Heroes::OpenDialog(bool readonly, bool fade)
     text.Blit(dst_pt.x - text.w() / 2, dst_pt.y);
 
     const Rect rectSpellSkill(cur_pt.x + 156 + 2 * 88, cur_pt.y + 30, 80, 92);
+    std::string powerDescription(_("Your spell power determines the length or power of a spell."));
+
+    message.clear();
+    GetPower(&message);
+    if(message.size())
+    {
+	powerDescription.append("\n \n");
+	powerDescription.append(_("Current Modifiers:"));
+	powerDescription.append("\n \n");
+	powerDescription.append(message);
+    }
 
     // knowledge
     message = _("Knowledge");
@@ -140,6 +173,17 @@ Dialog::answer_t Heroes::OpenDialog(bool readonly, bool fade)
     text.Blit(dst_pt.x - text.w() / 2, dst_pt.y);
 
     const Rect rectKnowledgeSkill(cur_pt.x + 156 + 3 * 88, cur_pt.y + 30, 80, 92);
+    std::string knowledgeDescription(_("Your knowledge determines how many spell points your hero may have. Under normal cirumstances, a hero is limited to 10 spell points per level of knowledge."));
+
+    message.clear();
+    GetKnowledge(&message);
+    if(message.size())
+    {
+	knowledgeDescription.append("\n \n");
+	knowledgeDescription.append(_("Current Modifiers:"));
+	knowledgeDescription.append("\n \n");
+	knowledgeDescription.append(message);
+    }
 
     // morale
     dst_pt.x = cur_pt.x + 514;
@@ -357,13 +401,13 @@ Dialog::answer_t Heroes::OpenDialog(bool readonly, bool fade)
 	if(le.MouseCursor(spellPointsInfo.GetArea())) spellPointsInfo.QueueEventProcessing();
 
 	// left click info
-        if(le.MouseClickLeft(rectAttackSkill)) Dialog::Message(_("Attack Skill"), _("Your attack skill is a bonus added to each creature's attack skill."), Font::BIG, Dialog::OK);
+        if(le.MouseClickLeft(rectAttackSkill)) Dialog::Message(_("Attack Skill"), attackDescription, Font::BIG, Dialog::OK);
         else
-        if(le.MouseClickLeft(rectDefenseSkill)) Dialog::Message(_("Defense Skill"), _("Your defense skill is a bonus added to each creature's defense skill."), Font::BIG, Dialog::OK);
+        if(le.MouseClickLeft(rectDefenseSkill)) Dialog::Message(_("Defense Skill"), defenseDescription, Font::BIG, Dialog::OK);
         else
-        if(le.MouseClickLeft(rectSpellSkill)) Dialog::Message(_("Spell Power"), _("Your spell power determines the length or power of a spell."), Font::BIG, Dialog::OK);
+        if(le.MouseClickLeft(rectSpellSkill)) Dialog::Message(_("Spell Power"), powerDescription, Font::BIG, Dialog::OK);
         else
-        if(le.MouseClickLeft(rectKnowledgeSkill)) Dialog::Message(_("Knowledge"), _("Your knowledge determines how many spell points your hero may have. Under normal cirumstances, a hero is limited to 10 spell points per level of knowledge."), Font::BIG, Dialog::OK);
+        if(le.MouseClickLeft(rectKnowledgeSkill)) Dialog::Message(_("Knowledge"), knowledgeDescription, Font::BIG, Dialog::OK);
 	else
         if(!readonly && le.MouseClickLeft(rectSpreadArmyFormat) && !combat_format)
         {
@@ -392,13 +436,13 @@ Dialog::answer_t Heroes::OpenDialog(bool readonly, bool fade)
 	if(le.MouseCursor(secskill_bar.GetArea())) secskill_bar.QueueEventProcessing();
 
 	// right info
-        if(le.MousePressRight(rectAttackSkill)) Dialog::Message(_("Attack Skill"), _("Your attack skill is a bonus added to each creature's attack skill."), Font::BIG);
+        if(le.MousePressRight(rectAttackSkill)) Dialog::Message(_("Attack Skill"), attackDescription, Font::BIG);
         else
-        if(le.MousePressRight(rectDefenseSkill)) Dialog::Message(_("Defense Skill"), _("Your defense skill is a bonus added to each creature's defense skill."), Font::BIG);
+        if(le.MousePressRight(rectDefenseSkill)) Dialog::Message(_("Defense Skill"), defenseDescription, Font::BIG);
         else
-        if(le.MousePressRight(rectSpellSkill)) Dialog::Message(_("Spell Power"), _("Your spell power determines the length or power of a spell."), Font::BIG);
+        if(le.MousePressRight(rectSpellSkill)) Dialog::Message(_("Spell Power"), powerDescription, Font::BIG);
         else
-        if(le.MousePressRight(rectKnowledgeSkill)) Dialog::Message(_("Knowledge"), _("Your knowledge determines how many spell points your hero may have. Under normal cirumstances, a hero is limited to 10 spell points per level of knowledge."), Font::BIG);
+        if(le.MousePressRight(rectKnowledgeSkill)) Dialog::Message(_("Knowledge"), knowledgeDescription, Font::BIG);
 	else
         if(le.MousePressRight(rectSpreadArmyFormat)) Dialog::Message(_("Spread Formation"), descriptionSpreadArmyFormat, Font::BIG);
         else
@@ -437,10 +481,10 @@ Dialog::answer_t Heroes::OpenDialog(bool readonly, bool fade)
 	if(le.MouseCursor(selectArtifacts.GetArea()))
 	{
 	    const s8 index = selectArtifacts.GetIndexFromCoord(le.GetMouseCursor());
-	    if(0 <= index && index < HEROESMAXARTIFACT && artifacts[index] != Artifact::UNKNOWN)
+	    if(0 <= index && index < HEROESMAXARTIFACT && bag_artifacts[index] != Artifact::UNKNOWN)
 	    {
 		message = _("View %{art} Info");
-		String::Replace(message, "%{art}", artifacts[index].GetName());
+		String::Replace(message, "%{art}", bag_artifacts[index].GetName());
 		statusBar.ShowMessage(message);
 	    }
 	    else

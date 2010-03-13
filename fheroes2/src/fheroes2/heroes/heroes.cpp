@@ -39,6 +39,8 @@
 #include "battle2.h"
 #include "heroes.h"
 #include "localclient.h"
+#include "game_focus.h"
+#include "game_interface.h"
 
 extern u16 DialogWithArtifact(const std::string & hdr, const std::string & msg, const Artifact::artifact_t art, const u16 buttons = Dialog::OK);
 extern void PlayPickupSound(void);
@@ -68,20 +70,49 @@ const char* HeroesName(Heroes::heroes_t id)
     return names[id];
 }
 
+typedef std::vector< std::pair<MP2::object_t, s8> > ObjectVisitedModifiers;
+
+s8 GetResultModifiers(const ObjectVisitedModifiers & modifiers, const Heroes & hero, std::string* strs)
+{
+    s8 result = 0;
+
+    for(size_t ii = 0; ii < modifiers.size(); ++ii)
+    {
+        const std::pair<MP2::object_t, s8> & pair = modifiers[ii];
+
+        if(hero.isVisited(pair.first))
+        {
+            result += pair.second;
+
+    	    if(strs)
+    	    {
+		strs->append(MP2::StringObject(pair.first));
+		StringAppendModifiers(*strs, pair.second);
+		strs->append("\n");
+	    }
+        }
+    }
+
+    return result;
+}
+
 Heroes::heroes_t Heroes::ConvertID(u8 index)
 {
     return index > UNKNOWN ? UNKNOWN : static_cast<heroes_t>(index);
 }
 
-Heroes::Heroes() : artifacts(HEROESMAXARTIFACT, Artifact::UNKNOWN), army(this), spell_book(this), path(*this)
+Heroes::Heroes() : army(this), path(*this)
 {
+    bag_artifacts.assign(HEROESMAXARTIFACT, Artifact::UNKNOWN);
 }
 
-Heroes::Heroes(heroes_t ht, Race::race_t rc) : killer_color(Color::GRAY), experience(0), magic_point(0), move_point(0),
-    artifacts(HEROESMAXARTIFACT, Artifact::UNKNOWN), army(this), spell_book(this), portrait(ht), race(rc),
+Heroes::Heroes(heroes_t ht, Race::race_t rc) : killer_color(Color::GRAY), experience(0), move_point(0),
+    army(this), portrait(ht), race(rc),
     save_maps_general(MP2::OBJ_ZERO), path(*this), direction(Direction::RIGHT), sprite_index(18)
 {
     name = _(HeroesName(ht));
+
+    bag_artifacts.assign(HEROESMAXARTIFACT, Artifact::UNKNOWN);
 
     u8 book, spell;
     Skill::Primary::LoadDefaults(race, *this, book, spell);
@@ -91,8 +122,8 @@ Heroes::Heroes(heroes_t ht, Race::race_t rc) : killer_color(Color::GRAY), experi
 
     if(book)
     {
-        spell_book.Activate();
-        spell_book.Append(Spell::FromInt(spell), GetLevelSkill(Skill::Secondary::WISDOM));
+        SpellBookActivate();
+        AppendSpellToBook(Spell::FromInt(spell));
         PickupArtifact(Artifact::MAGIC_BOOK);
     }
 
@@ -244,13 +275,13 @@ Heroes::Heroes(heroes_t ht, Race::race_t rc) : killer_color(Color::GRAY), experi
 	    experience = 777;
 
 	    // all spell in magic book
-	    for(u8 spell = Spell::FIREBALL; spell < Spell::STONE; ++spell) spell_book.Append(Spell::FromInt(spell), Skill::Level::EXPERT);
+	    for(u8 spell = Spell::FIREBALL; spell < Spell::STONE; ++spell) AppendSpellToBook(Spell::FromInt(spell), true);
 	    break;
 
 	default: break;
     }
 
-    magic_point = GetMaxSpellPoints();
+    SetSpellPoints(GetMaxSpellPoints());
     move_point = GetMaxMovePoints();
 }
 
@@ -431,7 +462,7 @@ void Heroes::LoadFromMP2(u16 map_index, const void *ptr, const Color::color_t cl
     }
 
     // other param
-    magic_point = GetMaxSpellPoints();
+    SetSpellPoints(GetMaxSpellPoints());
     move_point = GetMaxMovePoints();
 
     DEBUG(DBG_GAME , DBG_INFO, "add heroes: " << name << ", color: " << Color::String(color) << ", race: " << Race::String(race));
@@ -451,230 +482,71 @@ u16 Heroes::GetIndex(void) const
 u8 Heroes::GetMobilityIndexSprite(void) const
 {
     // valid range (0 - 25)
-    const u8 index = move_point  < Maps::Ground::GetPenalty(GetIndex(), Direction::CENTER, GetLevelSkill(Skill::Secondary::PATHFINDING)) ? 0 : move_point / 100;
+    const u8 index = !CanMove() ? 0 : move_point / 100;
     return 25 >= index ? index : 25;
 }
 
 u8 Heroes::GetManaIndexSprite(void) const
 {
     // valid range (0 - 25)
-    u8 r = magic_point / 5;
+    u8 r = GetSpellPoints() / 5;
     return 25 >= r ? r : 25;
 }
 
 u8 Heroes::GetAttack(void) const
 {
-    u8 result = attack;
+    return GetAttack(NULL);
+}
 
-    BagArtifacts::const_iterator it = artifacts.begin();
+u8 Heroes::GetAttack(std::string* strs) const
+{
+    s16 result = attack + GetAttackModificator(strs);
 
-    for(; it != artifacts.end(); ++it)
-
-	switch((*it).GetID())
-	{
-	    case Artifact::SPIKED_HELM:
-	    case Artifact::THUNDER_MACE:
-	    case Artifact::GIANT_FLAIL:
-	    case Artifact::SWORD_BREAKER:
-		result += 1;
-		break;
-
-            case Artifact::SPIKED_SHIELD:
-            case Artifact::POWER_AXE:
-            case Artifact::LEGENDARY_SCEPTER:
-        	result += 2;
-		break;
-	    
-	    case Artifact::DRAGON_SWORD:
-	        result += 3;
-	        break;
-	
-	    case Artifact::ULTIMATE_CROWN:
-	        result += 4;
-	        break;
-
-	    case Artifact::BATTLE_GARB:
-	    case Artifact::SWORD_ANDURAN:
-	    case Artifact::HOLY_HAMMER:
-	        result += 5;
-	        break;
-	
-	    case Artifact::ULTIMATE_SHIELD:
-	        result += 6;
-	        break;
-	
-	    case Artifact::ULTIMATE_SWORD:
-	        result += 12;
-	        break;
-	
-	    default:
-	        break;
-	}
-
-    return result;
+    return result < 0 ? 0 : (result > 255 ? 255 : result);
 }
 
 u8 Heroes::GetDefense(void) const
 {
-    u8 result = defence;
+    return GetDefense(NULL);
+}
 
-    BagArtifacts::const_iterator it = artifacts.begin();
-
-    for(; it != artifacts.end(); ++it)
-
-	switch((*it).GetID())
-	{
-            case Artifact::SPIKED_HELM:
-            case Artifact::ARMORED_GAUNTLETS:
-            case Artifact::DEFENDER_HELM:
-                result += 1;
-                break;
-
-            case Artifact::SPIKED_SHIELD:
-            case Artifact::STEALTH_SHIELD:
-            case Artifact::LEGENDARY_SCEPTER:
-                result += 2;
-                break;
-
-            case Artifact::DIVINE_BREASTPLATE:
-                result += 3;
-                break;
-
-            case Artifact::ULTIMATE_CROWN:
-	    case Artifact::SWORD_BREAKER:
-                result += 4;
-                break;
-
-            case Artifact::BREASTPLATE_ANDURAN:
-	    case Artifact::BATTLE_GARB:
-                result += 5;
-                break;
-
-            case Artifact::ULTIMATE_SHIELD:
-                result += 6;
-                break;
-
-            case Artifact::ULTIMATE_CLOAK:
-                result += 12;
-                break;
-
-            default:
-                break;
-	}
+u8 Heroes::GetDefense(std::string* strs) const
+{
+    s16 result = defence + GetDefenseModificator(strs);
 
     // check coliseum
     const Castle* castle = inCastle();
-    if(castle && Race::BARB == castle->GetRace() && castle->isBuild(BUILD_SPEC)) result +=2;
+    if(castle && Race::BARB == castle->GetRace() && castle->isBuild(BUILD_SPEC)) result += 2;
 
-    return result;
+    return result < 0 ? 0 : (result > 255 ? 255 : result);
 }
 
 u8 Heroes::GetPower(void) const
 {
-    s8 result = power;
+    return GetPower(NULL);
+}
 
-    BagArtifacts::const_iterator it = artifacts.begin();
-
-    for(; it != artifacts.end(); ++it)
-
-	switch((*it).GetID())
-	{
-            case Artifact::BROACH_SHIELDING:
-                result += -2;
-                break;
-
-            case Artifact::WHITE_PEARL:
-                result += 1;
-                break;
-
-            case Artifact::BLACK_PEARL:
-            case Artifact::CASTER_BRACELET:
-            case Artifact::MAGE_RING:
-            case Artifact::LEGENDARY_SCEPTER:
-                result += 2;
-                break;
-
-            case Artifact::WITCHES_BROACH:
-            case Artifact::ARM_MARTYR:
-                result += 3;
-                break;
-
-            case Artifact::ULTIMATE_CROWN:
-            case Artifact::ARCANE_NECKLACE:
-                result += 4;
-                break;
-
-	    case Artifact::BATTLE_GARB:
-	    case Artifact::STAFF_WIZARDRY:
-	    case Artifact::HELMET_ANDURAN:
-	        result += 5;
-	        break;
-
-            case Artifact::ULTIMATE_STAFF:
-                result += 6;
-                break;
-
-            case Artifact::ULTIMATE_WAND:
-                result += 12;
-                break;
-
-            default:
-                break;
-	}
+u8 Heroes::GetPower(std::string* strs) const
+{
+    s16 result = power + GetPowerModificator(strs);
 
     // check storm
     const Castle* castle = inCastle();
-    if(castle && Race::NECR == castle->GetRace() && castle->isBuild(BUILD_SPEC)) result +=2;
+    if(castle && Race::NECR == castle->GetRace() && castle->isBuild(BUILD_SPEC)) result += 2;
 
-    return result < 0 ? 0 : result;
+    return result < 0 ? 0 : (result > 255 ? 255 : result);
 }
 
 u8 Heroes::GetKnowledge(void) const
 {
-    u8 result = knowledge;
+    return GetKnowledge(NULL);
+}
 
-    BagArtifacts::const_iterator it = artifacts.begin();
+u8 Heroes::GetKnowledge(std::string* strs) const
+{
+    s16 result = knowledge + GetKnowledgeModificator(strs);
 
-    for(; it != artifacts.end(); ++it)
-
-	switch((*it).GetID())
-	{
-            case Artifact::WHITE_PEARL:
-                result += 1;
-                break;
-
-            case Artifact::BLACK_PEARL:
-            case Artifact::MINOR_SCROLL:
-            case Artifact::LEGENDARY_SCEPTER:
-                result += 2;
-                break;
-
-            case Artifact::MAJOR_SCROLL:
-                result += 3;
-                break;
-
-            case Artifact::ULTIMATE_CROWN:
-            case Artifact::SUPERIOR_SCROLL:
-                result += 4;
-                break;
-
-            case Artifact::FOREMOST_SCROLL:
-                result += 5;
-                break;
-
-            case Artifact::ULTIMATE_STAFF:
-                result += 6;
-                break;
-
-            case Artifact::ULTIMATE_BOOK:
-                result += 12;
-                break;
-
-            default:
-                break;
-	}
-
-    return result;
+    return result < 0 ? 0 : (result > 255 ? 255 : result);
 }
 
 void Heroes::IncreasePrimarySkill(const Skill::Primary::skill_t skill)
@@ -694,11 +566,6 @@ u32 Heroes::GetExperience(void) const
     return experience;
 }
 
-u16 Heroes::GetSpellPoints(void) const
-{
-    return magic_point;
-}
-
 void Heroes::IncreaseMovePoints(const u16 point)
 {
     move_point += point;
@@ -707,11 +574,6 @@ void Heroes::IncreaseMovePoints(const u16 point)
 u16 Heroes::GetMovePoints(void) const
 {
     return move_point;
-}
-
-void Heroes::SetSpellPoints(const u16 point)
-{
-    magic_point = point;
 }
 
 u16 Heroes::GetMaxSpellPoints(void) const
@@ -790,83 +652,20 @@ s8 Heroes::GetMorale(void) const
     return GetMoraleWithModificators(NULL);
 }
 
-const char* StringModifiers(s8 mod)
-{
-    const char* mods[] = { " 0", " -3", " -2", " -1", " +1", " +2", " +3" };
-
-    switch(mod)
-    {
-	case -3: return mods[1];
-	case -2: return mods[2];
-	case -1: return mods[3];
-	case  1: return mods[4];
-	case  2: return mods[5];
-	case  3: return mods[6];
-
-	default: break;
-    }
-
-    return mods[0];
-}
-
 s8 Heroes::GetMoraleWithModificators(std::string *strs) const
 {
     s8 result = Morale::NORMAL;
 
-    std::vector<std::pair<int, s8> > modifiers;
-    modifiers.reserve(10);
-
-    modifiers.push_back(std::make_pair(Artifact::MEDAL_VALOR, 1));
-    modifiers.push_back(std::make_pair(Artifact::MEDAL_COURAGE, 1));
-    modifiers.push_back(std::make_pair(Artifact::MEDAL_HONOR, 1));
-    modifiers.push_back(std::make_pair(Artifact::MEDAL_DISTINCTION, 1));
-    modifiers.push_back(std::make_pair(Artifact::FIZBIN_MISFORTUNE, -2));
-    modifiers.push_back(std::make_pair(Artifact::BATTLE_GARB, 10));
-    if(isShipMaster()) modifiers.push_back(std::make_pair(Artifact::MASTHEAD, 1));
-    
     // bonus artifact
-    BagArtifacts::const_iterator it = artifacts.begin();
-
-    for(u16 i = 0; i < modifiers.size(); i++)
-    {
-        Artifact::artifact_t art = Artifact::FromInt(modifiers[i].first);
-	if(!HasArtifact(art))
-	    continue;
-
-        result += modifiers[i].second;
-        if(strs)
-	{
-	    strs->append(Artifact::GetName(art));
-	    strs->append(StringModifiers(modifiers[i].second));
-	    strs->append("\n");
-	}
-    }
-
-    modifiers.clear();
-    modifiers.push_back(std::make_pair(Skill::Level::BASIC, 1));
-    modifiers.push_back(std::make_pair(Skill::Level::ADVANCED, 2));
-    modifiers.push_back(std::make_pair(Skill::Level::EXPERT, 3));
+    result += GetMoraleModificator(isShipMaster(), strs);
 
     // bonus leadership
-    for(u16 i = 0; i < modifiers.size(); i++)
-    {
-        Skill::Level::type_t level = (Skill::Level::type_t)modifiers[i].first;
-        if(GetLevelSkill(Skill::Secondary::LEADERSHIP) != level)
-            continue;
+    result += Skill::GetLeadershipModifiers(GetLevelSkill(Skill::Secondary::LEADERSHIP), strs);
 
-        result += modifiers[i].second;
-        if(strs)
-    	{
-	    strs->append(Skill::Level::String(level));
-	    strs->append(" ");
-	    strs->append(Skill::Secondary::String(Skill::Secondary::LEADERSHIP));
-	    strs->append(StringModifiers(modifiers[i].second));
-	    strs->append("\n");
-        }
-	break;
-    }
+    // object visited
+    ObjectVisitedModifiers modifiers;
+    modifiers.reserve(7);
 
-    modifiers.clear();
     modifiers.push_back(std::make_pair(MP2::OBJ_BUOY, 1));
     modifiers.push_back(std::make_pair(MP2::OBJ_OASIS, 1));
     modifiers.push_back(std::make_pair(MP2::OBJ_WATERINGHOLE, 1));
@@ -875,22 +674,8 @@ s8 Heroes::GetMoraleWithModificators(std::string *strs) const
     modifiers.push_back(std::make_pair(MP2::OBJ_DERELICTSHIP, -1));
     modifiers.push_back(std::make_pair(MP2::OBJ_SHIPWRECK, -1));
 
-    // object visited
-    for(u16 i = 0; i < modifiers.size(); i++)
-    {
-        MP2::object_t obj = (MP2::object_t)modifiers[i].first;
-        if(!isVisited(obj))
-            continue;
+    result += GetResultModifiers(modifiers, *this, strs);
 
-        result += modifiers[i].second;
-        if(strs)
-        {
-	    strs->append(MP2::StringObject(obj));
-	    strs->append(StringModifiers(modifiers[i].second));
-	    strs->append("\n");
-	}
-    }
-    
     const Castle* castle = inCastle();
     // check castle morale modificators
     if(castle) result += castle->GetMoraleWithModificators(strs);
@@ -923,80 +708,24 @@ s8 Heroes::GetLuckWithModificators(std::string *strs) const
 {
     s8 result = Luck::NORMAL;
 
-    BagArtifacts::const_iterator it = artifacts.begin();
-
-    std::vector<std::pair<int, s8> > modifiers;
-    modifiers.reserve(5);
-
-    modifiers.push_back(std::make_pair(Artifact::RABBIT_FOOT, 1));
-    modifiers.push_back(std::make_pair(Artifact::GOLDEN_HORSESHOE, 1));
-    modifiers.push_back(std::make_pair(Artifact::GAMBLER_LUCKY_COIN, 1));
-    modifiers.push_back(std::make_pair(Artifact::FOUR_LEAF_CLOVER, 1));
-    modifiers.push_back(std::make_pair(Artifact::BATTLE_GARB, 10));
-    if(isShipMaster()) modifiers.push_back(std::make_pair(Artifact::MASTHEAD, 1));
-
     // bonus artifact
-    for(u16 i = 0; i < modifiers.size(); i++)
-    {
-        Artifact::artifact_t art = Artifact::FromInt(modifiers[i].first);
-        if(!HasArtifact(art))
-            continue;
-
-        result += modifiers[i].second;
-        if(strs)
-	{
-	    strs->append(Artifact::GetName(art));
-	    strs->append(StringModifiers(modifiers[i].second));
-	    strs->append("\n");
-	}
-    }
-
-    modifiers.clear();
-    modifiers.push_back(std::make_pair(Skill::Level::BASIC, 1));
-    modifiers.push_back(std::make_pair(Skill::Level::ADVANCED, 2));
-    modifiers.push_back(std::make_pair(Skill::Level::EXPERT, 3));
+    result += GetLuckModificator(isShipMaster(), strs);
 
     // bonus luck
-    for(u16 i = 0; i < modifiers.size(); i++)
-    {
-        Skill::Level::type_t level = (Skill::Level::type_t)modifiers[i].first;
-        if(GetLevelSkill(Skill::Secondary::LUCK) != level)
-            continue;
+    result += Skill::GetLuckModifiers(GetLevelSkill(Skill::Secondary::LUCK), strs);
 
-        result += modifiers[i].second;
-        if(strs)
-        {
-	    strs->append(Skill::Level::String(level));
-	    strs->append(" ");
-	    strs->append(Skill::Secondary::String(Skill::Secondary::LUCK));
-	    strs->append(StringModifiers(modifiers[i].second));
-	    strs->append("\n");
-	}
-    }
+    // object visited
+    ObjectVisitedModifiers modifiers;
+    modifiers.reserve(5);
 
-    modifiers.clear();
     modifiers.push_back(std::make_pair(MP2::OBJ_MERMAID, 1));
     modifiers.push_back(std::make_pair(MP2::OBJ_FAERIERING, 1));
     modifiers.push_back(std::make_pair(MP2::OBJ_FOUNTAIN, 1));
     modifiers.push_back(std::make_pair(MP2::OBJ_IDOL, 1));
     modifiers.push_back(std::make_pair(MP2::OBJ_PYRAMID, -2));
-    
-    // object visited
-    for(u16 i = 0; i < modifiers.size(); i++)
-    {
-        MP2::object_t obj = (MP2::object_t)modifiers[i].first;
-        if(!isVisited(obj))
-            continue;
 
-        result += modifiers[i].second;
-        if(strs)
-        {
-	    strs->append(MP2::StringObject(obj));
-	    strs->append(StringModifiers(modifiers[i].second));
-	    strs->append("\n");
-	}
-    }
-    
+    result += GetResultModifiers(modifiers, *this, strs);
+
     const Castle* castle = inCastle();
     // check castle morale modificators
     if(castle) result += castle->GetLuckWithModificators(strs);
@@ -1046,13 +775,14 @@ bool Heroes::Recruit(const Castle & castle)
     if(NULL == hero || hero->isFreeman())
     {
 	Recruit(castle.GetColor(), castle.GetCenter());
-        if(castle.GetLevelMageGuild())
-        {
-            // magic point
-	    magic_point = GetMaxSpellPoints();
-            // learn spell
-            castle.GetMageGuild().EducateHero(*this);
-        }
+
+	if(castle.GetLevelMageGuild())
+	{
+	    // magic point
+	    SetSpellPoints(GetMaxSpellPoints());
+	    // learn spell
+	    castle.GetMageGuild().EducateHero(*this);
+	}
 	return true;
     }
 
@@ -1095,36 +825,39 @@ void Heroes::ActionNewDay(void)
     if(isVisited(MP2::OBJ_STABLES)) move_point += 400;
 
     // recovery spell points
-    if(spell_book.isActive())
+    if(HaveSpellBook())
     {
 	// possible visit arteian spring 2 * max
-	u16 prev = magic_point;
+	const u16 prev = GetSpellPoints();
 	const Castle* castle = inCastle();
 
 	// in castle?
 	if(castle && castle->GetLevelMageGuild())
 	{
 	    //restore from mage guild
-	    if(prev < GetMaxSpellPoints()) magic_point = GetMaxSpellPoints();
+	    if(prev < GetMaxSpellPoints()) SetSpellPoints(GetMaxSpellPoints());
 	}
 	else
 	{
+	    u16 curr = GetSpellPoints();
 	    // everyday
-	    ++magic_point;
+	    ++curr;
 
-	    if(HasArtifact(Artifact::POWER_RING)) magic_point += 2;
+	    if(HasArtifact(Artifact::POWER_RING)) curr += 2;
 
 	    // secondary skill
 	    switch(GetLevelSkill(Skill::Secondary::MYSTICISM))
 	    {
-		case Skill::Level::BASIC:	magic_point += 1; break;
-		case Skill::Level::ADVANCED:	magic_point += 2; break;
-		case Skill::Level::EXPERT:	magic_point += 3; break;
+		case Skill::Level::BASIC:	curr += 1; break;
+		case Skill::Level::ADVANCED:	curr += 2; break;
+		case Skill::Level::EXPERT:	curr += 3; break;
 
 		default: break;
 	    }
 
-	    if((magic_point > GetMaxSpellPoints()) && (magic_point > prev)) magic_point = prev;
+	    if((curr > GetMaxSpellPoints()) && (curr > prev)) curr = prev;
+
+	    SetSpellPoints(curr);
 	}
     }
 
@@ -1138,7 +871,7 @@ void Heroes::ActionNewWeek(void)
     visit_object.remove_if(Visit::isWeekLife);
     
     // fix artesian spring effect
-    if(magic_point > GetMaxSpellPoints()) magic_point = GetMaxSpellPoints();
+    if(GetSpellPoints() > GetMaxSpellPoints()) SetSpellPoints(GetMaxSpellPoints());
 }
 
 void Heroes::ActionNewMonth(void)
@@ -1243,23 +976,17 @@ void Heroes::SetVisited(const u16 index, const Visit::type_t type)
 
 u8 Heroes::GetCountArtifacts(void) const
 {
-    return std::count_if(artifacts.begin(), artifacts.end(), std::mem_fun_ref(&Artifact::isValid));
-}
-
-/* return true if artifact present */
-bool Heroes::HasArtifact(const Artifact::artifact_t art) const
-{
-    return artifacts.end() != std::find(artifacts.begin(), artifacts.end(), art);
+    return std::count_if(bag_artifacts.begin(), bag_artifacts.end(), std::mem_fun_ref(&Artifact::isValid));
 }
 
 bool Heroes::HasUltimateArtifact(void) const
 {
-    return artifacts.end() != std::find_if(artifacts.begin(), artifacts.end(), std::mem_fun_ref(&Artifact::isUltimate));
+    return bag_artifacts.end() != std::find_if(bag_artifacts.begin(), bag_artifacts.end(), std::mem_fun_ref(&Artifact::isUltimate));
 }
 
 bool Heroes::IsFullBagArtifacts(void) const
 {
-    return artifacts.end() == std::find(artifacts.begin(), artifacts.end(), Artifact::UNKNOWN);
+    return bag_artifacts.end() == std::find(bag_artifacts.begin(), bag_artifacts.end(), Artifact::UNKNOWN);
 }
 
 bool Heroes::PickupArtifact(const Artifact::artifact_t art)
@@ -1269,9 +996,9 @@ bool Heroes::PickupArtifact(const Artifact::artifact_t art)
 
 bool Heroes::PickupArtifact(const Artifact & art)
 {
-    BagArtifacts::iterator it = std::find(artifacts.begin(), artifacts.end(), Artifact::UNKNOWN);
+    BagArtifacts::iterator it = std::find(bag_artifacts.begin(), bag_artifacts.end(), Artifact::UNKNOWN);
 
-    if(artifacts.end() == it)
+    if(bag_artifacts.end() == it)
     {
 	if(Settings::Get().MyColor() == color)
 	{
@@ -1285,16 +1012,6 @@ bool Heroes::PickupArtifact(const Artifact & art)
     *it = art;
 
     return true;
-}
-
-const BagArtifacts & Heroes::GetBagArtifacts(void) const
-{
-    return artifacts;
-}
-
-BagArtifacts & Heroes::GetBagArtifacts(void)
-{
-    return artifacts;
 }
 
 /* return level hero */
@@ -1377,7 +1094,7 @@ u32 Heroes::GetExperienceFromLevel(u8 lvl)
 /* buy book */
 bool Heroes::BuySpellBook(const Castle & castle)
 {
-    if(spell_book.isActive() || Color::GRAY == color) return false;
+    if(HaveSpellBook() || Color::GRAY == color) return false;
 
     const payment_t payment = PaymentConditions::BuySpellBook();
     Kingdom & kingdom = world.GetKingdom(color);
@@ -1406,7 +1123,7 @@ bool Heroes::BuySpellBook(const Castle & castle)
     if(PickupArtifact(Artifact::MAGIC_BOOK))
     {
 	kingdom.OddFundsResource(payment);
-	spell_book.Activate();
+	SpellBookActivate();
 	// add all spell to book
 	castle.GetMageGuild().EducateHero(*this);
 #ifdef WITH_NET
@@ -1418,16 +1135,15 @@ bool Heroes::BuySpellBook(const Castle & castle)
     return false;
 }
 
-/* add new spell to book from storage */
-void Heroes::AppendSpellToBook(const Spell::spell_t spell)
-{
-    spell_book.Append(spell, GetLevelSkill(Skill::Secondary::WISDOM));
-}
-
 /* return true is move enable */
 bool Heroes::isEnableMove(void) const
 {
     return Modes(ENABLEMOVE) && path.isValid() && path.GetFrontPenalty() <= move_point;
+}
+
+bool Heroes::CanMove(void) const
+{
+    return move_point >= Maps::Ground::GetPenalty(GetIndex(), Direction::CENTER, GetLevelSkill(Skill::Secondary::PATHFINDING));
 }
 
 /* set enable move */
@@ -1760,9 +1476,7 @@ bool Heroes::ApplyPenaltyMovement(void)
 bool Heroes::MayStillMove(void) const
 {
     if(Modes(STUPID) || isFreeman()) return false;
-
-    if(path.isValid()) return move_point >= path.GetFrontPenalty();
-    return move_point >= Maps::Ground::GetPenalty(Maps::GetIndexFromAbsPoint(mp), Direction::CENTER, GetLevelSkill(Skill::Secondary::PATHFINDING));
+    return path.isValid() ? (move_point >= path.GetFrontPenalty()) : CanMove();
 }
 
 bool Heroes::isValid(void) const
@@ -1860,13 +1574,35 @@ void Heroes::PreBattleAction(void)
 {
 }
 
+void Heroes::ActionNewPosition(void)
+{
+    u16 dst;
+
+    // check around monster
+    while(!isFreeman() && Maps::TileUnderProtection(GetIndex(), &dst))
+    {
+    	// redraw gamearea for monster action sprite
+	if(Settings::Get().MyColor() == GetColor())
+	{
+	    Interface::Basic & I = Interface::Basic::Get();
+    	    Game::Focus & F = Game::Focus::Get();
+    	    I.gameArea.Center(F.Center());
+    	    F.SetRedraw();
+    	    I.Redraw();
+	}
+
+        Action(dst);
+        SetMove(false);
+    }
+}
+
 void Heroes::Dump(void) const
 {
     std::cout << "name            : " << name << std::endl;
     std::cout << "race            : " << Race::String(race) << std::endl;
     std::cout << "color           : " << Color::String(color) << std::endl;
     std::cout << "experience      : " << experience << std::endl;
-    std::cout << "magic point     : " << magic_point << std::endl;
+    std::cout << "magic point     : " << GetSpellPoints() << std::endl;
     std::cout << "position x      : " << mp.x << std::endl;
     std::cout << "position y      : " << mp.y << std::endl;
     std::cout << "move point      : " << move_point << std::endl;

@@ -396,7 +396,7 @@ u8 Battle2::Arena::DialogBattleHero(const HeroBase & hero) const
     Button btnSurrender(pos_rt.x + 148, pos_rt.y + 148, ICN::VIEWGEN, 13, 14);
     Button btnClose(pos_rt.x + 207, pos_rt.y + 148, ICN::VIEWGEN, 15, 16);
 
-    btnCast.SetDisable(readonly || !hero.GetSpellBook().isActive() || hero.Modes(Heroes::SPELLCASTED));
+    btnCast.SetDisable(readonly || !hero.HaveSpellBook() || hero.Modes(Heroes::SPELLCASTED));
     btnRetreat.SetDisable(readonly || !CanRetreatOpponent(hero.GetColor()));
     btnSurrender.SetDisable(readonly || !CanSurrenderOpponent(hero.GetColor()));
 

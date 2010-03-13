@@ -801,6 +801,9 @@ Game::menu_t Game::HumanTurn(void)
     // warning lost all town
     if(myCastles.empty()) ShowWarningLostTowns(res);
 
+    // check new monster aroute heroes
+    //std::for_each(myHeroes.begin(), myHeroes.end(), );
+
     // startgame loop
     while(CANCEL == res && le.HandleEvents())
     {
@@ -1280,18 +1283,14 @@ void Game::ButtonKingdom(void)
 void Game::ButtonSpell(void)
 {
     Game::Focus & global_focus = Focus::Get();
+    Interface::Basic & I = Interface::Basic::Get();
+
     if(Game::Focus::HEROES == global_focus.Type())
     {
 	Heroes & hero = global_focus.GetHeroes();
-	Spell::spell_t spell = hero.GetSpellBook().Open(SpellBook::ADVN, true);
 	// apply cast spell
-	if(Spell::NONE != spell && !hero.ActionSpellCast(spell))
-	{
-	    // failed
-	    std::string str = "%{spell} failed!!!";
-	    String::Replace(str, "%{spell}", Spell::GetName(spell));
-	    Dialog::Message("", str, Font::BIG, Dialog::OK);
-	}
+	hero.ActionSpellCast(hero.OpenSpellBook(SpellBook::ADVN, true));
+	I.SetRedraw(REDRAW_ICONS);
     }
 }
 

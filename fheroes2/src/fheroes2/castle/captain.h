@@ -22,10 +22,8 @@
 #ifndef H2CAPTAIN_H
 #define H2CAPTAIN_H
 
-#include "skill.h"
-#include "spell_book.h"
 #include "gamedefs.h"
-#include "heroes.h"
+#include "heroes_base.h"
 
 class Castle;
 
@@ -47,28 +45,20 @@ class Captain : public HeroBase
     const std::string & GetName(void) const;
     u8 GetType(void) const;
     u8 GetControl(void) const;
-    u16 GetSpellPoints(void) const;
-    const SpellBook & GetSpellBook(void) const;
-    SpellBook & GetSpellBook(void);
+    u16 GetIndex(void) const;
+
     u8 GetLevelSkill(const Skill::Secondary::skill_t) const;
 
     const Army::army_t & GetArmy(void) const;
     Army::army_t & GetArmy(void);
-    bool HasArtifact(const Artifact::artifact_t) const;
-    BagArtifacts & GetBagArtifacts(void);
-    const BagArtifacts & GetBagArtifacts(void) const;
+
     u16 GetMaxSpellPoints(void) const;
-    void SetSpellPoints(const u16 point);
-    u16 GetIndex(void) const;
 
     bool CanBattleRetreat(void) const;
     void PreBattleAction(void);
 
   private:
     const Castle & home;
-    SpellBook spell_book;
-    BagArtifacts artifacts;
-    u16 spellPoints;
 };
 
 #endif

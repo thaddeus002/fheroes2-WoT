@@ -38,15 +38,16 @@ struct SpellFiltered : std::binary_function<Spell::spell_t, SpellBook::filter_t,
     bool operator() (Spell::spell_t s, SpellBook::filter_t f) const { return ((SpellBook::ADVN & f) && Spell::isCombat(s)) || ((SpellBook::CMBT & f) && !Spell::isCombat(s)); };
 };
 
-void SpellBookRedrawLists(const std::vector<Spell::spell_t> &, std::vector<Rect> &, const size_t, const Point &, const HeroBase *, const SpellBook::filter_t only);
+void SpellBookSetFilter(const BagArtifacts &, const std::vector<Spell::spell_t> &, std::vector<Spell::spell_t> &, SpellBook::filter_t);
+void SpellBookRedrawLists(const std::vector<Spell::spell_t> &, std::vector<Rect> &, const size_t, const Point &, u16, const SpellBook::filter_t only);
 void SpellBookRedrawSpells(const std::vector<Spell::spell_t> &, std::vector<Rect> &, const size_t, s16, s16);
 void SpellBookRedrawMP(const Point &, u16);
 
-SpellBook::SpellBook(const HeroBase *p) : hero(p), active(false)
+SpellBook::SpellBook() : active(false)
 {
 }
 
-Spell::spell_t SpellBook::Open(const filter_t filt, bool canselect) const
+Spell::spell_t SpellBook::Open(const HeroBase & hero, const filter_t filt, bool canselect) const
 {
     if(!active) return Spell::NONE;
 
@@ -66,7 +67,7 @@ Spell::spell_t SpellBook::Open(const filter_t filt, bool canselect) const
     cursor.Hide();
 
     filter_t filter = filt;
-    SetFilter(spells2, filter);
+    SpellBookSetFilter(hero.GetBagArtifacts(), spells, spells2, filter);
 
     size_t current_index = 0;
 
@@ -92,7 +93,7 @@ Spell::spell_t SpellBook::Open(const filter_t filt, bool canselect) const
     std::vector<Rect> coords;
     coords.reserve(small ? SPELL_PER_PAGE_SMALL * 2 : SPELL_PER_PAGE * 2);
 
-    SpellBookRedrawLists(spells2, coords, current_index, pos, hero, filt);
+    SpellBookRedrawLists(spells2, coords, current_index, pos, hero.GetSpellPoints(), filt);
 
     cursor.Show();
     display.Flip();
@@ -106,7 +107,7 @@ Spell::spell_t SpellBook::Open(const filter_t filt, bool canselect) const
 	{
 	    cursor.Hide();
 	    current_index -= small ? SPELL_PER_PAGE_SMALL * 2 : SPELL_PER_PAGE * 2;
-	    SpellBookRedrawLists(spells2, coords, current_index, pos, hero, filt);
+	    SpellBookRedrawLists(spells2, coords, current_index, pos, hero.GetSpellPoints(), filt);
 	    cursor.Show();
 	    display.Flip();
 	}
@@ -115,16 +116,16 @@ Spell::spell_t SpellBook::Open(const filter_t filt, bool canselect) const
 	{
 	    cursor.Hide();
 	    current_index += small ? SPELL_PER_PAGE_SMALL * 2 : SPELL_PER_PAGE * 2;
-	    SpellBookRedrawLists(spells2, coords, current_index, pos, hero, filt);
+	    SpellBookRedrawLists(spells2, coords, current_index, pos, hero.GetSpellPoints(), filt);
 	    cursor.Show();
 	    display.Flip();
 	}
 	else
-	if((le.MouseClickLeft(info_rt) && hero) ||
-	   (le.MousePressRight(info_rt) && hero))
+	if((le.MouseClickLeft(info_rt)) ||
+	   (le.MousePressRight(info_rt)))
 	{
 	    std::string str = _("Your hero has %{point} spell points remaining");
-	    String::Replace(str, "%{point}", hero->GetSpellPoints());
+	    String::Replace(str, "%{point}", hero.GetSpellPoints());
 	    str += " spell points remaining";
 	    cursor.Hide();
 	    Dialog::Message("", str, Font::BIG, Dialog::OK);
@@ -137,8 +138,8 @@ Spell::spell_t SpellBook::Open(const filter_t filt, bool canselect) const
 	    cursor.Hide();
 	    filter = ADVN;
 	    current_index = 0;
-	    SetFilter(spells2, filter);
-	    SpellBookRedrawLists(spells2, coords, current_index, pos, hero, filt);
+	    SpellBookSetFilter(hero.GetBagArtifacts(), spells, spells2, filter);
+	    SpellBookRedrawLists(spells2, coords, current_index, pos, hero.GetSpellPoints(), filt);
 	    cursor.Show();
 	    display.Flip();
 	}
@@ -148,8 +149,8 @@ Spell::spell_t SpellBook::Open(const filter_t filt, bool canselect) const
 	    cursor.Hide();
 	    filter = CMBT;
 	    current_index = 0;
-	    SetFilter(spells2, filter);
-	    SpellBookRedrawLists(spells2, coords, current_index, pos, hero, filt);
+	    SpellBookSetFilter(hero.GetBagArtifacts(), spells, spells2, filter);
+	    SpellBookRedrawLists(spells2, coords, current_index, pos, hero.GetSpellPoints(), filt);
 	    cursor.Show();
 	    display.Flip();
 	}
@@ -165,9 +166,9 @@ Spell::spell_t SpellBook::Open(const filter_t filt, bool canselect) const
 
 		if(canselect)
 		{
-		    if(spell != Spell::NONE && hero)
+		    if(spell != Spell::NONE)
 		    {
-			if(hero->GetSpellPoints() >= Spell::CostManaPoints(spell))
+			if(hero.HaveSpellPoints(Spell::CostManaPoints(spell)))
 			{
 			    curspell = spell;
 			    break;
@@ -177,7 +178,7 @@ Spell::spell_t SpellBook::Open(const filter_t filt, bool canselect) const
 			    cursor.Hide();
 			    std::string str = _("That spell costs %{mana} mana. You only have %{point} mana, so you can't cast the spell.");
 			    String::Replace(str, "%{mana}", Spell::CostManaPoints(spell));
-			    String::Replace(str, "%{point}", hero->GetSpellPoints());
+			    String::Replace(str, "%{point}", hero.GetSpellPoints());
 			    Dialog::Message("", str, Font::BIG, Dialog::OK);
 			    cursor.Show();
 			    display.Flip();
@@ -221,26 +222,22 @@ Spell::spell_t SpellBook::Open(const filter_t filt, bool canselect) const
     return curspell;
 }
 
-void SpellBook::SetFilter(std::vector<Spell::spell_t> & v, filter_t filter) const
+void SpellBookSetFilter(const BagArtifacts & bag, const std::vector<Spell::spell_t> & spells, std::vector<Spell::spell_t> & v, SpellBook::filter_t filter)
 {
     v = spells;
 
     // added heroes spell scrolls
-    if(hero)
-    {
-	const BagArtifacts & bag = hero->GetBagArtifacts();
-	BagArtifacts::const_iterator it1 = bag.begin();
-	BagArtifacts::const_iterator it2 = bag.end();
-	for(; it1 != it2; ++it1)
-	    if(*it1 == Artifact::SPELL_SCROLL)
-	    {
-		const Spell::spell_t scroll = Spell::FromInt((*it1).GetExt());
-		if(Spell::NONE != scroll && v.end() == std::find(v.begin(), v.end(), scroll))
-		    v.push_back(scroll);
-	    }
-    }
+    BagArtifacts::const_iterator it1 = bag.begin();
+    BagArtifacts::const_iterator it2 = bag.end();
+    for(; it1 != it2; ++it1)
+	if(*it1 == Artifact::SPELL_SCROLL)
+	{
+	    const Spell::spell_t scroll = Spell::FromInt((*it1).GetExt());
+	    if(Spell::NONE != scroll && v.end() == std::find(v.begin(), v.end(), scroll))
+		v.push_back(scroll);
+	}
 
-    if(filter != ALL)
+    if(filter != SpellBook::ALL)
     {
 	std::vector<Spell::spell_t>::iterator it = std::remove_if(v.begin(), v.end(), std::bind2nd(SpellFiltered(), filter));
 	if(v.end() != it) v.resize(it - v.begin());
@@ -250,22 +247,27 @@ void SpellBook::SetFilter(std::vector<Spell::spell_t> & v, filter_t filter) cons
 void SpellBookRedrawMP(const Point & dst, u16 mp)
 {
     bool small = Settings::Get().PocketPC();
-    if(mp)
+
+    Point tp(dst.x + (small ? 5 : 11), dst.y + (small ? 1 : 9));
+    std::string mps;
+    if(0 == mp)
     {
-	Point tp(dst.x + (small ? 5 : 11), dst.y + (small ? 1 : 9));
-	std::string mps;
-	for(int i = 100; i >= 1; i /= 10) if(mp >= i)
-	{
-	    mps.clear();
-	    String::AddInt(mps, (mp % (i * 10)) / i);
-	    Text text(mps, Font::SMALL);
-	    text.Blit(tp.x - text.w() / 2, tp.y);
-	    tp.y += (small ? -2 : 0) + text.h();
-	}
+	mps = "0";
+	Text text(mps, Font::SMALL);
+	text.Blit(tp.x - text.w() / 2, tp.y);
+    }
+    else
+    for(int i = 100; i >= 1; i /= 10) if(mp >= i)
+    {
+	mps.clear();
+	String::AddInt(mps, (mp % (i * 10)) / i);
+	Text text(mps, Font::SMALL);
+	text.Blit(tp.x - text.w() / 2, tp.y);
+	tp.y += (small ? -2 : 0) + text.h();
     }
 }
 
-void SpellBookRedrawLists(const std::vector<Spell::spell_t> & spells, std::vector<Rect> & coords, const size_t cur, const Point & pt, const HeroBase *hero, const SpellBook::filter_t only)
+void SpellBookRedrawLists(const std::vector<Spell::spell_t> & spells, std::vector<Rect> & coords, const size_t cur, const Point & pt, u16 sp, const SpellBook::filter_t only)
 {
     Display & display = Display::Get();
     bool small = Settings::Get().PocketPC();
@@ -293,7 +295,7 @@ void SpellBookRedrawLists(const std::vector<Spell::spell_t> & spells, std::vecto
 
     if(coords.size()) coords.clear();
 
-    SpellBookRedrawMP(info_rt, hero ? hero->GetSpellPoints() : 0);
+    SpellBookRedrawMP(info_rt, sp);
     SpellBookRedrawSpells(spells, coords, cur, pt.x, pt.y);
     SpellBookRedrawSpells(spells, coords, cur + (small ? SPELL_PER_PAGE_SMALL : SPELL_PER_PAGE), pt.x + (small ? 110 : 220), pt.y);
 }
@@ -343,20 +345,4 @@ void SpellBookRedrawSpells(const std::vector<Spell::spell_t> & spells, std::vect
 
 	coords.push_back(rect);
     }
-}
-
-bool SpellBook::isPresentSpell(Spell::spell_t spell) const
-{
-    if(hero)
-    {
-	const BagArtifacts & bag = hero->GetBagArtifacts();
-	BagArtifacts::const_iterator it1 = bag.begin();
-	BagArtifacts::const_iterator it2 = bag.end();
-	for(; it1 != it2; ++it1) if(*it1 == Artifact::SPELL_SCROLL)
-	{
-	    if(spell == Spell::FromInt((*it1).GetExt())) return true;
-        }
-    }
-
-    return SpellStorage::isPresentSpell(spell);
 }

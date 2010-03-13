@@ -203,9 +203,7 @@ void Battle2::PickupArtifactsAction(HeroBase & hero1, HeroBase & hero2, bool loc
 void Battle2::EagleEyeSkillAction(HeroBase & hero, const std::vector<u8> & spells, bool local)
 {
     if(spells.empty() ||
-	!hero.HasArtifact(Artifact::MAGIC_BOOK)) return;
-
-    SpellBook & book = hero.GetSpellBook();
+	!hero.HaveSpellBook()) return;
 
     std::vector<Spell::spell_t> new_spells;
     new_spells.reserve(10);
@@ -215,7 +213,7 @@ void Battle2::EagleEyeSkillAction(HeroBase & hero, const std::vector<u8> & spell
     // filter spells
     for(std::vector<u8>::const_iterator it = spells.begin(); it != spells.end(); ++it)
     {
-    	if(!book.isPresentSpell(Spell::FromInt(*it)))
+    	if(!hero.HaveSpell(Spell::FromInt(*it)))
 	{
 	    switch(level)
 	    {
@@ -247,7 +245,7 @@ void Battle2::EagleEyeSkillAction(HeroBase & hero, const std::vector<u8> & spell
 	    PlayPickupSound();
 	    Dialog::SpellInfo("", msg, *it);
 	}
-	book.Append(*it);
+	hero.AppendSpellToBook(*it, true);
     }
 }
 

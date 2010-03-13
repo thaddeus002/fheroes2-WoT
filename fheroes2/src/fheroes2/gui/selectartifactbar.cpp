@@ -240,7 +240,7 @@ bool SelectArtifactsBar::QueueEventProcessing(SelectArtifactsBar & bar)
 	    if(index1 == index2)
 	    {
 		if(art1 == Artifact::MAGIC_BOOK)
-		    bar.hero.GetSpellBook().Open(SpellBook::ALL, false);
+		    bar.hero.OpenSpellBook(SpellBook::ALL, false);
 		else
 		if(art1 == Artifact::SPELL_SCROLL)
 		{

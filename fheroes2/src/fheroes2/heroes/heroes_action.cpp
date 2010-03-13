@@ -798,16 +798,7 @@ void ActionToCoast(Heroes &hero, const u8 obj, const u16 dst_index)
     hero.GetPath().Hide();
     hero.FadeIn();
 
-    if(Maps::TileUnderProtection(hero.GetIndex(), &from_index))
-    {
-	// redraw gamearea for monster action sprite
-	Interface::Basic & I = Interface::Basic::Get();
-	Game::Focus & F = Game::Focus::Get();
-	I.gameArea.Center(F.Center());
-	F.SetRedraw();
-	I.Redraw();
-	ActionToMonster(hero, MP2::OBJ_MONSTER, from_index);
-    }
+    hero.ActionNewPosition();
 
     DEBUG(DBG_GAME , DBG_INFO, "ActionToCoast: " << hero.GetName());
 }
@@ -1797,8 +1788,15 @@ void ActionToArtifact(Heroes &hero, const u8 obj, const u16 dst_index)
 
     	default:
 	    PlaySoundSuccess;
-	    std::string msg(_("You've found the artifact: "));
-	    msg.append(art.GetName());
+	    std::string msg;
+
+	    if(art == Artifact::SPELL_SCROLL)
+		msg = _("You find an elaborate aontainer which housesan old vellum scroll. The runes on the container are very old, and the artistry with whitch it was put together is stunning. As you pull the scroll out, you feel imbued with magical power.");
+	    else
+	    {
+		msg = (_("You've found the artifact: "));
+		msg.append(art.GetName());
+	    }
 	    DialogWithArtifact(MP2::StringObject(obj), msg, art());
 	    conditions = true;
 	    break;
@@ -1978,7 +1976,7 @@ void ActionToTeleports(Heroes &hero, const u16 index_from)
     hero.GetPath().Hide();
     hero.FadeIn();
 
-    if(Maps::TileUnderProtection(hero.GetIndex(), &index_to)) ActionToMonster(hero, MP2::OBJ_MONSTER, index_to);
+    hero.ActionNewPosition();
 
     DEBUG(DBG_GAME , DBG_INFO, "ActionToStoneLights: " << hero.GetName());
 }

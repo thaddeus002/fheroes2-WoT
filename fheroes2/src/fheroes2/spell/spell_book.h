@@ -27,7 +27,6 @@
 #include "spell_storage.h"
 
 class HeroBase;
-class Heroes;
 
 class SpellBook : public SpellStorage
 {
@@ -39,19 +38,15 @@ public:
 	    ALL  = ADVN | CMBT,
 	};
 
-	SpellBook(const HeroBase *p);
+	SpellBook(void);
 
-	Spell::spell_t Open(filter_t filt, bool canselect) const;
+	Spell::spell_t Open(const HeroBase &, filter_t filt, bool canselect) const;
 	void Activate(void) { active = true; };
 	bool isActive(void) const { return active; };
-        bool isPresentSpell(Spell::spell_t) const;
 
 private:
 	friend class Game::IO;
 
-	void SetFilter(std::vector<Spell::spell_t> & v, filter_t filter) const;
-
-	const HeroBase *hero;
 	bool active;
 };
 

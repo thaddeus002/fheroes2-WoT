@@ -385,12 +385,7 @@ bool Heroes::MoveStep(bool fast)
 	    }
 
 	    // check protection tile
-	    u16 dst_index2 = MAXU16;
-	    while(!isFreeman() && Maps::TileUnderProtection(index_to, &dst_index2))
-    	    {
-		Action(dst_index2);
-		SetMove(false);
-	    }
+	    ActionNewPosition();
 
 	    // possible hero is die
 	    if(!isFreeman())
@@ -446,19 +441,17 @@ bool Heroes::MoveStep(bool fast)
 	}
 
 	// check protection tile
-	u16 dst_index2 = MAXU16;
-	while(!isFreeman() && Maps::TileUnderProtection(index_to, &dst_index2))
-        {
-	    Interface::Basic::Get().SetRedraw(REDRAW_GAMEAREA);
-	    Action(dst_index2);
-	    SetMove(false);
-	}
+	ActionNewPosition();
 
 	// AI: force scan resource around
 	if(GetControl() == Game::AI)
 	{
-	    while(Maps::ScanAroundObject(index_to, MP2::OBJ_RESOURCE, true, &dst_index2))
+	    u16 dst_index2;
+	    while(CanMove() && Maps::ScanAroundObject(index_to, MP2::OBJ_RESOURCE, true, &dst_index2))
+	    {
 		Action(dst_index2);
+		ApplyPenaltyMovement();
+	    }
 	}
 
 	// possible hero is die

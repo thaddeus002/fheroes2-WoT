@@ -217,8 +217,8 @@ void Battle2::Arena::ApplyActionSpellCast(Action & action)
 
     const Spell::spell_t spell = Spell::FromInt(byte8);
     if(current_commander && !current_commander->Modes(Heroes::SPELLCASTED) &&
-	current_commander->GetSpellBook().isActive() && current_commander->GetSpellBook().isPresentSpell(spell) &&
-	Spell::isCombat(spell) && current_commander->GetSpellPoints() >= Spell::CostManaPoints(spell))
+	current_commander->HaveSpell(spell) &&
+	Spell::isCombat(spell) && current_commander->HaveSpellPoints(Spell::CostManaPoints(spell)))
     {
 	const u8 color = current_commander->GetColor();
 
@@ -262,7 +262,7 @@ void Battle2::Arena::ApplyActionSpellCast(Action & action)
 	}
 
 	current_commander->SetModes(Heroes::SPELLCASTED);
-	current_commander->SetSpellPoints(current_commander->GetSpellPoints() - Spell::CostManaPoints(spell, current_commander));
+	current_commander->TakeSpellPoints(Spell::CostManaPoints(spell, current_commander));
     }
     else
 	DEBUG(DBG_BATTLE, DBG_TRACE, "Battle2::Arena::ApplyActionSpellCast: " << "incorrect param: ");

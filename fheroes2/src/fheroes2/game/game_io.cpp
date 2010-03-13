@@ -555,11 +555,11 @@ void Game::IO::PackHeroes(QueueMessage & msg, const Heroes & hero)
     }
 
     // artifacts
-    msg.Push(static_cast<u32>(hero.artifacts.size()));
-    for(u32 jj = 0; jj < hero.artifacts.size(); ++jj)
+    msg.Push(static_cast<u32>(hero.bag_artifacts.size()));
+    for(u32 jj = 0; jj < hero.bag_artifacts.size(); ++jj)
     {
-	msg.Push(static_cast<u8>(hero.artifacts[jj].GetID()));
-	msg.Push(hero.artifacts[jj].GetExt());
+	msg.Push(static_cast<u8>(hero.bag_artifacts[jj].GetID()));
+	msg.Push(hero.bag_artifacts[jj].GetExt());
     }
 
     // armies
@@ -1096,15 +1096,15 @@ void Game::IO::UnpackHeroes(QueueMessage & msg, Heroes & hero, u16 check_version
     }
 
     // artifacts
-    std::fill(hero.artifacts.begin(), hero.artifacts.end(), Artifact::UNKNOWN);
+    std::fill(hero.bag_artifacts.begin(), hero.bag_artifacts.end(), Artifact::UNKNOWN);
     msg.Pop(byte32);
-    for(u32 jj = 0; jj < hero.artifacts.size(); ++jj)
+    for(u32 jj = 0; jj < hero.bag_artifacts.size(); ++jj)
     {
 	msg.Pop(byte8);
-	hero.artifacts[jj].Set(Artifact::FromInt(byte8));
+	hero.bag_artifacts[jj].Set(Artifact::FromInt(byte8));
 
 	msg.Pop(byte8);
-	hero.artifacts[jj].SetExt(byte8);
+	hero.bag_artifacts[jj].SetExt(byte8);
     }
 
     // armies

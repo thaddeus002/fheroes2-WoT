@@ -172,6 +172,7 @@ s16 Interface::Basic::GetDimensionDoorDestination(const u16 from, const u8 dista
 {
     Cursor & cursor = Cursor::Get();
     Display & display = Display::Get();
+    Settings & conf = Settings::Get();
     LocalEvent & le = LocalEvent::Get();
     s16 dst = -1;
 
@@ -179,10 +180,12 @@ s16 Interface::Basic::GetDimensionDoorDestination(const u16 from, const u8 dista
     {
 	const Point & mp = le.GetMouseCursor();
 	dst = gameArea.GetIndexFromMousePoint(mp);
+	const Maps::Tiles & tile = world.GetTiles(dst);
 
 	const bool valid = ((gameArea.GetArea() & mp) &&
 			dst >= 0 &&
-			MP2::isClearGroundObject(world.GetTiles(dst).GetObject()) &&
+			(! tile.isFog(conf.MyColor())) &&
+			MP2::isClearGroundObject(tile.GetObject()) &&
 			Maps::Ground::WATER != world.GetTiles(dst).GetGround() &&
 			distance >= Maps::GetApproximateDistance(from, dst));
 

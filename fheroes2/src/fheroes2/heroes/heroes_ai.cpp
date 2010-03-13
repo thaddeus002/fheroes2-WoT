@@ -765,7 +765,7 @@ void AIToTeleports(Heroes &hero, const u16 index_from)
     world.GetTiles(index_from).SetObject(MP2::OBJ_STONELIGHTS);
     world.GetTiles(index_to).SetObject(MP2::OBJ_HEROES);
 
-    if(Maps::TileUnderProtection(hero.GetIndex(), &index_to)) AIToMonster(hero, MP2::OBJ_MONSTER, index_to);
+    hero.ActionNewPosition();
 
     DEBUG(DBG_AI , DBG_INFO, "AIToStoneLights: " << hero.GetName());
 }
@@ -1525,8 +1525,7 @@ void AIToCoast(Heroes &hero, const u8 obj, const u16 dst_index)
     tiles_to.SetObject(MP2::OBJ_HEROES);
     hero.SaveUnderObject(MP2::OBJ_ZERO);
 
-    if(Maps::TileUnderProtection(hero.GetIndex(), &from_index))
-        AIToMonster(hero, MP2::OBJ_MONSTER, from_index);
+    hero.ActionNewPosition();
 
     DEBUG(DBG_AI, DBG_INFO, "AIToCoast: " << hero.GetName());
 }

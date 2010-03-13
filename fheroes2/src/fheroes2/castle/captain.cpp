@@ -26,7 +26,7 @@
 #include "captain.h"
 #include "settings.h"
 
-Captain::Captain(const Castle & c) : home(c), spell_book(this), spellPoints(0)
+Captain::Captain(const Castle & c) : home(c)
 {
 }
 
@@ -38,7 +38,7 @@ void Captain::LoadDefaults(void)
 	Skill::Primary::LoadDefaults(home.GetRace(), *this, book, spell);
 	if(home.GetLevelMageGuild())
 	{
-	    spell_book.Activate();
+	    SpellBookActivate();
 	    home.GetMageGuild().EducateHero(*this);
 	}
     }
@@ -141,21 +141,6 @@ u8 Captain::GetType(void) const
     return Skill::Primary::CAPTAIN;
 }
 
-SpellBook & Captain::GetSpellBook(void)
-{
-    return spell_book;
-}
-
-const SpellBook & Captain::GetSpellBook(void) const
-{
-    return spell_book;
-}
-
-u16 Captain::GetSpellPoints(void) const
-{
-    return spellPoints;
-}
-
 u8 Captain::GetLevelSkill(const Skill::Secondary::skill_t skill) const
 {
     return 0;
@@ -171,29 +156,9 @@ Army::army_t & Captain::GetArmy(void)
     return const_cast<Army::army_t &>(home.GetArmy());
 }
 
-bool Captain::HasArtifact(const Artifact::artifact_t art) const
-{
-    return false;
-}
-
-const BagArtifacts & Captain::GetBagArtifacts(void) const
-{
-    return artifacts;
-}
-
-BagArtifacts & Captain::GetBagArtifacts(void)
-{
-    return artifacts;
-}
-
 u16 Captain::GetMaxSpellPoints(void) const
 {
     return knowledge * 10;
-}
-
-void Captain::SetSpellPoints(const u16 point)
-{
-    spellPoints = point;
 }
 
 u8 Captain::GetControl(void) const
@@ -213,5 +178,5 @@ u16 Captain::GetIndex(void) const
 
 void Captain::PreBattleAction(void)
 {
-    spellPoints = GetMaxSpellPoints();
+    SetSpellPoints(GetMaxSpellPoints());
 }

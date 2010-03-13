@@ -1512,18 +1512,25 @@ void Maps::Tiles::UpdateQuantity(void)
 	    if(addon)
 	    {
 		Artifact::artifact_t art = Artifact::FromIndexSprite(addon->index);
+
 		if(Artifact::SPELL_SCROLL == art)
 		{
 		    // spell from origin mp2
 		    Spell::spell_t spell = Spell::FromInt(1 + (quantity2 * 256 + quantity1) / 8);
-		    quantity3 = spell;
+		    quantity1 = art;
+		    // always available
+		    quantity2 = 15;
+		    quantity3 = (spell == Spell::NONE ? Spell::FIREBALL : spell);
 		}
-		quantity1 = art;
-		// conditions: 70% empty
-		quantity2 = Rand::Get(1, 10) < 4 ? Rand::Get(1, 13) : 0;
-		//  added resource
-		if(quantity2 == 2 || quantity2 == 3)
-		    quantity4 = Resource::Rand();
+		else
+		{
+		    quantity1 = art;
+		    // conditions: 70% empty
+		    quantity2 = Rand::Get(1, 10) < 4 ? Rand::Get(1, 13) : 0;
+		    //  added resource
+		    if(quantity2 == 2 || quantity2 == 3)
+			quantity4 = Resource::Rand();
+		}
 	    }
 	break;
 

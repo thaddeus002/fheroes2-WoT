@@ -1208,7 +1208,7 @@ void Battle2::Interface::RedrawBorder(void)
 void Battle2::Interface::RedrawPocketControls(void) const
 {
     const HeroBase* hero = b_current ? b_current->GetCommander() : NULL;
-    if(hero && hero->GetSpellBook().isActive() && !hero->Modes(Heroes::SPELLCASTED))
+    if(hero && hero->HaveSpellBook() && !hero->Modes(Heroes::SPELLCASTED))
     {
         Display::Get().Blit(AGG::GetICN(ICN::ARTFX, 81), pocket_book);
     }
@@ -1349,7 +1349,7 @@ void Battle2::Interface::HumanTurn(const Stats & b, Actions & a)
 
     if(conf.Music() && !Music::isPlaying()) AGG::PlayMusic(MUS::GetBattleRandom(), false);
 
-    if(conf.PocketPC() && arena.current_commander && arena.current_commander->GetSpellBook().isActive())
+    if(conf.PocketPC() && arena.current_commander && arena.current_commander->HaveSpellBook())
     {
 	const Rect & area = border.GetArea();
     	const Sprite & book = AGG::GetICN(ICN::ARTFX, 81);
@@ -3815,20 +3815,19 @@ void Battle2::Interface::ProcessingHeroDialogResult(u8 res, Actions & a)
 	    const HeroBase* hero = b_current ? b_current->GetCommander() : NULL;
 	    if(hero)
 	    {
-		if(hero->GetSpellBook().isActive())
+		if(hero->HaveSpellBook())
 		{
 		    std::string msg;
 		    if(arena.isDisableCastSpell(Spell::NONE, &msg))
 			Dialog::Message("", msg, Font::BIG, Dialog::OK);
 		    else
 		    {
-			const SpellBook & book = hero->GetSpellBook();
-			Spell::spell_t spell = book.Open(SpellBook::CMBT, true);
+			Spell::spell_t spell = hero->OpenSpellBook(SpellBook::CMBT, true);
 
 			if(arena.isDisableCastSpell(spell, &msg))
 			    Dialog::Message("", msg, Font::BIG, Dialog::OK);
 			else
-			if(hero->GetSpellPoints() >= Spell::CostManaPoints(spell, hero))
+			if(hero->HaveSpellPoints(Spell::CostManaPoints(spell, hero)))
 			{
 			    if(Spell::isApplyWithoutFocusObject(spell))
 			    {

@@ -125,7 +125,7 @@ void Battle2::Arena::AIMagicAction(const Stats & b, Actions & a, const Stats* en
 {
     const HeroBase* hero = b.GetCommander();
 
-    if(b.Modes(SP_BERSERKER) || !hero || hero->Modes(Heroes::SPELLCASTED) || !hero->GetSpellBook().isActive()) return;
+    if(b.Modes(SP_BERSERKER) || !hero || hero->Modes(Heroes::SPELLCASTED) || !hero->HaveSpellBook()) return;
 
     const Army::army_t* my_army = b.GetArmy();
     const Army::army_t* enemy_army = GetArmy(GetOppositeColor(b.GetColor()));
@@ -254,7 +254,7 @@ bool Battle2::isApplySpell(const Spell::spell_t spell, const Stats* b, const Her
 	default: break;
     }
 
-    if(hero.GetSpellBook().isPresentSpell(spell) && hero.GetSpellPoints() >= Spell::CostManaPoints(spell) && (!b || b->AllowApplySpell(spell, &hero)))
+    if(hero.HaveSpell(spell) && hero.HaveSpellPoints(Spell::CostManaPoints(spell)) && (!b || b->AllowApplySpell(spell, &hero)))
     {
 	a.AddedCastAction(spell, (b ? b->GetPosition() : MAXU16));
 	return true;

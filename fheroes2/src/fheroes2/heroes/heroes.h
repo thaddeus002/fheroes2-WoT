@@ -103,9 +103,6 @@ public:
     u8 GetType(void) const { return Skill::Primary::HEROES; };
     u8 GetControl(void) const;
 
-    const SpellBook & GetSpellBook(void) const { return spell_book; };
-    SpellBook & GetSpellBook(void) { return spell_book; };
-
     Color::color_t GetKillerColor(void) const;
     void SetKillerColor(Color::color_t);
 
@@ -125,6 +122,12 @@ public:
     u8 GetDefense(void) const;
     u8 GetPower(void) const;
     u8 GetKnowledge(void) const;
+
+    u8 GetAttack(std::string*) const;
+    u8 GetDefense(std::string*) const;
+    u8 GetPower(std::string*) const;
+    u8 GetKnowledge(std::string*) const;
+
     void IncreasePrimarySkill(const Skill::Primary::skill_t skill);
 
     s8 GetMorale(void) const;
@@ -134,8 +137,6 @@ public:
     u8 GetLevel(void) const;
 
     u16 GetMaxSpellPoints(void) const;
-    u16 GetSpellPoints(void) const;
-    void SetSpellPoints(const u16 point);
 
     u16 GetMaxMovePoints(void) const;
     u16 GetMovePoints(void) const;
@@ -153,11 +154,8 @@ public:
 
     bool PickupArtifact(const Artifact::artifact_t);
     bool PickupArtifact(const Artifact &);
-    bool HasArtifact(const Artifact::artifact_t) const;
     bool HasUltimateArtifact(void) const;
     u8 GetCountArtifacts(void) const;
-    BagArtifacts & GetBagArtifacts(void);
-    const BagArtifacts & GetBagArtifacts(void) const;
     bool IsFullBagArtifacts(void) const;
 
     u8 GetMobilityIndexSprite(void) const;
@@ -175,7 +173,6 @@ public:
     void ActionAfterBattle(void);
 
     bool BuySpellBook(const Castle &);
-    void AppendSpellToBook(const Spell::spell_t spell);
 
     const Route::Path & GetPath(void) const{ return path; };
     Route::Path & GetPath(void) { return path; };
@@ -197,10 +194,12 @@ public:
     bool Move(bool fast = false);
     bool isShow(u8 color);
     bool isEnableMove(void) const;
+    bool CanMove(void) const;
     void SetMove(bool f);
     bool isAction(void) const { return Modes(ACTION); };
     void ResetAction(void) { ResetModes(ACTION); };
     void Action(const u16 dst_index);
+    void ActionNewPosition(void);
     bool ApplyPenaltyMovement(void);
     bool ActionSpellCast(Spell::spell_t);
 
@@ -249,14 +248,11 @@ private:
     Color::color_t	color;
     Color::color_t	killer_color;
     u32			experience;
-    u16			magic_point;
     u16			move_point;
 
     std::vector<Skill::Secondary>	secondary_skills;
 
-    BagArtifacts	artifacts;
     Army::army_t        army;
-    SpellBook		spell_book;
 
     heroes_t		portrait;
     Race::race_t	race;

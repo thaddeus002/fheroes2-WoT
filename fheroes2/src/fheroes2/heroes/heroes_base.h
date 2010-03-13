@@ -37,25 +37,51 @@ namespace Army { class army_t; };
 
 class HeroBase : public Skill::Primary, public BitModes
 {
-  public:
+public:
+    HeroBase();
+
     virtual const std::string & GetName(void) const = 0;
-    virtual const Army::army_t & GetArmy(void) const = 0;
-    virtual Army::army_t & GetArmy(void) = 0;
-    virtual bool HasArtifact(const Artifact::artifact_t) const = 0;
-    virtual BagArtifacts & GetBagArtifacts(void) = 0;
-    virtual const BagArtifacts & GetBagArtifacts(void) const = 0;
-    virtual u16 GetMaxSpellPoints(void) const = 0;
-    virtual void SetSpellPoints(const u16 point) = 0;
-    virtual u16 GetSpellPoints(void) const = 0;
-    virtual const SpellBook & GetSpellBook(void) const = 0;
-    virtual SpellBook & GetSpellBook(void) = 0;
-    virtual u8 GetLevelSkill(const Skill::Secondary::skill_t) const = 0;
     virtual Color::color_t GetColor(void) const = 0;
     virtual u8 GetControl(void) const = 0;
     virtual u16 GetIndex(void) const = 0;
+    virtual bool isValid(void) const = 0;
+
+    virtual const Army::army_t & GetArmy(void) const = 0;
+    virtual Army::army_t & GetArmy(void) = 0;
+
+    virtual u16 GetMaxSpellPoints(void) const = 0;
+
+    virtual u8 GetLevelSkill(const Skill::Secondary::skill_t) const = 0;
+
     virtual bool CanBattleRetreat(void) const = 0;
     virtual void PreBattleAction(void) = 0;
-    virtual bool isValid(void) const = 0;
+
+    s8 GetAttackModificator(std::string* = NULL) const;
+    s8 GetDefenseModificator(std::string* = NULL) const;
+    s8 GetPowerModificator(std::string* = NULL) const;
+    s8 GetKnowledgeModificator(std::string* = NULL) const;
+    s8 GetMoraleModificator(bool, std::string* = NULL) const;
+    s8 GetLuckModificator(bool, std::string* = NULL) const;
+
+    u16 GetSpellPoints(void) const;
+    bool HaveSpellPoints(u16) const;
+    void SetSpellPoints(u16);
+    void TakeSpellPoints(u16);
+
+    Spell::spell_t OpenSpellBook(SpellBook::filter_t, bool) const;
+    bool HaveSpellBook(void) const;
+    bool HaveSpell(Spell::spell_t) const;
+    void SpellBookActivate(void);
+    void AppendSpellToBook(Spell::spell_t, bool without_wisdom = false);
+
+    BagArtifacts & GetBagArtifacts(void);
+    const BagArtifacts & GetBagArtifacts(void) const;
+    bool HasArtifact(Artifact::artifact_t) const;
+
+protected:
+    u16 magic_point;
+    SpellBook spell_book;
+    BagArtifacts bag_artifacts;
 };
 
 #endif

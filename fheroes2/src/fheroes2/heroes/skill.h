@@ -30,8 +30,13 @@
 #include "color.h"
 #include "gamedefs.h"
 
+void StringAppendModifiers(std::string &, s8);
+
 namespace Skill
 {
+    s8 GetLeadershipModifiers(u8 level, std::string* strs);
+    s8 GetLuckModifiers(u8 level, std::string* strs);
+
     void UpdateStats(const std::string &);
 
     namespace Level
@@ -40,7 +45,7 @@ namespace Skill
 
 	type_t FromMP2(const u8 byte);
 
-	const char* String(const type_t level);
+	const char* String(u8 level);
     };
 
     class Secondary : private std::pair<u8, u8>

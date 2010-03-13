@@ -109,7 +109,7 @@ void LuckIndicator::Redraw(void)
     descriptions.clear();
     descriptions.append(Luck::Description(luck));
     descriptions.append("\n \n");
-    descriptions.append(_("Current Luck Modifiers:"));
+    descriptions.append(_("Current Modifiers:"));
     descriptions.append("\n \n");
 
     const Sprite & sprite = AGG::GetICN(ICN::HSICONS, (0 > luck ? 3 : (0 < luck ? 2 : 6)));
@@ -155,7 +155,7 @@ void MoraleIndicator::Redraw(void)
     descriptions.clear();
     descriptions.append(Morale::Description(morale));
     descriptions.append("\n \n");
-    descriptions.append(_("Current Morale Modifiers:"));
+    descriptions.append(_("Current Modifiers:"));
     descriptions.append("\n \n");
     
     const Sprite & sprite = AGG::GetICN(ICN::HSICONS, (0 > morale ? 5 : (0 < morale ? 4 : 7)));
