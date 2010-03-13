@@ -29,6 +29,7 @@
 #include "world.h"
 #include "kingdom.h"
 #include "payment.h"
+#include "profit.h"
 #include "statusbar.h"
 #include "buildinginfo.h"
 
@@ -476,7 +477,11 @@ bool BuildingInfo::DialogBuyBuilding(bool buttons) const
     Cursor & cursor = Cursor::Get();
     cursor.Hide();
 
-    TextBox box1(GetDescription(), Font::BIG, BOXAREA_WIDTH);
+    std::string description = GetDescription();
+    const payment_t profit = ProfitConditions::FromBuilding(building, castle.GetRace());
+    if(profit.gold) String::Replace(description, "%{count}", profit.gold);
+
+    TextBox box1(description, Font::BIG, BOXAREA_WIDTH);
 
     // prepare requires build string
     std::string str;

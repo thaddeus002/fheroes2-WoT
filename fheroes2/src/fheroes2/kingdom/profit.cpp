@@ -76,7 +76,7 @@ void ProfitConditions::UpdateCosts(const std::string & spec)
     const TiXmlElement* xml_profits = NULL;
 
     if(doc.LoadFile(spec.c_str()) &&
-        NULL != (xml_profits = doc.FirstChildElement("payments")))
+        NULL != (xml_profits = doc.FirstChildElement("profits")))
     {
 	profitstats_t* ptr = &_profits[0];
 
