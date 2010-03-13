@@ -1037,7 +1037,6 @@ void Heroes::Recruit(const Color::color_t & cl, const Point & pt)
     save_maps_general = tiles.GetObject();
     tiles.SetObject(MP2::OBJ_HEROES);
 
-    magic_point = GetMaxSpellPoints();
     move_point = GetMaxMovePoints();
 }
 
@@ -1047,8 +1046,13 @@ bool Heroes::Recruit(const Castle & castle)
     if(NULL == hero || hero->isFreeman())
     {
 	Recruit(castle.GetColor(), castle.GetCenter());
-	// learn spell
-	castle.GetMageGuild().EducateHero(*this);
+        if(castle.GetLevelMageGuild())
+        {
+            // magic point
+	    magic_point = GetMaxSpellPoints();
+            // learn spell
+            castle.GetMageGuild().EducateHero(*this);
+        }
 	return true;
     }
 
