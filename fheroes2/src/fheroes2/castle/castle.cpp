@@ -48,7 +48,15 @@ Castle::Castle(s16 cx, s16 cy, const Race::race_t rc) : mp(cx, cy), race(rc), ca
 
     mageguild.Builds();
 
-    if(3 > Maps::GetApproximateDistance(GetIndex(), world.GetNearestObject(GetIndex(), MP2::OBJ_COAST))) SetModes(NEARLYSEA);
+    // check nearest ocean
+    const u16 index = GetIndex() + world.w() * 2;
+    const Maps::Tiles & left = world.GetTiles(index - 1);
+    const Maps::Tiles & right = world.GetTiles(index + 1);
+    const Maps::Tiles & center = world.GetTiles(index);
+
+    if((MP2::OBJ_ZERO == left.GetObject() && Maps::Ground::WATER == left.GetGround()) ||
+	(MP2::OBJ_ZERO == right.GetObject() && Maps::Ground::WATER == right.GetGround()) ||
+	(MP2::OBJ_ZERO == center.GetObject() && Maps::Ground::WATER == center.GetGround())) SetModes(NEARLYSEA);
 }
 
 void Castle::LoadFromMP2(const void *ptr)
@@ -1603,17 +1611,7 @@ Army::army_t & Castle::GetActualArmy(void)
 bool Castle::AllowBuyBoat(void) const
 {
     // check payment and present other boat
-    if(world.GetMyKingdom().AllowPayment(PaymentConditions::BuyBoat()) && (! PresentBoat()))
-    {
-	const u16 index = GetIndex() + world.w() * 2;
-	const Maps::Tiles & left = world.GetTiles(index - 1);
-	const Maps::Tiles & right = world.GetTiles(index + 1);
-	const Maps::Tiles & center = world.GetTiles(index);
-	return ((MP2::OBJ_ZERO == left.GetObject() && Maps::Ground::WATER == left.GetGround()) ||
-		(MP2::OBJ_ZERO == right.GetObject() && Maps::Ground::WATER == right.GetGround()) ||
-		(MP2::OBJ_ZERO == center.GetObject() && Maps::Ground::WATER == center.GetGround()));
-    }
-    return false;
+    return (Modes(NEARLYSEA) && world.GetMyKingdom().AllowPayment(PaymentConditions::BuyBoat()) && (! PresentBoat()));
 }
 
 bool Castle::BuyBoat(void)
