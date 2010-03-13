@@ -848,9 +848,9 @@ void Heroes::ActionNewDay(void)
 	    // secondary skill
 	    switch(GetLevelSkill(Skill::Secondary::MYSTICISM))
 	    {
-		case Skill::Level::BASIC:	curr += 1; break;
-		case Skill::Level::ADVANCED:	curr += 2; break;
-		case Skill::Level::EXPERT:	curr += 3; break;
+		case Skill::Level::BASIC:	curr += 2; break;
+		case Skill::Level::ADVANCED:	curr += 3; break;
+		case Skill::Level::EXPERT:	curr += 4; break;
 
 		default: break;
 	    }
