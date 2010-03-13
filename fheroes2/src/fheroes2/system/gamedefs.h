@@ -44,7 +44,6 @@
 
 // hardcore defines: kingdom
 #define KINGDOMMAX			6
-#define KINGDOMMAXHEROES		8
 
 // hardcore defines: world
 #define MAXCASTLES			72

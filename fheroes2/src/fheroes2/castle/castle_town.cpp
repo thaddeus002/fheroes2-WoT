@@ -351,9 +351,9 @@ u32 Castle::OpenTown(void)
 	cursorFormat.Show(Army::FORMAT_SPREAD == army.GetCombatFormat() ? pointSpreadArmyFormat : pointGroupedArmyFormat);
     }
 
-    Kingdom & kingdom = world.GetMyKingdom();
+    Kingdom & kingdom = world.GetKingdom(GetColor());
 
-    const bool many_hero = kingdom.AllowRecruitHero(false);
+    const bool many_hero = !kingdom.AllowRecruitHero(false);
     const bool allow_buy_hero = AllowBuyHero();
 
     Heroes* hero1 = kingdom.GetRecruits().GetHero1();

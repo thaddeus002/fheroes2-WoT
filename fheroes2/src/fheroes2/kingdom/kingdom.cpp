@@ -34,6 +34,8 @@
 #include "battle2.h"
 #include "kingdom.h"
 
+u8 Kingdom::max_heroes = 8;
+
 cost_t Kingdom::starting_resource[] = {
     { 10000, 30, 10, 30, 10, 10, 10 },
     { 7500, 20, 5, 20, 5, 5, 5 },
@@ -103,7 +105,7 @@ Kingdom::Kingdom(const Color::color_t cl) : color(cl), control(Game::AI), flags(
     // set play
     if(conf.KingdomColors(color)) SetModes(PLAY);
     
-    heroes.reserve(KINGDOMMAXHEROES);
+    heroes.reserve(GetMaxHeroes());
     castles.reserve(15);
 
     // set control
@@ -475,7 +477,7 @@ bool Kingdom::IsVisitTravelersTent(u8 col)
 
 bool Kingdom::AllowRecruitHero(bool check_payment) const
 {
-	return (heroes.size() < KINGDOMMAXHEROES) && (!check_payment || AllowPayment(PaymentConditions::RecruitHero()));
+    return (heroes.size() < GetMaxHeroes()) && (!check_payment || AllowPayment(PaymentConditions::RecruitHero()));
 }
 
 void Kingdom::ApplyPlayWithStartingHero(void)
@@ -496,4 +498,14 @@ void Kingdom::ApplyPlayWithStartingHero(void)
 		AddHeroes(hero);
 	}
     }
+}
+
+void Kingdom::SetMaxHeroes(u8 max)
+{
+    max_heroes = max;
+}
+
+u8 Kingdom::GetMaxHeroes(void)
+{
+    return max_heroes;
 }

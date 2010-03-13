@@ -123,6 +123,9 @@ public:
     static void UpdateStartingResource(const TiXmlElement*);
 #endif
 
+    static void SetMaxHeroes(u8);
+    static u8 GetMaxHeroes(void);
+
 private:
     friend class Game::IO;
 
@@ -157,6 +160,8 @@ private:
     u8 visited_tents_colors;
 
     static cost_t starting_resource[];
+
+    static u8 max_heroes;
 };
 
 #endif

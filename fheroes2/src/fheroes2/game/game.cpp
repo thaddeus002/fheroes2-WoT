@@ -344,6 +344,16 @@ void Game::UpdateGlobalDefines(const std::string & spec)
 	    view_distance[8] = value;
 	}
 
+	// kingdom
+	xml_element = xml_globals->FirstChildElement("kingdom");
+	if(xml_element)
+	{
+	    int value;
+	    xml_element->Attribute("max_heroes", &value);
+	    Kingdom::SetMaxHeroes(value);
+	}
+
+
 	// game_over
 	xml_element = xml_globals->FirstChildElement("game_over");
 	if(xml_element)

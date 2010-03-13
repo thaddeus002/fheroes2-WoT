@@ -3007,7 +3007,7 @@ void ActionToJail(Heroes &hero, const u8 obj, const u16 dst_index)
     else
     {
 	std::string str = _("You already have %{count} heroes, and regretfully must leave the prisoner in this jail to languish in agony for untold days.");
-	String::Replace(str, "%{count}", KINGDOMMAXHEROES);
+	String::Replace(str, "%{count}", Kingdom::GetMaxHeroes());
 	PlaySoundFailure;
 	Dialog::Message(MP2::StringObject(obj), str, Font::BIG, Dialog::OK);
     }
