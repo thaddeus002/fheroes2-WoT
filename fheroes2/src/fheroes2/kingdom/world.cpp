@@ -754,7 +754,7 @@ void World::LoadMaps(const std::string &filename)
     }
 
     // last rumors
-    vec_rumors.push_back(_("You can load the newest version of game from a site: http://sourceforge.net/projects/fheroes2"));
+    vec_rumors.push_back(_("You can load the newest version of game from a site:\n http://sf.net/projects/fheroes2"));
     vec_rumors.push_back(_("This game is now in beta development version. ;)"));
 
     // close mp2

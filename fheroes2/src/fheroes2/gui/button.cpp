@@ -200,19 +200,22 @@ u16 ButtonGroups::QueueEventProcessing(void)
     if(button1 && le.MouseClickLeft(*button1)) return result1;
     if(button2 && le.MouseClickLeft(*button2)) return result2;
 
-    if(le.KeyPress(KEY_RETURN)) return result1;
+    if(button1 && button2)
+    {
+	if(le.KeyPress(KEY_RETURN)) return result1;
+	else
+	if(le.KeyPress(KEY_ESCAPE)) return result2;
+    }
     else
-    if(le.KeyPress(KEY_ESCAPE)) return result2;
+    // one button
+    {
+	if(le.KeyPress(KEY_ESCAPE) || le.KeyPress(KEY_SPACE) || le.KeyPress(KEY_RETURN)) return buttons;
+    }
 
     if(buttons == (Dialog::YES|Dialog::NO))
     {
 	if(le.KeyPress(KEY_y)) return result1;
     	if(le.KeyPress(KEY_n)) return result2;
-    }
-    else
-    if( buttons == Dialog::OK || buttons == Dialog::CANCEL)
-    {
-	if(le.KeyPress(KEY_SPACE)) return buttons;
     }
 
     return Dialog::ZERO;

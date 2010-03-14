@@ -71,7 +71,7 @@ Game::menu_t Game::Credits(void)
     std::string str = conf.BuildVersion();
 
     str.append("\n \n");
-    str.append("Site project: https://sourceforge.net/projects/fheroes2");
+    str.append("Site project: https://sf.net/projects/fheroes2");
 
     Dialog::Message("Free Heroes II Engine", str, Font::SMALL, Dialog::OK);
 
