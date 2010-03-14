@@ -49,7 +49,11 @@ SpellBook::SpellBook() : active(false)
 
 Spell::spell_t SpellBook::Open(const HeroBase & hero, const filter_t filt, bool canselect) const
 {
-    if(!active) return Spell::NONE;
+    if(!active)
+    {
+	Dialog::Message("", _("No spell to cast."), Font::BIG, Dialog::OK);
+	return Spell::NONE;
+    }
 
     std::vector<Spell::spell_t> spells2;
     spells2.reserve(spells.size());
@@ -59,17 +63,23 @@ Spell::spell_t SpellBook::Open(const HeroBase & hero, const filter_t filt, bool 
     bool small = Settings::Get().PocketPC();
 
     const Cursor::themes_t oldcursor = cursor.Themes();
-    cursor.SetThemes(Cursor::POINTER);
 
     const Sprite & r_list = AGG::GetICN(ICN::BOOK, 0);
     const Sprite & l_list = AGG::GetICN(ICN::BOOK, 0, true);
 
-    cursor.Hide();
-
     filter_t filter = filt;
     SpellBookSetFilter(hero.GetBagArtifacts(), spells, spells2, filter);
 
+    if(canselect && spells2.empty())
+    {
+	Dialog::Message("", _("No spell to cast."), Font::BIG, Dialog::OK);
+	return Spell::NONE;
+    }
+
     size_t current_index = 0;
+
+    cursor.Hide();
+    cursor.SetThemes(Cursor::POINTER);
 
     const Sprite & bookmark_info = AGG::GetICN(ICN::BOOK, 6);
     const Sprite & bookmark_advn = AGG::GetICN(ICN::BOOK, 3);
