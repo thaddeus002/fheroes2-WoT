@@ -67,7 +67,7 @@ namespace Game
 
     enum type_t { UNKNOWN = 0, STANDARD = 1, CAMPAIGN = 2, HOTSEAT = 4, NETWORK = 8, MULTI = HOTSEAT | NETWORK };
     enum control_t { NONE = 0, LOCAL = 1, REMOTE = 2, AI = 4 };
-    enum distance_t { VIEW_TOWN  = 0, VIEW_CASTLE = 1, VIEW_SCOUTING_NONE = 2, VIEW_SCOUTING_BASIC = 3, VIEW_SCOUTING_ADVANCED = 4, VIEW_SCOUTING_EXPERT = 5, VIEW_TELESCOPE = 6, VIEW_OBSERVATION_TOWER = 7, VIEW_MAGI_EYES = 8 };
+    enum distance_t { VIEW_TOWN  = 0, VIEW_CASTLE = 1, VIEW_HEROES = 2, VIEW_TELESCOPE = 3, VIEW_OBSERVATION_TOWER = 4, VIEW_MAGI_EYES = 5 };
 
     control_t GetControl(u8);
     type_t GetType(u8);

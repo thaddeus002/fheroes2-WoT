@@ -34,8 +34,7 @@ void Dialog::SecondarySkillInfo(const Skill::Secondary::skill_t skill, const Ski
     header.append(Skill::Secondary::String(skill));
 
     std::string description(Skill::Secondary::Description(skill, level));
-    payment_t info = ProfitConditions::FromSkillEstates(level);
-    String::Replace(description, "%{count}", info.gold);
+    String::Replace(description, "%{count}", Skill::Secondary::GetValues(skill, level));
 
     SecondarySkillInfo(header, description, skill, level, ok_button);
 }

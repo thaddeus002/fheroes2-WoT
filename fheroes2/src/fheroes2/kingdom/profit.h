@@ -45,12 +45,6 @@ namespace ProfitConditions
 	FromMine(u8);
     };
 
-    class FromSkillEstates : public payment_t
-    {
-    public:
-	FromSkillEstates(u8);
-    };
-
     void UpdateCosts(const std::string &);
 };
 

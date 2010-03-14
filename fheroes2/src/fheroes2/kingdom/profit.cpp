@@ -61,10 +61,6 @@ static profitstats_t _profits[] = {
     { "endless_pouch_crystal", { 0, 0, 0, 0, 0, 1, 0 } },
     { "endless_pouch_gems",    { 0, 0, 0, 0, 0, 0, 1 } },
 
-    { "estates_basic",         {100, 0, 0, 0, 0, 0, 0 } },
-    { "estates_advanced",      {250, 0, 0, 0, 0, 0, 0 } },
-    { "estates_expert",        {500, 0, 0, 0, 0, 0, 0 } },
-
     { NULL, { 0, 0, 0, 0, 0, 0, 0 } },
 };
 
@@ -150,24 +146,6 @@ ProfitConditions::FromMine::FromMine(u8 type)
 	case Resource::CRYSTAL: id = "mine_crystal"; break;
 	case Resource::GEMS: id = "mine_gems"; break;
 	case Resource::GOLD: id = "mine_gold"; break;
-	default: break;
-    }
-
-    profitstats_t* ptr = &_profits[0];
-    while(ptr->id && id && std::strcmp(id, ptr->id)) ++ptr;
-
-    if(ptr && id) PaymentLoadCost(*this, ptr->cost);
-}
-
-ProfitConditions::FromSkillEstates::FromSkillEstates(u8 level)
-{
-    const char* id = NULL;
-
-    switch(level)
-    {
-	case Skill::Level::BASIC:    id = "estates_basic"; break;
-	case Skill::Level::ADVANCED: id = "estates_advanced"; break;
-	case Skill::Level::EXPERT:   id = "estates_expert"; break;
 	default: break;
     }
 

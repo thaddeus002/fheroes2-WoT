@@ -534,12 +534,8 @@ void ActionToMonster(Heroes &hero, const u8 obj, const u16 dst_index)
             PaymentConditions::BuyMonster cost(monster());
     	    cost *= toJoin;
 
-            switch(hero.GetLevelSkill(Skill::Secondary::DIPLOMACY))
-            {
-        	case Skill::Level::BASIC:   toJoin = Monster::GetCountFromHitPoints(monster(), toJoin * monster.GetHitPoints() / 4); break;
-            	case Skill::Level::ADVANCED:toJoin = Monster::GetCountFromHitPoints(monster(), toJoin * monster.GetHitPoints() / 2); break;
-            	default: break;
-            }
+	    // skill diplomacy
+	    toJoin = Monster::GetCountFromHitPoints(monster(), toJoin * monster.GetHitPoints() * hero.GetSecondaryValues(Skill::Secondary::DIPLOMACY) / 100);
 
     	    if(toJoin && kingdom.AllowPayment(cost))
             {

@@ -27,8 +27,4 @@
  <endless_pouch_crystal crystal="1" />
  <endless_pouch_gems gems="1" />
 
- <estates_basic gold="100" />
- <estates_advanced gold="250" />
- <estates_expert gold="500" />
-
 </profits>

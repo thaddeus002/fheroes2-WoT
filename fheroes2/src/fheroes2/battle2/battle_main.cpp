@@ -209,6 +209,7 @@ void Battle2::EagleEyeSkillAction(HeroBase & hero, const std::vector<u8> & spell
     new_spells.reserve(10);
 
     const u8 level = hero.GetLevelSkill(Skill::Secondary::EAGLEEYE);
+    const u8 value = Skill::Secondary::GetValues(Skill::Secondary::EAGLEEYE, level);
 
     // filter spells
     for(std::vector<u8>::const_iterator it = spells.begin(); it != spells.end(); ++it)
@@ -219,15 +220,15 @@ void Battle2::EagleEyeSkillAction(HeroBase & hero, const std::vector<u8> & spell
 	    {
 		case Skill::Level::BASIC:
 		    // 20%
-		    if(3 > Spell::Level(*it) && 3 > Rand::Get(1, 10)) new_spells.push_back(Spell::FromInt(*it));
+		    if(3 > Spell::Level(*it) && value >= Rand::Get(1, 100)) new_spells.push_back(Spell::FromInt(*it));
 		    break;
 		case Skill::Level::ADVANCED:
 		    // 30%
-		    if(4 > Spell::Level(*it) && 4 > Rand::Get(1, 10)) new_spells.push_back(Spell::FromInt(*it));
+		    if(4 > Spell::Level(*it) && value >= Rand::Get(1, 100)) new_spells.push_back(Spell::FromInt(*it));
 		    break;
 		case Skill::Level::EXPERT:
 		    // 40%
-		    if(5 > Spell::Level(*it) && 5 > Rand::Get(1, 10)) new_spells.push_back(Spell::FromInt(*it));
+		    if(5 > Spell::Level(*it) && value >= Rand::Get(1, 100)) new_spells.push_back(Spell::FromInt(*it));
 		    break;
 		default: break;
     	    }
@@ -266,13 +267,7 @@ void Battle2::NecromancySkillAction(Army::army_t & army1, Army::army_t & army2, 
     // fix over 60%
     if(percent > 60) percent = 60;
 
-    switch(hero->GetLevelSkill(Skill::Secondary::NECROMANCY))
-    {
-	case Skill::Level::BASIC: percent += 10; break;
-	case Skill::Level::ADVANCED: percent += 20; break;
-	case Skill::Level::EXPERT: percent += 30; break;
-	default: break;
-    }
+    percent += (percent * hero->GetSecondaryValues(Skill::Secondary::NECROMANCY) / 100);
 
     const Monster skeleton(Monster::SKELETON);
     const u32 count = Monster::GetCountFromHitPoints(Monster::SKELETON, skeleton.GetHitPoints() * killed * percent / 100);

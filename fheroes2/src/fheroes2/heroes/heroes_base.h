@@ -52,6 +52,7 @@ public:
     virtual u16 GetMaxSpellPoints(void) const = 0;
 
     virtual u8 GetLevelSkill(const Skill::Secondary::skill_t) const = 0;
+    virtual u8 GetSecondaryValues(const Skill::Secondary::skill_t) const = 0;
 
     virtual bool CanBattleRetreat(void) const = 0;
     virtual void PreBattleAction(void) = 0;

@@ -14,7 +14,7 @@
  <kingdom max_heroes="8" />
 
  <!-- clear fog distance -->
- <view_distance town="4" castle="5" scouting_none="4" scouting_basic="5" scouting_advanced="6" scouting_expert="7" artifact_telescope="1" object_observation_tower="10" object_magi_eyes="9" />
+ <view_distance town="4" castle="5" heroes="4" artifact_telescope="1" object_observation_tower="10" object_magi_eyes="9" />
 
  <!-- additional growth -->
  <castle_extra_growth well="2" wel2="8" />

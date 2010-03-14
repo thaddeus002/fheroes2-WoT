@@ -56,5 +56,26 @@
    <necromancer archery="1" ballistics="3" diplomacy="2" eagleeye="3" estates="2" leadership="0" logistics="2" luck="1" mysticism="3" navigation="2" necromancy="5" pathfinding="3" scouting="1" wisdom="4" />
   </secondary>
  </maturity>
- 
+
+ <secondary>
+<!--
+  <wisdom basic="3" advanced="4" expert="5" />
+-->
+  <mysticism basic="2" advanced="3" expert="4" />
+  <leadership basic="1" advanced="2" expert="3" />
+  <luck basic="1" advanced="2" expert="3" />
+  <scouting basic="1" advanced="2" expert="3" />
+  <ballistics basic="0" advanced="0" expert="0" />
+  <estates basic="100" advanced="250" expert="500" />
+  <!-- percents: max 100 -->
+  <logistics basic="10" advanced="20" expert="30" />
+  <navigation basic="33" advanced="66" expert="100" />
+  <archery basic="10" advanced="25" expert="50" />
+  <necromancy basic="10" advanced="20" expert="30" />
+  <eagleeye basic="20" advanced="30" expert="40" />
+  <diplomacy basic="25" advanced="50" expert="100" />
+  <pathfinding basic="25" advanced="50" expert="100" />
+
+ </secondary>
+
 </skills>

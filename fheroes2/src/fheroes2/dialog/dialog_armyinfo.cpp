@@ -218,8 +218,10 @@ void DrawMonsterStats(const Point & dst, const Army::Troop & troop)
 	message += ")";
     }
 
+    const u8 ox = 15;
+
     text.Set(message);
-    dst_pt.x = dst.x + 20;
+    dst_pt.x = dst.x + ox;
     text.Blit(dst_pt);
 
     // defense
@@ -241,7 +243,7 @@ void DrawMonsterStats(const Point & dst, const Army::Troop & troop)
     }
 
     text.Set(message);
-    dst_pt.x = dst.x + 20;
+    dst_pt.x = dst.x + ox;
     text.Blit(dst_pt);
 
     // shot
@@ -257,7 +259,7 @@ void DrawMonsterStats(const Point & dst, const Army::Troop & troop)
 	message.clear();
 	String::AddInt(message, battle ? battle->GetShots() : mons.GetShots());
 	text.Set(message);
-	dst_pt.x = dst.x + 20;
+	dst_pt.x = dst.x + ox;
 	text.Blit(dst_pt);
     }
 
@@ -274,7 +276,7 @@ void DrawMonsterStats(const Point & dst, const Army::Troop & troop)
     message += " - ";
     String::AddInt(message, mons.GetDamageMax());
     text.Set(message);
-    dst_pt.x = dst.x + 20;
+    dst_pt.x = dst.x + ox;
     text.Blit(dst_pt);
 
     // hp
@@ -288,7 +290,7 @@ void DrawMonsterStats(const Point & dst, const Army::Troop & troop)
     message.clear();
     String::AddInt(message, mons.GetHitPoints());
     text.Set(message);
-    dst_pt.x = dst.x + 20;
+    dst_pt.x = dst.x + ox;
     text.Blit(dst_pt);
 
     if(battle && battle->isValid())
@@ -303,7 +305,7 @@ void DrawMonsterStats(const Point & dst, const Army::Troop & troop)
 	message.clear();
 	String::AddInt(message, battle->GetHitPoints() - (battle->GetCount() - 1) * mons.GetHitPoints());
 	text.Set(message);
-	dst_pt.x = dst.x + 20;
+	dst_pt.x = dst.x + ox;
 	text.Blit(dst_pt);
     }
 
@@ -315,8 +317,12 @@ void DrawMonsterStats(const Point & dst, const Army::Troop & troop)
     dst_pt.y += (pda ? 14 : 18);
     text.Blit(dst_pt);
 
-    text.Set(Speed::String(battle ? battle->GetSpeed(true) : mons.GetSpeed()));
-    dst_pt.x = dst.x + 20;
+    message = Speed::String(battle ? battle->GetSpeed(true) : mons.GetSpeed());
+    message += " (";
+    String::AddInt(message, battle ? battle->GetSpeed(true) : mons.GetSpeed());
+    message += ")";
+    text.Set(message);
+    dst_pt.x = dst.x + ox;
     text.Blit(dst_pt);
 
     // morale
@@ -328,7 +334,7 @@ void DrawMonsterStats(const Point & dst, const Army::Troop & troop)
     text.Blit(dst_pt);
 
     text.Set(Morale::String(troop.GetMorale()));
-    dst_pt.x = dst.x + 20;
+    dst_pt.x = dst.x + ox;
     text.Blit(dst_pt);
 
     // luck
@@ -340,7 +346,7 @@ void DrawMonsterStats(const Point & dst, const Army::Troop & troop)
     text.Blit(dst_pt);
 
     text.Set(Luck::String(troop.GetLuck()));
-    dst_pt.x = dst.x + 20;
+    dst_pt.x = dst.x + ox;
     text.Blit(dst_pt);
 }
 

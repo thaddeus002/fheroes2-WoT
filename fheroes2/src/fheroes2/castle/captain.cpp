@@ -146,6 +146,11 @@ u8 Captain::GetLevelSkill(const Skill::Secondary::skill_t skill) const
     return 0;
 }
 
+u8 Captain::GetSecondaryValues(const Skill::Secondary::skill_t skill) const
+{
+    return 0;
+}
+
 const Army::army_t & Captain::GetArmy(void) const
 {
     return home.GetArmy();

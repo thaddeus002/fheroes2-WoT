@@ -50,8 +50,8 @@ namespace Game
     static u8 lost_town_days(7);
     static std::vector<u8> reserved_vols(LOOPXX_COUNT, 0);
 
-    // town, castle, scouting_none, scouting_basic, scouting_advanced, scouting_expert, artifact_telescope, object_observation_tower, object_magi_eyes
-    static u8 view_distance[] = { 4, 5, 4, 5, 6, 7, 1, 10, 9 };
+    // town, castle, heroes, artifact_telescope, object_observation_tower, object_magi_eyes
+    static u8 view_distance[] = { 4, 5, 4, 1, 10, 9 };
 };
 
 Game::menu_t Game::Testing(u8 t)
@@ -317,31 +317,22 @@ void Game::UpdateGlobalDefines(const std::string & spec)
 	{
 	    int value;
 	    xml_element->Attribute("town", &value);
-	    view_distance[0] = value;
+	    if(value) view_distance[0] = value;
 
 	    xml_element->Attribute("castle", &value);
-	    view_distance[1] = value;
+	    if(value) view_distance[1] = value;
 
-	    xml_element->Attribute("scouting_none", &value);
-	    view_distance[2] = value;
-
-	    xml_element->Attribute("scouting_basic", &value);
-	    view_distance[3] = value;
-
-	    xml_element->Attribute("scouting_advanced", &value);
-	    view_distance[4] = value;
-
-	    xml_element->Attribute("scouting_expert", &value);
-	    view_distance[5] = value;
+	    xml_element->Attribute("heroes", &value);
+	    if(value) view_distance[2] = value;
 
 	    xml_element->Attribute("artifact_telescope", &value);
-	    view_distance[6] = value;
+	    if(value) view_distance[3] = value;
 
 	    xml_element->Attribute("object_observation_tower", &value);
-	    view_distance[7] = value;
+	    if(value) view_distance[4] = value;
 
 	    xml_element->Attribute("object_magi_eyes", &value);
-	    view_distance[8] = value;
+	    if(value) view_distance[5] = value;
 	}
 
 	// kingdom

@@ -41,7 +41,7 @@ namespace Skill
 
     namespace Level
     {
-	typedef enum { NONE=0, BASIC=1, ADVANCED=2, EXPERT=3 } type_t;
+	enum type_t { NONE=0, BASIC=1, ADVANCED=2, EXPERT=3 };
 
 	type_t FromMP2(const u8 byte);
 
@@ -52,7 +52,7 @@ namespace Skill
     {
 	public:
 
-	typedef enum
+	enum skill_t
 	{
 	    UNKNOWN	= 0,
 	    PATHFINDING	= 1,
@@ -69,7 +69,7 @@ namespace Skill
 	    EAGLEEYE	= 12,
 	    NECROMANCY	= 13,
 	    ESTATES	= 14,
-	} skill_t;
+	};
 
 	Secondary();
 	Secondary(const skill_t s, const Level::type_t t);
@@ -93,6 +93,7 @@ namespace Skill
 	static void FillStandard(std::vector<skill_t> &);
 	static u8 GetWeightSkillFromRace(u8 race, u8 skill);
 	static void LoadDefaults(u8, std::vector<Secondary> &);
+	static u16 GetValues(skill_t, u8);
 
 	/* index sprite from SECSKILL */
 	static u8 GetIndexSprite1(const skill_t skill);
@@ -105,22 +106,22 @@ namespace Skill
     {
 	public:
 
-	typedef enum
+	enum skill_t
 	{
 	    UNKNOWN	= 0,
 	    ATTACK	= 1,
 	    DEFENCE	= 2,
 	    POWER	= 3,
 	    KNOWLEDGE	= 4,
-	} skill_t;
+	};
 
-	enum
+	enum type_t
 	{
 	    UNDEFINED,
 	    MONSTER,
 	    CAPTAIN,
 	    HEROES,
-	} type_t;
+	};
 
 	Primary();
 	virtual ~Primary(){};

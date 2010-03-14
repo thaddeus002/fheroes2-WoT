@@ -514,10 +514,6 @@ u8 Heroes::GetDefense(std::string* strs) const
 {
     s16 result = defence + GetDefenseModificator(strs);
 
-    // check coliseum
-    const Castle* castle = inCastle();
-    if(castle && Race::BARB == castle->GetRace() && castle->isBuild(BUILD_SPEC)) result += 2;
-
     return result < 0 ? 0 : (result > 255 ? 255 : result);
 }
 
@@ -532,7 +528,18 @@ u8 Heroes::GetPower(std::string* strs) const
 
     // check storm
     const Castle* castle = inCastle();
-    if(castle && Race::NECR == castle->GetRace() && castle->isBuild(BUILD_SPEC)) result += 2;
+    if(castle && Race::NECR == castle->GetRace() && castle->isBuild(BUILD_SPEC))
+    {
+	const u8 mod = 2;
+	result += mod;
+
+	if(strs)
+	{
+	    strs->append(Castle::GetStringBuilding(BUILD_SPEC, castle->GetRace()));
+	    StringAppendModifiers(*strs, mod);
+	    strs->append("\n");
+	}
+    }
 
     return result < 0 ? 0 : (result > 255 ? 255 : result);
 }
@@ -590,14 +597,8 @@ u16 Heroes::GetMaxMovePoints(void) const
     {
 	point = 1500;
 
-	switch(GetLevelSkill(Skill::Secondary::NAVIGATION))
-	{
-	    case Skill::Level::BASIC:       point += 450; break;
-    	    case Skill::Level::ADVANCED:    point += 950; break;
-    	    case Skill::Level::EXPERT:      point += 1500; break;
-
-    	    default: break;
-	}
+	// skill navigation
+	point += point * GetSecondaryValues(Skill::Secondary::NAVIGATION) / 100;
 
 	// artifact bonus
         if(HasArtifact(Artifact::SAILORS_ASTROLABE_MOBILITY)) point += 1000;
@@ -622,17 +623,7 @@ u16 Heroes::GetMaxMovePoints(void) const
 	}
 
 	// skill logistics
-	switch(GetLevelSkill(Skill::Secondary::LOGISTICS))
-	{
-	    // bonus: 10%
-	    case Skill::Level::BASIC:       point += point * 10 / 100; break;
-    	    // bonus: 20%
-    	    case Skill::Level::ADVANCED:    point += point * 20 / 100; break;
-    	    // bonus: 29%
-    	    case Skill::Level::EXPERT:      point += point * 29 / 100; break;
-
-	    default: break;
-	}
+	point += point * GetSecondaryValues(Skill::Secondary::LOGISTICS) / 100;
 
 	// artifact bonus
 	if(HasArtifact(Artifact::NOMAD_BOOTS_MOBILITY)) point += 600;
@@ -807,7 +798,7 @@ void Heroes::ActionNewDay(void)
     if(HasArtifact(Artifact::ENDLESS_POUCH_CRYSTAL))  resource += ProfitConditions::FromArtifact(Artifact::ENDLESS_POUCH_CRYSTAL);
 
     // estates skill bonus
-    resource += ProfitConditions::FromSkillEstates(GetLevelSkill(Skill::Secondary::ESTATES));
+    resource.gold += GetSecondaryValues(Skill::Secondary::ESTATES);
 
     // added
     if(resource.GetValidItems()) world.GetKingdom(GetColor()).AddFundsResource(resource);
@@ -846,14 +837,7 @@ void Heroes::ActionNewDay(void)
 	    if(HasArtifact(Artifact::POWER_RING)) curr += 2;
 
 	    // secondary skill
-	    switch(GetLevelSkill(Skill::Secondary::MYSTICISM))
-	    {
-		case Skill::Level::BASIC:	curr += 2; break;
-		case Skill::Level::ADVANCED:	curr += 3; break;
-		case Skill::Level::EXPERT:	curr += 4; break;
-
-		default: break;
-	    }
+	    curr += GetSecondaryValues(Skill::Secondary::MYSTICISM);
 
 	    if((curr > GetMaxSpellPoints()) && (curr > prev)) curr = prev;
 
@@ -1226,6 +1210,11 @@ bool Heroes::HasSecondarySkill(const Skill::Secondary::skill_t skill) const
     return Skill::Level::NONE != GetLevelSkill(skill);
 }
 
+u8 Heroes::GetSecondaryValues(const Skill::Secondary::skill_t skill) const
+{
+    return Skill::Secondary::GetValues(skill, GetLevelSkill(skill));
+}
+
 u8 Heroes::CountSecondarySkill(void) const
 {
     return secondary_skills.size();
@@ -1275,7 +1264,7 @@ void Heroes::Scoute(void)
 u8 Heroes::GetScoute(void) const
 {
     return (HasArtifact(Artifact::TELESCOPE) ? Game::GetViewDistance(Game::VIEW_TELESCOPE) : 0) +
-	Game::GetViewDistance(Game::VIEW_SCOUTING_NONE) + GetLevelSkill(Skill::Secondary::SCOUTING);
+	Game::GetViewDistance(Game::VIEW_HEROES) + GetSecondaryValues(Skill::Secondary::SCOUTING);
 }
 
 /* set cente from index maps */

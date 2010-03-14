@@ -35,6 +35,13 @@
 #include "xmlccwrap.h"
 #endif
 
+struct level_t
+{
+    u16 basic;
+    u16 advanced;
+    u16 expert;
+};
+
 struct primary_t
 {
     u8 attack;
@@ -75,6 +82,12 @@ struct skillstats_t
     secondary_t mature_secondary;
 };
 
+struct skillvalues_t
+{
+    const char *id;
+    level_t values;
+};
+
 static skillstats_t _skillstats[] = {
     { "knight",      { 1, 1, 1, 1 }, { 2, 2, 1, 1 }, 0, 0, { 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0 }, 10, {35,45,10,10 }, {25,25,25,25 }, { 2, 4, 3, 1, 3, 5, 3, 1, 1, 2, 0, 3, 2, 2 } },
     { "barbarian",   { 1, 1, 1, 1 }, { 3, 1, 1, 1 }, 0, 0, { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0 }, 10, {55,35, 5, 5 }, {30,30,20,20 }, { 3, 3, 2, 1, 2, 3, 3, 2, 1, 3, 0, 4, 4, 1 } },
@@ -83,6 +96,24 @@ static skillstats_t _skillstats[] = {
     { "wizard",      { 0, 0, 2, 2 }, { 0, 1, 2, 2 }, 1,17, { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2 }, 10, {10,10,40,40 }, {20,20,30,30 }, { 1, 3, 2, 3, 2, 2, 2, 2, 4, 2, 0, 2, 2, 5 } },
     { "necromancer", { 0, 0, 2, 2 }, { 1, 0, 2, 2 }, 1,10, { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1 }, 10, {15,15,35,35 }, {25,25,25,25 }, { 1, 3, 2, 3, 2, 0, 2, 1, 3, 2, 5, 3, 1, 4 } },
     { NULL,          { 0, 0, 0, 0 }, { 0, 0, 0, 0 }, 0, 0, { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }, 10, { 0, 0, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 } }
+};
+
+static skillvalues_t _skillvalues[] = {
+    { "pathfinding", { 25, 50,100} },
+    { "archery",     { 10, 25, 50} },
+    { "logistics",   { 10, 20, 30} },
+    { "scouting",    {  1,  2,  3} },
+    { "diplomacy",   { 25, 50,100} },
+    { "navigation",  { 33, 66,100} },
+    { "leadership",  {  1,  2,  3} },
+    { "wisdom",      {  3,  4,  5} },
+    { "mysticism",   {  2,  3,  4} },
+    { "luck",        {  1,  2,  3} },
+    { "ballistics",  {  0,  0,  0} },
+    { "eagleeye",    { 20, 30, 40} },
+    { "necromancy",  { 10, 20, 30} },
+    { "estates",     {100,250,500} },
+    { NULL,          {  0,  0,  0} },
 };
 
 const skillstats_t* GetSkillStats(u8 race)
@@ -191,8 +222,40 @@ void Skill::UpdateStats(const std::string & spec)
 
 	    ++ptr;
 	}
+
+	xml_secondary = xml_skills->FirstChildElement("secondary");
+	if(xml_secondary)
+	{
+	    skillvalues_t* ptr2 = &_skillvalues[0];
+
+	    while(ptr2->id)
+	    {
+		const TiXmlElement* xml_sec = xml_secondary->FirstChildElement(ptr2->id);
+
+		if(xml_sec)
+		{
+		    xml_sec->Attribute("basic", &value); ptr2->values.basic = value;
+		    xml_sec->Attribute("advanced", &value); ptr2->values.advanced = value;
+		    xml_sec->Attribute("expert", &value); ptr2->values.expert = value;
+		}
+
+		++ptr2;
+	    }
+	}
     }
 #endif
+}
+
+u16 Skill::Secondary::GetValues(skill_t skill, u8 level)
+{
+    switch(level)
+    {
+	case Level::BASIC:	return _skillvalues[skill - 1].values.basic;
+	case Level::ADVANCED:	return _skillvalues[skill - 1].values.advanced;
+	case Level::EXPERT:	return _skillvalues[skill - 1].values.expert;
+	default: break;
+    }
+    return 0;
 }
 
 Skill::Primary::Primary() : attack(0), defence(0), power(0), knowledge(0)
@@ -478,61 +541,61 @@ const char* Skill::Secondary::Description(const skill_t skill, const Level::type
 {
     const char* description_skill[] =
     {
-	_("Basic Pathfinding reduces the movement penalty for rough terrain by 25 percent."),
-	_("Advanced Pathfinding reduces the movement penalty for rough terrain by 50 percent."),
-	_("Expert Pathfinding eliminates the movement penalty for rough terrain."),
+	_("Basic Pathfinding reduces the movement penalty for rough terrain by %{count} percent."),
+	_("Advanced Pathfinding reduces the movement penalty for rough terrain by %{count} percent."),
+	_("Expert Pathfinding eliminates the movement penalty for rough terrain by %{count} percent."),
 
-	_("Basic Archery increases the damage done by range attacking creatures by 10 percent."),
-	_("Advanced Archery increases the damage done by range attacking creatures by 25 percent."),
-	_("Expert Archery increases the damage done by range attacking creatures by 50 percent."),
+	_("Basic Archery increases the damage done by range attacking creatures by %{count} percent."),
+	_("Advanced Archery increases the damage done by range attacking creatures by %{count} percent."),
+	_("Expert Archery increases the damage done by range attacking creatures by %{count} percent."),
 
-	_("Basic Logistics increases your hero's movement points by 10 percent."),
-	_("Advanced Logistics increases your hero's movement points by 20 percent."),
-	_("Expert Logistics increases your hero's movement points by 30 percent."),
+	_("Basic Logistics increases your hero's movement points by %{count} percent."),
+	_("Advanced Logistics increases your hero's movement points by %{count} percent."),
+	_("Expert Logistics increases your hero's movement points by %{count} percent."),
 
-	_("Basic Scouting increases your hero's viewable area by 1 square."),
-	_("Advanced Scouting increases your hero's viewable area by 2 squares."),
-	_("Expert Scouting increases your hero's viewable area by 3 squares."),
+	_("Basic Scouting increases your hero's viewable area by %{count} square."),
+	_("Advanced Scouting increases your hero's viewable area by %{count} squares."),
+	_("Expert Scouting increases your hero's viewable area by %{count} squares."),
 
-	_("Basic Diplomacy allows you to negotiate with monsters who are weaker than your group. Approximately 1/4 of the creatures may offer to join you."),
-	_("Advanced Diplomacy allows you to negotiate with monsters who are weaker than your group. Approximately 1/2 of the creatures may offer to join you."),
-	_("Expert Diplomacy allows you to negotiate with monsters who are weaker than your group. All of the creatures may offer to join you."),
+	_("Basic Diplomacy allows you to negotiate with monsters who are weaker than your group. Approximately %{count} percent of the creatures may offer to join you."),
+	_("Advanced Diplomacy allows you to negotiate with monsters who are weaker than your group. Approximately %{count} percent of the creatures may offer to join you."),
+	_("Expert Diplomacy allows you to negotiate with monsters who are weaker than your group. %{count} percent of the creatures may offer to join you."),
 
-	_("Basic Navigation increases your hero's movement points over water by 1/3."),
-	_("Advanced Navigation increases your hero's movement points over water by 2/3."),
-	_("Expert Navigation doubles your hero's movement points over water."),
+	_("Basic Navigation increases your hero's movement points over water by %{count} percent."),
+	_("Advanced Navigation increases your hero's movement points over water by %{count} percent."),
+	_("Expert Navigation increases your hero's movement points over water by %{count} percent."),
 
-	_("Basic Leadership increases your hero's troops' morale by 1."),
-	_("Advanced Leadership increases your hero's troops' morale by 2."),
-	_("Expert Leadership increases your hero's troops' morale by 3."),
+	_("Basic Leadership increases your hero's troops' morale by %{count}."),
+	_("Advanced Leadership increases your hero's troops' morale by %{count}."),
+	_("Expert Leadership increases your hero's troops' morale by %{count}."),
 
 	_("Basic Wisdom allows your hero to learn third level spells."),
 	_("Advanced Wisdom allows your hero to learn fourth level spells."),
 	_("Expert Wisdom allows your hero to learn fifth level spells."),
 
-	_("Basic Mysticism regenerates two of your hero's spell points per day."),
-	_("Advanced Mysticism regenerates three of your hero's spell points per day."),
-	_("Expert Mysticism regenerates four of your hero's spell points per day."),
+	_("Basic Mysticism regenerates %{count} of your hero's spell points per day."),
+	_("Advanced Mysticism regenerates %{count} of your hero's spell points per day."),
+	_("Expert Mysticism regenerates %{count} of your hero's spell points per day."),
 
-	_("Basic Luck increases your hero's luck by 1."),
-	_("Advanced Luck increases your hero's luck by 2."),
-	_("Expert Luck increases your hero's luck by 3."),
+	_("Basic Luck increases your hero's luck by %{count}."),
+	_("Advanced Luck increases your hero's luck by %{count}."),
+	_("Expert Luck increases your hero's luck by %{count}."),
 
 	_("Basic Ballistics gives your hero's catapult shots a greater chance to hit and do damage to castle walls."),
 	_("Advanced Ballistics gives your hero's catapult an extra shot, and each shot has a greater chance to hit and do damage to castle walls."),
 	_("Expert Ballistics gives your hero's catapult an extra shot, and each shot automatically destroys any wall, except a fortified wall in a Knight town."),
 
-	_("Basic Eagle Eye gives your hero a 20 percent chance to learn any given 1st or 2nd level enemy spell used against him in a combat."),
-	_("Advanced Eagle Eye gives your hero a 30 percent chance to learn any given 3rd level spell (or below) used against him in combat."),
-	_("Expert Eagle Eye gives your hero a 40 percent chance to learn any given 4th level spell (or below) used against him in combat."),
+	_("Basic Eagle Eye gives your hero a %{count} percent chance to learn any given 1st or 2nd level enemy spell used against him in a combat."),
+	_("Advanced Eagle Eye gives your hero a %{count} percent chance to learn any given 3rd level spell (or below) used against him in combat."),
+	_("Expert Eagle Eye gives your hero a %{count} percent chance to learn any given 4th level spell (or below) used against him in combat."),
 
-	_("Basic Necromancy allows 10 percent of the creatures killed in combat to be brought back from the dead as Skeletons."),
-	_("Advanced Necromancy allows 20 percent of the creatures killed in combat to be brought back from the dead as Skeletons."),
-	_("Expert Necromancy allows 30 percent of the creatures killed in combat to be brought back from the dead as Skeletons."),
+	_("Basic Necromancy allows %{count} percent of the creatures killed in combat to be brought back from the dead as Skeletons."),
+	_("Advanced Necromancy allows %{count} percent of the creatures killed in combat to be brought back from the dead as Skeletons."),
+	_("Expert Necromancy allows %{count} percent of the creatures killed in combat to be brought back from the dead as Skeletons."),
 
-	_("Your hero produces 100 gold pieces per turn as tax revenue from estates."),
-	_("Your hero produces 250 gold pieces per turn as tax revenue from estates."),
-	_("Your hero produces 500 gold pieces per turn as tax revenue from estates.") };
+	_("Your hero produces %{count} gold pieces per turn as tax revenue from estates."),
+	_("Your hero produces %{count} gold pieces per turn as tax revenue from estates."),
+	_("Your hero produces %{count} gold pieces per turn as tax revenue from estates.") };
 
     u8 index = 0;
 
@@ -820,6 +883,8 @@ void StringAppendModifiers(std::string & str, s8 value)
 
 s8 Skill::GetLeadershipModifiers(u8 level, std::string* strs = NULL)
 {
+    level = Secondary::GetValues(Secondary::LEADERSHIP, level);
+
     if(level && strs)
     {
         strs->append(Level::String(level));
@@ -829,19 +894,13 @@ s8 Skill::GetLeadershipModifiers(u8 level, std::string* strs = NULL)
         strs->append("\n");
     }
 
-    switch(level)
-    {
-	case Level::BASIC:	return 1;
-	case Level::ADVANCED:	return 2;
-	case Level::EXPERT:	return 3;
-	default: break;
-    }
-
-    return 0;
+    return level;
 }
 
 s8 Skill::GetLuckModifiers(u8 level, std::string* strs = NULL)
 {
+    level = Secondary::GetValues(Secondary::LUCK, level);
+
     if(level && strs)
     {
         strs->append(Level::String(level));
@@ -851,13 +910,5 @@ s8 Skill::GetLuckModifiers(u8 level, std::string* strs = NULL)
         strs->append("\n");
     }
 
-    switch(level)
-    {
-	case Level::BASIC:	return 1;
-	case Level::ADVANCED:	return 2;
-	case Level::EXPERT:	return 3;
-	default: break;
-    }
-
-    return 0;
+    return level;
 }

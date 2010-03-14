@@ -64,43 +64,39 @@ u16 Maps::Ground::GetBasePenalty(const u16 index, const u8 pathfinding)
     //    Road    0.75   0.75   0.75   0.75
 
     // if(tile.isRoad(direct)) need fix isRoad(Direction::vector_t)
+
+
     if(tile.isRoad())
         return 75;
     else
-        switch(tile.GetGround())
-         {
-            case DESERT:
-                if(Skill::Level::EXPERT == pathfinding)
-                    return 100;
-                else if(Skill::Level::ADVANCED == pathfinding)
-                    return 150;
-                else if(Skill::Level::BASIC == pathfinding)
-                    return 175;
-                else
-                    return 200;
+    switch(tile.GetGround())
+    {
+        case DESERT:
+	{
+	    u16 fee = Skill::Secondary::GetValues(Skill::Secondary::PATHFINDING, pathfinding);
+	    if(fee > 100) fee = 100;
 
-            case SNOW:
-            case SWAMP:
-                if(Skill::Level::EXPERT == pathfinding)
-                    return 100;
-                else if(Skill::Level::ADVANCED == pathfinding)
-                    return 125;
-                else if(Skill::Level::BASIC == pathfinding)
-                    return 150;
-                else
-                    return 175;
+	    const u8 extra = 100;
+	    return 100 + extra - (extra * fee / 100);
+	}
 
-            case WASTELAND:
-            case BEACH:
-                return (Skill::Level::NONE == pathfinding ? 125 : 100);
+        case SNOW:
+        case SWAMP:
+	{
+	    u16 fee = Skill::Secondary::GetValues(Skill::Secondary::PATHFINDING, pathfinding);
 
-            case LAVA:
-            case DIRT:
-            case GRASS:
-            case WATER:			return 100;
+	    const u8 extra = 75;
+	    return 100 + extra - (extra * fee / 100);
+	}
 
-            default:			return 100;
-        }
+        case WASTELAND:
+        case BEACH:
+            return (Skill::Level::NONE == pathfinding ? 125 : 100);
+
+        default: break;
+    }
+
+    return 100;
 }
 
 u16 Maps::Ground::GetPenalty(const u16 index, const Direction::vector_t direct, const u8 pathfinding)

@@ -625,13 +625,7 @@ u32 Battle2::Stats::GetDamage(const Stats & enemy) const
             // check skill archery +%10, +%25, +%50
             if(GetCommander())
             {
-                switch(GetCommander()->GetLevelSkill(Skill::Secondary::ARCHERY))
-                {
-                    case Skill::Level::BASIC:   dmg += dmg * 0.1; break;
-                    case Skill::Level::ADVANCED:dmg += dmg * 0.25; break;
-                    case Skill::Level::EXPERT:  dmg += dmg * 0.5; break;
-                    default: break;
-            	}
+		dmg += (dmg * GetCommander()->GetSecondaryValues(Skill::Secondary::ARCHERY) / 100);
 	    }
 
 	    // check castle defence

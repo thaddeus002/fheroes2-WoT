@@ -48,6 +48,7 @@ class Captain : public HeroBase
     u16 GetIndex(void) const;
 
     u8 GetLevelSkill(const Skill::Secondary::skill_t) const;
+    u8 GetSecondaryValues(const Skill::Secondary::skill_t skill) const;
 
     const Army::army_t & GetArmy(void) const;
     Army::army_t & GetArmy(void);
