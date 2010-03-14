@@ -261,6 +261,28 @@ BuildingInfo::BuildingInfo(const Castle & c, building_t b) : castle(c), building
     else
 	description = Castle::GetDescriptionBuilding(building, castle.GetRace());
 
+    switch(building)
+    {
+	case BUILD_WELL:
+    	    String::Replace(description, "%{count}", Castle::GetGrownWell());
+	    break;
+
+	case BUILD_WEL2:
+    	    String::Replace(description, "%{count}", Castle::GetGrownWel2());
+	    break;
+
+	case BUILD_CASTLE:
+	case BUILD_STATUE:
+	case BUILD_SPEC:
+	{
+	    const payment_t profit = ProfitConditions::FromBuilding(building, castle.GetRace());
+	    String::Replace(description, "%{count}", profit.gold);
+	    break;
+	}
+
+	default: break;
+    }
+
     // necr and tavern check
     if(Race::NECR == castle.GetRace() && BUILD_TAVERN == building && !Settings::Get().PriceLoyaltyVersion())
 	disable = true;
@@ -476,10 +498,6 @@ bool BuildingInfo::DialogBuyBuilding(bool buttons) const
 
     Cursor & cursor = Cursor::Get();
     cursor.Hide();
-
-    std::string description = GetDescription();
-    const payment_t profit = ProfitConditions::FromBuilding(building, castle.GetRace());
-    if(profit.gold) String::Replace(description, "%{count}", profit.gold);
 
     TextBox box1(description, Font::BIG, BOXAREA_WIDTH);
 
