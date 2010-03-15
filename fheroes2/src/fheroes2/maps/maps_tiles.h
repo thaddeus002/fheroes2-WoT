@@ -109,6 +109,7 @@ namespace Maps
 	TilesAddon * FindRNDMonster(void);
 	TilesAddon * FindMonster(void);
 	const TilesAddon * FindMines(void) const;
+	const TilesAddon * FindStandingStones(void) const;
 	TilesAddon * FindJail(void);
 	TilesAddon * FindBarrier(void);
 

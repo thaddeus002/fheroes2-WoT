@@ -924,6 +924,24 @@ Maps::TilesAddon * Maps::Tiles::FindWaterResource(void)
     return NULL;
 }
 
+const Maps::TilesAddon * Maps::Tiles::FindStandingStones(void) const
+{
+    if(addons_level1.size())
+    {
+	std::list<TilesAddon>::const_iterator it1 = addons_level1.begin();
+	std::list<TilesAddon>::const_iterator it2 = addons_level1.end();
+
+	for(; it1 != it2; ++it1)
+	{
+	    const TilesAddon & addon = *it1;
+
+	    if(ICN::OBJNMULT == MP2::GetICNObject(addon.object) && (addon.index == 84 || addon.index == 85)) return &addon;
+	}
+    }
+
+    return NULL;
+}
+
 Maps::TilesAddon * Maps::Tiles::FindResource(void)
 {
     if(addons_level1.size())
