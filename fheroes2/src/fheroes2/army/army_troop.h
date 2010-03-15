@@ -33,6 +33,8 @@ namespace Battle2
     class Stats;
 };
 
+namespace Maps { class Tiles; };
+
 namespace Army
 {
     class army_t;
@@ -49,6 +51,7 @@ namespace Army
       public:
         Troop(monster_t m = Monster::UNKNOWN, u32 c = 0);
         Troop(const Troop &);
+	Troop(const Maps::Tiles &);
 	~Troop();
         
         Troop & operator= (const Troop &);

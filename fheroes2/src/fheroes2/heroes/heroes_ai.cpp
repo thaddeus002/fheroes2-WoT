@@ -397,26 +397,23 @@ void AIToMonster(Heroes &hero, const u8 obj, const u16 dst_index)
 {
     bool avoidBattle = false, destroyTile = false;
     Maps::Tiles & tile = world.GetTiles(dst_index);
-    const Monster monster(tile);
-    Army::army_t army;
-    army.JoinTroop(monster, tile.GetCountMonster());
-    army.ArrangeForBattle();
+    const Army::Troop troop(tile);
 
-    const float ratios = army.isValid() ? hero.GetArmy().GetHitPoints() / army.GetHitPoints() : 0;
+    const float ratios = troop.isValid() ? hero.GetArmy().GetHitPoints() / troop.GetHitPoints() : 0;
 
-    const bool check_free_stack = (hero.GetArmy().GetCount() < hero.GetArmy().Size() || hero.GetArmy().HasMonster(monster));
+    const bool check_free_stack = (hero.GetArmy().GetCount() < hero.GetArmy().Size() || hero.GetArmy().HasMonster(troop()));
     const bool check_extra_condition = Morale::NORMAL <= hero.GetMorale();
     
     if(tile.GetQuantity4() && check_free_stack && check_extra_condition && ratios >= 2)
     {
-        DEBUG(DBG_AI , DBG_INFO, "AIToMonster: possible " << hero.GetName() << " join monster " << monster.GetName());
+        DEBUG(DBG_AI , DBG_INFO, "AIToMonster: possible " << hero.GetName() << " join monster " << troop.GetName());
 
         if(2 == tile.GetQuantity4())
         {
             // join if ranged or flying monsters present
-            if(hero.GetArmy().HasMonster(monster) || monster.isArchers() || monster.isFly())
+            if(hero.GetArmy().HasMonster(troop()) || troop.isArchers() || troop.isFly())
             {
-                hero.GetArmy().JoinTroop(monster, tile.GetCountMonster());
+                hero.GetArmy().JoinTroop(troop);
                 avoidBattle = true;
 		destroyTile = true;
             }
@@ -426,21 +423,21 @@ void AIToMonster(Heroes &hero, const u8 obj, const u16 dst_index)
         else
         if(hero.HasSecondarySkill(Skill::Secondary::DIPLOMACY))
         {
-            u32 toJoin = tile.GetCountMonster();
+            u32 toJoin = troop.GetCount();
 
 	    Kingdom & kingdom = world.GetKingdom(hero.GetColor());
-            PaymentConditions::BuyMonster cost(monster());
+            PaymentConditions::BuyMonster cost(troop());
             cost *= toJoin;
     
 	    // skill diplomacy
-	    toJoin = Monster::GetCountFromHitPoints(monster(), toJoin * monster.GetHitPoints() * hero.GetSecondaryValues(Skill::Secondary::DIPLOMACY) / 100);
+	    toJoin = Monster::GetCountFromHitPoints(troop(), troop.GetHitPoints() * hero.GetSecondaryValues(Skill::Secondary::DIPLOMACY) / 100);
 
             if(toJoin && kingdom.AllowPayment(cost))
             {
                 // join if archers or fly or present
-                if(hero.GetArmy().HasMonster(monster) || monster.isArchers() || monster.isFly())
+                if(hero.GetArmy().HasMonster(troop()) || troop.isArchers() || troop.isFly())
                 {
-                    hero.GetArmy().JoinTroop(monster, toJoin);
+                    hero.GetArmy().JoinTroop(troop(), toJoin);
                     kingdom.OddFundsResource(cost);
                     avoidBattle = true;
 		    destroyTile = true;
@@ -451,7 +448,7 @@ void AIToMonster(Heroes &hero, const u8 obj, const u16 dst_index)
         }
     }
 
-    if(!army.isValid())
+    if(!troop.isValid())
     {
 	avoidBattle = true;
         destroyTile = true;
@@ -464,10 +461,14 @@ void AIToMonster(Heroes &hero, const u8 obj, const u16 dst_index)
 	if(avoidBattle) destroyTile = true;
     }
 
-    DEBUG(DBG_AI , DBG_INFO, "AIToMonster: " << hero.GetName() << " attack monster " << monster.GetName());
+    DEBUG(DBG_AI , DBG_INFO, "AIToMonster: " << hero.GetName() << " attack monster " << troop.GetName());
 
     if(!avoidBattle)
     {
+	Army::army_t army;
+	army.JoinTroop(troop);
+	army.ArrangeForBattle();
+
         // new battle2
         Battle2::Result res = Battle2::Loader(hero.GetArmy(), army, dst_index);
 
@@ -482,7 +483,7 @@ void AIToMonster(Heroes &hero, const u8 obj, const u16 dst_index)
             AIBattleLose(hero, res.AttackerResult());
             if(!Settings::Get().OriginalVersion())
             {
-                tile.SetCountMonster(army.GetCountMonsters(monster));
+                tile.SetCountMonster(army.GetCountMonsters(troop()));
                 if(2 == tile.GetQuantity4()) tile.SetQuantity4(1);
             }
         }
@@ -496,8 +497,8 @@ void AIToMonster(Heroes &hero, const u8 obj, const u16 dst_index)
             const u32 uniq = addon->uniq;
             tile.Remove(uniq);
             tile.SetObject(MP2::OBJ_ZERO);
-    	    tile.SetCountMonster(0);
-                
+    	    tile.ResetQuantity();
+
             // remove shadow from left cell
             if(Maps::isValidDirection(dst_index, Direction::LEFT))
                 world.GetTiles(Maps::GetDirectionIndex(dst_index, Direction::LEFT)).Remove(uniq);
@@ -1879,9 +1880,8 @@ bool Heroes::AIValidObject(u16 index, u8 obj)
 
 	case MP2::OBJ_MONSTER:
 	{
-            const Maps::Tiles & tile = world.GetTiles(index);
             Army::army_t enemy;
-            enemy.JoinTroop(Monster(tile), tile.GetCountMonster());
+            enemy.JoinTroop(Army::Troop(world.GetTiles(index)));
 
             // can we will win battle
             if(enemy.isValid() && GetArmy().StrongerEnemyArmy(enemy)) return true;

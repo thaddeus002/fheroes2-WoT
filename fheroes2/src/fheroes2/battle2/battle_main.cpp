@@ -279,7 +279,7 @@ void Battle2::NecromancySkillAction(Army::army_t & army1, Army::army_t & army2, 
 	String::Replace(msg, "%{count}", count);
 	String::Replace(msg, "%{monster}", skeleton.GetMultiName());
 	Surface sf1(40, 45);
-	const Sprite & sf2 = AGG::GetICN(ICN::MONS32, skeleton.GetSpriteIndex());
+	const Sprite & sf2 = AGG::GetICN(ICN::MONS32, Monster::GetSpriteIndex(skeleton()));
 	sf1.SetColorKey();
 	sf1.Blit(sf2, (sf1.w() - sf2.w()) / 2, 0);
 	std::string str;

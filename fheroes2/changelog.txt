@@ -1,4 +1,15 @@
-SVN - up to r1618
+SVN - up to r1640
++ Added 'Haunt' spell
++ Added 'Set Elemental Guardians' spell
++ Added customizing secondary skills
++ Added customization params kingdom::max_heroes
++ Fixed restore spell points from mysticism
++ Fixed 'Standing Stones' secondary visited
++ Fixed starting spell points for recruit heroes
++ Updated AI for double cell attack monsters
++ Updated battle GetDamage algorithm
+
+Mar, 13, 2010
 + Added customizing 'Dimension Door' spell
 + Added spells customizing (spell cost and damage and others params)
 + Fixed casting spell from scroll artifact

@@ -29,6 +29,7 @@
 #include "luck.h"
 #include "morale.h"
 #include "army.h"
+#include "maps_tiles.h"
 #include "army_troop.h"
 #include "battle_stats.h"
 
@@ -38,6 +39,12 @@ Army::Troop::Troop(monster_t m, u32 c) : Monster(m), count(c), army(NULL), battl
 
 Army::Troop::Troop(const Troop & t) : Monster(t.id), count(t.count), army(t.army), battle(NULL)
 {
+}
+
+Army::Troop::Troop(const Maps::Tiles & t) : army(NULL), battle(NULL)
+{
+    id = Monster::FromInt(t.GetQuantity3());
+    count = t.GetCountMonster();
 }
 
 Army::Troop::~Troop()

@@ -50,6 +50,7 @@ namespace Army
 namespace Maps
 {
     class FileInfo;
+    class Tiles;
 };
 
 namespace Dialog

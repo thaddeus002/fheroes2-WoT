@@ -190,7 +190,7 @@ void SelectArmyBar::Redraw(Surface & display)
             }
 
 	    const Sprite & spmonh = AGG::GetICN(troop.ICNMonh(), 0);
-	    const Sprite & mons32 = AGG::GetICN(ICN::MONS32, troop.GetSpriteIndex());
+	    const Sprite & mons32 = AGG::GetICN(ICN::MONS32, Monster::GetSpriteIndex(troop()));
 
             if(flags & FLAGS_USEMONS32)
 	    {

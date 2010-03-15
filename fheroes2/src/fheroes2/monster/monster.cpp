@@ -24,7 +24,6 @@
 #include "difficulty.h"
 #include "mp2.h"
 #include "speed.h"
-#include "maps_tiles.h"
 #include "settings.h"
 #include "luck.h"
 #include "morale.h"
@@ -197,10 +196,6 @@ Monster::Monster(monster_t m) : id(m)
 {
 }
 
-Monster::Monster(const Maps::Tiles & t) : id(FromMaps(t))
-{
-}
-
 Monster::Monster(u8 race, u32 dwelling) : id(FromDwelling(race, dwelling))
 {
 }
@@ -354,11 +349,6 @@ u16 Monster::GetRNDSize(bool skip_factor) const
     }
 
     return GetCountFromHitPoints(id, res);
-}
-
-u8 Monster::GetSpriteIndex(void) const
-{
-    return UNKNOWN < id ? id - 1 : 0;
 }
 
 const char* Monster::GetName(void) const
@@ -743,13 +733,6 @@ Monster::monster_t Monster::FromObject(u8 obj)
     return UNKNOWN;
 }
 
-Monster::monster_t Monster::FromMaps(const Maps::Tiles & tile)
-{
-    Maps::TilesAddon * addons = const_cast<Maps::Tiles &>(tile).FindMonster();
-
-    return (addons ? FromInt(addons->index + 1) : UNKNOWN);
-}
-
 Monster::monster_t Monster::Rand(level_t level)
 {
     switch(level)
@@ -1031,6 +1014,11 @@ const char* Monster::GetName(monster_t m)
 const char* Monster::GetMultiName(monster_t m)
 {
     return _(monsters[m].multiname);
+}
+
+u8 Monster::GetSpriteIndex(u8 m)
+{
+    return UNKNOWN < m ? m - 1 : 0;
 }
 
 Monster::monster_t Monster::Upgrade(Monster & m)

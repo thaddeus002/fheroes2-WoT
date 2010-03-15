@@ -1596,12 +1596,12 @@ void World::UpdateMonsterPopulation(void)
     for(; it1 != it2; ++it1) if(*it1 && MP2::OBJ_MONSTER == (*it1)->GetObject())
     {
 	Maps::Tiles & tile = **it1;
-	const u16 count = tile.GetCountMonster();
+	const Army::Troop troop(tile);
 
-	if(0 == count)
-	    tile.SetCountMonster(Monster(tile).GetRNDSize(false));
+	if(0 == troop.GetCount())
+	    tile.SetCountMonster(troop.GetRNDSize(false));
 	else
-	    tile.SetCountMonster(count * 8 / 7);
+	    tile.SetCountMonster(troop.GetCount() * 8 / 7);
     }
 }
 

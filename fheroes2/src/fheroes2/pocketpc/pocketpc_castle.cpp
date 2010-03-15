@@ -985,7 +985,7 @@ void DwellingBar::Redraw(void) const
     	display.Blit(AGG::GetICN(ICN::SWAPWIN, 0), Rect(36, 267, w, h), dw[ii].x, dw[ii].y);
     	const u32 dwelling = castle.GetActualDwelling(GetDwellingFromIndex(ii));
 	Monster m(castle.GetRace(), dwelling);
-	const Sprite & mons32 = AGG::GetICN(ICN::MONS32, m.GetSpriteIndex());
+	const Sprite & mons32 = AGG::GetICN(ICN::MONS32, Monster::GetSpriteIndex(m()));
     	display.Blit(mons32, dw[ii].x + (w - mons32.w()) / 2, dw[ii].y + (h - 3 - mons32.h()));
 
     	if(castle.isBuild(dwelling))

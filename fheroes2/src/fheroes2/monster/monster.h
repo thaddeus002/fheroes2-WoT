@@ -30,8 +30,6 @@
 #include "payment.h"
 #include "gamedefs.h"
 
-namespace Maps { class Tiles; };
-
 class Monster : public Skill::Primary
 {
 public:
@@ -125,7 +123,6 @@ public:
 
     Monster();
     Monster(monster_t);
-    Monster(const Maps::Tiles &);
     Monster(u8, u32);
 
     bool operator== (monster_t) const;
@@ -155,7 +152,6 @@ public:
     u8  GetGrown(void) const;
     u8  GetLevel(void) const;
     u16 GetRNDSize(bool skip) const;
-    u8  GetSpriteIndex(void) const;
 
     const char* GetName(void) const;
     const char* GetMultiName(void) const;
@@ -175,6 +171,7 @@ public:
     static u8  GetLevel(Monster &);
     static u32 GetDwelling(Monster &);
 
+    static u8 GetSpriteIndex(u8);
     static const char* GetName(monster_t);
     static const char* GetMultiName(monster_t);
     static monster_t Upgrade(monster_t);
@@ -188,7 +185,6 @@ public:
     static monster_t FromInt(u8);
     static monster_t FromDwelling(u8, u32);
     static monster_t FromObject(u8);
-    static monster_t FromMaps(const Maps::Tiles &);
     static monster_t Rand(level_t = LEVEL0);
 
     static void UpdateStats(const std::string &);

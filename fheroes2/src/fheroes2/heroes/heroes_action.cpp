@@ -103,6 +103,49 @@ void ActionToShinx(Heroes &hero, const u8 obj, const u16 dst_index);
 void ActionToBarrier(Heroes &hero, const u8 obj, const u16 dst_index);
 void ActionToTravellersTent(Heroes &hero, const u8 obj, const u16 dst_index);
 
+u16 DialogCaptureResourceObject(const std::string & hdr, std::string & msg, const u8 res, const u16 buttons = Dialog::OK)
+{
+    const Sprite & sprite = AGG::GetICN(ICN::RESOURCE, Resource::GetIndexSprite2(res));
+
+    // sprite resource with x / day test
+    Surface sf(sprite.w(), sprite.h() + 14);
+    sf.SetColorKey();
+    sf.Blit(sprite);
+
+    std::string perday = _("%{count} / day");
+    payment_t info = ProfitConditions::FromMine(res);
+    s32* current = NULL;
+
+    switch(res)
+    {
+	case Resource::MERCURY:	current = &info.mercury;  break;
+	case Resource::WOOD:	current = &info.wood; break;
+	case Resource::ORE:	current = &info.ore; break;
+	case Resource::SULFUR:	current = &info.sulfur; break;
+	case Resource::CRYSTAL:	current = &info.crystal; break;
+	case Resource::GEMS:	current = &info.gems; break;
+	case Resource::GOLD:	current = &info.gold; break;
+	default: break;
+    }
+
+    if(current)
+    {
+	String::Replace(perday, "%{count}", *current);
+
+	switch(*current)
+	{
+	    case 1:  String::Replace(msg, "%{count}", _("one")); break;
+	    case 2:  String::Replace(msg, "%{count}", _("two")); break;
+	    default: String::Replace(msg, "%{count}", *current); break;
+	}
+    }
+
+    Text text(perday, Font::SMALL);
+    text.Blit((sf.w() - text.w()) / 2, sf.h() - 12, sf);
+
+    return Dialog::SpriteInfo(hdr, msg, sf, buttons);
+}
+
 u16 DialogGoldWithExp(const std::string & hdr, const std::string & msg, const u16 count, const u16 exp, const u16 buttons = Dialog::OK)
 {
     const Sprite & gold = AGG::GetICN(ICN::RESOURCE, 6);
@@ -493,33 +536,29 @@ void ActionToMonster(Heroes &hero, const u8 obj, const u16 dst_index)
 {
     bool destroyTile = false, avoidBattle = false;
     Maps::Tiles & tile = world.GetTiles(dst_index);
-    const Monster monster(tile);
-    Army::army_t army;
+    const Army::Troop troop(tile);
 
-    army.JoinTroop(monster, tile.GetCountMonster());
-    army.ArrangeForBattle();
+    const float ratios = troop.isValid() ? hero.GetArmy().GetHitPoints() / troop.GetHitPoints() : 0;
 
-    const float ratios = army.isValid() ? hero.GetArmy().GetHitPoints() / army.GetHitPoints() : 0;
-
-    const bool check_free_stack = (hero.GetArmy().GetCount() < hero.GetArmy().Size() || hero.GetArmy().HasMonster(monster));
+    const bool check_free_stack = (hero.GetArmy().GetCount() < hero.GetArmy().Size() || hero.GetArmy().HasMonster(troop()));
     const bool check_extra_condition = Morale::NORMAL <= hero.GetMorale();
     // force join for campain and others...
-    const bool force_join = (5 == tile.GetQuantity4() && hero.GetColor() == tile.GetQuantity3());
+    const bool force_join = (5 == tile.GetQuantity4());
 
     if(tile.GetQuantity4() && check_free_stack && ((check_extra_condition && ratios >= 2) || force_join))
     {
-        DEBUG(DBG_GAME , DBG_INFO, "ActionToMonster: possible " << hero.GetName() << " join monster " << monster.GetName());
+        DEBUG(DBG_GAME , DBG_INFO, "ActionToMonster: possible " << hero.GetName() << " join monster " << troop.GetName());
 
         // free join
 	if(2 == tile.GetQuantity4() || force_join)
         {
             std::string message = _("A group of %{monster} with a desire for greater glory wish to join you.\nDo you accept?");
-            std::string monst = monster.GetMultiName();
+            std::string monst = troop.GetMultiName();
             String::Lower(monst);
             String::Replace(message, "%{monster}", monst);
             if(Dialog::Message("Followers", message, Font::BIG, Dialog::YES | Dialog::NO) == Dialog::YES)
             {
-                hero.GetArmy().JoinTroop(monster, tile.GetCountMonster());
+                hero.GetArmy().JoinTroop(troop);
                 avoidBattle = true;
         	destroyTile = true;
             }
@@ -528,38 +567,38 @@ void ActionToMonster(Heroes &hero, const u8 obj, const u16 dst_index)
         else
         if(hero.HasSecondarySkill(Skill::Secondary::DIPLOMACY))
         {
-            u32 toJoin = tile.GetCountMonster();
+            u32 toJoin = troop.GetCount();
 
 	    Kingdom & kingdom = world.GetKingdom(hero.GetColor());
-            PaymentConditions::BuyMonster cost(monster());
+            PaymentConditions::BuyMonster cost(troop());
     	    cost *= toJoin;
 
 	    // skill diplomacy
-	    toJoin = Monster::GetCountFromHitPoints(monster(), toJoin * monster.GetHitPoints() * hero.GetSecondaryValues(Skill::Secondary::DIPLOMACY) / 100);
+	    toJoin = Monster::GetCountFromHitPoints(troop(), troop.GetHitPoints() * hero.GetSecondaryValues(Skill::Secondary::DIPLOMACY) / 100);
 
     	    if(toJoin && kingdom.AllowPayment(cost))
             {
                 std::string message;
-                if(tile.GetCountMonster() == 1)
+                if(troop.GetCount() == 1)
                     message = _("The creature is swayed by your diplomatic tongue, and offers to join your army for the sum of %{gold} gold.\nDo you accept?");
                 else
                 {
                     message = _("The creatures are swayed by your diplomatic\ntongue, and make you an offer:\n \n");
-                    if(toJoin != tile.GetCountMonster())
+                    if(toJoin != troop.GetCount())
                         message += _("%{offer} of the %{total} %{monster} will join your army, and the rest will leave you alone, for the sum of %{gold} gold.\nDo you accept?");
                     else
                 	message += _("All %{offer} of the %{monster} will join your army for the sum of %{gold} gold.\nDo you accept?");
                 }
                 String::Replace(message, "%{offer}", toJoin);
-                String::Replace(message, "%{total}", tile.GetCountMonster());
-                std::string monst = monster.GetMultiName();
+                String::Replace(message, "%{total}", troop.GetCount());
+                std::string monst = troop.GetMultiName();
                 String::Lower(monst);
                 String::Replace(message, "%{monster}", monst);
                 String::Replace(message, "%{gold}", cost.gold);
 
                 if(Dialog::YES == Dialog::ResourceInfo("", message, cost, Dialog::YES | Dialog::NO))
                 {
-                    hero.GetArmy().JoinTroop(monster, toJoin);
+                    hero.GetArmy().JoinTroop(troop(), toJoin);
                     kingdom.OddFundsResource(cost);
                     avoidBattle = true;
         	    destroyTile = true;
@@ -570,7 +609,7 @@ void ActionToMonster(Heroes &hero, const u8 obj, const u16 dst_index)
         }
     }
 
-    if(!army.isValid())
+    if(!troop.isValid())
     {
 	avoidBattle = true;
     	destroyTile = true;
@@ -580,7 +619,7 @@ void ActionToMonster(Heroes &hero, const u8 obj, const u16 dst_index)
     if(!avoidBattle && ratios >= 5)
     {
 	std::string message = _("The %{monster}, awed by the power of your forces, begin to scatter.\nDo you wish to pursue and engage them?");
-        std::string monst = monster.GetMultiName();
+        std::string monst = troop.GetMultiName();
         String::Lower(monst);
         String::Replace(message, "%{monster}", monst);
 
@@ -591,11 +630,15 @@ void ActionToMonster(Heroes &hero, const u8 obj, const u16 dst_index)
 	}
     }
     
-    DEBUG(DBG_GAME , DBG_INFO, "ActionToMonster: " << hero.GetName() << " attack monster " << monster.GetName());
+    DEBUG(DBG_GAME , DBG_INFO, "ActionToMonster: " << hero.GetName() << " attack monster " << troop.GetName());
 
     // new battle2
     if(!avoidBattle)
     {
+	Army::army_t army;
+	army.JoinTroop(troop);
+	army.ArrangeForBattle();
+
 	Battle2::Result res = Battle2::Loader(hero.GetArmy(), army, dst_index);
 
 	if(res.AttackerWins())
@@ -609,7 +652,7 @@ void ActionToMonster(Heroes &hero, const u8 obj, const u16 dst_index)
     	    BattleLose(hero, res.AttackerResult());
     	    if(!Settings::Get().OriginalVersion())
     	    {
-        	tile.SetCountMonster(army.GetCountMonsters(monster));
+        	tile.SetCountMonster(army.GetCountMonsters(troop()));
         	// reset "can join"
         	if(2 == tile.GetQuantity4()) tile.SetQuantity4(1);
     	    }
@@ -626,7 +669,7 @@ void ActionToMonster(Heroes &hero, const u8 obj, const u16 dst_index)
             AnimationRemoveObject(tile);
             tile.Remove(uniq);
             tile.SetObject(MP2::OBJ_ZERO);
-    	    tile.SetCountMonster(0);
+    	    tile.ResetQuantity();
 
             // remove shadow from left cell
             if(Maps::isValidDirection(dst_index, Direction::LEFT))
@@ -2036,24 +2079,25 @@ void ActionToAbandoneMine(Heroes &hero, const u8 obj, const u16 dst_index)
 	Army::army_t army;
 	army.FromGuardian(tile);
 
-	    // new battle2
-	    Battle2::Result res = Battle2::Loader(hero.GetArmy(), army, dst_index);
-    	    if(res.AttackerWins())
-    	    {
-    		payment_t info = ProfitConditions::FromMine(Resource::GOLD);
-		hero.IncreaseExperience(res.GetExperience());
-		PlaySoundSuccess;
-		DialogWithGold(MP2::StringObject(obj), _("You beat the Ghosts and are able to restore the mine to production."), info.gold);
-		tile.SetQuantity1(0);
-		tile.UpdateAbandoneMineSprite();
-		hero.SaveUnderObject(MP2::OBJ_MINES);
-		world.CaptureObject(dst_index, hero.GetColor());
-		hero.ActionAfterBattle();
-	    }
-	    else
-	    {
-		BattleLose(hero, res.AttackerResult());
-	    }
+	// new battle2
+	Battle2::Result res = Battle2::Loader(hero.GetArmy(), army, dst_index);
+    	if(res.AttackerWins())
+    	{
+    	    payment_t info = ProfitConditions::FromMine(tile.GetQuantity4());
+	    hero.IncreaseExperience(res.GetExperience());
+	    PlaySoundSuccess;
+	    std::string msg = _("You beat the Ghosts and are able to restore the mine to production.");
+	    DialogCaptureResourceObject(MP2::StringObject(obj), msg, tile.GetQuantity4());
+	    tile.UpdateAbandoneMineSprite();
+	    tile.ResetQuantity();
+	    hero.SaveUnderObject(MP2::OBJ_MINES);
+	    world.CaptureObject(dst_index, hero.GetColor());
+	    hero.ActionAfterBattle();
+	}
+	else
+	{
+	    BattleLose(hero, res.AttackerResult());
+	}
 
 	DEBUG(DBG_GAME , DBG_INFO, "ActionToAbandoneMine: " << hero.GetName());
     }
@@ -2127,57 +2171,53 @@ void ActionToCaptureObject(Heroes &hero, const u8 obj, const u16 dst_index)
     }
 
     // capture object
-    if(res != Resource::UNKNOWN && hero.GetColor() != world.ColorCapturedObject(dst_index))
+    if(hero.GetColor() != world.ColorCapturedObject(dst_index))
     {
-	const Sprite & sprite = AGG::GetICN(ICN::RESOURCE, Resource::GetIndexSprite2(res));
+	Maps::Tiles & tile = world.GetTiles(dst_index);
+	bool capture = true;
 
-	// sprite resource with x / day test
-	Surface *sf = new Surface(sprite.w(), sprite.h() + 14);
-	sf->SetColorKey();
-	sf->Blit(sprite);
-
-	std::string perday = _("%{count} / day");
-	payment_t info = ProfitConditions::FromMine(res);
-	s32* current = NULL;
-
-	switch(res)
+	// check guardians
+	if(tile.CheckEnemyGuardians(hero.GetColor()))
 	{
-		case Resource::MERCURY:	current = &info.mercury;  break;
-		case Resource::WOOD:	current = &info.wood; break;
-		case Resource::ORE:	current = &info.ore; break;
-		case Resource::SULFUR:	current = &info.sulfur; break;
-		case Resource::CRYSTAL:	current = &info.crystal; break;
-		case Resource::GEMS:	current = &info.gems; break;
-		case Resource::GOLD:	current = &info.gold; break;
-		default: break;
+	    const Army::Troop troop(tile);
+    	    Army::army_t army;
+    	    army.JoinTroop(troop);
+
+    	    Battle2::Result result = Battle2::Loader(hero.GetArmy(), army, dst_index);
+
+    	    if(result.AttackerWins())
+    	    {
+        	hero.IncreaseExperience(result.GetExperience());
+        	hero.ActionAfterBattle();
+
+		tile.ResetQuantity();
+    	    }
+    	    else
+    	    {
+		capture = false;
+        	BattleLose(hero, result.AttackerResult());
+		if(!Settings::Get().OriginalVersion())
+            	    tile.SetCountMonster(army.GetCountMonsters(troop()));
+    	    }
 	}
 
-	if(current)
+	if(capture)
 	{
-	    String::Replace(perday, "%{count}", *current);
-
-	    switch(*current)
+	    if(res == Resource::UNKNOWN)
+		Dialog::Message(header, body, Font::BIG, Dialog::OK);
+	    else
 	    {
-		    case 1:  String::Replace(body, "%{count}", _("one")); break;
-		    case 2:  String::Replace(body, "%{count}", _("two")); break;
-		    default: String::Replace(body, "%{count}", *current); break;
+		world.CaptureObject(dst_index, hero.GetColor());
+		DialogCaptureResourceObject(header, body, res);
 	    }
 	}
-
-    	Text text(perday, Font::SMALL);
-    	text.Blit((sf->w() - text.w()) / 2, sf->h() - 12, *sf);
-
-	world.CaptureObject(dst_index, hero.GetColor());
-
-	if(sf)
-	{
-	    Dialog::SpriteInfo(header, body, *sf);
-	    delete sf;
-	}
-	else
-	    Dialog::Message(header, body, Font::BIG, Dialog::OK);
     }
-    
+    else
+    // set guardians
+    if(!Settings::Get().OriginalVersion())
+    {
+    }
+
     DEBUG(DBG_GAME , DBG_INFO, "ActionToCaptureObject: " << hero.GetName() << " captured: " << MP2::StringObject(obj));
 }
 

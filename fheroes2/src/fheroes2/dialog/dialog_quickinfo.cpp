@@ -103,25 +103,30 @@ void Dialog::QuickInfo(const Maps::Tiles & tile)
     if(tile.isFog(settings.MyColor()))
 	name_object = _("Unchartered Territory");
     else
+    // check guardians mine
+    if(MP2::OBJ_ABANDONEDMINE == tile.GetObject() || tile.CheckEnemyGuardians(settings.MyColor()))
+    {
+	const Army::Troop troop(tile);
+        name_object = _("guarded by %{count} of %{monster}");
+        std::string name = troop.GetMultiName();
+        String::Lower(name);
+        String::Replace(name_object, "%{monster}", name);
+	name = Army::String(troop.GetCount());
+        String::Lower(name);
+        String::Replace(name_object, "%{count}", name);
+    }
+    else
     switch(tile.GetObject())
     {
         case MP2::OBJ_MONSTER:
     	{
-	    name_object = ArmyGetSizeString(tile.GetCountMonster());
-            std::string name = Monster(tile).GetMultiName();
+	    const Army::Troop troop(tile);
+	    name_object = ArmyGetSizeString(troop.GetCount());
+            std::string name = troop.GetMultiName();
             String::Lower(name);
             String::Replace(name_object, "%{monster}", name);
     	}
     	    break;
-        
-        case MP2::OBJ_ABANDONEDMINE:
-        {
-            name_object = _("guarded by lots of %{ghosts}");
-            std::string name = Monster(Monster::GHOST).GetMultiName();
-            String::Lower(name);
-            String::Replace(name_object, "%{ghosts}", name);
-            break;
-        }
 
         case MP2::OBJ_EVENT:
         case MP2::OBJ_ZERO:

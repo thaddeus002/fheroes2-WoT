@@ -363,7 +363,6 @@ void Maps::Tiles::RedrawObjects(Surface & dst, s16 px, s16 py, const Interface::
 
 void Maps::Tiles::RedrawMonster(Surface & dst, s16 px, s16 py, const Interface::GameArea & area) const
 {
-    const Monster monster(*this);
     Point dst_pt;
     Rect src_rt;
     u16 dst_index = MAXU16;
@@ -381,7 +380,7 @@ void Maps::Tiles::RedrawMonster(Surface & dst, s16 px, s16 py, const Interface::
 	    default: break;
 	}
 
-	const Sprite & sprite_first = AGG::GetICN(ICN::MINIMON, monster.GetSpriteIndex() * 9 + (revert ? 8 : 7));
+	const Sprite & sprite_first = AGG::GetICN(ICN::MINIMON, Monster::GetSpriteIndex(quantity3) * 9 + (revert ? 8 : 7));
 
 	dst_pt.x = px + sprite_first.x() + 16;
 	dst_pt.y = py + TILEWIDTH + sprite_first.y();
@@ -392,7 +391,7 @@ void Maps::Tiles::RedrawMonster(Surface & dst, s16 px, s16 py, const Interface::
     else
     {
 	// draw first sprite
-	const Sprite & sprite_first = AGG::GetICN(ICN::MINIMON, monster.GetSpriteIndex() * 9);
+	const Sprite & sprite_first = AGG::GetICN(ICN::MINIMON, Monster::GetSpriteIndex(quantity3) * 9);
 
 	dst_pt.x = px + sprite_first.x() + 16;
 	dst_pt.y = py + TILEWIDTH + sprite_first.y();
@@ -401,16 +400,13 @@ void Maps::Tiles::RedrawMonster(Surface & dst, s16 px, s16 py, const Interface::
 	dst.Blit(sprite_first, src_rt, dst_pt);
 
 	// draw second sprite
-	const Sprite & sprite_next = AGG::GetICN(ICN::MINIMON, monster.GetSpriteIndex() * 9 + 1 + (Maps::AnimationTicket() % 6));
+	const Sprite & sprite_next = AGG::GetICN(ICN::MINIMON, Monster::GetSpriteIndex(quantity3) * 9 + 1 + (Maps::AnimationTicket() % 6));
 
 	dst_pt.x = px + sprite_next.x() + 16;
 	dst_pt.y = py + TILEWIDTH + sprite_next.y();
 
 	area.SrcRectFixed(src_rt, dst_pt, sprite_next.w(), sprite_next.h());
 	dst.Blit(sprite_next, src_rt, dst_pt);
-
-	//if(Maps::isValidDirection(tile.GetIndex(), Direction::BOTTOM))
-    	//    world.GetTiles(Maps::GetDirectionIndex(tile.GetIndex(), Direction::BOTTOM)).RedrawTop();
     }
 }
 
@@ -487,14 +483,31 @@ void Maps::Tiles::RedrawTop(Surface & dst, const Interface::GameArea & area) con
 
 void Maps::Tiles::RedrawTop(Surface & dst, s16 dstx, s16 dsty, const Interface::GameArea & gamearea, const TilesAddon* skip) const
 {
-    // fix for abandone mine
-    if(MP2::OBJ_ABANDONEDMINE == general)
+    // fix for haut mine
+    if(MP2::OBJ_MINES == general)
     {
-	const Sprite & anime_sprite = AGG::GetICN(ICN::OBJNHAUN,  Maps::AnimationTicket() % 15);
-	Rect rt;
-	Point pt(dstx + anime_sprite.x(), dsty + anime_sprite.y());
-	gamearea.SrcRectFixed(rt, pt, anime_sprite.w(), anime_sprite.h());
-	dst.Blit(anime_sprite, rt, pt);
+	if(quantity4 == Spell::HAUNT)
+	{
+    	    const Sprite & anime_sprite = AGG::GetICN(ICN::OBJNHAUN,  Maps::AnimationTicket() % 15);
+	    Rect rt;
+	    Point pt(dstx + anime_sprite.x(), dsty + anime_sprite.y());
+	    gamearea.SrcRectFixed(rt, pt, anime_sprite.w(), anime_sprite.h());
+	    dst.Blit(anime_sprite, rt, pt);
+	}
+	else
+	if(quantity4 >= Spell::SETEGUARDIAN && quantity4 <= Spell::SETWGUARDIAN)
+	{
+	    const Sprite* mons = NULL;
+	    switch(quantity4)
+	    {
+		case Spell::SETAGUARDIAN: mons = &AGG::GetICN(ICN::MONS32, Monster::GetSpriteIndex(Monster::AIR_ELEMENT)); break;
+		case Spell::SETWGUARDIAN: mons = &AGG::GetICN(ICN::MONS32, Monster::GetSpriteIndex(Monster::WATER_ELEMENT)); break;
+		case Spell::SETEGUARDIAN: mons = &AGG::GetICN(ICN::MONS32, Monster::GetSpriteIndex(Monster::EARTH_ELEMENT)); break;
+		case Spell::SETFGUARDIAN: mons = &AGG::GetICN(ICN::MONS32, Monster::GetSpriteIndex(Monster::FIRE_ELEMENT)); break;
+		default: break;
+	    }
+	    if(mons) dst.Blit(*mons, dstx + 32, dsty);
+	}
     }
 
     if(addons_level2.size())
@@ -1780,8 +1793,19 @@ void Maps::Tiles::UpdateQuantity(void)
 
 	// rand monster
 	case MP2::OBJ_ABANDONEDMINE:
-	    quantity1 = 0;
-	    quantity2 = Rand::Get(39, 45);	// I checked in Heroes II: min 3 x 13, and max 3 x 15
+	    SetCountMonster(Rand::Get(39, 45));	// I checked in Heroes II: min 3 x 13, and max 3 x 15
+	    quantity3 = Monster::GHOST;
+	    if(Settings::Get().OriginalVersion())
+		quantity4 =  Resource::GOLD;
+	    else
+		switch(Rand::Get(1, 5))
+		{
+		    case 1: quantity4 =  Resource::ORE; break;
+		    case 2: quantity4 =  Resource::SULFUR; break;
+		    case 3: quantity4 =  Resource::CRYSTAL; break;
+		    case 4: quantity4 =  Resource::GEMS; break;
+		    default: quantity4 =  Resource::GOLD; break;
+		}
 	break;
 
 	case MP2::OBJ_TREEKNOWLEDGE:
@@ -1927,8 +1951,9 @@ void Maps::Tiles::UpdateMonsterInfo(void)
 	default: break;
     }
 
-    const Monster m = Monster(*this);
-    bool fixed = false;
+    const TilesAddon* addons = FindMonster();
+    const Monster m(addons ? Monster::FromInt(addons->index + 1) : Monster::UNKNOWN);
+    bool  fixed = false;
 
     // update random count
     if(0 == quantity1 && 0 == quantity2)
@@ -1944,6 +1969,12 @@ void Maps::Tiles::UpdateMonsterInfo(void)
         SetCountMonster(count);
 	fixed = true;
     }
+
+    // set monster
+    quantity3 = m();
+
+    // extra params:
+    // quantity4 - join conditions (0: skip, 1: money, 2: free, 3: force (for campain need store color also)
 
     // skip join
     if(m() == Monster::GHOST || m.isElemental())
@@ -1985,6 +2016,8 @@ void Maps::Tiles::UpdateRNDMonsterSprite(void)
 
 void Maps::Tiles::UpdateAbandoneMineSprite(void)
 {
+    u32 uniq = 0;
+
     if(addons_level1.size())
     {
 	std::list<TilesAddon>::iterator it1 = addons_level1.begin();
@@ -1994,11 +2027,78 @@ void Maps::Tiles::UpdateAbandoneMineSprite(void)
 	{
 	    TilesAddon & addon = *it1;
 
+	    if(ICN::OBJNGRAS == MP2::GetICNObject(addon.object) && 6 == addon.index)
+	    {
+		addon.object = 128;
+		addon.index = 82;
+		uniq = addon.uniq;
+	    }
+
+	    if(ICN::OBJNDIRT == MP2::GetICNObject(addon.object) && 8 == addon.index)
+	    {
+		addon.object = 104;
+		addon.index = 112;
+	    }
+
 	    if(ICN::EXTRAOVR == MP2::GetICNObject(addon.object) && 5 == addon.index)
 	    {
-		addon.index = 4;
-		break;
+		switch(quantity4)
+		{
+		    case Resource::ORE:		addon.index = 0; break;
+		    case Resource::SULFUR:	addon.index = 1; break;
+		    case Resource::CRYSTAL:	addon.index = 2; break;
+		    case Resource::GEMS:	addon.index = 3; break;
+		    case Resource::GOLD:	addon.index = 4; break;
+		    default: break;
+		}
 	    }
+	}
+    }
+
+    if(uniq && Maps::isValidDirection(maps_index, Direction::RIGHT))
+    {
+        Tiles & tile = world.GetTiles(Maps::GetDirectionIndex(maps_index, Direction::RIGHT));
+        TilesAddon *mines = tile.FindAddonLevel1(uniq);
+	if(mines)
+	{
+	    // dirt
+	    if(ICN::OBJNDIRT == MP2::GetICNObject(mines->object) && mines->index == 9)
+	    {
+		mines->object = 104;
+		mines->index = 113;
+	    }
+
+	    // grass
+	    if(ICN::OBJNGRAS == MP2::GetICNObject(mines->object) && mines->index == 7)
+	    {
+		mines->object = 128;
+		mines->index = 83;
+	    }
+	}
+	if(tile.general == MP2::OBJN_ABANDONEDMINE) tile.general = MP2::OBJN_MINES;
+    }
+
+    if(Maps::isValidDirection(maps_index, Direction::LEFT))
+    {
+        Tiles & tile = world.GetTiles(Maps::GetDirectionIndex(maps_index, Direction::LEFT));
+	if(tile.general == MP2::OBJN_ABANDONEDMINE) tile.general = MP2::OBJN_MINES;
+    }
+
+    if(Maps::isValidDirection(maps_index, Direction::TOP))
+    {
+        Tiles & tile = world.GetTiles(Maps::GetDirectionIndex(maps_index, Direction::TOP));
+	if(tile.general == MP2::OBJN_ABANDONEDMINE) tile.general = MP2::OBJN_MINES;
+
+	if(Maps::isValidDirection(tile.maps_index, Direction::LEFT))
+	{
+    	    Tiles & tile2 = world.GetTiles(Maps::GetDirectionIndex(tile.maps_index, Direction::LEFT));
+	    if(tile2.general == MP2::OBJN_ABANDONEDMINE) tile2.general = MP2::OBJN_MINES;
+	}
+
+	if(Maps::isValidDirection(tile.maps_index, Direction::RIGHT))
+	{
+    	    Tiles & tile2 = world.GetTiles(Maps::GetDirectionIndex(tile.maps_index, Direction::RIGHT));
+	    if(tile2.general == MP2::OBJN_ABANDONEDMINE) tile2.general = MP2::OBJN_MINES;
 	}
     }
 }
@@ -2159,4 +2259,17 @@ void Maps::Tiles::ResetQuantity(void)
     quantity2 = 0;
     quantity3 = 0;
     quantity4 = 0;
+}
+
+bool Maps::Tiles::CheckEnemyGuardians(u8 color) const
+{
+    switch(general)
+    {
+	case MP2::OBJ_MINES:
+	    return color != world.ColorCapturedObject(maps_index) && quantity3 && (quantity1 || quantity2);
+
+	default: break;
+    }
+
+    return false;
 }

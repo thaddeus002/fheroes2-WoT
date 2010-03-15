@@ -125,7 +125,7 @@
  <!-- Visions -->
  <spell cost="6" />
  <!-- Haunt -->
- <spell cost="8" />
+ <spell cost="8" extra="4" />
  <!-- Set Earth Guardian -->
  <spell cost="15" extra="4" />
  <!-- Set Air Guardian -->

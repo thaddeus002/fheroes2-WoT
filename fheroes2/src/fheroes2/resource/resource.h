@@ -74,10 +74,10 @@ namespace Resource
     resource_t FromIndexSprite(u8 index);
 
     /* return index sprite objnrsrc.icn */
-    u8 GetIndexSprite(resource_t resource);
+    u8 GetIndexSprite(u8 resource);
 
     /* return index sprite resource.icn */
-    u8 GetIndexSprite2(resource_t resource);
+    u8 GetIndexSprite2(u8 resource);
 
     class BoxSprite : protected Rect
     {

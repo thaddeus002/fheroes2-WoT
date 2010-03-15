@@ -46,7 +46,7 @@ bool Mounts::isPassable(const u16 icn, const u8 index)
     switch(icn)
     {
         case ICN::MTNGRAS:
-	    if(43 == index || 44 == index || 53 == index || 54 == index) return false;
+	    if(43 == index || 44 == index || 53 == index || 54 == index || 78 == index) return false;
 	    break;
         case ICN::MTNDIRT:
 	    if(73 == index || 84 == index || 86 == index) return false;

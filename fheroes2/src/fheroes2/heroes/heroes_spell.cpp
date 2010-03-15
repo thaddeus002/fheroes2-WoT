@@ -319,16 +319,46 @@ bool ActionSpellVisions(Heroes & hero)
 
 bool ActionSpellSetGuardian(Heroes & hero, Monster::monster_t m)
 {
-    switch(m)
+    if(MP2::OBJ_MINES != hero.GetUnderObject())
     {
-	case Monster::GHOST:
-	case Monster::EARTH_ELEMENT:
-	case Monster::AIR_ELEMENT:
-	case Monster::FIRE_ELEMENT:
-	case Monster::WATER_ELEMENT:
-	default: break;
+	Dialog::Message("", _("You must be standing on the entrance to a mine (sawmills and alchemists don't count) to cast this spell."), Font::BIG, Dialog::OK);
+	return false;
     }
 
-    DialogNotAvailable();
+    const u16 index = hero.GetIndex();
+    Spell::spell_t spell = Spell::NONE;
+
+    switch(m)
+    {
+	case Monster::GHOST:		spell = Spell::HAUNT; break;
+	case Monster::EARTH_ELEMENT:	spell = Spell::SETEGUARDIAN; break;
+	case Monster::AIR_ELEMENT:	spell = Spell::SETAGUARDIAN; break;
+	case Monster::FIRE_ELEMENT:	spell = Spell::SETFGUARDIAN; break;
+	case Monster::WATER_ELEMENT:	spell = Spell::SETWGUARDIAN; break;
+	default: return false;
+    }
+
+
+    const u16 count = hero.GetPower() * Spell::GetExtraValue(spell);
+
+    if(count)
+    {
+	Maps::Tiles & tile = world.GetTiles(index);
+
+	// clear old spell
+	if(spell != tile.GetQuantity3()) tile.ResetQuantity();
+
+	tile.SetQuantity3(m);
+	tile.SetQuantity4(spell);
+
+	//if(Settings::Get().OriginalVersion())
+	    tile.SetCountMonster(count);
+	//else
+	//    tile.SetCountMonster(count + tile.GetCountMonster());
+
+	if(Spell::HAUNT == spell)
+	    world.CaptureObject(index, Color::GRAY);
+    }
+
     return false;
 }

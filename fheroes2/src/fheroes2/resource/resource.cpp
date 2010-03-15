@@ -232,7 +232,7 @@ const char* Resource::String(u8 resource)
 }
 
 /* return index sprite objnrsrc.icn */
-u8 Resource::GetIndexSprite(Resource::resource_t resource)
+u8 Resource::GetIndexSprite(u8 resource)
 {
     switch(resource){
         case Resource::WOOD:	return  1;
@@ -250,7 +250,7 @@ u8 Resource::GetIndexSprite(Resource::resource_t resource)
 }
 
 /* return index sprite resource.icn */
-u8 Resource::GetIndexSprite2(Resource::resource_t resource)
+u8 Resource::GetIndexSprite2(u8 resource)
 {
     switch(resource){
         case Resource::WOOD:	return  0;

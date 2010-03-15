@@ -194,7 +194,7 @@ void Army::army_t::FromGuardian(const Maps::Tiles & t)
 	    break;
 
 	case MP2::OBJ_ABANDONEDMINE:
-	    army[0].Set(Monster::GHOST, t.GetQuantity2());
+	    army[0] = Troop(t);
 	    ArrangeForBattle();
 	    break;
 
@@ -563,7 +563,7 @@ void Army::army_t::DrawMons32Line(s16 cx, s16 cy, u16 width, u8 first, u8 count,
 	{
 	    if(0 == first && count)
     	    {
-		const Sprite & monster = AGG::GetICN(ICN::MONS32, troop.GetSpriteIndex());
+		const Sprite & monster = AGG::GetICN(ICN::MONS32, Monster::GetSpriteIndex(troop()));
 
     		Display::Get().Blit(monster, cx - monster.w() / 2, cy + 30 - monster.h());
 
