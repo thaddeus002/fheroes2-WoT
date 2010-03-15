@@ -924,7 +924,25 @@ Maps::TilesAddon * Maps::Tiles::FindWaterResource(void)
     return NULL;
 }
 
-const Maps::TilesAddon * Maps::Tiles::FindStandingStones(void) const
+const Maps::TilesAddon* Maps::Tiles::FindWhirlpools(void) const
+{
+    if(addons_level1.size())
+    {
+	std::list<TilesAddon>::const_iterator it1 = addons_level1.begin();
+	std::list<TilesAddon>::const_iterator it2 = addons_level1.end();
+
+	for(; it1 != it2; ++it1)
+	{
+	    const TilesAddon & addon = *it1;
+
+	    if(ICN::OBJNWATR == MP2::GetICNObject(addon.object) && (addon.index >= 202 && addon.index <= 222 && ((addon.index - 202) % 4))) return &addon;
+	}
+    }
+
+    return NULL;
+}
+
+const Maps::TilesAddon* Maps::Tiles::FindStandingStones(void) const
 {
     if(addons_level1.size())
     {
@@ -936,6 +954,42 @@ const Maps::TilesAddon * Maps::Tiles::FindStandingStones(void) const
 	    const TilesAddon & addon = *it1;
 
 	    if(ICN::OBJNMULT == MP2::GetICNObject(addon.object) && (addon.index == 84 || addon.index == 85)) return &addon;
+	}
+    }
+
+    return NULL;
+}
+
+const Maps::TilesAddon* Maps::Tiles::FindArtesianSpring(void) const
+{
+    if(addons_level1.size())
+    {
+	std::list<TilesAddon>::const_iterator it1 = addons_level1.begin();
+	std::list<TilesAddon>::const_iterator it2 = addons_level1.end();
+
+	for(; it1 != it2; ++it1)
+	{
+	    const TilesAddon & addon = *it1;
+
+	    if(ICN::OBJNCRCK == MP2::GetICNObject(addon.object) && (addon.index == 3 || addon.index == 4)) return &addon;
+	}
+    }
+
+    return NULL;
+}
+
+const Maps::TilesAddon* Maps::Tiles::FindOasis(void) const
+{
+    if(addons_level1.size())
+    {
+	std::list<TilesAddon>::const_iterator it1 = addons_level1.begin();
+	std::list<TilesAddon>::const_iterator it2 = addons_level1.end();
+
+	for(; it1 != it2; ++it1)
+	{
+	    const TilesAddon & addon = *it1;
+
+	    if(ICN::OBJNDSRT == MP2::GetICNObject(addon.object) && (addon.index == 108 || addon.index == 109)) return &addon;
 	}
     }
 

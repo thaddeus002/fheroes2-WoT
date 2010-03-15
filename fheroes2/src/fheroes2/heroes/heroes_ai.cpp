@@ -819,10 +819,10 @@ void AIToPrimarySkillObject(Heroes &hero, const u8 obj, const u16 dst_index)
         {
             const Maps::TilesAddon* addon = tile.FindStandingStones();
 
-            if(Maps::isValidDirection(tile.GetIndex(), Direction::LEFT) &&
+            if(addon && Maps::isValidDirection(tile.GetIndex(), Direction::LEFT) &&
         	world.GetTiles(Maps::GetDirectionIndex(tile.GetIndex(), Direction::LEFT)).FindAddonLevel1(addon->uniq)) hero.SetVisited(Maps::GetDirectionIndex(tile.GetIndex(), Direction::LEFT));
 
-            if(Maps::isValidDirection(tile.GetIndex(), Direction::RIGHT) &&
+            if(addon && Maps::isValidDirection(tile.GetIndex(), Direction::RIGHT) &&
                 world.GetTiles(Maps::GetDirectionIndex(tile.GetIndex(), Direction::RIGHT)).FindAddonLevel1(addon->uniq)) hero.SetVisited(Maps::GetDirectionIndex(tile.GetIndex(), Direction::RIGHT));
         }
     }
@@ -910,10 +910,12 @@ void AIToGoodMoraleObject(Heroes &hero, const u8 obj, const u16 dst_index)
         // fix double action tile
         if(obj == MP2::OBJ_OASIS)
         {
-            if(Maps::isValidDirection(tile.GetIndex(), Direction::LEFT) &&
-                tile.GetUniq1() == world.GetTiles(Maps::GetDirectionIndex(tile.GetIndex(), Direction::LEFT)).GetUniq1()) hero.SetVisited(Maps::GetDirectionIndex(tile.GetIndex(), Direction::LEFT));
-            if(Maps::isValidDirection(tile.GetIndex(), Direction::RIGHT) &&
-                tile.GetUniq1() == world.GetTiles(Maps::GetDirectionIndex(tile.GetIndex(), Direction::RIGHT)).GetUniq1()) hero.SetVisited(Maps::GetDirectionIndex(tile.GetIndex(), Direction::RIGHT));
+    	    const Maps::TilesAddon* addon = tile.FindOasis();
+
+            if(addon && Maps::isValidDirection(tile.GetIndex(), Direction::LEFT) &&
+                world.GetTiles(Maps::GetDirectionIndex(tile.GetIndex(), Direction::LEFT)).FindAddonLevel1(addon->uniq)) hero.SetVisited(Maps::GetDirectionIndex(tile.GetIndex(), Direction::LEFT));
+            if(addon && Maps::isValidDirection(tile.GetIndex(), Direction::RIGHT) &&
+                world.GetTiles(Maps::GetDirectionIndex(tile.GetIndex(), Direction::RIGHT)).FindAddonLevel1(addon->uniq)) hero.SetVisited(Maps::GetDirectionIndex(tile.GetIndex(), Direction::RIGHT));
         }
     }
 
@@ -948,11 +950,12 @@ void AIToArtesianSpring(Heroes &hero, const u8 obj, const u16 dst_index)
         // fix double action tile
         {
 	    const Maps::Tiles & tile = world.GetTiles(dst_index);
+	    const Maps::TilesAddon* addon = tile.FindArtesianSpring();
 
-            if(Maps::isValidDirection(tile.GetIndex(), Direction::LEFT) &&
-                tile.GetUniq1() == world.GetTiles(Maps::GetDirectionIndex(tile.GetIndex(), Direction::LEFT)).GetUniq1()) hero.SetVisited(Maps::GetDirectionIndex(tile.GetIndex(), Direction::LEFT));
-            if(Maps::isValidDirection(tile.GetIndex(), Direction::RIGHT) &&
-                tile.GetUniq1() == world.GetTiles(Maps::GetDirectionIndex(tile.GetIndex(), Direction::RIGHT)).GetUniq1()) hero.SetVisited(Maps::GetDirectionIndex(tile.GetIndex(), Direction::RIGHT));
+            if(addon && Maps::isValidDirection(tile.GetIndex(), Direction::LEFT) &&
+                world.GetTiles(Maps::GetDirectionIndex(tile.GetIndex(), Direction::LEFT)).FindAddonLevel1(addon->uniq)) hero.SetVisited(Maps::GetDirectionIndex(tile.GetIndex(), Direction::LEFT));
+            if(addon && Maps::isValidDirection(tile.GetIndex(), Direction::RIGHT) &&
+                world.GetTiles(Maps::GetDirectionIndex(tile.GetIndex(), Direction::RIGHT)).FindAddonLevel1(addon->uniq)) hero.SetVisited(Maps::GetDirectionIndex(tile.GetIndex(), Direction::RIGHT));
         }
     }
 

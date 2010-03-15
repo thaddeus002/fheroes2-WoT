@@ -950,7 +950,7 @@ void World::LoadMaps(const std::string &filename)
 	    const Maps::Tiles & tile = *vec_tiles[ii];
 	    const u16 x = tile.GetIndex() % width;
 	    const u16 y = tile.GetIndex() / width;
-	    if(Maps::Ground::WATER != tile.GetGround() && 0 == tile.GetSize1() && x > 5 && x < width - 5 && y > 5 && y < height - 5) pools.push_back(tile.GetIndex());
+	    if(Maps::Ground::WATER != tile.GetGround() && tile.GoodForUltimateArtifact() && x > 5 && x < width - 5 && y > 5 && y < height - 5) pools.push_back(tile.GetIndex());
 	}
 
 	if(pools.size())
@@ -1345,7 +1345,10 @@ u16 World::NextWhirlpool(const u16 index)
     std::vector<u16>::const_iterator it3 = v3.begin();
     std::vector<u16>::const_iterator it4 = v3.end();
     for(; it3 != it4; ++it3)
-	map_whirlpools[GetTiles(*it3).GetUniq1()].push_back(*it3);
+    {
+    	const Maps::TilesAddon* addon = GetTiles(*it3).FindWhirlpools();
+	if(addon) map_whirlpools[addon->uniq].push_back(*it3);
+    }
 
     if(2 > map_whirlpools.size())
     {
@@ -1353,18 +1356,20 @@ u16 World::NextWhirlpool(const u16 index)
 	return index;
     }
 
-    const Maps::Tiles & tile = GetTiles(index);
+    const Maps::TilesAddon* addon = GetTiles(index).FindWhirlpools();
     std::vector<u32> v1;
     v1.reserve(map_whirlpools.size());
 
-    std::map<u32, std::vector<u16> >::const_iterator it1 = map_whirlpools.begin();
-    std::map<u32, std::vector<u16> >::const_iterator it2 = map_whirlpools.end();
-    for(; it1 != it2; ++it1)
+    if(addon)
     {
-	const u32 & uniq = (*it1).first;
-
-	if(uniq == tile.GetUniq1()) continue;
-	v1.push_back(uniq);
+	std::map<u32, std::vector<u16> >::const_iterator it1 = map_whirlpools.begin();
+	std::map<u32, std::vector<u16> >::const_iterator it2 = map_whirlpools.end();
+	for(; it1 != it2; ++it1)
+	{
+	    const u32 & uniq = (*it1).first;
+	    if(uniq == addon->uniq) continue;
+	    v1.push_back(uniq);
+	}
     }
 
     std::vector<u16> & v2 = map_whirlpools[*Rand::Get(v1)];

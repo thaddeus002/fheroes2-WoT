@@ -78,40 +78,40 @@ namespace Maps
 	u8 GetQuantity4(void) const{ return quantity4; };
 	Ground::ground_t GetGround(void) const;
 	const Surface & GetTileSurface(void) const;
-	u32 GetUniq1(void) const{ return addons_level1.size() ? addons_level1.front().uniq : 0; };
-	u32 GetUniq2(void) const{ return addons_level2.size() ? addons_level2.front().uniq : 0; };
-	u32 GetSize1(void) const{ return addons_level1.size(); };
-	u32 GetSize2(void) const{ return addons_level2.size(); };
 
 	bool isPassable(const Heroes * hero = NULL, bool skipfog = false) const;
 	bool isRoad(const Direction::vector_t & direct = Direction::CENTER) const;
 	bool isStream(void) const;
+	bool GoodForUltimateArtifact(void) const{ return addons_level1.empty(); };
 
-	TilesAddon * FindAddonICN1(u16 icn1);
-	TilesAddon * FindAddonICN2(u16 icn2);
+	TilesAddon* FindAddonICN1(u16 icn1);
+	TilesAddon* FindAddonICN2(u16 icn2);
 
-	TilesAddon * FindAddonLevel1(u32 uniq1);
-	TilesAddon * FindAddonLevel2(u32 uniq2);
+	TilesAddon* FindAddonLevel1(u32 uniq1);
+	TilesAddon* FindAddonLevel2(u32 uniq2);
 
-	TilesAddon * FindCampFire(void);
-	TilesAddon * FindWaterResource(void);
-	TilesAddon * FindResource(void);
-	TilesAddon * FindRNDResource(void);
-	TilesAddon * FindArtifact(void);
-	TilesAddon * FindRNDArtifact(const u8 level = 0);
-	TilesAddon * FindUltimateArtifact(void);
-	TilesAddon * FindMiniHero(void);
-	TilesAddon * FindEvent(void);
-	TilesAddon * FindBoat(void);
-	TilesAddon * FindCastle(void);
-	TilesAddon * FindRNDCastle(void);
-	TilesAddon * FindFlags(void);
-	TilesAddon * FindRNDMonster(void);
-	TilesAddon * FindMonster(void);
-	const TilesAddon * FindMines(void) const;
-	const TilesAddon * FindStandingStones(void) const;
-	TilesAddon * FindJail(void);
-	TilesAddon * FindBarrier(void);
+	TilesAddon* FindCampFire(void);
+	TilesAddon* FindWaterResource(void);
+	TilesAddon* FindResource(void);
+	TilesAddon* FindRNDResource(void);
+	TilesAddon* FindArtifact(void);
+	TilesAddon* FindRNDArtifact(const u8 level = 0);
+	TilesAddon* FindUltimateArtifact(void);
+	TilesAddon* FindMiniHero(void);
+	TilesAddon* FindEvent(void);
+	TilesAddon* FindBoat(void);
+	TilesAddon* FindCastle(void);
+	TilesAddon* FindRNDCastle(void);
+	TilesAddon* FindFlags(void);
+	TilesAddon* FindRNDMonster(void);
+	TilesAddon* FindMonster(void);
+	const TilesAddon* FindMines(void) const;
+	const TilesAddon* FindStandingStones(void) const;
+	const TilesAddon* FindArtesianSpring(void) const;
+	const TilesAddon* FindWhirlpools(void) const;
+	const TilesAddon* FindOasis(void) const;
+	TilesAddon* FindJail(void);
+	TilesAddon* FindBarrier(void);
 
 	void SetTile(const u16 index, const u8 shape);
 

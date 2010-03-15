@@ -1068,7 +1068,7 @@ bool Game::DiggingForArtifacts(const Heroes & hero)
 {
     if(hero.GetMaxMovePoints() == hero.GetMovePoints())
     {
-	if(0 != world.GetTiles(hero.GetCenter()).GetSize1())
+	if(! world.GetTiles(hero.GetCenter()).GoodForUltimateArtifact())
 	{
 	    Dialog::Message("", _("Try searching on clear ground."), Font::BIG, Dialog::OK);
 	    return false;
