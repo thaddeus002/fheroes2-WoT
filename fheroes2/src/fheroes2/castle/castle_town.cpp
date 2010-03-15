@@ -465,6 +465,22 @@ u32 Castle::OpenTown(void)
 	else
 	if(le.MouseCursor(buildingCaptain.GetArea()) && buildingCaptain.QueueEventProcessing()) return BUILD_CAPTAIN;
 	else
+	if(hero1 && le.MouseClickLeft(rectHero1) &&
+	    Dialog::OK == DialogBuyHero(hero1))
+        {
+    	    RecruitHero(hero1);
+
+    	    return BUILD_NOTHING;
+        }
+	else
+	if(hero2 && le.MouseClickLeft(rectHero2) &&
+	    Dialog::OK == DialogBuyHero(hero2))
+        {
+    	    RecruitHero(hero2);
+
+	    return BUILD_NOTHING;
+        }
+	else
 	if(isBuild(BUILD_CAPTAIN))
 	{
 	    if(le.MouseClickLeft(rectSpreadArmyFormat) && Army::FORMAT_SPREAD != army.GetCombatFormat())
@@ -491,22 +507,6 @@ u32 Castle::OpenTown(void)
 #endif
     	    }
 	}
-	else
-	if(hero1 && le.MouseClickLeft(rectHero1) &&
-	    Dialog::OK == DialogBuyHero(hero1))
-        {
-    	    RecruitHero(hero1);
-
-    	    return BUILD_NOTHING;
-        }
-	else
-	if(hero2 && le.MouseClickLeft(rectHero2) &&
-	    Dialog::OK == DialogBuyHero(hero2))
-        {
-    	    RecruitHero(hero2);
-
-	    return BUILD_NOTHING;
-        }
 
 
 	// right
