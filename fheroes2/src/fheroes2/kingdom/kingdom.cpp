@@ -190,6 +190,9 @@ void Kingdom::ActionNewDay(void)
 	return;
     }
 
+    // modes
+    ResetModes(IDENTIFYHERO);
+
     // check lost town
     if(castles.empty()) --lost_town_days;
 

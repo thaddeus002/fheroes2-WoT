@@ -1083,13 +1083,17 @@ bool Heroes::BuySpellBook(const Castle & castle)
     const payment_t payment = PaymentConditions::BuySpellBook();
     Kingdom & kingdom = world.GetKingdom(color);
 
-    std::string header = _("To cast spells, you must first buy a spell book for %{gold} gold");
+    std::string header = _("To cast spells, you must first buy a spell book for %{gold} gold.");
     String::Replace(header, "%{gold}", payment.gold);
 
     if( ! kingdom.AllowPayment(payment))
     {
 	if(Settings::Get().MyColor() == color)
-	Dialog::Message(header, _("Unfortunately, you seem to be a little short of cash at the moment."), Font::BIG, Dialog::OK);
+	{
+	    header.append(". ");
+	    header.append(_("Unfortunately, you seem to be a little short of cash at the moment."));
+	    Dialog::Message("", header, Font::BIG, Dialog::OK);
+	}
 	return false;
     }
 
@@ -1101,7 +1105,10 @@ bool Heroes::BuySpellBook(const Castle & castle)
 	sprite.Blit(border);
 	sprite.Blit(AGG::GetICN(ICN::ARTIFACT, Artifact::IndexSprite64(Artifact::MAGIC_BOOK)), 5, 5);
 
-	if(Dialog::NO == Dialog::SpriteInfo(header, _("Do you wish to buy one?"), sprite, Dialog::YES | Dialog::NO)) return false;
+	header.append(". ");
+	header.append(_("Do you wish to buy one?"));
+
+	if(Dialog::NO == Dialog::SpriteInfo("", header, sprite, Dialog::YES | Dialog::NO)) return false;
     }
 
     if(PickupArtifact(Artifact::MAGIC_BOOK))

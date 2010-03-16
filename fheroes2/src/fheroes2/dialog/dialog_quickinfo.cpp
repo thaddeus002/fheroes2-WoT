@@ -521,7 +521,9 @@ void Dialog::QuickInfo(const Heroes & hero)
     text.Blit(dst_pt);
 
     // draw monster sprite in one string
-    hero.GetArmy().DrawMons32Line(cur_rt.x - 5, cur_rt.y + 114, 160, 0, 0, (Settings::Get().MyColor() != hero.GetColor()));
+    const u8 mycolor = Settings::Get().MyColor();
+    const bool hide = mycolor != hero.GetColor() && !world.GetKingdom(mycolor).Modes(Kingdom::IDENTIFYHERO);
+    hero.GetArmy().DrawMons32Line(cur_rt.x - 5, cur_rt.y + 114, 160, 0, 0, hide);
 
     cursor.Show();
     display.Flip();

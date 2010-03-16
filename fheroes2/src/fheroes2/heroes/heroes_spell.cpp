@@ -147,8 +147,10 @@ bool ActionSpellViewAll(Heroes & hero)
 
 bool ActionSpellIdentifyHero(Heroes & hero)
 {
-    DialogNotAvailable();
-    return false;
+    world.GetKingdom(hero.GetColor()).SetModes(Kingdom::IDENTIFYHERO);
+    Message("", _("Enemy heroes are now fully identifiable."), Font::BIG, Dialog::OK);
+
+    return true;
 }
 
 bool ActionSpellSummonBoat(Heroes & hero)
@@ -312,6 +314,17 @@ bool ActionSpellTownPortal(Heroes & hero)
 
 bool ActionSpellVisions(Heroes & hero)
 {
+/*
+You must be within 3 spaces of a monster for the Visions spell to work.
+{%d %s}
+The creatures are willing to join us!
+All the creatures will join us...
+for a fee of %d gold.
+%d of the creatures will join us...
+for a fee of %d gold.
+These weak creatures will surely flee before us.
+I fear these creatures are in the mood for a fight.
+*/
     DialogNotAvailable();
     return false;
 }
