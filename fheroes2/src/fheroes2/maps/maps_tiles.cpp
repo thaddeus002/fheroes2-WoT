@@ -526,7 +526,7 @@ void Maps::Tiles::RedrawTop(Surface & dst, s16 dstx, s16 dsty, const Interface::
 	    if(ICN::UNKNOWN != icn && ICN::MINIHERO != icn && ICN::MONS32 != icn)
 	    {
 		const Sprite & sprite = AGG::GetICN(icn, index);
-		    
+
 		// fix flags redraw
 		if(ICN::FLAG32 == icn)
 		{
@@ -571,10 +571,20 @@ void Maps::Tiles::RedrawTop4Hero(Surface & dst, const Interface::GameArea & area
 	    const u8 & index  = (*it1).index;
 	    const ICN::icn_t icn = MP2::GetICNObject(object);
 
-	    if(ICN::UNKNOWN != icn)
+	    if(ICN::UNKNOWN != icn && ICN::OBJNMUL2 != icn && ICN::MTNDIRT != icn)
 	    {
 		const Sprite & sprite = AGG::GetICN(icn, index);
-		dst.Blit(sprite, dstx + sprite.x(), dsty + sprite.y());
+
+		// fix flags redraw
+		if(ICN::FLAG32 == icn)
+		{
+		    Rect rt;
+		    Point pt(dstx + sprite.x(), dsty + sprite.y());
+		    area.SrcRectFixed(rt, pt, sprite.w(), sprite.h());
+		    dst.Blit(sprite, rt, pt);
+		}
+		else
+		    dst.Blit(sprite, dstx + sprite.x(), dsty + sprite.y());
 
 		// possible anime
 		if(const u16 anime_index = ICN::AnimationFrame(icn, index, Maps::AnimationTicket()))

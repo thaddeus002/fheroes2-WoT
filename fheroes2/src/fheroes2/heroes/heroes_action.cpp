@@ -2203,13 +2203,12 @@ void ActionToCaptureObject(Heroes &hero, const u8 obj, const u16 dst_index)
 
 	if(capture)
 	{
+	    world.CaptureObject(dst_index, hero.GetColor());
+
 	    if(res == Resource::UNKNOWN)
 		Dialog::Message(header, body, Font::BIG, Dialog::OK);
 	    else
-	    {
-		world.CaptureObject(dst_index, hero.GetColor());
 		DialogCaptureResourceObject(header, body, res);
-	    }
 	}
     }
     else
