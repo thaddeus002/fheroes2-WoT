@@ -156,6 +156,13 @@ void Interface::StatusWindow::NextState(void)
     if(STATUS_ARMY == state) state = STATUS_DAY;
     else
     if(STATUS_RESOURCE == state) state = STATUS_ARMY;
+    
+    if(state == STATUS_ARMY)
+    {
+	const Game::Focus & focus = Game::Focus::Get();
+	// skip empty army for castle
+        if(Game::Focus::CASTLE == focus.Type() && !focus.GetCastle().GetArmy().isValid()) NextState();
+    }
 }
 
 void Interface::StatusWindow::DrawKingdomInfo(const u8 oh) const

@@ -779,7 +779,7 @@ Dialog::answer_t Castle::OpenDialog(bool fade)
 	if(le.MouseCursor(buttonNextCastle)) statusBar.ShowMessage(_("Show next town"));
 	else
 	// status message over sign
-	if(castle_heroes && le.MouseCursor(rectSign)) statusBar.ShowMessage(str_date);
+	if(le.MouseCursor(rectSign)) statusBar.ShowMessage(str_date);
 	else
 	// status message view hero
 	if(castle_heroes && le.MouseCursor(rectHeroPortrait)) statusBar.ShowMessage(_("View Hero"));
