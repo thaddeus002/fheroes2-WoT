@@ -701,7 +701,37 @@ void AIToCaptureObject(Heroes &hero, const u8 obj, const u16 dst_index)
 
     // capture object
     if(hero.GetColor() != world.ColorCapturedObject(dst_index))
-	world.CaptureObject(dst_index, hero.GetColor());
+    {
+	Maps::Tiles & tile = world.GetTiles(dst_index);
+	bool capture = true;
+
+	if(tile.CheckEnemyGuardians(hero.GetColor()))
+	{
+	    const Army::Troop troop(tile);
+	    Army::army_t army;
+	    army.JoinTroop(troop);
+
+	    Battle2::Result result = Battle2::Loader(hero.GetArmy(), army, dst_index);
+
+	    if(result.AttackerWins())
+	    {
+		hero.IncreaseExperience(result.GetExperience());
+	        hero.ActionAfterBattle();
+
+		tile.ResetQuantity();
+	    }
+	    else
+	    {
+		capture = false;
+	        AIBattleLose(hero, result.AttackerResult());
+		if(!Settings::Get().OriginalVersion())
+		    tile.SetCountMonster(army.GetCountMonsters(troop()));
+	    }
+	}
+
+	if(capture) world.CaptureObject(dst_index, hero.GetColor());
+    }
+
     DEBUG(DBG_AI , DBG_INFO, "AIToCaptureObject: " << hero.GetName() << " captured: " << MP2::StringObject(obj));
 }
 
@@ -1587,6 +1617,45 @@ bool Heroes::AIPriorityObject(u16 index, u8 obj)
 
 bool Heroes::AIValidObject(u16 index, u8 obj)
 {
+    // check guardians only (from capture objects)
+    Maps::Tiles & tile = world.GetTiles(index);
+
+    switch(obj)
+    {
+	case MP2::OBJ_ARTIFACT:
+	    // 6 - 50 rogues, 7 - 1 gin, 8,9,10,11,12,13 - 1 monster level4
+	    if(6 > tile.GetQuantity2() || 13 < tile.GetQuantity2()) break;
+
+	// poor object
+	case MP2::OBJ_SHIPWRECK:
+        case MP2::OBJ_GRAVEYARD:
+	case MP2::OBJ_DERELICTSHIP:
+
+	// monster
+	case MP2::OBJ_MONSTER:
+
+	// capture object
+	case MP2::OBJ_SAWMILL:
+	case MP2::OBJ_MINES:
+	case MP2::OBJ_ALCHEMYLAB:
+	case MP2::OBJ_STONELIGHTS:
+
+	    if(world.ColorCapturedObject(index) != GetColor())
+	    {
+		if(tile.CheckEnemyGuardians(GetColor()))
+		{
+		    Army::army_t enemy;
+		    enemy.FromGuardian(tile);
+		    if(enemy.isValid() && !GetArmy().StrongerEnemyArmy(enemy)) return false;
+		}
+	    }
+	    break;
+
+
+	default: break;
+    }
+
+    // check other
     switch(obj)
     {
 	// water object
@@ -1608,8 +1677,7 @@ bool Heroes::AIValidObject(u16 index, u8 obj)
 	case MP2::OBJ_SAWMILL:
 	case MP2::OBJ_MINES:
 	case MP2::OBJ_ALCHEMYLAB:
-	    if(world.ColorCapturedObject(index) != GetColor()) return true;
-	    break;
+	    return world.ColorCapturedObject(index) != GetColor();
 
 	// pickup object
 	case MP2::OBJ_WAGON:
@@ -1618,7 +1686,7 @@ bool Heroes::AIValidObject(u16 index, u8 obj)
 	case MP2::OBJ_LEANTO:
 	case MP2::OBJ_MAGICGARDEN:
 	case MP2::OBJ_SKELETON:
-	    if(world.GetTiles(index).ValidQuantity()) return true;
+	    if(tile.ValidQuantity()) return true;
 	    break;
 
 	// pickup resource
@@ -1630,7 +1698,6 @@ bool Heroes::AIValidObject(u16 index, u8 obj)
 	case MP2::OBJ_ARTIFACT:
 	{
 	    if(IsFullBagArtifacts()) return false;
-	    Maps::Tiles & tile = world.GetTiles(index);
 
 	    // 1,2,3 - 2000g, 2500g+3res, 3000g+5res
 	    if(1 <= tile.GetQuantity2() && 3 >= tile.GetQuantity2())
@@ -1657,14 +1724,10 @@ bool Heroes::AIValidObject(u16 index, u8 obj)
 	    {
 		return HasSecondarySkill(4 == tile.GetQuantity2() ? Skill::Secondary::WISDOM : Skill::Secondary::LEADERSHIP);
 	    }
-	    else
+	    //else
 	    // 6 - 50 rogues, 7 - 1 gin, 8,9,10,11,12,13 - 1 monster level4
-	    if(5 < tile.GetQuantity2() && 14 > tile.GetQuantity2())
-	    {
-		Army::army_t enemy;
-		enemy.FromGuardian(tile);
-        	return (enemy.isValid() && GetArmy().StrongerEnemyArmy(enemy));
-	    }
+	    //if(5 < tile.GetQuantity2() && 14 > tile.GetQuantity2())
+	    //	return true
 	    else
 		return true;
 	}
@@ -1674,26 +1737,26 @@ bool Heroes::AIValidObject(u16 index, u8 obj)
 	case MP2::OBJ_OBSERVATIONTOWER:
 	// obelisk
 	case MP2::OBJ_OBELISK:
-	    if(! isVisited(world.GetTiles(index), Visit::GLOBAL)) return true;
+	    if(! isVisited(tile, Visit::GLOBAL)) return true;
 	    break;
 
         case MP2::OBJ_BARRIER:
-	    if(world.GetKingdom(GetColor()).IsVisitTravelersTent(world.GetTiles(index).GetQuantity1())) return true;
+	    if(world.GetKingdom(GetColor()).IsVisitTravelersTent(tile.GetQuantity1())) return true;
 	    break;
 
         case MP2::OBJ_TRAVELLERTENT:
-	    if(!world.GetKingdom(GetColor()).IsVisitTravelersTent(world.GetTiles(index).GetQuantity1())) return true;
+	    if(!world.GetKingdom(GetColor()).IsVisitTravelersTent(tile.GetQuantity1())) return true;
 	    break;
 
 	// new spell
         case MP2::OBJ_SHRINE1:
 	case MP2::OBJ_SHRINE2:
 	case MP2::OBJ_SHRINE3:
-	    if(! isVisited(world.GetTiles(index)) &&
+	    if(! isVisited(tile) &&
                 // check spell book
 		HasArtifact(Artifact::MAGIC_BOOK) &&
                 // check valid level spell and wisdom skill
-                !(3 == Spell::Level(Spell::FromInt(world.GetTiles(index).GetQuantity1())) &&
+                !(3 == Spell::Level(Spell::FromInt(tile.GetQuantity1())) &&
                 Skill::Level::NONE == GetLevelSkill(Skill::Secondary::WISDOM))) return true;
 	    break;
 
@@ -1706,14 +1769,14 @@ bool Heroes::AIValidObject(u16 index, u8 obj)
 	case MP2::OBJ_WITCHSHUT:
 	// exp
 	case MP2::OBJ_GAZEBO:
-	    if(! isVisited(world.GetTiles(index))) return true;
+	    if(! isVisited(tile)) return true;
 	    break;
 
 	case MP2::OBJ_TREEKNOWLEDGE:
-	    if(! isVisited(world.GetTiles(index)))
+	    if(! isVisited(tile))
 	    {
 		Resource::funds_t payment;
-		switch(world.GetTiles(index).GetQuantity2())
+		switch(tile.GetQuantity2())
 		{
 		    case 10:	payment.gems = 10; break;
 		    case 20:	payment.gold = 2000; break;
@@ -1742,12 +1805,12 @@ bool Heroes::AIValidObject(u16 index, u8 obj)
 	    break;
 
 	case MP2::OBJ_MAGICWELL:
-	    if(! isVisited(world.GetTiles(index)) &&
+	    if(! isVisited(tile) &&
 		GetMaxSpellPoints() != GetSpellPoints()) return true;
 	    break;
 
 	case MP2::OBJ_ARTESIANSPRING:
-	    if(! isVisited(world.GetTiles(index)) &&
+	    if(! isVisited(tile) &&
 		2 * GetMaxSpellPoints() > GetSpellPoints()) return true;
 	    break;
 
@@ -1756,7 +1819,7 @@ bool Heroes::AIValidObject(u16 index, u8 obj)
 	    const u8 level1 = GetLevelSkill(Skill::Secondary::DIPLOMACY);
 	    const u8 level2 = GetLevel();
 
-	    if(!isVisited(world.GetTiles(index)) &&
+	    if(!isVisited(tile) &&
 		((level1 == Skill::Level::BASIC && 7 < level2) ||
 		(level1 == Skill::Level::ADVANCED && 5 < level2) ||
 		(level1 == Skill::Level::EXPERT && 3 < level2) || (9 < level2))) return true;
@@ -1776,7 +1839,7 @@ bool Heroes::AIValidObject(u16 index, u8 obj)
         case MP2::OBJ_THATCHEDHUT:
         {
     	    Monster mons = Monster::FromObject(obj);
-	    if(world.GetTiles(index).GetCountMonster() &&
+	    if(tile.GetCountMonster() &&
 		(army.HasMonster(mons) ||
 		(army.GetCount() < army.Size() && (mons.isArchers() || mons.isFly())))) return true;
 	    break;
@@ -1793,7 +1856,7 @@ bool Heroes::AIValidObject(u16 index, u8 obj)
         case MP2::OBJ_EARTHALTAR:
         case MP2::OBJ_BARROWMOUNDS:
 	{
-	    const u32 count = world.GetTiles(index).GetCountMonster();
+	    const u32 count = tile.GetCountMonster();
     	    const Monster monster(Monster::FromObject(obj));
 	    const payment_t paymentCosts(PaymentConditions::BuyMonster(monster()) * count);
 	    const Resource::funds_t & kingdomResource = world.GetKingdom(GetColor()).GetFundsResource();
@@ -1810,7 +1873,7 @@ bool Heroes::AIValidObject(u16 index, u8 obj)
         case MP2::OBJ_TROLLBRIDGE:
         {
     	    const bool battle = (Color::GRAY == world.ColorCapturedObject(index));
-	    const u32 count = world.GetTiles(index).GetCountMonster();
+	    const u32 count = tile.GetCountMonster();
     	    const Monster monster(Monster::FromObject(obj));
 	    const payment_t paymentCosts(PaymentConditions::BuyMonster(monster()) * count);
 	    const Resource::funds_t & kingdomResource = world.GetKingdom(GetColor()).GetFundsResource();
@@ -1824,7 +1887,7 @@ bool Heroes::AIValidObject(u16 index, u8 obj)
 	// recruit genie
 	case MP2::OBJ_ANCIENTLAMP:
 	{
-	    const u32 count = world.GetTiles(index).GetCountMonster();
+	    const u32 count = tile.GetCountMonster();
 	    const payment_t paymentCosts(PaymentConditions::BuyMonster(Monster::GENIE) * count);
 	    const Resource::funds_t & kingdomResource = world.GetKingdom(GetColor()).GetFundsResource();
 
@@ -1851,46 +1914,31 @@ bool Heroes::AIValidObject(u16 index, u8 obj)
 	// loyalty obj
 	case MP2::OBJ_STABLES:
 	    if(army.HasMonster(Monster::CAVALRY) ||
-		! isVisited(world.GetTiles(index))) return true;
+		! isVisited(tile)) return true;
 	    break;
 
 	case MP2::OBJ_ARENA:
-	    if(! isVisited(world.GetTiles(index))) return true;
+	    if(! isVisited(tile)) return true;
 	    break;
 
 	// poor morale obj
 	case MP2::OBJ_SHIPWRECK:
         case MP2::OBJ_GRAVEYARD:
 	case MP2::OBJ_DERELICTSHIP:
-        {
-	    const Maps::Tiles & tile = world.GetTiles(index);
-            Army::army_t enemy;
-	    enemy.FromGuardian(tile);
-
-            // can we will win battle
-            if(enemy.isValid() && GetArmy().StrongerEnemyArmy(enemy)) return true;
-	    break;
-	}
+	    return true;
 
 	//case MP2::OBJ_PYRAMID:
 
 	case MP2::OBJ_DAEMONCAVE:
-	    if(world.GetTiles(index).GetQuantity2() && 4 != world.GetTiles(index).GetQuantity2()) return true;
+	    if(tile.GetQuantity2() && 4 != tile.GetQuantity2()) return true;
 	    break;
 
 	case MP2::OBJ_MONSTER:
-	{
-            Army::army_t enemy;
-            enemy.JoinTroop(Army::Troop(world.GetTiles(index)));
-
-            // can we will win battle
-            if(enemy.isValid() && GetArmy().StrongerEnemyArmy(enemy)) return true;
-	    break;
-	}
+	    return true;
 
 	// sign
 	case MP2::OBJ_SIGN:
-	    if(!isVisited(world.GetTiles(index))) return true;
+	    if(!isVisited(tile)) return true;
 	    break;
 
 	case MP2::OBJ_CASTLE:

@@ -193,10 +193,10 @@ void Army::army_t::FromGuardian(const Maps::Tiles & t)
 	    ArrangeForBattle();
 	    break;
 
-	case MP2::OBJ_ABANDONEDMINE:
-	    army[0] = Troop(t);
-	    ArrangeForBattle();
-	    break;
+	//case MP2::OBJ_ABANDONEDMINE:
+	//    army[0] = Troop(t);
+	//    ArrangeForBattle();
+	//    break;
 
 	case MP2::OBJ_CITYDEAD:
             army[0].Set(Monster::ZOMBIE, 20);
@@ -227,7 +227,10 @@ void Army::army_t::FromGuardian(const Maps::Tiles & t)
             army[3].Set(Monster::EARTH_ELEMENT, 2);
 	    break;
 
-	default: break;
+	default:
+	    army[0] = Troop(t);
+	    ArrangeForBattle();
+	    break;
     }
 }
 
