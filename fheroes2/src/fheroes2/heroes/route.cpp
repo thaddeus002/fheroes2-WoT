@@ -257,7 +257,7 @@ void Route::Path::Dump(void) const
     for(; it1 != it2; ++it1) std::cout << "Path::Dump: " << Direction::String((*it1).Direction()) << ", " << (*it1).Penalty() << std::endl;
 }
 
-bool Route::Path::isUnderProtection(u16* res) const
+u16 Route::Path::isUnderProtection(u16 & pos) const
 {
     const_iterator it = begin();
     u16 next = hero.GetIndex();
@@ -267,10 +267,16 @@ bool Route::Path::isUnderProtection(u16* res) const
 	if(Maps::isValidDirection(next, (*it).Direction()))
 	    next = Maps::GetDirectionIndex(next, (*it).Direction());
 
-	if(Maps::TileUnderProtection(next, res))  return true;
+	const u16 res = Maps::TileUnderProtection(next);
+
+	if(res)
+	{
+	    pos = next;
+	    return res;
+	}
     }
 
-    return false;
+    return 0;
 }
 
 bool Route::Path::hasObstacle(u16* res) const

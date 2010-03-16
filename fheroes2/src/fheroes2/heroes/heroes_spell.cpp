@@ -167,22 +167,21 @@ bool ActionSpellSummonBoat(Heroes & hero)
     const u16 center = hero.GetIndex();
 
     // find water
-    std::vector<u16> v;
-    std::vector<u16>::const_iterator dst;
-    if(Maps::ScanAroundObject(center, MP2::OBJ_ZERO, true, v))
+    u16 around_zero = Maps::ScanAroundObject(center, MP2::OBJ_ZERO);
+    u16 dst_water = MAXU16;
+    for(Direction::vector_t dir = Direction::TOP_LEFT; dir < Direction::CENTER; ++dir) if(around_zero & dir)
     {
-        dst = v.begin();
-        // find_if water
-        for(; dst != v.end(); ++dst) if(Maps::Ground::WATER == world.GetTiles(*dst).GetGround()) break;
+	const u16 dst = Maps::GetDirectionIndex(center, dir);
+        if(Maps::Ground::WATER == world.GetTiles(dst).GetGround()){ dst_water = dst; break; }
     }
 
     // find boat
     const u16 src = world.GetNearestObject(center, MP2::OBJ_BOAT);
 
-    if(Rand::Get(1, 100) <= chance && MAXU16 != src && dst != v.end())
+    if(Rand::Get(1, 100) <= chance && MAXU16 != src && dst_water != MAXU16)
     {
 	world.GetTiles(src).SetObject(MP2::OBJ_ZERO);
-	world.GetTiles(*dst).SetObject(MP2::OBJ_BOAT);
+	world.GetTiles(dst_water).SetObject(MP2::OBJ_BOAT);
     }
     else
 	DialogSpellFailed(Spell::SUMMONBOAT);

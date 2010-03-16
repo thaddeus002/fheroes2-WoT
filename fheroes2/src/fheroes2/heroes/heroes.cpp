@@ -1565,23 +1565,30 @@ void Heroes::PreBattleAction(void)
 
 void Heroes::ActionNewPosition(void)
 {
-    u16 dst;
-
     // check around monster
-    while(!isFreeman() && Maps::TileUnderProtection(GetIndex(), &dst))
-    {
-    	// redraw gamearea for monster action sprite
-	if(Settings::Get().MyColor() == GetColor())
-	{
-	    Interface::Basic & I = Interface::Basic::Get();
-    	    Game::Focus & F = Game::Focus::Get();
-    	    I.gameArea.Center(F.Center());
-    	    F.SetRedraw();
-    	    I.Redraw();
-	}
+    const u16 dst_around = Maps::TileUnderProtection(GetIndex());
 
-        Action(dst);
-        SetMove(false);
+    for(Direction::vector_t dir = Direction::TOP_LEFT; dir < Direction::CENTER; ++dir) if(dst_around & dir)
+    {
+	if(isFreeman())
+	    break;
+	else
+	{
+	    const u16 mons = Maps::GetDirectionIndex(dst_around, dir);
+
+    	    // redraw gamearea for monster action sprite
+	    if(Settings::Get().MyColor() == GetColor())
+	    {
+		Interface::Basic & I = Interface::Basic::Get();
+		Game::Focus & F = Game::Focus::Get();
+		I.gameArea.Center(F.Center());
+		F.SetRedraw();
+		I.Redraw();
+	    }
+
+	    Action(mons);
+	    SetMove(false);
+	}
     }
 }
 

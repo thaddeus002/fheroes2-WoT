@@ -60,7 +60,7 @@ namespace Route
 
 	    bool	isValid(void) const { return size(); };
 	    bool	isShow(void) const { return !hide; };
-	    bool	isUnderProtection(u16* res = NULL) const;
+	    u16		isUnderProtection(u16 & pos) const;
 	    bool	hasObstacle(u16* res = NULL) const;
 
 	    void	Dump(void) const;

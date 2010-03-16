@@ -684,7 +684,7 @@ Battle2::Arena::Arena(Army::army_t & a1, Army::army_t & a2, u16 index, bool loca
     else
     // set obstacles
     {
-	icn_covr = Maps::ScanAroundObject(index, MP2::OBJ_CRATER, false) ? GetCovr(world.GetTiles(index).GetGround()) : ICN::UNKNOWN;
+	icn_covr = Maps::ScanAroundObject(index, MP2::OBJ_CRATER) ? GetCovr(world.GetTiles(index).GetGround()) : ICN::UNKNOWN;
 
 	if(icn_covr != ICN::UNKNOWN)
 	    board.SetCovrObjects(icn_covr);

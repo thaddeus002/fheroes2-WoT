@@ -848,6 +848,8 @@ bool MP2::isQuantityObject(const u8 obj)
         default: break;
     }
 
+    if(isPickupObject(obj)) return true;
+
     return false;
 }
 

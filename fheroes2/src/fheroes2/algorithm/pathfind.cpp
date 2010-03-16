@@ -87,6 +87,15 @@ u16 GetCurrentLength(std::map<u16, cell_t> & list, u16 cur)
     return res;
 }
 
+bool MonsterDestination(const u16 from, const u16 around, const u16 dst)
+{
+    for(Direction::vector_t dir = Direction::TOP_LEFT; dir < Direction::CENTER; ++dir)
+	if((around & dir) && dst == Maps::GetDirectionIndex(from, dir))
+	    return true;
+
+    return false;
+}
+
 bool Algorithm::PathFind(std::list<Route::Step> *result, const u16 from, const u16 to, const u16 limit, const Heroes *hero)
 {
     const u8 pathfinding = (hero ? hero->GetLevelSkill(Skill::Secondary::PATHFINDING) : Skill::Level::NONE);
@@ -132,7 +141,7 @@ bool Algorithm::PathFind(std::list<Route::Step> *result, const u16 from, const u
 			if(MAXU16 == cell.cost_g) continue;
 
 			// check monster protection
-			if(tmp != to && Maps::TileUnderProtection(tmp, &mons) && mons != to) continue;
+			if(tmp != to && (mons = Maps::TileUnderProtection(tmp)) && ! MonsterDestination(tmp, mons, to)) continue;
 
 			// check direct from object
 			const Maps::Tiles & tile1 = world.GetTiles(cur);

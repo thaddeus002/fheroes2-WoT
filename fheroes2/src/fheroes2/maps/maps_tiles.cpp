@@ -367,8 +367,23 @@ void Maps::Tiles::RedrawMonster(Surface & dst, s16 px, s16 py, const Interface::
     Rect src_rt;
     u16 dst_index = MAXU16;
 
+    // scan hero around
+    const u16 dst_around = Maps::ScanAroundObject(maps_index, MP2::OBJ_HEROES);
+    for(Direction::vector_t dir = Direction::TOP_LEFT; dir < Direction::CENTER; ++dir) if(dst_around & dir)
+    {
+	dst_index = Maps::GetDirectionIndex(maps_index, dir);
+	const Heroes* hero = world.GetHeroes(dst_index);
+
+	if(!hero ||
+	    // skip bottom, bottom_right, bottom_left with ground objects
+	    (((Direction::BOTTOM | Direction::BOTTOM_LEFT | Direction::BOTTOM_RIGHT) & dir) && MP2::isGroundObject(hero->GetUnderObject())))
+	    dst_index = MAXU16;
+	else
+	    break;
+    }
+
     // draw attack sprite
-    if(Maps::ScanAroundObject(maps_index, MP2::OBJ_HEROES, Settings::Get().OriginalVersion(), &dst_index))
+    if(MAXU16 != dst_index)
     {
 	bool revert = false;
 
@@ -671,7 +686,6 @@ Maps::TilesAddon * Maps::Tiles::FindAddonLevel2(u32 uniq2)
 
 void Maps::Tiles::DebugInfo(void) const
 {
-    u16 res = 0;
     std::list<TilesAddon>::const_iterator it1;
     std::list<TilesAddon>::const_iterator it2;
 
@@ -847,9 +861,17 @@ void Maps::Tiles::DebugInfo(void) const
 	    break;
 
 	default:
-	    if(Maps::TileUnderProtection(maps_index, &res))
-		std::cout << "protection      : " << res << std::endl;
+	{
+	    const u16 dst_around = Maps::TileUnderProtection(maps_index);
+	    if(dst_around)
+	    {
+		std::cout << "protection      : ";
+		for(Direction::vector_t dir = Direction::TOP_LEFT; dir < Direction::CENTER; ++dir)
+		    if(dst_around & dir)
+			std::cout << Maps::GetDirectionIndex(maps_index, dir) << std::endl;
+	    }
 	    break;
+	}
     }
 
     std::cout << "----------------:--------" << std::endl << std::endl;

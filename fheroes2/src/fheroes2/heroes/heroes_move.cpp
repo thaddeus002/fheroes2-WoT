@@ -28,6 +28,7 @@
 #include "kingdom.h"
 #include "maps_tiles.h"
 #include "castle.h"
+#include "direction.h"
 #include "heroes.h"
 
 bool ReflectSprite(const u16 from);
@@ -452,12 +453,14 @@ bool Heroes::MoveStep(bool fast)
 	// AI: force scan resource around
 	if(GetControl() == Game::AI)
 	{
-	    u16 dst_index2;
-	    while(CanMove() && Maps::ScanAroundObject(index_to, MP2::OBJ_RESOURCE, true, &dst_index2))
+	    const u16 dst = Maps::ScanAroundObject(index_to, MP2::OBJ_RESOURCE);
+	    for(Direction::vector_t dir = Direction::TOP_LEFT; dir < Direction::CENTER; ++dir) if(dst & dir)
 	    {
-		Action(dst_index2);
-		ApplyPenaltyMovement();
-	    }
+                if(CanMove())
+            	    Action(Maps::GetDirectionIndex(index_to, dir));
+            	else
+            	    break;
+            }
 	}
 
 	// possible hero is die

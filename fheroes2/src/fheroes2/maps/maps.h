@@ -70,10 +70,9 @@ namespace Maps
     u8  GetCountAroundGround(const u16 center, const u16 ground);
     u16 GetMaxGroundAround(const u16 center);
 
-    bool ScanAroundObject(const u16 center, const u8 obj, bool full, std::vector<u16> &);
-    bool ScanAroundObject(const u16 center, const u8 obj, bool full, u16 *res = NULL);
+    u16  ScanAroundObject(const u16 center, const u8 obj, const u16 exclude = 0);
     bool ScanDistanceObject(const u16 center, const u8 obj, const u16 dist, u16 *res = NULL);
-    bool TileUnderProtection(const u16 index, u16 *res = NULL);
+    u16  TileUnderProtection(const u16 center);
 
     void ClearFog(u16 center, u8 scoute, const u8 color);
     u16 GetApproximateDistance(const u16 index1, const u16 index2);

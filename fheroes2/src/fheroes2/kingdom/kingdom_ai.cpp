@@ -342,14 +342,29 @@ void Kingdom::AIHeroesPrepareTask(Heroes & hero)
 	    if(hero.GetPath().Calculate((*itm1).first) && hero.AIValidObject((*itm1).first, (*itm1).second))
 	    {
 		u16 pos = 0;
-		// check monster on path
-		if(hero.GetPath().isUnderProtection(&pos))
-		{
-		    Army::army_t enemy;
-		    enemy.JoinTroop(Army::Troop(world.GetTiles(pos)));
+		const u16 dst_around = hero.GetPath().isUnderProtection(pos);
 
-		    // can we will win battle
-		    if(enemy.isValid() && ! hero.GetArmy().StrongerEnemyArmy(enemy)) continue;
+		// check monster on path
+		if(dst_around)
+		{
+		    bool skip = false;
+
+		    for(Direction::vector_t dir = Direction::TOP_LEFT; dir < Direction::CENTER; ++dir) if(dst_around & dir)
+		    {
+			const u16 dst_index = Maps::GetDirectionIndex(pos, dir);
+
+			Army::army_t enemy;
+			enemy.JoinTroop(Army::Troop(world.GetTiles(dst_index)));
+
+			// can we will not win battle
+			if(enemy.isValid() && ! hero.GetArmy().StrongerEnemyArmy(enemy))
+			{
+			    skip = true;
+			    break;
+			}
+		    }
+
+		    if(skip) continue;
 		}
 
 		if(hero.AIPriorityObject((*itm1).first, (*itm1).second))

@@ -269,51 +269,17 @@ void Maps::ClearFog(u16 index, u8 scoute, const u8 color)
                 world.GetTiles(GetIndexFromAbsPoint(x, y)).ClearFog(color);
 }
 
-bool Maps::ScanAroundObject(const u16 center, const u8 obj, bool full, std::vector<u16> & res)
+u16 Maps::ScanAroundObject(const u16 center, const u8 obj, const u16 exclude)
 {
-    const s16 cx = center % world.w();
-    const s16 cy = center / world.w();
-    u16 res2 = 0;
+    u16 result = 0;
 
-    if(res.size()) res.clear();
-
-    for(s16 y = -1; y <= 1; ++y)
-        for(s16 x = -1; x <= 1; ++x)
+    for(Direction::vector_t dir = Direction::TOP_LEFT; dir < Direction::CENTER; ++dir)
     {
-            if((!y && !x) || (y && x && !full)) continue;
-
-	    res2 = GetIndexFromAbsPoint(cx + x, cy + y);
-
-	    if(isValidAbsPoint(cx + x, cy + y) &&
-		obj == world.GetTiles(res2).GetObject()) res.push_back(res2);
+	if((exclude & dir) || !isValidDirection(center, dir)) continue;
+	if(obj == world.GetTiles(GetDirectionIndex(center, dir)).GetObject()) result |= dir;
     }
 
-    return res.size();
-}
-
-bool Maps::ScanAroundObject(const u16 center, const u8 obj, bool full, u16 *res)
-{
-    const s16 cx = center % world.w();
-    const s16 cy = center / world.w();
-    u16 res2 = 0;
-
-    for(s16 y = -1; y <= 1; ++y)
-        for(s16 x = -1; x <= 1; ++x)
-    {
-            if((!y && !x) || (y && x && !full)) continue;
-
-	    res2 = GetIndexFromAbsPoint(cx + x, cy + y);
-
-	    if(isValidAbsPoint(cx + x, cy + y) &&
-		obj == world.GetTiles(res2).GetObject())
-	    {
-		if(res) *res = res2;
-		return true;
-	    }
-    }
-
-    if(res) *res = MAXU16;
-    return false;
+    return result;
 }
 
 bool Maps::ScanDistanceObject(const u16 center, const u8 obj, const u16 dist, u16 *res)
@@ -508,7 +474,21 @@ void Maps::UpdateSpritesFromTownToCastle(const Point & center)
     }
 }
 
-bool Maps::TileUnderProtection(const u16 index, u16 *res)
+u16 Maps::TileUnderProtection(const u16 center)
 {
-    return Maps::ScanAroundObject(index, MP2::OBJ_MONSTER, true, res); //Settings::Get().OriginalVersion(), res);
+    u16 result = 0;
+    const u16 dst_around = Maps::ScanAroundObject(center, MP2::OBJ_MONSTER);
+    const u8  obj = MP2::OBJ_HEROES == world.GetTiles(center).GetObject() ? world.GetHeroes(center)->GetUnderObject() : world.GetTiles(center).GetObject();
+
+    for(Direction::vector_t dir = Direction::TOP_LEFT; dir < Direction::CENTER; ++dir) if(dst_around & dir)
+    {
+	if((Direction::TOP | Direction::TOP_LEFT | Direction::TOP_RIGHT) & dir)
+	{
+	    if(! MP2::isGroundObject(obj)) result |= dir;
+	}
+	else
+	    result |= dir;
+    }
+
+    return result;
 }
