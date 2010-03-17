@@ -86,8 +86,11 @@ Game::menu_t Game::ScenarioInfo(void)
     const Point top((display.w() - back.w()) / 2, (display.h() - back.h()) / 2);
     display.Blit(back, top);
 
+    const bool reset_starting_settings = Color::GRAY == conf.MyColor();
+
     // set first maps settings
-    conf.LoadFileMapsMP2(lists.front().file);
+    if(reset_starting_settings)
+	conf.LoadFileMapsMP2(lists.front().file);
     
     const Point pointPanel(top.x + 204, top.y + 32);
     const Point pointDifficultyInfo(pointPanel.x + 24, pointPanel.y + 93);
@@ -113,8 +116,11 @@ Game::menu_t Game::ScenarioInfo(void)
     std::vector<Rect> coordClass(KINGDOMMAX);
 
     // first allow color
-    conf.SetMyColor(conf.FirstAllowColor());
-    conf.SetPlayersColors(conf.MyColor());
+    if(reset_starting_settings)
+    {
+	conf.SetMyColor(conf.FirstAllowColor());
+	conf.SetPlayersColors(conf.MyColor());
+    }
 
     Scenario::RedrawStaticInfo(pointPanel);
     Scenario::RedrawDifficultyInfo(pointDifficultyInfo);
@@ -125,16 +131,26 @@ Game::menu_t Game::ScenarioInfo(void)
     UpdateCoordClassInfo(pointClassInfo, coordClass);
     Scenario::RedrawClassInfo(pointClassInfo);
 
-    const Point pointDifficultyNormal(pointPanel.x + 98, pointPanel.y + 91);
-    SpriteCursor levelCursor(AGG::GetICN(ICN::NGEXTRA, 62), pointDifficultyNormal);
-    levelCursor.Show(pointDifficultyNormal);
-    conf.SetGameDifficulty(Difficulty::NORMAL);
+    const Sprite & ngextra = AGG::GetICN(ICN::NGEXTRA, 62);
+    
+    coordDifficulty[0] = Rect(pointPanel.x + 21, pointPanel.y + 91,  ngextra.w(), ngextra.h());
+    coordDifficulty[1] = Rect(pointPanel.x + 98, pointPanel.y + 91,  ngextra.w(), ngextra.h());
+    coordDifficulty[2] = Rect(pointPanel.x + 174, pointPanel.y + 91, ngextra.w(), ngextra.h());
+    coordDifficulty[3] = Rect(pointPanel.x + 251, pointPanel.y + 91, ngextra.w(), ngextra.h());
+    coordDifficulty[4] = Rect(pointPanel.x + 328, pointPanel.y + 91, ngextra.w(), ngextra.h());
 
-    coordDifficulty[0] = Rect(pointPanel.x + 21, pointPanel.y + 91,  levelCursor.w(), levelCursor.h());
-    coordDifficulty[1] = Rect(pointDifficultyNormal.x, pointDifficultyNormal.y,  levelCursor.w(), levelCursor.h());
-    coordDifficulty[2] = Rect(pointPanel.x + 174, pointPanel.y + 91, levelCursor.w(), levelCursor.h());
-    coordDifficulty[3] = Rect(pointPanel.x + 251, pointPanel.y + 91, levelCursor.w(), levelCursor.h());
-    coordDifficulty[4] = Rect(pointPanel.x + 328, pointPanel.y + 91, levelCursor.w(), levelCursor.h());
+    SpriteCursor levelCursor(ngextra);
+
+    switch(conf.GameDifficulty())
+    {
+	case Difficulty::EASY:		levelCursor.Move(coordDifficulty[0]); break;
+	case Difficulty::NORMAL:	levelCursor.Move(coordDifficulty[1]); break;
+	case Difficulty::HARD:		levelCursor.Move(coordDifficulty[2]); break;
+	case Difficulty::EXPERT:	levelCursor.Move(coordDifficulty[3]); break;
+	case Difficulty::IMPOSSIBLE:	levelCursor.Move(coordDifficulty[4]); break;
+    }
+
+    levelCursor.Show();
 
 
     TextSprite rating;
@@ -173,8 +189,10 @@ Game::menu_t Game::ScenarioInfo(void)
 		UpdateCoordClassInfo(pointClassInfo, coordClass);
 		Scenario::RedrawClassInfo(pointClassInfo);
 		RedrawRatingInfo(rating);
-		levelCursor.Move(pointDifficultyNormal);
+		// default difficulty normal
+		levelCursor.Move(coordDifficulty[1]);
 		levelCursor.Show();
+    		conf.SetGameDifficulty(Difficulty::NORMAL);
 	    }
 	    cursor.Show();
 	    display.Flip();
