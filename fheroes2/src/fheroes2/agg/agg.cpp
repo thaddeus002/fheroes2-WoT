@@ -36,10 +36,6 @@
 #include "xmlccwrap.h"
 #endif
 
-void StoreMemToFile(const std::vector<u8> &, const std::string &);
-void StoreFileToMem(std::vector<u8> &, const std::string &);
-bool FilePresent(const std::string &);
-
 #define FATSIZENAME	15
 
 /*AGG::File constructor */
@@ -569,10 +565,9 @@ void AGG::Cache::LoadWAV(const M82::m82_t m82)
        String::Replace(name, ".82m", ".ogg");
        std::string sound = Settings::Get().LocalPrefix() + SEPARATOR + "files" + SEPARATOR + "sounds" + SEPARATOR + name;
 
-       if(FilePresent(sound))
+       if(StoreFileToMem(v, sound))
        {
            DEBUG(DBG_ENGINE , DBG_INFO, "AGG::Cache::LoadWAV: " << sound);
-           StoreFileToMem(v, sound);
            return;
        }
 
@@ -580,10 +575,9 @@ void AGG::Cache::LoadWAV(const M82::m82_t m82)
        String::Replace(name, ".82m", ".mp3");
        sound = Settings::Get().LocalPrefix() + SEPARATOR + "files" + SEPARATOR + "sounds" + SEPARATOR + name;
 
-       if(FilePresent(sound))
+       if(StoreFileToMem(v, sound))
        {
            DEBUG(DBG_ENGINE , DBG_INFO, "AGG::Cache::LoadWAV: " << sound);
-           StoreFileToMem(v, sound);
            return;
        }
     }
@@ -1203,13 +1197,13 @@ void AGG::PlayMusic(const MUS::mus_t mus, bool loop)
 	    if(conf.PlayMusCommand().size())
 	    {
 		const std::string file = conf.LocalPrefix() + SEPARATOR + "files" + SEPARATOR + "music" + SEPARATOR + XMI::GetString(xmi);
-		if(!FilePresent(file))
-		    StoreMemToFile(AGG::Cache::Get().GetMID(xmi), file);
-		else
+		if(FilePresent(file))
 		{
 		    const std::string run = conf.PlayMusCommand() + " " + file;
 		    Music::Play(run.c_str(), loop);
 		}
+		else
+		    StoreMemToFile(AGG::Cache::Get().GetMID(xmi), file);
 	    }
 #endif
 	}
@@ -1243,43 +1237,4 @@ const Surface & AGG::GetLetter(char ch, u8 ft)
     }
 
     return AGG::GetICN(ICN::SMALFONT, ch - 0x20);
-}
-
-bool FilePresent(const std::string & file)
-{
-    std::fstream fs;
-    // check file
-    fs.open(file.c_str(), std::ios::in | std::ios::binary);
-    if(fs.good())
-    {
-	fs.close();
-	return true;
-    }
-    return false;
-}
-
-void StoreMemToFile(const std::vector<u8> & data, const std::string & file)
-{
-    if(FilePresent(file)) return;
-    std::fstream fs;
-    fs.open(file.c_str(), std::ios::out | std::ios::binary);
-    if(fs.good() && data.size())
-    {
-	fs.write(reinterpret_cast<const char*>(&data[0]), data.size());
-	fs.close();
-    }
-}
-
-void StoreFileToMem(std::vector<u8> & data, const std::string & file)
-{
-    std::fstream fs;
-    fs.open(file.c_str(), std::ios::in | std::ios::binary);
-    if(fs.good())
-    {
-	fs.seekg(0, std::ios_base::end);
-	data.resize(fs.tellg());
-	fs.seekg(0, std::ios_base::beg);
-	fs.read(reinterpret_cast<char*>(&data[0]), data.size());
-	fs.close();
-    }
 }

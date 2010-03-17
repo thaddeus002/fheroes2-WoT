@@ -54,4 +54,8 @@ const char* GetDirname(const char *);
 const char* GetBasename(const char *);
 u32 GetMemoryUsage(void);
 
+bool StoreMemToFile(const std::vector<u8> &, const std::string &);
+bool StoreFileToMem(std::vector<u8> &, const std::string &);
+bool FilePresent(const std::string &);
+
 #endif

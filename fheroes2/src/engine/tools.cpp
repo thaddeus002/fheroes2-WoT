@@ -410,3 +410,45 @@ KeySym KeySymFromChar(char c)
     }
     return KEY_NONE;
 }
+
+bool FilePresent(const std::string & file)
+{
+    std::fstream fs;
+    // check file
+    fs.open(file.c_str(), std::ios::in | std::ios::binary);
+    if(fs.good())
+    {
+        fs.close();
+        return true;
+    }
+    return false;
+}
+
+bool StoreMemToFile(const std::vector<u8> & data, const std::string & file)
+{
+    std::fstream fs;
+    fs.open(file.c_str(), std::ios::out | std::ios::binary);
+    if(fs.good() && data.size())
+    {
+        fs.write(reinterpret_cast<const char*>(&data[0]), data.size());
+        fs.close();
+        return true;
+    }
+    return false;
+}
+
+bool StoreFileToMem(std::vector<u8> & data, const std::string & file)
+{
+    std::fstream fs;
+    fs.open(file.c_str(), std::ios::in | std::ios::binary);
+    if(fs.good())
+    {
+        fs.seekg(0, std::ios_base::end);
+        data.resize(fs.tellg());
+        fs.seekg(0, std::ios_base::beg);
+        fs.read(reinterpret_cast<char*>(&data[0]), data.size());
+        fs.close();
+        return true;
+    }
+    return false;
+}

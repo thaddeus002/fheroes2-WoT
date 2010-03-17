@@ -45,7 +45,6 @@
 
 #include "zzlib.h"
 
-extern bool FilePresent(const std::string &);
 void LoadZLogo(void);
 void SetTimidityEnvPath(const Settings &);
 void SetLangEnvPath(const Settings &);
