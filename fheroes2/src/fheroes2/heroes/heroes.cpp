@@ -1581,7 +1581,7 @@ void Heroes::ActionNewPosition(void)
 	    break;
 	else
 	{
-	    const u16 mons = Maps::GetDirectionIndex(dst_around, dir);
+	    const u16 mons = Maps::GetDirectionIndex(GetIndex(), dir);
 
     	    // redraw gamearea for monster action sprite
 	    if(Settings::Get().MyColor() == GetColor())
