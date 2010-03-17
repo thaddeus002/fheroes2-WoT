@@ -30,8 +30,10 @@
 #include "army_troop.h"
 
 class Castle;
+class Heroes;
 namespace Maps { class Tiles; };
 namespace Battle2 { class Stats; };
+namespace Resource { struct funds_t; };
 
 namespace Army
 {
@@ -58,6 +60,9 @@ namespace Army
 
     const char* String(u32);
     armysize_t GetSize(u32);
+
+    // 0: fight, 1: free join, 2: join with gold, 3: flee
+    u8 GetJoinSolution(const Heroes &, const Maps::Tiles &, u32 &, Resource::funds_t &);
 
     class army_t
     {

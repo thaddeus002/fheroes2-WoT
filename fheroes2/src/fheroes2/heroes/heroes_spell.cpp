@@ -314,19 +314,64 @@ bool ActionSpellTownPortal(Heroes & hero)
 
 bool ActionSpellVisions(Heroes & hero)
 {
-/*
-You must be within 3 spaces of a monster for the Visions spell to work.
-{%d %s}
-The creatures are willing to join us!
-All the creatures will join us...
-for a fee of %d gold.
-%d of the creatures will join us...
-for a fee of %d gold.
-These weak creatures will surely flee before us.
-I fear these creatures are in the mood for a fight.
-*/
-    DialogNotAvailable();
-    return false;
+    std::vector<u16> monsters;
+    const u8 dist = Spell::GetExtraValue(Spell::VISIONS);
+
+    if(Maps::ScanDistanceObject(hero.GetIndex(), MP2::OBJ_MONSTER, dist, monsters))
+    {
+	for(std::vector<u16>::const_iterator it = monsters.begin(); it != monsters.end(); ++it)
+	{
+	    const Maps::Tiles & tile = world.GetTiles(*it);
+	    const Army::Troop troop(tile);
+
+    	    u32 join = troop.GetCount();
+    	    Resource::funds_t cost;
+
+	    const u8 reason = Army::GetJoinSolution(hero, tile, join, cost);
+	    std::string hdr, msg;
+
+	    hdr = std::string("%{count} ") + troop.GetMultiName();
+	    String::Lower(hdr);
+	    String::Replace(hdr, "%{count}", join);
+
+	    switch(reason)
+	    {
+		case 0:
+		    msg = _("I fear these creatures are in the mood for a fight.");
+		    break;
+
+		case 1:
+		    msg = _("The creatures are willing to join us!");
+		    break;
+
+		case 2:
+		    if(join == troop.GetCount())
+			msg = _("All the creatures will join us...\n for a fee of %{gold} gold.");
+		    else
+		    {
+			msg = _("%{count} of the creatures will join us...\n for a fee of %{gold} gold.");
+			String::Replace(msg, "%{count}", join);
+		    }
+		    String::Replace(msg, "%{gold}", cost.gold);
+		    break;
+
+		default:
+		    msg = _("These weak creatures will surely flee before us.");
+		    break;
+	    }
+
+	    Dialog::Message(hdr, msg, Font::BIG, Dialog::OK);
+	}
+    }
+    else
+    {
+	std::string msg = _("You must be within %{count} spaces of a monster for the Visions spell to work.");
+	String::Replace(msg, "%{count}", dist);
+	Dialog::Message("", msg, Font::BIG, Dialog::OK);
+	return false;
+    }
+
+    return true;
 }
 
 bool ActionSpellSetGuardian(Heroes & hero, Monster::monster_t m)

@@ -1177,3 +1177,55 @@ u32 Army::army_t::GetSurrenderCost(void) const
 
     return res;
 }
+
+u8 Army::GetJoinSolution(const Heroes & hero, const Maps::Tiles & tile, u32 & join, Resource::funds_t & cost)
+{
+    const Army::Troop troop(tile);
+
+    if(! troop.isValid()) return 0xFF;
+
+    const float ratios = troop.isValid() ? hero.GetArmy().GetHitPoints() / troop.GetHitPoints() : 0;
+    const bool check_free_stack = (hero.GetArmy().GetCount() < hero.GetArmy().Size() || hero.GetArmy().HasMonster(troop()));
+    const bool check_extra_condition = Morale::NORMAL <= hero.GetMorale();
+
+    // force join for campain and others...
+    const bool force_join = (5 == tile.GetQuantity4());
+
+VERBOSE(ratios);
+
+    if(tile.GetQuantity4() && check_free_stack && ((check_extra_condition && ratios >= 2) || force_join))
+    {
+        if(2 == tile.GetQuantity4() || force_join)
+        {
+	    join = troop.GetCount();
+	    return 1;
+	}
+	else
+        if(hero.HasSecondarySkill(Skill::Secondary::DIPLOMACY))
+        {
+            const Kingdom & kingdom = world.GetKingdom(hero.GetColor());
+            cost = PaymentConditions::BuyMonster(troop());
+            cost *= troop.GetCount();
+
+            // skill diplomacy
+            const u32 to_join = Monster::GetCountFromHitPoints(troop(), troop.GetHitPoints() * hero.GetSecondaryValues(Skill::Secondary::DIPLOMACY) / 100);
+
+            if(to_join && kingdom.AllowPayment(cost))
+            {
+		join = to_join;
+		return 2;
+	    }
+	}
+    }
+    else
+    if(ratios >= 5)
+    {
+	// ... surely flee before us
+
+	if(hero.GetControl() == Game::AI) return Rand::Get(0, 10) < 5 ? 0 : 3;
+
+	return 3;
+    }
+
+    return 0;
+}

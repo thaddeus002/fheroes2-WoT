@@ -395,101 +395,77 @@ void AIToCastle(Heroes &hero, const u8 obj, const u16 dst_index)
 
 void AIToMonster(Heroes &hero, const u8 obj, const u16 dst_index)
 {
-    bool avoidBattle = false, destroyTile = false;
+    bool destroy = false;
     Maps::Tiles & tile = world.GetTiles(dst_index);
     const Army::Troop troop(tile);
 
-    const float ratios = troop.isValid() ? hero.GetArmy().GetHitPoints() / troop.GetHitPoints() : 0;
+    u32 join = 0;
+    Resource::funds_t cost;
 
-    const bool check_free_stack = (hero.GetArmy().GetCount() < hero.GetArmy().Size() || hero.GetArmy().HasMonster(troop()));
-    const bool check_extra_condition = Morale::NORMAL <= hero.GetMorale();
-    
-    if(tile.GetQuantity4() && check_free_stack && check_extra_condition && ratios >= 2)
+    u8 reason = Army::GetJoinSolution(hero, tile, join, cost);
+
+    // free join
+    if(1 == reason)
     {
-        DEBUG(DBG_AI , DBG_INFO, "AIToMonster: possible " << hero.GetName() << " join monster " << troop.GetName());
-
-        if(2 == tile.GetQuantity4())
-        {
-            // join if ranged or flying monsters present
-            if(hero.GetArmy().HasMonster(troop()) || troop.isArchers() || troop.isFly())
-            {
-                hero.GetArmy().JoinTroop(troop);
-                avoidBattle = true;
-		destroyTile = true;
-            }
-            else
-                DEBUG(DBG_AI , DBG_WARN, "AIToMonster: " << "condition is not fulfilled");
-        }
-        else
-        if(hero.HasSecondarySkill(Skill::Secondary::DIPLOMACY))
-        {
-            u32 toJoin = troop.GetCount();
-
-	    Kingdom & kingdom = world.GetKingdom(hero.GetColor());
-            PaymentConditions::BuyMonster cost(troop());
-            cost *= toJoin;
-    
-	    // skill diplomacy
-	    toJoin = Monster::GetCountFromHitPoints(troop(), troop.GetHitPoints() * hero.GetSecondaryValues(Skill::Secondary::DIPLOMACY) / 100);
-
-            if(toJoin && kingdom.AllowPayment(cost))
-            {
-                // join if archers or fly or present
-                if(hero.GetArmy().HasMonster(troop()) || troop.isArchers() || troop.isFly())
-                {
-                    hero.GetArmy().JoinTroop(troop(), toJoin);
-                    kingdom.OddFundsResource(cost);
-                    avoidBattle = true;
-		    destroyTile = true;
-                }
-            }
-            else
-                DEBUG(DBG_AI , DBG_WARN, "AIToMonster: " << "condition is not fulfilled");
-        }
+    	// join if ranged or flying monsters present
+    	if(hero.GetArmy().HasMonster(troop()) || troop.isArchers() || troop.isFly())
+    	{
+    	    DEBUG(DBG_AI , DBG_INFO, "AIToMonster: " << hero.GetName() << " join monster " << troop.GetName());
+    	    hero.GetArmy().JoinTroop(troop);
+	    destroy = true;
+    	}
+	else
+	    reason = 0;
+    }
+    else
+    // join with cost
+    if(2 == reason)
+    {
+    	// join if archers or fly or present
+    	if(hero.GetArmy().HasMonster(troop()) || troop.isArchers() || troop.isFly())
+    	{
+    	    DEBUG(DBG_AI , DBG_INFO, "AIToMonster: " << hero.GetName() << " join monster " << troop.GetName() << ", count: " << join << ", cost: " << cost.gold);
+    	    hero.GetArmy().JoinTroop(troop(), join);
+	    world.GetKingdom(hero.GetColor()).OddFundsResource(cost);
+	    destroy = true;
+    	}
+	else
+	    reason = 0;
     }
 
-    if(!troop.isValid())
+    // fight
+    if(0 == reason)
     {
-	avoidBattle = true;
-        destroyTile = true;
-        DEBUG(DBG_AI , DBG_WARN, "AIToMonster: " << "skip empty army!");
-    }
+	DEBUG(DBG_AI , DBG_INFO, "AIToMonster: " << hero.GetName() << " attack monster " << troop.GetName());
 
-    if(!avoidBattle && ratios >= 5)
-    {
-	avoidBattle = Rand::Get(0, 10) < 5;
-	if(avoidBattle) destroyTile = true;
-    }
-
-    DEBUG(DBG_AI , DBG_INFO, "AIToMonster: " << hero.GetName() << " attack monster " << troop.GetName());
-
-    if(!avoidBattle)
-    {
 	Army::army_t army;
 	army.JoinTroop(troop);
 	army.ArrangeForBattle();
 
-        // new battle2
-        Battle2::Result res = Battle2::Loader(hero.GetArmy(), army, dst_index);
+    	Battle2::Result res = Battle2::Loader(hero.GetArmy(), army, dst_index);
 
-        if(res.AttackerWins())
-        {
-            hero.IncreaseExperience(res.GetExperience());
-            destroyTile = true;
-            hero.ActionAfterBattle();
-        }
-        else
-        {
-            AIBattleLose(hero, res.AttackerResult());
-            if(!Settings::Get().OriginalVersion())
-            {
-                tile.SetCountMonster(army.GetCountMonsters(troop()));
-                if(2 == tile.GetQuantity4()) tile.SetQuantity4(1);
-            }
-        }
+    	if(res.AttackerWins())
+    	{
+    	    hero.IncreaseExperience(res.GetExperience());
+    	    destroy = true;
+    	    hero.ActionAfterBattle();
+    	}
+    	else
+    	{
+    	    AIBattleLose(hero, res.AttackerResult());
+    	    if(!Settings::Get().OriginalVersion())
+    	    {
+            	tile.SetCountMonster(army.GetCountMonsters(troop()));
+            	if(2 == tile.GetQuantity4()) tile.SetQuantity4(1);
+    	    }
+    	}
     }
+    // unknown
+    else
+	destroy = true;
 
-    if(destroyTile)
+
+    if(destroy)
     {
         Maps::TilesAddon *addon = tile.FindMonster();
         if(addon)

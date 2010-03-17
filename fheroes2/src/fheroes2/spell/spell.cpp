@@ -104,7 +104,7 @@ static spellstats_t spells[] = {
 	{ _("Dimension Door"),         10, 47,     0, _("Allows the caster to magically transport to a nearby location.") },
 	{ _("Town Gate"),              10, 48,     0, _("Returns the caster to any town or castle currently owned.") },
 	{ _("Town Portal"),            20, 49,     0, _("Returns the hero to the town or castle of choice, provided it is controlled by you.") },
-	{ _("Visions"),                 6, 50,     0, _("Visions predicts the likely outcome of an encounter with a neutral army camp.") },
+	{ _("Visions"),                 6, 50,     3, _("Visions predicts the likely outcome of an encounter with a neutral army camp.") },
 	{ _("Haunt"),                   8, 51,     4, _("Haunts a mine you control with Ghosts.  This mine stops producing resources.  (If I can't keep it, nobody will!)") },
 	{ _("Set Earth Guardian"),     15, 52,     4, _("Sets Earth Elementals to guard a mine against enemy armies.") },
 	{ _("Set Air Guardian"),       15, 53,     4, _("Sets Air Elementals to guard a mine against enemy armies.") },

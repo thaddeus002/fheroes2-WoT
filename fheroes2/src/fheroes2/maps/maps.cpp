@@ -282,11 +282,13 @@ u16 Maps::ScanAroundObject(const u16 center, const u8 obj, const u16 exclude)
     return result;
 }
 
-bool Maps::ScanDistanceObject(const u16 center, const u8 obj, const u16 dist, u16 *res)
+bool Maps::ScanDistanceObject(const u16 center, const u8 obj, const u16 dist, std::vector<u16> & results)
 {
+    if(results.size()) results.clear();
+
     const s16 cx = center % world.w();
     const s16 cy = center / world.w();
-    u16 res2 = 0;
+    u16 res = 0;
 
     // from center to abroad
     for(u16 ii = 1; ii <= dist; ++ii)
@@ -302,19 +304,15 @@ bool Maps::ScanDistanceObject(const u16 center, const u8 obj, const u16 dist, u1
 	{
 	    if(ty < iy && iy < my && tx < ix && ix < mx) continue;
 
-	    res2 = GetIndexFromAbsPoint(ix, iy);
+	    res = GetIndexFromAbsPoint(ix, iy);
 
 	    if(isValidAbsPoint(ix, iy) &&
-		obj == world.GetTiles(res2).GetObject())
-	    {
-		if(res) *res = res2;
-		return true;
-	    }
+		obj == world.GetTiles(res).GetObject())
+		    results.push_back(res);
 	}
     }
 
-    if(res) *res = MAXU16;
-    return false;
+    return results.size();
 }
 
 u16 Maps::GetApproximateDistance(const u16 index1, const u16 index2)
