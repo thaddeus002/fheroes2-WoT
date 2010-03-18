@@ -356,6 +356,11 @@ const char* Monster::GetName(void) const
     return GetName(id);
 }
 
+const char* Monster::GetPluralName(u32 count) const
+{
+    return GetPluralName(id, count);
+}
+
 const char* Monster::GetMultiName(void) const
 {
     return GetMultiName(id);
@@ -371,7 +376,7 @@ bool Monster::isUndead(void) const
         case MUMMY:
         case ROYAL_MUMMY:
         case VAMPIRE:
-        case LORD_VAMPIRE:
+        case VAMPIRE_LORD:
         case LICH:
         case POWER_LICH:
         case BONE_DRAGON:
@@ -426,7 +431,7 @@ bool Monster::isFly(void) const
 	case BLACK_DRAGON:
 	case ROC:
 	case VAMPIRE:
-	case LORD_VAMPIRE:
+	case VAMPIRE_LORD:
 	case BONE_DRAGON:
 	case GHOST:
 	case GENIE:	return true;
@@ -500,21 +505,21 @@ Monster::monster_t Monster::Upgrade(monster_t m)
         case SWORDSMAN:		return MASTER_SWORDSMAN;
         case CAVALRY:		return CHAMPION;
         case PALADIN:		return CRUSADER;
-        case ORC:		return CHIEF_ORC;
-        case OGRE:		return LORD_OGRE;
+        case ORC:		return ORC_CHIEF;
+        case OGRE:		return OGRE_LORD;
         case TROLL:		return WAR_TROLL;
         case DWARF:		return BATTLE_DWARF;
         case ELF:		return GRAND_ELF;
         case DRUID:		return GREATER_DRUID;
         case ZOMBIE:		return MUTANT_ZOMBIE;
         case MUMMY:		return ROYAL_MUMMY;
-        case VAMPIRE:		return LORD_VAMPIRE;
+        case VAMPIRE:		return VAMPIRE_LORD;
         case LICH:		return POWER_LICH;
-        case MINOTAUR:		return KNIGHT_MINOTAUR;
+        case MINOTAUR:		return MINOTAUR_KING;
         case GREEN_DRAGON:	return RED_DRAGON;
         case RED_DRAGON:	return BLACK_DRAGON;
         case IRON_GOLEM:	return STEEL_GOLEM;
-        case MAGE:		return ARCHMAGE;
+        case MAGI:		return ARCHMAGI;
         case GIANT:		return TITAN;
 
 	default: break;
@@ -562,7 +567,7 @@ Monster::monster_t Monster::FromDwelling(u8 race, u32 dwelling)
         switch(race)
         {
 	case Race::KNGT: return RANGER;
-	case Race::BARB: return CHIEF_ORC;
+	case Race::BARB: return ORC_CHIEF;
 	case Race::SORC: return BATTLE_DWARF;
 	case Race::WRLK: return GARGOYLE;
 	case Race::WZRD: return BOAR;
@@ -614,11 +619,11 @@ Monster::monster_t Monster::FromDwelling(u8 race, u32 dwelling)
         switch(race)
         {
 	case Race::KNGT: return MASTER_SWORDSMAN;
-	case Race::BARB: return LORD_OGRE;
+	case Race::BARB: return OGRE_LORD;
 	case Race::SORC: return GREATER_DRUID;
-	case Race::WRLK: return KNIGHT_MINOTAUR;
+	case Race::WRLK: return MINOTAUR_KING;
 	case Race::WZRD: return ROC;
-	case Race::NECR: return LORD_VAMPIRE;
+	case Race::NECR: return VAMPIRE_LORD;
 	default: break;
         }
         break;
@@ -630,7 +635,7 @@ Monster::monster_t Monster::FromDwelling(u8 race, u32 dwelling)
 	case Race::BARB: return TROLL;
 	case Race::SORC: return UNICORN;
 	case Race::WRLK: return HYDRA;
-	case Race::WZRD: return MAGE;
+	case Race::WZRD: return MAGI;
 	case Race::NECR: return LICH;
 	default: break;
         }
@@ -643,7 +648,7 @@ Monster::monster_t Monster::FromDwelling(u8 race, u32 dwelling)
 	case Race::BARB: return WAR_TROLL;
 	case Race::SORC: return UNICORN;
 	case Race::WRLK: return HYDRA;
-	case Race::WZRD: return ARCHMAGE;
+	case Race::WZRD: return ARCHMAGI;
 	case Race::NECR: return POWER_LICH;
 	default: break;
         }
@@ -761,7 +766,7 @@ Monster::monster_t Monster::Rand(level_t level)
 		case 1:  return RANGER;
 		case 2:  return PIKEMAN;
 		case 3:  return VETERAN_PIKEMAN;
-		case 4:  return CHIEF_ORC;
+		case 4:  return ORC_CHIEF;
 		case 5:  return WOLF;
 		case 6:  return DWARF;
 		case 7:  return BATTLE_DWARF;
@@ -784,21 +789,21 @@ Monster::monster_t Monster::Rand(level_t level)
 	        case 3:  return CAVALRY;
 		case 4:  return CHAMPION;
 		case 5:  return OGRE;
-		case 6:  return LORD_OGRE;
+		case 6:  return OGRE_LORD;
 		case 7:  return TROLL;
 		case 8:  return WAR_TROLL;
 		case 9:  return DRUID;
 		case 10: return GREATER_DRUID;
 		case 11: return GRIFFIN;
 		case 12: return MINOTAUR;
-		case 13: return KNIGHT_MINOTAUR;
+		case 13: return MINOTAUR_KING;
 		case 14: return STEEL_GOLEM;
 		case 15: return ROC;
-		case 16: return MAGE;
-		case 17: return ARCHMAGE;
+		case 16: return MAGI;
+		case 17: return ARCHMAGI;
 		case 18: return ROYAL_MUMMY;
 		case 19: return VAMPIRE;
-		case 20: return LORD_VAMPIRE;
+		case 20: return VAMPIRE_LORD;
 		case 21: return LICH;
 		case 22: return GHOST;
 		case 23: return MEDUSA;
@@ -852,7 +857,7 @@ u8 Monster::GetLevel(monster_t m)
 	case RANGER:
 	case PIKEMAN:
 	case VETERAN_PIKEMAN:
-	case CHIEF_ORC:
+	case ORC_CHIEF:
 	case WOLF:
 	case DWARF:
 	case BATTLE_DWARF:
@@ -871,21 +876,21 @@ u8 Monster::GetLevel(monster_t m)
 	case CAVALRY:
 	case CHAMPION:
 	case OGRE:
-	case LORD_OGRE:
+	case OGRE_LORD:
 	case TROLL:
 	case WAR_TROLL:
 	case DRUID:
 	case GREATER_DRUID:
 	case GRIFFIN:
 	case MINOTAUR:
-	case KNIGHT_MINOTAUR:
+	case MINOTAUR_KING:
 	case STEEL_GOLEM:
 	case ROC:
-	case MAGE:
-	case ARCHMAGE:
+	case MAGI:
+	case ARCHMAGI:
 	case ROYAL_MUMMY:
 	case VAMPIRE:
-	case LORD_VAMPIRE:
+	case VAMPIRE_LORD:
 	case LICH:
 	case GHOST:
 	case MEDUSA:
@@ -946,7 +951,7 @@ u32 Monster::GetDwelling(monster_t m)
 	case BOAR:		return DWELLING_MONSTER2;
 
 	case RANGER:
-	case CHIEF_ORC:
+	case ORC_CHIEF:
 	case BATTLE_DWARF:
 	case MUTANT_ZOMBIE:	return DWELLING_UPGRADE2;
 
@@ -970,21 +975,21 @@ u32 Monster::GetDwelling(monster_t m)
 	case VAMPIRE:		return DWELLING_MONSTER4;
 
 	case MASTER_SWORDSMAN:
-	case LORD_OGRE:
+	case OGRE_LORD:
 	case GREATER_DRUID:
-	case KNIGHT_MINOTAUR:
-	case LORD_VAMPIRE:	return DWELLING_UPGRADE4;
+	case MINOTAUR_KING:
+	case VAMPIRE_LORD:	return DWELLING_UPGRADE4;
 
 	case CAVALRY:
 	case TROLL:
-	case MAGE:
+	case MAGI:
 	case LICH:
 	case UNICORN:
 	case HYDRA:		return DWELLING_MONSTER5;
 
 	case CHAMPION:
 	case WAR_TROLL:
-	case ARCHMAGE:
+	case ARCHMAGI:
 	case POWER_LICH:	return DWELLING_UPGRADE5;
 
 	case PALADIN:
@@ -1014,6 +1019,89 @@ const char* Monster::GetName(monster_t m)
 const char* Monster::GetMultiName(monster_t m)
 {
     return _(monsters[m].multiname);
+}
+
+const char* Monster::GetPluralName(monster_t m, u32 count)
+{
+    switch(m)
+    {
+	case PEASANT:		return ngettext("Peasant", "Peasants", count);
+	case ARCHER:		return ngettext("Archer", "Archers", count);
+	case RANGER:		return ngettext("Ranger", "Rangers", count);
+	case PIKEMAN:		return ngettext("Pikeman", "Pikemen", count);
+	case VETERAN_PIKEMAN:	return ngettext("Veteran Pikeman", "Veteran Pikemen", count);
+	case SWORDSMAN:		return ngettext("Swordsman", "Swordsmen", count);
+	case MASTER_SWORDSMAN:	return ngettext("Master Swordsman", "Master Swordsmen", count);
+	case CAVALRY:		return ngettext("Cavalry", "Cavalries", count);
+	case CHAMPION:		return ngettext("Champion", "Champions", count);
+	case PALADIN:		return ngettext("Paladin", "Paladins", count);
+	case CRUSADER:		return ngettext("Crusader", "Crusaders", count);
+
+	case GOBLIN:		return ngettext("Goblin", "Goblins", count);
+	case ORC:		return ngettext("Orc", "Orcs", count);
+	case ORC_CHIEF:		return ngettext("Orc Chief", "Orc Chiefs", count);
+	case WOLF:		return ngettext("Wolf", "Wolves", count);
+	case OGRE:		return ngettext("Ogre", "Ogres", count);
+	case OGRE_LORD:		return ngettext("Ogre Lord", "Ogre Lords", count);
+	case TROLL:		return ngettext("Troll", "Trolls", count);
+	case WAR_TROLL:		return ngettext("War Troll", "War Trolls", count);
+	case CYCLOPS:		return ngettext("Cyclops", "Cyclopes", count);
+
+	case SPRITE:		return ngettext("Sprite", "Sprites", count);
+	case DWARF:		return ngettext("Dwarf", "Dwarves", count);
+	case BATTLE_DWARF:	return ngettext("Battle Dwarf", "Battle Dwarves", count);
+	case ELF:		return ngettext("Elf", "Elves", count);
+	case GRAND_ELF:		return ngettext("Grand Elf", "Grand Elves", count);
+	case DRUID:		return ngettext("Druid", "Druids", count);
+	case GREATER_DRUID:	return ngettext("Greater Druid", "Greater Druids", count);
+	case UNICORN:		return ngettext("Unicorn", "Unicorns", count);
+	case PHOENIX:		return ngettext("Phoenix", "Phoenix", count);
+
+	case CENTAUR:		return ngettext("Centaur", "Centaurs", count);
+	case GARGOYLE:		return ngettext("Gargoyle", "Gargoyles", count);
+	case GRIFFIN:		return ngettext("Griffin", "Griffins", count);
+	case MINOTAUR:		return ngettext("Minotaur", "Minotaurs", count);
+	case MINOTAUR_KING:	return ngettext("Minotaur King", "Minotaur Kings", count);
+	case HYDRA:		return ngettext("Hydra", "Hydras", count);
+	case GREEN_DRAGON:	return ngettext("Green Dragon", "Green Dragons", count);
+	case RED_DRAGON:	return ngettext("Red Dragon", "Red Dragons", count);
+	case BLACK_DRAGON:	return ngettext("Black Dragon", "Black Dragons", count);
+
+	case HALFLING:		return ngettext("Halfling", "Halflings", count);
+	case BOAR:		return ngettext("Boar", "Boars", count);
+	case IRON_GOLEM:	return ngettext("Iron Golem", "Iron Golems", count);
+	case STEEL_GOLEM:	return ngettext("Steel Golem", "Steel Golems", count);
+	case ROC:		return ngettext("Roc", "Rocs", count);
+	case MAGI:		return ngettext("Magi", "Magi", count);
+	case ARCHMAGI:		return ngettext("Archmagi", "Archmagi", count);
+	case GIANT:		return ngettext("Giant", "Giants", count);
+	case TITAN:		return ngettext("Titan", "Titans", count);
+
+	case SKELETON:		return ngettext("Skeleton", "Skeletons", count);
+	case ZOMBIE:		return ngettext("Zombie", "Zombies", count);
+	case MUTANT_ZOMBIE:	return ngettext("Mutant Zombie", "Mutant Zombies", count);
+	case MUMMY:		return ngettext("Mummy", "Mummies", count);
+	case ROYAL_MUMMY:	return ngettext("Royal Mummy", "Royal Mummies", count);
+	case VAMPIRE:		return ngettext("Vampire", "Vampires", count);
+	case VAMPIRE_LORD:	return ngettext("Vampire Lord", "Vampire Lords", count);
+	case LICH:		return ngettext("Lich", "Liches", count);
+	case POWER_LICH:	return ngettext("Power Lich", "Power Liches", count);
+	case BONE_DRAGON:	return ngettext("Bone Dragon", "Bone Dragons", count);
+
+	case ROGUE:		return ngettext("Rogue", "Rogues", count);
+	case NOMAD:		return ngettext("Nomad", "Nomads", count);
+	case GHOST:		return ngettext("Ghost", "Ghosts", count);
+	case GENIE:		return ngettext("Genie", "Genies", count);
+	case MEDUSA:		return ngettext("Medusa", "Medusas", count);
+	case EARTH_ELEMENT:	return ngettext("Earth Elemental", "Earth Elementals", count);
+	case AIR_ELEMENT:	return ngettext("Air Elemental", "Air Elementals", count);
+	case FIRE_ELEMENT:	return ngettext("Fire Elemental", "Fire Elementals", count);
+	case WATER_ELEMENT:	return ngettext("Water Elemental", "Water Elementals", count);
+
+	default: break;
+    }
+
+    return NULL;
 }
 
 u8 Monster::GetSpriteIndex(u8 m)

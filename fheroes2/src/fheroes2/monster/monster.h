@@ -59,10 +59,10 @@ public:
 	CRUSADER,
 	GOBLIN,
 	ORC,
-	CHIEF_ORC,
+	ORC_CHIEF,
 	WOLF,
 	OGRE,
-	LORD_OGRE,
+	OGRE_LORD,
 	TROLL,
 	WAR_TROLL,
 	CYCLOPS,
@@ -79,7 +79,7 @@ public:
 	GARGOYLE,
 	GRIFFIN,
 	MINOTAUR,
-	KNIGHT_MINOTAUR,
+	MINOTAUR_KING,
 	HYDRA,
 	GREEN_DRAGON,
 	RED_DRAGON,
@@ -89,8 +89,8 @@ public:
 	IRON_GOLEM,
 	STEEL_GOLEM,
 	ROC,
-	MAGE,
-	ARCHMAGE,
+	MAGI,
+	ARCHMAGI,
 	GIANT,
 	TITAN,
 	SKELETON,
@@ -99,7 +99,7 @@ public:
 	MUMMY,
 	ROYAL_MUMMY,
 	VAMPIRE,
-	LORD_VAMPIRE,
+	VAMPIRE_LORD,
 	LICH,
 	POWER_LICH,
 	BONE_DRAGON,
@@ -155,6 +155,7 @@ public:
 
     const char* GetName(void) const;
     const char* GetMultiName(void) const;
+    const char* GetPluralName(u32) const;
 
     bool isElemental(void) const;
     bool isUndead(void) const;
@@ -174,6 +175,7 @@ public:
     static u8 GetSpriteIndex(u8);
     static const char* GetName(monster_t);
     static const char* GetMultiName(monster_t);
+    static const char* GetPluralName(monster_t, u32);
     static monster_t Upgrade(monster_t);
     static u8  GetLevel(monster_t);
     static u32 GetDwelling(monster_t);

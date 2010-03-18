@@ -156,9 +156,9 @@ void Army::army_t::FromGuardian(const Maps::Tiles & t)
     {
 	case MP2::OBJ_PYRAMID:
             army[0].Set(Monster::ROYAL_MUMMY, 10);
-            army[1].Set(Monster::LORD_VAMPIRE, 10);
+            army[1].Set(Monster::VAMPIRE_LORD, 10);
             army[2].Set(Monster::ROYAL_MUMMY, 10);
-            army[3].Set(Monster::LORD_VAMPIRE, 10);
+            army[3].Set(Monster::VAMPIRE_LORD, 10);
             army[4].Set(Monster::ROYAL_MUMMY, 10);
 	    break;
 
@@ -200,9 +200,9 @@ void Army::army_t::FromGuardian(const Maps::Tiles & t)
 
 	case MP2::OBJ_CITYDEAD:
             army[0].Set(Monster::ZOMBIE, 20);
-            army[1].Set(Monster::LORD_VAMPIRE, 5);
+            army[1].Set(Monster::VAMPIRE_LORD, 5);
             army[2].Set(Monster::POWER_LICH, 5);
-            army[3].Set(Monster::LORD_VAMPIRE, 5);
+            army[3].Set(Monster::VAMPIRE_LORD, 5);
             army[4].Set(Monster::ZOMBIE, 20);
 	    break;
 

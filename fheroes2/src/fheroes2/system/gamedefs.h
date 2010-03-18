@@ -31,13 +31,9 @@
 
 #ifdef WITH_TTF
 #include <libintl.h>
-#define _(String) gettext(String)
-#define gettext_noop(String) String
-#define N_(String) gettext_noop(String)
+#define _(s) gettext(s)
 #else
-#define _(String) String
-#define gettext_noop(String) String
-#define N_(String) gettext_noop(String)
+#define _(s) s
 #endif
 
 #define GETTEXT_PACKAGE "fheroes2"

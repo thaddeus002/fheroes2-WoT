@@ -2008,7 +2008,7 @@ void Battle2::Interface::RedrawActionAttackPart1(Stats & attacker, Stats & defen
     // post attack action
     switch(attacker.troop.GetID())
     {
-	case Monster::LORD_VAMPIRE:
+	case Monster::VAMPIRE_LORD:
 	    // possible: vampire ressurect animation
 	    //RedrawTroopWithFrameAnimation(attacker, , );
 	    break;
@@ -2482,7 +2482,7 @@ void Battle2::Interface::RedrawActionMonsterSpellCastStatus(const Stats & attack
 	case Monster::ROYAL_MUMMY:
 	case Monster::MUMMY:		msg = _("The Mummies' curse falls upon the %{name}!"); break;
 	case Monster::CYCLOPS:		msg = _("The %{name} are paralyzed by the Cyclopes!"); break;
-	case Monster::ARCHMAGE:		msg = _("The Archmages dispel all good spells on your %{name}!"); break;
+	case Monster::ARCHMAGI:		msg = _("The Archmages dispel all good spells on your %{name}!"); break;
 	default: break;
     }
 

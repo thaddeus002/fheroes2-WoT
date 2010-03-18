@@ -613,8 +613,8 @@ u32 Battle2::Stats::GetDamage(const Stats & enemy) const
     	    switch(troop())
             {
             	// skip
-                case Monster::MAGE:
-                case Monster::ARCHMAGE:
+                case Monster::MAGI:
+                case Monster::ARCHMAGI:
                 case Monster::TITAN: break;
 
                 default: dmg /= 2; break;
@@ -793,7 +793,7 @@ u32 Battle2::Stats::ApplyDamage(Stats & enemy, u32 dmg)
 	    DEBUG(DBG_BATTLE, DBG_TRACE, "Battle2::Stats::ApplyDamage: " << enemy.GetName() << " capability");
 	    break;
 
-	case Monster::LORD_VAMPIRE:
+	case Monster::VAMPIRE_LORD:
 	    // restore hit points
 	    enemy.Resurrect(killed * GetMonster().GetHitPoints(), false);
 	    DEBUG(DBG_BATTLE, DBG_TRACE, "Battle2::Stats::ApplyDamage: " << enemy.GetName() << " capability");
@@ -917,7 +917,7 @@ void Battle2::Stats::PostAttackAction(Stats & enemy)
 {
     switch(troop())
     {
-	case Monster::ARCHMAGE:
+	case Monster::ARCHMAGI:
 	    // 20% clean magic state
 	    if(enemy.isValid() && enemy.Modes(IS_GOOD_MAGIC) && 3 > Rand::Get(1, 10)) enemy.ResetModes(IS_GOOD_MAGIC);
 	    break;
@@ -1017,7 +1017,7 @@ u16 Battle2::Stats::GetScoreQuality(const Stats & enemy) const
 	    res = 1;
 	    break;
 
-	case Monster::LORD_VAMPIRE:
+	case Monster::VAMPIRE_LORD:
 	    if(enemy.isHaveDamage())
 	    {
 		// alive priority
@@ -1452,7 +1452,7 @@ bool Battle2::Stats::isHideAttack(void) const
 	case Monster::ROGUE:
 	case Monster::SPRITE:
 	case Monster::VAMPIRE:
-	case Monster::LORD_VAMPIRE:
+	case Monster::VAMPIRE_LORD:
         case Monster::HYDRA:
             return true;
 
@@ -1621,7 +1621,7 @@ u8 Battle2::Stats::GetSpellMagic(bool force) const
             break;
 
         /* skip: see Stats::PostAttackAction
-	case Monster::ARCHMAGE:
+	case Monster::ARCHMAGI:
             // 20% dispel
             if(!force && 3 > Rand::Get(1, 10)) return Spell::DISPEL;
             break;
@@ -1757,7 +1757,7 @@ M82::m82_t Battle2::Stats::M82Expl(void) const
     switch(troop.GetID())
     {
         case Monster::VAMPIRE:           return M82::VAMPEXT1;
-        case Monster::LORD_VAMPIRE:      return M82::VAMPEXT1;
+        case Monster::VAMPIRE_LORD:      return M82::VAMPEXT1;
         case Monster::LICH:              return M82::LICHEXPL;
         case Monster::POWER_LICH:        return M82::LICHEXPL;
 
@@ -1779,7 +1779,7 @@ ICN::icn_t Battle2::Stats::ICNMiss(void) const
         case Monster::ARCHER:            return ICN::ARCH_MSL;
         case Monster::RANGER:            return ICN::ARCH_MSL;
         case Monster::ORC:               return ICN::ORC__MSL;
-        case Monster::CHIEF_ORC:         return ICN::ORC__MSL;
+        case Monster::ORC_CHIEF:         return ICN::ORC__MSL;
         case Monster::TROLL:             return ICN::TROLLMSL;
         case Monster::WAR_TROLL:         return ICN::TROLLMSL;
         case Monster::ELF:               return ICN::ELF__MSL;
@@ -1788,8 +1788,8 @@ ICN::icn_t Battle2::Stats::ICNMiss(void) const
         case Monster::GREATER_DRUID:     return ICN::DRUIDMSL;
         case Monster::CENTAUR:           return ICN::ARCH_MSL;
         case Monster::HALFLING:          return ICN::HALFLMSL;
-        case Monster::MAGE:              return ICN::DRUIDMSL;
-        case Monster::ARCHMAGE:          return ICN::DRUIDMSL;
+        case Monster::MAGI:              return ICN::DRUIDMSL;
+        case Monster::ARCHMAGI:          return ICN::DRUIDMSL;
         case Monster::TITAN:             return ICN::TITANMSL;
         case Monster::LICH:              return ICN::LICH_MSL;
         case Monster::POWER_LICH:        return ICN::LICH_MSL;
@@ -1862,7 +1862,7 @@ s8 Battle2::Stats::GetStartMissileOffset(u8 state) const
 	    break;
 
 	case Monster::ORC:
-	case Monster::CHIEF_ORC:
+	case Monster::ORC_CHIEF:
     		return 5;
 
 	case Monster::TROLL:
@@ -1922,8 +1922,8 @@ s8 Battle2::Stats::GetStartMissileOffset(u8 state) const
 	    }
 	    break;
 
-	case Monster::MAGE:
-	case Monster::ARCHMAGE:
+	case Monster::MAGI:
+	case Monster::ARCHMAGI:
 	    switch(state)
 	    {
     		case AS_SHOT1: return -40;
