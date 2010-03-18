@@ -143,9 +143,7 @@ void Army::Troop::BattleNewTurn(void)
 
 u32 Army::Troop::BattleKilled(void) const
 {
-    if(!battle) return 0;
-    u32 life = (battle->dead && battle->count > battle->dead ? battle->count - battle->dead : battle->count);
-    return life < count ? count - life : 0;
+    return battle ? battle->dead : 0;
 }
 
 void Army::Troop::BattleSetModes(u32 f)

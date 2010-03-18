@@ -267,7 +267,10 @@ void Battle2::NecromancySkillAction(Army::army_t & army1, Army::army_t & army2, 
     // fix over 60%
     if(percent > 60) percent = 60;
 
-    percent += (percent * hero->GetSecondaryValues(Skill::Secondary::NECROMANCY) / 100);
+    percent += hero->GetSecondaryValues(Skill::Secondary::NECROMANCY);
+    
+    // hard fix overflow
+    if(percent > 90) percent = 90;
 
     const Monster skeleton(Monster::SKELETON);
     const u32 count = Monster::GetCountFromHitPoints(Monster::SKELETON, skeleton.GetHitPoints() * killed * percent / 100);

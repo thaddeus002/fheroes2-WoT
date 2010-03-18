@@ -1191,8 +1191,6 @@ u8 Army::GetJoinSolution(const Heroes & hero, const Maps::Tiles & tile, u32 & jo
     // force join for campain and others...
     const bool force_join = (5 == tile.GetQuantity4());
 
-VERBOSE(ratios);
-
     if(tile.GetQuantity4() && check_free_stack && ((check_extra_condition && ratios >= 2) || force_join))
     {
         if(2 == tile.GetQuantity4() || force_join)

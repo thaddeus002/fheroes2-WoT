@@ -221,7 +221,7 @@ namespace Battle2
 	u16	position;
 	u32	hp;
 	u32	count;
-	u16	dead;
+	u32	dead;
 	u8	shots;
 	u8	disruptingray;
 	bool	reflect;

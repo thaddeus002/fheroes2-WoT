@@ -710,6 +710,7 @@ u32 Battle2::Stats::ApplyDamage(u32 dmg)
 			    ", pos: " << position << ", count: " << count << ", hp: " << hp << ")" << \
 			    " get damage: " << dmg << ", killed: " << killed);
 
+	dead += (killed >= count ? count : killed);
 	count -= (killed >= count ? count : killed);
 	hp -= (dmg >= hp ? hp : dmg);
 
@@ -759,24 +760,28 @@ void Battle2::Stats::PostKilledAction(void)
 
 u32 Battle2::Stats::Resurrect(u32 points, bool check_original)
 {
-    const u32 old = count;
+    const u32 resurrect = Monster::GetCountFromHitPoints(troop(), hp + points) - count;
 
-    hp += points;
-    count = Monster::GetCountFromHitPoints(troop(), hp);
-
-    if(check_original && count > troop.count)
+    if(check_original && (count + resurrect > troop.count))
     {
 	count = troop.count;
 	hp = count * GetMonster().GetHitPoints();
     }
+    else
+    {
+	count += resurrect;
+	hp += points;
+    }
 
-    return count - old;
+    dead -= (resurrect < dead ? resurrect : dead);
+
+    return resurrect;
 }
 
 u32 Battle2::Stats::ApplyDamage(Stats & enemy, u32 dmg)
 {
     const u32 killed = ApplyDamage(dmg);
-
+    
     if(killed) switch(enemy.troop())
     {
 	case Monster::GHOST:
@@ -793,6 +798,7 @@ u32 Battle2::Stats::ApplyDamage(Stats & enemy, u32 dmg)
 
 	default: break;
     }
+
     return killed;
 }
 
@@ -1356,7 +1362,7 @@ void Battle2::Stats::SpellRestoreAction(u8 spell, u8 spoint, const HeroBase* her
 
 	    // Spell::RESURRECT it is not full resurrect
 	    if(Spell::RESURRECT == spell) dead += res;
-	    
+
 	    if(arena->interface)
 	    {
 		std::string str(_("%{count} %{name} rise(s) from the dead!"));
