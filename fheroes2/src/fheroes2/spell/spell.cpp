@@ -56,7 +56,7 @@ static spellstats_t spells[] = {
 	{ _("Resurrect True"),         15, 12,    50, _("Resurrects creatures from a damaged or dead unit permanently.") }, 
 	{ _("Haste"),                   3, 14,     2, _("Increases the speed of any creature by two.") }, 
 	{ _("Mass Haste"),             10, 14,     0, _("Increases the speed of all of your creatures by two.") }, 
-	{ _("Slow"),                    3,  1,     2, _("Slows target to half movement rate.") }, 
+	{ _("spell|Slow"),              3,  1,     2, _("Slows target to half movement rate.") }, 
 	{ _("Mass Slow"),              15,  1,     0, _("Slows all enemies to half movement rate.") }, 
 	{ _("Blind "),                  6, 21,     0, _("Clouds the affected creatures' eyes, preventing them from moving.") }, 
 	{ _("Bless"),                   3,  7,     0, _("Causes the selected creatures to inflict maximum damage.") }, 
