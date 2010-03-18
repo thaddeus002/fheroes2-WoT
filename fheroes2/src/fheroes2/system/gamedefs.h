@@ -29,14 +29,16 @@
 
 #define ANIMATION_SPEED 23
 
+const char* strip_context(const char* p){ while(p && *p && *p++ != '|'); return p; };
+
 #ifdef WITH_TTF
 #include <libintl.h>
 #define _(s) gettext(s)
 #else
 #define _(s) s
-#define ngettext(s) s
-#define pgettext(s) s
 #endif
+
+#define _strip(s) strip_context(_(s))
 
 #define GETTEXT_PACKAGE "fheroes2"
 
