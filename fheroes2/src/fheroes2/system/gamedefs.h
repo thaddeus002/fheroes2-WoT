@@ -34,6 +34,8 @@
 #define _(s) gettext(s)
 #else
 #define _(s) s
+#define ngettext(s) s
+#define pgettext(s) s
 #endif
 
 #define GETTEXT_PACKAGE "fheroes2"
