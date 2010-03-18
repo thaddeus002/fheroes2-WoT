@@ -33,13 +33,12 @@ void Dialog::SpellInfo(const Spell::spell_t spell, const bool ok_button)
     const u8 extra = Spell::GetExtraValue(spell);
 
     if(1 == extra)
-        String::Replace(msg, "%{count}", "one");
+        String::Replace(msg, "%{count}", _("one"));
     else
     if(2 == extra)
-        String::Replace(msg, "%{count}", "two");
+        String::Replace(msg, "%{count}", _("two"));
     else
-
-    String::Replace(msg, "%{count}", extra);
+	String::Replace(msg, "%{count}", extra);
 
     Dialog::SpellInfo(Spell::GetName(spell), msg, spell, ok_button);
 }

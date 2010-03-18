@@ -36,6 +36,7 @@ const char* strip_context(const char* c);
 #define _(s) strip_context(gettext(s))
 #else
 #define _(s) strip_context(s)
+#define ngettext(s1, s2, c) (c == 1 ? s1 : s2)
 #endif
 
 #define GETTEXT_PACKAGE "fheroes2"

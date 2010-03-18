@@ -988,6 +988,11 @@ const char* Battle2::Stats::GetName(void) const
     return troop.GetName();
 }
 
+const char* Battle2::Stats::GetPluralName(u32 count) const
+{
+    return troop.GetPluralName(count);
+}
+
 u16 Battle2::Stats::GetScoreQuality(const Stats & enemy) const
 {
     u16 res = 0;

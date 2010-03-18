@@ -2059,9 +2059,9 @@ void Battle2::Interface::RedrawActionAttackPart2(Stats & attacker, std::vector<T
 	    if(target.killed)
 	    {
 		msg.append(" ");
-		msg.append(_("%{count} %{defender} perish."));
+		msg.append(ngettext("one %{defender} perish.", "%{count} %{defender} perished.", target.killed));
     		String::Replace(msg, "%{count}", target.killed);
-    		String::Replace(msg, "%{defender}", target.defender->GetName());
+    		String::Replace(msg, "%{defender}", target.defender->GetPluralName(target.killed));
 	    }
 	}
 
@@ -2441,7 +2441,7 @@ void Battle2::Interface::RedrawActionSpellCastPart2(u8 spell, std::vector<Target
 	    if(killed)
 	    {
 		msg.append(" ");
-		msg.append(_("%{count} creatures perished."));
+		msg.append(ngettext("one creature perish.", "%{count} creatures perished.", killed));
     		String::Replace(msg, "%{count}", killed);
 	    }
 
@@ -2571,7 +2571,7 @@ void Battle2::Interface::RedrawActionTowerPart2(Tower & tower, TargetInfo & targ
     if(target.killed)
     {
 	msg.append(" ");
-	msg.append(_("%{count} %{defender} perish."));
+	msg.append(ngettext("one %{defender} perish.", "%{count} %{defender} perished.", target.killed));
     	String::Replace(msg, "%{count}", target.killed);
     	String::Replace(msg, "%{defender}", target.defender->GetName());
     }

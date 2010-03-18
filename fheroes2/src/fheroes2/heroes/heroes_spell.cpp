@@ -330,7 +330,7 @@ bool ActionSpellVisions(Heroes & hero)
 	    const u8 reason = Army::GetJoinSolution(hero, tile, join, cost);
 	    std::string hdr, msg;
 
-	    hdr = std::string("%{count} ") + troop.GetMultiName();
+	    hdr = std::string("%{count} ") + troop.GetPluralName(join);
 	    String::Lower(hdr);
 	    String::Replace(hdr, "%{count}", join);
 
@@ -346,12 +346,14 @@ bool ActionSpellVisions(Heroes & hero)
 
 		case 2:
 		    if(join == troop.GetCount())
-			msg = _("All the creatures will join us...\n for a fee of %{gold} gold.");
+			msg = _("All the creatures will join us...");
 		    else
 		    {
-			msg = _("%{count} of the creatures will join us...\n for a fee of %{gold} gold.");
+			msg = ngettext("The creature will join us...", "%{count} of the creatures will join us...", join);
 			String::Replace(msg, "%{count}", join);
 		    }
+		    msg.append("\n");
+		    msg.append("\n for a fee of %{gold} gold.");
 		    String::Replace(msg, "%{gold}", cost.gold);
 		    break;
 

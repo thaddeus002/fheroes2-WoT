@@ -1023,7 +1023,6 @@ const char* Monster::GetMultiName(monster_t m)
 
 const char* Monster::GetPluralName(monster_t m, u32 count)
 {
-#ifdef WITH_TTF
     switch(m)
     {
 	case PEASANT:		return ngettext("Peasant", "Peasants", count);
@@ -1101,7 +1100,6 @@ const char* Monster::GetPluralName(monster_t m, u32 count)
 
 	default: break;
     }
-#endif
 
     return 1 == count ? GetName(m) : GetMultiName(m);
 }

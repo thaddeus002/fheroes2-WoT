@@ -585,7 +585,7 @@ void ActionToMonster(Heroes &hero, const u8 obj, const u16 dst_index)
 
         String::Replace(message, "%{offer}", join);
         String::Replace(message, "%{total}", troop.GetCount());
-        std::string monst = troop.GetMultiName();
+        std::string monst = troop.GetPluralName(join);
         String::Lower(monst);
         String::Replace(message, "%{monster}", monst);
         String::Replace(message, "%{gold}", cost.gold);
