@@ -106,8 +106,8 @@ namespace
 	{     5,  10,   4,   5,  30,  Speed::VERYSLOW,   4,     0, _("Iron Golem")     , _("Iron Golems")   , { 300, 0, 0, 0, 0, 0, 0} },
 	{     7,  10,   4,   5,  35,      Speed::SLOW,   4,     0, _("Steel Golem")    , _("Steel Golems")  , { 350, 0, 0, 0, 0, 0, 0} },
 	{     7,   7,   4,   8,  40,   Speed::AVERAGE,   3,     0, _("Roc")            , _("Rocs")          , { 400, 0, 0, 0, 0, 0, 0} },
-	{    11,   7,   7,   9,  30,      Speed::FAST,   2,    12, _("Magi")           , _("Magi")          , { 600, 0, 0, 0, 0, 0, 0} },
-	{    12,   8,   7,   9,  35,  Speed::VERYFAST,   2,    24, _("Archmagi")       , _("Archmagi")      , { 700, 0, 0, 0, 0, 0, 0} },
+	{    11,   7,   7,   9,  30,      Speed::FAST,   2,    12, _("Mage")           , _("Magi")          , { 600, 0, 0, 0, 0, 0, 0} },
+	{    12,   8,   7,   9,  35,  Speed::VERYFAST,   2,    24, _("Archmage")       , _("Archmagi")      , { 700, 0, 0, 0, 0, 0, 0} },
 	{    13,  10,  20,  30, 150,   Speed::AVERAGE,   1,     0, _("Giant")          , _("Giants")        , { 2000, 0, 0, 0, 0, 0, 1} },
 	{    15,  15,  20,  30, 300,  Speed::VERYFAST,   1,    24, _("Titan")          , _("Titans")        , { 5000, 0, 0, 0, 0, 0, 2} },
 
@@ -519,7 +519,7 @@ Monster::monster_t Monster::Upgrade(monster_t m)
         case GREEN_DRAGON:	return RED_DRAGON;
         case RED_DRAGON:	return BLACK_DRAGON;
         case IRON_GOLEM:	return STEEL_GOLEM;
-        case MAGI:		return ARCHMAGI;
+        case MAGE:		return ARCHMAGE;
         case GIANT:		return TITAN;
 
 	default: break;
@@ -635,7 +635,7 @@ Monster::monster_t Monster::FromDwelling(u8 race, u32 dwelling)
 	case Race::BARB: return TROLL;
 	case Race::SORC: return UNICORN;
 	case Race::WRLK: return HYDRA;
-	case Race::WZRD: return MAGI;
+	case Race::WZRD: return MAGE;
 	case Race::NECR: return LICH;
 	default: break;
         }
@@ -648,7 +648,7 @@ Monster::monster_t Monster::FromDwelling(u8 race, u32 dwelling)
 	case Race::BARB: return WAR_TROLL;
 	case Race::SORC: return UNICORN;
 	case Race::WRLK: return HYDRA;
-	case Race::WZRD: return ARCHMAGI;
+	case Race::WZRD: return ARCHMAGE;
 	case Race::NECR: return POWER_LICH;
 	default: break;
         }
@@ -799,8 +799,8 @@ Monster::monster_t Monster::Rand(level_t level)
 		case 13: return MINOTAUR_KING;
 		case 14: return STEEL_GOLEM;
 		case 15: return ROC;
-		case 16: return MAGI;
-		case 17: return ARCHMAGI;
+		case 16: return MAGE;
+		case 17: return ARCHMAGE;
 		case 18: return ROYAL_MUMMY;
 		case 19: return VAMPIRE;
 		case 20: return VAMPIRE_LORD;
@@ -886,8 +886,8 @@ u8 Monster::GetLevel(monster_t m)
 	case MINOTAUR_KING:
 	case STEEL_GOLEM:
 	case ROC:
-	case MAGI:
-	case ARCHMAGI:
+	case MAGE:
+	case ARCHMAGE:
 	case ROYAL_MUMMY:
 	case VAMPIRE:
 	case VAMPIRE_LORD:
@@ -982,14 +982,14 @@ u32 Monster::GetDwelling(monster_t m)
 
 	case CAVALRY:
 	case TROLL:
-	case MAGI:
+	case MAGE:
 	case LICH:
 	case UNICORN:
 	case HYDRA:		return DWELLING_MONSTER5;
 
 	case CHAMPION:
 	case WAR_TROLL:
-	case ARCHMAGI:
+	case ARCHMAGE:
 	case POWER_LICH:	return DWELLING_UPGRADE5;
 
 	case PALADIN:
@@ -1072,8 +1072,8 @@ const char* Monster::GetPluralName(monster_t m, u32 count)
 	case IRON_GOLEM:	return ngettext("Iron Golem", "Iron Golems", count);
 	case STEEL_GOLEM:	return ngettext("Steel Golem", "Steel Golems", count);
 	case ROC:		return ngettext("Roc", "Rocs", count);
-	case MAGI:		return ngettext("Magi", "Magi", count);
-	case ARCHMAGI:		return ngettext("Archmagi", "Archmagi", count);
+	case MAGE:		return ngettext("Mage", "Magi", count);
+	case ARCHMAGE:		return ngettext("Archmage", "Archmagi", count);
 	case GIANT:		return ngettext("Giant", "Giants", count);
 	case TITAN:		return ngettext("Titan", "Titans", count);
 

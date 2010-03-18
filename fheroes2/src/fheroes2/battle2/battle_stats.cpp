@@ -613,8 +613,8 @@ u32 Battle2::Stats::GetDamage(const Stats & enemy) const
     	    switch(troop())
             {
             	// skip
-                case Monster::MAGI:
-                case Monster::ARCHMAGI:
+                case Monster::MAGE:
+                case Monster::ARCHMAGE:
                 case Monster::TITAN: break;
 
                 default: dmg /= 2; break;
@@ -917,7 +917,7 @@ void Battle2::Stats::PostAttackAction(Stats & enemy)
 {
     switch(troop())
     {
-	case Monster::ARCHMAGI:
+	case Monster::ARCHMAGE:
 	    // 20% clean magic state
 	    if(enemy.isValid() && enemy.Modes(IS_GOOD_MAGIC) && 3 > Rand::Get(1, 10)) enemy.ResetModes(IS_GOOD_MAGIC);
 	    break;
@@ -1626,7 +1626,7 @@ u8 Battle2::Stats::GetSpellMagic(bool force) const
             break;
 
         /* skip: see Stats::PostAttackAction
-	case Monster::ARCHMAGI:
+	case Monster::ARCHMAGE:
             // 20% dispel
             if(!force && 3 > Rand::Get(1, 10)) return Spell::DISPEL;
             break;
@@ -1793,8 +1793,8 @@ ICN::icn_t Battle2::Stats::ICNMiss(void) const
         case Monster::GREATER_DRUID:     return ICN::DRUIDMSL;
         case Monster::CENTAUR:           return ICN::ARCH_MSL;
         case Monster::HALFLING:          return ICN::HALFLMSL;
-        case Monster::MAGI:              return ICN::DRUIDMSL;
-        case Monster::ARCHMAGI:          return ICN::DRUIDMSL;
+        case Monster::MAGE:              return ICN::DRUIDMSL;
+        case Monster::ARCHMAGE:          return ICN::DRUIDMSL;
         case Monster::TITAN:             return ICN::TITANMSL;
         case Monster::LICH:              return ICN::LICH_MSL;
         case Monster::POWER_LICH:        return ICN::LICH_MSL;
@@ -1927,8 +1927,8 @@ s8 Battle2::Stats::GetStartMissileOffset(u8 state) const
 	    }
 	    break;
 
-	case Monster::MAGI:
-	case Monster::ARCHMAGI:
+	case Monster::MAGE:
+	case Monster::ARCHMAGE:
 	    switch(state)
 	    {
     		case AS_SHOT1: return -40;

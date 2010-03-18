@@ -2482,7 +2482,7 @@ void Battle2::Interface::RedrawActionMonsterSpellCastStatus(const Stats & attack
 	case Monster::ROYAL_MUMMY:
 	case Monster::MUMMY:		msg = _("The Mummies' curse falls upon the %{name}!"); break;
 	case Monster::CYCLOPS:		msg = _("The %{name} are paralyzed by the Cyclopes!"); break;
-	case Monster::ARCHMAGI:		msg = _("The Archmages dispel all good spells on your %{name}!"); break;
+	case Monster::ARCHMAGE:		msg = _("The Archmagi dispel all good spells on your %{name}!"); break;
 	default: break;
     }
 
