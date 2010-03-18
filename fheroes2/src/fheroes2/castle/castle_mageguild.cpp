@@ -122,7 +122,7 @@ void RowSpells::QueueEventProcessing(void)
 	    if(Spell::NONE != spell)
 	    {
     		cursor.Hide();
-    		Dialog::SpellInfo(Spell::GetName(spell), Spell::GetDescription(spell), spell, !le.MousePressRight());
+    		Dialog::SpellInfo(spell, !le.MousePressRight());
     		cursor.Show();
     		display.Flip();
 	    }

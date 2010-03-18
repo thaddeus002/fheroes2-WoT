@@ -199,7 +199,7 @@ Spell::spell_t SpellBook::Open(const HeroBase & hero, const filter_t filt, bool 
 		if(spell != Spell::NONE)
 		{
 		    cursor.Hide();
-		    Dialog::SpellInfo(Spell::GetName(spell), Spell::GetDescription(spell), spell, true);
+		    Dialog::SpellInfo(spell, true);
 		    cursor.Show();
 		    display.Flip();
 		}
@@ -215,7 +215,7 @@ Spell::spell_t SpellBook::Open(const HeroBase & hero, const filter_t filt, bool 
 		if(spell != Spell::NONE)
 		{
 		    cursor.Hide();
-		    Dialog::SpellInfo(Spell::GetName(spell), Spell::GetDescription(spell), spell, false);
+		    Dialog::SpellInfo(spell, false);
 		    cursor.Show();
 		    display.Flip();
 		}

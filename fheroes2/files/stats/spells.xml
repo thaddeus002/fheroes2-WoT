@@ -25,11 +25,11 @@
  <!-- Haste -->
  <spell cost="3" extra="2" />
  <!-- Mass Haste -->
- <spell cost="10" />
+ <spell cost="10" extra="2" />
  <!-- Slow -->
  <spell cost="3" extra="2" />
  <!-- Mass Slow -->
- <spell cost="15" />
+ <spell cost="15" extra="2" />
  <!-- Blind  -->
  <spell cost="6" />
  <!-- Bless -->

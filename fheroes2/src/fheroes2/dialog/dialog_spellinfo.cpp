@@ -26,6 +26,24 @@
 #include "button.h"
 #include "dialog.h"
 
+void Dialog::SpellInfo(const Spell::spell_t spell, const bool ok_button)
+{
+    std::string msg = Spell::GetDescription(spell);
+
+    const u8 extra = Spell::GetExtraValue(spell);
+
+    if(1 == extra)
+        String::Replace(msg, "%{count}", "one");
+    else
+    if(2 == extra)
+        String::Replace(msg, "%{count}", "two");
+    else
+
+    String::Replace(msg, "%{count}", extra);
+
+    Dialog::SpellInfo(Spell::GetName(spell), msg, spell, ok_button);
+}
+
 void Dialog::SpellInfo(const std::string &header, const std::string &message, const Spell::spell_t spell, const bool ok_button)
 {
     Display & display = Display::Get();
