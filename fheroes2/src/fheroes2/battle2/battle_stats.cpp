@@ -758,22 +758,25 @@ void Battle2::Stats::PostKilledAction(void)
     // possible also..
 }
 
-u32 Battle2::Stats::Resurrect(u32 points, bool check_original)
+u32 Battle2::Stats::Resurrect(u32 points, bool allow_overflow)
 {
     const u32 resurrect = Monster::GetCountFromHitPoints(troop(), hp + points) - count;
 
-    if(check_original && (count + resurrect > troop.count))
+    count += resurrect;
+    hp += points;
+    dead -= (resurrect < dead ? resurrect : dead);
+
+    if(allow_overflow)
+    {
+	if(troop.count < count) troop.count = count;
+    }
+    else
+    if(count > troop.count)
     {
 	count = troop.count;
 	hp = count * GetMonster().GetHitPoints();
     }
-    else
-    {
-	count += resurrect;
-	hp += points;
-    }
 
-    dead -= (resurrect < dead ? resurrect : dead);
 
     return resurrect;
 }
@@ -786,13 +789,13 @@ u32 Battle2::Stats::ApplyDamage(Stats & enemy, u32 dmg)
     {
 	case Monster::GHOST:
 	    // grow troop
-	    enemy.Resurrect(killed * enemy.GetMonster().GetHitPoints(), false);
+	    enemy.Resurrect(killed * enemy.GetMonster().GetHitPoints(), true);
 	    DEBUG(DBG_BATTLE, DBG_TRACE, "Battle2::Stats::ApplyDamage: " << enemy.GetName() << " capability");
 	    break;
 
 	case Monster::LORD_VAMPIRE:
 	    // restore hit points
-	    enemy.Resurrect(killed * GetMonster().GetHitPoints(), true);
+	    enemy.Resurrect(killed * GetMonster().GetHitPoints(), false);
 	    DEBUG(DBG_BATTLE, DBG_TRACE, "Battle2::Stats::ApplyDamage: " << enemy.GetName() << " capability");
 	    break;
 
@@ -1358,7 +1361,7 @@ void Battle2::Stats::SpellRestoreAction(u8 spell, u8 spoint, const HeroBase* her
 	    // restore hp
 	    if(hero && hero->HasArtifact(Artifact::ANKH)) restore *= 2;
 
-	    const u16 res = Resurrect(restore, true);
+	    const u16 res = Resurrect(restore, false);
 
 	    // Spell::RESURRECT it is not full resurrect
 	    if(Spell::RESURRECT == spell) dead += res;
