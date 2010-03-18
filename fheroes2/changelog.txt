@@ -1,4 +1,11 @@
-SVN - up to r1640
+SVN - up to r1656
++ Added plural form for monster name
++ Update text, separate context for spell Slow and speed Slow
++ Fixed Necromancy skill ability
++ Added Visions spell, and 'Identify Hero' spell
++ Update dialog scenario, set default params from last game
++ Update show status info: skip empty army
++ Fixed redraw top hero sprite with objects
 + Added 'Haunt' spell
 + Added 'Set Elemental Guardians' spell
 + Added customizing secondary skills
