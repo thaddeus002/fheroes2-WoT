@@ -771,7 +771,7 @@ Game::menu_t Game::HumanTurn(void)
     // set focus
     if(Game::HOTSEAT == conf.GameType()) global_focus.Reset();
 
-    if(conf.OriginalVersion() && myHeroes.size())
+    if(!conf.ExtRememberLastFocus() && myHeroes.size())
 	global_focus.Set(myHeroes.front());
     else
 	global_focus.Reset(Focus::HEROES);
@@ -1429,17 +1429,17 @@ void Game::KeyPress_s(void)
 
 void Game::KeyPress_l(menu_t & ret)
 {
-    if(Settings::Get().OriginalVersion())
-    {
-	if(Dialog::YES == Dialog::Message("", _("Are you sure you want to load a new game? (Your current game will be lost)"), Font::BIG, Dialog::YES|Dialog::NO))
-	ret = LOADGAME;
-    }
-    else
+    if(Settings::Get().ExtFastLoadGameDialog())
     {
 	// fast load
 	std::string filename;
 	if(Dialog::SelectFileLoad(filename) && filename.size())
 	    ret = Game::Load(filename) ? STARTGAME : MAINMENU;
+    }
+    else
+    {
+	if(Dialog::YES == Dialog::Message("", _("Are you sure you want to load a new game? (Your current game will be lost)"), Font::BIG, Dialog::YES|Dialog::NO))
+	ret = LOADGAME;
     }
 }
 

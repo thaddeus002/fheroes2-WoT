@@ -170,7 +170,7 @@ void Dialog::QuickInfo(const Maps::Tiles & tile)
 	case MP2::OBJ_SHRINE3:
 	    name_object = MP2::StringObject(tile.GetObject());
 	    // addons pack
-	    if(!settings.OriginalVersion() && world.GetKingdom(settings.MyColor()).isVisited(tile))
+	    if(settings.ExtShowVisitedContent() && world.GetKingdom(settings.MyColor()).isVisited(tile))
 	    {
 	    	name_object.append("\n(");
 	    	name_object.append(Spell::GetName(Spell::FromInt(tile.GetQuantity1())));
@@ -181,7 +181,7 @@ void Dialog::QuickInfo(const Maps::Tiles & tile)
 	case MP2::OBJ_WITCHSHUT:
 	    name_object = MP2::StringObject(tile.GetObject());
 	    // addons pack
-	    if(!settings.OriginalVersion() && world.GetKingdom(settings.MyColor()).isVisited(tile))
+	    if(settings.ExtShowVisitedContent() && world.GetKingdom(settings.MyColor()).isVisited(tile))
 	    {
 		name_object.append("\n(");
 		name_object.append(Skill::Secondary::String(Skill::Secondary::Skill(tile.GetQuantity1())));

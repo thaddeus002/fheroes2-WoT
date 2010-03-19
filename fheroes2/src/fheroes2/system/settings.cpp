@@ -30,7 +30,7 @@
 
 namespace
 {
-    enum ns_t { NS_UNKNOWN, NS_BATTLE, NS_NETWORK, NS_POCKETPC, NS_GLOBAL, };
+    enum ns_t { NS_UNKNOWN, NS_BATTLE, NS_NETWORK, NS_POCKETPC, NS_GLOBAL, NS_FHEROES2 };
 
     struct ModeSetting
     {
@@ -47,7 +47,6 @@ namespace
         { NS_GLOBAL,   "evil interface",       Settings::EVILINTERFACE     },
         { NS_GLOBAL,   "evilinterface",        Settings::EVILINTERFACE     },
         { NS_GLOBAL,   "fade",                 Settings::FADE              },
-        { NS_GLOBAL,   "original",             Settings::ORIGINAL          },
         { NS_GLOBAL,   "logo",                 Settings::LOGO              },
         { NS_GLOBAL,   "unicode",              Settings::USEUNICODE        },
         { NS_GLOBAL,   "autosave",             Settings::AUTOSAVE          },
@@ -72,9 +71,20 @@ namespace
         { NS_POCKETPC, "tapmode",              Settings::TAPMODE           },
         { NS_POCKETPC, "tap mode",             Settings::TAPMODE           },
 
+	{ NS_FHEROES2, "allow buy from well",	Settings::ALLOW_BUY_FROM_WELL },
+	{ NS_FHEROES2, "show visited content",	Settings::SHOW_VISITED_CONTENT },
+	{ NS_FHEROES2, "fast load game dialog",	Settings::FAST_LOAD_GAME_DIALOG },
+	{ NS_FHEROES2, "remember last focus",	Settings::REMEMBER_LAST_FOCUS },
+	{ NS_FHEROES2, "abandoned mine random",	Settings::ABANDONED_MINE_RANDOM },
+	{ NS_FHEROES2, "save monster after battle", Settings::SAVE_MONSTER_BATTLE },
+	{ NS_FHEROES2, "allow set guardian (future)", Settings::ALLOW_SET_GUARDIAN },
+	{ NS_FHEROES2, "learn spells with day",  Settings::LEARN_SPELLS_WITH_DAY },
+	{ NS_FHEROES2, "battle show damage",    Settings::BATTLE_SHOW_DAMAGE },
+	{ NS_FHEROES2, "battle troop direction",Settings::BATTLE_TROOP_DIRECTION },
+
         { NS_UNKNOWN,  NULL,                   0                           },
     };
-}
+};
 
 /* constructor */
 Settings::Settings() : major_version(MAJOR_VERSION), minor_version(MINOR_VERSION),
@@ -99,7 +109,6 @@ Settings::Settings() : major_version(MAJOR_VERSION), minor_version(MINOR_VERSION
     // default maps dir
     list_maps_directory.push_back("maps");
 
-    opt_global.SetModes(ORIGINAL);
     opt_global.SetModes(FADE);
     opt_global.SetModes(LOGO);
 
@@ -254,7 +263,6 @@ void Settings::Dump(std::ostream & stream) const
     stream << "hide interface = " << (opt_global.Modes(HIDEINTERFACE) ? "on"  : "off") << std::endl;
     stream << "evil interface = " << (opt_global.Modes(EVILINTERFACE) ? "on"  : "off") << std::endl;
     stream << "fade = " << (opt_global.Modes(FADE) ? "on"  : "off") << std::endl;
-    stream << "original = " << (opt_global.Modes(ORIGINAL) ? "on"  : "off") << std::endl;
     stream << "alt resource = " << (opt_global.Modes(ALTRESOURCE) ? "on"  : "off") << std::endl;
     stream << "debug = " << (debug ? "on"  : "off") << std::endl;
 
@@ -352,9 +360,6 @@ const std::string & Settings::PlayMusCommand(void) const { return playmus_comman
 
 /* return editor */
 bool Settings::Editor(void) const { return opt_global.Modes(EDITOR); }
-
-/* return original version */
-bool Settings::OriginalVersion(void) const { return opt_global.Modes(ORIGINAL); }
 
 /* return sound */
 bool Settings::Sound(void) const { return opt_global.Modes(SOUND); }
@@ -580,6 +585,7 @@ void Settings::SetStrModes(const std::string & key)
 	    case NS_NETWORK:  opt_global.SetModes(ptr->value); break;
 	    case NS_POCKETPC: opt_pocket.SetModes(ptr->value); break;
 	    case NS_GLOBAL:   opt_global.SetModes(ptr->value); break;
+	    case NS_FHEROES2: opt_fheroes2.SetModes(ptr->value); break;
 	    default: break;
 	}
     }
@@ -840,11 +846,6 @@ void Settings::SetUnicode(bool f)
     f ? opt_global.SetModes(USEUNICODE) : opt_global.ResetModes(USEUNICODE);
 }
 
-void Settings::SetOriginalVersion(void)
-{
-    opt_global.SetModes(ORIGINAL);
-}
-
 void Settings::SetPriceLoyaltyVersion(void)
 {
     opt_global.SetModes(PRICELOYALTY);
@@ -934,4 +935,76 @@ void Settings::SetNetworkLocalClient(bool f)
 void Settings::SetNetworkDedicatedServer(bool f)
 {
     f ? opt_global.SetModes(DEDICATEDSERVER) : opt_global.ResetModes(DEDICATEDSERVER);
+}
+
+bool Settings::ExtModes(u32 f) const
+{
+    return opt_fheroes2.Modes(f);
+}
+
+const char* Settings::ExtName(u32 f) const
+{
+    ModeSetting* ptr = modeSettings;
+    while(NS_UNKNOWN != ptr->ns) if(NS_FHEROES2 == ptr->ns && ptr->value == f) return ptr->name; else ++ptr;
+    return NULL;
+}
+
+void Settings::ExtSetModes(u32 f)
+{
+    opt_fheroes2.SetModes(f);
+}
+
+void Settings::ExtResetModes(u32 f)
+{
+    opt_fheroes2.ResetModes(f);
+}
+
+bool Settings::ExtAllowBuyFromWell(void) const
+{
+    return opt_fheroes2.Modes(ALLOW_BUY_FROM_WELL);
+}
+
+bool Settings::ExtShowVisitedContent(void) const
+{
+    return opt_fheroes2.Modes(SHOW_VISITED_CONTENT);
+}
+
+bool Settings::ExtFastLoadGameDialog(void) const
+{
+    return opt_fheroes2.Modes(FAST_LOAD_GAME_DIALOG);
+}
+
+bool Settings::ExtRememberLastFocus(void) const
+{
+    return opt_fheroes2.Modes(REMEMBER_LAST_FOCUS);
+}
+
+bool Settings::ExtAbandonedMineRandom(void) const
+{
+    return opt_fheroes2.Modes(ABANDONED_MINE_RANDOM);
+}
+
+bool Settings::ExtSaveMonsterBattle(void) const
+{
+    return opt_fheroes2.Modes(SAVE_MONSTER_BATTLE);
+}
+
+bool Settings::ExtAllowSetGuardian(void) const
+{
+    return opt_fheroes2.Modes(ALLOW_SET_GUARDIAN);
+}
+
+bool Settings::ExtLearnSpellsWithDay(void) const
+{
+    return opt_fheroes2.Modes(LEARN_SPELLS_WITH_DAY);
+}
+
+bool Settings::ExtBattleShowDamage(void) const
+{
+    return opt_fheroes2.Modes(BATTLE_SHOW_DAMAGE);
+}
+
+bool Settings::ExtBattleTroopDirection(void) const
+{
+    return opt_fheroes2.Modes(BATTLE_TROOP_DIRECTION);
 }

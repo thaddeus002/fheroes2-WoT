@@ -638,7 +638,7 @@ void ActionToMonster(Heroes &hero, const u8 obj, const u16 dst_index)
 	else
 	{
     	    BattleLose(hero, res.AttackerResult());
-    	    if(!Settings::Get().OriginalVersion())
+    	    if(Settings::Get().ExtSaveMonsterBattle())
     	    {
         	tile.SetCountMonster(army.GetCountMonsters(troop()));
         	// reset "can join"
@@ -730,7 +730,7 @@ void ActionToCastle(Heroes &hero, const u8 obj, const u16 dst_index)
 
         Mixer::Reduce();
 
-        if(Settings::Get().OriginalVersion()) castle->GetMageGuild().EducateHero(hero);
+        if(!Settings::Get().ExtLearnSpellsWithDay()) castle->GetMageGuild().EducateHero(hero);
         Game::OpenCastle(castle);
 
         Mixer::Enhance();
@@ -1119,7 +1119,7 @@ void ActionToShrine(Heroes &hero, const u8 obj, const u16 dst_index)
 
     PlaySoundSuccess;
     hero.AppendSpellToBook(spell());
-    hero.SetVisited(dst_index, Settings::Get().OriginalVersion() ? Visit::LOCAL : Visit::GLOBAL); // see dialog_quickinfo
+    hero.SetVisited(dst_index, Settings::Get().ExtShowVisitedContent() ? Visit::GLOBAL : Visit::LOCAL); // see dialog_quickinfo
     Dialog::SpellInfo(spell_name, body, spell());
 
     DEBUG(DBG_GAME , DBG_INFO, "ActionToShrine: " << hero.GetName());
@@ -1149,7 +1149,7 @@ void ActionToWitchsHut(Heroes &hero, const u8 obj, const u16 dst_index)
     }
 
     hero.LearnBasicSkill(skill);
-    hero.SetVisited(dst_index, Settings::Get().OriginalVersion() ? Visit::LOCAL : Visit::GLOBAL); // see dialog_quickinfo
+    hero.SetVisited(dst_index, Settings::Get().ExtShowVisitedContent() ? Visit::GLOBAL : Visit::LOCAL); // see dialog_quickinfo
 
     body = _("An ancient and immortal witch living in a hut with bird's legs for stilts teaches you %{skill} for her own inscrutable purposes.");
     String::Replace(body, "%{skill}", skill_name);
@@ -2187,7 +2187,7 @@ void ActionToCaptureObject(Heroes &hero, const u8 obj, const u16 dst_index)
     	    {
 		capture = false;
         	BattleLose(hero, result.AttackerResult());
-		if(!Settings::Get().OriginalVersion())
+		if(Settings::Get().ExtSaveMonsterBattle())
             	    tile.SetCountMonster(army.GetCountMonsters(troop()));
     	    }
 	}
@@ -2204,7 +2204,7 @@ void ActionToCaptureObject(Heroes &hero, const u8 obj, const u16 dst_index)
     }
     else
     // set guardians
-    if(!Settings::Get().OriginalVersion())
+    if(Settings::Get().ExtAllowSetGuardian())
     {
     }
 

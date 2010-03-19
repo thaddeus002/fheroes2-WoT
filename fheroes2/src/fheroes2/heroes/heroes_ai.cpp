@@ -453,7 +453,7 @@ void AIToMonster(Heroes &hero, const u8 obj, const u16 dst_index)
     	else
     	{
     	    AIBattleLose(hero, res.AttackerResult());
-    	    if(!Settings::Get().OriginalVersion())
+    	    if(Settings::Get().ExtSaveMonsterBattle())
     	    {
             	tile.SetCountMonster(army.GetCountMonsters(troop()));
             	if(2 == tile.GetQuantity4()) tile.SetQuantity4(1);
@@ -700,7 +700,7 @@ void AIToCaptureObject(Heroes &hero, const u8 obj, const u16 dst_index)
 	    {
 		capture = false;
 	        AIBattleLose(hero, result.AttackerResult());
-		if(!Settings::Get().OriginalVersion())
+		if(Settings::Get().ExtSaveMonsterBattle())
 		    tile.SetCountMonster(army.GetCountMonsters(troop()));
 	    }
 	}

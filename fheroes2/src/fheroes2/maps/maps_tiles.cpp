@@ -1827,7 +1827,7 @@ void Maps::Tiles::UpdateQuantity(void)
 	case MP2::OBJ_ABANDONEDMINE:
 	    SetCountMonster(Rand::Get(39, 45));	// I checked in Heroes II: min 3 x 13, and max 3 x 15
 	    quantity3 = Monster::GHOST;
-	    if(Settings::Get().OriginalVersion())
+	    if(! Settings::Get().ExtAbandonedMineRandom())
 		quantity4 =  Resource::GOLD;
 	    else
 		switch(Rand::Get(1, 5))

@@ -866,7 +866,7 @@ bool Battle2::Stats::ApplySpell(u8 spell, const HeroBase* hero, TargetInfo & tar
     // save spell for "eagle eye" capability
     arena->AddSpell(spell);
 
-    u16 spoint = hero ? hero->GetPower() : (Settings::Get().OriginalVersion() ? 2 : 3);
+    u16 spoint = hero ? hero->GetPower() : 2; // FIX: need customizing value
 
     // magic defenced
     switch(troop())

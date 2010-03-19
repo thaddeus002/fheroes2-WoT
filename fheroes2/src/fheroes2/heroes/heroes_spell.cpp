@@ -296,7 +296,7 @@ bool ActionSpellTownGate(Heroes & hero)
 	hero.FadeIn();
 
 	// educate spells
-	if(Settings::Get().OriginalVersion()) castle->GetMageGuild().EducateHero(hero);
+	if(! Settings::Get().ExtLearnSpellsWithDay()) castle->GetMageGuild().EducateHero(hero);
 
 	return true;
     }

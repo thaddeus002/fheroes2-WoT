@@ -35,10 +35,11 @@
 #include "interface_gamearea.h"
 #include "tools.h"
 
+#define FORMAT_VERSION_1661 0x067D
 #define FORMAT_VERSION_1520 0x05F0
 #define FORMAT_VERSION_1389 0x056D
 
-#define CURRENT_FORMAT_VERSION FORMAT_VERSION_1520
+#define CURRENT_FORMAT_VERSION FORMAT_VERSION_1661
 
 bool Game::Save(const std::string &fn)
 {
@@ -232,7 +233,7 @@ bool Game::IO::SaveBIN(QueueMessage & msg)
     msg.Push(conf.players_colors);
     msg.Push(conf.preferably_count_players);
     msg.Push(conf.debug);
-    msg.Push(static_cast<u8>(conf.OriginalVersion()));
+    msg.Push(conf.opt_fheroes2());
 
     // world
     msg.Push(static_cast<u16>(0xFF05));
@@ -689,9 +690,17 @@ bool Game::IO::LoadBIN(QueueMessage & msg)
 #else
     msg.Pop(conf.debug);
 #endif
-    // settings: original
-    msg.Pop(byte8);
-    if(byte8) conf.SetOriginalVersion();
+    if(format < FORMAT_VERSION_1661)
+    {
+	// settings: original
+	msg.Pop(byte8);
+	if(byte8) conf.opt_fheroes2.SetModes(0xFFFFFFFF);
+    }
+    else
+    {
+    	msg.Pop(byte32);
+    	conf.opt_fheroes2.SetModes(byte32);
+    }
     // world
     msg.Pop(byte16);
     if(byte16 != 0xFF05) DEBUG(DBG_GAME , DBG_WARN, "Game::IO::LoadBIN: 0xFF05");

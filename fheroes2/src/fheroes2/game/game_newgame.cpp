@@ -141,11 +141,13 @@ Game::menu_t Game::NewGame(void)
     Button buttonCampainGame(top.x + 455, top.y + 110, ICN::BTNNEWGM, 2, 3);
     Button buttonMultiGame(top.x + 455, top.y + 175, ICN::BTNNEWGM, 4, 5);
     Button buttonCancelGame(top.x + 455, top.y + 375, ICN::BTNNEWGM, 6, 7);
+    Button buttonSettings(top.x + 455, top.y + 240, ICN::BTNDCCFG, 4, 5);
 
     buttonStandartGame.Draw();
     buttonCampainGame.Draw();
     buttonMultiGame.Draw();
     buttonCancelGame.Draw();
+    buttonSettings.Draw();
 
     cursor.Show();
     display.Flip();
@@ -157,18 +159,20 @@ Game::menu_t Game::NewGame(void)
 	le.MousePressLeft(buttonCampainGame) ? buttonCampainGame.PressDraw() : buttonCampainGame.ReleaseDraw();
 	le.MousePressLeft(buttonMultiGame) ? buttonMultiGame.PressDraw() : buttonMultiGame.ReleaseDraw();
 	le.MousePressLeft(buttonCancelGame) ? buttonCancelGame.PressDraw() : buttonCancelGame.ReleaseDraw();
+	le.MousePressLeft(buttonSettings) ? buttonSettings.PressDraw() : buttonSettings.ReleaseDraw();
 
 	if(le.KeyPress(KEY_s) || le.MouseClickLeft(buttonStandartGame)) return NEWSTANDARD;
 	if(le.KeyPress(KEY_c) || le.MouseClickLeft(buttonCampainGame)) return NEWCAMPAIN;
 	if(le.KeyPress(KEY_m) || le.MouseClickLeft(buttonMultiGame)) return NEWMULTI;
 	if(le.MouseClickLeft(buttonCancelGame) || le.KeyPress(KEY_ESCAPE)) return MAINMENU;
+	if(le.MouseClickLeft(buttonSettings)){ Dialog::ExtSettings(); cursor.Show(); display.Flip(); }
 
         // right info
 	if(le.MousePressRight(buttonStandartGame)) Dialog::Message(_("Standard Game"), _("A single player game playing out a single map."), Font::BIG);
 	if(le.MousePressRight(buttonCampainGame)) Dialog::Message(_("Campaign Game"), _("A single player game playing through a series of maps."), Font::BIG);
 	if(le.MousePressRight(buttonMultiGame)) Dialog::Message(_("Multi-Player Game"), _("A multi-player game, with several human players completing against each other on a single map."), Font::BIG);
+	if(le.MousePressRight(buttonSettings)) Dialog::Message(_("Settings"), _("FHeroes2 game settings."), Font::BIG);
 	if(le.MousePressRight(buttonCancelGame)) Dialog::Message(_("Cancel"), _("Cancel back to the main menu."), Font::BIG);
-		 
     }
 
     return QUITGAME;

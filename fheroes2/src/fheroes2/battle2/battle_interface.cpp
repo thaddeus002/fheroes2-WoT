@@ -2139,7 +2139,7 @@ void Battle2::Interface::RedrawActionWinces(std::vector<TargetInfo> & targets)
 		Redraw();
 
 		// extended damage info
-		if(!conf.OriginalVersion() && target.killed)
+		if(conf.ExtBattleShowDamage() && target.killed)
 		{
 		    msg = "-";
 		    String::AddInt(msg, target.killed);

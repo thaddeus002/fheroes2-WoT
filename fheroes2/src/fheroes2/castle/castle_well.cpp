@@ -74,6 +74,7 @@ void Castle::OpenWell(void)
         if(le.MouseClickLeft(buttonExit) || le.KeyPress(KEY_RETURN) || le.KeyPress(KEY_ESCAPE)) break;
 
         // extended version (click - buy dialog monster)
+        if(Settings::Get().ExtAllowBuyFromWell())
         {
     	    if(building & DWELLING_MONSTER1 && le.MouseClickLeft(rectMonster1) &&
     		Castle::RecruitMonster(DWELLING_MONSTER1, Dialog::RecruitMonster(

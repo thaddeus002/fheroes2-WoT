@@ -317,7 +317,7 @@ void Battle2::Arena::ApplyActionAttack(Action & action)
 		b2->GetName() << "(color: " << Color::String(b2->GetColor()) << ", pos: " << b2->position << ")");
 	}
 
-	if(Settings::Get().OriginalVersion())
+	if(!Settings::Get().ExtBattleTroopDirection())
 	{
 	    b1->UpdateDirection();
 	    b2->UpdateDirection();

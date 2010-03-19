@@ -79,11 +79,25 @@ public:
 	TAPMODE           = 0x00000004,
     };
 
+    // ns: fheroes2
+    enum
+    {
+	ALLOW_BUY_FROM_WELL		= 0x00000001,
+	SHOW_VISITED_CONTENT		= 0x00000002,
+	FAST_LOAD_GAME_DIALOG		= 0x00000004,
+	REMEMBER_LAST_FOCUS		= 0x00000008,
+	ABANDONED_MINE_RANDOM		= 0x00000010,
+	SAVE_MONSTER_BATTLE		= 0x00000020,
+	ALLOW_SET_GUARDIAN		= 0x00000040,
+	LEARN_SPELLS_WITH_DAY		= 0x00000080,
+	BATTLE_SHOW_DAMAGE		= 0x00000100,
+	BATTLE_TROOP_DIRECTION		= 0x00000200,
+    };
+
     // ns: global
     enum
     {
 	LOADGAME          = 0x00000001,
-        ORIGINAL          = 0x00000002,
         PRICELOYALTY      = 0x00000004,
 
 	AUTOSAVE          = 0x00000010,
@@ -118,7 +132,6 @@ public:
 	ALTRESOURCE       = 0x80000000,
 
 	MUSIC		= MUSIC_CD | MUSIC_EXT | MUSIC_MIDI,
-
     };
 
     static Settings & Get(void);
@@ -175,11 +188,25 @@ public:
     bool TapMode(void) const;
     bool HideAIMove(void) const;
     bool UseAltResource(void) const;
-    bool OriginalVersion(void) const;
     bool PriceLoyaltyVersion(void) const;
     bool LoadedGameVersion(void) const;
     bool UseFade(void) const;
     bool AutoSave(void) const;
+
+    bool ExtModes(u32) const;
+    void ExtSetModes(u32);
+    void ExtResetModes(u32);
+    const char* ExtName(u32) const;
+    bool ExtAllowBuyFromWell(void) const;
+    bool ExtShowVisitedContent(void) const;
+    bool ExtFastLoadGameDialog(void) const;
+    bool ExtRememberLastFocus(void) const;
+    bool ExtAbandonedMineRandom(void) const;
+    bool ExtSaveMonsterBattle(void) const;
+    bool ExtAllowSetGuardian(void) const;
+    bool ExtLearnSpellsWithDay(void) const;
+    bool ExtBattleShowDamage(void) const;
+    bool ExtBattleTroopDirection(void) const;
 
     bool NetworkDedicatedServer(void) const;
     bool NetworkLocalClient(void) const;
@@ -193,7 +220,6 @@ public:
     void SetDebug(const u16 d);
     void SetEditor(void);
     void SetUnicode(bool);
-    void SetOriginalVersion(void);
     void SetPriceLoyaltyVersion(void);
     void SetGameDifficulty(const Difficulty::difficulty_t d);
     void SetEvilInterface(bool);
@@ -275,6 +301,7 @@ private:
     BitModes opt_global;
     BitModes opt_battle;
     BitModes opt_pocket;
+    BitModes opt_fheroes2;
 
     const u8 major_version;
     const u8 minor_version;
