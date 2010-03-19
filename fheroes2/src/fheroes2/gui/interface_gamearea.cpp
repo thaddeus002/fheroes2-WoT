@@ -32,9 +32,10 @@
 
 namespace Game
 {
-    extern Cursor::themes_t GetCursor(u16);
-    extern void MouseCursorAreaClickLeft(u16);
-    extern void MouseCursorAreaPressRight(u16);
+    // game_startgame.cpp
+    Cursor::themes_t GetCursor(u16);
+    void MouseCursorAreaClickLeft(u16);
+    void MouseCursorAreaPressRight(u16);
 };
 
 void	RedrawClopOrClofSpriteFog(const u16 dst_index, const Point & dst);

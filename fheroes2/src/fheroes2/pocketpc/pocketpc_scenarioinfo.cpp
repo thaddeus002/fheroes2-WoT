@@ -30,9 +30,9 @@
 #include "world.h"
 #include "pocketpc.h"
 
-extern bool DialogSelectMapsFileList(MapsFileInfoList &, std::string &);
-extern void UpdateCoordOpponentsInfo(const Point &, std::vector<Rect> &);
-extern void UpdateCoordClassInfo(const Point &, std::vector<Rect> &);
+bool DialogSelectMapsFileList(MapsFileInfoList &, std::string &);
+void UpdateCoordOpponentsInfo(const Point &, std::vector<Rect> &);
+void UpdateCoordClassInfo(const Point &, std::vector<Rect> &);
 
 Game::menu_t PocketPC::ScenarioInfo(void)
 {

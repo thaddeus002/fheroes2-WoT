@@ -27,12 +27,13 @@
 
 namespace Game
 {
-    extern void SwitchShowRadar(void);
-    extern void SwitchShowStatus(void);
-    extern void SwitchShowButtons(void);
-    extern void SwitchShowIcons(void);
-    extern void KeyPress_e(menu_t &);
-    extern void KeyPress_ESC(menu_t &);
+    // game_startgame.cpp
+    void SwitchShowRadar(void);
+    void SwitchShowStatus(void);
+    void SwitchShowButtons(void);
+    void SwitchShowIcons(void);
+    void KeyPress_e(menu_t &);
+    void KeyPress_ESC(menu_t &);
 };
 
 Interface::ControlPanel::ControlPanel()

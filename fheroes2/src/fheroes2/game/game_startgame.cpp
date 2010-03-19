@@ -43,7 +43,8 @@
 #include "kingdom.h"
 #include "localclient.h"
 
-extern u16 DialogWithArtifact(const std::string & hdr, const std::string & msg, const Artifact::artifact_t art, const u16 buttons = Dialog::OK);
+// heroes_action.cpp
+u16 DialogWithArtifact(const std::string & hdr, const std::string & msg, const Artifact::artifact_t art, const u16 buttons = Dialog::OK);
 
 namespace Game
 {

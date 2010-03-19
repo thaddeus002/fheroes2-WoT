@@ -37,9 +37,9 @@
 
 namespace Game
 {
-    /* extern func from game_startgame.cpp */
-    extern void OpenCastle(Castle *);
-    extern void OpenHeroes(Heroes *);
+    // game_startgame.cpp
+    void OpenCastle(Castle *);
+    void OpenHeroes(Heroes *);
 }
 
 #define ICONS_WIDTH             46

@@ -29,15 +29,15 @@
 
 namespace Game
 {
-    /* extern func from game_startgame.cpp */
-    extern void ButtonNextHero(void);
-    extern void ButtonMovement(void);
-    extern void ButtonKingdom(void);
-    extern void ButtonSpell(void);
-    extern void ButtonEndTurn(Game::menu_t &);
-    extern void ButtonAdventure(Game::menu_t &);
-    extern void ButtonFile(Game::menu_t &);
-    extern void ButtonSystem(void);
+    // game_startgame.cpp
+    void ButtonNextHero(void);
+    void ButtonMovement(void);
+    void ButtonKingdom(void);
+    void ButtonSpell(void);
+    void ButtonEndTurn(Game::menu_t &);
+    void ButtonAdventure(Game::menu_t &);
+    void ButtonFile(Game::menu_t &);
+    void ButtonSystem(void);
 };
 
 Interface::ButtonsArea::ButtonsArea() : Rect(0, 0, 144, 72)

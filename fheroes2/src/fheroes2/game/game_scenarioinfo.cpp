@@ -39,7 +39,8 @@
 #include "pocketpc.h"
 #include "game.h"
 
-extern bool DialogSelectMapsFileList(MapsFileInfoList &, std::string &);
+// dialog_selectfile.cpp
+bool DialogSelectMapsFileList(MapsFileInfoList &, std::string &);
 
 u16 GetStepFor(u16, u16, u16);
 void RedrawRatingInfo(TextSprite &);

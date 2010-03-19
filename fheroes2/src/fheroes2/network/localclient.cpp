@@ -35,7 +35,7 @@
 #include "zzlib.h"
 #include "server.h"
 
-extern bool DialogSelectMapsFileList(MapsFileInfoList &, std::string &);
+bool DialogSelectMapsFileList(MapsFileInfoList &, std::string &);
 
 #ifdef WITH_NET
 

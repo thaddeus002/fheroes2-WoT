@@ -35,7 +35,7 @@
 
 #ifdef WITH_NET
 
-extern u8 SelectCountPlayers(void);
+u8 SelectCountPlayers(void);
 
 void SendPacketToAllClients(std::vector<FH2RemoteClient> & clients, const QueueMessage & msg, u32 owner)
 {

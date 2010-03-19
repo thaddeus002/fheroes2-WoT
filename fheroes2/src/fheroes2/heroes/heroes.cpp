@@ -42,8 +42,9 @@
 #include "game_focus.h"
 #include "game_interface.h"
 
-extern u16 DialogWithArtifact(const std::string & hdr, const std::string & msg, const Artifact::artifact_t art, const u16 buttons = Dialog::OK);
-extern void PlayPickupSound(void);
+// heroes_action.cpp
+u16 DialogWithArtifact(const std::string & hdr, const std::string & msg, const Artifact::artifact_t art, const u16 buttons = Dialog::OK);
+void PlayPickupSound(void);
 
 const char* HeroesName(Heroes::heroes_t id)
 {

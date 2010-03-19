@@ -31,8 +31,8 @@
 #include "battle_stats.h"
 #include "pocketpc.h"
 
-extern void DrawMonsterStats(const Point &, const Army::Troop &);
-extern void DrawBattleStats(const Point &, const Battle2::Stats &);
+void DrawMonsterStats(const Point &, const Army::Troop &);
+void DrawBattleStats(const Point &, const Battle2::Stats &);
 
 Dialog::answer_t PocketPC::DialogArmyInfo(const Army::Troop & troop, u16 flags)
 {
