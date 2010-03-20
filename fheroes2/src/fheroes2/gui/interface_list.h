@@ -60,6 +60,9 @@ namespace Interface
 	void Redraw(void);
 	void QueueEventProcessing(void);
 	Item & GetCurrent(void);
+	void RemoveSelected(void);
+	bool isSelected(void) const;
+	void Unselect(void);
 	*/
 
 	void SetScrollButtonUp(const ICN::icn_t icn, const u16 index1, const u16 index2, const Point & pos)
@@ -118,6 +121,21 @@ namespace Interface
 	Item & GetCurrent(void)
 	{
 	    return *cur;
+	};
+
+	void RemoveSelected(void)
+	{
+	    if(content && cur != content->end()) content->erase(cur);
+	};
+
+	bool isSelected(void) const
+	{
+	    return content && cur != content->end();
+	};
+
+	void Unselect(void)
+	{
+	    if(content) cur = content->end();
 	};
 
 	void QueueEventProcessing(void)

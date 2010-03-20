@@ -237,7 +237,11 @@ bool Dialog::SelectScenario(const MapsFileInfoList & all, std::string & filename
 	    break;
 	}
 	else
-        if(le.KeyPress(KEY_ESCAPE)) break;
+        if(le.KeyPress(KEY_ESCAPE))
+	{
+	    filename.clear();
+	    break;
+	}
 	else
 	if(((le.MouseClickLeft(buttonSelectSmall) || le.KeyPress(KEY_s)) && buttonSelectSmall.isEnable()) && buttonSelectSmall.isEnable())
 	{

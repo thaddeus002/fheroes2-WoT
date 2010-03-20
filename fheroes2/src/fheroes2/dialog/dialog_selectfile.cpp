@@ -28,15 +28,90 @@
 #include "agg.h"
 #include "button.h"
 #include "cursor.h"
-#include "splitter.h"
 #include "settings.h"
-#include "maps.h"
+#include "maps_fileinfo.h"
+#include "interface_list.h"
 #include "dialog.h"
-#include "tools.h"
-
 
 bool SelectFileListSimple(const std::string &, MapsFileInfoList &, std::string &, bool);
-void RedrawFileListSimple(const Point &, const std::string &, const std::string & filename, const MapsFileInfoList &, MapsFileInfoList::const_iterator, MapsFileInfoList::const_iterator, const u8);
+void RedrawExtraInfo(const Point &, const std::string &, const std::string &);
+
+class FileInfoListBox : public Interface::ListBox<Maps::FileInfo>
+{
+public:
+    FileInfoListBox(const Point & pt, std::string & res, bool & edit) : Interface::ListBox<Maps::FileInfo>(pt), result(res), edit_mode(edit) {};
+
+    void RedrawItem(const Maps::FileInfo &, u16, u16, bool);
+    void RedrawBackground(const Point &);
+
+    void ActionCurrentUp(void);
+    void ActionCurrentDn(void);
+    void ActionListDoubleClick(Maps::FileInfo &);
+    void ActionListSingleClick(Maps::FileInfo &);
+
+    std::string & result;
+    bool & edit_mode;
+};
+
+void FileInfoListBox::RedrawItem(const Maps::FileInfo & info, u16 dstx, u16 dsty, bool current)
+{
+
+    char short_date[15];
+         short_date[14] = 0;
+
+    std::strftime(short_date, 14, "%b %d, %H:%M", std::localtime(&info.localtime));
+    std::string savname(GetBasename(info.file.c_str()));
+    
+    if(savname.size())
+    {
+	Text text;
+	const size_t dotpos = savname.size() - 4;
+	std::string ext = savname.substr(dotpos);
+	String::Lower(ext);
+    	if(ext == ".sav") savname.erase(dotpos);
+
+	text.Set(savname, (current ? Font::YELLOW_BIG : Font::BIG));
+	text.Blit(dstx + 5, dsty);
+
+	text.Set(short_date, (current ? Font::YELLOW_BIG : Font::BIG));
+	text.Blit(dstx + 265 - text.w(), dsty);
+    }
+}
+
+void FileInfoListBox::RedrawBackground(const Point & dst)
+{
+    Display & display = Display::Get();
+    const Sprite & panel = AGG::GetICN(ICN::REQBKG, 0);
+
+    if(Settings::Get().PocketPC())
+    {
+	display.Blit(panel, Rect(0, 0, panel.w(), 120), dst.x, dst.y);
+	display.Blit(panel, Rect(0, panel.h() - 120, panel.w(), 120), dst.x, dst.y + 224 - 120);
+    }
+    else
+	display.Blit(panel, dst);
+}
+
+void FileInfoListBox::ActionCurrentUp(void)
+{
+    edit_mode = false;
+}
+
+void FileInfoListBox::ActionCurrentDn(void)
+{
+    edit_mode = false;
+}
+
+void FileInfoListBox::ActionListDoubleClick(Maps::FileInfo &)
+{
+    result = (*cur).file;
+    edit_mode = false;
+}
+
+void FileInfoListBox::ActionListSingleClick(Maps::FileInfo &)
+{
+    edit_mode = false;
+}
 
 void ResizeToShortName(const std::string & str, std::string & res)
 {
@@ -79,12 +154,9 @@ bool Dialog::SelectFileLoad(std::string & file)
 
 bool SelectFileListSimple(const std::string & header, MapsFileInfoList & lists, std::string & result, bool editor)
 {
-    // preload
-    AGG::PreloadObject(ICN::REQBKG);
-    AGG::PreloadObject(ICN::REQUEST);
-
     Display & display = Display::Get();
     Cursor & cursor = Cursor::Get();
+    LocalEvent & le = LocalEvent::Get();
 
     cursor.Hide();
     cursor.SetThemes(cursor.POINTER);
@@ -98,26 +170,29 @@ bool SelectFileListSimple(const std::string & header, MapsFileInfoList & lists, 
     back.Save();
 
     const Rect & rt = back.GetRect();
-    const Rect list_rt(rt.x + 40, rt.y + 55, 265, (pocket ? 78 : 215));
     const Rect enter_field(rt.x + 45, rt.y + (pocket ? 148 : 286), 260, 16);
 
-    Button buttonCancel(rt.x + 34, rt.y + (pocket ? 176 : 315), ICN::REQUEST, 3, 4);
-    Button buttonOk(rt.x + 244, rt.y + (pocket ? 176 : 315), ICN::REQUEST, 1, 2);
-    Button buttonPgUp(rt.x + 327, rt.y + 55, ICN::REQUEST, 5, 6);
-    Button buttonPgDn(rt.x + 327, rt.y + (pocket ? 117 : 257), ICN::REQUEST, 7, 8);
+    Button buttonOk(rt.x + 34, rt.y + (pocket ? 176 : 315), ICN::REQUEST, 1, 2);
+    Button buttonCancel(rt.x + 244, rt.y + (pocket ? 176 : 315), ICN::REQUEST, 3, 4);
 
-    const u8 max_items = pocket ? 5 : 11;
-    MapsFileInfoList::iterator top = lists.begin();
-    MapsFileInfoList::iterator cur = lists.begin();
+    bool edit_mode = false;
 
-    Splitter split(AGG::GetICN(ICN::ESCROLL, 3), Rect(rt.x + 330, rt.y + 73, 12, (pocket ? 40 : 180)), Splitter::VERTICAL);
-    split.SetRange(0, (max_items < lists.size() ? lists.size() - max_items : 0));
+    FileInfoListBox listbox(rt, result, edit_mode);
+
+    listbox.RedrawBackground(rt);
+    listbox.SetScrollButtonUp(ICN::REQUESTS, 5, 6, Point(rt.x + 327, rt.y + 55));
+    listbox.SetScrollButtonDn(ICN::REQUESTS, 7, 8, Point(rt.x + 327, rt.y + (pocket ? 117 : 257)));
+    listbox.SetScrollSplitter(AGG::GetICN(ICN::ESCROLL, 3), Rect(rt.x + 330, rt.y + 73, 12, (pocket ? 40 : 180)));
+    listbox.SetAreaMaxItems(pocket ? 5 : 11);
+    listbox.SetAreaItems(Rect(rt.x + 40, rt.y + 55, 265, (pocket ? 78 : 215)));
+    listbox.SetListContent(lists);
 
     std::string filename;
+    result.clear();
 
     if(editor)
     {
-	if(Settings::Get().PocketPC())
+	if(pocket)
 	{
             std::ostringstream ss;
 	    ss << std::time(0);
@@ -125,196 +200,94 @@ bool SelectFileListSimple(const std::string & header, MapsFileInfoList & lists, 
 	}
 	else
 	    filename.assign("newgame");
-	cur = lists.end();
+
+	listbox.Unselect();
     }
     else
     {
 	if(lists.empty())
 	    buttonOk.SetDisable(true);
 	else
-	    ResizeToShortName((*cur).file, filename);
+	    ResizeToShortName(listbox.GetCurrent().file, filename);
     }
 
-    RedrawFileListSimple(rt, header, filename, lists, top, cur, max_items);
+    listbox.Redraw();
+    RedrawExtraInfo(rt, header, filename);
+
 
     buttonOk.Draw();
     buttonCancel.Draw();
-    buttonPgUp.Draw();
-    buttonPgDn.Draw();
-    split.Redraw();
 
     cursor.Show();
     display.Flip();
 
-    LocalEvent & le = LocalEvent::Get();
-    bool redraw = false;
-    bool edit_mode = false;
-
-    while(le.HandleEvents())
+    while(le.HandleEvents() && result.empty())
     {
         le.MousePressLeft(buttonOk) && buttonOk.isEnable() ? buttonOk.PressDraw() : buttonOk.ReleaseDraw();
         le.MousePressLeft(buttonCancel) ? buttonCancel.PressDraw() : buttonCancel.ReleaseDraw();
-        le.MousePressLeft(buttonPgUp) ? buttonPgUp.PressDraw() : buttonPgUp.ReleaseDraw();
-        le.MousePressLeft(buttonPgDn) ? buttonPgDn.PressDraw() : buttonPgDn.ReleaseDraw();
 
-        if((le.MouseClickLeft(buttonOk) && buttonOk.isEnable()) || le.KeyPress(KEY_RETURN))
+	listbox.QueueEventProcessing();
+
+        if((buttonOk.isEnable() && le.MouseClickLeft(buttonOk)) || le.KeyPress(KEY_RETURN))
         {
     	    if(editor && filename.size())
 		result = Settings::Get().LocalPrefix() + SEPARATOR + "files" + SEPARATOR + "save" + SEPARATOR + filename + ".sav";
     	    else
-    	    if(cur != lists.end())
-    		result = (*cur).file;
-    	    break;
+    	    if(listbox.isSelected())
+    		result = listbox.GetCurrent().file;
     	}
     	else
         if(le.MouseClickLeft(buttonCancel) || le.KeyPress(KEY_ESCAPE))
         {
-    	    result.clear();
     	    break;
 	}
 	else
         if(le.MouseClickLeft(enter_field) && editor)
 	{
 	    edit_mode = true;
-	    redraw = true;
+	    cursor.Hide();
 	}
 	else
 	if(edit_mode && le.KeyPress())
 	{
 	    String::AppendKey(filename, le.KeyValue(), le.KeyMod());
-
 	    buttonOk.SetDisable(filename.empty());
-
-	    redraw = true;
+	    cursor.Hide();
 	}
-	else
-        if((le.MouseClickLeft(buttonPgUp) || le.KeyPress(KEY_PAGEUP)) && (top > lists.begin()))
-	{
-	    top = (top - lists.begin() > max_items ? top - max_items : lists.begin());
-	    split.Move(top - lists.begin());
-	    redraw = true;
-	}
-	else
-        if((le.MouseClickLeft(buttonPgDn) || le.KeyPress(KEY_PAGEDOWN)) && (top + max_items < lists.end()))
-	{
-	    top += max_items;
-	    if(top + max_items > lists.end()) top = lists.end() - max_items;
-	    split.Move(top - lists.begin());
-	    redraw = true;
-	}
-	else
-        if(le.KeyPress(KEY_UP) && (cur > lists.begin()))
-	{
-	    --cur;
-	    if((cur < top) || (cur > top + max_items - 1))
-	    {
-		top = cur;
-		if(top + max_items > lists.end()) top = lists.end() - max_items;
-	    }
-	    split.Move(top - lists.begin());
-	    redraw = true;
-	    edit_mode = false;
-	}
-	else
-        if(le.KeyPress(KEY_DOWN) && (cur < (lists.end() - 1)))
-	{
-	    ++cur;
-	    if((cur < top) || (cur > top + max_items - 1))
-	    {
-		top = cur - max_items + 1;
-		if(top + max_items > lists.end()) top = lists.end() - max_items;
-		else
-		if(top < lists.begin()) top = lists.begin();
-	    }
-	    split.Move(top - lists.begin());
-	    redraw = true;
-	    edit_mode = false;
-	}
-	else
-	if((le.MouseWheelUp(list_rt) || le.MouseWheelUp(split.GetRect())) && (top > lists.begin()))
-	{
-	    --top;
-	    split.Backward();
-	    redraw = true;
-	}
-	else
-	if((le.MouseWheelDn(list_rt) || le.MouseWheelDn(split.GetRect())) && (top < (lists.end() - max_items)))
-	{
-	    ++top;
-	    split.Forward();
-	    redraw = true;
-	}
-	else
-	if(le.MousePressLeft(split.GetRect()) && (lists.size() > max_items))
-	{
-	    s16 seek = (le.GetMouseCursor().y - split.GetRect().y) * 100 / split.GetStep();
-	    if(seek < split.Min()) seek = split.Min();
-	    else
-	    if(seek > split.Max()) seek = split.Max();
-	    top = lists.begin() + seek;
-	    split.Move(seek);
-	    redraw = true;
- 	}
-	else
-	if((le.KeyPress(KEY_DELETE) || (Settings::Get().PocketPC() && le.MousePressRight())) && cur != lists.end())
+	if((le.KeyPress(KEY_DELETE) || (pocket && le.MousePressRight())) && listbox.isSelected())
 	{
 	    std::string msg(_("Are you sure you want to delete file:"));
 	    msg.append("\n \n");
-	    msg.append(GetBasename((*cur).file.c_str()));
+	    msg.append(GetBasename(listbox.GetCurrent().file.c_str()));
 	    if(Dialog::YES == Dialog::Message(_("Warning!"), msg, Font::BIG, Dialog::YES | Dialog::NO))
 	    {
-		unlink((*cur).file.c_str());
-		lists.erase(cur);
+		unlink(listbox.GetCurrent().file.c_str());
+		listbox.RemoveSelected();
 		if(lists.empty() || filename.empty()) buttonOk.SetDisable(true);
-		top = lists.begin();
-		cur = top;
-		split.SetRange(0, (max_items < lists.size() ? lists.size() - max_items : 0));
-		split.Move(top - lists.begin());
-		redraw = true;
+		listbox.SetListContent(lists);
 	    }
-	}
-
-	if(le.MouseClickLeft(list_rt) && lists.size())
-	{
-	    MapsFileInfoList::iterator cur2 = top + static_cast<size_t>((le.GetMouseReleaseLeft().y - list_rt.y) * max_items / static_cast<float>(list_rt.h));
-	    if(cur2 > (lists.end() - 1)) cur2 = lists.end() - 1;
-	    // double click
-	    if(cur2 == cur)
-	    {
-    		result = (*cur).file;
-    		break;
-	    }
-	    else
-		cur = cur2;
-	    redraw = true;
-	    edit_mode = false;
-	}
-
-	if(redraw)
-	{
 	    cursor.Hide();
+	}
+
+	if(! cursor.isVisible())
+	{
+	    listbox.Redraw();
 
 	    if(edit_mode && editor)
+		RedrawExtraInfo(rt, header, filename + "_");
+	    else
+	    if(listbox.isSelected())
 	    {
-		RedrawFileListSimple(rt, header, filename + "_", lists, top, cur, max_items);
+	    	ResizeToShortName(listbox.GetCurrent().file, filename);
+		RedrawExtraInfo(rt, header, filename);
 	    }
 	    else
-	    if(cur != lists.end())
-	    {
-	    	ResizeToShortName((*cur).file, filename);
-		RedrawFileListSimple(rt, header, filename, lists, top, cur, max_items);
-	    }
-	    else
-		RedrawFileListSimple(rt, header, filename, lists, top, cur, max_items);
+		RedrawExtraInfo(rt, header, filename);
 
 	    buttonOk.Draw();
 	    buttonCancel.Draw();
-	    buttonPgUp.Draw();
-	    buttonPgDn.Draw();
-	    split.Redraw();
 	    cursor.Show();
 	    display.Flip();
-	    redraw = false;
 	}
     }
 
@@ -324,50 +297,11 @@ bool SelectFileListSimple(const std::string & header, MapsFileInfoList & lists, 
     return result.size();
 }
 
-void RedrawFileListSimple(const Point & dst, const std::string & header, const std::string & filename, const MapsFileInfoList & lists, MapsFileInfoList::const_iterator top, MapsFileInfoList::const_iterator cur, const u8 max_items)
+void RedrawExtraInfo(const Point & dst, const std::string & header, const std::string & filename)
 {
-    Display & display = Display::Get();
-    const Sprite & panel = AGG::GetICN(ICN::REQBKG, 0);
-
-    if(Settings::Get().PocketPC())
-    {
-	display.Blit(panel, Rect(0, 0, panel.w(), 120), dst.x, dst.y);
-	display.Blit(panel, Rect(0, panel.h() - 120, panel.w(), 120), dst.x, dst.y + 224 - 120);
-    }
-    else
-	display.Blit(panel, dst);
-
     Text text(header, Font::BIG);
     text.Blit(dst.x + 175 - text.w() / 2, dst.y + 30);
     
-    u16 oy = 60;
-    char short_date[15];
-         short_date[14] = 0;
-
-    for(MapsFileInfoList::const_iterator ii = top; ii != lists.end() && (ii - top < max_items); ++ii)
-    {
-	const Maps::FileInfo & info = *ii;
-
-	const std::string name(GetBasename(info.file.c_str()));
-
-	std::strftime(short_date, 14, "%b %d, %H:%M", std::localtime(&info.localtime));
-	std::string savname(GetBasename(info.file.c_str()));
-	if(savname.empty()) continue;
-
-	const size_t dotpos = savname.size() - 4;
-	std::string ext = savname.substr(dotpos);
-	String::Lower(ext);
-    	if(ext == ".sav") savname.erase(dotpos);
-
-	text.Set(savname, (cur == ii ? Font::YELLOW_BIG : Font::BIG));
-	text.Blit(dst.x + 45, dst.y + oy);
-
-	text.Set(short_date, (cur == ii ? Font::YELLOW_BIG : Font::BIG));
-	text.Blit(dst.x + 305 - text.w(), dst.y + oy);
-
-	oy += text.h() + 2;
-    }
-
     if(filename.size())
     {
 	text.Set(filename, Font::BIG);

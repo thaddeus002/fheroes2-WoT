@@ -30,8 +30,8 @@
 #include "spell.h"
 #include "skill.h"
 #include "text.h"
+#include "game.h"
 #include "resource.h"
-#include "maps_fileinfo.h"
 
 #define	SHADOWWIDTH	16
 #define BOXAREA_WIDTH   245
