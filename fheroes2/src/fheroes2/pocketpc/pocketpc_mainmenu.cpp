@@ -76,15 +76,19 @@ Game::menu_t PocketPC::MainMenu(void)
     text.Blit(rectNewGame);
 
     text.Set(_("Load Game"));
-    const Rect rectLoadGame(dst_pt.x + (src_rt.w - text.w()) / 2 - 5, dst_pt.y + 60, text.w() + 10, text.h() + 10);
+    const Rect rectLoadGame(dst_pt.x + (src_rt.w - text.w()) / 2 - 5, dst_pt.y + 55, text.w() + 10, text.h() + 10);
     text.Blit(rectLoadGame);
 
+    text.Set(_("Settings"));
+    const Rect rectSettings(dst_pt.x + (src_rt.w - text.w()) / 2 - 5, dst_pt.y + 75, text.w() + 10, text.h() + 10);
+    text.Blit(rectSettings);
+
     text.Set(_("High Scores"));
-    const Rect rectHighScores(dst_pt.x + (src_rt.w - text.w()) / 2 - 5, dst_pt.y + 85, text.w() + 10, text.h() + 10);
+    const Rect rectHighScores(dst_pt.x + (src_rt.w - text.w()) / 2 - 5, dst_pt.y + 95, text.w() + 10, text.h() + 10);
     text.Blit(rectHighScores);
 
     text.Set(_("Credits"));
-    const Rect rectCredits(dst_pt.x + (src_rt.w - text.w()) / 2 - 5, dst_pt.y + 110, text.w() + 10, text.h() + 10);
+    const Rect rectCredits(dst_pt.x + (src_rt.w - text.w()) / 2 - 5, dst_pt.y + 115, text.w() + 10, text.h() + 10);
     text.Blit(rectCredits);
 
     text.Set(_("Quit"));
@@ -100,6 +104,8 @@ Game::menu_t PocketPC::MainMenu(void)
 	if(le.KeyPress(KEY_n) || le.MouseClickLeft(rectNewGame)) return Game::NEWGAME;
 	else
 	if(le.KeyPress(KEY_l) || le.MouseClickLeft(rectLoadGame)) return Game::LOADGAME;
+	else
+	if(le.KeyPress(KEY_s) || le.MouseClickLeft(rectSettings)){ Dialog::ExtSettings(); cursor.Show(); display.Flip(); }
 	else
 	if(le.KeyPress(KEY_c) || le.MouseClickLeft(rectCredits)) return Game::CREDITS;
 	else
