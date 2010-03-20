@@ -31,7 +31,7 @@
 #include "skill.h"
 #include "text.h"
 #include "resource.h"
-#include "game.h"
+#include "maps_fileinfo.h"
 
 #define	SHADOWWIDTH	16
 #define BOXAREA_WIDTH   245
@@ -84,7 +84,6 @@ namespace Dialog
 
     bool SelectFileLoad(std::string &);
     bool SelectFileSave(std::string &);
-    bool SelectMapsFile(std::string &);
 
     // show info cell maps
     void QuickInfo(const Maps::Tiles & tile);

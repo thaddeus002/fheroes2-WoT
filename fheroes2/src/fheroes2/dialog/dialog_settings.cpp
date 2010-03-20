@@ -28,35 +28,21 @@
 #include "dialog.h"
 #include "interface_list.h"
 
-class State
+class SettingsListBox : public Interface::ListBox<u32>
 {
 public:
-    State(u32 f);
+    SettingsListBox(const Point & pt) : Interface::ListBox<u32>(pt) {};
 
-    u32  state;
-    Text msg;
-};
-
-State::State(u32 f) : state(f)
-{
-    msg.Set(Settings::Get().ExtName(f), Font::SMALL);
-}
-
-class SettingsListBox : public Interface::ListBox<State>
-{
-    public:
-    SettingsListBox(const Point & pt) : Interface::ListBox<State>(pt) {};
-
-    void RedrawItem(const State &, u16, u16);
+    void RedrawItem(const u32 &, u16, u16, bool);
     void RedrawBackground(const Point &);
 
     void ActionCurrentUp(void);
     void ActionCurrentDn(void);
-    void ActionListDoubleClick(State &);
-    void ActionListSingleClick(State &);
+    void ActionListDoubleClick(u32 &);
+    void ActionListSingleClick(u32 &);
 };
 
-void SettingsListBox::RedrawItem(const State & item, u16 ox, u16 oy)
+void SettingsListBox::RedrawItem(const u32 & item, u16 ox, u16 oy, bool current)
 {
     Display & display = Display::Get();
     const Settings & conf = Settings::Get();
@@ -65,9 +51,10 @@ void SettingsListBox::RedrawItem(const State & item, u16 ox, u16 oy)
     const Sprite & mark = AGG::GetICN(ICN::CELLWIN, 2);
 
     display.Blit(cell, ox, oy);
-    if(conf.ExtModes(item.state)) display.Blit(mark, ox + 3, oy + 2);
+    if(conf.ExtModes(item)) display.Blit(mark, ox + 3, oy + 2);
 
-    item.msg.Blit(ox + cell.w() + 5, oy + 4);
+    Text msg(conf.ExtName(item), Font::SMALL);
+    msg.Blit(ox + cell.w() + 5, oy + 4);
 }
 
 void SettingsListBox::RedrawBackground(const Point & top)
@@ -91,16 +78,15 @@ void SettingsListBox::ActionCurrentDn(void)
 {
 }
 
-void SettingsListBox::ActionListDoubleClick(State & item)
+void SettingsListBox::ActionListDoubleClick(u32 & item)
 {
     ActionListSingleClick(item);
 }
 
-void SettingsListBox::ActionListSingleClick(State & item)
+void SettingsListBox::ActionListSingleClick(u32 & item)
 {
     Settings & conf = Settings::Get();
-    conf.ExtModes(item.state) ? conf.ExtResetModes(item.state) : conf.ExtSetModes(item.state);
-    Cursor::Get().Hide();
+    conf.ExtModes(item) ? conf.ExtResetModes(item) : conf.ExtSetModes(item);
 }
 
 void Dialog::ExtSettings(void)
@@ -126,18 +112,18 @@ void Dialog::ExtSettings(void)
     Text text("FHeroes2 Settings", Font::YELLOW_BIG);
     text.Blit(area.x + (area.w - text.w()) / 2, area.y + 6);
 
-    std::vector<State> states;
+    std::vector<u32> states;
 
-    states.push_back(State(Settings::REMEMBER_LAST_FOCUS));
-    states.push_back(State(Settings::FAST_LOAD_GAME_DIALOG));
-    states.push_back(State(Settings::SHOW_VISITED_CONTENT));
-    states.push_back(State(Settings::ABANDONED_MINE_RANDOM));
-    states.push_back(State(Settings::SAVE_MONSTER_BATTLE));
-    states.push_back(State(Settings::ALLOW_SET_GUARDIAN));
-    states.push_back(State(Settings::LEARN_SPELLS_WITH_DAY));
-    states.push_back(State(Settings::ALLOW_BUY_FROM_WELL));
-    states.push_back(State(Settings::BATTLE_SHOW_DAMAGE));
-    states.push_back(State(Settings::BATTLE_TROOP_DIRECTION));
+    states.push_back(Settings::REMEMBER_LAST_FOCUS);
+    states.push_back(Settings::FAST_LOAD_GAME_DIALOG);
+    states.push_back(Settings::SHOW_VISITED_CONTENT);
+    states.push_back(Settings::ABANDONED_MINE_RANDOM);
+    states.push_back(Settings::SAVE_MONSTER_BATTLE);
+    states.push_back(Settings::ALLOW_SET_GUARDIAN);
+    states.push_back(Settings::LEARN_SPELLS_WITH_DAY);
+    states.push_back(Settings::ALLOW_BUY_FROM_WELL);
+    states.push_back(Settings::BATTLE_SHOW_DAMAGE);
+    states.push_back(Settings::BATTLE_TROOP_DIRECTION);
 
     SettingsListBox listbox(area);
 

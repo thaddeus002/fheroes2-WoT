@@ -42,7 +42,7 @@ namespace Interface
 	ListBox(const Point & pt) : ptRedraw(pt), maxItems(0), content(NULL) {};
 	virtual ~ListBox(){};
 
-	virtual void RedrawItem(const Item &, u16, u16) = 0;
+	virtual void RedrawItem(const Item &, u16, u16, bool) = 0;
 	virtual void RedrawBackground(const Point &) = 0;
 
 	virtual void ActionCurrentUp(void) = 0;
@@ -59,6 +59,7 @@ namespace Interface
 	void SetListContent(std::vector<Item> &);
 	void Redraw(void);
 	void QueueEventProcessing(void);
+	Item & GetCurrent(void);
 	*/
 
 	void SetScrollButtonUp(const ICN::icn_t icn, const u16 index1, const u16 index2, const Point & pos)
@@ -111,8 +112,13 @@ namespace Interface
             ItemsIterator curt = top;
             ItemsIterator last = top + maxItems < content->end() ? top + maxItems : content->end();
             for(; curt != last; ++curt)
-                RedrawItem(*curt, rtAreaItems.x, rtAreaItems.y + (curt - top) * rtAreaItems.h / maxItems);
+                RedrawItem(*curt, rtAreaItems.x, rtAreaItems.y + (curt - top) * rtAreaItems.h / maxItems, curt == cur);
         };
+
+	Item & GetCurrent(void)
+	{
+	    return *cur;
+	};
 
 	void QueueEventProcessing(void)
 	{
@@ -197,6 +203,8 @@ namespace Interface
 	    if(le.MouseClickLeft(rtAreaItems) && content->size())
 	    {
 		float offset = (le.GetMouseReleaseLeft().y - rtAreaItems.y) * maxItems / rtAreaItems.h;
+
+		cursor.Hide();
 
 		ItemsIterator last  = content->end() - 1;
 		ItemsIterator click = top + static_cast<size_t>(offset);

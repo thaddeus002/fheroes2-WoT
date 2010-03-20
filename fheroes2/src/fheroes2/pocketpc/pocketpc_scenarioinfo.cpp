@@ -30,7 +30,6 @@
 #include "world.h"
 #include "pocketpc.h"
 
-bool DialogSelectMapsFileList(MapsFileInfoList &, std::string &);
 void UpdateCoordOpponentsInfo(const Point &, std::vector<Rect> &);
 void UpdateCoordClassInfo(const Point &, std::vector<Rect> &);
 

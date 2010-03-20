@@ -33,9 +33,8 @@
 #include "world.h"
 #include "agg.h"
 #include "zzlib.h"
+#include "dialog_selectscenario.h"
 #include "server.h"
-
-bool DialogSelectMapsFileList(MapsFileInfoList &, std::string &);
 
 #ifdef WITH_NET
 
@@ -342,7 +341,7 @@ bool FH2LocalClient::ScenarioInfoDialog(void)
 	    Network::PacketPopMapsFileInfoList(packet, lists);
 
             std::string filemaps;
-            if(DialogSelectMapsFileList(lists, filemaps) && filemaps.size())
+            if(Dialog::SelectScenario(lists, filemaps) && filemaps.size())
             {
 		// send set_maps_info
 	        packet.Reset();

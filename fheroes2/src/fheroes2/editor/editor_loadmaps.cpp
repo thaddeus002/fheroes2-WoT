@@ -26,13 +26,22 @@
 #include "settings.h"
 #include "world.h"
 #include "dialog.h"
+#include "dialog_selectscenario.h"
 
 Game::menu_t Game::Editor::LoadMaps(void)
 {
     Settings & conf = Settings::Get();
-    std::string filemaps;
 
-    if(Dialog::SelectMapsFile(filemaps) && conf.LoadFileMapsMP2(filemaps))
+    std::string filemaps;
+    MapsFileInfoList lists;
+
+    if(! PrepareMapsFileInfoList(lists))
+    {
+        Dialog::Message(_("Warning"), _("No maps available!"), Font::BIG, Dialog::OK);
+        return MAINMENU;
+    }
+
+    if(Dialog::SelectScenario(lists, filemaps) && conf.LoadFileMapsMP2(filemaps))
     {
 	Game::ShowLoadMapsText();
     	//

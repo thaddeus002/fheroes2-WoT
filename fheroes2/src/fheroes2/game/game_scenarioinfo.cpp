@@ -29,6 +29,7 @@
 #include "cursor.h"
 #include "settings.h"
 #include "maps_fileinfo.h"
+#include "dialog_selectscenario.h"
 #include "difficulty.h"
 #include "dialog.h"
 #include "text.h"
@@ -38,9 +39,6 @@
 #include "player.h"
 #include "pocketpc.h"
 #include "game.h"
-
-// dialog_selectfile.cpp
-bool DialogSelectMapsFileList(MapsFileInfoList &, std::string &);
 
 u16 GetStepFor(u16, u16, u16);
 void RedrawRatingInfo(TextSprite &);
@@ -177,7 +175,7 @@ Game::menu_t Game::ScenarioInfo(void)
 	if(le.KeyPress(KEY_s) || le.MouseClickLeft(buttonSelectMaps))
 	{
 	    std::string filemaps;
-	    if(DialogSelectMapsFileList(lists, filemaps) && conf.LoadFileMapsMP2(filemaps))
+	    if(Dialog::SelectScenario(lists, filemaps) && conf.LoadFileMapsMP2(filemaps))
 	    {
 		cursor.Hide();
 		levelCursor.Hide();

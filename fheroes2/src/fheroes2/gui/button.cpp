@@ -194,11 +194,11 @@ u16 ButtonGroups::QueueEventProcessing(void)
 {
     LocalEvent & le = LocalEvent::Get();
 
-    if(button1) le.MousePressLeft(*button1) ? button1->PressDraw() : button1->ReleaseDraw();
-    if(button2) le.MousePressLeft(*button2) ? button2->PressDraw() : button2->ReleaseDraw();
+    if(button1 && button1->isEnable()) le.MousePressLeft(*button1) ? button1->PressDraw() : button1->ReleaseDraw();
+    if(button2 && button2->isEnable()) le.MousePressLeft(*button2) ? button2->PressDraw() : button2->ReleaseDraw();
 
-    if(button1 && le.MouseClickLeft(*button1)) return result1;
-    if(button2 && le.MouseClickLeft(*button2)) return result2;
+    if(button1 && button1->isEnable() && le.MouseClickLeft(*button1)) return result1;
+    if(button2 && button2->isEnable() && le.MouseClickLeft(*button2)) return result2;
 
     if(button1 && button2)
     {
@@ -219,4 +219,14 @@ u16 ButtonGroups::QueueEventProcessing(void)
     }
 
     return Dialog::ZERO;
+}
+
+void ButtonGroups::DisableButton1(bool f)
+{
+    if(button1) button1->SetDisable(f);
+}
+
+void ButtonGroups::DisableButton2(bool f)
+{
+    if(button1) button2->SetDisable(f);
 }

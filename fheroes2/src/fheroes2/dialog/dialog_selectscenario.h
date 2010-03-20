@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2009 by Andrey Afletdinov <fheroes2@gmail.com>          *
+ *   Copyright (C) 2010 by Andrey Afletdinov <fheroes2@gmail.com>          *
  *                                                                         *
  *   Part of the Free Heroes2 Engine:                                      *
  *   http://sourceforge.net/projects/fheroes2                              *
@@ -19,62 +19,30 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef H2BUTTON_H
-#define H2BUTTON_H
 
-#include "icn.h"
-#include "gamedefs.h"
+#ifndef H2SELECT_SCENARIO_H
+#define H2SELECT_SCENARIO_H
 
-class Button : public Rect
+#include "maps_fileinfo.h"
+#include "interface_list.h"
+
+class ScenarioListBox : public Interface::ListBox<Maps::FileInfo>
 {
 public:
-    Button();
-    Button(const Point &pt, const ICN::icn_t icn, u16 index1, u16 index2);
-    Button(u16 ox, u16 oy, const ICN::icn_t icn, u16 index1, u16 index2);
+    ScenarioListBox(const Point & pt) : Interface::ListBox<Maps::FileInfo>(pt) {};
 
-    bool isEnable(void) const{ return !disable; };
-    bool isDisable(void) const{ return disable; };
-    bool isPressed(void) const{ return pressed; };
-    bool isReleased(void) const{ return !pressed; };
+    void RedrawItem(const Maps::FileInfo &, u16, u16, bool);
+    void RedrawBackground(const Point &);
 
-    void Press(void);
-    void Release(void);
-
-    void SetPos(const Point & pt);
-    void SetPos(const u16 ox, const u16 oy);
-    void SetSprite(const ICN::icn_t icn, const u16 index1, const u16 index2);
-    void SetDisable(bool fl){ disable = fl; pressed = fl; };
-
-    void Draw(void);
-    void PressDraw(void);
-    void ReleaseDraw(void);
-
-private:
-    const Sprite *sprite1;
-    const Sprite *sprite2;
-
-    bool pressed;
-    bool disable;
+    void ActionCurrentUp(void);
+    void ActionCurrentDn(void);
+    void ActionListDoubleClick(Maps::FileInfo &);
+    void ActionListSingleClick(Maps::FileInfo &);
 };
 
-class ButtonGroups
+namespace Dialog
 {
-public:
-    ButtonGroups(const Rect &, u16);
-    ~ButtonGroups();
-    
-    void Draw(void);
-    u16 QueueEventProcessing(void);
-
-    void DisableButton1(bool);
-    void DisableButton2(bool);
-
-private:
-    Button *button1;
-    Button *button2;
-    u16 result1;
-    u16 result2;
-    u16 buttons;
+    bool SelectScenario(const MapsFileInfoList &, std::string &);
 };
 
 #endif
