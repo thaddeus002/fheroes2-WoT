@@ -31,6 +31,7 @@
 #include "settings.h"
 #include "game_focus.h"
 #include "game_interface.h"
+#include "interface_list.h"
 #include "heroes.h"
 
 void DialogSpellFailed(Spell::spell_t);
@@ -49,6 +50,71 @@ bool ActionSpellTownGate(Heroes &);
 bool ActionSpellTownPortal(Heroes &);
 bool ActionSpellVisions(Heroes &);
 bool ActionSpellSetGuardian(Heroes &, Monster::monster_t);
+
+class CastleIndexListBox : public Interface::ListBox<u16>
+{
+public:
+    CastleIndexListBox(const Point & pt, u16 & res) : Interface::ListBox<u16>(pt), result(res) {};
+
+    void RedrawItem(const u16 &, u16, u16, bool);
+    void RedrawBackground(const Point &);
+
+    void ActionCurrentUp(void);
+    void ActionCurrentDn(void);
+    void ActionListDoubleClick(u16 &);
+    void ActionListSingleClick(u16 &);
+
+    u16 & result;
+};
+
+void CastleIndexListBox::RedrawItem(const u16 & index, u16 dstx, u16 dsty, bool current)
+{
+    const Castle* castle =world.GetCastle(index);
+
+    if(castle)
+    {
+	Text text(castle->GetName(), (current ? Font::YELLOW_BIG : Font::BIG));
+	text.Blit(dstx + 10, dsty);
+    }
+}
+
+void CastleIndexListBox::RedrawBackground(const Point & dst)
+{
+    Display & display = Display::Get();
+
+    Text text(_("Town Portal"), Font::YELLOW_BIG);
+    text.Blit(dst.x + 140 - text.w() / 2, dst.y + 6);
+
+    text.Set(_("Select town to port to."), Font::BIG);
+    text.Blit(dst.x + 140 - text.w() / 2, dst.y + 30);
+
+    display.Blit(AGG::GetICN(ICN::LISTBOX, 0), dst.x + 2, dst.y + 55);
+    for(u8 ii = 1; ii < 5; ++ii)
+	display.Blit(AGG::GetICN(ICN::LISTBOX, 1), dst.x + 2, dst.y + 55 + (ii * 19));
+    display.Blit(AGG::GetICN(ICN::LISTBOX, 2), dst.x + 2, dst.y + 145);
+
+    display.Blit(AGG::GetICN(ICN::LISTBOX, 7), dst.x + 256, dst.y + 75);
+    for(u8 ii = 1; ii < 3; ++ii)
+	display.Blit(AGG::GetICN(ICN::LISTBOX, 8), dst.x + 256, dst.y + 74 + (ii * 19));
+    display.Blit(AGG::GetICN(ICN::LISTBOX, 9), dst.x + 256, dst.y + 126);
+}
+
+void CastleIndexListBox::ActionCurrentUp(void)
+{
+}
+
+void CastleIndexListBox::ActionCurrentDn(void)
+{
+}
+
+void CastleIndexListBox::ActionListDoubleClick(u16 &)
+{
+    result = Dialog::OK;
+}
+
+void CastleIndexListBox::ActionListSingleClick(u16 &)
+{
+}
 
 bool Heroes::ActionSpellCast(Spell::spell_t spell)
 {
@@ -91,6 +157,44 @@ bool Heroes::ActionSpellCast(Spell::spell_t spell)
     {
 	DEBUG(DBG_GAME, DBG_INFO, "ActionSpell: " << GetName() << " cast spell: " << Spell::GetName(spell));
 	TakeSpellPoints(Spell::CostManaPoints(spell, this));
+	return true;
+    }
+    return false;
+}
+
+bool HeroesTownGate(Heroes & hero, const Castle* castle)
+{
+    if(castle)
+    {
+	Interface::Basic & I = Interface::Basic::Get();
+	Game::Focus & F = Game::Focus::Get();
+
+	const u16 src = hero.GetIndex();
+	const u16 dst = castle->GetIndex();
+
+	AGG::PlaySound(M82::KILLFADE);
+	hero.GetPath().Hide();
+	hero.FadeOut();
+
+	Cursor::Get().Hide();
+	hero.SetCenter(dst);
+	hero.Scoute();
+
+	world.GetTiles(src).SetObject(hero.GetUnderObject());
+	hero.SaveUnderObject(world.GetTiles(dst).GetObject());
+	world.GetTiles(dst).SetObject(MP2::OBJ_HEROES);
+
+	I.gameArea.Center(F.Center());
+	F.SetRedraw();
+	I.Redraw();
+
+	AGG::PlaySound(M82::KILLFADE);
+	hero.GetPath().Hide();
+	hero.FadeIn();
+
+	// educate spells
+	if(! Settings::Get().ExtLearnSpellsWithDay()) castle->GetMageGuild().EducateHero(hero);
+
 	return true;
     }
     return false;
@@ -270,45 +374,86 @@ bool ActionSpellTownGate(Heroes & hero)
     F.SetRedraw();
     I.Redraw();
 
-    if(castle)
+    if(!castle)
     {
-	const u16 src = hero.GetIndex();
-	const u16 dst = castle->GetIndex();
-
-	AGG::PlaySound(M82::KILLFADE);
-	hero.GetPath().Hide();
-	hero.FadeOut();
-
-	cursor.Hide();
-	hero.SetCenter(dst);
-	hero.Scoute();
-
-	world.GetTiles(src).SetObject(hero.GetUnderObject());
-	hero.SaveUnderObject(world.GetTiles(dst).GetObject());
-	world.GetTiles(dst).SetObject(MP2::OBJ_HEROES);
-
-	I.gameArea.Center(F.Center());
-	F.SetRedraw();
-	I.Redraw();
-
-	AGG::PlaySound(M82::KILLFADE);
-	hero.GetPath().Hide();
-	hero.FadeIn();
-
-	// educate spells
-	if(! Settings::Get().ExtLearnSpellsWithDay()) castle->GetMageGuild().EducateHero(hero);
-
-	return true;
+	Dialog::Message("", _("No avaialble town. Spell Failed!!!"), Font::BIG, Dialog::OK);
+	return false;
     }
 
-    Dialog::Message("", _("No avaialble town. Spell Failed!!!"), Font::BIG, Dialog::OK);
-
-    return false;
+    return HeroesTownGate(hero, castle);
 }
 
 bool ActionSpellTownPortal(Heroes & hero)
 {
-    DialogNotAvailable();
+    const Kingdom & kingdom = world.GetKingdom(hero.GetColor());
+    std::vector<u16> castles;
+
+    Display & display = Display::Get();
+    Cursor & cursor = Cursor::Get();
+    LocalEvent & le = LocalEvent::Get();
+
+    cursor.Hide();
+    cursor.SetThemes(cursor.POINTER);
+
+    for(std::vector<Castle *>::const_iterator it = kingdom.GetCastles().begin(); it != kingdom.GetCastles().end(); ++it)
+	if(*it) castles.push_back((**it).GetIndex());
+
+    if(castles.empty())
+    {
+	Dialog::Message("", _("No avaialble town. Spell Failed!!!"), Font::BIG, Dialog::OK);
+	return false;
+    }
+
+    const u16 window_w = 280;
+    const u16 window_h = 200;
+
+    Dialog::FrameBorder* frameborder = new Dialog::FrameBorder();
+    frameborder->SetPosition((display.w() - window_w) / 2 - BORDERWIDTH, (display.h() - window_h) / 2 - BORDERWIDTH, window_w, window_h);
+    frameborder->Redraw();
+
+    const Rect & area = frameborder->GetArea();
+    const Sprite & background = AGG::GetICN(ICN::STONEBAK, 0);
+    display.Blit(background, Rect(0, 0, window_w, window_h), area);
+
+    u16 result = Dialog::ZERO;
+
+    CastleIndexListBox listbox(area, result);
+
+    listbox.RedrawBackground(area);
+    listbox.SetScrollButtonUp(ICN::LISTBOX, 3, 4, Point(area.x + 256, area.y + 55));
+    listbox.SetScrollButtonDn(ICN::LISTBOX, 5, 6, Point(area.x + 256, area.y + 145));
+    listbox.SetScrollSplitter(AGG::GetICN(ICN::LISTBOX, 10), Rect(area.x + 261, area.y + 78, 14, 64));
+    listbox.SetAreaMaxItems(5);
+    listbox.SetAreaItems(Rect(area.x + 10, area.y + 60, 250, 100));
+    listbox.SetListContent(castles);
+    listbox.Redraw();
+
+    ButtonGroups btnGroups(area, Dialog::OK|Dialog::CANCEL);
+    btnGroups.Draw();
+
+    cursor.Show();
+    display.Flip();
+
+    while(result == Dialog::ZERO && le.HandleEvents())
+    {
+        result = btnGroups.QueueEventProcessing();
+
+        listbox.QueueEventProcessing();
+
+        if(!cursor.isVisible())
+        {
+            listbox.Redraw();
+            cursor.Show();
+            display.Flip();
+        }
+    }
+
+    delete frameborder;
+
+    // store
+    if(result == Dialog::OK)
+	return HeroesTownGate(hero, world.GetCastle(listbox.GetCurrent()));
+
     return false;
 }
 
