@@ -907,6 +907,20 @@ bool Game::IO::LoadBIN(QueueMessage & msg)
     // regenerate puzzle surface
     Interface::GameArea::GenerateUltimateArtifactAreaSurface(world.ultimate_artifact, world.puzzle_surface);
 
+    // fixed monster (prev. rev. 1614)
+    if(format < FORMAT_VERSION_1661)
+    {
+	for(u16 ii = 0; ii < world.vec_tiles.size(); ++ii)
+	{
+	    Maps::Tiles* tile =  world.vec_tiles[ii];
+	    if(tile && tile->general == MP2::OBJ_MONSTER && 0 == tile->quantity3)
+            {
+                const Maps::TilesAddon * addons = tile->FindMonster();
+        	tile->quantity3 = (addons ? Monster::FromInt(addons->index + 1) : Monster::UNKNOWN);
+            }
+        }
+    }
+
     return byte16 == 0xFFFF;
 }
 
