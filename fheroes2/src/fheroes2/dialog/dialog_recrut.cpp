@@ -32,6 +32,7 @@
 u16 Dialog::RecruitMonster(const Monster & monster, u16 available)
 {
     Display & display = Display::Get();
+    LocalEvent & le = LocalEvent::Get();
 
     // cursor
     Cursor & cursor = Cursor::Get();
@@ -56,13 +57,22 @@ u16 Dialog::RecruitMonster(const Monster & monster, u16 available)
     back.Save();
 
     display.Blit(box, pos.x, pos.y);
-    
-    LocalEvent & le = LocalEvent::Get();
 
     Point dst_pt;
-
     std::string str;
     Text text;
+
+    // smear hardcore text "Cost per troop:"
+    const Sprite & smear = AGG::GetICN(ICN::TOWNNAME, 0);
+    dst_pt.x = pos.x + 144;
+    dst_pt.y = pos.y + 55;
+    display.Blit(smear, Rect(8, 1, 120, 12), dst_pt);
+
+    str = _("Cost per troop:");
+    text.Set(str, Font::SMALL);
+    dst_pt.x = pos.x + 206 - text.w() / 2;
+    dst_pt.y = pos.y + 55;
+    text.Blit(dst_pt);
 
     // text recruit monster
     str = _("Recruit %{name}");
