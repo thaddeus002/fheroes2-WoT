@@ -77,6 +77,7 @@ int main(int argc, char **argv)
 	std::cout << "Free Heroes II, " + conf.BuildVersion() << std::endl;
 
 	LoadConfigFiles(conf, GetDirname(argv[0]));
+	conf.BinaryLoad();
 
 	// getopt
 	{

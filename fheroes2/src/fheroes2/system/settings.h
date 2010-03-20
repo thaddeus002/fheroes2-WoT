@@ -36,6 +36,11 @@
 #include "game_io.h"
 #include "bitmodes.h"
 
+#define FORMAT_VERSION_1661 0x067D
+#define FORMAT_VERSION_1520 0x05F0
+#define FORMAT_VERSION_1389 0x056D
+#define CURRENT_FORMAT_VERSION FORMAT_VERSION_1661
+
 #define ListMapsDirectory std::list<std::string>
 
 enum
@@ -192,6 +197,9 @@ public:
     bool LoadedGameVersion(void) const;
     bool UseFade(void) const;
     bool AutoSave(void) const;
+
+    void BinarySave(void) const;
+    void BinaryLoad(void);
 
     bool ExtModes(u32) const;
     void ExtSetModes(u32);

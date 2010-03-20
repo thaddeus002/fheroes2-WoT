@@ -33,13 +33,8 @@
 #include "world.h"
 #include "gameevent.h"
 #include "interface_gamearea.h"
+#include "settings.h"
 #include "tools.h"
-
-#define FORMAT_VERSION_1661 0x067D
-#define FORMAT_VERSION_1520 0x05F0
-#define FORMAT_VERSION_1389 0x056D
-
-#define CURRENT_FORMAT_VERSION FORMAT_VERSION_1661
 
 bool Game::Save(const std::string &fn)
 {
@@ -49,17 +44,16 @@ bool Game::Save(const std::string &fn)
 
     if(! Game::IO::SaveBIN(msg)) return false;
 
+#ifdef WITH_ZLIB
     std::fstream fs(fn.c_str(), std::ios::out | std::ios::binary);
     if(fs.fail()) return false;
-
-#ifdef WITH_ZLIB
     std::vector<char> v;
     if(!ZLib::Compress(v, msg.DtPt(), msg.DtSz())) return false;
     fs.write(&v[0], v.size());
-#else
-    fs.write(msg.DtPt(), msg.DtSz());
-#endif
     fs.close();
+#else
+    msg.Save(fn.c_str());
+#endif
 
     return true;
 }
@@ -68,18 +62,7 @@ bool Game::IO::LoadSAV(const std::string & fn)
 {
     if(fn.empty()) return false;
 
-    std::fstream fs(fn.c_str(), std::ios::in | std::ios::binary);
-    if(fs.fail()) return false;
-
-    fs.seekg(0, std::ios_base::end);
-    dtsz = fs.tellg();
-    fs.seekg(0, std::ios_base::beg);
-
-    delete [] data;
-    data = new char [dtsz];
-
-    fs.read(data, dtsz);
-    fs.close();
+    Load(fn.c_str());
 
 #ifdef WITH_ZLIB
     std::vector<char> v;
@@ -87,14 +70,14 @@ bool Game::IO::LoadSAV(const std::string & fn)
     {
 	dtsz = v.size();
 	delete [] data;
-        data = new char [dtsz];
+        data = new char [dtsz + 1];
+	itd1 = data;
+	itd2 = data + dtsz;
+
 	std::memcpy(data, &v[0], dtsz);
 	v.clear();
     }
 #endif
-
-    itd1 = data;
-    itd2 = data + dtsz;
 
     return true;
 }

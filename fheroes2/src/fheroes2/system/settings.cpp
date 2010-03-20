@@ -71,16 +71,16 @@ namespace
         { NS_POCKETPC, "tapmode",              Settings::TAPMODE           },
         { NS_POCKETPC, "tap mode",             Settings::TAPMODE           },
 
-	{ NS_FHEROES2, "allow buy from well",	Settings::ALLOW_BUY_FROM_WELL },
-	{ NS_FHEROES2, "show visited content",	Settings::SHOW_VISITED_CONTENT },
-	{ NS_FHEROES2, "fast load game dialog",	Settings::FAST_LOAD_GAME_DIALOG },
-	{ NS_FHEROES2, "remember last focus",	Settings::REMEMBER_LAST_FOCUS },
-	{ NS_FHEROES2, "abandoned mine random",	Settings::ABANDONED_MINE_RANDOM },
-	{ NS_FHEROES2, "save monster after battle", Settings::SAVE_MONSTER_BATTLE },
-	{ NS_FHEROES2, "allow set guardian (future)", Settings::ALLOW_SET_GUARDIAN },
-	{ NS_FHEROES2, "learn spells with day",  Settings::LEARN_SPELLS_WITH_DAY },
-	{ NS_FHEROES2, "battle show damage",    Settings::BATTLE_SHOW_DAMAGE },
-	{ NS_FHEROES2, "battle troop direction",Settings::BATTLE_TROOP_DIRECTION },
+	{ NS_FHEROES2, "castle: allow buy from well",			Settings::ALLOW_BUY_FROM_WELL },
+	{ NS_FHEROES2, "world: show visited content from objects",	Settings::SHOW_VISITED_CONTENT },
+	{ NS_FHEROES2, "game: fast load game dialog (L hot key)",	Settings::FAST_LOAD_GAME_DIALOG },
+	{ NS_FHEROES2, "game: remember last focus",			Settings::REMEMBER_LAST_FOCUS },
+	{ NS_FHEROES2, "world: abandoned mine random resource",		Settings::ABANDONED_MINE_RANDOM },
+	{ NS_FHEROES2, "world: save count monster after battle",	Settings::SAVE_MONSTER_BATTLE },
+	{ NS_FHEROES2, "world: allow set guardian to objects (future)", Settings::ALLOW_SET_GUARDIAN },
+	{ NS_FHEROES2, "heroes: learn spells with day",  		Settings::LEARN_SPELLS_WITH_DAY },
+	{ NS_FHEROES2, "battle: show damage info",    			Settings::BATTLE_SHOW_DAMAGE },
+	{ NS_FHEROES2, "battle: troop direction to move",		Settings::BATTLE_TROOP_DIRECTION },
 
         { NS_UNKNOWN,  NULL,                   0                           },
     };
@@ -1007,4 +1007,34 @@ bool Settings::ExtBattleShowDamage(void) const
 bool Settings::ExtBattleTroopDirection(void) const
 {
     return opt_fheroes2.Modes(BATTLE_TROOP_DIRECTION);
+}
+
+void Settings::BinarySave(void) const
+{
+    const std::string binary = local_prefix + SEPARATOR + "fheroes2.bin";
+    QueueMessage msg;
+
+    msg.Push(static_cast<u16>(CURRENT_FORMAT_VERSION));
+    msg.Push(opt_fheroes2());
+
+    msg.Save(binary.c_str());
+}
+
+void Settings::BinaryLoad(void)
+{
+    const std::string binary = local_prefix + SEPARATOR + "fheroes2.bin";
+
+    if(FilePresent(binary))
+    {
+	QueueMessage msg;
+	u32 byte32;
+	u16 byte16;
+
+	msg.Load(binary.c_str());
+
+	msg.Pop(byte16);
+	msg.Pop(byte32);
+
+	opt_fheroes2.SetModes(byte32);
+    }
 }

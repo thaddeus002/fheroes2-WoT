@@ -26,36 +26,37 @@
 #include "cursor.h"
 #include "button.h"
 #include "dialog.h"
+#include "interface_list.h"
 
 class State
 {
 public:
-    State(const Point & p, u32 f);
+    State(u32 f);
 
-    bool operator() (void) const { return state; };
-
-    void Redraw(void);
-    bool QueueEventProcessing(void);
-
-private:
-    Rect area;
+    u32  state;
     Text msg;
-    const u32 state;
 };
 
-State::State(const Point & p, u32 f) : area(p, 0, 0), state(f)
+State::State(u32 f) : state(f)
 {
-    const Settings & conf = Settings::Get();
-
-    msg.Set(conf.ExtName(f), Font::SMALL);
-
-    const Sprite & cell = AGG::GetICN(ICN::CELLWIN, 1);
-
-    area.w = cell.w() + 5 + msg.w();
-    area.h = cell.h();
+    msg.Set(Settings::Get().ExtName(f), Font::SMALL);
 }
 
-void State::Redraw(void)
+class SettingsListBox : public Interface::ListBox<State>
+{
+    public:
+    SettingsListBox(const Point & pt) : Interface::ListBox<State>(pt) {};
+
+    void RedrawItem(const State &, u16, u16);
+    void RedrawBackground(const Point &);
+
+    void ActionCurrentUp(void);
+    void ActionCurrentDn(void);
+    void ActionListDoubleClick(State &);
+    void ActionListSingleClick(State &);
+};
+
+void SettingsListBox::RedrawItem(const State & item, u16 ox, u16 oy)
 {
     Display & display = Display::Get();
     const Settings & conf = Settings::Get();
@@ -63,26 +64,43 @@ void State::Redraw(void)
     const Sprite & cell = AGG::GetICN(ICN::CELLWIN, 1);
     const Sprite & mark = AGG::GetICN(ICN::CELLWIN, 2);
 
-    display.Blit(cell, area);
-    if(conf.ExtModes(state)) display.Blit(mark, area.x + 3, area.y + 2);
+    display.Blit(cell, ox, oy);
+    if(conf.ExtModes(item.state)) display.Blit(mark, ox + 3, oy + 2);
 
-    msg.Blit(area.x + cell.w() + 5, area.y + 4);
+    item.msg.Blit(ox + cell.w() + 5, oy + 4);
 }
 
-bool State::QueueEventProcessing(void)
+void SettingsListBox::RedrawBackground(const Point & top)
 {
-    LocalEvent & le = LocalEvent::Get();
-    Cursor & cursor = Cursor::Get();
+    Display & display = Display::Get();
+
+    display.Blit(AGG::GetICN(ICN::STONEBAK, 0), Rect(15, 25, 280, 170), top.x + 15, top.y + 25);
+
+    for(u8 ii = 1; ii < 7; ++ii)
+	display.Blit(AGG::GetICN(ICN::DROPLISL, 11), top.x + 295, top.y + 35 + (19 * ii));
+
+    display.Blit(AGG::GetICN(ICN::DROPLISL, 10), top.x + 295, top.y + 46);
+    display.Blit(AGG::GetICN(ICN::DROPLISL, 12), top.x + 295, top.y + 156);
+}
+
+void SettingsListBox::ActionCurrentUp(void)
+{
+}
+
+void SettingsListBox::ActionCurrentDn(void)
+{
+}
+
+void SettingsListBox::ActionListDoubleClick(State & item)
+{
+    ActionListSingleClick(item);
+}
+
+void SettingsListBox::ActionListSingleClick(State & item)
+{
     Settings & conf = Settings::Get();
-    
-    if(le.MouseClickLeft(area))
-    {
-        conf.ExtModes(state) ? conf.ExtResetModes(state) : conf.ExtSetModes(state);
-        cursor.Hide();
-        Redraw();
-	return true;
-    }
-    return false;
+    conf.ExtModes(item.state) ? conf.ExtResetModes(item.state) : conf.ExtSetModes(item.state);
+    Cursor::Get().Hide();
 }
 
 void Dialog::ExtSettings(void)
@@ -101,7 +119,6 @@ void Dialog::ExtSettings(void)
     frameborder.SetPosition((display.w() - window_w) / 2 - BORDERWIDTH, (display.h() - window_h) / 2 - BORDERWIDTH, window_w, window_h);
     frameborder.Redraw();
 
-    Point pt;
     const Rect & area = frameborder.GetArea();
     const Sprite & background = AGG::GetICN(ICN::STONEBAK, 0);
     display.Blit(background, Rect(0, 0, window_w, window_h), area);
@@ -109,55 +126,34 @@ void Dialog::ExtSettings(void)
     Text text("FHeroes2 Settings", Font::YELLOW_BIG);
     text.Blit(area.x + (area.w - text.w()) / 2, area.y + 6);
 
-    std::vector<State *> states;
+    std::vector<State> states;
 
-    pt.x = area.x + 10;
-    pt.y = area.y + 30;
-    states.push_back(new State(pt, Settings::ALLOW_BUY_FROM_WELL));
+    states.push_back(State(Settings::REMEMBER_LAST_FOCUS));
+    states.push_back(State(Settings::FAST_LOAD_GAME_DIALOG));
+    states.push_back(State(Settings::SHOW_VISITED_CONTENT));
+    states.push_back(State(Settings::ABANDONED_MINE_RANDOM));
+    states.push_back(State(Settings::SAVE_MONSTER_BATTLE));
+    states.push_back(State(Settings::ALLOW_SET_GUARDIAN));
+    states.push_back(State(Settings::LEARN_SPELLS_WITH_DAY));
+    states.push_back(State(Settings::ALLOW_BUY_FROM_WELL));
+    states.push_back(State(Settings::BATTLE_SHOW_DAMAGE));
+    states.push_back(State(Settings::BATTLE_TROOP_DIRECTION));
 
-    pt.x = area.x + 10;
-    pt.y = area.y + 60;
-    states.push_back(new State(pt, Settings::SHOW_VISITED_CONTENT));
+    SettingsListBox listbox(area);
 
-    pt.x = area.x + 10;
-    pt.y = area.y + 90;
-    states.push_back(new State(pt, Settings::ABANDONED_MINE_RANDOM));
-
-    pt.x = area.x + 10;
-    pt.y = area.y + 120;
-    states.push_back(new State(pt, Settings::SAVE_MONSTER_BATTLE));
-
-    pt.x = area.x + 10;
-    pt.y = area.y + 150;
-    states.push_back(new State(pt, Settings::ALLOW_SET_GUARDIAN));
-
-    pt.x = area.x + 10;
-    pt.y = area.y + 180;
-    states.push_back(new State(pt, Settings::LEARN_SPELLS_WITH_DAY));
-
-
-    pt.x = area.x + area.w / 2 + 10;
-    pt.y = area.y + 30;
-    states.push_back(new State(pt, Settings::BATTLE_SHOW_DAMAGE));
-
-    pt.x = area.x + area.w / 2 + 10;
-    pt.y = area.y + 60;
-    states.push_back(new State(pt, Settings::BATTLE_TROOP_DIRECTION));
-
-    pt.x = area.x + area.w / 2 + 10;
-    pt.y = area.y + 90;
-    states.push_back(new State(pt, Settings::REMEMBER_LAST_FOCUS));
-
-    pt.x = area.x + area.w / 2 + 10;
-    pt.y = area.y + 120;
-    states.push_back(new State(pt, Settings::FAST_LOAD_GAME_DIALOG));
+    listbox.RedrawBackground(area);
+    listbox.SetScrollButtonUp(ICN::DROPLISL, 6, 7, Point(area.x + 295, area.y + 25));
+    listbox.SetScrollButtonDn(ICN::DROPLISL, 8, 9, Point(area.x + 295, area.y + 175));
+    listbox.SetScrollSplitter(AGG::GetICN(ICN::DROPLISL, 13), Rect(area.x + 300, area.y + 49, 12, 122));
+    listbox.SetAreaMaxItems(6);
+    listbox.SetAreaItems(Rect(area.x + 15, area.y + 25, 280, 170));
+    listbox.SetListContent(states);
+    listbox.Redraw();
 
     LocalEvent & le = LocalEvent::Get();
 
     ButtonGroups btnGroups(area, Dialog::OK|Dialog::CANCEL);
     btnGroups.Draw();
-
-    std::for_each(states.begin(), states.end(), std::mem_fun(&State::Redraw));
 
     cursor.Show();
     display.Flip();
@@ -169,14 +165,16 @@ void Dialog::ExtSettings(void)
     {
 	result = btnGroups.QueueEventProcessing();
 
-	for(std::vector<State *>::iterator it = states.begin(); it != states.end(); ++it) if((**it).QueueEventProcessing()) break;
+	listbox.QueueEventProcessing();
 
 	if(!cursor.isVisible())
 	{
+	    listbox.Redraw();
 	    cursor.Show();
 	    display.Flip();
 	}
     }
 
-    for(std::vector<State *>::iterator it = states.begin(); it != states.end(); ++it) delete *it;
+    // store
+    if(result == Dialog::OK) Settings::Get().BinarySave();
 }

@@ -49,6 +49,7 @@ void Splitter::SetArea(s16 rx, s16 ry, u16 rw, u16 rh)
 void Splitter::SetArea(const Rect & rt)
 {
     area = rt;
+    SpriteCursor::Move(rt.x, rt.y);
 }
 
 void Splitter::SetOrientation(positions_t ps)
