@@ -9,7 +9,7 @@
  <!-- Fireblast -->
  <spell cost="15" extra="10" />
  <!-- Lightning Bolt -->
- <spell cost="7" extra="10" />
+ <spell cost="7" extra="25" />
  <!-- Chain Lightning -->
  <spell cost="15" extra="40" />
  <!-- Teleport -->

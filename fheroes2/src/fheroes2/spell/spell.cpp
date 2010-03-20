@@ -47,7 +47,7 @@ static spellstats_t spells[] = {
 	{ "Unknown",                    0,  0,     0, "Unknown spell." },
 	{ _("Fireball"),                9,  8,    10, _("Causes a giant fireball to strike the selected area, damaging all nearby creatures.") },
 	{ _("Fireblast"),              15,  9,    10, _("An improved version of fireball, fireblast affects two hexes around the center point of the spell, rather than one.") }, 
-	{ _("Lightning Bolt"),          7,  4,    10, _("Causes a bolt of electrical energy to strike the selected creature.") }, 
+	{ _("Lightning Bolt"),          7,  4,    25, _("Causes a bolt of electrical energy to strike the selected creature.") }, 
 	{ _("Chain Lightning"),        15,  5,    40, _("Causes a bolt of electrical energy to strike a selected creature, then strike the nearest creature with half damage, then strike the NEXT nearest creature with half again damage, and so on, until it becomes too weak to be harmful.  Warning:  This spell can hit your own creatures!") }, 
 	{ _("Teleport"),                9, 10,     0, _("Teleports the creature you select to any open position on the battlefield.") }, 
 	{ _("Cure"),                    6,  6,     5, _("Removes all negative spells cast upon one of your units, and restores up to %{count} HP per level of spell power.") }, 
