@@ -1,4 +1,6 @@
-SVN - up to r1656
+SVN - up to r1667
++ Fixed Lightning Bolt damage
++ Added Dialog::Settings
 + Added plural form for monster name
 + Update text, separate context for spell Slow and speed Slow
 + Fixed Necromancy skill ability
