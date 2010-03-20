@@ -114,6 +114,9 @@ public:
     const char*	DtPt(void) const;
     size_t      DtSz(void) const;
 
+    void	Save(const char*) const;
+    void	Load(const char*);
+
 protected:
 #ifdef WITH_NET
     friend bool Network::RecvMessage(const Network::Socket &, QueueMessage &, bool);

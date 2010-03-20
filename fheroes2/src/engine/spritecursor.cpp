@@ -86,8 +86,11 @@ void SpriteCursor::Hide(void)
 
 void SpriteCursor::Redraw(void)
 {
-    Hide();
-    Show();
+    if(visible)
+    {
+	Hide();
+	Show();
+    }
 }
 
 void SpriteCursor::Show(void)

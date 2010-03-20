@@ -86,6 +86,7 @@ void Background::Save(const Rect &rt)
 
 void Background::Restore(void)
 {
+    if(Surface::isValid())
     Display::Get().Blit(*this, x, y);
 }
 

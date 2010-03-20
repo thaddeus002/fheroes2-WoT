@@ -20,7 +20,7 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-
+#include <fstream>
 #include <iomanip>
 #include <algorithm>
 #include <cstring>
@@ -262,6 +262,38 @@ const char* QueueMessage::DtPt(void) const
 size_t QueueMessage::DtSz(void) const
 {
     return itd2 > itd1 ? itd2 - itd1 : 0;
+}
+
+void QueueMessage::Save(const char* fn) const
+{
+    std::fstream fs(fn, std::ios::out | std::ios::binary);
+
+    if(fs.good())
+    {
+	fs.write(DtPt(), DtSz());
+	fs.close();
+    }
+}
+
+void QueueMessage::Load(const char* fn)
+{
+    std::fstream fs(fn, std::ios::in | std::ios::binary);
+
+    if(fs.good())
+    {
+	fs.seekg(0, std::ios_base::end);
+	dtsz = fs.tellg();
+	fs.seekg(0, std::ios_base::beg);
+
+	delete [] data;
+	data = new char [dtsz + 1];
+
+	fs.read(data, dtsz);
+	fs.close();
+
+	itd1 = data;
+	itd2 = itd1 + dtsz;
+    }
 }
 
 #ifdef WITH_NET
