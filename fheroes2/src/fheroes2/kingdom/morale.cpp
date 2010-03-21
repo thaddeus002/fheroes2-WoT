@@ -24,7 +24,7 @@
 
 const char* Morale::String(s8 morale)
 {
-    const char* str_morale[] = { "Unknown", _("Treason"), _("Awful"), _("Poor"), _("Normal"), _("Good"), _("Great"), _("Blood!") };
+    const char* str_morale[] = { "Unknown", _("morale|Treason"), _("morale|Awful"), _("morale|Poor"), _("morale|Normal"), _("morale|Good"), _("morale|Great"), _("morale|Blood!") };
 
     switch(morale)
     {

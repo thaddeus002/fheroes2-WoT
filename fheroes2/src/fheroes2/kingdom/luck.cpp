@@ -24,7 +24,7 @@
 
 const char* Luck::String(s8 luck)
 {
-    const char* str_luck[] = { "Unknown", _("Cursed"), _("Awful"), _("Bad"), _("Normal"), _("Good"), _("Great"), _("Irish") };
+    const char* str_luck[] = { "Unknown", _("luck|Cursed"), _("luck|Awful"), _("luck|Bad"), _("luck|Normal"), _("luck|Good"), _("luck|Great"), _("luck|Irish") };
 
     switch(luck)
     {
