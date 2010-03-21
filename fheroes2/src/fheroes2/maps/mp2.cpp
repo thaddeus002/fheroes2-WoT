@@ -450,13 +450,13 @@ const char* MP2::StringObject(u8 object)
         case MP2::OBJN_GAZEBO:
         case MP2::OBJ_GAZEBO:			return _("Gazebo");
         case MP2::OBJN_ARCHERHOUSE:
-        case MP2::OBJ_ARCHERHOUSE:		return _("Archer House");
+        case MP2::OBJ_ARCHERHOUSE:		return _("Archer's House");
         case MP2::OBJN_PEASANTHUT:
         case MP2::OBJ_PEASANTHUT:		return _("Peasant Hut");
         case MP2::OBJN_DWARFCOTT:
         case MP2::OBJ_DWARFCOTT:		return _("Dwarf Cottage");
         case MP2::OBJN_STONELIGHTS:
-        case MP2::OBJ_STONELIGHTS:		return _("Stonelights");
+        case MP2::OBJ_STONELIGHTS:		return _("Stone Liths");
         case MP2::OBJN_MAGICWELL:
         case MP2::OBJ_MAGICWELL:             	return _("Magic Well");
         case MP2::OBJ_HEROES:			return _("Heroes");
