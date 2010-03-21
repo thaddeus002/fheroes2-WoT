@@ -266,6 +266,7 @@ Heroes::Heroes(heroes_t ht, Race::race_t rc) : killer_color(Color::GRAY), experi
 	    secondary_skills.push_back(Skill::Secondary(Skill::Secondary::PATHFINDING, Skill::Level::ADVANCED));
 	    secondary_skills.push_back(Skill::Secondary(Skill::Secondary::LOGISTICS, Skill::Level::ADVANCED));
 	    secondary_skills.push_back(Skill::Secondary(Skill::Secondary::SCOUTING, Skill::Level::BASIC));
+	    secondary_skills.push_back(Skill::Secondary(Skill::Secondary::MYSTICISM, Skill::Level::BASIC));
 
 	    PickupArtifact(Artifact::STEALTH_SHIELD);
 	    PickupArtifact(Artifact::DRAGON_SWORD);
@@ -599,7 +600,9 @@ u16 Heroes::GetMaxMovePoints(void) const
 	point = 1500;
 
 	// skill navigation
+VERBOSE("111");
 	point += point * GetSecondaryValues(Skill::Secondary::NAVIGATION) / 100;
+VERBOSE("222");
 
 	// artifact bonus
         if(HasArtifact(Artifact::SAILORS_ASTROLABE_MOBILITY)) point += 1000;

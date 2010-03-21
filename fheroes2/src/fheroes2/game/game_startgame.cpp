@@ -240,7 +240,7 @@ Game::menu_t Game::StartGame(void)
 		    heroesBar.Show();
 		    conf.SetMyColor(color);
 		    m = HumanTurn();
-		    if(conf.LoadedGameVersion()) conf.SetLoadedGameVersion(false);
+		    if(m == ENDTURN && conf.LoadedGameVersion()) conf.SetLoadedGameVersion(false);
 		break;
 
 		// AI turn
@@ -871,6 +871,9 @@ Game::menu_t Game::HumanTurn(void)
 	    
 	    default: break;
 	}
+
+	// fast break (or crash after KeyPress_L)
+	if(res != CANCEL) break;
 
 	if(conf.TapMode())
 	{
