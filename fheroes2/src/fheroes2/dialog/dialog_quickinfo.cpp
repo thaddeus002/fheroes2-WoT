@@ -100,6 +100,9 @@ void Dialog::QuickInfo(const Maps::Tiles & tile)
     std::string name_object;
     const Settings & settings = Settings::Get();
 
+    const Heroes* hero = (Game::Focus::HEROES == Game::Focus::Get().Type() ? &Game::Focus::Get().GetHeroes() : NULL);
+    const Kingdom & kingdom = world.GetKingdom(settings.MyColor());
+
     if(tile.isFog(settings.MyColor()))
 	name_object = _("Unchartered Territory");
     else
@@ -133,20 +136,43 @@ void Dialog::QuickInfo(const Maps::Tiles & tile)
     	    name_object = Maps::Ground::String(tile.GetGround());
     	    break;
 
+	case MP2::OBJ_DERELICTSHIP:
+	case MP2::OBJ_SHIPWRECK:
+	case MP2::OBJ_GRAVEYARD:
+	case MP2::OBJ_DAEMONCAVE:
+	case MP2::OBJ_PYRAMID:
+	case MP2::OBJ_WAGON:
+	case MP2::OBJ_SKELETON:
+	case MP2::OBJ_WINDMILL:
+	case MP2::OBJ_WATERWHEEL:
+	case MP2::OBJ_LEANTO:
+	case MP2::OBJ_MAGICGARDEN:
+	    name_object = MP2::StringObject(tile.GetObject());
+	    // check visited
+	    if(settings.ExtShowVisitedContent() && kingdom.isVisited(tile))
+	    {
+	    	name_object.append("\n");
+		name_object.append(_("(already visited)"));
+	    }
+	    break;
+
 	case MP2::OBJ_GAZEBO:
 	case MP2::OBJ_FORT:
 	case MP2::OBJ_MERCENARYCAMP:
 	case MP2::OBJ_DOCTORHUT:
 	case MP2::OBJ_STANDINGSTONES:
+	case MP2::OBJ_ARTESIANSPRING:
+	case MP2::OBJ_TREEKNOWLEDGE:
 	    name_object = MP2::StringObject(tile.GetObject());
 	    // check visited
-	    if(Game::Focus::HEROES == Game::Focus::Get().Type())
+	    if(hero)
 	    {
 	    	name_object.append("\n");
-		name_object.append(Game::Focus::Get().GetHeroes().isVisited(tile) ? _("(already visited)") : _("(not visited)"));
+		name_object.append(hero->isVisited(tile) ? _("(already visited)") : _("(not visited)"));
 	    }
 	    break;
 
+	case MP2::OBJ_MAGICWELL:
 	case MP2::OBJ_FOUNTAIN:
 	case MP2::OBJ_FAERIERING:
 	case MP2::OBJ_IDOL:
@@ -158,10 +184,10 @@ void Dialog::QuickInfo(const Maps::Tiles & tile)
 	case MP2::OBJ_STABLES:
 	    name_object = MP2::StringObject(tile.GetObject());
 	    // check visited
-	    if(Game::Focus::HEROES == Game::Focus::Get().Type())
+	    if(hero)
 	    {
 		name_object.append("\n");
-		name_object.append(Game::Focus::Get().GetHeroes().isVisited(tile.GetObject()) ? _("(already visited)") : _("(not visited)"));
+		name_object.append(hero->isVisited(tile.GetObject()) ? _("(already visited)") : _("(not visited)"));
 	    }
 	    break;
 
@@ -170,18 +196,24 @@ void Dialog::QuickInfo(const Maps::Tiles & tile)
 	case MP2::OBJ_SHRINE3:
 	    name_object = MP2::StringObject(tile.GetObject());
 	    // addons pack
-	    if(settings.ExtShowVisitedContent() && world.GetKingdom(settings.MyColor()).isVisited(tile))
+	    if(settings.ExtShowVisitedContent() && kingdom.isVisited(tile))
 	    {
 	    	name_object.append("\n(");
 	    	name_object.append(Spell::GetName(Spell::FromInt(tile.GetQuantity1())));
 	    	name_object.append(")");
+		if(hero && hero->HaveSpell(Spell::FromInt(tile.GetQuantity1())))
+		{
+	    	    name_object.append("\n(");
+	    	    name_object.append(_("you know it"));
+	    	    name_object.append(")");
+		}
 	    }
 	    break;
 
 	case MP2::OBJ_WITCHSHUT:
 	    name_object = MP2::StringObject(tile.GetObject());
 	    // addons pack
-	    if(settings.ExtShowVisitedContent() && world.GetKingdom(settings.MyColor()).isVisited(tile))
+	    if(settings.ExtShowVisitedContent() && kingdom.isVisited(tile))
 	    {
 		name_object.append("\n(");
 		name_object.append(Skill::Secondary::String(Skill::Secondary::Skill(tile.GetQuantity1())));
@@ -193,7 +225,7 @@ void Dialog::QuickInfo(const Maps::Tiles & tile)
 	    name_object = MP2::StringObject(tile.GetObject());
             // check visited
 	    name_object.append("\n");
-	    name_object.append(world.GetKingdom(settings.MyColor()).isVisited(tile) ? _("(already visited)") : _("(not visited)"));
+	    name_object.append(kingdom.isVisited(tile) ? _("(already visited)") : _("(not visited)"));
             break;
 
         case MP2::OBJ_BARRIER:
@@ -203,7 +235,7 @@ void Dialog::QuickInfo(const Maps::Tiles & tile)
 	    name_object.append(MP2::StringObject(tile.GetObject()));
 
 	    if(MP2::OBJ_TRAVELLERTENT == tile.GetObject() &&
-		world.GetKingdom(settings.MyColor()).IsVisitTravelersTent(tile.GetQuantity1()))
+		kingdom.IsVisitTravelersTent(tile.GetQuantity1()))
 	    {
 		name_object.append("\n");
 		name_object.append(_("(already visited)"));

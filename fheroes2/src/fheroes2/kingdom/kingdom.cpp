@@ -241,6 +241,9 @@ void Kingdom::ActionNewDay(void)
     std::vector<GameEvent::Day *>::const_iterator it2 = events.end();
 
     for(; it1 != it2; ++it1) if(*it1) AddFundsResource((*it1)->GetResource());
+
+    // remove day visit object
+    visit_object.remove_if(Visit::isDayLife);
 }
 
 void Kingdom::ActionNewWeek(void)
@@ -269,6 +272,9 @@ void Kingdom::ActionNewWeek(void)
 	}
     }
 
+    // remove week visit object
+    visit_object.remove_if(Visit::isWeekLife);
+
     UpdateRecruits();
 }
 
@@ -283,6 +289,9 @@ void Kingdom::ActionNewMonth(void)
 	// heroes New Month
 	std::for_each(heroes.begin(), heroes.end(), std::mem_fun(&Heroes::ActionNewMonth));
     }
+
+    // remove week visit object
+    visit_object.remove_if(Visit::isMonthLife);
 }
 
 void Kingdom::AddHeroes(const Heroes *hero)
@@ -473,7 +482,7 @@ void Kingdom::SetVisitTravelersTent(u8 col)
     visited_tents_colors |= col;
 }
 
-bool Kingdom::IsVisitTravelersTent(u8 col)
+bool Kingdom::IsVisitTravelersTent(u8 col) const
 {
     return visited_tents_colors & col;
 }

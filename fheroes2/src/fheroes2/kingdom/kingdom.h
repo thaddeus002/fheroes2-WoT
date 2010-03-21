@@ -116,7 +116,7 @@ public:
     Puzzle & PuzzleMaps(void);
 
     void SetVisitTravelersTent(u8);
-    bool IsVisitTravelersTent(u8);
+    bool IsVisitTravelersTent(u8) const;
 
     void Dump(void) const;
 

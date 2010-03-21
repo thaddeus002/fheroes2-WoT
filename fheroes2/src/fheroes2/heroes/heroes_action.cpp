@@ -950,6 +950,8 @@ void ActionToResource(Heroes &hero, const u8 obj, const u16 dst_index)
     tile.SetQuantity1(0);
     tile.SetQuantity2(0);
 
+    hero.SetVisited(dst_index, Visit::GLOBAL);
+
     DEBUG(DBG_GAME , DBG_INFO, "ActionToResource: " << hero.GetName());
 }
 
@@ -976,6 +978,8 @@ void ActionToSkeleton(Heroes &hero, const u8 obj, const u16 dst_index)
 	PlaySoundVisited;
 	Dialog::Message("", _("You come upon the remains of an unfortunate adventurer.\nSearching through the tattered clothing, you find nothing."), Font::BIG, Dialog::OK);
     }
+
+    hero.SetVisited(dst_index, Visit::GLOBAL);
 
     DEBUG(DBG_GAME , DBG_INFO, "ActionToSkeleton: " << hero.GetName());
 }
@@ -1023,12 +1027,15 @@ void ActionToWagon(Heroes &hero, const u8 obj, const u16 dst_index)
 
 	tile.SetQuantity1(0);
 	tile.SetQuantity2(0);
+
     }
     else
     {
     	PlaySoundVisited;
 	Dialog::Message("", _("You come across an old wagon left by a trader who didn't quite make it to safe terrain.\nUnfortunately, others have found it first, and the wagon is empty."), Font::BIG, Dialog::OK);
     }
+
+    hero.SetVisited(dst_index, Visit::GLOBAL);
 
     DEBUG(DBG_GAME , DBG_INFO, "ActionToWagon: " << hero.GetName());
 }
@@ -1269,6 +1276,7 @@ void ActionToPoorLuckObject(Heroes &hero, const u8 obj, const u16 dst_index)
     {
 	// modify luck
         hero.SetVisited(dst_index);
+        hero.SetVisited(dst_index, Visit::GLOBAL);
 	AGG::PlaySound(M82::BADLUCK);
 	DialogLuck(MP2::StringObject(obj), body, false, 2);
     }
@@ -1519,6 +1527,7 @@ void ActionToPoorMoraleObject(Heroes &hero, const u8 obj, const u16 dst_index)
     {
 	// modify morale
 	hero.SetVisited(dst_index);
+        hero.SetVisited(dst_index, Visit::GLOBAL);
 	AGG::PlaySound(M82::BADMRLE);
 	DialogMorale(MP2::StringObject(obj), body, false, 1);
     }
@@ -2914,6 +2923,8 @@ void ActionToDaemonCave(Heroes &hero, const u8 obj, const u16 dst_index)
 	}
 	else
 	    Dialog::Message("", _("Except for evidence of a terrible battle, the cave is empty."), Font::BIG, Dialog::OK);
+
+        hero.SetVisited(dst_index, Visit::GLOBAL);
     }
 
     DEBUG(DBG_GAME , DBG_INFO, "ActionToDaemonCave: " << hero.GetName());
