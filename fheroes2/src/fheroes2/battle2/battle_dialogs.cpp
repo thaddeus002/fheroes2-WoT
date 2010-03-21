@@ -204,6 +204,24 @@ void Battle2::Arena::DialogBattleSummary(const Result & res) const
     	GetSummaryParams(res.army2, res.army1, army2.GetCommander()->GetName(), res.exp, icn_anim, msg);
 	if(conf.Music()) AGG::PlayMusic(MUS::BATTLELOSE, false);
     }
+    else
+    // AI move
+    if(army1.GetCommander() && Game::AI == army1.GetCommander()->GetControl())
+    {
+	// AI wins
+	if(res.army1 & RESULT_WINS)
+	{
+	    icn_anim = ICN::CMBTLOS3;
+	    msg.append(_("Your force suffer a bitter defeat."));
+	}
+	else
+	// Human wins
+	if(res.army2 & RESULT_WINS)
+	{
+	    icn_anim = ICN::WINCMBT;
+	    msg.append(_("A glorious victory!"));
+	}
+    }
 
     const Sprite & dialog = AGG::GetICN((conf.EvilInterface() ? ICN::WINLOSEE : ICN::WINLOSE), 0);
 
