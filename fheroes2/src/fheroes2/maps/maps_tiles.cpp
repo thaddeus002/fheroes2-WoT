@@ -1272,8 +1272,10 @@ Maps::TilesAddon * Maps::Tiles::FindRNDCastle(void)
     return NULL;
 }
 
-Maps::TilesAddon * Maps::Tiles::FindFlags(void)
+Maps::TilesAddon* Maps::Tiles::FindFlags(void)
 {
+    Maps::TilesAddon* res = NULL;
+
     if(addons_level1.size())
     {
 	std::list<TilesAddon>::iterator it1 = addons_level1.begin();
@@ -1284,7 +1286,8 @@ Maps::TilesAddon * Maps::Tiles::FindFlags(void)
 	    TilesAddon & addon = *it1;
 
 	    // FLAG32
-            if(ICN::FLAG32 == MP2::GetICNObject(addon.object)) return &addon;
+            //if(ICN::FLAG32 == MP2::GetICNObject(addon.object)) return &addon;
+            if(ICN::FLAG32 == MP2::GetICNObject(addon.object)) res = &addon;
 	}
     }
 
@@ -1298,11 +1301,12 @@ Maps::TilesAddon * Maps::Tiles::FindFlags(void)
 	    TilesAddon & addon = *it1;
 
 	    // FLAG32
-            if(ICN::FLAG32 == MP2::GetICNObject(addon.object)) return &addon;
+            //if(ICN::FLAG32 == MP2::GetICNObject(addon.object)) return &addon;
+            if(ICN::FLAG32 == MP2::GetICNObject(addon.object)) res = &addon;
 	}
     }
 
-    return NULL;
+    return res;
 }
 
 Maps::TilesAddon * Maps::Tiles::FindJail(void)
@@ -1503,7 +1507,7 @@ void Maps::Tiles::CaptureFlags32(const MP2::object_t obj, const Color::color_t c
 /* correct flags, ICN::FLAGS32 vesion */
 void Maps::Tiles::CorrectFlags32(const u8 index, bool up)
 {
-    TilesAddon * taddon = FindFlags();
+    TilesAddon* taddon = FindFlags();
 
     // replace flag
     if(NULL != taddon)
