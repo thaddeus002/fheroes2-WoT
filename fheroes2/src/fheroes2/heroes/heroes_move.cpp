@@ -325,7 +325,7 @@ void Heroes::Redraw(Surface & dst, const s16 dx, const s16 dy, const Interface::
     {
 	Maps::Tiles & tile_bottom = world.GetTiles(Maps::GetDirectionIndex(center, Direction::BOTTOM));
 	tile_bottom.RedrawBottom4Hero(dst, gamearea);
-	tile_bottom.RedrawTop4Hero(dst, gamearea, skip_ground);
+	tile_bottom.RedrawTop(dst, gamearea);
     }
 
     if(45 > GetSpriteIndex() &&

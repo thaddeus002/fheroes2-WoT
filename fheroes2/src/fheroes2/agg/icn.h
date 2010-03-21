@@ -944,6 +944,7 @@ namespace ICN
     u8   GetMissIndex(icn_t, s16, s16);
 
     bool isBattleMonsterICN(u16);
+    bool HighlyObjectSprite(icn_t, u16);
 
     bool SkipRegistryFree(icn_t);
 

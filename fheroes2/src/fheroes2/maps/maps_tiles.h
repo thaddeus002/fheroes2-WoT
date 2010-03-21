@@ -176,7 +176,7 @@ namespace Maps
 	void UpdateTreasureChestSprite(void);
 
     private:
-	void CorrectFlags32(const u8 index);
+	void CorrectFlags32(const u8 index, bool);
 	void RemoveJailSprite(void);
 	void RemoveBarrierSprite(void);
 

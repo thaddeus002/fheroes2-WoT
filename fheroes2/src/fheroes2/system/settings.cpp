@@ -78,7 +78,7 @@ namespace
 	{ NS_FHEROES2, "world: abandoned mine random resource",		Settings::ABANDONED_MINE_RANDOM },
 	{ NS_FHEROES2, "world: save count monster after battle",	Settings::SAVE_MONSTER_BATTLE },
 	{ NS_FHEROES2, "world: allow set guardian to objects (future)", Settings::ALLOW_SET_GUARDIAN },
-	{ NS_FHEROES2, "heroes: learn spells with day",  		Settings::LEARN_SPELLS_WITH_DAY },
+	{ NS_FHEROES2, "heroes: learn new spells with day",  		Settings::LEARN_SPELLS_WITH_DAY },
 	{ NS_FHEROES2, "battle: show damage info",    			Settings::BATTLE_SHOW_DAMAGE },
 	{ NS_FHEROES2, "battle: troop direction to move",		Settings::BATTLE_TROOP_DIRECTION },
 

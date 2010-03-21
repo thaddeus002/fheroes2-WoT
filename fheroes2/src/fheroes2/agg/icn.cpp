@@ -2045,3 +2045,67 @@ ICN::icn_t ICN::FromString(const char* str)
     while(ptr->type != ICN::UNKNOWN && str && 0 != std::strcmp(str, ptr->string)) ++ptr;
     return ptr->type;
 }
+
+bool ICN::HighlyObjectSprite(ICN::icn_t icn, u16 index)
+{
+    switch(icn)
+    {
+        case OBJNDIRT:
+	    // wind mill
+	    if(154 <= index && index <= 160) return true;
+	    break;
+
+        case OBJNGRA2:
+	    // wind mill
+	    if(24 <= index && index <= 30) return true;
+	    break;
+
+	case OBJNLAV2:
+	case OBJNLAV3:
+	    // fog lava
+	    return true;
+
+	case OBJNMUL2:
+	    // dragon city
+	    if(35 == index || 37 == index || 38 == index || 40 == index || 41 == index) return true;
+	    // ligth
+	    if(59 == index) return true;
+	    // water mill
+	    if(82 == index) return true;
+	    break;
+
+	case OBJNMULT:
+	    // fort
+	    if(36 <= index && index <= 44) return true;
+	    // tree
+	    if(117 == index || 118 == index) return true;
+	    break;
+
+        case OBJNSNOW:
+	    // wind mill
+	    if(97 <= index && index <= 103) return true;
+	    // water mill
+	    if(161 == index) return true;
+	    break;
+
+        case OBJNSWMP:
+	    // 
+	    if(35 <= index && index <= 42) return true;
+	    break;
+
+	case OBJNTOWN:
+	    if(1 <= index && index <= 5) return true;
+	    if(32 <= index && index <= 37) return true;
+	    if(64 <= index && index <= 69) return true;
+	    if(96 <= index && index <= 101) return true;
+	    if(128 <= index && index <= 133) return true;
+	    if(160 <= index && index <= 165) return true;
+	    break;
+
+	case FLAG32:
+	    return true;
+
+	default: break;
+    }
+    return false;
+}

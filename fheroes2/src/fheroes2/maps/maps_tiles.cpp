@@ -586,7 +586,7 @@ void Maps::Tiles::RedrawTop4Hero(Surface & dst, const Interface::GameArea & area
 	    const u8 & index  = (*it1).index;
 	    const ICN::icn_t icn = MP2::GetICNObject(object);
 
-	    if(ICN::UNKNOWN != icn && ICN::OBJNMUL2 != icn && ICN::MTNDIRT != icn)
+	    if(ICN::HighlyObjectSprite(icn, index))
 	    {
 		const Sprite & sprite = AGG::GetICN(icn, index);
 
@@ -1288,6 +1288,20 @@ Maps::TilesAddon * Maps::Tiles::FindFlags(void)
 	}
     }
 
+    if(addons_level2.size())
+    {
+	std::list<TilesAddon>::iterator it1 = addons_level2.begin();
+	std::list<TilesAddon>::const_iterator it2 = addons_level2.end();
+
+	for(; it1 != it2; ++it1)
+	{
+	    TilesAddon & addon = *it1;
+
+	    // FLAG32
+            if(ICN::FLAG32 == MP2::GetICNObject(addon.object)) return &addon;
+	}
+    }
+
     return NULL;
 }
 
@@ -1438,9 +1452,9 @@ void Maps::Tiles::CaptureFlags32(const MP2::object_t obj, const Color::color_t c
 
     switch(obj)
     {
-	case MP2::OBJ_MINES:		index += 14; CorrectFlags32(index); break;
+	case MP2::OBJ_MINES:		index += 14; CorrectFlags32(index, true); break;
 	//case MP2::OBJ_DRAGONCITY:	index += 35; CorrectFlags32(index); break; unused
-        case MP2::OBJ_LIGHTHOUSE:	index += 42; CorrectFlags32(index); break;
+        case MP2::OBJ_LIGHTHOUSE:	index += 42; CorrectFlags32(index, false); break;
 
 	case MP2::OBJ_ALCHEMYLAB:
 	{
@@ -1448,7 +1462,7 @@ void Maps::Tiles::CaptureFlags32(const MP2::object_t obj, const Color::color_t c
 	    if(Maps::isValidDirection(maps_index, Direction::TOP))
 	    {
 		Maps::Tiles & tile = world.GetTiles(Maps::GetDirectionIndex(maps_index, Direction::TOP));
-		tile.CorrectFlags32(index);
+		tile.CorrectFlags32(index, true);
 	    }
 	}
 	break;
@@ -1459,7 +1473,7 @@ void Maps::Tiles::CaptureFlags32(const MP2::object_t obj, const Color::color_t c
 	    if(Maps::isValidDirection(maps_index, Direction::TOP_RIGHT))
     	    {
     		Maps::Tiles & tile = world.GetTiles(Maps::GetDirectionIndex(maps_index, Direction::TOP_RIGHT));
-    		tile.CorrectFlags32(index);
+    		tile.CorrectFlags32(index, true);
 	    }
 	}
 	break;
@@ -1470,14 +1484,14 @@ void Maps::Tiles::CaptureFlags32(const MP2::object_t obj, const Color::color_t c
 	    if(Maps::isValidDirection(maps_index, Direction::LEFT))
 	    {
 		Maps::Tiles & tile = world.GetTiles(Maps::GetDirectionIndex(maps_index, Direction::LEFT));
-    		tile.CorrectFlags32(index);
+    		tile.CorrectFlags32(index, true);
 	    }
 
 	    index += 1;
 	    if(Maps::isValidDirection(maps_index, Direction::RIGHT))
 	    {
 		Maps::Tiles & tile = world.GetTiles(Maps::GetDirectionIndex(maps_index, Direction::RIGHT));
-    		tile.CorrectFlags32(index);
+    		tile.CorrectFlags32(index, true);
 	    }
 	}
 	break;
@@ -1487,7 +1501,7 @@ void Maps::Tiles::CaptureFlags32(const MP2::object_t obj, const Color::color_t c
 }
 
 /* correct flags, ICN::FLAGS32 vesion */
-void Maps::Tiles::CorrectFlags32(const u8 index)
+void Maps::Tiles::CorrectFlags32(const u8 index, bool up)
 {
     TilesAddon * taddon = FindFlags();
 
@@ -1495,8 +1509,12 @@ void Maps::Tiles::CorrectFlags32(const u8 index)
     if(NULL != taddon)
 	taddon->index = index;
     else
-    // or new flag
+    if(up)
+	// or new flag
 	addons_level2.push_back(TilesAddon(TilesAddon::UPPER, world.GetUniq(), 0x38, index));
+    else
+	// or new flag
+	addons_level1.push_back(TilesAddon(TilesAddon::UPPER, world.GetUniq(), 0x38, index));
 }
 
 void Maps::Tiles::FixLoyaltyVersion(void)
