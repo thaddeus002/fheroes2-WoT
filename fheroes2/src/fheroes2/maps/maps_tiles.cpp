@@ -980,7 +980,7 @@ const Maps::TilesAddon* Maps::Tiles::FindWhirlpools(void) const
 	{
 	    const TilesAddon & addon = *it1;
 
-	    if(ICN::OBJNWATR == MP2::GetICNObject(addon.object) && (addon.index >= 202 && addon.index <= 222 && ((addon.index - 202) % 4))) return &addon;
+	    if(ICN::OBJNWATR == MP2::GetICNObject(addon.object) && (addon.index >= 202 && addon.index <= 225)) return &addon;
 	}
     }
 

@@ -600,9 +600,7 @@ u16 Heroes::GetMaxMovePoints(void) const
 	point = 1500;
 
 	// skill navigation
-VERBOSE("111");
 	point += point * GetSecondaryValues(Skill::Secondary::NAVIGATION) / 100;
-VERBOSE("222");
 
 	// artifact bonus
         if(HasArtifact(Artifact::SAILORS_ASTROLABE_MOBILITY)) point += 1000;

@@ -21,4 +21,7 @@
 
  <game_over lost_towns_days="7" />
 
+ <!-- whirlpool percent: 0 - 90 -->
+ <whirlpool percent="50" />
+
 </globals>

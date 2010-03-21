@@ -793,7 +793,7 @@ void AIToWhirlpools(Heroes &hero, const u16 index_from)
     Army::Troop & troops = hero.GetArmy().GetWeakestTroop();
 
     if(Rand::Get(1) && 1 < troops.GetCount())
-	troops.SetCount(Monster::GetCountFromHitPoints(troops(), troops.GetHitPoints() / 2));
+	troops.SetCount(Monster::GetCountFromHitPoints(troops(), troops.GetHitPoints() - troops.GetHitPoints() * Game::GetWhirlpoolPercent() / 100));
 
     DEBUG(DBG_AI , DBG_INFO, "AIToWhirlpools: " << hero.GetName());
 }

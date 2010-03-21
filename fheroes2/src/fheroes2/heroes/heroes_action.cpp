@@ -2054,7 +2054,7 @@ void ActionToWhirlpools(Heroes &hero, const u8 obj, const u16 index_from)
     {
 	PlaySoundWarning;
 	Dialog::Message(_("A whirlpool engulfs your ship."), _("Some of your army has fallen overboard."), Font::BIG, Dialog::OK);
-	troops.SetCount(Monster::GetCountFromHitPoints(troops(), troops.GetHitPoints() / 2));
+	troops.SetCount(Monster::GetCountFromHitPoints(troops(), troops.GetHitPoints() - troops.GetHitPoints() * Game::GetWhirlpoolPercent() / 100));
     }
 
     DEBUG(DBG_GAME , DBG_INFO, "ActionToWhirlpools: " << hero.GetName());

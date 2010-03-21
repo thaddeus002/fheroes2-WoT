@@ -106,6 +106,7 @@ namespace Game
     u16 GetGameOverScores(void);
     u8  GetLostTownDays(void);
     u8  GetViewDistance(distance_t);
+    u8  GetWhirlpoolPercent(void);
 
     void UpdateGlobalDefines(const std::string &);
 

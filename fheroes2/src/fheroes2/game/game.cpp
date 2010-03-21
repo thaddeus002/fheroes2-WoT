@@ -52,6 +52,7 @@ namespace Game
 
     // town, castle, heroes, artifact_telescope, object_observation_tower, object_magi_eyes
     static u8 view_distance[] = { 4, 5, 4, 1, 10, 9 };
+    static u8 whirlpool_percent = 50;
 };
 
 Game::menu_t Game::Testing(u8 t)
@@ -354,9 +355,23 @@ void Game::UpdateGlobalDefines(const std::string & spec)
 	    lost_town_days = value;
 	}
 
+	// whirlpool
+	xml_element = xml_globals->FirstChildElement("whirlpool");
+	if(xml_element)
+	{
+	    int value;
+	    xml_element->Attribute("percent", &value);
+	    if(value && value < 90) whirlpool_percent = value;
+	}
+
 	// castle_extra_growth 
 	xml_element = xml_globals->FirstChildElement("castle_extra_growth ");
 	if(xml_element) Castle::UpdateExtraGrowth(xml_element);
     }
 #endif
+}
+
+u8 Game::GetWhirlpoolPercent(void)
+{
+    return whirlpool_percent;
 }

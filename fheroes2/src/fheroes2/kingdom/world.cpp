@@ -1306,8 +1306,9 @@ const std::string & World::GetRumors(void)
 u16 World::NextTeleport(const u16 index) const
 {
     std::vector<u16> vec_teleports;
+    
     vec_teleports.reserve(10);
-    GetObjectIndexes(vec_teleports, MP2::OBJ_STONELIGHTS, true);
+    GetObjectIndexes(vec_teleports, MP2::OBJ_STONELIGHTS, false);
 
     if(2 > vec_teleports.size())
     {
@@ -1320,14 +1321,8 @@ u16 World::NextTeleport(const u16 index) const
     std::vector<u16> v;
     v.reserve(vec_teleports.size());
 
-    std::vector<u16>::const_iterator it1 = vec_teleports.begin();
-    std::vector<u16>::const_iterator it2 = vec_teleports.end();
-    for(; it1 != it2; ++it1)
-    {
-	const u16 & i = *it1;
-	if(i == index || type != GetTiles(i).GetQuantity1() || NULL != world.GetHeroes(i)) continue;
-	v.push_back(i);
-    }
+    for(std::vector<u16>::const_iterator itv = vec_teleports.begin(); itv != vec_teleports.end(); ++itv)
+	if(type == GetTiles(*itv).GetQuantity1()) v.push_back(*itv);
 
     if(v.empty()) DEBUG(DBG_GAME , DBG_WARN, "World::NextTeleport: not found.");
 
@@ -1337,58 +1332,49 @@ u16 World::NextTeleport(const u16 index) const
 /* return random whirlpools destination */
 u16 World::NextWhirlpool(const u16 index)
 {
-    std::vector<u16> v3;
-    v3.reserve(40);
-    GetObjectIndexes(v3, MP2::OBJ_WHIRLPOOL, true);
+    std::vector<u16> whilrpools;
+    std::vector<u16>::const_iterator itv;
 
-    std::map<u32, std::vector<u16> > map_whirlpools;
-    std::vector<u16>::const_iterator it3 = v3.begin();
-    std::vector<u16>::const_iterator it4 = v3.end();
-    for(; it3 != it4; ++it3)
+    whilrpools.reserve(40);
+    GetObjectIndexes(whilrpools, MP2::OBJ_WHIRLPOOL, false);
+
+    std::map<u32, std::vector<u16> > uniq_whirlpools;
+
+    for(itv = whilrpools.begin(); itv != whilrpools.end(); ++itv)
     {
-    	const Maps::TilesAddon* addon = GetTiles(*it3).FindWhirlpools();
-	if(addon) map_whirlpools[addon->uniq].push_back(*it3);
+    	const Maps::TilesAddon* addon = GetTiles(*itv).FindWhirlpools();
+	if(addon) uniq_whirlpools[addon->uniq].push_back(*itv);
     }
+    whilrpools.clear();
 
-    if(2 > map_whirlpools.size())
+    if(2 > uniq_whirlpools.size())
     {
 	DEBUG(DBG_GAME , DBG_WARN, "World::NextWhirlpool: is empty.");
 	return index;
     }
 
     const Maps::TilesAddon* addon = GetTiles(index).FindWhirlpools();
-    std::vector<u32> v1;
-    v1.reserve(map_whirlpools.size());
+    std::vector<u32> uniqs;
+    uniqs.reserve(uniq_whirlpools.size());
 
     if(addon)
     {
-	std::map<u32, std::vector<u16> >::const_iterator it1 = map_whirlpools.begin();
-	std::map<u32, std::vector<u16> >::const_iterator it2 = map_whirlpools.end();
+	std::map<u32, std::vector<u16> >::const_iterator it1 = uniq_whirlpools.begin();
+	std::map<u32, std::vector<u16> >::const_iterator it2 = uniq_whirlpools.end();
 	for(; it1 != it2; ++it1)
 	{
 	    const u32 & uniq = (*it1).first;
 	    if(uniq == addon->uniq) continue;
-	    v1.push_back(uniq);
+	    uniqs.push_back(uniq);
 	}
     }
 
-    std::vector<u16> & v2 = map_whirlpools[*Rand::Get(v1)];
+    std::vector<u16> & dest = uniq_whirlpools[*Rand::Get(uniqs)];
+    uniqs.clear();
 
-    v3.clear();
-    v3.reserve(v2.size());
+    if(dest.empty()) DEBUG(DBG_GAME , DBG_WARN, "World::NextWhirlpool: is full.");
 
-    it3 = v2.begin();
-    it4 = v2.end();
-    for(; it3 != it4; ++it3)
-    {
-	const u16 & i = *it3;
-	if(i == index || NULL != world.GetHeroes(i)) continue;
-	v3.push_back(i);
-    }
-
-    if(v3.empty()) DEBUG(DBG_GAME , DBG_WARN, "World::NextWhirlpool: is full.");
-
-    return v3.size() ? *Rand::Get(v3) : index;
+    return dest.size() ? *Rand::Get(dest) : index;
 }
 
 /* return message from sign */
