@@ -96,9 +96,10 @@ void RunTest3(void)
     army1.Clear();
     //army1.JoinTroop(Monster::PHOENIX, 10);
     //army1.JoinTroop(Monster::RANGER, 80);
-    army1.At(0) = Army::Troop(Monster::SKELETON, 400);
-    army1.At(2) = Army::Troop(Monster::SKELETON, 400);
-    army1.At(4) = Army::Troop(Monster::SKELETON, 400);
+    army1.At(0) = Army::Troop(Monster::ROYAL_MUMMY, 20);
+    army1.At(2) = Army::Troop(Monster::MUMMY, 30);
+    army1.At(3) = Army::Troop(Monster::ROYAL_MUMMY, 20);
+    army1.At(4) = Army::Troop(Monster::MUMMY, 30);
     //army1.JoinTroop(Monster::GARGOYLE, 100);
 
     //army1.JoinTroop(Monster::Rand(Monster::LEVEL1), 30);
@@ -106,9 +107,10 @@ void RunTest3(void)
     //army1.JoinTroop(Monster::Rand(Monster::LEVEL3), 10);
 
     army2.Clear();
-    army2.At(0) = Army::Troop(Monster::SKELETON, 400);
-    army2.At(2) = Army::Troop(Monster::SKELETON, 400);
-    army2.At(4) = Army::Troop(Monster::SKELETON, 400);
+    army2.At(0) = Army::Troop(Monster::VETERAN_PIKEMAN, 20);
+    army2.At(2) = Army::Troop(Monster::PIKEMAN, 30);
+    army2.At(3) = Army::Troop(Monster::VETERAN_PIKEMAN, 20);
+    army2.At(4) = Army::Troop(Monster::PIKEMAN, 30);
 //    army2.JoinTroop(static_cast<Monster::monster_t>(1), 10);
 //    army2.JoinTroop(static_cast<Monster::monster_t>(4), 10);
 //    army2.JoinTroop(static_cast<Monster::monster_t>(6), 10);

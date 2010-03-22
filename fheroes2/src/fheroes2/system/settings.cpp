@@ -83,6 +83,7 @@ namespace
 	{ NS_FHEROES2, _("battle: troop direction to move"),		Settings::BATTLE_TROOP_DIRECTION },
 	{ NS_FHEROES2, _("battle: soft wait troop"),			Settings::BATTLE_SOFT_WAITING },
 	{ NS_FHEROES2, _("game: always confirm for rewrite savefile"),	Settings::SAVE_REWRITE_CONFIRM },
+	{ NS_FHEROES2, _("pocketpc: hide cursor"),			Settings::POCKETPC_HIDE_CURSOR },
 
         { NS_UNKNOWN,  NULL,                   0                           },
     };
@@ -1019,6 +1020,11 @@ bool Settings::ExtBattleSoftWait(void) const
 bool Settings::ExtRewriteConfirm(void) const
 {
     return opt_fheroes2.Modes(SAVE_REWRITE_CONFIRM);
+}
+
+bool Settings::ExtHideCursor(void) const
+{
+    return opt_fheroes2.Modes(POCKETPC_HIDE_CURSOR);
 }
 
 void Settings::BinarySave(void) const

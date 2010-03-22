@@ -99,6 +99,7 @@ public:
 	BATTLE_TROOP_DIRECTION		= 0x00000200,
 	BATTLE_SOFT_WAITING		= 0x00000400,
 	SAVE_REWRITE_CONFIRM		= 0x00000800,
+	POCKETPC_HIDE_CURSOR		= 0x00001000,
     };
 
     // ns: global
@@ -219,6 +220,7 @@ public:
     bool ExtBattleTroopDirection(void) const;
     bool ExtBattleSoftWait(void) const;
     bool ExtRewriteConfirm(void) const;
+    bool ExtHideCursor(void) const;
 
     bool NetworkDedicatedServer(void) const;
     bool NetworkLocalClient(void) const;

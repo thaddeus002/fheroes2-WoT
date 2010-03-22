@@ -28,7 +28,7 @@ class Cursor : public SpriteCursor
 {
 public:
 
-    typedef enum
+    enum themes_t
     {
 	NONE               = 0x0000,
 	// ADVMCO.ICN
@@ -130,7 +130,7 @@ public:
         SP_COLDRAY            = 0x3024,
         SP_HYPNOTIZE          = 0x3025,
         SP_ARROW              = 0x3026,
-    } themes_t;
+    };
 
 	static Cursor &	Get(void);
 
@@ -140,6 +140,7 @@ public:
 
 	themes_t	Themes(void);
 	bool		SetThemes(u16 cursor);
+	void		Show(void);
 
 private:
 	Cursor();

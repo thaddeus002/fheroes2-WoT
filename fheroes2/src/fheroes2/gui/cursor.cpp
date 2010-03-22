@@ -305,3 +305,8 @@ void Cursor::DrawCursor(Surface &surface, const u8 indexcolor, bool solid)
     }
     surface.Unlock();
 }
+
+void Cursor::Show(void)
+{
+    if(! Settings::Get().ExtHideCursor()) SpriteCursor::Show();
+}

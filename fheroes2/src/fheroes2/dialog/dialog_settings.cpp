@@ -126,6 +126,7 @@ void Dialog::ExtSettings(void)
     states.push_back(Settings::BATTLE_SHOW_DAMAGE);
     states.push_back(Settings::BATTLE_SOFT_WAITING);
     states.push_back(Settings::BATTLE_TROOP_DIRECTION);
+    states.push_back(Settings::POCKETPC_HIDE_CURSOR);
 
     SettingsListBox listbox(area);
 
