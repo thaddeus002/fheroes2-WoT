@@ -23,9 +23,9 @@
 #ifndef SDLNET_H
 #define SDLNET_H
 
-#include <iostream>
 #include <string>
 #include "types.h"
+#include <iostream>
 
 #ifdef WITH_NET
 #include "SDL_net.h"

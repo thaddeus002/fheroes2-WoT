@@ -37,7 +37,10 @@ typedef SDL_Color Colors;
 #define MAXU16   0xFFFF
 #define MAXU32   0xFFFFFFFF
 
-#ifdef __WIN32__
+#if defined __SYMBIAN32__
+#define MKDIR(X)    mkdir(X, S_IRWXU)
+#define SEPARATOR       '\\'
+#elif defined __WIN32__
 #include <io.h>
 #define MKDIR(X)    mkdir(X)
 #define SEPARATOR       '\\'
@@ -101,7 +104,18 @@ void WriteBE16(u8 *p, u16 x);
 void WriteLE32(u8 *p, u32 x);
 void WriteLE16(u8 *p, u16 x);
 
-#ifdef __MINGW32CE__
+#if defined __SYMBIAN32__
+#define PATH_MAX FILENAME_MAX
+#define c_isspace(c) isspace(c)
+#define c_abs(x) abs((int) x)
+namespace std
+{
+#define isspace(c) c_isspace(c)
+#define abs(x) c_abs(x)
+};
+#endif
+
+#if defined __MINGW32CE__
 #include <cstdlib>
 #ifndef PATH_MAX
 #define PATH_MAX 255

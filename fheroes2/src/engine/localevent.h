@@ -291,7 +291,7 @@ private:
     void (*redraw_cursor_func)(u16, u16);
     void (*keyboard_filter_func)(u32, u16);
 
-    Time clock;
+    SDL::Time clock;
     double clock_delay;
 
 #ifdef WITH_KEYMAPPING

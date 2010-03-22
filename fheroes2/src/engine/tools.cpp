@@ -266,7 +266,7 @@ int Sign(int s)
     return (s < 0 ? -1 : (s > 0 ? 1 : 0));
 }
 
-#ifdef __WIN32__ /* SDL_platform.h */
+#if defined __WIN32__  || defined __SYMBIAN32__
 const char *GetDirname(const char *path)
 {
     static char buff[PATH_MAX];
@@ -298,7 +298,12 @@ const char *GetBasename(const char *path)
 }
 #endif
 
-#ifdef __WIN32__
+#if defined __SYMBIAN32__
+u32 GetMemoryUsage(void)
+{
+    return 0;
+}
+#elif defined __WIN32__
 #include "windows.h"
 u32 GetMemoryUsage(void)
 {
@@ -308,9 +313,7 @@ u32 GetMemoryUsage(void)
     GlobalMemoryStatus(&ms);
     return (ms.dwTotalVirtual - ms.dwAvailVirtual) / 1024;
 }
-#else
-
-#ifdef __LINUX__
+#elif defined __LINUX__
 #include "unistd.h"
 u32 GetMemoryUsage(void)
 {
@@ -332,8 +335,6 @@ u32 GetMemoryUsage(void)
 {
     return 0;
 }
-#endif
-
 #endif
 
 KeySym KeySymFromChar(char c)

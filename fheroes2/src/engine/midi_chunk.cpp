@@ -71,7 +71,7 @@ Chunk::~Chunk()
     if(data) delete [] data;
 }
 
-Chunk::Chunk & Chunk::operator= (const Chunk & c)
+Chunk & Chunk::operator= (const Chunk & c)
 {
     if(data) delete [] data;
     data = NULL;

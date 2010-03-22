@@ -23,6 +23,8 @@
 #include <iostream>
 #include "thread.h"
 
+using namespace SDL;
+
 Thread::Thread() : thread(NULL)
 {
 }

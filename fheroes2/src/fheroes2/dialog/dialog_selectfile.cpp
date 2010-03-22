@@ -33,6 +33,10 @@
 #include "interface_list.h"
 #include "dialog.h"
 
+#ifdef __SYMBIAN32__
+#include <unistd.h>
+#endif
+
 bool SelectFileListSimple(const std::string &, MapsFileInfoList &, std::string &, bool);
 void RedrawExtraInfo(const Point &, const std::string &, const std::string &);
 

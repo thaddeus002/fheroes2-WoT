@@ -75,7 +75,7 @@ u32 Interface::StatusWindow::ResetResourceStatus(u32 tick, void *ptr)
 	    Interface::Basic::Get().Redraw(REDRAW_STATUS);
 	}
 	else
-	    Timer::Remove(status->timerShowLastResource);
+	    SDL::Timer::Remove(status->timerShowLastResource);
     }
 
     return tick;
@@ -246,12 +246,12 @@ void Interface::StatusWindow::SetResource(Resource::resource_t res, u16 count)
     countLastResource = count;
 
     if(timerShowLastResource.IsValid())
-	Timer::Remove(timerShowLastResource);
+	SDL::Timer::Remove(timerShowLastResource);
     else
 	oldState = state;
 
     state = STATUS_RESOURCE;
-    Timer::Run(timerShowLastResource, RESOURCE_WINDOW_EXPIRE, ResetResourceStatus, this);
+    SDL::Timer::Run(timerShowLastResource, RESOURCE_WINDOW_EXPIRE, ResetResourceStatus, this);
 }
 
 void Interface::StatusWindow::ResetTimer(void)
@@ -259,7 +259,7 @@ void Interface::StatusWindow::ResetTimer(void)
     StatusWindow & window = Get();
     if(window.timerShowLastResource.IsValid())
     {
-	Timer::Remove(window.timerShowLastResource);
+	SDL::Timer::Remove(window.timerShowLastResource);
 	ResetResourceStatus(0, &window);
     }
 }

@@ -27,7 +27,7 @@
 #include "types.h"
 
 #ifdef WITH_MIXER
-struct Mix_Chunk;
+#include "SDL_mixer.h"
 #endif
 
 namespace Mixer

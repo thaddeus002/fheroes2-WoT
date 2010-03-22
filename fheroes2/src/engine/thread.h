@@ -27,6 +27,9 @@
 #include "SDL_thread.h"
 #include "types.h"
 
+namespace SDL
+{
+
 class Thread
 {
 public:
@@ -85,6 +88,8 @@ public:
 private:
     struct timeval clock1;
     struct timeval clock2;
+};
+
 };
 
 #endif

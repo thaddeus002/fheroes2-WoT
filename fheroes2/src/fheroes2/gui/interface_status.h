@@ -71,8 +71,8 @@ namespace Interface
 	info_t               oldState;
 	Resource::resource_t lastResource;
 	u16                  countLastResource;
-	Timer                timerShowLastResource;
-	Timer                timerRedrawAIStatus;
+	SDL::Timer           timerShowLastResource;
+	SDL::Timer           timerRedrawAIStatus;
 	Dialog::FrameBorder border;
 
 	u8 turn_progress;

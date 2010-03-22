@@ -533,6 +533,11 @@ void Settings::Parse(const std::string & left, const std::string & right)
 		possible_w *= TILEWIDTH;
 		possible_h *= TILEWIDTH;
 
+#ifdef __SYMBIAN32__
+		if(possible_h == 224) possible_h = 240;
+		else
+		if(possible_h == 352) possible_h = 360;
+#endif
 		DEBUG(DBG_ENGINE , DBG_INFO, "Settings::Parse: videomode: " << video_mode.w << "x" << video_mode.h << ", current: " << possible_w << "x" << possible_h);
 		video_mode.w = possible_w;
 		video_mode.h = possible_h;

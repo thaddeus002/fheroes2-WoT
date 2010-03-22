@@ -130,7 +130,7 @@ Army::army_t::army_t(const army_t & a) : army(ARMYMAXTROOPS), commander(NULL), c
     Import(a.army);
 }
 
-Army::army_t::army_t & Army::army_t::operator= (const army_t & a)
+Army::army_t & Army::army_t::operator= (const army_t & a)
 {
     commander = NULL;
 
