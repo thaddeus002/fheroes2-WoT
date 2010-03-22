@@ -116,6 +116,7 @@ void Dialog::ExtSettings(void)
 
     states.push_back(Settings::REMEMBER_LAST_FOCUS);
     states.push_back(Settings::FAST_LOAD_GAME_DIALOG);
+    states.push_back(Settings::SAVE_REWRITE_CONFIRM);
     states.push_back(Settings::SHOW_VISITED_CONTENT);
     states.push_back(Settings::ABANDONED_MINE_RANDOM);
     states.push_back(Settings::SAVE_MONSTER_BATTLE);

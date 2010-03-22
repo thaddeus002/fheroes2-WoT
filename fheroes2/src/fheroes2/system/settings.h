@@ -98,6 +98,7 @@ public:
 	BATTLE_SHOW_DAMAGE		= 0x00000100,
 	BATTLE_TROOP_DIRECTION		= 0x00000200,
 	BATTLE_SOFT_WAITING		= 0x00000400,
+	SAVE_REWRITE_CONFIRM		= 0x00000800,
     };
 
     // ns: global
@@ -217,6 +218,7 @@ public:
     bool ExtBattleShowDamage(void) const;
     bool ExtBattleTroopDirection(void) const;
     bool ExtBattleSoftWait(void) const;
+    bool ExtRewriteConfirm(void) const;
 
     bool NetworkDedicatedServer(void) const;
     bool NetworkLocalClient(void) const;

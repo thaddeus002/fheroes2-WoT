@@ -82,6 +82,7 @@ namespace
 	{ NS_FHEROES2, _("battle: show damage info"),    		Settings::BATTLE_SHOW_DAMAGE },
 	{ NS_FHEROES2, _("battle: troop direction to move"),		Settings::BATTLE_TROOP_DIRECTION },
 	{ NS_FHEROES2, _("battle: soft wait troop"),			Settings::BATTLE_SOFT_WAITING },
+	{ NS_FHEROES2, _("game: always confirm for rewrite savefile"),	Settings::SAVE_REWRITE_CONFIRM },
 
         { NS_UNKNOWN,  NULL,                   0                           },
     };
@@ -1013,6 +1014,11 @@ bool Settings::ExtBattleTroopDirection(void) const
 bool Settings::ExtBattleSoftWait(void) const
 {
     return opt_fheroes2.Modes(BATTLE_SOFT_WAITING);
+}
+
+bool Settings::ExtRewriteConfirm(void) const
+{
+    return opt_fheroes2.Modes(SAVE_REWRITE_CONFIRM);
 }
 
 void Settings::BinarySave(void) const
