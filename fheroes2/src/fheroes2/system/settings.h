@@ -97,6 +97,7 @@ public:
 	LEARN_SPELLS_WITH_DAY		= 0x00000080,
 	BATTLE_SHOW_DAMAGE		= 0x00000100,
 	BATTLE_TROOP_DIRECTION		= 0x00000200,
+	BATTLE_SOFT_WAITING		= 0x00000400,
     };
 
     // ns: global
@@ -215,6 +216,7 @@ public:
     bool ExtLearnSpellsWithDay(void) const;
     bool ExtBattleShowDamage(void) const;
     bool ExtBattleTroopDirection(void) const;
+    bool ExtBattleSoftWait(void) const;
 
     bool NetworkDedicatedServer(void) const;
     bool NetworkLocalClient(void) const;

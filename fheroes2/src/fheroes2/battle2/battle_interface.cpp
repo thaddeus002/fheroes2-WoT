@@ -1427,15 +1427,16 @@ void Battle2::Interface::HumanBattleTurn(const Stats & b, Actions & a, std::stri
 	    // skip
 	    case KEY_s:		a.AddedSkipAction(b); a.AddedEndAction(b);  humanturn_exit = true; break;
     	    case KEY_SPACE:
-    	    {
-    		a.AddedSkipAction(b);
-    		std::string str(_("%{name} waiting"));
-    		String::Replace(str, "%{name}", b.GetName());
-    		status.SetMessage(str, true);
-    		humanturn_exit = true;
+    		if(conf.ExtBattleSoftWait())
+    		{
+    		    a.AddedSkipAction(b);
+    		    std::string str(_("%{name} waiting"));
+    		    String::Replace(str, "%{name}", b.GetName());
+    		    status.SetMessage(str, true);
+    		    humanturn_exit = true;
+    		}
     		break;
-	    }
-	    
+
 	    // options
 	    case KEY_o:		KeyPress_o(); break;
 	    // auto

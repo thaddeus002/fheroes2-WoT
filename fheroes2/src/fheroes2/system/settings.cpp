@@ -71,16 +71,17 @@ namespace
         { NS_POCKETPC, "tapmode",              Settings::TAPMODE           },
         { NS_POCKETPC, "tap mode",             Settings::TAPMODE           },
 
-	{ NS_FHEROES2, "castle: allow buy from well",			Settings::ALLOW_BUY_FROM_WELL },
-	{ NS_FHEROES2, "world: show visited content from objects",	Settings::SHOW_VISITED_CONTENT },
-	{ NS_FHEROES2, "game: fast load game dialog (L hot key)",	Settings::FAST_LOAD_GAME_DIALOG },
-	{ NS_FHEROES2, "game: remember last focus",			Settings::REMEMBER_LAST_FOCUS },
-	{ NS_FHEROES2, "world: abandoned mine random resource",		Settings::ABANDONED_MINE_RANDOM },
-	{ NS_FHEROES2, "world: save count monster after battle",	Settings::SAVE_MONSTER_BATTLE },
-	{ NS_FHEROES2, "world: allow set guardian to objects (future)", Settings::ALLOW_SET_GUARDIAN },
-	{ NS_FHEROES2, "heroes: learn new spells with day",  		Settings::LEARN_SPELLS_WITH_DAY },
-	{ NS_FHEROES2, "battle: show damage info",    			Settings::BATTLE_SHOW_DAMAGE },
-	{ NS_FHEROES2, "battle: troop direction to move",		Settings::BATTLE_TROOP_DIRECTION },
+	{ NS_FHEROES2, _("castle: allow buy from well"),		Settings::ALLOW_BUY_FROM_WELL },
+	{ NS_FHEROES2, _("world: show visited content from objects"),	Settings::SHOW_VISITED_CONTENT },
+	{ NS_FHEROES2, _("game: fast load game dialog (L hot key)"),	Settings::FAST_LOAD_GAME_DIALOG },
+	{ NS_FHEROES2, _("game: remember last focus"),			Settings::REMEMBER_LAST_FOCUS },
+	{ NS_FHEROES2, _("world: abandoned mine random resource"),	Settings::ABANDONED_MINE_RANDOM },
+	{ NS_FHEROES2, _("world: save count monster after battle"),	Settings::SAVE_MONSTER_BATTLE },
+	{ NS_FHEROES2, _("world: allow set guardian to objects (future)"),Settings::ALLOW_SET_GUARDIAN },
+	{ NS_FHEROES2, _("heroes: learn new spells with day"),  	Settings::LEARN_SPELLS_WITH_DAY },
+	{ NS_FHEROES2, _("battle: show damage info"),    		Settings::BATTLE_SHOW_DAMAGE },
+	{ NS_FHEROES2, _("battle: troop direction to move"),		Settings::BATTLE_TROOP_DIRECTION },
+	{ NS_FHEROES2, _("battle: soft wait troop"),			Settings::BATTLE_SOFT_WAITING },
 
         { NS_UNKNOWN,  NULL,                   0                           },
     };
@@ -1007,6 +1008,11 @@ bool Settings::ExtBattleShowDamage(void) const
 bool Settings::ExtBattleTroopDirection(void) const
 {
     return opt_fheroes2.Modes(BATTLE_TROOP_DIRECTION);
+}
+
+bool Settings::ExtBattleSoftWait(void) const
+{
+    return opt_fheroes2.Modes(BATTLE_SOFT_WAITING);
 }
 
 void Settings::BinarySave(void) const

@@ -123,6 +123,7 @@ void Dialog::ExtSettings(void)
     states.push_back(Settings::LEARN_SPELLS_WITH_DAY);
     states.push_back(Settings::ALLOW_BUY_FROM_WELL);
     states.push_back(Settings::BATTLE_SHOW_DAMAGE);
+    states.push_back(Settings::BATTLE_SOFT_WAITING);
     states.push_back(Settings::BATTLE_TROOP_DIRECTION);
 
     SettingsListBox listbox(area);

@@ -745,6 +745,7 @@ void Battle2::Arena::Turns(u16 turn, Result & result)
 
     Actions actions;
     Stats* current_troop = NULL;
+    u8 equal_color = 0;
     u8 current_color = 0;
     bool tower_moved = false;
     bool catapult_moved = false;
@@ -763,16 +764,56 @@ void Battle2::Arena::Turns(u16 turn, Result & result)
 	    if(btroop1 && btroop2)
 	    {
 		if(btroop1->GetSpeed() > btroop2->GetSpeed())
+		{
 		    current_troop = btroop1;
+		    current_color = army1.GetColor();
+		    equal_color = 0;
+		}
 		else
 		if(btroop1->GetSpeed() < btroop2->GetSpeed())
+		{
 		    current_troop = btroop2;
+		    current_color = army2.GetColor();
+		    equal_color = 0;
+		}
 		else
-		    current_troop = (current_color == btroop1->GetColor() ? btroop2 : btroop1);
+		// equal speed
+		{
+		    // first attacker moved
+		    if(0 == equal_color)
+		    {
+			current_troop = btroop1;
+			current_color = army1.GetColor();
+			equal_color = army1.GetColor();
+		    }
+		    else
+		    // changed
+		    if(equal_color == army1.GetColor())
+		    {
+			current_troop = btroop2;
+			current_color = army2.GetColor();
+			equal_color = army2.GetColor();
+		    }
+		    else
+		    {
+			current_troop = btroop1;
+			current_color = army1.GetColor();
+			equal_color = army1.GetColor();
+		    }
+		}
 	    }
 	    else
-	    if(btroop1 || btroop2)
-		current_troop = btroop1 ? btroop1 : btroop2;
+	    if(btroop1)
+	    {
+	    	current_troop = btroop1;
+		current_color = army1.GetColor();
+	    }
+	    else
+	    if(btroop2)
+	    {
+	    	current_troop = btroop2;
+		current_color = army2.GetColor();
+	    }
 	    else
 	    {
 		btroop1 = army1.BattleSlowestTroop(true);
@@ -781,16 +822,56 @@ void Battle2::Arena::Turns(u16 turn, Result & result)
 		if(btroop1 && btroop2)
 		{
 		    if(btroop1->GetSpeed() < btroop2->GetSpeed())
-			current_troop = btroop1;
+		    {
+		    	current_troop = btroop1;
+			current_color = army1.GetColor();
+			equal_color = 0;
+		    }
 		    else
 		    if(btroop1->GetSpeed() > btroop2->GetSpeed())
-			current_troop = btroop2;
+		    {
+		    	current_troop = btroop2;
+			current_color = army2.GetColor();
+			equal_color = 0;
+		    }
 		    else
-			current_troop = (current_color == btroop1->GetColor() ? btroop2 : btroop1);
+		    // equal speed
+		    {
+			// first defender moved (attacker have priority)
+			if(0 == equal_color)
+			{
+			    current_troop = btroop2;
+			    current_color = army2.GetColor();
+			    equal_color = army2.GetColor();
+			}
+			else
+			// changed
+			if(equal_color == army1.GetColor())
+			{
+			    current_troop = btroop2;
+			    current_color = army2.GetColor();
+			    equal_color = army2.GetColor();
+			}
+			else
+			{
+			    current_troop = btroop1;
+			    current_color = army1.GetColor();
+			    equal_color = army1.GetColor();
+			}
+		    }
 		}
 		else
-		if(btroop1 || btroop2)
-		    current_troop = btroop1 ? btroop1 : btroop2;
+		if(btroop1)
+		{
+		    current_troop = btroop1;
+		    current_color = army1.GetColor();
+		}
+		else
+		if(btroop2)
+		{
+		    current_troop = btroop2;
+		    current_color = army2.GetColor();
+		}
 	    }
 
 	    // end turns
@@ -801,8 +882,7 @@ void Battle2::Arena::Turns(u16 turn, Result & result)
 	    Color::String(current_troop->GetColor()) << ", speed: " << Speed::String(current_troop->GetSpeed()) << "(" << static_cast<int>(current_troop->GetSpeed()) << ")");
 
 	current_commander = current_troop->GetCommander();
-	current_color = current_troop->GetColor();
-	
+
 	// first turn: castle and catapult action
 	if(castle)
 	{
