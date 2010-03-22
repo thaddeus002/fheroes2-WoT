@@ -126,7 +126,7 @@ void Dialog::QuickInfo(const Maps::Tiles & tile)
 	    const Army::Troop troop(tile);
 	    name_object = ArmyGetSizeString(troop.GetCount());
             std::string name = troop.GetMultiName();
-            String::Lower(name);
+            if(!settings.Unicode()) String::Lower(name);
             String::Replace(name_object, "%{monster}", name);
     	}
     	    break;
