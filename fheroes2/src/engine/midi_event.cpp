@@ -21,6 +21,8 @@
  ***************************************************************************/
 
 #include <cstring>
+#include <iomanip>
+#include <iostream>
 #include "midi_event.h"
 
 using namespace MIDI;
@@ -123,9 +125,11 @@ bool Event::Write(std::ostream & o) const
 
 void Event::Dump(void) const
 {
-    printf("          [dl:%d:st:%hhX:dt", delta, status);
+   std::cerr << std::hex << std::setfill('0') \
+	<< "[dl:0x" << std::setw(4) << delta \
+	<< ":st:0x" << std::setw(2) << static_cast<int>(status) << ":dt";
 
-    for(u32 ii = 0; ii < size; ++ii) printf(":%hhX", data[ii]);
+    for(u32 ii = 0; ii < size; ++ii) std::cerr << ":0x" << std::setw(2) << static_cast<int>(data[ii]);
 
-    printf("]\n");
+    std::cerr << "]" << std::endl;
 }
