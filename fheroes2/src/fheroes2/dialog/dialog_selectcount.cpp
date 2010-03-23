@@ -43,7 +43,7 @@ bool Dialog::SelectCount(const std::string &header, u32 min, u32 max, u32 & cur)
     cursor.Hide();
 
     Text text(header, Font::BIG);
-    const u8 spacer = Settings::Get().PocketPC() ? 5 : 10;
+    const u8 spacer = Settings::Get().QVGA() ? 5 : 10;
 
     Box box(text.h() + spacer + 30, true);
 

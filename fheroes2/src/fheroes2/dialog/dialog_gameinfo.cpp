@@ -32,7 +32,7 @@
 void Dialog::GameInfo(void)
 {
     // FIXME: QVGA version
-    if(Settings::Get().PocketPC())
+    if(Settings::Get().QVGA())
     {
        Dialog::Message("", _("For the QVGA version is not available."), Font::SMALL, Dialog::OK);
        return;

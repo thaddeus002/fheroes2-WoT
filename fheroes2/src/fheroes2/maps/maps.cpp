@@ -35,7 +35,7 @@ namespace Maps
 
 const char* Maps::SizeString(u8 s)
 {
-    const char* mapsize[] = { "Unknown", _("Small"), _("Medium"), _("Large"), _("Extra Large") };
+    const char* mapsize[] = { "Unknown", _("maps|Small"), _("maps|Medium"), _("maps|Large"), _("maps|Extra Large") };
 
     switch(s)
     {

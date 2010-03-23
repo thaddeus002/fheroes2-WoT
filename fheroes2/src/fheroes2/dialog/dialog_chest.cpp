@@ -52,7 +52,7 @@ bool Dialog::SelectGoldOrExp(const std::string &header, const std::string &messa
     String::AddInt(str, gold);
     text.Set(str, Font::SMALL);
 
-    const u8 spacer = Settings::Get().PocketPC() ? 5 : 10;
+    const u8 spacer = Settings::Get().QVGA() ? 5 : 10;
 
     Box box(box1.h() + spacer + box2.h() + spacer + sprite_expr.h() + 2 + text.h(), true);
 

@@ -31,7 +31,7 @@
 void Dialog::ThievesGuild(u8 count)
 {
     // FIXME: QVGA version
-    if(Settings::Get().PocketPC())
+    if(Settings::Get().QVGA())
     {
        Dialog::Message("", _("For the QVGA version is not available."), Font::SMALL, Dialog::OK);
        return;

@@ -166,7 +166,7 @@ void ShowExtendedDialog(const Puzzle & pzl, const Surface & sf)
     frameborder.SetPosition((display.w() - BORDERWIDTH * 2 - sf.w()) / 2,
 	    (display.h() - sf.h() - BORDERWIDTH * 2 - 32) / 2,
 	    sf.w(),
-	    sf.h() + (Settings::Get().PocketPC() ? 25 : 32));
+	    sf.h() + (Settings::Get().QVGA() ? 25 : 32));
     frameborder.Redraw();
 
     if(evil_interface)
@@ -176,7 +176,7 @@ void ShowExtendedDialog(const Puzzle & pzl, const Surface & sf)
     display.Blit(sf, frameborder.GetArea());
 
     Button buttonExit(frameborder.GetArea().x + sf.w() / 2 - 40,
-	frameborder.GetArea().y + sf.h() + (Settings::Get().PocketPC() ? 0 : 5),
+	frameborder.GetArea().y + sf.h() + (Settings::Get().QVGA() ? 0 : 5),
 	(evil_interface ? ICN::LGNDXTRE : ICN::LGNDXTRA), 4, 5);
 
     buttonExit.Draw();
@@ -191,7 +191,7 @@ void ShowExtendedDialog(const Puzzle & pzl, const Surface & sf)
     {
         le.MousePressLeft(buttonExit) ? buttonExit.PressDraw() : buttonExit.ReleaseDraw();
         if(le.MouseClickLeft(buttonExit) || le.KeyPress(KEY_RETURN) || le.KeyPress(KEY_ESCAPE)) break;
-        if(Settings::Get().PocketPC() && le.MouseClickLeft(frameborder.GetArea())) break;
+        if(Settings::Get().QVGA() && le.MouseClickLeft(frameborder.GetArea())) break;
     }
 }
 
@@ -221,14 +221,14 @@ void PuzzlesDraw(const Puzzle & pzl, const Surface & sf, s16 dstx, s16 dsty)
 		    fade.SetColorKey();
 		    fade.Blit(piece);
 		    fade.SetAlpha(alpha);
-		    if(Settings::Get().PocketPC())
+		    if(Settings::Get().QVGA())
 		    display.Blit(fade, dstx + 8 + piece.x() - BORDERWIDTH, dsty + 8 + piece.y() - BORDERWIDTH);
 		    else
 		    display.Blit(fade, dstx + piece.x() - BORDERWIDTH, dsty + piece.y() - BORDERWIDTH);
 		}
 		else
 		{
-		    if(Settings::Get().PocketPC())
+		    if(Settings::Get().QVGA())
 		    display.Blit(piece, dstx + 8 + piece.x() - BORDERWIDTH, dsty + 8 + piece.y() - BORDERWIDTH);
 		    else
 		    display.Blit(piece, dstx + piece.x() - BORDERWIDTH, dsty + piece.y() - BORDERWIDTH);

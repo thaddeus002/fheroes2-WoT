@@ -37,7 +37,7 @@ void ScenarioListBox::RedrawItem(const Maps::FileInfo & info, u16 dstx, u16 dsty
     Text text;
     u8 index = 19 + info.KingdomColorsCount();
 
-    if(!Settings::Get().PocketPC())
+    if(!Settings::Get().QVGA())
     {
 	dstx = dstx - 10;
 	dsty = dsty + 2;
@@ -75,7 +75,7 @@ void ScenarioListBox::RedrawBackground(const Point & dst)
 {
     Display & display = Display::Get();
 
-    if(Settings::Get().PocketPC())
+    if(Settings::Get().QVGA())
     {
 	display.Blit(AGG::GetICN(ICN::STONEBAK, 0), Rect(17, 37, 266, 156), dst.x + 15, dst.y + 35);
 	display.Blit(AGG::GetICN(ICN::REQSBKG, 0), Rect(325, 70, 16, 100), dst.x + 283, dst.y + 55);

@@ -51,7 +51,7 @@ u16 Dialog::RecruitMonster(const Monster & monster, u16 available)
     payment_t paymentCosts(paymentMonster * result);
 
     const Sprite & box = AGG::GetICN(ICN::RECRBKG, 0);
-    const Rect pos((display.w() - box.w()) / 2, Settings::Get().PocketPC() ? (display.h() - box.h()) / 2 - 15 : (display.h() - box.h()) / 2, box.w(), box.h());
+    const Rect pos((display.w() - box.w()) / 2, Settings::Get().QVGA() ? (display.h() - box.h()) / 2 - 15 : (display.h() - box.h()) / 2, box.w(), box.h());
 
     Background back(pos);
     back.Save();

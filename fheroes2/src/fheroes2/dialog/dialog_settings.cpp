@@ -53,8 +53,13 @@ void SettingsListBox::RedrawItem(const u32 & item, u16 ox, u16 oy, bool current)
     display.Blit(cell, ox, oy);
     if(conf.ExtModes(item)) display.Blit(mark, ox + 3, oy + 2);
 
-    Text msg(conf.ExtName(item), Font::SMALL);
-    msg.Blit(ox + cell.w() + 5, oy + 4);
+    TextBox msg(conf.ExtName(item), Font::SMALL, 250);
+    msg.SetAlignLeft();
+
+    if(1 < msg.row())
+	msg.Blit(ox + cell.w() + 5, oy - 1);
+    else
+	msg.Blit(ox + cell.w() + 5, oy + 4);
 }
 
 void SettingsListBox::RedrawBackground(const Point & top)
@@ -117,8 +122,6 @@ void Dialog::ExtSettings(void)
 
     states.push_back(Settings::GAME_FAST_LOAD_GAME_DIALOG);
     states.push_back(Settings::GAME_SAVE_REWRITE_CONFIRM);
-    if(conf.PocketPC())
-	states.push_back(Settings::GAME_POCKETPC_HIDE_CURSOR);
     states.push_back(Settings::GAME_REMEMBER_LAST_FOCUS);
     states.push_back(Settings::GAME_SHOW_SYSTEM_INFO);
     states.push_back(Settings::GAME_EVIL_INTERFACE);
@@ -134,19 +137,19 @@ void Dialog::ExtSettings(void)
     states.push_back(Settings::WORLD_SHOW_VISITED_CONTENT);
     states.push_back(Settings::WORLD_ABANDONED_MINE_RANDOM);
     states.push_back(Settings::WORLD_SAVE_MONSTER_BATTLE);
-    states.push_back(Settings::WORLD_ALLOW_SET_GUARDIAN);
+    //states.push_back(Settings::WORLD_ALLOW_SET_GUARDIAN);
     states.push_back(Settings::HEROES_LEARN_SPELLS_WITH_DAY);
     if(conf.VideoMode().w >= 640 && conf.VideoMode().w >= 480)
 	states.push_back(Settings::CASTLE_ALLOW_BUY_FROM_WELL);
     states.push_back(Settings::BATTLE_SHOW_DAMAGE);
     states.push_back(Settings::BATTLE_SOFT_WAITING);
     states.push_back(Settings::BATTLE_TROOP_DIRECTION);
-    states.push_back(Settings::BATTLE_SET_AUTO);
     states.push_back(Settings::BATTLE_SHOW_GRID);
     states.push_back(Settings::BATTLE_SHOW_MOUSE_SHADOW);
     states.push_back(Settings::BATTLE_SHOW_MOVE_SHADOW);
-    if(! conf.PocketPC())
+    if(conf.PocketPC())
     {
+	states.push_back(Settings::POCKETPC_HIDE_CURSOR);
 	states.push_back(Settings::POCKETPC_TAP_MODE);
 	states.push_back(Settings::POCKETPC_LOW_MEMORY);
     }
@@ -188,5 +191,10 @@ void Dialog::ExtSettings(void)
     }
 
     // store
-    if(result == Dialog::OK) Settings::Get().BinarySave();
+    if(result == Dialog::OK)
+    {
+	AGG::ICNRegistryEnable(conf.ExtLowMemory());
+	le.SetTapMode(conf.ExtTapMode());
+	Settings::Get().BinarySave();
+    }
 }

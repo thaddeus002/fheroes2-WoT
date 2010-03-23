@@ -894,7 +894,7 @@ void Interface::IconsPanel::QueueEventProcessing(void)
         }
 
         // for QVGA: auto hide icons after click
-        if(conf.PocketPC()) conf.SetShowIcons(false);
+        if(conf.QVGA()) conf.SetShowIcons(false);
     }
     else
     if(const Heroes * hero = selectHeroes.MousePressRight())
@@ -917,7 +917,7 @@ void Interface::IconsPanel::QueueEventProcessing(void)
         }
 
         // for QVGA: auto hide icons after click
-        if(conf.PocketPC()) conf.SetShowIcons(false);
+        if(conf.QVGA()) conf.SetShowIcons(false);
     }
     else
     if(const Castle * cstl = selectCastle.MousePressRight())

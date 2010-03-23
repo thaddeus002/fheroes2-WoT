@@ -47,14 +47,14 @@ void UpdateCoordClassInfo(const Point &, std::vector<Rect> &);
 
 Game::menu_t Game::SelectScenario(void)
 {
-    if(Settings::Get().PocketPC()) return PocketPC::SelectScenario();
+    if(Settings::Get().QVGA()) return PocketPC::SelectScenario();
     return SCENARIOINFO;
 }
 
 Game::menu_t Game::ScenarioInfo(void)
 {
     Settings & conf = Settings::Get();
-    if(conf.PocketPC()) return PocketPC::ScenarioInfo();
+    if(conf.QVGA()) return PocketPC::ScenarioInfo();
 
     AGG::PlayMusic(MUS::MAINMENU);
 

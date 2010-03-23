@@ -60,7 +60,7 @@ Spell::spell_t SpellBook::Open(const HeroBase & hero, const filter_t filt, bool 
 
     Display & display = Display::Get();
     Cursor & cursor = Cursor::Get();
-    bool small = Settings::Get().PocketPC();
+    bool small = Settings::Get().QVGA();
 
     const Cursor::themes_t oldcursor = cursor.Themes();
 
@@ -256,7 +256,7 @@ void SpellBookSetFilter(const BagArtifacts & bag, const std::vector<Spell::spell
 
 void SpellBookRedrawMP(const Point & dst, u16 mp)
 {
-    bool small = Settings::Get().PocketPC();
+    bool small = Settings::Get().QVGA();
 
     Point tp(dst.x + (small ? 5 : 11), dst.y + (small ? 1 : 9));
     std::string mps;
@@ -280,7 +280,7 @@ void SpellBookRedrawMP(const Point & dst, u16 mp)
 void SpellBookRedrawLists(const std::vector<Spell::spell_t> & spells, std::vector<Rect> & coords, const size_t cur, const Point & pt, u16 sp, const SpellBook::filter_t only)
 {
     Display & display = Display::Get();
-    bool small = Settings::Get().PocketPC();
+    bool small = Settings::Get().QVGA();
 
     const Sprite & r_list = AGG::GetICN(ICN::BOOK, 0);
     const Sprite & l_list = AGG::GetICN(ICN::BOOK, 0, true);
@@ -313,7 +313,7 @@ void SpellBookRedrawLists(const std::vector<Spell::spell_t> & spells, std::vecto
 void SpellBookRedrawSpells(const std::vector<Spell::spell_t> & spells, std::vector<Rect> & coords, const size_t cur, s16 px, s16 py)
 {
     Display & display = Display::Get();
-    bool small = Settings::Get().PocketPC();
+    bool small = Settings::Get().QVGA();
 
     u16 ox = 0;
     u16 oy = 0;

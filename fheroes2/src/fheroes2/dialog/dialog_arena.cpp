@@ -44,7 +44,7 @@ Skill::Primary::skill_t Dialog::SelectSkillFromArena(void)
 
     TextBox textbox(_("You enter the arena and face a pack of vicious lions. You handily defeat them, to the wild cheers of the crowd.  Impressed by your skill, the aged trainer of gladiators agrees to train you in a skill of your choice."), Font::BIG, BOXAREA_WIDTH);
     const Sprite & sprite = AGG::GetICN(ICN::XPRIMARY, 0);
-    const u8 spacer = Settings::Get().PocketPC() ? 5 : 10;
+    const u8 spacer = Settings::Get().QVGA() ? 5 : 10;
 
     Dialog::Box box(textbox.h() + spacer + sprite.h() + 15, true);
 

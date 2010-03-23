@@ -69,32 +69,31 @@ class Settings
 public:
     enum
     {
-	CASTLE_ALLOW_BUY_FROM_WELL	= 0x00000001,
-	WORLD_SHOW_VISITED_CONTENT	= 0x00000002,
-	GAME_FAST_LOAD_GAME_DIALOG	= 0x00000004,
-	GAME_REMEMBER_LAST_FOCUS	= 0x00000008,
-	WORLD_ABANDONED_MINE_RANDOM	= 0x00000010,
-	WORLD_SAVE_MONSTER_BATTLE	= 0x00000020,
-	WORLD_ALLOW_SET_GUARDIAN	= 0x00000040,
-	HEROES_LEARN_SPELLS_WITH_DAY	= 0x00000080,
-	BATTLE_SHOW_DAMAGE		= 0x00000100,
-	BATTLE_TROOP_DIRECTION		= 0x00000200,
-	BATTLE_SOFT_WAITING		= 0x00000400,
-	GAME_SAVE_REWRITE_CONFIRM	= 0x00000800,
-	GAME_POCKETPC_HIDE_CURSOR	= 0x00001000,
-	GAME_HIDE_AI_MOVE		= 0x00002000,
-        BATTLE_SET_AUTO			= 0x00004000,
-        BATTLE_SHOW_GRID		= 0x00008000,
-        BATTLE_SHOW_MOUSE_SHADOW	= 0x00010000,
-        BATTLE_SHOW_MOVE_SHADOW		= 0x00020000,
-	GAME_SHOW_SYSTEM_INFO		= 0x00040000,
-	GAME_AUTOSAVE_ON		= 0x00080000,
-	GAME_USE_FADE			= 0x00100000,
-	GAME_SHOW_SDL_LOGO		= 0x00200000,
-	GAME_EVIL_INTERFACE		= 0x00400000,
-	GAME_HIDE_INTERFACE		= 0x00800000,
-	POCKETPC_LOW_MEMORY		= 0x01000000,
-	POCKETPC_TAP_MODE		= 0x02000000,
+	WORLD_SHOW_VISITED_CONTENT	= 0x00000001,
+	WORLD_ABANDONED_MINE_RANDOM	= 0x00000002,
+	WORLD_SAVE_MONSTER_BATTLE	= 0x00000004,
+	WORLD_ALLOW_SET_GUARDIAN	= 0x00000008,
+	GAME_FAST_LOAD_GAME_DIALOG	= 0x00000010,
+	GAME_REMEMBER_LAST_FOCUS	= 0x00000020,
+	GAME_SAVE_REWRITE_CONFIRM	= 0x00000040,
+	GAME_HIDE_AI_MOVE		= 0x00000080,
+	GAME_SHOW_SYSTEM_INFO		= 0x00000100,
+	GAME_AUTOSAVE_ON		= 0x00000200,
+	GAME_USE_FADE			= 0x00000400,
+	GAME_SHOW_SDL_LOGO		= 0x00000800,
+	GAME_EVIL_INTERFACE		= 0x00001000,
+	GAME_HIDE_INTERFACE		= 0x00002000,
+	BATTLE_SHOW_DAMAGE		= 0x00004000,
+	BATTLE_TROOP_DIRECTION		= 0x00008000,
+	BATTLE_SOFT_WAITING		= 0x00010000,
+        BATTLE_SHOW_GRID		= 0x00020000,
+        BATTLE_SHOW_MOUSE_SHADOW	= 0x00040000,
+        BATTLE_SHOW_MOVE_SHADOW		= 0x00080000,
+	CASTLE_ALLOW_BUY_FROM_WELL	= 0x00100000,
+	HEROES_LEARN_SPELLS_WITH_DAY	= 0x00200000,
+	POCKETPC_HIDE_CURSOR		= 0x00400000,
+	POCKETPC_LOW_MEMORY		= 0x00800000,
+	POCKETPC_TAP_MODE		= 0x01000000,
     };
 
     static Settings & Get(void);
@@ -127,6 +126,7 @@ public:
     u8 FontsSmallSize(void) const;
     bool FontsRenderBlended(void) const;
 
+    bool QVGA(void) const;
     bool Editor(void) const;
     bool Sound(void) const;
     bool Music(void) const;
@@ -140,6 +140,7 @@ public:
     bool Unicode(void) const;
     bool PocketPC(void) const;
     bool UseAltResource(void) const;
+    bool AutoBattle(void) const;
     bool PriceLoyaltyVersion(void) const;
     bool LoadedGameVersion(void) const;
     bool MusicExt(void) const;
@@ -166,7 +167,6 @@ public:
     bool ExtRewriteConfirm(void) const;
     bool ExtHideCursor(void) const;
     bool ExtHideAIMove(void) const;
-    bool ExtBattleSetAuto(void) const;
     bool ExtBattleShowGrid(void) const;
     bool ExtBattleShowMouseShadow(void) const;
     bool ExtBattleShowMoveShadow(void) const;
@@ -193,7 +193,7 @@ public:
     void SetPriceLoyaltyVersion(void);
     void SetGameDifficulty(const Difficulty::difficulty_t d);
     void SetEvilInterface(bool);
-    void SetBattleAuto(bool);
+    void SetAutoBattle(bool);
     void SetBattleGrid(bool);
     void SetBattleMovementShaded(bool);
     void SetBattleMouseShaded(bool);

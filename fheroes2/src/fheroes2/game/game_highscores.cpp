@@ -204,7 +204,7 @@ void HGSData::RedrawList(s16 ox, s16 oy)
     std::vector<hgs_t>::const_iterator it2 = list.end();
 
     Text text;
-    text.Set(conf.PocketPC() ? Font::SMALL : Font::BIG);
+    text.Set(conf.QVGA() ? Font::SMALL : Font::BIG);
     std::string str;
 
     for(; it1 != it2 && (it1 - list.begin() < HGS_MAX); ++it1)
@@ -212,22 +212,22 @@ void HGSData::RedrawList(s16 ox, s16 oy)
 	const hgs_t & hgs = *it1;
 
 	text.Set(hgs.player);
-	text.Blit(ox + (conf.PocketPC() ? 45 : 88), oy + (conf.PocketPC() ? 33 : 70));
+	text.Blit(ox + (conf.QVGA() ? 45 : 88), oy + (conf.QVGA() ? 33 : 70));
 
 	text.Set(hgs.land);
-	text.Blit(ox + (conf.PocketPC() ? 170 : 260), oy + (conf.PocketPC() ? 33 : 70));
+	text.Blit(ox + (conf.QVGA() ? 170 : 260), oy + (conf.QVGA() ? 33 : 70));
 
 	str.clear();
 	String::AddInt(str, hgs.days);
 	text.Set(str);
-	text.Blit(ox + (conf.PocketPC() ? 250 : 420), oy + (conf.PocketPC() ? 33 : 70));
+	text.Blit(ox + (conf.QVGA() ? 250 : 420), oy + (conf.QVGA() ? 33 : 70));
 
 	str.clear();
 	String::AddInt(str, hgs.rating);
 	text.Set(str);
-	text.Blit(ox + (conf.PocketPC() ? 270 : 480), oy + (conf.PocketPC() ? 33 : 70));
+	text.Blit(ox + (conf.QVGA() ? 270 : 480), oy + (conf.QVGA() ? 33 : 70));
 
-	oy += conf.PocketPC() ? 20 : 40;
+	oy += conf.QVGA() ? 20 : 40;
     }
 }
 
@@ -257,8 +257,8 @@ Game::menu_t Game::HighScores(void)
 
     LocalEvent & le = LocalEvent::Get();
 
-    Button buttonCampain(top.x + (conf.PocketPC() ? 0 : 9), top.y + (conf.PocketPC() ? 100 : 315), ICN::HISCORE, 0, 1);
-    Button buttonExit(top.x + back.w() - (conf.PocketPC() ? 27 : 36), top.y + (conf.PocketPC() ? 100 : 315), ICN::HISCORE, 4, 5);
+    Button buttonCampain(top.x + (conf.QVGA() ? 0 : 9), top.y + (conf.QVGA() ? 100 : 315), ICN::HISCORE, 0, 1);
+    Button buttonExit(top.x + back.w() - (conf.QVGA() ? 27 : 36), top.y + (conf.QVGA() ? 100 : 315), ICN::HISCORE, 4, 5);
 
     buttonCampain.Draw();
     buttonExit.Draw();

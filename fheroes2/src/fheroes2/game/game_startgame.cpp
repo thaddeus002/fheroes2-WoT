@@ -251,7 +251,7 @@ Game::menu_t Game::StartGame(void)
 			statusWin.SetState(STATUS_AITURN);
 
 			// for pocketpc: show status window
-			if(conf.PocketPC() && !conf.ShowStatus())
+			if(conf.QVGA() && !conf.ShowStatus())
 			{
 			    conf.SetShowStatus(true);
 			    I.SetRedraw(REDRAW_STATUS);
@@ -291,7 +291,7 @@ void Game::OpenCastle(Castle *castle)
     std::vector<Castle *>::const_iterator it = std::find(myCastles.begin(), myCastles.end(), castle);
     Game::Focus & globalfocus = Game::Focus::Get();
     Interface::StatusWindow::ResetTimer();
-    bool show_position = !Settings::Get().PocketPC() && (640 != display.w() || 480 != display.h());
+    bool show_position = !Settings::Get().QVGA() && (640 != display.w() || 480 != display.h());
     bool need_fade = !show_position;
 
     if(it != myCastles.end())
@@ -356,7 +356,7 @@ void Game::OpenHeroes(Heroes *hero)
     Game::Focus & globalfocus = Game::Focus::Get();
     Interface::StatusWindow::ResetTimer();
     Interface::Basic & I = Interface::Basic::Get();
-    bool show_position = !Settings::Get().PocketPC() && (640 != display.w() || 480 != display.h());
+    bool show_position = !Settings::Get().QVGA() && (640 != display.w() || 480 != display.h());
     bool need_fade = !show_position;
 
     if(it != myHeroes.end())
@@ -766,7 +766,7 @@ Game::menu_t Game::HumanTurn(void)
 
     GameOver::Result & gameResult = GameOver::Result::Get();
 
-    bool autohide_status = conf.PocketPC();
+    bool autohide_status = conf.QVGA();
 
     // set focus
     if(Game::HOTSEAT == conf.GameType()) global_focus.Reset();
@@ -1621,7 +1621,7 @@ void Game::SwitchShowRadar(void)
 	}
 	else
 	{
-	    if(conf.PocketPC() && (conf.ShowIcons() || conf.ShowStatus() || conf.ShowButtons()))
+	    if(conf.QVGA() && (conf.ShowIcons() || conf.ShowStatus() || conf.ShowButtons()))
 	    {
 		conf.SetShowIcons(false);
 		conf.SetShowStatus(false);
@@ -1647,7 +1647,7 @@ void Game::SwitchShowButtons(void)
 	}
 	else
 	{
-	    if(conf.PocketPC() && (conf.ShowRadar() || conf.ShowStatus() || conf.ShowIcons()))
+	    if(conf.QVGA() && (conf.ShowRadar() || conf.ShowStatus() || conf.ShowIcons()))
 	    {
 		conf.SetShowIcons(false);
 		conf.SetShowStatus(false);
@@ -1673,7 +1673,7 @@ void Game::SwitchShowStatus(void)
 	}
 	else
 	{
-	    if(conf.PocketPC() && (conf.ShowRadar() || conf.ShowIcons() || conf.ShowButtons()))
+	    if(conf.QVGA() && (conf.ShowRadar() || conf.ShowIcons() || conf.ShowButtons()))
 	    {
 		conf.SetShowIcons(false);
 		conf.SetShowButtons(false);
@@ -1699,7 +1699,7 @@ void Game::SwitchShowIcons(void)
 	}
 	else
 	{
-	    if(conf.PocketPC() && (conf.ShowRadar() || conf.ShowStatus() || conf.ShowButtons()))
+	    if(conf.QVGA() && (conf.ShowRadar() || conf.ShowStatus() || conf.ShowButtons()))
 	    {
 		conf.SetShowButtons(false);
 		conf.SetShowRadar(false);

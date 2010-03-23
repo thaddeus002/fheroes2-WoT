@@ -37,7 +37,7 @@ Battle2::Cell::Cell(u16 i, const Rect* area, Arena & a) : index(i), arena(&a)
     direction = UNKNOWN;
     quality = 0;
 
-    if(Settings::Get().PocketPC())
+    if(Settings::Get().QVGA())
     {
 	pos.x = (area ? area->x : 0) + 45 - ((i / ARENAW) % 2 ? CELLW2 / 2 : 0) + (CELLW2 - 1) * (i % ARENAW);
 	pos.y = (area ? area->y + area->h - 188 : 0) + ((CELLH2 / 4) * 3) * (i / ARENAW);

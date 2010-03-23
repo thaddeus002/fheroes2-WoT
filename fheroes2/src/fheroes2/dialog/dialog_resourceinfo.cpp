@@ -44,7 +44,7 @@ u16 Dialog::ResourceInfo(const std::string &header, const std::string &message, 
     TextBox box2(message, Font::BIG, BOXAREA_WIDTH);
     Resource::BoxSprite rbs(rs, BOXAREA_WIDTH);
 
-    const u8 spacer = Settings::Get().PocketPC();
+    const u8 spacer = Settings::Get().QVGA();
 
     Box box(box1.h() + spacer + box2.h() + spacer + rbs.GetArea().h, true);
     Point pos = box.GetArea();

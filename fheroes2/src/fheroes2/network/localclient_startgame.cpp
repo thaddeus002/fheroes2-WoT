@@ -419,7 +419,7 @@ bool FH2LocalClient::StartGame(void)
 			if(STATUS_AITURN != statusWin.GetState())
 			{
                     	    // for pocketpc: show status window
-                    	    if(conf.PocketPC() && !conf.ShowStatus())
+                    	    if(conf.QVGA() && !conf.ShowStatus())
                     	    {
                         	conf.SetModes(Settings::SHOWSTATUS);
                     	    }

@@ -51,14 +51,14 @@ RowSpells::RowSpells(const Point & pos, const MageGuild & guild, u8 lvl)
     }
 
     for(u8 ii = 0; ii < count; ++ii)
-	coords.push_back(Rect(pos.x + coords.size() * (Settings::Get().PocketPC() ? 72 : 110) - roll.w() / 2, pos.y, roll.w(), roll.h()));
+	coords.push_back(Rect(pos.x + coords.size() * (Settings::Get().QVGA() ? 72 : 110) - roll.w() / 2, pos.y, roll.w(), roll.h()));
 
     if(guild.HaveLibraryCapability())
     {
 	if(! hide && guild.isLibraryBuild())
-	    coords.push_back(Rect(pos.x + coords.size() * (Settings::Get().PocketPC() ? 72 : 110) - roll_show.w() / 2, pos.y, roll_show.w(), roll_show.h()));
+	    coords.push_back(Rect(pos.x + coords.size() * (Settings::Get().QVGA() ? 72 : 110) - roll_show.w() / 2, pos.y, roll_show.w(), roll_show.h()));
 	else
-	    coords.push_back(Rect(pos.x + coords.size() * (Settings::Get().PocketPC() ? 72 : 110) - roll_hide.w() / 2, pos.y, roll_hide.w(), roll_hide.h()));
+	    coords.push_back(Rect(pos.x + coords.size() * (Settings::Get().QVGA() ? 72 : 110) - roll_hide.w() / 2, pos.y, roll_hide.w(), roll_hide.h()));
     }
 
     guild.GetSpells(spells, lvl);
@@ -92,7 +92,7 @@ void RowSpells::Redraw(void)
 
 	    const Sprite & icon = AGG::GetICN(ICN::SPELLS, Spell::IndexSprite(spell));
 
-	    if(Settings::Get().PocketPC())
+	    if(Settings::Get().QVGA())
 	    {
 		display.Blit(icon, dst.x + 2 + (dst.w - icon.w()) / 2, dst.y + 20 - icon.h() / 2);
 	    }

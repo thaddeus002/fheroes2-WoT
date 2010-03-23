@@ -75,7 +75,7 @@ std::vector<Army::Troop>::const_iterator MinElement(std::vector<Army::Troop>::co
 
 const char* Army::String(u32 size)
 {
-    const char* str_size[] = { _("Few"), _("Several"), _("Pack"), _("Lots"), _("Horde"), _("Throng"), _("Swarm"), _("Zounds"), _("Legion") };
+    const char* str_size[] = { _("army|Few"), _("army|Several"), _("army|Pack"), _("army|Lots"), _("army|Horde"), _("army|Throng"), _("army|Swarm"), _("army|Zounds"), _("army|Legion") };
 
     switch(GetSize(size))
     {

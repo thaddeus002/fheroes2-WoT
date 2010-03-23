@@ -34,7 +34,7 @@ Difficulty::difficulty_t& Difficulty::operator-- (Difficulty::difficulty_t& diff
 
 const char* Difficulty::String(u8 difficulty)
 {
-    const char* str_difficulty[] = { _("Easy"), _("Normal"), _("Hard"), _("Expert"), _("Impossible"), "Unknown" };
+    const char* str_difficulty[] = { _("difficulty|Easy"), _("difficulty|Normal"), _("difficulty|Hard"), _("difficulty|Expert"), _("difficulty|Impossible"), "Unknown" };
 
     switch(difficulty)
     {

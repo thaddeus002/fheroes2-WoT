@@ -44,7 +44,7 @@ Dialog::answer_t Dialog::BuyBoat(bool enable)
 
     const Sprite & sprite = AGG::GetICN(ICN::BOATWIND, 0);
     Text text(_("Build a new ship:"), Font::BIG);
-    const u8 spacer = Settings::Get().PocketPC() ? 5 : 10;
+    const u8 spacer = Settings::Get().QVGA() ? 5 : 10;
 
     Dialog::Box box(text.h() + spacer + sprite.h() + spacer + text.h() + spacer + rbs.GetArea().h - 20, true);
 

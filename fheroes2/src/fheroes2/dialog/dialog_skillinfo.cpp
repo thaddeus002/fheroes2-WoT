@@ -56,7 +56,7 @@ void Dialog::SecondarySkillInfo(const std::string &header, const std::string &me
     TextBox box1(header, Font::YELLOW_BIG, BOXAREA_WIDTH);
     TextBox box2(message, Font::BIG, BOXAREA_WIDTH);
     const Sprite & border = AGG::GetICN(ICN::SECSKILL, 15);
-    const u8 spacer = Settings::Get().PocketPC() ? 5 : 10;
+    const u8 spacer = Settings::Get().QVGA() ? 5 : 10;
 
     Box box(box1.h() + spacer + box2.h() + spacer + border.h(), ok_button);
     Rect pos = box.GetArea();
@@ -163,7 +163,7 @@ void Dialog::PrimarySkillInfo(const std::string &header, const std::string &mess
     TextBox box1(header, Font::BIG, BOXAREA_WIDTH);
     TextBox box2(message, Font::BIG, BOXAREA_WIDTH);
     const Sprite & border = AGG::GetICN(ICN::PRIMSKIL, 4);
-    const u8 spacer = Settings::Get().PocketPC() ? 5 : 10;
+    const u8 spacer = Settings::Get().QVGA() ? 5 : 10;
 
     Box box(box1.h() + spacer + box2.h() + spacer + border.h(), Dialog::OK);
     Rect pos = box.GetArea();

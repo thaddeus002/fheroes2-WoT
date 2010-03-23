@@ -44,6 +44,8 @@ enum
     GLOBAL_SHOWBUTTONS       = 0x00000800,
     GLOBAL_SHOWSTATUS        = 0x00001000,
 
+    GLOBAL_AUTOBATTLE        = 0x00010000,
+
     GLOBAL_FONTRENDERBLENDED = 0x00020000,
     GLOBAL_FULLSCREEN        = 0x00400000,
 
@@ -87,7 +89,6 @@ static const settings_t settingsGeneral[] =
 static const settings_t settingsFHeroes2[] =
 {
     { Settings::GAME_SAVE_REWRITE_CONFIRM,	_("game: always confirm for rewrite savefile"),		},
-    { Settings::GAME_POCKETPC_HIDE_CURSOR,	_("game: hide cursor (for pocketpc)"),			},
     { Settings::GAME_FAST_LOAD_GAME_DIALOG,	_("game: fast load game dialog (L hot key)"),		},
     { Settings::GAME_REMEMBER_LAST_FOCUS,	_("game: remember last focus"),				},
     { Settings::GAME_HIDE_AI_MOVE,		_("game: hide AI move"),				},
@@ -100,16 +101,16 @@ static const settings_t settingsFHeroes2[] =
     { Settings::BATTLE_SHOW_DAMAGE,		_("battle: show damage info"),    			},
     { Settings::BATTLE_TROOP_DIRECTION,		_("battle: troop direction to move"),			},
     { Settings::BATTLE_SOFT_WAITING,		_("battle: soft wait troop"),				},
-    { Settings::BATTLE_SET_AUTO,		_("battle: set auto mode "),				},
     { Settings::BATTLE_SHOW_GRID,		_("battle: show grid"),					},
     { Settings::BATTLE_SHOW_MOUSE_SHADOW,	_("battle: show mouse shadow"),				},
     { Settings::BATTLE_SHOW_MOVE_SHADOW,	_("battle: show move shadow"),				},
     { Settings::GAME_SHOW_SYSTEM_INFO,		_("game: show system info"),				},
     { Settings::GAME_AUTOSAVE_ON,		_("game: autosave on"),					},
-    { Settings::GAME_USE_FADE,			_("game: use fade (640x480 only)"),			},
+    { Settings::GAME_USE_FADE,			_("game: use fade"),					},
     { Settings::GAME_SHOW_SDL_LOGO,		_("game: show SDL logo"),				},
     { Settings::GAME_EVIL_INTERFACE,		_("game: use evil interface"),				},
     { Settings::GAME_HIDE_INTERFACE,		_("game: hide interface"),				},
+    { Settings::POCKETPC_HIDE_CURSOR,		_("pocketpc: hide cursor"),				},
     { Settings::POCKETPC_TAP_MODE,		_("pocketpc: tap mode"),				},
     { Settings::POCKETPC_LOW_MEMORY,		_("pocketpc: low memory"),				},
 
@@ -228,20 +229,17 @@ bool Settings::Read(const std::string & filename)
     debug |= (DBG_ENGINE | DBG_GAME | DBG_BATTLE | DBG_AI | DBG_NETWORK);
 #endif
 
-    if(video_mode.w < 640 || video_mode.h < 480)
+    if(QVGA())
     {
 	opt_global.SetModes(GLOBAL_POCKETPC);
-    }
-    else
-    {
-        opt_global.ResetModes(GLOBAL_POCKETPC);
+	opt_fheroes2.SetModes(GAME_HIDE_INTERFACE);
     }
 
-    if(opt_global.Modes(GLOBAL_POCKETPC))
+    if(! opt_global.Modes(GLOBAL_POCKETPC))
     {
-	opt_fheroes2.SetModes(GAME_HIDE_INTERFACE);
-	opt_fheroes2.SetModes(POCKETPC_TAP_MODE);
-	//opt_fheroes2.SetModes(POCKETPC_LOW_MEMORY);
+	opt_fheroes2.ResetModes(POCKETPC_HIDE_CURSOR);
+	opt_fheroes2.ResetModes(POCKETPC_TAP_MODE);
+	opt_fheroes2.ResetModes(POCKETPC_LOW_MEMORY);
     }
 
     if(opt_fheroes2.Modes(GAME_HIDE_INTERFACE))
@@ -405,6 +403,8 @@ u8   Settings::Animation(void) const { return animation; }
 
 /* return full screen */
 bool Settings::FullScreen(void) const { return opt_global.Modes(GLOBAL_FULLSCREEN); }
+
+bool Settings::QVGA(void) const { return video_mode.w < 640 || video_mode.h < 480; }
 
 bool Settings::UseAltResource(void) const { return opt_global.Modes(GLOBAL_ALTRESOURCE); }
 bool Settings::PriceLoyaltyVersion(void) const { return opt_global.Modes(GLOBAL_PRICELOYALTY); }
@@ -631,6 +631,11 @@ void Settings::SetPlayersColors(u8 c)
     players_colors = c;
 }
 
+bool Settings::AutoBattle(void) const
+{
+    return opt_global.Modes(GLOBAL_AUTOBATTLE);
+}
+
 void Settings::SetPreferablyCountPlayers(u8 c)
 {
     preferably_count_players = 6 < c ? 6 : c;
@@ -819,14 +824,14 @@ void Settings::SetPriceLoyaltyVersion(void)
     opt_global.SetModes(GLOBAL_PRICELOYALTY);
 }
 
+void Settings::SetAutoBattle(bool f)
+{
+    f ? opt_global.SetModes(GLOBAL_AUTOBATTLE) : opt_global.ResetModes(GLOBAL_AUTOBATTLE);
+}
+
 void Settings::SetEvilInterface(bool f)
 {
     f ? opt_fheroes2.SetModes(GAME_EVIL_INTERFACE) : opt_fheroes2.ResetModes(GAME_EVIL_INTERFACE);
-}
-
-void Settings::SetBattleAuto(bool f)
-{
-    f ? opt_fheroes2.SetModes(BATTLE_SET_AUTO) : opt_fheroes2.ResetModes(BATTLE_SET_AUTO);
 }
 
 void Settings::SetBattleGrid(bool f)
@@ -904,7 +909,7 @@ const char* Settings::ExtName(u32 f) const
     const settings_t* ptr = std::find(settingsFHeroes2,
 		settingsFHeroes2 + sizeof(settingsFHeroes2) / sizeof(settings_t) - 1, f);
 
-    return ptr ? ptr->str : NULL;
+    return ptr ? _(ptr->str) : NULL;
 }
 
 void Settings::ExtSetModes(u32 f)
@@ -972,11 +977,6 @@ bool Settings::ExtBattleSoftWait(void) const
     return opt_fheroes2.Modes(BATTLE_SOFT_WAITING);
 }
 
-bool Settings::ExtBattleSetAuto(void) const
-{
-    return opt_fheroes2.Modes(BATTLE_SET_AUTO);
-}
-
 bool Settings::ExtBattleShowGrid(void) const
 {
     return opt_fheroes2.Modes(BATTLE_SHOW_GRID);
@@ -999,7 +999,7 @@ bool Settings::ExtRewriteConfirm(void) const
 
 bool Settings::ExtHideCursor(void) const
 {
-    return opt_fheroes2.Modes(GAME_POCKETPC_HIDE_CURSOR);
+    return opt_fheroes2.Modes(POCKETPC_HIDE_CURSOR);
 }
 
 bool Settings::ExtHideAIMove(void) const

@@ -278,7 +278,7 @@ void LoadZLogo(void)
 	    Surface* logo = zlogo;
 
 	    // scale logo
-	    if(Settings::Get().PocketPC())
+	    if(Settings::Get().QVGA())
 	    {
     		Surface* small = new Surface();
 		Surface::ScaleMinifyByTwo(*small, *zlogo);

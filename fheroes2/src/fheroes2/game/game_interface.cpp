@@ -44,9 +44,9 @@ Interface::Basic::Basic() : gameArea(GameArea::Get()), radar(Radar::Get()),
 {
     const Display & display = Display::Get();
     const u16 & px = display.w() - BORDERWIDTH - RADARWIDTH;
-    const u8 scroll_width = Settings::Get().PocketPC() ? 12 : BORDERWIDTH;
+    const u8 scroll_width = Settings::Get().QVGA() ? 12 : BORDERWIDTH;
 
-    if(Settings::Get().PocketPC())
+    if(Settings::Get().QVGA())
     {
         iconsPanel.SetCount(2);
 	radar.SetPos(BORDERWIDTH, BORDERWIDTH);
@@ -79,7 +79,7 @@ Interface::Basic::Basic() : gameArea(GameArea::Get()), radar(Radar::Get()),
 
     scrollLeft = Rect(0, 0, scroll_width, display.h());
     scrollRight = Rect(display.w() - scroll_width, 0, scroll_width, display.h());
-    scrollTop = Settings::Get().PocketPC() ? Rect(0, 0, controlPanel.GetArea().x, scroll_width) : Rect(0, 0, display.w() - radar.GetArea().w, scroll_width);
+    scrollTop = Settings::Get().QVGA() ? Rect(0, 0, controlPanel.GetArea().x, scroll_width) : Rect(0, 0, display.w() - radar.GetArea().w, scroll_width);
     scrollBottom = Rect(0, display.h() - scroll_width, display.w(), scroll_width);
     
     system_info.Set(Font::YELLOW_SMALL);

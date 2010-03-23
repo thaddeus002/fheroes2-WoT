@@ -28,7 +28,7 @@
 TextInterface::TextInterface(Font::type_t ft) : font(ft)
 {
     const Settings & conf = Settings::Get();
-    if(conf.PocketPC() && !conf.Unicode()) ft == Font::YELLOW_BIG || ft == Font::YELLOW_SMALL ? font = Font::YELLOW_SMALL : font = Font::SMALL;
+    if(conf.QVGA() && !conf.Unicode()) ft == Font::YELLOW_BIG || ft == Font::YELLOW_SMALL ? font = Font::YELLOW_SMALL : font = Font::SMALL;
 }
 
 TextAscii::TextAscii(const std::string & msg, Font::type_t ft) : TextInterface(ft), message(msg)
@@ -43,7 +43,7 @@ void TextAscii::SetText(const std::string & msg)
 void TextAscii::SetFont(const Font::type_t & ft)
 {
     const Settings & conf = Settings::Get();
-    if(conf.PocketPC() && !conf.Unicode()) ft == Font::YELLOW_BIG || ft == Font::YELLOW_SMALL ? font = Font::YELLOW_SMALL : font = Font::SMALL;
+    if(conf.QVGA() && !conf.Unicode()) ft == Font::YELLOW_BIG || ft == Font::YELLOW_SMALL ? font = Font::YELLOW_SMALL : font = Font::SMALL;
     else
     font = ft;
 }
@@ -237,7 +237,7 @@ void TextUnicode::SetText(const std::string & msg)
 void TextUnicode::SetFont(const Font::type_t & ft)
 {
     const Settings & conf = Settings::Get();
-    if(conf.PocketPC() && !conf.Unicode()) ft == Font::YELLOW_BIG || ft == Font::YELLOW_SMALL ? font = Font::YELLOW_SMALL : font = Font::SMALL;
+    if(conf.QVGA() && !conf.Unicode()) ft == Font::YELLOW_BIG || ft == Font::YELLOW_SMALL ? font = Font::YELLOW_SMALL : font = Font::SMALL;
     else
     font = ft;
 }
@@ -519,7 +519,7 @@ TextBox::TextBox(const std::string & msg, Font::type_t ft, u16 width)
     Set(msg, ft, width);
 }
 
-TextBox::TextBox(const std::string & msg, Font::type_t ft, const Rect & rt)
+TextBox::TextBox(const std::string & msg, Font::type_t ft, const Rect & rt) : align(2)
 {
     Set(msg, ft, rt.w);
     Blit(rt.x, rt.y);
@@ -576,11 +576,16 @@ void TextBox::Set(const std::string & msg, Font::type_t ft, u16 width)
     }
 }
 
+void TextBox::SetAlignLeft(void)
+{
+    align = 1;
+}
+
 void TextBox::Append(const std::string & msg, Font::type_t ft, u16 width)
 {
     if(msg.empty()) return;
     const Settings & conf = Settings::Get();
-    if(conf.PocketPC() && !conf.Unicode()) ft == Font::YELLOW_BIG || ft == Font::YELLOW_SMALL ? ft = Font::YELLOW_SMALL : ft = Font::SMALL;
+    if(conf.QVGA() && !conf.Unicode()) ft == Font::YELLOW_BIG || ft == Font::YELLOW_SMALL ? ft = Font::YELLOW_SMALL : ft = Font::SMALL;
 
     u16 www = 0;
     Rect::w = width;
@@ -627,7 +632,7 @@ void TextBox::Append(const std::vector<u16> & msg, Font::type_t ft, u16 width)
 {
     if(msg.empty()) return;
     const Settings & conf = Settings::Get();
-    if(conf.PocketPC() && !conf.Unicode()) ft == Font::YELLOW_BIG || ft == Font::YELLOW_SMALL ? ft = Font::YELLOW_SMALL : ft = Font::SMALL;
+    if(conf.QVGA() && !conf.Unicode()) ft == Font::YELLOW_BIG || ft == Font::YELLOW_SMALL ? ft = Font::YELLOW_SMALL : ft = Font::SMALL;
 
     u16 www = 0;
     Rect::w = width;
@@ -680,7 +685,13 @@ void TextBox::Blit(u16 ax, u16 ay, Surface & sf)
     
     for(; it1 != it2; ++it1)
     {
-    	(*it1).Blit(ax + (Rect::w - (*it1).w()) / 2, ay);
+	// center
+	if(align == 2)
+	    (*it1).Blit(ax + (Rect::w - (*it1).w()) / 2, ay);
+	// left
+	else
+	    (*it1).Blit(ax, ay);
+
     	ay += (*it1).h();
     }
 }

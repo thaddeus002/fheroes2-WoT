@@ -53,7 +53,7 @@ Skill::Secondary::skill_t Dialog::LevelUpSelectSkill(const std::string & header,
 
     TextBox box1(header, Font::BIG, BOXAREA_WIDTH);
     TextBox box2(message, Font::BIG, BOXAREA_WIDTH);
-    const u8 spacer = Settings::Get().PocketPC() ? 5 : 10;
+    const u8 spacer = Settings::Get().QVGA() ? 5 : 10;
 
     Box box(box1.h() + spacer + box2.h() + 10 + sprite_frame.h(), true);
 

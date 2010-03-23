@@ -63,7 +63,7 @@ void DrawHexagon(Surface & sf, u8 index_color)
 {
     u8 r, l, w, h;
 
-    if(Settings::Get().PocketPC())
+    if(Settings::Get().QVGA())
     {
 	r = 11;
 	l = 7;
@@ -112,7 +112,7 @@ void DrawHexagonShadow(Surface & sf)
 {
     u8 l, w, h;
 
-    if(Settings::Get().PocketPC())
+    if(Settings::Get().QVGA())
     {
 	//r = 11;
 	l = 7;
@@ -291,7 +291,7 @@ Battle2::direction_t Battle2::GetDirectionFromCursorSword(u16 sword)
 Battle2::direction_t Battle2::GetCellDirection(const Rect & rt, const Point & pt)
 {
     const u16 cw = rt.w / 2;
-    const u16 ch = (rt.h + (Settings::Get().PocketPC() ? 3 : 6)) / 3;
+    const u16 ch = (rt.h + (Settings::Get().QVGA() ? 3 : 6)) / 3;
 
     if(Rect(rt.x, rt.y, cw, ch) & pt)
 	return TOP_LEFT;
@@ -319,7 +319,7 @@ Battle2::OpponentSprite::OpponentSprite(const Rect & area, const HeroBase *b, bo
 {
     ResetAnimFrame(OP_IDLE);
 
-    if(Settings::Get().PocketPC())
+    if(Settings::Get().QVGA())
     {
 	if(reflect)
 	{
@@ -379,7 +379,7 @@ void Battle2::OpponentSprite::IncreaseAnimFrame(bool loop)
 
 void Battle2::OpponentSprite::ResetAnimFrame(u8 rule)
 {
-    if(Settings::Get().PocketPC())
+    if(Settings::Get().QVGA())
     {
 	switch(base->GetColor())
 	{
@@ -524,8 +524,8 @@ void Battle2::OpponentSprite::Redraw(void) const
 
 Battle2::Status::Status() : back1(AGG::GetICN(ICN::TEXTBAR, 8)), back2(AGG::GetICN(ICN::TEXTBAR, 9))
 {
-    bar1.Set(Settings::Get().PocketPC() ? Font::SMALL : Font::BIG);
-    bar2.Set(Settings::Get().PocketPC() ? Font::SMALL : Font::BIG);
+    bar1.Set(Settings::Get().QVGA() ? Font::SMALL : Font::BIG);
+    bar2.Set(Settings::Get().QVGA() ? Font::SMALL : Font::BIG);
 }
 
 void Battle2::Status::SetPosition(s16 cx, s16 cy)
@@ -554,8 +554,8 @@ void Battle2::Status::Redraw(void)
     display.Blit(back1, pos.x, pos.y);
     display.Blit(back2, pos.x, pos.y + back1.h());
 
-    if(bar1.Size()) bar1.Blit(pos.x + (back1.w() - bar1.w()) / 2, pos.y + (Settings::Get().PocketPC() ? -1 : 3));
-    if(bar2.Size()) bar2.Blit(pos.x + (back2.w() - bar2.w()) / 2, pos.y + back1.h() + (Settings::Get().PocketPC() ? -3 : 0));
+    if(bar1.Size()) bar1.Blit(pos.x + (back1.w() - bar1.w()) / 2, pos.y + (Settings::Get().QVGA() ? -1 : 3));
+    if(bar2.Size()) bar2.Blit(pos.x + (back2.w() - bar2.w()) / 2, pos.y + back1.h() + (Settings::Get().QVGA() ? -3 : 0));
 }
 
 const std::string & Battle2::Status::GetMessage(void) const
@@ -568,7 +568,7 @@ Battle2::Interface::Interface(Arena & a, u16 center) : arena(a), icn_cbkg(ICN::U
     b_current(NULL), b_move(NULL), b_fly(NULL), b_current_sprite(NULL), teleport_src(MAXU16)
 {
     const Settings & conf = Settings::Get();
-    bool pda = conf.PocketPC();
+    bool pda = conf.QVGA();
 
     switch(conf.Animation())
     {
@@ -612,7 +612,7 @@ Battle2::Interface::Interface(Arena & a, u16 center) : arena(a), icn_cbkg(ICN::U
     }
 
     if(grave){ icn_cbkg = ICN::CBKGGRAV; light = true; icn_frng = ICN::FRNG0001; }
-    if(conf.PocketPC() || conf.ExtLowMemory()) icn_frng = ICN::UNKNOWN;
+    if(conf.QVGA() || conf.ExtLowMemory()) icn_frng = ICN::UNKNOWN;
 
     // hexagon
     DrawHexagon(sf_hexagon, (light ? 0xE0 : 0xE5));
@@ -641,7 +641,7 @@ Battle2::Interface::~Interface()
 {
     if(opponent1) delete opponent1;
     if(opponent2) delete opponent2;
-    if(Settings::Get().ExtBattleSetAuto()) Settings::Get().SetBattleAuto(false);
+    if(Settings::Get().AutoBattle()) Settings::Get().SetAutoBattle(false);
 }
 
 const Rect & Battle2::Interface::GetArea(void) const
@@ -671,7 +671,7 @@ void Battle2::Interface::Redraw(void)
     RedrawArmies();
     RedrawInterface();
     RedrawBorder();
-    if(Settings::Get().PocketPC()) RedrawPocketControls();
+    if(Settings::Get().QVGA()) RedrawPocketControls();
 }
 
 void Battle2::Interface::RedrawInterface(void)
@@ -720,7 +720,7 @@ void Battle2::Interface::RedrawOpponents(void) const
 
 void Battle2::Interface::RedrawOpponentsFlags(void) const
 {
-    if(!Settings::Get().PocketPC() && opponent1)
+    if(!Settings::Get().QVGA() && opponent1)
     {
 	ICN::icn_t icn = ICN::UNKNOWN;
 
@@ -739,7 +739,7 @@ void Battle2::Interface::RedrawOpponentsFlags(void) const
 	Display::Get().Blit(flag, opponent1->GetArea().x + 38 - flag.w(), opponent1->GetArea().y + 5);
     }
 
-    if(!Settings::Get().PocketPC() && opponent2)
+    if(!Settings::Get().QVGA() && opponent2)
     {
 	ICN::icn_t icn = ICN::UNKNOWN;
 
@@ -846,7 +846,7 @@ void Battle2::Interface::RedrawTroopCount(const Stats & b, const Rect & rt) cons
     s16 sx = 0;
     s16 sy = 0;
 
-    if(Settings::Get().PocketPC())
+    if(Settings::Get().QVGA())
     {
 	sy = rt.y + rt.h - bar.h();
 
@@ -1079,7 +1079,7 @@ void Battle2::Interface::RedrawCastle2(const u16 cell_index) const
 	    index = (arena.towers[0] && arena.towers[0]->isValid() ? 18 : 19);
     	}
 
-        display.Blit(AGG::GetICN(icn_castle, index), topleft.x + (conf.PocketPC() ? 207 : 415), topleft.y + (conf.PocketPC() ? 20 : 40));
+        display.Blit(AGG::GetICN(icn_castle, index), topleft.x + (conf.QVGA() ? 207 : 415), topleft.y + (conf.QVGA() ? 20 : 40));
     }
     else
     if(85 == cell_index)
@@ -1091,16 +1091,16 @@ void Battle2::Interface::RedrawCastle2(const u16 cell_index) const
 	    index = ( arena.towers[2] && arena.towers[2]->isValid() ? 18 : 19);
     	}
 
-        display.Blit(AGG::GetICN(icn_castle, index), topleft.x + (conf.PocketPC() ? 207 : 415), topleft.y + (conf.PocketPC() ? 145 : 290));
+        display.Blit(AGG::GetICN(icn_castle, index), topleft.x + (conf.QVGA() ? 207 : 415), topleft.y + (conf.QVGA() ? 145 : 290));
     }
     else
     // castle towers
     if(40 == cell_index)
-        display.Blit(AGG::GetICN(icn_castle, 17), topleft.x + (conf.PocketPC() ? 187 : 375), topleft.y + (conf.PocketPC() ? 60 : 120));
+        display.Blit(AGG::GetICN(icn_castle, 17), topleft.x + (conf.QVGA() ? 187 : 375), topleft.y + (conf.QVGA() ? 60 : 120));
     else
     // castle towers
     if(62 == cell_index)
-	display.Blit(AGG::GetICN(icn_castle, 17), topleft.x + (conf.PocketPC() ? 187 : 375), topleft.y + (conf.PocketPC() ? 102 : 205));
+	display.Blit(AGG::GetICN(icn_castle, 17), topleft.x + (conf.QVGA() ? 187 : 375), topleft.y + (conf.QVGA() ? 102 : 205));
 }
 
 void Battle2::Interface::RedrawCastle3(void) const
@@ -1170,7 +1170,7 @@ void Battle2::Interface::RedrawObjects(const u16 cell_index) const
     {
 	Display & display = Display::Get();
 	const Rect & pt = arena.board[cell_index].pos;
-	display.Blit(*sprite, pt.x + pt.w / 2 + sprite->x(), pt.y + pt.h + sprite->y() - (Settings::Get().PocketPC() ? 5 : 10));
+	display.Blit(*sprite, pt.x + pt.w / 2 + sprite->x(), pt.y + pt.h + sprite->y() - (Settings::Get().QVGA() ? 5 : 10));
     }
 }
 
@@ -1349,7 +1349,7 @@ void Battle2::Interface::HumanTurn(const Stats & b, Actions & a)
 
     if(conf.Music() && !Music::isPlaying()) AGG::PlayMusic(MUS::GetBattleRandom(), false);
 
-    if(conf.PocketPC() && arena.current_commander && arena.current_commander->HaveSpellBook())
+    if(conf.QVGA() && arena.current_commander && arena.current_commander->HaveSpellBook())
     {
 	const Rect & area = border.GetArea();
     	const Sprite & book = AGG::GetICN(ICN::ARTFX, 81);
@@ -1647,7 +1647,7 @@ void Battle2::Interface::FadeArena(void)
     Redraw();
     cursor.Show();
     display.Flip();
-    if(!conf.PocketPC())
+    if(!conf.QVGA())
     {
 	display.Fade(100);
 	display.Flip();
@@ -1670,7 +1670,7 @@ u8 Battle2::GetIndexIndicator(const Stats & b)
 
 void Battle2::Interface::SetAutoBattle(const Stats & b, Actions & a)
 {
-    Settings::Get().SetBattleAuto(true);
+    Settings::Get().SetAutoBattle(true);
     Cursor::Get().SetThemes(Cursor::WAR_NONE);
     status.SetMessage(_("Set auto battle on"), true);
     arena.AITurn(b, a);
@@ -1680,7 +1680,7 @@ void Battle2::Interface::SetAutoBattle(const Stats & b, Actions & a)
 
 void Battle2::Interface::ResetAutoBattle(void)
 {
-    Settings::Get().SetBattleAuto(false);
+    Settings::Get().SetAutoBattle(false);
     status.SetMessage(_("Set auto battle off"), true);
     humanturn_redraw = true;
 }
@@ -1696,7 +1696,7 @@ void Battle2::Interface::KeyPress_o(void)
 void Battle2::Interface::KeyPress_a(const Stats & b, Actions & a)
 {
     btn_auto.PressDraw();
-    if(Settings::Get().ExtBattleSetAuto())
+    if(Settings::Get().AutoBattle())
 	ResetAutoBattle();
     else
 	SetAutoBattle(b, a);
@@ -1711,7 +1711,7 @@ void Battle2::Interface::ButtonAutoAction(const Stats & b, Actions & a)
 
     if(le.MouseClickLeft(btn_auto))
     {
-	if(Settings::Get().ExtBattleSetAuto())
+	if(Settings::Get().AutoBattle())
 	    ResetAutoBattle();
 	else
 	    SetAutoBattle(b, a);
@@ -1975,7 +1975,7 @@ void Battle2::Interface::RedrawActionAttackPart1(Stats & attacker, Stats & defen
 	std::vector<Point> points;
 	std::vector<Point>::const_iterator pnt;
 	
-	if(Settings::Get().PocketPC())
+	if(Settings::Get().QVGA())
 	{
 	    const Point line_from(pos1.x + (attacker.isReflect() ? -5 : pos1.w), pos1.y + attacker.GetStartMissileOffset(action1) / 2);
 	    const Point line_to(pos2.x + (attacker.isReflect() ? pos1.w : 0), pos2.y);
@@ -2102,7 +2102,7 @@ void Battle2::Interface::RedrawActionWinces(std::vector<TargetInfo> & targets)
     // targets damage animation
     std::vector<TargetInfo>::iterator it = targets.begin();
     std::string msg;
-    u16 py = (conf.PocketPC() ? 20 : 50);
+    u16 py = (conf.QVGA() ? 20 : 50);
     u8 finish = 0;
     u32 ticket = 0;
 
@@ -2152,7 +2152,7 @@ void Battle2::Interface::RedrawActionWinces(std::vector<TargetInfo> & targets)
 		display.Flip();
     		target.defender->IncreaseAnimFrame();
 	    }
-	    py += (conf.PocketPC() ? 5 : 10);
+	    py += (conf.QVGA() ? 5 : 10);
 	}
 	++ticket;
     }
@@ -2282,7 +2282,7 @@ void Battle2::Interface::RedrawActionFly(Stats & b, u16 dst)
 
     cursor.SetThemes(Cursor::WAR_NONE);
     const u8 step = b.isWide() ? 80 : 40;
-    GetLinePoints(pt1, pt2, Settings::Get().PocketPC() ? step / 2 : step, points);
+    GetLinePoints(pt1, pt2, Settings::Get().QVGA() ? step / 2 : step, points);
 
     pnt = points.begin();
 
@@ -2631,7 +2631,7 @@ void Battle2::Interface::RedrawActionCatapult(u8 target)
     Point pt2 = arena.catapult->GetTargetPosition(target);
     Point max(300, 20);
 
-    if(Settings::Get().PocketPC())
+    if(Settings::Get().QVGA())
     {
 	pt1.x /= 2;
 	pt1.y /= 2;
@@ -3310,7 +3310,7 @@ void Battle2::Interface::RedrawActionArmageddonSpell(const std::vector<TargetInf
 
     u32 ticket = 0;
     u8 alpha = 10;
-    area.h -= Settings::Get().PocketPC() ? 18 : 36;
+    area.h -= Settings::Get().QVGA() ? 18 : 36;
 
     Surface sprite1;
     Surface sprite2;
@@ -3349,7 +3349,7 @@ void Battle2::Interface::RedrawActionArmageddonSpell(const std::vector<TargetInf
     cursor.Hide();
 
     alpha = 0;
-    const u8 offset = Settings::Get().PocketPC() ? 5 : 10;
+    const u8 offset = Settings::Get().QVGA() ? 5 : 10;
     bool restore = false;
 
     while(le.HandleEvents() && alpha < 20)
@@ -3399,7 +3399,7 @@ void Battle2::Interface::RedrawActionEarthQuakeSpell(const std::vector<u8> & tar
 
     u32 ticket = 0;
     u8 frame = 0;
-    area.h -= Settings::Get().PocketPC() ? 19 : 38;
+    area.h -= Settings::Get().QVGA() ? 19 : 38;
 
     std::vector<u8>::const_iterator it;
 
@@ -3414,7 +3414,7 @@ void Battle2::Interface::RedrawActionEarthQuakeSpell(const std::vector<u8> & tar
     b_current = NULL;
     AGG::PlaySound(M82::ERTHQUAK);
 
-    const u8 offset = Settings::Get().PocketPC() ? 5 : 10;
+    const u8 offset = Settings::Get().QVGA() ? 5 : 10;
     bool restore = false;
 
     while(le.HandleEvents() && frame < 18)
@@ -3470,7 +3470,7 @@ void Battle2::Interface::RedrawActionEarthQuakeSpell(const std::vector<u8> & tar
 	    {
 		Point pt2 = arena.catapult->GetTargetPosition(*it);
 
-		if(Settings::Get().PocketPC())
+		if(Settings::Get().QVGA())
 		{
 		    pt2.x /= 2;
 		    pt2.y /= 2;
@@ -3776,7 +3776,7 @@ bool Battle2::Interface::IdleTroopsAnimation(u32 ticket)
 void Battle2::Interface::CheckGlobalEvents(LocalEvent & le, u32 ticket)
 {
     // reset auto battle
-    if(le.KeyPress() && Settings::Get().ExtBattleSetAuto()) ResetAutoBattle();
+    if(le.KeyPress() && Settings::Get().AutoBattle()) ResetAutoBattle();
 
     // animation opponents
     if(Game::ShouldAnimateInfrequent(ticket, animation_delay * 2))

@@ -533,7 +533,7 @@ void Interface::GameArea::GenerateUltimateArtifactAreaSurface(const u16 index, S
 
 	Settings::Get().EvilInterface() ? sf.GrayScale() : sf.Sepia();
 
-	if(Settings::Get().PocketPC())
+	if(Settings::Get().QVGA())
     	    sf.ScaleMinifyByTwo();
     }
     else

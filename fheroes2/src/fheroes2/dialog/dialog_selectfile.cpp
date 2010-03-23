@@ -87,7 +87,7 @@ void FileInfoListBox::RedrawBackground(const Point & dst)
     Display & display = Display::Get();
     const Sprite & panel = AGG::GetICN(ICN::REQBKG, 0);
 
-    if(Settings::Get().PocketPC())
+    if(Settings::Get().QVGA())
     {
 	display.Blit(panel, Rect(0, 0, panel.w(), 120), dst.x, dst.y);
 	display.Blit(panel, Rect(0, panel.h() - 120, panel.w(), 120), dst.x, dst.y + 224 - 120);
@@ -167,7 +167,7 @@ bool SelectFileListSimple(const std::string & header, MapsFileInfoList & lists, 
 
     const Sprite & sprite = AGG::GetICN(ICN::REQBKG, 0);
     Size panel(sprite.w(), sprite.h());
-    bool pocket = Settings::Get().PocketPC();
+    bool pocket = Settings::Get().QVGA();
     if(pocket) panel = Size(sprite.w(), 224);
 
     Background back((display.w() - panel.w) / 2, (display.h() - panel.h) / 2, panel.w, panel.h);
@@ -309,6 +309,6 @@ void RedrawExtraInfo(const Point & dst, const std::string & header, const std::s
     if(filename.size())
     {
 	text.Set(filename, Font::BIG);
-	text.Blit(dst.x + 175 - text.w() / 2, Settings::Get().PocketPC() ? dst.y + 148 : dst.y + 289);
+	text.Blit(dst.x + 175 - text.w() / 2, Settings::Get().QVGA() ? dst.y + 148 : dst.y + 289);
     }
 }

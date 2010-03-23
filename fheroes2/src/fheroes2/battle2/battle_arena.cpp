@@ -606,7 +606,7 @@ Battle2::Arena::Arena(Army::army_t & a1, Army::army_t & a2, u16 index, bool loca
     const Settings & conf = Settings::Get();
     usage_spells.reserve(10);
 
-    interface = local && !Settings::Get().ExtBattleSetAuto() ? new Interface(*this, index) : NULL;
+    interface = local ? new Interface(*this, index) : NULL;
 
     if(interface && conf.Sound())
 	AGG::PlaySound(M82::PREBATTL);
@@ -979,7 +979,7 @@ void Battle2::Arena::HumanTurn(const Stats & b, Actions & a)
 
     conf.SetMyColor(Color::Get(b.GetColor()));
 
-    if(conf.ExtBattleSetAuto())
+    if(conf.AutoBattle())
         AITurn(b, a);
     else
     if(interface)

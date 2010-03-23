@@ -62,7 +62,7 @@ Point Battle2::Tower::GetPortPosition(void) const
 	default: break;
     }
 
-    if(Settings::Get().PocketPC())
+    if(Settings::Get().QVGA())
     {
 	res.x /= 2;
 	res.y /= 2;

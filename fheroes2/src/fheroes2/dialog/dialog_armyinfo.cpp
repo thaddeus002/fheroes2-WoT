@@ -41,7 +41,7 @@ void DrawBattleStats(const Point &, const Battle2::Stats &);
 
 Dialog::answer_t Dialog::ArmyInfo(const Army::Troop & troop, u16 flags)
 {
-    if(Settings::Get().PocketPC()) return PocketPC::DialogArmyInfo(troop, flags);
+    if(Settings::Get().QVGA()) return PocketPC::DialogArmyInfo(troop, flags);
     Display & display = Display::Get();
 
     const ICN::icn_t viewarmy = Settings::Get().EvilInterface() ? ICN::VIEWARME : ICN::VIEWARMY;
@@ -198,7 +198,7 @@ void DrawMonsterStats(const Point & dst, const Army::Troop & troop)
     const Monster & mons = static_cast<Monster>(troop);
     const Battle2::Stats* battle = troop.GetBattleStats();
     bool commander = troop.MasterSkill();
-    bool pda = Settings::Get().PocketPC();
+    bool pda = Settings::Get().QVGA();
 
     // attack
     message = _("Attack");

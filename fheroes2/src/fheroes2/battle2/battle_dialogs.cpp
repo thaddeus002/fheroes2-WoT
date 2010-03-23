@@ -227,14 +227,14 @@ void Battle2::Arena::DialogBattleSummary(const Result & res) const
 
     Rect pos_rt;
     pos_rt.x = (display.w() - dialog.w()) / 2;
-    pos_rt.y = (display.h() - (conf.PocketPC() ? 224 : dialog.h())) / 2;
+    pos_rt.y = (display.h() - (conf.QVGA() ? 224 : dialog.h())) / 2;
     pos_rt.w = dialog.w();
-    pos_rt.h = conf.PocketPC() ? 224 : dialog.h();
+    pos_rt.h = conf.QVGA() ? 224 : dialog.h();
 
     Background back(pos_rt);
     back.Save();
 
-    if(conf.PocketPC())
+    if(conf.QVGA())
     {
 	display.Blit(dialog, Rect(0, 232, pos_rt.w, 224), pos_rt.x, pos_rt.y);
 	display.Blit(dialog, Rect(0, 0, pos_rt.w, 30), pos_rt.x, pos_rt.y);
@@ -245,7 +245,7 @@ void Battle2::Arena::DialogBattleSummary(const Result & res) const
     const u8 anime_ox = 47;
     const u8 anime_oy = 36;
 
-    if(!conf.PocketPC())
+    if(!conf.QVGA())
     {
 	const Sprite & sprite1 = AGG::GetICN(icn_anim, 0);
 	const Sprite & sprite2 = AGG::GetICN(icn_anim, 1);
@@ -254,37 +254,37 @@ void Battle2::Arena::DialogBattleSummary(const Result & res) const
 	display.Blit(sprite2, pos_rt.x + anime_ox + sprite2.x(), pos_rt.y + anime_oy + sprite2.y());
     }
 
-    Button btn_ok(pos_rt.x + 121, pos_rt.y + (conf.PocketPC() ? 176 : 410), (conf.EvilInterface() ? ICN::WINCMBBE : ICN::WINCMBTB), 0, 1);
+    Button btn_ok(pos_rt.x + 121, pos_rt.y + (conf.QVGA() ? 176 : 410), (conf.EvilInterface() ? ICN::WINCMBBE : ICN::WINCMBTB), 0, 1);
 
     TextBox box(msg, Font::BIG, 270);
-    box.Blit(pos_rt.x + 25, pos_rt.y + (conf.PocketPC() ? 20 : 175));
+    box.Blit(pos_rt.x + 25, pos_rt.y + (conf.QVGA() ? 20 : 175));
 
     // battlefield casualties
     Text text(_("Battlefield Casualties"), Font::SMALL);
-    text.Blit(pos_rt.x + (pos_rt.w - text.w()) / 2, pos_rt.y + (conf.PocketPC() ? 58 : 270));
+    text.Blit(pos_rt.x + (pos_rt.w - text.w()) / 2, pos_rt.y + (conf.QVGA() ? 58 : 270));
 
     // attacker
     text.Set(_("Attacker"), Font::SMALL);
-    text.Blit(pos_rt.x + (pos_rt.w - text.w()) / 2, pos_rt.y + (conf.PocketPC() ? 70 : 285));
+    text.Blit(pos_rt.x + (pos_rt.w - text.w()) / 2, pos_rt.y + (conf.QVGA() ? 70 : 285));
 
     if(killed1.isValid())
-	killed1.DrawMons32Line(pos_rt.x + 25, pos_rt.y + (conf.PocketPC() ? 83 : 303), 270);
+	killed1.DrawMons32Line(pos_rt.x + 25, pos_rt.y + (conf.QVGA() ? 83 : 303), 270);
     else
     {
 	text.Set("None", Font::SMALL);
-	text.Blit(pos_rt.x + (pos_rt.w - text.w()) / 2, pos_rt.y + (conf.PocketPC() ? 80 : 300));
+	text.Blit(pos_rt.x + (pos_rt.w - text.w()) / 2, pos_rt.y + (conf.QVGA() ? 80 : 300));
     }
 
     // defender
     text.Set(_("Defender"), Font::SMALL);
-    text.Blit(pos_rt.x + (pos_rt.w - text.w()) / 2, pos_rt.y + (conf.PocketPC() ? 120 : 345));
+    text.Blit(pos_rt.x + (pos_rt.w - text.w()) / 2, pos_rt.y + (conf.QVGA() ? 120 : 345));
 
     if(killed2.isValid())
-	killed2.DrawMons32Line(pos_rt.x + 25, pos_rt.y + (conf.PocketPC() ? 138 : 363), 270);
+	killed2.DrawMons32Line(pos_rt.x + 25, pos_rt.y + (conf.QVGA() ? 138 : 363), 270);
     else
     {
 	text.Set("None", Font::SMALL);
-	text.Blit(pos_rt.x + (pos_rt.w - text.w()) / 2, pos_rt.y + (conf.PocketPC() ? 135 : 360));
+	text.Blit(pos_rt.x + (pos_rt.w - text.w()) / 2, pos_rt.y + (conf.QVGA() ? 135 : 360));
     }
 
     btn_ok.Draw();
@@ -303,7 +303,7 @@ void Battle2::Arena::DialogBattleSummary(const Result & res) const
 	if(le.KeyPress(KEY_ESCAPE) || le.KeyPress(KEY_RETURN) || le.MouseClickLeft(btn_ok)) break;
 
         // animation
-	if(!conf.PocketPC() && Game::ShouldAnimateInfrequent(ticket, 6))
+	if(!conf.QVGA() && Game::ShouldAnimateInfrequent(ticket, 6))
         {
 	    const Sprite & sprite1 = AGG::GetICN(icn_anim, 0);
 	    const Sprite & sprite2 = AGG::GetICN(icn_anim, ICN::AnimationFrame(icn_anim, 1, frame));
@@ -423,7 +423,7 @@ u8 Battle2::Arena::DialogBattleHero(const HeroBase & hero) const
     btnSurrender.Draw();
     btnClose.Draw();
 
-    if(!conf.PocketPC())
+    if(!conf.QVGA())
     {
 	Surface shadow(btnCast.w, btnCast.h);
 	shadow.Fill(0, 0, 0);

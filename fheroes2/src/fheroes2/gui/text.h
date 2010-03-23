@@ -179,12 +179,14 @@ public:
     TextBox(const std::string &, Font::type_t, const Rect &);
 
     void Set(const std::string &, Font::type_t, u16);
+    void SetAlignLeft(void);
 
     const Rect & GetRect(void) const{ return *this; };
     s16 x(void) const{ return Rect::x; };
     s16 y(void) const{ return Rect::y; };
     u16 w(void) const{ return Rect::w; };
     u16 h(void) const{ return Rect::h; };
+    u16 row(void) const{ return messages.size(); };
 
     void Blit(u16 ax, u16 ay, Surface & sf = Display::Get());
     void Blit(const Point & pt, Surface & sf = Display::Get());
@@ -196,6 +198,7 @@ private:
 #endif
 
     std::list<Text> messages;
+    u8 align;
 };
 
 #endif

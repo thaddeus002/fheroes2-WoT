@@ -41,7 +41,7 @@ Game::menu_t Game::MainMenu(void)
     AGG::PlayMusic(MUS::MAINMENU);
 
     if(Settings::Get().ExtLowMemory()) AGG::ICNRegistryEnable(true);
-    if(Settings::Get().PocketPC()) return PocketPC::MainMenu();
+    if(Settings::Get().QVGA()) return PocketPC::MainMenu();
 
     // preload
     AGG::PreloadObject(ICN::HEROES);

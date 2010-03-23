@@ -49,7 +49,7 @@ Dialog::answer_t Castle::DialogBuyHero(const Heroes* hero)
 
     cursor.Hide();
 
-    const u8 spacer = Settings::Get().PocketPC() ? 5 : 10;
+    const u8 spacer = Settings::Get().QVGA() ? 5 : 10;
     const Sprite & portrait_frame = AGG::GetICN(ICN::SURRENDR, 4);
 
     Text text(_("Recruit Hero"), Font::BIG);

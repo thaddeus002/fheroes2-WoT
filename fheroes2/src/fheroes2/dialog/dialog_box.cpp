@@ -56,7 +56,7 @@ Dialog::Box::Box(u16 height, bool buttons)
     s16 posx = (display.w() - BOX_WIDTH) / 2;
     s16 posy = (display.h() - height_top_bottom - height_middle) / 2;
 
-    if(Settings::Get().PocketPC() && height > display.h())
+    if(Settings::Get().QVGA() && height > display.h())
 	posy = display.h() - area.h - ((evil ? BOXE_TOP : BOX_TOP) - BOXAREA_TOP);
 
     Save(posx, posy, BOX_WIDTH, height_top_bottom + height_middle);

@@ -26,11 +26,11 @@
 
 const char* Week::GetString(type_t type)
 {
-    const char* str_name[] = { "Unnamed", _("PLAGUE"),
-		_("Ant"), _("Grasshopper"), _("Dragonfly"), _("Spider"), _("Butterfly"), _("Bumblebee"),
-		_("Locust"), _("Earthworm"), _("Hornet"), _("Beetle"), _("Squirrel"), _("Rabbit"),
-		_("Gopher"), _("Badger"), _("Eagle"), _("Weasel"), _("Raven"), _("Mongoose"), _("Aardvark"),
-		_("Lizard"), _("Tortoise"), _("Hedgehog"), _("Condor"), "Monsters HII" };
+    const char* str_name[] = { "Unnamed", _("week|PLAGUE"),
+		_("week|Ant"), _("week|Grasshopper"), _("week|Dragonfly"), _("week|Spider"), _("week|Butterfly"), _("week|Bumblebee"),
+		_("week|Locust"), _("week|Earthworm"), _("week|Hornet"), _("week|Beetle"), _("week|Squirrel"), _("week|Rabbit"),
+		_("week|Gopher"), _("week|Badger"), _("week|Eagle"), _("week|Weasel"), _("week|Raven"), _("week|Mongoose"), _("week|Aardvark"),
+		_("week|Lizard"), _("week|Tortoise"), _("week|Hedgehog"), _("week|Condor"), "Monsters HII" };
 
     switch(type)
     {

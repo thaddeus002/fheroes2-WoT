@@ -24,8 +24,8 @@
 
 const char* Speed::String(u8 speed)
 {
-    const char* str_speed[] = { _("Standing"), _("Crawling"), _("Very Slow"), _("speed|Slow"), _("Average"), _("Fast"),
-	_("Very Fast"), _("Ultra Fast"), _("Blazing"), _("Instant"), "Unknown" };
+    const char* str_speed[] = { _("speed|Standing"), _("speed|Crawling"), _("speed|Very Slow"), _("speed|Slow"), _("speed|Average"), _("speed|Fast"),
+	_("speed|Very Fast"), _("speed|Ultra Fast"), _("speed|Blazing"), _("speed|Instant"), "Unknown" };
 
     switch(speed)
     {

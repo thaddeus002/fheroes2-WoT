@@ -39,7 +39,7 @@ void RedrawPrimarySkillInfo(const Point &, const Skill::Primary &, const Skill::
 
 void Heroes::MeetingDialog(Heroes & heroes2)
 {
-    if(Settings::Get().PocketPC()) return PocketPC::HeroesMeeting(*this, heroes2);
+    if(Settings::Get().QVGA()) return PocketPC::HeroesMeeting(*this, heroes2);
 
     Display & display = Display::Get();
 

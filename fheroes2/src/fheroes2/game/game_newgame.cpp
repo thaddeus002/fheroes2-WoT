@@ -44,7 +44,7 @@ Game::menu_t Game::NewHotSeat(void)
 {
     Settings & conf = Settings::Get();
     conf.SetGameType(Game::HOTSEAT);
-    conf.SetPreferablyCountPlayers(conf.PocketPC() ? 2 : SelectCountPlayers());
+    conf.SetPreferablyCountPlayers(conf.QVGA() ? 2 : SelectCountPlayers());
     return Game::SELECTSCENARIO;
 }
 
@@ -113,7 +113,7 @@ Game::menu_t Game::NewGame(void)
     Mixer::Pause();
     AGG::PlayMusic(MUS::MAINMENU);
 
-    if(Settings::Get().PocketPC()) return PocketPC::NewGame();
+    if(Settings::Get().QVGA()) return PocketPC::NewGame();
    
     // preload
     AGG::PreloadObject(ICN::HEROES);
@@ -180,7 +180,7 @@ Game::menu_t Game::NewGame(void)
 
 Game::menu_t Game::NewMulti(void)
 {
-    if(Settings::Get().PocketPC()) return PocketPC::NewMulti();
+    if(Settings::Get().QVGA()) return PocketPC::NewMulti();
 
     // preload
     AGG::PreloadObject(ICN::HEROES);

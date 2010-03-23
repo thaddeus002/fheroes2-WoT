@@ -457,7 +457,7 @@ void AGG::Cache::LoadOrgICN(icn_cache_t & v, const ICN::icn_t icn, const u16 ind
     LoadOrgICN(sp, icn, index, reflect);
     // set display format
     if(8 != sp.depth() &&
-       !(Settings::Get().PocketPC() && ICN::NeedMinify4PocketPC(icn, index))) sp.SetDisplayFormat();
+       !(Settings::Get().QVGA() && ICN::NeedMinify4PocketPC(icn, index))) sp.SetDisplayFormat();
 }
 
 /* load ICN object to AGG::Cache */
@@ -500,7 +500,7 @@ void AGG::Cache::LoadICN(const ICN::icn_t icn, u16 index, bool reflect)
     if(!skip_origin) LoadOrgICN(v, icn, index, reflect);
 
     // pocketpc: scale sprites
-    if(Settings::Get().PocketPC() && ICN::NeedMinify4PocketPC(icn, index))
+    if(Settings::Get().QVGA() && ICN::NeedMinify4PocketPC(icn, index))
     {
 	Sprite & sp = reflect ? v.reflect[index] : v.sprites[index];
 	sp.ScaleMinifyByTwo();
@@ -725,7 +725,7 @@ void AGG::Cache::LoadFNT(u16 ch)
 	font_small.RenderUnicodeChar(fnt_cache[ch].small_yellow, ch, yellow, conf.FontsRenderBlended() ? SDL::Font::BLENDED : SDL::Font::SOLID);
 
 	// medium
-	if(!(conf.PocketPC() && !conf.Unicode()))
+	if(!(conf.QVGA() && !conf.Unicode()))
 	{
 	    font_medium.RenderUnicodeChar(fnt_cache[ch].medium_white, ch, white, conf.FontsRenderBlended() ? SDL::Font::BLENDED : SDL::Font::SOLID);
 	    font_medium.RenderUnicodeChar(fnt_cache[ch].medium_yellow, ch, yellow, conf.FontsRenderBlended() ? SDL::Font::BLENDED : SDL::Font::SOLID);

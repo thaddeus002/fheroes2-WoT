@@ -62,7 +62,7 @@ void Dialog::SpellInfo(const std::string &header, const std::string &message, co
     Text text(Spell::GetName(spell), Font::SMALL);
 
     const Sprite & sprite = AGG::GetICN(ICN::SPELLS, Spell::IndexSprite(spell));
-    const u8 spacer = Settings::Get().PocketPC() ? 5 : 10;
+    const u8 spacer = Settings::Get().QVGA() ? 5 : 10;
 
     Box box(box1.h() + spacer + box2.h() + spacer + sprite.h() + 2 + text.h(), ok_button);
 

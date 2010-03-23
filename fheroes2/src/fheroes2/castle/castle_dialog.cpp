@@ -56,7 +56,7 @@ void Castle::RedrawNameTown(const Point & src_pt)
 
 Dialog::answer_t Castle::OpenDialog(bool fade)
 {
-    if(Settings::Get().PocketPC()) return PocketPC::CastleOpenDialog(*this);
+    if(Settings::Get().QVGA()) return PocketPC::CastleOpenDialog(*this);
 
     Display & display = Display::Get();
     castle_heroes = const_cast<Heroes*>(world.GetHeroes(mp.x, mp.y));
