@@ -514,7 +514,7 @@ u16 Text::height(const std::string &str, Font::type_t ft, u16 width)
     return 0;
 }
 
-TextBox::TextBox(const std::string & msg, Font::type_t ft, u16 width)
+TextBox::TextBox(const std::string & msg, Font::type_t ft, u16 width) : align(2)
 {
     Set(msg, ft, width);
 }
