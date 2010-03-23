@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-03-23 23:34+0800\n"
+"POT-Creation-Date: 2010-03-23 23:37+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -156,7 +156,7 @@ msgstr ""
 #: ../fheroes2/battle2/battle_dialogs.cpp:369
 #: ../fheroes2/castle/castle_well.cpp:253
 #: ../fheroes2/dialog/dialog_armyinfo.cpp:204
-#: ../fheroes2/dialog/dialog_quickinfo.cpp:521
+#: ../fheroes2/dialog/dialog_quickinfo.cpp:520
 #: ../fheroes2/heroes/skill.cpp:305
 msgid "Attack"
 msgstr ""
@@ -164,13 +164,13 @@ msgstr ""
 #: ../fheroes2/battle2/battle_dialogs.cpp:375
 #: ../fheroes2/castle/castle_well.cpp:261
 #: ../fheroes2/dialog/dialog_armyinfo.cpp:228
-#: ../fheroes2/dialog/dialog_quickinfo.cpp:535
+#: ../fheroes2/dialog/dialog_quickinfo.cpp:534
 msgid "Defense"
 msgstr ""
 
 #: ../fheroes2/battle2/battle_dialogs.cpp:381
 #: ../fheroes2/castle/castle_town.cpp:326
-#: ../fheroes2/dialog/dialog_quickinfo.cpp:549
+#: ../fheroes2/dialog/dialog_quickinfo.cpp:548
 #: ../fheroes2/dialog/dialog_skillinfo.cpp:152
 #: ../fheroes2/heroes/heroes_dialog.cpp:137
 #: ../fheroes2/heroes/heroes_dialog.cpp:408
@@ -182,7 +182,7 @@ msgstr ""
 
 #: ../fheroes2/battle2/battle_dialogs.cpp:387
 #: ../fheroes2/castle/castle_town.cpp:337
-#: ../fheroes2/dialog/dialog_quickinfo.cpp:563
+#: ../fheroes2/dialog/dialog_quickinfo.cpp:562
 #: ../fheroes2/dialog/dialog_skillinfo.cpp:157
 #: ../fheroes2/heroes/heroes_dialog.cpp:163
 #: ../fheroes2/heroes/heroes_dialog.cpp:410
@@ -203,7 +203,7 @@ msgid "Luck"
 msgstr ""
 
 #: ../fheroes2/battle2/battle_dialogs.cpp:403
-#: ../fheroes2/dialog/dialog_quickinfo.cpp:577
+#: ../fheroes2/dialog/dialog_quickinfo.cpp:576
 #: ../fheroes2/heroes/heroes_indicator.cpp:252
 msgid "Spell Points"
 msgstr ""
@@ -1378,32 +1378,28 @@ msgid "guarded by %{count} of %{monster}"
 msgstr ""
 
 #: ../fheroes2/dialog/dialog_quickinfo.cpp:155
-#: ../fheroes2/dialog/dialog_quickinfo.cpp:208
-#: ../fheroes2/dialog/dialog_quickinfo.cpp:227
-#: ../fheroes2/dialog/dialog_quickinfo.cpp:265
-#: ../fheroes2/dialog/dialog_quickinfo.cpp:278
+#: ../fheroes2/dialog/dialog_quickinfo.cpp:207
+#: ../fheroes2/dialog/dialog_quickinfo.cpp:226
+#: ../fheroes2/dialog/dialog_quickinfo.cpp:264
+#: ../fheroes2/dialog/dialog_quickinfo.cpp:277
 msgid "(already visited)"
 msgstr ""
 
-#: ../fheroes2/dialog/dialog_quickinfo.cpp:185
-msgid "(lived: "
-msgstr ""
-
-#: ../fheroes2/dialog/dialog_quickinfo.cpp:208
-#: ../fheroes2/dialog/dialog_quickinfo.cpp:227
-#: ../fheroes2/dialog/dialog_quickinfo.cpp:265
+#: ../fheroes2/dialog/dialog_quickinfo.cpp:207
+#: ../fheroes2/dialog/dialog_quickinfo.cpp:226
+#: ../fheroes2/dialog/dialog_quickinfo.cpp:264
 msgid "(not visited)"
 msgstr ""
 
-#: ../fheroes2/dialog/dialog_quickinfo.cpp:244
+#: ../fheroes2/dialog/dialog_quickinfo.cpp:243
 msgid "you know it"
 msgstr ""
 
-#: ../fheroes2/dialog/dialog_quickinfo.cpp:402
+#: ../fheroes2/dialog/dialog_quickinfo.cpp:401
 msgid "Defenders:"
 msgstr ""
 
-#: ../fheroes2/dialog/dialog_quickinfo.cpp:411
+#: ../fheroes2/dialog/dialog_quickinfo.cpp:410
 #: ../fheroes2/heroes/heroes_indicator.cpp:124
 #: ../fheroes2/heroes/heroes_indicator.cpp:170
 msgid "None"
