@@ -122,7 +122,7 @@ void Dialog::ExtSettings(void)
     states.push_back(Settings::GAME_REMEMBER_LAST_FOCUS);
     states.push_back(Settings::GAME_SHOW_SYSTEM_INFO);
     states.push_back(Settings::GAME_EVIL_INTERFACE);
-    if(!conf.PocketPC())
+    if(conf.VideoMode().w >= 640 && conf.VideoMode().w >= 480)
 	states.push_back(Settings::GAME_HIDE_INTERFACE);
     states.push_back(Settings::GAME_AUTOSAVE_ON);
     if(conf.VideoMode().w == 640 && conf.VideoMode().w == 480)
@@ -136,7 +136,8 @@ void Dialog::ExtSettings(void)
     states.push_back(Settings::WORLD_SAVE_MONSTER_BATTLE);
     states.push_back(Settings::WORLD_ALLOW_SET_GUARDIAN);
     states.push_back(Settings::HEROES_LEARN_SPELLS_WITH_DAY);
-    states.push_back(Settings::CASTLE_ALLOW_BUY_FROM_WELL);
+    if(conf.VideoMode().w >= 640 && conf.VideoMode().w >= 480)
+	states.push_back(Settings::CASTLE_ALLOW_BUY_FROM_WELL);
     states.push_back(Settings::BATTLE_SHOW_DAMAGE);
     states.push_back(Settings::BATTLE_SOFT_WAITING);
     states.push_back(Settings::BATTLE_TROOP_DIRECTION);
@@ -144,7 +145,7 @@ void Dialog::ExtSettings(void)
     states.push_back(Settings::BATTLE_SHOW_GRID);
     states.push_back(Settings::BATTLE_SHOW_MOUSE_SHADOW);
     states.push_back(Settings::BATTLE_SHOW_MOVE_SHADOW);
-    if(conf.PocketPC())
+    if(! conf.PocketPC())
     {
 	states.push_back(Settings::POCKETPC_TAP_MODE);
 	states.push_back(Settings::POCKETPC_LOW_MEMORY);
