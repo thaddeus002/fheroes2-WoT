@@ -2246,6 +2246,8 @@ void ActionToDwellingJoinMonster(Heroes &hero, const u8 obj, const u16 dst_index
 	Dialog::Message("", _("As you approach the dwelling, you notice that there is no one here."), Font::BIG, Dialog::OK);
     }
 
+    hero.SetVisited(dst_index, Visit::GLOBAL);
+
     DEBUG(DBG_GAME , DBG_INFO, "ActionToDwellingJoinMonster: " << hero.GetName() << ", object: " << MP2::StringObject(obj));
 }
 
@@ -2331,6 +2333,8 @@ void ActionToDwellingRecruitMonster(Heroes &hero, const u8 obj, const u16 dst_in
     {
 	Dialog::Message(name_object, msg_void, Font::BIG, Dialog::OK);
     }
+
+    hero.SetVisited(dst_index, Visit::GLOBAL);
 
     DEBUG(DBG_GAME , DBG_INFO, "ActionToDwellingRecruitMonster: " << hero.GetName() << ", object: " << name_object);
 }
@@ -2473,20 +2477,25 @@ void ActionToDwellingBattleMonster(Heroes &hero, const u8 obj, const u16 dst_ind
     }
 
     // recruit monster
-    if(count && complete)
+    if(complete)
     {
-	const Monster monster(Monster::FromObject(obj));
-        const u16 recruit = Dialog::RecruitMonster(monster, count);
-        if(recruit)
-        {
-    	    if(!hero.GetArmy().JoinTroop(monster, recruit))
-		Dialog::Message(monster.GetName(), _("You are unable to recruit at this time, your ranks are full."), Font::BIG, Dialog::OK);
-    	    else
-    		tile.SetCountMonster(count - recruit);
+	if(count)
+	{
+	    const Monster monster(Monster::FromObject(obj));
+    	    const u16 recruit = Dialog::RecruitMonster(monster, count);
+    	    if(recruit)
+    	    {
+    		if(!hero.GetArmy().JoinTroop(monster, recruit))
+		    Dialog::Message(monster.GetName(), _("You are unable to recruit at this time, your ranks are full."), Font::BIG, Dialog::OK);
+    		else
+    		    tile.SetCountMonster(count - recruit);
 
-    	    const payment_t paymentCosts(PaymentConditions::BuyMonster(monster()) * recruit);
-    	    world.GetKingdom(hero.GetColor()).OddFundsResource(paymentCosts);
-    	}
+    		const payment_t paymentCosts(PaymentConditions::BuyMonster(monster()) * recruit);
+    		world.GetKingdom(hero.GetColor()).OddFundsResource(paymentCosts);
+    	    }
+	}
+
+	hero.SetVisited(dst_index, Visit::GLOBAL);
     }
 
     DEBUG(DBG_GAME , DBG_INFO, "ActionToDwellingBattleMonster: " << hero.GetName() << ", object: " << MP2::StringObject(obj));

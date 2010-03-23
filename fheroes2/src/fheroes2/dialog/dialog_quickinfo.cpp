@@ -156,6 +156,43 @@ void Dialog::QuickInfo(const Maps::Tiles & tile)
 	    }
 	    break;
 
+        // join army
+        case MP2::OBJ_WATCHTOWER:
+        case MP2::OBJ_EXCAVATION:
+        case MP2::OBJ_CAVE:
+        case MP2::OBJ_TREEHOUSE:
+        case MP2::OBJ_ARCHERHOUSE:
+        case MP2::OBJ_GOBLINHUT:
+        case MP2::OBJ_DWARFCOTT:
+        case MP2::OBJ_HALFLINGHOLE:
+        case MP2::OBJ_PEASANTHUT:
+        case MP2::OBJ_THATCHEDHUT:
+        // recruit army
+        case MP2::OBJ_RUINS:
+        case MP2::OBJ_TREECITY:
+        case MP2::OBJ_WAGONCAMP:
+        case MP2::OBJ_DESERTTENT:
+        // battle and recruit army
+        case MP2::OBJ_DRAGONCITY:
+        case MP2::OBJ_CITYDEAD:
+        case MP2::OBJ_TROLLBRIDGE:
+	    name_object = MP2::StringObject(tile.GetObject());
+	    if(settings.ExtShowVisitedContent() && kingdom.isVisited(tile))
+	    {
+	    	name_object.append("\n");
+		if(tile.GetCountMonster())
+		{
+		    name_object.append(_("(lived: "));
+		    String::AddInt(name_object, tile.GetCountMonster());
+		    name_object.append(")");
+		}
+		else
+		{
+		    name_object.append("(empty)");
+		}
+	    }
+	    break;
+
 	case MP2::OBJ_GAZEBO:
 	case MP2::OBJ_FORT:
 	case MP2::OBJ_MERCENARYCAMP:

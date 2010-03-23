@@ -645,6 +645,30 @@ bool MP2::isWeekLife(const u8 obj)
         case OBJ_WATERWHEEL:
         case OBJ_WINDMILL:
         case OBJ_ARTESIANSPRING:
+
+	// join army
+        case OBJ_WATCHTOWER:
+        case OBJ_EXCAVATION:
+        case OBJ_CAVE:
+        case OBJ_TREEHOUSE:
+        case OBJ_ARCHERHOUSE:
+        case OBJ_GOBLINHUT:
+        case OBJ_DWARFCOTT:
+        case OBJ_HALFLINGHOLE:
+        case OBJ_PEASANTHUT:
+        case OBJ_THATCHEDHUT:
+
+        // recruit army
+        case OBJ_RUINS:
+        case OBJ_TREECITY:
+        case OBJ_WAGONCAMP:
+        case OBJ_DESERTTENT:
+
+        // battle and recruit army
+        case OBJ_DRAGONCITY:
+        case OBJ_CITYDEAD:
+        case OBJ_TROLLBRIDGE:
+
 	    return true;
 
 	default: break;
