@@ -182,7 +182,7 @@ void Dialog::QuickInfo(const Maps::Tiles & tile)
 	    	name_object.append("\n");
 		if(tile.GetCountMonster())
 		{
-		    name_object.append(_("(lived: %{count})"));
+		    name_object.append(_("(available: %{count})"));
 		    String::Replace(name_object, "%{count}", tile.GetCountMonster());
 		}
 		else
