@@ -143,7 +143,7 @@ void Interface::Basic::Redraw(u8 force)
     if(conf.HideInterface() && conf.ShowControlPanel() && (redraw & REDRAW_GAMEAREA)) controlPanel.Redraw();
 
     // show system info
-    if(conf.ShowSystem())
+    if(conf.ExtShowSystemInfo())
 	RedrawSystemInfo((conf.HideInterface() ? 10 : 26), Display::Get().h() - (conf.HideInterface() ? 14 : 30));
 
     if((redraw | force) & REDRAW_BORDER) borderWindow.Redraw();

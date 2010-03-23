@@ -67,79 +67,34 @@ enum
 class Settings
 {
 public:
-    // ns: battle
     enum
     {
-        BATTLEAUTO	  = 0x00000001,
-        BATTLEGRID        = 0x00000002,
-        BATTLEMOUSESHADOW = 0x00000004,
-        BATTLEMOVESHADOW  = 0x00000008,
-    };
-
-    // ns: pocketpc
-    enum
-    {
-	POCKETPC          = 0x00000001,
-	LOWMEMORY         = 0x00000002,
-	TAPMODE           = 0x00000004,
-    };
-
-    // ns: fheroes2
-    enum
-    {
-	ALLOW_BUY_FROM_WELL		= 0x00000001,
-	SHOW_VISITED_CONTENT		= 0x00000002,
-	FAST_LOAD_GAME_DIALOG		= 0x00000004,
-	REMEMBER_LAST_FOCUS		= 0x00000008,
-	ABANDONED_MINE_RANDOM		= 0x00000010,
-	SAVE_MONSTER_BATTLE		= 0x00000020,
-	ALLOW_SET_GUARDIAN		= 0x00000040,
-	LEARN_SPELLS_WITH_DAY		= 0x00000080,
+	CASTLE_ALLOW_BUY_FROM_WELL	= 0x00000001,
+	WORLD_SHOW_VISITED_CONTENT	= 0x00000002,
+	GAME_FAST_LOAD_GAME_DIALOG	= 0x00000004,
+	GAME_REMEMBER_LAST_FOCUS	= 0x00000008,
+	WORLD_ABANDONED_MINE_RANDOM	= 0x00000010,
+	WORLD_SAVE_MONSTER_BATTLE	= 0x00000020,
+	WORLD_ALLOW_SET_GUARDIAN	= 0x00000040,
+	HEROES_LEARN_SPELLS_WITH_DAY	= 0x00000080,
 	BATTLE_SHOW_DAMAGE		= 0x00000100,
 	BATTLE_TROOP_DIRECTION		= 0x00000200,
 	BATTLE_SOFT_WAITING		= 0x00000400,
-	SAVE_REWRITE_CONFIRM		= 0x00000800,
-	POCKETPC_HIDE_CURSOR		= 0x00001000,
-    };
-
-    // ns: global
-    enum
-    {
-	LOADGAME          = 0x00000001,
-        PRICELOYALTY      = 0x00000004,
-
-	AUTOSAVE          = 0x00000010,
-
-	DEDICATEDSERVER   = 0x00000020,
-	LOCALCLIENT       = 0x00000040,
-
-	HIDEAIMOVE        = 0x00000080,
-
-	SHOWCPANEL        = 0x00000100,
-	SHOWRADAR         = 0x00000200,
-	SHOWICONS         = 0x00000400,
-	SHOWBUTTONS       = 0x00000800,
-	SHOWSTATUS        = 0x00001000,
-	SHOWSYSTEM        = 0x00002000,
-        HIDEINTERFACE     = 0x00004000,
-
-	FADE              = 0x00008000,
-        EVILINTERFACE     = 0x00010000,
-        FONTRENDERBLENDED = 0x00020000,
-
-        FULLSCREEN        = 0x00400000,
-        LOGO              = 0x00800000,
-
-        SOUND             = 0x01000000,
-        MUSIC_EXT         = 0x02000000,
-        MUSIC_CD          = 0x04000000,
-        MUSIC_MIDI        = 0x08000000,
-
-        EDITOR            = 0x20000000,
-        USEUNICODE        = 0x40000000,
-	ALTRESOURCE       = 0x80000000,
-
-	MUSIC		= MUSIC_CD | MUSIC_EXT | MUSIC_MIDI,
+	GAME_SAVE_REWRITE_CONFIRM	= 0x00000800,
+	GAME_POCKETPC_HIDE_CURSOR	= 0x00001000,
+	GAME_HIDE_AI_MOVE		= 0x00002000,
+        BATTLE_SET_AUTO			= 0x00004000,
+        BATTLE_SHOW_GRID		= 0x00008000,
+        BATTLE_SHOW_MOUSE_SHADOW	= 0x00010000,
+        BATTLE_SHOW_MOVE_SHADOW		= 0x00020000,
+	GAME_SHOW_SYSTEM_INFO		= 0x00040000,
+	GAME_AUTOSAVE_ON		= 0x00080000,
+	GAME_USE_FADE			= 0x00100000,
+	GAME_SHOW_SDL_LOGO		= 0x00200000,
+	GAME_EVIL_INTERFACE		= 0x00400000,
+	GAME_HIDE_INTERFACE		= 0x00800000,
+	POCKETPC_LOW_MEMORY		= 0x01000000,
+	POCKETPC_TAP_MODE		= 0x02000000,
     };
 
     static Settings & Get(void);
@@ -177,30 +132,19 @@ public:
     bool Music(void) const;
     bool CDMusic(void) const;
     bool FullScreen(void) const;
-    bool HideInterface(void) const;
     bool ShowControlPanel(void) const;
     bool ShowRadar(void) const;
     bool ShowIcons(void) const;
     bool ShowButtons(void) const;
     bool ShowStatus(void) const;
-    bool ShowSystem(void) const;
-    bool EvilInterface(void) const;
-    bool Logo(void) const;
-    bool BattleAuto(void) const;
-    bool BattleGrid(void) const;
-    bool BattleMovementShaded(void) const;
-    bool BattleMouseShaded(void) const;
     bool Unicode(void) const;
     bool PocketPC(void) const;
-    bool LowMemory(void) const;
-    bool TapMode(void) const;
-    bool HideAIMove(void) const;
     bool UseAltResource(void) const;
     bool PriceLoyaltyVersion(void) const;
     bool LoadedGameVersion(void) const;
-    bool UseFade(void) const;
-    bool AutoSave(void) const;
-
+    bool MusicExt(void) const;
+    bool MusicMIDI(void) const;
+    bool MusicCD(void) const;
     void BinarySave(void) const;
     void BinaryLoad(void);
 
@@ -221,6 +165,19 @@ public:
     bool ExtBattleSoftWait(void) const;
     bool ExtRewriteConfirm(void) const;
     bool ExtHideCursor(void) const;
+    bool ExtHideAIMove(void) const;
+    bool ExtBattleSetAuto(void) const;
+    bool ExtBattleShowGrid(void) const;
+    bool ExtBattleShowMouseShadow(void) const;
+    bool ExtBattleShowMoveShadow(void) const;
+    bool ExtShowSystemInfo(void) const;
+    bool ExtAutoSaveOn(void) const;
+    bool ExtUseFade(void) const;
+    bool ExtShowSDL(void) const;
+    bool ExtLowMemory(void) const;
+    bool ExtTapMode(void) const;
+    bool EvilInterface(void) const;
+    bool HideInterface(void) const;
 
     bool NetworkDedicatedServer(void) const;
     bool NetworkLocalClient(void) const;
@@ -229,7 +186,6 @@ public:
 
     u8   SoundVolume(void) const;
     u8   MusicVolume(void) const;
-    u32  GetMusicType(void) const;
 
     void SetDebug(const u16 d);
     void SetEditor(void);
@@ -304,8 +260,6 @@ public:
 
 protected:
     void Parse(const std::string & left, const std::string & right);
-    void SetStrModes(const std::string & key);
-    void ResetStrModes(const std::string & key);
 
 private:
     friend class Game::IO;
@@ -313,8 +267,6 @@ private:
     Settings();
 
     BitModes opt_global;
-    BitModes opt_battle;
-    BitModes opt_pocket;
     BitModes opt_fheroes2;
 
     const u8 major_version;

@@ -66,9 +66,9 @@ void Battle2::DialogBattleSettings(void)
 
     btn_ok.Draw();
 
-    if(conf.BattleGrid()) opt_grid.Press();
-    if(conf.BattleMovementShaded()) opt_shadow_movement.Press();
-    if(conf.BattleMouseShaded()) opt_shadow_cursor.Press();
+    if(conf.ExtBattleShowGrid()) opt_grid.Press();
+    if(conf.ExtBattleShowMoveShadow()) opt_shadow_movement.Press();
+    if(conf.ExtBattleShowMouseShadow()) opt_shadow_cursor.Press();
 
     opt_grid.Draw();
     opt_shadow_movement.Draw();
@@ -84,7 +84,7 @@ void Battle2::DialogBattleSettings(void)
 
 	if(le.MouseClickLeft(opt_grid))
 	{
-	    conf.SetBattleGrid(!conf.BattleGrid());
+	    conf.SetBattleGrid(!conf.ExtBattleShowGrid());
 	    cursor.Hide();
 	    opt_grid.isPressed() ? opt_grid.Release() : opt_grid.Press();
 	    opt_grid.Draw();
@@ -94,7 +94,7 @@ void Battle2::DialogBattleSettings(void)
 
 	if(le.MouseClickLeft(opt_shadow_movement))
 	{
-	    conf.SetBattleMovementShaded(!conf.BattleMovementShaded());
+	    conf.SetBattleMovementShaded(!conf.ExtBattleShowMoveShadow());
 	    cursor.Hide();
 	    opt_shadow_movement.isPressed() ? opt_shadow_movement.Release() : opt_shadow_movement.Press();
 	    opt_shadow_movement.Draw();
@@ -104,7 +104,7 @@ void Battle2::DialogBattleSettings(void)
 
 	if(le.MouseClickLeft(opt_shadow_cursor))
 	{
-	    conf.SetBattleMouseShaded(!conf.BattleMouseShaded());
+	    conf.SetBattleMouseShaded(!conf.ExtBattleShowMouseShadow());
 	    cursor.Hide();
 	    opt_shadow_cursor.isPressed() ? opt_shadow_cursor.Release() : opt_shadow_cursor.Press();
 	    opt_shadow_cursor.Draw();

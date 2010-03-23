@@ -59,7 +59,7 @@ Dialog::answer_t Heroes::OpenDialog(bool readonly, bool fade)
     Point dst_pt(cur_pt);
 
     // fade
-    if(fade && Settings::Get().UseFade()) display.Fade();
+    if(fade && Settings::Get().ExtUseFade()) display.Fade();
     display.FillRect(0, 0, 0, Rect(dst_pt, 640, 480));
 
     display.Blit(AGG::GetICN(ICN::HEROBKG, 0), dst_pt);

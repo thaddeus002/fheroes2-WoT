@@ -28,65 +28,91 @@
 #define DEFAULT_PORT	5154
 #define DEFAULT_DEBUG	(DBG_ENGINE | DBG_GAME | DBG_BATTLE | DBG_AI | DBG_NETWORK | DBG_WARN)
 
-namespace
+enum
 {
-    enum ns_t { NS_UNKNOWN, NS_BATTLE, NS_NETWORK, NS_POCKETPC, NS_GLOBAL, NS_FHEROES2 };
+    GLOBAL_LOADGAME          = 0x00000001,
+    GLOBAL_PRICELOYALTY      = 0x00000004,
 
-    struct ModeSetting
-    {
-	const ns_t ns;    // Name space
-        const char *name; // Name of config setting
-        u32 value;        // Mode value to set
-    } modeSettings[] =
-    {
-        { NS_GLOBAL,   "sound",                Settings::SOUND             },
-        { NS_GLOBAL,   "music",                Settings::MUSIC_MIDI        },
-        { NS_GLOBAL,   "fullscreen",           Settings::FULLSCREEN        },
-        { NS_GLOBAL,   "full screen",          Settings::FULLSCREEN        },
-        { NS_GLOBAL,   "hide interface",       Settings::HIDEINTERFACE     },
-        { NS_GLOBAL,   "evil interface",       Settings::EVILINTERFACE     },
-        { NS_GLOBAL,   "evilinterface",        Settings::EVILINTERFACE     },
-        { NS_GLOBAL,   "fade",                 Settings::FADE              },
-        { NS_GLOBAL,   "logo",                 Settings::LOGO              },
-        { NS_GLOBAL,   "unicode",              Settings::USEUNICODE        },
-        { NS_GLOBAL,   "autosave",             Settings::AUTOSAVE          },
-        { NS_GLOBAL,   "alt resource",         Settings::ALTRESOURCE       },
-        { NS_GLOBAL,   "alternative resource", Settings::ALTRESOURCE       },
-        { NS_GLOBAL,   "hide ai move",         Settings::HIDEAIMOVE        },
-        { NS_GLOBAL,   "system info",          Settings::SHOWSYSTEM        },
+    GLOBAL_POCKETPC          = 0x00000010,
+    GLOBAL_DEDICATEDSERVER   = 0x00000020,
+    GLOBAL_LOCALCLIENT       = 0x00000040,
 
-        { NS_BATTLE,   "battleauto",           Settings::BATTLEAUTO        },
-        { NS_BATTLE,   "battle auto",          Settings::BATTLEAUTO        },
-        { NS_BATTLE,   "battlegrid",           Settings::BATTLEGRID        },
-        { NS_BATTLE,   "battle grid",          Settings::BATTLEGRID        },
-        { NS_BATTLE,   "battlemoveshadow",     Settings::BATTLEMOVESHADOW  },
-        { NS_BATTLE,   "battle move shadow",   Settings::BATTLEMOVESHADOW  },
-        { NS_BATTLE,   "battlemouseshadow",    Settings::BATTLEMOUSESHADOW },
-        { NS_BATTLE,   "battle mouse shadow",  Settings::BATTLEMOUSESHADOW },
+    GLOBAL_SHOWCPANEL        = 0x00000100,
+    GLOBAL_SHOWRADAR         = 0x00000200,
+    GLOBAL_SHOWICONS         = 0x00000400,
+    GLOBAL_SHOWBUTTONS       = 0x00000800,
+    GLOBAL_SHOWSTATUS        = 0x00001000,
 
-        { NS_POCKETPC, "pocketpc",             Settings::POCKETPC          },
-        { NS_POCKETPC, "pocket pc",            Settings::POCKETPC          },
-        { NS_POCKETPC, "lowmemory",            Settings::LOWMEMORY         },
-        { NS_POCKETPC, "low memory",           Settings::LOWMEMORY         },
-        { NS_POCKETPC, "tapmode",              Settings::TAPMODE           },
-        { NS_POCKETPC, "tap mode",             Settings::TAPMODE           },
+    GLOBAL_FONTRENDERBLENDED = 0x00020000,
+    GLOBAL_FULLSCREEN        = 0x00400000,
 
-	{ NS_FHEROES2, _("castle: allow buy from well"),		Settings::ALLOW_BUY_FROM_WELL },
-	{ NS_FHEROES2, _("world: show visited content from objects"),	Settings::SHOW_VISITED_CONTENT },
-	{ NS_FHEROES2, _("game: fast load game dialog (L hot key)"),	Settings::FAST_LOAD_GAME_DIALOG },
-	{ NS_FHEROES2, _("game: remember last focus"),			Settings::REMEMBER_LAST_FOCUS },
-	{ NS_FHEROES2, _("world: abandoned mine random resource"),	Settings::ABANDONED_MINE_RANDOM },
-	{ NS_FHEROES2, _("world: save count monster after battle"),	Settings::SAVE_MONSTER_BATTLE },
-	{ NS_FHEROES2, _("world: allow set guardian to objects (future)"),Settings::ALLOW_SET_GUARDIAN },
-	{ NS_FHEROES2, _("heroes: learn new spells with day"),  	Settings::LEARN_SPELLS_WITH_DAY },
-	{ NS_FHEROES2, _("battle: show damage info"),    		Settings::BATTLE_SHOW_DAMAGE },
-	{ NS_FHEROES2, _("battle: troop direction to move"),		Settings::BATTLE_TROOP_DIRECTION },
-	{ NS_FHEROES2, _("battle: soft wait troop"),			Settings::BATTLE_SOFT_WAITING },
-	{ NS_FHEROES2, _("game: always confirm for rewrite savefile"),	Settings::SAVE_REWRITE_CONFIRM },
-	{ NS_FHEROES2, _("pocketpc: hide cursor"),			Settings::POCKETPC_HIDE_CURSOR },
+    GLOBAL_SOUND             = 0x01000000,
+    GLOBAL_MUSIC_EXT         = 0x02000000,
+    GLOBAL_MUSIC_CD          = 0x04000000,
+    GLOBAL_MUSIC_MIDI        = 0x08000000,
 
-        { NS_UNKNOWN,  NULL, 0 },
-    };
+    GLOBAL_EDITOR            = 0x20000000,
+    GLOBAL_USEUNICODE        = 0x40000000,
+    GLOBAL_ALTRESOURCE       = 0x80000000,
+
+    GLOBAL_MUSIC           = GLOBAL_MUSIC_CD | GLOBAL_MUSIC_EXT | GLOBAL_MUSIC_MIDI,
+};
+
+struct settings_t
+{
+    u32 id;
+    const char* str;
+
+    bool operator== (const std::string & s) const { return str && s == str; };
+    bool operator== (u32 i) const { return id && id == i; };
+};
+
+// external settings
+static const settings_t settingsGeneral[] =
+{
+    { GLOBAL_SOUND,       "sound",        },
+    { GLOBAL_MUSIC_MIDI,  "music",        },
+    { GLOBAL_FULLSCREEN,  "fullscreen",   },
+    { GLOBAL_FULLSCREEN,  "full screen",  },
+    { GLOBAL_USEUNICODE,  "unicode",      },
+    { GLOBAL_ALTRESOURCE, "alt resource", },
+    { GLOBAL_POCKETPC,    "pocketpc",     },
+    { GLOBAL_POCKETPC,    "pocket pc",    },
+
+    { 0, NULL, },
+};
+
+// internal settings
+static const settings_t settingsFHeroes2[] =
+{
+    { Settings::GAME_SAVE_REWRITE_CONFIRM,	_("game: always confirm for rewrite savefile"),		},
+    { Settings::GAME_POCKETPC_HIDE_CURSOR,	_("game: hide cursor (for pocketpc)"),			},
+    { Settings::GAME_FAST_LOAD_GAME_DIALOG,	_("game: fast load game dialog (L hot key)"),		},
+    { Settings::GAME_REMEMBER_LAST_FOCUS,	_("game: remember last focus"),				},
+    { Settings::GAME_HIDE_AI_MOVE,		_("game: hide AI move"),				},
+    { Settings::WORLD_SHOW_VISITED_CONTENT,	_("world: show visited content from objects"),		},
+    { Settings::WORLD_ABANDONED_MINE_RANDOM,	_("world: abandoned mine random resource"),		},
+    { Settings::WORLD_SAVE_MONSTER_BATTLE,	_("world: save count monster after battle"),		},
+    { Settings::WORLD_ALLOW_SET_GUARDIAN,	_("world: allow set guardian to objects (future)"),	},
+    { Settings::CASTLE_ALLOW_BUY_FROM_WELL,	_("castle: allow buy from well"),			},
+    { Settings::HEROES_LEARN_SPELLS_WITH_DAY,	_("heroes: learn new spells with day"),  		},
+    { Settings::BATTLE_SHOW_DAMAGE,		_("battle: show damage info"),    			},
+    { Settings::BATTLE_TROOP_DIRECTION,		_("battle: troop direction to move"),			},
+    { Settings::BATTLE_SOFT_WAITING,		_("battle: soft wait troop"),				},
+    { Settings::BATTLE_SET_AUTO,		_("battle: set auto mode "),				},
+    { Settings::BATTLE_SHOW_GRID,		_("battle: show grid"),					},
+    { Settings::BATTLE_SHOW_MOUSE_SHADOW,	_("battle: show mouse shadow"),				},
+    { Settings::BATTLE_SHOW_MOVE_SHADOW,	_("battle: show move shadow"),				},
+    { Settings::GAME_SHOW_SYSTEM_INFO,		_("game: show system info"),				},
+    { Settings::GAME_AUTOSAVE_ON,		_("game: autosave on"),					},
+    { Settings::GAME_USE_FADE,			_("game: use fade (640x480 only)"),			},
+    { Settings::GAME_SHOW_SDL_LOGO,		_("game: show SDL logo"),				},
+    { Settings::GAME_EVIL_INTERFACE,		_("game: use evil interface"),				},
+    { Settings::GAME_HIDE_INTERFACE,		_("game: hide interface"),				},
+    { Settings::POCKETPC_TAP_MODE,		_("pocketpc: tap mode"),				},
+    { Settings::POCKETPC_LOW_MEMORY,		_("pocketpc: low memory"),				},
+
+    { 0, NULL },
 };
 
 /* constructor */
@@ -112,13 +138,13 @@ Settings::Settings() : major_version(MAJOR_VERSION), minor_version(MINOR_VERSION
     // default maps dir
     list_maps_directory.push_back("maps");
 
-    opt_global.SetModes(FADE);
-    opt_global.SetModes(LOGO);
+    opt_fheroes2.SetModes(GAME_SHOW_SDL_LOGO);
+    opt_fheroes2.SetModes(GAME_AUTOSAVE_ON);
 
-    opt_global.SetModes(SHOWRADAR);
-    opt_global.SetModes(SHOWICONS);
-    opt_global.SetModes(SHOWBUTTONS);
-    opt_global.SetModes(SHOWSTATUS);
+    opt_global.SetModes(GLOBAL_SHOWRADAR);
+    opt_global.SetModes(GLOBAL_SHOWICONS);
+    opt_global.SetModes(GLOBAL_SHOWBUTTONS);
+    opt_global.SetModes(GLOBAL_SHOWSTATUS);
 }
 
 Settings & Settings::Get(void)
@@ -157,12 +183,28 @@ bool Settings::Read(const std::string & filename)
 
 	    String::Lower(left);
 	    String::Lower(lower_right);
-	    
+
 	    if(lower_right == "on")
-		SetStrModes(left);
+	    {
+		if(left == "debug") debug = DEFAULT_DEBUG;
+		else
+		{
+		    const settings_t* ptr = std::find(settingsGeneral,
+				settingsGeneral + sizeof(settingsGeneral) / sizeof(settings_t) - 1, left);
+		    if(ptr->str) opt_global.SetModes(ptr->id);
+		}
+	    }
 	    else
 	    if(lower_right == "off")
-		ResetStrModes(left);
+	    {
+		if(left == "debug") debug = DEFAULT_DEBUG;
+		else
+		{
+		    const settings_t* ptr = std::find(settingsGeneral,
+				settingsGeneral + sizeof(settingsGeneral) / sizeof(settings_t) - 1, left);
+		    if(ptr->str) opt_global.ResetModes(ptr->id);
+		}
+	    }
 	    else
 		Parse(left, right);
 	}
@@ -175,10 +217,10 @@ bool Settings::Read(const std::string & filename)
     list_maps_directory.unique();
 
 #ifndef WITH_TTF
-    opt_global.ResetModes(USEUNICODE);
+    opt_global.ResetModes(GLOBAL_USEUNICODE);
 #endif
 
-    if(font_normal.empty() || font_small.empty()) opt_global.ResetModes(USEUNICODE);
+    if(font_normal.empty() || font_small.empty()) opt_global.ResetModes(GLOBAL_USEUNICODE);
 
 #ifdef BUILD_RELEASE
     debug &= 0x000F;
@@ -187,30 +229,27 @@ bool Settings::Read(const std::string & filename)
 
     if(video_mode.w < 640 || video_mode.h < 480)
     {
-	opt_pocket.SetModes(POCKETPC);
+	opt_global.SetModes(GLOBAL_POCKETPC);
     }
     else
     {
-        opt_pocket.ResetModes(POCKETPC);
+        opt_global.ResetModes(GLOBAL_POCKETPC);
     }
 
-    if(opt_pocket.Modes(POCKETPC))
+    if(opt_global.Modes(GLOBAL_POCKETPC))
     {
-	opt_global.SetModes(HIDEINTERFACE);
-	opt_pocket.SetModes(TAPMODE);
-	//opt_pocket.SetModes(LOWMEMORY);
-	opt_battle.SetModes(BATTLEGRID);
-	opt_battle.SetModes(BATTLEMOUSESHADOW);
-	opt_battle.SetModes(BATTLEMOVESHADOW);
+	opt_fheroes2.SetModes(GAME_HIDE_INTERFACE);
+	opt_fheroes2.SetModes(POCKETPC_TAP_MODE);
+	//opt_fheroes2.SetModes(POCKETPC_LOW_MEMORY);
     }
 
-    if(opt_global.Modes(HIDEINTERFACE))
+    if(opt_fheroes2.Modes(GAME_HIDE_INTERFACE))
     {
-       opt_global.SetModes(SHOWCPANEL);
-       opt_global.ResetModes(SHOWRADAR);
-       opt_global.ResetModes(SHOWICONS);
-       opt_global.ResetModes(SHOWBUTTONS);
-       opt_global.ResetModes(SHOWSTATUS);
+       opt_global.SetModes(GLOBAL_SHOWCPANEL);
+       opt_global.ResetModes(GLOBAL_SHOWRADAR);
+       opt_global.ResetModes(GLOBAL_SHOWICONS);
+       opt_global.ResetModes(GLOBAL_SHOWBUTTONS);
+       opt_global.ResetModes(GLOBAL_SHOWSTATUS);
     }
 
     return true;
@@ -257,25 +296,14 @@ void Settings::Dump(std::ostream & stream) const
     String::AddInt(str, video_mode.h);
 
     stream << "videomode = " << str << std::endl;
-    stream << "sound = " << (opt_global.Modes(SOUND) ? "on"  : "off") << std::endl;
-    stream << "music = " << (opt_global.Modes(MUSIC_CD) ? "cd" : (opt_global.Modes(MUSIC_MIDI) ? "midi" : (opt_global.Modes(MUSIC_EXT) ? "ext" : "off"))) << std::endl;
+    stream << "sound = " << (opt_global.Modes(GLOBAL_SOUND) ? "on"  : "off") << std::endl;
+    stream << "music = " << (opt_global.Modes(GLOBAL_MUSIC_CD) ? "cd" : (opt_global.Modes(GLOBAL_MUSIC_MIDI) ? "midi" : (opt_global.Modes(GLOBAL_MUSIC_EXT) ? "ext" : "off"))) << std::endl;
     stream << "sound volume = " << static_cast<int>(sound_volume) << std::endl;
     stream << "music volume = " << static_cast<int>(music_volume) << std::endl;
     stream << "animation = " << static_cast<int>(animation) << std::endl;
-    stream << "fullscreen = " << (opt_global.Modes(FULLSCREEN) ? "on"  : "off") << std::endl;
-    stream << "hide interface = " << (opt_global.Modes(HIDEINTERFACE) ? "on"  : "off") << std::endl;
-    stream << "evil interface = " << (opt_global.Modes(EVILINTERFACE) ? "on"  : "off") << std::endl;
-    stream << "fade = " << (opt_global.Modes(FADE) ? "on"  : "off") << std::endl;
-    stream << "alt resource = " << (opt_global.Modes(ALTRESOURCE) ? "on"  : "off") << std::endl;
+    stream << "fullscreen = " << (opt_global.Modes(GLOBAL_FULLSCREEN) ? "on"  : "off") << std::endl;
+    stream << "alt resource = " << (opt_global.Modes(GLOBAL_ALTRESOURCE) ? "on"  : "off") << std::endl;
     stream << "debug = " << (debug ? "on"  : "off") << std::endl;
-
-    stream << "battle auto = " << (opt_battle.Modes(BATTLEAUTO) ? "on" : "off") << std::endl;
-    stream << "battle grid = " << (opt_battle.Modes(BATTLEGRID) ? "on" : "off") << std::endl;
-    stream << "battle movement shadow = " << (opt_battle.Modes(BATTLEMOVESHADOW) ? "on" : "off") << std::endl;
-    stream << "battle mouse shadow = " << (opt_battle.Modes(BATTLEMOUSESHADOW) ? "on" : "off") << std::endl;
-
-    if(opt_global.Modes(HIDEAIMOVE))
-    stream << "hide ai move = on" << std::endl;
 
 #ifdef WITH_TTF
     stream << "fonts normal = " << font_normal << std::endl;
@@ -284,21 +312,16 @@ void Settings::Dump(std::ostream & stream) const
     stream << "force lang = " << force_lang << std::endl;
     stream << "fonts normal size = " << static_cast<int>(size_normal) << std::endl;
     stream << "fonts small size = " << static_cast<int>(size_small) << std::endl;
-    stream << "unicode = " << (opt_global.Modes(USEUNICODE) ? "on" : "off") << std::endl;
+    stream << "unicode = " << (opt_global.Modes(GLOBAL_USEUNICODE) ? "on" : "off") << std::endl;
 #endif
 
 #ifndef WITH_MIXER
     stream << "playmus command = " << playmus_command << std::endl;
 #endif
 
-    stream << "autosave = " << (opt_global.Modes(AUTOSAVE) ? "on" : "off") << std::endl;
     stream << "port = " << port << std::endl;
 
-    if(opt_pocket.Modes(TAPMODE))
-    stream << "tap mode = on" << std::endl;
-    if(opt_pocket.Modes(LOWMEMORY))
-    stream << "low memory = on" << std::endl;
-    if(opt_pocket.Modes(POCKETPC))
+    if(opt_global.Modes(GLOBAL_POCKETPC))
     stream << "pocket pc = on" << std::endl;
 
     stream << std::endl;
@@ -347,7 +370,7 @@ const std::string & Settings::FontsSmall(void) const { return font_small; }
 const std::string & Settings::ForceLang(void) const { return force_lang; }
 u8 Settings::FontsNormalSize(void) const { return size_normal; }
 u8 Settings::FontsSmallSize(void) const { return size_small; }
-bool Settings::FontsRenderBlended(void) const { return opt_global.Modes(FONTRENDERBLENDED); }
+bool Settings::FontsRenderBlended(void) const { return opt_global.Modes(GLOBAL_FONTRENDERBLENDED); }
 
 const std::string & Settings::BuildVersion(void) const { return build_version; }
 
@@ -361,65 +384,43 @@ const ListMapsDirectory & Settings::GetListMapsDirectory(void) const { return li
 const std::string & Settings::LocalPrefix(void) const { return local_prefix; }
 const std::string & Settings::PlayMusCommand(void) const { return playmus_command; };
 
+bool Settings::MusicExt(void) const { return opt_global.Modes(GLOBAL_MUSIC_EXT); }
+bool Settings::MusicMIDI(void) const { return opt_global.Modes(GLOBAL_MUSIC_MIDI); }
+bool Settings::MusicCD(void) const { return opt_global.Modes(GLOBAL_MUSIC_CD); }
+
 /* return editor */
-bool Settings::Editor(void) const { return opt_global.Modes(EDITOR); }
+bool Settings::Editor(void) const { return opt_global.Modes(GLOBAL_EDITOR); }
 
 /* return sound */
-bool Settings::Sound(void) const { return opt_global.Modes(SOUND); }
+bool Settings::Sound(void) const { return opt_global.Modes(GLOBAL_SOUND); }
 
 /* return music */
-bool Settings::Music(void) const { return opt_global.Modes(MUSIC); }
+bool Settings::Music(void) const { return opt_global.Modes(GLOBAL_MUSIC); }
 
-bool Settings::CDMusic(void) const { return opt_global.Modes(MUSIC_CD | MUSIC_EXT); }
+bool Settings::CDMusic(void) const { return opt_global.Modes(GLOBAL_MUSIC_CD | GLOBAL_MUSIC_EXT); }
 
 /* return animation */
 u8   Settings::Animation(void) const { return animation; }
 
 /* return full screen */
-bool Settings::FullScreen(void) const { return opt_global.Modes(FULLSCREEN); }
+bool Settings::FullScreen(void) const { return opt_global.Modes(GLOBAL_FULLSCREEN); }
 
-/* return evil interface */
-bool Settings::EvilInterface(void) const { return opt_global.Modes(EVILINTERFACE); }
+bool Settings::UseAltResource(void) const { return opt_global.Modes(GLOBAL_ALTRESOURCE); }
+bool Settings::PriceLoyaltyVersion(void) const { return opt_global.Modes(GLOBAL_PRICELOYALTY); }
+bool Settings::LoadedGameVersion(void) const { return opt_global.Modes(GLOBAL_LOADGAME); }
 
-bool Settings::HideInterface(void) const { return opt_global.Modes(HIDEINTERFACE); }
-
-bool Settings::UseAltResource(void) const { return opt_global.Modes(ALTRESOURCE); }
-bool Settings::PriceLoyaltyVersion(void) const { return opt_global.Modes(PRICELOYALTY); }
-bool Settings::LoadedGameVersion(void) const { return opt_global.Modes(LOADGAME); }
-bool Settings::UseFade(void) const { return opt_global.Modes(FADE); }
-bool Settings::AutoSave(void) const { return opt_global.Modes(AUTOSAVE); }
-
-bool Settings::ShowControlPanel(void) const { return opt_global.Modes(SHOWCPANEL); }
-bool Settings::ShowRadar(void) const { return opt_global.Modes(SHOWRADAR); }
-bool Settings::ShowIcons(void) const { return opt_global.Modes(SHOWICONS); }
-bool Settings::ShowButtons(void) const { return opt_global.Modes(SHOWBUTTONS); }
-bool Settings::ShowStatus(void) const { return opt_global.Modes(SHOWSTATUS); }
-bool Settings::ShowSystem(void) const { return opt_global.Modes(SHOWSYSTEM); }
-
-/* get show logo */
-bool Settings::Logo(void) const { return opt_global.Modes(LOGO); }
-
-bool Settings::BattleAuto(void) const { return opt_battle.Modes(BATTLEAUTO); }
-
-/* battle grid */
-bool Settings::BattleGrid(void) const { return opt_battle.Modes(BATTLEGRID); }
-
-/* battle shaded grid */
-bool Settings::BattleMovementShaded(void) const { return opt_battle.Modes(BATTLEMOVESHADOW); }
-
-/* battle shaded mouse */
-bool Settings::BattleMouseShaded(void) const { return opt_battle.Modes(BATTLEMOUSESHADOW); }
+bool Settings::ShowControlPanel(void) const { return opt_global.Modes(GLOBAL_SHOWCPANEL); }
+bool Settings::ShowRadar(void) const { return opt_global.Modes(GLOBAL_SHOWRADAR); }
+bool Settings::ShowIcons(void) const { return opt_global.Modes(GLOBAL_SHOWICONS); }
+bool Settings::ShowButtons(void) const { return opt_global.Modes(GLOBAL_SHOWBUTTONS); }
+bool Settings::ShowStatus(void) const { return opt_global.Modes(GLOBAL_SHOWSTATUS); }
 
 /* unicode support */
-bool Settings::Unicode(void) const { return opt_global.Modes(USEUNICODE); }
+bool Settings::Unicode(void) const { return opt_global.Modes(GLOBAL_USEUNICODE); }
 
-bool Settings::PocketPC(void) const { return opt_pocket.Modes(POCKETPC); }
-bool Settings::LowMemory(void) const { return opt_pocket.Modes(LOWMEMORY); }
-bool Settings::TapMode(void) const { return opt_pocket.Modes(TAPMODE); }
-bool Settings::HideAIMove(void) const { return opt_global.Modes(HIDEAIMOVE); }
-
-bool Settings::NetworkDedicatedServer(void) const { return opt_global.Modes(DEDICATEDSERVER); }
-bool Settings::NetworkLocalClient(void) const { return opt_global.Modes(LOCALCLIENT); }
+bool Settings::PocketPC(void) const { return opt_global.Modes(GLOBAL_POCKETPC); }
+bool Settings::NetworkDedicatedServer(void) const { return opt_global.Modes(GLOBAL_DEDICATEDSERVER); }
+bool Settings::NetworkLocalClient(void) const { return opt_global.Modes(GLOBAL_LOCALCLIENT); }
 
 /* get video mode */
 const Size & Settings::VideoMode(void) const { return video_mode; }
@@ -451,7 +452,7 @@ void Settings::Parse(const std::string & left, const std::string & right)
     else
     if(left == "fonts small size") size_small = String::ToInt(right);
     else
-    if(left == "fonts render" && right == "blended") opt_global.SetModes(FONTRENDERBLENDED);
+    if(left == "fonts render" && right == "blended") opt_global.SetModes(GLOBAL_FONTRENDERBLENDED);
     else
     // data directory
     if(left == "data") path_data_directory = right;
@@ -466,18 +467,18 @@ void Settings::Parse(const std::string & left, const std::string & right)
 
         if(lower == "midi")
         {
-            opt_global.ResetModes(MUSIC);
-            opt_global.SetModes(MUSIC_MIDI);
+            opt_global.ResetModes(GLOBAL_MUSIC);
+            opt_global.SetModes(GLOBAL_MUSIC_MIDI);
         }
         else if(lower == "cd")
         {
-            opt_global.ResetModes(MUSIC);
-            opt_global.SetModes(MUSIC_CD);
+            opt_global.ResetModes(GLOBAL_MUSIC);
+            opt_global.SetModes(GLOBAL_MUSIC_CD);
         }
         else if(lower == "ext")
         {
-            opt_global.ResetModes(MUSIC);
-            opt_global.SetModes(MUSIC_EXT);
+            opt_global.ResetModes(GLOBAL_MUSIC);
+            opt_global.SetModes(GLOBAL_MUSIC_EXT);
         }
     }
     else
@@ -576,48 +577,6 @@ void Settings::SetGameDifficulty(const Difficulty::difficulty_t d) { game_diffic
 
 void Settings::SetCurrentColor(const Color::color_t c) { cur_color = c; }
 void Settings::SetMyColor(const Color::color_t c) { my_color = c; }
-
-/**/
-void Settings::SetStrModes(const std::string & key)
-{
-    // debug
-    if(key == "debug") debug = DEFAULT_DEBUG;
-    else
-    {
-	ModeSetting* ptr = modeSettings;
-	while(NS_UNKNOWN != ptr->ns && key != ptr->name) ++ptr;
-
-	switch(ptr->ns)
-        {
-	    case NS_BATTLE:   opt_battle.SetModes(ptr->value); break;
-	    case NS_NETWORK:  opt_global.SetModes(ptr->value); break;
-	    case NS_POCKETPC: opt_pocket.SetModes(ptr->value); break;
-	    case NS_GLOBAL:   opt_global.SetModes(ptr->value); break;
-	    case NS_FHEROES2: opt_fheroes2.SetModes(ptr->value); break;
-	    default: break;
-	}
-    }
-}
-
-void Settings::ResetStrModes(const std::string & key)
-{
-    // debug
-    if(key == "debug")		debug = 0;
-    else
-    {
-	ModeSetting* ptr = modeSettings;
-	while(NS_UNKNOWN != ptr->ns && key != ptr->name) ++ptr;
-
-	switch(ptr->ns)
-        {
-	    case NS_BATTLE:   opt_battle.ResetModes(ptr->value); break;
-	    case NS_NETWORK:  opt_global.ResetModes(ptr->value); break;
-	    case NS_POCKETPC: opt_pocket.ResetModes(ptr->value); break;
-	    case NS_GLOBAL:   opt_global.ResetModes(ptr->value); break;
-	    default: break;
-	}
-    }
-}
 
 u8   Settings::SoundVolume(void) const
 {
@@ -846,103 +805,92 @@ void Settings::FixKingdomRandomRace(void)
 
 void Settings::SetEditor(void)
 {
-    opt_global.SetModes(EDITOR);
+    opt_global.SetModes(GLOBAL_EDITOR);
 }
 
 void Settings::SetUnicode(bool f)
 {
-    f ? opt_global.SetModes(USEUNICODE) : opt_global.ResetModes(USEUNICODE);
+    f ? opt_global.SetModes(GLOBAL_USEUNICODE) : opt_global.ResetModes(GLOBAL_USEUNICODE);
 }
 
 void Settings::SetPriceLoyaltyVersion(void)
 {
-    opt_global.SetModes(PRICELOYALTY);
-}
-
-u32 Settings::GetMusicType(void) const
-{
-    if(opt_global.Modes(MUSIC_EXT)) return MUSIC_EXT;
-    else
-    if(opt_global.Modes(MUSIC_CD)) return MUSIC_CD;
-    else
-    if(opt_global.Modes(MUSIC_MIDI)) return MUSIC_MIDI;
-
-    return 0;
+    opt_global.SetModes(GLOBAL_PRICELOYALTY);
 }
 
 void Settings::SetEvilInterface(bool f)
 {
-    f ? opt_global.SetModes(EVILINTERFACE) : opt_global.ResetModes(EVILINTERFACE);
+    f ? opt_fheroes2.SetModes(GAME_EVIL_INTERFACE) : opt_fheroes2.ResetModes(GAME_EVIL_INTERFACE);
 }
 
 void Settings::SetBattleAuto(bool f)
 {
-    f ? opt_battle.SetModes(BATTLEAUTO) : opt_battle.ResetModes(BATTLEAUTO);
+    f ? opt_fheroes2.SetModes(BATTLE_SET_AUTO) : opt_fheroes2.ResetModes(BATTLE_SET_AUTO);
 }
 
 void Settings::SetBattleGrid(bool f)
 {
-    f ? opt_battle.SetModes(BATTLEGRID) : opt_battle.ResetModes(BATTLEGRID);
+    f ? opt_fheroes2.SetModes(BATTLE_SHOW_GRID) : opt_fheroes2.ResetModes(BATTLE_SHOW_GRID);
 }
 
 void Settings::SetBattleMovementShaded(bool f)
 {
-    f ? opt_battle.SetModes(BATTLEMOVESHADOW) : opt_battle.ResetModes(BATTLEMOVESHADOW);
+    f ? opt_fheroes2.SetModes(BATTLE_SHOW_MOVE_SHADOW) : opt_fheroes2.ResetModes(BATTLE_SHOW_MOVE_SHADOW);
 }
 
 void Settings::SetBattleMouseShaded(bool f)
 {
-    f ? opt_battle.SetModes(BATTLEMOUSESHADOW) : opt_battle.ResetModes(BATTLEMOUSESHADOW);
+    f ? opt_fheroes2.SetModes(BATTLE_SHOW_MOUSE_SHADOW) : opt_fheroes2.ResetModes(BATTLE_SHOW_MOUSE_SHADOW);
 }
 
 void Settings::ResetSound(void)
 {
-    opt_global.ResetModes(SOUND);
+    opt_global.ResetModes(GLOBAL_SOUND);
 }
 
 void Settings::ResetMusic(void)
 {
-    opt_global.ResetModes(MUSIC);
+    opt_global.ResetModes(GLOBAL_MUSIC);
 }
 
 void Settings::SetLoadedGameVersion(bool f)
 {
-    f ? opt_global.SetModes(LOADGAME) : opt_global.ResetModes(LOADGAME);
+    f ? opt_global.SetModes(GLOBAL_LOADGAME) : opt_global.ResetModes(GLOBAL_LOADGAME);
 }
 
 void Settings::SetShowPanel(bool f)
 {
-    f ? opt_global.SetModes(SHOWCPANEL) : opt_global.ResetModes(SHOWCPANEL);
+    f ? opt_global.SetModes(GLOBAL_SHOWCPANEL) : opt_global.ResetModes(GLOBAL_SHOWCPANEL);
 }
 
 void Settings::SetShowRadar(bool f)
 {
-    f ? opt_global.SetModes(SHOWRADAR) : opt_global.ResetModes(SHOWRADAR);
+    f ? opt_global.SetModes(GLOBAL_SHOWRADAR) : opt_global.ResetModes(GLOBAL_SHOWRADAR);
 }
 
 void Settings::SetShowIcons(bool f)
 {
-    f ? opt_global.SetModes(SHOWICONS) : opt_global.ResetModes(SHOWICONS);
+    f ? opt_global.SetModes(GLOBAL_SHOWICONS) : opt_global.ResetModes(GLOBAL_SHOWICONS);
 }
 
 void Settings::SetShowButtons(bool f)
 {
-    f ? opt_global.SetModes(SHOWBUTTONS) : opt_global.ResetModes(SHOWBUTTONS);
+    f ? opt_global.SetModes(GLOBAL_SHOWBUTTONS) : opt_global.ResetModes(GLOBAL_SHOWBUTTONS);
 }
 
 void Settings::SetShowStatus(bool f)
 {
-    f ? opt_global.SetModes(SHOWSTATUS) : opt_global.ResetModes(SHOWSTATUS);
+    f ? opt_global.SetModes(GLOBAL_SHOWSTATUS) : opt_global.ResetModes(GLOBAL_SHOWSTATUS);
 }
 
 void Settings::SetNetworkLocalClient(bool f)
 {
-    f ? opt_global.SetModes(LOCALCLIENT) : opt_global.ResetModes(LOCALCLIENT);
+    f ? opt_global.SetModes(GLOBAL_LOCALCLIENT) : opt_global.ResetModes(GLOBAL_LOCALCLIENT);
 }
 
 void Settings::SetNetworkDedicatedServer(bool f)
 {
-    f ? opt_global.SetModes(DEDICATEDSERVER) : opt_global.ResetModes(DEDICATEDSERVER);
+    f ? opt_global.SetModes(GLOBAL_DEDICATEDSERVER) : opt_global.ResetModes(GLOBAL_DEDICATEDSERVER);
 }
 
 bool Settings::ExtModes(u32 f) const
@@ -952,9 +900,10 @@ bool Settings::ExtModes(u32 f) const
 
 const char* Settings::ExtName(u32 f) const
 {
-    ModeSetting* ptr = modeSettings;
-    while(NS_UNKNOWN != ptr->ns) if(NS_FHEROES2 == ptr->ns && ptr->value == f) return ptr->name; else ++ptr;
-    return NULL;
+    const settings_t* ptr = std::find(settingsFHeroes2,
+		settingsFHeroes2 + sizeof(settingsFHeroes2) / sizeof(settings_t) - 1, f);
+
+    return ptr ? ptr->str : NULL;
 }
 
 void Settings::ExtSetModes(u32 f)
@@ -969,42 +918,42 @@ void Settings::ExtResetModes(u32 f)
 
 bool Settings::ExtAllowBuyFromWell(void) const
 {
-    return opt_fheroes2.Modes(ALLOW_BUY_FROM_WELL);
+    return opt_fheroes2.Modes(CASTLE_ALLOW_BUY_FROM_WELL);
 }
 
 bool Settings::ExtShowVisitedContent(void) const
 {
-    return opt_fheroes2.Modes(SHOW_VISITED_CONTENT);
+    return opt_fheroes2.Modes(WORLD_SHOW_VISITED_CONTENT);
 }
 
 bool Settings::ExtFastLoadGameDialog(void) const
 {
-    return opt_fheroes2.Modes(FAST_LOAD_GAME_DIALOG);
+    return opt_fheroes2.Modes(GAME_FAST_LOAD_GAME_DIALOG);
 }
 
 bool Settings::ExtRememberLastFocus(void) const
 {
-    return opt_fheroes2.Modes(REMEMBER_LAST_FOCUS);
+    return opt_fheroes2.Modes(GAME_REMEMBER_LAST_FOCUS);
 }
 
 bool Settings::ExtAbandonedMineRandom(void) const
 {
-    return opt_fheroes2.Modes(ABANDONED_MINE_RANDOM);
+    return opt_fheroes2.Modes(WORLD_ABANDONED_MINE_RANDOM);
 }
 
 bool Settings::ExtSaveMonsterBattle(void) const
 {
-    return opt_fheroes2.Modes(SAVE_MONSTER_BATTLE);
+    return opt_fheroes2.Modes(WORLD_SAVE_MONSTER_BATTLE);
 }
 
 bool Settings::ExtAllowSetGuardian(void) const
 {
-    return opt_fheroes2.Modes(ALLOW_SET_GUARDIAN);
+    return opt_fheroes2.Modes(WORLD_ALLOW_SET_GUARDIAN);
 }
 
 bool Settings::ExtLearnSpellsWithDay(void) const
 {
-    return opt_fheroes2.Modes(LEARN_SPELLS_WITH_DAY);
+    return opt_fheroes2.Modes(HEROES_LEARN_SPELLS_WITH_DAY);
 }
 
 bool Settings::ExtBattleShowDamage(void) const
@@ -1022,14 +971,79 @@ bool Settings::ExtBattleSoftWait(void) const
     return opt_fheroes2.Modes(BATTLE_SOFT_WAITING);
 }
 
+bool Settings::ExtBattleSetAuto(void) const
+{
+    return opt_fheroes2.Modes(BATTLE_SET_AUTO);
+}
+
+bool Settings::ExtBattleShowGrid(void) const
+{
+    return opt_fheroes2.Modes(BATTLE_SHOW_GRID);
+}
+
+bool Settings::ExtBattleShowMouseShadow(void) const
+{
+    return opt_fheroes2.Modes(BATTLE_SHOW_MOUSE_SHADOW);
+}
+
+bool Settings::ExtBattleShowMoveShadow(void) const
+{
+    return opt_fheroes2.Modes(BATTLE_SHOW_MOVE_SHADOW);
+}
+
 bool Settings::ExtRewriteConfirm(void) const
 {
-    return opt_fheroes2.Modes(SAVE_REWRITE_CONFIRM);
+    return opt_fheroes2.Modes(GAME_SAVE_REWRITE_CONFIRM);
 }
 
 bool Settings::ExtHideCursor(void) const
 {
-    return opt_fheroes2.Modes(POCKETPC_HIDE_CURSOR);
+    return opt_fheroes2.Modes(GAME_POCKETPC_HIDE_CURSOR);
+}
+
+bool Settings::ExtHideAIMove(void) const
+{
+    return opt_fheroes2.Modes(GAME_HIDE_AI_MOVE);
+}
+
+bool Settings::ExtShowSystemInfo(void) const
+{
+    return opt_fheroes2.Modes(GAME_SHOW_SYSTEM_INFO);
+}
+
+bool Settings::ExtAutoSaveOn(void) const
+{
+    return opt_fheroes2.Modes(GAME_AUTOSAVE_ON);
+}
+
+bool Settings::ExtUseFade(void) const
+{
+    return opt_fheroes2.Modes(GAME_USE_FADE);
+}
+
+bool Settings::ExtShowSDL(void) const
+{
+    return opt_fheroes2.Modes(GAME_SHOW_SDL_LOGO);
+}
+
+bool Settings::EvilInterface(void) const
+{
+    return opt_fheroes2.Modes(GAME_EVIL_INTERFACE);
+}
+
+bool Settings::HideInterface(void) const
+{
+    return opt_fheroes2.Modes(GAME_HIDE_INTERFACE);
+}
+
+bool Settings::ExtLowMemory(void) const
+{
+    return opt_fheroes2.Modes(POCKETPC_LOW_MEMORY);
+}
+
+bool Settings::ExtTapMode(void) const
+{
+    return opt_fheroes2.Modes(POCKETPC_TAP_MODE);
 }
 
 void Settings::BinarySave(void) const

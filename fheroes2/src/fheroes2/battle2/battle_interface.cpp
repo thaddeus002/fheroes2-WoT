@@ -612,7 +612,7 @@ Battle2::Interface::Interface(Arena & a, u16 center) : arena(a), icn_cbkg(ICN::U
     }
 
     if(grave){ icn_cbkg = ICN::CBKGGRAV; light = true; icn_frng = ICN::FRNG0001; }
-    if(conf.PocketPC() || conf.LowMemory()) icn_frng = ICN::UNKNOWN;
+    if(conf.PocketPC() || conf.ExtLowMemory()) icn_frng = ICN::UNKNOWN;
 
     // hexagon
     DrawHexagon(sf_hexagon, (light ? 0xE0 : 0xE5));
@@ -641,7 +641,7 @@ Battle2::Interface::~Interface()
 {
     if(opponent1) delete opponent1;
     if(opponent2) delete opponent2;
-    if(Settings::Get().BattleAuto()) Settings::Get().SetBattleAuto(false);
+    if(Settings::Get().ExtBattleSetAuto()) Settings::Get().SetBattleAuto(false);
 }
 
 const Rect & Battle2::Interface::GetArea(void) const
@@ -915,7 +915,7 @@ void Battle2::Interface::RedrawCover(void)
     if(arena.castle) RedrawCastle1();
 
     // shadow
-    if(!b_move && conf.BattleMovementShaded())
+    if(!b_move && conf.ExtBattleShowMoveShadow())
     {
 	Board::const_iterator it1 = arena.board.begin();
 	Board::const_iterator it2 = arena.board.end();
@@ -925,7 +925,7 @@ void Battle2::Interface::RedrawCover(void)
     }
 
     // grid
-    if(conf.BattleGrid())
+    if(conf.ExtBattleShowGrid())
     {
 	Board::const_iterator it1 = arena.board.begin();
 	Board::const_iterator it2 = arena.board.end();
@@ -935,7 +935,7 @@ void Battle2::Interface::RedrawCover(void)
     }
 
     // cursor
-    if(conf.BattleMouseShaded() && 0 <= cursor && b_current && Cursor::Get().Themes() != Cursor::WAR_NONE)
+    if(conf.ExtBattleShowMouseShadow() && 0 <= cursor && b_current && Cursor::Get().Themes() != Cursor::WAR_NONE)
 	display.Blit(sf_cursor, arena.board[cursor].GetPos());
 
     RedrawKilled();
@@ -1696,7 +1696,7 @@ void Battle2::Interface::KeyPress_o(void)
 void Battle2::Interface::KeyPress_a(const Stats & b, Actions & a)
 {
     btn_auto.PressDraw();
-    if(Settings::Get().BattleAuto())
+    if(Settings::Get().ExtBattleSetAuto())
 	ResetAutoBattle();
     else
 	SetAutoBattle(b, a);
@@ -1711,7 +1711,7 @@ void Battle2::Interface::ButtonAutoAction(const Stats & b, Actions & a)
 
     if(le.MouseClickLeft(btn_auto))
     {
-	if(Settings::Get().BattleAuto())
+	if(Settings::Get().ExtBattleSetAuto())
 	    ResetAutoBattle();
 	else
 	    SetAutoBattle(b, a);
@@ -1779,7 +1779,7 @@ void Battle2::Interface::MousePressRightBoardAction(u16 themes, s16 index, Actio
 	if(b)
 	{
 	    const u8 allow = GetAllowSwordDirection(index);
-	    if(!Settings::Get().TapMode() || !allow)
+	    if(!Settings::Get().ExtTapMode() || !allow)
 		Dialog::ArmyInfo(b->troop, Dialog::READONLY);
 	    else
 	    switch(PocketPC::GetCursorAttackDialog(b->GetCellPosition(), allow))
@@ -3776,7 +3776,7 @@ bool Battle2::Interface::IdleTroopsAnimation(u32 ticket)
 void Battle2::Interface::CheckGlobalEvents(LocalEvent & le, u32 ticket)
 {
     // reset auto battle
-    if(le.KeyPress() && Settings::Get().BattleAuto()) ResetAutoBattle();
+    if(le.KeyPress() && Settings::Get().ExtBattleSetAuto()) ResetAutoBattle();
 
     // animation opponents
     if(Game::ShouldAnimateInfrequent(ticket, animation_delay * 2))

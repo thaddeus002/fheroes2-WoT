@@ -92,6 +92,7 @@ void SettingsListBox::ActionListSingleClick(u32 & item)
 void Dialog::ExtSettings(void)
 {
     Display & display = Display::Get();
+    const Settings & conf = Settings::Get();
 
     // cursor
     Cursor & cursor = Cursor::Get();
@@ -114,19 +115,40 @@ void Dialog::ExtSettings(void)
 
     std::vector<u32> states;
 
-    states.push_back(Settings::REMEMBER_LAST_FOCUS);
-    states.push_back(Settings::FAST_LOAD_GAME_DIALOG);
-    states.push_back(Settings::SAVE_REWRITE_CONFIRM);
-    states.push_back(Settings::SHOW_VISITED_CONTENT);
-    states.push_back(Settings::ABANDONED_MINE_RANDOM);
-    states.push_back(Settings::SAVE_MONSTER_BATTLE);
-    states.push_back(Settings::ALLOW_SET_GUARDIAN);
-    states.push_back(Settings::LEARN_SPELLS_WITH_DAY);
-    states.push_back(Settings::ALLOW_BUY_FROM_WELL);
+    states.push_back(Settings::GAME_FAST_LOAD_GAME_DIALOG);
+    states.push_back(Settings::GAME_SAVE_REWRITE_CONFIRM);
+    if(conf.PocketPC())
+	states.push_back(Settings::GAME_POCKETPC_HIDE_CURSOR);
+    states.push_back(Settings::GAME_REMEMBER_LAST_FOCUS);
+    states.push_back(Settings::GAME_SHOW_SYSTEM_INFO);
+    states.push_back(Settings::GAME_EVIL_INTERFACE);
+    if(!conf.PocketPC())
+	states.push_back(Settings::GAME_HIDE_INTERFACE);
+    states.push_back(Settings::GAME_AUTOSAVE_ON);
+    if(conf.VideoMode().w == 640 && conf.VideoMode().w == 480)
+	states.push_back(Settings::GAME_USE_FADE);
+#ifdef BUILD_RELEASE
+    states.push_back(Settings::GAME_SHOW_SDL_LOGO);
+#endif
+    states.push_back(Settings::GAME_HIDE_AI_MOVE);
+    states.push_back(Settings::WORLD_SHOW_VISITED_CONTENT);
+    states.push_back(Settings::WORLD_ABANDONED_MINE_RANDOM);
+    states.push_back(Settings::WORLD_SAVE_MONSTER_BATTLE);
+    states.push_back(Settings::WORLD_ALLOW_SET_GUARDIAN);
+    states.push_back(Settings::HEROES_LEARN_SPELLS_WITH_DAY);
+    states.push_back(Settings::CASTLE_ALLOW_BUY_FROM_WELL);
     states.push_back(Settings::BATTLE_SHOW_DAMAGE);
     states.push_back(Settings::BATTLE_SOFT_WAITING);
     states.push_back(Settings::BATTLE_TROOP_DIRECTION);
-    states.push_back(Settings::POCKETPC_HIDE_CURSOR);
+    states.push_back(Settings::BATTLE_SET_AUTO);
+    states.push_back(Settings::BATTLE_SHOW_GRID);
+    states.push_back(Settings::BATTLE_SHOW_MOUSE_SHADOW);
+    states.push_back(Settings::BATTLE_SHOW_MOVE_SHADOW);
+    if(conf.PocketPC())
+    {
+	states.push_back(Settings::POCKETPC_TAP_MODE);
+	states.push_back(Settings::POCKETPC_LOW_MEMORY);
+    }
 
     SettingsListBox listbox(area);
 

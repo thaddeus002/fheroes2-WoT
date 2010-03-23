@@ -52,7 +52,7 @@ void Kingdom::AITurns(void)
 	return;
     }
     
-    if(Settings::MUSIC_MIDI != Settings::Get().GetMusicType()) AGG::PlayMusic(MUS::COMPUTER);
+    if(! Settings::Get().MusicMIDI()) AGG::PlayMusic(MUS::COMPUTER);
 
     Interface::StatusWindow *status = Interface::NoGUI() ? NULL : &Interface::StatusWindow::Get();
 
@@ -201,7 +201,7 @@ void Kingdom::AIHeroesTurns(Heroes &hero)
     cursor.Hide();
     u32 ticket = 0;
 
-    if(!Settings::Get().HideAIMove() && hero.isShow(Settings::Get().MyColor()))
+    if(!Settings::Get().ExtHideAIMove() && hero.isShow(Settings::Get().MyColor()))
     {
 	    cursor.Hide();
 	    I.gameArea.Center(hero.GetCenter());
@@ -210,7 +210,7 @@ void Kingdom::AIHeroesTurns(Heroes &hero)
 	    display.Flip();
     }
 
-    bool hide_move = conf.HideAIMove() ||
+    bool hide_move = conf.ExtHideAIMove() ||
 	    (! IS_DEVEL() && !hero.isShow(Settings::Get().MyColor()));
 
     while(LocalEvent::Get().HandleEvents())

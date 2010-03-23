@@ -201,7 +201,7 @@ int main(int argc, char **argv)
 	    le.SetGlobalFilterKeysEvents(Game::KeyboardGlobalFilter);
 	    le.SetGlobalFilter(true);
 
-	    le.SetTapMode(conf.TapMode());
+	    le.SetTapMode(conf.ExtTapMode());
 
 	    // goto main menu
 #ifdef WITH_EDITOR
@@ -242,8 +242,10 @@ int main(int argc, char **argv)
 		}
 	    }
 
+	    conf.BinarySave();
+
 	    Display::ShowCursor();
-	    if(Settings::Get().UseFade()) Display::Fade();
+	    if(Settings::Get().ExtUseFade()) Display::Fade();
 
 	} catch(std::bad_alloc)
 	{
@@ -258,7 +260,7 @@ int main(int argc, char **argv)
     	    AGG::Cache::Get().Dump();
 	    conf.Dump();
 	}
-	
+
 	return EXIT_SUCCESS;
 }
 
@@ -266,7 +268,7 @@ void LoadZLogo(void)
 {
 #ifdef BUILD_RELEASE
     // SDL logo
-    if(Settings::Get().Logo())
+    if(Settings::Get().ExtShowSDL())
     {
 	Display & display = Display::Get();
 

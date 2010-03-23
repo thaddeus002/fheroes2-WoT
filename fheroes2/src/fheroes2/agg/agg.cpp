@@ -1148,7 +1148,7 @@ void AGG::PlayMusic(const MUS::mus_t mus, bool loop)
 
     old = mus;
     
-    if(Settings::MUSIC_EXT == conf.GetMusicType())
+    if(conf.MusicExt())
     {
 	const std::string musname(conf.LocalPrefix() + SEPARATOR + "files" + SEPARATOR + "music" + SEPARATOR + MUS::GetString(mus));
 #ifdef WITH_MIXER
@@ -1178,14 +1178,14 @@ void AGG::PlayMusic(const MUS::mus_t mus, bool loop)
     }
     else
 #ifdef WITH_AUDIOCD
-    if((Settings::MUSIC_CD == conf.GetMusicType()) && Cdrom::isValid())
+    if(conf.MusicCD() && Cdrom::isValid())
     {
 	Cdrom::Play(mus, loop);
 	DEBUG(DBG_ENGINE , DBG_INFO, "AGG::PlayMusic: cd track " << static_cast<int>(mus));
     }
     else
 #endif
-    if(Settings::MUSIC_MIDI == conf.GetMusicType())
+    if(conf.MusicMIDI())
     {
 	XMI::xmi_t xmi = XMI::FromMUS(mus);
 	if(XMI::UNKNOWN != xmi)

@@ -169,7 +169,7 @@ Game::menu_t Game::StartGame(void)
     AGG::FreeObject(ICN::HSBKG);
     AGG::FreeObject(ICN::HISCORE);
 
-    if(Settings::Get().LowMemory())
+    if(Settings::Get().ExtLowMemory())
     {
         AGG::ICNRegistryEnable(false);
         AGG::ICNRegistryFreeObjects();
@@ -314,7 +314,7 @@ void Game::OpenCastle(Castle *castle)
 	    result = (*it)->OpenDialog(need_fade);
 	    if(need_fade) need_fade = false;
 
-	    if(Settings::Get().LowMemory())
+	    if(Settings::Get().ExtLowMemory())
 	    {
     		AGG::ICNRegistryEnable(false);
     		AGG::ICNRegistryFreeObjects();
@@ -376,12 +376,12 @@ void Game::OpenHeroes(Heroes *hero)
 		DELAY(100);
 	    }
 
-	    if(Settings::Get().LowMemory()) AGG::ICNRegistryEnable(true);
+	    if(Settings::Get().ExtLowMemory()) AGG::ICNRegistryEnable(true);
 
 	    result = (*it)->OpenDialog(false, need_fade);
 	    if(need_fade) need_fade = false;
 
-	    if(Settings::Get().LowMemory())
+	    if(Settings::Get().ExtLowMemory())
 	    {
     		AGG::ICNRegistryEnable(false);
     		AGG::ICNRegistryFreeObjects();
@@ -875,7 +875,7 @@ Game::menu_t Game::HumanTurn(void)
 	// fast break (or crash after KeyPress_L)
 	if(res != CANCEL) break;
 
-	if(conf.TapMode())
+	if(conf.ExtTapMode())
 	{
 	    // scroll area maps left
 	    if(le.MouseCursor(I.GetAreaScrollLeft()) && le.MousePressLeft()) I.gameArea.SetScroll(SCROLL_LEFT);
@@ -1058,7 +1058,7 @@ Game::menu_t Game::HumanTurn(void)
 	    global_focus.SetRedraw();
 	}
 
-	if(conf.AutoSave())
+	if(conf.ExtAutoSaveOn())
 	{
 	    std::string filename(conf.LocalPrefix() + SEPARATOR + "files" + SEPARATOR + "save" + SEPARATOR +  "autosave.sav");
 	    Game::Save(filename);
