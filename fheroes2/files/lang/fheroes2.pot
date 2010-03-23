@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-03-23 07:56+0800\n"
+"POT-Creation-Date: 2010-03-23 23:12+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -18,39 +18,39 @@ msgstr ""
 "Plural-Forms: nplurals=INTEGER; plural=EXPRESSION;\n"
 
 #: ../fheroes2/army/army.cpp:78
-msgid "Few"
+msgid "army|Few"
 msgstr ""
 
 #: ../fheroes2/army/army.cpp:78
-msgid "Several"
+msgid "army|Several"
 msgstr ""
 
 #: ../fheroes2/army/army.cpp:78
-msgid "Pack"
+msgid "army|Pack"
 msgstr ""
 
 #: ../fheroes2/army/army.cpp:78
-msgid "Lots"
+msgid "army|Lots"
 msgstr ""
 
 #: ../fheroes2/army/army.cpp:78
-msgid "Horde"
+msgid "army|Horde"
 msgstr ""
 
 #: ../fheroes2/army/army.cpp:78
-msgid "Throng"
+msgid "army|Throng"
 msgstr ""
 
 #: ../fheroes2/army/army.cpp:78
-msgid "Swarm"
+msgid "army|Swarm"
 msgstr ""
 
 #: ../fheroes2/army/army.cpp:78
-msgid "Zounds"
+msgid "army|Zounds"
 msgstr ""
 
 #: ../fheroes2/army/army.cpp:78
-msgid "Legion"
+msgid "army|Legion"
 msgstr ""
 
 #: ../fheroes2/army/army.cpp:477
@@ -1981,23 +1981,23 @@ msgid "Used to place a resource or treasure."
 msgstr ""
 
 #: ../fheroes2/game/difficulty.cpp:37
-msgid "Easy"
+msgid "difficulty|Easy"
 msgstr ""
 
 #: ../fheroes2/game/difficulty.cpp:37
-msgid "Normal"
+msgid "difficulty|Normal"
 msgstr ""
 
 #: ../fheroes2/game/difficulty.cpp:37
-msgid "Hard"
-msgstr ""
-
-#: ../fheroes2/game/difficulty.cpp:37 ../fheroes2/heroes/skill.cpp:335
-msgid "Expert"
+msgid "difficulty|Hard"
 msgstr ""
 
 #: ../fheroes2/game/difficulty.cpp:37
-msgid "Impossible"
+msgid "difficulty|Expert"
+msgstr ""
+
+#: ../fheroes2/game/difficulty.cpp:37
+msgid "difficulty|Impossible"
 msgstr ""
 
 #: ../fheroes2/game/game.cpp:284 ../fheroes2/game/game_io.cpp:96
@@ -4355,6 +4355,10 @@ msgstr ""
 msgid "Advanced"
 msgstr ""
 
+#: ../fheroes2/heroes/skill.cpp:335
+msgid "Expert"
+msgstr ""
+
 #: ../fheroes2/heroes/skill.cpp:514
 msgid "Pathfinding"
 msgstr ""
@@ -4778,15 +4782,15 @@ msgid "Multi"
 msgstr ""
 
 #: ../fheroes2/kingdom/speed.cpp:27
-msgid "Standing"
+msgid "speed|Standing"
 msgstr ""
 
 #: ../fheroes2/kingdom/speed.cpp:27
-msgid "Crawling"
+msgid "speed|Crawling"
 msgstr ""
 
 #: ../fheroes2/kingdom/speed.cpp:27
-msgid "Very Slow"
+msgid "speed|Very Slow"
 msgstr ""
 
 #: ../fheroes2/kingdom/speed.cpp:27
@@ -4794,123 +4798,123 @@ msgid "speed|Slow"
 msgstr ""
 
 #: ../fheroes2/kingdom/speed.cpp:27
-msgid "Average"
+msgid "speed|Average"
 msgstr ""
 
 #: ../fheroes2/kingdom/speed.cpp:27
-msgid "Fast"
+msgid "speed|Fast"
 msgstr ""
 
 #: ../fheroes2/kingdom/speed.cpp:28
-msgid "Very Fast"
+msgid "speed|Very Fast"
 msgstr ""
 
 #: ../fheroes2/kingdom/speed.cpp:28
-msgid "Ultra Fast"
+msgid "speed|Ultra Fast"
 msgstr ""
 
 #: ../fheroes2/kingdom/speed.cpp:28
-msgid "Blazing"
+msgid "speed|Blazing"
 msgstr ""
 
 #: ../fheroes2/kingdom/speed.cpp:28
-msgid "Instant"
+msgid "speed|Instant"
 msgstr ""
 
 #: ../fheroes2/kingdom/week.cpp:29
-msgid "PLAGUE"
+msgid "week|PLAGUE"
 msgstr ""
 
 #: ../fheroes2/kingdom/week.cpp:30
-msgid "Ant"
+msgid "week|Ant"
 msgstr ""
 
 #: ../fheroes2/kingdom/week.cpp:30
-msgid "Grasshopper"
+msgid "week|Grasshopper"
 msgstr ""
 
 #: ../fheroes2/kingdom/week.cpp:30
-msgid "Dragonfly"
+msgid "week|Dragonfly"
 msgstr ""
 
 #: ../fheroes2/kingdom/week.cpp:30
-msgid "Spider"
+msgid "week|Spider"
 msgstr ""
 
 #: ../fheroes2/kingdom/week.cpp:30
-msgid "Butterfly"
+msgid "week|Butterfly"
 msgstr ""
 
 #: ../fheroes2/kingdom/week.cpp:30
-msgid "Bumblebee"
+msgid "week|Bumblebee"
 msgstr ""
 
 #: ../fheroes2/kingdom/week.cpp:31
-msgid "Locust"
+msgid "week|Locust"
 msgstr ""
 
 #: ../fheroes2/kingdom/week.cpp:31
-msgid "Earthworm"
+msgid "week|Earthworm"
 msgstr ""
 
 #: ../fheroes2/kingdom/week.cpp:31
-msgid "Hornet"
+msgid "week|Hornet"
 msgstr ""
 
 #: ../fheroes2/kingdom/week.cpp:31
-msgid "Beetle"
+msgid "week|Beetle"
 msgstr ""
 
 #: ../fheroes2/kingdom/week.cpp:31
-msgid "Squirrel"
+msgid "week|Squirrel"
 msgstr ""
 
 #: ../fheroes2/kingdom/week.cpp:31
-msgid "Rabbit"
+msgid "week|Rabbit"
 msgstr ""
 
 #: ../fheroes2/kingdom/week.cpp:32
-msgid "Gopher"
+msgid "week|Gopher"
 msgstr ""
 
 #: ../fheroes2/kingdom/week.cpp:32
-msgid "Badger"
+msgid "week|Badger"
 msgstr ""
 
 #: ../fheroes2/kingdom/week.cpp:32
-msgid "Eagle"
+msgid "week|Eagle"
 msgstr ""
 
 #: ../fheroes2/kingdom/week.cpp:32
-msgid "Weasel"
+msgid "week|Weasel"
 msgstr ""
 
 #: ../fheroes2/kingdom/week.cpp:32
-msgid "Raven"
+msgid "week|Raven"
 msgstr ""
 
 #: ../fheroes2/kingdom/week.cpp:32
-msgid "Mongoose"
+msgid "week|Mongoose"
 msgstr ""
 
 #: ../fheroes2/kingdom/week.cpp:32
-msgid "Aardvark"
+msgid "week|Aardvark"
 msgstr ""
 
 #: ../fheroes2/kingdom/week.cpp:33
-msgid "Lizard"
+msgid "week|Lizard"
 msgstr ""
 
 #: ../fheroes2/kingdom/week.cpp:33
-msgid "Tortoise"
+msgid "week|Tortoise"
 msgstr ""
 
 #: ../fheroes2/kingdom/week.cpp:33
-msgid "Hedgehog"
+msgid "week|Hedgehog"
 msgstr ""
 
 #: ../fheroes2/kingdom/week.cpp:33
-msgid "Condor"
+msgid "week|Condor"
 msgstr ""
 
 #: ../fheroes2/kingdom/world.cpp:757
@@ -4924,19 +4928,19 @@ msgid "This game is now in beta development version. ;)"
 msgstr ""
 
 #: ../fheroes2/maps/maps.cpp:38
-msgid "Small"
+msgid "maps|Small"
 msgstr ""
 
 #: ../fheroes2/maps/maps.cpp:38
-msgid "Medium"
+msgid "maps|Medium"
 msgstr ""
 
 #: ../fheroes2/maps/maps.cpp:38
-msgid "Large"
+msgid "maps|Large"
 msgstr ""
 
 #: ../fheroes2/maps/maps.cpp:38
-msgid "Extra Large"
+msgid "maps|Extra Large"
 msgstr ""
 
 #: ../fheroes2/maps/mp2.cpp:359
@@ -11829,54 +11833,102 @@ msgstr ""
 msgid "Stone spell from Medusa."
 msgstr ""
 
-#: ../fheroes2/system/settings.cpp:74
-msgid "castle: allow buy from well"
-msgstr ""
-
-#: ../fheroes2/system/settings.cpp:75
-msgid "world: show visited content from objects"
-msgstr ""
-
-#: ../fheroes2/system/settings.cpp:76
-msgid "game: fast load game dialog (L hot key)"
-msgstr ""
-
-#: ../fheroes2/system/settings.cpp:77
-msgid "game: remember last focus"
-msgstr ""
-
-#: ../fheroes2/system/settings.cpp:78
-msgid "world: abandoned mine random resource"
-msgstr ""
-
-#: ../fheroes2/system/settings.cpp:79
-msgid "world: save count monster after battle"
-msgstr ""
-
-#: ../fheroes2/system/settings.cpp:80
-msgid "world: allow set guardian to objects (future)"
-msgstr ""
-
-#: ../fheroes2/system/settings.cpp:81
-msgid "heroes: learn new spells with day"
-msgstr ""
-
-#: ../fheroes2/system/settings.cpp:82
-msgid "battle: show damage info"
-msgstr ""
-
-#: ../fheroes2/system/settings.cpp:83
-msgid "battle: troop direction to move"
-msgstr ""
-
-#: ../fheroes2/system/settings.cpp:84
-msgid "battle: soft wait troop"
-msgstr ""
-
-#: ../fheroes2/system/settings.cpp:85
+#: ../fheroes2/system/settings.cpp:91
 msgid "game: always confirm for rewrite savefile"
 msgstr ""
 
-#: ../fheroes2/system/settings.cpp:86
+#: ../fheroes2/system/settings.cpp:92
+msgid "game: fast load game dialog (L hot key)"
+msgstr ""
+
+#: ../fheroes2/system/settings.cpp:93
+msgid "game: remember last focus"
+msgstr ""
+
+#: ../fheroes2/system/settings.cpp:94
+msgid "game: hide AI move"
+msgstr ""
+
+#: ../fheroes2/system/settings.cpp:95
+msgid "world: show visited content from objects"
+msgstr ""
+
+#: ../fheroes2/system/settings.cpp:96
+msgid "world: abandoned mine random resource"
+msgstr ""
+
+#: ../fheroes2/system/settings.cpp:97
+msgid "world: save count monster after battle"
+msgstr ""
+
+#: ../fheroes2/system/settings.cpp:98
+msgid "world: allow set guardian to objects (future)"
+msgstr ""
+
+#: ../fheroes2/system/settings.cpp:99
+msgid "castle: allow buy from well"
+msgstr ""
+
+#: ../fheroes2/system/settings.cpp:100
+msgid "heroes: learn new spells with day"
+msgstr ""
+
+#: ../fheroes2/system/settings.cpp:101
+msgid "battle: show damage info"
+msgstr ""
+
+#: ../fheroes2/system/settings.cpp:102
+msgid "battle: troop direction to move"
+msgstr ""
+
+#: ../fheroes2/system/settings.cpp:103
+msgid "battle: soft wait troop"
+msgstr ""
+
+#: ../fheroes2/system/settings.cpp:104
+msgid "battle: show grid"
+msgstr ""
+
+#: ../fheroes2/system/settings.cpp:105
+msgid "battle: show mouse shadow"
+msgstr ""
+
+#: ../fheroes2/system/settings.cpp:106
+msgid "battle: show move shadow"
+msgstr ""
+
+#: ../fheroes2/system/settings.cpp:107
+msgid "game: show system info"
+msgstr ""
+
+#: ../fheroes2/system/settings.cpp:108
+msgid "game: autosave on"
+msgstr ""
+
+#: ../fheroes2/system/settings.cpp:109
+msgid "game: use fade"
+msgstr ""
+
+#: ../fheroes2/system/settings.cpp:110
+msgid "game: show SDL logo"
+msgstr ""
+
+#: ../fheroes2/system/settings.cpp:111
+msgid "game: use evil interface"
+msgstr ""
+
+#: ../fheroes2/system/settings.cpp:112
+msgid "game: hide interface"
+msgstr ""
+
+#: ../fheroes2/system/settings.cpp:113
 msgid "pocketpc: hide cursor"
+msgstr ""
+
+#: ../fheroes2/system/settings.cpp:114
+msgid "pocketpc: tap mode"
+msgstr ""
+
+#: ../fheroes2/system/settings.cpp:115
+msgid "pocketpc: low memory"
 msgstr ""
