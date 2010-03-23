@@ -68,6 +68,11 @@ void Battle2::Arena::AITurn(const Stats & b, Actions & a)
 	}
     }
     else
+    if(!b.isArchers() && b.isHandFighting())
+    {
+	enemy = GetEnemyAbroadMaxQuality(b.GetPosition(), b.GetColor());
+    }
+    else
     {
 	// set quality position from enemy
 	board.SetPositionQuality(b);
