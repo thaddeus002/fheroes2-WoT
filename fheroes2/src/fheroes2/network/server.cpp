@@ -437,7 +437,7 @@ Game::menu_t Game::NetworkHost(void)
 	return Game::MAINMENU;
     }
 
-    Thread thread;
+    SDL::Thread thread;
     thread.Create(FH2Server::callbackCreateThread, &server);
 
     // create local client

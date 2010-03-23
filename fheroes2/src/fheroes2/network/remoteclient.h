@@ -72,7 +72,7 @@ public:
 
     static int callbackCreateThread(void *);
 
-    Thread thread;
+    SDL::Thread thread;
 };
 
 #endif

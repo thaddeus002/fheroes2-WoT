@@ -106,13 +106,17 @@ void WriteLE16(u8 *p, u16 x);
 
 #if defined __SYMBIAN32__
 #define PATH_MAX FILENAME_MAX
-#define c_isspace(c) isspace(c)
-#define c_abs(x) abs((int) x)
 namespace std
 {
+    int c_abs(int x);
+    int c_abs(float x);
+    int c_abs(double x);
+    int c_isspace(char c);
+
 #define isspace(c) c_isspace(c)
 #define abs(x) c_abs(x)
 };
+using namespace std;
 #endif
 
 #if defined __MINGW32CE__

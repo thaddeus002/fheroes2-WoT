@@ -85,7 +85,7 @@ namespace
 	{ NS_FHEROES2, _("game: always confirm for rewrite savefile"),	Settings::SAVE_REWRITE_CONFIRM },
 	{ NS_FHEROES2, _("pocketpc: hide cursor"),			Settings::POCKETPC_HIDE_CURSOR },
 
-        { NS_UNKNOWN,  NULL,                   0                           },
+        { NS_UNKNOWN,  NULL, 0 },
     };
 };
 

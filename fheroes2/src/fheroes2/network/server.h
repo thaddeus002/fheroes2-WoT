@@ -66,8 +66,8 @@ protected:
     void CloseClients(void);
     void StartGame(void);
 
-    Mutex mutex;
-    Timer timer;
+    SDL::Mutex mutex;
+    SDL::Timer timer;
     std::vector<FH2RemoteClient> clients;
     bool exit;
     bool start_game;

@@ -1,4 +1,12 @@
-SVN - up to r1667
+SVN - up to r1689
++ Added Symbian port
++ Added polish translation
++ Added more visited info check
++ Fixed whirlpool sprite detect, added customizing wirlpool percent to globals.xml
++ Update objects and artifacts names
++ Added cast spell 'Town Portal'
+
+Mar, 20, 2010
 + Fixed Lightning Bolt damage
 + Added Dialog::Settings
 + Added plural form for monster name
