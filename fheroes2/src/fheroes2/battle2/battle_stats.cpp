@@ -1739,6 +1739,31 @@ void Battle2::Stats::ResetAnimFrame(u8 rule)
 
 M82::m82_t Battle2::Stats::M82Attk(void) const
 {
+    if(isArchers() && !isHandFighting())
+    {
+	switch(troop())
+	{
+	    case Monster::ARCHER:
+	    case Monster::RANGER:	return M82::ARCHSHOT;
+	    case Monster::ORC:
+	    case Monster::ORC_CHIEF:	return M82::ORC_SHOT;
+	    case Monster::TROLL:
+	    case Monster::WAR_TROLL:	return M82::TRLLSHOT;
+	    case Monster::ELF:
+	    case Monster::GRAND_ELF:	return M82::ELF_SHOT;
+	    case Monster::DRUID:
+	    case Monster::GREATER_DRUID:return M82::DRUISHOT;
+	    case Monster::CENTAUR:	return M82::CNTRSHOT;
+	    case Monster::HALFLING:	return M82::HALFSHOT;
+	    case Monster::MAGE:
+	    case Monster::ARCHMAGE:	return M82::MAGESHOT;
+	    case Monster::TITAN:	return M82::TITNSHOT;
+	    case Monster::LICH:
+	    case Monster::POWER_LICH:	return M82::LICHSHOT;
+	    default: break;
+	}
+    }
+
     return GetMonsterInfo().m82_attk;
 }
 
