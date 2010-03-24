@@ -548,16 +548,9 @@ bool Castle::AllowBuyHero(void)
 
 bool Castle::RecruitHero(Heroes* hero)
 {
-    if(! AllowBuyHero() && !hero) return false;
+    if(! AllowBuyHero() || !hero || !hero->Recruit(*this)) return false;
 
-    Kingdom & kingdom = world.GetKingdom(color);
-    kingdom.OddFundsResource(PaymentConditions::RecruitHero());
-
-    hero->SetCenter(GetCenter());
-    hero->Recruit(*this);
-
-    kingdom.AddHeroes(hero);
-    
+    world.GetKingdom(color).OddFundsResource(PaymentConditions::RecruitHero());
     castle_heroes = hero;
 
     // update spell book
@@ -1355,7 +1348,8 @@ ICN::icn_t Castle::GetICNBuilding(u32 build, Race::race_t race)
 
 const Heroes* Castle::GetHeroes(void) const
 {
-    return world.GetHeroes(mp.x, mp.y);
+    const Heroes* hero = world.GetHeroes(mp.x, mp.y);
+    return hero && Color::GRAY != hero->GetColor() ? hero : NULL;
 }
 
 Heroes* Castle::GetHeroes(void)

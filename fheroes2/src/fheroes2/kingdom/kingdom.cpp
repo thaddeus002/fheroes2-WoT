@@ -506,8 +506,18 @@ void Kingdom::ApplyPlayWithStartingHero(void)
 	{
     	    Heroes *hero = world.GetFreemanHeroes((*it)->GetRace());
 
-	    if(hero && AllowRecruitHero(false) && hero->Recruit(**it))
-		AddHeroes(hero);
+	    if(hero && AllowRecruitHero(false)) hero->Recruit(**it);
+	}
+	else
+	// move manual set hero to castle
+	{
+    	    Heroes *hero = world.GetHeroes((cp.y + 1) * world.w() + cp.x);
+    	    
+    	    if(hero && hero->GetColor() == GetColor())
+    	    {
+    		hero->SetFreeman(0);
+    		hero->Recruit(**it);
+    	    }
 	}
     }
 }

@@ -915,6 +915,10 @@ void World::LoadMaps(const std::string &filename)
     for(; itc1 != itc2; ++itc1)
 	if(*itc1) GetKingdom((*itc1)->GetColor()).AddCastle(*itc1);
 
+    // play with hero
+    if(Settings::Get().GameStartWithHeroes())
+	std::for_each(vec_kingdoms.begin(), vec_kingdoms.end(), std::mem_fun(&Kingdom::ApplyPlayWithStartingHero));
+
     // play with debug hero
     if(IS_DEVEL())
     {
@@ -930,14 +934,9 @@ void World::LoadMaps(const std::string &filename)
 	    {
 		const Point & cp = castle->GetCenter();
 		hero->Recruit(castle->GetColor(), Point(cp.x, cp.y + 1));
-		kingdom.AddHeroes(hero);
 	    }
 	}
     }
-
-    // play with hero
-    if(Settings::Get().GameStartWithHeroes())
-	std::for_each(vec_kingdoms.begin(), vec_kingdoms.end(), std::mem_fun(&Kingdom::ApplyPlayWithStartingHero));
 
     // generate position for ultimate
     if(MAXU16 == ultimate_artifact)

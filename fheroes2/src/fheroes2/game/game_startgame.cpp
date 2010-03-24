@@ -407,7 +407,6 @@ void Game::OpenHeroes(Heroes *hero)
 
 		    (*it)->FadeOut();
 		    (*it)->SetFreeman(0);
-		    myKingdom.RemoveHeroes(*it);
 		    it = myHeroes.begin();
 		    result = Dialog::CANCEL;
 		    break;

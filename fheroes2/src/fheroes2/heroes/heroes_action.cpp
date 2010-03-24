@@ -263,7 +263,6 @@ void BattleLose(Heroes &hero, u8 reason, Color::color_t color = Color::GRAY)
 {
     AGG::PlaySound(M82::KILLFADE);
     hero.FadeOut();
-    world.GetKingdom(hero.GetColor()).RemoveHeroes(&hero);
     hero.SetKillerColor(color);
     hero.SetFreeman(reason);
     Game::Focus::Get().Reset(Game::Focus::HEROES);
@@ -3050,9 +3049,8 @@ void ActionToJail(Heroes &hero, const u8 obj, const u16 dst_index)
 	if(prisoner)
 	{
 	    const Point center(tile.GetIndex() % world.w(), tile.GetIndex() / world.w());
-	    prisoner->Recruit(hero.GetColor(), center);
-	    prisoner->ResetModes(Heroes::JAIL);
-	    kingdom.AddHeroes(prisoner);
+	    if(prisoner->Recruit(hero.GetColor(), center))
+		prisoner->ResetModes(Heroes::JAIL);
 	}
     }
     else

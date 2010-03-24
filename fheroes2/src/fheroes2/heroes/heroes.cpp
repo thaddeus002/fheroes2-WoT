@@ -742,33 +742,42 @@ s8 Heroes::GetLuckWithModificators(std::string *strs) const
 }
 
 /* recrut hero */
-void Heroes::Recruit(const Color::color_t & cl, const Point & pt)
+bool Heroes::Recruit(const Color::color_t cl, const Point & pt)
 {
-    if(color != Color::GRAY) DEBUG(DBG_GAME , DBG_WARN, "Heroes::Recrut: hero not freeman!");
+    if(color != Color::GRAY)
+    {
+	DEBUG(DBG_GAME , DBG_WARN, "Heroes::Recrut: hero not freeman!");
+	return false;
+    }
 
-    color = cl;
-    killer_color = Color::GRAY;
+    Kingdom & kingdom = world.GetKingdom(cl);
 
-    mp = pt;
+    if(kingdom.AllowRecruitHero(false))
+    {
+	Maps::Tiles & tiles = world.GetTiles(pt);
+	color = cl;
+	killer_color = Color::GRAY;
+	mp = pt;
+	move_point = GetMaxMovePoints();
 
-    Maps::Tiles & tiles = world.GetTiles(mp);
+	if(!army.isValid()) army.Reset(false);
 
-    if(!army.isValid()) army.Reset(false);
+	// save general object
+	save_maps_general = tiles.GetObject();
+	tiles.SetObject(MP2::OBJ_HEROES);
 
-    // save general object
-    save_maps_general = tiles.GetObject();
-    tiles.SetObject(MP2::OBJ_HEROES);
+	kingdom.AddHeroes(this);
+	return true;
+    }
 
-    move_point = GetMaxMovePoints();
+    return false;
 }
 
 bool Heroes::Recruit(const Castle & castle)
 {
-    const Heroes* hero = castle.GetHeroes();
-    if(NULL == hero || hero->isFreeman())
+    if(NULL == castle.GetHeroes() &&
+	Recruit(castle.GetColor(), castle.GetCenter()))
     {
-	Recruit(castle.GetColor(), castle.GetCenter());
-
 	if(castle.GetLevelMageGuild())
 	{
 	    // magic point
@@ -1496,6 +1505,8 @@ void Heroes::SetFreeman(const u8 reason)
     if(!army.isValid() || (Battle2::RESULT_RETREAT & reason)) army.Reset(false);
     else
     if((Battle2::RESULT_LOSS & reason) && !(Battle2::RESULT_SURRENDER & reason)) army.Reset(true);
+
+    if(color != Color::GRAY) world.GetKingdom(color).RemoveHeroes(this);
 
     color = Color::GRAY;
     world.GetTiles(mp).SetObject(save_maps_general);

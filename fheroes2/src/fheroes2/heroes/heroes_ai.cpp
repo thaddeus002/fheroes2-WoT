@@ -133,7 +133,6 @@ Skill::Primary::skill_t AISelectPrimarySkill(Heroes &hero)
 
 void AIBattleLose(Heroes &hero, u8 reason, Color::color_t color = Color::GRAY)
 {
-    world.GetKingdom(hero.GetColor()).RemoveHeroes(&hero);
     hero.SetKillerColor(color);
     hero.SetFreeman(reason);
 }
