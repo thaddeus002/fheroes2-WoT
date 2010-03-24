@@ -104,20 +104,36 @@ void Game::MoveHeroFromArrowKeys(Heroes & hero, Direction::vector_t direct)
 {
     if(Maps::isValidDirection(hero.GetIndex(), direct))
     {
-	const u16 dst = Maps::GetDirectionIndex(hero.GetIndex(), direct);
+	u16 dst = Maps::GetDirectionIndex(hero.GetIndex(), direct);
 	const Maps::Tiles & tile = world.GetTiles(dst);
+	bool allow = false;
 
 	switch(tile.GetObject())
 	{
     	    case MP2::OBJN_CASTLE:
     	    {
     		const Castle *to_castle = world.GetCastle(dst);
-		if(to_castle) ShowPathOrStartMoveHero(&hero, to_castle->GetIndex());
+		if(to_castle)
+		{
+		    dst = to_castle->GetIndex();
+		    allow = true;
+		}
+		break;
 	    }
 
+    	    case MP2::OBJ_BOAT:
+    	    case MP2::OBJ_CASTLE:
+    	    case MP2::OBJ_HEROES:
+    	    case MP2::OBJ_MONSTER:
+		allow = true;
+		break;
+
 	    default:
-		if(Cursor::POINTER != GetCursor(dst)) ShowPathOrStartMoveHero(&hero, dst);
+		allow = (tile.isPassable(&hero) || MP2::isActionObject(tile.GetObject(), hero.isShipMaster()));
+		break;
 	}
+
+	if(allow) ShowPathOrStartMoveHero(&hero, dst);
     }
 }
                                    
