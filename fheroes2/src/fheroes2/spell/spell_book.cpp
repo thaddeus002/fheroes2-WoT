@@ -43,6 +43,12 @@ void SpellBookRedrawLists(const std::vector<Spell::spell_t> &, std::vector<Rect>
 void SpellBookRedrawSpells(const std::vector<Spell::spell_t> &, std::vector<Rect> &, const size_t, s16, s16);
 void SpellBookRedrawMP(const Point &, u16);
 
+bool SortingSpell(const Spell::spell_t spell1, const Spell::spell_t spell2)
+{
+    return (!Spell::isCombat(spell1) && Spell::isCombat(spell1)) ||
+	    (std::string(Spell::GetName(spell1)) < std::string(Spell::GetName(spell2)));
+}
+
 SpellBook::SpellBook() : active(false)
 {
 }
@@ -75,6 +81,9 @@ Spell::spell_t SpellBook::Open(const HeroBase & hero, const filter_t filt, bool 
 	Dialog::Message("", _("No spell to cast."), Font::BIG, Dialog::OK);
 	return Spell::NONE;
     }
+
+    // sorting results
+    std::sort(spells2.begin(), spells2.end(), SortingSpell);
 
     size_t current_index = 0;
 
