@@ -109,12 +109,13 @@ void Battle2::Arena::AITurn(const Stats & b, Actions & a)
 	}
 	else
 	    enemy = GetEnemyAbroadMaxQuality(b);
-
-	AIMagicAction(b, a, enemy);
     }
 
     if(enemy)
+    {
+	AIMagicAction(b, a, enemy);
 	a.AddedAttackAction(b, *enemy);
+    }
     else
     if(IS_DEBUG(DBG_BATTLE, DBG_TRACE))
     {
