@@ -947,11 +947,6 @@ namespace ICN
     bool HighlyObjectSprite(icn_t, u16);
 
     bool SkipRegistryFree(icn_t);
-
-#ifdef WITH_BATTLE1
-    icn_t PreImpactFromSpell(u8);
-    icn_t ImpactFromSpell(u8);
-#endif
 };
 
 #endif
