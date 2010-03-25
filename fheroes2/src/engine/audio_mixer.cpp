@@ -33,7 +33,7 @@ namespace Mixer
     void        Init(void);
     void        Quit(void);
     bool valid = false;
-};
+}
 
 bool Mixer::isValid(void)
 {
@@ -227,7 +227,7 @@ namespace Mixer
 
     std::vector<chunk_t> chunks;
     u8 reserved_channels;
-};
+}
 
 void Mixer::PredicateStopSound(chunk_t & ch)
 {

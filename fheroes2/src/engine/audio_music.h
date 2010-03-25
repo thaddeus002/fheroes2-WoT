@@ -37,6 +37,6 @@ namespace Music
     void	Reset(void);
     bool	isPlaying(void);
     bool	isPaused(void);
-};
+}
 
 #endif

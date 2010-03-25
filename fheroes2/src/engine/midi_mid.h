@@ -59,6 +59,6 @@ namespace MIDI
 	MThd			mthd;
 	std::list<MTrk *>	tracks;
     };
-};
+}
 
 #endif

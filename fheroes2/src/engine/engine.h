@@ -49,6 +49,6 @@ namespace SDL
     void Quit(void);
 
     bool SubSystem(const u32 system);
-};
+}
 
 #endif

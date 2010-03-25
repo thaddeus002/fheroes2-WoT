@@ -146,9 +146,9 @@ struct info_t
 
 namespace Music
 {
-    Thread music;
+    SDL::Thread music;
     info_t info;
-};
+}
 
 int callbackPlayMusic(void *ptr)
 {

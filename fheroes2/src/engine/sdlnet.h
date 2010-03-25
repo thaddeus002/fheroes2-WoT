@@ -79,7 +79,7 @@ namespace Network
 
     bool		RecvMessage(const Network::Socket &, QueueMessage &, bool = false);
     bool		SendMessage(const Network::Socket &, const QueueMessage &);
-};
+}
 #endif
 
 class QueueMessage

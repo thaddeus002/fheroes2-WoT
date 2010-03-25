@@ -58,6 +58,6 @@ namespace MIDI
 	u8	pack[4];
 	u8	sp;
     };
-};
+}
 
 #endif

@@ -33,6 +33,36 @@ LocalEvent::LocalEvent() : modes(0), key_value(KEY_NONE), mouse_state(0),
 #endif
 }
 
+const Point & LocalEvent::GetMousePressLeft(void) const
+{
+    return mouse_pl;
+}
+
+const Point & LocalEvent::GetMousePressMiddle(void) const
+{
+    return mouse_pm;
+}
+
+const Point & LocalEvent::GetMousePressRight(void) const
+{
+    return mouse_pr;
+}
+
+const Point & LocalEvent::GetMouseReleaseLeft(void) const
+{
+    return mouse_rl;
+}
+
+const Point & LocalEvent::GetMouseReleaseMiddle(void) const
+{
+    return mouse_rm;
+}
+
+const Point & LocalEvent::GetMouseReleaseRight(void) const
+{
+    return mouse_rr;
+}
+
 void LocalEvent::SetTapMode(bool f)
 {
     f ? SetModes(TAP_MODE) : ResetModes(TAP_MODE);
@@ -191,7 +221,7 @@ KeySym SDLToKeySym(SDLKey key)
     }
 
     return KEY_NONE;
-};
+}
 
 #ifdef WITH_KEYMAPPING
 #include <algorithm>

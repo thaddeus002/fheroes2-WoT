@@ -45,6 +45,6 @@ namespace MIDI
 	Chunk	timb;
 	Chunk	evnt;
     };
-};
+}
 
 #endif

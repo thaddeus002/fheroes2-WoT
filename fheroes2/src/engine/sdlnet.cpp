@@ -301,7 +301,7 @@ void QueueMessage::Load(const char* fn)
 namespace Network
 {
     static u16 proto = 0xFF01;
-};
+}
 
 void Network::SetProtocolVersion(u16 v)
 {

@@ -35,7 +35,7 @@ struct SDL_Surface;
 struct SDL_PixelFormat;
 
 #ifdef WITH_TTF
-namespace SDL { class Font; };
+namespace SDL { class Font; }
 #endif
 
 class Surface

@@ -62,7 +62,7 @@ namespace SDL
 
 	static bool init;
     };
-};
+}
 #endif
 
 #endif

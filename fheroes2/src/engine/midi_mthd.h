@@ -58,6 +58,6 @@ namespace MIDI
 
 	void Dump(void) const;
     };
-};
+}
 
 #endif

@@ -37,7 +37,7 @@ namespace Rand
         if(vec.empty()) return NULL;
 
         return & vec[Rand::Get(vec.size() - 1)];
-    };
+    }
     
     template< typename T > const T * Get(const std::list< T > & list)
     {
@@ -50,7 +50,7 @@ namespace Rand
         for(; it != list.end(); ++it) if(index1 == index2++) break;
 
         return & (*it);
-    };
+    }
 
     typedef std::pair<s32, u32> ValuePercent;
 
@@ -64,6 +64,6 @@ namespace Rand
 	size_t Size(void) const;
 	s32 Get(void);
     };
-};
+}
    
 #endif

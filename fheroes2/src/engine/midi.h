@@ -29,6 +29,6 @@ namespace MIDI
 {
     u8 UnpackDelta(const u8 *p, u32 & d);
     u8 PackDelta(u8 *p, const u32 & d);
-};
+}
 
 #endif

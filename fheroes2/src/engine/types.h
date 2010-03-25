@@ -115,7 +115,7 @@ namespace std
 
 #define isspace(c) c_isspace(c)
 #define abs(x) c_abs(x)
-};
+}
 using namespace std;
 #endif
 

@@ -41,6 +41,6 @@ namespace Audio
     };
 
     Spec & GetHardwareSpec(void);
-};
+}
 
 #endif

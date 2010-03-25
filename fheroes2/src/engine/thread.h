@@ -90,6 +90,6 @@ private:
     struct timeval clock2;
 };
 
-};
+}
 
 #endif

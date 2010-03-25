@@ -148,6 +148,8 @@ enum KeySym
     KEY_APP14		= 0xCE,
     KEY_APP15		= 0xCF,
 #endif
+
+    KEY_LAST
 };
 
 #ifdef WITH_KEYMAPPING
@@ -189,13 +191,12 @@ public:
     bool MouseMotion(const Rect &rt) const;
 
     const Point & GetMouseCursor(void);
-    const Point & GetMousePressLeft(void) const{ return mouse_pl; };
-    const Point & GetMousePressMiddle(void) const{ return mouse_pm; };
-    const Point & GetMousePressRight(void) const{ return mouse_pr; };
-
-    const Point & GetMouseReleaseLeft(void) const{ return mouse_rl; };
-    const Point & GetMouseReleaseMiddle(void) const{ return mouse_rm; };
-    const Point & GetMouseReleaseRight(void) const{ return mouse_rr; };
+    const Point & GetMousePressLeft(void) const;
+    const Point & GetMousePressMiddle(void) const;
+    const Point & GetMousePressRight(void) const;
+    const Point & GetMouseReleaseLeft(void) const;
+    const Point & GetMouseReleaseMiddle(void) const;
+    const Point & GetMouseReleaseRight(void) const;
 
     void ResetPressLeft(void);
     void ResetPressRight(void);
@@ -265,7 +266,7 @@ private:
 	CLICK_MIDDLE	= 0x0040,
 	TAP_MODE	= 0x0080,
 	MOUSE_OFFSET	= 0x0100,
-	CLOCK_ON	= 0x0200,
+	CLOCK_ON	= 0x0200
     };
 
     void SetModes(flag_t);

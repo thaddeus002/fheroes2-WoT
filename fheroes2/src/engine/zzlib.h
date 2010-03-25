@@ -37,7 +37,7 @@ namespace ZLib
     bool	Compress(std::vector<char> &, const char*, size_t);
     bool	Compress(std::vector<char> &, const std::vector<char> &);
     bool	Compress(std::vector<char> &, const std::string &);
-};
+}
 
 #include "types.h"
 #include "surface.h"
@@ -51,7 +51,7 @@ public:
 
 private:
     std::vector<char> buf;
-};
+}
 
 #endif
 #endif

@@ -57,6 +57,6 @@ namespace MIDI
     private:
 	std::list<Event *> events;
     };
-};
+}
 
 #endif
