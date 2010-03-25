@@ -51,7 +51,7 @@ public:
 
 private:
     std::vector<char> buf;
-}
+};
 
 #endif
 #endif
