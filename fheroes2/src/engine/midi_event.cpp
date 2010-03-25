@@ -127,9 +127,20 @@ void Event::Dump(void) const
 {
    std::cerr << std::hex << std::setfill('0') \
 	<< "[dl:0x" << std::setw(4) << delta \
-	<< ":st:0x" << std::setw(2) << static_cast<int>(status) << ":dt";
+	<< ":st:0x" << std::setw(2) << static_cast<u16>(static_cast<u8>(status)) << ":dt";
 
-    for(u32 ii = 0; ii < size; ++ii) std::cerr << ":0x" << std::setw(2) << static_cast<int>(data[ii]);
+    u8 endline = 0;
+    for(u32 ii = 0; ii < size; ++ii)
+    {
+        std::cerr << " 0x" << std::setw(2) << std::setfill('0') << std::hex << static_cast<u32>(static_cast<u8>(data[ii])) << ":";
+        ++endline;
+
+        if(endline > 15)
+        {
+            endline = 0;
+            std::cerr << std::endl;
+        }
+    }
 
     std::cerr << "]" << std::endl;
 }

@@ -129,3 +129,10 @@ bool Xmi::Read(const std::string & filename)
 
     return Read(body);
 }
+
+void Xmi::Dump(void) const
+{
+    head.Dump();
+    timb.Dump();
+    evnt.Dump();
+}

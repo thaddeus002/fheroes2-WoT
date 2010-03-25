@@ -22,6 +22,8 @@
 
 #include <cstring>
 #include <iostream>
+#include <iomanip>
+
 #include "midi_chunk.h"
 
 using namespace MIDI;
@@ -183,5 +185,19 @@ void Chunk::Dump(void) const
 {
     std::cerr << "id:   ";
     std::cerr.write(id, 4);
-    std::cerr << std::endl << "size: " << size << std::endl << "data: " << (data ? "[binary]" : "NULL" ) << std::endl;
+    std::cerr << std::endl << "size: " << std::dec << size << std::endl << "data: " << std::endl;
+
+    u8 endline = 0;
+    for(u32 ii = 0; ii < size; ++ii)
+    {
+        std::cerr << " 0x" << std::setw(2) << std::setfill('0') << std::hex << static_cast<u32>(static_cast<u8>(data[ii])) << ":";
+        ++endline;
+
+        if(endline > 15)
+        {
+            endline = 0;
+            std::cerr << std::endl;
+        }
+    }
+    std::cerr << std::endl;
 }

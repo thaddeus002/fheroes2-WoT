@@ -29,12 +29,16 @@ using namespace MIDI;
 
 struct meta_t
 {
-    meta_t() : command(0), quantity(0), duration(0){};
-    meta_t(u8 c, u8 q, u8 d) : command(c), quantity(q), duration(d){};
+    meta_t() : command(0), quantity(0), duration(0){}
+    meta_t(u8 c, u8 q, u32 d) : command(c), quantity(q), duration(d){}
+
+    bool operator< (const meta_t & m) const{ return duration < m.duration; }
+
     u8 command;
     u8 quantity;
-    u8 duration;
+    u32 duration;
 };
+
 
 MTrk::MTrk(const u8 *p, const u32 s)
 {
@@ -170,8 +174,6 @@ bool MTrk::Write(u8 *p) const
     for(; it1 != it2; ++it1) if(*it1) size += (*it1)->Size();
 
     u32 x = size;
-    //SwapBE32(x);
-    //memcpy(p, reinterpret_cast<u8 *>(&x), 4);
     WriteBE32(p, x);
     p+= 4;
 
@@ -211,41 +213,113 @@ void MTrk::Dump(void) const
 void MTrk::ImportXmiEVNT(const Chunk & evnt)
 {
     const u8 *ptr = evnt.data;
-    std::list<meta_t> notesoff;
+
     u8 buf[2];
-
     u32 delta = 0;
-    bool end = false;
 
-    while(ptr && !end)
+    std::list<meta_t> notesoff;
+    std::list<meta_t>::iterator it1, it2;
+
+    while(ptr)
     {
+	// interval
+	if(*ptr < 128)
+	{
+	    delta += *ptr;
+	    ++ptr;
+	}
+	else
+	// command
+	{
+	    // end
+	    if(0xFF == *ptr && 0x2F == *(ptr + 1))
+	    {
+		events.push_back(new Event(delta, *ptr, 2, ptr + 1));
+		break;
+	    }
+	    else
+	    switch(*ptr >> 4)
+	    {
+		// meta
+		case 0x0F:
+		{
+		    u32 size = 0;
+		    size += 1 + MIDI::UnpackDelta(ptr + 2, size);
+		    ptr += size + 1;
+		    delta = 0;
+		}
+		break;
 
-	const u8 status = *ptr;
+		// key pressure
+		case 0x0A:
+		// control change
+		case 0x0B:
+		// pitch bend
+		case 0x0E:
+		{
+		    events.push_back(new Event(delta, *ptr, 2, ptr + 1));
+		    ptr += 3;
+		    delta = 0;
+		}
+		break;
+
+		// note on
+		case 0x09:
+		{
+		    events.push_back(new Event(delta, *ptr, 2, ptr + 1));
+		    u32 duration = 0;
+		    const u8 s = MIDI::UnpackDelta(ptr + 3, duration);
+		    notesoff.push_back(meta_t(*ptr - 0x10, *(ptr + 1), duration));
+		    ptr += 3 + s;
+		    delta = 0;
+		}
+		break;
+
+		// program change
+	        case 0x0C:
+		// chanel pressure
+		case 0x0D:
+		{
+		    events.push_back(new Event(delta, *ptr, 1, ptr + 1));
+		    ptr += 2;
+		    delta = 0;
+		}
+		break;
+
+		// unused command
+		default:
+		    CloseEvents();
+		    std::cerr << "unknown st: 0x" << std::setw(2) << std::setfill('0') << std::hex << static_cast<int>(*ptr) << ", ln: " << static_cast<int>(evnt.data + evnt.size - ptr) << std::endl;
+		break;
+	    }
+	}
 
 	// insert event: note off
 	if(delta)
 	{
-	    std::list<meta_t>::iterator it1 = notesoff.begin();
-	    std::list<meta_t>::const_iterator it2 = notesoff.end();
+	    // sort delta
+	    notesoff.sort();
+
+	    it1 = notesoff.begin();
+	    it2 = notesoff.end();
 
 	    // apply delta
 	    for(; it1 != it2; ++it1)
-		if((*it1).duration > delta)
-		{
-		    (*it1).duration -= delta;
-		}
+		if((*it1).duration > delta) (*it1).duration -= delta;
 
 	    it1 = notesoff.begin();
 	    it2 = notesoff.end();
 
 	    // insert event
 	    for(; it1 != it2; ++it1)
+	    {
 		if((*it1).duration < delta)
 		{
 		    buf[0] = (*it1).quantity;
 		    buf[1] = 0x7F;
 
 		    delta -= (*it1).duration;
+
 		    // note off
 		    events.push_back(new Event((*it1).duration, (*it1).command, 2, buf));
 		    it1 = notesoff.erase(it1);
@@ -259,84 +333,8 @@ void MTrk::ImportXmiEVNT(const Chunk & evnt)
 		    // note off
 		    events.push_back(new Event(delta, (*it1).command, 2, buf));
 		    it1 = notesoff.erase(it1);
-		    delta = 0;
 		}
-	}
-
-	switch(status >> 4)
-	{
-	    // meta
-	    case 0x0F:
-	    {
-		ptr += 1;
-		u32 size = 0;
-		const u8 s = MIDI::UnpackDelta(ptr + 1, size);
-		// store only end event
-		if(0xFF == status && 0x2F == *ptr)
-		{
-		    end = true;
-		    events.push_back(new Event(delta, status, 1 + s + size, ptr));
-		}
-		ptr += 1 + s + size;
-		delta = 0;
 	    }
-	    break;
-
-	    // key pressure
-	    case 0x0A:
-	    // control change
-	    case 0x0B:
-	    // pitch bend
-	    case 0x0E:
-	    {
-		events.push_back(new Event(delta, status, 2, ptr + 1));
-		ptr += 3;
-		delta = 0;
-	    }
-	    break;
-
-	    // note on
-	    case 0x09:
-	    {
-		ptr += 1;
-		const u8 m = *ptr;
-		events.push_back(new Event(delta, status, 2, ptr));
-		ptr += 2;
-		u32 duration = 0;
-		const u8 s = MIDI::UnpackDelta(ptr, duration);
-		ptr += s;
-		notesoff.push_back(meta_t(status - 0x10, m, duration));
-		delta = 0;
-	    }
-	    break;
-
-	    // program change
-	    case 0x0C:
-	    // chanel pressure
-	    case 0x0D:
-	    {
-		events.push_back(new Event(delta, status, 1, ptr + 1));
-		ptr += 2;
-		delta = 0;
-	    }
-	    break;
-
-	    // unused command
-	    default:
-		end = true;
-		CloseEvents();
-		std::cerr << "unknown st: 0x" << std::setw(2) << std::setfill('0') << std::hex << static_cast<int>(status) << ", ln: " << static_cast<int>(evnt.data + evnt.size - ptr) << std::endl;
-	    break;
-	}
-
-	// brocken data
-	if(ptr >= (evnt.data  + evnt.size)){ break; }
-
-	// read delta
-	while(0 < static_cast<s8>(*ptr))
-	{
-	    delta += *ptr;
-	    ++ptr;
 	}
     }
 }

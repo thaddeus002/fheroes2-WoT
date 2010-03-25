@@ -37,8 +37,10 @@ namespace MIDI
 	bool Read(const std::string & filename);
 	bool Read(const std::vector<u8> & body);
 
-	const Chunk & TIMB(void) const { return timb; };
-	const Chunk & EVNT(void) const { return evnt; };
+	const Chunk & TIMB(void) const { return timb; }
+	const Chunk & EVNT(void) const { return evnt; }
+
+	void Dump(void) const;
 
     private:
 	Chunk	head;
