@@ -1080,7 +1080,6 @@ void ActionToFlotSam(Heroes &hero, const u8 obj, const u16 dst_index)
 void ActionToShrine(Heroes &hero, const u8 obj, const u16 dst_index)
 {
     const Spell spell(Spell::FromInt(world.GetTiles(dst_index).GetQuantity1()));
-    const std::string & spell_name = spell.GetName();
     const u8 spell_level = spell.GetLevel();
 
     std::string head;
@@ -1103,7 +1102,7 @@ void ActionToShrine(Heroes &hero, const u8 obj, const u16 dst_index)
 	default: return;
     }
     
-    String::Replace(body, "%{spell}", spell_name);
+    String::Replace(body, "%{spell}", spell.GetName());
 
     // check spell book
     if(!hero.HasArtifact(Artifact::MAGIC_BOOK))
@@ -1111,22 +1110,30 @@ void ActionToShrine(Heroes &hero, const u8 obj, const u16 dst_index)
 	PlaySoundFailure;
 	body += _("\nUnfortunately, you have no Magic Book to record the spell with.");
 	Dialog::Message(head, body, Font::BIG, Dialog::OK);
-	return;
     }
-
+    else
     // check valid level spell and wisdom skill
     if(3 == spell_level && Skill::Level::NONE == hero.GetLevelSkill(Skill::Secondary::WISDOM))
     {
 	PlaySoundFailure;
 	body += _("\nUnfortunately, you do not have the wisdom to understand the spell, and you are unable to learn it.");
 	Dialog::Message(head, body, Font::BIG, Dialog::OK);
-	return;
     }
-
-    PlaySoundSuccess;
-    hero.AppendSpellToBook(spell());
-    hero.SetVisited(dst_index, Settings::Get().ExtShowVisitedContent() ? Visit::GLOBAL : Visit::LOCAL); // see dialog_quickinfo
-    Dialog::SpellInfo(spell_name, body, spell());
+    else
+    // is visited
+    if(hero.isVisited(obj, Visit::GLOBAL))
+    {
+	PlaySoundFailure;
+	body += _("\nUnfortunately, you already have knowledge of this spell, so there is nothing more for them to teach you.");
+	Dialog::Message(head, body, Font::BIG, Dialog::OK);
+    }
+    else
+    {
+	PlaySoundSuccess;
+	hero.AppendSpellToBook(spell());
+	hero.SetVisited(dst_index, Visit::GLOBAL);
+	Dialog::SpellInfo(head, body, spell());
+    }
 
     DEBUG(DBG_GAME , DBG_INFO, "ActionToShrine: " << hero.GetName());
 }
@@ -1144,22 +1151,22 @@ void ActionToWitchsHut(Heroes &hero, const u8 obj, const u16 dst_index)
     if(HEROESMAXSKILL == hero.CountSecondarySkill())
     {
 	Dialog::Message(head, body + _("As you approach, she turns and focuses her one glass eye on you.\n\"You already know everything you deserve to learn!\" the witch screeches. \"NOW GET OUT OF MY HOUSE!\""), Font::BIG, Dialog::OK);
-	return;
     }
-
+    else
     // check present skill
     if(hero.HasSecondarySkill(skill))
     {
 	Dialog::Message(head, body + _("As you approach, she turns and speaks.\n\"You already know that which I would teach you. I can help you no further.\""), Font::BIG, Dialog::OK);
-	return;
     }
+    else
+    {
+	hero.LearnBasicSkill(skill);
+	hero.SetVisited(dst_index, Visit::GLOBAL);
 
-    hero.LearnBasicSkill(skill);
-    hero.SetVisited(dst_index, Settings::Get().ExtShowVisitedContent() ? Visit::GLOBAL : Visit::LOCAL); // see dialog_quickinfo
-
-    body = _("An ancient and immortal witch living in a hut with bird's legs for stilts teaches you %{skill} for her own inscrutable purposes.");
-    String::Replace(body, "%{skill}", skill_name);
-    Dialog::SecondarySkillInfo(head, body, skill, Skill::Level::BASIC);
+	body = _("An ancient and immortal witch living in a hut with bird's legs for stilts teaches you %{skill} for her own inscrutable purposes.");
+	String::Replace(body, "%{skill}", skill_name);
+	Dialog::SecondarySkillInfo(head, body, skill, Skill::Level::BASIC);
+    }
 
     DEBUG(DBG_GAME , DBG_INFO, "ActionToWitchsHut: " << hero.GetName());
 }

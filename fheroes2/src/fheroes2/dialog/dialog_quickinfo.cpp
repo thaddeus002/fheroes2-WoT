@@ -240,7 +240,7 @@ void Dialog::QuickInfo(const Maps::Tiles & tile)
 		if(hero && hero->HaveSpell(Spell::FromInt(tile.GetQuantity1())))
 		{
 	    	    name_object.append("\n(");
-	    	    name_object.append(_("you know it"));
+	    	    name_object.append(_("already learned"));
 	    	    name_object.append(")");
 		}
 	    }
