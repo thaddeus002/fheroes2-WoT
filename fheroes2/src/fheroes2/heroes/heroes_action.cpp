@@ -1881,14 +1881,14 @@ void ActionToTreasureChest(Heroes &hero, const u8 obj, const u16 dst_index)
 		message = _("After spending hours trying to fish the chest out of the sea, you open it and find %{gold} gold and the %{art}.");
 		String::Replace(message, "%{gold}", resource.gold);
 		String::Replace(message, "%{art}", art.GetName());
-		DialogWithArtifactAndGold("Chest", message, art(), resource.gold);
+		DialogWithArtifactAndGold(_("Sea Chest"), message, art(), resource.gold);
 	    }
 	    else
 	    {
 		resource.gold = 1500;	// it is from FAQ
 		message = _("After spending hours trying to fish the chest out of the sea, you open it and find %{gold} gold pieces.");
 		String::Replace(message, "%{gold}", resource.gold);
-		DialogWithGold("Chest", message, resource.gold);
+		DialogWithGold(_("Sea Chest"), message, resource.gold);
 	    }
 	    world.GetKingdom(hero.GetColor()).AddFundsResource(resource);
 	}
@@ -1898,13 +1898,13 @@ void ActionToTreasureChest(Heroes &hero, const u8 obj, const u16 dst_index)
 	{
 	    message = _("After spending hours trying to fish the chest out of the sea, you open it and find %{gold} gold pieces.");
 	    String::Replace(message, "%{gold}", resource.gold);
-	    DialogWithGold("Chest", message, resource.gold);
+	    DialogWithGold(_("Sea Chest"), message, resource.gold);
 
 	    world.GetKingdom(hero.GetColor()).AddFundsResource(resource);
 	}
 	else
 	{
-	    Dialog::Message("Chest", _("After spending hours trying to fish the chest out of the sea, you open it, only to find it empty."), Font::BIG, Dialog::OK);
+	    Dialog::Message(_("Sea Chest"), _("After spending hours trying to fish the chest out of the sea, you open it, only to find it empty."), Font::BIG, Dialog::OK);
 	}
     }
     else
@@ -1919,14 +1919,14 @@ void ActionToTreasureChest(Heroes &hero, const u8 obj, const u16 dst_index)
 	    {
 		message = _("After scouring the area, you fall upon a hidden chest, containing the ancient artifact %{art}.");
 		String::Replace(message, "%{art}", art.GetName());
-		DialogWithArtifact("Chest", message, art());
+		DialogWithArtifact(_("Treasure Chest"), message, art());
 	    }
 	    else
 	    {
 		resource.gold = 1000;	// it is from FAQ
 		message = _("After scouring the area, you fall upon a hidden chest, containing the %{gold} gold pieces.");
 		String::Replace(message, "%{gold}", resource.gold);
-		DialogWithGold("Chest", message, resource.gold);
+		DialogWithGold(_("Treasure Chest"), message, resource.gold);
 	    }
 	    world.GetKingdom(hero.GetColor()).AddFundsResource(resource);
 	}
@@ -1936,7 +1936,7 @@ void ActionToTreasureChest(Heroes &hero, const u8 obj, const u16 dst_index)
 	    const u16 expr = resource.gold - 500;
 	    message = _("After scouring the area, you fall upon a hidden treasure cache. You may take the gold or distribute the gold to the peasants for experience. Do you wish to keep the gold?");
 
-	    if(Dialog::SelectGoldOrExp("Chest", message, resource.gold, expr))
+	    if(Dialog::SelectGoldOrExp(_("Treasure Chest"), message, resource.gold, expr))
 		world.GetKingdom(hero.GetColor()).AddFundsResource(resource);
 	    else
 		hero.IncreaseExperience(expr);

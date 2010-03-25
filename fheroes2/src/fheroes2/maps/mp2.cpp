@@ -484,7 +484,7 @@ const char* MP2::StringObject(u8 object)
         case MP2::OBJ_SKELETON:			return _("Skeleton");
         case MP2::OBJ_TREASURECHEST:
         case MP2::OBJ_WATERCHEST:		return _("Treasure Chest");
-        case MP2::OBJ_CAMPFIRE:			return _("Camp Fire");
+        case MP2::OBJ_CAMPFIRE:			return _("Campfire");
         case MP2::OBJ_FOUNTAIN:			return _("Fountain");
         case MP2::OBJ_ANCIENTLAMP:		return _("Genie Lamp");
         case MP2::OBJ_GOBLINHUT:		return _("Goblin Hut");

@@ -278,6 +278,13 @@ void Dialog::QuickInfo(const Maps::Tiles & tile)
 	    }
 	    break;
 
+	case MP2::OBJ_TREASURECHEST:
+	    if(Maps::Ground::WATER == tile.GetGround())
+		name_object = _("Sea Chest");
+	    else
+		name_object = MP2::StringObject(tile.GetObject());
+	    break;
+
         default: 
 	    name_object = MP2::StringObject(tile.GetObject());
 	    break;
