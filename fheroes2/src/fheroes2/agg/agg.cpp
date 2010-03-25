@@ -554,16 +554,17 @@ void AGG::Cache::LoadWAV(const M82::m82_t m82)
     std::vector<u8> & v = wav_cache[m82];
 
     if(v.size() || !Mixer::isValid()) return;
-    const Settings & conf = Settings::Get();
 
 #ifdef WITH_MIXER
+    const Settings & conf = Settings::Get();
+
     if(conf.UseAltResource())
     {
        std::string name(M82::GetString(m82));
        String::Lower(name);
        // ogg
        String::Replace(name, ".82m", ".ogg");
-       std::string sound = Settings::Get().LocalPrefix() + SEPARATOR + "files" + SEPARATOR + "sounds" + SEPARATOR + name;
+       std::string sound = conf.LocalPrefix() + SEPARATOR + "files" + SEPARATOR + "sounds" + SEPARATOR + name;
 
        if(StoreFileToMem(v, sound))
        {
@@ -573,7 +574,7 @@ void AGG::Cache::LoadWAV(const M82::m82_t m82)
 
        // mp3
        String::Replace(name, ".82m", ".mp3");
-       sound = Settings::Get().LocalPrefix() + SEPARATOR + "files" + SEPARATOR + "sounds" + SEPARATOR + name;
+       sound = conf.LocalPrefix() + SEPARATOR + "files" + SEPARATOR + "sounds" + SEPARATOR + name;
 
        if(StoreFileToMem(v, sound))
        {

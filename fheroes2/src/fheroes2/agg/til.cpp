@@ -34,7 +34,7 @@ namespace TIL
 	{ GROUND32,	"GROUND32.TIL" },
 	{ STON,		"STON.TIL" },
     };
-};
+}
 
 const char* TIL::GetString(const til_t til)
 {

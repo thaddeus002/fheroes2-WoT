@@ -57,7 +57,7 @@ namespace Battle2
 	Point coord;
 	s16 index;
     };
-};
+}
 
 void DrawHexagon(Surface & sf, u8 index_color)
 {

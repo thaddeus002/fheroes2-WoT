@@ -47,8 +47,8 @@ namespace Game
 	void ModifySingleTile(Maps::Tiles & center);
 	void ModifyTileAbroad(Maps::Tiles & center);
 	void SetGroundToTile(Maps::Tiles & tile, const Maps::Ground::ground_t ground);
-    };
-};
+    }
+}
 
 Game::menu_t Game::Editor::StartGame()
 {

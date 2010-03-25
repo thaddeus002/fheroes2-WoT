@@ -46,7 +46,7 @@ namespace XMI
 	MIDI0017,
 	MIDI0018,
 	MIDI0042,
-	MIDI0043,
+	MIDI0043
     };
 
     const char* GetString(const xmi_t xmi);

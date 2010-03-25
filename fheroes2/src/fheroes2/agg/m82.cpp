@@ -342,7 +342,7 @@ namespace M82
 	{ ZOMBWNCE,	"ZOMBWNCE.82M" },
 
     };
-};
+}
 
 const char* M82::GetString(const m82_t m82)
 {

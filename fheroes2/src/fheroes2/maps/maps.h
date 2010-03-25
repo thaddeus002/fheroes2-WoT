@@ -82,6 +82,6 @@ namespace Maps
     void UpdateRNDSpriteForCastle(const Point & center, u8 race, bool castle);
     void UpdateSpritesFromTownToCastle(const Point & center);
     void MinimizeAreaForCastle(const Point & center);
-};
+}
 
 #endif

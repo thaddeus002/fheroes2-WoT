@@ -38,7 +38,7 @@
 enum
 {
     FLAGS_READONLY	= 0x01,
-    FLAGS_USEART32	= 0x02,
+    FLAGS_USEART32	= 0x02
 };
 
 SelectArtifactsBar::SelectArtifactsBar(Heroes &h) : hero(h), interval(0), selected(-1), flags(0), background(NULL)

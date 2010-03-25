@@ -41,7 +41,7 @@ enum
     FLAGS_READONLY	= 0x01,
     FLAGS_USEMONS32	= 0x02,
     FLAGS_SAVELAST	= 0x04,
-    FLAGS_COUNT2SPRITE	= 0x08,
+    FLAGS_COUNT2SPRITE	= 0x08
 };
 
 SelectArmyBar::SelectArmyBar() : army(NULL), interval(0), selected(-1), flags(0), background(NULL), castle(NULL)

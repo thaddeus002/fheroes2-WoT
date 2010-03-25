@@ -48,7 +48,7 @@ namespace XMI
 	{ MIDI0042,	"MIDI0042.XMI" },
 	{ MIDI0043,	"MIDI0043.XMI" },
     };
-};
+}
 
 const char* XMI::GetString(const xmi_t xmi)
 {

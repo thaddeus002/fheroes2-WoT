@@ -84,9 +84,9 @@ bool ZLib::Compress(std::vector<char> & dst, const std::string & src)
     return src.size() && Compress(dst, src.c_str(), src.size());
 }
 
-bool ZSurface::Load(u16 w, u16 h, u8 b, const char* p, size_t s, bool a)
+bool ZSurface::Load(u16 w, u16 h, u8 b, const u8* p, size_t s, bool a)
 {
-    if(!ZLib::UnCompress(buf, p, s)) return false;
+    if(!ZLib::UnCompress(buf, reinterpret_cast<const char*>(p), s)) return false;
     Set(&buf[0], w, h, b, a);
     return true;
 }

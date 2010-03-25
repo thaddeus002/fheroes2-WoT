@@ -31,7 +31,7 @@
 namespace Maps
 {
     static u32 animation_ticket = 0;
-};
+}
 
 const char* Maps::SizeString(u8 s)
 {

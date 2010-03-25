@@ -34,7 +34,7 @@ namespace Game
     void SwitchShowIcons(void);
     void KeyPress_e(menu_t &);
     void KeyPress_ESC(menu_t &);
-};
+}
 
 Interface::ControlPanel::ControlPanel()
 {

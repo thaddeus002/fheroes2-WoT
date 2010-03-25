@@ -921,7 +921,7 @@ namespace ICN
 
     u8 missile9(float, float);
     u8 missile7(float, float);
-};
+}
 
 const char* ICN::GetString(const icn_t icn)
 {

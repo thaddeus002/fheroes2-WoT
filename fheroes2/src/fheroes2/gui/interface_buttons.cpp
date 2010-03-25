@@ -38,7 +38,7 @@ namespace Game
     void ButtonAdventure(Game::menu_t &);
     void ButtonFile(Game::menu_t &);
     void ButtonSystem(void);
-};
+}
 
 Interface::ButtonsArea::ButtonsArea() : Rect(0, 0, 144, 72)
 {

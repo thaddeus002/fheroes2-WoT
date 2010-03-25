@@ -58,7 +58,7 @@ enum
     GLOBAL_USEUNICODE        = 0x40000000,
     GLOBAL_ALTRESOURCE       = 0x80000000,
 
-    GLOBAL_MUSIC           = GLOBAL_MUSIC_CD | GLOBAL_MUSIC_EXT | GLOBAL_MUSIC_MIDI,
+    GLOBAL_MUSIC           = GLOBAL_MUSIC_CD | GLOBAL_MUSIC_EXT | GLOBAL_MUSIC_MIDI
 };
 
 struct settings_t
@@ -381,7 +381,7 @@ const ListMapsDirectory & Settings::GetListMapsDirectory(void) const { return li
 
 /* return path to locales directory */
 const std::string & Settings::LocalPrefix(void) const { return local_prefix; }
-const std::string & Settings::PlayMusCommand(void) const { return playmus_command; };
+const std::string & Settings::PlayMusCommand(void) const { return playmus_command; }
 
 bool Settings::MusicExt(void) const { return opt_global.Modes(GLOBAL_MUSIC_EXT); }
 bool Settings::MusicMIDI(void) const { return opt_global.Modes(GLOBAL_MUSIC_MIDI); }

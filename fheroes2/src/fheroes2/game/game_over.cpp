@@ -191,7 +191,7 @@ u16  GameOver::Result::GetResult(void) const
 namespace Game
 {
     void DialogPlayers(const Color::color_t, const std::string &);
-};
+}
 
 bool GameOver::Result::CheckGameOver(Game::menu_t & res)
 {

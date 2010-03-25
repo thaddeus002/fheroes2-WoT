@@ -47,7 +47,7 @@
 namespace Game
 {
     menu_t HumanTurn(void);
-};
+}
 
 bool FH2LocalClient::BattleLoop(Battle2::Arena & arena, Battle2::Result & result)
 {

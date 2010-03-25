@@ -30,7 +30,7 @@
 namespace Dialog
 {
     void DrawSystemInfo(const Point & dst);
-};
+}
 
 /* return 0x02 - change sound, 0x04 - change music, 0x08 - change interface */
 u8 Dialog::SystemOptions(void)

@@ -44,7 +44,7 @@ namespace Battle2
     void PickupArtifactsAction(HeroBase &, HeroBase &, bool);
     void EagleEyeSkillAction(HeroBase &, const std::vector<u8> &, bool);
     void NecromancySkillAction(Army::army_t &, Army::army_t &, bool);
-};
+}
 
 Battle2::Result Battle2::Loader(Army::army_t & army1, Army::army_t & army2, u16 mapsindex)
 {

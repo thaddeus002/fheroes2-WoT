@@ -33,7 +33,7 @@
 namespace Battle2
 {
     bool isApplySpell(const Spell::spell_t, const Stats*, const HeroBase &, Actions &);
-};
+}
 
 void Battle2::Arena::AITurn(const Stats & b, Actions & a)
 {

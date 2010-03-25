@@ -53,7 +53,7 @@ namespace Game
     // town, castle, heroes, artifact_telescope, object_observation_tower, object_magi_eyes
     static u8 view_distance[] = { 4, 5, 4, 1, 10, 9 };
     static u8 whirlpool_percent = 50;
-};
+}
 
 Game::menu_t Game::Testing(u8 t)
 {

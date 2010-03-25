@@ -25,11 +25,11 @@
 
 // operator ++difficulty_t
 Difficulty::difficulty_t& Difficulty::operator++ (Difficulty::difficulty_t& difficulty)
-{ return difficulty = ( Difficulty::IMPOSSIBLE == difficulty ? Difficulty::EASY : Difficulty::difficulty_t(difficulty + 1)); };
+{ return difficulty = ( Difficulty::IMPOSSIBLE == difficulty ? Difficulty::EASY : Difficulty::difficulty_t(difficulty + 1)); }
 
 // operator --difficulty_t
 Difficulty::difficulty_t& Difficulty::operator-- (Difficulty::difficulty_t& difficulty)
-{ return difficulty = ( Difficulty::EASY == difficulty ? Difficulty::IMPOSSIBLE : Difficulty::difficulty_t(difficulty - 1)); };
+{ return difficulty = ( Difficulty::EASY == difficulty ? Difficulty::IMPOSSIBLE : Difficulty::difficulty_t(difficulty - 1)); }
 
 
 const char* Difficulty::String(u8 difficulty)

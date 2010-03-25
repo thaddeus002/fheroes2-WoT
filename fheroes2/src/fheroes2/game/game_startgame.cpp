@@ -98,7 +98,7 @@ namespace Game
     void ShowWarningLostTowns(menu_t &);
 
     u32 UpdateFPS(u32, void *);
-};
+}
 
 void Game::MoveHeroFromArrowKeys(Heroes & hero, Direction::vector_t direct)
 {

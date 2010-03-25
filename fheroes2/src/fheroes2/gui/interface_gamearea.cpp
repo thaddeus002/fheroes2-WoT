@@ -36,7 +36,7 @@ namespace Game
     Cursor::themes_t GetCursor(u16);
     void MouseCursorAreaClickLeft(u16);
     void MouseCursorAreaPressRight(u16);
-};
+}
 
 void	RedrawClopOrClofSpriteFog(const u16 dst_index, const Point & dst);
 

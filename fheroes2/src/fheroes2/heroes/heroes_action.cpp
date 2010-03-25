@@ -48,7 +48,7 @@
 namespace Game
 {
     void OpenCastle(Castle *);
-};
+}
 
 void ActionToCastle(Heroes &hero, const u8 obj, const u16 dst_index);
 void ActionToHeroes(Heroes &hero, const u8 obj, const u16 dst_index);
