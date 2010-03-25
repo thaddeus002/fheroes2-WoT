@@ -31,9 +31,9 @@ namespace Battle2
 {
     class Arena;
     class Stats;
-};
+}
 
-namespace Maps { class Tiles; };
+namespace Maps { class Tiles; }
 
 namespace Army
 {
@@ -68,7 +68,7 @@ namespace Army
         const army_t*   GetArmy(void) const;
 	const char*     GetName(u32 amount = 0) const;
 
-        u32 		Count(void) const { return GetCount(); };
+        u32 		Count(void) const { return GetCount(); }
         u32 		GetCount(void) const;
         
 	u8		GetAttack(void) const;
@@ -110,6 +110,6 @@ namespace Army
 	army_t*		army;
 	Battle2::Stats*	battle;
     };
-};
+}
 
 #endif

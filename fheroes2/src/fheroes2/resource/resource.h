@@ -28,7 +28,8 @@
 
 namespace Resource
 {
-    typedef enum {
+    enum resource_t
+    {
 	UNKNOWN = 0x00,
         WOOD	= 0x01,
         MERCURY	= 0x02,
@@ -36,8 +37,8 @@ namespace Resource
         SULFUR	= 0x08,
         CRYSTAL	= 0x10,
         GEMS	= 0x20,
-        GOLD	= 0x40,
-    } resource_t;
+        GOLD	= 0x40
+    };
 
     struct funds_t
     {
@@ -90,6 +91,6 @@ namespace Resource
 
 	const funds_t & rs;
     };
-};
+}
 
 #endif

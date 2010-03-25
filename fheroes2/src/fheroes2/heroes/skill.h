@@ -46,7 +46,7 @@ namespace Skill
 	type_t FromMP2(const u8 byte);
 
 	const char* String(u8 level);
-    };
+    }
 
     class Secondary : private std::pair<u8, u8>
     {
@@ -68,7 +68,7 @@ namespace Skill
 	    BALLISTICS	= 11,
 	    EAGLEEYE	= 12,
 	    NECROMANCY	= 13,
-	    ESTATES	= 14,
+	    ESTATES	= 14
 	};
 
 	Secondary();
@@ -112,7 +112,7 @@ namespace Skill
 	    ATTACK	= 1,
 	    DEFENCE	= 2,
 	    POWER	= 3,
-	    KNOWLEDGE	= 4,
+	    KNOWLEDGE	= 4
 	};
 
 	enum type_t
@@ -120,7 +120,7 @@ namespace Skill
 	    UNDEFINED,
 	    MONSTER,
 	    CAPTAIN,
-	    HEROES,
+	    HEROES
 	};
 
 	Primary();
@@ -146,7 +146,7 @@ namespace Skill
 	u8			knowledge;
     };
 
-};
+}
 
 class SecondarySkillBar
 {

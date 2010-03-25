@@ -27,7 +27,7 @@
 
 namespace Race
 {
-    typedef enum
+    enum race_t
     {
         KNGT    = 0x01,
         BARB    = 0x02,
@@ -39,11 +39,11 @@ namespace Race
         RAND    = 0x80,
         BOMG    = 0x00,
 	ALL	= KNGT | BARB | SORC | WRLK | WZRD | NECR
-    } race_t;
+    };
 
     const char* String(u8);
     race_t Rand(void);
     race_t Get(u8);
-};
+}
 
 #endif

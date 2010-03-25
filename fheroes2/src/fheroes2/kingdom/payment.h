@@ -82,6 +82,6 @@ namespace PaymentConditions
     };
 
     void UpdateCosts(const std::string &);
-};
+}
 
 #endif

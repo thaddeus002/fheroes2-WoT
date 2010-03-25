@@ -27,12 +27,12 @@ class IndexObject;
 
 namespace Visit
 {
-    typedef enum { LOCAL, GLOBAL } type_t;
+    enum type_t { LOCAL, GLOBAL };
 
     bool isDayLife(const IndexObject & visit);
     bool isWeekLife(const IndexObject & visit);
     bool isMonthLife(const IndexObject & visit);
     bool isBattleLife(const IndexObject & visit);
-};
+}
 
 #endif

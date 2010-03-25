@@ -51,6 +51,6 @@ namespace XMI
 
     const char* GetString(const xmi_t xmi);
     xmi_t FromMUS(const MUS::mus_t mus);
-};
+}
 
 #endif

@@ -25,6 +25,8 @@
 #include "icn.h"
 #include "gamedefs.h"
 
+class Sprite;
+
 class Button : public Rect
 {
 public:
@@ -32,10 +34,10 @@ public:
     Button(const Point &pt, const ICN::icn_t icn, u16 index1, u16 index2);
     Button(u16 ox, u16 oy, const ICN::icn_t icn, u16 index1, u16 index2);
 
-    bool isEnable(void) const{ return !disable; };
-    bool isDisable(void) const{ return disable; };
-    bool isPressed(void) const{ return pressed; };
-    bool isReleased(void) const{ return !pressed; };
+    bool isEnable(void) const{ return !disable; }
+    bool isDisable(void) const{ return disable; }
+    bool isPressed(void) const{ return pressed; }
+    bool isReleased(void) const{ return !pressed; }
 
     void Press(void);
     void Release(void);
@@ -43,7 +45,7 @@ public:
     void SetPos(const Point & pt);
     void SetPos(const u16 ox, const u16 oy);
     void SetSprite(const ICN::icn_t icn, const u16 index1, const u16 index2);
-    void SetDisable(bool fl){ disable = fl; pressed = fl; };
+    void SetDisable(bool fl){ disable = fl; pressed = fl; }
 
     void Draw(void);
     void PressDraw(void);

@@ -34,7 +34,7 @@ namespace Game
     class Focus
     {
     public:
-	typedef enum { UNSEL, HEROES, CASTLE } focus_t;
+	enum focus_t { UNSEL, HEROES, CASTLE };
 
    	static Focus &	Get(void);
 
@@ -60,6 +60,6 @@ namespace Game
 	Heroes *	heroes;
 	Point		center;
     };
-};
+}
 
 #endif

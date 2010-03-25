@@ -34,11 +34,11 @@ namespace Route
     class Step : public std::pair<Direction::vector_t, u16>
     {
 	public:
-	Step() : std::pair<Direction::vector_t, u16>(Direction::CENTER, 0) {};
-	Step(const Direction::vector_t v, const u16 c) : std::pair<Direction::vector_t, u16>(v, c) {};
+	Step() : std::pair<Direction::vector_t, u16>(Direction::CENTER, 0) {}
+	Step(const Direction::vector_t v, const u16 c) : std::pair<Direction::vector_t, u16>(v, c) {}
 
-	Direction::vector_t Direction() const { return first; };
-	u16 Penalty() const { return second; };
+	Direction::vector_t Direction() const { return first; }
+	u16 Penalty() const { return second; }
     };
 
     class Path : public std::list<Step>
@@ -46,20 +46,20 @@ namespace Route
 	public:
 	    Path(const Heroes & h);
 
-	    u16		GetDestinationIndex(void) const{ return dst; };
+	    u16		GetDestinationIndex(void) const{ return dst; }
 	    Direction::vector_t GetFrontDirection(void) const;
 	    u16		GetFrontPenalty(void) const;
 	    u16		Calculate(const u16 dst_index, const u16 limit = MAXU16);
 
-	    void	Show(void){ hide = false; };
-	    void	Hide(void){ hide = true; };
+	    void	Show(void){ hide = false; }
+	    void	Hide(void){ hide = true; }
 	    void	Reset(void);
 	    void	Resize(u16);
 	    void	PopFront(void);
 	    void	ScanObstacleAndReduce(void);
 
-	    bool	isValid(void) const { return size(); };
-	    bool	isShow(void) const { return !hide; };
+	    bool	isValid(void) const { return size(); }
+	    bool	isShow(void) const { return !hide; }
 	    u16		isUnderProtection(u16 & pos) const;
 	    bool	hasObstacle(u16* res = NULL) const;
 
@@ -68,8 +68,8 @@ namespace Route
 	    u16		GetAllowStep(void) const;
 	    u32		TotalPenalty(void) const;
 
-	    const_iterator Begin(void) const{ return begin(); };
-	    const_iterator End(void) const{ return end(); };
+	    const_iterator Begin(void) const{ return begin(); }
+	    const_iterator End(void) const{ return end(); }
 
     	    static u16	GetIndexSprite(const Direction::vector_t & from, const Direction::vector_t & to, u8 mod);
 
@@ -79,6 +79,6 @@ namespace Route
 	    u16		dst;
 	    bool	hide;
     };
-};
+}
 
 #endif

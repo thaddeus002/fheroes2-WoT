@@ -29,7 +29,7 @@
 
 namespace M82
 {
-    typedef enum
+    enum m82_t
     {
 	AELMATTK,
 	AELMKILL,
@@ -343,12 +343,12 @@ namespace M82
 	
 	UNKNOWN
 
-    } m82_t;
+    };
 
     const char* GetString(const m82_t m82);
     m82_t FromSpell(u8);
     u8 GetIndexLOOP00XXFromObject(u8);
     m82_t GetLOOP00XX(u8);
-};
+}
 
 #endif

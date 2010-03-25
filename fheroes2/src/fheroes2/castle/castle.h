@@ -37,7 +37,7 @@
 #include "game_io.h"
 
 class Heroes;
-namespace Maps { class Tiles; };
+namespace Maps { class Tiles; }
 
 enum building_t
 {
@@ -86,7 +86,7 @@ public:
 	//			= 0x0004,
 	ALLOWBUILD		= 0x0008,
 	//			- 0x0010,
-	CAPITAL			= 0x0020,
+	CAPITAL			= 0x0020
     };
 
     Castle();
@@ -95,8 +95,8 @@ public:
 
     Captain &GetCaptain() { return captain; }
 
-    bool isCastle(void) const{ return building & BUILD_CASTLE; };
-    bool isCapital(void) const{ return Modes(CAPITAL); };
+    bool isCastle(void) const{ return building & BUILD_CASTLE; }
+    bool isCapital(void) const{ return Modes(CAPITAL); }
     bool HaveNearlySea(void) const;
     bool PresentBoat(void) const;
     bool RecruitMonster(u32 dw, u16 count);
@@ -110,9 +110,9 @@ public:
     const Heroes* GetHeroes(void) const;
     Heroes* GetHeroes(void);
 
-    Race::race_t GetRace(void) const{ return race; };
-    Color::color_t GetColor(void) const{ return color; };
-    const std::string & GetName(void) const{ return name; };
+    Race::race_t GetRace(void) const{ return race; }
+    Color::color_t GetColor(void) const{ return color; }
+    const std::string & GetName(void) const{ return name; }
     u8 GetControl(void) const;
     u8 GetLevelMageGuild(void) const;
     const MageGuild & GetMageGuild(void) const;
@@ -142,9 +142,9 @@ public:
     s8 GetMoraleWithModificators(std::string *strs = NULL) const;
     s8 GetLuckWithModificators(std::string *strs = NULL) const;
 
-    bool AllowBuild(void) const{ return Modes(ALLOWBUILD); };
+    bool AllowBuild(void) const{ return Modes(ALLOWBUILD); }
     bool AllowBuyBuilding(u32) const;
-    bool isBuild(u32 bd) const{ return building & bd; };
+    bool isBuild(u32 bd) const{ return building & bd; }
     bool BuyBuilding(u32);
     bool AllowBuyBoat(void) const;
     bool BuyBoat(void);

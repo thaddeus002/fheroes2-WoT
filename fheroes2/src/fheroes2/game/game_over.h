@@ -44,7 +44,7 @@ namespace GameOver
 	LOSS_TOWN	= 0x0200,
 	LOSS_HERO	= 0x0400,
 	LOSS_TIME	= 0x0800,
-	LOSS            = LOSS_ALL | LOSS_TOWN | LOSS_HERO | LOSS_TIME,
+	LOSS            = LOSS_ALL | LOSS_TOWN | LOSS_HERO | LOSS_TIME
     };
 
     const char* GetString(conditions_t);
@@ -68,6 +68,6 @@ namespace GameOver
 	u8  colors;
 	u16 result;
     };
-};
+}
 
 #endif

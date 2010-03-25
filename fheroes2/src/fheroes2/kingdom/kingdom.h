@@ -43,7 +43,7 @@ public:
     enum flags_t
     {
 	PLAY	= 0x0001,
-	IDENTIFYHERO = 0x0002,
+	IDENTIFYHERO = 0x0002
     };
 
     Kingdom();
@@ -53,25 +53,25 @@ public:
     void ResetModes(flags_t);
     bool Modes(flags_t) const;
 
-    Game::control_t Control(void) const{ return control; };
-    void SetControl(const Game::control_t con) { control = con; };
+    Game::control_t Control(void) const{ return control; }
+    void SetControl(const Game::control_t con) { control = con; }
     void UpdateStartingResource(void);
-    bool isPlay(void) const{ return Modes(PLAY); };
+    bool isPlay(void) const{ return Modes(PLAY); }
     bool isLoss(void) const;
     bool AllowPayment(const Resource::funds_t & funds) const;
     bool AllowRecruitHero(bool check_payment) const;
 
-    Color::color_t GetColor(void) const{ return color; };
+    Color::color_t GetColor(void) const{ return color; }
     Race::race_t GetRace(void) const;
 
-    const Resource::funds_t & GetFundsResource(void) const{ return resource; };
-    u16 GetFundsWood(void) const{ return resource.wood; };
-    u16 GetFundsMercury(void) const{ return resource.mercury; };
-    u16 GetFundsOre(void) const{ return resource.ore; };
-    u16 GetFundsSulfur(void) const{ return resource.sulfur; };
-    u16 GetFundsCrystal(void) const{ return resource.crystal; };
-    u16 GetFundsGems(void) const{ return resource.gems; };
-    u32 GetFundsGold(void) const{ return resource.gold; };
+    const Resource::funds_t & GetFundsResource(void) const{ return resource; }
+    u16 GetFundsWood(void) const{ return resource.wood; }
+    u16 GetFundsMercury(void) const{ return resource.mercury; }
+    u16 GetFundsOre(void) const{ return resource.ore; }
+    u16 GetFundsSulfur(void) const{ return resource.sulfur; }
+    u16 GetFundsCrystal(void) const{ return resource.crystal; }
+    u16 GetFundsGems(void) const{ return resource.gems; }
+    u32 GetFundsGold(void) const{ return resource.gold; }
 
     void AddFundsResource(const Resource::funds_t & funds);
     void OddFundsResource(const Resource::funds_t & funds);
@@ -85,11 +85,11 @@ public:
 
     Recruits & GetRecruits(void);
 
-    const std::vector<Heroes *> & GetHeroes(void) const{ return heroes; };
-    const std::vector<Castle *> & GetCastles(void) const{ return castles; };
+    const std::vector<Heroes *> & GetHeroes(void) const{ return heroes; }
+    const std::vector<Castle *> & GetCastles(void) const{ return castles; }
 
-    std::vector<Heroes *> & GetHeroes(void) { return heroes; };
-    std::vector<Castle *> & GetCastles(void) { return castles; };
+    std::vector<Heroes *> & GetHeroes(void) { return heroes; }
+    std::vector<Castle *> & GetCastles(void) { return castles; }
 
     void AddHeroes(const Heroes *hero);
     void RemoveHeroes(const Heroes *hero);

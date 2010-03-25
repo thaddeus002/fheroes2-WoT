@@ -33,7 +33,7 @@
 #define ARENAH 9
 #define ARENASIZE ARENAW * ARENAH
 
-namespace Army { class Troop; };
+namespace Army { class Troop; }
 class Castle;
 class HeroBase;
 
@@ -231,6 +231,6 @@ namespace Battle2
 	Board board;
 	ICN::icn_t icn_covr;
     };
-};
+}
 
 #endif

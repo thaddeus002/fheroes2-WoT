@@ -28,6 +28,6 @@
 namespace ObjTown
 {
     bool	isPassable(const u16 icn, const u8 index);
-};
+}
 
 #endif

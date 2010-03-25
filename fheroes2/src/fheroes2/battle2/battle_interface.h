@@ -211,6 +211,6 @@ namespace Battle2
 	u16 teleport_src;
 	Rect pocket_book;
     };
-};
+}
 
 #endif

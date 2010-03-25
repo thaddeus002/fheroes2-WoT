@@ -25,11 +25,9 @@
 
 #include "gamedefs.h"
 
-class Sprite;
-
 namespace ICN
 {
-    typedef enum
+    enum icn_t
     {
 	ADVBORDE,
 	ADVBORD,
@@ -906,7 +904,7 @@ namespace ICN
 
 	UNKNOWN
 
-    } icn_t;
+    };
 
     class Header
     {
@@ -915,14 +913,14 @@ namespace ICN
 	
 	void Load(const u8* p);
 
-	u16 OffsetX(void) const{ return offset_x; };
-	u16 OffsetY(void) const{ return offset_y; };
-	u16 Width(void) const{ return width; };
-	u16 Height(void) const{ return height; };
-	u8  Type(void) const{ return type; };
-	u32 OffsetData(void) const{ return offset_data; };
+	u16 OffsetX(void) const{ return offset_x; }
+	u16 OffsetY(void) const{ return offset_y; }
+	u16 Width(void) const{ return width; }
+	u16 Height(void) const{ return height; }
+	u8  Type(void) const{ return type; }
+	u32 OffsetData(void) const{ return offset_data; }
 
-	inline static u8 SizeOf(void){ return 13; };
+	inline static u8 SizeOf(void){ return 13; }
 
 	private:
 	u16 offset_x;
@@ -947,6 +945,6 @@ namespace ICN
     bool HighlyObjectSprite(icn_t, u16);
 
     bool SkipRegistryFree(icn_t);
-};
+}
 
 #endif

@@ -46,27 +46,27 @@ namespace GameEvent
     class Day;
     class Coord;
     class Riddle;
-};
+}
 
 class World : protected Size
 {
 public:
-    ~World(){ Reset(); };
+    ~World(){ Reset(); }
 
     void LoadMaps(const std::string &filename);
     void NewMaps(const u16 sw, const u16 sh);
 
     static World & Get(void);
 
-    u16 w(void){ return width; };
-    u16 h(void){ return height; };
+    u16 w(void){ return width; }
+    u16 h(void){ return height; }
 
-    const Maps::Tiles & GetTiles(const Point & pt) const{ return GetTiles(pt.y * width + pt.x); };
-    const Maps::Tiles & GetTiles(u16 ax, u16 ay) const{ return GetTiles(ay * width + ax); };
-    const Maps::Tiles & GetTiles(u16 index) const{ return *vec_tiles.at(index); };
-    Maps::Tiles & GetTiles(const Point & pt) { return GetTiles(pt.y * width + pt.x); };
-    Maps::Tiles & GetTiles(u16 ax, u16 ay) { return GetTiles(ay * width + ax); };
-    Maps::Tiles & GetTiles(u16 index){ return *vec_tiles.at(index); };
+    const Maps::Tiles & GetTiles(const Point & pt) const{ return GetTiles(pt.y * width + pt.x); }
+    const Maps::Tiles & GetTiles(u16 ax, u16 ay) const{ return GetTiles(ay * width + ax); }
+    const Maps::Tiles & GetTiles(u16 index) const{ return *vec_tiles.at(index); }
+    Maps::Tiles & GetTiles(const Point & pt) { return GetTiles(pt.y * width + pt.x); }
+    Maps::Tiles & GetTiles(u16 ax, u16 ay) { return GetTiles(ay * width + ax); }
+    Maps::Tiles & GetTiles(u16 index){ return *vec_tiles.at(index); }
 
     Kingdom & GetMyKingdom(void);
     Kingdom & GetKingdom(u8 color);
@@ -75,13 +75,13 @@ public:
     void KingdomLoss(const Color::color_t);
 
     const Castle * GetCastle(u16 maps_index) const;
-    const Castle * GetCastle(const Point & pt) const{ return GetCastle(pt.x, pt.y); };
+    const Castle * GetCastle(const Point & pt) const{ return GetCastle(pt.x, pt.y); }
     Castle * GetCastle(u16 maps_index);
     Castle * GetCastle(u8 ax, u8 ay) const;
 
     const Heroes * GetHeroes(Heroes::heroes_t) const;
     const Heroes * GetHeroes(u16 maps_index) const;
-    const Heroes * GetHeroes(const Point & pt) const{ return GetHeroes(pt.x, pt.y); };
+    const Heroes * GetHeroes(const Point & pt) const{ return GetHeroes(pt.x, pt.y); }
     Heroes * GetHeroes(Heroes::heroes_t);
     Heroes * GetHeroes(u16 maps_index);
     Heroes * GetHeroes(u8 ax, u8 ay) const;
@@ -95,16 +95,16 @@ public:
     bool DiggingForUltimateArtifact(const Point & center);
     void ActionForMagellanMaps(u8 color);
 
-    u8 GetDay(void) const{ return LastDay() ? DAYOFWEEK : day % DAYOFWEEK; };
-    u8 GetWeek(void) const{ return LastWeek() ? WEEKOFMONTH : week % WEEKOFMONTH; };
-    u8 GetMonth(void) const{ return month; };
-    u16 CountDay(void) const{ return day; };
-    u16 CountWeek(void) const{ return week; };
-    bool BeginWeek(void) const{ return 1 == (day % DAYOFWEEK); };
-    bool BeginMonth(void) const{ return 1 == (week % WEEKOFMONTH); };
-    bool LastDay(void) const{ return (0 == (day % DAYOFWEEK)); };
-    bool LastWeek(void) const{ return (0 == (week % WEEKOFMONTH)); };
-    Week::type_t GetWeekType(void) const{ return week_name; };
+    u8 GetDay(void) const{ return LastDay() ? DAYOFWEEK : day % DAYOFWEEK; }
+    u8 GetWeek(void) const{ return LastWeek() ? WEEKOFMONTH : week % WEEKOFMONTH; }
+    u8 GetMonth(void) const{ return month; }
+    u16 CountDay(void) const{ return day; }
+    u16 CountWeek(void) const{ return week; }
+    bool BeginWeek(void) const{ return 1 == (day % DAYOFWEEK); }
+    bool BeginMonth(void) const{ return 1 == (week % WEEKOFMONTH); }
+    bool LastDay(void) const{ return (0 == (day % DAYOFWEEK)); }
+    bool LastWeek(void) const{ return (0 == (week % WEEKOFMONTH)); }
+    Week::type_t GetWeekType(void) const{ return week_name; }
     void DateDump(void) const;
 
     void NewDay(void);

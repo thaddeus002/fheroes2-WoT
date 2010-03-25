@@ -29,7 +29,7 @@
 #include "bitmodes.h"
 #include "battle_arena.h"
 
-class Surface;
+class Sprite;
 class HeroBase;
 
 namespace Battle2
@@ -77,7 +77,7 @@ namespace Battle2
         IS_MAGIC        = 0xFFFE0000,
 
 	IS_RED_STATUS	= IS_BAD_MAGIC,
-	IS_GREEN_STATUS = SP_SHIELD | SP_STEELSKIN | SP_STONESKIN | SP_DRAGONSLAYER | SP_BLOODLUST | SP_BLESS | SP_HASTE | SP_ANTIMAGIC,
+	IS_GREEN_STATUS = SP_SHIELD | SP_STEELSKIN | SP_STONESKIN | SP_DRAGONSLAYER | SP_BLOODLUST | SP_BLESS | SP_HASTE | SP_ANTIMAGIC
     };
 
     u8 GetCellTargets(const Stats &, const Stats &, std::vector<u16> &);
@@ -236,6 +236,6 @@ namespace Battle2
 	ModesAffected affected;
 	Sprite* contours[4];
     };
-};
+}
 
 #endif

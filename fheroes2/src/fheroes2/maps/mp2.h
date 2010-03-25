@@ -39,7 +39,8 @@
 namespace MP2
 {
     // origin mp2 tile
-    typedef struct {
+    struct mp2tile_t
+    {
         u16  tileIndex;		// tile (ocean, grass, snow, swamp, lava, desert, dirt, wasteland, beach)
         u8   objectName1;	// level 1.0
         u8   indexName1;	// index level 1.0 or 0xFF
@@ -52,10 +53,11 @@ namespace MP2
 	u16  indexAddon;	// zero or index addons_t
 	u32  uniqNumber1;	// level 1.0
 	u32  uniqNumber2;	// level 2.0
-    } mp2tile_t;
+    };
 
     // origin mp2 addons tile
-    typedef struct {
+    struct mp2addon_t
+    {
 	u16      indexAddon;	// zero or next addons_t
 	u8       objectNameN1;	// level 1.N
 	u8       indexNameN1;	// level 1.N or 0xFF
@@ -64,11 +66,12 @@ namespace MP2
 	u8       indexNameN2;	// level 1.N or 0xFF
 	u32      uniqNumberN1;	// level 1.N
 	u32      uniqNumberN2;	// level 2.N
-    } mp2addon_t;
+    };
 
     // origin mp2 castle
     // 0x0046 - size
-    typedef struct {
+    struct mp2castle_t
+    {
 	u8	color; 		// 00 blue, 01 green, 02 red, 03 yellow, 04 orange, 05 purpl, ff unknown
 	bool	customBuilding;
 	u16	building;
@@ -118,11 +121,12 @@ namespace MP2
 	bool	castle;
 	u8	allowCastle;	// 00 TRUE, 01 FALSE
 	u8	unknown[29];
-    } mp2castle_t;
+    };
 
     // origin mp2 heroes
     // 0x004c - size
-    typedef struct {
+    struct mp2heroes_t
+    {
 	u8	unknown;
 	bool	customTroops;
 	u8	monster1;	// 0xff none
@@ -165,17 +169,19 @@ namespace MP2
 	bool	patrol;
 	u8	countSquare;	// for patrol
 	u8	unknown4[15];	// 0
-    } mp2heroes_t;
+    };
 
     // origin mp2 sign or buttle
-    typedef struct {
+    struct mp2info_t
+    {
 	u8	id;		// 0x01
 	u8	zero[8];	// 8 byte 0x00
 	char	text;		// message  + '/0'
-    } mp2info_t;
+    };
 
     // origin mp2 event for coord
-    typedef struct {
+    struct mp2eventcoord_t
+    {
 	u8	id;		// 0x01
 	u32	wood;
 	u32	mercury;
@@ -195,11 +201,12 @@ namespace MP2
 	bool	orange;
 	bool	purple;
 	char	text;		// message + '/0'
-    } mp2eventcoord_t;
+    };
 
 
     // origin mp2 event for day
-    typedef struct {
+    struct mp2eventday_t
+    {
 	u8	id;		// 0x00
 	u32	wood;
 	u32	mercury;
@@ -220,17 +227,19 @@ namespace MP2
 	bool	orange;
 	bool	purple;
 	char	text;		// message + '/0'
-    } mp2eventday_t;
+    };
 
     // origin mp2 rumor
-    typedef struct {
+    struct mp2rumor_t
+    {
 	u8	id;		// 0x00
 	u8	zero[7];	// 7 byte 0x00
 	char	text;   	// message + '/0'
-    } mp2rumor_t;
+    };
 
     // origin mp2 riddle sphinx
-    typedef struct {
+    struct mp2riddle_t
+    {
 	u8	id;		// 0x00
 	u32	wood;
 	u32	mercury;
@@ -250,11 +259,12 @@ namespace MP2
 	char	answer7[13];
 	char	answer8[13];
 	char	text;		// message + '/0'
-    } mp2riddle_t;
+    };
         
     ///////////////////////////////////////////////////////////////////////////////
 
-    typedef enum {
+    enum object_t
+    {
 	OBJ_ZERO		= 0x00,
 	OBJ_UNKNW_02		= 0x02,
 	OBJN_ALCHEMYLAB		= 0x01,
@@ -526,7 +536,7 @@ namespace MP2
 	OBJ_EARTHALTAR		= 0xFE,
 	OBJ_WATERALTAR		= 0xFF,
 
-    } object_t;
+    };
 
     ICN::icn_t GetICNObject(const u8 type);
     const char *StringObject(u8 object);
@@ -544,6 +554,6 @@ namespace MP2
     bool isWeekLife(const u8 obj);
     bool isMonthLife(const u8 obj);
     bool isBattleLife(const u8 obj);
-};
+}
 
 #endif

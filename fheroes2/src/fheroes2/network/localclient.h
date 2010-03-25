@@ -32,8 +32,8 @@
 class heroes;
 class Castle;
 class Kingdom;
-namespace Army { class army_t; };
-namespace Battle2 { class Arena; class Result; };
+namespace Army { class army_t; }
+namespace Battle2 { class Arena; class Result; }
 
 class FH2LocalClient : public FH2Client
 {

@@ -27,7 +27,7 @@
 #include "sdlnet.h"
 #include "maps_fileinfo.h"
 
-namespace Maps {class Tiles; };
+namespace Maps {class Tiles; }
 class Kingdom;
 class Castle;
 class Heroes;
@@ -58,6 +58,6 @@ namespace Game
     bool Save(const std::string &);
     bool Load(const std::string &);
     bool LoadSAV2FileInfo(const std::string &,  Maps::FileInfo &);
-};
+}
 
 #endif

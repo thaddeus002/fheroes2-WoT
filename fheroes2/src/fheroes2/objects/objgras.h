@@ -28,6 +28,6 @@
 namespace ObjGrass
 {
     bool	isPassable(const u16 icn, const u8 index);
-};
+}
 
 #endif

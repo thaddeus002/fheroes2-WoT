@@ -39,8 +39,8 @@ namespace Interface
 	typedef std::vector<Item> Items;
 	typedef typename std::vector<Item>::iterator ItemsIterator;
 
-	ListBox(const Point & pt) : ptRedraw(pt), maxItems(0), content(NULL) {};
-	virtual ~ListBox(){};
+	ListBox(const Point & pt) : ptRedraw(pt), maxItems(0), content(NULL) {}
+	virtual ~ListBox(){}
 
 	virtual void RedrawItem(const Item &, u16, u16, bool) = 0;
 	virtual void RedrawBackground(const Point &) = 0;
@@ -69,30 +69,30 @@ namespace Interface
 	{
 	    buttonPgUp.SetSprite(icn, index1, index2);
     	    buttonPgUp.SetPos(pos);
-        };
+        }
 
 	void SetScrollButtonDn(const ICN::icn_t icn, const u16 index1, const u16 index2, const Point & pos)
 	{
 	    buttonPgDn.SetSprite(icn, index1, index2);
     	    buttonPgDn.SetPos(pos);
-        };
+        }
 
 	void SetScrollSplitter(const Sprite & sp, const Rect & area)
 	{
 	    splitter.SetOrientation(Splitter::VERTICAL);
 	    splitter.SetArea(area);
 	    splitter.SetSprite(sp);
-	};
+	}
 
 	void SetAreaMaxItems(const u8 max)
 	{
 	    maxItems = max;
-	};
+	}
 
 	void SetAreaItems(const Rect & rt)
 	{
 	    rtAreaItems = rt;
-	};
+	}
 
 	void SetListContent(std::vector<Item> & list)
 	{
@@ -100,7 +100,7 @@ namespace Interface
 	    cur = content->begin();
 	    top = content->begin();
 	    splitter.SetRange(0, (maxItems < list.size() ? list.size() - maxItems : 0));
-	};
+	}
 
 	void Redraw(void)
 	{
@@ -116,27 +116,27 @@ namespace Interface
             ItemsIterator last = top + maxItems < content->end() ? top + maxItems : content->end();
             for(; curt != last; ++curt)
                 RedrawItem(*curt, rtAreaItems.x, rtAreaItems.y + (curt - top) * rtAreaItems.h / maxItems, curt == cur);
-        };
+        }
 
 	Item & GetCurrent(void)
 	{
 	    return *cur;
-	};
+	}
 
 	void RemoveSelected(void)
 	{
 	    if(content && cur != content->end()) content->erase(cur);
-	};
+	}
 
 	bool isSelected(void) const
 	{
 	    return content && cur != content->end();
-	};
+	}
 
 	void Unselect(void)
 	{
 	    if(content) cur = content->end();
-	};
+	}
 
 	void QueueEventProcessing(void)
 	{
@@ -239,7 +239,7 @@ namespace Interface
 		    ActionListSingleClick(*cur);
 		}
 	    }
-	};
+	}
 
     protected:
 	Point ptRedraw;
@@ -256,6 +256,6 @@ namespace Interface
 	ItemsIterator cur;
 	ItemsIterator top;
     };
-};
+}
 
 #endif

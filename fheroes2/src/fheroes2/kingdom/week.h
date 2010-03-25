@@ -62,6 +62,6 @@ namespace Week
     type_t WeekRand(void);
     type_t MonthRand(void);
     type_t Get(u8);
-};
+}
 
 #endif

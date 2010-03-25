@@ -149,6 +149,6 @@ namespace Interface
 	u8      count_icons;
 	Dialog::FrameBorder border;
     };
-};
+}
 
 #endif

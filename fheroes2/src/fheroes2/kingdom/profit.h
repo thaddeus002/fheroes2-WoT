@@ -46,6 +46,6 @@ namespace ProfitConditions
     };
 
     void UpdateCosts(const std::string &);
-};
+}
 
 #endif

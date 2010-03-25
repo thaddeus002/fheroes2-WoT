@@ -47,6 +47,6 @@ namespace Battle2
 	bool cat_miss;
 	bool cat_fort;
     };
-};
+}
 
 #endif

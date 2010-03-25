@@ -33,13 +33,14 @@ class Castle;
 namespace Maps
 {
 
-    typedef enum {
+    enum mapsize_t
+    {
 	ZERO	= 0,
         SMALL	= 36,
         MEDIUM	= 72,
         LARGE	= 108,
         XLARGE	= 144
-    } mapsize_t;
+    };
 
     const char* SizeString(u8);
 

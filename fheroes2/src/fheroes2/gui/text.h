@@ -29,8 +29,8 @@
 
 namespace Font
 {
-    typedef enum { SMALL = 0x01, BIG = 0x02, YELLOW_BIG = 0x04, YELLOW_SMALL = 0x08 } type_t;
-};
+    enum type_t { SMALL = 0x01, BIG = 0x02, YELLOW_BIG = 0x04, YELLOW_SMALL = 0x08 };
+}
 
 class TextInterface
 {
@@ -129,8 +129,8 @@ public:
     void Clear(void);
     size_t Size(void) const;
 
-    u16 w(void) const{ return gw; };
-    u16 h(void) const{ return gh; };
+    u16 w(void) const{ return gw; }
+    u16 h(void) const{ return gh; }
 
     void Blit(u16 ax, u16 ay, Surface & sf = Display::Get()) const;
     void Blit(const Point & dst_pt, Surface & sf = Display::Get()) const;
@@ -151,7 +151,7 @@ public:
     TextSprite(const std::string & msg, Font::type_t ft, const Point & pt);
     TextSprite(const std::string & msg, Font::type_t ft, u16 ax, u16 ay);
 
-    void SetPos(const Point & pt){ SetPos(pt.x, pt.y); };
+    void SetPos(const Point & pt){ SetPos(pt.x, pt.y); }
     void SetPos(u16 ax, u16 ay);
     void SetText(const std::string & msg);
     void SetFont(Font::type_t ft);
@@ -181,12 +181,12 @@ public:
     void Set(const std::string &, Font::type_t, u16);
     void SetAlignLeft(void);
 
-    const Rect & GetRect(void) const{ return *this; };
-    s16 x(void) const{ return Rect::x; };
-    s16 y(void) const{ return Rect::y; };
-    u16 w(void) const{ return Rect::w; };
-    u16 h(void) const{ return Rect::h; };
-    u16 row(void) const{ return messages.size(); };
+    const Rect & GetRect(void) const{ return *this; }
+    s16 x(void) const{ return Rect::x; }
+    s16 y(void) const{ return Rect::y; }
+    u16 w(void) const{ return Rect::w; }
+    u16 h(void) const{ return Rect::h; }
+    u16 row(void) const{ return messages.size(); }
 
     void Blit(u16 ax, u16 ay, Surface & sf = Display::Get());
     void Blit(const Point & pt, Surface & sf = Display::Get());

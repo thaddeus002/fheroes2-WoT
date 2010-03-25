@@ -98,7 +98,7 @@ enum msg_t
     MSG_KINGDOM,
     MSG_WORLD,
 
-    MSG_UNKNOWN,
+    MSG_UNKNOWN
 };
 
 #ifdef WITH_NET
@@ -111,7 +111,7 @@ class FH2RemoteClient;
 class Kingdom;
 class Heroes;
 class Castle;
-namespace Maps { class Tiles; };
+namespace Maps { class Tiles; }
 
 
 namespace Network
@@ -142,7 +142,7 @@ namespace Network
 
     void		PackCastle(QueueMessage &, const Castle &);
     void		UnpackCastle(QueueMessage &);
-};
+}
 
 #endif
 

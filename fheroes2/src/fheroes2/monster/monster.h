@@ -118,7 +118,7 @@ public:
 	MONSTER_RND2,
 	MONSTER_RND3,
 	MONSTER_RND4,
-	MONSTER_RND,
+	MONSTER_RND
     };
 
     Monster();

@@ -99,7 +99,7 @@ public:
 	SETFGUARDIAN,
 	SETWGUARDIAN,
 
-	STONE,
+	STONE
     };
 
     Spell();

@@ -38,11 +38,11 @@ namespace Direction
 	BOTTOM		= 0x0020,
 	BOTTOM_LEFT	= 0x0040,
 	LEFT		= 0x0080,
-	CENTER		= 0x0100,
+	CENTER		= 0x0100
     };
 
-    inline vector_t& operator++ (vector_t& direct){ return direct = ( CENTER == direct ? TOP_LEFT : vector_t(direct << 1)); };
-    inline vector_t& operator-- (vector_t& direct){ return direct = ( TOP_LEFT == direct ? CENTER : vector_t(direct >> 1)); };
+    inline vector_t& operator++ (vector_t& direct){ return direct = ( CENTER == direct ? TOP_LEFT : vector_t(direct << 1)); }
+    inline vector_t& operator-- (vector_t& direct){ return direct = ( TOP_LEFT == direct ? CENTER : vector_t(direct >> 1)); }
 
     const char* String(vector_t direct);
 
@@ -51,7 +51,7 @@ namespace Direction
     vector_t Reflect(vector_t from);
 
     bool ShortDistanceClockWise(const vector_t from, const vector_t to);
-};
+}
 
 #define DIRECTION_TOP_ROW	(Direction::TOP_LEFT | Direction::TOP | Direction::TOP_RIGHT)
 #define DIRECTION_BOTTOM_ROW	(Direction::BOTTOM_LEFT | Direction::BOTTOM | Direction::BOTTOM_RIGHT)

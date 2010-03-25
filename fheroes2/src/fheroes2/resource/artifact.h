@@ -136,7 +136,7 @@ public:
 	SWORD_ANDURAN,
 	SPADE_NECROMANCY,
 
-	UNKNOWN,
+	UNKNOWN
     };
 
     Artifact();

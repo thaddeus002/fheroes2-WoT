@@ -37,15 +37,12 @@
 #include "sprite.h"
 #include "font.h"
 
-class Surface;
-class Sprite;
-
 namespace AGG
 {	
     class FAT
     {
     public:
-	FAT() : crc(0), offset(0), size(0) {};
+	FAT() : crc(0), offset(0), size(0) {}
 
 	u32 crc;
 	u32 offset;
@@ -79,7 +76,7 @@ namespace AGG
 
     struct icn_cache_t
     {
-	icn_cache_t() : sprites(NULL), reflect(NULL), count(0) {};
+	icn_cache_t() : sprites(NULL), reflect(NULL), count(0) {}
 	Sprite *sprites;
 	Sprite *reflect;
 	u16 count;
@@ -87,14 +84,14 @@ namespace AGG
 
     struct til_cache_t
     {
-	til_cache_t() : sprites(NULL),  count(0) {};
+	til_cache_t() : sprites(NULL),  count(0) {}
 	Surface *sprites;
 	u16 count;
     };
 
     struct fnt_cache_t
     {
-	fnt_cache_t() : medium_white(NULL), medium_yellow(NULL), small_white(NULL), small_yellow(NULL) {};
+	fnt_cache_t() : medium_white(NULL), medium_yellow(NULL), small_white(NULL), small_yellow(NULL) {}
 	Surface medium_white;
 	Surface medium_yellow;
 	Surface small_white;
@@ -103,8 +100,8 @@ namespace AGG
 
     struct loop_sound_t
     {
-	loop_sound_t(M82::m82_t w, int c) : sound(w), channel(c) {};
-	bool isM82(const M82::m82_t wav) const{ return wav == sound; };
+	loop_sound_t(M82::m82_t w, int c) : sound(w), channel(c) {}
+	bool isM82(const M82::m82_t wav) const{ return wav == sound; }
 
 	M82::m82_t sound;
 	int        channel;
@@ -202,6 +199,6 @@ namespace AGG
     // wrapper Audio
     void PlaySound(const M82::m82_t m82);
     void PlayMusic(const MUS::mus_t mus, bool loop = true);
-};
+}
 
 #endif

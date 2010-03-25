@@ -45,17 +45,17 @@ namespace Army
 {
     class Troop;
     class BattleTroop;
-};
+}
 
 namespace Maps
 {
     class FileInfo;
     class Tiles;
-};
+}
 
 namespace Dialog
 {
-    typedef enum
+    enum answer_t
     {
 	ZERO	= 0x0000,
 	YES     = 0x0001,
@@ -75,8 +75,8 @@ namespace Dialog
 
 	READONLY= 0x2000,
 	BATTLE	= 0x4000,
-	BUTTONS = (YES|OK|NO|CANCEL),
-    } answer_t;
+	BUTTONS = (YES|OK|NO|CANCEL)
+    };
 
     answer_t AdventureOptions(const bool enabledig);
     Game::menu_t FileOptions(void);
@@ -188,6 +188,6 @@ private:
     bool modify;
 };
 
-};
+}
 
 #endif

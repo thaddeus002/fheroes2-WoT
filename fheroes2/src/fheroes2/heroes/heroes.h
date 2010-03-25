@@ -41,7 +41,7 @@
 
 class Recruits;
 class Surface;
-namespace Interface { class GameArea; };
+namespace Interface { class GameArea; }
 
 class Heroes : public HeroBase
 {
@@ -80,7 +80,7 @@ public:
 	SCOUTER		= 0x0020,
 	STUPID		= 0x0040,
 	JAIL		= 0x0080,
-	ACTION		= 0x0100,
+	ACTION		= 0x0100
     };
 
     Heroes();
@@ -95,12 +95,12 @@ public:
 
     void LoadFromMP2(u16 map_index, const void *ptr,  const Color::color_t cl);
 
-    void ResetStupidFlag(void) { ResetModes(STUPID); };
+    void ResetStupidFlag(void) { ResetModes(STUPID); }
 
-    Color::color_t GetColor(void) const{ return color; };
-    Race::race_t GetRace(void) const{ return race; };
-    const std::string & GetName(void) const{ return name; };
-    u8 GetType(void) const { return Skill::Primary::HEROES; };
+    Color::color_t GetColor(void) const{ return color; }
+    Race::race_t GetRace(void) const{ return race; }
+    const std::string & GetName(void) const{ return name; }
+    u8 GetType(void) const { return Skill::Primary::HEROES; }
     u8 GetControl(void) const;
 
     Color::color_t GetKillerColor(void) const;
@@ -114,7 +114,7 @@ public:
     u16 GetIndex(void) const;
 
     const Army::army_t & GetArmy(void) const{ return army; }
-    Army::army_t & GetArmy(void) { return army; };
+    Army::army_t & GetArmy(void) { return army; }
 
     heroes_t GetID(void) const;
 
@@ -175,21 +175,21 @@ public:
 
     bool BuySpellBook(const Castle &);
 
-    const Route::Path & GetPath(void) const{ return path; };
-    Route::Path & GetPath(void) { return path; };
+    const Route::Path & GetPath(void) const{ return path; }
+    Route::Path & GetPath(void) { return path; }
     u16 FindPath(u16 dst_index) const;
     u8 GetRangeRouteDays(const u16 dst) const;
-    void ShowPath(bool f){ f ? path.Show() : path.Hide(); };
+    void ShowPath(bool f){ f ? path.Show() : path.Hide(); }
     void RescanPath(void);
 
-    Direction::vector_t GetDirection(void) const{ return direction; };
+    Direction::vector_t GetDirection(void) const{ return direction; }
 
     void SetVisited(const u16 index, const Visit::type_t type = Visit::LOCAL);
     bool isVisited(const u8 object, const Visit::type_t type = Visit::LOCAL) const;
     bool isVisited(const Maps::Tiles & tile, const Visit::type_t type = Visit::LOCAL) const;
-    std::deque<u16> & GetSheduledVisit(void) { return sheduled_visit; };
+    std::deque<u16> & GetSheduledVisit(void) { return sheduled_visit; }
 
-    void SetCenter(const Point& pt){ mp = pt; };
+    void SetCenter(const Point& pt){ mp = pt; }
     void SetCenter(const u16 index);
 
     bool Move(bool fast = false);
@@ -197,8 +197,8 @@ public:
     bool isEnableMove(void) const;
     bool CanMove(void) const;
     void SetMove(bool f);
-    bool isAction(void) const { return Modes(ACTION); };
-    void ResetAction(void) { ResetModes(ACTION); };
+    bool isAction(void) const { return Modes(ACTION); }
+    void ResetAction(void) { ResetModes(ACTION); }
     void Action(const u16 dst_index);
     void ActionNewPosition(void);
     bool ApplyPenaltyMovement(void);
@@ -211,7 +211,7 @@ public:
 
     void Redraw(Surface &, const Interface::GameArea &, bool) const;
     void Redraw(Surface &, const s16, const s16, const Interface::GameArea &, bool) const;
-    u8   GetSpriteIndex(void) const{ return sprite_index; };
+    u8   GetSpriteIndex(void) const{ return sprite_index; }
     void FadeOut(void) const;
     void FadeIn(void) const;
     void Scoute(void);

@@ -37,7 +37,7 @@ namespace Battle2
     class Stats;
     struct Result;
     struct TargetInfo;
-};
+}
 
 class FH2RemoteClient : public FH2Client
 {

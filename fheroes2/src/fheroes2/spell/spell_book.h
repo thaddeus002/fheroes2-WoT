@@ -35,14 +35,14 @@ public:
 	{
 	    ADVN = 0x01,
 	    CMBT = 0x02,
-	    ALL  = ADVN | CMBT,
+	    ALL  = ADVN | CMBT
 	};
 
 	SpellBook(void);
 
 	Spell::spell_t Open(const HeroBase &, filter_t filt, bool canselect) const;
-	void Activate(void) { active = true; };
-	bool isActive(void) const { return active; };
+	void Activate(void) { active = true; }
+	bool isActive(void) const { return active; }
 
 private:
 	friend class Game::IO;

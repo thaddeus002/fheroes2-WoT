@@ -32,7 +32,7 @@ enum scroll_t
     SCROLL_LEFT	  = 0x01,
     SCROLL_RIGHT  = 0x02,
     SCROLL_TOP	  = 0x04,
-    SCROLL_BOTTOM = 0x08,
+    SCROLL_BOTTOM = 0x08
 };
 
 enum level_t
@@ -43,10 +43,10 @@ enum level_t
     LEVEL_OBJECTS = 0x08,
     LEVEL_FOG     = 0x20,
 
-    LEVEL_ALL     = 0xFF,
+    LEVEL_ALL     = 0xFF
 };
 
-namespace Maps { class Tiles; };
+namespace Maps { class Tiles; }
 
 namespace Interface
 {
@@ -87,6 +87,6 @@ namespace Interface
 	u8	scrollDirection;
 	bool    updateCursor;
     };
-};
+}
 
 #endif

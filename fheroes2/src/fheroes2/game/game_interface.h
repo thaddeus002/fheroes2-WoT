@@ -88,6 +88,6 @@ namespace Interface
 
 	Text system_info;
     };
-};
+}
 
 #endif

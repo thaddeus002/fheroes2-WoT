@@ -35,7 +35,7 @@ class Player;
 
 namespace Game
 {
-    typedef enum
+    enum menu_t
     {
 	CANCEL = 0,
 	QUITGAME,
@@ -62,8 +62,8 @@ namespace Game
 	EDITSAVEMAP,
 	EDITSTART,
 	ENDTURN,
-	TESTING,
-    } menu_t;
+	TESTING
+    };
 
     enum type_t { UNKNOWN = 0, STANDARD = 1, CAMPAIGN = 2, HOTSEAT = 4, NETWORK = 8, MULTI = HOTSEAT | NETWORK };
     enum control_t { NONE = 0, LOCAL = 1, REMOTE = 2, AI = 4 };
@@ -119,7 +119,7 @@ namespace Game
 	void RedrawDifficultyInfo(const Point & dst, bool label = true);
 	void RedrawOpponentsInfo(const Point &, const std::vector<Player> *players = NULL);
 	void RedrawClassInfo(const Point &, bool label = true);
-    };
+    }
 
     namespace Editor
     {
@@ -128,7 +128,7 @@ namespace Game
 	Game::menu_t LoadMaps(void);
 	Game::menu_t StartGame(void);
 	Game::menu_t StartGame(void);
-    };
-};
+    }
+}
 
 #endif

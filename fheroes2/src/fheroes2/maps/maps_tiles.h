@@ -32,14 +32,14 @@
 
 class Sprite;
 class Heroes;
-namespace Interface { class GameArea; };
+namespace Interface { class GameArea; }
 
 namespace Maps
 {
     class TilesAddon
     {
     public:
-	typedef enum { GROUND = 0, DOWN = 1, SHADOW = 2, UPPER = 3 } level_t;
+	enum level_t { GROUND = 0, DOWN = 1, SHADOW = 2, UPPER = 3 };
 
 	TilesAddon();
 	TilesAddon(u8 lv, u32 gid, u8 obj, u8 ii);
@@ -70,19 +70,19 @@ namespace Maps
 	Tiles(u16);
 	Tiles(u16 mi, const MP2::mp2tile_t & mp2tile);
 
-	u16 GetIndex(void) const{ return maps_index; };
+	u16 GetIndex(void) const{ return maps_index; }
 	MP2::object_t GetObject(void) const;
-	u8 GetQuantity1(void) const{ return quantity1; };
-	u8 GetQuantity2(void) const{ return quantity2; };
-	u8 GetQuantity3(void) const{ return quantity3; };
-	u8 GetQuantity4(void) const{ return quantity4; };
+	u8 GetQuantity1(void) const{ return quantity1; }
+	u8 GetQuantity2(void) const{ return quantity2; }
+	u8 GetQuantity3(void) const{ return quantity3; }
+	u8 GetQuantity4(void) const{ return quantity4; }
 	Ground::ground_t GetGround(void) const;
 	const Surface & GetTileSurface(void) const;
 
 	bool isPassable(const Heroes * hero = NULL, bool skipfog = false) const;
 	bool isRoad(const Direction::vector_t & direct = Direction::CENTER) const;
 	bool isStream(void) const;
-	bool GoodForUltimateArtifact(void) const{ return addons_level1.empty(); };
+	bool GoodForUltimateArtifact(void) const{ return addons_level1.empty(); }
 	bool CheckEnemyGuardians(u8) const;
 
 	TilesAddon* FindAddonICN1(u16 icn1);
@@ -116,12 +116,12 @@ namespace Maps
 
 	void SetTile(const u16 index, const u8 shape);
 
-	void SetQuantity1(u8 val){ quantity1 = val; };
-	void SetQuantity2(u8 val){ quantity2 = val; };
-	void SetQuantity3(u8 val){ quantity3 = val; };
-	void SetQuantity4(u8 val){ quantity4 = val; };
+	void SetQuantity1(u8 val){ quantity1 = val; }
+	void SetQuantity2(u8 val){ quantity2 = val; }
+	void SetQuantity3(u8 val){ quantity3 = val; }
+	void SetQuantity4(u8 val){ quantity4 = val; }
 	void ResetQuantity(void);
-	void SetObject(MP2::object_t object){ general = object; };
+	void SetObject(MP2::object_t object){ general = object; }
 
 	void UpdateQuantity(void);
 	bool ValidQuantity(void) const;
@@ -201,6 +201,6 @@ namespace Maps
         u8	fogs;
 	u8	flags;
     };
-};
+}
 
 #endif

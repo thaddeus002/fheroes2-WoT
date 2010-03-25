@@ -26,11 +26,11 @@ class Heroes;
 
 namespace Portrait
 {
-    typedef enum { BIG, MEDIUM, SMALL } size_t;
+    enum size_t { BIG, MEDIUM, SMALL };
 
     const Surface & Get(const HeroBase & hero, const Portrait::size_t sz);
     const Surface & Hero(const Heroes & hero, const Portrait::size_t sz);
     const Surface & Captain(const Race::race_t rs, const Portrait::size_t sz);
-};
+}
 
 #endif

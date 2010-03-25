@@ -37,6 +37,6 @@ namespace Interface
     private:
 	BorderWindow();
     };
-};
+}
 
 #endif

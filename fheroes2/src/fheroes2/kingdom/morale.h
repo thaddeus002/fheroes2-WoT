@@ -27,7 +27,7 @@
 
 namespace Morale
 {
-    typedef enum
+    enum morale_t
     {
 	UNKNOWN  = -4,
 	TREASON  = -3,
@@ -37,13 +37,13 @@ namespace Morale
         GOOD     = 1,
         GREAT    = 2,
         BLOOD    = 3
-    } morale_t;
+    };
 
     const char* String(s8);
     const char* Description(s8);
 
-    inline morale_t & operator++ (morale_t & morale){ return morale = BLOOD == morale ? BLOOD : morale_t(morale + 1); };
+    inline morale_t & operator++ (morale_t & morale){ return morale = BLOOD == morale ? BLOOD : morale_t(morale + 1); }
     inline morale_t & operator-- (morale_t & morale){ return morale = TREASON == morale ? TREASON : morale_t(morale - 1); }
-};
+}
 
 #endif

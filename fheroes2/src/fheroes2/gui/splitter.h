@@ -27,7 +27,7 @@
 class Splitter : public SpriteCursor
 {
 public:
-    typedef enum { HORIZONTAL, VERTICAL } positions_t;
+    enum positions_t { HORIZONTAL, VERTICAL };
 
     Splitter();
     Splitter(const Surface &sf, const Rect &rt, positions_t pos);

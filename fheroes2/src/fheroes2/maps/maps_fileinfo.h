@@ -85,7 +85,7 @@ namespace Maps
 
     bool with_heroes;
     };
-};
+}
 
 typedef std::vector<Maps::FileInfo> MapsFileInfoList;
 

@@ -33,7 +33,7 @@
 
 typedef std::vector<Artifact> BagArtifacts;
 
-namespace Army { class army_t; };
+namespace Army { class army_t; }
 
 class HeroBase : public Skill::Primary, public BitModes
 {

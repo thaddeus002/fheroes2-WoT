@@ -32,7 +32,7 @@ class Surface;
 class Castle;
 class Heroes;
 
-typedef enum { STATUS_UNKNOWN, STATUS_DAY, STATUS_FUNDS, STATUS_ARMY, STATUS_RESOURCE, STATUS_AITURN } info_t;
+enum info_t { STATUS_UNKNOWN, STATUS_DAY, STATUS_FUNDS, STATUS_ARMY, STATUS_RESOURCE, STATUS_AITURN };
 
 namespace Interface
 {
@@ -77,6 +77,6 @@ namespace Interface
 
 	u8 turn_progress;
     };
-};
+}
 
 #endif

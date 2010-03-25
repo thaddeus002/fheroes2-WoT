@@ -48,6 +48,6 @@ namespace Battle2
 	const u8 type;
 	bool valid;
     };
-};
+}
 
 #endif

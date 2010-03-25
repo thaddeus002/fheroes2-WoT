@@ -29,11 +29,11 @@
 class Player
 {
 public:
-    Player() : player_color(0) {};
+    Player() : player_color(0) {}
 
-    bool isID(u32 id) const { return id == player_id; };
-    bool isColor(u8 color) const { return color == player_color; };
-    bool isName(const std::string & name) const { return name == player_name; };
+    bool isID(u32 id) const { return id == player_id; }
+    bool isColor(u8 color) const { return color == player_color; }
+    bool isName(const std::string & name) const { return name == player_name; }
 
     static void FixRandomRace(Player &);
     

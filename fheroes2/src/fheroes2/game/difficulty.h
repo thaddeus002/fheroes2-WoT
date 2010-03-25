@@ -27,19 +27,20 @@
 
 namespace Difficulty
 {
-    typedef enum {
+    enum  difficulty_t
+    {
 	EASY,
         NORMAL,
         HARD,
         EXPERT,
         IMPOSSIBLE
-    } difficulty_t;
+    };
 
     difficulty_t& operator++ (difficulty_t& difficulty);
     difficulty_t& operator-- (difficulty_t& difficulty);
     
     const char* String(u8);
     difficulty_t Get(u8);
-};
+}
 
 #endif

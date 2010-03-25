@@ -27,7 +27,7 @@
 
 namespace MUS
 {
-    typedef enum
+    enum mus_t
     {
         UNUSED,
         DATATRACK,
@@ -73,8 +73,9 @@ namespace MUS
         NEWS,
         MAINMENU,
         VICTORY,
+
         UNKNOWN
-    } mus_t;
+    };
 
     const std::string GetString(const mus_t mus, bool shortname = false);
 
@@ -83,6 +84,6 @@ namespace MUS
     mus_t FromMapObject(u8 object);
 
     mus_t GetBattleRandom(void);
-};
+}
 
 #endif

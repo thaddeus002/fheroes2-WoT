@@ -31,9 +31,9 @@
 
 class Castle;
 class Heroes;
-namespace Maps { class Tiles; };
-namespace Battle2 { class Stats; };
-namespace Resource { struct funds_t; };
+namespace Maps { class Tiles; }
+namespace Battle2 { class Stats; }
+namespace Resource { struct funds_t; }
 
 namespace Army
 {
@@ -42,7 +42,7 @@ namespace Army
     enum format_t
     {
 	FORMAT_GROUPED = 0,
-	FORMAT_SPREAD  = 1,
+	FORMAT_SPREAD  = 1
     };
 
     enum armysize_t
@@ -159,6 +159,6 @@ namespace Army
 	    HeroBase*    commander;
 	    u8 combat_format;
     };
-};
+}
 
 #endif

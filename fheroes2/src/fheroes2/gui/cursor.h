@@ -129,7 +129,7 @@ public:
         SP_COLDRING           = 0x3023,
         SP_COLDRAY            = 0x3024,
         SP_HYPNOTIZE          = 0x3025,
-        SP_ARROW              = 0x3026,
+        SP_ARROW              = 0x3026
     };
 
 	static Cursor &	Get(void);

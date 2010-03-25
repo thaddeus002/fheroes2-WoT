@@ -37,12 +37,12 @@ namespace Barrier
         GREEN	= 0x10,
         ORANGE	= 0x20,
         PURPLE	= 0x40,
-        RED	= 0x80,
+        RED	= 0x80
     };
 
     const char* Color(u8);
     color_t FromMP2(u8);
-};
+}
 
 namespace Color
 {
@@ -54,11 +54,11 @@ namespace Color
         YELLOW  = 0x08,
         ORANGE  = 0x10,
         PURPLE  = 0x20,
-        GRAY    = 0x40,
+        GRAY    = 0x40
     };
 
-    inline color_t& operator++ (color_t& color){ return color = ( GRAY == color ? BLUE : color_t(color << 1)); };
-    inline color_t& operator-- (color_t& color){ return color = ( BLUE == color ? GRAY : color_t(color >> 1)); };
+    inline color_t& operator++ (color_t& color){ return color = ( GRAY == color ? BLUE : color_t(color << 1)); }
+    inline color_t& operator-- (color_t& color){ return color = ( BLUE == color ? GRAY : color_t(color >> 1)); }
 
     const char* String(u8);
 
@@ -66,6 +66,6 @@ namespace Color
     color_t GetFromIndex(u8);
     u8 GetFirst(u8);
     color_t Get(u8);
-};
+}
 
 #endif

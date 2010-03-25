@@ -22,6 +22,7 @@
 #ifndef H2SPRITE_H
 #define H2SPRITE_H
 
+#include "surface.h"
 #include "gamedefs.h"
 
 class Sprite : public Surface
@@ -31,8 +32,8 @@ public:
 
     void SetOffset(s16, s16);
 
-    s16 x(void) const{ return offsetX; };
-    s16 y(void) const{ return offsetY; };
+    s16 x(void) const{ return offsetX; }
+    s16 y(void) const{ return offsetY; }
 
     u32 GetSize(void) const;
     void ScaleMinifyByTwo(void);

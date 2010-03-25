@@ -34,7 +34,7 @@
 #include "localclient.h"
 #endif
 
-namespace Army { class army_t; };
+namespace Army { class army_t; }
 namespace Battle2
 {
     struct Stats;
@@ -43,7 +43,7 @@ namespace Battle2
 
     struct Result
     {
-	Result() : army1(0), army2(0), exp(0) {};
+	Result() : army1(0), army2(0), exp(0) {}
 
 	bool AttackerWins(void) const;
 	bool DefenderWins(void) const;
@@ -68,11 +68,11 @@ namespace Battle2
         BOTTOM_RIGHT    = 0x08,
         BOTTOM_LEFT     = 0x10,
         LEFT            = 0x20,
-        CENTER          = 0x40,
+        CENTER          = 0x40
     };
 
-    inline direction_t & operator++ (direction_t & d){ return d = ( CENTER == d ? TOP_LEFT : direction_t(d << 1)); };
-    inline direction_t & operator-- (direction_t & d){ return d = ( TOP_LEFT == d ? CENTER : direction_t(d >> 1)); };
+    inline direction_t & operator++ (direction_t & d){ return d = ( CENTER == d ? TOP_LEFT : direction_t(d << 1)); }
+    inline direction_t & operator-- (direction_t & d){ return d = ( TOP_LEFT == d ? CENTER : direction_t(d >> 1)); }
 
     enum tower_t { TWR_LEFT, TWR_CENTER, TWR_RIGHT };
 
@@ -95,7 +95,7 @@ namespace Battle2
         AS_ATTK2,
         AS_ATTK3,
         AS_WNCE,
-        AS_KILL,
+        AS_KILL
     };
 
     struct animframe_t
@@ -138,6 +138,6 @@ namespace Battle2
     };
 
     typedef QueueMessage Action;
-};
+}
 
 #endif

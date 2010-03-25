@@ -27,12 +27,12 @@
 #include "skill.h"
 #include "mp2.h"
 
-namespace Route { class Step; };
+namespace Route { class Step; }
 class Heroes;
 
 namespace Algorithm
 {
     bool PathFind(std::list<Route::Step> *result, const u16 from, const u16 to, const u16 limit = MAXU16, const Heroes * = NULL);
-};
+}
 
 #endif

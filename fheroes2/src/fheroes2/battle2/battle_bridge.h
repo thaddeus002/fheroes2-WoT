@@ -53,6 +53,6 @@ namespace Battle2
 	bool destroy;
 	bool down;
     };
-};
+}
 
 #endif

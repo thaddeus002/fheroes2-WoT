@@ -26,7 +26,7 @@
 #include "mp2.h"
 #include "gamedefs.h"
 
-namespace Maps { class TilesAddon; };
+namespace Maps { class TilesAddon; }
 
 class Object
 {

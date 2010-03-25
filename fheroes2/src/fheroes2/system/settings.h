@@ -56,7 +56,7 @@ enum
     DBG_NETWORK	= 0x0100,
 
 
-    DBG_DEVEL	= 0x8000,
+    DBG_DEVEL	= 0x8000
 };
 
 #define VERBOSE(x) std::cout << x << std::endl
@@ -93,7 +93,7 @@ public:
 	HEROES_LEARN_SPELLS_WITH_DAY	= 0x00200000,
 	POCKETPC_HIDE_CURSOR		= 0x00400000,
 	POCKETPC_LOW_MEMORY		= 0x00800000,
-	POCKETPC_TAP_MODE		= 0x01000000,
+	POCKETPC_TAP_MODE		= 0x01000000
     };
 
     static Settings & Get(void);

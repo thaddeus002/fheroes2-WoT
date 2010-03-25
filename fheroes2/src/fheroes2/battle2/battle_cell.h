@@ -26,7 +26,7 @@
 #include "gamedefs.h"
 #include "battle_arena.h"
 
-namespace Army { class Troop; };
+namespace Army { class Troop; }
 
 namespace Battle2
 {
@@ -55,6 +55,6 @@ namespace Battle2
 	s32 quality;
 	Arena* arena;
     };
-};
+}
 
 #endif

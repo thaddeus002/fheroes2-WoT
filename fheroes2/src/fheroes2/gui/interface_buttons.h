@@ -54,6 +54,6 @@ namespace Interface
 
 	Dialog::FrameBorder border;
     };
-};
+}
 
 #endif

@@ -48,6 +48,6 @@ namespace Interface
 	Rect rt_stat;
 	Rect rt_quit;
     };
-};
+}
 
 #endif

@@ -38,12 +38,12 @@ public:
     Day();
     Day(const void *ptr);
     
-    bool AllowComputer(void) const{ return computer; };
-    const Resource::funds_t & GetResource(void) const{ return resource; };
-    u16 GetFirst(void) const{ return first; };
-    u16 GetSubsequent(void) const{ return subsequent; };
-    u8  GetColors(void) const{ return colors; };
-    const std::string & GetMessage(void) const{ return message; };
+    bool AllowComputer(void) const{ return computer; }
+    const Resource::funds_t & GetResource(void) const{ return resource; }
+    u16 GetFirst(void) const{ return first; }
+    u16 GetSubsequent(void) const{ return subsequent; }
+    u8  GetColors(void) const{ return colors; }
+    const std::string & GetMessage(void) const{ return message; }
 
 private:
     friend class Game::IO;
@@ -62,12 +62,12 @@ public:
     Coord();
     Coord(u16 index, const void *ptr);
 
-    bool AllowComputer(void) const{ return computer; };
-    const Resource::funds_t & GetResource(void) const{ return resource; };
-    u16 GetIndex(void) const{ return index_map; };
-    u8  GetColors(void) const{ return colors; };
-    const std::string & GetMessage(void) const{ return message; };
-    Artifact::artifact_t GetArtifact(void) const {return artifact; };
+    bool AllowComputer(void) const{ return computer; }
+    const Resource::funds_t & GetResource(void) const{ return resource; }
+    u16 GetIndex(void) const{ return index_map; }
+    u8  GetColors(void) const{ return colors; }
+    const std::string & GetMessage(void) const{ return message; }
+    Artifact::artifact_t GetArtifact(void) const {return artifact; }
 
 private:
     friend class Game::IO;
@@ -87,11 +87,11 @@ public:
     Riddle();
     Riddle(u16 index, const void *ptr);
 
-    const Resource::funds_t & GetResource(void) const{ return resource; };
-    Artifact::artifact_t GetArtifact(void) const {return artifact; };
+    const Resource::funds_t & GetResource(void) const{ return resource; }
+    Artifact::artifact_t GetArtifact(void) const {return artifact; }
     bool AnswerCorrect(const std::string & answer);
-    u16 GetIndex(void) const{ return index_map; };
-    const std::string & GetMessage(void) const{ return message; };
+    u16 GetIndex(void) const{ return index_map; }
+    const std::string & GetMessage(void) const{ return message; }
     bool isValid(void) const;
     void SetQuiet(void);
 
@@ -106,6 +106,6 @@ private:
     bool quiet;
 };
 
-};
+}
 
 #endif
