@@ -116,7 +116,8 @@
  <spell cost="3" />
  <!-- Summon Boat -->
  <spell cost="5" />
- <!-- Dimension Door (distance settings, or distance="0" for defaults: 14) -->
+ <!-- Dimension Door (distance settings, or distance="0" for defaults: 14) OR:
+   current_distance = configurable_distance * (current_sp * configurable_hp) / (configurable_sp * current_hp)  -->
  <spell cost="10" distance="10" sp="2" hp="100" />
  <!-- Town Gate -->
  <spell cost="10" />
