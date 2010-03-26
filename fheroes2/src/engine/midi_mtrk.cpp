@@ -21,6 +21,7 @@
  ***************************************************************************/
 
 #include <iomanip>
+#include <algorithm>
 #include <iostream>
 #include <string.h>
 #include "midi_mtrk.h"
@@ -33,6 +34,7 @@ struct meta_t
     meta_t(u8 c, u8 q, u32 d) : command(c), quantity(q), duration(d){}
 
     bool operator< (const meta_t & m) const{ return duration < m.duration; }
+    void decrease_duration(u32 delta) { duration -= delta; }
 
     u8 command;
     u8 quantity;
@@ -216,12 +218,58 @@ void MTrk::ImportXmiEVNT(const Chunk & evnt)
 
     u8 buf[2];
     u32 delta = 0;
+    u32 delta2 = 0;
 
     std::list<meta_t> notesoff;
     std::list<meta_t>::iterator it1, it2;
 
     while(ptr)
     {
+	// insert event: note off
+	if(delta)
+	{
+	    // sort duration
+	    notesoff.sort();
+
+	    it1 = notesoff.begin();
+	    it2 = notesoff.end();
+	    delta2 = 0;
+
+	    // apply delta
+	    for(; it1 != it2; ++it1)
+	    {
+		if((*it1).duration < delta)
+		{
+		    buf[0] = (*it1).quantity;
+		    buf[1] = 0x7F;
+
+		    // note off
+		    events.push_back(new Event((*it1).duration - delta2, (*it1).command, 2, buf));
+		    delta2 += ((*it1).duration - delta2);
+		}
+		else
+		if((*it1).duration == delta)
+		{
+		    buf[0] = (*it1).quantity;
+		    buf[1] = 0x7F;
+
+		    // note off
+		    events.push_back(new Event((*it1).duration - delta2, (*it1).command, 2, buf));
+		    delta2 += ((*it1).duration - delta2);
+		}
+	    }
+
+	    // remove end notes
+	    while(notesoff.size() && notesoff.front().duration <= delta)
+		notesoff.pop_front();
+
+	    // fixed delta
+	    if(delta2) delta -= delta2;
+
+	    // decrease duration
+	    std::for_each(notesoff.begin(), notesoff.end(), std::bind2nd(std::mem_fun_ref(&meta_t::decrease_duration), delta));
+	}
+
 	// interval
 	if(*ptr < 128)
 	{
@@ -291,49 +339,6 @@ void MTrk::ImportXmiEVNT(const Chunk & evnt)
 		    CloseEvents();
 		    std::cerr << "unknown st: 0x" << std::setw(2) << std::setfill('0') << std::hex << static_cast<int>(*ptr) << ", ln: " << static_cast<int>(evnt.data + evnt.size - ptr) << std::endl;
 		break;
-	    }
-	}
-
-	// insert event: note off
-	if(delta)
-	{
-	    // sort delta
-	    notesoff.sort();
-
-	    it1 = notesoff.begin();
-	    it2 = notesoff.end();
-
-	    // apply delta
-	    for(; it1 != it2; ++it1)
-		if((*it1).duration > delta) (*it1).duration -= delta;
-
-	    it1 = notesoff.begin();
-	    it2 = notesoff.end();
-
-	    // insert event
-	    for(; it1 != it2; ++it1)
-	    {
-		if((*it1).duration < delta)
-		{
-		    buf[0] = (*it1).quantity;
-		    buf[1] = 0x7F;
-
-		    delta -= (*it1).duration;
-
-		    // note off
-		    events.push_back(new Event((*it1).duration, (*it1).command, 2, buf));
-		    it1 = notesoff.erase(it1);
-		}
-		else
-		if((*it1).duration == 0)
-		{
-		    buf[0] = (*it1).quantity;
-		    buf[1] = 0x7F;
-
-		    // note off
-		    events.push_back(new Event(delta, (*it1).command, 2, buf));
-		    it1 = notesoff.erase(it1);
-		}
 	    }
 	}
     }
