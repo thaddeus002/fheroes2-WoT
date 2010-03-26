@@ -109,8 +109,8 @@ void WriteLE16(u8 *p, u16 x);
 namespace std
 {
     int c_abs(int x);
-    int c_abs(float x);
-    int c_abs(double x);
+    float c_abs(float x);
+    double c_abs(double x);
     int c_isspace(char c);
 
 #define isspace(c) c_isspace(c)

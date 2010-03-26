@@ -21,6 +21,7 @@
  ***************************************************************************/
 
 #include <iomanip>
+#include <functional>
 #include <algorithm>
 #include <iostream>
 #include <string.h>

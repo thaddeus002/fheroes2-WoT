@@ -789,7 +789,7 @@ void Battle2::Arena::ApplyActionTower(Action & action)
     if(b2 && b2->isValid() && tower)
     {
 	DEBUG(DBG_BATTLE, DBG_TRACE, "Battle2::Arena::ApplyActionTower: " << "tower: " << static_cast<int>(type) << \
-		", attack pos: " << b2->position) << ", troop: " << b2->GetName();
+		", attack pos: " << b2->position << ", troop: " << b2->GetName());
 
 	Stats* b1 = tower->GetBattleStats();
 	TargetInfo target;

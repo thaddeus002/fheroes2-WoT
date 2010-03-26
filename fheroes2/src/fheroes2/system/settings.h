@@ -59,10 +59,16 @@ enum
     DBG_DEVEL	= 0x8000
 };
 
+#ifdef __SYMBIAN32__
+#define VERBOSE(x)
+#define DEBUG(x, y, z)
+#else
 #define VERBOSE(x) std::cout << x << std::endl
+#define DEBUG(x, y, z) if(IS_DEBUG((x), (y))) VERBOSE(z)
+#endif
+
 #define IS_DEVEL() (DBG_DEVEL & Settings::Get().Debug())
 #define IS_DEBUG(x, y) (((x) & Settings::Get().Debug()) && ((0x000F & (y)) <= (0x000F & Settings::Get().Debug())))
-#define DEBUG(x, y, z) if(IS_DEBUG((x), (y))) VERBOSE(z)
 
 class Settings
 {

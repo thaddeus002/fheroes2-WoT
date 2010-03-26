@@ -115,7 +115,7 @@ bool Xmi::Read(const std::string & filename)
 
     if(fd.fail())
     {
-        std::cerr << "Xmi: error read: " << filename << std::endl;
+        std::cerr << "Xmi: error read: " << filename.c_str() << std::endl;
         return false;
     }
 
