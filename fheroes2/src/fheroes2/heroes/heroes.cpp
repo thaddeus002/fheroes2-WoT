@@ -275,6 +275,7 @@ Heroes::Heroes(heroes_t ht, Race::race_t rc) : killer_color(Color::GRAY), experi
 	    PickupArtifact(Artifact::TRUE_COMPASS_MOBILITY);
 
 	    experience = 777;
+	    magic_point =10;
 
 	    // all spell in magic book
 	    for(u8 spell = Spell::FIREBALL; spell < Spell::STONE; ++spell) AppendSpellToBook(Spell::FromInt(spell), true);
@@ -283,7 +284,7 @@ Heroes::Heroes(heroes_t ht, Race::race_t rc) : killer_color(Color::GRAY), experi
 	default: break;
     }
 
-    SetSpellPoints(GetMaxSpellPoints());
+    //SetSpellPoints(GetMaxSpellPoints());
     move_point = GetMaxMovePoints();
 }
 
@@ -842,8 +843,9 @@ void Heroes::ActionNewDay(void)
 	else
 	{
 	    u16 curr = GetSpellPoints();
+
 	    // everyday
-	    ++curr;
+	    curr += Game::GetHeroRestoreSpellPointsPerDay();
 
 	    if(HasArtifact(Artifact::POWER_RING)) curr += 2;
 

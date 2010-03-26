@@ -53,6 +53,7 @@ namespace Game
     // town, castle, heroes, artifact_telescope, object_observation_tower, object_magi_eyes
     static u8 view_distance[] = { 4, 5, 4, 1, 10, 9 };
     static u8 whirlpool_percent = 50;
+    static u8 heroes_restore_spell_points_day = 1;
 }
 
 Game::menu_t Game::Testing(u8 t)
@@ -364,6 +365,15 @@ void Game::UpdateGlobalDefines(const std::string & spec)
 	    if(value && value < 90) whirlpool_percent = value;
 	}
 
+	// heroes
+	xml_element = xml_globals->FirstChildElement("heroes");
+	if(xml_element)
+	{
+	    int value;
+	    xml_element->Attribute("spell_points_per_day", &value);
+	    if(value < 11) heroes_restore_spell_points_day = value;
+	}
+
 	// castle_extra_growth 
 	xml_element = xml_globals->FirstChildElement("castle_extra_growth ");
 	if(xml_element) Castle::UpdateExtraGrowth(xml_element);
@@ -374,4 +384,9 @@ void Game::UpdateGlobalDefines(const std::string & spec)
 u8 Game::GetWhirlpoolPercent(void)
 {
     return whirlpool_percent;
+}
+
+u8 Game::GetHeroRestoreSpellPointsPerDay(void)
+{
+    return heroes_restore_spell_points_day;
 }

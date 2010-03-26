@@ -19,9 +19,12 @@
  <!-- additional growth -->
  <castle_extra_growth well="2" wel2="8" />
 
+ <!-- restore spell point: 0 - 10 -->
+ <heroes spell_points_per_day="1" />
+
  <game_over lost_towns_days="7" />
 
- <!-- whirlpool percent: 0 - 90 -->
+ <!-- whirlpool percent: 1 - 90 -->
  <whirlpool percent="50" />
 
 </globals>

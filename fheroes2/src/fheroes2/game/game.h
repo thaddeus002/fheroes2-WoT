@@ -107,6 +107,7 @@ namespace Game
     u8  GetLostTownDays(void);
     u8  GetViewDistance(distance_t);
     u8  GetWhirlpoolPercent(void);
+    u8  GetHeroRestoreSpellPointsPerDay(void);
 
     void UpdateGlobalDefines(const std::string &);
 
