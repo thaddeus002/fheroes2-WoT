@@ -22,6 +22,7 @@
 
 #include "heroes_base.h"
 #include "artifact.h"
+#include "settings.h"
 #include "spell.h"
 #include "army.h"
 
@@ -150,6 +151,8 @@ void Spell::UpdateStats(const std::string & spec)
             if((ptr - &spells[0]) >= STONE) break;
 	}
     }
+    else
+    VERBOSE(spec << ": " << doc.ErrorDesc());
 #endif
 }
 

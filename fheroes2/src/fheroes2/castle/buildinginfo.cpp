@@ -179,6 +179,8 @@ void BuildingInfo::UpdateCosts(const std::string & spec)
 	    ++ptr;
 	}
     }
+    else
+    VERBOSE(spec << ": " << doc.ErrorDesc());
 #endif
 }
 

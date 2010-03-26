@@ -378,6 +378,8 @@ void Game::UpdateGlobalDefines(const std::string & spec)
 	xml_element = xml_globals->FirstChildElement("castle_extra_growth ");
 	if(xml_element) Castle::UpdateExtraGrowth(xml_element);
     }
+    else
+    VERBOSE(spec << ": " << doc.ErrorDesc());
 #endif
 }
 

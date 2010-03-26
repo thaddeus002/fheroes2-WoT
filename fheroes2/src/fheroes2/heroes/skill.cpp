@@ -243,6 +243,8 @@ void Skill::UpdateStats(const std::string & spec)
 	    }
 	}
     }
+    else
+    VERBOSE(spec << ": " << doc.ErrorDesc());
 #endif
 }
 

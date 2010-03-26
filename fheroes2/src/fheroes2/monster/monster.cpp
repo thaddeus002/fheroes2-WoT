@@ -185,6 +185,8 @@ void Monster::UpdateStats(const std::string & spec)
 	    if((ptr - &monsters[0]) >= MONSTER_RND1) break;
         }
     }
+    else
+    VERBOSE(spec << ": " << doc.ErrorDesc());
 #endif
 }
 

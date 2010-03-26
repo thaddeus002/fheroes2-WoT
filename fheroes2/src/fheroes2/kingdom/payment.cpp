@@ -25,6 +25,7 @@
 #include "race.h"
 #include "monster.h"
 #include "buildinginfo.h"
+#include "settings.h"
 #include "payment.h"
 
 #ifdef WITH_XML
@@ -93,6 +94,8 @@ void PaymentConditions::UpdateCosts(const std::string & spec)
             ++ptr;
         }
     }
+    else
+    VERBOSE(spec << ": " << doc.ErrorDesc());
 #endif
 }
 

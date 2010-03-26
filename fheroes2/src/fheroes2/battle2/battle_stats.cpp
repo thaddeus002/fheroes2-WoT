@@ -204,6 +204,8 @@ void Battle2::UpdateMonsterInfoAnimation(const std::string & spec)
 	    }
 	}
     }
+    else
+    VERBOSE(spec << ": " << doc.ErrorDesc());
 #endif
 }
 

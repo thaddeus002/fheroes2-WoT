@@ -24,6 +24,7 @@
 #include "castle.h"
 #include "artifact.h"
 #include "skill.h"
+#include "settings.h"
 #include "profit.h"
 
 #ifdef WITH_XML
@@ -86,6 +87,8 @@ void ProfitConditions::UpdateCosts(const std::string & spec)
             ++ptr;
         }
     }
+    else
+    VERBOSE(spec << ": " << doc.ErrorDesc());
 #endif
 }
 
