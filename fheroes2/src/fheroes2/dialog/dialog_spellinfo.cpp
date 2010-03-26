@@ -57,7 +57,7 @@ void Dialog::SpellInfo(const std::string &header, const std::string &message, co
     cursor.Hide();
     cursor.SetThemes(cursor.POINTER);
 
-    TextBox box1(header, Font::BIG, BOXAREA_WIDTH);
+    TextBox box1(header, Font::YELLOW_BIG, BOXAREA_WIDTH);
     TextBox box2(message, Font::BIG, BOXAREA_WIDTH);
     Text text(Spell::GetName(spell), Font::SMALL);
 

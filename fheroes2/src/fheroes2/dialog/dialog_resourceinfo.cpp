@@ -40,7 +40,7 @@ u16 Dialog::ResourceInfo(const std::string &header, const std::string &message, 
     cursor.Hide();
     cursor.SetThemes(cursor.POINTER);
 
-    TextBox box1(header, Font::BIG, BOXAREA_WIDTH);
+    TextBox box1(header, Font::YELLOW_BIG, BOXAREA_WIDTH);
     TextBox box2(message, Font::BIG, BOXAREA_WIDTH);
     Resource::BoxSprite rbs(rs, BOXAREA_WIDTH);
 

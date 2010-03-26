@@ -44,7 +44,7 @@ bool Dialog::SelectGoldOrExp(const std::string &header, const std::string &messa
     const Sprite & sprite_expr = AGG::GetICN(ICN::EXPMRL, 4);
 
     Point pt;
-    TextBox box1(header, Font::BIG, BOXAREA_WIDTH);
+    TextBox box1(header, Font::YELLOW_BIG, BOXAREA_WIDTH);
     TextBox box2(message, Font::BIG, BOXAREA_WIDTH);
 
     Text text;

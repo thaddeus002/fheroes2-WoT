@@ -931,16 +931,16 @@ void ActionToResource(Heroes &hero, const u8 obj, const u16 dst_index)
 	    
 	    case MP2::OBJ_LEANTO:
 	    	if(resource.GetValidItems())
-		    Dialog::ResourceInfo(_("You've found an abandoned lean-to."), _("Poking about, you discover some resources hidden nearby."), resource);
+		    Dialog::ResourceInfo("", _("You've found an abandoned lean-to.\nPoking about, you discover some resources hidden nearby."), resource);
 		else
-		    Dialog::Message(_("The lean-to is long abandoned."), _("There is nothing of value here."), Font::BIG, Dialog::OK);
+		    Dialog::Message("", _("The lean-to is long abandoned. There is nothing of value here."), Font::BIG, Dialog::OK);
 	    break;
 
     	    case MP2::OBJ_MAGICGARDEN:
 	    	if(resource.GetValidItems())
-		    Dialog::ResourceInfo(_("You catch a leprechaun foolishly sleeping amidst a cluster of magic mushrooms."), _("In exchange for his freedom, he guides you to a small pot filled with precious things."), resource);
+		    Dialog::ResourceInfo("", _("You catch a leprechaun foolishly sleeping amidst a cluster of magic mushrooms.\nIn exchange for his freedom, he guides you to a small pot filled with precious things."), resource);
 		else
-		    Dialog::Message(_("You've found a magic garden, the kind of place that leprechauns and faeries like to cavort in, but there is no one here today."), _("Perhaps you should try again next week."), Font::BIG, Dialog::OK);
+		    Dialog::Message("", _("You've found a magic garden, the kind of place that leprechauns and faeries like to cavort in, but there is no one here today.\nPerhaps you should try again next week."), Font::BIG, Dialog::OK);
     	    break;
 
 	    default: break;

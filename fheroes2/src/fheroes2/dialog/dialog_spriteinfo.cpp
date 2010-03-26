@@ -40,7 +40,7 @@ u16 Dialog::SpriteInfo(const std::string &header, const std::string &message, co
     cursor.Hide();
     cursor.SetThemes(cursor.POINTER);
 
-    TextBox box1(header, Font::BIG, BOXAREA_WIDTH);
+    TextBox box1(header, Font::YELLOW_BIG, BOXAREA_WIDTH);
     TextBox box2(message, Font::BIG, BOXAREA_WIDTH);
     const u8 spacer = Settings::Get().QVGA() ? 5 : 10;
 
