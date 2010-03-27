@@ -1574,6 +1574,22 @@ void Maps::Tiles::FixLoyaltyVersion(void)
     }
 }
 
+u8 Maps::Tiles::GetMinesType(void) const
+{
+    const TilesAddon * taddon = FindMines();
+
+    if(taddon) switch(taddon->index)
+    {
+	case 0:	return Resource::ORE;
+	case 1: return Resource::SULFUR;
+        case 2: return Resource::CRYSTAL;
+        case 3: return Resource::GEMS;
+	case 4: return Resource::GOLD;
+        default: break;
+    }
+    return 0;
+}
+
 /* for few object need many resource */
 void Maps::Tiles::UpdateQuantity(void)
 {
@@ -1845,7 +1861,7 @@ void Maps::Tiles::UpdateQuantity(void)
 	    quantity1 = Artifact::Rand();
 	break;
 
-	// rand monster
+	// aband mines
 	case MP2::OBJ_ABANDONEDMINE:
 	    SetCountMonster(Rand::Get(39, 45));	// I checked in Heroes II: min 3 x 13, and max 3 x 15
 	    quantity3 = Monster::GHOST;

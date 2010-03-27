@@ -651,33 +651,20 @@ void AIToWagon(Heroes &hero, const u8 obj, const u16 dst_index)
 
 void AIToCaptureObject(Heroes &hero, const u8 obj, const u16 dst_index)
 {
+    Maps::Tiles & tile = world.GetTiles(dst_index);
     Resource::resource_t res = Resource::UNKNOWN;
 
     switch(obj)
     {
 	case MP2::OBJ_ALCHEMYLAB:	res = Resource::MERCURY; break;
 	case MP2::OBJ_SAWMILL:		res = Resource::WOOD; break;
-        case MP2::OBJ_MINES:
-    	{
-    	    const Maps::TilesAddon * taddon = world.GetTiles(dst_index).FindMines();
-            if(taddon) switch(taddon->index)
-            {
-                case 0: res = Resource::ORE; break;
-                case 1: res = Resource::SULFUR; break;
-                case 2: res = Resource::CRYSTAL; break;
-                case 3: res = Resource::GEMS; break;
-                case 4: res = Resource::GOLD; break;
-                default: break;
-            }
-    	}
-    	break;
+        case MP2::OBJ_MINES:		res = static_cast<Resource::resource_t>(tile.GetMinesType()); break;
         default: break;
     }
 
     // capture object
     if(hero.GetColor() != world.ColorCapturedObject(dst_index))
     {
-	Maps::Tiles & tile = world.GetTiles(dst_index);
 	bool capture = true;
 
 	if(tile.CheckEnemyGuardians(hero.GetColor()))

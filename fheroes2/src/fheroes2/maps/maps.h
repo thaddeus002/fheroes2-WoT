@@ -43,6 +43,7 @@ namespace Maps
     };
 
     const char* SizeString(u8);
+    const char* GetMinesName(u8);
 
     u16 GetDirectionIndex(u16 from, Direction::vector_t vector);
     bool isValidDirection(u16 from, Direction::vector_t vector);

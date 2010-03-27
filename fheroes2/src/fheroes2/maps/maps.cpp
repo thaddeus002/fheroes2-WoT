@@ -49,6 +49,21 @@ const char* Maps::SizeString(u8 s)
     return mapsize[0];
 }
 
+const char* Maps::GetMinesName(u8 type)
+{
+    switch(type)
+    {
+	case Resource::ORE:	return _("Ore Mine");
+        case Resource::SULFUR:	return _("Sulfur Mine");
+        case Resource::CRYSTAL:	return _("Crystal Mine");
+        case Resource::GEMS:	return _("Gems Mine");
+        case Resource::GOLD:	return _("Gold Mine");
+	default: break;
+    }
+
+    return _("Mine");
+}
+
 u32 Maps::AnimationTicket(void)
 {
     return animation_ticket;

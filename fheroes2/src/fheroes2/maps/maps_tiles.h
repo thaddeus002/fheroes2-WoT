@@ -162,6 +162,8 @@ namespace Maps
 
 	void FixLoyaltyVersion(void);
 
+	u8   GetMinesType(void) const;
+
 	u16 GetCountMonster(void) const;
 	void SetCountMonster(const u16 count);
 	void UpdateRNDMonsterSprite(void);

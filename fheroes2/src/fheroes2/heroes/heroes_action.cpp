@@ -2134,34 +2134,21 @@ void ActionToCaptureObject(Heroes &hero, const u8 obj, const u16 dst_index)
 
         case MP2::OBJ_MINES:
 	{
-    	    const Maps::TilesAddon * taddon = world.GetTiles(dst_index).FindMines();
-    	    if(taddon) switch(taddon->index)
+	    res = static_cast<Resource::resource_t>(tile.GetMinesType());
+    	    header = Maps::GetMinesName(res);
+
+    	    switch(res)
     	    {
-        	case 0:
-		    res = Resource::ORE;
-        	    header = _("Ore Mine");
-        	    body = _("You gain control of an ore mine. It will provide you with %{count} units of ore per day.");
-		    break;
-            	case 1:
-		    res = Resource::SULFUR;
-        	    header = _("Sulfur Mine");
-		    body = _("You gain control of a sulfur mine. It will provide you with %{count} unit of sulfur per day.");
-		    break;
-            	case 2:
-		    res = Resource::CRYSTAL;
-        	    header = _("Crystal Mine");
-		    body = _("You gain control of a crystal mine. It will provide you with %{count} unit of crystal per day.");
-		    break;
-            	case 3:
-		    res = Resource::GEMS;
-        	    header = _("Gems Mine");
-		    body = _("You gain control of a gem mine. It will provide you with %{count} unit of gems per day.");
-		    break;
-            	case 4:
-		    res = Resource::GOLD;
-        	    header = _("Gold Mine");
-		    body = _("You gain control of a gold mine. It will provide you with %{count} gold per day.");
-		    break;
+        	case Resource::ORE:
+        	    body = _("You gain control of an ore mine. It will provide you with %{count} units of ore per day."); break;
+            	case Resource::SULFUR:
+		    body = _("You gain control of a sulfur mine. It will provide you with %{count} unit of sulfur per day."); break;
+            	case Resource::CRYSTAL:
+		    body = _("You gain control of a crystal mine. It will provide you with %{count} unit of crystal per day."); break;
+            	case Resource::GEMS:
+		    body = _("You gain control of a gem mine. It will provide you with %{count} unit of gems per day."); break;
+            	case Resource::GOLD:
+		    body = _("You gain control of a gold mine. It will provide you with %{count} gold per day."); break;
             	default: break;
     	    }
 	}

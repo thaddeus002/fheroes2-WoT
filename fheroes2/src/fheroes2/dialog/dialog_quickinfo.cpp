@@ -110,7 +110,12 @@ void Dialog::QuickInfo(const Maps::Tiles & tile)
     if(MP2::OBJ_ABANDONEDMINE == tile.GetObject() || tile.CheckEnemyGuardians(settings.MyColor()))
     {
 	const Army::Troop troop(tile);
-	name_object = MP2::StringObject(tile.GetObject());
+
+	if(MP2::OBJ_MINES == tile.GetObject())
+            name_object = Maps::GetMinesName(tile.GetMinesType());
+	else
+	    name_object = MP2::StringObject(tile.GetObject());
+
 	name_object.append("\n");
         name_object.append(_("guarded by %{count} of %{monster}"));
         std::string name = troop.GetMultiName();
@@ -178,6 +183,10 @@ void Dialog::QuickInfo(const Maps::Tiles & tile)
 		name_object.append( Artifact::GetName(Artifact::FromInt(tile.GetQuantity1())));
 	    	name_object.append(")");
 	    }
+	    break;
+
+	case MP2::OBJ_MINES:
+            name_object = Maps::GetMinesName(tile.GetMinesType());
 	    break;
 
         // join army
