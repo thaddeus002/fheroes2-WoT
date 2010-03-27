@@ -110,7 +110,9 @@ void Dialog::QuickInfo(const Maps::Tiles & tile)
     if(MP2::OBJ_ABANDONEDMINE == tile.GetObject() || tile.CheckEnemyGuardians(settings.MyColor()))
     {
 	const Army::Troop troop(tile);
-        name_object = _("guarded by %{count} of %{monster}");
+	name_object = MP2::StringObject(tile.GetObject());
+	name_object.append("\n");
+        name_object.append(_("guarded by %{count} of %{monster}"));
         std::string name = troop.GetMultiName();
         String::Lower(name);
         String::Replace(name_object, "%{monster}", name);
@@ -153,6 +155,28 @@ void Dialog::QuickInfo(const Maps::Tiles & tile)
 	    {
 	    	name_object.append("\n");
 		name_object.append(_("(already visited)"));
+	    }
+	    break;
+
+	case MP2::OBJ_RESOURCE:
+	    name_object = MP2::StringObject(tile.GetObject());
+	    // check visited
+	    if(settings.ExtShowVisitedContent())
+	    {
+	    	name_object.append("\n(");
+		name_object.append(Resource::String(tile.GetQuantity1()));
+	    	name_object.append(")");
+	    }
+	    break;
+
+	case MP2::OBJ_ARTIFACT:
+	    name_object = MP2::StringObject(tile.GetObject());
+	    // check visited
+	    if(settings.ExtShowVisitedContent())
+	    {
+	    	name_object.append("\n(");
+		name_object.append( Artifact::GetName(Artifact::FromInt(tile.GetQuantity1())));
+	    	name_object.append(")");
 	    }
 	    break;
 
