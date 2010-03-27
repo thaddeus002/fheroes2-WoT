@@ -1,4 +1,18 @@
-SVN - up to r1689
+SVN - up to r1738
+
+Mar, 27, 2010
++ Added set guardian for capture objects
++ Fixed obstacles positions for battle, added archers penalty from obstacles
++ Fixed show radar opposite position for hotseat game
++ Updated: main dialogues with yellow color for header
++ Added: customizing value: heroes restore spell points per day, update globals.xml
++ Fixed name objects: Mines, Campfire, update 'Treasure Chest' and 'Sea Chest'
++ Added sorting spell for open book
++ Fixed golem attack sprite direction
++ Fixed shot sound attack
++ Fixed AI spellcast after move
++ Fixed spells 'Town Gate' and 'Town Portal' check other hero present
++ Added ext. info for joining and recruits monster dwellings, for shrine, for resources, witch hut and other
 + Added Symbian port
 + Added polish translation
 + Added more visited info check
