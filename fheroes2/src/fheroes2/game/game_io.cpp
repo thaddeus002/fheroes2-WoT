@@ -220,7 +220,10 @@ bool Game::IO::SaveBIN(QueueMessage & msg)
     msg.Push(conf.players_colors);
     msg.Push(conf.preferably_count_players);
     msg.Push(conf.debug);
-    msg.Push(conf.opt_fheroes2());
+
+    msg.Push(conf.opt_game());
+    msg.Push(conf.opt_world());
+    msg.Push(conf.opt_battle());
 
     // world
     msg.Push(static_cast<u16>(0xFF05));
@@ -681,13 +684,22 @@ bool Game::IO::LoadBIN(QueueMessage & msg)
     {
 	// settings: original
 	msg.Pop(byte8);
-	if(byte8) conf.opt_fheroes2.SetModes(0xFFFFFFFF);
+    }
+    else
+    if(format < FORMAT_VERSION_1735)
+    {
+    	msg.Pop(byte32);
     }
     else
     {
     	msg.Pop(byte32);
-    	conf.opt_fheroes2.SetModes(byte32);
+	conf.opt_game.SetModes(byte32);
+    	msg.Pop(byte32);
+	conf.opt_world.SetModes(byte32);
+    	msg.Pop(byte32);
+	conf.opt_battle.SetModes(byte32);
     }
+
     // world
     msg.Pop(byte16);
     if(byte16 != 0xFF05) DEBUG(DBG_GAME , DBG_WARN, "Game::IO::LoadBIN: 0xFF05");

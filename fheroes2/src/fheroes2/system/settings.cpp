@@ -141,8 +141,8 @@ Settings::Settings() : major_version(MAJOR_VERSION), minor_version(MINOR_VERSION
     // default maps dir
     list_maps_directory.push_back("maps");
 
-    opt_fheroes2.SetModes(GAME_SHOW_SDL_LOGO);
-    opt_fheroes2.SetModes(GAME_AUTOSAVE_ON);
+    ExtSetModes(GAME_SHOW_SDL_LOGO);
+    ExtSetModes(GAME_AUTOSAVE_ON);
 
     opt_global.SetModes(GLOBAL_SHOWRADAR);
     opt_global.SetModes(GLOBAL_SHOWICONS);
@@ -233,17 +233,17 @@ bool Settings::Read(const std::string & filename)
     if(QVGA())
     {
 	opt_global.SetModes(GLOBAL_POCKETPC);
-	opt_fheroes2.SetModes(GAME_HIDE_INTERFACE);
+	ExtSetModes(GAME_HIDE_INTERFACE);
     }
 
     if(! opt_global.Modes(GLOBAL_POCKETPC))
     {
-	opt_fheroes2.ResetModes(POCKETPC_HIDE_CURSOR);
-	opt_fheroes2.ResetModes(POCKETPC_TAP_MODE);
-	opt_fheroes2.ResetModes(POCKETPC_LOW_MEMORY);
+	ExtResetModes(POCKETPC_HIDE_CURSOR);
+	ExtResetModes(POCKETPC_TAP_MODE);
+	ExtResetModes(POCKETPC_LOW_MEMORY);
     }
 
-    if(opt_fheroes2.Modes(GAME_HIDE_INTERFACE))
+    if(ExtModes(GAME_HIDE_INTERFACE))
     {
        opt_global.SetModes(GLOBAL_SHOWCPANEL);
        opt_global.ResetModes(GLOBAL_SHOWRADAR);
@@ -832,22 +832,22 @@ void Settings::SetAutoBattle(bool f)
 
 void Settings::SetEvilInterface(bool f)
 {
-    f ? opt_fheroes2.SetModes(GAME_EVIL_INTERFACE) : opt_fheroes2.ResetModes(GAME_EVIL_INTERFACE);
+    f ? ExtSetModes(GAME_EVIL_INTERFACE) : ExtResetModes(GAME_EVIL_INTERFACE);
 }
 
 void Settings::SetBattleGrid(bool f)
 {
-    f ? opt_fheroes2.SetModes(BATTLE_SHOW_GRID) : opt_fheroes2.ResetModes(BATTLE_SHOW_GRID);
+    f ? ExtSetModes(BATTLE_SHOW_GRID) : ExtResetModes(BATTLE_SHOW_GRID);
 }
 
 void Settings::SetBattleMovementShaded(bool f)
 {
-    f ? opt_fheroes2.SetModes(BATTLE_SHOW_MOVE_SHADOW) : opt_fheroes2.ResetModes(BATTLE_SHOW_MOVE_SHADOW);
+    f ? ExtSetModes(BATTLE_SHOW_MOVE_SHADOW) : ExtResetModes(BATTLE_SHOW_MOVE_SHADOW);
 }
 
 void Settings::SetBattleMouseShaded(bool f)
 {
-    f ? opt_fheroes2.SetModes(BATTLE_SHOW_MOUSE_SHADOW) : opt_fheroes2.ResetModes(BATTLE_SHOW_MOUSE_SHADOW);
+    f ? ExtSetModes(BATTLE_SHOW_MOUSE_SHADOW) : ExtResetModes(BATTLE_SHOW_MOUSE_SHADOW);
 }
 
 void Settings::ResetSound(void)
@@ -902,7 +902,15 @@ void Settings::SetNetworkDedicatedServer(bool f)
 
 bool Settings::ExtModes(u32 f) const
 {
-    return opt_fheroes2.Modes(f);
+    const u32 mask = 0x0FFFFFFF;
+    switch(f >> 28)
+    {
+	case 0x01: return opt_game.Modes(f & mask);
+	case 0x02: return opt_world.Modes(f & mask);
+	case 0x04: return opt_battle.Modes(f & mask);
+	default: break;
+    }
+    return false;
 }
 
 const char* Settings::ExtName(u32 f) const
@@ -915,142 +923,156 @@ const char* Settings::ExtName(u32 f) const
 
 void Settings::ExtSetModes(u32 f)
 {
-    opt_fheroes2.SetModes(f);
+    const u32 mask = 0x0FFFFFFF;
+    switch(f >> 28)
+    {
+	case 0x01: opt_game.SetModes(f & mask); break;
+	case 0x02: opt_world.SetModes(f & mask); break;
+	case 0x04: opt_battle.SetModes(f & mask); break;
+	default: break;
+    }
 }
 
 void Settings::ExtResetModes(u32 f)
 {
-    opt_fheroes2.ResetModes(f);
+    const u32 mask = 0x0FFFFFFF;
+    switch(f >> 28)
+    {
+	case 0x01: opt_game.ResetModes(f & mask); break;
+	case 0x02: opt_world.ResetModes(f & mask); break;
+	case 0x04: opt_battle.ResetModes(f & mask); break;
+	default: break;
+    }
 }
 
 bool Settings::ExtAllowBuyFromWell(void) const
 {
-    return opt_fheroes2.Modes(CASTLE_ALLOW_BUY_FROM_WELL);
+    return ExtModes(CASTLE_ALLOW_BUY_FROM_WELL);
 }
 
 bool Settings::ExtShowVisitedContent(void) const
 {
-    return opt_fheroes2.Modes(WORLD_SHOW_VISITED_CONTENT);
+    return ExtModes(WORLD_SHOW_VISITED_CONTENT);
 }
 
 bool Settings::ExtFastLoadGameDialog(void) const
 {
-    return opt_fheroes2.Modes(GAME_FAST_LOAD_GAME_DIALOG);
+    return ExtModes(GAME_FAST_LOAD_GAME_DIALOG);
 }
 
 bool Settings::ExtRememberLastFocus(void) const
 {
-    return opt_fheroes2.Modes(GAME_REMEMBER_LAST_FOCUS);
+    return ExtModes(GAME_REMEMBER_LAST_FOCUS);
 }
 
 bool Settings::ExtAbandonedMineRandom(void) const
 {
-    return opt_fheroes2.Modes(WORLD_ABANDONED_MINE_RANDOM);
+    return ExtModes(WORLD_ABANDONED_MINE_RANDOM);
 }
 
 bool Settings::ExtSaveMonsterBattle(void) const
 {
-    return opt_fheroes2.Modes(WORLD_SAVE_MONSTER_BATTLE);
+    return ExtModes(WORLD_SAVE_MONSTER_BATTLE);
 }
 
 bool Settings::ExtAllowSetGuardian(void) const
 {
-    return opt_fheroes2.Modes(WORLD_ALLOW_SET_GUARDIAN);
+    return ExtModes(WORLD_ALLOW_SET_GUARDIAN);
 }
 
 bool Settings::ExtLearnSpellsWithDay(void) const
 {
-    return opt_fheroes2.Modes(HEROES_LEARN_SPELLS_WITH_DAY);
+    return ExtModes(HEROES_LEARN_SPELLS_WITH_DAY);
 }
 
 bool Settings::ExtBattleShowDamage(void) const
 {
-    return opt_fheroes2.Modes(BATTLE_SHOW_DAMAGE);
+    return ExtModes(BATTLE_SHOW_DAMAGE);
 }
 
 bool Settings::ExtBattleTroopDirection(void) const
 {
-    return opt_fheroes2.Modes(BATTLE_TROOP_DIRECTION);
+    return ExtModes(BATTLE_TROOP_DIRECTION);
 }
 
 bool Settings::ExtBattleSoftWait(void) const
 {
-    return opt_fheroes2.Modes(BATTLE_SOFT_WAITING);
+    return ExtModes(BATTLE_SOFT_WAITING);
 }
 
 bool Settings::ExtBattleShowGrid(void) const
 {
-    return opt_fheroes2.Modes(BATTLE_SHOW_GRID);
+    return ExtModes(BATTLE_SHOW_GRID);
 }
 
 bool Settings::ExtBattleShowMouseShadow(void) const
 {
-    return opt_fheroes2.Modes(BATTLE_SHOW_MOUSE_SHADOW);
+    return ExtModes(BATTLE_SHOW_MOUSE_SHADOW);
 }
 
 bool Settings::ExtBattleShowMoveShadow(void) const
 {
-    return opt_fheroes2.Modes(BATTLE_SHOW_MOVE_SHADOW);
+    return ExtModes(BATTLE_SHOW_MOVE_SHADOW);
 }
 
 bool Settings::ExtBattleObjectsArchersPenalty(void) const
 {
-    return opt_fheroes2.Modes(BATTLE_OBJECTS_ARCHERS_PENALTY);
+    return ExtModes(BATTLE_OBJECTS_ARCHERS_PENALTY);
 }
 
 bool Settings::ExtRewriteConfirm(void) const
 {
-    return opt_fheroes2.Modes(GAME_SAVE_REWRITE_CONFIRM);
+    return ExtModes(GAME_SAVE_REWRITE_CONFIRM);
 }
 
 bool Settings::ExtHideCursor(void) const
 {
-    return opt_fheroes2.Modes(POCKETPC_HIDE_CURSOR);
+    return ExtModes(POCKETPC_HIDE_CURSOR);
 }
 
 bool Settings::ExtHideAIMove(void) const
 {
-    return opt_fheroes2.Modes(GAME_HIDE_AI_MOVE);
+    return ExtModes(GAME_HIDE_AI_MOVE);
 }
 
 bool Settings::ExtShowSystemInfo(void) const
 {
-    return opt_fheroes2.Modes(GAME_SHOW_SYSTEM_INFO);
+    return ExtModes(GAME_SHOW_SYSTEM_INFO);
 }
 
 bool Settings::ExtAutoSaveOn(void) const
 {
-    return opt_fheroes2.Modes(GAME_AUTOSAVE_ON);
+    return ExtModes(GAME_AUTOSAVE_ON);
 }
 
 bool Settings::ExtUseFade(void) const
 {
-    return opt_fheroes2.Modes(GAME_USE_FADE);
+    return ExtModes(GAME_USE_FADE);
 }
 
 bool Settings::ExtShowSDL(void) const
 {
-    return opt_fheroes2.Modes(GAME_SHOW_SDL_LOGO);
+    return ExtModes(GAME_SHOW_SDL_LOGO);
 }
 
 bool Settings::EvilInterface(void) const
 {
-    return opt_fheroes2.Modes(GAME_EVIL_INTERFACE);
+    return ExtModes(GAME_EVIL_INTERFACE);
 }
 
 bool Settings::HideInterface(void) const
 {
-    return opt_fheroes2.Modes(GAME_HIDE_INTERFACE);
+    return ExtModes(GAME_HIDE_INTERFACE);
 }
 
 bool Settings::ExtLowMemory(void) const
 {
-    return opt_fheroes2.Modes(POCKETPC_LOW_MEMORY);
+    return ExtModes(POCKETPC_LOW_MEMORY);
 }
 
 bool Settings::ExtTapMode(void) const
 {
-    return opt_fheroes2.Modes(POCKETPC_TAP_MODE);
+    return ExtModes(POCKETPC_TAP_MODE);
 }
 
 void Settings::BinarySave(void) const
@@ -1059,7 +1081,9 @@ void Settings::BinarySave(void) const
     QueueMessage msg;
 
     msg.Push(static_cast<u16>(CURRENT_FORMAT_VERSION));
-    msg.Push(opt_fheroes2());
+    msg.Push(opt_game());
+    msg.Push(opt_world());
+    msg.Push(opt_battle());
 
     msg.Save(binary.c_str());
 }
@@ -1072,13 +1096,19 @@ void Settings::BinaryLoad(void)
     {
 	QueueMessage msg;
 	u32 byte32;
-	u16 byte16;
+	u16 version;
 
 	msg.Load(binary.c_str());
 
-	msg.Pop(byte16);
-	msg.Pop(byte32);
+	msg.Pop(version);
 
-	opt_fheroes2.SetModes(byte32);
+	msg.Pop(byte32);
+	opt_game.SetModes(byte32);
+
+	msg.Pop(byte32);
+	opt_world.SetModes(byte32);
+
+	msg.Pop(byte32);
+	opt_battle.SetModes(byte32);
     }
 }
