@@ -104,6 +104,7 @@ static const settings_t settingsFHeroes2[] =
     { Settings::BATTLE_SHOW_GRID,		_("battle: show grid"),					},
     { Settings::BATTLE_SHOW_MOUSE_SHADOW,	_("battle: show mouse shadow"),				},
     { Settings::BATTLE_SHOW_MOVE_SHADOW,	_("battle: show move shadow"),				},
+    { Settings::BATTLE_OBJECTS_ARCHERS_PENALTY, _("battle: high objects are an obstacle for archers"),  },
     { Settings::GAME_SHOW_SYSTEM_INFO,		_("game: show system info"),				},
     { Settings::GAME_AUTOSAVE_ON,		_("game: autosave on"),					},
     { Settings::GAME_USE_FADE,			_("game: use fade"),					},
@@ -990,6 +991,11 @@ bool Settings::ExtBattleShowMouseShadow(void) const
 bool Settings::ExtBattleShowMoveShadow(void) const
 {
     return opt_fheroes2.Modes(BATTLE_SHOW_MOVE_SHADOW);
+}
+
+bool Settings::ExtBattleObjectsArchersPenalty(void) const
+{
+    return opt_fheroes2.Modes(BATTLE_OBJECTS_ARCHERS_PENALTY);
 }
 
 bool Settings::ExtRewriteConfirm(void) const

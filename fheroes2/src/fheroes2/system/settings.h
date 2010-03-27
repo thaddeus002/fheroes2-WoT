@@ -99,7 +99,8 @@ public:
 	HEROES_LEARN_SPELLS_WITH_DAY	= 0x00200000,
 	POCKETPC_HIDE_CURSOR		= 0x00400000,
 	POCKETPC_LOW_MEMORY		= 0x00800000,
-	POCKETPC_TAP_MODE		= 0x01000000
+	POCKETPC_TAP_MODE		= 0x01000000,
+	BATTLE_OBJECTS_ARCHERS_PENALTY	= 0x02000000
     };
 
     static Settings & Get(void);
@@ -170,6 +171,7 @@ public:
     bool ExtBattleShowDamage(void) const;
     bool ExtBattleTroopDirection(void) const;
     bool ExtBattleSoftWait(void) const;
+    bool ExtBattleObjectsArchersPenalty(void) const;
     bool ExtRewriteConfirm(void) const;
     bool ExtHideCursor(void) const;
     bool ExtHideAIMove(void) const;

@@ -121,7 +121,6 @@ namespace Battle2
 	bool	isFly(void) const;
 	bool	isWide(void) const;
 	bool	isValid(void) const;
-	bool	isCastleWallDefensed(const Stats &) const;
 	bool	isHandFighting(void) const;
 	bool	isReflect(void) const;
 	bool	AllowResponse(void) const;
@@ -206,6 +205,7 @@ namespace Battle2
 	bool	isMagicAttack(void) const;
 	u8	GetSpellMagic(bool force = false) const;
 	bool	isHaveDamage(void) const;
+	u8	GetObstaclesPenalty(const Stats &) const;
 
 	const Army::army_t* GetArmy(void) const;
 	Army::army_t*       GetArmy(void);

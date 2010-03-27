@@ -1239,7 +1239,7 @@ u16 Battle2::Interface::GetBattleCursor(const Point & mouse, std::string & statu
 		    status = _("Shot %{monster} (%{count} shot(s) left)");
 		    String::Replace(status, "%{monster}", b_enemy->GetName());
 		    String::Replace(status, "%{count}", b_current->GetShots());
-		    return b_enemy->isCastleWallDefensed(*b_current) ? Cursor::WAR_BROKENARROW : Cursor::WAR_ARROW;
+		    return b_enemy->GetObstaclesPenalty(*b_current) ? Cursor::WAR_BROKENARROW : Cursor::WAR_ARROW;
 		}
 		else
 		{

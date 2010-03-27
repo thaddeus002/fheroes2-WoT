@@ -199,6 +199,24 @@ s16 Battle2::Board::GetIndexAbsPosition(const Point & pt) const
     return it1 != it2 ? (*it1).GetIndex() : -1;
 }
 
+void Battle2::Board::GetIndexesFromAbsPoints(std::vector<u16> & indexes, const std::vector<Point> & points) const
+{
+    std::vector<Point>::const_iterator it = points.begin();
+    for(; it != points.end(); ++it)
+    {
+	const s16 index = GetIndexAbsPosition(*it);
+	if(0 <= index) indexes.push_back(index);
+    }
+
+    if(indexes.size())
+    {
+	std::sort(indexes.begin(), indexes.end());
+
+	std::vector<u16>::iterator it1 = std::unique(indexes.begin(), indexes.end());
+	indexes.resize(it1 - indexes.begin());
+    }
+}
+
 bool Battle2::Board::inCastle(u16 ii)
 {
  return((8 < ii && ii <= 10) ||
@@ -353,11 +371,11 @@ void Battle2::Board::SetCobjObjects(u16 center)
 	SetCobjObject(*Rand::Get(objs), dst);
 
 	// 50% 2 obj
-	while(at(dst).object) dst = Rand::Get(2, 7) * 11 + Rand::Get(1, 7);
+	while(at(dst).object) dst = Rand::Get(3, 7) * 11 + Rand::Get(1, 7);
 	if(objs.size() > 1 && 5 < Rand::Get(1, 10)) SetCobjObject(*Rand::Get(objs), dst);
 
 	// 30% 3 obj
-        while(at(dst).object) dst = Rand::Get(2, 7) * 11 + Rand::Get(1, 7);
+        while(at(dst).object) dst = Rand::Get(3, 7) * 11 + Rand::Get(1, 7);
 	if(objs.size() > 1 && 7 < Rand::Get(1, 10)) SetCobjObject(*Rand::Get(objs), dst);
     }
 }
