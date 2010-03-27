@@ -61,6 +61,9 @@ Battle2::Result Battle2::Loader(Army::army_t & army1, Army::army_t & army2, u16 
 	army2.Dump();
     }
 
+    if(conf.ExtLowMemory())
+        AGG::ICNRegistryEnable(true);
+
     Mixer::Reset();
     bool local = Game::LOCAL == army1.GetControl() || Game::LOCAL == army2.GetControl();
 #ifdef WITH_NET
@@ -156,6 +159,12 @@ Battle2::Result Battle2::Loader(Army::army_t & army1, Army::army_t & army2, u16 
 
     army1.BattleQuit();
     army2.BattleQuit();
+
+    if(conf.ExtLowMemory())
+    {
+        AGG::ICNRegistryEnable(false);
+        AGG::ICNRegistryFreeObjects();
+    }
 
     if(IS_DEBUG(DBG_BATTLE , DBG_INFO))
     {

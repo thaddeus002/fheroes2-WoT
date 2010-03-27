@@ -171,25 +171,8 @@ Game::menu_t Game::StartGame(void)
 
     cursor.Hide();
 
-    AGG::FreeObject(ICN::HEROES);
-    AGG::FreeObject(ICN::BTNSHNGL);
-    AGG::FreeObject(ICN::SHNGANIM);
-    AGG::FreeObject(ICN::BTNNEWGM);
-    AGG::FreeObject(ICN::REDBACK);
-    AGG::FreeObject(ICN::NGEXTRA);
-    AGG::FreeObject(ICN::NGHSBKG);
-    AGG::FreeObject(ICN::REQSBKG);
-    AGG::FreeObject(ICN::REQUEST);
-    AGG::FreeObject(ICN::REQUESTS);
-    AGG::FreeObject(ICN::ESCROLL);
-    AGG::FreeObject(ICN::HSBKG);
-    AGG::FreeObject(ICN::HISCORE);
-
-    if(Settings::Get().ExtLowMemory())
-    {
-        AGG::ICNRegistryEnable(false);
-        AGG::ICNRegistryFreeObjects();
-    }
+    AGG::ICNRegistryFreeObjects();
+    AGG::ICNRegistryEnable(false);
 
     AGG::Cache::Get().ResetMixer();
 
@@ -328,6 +311,9 @@ void Game::OpenCastle(Castle *castle)
 		DELAY(100);
 	    }
 
+	    if(Settings::Get().ExtLowMemory())
+    		AGG::ICNRegistryEnable(true);
+
 	    result = (*it)->OpenDialog(need_fade);
 	    if(need_fade) need_fade = false;
 
@@ -393,7 +379,8 @@ void Game::OpenHeroes(Heroes *hero)
 		DELAY(100);
 	    }
 
-	    if(Settings::Get().ExtLowMemory()) AGG::ICNRegistryEnable(true);
+	    if(Settings::Get().ExtLowMemory())
+		AGG::ICNRegistryEnable(true);
 
 	    result = (*it)->OpenDialog(false, need_fade);
 	    if(need_fade) need_fade = false;

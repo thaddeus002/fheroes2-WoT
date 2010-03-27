@@ -123,7 +123,7 @@ int main(int argc, char **argv)
         if(conf.Sound() || conf.Music())
             subsystem |= INIT_AUDIO;
 #ifdef WITH_AUDIOCD
-        if(Settings::MUSIC_CD == conf.GetMusicType())
+        if(conf.CDMusic())
             subsystem |= INIT_CDROM | INIT_AUDIO;
 #endif
 #ifdef WITH_NET
@@ -188,8 +188,8 @@ int main(int argc, char **argv)
 #endif
 
 	    // init cursor
-	    AGG::PreloadObject(ICN::ADVMCO);
 	    Cursor::Get().SetThemes(Cursor::POINTER);
+	    AGG::ICNRegistryEnable(true);
 
 	    LocalEvent & le = LocalEvent::Get();
 

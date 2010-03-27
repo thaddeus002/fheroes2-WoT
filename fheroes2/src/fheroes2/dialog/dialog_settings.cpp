@@ -137,7 +137,7 @@ void Dialog::ExtSettings(void)
     states.push_back(Settings::WORLD_SHOW_VISITED_CONTENT);
     states.push_back(Settings::WORLD_ABANDONED_MINE_RANDOM);
     states.push_back(Settings::WORLD_SAVE_MONSTER_BATTLE);
-    //states.push_back(Settings::WORLD_ALLOW_SET_GUARDIAN);
+    states.push_back(Settings::WORLD_ALLOW_SET_GUARDIAN);
     states.push_back(Settings::HEROES_LEARN_SPELLS_WITH_DAY);
     if(conf.VideoMode().w >= 640 && conf.VideoMode().w >= 480)
 	states.push_back(Settings::CASTLE_ALLOW_BUY_FROM_WELL);
@@ -194,7 +194,6 @@ void Dialog::ExtSettings(void)
     // store
     if(result == Dialog::OK)
     {
-	AGG::ICNRegistryEnable(conf.ExtLowMemory());
 	le.SetTapMode(conf.ExtTapMode());
 	Settings::Get().BinarySave();
     }

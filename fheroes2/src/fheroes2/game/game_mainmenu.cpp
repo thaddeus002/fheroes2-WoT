@@ -40,7 +40,6 @@ Game::menu_t Game::MainMenu(void)
     Mixer::Pause();
     AGG::PlayMusic(MUS::MAINMENU);
 
-    if(Settings::Get().ExtLowMemory()) AGG::ICNRegistryEnable(true);
     if(Settings::Get().QVGA()) return PocketPC::MainMenu();
 
     // preload
