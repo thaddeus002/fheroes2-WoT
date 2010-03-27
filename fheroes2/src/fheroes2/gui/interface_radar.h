@@ -41,7 +41,7 @@ namespace Interface
 	void Generate(void);
 	void Redraw(void);
 	void RedrawArea(const u8 color = 0xFF);
-	void HideArea(void);
+	void SetHide(bool);
 	void RedrawCursor(void);
 
 	void QueueEventProcessing(void);
@@ -64,6 +64,8 @@ namespace Interface
 	Surface* sf_black;
 
 	Dialog::FrameBorder border;
+
+	bool hide;
     };
 }
 

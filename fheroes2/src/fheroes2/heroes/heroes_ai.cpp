@@ -685,6 +685,7 @@ void AIToCaptureObject(Heroes &hero, const u8 obj, const u16 dst_index)
 	    const Army::Troop troop(tile);
 	    Army::army_t army;
 	    army.JoinTroop(troop);
+	    army.SetColor(world.ColorCapturedObject(dst_index));
 
 	    Battle2::Result result = Battle2::Loader(hero.GetArmy(), army, dst_index);
 

@@ -2317,13 +2317,13 @@ void Maps::Tiles::ResetQuantity(void)
 
 bool Maps::Tiles::CheckEnemyGuardians(u8 color) const
 {
-    switch(general)
+    if(MP2::OBJ_HEROES == general)
     {
-	case MP2::OBJ_MINES:
-	    return color != world.ColorCapturedObject(maps_index) && quantity3 && (quantity1 || quantity2);
-
-	default: break;
+	const Heroes* hero = world.GetHeroes(maps_index);
+	if(! hero || ! MP2::isCaptureObject(hero->GetUnderObject())) return false;
     }
+    else
+    if(! MP2::isCaptureObject(general)) return false;
 
-    return false;
+    return color != world.ColorCapturedObject(maps_index) && quantity3 && (quantity1 || quantity2);
 }

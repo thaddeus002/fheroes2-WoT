@@ -33,6 +33,7 @@
 #include "gameevent.h"
 #include "mp2.h"
 #include "text.h"
+#include "pairs.h"
 #include "algorithm.h"
 #include "game_over.h"
 #include "interface_gamearea.h"
@@ -434,7 +435,7 @@ void World::LoadMaps(const std::string &filename)
 		break;
 	}
 	// preload in to capture objects cache
-	map_captureobj[Maps::GetIndexFromAbsPoint(cx, cy)] = std::make_pair(MP2::OBJ_CASTLE, Color::GRAY);
+	map_captureobj[Maps::GetIndexFromAbsPoint(cx, cy)] = ObjectColor(MP2::OBJ_CASTLE, Color::GRAY);
     }
 
     DEBUG(DBG_GAME , DBG_INFO, "World::World: read coord castles, tellg: " << fd.tellg());
@@ -457,11 +458,11 @@ void World::LoadMaps(const std::string &filename)
 	{
 	    // mines: wood
 	    case 0x00:
-		map_captureobj[Maps::GetIndexFromAbsPoint(cx, cy)] = std::make_pair(MP2::OBJ_SAWMILL, Color::GRAY);
+		map_captureobj[Maps::GetIndexFromAbsPoint(cx, cy)] = ObjectColor(MP2::OBJ_SAWMILL, Color::GRAY);
 		break; 
 	    // mines: mercury
 	    case 0x01:
-		map_captureobj[Maps::GetIndexFromAbsPoint(cx, cy)] = std::make_pair(MP2::OBJ_ALCHEMYLAB, Color::GRAY);
+		map_captureobj[Maps::GetIndexFromAbsPoint(cx, cy)] = ObjectColor(MP2::OBJ_ALCHEMYLAB, Color::GRAY);
 		break;
 	    // mines: ore
  	    case 0x02:
@@ -473,19 +474,19 @@ void World::LoadMaps(const std::string &filename)
 	    case 0x05:
 	    // mines: gold
 	    case 0x06:
-		map_captureobj[Maps::GetIndexFromAbsPoint(cx, cy)] = std::make_pair(MP2::OBJ_MINES, Color::GRAY);
+		map_captureobj[Maps::GetIndexFromAbsPoint(cx, cy)] = ObjectColor(MP2::OBJ_MINES, Color::GRAY);
 		break; 
 	    // lighthouse
 	    case 0x64:
-		map_captureobj[Maps::GetIndexFromAbsPoint(cx, cy)] = std::make_pair(MP2::OBJ_LIGHTHOUSE, Color::GRAY);
+		map_captureobj[Maps::GetIndexFromAbsPoint(cx, cy)] = ObjectColor(MP2::OBJ_LIGHTHOUSE, Color::GRAY);
 		break; 
 	    // dragon city
 	    case 0x65:
-		map_captureobj[Maps::GetIndexFromAbsPoint(cx, cy)] = std::make_pair(MP2::OBJ_DRAGONCITY, Color::GRAY);
+		map_captureobj[Maps::GetIndexFromAbsPoint(cx, cy)] = ObjectColor(MP2::OBJ_DRAGONCITY, Color::GRAY);
 		break; 
 	    // abandoned mines
 	    case 0x67:
-		map_captureobj[Maps::GetIndexFromAbsPoint(cx, cy)] = std::make_pair(MP2::OBJ_ABANDONEDMINE, Color::GRAY);
+		map_captureobj[Maps::GetIndexFromAbsPoint(cx, cy)] = ObjectColor(MP2::OBJ_ABANDONEDMINE, Color::GRAY);
 		break; 
 	    default:
 		DEBUG(DBG_GAME , DBG_WARN, "World::World: kingdom block, unknown id: " << static_cast<int>(id) << ", maps index: " << cx + cy * w());
@@ -1385,12 +1386,11 @@ const std::string & World::MessageSign(const u16 index)
 /* return count captured object */
 u16 World::CountCapturedObject(const MP2::object_t obj, const Color::color_t col) const
 {
-    std::map<u16, std::pair<MP2::object_t, Color::color_t> >::const_iterator it1 = map_captureobj.begin();
-    std::map<u16, std::pair<MP2::object_t, Color::color_t> >::const_iterator it2 = map_captureobj.end();
+    std::map<u16, ObjectColor>::const_iterator it1 = map_captureobj.begin();
+    std::map<u16, ObjectColor>::const_iterator it2 = map_captureobj.end();
 
     u16 result = 0;
-
-    for(; it1 != it2; ++it1) if((*it1).second.first == obj && (*it1).second.second == col) ++result;
+    for(; it1 != it2; ++it1) if((*it1).second.isObject(obj) && (*it1).second.isColor(col)) ++result;
 
     return result;
 }
@@ -1398,13 +1398,13 @@ u16 World::CountCapturedObject(const MP2::object_t obj, const Color::color_t col
 /* return count captured mines */
 u16 World::CountCapturedMines(const Resource::resource_t res, const Color::color_t col) const
 {
-    std::map<u16, std::pair<MP2::object_t, Color::color_t> >::const_iterator it1 = map_captureobj.begin();
-    std::map<u16, std::pair<MP2::object_t, Color::color_t> >::const_iterator it2 = map_captureobj.end();
+    std::map<u16, ObjectColor>::const_iterator it1 = map_captureobj.begin();
+    std::map<u16, ObjectColor>::const_iterator it2 = map_captureobj.end();
 
     u16 result = 0;
 
     for(; it1 != it2; ++it1)
-	if(MP2::OBJ_MINES == (*it1).second.first || MP2::OBJ_HEROES == (*it1).second.first)
+	if((*it1).second.isObject(MP2::OBJ_MINES) || (*it1).second.isObject(MP2::OBJ_HEROES))
     {
 	    // scan for find mines
 	    const Maps::TilesAddon * addon = GetTiles((*it1).first).FindMines();
@@ -1412,15 +1412,15 @@ u16 World::CountCapturedMines(const Resource::resource_t res, const Color::color
 	    if(addon)
 	    {
 		// index sprite EXTRAOVR
-		if(0 == addon->index && Resource::ORE == res && (*it1).second.second == col) ++result;
+		if(0 == addon->index && Resource::ORE == res && (*it1).second.isColor(col)) ++result;
 		else
-		if(1 == addon->index && Resource::SULFUR == res && (*it1).second.second == col) ++result;
+		if(1 == addon->index && Resource::SULFUR == res && (*it1).second.isColor(col)) ++result;
 		else
-		if(2 == addon->index && Resource::CRYSTAL == res && (*it1).second.second == col) ++result;
+		if(2 == addon->index && Resource::CRYSTAL == res && (*it1).second.isColor(col)) ++result;
 		else
-		if(3 == addon->index && Resource::GEMS == res && (*it1).second.second == col) ++result;
+		if(3 == addon->index && Resource::GEMS == res && (*it1).second.isColor(col)) ++result;
 		else
-		if(4 == addon->index && Resource::GOLD == res && (*it1).second.second == col) ++result;
+		if(4 == addon->index && Resource::GOLD == res && (*it1).second.isColor(col)) ++result;
 	    }
     }
     
@@ -1455,8 +1455,8 @@ void World::CaptureObject(const u16 index, const Color::color_t col)
 /* return color captured object */
 Color::color_t World::ColorCapturedObject(const u16 index) const
 {
-    std::map<u16, std::pair<MP2::object_t, Color::color_t> >::const_iterator it1 = map_captureobj.begin();
-    std::map<u16, std::pair<MP2::object_t, Color::color_t> >::const_iterator it2 = map_captureobj.end();
+    std::map<u16, ObjectColor>::const_iterator it1 = map_captureobj.begin();
+    std::map<u16, ObjectColor>::const_iterator it2 = map_captureobj.end();
 
     for(; it1 != it2; ++it1) if((*it1).first == index) return (*it1).second.second;
 
@@ -1485,8 +1485,8 @@ void World::ClearFog(const u8 color)
     }
 
     // clear abroad objects
-    std::map<u16, std::pair<MP2::object_t, Color::color_t> >::const_iterator it1 = map_captureobj.begin();
-    std::map<u16, std::pair<MP2::object_t, Color::color_t> >::const_iterator it2 = map_captureobj.end();
+    std::map<u16, ObjectColor>::const_iterator it1 = map_captureobj.begin();
+    std::map<u16, ObjectColor>::const_iterator it2 = map_captureobj.end();
 
     for(; it1 != it2; ++it1)
 	if(color & (*it1).second.second)
@@ -1764,12 +1764,12 @@ void World::KingdomLoss(const Color::color_t color)
     for(; itc1 != itc2; ++itc1) if(*itc1 && (*itc1)->GetColor() == color) (*itc1)->ChangeColor(color);
 
     // capture object
-    std::map<u16, std::pair<MP2::object_t, Color::color_t> >::iterator it1 = map_captureobj.begin();
-    std::map<u16, std::pair<MP2::object_t, Color::color_t> >::const_iterator it2 = map_captureobj.end();
+    std::map<u16, ObjectColor>::iterator it1 = map_captureobj.begin();
+    std::map<u16, ObjectColor>::const_iterator it2 = map_captureobj.end();
     for(; it1 != it2; ++it1)
     {
-	std::pair<MP2::object_t, Color::color_t> & pair = (*it1).second;
-	if(pair.second == color)
+	ObjectColor & pair = (*it1).second;
+	if(pair.isColor(color))
 	{
 	    pair.second = Color::GRAY;
 	    GetTiles((*it1).first).CaptureFlags32(pair.first, Color::GRAY);

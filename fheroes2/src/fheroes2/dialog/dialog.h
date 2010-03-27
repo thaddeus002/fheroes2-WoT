@@ -116,6 +116,7 @@ namespace Dialog
     // recruit monster
     u16 RecruitMonster(const Monster & monster, u16 available);
     void DwellingInfo(const Monster & monster, u16 available);
+    void SetGuardian(Heroes &, Army::Troop &, bool readonly);
 
     // army info
     answer_t ArmyInfo(const Army::Troop & troop, u16 flags);

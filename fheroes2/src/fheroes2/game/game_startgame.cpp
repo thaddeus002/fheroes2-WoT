@@ -230,7 +230,8 @@ Game::menu_t Game::StartGame(void)
 
 	    if(IS_DEBUG(DBG_GAME, DBG_INFO)) kingdom.Dump();
 
-	    radar.HideArea();
+	    radar.SetHide(true);
+	    I.SetRedraw(REDRAW_RADAR);
 	    conf.SetCurrentColor(color);
 	    world.ClearFog(color);
 	    kingdom.ActionBeforeTurn();
@@ -792,6 +793,7 @@ Game::menu_t Game::HumanTurn(void)
 	global_focus.Reset(Focus::HEROES);
     if(Focus::HEROES == global_focus.Type() && global_focus.GetHeroes().GetPath().isValid()) global_focus.GetHeroes().GetPath().Show();
 
+    I.radar.SetHide(false);
     I.statusWindow.Reset();
     I.Redraw(REDRAW_GAMEAREA | REDRAW_RADAR | REDRAW_ICONS | REDRAW_BUTTONS | REDRAW_STATUS | REDRAW_BORDER);
 
@@ -883,7 +885,7 @@ Game::menu_t Game::HumanTurn(void)
 	    case KEY_4:		SwitchShowStatus(); break;
 	    // hide/show hero/town icons
 	    case KEY_5:		SwitchShowIcons(); break;
-	    
+
 	    default: break;
 	}
 

@@ -260,6 +260,8 @@ void Castle::LoadFromMP2(const void *ptr)
 	captain.LoadDefaults();
 	army.SetCommander(&captain);
     }
+    else
+	army.SetColor(color);
 
     // AI troops auto pack
     if(!custom_troops && Game::AI == GetControl())
@@ -353,6 +355,10 @@ void Castle::ActionNewMonth(void)
 void Castle::ChangeColor(Color::color_t cl)
 {
     color = cl;
+
+    // fix army
+    if(!isBuild(BUILD_CAPTAIN))
+	army.SetColor(color);
 }
 
 // return mage guild level

@@ -213,7 +213,7 @@ u8 Army::Troop::GetDefense(void) const
 
 Color::color_t Army::Troop::GetColor(void) const
 {
-    return army && army->commander ? army->commander->GetColor() : Color::GRAY;
+    return army ? army->GetColor() : Color::GRAY;
 }
 
 u32 Army::Troop::GetHitPoints(void) const

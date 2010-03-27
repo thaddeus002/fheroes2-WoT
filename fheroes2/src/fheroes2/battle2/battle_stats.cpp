@@ -1057,8 +1057,7 @@ u32 Battle2::Stats::GetHitPoints(void) const
 
 u8 Battle2::Stats::GetControl(void) const
 {
-    return Modes(SP_BERSERKER) ? Game::AI :
-	  (Modes(SP_HYPNOTIZE) ? arena->GetArmy(GetColor())->GetControl() : troop.GetArmy()->GetControl());
+    return Modes(SP_BERSERKER) ? Game::AI : arena->GetArmy(GetColor())->GetControl();
 }
 
 bool Battle2::Stats::isArchers(void) const

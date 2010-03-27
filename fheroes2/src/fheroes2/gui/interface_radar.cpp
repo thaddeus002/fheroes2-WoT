@@ -55,7 +55,7 @@ u32 GetPaletteIndexFromGround(const u16 ground);
 /* constructor */
 Interface::Radar::Radar() : spriteArea(NULL), spriteCursor(NULL), cursorArea(NULL),
     sf_blue(NULL), sf_green(NULL), sf_red(NULL), sf_yellow(NULL),
-    sf_orange(NULL), sf_purple(NULL), sf_gray(NULL), sf_black(NULL)
+    sf_orange(NULL), sf_purple(NULL), sf_gray(NULL), sf_black(NULL), hide(true)
 {
     Rect::w = RADARWIDTH;
     Rect::h = RADARWIDTH;
@@ -182,20 +182,25 @@ void Interface::Radar::Generate(void)
     }
 }
 
-void Interface::Radar::HideArea(void)
+void Interface::Radar::SetHide(bool f)
 {
-    const Settings & conf = Settings::Get();
-    if(conf.HideInterface() && !conf.ShowRadar()) return;
-    Display::Get().Blit(AGG::GetICN((Settings::Get().EvilInterface() ? ICN::HEROLOGE : ICN::HEROLOGO), 0), x, y);
+    hide = f;
 }
 
 void Interface::Radar::Redraw(void)
 {
-    RedrawArea(Settings::Get().MyColor());
-    RedrawCursor();
+    const Settings & conf = Settings::Get();
+
+    if(!hide)
+    {
+	RedrawArea(conf.MyColor());
+	RedrawCursor();
+    }
+    else
+    if(!conf.HideInterface() || conf.ShowRadar())
+	Display::Get().Blit(AGG::GetICN((conf.EvilInterface() ? ICN::HEROLOGE : ICN::HEROLOGO), 0), x, y);
 
     // redraw border
-    const Settings & conf = Settings::Get();
     if(conf.HideInterface() && conf.ShowRadar())
     {
 	border.Redraw();
@@ -208,6 +213,7 @@ void Interface::Radar::RedrawArea(const u8 color)
     const Settings & conf = Settings::Get();
     if(conf.HideInterface() && !conf.ShowRadar()) return;
     Display & display = Display::Get();
+
 
     const u16 world_w = world.w();
     const u16 world_h = world.h();

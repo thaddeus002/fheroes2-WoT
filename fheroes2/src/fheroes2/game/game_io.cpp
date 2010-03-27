@@ -288,8 +288,8 @@ bool Game::IO::SaveBIN(QueueMessage & msg)
     msg.Push(static_cast<u16>(0xFF0B));
     msg.Push(static_cast<u32>(world.map_captureobj.size()));
     {
-	std::map<u16, std::pair<MP2::object_t, Color::color_t> >::const_iterator it1 = world.map_captureobj.begin();
-	std::map<u16, std::pair<MP2::object_t, Color::color_t> >::const_iterator it2 = world.map_captureobj.end();
+	std::map<u16, ObjectColor>::const_iterator it1 = world.map_captureobj.begin();
+	std::map<u16, ObjectColor>::const_iterator it2 = world.map_captureobj.end();
 	for(; it1 != it2; ++it1)
 	{
 	    msg.Push((*it1).first);
@@ -770,7 +770,7 @@ bool Game::IO::LoadBIN(QueueMessage & msg)
     for(u32 ii = 0; ii < byte32; ++ii)
     {
 	msg.Pop(byte16);
-	std::pair<MP2::object_t, Color::color_t> & value = world.map_captureobj[byte16];
+	ObjectColor & value = world.map_captureobj[byte16];
 	msg.Pop(byte8); value.first = static_cast<MP2::object_t>(byte8);
 	msg.Pop(byte8); value.second = Color::Get(byte8);
     }

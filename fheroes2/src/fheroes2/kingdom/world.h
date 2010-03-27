@@ -170,7 +170,7 @@ private:
     std::map<u16, std::string>		map_sign;
 
     // index, object, color
-    std::map<u16, std::pair<MP2::object_t, Color::color_t> > map_captureobj;
+    std::map<u16, ObjectColor> map_captureobj;
 
     u16 ultimate_artifact;
 

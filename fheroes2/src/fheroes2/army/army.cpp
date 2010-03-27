@@ -114,35 +114,28 @@ Army::armysize_t Army::GetSize(u32 count)
     return FEW;
 }
 
-Army::army_t::army_t(HeroBase* s) : army(ARMYMAXTROOPS), commander(s), combat_format(FORMAT_SPREAD)
+Army::army_t::army_t(HeroBase* s) : army(ARMYMAXTROOPS), commander(s), combat_format(FORMAT_SPREAD), color(Color::GRAY)
 {
     std::vector<Troop>::iterator it1 = army.begin();
     std::vector<Troop>::const_iterator it2 = army.end();
     for(; it1 != it2; ++it1) (*it1).army = this;
 }
 
-Army::army_t::army_t(const army_t & a) : army(ARMYMAXTROOPS), commander(NULL), combat_format(FORMAT_SPREAD)
+Army::army_t::army_t(const army_t & a) : army(ARMYMAXTROOPS), commander(NULL), combat_format(FORMAT_SPREAD), color(Color::GRAY)
 {
     std::vector<Troop>::iterator it1 = army.begin();
     std::vector<Troop>::const_iterator it2 = army.end();
     for(; it1 != it2; ++it1) (*it1).army = this;
 
     Import(a.army);
-}
-
-Army::army_t & Army::army_t::operator= (const army_t & a)
-{
-    commander = NULL;
-
-    Import(a.army);
-    combat_format = a.combat_format;
-
-    return *this;
 }
 
 void Army::army_t::FromGuardian(const Maps::Tiles & t)
 {
     Reset();
+
+    if(MP2::isCaptureObject(t.GetObject()))
+	color = world.ColorCapturedObject(t.GetIndex());
 
     u8 obj = t.GetObject();
 
@@ -232,6 +225,17 @@ void Army::army_t::FromGuardian(const Maps::Tiles & t)
 	    ArrangeForBattle();
 	    break;
     }
+}
+
+Army::army_t & Army::army_t::operator= (const army_t & a)
+{
+    commander = NULL;
+
+    Import(a.army);
+    combat_format = a.combat_format;
+    color = a.color;
+
+    return *this;
 }
 
 void Army::army_t::SetCombatFormat(format_t f)
@@ -382,7 +386,12 @@ bool Army::army_t::HasMonster(const Monster::monster_t mons) const
 
 Color::color_t Army::army_t::GetColor(void) const
 {
-    return commander ? commander->GetColor() : Color::GRAY;
+    return commander ? commander->GetColor() : color;
+}
+
+void Army::army_t::SetColor(Color::color_t cl)
+{
+    color = cl;
 }
 
 Race::race_t Army::army_t::GetRace(void) const
@@ -1026,7 +1035,7 @@ void Army::army_t::UpgradeTroops(const Castle & castle)
 
 void Army::army_t::Dump(void) const
 {
-    std::cout << "Army::Dump: " << (commander ? Color::String(commander->GetColor()) : "Gray") << ": ";
+    std::cout << "Army::Dump: " << Color::String(commander ? commander->GetColor() : color) << ": ";
 
     std::vector<Troop>::const_iterator it1 = army.begin();
     std::vector<Troop>::const_iterator it2 = army.end();
@@ -1158,7 +1167,7 @@ u32 Army::army_t::ActionToSirens(void)
 
 u8 Army::army_t::GetControl(void) const
 {
-    return commander ? commander->GetControl() : Game::AI;
+    return commander ? commander->GetControl() : (color == Color::GRAY ? Game::AI : world.GetKingdom(color).Control());
 }
 
 u32 Army::army_t::GetSurrenderCost(void) const

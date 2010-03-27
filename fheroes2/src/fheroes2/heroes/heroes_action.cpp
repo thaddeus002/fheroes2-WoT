@@ -2112,6 +2112,7 @@ void ActionToAbandoneMine(Heroes &hero, const u8 obj, const u16 dst_index)
 /* capture color object */
 void ActionToCaptureObject(Heroes &hero, const u8 obj, const u16 dst_index)
 {
+    Maps::Tiles & tile = world.GetTiles(dst_index);
     std::string header;
     std::string body;
 
@@ -2179,7 +2180,6 @@ void ActionToCaptureObject(Heroes &hero, const u8 obj, const u16 dst_index)
     // capture object
     if(hero.GetColor() != world.ColorCapturedObject(dst_index))
     {
-	Maps::Tiles & tile = world.GetTiles(dst_index);
 	bool capture = true;
 
 	// check guardians
@@ -2188,6 +2188,7 @@ void ActionToCaptureObject(Heroes &hero, const u8 obj, const u16 dst_index)
 	    const Army::Troop troop(tile);
     	    Army::army_t army;
     	    army.JoinTroop(troop);
+	    army.SetColor(world.ColorCapturedObject(dst_index));
 
     	    Battle2::Result result = Battle2::Loader(hero.GetArmy(), army, dst_index);
 
@@ -2221,6 +2222,14 @@ void ActionToCaptureObject(Heroes &hero, const u8 obj, const u16 dst_index)
     // set guardians
     if(Settings::Get().ExtAllowSetGuardian())
     {
+	Army::Troop troop(tile);
+
+	// check set with spell ?
+	bool readonly = tile.GetQuantity4();
+
+	Dialog::SetGuardian(hero, troop, readonly);
+	tile.SetQuantity3(troop());
+        tile.SetCountMonster(troop.GetCount());
     }
 
     DEBUG(DBG_GAME , DBG_INFO, "ActionToCaptureObject: " << hero.GetName() << " captured: " << MP2::StringObject(obj));

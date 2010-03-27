@@ -108,6 +108,8 @@ namespace Army
 	    Color::color_t GetColor(void) const;
 	    u8             GetControl(void) const;
 
+	    void        SetColor(Color::color_t);
+
 	    u8		Size(void) const;
 	    u8		GetCount(void) const;
 	    u8		GetUniqCount(void) const;
@@ -158,6 +160,7 @@ namespace Army
 	    std::vector<Troop> army;
 	    HeroBase*    commander;
 	    u8 combat_format;
+	    Color::color_t color;
     };
 }
 

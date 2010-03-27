@@ -67,7 +67,7 @@ Dialog::answer_t Dialog::ArmyInfo(const Army::Troop & troop, u16 flags)
     Text text;
     std::string message;
 
-    dst_pt.x = pos_rt.x + 400;
+    dst_pt.x = pos_rt.x + 380;
     dst_pt.y = pos_rt.y + 40;
 
     DrawMonsterStats(dst_pt, troop);

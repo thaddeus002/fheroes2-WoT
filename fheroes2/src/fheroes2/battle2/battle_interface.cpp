@@ -3849,7 +3849,8 @@ void Battle2::Interface::ProcessingHeroDialogResult(u8 res, Actions & a)
 
 	// retreat
 	case 2:
-	    if(Dialog::YES == Dialog::Message("", _("Are you sure you want to retreat?"), Font::BIG, Dialog::YES | Dialog::NO))
+	    if(b_current->GetCommander() && 
+		Dialog::YES == Dialog::Message("", _("Are you sure you want to retreat?"), Font::BIG, Dialog::YES | Dialog::NO))
 	    {
 		a.AddedRetreatAction();
 		a.AddedEndAction(*b_current);
