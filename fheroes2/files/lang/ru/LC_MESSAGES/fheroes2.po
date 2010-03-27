@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: fheroes2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-03-27 20:18+0800\n"
+"POT-Creation-Date: 2010-03-27 22:04+0800\n"
 "PO-Revision-Date: 2010-03-27 18:50+0800\n"
 "Last-Translator: Andrey Afletdinov <fheroes2@gmail.com>\n"
 "Language-Team:  <ru@li.org>\n"
@@ -159,7 +159,7 @@ msgstr "%{name} %{race}"
 #: ../fheroes2/battle2/battle_dialogs.cpp:369
 #: ../fheroes2/castle/castle_well.cpp:253
 #: ../fheroes2/dialog/dialog_armyinfo.cpp:204
-#: ../fheroes2/dialog/dialog_quickinfo.cpp:578
+#: ../fheroes2/dialog/dialog_quickinfo.cpp:588
 #: ../fheroes2/heroes/skill.cpp:307
 msgid "Attack"
 msgstr "Атака"
@@ -167,13 +167,13 @@ msgstr "Атака"
 #: ../fheroes2/battle2/battle_dialogs.cpp:375
 #: ../fheroes2/castle/castle_well.cpp:261
 #: ../fheroes2/dialog/dialog_armyinfo.cpp:228
-#: ../fheroes2/dialog/dialog_quickinfo.cpp:592
+#: ../fheroes2/dialog/dialog_quickinfo.cpp:602
 msgid "Defense"
 msgstr "Защита"
 
 #: ../fheroes2/battle2/battle_dialogs.cpp:381
 #: ../fheroes2/castle/castle_town.cpp:326
-#: ../fheroes2/dialog/dialog_quickinfo.cpp:606
+#: ../fheroes2/dialog/dialog_quickinfo.cpp:616
 #: ../fheroes2/dialog/dialog_skillinfo.cpp:152
 #: ../fheroes2/heroes/heroes_dialog.cpp:137
 #: ../fheroes2/heroes/heroes_dialog.cpp:408
@@ -185,7 +185,7 @@ msgstr "Сила магии"
 
 #: ../fheroes2/battle2/battle_dialogs.cpp:387
 #: ../fheroes2/castle/castle_town.cpp:337
-#: ../fheroes2/dialog/dialog_quickinfo.cpp:620
+#: ../fheroes2/dialog/dialog_quickinfo.cpp:630
 #: ../fheroes2/dialog/dialog_skillinfo.cpp:157
 #: ../fheroes2/heroes/heroes_dialog.cpp:163
 #: ../fheroes2/heroes/heroes_dialog.cpp:410
@@ -206,7 +206,7 @@ msgid "Luck"
 msgstr "Удача"
 
 #: ../fheroes2/battle2/battle_dialogs.cpp:403
-#: ../fheroes2/dialog/dialog_quickinfo.cpp:634
+#: ../fheroes2/dialog/dialog_quickinfo.cpp:644
 #: ../fheroes2/heroes/heroes_indicator.cpp:252
 msgid "Spell Points"
 msgstr "Очки магии"
@@ -447,17 +447,17 @@ msgstr "Вы действительно хотите отступить?"
 msgid "You don't have enough gold!"
 msgstr "Вам не хватает золота!"
 
-#: ../fheroes2/battle2/battle_main.cpp:195
+#: ../fheroes2/battle2/battle_main.cpp:204
 msgid "You have captured an enemy artifact!"
 msgstr "Вы захватили вражеский артефакт."
 
-#: ../fheroes2/battle2/battle_main.cpp:243
+#: ../fheroes2/battle2/battle_main.cpp:252
 msgid ""
 "Through eagle-eyed observation, %{name} is able to learn the magic spell %"
 "{spell}."
 msgstr "Блягодаря 'Взгляду Орла', %{name} смог узнать заклинание %{spell}."
 
-#: ../fheroes2/battle2/battle_main.cpp:281
+#: ../fheroes2/battle2/battle_main.cpp:290
 msgid ""
 "Practicing the dark arts of necromancy, you are able to raise %{count} of "
 "the enemy's dead to return under your service as %{monster}"
@@ -1456,37 +1456,37 @@ msgstr "Терра инкогнито"
 msgid "guarded by %{count} of %{monster}"
 msgstr "охраняется %{count} %{monster}"
 
-#: ../fheroes2/dialog/dialog_quickinfo.cpp:162
-#: ../fheroes2/dialog/dialog_quickinfo.cpp:240
-#: ../fheroes2/dialog/dialog_quickinfo.cpp:259
-#: ../fheroes2/dialog/dialog_quickinfo.cpp:315
-#: ../fheroes2/dialog/dialog_quickinfo.cpp:328
+#: ../fheroes2/dialog/dialog_quickinfo.cpp:172
+#: ../fheroes2/dialog/dialog_quickinfo.cpp:250
+#: ../fheroes2/dialog/dialog_quickinfo.cpp:269
+#: ../fheroes2/dialog/dialog_quickinfo.cpp:325
+#: ../fheroes2/dialog/dialog_quickinfo.cpp:338
 msgid "(already visited)"
 msgstr "(Посещено)"
 
-#: ../fheroes2/dialog/dialog_quickinfo.cpp:218
+#: ../fheroes2/dialog/dialog_quickinfo.cpp:228
 msgid "(available: %{count})"
 msgstr "(Доступно: %{count})"
 
-#: ../fheroes2/dialog/dialog_quickinfo.cpp:240
-#: ../fheroes2/dialog/dialog_quickinfo.cpp:259
-#: ../fheroes2/dialog/dialog_quickinfo.cpp:315
+#: ../fheroes2/dialog/dialog_quickinfo.cpp:250
+#: ../fheroes2/dialog/dialog_quickinfo.cpp:269
+#: ../fheroes2/dialog/dialog_quickinfo.cpp:325
 msgid "(not visited)"
 msgstr "(Не посещено)"
 
-#: ../fheroes2/dialog/dialog_quickinfo.cpp:276
+#: ../fheroes2/dialog/dialog_quickinfo.cpp:286
 msgid "already learned"
 msgstr "уже выучено"
 
-#: ../fheroes2/dialog/dialog_quickinfo.cpp:297
+#: ../fheroes2/dialog/dialog_quickinfo.cpp:307
 msgid "already know the skill"
 msgstr "уже знаете"
 
-#: ../fheroes2/dialog/dialog_quickinfo.cpp:304
+#: ../fheroes2/dialog/dialog_quickinfo.cpp:314
 msgid "already has max skills"
 msgstr "максимум навыков"
 
-#: ../fheroes2/dialog/dialog_quickinfo.cpp:334
+#: ../fheroes2/dialog/dialog_quickinfo.cpp:344
 #: ../fheroes2/heroes/heroes_action.cpp:1891
 #: ../fheroes2/heroes/heroes_action.cpp:1898
 #: ../fheroes2/heroes/heroes_action.cpp:1908
@@ -1494,11 +1494,11 @@ msgstr "максимум навыков"
 msgid "Sea Chest"
 msgstr "Морской Сундук"
 
-#: ../fheroes2/dialog/dialog_quickinfo.cpp:459
+#: ../fheroes2/dialog/dialog_quickinfo.cpp:469
 msgid "Defenders:"
 msgstr "Защитники:"
 
-#: ../fheroes2/dialog/dialog_quickinfo.cpp:468
+#: ../fheroes2/dialog/dialog_quickinfo.cpp:478
 #: ../fheroes2/heroes/heroes_indicator.cpp:124
 #: ../fheroes2/heroes/heroes_indicator.cpp:170
 msgid "None"
@@ -1759,7 +1759,7 @@ msgid "Load an existing map."
 msgstr "Загрузить существующую карту"
 
 #: ../fheroes2/editor/editor_mainmenu.cpp:82
-#: ../fheroes2/game/game_mainmenu.cpp:161
+#: ../fheroes2/game/game_mainmenu.cpp:160
 #: ../fheroes2/pocketpc/pocketpc_mainmenu.cpp:94
 msgid "Quit"
 msgstr "Выход"
@@ -1799,7 +1799,7 @@ msgid "Cancel back to the main menu."
 msgstr "Вернуться в главное меню"
 
 #: ../fheroes2/editor/editor_startgame.cpp:175
-#: ../fheroes2/game/game_startgame.cpp:1409
+#: ../fheroes2/game/game_startgame.cpp:1396
 msgid "Are you sure you want to quit?"
 msgstr "Вы уверены, что хотите выйти?"
 
@@ -2125,43 +2125,43 @@ msgstr "Загрузка..."
 msgid "Are you sure you want to overwrite the save with this name?"
 msgstr "Вы хотите перезаписать файл игры?"
 
-#: ../fheroes2/game/game_mainmenu.cpp:161
+#: ../fheroes2/game/game_mainmenu.cpp:160
 msgid "Quit Heroes of Might and Magic and return to the operating system."
 msgstr "Завершить игру Heroes of Might and Magic."
 
-#: ../fheroes2/game/game_mainmenu.cpp:163
+#: ../fheroes2/game/game_mainmenu.cpp:162
 #: ../fheroes2/pocketpc/pocketpc_mainmenu.cpp:78
 msgid "Load Game"
 msgstr "Загрузка игры"
 
-#: ../fheroes2/game/game_mainmenu.cpp:163
+#: ../fheroes2/game/game_mainmenu.cpp:162
 msgid "Load a previously saved game."
 msgstr "Загрузка ранее сохраненной игры"
 
-#: ../fheroes2/game/game_mainmenu.cpp:165
+#: ../fheroes2/game/game_mainmenu.cpp:164
 #: ../fheroes2/pocketpc/pocketpc_mainmenu.cpp:90
 msgid "Credits"
 msgstr "Авторы"
 
-#: ../fheroes2/game/game_mainmenu.cpp:165
+#: ../fheroes2/game/game_mainmenu.cpp:164
 msgid "View the credits screen."
 msgstr "Просмотр окна авторов"
 
-#: ../fheroes2/game/game_mainmenu.cpp:167
+#: ../fheroes2/game/game_mainmenu.cpp:166
 #: ../fheroes2/pocketpc/pocketpc_mainmenu.cpp:86
 msgid "High Scores"
 msgstr "Счет"
 
-#: ../fheroes2/game/game_mainmenu.cpp:167
+#: ../fheroes2/game/game_mainmenu.cpp:166
 msgid "View the high score screen."
 msgstr "Просмотр лучших результатов."
 
-#: ../fheroes2/game/game_mainmenu.cpp:169
+#: ../fheroes2/game/game_mainmenu.cpp:168
 #: ../fheroes2/pocketpc/pocketpc_mainmenu.cpp:74
 msgid "New Game"
 msgstr "Новая игра"
 
-#: ../fheroes2/game/game_mainmenu.cpp:169
+#: ../fheroes2/game/game_mainmenu.cpp:168
 msgid "Start a single or multi-player game."
 msgstr "Начало одиночной или сетевой игры."
 
@@ -2522,11 +2522,11 @@ msgstr "Некромант"
 msgid "Rating %{rating}%"
 msgstr "Рейтинг %{rating}%"
 
-#: ../fheroes2/game/game_startgame.cpp:252
+#: ../fheroes2/game/game_startgame.cpp:235
 msgid "%{color} player's turn"
 msgstr "%{color} игрок ходит."
 
-#: ../fheroes2/game/game_startgame.cpp:1067
+#: ../fheroes2/game/game_startgame.cpp:1054
 msgid ""
 "%{color} player, you have lost your last town. If you do not conquer another "
 "town in next week, you will be eliminated."
@@ -2534,64 +2534,64 @@ msgstr ""
 "%{color} игрок, вы потеряли последний город. Если вы не захватите любой "
 "другой в течении 7 дней, то потерпите поражение."
 
-#: ../fheroes2/game/game_startgame.cpp:1094
+#: ../fheroes2/game/game_startgame.cpp:1081
 msgid "Try searching on clear ground."
 msgstr "Попробуйте копать на нормальной земле."
 
-#: ../fheroes2/game/game_startgame.cpp:1108
+#: ../fheroes2/game/game_startgame.cpp:1095
 msgid "After spending many hours digging here, you have uncovered the "
 msgstr "После нескольких часов бесплодных раскопок, вы наконец обнаружили "
 
-#: ../fheroes2/game/game_startgame.cpp:1110
+#: ../fheroes2/game/game_startgame.cpp:1097
 msgid "Congratulations!"
 msgstr "Поздравляем!"
 
-#: ../fheroes2/game/game_startgame.cpp:1113
+#: ../fheroes2/game/game_startgame.cpp:1100
 msgid "Nothing here. Where could it be?"
 msgstr "Здесь ничечго. Где бы это могло быть?"
 
-#: ../fheroes2/game/game_startgame.cpp:1121
+#: ../fheroes2/game/game_startgame.cpp:1108
 msgid "Digging for artifacts requires a whole day, try again tomorrow."
 msgstr "Раскопки артефакта занимают целый день. Попробуйте завтра."
 
-#: ../fheroes2/game/game_startgame.cpp:1327
+#: ../fheroes2/game/game_startgame.cpp:1314
 msgid ""
 "One or more heroes may still move, are you sure you want to end your turn?"
 msgstr ""
 "Один или несколько героев все еще могут ходить. Вы действительно хотитие "
 "закончить ход?"
 
-#: ../fheroes2/game/game_startgame.cpp:1359
+#: ../fheroes2/game/game_startgame.cpp:1346
 msgid "Are you sure you want to restart? (Your current game will be lost)"
 msgstr "Вы действительно хотите начать сначала? (Текущая игра будет потеряна)"
 
-#: ../fheroes2/game/game_startgame.cpp:1446
+#: ../fheroes2/game/game_startgame.cpp:1433
 msgid "Game saved successfully."
 msgstr "Игра успешно сохранена."
 
-#: ../fheroes2/game/game_startgame.cpp:1461
+#: ../fheroes2/game/game_startgame.cpp:1448
 msgid ""
 "Are you sure you want to load a new game? (Your current game will be lost)"
 msgstr ""
 "Вы действительно хотите загрузить новую игру? (Текущая игра будет потеряна)"
 
-#: ../fheroes2/game/game_startgame.cpp:1570
+#: ../fheroes2/game/game_startgame.cpp:1557
 msgid "Astrologers proclaim month of the %{name}."
 msgstr "Астрологи предсказали месяц %{name}."
 
-#: ../fheroes2/game/game_startgame.cpp:1570
+#: ../fheroes2/game/game_startgame.cpp:1557
 msgid "Astrologers proclaim week of the %{name}."
 msgstr "Астрологи предсказали неделю %{name}."
 
-#: ../fheroes2/game/game_startgame.cpp:1574
+#: ../fheroes2/game/game_startgame.cpp:1561
 msgid " All populations are halved."
 msgstr " Все население уменьшилось вдвое."
 
-#: ../fheroes2/game/game_startgame.cpp:1574
+#: ../fheroes2/game/game_startgame.cpp:1561
 msgid " All dwellings increase population."
 msgstr " Население всех жилищ возросло."
 
-#: ../fheroes2/game/game_startgame.cpp:1605
+#: ../fheroes2/game/game_startgame.cpp:1592
 msgid ""
 "%{color} player, your heroes abandon you, and you are banished from this "
 "land."
@@ -2599,7 +2599,7 @@ msgstr ""
 "%{color} игрок, ваши герои отвернулись от вас, а вы изгоняетесь из этих "
 "земель."
 
-#: ../fheroes2/game/game_startgame.cpp:1614
+#: ../fheroes2/game/game_startgame.cpp:1601
 msgid ""
 "%{color} player, this is your last day to capture a town, or you will be "
 "banished from this land."
@@ -2607,7 +2607,7 @@ msgstr ""
 "%{color} игрок, у вас остался последний день чтобы захватить город, иначе вы "
 "будете изгнаны из этих земель."
 
-#: ../fheroes2/game/game_startgame.cpp:1621
+#: ../fheroes2/game/game_startgame.cpp:1608
 msgid ""
 "%{color} player, you only have %{day} days left to capture a town, or you "
 "will be banished from this land."
@@ -12812,7 +12812,7 @@ msgid "world: save count monster after battle"
 msgstr "world: сохранить количество врагов, после поражения"
 
 #: ../fheroes2/system/settings.cpp:98
-msgid "world: allow set guardian to objects (future)"
+msgid "world: allow set guardian to objects"
 msgstr "world: разрешить охранников для дополнительных объектов"
 
 #: ../fheroes2/system/settings.cpp:99

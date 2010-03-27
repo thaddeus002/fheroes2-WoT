@@ -107,7 +107,7 @@ void Dialog::QuickInfo(const Maps::Tiles & tile)
 	name_object = _("Unchartered Territory");
     else
     // check guardians mine
-    if(MP2::OBJ_ABANDONEDMINE == tile.GetObject() || tile.CheckEnemyGuardians(settings.MyColor()))
+    if(MP2::OBJ_ABANDONEDMINE == tile.GetObject() || tile.CheckEnemyGuardians(0))
     {
 	const Army::Troop troop(tile);
 
@@ -119,11 +119,21 @@ void Dialog::QuickInfo(const Maps::Tiles & tile)
 	name_object.append("\n");
         name_object.append(_("guarded by %{count} of %{monster}"));
         std::string name = troop.GetMultiName();
-        String::Lower(name);
+        if(!settings.Unicode()) String::Lower(name);
         String::Replace(name_object, "%{monster}", name);
-	name = Army::String(troop.GetCount());
-        String::Lower(name);
-        String::Replace(name_object, "%{count}", name);
+
+	if(settings.MyColor() == world.ColorCapturedObject(tile.GetIndex()))
+	{
+	    name.clear();
+	    String::AddInt(name, troop.GetCount());
+	}
+	else
+	{
+	    name = Army::String(troop.GetCount());
+    	    if(!settings.Unicode()) String::Lower(name);
+        }
+
+	String::Replace(name_object, "%{count}", name);
     }
     else
     switch(tile.GetObject())

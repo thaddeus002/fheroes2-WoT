@@ -95,7 +95,7 @@ static const settings_t settingsFHeroes2[] =
     { Settings::WORLD_SHOW_VISITED_CONTENT,	_("world: show visited content from objects"),		},
     { Settings::WORLD_ABANDONED_MINE_RANDOM,	_("world: abandoned mine random resource"),		},
     { Settings::WORLD_SAVE_MONSTER_BATTLE,	_("world: save count monster after battle"),		},
-    { Settings::WORLD_ALLOW_SET_GUARDIAN,	_("world: allow set guardian to objects (future)"),	},
+    { Settings::WORLD_ALLOW_SET_GUARDIAN,	_("world: allow set guardian to objects"),		},
     { Settings::CASTLE_ALLOW_BUY_FROM_WELL,	_("castle: allow buy from well"),			},
     { Settings::HEROES_LEARN_SPELLS_WITH_DAY,	_("heroes: learn new spells with day"),  		},
     { Settings::BATTLE_SHOW_DAMAGE,		_("battle: show damage info"),    			},
