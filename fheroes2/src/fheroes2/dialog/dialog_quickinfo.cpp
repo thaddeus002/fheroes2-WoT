@@ -251,9 +251,27 @@ void Dialog::QuickInfo(const Maps::Tiles & tile)
 	    // addons pack
 	    if(settings.ExtShowVisitedContent() && kingdom.isVisited(tile))
 	    {
+		const Skill::Secondary::skill_t skill = Skill::Secondary::Skill(tile.GetQuantity1());
 		name_object.append("\n(");
-		name_object.append(Skill::Secondary::String(Skill::Secondary::Skill(tile.GetQuantity1())));
+		name_object.append(Skill::Secondary::String(skill));
 		name_object.append(")");
+
+		if(hero)
+		{
+		    if(hero->HasSecondarySkill(skill))
+		    {
+			name_object.append("\n(");
+			name_object.append(_("already know the skill"));
+			name_object.append(")");
+		    }
+		    else
+		    if(hero->HasMaxSecondarySkill())
+		    {
+			name_object.append("\n(");
+			name_object.append(_("already has max skills"));
+			name_object.append(")");
+		    }
+		}
 	    }
 	    break;
 

@@ -1148,7 +1148,7 @@ void ActionToWitchsHut(Heroes &hero, const u8 obj, const u16 dst_index)
     String::Replace(body, "%{skill}", skill_name);
 
     // check full
-    if(HEROESMAXSKILL == hero.CountSecondarySkill())
+    if(hero.HasMaxSecondarySkill())
     {
 	Dialog::Message(head, body + _("As you approach, she turns and focuses her one glass eye on you.\n\"You already know everything you deserve to learn!\" the witch screeches. \"NOW GET OUT OF MY HOUSE!\""), Font::BIG, Dialog::OK);
     }

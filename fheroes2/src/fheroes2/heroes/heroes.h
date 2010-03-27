@@ -145,7 +145,7 @@ public:
     void ResetMovePoints(void) { move_point = 0; };
 
     bool HasSecondarySkill(const Skill::Secondary::skill_t skill) const;
-    u8   CountSecondarySkill(void) const;
+    bool HasMaxSecondarySkill(void) const;
     u8   GetLevelSkill(const Skill::Secondary::skill_t skill) const;
     void LearnBasicSkill(const Skill::Secondary::skill_t skill);
     void LevelUpSkill(const Skill::Secondary::skill_t skill);

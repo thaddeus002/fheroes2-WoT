@@ -864,7 +864,7 @@ void AIToWitchsHut(Heroes &hero, const u8 obj, const u16 dst_index)
     const Skill::Secondary::skill_t skill = Skill::Secondary::Skill(world.GetTiles(dst_index).GetQuantity1());
 
     // check full
-    if(HEROESMAXSKILL > hero.CountSecondarySkill() && !hero.HasSecondarySkill(skill))
+    if(!hero.HasMaxSecondarySkill() && !hero.HasSecondarySkill(skill))
 	hero.LearnBasicSkill(skill);
 
     hero.SetVisited(dst_index);

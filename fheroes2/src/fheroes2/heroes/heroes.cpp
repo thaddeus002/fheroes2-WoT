@@ -1235,9 +1235,9 @@ u8 Heroes::GetSecondaryValues(const Skill::Secondary::skill_t skill) const
     return Skill::Secondary::GetValues(skill, GetLevelSkill(skill));
 }
 
-u8 Heroes::CountSecondarySkill(void) const
+bool Heroes::HasMaxSecondarySkill(void) const
 {
-    return secondary_skills.size();
+    return HEROESMAXSKILL <= secondary_skills.size();
 }
 
 u8 Heroes::GetLevelSkill(const Skill::Secondary::skill_t skill) const
