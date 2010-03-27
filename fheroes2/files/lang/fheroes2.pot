@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-03-25 18:37+0800\n"
+"POT-Creation-Date: 2010-03-27 20:18+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -53,27 +53,27 @@ msgstr ""
 msgid "army|Legion"
 msgstr ""
 
-#: ../fheroes2/army/army.cpp:477
+#: ../fheroes2/army/army.cpp:486
 msgid "All %{race} troops +1"
 msgstr ""
 
-#: ../fheroes2/army/army.cpp:488
+#: ../fheroes2/army/army.cpp:497
 msgid "Entire unit is undead, so morale does not apply."
 msgstr ""
 
-#: ../fheroes2/army/army.cpp:497
+#: ../fheroes2/army/army.cpp:506
 msgid "Troops of 3 alignments -1"
 msgstr ""
 
-#: ../fheroes2/army/army.cpp:505
+#: ../fheroes2/army/army.cpp:514
 msgid "Troops of 4 alignments -2"
 msgstr ""
 
-#: ../fheroes2/army/army.cpp:513
+#: ../fheroes2/army/army.cpp:522
 msgid "Troops of 5 alignments -3"
 msgstr ""
 
-#: ../fheroes2/army/army.cpp:527
+#: ../fheroes2/army/army.cpp:536
 msgid "Some undead in groups -1"
 msgstr ""
 
@@ -85,26 +85,26 @@ msgstr ""
 msgid "Mirror Image spell failed!"
 msgstr ""
 
-#: ../fheroes2/battle2/battle_arena.cpp:1450
+#: ../fheroes2/battle2/battle_arena.cpp:1468
 msgid ""
 "The Sphere of Negation artifact is in effect for this battle, disabling all "
 "combat spells."
 msgstr ""
 
-#: ../fheroes2/battle2/battle_arena.cpp:1459
+#: ../fheroes2/battle2/battle_arena.cpp:1477
 msgid "You have already cast a spell this round."
 msgstr ""
 
-#: ../fheroes2/battle2/battle_arena.cpp:1465
-#: ../fheroes2/battle2/battle_arena.cpp:1513
+#: ../fheroes2/battle2/battle_arena.cpp:1483
+#: ../fheroes2/battle2/battle_arena.cpp:1531
 msgid "That spell will affect no one!"
 msgstr ""
 
-#: ../fheroes2/battle2/battle_arena.cpp:1483
+#: ../fheroes2/battle2/battle_arena.cpp:1501
 msgid "You may only summon one type of elemental per combat."
 msgstr ""
 
-#: ../fheroes2/battle2/battle_arena.cpp:1489
+#: ../fheroes2/battle2/battle_arena.cpp:1507
 msgid "There is no open space adjacent to your hero to summon an Elemental to."
 msgstr ""
 
@@ -156,21 +156,21 @@ msgstr ""
 #: ../fheroes2/battle2/battle_dialogs.cpp:369
 #: ../fheroes2/castle/castle_well.cpp:253
 #: ../fheroes2/dialog/dialog_armyinfo.cpp:204
-#: ../fheroes2/dialog/dialog_quickinfo.cpp:527
-#: ../fheroes2/heroes/skill.cpp:305
+#: ../fheroes2/dialog/dialog_quickinfo.cpp:578
+#: ../fheroes2/heroes/skill.cpp:307
 msgid "Attack"
 msgstr ""
 
 #: ../fheroes2/battle2/battle_dialogs.cpp:375
 #: ../fheroes2/castle/castle_well.cpp:261
 #: ../fheroes2/dialog/dialog_armyinfo.cpp:228
-#: ../fheroes2/dialog/dialog_quickinfo.cpp:541
+#: ../fheroes2/dialog/dialog_quickinfo.cpp:592
 msgid "Defense"
 msgstr ""
 
 #: ../fheroes2/battle2/battle_dialogs.cpp:381
 #: ../fheroes2/castle/castle_town.cpp:326
-#: ../fheroes2/dialog/dialog_quickinfo.cpp:555
+#: ../fheroes2/dialog/dialog_quickinfo.cpp:606
 #: ../fheroes2/dialog/dialog_skillinfo.cpp:152
 #: ../fheroes2/heroes/heroes_dialog.cpp:137
 #: ../fheroes2/heroes/heroes_dialog.cpp:408
@@ -182,12 +182,12 @@ msgstr ""
 
 #: ../fheroes2/battle2/battle_dialogs.cpp:387
 #: ../fheroes2/castle/castle_town.cpp:337
-#: ../fheroes2/dialog/dialog_quickinfo.cpp:569
+#: ../fheroes2/dialog/dialog_quickinfo.cpp:620
 #: ../fheroes2/dialog/dialog_skillinfo.cpp:157
 #: ../fheroes2/heroes/heroes_dialog.cpp:163
 #: ../fheroes2/heroes/heroes_dialog.cpp:410
 #: ../fheroes2/heroes/heroes_dialog.cpp:445
-#: ../fheroes2/heroes/heroes_meeting.cpp:311 ../fheroes2/heroes/skill.cpp:305
+#: ../fheroes2/heroes/heroes_meeting.cpp:311 ../fheroes2/heroes/skill.cpp:307
 #: ../fheroes2/pocketpc/pocketpc_heroes.cpp:217
 msgid "Knowledge"
 msgstr ""
@@ -198,12 +198,12 @@ msgid "Morale"
 msgstr ""
 
 #: ../fheroes2/battle2/battle_dialogs.cpp:398
-#: ../fheroes2/dialog/dialog_armyinfo.cpp:341 ../fheroes2/heroes/skill.cpp:515
+#: ../fheroes2/dialog/dialog_armyinfo.cpp:341 ../fheroes2/heroes/skill.cpp:517
 msgid "Luck"
 msgstr ""
 
 #: ../fheroes2/battle2/battle_dialogs.cpp:403
-#: ../fheroes2/dialog/dialog_quickinfo.cpp:583
+#: ../fheroes2/dialog/dialog_quickinfo.cpp:634
 #: ../fheroes2/heroes/heroes_indicator.cpp:252
 msgid "Spell Points"
 msgstr ""
@@ -426,11 +426,11 @@ msgstr ""
 msgid "No spells to cast."
 msgstr ""
 
-#: ../fheroes2/battle2/battle_interface.cpp:3852
+#: ../fheroes2/battle2/battle_interface.cpp:3853
 msgid "Are you sure you want to retreat?"
 msgstr ""
 
-#: ../fheroes2/battle2/battle_interface.cpp:3869
+#: ../fheroes2/battle2/battle_interface.cpp:3870
 msgid "You don't have enough gold!"
 msgstr ""
 
@@ -450,512 +450,512 @@ msgid ""
 "the enemy's dead to return under your service as %{monster}"
 msgstr ""
 
-#: ../fheroes2/battle2/battle_stats.cpp:848
+#: ../fheroes2/battle2/battle_stats.cpp:913
 msgid ""
 "The %{artifact} artifact is in effect for this battle, disabling %{spell} "
 "spell."
 msgstr ""
 
-#: ../fheroes2/battle2/battle_stats.cpp:1376
+#: ../fheroes2/battle2/battle_stats.cpp:1440
 msgid "%{count} %{name} rise(s) from the dead!"
 msgstr ""
 
-#: ../fheroes2/castle/buildinginfo.cpp:255
+#: ../fheroes2/castle/buildinginfo.cpp:257
 msgid "The %{building} produces %{monster}."
 msgstr ""
 
-#: ../fheroes2/castle/buildinginfo.cpp:475
+#: ../fheroes2/castle/buildinginfo.cpp:477
 msgid "For this action it is necessary first to build a castle."
 msgstr ""
 
-#: ../fheroes2/castle/buildinginfo.cpp:529
+#: ../fheroes2/castle/buildinginfo.cpp:531
 msgid "Requires:"
 msgstr ""
 
-#: ../fheroes2/castle/buildinginfo.cpp:633
+#: ../fheroes2/castle/buildinginfo.cpp:635
 msgid "%{name} is already built"
 msgstr ""
 
-#: ../fheroes2/castle/buildinginfo.cpp:642
+#: ../fheroes2/castle/buildinginfo.cpp:644
 msgid "Cannot build. Already built here this turn."
 msgstr ""
 
-#: ../fheroes2/castle/buildinginfo.cpp:647
+#: ../fheroes2/castle/buildinginfo.cpp:649
 msgid "Cannot afford %{name}"
 msgstr ""
 
-#: ../fheroes2/castle/buildinginfo.cpp:653
+#: ../fheroes2/castle/buildinginfo.cpp:655
 msgid "Cannot build %{name} because castle is too far from water."
 msgstr ""
 
-#: ../fheroes2/castle/buildinginfo.cpp:659
+#: ../fheroes2/castle/buildinginfo.cpp:661
 msgid "Cannot build %{name}"
 msgstr ""
 
-#: ../fheroes2/castle/buildinginfo.cpp:664
+#: ../fheroes2/castle/buildinginfo.cpp:666
 msgid "Build %{name}"
 msgstr ""
 
-#: ../fheroes2/castle/castle.cpp:381
+#: ../fheroes2/castle/castle.cpp:387
 msgid "Thieves' Guild"
 msgstr ""
 
-#: ../fheroes2/castle/castle.cpp:381
+#: ../fheroes2/castle/castle.cpp:387
 msgid "Tavern"
 msgstr ""
 
-#: ../fheroes2/castle/castle.cpp:381
+#: ../fheroes2/castle/castle.cpp:387
 msgid "Shipyard"
 msgstr ""
 
-#: ../fheroes2/castle/castle.cpp:381
+#: ../fheroes2/castle/castle.cpp:387
 msgid "Well"
 msgstr ""
 
-#: ../fheroes2/castle/castle.cpp:381
+#: ../fheroes2/castle/castle.cpp:387
 msgid "Statue"
 msgstr ""
 
-#: ../fheroes2/castle/castle.cpp:381
+#: ../fheroes2/castle/castle.cpp:387
 msgid "Left Turret"
 msgstr ""
 
-#: ../fheroes2/castle/castle.cpp:382
+#: ../fheroes2/castle/castle.cpp:388
 msgid "Right Turret"
 msgstr ""
 
-#: ../fheroes2/castle/castle.cpp:382
+#: ../fheroes2/castle/castle.cpp:388
 #: ../fheroes2/dialog/dialog_marketplace.cpp:194
 msgid "Marketplace"
 msgstr ""
 
-#: ../fheroes2/castle/castle.cpp:382
+#: ../fheroes2/castle/castle.cpp:388
 msgid "Moat"
 msgstr ""
 
-#: ../fheroes2/castle/castle.cpp:382 ../fheroes2/maps/mp2.cpp:385
+#: ../fheroes2/castle/castle.cpp:388 ../fheroes2/maps/mp2.cpp:385
 msgid "Castle"
 msgstr ""
 
-#: ../fheroes2/castle/castle.cpp:382
+#: ../fheroes2/castle/castle.cpp:388
 msgid "Tent"
 msgstr ""
 
-#: ../fheroes2/castle/castle.cpp:382
+#: ../fheroes2/castle/castle.cpp:388
 msgid "Captain's Quarters"
 msgstr ""
 
-#: ../fheroes2/castle/castle.cpp:382
+#: ../fheroes2/castle/castle.cpp:388
 msgid "Mage Guild, Level 1"
 msgstr ""
 
-#: ../fheroes2/castle/castle.cpp:383
+#: ../fheroes2/castle/castle.cpp:389
 msgid "Mage Guild, Level 2"
 msgstr ""
 
-#: ../fheroes2/castle/castle.cpp:383
+#: ../fheroes2/castle/castle.cpp:389
 msgid "Mage Guild, Level 3"
 msgstr ""
 
-#: ../fheroes2/castle/castle.cpp:383
+#: ../fheroes2/castle/castle.cpp:389
 msgid "Mage Guild, Level 4"
 msgstr ""
 
-#: ../fheroes2/castle/castle.cpp:383
+#: ../fheroes2/castle/castle.cpp:389
 msgid "Mage Guild, Level 5"
 msgstr ""
 
-#: ../fheroes2/castle/castle.cpp:385
+#: ../fheroes2/castle/castle.cpp:391
 msgid "Farm"
 msgstr ""
 
-#: ../fheroes2/castle/castle.cpp:385
+#: ../fheroes2/castle/castle.cpp:391
 msgid "Garbage Heap"
 msgstr ""
 
-#: ../fheroes2/castle/castle.cpp:385
+#: ../fheroes2/castle/castle.cpp:391
 msgid "Crystal Garden"
 msgstr ""
 
-#: ../fheroes2/castle/castle.cpp:385
+#: ../fheroes2/castle/castle.cpp:391
 msgid "Waterfall"
 msgstr ""
 
-#: ../fheroes2/castle/castle.cpp:385
+#: ../fheroes2/castle/castle.cpp:391
 msgid "Orchard"
 msgstr ""
 
-#: ../fheroes2/castle/castle.cpp:385
+#: ../fheroes2/castle/castle.cpp:391
 msgid "Skull Pile"
 msgstr ""
 
-#: ../fheroes2/castle/castle.cpp:387
+#: ../fheroes2/castle/castle.cpp:393
 msgid "Fortifications"
 msgstr ""
 
-#: ../fheroes2/castle/castle.cpp:387
+#: ../fheroes2/castle/castle.cpp:393
 msgid "Coliseum"
 msgstr ""
 
-#: ../fheroes2/castle/castle.cpp:387
+#: ../fheroes2/castle/castle.cpp:393
 msgid "Rainbow"
 msgstr ""
 
-#: ../fheroes2/castle/castle.cpp:387
+#: ../fheroes2/castle/castle.cpp:393
 msgid "Dungeon"
 msgstr ""
 
-#: ../fheroes2/castle/castle.cpp:387
+#: ../fheroes2/castle/castle.cpp:393
 msgid "Library"
 msgstr ""
 
-#: ../fheroes2/castle/castle.cpp:387
+#: ../fheroes2/castle/castle.cpp:393
 msgid "Storm"
 msgstr ""
 
-#: ../fheroes2/castle/castle.cpp:390 ../fheroes2/maps/mp2.cpp:491
+#: ../fheroes2/castle/castle.cpp:396 ../fheroes2/maps/mp2.cpp:491
 msgid "Thatched Hut"
 msgstr ""
 
-#: ../fheroes2/castle/castle.cpp:390
+#: ../fheroes2/castle/castle.cpp:396
 msgid "Hut"
 msgstr ""
 
-#: ../fheroes2/castle/castle.cpp:390
+#: ../fheroes2/castle/castle.cpp:396
 msgid "Treehouse"
 msgstr ""
 
-#: ../fheroes2/castle/castle.cpp:390 ../fheroes2/maps/mp2.cpp:435
+#: ../fheroes2/castle/castle.cpp:396 ../fheroes2/maps/mp2.cpp:435
 msgid "Cave"
 msgstr ""
 
-#: ../fheroes2/castle/castle.cpp:390
+#: ../fheroes2/castle/castle.cpp:396
 msgid "Habitat"
 msgstr ""
 
-#: ../fheroes2/castle/castle.cpp:390 ../fheroes2/maps/mp2.cpp:425
+#: ../fheroes2/castle/castle.cpp:396 ../fheroes2/maps/mp2.cpp:425
 msgid "Excavation"
 msgstr ""
 
-#: ../fheroes2/castle/castle.cpp:391 ../fheroes2/castle/castle.cpp:392
+#: ../fheroes2/castle/castle.cpp:397 ../fheroes2/castle/castle.cpp:398
 msgid "Archery Range"
 msgstr ""
 
-#: ../fheroes2/castle/castle.cpp:391
+#: ../fheroes2/castle/castle.cpp:397
 msgid "Stick Hut"
 msgstr ""
 
-#: ../fheroes2/castle/castle.cpp:391
+#: ../fheroes2/castle/castle.cpp:397
 msgid "Cottage"
 msgstr ""
 
-#: ../fheroes2/castle/castle.cpp:391 ../fheroes2/castle/castle.cpp:398
+#: ../fheroes2/castle/castle.cpp:397 ../fheroes2/castle/castle.cpp:404
 msgid "Crypt"
 msgstr ""
 
-#: ../fheroes2/castle/castle.cpp:391 ../fheroes2/castle/castle.cpp:398
+#: ../fheroes2/castle/castle.cpp:397 ../fheroes2/castle/castle.cpp:404
 msgid "Pen"
 msgstr ""
 
-#: ../fheroes2/castle/castle.cpp:391 ../fheroes2/maps/mp2.cpp:365
+#: ../fheroes2/castle/castle.cpp:397 ../fheroes2/maps/mp2.cpp:365
 msgid "Graveyard"
 msgstr ""
 
-#: ../fheroes2/castle/castle.cpp:392
+#: ../fheroes2/castle/castle.cpp:398
 msgid "Blacksmith"
 msgstr ""
 
-#: ../fheroes2/castle/castle.cpp:392 ../fheroes2/castle/castle.cpp:399
+#: ../fheroes2/castle/castle.cpp:398 ../fheroes2/castle/castle.cpp:405
 msgid "Den"
 msgstr ""
 
-#: ../fheroes2/castle/castle.cpp:392 ../fheroes2/castle/castle.cpp:399
+#: ../fheroes2/castle/castle.cpp:398 ../fheroes2/castle/castle.cpp:405
 msgid "Nest"
 msgstr ""
 
-#: ../fheroes2/castle/castle.cpp:392
+#: ../fheroes2/castle/castle.cpp:398
 msgid "Foundry"
 msgstr ""
 
-#: ../fheroes2/castle/castle.cpp:392 ../fheroes2/castle/castle.cpp:395
-#: ../fheroes2/castle/castle.cpp:402 ../fheroes2/maps/mp2.cpp:421
+#: ../fheroes2/castle/castle.cpp:398 ../fheroes2/castle/castle.cpp:401
+#: ../fheroes2/castle/castle.cpp:408 ../fheroes2/maps/mp2.cpp:421
 #: ../fheroes2/resource/maps_text.cpp:521
 msgid "Pyramid"
 msgstr ""
 
-#: ../fheroes2/castle/castle.cpp:393
+#: ../fheroes2/castle/castle.cpp:399
 msgid "Armory"
 msgstr ""
 
-#: ../fheroes2/castle/castle.cpp:393
+#: ../fheroes2/castle/castle.cpp:399
 msgid "Adobe"
 msgstr ""
 
-#: ../fheroes2/castle/castle.cpp:393
+#: ../fheroes2/castle/castle.cpp:399
 msgid "Stonehenge"
 msgstr ""
 
-#: ../fheroes2/castle/castle.cpp:393
+#: ../fheroes2/castle/castle.cpp:399
 msgid "Maze"
 msgstr ""
 
-#: ../fheroes2/castle/castle.cpp:393 ../fheroes2/castle/castle.cpp:400
+#: ../fheroes2/castle/castle.cpp:399 ../fheroes2/castle/castle.cpp:406
 msgid "Cliff Nest"
 msgstr ""
 
-#: ../fheroes2/castle/castle.cpp:393
+#: ../fheroes2/castle/castle.cpp:399
 msgid "Mansion"
 msgstr ""
 
-#: ../fheroes2/castle/castle.cpp:394
+#: ../fheroes2/castle/castle.cpp:400
 msgid "Jousting Arena"
 msgstr ""
 
-#: ../fheroes2/castle/castle.cpp:394
+#: ../fheroes2/castle/castle.cpp:400
 msgid "Bridge"
 msgstr ""
 
-#: ../fheroes2/castle/castle.cpp:394 ../fheroes2/castle/castle.cpp:401
+#: ../fheroes2/castle/castle.cpp:400 ../fheroes2/castle/castle.cpp:407
 msgid "Fenced Meadow"
 msgstr ""
 
-#: ../fheroes2/castle/castle.cpp:394 ../fheroes2/castle/castle.cpp:401
+#: ../fheroes2/castle/castle.cpp:400 ../fheroes2/castle/castle.cpp:407
 #: ../fheroes2/editor/editor_startgame.cpp:837 ../fheroes2/maps/ground.cpp:30
 msgid "Swamp"
 msgstr ""
 
-#: ../fheroes2/castle/castle.cpp:394
+#: ../fheroes2/castle/castle.cpp:400
 msgid "Ivory Tower"
 msgstr ""
 
-#: ../fheroes2/castle/castle.cpp:394
+#: ../fheroes2/castle/castle.cpp:400
 msgid "Mausoleum"
 msgstr ""
 
-#: ../fheroes2/castle/castle.cpp:395
+#: ../fheroes2/castle/castle.cpp:401
 msgid "Cathedral"
 msgstr ""
 
-#: ../fheroes2/castle/castle.cpp:395 ../fheroes2/castle/castle.cpp:402
+#: ../fheroes2/castle/castle.cpp:401 ../fheroes2/castle/castle.cpp:408
 msgid "Red Tower"
 msgstr ""
 
-#: ../fheroes2/castle/castle.cpp:395
+#: ../fheroes2/castle/castle.cpp:401
 msgid "Green Tower"
 msgstr ""
 
-#: ../fheroes2/castle/castle.cpp:395
+#: ../fheroes2/castle/castle.cpp:401
 msgid "Cloud Castle"
 msgstr ""
 
-#: ../fheroes2/castle/castle.cpp:395 ../fheroes2/castle/castle.cpp:402
+#: ../fheroes2/castle/castle.cpp:401 ../fheroes2/castle/castle.cpp:408
 msgid "Laboratory"
 msgstr ""
 
-#: ../fheroes2/castle/castle.cpp:398 ../fheroes2/castle/castle.cpp:399
+#: ../fheroes2/castle/castle.cpp:404 ../fheroes2/castle/castle.cpp:405
 msgid "Upg. Archery Range"
 msgstr ""
 
-#: ../fheroes2/castle/castle.cpp:398
+#: ../fheroes2/castle/castle.cpp:404
 msgid "Upg. Stick Hut"
 msgstr ""
 
-#: ../fheroes2/castle/castle.cpp:398
+#: ../fheroes2/castle/castle.cpp:404
 msgid "Upg. Cottage"
 msgstr ""
 
-#: ../fheroes2/castle/castle.cpp:398
+#: ../fheroes2/castle/castle.cpp:404
 msgid "Upg. Graveyard"
 msgstr ""
 
-#: ../fheroes2/castle/castle.cpp:399
+#: ../fheroes2/castle/castle.cpp:405
 msgid "Upg. Blacksmith"
 msgstr ""
 
-#: ../fheroes2/castle/castle.cpp:399
+#: ../fheroes2/castle/castle.cpp:405
 msgid "Upg. Foundry"
 msgstr ""
 
-#: ../fheroes2/castle/castle.cpp:399
+#: ../fheroes2/castle/castle.cpp:405
 msgid "Upg. Pyramid"
 msgstr ""
 
-#: ../fheroes2/castle/castle.cpp:400
+#: ../fheroes2/castle/castle.cpp:406
 msgid "Upg. Armory"
 msgstr ""
 
-#: ../fheroes2/castle/castle.cpp:400
+#: ../fheroes2/castle/castle.cpp:406
 msgid "Upg. Adobe"
 msgstr ""
 
-#: ../fheroes2/castle/castle.cpp:400
+#: ../fheroes2/castle/castle.cpp:406
 msgid "Upg. Stonehenge"
 msgstr ""
 
-#: ../fheroes2/castle/castle.cpp:400
+#: ../fheroes2/castle/castle.cpp:406
 msgid "Upg. Maze"
 msgstr ""
 
-#: ../fheroes2/castle/castle.cpp:400
+#: ../fheroes2/castle/castle.cpp:406
 msgid "Upg. Mansion"
 msgstr ""
 
-#: ../fheroes2/castle/castle.cpp:401
+#: ../fheroes2/castle/castle.cpp:407
 msgid "Upg. Jousting Arena"
 msgstr ""
 
-#: ../fheroes2/castle/castle.cpp:401
+#: ../fheroes2/castle/castle.cpp:407
 msgid "Upg. Bridge"
 msgstr ""
 
-#: ../fheroes2/castle/castle.cpp:401
+#: ../fheroes2/castle/castle.cpp:407
 msgid "Upg. Ivory Tower"
 msgstr ""
 
-#: ../fheroes2/castle/castle.cpp:401
+#: ../fheroes2/castle/castle.cpp:407
 msgid "Upg. Mausoleum"
 msgstr ""
 
-#: ../fheroes2/castle/castle.cpp:402
+#: ../fheroes2/castle/castle.cpp:408
 msgid "Upg. Cathedral"
 msgstr ""
 
-#: ../fheroes2/castle/castle.cpp:402
+#: ../fheroes2/castle/castle.cpp:408
 msgid "Upg. Cloud Castle"
 msgstr ""
 
-#: ../fheroes2/castle/castle.cpp:403
+#: ../fheroes2/castle/castle.cpp:409
 msgid "Black Tower"
 msgstr ""
 
-#: ../fheroes2/castle/castle.cpp:405
+#: ../fheroes2/castle/castle.cpp:411
 msgid "Shrine"
 msgstr ""
 
-#: ../fheroes2/castle/castle.cpp:468
+#: ../fheroes2/castle/castle.cpp:474
 msgid ""
 "The Thieves' Guild provides information on enemy players. Thieves' Guilds "
 "can also provide scouting information on enemy towns."
 msgstr ""
 
-#: ../fheroes2/castle/castle.cpp:469
+#: ../fheroes2/castle/castle.cpp:475
 msgid "The Tavern increases morale for troops defending the castle."
 msgstr ""
 
-#: ../fheroes2/castle/castle.cpp:470
+#: ../fheroes2/castle/castle.cpp:476
 msgid "The Shipyard allows ships to be built."
 msgstr ""
 
-#: ../fheroes2/castle/castle.cpp:471
+#: ../fheroes2/castle/castle.cpp:477
 msgid ""
 "The Well increases the growth rate of all dwellings by %{count} creatures "
 "per week."
 msgstr ""
 
-#: ../fheroes2/castle/castle.cpp:472
+#: ../fheroes2/castle/castle.cpp:478
 msgid "The Statue increases your town's income by %{count} per day."
 msgstr ""
 
-#: ../fheroes2/castle/castle.cpp:473
+#: ../fheroes2/castle/castle.cpp:479
 msgid "The Left Turret provides extra firepower during castle combat."
 msgstr ""
 
-#: ../fheroes2/castle/castle.cpp:474
+#: ../fheroes2/castle/castle.cpp:480
 msgid "The Right Turret provides extra firepower during castle combat."
 msgstr ""
 
-#: ../fheroes2/castle/castle.cpp:475
+#: ../fheroes2/castle/castle.cpp:481
 msgid ""
 "The Marketplace can be used to convert one type of resource into another. "
 "The more marketplaces you control, the better the exchange rate."
 msgstr ""
 
-#: ../fheroes2/castle/castle.cpp:476
+#: ../fheroes2/castle/castle.cpp:482
 msgid ""
 "The Moat slows attacking units. Any unit entering the moat must end its turn "
 "there and becomes more vulnerable to attack."
 msgstr ""
 
-#: ../fheroes2/castle/castle.cpp:477
+#: ../fheroes2/castle/castle.cpp:483
 msgid ""
 "The Castle improves town defense and increases income to %{count} gold per "
 "day."
 msgstr ""
 
-#: ../fheroes2/castle/castle.cpp:478
+#: ../fheroes2/castle/castle.cpp:484
 msgid ""
 "The Tent provides workers to build a castle, provided the materials and the "
 "gold are available."
 msgstr ""
 
-#: ../fheroes2/castle/castle.cpp:479
+#: ../fheroes2/castle/castle.cpp:485
 msgid ""
 "The Captain's Quarters provides a captain to assist in the castle's defense "
 "when no hero is present."
 msgstr ""
 
-#: ../fheroes2/castle/castle.cpp:480
+#: ../fheroes2/castle/castle.cpp:486
 msgid ""
 "The Mage Guild allows heroes to learn spells and replenish their spell "
 "points."
 msgstr ""
 
-#: ../fheroes2/castle/castle.cpp:483
+#: ../fheroes2/castle/castle.cpp:489
 msgid "The Farm increases production of Peasants by %{count} per week."
 msgstr ""
 
-#: ../fheroes2/castle/castle.cpp:484
+#: ../fheroes2/castle/castle.cpp:490
 msgid "The Garbage Heap increases production of Goblins by %{count} per week."
 msgstr ""
 
-#: ../fheroes2/castle/castle.cpp:485
+#: ../fheroes2/castle/castle.cpp:491
 msgid ""
 "The Crystal Garden increases production of Sprites by %{count} per week."
 msgstr ""
 
-#: ../fheroes2/castle/castle.cpp:486
+#: ../fheroes2/castle/castle.cpp:492
 msgid "The Waterfall increases production of Centaurs by %{count} per week."
 msgstr ""
 
-#: ../fheroes2/castle/castle.cpp:487
+#: ../fheroes2/castle/castle.cpp:493
 msgid "The Orchard increases production of Halflings by %{count} per week."
 msgstr ""
 
-#: ../fheroes2/castle/castle.cpp:488
+#: ../fheroes2/castle/castle.cpp:494
 msgid "The Skull Pile increases production of Skeletons by %{count} per week."
 msgstr ""
 
-#: ../fheroes2/castle/castle.cpp:491
+#: ../fheroes2/castle/castle.cpp:497
 msgid ""
 "The Fortifications increase the toughness of the walls, increasing the "
 "number of turns it takes to knock them down."
 msgstr ""
 
-#: ../fheroes2/castle/castle.cpp:492
+#: ../fheroes2/castle/castle.cpp:498
 msgid ""
 "The Coliseum provides inspiring spectacles to defending troops, raising "
 "their morale by two during combat."
 msgstr ""
 
-#: ../fheroes2/castle/castle.cpp:493
+#: ../fheroes2/castle/castle.cpp:499
 msgid "The Rainbow increases the luck of the defending units by two."
 msgstr ""
 
-#: ../fheroes2/castle/castle.cpp:494
+#: ../fheroes2/castle/castle.cpp:500
 msgid "The Dungeon increases the income of the town by %{count} / day."
 msgstr ""
 
-#: ../fheroes2/castle/castle.cpp:495
+#: ../fheroes2/castle/castle.cpp:501
 msgid ""
 "The Library increases the number of spells in the Guild by one for each "
 "level of the guild."
 msgstr ""
 
-#: ../fheroes2/castle/castle.cpp:496
+#: ../fheroes2/castle/castle.cpp:502
 msgid "The Storm adds +2 to the power of spells of a defending spell caster."
 msgstr ""
 
-#: ../fheroes2/castle/castle.cpp:498
+#: ../fheroes2/castle/castle.cpp:504
 msgid ""
 "The Shrine increases the necromancy skill of all your necromancers by 10 "
 "percent."
@@ -1275,6 +1275,15 @@ msgid ""
 "Conditions"
 msgstr ""
 
+#: ../fheroes2/dialog/dialog_guardian.cpp:141
+msgid "Set Guardian"
+msgstr ""
+
+#: ../fheroes2/dialog/dialog_guardian.cpp:171
+#: ../fheroes2/dialog/dialog_guardian.cpp:223
+msgid "Your army too big!"
+msgstr ""
+
 #: ../fheroes2/dialog/dialog_levelup.cpp:48
 msgid "You may learn either %{level1} %{skill1} or %{level2} %{skill2}."
 msgstr ""
@@ -1373,33 +1382,41 @@ msgstr ""
 msgid "Unchartered Territory"
 msgstr ""
 
-#: ../fheroes2/dialog/dialog_quickinfo.cpp:113
+#: ../fheroes2/dialog/dialog_quickinfo.cpp:120
 msgid "guarded by %{count} of %{monster}"
 msgstr ""
 
-#: ../fheroes2/dialog/dialog_quickinfo.cpp:155
-#: ../fheroes2/dialog/dialog_quickinfo.cpp:207
-#: ../fheroes2/dialog/dialog_quickinfo.cpp:226
-#: ../fheroes2/dialog/dialog_quickinfo.cpp:264
-#: ../fheroes2/dialog/dialog_quickinfo.cpp:277
+#: ../fheroes2/dialog/dialog_quickinfo.cpp:162
+#: ../fheroes2/dialog/dialog_quickinfo.cpp:240
+#: ../fheroes2/dialog/dialog_quickinfo.cpp:259
+#: ../fheroes2/dialog/dialog_quickinfo.cpp:315
+#: ../fheroes2/dialog/dialog_quickinfo.cpp:328
 msgid "(already visited)"
 msgstr ""
 
-#: ../fheroes2/dialog/dialog_quickinfo.cpp:185
+#: ../fheroes2/dialog/dialog_quickinfo.cpp:218
 msgid "(available: %{count})"
 msgstr ""
 
-#: ../fheroes2/dialog/dialog_quickinfo.cpp:207
-#: ../fheroes2/dialog/dialog_quickinfo.cpp:226
-#: ../fheroes2/dialog/dialog_quickinfo.cpp:264
+#: ../fheroes2/dialog/dialog_quickinfo.cpp:240
+#: ../fheroes2/dialog/dialog_quickinfo.cpp:259
+#: ../fheroes2/dialog/dialog_quickinfo.cpp:315
 msgid "(not visited)"
 msgstr ""
 
-#: ../fheroes2/dialog/dialog_quickinfo.cpp:243
+#: ../fheroes2/dialog/dialog_quickinfo.cpp:276
 msgid "already learned"
 msgstr ""
 
-#: ../fheroes2/dialog/dialog_quickinfo.cpp:283
+#: ../fheroes2/dialog/dialog_quickinfo.cpp:297
+msgid "already know the skill"
+msgstr ""
+
+#: ../fheroes2/dialog/dialog_quickinfo.cpp:304
+msgid "already has max skills"
+msgstr ""
+
+#: ../fheroes2/dialog/dialog_quickinfo.cpp:334
 #: ../fheroes2/heroes/heroes_action.cpp:1891
 #: ../fheroes2/heroes/heroes_action.cpp:1898
 #: ../fheroes2/heroes/heroes_action.cpp:1908
@@ -1407,11 +1424,11 @@ msgstr ""
 msgid "Sea Chest"
 msgstr ""
 
-#: ../fheroes2/dialog/dialog_quickinfo.cpp:408
+#: ../fheroes2/dialog/dialog_quickinfo.cpp:459
 msgid "Defenders:"
 msgstr ""
 
-#: ../fheroes2/dialog/dialog_quickinfo.cpp:417
+#: ../fheroes2/dialog/dialog_quickinfo.cpp:468
 #: ../fheroes2/heroes/heroes_indicator.cpp:124
 #: ../fheroes2/heroes/heroes_indicator.cpp:170
 msgid "None"
@@ -1708,7 +1725,7 @@ msgid "Cancel back to the main menu."
 msgstr ""
 
 #: ../fheroes2/editor/editor_startgame.cpp:175
-#: ../fheroes2/game/game_startgame.cpp:1407
+#: ../fheroes2/game/game_startgame.cpp:1409
 msgid "Are you sure you want to quit?"
 msgstr ""
 
@@ -2012,7 +2029,7 @@ msgstr ""
 msgid "difficulty|Impossible"
 msgstr ""
 
-#: ../fheroes2/game/game.cpp:284 ../fheroes2/game/game_io.cpp:96
+#: ../fheroes2/game/game.cpp:285 ../fheroes2/game/game_io.cpp:96
 #: ../fheroes2/network/localclient.cpp:274
 msgid "Maps Loading..."
 msgstr ""
@@ -2378,83 +2395,83 @@ msgstr ""
 msgid "Rating %{rating}%"
 msgstr ""
 
-#: ../fheroes2/game/game_startgame.cpp:251
+#: ../fheroes2/game/game_startgame.cpp:252
 msgid "%{color} player's turn"
 msgstr ""
 
-#: ../fheroes2/game/game_startgame.cpp:1065
+#: ../fheroes2/game/game_startgame.cpp:1067
 msgid ""
 "%{color} player, you have lost your last town. If you do not conquer another "
 "town in next week, you will be eliminated."
 msgstr ""
 
-#: ../fheroes2/game/game_startgame.cpp:1092
+#: ../fheroes2/game/game_startgame.cpp:1094
 msgid "Try searching on clear ground."
 msgstr ""
 
-#: ../fheroes2/game/game_startgame.cpp:1106
+#: ../fheroes2/game/game_startgame.cpp:1108
 msgid "After spending many hours digging here, you have uncovered the "
 msgstr ""
 
-#: ../fheroes2/game/game_startgame.cpp:1108
+#: ../fheroes2/game/game_startgame.cpp:1110
 msgid "Congratulations!"
 msgstr ""
 
-#: ../fheroes2/game/game_startgame.cpp:1111
+#: ../fheroes2/game/game_startgame.cpp:1113
 msgid "Nothing here. Where could it be?"
 msgstr ""
 
-#: ../fheroes2/game/game_startgame.cpp:1119
+#: ../fheroes2/game/game_startgame.cpp:1121
 msgid "Digging for artifacts requires a whole day, try again tomorrow."
 msgstr ""
 
-#: ../fheroes2/game/game_startgame.cpp:1325
+#: ../fheroes2/game/game_startgame.cpp:1327
 msgid ""
 "One or more heroes may still move, are you sure you want to end your turn?"
 msgstr ""
 
-#: ../fheroes2/game/game_startgame.cpp:1357
+#: ../fheroes2/game/game_startgame.cpp:1359
 msgid "Are you sure you want to restart? (Your current game will be lost)"
 msgstr ""
 
-#: ../fheroes2/game/game_startgame.cpp:1444
+#: ../fheroes2/game/game_startgame.cpp:1446
 msgid "Game saved successfully."
 msgstr ""
 
-#: ../fheroes2/game/game_startgame.cpp:1459
+#: ../fheroes2/game/game_startgame.cpp:1461
 msgid ""
 "Are you sure you want to load a new game? (Your current game will be lost)"
 msgstr ""
 
-#: ../fheroes2/game/game_startgame.cpp:1568
+#: ../fheroes2/game/game_startgame.cpp:1570
 msgid "Astrologers proclaim month of the %{name}."
 msgstr ""
 
-#: ../fheroes2/game/game_startgame.cpp:1568
+#: ../fheroes2/game/game_startgame.cpp:1570
 msgid "Astrologers proclaim week of the %{name}."
 msgstr ""
 
-#: ../fheroes2/game/game_startgame.cpp:1572
+#: ../fheroes2/game/game_startgame.cpp:1574
 msgid " All populations are halved."
 msgstr ""
 
-#: ../fheroes2/game/game_startgame.cpp:1572
+#: ../fheroes2/game/game_startgame.cpp:1574
 msgid " All dwellings increase population."
 msgstr ""
 
-#: ../fheroes2/game/game_startgame.cpp:1603
+#: ../fheroes2/game/game_startgame.cpp:1605
 msgid ""
 "%{color} player, your heroes abandon you, and you are banished from this "
 "land."
 msgstr ""
 
-#: ../fheroes2/game/game_startgame.cpp:1612
+#: ../fheroes2/game/game_startgame.cpp:1614
 msgid ""
 "%{color} player, this is your last day to capture a town, or you will be "
 "banished from this land."
 msgstr ""
 
-#: ../fheroes2/game/game_startgame.cpp:1619
+#: ../fheroes2/game/game_startgame.cpp:1621
 msgid ""
 "%{color} player, you only have %{day} days left to capture a town, or you "
 "will be banished from this land."
@@ -2512,11 +2529,11 @@ msgstr ""
 msgid "Bring up the system options menu, alloving you to customize your game."
 msgstr ""
 
-#: ../fheroes2/gui/interface_radar.cpp:374
+#: ../fheroes2/gui/interface_radar.cpp:380
 msgid "World Map"
 msgstr ""
 
-#: ../fheroes2/gui/interface_radar.cpp:374
+#: ../fheroes2/gui/interface_radar.cpp:380
 msgid "A miniature view of the known world. Left click to move viewing area."
 msgstr ""
 
@@ -2630,29 +2647,19 @@ msgid ""
 msgstr ""
 
 #: ../fheroes2/heroes/heroes_action.cpp:934
-msgid "You've found an abandoned lean-to."
-msgstr ""
-
-#: ../fheroes2/heroes/heroes_action.cpp:934
-msgid "Poking about, you discover some resources hidden nearby."
-msgstr ""
-
-#: ../fheroes2/heroes/heroes_action.cpp:936
-msgid "The lean-to is long abandoned."
+msgid ""
+"You've found an abandoned lean-to.\n"
+"Poking about, you discover some resources hidden nearby."
 msgstr ""
 
 #: ../fheroes2/heroes/heroes_action.cpp:936
-msgid "There is nothing of value here."
+msgid "The lean-to is long abandoned. There is nothing of value here."
 msgstr ""
 
 #: ../fheroes2/heroes/heroes_action.cpp:941
 msgid ""
 "You catch a leprechaun foolishly sleeping amidst a cluster of magic "
-"mushrooms."
-msgstr ""
-
-#: ../fheroes2/heroes/heroes_action.cpp:941
-msgid ""
+"mushrooms.\n"
 "In exchange for his freedom, he guides you to a small pot filled with "
 "precious things."
 msgstr ""
@@ -2660,11 +2667,8 @@ msgstr ""
 #: ../fheroes2/heroes/heroes_action.cpp:943
 msgid ""
 "You've found a magic garden, the kind of place that leprechauns and faeries "
-"like to cavort in, but there is no one here today."
-msgstr ""
-
-#: ../fheroes2/heroes/heroes_action.cpp:943
-msgid "Perhaps you should try again next week."
+"like to cavort in, but there is no one here today.\n"
+"Perhaps you should try again next week."
 msgstr ""
 
 #: ../fheroes2/heroes/heroes_action.cpp:968
@@ -3054,7 +3058,7 @@ msgid ""
 msgstr ""
 
 #: ../fheroes2/heroes/heroes_action.cpp:1691
-#: ../fheroes2/heroes/heroes.cpp:1002
+#: ../fheroes2/heroes/heroes.cpp:1003
 msgid "You have no room to carry another artifact!"
 msgstr ""
 
@@ -3201,9 +3205,9 @@ msgid ""
 msgstr ""
 
 #: ../fheroes2/heroes/heroes_action.cpp:1988
-#: ../fheroes2/heroes/heroes_action.cpp:2245
-#: ../fheroes2/heroes/heroes_action.cpp:2329
-#: ../fheroes2/heroes/heroes_action.cpp:2495
+#: ../fheroes2/heroes/heroes_action.cpp:2241
+#: ../fheroes2/heroes/heroes_action.cpp:2325
+#: ../fheroes2/heroes/heroes_action.cpp:2491
 msgid "You are unable to recruit at this time, your ranks are full."
 msgstr ""
 
@@ -3227,148 +3231,128 @@ msgstr ""
 msgid "You beat the Ghosts and are able to restore the mine to production."
 msgstr ""
 
-#: ../fheroes2/heroes/heroes_action.cpp:2125
+#: ../fheroes2/heroes/heroes_action.cpp:2126
 msgid ""
 "You have taken control of the local Alchemist shop. It will provide you with "
 "%{count} unit of Mercury per day."
 msgstr ""
 
-#: ../fheroes2/heroes/heroes_action.cpp:2131
+#: ../fheroes2/heroes/heroes_action.cpp:2132
 msgid ""
 "You gain control of a sawmill. It will provide you with %{count} units of "
 "wood per day."
 msgstr ""
 
-#: ../fheroes2/heroes/heroes_action.cpp:2141
-msgid "Ore Mine"
-msgstr ""
-
-#: ../fheroes2/heroes/heroes_action.cpp:2142
+#: ../fheroes2/heroes/heroes_action.cpp:2143
 msgid ""
 "You gain control of an ore mine. It will provide you with %{count} units of "
 "ore per day."
 msgstr ""
 
-#: ../fheroes2/heroes/heroes_action.cpp:2146
-msgid "Sulfur Mine"
-msgstr ""
-
-#: ../fheroes2/heroes/heroes_action.cpp:2147
+#: ../fheroes2/heroes/heroes_action.cpp:2145
 msgid ""
 "You gain control of a sulfur mine. It will provide you with %{count} unit of "
 "sulfur per day."
 msgstr ""
 
-#: ../fheroes2/heroes/heroes_action.cpp:2151
-msgid "Crystal Mine"
-msgstr ""
-
-#: ../fheroes2/heroes/heroes_action.cpp:2152
+#: ../fheroes2/heroes/heroes_action.cpp:2147
 msgid ""
 "You gain control of a crystal mine. It will provide you with %{count} unit "
 "of crystal per day."
 msgstr ""
 
-#: ../fheroes2/heroes/heroes_action.cpp:2156
-msgid "Gems Mine"
-msgstr ""
-
-#: ../fheroes2/heroes/heroes_action.cpp:2157
+#: ../fheroes2/heroes/heroes_action.cpp:2149
 msgid ""
 "You gain control of a gem mine. It will provide you with %{count} unit of "
 "gems per day."
 msgstr ""
 
-#: ../fheroes2/heroes/heroes_action.cpp:2161
-msgid "Gold Mine"
-msgstr ""
-
-#: ../fheroes2/heroes/heroes_action.cpp:2162
+#: ../fheroes2/heroes/heroes_action.cpp:2151
 msgid ""
 "You gain control of a gold mine. It will provide you with %{count} gold per "
 "day."
 msgstr ""
 
-#: ../fheroes2/heroes/heroes_action.cpp:2171
+#: ../fheroes2/heroes/heroes_action.cpp:2159
 msgid ""
 "The lighthouse is now under your control, and all of your ships will now "
 "move further each turn."
 msgstr ""
 
-#: ../fheroes2/heroes/heroes_action.cpp:2238
+#: ../fheroes2/heroes/heroes_action.cpp:2234
 msgid ""
 "A group of %{monster} with a desire for greater glory wish to join you. Do "
 "you accept?"
 msgstr ""
 
-#: ../fheroes2/heroes/heroes_action.cpp:2252
+#: ../fheroes2/heroes/heroes_action.cpp:2248
 msgid "As you approach the dwelling, you notice that there is no one here."
 msgstr ""
 
-#: ../fheroes2/heroes/heroes_action.cpp:2269
+#: ../fheroes2/heroes/heroes_action.cpp:2265
 msgid ""
 "You search the ruins, but the Medusas that used to live here are gone. "
 "Perhaps there will be more next week."
 msgstr ""
 
-#: ../fheroes2/heroes/heroes_action.cpp:2270
+#: ../fheroes2/heroes/heroes_action.cpp:2266
 msgid ""
 "You've found some Medusas living in the ruins. They are willing to join your "
 "army for a price. Do you want to recruit Medusas?"
 msgstr ""
 
-#: ../fheroes2/heroes/heroes_action.cpp:2274
+#: ../fheroes2/heroes/heroes_action.cpp:2270
 msgid ""
 "You've found a Sprite Tree City. Unfortunately, none of the Sprites living "
 "there wish to join an army. Maybe next week."
 msgstr ""
 
-#: ../fheroes2/heroes/heroes_action.cpp:2275
+#: ../fheroes2/heroes/heroes_action.cpp:2271
 msgid ""
 "Some of the Sprites living in the tree city are willing to join your army "
 "for a price. Do you want to recruit Sprites?"
 msgstr ""
 
-#: ../fheroes2/heroes/heroes_action.cpp:2279
+#: ../fheroes2/heroes/heroes_action.cpp:2275
 msgid ""
 "A colorful Rogues' wagon stands empty here. Perhaps more Rogues will be here "
 "later."
 msgstr ""
 
-#: ../fheroes2/heroes/heroes_action.cpp:2280
+#: ../fheroes2/heroes/heroes_action.cpp:2276
 msgid ""
 "Distant sounds of music and laughter draw you to a colorful wagon housing "
 "Rogues. Do you wish to have any Rogues join your army?"
 msgstr ""
 
-#: ../fheroes2/heroes/heroes_action.cpp:2284
+#: ../fheroes2/heroes/heroes_action.cpp:2280
 msgid ""
 "A group of tattered tents, billowing in the sandy wind, beckons you. The "
 "tents are unoccupied. Perhaps more Nomads will be here later."
 msgstr ""
 
-#: ../fheroes2/heroes/heroes_action.cpp:2285
+#: ../fheroes2/heroes/heroes_action.cpp:2281
 msgid ""
 "A group of tattered tents, billowing in the sandy wind, beckons you. Do you "
 "wish to have any Nomads join you during your travels?"
 msgstr ""
 
-#: ../fheroes2/heroes/heroes_action.cpp:2289
+#: ../fheroes2/heroes/heroes_action.cpp:2285
 msgid "The pit of mud bubbles for a minute and then lies still."
 msgstr ""
 
-#: ../fheroes2/heroes/heroes_action.cpp:2290
+#: ../fheroes2/heroes/heroes_action.cpp:2286
 msgid ""
 "As you approach the bubbling pit of mud, creatures begin to climb out and "
 "position themselves around it. In unison they say: \"Mother Earth would like "
 "to offer you a few of her troops. Do you want to recruit Earth Elementals?\""
 msgstr ""
 
-#: ../fheroes2/heroes/heroes_action.cpp:2294
+#: ../fheroes2/heroes/heroes_action.cpp:2290
 msgid "You enter the structure of white stone pillars, and find nothing."
 msgstr ""
 
-#: ../fheroes2/heroes/heroes_action.cpp:2295
+#: ../fheroes2/heroes/heroes_action.cpp:2291
 msgid ""
 "White stone pillars support a roof that rises up to the sky. As you enter "
 "the structure, the dead air of the outside gives way to a whirling gust that "
@@ -3378,166 +3362,166 @@ msgid ""
 "air?\""
 msgstr ""
 
-#: ../fheroes2/heroes/heroes_action.cpp:2299
+#: ../fheroes2/heroes/heroes_action.cpp:2295
 msgid "No Fire Elementals approach you from the lava pool."
 msgstr ""
 
-#: ../fheroes2/heroes/heroes_action.cpp:2300
+#: ../fheroes2/heroes/heroes_action.cpp:2296
 msgid ""
 "Beneath a structure that serves to hold in heat, Fire Elementals move about "
 "in a fiery pool of molten lava. A group of them approach you and offer their "
 "services. Would you like to recruit Fire Elementals?"
 msgstr ""
 
-#: ../fheroes2/heroes/heroes_action.cpp:2304
+#: ../fheroes2/heroes/heroes_action.cpp:2300
 msgid "A face forms in the water for a moment, and then is gone."
 msgstr ""
 
-#: ../fheroes2/heroes/heroes_action.cpp:2305
+#: ../fheroes2/heroes/heroes_action.cpp:2301
 msgid ""
 "Crystalline structures cast shadows over a small reflective pool of water. "
 "You peer into the pool, and a face that is not your own peers back. It asks: "
 "\"Would you like to call upon the powers of water?\""
 msgstr ""
 
-#: ../fheroes2/heroes/heroes_action.cpp:2309
+#: ../fheroes2/heroes/heroes_action.cpp:2305
 msgid "This burial site is deathly still."
 msgstr ""
 
-#: ../fheroes2/heroes/heroes_action.cpp:2310
+#: ../fheroes2/heroes/heroes_action.cpp:2306
 msgid ""
 "Restless spirits of long dead warriors seeking their final resting place "
 "offer to join you in hopes of finding peace. Do you wish to recruit ghosts?"
 msgstr ""
 
-#: ../fheroes2/heroes/heroes_action.cpp:2365
+#: ../fheroes2/heroes/heroes_action.cpp:2361
 msgid ""
 "The City of the Dead is empty of life, and empty of unlife as well. Perhaps "
 "some undead will move in next week."
 msgstr ""
 
-#: ../fheroes2/heroes/heroes_action.cpp:2371
+#: ../fheroes2/heroes/heroes_action.cpp:2367
 msgid ""
 "Some Liches living here are willing to join your army for a price. Do you "
 "want to recruit Liches?"
 msgstr ""
 
-#: ../fheroes2/heroes/heroes_action.cpp:2380
+#: ../fheroes2/heroes/heroes_action.cpp:2376
 msgid ""
 "You've found the ruins of an ancient city, now inhabited solely by the "
 "undead. Will you search?"
 msgstr ""
 
-#: ../fheroes2/heroes/heroes_action.cpp:2389
+#: ../fheroes2/heroes/heroes_action.cpp:2385
 msgid ""
 "Some of the surviving Liches are impressed by your victory over their "
 "fellows, and offer to join you for a price. Do you want to recruit Liches?"
 msgstr ""
 
-#: ../fheroes2/heroes/heroes_action.cpp:2406
+#: ../fheroes2/heroes/heroes_action.cpp:2402
 msgid ""
 "You've found one of those bridges that Trolls are so fond of living under, "
 "but there are none here. Perhaps there will be some next week."
 msgstr ""
 
-#: ../fheroes2/heroes/heroes_action.cpp:2412
+#: ../fheroes2/heroes/heroes_action.cpp:2408
 msgid ""
 "Some Trolls living under a bridge are willing to join your army, but for a "
 "price. Do you want to recruit Trolls?"
 msgstr ""
 
-#: ../fheroes2/heroes/heroes_action.cpp:2421
+#: ../fheroes2/heroes/heroes_action.cpp:2417
 msgid "Trolls living under the bridge challenge you. Will you fight them?"
 msgstr ""
 
-#: ../fheroes2/heroes/heroes_action.cpp:2430
+#: ../fheroes2/heroes/heroes_action.cpp:2426
 msgid ""
 "A few Trolls remain, cowering under the bridge. They approach you and offer "
 "to join your forces as mercenaries. Do you want to buy any Trolls?"
 msgstr ""
 
-#: ../fheroes2/heroes/heroes_action.cpp:2447
+#: ../fheroes2/heroes/heroes_action.cpp:2443
 msgid ""
 "The Dragon city has no Dragons willing to join you this week. Perhaps a "
 "Dragon will become available next week."
 msgstr ""
 
-#: ../fheroes2/heroes/heroes_action.cpp:2453
+#: ../fheroes2/heroes/heroes_action.cpp:2449
 msgid ""
 "The Dragon city is willing to offer some Dragons for your army for a price. "
 "Do you wish to recruit Dragons?"
 msgstr ""
 
-#: ../fheroes2/heroes/heroes_action.cpp:2462
+#: ../fheroes2/heroes/heroes_action.cpp:2458
 msgid ""
 "You stand before the Dragon City, a place off-limits to mere humans. Do you "
 "wish to violate this rule and challenge the Dragons to a fight?"
 msgstr ""
 
-#: ../fheroes2/heroes/heroes_action.cpp:2471
+#: ../fheroes2/heroes/heroes_action.cpp:2467
 msgid ""
 "Having defeated the Dragon champions, the city's leaders agree to supply "
 "some Dragons to your army for a price. Do you wish to recruit Dragons?"
 msgstr ""
 
-#: ../fheroes2/heroes/heroes_action.cpp:2513
+#: ../fheroes2/heroes/heroes_action.cpp:2509
 msgid "From the observation tower, you are able to see distant lands."
 msgstr ""
 
-#: ../fheroes2/heroes/heroes_action.cpp:2525
+#: ../fheroes2/heroes/heroes_action.cpp:2521
 msgid ""
 "The spring only refills once a week, and someone's already been here this "
 "week."
 msgstr ""
 
-#: ../fheroes2/heroes/heroes_action.cpp:2531
+#: ../fheroes2/heroes/heroes_action.cpp:2527
 msgid ""
 "A drink at the spring is supposed to give you twice your normal spell "
 "points, but you are already at that level."
 msgstr ""
 
-#: ../fheroes2/heroes/heroes_action.cpp:2538
+#: ../fheroes2/heroes/heroes_action.cpp:2534
 msgid ""
 "A drink from the spring fills your blood with magic! You have twice your "
 "normal spell points in reserve."
 msgstr ""
 
-#: ../fheroes2/heroes/heroes_action.cpp:2562
+#: ../fheroes2/heroes/heroes_action.cpp:2558
 msgid ""
 "Recognizing you, the butler refuses to admit you. \"The master,\" he says, "
 "\"will not see the same student twice.\""
 msgstr ""
 
-#: ../fheroes2/heroes/heroes_action.cpp:2582
+#: ../fheroes2/heroes/heroes_action.cpp:2578
 msgid ""
 "The butler admits you to see the master of the house. He trains you in the "
 "four skills a hero should know."
 msgstr ""
 
-#: ../fheroes2/heroes/heroes_action.cpp:2592
+#: ../fheroes2/heroes/heroes_action.cpp:2588
 msgid ""
 "The butler opens the door and looks you up and down. \"You are neither "
 "famous nor diplomatic enough to be admitted to see my master,\" he sniffs. "
 "\"Come back when you think yourself worthy.\""
 msgstr ""
 
-#: ../fheroes2/heroes/heroes_action.cpp:2638
+#: ../fheroes2/heroes/heroes_action.cpp:2634
 msgid ""
 "All of the %{monsters} you have in your army have been trained by the battle "
 "masters of the fort. Your army now contains %{monsters2}."
 msgstr ""
 
-#: ../fheroes2/heroes/heroes_action.cpp:2641
+#: ../fheroes2/heroes/heroes_action.cpp:2637
 msgid ""
 "An unusual alliance of Orcs, Ogres, and Dwarves offer to train (upgrade) any "
 "such troops brought to them. Unfortunately, you have none with you."
 msgstr ""
 
-#: ../fheroes2/heroes/heroes_action.cpp:2670
+#: ../fheroes2/heroes/heroes_action.cpp:2666
 msgid "All of your %{monsters} have been upgraded into %{monsters2}."
 msgstr ""
 
-#: ../fheroes2/heroes/heroes_action.cpp:2673
+#: ../fheroes2/heroes/heroes_action.cpp:2669
 msgid ""
 "A blacksmith working at the foundry offers to convert all Pikemen and "
 "Swordsmen's weapons brought to him from iron to steel. He also says that he "
@@ -3546,24 +3530,24 @@ msgid ""
 "you."
 msgstr ""
 
-#: ../fheroes2/heroes/heroes_action.cpp:2721
+#: ../fheroes2/heroes/heroes_action.cpp:2717
 msgid ""
 "The captain sighs. \"You don't have enough money, eh?  You can't expect me "
 "to give my maps away for free!\""
 msgstr ""
 
-#: ../fheroes2/heroes/heroes_action.cpp:2726
+#: ../fheroes2/heroes/heroes_action.cpp:2722
 msgid ""
 "A retired captain living on this refurbished fishing platform offers to sell "
 "you maps of the sea he made in his younger days for 1,000 gold. Do you wish "
 "to buy the maps?"
 msgstr ""
 
-#: ../fheroes2/heroes/heroes_action.cpp:2756
+#: ../fheroes2/heroes/heroes_action.cpp:2752
 msgid "You find %{artifact}."
 msgstr ""
 
-#: ../fheroes2/heroes/heroes_action.cpp:2776
+#: ../fheroes2/heroes/heroes_action.cpp:2772
 msgid ""
 "You come upon an obelisk made from a type of stone you have never seen "
 "before. Staring at it intensely, the smooth surface suddenly changes to an "
@@ -3571,66 +3555,66 @@ msgid ""
 "copy down the piece and the inscription vanishes as abruptly as it appeared."
 msgstr ""
 
-#: ../fheroes2/heroes/heroes_action.cpp:2780
+#: ../fheroes2/heroes/heroes_action.cpp:2776
 msgid "You have already been to this obelisk."
 msgstr ""
 
-#: ../fheroes2/heroes/heroes_action.cpp:2792
+#: ../fheroes2/heroes/heroes_action.cpp:2788
 msgid ""
 "Upon your approach, the tree opens its eyes in delight. \"It is good to see "
 "you, my student. I hope my teachings have helped you.\""
 msgstr ""
 
-#: ../fheroes2/heroes/heroes_action.cpp:2808
+#: ../fheroes2/heroes/heroes_action.cpp:2804
 msgid ""
 "Upon your approach, the tree opens its eyes in delight. \"Ahh, an "
 "adventurer! Allow me to teach you a little of what I have learned over the "
 "ages.\""
 msgstr ""
 
-#: ../fheroes2/heroes/heroes_action.cpp:2816
+#: ../fheroes2/heroes/heroes_action.cpp:2812
 msgid "Upon your approach, the tree opens its eyes in delight."
 msgstr ""
 
-#: ../fheroes2/heroes/heroes_action.cpp:2818
+#: ../fheroes2/heroes/heroes_action.cpp:2814
 msgid ""
 "\"Ahh, an adventurer! I will be happy to teach you a little of what I have "
 "learned over the ages for a mere 2000 gold.\""
 msgstr ""
 
-#: ../fheroes2/heroes/heroes_action.cpp:2819
+#: ../fheroes2/heroes/heroes_action.cpp:2815
 msgid ""
 "\"Ahh, an adventurer! I will be happy to teach you a little of what I have "
 "learned over the ages for a mere 10 gems.\""
 msgstr ""
 
-#: ../fheroes2/heroes/heroes_action.cpp:2821
+#: ../fheroes2/heroes/heroes_action.cpp:2817
 msgid "(Just bury it around my roots.)"
 msgstr ""
 
-#: ../fheroes2/heroes/heroes_action.cpp:2826
+#: ../fheroes2/heroes/heroes_action.cpp:2822
 msgid "Tears brim in the eyes of the tree."
 msgstr ""
 
-#: ../fheroes2/heroes/heroes_action.cpp:2828
+#: ../fheroes2/heroes/heroes_action.cpp:2824
 msgid "\"I need 2000 gold.\""
 msgstr ""
 
-#: ../fheroes2/heroes/heroes_action.cpp:2828
+#: ../fheroes2/heroes/heroes_action.cpp:2824
 msgid "\"I need 10 gems.\""
 msgstr ""
 
-#: ../fheroes2/heroes/heroes_action.cpp:2830
+#: ../fheroes2/heroes/heroes_action.cpp:2826
 msgid "it whispers. (sniff) \"Well, come back when you can pay me.\""
 msgstr ""
 
-#: ../fheroes2/heroes/heroes_action.cpp:2856
+#: ../fheroes2/heroes/heroes_action.cpp:2852
 msgid ""
 "The entrance to the cave is dark, and a foul, sulfurous smell issues from "
 "the cave mouth. Will you enter?"
 msgstr ""
 
-#: ../fheroes2/heroes/heroes_action.cpp:2862
+#: ../fheroes2/heroes/heroes_action.cpp:2858
 msgid ""
 "You find a powerful and grotesque Demon in the cave. \"Today,\" it rasps, "
 "\"you will fight and surely die. But I will give you a choice of deaths. You "
@@ -3638,60 +3622,60 @@ msgid ""
 "servants?\""
 msgstr ""
 
-#: ../fheroes2/heroes/heroes_action.cpp:2875
+#: ../fheroes2/heroes/heroes_action.cpp:2871
 msgid ""
 "Upon defeating the daemon's servants, you find a hidden cache with 2500 gold."
 msgstr ""
 
-#: ../fheroes2/heroes/heroes_action.cpp:2892
+#: ../fheroes2/heroes/heroes_action.cpp:2888
 msgid ""
 "The Demon screams its challenge and attacks! After a short, desperate "
 "battle, you slay the monster and receive 1,000 experience points."
 msgstr ""
 
-#: ../fheroes2/heroes/heroes_action.cpp:2900
+#: ../fheroes2/heroes/heroes_action.cpp:2896
 msgid ""
 "The Demon screams its challenge and attacks! After a short, desperate "
 "battle, you slay the monster and find the %{art} in the back of the cave."
 msgstr ""
 
-#: ../fheroes2/heroes/heroes_action.cpp:2912
+#: ../fheroes2/heroes/heroes_action.cpp:2908
 msgid ""
 "The Demon screams its challenge and attacks! After a short, desperate "
 "battle, you slay the monster and receive 1,000 experience points and 2,500 "
 "gold."
 msgstr ""
 
-#: ../fheroes2/heroes/heroes_action.cpp:2922
+#: ../fheroes2/heroes/heroes_action.cpp:2918
 msgid ""
 "The Demon leaps upon you and has its claws at your throat before you can "
 "even draw your sword. \"Your life is mine,\" it says. \"I will sell it back "
 "to you for 2,500 gold.\""
 msgstr ""
 
-#: ../fheroes2/heroes/heroes_action.cpp:2930
+#: ../fheroes2/heroes/heroes_action.cpp:2926
 msgid ""
 "Seeing that you do not have 2500 gold, the demon slashes you with its claws, "
 "and the last thing you see is a red haze."
 msgstr ""
 
-#: ../fheroes2/heroes/heroes_action.cpp:2940
+#: ../fheroes2/heroes/heroes_action.cpp:2936
 msgid "Except for evidence of a terrible battle, the cave is empty."
 msgstr ""
 
-#: ../fheroes2/heroes/heroes_action.cpp:2958
+#: ../fheroes2/heroes/heroes_action.cpp:2954
 msgid ""
 "You hear a voice from high above in the tower, \"Go away! I can't help you!\""
 msgstr ""
 
-#: ../fheroes2/heroes/heroes_action.cpp:2970
+#: ../fheroes2/heroes/heroes_action.cpp:2966
 msgid ""
 "The head groom approaches you and speaks, \"You already have a fine horse, "
 "and have no inexperienced cavalry which might make use of our trained war "
 "horses.\""
 msgstr ""
 
-#: ../fheroes2/heroes/heroes_action.cpp:2973
+#: ../fheroes2/heroes/heroes_action.cpp:2969
 msgid ""
 "As you approach the stables, the head groom appears, leading a fine looking "
 "war horse. \"This steed will help speed you in your travels. Alas, his "
@@ -3700,7 +3684,7 @@ msgid ""
 "mounted soldiers, but you have none we can help.\""
 msgstr ""
 
-#: ../fheroes2/heroes/heroes_action.cpp:2976
+#: ../fheroes2/heroes/heroes_action.cpp:2972
 msgid ""
 "The head groom speaks to you, \"That is a fine looking horse you have. I am "
 "afraid we can give you no better, but the horses your cavalry are riding "
@@ -3708,7 +3692,7 @@ msgid ""
 "would aid your riders greatly. I insist you take them.\""
 msgstr ""
 
-#: ../fheroes2/heroes/heroes_action.cpp:2979
+#: ../fheroes2/heroes/heroes_action.cpp:2975
 msgid ""
 "As you approach the stables, the head groom appears, leading a fine looking "
 "war horse. \"This steed will help speed you in your travels. Alas, he will "
@@ -3716,17 +3700,17 @@ msgid ""
 "mounted soldiers, their horses look shoddy and weak.\""
 msgstr ""
 
-#: ../fheroes2/heroes/heroes_action.cpp:3006
+#: ../fheroes2/heroes/heroes_action.cpp:3002
 msgid "The Arena guards turn you away."
 msgstr ""
 
-#: ../fheroes2/heroes/heroes_action.cpp:3023
+#: ../fheroes2/heroes/heroes_action.cpp:3019
 msgid ""
 "As the sirens sing their eerie song, your small, determined army manages to "
 "overcome the urge to dive headlong into the sea."
 msgstr ""
 
-#: ../fheroes2/heroes/heroes_action.cpp:3028
+#: ../fheroes2/heroes/heroes_action.cpp:3024
 msgid ""
 "You have your crew stop up their ears with wax before the sirens' eerie song "
 "has any chance of luring them to a watery grave. An eerie wailing song "
@@ -3735,57 +3719,57 @@ msgid ""
 "for the visit, and gain %{exp} experience."
 msgstr ""
 
-#: ../fheroes2/heroes/heroes_action.cpp:3048
+#: ../fheroes2/heroes/heroes_action.cpp:3044
 msgid ""
 "In a dazzling display of daring, you break into the local jail and free the "
 "hero imprisoned there, who, in return, pledges loyalty to your cause."
 msgstr ""
 
-#: ../fheroes2/heroes/heroes_action.cpp:3065
+#: ../fheroes2/heroes/heroes_action.cpp:3061
 msgid ""
 "You already have %{count} heroes, and regretfully must leave the prisoner in "
 "this jail to languish in agony for untold days."
 msgstr ""
 
-#: ../fheroes2/heroes/heroes_action.cpp:3076
+#: ../fheroes2/heroes/heroes_action.cpp:3072
 msgid ""
 "You enter a rickety hut and talk to the magician who lives there. He tells "
 "you of places near and far which may aid you in your journeys."
 msgstr ""
 
-#: ../fheroes2/heroes/heroes_action.cpp:3089
+#: ../fheroes2/heroes/heroes_action.cpp:3085
 msgid "This eye seems to be intently studying its surroundings."
 msgstr ""
 
-#: ../fheroes2/heroes/heroes_action.cpp:3100
+#: ../fheroes2/heroes/heroes_action.cpp:3096
 msgid ""
 "\"I have a riddle for you,\" the Sphinx says. \"Answer correctly, and you "
 "shall be rewarded. Answer incorrectly, and you shall be eaten. Do you accept "
 "the challenge?\""
 msgstr ""
 
-#: ../fheroes2/heroes/heroes_action.cpp:3102
+#: ../fheroes2/heroes/heroes_action.cpp:3098
 msgid "The Sphinx asks you the following riddle: %{riddle}. Your answer?"
 msgstr ""
 
-#: ../fheroes2/heroes/heroes_action.cpp:3110
+#: ../fheroes2/heroes/heroes_action.cpp:3106
 msgid ""
 "Looking somewhat disappointed, the Sphinx sighs. You've answered my riddle "
 "so here's your reward. Now begone."
 msgstr ""
 
-#: ../fheroes2/heroes/heroes_action.cpp:3131
+#: ../fheroes2/heroes/heroes_action.cpp:3127
 msgid ""
 "\"You guessed incorrectly,\" the Sphinx says, smiling. The Sphinx swipes at "
 "you with a paw, knocking you to the ground. Another blow makes the world go "
 "black, and you know no more."
 msgstr ""
 
-#: ../fheroes2/heroes/heroes_action.cpp:3137
+#: ../fheroes2/heroes/heroes_action.cpp:3133
 msgid "You come across a giant Sphinx. The Sphinx remains strangely quiet."
 msgstr ""
 
-#: ../fheroes2/heroes/heroes_action.cpp:3150
+#: ../fheroes2/heroes/heroes_action.cpp:3146
 msgid ""
 "A magical barrier stands tall before you, blocking your way. Runes on the "
 "arch read,\n"
@@ -3793,7 +3777,7 @@ msgid ""
 "As you speak the magic word, the glowing barrier dissolves into nothingness."
 msgstr ""
 
-#: ../fheroes2/heroes/heroes_action.cpp:3160
+#: ../fheroes2/heroes/heroes_action.cpp:3156
 msgid ""
 "A magical barrier stands tall before you, blocking your way. Runes on the "
 "arch read,\n"
@@ -3801,7 +3785,7 @@ msgid ""
 "You speak, and nothing happens."
 msgstr ""
 
-#: ../fheroes2/heroes/heroes_action.cpp:3170
+#: ../fheroes2/heroes/heroes_action.cpp:3166
 msgid ""
 "You enter the tent and see an old woman gazing into a magic gem. She looks "
 "up and says,\n"
@@ -4093,37 +4077,37 @@ msgstr ""
 msgid "Jarkonas"
 msgstr ""
 
-#: ../fheroes2/heroes/heroes.cpp:1001
+#: ../fheroes2/heroes/heroes.cpp:1002
 msgid ""
 "You must purchase a spell book to use the mage guild, but you currently have "
 "no room for a spell book. Try giving one of your artifacts to another hero."
 msgstr ""
 
-#: ../fheroes2/heroes/heroes.cpp:1097
+#: ../fheroes2/heroes/heroes.cpp:1098
 msgid "To cast spells, you must first buy a spell book for %{gold} gold."
 msgstr ""
 
-#: ../fheroes2/heroes/heroes.cpp:1105
+#: ../fheroes2/heroes/heroes.cpp:1106
 msgid "Unfortunately, you seem to be a little short of cash at the moment."
 msgstr ""
 
-#: ../fheroes2/heroes/heroes.cpp:1120
+#: ../fheroes2/heroes/heroes.cpp:1121
 msgid "Do you wish to buy one?"
 msgstr ""
 
-#: ../fheroes2/heroes/heroes.cpp:1406
+#: ../fheroes2/heroes/heroes.cpp:1407
 msgid "%{name} has gained a level."
 msgstr ""
 
-#: ../fheroes2/heroes/heroes.cpp:1408
+#: ../fheroes2/heroes/heroes.cpp:1409
 msgid "%{skill} Skill +1"
 msgstr ""
 
-#: ../fheroes2/heroes/heroes.cpp:1421 ../fheroes2/heroes/heroes.cpp:1453
+#: ../fheroes2/heroes/heroes.cpp:1422 ../fheroes2/heroes/heroes.cpp:1454
 msgid "%{name} has gained a level. %{skill} Skill +1"
 msgstr ""
 
-#: ../fheroes2/heroes/heroes.cpp:1424
+#: ../fheroes2/heroes/heroes.cpp:1425
 msgid "You have learned %{level} %{skill}."
 msgstr ""
 
@@ -4310,7 +4294,7 @@ msgstr ""
 msgid "%{name1} meets %{name2}"
 msgstr ""
 
-#: ../fheroes2/heroes/heroes_spell.cpp:85 ../fheroes2/spell/spell.cpp:106
+#: ../fheroes2/heroes/heroes_spell.cpp:85 ../fheroes2/spell/spell.cpp:107
 msgid "Town Portal"
 msgstr ""
 
@@ -4365,288 +4349,288 @@ msgid ""
 "don't count) to cast this spell."
 msgstr ""
 
-#: ../fheroes2/heroes/skill.cpp:305
+#: ../fheroes2/heroes/skill.cpp:307
 msgid "Defence"
 msgstr ""
 
-#: ../fheroes2/heroes/skill.cpp:305
+#: ../fheroes2/heroes/skill.cpp:307
 msgid "Power"
 msgstr ""
 
-#: ../fheroes2/heroes/skill.cpp:335
+#: ../fheroes2/heroes/skill.cpp:337
 msgid "Basic"
 msgstr ""
 
-#: ../fheroes2/heroes/skill.cpp:335
+#: ../fheroes2/heroes/skill.cpp:337
 msgid "Advanced"
 msgstr ""
 
-#: ../fheroes2/heroes/skill.cpp:335
+#: ../fheroes2/heroes/skill.cpp:337
 msgid "Expert"
 msgstr ""
 
-#: ../fheroes2/heroes/skill.cpp:514
+#: ../fheroes2/heroes/skill.cpp:516
 msgid "Pathfinding"
 msgstr ""
 
-#: ../fheroes2/heroes/skill.cpp:514
+#: ../fheroes2/heroes/skill.cpp:516
 msgid "Archery"
 msgstr ""
 
-#: ../fheroes2/heroes/skill.cpp:514
+#: ../fheroes2/heroes/skill.cpp:516
 msgid "Logistics"
 msgstr ""
 
-#: ../fheroes2/heroes/skill.cpp:514
+#: ../fheroes2/heroes/skill.cpp:516
 msgid "Scouting"
 msgstr ""
 
-#: ../fheroes2/heroes/skill.cpp:514
+#: ../fheroes2/heroes/skill.cpp:516
 msgid "Diplomacy"
 msgstr ""
 
-#: ../fheroes2/heroes/skill.cpp:514
+#: ../fheroes2/heroes/skill.cpp:516
 msgid "Navigation"
 msgstr ""
 
-#: ../fheroes2/heroes/skill.cpp:515
+#: ../fheroes2/heroes/skill.cpp:517
 msgid "Leadership"
 msgstr ""
 
-#: ../fheroes2/heroes/skill.cpp:515
+#: ../fheroes2/heroes/skill.cpp:517
 msgid "Wisdom"
 msgstr ""
 
-#: ../fheroes2/heroes/skill.cpp:515
+#: ../fheroes2/heroes/skill.cpp:517
 msgid "Mysticism"
 msgstr ""
 
-#: ../fheroes2/heroes/skill.cpp:515
+#: ../fheroes2/heroes/skill.cpp:517
 msgid "Ballistics"
 msgstr ""
 
-#: ../fheroes2/heroes/skill.cpp:515
+#: ../fheroes2/heroes/skill.cpp:517
 msgid "Eagle Eye"
 msgstr ""
 
-#: ../fheroes2/heroes/skill.cpp:515
+#: ../fheroes2/heroes/skill.cpp:517
 msgid "Necromancy"
 msgstr ""
 
-#: ../fheroes2/heroes/skill.cpp:515
+#: ../fheroes2/heroes/skill.cpp:517
 msgid "Estates"
 msgstr ""
 
-#: ../fheroes2/heroes/skill.cpp:544
+#: ../fheroes2/heroes/skill.cpp:546
 msgid ""
 "Basic Pathfinding reduces the movement penalty for rough terrain by %{count} "
 "percent."
 msgstr ""
 
-#: ../fheroes2/heroes/skill.cpp:545
+#: ../fheroes2/heroes/skill.cpp:547
 msgid ""
 "Advanced Pathfinding reduces the movement penalty for rough terrain by %"
 "{count} percent."
 msgstr ""
 
-#: ../fheroes2/heroes/skill.cpp:546
+#: ../fheroes2/heroes/skill.cpp:548
 msgid ""
 "Expert Pathfinding eliminates the movement penalty for rough terrain by %"
 "{count} percent."
 msgstr ""
 
-#: ../fheroes2/heroes/skill.cpp:548
+#: ../fheroes2/heroes/skill.cpp:550
 msgid ""
 "Basic Archery increases the damage done by range attacking creatures by %"
 "{count} percent."
 msgstr ""
 
-#: ../fheroes2/heroes/skill.cpp:549
+#: ../fheroes2/heroes/skill.cpp:551
 msgid ""
 "Advanced Archery increases the damage done by range attacking creatures by %"
 "{count} percent."
 msgstr ""
 
-#: ../fheroes2/heroes/skill.cpp:550
+#: ../fheroes2/heroes/skill.cpp:552
 msgid ""
 "Expert Archery increases the damage done by range attacking creatures by %"
 "{count} percent."
 msgstr ""
 
-#: ../fheroes2/heroes/skill.cpp:552
+#: ../fheroes2/heroes/skill.cpp:554
 msgid ""
 "Basic Logistics increases your hero's movement points by %{count} percent."
 msgstr ""
 
-#: ../fheroes2/heroes/skill.cpp:553
+#: ../fheroes2/heroes/skill.cpp:555
 msgid ""
 "Advanced Logistics increases your hero's movement points by %{count} percent."
 msgstr ""
 
-#: ../fheroes2/heroes/skill.cpp:554
+#: ../fheroes2/heroes/skill.cpp:556
 msgid ""
 "Expert Logistics increases your hero's movement points by %{count} percent."
 msgstr ""
 
-#: ../fheroes2/heroes/skill.cpp:556
+#: ../fheroes2/heroes/skill.cpp:558
 msgid "Basic Scouting increases your hero's viewable area by %{count} square."
 msgstr ""
 
-#: ../fheroes2/heroes/skill.cpp:557
+#: ../fheroes2/heroes/skill.cpp:559
 msgid ""
 "Advanced Scouting increases your hero's viewable area by %{count} squares."
 msgstr ""
 
-#: ../fheroes2/heroes/skill.cpp:558
+#: ../fheroes2/heroes/skill.cpp:560
 msgid ""
 "Expert Scouting increases your hero's viewable area by %{count} squares."
 msgstr ""
 
-#: ../fheroes2/heroes/skill.cpp:560
+#: ../fheroes2/heroes/skill.cpp:562
 msgid ""
 "Basic Diplomacy allows you to negotiate with monsters who are weaker than "
 "your group. Approximately %{count} percent of the creatures may offer to "
 "join you."
 msgstr ""
 
-#: ../fheroes2/heroes/skill.cpp:561
+#: ../fheroes2/heroes/skill.cpp:563
 msgid ""
 "Advanced Diplomacy allows you to negotiate with monsters who are weaker than "
 "your group. Approximately %{count} percent of the creatures may offer to "
 "join you."
 msgstr ""
 
-#: ../fheroes2/heroes/skill.cpp:562
+#: ../fheroes2/heroes/skill.cpp:564
 msgid ""
 "Expert Diplomacy allows you to negotiate with monsters who are weaker than "
 "your group. %{count} percent of the creatures may offer to join you."
 msgstr ""
 
-#: ../fheroes2/heroes/skill.cpp:564
+#: ../fheroes2/heroes/skill.cpp:566
 msgid ""
 "Basic Navigation increases your hero's movement points over water by %"
 "{count} percent."
 msgstr ""
 
-#: ../fheroes2/heroes/skill.cpp:565
+#: ../fheroes2/heroes/skill.cpp:567
 msgid ""
 "Advanced Navigation increases your hero's movement points over water by %"
 "{count} percent."
 msgstr ""
 
-#: ../fheroes2/heroes/skill.cpp:566
+#: ../fheroes2/heroes/skill.cpp:568
 msgid ""
 "Expert Navigation increases your hero's movement points over water by %"
 "{count} percent."
 msgstr ""
 
-#: ../fheroes2/heroes/skill.cpp:568
+#: ../fheroes2/heroes/skill.cpp:570
 msgid "Basic Leadership increases your hero's troops' morale by %{count}."
 msgstr ""
 
-#: ../fheroes2/heroes/skill.cpp:569
+#: ../fheroes2/heroes/skill.cpp:571
 msgid "Advanced Leadership increases your hero's troops' morale by %{count}."
 msgstr ""
 
-#: ../fheroes2/heroes/skill.cpp:570
+#: ../fheroes2/heroes/skill.cpp:572
 msgid "Expert Leadership increases your hero's troops' morale by %{count}."
 msgstr ""
 
-#: ../fheroes2/heroes/skill.cpp:572
+#: ../fheroes2/heroes/skill.cpp:574
 msgid "Basic Wisdom allows your hero to learn third level spells."
 msgstr ""
 
-#: ../fheroes2/heroes/skill.cpp:573
+#: ../fheroes2/heroes/skill.cpp:575
 msgid "Advanced Wisdom allows your hero to learn fourth level spells."
 msgstr ""
 
-#: ../fheroes2/heroes/skill.cpp:574
-msgid "Expert Wisdom allows your hero to learn fifth level spells."
-msgstr ""
-
 #: ../fheroes2/heroes/skill.cpp:576
-msgid ""
-"Basic Mysticism regenerates %{count} of your hero's spell points per day."
-msgstr ""
-
-#: ../fheroes2/heroes/skill.cpp:577
-msgid ""
-"Advanced Mysticism regenerates %{count} of your hero's spell points per day."
+msgid "Expert Wisdom allows your hero to learn fifth level spells."
 msgstr ""
 
 #: ../fheroes2/heroes/skill.cpp:578
 msgid ""
-"Expert Mysticism regenerates %{count} of your hero's spell points per day."
+"Basic Mysticism regenerates %{count} of your hero's spell points per day."
+msgstr ""
+
+#: ../fheroes2/heroes/skill.cpp:579
+msgid ""
+"Advanced Mysticism regenerates %{count} of your hero's spell points per day."
 msgstr ""
 
 #: ../fheroes2/heroes/skill.cpp:580
-msgid "Basic Luck increases your hero's luck by %{count}."
-msgstr ""
-
-#: ../fheroes2/heroes/skill.cpp:581
-msgid "Advanced Luck increases your hero's luck by %{count}."
+msgid ""
+"Expert Mysticism regenerates %{count} of your hero's spell points per day."
 msgstr ""
 
 #: ../fheroes2/heroes/skill.cpp:582
-msgid "Expert Luck increases your hero's luck by %{count}."
+msgid "Basic Luck increases your hero's luck by %{count}."
+msgstr ""
+
+#: ../fheroes2/heroes/skill.cpp:583
+msgid "Advanced Luck increases your hero's luck by %{count}."
 msgstr ""
 
 #: ../fheroes2/heroes/skill.cpp:584
+msgid "Expert Luck increases your hero's luck by %{count}."
+msgstr ""
+
+#: ../fheroes2/heroes/skill.cpp:586
 msgid ""
 "Basic Ballistics gives your hero's catapult shots a greater chance to hit "
 "and do damage to castle walls."
 msgstr ""
 
-#: ../fheroes2/heroes/skill.cpp:585
+#: ../fheroes2/heroes/skill.cpp:587
 msgid ""
 "Advanced Ballistics gives your hero's catapult an extra shot, and each shot "
 "has a greater chance to hit and do damage to castle walls."
 msgstr ""
 
-#: ../fheroes2/heroes/skill.cpp:586
+#: ../fheroes2/heroes/skill.cpp:588
 msgid ""
 "Expert Ballistics gives your hero's catapult an extra shot, and each shot "
 "automatically destroys any wall, except a fortified wall in a Knight town."
 msgstr ""
 
-#: ../fheroes2/heroes/skill.cpp:588
+#: ../fheroes2/heroes/skill.cpp:590
 msgid ""
 "Basic Eagle Eye gives your hero a %{count} percent chance to learn any given "
 "1st or 2nd level enemy spell used against him in a combat."
 msgstr ""
 
-#: ../fheroes2/heroes/skill.cpp:589
+#: ../fheroes2/heroes/skill.cpp:591
 msgid ""
 "Advanced Eagle Eye gives your hero a %{count} percent chance to learn any "
 "given 3rd level spell (or below) used against him in combat."
 msgstr ""
 
-#: ../fheroes2/heroes/skill.cpp:590
+#: ../fheroes2/heroes/skill.cpp:592
 msgid ""
 "Expert Eagle Eye gives your hero a %{count} percent chance to learn any "
 "given 4th level spell (or below) used against him in combat."
 msgstr ""
 
-#: ../fheroes2/heroes/skill.cpp:592
+#: ../fheroes2/heroes/skill.cpp:594
 msgid ""
 "Basic Necromancy allows %{count} percent of the creatures killed in combat "
 "to be brought back from the dead as Skeletons."
 msgstr ""
 
-#: ../fheroes2/heroes/skill.cpp:593
+#: ../fheroes2/heroes/skill.cpp:595
 msgid ""
 "Advanced Necromancy allows %{count} percent of the creatures killed in "
 "combat to be brought back from the dead as Skeletons."
 msgstr ""
 
-#: ../fheroes2/heroes/skill.cpp:594
+#: ../fheroes2/heroes/skill.cpp:596
 msgid ""
 "Expert Necromancy allows %{count} percent of the creatures killed in combat "
 "to be brought back from the dead as Skeletons."
 msgstr ""
 
-#: ../fheroes2/heroes/skill.cpp:596 ../fheroes2/heroes/skill.cpp:597
-#: ../fheroes2/heroes/skill.cpp:598
+#: ../fheroes2/heroes/skill.cpp:598 ../fheroes2/heroes/skill.cpp:599
+#: ../fheroes2/heroes/skill.cpp:600
 msgid ""
 "Your hero produces %{count} gold pieces per turn as tax revenue from estates."
 msgstr ""
@@ -4943,13 +4927,13 @@ msgstr ""
 msgid "week|Condor"
 msgstr ""
 
-#: ../fheroes2/kingdom/world.cpp:757
+#: ../fheroes2/kingdom/world.cpp:758
 msgid ""
 "You can load the newest version of game from a site:\n"
 " http://sf.net/projects/fheroes2"
 msgstr ""
 
-#: ../fheroes2/kingdom/world.cpp:758
+#: ../fheroes2/kingdom/world.cpp:759
 msgid "This game is now in beta development version. ;)"
 msgstr ""
 
@@ -4967,6 +4951,30 @@ msgstr ""
 
 #: ../fheroes2/maps/maps.cpp:38
 msgid "maps|Extra Large"
+msgstr ""
+
+#: ../fheroes2/maps/maps.cpp:56
+msgid "Ore Mine"
+msgstr ""
+
+#: ../fheroes2/maps/maps.cpp:57
+msgid "Sulfur Mine"
+msgstr ""
+
+#: ../fheroes2/maps/maps.cpp:58
+msgid "Crystal Mine"
+msgstr ""
+
+#: ../fheroes2/maps/maps.cpp:59
+msgid "Gems Mine"
+msgstr ""
+
+#: ../fheroes2/maps/maps.cpp:60
+msgid "Gold Mine"
+msgstr ""
+
+#: ../fheroes2/maps/maps.cpp:64
+msgid "Mine"
 msgstr ""
 
 #: ../fheroes2/maps/mp2.cpp:359
@@ -5234,7 +5242,7 @@ msgid "Buoy"
 msgstr ""
 
 #: ../fheroes2/maps/mp2.cpp:484 ../fheroes2/monster/monster.cpp:115
-#: ../fheroes2/monster/monster.cpp:1080
+#: ../fheroes2/monster/monster.cpp:1082
 msgid "Skeleton"
 msgid_plural "Skeletons"
 msgstr[0] ""
@@ -5380,7 +5388,7 @@ msgstr ""
 msgid "Reefs"
 msgstr ""
 
-#: ../fheroes2/monster/monster.cpp:58 ../fheroes2/monster/monster.cpp:1028
+#: ../fheroes2/monster/monster.cpp:58 ../fheroes2/monster/monster.cpp:1030
 msgid "Peasant"
 msgid_plural "Peasants"
 msgstr[0] ""
@@ -5390,7 +5398,7 @@ msgstr[1] ""
 msgid "Peasants"
 msgstr ""
 
-#: ../fheroes2/monster/monster.cpp:59 ../fheroes2/monster/monster.cpp:1029
+#: ../fheroes2/monster/monster.cpp:59 ../fheroes2/monster/monster.cpp:1031
 msgid "Archer"
 msgid_plural "Archers"
 msgstr[0] ""
@@ -5400,7 +5408,7 @@ msgstr[1] ""
 msgid "Archers"
 msgstr ""
 
-#: ../fheroes2/monster/monster.cpp:60 ../fheroes2/monster/monster.cpp:1030
+#: ../fheroes2/monster/monster.cpp:60 ../fheroes2/monster/monster.cpp:1032
 msgid "Ranger"
 msgid_plural "Rangers"
 msgstr[0] ""
@@ -5410,7 +5418,7 @@ msgstr[1] ""
 msgid "Rangers"
 msgstr ""
 
-#: ../fheroes2/monster/monster.cpp:61 ../fheroes2/monster/monster.cpp:1031
+#: ../fheroes2/monster/monster.cpp:61 ../fheroes2/monster/monster.cpp:1033
 msgid "Pikeman"
 msgid_plural "Pikemen"
 msgstr[0] ""
@@ -5420,7 +5428,7 @@ msgstr[1] ""
 msgid "Pikemen"
 msgstr ""
 
-#: ../fheroes2/monster/monster.cpp:62 ../fheroes2/monster/monster.cpp:1032
+#: ../fheroes2/monster/monster.cpp:62 ../fheroes2/monster/monster.cpp:1034
 msgid "Veteran Pikeman"
 msgid_plural "Veteran Pikemen"
 msgstr[0] ""
@@ -5430,7 +5438,7 @@ msgstr[1] ""
 msgid "Veteran Pikemen"
 msgstr ""
 
-#: ../fheroes2/monster/monster.cpp:63 ../fheroes2/monster/monster.cpp:1033
+#: ../fheroes2/monster/monster.cpp:63 ../fheroes2/monster/monster.cpp:1035
 msgid "Swordsman"
 msgid_plural "Swordsmen"
 msgstr[0] ""
@@ -5440,7 +5448,7 @@ msgstr[1] ""
 msgid "Swordsmen"
 msgstr ""
 
-#: ../fheroes2/monster/monster.cpp:64 ../fheroes2/monster/monster.cpp:1034
+#: ../fheroes2/monster/monster.cpp:64 ../fheroes2/monster/monster.cpp:1036
 msgid "Master Swordsman"
 msgid_plural "Master Swordsmen"
 msgstr[0] ""
@@ -5450,7 +5458,7 @@ msgstr[1] ""
 msgid "Master Swordsmen"
 msgstr ""
 
-#: ../fheroes2/monster/monster.cpp:65 ../fheroes2/monster/monster.cpp:1035
+#: ../fheroes2/monster/monster.cpp:65 ../fheroes2/monster/monster.cpp:1037
 msgid "Cavalry"
 msgid_plural "Cavalries"
 msgstr[0] ""
@@ -5460,7 +5468,7 @@ msgstr[1] ""
 msgid "Cavalries"
 msgstr ""
 
-#: ../fheroes2/monster/monster.cpp:66 ../fheroes2/monster/monster.cpp:1036
+#: ../fheroes2/monster/monster.cpp:66 ../fheroes2/monster/monster.cpp:1038
 msgid "Champion"
 msgid_plural "Champions"
 msgstr[0] ""
@@ -5470,7 +5478,7 @@ msgstr[1] ""
 msgid "Champions"
 msgstr ""
 
-#: ../fheroes2/monster/monster.cpp:67 ../fheroes2/monster/monster.cpp:1037
+#: ../fheroes2/monster/monster.cpp:67 ../fheroes2/monster/monster.cpp:1039
 msgid "Paladin"
 msgid_plural "Paladins"
 msgstr[0] ""
@@ -5480,7 +5488,7 @@ msgstr[1] ""
 msgid "Paladins"
 msgstr ""
 
-#: ../fheroes2/monster/monster.cpp:68 ../fheroes2/monster/monster.cpp:1038
+#: ../fheroes2/monster/monster.cpp:68 ../fheroes2/monster/monster.cpp:1040
 msgid "Crusader"
 msgid_plural "Crusaders"
 msgstr[0] ""
@@ -5490,7 +5498,7 @@ msgstr[1] ""
 msgid "Crusaders"
 msgstr ""
 
-#: ../fheroes2/monster/monster.cpp:71 ../fheroes2/monster/monster.cpp:1040
+#: ../fheroes2/monster/monster.cpp:71 ../fheroes2/monster/monster.cpp:1042
 msgid "Goblin"
 msgid_plural "Goblins"
 msgstr[0] ""
@@ -5500,7 +5508,7 @@ msgstr[1] ""
 msgid "Goblins"
 msgstr ""
 
-#: ../fheroes2/monster/monster.cpp:72 ../fheroes2/monster/monster.cpp:1041
+#: ../fheroes2/monster/monster.cpp:72 ../fheroes2/monster/monster.cpp:1043
 msgid "Orc"
 msgid_plural "Orcs"
 msgstr[0] ""
@@ -5510,7 +5518,7 @@ msgstr[1] ""
 msgid "Orcs"
 msgstr ""
 
-#: ../fheroes2/monster/monster.cpp:73 ../fheroes2/monster/monster.cpp:1042
+#: ../fheroes2/monster/monster.cpp:73 ../fheroes2/monster/monster.cpp:1044
 msgid "Orc Chief"
 msgid_plural "Orc Chiefs"
 msgstr[0] ""
@@ -5520,7 +5528,7 @@ msgstr[1] ""
 msgid "Orc Chiefs"
 msgstr ""
 
-#: ../fheroes2/monster/monster.cpp:74 ../fheroes2/monster/monster.cpp:1043
+#: ../fheroes2/monster/monster.cpp:74 ../fheroes2/monster/monster.cpp:1045
 msgid "Wolf"
 msgid_plural "Wolves"
 msgstr[0] ""
@@ -5530,7 +5538,7 @@ msgstr[1] ""
 msgid "Wolves"
 msgstr ""
 
-#: ../fheroes2/monster/monster.cpp:75 ../fheroes2/monster/monster.cpp:1044
+#: ../fheroes2/monster/monster.cpp:75 ../fheroes2/monster/monster.cpp:1046
 msgid "Ogre"
 msgid_plural "Ogres"
 msgstr[0] ""
@@ -5540,7 +5548,7 @@ msgstr[1] ""
 msgid "Ogres"
 msgstr ""
 
-#: ../fheroes2/monster/monster.cpp:76 ../fheroes2/monster/monster.cpp:1045
+#: ../fheroes2/monster/monster.cpp:76 ../fheroes2/monster/monster.cpp:1047
 msgid "Ogre Lord"
 msgid_plural "Ogre Lords"
 msgstr[0] ""
@@ -5550,7 +5558,7 @@ msgstr[1] ""
 msgid "Ogre Lords"
 msgstr ""
 
-#: ../fheroes2/monster/monster.cpp:77 ../fheroes2/monster/monster.cpp:1046
+#: ../fheroes2/monster/monster.cpp:77 ../fheroes2/monster/monster.cpp:1048
 msgid "Troll"
 msgid_plural "Trolls"
 msgstr[0] ""
@@ -5560,7 +5568,7 @@ msgstr[1] ""
 msgid "Trolls"
 msgstr ""
 
-#: ../fheroes2/monster/monster.cpp:78 ../fheroes2/monster/monster.cpp:1047
+#: ../fheroes2/monster/monster.cpp:78 ../fheroes2/monster/monster.cpp:1049
 msgid "War Troll"
 msgid_plural "War Trolls"
 msgstr[0] ""
@@ -5570,7 +5578,7 @@ msgstr[1] ""
 msgid "War Trolls"
 msgstr ""
 
-#: ../fheroes2/monster/monster.cpp:79 ../fheroes2/monster/monster.cpp:1048
+#: ../fheroes2/monster/monster.cpp:79 ../fheroes2/monster/monster.cpp:1050
 msgid "Cyclops"
 msgid_plural "Cyclopes"
 msgstr[0] ""
@@ -5580,7 +5588,7 @@ msgstr[1] ""
 msgid "Cyclopes"
 msgstr ""
 
-#: ../fheroes2/monster/monster.cpp:82 ../fheroes2/monster/monster.cpp:1050
+#: ../fheroes2/monster/monster.cpp:82 ../fheroes2/monster/monster.cpp:1052
 msgid "Sprite"
 msgid_plural "Sprites"
 msgstr[0] ""
@@ -5590,7 +5598,7 @@ msgstr[1] ""
 msgid "Sprites"
 msgstr ""
 
-#: ../fheroes2/monster/monster.cpp:83 ../fheroes2/monster/monster.cpp:1051
+#: ../fheroes2/monster/monster.cpp:83 ../fheroes2/monster/monster.cpp:1053
 msgid "Dwarf"
 msgid_plural "Dwarves"
 msgstr[0] ""
@@ -5600,7 +5608,7 @@ msgstr[1] ""
 msgid "Dwarves"
 msgstr ""
 
-#: ../fheroes2/monster/monster.cpp:84 ../fheroes2/monster/monster.cpp:1052
+#: ../fheroes2/monster/monster.cpp:84 ../fheroes2/monster/monster.cpp:1054
 msgid "Battle Dwarf"
 msgid_plural "Battle Dwarves"
 msgstr[0] ""
@@ -5610,7 +5618,7 @@ msgstr[1] ""
 msgid "Battle Dwarves"
 msgstr ""
 
-#: ../fheroes2/monster/monster.cpp:85 ../fheroes2/monster/monster.cpp:1053
+#: ../fheroes2/monster/monster.cpp:85 ../fheroes2/monster/monster.cpp:1055
 msgid "Elf"
 msgid_plural "Elves"
 msgstr[0] ""
@@ -5620,7 +5628,7 @@ msgstr[1] ""
 msgid "Elves"
 msgstr ""
 
-#: ../fheroes2/monster/monster.cpp:86 ../fheroes2/monster/monster.cpp:1054
+#: ../fheroes2/monster/monster.cpp:86 ../fheroes2/monster/monster.cpp:1056
 msgid "Grand Elf"
 msgid_plural "Grand Elves"
 msgstr[0] ""
@@ -5630,7 +5638,7 @@ msgstr[1] ""
 msgid "Grand Elves"
 msgstr ""
 
-#: ../fheroes2/monster/monster.cpp:87 ../fheroes2/monster/monster.cpp:1055
+#: ../fheroes2/monster/monster.cpp:87 ../fheroes2/monster/monster.cpp:1057
 msgid "Druid"
 msgid_plural "Druids"
 msgstr[0] ""
@@ -5640,7 +5648,7 @@ msgstr[1] ""
 msgid "Druids"
 msgstr ""
 
-#: ../fheroes2/monster/monster.cpp:88 ../fheroes2/monster/monster.cpp:1056
+#: ../fheroes2/monster/monster.cpp:88 ../fheroes2/monster/monster.cpp:1058
 msgid "Greater Druid"
 msgid_plural "Greater Druids"
 msgstr[0] ""
@@ -5650,7 +5658,7 @@ msgstr[1] ""
 msgid "Greater Druids"
 msgstr ""
 
-#: ../fheroes2/monster/monster.cpp:89 ../fheroes2/monster/monster.cpp:1057
+#: ../fheroes2/monster/monster.cpp:89 ../fheroes2/monster/monster.cpp:1059
 msgid "Unicorn"
 msgid_plural "Unicorns"
 msgstr[0] ""
@@ -5660,13 +5668,13 @@ msgstr[1] ""
 msgid "Unicorns"
 msgstr ""
 
-#: ../fheroes2/monster/monster.cpp:90 ../fheroes2/monster/monster.cpp:1058
+#: ../fheroes2/monster/monster.cpp:90 ../fheroes2/monster/monster.cpp:1060
 msgid "Phoenix"
 msgid_plural "Phoenix"
 msgstr[0] ""
 msgstr[1] ""
 
-#: ../fheroes2/monster/monster.cpp:93 ../fheroes2/monster/monster.cpp:1060
+#: ../fheroes2/monster/monster.cpp:93 ../fheroes2/monster/monster.cpp:1062
 msgid "Centaur"
 msgid_plural "Centaurs"
 msgstr[0] ""
@@ -5676,7 +5684,7 @@ msgstr[1] ""
 msgid "Centaurs"
 msgstr ""
 
-#: ../fheroes2/monster/monster.cpp:94 ../fheroes2/monster/monster.cpp:1061
+#: ../fheroes2/monster/monster.cpp:94 ../fheroes2/monster/monster.cpp:1063
 msgid "Gargoyle"
 msgid_plural "Gargoyles"
 msgstr[0] ""
@@ -5686,7 +5694,7 @@ msgstr[1] ""
 msgid "Gargoyles"
 msgstr ""
 
-#: ../fheroes2/monster/monster.cpp:95 ../fheroes2/monster/monster.cpp:1062
+#: ../fheroes2/monster/monster.cpp:95 ../fheroes2/monster/monster.cpp:1064
 msgid "Griffin"
 msgid_plural "Griffins"
 msgstr[0] ""
@@ -5696,7 +5704,7 @@ msgstr[1] ""
 msgid "Griffins"
 msgstr ""
 
-#: ../fheroes2/monster/monster.cpp:96 ../fheroes2/monster/monster.cpp:1063
+#: ../fheroes2/monster/monster.cpp:96 ../fheroes2/monster/monster.cpp:1065
 msgid "Minotaur"
 msgid_plural "Minotaurs"
 msgstr[0] ""
@@ -5706,7 +5714,7 @@ msgstr[1] ""
 msgid "Minotaurs"
 msgstr ""
 
-#: ../fheroes2/monster/monster.cpp:97 ../fheroes2/monster/monster.cpp:1064
+#: ../fheroes2/monster/monster.cpp:97 ../fheroes2/monster/monster.cpp:1066
 msgid "Minotaur King"
 msgid_plural "Minotaur Kings"
 msgstr[0] ""
@@ -5716,7 +5724,7 @@ msgstr[1] ""
 msgid "Minotaur Kings"
 msgstr ""
 
-#: ../fheroes2/monster/monster.cpp:98 ../fheroes2/monster/monster.cpp:1065
+#: ../fheroes2/monster/monster.cpp:98 ../fheroes2/monster/monster.cpp:1067
 msgid "Hydra"
 msgid_plural "Hydras"
 msgstr[0] ""
@@ -5726,7 +5734,7 @@ msgstr[1] ""
 msgid "Hydras"
 msgstr ""
 
-#: ../fheroes2/monster/monster.cpp:99 ../fheroes2/monster/monster.cpp:1066
+#: ../fheroes2/monster/monster.cpp:99 ../fheroes2/monster/monster.cpp:1068
 msgid "Green Dragon"
 msgid_plural "Green Dragons"
 msgstr[0] ""
@@ -5736,7 +5744,7 @@ msgstr[1] ""
 msgid "Green Dragons"
 msgstr ""
 
-#: ../fheroes2/monster/monster.cpp:100 ../fheroes2/monster/monster.cpp:1067
+#: ../fheroes2/monster/monster.cpp:100 ../fheroes2/monster/monster.cpp:1069
 msgid "Red Dragon"
 msgid_plural "Red Dragons"
 msgstr[0] ""
@@ -5746,7 +5754,7 @@ msgstr[1] ""
 msgid "Red Dragons"
 msgstr ""
 
-#: ../fheroes2/monster/monster.cpp:101 ../fheroes2/monster/monster.cpp:1068
+#: ../fheroes2/monster/monster.cpp:101 ../fheroes2/monster/monster.cpp:1070
 msgid "Black Dragon"
 msgid_plural "Black Dragons"
 msgstr[0] ""
@@ -5756,7 +5764,7 @@ msgstr[1] ""
 msgid "Black Dragons"
 msgstr ""
 
-#: ../fheroes2/monster/monster.cpp:104 ../fheroes2/monster/monster.cpp:1070
+#: ../fheroes2/monster/monster.cpp:104 ../fheroes2/monster/monster.cpp:1072
 msgid "Halfling"
 msgid_plural "Halflings"
 msgstr[0] ""
@@ -5766,7 +5774,7 @@ msgstr[1] ""
 msgid "Halflings"
 msgstr ""
 
-#: ../fheroes2/monster/monster.cpp:105 ../fheroes2/monster/monster.cpp:1071
+#: ../fheroes2/monster/monster.cpp:105 ../fheroes2/monster/monster.cpp:1073
 msgid "Boar"
 msgid_plural "Boars"
 msgstr[0] ""
@@ -5776,7 +5784,7 @@ msgstr[1] ""
 msgid "Boars"
 msgstr ""
 
-#: ../fheroes2/monster/monster.cpp:106 ../fheroes2/monster/monster.cpp:1072
+#: ../fheroes2/monster/monster.cpp:106 ../fheroes2/monster/monster.cpp:1074
 msgid "Iron Golem"
 msgid_plural "Iron Golems"
 msgstr[0] ""
@@ -5786,7 +5794,7 @@ msgstr[1] ""
 msgid "Iron Golems"
 msgstr ""
 
-#: ../fheroes2/monster/monster.cpp:107 ../fheroes2/monster/monster.cpp:1073
+#: ../fheroes2/monster/monster.cpp:107 ../fheroes2/monster/monster.cpp:1075
 msgid "Steel Golem"
 msgid_plural "Steel Golems"
 msgstr[0] ""
@@ -5796,7 +5804,7 @@ msgstr[1] ""
 msgid "Steel Golems"
 msgstr ""
 
-#: ../fheroes2/monster/monster.cpp:108 ../fheroes2/monster/monster.cpp:1074
+#: ../fheroes2/monster/monster.cpp:108 ../fheroes2/monster/monster.cpp:1076
 msgid "Roc"
 msgid_plural "Rocs"
 msgstr[0] ""
@@ -5806,7 +5814,7 @@ msgstr[1] ""
 msgid "Rocs"
 msgstr ""
 
-#: ../fheroes2/monster/monster.cpp:109 ../fheroes2/monster/monster.cpp:1075
+#: ../fheroes2/monster/monster.cpp:109 ../fheroes2/monster/monster.cpp:1077
 msgid "Mage"
 msgid_plural "Magi"
 msgstr[0] ""
@@ -5816,7 +5824,7 @@ msgstr[1] ""
 msgid "Magi"
 msgstr ""
 
-#: ../fheroes2/monster/monster.cpp:110 ../fheroes2/monster/monster.cpp:1076
+#: ../fheroes2/monster/monster.cpp:110 ../fheroes2/monster/monster.cpp:1078
 msgid "Archmage"
 msgid_plural "Archmagi"
 msgstr[0] ""
@@ -5826,7 +5834,7 @@ msgstr[1] ""
 msgid "Archmagi"
 msgstr ""
 
-#: ../fheroes2/monster/monster.cpp:111 ../fheroes2/monster/monster.cpp:1077
+#: ../fheroes2/monster/monster.cpp:111 ../fheroes2/monster/monster.cpp:1079
 msgid "Giant"
 msgid_plural "Giants"
 msgstr[0] ""
@@ -5836,7 +5844,7 @@ msgstr[1] ""
 msgid "Giants"
 msgstr ""
 
-#: ../fheroes2/monster/monster.cpp:112 ../fheroes2/monster/monster.cpp:1078
+#: ../fheroes2/monster/monster.cpp:112 ../fheroes2/monster/monster.cpp:1080
 msgid "Titan"
 msgid_plural "Titans"
 msgstr[0] ""
@@ -5850,7 +5858,7 @@ msgstr ""
 msgid "Skeletons"
 msgstr ""
 
-#: ../fheroes2/monster/monster.cpp:116 ../fheroes2/monster/monster.cpp:1081
+#: ../fheroes2/monster/monster.cpp:116 ../fheroes2/monster/monster.cpp:1083
 msgid "Zombie"
 msgid_plural "Zombies"
 msgstr[0] ""
@@ -5860,7 +5868,7 @@ msgstr[1] ""
 msgid "Zombies"
 msgstr ""
 
-#: ../fheroes2/monster/monster.cpp:117 ../fheroes2/monster/monster.cpp:1082
+#: ../fheroes2/monster/monster.cpp:117 ../fheroes2/monster/monster.cpp:1084
 msgid "Mutant Zombie"
 msgid_plural "Mutant Zombies"
 msgstr[0] ""
@@ -5870,7 +5878,7 @@ msgstr[1] ""
 msgid "Mutant Zombies"
 msgstr ""
 
-#: ../fheroes2/monster/monster.cpp:118 ../fheroes2/monster/monster.cpp:1083
+#: ../fheroes2/monster/monster.cpp:118 ../fheroes2/monster/monster.cpp:1085
 msgid "Mummy"
 msgid_plural "Mummies"
 msgstr[0] ""
@@ -5880,7 +5888,7 @@ msgstr[1] ""
 msgid "Mummies"
 msgstr ""
 
-#: ../fheroes2/monster/monster.cpp:119 ../fheroes2/monster/monster.cpp:1084
+#: ../fheroes2/monster/monster.cpp:119 ../fheroes2/monster/monster.cpp:1086
 msgid "Royal Mummy"
 msgid_plural "Royal Mummies"
 msgstr[0] ""
@@ -5890,7 +5898,7 @@ msgstr[1] ""
 msgid "Royal Mummies"
 msgstr ""
 
-#: ../fheroes2/monster/monster.cpp:120 ../fheroes2/monster/monster.cpp:1085
+#: ../fheroes2/monster/monster.cpp:120 ../fheroes2/monster/monster.cpp:1087
 msgid "Vampire"
 msgid_plural "Vampires"
 msgstr[0] ""
@@ -5900,7 +5908,7 @@ msgstr[1] ""
 msgid "Vampires"
 msgstr ""
 
-#: ../fheroes2/monster/monster.cpp:121 ../fheroes2/monster/monster.cpp:1086
+#: ../fheroes2/monster/monster.cpp:121 ../fheroes2/monster/monster.cpp:1088
 msgid "Vampire Lord"
 msgid_plural "Vampire Lords"
 msgstr[0] ""
@@ -5910,7 +5918,7 @@ msgstr[1] ""
 msgid "Vampire Lords"
 msgstr ""
 
-#: ../fheroes2/monster/monster.cpp:122 ../fheroes2/monster/monster.cpp:1087
+#: ../fheroes2/monster/monster.cpp:122 ../fheroes2/monster/monster.cpp:1089
 msgid "Lich"
 msgid_plural "Liches"
 msgstr[0] ""
@@ -5920,7 +5928,7 @@ msgstr[1] ""
 msgid "Liches"
 msgstr ""
 
-#: ../fheroes2/monster/monster.cpp:123 ../fheroes2/monster/monster.cpp:1088
+#: ../fheroes2/monster/monster.cpp:123 ../fheroes2/monster/monster.cpp:1090
 msgid "Power Lich"
 msgid_plural "Power Liches"
 msgstr[0] ""
@@ -5930,7 +5938,7 @@ msgstr[1] ""
 msgid "Power Liches"
 msgstr ""
 
-#: ../fheroes2/monster/monster.cpp:124 ../fheroes2/monster/monster.cpp:1089
+#: ../fheroes2/monster/monster.cpp:124 ../fheroes2/monster/monster.cpp:1091
 msgid "Bone Dragon"
 msgid_plural "Bone Dragons"
 msgstr[0] ""
@@ -5940,7 +5948,7 @@ msgstr[1] ""
 msgid "Bone Dragons"
 msgstr ""
 
-#: ../fheroes2/monster/monster.cpp:127 ../fheroes2/monster/monster.cpp:1091
+#: ../fheroes2/monster/monster.cpp:127 ../fheroes2/monster/monster.cpp:1093
 msgid "Rogue"
 msgid_plural "Rogues"
 msgstr[0] ""
@@ -5950,7 +5958,7 @@ msgstr[1] ""
 msgid "Rogues"
 msgstr ""
 
-#: ../fheroes2/monster/monster.cpp:128 ../fheroes2/monster/monster.cpp:1092
+#: ../fheroes2/monster/monster.cpp:128 ../fheroes2/monster/monster.cpp:1094
 msgid "Nomad"
 msgid_plural "Nomads"
 msgstr[0] ""
@@ -5960,7 +5968,7 @@ msgstr[1] ""
 msgid "Nomads"
 msgstr ""
 
-#: ../fheroes2/monster/monster.cpp:129 ../fheroes2/monster/monster.cpp:1093
+#: ../fheroes2/monster/monster.cpp:129 ../fheroes2/monster/monster.cpp:1095
 msgid "Ghost"
 msgid_plural "Ghosts"
 msgstr[0] ""
@@ -5970,7 +5978,7 @@ msgstr[1] ""
 msgid "Ghosts"
 msgstr ""
 
-#: ../fheroes2/monster/monster.cpp:130 ../fheroes2/monster/monster.cpp:1094
+#: ../fheroes2/monster/monster.cpp:130 ../fheroes2/monster/monster.cpp:1096
 msgid "Genie"
 msgid_plural "Genies"
 msgstr[0] ""
@@ -5980,7 +5988,7 @@ msgstr[1] ""
 msgid "Genies"
 msgstr ""
 
-#: ../fheroes2/monster/monster.cpp:131 ../fheroes2/monster/monster.cpp:1095
+#: ../fheroes2/monster/monster.cpp:131 ../fheroes2/monster/monster.cpp:1097
 msgid "Medusa"
 msgid_plural "Medusas"
 msgstr[0] ""
@@ -5990,7 +5998,7 @@ msgstr[1] ""
 msgid "Medusas"
 msgstr ""
 
-#: ../fheroes2/monster/monster.cpp:132 ../fheroes2/monster/monster.cpp:1096
+#: ../fheroes2/monster/monster.cpp:132 ../fheroes2/monster/monster.cpp:1098
 msgid "Earth Elemental"
 msgid_plural "Earth Elementals"
 msgstr[0] ""
@@ -6000,7 +6008,7 @@ msgstr[1] ""
 msgid "Earth Elementals"
 msgstr ""
 
-#: ../fheroes2/monster/monster.cpp:133 ../fheroes2/monster/monster.cpp:1097
+#: ../fheroes2/monster/monster.cpp:133 ../fheroes2/monster/monster.cpp:1099
 msgid "Air Elemental"
 msgid_plural "Air Elementals"
 msgstr[0] ""
@@ -6010,7 +6018,7 @@ msgstr[1] ""
 msgid "Air Elementals"
 msgstr ""
 
-#: ../fheroes2/monster/monster.cpp:134 ../fheroes2/monster/monster.cpp:1098
+#: ../fheroes2/monster/monster.cpp:134 ../fheroes2/monster/monster.cpp:1100
 msgid "Fire Elemental"
 msgid_plural "Fire Elementals"
 msgstr[0] ""
@@ -6020,7 +6028,7 @@ msgstr[1] ""
 msgid "Fire Elementals"
 msgstr ""
 
-#: ../fheroes2/monster/monster.cpp:135 ../fheroes2/monster/monster.cpp:1099
+#: ../fheroes2/monster/monster.cpp:135 ../fheroes2/monster/monster.cpp:1101
 msgid "Water Elemental"
 msgid_plural "Water Elementals"
 msgstr[0] ""
@@ -11295,39 +11303,39 @@ msgid ""
 "cast the spell."
 msgstr ""
 
-#: ../fheroes2/spell/spell.cpp:48
+#: ../fheroes2/spell/spell.cpp:49
 msgid "Fireball"
 msgstr ""
 
-#: ../fheroes2/spell/spell.cpp:48
+#: ../fheroes2/spell/spell.cpp:49
 msgid ""
 "Causes a giant fireball to strike the selected area, damaging all nearby "
 "creatures."
 msgstr ""
 
-#: ../fheroes2/spell/spell.cpp:49
+#: ../fheroes2/spell/spell.cpp:50
 msgid "Fireblast"
 msgstr ""
 
-#: ../fheroes2/spell/spell.cpp:49
+#: ../fheroes2/spell/spell.cpp:50
 msgid ""
 "An improved version of fireball, fireblast affects two hexes around the "
 "center point of the spell, rather than one."
 msgstr ""
 
-#: ../fheroes2/spell/spell.cpp:50
+#: ../fheroes2/spell/spell.cpp:51
 msgid "Lightning Bolt"
 msgstr ""
 
-#: ../fheroes2/spell/spell.cpp:50
+#: ../fheroes2/spell/spell.cpp:51
 msgid "Causes a bolt of electrical energy to strike the selected creature."
 msgstr ""
 
-#: ../fheroes2/spell/spell.cpp:51
+#: ../fheroes2/spell/spell.cpp:52
 msgid "Chain Lightning"
 msgstr ""
 
-#: ../fheroes2/spell/spell.cpp:51
+#: ../fheroes2/spell/spell.cpp:52
 msgid ""
 "Causes a bolt of electrical energy to strike a selected creature, then "
 "strike the nearest creature with half damage, then strike the NEXT nearest "
@@ -11335,523 +11343,523 @@ msgid ""
 "harmful.  Warning:  This spell can hit your own creatures!"
 msgstr ""
 
-#: ../fheroes2/spell/spell.cpp:52
+#: ../fheroes2/spell/spell.cpp:53
 msgid "Teleport"
 msgstr ""
 
-#: ../fheroes2/spell/spell.cpp:52
+#: ../fheroes2/spell/spell.cpp:53
 msgid ""
 "Teleports the creature you select to any open position on the battlefield."
 msgstr ""
 
-#: ../fheroes2/spell/spell.cpp:53
+#: ../fheroes2/spell/spell.cpp:54
 msgid "Cure"
 msgstr ""
 
-#: ../fheroes2/spell/spell.cpp:53
+#: ../fheroes2/spell/spell.cpp:54
 msgid ""
 "Removes all negative spells cast upon one of your units, and restores up to %"
 "{count} HP per level of spell power."
 msgstr ""
 
-#: ../fheroes2/spell/spell.cpp:54
+#: ../fheroes2/spell/spell.cpp:55
 msgid "Mass Cure"
 msgstr ""
 
-#: ../fheroes2/spell/spell.cpp:54
+#: ../fheroes2/spell/spell.cpp:55
 msgid ""
 "Removes all negative spells cast upon your forces, and restores up to %"
 "{count} HP per level of spell power, per creature."
 msgstr ""
 
-#: ../fheroes2/spell/spell.cpp:55
+#: ../fheroes2/spell/spell.cpp:56
 msgid "Resurrect"
 msgstr ""
 
-#: ../fheroes2/spell/spell.cpp:55
+#: ../fheroes2/spell/spell.cpp:56
 msgid "Resurrects creatures from a damaged or dead unit until end of combat."
 msgstr ""
 
-#: ../fheroes2/spell/spell.cpp:56
+#: ../fheroes2/spell/spell.cpp:57
 msgid "Resurrect True"
 msgstr ""
 
-#: ../fheroes2/spell/spell.cpp:56
+#: ../fheroes2/spell/spell.cpp:57
 msgid "Resurrects creatures from a damaged or dead unit permanently."
 msgstr ""
 
-#: ../fheroes2/spell/spell.cpp:57
+#: ../fheroes2/spell/spell.cpp:58
 msgid "Haste"
 msgstr ""
 
-#: ../fheroes2/spell/spell.cpp:57
+#: ../fheroes2/spell/spell.cpp:58
 msgid "Increases the speed of any creature by %{count}."
 msgstr ""
 
-#: ../fheroes2/spell/spell.cpp:58
+#: ../fheroes2/spell/spell.cpp:59
 msgid "Mass Haste"
 msgstr ""
 
-#: ../fheroes2/spell/spell.cpp:58
+#: ../fheroes2/spell/spell.cpp:59
 msgid "Increases the speed of all of your creatures by %{count}."
 msgstr ""
 
-#: ../fheroes2/spell/spell.cpp:59
+#: ../fheroes2/spell/spell.cpp:60
 msgid "spell|Slow"
 msgstr ""
 
-#: ../fheroes2/spell/spell.cpp:59
+#: ../fheroes2/spell/spell.cpp:60
 msgid "Slows target to half movement rate."
 msgstr ""
 
-#: ../fheroes2/spell/spell.cpp:60
+#: ../fheroes2/spell/spell.cpp:61
 msgid "Mass Slow"
 msgstr ""
 
-#: ../fheroes2/spell/spell.cpp:60
+#: ../fheroes2/spell/spell.cpp:61
 msgid "Slows all enemies to half movement rate."
 msgstr ""
 
-#: ../fheroes2/spell/spell.cpp:61
+#: ../fheroes2/spell/spell.cpp:62
 msgid "Blind "
 msgstr ""
 
-#: ../fheroes2/spell/spell.cpp:61
+#: ../fheroes2/spell/spell.cpp:62
 msgid "Clouds the affected creatures' eyes, preventing them from moving."
 msgstr ""
 
-#: ../fheroes2/spell/spell.cpp:62
+#: ../fheroes2/spell/spell.cpp:63
 msgid "Bless"
 msgstr ""
 
-#: ../fheroes2/spell/spell.cpp:62
+#: ../fheroes2/spell/spell.cpp:63
 msgid "Causes the selected creatures to inflict maximum damage."
 msgstr ""
 
-#: ../fheroes2/spell/spell.cpp:63
+#: ../fheroes2/spell/spell.cpp:64
 msgid "Mass Bless"
 msgstr ""
 
-#: ../fheroes2/spell/spell.cpp:63
+#: ../fheroes2/spell/spell.cpp:64
 msgid "Causes all of your units to inflict maximum damage."
 msgstr ""
 
-#: ../fheroes2/spell/spell.cpp:64
+#: ../fheroes2/spell/spell.cpp:65
 msgid "Stoneskin"
 msgstr ""
 
-#: ../fheroes2/spell/spell.cpp:64
+#: ../fheroes2/spell/spell.cpp:65
 msgid "Magically increases the defense skill of the selected creatures."
 msgstr ""
 
-#: ../fheroes2/spell/spell.cpp:65
+#: ../fheroes2/spell/spell.cpp:66
 msgid "Steelskin"
 msgstr ""
 
-#: ../fheroes2/spell/spell.cpp:65
+#: ../fheroes2/spell/spell.cpp:66
 msgid ""
 "Increases the defense skill of the targeted creatures.  This is an improved "
 "version of Stoneskin."
 msgstr ""
 
-#: ../fheroes2/spell/spell.cpp:66
+#: ../fheroes2/spell/spell.cpp:67
 msgid "Curse"
 msgstr ""
 
-#: ../fheroes2/spell/spell.cpp:66
+#: ../fheroes2/spell/spell.cpp:67
 msgid "Causes the selected creatures to inflict minimum damage."
 msgstr ""
 
-#: ../fheroes2/spell/spell.cpp:67
+#: ../fheroes2/spell/spell.cpp:68
 msgid "Mass Curse"
 msgstr ""
 
-#: ../fheroes2/spell/spell.cpp:67
+#: ../fheroes2/spell/spell.cpp:68
 msgid "Causes all enemy troops to inflict minimum damage."
 msgstr ""
 
-#: ../fheroes2/spell/spell.cpp:68
+#: ../fheroes2/spell/spell.cpp:69
 msgid "Holy Word"
 msgstr ""
 
-#: ../fheroes2/spell/spell.cpp:68
+#: ../fheroes2/spell/spell.cpp:69
 msgid "Damages all undead in the battle."
 msgstr ""
 
-#: ../fheroes2/spell/spell.cpp:69
+#: ../fheroes2/spell/spell.cpp:70
 msgid "Holy Shout"
 msgstr ""
 
-#: ../fheroes2/spell/spell.cpp:69
+#: ../fheroes2/spell/spell.cpp:70
 msgid ""
 "Damages all undead in the battle.  This is an improved version of Holy Word."
 msgstr ""
 
-#: ../fheroes2/spell/spell.cpp:70
+#: ../fheroes2/spell/spell.cpp:71
 msgid "Anti-Magic"
 msgstr ""
 
-#: ../fheroes2/spell/spell.cpp:70
+#: ../fheroes2/spell/spell.cpp:71
 msgid "Prevents harmful magic against the selected creatures."
 msgstr ""
 
-#: ../fheroes2/spell/spell.cpp:71
+#: ../fheroes2/spell/spell.cpp:72
 msgid "Dispel Magic"
 msgstr ""
 
-#: ../fheroes2/spell/spell.cpp:71
+#: ../fheroes2/spell/spell.cpp:72
 msgid "Removes all magic spells from a single target."
 msgstr ""
 
-#: ../fheroes2/spell/spell.cpp:72
+#: ../fheroes2/spell/spell.cpp:73
 msgid "Mass Dispel"
 msgstr ""
 
-#: ../fheroes2/spell/spell.cpp:72
+#: ../fheroes2/spell/spell.cpp:73
 msgid "Removes all magic spells from all creatures."
 msgstr ""
 
-#: ../fheroes2/spell/spell.cpp:73
+#: ../fheroes2/spell/spell.cpp:74
 msgid "Magic Arrow"
 msgstr ""
 
-#: ../fheroes2/spell/spell.cpp:73
+#: ../fheroes2/spell/spell.cpp:74
 msgid "Causes a magic arrow to strike the selected target."
 msgstr ""
 
-#: ../fheroes2/spell/spell.cpp:74
+#: ../fheroes2/spell/spell.cpp:75
 msgid "Berserker"
 msgstr ""
 
-#: ../fheroes2/spell/spell.cpp:74
+#: ../fheroes2/spell/spell.cpp:75
 msgid "Causes a creature to attack its nearest neighbor."
 msgstr ""
 
-#: ../fheroes2/spell/spell.cpp:75
+#: ../fheroes2/spell/spell.cpp:76
 msgid "Armageddon"
 msgstr ""
 
-#: ../fheroes2/spell/spell.cpp:75
+#: ../fheroes2/spell/spell.cpp:76
 msgid ""
 "Holy terror strikes the battlefield, causing severe damage to all creatures."
 msgstr ""
 
-#: ../fheroes2/spell/spell.cpp:76
+#: ../fheroes2/spell/spell.cpp:77
 msgid "Elemental Storm"
 msgstr ""
 
-#: ../fheroes2/spell/spell.cpp:76
+#: ../fheroes2/spell/spell.cpp:77
 msgid "Magical elements pour down on the battlefield, damaging all creatures."
 msgstr ""
 
-#: ../fheroes2/spell/spell.cpp:77
+#: ../fheroes2/spell/spell.cpp:78
 msgid "Meteor Shower"
 msgstr ""
 
-#: ../fheroes2/spell/spell.cpp:77
+#: ../fheroes2/spell/spell.cpp:78
 msgid ""
 "A rain of rocks strikes an area of the battlefield, damaging all nearby "
 "creatures."
 msgstr ""
 
-#: ../fheroes2/spell/spell.cpp:78
+#: ../fheroes2/spell/spell.cpp:79
 msgid "Paralyze"
 msgstr ""
 
-#: ../fheroes2/spell/spell.cpp:78
+#: ../fheroes2/spell/spell.cpp:79
 msgid "The targeted creatures are paralyzed, unable to move or retaliate."
 msgstr ""
 
-#: ../fheroes2/spell/spell.cpp:79
+#: ../fheroes2/spell/spell.cpp:80
 msgid "Hypnotize"
 msgstr ""
 
-#: ../fheroes2/spell/spell.cpp:79
+#: ../fheroes2/spell/spell.cpp:80
 msgid ""
 "Brings a single enemy unit under your control for one combat round if its "
 "hits are less than %{count} times the caster's spell power."
 msgstr ""
 
-#: ../fheroes2/spell/spell.cpp:80
+#: ../fheroes2/spell/spell.cpp:81
 msgid "Cold Ray"
 msgstr ""
 
-#: ../fheroes2/spell/spell.cpp:80
+#: ../fheroes2/spell/spell.cpp:81
 msgid "Drains body heat from a single enemy unit."
 msgstr ""
 
-#: ../fheroes2/spell/spell.cpp:81
+#: ../fheroes2/spell/spell.cpp:82
 msgid "Cold Ring"
 msgstr ""
 
-#: ../fheroes2/spell/spell.cpp:81
+#: ../fheroes2/spell/spell.cpp:82
 msgid ""
 "Drains body heat from all units surrounding the center point, but not "
 "including the center point."
 msgstr ""
 
-#: ../fheroes2/spell/spell.cpp:82
+#: ../fheroes2/spell/spell.cpp:83
 msgid "Disrupting Ray"
 msgstr ""
 
-#: ../fheroes2/spell/spell.cpp:82
+#: ../fheroes2/spell/spell.cpp:83
 msgid "Reduces the defense rating of an enemy unit by three."
 msgstr ""
 
-#: ../fheroes2/spell/spell.cpp:83
+#: ../fheroes2/spell/spell.cpp:84
 msgid "Death Ripple"
 msgstr ""
 
-#: ../fheroes2/spell/spell.cpp:83
+#: ../fheroes2/spell/spell.cpp:84
 msgid "Damages all living (non-undead) units in the battle."
 msgstr ""
 
-#: ../fheroes2/spell/spell.cpp:84
+#: ../fheroes2/spell/spell.cpp:85
 msgid "Death Wave"
 msgstr ""
 
-#: ../fheroes2/spell/spell.cpp:84
+#: ../fheroes2/spell/spell.cpp:85
 msgid ""
 "Damages all living (non-undead) units in the battle.  This spell is an "
 "improved version of Death Ripple."
 msgstr ""
 
-#: ../fheroes2/spell/spell.cpp:85
+#: ../fheroes2/spell/spell.cpp:86
 msgid "Dragon Slayer"
 msgstr ""
 
-#: ../fheroes2/spell/spell.cpp:85
+#: ../fheroes2/spell/spell.cpp:86
 msgid "Greatly increases a unit's attack skill vs. Dragons."
 msgstr ""
 
-#: ../fheroes2/spell/spell.cpp:86
+#: ../fheroes2/spell/spell.cpp:87
 msgid "Blood Lust"
 msgstr ""
 
-#: ../fheroes2/spell/spell.cpp:86
+#: ../fheroes2/spell/spell.cpp:87
 msgid "Increases a unit's attack skill."
 msgstr ""
 
-#: ../fheroes2/spell/spell.cpp:87
+#: ../fheroes2/spell/spell.cpp:88
 msgid "Animate Dead"
 msgstr ""
 
-#: ../fheroes2/spell/spell.cpp:87
+#: ../fheroes2/spell/spell.cpp:88
 msgid "Resurrects creatures from a damaged or dead undead unit permanently."
 msgstr ""
 
-#: ../fheroes2/spell/spell.cpp:88
+#: ../fheroes2/spell/spell.cpp:89
 msgid "Mirror Image"
 msgstr ""
 
-#: ../fheroes2/spell/spell.cpp:88
+#: ../fheroes2/spell/spell.cpp:89
 msgid ""
 "Creates an illusionary unit that duplicates one of your existing units.  "
 "This illusionary unit does the same damages as the original, but will vanish "
 "if it takes any damage."
 msgstr ""
 
-#: ../fheroes2/spell/spell.cpp:89
+#: ../fheroes2/spell/spell.cpp:90
 msgid "Shield"
 msgstr ""
 
-#: ../fheroes2/spell/spell.cpp:89
+#: ../fheroes2/spell/spell.cpp:90
 msgid "Halves damage received from ranged attacks for a single unit."
 msgstr ""
 
-#: ../fheroes2/spell/spell.cpp:90
+#: ../fheroes2/spell/spell.cpp:91
 msgid "Mass Shield"
 msgstr ""
 
-#: ../fheroes2/spell/spell.cpp:90
+#: ../fheroes2/spell/spell.cpp:91
 msgid "Halves damage received from ranged attacks for all of your units."
 msgstr ""
 
-#: ../fheroes2/spell/spell.cpp:91
+#: ../fheroes2/spell/spell.cpp:92
 msgid "Summon Earth Elemental"
 msgstr ""
 
-#: ../fheroes2/spell/spell.cpp:91
+#: ../fheroes2/spell/spell.cpp:92
 msgid "Summons Earth Elementals to fight for your army."
 msgstr ""
 
-#: ../fheroes2/spell/spell.cpp:92
+#: ../fheroes2/spell/spell.cpp:93
 msgid "Summon Air Elemental"
 msgstr ""
 
-#: ../fheroes2/spell/spell.cpp:92
+#: ../fheroes2/spell/spell.cpp:93
 msgid "Summons Air Elementals to fight for your army."
 msgstr ""
 
-#: ../fheroes2/spell/spell.cpp:93
+#: ../fheroes2/spell/spell.cpp:94
 msgid "Summon Fire Elemental"
 msgstr ""
 
-#: ../fheroes2/spell/spell.cpp:93
+#: ../fheroes2/spell/spell.cpp:94
 msgid "Summons Fire Elementals to fight for your army."
 msgstr ""
 
-#: ../fheroes2/spell/spell.cpp:94
+#: ../fheroes2/spell/spell.cpp:95
 msgid "Summon Water Elemental"
 msgstr ""
 
-#: ../fheroes2/spell/spell.cpp:94
+#: ../fheroes2/spell/spell.cpp:95
 msgid "Summons Water Elementals to fight for your army."
 msgstr ""
 
-#: ../fheroes2/spell/spell.cpp:95
+#: ../fheroes2/spell/spell.cpp:96
 msgid "Earthquake"
 msgstr ""
 
-#: ../fheroes2/spell/spell.cpp:95
+#: ../fheroes2/spell/spell.cpp:96
 msgid "Damages castle walls."
 msgstr ""
 
-#: ../fheroes2/spell/spell.cpp:96
+#: ../fheroes2/spell/spell.cpp:97
 msgid "View Mines"
 msgstr ""
 
-#: ../fheroes2/spell/spell.cpp:96
+#: ../fheroes2/spell/spell.cpp:97
 msgid "Causes all mines across the land to become visible."
 msgstr ""
 
-#: ../fheroes2/spell/spell.cpp:97
+#: ../fheroes2/spell/spell.cpp:98
 msgid "View Resources"
 msgstr ""
 
-#: ../fheroes2/spell/spell.cpp:97
+#: ../fheroes2/spell/spell.cpp:98
 msgid "Causes all resources across the land to become visible."
 msgstr ""
 
-#: ../fheroes2/spell/spell.cpp:98
+#: ../fheroes2/spell/spell.cpp:99
 msgid "View Artifacts"
 msgstr ""
 
-#: ../fheroes2/spell/spell.cpp:98
+#: ../fheroes2/spell/spell.cpp:99
 msgid "Causes all artifacts across the land to become visible."
 msgstr ""
 
-#: ../fheroes2/spell/spell.cpp:99
+#: ../fheroes2/spell/spell.cpp:100
 msgid "View Towns"
 msgstr ""
 
-#: ../fheroes2/spell/spell.cpp:99
+#: ../fheroes2/spell/spell.cpp:100
 msgid "Causes all towns and castles across the land to become visible."
 msgstr ""
 
-#: ../fheroes2/spell/spell.cpp:100
+#: ../fheroes2/spell/spell.cpp:101
 msgid "View Heroes"
 msgstr ""
 
-#: ../fheroes2/spell/spell.cpp:100
+#: ../fheroes2/spell/spell.cpp:101
 msgid "Causes all Heroes across the land to become visible."
 msgstr ""
 
-#: ../fheroes2/spell/spell.cpp:101
+#: ../fheroes2/spell/spell.cpp:102
 msgid "View All"
 msgstr ""
 
-#: ../fheroes2/spell/spell.cpp:101
+#: ../fheroes2/spell/spell.cpp:102
 msgid "Causes the entire land to become visible."
 msgstr ""
 
-#: ../fheroes2/spell/spell.cpp:102
+#: ../fheroes2/spell/spell.cpp:103
 msgid "Identify Hero"
 msgstr ""
 
-#: ../fheroes2/spell/spell.cpp:102
+#: ../fheroes2/spell/spell.cpp:103
 msgid "Allows the caster to view detailed information on enemy Heroes."
 msgstr ""
 
-#: ../fheroes2/spell/spell.cpp:103
+#: ../fheroes2/spell/spell.cpp:104
 msgid "Summon Boat"
 msgstr ""
 
-#: ../fheroes2/spell/spell.cpp:103
+#: ../fheroes2/spell/spell.cpp:104
 msgid ""
 "Summons the nearest unoccupied, friendly boat to an adjacent shore "
 "location.  A friendly boat is one which you just built or were the most "
 "recent player to occupy."
 msgstr ""
 
-#: ../fheroes2/spell/spell.cpp:104
+#: ../fheroes2/spell/spell.cpp:105
 msgid "Dimension Door"
 msgstr ""
 
-#: ../fheroes2/spell/spell.cpp:104
+#: ../fheroes2/spell/spell.cpp:105
 msgid "Allows the caster to magically transport to a nearby location."
 msgstr ""
 
-#: ../fheroes2/spell/spell.cpp:105
+#: ../fheroes2/spell/spell.cpp:106
 msgid "Town Gate"
 msgstr ""
 
-#: ../fheroes2/spell/spell.cpp:105
+#: ../fheroes2/spell/spell.cpp:106
 msgid "Returns the caster to any town or castle currently owned."
 msgstr ""
 
-#: ../fheroes2/spell/spell.cpp:106
+#: ../fheroes2/spell/spell.cpp:107
 msgid ""
 "Returns the hero to the town or castle of choice, provided it is controlled "
 "by you."
 msgstr ""
 
-#: ../fheroes2/spell/spell.cpp:107
+#: ../fheroes2/spell/spell.cpp:108
 msgid "Visions"
 msgstr ""
 
-#: ../fheroes2/spell/spell.cpp:107
+#: ../fheroes2/spell/spell.cpp:108
 msgid ""
 "Visions predicts the likely outcome of an encounter with a neutral army camp."
 msgstr ""
 
-#: ../fheroes2/spell/spell.cpp:108
+#: ../fheroes2/spell/spell.cpp:109
 msgid "Haunt"
 msgstr ""
 
-#: ../fheroes2/spell/spell.cpp:108
+#: ../fheroes2/spell/spell.cpp:109
 msgid ""
 "Haunts a mine you control with Ghosts.  This mine stops producing "
 "resources.  (If I can't keep it, nobody will!)"
 msgstr ""
 
-#: ../fheroes2/spell/spell.cpp:109
+#: ../fheroes2/spell/spell.cpp:110
 msgid "Set Earth Guardian"
 msgstr ""
 
-#: ../fheroes2/spell/spell.cpp:109
+#: ../fheroes2/spell/spell.cpp:110
 msgid "Sets Earth Elementals to guard a mine against enemy armies."
 msgstr ""
 
-#: ../fheroes2/spell/spell.cpp:110
+#: ../fheroes2/spell/spell.cpp:111
 msgid "Set Air Guardian"
 msgstr ""
 
-#: ../fheroes2/spell/spell.cpp:110
+#: ../fheroes2/spell/spell.cpp:111
 msgid "Sets Air Elementals to guard a mine against enemy armies."
 msgstr ""
 
-#: ../fheroes2/spell/spell.cpp:111
+#: ../fheroes2/spell/spell.cpp:112
 msgid "Set Fire Guardian"
 msgstr ""
 
-#: ../fheroes2/spell/spell.cpp:111
+#: ../fheroes2/spell/spell.cpp:112
 msgid "Sets Fire Elementals to guard a mine against enemy armies."
 msgstr ""
 
-#: ../fheroes2/spell/spell.cpp:112
+#: ../fheroes2/spell/spell.cpp:113
 msgid "Set Water Guardian"
 msgstr ""
 
-#: ../fheroes2/spell/spell.cpp:112
+#: ../fheroes2/spell/spell.cpp:113
 msgid "Sets Water Elementals to guard a mine against enemy armies."
 msgstr ""
 
-#: ../fheroes2/spell/spell.cpp:113
+#: ../fheroes2/spell/spell.cpp:114
 msgid "Stone"
 msgstr ""
 
-#: ../fheroes2/spell/spell.cpp:113
+#: ../fheroes2/spell/spell.cpp:114
 msgid "Stone spell from Medusa."
 msgstr ""
 
@@ -11920,37 +11928,41 @@ msgid "battle: show move shadow"
 msgstr ""
 
 #: ../fheroes2/system/settings.cpp:107
-msgid "game: show system info"
+msgid "battle: high objects are an obstacle for archers"
 msgstr ""
 
 #: ../fheroes2/system/settings.cpp:108
-msgid "game: autosave on"
+msgid "game: show system info"
 msgstr ""
 
 #: ../fheroes2/system/settings.cpp:109
-msgid "game: use fade"
+msgid "game: autosave on"
 msgstr ""
 
 #: ../fheroes2/system/settings.cpp:110
-msgid "game: show SDL logo"
+msgid "game: use fade"
 msgstr ""
 
 #: ../fheroes2/system/settings.cpp:111
-msgid "game: use evil interface"
+msgid "game: show SDL logo"
 msgstr ""
 
 #: ../fheroes2/system/settings.cpp:112
-msgid "game: hide interface"
+msgid "game: use evil interface"
 msgstr ""
 
 #: ../fheroes2/system/settings.cpp:113
-msgid "pocketpc: hide cursor"
+msgid "game: hide interface"
 msgstr ""
 
 #: ../fheroes2/system/settings.cpp:114
-msgid "pocketpc: tap mode"
+msgid "pocketpc: hide cursor"
 msgstr ""
 
 #: ../fheroes2/system/settings.cpp:115
+msgid "pocketpc: tap mode"
+msgstr ""
+
+#: ../fheroes2/system/settings.cpp:116
 msgid "pocketpc: low memory"
 msgstr ""
