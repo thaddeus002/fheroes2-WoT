@@ -29,7 +29,7 @@ namespace Music
 {
     void	Play(const u8* ptr, u32 size, bool loop);
     void	Play(const char* file, bool loop);
-    u8		Volume(s8 vol);
+    u16		Volume(s16 vol);
     void	SetFadeIn(u16);
     void	SetFadeOut(u16);
     void	Pause(void);

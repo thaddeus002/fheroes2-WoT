@@ -122,7 +122,7 @@ u8 Dialog::SystemOptions(void)
 	    DrawSystemInfo(rb);
     	    cursor.Show();
     	    display.Flip();
-    	    Music::Volume(conf.MusicVolume());
+    	    Music::Volume(Mixer::MaxVolume() * conf.MusicVolume() / 10);
     	}
 
         // set animation

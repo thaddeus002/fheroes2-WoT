@@ -88,16 +88,9 @@ void Music::SetFadeOut(u16 f)
     fadeout = f;
 }
 
-/* range 0 - 10 */
-u8 Music::Volume(s8 vol)
+u16 Music::Volume(s16 vol)
 {
-    if(Mixer::isValid())
-    {
-	if(vol > 0)
-	    vol = (vol > 10 ? 10 : vol) * MIX_MAX_VOLUME / 10;
-	return Mix_VolumeMusic(vol);
-    }
-    return 0;
+    return Mixer::isValid() ? (Mix_VolumeMusic(vol > MIX_MAX_VOLUME ? MIX_MAX_VOLUME : vol)) : 0;
 }
 
 void Music::Pause(void)
@@ -189,7 +182,7 @@ void Music::SetFadeOut(u16 f)
 {
 }
 
-u8 Music::Volume(s8 vol)
+u16 Music::Volume(s16 vol)
 {
     return 0;
 }
