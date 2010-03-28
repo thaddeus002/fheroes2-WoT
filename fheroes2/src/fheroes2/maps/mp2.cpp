@@ -428,7 +428,7 @@ const char* MP2::StringObject(u8 object)
         case MP2::OBJN_TROLLBRIDGE:
         case MP2::OBJ_TROLLBRIDGE:		return _("Troll Bridge");
         case MP2::OBJN_WITCHSHUT:
-        case MP2::OBJ_WITCHSHUT:		return _("Witch's Hut");
+        case MP2::OBJ_WITCHSHUT:		return _("Witch Huts");
         case MP2::OBJN_XANADU:
         case MP2::OBJ_XANADU:			return _("Xanadu");
         case MP2::OBJN_CAVE:
