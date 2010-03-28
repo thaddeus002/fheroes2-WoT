@@ -1161,12 +1161,13 @@ void ActionToWitchsHut(Heroes &hero, const u8 obj, const u16 dst_index)
     else
     {
 	hero.LearnBasicSkill(skill);
-	hero.SetVisited(dst_index, Visit::GLOBAL);
 
 	body = _("An ancient and immortal witch living in a hut with bird's legs for stilts teaches you %{skill} for her own inscrutable purposes.");
 	String::Replace(body, "%{skill}", skill_name);
 	Dialog::SecondarySkillInfo(head, body, skill, Skill::Level::BASIC);
     }
+
+    hero.SetVisited(dst_index, Visit::GLOBAL);
 
     DEBUG(DBG_GAME , DBG_INFO, "ActionToWitchsHut: " << hero.GetName());
 }

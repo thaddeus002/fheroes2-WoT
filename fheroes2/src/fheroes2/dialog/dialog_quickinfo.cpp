@@ -304,7 +304,7 @@ void Dialog::QuickInfo(const Maps::Tiles & tile)
 		    if(hero->HasSecondarySkill(skill))
 		    {
 			name_object.append("\n(");
-			name_object.append(_("already know the skill"));
+			name_object.append(_("already knows this skill"));
 			name_object.append(")");
 		    }
 		    else
