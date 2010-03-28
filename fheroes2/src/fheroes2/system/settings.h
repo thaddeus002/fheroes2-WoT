@@ -86,6 +86,7 @@ public:
 	GAME_SHOW_SDL_LOGO		= 0x10000800,
 	GAME_EVIL_INTERFACE		= 0x10001000,
 	GAME_HIDE_INTERFACE		= 0x10002000,
+	GAME_ALSO_CONFIRM_AUTOSAVE	= 0x10004000,
 	POCKETPC_HIDE_CURSOR		= 0x10400000,
 	POCKETPC_LOW_MEMORY		= 0x10800000,
 	POCKETPC_TAP_MODE		= 0x11000000,
@@ -178,6 +179,7 @@ public:
     bool ExtBattleSoftWait(void) const;
     bool ExtBattleObjectsArchersPenalty(void) const;
     bool ExtRewriteConfirm(void) const;
+    bool ExtAutosaveConfirm(void) const;
     bool ExtHideCursor(void) const;
     bool ExtHideAIMove(void) const;
     bool ExtBattleShowGrid(void) const;

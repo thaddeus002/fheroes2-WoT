@@ -89,6 +89,7 @@ static const settings_t settingsGeneral[] =
 static const settings_t settingsFHeroes2[] =
 {
     { Settings::GAME_SAVE_REWRITE_CONFIRM,	_("game: always confirm for rewrite savefile"),		},
+    { Settings::GAME_ALSO_CONFIRM_AUTOSAVE,	_("game: also confirm autosave"),			},
     { Settings::GAME_FAST_LOAD_GAME_DIALOG,	_("game: fast load game dialog (L hot key)"),		},
     { Settings::GAME_REMEMBER_LAST_FOCUS,	_("game: remember last focus"),				},
     { Settings::GAME_HIDE_AI_MOVE,		_("game: hide AI move"),				},
@@ -1023,6 +1024,11 @@ bool Settings::ExtBattleObjectsArchersPenalty(void) const
 bool Settings::ExtRewriteConfirm(void) const
 {
     return ExtModes(GAME_SAVE_REWRITE_CONFIRM);
+}
+
+bool Settings::ExtAutosaveConfirm(void) const
+{
+    return ExtModes(GAME_ALSO_CONFIRM_AUTOSAVE);
 }
 
 bool Settings::ExtHideCursor(void) const

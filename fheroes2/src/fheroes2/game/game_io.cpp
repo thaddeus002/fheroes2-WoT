@@ -41,8 +41,11 @@ bool Game::Save(const std::string &fn)
     DEBUG(DBG_GAME , DBG_INFO, "Game::Save: " << fn);
 
     if(Settings::Get().ExtRewriteConfirm() && FilePresent(fn) &&
+	(std::string::npos == fn.find("autosave.sav") || Settings::Get().ExtAutosaveConfirm()) &&
 	Dialog::NO == Dialog::Message("", _("Are you sure you want to overwrite the save with this name?"), Font::BIG, Dialog::YES|Dialog::NO))
-	    return false;
+    {
+	return false;
+    }
 
     Game::IO msg;
 
