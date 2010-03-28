@@ -40,7 +40,7 @@ bool Game::Save(const std::string &fn)
 {
     DEBUG(DBG_GAME , DBG_INFO, "Game::Save: " << fn);
 
-    if(Settings::Get().ExtRewriteConfirm() &&
+    if(Settings::Get().ExtRewriteConfirm() && FilePresent(fn) &&
 	Dialog::NO == Dialog::Message("", _("Are you sure you want to overwrite the save with this name?"), Font::BIG, Dialog::YES|Dialog::NO))
 	    return false;
 

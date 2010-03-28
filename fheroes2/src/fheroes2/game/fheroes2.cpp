@@ -140,8 +140,8 @@ int main(int argc, char **argv)
 	    if(Mixer::isValid())
 	    {
 		Mixer::SetChannels(8);
-                Mixer::Volume(-1, conf.SoundVolume());
-                Music::Volume(conf.MusicVolume());
+                Mixer::Volume(-1, Mixer::MaxVolume() * conf.SoundVolume() / 10);
+                Music::Volume(Mixer::MaxVolume() * conf.MusicVolume() / 10);
                 if(conf.Music())
 		{
 		    Music::SetFadeIn(3000);
