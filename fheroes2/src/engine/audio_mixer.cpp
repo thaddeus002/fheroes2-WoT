@@ -150,12 +150,15 @@ int Mixer::Play(const u8* ptr, u32 size, int channel, bool loop)
     return -1;
 }
 
-/* vol range: 0 - 10 */
-u8 Mixer::Volume(int channel, s8 vol)
+u16 Mixer::MaxVolume(void)
+{
+    return MIX_MAX_VOLUME;
+}
+
+u16 Mixer::Volume(int channel, s16 vol)
 {
     if(!valid) return 0;
-    if(vol > 0) vol = (vol > 10 ? 10 : vol) * MIX_MAX_VOLUME / 10;
-    return Mix_Volume(channel, vol);
+    return Mix_Volume(channel, vol > MIX_MAX_VOLUME ? MIX_MAX_VOLUME : vol);
 }
 
 void Mixer::Pause(int channel)
@@ -332,30 +335,41 @@ void Mixer::SetChannels(u8 num)
     reserved_channels = 1;
 }
 
-/* volume: 0 - 10 */
-u8 Mixer::Volume(int ch, s8 vol)
+u16 Mixer::MaxVolume(void)
+{
+    return SDL_MIX_MAXVOLUME;
+}
+
+u16 Mixer::Volume(int ch, s16 vol)
 {
     if(!valid) return 0;
 
-    s16 volume = vol > 0 ? (vol > 10 ? 10 : vol) * SDL_MIX_MAXVOLUME / 10 : 0;
+    if(vol > SDL_MIX_MAXVOLUME) vol = SDL_MIX_MAXVOLUME;
 
     if(ch < 0)
     {
 	for(u8 ii = 0; ii < chunks.size(); ++ii)
 	{
 	    SDL_LockAudio();
-	    chunks[ii].volume1 = volume;
-	    chunks[ii].volume2 = volume;
+	    chunks[ii].volume1 = vol;
+	    chunks[ii].volume2 = vol;
 	    SDL_UnlockAudio();
 	}
     }
     else
     if(ch < static_cast<int>(chunks.size()))
     {
-	SDL_LockAudio();
-	chunks[ch].volume1 = volume;
-	chunks[ch].volume2 = volume;
-	SDL_UnlockAudio();
+	if(0 > vol)
+	{
+	    vol = chunks[ch].volume1;
+	}
+	else
+	{
+	    SDL_LockAudio();
+	    chunks[ch].volume1 = vol;
+	    chunks[ch].volume2 = vol;
+	    SDL_UnlockAudio();
+	}
     }
     return vol;
 }

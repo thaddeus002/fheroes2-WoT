@@ -138,7 +138,7 @@ namespace AGG
 	void LoadWAV(const M82::m82_t m82);
 	void LoadMID(const XMI::xmi_t xmi);
 
-	void LoadLOOPXXSounds(const std::vector<u8> &);
+	void LoadLOOPXXSounds(const u16*);
 	void ResetMixer(void);
 	
 	void LoadPAL(void);

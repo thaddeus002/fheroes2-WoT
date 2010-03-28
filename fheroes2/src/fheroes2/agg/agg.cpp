@@ -1054,18 +1054,17 @@ void AGG::Cache::ResetMixer(void)
     loop_sounds.reserve(7);
 }
 
-void AGG::Cache::LoadLOOPXXSounds(const std::vector<u8> & vols)
+void AGG::Cache::LoadLOOPXXSounds(const u16* vols)
 {
     const Settings & conf = Settings::Get();
 
-    if(conf.Sound())
+    if(conf.Sound() && vols)
     {
-	std::vector<u8>::const_iterator vol = vols.begin();
-
 	// set volume loop sounds
-	for(; vol != vols.end(); ++vol)
+	for(u8 channel = 0; channel != LOOPXX_COUNT; ++channel)
 	{
-	    M82::m82_t m82 = M82::GetLOOP00XX(vol - vols.begin());
+	    u16 vol = vols[channel];
+	    M82::m82_t m82 = M82::GetLOOP00XX(channel);
 	    if(M82::UNKNOWN == m82) continue;
 
 	    // find loops
@@ -1075,34 +1074,38 @@ void AGG::Cache::LoadLOOPXXSounds(const std::vector<u8> & vols)
 	    if(it != loop_sounds.end())
 	    {
 		// unused and free
-		if(0 == (*vol))
+		if(0 == vol)
 		{
-		    (*it).sound = M82::UNKNOWN;
 		    if(Mixer::isPlaying((*it).channel))
 		    {
 			Mixer::Pause((*it).channel);
-			Mixer::Volume((*it).channel, conf.SoundVolume());
+			Mixer::Volume((*it).channel, Mixer::MaxVolume() * conf.SoundVolume() / 10);
 			Mixer::Stop((*it).channel);
 		    }
+		    (*it).sound = M82::UNKNOWN;
 		}
 		// used and set vols
 		else
 		if(Mixer::isPlaying((*it).channel))
 		{
 		    Mixer::Pause((*it).channel);
-		    Mixer::Volume((*it).channel, *vol);
+		    Mixer::Volume((*it).channel, vol * conf.SoundVolume() / 10);
 		    Mixer::Resume((*it).channel);
 		}
 	    }
 	    else
 	    // new sound
-	    if(0 != (*vol))
+	    if(0 != vol)
 	    {
     		const std::vector<u8> & v = AGG::Cache::Get().GetWAV(m82);
-		int channel = Mixer::Play(&v[0], v.size(), -1, true);
+		int ch = Mixer::Play(&v[0], v.size(), -1, true);
 
-		if(0 <= channel)
+		if(0 <= ch)
 		{
+		    Mixer::Pause(ch);
+		    Mixer::Volume(ch, vol * conf.SoundVolume() / 10);
+		    Mixer::Resume(ch);
+
 		    // find unused
 		    std::vector<loop_sound_t>::iterator it = std::find_if(loop_sounds.begin(), loop_sounds.end(),
 			    std::bind2nd(std::mem_fun_ref(&loop_sound_t::isM82), M82::UNKNOWN));
@@ -1110,14 +1113,10 @@ void AGG::Cache::LoadLOOPXXSounds(const std::vector<u8> & vols)
 		    if(it != loop_sounds.end())
 		    {
 			(*it).sound = m82;
-			(*it).channel = channel;
+			(*it).channel = ch;
 		    }
 		    else
-			loop_sounds.push_back(loop_sound_t(m82, channel));
-
-		    Mixer::Pause(channel);
-		    Mixer::Volume(channel, *vol);
-		    Mixer::Resume(channel);
+			loop_sounds.push_back(loop_sound_t(m82, ch));
 
 		    DEBUG(DBG_ENGINE , DBG_INFO, "AGG::PlayLOOPSound: " << M82::GetString(m82));
 		}
@@ -1135,7 +1134,10 @@ void AGG::PlaySound(const M82::m82_t m82)
     {
 	DEBUG(DBG_ENGINE , DBG_INFO, "AGG::PlaySound: " << M82::GetString(m82));
 	const std::vector<u8> & v = AGG::Cache::Get().GetWAV(m82);
-	Mixer::Play(&v[0], v.size(), -1, false);
+	int ch = Mixer::Play(&v[0], v.size(), -1, false);
+	Mixer::Pause(ch);
+	Mixer::Volume(ch, Mixer::MaxVolume() * conf.SoundVolume() / 10);
+	Mixer::Resume(ch);
     }
 }
 

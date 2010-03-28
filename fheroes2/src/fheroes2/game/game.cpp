@@ -48,7 +48,7 @@ namespace Game
     u8 GetMixerChannelFromObject(const Maps::Tiles &);
 
     static u8 lost_town_days(7);
-    static std::vector<u8> reserved_vols(LOOPXX_COUNT, 0);
+    static u16 reserved_vols[LOOPXX_COUNT];
 
     // town, castle, heroes, artifact_telescope, object_observation_tower, object_magi_eyes
     static u8 view_distance[] = { 4, 5, 4, 1, 10, 9 };
@@ -124,8 +124,7 @@ void Game::EnvironmentSoundMixer(void)
 
     if(conf.Sound())
     {
-	std::vector<u8> & vols = reserved_vols;
-	std::fill(vols.begin(), vols.end(), 0);
+	std::fill(reserved_vols, reserved_vols + LOOPXX_COUNT, 0);
 
         // scan 4x4 square from focus
         for(s16 yy = abs_pt.y - 3; yy <= abs_pt.y + 3; ++yy)
@@ -135,19 +134,19 @@ void Game::EnvironmentSoundMixer(void)
 		if(Maps::isValidAbsPoint(xx, yy))
 		{
 		    const u8 channel = GetMixerChannelFromObject(world.GetTiles(xx, yy));
-    		    if(channel < vols.size())
+    		    if(channel < LOOPXX_COUNT)
 		    {
 			// calculation volume
     			const u8 length = std::max(std::abs(xx - abs_pt.x), std::abs(yy - abs_pt.y));
-			const u8 volume = (2 < length ? 2 : (1 < length ? 5 : (0 < length ? 7 : 10))) * conf.SoundVolume() / 10;
+			const u16 volume = (2 < length ? 4 : (1 < length ? 8 : (0 < length ? 12 : 16))) * Mixer::MaxVolume() / 16;
 
-			if(volume > vols[channel]) vols[channel] = volume;
+			if(volume > reserved_vols[channel]) reserved_vols[channel] = volume;
 		    }
 		}
 	    }
 	}
 
-	AGG::Cache::Get().LoadLOOPXXSounds(vols);
+	AGG::Cache::Get().LoadLOOPXXSounds(reserved_vols);
     }
 }
 
