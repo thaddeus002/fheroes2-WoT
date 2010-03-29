@@ -124,7 +124,7 @@ void Interface::Basic::SetRedraw(u8 f)
 
 void Interface::Basic::Redraw(u8 force)
 {
-    const Settings & conf = Settings::Get();
+    Settings & conf = Settings::Get();
 
     if((redraw | force) & REDRAW_GAMEAREA) gameArea.Redraw(Display::Get());
 
@@ -142,19 +142,69 @@ void Interface::Basic::Redraw(u8 force)
 
     if(conf.HideInterface() && conf.ShowControlPanel() && (redraw & REDRAW_GAMEAREA)) controlPanel.Redraw();
 
+    u32 usage = GetMemoryUsage();
+
     // show system info
-    if(conf.ExtShowSystemInfo())
-	RedrawSystemInfo((conf.HideInterface() ? 10 : 26), Display::Get().h() - (conf.HideInterface() ? 14 : 30));
+    if(conf.ExtShowSystemInfo() && usage)
+	RedrawSystemInfo((conf.HideInterface() ? 10 : 26), Display::Get().h() - (conf.HideInterface() ? 14 : 30), usage);
+
+    // memory limit trigger
+    if(conf.ExtLowMemory() && conf.MemoryLimit() && usage)
+    {
+	if(conf.MemoryLimit() < usage)
+	{
+	    Display & display = Display::Get();
+	    Cursor & cursor = Cursor::Get();
+
+	    cursor.Hide();
+
+	    Rect rect((display.w() - 90) / 2, (display.h() - 30) / 2, 90, 30);
+	    TextBox text("memory limit\nclear cache\nwaiting...", Font::SMALL, rect.w);
+
+	    display.FillRect(0, 0, 0, rect);
+	    text.Blit(rect.x, rect.y);
+	    
+	    display.Flip();
+
+	    AGG::Cache & cache = AGG::Cache::Get();
+
+	    VERBOSE("MemoryLimit: " << "settings: " << conf.MemoryLimit() << ", game usage: " << usage);
+	    cache.ClearAllICN();
+	    VERBOSE("MemoryLimit: " << "free all " << "ICN" << ", game usage: " << GetMemoryUsage());
+	    cache.ClearAllWAV();
+	    VERBOSE("MemoryLimit: " << "free all " << "WAV" << ", game usage: " << GetMemoryUsage());
+	    cache.ClearAllMID();
+	    VERBOSE("MemoryLimit: " << "free all " << "MID" << ", game usage: " << GetMemoryUsage());
+
+	    redraw = 0xFF;
+	    if(conf.HideInterface()) redraw &= ~REDRAW_BORDER;
+
+	    cursor.SetThemes(cursor.Themes(), true);
+	    cursor.Show();
+	}
+
+	usage = GetMemoryUsage();
+
+	if(conf.MemoryLimit() < usage)
+	{
+	    VERBOSE("MemoryLimit: " << "settings: " << conf.MemoryLimit() << ", too small");
+
+	    // increase + 300Kb
+	    conf.SetMemoryLimit(usage + (300 * 1024));
+
+	    VERBOSE("MemoryLimit: " << "settings: " << "increase limit on 300kb, current value: " << conf.MemoryLimit());
+	}
+    }
 
     if((redraw | force) & REDRAW_BORDER) borderWindow.Redraw();
 
     redraw = 0;
 }
 
-void Interface::Basic::RedrawSystemInfo(s16 cx, s16 cy)
+void Interface::Basic::RedrawSystemInfo(s16 cx, s16 cy, u32 usage)
 {
     std::ostringstream os;
-    os << "mem. usage: " << GetMemoryUsage() << "Kb" << ", cur. time: ";
+    os << "mem. usage: " << usage / 1024 << "Kb" << ", cur. time: ";
 
     time_t rawtime;
     std::time(&rawtime);

@@ -150,6 +150,10 @@ namespace AGG
 	void FreeWAV(const M82::m82_t m82);
 	void FreeMID(const XMI::xmi_t xmi);
 
+	void ClearAllICN(void);
+	void ClearAllWAV(void);
+	void ClearAllMID(void);
+
 	void ICNRegistryEnable(bool);
 	void ICNRegistryFreeObjects(void);
 

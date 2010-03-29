@@ -128,7 +128,7 @@ Settings::Settings() : major_version(MAJOR_VERSION), minor_version(MINOR_VERSION
     my_color(Color::GRAY), cur_color(Color::GRAY), path_data_directory("data"),
     font_normal("dejavusans.ttf"), font_small("dejavusans.ttf"), size_normal(15), size_small(10),
     sound_volume(6), music_volume(6), animation(6), game_type(0), players_colors(0), preferably_count_players(0),
-    port(DEFAULT_PORT)
+    port(DEFAULT_PORT), memory_limit(0)
 {
     build_version = "version: ";
     String::AddInt(build_version, MAJOR_VERSION);
@@ -432,6 +432,9 @@ void Settings::Parse(const std::string & left, const std::string & right)
 {
     // debug
     if(left == "debug") debug = String::ToInt(right);
+    else
+    //
+    if(left == "memory limit") memory_limit = String::ToInt(right);
     else
     // default depth
     if(left == "default depth") Surface::SetDefaultDepth(String::ToInt(right));
@@ -1117,4 +1120,14 @@ void Settings::BinaryLoad(void)
 	msg.Pop(byte32);
 	opt_battle.SetModes(byte32);
     }
+}
+
+void Settings::SetMemoryLimit(u32 limit)
+{
+    memory_limit = limit;
+}
+
+u32 Settings::MemoryLimit(void) const
+{
+    return memory_limit;
 }

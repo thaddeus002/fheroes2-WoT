@@ -212,6 +212,38 @@ AGG::Cache::~Cache()
     }
 }
 
+void AGG::Cache::ClearAllICN(void)
+{
+    if(icn_cache)
+    {
+	for(u16 ii = 0; ii < ICN::UNKNOWN; ++ii)
+	{
+	    if(icn_cache[ii].sprites) delete [] icn_cache[ii].sprites;
+	    icn_cache[ii].sprites = NULL;
+	    if(icn_cache[ii].reflect) delete [] icn_cache[ii].reflect;
+	    icn_cache[ii].reflect = NULL;
+	}
+    }
+}
+
+void AGG::Cache::ClearAllWAV(void)
+{
+    loop_sounds.clear();
+
+    std::map<M82::m82_t, std::vector<u8> >::iterator it1 = wav_cache.begin();
+    std::map<M82::m82_t, std::vector<u8> >::iterator it2 = wav_cache.end();
+
+    for(; it1 != it2; ++it1) if((*it1).second.size()) (*it1).second.clear();
+}
+
+void AGG::Cache::ClearAllMID(void)
+{
+    std::map<XMI::xmi_t, std::vector<u8> >::iterator it1 = mid_cache.begin();
+    std::map<XMI::xmi_t, std::vector<u8> >::iterator it2 = mid_cache.end();
+
+    for(; it1 != it2; ++it1) if((*it1).second.size()) (*it1).second.clear();
+}
+
 /* get AGG::Cache object */
 AGG::Cache & AGG::Cache::Get(void)
 {
@@ -782,7 +814,7 @@ const Sprite & AGG::Cache::GetICN(const ICN::icn_t icn, u16 index, bool reflect)
     }
 
     // need load?
-    if(0 == v.count || ((reflect && !v.reflect[index].isValid()) || !v.sprites[index].isValid()))
+    if(0 == v.count || ((reflect && (!v.reflect || !v.reflect[index].isValid())) || (!v.sprites || !v.sprites[index].isValid())))
 	LoadICN(icn, index, reflect);
 
     // invalid sprite?

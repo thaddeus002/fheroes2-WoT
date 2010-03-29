@@ -44,9 +44,9 @@ Cursor::themes_t Cursor::Themes(void)
 }
 
 /* set cursor theme */
-bool Cursor::SetThemes(const u16 name)
+bool Cursor::SetThemes(u16 name, bool force)
 {
-    if(theme != name)
+    if(force || theme != name)
     {
 	if(isVisible()) Hide();
 	theme = name;
@@ -72,10 +72,9 @@ bool Cursor::SetThemes(const u16 name)
 		// default Cursor::POINTER
             SetSprite(AGG::GetICN(ICN::ADVMCO, 0));
 		break;
-    }
+	}
 
 	SetOffset(name);
-	
 	return true;
     }
 

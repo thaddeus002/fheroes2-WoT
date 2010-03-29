@@ -139,7 +139,7 @@ public:
 
 
 	themes_t	Themes(void);
-	bool		SetThemes(u16 cursor);
+	bool		SetThemes(u16 cursor, bool force = false);
 	void		Show(void);
 
 private:

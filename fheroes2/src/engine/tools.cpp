@@ -311,7 +311,7 @@ u32 GetMemoryUsage(void)
     ZeroMemory(&ms, sizeof(ms));
     ms.dwLength = sizeof(MEMORYSTATUS);
     GlobalMemoryStatus(&ms);
-    return (ms.dwTotalVirtual - ms.dwAvailVirtual) / 1024;
+    return (ms.dwTotalVirtual - ms.dwAvailVirtual);
 }
 #elif defined __LINUX__
 #include "unistd.h"
@@ -328,7 +328,7 @@ u32 GetMemoryUsage(void)
         fs.close();
     }
 
-    return size * getpagesize() / 1024;
+    return size * getpagesize();
 }
 #else
 u32 GetMemoryUsage(void)

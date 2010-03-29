@@ -77,7 +77,7 @@ namespace Interface
 
     private:
 	Basic();
-	void RedrawSystemInfo(s16, s16);
+	void RedrawSystemInfo(s16, s16, u32);
 
 	u8 redraw;
 

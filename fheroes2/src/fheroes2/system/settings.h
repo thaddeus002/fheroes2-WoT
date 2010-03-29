@@ -122,6 +122,7 @@ public:
     u8 MinorVersion(void) const;
     u16 Debug(void) const;
     u8 Animation(void) const;
+    u32 MemoryLimit(void) const;
 
     const std::string & BuildVersion(void) const;
     const std::string & DataDirectory(void) const;
@@ -220,6 +221,7 @@ public:
     void SetShowStatus(bool);
     void SetNetworkLocalClient(bool);
     void SetNetworkDedicatedServer(bool);
+    void SetMemoryLimit(u32);
 
     void SetSoundVolume(const u8 v);
     void SetMusicVolume(const u8 v);
@@ -323,6 +325,8 @@ private:
     std::string playmus_command;
 
     u16 port;
+    
+    u32 memory_limit;
 };
 
 #endif
