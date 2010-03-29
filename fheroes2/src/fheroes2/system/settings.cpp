@@ -106,6 +106,7 @@ static const settings_t settingsFHeroes2[] =
     { Settings::BATTLE_SHOW_MOUSE_SHADOW,	_("battle: show mouse shadow"),				},
     { Settings::BATTLE_SHOW_MOVE_SHADOW,	_("battle: show move shadow"),				},
     { Settings::BATTLE_OBJECTS_ARCHERS_PENALTY, _("battle: high objects are an obstacle for archers"),  },
+    { Settings::BATTLE_MERGE_ARMIES, 		_("battle: merge armies for hero from castle"),  	},
     { Settings::GAME_SHOW_SYSTEM_INFO,		_("game: show system info"),				},
     { Settings::GAME_AUTOSAVE_ON,		_("game: autosave on"),					},
     { Settings::GAME_USE_FADE,			_("game: use fade"),					},
@@ -1022,6 +1023,11 @@ bool Settings::ExtBattleShowMoveShadow(void) const
 bool Settings::ExtBattleObjectsArchersPenalty(void) const
 {
     return ExtModes(BATTLE_OBJECTS_ARCHERS_PENALTY);
+}
+
+bool Settings::ExtBattleMergeArmies(void) const
+{
+    return ExtModes(BATTLE_MERGE_ARMIES);
 }
 
 bool Settings::ExtRewriteConfirm(void) const

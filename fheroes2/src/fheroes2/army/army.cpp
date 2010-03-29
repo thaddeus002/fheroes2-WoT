@@ -602,6 +602,8 @@ void Army::army_t::DrawMons32Line(s16 cx, s16 cy, u16 width, u8 first, u8 count,
 
 void Army::army_t::ArrangeForBattle(void)
 {
+    if(GetControl() != Game::AI) return;
+
     std::vector<Troop> priority;
     priority.reserve(ARMYMAXTROOPS);
 

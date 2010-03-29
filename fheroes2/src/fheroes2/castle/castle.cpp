@@ -1592,7 +1592,7 @@ void Castle::MergeArmies(void)
 {
     Heroes *hero = GetHeroes();
 
-    if(hero)
+    if(hero && army.isValid() && (GetControl() == Game::AI || Settings::Get().ExtBattleMergeArmies()))
 	hero->GetArmy().JoinStrongestFromArmy(army);
 }
 
