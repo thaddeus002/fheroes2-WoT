@@ -1120,8 +1120,8 @@ void ActionToShrine(Heroes &hero, const u8 obj, const u16 dst_index)
 	Dialog::Message(head, body, Font::BIG, Dialog::OK);
     }
     else
-    // is visited
-    if(hero.isVisited(obj, Visit::GLOBAL))
+    // already know
+    if(hero.HaveSpell(spell()))
     {
 	PlaySoundFailure;
 	body += _("\nUnfortunately, you already have knowledge of this spell, so there is nothing more for them to teach you.");

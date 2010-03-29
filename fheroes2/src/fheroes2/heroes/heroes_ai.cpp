@@ -865,6 +865,7 @@ void AIToShrine(Heroes &hero, const u8 obj, const u16 dst_index)
 
     // check spell book
     if(hero.HasArtifact(Artifact::MAGIC_BOOK) &&
+      !hero.HaveSpell(spell) &&
     // check valid level spell and wisdom skill
       !(3 == spell_level && Skill::Level::NONE == hero.GetLevelSkill(Skill::Secondary::WISDOM)))
     {
@@ -1715,9 +1716,9 @@ bool Heroes::AIValidObject(u16 index, u8 obj)
         case MP2::OBJ_SHRINE1:
 	case MP2::OBJ_SHRINE2:
 	case MP2::OBJ_SHRINE3:
-	    if(! isVisited(tile) &&
-                // check spell book
+	    if( // check spell book
 		HasArtifact(Artifact::MAGIC_BOOK) &&
+		!HaveSpell(Spell::FromInt(tile.GetQuantity1())) &&
                 // check valid level spell and wisdom skill
                 !(3 == Spell::Level(Spell::FromInt(tile.GetQuantity1())) &&
                 Skill::Level::NONE == GetLevelSkill(Skill::Secondary::WISDOM))) return true;
