@@ -702,7 +702,8 @@ bool Game::IO::LoadBIN(QueueMessage & msg)
     else
     {
     	msg.Pop(byte32);
-	conf.opt_game.SetModes(byte32);
+	// skip load interface options
+	//conf.opt_game.SetModes(byte32);
     	msg.Pop(byte32);
 	conf.opt_world.SetModes(byte32);
     	msg.Pop(byte32);
