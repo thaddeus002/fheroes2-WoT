@@ -93,6 +93,7 @@ static const settings_t settingsFHeroes2[] =
     { Settings::GAME_FAST_LOAD_GAME_DIALOG,	_("game: fast load game dialog (L hot key)"),		},
     { Settings::GAME_REMEMBER_LAST_FOCUS,	_("game: remember last focus"),				},
     { Settings::GAME_HIDE_AI_MOVE,		_("game: hide AI move"),				},
+    { Settings::GAME_REMEMBER_LAST_FILENAME,	_("game: remember last filename"),			},
     { Settings::WORLD_SHOW_VISITED_CONTENT,	_("world: show visited content from objects"),		},
     { Settings::WORLD_ABANDONED_MINE_RANDOM,	_("world: abandoned mine random resource"),		},
     { Settings::WORLD_SAVE_MONSTER_BATTLE,	_("world: save count monster after battle"),		},
@@ -1058,6 +1059,11 @@ bool Settings::ExtShowSystemInfo(void) const
 bool Settings::ExtAutoSaveOn(void) const
 {
     return ExtModes(GAME_AUTOSAVE_ON);
+}
+
+bool Settings::ExtRememberLastFilename(void) const
+{
+    return ExtModes(GAME_REMEMBER_LAST_FILENAME);
 }
 
 bool Settings::ExtUseFade(void) const

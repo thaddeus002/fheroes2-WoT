@@ -125,6 +125,7 @@ void Dialog::ExtSettings(void)
     if(conf.ExtRewriteConfirm())
 	states.push_back(Settings::GAME_ALSO_CONFIRM_AUTOSAVE);
     states.push_back(Settings::GAME_REMEMBER_LAST_FOCUS);
+    states.push_back(Settings::GAME_REMEMBER_LAST_FILENAME);
     states.push_back(Settings::GAME_SHOW_SYSTEM_INFO);
     states.push_back(Settings::GAME_EVIL_INTERFACE);
     if(conf.VideoMode().w >= 640 && conf.VideoMode().w >= 480)

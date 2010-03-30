@@ -36,6 +36,8 @@
 #include "settings.h"
 #include "tools.h"
 
+std::string Game::IO::last_name;
+
 bool Game::Save(const std::string &fn)
 {
     DEBUG(DBG_GAME , DBG_INFO, "Game::Save: " << fn);
@@ -61,6 +63,8 @@ bool Game::Save(const std::string &fn)
 #else
     msg.Save(fn.c_str());
 #endif
+
+    Game::IO::last_name = fn;
 
     return true;
 }
@@ -102,7 +106,9 @@ bool Game::Load(const std::string & fn)
     Game::IO msg;
     if(!msg.LoadSAV(fn) || !Game::IO::LoadBIN(msg)) return false;
 
+    Game::IO::last_name = fn;
     Settings::Get().SetLoadedGameVersion(true);
+
     return true;
 }
 

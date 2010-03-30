@@ -137,6 +137,25 @@ bool Dialog::SelectFileSave(std::string & file)
     if(static_cast<size_t>(ii) != lists.size()) lists.resize(ii);
     std::sort(lists.begin(), lists.end());
 
+    // set default
+    if(file.empty())
+    {
+	const Settings & conf = Settings::Get();
+	file = conf.LocalPrefix() + SEPARATOR + "files" + SEPARATOR + "save" + SEPARATOR;
+
+	if(conf.ExtRememberLastFilename() && Game::IO::last_name.size())
+	    file = Game::IO::last_name;
+	else
+	if(conf.PocketPC())
+	{
+    	    std::ostringstream ss;
+	    ss << std::time(0);
+	    file += ss.str() + ".sav";
+	}
+	else
+	    file += "newgame.sav";
+    }
+
     return SelectFileListSimple(_("File to Save:"), lists, file, true);
 }
 
@@ -152,6 +171,9 @@ bool Dialog::SelectFileLoad(std::string & file)
     for(Dir::const_iterator itd = dir.begin(); itd != dir.end(); ++itd, ++ii) if(!lists[ii].ReadSAV(*itd)) --ii;
     if(static_cast<size_t>(ii) != lists.size()) lists.resize(ii);
     std::sort(lists.begin(), lists.end());
+
+    // set default
+    if(file.empty() && Settings::Get().ExtRememberLastFilename() && Game::IO::last_name.size()) file = Game::IO::last_name;
 
     return SelectFileListSimple(_("File to Load:"), lists, file, false);
 }
@@ -192,32 +214,30 @@ bool SelectFileListSimple(const std::string & header, MapsFileInfoList & lists, 
     listbox.SetListContent(lists);
 
     std::string filename;
-    result.clear();
 
-    if(editor)
+    if(result.size())
     {
-	if(pocket)
-	{
-            std::ostringstream ss;
-	    ss << std::time(0);
-	    filename = ss.str();
-	}
-	else
-	    filename.assign("newgame");
+	ResizeToShortName(result, filename);
 
-	listbox.Unselect();
-    }
-    else
-    {
-	if(lists.empty())
-	    buttonOk.SetDisable(true);
+	MapsFileInfoList::iterator it = lists.begin();
+	for(; it != lists.end(); ++it) if((*it).file == result) break;
+
+	if(it != lists.end())
+	    listbox.SetCurrent(std::distance(lists.begin(), it));
 	else
-	    ResizeToShortName(listbox.GetCurrent().file, filename);
+    	    listbox.Unselect();
+
+	result.clear();
     }
+
+    if(!editor && lists.empty())
+    	buttonOk.SetDisable(true);
+
+    if(filename.empty() && listbox.isSelected())
+        ResizeToShortName(listbox.GetCurrent().file, filename);
 
     listbox.Redraw();
     RedrawExtraInfo(rt, header, filename);
-
 
     buttonOk.Draw();
     buttonCancel.Draw();
@@ -234,7 +254,7 @@ bool SelectFileListSimple(const std::string & header, MapsFileInfoList & lists, 
 
         if((buttonOk.isEnable() && le.MouseClickLeft(buttonOk)) || le.KeyPress(KEY_RETURN))
         {
-    	    if(editor && filename.size())
+    	    if(filename.size())
 		result = Settings::Get().LocalPrefix() + SEPARATOR + "files" + SEPARATOR + "save" + SEPARATOR + filename + ".sav";
     	    else
     	    if(listbox.isSelected())

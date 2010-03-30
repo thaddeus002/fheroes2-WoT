@@ -123,6 +123,11 @@ namespace Interface
 	    return *cur;
 	}
 
+	void SetCurrent(size_t pos)
+	{
+	    if(pos < content->size()) cur = content->begin() + pos;
+	}
+
 	void RemoveSelected(void)
 	{
 	    if(content && cur != content->end()) content->erase(cur);

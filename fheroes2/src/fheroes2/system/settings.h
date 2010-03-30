@@ -87,6 +87,7 @@ public:
 	GAME_EVIL_INTERFACE		= 0x10001000,
 	GAME_HIDE_INTERFACE		= 0x10002000,
 	GAME_ALSO_CONFIRM_AUTOSAVE	= 0x10004000,
+	GAME_REMEMBER_LAST_FILENAME	= 0x10008000,
 	POCKETPC_HIDE_CURSOR		= 0x10400000,
 	POCKETPC_LOW_MEMORY		= 0x10800000,
 	POCKETPC_TAP_MODE		= 0x11000000,
@@ -172,6 +173,7 @@ public:
     bool ExtShowVisitedContent(void) const;
     bool ExtFastLoadGameDialog(void) const;
     bool ExtRememberLastFocus(void) const;
+    bool ExtRememberLastFilename(void) const;
     bool ExtAbandonedMineRandom(void) const;
     bool ExtSaveMonsterBattle(void) const;
     bool ExtAllowSetGuardian(void) const;
