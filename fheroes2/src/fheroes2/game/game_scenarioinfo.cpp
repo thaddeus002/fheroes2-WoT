@@ -85,7 +85,7 @@ Game::menu_t Game::ScenarioInfo(void)
     const Point top((display.w() - back.w()) / 2, (display.h() - back.h()) / 2);
     display.Blit(back, top);
 
-    const bool reset_starting_settings = Color::GRAY == conf.MyColor();
+    const bool reset_starting_settings = (Color::GRAY == conf.MyColor() || !FilePresent(conf.MapsFile()));
 
     // set first maps settings
     if(reset_starting_settings)

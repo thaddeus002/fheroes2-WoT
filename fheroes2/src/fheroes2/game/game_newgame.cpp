@@ -113,8 +113,10 @@ Game::menu_t Game::NewGame(void)
     Mixer::Pause();
     AGG::PlayMusic(MUS::MAINMENU);
 
+    Game::IO::last_name.clear();
+
     if(Settings::Get().QVGA()) return PocketPC::NewGame();
-   
+  
     // preload
     AGG::PreloadObject(ICN::HEROES);
     AGG::PreloadObject(ICN::BTNNEWGM);
