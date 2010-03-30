@@ -59,7 +59,7 @@ bool ObjMulti::isPassable(const u16 icn, const u8 index)
 	    if(116 == index || 119 == index || 122 == index) return false;
 	    else
 	    // wagon camp
-	    if((127 < index && index < 130) || 136 == index) return false;
+	    if((123 < index && index < 127) || (127 < index && index < 130) || 136 == index) return false;
 	    else
 	    // well
 	    if(162 == index || 165 == index) return false;
