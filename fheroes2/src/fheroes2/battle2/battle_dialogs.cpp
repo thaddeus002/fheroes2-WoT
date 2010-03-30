@@ -136,7 +136,7 @@ void GetSummaryParams(u8 res1, u8 res2, const std::string & name, u32 exp, ICN::
 	else
 	    msg.append(_("A glorious victory!"));
     	msg.append("\n");
-    	msg.append("For valor in combat, %{name} receives %{exp} experience");
+    	msg.append(_("For valor in combat, %{name} receives %{exp} experience"));
     	String::Replace(msg, "%{name}", name);
     	String::Replace(msg, "%{exp}", exp);
     }
