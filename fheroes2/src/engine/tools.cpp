@@ -110,6 +110,13 @@ bool String::Compare(const std::string &str1, const std::string &str2, bool sens
     return str1 == str2;
 }
 
+void String::Replace(std::string & dst, const char* pred, const char* src)
+{
+    size_t pos = std::string::npos;
+
+    while(std::string::npos != (pos = dst.find(pred))) dst.replace(pos, std::strlen(pred), src);
+}
+
 void String::Replace(std::string & dst, const char* pred, const std::string & src)
 {
     size_t pos = std::string::npos;
