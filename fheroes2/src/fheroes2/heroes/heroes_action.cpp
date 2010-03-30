@@ -108,9 +108,9 @@ u16 DialogCaptureResourceObject(const std::string & hdr, std::string & msg, cons
     const Sprite & sprite = AGG::GetICN(ICN::RESOURCE, Resource::GetIndexSprite2(res));
 
     // sprite resource with x / day test
-    Surface sf(sprite.w(), sprite.h() + 14);
+    Surface sf(sprite.w() + 30, sprite.h() + 14);
     sf.SetColorKey();
-    sf.Blit(sprite);
+    sf.Blit(sprite, 15, 0);
 
     std::string perday = _("%{count} / day");
     payment_t info = ProfitConditions::FromMine(res);
