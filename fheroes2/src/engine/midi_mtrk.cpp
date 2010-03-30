@@ -312,6 +312,18 @@ void MTrk::ImportXmiEVNT(const Chunk & evnt)
 		}
 		break;
 
+		// note off
+		case 0x08:
+		{
+		    events.push_back(new Event(delta, *ptr, 2, ptr + 1));
+		    u32 duration = 0;
+		    const u8 s = MIDI::UnpackDelta(ptr + 3, duration);
+//		    notesoff.push_back(meta_t(*ptr - 0x10, *(ptr + 1), duration));
+		    ptr += 3 + s;
+		    delta = 0;
+		}
+		break;
+
 		// note on
 		case 0x09:
 		{
