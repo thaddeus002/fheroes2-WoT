@@ -150,6 +150,7 @@ void Dialog::ExtSettings(void)
     states.push_back(Settings::BATTLE_SHOW_MOUSE_SHADOW);
     states.push_back(Settings::BATTLE_SHOW_MOVE_SHADOW);
     states.push_back(Settings::BATTLE_OBJECTS_ARCHERS_PENALTY);
+    states.push_back(Settings::BATTLE_MERGE_ARMIES);
     if(conf.PocketPC())
     {
 	states.push_back(Settings::POCKETPC_HIDE_CURSOR);

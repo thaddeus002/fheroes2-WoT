@@ -237,6 +237,7 @@ void Dialog::QuickInfo(const Maps::Tiles & tile)
 
 	case MP2::OBJ_GAZEBO:
 	case MP2::OBJ_FORT:
+	case MP2::OBJ_XANADU:
 	case MP2::OBJ_MERCENARYCAMP:
 	case MP2::OBJ_DOCTORHUT:
 	case MP2::OBJ_STANDINGSTONES:
