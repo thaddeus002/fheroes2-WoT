@@ -58,6 +58,7 @@ public:
 
         splitter.SetSprite(AGG::GetICN(tradpost, 2));
         splitter.SetArea(Rect(pos_rt.x + (pos_rt.w - AGG::GetICN(tradpost, 1).w()) / 2 + 22, pos_rt.y + 132, 188, 10));
+        splitter.Hide();
 	splitter.SetOrientation(Splitter::HORIZONTAL);
 
 	TextBox(_("Please inspect our fine wares. If you feel like offering a trade, click on the items you wish to trade with and for."), Font::BIG, Rect(pos_rt.x, pos_rt.y + 30, pos_rt.w, 100));
