@@ -185,7 +185,7 @@ void Interface::Basic::Redraw(u8 force)
 
 	usage = GetMemoryUsage();
 
-	if(conf.MemoryLimit() < usage)
+	if(conf.MemoryLimit() < usage + (300 * 1024))
 	{
 	    VERBOSE("MemoryLimit: " << "settings: " << conf.MemoryLimit() << ", too small");
 

@@ -271,6 +271,7 @@ void Interface::HeroesIcons::Reset(void)
     it_cur = it_top;
     selected = false;
 
+    splitter.SetSprite(AGG::GetICN(Settings::Get().EvilInterface() ? ICN::SCROLLE : ICN::SCROLL, 4));
     splitter.SetRange(0, heroes.size() > coords.size() ? heroes.size() - coords.size() : 0);
 }
 
@@ -524,6 +525,7 @@ void Interface::CastleIcons::Reset(void)
     it_cur = it_top;
     selected = false;
 
+    splitter.SetSprite(AGG::GetICN(Settings::Get().EvilInterface() ? ICN::SCROLLE : ICN::SCROLL, 4));
     splitter.SetRange(0, castles.size() > coords.size() ? castles.size() - coords.size() : 0);
 }
 

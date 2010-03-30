@@ -52,9 +52,9 @@ public:
     void ReleaseDraw(void);
 
 private:
-    const Sprite *sprite1;
-    const Sprite *sprite2;
-
+    ICN::icn_t icn;
+    u16 index1;
+    u16 index2;
     bool pressed;
     bool disable;
 };

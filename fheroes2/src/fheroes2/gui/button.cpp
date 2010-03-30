@@ -26,36 +26,30 @@
 #include "dialog.h"
 #include "button.h"
 
-Button::Button() : sprite1(NULL), sprite2(NULL), pressed(false), disable(false)
+Button::Button() : icn(ICN::UNKNOWN), index1(0), index2(0), pressed(false), disable(false)
 {
 }
 
-Button::Button(const Point &pt, const ICN::icn_t icn, u16 index1, u16 index2)
-    : sprite1(&AGG::GetICN(icn, index1)), sprite2(&AGG::GetICN(icn, index2)), pressed(false), disable(false)
+Button::Button(const Point &pt, const ICN::icn_t n, u16 i1, u16 i2) : icn(n), index1(i1), index2(i2),
+    pressed(false), disable(false)
 {
     SetPos(pt);
 
-    if(!sprite1 || !sprite2) DEBUG(DBG_ENGINE , DBG_WARN, "Button::Button: sprite is NULL");
+    const Sprite & sprite1 = AGG::GetICN(icn, index1);
 
-    if(sprite1)
-    {
-	w = sprite1->w();
-	h = sprite1->h();
-    }
+    w = sprite1.w();
+    h = sprite1.h();
 }
 
-Button::Button(u16 ox, u16 oy, const ICN::icn_t icn, u16 index1, u16 index2)
-    : sprite1(&AGG::GetICN(icn, index1)), sprite2(&AGG::GetICN(icn, index2)), pressed(false), disable(false)
+Button::Button(u16 ox, u16 oy, const ICN::icn_t n, u16 i1, u16 i2) : icn(n), index1(i1), index2(i2),
+    pressed(false), disable(false)
 {
     SetPos(ox, oy);
 
-    if(!sprite1 || !sprite2) DEBUG(DBG_ENGINE , DBG_WARN, "Button::Button: sprite is NULL");
+    const Sprite & sprite1 = AGG::GetICN(icn, index1);
 
-    if(sprite1)
-    {
-	w = sprite1->w();
-	h = sprite1->h();
-    }
+    w = sprite1.w();
+    h = sprite1.h();
 }
 
 void Button::SetPos(const Point & pt)
@@ -69,18 +63,16 @@ void Button::SetPos(const u16 ox, const u16 oy)
     y = oy;
 }
 
-void Button::SetSprite(const ICN::icn_t icn, const u16 index1, const u16 index2)
+void Button::SetSprite(const ICN::icn_t n, const u16 i1, const u16 i2)
 {
-    sprite1 = &AGG::GetICN(icn, index1);
-    sprite2 = &AGG::GetICN(icn, index2);
+    icn = n;
+    index1 = i1;
+    index2 = i2;
 
-    if(!sprite1 || !sprite2) DEBUG(DBG_ENGINE , DBG_WARN, "Button::SetSprite: sprite is NULL");
+    const Sprite & sprite1 = AGG::GetICN(icn, index1);
 
-    if(sprite1)
-    {
-	w = sprite1->w();
-	h = sprite1->h();
-    }
+    w = sprite1.w();
+    h = sprite1.h();
 }
 
 void Button::Press(void)
@@ -125,7 +117,10 @@ void Button::Draw(void)
     Cursor & cursor = Cursor::Get();
     if(*this & cursor.GetRect() && cursor.isVisible()){ cursor.Hide(); localcursor = true; }
 
-    Display::Get().Blit(pressed ? *sprite2 : *sprite1, x, y);
+    const Sprite & sprite1 = AGG::GetICN(icn, index1);
+    const Sprite & sprite2 = AGG::GetICN(icn, index2);
+
+    Display::Get().Blit(pressed ? sprite2 : sprite1, x, y);
 
     if(localcursor) cursor.Show();
 }
