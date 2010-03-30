@@ -54,6 +54,7 @@ void Battle2::Arena::AITurn(const Stats & b, Actions & a)
     {
 	enemy = GetEnemyMaxQuality(b.GetColor());
 	AIMagicAction(b, a, enemy);
+	attack = true;
     }
     else
     if(b.Modes(SP_BERSERKER))
