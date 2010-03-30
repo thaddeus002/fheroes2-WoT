@@ -48,6 +48,7 @@ void Battle2::Arena::AITurn(const Stats & b, Actions & a)
     board.SetEnemyQuality(b);
 
     const Stats* enemy = NULL;
+    bool attack = false;
 
     if(b.isArchers() && !b.isHandFighting())
     {
@@ -65,12 +66,15 @@ void Battle2::Arena::AITurn(const Stats & b, Actions & a)
 	{
 	    a.AddedMoveAction(b, *move);
 	    enemy = GetEnemyAbroadMaxQuality(*move, 0);
+	    attack = true;
 	}
     }
     else
     if(!b.isArchers() && b.isHandFighting())
     {
 	enemy = GetEnemyAbroadMaxQuality(b.GetPosition(), b.GetColor());
+	AIMagicAction(b, a, enemy);
+	attack = true;
     }
     else
     {
@@ -81,6 +85,7 @@ void Battle2::Arena::AITurn(const Stats & b, Actions & a)
 	std::vector<u16> positions;
 	positions.reserve(30);
 	GetPassableQualityPositions(b, positions);
+	attack = true;
 
 	if(positions.size())
 	{
@@ -91,6 +96,7 @@ void Battle2::Arena::AITurn(const Stats & b, Actions & a)
 		enemy = GetEnemyAbroadMaxQuality(move, b.GetColor());
 		AIMagicAction(b, a, enemy);
 	    	a.AddedMoveAction(b, move);
+		attack = true;
 	    }
 	    else
 	    {
@@ -99,11 +105,11 @@ void Battle2::Arena::AITurn(const Stats & b, Actions & a)
 		if(path.size())
 		{
 		    enemy = GetEnemyAbroadMaxQuality(path.back(), b.GetColor());
-		    if(enemy) AIMagicAction(b, a, enemy);
+		    AIMagicAction(b, a, enemy);
 	    	    a.AddedMoveAction(b, path);
 
 		    // archers move and short attack only
-		    //if(.b.isArchers() && enemy && !Stats::isHandFighting(b, *enemy)) enemy = GetEnemyAbroadMaxQuality(b);
+		    attack = b.isArchers() ? false : true;
 		}
 	    }
 	}
@@ -113,8 +119,7 @@ void Battle2::Arena::AITurn(const Stats & b, Actions & a)
 
     if(enemy)
     {
-	AIMagicAction(b, a, enemy);
-	a.AddedAttackAction(b, *enemy);
+	if(attack) a.AddedAttackAction(b, *enemy);
     }
     else
     if(IS_DEBUG(DBG_BATTLE, DBG_TRACE))
