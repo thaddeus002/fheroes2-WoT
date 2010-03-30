@@ -28,6 +28,7 @@
 #include "mp2.h"
 #include "world.h"
 #include "dialog.h"
+#include "game_focus.h"
 #include "game_interface.h"
 
 bool Interface::NoGUI(void)
@@ -157,6 +158,7 @@ void Interface::Basic::Redraw(u8 force)
 	    Cursor & cursor = Cursor::Get();
 
 	    cursor.Hide();
+	    Mixer::Reset();
 
 	    Rect rect((display.w() - 90) / 2, (display.h() - 30) / 2, 90, 30);
 	    TextBox text("memory limit\nclear cache\nwaiting...", Font::SMALL, rect.w);
@@ -181,6 +183,9 @@ void Interface::Basic::Redraw(u8 force)
 
 	    cursor.SetThemes(cursor.Themes(), true);
 	    cursor.Show();
+
+	    AGG::PlayMusic(MUS::FromGround(world.GetTiles(Game::Focus::Get().Center()).GetGround()));
+	    Game::EnvironmentSoundMixer();
 	}
 
 	usage = GetMemoryUsage();
