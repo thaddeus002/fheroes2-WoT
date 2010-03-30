@@ -1121,6 +1121,10 @@ void Settings::BinaryLoad(void)
 
 	msg.Load(binary.c_str());
 
+	opt_game.ResetModes(MODES_ALL);
+	opt_world.ResetModes(MODES_ALL);
+	opt_battle.ResetModes(MODES_ALL);
+
 	msg.Pop(version);
 
 	msg.Pop(byte32);
