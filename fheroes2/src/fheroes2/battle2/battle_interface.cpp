@@ -1897,7 +1897,7 @@ void Battle2::Interface::RedrawActionAttackPart1(Stats & attacker, Stats & defen
     p_move = attacker.GetCellPosition();
 
     u32 ticket = 0;
-    u8 action0 = attacker.isArchers() ? AS_SHOT0 : AS_ATTK0;
+    u8 action0 = AS_ATTK0;
     u8 action1 = 0;
 
     const Rect & pos1 = attacker.GetCellPosition();
@@ -1933,6 +1933,7 @@ void Battle2::Interface::RedrawActionAttackPart1(Stats & attacker, Stats & defen
 	const float dy = pos1.y - pos2.y;
         const float tan = std::fabs(dy / dx);
 
+	action0 = AS_SHOT0;
 	action1 = (0.6 >= tan ? AS_SHOT2 : (dy > 0 ? AS_SHOT1 : AS_SHOT3));
     }
 
