@@ -88,6 +88,11 @@ ICN::icn_t GetCovr(u16 ground)
     return covrs.empty() ? ICN::UNKNOWN : *Rand::Get(covrs);
 }
 
+u16 GetObstaclePosition(void)
+{
+    return Rand::Get(3, 6) + (11 * Rand::Get(1, 7));
+}
+
 Battle2::Board::Board()
 {
 }
@@ -367,15 +372,15 @@ void Battle2::Board::SetCobjObjects(u16 center)
     if(objs.size() && 2 < Rand::Get(1, 10))
     {
 	// 80% 1 obj
-	u16 dst = Rand::Get(3, 7) * 11 + Rand::Get(1, 7);
+	u16 dst = GetObstaclePosition();
 	SetCobjObject(*Rand::Get(objs), dst);
 
 	// 50% 2 obj
-	while(at(dst).object) dst = Rand::Get(3, 7) * 11 + Rand::Get(1, 7);
+	while(at(dst).object) dst = GetObstaclePosition();
 	if(objs.size() > 1 && 5 < Rand::Get(1, 10)) SetCobjObject(*Rand::Get(objs), dst);
 
 	// 30% 3 obj
-        while(at(dst).object) dst = Rand::Get(3, 7) * 11 + Rand::Get(1, 7);
+        while(at(dst).object) dst = GetObstaclePosition();
 	if(objs.size() > 1 && 7 < Rand::Get(1, 10)) SetCobjObject(*Rand::Get(objs), dst);
     }
 }

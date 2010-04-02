@@ -872,7 +872,7 @@ u32 Battle2::Stats::ApplyDamage(Stats & enemy, u32 dmg)
 
 bool Battle2::Stats::AllowApplySpell(u8 spell, const HeroBase* hero, std::string *msg) const
 {
-    if(!hero || Modes(SP_ANTIMAGIC)) return false;
+    if(Modes(SP_ANTIMAGIC)) return false;
 
     if((Modes(CAP_MIRRORIMAGE) || Modes(CAP_MIRROROWNER)) &&
 	(spell == Spell::ANTIMAGIC || spell == Spell::MIRRORIMAGE)) return false;
@@ -880,8 +880,8 @@ bool Battle2::Stats::AllowApplySpell(u8 spell, const HeroBase* hero, std::string
     // check global
     // if(arena->DisableCastSpell(spell, msg)) return false; // disable - recursion!
 
-    if(Spell::isApplyToFriends(spell) && GetColor() != hero->GetColor()) return false;
-    if(Spell::isApplyToEnemies(spell) && GetColor() == hero->GetColor()) return false;
+    if(hero && Spell::isApplyToFriends(spell) && GetColor() != hero->GetColor()) return false;
+    if(hero && Spell::isApplyToEnemies(spell) && GetColor() == hero->GetColor()) return false;
     if(isMagicDefence(spell, (hero ? hero->GetPower() : 0))) return false;
 
     const HeroBase* myhero = GetCommander();
@@ -941,6 +941,13 @@ bool Battle2::Stats::ApplySpell(u8 spell, const HeroBase* hero, TargetInfo & tar
 	case Monster::BATTLE_DWARF:
 	    if(5 > Rand::Get(1, 16) && (Spell::isDamage(spell) || Spell::isApplyToEnemies(spell)))
 	    {
+		if(arena->interface)
+		{
+		    std::string str(_("The %{name} resist the spell!"));
+		    String::Replace(str, "%{name}", GetName());
+		    arena->interface->SetStatus(str, true);
+		}
+		
 		SetModes(MAGIC_DEFENCED);
 		return false;
 	    }
@@ -1255,6 +1262,7 @@ void Battle2::Stats::SpellModesAction(u8 spell, u8 duration, const HeroBase* her
 
         case Spell::STONE:
 	    SetModes(SP_STONE);
+	    affected.AddMode(SP_STONE, duration);
 	    break;
 
 	case Spell::MIRRORIMAGE:

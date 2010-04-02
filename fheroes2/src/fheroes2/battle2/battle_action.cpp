@@ -141,26 +141,24 @@ void Battle2::Arena::BattleProcess(Stats & attacker, Stats & defender)
     TargetsApplyDamage(attacker, defender, targets);
     if(interface) interface->RedrawActionAttackPart2(attacker, targets);
 
+    const u8 spell = attacker.GetSpellMagic();
+
     // magic attack
-    if(defender.isValid() && attacker.isMagicAttack())
+    if(defender.isValid() && Spell::NONE != spell)
     {
-	const u8 spell = attacker.GetSpellMagic();
-	if(Spell::NONE != spell)
-	{
-	    const std::string name(attacker.GetName());
+	const std::string name(attacker.GetName());
 
-	    GetTargetsForSpells(attacker.GetCommander(), spell, defender.GetPosition(), targets);
-	    if(interface) interface->RedrawActionSpellCastPart1(spell, defender.GetPosition(), name, targets);
+	GetTargetsForSpells(attacker.GetCommander(), spell, defender.GetPosition(), targets);
+	if(interface) interface->RedrawActionSpellCastPart1(spell, defender.GetPosition(), name, targets);
 
-	    TargetsApplySpell(attacker.GetCommander(), spell, targets);
-	    if(interface) interface->RedrawActionSpellCastPart2(spell, targets);
-	    if(interface) interface->RedrawActionMonsterSpellCastStatus(attacker, targets.front());
+	TargetsApplySpell(attacker.GetCommander(), spell, targets);
+	if(interface) interface->RedrawActionSpellCastPart2(spell, targets);
+	if(interface) interface->RedrawActionMonsterSpellCastStatus(attacker, targets.front());
 
 #ifdef WITH_NET
-	    if(Game::REMOTE == army1.GetControl()) FH2RemoteClient::SendBattleSpell(army1.GetColor(), spell, attacker.GetColor(), targets);
-	    if(Game::REMOTE == army2.GetControl()) FH2RemoteClient::SendBattleSpell(army2.GetColor(), spell, attacker.GetColor(), targets);
+	if(Game::REMOTE == army1.GetControl()) FH2RemoteClient::SendBattleSpell(army1.GetColor(), spell, attacker.GetColor(), targets);
+	if(Game::REMOTE == army2.GetControl()) FH2RemoteClient::SendBattleSpell(army2.GetColor(), spell, attacker.GetColor(), targets);
 #endif
-	}
     }
 
     attacker.PostAttackAction(defender);
