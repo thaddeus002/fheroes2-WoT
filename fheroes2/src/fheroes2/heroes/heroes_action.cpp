@@ -2215,9 +2215,11 @@ void ActionToCaptureObject(Heroes &hero, const u8 obj, const u16 dst_index)
 	// check set with spell ?
 	bool readonly = tile.GetQuantity4();
 
-	Dialog::SetGuardian(hero, troop, readonly);
-	tile.SetQuantity3(troop());
-        tile.SetCountMonster(troop.GetCount());
+	if(Dialog::SetGuardian(hero, troop, readonly))
+	{
+	    tile.SetQuantity3(troop());
+    	    tile.SetCountMonster(troop.GetCount());
+	}
     }
 
     DEBUG(DBG_GAME , DBG_INFO, "ActionToCaptureObject: " << hero.GetName() << " captured: " << MP2::StringObject(obj));

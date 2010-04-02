@@ -67,7 +67,7 @@ public:
     const bool & readonly;
 };
 
-void Dialog::SetGuardian(Heroes & hero, Army::Troop & troop, bool readonly)
+bool Dialog::SetGuardian(Heroes & hero, Army::Troop & troop, bool readonly)
 {
     Display & display = Display::Get();
     //const Settings & conf = Settings::Get();
@@ -144,15 +144,17 @@ void Dialog::SetGuardian(Heroes & hero, Army::Troop & troop, bool readonly)
     ButtonGroups btnGroups(area, Dialog::OK);
     btnGroups.Draw();
 
+    const Army::Troop shadow(troop);
+
     cursor.Show();
     display.Flip();
 
     // message loop
-    u16 result = Dialog::ZERO;
+    u16 buttons = Dialog::ZERO;
 
-    while(result == Dialog::ZERO && le.HandleEvents())
+    while(buttons == Dialog::ZERO && le.HandleEvents())
     {
-	result = btnGroups.QueueEventProcessing();
+	buttons = btnGroups.QueueEventProcessing();
 
         if(le.MouseCursor(selectArmy.GetArea()))
 	{
@@ -257,4 +259,6 @@ void Dialog::SetGuardian(Heroes & hero, Army::Troop & troop, bool readonly)
 	    display.Flip();
 	}
     }
+
+    return shadow() != troop() || shadow.GetCount() != troop.GetCount();
 }
