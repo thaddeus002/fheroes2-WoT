@@ -109,7 +109,7 @@ Heroes::Heroes() : army(this), path(*this)
 
 Heroes::Heroes(heroes_t ht, Race::race_t rc) : killer_color(Color::GRAY), experience(0), move_point(0),
     army(this), portrait(ht), race(rc),
-    save_maps_general(MP2::OBJ_ZERO), path(*this), direction(Direction::RIGHT), sprite_index(18)
+    save_maps_general(MP2::OBJ_ZERO), path(*this), direction(Direction::RIGHT), sprite_index(18), patrol_square(0)
 {
     name = _(HeroesName(ht));
 
@@ -443,9 +443,15 @@ void Heroes::LoadFromMP2(u16 map_index, const void *ptr, const Color::color_t cl
     
     // patrol
     ++ptr8;
+    if(*ptr8)
+    {
+	SetModes(PATROL);
+	patrol_center = mp;
+    }
 
     // count square
     ++ptr8;
+    patrol_square = *ptr8;
 
     // end
 
@@ -527,21 +533,6 @@ u8 Heroes::GetPower(void) const
 u8 Heroes::GetPower(std::string* strs) const
 {
     s16 result = power + GetPowerModificator(strs);
-
-    // check storm
-    const Castle* castle = inCastle();
-    if(castle && Race::NECR == castle->GetRace() && castle->isBuild(BUILD_SPEC))
-    {
-	const u8 mod = 2;
-	result += mod;
-
-	if(strs)
-	{
-	    strs->append(Castle::GetStringBuilding(BUILD_SPEC, castle->GetRace()));
-	    StringAppendModifiers(*strs, mod);
-	    strs->append("\n");
-	}
-    }
 
     return result < 0 ? 0 : (result > 255 ? 255 : result);
 }
@@ -667,14 +658,8 @@ s8 Heroes::GetMoraleWithModificators(std::string *strs) const
     modifiers.push_back(std::make_pair(MP2::OBJ_DERELICTSHIP, -1));
     modifiers.push_back(std::make_pair(MP2::OBJ_SHIPWRECK, -1));
 
+    // global modificator
     result += GetResultModifiers(modifiers, *this, strs);
-
-    const Castle* castle = inCastle();
-    // check castle morale modificators
-    if(castle) result += castle->GetMoraleWithModificators(strs);
-
-    // check from army morale
-    result += army.GetMoraleWithModificators(strs);
 
     // result
     if(result < Morale::AWFUL)	return Morale::TREASON;
@@ -717,14 +702,8 @@ s8 Heroes::GetLuckWithModificators(std::string *strs) const
     modifiers.push_back(std::make_pair(MP2::OBJ_IDOL, 1));
     modifiers.push_back(std::make_pair(MP2::OBJ_PYRAMID, -2));
 
+    // global modificator
     result += GetResultModifiers(modifiers, *this, strs);
-
-    const Castle* castle = inCastle();
-    // check castle morale modificators
-    if(castle) result += castle->GetLuckWithModificators(strs);
-
-    // check from army morale
-    result += army.GetLuckWithModificators(strs);
 
     if(result < Luck::AWFUL)	return Luck::CURSED;
     else

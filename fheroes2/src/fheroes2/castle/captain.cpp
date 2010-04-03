@@ -48,33 +48,30 @@ bool Captain::isValid(void) const
 
 u8 Captain::GetAttack(void) const
 {
-    return attack;
+    return attack + GetAttackModificator(NULL);
 }
 
 u8 Captain::GetDefense(void) const
 {
-    return Race::BARB == home.GetRace() && home.isBuild(BUILD_SPEC) ?  defence + 2 : defence;
+    return defence + GetDefenseModificator(NULL);
 }
 
 u8 Captain::GetPower(void) const
 {
-   return Race::NECR == home.GetRace() && home.isBuild(BUILD_SPEC) ? power + 2 : power;
+   return power + GetPowerModificator(NULL);
 }
 
 u8 Captain::GetKnowledge(void) const
 {
-    return knowledge;
+    return knowledge + GetKnowledgeModificator(NULL);
 }
 
 s8 Captain::GetMorale(void) const
 {
     s8 result = Morale::NORMAL;
 
-    // check castle morale modificators
-    result += home.GetMoraleWithModificators();
-
-    // check from army morale modificators
-    result += home.GetArmy().GetMoraleWithModificators();
+    // global modificator
+    result += GetMoraleModificator(false, NULL);
 
     // result
     if(result < Morale::AWFUL)  return Morale::TREASON;
@@ -96,11 +93,8 @@ s8 Captain::GetLuck(void) const
 {
     s8 result = Luck::NORMAL;
 
-    // check castle morale modificators
-    result += home.GetLuckWithModificators();
-
-    // check from army morale modificators
-    result += home.GetArmy().GetLuckWithModificators();
+    // global modificator
+    result += GetLuckModificator(false, NULL);
 
     // result
     if(result < Luck::AWFUL)    return Luck::CURSED;
@@ -181,4 +175,9 @@ u16 Captain::GetIndex(void) const
 void Captain::PreBattleAction(void)
 {
     SetSpellPoints(GetMaxSpellPoints());
+}
+
+const Castle* Captain::inCastle(void) const
+{
+    return &home;
 }

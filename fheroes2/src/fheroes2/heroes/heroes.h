@@ -80,7 +80,8 @@ public:
 	SCOUTER		= 0x0020,
 	STUPID		= 0x0040,
 	JAIL		= 0x0080,
-	ACTION		= 0x0100
+	ACTION		= 0x0100,
+	PATROL		= 0x8000
     };
 
     Heroes();
@@ -265,6 +266,9 @@ private:
 
     Direction::vector_t direction;
     u8			sprite_index;
+
+    Point patrol_center;
+    u8 patrol_square;
 
     std::list<IndexObject> visit_object;
     std::deque<u16> sheduled_visit;

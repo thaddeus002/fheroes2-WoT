@@ -23,6 +23,8 @@
 #include <algorithm>
 #include <utility>
 #include "artifact.h"
+#include "army.h"
+#include "castle.h"
 #include "heroes_base.h"
 
 typedef std::vector< std::pair<Artifact::artifact_t, s8> > ArtifactsModifiers;
@@ -149,7 +151,15 @@ s8 HeroBase::GetAttackModificator(std::string* strs) const
 	modifiers.push_back(std::make_pair(Artifact::ULTIMATE_SWORD, 12));
     }
 
-    return GetResultModifiers(modifiers, *this, strs);
+    s8 result = GetResultModifiers(modifiers, *this, strs);
+
+    // check castle modificator
+    const Castle* castle = inCastle();
+
+    if(castle)
+	result += castle->GetAttackModificator(strs);
+
+    return result;
 }
 
 s8 HeroBase::GetDefenseModificator(std::string* strs) const
@@ -175,7 +185,15 @@ s8 HeroBase::GetDefenseModificator(std::string* strs) const
 	modifiers.push_back(std::make_pair(Artifact::ULTIMATE_CLOAK, 12));
     }
 
-    return GetResultModifiers(modifiers, *this, strs);
+    s8 result = GetResultModifiers(modifiers, *this, strs);
+
+    // check castle modificator
+    const Castle* castle = inCastle();
+
+    if(castle)
+	result += castle->GetDefenseModificator(strs);
+
+    return result;
 }
 
 s8 HeroBase::GetPowerModificator(std::string* strs) const
@@ -203,7 +221,15 @@ s8 HeroBase::GetPowerModificator(std::string* strs) const
 	modifiers.push_back(std::make_pair(Artifact::ULTIMATE_WAND, 12));
     }
 
-    return GetResultModifiers(modifiers, *this, strs);
+    s8 result = GetResultModifiers(modifiers, *this, strs);
+
+    // check castle modificator
+    const Castle* castle = inCastle();
+
+    if(castle)
+	result += castle->GetPowerModificator(strs);
+
+    return result;
 }
 
 s8 HeroBase::GetKnowledgeModificator(std::string* strs) const
@@ -226,7 +252,15 @@ s8 HeroBase::GetKnowledgeModificator(std::string* strs) const
 	modifiers.push_back(std::make_pair(Artifact::ULTIMATE_BOOK, 12));
     }
 
-    return GetResultModifiers(modifiers, *this, strs);
+    s8 result = GetResultModifiers(modifiers, *this, strs);
+
+    // check castle modificator
+    const Castle* castle = inCastle();
+
+    if(castle)
+	result += castle->GetKnowledgeModificator(strs);
+
+    return result;
 }
 
 s8 HeroBase::GetMoraleModificator(bool shipmaster, std::string* strs) const
@@ -243,7 +277,18 @@ s8 HeroBase::GetMoraleModificator(bool shipmaster, std::string* strs) const
     modifiers.push_back(std::make_pair(Artifact::BATTLE_GARB, 10));
     if(shipmaster) modifiers.push_back(std::make_pair(Artifact::MASTHEAD, 1));
 
-    return GetResultModifiers(modifiers, *this, strs);
+    s8 result = GetResultModifiers(modifiers, *this, strs);
+
+    // check castle modificator
+    const Castle* castle = inCastle();
+
+    if(castle)
+	result += castle->GetMoraleModificator(strs);
+
+    // army modificator
+    result += GetArmy().GetMoraleModificator(strs);
+
+    return result;
 }
 
 s8 HeroBase::GetLuckModificator(bool shipmaster, std::string* strs) const
@@ -259,5 +304,16 @@ s8 HeroBase::GetLuckModificator(bool shipmaster, std::string* strs) const
     modifiers.push_back(std::make_pair(Artifact::BATTLE_GARB, 10));
     if(shipmaster) modifiers.push_back(std::make_pair(Artifact::MASTHEAD, 1));
 
-    return GetResultModifiers(modifiers, *this, strs);
+    s8 result = GetResultModifiers(modifiers, *this, strs);
+
+    // check castle modificator
+    const Castle* castle = inCastle();
+
+    if(castle)
+	result += castle->GetLuckModificator(strs);
+
+    // army modificator
+    result += GetArmy().GetLuckModificator(strs);
+
+    return result;
 }

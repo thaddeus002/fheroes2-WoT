@@ -238,23 +238,12 @@ u8 Army::Troop::GetSpeed(void) const
 
 s8 Army::Troop::GetMorale(void) const
 {
-    if(!isAffectedByMorale()) return Morale::NORMAL;
-    else if(army)
-    {
-        return army->commander ? army->commander->GetMorale() : army->GetMorale();
-    }
-    
-    return Morale::NORMAL;
+    return isAffectedByMorale() && army ? army->GetMorale() : Morale::NORMAL;
 }
 
 s8 Army::Troop::GetLuck(void) const
 {
-    if(army)
-    {
-        return army->commander ? army->commander->GetLuck() : army->GetLuck();
-    }
-
-    return Luck::NORMAL;
+    return army ? army->GetLuck() : Luck::NORMAL;
 }
 
 bool Army::Troop::isValid(void) const

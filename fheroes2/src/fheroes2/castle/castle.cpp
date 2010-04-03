@@ -1522,46 +1522,82 @@ void Castle::Dump(void) const
     std::cout << "is castle       : " << (isCastle() ? "yes" : "no") << std::endl;
 }
 
-s8 Castle::GetMoraleWithModificators(std::string *strs) const
+s8 Castle::GetAttackModificator(std::string *strs) const
+{
+    return 0;
+}
+
+s8 Castle::GetDefenseModificator(std::string *strs) const
+{
+    return 0;
+}
+
+s8 Castle::GetPowerModificator(std::string *strs) const
+{
+    s8 result = 0;
+
+    if(Race::NECR == race && isBuild(BUILD_SPEC))
+    {
+	const u8 mod = 2;
+        result += mod;
+        if(strs)
+        {
+            strs->append(GetStringBuilding(BUILD_SPEC, race));
+            StringAppendModifiers(*strs, mod);
+        }
+    }
+
+    return result;
+}
+
+s8 Castle::GetKnowledgeModificator(std::string *strs) const
+{
+    return 0;
+}
+
+s8 Castle::GetMoraleModificator(std::string *strs) const
 {
     s8 result(Morale::NORMAL);
 
     // and tavern
     if(Race::NECR != race && isBuild(BUILD_TAVERN))
     {
-        result += 1;
+	const u8 mod = 1;
+        result += mod;
         if(strs)
     	{
 	    strs->append(GetStringBuilding(BUILD_TAVERN, race));
-	    strs->append(" +1\n");
+            StringAppendModifiers(*strs, mod);
 	}
     }
 
     // and barbarian coliseum
     if(Race::BARB == race && isBuild(BUILD_SPEC))
     {
-        result += 2;
+	const u8 mod = 2;
+        result += mod;
         if(strs)
 	{
 	    strs->append(GetStringBuilding(BUILD_SPEC, race));
-	    strs->append(" +2\n");
+            StringAppendModifiers(*strs, mod);
 	}
     }
 
     return result;
 }
 
-s8 Castle::GetLuckWithModificators(std::string *strs) const
+s8 Castle::GetLuckModificator(std::string *strs) const
 {
     s8 result(Luck::NORMAL);
 
     if(Race::SORC == race && isBuild(BUILD_SPEC))
     {
-        result += 2;
+	const u8 mod = 2;
+        result += mod;
         if(strs)
 	{
 	    strs->append(Castle::GetStringBuilding(BUILD_SPEC, race));
-	    strs->append(" +2\n");
+            StringAppendModifiers(*strs, mod);
 	}
     }
 

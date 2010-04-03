@@ -139,8 +139,12 @@ public:
 
     Dialog::answer_t OpenDialog(bool fade = false);
 
-    s8 GetMoraleWithModificators(std::string *strs = NULL) const;
-    s8 GetLuckWithModificators(std::string *strs = NULL) const;
+    s8 GetAttackModificator(std::string *strs) const;
+    s8 GetDefenseModificator(std::string *strs) const;
+    s8 GetPowerModificator(std::string *strs) const;
+    s8 GetKnowledgeModificator(std::string *strs) const;
+    s8 GetMoraleModificator(std::string *strs) const;
+    s8 GetLuckModificator(std::string *strs) const;
 
     bool AllowBuild(void) const{ return Modes(ALLOWBUILD); }
     bool AllowBuyBuilding(u32) const;

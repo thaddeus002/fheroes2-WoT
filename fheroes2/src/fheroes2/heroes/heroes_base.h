@@ -57,6 +57,8 @@ public:
     virtual bool CanBattleRetreat(void) const = 0;
     virtual void PreBattleAction(void) = 0;
 
+    virtual const Castle* inCastle(void) const = 0;
+
     s8 GetAttackModificator(std::string* = NULL) const;
     s8 GetDefenseModificator(std::string* = NULL) const;
     s8 GetPowerModificator(std::string* = NULL) const;

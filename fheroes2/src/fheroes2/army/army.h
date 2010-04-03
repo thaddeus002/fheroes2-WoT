@@ -117,8 +117,8 @@ namespace Army
 	    u32		GetCountMonsters(const Monster::monster_t) const;
 	    s8		GetMorale(void) const;
 	    s8		GetLuck(void) const;
-	    s8		GetMoraleWithModificators(std::string *strs = NULL) const;
-	    s8		GetLuckWithModificators(std::string *strs = NULL) const;
+	    s8		GetMoraleModificator(std::string *strs) const;
+	    s8		GetLuckModificator(std::string *strs) const;
 	    u32		CalculateExperience(void) const;
 	    u32		ActionToSirens(void);
 	    u32		GetSurrenderCost(void) const;

@@ -72,6 +72,8 @@ void RunTest3(void)
     world.LoadMaps("/opt/projects/fh2/maps/beltway.mp2");
 
     Heroes & hero1 = *world.GetHeroes(Heroes::SANDYSANDY);
+    Heroes & hero2 = *world.GetHeroes(Heroes::BAX);
+
     Kingdom & kingdom1 = world.GetKingdom(Color::RED);
     Kingdom & kingdom2 = world.GetKingdom(Color::YELLOW);
 
@@ -80,17 +82,21 @@ void RunTest3(void)
     hero1.SetSpellPoints(150);
 
     kingdom1.SetControl(Game::LOCAL);
-    kingdom2.SetControl(Game::AI);
+    kingdom2.SetControl(Game::LOCAL);
 
     if(kingdom1.GetCastles().size())
     hero1.Recruit(kingdom1.GetColor(), Point(20, 20));
-    //hero1.Recruit(*kingdom1.GetCastles().at(0));
+    hero2.Recruit(kingdom2.GetColor(), Point(20, 21));
 
     Army::army_t & army1 = hero1.GetArmy();
 
     Castle* castle = kingdom2.GetCastles().at(0);
     castle->BuyBuilding(BUILD_CAPTAIN);
+    castle->ActionNewDay();
+    castle->BuyBuilding(BUILD_MAGEGUILD1);
+
     //Army::army_t army2;
+    //Army::army_t & army2 = hero2.GetArmy();
     Army::army_t & army2 = castle->GetArmy();
 
     army1.Clear();
@@ -104,15 +110,16 @@ void RunTest3(void)
     //army1.JoinTroop(Monster::Rand(Monster::LEVEL3), 10);
 
     army2.Clear();
-    army2.At(0) = Army::Troop(Monster::HYDRA, 10);
+    army2.At(0) = Army::Troop(Monster::OGRE, 1);
+    army2.At(4) = Army::Troop(Monster::DWARF, 2);
 //    army2.JoinTroop(static_cast<Monster::monster_t>(1), 10);
 //    army2.JoinTroop(static_cast<Monster::monster_t>(4), 10);
 //    army2.JoinTroop(static_cast<Monster::monster_t>(6), 10);
 //    army2.JoinTroop(static_cast<Monster::monster_t>(8), 10);
 
-    kingdom2.Dump();
+//    kingdom2.Dump();
     
-    Battle2::Loader(army1, army2, 34); //castle->GetIndex());
+    Battle2::Loader(army1, army2, castle->GetIndex());
 }
 
 #endif

@@ -415,21 +415,21 @@ Race::race_t Army::army_t::GetRace(void) const
 
 s8 Army::army_t::GetLuck(void) const
 {
-    return GetLuckWithModificators();
+    return commander ? commander->GetLuck() : GetLuckModificator(NULL);
 }
 
-s8 Army::army_t::GetLuckWithModificators(std::string *strs) const
+s8 Army::army_t::GetLuckModificator(std::string *strs) const
 {
     return Luck::NORMAL;
 }
 
 s8 Army::army_t::GetMorale(void) const
 {
-    return GetMoraleWithModificators();
+    return commander ? commander->GetMorale() : GetMoraleModificator(NULL);
 }
 
 // TODO:: need optimize
-s8 Army::army_t::GetMoraleWithModificators(std::string *strs) const
+s8 Army::army_t::GetMoraleModificator(std::string *strs) const
 {
     s8 result(Morale::NORMAL);
 

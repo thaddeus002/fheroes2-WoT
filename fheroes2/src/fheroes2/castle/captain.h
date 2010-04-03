@@ -47,6 +47,8 @@ class Captain : public HeroBase
     u8 GetControl(void) const;
     u16 GetIndex(void) const;
 
+    const Castle* inCastle(void) const;
+
     u8 GetLevelSkill(const Skill::Secondary::skill_t) const;
     u8 GetSecondaryValues(const Skill::Secondary::skill_t skill) const;
 
