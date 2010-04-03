@@ -450,19 +450,6 @@ bool Heroes::MoveStep(bool fast)
 	// check protection tile
 	ActionNewPosition();
 
-	// AI: force scan resource around
-	if(GetControl() == Game::AI)
-	{
-	    const u16 dst = Maps::ScanAroundObject(index_to, MP2::OBJ_RESOURCE);
-	    for(Direction::vector_t dir = Direction::TOP_LEFT; dir < Direction::CENTER; ++dir) if(dst & dir)
-	    {
-                if(CanMove())
-            	    Action(Maps::GetDirectionIndex(index_to, dir));
-            	else
-            	    break;
-            }
-	}
-
 	// possible hero is die
 	if(!isFreeman())
 	{
@@ -471,6 +458,19 @@ bool Heroes::MoveStep(bool fast)
 		path.Reset();
 		Action(index_to);
 		SetMove(false);
+	    }
+
+	    // AI: force scan resource around
+	    if(GetControl() == Game::AI)
+	    {
+		const u16 dst = Maps::ScanAroundObject(index_to, MP2::OBJ_RESOURCE);
+		for(Direction::vector_t dir = Direction::TOP_LEFT; dir < Direction::CENTER; ++dir) if(dst & dir)
+		{
+            	    if(CanMove())
+            		Action(Maps::GetDirectionIndex(index_to, dir));
+            	    else
+            		break;
+        	}
 	    }
 	}
 
