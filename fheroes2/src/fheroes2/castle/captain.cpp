@@ -36,11 +36,8 @@ void Captain::LoadDefaults(void)
     {
 	u8 book, spell;
 	Skill::Primary::LoadDefaults(home.GetRace(), *this, book, spell);
-	if(home.GetLevelMageGuild())
-	{
-	    SpellBookActivate();
-	    home.GetMageGuild().EducateHero(*this);
-	}
+	SpellBookActivate();
+	if(home.GetLevelMageGuild()) home.GetMageGuild().EducateHero(*this);
     }
 }
 
