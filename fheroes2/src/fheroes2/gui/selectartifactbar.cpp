@@ -176,13 +176,14 @@ void SelectArtifactsBar::Redraw(Surface & display)
     {
 	const Artifact & art = arts[ii + MAXARTIFACTLINE];
 
-	if(art == Artifact::UNKNOWN)
-	    display.Blit(*background, pt);
-	else
-	if(flags & FLAGS_USEART32)
-    	    display.Blit(AGG::GetICN(ICN::ARTFX, art.GetIndexSprite32()), pt.x + 1, pt.y + 1);
-	else
-    	    display.Blit(AGG::GetICN(ICN::ARTIFACT, art.GetIndexSprite64()), pt);
+	display.Blit(*background, pt);
+	if(art != Artifact::UNKNOWN)
+	{
+	    if(flags & FLAGS_USEART32)
+    		display.Blit(AGG::GetICN(ICN::ARTFX, art.GetIndexSprite32()), pt.x + 1, pt.y + 1);
+	    else
+    		display.Blit(AGG::GetICN(ICN::ARTIFACT, art.GetIndexSprite64()), pt);
+	}
 
 	pt.x += background->w() + interval;
     }
