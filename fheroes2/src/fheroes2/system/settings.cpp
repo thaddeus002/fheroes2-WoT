@@ -233,6 +233,8 @@ bool Settings::Read(const std::string & filename)
     debug |= (DBG_ENGINE | DBG_GAME | DBG_BATTLE | DBG_AI | DBG_NETWORK);
 #endif
 
+    BinaryLoad();
+
     if(QVGA())
     {
 	opt_global.SetModes(GLOBAL_POCKETPC);
