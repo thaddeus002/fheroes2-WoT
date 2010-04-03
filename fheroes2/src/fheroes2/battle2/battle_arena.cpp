@@ -950,7 +950,9 @@ void Battle2::Arena::Turns(u16 turn, Result & result)
 	    actions.pop_front();
 
 	    // good morale
-	    if(check_morale && !current_troop->Modes(TR_SKIPMOVE) && current_troop->Modes(TR_MOVED) && current_troop->Modes(MORALE_GOOD) && army1.isValid() && army2.isValid())
+	    if(check_morale && !current_troop->Modes(TR_SKIPMOVE) &&
+		current_troop->Modes(TR_MOVED) && current_troop->Modes(MORALE_GOOD) && army1.isValid() && army2.isValid() &&
+		0 == result.army1 && 0 == result.army2)
 		actions.AddedMoraleAction(*current_troop, true);
 	}
 
