@@ -1516,8 +1516,14 @@ void World::UpdateDwellingPopulation(void)
     for(; it1 != it2; ++it1)
     {
 	Maps::Tiles & tile = **it1;
-	const MP2::object_t & obj = tile.GetObject();
+	MP2::object_t obj = tile.GetObject();
 	float count = 0;
+
+	if(obj == MP2::OBJ_HEROES)
+	{
+	    const Heroes* hero = world.GetHeroes(tile.GetIndex());
+	    if(hero) obj = hero->GetUnderObject();
+	}
 
 	switch(obj)
 	{
