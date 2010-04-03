@@ -284,8 +284,9 @@ void Battle2::Arena::ApplyActionAttack(Action & action)
 	    b1->GetName() << "(color: " << Color::String(b1->GetColor()) << ", pos: " << b1->position << ") to " << \
 	    b2->GetName() << "(color: " << Color::String(b2->GetColor()) << ", pos: " << b2->position << ")");
 
+	const bool handfighting = Stats::isHandFighting(*b1, *b2);
 	// check position
-	if(b1->isArchers() || Stats::isHandFighting(*b1, *b2))
+	if(b1->isArchers() || handfighting)
 	{
 	    b1->UpdateDirection(*b2);
 	    b2->UpdateDirection(*b1);
@@ -296,8 +297,7 @@ void Battle2::Arena::ApplyActionAttack(Action & action)
 	    if(b2->isValid())
 	    {
 		// defence answer
-		if(Stats::isHandFighting(*b1, *b2) &&
-		!b1->isHideAttack() && b2->AllowResponse())
+		if(handfighting && !b1->isHideAttack() && b2->AllowResponse())
 		{
 		    BattleProcess(*b2, *b1);
 		    b2->SetResponse();

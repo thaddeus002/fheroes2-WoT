@@ -631,11 +631,6 @@ void Battle2::Stats::NewTurn(void)
     SetLuck(troop.GetLuck());
 }
 
-u8 Battle2::Stats::GetColor(void) const
-{
-    return (Modes(SP_BERSERKER) ? 0 : Modes(SP_HYPNOTIZE) ? arena->GetOppositeColor(troop.GetColor()) : troop.GetColor());
-}
-
 u8 Battle2::Stats::GetSpeed(bool skip_standing_check) const
 {
     if(!skip_standing_check && (!count || Modes(TR_MOVED | SP_BLIND | IS_PARALYZE_MAGIC))) return Speed::STANDING;
@@ -2051,24 +2046,29 @@ s8 Battle2::Stats::GetStartMissileOffset(u8 state) const
     return 0;
 }
 
+u8 Battle2::Stats::GetColor(void) const
+{
+    return (Modes(SP_BERSERKER) ? 0 : Modes(SP_HYPNOTIZE) ? arena->GetOppositeColor(troop.GetColor()) : troop.GetColor());
+}
+
 const Army::army_t* Battle2::Stats::GetArmy(void) const
 {
-    return troop.GetArmy();
+    return arena ? arena->GetArmy(GetColor()) : NULL;
 }
 
 Army::army_t* Battle2::Stats::GetArmy(void)
 {
-    return troop.GetArmy();
+    return arena ? arena->GetArmy(GetColor()) : NULL;
 }
 
 const HeroBase* Battle2::Stats::GetCommander(void) const
 {
-    return troop.GetArmy() ? troop.GetArmy()->GetCommander() : NULL;
+    return GetArmy() ? GetArmy()->GetCommander() : NULL;
 }
 
 HeroBase* Battle2::Stats::GetCommander(void)
 {
-    return troop.GetArmy() ? troop.GetArmy()->GetCommander() : NULL;
+    return GetArmy() ? GetArmy()->GetCommander() : NULL;
 }
 
 u16 Battle2::Stats::AIGetAttackPosition(const std::vector<u16> & positions) const
