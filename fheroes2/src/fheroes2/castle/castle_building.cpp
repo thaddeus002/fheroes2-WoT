@@ -536,13 +536,6 @@ void CastleRedrawBuilding(const Castle & castle, const Point & dst_pt, u32 build
 	case DWELLING_MONSTER5:
 	case DWELLING_MONSTER6: build = castle.GetActualDwelling(build); break;
 
-        case BUILD_MAGEGUILD1:  if(castle.isBuild(BUILD_MAGEGUILD5)) build = BUILD_MAGEGUILD5;
-        			else
-        			if(castle.isBuild(BUILD_MAGEGUILD4)) build = BUILD_MAGEGUILD4;
-        			else
-        			if(castle.isBuild(BUILD_MAGEGUILD3)) build = BUILD_MAGEGUILD3;
-        			else
-        			if(castle.isBuild(BUILD_MAGEGUILD2)) build = BUILD_MAGEGUILD2; break;
 	default: break;
     }
 

@@ -42,6 +42,170 @@
 #include "selectarmybar.h"
 #include "pocketpc.h"
 
+void PackOrdersBuilding(const Castle & castle, std::vector<building_t> & orders_building)
+{
+    switch(castle.GetRace())
+    {
+	case Race::KNGT:
+	    orders_building.push_back(BUILD_CASTLE);
+	    orders_building.push_back(BUILD_WEL2);
+	    orders_building.push_back(BUILD_CAPTAIN);
+	    orders_building.push_back(BUILD_LEFTTURRET);
+	    orders_building.push_back(BUILD_RIGHTTURRET);
+	    orders_building.push_back(BUILD_MOAT);
+	    orders_building.push_back(BUILD_MARKETPLACE);
+	    orders_building.push_back(DWELLING_MONSTER2);
+	    orders_building.push_back(BUILD_THIEVESGUILD);
+	    orders_building.push_back(BUILD_TAVERN);
+	    orders_building.push_back(BUILD_MAGEGUILD1);
+	    orders_building.push_back(BUILD_MAGEGUILD2);
+	    orders_building.push_back(BUILD_MAGEGUILD3);
+	    orders_building.push_back(BUILD_MAGEGUILD4);
+	    orders_building.push_back(BUILD_MAGEGUILD5);
+	    orders_building.push_back(DWELLING_MONSTER5);
+	    orders_building.push_back(DWELLING_MONSTER6);
+	    orders_building.push_back(DWELLING_MONSTER1);
+	    orders_building.push_back(DWELLING_MONSTER3);
+	    orders_building.push_back(DWELLING_MONSTER4);
+	    orders_building.push_back(BUILD_WELL);
+	    orders_building.push_back(BUILD_STATUE);
+	    orders_building.push_back(BUILD_SHIPYARD);
+	    break;
+	case Race::BARB:
+	    orders_building.push_back(BUILD_SPEC);
+	    orders_building.push_back(BUILD_WEL2);
+	    orders_building.push_back(DWELLING_MONSTER6);
+	    orders_building.push_back(BUILD_MAGEGUILD1);
+	    orders_building.push_back(BUILD_MAGEGUILD2);
+	    orders_building.push_back(BUILD_MAGEGUILD3);
+	    orders_building.push_back(BUILD_MAGEGUILD4);
+	    orders_building.push_back(BUILD_MAGEGUILD5);
+	    orders_building.push_back(BUILD_CAPTAIN);
+	    orders_building.push_back(BUILD_CASTLE);
+	    orders_building.push_back(BUILD_LEFTTURRET);
+	    orders_building.push_back(BUILD_RIGHTTURRET);
+	    orders_building.push_back(BUILD_MOAT);
+	    orders_building.push_back(DWELLING_MONSTER3);
+	    orders_building.push_back(BUILD_THIEVESGUILD);
+	    orders_building.push_back(BUILD_TAVERN);
+	    orders_building.push_back(DWELLING_MONSTER1);
+	    orders_building.push_back(BUILD_MARKETPLACE);
+	    orders_building.push_back(DWELLING_MONSTER2);
+	    orders_building.push_back(DWELLING_MONSTER4);
+	    orders_building.push_back(DWELLING_MONSTER5);
+	    orders_building.push_back(BUILD_WELL);
+	    orders_building.push_back(BUILD_STATUE);
+	    orders_building.push_back(BUILD_SHIPYARD);
+	    break;
+	case Race::SORC:
+	    orders_building.push_back(BUILD_SPEC);
+	    orders_building.push_back(DWELLING_MONSTER6);
+	    orders_building.push_back(BUILD_MAGEGUILD1);
+	    orders_building.push_back(BUILD_MAGEGUILD2);
+	    orders_building.push_back(BUILD_MAGEGUILD3);
+	    orders_building.push_back(BUILD_MAGEGUILD4);
+	    orders_building.push_back(BUILD_MAGEGUILD5);
+	    orders_building.push_back(BUILD_CAPTAIN);
+	    orders_building.push_back(BUILD_CASTLE);
+	    orders_building.push_back(BUILD_LEFTTURRET);
+	    orders_building.push_back(BUILD_RIGHTTURRET);
+	    orders_building.push_back(BUILD_MOAT);
+	    orders_building.push_back(DWELLING_MONSTER3);
+	    orders_building.push_back(BUILD_SHIPYARD);
+	    orders_building.push_back(BUILD_MARKETPLACE);
+	    orders_building.push_back(DWELLING_MONSTER2);
+	    orders_building.push_back(BUILD_THIEVESGUILD);
+	    orders_building.push_back(DWELLING_MONSTER1);
+	    orders_building.push_back(BUILD_TAVERN);
+	    orders_building.push_back(BUILD_STATUE);
+	    orders_building.push_back(BUILD_WEL2);
+	    orders_building.push_back(DWELLING_MONSTER4);
+	    orders_building.push_back(BUILD_WELL);
+	    orders_building.push_back(DWELLING_MONSTER5);
+	    break;
+	case Race::WRLK:
+	    orders_building.push_back(DWELLING_MONSTER5);
+	    orders_building.push_back(DWELLING_MONSTER3);
+	    orders_building.push_back(BUILD_CASTLE);
+	    orders_building.push_back(BUILD_LEFTTURRET);
+	    orders_building.push_back(BUILD_RIGHTTURRET);
+	    orders_building.push_back(BUILD_CAPTAIN);
+	    orders_building.push_back(BUILD_MOAT);
+	    orders_building.push_back(BUILD_SHIPYARD);
+	    orders_building.push_back(BUILD_MAGEGUILD1);
+	    orders_building.push_back(BUILD_MAGEGUILD2);
+	    orders_building.push_back(BUILD_MAGEGUILD3);
+	    orders_building.push_back(BUILD_MAGEGUILD4);
+	    orders_building.push_back(BUILD_MAGEGUILD5);
+	    orders_building.push_back(BUILD_TAVERN);
+	    orders_building.push_back(BUILD_THIEVESGUILD);
+	    orders_building.push_back(BUILD_MARKETPLACE);
+	    orders_building.push_back(BUILD_STATUE);
+	    orders_building.push_back(DWELLING_MONSTER1);
+	    orders_building.push_back(BUILD_WEL2);
+	    orders_building.push_back(BUILD_SPEC);
+	    orders_building.push_back(DWELLING_MONSTER4);
+	    orders_building.push_back(DWELLING_MONSTER2);
+	    orders_building.push_back(DWELLING_MONSTER6);
+	    orders_building.push_back(BUILD_WELL);
+	    break;
+	case Race::WZRD:
+	    orders_building.push_back(DWELLING_MONSTER6);
+	    orders_building.push_back(BUILD_CASTLE);
+	    orders_building.push_back(BUILD_LEFTTURRET);
+	    orders_building.push_back(BUILD_RIGHTTURRET);
+	    orders_building.push_back(BUILD_MOAT);
+	    orders_building.push_back(BUILD_CAPTAIN);
+	    orders_building.push_back(DWELLING_MONSTER2);
+	    orders_building.push_back(BUILD_THIEVESGUILD);
+	    orders_building.push_back(BUILD_TAVERN);
+	    orders_building.push_back(BUILD_SHIPYARD);
+	    orders_building.push_back(BUILD_WELL);
+	    orders_building.push_back(BUILD_SPEC);
+	    orders_building.push_back(DWELLING_MONSTER3);
+	    orders_building.push_back(DWELLING_MONSTER5);
+	    orders_building.push_back(BUILD_MAGEGUILD1);
+	    orders_building.push_back(BUILD_MAGEGUILD2);
+	    orders_building.push_back(BUILD_MAGEGUILD3);
+	    orders_building.push_back(BUILD_MAGEGUILD4);
+	    orders_building.push_back(BUILD_MAGEGUILD5);
+	    orders_building.push_back(BUILD_STATUE);
+	    orders_building.push_back(DWELLING_MONSTER1);
+	    orders_building.push_back(DWELLING_MONSTER4);
+	    orders_building.push_back(BUILD_MARKETPLACE);
+	    orders_building.push_back(BUILD_WEL2);
+	    break;
+	case Race::NECR:
+	    orders_building.push_back(BUILD_SPEC);
+	    if(Settings::Get().PriceLoyaltyVersion()) orders_building.push_back(BUILD_TAVERN); // shrine
+	    orders_building.push_back(BUILD_CASTLE);
+	    orders_building.push_back(BUILD_CAPTAIN);
+	    orders_building.push_back(BUILD_LEFTTURRET);
+	    orders_building.push_back(BUILD_RIGHTTURRET);
+	    orders_building.push_back(DWELLING_MONSTER6);
+	    orders_building.push_back(BUILD_MOAT);
+	    orders_building.push_back(DWELLING_MONSTER1);
+	    orders_building.push_back(BUILD_SHIPYARD);
+	    orders_building.push_back(BUILD_THIEVESGUILD);
+	    orders_building.push_back(BUILD_TAVERN);
+	    orders_building.push_back(DWELLING_MONSTER3);
+	    orders_building.push_back(DWELLING_MONSTER5);
+	    orders_building.push_back(DWELLING_MONSTER2);
+	    orders_building.push_back(DWELLING_MONSTER4);
+	    orders_building.push_back(BUILD_MAGEGUILD1);
+	    orders_building.push_back(BUILD_MAGEGUILD2);
+	    orders_building.push_back(BUILD_MAGEGUILD3);
+	    orders_building.push_back(BUILD_MAGEGUILD4);
+	    orders_building.push_back(BUILD_MAGEGUILD5);
+	    orders_building.push_back(BUILD_WEL2);
+	    orders_building.push_back(BUILD_MARKETPLACE);
+	    orders_building.push_back(BUILD_STATUE);
+	    orders_building.push_back(BUILD_WELL);
+	    break;
+	default: break;
+    }
+}
+
 Dialog::answer_t Castle::OpenDialog(bool fade)
 {
     if(Settings::Get().QVGA()) return PocketPC::CastleOpenDialog(*this);
@@ -178,144 +342,9 @@ Dialog::answer_t Castle::OpenDialog(bool fade)
 
     // orders draw building
     std::vector<building_t> orders_building;
-    orders_building.reserve(32);
+    orders_building.reserve(25);
 
-    switch(race)
-    {
-	case Race::KNGT:
-	    orders_building.push_back(BUILD_CASTLE);
-	    orders_building.push_back(BUILD_WEL2);
-	    orders_building.push_back(BUILD_CAPTAIN);
-	    orders_building.push_back(BUILD_LEFTTURRET);
-	    orders_building.push_back(BUILD_RIGHTTURRET);
-	    orders_building.push_back(BUILD_MOAT);
-	    orders_building.push_back(BUILD_MARKETPLACE);
-	    orders_building.push_back(DWELLING_MONSTER2);
-	    orders_building.push_back(BUILD_THIEVESGUILD);
-	    orders_building.push_back(BUILD_TAVERN);
-	    orders_building.push_back(BUILD_MAGEGUILD1);
-	    orders_building.push_back(DWELLING_MONSTER5);
-	    orders_building.push_back(DWELLING_MONSTER6);
-	    orders_building.push_back(DWELLING_MONSTER1);
-	    orders_building.push_back(DWELLING_MONSTER3);
-	    orders_building.push_back(DWELLING_MONSTER4);
-	    orders_building.push_back(BUILD_WELL);
-	    orders_building.push_back(BUILD_STATUE);
-	    orders_building.push_back(BUILD_SHIPYARD);
-	    break;
-	case Race::BARB:
-	    orders_building.push_back(BUILD_SPEC);
-	    orders_building.push_back(BUILD_WEL2);
-	    orders_building.push_back(DWELLING_MONSTER6);
-	    orders_building.push_back(BUILD_MAGEGUILD1);
-	    orders_building.push_back(BUILD_CAPTAIN);
-	    orders_building.push_back(BUILD_CASTLE);
-	    orders_building.push_back(BUILD_LEFTTURRET);
-	    orders_building.push_back(BUILD_RIGHTTURRET);
-	    orders_building.push_back(BUILD_MOAT);
-	    orders_building.push_back(DWELLING_MONSTER3);
-	    orders_building.push_back(BUILD_THIEVESGUILD);
-	    orders_building.push_back(BUILD_TAVERN);
-	    orders_building.push_back(DWELLING_MONSTER1);
-	    orders_building.push_back(BUILD_MARKETPLACE);
-	    orders_building.push_back(DWELLING_MONSTER2);
-	    orders_building.push_back(DWELLING_MONSTER4);
-	    orders_building.push_back(DWELLING_MONSTER5);
-	    orders_building.push_back(BUILD_WELL);
-	    orders_building.push_back(BUILD_STATUE);
-	    orders_building.push_back(BUILD_SHIPYARD);
-	    break;
-	case Race::SORC:
-	    orders_building.push_back(BUILD_SPEC);
-	    orders_building.push_back(DWELLING_MONSTER6);
-	    orders_building.push_back(BUILD_MAGEGUILD1);
-	    orders_building.push_back(BUILD_CAPTAIN);
-	    orders_building.push_back(BUILD_CASTLE);
-	    orders_building.push_back(BUILD_LEFTTURRET);
-	    orders_building.push_back(BUILD_RIGHTTURRET);
-	    orders_building.push_back(BUILD_MOAT);
-	    orders_building.push_back(DWELLING_MONSTER3);
-	    orders_building.push_back(BUILD_SHIPYARD);
-	    orders_building.push_back(BUILD_MARKETPLACE);
-	    orders_building.push_back(DWELLING_MONSTER2);
-	    orders_building.push_back(BUILD_THIEVESGUILD);
-	    orders_building.push_back(DWELLING_MONSTER1);
-	    orders_building.push_back(BUILD_TAVERN);
-	    orders_building.push_back(BUILD_STATUE);
-	    orders_building.push_back(BUILD_WEL2);
-	    orders_building.push_back(DWELLING_MONSTER4);
-	    orders_building.push_back(BUILD_WELL);
-	    orders_building.push_back(DWELLING_MONSTER5);
-	    break;
-	case Race::WRLK:
-	    orders_building.push_back(DWELLING_MONSTER5);
-	    orders_building.push_back(DWELLING_MONSTER3);
-	    orders_building.push_back(BUILD_CASTLE);
-	    orders_building.push_back(BUILD_LEFTTURRET);
-	    orders_building.push_back(BUILD_RIGHTTURRET);
-	    orders_building.push_back(BUILD_CAPTAIN);
-	    orders_building.push_back(BUILD_MOAT);
-	    orders_building.push_back(BUILD_SHIPYARD);
-	    orders_building.push_back(BUILD_MAGEGUILD1);
-	    orders_building.push_back(BUILD_TAVERN);
-	    orders_building.push_back(BUILD_THIEVESGUILD);
-	    orders_building.push_back(BUILD_MARKETPLACE);
-	    orders_building.push_back(BUILD_STATUE);
-	    orders_building.push_back(DWELLING_MONSTER1);
-	    orders_building.push_back(BUILD_WEL2);
-	    orders_building.push_back(BUILD_SPEC);
-	    orders_building.push_back(DWELLING_MONSTER4);
-	    orders_building.push_back(DWELLING_MONSTER2);
-	    orders_building.push_back(DWELLING_MONSTER6);
-	    orders_building.push_back(BUILD_WELL);
-	    break;
-	case Race::WZRD:
-	    orders_building.push_back(DWELLING_MONSTER6);
-	    orders_building.push_back(BUILD_CASTLE);
-	    orders_building.push_back(BUILD_LEFTTURRET);
-	    orders_building.push_back(BUILD_RIGHTTURRET);
-	    orders_building.push_back(BUILD_MOAT);
-	    orders_building.push_back(BUILD_CAPTAIN);
-	    orders_building.push_back(DWELLING_MONSTER2);
-	    orders_building.push_back(BUILD_THIEVESGUILD);
-	    orders_building.push_back(BUILD_TAVERN);
-	    orders_building.push_back(BUILD_SHIPYARD);
-	    orders_building.push_back(BUILD_WELL);
-	    orders_building.push_back(BUILD_SPEC);
-	    orders_building.push_back(DWELLING_MONSTER3);
-	    orders_building.push_back(DWELLING_MONSTER5);
-	    orders_building.push_back(BUILD_MAGEGUILD1);
-	    orders_building.push_back(BUILD_STATUE);
-	    orders_building.push_back(DWELLING_MONSTER1);
-	    orders_building.push_back(DWELLING_MONSTER4);
-	    orders_building.push_back(BUILD_MARKETPLACE);
-	    orders_building.push_back(BUILD_WEL2);
-	    break;
-	case Race::NECR:
-	    orders_building.push_back(BUILD_SPEC);
-	    if(Settings::Get().PriceLoyaltyVersion()) orders_building.push_back(BUILD_TAVERN); // shrine
-	    orders_building.push_back(BUILD_CASTLE);
-	    orders_building.push_back(BUILD_CAPTAIN);
-	    orders_building.push_back(BUILD_LEFTTURRET);
-	    orders_building.push_back(BUILD_RIGHTTURRET);
-	    orders_building.push_back(DWELLING_MONSTER6);
-	    orders_building.push_back(BUILD_MOAT);
-	    orders_building.push_back(DWELLING_MONSTER1);
-	    orders_building.push_back(BUILD_SHIPYARD);
-	    orders_building.push_back(BUILD_THIEVESGUILD);
-	    orders_building.push_back(BUILD_TAVERN);
-	    orders_building.push_back(DWELLING_MONSTER3);
-	    orders_building.push_back(DWELLING_MONSTER5);
-	    orders_building.push_back(DWELLING_MONSTER2);
-	    orders_building.push_back(DWELLING_MONSTER4);
-	    orders_building.push_back(BUILD_MAGEGUILD1);
-	    orders_building.push_back(BUILD_WEL2);
-	    orders_building.push_back(BUILD_MARKETPLACE);
-	    orders_building.push_back(BUILD_STATUE);
-	    orders_building.push_back(BUILD_WELL);
-	    break;
-	default: break;
-    }
+    PackOrdersBuilding(*this, orders_building);
 
     // update extra description
     payment_t profit;
