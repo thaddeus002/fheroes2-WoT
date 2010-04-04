@@ -71,7 +71,7 @@ void Battle2::Arena::AITurn(const Stats & b, Actions & a)
 	}
     }
     else
-    if(!b.isArchers() && b.isHandFighting())
+    if(b.isHandFighting())
     {
 	enemy = GetEnemyAbroadMaxQuality(b.GetPosition(), b.GetColor());
 	AIMagicAction(b, a, enemy);
