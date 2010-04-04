@@ -301,6 +301,8 @@ void Battle2::NecromancySkillAction(Army::army_t & army1, Army::army_t & army2, 
 	PlayPickupSound();
 	Dialog::SpriteInfo("", msg, sf1);
     }
+
+    DEBUG(DBG_BATTLE, DBG_TRACE, "Battle2::NecromancySkillAction: raise skeletons: " << count);
 }
 
 u8 Battle2::Result::AttackerResult(void) const

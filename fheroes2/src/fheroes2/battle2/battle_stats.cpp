@@ -812,7 +812,7 @@ void Battle2::Stats::PostKilledAction(void)
     if(!Modes(CAP_MIRRORIMAGE) && !Modes(CAP_SUMMONELEM))
 	arena->graveyard.AddTroopID(id);
 
-    DEBUG(DBG_BATTLE, DBG_TRACE, "Battle2::Stats::KilledAction: " << GetName() << "is killed");
+    DEBUG(DBG_BATTLE, DBG_TRACE, "Battle2::Stats::KilledAction: " << GetName() << " is killed");
     // possible also..
 }
 
