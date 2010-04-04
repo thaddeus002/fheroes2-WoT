@@ -95,11 +95,11 @@ void MageGuild::GetSpells(std::vector<Spell::spell_t> & spells, u8 level) const
 
 void MageGuild::EducateHero(HeroBase & hero) const
 {
-    if(hero.HaveSpellBook() && home.GetLevelMageGuild())
+    if(hero.HaveSpellBook() && GetLevel())
     {
 	std::vector<Spell::spell_t> spells;
 
-	for(u8 level = 1; level <= 5; ++level) if(level <= home.GetLevelMageGuild())
+	for(u8 level = 1; level <= 5; ++level) if(level <= GetLevel())
 	{
 	    general.GetSpells(spells, level);
 	    if(isLibraryBuild()) library.GetSpells(spells, level);
@@ -107,7 +107,7 @@ void MageGuild::EducateHero(HeroBase & hero) const
 
 	std::vector<Spell::spell_t>::const_iterator it1 = spells.begin();
 	std::vector<Spell::spell_t>::const_iterator it2 = spells.end();
-	for(; it1 != it2; ++it1) hero.AppendSpellToBook(*it1, hero.GetLevelSkill(Skill::Secondary::WISDOM));
+	for(; it1 != it2; ++it1) hero.AppendSpellToBook(*it1);
     }
 }
 
