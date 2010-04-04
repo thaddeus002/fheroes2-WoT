@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-04-04 17:22+0900\n"
+"POT-Creation-Date: 2010-04-04 21:28+0900\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -969,77 +969,77 @@ msgid ""
 "percent."
 msgstr ""
 
-#: ../fheroes2/castle/castle_dialog.cpp:109
+#: ../fheroes2/castle/castle_dialog.cpp:261
 msgid "Month: %{month}, Week: %{week}, Day: %{day}"
 msgstr ""
 
-#: ../fheroes2/castle/castle_dialog.cpp:590
+#: ../fheroes2/castle/castle_dialog.cpp:609
 #: ../fheroes2/pocketpc/pocketpc_castle.cpp:260
 msgid "Town"
 msgstr ""
 
-#: ../fheroes2/castle/castle_dialog.cpp:590
+#: ../fheroes2/castle/castle_dialog.cpp:609
 #: ../fheroes2/pocketpc/pocketpc_castle.cpp:260
 msgid "This town may not be upgraded to a castle."
 msgstr ""
 
-#: ../fheroes2/castle/castle_dialog.cpp:773
+#: ../fheroes2/castle/castle_dialog.cpp:795
 msgid "Exit castle"
 msgstr ""
 
-#: ../fheroes2/castle/castle_dialog.cpp:773
+#: ../fheroes2/castle/castle_dialog.cpp:795
 msgid "Exit town"
 msgstr ""
 
-#: ../fheroes2/castle/castle_dialog.cpp:776
+#: ../fheroes2/castle/castle_dialog.cpp:798
 msgid "Show previous town"
 msgstr ""
 
-#: ../fheroes2/castle/castle_dialog.cpp:779
+#: ../fheroes2/castle/castle_dialog.cpp:801
 msgid "Show next town"
 msgstr ""
 
-#: ../fheroes2/castle/castle_dialog.cpp:785
+#: ../fheroes2/castle/castle_dialog.cpp:807
 msgid "View Hero"
 msgstr ""
 
-#: ../fheroes2/castle/castle_dialog.cpp:854
-#: ../fheroes2/castle/castle_dialog.cpp:923
+#: ../fheroes2/castle/castle_dialog.cpp:876
+#: ../fheroes2/castle/castle_dialog.cpp:945
 msgid "View %{name}"
 msgstr ""
 
-#: ../fheroes2/castle/castle_dialog.cpp:860
 #: ../fheroes2/castle/castle_dialog.cpp:882
-#: ../fheroes2/castle/castle_dialog.cpp:929
-#: ../fheroes2/castle/castle_dialog.cpp:948
+#: ../fheroes2/castle/castle_dialog.cpp:904
+#: ../fheroes2/castle/castle_dialog.cpp:951
+#: ../fheroes2/castle/castle_dialog.cpp:970
 msgid "Combine %{name} armies"
 msgstr ""
 
-#: ../fheroes2/castle/castle_dialog.cpp:860
 #: ../fheroes2/castle/castle_dialog.cpp:882
-#: ../fheroes2/castle/castle_dialog.cpp:929
-#: ../fheroes2/castle/castle_dialog.cpp:948
+#: ../fheroes2/castle/castle_dialog.cpp:904
+#: ../fheroes2/castle/castle_dialog.cpp:951
+#: ../fheroes2/castle/castle_dialog.cpp:970
 msgid "Exchange %{name2} with %{name}"
 msgstr ""
 
-#: ../fheroes2/castle/castle_dialog.cpp:866
 #: ../fheroes2/castle/castle_dialog.cpp:888
-#: ../fheroes2/castle/castle_dialog.cpp:935
-#: ../fheroes2/castle/castle_dialog.cpp:954
+#: ../fheroes2/castle/castle_dialog.cpp:910
+#: ../fheroes2/castle/castle_dialog.cpp:957
+#: ../fheroes2/castle/castle_dialog.cpp:976
 msgid "Move and right click Redistribute %{name}"
 msgstr ""
 
-#: ../fheroes2/castle/castle_dialog.cpp:878
+#: ../fheroes2/castle/castle_dialog.cpp:900
 msgid "Cannot move last army to garrison"
 msgstr ""
 
-#: ../fheroes2/castle/castle_dialog.cpp:895
-#: ../fheroes2/castle/castle_dialog.cpp:961
+#: ../fheroes2/castle/castle_dialog.cpp:917
+#: ../fheroes2/castle/castle_dialog.cpp:983
 msgid "Select %{name}"
 msgstr ""
 
-#: ../fheroes2/castle/castle_dialog.cpp:899
-#: ../fheroes2/castle/castle_dialog.cpp:965
+#: ../fheroes2/castle/castle_dialog.cpp:921
+#: ../fheroes2/castle/castle_dialog.cpp:987
 #: ../fheroes2/heroes/heroes_dialog.cpp:552
 msgid "Empty"
 msgstr ""
@@ -1049,7 +1049,7 @@ msgid "The above spells have been added to your book."
 msgstr ""
 
 #: ../fheroes2/castle/castle_tavern.cpp:37
-#: ../fheroes2/pocketpc/pocketpc_castle.cpp:644
+#: ../fheroes2/pocketpc/pocketpc_castle.cpp:646
 msgid "A generous tip for the barkeep yields the following rumor:"
 msgstr ""
 
@@ -6062,7 +6062,7 @@ msgstr ""
 msgid "This release is compiled without network support."
 msgstr ""
 
-#: ../fheroes2/pocketpc/pocketpc_castle.cpp:812
+#: ../fheroes2/pocketpc/pocketpc_castle.cpp:815
 msgid "buy"
 msgstr ""
 
@@ -11915,85 +11915,89 @@ msgid "world: allow set guardian to objects"
 msgstr ""
 
 #: ../fheroes2/system/settings.cpp:101
-msgid "castle: allow buy from well"
+msgid "world: no in-built requirements or guardians for placed artifacts"
 msgstr ""
 
 #: ../fheroes2/system/settings.cpp:102
-msgid "heroes: learn new spells with day"
+msgid "castle: allow buy from well"
 msgstr ""
 
 #: ../fheroes2/system/settings.cpp:103
-msgid "battle: show damage info"
+msgid "heroes: learn new spells with day"
 msgstr ""
 
 #: ../fheroes2/system/settings.cpp:104
-msgid "battle: troop direction to move"
+msgid "battle: show damage info"
 msgstr ""
 
 #: ../fheroes2/system/settings.cpp:105
-msgid "battle: soft wait troop"
+msgid "battle: troop direction to move"
 msgstr ""
 
 #: ../fheroes2/system/settings.cpp:106
-msgid "battle: show grid"
+msgid "battle: soft wait troop"
 msgstr ""
 
 #: ../fheroes2/system/settings.cpp:107
-msgid "battle: show mouse shadow"
+msgid "battle: show grid"
 msgstr ""
 
 #: ../fheroes2/system/settings.cpp:108
-msgid "battle: show move shadow"
+msgid "battle: show mouse shadow"
 msgstr ""
 
 #: ../fheroes2/system/settings.cpp:109
-msgid "battle: high objects are an obstacle for archers"
+msgid "battle: show move shadow"
 msgstr ""
 
 #: ../fheroes2/system/settings.cpp:110
-msgid "battle: merge armies for hero from castle"
+msgid "battle: high objects are an obstacle for archers"
 msgstr ""
 
 #: ../fheroes2/system/settings.cpp:111
-msgid "battle: archmage can resists (20%) bad spells"
+msgid "battle: merge armies for hero from castle"
 msgstr ""
 
 #: ../fheroes2/system/settings.cpp:112
-msgid "battle: magical creature resists (20%) the same magic"
+msgid "battle: archmage can resists (20%) bad spells"
 msgstr ""
 
 #: ../fheroes2/system/settings.cpp:113
-msgid "game: show system info"
+msgid "battle: magical creature resists (20%) the same magic"
 msgstr ""
 
 #: ../fheroes2/system/settings.cpp:114
-msgid "game: autosave on"
+msgid "game: show system info"
 msgstr ""
 
 #: ../fheroes2/system/settings.cpp:115
-msgid "game: use fade"
+msgid "game: autosave on"
 msgstr ""
 
 #: ../fheroes2/system/settings.cpp:116
-msgid "game: show SDL logo"
+msgid "game: use fade"
 msgstr ""
 
 #: ../fheroes2/system/settings.cpp:117
-msgid "game: use evil interface"
+msgid "game: show SDL logo"
 msgstr ""
 
 #: ../fheroes2/system/settings.cpp:118
-msgid "game: hide interface"
+msgid "game: use evil interface"
 msgstr ""
 
 #: ../fheroes2/system/settings.cpp:119
-msgid "pocketpc: hide cursor"
+msgid "game: hide interface"
 msgstr ""
 
 #: ../fheroes2/system/settings.cpp:120
-msgid "pocketpc: tap mode"
+msgid "pocketpc: hide cursor"
 msgstr ""
 
 #: ../fheroes2/system/settings.cpp:121
+msgid "pocketpc: tap mode"
+msgstr ""
+
+#: ../fheroes2/system/settings.cpp:122
 msgid "pocketpc: low memory"
 msgstr ""

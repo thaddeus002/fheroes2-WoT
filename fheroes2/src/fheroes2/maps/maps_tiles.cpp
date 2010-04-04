@@ -1685,6 +1685,9 @@ void Maps::Tiles::UpdateQuantity(void)
 		    //  added resource
 		    if(quantity2 == 2 || quantity2 == 3)
 			quantity4 = Resource::Rand();
+
+		    if(Settings::Get().ExtNoRequirementsForArtifacts())
+			quantity2 = 0;
 		}
 	    }
 	break;
