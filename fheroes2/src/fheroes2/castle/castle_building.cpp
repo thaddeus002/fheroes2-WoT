@@ -20,11 +20,17 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
+#include <algorithm>
 #include "agg.h"
 #include "castle.h"
 #include "settings.h"
 #include "cursor.h"
 #include "game.h"
+
+void CastleRedrawTownName(const Castle &, const Point &);
+void CastleRedrawCurrentBuilding(const Castle &, const Point &, const std::vector<building_t> &, u32 build);
+void CastleRedrawBuilding(const Castle &, const Point &, u32 build, u32 ticket, u8 alpha);
+void CastleRedrawBuildingExtended(const Castle &, const Point &, u32 build, u32 ticket);
 
 Rect Castle::GetCoordBuilding(building_t building, const Point & pt)
 {
@@ -342,74 +348,38 @@ Rect Castle::GetCoordBuilding(building_t building, const Point & pt)
     return Rect();
 }
 
-/* animation building */
-void Castle::RedrawAnimationBuilding(const Point & dst_pt, u32 build)
+void Castle::RedrawAnimationBuilding(const Castle & castle, const Point & dst_pt, const std::vector<building_t> & orders, u32 build)
 {
-    Display & display = Display::Get();
-    Cursor & cursor = Cursor::Get();
-
-    const ICN::icn_t icn = GetICNBuilding(build, race);
-
-    u8 index = 0;
-	    
-    // correct index
-    switch(build)
-    {
-        case BUILD_MAGEGUILD1: index = 0; break;
-        case BUILD_MAGEGUILD2: index = Race::NECR == race ? 6 : 1; break;
-        case BUILD_MAGEGUILD3: index = Race::NECR == race ? 12 : 2; break;
-        case BUILD_MAGEGUILD4: index = Race::NECR == race ? 18 : 3; break;
-        case BUILD_MAGEGUILD5: index = Race::NECR == race ? 24 : 4; break;
-        default: break;
-    }
-
-    const Sprite & sprite = AGG::GetICN(icn, index);
-    const Rect src_rt(dst_pt.x + sprite.x(), dst_pt.y + sprite.y(), sprite.w(), sprite.h());
-
-    Surface bg(src_rt.w, src_rt.h);
-    Surface sf(src_rt.w, src_rt.h);
-
-    sf.SetColorKey();
-
-    bg.Blit(display, src_rt, 0, 0);
-    sf.Blit(sprite);
-
-    if(const u16 index2 = ICN::AnimationFrame(icn, index))
-    {
-	const Sprite & sprite2 = AGG::GetICN(icn, index2);
-	sf.Blit(sprite2, sprite2.x() - sprite.x(), sprite2.y() - sprite.y());
-    }
-
-    LocalEvent & le = LocalEvent::Get();
-    u32 ticket = 0;
-    u8 ii = 0;
-
-    while(le.HandleEvents() && ii < 250)
-    {
-        if(Game::ShouldAnimateInfrequent(ticket, 1))
-        {
-    	    cursor.Hide();
-    	    display.Blit(bg, src_rt);
-    	    sf.SetAlpha(ii);
-    	    display.Blit(sf, src_rt);
-	    cursor.Show();
-    	    display.Flip();
-	    ii += 10;
-	}
-
-	++ticket;
-    }
+    CastleRedrawCurrentBuilding(castle, dst_pt, orders, build);
 }
 
-/* redraw town area */
-void Castle::RedrawAllBuilding(const Point & dst_pt, const std::vector<building_t> & orders)
+void Castle::RedrawAllBuilding(const Castle & castle, const Point & dst_pt, const std::vector<building_t> & orders)
+{
+    CastleRedrawCurrentBuilding(castle, dst_pt, orders, BUILD_NOTHING);
+    CastleRedrawTownName(castle, dst_pt);
+}
+
+void CastleRedrawTownName(const Castle & castle, const Point & dst)
+{
+    const Sprite & ramka = AGG::GetICN(ICN::TOWNNAME, 0);
+    Point dst_pt(dst.x + 320 - ramka.w() / 2, dst.y + 248);
+    Display::Get().Blit(ramka, dst_pt);
+
+    Text text(castle.GetName(), Font::SMALL);
+    dst_pt.x = dst.x + 320 - text.w() / 2;
+    dst_pt.y = dst.y + 248;
+    text.Blit(dst_pt);
+}
+
+void CastleRedrawCurrentBuilding(const Castle & castle, const Point & dst_pt, const std::vector<building_t> & orders, u32 build)
 {
     static u32 ticket = 0;
 
     Display & display = Display::Get();
+    Cursor & cursor = Cursor::Get();
 
     // before redraw
-    switch(race)
+    switch(castle.GetRace())
     {
 	case Race::KNGT:
 	{
@@ -454,12 +424,12 @@ void Castle::RedrawAllBuilding(const Point & dst_pt, const std::vector<building_
     }
 
     // sea anime
-    if(Race::WZRD == race || (!(BUILD_SHIPYARD & building) && HaveNearlySea()))
+    if(Race::WZRD == castle.GetRace() || (!castle.isBuild(BUILD_SHIPYARD) && castle.HaveNearlySea()))
     {
     	const Sprite * sprite50 = NULL;
     	const Sprite * sprite51 = NULL;
 
-    	switch(race)
+    	switch(castle.GetRace())
     	{
     	    case Race::KNGT:
     		sprite50 = &AGG::GetICN(ICN::TWNKEXT0, 0);
@@ -494,108 +464,164 @@ void Castle::RedrawAllBuilding(const Point & dst_pt, const std::vector<building_
 	if(sprite51) display.Blit(*sprite51, dst_pt.x + sprite51->x(), dst_pt.y + sprite51->y());
     }
 
-    // redraw builds
-    for(u8 ii = 0; ii < orders.size(); ++ii)
+    // redraw all builds
+    if(BUILD_NOTHING == build)
     {
-	const u32 & build = orders[ii];
+	for(u8 ii = 0; ii < orders.size(); ++ii)
+	{
+	    const u32 & build2 = orders[ii];
 
-	if(! isBuild(build)) continue;
+	    if(castle.isBuild(build2))
+	    {
+		CastleRedrawBuilding(castle, dst_pt, build2, ticket, 0);
+		CastleRedrawBuildingExtended(castle, dst_pt, build2, ticket);
+	    }
+	}
+    }
+    // redraw build with alpha 
+    else
+    if(orders.end() != std::find(orders.begin(), orders.end(), build))
+    {
+	LocalEvent & le = LocalEvent::Get();
+	u8 alpha = 1;
 
-	RedrawBuilding(build, dst_pt, ticket);
+	while(le.HandleEvents() && alpha < 250)
+	{
+    	    if(Game::ShouldAnimateInfrequent(ticket, 1))
+    	    {
+    		cursor.Hide();
+
+		for(u8 ii = 0; ii < orders.size(); ++ii)
+		{
+		    const u32 & build2 = orders[ii];
+
+		    if(castle.isBuild(build2))
+		    {
+			CastleRedrawBuilding(castle, dst_pt, build2, ticket, 0);
+			CastleRedrawBuildingExtended(castle, dst_pt, build2, ticket);
+		    }
+		    else
+		    if(build2 == build)
+		    {
+			CastleRedrawBuilding(castle, dst_pt, build2, ticket, alpha);
+			CastleRedrawTownName(castle, dst_pt);
+			alpha += 10;
+		    }
+		}
+
+		CastleRedrawTownName(castle, dst_pt);
+
+		cursor.Show();
+    		display.Flip();
+	    }
+	    ++ticket;
+	}
+
+	cursor.Hide();
     }
 
     ++ticket;
 }
 
-void Castle::RedrawBuilding(u32 build2, const Point & dst_pt, const u32 ticket)
+void CastleRedrawBuilding(const Castle & castle, const Point & dst_pt, u32 build, u32 ticket, u8 alpha)
 {
     Display & display = Display::Get();
 
-	// correct build
-	switch(build2)
-	{
-	    case DWELLING_MONSTER2:
-	    case DWELLING_MONSTER3:
-	    case DWELLING_MONSTER4:
-	    case DWELLING_MONSTER5:
-	    case DWELLING_MONSTER6: build2 = GetActualDwelling(build2); break;
+    // correct build
+    switch(build)
+    {
+	case DWELLING_MONSTER2:
+	case DWELLING_MONSTER3:
+	case DWELLING_MONSTER4:
+	case DWELLING_MONSTER5:
+	case DWELLING_MONSTER6: build = castle.GetActualDwelling(build); break;
 
-            case BUILD_MAGEGUILD1:  if(BUILD_MAGEGUILD5 & building) build2 = BUILD_MAGEGUILD5;
-        			    else
-        			    if(BUILD_MAGEGUILD4 & building) build2 = BUILD_MAGEGUILD4;
-        			    else
-        			    if(BUILD_MAGEGUILD3 & building) build2 = BUILD_MAGEGUILD3;
-        			    else
-        			    if(BUILD_MAGEGUILD2 & building) build2 = BUILD_MAGEGUILD2; break;
-	    default: break;
-	}
+        case BUILD_MAGEGUILD1:  if(castle.isBuild(BUILD_MAGEGUILD5)) build = BUILD_MAGEGUILD5;
+        			else
+        			if(castle.isBuild(BUILD_MAGEGUILD4)) build = BUILD_MAGEGUILD4;
+        			else
+        			if(castle.isBuild(BUILD_MAGEGUILD3)) build = BUILD_MAGEGUILD3;
+        			else
+        			if(castle.isBuild(BUILD_MAGEGUILD2)) build = BUILD_MAGEGUILD2; break;
+	default: break;
+    }
 
-    	const ICN::icn_t icn = GetICNBuilding(build2, race);
-
-    	u8 index = 0;
+    const ICN::icn_t icn = Castle::GetICNBuilding(build, castle.GetRace());
+    u8 index = 0;
     	    
-    	// correct index
-	switch(build2)
-        {
-                case BUILD_MAGEGUILD1: index = 0; break;
-                case BUILD_MAGEGUILD2: index = Race::NECR == race ? 6 : 1; break;
-                case BUILD_MAGEGUILD3: index = Race::NECR == race ? 12 : 2; break;
-                case BUILD_MAGEGUILD4: index = Race::NECR == race ? 18 : 3; break;
-                case BUILD_MAGEGUILD5: index = Race::NECR == race ? 24 : 4; break;
-                default: break;
-        }
+    // correct index
+    switch(build)
+    {
+        case BUILD_MAGEGUILD1: index = 0; break;
+        case BUILD_MAGEGUILD2: index = Race::NECR == castle.GetRace() ? 6 : 1; break;
+        case BUILD_MAGEGUILD3: index = Race::NECR == castle.GetRace() ? 12 : 2; break;
+        case BUILD_MAGEGUILD4: index = Race::NECR == castle.GetRace() ? 18 : 3; break;
+        case BUILD_MAGEGUILD5: index = Race::NECR == castle.GetRace() ? 24 : 4; break;
+        default: break;
+    }
 
-    	// simple first sprite
-    	const Sprite & sprite1 = AGG::GetICN(icn, index);
+    // simple first sprite
+    const Sprite & sprite1 = AGG::GetICN(icn, index);
+    if(alpha)
+	sprite1.BlitSpriteWithAlpha(display, alpha, dst_pt.x + sprite1.x(), dst_pt.y + sprite1.y());
+    else
 	display.Blit(sprite1, dst_pt.x + sprite1.x(), dst_pt.y + sprite1.y());
 
-    	// second anime sprite
-    	if(const u16 index2 = ICN::AnimationFrame(icn, index, ticket))
-	{
-	    const Sprite & sprite2 = AGG::GetICN(icn, index2);
-	    display.Blit(sprite2, dst_pt.x + sprite2.x(), dst_pt.y + sprite2.y());
-	}
-
-	// shipyard
-	if(BUILD_SHIPYARD == build2)
-    	{
-	    // boat
-	    if(PresentBoat())
-	    {
-		const ICN::icn_t icn2 = GetICNBoat(race);
-
-    		const Sprite & sprite40 = AGG::GetICN(icn2, 0);
-		display.Blit(sprite40, dst_pt.x + sprite40.x(), dst_pt.y + sprite40.y());
-
-    		if(const u16 index2 = ICN::AnimationFrame(icn2, 0, ticket))
-		{
-		    const Sprite & sprite41 = AGG::GetICN(icn2, index2);
-		    display.Blit(sprite41, dst_pt.x + sprite41.x(), dst_pt.y + sprite41.y());
-		}
-	    }
-	    else
-	    {
-    		if(const u16 index2 = ICN::AnimationFrame(icn, index, ticket))
-		{
-		    const Sprite & sprite3 = AGG::GetICN(icn, index2);
-		    display.Blit(sprite3, dst_pt.x + sprite3.x(), dst_pt.y + sprite3.y());
-		}
-	    }
-	}
+    // second anime sprite
+    if(const u16 index2 = ICN::AnimationFrame(icn, index, ticket))
+    {
+	const Sprite & sprite2 = AGG::GetICN(icn, index2);
+	if(alpha)
+	    sprite2.BlitSpriteWithAlpha(display, alpha, dst_pt.x + sprite2.x(), dst_pt.y + sprite2.y());
 	else
-	// sorc and anime wel2 or statue
-	if(Race::SORC == race && BUILD_WEL2 == build2)
-	{
-	    const ICN::icn_t icn2 = BUILD_STATUE & building ? ICN::TWNSEXT1 : icn;
+	    display.Blit(sprite2, dst_pt.x + sprite2.x(), dst_pt.y + sprite2.y());
+    }
+}
 
-    	    const Sprite & sprite20 = AGG::GetICN(icn2, 0);
-	    display.Blit(sprite20, dst_pt.x + sprite20.x(), dst_pt.y + sprite20.y());
+void CastleRedrawBuildingExtended(const Castle & castle, const Point & dst_pt, u32 build, u32 ticket)
+{
+    Display & display = Display::Get();
+    ICN::icn_t icn = Castle::GetICNBuilding(build, castle.GetRace());
+
+    // shipyard
+    if(BUILD_SHIPYARD == build)
+    {
+	// boat
+	if(castle.PresentBoat())
+	{
+	    const ICN::icn_t icn2 = castle.GetICNBoat(castle.GetRace());
+
+    	    const Sprite & sprite40 = AGG::GetICN(icn2, 0);
+	    display.Blit(sprite40, dst_pt.x + sprite40.x(), dst_pt.y + sprite40.y());
 
     	    if(const u16 index2 = ICN::AnimationFrame(icn2, 0, ticket))
 	    {
-		const Sprite & sprite21 = AGG::GetICN(icn2, index2);
-		display.Blit(sprite21, dst_pt.x + sprite21.x(), dst_pt.y + sprite21.y());
+		const Sprite & sprite41 = AGG::GetICN(icn2, index2);
+		display.Blit(sprite41, dst_pt.x + sprite41.x(), dst_pt.y + sprite41.y());
 	    }
 	}
+	else
+	{
+    	    if(const u16 index2 = ICN::AnimationFrame(icn, 0, ticket))
+	    {
+		const Sprite & sprite3 = AGG::GetICN(icn, index2);
+		display.Blit(sprite3, dst_pt.x + sprite3.x(), dst_pt.y + sprite3.y());
+	    }
+	}
+    }
+    else
+    // sorc and anime wel2 or statue
+    if(Race::SORC == castle.GetRace() && BUILD_WEL2 == build)
+    {
+	const ICN::icn_t icn2 = castle.isBuild(BUILD_STATUE) ? ICN::TWNSEXT1 : icn;
 
+    	const Sprite & sprite20 = AGG::GetICN(icn2, 0);
+	display.Blit(sprite20, dst_pt.x + sprite20.x(), dst_pt.y + sprite20.y());
+
+    	if(const u16 index2 = ICN::AnimationFrame(icn2, 0, ticket))
+	{
+	    const Sprite & sprite21 = AGG::GetICN(icn2, index2);
+	    display.Blit(sprite21, dst_pt.x + sprite21.x(), dst_pt.y + sprite21.y());
+	}
+    }
 }

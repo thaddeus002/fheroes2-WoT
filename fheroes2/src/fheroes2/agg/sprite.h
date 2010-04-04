@@ -37,7 +37,8 @@ public:
 
     u32 GetSize(void) const;
     void ScaleMinifyByTwo(void);
-    
+    void BlitSpriteWithAlpha(Surface &, u8, s16, s16) const;
+
     static void DrawICN(Surface & sf, const u8* buf, const u32 size, bool reflect);
     static void AddonExtensionModify(Sprite & sp, u16 icn, u16 index);
 

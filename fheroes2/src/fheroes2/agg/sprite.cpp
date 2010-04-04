@@ -177,3 +177,13 @@ void Sprite::AddonExtensionModify(Sprite & sp, u16 icn, u16 index)
 	default: break;
     }
 }
+
+void Sprite::BlitSpriteWithAlpha(Surface & dst, u8 alpha, s16 dstx, s16 dsty) const
+{
+    Surface sf(w(), h());
+    sf.SetColorKey();
+    sf.Blit(*this);
+    sf.SetAlpha(alpha);
+
+    dst.Blit(sf, dstx, dsty);
+}

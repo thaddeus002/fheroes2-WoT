@@ -1017,12 +1017,6 @@ bool Castle::BuyBuilding(u32 build)
     // disable day build
     ResetModes(ALLOWBUILD);
 
-    // play sound
-    if(Game::LOCAL == world.GetKingdom(color).Control())
-    {
-	AGG::PlaySound(M82::BUILDTWN);
-    }
-
     DEBUG(DBG_GAME , DBG_INFO, "Castle::BuyBuilding: " << name << " build " << GetStringBuilding(build, race));
     return true;
 }

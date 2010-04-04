@@ -261,6 +261,8 @@ screen_t CastleOpenDialog1(Castle & castle)
     	    else
             if(Dialog::OK == castle.DialogBuyCastle(true))
 	    {
+		// play sound
+    		AGG::PlaySound(M82::BUILDTWN);
                 castle.BuyBuilding(BUILD_CASTLE);
                 cursor.Hide();
                 RedrawTownSprite(rectTown, castle);
@@ -382,17 +384,17 @@ screen_t CastleOpenDialog2(Castle & castle)
         // exit
         if(le.MouseClickLeft(rectExit) || le.KeyPress(KEY_ESCAPE)) break;
 
-	if(le.MouseCursor(dwelling1.GetArea()) && dwelling1.QueueEventProcessing()) { castle.BuyBuilding(dwelling1()); return SCREEN1; }
+	if(le.MouseCursor(dwelling1.GetArea()) && dwelling1.QueueEventProcessing()) { AGG::PlaySound(M82::BUILDTWN); castle.BuyBuilding(dwelling1()); return SCREEN1; }
 	else
-	if(le.MouseCursor(dwelling2.GetArea()) && dwelling2.QueueEventProcessing()) { castle.BuyBuilding(dwelling2()); return SCREEN1; }
+	if(le.MouseCursor(dwelling2.GetArea()) && dwelling2.QueueEventProcessing()) { AGG::PlaySound(M82::BUILDTWN); castle.BuyBuilding(dwelling2()); return SCREEN1; }
 	else
-	if(le.MouseCursor(dwelling3.GetArea()) && dwelling3.QueueEventProcessing()) { castle.BuyBuilding(dwelling3()); return SCREEN1; }
+	if(le.MouseCursor(dwelling3.GetArea()) && dwelling3.QueueEventProcessing()) { AGG::PlaySound(M82::BUILDTWN); castle.BuyBuilding(dwelling3()); return SCREEN1; }
 	else
-	if(le.MouseCursor(dwelling4.GetArea()) && dwelling4.QueueEventProcessing()) { castle.BuyBuilding(dwelling4()); return SCREEN1; }
+	if(le.MouseCursor(dwelling4.GetArea()) && dwelling4.QueueEventProcessing()) { AGG::PlaySound(M82::BUILDTWN); castle.BuyBuilding(dwelling4()); return SCREEN1; }
 	else
-	if(le.MouseCursor(dwelling5.GetArea()) && dwelling5.QueueEventProcessing()) { castle.BuyBuilding(dwelling5()); return SCREEN1; }
+	if(le.MouseCursor(dwelling5.GetArea()) && dwelling5.QueueEventProcessing()) { AGG::PlaySound(M82::BUILDTWN); castle.BuyBuilding(dwelling5()); return SCREEN1; }
 	else
-	if(le.MouseCursor(dwelling6.GetArea()) && dwelling6.QueueEventProcessing()) { castle.BuyBuilding(dwelling6()); return SCREEN1; }
+	if(le.MouseCursor(dwelling6.GetArea()) && dwelling6.QueueEventProcessing()) { AGG::PlaySound(M82::BUILDTWN); castle.BuyBuilding(dwelling6()); return SCREEN1; }
     }
     return SCREENOUT;
 }
@@ -486,11 +488,11 @@ screen_t CastleOpenDialog3(Castle & castle)
         // exit
         if(le.MouseClickLeft(rectExit) || le.KeyPress(KEY_ESCAPE)) break;
 
-	if(le.MouseCursor(building1.GetArea()) && building1.QueueEventProcessing()) { castle.BuyBuilding(building1()); return SCREEN1; }
+	if(le.MouseCursor(building1.GetArea()) && building1.QueueEventProcessing()) { AGG::PlaySound(M82::BUILDTWN); castle.BuyBuilding(building1()); return SCREEN1; }
 	else
-	if(le.MouseCursor(building2.GetArea()) && building2.QueueEventProcessing()) { castle.BuyBuilding(building2()); return SCREEN1; }
+	if(le.MouseCursor(building2.GetArea()) && building2.QueueEventProcessing()) { AGG::PlaySound(M82::BUILDTWN); castle.BuyBuilding(building2()); return SCREEN1; }
 	else
-	if(le.MouseCursor(building3.GetArea()) && building3.QueueEventProcessing()) { castle.BuyBuilding(building3()); return SCREEN1; }
+	if(le.MouseCursor(building3.GetArea()) && building3.QueueEventProcessing()) { AGG::PlaySound(M82::BUILDTWN); castle.BuyBuilding(building3()); return SCREEN1; }
 	else
 	if(le.MouseCursor(building4.GetArea()))
 	{
@@ -500,10 +502,10 @@ screen_t CastleOpenDialog3(Castle & castle)
 		if(le.MouseClickLeft(building4.GetArea()) && Dialog::OK == Dialog::BuyBoat(castle.AllowBuyBoat())) castle.BuyBoat();
 	    }
 	    else
-	    if(building4.QueueEventProcessing()) { castle.BuyBuilding(building4()); return SCREEN1; }
+	    if(building4.QueueEventProcessing()) { AGG::PlaySound(M82::BUILDTWN); castle.BuyBuilding(building4()); return SCREEN1; }
 	}
 	else
-	if(le.MouseCursor(building5.GetArea()) && building5.QueueEventProcessing()) { castle.BuyBuilding(building5()); return SCREEN1; }
+	if(le.MouseCursor(building5.GetArea()) && building5.QueueEventProcessing()) { AGG::PlaySound(M82::BUILDTWN); castle.BuyBuilding(building5()); return SCREEN1; }
 	else
 	if(le.MouseCursor(building6.GetArea()))
 	{
@@ -513,7 +515,7 @@ screen_t CastleOpenDialog3(Castle & castle)
 		if(le.MouseClickLeft(building6.GetArea())) Dialog::Marketplace();
 	    }
 	    else
-	    if(building6.QueueEventProcessing()) { castle.BuyBuilding(building6()); return SCREEN1; }
+	    if(building6.QueueEventProcessing()) { AGG::PlaySound(M82::BUILDTWN); castle.BuyBuilding(building6()); return SCREEN1; }
 	}
     }
     return SCREENOUT;
@@ -598,17 +600,17 @@ screen_t CastleOpenDialog4(Castle & castle)
         // exit
         if(le.MouseClickLeft(rectExit) || le.KeyPress(KEY_ESCAPE)) break;
 
-	if(le.MouseCursor(building1.GetArea()) && building1.QueueEventProcessing()) { castle.BuyBuilding(building1()); return SCREEN1; }
+	if(le.MouseCursor(building1.GetArea()) && building1.QueueEventProcessing()) { AGG::PlaySound(M82::BUILDTWN); castle.BuyBuilding(building1()); return SCREEN1; }
 	else
-	if(le.MouseCursor(building2.GetArea()) && building2.QueueEventProcessing()) { castle.BuyBuilding(building2()); return SCREEN1; }
+	if(le.MouseCursor(building2.GetArea()) && building2.QueueEventProcessing()) { AGG::PlaySound(M82::BUILDTWN); castle.BuyBuilding(building2()); return SCREEN1; }
 	else
-	if(le.MouseCursor(building3.GetArea()) && building3.QueueEventProcessing()) { castle.BuyBuilding(building3()); return SCREEN1; }
+	if(le.MouseCursor(building3.GetArea()) && building3.QueueEventProcessing()) { AGG::PlaySound(M82::BUILDTWN); castle.BuyBuilding(building3()); return SCREEN1; }
 	else
-	if(le.MouseCursor(building4.GetArea()) && building4.QueueEventProcessing()) { castle.BuyBuilding(building4()); return SCREEN1; }
+	if(le.MouseCursor(building4.GetArea()) && building4.QueueEventProcessing()) { AGG::PlaySound(M82::BUILDTWN); castle.BuyBuilding(building4()); return SCREEN1; }
 	else
-	if(le.MouseCursor(building5.GetArea()) && building5.QueueEventProcessing()) { castle.BuyBuilding(building5()); return SCREEN1; }
+	if(le.MouseCursor(building5.GetArea()) && building5.QueueEventProcessing()) { AGG::PlaySound(M82::BUILDTWN); castle.BuyBuilding(building5()); return SCREEN1; }
 	else
-	if(le.MouseCursor(building6.GetArea()) && building6.QueueEventProcessing()) { castle.BuyBuilding(building6()); return SCREEN1; }
+	if(le.MouseCursor(building6.GetArea()) && building6.QueueEventProcessing()) { AGG::PlaySound(M82::BUILDTWN); castle.BuyBuilding(building6()); return SCREEN1; }
     }
     return SCREENOUT;
 }
@@ -743,6 +745,7 @@ screen_t CastleOpenDialog5(Castle & castle)
 	    else
 	    if(b.DialogBuyBuilding(true))
 	    {
+		AGG::PlaySound(M82::BUILDTWN);
 		castle.BuyBuilding(b());
 		return SCREEN1;
 	    }
@@ -1030,6 +1033,7 @@ bool DwellingBar::QueueEventProcessing(void)
 	    BuildingInfo dwelling2(castle, static_cast<building_t>(dwelling));
 	    if(dwelling2.DialogBuyBuilding(true))
 	    {
+		AGG::PlaySound(M82::BUILDTWN);
 		const_cast<Castle &>(castle).BuyBuilding(dwelling);
 		return true;
 	    }

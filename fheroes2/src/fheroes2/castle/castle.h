@@ -185,16 +185,14 @@ private:
     void RedrawResourcePanel(const Point &);
     void TownUpgradeToCastle(void);
     Rect GetCoordBuilding(building_t building, const Point & pt);
-    void RedrawAllBuilding(const Point & dst_pt, const std::vector<building_t> & orders);
-    void RedrawBuilding(u32, const Point & dst_pt, const u32 ticket);
     u32  OpenTown(void);
     void OpenTavern(void);
     void OpenThievesGuild(void);
     void OpenWell(void);
     void OpenMageGuild(void);
-    void RedrawNameTown(const Point & src_pt);
     void WellRedrawInfoArea(const Point & cur_pt);
-    void RedrawAnimationBuilding(const Point & dst_pt, u32 build);
+    static void RedrawAllBuilding(const Castle &, const Point &, const std::vector<building_t> &);
+    static void RedrawAnimationBuilding(const Castle &, const Point &, const std::vector<building_t> &, u32 build);
 
 private:
     friend class Game::IO;

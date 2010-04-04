@@ -42,18 +42,6 @@
 #include "selectarmybar.h"
 #include "pocketpc.h"
 
-void Castle::RedrawNameTown(const Point & src_pt)
-{
-    const Sprite & ramka = AGG::GetICN(ICN::TOWNNAME, 0);
-    Point dst_pt(src_pt.x + 320 - ramka.w() / 2, src_pt.y + 248);
-    Display::Get().Blit(ramka, dst_pt);
-
-    Text text(name, Font::SMALL);
-    dst_pt.x = src_pt.x + 320 - text.w() / 2;
-    dst_pt.y = src_pt.y + 248;
-    text.Blit(dst_pt);
-}
-
 Dialog::answer_t Castle::OpenDialog(bool fade)
 {
     if(Settings::Get().QVGA()) return PocketPC::CastleOpenDialog(*this);
@@ -346,8 +334,7 @@ Dialog::answer_t Castle::OpenDialog(bool fade)
     String::Replace(description_spec, "%{count}", profit.gold);
 
     // draw building
-    RedrawAllBuilding(cur_pt, orders_building);
-    RedrawNameTown(cur_pt);
+    RedrawAllBuilding(*this, cur_pt, orders_building);
 
     if(2 > world.GetMyKingdom().GetCastles().size())
     {
@@ -516,9 +503,12 @@ Dialog::answer_t Castle::OpenDialog(bool fade)
 		cursor.Hide();
 
                 if(selectCaptainArmy.isSelected()) selectCaptainArmy.Reset();
+
+		// play sound
+    		AGG::PlaySound(M82::BUILDTWN);
+
+		RedrawAnimationBuilding(*this, cur_pt, orders_building, build);
 		BuyBuilding(build);
-		
-		RedrawAnimationBuilding(cur_pt, build);
 		RedrawResourcePanel(cur_pt);
 
 		if(BUILD_CAPTAIN == build && ! castle_heroes)
@@ -593,9 +583,12 @@ Dialog::answer_t Castle::OpenDialog(bool fade)
 	    if(Dialog::OK == DialogBuyCastle(true))
 	    {
 		cursor.Hide();
-		BuyBuilding(BUILD_CASTLE);
 
-		RedrawAnimationBuilding(cur_pt, BUILD_CASTLE);
+		// play sound
+    		AGG::PlaySound(M82::BUILDTWN);
+
+		RedrawAnimationBuilding(*this, cur_pt, orders_building, BUILD_CASTLE);
+		BuyBuilding(BUILD_CASTLE);
 		RedrawResourcePanel(cur_pt);
 
 		// RedrawResourcePanel destroy sprite buttonExit
@@ -972,8 +965,7 @@ Dialog::answer_t Castle::OpenDialog(bool fade)
 	if(Game::ShouldAnimateInfrequent(ticket, 10))
 	{
 	    cursor.Hide();
-	    RedrawAllBuilding(cur_pt, orders_building);
-	    RedrawNameTown(cur_pt);
+	    RedrawAllBuilding(*this, cur_pt, orders_building);
 	    cursor.Show();
 	    display.Flip();
 	}
