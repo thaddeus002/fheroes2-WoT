@@ -2109,7 +2109,7 @@ void Battle2::Interface::RedrawActionWinces(std::vector<TargetInfo> & targets)
 
     for(; it != targets.end(); ++it) if((*it).defender)
     {
-	if((*it).damage && !(*it).defender->Modes(MAGIC_DEFENCED))
+	if((*it).damage)
 	{
 	    TargetInfo & target = *it;
 	    // wnce animation
@@ -2132,7 +2132,7 @@ void Battle2::Interface::RedrawActionWinces(std::vector<TargetInfo> & targets)
 	if(Game::ShouldAnimateInfrequent(ticket, animation_delay))
     	{
 	    it = targets.begin();
-	    for(; it != targets.end(); ++it) if((*it).defender && !(*it).defender->Modes(MAGIC_DEFENCED))
+	    for(; it != targets.end(); ++it) if((*it).defender)
 	    {
 		TargetInfo & target = *it;
 		const Rect & pos = target.defender->GetCellPosition();
@@ -2329,6 +2329,14 @@ void Battle2::Interface::RedrawActionFly(Stats & b, u16 dst)
     b.ResetAnimFrame(AS_IDLE);
 }
 
+void Battle2::Interface::RedrawActionResistSpell(const Stats & target)
+{
+    std::string str(_("The %{name} resist the spell!"));
+    String::Replace(str, "%{name}", target.GetName());
+    status.SetMessage(str, true);
+    status.SetMessage("", false);
+}
+
 void Battle2::Interface::RedrawActionSpellCastPart1(u8 spell2, u16 dst, const std::string & name, const std::vector<TargetInfo> & targets)
 {
     Spell::spell_t spell = Spell::FromInt(spell2);
@@ -2341,13 +2349,16 @@ void Battle2::Interface::RedrawActionSpellCastPart1(u8 spell2, u16 dst, const st
 	String::Replace(msg, "%{troop}", target->GetName());
     }
     else
+    if(Spell::isApplyWithoutFocusObject(spell))
 	msg = _("%{name} casts %{spell}.");
 
-    String::Replace(msg, "%{name}", name);
-    String::Replace(msg, "%{spell}", Spell::GetName(Spell::FromInt(spell)));
-    status.SetMessage(msg, true);
-    status.SetMessage("", false);
-
+    if(msg.size())
+    {
+	String::Replace(msg, "%{name}", name);
+	String::Replace(msg, "%{spell}", Spell::GetName(Spell::FromInt(spell)));
+	status.SetMessage(msg, true);
+	status.SetMessage("", false);
+    }
 
     // without object
     switch(spell)
@@ -2448,12 +2459,13 @@ void Battle2::Interface::RedrawActionSpellCastPart2(u8 spell, std::vector<Target
 	    }
 
 	    status.SetMessage(msg, true);
-	    status.SetMessage("", false);
 	}
 
 	// target killed animation
 	RedrawActionKills(targets);
     }
+
+    status.SetMessage(" ", false);
 
     // restore
     std::vector<TargetInfo>::iterator it = targets.begin();
@@ -2488,7 +2500,7 @@ void Battle2::Interface::RedrawActionMonsterSpellCastStatus(const Stats & attack
 	default: break;
     }
 
-    if(msg && !target.defender->Modes(MAGIC_DEFENCED))
+    if(msg)
     {
 	std::string str(msg);
 	String::Replace(str, "%{name}", target.defender->GetName());

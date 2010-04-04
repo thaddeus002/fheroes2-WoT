@@ -40,8 +40,6 @@ namespace Battle2
         TR_MOVED        = 0x00000002,
         TR_SKIPMOVE     = 0x00000004,
 
-	MAGIC_DEFENCED  = 0x00000008,
-
         LUCK_GOOD       = 0x00000100,
         LUCK_BAD        = 0x00000200,
         MORALE_GOOD     = 0x00000400,
@@ -201,7 +199,8 @@ namespace Battle2
 	bool	isMultiCellAttack(void) const;
 	bool	isHideAttack(void) const;
 	bool	isAlwayResponse(void) const;
-	bool	isMagicDefence(u8, u8) const;
+	bool 	isMagicResist(u8, u8) const;
+	u8	GetMagicResist(u8, u8) const;
 	bool	isMagicAttack(void) const;
 	u8	GetSpellMagic(bool force = false) const;
 	bool	isHaveDamage(void) const;

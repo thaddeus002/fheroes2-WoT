@@ -130,9 +130,12 @@ namespace Battle2
 
     struct TargetInfo
     {
+	TargetInfo() : defender(NULL), damage(0), killed(0), resist(false) {};
+
         Stats* defender;
 	u32 damage;
 	u32 killed;
+	bool resist;
 
         bool isFinishAnimFrame(void) const;
     };

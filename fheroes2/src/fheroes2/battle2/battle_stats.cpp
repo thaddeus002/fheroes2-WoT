@@ -596,7 +596,6 @@ void Battle2::Stats::NewTurn(void)
     ResetModes(TR_RESPONSED);
     ResetModes(TR_MOVED);
     ResetModes(TR_SKIPMOVE);
-    ResetModes(MAGIC_DEFENCED);
     ResetModes(MORALE_BAD);
     ResetModes(MORALE_GOOD);
     ResetModes(LUCK_BAD);
@@ -803,7 +802,6 @@ void Battle2::Stats::PostKilledAction(void)
     ResetModes(TR_SKIPMOVE);
     ResetModes(LUCK_GOOD);
     ResetModes(LUCK_BAD);
-    ResetModes(MAGIC_DEFENCED);
     ResetModes(MORALE_GOOD);
     ResetModes(MORALE_BAD);
 
@@ -877,7 +875,7 @@ bool Battle2::Stats::AllowApplySpell(u8 spell, const HeroBase* hero, std::string
 
     if(hero && Spell::isApplyToFriends(spell) && GetColor() != hero->GetColor()) return false;
     if(hero && Spell::isApplyToEnemies(spell) && GetColor() == hero->GetColor()) return false;
-    if(isMagicDefence(spell, (hero ? hero->GetPower() : 0))) return false;
+    if(isMagicResist(spell, (hero ? hero->GetPower() : 0))) return false;
 
     const HeroBase* myhero = GetCommander();
     if(!myhero) return true;
@@ -921,35 +919,10 @@ bool Battle2::Stats::ApplySpell(u8 spell, const HeroBase* hero, TargetInfo & tar
 
     DEBUG(DBG_BATTLE, DBG_TRACE, "Battle2::Stats::ApplySpell: " << Spell::GetName(Spell::FromInt(spell)));
 
-    ResetModes(MAGIC_DEFENCED);
-
     // save spell for "eagle eye" capability
     arena->AddSpell(spell);
 
     u16 spoint = hero ? hero->GetPower() : 3;
-
-    // magic defenced
-    switch(troop())
-    {
-	// 25% unfortunatly
-	case Monster::DWARF:
-	case Monster::BATTLE_DWARF:
-	    if(5 > Rand::Get(1, 16) && (Spell::isDamage(spell) || Spell::isApplyToEnemies(spell)))
-	    {
-		if(arena->interface)
-		{
-		    std::string str(_("The %{name} resist the spell!"));
-		    String::Replace(str, "%{name}", GetName());
-		    arena->interface->SetStatus(str, true);
-		}
-		
-		SetModes(MAGIC_DEFENCED);
-		return false;
-	    }
-	    break;
-
-	default: break;
-    }
 
     if(Spell::isDamage(spell))
 	SpellApplyDamage(spell, spoint, hero, target);
@@ -1547,23 +1520,33 @@ bool Battle2::Stats::isAlwayResponse(void) const
     return false;
 }
 
-bool Battle2::Stats::isMagicDefence(u8 spell, u8 spower) const
+bool Battle2::Stats::isMagicResist(u8 spell, u8 spower) const
+{
+    return 100 == GetMagicResist(spell, spower);
+}
+
+u8 Battle2::Stats::GetMagicResist(u8 spell, u8 spower) const
 {
     if(Spell::isMindInfluence(spell) &&
-        (troop.isUndead() || troop() == Monster::GIANT || troop() == Monster::TITAN)) return true;
+        (troop.isUndead() || troop() == Monster::GIANT || troop() == Monster::TITAN)) return 100;
 
     if(Spell::isALiveOnly(spell) &&
-        troop.isUndead()) return true;
+        troop.isUndead()) return 100;
 
     if(Spell::isUndeadOnly(spell) &&
-        !troop.isUndead()) return true;
+        !troop.isUndead()) return 100;
 
     switch(troop())
     {
+	// 25% unfortunatly
+	case Monster::DWARF:
+	case Monster::BATTLE_DWARF:
+            return 25;
+
         case Monster::GREEN_DRAGON:
         case Monster::RED_DRAGON:
         case Monster::BLACK_DRAGON:
-            return true;
+            return 100;
 
         case Monster::PHOENIX:
             switch(spell)
@@ -1575,7 +1558,7 @@ bool Battle2::Stats::isMagicDefence(u8 spell, u8 spower) const
                 case Spell::LIGHTNINGBOLT:
                 case Spell::CHAINLIGHTNING:
                 case Spell::ELEMENTALSTORM:
-                    return true;
+                    return 100;
                 default: break;
             }
             break;
@@ -1586,7 +1569,7 @@ bool Battle2::Stats::isMagicDefence(u8 spell, u8 spower) const
             {
                 case Spell::CURSE:
                 case Spell::MASSCURSE:
-                    return true;
+                    return 100;
                 default: break;
             }
             break;
@@ -1597,7 +1580,7 @@ bool Battle2::Stats::isMagicDefence(u8 spell, u8 spower) const
                 case Spell::METEORSHOWER:
                 case Spell::LIGHTNINGBOLT:
                 case Spell::CHAINLIGHTNING:
-                    return true;
+                    return 100;
                 default: break;
             }
             break;
@@ -1606,7 +1589,7 @@ bool Battle2::Stats::isMagicDefence(u8 spell, u8 spower) const
             switch(spell)
             {
                 case Spell::METEORSHOWER:
-                    return true;
+                    return 100;
                 default: break;
             }
             break;
@@ -1616,7 +1599,7 @@ bool Battle2::Stats::isMagicDefence(u8 spell, u8 spower) const
             {
                 case Spell::FIREBALL:
                 case Spell::FIREBLAST:
-                    return true;
+                    return 100;
                 default: break;
             }
             break;
@@ -1626,7 +1609,7 @@ bool Battle2::Stats::isMagicDefence(u8 spell, u8 spower) const
             {
                 case Spell::COLDRAY:
                 case Spell::COLDRING:
-                    return true;
+                    return 100;
                 default: break;
             }
             break;
@@ -1638,28 +1621,28 @@ bool Battle2::Stats::isMagicDefence(u8 spell, u8 spower) const
     {
 	case Spell::CURE:
 	case Spell::MASSCURE:
-	    if(troop.isUndead()) return true;
-	    if(!isHaveDamage() && !(modes & IS_MAGIC)) return true;
+	    if(troop.isUndead()) return 100;
+	    if(!isHaveDamage() && !(modes & IS_MAGIC)) return 100;
 	    break;
 
 	case Spell::RESURRECT:
 	case Spell::RESURRECTTRUE:
 	case Spell::ANIMATEDEAD:
-	    if(!isHaveDamage()) return true;
+	    if(!isHaveDamage()) return 100;
 	    break;
 
 	case Spell::DISPEL:
-	    if(! (modes & IS_MAGIC)) return true;
+	    if(! (modes & IS_MAGIC)) return 100;
 	    break;
 
 	case Spell::HYPNOTIZE:
-	    if(Spell::GetExtraValue(Spell::FromInt(spell)) * spower < hp) return true;
+	    if(Spell::GetExtraValue(Spell::FromInt(spell)) * spower < hp) return 100;
 	    break;
 
 	default: break;
     }
 
-    return false;
+    return 0;
 }
 
 bool Battle2::Stats::isMagicAttack(void) const

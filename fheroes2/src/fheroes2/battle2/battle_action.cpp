@@ -646,7 +646,7 @@ void Battle2::Arena::GetTargetsForSpells(const HeroBase* hero, const u8 spell, c
     targets.reserve(8);
 
     TargetInfo res;
-    Battle2::Stats* target = GetTroopBoard(dst);
+    Stats* target = GetTroopBoard(dst);
 
     // from spells
     switch(spell)
@@ -705,7 +705,7 @@ void Battle2::Arena::GetTargetsForSpells(const HeroBase* hero, const u8 spell, c
 	    it2 = trgts.end();
 	    for(; it1 != it2; ++it1)
 	    {
-		Battle2::Stats* target = GetTroopBoard(*it1);
+		Stats* target = GetTroopBoard(*it1);
 		if(target)
 		{
 		    res.defender = target;
@@ -730,7 +730,7 @@ void Battle2::Arena::GetTargetsForSpells(const HeroBase* hero, const u8 spell, c
 	    std::vector<u16>::const_iterator it2 = positions.end();
             for(; it1 != it2; ++it1)
             {
-		Battle2::Stats* target = GetTroopBoard(*it1);
+		Stats* target = GetTroopBoard(*it1);
 		if(target && target->AllowApplySpell(spell, hero))
 		{
 		    res.defender = target;
@@ -759,7 +759,7 @@ void Battle2::Arena::GetTargetsForSpells(const HeroBase* hero, const u8 spell, c
 	    Board::const_iterator it2 = board.end();
             for(; it1 != it2; ++it1)
             {
-		Battle2::Stats* target = GetTroopBoard((*it1).index);
+		Stats* target = GetTroopBoard((*it1).index);
 		if(target && target->GetPosition() != dst && target->AllowApplySpell(spell, hero))
 		{
 		    res.defender = target;
@@ -770,6 +770,20 @@ void Battle2::Arena::GetTargetsForSpells(const HeroBase* hero, const u8 spell, c
         break;
 
 	default: break;
+    }
+
+    // remove resistent magic troop
+    std::vector<TargetInfo>::iterator it = targets.begin();
+    while(it != targets.end())
+    {
+	const u8 resist = (*it).defender->GetMagicResist(spell, hero ? hero->GetPower() : 0);
+
+	if(0 < resist && 100 > resist && resist >= Rand::Get(1, 100))
+	{
+	    if(interface) interface->RedrawActionResistSpell(*(*it).defender);
+	    targets.erase(it);
+	}
+	else ++it;
     }
 }
 
