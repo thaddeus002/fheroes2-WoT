@@ -1536,8 +1536,16 @@ u8 Battle2::Stats::GetMagicResist(u8 spell, u8 spower) const
     if(Spell::isUndeadOnly(spell) &&
         !troop.isUndead()) return 100;
 
+    if(Settings::Get().ExtBattleMagicTroopCanResist() && spell == GetSpellMagic(true))
+	return 20;
+
     switch(troop())
     {
+        case Monster::ARCHMAGE:
+	    if(Settings::Get().ExtBattleArchmageCanResistBadMagic() &&
+		(Spell::isDamage(spell) || Spell::isApplyToEnemies(spell))) return 20;
+	    break;
+
 	// 25% unfortunatly
 	case Monster::DWARF:
 	case Monster::BATTLE_DWARF:

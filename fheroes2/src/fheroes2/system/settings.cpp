@@ -108,6 +108,8 @@ static const settings_t settingsFHeroes2[] =
     { Settings::BATTLE_SHOW_MOVE_SHADOW,	_("battle: show move shadow"),				},
     { Settings::BATTLE_OBJECTS_ARCHERS_PENALTY, _("battle: high objects are an obstacle for archers"),  },
     { Settings::BATTLE_MERGE_ARMIES, 		_("battle: merge armies for hero from castle"),  	},
+    { Settings::BATTLE_ARCHMAGE_RESIST_BAD_SPELL,_("battle: archmage can resists (20%) bad spells"),     },
+    { Settings::BATTLE_MAGIC_TROOP_RESIST,	_("battle: magical creature resists (20%) the same magic"),},
     { Settings::GAME_SHOW_SYSTEM_INFO,		_("game: show system info"),				},
     { Settings::GAME_AUTOSAVE_ON,		_("game: autosave on"),					},
     { Settings::GAME_USE_FADE,			_("game: use fade"),					},
@@ -1031,6 +1033,16 @@ bool Settings::ExtBattleObjectsArchersPenalty(void) const
 bool Settings::ExtBattleMergeArmies(void) const
 {
     return ExtModes(BATTLE_MERGE_ARMIES);
+}
+
+bool Settings::ExtBattleArchmageCanResistBadMagic(void) const
+{
+    return ExtModes(BATTLE_ARCHMAGE_RESIST_BAD_SPELL);
+}
+
+bool Settings::ExtBattleMagicTroopCanResist(void) const
+{
+    return ExtModes(BATTLE_MAGIC_TROOP_RESIST);
 }
 
 bool Settings::ExtRewriteConfirm(void) const

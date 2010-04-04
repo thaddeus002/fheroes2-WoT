@@ -99,6 +99,8 @@ public:
 	CASTLE_ALLOW_BUY_FROM_WELL	= 0x20100000,
 	HEROES_LEARN_SPELLS_WITH_DAY	= 0x20200000,
 
+	BATTLE_ARCHMAGE_RESIST_BAD_SPELL= 0x40001000,
+	BATTLE_MAGIC_TROOP_RESIST	= 0x40002000,
 	BATTLE_SHOW_DAMAGE		= 0x40004000,
 	BATTLE_TROOP_DIRECTION		= 0x40008000,
 	BATTLE_SOFT_WAITING		= 0x40010000,
@@ -181,6 +183,8 @@ public:
     bool ExtBattleShowDamage(void) const;
     bool ExtBattleTroopDirection(void) const;
     bool ExtBattleSoftWait(void) const;
+    bool ExtBattleMagicTroopCanResist(void) const;
+    bool ExtBattleArchmageCanResistBadMagic(void) const;
     bool ExtBattleObjectsArchersPenalty(void) const;
     bool ExtBattleMergeArmies(void) const;
     bool ExtRewriteConfirm(void) const;

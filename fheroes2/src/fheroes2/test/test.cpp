@@ -110,7 +110,11 @@ void RunTest3(void)
     //army1.JoinTroop(Monster::Rand(Monster::LEVEL3), 10);
 
     army2.Clear();
-    army2.At(0) = Army::Troop(Monster::OGRE, 1);
+//    army2.At(0) = Army::Troop(Monster::OGRE, 1);
+    army2.At(0) = Army::Troop(Monster::DWARF, 2);
+    army2.At(1) = Army::Troop(Monster::DWARF, 2);
+    army2.At(2) = Army::Troop(Monster::DWARF, 2);
+    army2.At(3) = Army::Troop(Monster::DWARF, 2);
     army2.At(4) = Army::Troop(Monster::DWARF, 2);
 //    army2.JoinTroop(static_cast<Monster::monster_t>(1), 10);
 //    army2.JoinTroop(static_cast<Monster::monster_t>(4), 10);
