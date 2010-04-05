@@ -81,7 +81,6 @@ class Castle : public BitModes
 public:
     enum flags_t
     {
-	NEARLYSEA		= 0x0001,
 	ALLOWCASTLE		= 0x0002,
 	//			= 0x0004,
 	ALLOWBUILD		= 0x0008,
