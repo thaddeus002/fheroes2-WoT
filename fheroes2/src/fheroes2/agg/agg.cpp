@@ -46,9 +46,9 @@ AGG::File::File(void) : count_items(0), stream(NULL)
 bool AGG::File::Open(const std::string & fname)
 {
     filename = fname;
-    stream = new std::fstream(filename.c_str(), std::ios::in | std::ios::binary);
+    stream = new std::ifstream(filename.c_str(), std::ios::binary);
 
-    if(!stream || stream->fail())
+    if(!stream || !stream->is_open())
     {
 	DEBUG(DBG_ENGINE , DBG_WARN, "AGG::File: error read file: " << filename << ", skipping...");
 	return false;

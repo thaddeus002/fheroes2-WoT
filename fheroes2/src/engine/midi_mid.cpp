@@ -107,9 +107,9 @@ bool Mid::Read(const std::vector<u8> & body)
 
 bool Mid::Read(const std::string & filename)
 {
-    std::fstream fd(filename.c_str(), std::ios::in | std::ios::binary);
+    std::ifstream fd(filename.c_str(), std::ios::binary);
 
-    if(fd.fail())
+    if(!fd.is_open())
     {
         std::cerr << "Mid: error read: " << filename << std::endl;
 
@@ -183,9 +183,9 @@ bool Mid::Write(std::vector<u8> & body)
 
 bool Mid::Write(const std::string & filename)
 {
-    std::fstream fd(filename.c_str(), std::ios::out | std::ios::binary);
+    std::ofstream fd(filename.c_str(), std::ios::binary);
 
-    if(fd.fail())
+    if(!fd.is_open())
     {
         std::cerr << "error write: " << filename << std::endl;
 

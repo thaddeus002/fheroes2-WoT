@@ -168,9 +168,9 @@ bool Settings::Read(const std::string & filename)
     if(filename.empty()) return false;
 
     // read
-    std::fstream file(filename.c_str(), std::ios::in);
+    std::ifstream file(filename.c_str());
 
-    if(! file || file.fail()) return false;
+    if(!file.is_open()) return false;
 
     std::string str;
 
@@ -267,9 +267,9 @@ bool Settings::Save(const std::string & filename) const
 {
     if(filename.empty()) return false;
     
-    std::fstream file(filename.c_str(), std::ios::out);
+    std::ofstream file(filename.c_str());
 
-    if(! file || file.fail()) return false;
+    if(!file.is_open()) return false;
     
     Dump(file);
 

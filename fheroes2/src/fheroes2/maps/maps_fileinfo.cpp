@@ -69,9 +69,9 @@ bool Maps::FileInfo::ReadMP2(const std::string & filename)
 {
     if(filename.empty()) return false;
 
-    std::fstream fd(filename.c_str(), std::ios::in | std::ios::binary);
+    std::ifstream fd(filename.c_str(), std::ios::binary);
 
-    if(! fd || fd.fail())
+    if(!fd.is_open())
     {
 	DEBUG(DBG_GAME , DBG_WARN, "Maps::FileInfo::ReadMP2: file not found " << filename);
 	return false;

@@ -211,8 +211,8 @@ void World::LoadMaps(const std::string &filename)
     Reset();
     Defaults();
 
-    std::fstream fd(filename.c_str(), std::ios::in | std::ios::binary);
-    if(! fd || fd.fail()) Error::Except("World::LoadMaps: file not found ", filename.c_str());
+    std::ifstream fd(filename.c_str(), std::ios::binary);
+    if(!fd.is_open()) Error::Except("World::LoadMaps: file not found ", filename.c_str());
 
     AGG::PreloadObject(TIL::GROUND32);
 

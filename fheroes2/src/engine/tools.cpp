@@ -328,8 +328,8 @@ u32 GetMemoryUsage(void)
     std::ostringstream os;
     os << "/proc/" << getpid() << "/statm";
 
-    std::fstream fs(os.str().c_str(), std::ios::in);
-    if(fs.good())
+    std::ifstream fs(os.str().c_str());
+    if(fs.is_open())
     {
 	fs >> size;
         fs.close();
@@ -421,10 +421,10 @@ KeySym KeySymFromChar(char c)
 
 bool FilePresent(const std::string & file)
 {
-    std::fstream fs;
+    std::ifstream fs;
     // check file
-    fs.open(file.c_str(), std::ios::in | std::ios::binary);
-    if(fs.good())
+    fs.open(file.c_str(), std::ios::binary);
+    if(fs.is_open())
     {
         fs.close();
         return true;
@@ -434,9 +434,9 @@ bool FilePresent(const std::string & file)
 
 bool StoreMemToFile(const std::vector<u8> & data, const std::string & file)
 {
-    std::fstream fs;
-    fs.open(file.c_str(), std::ios::out | std::ios::binary);
-    if(fs.good() && data.size())
+    std::ofstream fs;
+    fs.open(file.c_str(), std::ios::binary);
+    if(fs.is_open() && data.size())
     {
         fs.write(reinterpret_cast<const char*>(&data[0]), data.size());
         fs.close();
@@ -447,9 +447,9 @@ bool StoreMemToFile(const std::vector<u8> & data, const std::string & file)
 
 bool StoreFileToMem(std::vector<u8> & data, const std::string & file)
 {
-    std::fstream fs;
-    fs.open(file.c_str(), std::ios::in | std::ios::binary);
-    if(fs.good())
+    std::ifstream fs;
+    fs.open(file.c_str(), std::ios::binary);
+    if(fs.is_open())
     {
         fs.seekg(0, std::ios_base::end);
         data.resize(fs.tellg());

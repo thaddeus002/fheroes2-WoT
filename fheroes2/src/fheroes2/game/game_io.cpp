@@ -54,8 +54,8 @@ bool Game::Save(const std::string &fn)
     if(! Game::IO::SaveBIN(msg)) return false;
 
 #ifdef WITH_ZLIB
-    std::fstream fs(fn.c_str(), std::ios::out | std::ios::binary);
-    if(fs.fail()) return false;
+    std::ofstream fs(fn.c_str(), std::ios::binary);
+    if(!fs.is_open()) return false;
     std::vector<char> v;
     if(!ZLib::Compress(v, msg.DtPt(), msg.DtSz())) return false;
     fs.write(&v[0], v.size());

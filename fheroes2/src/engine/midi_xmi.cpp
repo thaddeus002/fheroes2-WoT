@@ -111,9 +111,9 @@ bool Xmi::Read(const std::vector<u8> & body)
 
 bool Xmi::Read(const std::string & filename)
 {
-    std::fstream fd(filename.c_str(), std::ios::in | std::ios::binary);
+    std::ifstream fd(filename.c_str(), std::ios::binary);
 
-    if(fd.fail())
+    if(!fd.is_open())
     {
         std::cerr << "Xmi: error read: " << filename.c_str() << std::endl;
         return false;

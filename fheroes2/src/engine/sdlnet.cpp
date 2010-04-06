@@ -266,9 +266,9 @@ size_t QueueMessage::DtSz(void) const
 
 void QueueMessage::Save(const char* fn) const
 {
-    std::fstream fs(fn, std::ios::out | std::ios::binary);
+    std::ofstream fs(fn, std::ios::binary);
 
-    if(fs.good())
+    if(fs.is_open())
     {
 	fs.write(DtPt(), DtSz());
 	fs.close();
@@ -277,9 +277,9 @@ void QueueMessage::Save(const char* fn) const
 
 void QueueMessage::Load(const char* fn)
 {
-    std::fstream fs(fn, std::ios::in | std::ios::binary);
+    std::ifstream fs(fn, std::ios::binary);
 
-    if(fs.good())
+    if(fs.is_open())
     {
 	fs.seekg(0, std::ios_base::end);
 	dtsz = fs.tellg();
