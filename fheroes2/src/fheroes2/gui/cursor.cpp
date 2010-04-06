@@ -307,5 +307,9 @@ void Cursor::DrawCursor(Surface &surface, const u8 indexcolor, bool solid)
 
 void Cursor::Show(void)
 {
+#ifdef WITHOUT_MOUSE
+    SpriteCursor::Show();
+#else
     if(! Settings::Get().ExtHideCursor()) SpriteCursor::Show();
+#endif
 }
