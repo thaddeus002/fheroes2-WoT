@@ -800,6 +800,7 @@ void LocalEvent::SetStateDefaults(void)
 void LocalEvent::SetEmulateMouse(bool f)
 {
     emulate_mouse = f;
+    if(f) mouse_cu = Point(0, 0);
 }
 
 void LocalEvent::SetEmulateMouseUpKey(int k)
