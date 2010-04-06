@@ -71,7 +71,7 @@ namespace AGG
 	std::string filename;
 	std::map<std::string, FAT> fat;
 	u16 count_items;
-	std::fstream * stream;
+	std::ifstream* stream;
     };
 
     struct icn_cache_t
