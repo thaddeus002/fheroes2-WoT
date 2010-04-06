@@ -921,6 +921,9 @@ void Battle2::Arena::Turns(u16 turn, Result & result)
 		if(towers[1] && towers[1]->isValid()) towers[1]->Action();
 		if(towers[2] && towers[2]->isValid()) towers[2]->Action();
 		tower_moved = true;
+
+    		// check dead last army from towers
+    		if(!army1.isValid() || !army2.isValid() || result.army1 || result.army2) break;
 	    }
 	}
 
