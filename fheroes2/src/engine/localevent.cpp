@@ -28,6 +28,17 @@
 LocalEvent::LocalEvent() : modes(0), key_value(KEY_NONE), mouse_state(0),
     mouse_button(0), mouse_st(0, 0), redraw_cursor_func(NULL), keyboard_filter_func(NULL), clock_delay(TAP_DELAY_EMULATE)
 {
+#ifdef WITHOUT_MOUSE
+    emulate_mouse = true;
+    emulate_mouse_up = KEY_UP;
+    emulate_mouse_down = KEY_DOWN;
+    emulate_mouse_left = KEY_LEFT;
+    emulate_mouse_right = KEY_RIGHT;
+    emulate_mouse_step = 10;
+    emulate_press_left = KEY_1;
+    emulate_press_right = KEY_2;
+#endif
+
 #ifdef WITH_KEYMAPPING
     vkey.reserve(12);
 #endif
@@ -259,12 +270,11 @@ bool LocalEvent::HandleEvents(bool delay)
     {
 	switch(event.type)
 	{
-
 	    // keyboard
 	    case SDL_KEYDOWN:
 	    case SDL_KEYUP:
-		HandleKeyboardEvent(event.key);
-		break;
+                HandleKeyboardEvent(event.key);
+	    	break;
 
 	    // mouse motion
 	    case SDL_MOUSEMOTION:
@@ -357,6 +367,74 @@ void LocalEvent::HandleKeyboardEvent(SDL_KeyboardEvent & event)
 	key_value = SDLToKeySym(event.keysym.sym);
 #ifdef WITH_KEYMAPPING
 	key_value = GetVirtualKey(key_value);
+#endif
+
+#ifdef WITHOUT_MOUSE
+	if(emulate_mouse)
+	{
+	    if(emulate_mouse_up == key_value)
+	    {
+		mouse_cu.y -= emulate_mouse_step;
+		SetModes(MOUSE_MOTION);
+	    }
+	    else
+	    if(emulate_mouse_down == key_value)
+	    {
+		mouse_cu.y += emulate_mouse_step;
+		SetModes(MOUSE_MOTION);
+	    }
+	    else
+	    if(emulate_mouse_left == key_value)
+	    {
+		mouse_cu.x -= emulate_mouse_step;
+		SetModes(MOUSE_MOTION);
+	    }
+	    else
+	    if(emulate_mouse_right == key_value)
+	    {
+		mouse_cu.x += emulate_mouse_step;
+		SetModes(MOUSE_MOTION);
+	    }
+
+	    if(emulate_press_left == key_value)
+	    {
+		if(modes & KEY_PRESSED)
+		{
+		    mouse_pl = mouse_cu;
+		    SetModes(MOUSE_PRESSED);
+		    SetModes(CLICK_LEFT);
+		}
+		else
+		{
+		    mouse_rl = mouse_cu;
+		    ResetModes(MOUSE_PRESSED);
+		}
+		mouse_button = SDL_BUTTON_LEFT;
+	    }
+	    else
+	    if(emulate_press_right == key_value)
+	    {
+		if(modes & KEY_PRESSED)
+		{
+		    mouse_pr = mouse_cu;
+		    SetModes(MOUSE_PRESSED);
+		}
+		else
+		{
+		    mouse_rr = mouse_cu;
+		    ResetModes(MOUSE_PRESSED);
+		}
+		mouse_button = SDL_BUTTON_RIGHT;
+	    }
+
+    	    if((modes & MOUSE_MOTION) && redraw_cursor_func)
+	    {
+		if(modes & MOUSE_OFFSET)
+    		    (*(redraw_cursor_func))(mouse_cu.x + mouse_st.x, mouse_cu.y + mouse_st.y);
+    		else
+		    (*(redraw_cursor_func))(mouse_cu.x, mouse_cu.y);
+	    }
+	}
 #endif
     }
 }
@@ -602,6 +680,7 @@ bool LocalEvent::MouseCursor(const Rect &rt) const
 
 const Point & LocalEvent::GetMouseCursor(void)
 {
+#ifndef WITHOUT_MOUSE
     int x, y;
 
     SDL_PumpEvents();
@@ -609,6 +688,7 @@ const Point & LocalEvent::GetMouseCursor(void)
 
     mouse_cu.x = x;
     mouse_cu.y = y;
+#endif
     if(modes & MOUSE_OFFSET) mouse_cu += mouse_st;
 
     return mouse_cu;
@@ -715,3 +795,45 @@ void LocalEvent::SetStateDefaults(void)
     SDL_SetEventFilter(GlobalFilterEvents);
 #endif
 }
+
+#ifdef WITHOUT_MOUSE
+void LocalEvent::SetEmulateMouse(bool f)
+{
+    emulate_mouse = f;
+}
+
+void LocalEvent::SetEmulateMouseUpKey(int k)
+{
+    emulate_mouse_up = static_cast<KeySym>(k);
+}
+
+void LocalEvent::SetEmulateMouseDownKey(int k)
+{
+    emulate_mouse_down = static_cast<KeySym>(k);
+}
+
+void LocalEvent::SetEmulateMouseLeftKey(int k)
+{
+    emulate_mouse_left = static_cast<KeySym>(k);
+}
+
+void LocalEvent::SetEmulateMouseRightKey(int k)
+{
+    emulate_mouse_right = static_cast<KeySym>(k);
+}
+                                
+void LocalEvent::SetEmulateMouseStep(u8 s)
+{
+    emulate_mouse_step = s;
+}
+
+void LocalEvent::SetEmulatePressLeftKey(int k)
+{
+    emulate_press_left = static_cast<KeySym>(k);
+}
+
+void LocalEvent::SetEmulatePressRightKey(int k)
+{
+    emulate_press_right = static_cast<KeySym>(k);
+}
+#endif

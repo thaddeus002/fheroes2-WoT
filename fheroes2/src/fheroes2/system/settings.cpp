@@ -214,8 +214,8 @@ bool Settings::Read(const std::string & filename)
 		    if(ptr->str) opt_global.ResetModes(ptr->id);
 		}
 	    }
-	    else
-		Parse(left, right);
+
+	    Parse(left, right);
 	}
     }
 
@@ -437,6 +437,8 @@ const Size & Settings::VideoMode(void) const { return video_mode; }
 
 void Settings::Parse(const std::string & left, const std::string & right)
 {
+    LocalEvent & le = LocalEvent::Get();
+
     // debug
     if(left == "debug") debug = String::ToInt(right);
     else
@@ -561,12 +563,30 @@ void Settings::Parse(const std::string & left, const std::string & right)
     }
     // offset mouse
     else
-    if(left == "pointer offset x") LocalEvent::Get().SetMouseOffsetX(String::ToInt(right));
+    if(left == "pointer offset x") le.SetMouseOffsetX(String::ToInt(right));
     else
-    if(left == "pointer offset y") LocalEvent::Get().SetMouseOffsetY(String::ToInt(right));
+    if(left == "pointer offset y") le.SetMouseOffsetY(String::ToInt(right));
     // tap delay for right click emulation
     else
-    if(left == "tap delay") LocalEvent::Get().SetTapDelayForRightClickEmulation(String::ToInt(right));
+    if(left == "tap delay") le.SetTapDelayForRightClickEmulation(String::ToInt(right));
+#ifdef WITHOUT_MOUSE
+    else
+    if(left == "emulate mouse") le.SetEmulateMouse(right == "on");
+    else
+    if(left == "emulate mouse up") le.SetEmulateMouseUpKey(String::ToInt(right));
+    else
+    if(left == "emulate mouse down") le.SetEmulateMouseDownKey(String::ToInt(right));
+    else
+    if(left == "emulate mouse left") le.SetEmulateMouseLeftKey(String::ToInt(right));
+    else
+    if(left == "emulate mouse right") le.SetEmulateMouseRightKey(String::ToInt(right));
+    else
+    if(left == "emulate mouse step") le.SetEmulateMouseStep(String::ToInt(right));
+    else
+    if(left == "emulate press left") le.SetEmulatePressLeftKey(String::ToInt(right));
+    else
+    if(left == "emulate press right") le.SetEmulatePressRightKey(String::ToInt(right));
+#endif
 #ifdef WITH_KEYMAPPING
     else
     // load virtual key map

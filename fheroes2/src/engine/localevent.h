@@ -242,6 +242,17 @@ public:
     KeySym KeyValue(void) const;
     u16	   KeyMod(void) const;
 
+#ifdef WITHOUT_MOUSE
+    void SetEmulateMouse(bool);
+    void SetEmulateMouseUpKey(int);
+    void SetEmulateMouseDownKey(int);
+    void SetEmulateMouseLeftKey(int);
+    void SetEmulateMouseRightKey(int);
+    void SetEmulateMouseStep(u8);
+    void SetEmulatePressLeftKey(int);
+    void SetEmulatePressRightKey(int);
+#endif
+
 private:
     LocalEvent();
 
@@ -294,6 +305,17 @@ private:
 
     SDL::Time clock;
     double clock_delay;
+
+#ifdef WITHOUT_MOUSE
+    bool emulate_mouse;
+    KeySym emulate_mouse_up;
+    KeySym emulate_mouse_down;
+    KeySym emulate_mouse_left;
+    KeySym emulate_mouse_right;
+    u8 emulate_mouse_step;
+    KeySym emulate_press_left;
+    KeySym emulate_press_right;
+#endif
 
 #ifdef WITH_KEYMAPPING
     std::vector<KeyMap> vkey;
