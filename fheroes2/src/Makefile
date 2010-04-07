@@ -10,7 +10,7 @@ CFLAGS := $(CFLAGS) -Wall -fsigned-char
 LIBS :=
 
 ifdef DEBUG
-CFLAGS := $(CFLAGS) -O0 -g -pedantic -DWITH_DEBUG -DWITHOUT_MOUSE
+CFLAGS := $(CFLAGS) -O0 -g -pedantic -DWITH_DEBUG
 else
 CFLAGS := $(CFLAGS) -O2
 endif
