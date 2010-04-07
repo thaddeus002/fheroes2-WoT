@@ -120,6 +120,7 @@ namespace Battle2
 	void RedrawActionSummonElementalSpell(const Stats &);
 	void RedrawActionMirrorImageSpell(const Stats &, u16);
 	void RedrawActionRemoveMirrorImage(const Stats &);
+	void RedrawActionSkipStatus(const Stats &);
 
 	void HumanBattleTurn(const Stats &, Actions &, std::string &);
 	void HumanCastSpellTurn(const Stats &, Actions &, std::string &);

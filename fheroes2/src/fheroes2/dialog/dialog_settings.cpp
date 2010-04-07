@@ -155,6 +155,7 @@ void Dialog::ExtSettings(void)
     states.push_back(Settings::BATTLE_MERGE_ARMIES);
     states.push_back(Settings::BATTLE_ARCHMAGE_RESIST_BAD_SPELL);
     states.push_back(Settings::BATTLE_MAGIC_TROOP_RESIST);
+    states.push_back(Settings::BATTLE_SKIP_INCREASE_DEFENCE);
 
     if(conf.PocketPC())
     {

@@ -406,10 +406,11 @@ void Battle2::Arena::ApplyActionSkip(Action & action)
     action.Pop(id);
 
     Battle2::Stats* battle = GetTroopID(id);
-
-    if(battle && battle->isValid())
+    if(battle && battle->isValid() && !battle->Modes(TR_MOVED))
     {
 	battle->SetModes(battle->Modes(TR_SKIPMOVE) ? TR_MOVED : TR_SKIPMOVE);
+
+	if(interface) interface->RedrawActionSkipStatus(*battle);
 
 	DEBUG(DBG_BATTLE, DBG_TRACE, "Battle2::Arena::ApplyActionSkip: " << \
 	    battle->GetName() << "(color: " << Color::String(battle->GetColor()) << ", pos: " << battle->position << ")");
@@ -426,9 +427,11 @@ void Battle2::Arena::ApplyActionEnd(Action & action)
 
     Battle2::Stats* battle = GetTroopID(id);
 
-    if(battle)
+    if(battle && !battle->Modes(TR_MOVED))
     {
 	battle->SetModes(TR_MOVED);
+
+	if(battle->Modes(TR_SKIPMOVE) && interface) interface->RedrawActionSkipStatus(*battle);
 
 	DEBUG(DBG_BATTLE, DBG_TRACE, "Battle2::Arena::ApplyActionEnd: " << \
 	    battle->GetName() << "(color: " << Color::String(battle->GetColor()) << ", pos: " << battle->position << ")");

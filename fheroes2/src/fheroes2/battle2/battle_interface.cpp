@@ -1427,14 +1427,7 @@ void Battle2::Interface::HumanBattleTurn(const Stats & b, Actions & a, std::stri
 	    // skip
 	    case KEY_s:		a.AddedSkipAction(b); a.AddedEndAction(b);  humanturn_exit = true; break;
     	    case KEY_SPACE:
-    		if(conf.ExtBattleSoftWait())
-    		{
-    		    a.AddedSkipAction(b);
-    		    std::string str(_("%{name} waiting"));
-    		    String::Replace(str, "%{name}", b.GetName());
-    		    status.SetMessage(str, true);
-    		    humanturn_exit = true;
-    		}
+    		if(conf.ExtBattleSoftWait()) { a.AddedSkipAction(b); humanturn_exit = true; }
     		break;
 
 	    // options
@@ -1882,6 +1875,21 @@ void Battle2::Interface::RedrawTroopFrameAnimation(Stats & b)
 	}
 	++ticket;
     }
+}
+
+void Battle2::Interface::RedrawActionSkipStatus(const Stats & attacker)
+{
+    std::string msg;
+    if(attacker.Modes(TR_MOVED))
+    {
+	msg = _("%{name} skipping turn");
+	if(Settings::Get().ExtBattleSkipIncreaseDefence()) msg.append(_(", and get +2 defence"));
+    }
+    else
+	msg = _("%{name} waiting turn");
+
+    String::Replace(msg, "%{name}", attacker.GetName());
+    status.SetMessage(msg, true);
 }
 
 void Battle2::Interface::RedrawActionAttackPart1(Stats & attacker, Stats & defender, const std::vector<TargetInfo> & targets)

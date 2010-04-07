@@ -1016,6 +1016,9 @@ u16 Battle2::Stats::GetDefense(void) const
     else
     if(Modes(SP_STEELSKIN)) res += Spell::GetExtraValue(Spell::STEELSKIN);
 
+    // extra
+    if(Modes(TR_SKIPMOVE | TR_MOVED) && Settings::Get().ExtBattleSkipIncreaseDefence()) res += 2;
+
     // disrupting ray accumulate effect
     if(disruptingray) res -= disruptingray * Spell::GetExtraValue(Spell::DISRUPTINGRAY);
     if(0 > res) res = 1;

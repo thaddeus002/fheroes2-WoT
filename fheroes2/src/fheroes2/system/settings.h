@@ -108,6 +108,7 @@ public:
         BATTLE_SHOW_MOUSE_SHADOW	= 0x40040000,
         BATTLE_SHOW_MOVE_SHADOW		= 0x40080000,
         BATTLE_MERGE_ARMIES		= 0x40100000,
+        BATTLE_SKIP_INCREASE_DEFENCE	= 0x40200000,
 	BATTLE_OBJECTS_ARCHERS_PENALTY	= 0x42000000,
 
 	SETTINGS_LAST
@@ -188,6 +189,7 @@ public:
     bool ExtBattleArchmageCanResistBadMagic(void) const;
     bool ExtBattleObjectsArchersPenalty(void) const;
     bool ExtBattleMergeArmies(void) const;
+    bool ExtBattleSkipIncreaseDefence(void) const;
     bool ExtRewriteConfirm(void) const;
     bool ExtAutosaveConfirm(void) const;
     bool ExtHideCursor(void) const;
