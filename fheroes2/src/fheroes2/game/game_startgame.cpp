@@ -835,6 +835,8 @@ Game::menu_t Game::HumanTurn(void)
 	    case KEY_s:		KeyPress_s(); break;
 	    // load game
 	    case KEY_l:		KeyPress_l(res); break;
+	    // file options
+	    case KEY_f:		ButtonFile(res); break;
 	    // puzzle map
 	    case KEY_p:		KeyPress_p(); break;
 	    // info game
