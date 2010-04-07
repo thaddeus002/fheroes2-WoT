@@ -160,7 +160,7 @@ void Interface::Basic::Redraw(u8 force)
 	    cursor.Hide();
 	    Mixer::Reset();
 
-	    Rect rect((display.w() - 90) / 2, (display.h() - 30) / 2, 90, 30);
+	    Rect rect((display.w() - 90) / 2, (display.h() - 30) / 2, 90, 45);
 	    TextBox text("memory limit\nclear cache\nwaiting...", Font::SMALL, rect.w);
 
 	    display.FillRect(0, 0, 0, rect);
