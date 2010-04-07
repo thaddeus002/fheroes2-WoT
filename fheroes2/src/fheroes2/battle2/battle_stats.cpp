@@ -636,10 +636,10 @@ u8 Battle2::Stats::GetSpeed(bool skip_standing_check) const
 
     const u8 speed = GetMonster().GetSpeed();
 
-    if(Modes(SP_HASTE)) return (Speed::ULTRAFAST < speed ? Speed::INSTANT : speed + Spell::GetExtraValue(Spell::HASTE));
+    if(Modes(SP_HASTE)) return (Spell::GetExtraValue(Spell::HASTE) ? speed + Spell::GetExtraValue(Spell::HASTE) : Speed::GetOriginalFast(speed));
     else
-    if(Modes(SP_SLOW)) return (Speed::SLOW > speed ? Speed::CRAWLING : speed - Spell::GetExtraValue(Spell::SLOW));
-    
+    if(Modes(SP_SLOW)) return (Spell::GetExtraValue(Spell::SLOW) ? speed - Spell::GetExtraValue(Spell::SLOW) : Speed::GetOriginalSlow(speed));
+
     return speed;
 }
 

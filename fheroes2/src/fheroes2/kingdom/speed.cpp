@@ -44,3 +44,41 @@ const char* Speed::String(u8 speed)
     
     return str_speed[10];
 }
+
+Speed::speed_t Speed::GetOriginalSlow(u8 speed)
+{
+    switch(speed)
+    {
+	case CRAWLING:
+	case VERYSLOW:	return CRAWLING;
+	case SLOW:
+	case AVERAGE:	return VERYSLOW;
+	case FAST:
+	case VERYFAST:	return SLOW;
+	case ULTRAFAST:
+	case BLAZING:	return AVERAGE;
+	case INSTANT:	return FAST;
+	default: break;
+    }
+
+    return STANDING;
+}
+
+Speed::speed_t Speed::GetOriginalFast(u8 speed)
+{
+    switch(speed)
+    {
+	case CRAWLING:	return SLOW;
+	case VERYSLOW:	return AVERAGE;
+	case SLOW:	return FAST;
+	case AVERAGE:
+	case FAST:	return VERYFAST;
+	case VERYFAST:	return BLAZING;
+	case ULTRAFAST:
+	case BLAZING:
+	case INSTANT:	return INSTANT;
+	default: break;
+    }
+
+    return STANDING;
+}
