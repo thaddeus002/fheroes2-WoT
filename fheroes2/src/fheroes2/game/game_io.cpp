@@ -624,9 +624,10 @@ bool Game::IO::LoadBIN(QueueMessage & msg)
 
     // format version
     msg.Pop(format);
-    if(format > CURRENT_FORMAT_VERSION)
+    if(format > CURRENT_FORMAT_VERSION || format < LAST_FORMAT_VERSION)
     {
     	DEBUG(DBG_GAME , DBG_WARN, "Game::IO::LoadBIN: unknown format: 0x" << std::hex << format);
+    	return false;
     }
     else
     {
@@ -1045,35 +1046,23 @@ void Game::IO::UnpackCastle(QueueMessage & msg, Castle & castle, u16 check_versi
     msg.Pop(castle.name);
     msg.Pop(castle.building);
 
-    // mageguild
-    if(check_version && check_version < FORMAT_VERSION_1520)
+    // general
+    msg.Pop(byte32);
+    castle.mageguild.general.spells.clear();
+    castle.mageguild.general.spells.reserve(byte32);
+    for(u32 jj = 0; jj < byte32; ++jj)
     {
 	msg.Pop(byte8);
-	msg.Pop(byte8);
-	msg.Pop(byte32);
-	for(u32 jj = 0; jj < byte32; ++jj) msg.Pop(byte8);
-	castle.mageguild.Builds();
+	castle.mageguild.general.spells.push_back(Spell::FromInt(byte8));
     }
-    else
+    // library
+    msg.Pop(byte32);
+    castle.mageguild.library.spells.clear();
+    castle.mageguild.library.spells.reserve(byte32);
+    for(u32 jj = 0; jj < byte32; ++jj)
     {
-	// general
-	msg.Pop(byte32);
-	castle.mageguild.general.spells.clear();
-	castle.mageguild.general.spells.reserve(byte32);
-	for(u32 jj = 0; jj < byte32; ++jj)
-	{
-	    msg.Pop(byte8);
-	    castle.mageguild.general.spells.push_back(Spell::FromInt(byte8));
-	}
-	// library
-	msg.Pop(byte32);
-	castle.mageguild.library.spells.clear();
-	castle.mageguild.library.spells.reserve(byte32);
-	for(u32 jj = 0; jj < byte32; ++jj)
-	{
-	    msg.Pop(byte8);
-	    castle.mageguild.library.spells.push_back(Spell::FromInt(byte8));
-	}
+	msg.Pop(byte8);
+	castle.mageguild.library.spells.push_back(Spell::FromInt(byte8));
     }
 
     // armies
