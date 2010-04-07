@@ -71,8 +71,8 @@ Speed::speed_t Speed::GetOriginalFast(u8 speed)
 	case CRAWLING:	return SLOW;
 	case VERYSLOW:	return AVERAGE;
 	case SLOW:	return FAST;
-	case AVERAGE:
-	case FAST:	return VERYFAST;
+	case AVERAGE:	return VERYFAST;
+	case FAST:	return ULTRAFAST;
 	case VERYFAST:	return BLAZING;
 	case ULTRAFAST:
 	case BLAZING:
