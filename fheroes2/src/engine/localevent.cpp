@@ -837,4 +837,14 @@ void LocalEvent::SetEmulatePressRightKey(int k)
 {
     emulate_press_right = static_cast<KeySym>(k);
 }
+
+bool LocalEvent::EmulateKeyPressed(void) const
+{
+    return  key_value == emulate_mouse_up ||
+	    key_value == emulate_mouse_down ||
+	    key_value == emulate_mouse_left ||
+	    key_value == emulate_mouse_right ||
+	    key_value == emulate_press_left ||
+	    key_value == emulate_press_right;
+}
 #endif
