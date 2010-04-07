@@ -846,7 +846,9 @@ bool LocalEvent::EmulateMouseAction(KeySym key)
     	    else
 		(*(redraw_cursor_func))(mouse_cu.x, mouse_cu.y);
 	}
-	
+
+	ResetModes(KEY_PRESSED);
+
 	return true;
     }
 
