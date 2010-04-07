@@ -251,7 +251,7 @@ public:
     void SetEmulateMouseStep(u8);
     void SetEmulatePressLeftKey(int);
     void SetEmulatePressRightKey(int);
-    bool EmulateKeyPressed(void) const;
+    bool EmulateMouseAction(KeySym);
 #endif
 
 private:

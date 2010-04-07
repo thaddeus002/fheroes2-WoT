@@ -364,77 +364,14 @@ void LocalEvent::HandleKeyboardEvent(SDL_KeyboardEvent & event)
     if(KEY_NONE != SDLToKeySym(event.keysym.sym))
     {
 	(event.type == SDL_KEYDOWN) ? SetModes(KEY_PRESSED) : ResetModes(KEY_PRESSED);
+
+#ifdef WITHOUT_MOUSE
+	if(EmulateMouseAction(SDLToKeySym(event.keysym.sym))) return;
+#endif
+
 	key_value = SDLToKeySym(event.keysym.sym);
 #ifdef WITH_KEYMAPPING
 	key_value = GetVirtualKey(key_value);
-#endif
-
-#ifdef WITHOUT_MOUSE
-	if(emulate_mouse)
-	{
-	    if(emulate_mouse_up == key_value)
-	    {
-		mouse_cu.y -= emulate_mouse_step;
-		SetModes(MOUSE_MOTION);
-	    }
-	    else
-	    if(emulate_mouse_down == key_value)
-	    {
-		mouse_cu.y += emulate_mouse_step;
-		SetModes(MOUSE_MOTION);
-	    }
-	    else
-	    if(emulate_mouse_left == key_value)
-	    {
-		mouse_cu.x -= emulate_mouse_step;
-		SetModes(MOUSE_MOTION);
-	    }
-	    else
-	    if(emulate_mouse_right == key_value)
-	    {
-		mouse_cu.x += emulate_mouse_step;
-		SetModes(MOUSE_MOTION);
-	    }
-
-	    if(emulate_press_left == key_value)
-	    {
-		if(modes & KEY_PRESSED)
-		{
-		    mouse_pl = mouse_cu;
-		    SetModes(MOUSE_PRESSED);
-		    SetModes(CLICK_LEFT);
-		}
-		else
-		{
-		    mouse_rl = mouse_cu;
-		    ResetModes(MOUSE_PRESSED);
-		}
-		mouse_button = SDL_BUTTON_LEFT;
-	    }
-	    else
-	    if(emulate_press_right == key_value)
-	    {
-		if(modes & KEY_PRESSED)
-		{
-		    mouse_pr = mouse_cu;
-		    SetModes(MOUSE_PRESSED);
-		}
-		else
-		{
-		    mouse_rr = mouse_cu;
-		    ResetModes(MOUSE_PRESSED);
-		}
-		mouse_button = SDL_BUTTON_RIGHT;
-	    }
-
-    	    if((modes & MOUSE_MOTION) && redraw_cursor_func)
-	    {
-		if(modes & MOUSE_OFFSET)
-    		    (*(redraw_cursor_func))(mouse_cu.x + mouse_st.x, mouse_cu.y + mouse_st.y);
-    		else
-		    (*(redraw_cursor_func))(mouse_cu.x, mouse_cu.y);
-	    }
-	}
 #endif
     }
 }
@@ -838,13 +775,82 @@ void LocalEvent::SetEmulatePressRightKey(int k)
     emulate_press_right = static_cast<KeySym>(k);
 }
 
-bool LocalEvent::EmulateKeyPressed(void) const
+bool LocalEvent::EmulateMouseAction(KeySym key)
 {
-    return  key_value == emulate_mouse_up ||
-	    key_value == emulate_mouse_down ||
-	    key_value == emulate_mouse_left ||
-	    key_value == emulate_mouse_right ||
-	    key_value == emulate_press_left ||
-	    key_value == emulate_press_right;
+    if((key == emulate_mouse_up ||
+	key == emulate_mouse_down ||
+	key == emulate_mouse_left ||
+	key == emulate_mouse_right ||
+	key == emulate_press_left ||
+	key == emulate_press_right) && emulate_mouse)
+    {
+	if(emulate_mouse_up == key)
+	{
+	    mouse_cu.y -= emulate_mouse_step;
+	    SetModes(MOUSE_MOTION);
+	}
+	else
+	if(emulate_mouse_down == key)
+	{
+	    mouse_cu.y += emulate_mouse_step;
+	    SetModes(MOUSE_MOTION);
+	}
+	else
+	if(emulate_mouse_left == key)
+	{
+	    mouse_cu.x -= emulate_mouse_step;
+	    SetModes(MOUSE_MOTION);
+	}
+	else
+	if(emulate_mouse_right == key)
+	{
+	    mouse_cu.x += emulate_mouse_step;
+	    SetModes(MOUSE_MOTION);
+	}
+
+	if(emulate_press_left == key)
+	{
+	    if(modes & KEY_PRESSED)
+	    {
+		mouse_pl = mouse_cu;
+		SetModes(MOUSE_PRESSED);
+		SetModes(CLICK_LEFT);
+	    }
+	    else
+	    {
+		mouse_rl = mouse_cu;
+		ResetModes(MOUSE_PRESSED);
+	    }
+	    mouse_button = SDL_BUTTON_LEFT;
+	}
+	else
+	if(emulate_press_right == key)
+	{
+	    if(modes & KEY_PRESSED)
+	    {
+		mouse_pr = mouse_cu;
+		SetModes(MOUSE_PRESSED);
+	    }
+	    else
+	    {
+		mouse_rr = mouse_cu;
+		ResetModes(MOUSE_PRESSED);
+	    }
+	    mouse_button = SDL_BUTTON_RIGHT;
+	}
+
+    	if((modes & MOUSE_MOTION) && redraw_cursor_func)
+	{
+	    if(modes & MOUSE_OFFSET)
+    		(*(redraw_cursor_func))(mouse_cu.x + mouse_st.x, mouse_cu.y + mouse_st.y);
+    	    else
+		(*(redraw_cursor_func))(mouse_cu.x, mouse_cu.y);
+	}
+	
+	return true;
+    }
+
+    return false;
 }
+
 #endif

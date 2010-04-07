@@ -820,12 +820,7 @@ Game::menu_t Game::HumanTurn(void)
 	}
 
 	// hot keys
-#ifdef WITHOUT_MOUSE
-	if(le.KeyPress() && !le.EmulateKeyPressed())
-#else
-	if(le.KeyPress())
-#endif
-	switch(le.KeyValue())
+	if(le.KeyPress()) switch(le.KeyValue())
 	{
 	    // exit
 	    case KEY_ESCAPE:	KeyPress_ESC(res); break;
