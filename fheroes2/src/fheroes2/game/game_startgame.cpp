@@ -823,6 +823,7 @@ Game::menu_t Game::HumanTurn(void)
 	if(le.KeyPress()) switch(le.KeyValue())
 	{
 	    // exit
+	    case KEY_q:
 	    case KEY_ESCAPE:	KeyPress_ESC(res); break;
     	    // end turn
 	    case KEY_e:		KeyPress_e(res); break;
