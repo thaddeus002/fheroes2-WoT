@@ -21,6 +21,7 @@
  ***************************************************************************/
 
 #include "error.h"
+#include "display.h"
 #include "localevent.h"
 
 #define TAP_DELAY_EMULATE 1050
@@ -807,6 +808,11 @@ bool LocalEvent::EmulateMouseAction(KeySym key)
 	    mouse_cu.x += emulate_mouse_step;
 	    SetModes(MOUSE_MOTION);
 	}
+
+	if(mouse_cu.x < 0) mouse_cu.x = 0;
+	if(mouse_cu.y < 0) mouse_cu.y = 0;
+	if(mouse_cu.x > Display::Get().w()) mouse_cu.x = Display::Get().w();
+	if(mouse_cu.y > Display::Get().h()) mouse_cu.y = Display::Get().h();
 
 	if(emulate_press_left == key)
 	{
