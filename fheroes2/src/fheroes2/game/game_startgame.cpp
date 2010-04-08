@@ -866,15 +866,15 @@ Game::menu_t Game::HumanTurn(void)
     	    case KEY_SLASH:	I.gameArea.SetScroll(SCROLL_BOTTOM); break;
 
     	    // show/hide control panel
-	    case KEY_1:		SwitchShowControlPanel(); break;
+	    case KEY_5:		SwitchShowControlPanel(); break;
 	    // hide/show radar
-	    case KEY_2:		SwitchShowRadar(); break;
+	    case KEY_6:		SwitchShowRadar(); break;
 	    // hide/show buttons
-	    case KEY_3:		SwitchShowButtons(); break;
+	    case KEY_7:		SwitchShowButtons(); break;
 	    // hide/show status window
-	    case KEY_4:		SwitchShowStatus(); break;
+	    case KEY_8:		SwitchShowStatus(); break;
 	    // hide/show hero/town icons
-	    case KEY_5:		SwitchShowIcons(); break;
+	    case KEY_9:		SwitchShowIcons(); break;
 
 	    default: break;
 	}

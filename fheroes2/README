@@ -39,6 +39,7 @@ t		- next town
 h		- next hero
 m		- move hero
 s		- save game to fheroes2.sav
+f		- file options
 l		- load game
 i		- game info
 p		- puzzle dialog
@@ -47,11 +48,11 @@ space or a	- default action
 return or n	- open dialog
 o		- system dialog
 
-1		- show/hide control panel
-2		- show/hide radar (only for option: hide interface = on)
-3		- show/hide buttons (only for option: hide interface = on)
-4		- show/hide status window (only for option: hide interface = on)
-5		- show/hide hero/town icons (only for option: hide interface = on)
+5		- show/hide control panel
+6		- show/hide radar (only for option: hide interface = on)
+7		- show/hide buttons (only for option: hide interface = on)
+8		- show/hide status window (only for option: hide interface = on)
+9		- show/hide hero/town icons (only for option: hide interface = on)
 
 Main menu:
 n		- new game
