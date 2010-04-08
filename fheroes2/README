@@ -48,11 +48,11 @@ space or a	- default action
 return or n	- open dialog
 o		- system dialog
 
-5		- show/hide control panel
-6		- show/hide radar (only for option: hide interface = on)
-7		- show/hide buttons (only for option: hide interface = on)
-8		- show/hide status window (only for option: hide interface = on)
-9		- show/hide hero/town icons (only for option: hide interface = on)
+1		- show/hide control panel
+9		- show/hide radar (only for option: hide interface = on)
+3		- show/hide buttons (only for option: hide interface = on)
+7		- show/hide status window (only for option: hide interface = on)
+5		- show/hide hero/town icons (only for option: hide interface = on)
 
 Main menu:
 n		- new game
