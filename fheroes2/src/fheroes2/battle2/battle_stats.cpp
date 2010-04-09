@@ -700,8 +700,11 @@ u32 Battle2::Stats::GetDamage(const Stats & enemy) const
     else
     if(Modes(LUCK_BAD)) dmg /= 2;
 
-    if(Modes(SP_BLIND) ||
-	enemy.Modes(SP_STONE)) dmg /= 2;
+    // after blind
+    if(Modes(SP_BLIND)) dmg /= 2;
+
+    // stone cap.
+    if(enemy.Modes(SP_STONE)) dmg /= 2;
 
     // check capability
     switch(troop())
@@ -740,14 +743,9 @@ u32 Battle2::Stats::ApplyDamage(u32 dmg)
     if(Modes(IS_PARALYZE_MAGIC))
     {
 	SetModes(TR_RESPONSED);
+	SetModes(TR_MOVED);
         ResetModes(IS_PARALYZE_MAGIC);
         affected.RemoveMode(IS_PARALYZE_MAGIC);
-    }
-
-    // skip move
-    if(Modes(SP_BLIND))
-    {
-    	SetModes(TR_RESPONSED);
     }
 
     if(dmg && count)
@@ -858,6 +856,15 @@ u32 Battle2::Stats::ApplyDamage(Stats & enemy, u32 dmg)
 	    break;
 
 	default: break;
+    }
+
+    // remove blind action
+    if(enemy.Modes(SP_BLIND))
+    {
+    	enemy.SetModes(TR_RESPONSED);
+    	enemy.SetModes(TR_MOVED);
+        enemy.ResetModes(SP_BLIND);
+        enemy.affected.RemoveMode(SP_BLIND);
     }
 
     return killed;
