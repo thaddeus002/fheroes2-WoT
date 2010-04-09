@@ -1092,11 +1092,11 @@ void ActionToShrine(Heroes &hero, const u8 obj, const u16 dst_index)
 	    body = _("You come across a small shrine attended by a group of novice acolytes.\nIn exchange for your protection, they agree to teach you a simple spell - '%{spell}'.");
 	    break;
 	case 2:
-	    head = _("Shrine of the 2st Circle");
+	    head = _("Shrine of the 2nd Circle");
 	    body = _("You come across an ornate shrine attended by a group of rotund friars.\nIn exchange for your protection, they agree to teach you a spell - '%{spell}'.");
 	    break;
 	case 3:
-	    head = _("Shrine of the 3st Circle");
+	    head = _("Shrine of the 3rd Circle");
 	    body = _("You come across a lavish shrine attended by a group of high priests.\nIn exchange for your protection, they agree to teach you a sophisticated spell - '%{spell}'.");
 	    break;
 	default: return;
