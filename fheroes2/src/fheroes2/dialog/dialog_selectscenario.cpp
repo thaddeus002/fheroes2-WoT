@@ -31,6 +31,9 @@
 #include "tools.h"
 #include "dialog_selectscenario.h"
 
+void LossConditionInfo(const Maps::FileInfo &);
+void VictoryConditionInfo(const Maps::FileInfo &);
+
 void ScenarioListBox::RedrawItem(const Maps::FileInfo & info, u16 dstx, u16 dsty, bool current)
 {
     Display & display = Display::Get();
@@ -68,7 +71,6 @@ void ScenarioListBox::RedrawItem(const Maps::FileInfo & info, u16 dstx, u16 dsty
     index = 36 + info.conditions_loss;
     const Sprite & spriteLoss = AGG::GetICN(ICN::REQUESTS, index);
     display.Blit(spriteLoss, dstx + 224 + spriteWins.w() + 2, dsty);
-
 }
 
 void ScenarioListBox::RedrawBackground(const Point & dst)
@@ -184,8 +186,16 @@ bool Dialog::SelectScenario(const MapsFileInfoList & all, std::string & filename
 
     const Rect countPlayers(rt.x + 45, rt.y + 55, 20, 175);
     const Rect sizeMaps(rt.x + 62, rt.y + 55, 20, 175);
-    const Rect victoryCond(rt.x + 267, rt.y + 55, 20, 175);
-    const Rect lossCond(rt.x + 287, rt.y + 55, 20, 175);
+    const Rect victoryConds(rt.x + 267, rt.y + 55, 20, 175);
+    const Rect lossConds(rt.x + 287, rt.y + 55, 20, 175);
+
+    const Rect curCountPlayer(rt.x + 66, rt.y + 264, 18, 18);
+    const Rect curMapSize(rt.x + 85, rt.y + 264, 18, 18);
+    const Rect curMapName(rt.x + 107, rt.y + 264, 166, 18);
+    const Rect curVictoryCond(rt.x + 277, rt.y + 264, 18, 18);
+    const Rect curLossCond(rt.x + 295, rt.y + 264, 18, 18);
+    const Rect curDifficulty(rt.x + 220, rt.y + 292, 114, 20);
+    const Rect curDescription(rt.x + 42, rt.y + 316, 292, 90);
 
     Button buttonOk(rt.x + 140, rt.y + 410, ICN::REQUESTS, 1, 2);
 
@@ -277,17 +287,41 @@ bool Dialog::SelectScenario(const MapsFileInfoList & all, std::string & filename
 
 	// right info
 	if(le.MousePressRight(buttonSelectSmall)) Dialog::Message(_("Small Maps"), _("View only maps of size small (36x36)."), Font::BIG);
+	else
 	if(le.MousePressRight(buttonSelectMedium)) Dialog::Message(_("Medium Maps"), _("View only maps of size medium (72x72)."), Font::BIG);
+	else
 	if(le.MousePressRight(buttonSelectLarge)) Dialog::Message(_("Large Maps"), _("View only maps of size large (108x108)."), Font::BIG);
+	else
 	if(le.MousePressRight(buttonSelectXLarge)) Dialog::Message(_("Extra Large Maps"), _("View only maps of size extra large (144x144)."), Font::BIG);
+	else
 	if(le.MousePressRight(buttonSelectAll)) Dialog::Message(_("All Maps"), _("View all maps, regardless of size."), Font::BIG);
-	if(le.MousePressRight(countPlayers)) Dialog::Message(_("Players Icon"), _("Indicates how many players total are in the EditScenario. Any positions not occupied by humans will be occupied by computer players."), Font::BIG);
-	if(le.MousePressRight(sizeMaps)) Dialog::Message(_("Size Icon"), _("Indicates whether the maps is small (36x36), medium (72x72), large (108x108), or extra large (144x144)."), Font::BIG);
-	//if(le.MousePressRight(?)) Dialog::Message(_("Selected Name"), _("The name of the currently selected map."), Font::BIG);
-	if(le.MousePressRight(victoryCond)) Dialog::Message(_("Victory Condition Icon"), _("There are 6 possiblities: FIXME."), Font::BIG);
-	if(le.MousePressRight(lossCond)) Dialog::Message(_("Loss Condition Icon"), _("There are 4 possible loss conditions, as indicated by the following icons: FIXME."), Font::BIG);
-	//if(le.MousePressRight(?)) Dialog::Message(_("Selected Map Difficulty"), _("The map difficulty of the currently selected map.  The map difficulty is determined by the EditScenario designer. More difficult maps might include more or stronger enemies, fewer resources, or other special conditions making things tougher for the human player."), Font::BIG);
-	//if(le.MousePressRight(?)) Dialog::Message(_("Selected Description"), _("The description of the currently selected map."), Font::BIG);
+	else
+	if(le.MousePressRight(countPlayers) || le.MousePressRight(curCountPlayer)) Dialog::Message(_("Players Icon"), _("Indicates how many players total are in the EditScenario. Any positions not occupied by humans will be occupied by computer players."), Font::BIG);
+	else
+	if(le.MousePressRight(sizeMaps) || le.MousePressRight(curMapSize)) Dialog::Message(_("Size Icon"), _("Indicates whether the maps is small (36x36), medium (72x72), large (108x108), or extra large (144x144)."), Font::BIG);
+	else
+	if(le.MousePressRight(curMapName)) Dialog::Message(_("Selected Name"), _("The name of the currently selected map."), Font::BIG);
+	else
+	if(le.MousePressRight(victoryConds))
+	{
+	    const Maps::FileInfo* item = listbox.GetFromPosition(le.GetMouseCursor());
+	    if(item) VictoryConditionInfo(*item);
+	}
+	else
+	if(le.MousePressRight(lossConds))
+	{
+	    const Maps::FileInfo* item = listbox.GetFromPosition(le.GetMouseCursor());
+	    if(item) LossConditionInfo(*item);
+	}
+	else
+	if(le.MousePressRight(curVictoryCond)) VictoryConditionInfo(listbox.GetCurrent());
+	else
+	if(le.MousePressRight(curLossCond)) LossConditionInfo(listbox.GetCurrent());
+	else
+	if(le.MousePressRight(curDifficulty)) Dialog::Message(_("Selected Map Difficulty"), _("The map difficulty of the currently selected map.  The map difficulty is determined by the EditScenario designer. More difficult maps might include more or stronger enemies, fewer resources, or other special conditions making things tougher for the human player."), Font::BIG);
+	else
+	if(le.MousePressRight(curDescription)) Dialog::Message(_("Selected Description"), _("The description of the currently selected map."), Font::BIG);
+	else
 	if(le.MousePressRight(buttonOk)) Dialog::Message(_("OK"), _("Accept the choice made."), Font::BIG);
 
 	if(!cursor.isVisible())
@@ -308,4 +342,36 @@ bool Dialog::SelectScenario(const MapsFileInfoList & all, std::string & filename
     back.Restore();
 
     return filename.size();
+}
+
+void LossConditionInfo(const Maps::FileInfo & info)
+{
+    std::string msg;
+
+    switch(info.conditions_loss)
+    {
+	case 0:	msg = _("Lose all your heroes and towns."); break;
+	case 1:	msg = _("Lose a specific town."); break;
+	case 2:	msg = _("Lose a specific hero."); break;
+	case 3:	msg = _("Run out of time. Fail to win by a certain point."); break;
+	default: return;
+    }
+    Dialog::Message(_("Loss Condition"), msg, Font::BIG);
+}
+
+void VictoryConditionInfo(const Maps::FileInfo & info)
+{
+    std::string msg;
+
+    switch(info.conditions_wins)
+    {
+	case 0:	msg = _("Defeat all enemy heroes and towns."); break;
+	case 1:	msg = _("Capture a specific town."); break;
+	case 2:	msg = _("Defeat a specific hero."); break;
+	case 3:	msg = _("Find a specidic artifact."); break;
+	case 4:	msg = _("Your side defeats the opposing side."); break;
+	case 5:	msg = _("Accumulate a large amount of gold."); break;
+	default: return;
+    }
+    Dialog::Message(_("Victory Condition"), msg, Font::BIG);
 }

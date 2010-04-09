@@ -123,6 +123,14 @@ namespace Interface
 	    return *cur;
 	}
 
+	Item* GetFromPosition(const Point & mp)
+	{
+	    ItemsIterator click = content->end();
+	    float offset = (mp.y - rtAreaItems.y) * maxItems / rtAreaItems.h;
+	    click = top + static_cast<size_t>(offset);
+	    return click < content->begin() || click >= content->end() ? NULL : &(*click);
+	}
+
 	void SetCurrent(size_t pos)
 	{
 	    if(pos < content->size()) cur = content->begin() + pos;
@@ -227,21 +235,24 @@ namespace Interface
 	    {
 		float offset = (le.GetMouseReleaseLeft().y - rtAreaItems.y) * maxItems / rtAreaItems.h;
 
-		cursor.Hide();
-
-		ItemsIterator last  = content->end() - 1;
-		ItemsIterator click = top + static_cast<size_t>(offset);
-
-		if(click > last) click = last;
-
-		if(click == cur)
+		if(offset >= 0)
 		{
-		    ActionListDoubleClick(*cur);
-		}
-		else
-		{
-		    cur = click;
-		    ActionListSingleClick(*cur);
+		    cursor.Hide();
+
+		    ItemsIterator click = top + static_cast<size_t>(offset);
+
+		    if(click >= content->begin() && click < content->end())
+		    {
+			if(click == cur)
+			{
+			    ActionListDoubleClick(*cur);
+			}
+			else
+			{
+			    cur = click;
+			    ActionListSingleClick(*cur);
+			}
+		    }
 		}
 	    }
 	}
