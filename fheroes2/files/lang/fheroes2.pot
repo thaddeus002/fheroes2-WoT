@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-04-07 21:46+0900\n"
+"POT-Creation-Date: 2010-04-09 16:51+0900\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -77,11 +77,11 @@ msgstr ""
 msgid "Some undead in groups -1"
 msgstr ""
 
-#: ../fheroes2/battle2/battle_action.cpp:899
+#: ../fheroes2/battle2/battle_action.cpp:897
 msgid "Summon Elemental spell failed!"
 msgstr ""
 
-#: ../fheroes2/battle2/battle_action.cpp:995
+#: ../fheroes2/battle2/battle_action.cpp:993
 msgid "Mirror Image spell failed!"
 msgstr ""
 
@@ -341,112 +341,112 @@ msgstr ""
 msgid "Set auto battle off"
 msgstr ""
 
-#: ../fheroes2/battle2/battle_interface.cpp:1886
+#: ../fheroes2/battle2/battle_interface.cpp:1885
 msgid "%{name} skipping turn"
 msgstr ""
 
-#: ../fheroes2/battle2/battle_interface.cpp:1887
+#: ../fheroes2/battle2/battle_interface.cpp:1886
 msgid ", and get +2 defence"
 msgstr ""
 
-#: ../fheroes2/battle2/battle_interface.cpp:1890
+#: ../fheroes2/battle2/battle_interface.cpp:1889
 msgid "%{name} waiting turn"
 msgstr ""
 
-#: ../fheroes2/battle2/battle_interface.cpp:1952
+#: ../fheroes2/battle2/battle_interface.cpp:1951
 msgid "Good luck shines on the  %{attacker}"
 msgstr ""
 
-#: ../fheroes2/battle2/battle_interface.cpp:1962
+#: ../fheroes2/battle2/battle_interface.cpp:1961
 msgid "Bad luck descends on the %{attacker}"
 msgstr ""
 
-#: ../fheroes2/battle2/battle_interface.cpp:2045
+#: ../fheroes2/battle2/battle_interface.cpp:2044
 msgid "%{attacker} do %{damage} damage."
 msgstr ""
 
-#: ../fheroes2/battle2/battle_interface.cpp:2061
+#: ../fheroes2/battle2/battle_interface.cpp:2060
 msgid "%{count} creatures perished."
 msgstr ""
 
-#: ../fheroes2/battle2/battle_interface.cpp:2073
-#: ../fheroes2/battle2/battle_interface.cpp:2597
+#: ../fheroes2/battle2/battle_interface.cpp:2072
+#: ../fheroes2/battle2/battle_interface.cpp:2596
 msgid "one %{defender} perish."
 msgid_plural "%{count} %{defender} perished."
 msgstr[0] ""
 msgstr[1] ""
 
-#: ../fheroes2/battle2/battle_interface.cpp:2343
+#: ../fheroes2/battle2/battle_interface.cpp:2342
 msgid "The %{name} resist the spell!"
 msgstr ""
 
-#: ../fheroes2/battle2/battle_interface.cpp:2357
+#: ../fheroes2/battle2/battle_interface.cpp:2356
 msgid "%{name} casts %{spell} on the %{troop}."
 msgstr ""
 
-#: ../fheroes2/battle2/battle_interface.cpp:2362
+#: ../fheroes2/battle2/battle_interface.cpp:2361
 msgid "%{name} casts %{spell}."
 msgstr ""
 
-#: ../fheroes2/battle2/battle_interface.cpp:2454
+#: ../fheroes2/battle2/battle_interface.cpp:2453
 msgid "The %{spell} spell does %{damage} damage to all undead creatures."
 msgstr ""
 
-#: ../fheroes2/battle2/battle_interface.cpp:2457
+#: ../fheroes2/battle2/battle_interface.cpp:2456
 msgid "The %{spell} spell does %{damage} damage to all living creatures."
 msgstr ""
 
-#: ../fheroes2/battle2/battle_interface.cpp:2459
+#: ../fheroes2/battle2/battle_interface.cpp:2458
 msgid "The %{spell} does %{damage} damage."
 msgstr ""
 
-#: ../fheroes2/battle2/battle_interface.cpp:2466
+#: ../fheroes2/battle2/battle_interface.cpp:2465
 msgid "one creature perish."
 msgid_plural "%{count} creatures perished."
 msgstr[0] ""
 msgstr[1] ""
 
-#: ../fheroes2/battle2/battle_interface.cpp:2503
+#: ../fheroes2/battle2/battle_interface.cpp:2502
 msgid "The Unicorns attack blinds the %{name}!"
 msgstr ""
 
-#: ../fheroes2/battle2/battle_interface.cpp:2504
+#: ../fheroes2/battle2/battle_interface.cpp:2503
 msgid "The Medusas gaze turns the %{name} to stone!"
 msgstr ""
 
-#: ../fheroes2/battle2/battle_interface.cpp:2506
+#: ../fheroes2/battle2/battle_interface.cpp:2505
 msgid "The Mummies' curse falls upon the %{name}!"
 msgstr ""
 
-#: ../fheroes2/battle2/battle_interface.cpp:2507
+#: ../fheroes2/battle2/battle_interface.cpp:2506
 msgid "The %{name} are paralyzed by the Cyclopes!"
 msgstr ""
 
-#: ../fheroes2/battle2/battle_interface.cpp:2508
+#: ../fheroes2/battle2/battle_interface.cpp:2507
 msgid "The Archmagi dispel all good spells on your %{name}!"
 msgstr ""
 
-#: ../fheroes2/battle2/battle_interface.cpp:2528
+#: ../fheroes2/battle2/battle_interface.cpp:2527
 msgid "High morale enables the %{monster} to attack again."
 msgstr ""
 
-#: ../fheroes2/battle2/battle_interface.cpp:2535
+#: ../fheroes2/battle2/battle_interface.cpp:2534
 msgid "Low morale causes the %{monster} to freeze in panic."
 msgstr ""
 
-#: ../fheroes2/battle2/battle_interface.cpp:2592
+#: ../fheroes2/battle2/battle_interface.cpp:2591
 msgid "Tower do %{damage} damage."
 msgstr ""
 
-#: ../fheroes2/battle2/battle_interface.cpp:3867
+#: ../fheroes2/battle2/battle_interface.cpp:3866
 msgid "No spells to cast."
 msgstr ""
 
-#: ../fheroes2/battle2/battle_interface.cpp:3875
+#: ../fheroes2/battle2/battle_interface.cpp:3874
 msgid "Are you sure you want to retreat?"
 msgstr ""
 
-#: ../fheroes2/battle2/battle_interface.cpp:3892
+#: ../fheroes2/battle2/battle_interface.cpp:3891
 msgid "You don't have enough gold!"
 msgstr ""
 
@@ -466,13 +466,13 @@ msgid ""
 "the enemy's dead to return under your service as %{monster}"
 msgstr ""
 
-#: ../fheroes2/battle2/battle_stats.cpp:906
+#: ../fheroes2/battle2/battle_stats.cpp:912
 msgid ""
 "The %{artifact} artifact is in effect for this battle, disabling %{spell} "
 "spell."
 msgstr ""
 
-#: ../fheroes2/battle2/battle_stats.cpp:1419
+#: ../fheroes2/battle2/battle_stats.cpp:1425
 msgid "%{count} %{name} rise(s) from the dead!"
 msgstr ""
 
@@ -1484,95 +1484,161 @@ msgstr ""
 msgid "Warning!"
 msgstr ""
 
-#: ../fheroes2/dialog/dialog_selectscenario.cpp:120
+#: ../fheroes2/dialog/dialog_selectscenario.cpp:122
 msgid "Maps Difficulty:"
 msgstr ""
 
-#: ../fheroes2/dialog/dialog_selectscenario.cpp:279
+#: ../fheroes2/dialog/dialog_selectscenario.cpp:289
 msgid "Small Maps"
 msgstr ""
 
-#: ../fheroes2/dialog/dialog_selectscenario.cpp:279
+#: ../fheroes2/dialog/dialog_selectscenario.cpp:289
 msgid "View only maps of size small (36x36)."
 msgstr ""
 
-#: ../fheroes2/dialog/dialog_selectscenario.cpp:280
+#: ../fheroes2/dialog/dialog_selectscenario.cpp:291
 msgid "Medium Maps"
 msgstr ""
 
-#: ../fheroes2/dialog/dialog_selectscenario.cpp:280
+#: ../fheroes2/dialog/dialog_selectscenario.cpp:291
 msgid "View only maps of size medium (72x72)."
 msgstr ""
 
-#: ../fheroes2/dialog/dialog_selectscenario.cpp:281
+#: ../fheroes2/dialog/dialog_selectscenario.cpp:293
 msgid "Large Maps"
 msgstr ""
 
-#: ../fheroes2/dialog/dialog_selectscenario.cpp:281
+#: ../fheroes2/dialog/dialog_selectscenario.cpp:293
 msgid "View only maps of size large (108x108)."
 msgstr ""
 
-#: ../fheroes2/dialog/dialog_selectscenario.cpp:282
+#: ../fheroes2/dialog/dialog_selectscenario.cpp:295
 msgid "Extra Large Maps"
 msgstr ""
 
-#: ../fheroes2/dialog/dialog_selectscenario.cpp:282
+#: ../fheroes2/dialog/dialog_selectscenario.cpp:295
 msgid "View only maps of size extra large (144x144)."
 msgstr ""
 
-#: ../fheroes2/dialog/dialog_selectscenario.cpp:283
+#: ../fheroes2/dialog/dialog_selectscenario.cpp:297
 msgid "All Maps"
 msgstr ""
 
-#: ../fheroes2/dialog/dialog_selectscenario.cpp:283
+#: ../fheroes2/dialog/dialog_selectscenario.cpp:297
 msgid "View all maps, regardless of size."
 msgstr ""
 
-#: ../fheroes2/dialog/dialog_selectscenario.cpp:284
+#: ../fheroes2/dialog/dialog_selectscenario.cpp:299
 msgid "Players Icon"
 msgstr ""
 
-#: ../fheroes2/dialog/dialog_selectscenario.cpp:284
+#: ../fheroes2/dialog/dialog_selectscenario.cpp:299
 msgid ""
 "Indicates how many players total are in the EditScenario. Any positions not "
 "occupied by humans will be occupied by computer players."
 msgstr ""
 
-#: ../fheroes2/dialog/dialog_selectscenario.cpp:285
+#: ../fheroes2/dialog/dialog_selectscenario.cpp:301
 msgid "Size Icon"
 msgstr ""
 
-#: ../fheroes2/dialog/dialog_selectscenario.cpp:285
+#: ../fheroes2/dialog/dialog_selectscenario.cpp:301
 msgid ""
 "Indicates whether the maps is small (36x36), medium (72x72), large "
 "(108x108), or extra large (144x144)."
 msgstr ""
 
-#: ../fheroes2/dialog/dialog_selectscenario.cpp:287
-msgid "Victory Condition Icon"
+#: ../fheroes2/dialog/dialog_selectscenario.cpp:303
+msgid "Selected Name"
 msgstr ""
 
-#: ../fheroes2/dialog/dialog_selectscenario.cpp:287
-msgid "There are 6 possiblities: FIXME."
+#: ../fheroes2/dialog/dialog_selectscenario.cpp:303
+msgid "The name of the currently selected map."
 msgstr ""
 
-#: ../fheroes2/dialog/dialog_selectscenario.cpp:288
-msgid "Loss Condition Icon"
+#: ../fheroes2/dialog/dialog_selectscenario.cpp:321
+msgid "Selected Map Difficulty"
 msgstr ""
 
-#: ../fheroes2/dialog/dialog_selectscenario.cpp:288
+#: ../fheroes2/dialog/dialog_selectscenario.cpp:321
 msgid ""
-"There are 4 possible loss conditions, as indicated by the following icons: "
-"FIXME."
+"The map difficulty of the currently selected map.  The map difficulty is "
+"determined by the EditScenario designer. More difficult maps might include "
+"more or stronger enemies, fewer resources, or other special conditions "
+"making things tougher for the human player."
 msgstr ""
 
-#: ../fheroes2/dialog/dialog_selectscenario.cpp:291
+#: ../fheroes2/dialog/dialog_selectscenario.cpp:323
+msgid "Selected Description"
+msgstr ""
+
+#: ../fheroes2/dialog/dialog_selectscenario.cpp:323
+msgid "The description of the currently selected map."
+msgstr ""
+
+#: ../fheroes2/dialog/dialog_selectscenario.cpp:325
 #: ../fheroes2/game/game_scenarioinfo.cpp:313
 msgid "OK"
 msgstr ""
 
-#: ../fheroes2/dialog/dialog_selectscenario.cpp:291
+#: ../fheroes2/dialog/dialog_selectscenario.cpp:325
 msgid "Accept the choice made."
+msgstr ""
+
+#: ../fheroes2/dialog/dialog_selectscenario.cpp:353
+#: ../fheroes2/game/game_over.cpp:35
+msgid "Lose all your heroes and towns."
+msgstr ""
+
+#: ../fheroes2/dialog/dialog_selectscenario.cpp:354
+#: ../fheroes2/game/game_over.cpp:35
+msgid "Lose a specific town."
+msgstr ""
+
+#: ../fheroes2/dialog/dialog_selectscenario.cpp:355
+#: ../fheroes2/game/game_over.cpp:35
+msgid "Lose a specific hero."
+msgstr ""
+
+#: ../fheroes2/dialog/dialog_selectscenario.cpp:356
+msgid "Run out of time. Fail to win by a certain point."
+msgstr ""
+
+#: ../fheroes2/dialog/dialog_selectscenario.cpp:359
+msgid "Loss Condition"
+msgstr ""
+
+#: ../fheroes2/dialog/dialog_selectscenario.cpp:368
+#: ../fheroes2/game/game_over.cpp:34
+msgid "Defeat all enemy heroes and towns."
+msgstr ""
+
+#: ../fheroes2/dialog/dialog_selectscenario.cpp:369
+#: ../fheroes2/game/game_over.cpp:34
+msgid "Capture a specific town."
+msgstr ""
+
+#: ../fheroes2/dialog/dialog_selectscenario.cpp:370
+#: ../fheroes2/game/game_over.cpp:34
+msgid "Defeat a specific hero."
+msgstr ""
+
+#: ../fheroes2/dialog/dialog_selectscenario.cpp:371
+msgid "Find a specidic artifact."
+msgstr ""
+
+#: ../fheroes2/dialog/dialog_selectscenario.cpp:372
+#: ../fheroes2/game/game_over.cpp:34
+msgid "Your side defeats the opposing side."
+msgstr ""
+
+#: ../fheroes2/dialog/dialog_selectscenario.cpp:373
+#: ../fheroes2/game/game_over.cpp:34
+msgid "Accumulate a large amount of gold."
+msgstr ""
+
+#: ../fheroes2/dialog/dialog_selectscenario.cpp:376
+msgid "Victory Condition"
 msgstr ""
 
 #: ../fheroes2/dialog/dialog_spellinfo.cpp:36
@@ -2223,39 +2289,7 @@ msgid "Play with 6 human players."
 msgstr ""
 
 #: ../fheroes2/game/game_over.cpp:34
-msgid "Defeat all enemy heroes and towns."
-msgstr ""
-
-#: ../fheroes2/game/game_over.cpp:34
-msgid "Capture a specific town."
-msgstr ""
-
-#: ../fheroes2/game/game_over.cpp:34
-msgid "Defeat a specific hero."
-msgstr ""
-
-#: ../fheroes2/game/game_over.cpp:34
 msgid "Find a specific artifact."
-msgstr ""
-
-#: ../fheroes2/game/game_over.cpp:34
-msgid "Your side defeats the opposing side."
-msgstr ""
-
-#: ../fheroes2/game/game_over.cpp:34
-msgid "Accumulate a large amount of gold."
-msgstr ""
-
-#: ../fheroes2/game/game_over.cpp:35
-msgid "Lose all your heroes and towns."
-msgstr ""
-
-#: ../fheroes2/game/game_over.cpp:35
-msgid "Lose a specific town."
-msgstr ""
-
-#: ../fheroes2/game/game_over.cpp:35
-msgid "Lose a specific hero."
 msgstr ""
 
 #: ../fheroes2/game/game_over.cpp:35
@@ -2748,7 +2782,7 @@ msgid ""
 msgstr ""
 
 #: ../fheroes2/heroes/heroes_action.cpp:1095
-msgid "Shrine of the 2st Circle"
+msgid "Shrine of the 2nd Circle"
 msgstr ""
 
 #: ../fheroes2/heroes/heroes_action.cpp:1096
@@ -2759,7 +2793,7 @@ msgid ""
 msgstr ""
 
 #: ../fheroes2/heroes/heroes_action.cpp:1099
-msgid "Shrine of the 3st Circle"
+msgid "Shrine of the 3rd Circle"
 msgstr ""
 
 #: ../fheroes2/heroes/heroes_action.cpp:1100

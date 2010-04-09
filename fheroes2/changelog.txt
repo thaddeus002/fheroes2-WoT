@@ -1,4 +1,36 @@
-SVN - up to r1738
+SVN - up to r1815
+
+Apr, 9, 2010
++ Update latest translation files from launchpad
++ Update battle: fixed blind, paralize and stone
++ Added options, battle: skip turn and +2 defence
++ Fixed original version Slow and Haste speed
++ Added check save format
++ Updated battle: added check end battle after tower action
++ Fixed shipyard check
++ Updated battle: added check for probable overflow count troop
++ Added settings: no in-built requirements artifacts
++ Fixed mageguild learn hero
++ Fixed castle building animation
++ Fixed archers attack
++ Added settings: archmage can resists (20%) bad spells, magic creatures can resists (20%) same magic
++ Fixed magic resist troop battle animation
++ Updated captain: added spell book defaults, update captain stats with modificators
++ Fixed morale modificator with end battle
++ Fixed crash, out of range: hero retreat
++ Fixed Battle::Stats::GetCommander Battle::Stats::GetArmy with hypnotize and berzerker
++ Fixed dwelling population with hero present
++ Fixed artifact bar redraw
++ Added check for changes SetGuardians
++ Fixed battle AllowApplySpell without commander, fixed battle obstacle position, fixed Medusa Stone spell duration
++ Fixed archers animation handfighting attack
++ Fixed wagon camp passable sprite
++ Fixed load game and new game state
++ Updated load/save dialogue, added settings: remember last filename
++ Fixed AI magick, shots and move priority
++ Added visited Xanadu update visited shrine, update, name shrine info
++ Added confirm autosave
++ Updated visited witch hut, and name
 
 Mar, 27, 2010
 + Added set guardian for capture objects
