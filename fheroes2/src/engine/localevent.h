@@ -172,7 +172,7 @@ public:
     void SetGlobalFilterKeysEvents(void (*pf)(u32, u16));
     void SetGlobalFilter(bool);
     void SetTapMode(bool);
-    void SetTapDelayForRightClickEmulation(double);
+    void SetTapDelayForRightClickEmulation(u32);
     void SetMouseOffsetX(s16);
     void SetMouseOffsetY(s16);
 
@@ -305,7 +305,7 @@ private:
     void (*keyboard_filter_func)(u32, u16);
 
     SDL::Time clock;
-    double clock_delay;
+    u32 clock_delay;
 
 #ifdef WITHOUT_MOUSE
     bool emulate_mouse;

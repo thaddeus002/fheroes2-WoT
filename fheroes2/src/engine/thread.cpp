@@ -113,20 +113,20 @@ Time::Time()
 
 void Time::Start(void)
 {
-    gettimeofday(&clock1, NULL);
+    tick1 = SDL_GetTicks();
 }
 
 void Time::Stop(void)
 {
-    gettimeofday(&clock2, NULL);
+    tick2 = SDL_GetTicks();
 }
 
-double Time::Get(void) const
+u32 Time::Get(void) const
 {
-    return ((clock2.tv_sec - clock1.tv_sec) * 1000 + (clock2.tv_usec - clock1.tv_usec) / 1000.0) + 0.5;
+    return tick2 > tick1 ? tick2 - tick1 : 0;
 }
 
-void Time::Print(void) const
+void Time::Print(const char* header) const
 {
-    std::cerr << "Performance: " << Get() << " ms" << std::endl;
+    std::cerr << (header ? header : "time: ") << Get() << " ms" << std::endl;
 }

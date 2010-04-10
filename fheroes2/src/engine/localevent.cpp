@@ -80,7 +80,7 @@ void LocalEvent::SetTapMode(bool f)
     f ? SetModes(TAP_MODE) : ResetModes(TAP_MODE);
 }
 
-void LocalEvent::SetTapDelayForRightClickEmulation(double d)
+void LocalEvent::SetTapDelayForRightClickEmulation(u32 d)
 {
     clock_delay = d < 200 ? TAP_DELAY_EMULATE : d;
 }

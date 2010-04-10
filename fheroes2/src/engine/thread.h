@@ -82,12 +82,12 @@ public:
 
     void Start(void);
     void Stop(void);
-    double Get(void) const;
-    void Print(void) const;
+    u32 Get(void) const;
+    void Print(const char* header = NULL) const;
 
 private:
-    struct timeval clock1;
-    struct timeval clock2;
+    u32 tick1;
+    u32 tick2;
 };
 
 }
