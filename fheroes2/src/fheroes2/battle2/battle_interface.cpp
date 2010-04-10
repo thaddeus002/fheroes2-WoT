@@ -2251,7 +2251,7 @@ void Battle2::Interface::RedrawActionMove(Stats & b, const std::vector<u16> & pa
 		arena.bridge->SetDown(true);
 	    }
 	    else
-	    if(arena.bridge->isDown() && arena.bridge->AllowUp())
+	    if(arena.bridge->isValid() && arena.bridge->isDown() && arena.bridge->AllowUp())
 	    {
 		RedrawBridgeAnimation(false);
 		arena.bridge->SetDown(false);
