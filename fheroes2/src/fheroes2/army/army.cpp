@@ -35,6 +35,7 @@
 #include "castle.h"
 #include "heroes.h"
 #include "battle_stats.h"
+#include "tools.h"
 #include "army.h"
 
 std::vector<Army::Troop>::iterator MaxElement(std::vector<Army::Troop>::iterator first, std::vector<Army::Troop>::iterator last, bool (*pf)(const Army::Troop &, const Army::Troop &))
