@@ -1592,6 +1592,16 @@ void Heroes::ActionNewPosition(void)
     }
 }
 
+const Point & Heroes::GetCenterPatrol(void) const
+{
+    return patrol_center;
+}
+
+u8 Heroes::GetSquarePatrol(void) const
+{
+    return patrol_square;
+}
+
 void Heroes::Dump(void) const
 {
     std::cout << "name            : " << name << std::endl;
@@ -1609,6 +1619,7 @@ void Heroes::Dump(void) const
     std::cout << "flags           : " << (Modes(SHIPMASTER) ? "SHIPMATER," : ",") <<
                                          (Modes(SCOUTER) ? "SCOUTER," : ",") <<
                                          (Modes(HUNTER) ? "HUNTER," : ",") <<
+                                         (Modes(PATROL) ? "PATROL," : ",") <<
                                          (Modes(STUPID) ? "STUPID," : ",") << std::endl;
 
     std::cout << "sheduled visit  : ";

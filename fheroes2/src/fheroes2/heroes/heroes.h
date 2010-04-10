@@ -137,6 +137,9 @@ public:
     s8 GetLuckWithModificators(std::string *str = NULL) const;
     u8 GetLevel(void) const;
 
+    const Point & GetCenterPatrol(void) const;
+    u8 GetSquarePatrol(void) const;
+
     u16 GetMaxSpellPoints(void) const;
 
     u16 GetMaxMovePoints(void) const;

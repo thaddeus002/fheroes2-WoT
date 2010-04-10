@@ -46,6 +46,7 @@
 #include "zzlib.h"
 
 void LoadZLogo(void);
+void SetVideoDriver(const std::string &);
 void SetTimidityEnvPath(const Settings &);
 void SetLangEnvPath(const Settings &);
 void ReadConfigFile(Settings &);
@@ -112,6 +113,8 @@ int main(int argc, char **argv)
 		}
 
 	}
+
+	if(conf.SelectVideoDriver().size()) SetVideoDriver(conf.SelectVideoDriver());
 
 	// random init
 	Rand::Init();
@@ -315,6 +318,12 @@ void LoadZLogo(void)
 	}
     }
 #endif
+}
+
+void SetVideoDriver(const std::string & driver)
+{
+    std::string strtmp = "SDL_VIDEODRIVER=" + driver;
+    putenv(const_cast<char *>(strtmp.c_str()));
 }
 
 void SetTimidityEnvPath(const Settings & conf)

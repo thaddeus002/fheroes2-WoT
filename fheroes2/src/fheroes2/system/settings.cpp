@@ -121,6 +121,7 @@ static const settings_t settingsFHeroes2[] =
     { Settings::POCKETPC_HIDE_CURSOR,		_("pocketpc: hide cursor"),				},
     { Settings::POCKETPC_TAP_MODE,		_("pocketpc: tap mode"),				},
     { Settings::POCKETPC_LOW_MEMORY,		_("pocketpc: low memory"),				},
+    { Settings::POCKETPC_VERY_VERY_SLOW,	_("pocketpc: very very slow"),				},
 
     { 0, NULL },
 };
@@ -239,6 +240,9 @@ bool Settings::Read(const std::string & filename)
 
     BinaryLoad();
 
+    if(video_driver.size())
+	String::Lower(video_driver);
+
     if(QVGA())
     {
 	opt_global.SetModes(GLOBAL_POCKETPC);
@@ -328,7 +332,7 @@ void Settings::Dump(std::ostream & stream) const
     stream << "playmus command = " << playmus_command << std::endl;
 #endif
 
-    stream << "port = " << port << std::endl;
+    if(video_driver.size()) stream << "videodriver = " << video_driver << std::endl;
 
     if(opt_global.Modes(GLOBAL_POCKETPC))
     stream << "pocket pc = on" << std::endl;
@@ -372,6 +376,8 @@ Difficulty::difficulty_t Settings::GameDifficulty(void) const { return game_diff
 
 Color::color_t Settings::CurrentColor(void) const { return cur_color; }
 Color::color_t Settings::MyColor(void) const { return my_color; }
+
+const std::string & Settings::SelectVideoDriver(void) const { return video_driver; }
 
 /* return fontname */
 const std::string & Settings::FontsNormal(void) const { return font_normal; }
@@ -456,6 +462,8 @@ void Settings::Parse(const std::string & left, const std::string & right)
     if(left == "playmus command") playmus_command = right;
     // port
     if(left == "port"){ port = String::ToInt(right); if(!port) port = DEFAULT_PORT; }
+    else
+    if(left == "videodriver") video_driver = right;
     else
     // font name
     if(left == "lang") force_lang = right;
@@ -1140,6 +1148,11 @@ bool Settings::ExtLowMemory(void) const
 bool Settings::ExtTapMode(void) const
 {
     return ExtModes(POCKETPC_TAP_MODE);
+}
+
+bool Settings::ExtVeryVerySlow(void) const
+{
+    return ExtModes(POCKETPC_VERY_VERY_SLOW);
 }
 
 void Settings::BinarySave(void) const

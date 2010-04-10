@@ -757,7 +757,6 @@ Game::menu_t Game::HumanTurn(void)
 
     LocalEvent & le = LocalEvent::Get();
     
-    u32 ticket = 0;
     Game::menu_t res = CANCEL;
 
     cursor.Hide();
@@ -809,8 +808,15 @@ Game::menu_t Game::HumanTurn(void)
     // check new monster aroute heroes
     //std::for_each(myHeroes.begin(), myHeroes.end(), );
 
+    // frame count
+    I.frames = 0;
+    I.ticks.Start();
+    u32 & ticket = I.frames;
+
+    const bool withdelay = !conf.ExtVeryVerySlow();
+
     // startgame loop
-    while(CANCEL == res && le.HandleEvents())
+    while(CANCEL == res && le.HandleEvents(withdelay))
     {
 	// for pocketpc: auto hide status if start turn
 	if(autohide_status && conf.ShowStatus() && ticket > 300)
@@ -1046,7 +1052,7 @@ Game::menu_t Game::HumanTurn(void)
     	    display.Flip();
 	}
 
-        ++ticket;
+	++ticket;
     }
 
     if(ENDTURN == res)

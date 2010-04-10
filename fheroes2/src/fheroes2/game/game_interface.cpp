@@ -209,7 +209,10 @@ void Interface::Basic::Redraw(u8 force)
 void Interface::Basic::RedrawSystemInfo(s16 cx, s16 cy, u32 usage)
 {
     std::ostringstream os;
-    os << "mem. usage: " << usage / 1024 << "Kb" << ", cur. time: ";
+
+    ticks.Stop();
+
+    os << "frm. count: " << (frames * 1000 / ticks.Get()) << ", mem. usage: " << usage / 1024 << "Kb" << ", cur. time: ";
 
     time_t rawtime;
     std::time(&rawtime);
