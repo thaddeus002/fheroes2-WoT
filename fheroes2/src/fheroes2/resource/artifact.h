@@ -184,6 +184,8 @@ public:
     /* artifact.icn */
     static u8 IndexSprite64(artifact_t);
 
+    static const char* GetScenario(artifact_t);
+
 private:
     artifact_t id;
     u8 ext; /* spell for scrolls, and other */

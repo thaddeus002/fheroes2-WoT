@@ -1743,7 +1743,7 @@ void ActionToArtifact(Heroes &hero, const u8 obj, const u16 dst_index)
 		else
 		{
 		    PlaySoundFailure;
-		    Dialog::Message(_("You try to pay the leprechaun, but realize that you can't afford it."), _("The leprechaun stamps his foot and ignores you."), Font::BIG, Dialog::OK);
+		    Dialog::Message("", _("You try to pay the leprechaun, but realize that you can't afford it. The leprechaun stamps his foot and ignores you."), Font::BIG, Dialog::OK);
 		}
 	    }
 	    else
@@ -1768,15 +1768,15 @@ void ActionToArtifact(Heroes &hero, const u8 obj, const u16 dst_index)
 		PlaySoundFailure;
 		if(4 == tile.GetQuantity2())
 		{
-		    std::string str = _("The hermit tells you that he is willing to give the %{art} to the first wise person he meets.");
+		    std::string str = _("You've found the humble dwelling of a withered hermit. The hermit tells you that he is willing to give the %{art} to the first wise person he meets.");
 		    String::Replace(str, "%{art}", art.GetName());
-		    Dialog::Message(_("You've found the humble dwelling of a withered hermit."), str, Font::BIG, Dialog::OK);
+		    Dialog::Message("", str, Font::BIG, Dialog::OK);
 		}
 		else
 		{
-		    std::string str = _("The soldier tells you that he is willing to pass on the %{art} to the first true leader he meets.");
+		    std::string str = _("You've come across the spartan quarters of a retired soldier. The soldier tells you that he is willing to pass on the %{art} to the first true leader he meets.");
 		    String::Replace(str, "%{art}", art.GetName());
-		    Dialog::Message(_("You've come across the spartan quarters of a retired soldier."), str, Font::BIG, Dialog::OK);
+		    Dialog::Message("", str, Font::BIG, Dialog::OK);
 		}
 	    }
 	    break;
@@ -1801,12 +1801,12 @@ void ActionToArtifact(Heroes &hero, const u8 obj, const u16 dst_index)
 	    PlaySoundWarning;
 
 	    if(6 == tile.GetQuantity2())
-		Dialog::Message(_("You come upon an ancient artifact."), _("As you reach for it, a pack of Rogues leap out of the brush to guard their stolen loot."), Font::BIG, Dialog::OK);
+		Dialog::Message("", _("You come upon an ancient artifact. As you reach for it, a pack of Rogues leap out of the brush to guard their stolen loot."), Font::BIG, Dialog::OK);
 	    else
 	    {
-		std::string str = _("Unfortunately, it's guarded by a nearby %{monster}. Do you want to fight the %{monster} for the artifact?");
+		std::string str = _("Through a clearing you observe an ancient artifact. Unfortunately, it's guarded by a nearby %{monster}. Do you want to fight the %{monster} for the artifact?");
 		String::Replace(str, "%{monster}", monster);
-		battle = (Dialog::YES == Dialog::Message(_("Through a clearing you observe an ancient artifact."), str,	Font::BIG, Dialog::YES | Dialog::NO));
+		battle = (Dialog::YES == Dialog::Message("", str, Font::BIG, Dialog::YES | Dialog::NO));
 	    }
 		    
 	    if(battle)
@@ -1840,13 +1840,15 @@ void ActionToArtifact(Heroes &hero, const u8 obj, const u16 dst_index)
 	    PlaySoundSuccess;
 	    std::string msg;
 
-	    if(art == Artifact::SPELL_SCROLL)
-		msg = _("You find an elaborate aontainer which housesan old vellum scroll. The runes on the container are very old, and the artistry with whitch it was put together is stunning. As you pull the scroll out, you feel imbued with magical power.");
+	    if(Artifact::GetScenario(art()))
+		msg = Artifact::GetScenario(art());
 	    else
 	    {
 		msg = (_("You've found the artifact: "));
+		msg.append("\n");
 		msg.append(art.GetName());
 	    }
+
 	    DialogWithArtifact(MP2::StringObject(obj), msg, art());
 	    conditions = true;
 	    break;
@@ -2081,7 +2083,7 @@ void ActionToAbandoneMine(Heroes &hero, const u8 obj, const u16 dst_index)
     Maps::Tiles & tile = world.GetTiles(dst_index);
 
     PlaySoundWarning;
-    if(Dialog::YES == Dialog::Message(_("You come upon an abandoned gold mine."), _("The mine appears to be haunted. Do you wish to enter?"), Font::BIG, Dialog::YES | Dialog::NO))
+    if(Dialog::YES == Dialog::Message("", _("You come upon an abandoned gold mine. The mine appears to be haunted. Do you wish to enter?"), Font::BIG, Dialog::YES | Dialog::NO))
     {
 	Army::army_t army;
 	army.FromGuardian(tile);
