@@ -249,12 +249,30 @@ void SpellBookSetFilter(const BagArtifacts & bag, const std::vector<Spell::spell
     BagArtifacts::const_iterator it1 = bag.begin();
     BagArtifacts::const_iterator it2 = bag.end();
     for(; it1 != it2; ++it1)
-	if(*it1 == Artifact::SPELL_SCROLL)
+    {
+	switch((*it1).GetID())
 	{
-	    const Spell::spell_t scroll = Spell::FromInt((*it1).GetExt());
-	    if(Spell::NONE != scroll && v.end() == std::find(v.begin(), v.end(), scroll))
-		v.push_back(scroll);
+	    case Artifact::SPELL_SCROLL:
+	    {
+		const Spell::spell_t scroll = Spell::FromInt((*it1).GetExt());
+		if(Spell::NONE != scroll && v.end() == std::find(v.begin(), v.end(), scroll))
+		    v.push_back(scroll);
+	    }
+	    break;
+
+	    case Artifact::CRYSTAL_BALL:
+		if(Settings::Get().ExtArtifactCrystalBall())
+		{
+		    if(v.end() == std::find(v.begin(), v.end(), Spell::IDENTIFYHERO))
+			v.push_back(Spell::IDENTIFYHERO);
+		    if(v.end() == std::find(v.begin(), v.end(), Spell::VISIONS))
+			v.push_back(Spell::VISIONS);
+		}
+	    break;
+
+	    default: break;
 	}
+    }
 
     if(filter != SpellBook::ALL)
     {

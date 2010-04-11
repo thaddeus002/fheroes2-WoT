@@ -99,6 +99,7 @@ static const settings_t settingsFHeroes2[] =
     { Settings::WORLD_SAVE_MONSTER_BATTLE,	_("world: save count monster after battle"),		},
     { Settings::WORLD_ALLOW_SET_GUARDIAN,	_("world: allow set guardian to objects"),		},
     { Settings::WORLD_NOREQ_FOR_ARTIFACTS,	_("world: no in-built requirements or guardians for placed artifacts"),	},
+    { Settings::WORLD_ARTIFACT_CRYSTAL_BALL,	_("artifact: Crystal Ball also added Identify Hero and Visions spells"), },
     { Settings::CASTLE_ALLOW_BUY_FROM_WELL,	_("castle: allow buy from well"),			},
     { Settings::HEROES_LEARN_SPELLS_WITH_DAY,	_("heroes: learn new spells with day"),  		},
     { Settings::BATTLE_SHOW_DAMAGE,		_("battle: show damage info"),    			},
@@ -1023,6 +1024,11 @@ bool Settings::ExtAllowSetGuardian(void) const
 bool Settings::ExtNoRequirementsForArtifacts(void) const
 {
     return ExtModes(WORLD_NOREQ_FOR_ARTIFACTS);
+}
+
+bool Settings::ExtArtifactCrystalBall(void) const
+{
+    return ExtModes(WORLD_ARTIFACT_CRYSTAL_BALL);
 }
 
 bool Settings::ExtLearnSpellsWithDay(void) const

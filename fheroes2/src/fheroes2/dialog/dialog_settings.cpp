@@ -65,14 +65,18 @@ void SettingsListBox::RedrawItem(const u32 & item, u16 ox, u16 oy, bool current)
 void SettingsListBox::RedrawBackground(const Point & top)
 {
     Display & display = Display::Get();
+    const Settings & conf = Settings::Get();
 
-    display.Blit(AGG::GetICN(ICN::STONEBAK, 0), Rect(15, 25, 280, 170), top.x + 15, top.y + 25);
+    const u16 window_h = conf.QVGA() ? 224 : 400;
+    const u16 ah = window_h - 54;
 
-    for(u8 ii = 1; ii < 7; ++ii)
+    display.Blit(AGG::GetICN(ICN::STONEBAK, 0), Rect(15, 25, 280, ah), top.x + 15, top.y + 25);
+
+    for(u8 ii = 1; ii < (window_h / 25); ++ii)
 	display.Blit(AGG::GetICN(ICN::DROPLISL, 11), top.x + 295, top.y + 35 + (19 * ii));
 
     display.Blit(AGG::GetICN(ICN::DROPLISL, 10), top.x + 295, top.y + 46);
-    display.Blit(AGG::GetICN(ICN::DROPLISL, 12), top.x + 295, top.y + 156);
+    display.Blit(AGG::GetICN(ICN::DROPLISL, 12), top.x + 295, top.y + ah - 14);
 }
 
 void SettingsListBox::ActionCurrentUp(void)
@@ -105,7 +109,7 @@ void Dialog::ExtSettings(void)
     cursor.SetThemes(cursor.POINTER);
 
     const u16 window_w = 320;
-    const u16 window_h = 224;
+    const u16 window_h = conf.QVGA() ? 224 : 400;
 
     Dialog::FrameBorder frameborder;
     frameborder.SetPosition((display.w() - window_w) / 2 - BORDERWIDTH, (display.h() - window_h) / 2 - BORDERWIDTH, window_w, window_h);
@@ -142,6 +146,7 @@ void Dialog::ExtSettings(void)
     states.push_back(Settings::WORLD_SAVE_MONSTER_BATTLE);
     states.push_back(Settings::WORLD_ALLOW_SET_GUARDIAN);
     states.push_back(Settings::WORLD_NOREQ_FOR_ARTIFACTS);
+    states.push_back(Settings::WORLD_ARTIFACT_CRYSTAL_BALL);
     states.push_back(Settings::HEROES_LEARN_SPELLS_WITH_DAY);
     if(conf.VideoMode().w >= 640 && conf.VideoMode().w >= 480)
 	states.push_back(Settings::CASTLE_ALLOW_BUY_FROM_WELL);
@@ -167,12 +172,14 @@ void Dialog::ExtSettings(void)
 
     SettingsListBox listbox(area);
 
+    const u16 ah = window_h - 54;
+
     listbox.RedrawBackground(area);
     listbox.SetScrollButtonUp(ICN::DROPLISL, 6, 7, Point(area.x + 295, area.y + 25));
-    listbox.SetScrollButtonDn(ICN::DROPLISL, 8, 9, Point(area.x + 295, area.y + 175));
-    listbox.SetScrollSplitter(AGG::GetICN(ICN::DROPLISL, 13), Rect(area.x + 300, area.y + 49, 12, 122));
-    listbox.SetAreaMaxItems(6);
-    listbox.SetAreaItems(Rect(area.x + 15, area.y + 25, 280, 170));
+    listbox.SetScrollButtonDn(ICN::DROPLISL, 8, 9, Point(area.x + 295, area.y + ah + 5));
+    listbox.SetScrollSplitter(AGG::GetICN(ICN::DROPLISL, 13), Rect(area.x + 300, area.y + 49, 12, ah - 48));
+    listbox.SetAreaMaxItems(ah / 28);
+    listbox.SetAreaItems(Rect(area.x + 15, area.y + 25, 280, ah));
     listbox.SetListContent(states);
     listbox.Redraw();
 

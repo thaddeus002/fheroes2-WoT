@@ -460,7 +460,10 @@ bool ActionSpellTownPortal(Heroes & hero)
 bool ActionSpellVisions(Heroes & hero)
 {
     std::vector<u16> monsters;
-    const u8 dist = Spell::GetExtraValue(Spell::VISIONS);
+    u8 dist = Spell::GetExtraValue(Spell::VISIONS);
+
+    if(hero.HasArtifact(Artifact::CRYSTAL_BALL))
+	dist = Settings::Get().UseAltResource() ? dist * 2 + 2 : 8;
 
     if(Maps::ScanDistanceObject(hero.GetIndex(), MP2::OBJ_MONSTER, dist, monsters))
     {

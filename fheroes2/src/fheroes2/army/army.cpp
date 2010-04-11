@@ -1187,6 +1187,12 @@ u32 Army::army_t::GetSurrenderCost(void) const
 	res += (payment.gold * (*it1).GetCount());
     }
 
+    if(commander && commander->HasArtifact(Artifact::STATESMAN_QUILL))
+	res /= 5;
+
+    // limit
+    if(res < 100) res = 100;
+
     return res;
 }
 
@@ -1198,7 +1204,7 @@ u8 Army::GetJoinSolution(const Heroes & hero, const Maps::Tiles & tile, u32 & jo
 
     const float ratios = troop.isValid() ? hero.GetArmy().GetHitPoints() / troop.GetHitPoints() : 0;
     const bool check_free_stack = (hero.GetArmy().GetCount() < hero.GetArmy().Size() || hero.GetArmy().HasMonster(troop()));
-    const bool check_extra_condition = Morale::NORMAL <= hero.GetMorale();
+    const bool check_extra_condition = (!hero.HasArtifact(Artifact::HIDEOUS_MASK) && Morale::NORMAL <= hero.GetMorale());
 
     // force join for campain and others...
     const bool force_join = (5 == tile.GetQuantity4());

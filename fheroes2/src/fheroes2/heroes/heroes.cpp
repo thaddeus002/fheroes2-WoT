@@ -1252,6 +1252,9 @@ void Heroes::LevelUpSkill(const Skill::Secondary::skill_t skill)
 	(*it).NextLevel();
     else
 	secondary_skills.push_back(Skill::Secondary(skill, Skill::Level::BASIC));
+
+    if(skill == Skill::Secondary::SCOUTING)
+	Scoute();
 }
 
 void Heroes::Scoute(void)

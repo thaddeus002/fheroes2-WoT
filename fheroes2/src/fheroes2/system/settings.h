@@ -97,6 +97,7 @@ public:
 	WORLD_SAVE_MONSTER_BATTLE	= 0x20000004,
 	WORLD_ALLOW_SET_GUARDIAN	= 0x20000008,
 	WORLD_NOREQ_FOR_ARTIFACTS	= 0x20000010,
+	WORLD_ARTIFACT_CRYSTAL_BALL	= 0x20000020,
 	CASTLE_ALLOW_BUY_FROM_WELL	= 0x20100000,
 	HEROES_LEARN_SPELLS_WITH_DAY	= 0x20200000,
 
@@ -183,6 +184,7 @@ public:
     bool ExtSaveMonsterBattle(void) const;
     bool ExtAllowSetGuardian(void) const;
     bool ExtNoRequirementsForArtifacts(void) const;
+    bool ExtArtifactCrystalBall(void) const;
     bool ExtLearnSpellsWithDay(void) const;
     bool ExtBattleShowDamage(void) const;
     bool ExtBattleTroopDirection(void) const;
