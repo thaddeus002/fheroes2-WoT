@@ -137,6 +137,9 @@ Battle2::Result Battle2::Loader(Army::army_t & army1, Army::army_t & army2, u16 
 	army_wins->GetCommander()->GetLevelSkill(Skill::Secondary::NECROMANCY))
 	    NecromancySkillAction(*army_wins, *army_loss, local && (Game::LOCAL == army_wins->GetControl()));
 
+    army1.BattleQuit();
+    army2.BattleQuit();
+
     // update army
     if(army1.GetCommander() && Skill::Primary::HEROES == army1.GetCommander()->GetType())
     {
@@ -156,9 +159,6 @@ Battle2::Result Battle2::Loader(Army::army_t & army1, Army::army_t & army2, u16 
         // FIX: surrender cost
         if(result.army2 & RESULT_SURRENDER);
     }
-
-    army1.BattleQuit();
-    army2.BattleQuit();
 
     if(conf.ExtLowMemory())
     {

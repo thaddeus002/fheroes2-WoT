@@ -49,13 +49,11 @@ Army::Troop::Troop(const Maps::Tiles & t) : army(NULL), battle(NULL)
 
 Army::Troop::~Troop()
 {
-    BattleQuit();
+    if(battle) BattleQuit();
 }
 
 Army::Troop & Army::Troop::operator= (const Troop & t)
 {
-    BattleQuit();
-    
     id = t.id;
     count = t.count;
     if(!army && t.army) army = t.army;
