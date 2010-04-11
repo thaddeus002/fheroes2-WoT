@@ -160,7 +160,7 @@ bool Object::AllowDirect(const u8 general, const u16 direct)
 	case MP2::OBJ_LEANTO:
 	case MP2::OBJ_MAGICGARDEN:
 	case MP2::OBJ_WAGON:
-	case MP2::OBJ_BARRIER:
+	//case MP2::OBJ_BARRIER: // because Barrier used with any direction
 	case MP2::OBJ_TRAVELLERTENT:
 	case MP2::OBJ_JAIL:
 	case MP2::OBJ_ALCHEMYTOWER:
