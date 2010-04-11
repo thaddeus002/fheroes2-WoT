@@ -126,8 +126,7 @@ void Dialog::ExtSettings(void)
 
     states.push_back(Settings::GAME_FAST_LOAD_GAME_DIALOG);
     states.push_back(Settings::GAME_SAVE_REWRITE_CONFIRM);
-    if(conf.ExtRewriteConfirm())
-	states.push_back(Settings::GAME_ALSO_CONFIRM_AUTOSAVE);
+    states.push_back(Settings::GAME_ALSO_CONFIRM_AUTOSAVE);
     states.push_back(Settings::GAME_REMEMBER_LAST_FOCUS);
     states.push_back(Settings::GAME_REMEMBER_LAST_FILENAME);
     states.push_back(Settings::GAME_SHOW_SYSTEM_INFO);
