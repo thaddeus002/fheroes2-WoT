@@ -739,15 +739,6 @@ u32 Battle2::Stats::HowMuchWillKilled(u32 dmg) const
 
 u32 Battle2::Stats::ApplyDamage(u32 dmg)
 {
-    // clean paralyze magic
-    if(Modes(IS_PARALYZE_MAGIC))
-    {
-	SetModes(TR_RESPONSED);
-	SetModes(TR_MOVED);
-        ResetModes(IS_PARALYZE_MAGIC);
-        affected.RemoveMode(IS_PARALYZE_MAGIC);
-    }
-
     if(dmg && count)
     {
 	u32 killed = HowMuchWillKilled(dmg);
@@ -858,7 +849,25 @@ u32 Battle2::Stats::ApplyDamage(Stats & enemy, u32 dmg)
 	default: break;
     }
 
+    // clean paralyze magic
+    if(Modes(IS_PARALYZE_MAGIC))
+    {
+	SetModes(TR_RESPONSED);
+	SetModes(TR_MOVED);
+        ResetModes(IS_PARALYZE_MAGIC);
+        affected.RemoveMode(IS_PARALYZE_MAGIC);
+    }
+
     // remove blind action
+    if(enemy.isArchers() && Modes(SP_BLIND))
+    {
+    	SetModes(TR_RESPONSED);
+    	SetModes(TR_MOVED);
+        ResetModes(SP_BLIND);
+        affected.RemoveMode(SP_BLIND);
+    }
+    else
+    // remove after response, because SP_BLIND used in GetDamage
     if(enemy.Modes(SP_BLIND))
     {
     	enemy.SetModes(TR_RESPONSED);
