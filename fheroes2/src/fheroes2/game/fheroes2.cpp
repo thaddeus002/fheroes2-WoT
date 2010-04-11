@@ -244,8 +244,6 @@ int main(int argc, char **argv)
 		}
 	    }
 
-	    conf.BinarySave();
-
 	    Display::ShowCursor();
 	    if(Settings::Get().ExtUseFade()) Display::Fade();
 

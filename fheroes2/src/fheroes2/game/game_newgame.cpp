@@ -129,6 +129,9 @@ Game::menu_t Game::NewGame(void)
 
     Display & display = Display::Get();
 
+    // load game settings
+    Settings::Get().BinaryLoad();
+
     // image background
     const Sprite &back = AGG::GetICN(ICN::HEROES, 0);
     const Point top((display.w() - back.w()) / 2, (display.h() - back.h()) / 2);
