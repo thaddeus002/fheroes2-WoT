@@ -202,7 +202,7 @@ bool Dialog::SetGuardian(Heroes & hero, Army::Troop & troop, bool readonly)
 		cursor.Hide();
 	    }
 	    else
-	    if(selectArmy.isSelected() && !readonly)
+	    if(selectArmy.isSelected() && !readonly && !selectArmy.SaveLastTroop())
 	    {
 		Army::Troop & troop1 = hero.GetArmy().At(selectArmy.Selected());
 
