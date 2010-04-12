@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-04-11 18:40+0900\n"
+"POT-Creation-Date: 2010-04-12 17:14+0900\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -77,11 +77,11 @@ msgstr ""
 msgid "Some undead in groups -1"
 msgstr ""
 
-#: ../fheroes2/battle2/battle_action.cpp:897
+#: ../fheroes2/battle2/battle_action.cpp:906
 msgid "Summon Elemental spell failed!"
 msgstr ""
 
-#: ../fheroes2/battle2/battle_action.cpp:993
+#: ../fheroes2/battle2/battle_action.cpp:1002
 msgid "Mirror Image spell failed!"
 msgstr ""
 
@@ -169,6 +169,7 @@ msgstr ""
 #: ../fheroes2/castle/castle_well.cpp:261
 #: ../fheroes2/dialog/dialog_armyinfo.cpp:228
 #: ../fheroes2/dialog/dialog_quickinfo.cpp:603
+#: ../fheroes2/heroes/skill.cpp:307
 msgid "Defense"
 msgstr ""
 
@@ -341,112 +342,112 @@ msgstr ""
 msgid "Set auto battle off"
 msgstr ""
 
-#: ../fheroes2/battle2/battle_interface.cpp:1885
+#: ../fheroes2/battle2/battle_interface.cpp:1884
 msgid "%{name} skipping turn"
 msgstr ""
 
-#: ../fheroes2/battle2/battle_interface.cpp:1886
-msgid ", and get +2 defence"
+#: ../fheroes2/battle2/battle_interface.cpp:1885
+msgid ", and get +2 defense"
 msgstr ""
 
-#: ../fheroes2/battle2/battle_interface.cpp:1889
+#: ../fheroes2/battle2/battle_interface.cpp:1888
 msgid "%{name} waiting turn"
 msgstr ""
 
-#: ../fheroes2/battle2/battle_interface.cpp:1951
+#: ../fheroes2/battle2/battle_interface.cpp:1950
 msgid "Good luck shines on the  %{attacker}"
 msgstr ""
 
-#: ../fheroes2/battle2/battle_interface.cpp:1961
+#: ../fheroes2/battle2/battle_interface.cpp:1960
 msgid "Bad luck descends on the %{attacker}"
 msgstr ""
 
-#: ../fheroes2/battle2/battle_interface.cpp:2044
+#: ../fheroes2/battle2/battle_interface.cpp:2043
 msgid "%{attacker} do %{damage} damage."
 msgstr ""
 
-#: ../fheroes2/battle2/battle_interface.cpp:2060
+#: ../fheroes2/battle2/battle_interface.cpp:2059
 msgid "%{count} creatures perished."
 msgstr ""
 
-#: ../fheroes2/battle2/battle_interface.cpp:2072
-#: ../fheroes2/battle2/battle_interface.cpp:2596
+#: ../fheroes2/battle2/battle_interface.cpp:2071
+#: ../fheroes2/battle2/battle_interface.cpp:2595
 msgid "one %{defender} perish."
 msgid_plural "%{count} %{defender} perished."
 msgstr[0] ""
 msgstr[1] ""
 
-#: ../fheroes2/battle2/battle_interface.cpp:2342
+#: ../fheroes2/battle2/battle_interface.cpp:2341
 msgid "The %{name} resist the spell!"
 msgstr ""
 
-#: ../fheroes2/battle2/battle_interface.cpp:2356
+#: ../fheroes2/battle2/battle_interface.cpp:2355
 msgid "%{name} casts %{spell} on the %{troop}."
 msgstr ""
 
-#: ../fheroes2/battle2/battle_interface.cpp:2361
+#: ../fheroes2/battle2/battle_interface.cpp:2360
 msgid "%{name} casts %{spell}."
 msgstr ""
 
-#: ../fheroes2/battle2/battle_interface.cpp:2453
+#: ../fheroes2/battle2/battle_interface.cpp:2452
 msgid "The %{spell} spell does %{damage} damage to all undead creatures."
 msgstr ""
 
-#: ../fheroes2/battle2/battle_interface.cpp:2456
+#: ../fheroes2/battle2/battle_interface.cpp:2455
 msgid "The %{spell} spell does %{damage} damage to all living creatures."
 msgstr ""
 
-#: ../fheroes2/battle2/battle_interface.cpp:2458
+#: ../fheroes2/battle2/battle_interface.cpp:2457
 msgid "The %{spell} does %{damage} damage."
 msgstr ""
 
-#: ../fheroes2/battle2/battle_interface.cpp:2465
+#: ../fheroes2/battle2/battle_interface.cpp:2464
 msgid "one creature perish."
 msgid_plural "%{count} creatures perished."
 msgstr[0] ""
 msgstr[1] ""
 
-#: ../fheroes2/battle2/battle_interface.cpp:2502
+#: ../fheroes2/battle2/battle_interface.cpp:2501
 msgid "The Unicorns attack blinds the %{name}!"
 msgstr ""
 
-#: ../fheroes2/battle2/battle_interface.cpp:2503
+#: ../fheroes2/battle2/battle_interface.cpp:2502
 msgid "The Medusas gaze turns the %{name} to stone!"
 msgstr ""
 
-#: ../fheroes2/battle2/battle_interface.cpp:2505
+#: ../fheroes2/battle2/battle_interface.cpp:2504
 msgid "The Mummies' curse falls upon the %{name}!"
 msgstr ""
 
-#: ../fheroes2/battle2/battle_interface.cpp:2506
+#: ../fheroes2/battle2/battle_interface.cpp:2505
 msgid "The %{name} are paralyzed by the Cyclopes!"
 msgstr ""
 
-#: ../fheroes2/battle2/battle_interface.cpp:2507
+#: ../fheroes2/battle2/battle_interface.cpp:2506
 msgid "The Archmagi dispel all good spells on your %{name}!"
 msgstr ""
 
-#: ../fheroes2/battle2/battle_interface.cpp:2527
+#: ../fheroes2/battle2/battle_interface.cpp:2526
 msgid "High morale enables the %{monster} to attack again."
 msgstr ""
 
-#: ../fheroes2/battle2/battle_interface.cpp:2534
+#: ../fheroes2/battle2/battle_interface.cpp:2533
 msgid "Low morale causes the %{monster} to freeze in panic."
 msgstr ""
 
-#: ../fheroes2/battle2/battle_interface.cpp:2591
+#: ../fheroes2/battle2/battle_interface.cpp:2590
 msgid "Tower do %{damage} damage."
 msgstr ""
 
-#: ../fheroes2/battle2/battle_interface.cpp:3866
+#: ../fheroes2/battle2/battle_interface.cpp:3865
 msgid "No spells to cast."
 msgstr ""
 
-#: ../fheroes2/battle2/battle_interface.cpp:3874
+#: ../fheroes2/battle2/battle_interface.cpp:3873
 msgid "Are you sure you want to retreat?"
 msgstr ""
 
-#: ../fheroes2/battle2/battle_interface.cpp:3891
+#: ../fheroes2/battle2/battle_interface.cpp:3890
 msgid "You don't have enough gold!"
 msgstr ""
 
@@ -466,13 +467,13 @@ msgid ""
 "the enemy's dead to return under your service as %{monster}"
 msgstr ""
 
-#: ../fheroes2/battle2/battle_stats.cpp:913
+#: ../fheroes2/battle2/battle_stats.cpp:923
 msgid ""
 "The %{artifact} artifact is in effect for this battle, disabling %{spell} "
 "spell."
 msgstr ""
 
-#: ../fheroes2/battle2/battle_stats.cpp:1426
+#: ../fheroes2/battle2/battle_stats.cpp:1436
 msgid "%{count} %{name} rise(s) from the dead!"
 msgstr ""
 
@@ -1249,43 +1250,43 @@ msgstr ""
 msgid "For the QVGA version is not available."
 msgstr ""
 
-#: ../fheroes2/dialog/dialog_gameinfo.cpp:60
+#: ../fheroes2/dialog/dialog_gameinfo.cpp:61
 msgid ""
 "Map\n"
 "Difficulty"
 msgstr ""
 
-#: ../fheroes2/dialog/dialog_gameinfo.cpp:63
+#: ../fheroes2/dialog/dialog_gameinfo.cpp:64
 msgid ""
 "Game\n"
 "Difficulty"
 msgstr ""
 
-#: ../fheroes2/dialog/dialog_gameinfo.cpp:66
+#: ../fheroes2/dialog/dialog_gameinfo.cpp:67
 msgid "Rating"
 msgstr ""
 
-#: ../fheroes2/dialog/dialog_gameinfo.cpp:69
+#: ../fheroes2/dialog/dialog_gameinfo.cpp:70
 msgid "Map Size"
 msgstr ""
 
-#: ../fheroes2/dialog/dialog_gameinfo.cpp:90
+#: ../fheroes2/dialog/dialog_gameinfo.cpp:91
 #: ../fheroes2/game/game_scenarioinfo.cpp:304
 msgid "Opponents"
 msgstr ""
 
-#: ../fheroes2/dialog/dialog_gameinfo.cpp:96
+#: ../fheroes2/dialog/dialog_gameinfo.cpp:97
 #: ../fheroes2/game/game_scenarioinfo.cpp:309
 msgid "Class"
 msgstr ""
 
-#: ../fheroes2/dialog/dialog_gameinfo.cpp:102
+#: ../fheroes2/dialog/dialog_gameinfo.cpp:103
 msgid ""
 "Victory\n"
 "Conditions"
 msgstr ""
 
-#: ../fheroes2/dialog/dialog_gameinfo.cpp:108
+#: ../fheroes2/dialog/dialog_gameinfo.cpp:110
 msgid ""
 "Loss\n"
 "Conditions"
@@ -2297,76 +2298,122 @@ msgid "Run out of time. (Fail to win by a certain point.)"
 msgstr ""
 
 #: ../fheroes2/game/game_over.cpp:69
+msgid "Capture the castle '%{name}'"
+msgstr ""
+
+#: ../fheroes2/game/game_over.cpp:69
+msgid "Capture the town '%{name}'"
+msgstr ""
+
+#: ../fheroes2/game/game_over.cpp:79
+msgid "Defeat the hero '%{name}'"
+msgstr ""
+
+#: ../fheroes2/game/game_over.cpp:87
+msgid "Find the ultimate artifact"
+msgstr ""
+
+#: ../fheroes2/game/game_over.cpp:90
+msgid "Find the '%{name}' artifact"
+msgstr ""
+
+#: ../fheroes2/game/game_over.cpp:97
+msgid "Accumulate %{count} gold"
+msgstr ""
+
+#: ../fheroes2/game/game_over.cpp:101
+msgid ""
+", or you may win by defeating all enemy heroes and capturing all enemy towns "
+"and castles."
+msgstr ""
+
+#: ../fheroes2/game/game_over.cpp:111
+msgid "Lose the castle '%{name}'."
+msgstr ""
+
+#: ../fheroes2/game/game_over.cpp:111
+msgid "Lose the town '%{name}'."
+msgstr ""
+
+#: ../fheroes2/game/game_over.cpp:121
+msgid "Lose the hero '%{name}'."
+msgstr ""
+
+#: ../fheroes2/game/game_over.cpp:128
+msgid "Fail to win by the end of month %{month}, week %{week}, day %{day}."
+msgstr ""
+
+#: ../fheroes2/game/game_over.cpp:147
 msgid ""
 "You captured %{name}!\n"
 "You are victorious."
 msgstr ""
 
-#: ../fheroes2/game/game_over.cpp:77
+#: ../fheroes2/game/game_over.cpp:155
 msgid ""
 "You have captured the enemy hero %{name}!\n"
 "Your quest is complete."
 msgstr ""
 
-#: ../fheroes2/game/game_over.cpp:85
+#: ../fheroes2/game/game_over.cpp:163
 msgid ""
 "You have found the %{name}.\n"
 "Your quest is complete."
 msgstr ""
 
-#: ../fheroes2/game/game_over.cpp:92
+#: ../fheroes2/game/game_over.cpp:170
 msgid ""
 "The enemy is beaten.\n"
 "Your side has triumphed!"
 msgstr ""
 
-#: ../fheroes2/game/game_over.cpp:97
+#: ../fheroes2/game/game_over.cpp:175
 msgid ""
 "You have built up over %{count} gold in your treasury.\n"
 "All enemies bow before your wealth and power."
 msgstr ""
 
-#: ../fheroes2/game/game_over.cpp:117
+#: ../fheroes2/game/game_over.cpp:195
 msgid ""
 "The enemy has found the %{name}.\n"
 "Your quest is a failure."
 msgstr ""
 
-#: ../fheroes2/game/game_over.cpp:125
+#: ../fheroes2/game/game_over.cpp:203
 msgid ""
 "%{color} has fallen!\n"
 "All is lost."
 msgstr ""
 
-#: ../fheroes2/game/game_over.cpp:131
+#: ../fheroes2/game/game_over.cpp:209
 msgid ""
 "The enemy has built up over %{count} gold in his treasury.\n"
 "You must bow done in defeat before his wealth and power."
 msgstr ""
 
-#: ../fheroes2/game/game_over.cpp:137
+#: ../fheroes2/game/game_over.cpp:215
 msgid "You have been eliminated from the game!!!"
 msgstr ""
 
-#: ../fheroes2/game/game_over.cpp:142
+#: ../fheroes2/game/game_over.cpp:220
 msgid ""
 "The enemy has captured %{name}!\n"
 "They are triumphant."
 msgstr ""
 
-#: ../fheroes2/game/game_over.cpp:149
+#: ../fheroes2/game/game_over.cpp:227
 msgid ""
 "You have lost the hero %{name}.\n"
 "Your quest is over."
 msgstr ""
 
-#: ../fheroes2/game/game_over.cpp:156
+#: ../fheroes2/game/game_over.cpp:234
 msgid ""
 "You have failed to complete your quest in time.\n"
 "All is lost."
 msgstr ""
 
-#: ../fheroes2/game/game_over.cpp:201
+#: ../fheroes2/game/game_over.cpp:279
 msgid "%{color} has been vanquished!"
 msgstr ""
 
@@ -4370,10 +4417,6 @@ msgstr ""
 msgid ""
 "You must be standing on the entrance to a mine (sawmills and alchemists "
 "don't count) to cast this spell."
-msgstr ""
-
-#: ../fheroes2/heroes/skill.cpp:307
-msgid "Defence"
 msgstr ""
 
 #: ../fheroes2/heroes/skill.cpp:307
@@ -6757,27 +6800,6 @@ msgstr ""
 
 #: ../fheroes2/resource/artifact.cpp:119
 msgid "The Magic Book enables you to cast spells."
-msgstr ""
-
-#: ../fheroes2/resource/artifact.cpp:121
-msgid "Dummy 1"
-msgstr ""
-
-#: ../fheroes2/resource/artifact.cpp:121 ../fheroes2/resource/artifact.cpp:122
-#: ../fheroes2/resource/artifact.cpp:123 ../fheroes2/resource/artifact.cpp:124
-msgid "The reserved artifact."
-msgstr ""
-
-#: ../fheroes2/resource/artifact.cpp:122
-msgid "Dummy 2"
-msgstr ""
-
-#: ../fheroes2/resource/artifact.cpp:123
-msgid "Dummy 3"
-msgstr ""
-
-#: ../fheroes2/resource/artifact.cpp:124
-msgid "Dummy 4"
 msgstr ""
 
 #: ../fheroes2/resource/artifact.cpp:126
@@ -12122,7 +12144,7 @@ msgid "battle: magical creature resists (20%) the same magic"
 msgstr ""
 
 #: ../fheroes2/system/settings.cpp:115
-msgid "battle: skip increase +2 defence"
+msgid "battle: skip increase +2 defense"
 msgstr ""
 
 #: ../fheroes2/system/settings.cpp:116

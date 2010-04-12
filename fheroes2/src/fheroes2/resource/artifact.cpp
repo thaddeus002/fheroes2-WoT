@@ -118,10 +118,10 @@ static struct
 
 	{ _("Magic Book"), _("The Magic Book enables you to cast spells.") },
 	
-	{ _("Dummy 1"), _("The reserved artifact.") },
-	{ _("Dummy 2"), _("The reserved artifact.") },
-	{ _("Dummy 3"), _("The reserved artifact.") },
-	{ _("Dummy 4"), _("The reserved artifact.") },
+	{ "Dummy 1", "The reserved artifact." },
+	{ "Dummy 2", "The reserved artifact." },
+	{ "Dummy 3", "The reserved artifact." },
+	{ "Dummy 4", "The reserved artifact." },
 
 	{ _("Spell Scroll"), _("This Spell Scroll gives your hero the ability to cast the %{spell} spell.") },
 	{ _("Arm of the Martyr"), _("The Arm of the Martyr increases your spell power by 3 but adds the undead morale penalty.") },

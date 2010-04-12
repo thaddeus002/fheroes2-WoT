@@ -108,7 +108,7 @@ void GameOver::GetActualDescription(u16 cond, std::string & msg)
 	const Castle *town = world.GetCastle(conf.WinsMapsIndexObject());
 	if(town)
 	{
-    	    msg = town->isCastle() ? _("Lose the castle '%{name}'.") : _("Lose the town '%{name}'.");;
+    	    msg = town->isCastle() ? _("Lose the castle '%{name}'.") : _("Lose the town '%{name}'.");
 	    String::Replace(msg, "%{name}", town->GetName());
 	}
     }
