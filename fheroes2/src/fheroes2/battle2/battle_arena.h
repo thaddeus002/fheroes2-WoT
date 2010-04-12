@@ -54,7 +54,7 @@ namespace Battle2
         void AddedCastAction(u8, u16);
         void AddedCastTeleportAction(u16, u16);
         void AddedEndAction(const Stats &);
-        void AddedSkipAction(const Stats &);
+        void AddedSkipAction(const Stats &, bool);
         void AddedMoveAction(const Stats &, u16);
         void AddedMoveAction(const Stats &, const std::vector<u16> &);
         void AddedAttackAction(const Stats &, const Stats &);

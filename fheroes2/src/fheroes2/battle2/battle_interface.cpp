@@ -1425,9 +1425,9 @@ void Battle2::Interface::HumanBattleTurn(const Stats & b, Actions & a, std::stri
 	    case KEY_ESCAPE:	ProcessingHeroDialogResult(2, a); break;
 
 	    // skip
-	    case KEY_s:		a.AddedSkipAction(b); a.AddedEndAction(b);  humanturn_exit = true; break;
+	    case KEY_s:		a.AddedSkipAction(b, true); humanturn_exit = true; break;
     	    case KEY_SPACE:
-    		if(conf.ExtBattleSoftWait()) { a.AddedSkipAction(b); humanturn_exit = true; }
+    		if(conf.ExtBattleSoftWait()) { a.AddedSkipAction(b, false); humanturn_exit = true; }
     		break;
 
 	    // options
@@ -1733,8 +1733,7 @@ void Battle2::Interface::ButtonSkipAction(Actions & a)
 
     if(le.MouseClickLeft(btn_skip) && b_current)
     {
-	a.AddedSkipAction(*b_current); 
-	a.AddedEndAction(*b_current);
+	a.AddedSkipAction(*b_current, true);
 	humanturn_exit = true;
     }
 }
@@ -1880,7 +1879,7 @@ void Battle2::Interface::RedrawTroopFrameAnimation(Stats & b)
 void Battle2::Interface::RedrawActionSkipStatus(const Stats & attacker)
 {
     std::string msg;
-    if(attacker.Modes(TR_MOVED))
+    if(attacker.Modes(TR_HARDSKIP))
     {
 	msg = _("%{name} skipping turn");
 	if(Settings::Get().ExtBattleSkipIncreaseDefence()) msg.append(_(", and get +2 defence"));

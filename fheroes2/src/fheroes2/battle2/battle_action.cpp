@@ -79,11 +79,12 @@ void Battle2::Actions::AddedEndAction(const Stats & b)
     push_back(action);
 }
 
-void Battle2::Actions::AddedSkipAction(const Stats & b)
+void Battle2::Actions::AddedSkipAction(const Stats & b, bool hard)
 {
     Action action;
     action.SetID(MSG_BATTLE_SKIP);
     action.Push(b.id);
+    action.Push(static_cast<u8>(hard));
 
     push_back(action);
 }
@@ -402,13 +403,21 @@ void Battle2::Arena::ApplyActionMove(Action & action)
 void Battle2::Arena::ApplyActionSkip(Action & action)
 {
     u16 id;
-
+    u8 hard;
     action.Pop(id);
+    action.Pop(hard);
 
     Battle2::Stats* battle = GetTroopID(id);
     if(battle && battle->isValid() && !battle->Modes(TR_MOVED))
     {
-	battle->SetModes(battle->Modes(TR_SKIPMOVE) ? TR_MOVED : TR_SKIPMOVE);
+	if(hard)
+	{
+	    battle->SetModes(TR_HARDSKIP);
+	    battle->SetModes(TR_SKIPMOVE);
+	    battle->SetModes(TR_MOVED);
+	}
+	else
+	    battle->SetModes(battle->Modes(TR_SKIPMOVE) ? TR_MOVED : TR_SKIPMOVE);
 
 	if(interface) interface->RedrawActionSkipStatus(*battle);
 

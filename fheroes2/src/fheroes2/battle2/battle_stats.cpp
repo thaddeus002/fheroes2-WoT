@@ -596,6 +596,7 @@ void Battle2::Stats::NewTurn(void)
     ResetModes(TR_RESPONSED);
     ResetModes(TR_MOVED);
     ResetModes(TR_SKIPMOVE);
+    ResetModes(TR_HARDSKIP);
     ResetModes(MORALE_BAD);
     ResetModes(MORALE_GOOD);
     ResetModes(LUCK_BAD);
@@ -1033,7 +1034,7 @@ u16 Battle2::Stats::GetDefense(void) const
     if(Modes(SP_STEELSKIN)) res += Spell::GetExtraValue(Spell::STEELSKIN);
 
     // extra
-    if(Modes(TR_SKIPMOVE | TR_MOVED) && Settings::Get().ExtBattleSkipIncreaseDefence()) res += 2;
+    if(Modes(TR_HARDSKIP) && Settings::Get().ExtBattleSkipIncreaseDefence()) res += 2;
 
     // disrupting ray accumulate effect
     if(disruptingray) res -= disruptingray * Spell::GetExtraValue(Spell::DISRUPTINGRAY);
