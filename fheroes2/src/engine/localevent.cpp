@@ -30,7 +30,7 @@ LocalEvent::LocalEvent() : modes(0), key_value(KEY_NONE), mouse_state(0),
     mouse_button(0), mouse_st(0, 0), redraw_cursor_func(NULL), keyboard_filter_func(NULL), clock_delay(TAP_DELAY_EMULATE)
 {
 #ifdef WITHOUT_MOUSE
-    emulate_mouse = true;
+    emulate_mouse = false;
     emulate_mouse_up = KEY_UP;
     emulate_mouse_down = KEY_DOWN;
     emulate_mouse_left = KEY_LEFT;
@@ -367,7 +367,7 @@ void LocalEvent::HandleKeyboardEvent(SDL_KeyboardEvent & event)
 	(event.type == SDL_KEYDOWN) ? SetModes(KEY_PRESSED) : ResetModes(KEY_PRESSED);
 
 #ifdef WITHOUT_MOUSE
-	if(EmulateMouseAction(SDLToKeySym(event.keysym.sym))) return;
+	if(emulate_mouse && EmulateMouseAction(SDLToKeySym(event.keysym.sym))) return;
 #endif
 
 	key_value = SDLToKeySym(event.keysym.sym);
@@ -618,15 +618,19 @@ bool LocalEvent::MouseCursor(const Rect &rt) const
 
 const Point & LocalEvent::GetMouseCursor(void)
 {
-#ifndef WITHOUT_MOUSE
-    int x, y;
-
-    SDL_PumpEvents();
-    SDL_GetMouseState(&x, &y);
-
-    mouse_cu.x = x;
-    mouse_cu.y = y;
+#ifdef WITHOUT_MOUSE
+    if(!emulate_mouse)
 #endif
+    {
+	int x, y;
+
+	SDL_PumpEvents();
+	SDL_GetMouseState(&x, &y);
+
+	mouse_cu.x = x;
+	mouse_cu.y = y;
+    }
+
     if(modes & MOUSE_OFFSET) mouse_cu += mouse_st;
 
     return mouse_cu;
@@ -783,7 +787,7 @@ bool LocalEvent::EmulateMouseAction(KeySym key)
 	key == emulate_mouse_left ||
 	key == emulate_mouse_right ||
 	key == emulate_press_left ||
-	key == emulate_press_right) && emulate_mouse)
+	key == emulate_press_right))
     {
 	if(emulate_mouse_up == key)
 	{
