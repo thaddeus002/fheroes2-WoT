@@ -514,12 +514,16 @@ u16 Text::height(const std::string &str, Font::type_t ft, u16 width)
     return 0;
 }
 
-TextBox::TextBox(const std::string & msg, Font::type_t ft, u16 width) : align(2)
+TextBox::TextBox() : align(ALIGN_CENTER)
+{
+}
+
+TextBox::TextBox(const std::string & msg, Font::type_t ft, u16 width) : align(ALIGN_CENTER)
 {
     Set(msg, ft, width);
 }
 
-TextBox::TextBox(const std::string & msg, Font::type_t ft, const Rect & rt) : align(2)
+TextBox::TextBox(const std::string & msg, Font::type_t ft, const Rect & rt) : align(ALIGN_CENTER)
 {
     Set(msg, ft, rt.w);
     Blit(rt.x, rt.y);
@@ -576,9 +580,9 @@ void TextBox::Set(const std::string & msg, Font::type_t ft, u16 width)
     }
 }
 
-void TextBox::SetAlignLeft(void)
+void TextBox::SetAlign(u8 f)
 {
-    align = 1;
+    align = f;
 }
 
 void TextBox::Append(const std::string & msg, Font::type_t ft, u16 width)
@@ -685,14 +689,23 @@ void TextBox::Blit(u16 ax, u16 ay, Surface & sf)
     
     for(; it1 != it2; ++it1)
     {
-	// center
-	if(align == 2)
-	    (*it1).Blit(ax + (Rect::w - (*it1).w()) / 2, ay);
-	// left
-	else
-	    (*it1).Blit(ax, ay);
+	switch(align)
+	{
+	    case ALIGN_LEFT:
+		(*it1).Blit(ax, ay);
+		break;
 
-    	ay += (*it1).h();
+	    case ALIGN_RIGHT:
+		(*it1).Blit(ax + Rect::w - (*it1).w(), ay);
+		break;
+	
+	    // center
+	    default:
+		(*it1).Blit(ax + (Rect::w - (*it1).w()) / 2, ay);
+		break;
+	}
+
+	ay += (*it1).h();
     }
 }
 

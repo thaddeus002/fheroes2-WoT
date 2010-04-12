@@ -54,7 +54,7 @@ void SettingsListBox::RedrawItem(const u32 & item, u16 ox, u16 oy, bool current)
     if(conf.ExtModes(item)) display.Blit(mark, ox + 3, oy + 2);
 
     TextBox msg(conf.ExtName(item), Font::SMALL, 250);
-    msg.SetAlignLeft();
+    msg.SetAlign(ALIGN_LEFT);
 
     if(1 < msg.row())
 	msg.Blit(ox + cell.w() + 5, oy - 1);

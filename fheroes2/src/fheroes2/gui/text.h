@@ -32,6 +32,8 @@ namespace Font
     enum type_t { SMALL = 0x01, BIG = 0x02, YELLOW_BIG = 0x04, YELLOW_SMALL = 0x08 };
 }
 
+enum { ALIGN_NONE, ALIGN_LEFT, ALIGN_CENTER, ALIGN_RIGHT };
+
 class TextInterface
 {
 public:
@@ -174,12 +176,12 @@ private:
 class TextBox : protected Rect
 {
 public:
-    TextBox(){};
+    TextBox();
     TextBox(const std::string &, Font::type_t, u16);
     TextBox(const std::string &, Font::type_t, const Rect &);
 
     void Set(const std::string &, Font::type_t, u16);
-    void SetAlignLeft(void);
+    void SetAlign(u8);
 
     const Rect & GetRect(void) const{ return *this; }
     s16 x(void) const{ return Rect::x; }
