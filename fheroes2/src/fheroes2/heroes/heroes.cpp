@@ -434,24 +434,20 @@ void Heroes::LoadFromMP2(u16 map_index, const void *ptr, const Color::color_t cl
     ++ptr8;
 
     // custom name
-    ++ptr8;
+    if(*ptr8) name = std::string(_(reinterpret_cast<const char *>(ptr8 + 1)));
+    ptr8 += 14;
 
-    //name hero
-    if(*ptr8) name = std::string(_(reinterpret_cast<const char *>(ptr8)));
-    
-    ptr8 += 13;
-    
     // patrol
-    ++ptr8;
     if(*ptr8)
     {
 	SetModes(PATROL);
 	patrol_center = mp;
     }
+    ++ptr8;
 
     // count square
-    ++ptr8;
     patrol_square = *ptr8;
+    ++ptr8;
 
     // end
 
@@ -838,6 +834,10 @@ void Heroes::ActionNewDay(void)
 
     // remove day visit object
     visit_object.remove_if(Visit::isDayLife);
+    
+
+    // new day, new capacities
+    if(Modes(STUPID)) ResetModes(STUPID);
 }
 
 void Heroes::ActionNewWeek(void)

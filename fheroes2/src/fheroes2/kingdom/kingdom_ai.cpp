@@ -128,6 +128,8 @@ void Kingdom::AITurns(void)
 
 	while(hero.MayStillMove())
 	{
+	    if(hero.Modes(Heroes::PATROL) && hero.Modes(Heroes::STUPID)) break;
+
 	    // turn indicator
 	    if(status) status->RedrawTurnProgress(3);
 	    //if(status) status->RedrawTurnProgress(4);
@@ -265,6 +267,8 @@ void Kingdom::AIHeroesGetTask(Heroes & hero)
 
     if(task.empty()) AIHeroesPrepareTask(hero);
 
+    if(task.empty() && hero.Modes(Heroes::PATROL)) return;
+
     // find passable index
     while(task.size() && !hero.GetPath().Calculate(task.front())){ task.pop_front(); }
 
@@ -289,6 +293,32 @@ void Kingdom::AIHeroesPrepareTask(Heroes & hero)
 {
     if(hero.GetPath().isValid()) return;
 
+    std::deque<u16> & task = hero.GetSheduledVisit();
+
+    if(hero.Modes(Heroes::PATROL))
+    {
+	// goto patrol center
+	if(hero.GetCenterPatrol() != hero.GetCenter())
+	    task.push_front(Maps::GetIndexFromAbsPoint(hero.GetCenterPatrol()));
+
+	// scan enemy hero
+	std::vector<u16> enemies;
+	Maps::ScanDistanceObject(Maps::GetIndexFromAbsPoint(hero.GetCenterPatrol()), MP2::OBJ_HEROES, hero.GetSquarePatrol(), enemies);
+	if(enemies.size())
+	{
+	    for(std::vector<u16>::const_iterator it = enemies.begin(); it != enemies.end(); ++it)
+	    {
+		const Heroes* enemy = world.GetHeroes(*it);
+		if(enemy && enemy->GetColor() != hero.GetColor())
+		    task.push_front(*it);
+	    }
+	}
+
+	if(task.empty()) hero.SetModes(Heroes::STUPID);
+
+	return;
+    }
+
     Castle *castle = hero.inCastle();
 
     // if hero in castle
@@ -305,7 +335,6 @@ void Kingdom::AIHeroesPrepareTask(Heroes & hero)
 		hero.GetArmy().KeepOnlyWeakestTroops(castle->GetArmy());
     }
 
-    std::deque<u16> & task = hero.GetSheduledVisit();
 
     // load minimal distance tasks
     std::vector<IndexDistance> objs;
