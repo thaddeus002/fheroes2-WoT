@@ -53,6 +53,7 @@ void Dialog::GameInfo(void)
     display.Blit(dlg, pt);
 
     TextBox text;
+    std::string msg;
 
     text.Set(conf.MapsName(), Font::BIG, 350);
     text.Blit(pt.x + 52, pt.y + 30);
@@ -102,14 +103,16 @@ void Dialog::GameInfo(void)
     text.Set(_("Victory\nConditions"), Font::SMALL, 80);
     text.Blit(pt.x + 40, pt.y + 345);
 
-    text.Set(GameOver::GetString(conf.ConditionWins()), Font::SMALL, 272);
-    text.Blit(pt.x + 114, pt.y + 348);
+    GameOver::GetActualDescription(conf.ConditionWins(), msg);
+    text.Set(msg, Font::SMALL, 272);
+    text.Blit(pt.x + 130, pt.y + 348);
 
     text.Set(_("Loss\nConditions"), Font::SMALL, 80);
     text.Blit(pt.x + 40, pt.y + 390);
 
-    text.Set(GameOver::GetString(conf.ConditionLoss()), Font::SMALL, 272);
-    text.Blit(pt.x + 114, pt.y + 396);
+    GameOver::GetActualDescription(conf.ConditionLoss(), msg);
+    text.Set(msg, Font::SMALL, 272);
+    text.Blit(pt.x + 130, pt.y + 396);
 
     str = "score: ";
     String::AddInt(str, Game::GetGameOverScores());

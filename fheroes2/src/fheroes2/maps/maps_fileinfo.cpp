@@ -326,23 +326,23 @@ u8 Maps::FileInfo::KingdomRace(u8 color) const
     return 0;
 }
 
-GameOver::conditions_t Maps::FileInfo::ConditionWins(void) const
+u16 Maps::FileInfo::ConditionWins(void) const
 {
     switch(conditions_wins)
     {
 	case 0: return GameOver::WINS_ALL;
-	case 1:	return GameOver::WINS_TOWN;
-	case 2:	return GameOver::WINS_HERO;
-	case 3:	return GameOver::WINS_ARTIFACT;
+	case 1:	return wins2 ? GameOver::WINS_TOWN | GameOver::WINS_ALL : GameOver::WINS_TOWN;
+	case 2:	return wins2 ? GameOver::WINS_HERO | GameOver::WINS_ALL : GameOver::WINS_HERO;
+	case 3:	return wins2 ? GameOver::WINS_ARTIFACT | GameOver::WINS_ALL : GameOver::WINS_ARTIFACT;
 	case 4:	return GameOver::WINS_SIDE;
-	case 5:	return GameOver::WINS_GOLD;
+	case 5:	return wins2 ? GameOver::WINS_GOLD | GameOver::WINS_ALL : GameOver::WINS_GOLD;
 	default: break;
     }
 
     return GameOver::COND_NONE;
 }
 
-GameOver::conditions_t Maps::FileInfo::ConditionLoss(void) const
+u16 Maps::FileInfo::ConditionLoss(void) const
 {
     switch(conditions_loss)
     {

@@ -787,12 +787,12 @@ bool Settings::GameStartWithHeroes(void) const
     return current_maps_file.with_heroes;
 }
 
-GameOver::conditions_t Settings::ConditionWins(void) const
+u16 Settings::ConditionWins(void) const
 {
     return current_maps_file.ConditionWins();
 }
 
-GameOver::conditions_t Settings::ConditionLoss(void) const
+u16 Settings::ConditionLoss(void) const
 {
     return current_maps_file.ConditionLoss();
 }

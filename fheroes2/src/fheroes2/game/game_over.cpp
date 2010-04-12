@@ -54,6 +54,84 @@ const char* GameOver::GetString(conditions_t cond)
     return cond_str[0];
 }
 
+void GameOver::GetActualDescription(u16 cond, std::string & msg)
+{
+    const Settings & conf = Settings::Get();
+
+    if(WINS_ALL == cond || WINS_SIDE == cond)
+	msg = GetString(WINS_ALL);
+    else
+    if(WINS_TOWN & cond)
+    {
+	const Castle *town = world.GetCastle(conf.WinsMapsIndexObject());
+	if(town)
+	{
+    	    msg = town->isCastle() ? _("Capture the castle '%{name}'") : _("Capture the town '%{name}'");;
+	    String::Replace(msg, "%{name}", town->GetName());
+	}
+    }
+    else
+    if(WINS_HERO & cond)
+    {
+	const Heroes *hero = world.GetHeroesCondWins();
+	if(hero)
+	{
+	    msg = _("Defeat the hero '%{name}'");
+	    String::Replace(msg, "%{name}", hero->GetName());
+	}
+    }
+    else
+    if(WINS_ARTIFACT & cond)
+    {
+	if(conf.WinsFindUltimateArtifact())
+	    msg = _("Find the ultimate artifact");
+	else
+	{
+	    msg = _("Find the '%{name}' artifact");
+	    String::Replace(msg, "%{name}", Artifact::GetName(conf.WinsFindArtifact()));
+	}
+    }
+    else
+    if(WINS_GOLD & cond)
+    {
+	msg = _("Accumulate %{count} gold");
+	String::Replace(msg, "%{count}", conf.WinsAccumulateGold());
+    }
+
+    if(WINS_ALL != cond && (WINS_ALL & cond)) msg.append(_(", or you may win by defeating all enemy heroes and capturing all enemy towns and castles."));
+
+    if(LOSS_ALL == cond)
+	msg = GetString(WINS_ALL);
+    else
+    if(LOSS_TOWN & cond)
+    {
+	const Castle *town = world.GetCastle(conf.WinsMapsIndexObject());
+	if(town)
+	{
+    	    msg = town->isCastle() ? _("Lose the castle '%{name}'.") : _("Lose the town '%{name}'.");;
+	    String::Replace(msg, "%{name}", town->GetName());
+	}
+    }
+    else
+    if(LOSS_HERO & cond)
+    {
+    	const Heroes *hero = world.GetHeroesCondWins();
+	if(hero)
+	{
+	    msg = _("Lose the hero '%{name}'.");
+	    String::Replace(msg, "%{name}", hero->GetName());
+	}
+    }
+    else
+    if(LOSS_TIME & cond)
+    {
+	msg = _("Fail to win by the end of month %{month}, week %{week}, day %{day}.");
+        String::Replace(msg, "%{day}", (conf.LossCountDays() % DAYOFWEEK));
+        String::Replace(msg, "%{week}", (conf.LossCountDays() / DAYOFWEEK) + 1);
+        String::Replace(msg, "%{month}", (conf.LossCountDays() / (DAYOFWEEK * WEEKOFMONTH)) + 1);
+    }
+}
+
 void GameOver::DialogWins(u16 cond)
 {
     const Settings & conf = Settings::Get();
