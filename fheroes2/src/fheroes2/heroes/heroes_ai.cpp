@@ -80,7 +80,7 @@ Skill::Primary::skill_t AISelectPrimarySkill(Heroes &hero)
     {
 	case Race::KNGT:
 	{
-	    if(5 > hero.GetDefense())	return Skill::Primary::DEFENCE;
+	    if(5 > hero.GetDefense())	return Skill::Primary::DEFENSE;
 	    if(5 > hero.GetAttack())	return Skill::Primary::ATTACK;
 	    if(3 > hero.GetKnowledge())	return Skill::Primary::KNOWLEDGE;
 	    if(3 > hero.GetPower())	return Skill::Primary::POWER;
@@ -90,7 +90,7 @@ Skill::Primary::skill_t AISelectPrimarySkill(Heroes &hero)
 	case Race::BARB:
 	{
 	    if(5 > hero.GetAttack())	return Skill::Primary::ATTACK;
-	    if(5 > hero.GetDefense())	return Skill::Primary::DEFENCE;
+	    if(5 > hero.GetDefense())	return Skill::Primary::DEFENSE;
 	    if(3 > hero.GetPower())	return Skill::Primary::POWER;
 	    if(3 > hero.GetKnowledge())	return Skill::Primary::KNOWLEDGE;
 	    break;
@@ -101,7 +101,7 @@ Skill::Primary::skill_t AISelectPrimarySkill(Heroes &hero)
 	{
 	    if(5 > hero.GetKnowledge())	return Skill::Primary::KNOWLEDGE;
 	    if(5 > hero.GetPower())	return Skill::Primary::POWER;
-	    if(3 > hero.GetDefense())	return Skill::Primary::DEFENCE;
+	    if(3 > hero.GetDefense())	return Skill::Primary::DEFENSE;
 	    if(3 > hero.GetAttack())	return Skill::Primary::ATTACK;
 	    break;
 	}
@@ -112,7 +112,7 @@ Skill::Primary::skill_t AISelectPrimarySkill(Heroes &hero)
 	    if(5 > hero.GetPower())	return Skill::Primary::POWER;
 	    if(5 > hero.GetKnowledge())	return Skill::Primary::KNOWLEDGE;
 	    if(3 > hero.GetAttack())	return Skill::Primary::ATTACK;
-	    if(3 > hero.GetDefense())	return Skill::Primary::DEFENCE;
+	    if(3 > hero.GetDefense())	return Skill::Primary::DEFENSE;
 	    break;
 	}
 	
@@ -122,7 +122,7 @@ Skill::Primary::skill_t AISelectPrimarySkill(Heroes &hero)
     switch(Rand::Get(1,4))
     {
 	case 1:	return Skill::Primary::ATTACK;
-	case 2:	return Skill::Primary::DEFENCE;
+	case 2:	return Skill::Primary::DEFENSE;
 	case 3:	return Skill::Primary::POWER;
 	case 4:	return Skill::Primary::KNOWLEDGE;
 	default: break;
@@ -793,7 +793,7 @@ void AIToPrimarySkillObject(Heroes &hero, const u8 obj, const u16 dst_index)
 
     switch(obj)
     {
-        case MP2::OBJ_FORT:		skill = Skill::Primary::DEFENCE; break;
+        case MP2::OBJ_FORT:		skill = Skill::Primary::DEFENSE; break;
         case MP2::OBJ_MERCENARYCAMP:	skill = Skill::Primary::ATTACK; break;
         case MP2::OBJ_DOCTORHUT:	skill = Skill::Primary::KNOWLEDGE; break;
         case MP2::OBJ_STANDINGSTONES:	skill = Skill::Primary::POWER; break;
@@ -970,7 +970,7 @@ void AIToXanadu(Heroes &hero, const u8 obj, const u16 dst_index)
        (9 < level2)))
     {
 	hero.IncreasePrimarySkill(Skill::Primary::ATTACK);
-	hero.IncreasePrimarySkill(Skill::Primary::DEFENCE);
+	hero.IncreasePrimarySkill(Skill::Primary::DEFENSE);
 	hero.IncreasePrimarySkill(Skill::Primary::KNOWLEDGE);
 	hero.IncreasePrimarySkill(Skill::Primary::POWER);
 	hero.SetVisited(dst_index);

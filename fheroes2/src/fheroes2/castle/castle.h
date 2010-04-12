@@ -172,7 +172,7 @@ public:
 
     void Dump(void) const;
 
-    void AIDefence(void);
+    void AIDefense(void);
     void AIDevelopment(void);
     void AIJoinRNDArmy(void);
 

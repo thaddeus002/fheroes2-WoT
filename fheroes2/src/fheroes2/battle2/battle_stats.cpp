@@ -454,7 +454,7 @@ u8 Battle2::Stats::GetObstaclesPenalty(const Stats & attacker) const
     	    (77 <= position && position <= 85) ||
     	    (88 <= position && position <= 96)) return 0;
 
-	// check castle walls defenced
+	// check castle walls defensed
 	if(troop.GetColor() == arena->army2.GetColor())
 	{
 	    const Rect & pos1 = attacker.GetCellPosition();
@@ -688,7 +688,7 @@ u32 Battle2::Stats::GetDamage(const Stats & enemy) const
 		dmg += (dmg * GetCommander()->GetSecondaryValues(Skill::Secondary::ARCHERY) / 100);
 	    }
 
-	    // check castle defence
+	    // check castle defense
 	    if(enemy.GetObstaclesPenalty(*this)) dmg /= 2;
 
 	    // check spell shield
@@ -1034,7 +1034,7 @@ u16 Battle2::Stats::GetDefense(void) const
     if(Modes(SP_STEELSKIN)) res += Spell::GetExtraValue(Spell::STEELSKIN);
 
     // extra
-    if(Modes(TR_HARDSKIP) && Settings::Get().ExtBattleSkipIncreaseDefence()) res += 2;
+    if(Modes(TR_HARDSKIP) && Settings::Get().ExtBattleSkipIncreaseDefense()) res += 2;
 
     // disrupting ray accumulate effect
     if(disruptingray) res -= disruptingray * Spell::GetExtraValue(Spell::DISRUPTINGRAY);

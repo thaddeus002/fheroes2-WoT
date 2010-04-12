@@ -53,7 +53,7 @@ u8 Captain::GetAttack(void) const
 
 u8 Captain::GetDefense(void) const
 {
-    return defence + GetDefenseModificator(NULL);
+    return defense + GetDefenseModificator(NULL);
 }
 
 u8 Captain::GetPower(void) const

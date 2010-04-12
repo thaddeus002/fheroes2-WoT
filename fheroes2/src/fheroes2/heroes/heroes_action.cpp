@@ -1343,7 +1343,7 @@ void ActionToPrimarySkillObject(Heroes &hero, const u8 obj, const u16 dst_index)
     switch(obj)
     {
         case MP2::OBJ_FORT:
-    	    skill = Skill::Primary::DEFENCE;
+    	    skill = Skill::Primary::DEFENSE;
     	    body_false = _("\"I'm sorry sir,\" The leader of the soldiers says, \"but you already know everything we have to teach.\"");
     	    body_true = _("The soldiers living in the fort teach you a few new defensive tricks.");
     	    break;
@@ -2582,7 +2582,7 @@ void ActionToXanadu(Heroes &hero, const u8 obj, const u16 dst_index)
 	    PlaySoundSuccess;
 	    Dialog::Message(MP2::StringObject(obj), _("The butler admits you to see the master of the house. He trains you in the four skills a hero should know."), Font::BIG, Dialog::OK);
 	    hero.IncreasePrimarySkill(Skill::Primary::ATTACK);
-	    hero.IncreasePrimarySkill(Skill::Primary::DEFENCE);
+	    hero.IncreasePrimarySkill(Skill::Primary::DEFENSE);
 	    hero.IncreasePrimarySkill(Skill::Primary::KNOWLEDGE);
 	    hero.IncreasePrimarySkill(Skill::Primary::POWER);
 	    hero.SetVisited(dst_index);

@@ -142,7 +142,7 @@ void Dialog::PrimarySkillInfo(const std::string &header, const std::string &mess
 	    skill_name = _("Attack Skill");
 	    break;
 
-	case Skill::Primary::DEFENCE:
+	case Skill::Primary::DEFENSE:
 	    index = 1;
 	    skill_name = _("Defense Skill");
 	    break;

@@ -88,7 +88,7 @@ const char* Network::GetMsgString(u16 msg)
         case MSG_BATTLE_BOARD:		return "MSG_BATTLE_BOARD";
         case MSG_BATTLE_MOVE:		return "MSG_BATTLE_MOVE";
         case MSG_BATTLE_ATTACK:		return "MSG_BATTLE_ATTACK";
-        case MSG_BATTLE_DEFENCE:	return "MSG_BATTLE_DEFENCE";
+        case MSG_BATTLE_DEFENSE:	return "MSG_BATTLE_DEFENSE";
         case MSG_BATTLE_DAMAGE:		return "MSG_BATTLE_DAMAGE";
         case MSG_BATTLE_CAST:		return "MSG_BATTLE_CAST";
         case MSG_BATTLE_SKIP:		return "MSG_BATTLE_SKIP";

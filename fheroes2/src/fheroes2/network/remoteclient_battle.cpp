@@ -228,7 +228,7 @@ bool FH2RemoteClient::RecvBattleHumanTurn(const Battle2::Stats & b, const Battle
 
 		case MSG_BATTLE_MOVE:
 		case MSG_BATTLE_ATTACK:
-		case MSG_BATTLE_DEFENCE:
+		case MSG_BATTLE_DEFENSE:
 		case MSG_BATTLE_DAMAGE:
 		case MSG_BATTLE_MORALE:
 		case MSG_BATTLE_LUCK:

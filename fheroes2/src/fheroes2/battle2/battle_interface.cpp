@@ -1882,7 +1882,7 @@ void Battle2::Interface::RedrawActionSkipStatus(const Stats & attacker)
     if(attacker.Modes(TR_HARDSKIP))
     {
 	msg = _("%{name} skipping turn");
-	if(Settings::Get().ExtBattleSkipIncreaseDefence()) msg.append(_(", and get +2 defence"));
+	if(Settings::Get().ExtBattleSkipIncreaseDefense()) msg.append(_(", and get +2 defense"));
     }
     else
 	msg = _("%{name} waiting turn");
@@ -2126,7 +2126,7 @@ void Battle2::Interface::RedrawActionWinces(std::vector<TargetInfo> & targets)
 	}
 	else
 	{
-	    // defence
+	    // defense
 	    AGG::PlaySound(M82::RSBRYFZL);
 	}
     }

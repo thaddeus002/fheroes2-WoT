@@ -110,7 +110,7 @@ namespace Skill
 	{
 	    UNKNOWN	= 0,
 	    ATTACK	= 1,
-	    DEFENCE	= 2,
+	    DEFENSE	= 2,
 	    POWER	= 3,
 	    KNOWLEDGE	= 4
 	};
@@ -141,7 +141,7 @@ namespace Skill
 
 	protected:
 	u8			attack;
-	u8			defence;
+	u8			defense;
 	u8			power;
 	u8			knowledge;
     };

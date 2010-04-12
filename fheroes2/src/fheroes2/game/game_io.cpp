@@ -533,7 +533,7 @@ void Game::IO::PackHeroes(QueueMessage & msg, const Heroes & hero)
     msg.Push(static_cast<u8>(hero.color));
     msg.Push(hero.name);
     msg.Push(hero.attack);
-    msg.Push(hero.defence);
+    msg.Push(hero.defense);
     msg.Push(hero.knowledge);
     msg.Push(hero.power);
     msg.Push(hero.experience);
@@ -1095,7 +1095,7 @@ void Game::IO::UnpackHeroes(QueueMessage & msg, Heroes & hero, u16 check_version
     msg.Pop(byte8); hero.color = Color::Get(byte8);
     msg.Pop(hero.name);
     msg.Pop(hero.attack);
-    msg.Pop(hero.defence);
+    msg.Pop(hero.defense);
     msg.Pop(hero.knowledge);
     msg.Pop(hero.power);
     msg.Pop(hero.experience);

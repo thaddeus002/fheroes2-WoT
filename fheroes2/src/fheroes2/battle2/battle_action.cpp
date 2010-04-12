@@ -297,7 +297,7 @@ void Battle2::Arena::ApplyActionAttack(Action & action)
 
 	    if(b2->isValid())
 	    {
-		// defence answer
+		// defense answer
 		if(handfighting && !b1->isHideAttack() && b2->AllowResponse())
 		{
 		    BattleProcess(*b2, *b1);

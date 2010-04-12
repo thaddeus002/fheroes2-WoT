@@ -56,7 +56,7 @@ void Castle::AIJoinRNDArmy(void)
     }
 }
 
-void Castle::AIDefence(void)
+void Castle::AIDefense(void)
 {
     if(isCastle())
     {

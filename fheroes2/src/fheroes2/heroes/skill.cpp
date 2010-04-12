@@ -45,7 +45,7 @@ struct level_t
 struct primary_t
 {
     u8 attack;
-    u8 defence;
+    u8 defense;
     u8 power;
     u8 knowledge;
 };
@@ -144,7 +144,7 @@ void LoadPrimarySection(const TiXmlElement* xml, primary_t & skill)
     if(!xml) return;
     int value;
     xml->Attribute("attack", &value);    skill.attack = value;
-    xml->Attribute("defence", &value);   skill.defence = value;
+    xml->Attribute("defense", &value);   skill.defense = value;
     xml->Attribute("power", &value);     skill.power = value;
     xml->Attribute("knowledge", &value); skill.knowledge = value;
 }
@@ -260,7 +260,7 @@ u16 Skill::Secondary::GetValues(skill_t skill, u8 level)
     return 0;
 }
 
-Skill::Primary::Primary() : attack(0), defence(0), power(0), knowledge(0)
+Skill::Primary::Primary() : attack(0), defense(0), power(0), knowledge(0)
 {
 }
 
@@ -275,14 +275,14 @@ Skill::Primary::skill_t Skill::Primary::FromLevelUp(const u8 race, const u8 leve
 	if(ptr->over_level > level)
 	{
 	    percents.Push(ATTACK, ptr->mature_primary_under.attack);
-	    percents.Push(DEFENCE, ptr->mature_primary_under.defence);
+	    percents.Push(DEFENSE, ptr->mature_primary_under.defense);
 	    percents.Push(POWER, ptr->mature_primary_under.power);
 	    percents.Push(KNOWLEDGE, ptr->mature_primary_under.knowledge);
 	}
 	else
 	{
 	    percents.Push(ATTACK, ptr->mature_primary_over.attack);
-	    percents.Push(DEFENCE, ptr->mature_primary_over.defence);
+	    percents.Push(DEFENSE, ptr->mature_primary_over.defense);
 	    percents.Push(POWER, ptr->mature_primary_over.power);
 	    percents.Push(KNOWLEDGE, ptr->mature_primary_over.knowledge);
 	}
@@ -292,7 +292,7 @@ Skill::Primary::skill_t Skill::Primary::FromLevelUp(const u8 race, const u8 leve
     switch(percents.Get())
     {
 	case ATTACK:	return ATTACK;
-	case DEFENCE:	return DEFENCE;
+	case DEFENSE:	return DEFENSE;
 	case POWER:	return POWER;
 	case KNOWLEDGE:	return KNOWLEDGE;
 	default: break;
@@ -304,12 +304,12 @@ Skill::Primary::skill_t Skill::Primary::FromLevelUp(const u8 race, const u8 leve
 
 const char* Skill::Primary::String(const Skill::Primary::skill_t skill)
 {
-    const char* str_skill[] = { _("Attack"), _("Defence"), _("Power"), _("Knowledge"), "Unknown" };
+    const char* str_skill[] = { _("Attack"), _("Defense"), _("Power"), _("Knowledge"), "Unknown" };
 
     switch(skill)
     {
 	case ATTACK:	return str_skill[0];
-        case DEFENCE:	return str_skill[1];
+        case DEFENSE:	return str_skill[1];
         case POWER:	return str_skill[2];
         case KNOWLEDGE:	return str_skill[3];
         default:	break;
@@ -832,7 +832,7 @@ void Skill::Primary::LoadDefaults(u8 race, Primary & skill, u8 & book, u8 & spel
 	if(CAPTAIN == skill.GetType())
 	{
 	    skill.attack = ptr->captain_primary.attack;
-	    skill.defence = ptr->captain_primary.defence;
+	    skill.defense = ptr->captain_primary.defense;
 	    skill.power = ptr->captain_primary.power;
 	    skill.knowledge = ptr->captain_primary.knowledge;
 	    book = ptr->initial_book;
@@ -842,7 +842,7 @@ void Skill::Primary::LoadDefaults(u8 race, Primary & skill, u8 & book, u8 & spel
 	if(HEROES == skill.GetType())
 	{
 	    skill.attack = ptr->initial_primary.attack;
-	    skill.defence = ptr->initial_primary.defence;
+	    skill.defense = ptr->initial_primary.defense;
 	    skill.power = ptr->initial_primary.power;
 	    skill.knowledge = ptr->initial_primary.knowledge;
 	    book = ptr->initial_book;

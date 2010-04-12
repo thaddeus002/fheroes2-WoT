@@ -112,7 +112,7 @@ static const settings_t settingsFHeroes2[] =
     { Settings::BATTLE_MERGE_ARMIES, 		_("battle: merge armies for hero from castle"),  	},
     { Settings::BATTLE_ARCHMAGE_RESIST_BAD_SPELL,_("battle: archmage can resists (20%) bad spells"),     },
     { Settings::BATTLE_MAGIC_TROOP_RESIST,	_("battle: magical creature resists (20%) the same magic"),},
-    { Settings::BATTLE_SKIP_INCREASE_DEFENCE,	_("battle: skip increase +2 defence"), 			},
+    { Settings::BATTLE_SKIP_INCREASE_DEFENSE,	_("battle: skip increase +2 defense"), 			},
     { Settings::GAME_SHOW_SYSTEM_INFO,		_("game: show system info"),				},
     { Settings::GAME_AUTOSAVE_ON,		_("game: autosave on"),					},
     { Settings::GAME_USE_FADE,			_("game: use fade"),					},
@@ -1046,9 +1046,9 @@ bool Settings::ExtBattleTroopDirection(void) const
     return ExtModes(BATTLE_TROOP_DIRECTION);
 }
 
-bool Settings::ExtBattleSkipIncreaseDefence(void) const
+bool Settings::ExtBattleSkipIncreaseDefense(void) const
 {
-    return ExtModes(BATTLE_SKIP_INCREASE_DEFENCE);
+    return ExtModes(BATTLE_SKIP_INCREASE_DEFENSE);
 }
 
 bool Settings::ExtBattleSoftWait(void) const

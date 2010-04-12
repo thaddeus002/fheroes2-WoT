@@ -159,7 +159,7 @@ void Battle2::Arena::AIMagicAction(const Stats & b, Actions & a, const Stats* en
 	// enemy good spell - clean
 	if(enemy->Modes(IS_GOOD_MAGIC) && isApplySpell(Spell::DISPEL, enemy, *hero, a)) return;
 
-	// up defence
+	// up defense
 	if(!b.Modes(SP_STEELSKIN) && !b.Modes(SP_STONESKIN) && isApplySpell(Spell::STEELSKIN, &b, *hero, a)) return;
 	if(!b.Modes(SP_STONESKIN) && !b.Modes(SP_STEELSKIN) && isApplySpell(Spell::STONESKIN, &b, *hero, a)) return;
     }

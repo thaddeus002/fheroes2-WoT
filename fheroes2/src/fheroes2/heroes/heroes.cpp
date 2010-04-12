@@ -139,7 +139,7 @@ Heroes::Heroes(heroes_t ht, Race::race_t rc) : killer_color(Color::GRAY), experi
     {
         case ROLAND:
             attack    = 0;
-            defence   = 1;
+            defense   = 1;
             power     = 4;
             knowledge = 5;
 
@@ -151,7 +151,7 @@ Heroes::Heroes(heroes_t ht, Race::race_t rc) : killer_color(Color::GRAY), experi
 
         case CORLAGON:
             attack    = 5;
-            defence   = 3;
+            defense   = 3;
             power     = 1;
             knowledge = 1;
 
@@ -165,7 +165,7 @@ Heroes::Heroes(heroes_t ht, Race::race_t rc) : killer_color(Color::GRAY), experi
         
         case ELIZA:
             attack    = 0;
-            defence   = 1;
+            defense   = 1;
             power     = 2;
             knowledge = 6;
 
@@ -178,7 +178,7 @@ Heroes::Heroes(heroes_t ht, Race::race_t rc) : killer_color(Color::GRAY), experi
 
     	case ARCHIBALD:
             attack    = 1;
-            defence   = 1;
+            defense   = 1;
             power     = 4;
             knowledge = 4;
 
@@ -190,7 +190,7 @@ Heroes::Heroes(heroes_t ht, Race::race_t rc) : killer_color(Color::GRAY), experi
 
     	case HALTON:
             attack    = 3;
-            defence   = 3;
+            defense   = 3;
             power     = 3;
             knowledge = 2;
 
@@ -202,7 +202,7 @@ Heroes::Heroes(heroes_t ht, Race::race_t rc) : killer_color(Color::GRAY), experi
     	
     	case BAX:
             attack    = 1;
-            defence   = 1;
+            defense   = 1;
             power     = 4;
             knowledge = 3;
 
@@ -520,7 +520,7 @@ u8 Heroes::GetDefense(void) const
 
 u8 Heroes::GetDefense(std::string* strs) const
 {
-    s16 result = defence + GetDefenseModificator(strs);
+    s16 result = defense + GetDefenseModificator(strs);
 
     return result < 0 ? 0 : (result > 255 ? 255 : result);
 }
@@ -554,7 +554,7 @@ void Heroes::IncreasePrimarySkill(const Skill::Primary::skill_t skill)
     switch(skill)
     {
 	case Skill::Primary::ATTACK:	++attack; break;
-	case Skill::Primary::DEFENCE:	++defence; break;
+	case Skill::Primary::DEFENSE:	++defense; break;
 	case Skill::Primary::POWER:	++power; break;
 	case Skill::Primary::KNOWLEDGE:	++knowledge; break;
 	default: break;
@@ -1360,7 +1360,7 @@ Skill::Primary::skill_t Heroes::LevelUpPrimarySkill(void)
     switch(primary1)
     {
 	case Skill::Primary::ATTACK:	++attack; break;
-	case Skill::Primary::DEFENCE:	++defence; break;
+	case Skill::Primary::DEFENSE:	++defense; break;
 	case Skill::Primary::POWER:	++power; break;
 	case Skill::Primary::KNOWLEDGE:	++knowledge; break;
 	default: break;

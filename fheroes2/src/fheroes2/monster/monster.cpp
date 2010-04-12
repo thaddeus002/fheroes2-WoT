@@ -37,7 +37,7 @@
 struct monstats_t
 {
     u8 attack;
-    u8 defence;
+    u8 defense;
     u8 damageMin;
     u8 damageMax;
     u16 hp;
@@ -163,7 +163,7 @@ void Monster::UpdateStats(const std::string & spec)
 	    if(0 == value)
 	    {
     		xml_monster->Attribute("attack", &value); if(value) ptr->attack = value;
-    		xml_monster->Attribute("defence", &value); if(value) ptr->defence = value;
+    		xml_monster->Attribute("defense", &value); if(value) ptr->defense = value;
     		xml_monster->Attribute("damage_min", &value); if(value) ptr->damageMin = value;
     		xml_monster->Attribute("damage_max", &value); if(value) ptr->damageMax = value;
     		xml_monster->Attribute("hp", &value); if(value) ptr->hp = value;
@@ -244,7 +244,7 @@ u8 Monster::GetAttack(void) const
 
 u8 Monster::GetDefense(void) const
 {
-    return monsters[id].defence;
+    return monsters[id].defense;
 }
 
 u8 Monster::GetPower(void) const

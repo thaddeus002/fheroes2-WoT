@@ -166,11 +166,11 @@ void Kingdom::AICastlesTurns(void)
     {
 	Castle & castle = **itc1;
 	const s8 range = Game::GetViewDistance(castle.isCastle() ? Game::VIEW_CASTLE : Game::VIEW_TOWN);
-	bool defence = false;
+	bool defense = false;
 
 	// find enemy hero
-	for(s8 y = -range; y <= range && !defence; ++y)
-    	    for(s8 x = -range; x <= range && !defence; ++x)
+	for(s8 y = -range; y <= range && !defense; ++y)
+    	    for(s8 x = -range; x <= range && !defense; ++x)
 	{
     	    if(!y && !x) continue;
 
@@ -180,11 +180,11 @@ void Kingdom::AICastlesTurns(void)
         	const Heroes* hero = NULL;
 
         	if(MP2::OBJ_HEROES == tile.GetObject() && NULL != (hero = world.GetHeroes(tile.GetIndex())) && GetColor() != hero->GetColor())
-		    defence = true;
+		    defense = true;
 	    }
 	}
 
-	defence ? castle.AIDefence() : castle.AIDevelopment();
+	defense ? castle.AIDefense() : castle.AIDevelopment();
     }
 }
 

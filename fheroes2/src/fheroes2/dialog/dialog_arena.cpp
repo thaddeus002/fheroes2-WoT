@@ -69,7 +69,7 @@ Skill::Primary::skill_t Dialog::SelectSkillFromArena(void)
     dst_pt.y = rect1.y + rect1.h + 5;
     text.Blit(dst_pt);
 
-    text.Set(Skill::Primary::String(Skill::Primary::DEFENCE));
+    text.Set(Skill::Primary::String(Skill::Primary::DEFENSE));
     dst_pt.x = rect2.x + (rect2.w - text.w()) / 2;
     dst_pt.y = rect2.y + rect2.h + 5;
     text.Blit(dst_pt);
@@ -121,7 +121,7 @@ Skill::Primary::skill_t Dialog::SelectSkillFromArena(void)
 	else
 	if(le.MouseClickLeft(rect2))
 	{
-	    res = Skill::Primary::DEFENCE;
+	    res = Skill::Primary::DEFENSE;
 	    redraw = true;
 	}
 	else
@@ -174,7 +174,7 @@ void InfoSkillSelect(Skill::Primary::skill_t skill, const Rect & rect1, const Re
     switch(skill)
     {
 	case Skill::Primary::ATTACK:	display.Blit(AGG::GetICN(ICN::XPRIMARY, 4), rect1); break;
-	case Skill::Primary::DEFENCE:	display.Blit(AGG::GetICN(ICN::XPRIMARY, 5), rect2); break;
+	case Skill::Primary::DEFENSE:	display.Blit(AGG::GetICN(ICN::XPRIMARY, 5), rect2); break;
 	case Skill::Primary::POWER:	display.Blit(AGG::GetICN(ICN::XPRIMARY, 6), rect3); break;
 	case Skill::Primary::KNOWLEDGE:	display.Blit(AGG::GetICN(ICN::XPRIMARY, 7), rect4); break;
 	default: break;
@@ -185,8 +185,8 @@ Skill::Primary::skill_t InfoSkillNext(Skill::Primary::skill_t skill)
 {
     switch(skill)
     {
-	case Skill::Primary::ATTACK:	return Skill::Primary::DEFENCE;
-	case Skill::Primary::DEFENCE:	return Skill::Primary::POWER;
+	case Skill::Primary::ATTACK:	return Skill::Primary::DEFENSE;
+	case Skill::Primary::DEFENSE:	return Skill::Primary::POWER;
 	case Skill::Primary::POWER:	return Skill::Primary::KNOWLEDGE;
 	default: break;
     }
@@ -198,8 +198,8 @@ Skill::Primary::skill_t InfoSkillPrev(Skill::Primary::skill_t skill)
 {
     switch(skill)
     {
-	case Skill::Primary::DEFENCE:	return Skill::Primary::ATTACK;
-	case Skill::Primary::POWER:	return Skill::Primary::DEFENCE;
+	case Skill::Primary::DEFENSE:	return Skill::Primary::ATTACK;
+	case Skill::Primary::POWER:	return Skill::Primary::DEFENSE;
 	case Skill::Primary::KNOWLEDGE:	return Skill::Primary::POWER;
 	default: break;
     }
