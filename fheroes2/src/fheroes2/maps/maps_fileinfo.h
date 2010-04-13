@@ -37,8 +37,10 @@ namespace Maps
     bool ReadMP2(const std::string &);
     bool ReadSAV(const std::string &);
 
-    bool operator<  (const FileInfo &) const;
-    bool operator== (const FileInfo &) const;
+    static bool NameSorting(const FileInfo &, const FileInfo &);
+    static bool FileSorting(const FileInfo &, const FileInfo &);
+    static bool NameCompare(const FileInfo &, const FileInfo &);
+
     bool isAllowColorsCount(u8) const;
 
     u8 AllowColorsCount(void) const;

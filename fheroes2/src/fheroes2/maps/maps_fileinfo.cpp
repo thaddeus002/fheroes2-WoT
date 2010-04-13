@@ -22,6 +22,7 @@
 
 #include <bitset>
 #include <cstring>
+#include <locale>
 #include <algorithm>
 #include <fstream>
 #include "difficulty.h"
@@ -34,6 +35,13 @@
 
 #define LENGTHNAME		16
 #define LENGTHDESCRIPTION	143
+
+template <typename CharType>
+bool AlphabeticalCompare(const std::basic_string<CharType> & lhs, const std::basic_string<CharType> & rhs)
+{
+    return std::use_facet< std::collate< CharType > >( std::locale() ).compare( lhs.data(), lhs.data() + lhs.size(),
+		    rhs.data(), rhs.data() + rhs.size() ) == -1;
+}
 
 Race::race_t ByteToRace(u8 byte)
 {
@@ -289,14 +297,19 @@ bool Maps::FileInfo::ReadMP2(const std::string & filename)
     return true;
 }
 
-bool Maps::FileInfo::operator< (const FileInfo & second) const
+bool Maps::FileInfo::FileSorting(const FileInfo & fi1, const FileInfo & fi2)
 {
-    return name < second.name;
+    return AlphabeticalCompare(fi1.file, fi2.file);
 }
 
-bool Maps::FileInfo::operator== (const FileInfo & second) const
+bool Maps::FileInfo::NameSorting(const FileInfo & fi1, const FileInfo & fi2)
 {
-    return name == second.name;
+    return AlphabeticalCompare(fi1.name, fi2.name);
+}
+
+bool Maps::FileInfo::NameCompare(const FileInfo & fi1, const FileInfo & fi2)
+{
+    return fi1.name == fi2.name;
 }
 
 u8 Maps::FileInfo::AllowColorsCount(void) const
@@ -449,8 +462,8 @@ bool PrepareMapsFileInfoList(MapsFileInfoList & lists)
 	if(fi.ReadMP2(*itd)) lists.push_back(fi);
     }
 
-    std::sort(lists.begin(), lists.end());
-    lists.resize(std::unique(lists.begin(), lists.end()) - lists.begin());
+    std::sort(lists.begin(), lists.end(), Maps::FileInfo::NameSorting);
+    lists.resize(std::unique(lists.begin(), lists.end(), Maps::FileInfo::NameCompare) - lists.begin());
 
     // set preferably count filter
     if(conf.PreferablyCountPlayers())
