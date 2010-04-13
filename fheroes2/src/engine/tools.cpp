@@ -197,32 +197,45 @@ void String::AppendKey(std::string & res, KeySym sym, u16 mod)
 {
     switch(sym)
     {
+        case KEY_1:     res += (MOD_SHIFT & mod ? '!' : '1'); break;
+        case KEY_2:     res += (MOD_SHIFT & mod ? '@' : '2'); break;
+        case KEY_3:     res += (MOD_SHIFT & mod ? '#' : '3'); break;
+        case KEY_4:     res += (MOD_SHIFT & mod ? '$' : '4'); break;
+        case KEY_5:     res += (MOD_SHIFT & mod ? '%' : '5'); break;
+        case KEY_6:     res += (MOD_SHIFT & mod ? '^' : '6'); break;
+        case KEY_7:     res += (MOD_SHIFT & mod ? '&' : '7'); break;
+        case KEY_8:     res += (MOD_SHIFT & mod ? '*' : '8'); break;
+        case KEY_9:     res += (MOD_SHIFT & mod ? '(' : '9'); break;
+        case KEY_0:     res += (MOD_SHIFT & mod ? ')' : '0'); break;
+
+        case KEY_MINUS:         res += (MOD_SHIFT & mod ? '_' : '-'); break;
+        case KEY_EQUALS:        res += (MOD_SHIFT & mod ? '+' : '='); break;
+	case KEY_BACKSLASH:     res += (MOD_SHIFT & mod ? '|' : '\\'); break;
+	case KEY_LEFTBRACKET:   res += (MOD_SHIFT & mod ? '{' : '['); break;
+	case KEY_RIGHTBRACKET:  res += (MOD_SHIFT & mod ? '}' : ']'); break;
+        case KEY_SEMICOLON:     res += (MOD_SHIFT & mod ? ':' : ';'); break;
+        case KEY_QUOTE:         res += (MOD_SHIFT & mod ? '"' : '\''); break;
+        case KEY_COMMA:         res += (MOD_SHIFT & mod ? '<' : ','); break;
+        case KEY_PERIOD:        res += (MOD_SHIFT & mod ? '>' : '.'); break;
+        case KEY_SLASH:         res += (MOD_SHIFT & mod ? '?' : '/'); break;
+
         case KEY_EXCLAIM:       res += '!'; break;
-        case KEY_QUOTEDBL:      res += '"'; break;
+	case KEY_AT:            res += '@'; break;
         case KEY_HASH:          res += '#'; break;
         case KEY_DOLLAR:        res += '$'; break;
         case KEY_AMPERSAND:     res += '&'; break;
-        case KEY_QUOTE:         res += '\''; break;
+        case KEY_ASTERISK:      res += '*'; break;
         case KEY_LEFTPAREN:     res += '('; break;
         case KEY_RIGHTPAREN:    res += ')'; break;
-        case KEY_ASTERISK:      res += '*'; break;
+        case KEY_QUOTEDBL:      res += '"'; break;
         case KEY_PLUS:          res += '+'; break;
-        case KEY_COMMA:         res += ','; break;
-        case KEY_MINUS:         res += '-'; break;
-        case KEY_PERIOD:        res += '.'; break;
-        case KEY_SLASH:         res += '/'; break;
         case KEY_COLON:         res += ':'; break;
-        case KEY_SEMICOLON:     res += ';'; break;
 	case KEY_LESS:          res += '<'; break;
-        case KEY_EQUALS:        res += '='; break;
 	case KEY_GREATER:       res += '>'; break;
 	case KEY_QUESTION:      res += '?'; break;
-	case KEY_AT:            res += '@'; break;
-	case KEY_LEFTBRACKET:   res += '['; break;
-	case KEY_BACKSLASH:     res += '\\'; break;
-	case KEY_RIGHTBRACKET:  res += ']'; break;
 	case KEY_CARET:         res += '^'; break;
 	case KEY_UNDERSCORE:    res += '_'; break;
+
         case KEY_SPACE:		res += ' '; break;
 
         case KEY_a:     res += ((MOD_SHIFT | MOD_CAPS) & mod ? 'A' : 'a'); break;
@@ -252,16 +265,6 @@ void String::AppendKey(std::string & res, KeySym sym, u16 mod)
         case KEY_y:     res += ((MOD_SHIFT | MOD_CAPS) & mod ? 'Y' : 'y'); break;
         case KEY_z:     res += ((MOD_SHIFT | MOD_CAPS) & mod ? 'Z' : 'z'); break;
 
-        case KEY_0:     res += '0'; break;
-        case KEY_1:     res += '1'; break;
-        case KEY_2:     res += '2'; break;
-        case KEY_3:     res += '3'; break;
-        case KEY_4:     res += '4'; break;
-        case KEY_5:     res += '5'; break;
-        case KEY_6:     res += '6'; break;
-        case KEY_7:     res += '7'; break;
-        case KEY_8:     res += '8'; break;
-        case KEY_9:     res += '9'; break;
 
         case KEY_BACKSPACE: if(res.size()) res.resize(res.size() - 1); break;
         default: break;
