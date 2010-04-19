@@ -1306,6 +1306,8 @@ void Battle2::Stats::SpellApplyDamage(u8 spell, u8 spoint, const HeroBase* hero,
 	    {
 		// 200% damage
                 case Spell::ELEMENTALSTORM:
+                case Spell::LIGHTNINGBOLT:
+                case Spell::CHAINLIGHTNING:
             	    dmg *= 2; break;
                 default: break;
             }
