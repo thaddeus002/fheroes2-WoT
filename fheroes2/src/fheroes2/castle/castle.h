@@ -153,6 +153,8 @@ public:
     bool BuyBoat(void);
     u32 GetBuildingRequires(u32) const;
 
+    void Scoute(void) const;
+    
     static const char* GetStringBuilding(u32, Race::race_t = Race::BOMG);
     static const char* GetDescriptionBuilding(u32, Race::race_t = Race::BOMG);
     static ICN::icn_t GetICNBuilding(u32, Race::race_t);

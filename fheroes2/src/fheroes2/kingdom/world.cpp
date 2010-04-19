@@ -1471,11 +1471,10 @@ void World::ClearFog(const u8 color)
         std::vector<Castle *>::const_iterator it1 = vec_castles.begin();
         std::vector<Castle *>::const_iterator it2 = vec_castles.end();
 
-        for(; it1 != it2; ++it1) if(*it1 && color & (**it1).GetColor())
-    	    Maps::ClearFog((**it1).GetIndex(), Game::GetViewDistance((**it1).isCastle() ? Game::VIEW_CASTLE : Game::VIEW_TOWN), color);
+        for(; it1 != it2; ++it1) if(*it1 && color & (**it1).GetColor()) (**it1).Scoute();
     }
 
-    // clear adboar heroes
+    // clear abroad heroes
     if(vec_heroes.size())
     {
         std::vector<Heroes *>::const_iterator it1 = vec_heroes.begin();

@@ -763,6 +763,7 @@ void ActionToCastle(Heroes &hero, const u8 obj, const u16 dst_index)
                 world.GetKingdom(castle->GetColor()).RemoveCastle(castle);
                 world.GetKingdom(hero.GetColor()).AddCastle(castle);
                 world.CaptureObject(dst_index, hero.GetColor());
+        	castle->Scoute();
 		Interface::Basic::Get().SetRedraw(REDRAW_CASTLES);
 
         	hero.IncreaseExperience(res.GetExperience());
@@ -781,6 +782,7 @@ void ActionToCastle(Heroes &hero, const u8 obj, const u16 dst_index)
     	    world.GetKingdom(castle->GetColor()).RemoveCastle(castle);
             world.GetKingdom(hero.GetColor()).AddCastle(castle);
             world.CaptureObject(dst_index, hero.GetColor());
+            castle->Scoute();
 	    Interface::Basic::Get().SetRedraw(REDRAW_CASTLES);
 	}
     }

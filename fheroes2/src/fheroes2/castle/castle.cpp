@@ -1704,6 +1704,11 @@ u8 Castle::GetGrownWel2(void)
     return grown_wel2;
 }
 
+void Castle::Scoute(void) const
+{
+    Maps::ClearFog(GetIndex(), Game::GetViewDistance(isCastle() ? Game::VIEW_CASTLE : Game::VIEW_TOWN), color);
+}
+
 #ifdef WITH_XML
 #include "xmlccwrap.h"
 

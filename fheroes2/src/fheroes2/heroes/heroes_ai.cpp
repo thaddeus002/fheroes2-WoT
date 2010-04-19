@@ -371,6 +371,7 @@ void AIToCastle(Heroes &hero, const u8 obj, const u16 dst_index)
                 world.GetKingdom(castle->GetColor()).RemoveCastle(castle);
                 world.GetKingdom(hero.GetColor()).AddCastle(castle);
                 world.CaptureObject(dst_index, hero.GetColor());
+    		castle->Scoute();
 
                 hero.IncreaseExperience(res.GetExperience());
                 hero.ActionAfterBattle();
@@ -388,6 +389,7 @@ void AIToCastle(Heroes &hero, const u8 obj, const u16 dst_index)
     	    world.GetKingdom(castle->GetColor()).RemoveCastle(castle);
 	    world.GetKingdom(hero.GetColor()).AddCastle(castle);
     	    world.CaptureObject(dst_index, hero.GetColor());
+    	    castle->Scoute();
 	}
     }
 }
