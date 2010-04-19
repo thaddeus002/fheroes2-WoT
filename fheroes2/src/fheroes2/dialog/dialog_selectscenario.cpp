@@ -368,7 +368,7 @@ void VictoryConditionInfo(const Maps::FileInfo & info)
 	case 0:	msg = _("Defeat all enemy heroes and towns."); break;
 	case 1:	msg = _("Capture a specific town."); break;
 	case 2:	msg = _("Defeat a specific hero."); break;
-	case 3:	msg = _("Find a specidic artifact."); break;
+	case 3:	msg = _("Find a specific artifact."); break;
 	case 4:	msg = _("Your side defeats the opposing side."); break;
 	case 5:	msg = _("Accumulate a large amount of gold."); break;
 	default: return;
