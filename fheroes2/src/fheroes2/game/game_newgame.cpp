@@ -112,8 +112,10 @@ Game::menu_t Game::NewGame(void)
 {
     Mixer::Pause();
     AGG::PlayMusic(MUS::MAINMENU);
+    Settings & conf = Settings::Get();
 
     Game::IO::last_name.clear();
+    conf.SetLoadedGameVersion(false);
 
     if(Settings::Get().QVGA()) return PocketPC::NewGame();
   
@@ -130,7 +132,7 @@ Game::menu_t Game::NewGame(void)
     Display & display = Display::Get();
 
     // load game settings
-    Settings::Get().BinaryLoad();
+    conf.BinaryLoad();
 
     // image background
     const Sprite &back = AGG::GetICN(ICN::HEROES, 0);
