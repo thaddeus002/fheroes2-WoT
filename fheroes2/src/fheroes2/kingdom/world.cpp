@@ -917,8 +917,7 @@ void World::LoadMaps(const std::string &filename)
 	if(*itc1) GetKingdom((*itc1)->GetColor()).AddCastle(*itc1);
 
     // play with hero
-    if(Settings::Get().GameStartWithHeroes())
-	std::for_each(vec_kingdoms.begin(), vec_kingdoms.end(), std::mem_fun(&Kingdom::ApplyPlayWithStartingHero));
+    std::for_each(vec_kingdoms.begin(), vec_kingdoms.end(), std::mem_fun(&Kingdom::ApplyPlayWithStartingHero));
 
     // play with debug hero
     if(IS_DEVEL())

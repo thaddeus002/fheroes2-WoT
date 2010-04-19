@@ -502,22 +502,21 @@ void Kingdom::ApplyPlayWithStartingHero(void)
 
 	// check manual set hero (castle position + point(0, 1))?
 	const Point & cp = (*it)->GetCenter();
-	if(world.GetTiles(cp.x, cp.y + 1).GetObject() != MP2::OBJ_HEROES)
-	{
-    	    Heroes *hero = world.GetFreemanHeroes((*it)->GetRace());
-
-	    if(hero && AllowRecruitHero(false)) hero->Recruit(**it);
-	}
-	else
-	// move manual set hero to castle
+	if(world.GetTiles(cp.x, cp.y + 1).GetObject() == MP2::OBJ_HEROES)
 	{
     	    Heroes *hero = world.GetHeroes((cp.y + 1) * world.w() + cp.x);
-    	    
+    	    // and move manual set hero to castle
     	    if(hero && hero->GetColor() == GetColor())
     	    {
     		hero->SetFreeman(0);
     		hero->Recruit(**it);
     	    }
+	}
+	else
+	if(Settings::Get().GameStartWithHeroes())
+	{
+    	    Heroes *hero = world.GetFreemanHeroes((*it)->GetRace());
+	    if(hero && AllowRecruitHero(false)) hero->Recruit(**it);
 	}
     }
 }
