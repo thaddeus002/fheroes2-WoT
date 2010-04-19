@@ -2353,136 +2353,78 @@ void ActionToDwellingBattleMonster(Heroes &hero, const u8 obj, const u16 dst_ind
     Maps::Tiles & tile = world.GetTiles(dst_index);
 
     // yet no one captured.
-    const bool battle = (Color::GRAY == world.ColorCapturedObject(dst_index));
+    const bool battle = (Color::GRAY == world.ColorCapturedObject(dst_index) && 0 == tile.GetQuantity4());
     const u32 count = tile.GetCountMonster();
     bool complete = false;
 
+    const char* str_empty = NULL;
+    const char* str_full  = NULL;
+    const char* str_warn  = NULL;
+    const char* str_recr  = NULL;
+    
     switch(obj)
     {
         case MP2::OBJ_CITYDEAD:
-	    if(!battle)
-	    {
-	    	if(0 == count)
-	    	{
-		    PlaySoundVisited;
-	    	    Dialog::Message(MP2::StringObject(obj), _("The City of the Dead is empty of life, and empty of unlife as well. Perhaps some undead will move in next week."), Font::BIG, Dialog::OK);
-		    break;
-		}
-		else
-	    	{
-		    PlaySoundSuccess;
-		    complete = (Dialog::YES == Dialog::Message(MP2::StringObject(obj), _("Some Liches living here are willing to join your army for a price. Do you want to recruit Liches?"), Font::BIG, Dialog::YES | Dialog::NO));
-		}
-	    }
-	    else
-	    {
-		Army::army_t army;
-		army.FromGuardian(tile);
-
-		PlaySoundWarning;
-		if(Dialog::YES == Dialog::Message(MP2::StringObject(obj), _("You've found the ruins of an ancient city, now inhabited solely by the undead. Will you search?"), Font::BIG, Dialog::YES | Dialog::NO))
-		{
-			// new battle2
-			Battle2::Result res = Battle2::Loader(hero.GetArmy(), army, dst_index);
-    			if(res.AttackerWins())
-    			{
-			    hero.IncreaseExperience(res.GetExperience());
-			    world.CaptureObject(dst_index, hero.GetColor());
-			    PlaySoundSuccess;
-			    complete = (Dialog::YES == Dialog::Message(MP2::StringObject(obj), _("Some of the surviving Liches are impressed by your victory over their fellows, and offer to join you for a price. Do you want to recruit Liches?"), Font::BIG, Dialog::YES | Dialog::NO));
-			    hero.ActionAfterBattle();
-			}
-			else
-			{
-			    BattleLose(hero, res.AttackerResult());
-			}
-		}
-	    }
+	    str_empty = _("The City of the Dead is empty of life, and empty of unlife as well. Perhaps some undead will move in next week.");
+	    str_full  = _("Some Liches living here are willing to join your army for a price. Do you want to recruit Liches?");
+	    str_warn  = _("You've found the ruins of an ancient city, now inhabited solely by the undead. Will you search?");
+	    str_recr  = _("Some of the surviving Liches are impressed by your victory over their fellows, and offer to join you for a price. Do you want to recruit Liches?");
 	    break;
 
         case MP2::OBJ_TROLLBRIDGE:
-	    if(!battle)
-	    {
-	    	if(0 == count)
-	    	{
-		    PlaySoundVisited;
-	    	    Dialog::Message(MP2::StringObject(obj), _("You've found one of those bridges that Trolls are so fond of living under, but there are none here. Perhaps there will be some next week."), Font::BIG, Dialog::OK);
-		    break;
-		}
-		else
-		{
-		    PlaySoundSuccess;
-	    	    complete = (Dialog::YES == Dialog::Message(MP2::StringObject(obj), _("Some Trolls living under a bridge are willing to join your army, but for a price. Do you want to recruit Trolls?"), Font::BIG, Dialog::YES | Dialog::NO));
-		}
-	    }
-	    else
-	    {
-		Army::army_t army;
-		army.FromGuardian(tile);
-
-		PlaySoundWarning;
-		if(Dialog::YES == Dialog::Message(MP2::StringObject(obj), _("Trolls living under the bridge challenge you. Will you fight them?"), Font::BIG, Dialog::YES | Dialog::NO))
-		{
-			// new battle2
-			Battle2::Result res = Battle2::Loader(hero.GetArmy(), army, dst_index);
-    			if(res.AttackerWins())
-    			{
-			    hero.IncreaseExperience(res.GetExperience());
-			    world.CaptureObject(dst_index, hero.GetColor());
-			    PlaySoundSuccess;
-			    complete = (Dialog::YES == Dialog::Message(MP2::StringObject(obj), _("A few Trolls remain, cowering under the bridge. They approach you and offer to join your forces as mercenaries. Do you want to buy any Trolls?"), Font::BIG, Dialog::YES | Dialog::NO));
-			    hero.ActionAfterBattle();
-			}
-			else
-			{
-			    BattleLose(hero, res.AttackerResult());
-			}
-		}
-	    }
+	    str_empty = _("You've found one of those bridges that Trolls are so fond of living under, but there are none here. Perhaps there will be some next week.");
+	    str_full  = _("Some Trolls living under a bridge are willing to join your army, but for a price. Do you want to recruit Trolls?");
+	    str_warn  = _("Trolls living under the bridge challenge you. Will you fight them?");
+	    str_recr  = _("A few Trolls remain, cowering under the bridge. They approach you and offer to join your forces as mercenaries. Do you want to buy any Trolls?");
     	    break;
 
 	case MP2::OBJ_DRAGONCITY:
-	    if(!battle)
-	    {
-	    	if(0 == count)
-	    	{
-		    PlaySoundVisited;
-	    	    Dialog::Message(MP2::StringObject(obj), _("The Dragon city has no Dragons willing to join you this week. Perhaps a Dragon will become available next week."), Font::BIG, Dialog::OK);
-		    break;
-		}
-		else
-		{
-		    PlaySoundSuccess;
-	    	    complete = (Dialog::YES == Dialog::Message(MP2::StringObject(obj), _("The Dragon city is willing to offer some Dragons for your army for a price. Do you wish to recruit Dragons?"), Font::BIG, Dialog::YES | Dialog::NO));
-		}
-	    }
-	    else
-	    {
-		Army::army_t army;
-		army.FromGuardian(tile);
-
-		PlaySoundWarning;
-		if(Dialog::YES == Dialog::Message(MP2::StringObject(obj), _("You stand before the Dragon City, a place off-limits to mere humans. Do you wish to violate this rule and challenge the Dragons to a fight?"), Font::BIG, Dialog::YES | Dialog::NO))
-		{
-			// new battle2
-			Battle2::Result res = Battle2::Loader(hero.GetArmy(), army, dst_index);
-    			if(res.AttackerWins())
-    			{
-			    hero.IncreaseExperience(res.GetExperience());
-			    world.CaptureObject(dst_index, hero.GetColor());
-			    PlaySoundSuccess;
-			    complete = (Dialog::YES == Dialog::Message(MP2::StringObject(obj), _("Having defeated the Dragon champions, the city's leaders agree to supply some Dragons to your army for a price. Do you wish to recruit Dragons?"), Font::BIG, Dialog::YES | Dialog::NO));
-			    hero.ActionAfterBattle();
-			}
-			else
-			{
-			    BattleLose(hero, res.AttackerResult());
-			}
-		}
-	    }
+	    str_empty = _("The Dragon city has no Dragons willing to join you this week. Perhaps a Dragon will become available next week.");
+	    str_full  = _("The Dragon city is willing to offer some Dragons for your army for a price. Do you wish to recruit Dragons?");
+	    str_warn  = _("You stand before the Dragon City, a place off-limits to mere humans. Do you wish to violate this rule and challenge the Dragons to a fight?");
+	    str_recr  = _("Having defeated the Dragon champions, the city's leaders agree to supply some Dragons to your army for a price. Do you wish to recruit Dragons?");
 	    break;
 
 	default: return;
+    }
+
+    if(!battle)
+    {
+	if(0 == count)
+	{
+	    PlaySoundVisited;
+	    Dialog::Message(MP2::StringObject(obj), str_empty, Font::BIG, Dialog::OK);
+	}
+	else
+	{
+	    PlaySoundSuccess;
+	    complete = (Dialog::YES == Dialog::Message(MP2::StringObject(obj), str_full, Font::BIG, Dialog::YES | Dialog::NO));
+	}
+    }
+    else
+    {
+	Army::army_t army;
+	army.FromGuardian(tile);
+
+	PlaySoundWarning;
+	if(Dialog::YES == Dialog::Message(MP2::StringObject(obj), str_warn, Font::BIG, Dialog::YES | Dialog::NO))
+	{
+	    // new battle2
+	    Battle2::Result res = Battle2::Loader(hero.GetArmy(), army, dst_index);
+	    if(res.AttackerWins())
+	    {
+		hero.IncreaseExperience(res.GetExperience());
+		world.CaptureObject(dst_index, hero.GetColor());
+		PlaySoundSuccess;
+		complete = (Dialog::YES == Dialog::Message(MP2::StringObject(obj), str_recr, Font::BIG, Dialog::YES | Dialog::NO));
+		hero.ActionAfterBattle();
+		tile.SetQuantity4(hero.GetColor());
+	    }
+	    else
+	    {
+		BattleLose(hero, res.AttackerResult());
+	    }
+	}
     }
 
     // recruit monster

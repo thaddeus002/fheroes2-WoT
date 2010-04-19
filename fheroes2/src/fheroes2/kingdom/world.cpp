@@ -1554,21 +1554,29 @@ void World::UpdateDwellingPopulation(void)
 	    case MP2::OBJ_RUINS:
             case MP2::OBJ_WAGONCAMP:
             case MP2::OBJ_DESERTTENT:
-            case MP2::OBJ_TROLLBRIDGE:
             case MP2::OBJ_WATERALTAR:
             case MP2::OBJ_AIRALTAR:
             case MP2::OBJ_FIREALTAR:
             case MP2::OBJ_EARTHALTAR:
 	    case MP2::OBJ_BARROWMOUNDS:
-            case MP2::OBJ_CITYDEAD:
 	    {
 		const Monster m(Monster::FromObject(obj));
 		count = m.GetRNDSize(true);
 		break;
 	    }
 
+            case MP2::OBJ_TROLLBRIDGE:
+            case MP2::OBJ_CITYDEAD:
+	    {
+		const Monster m(Monster::FromObject(obj));
+        	// quantity4 - flag guardians beaten
+		count = (0 == tile.GetQuantity4() ? 0 : m.GetRNDSize(true));
+		break;
+	    }
+
             case MP2::OBJ_DRAGONCITY:
-        	count = 1;
+        	// quantity4 - flag guardians beaten
+        	count = (0 == tile.GetQuantity4() ? 0 : 1);
         	break;
 
 	    default: break;
