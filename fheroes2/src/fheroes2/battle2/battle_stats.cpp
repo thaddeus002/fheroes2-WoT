@@ -1548,7 +1548,8 @@ bool Battle2::Stats::isMagicResist(u8 spell, u8 spower) const
 u8 Battle2::Stats::GetMagicResist(u8 spell, u8 spower) const
 {
     if(Spell::isMindInfluence(spell) &&
-        (troop.isUndead() || troop() == Monster::GIANT || troop() == Monster::TITAN)) return 100;
+        (troop.isUndead() || troop.isElemental() ||
+    	troop() == Monster::GIANT || troop() == Monster::TITAN)) return 100;
 
     if(Spell::isALiveOnly(spell) &&
         troop.isUndead()) return 100;
