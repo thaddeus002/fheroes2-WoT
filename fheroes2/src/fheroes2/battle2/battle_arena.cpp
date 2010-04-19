@@ -640,7 +640,7 @@ Battle2::Arena::Arena(Army::army_t & a1, Army::army_t & a2, u16 index, bool loca
     for(u8 ii = 0; ii < army1.Size(); ++ii)
     {
 	// place army1 troops
-	const u8 index1 = ii * 22;
+	const u8 index1 = Army::FORMAT_SPREAD == army1.GetCombatFormat() ? ii * 22 : 22 + ii * 11;
 	Army::Troop & troop1 = army1.At(ii);
 	if(troop1.isValid() && troop1.BattleInit())
 	{
@@ -655,7 +655,7 @@ Battle2::Arena::Arena(Army::army_t & a1, Army::army_t & a2, u16 index, bool loca
     for(u8 ii = 0; ii < army2.Size(); ++ii)
     {
     	// place army2 troops
-	const u8 index2 = 10 + (ii * 22);
+	const u8 index2 = Army::FORMAT_SPREAD == army2.GetCombatFormat() ? 10 + ii * 22 : 32 + ii * 11;
 	Army::Troop & troop2 = army2.At(ii);
 	if(troop2.isValid() && troop2.BattleInit())
 	{
