@@ -53,6 +53,33 @@ const char* ArmyGetSizeString(u32 count)
 
 void Dialog::QuickInfo(const Maps::Tiles & tile)
 {
+    // check 
+    switch(tile.GetObject())
+    {
+	case MP2::OBJN_MINES:
+	case MP2::OBJN_ABANDONEDMINE:
+	case MP2::OBJN_SAWMILL:
+	case MP2::OBJN_ALCHEMYLAB:
+	{
+	    const Maps::Tiles & left  = world.GetTiles(tile.GetIndex() - 1);
+	    const Maps::Tiles & right = world.GetTiles(tile.GetIndex() + 1);
+	    const Maps::Tiles* center = NULL;
+
+	    if(MP2::isGroundObject(left.GetObject()))  center = &left;
+	    else
+	    if(MP2::isGroundObject(right.GetObject())) center = &right;
+
+	    if(center)
+	    {
+		QuickInfo(*center);
+		return;
+	    }
+	}
+	break;
+
+	default: break;
+    }
+
     Display & display = Display::Get();
 
     Cursor & cursor = Cursor::Get();
