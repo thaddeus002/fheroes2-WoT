@@ -909,7 +909,7 @@ void Battle2::Interface::RedrawCover(void)
     if(arena.icn_covr != ICN::UNKNOWN)
     {
 	const Sprite & cover = AGG::GetICN(arena.icn_covr, 0);
-	display.Blit(cover, topleft.x + cover.x(), topleft.x + cover.y());
+	display.Blit(cover, topleft.x + cover.x(), topleft.y + cover.y());
     }
 
     if(arena.castle) RedrawCastle1();
@@ -1169,6 +1169,7 @@ void Battle2::Interface::RedrawObjects(const u16 cell_index) const
     if(sprite)
     {
 	Display & display = Display::Get();
+	//const Point & topleft = border.GetArea();
 	const Rect & pt = arena.board[cell_index].pos;
 	display.Blit(*sprite, pt.x + pt.w / 2 + sprite->x(), pt.y + pt.h + sprite->y() - (Settings::Get().QVGA() ? 5 : 10));
     }
