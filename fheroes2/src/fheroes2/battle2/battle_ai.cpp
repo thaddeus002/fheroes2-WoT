@@ -211,9 +211,9 @@ void Battle2::Arena::AIMagicAction(const Stats & b, Actions & a, const Stats* en
 	if(NULL != (troop = enemy_army->BattleFindModes(IS_GOOD_MAGIC)) && NULL != (stats = troop->GetBattleStats()))
 	{
 	    // slow
-	    if(enemy_army->Modes(SP_HASTE) && isApplySpell(Spell::SLOW, stats, *hero, a)) return;
+	    if(stats->Modes(SP_HASTE) && isApplySpell(Spell::SLOW, stats, *hero, a)) return;
 	    // curse
-	    if(!enemy_army->Modes(SP_CURSE) && isApplySpell(Spell::CURSE, stats, *hero, a)) return;
+	    if(!stats->Modes(SP_CURSE) && isApplySpell(Spell::CURSE, stats, *hero, a)) return;
 	    //
 	    if(isApplySpell(Spell::DISPEL, stats, *hero, a)) return;
 	}
