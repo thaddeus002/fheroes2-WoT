@@ -371,8 +371,11 @@ void Heroes::LoadFromMP2(u16 map_index, const void *ptr, const Color::color_t cl
 	++ptr8;
 
 	// index sprite portrate
-	if(Heroes::SANDYSANDY > *ptr8)
+	heroes_t ht = ConvertID(*ptr8);
+	if(Heroes::UNKNOWN != ht)
 	{
+	    const Heroes* hero = world.GetHeroes(ht);
+	    if(hero && hero->isFreeman())
 	    portrait = static_cast<heroes_t>(*ptr8);
 	}
 
@@ -470,6 +473,23 @@ void Heroes::LoadFromMP2(u16 map_index, const void *ptr, const Color::color_t cl
     move_point = GetMaxMovePoints();
 
     DEBUG(DBG_GAME , DBG_INFO, "add heroes: " << name << ", color: " << Color::String(color) << ", race: " << Race::String(race));
+}
+
+void Heroes::SetRace(Race::race_t r)
+{
+    switch(r)
+    {
+	case Race::KNGT:
+	case Race::BARB:
+	case Race::SORC:
+	case Race::WRLK:
+	case Race::WZRD:
+	case Race::NECR:
+	    race = r;
+	    break;
+	default:
+	    break;
+    }
 }
 
 Heroes::heroes_t Heroes::GetID(void) const
