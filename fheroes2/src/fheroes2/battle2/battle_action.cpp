@@ -152,7 +152,8 @@ void Battle2::Arena::BattleProcess(Stats & attacker, Stats & defender)
 	GetTargetsForSpells(attacker.GetCommander(), spell, defender.GetPosition(), targets);
 	if(interface) interface->RedrawActionSpellCastPart1(spell, defender.GetPosition(), name, targets);
 
-	TargetsApplySpell(attacker.GetCommander(), spell, targets);
+	// magic attack not depends from hero
+	TargetsApplySpell(NULL, spell, targets);
 	if(interface) interface->RedrawActionSpellCastPart2(spell, targets);
 	if(interface) interface->RedrawActionMonsterSpellCastStatus(attacker, targets.front());
 

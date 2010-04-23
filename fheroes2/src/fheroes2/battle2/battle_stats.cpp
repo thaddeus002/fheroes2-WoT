@@ -850,7 +850,7 @@ u32 Battle2::Stats::ApplyDamage(Stats & enemy, u32 dmg)
 	default: break;
     }
 
-    // clean paralyze magic
+    // clean paralyze or stone magic
     if(Modes(IS_PARALYZE_MAGIC))
     {
 	SetModes(TR_RESPONSED);
@@ -997,6 +997,7 @@ void Battle2::Stats::PostAttackAction(Stats & enemy)
         ResetModes(SP_BERSERKER);
         affected.RemoveMode(SP_BERSERKER);
     }
+
     // clean hypnotize spell
     if(Modes(SP_HYPNOTIZE))
     {
