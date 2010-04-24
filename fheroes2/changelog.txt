@@ -1,4 +1,20 @@
-SVN - up to r1815
+SVN - up to r1854
+
+Apr, 24, 2010
++ Added: extended scouting capability
++ Fixed: manual set hero portrait and class type
++ Fixed: spell duration for magic monsters
++ Fixed: air element + lightning 200% damage
++ Fixed: elemental immunable mind spells
++ Added: groupped/spread battle format
++ Added: hero patrol mode
++ Update: wins/loss game conditions, update game info dialog
++ Added: battle hard skip with +2 defense
++ Fixed: autosave remember settings
++ Fixed: set guardian with last troop
++ Added: pickup artifact scenario messages
++ Added: artifacts affinities HideousMask, StatesmanQuill, CrystalBall, extra settings CrystalBall added spells Visions and IdentifyHero
++ Fixed: broken bridge animation
 
 Apr, 9, 2010
 + Update latest translation files from launchpad
