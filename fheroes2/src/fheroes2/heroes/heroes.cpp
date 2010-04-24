@@ -857,7 +857,7 @@ void Heroes::ActionNewDay(void)
     
 
     // new day, new capacities
-    if(Modes(STUPID)) ResetModes(STUPID);
+    ResetModes(STUPID);
 }
 
 void Heroes::ActionNewWeek(void)
@@ -1288,6 +1288,16 @@ u8 Heroes::GetScoute(void) const
 	Game::GetViewDistance(Game::VIEW_HEROES) + GetSecondaryValues(Skill::Secondary::SCOUTING);
 }
 
+u8 Heroes::GetVisionsDistance(void) const
+{
+    u8 dist = Spell::GetExtraValue(Spell::VISIONS);
+
+    if(HasArtifact(Artifact::CRYSTAL_BALL))
+        dist = Settings::Get().UseAltResource() ? dist * 2 + 2 : 8;
+
+    return dist;
+}
+
 /* set cente from index maps */
 void Heroes::SetCenter(const u16 index)
 {
@@ -1613,6 +1623,8 @@ void Heroes::ActionNewPosition(void)
 	    SetMove(false);
 	}
     }
+
+    ResetModes(VISIONS);
 }
 
 const Point & Heroes::GetCenterPatrol(void) const
@@ -1623,6 +1635,20 @@ const Point & Heroes::GetCenterPatrol(void) const
 u8 Heroes::GetSquarePatrol(void) const
 {
     return patrol_square;
+}
+
+bool Heroes::CanScouteTile(u16 index) const
+{
+    if(Settings::Get().ExtScouteExtended())
+    {
+	const Maps::Tiles & tile = world.GetTiles(index);
+
+	u8 dist = GetScoute();
+	if(Modes(VISIONS) && dist < GetVisionsDistance()) dist = GetVisionsDistance();
+
+	return (dist > Maps::GetApproximateDistance(GetIndex(), tile.GetIndex()));
+    }
+    return false;
 }
 
 void Heroes::Dump(void) const

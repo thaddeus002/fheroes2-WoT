@@ -95,6 +95,7 @@ static const settings_t settingsFHeroes2[] =
     { Settings::GAME_HIDE_AI_MOVE,		_("game: hide AI move"),				},
     { Settings::GAME_REMEMBER_LAST_FILENAME,	_("game: remember last filename"),			},
     { Settings::WORLD_SHOW_VISITED_CONTENT,	_("world: show visited content from objects"),		},
+    { Settings::WORLD_SCOUTING_EXTENDED,	_("world: scouting skill show extended content info"),  },
     { Settings::WORLD_ABANDONED_MINE_RANDOM,	_("world: abandoned mine random resource"),		},
     { Settings::WORLD_SAVE_MONSTER_BATTLE,	_("world: save count monster after battle"),		},
     { Settings::WORLD_ALLOW_SET_GUARDIAN,	_("world: allow set guardian to objects"),		},
@@ -994,6 +995,11 @@ bool Settings::ExtAllowBuyFromWell(void) const
 bool Settings::ExtShowVisitedContent(void) const
 {
     return ExtModes(WORLD_SHOW_VISITED_CONTENT);
+}
+
+bool Settings::ExtScouteExtended(void) const
+{
+    return ExtModes(WORLD_SCOUTING_EXTENDED);
 }
 
 bool Settings::ExtFastLoadGameDialog(void) const

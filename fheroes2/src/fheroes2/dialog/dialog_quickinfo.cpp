@@ -149,7 +149,8 @@ void Dialog::QuickInfo(const Maps::Tiles & tile)
         if(!settings.Unicode()) String::Lower(name);
         String::Replace(name_object, "%{monster}", name);
 
-	if(settings.MyColor() == world.ColorCapturedObject(tile.GetIndex()))
+	if((settings.MyColor() == world.ColorCapturedObject(tile.GetIndex())) ||
+	    (hero && hero->CanScouteTile(tile.GetIndex())))
 	{
 	    name.clear();
 	    String::AddInt(name, troop.GetCount());
@@ -172,6 +173,15 @@ void Dialog::QuickInfo(const Maps::Tiles & tile)
             std::string name = troop.GetMultiName();
             if(!settings.Unicode()) String::Lower(name);
             String::Replace(name_object, "%{monster}", name);
+
+            if(hero && hero->CanScouteTile(tile.GetIndex()) &&
+        	Skill::Level::EXPERT == hero->GetSecondaryValues(Skill::Secondary::SCOUTING))
+            {
+        	name_object.append("\n");
+        	name = _("scoute expert: (%{count})");
+        	String::Replace(name, "%{count}", troop.GetCount());
+        	name_object.append(name);
+	    }
     	}
     	    break;
 
@@ -247,7 +257,8 @@ void Dialog::QuickInfo(const Maps::Tiles & tile)
         case MP2::OBJ_CITYDEAD:
         case MP2::OBJ_TROLLBRIDGE:
 	    name_object = MP2::StringObject(tile.GetObject());
-	    if(settings.ExtShowVisitedContent() && kingdom.isVisited(tile))
+	    if((settings.ExtShowVisitedContent() && kingdom.isVisited(tile)) ||
+		(hero && hero->CanScouteTile(tile.GetIndex())))
 	    {
 	    	name_object.append("\n");
 		if(tile.GetCountMonster())
@@ -500,6 +511,13 @@ void Dialog::QuickInfo(const Castle & castle)
     text.Blit(dst_pt);
 
     u8 count = castle.GetArmy().GetCount();
+    bool hide = Settings::Get().MyColor() != castle.GetColor();
+
+    if(hide)
+    {
+	const Heroes* hero = (Game::Focus::HEROES == Game::Focus::Get().Type() ? &Game::Focus::Get().GetHeroes() : NULL);
+	if(hero && Skill::Level::EXPERT == hero->GetSecondaryValues(Skill::Secondary::SCOUTING)) hide = false;
+    }
 
     if(! count)
     {
@@ -509,7 +527,7 @@ void Dialog::QuickInfo(const Castle & castle)
 	text.Blit(dst_pt);
     }
     else
-	castle.GetArmy().DrawMons32Line(cur_rt.x - 5, cur_rt.y + 100, 192, 0, 0, (Settings::Get().MyColor() != castle.GetColor()));
+	castle.GetArmy().DrawMons32Line(cur_rt.x - 5, cur_rt.y + 100, 192, 0, 0, hide);
 
     cursor.Show();
     display.Flip();
@@ -686,7 +704,18 @@ void Dialog::QuickInfo(const Heroes & hero)
 
     // draw monster sprite in one string
     const u8 mycolor = Settings::Get().MyColor();
-    const bool hide = mycolor != hero.GetColor() && !world.GetKingdom(mycolor).Modes(Kingdom::IDENTIFYHERO);
+    bool hide = mycolor != hero.GetColor();
+
+    // check spell identify hero
+    if(hide && world.GetKingdom(mycolor).Modes(Kingdom::IDENTIFYHERO)) hide = false;
+
+    // check scouting expert
+    if(hide)
+    {
+	const Heroes* hero = (Game::Focus::HEROES == Game::Focus::Get().Type() ? &Game::Focus::Get().GetHeroes() : NULL);
+	if(hero && Skill::Level::EXPERT == hero->GetSecondaryValues(Skill::Secondary::SCOUTING)) hide = false;
+    }
+
     hero.GetArmy().DrawMons32Line(cur_rt.x - 5, cur_rt.y + 114, 160, 0, 0, hide);
 
     cursor.Show();

@@ -98,6 +98,7 @@ public:
 	WORLD_ALLOW_SET_GUARDIAN	= 0x20000008,
 	WORLD_NOREQ_FOR_ARTIFACTS	= 0x20000010,
 	WORLD_ARTIFACT_CRYSTAL_BALL	= 0x20000020,
+	WORLD_SCOUTING_EXTENDED		= 0x20000040,
 	CASTLE_ALLOW_BUY_FROM_WELL	= 0x20100000,
 	HEROES_LEARN_SPELLS_WITH_DAY	= 0x20200000,
 
@@ -177,6 +178,7 @@ public:
     const char* ExtName(u32) const;
     bool ExtAllowBuyFromWell(void) const;
     bool ExtShowVisitedContent(void) const;
+    bool ExtScouteExtended(void) const;
     bool ExtFastLoadGameDialog(void) const;
     bool ExtRememberLastFocus(void) const;
     bool ExtRememberLastFilename(void) const;

@@ -81,6 +81,7 @@ public:
 	STUPID		= 0x0040,
 	JAIL		= 0x0080,
 	ACTION		= 0x0100,
+	VISIONS		= 0x4000,
 	PATROL		= 0x8000
     };
 
@@ -221,6 +222,8 @@ public:
     void FadeIn(void) const;
     void Scoute(void);
     u8   GetScoute(void) const;
+    bool CanScouteTile(u16) const;
+    u8   GetVisionsDistance(void) const;
 
     bool isShipMaster(void) const;
     bool CanPassToShipMaster(const Heroes &) const;

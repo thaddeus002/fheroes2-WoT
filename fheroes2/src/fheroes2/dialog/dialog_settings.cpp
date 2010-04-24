@@ -145,6 +145,7 @@ void Dialog::ExtSettings(void)
     states.push_back(Settings::WORLD_SAVE_MONSTER_BATTLE);
     states.push_back(Settings::WORLD_ALLOW_SET_GUARDIAN);
     states.push_back(Settings::WORLD_NOREQ_FOR_ARTIFACTS);
+    states.push_back(Settings::WORLD_SCOUTING_EXTENDED);
     states.push_back(Settings::WORLD_ARTIFACT_CRYSTAL_BALL);
     states.push_back(Settings::HEROES_LEARN_SPELLS_WITH_DAY);
     if(conf.VideoMode().w >= 640 && conf.VideoMode().w >= 480)

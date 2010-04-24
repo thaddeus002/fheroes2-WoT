@@ -42,7 +42,7 @@ class Kingdom
 public:
     enum flags_t
     {
-	PLAY	= 0x0001,
+	PLAY	     = 0x0001,
 	IDENTIFYHERO = 0x0002
     };
 
