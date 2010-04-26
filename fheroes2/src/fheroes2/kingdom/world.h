@@ -101,7 +101,7 @@ public:
     u16 CountDay(void) const{ return day; }
     u16 CountWeek(void) const{ return week; }
     bool BeginWeek(void) const{ return 1 == (day % DAYOFWEEK); }
-    bool BeginMonth(void) const{ return 1 == (week % WEEKOFMONTH); }
+    bool BeginMonth(void) const{ return 1 == (week % WEEKOFMONTH) && BeginWeek(); }
     bool LastDay(void) const{ return (0 == (day % DAYOFWEEK)); }
     bool LastWeek(void) const{ return (0 == (week % WEEKOFMONTH)); }
     Week::type_t GetWeekType(void) const{ return week_name; }
