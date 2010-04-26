@@ -1771,8 +1771,10 @@ void Battle2::Interface::MousePressRightBoardAction(u16 themes, s16 index, Actio
 	const Stats* b = arena.GetTroopBoard(index);
 	if(b)
 	{
+	    const Settings & conf = Settings::Get();
 	    const u8 allow = GetAllowSwordDirection(index);
-	    if(!Settings::Get().ExtTapMode() || !allow)
+
+	    if(conf.MyColor() == b->GetColor() || !conf.ExtTapMode() || !allow)
 		Dialog::ArmyInfo(b->troop, Dialog::READONLY);
 	    else
 	    switch(PocketPC::GetCursorAttackDialog(b->GetCellPosition(), allow))
