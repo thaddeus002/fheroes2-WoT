@@ -41,6 +41,11 @@ namespace Cdrom
 
 bool SDL::Init(const u32 system)
 {
+#ifdef __MINGW32CE__
+    SDL_putenv("DEBUG_VIDEO=1");
+    SDL_putenv("DEBUG_VIDEO_GAPI=1");
+#endif
+
     if(0 > SDL_Init(system))
     {
 	std::cerr << "SDL::Init: error: " << SDL_GetError() << std::endl;
