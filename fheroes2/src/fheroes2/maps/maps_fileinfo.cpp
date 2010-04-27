@@ -66,6 +66,13 @@ Maps::FileInfo::FileInfo() : difficulty(Difficulty::EASY),
     kingdom_colors(0), allow_colors(0), rnd_colors(0), rnd_races(0), localtime(0), with_heroes(false)
 {
     for(u8 ii = 0; ii < KINGDOMMAX; ++ii) races[ii] = Race::BOMG;
+
+    aliases[0] = Color::BLUE;
+    aliases[1] = Color::GREEN;
+    aliases[2] = Color::RED;
+    aliases[3] = Color::YELLOW;
+    aliases[4] = Color::ORANGE;
+    aliases[5] = Color::PURPLE;
 }
 
 bool Maps::FileInfo::ReadSAV(const std::string & filename)
