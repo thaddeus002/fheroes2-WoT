@@ -1643,7 +1643,7 @@ bool Heroes::CanScouteTile(u16 index) const
     {
 	const Maps::Tiles & tile = world.GetTiles(index);
 
-	u8 dist = GetScoute();
+	u8 dist = GetSecondaryValues(Skill::Secondary::SCOUTING) ? GetScoute() : 0;
 	if(Modes(VISIONS) && dist < GetVisionsDistance()) dist = GetVisionsDistance();
 
 	return (dist > Maps::GetApproximateDistance(GetIndex(), tile.GetIndex()));
