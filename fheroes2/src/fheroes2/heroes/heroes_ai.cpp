@@ -413,7 +413,7 @@ void AIToMonster(Heroes &hero, const u8 obj, const u16 dst_index)
     u32 join = 0;
     Resource::funds_t cost;
 
-    u8 reason = Army::GetJoinSolution(hero, tile, join, cost);
+    u8 reason = Army::GetJoinSolution(hero, tile, join, cost.gold);
 
     // free join
     if(1 == reason)

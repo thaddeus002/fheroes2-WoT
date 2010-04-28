@@ -473,7 +473,7 @@ bool ActionSpellVisions(Heroes & hero)
     	    u32 join = troop.GetCount();
     	    Resource::funds_t cost;
 
-	    const u8 reason = Army::GetJoinSolution(hero, tile, join, cost);
+	    const u8 reason = Army::GetJoinSolution(hero, tile, join, cost.gold);
 	    std::string hdr, msg;
 
 	    hdr = std::string("%{count} ") + troop.GetPluralName(join);
