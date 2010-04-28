@@ -62,7 +62,7 @@ namespace Army
     armysize_t GetSize(u32);
 
     // 0: fight, 1: free join, 2: join with gold, 3: flee
-    u8 GetJoinSolution(const Heroes &, const Maps::Tiles &, u32 &, Resource::funds_t &);
+    u8 GetJoinSolution(const Heroes &, const Maps::Tiles &, u32 &, u32 &);
 
     class army_t
     {

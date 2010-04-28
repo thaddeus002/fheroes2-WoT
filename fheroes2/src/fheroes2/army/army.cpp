@@ -1187,8 +1187,23 @@ u32 Army::army_t::GetSurrenderCost(void) const
 	res += (payment.gold * (*it1).GetCount());
     }
 
-    if(commander && commander->HasArtifact(Artifact::STATESMAN_QUILL))
-	res /= 5;
+    if(commander)
+    {
+	switch(commander->GetLevelSkill(Skill::Secondary::DIPLOMACY))
+	{
+	    // 40%
+	    case Skill::Level::BASIC: res = res * 40 / 100; break;
+	    // 30%
+	    case Skill::Level::ADVANCED: res = res * 30 / 100; break;
+	    // 20%
+	    case Skill::Level::EXPERT: res = res * 20 / 100; break;
+	    // 50%
+	    default: res = res * 50 / 100; break;
+	}
+
+	if(commander->HasArtifact(Artifact::STATESMAN_QUILL))
+	    res /= 5;
+    }
 
     // limit
     if(res < 100) res = 100;
@@ -1196,7 +1211,7 @@ u32 Army::army_t::GetSurrenderCost(void) const
     return res;
 }
 
-u8 Army::GetJoinSolution(const Heroes & hero, const Maps::Tiles & tile, u32 & join, Resource::funds_t & cost)
+u8 Army::GetJoinSolution(const Heroes & hero, const Maps::Tiles & tile, u32 & join, u32 & cost)
 {
     const Army::Troop troop(tile);
 
@@ -1220,13 +1235,15 @@ u8 Army::GetJoinSolution(const Heroes & hero, const Maps::Tiles & tile, u32 & jo
         if(hero.HasSecondarySkill(Skill::Secondary::DIPLOMACY))
         {
             const Kingdom & kingdom = world.GetKingdom(hero.GetColor());
-            cost = PaymentConditions::BuyMonster(troop());
-            cost *= troop.GetCount();
+            Resource::funds_t payment = PaymentConditions::BuyMonster(troop());
+            cost = payment.gold * troop.GetCount();
+	    payment.Reset();
+	    payment.gold = cost;
 
             // skill diplomacy
             const u32 to_join = Monster::GetCountFromHitPoints(troop(), troop.GetHitPoints() * hero.GetSecondaryValues(Skill::Secondary::DIPLOMACY) / 100);
 
-            if(to_join && kingdom.AllowPayment(cost))
+            if(to_join && kingdom.AllowPayment(payment))
             {
 		join = to_join;
 		return 2;
