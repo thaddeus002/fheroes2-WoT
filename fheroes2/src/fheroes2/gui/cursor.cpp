@@ -309,3 +309,27 @@ void Cursor::Show(void)
 {
     if(! Settings::Get().ExtHideCursor()) SpriteCursor::Show();
 }
+
+Cursor::themes_t Cursor::DistanceThemes(themes_t theme, u16 dist)
+{
+    if(0 == dist) return POINTER;
+    else
+    if(dist > 4) dist = 4;
+
+    switch(theme)
+    {
+	case MOVE:
+	case FIGHT:
+	case BOAT:
+	case ANCHOR:
+	case CHANGE:
+	case ACTION:
+	    return static_cast<themes_t>(theme + 6 * (dist - 1));
+
+	case REDBOAT:
+	    return static_cast<themes_t>(REDBOAT + dist - 1);
+
+	default: return theme;
+    }
+                                                
+}

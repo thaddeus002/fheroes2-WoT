@@ -479,51 +479,23 @@ Cursor::themes_t Game::GetCursor(const u16 dst_index)
 			    if(to_hero->GetCenter() == from_hero.GetCenter())
 				return Cursor::HEROES;
 			    else
-				switch(from_hero.GetRangeRouteDays(dst_index))
-				{
-				    case 0:	return Cursor::POINTER;
-				    case 1:	return from_hero.GetColor() == to_hero->GetColor() ? Cursor::CHANGE : Cursor::FIGHT;
-				    case 2:	return from_hero.GetColor() == to_hero->GetColor() ? Cursor::CHANGE2 : Cursor::FIGHT2;
-				    case 3:	return from_hero.GetColor() == to_hero->GetColor() ? Cursor::CHANGE3 : Cursor::FIGHT3;
-				    default:	return from_hero.GetColor() == to_hero->GetColor() ? Cursor::CHANGE4 : Cursor::FIGHT4;
-				}
+				return Cursor::DistanceThemes((from_hero.GetColor() == to_hero->GetColor() ? Cursor::CHANGE : Cursor::FIGHT),
+								from_hero.GetRangeRouteDays(dst_index));
 			}
     		    }
     		    break;
 
 		    case MP2::OBJ_COAST:
-			switch(from_hero.GetRangeRouteDays(dst_index))
-			{
-			    case 0:	return Cursor::POINTER;
-			    case 1:	return Cursor::ANCHOR;
-			    case 2:	return Cursor::ANCHOR2;
-			    case 3:	return Cursor::ANCHOR3;
-			    default:	return Cursor::ANCHOR4;
-			}
-			break;
+			return Cursor::DistanceThemes(Cursor::ANCHOR, from_hero.GetRangeRouteDays(dst_index));
 
 		    default:
-			    if(MP2::isWaterObject(tile.GetObject()))
-				switch(from_hero.GetRangeRouteDays(dst_index))
-				{
-				    case 0:	return Cursor::POINTER;
-				    case 1:	return Cursor::REDBOAT;
-				    case 2:	return Cursor::REDBOAT2;
-				    case 3:	return Cursor::REDBOAT3;
-				    default:	return Cursor::REDBOAT4;
-				}
-			    else
-			    if(tile.isPassable(&from_hero))
-				switch(from_hero.GetRangeRouteDays(dst_index))
-				{
-				    case 0:	return Cursor::POINTER;
-				    case 1:	return Cursor::BOAT;
-				    case 2:	return Cursor::BOAT2;
-				    case 3:	return Cursor::BOAT3;
-				    default:	return Cursor::BOAT4;
-				}
-			    else
-				return Cursor::POINTER;
+			if(MP2::isWaterObject(tile.GetObject()))
+			    return Cursor::DistanceThemes(Cursor::REDBOAT, from_hero.GetRangeRouteDays(dst_index));
+			else
+			if(tile.isPassable(&from_hero))
+			    return Cursor::DistanceThemes(Cursor::BOAT, from_hero.GetRangeRouteDays(dst_index));
+			else
+			    return Cursor::POINTER;
 		}
 	    }
 	    else
@@ -531,15 +503,7 @@ Cursor::themes_t Game::GetCursor(const u16 dst_index)
 		switch(tile.GetObject())
 		{
     		    case MP2::OBJ_MONSTER:
-			switch(from_hero.GetRangeRouteDays(dst_index))
-			{
-			    case 0:	return Cursor::POINTER;
-			    case 1:	return Cursor::FIGHT;
-			    case 2:	return Cursor::FIGHT2;
-			    case 3:	return Cursor::FIGHT3;
-			    default:	return Cursor::FIGHT4;
-			}
-			break;
+    			return Cursor::DistanceThemes(Cursor::FIGHT, from_hero.GetRangeRouteDays(dst_index));
 
 		    case MP2::OBJN_CASTLE:
     		    {
@@ -550,23 +514,9 @@ Cursor::themes_t Game::GetCursor(const u16 dst_index)
 			    if(from_hero.GetColor() == castle->GetColor()) return Cursor::CASTLE;
 			    else
 			    if(castle->GetArmy().isValid())
-			    switch(from_hero.GetRangeRouteDays(dst_index))
-			    {
-				case 0:	return Cursor::POINTER;
-				case 1:	return Cursor::FIGHT;
-				case 2:	return Cursor::FIGHT2;
-				case 3:	return Cursor::FIGHT3;
-				default:return Cursor::FIGHT4;
-			    }
+				return Cursor::DistanceThemes(Cursor::FIGHT, from_hero.GetRangeRouteDays(dst_index));
 			    else
-			    switch(from_hero.GetRangeRouteDays(dst_index))
-			    {
-				case 0:	return Cursor::POINTER;
-				case 1:	return Cursor::ACTION;
-				case 2:	return Cursor::ACTION2;
-				case 3:	return Cursor::ACTION3;
-				default:return Cursor::ACTION4;
-			    }
+				return Cursor::DistanceThemes(Cursor::ACTION, from_hero.GetRangeRouteDays(dst_index));
 			}
     		    }
     		    break;
@@ -578,24 +528,9 @@ Cursor::themes_t Game::GetCursor(const u16 dst_index)
     			if(NULL != castle)
 			{
 			    if(from_hero.GetColor() != castle->GetColor() && castle->GetArmy().isValid())
-			    switch(from_hero.GetRangeRouteDays(dst_index))
-			    {
-				case 0:	return Cursor::POINTER;
-				case 1:	return Cursor::FIGHT;
-				case 2:	return Cursor::FIGHT2;
-				case 3:	return Cursor::FIGHT3;
-				default:return Cursor::FIGHT4;
-			    }
+				return Cursor::DistanceThemes(Cursor::FIGHT, from_hero.GetRangeRouteDays(dst_index));
 			    else
-			    switch(from_hero.GetRangeRouteDays(dst_index))
-			    {
-				case 0:	return Cursor::POINTER;
-				case 1:	return Cursor::ACTION;
-				case 2:	return Cursor::ACTION2;
-				case 3:	return Cursor::ACTION3;
-				default:return Cursor::ACTION4;
-			    }
-			    break;
+				return Cursor::DistanceThemes(Cursor::ACTION, from_hero.GetRangeRouteDays(dst_index));
 			}
         	    }
         	    break;
@@ -610,57 +545,31 @@ Cursor::themes_t Game::GetCursor(const u16 dst_index)
 			    if(to_hero->GetCenter() == from_hero.GetCenter())
 				return Cursor::HEROES;
 			    else
-				switch(from_hero.GetRangeRouteDays(dst_index))
-				{
-				    case 0:	return Cursor::POINTER;
-				    case 1:	return from_hero.GetColor() == to_hero->GetColor() ? Cursor::CHANGE : Cursor::FIGHT;
-				    case 2:	return from_hero.GetColor() == to_hero->GetColor() ? Cursor::CHANGE2 : Cursor::FIGHT2;
-				    case 3:	return from_hero.GetColor() == to_hero->GetColor() ? Cursor::CHANGE3 : Cursor::FIGHT3;
-				    default:	return from_hero.GetColor() == to_hero->GetColor() ? Cursor::CHANGE4 : Cursor::FIGHT4;
-				}
-				break;
+				return Cursor::DistanceThemes((from_hero.GetColor() == to_hero->GetColor() ? Cursor::CHANGE : Cursor::FIGHT),
+								from_hero.GetRangeRouteDays(dst_index));
 			}
     		    }
     		    break;
 
     		    case MP2::OBJ_BOAT:
-			switch(from_hero.GetRangeRouteDays(dst_index))
-			{
-			    case 0:	return Cursor::POINTER;
-			    case 1:	return Cursor::BOAT;
-			    case 2:	return Cursor::BOAT2;
-			    case 3:	return Cursor::BOAT3;
-			    default:	return Cursor::BOAT4;
-			}
-			break;
+    			return Cursor::DistanceThemes(Cursor::BOAT, from_hero.GetRangeRouteDays(dst_index));
 
 		    default:
 			    if(MP2::isGroundObject(tile.GetObject()))
 			    {
-				const bool protection = (MP2::isPickupObject(tile.GetObject()) ? false :
+				bool protection = (MP2::isPickupObject(tile.GetObject()) ? false :
 					(Maps::TileUnderProtection(dst_index) || tile.CheckEnemyGuardians(from_hero.GetColor())));
 
-				switch(from_hero.GetRangeRouteDays(dst_index))
-				{
-				    case 0:	return Cursor::POINTER;
-				    case 1:	return protection ? Cursor::FIGHT : Cursor::ACTION;
-				    case 2:	return protection ? Cursor::FIGHT2 : Cursor::ACTION2;
-				    case 3:	return protection ? Cursor::FIGHT3 : Cursor::ACTION3;
-				    default:	return protection ? Cursor::FIGHT4 : Cursor::ACTION4;
-				}
+				return Cursor::DistanceThemes((protection ? Cursor::FIGHT : Cursor::ACTION),
+								from_hero.GetRangeRouteDays(dst_index));
 			    }
 			    else
 			    if(tile.isPassable(&from_hero))
 			    {
-				const bool protection = Maps::TileUnderProtection(dst_index);
-				switch(from_hero.GetRangeRouteDays(dst_index))
-				{
-				    case 0:	return Cursor::POINTER;
-				    case 1:	return protection ? Cursor::FIGHT : Cursor::MOVE;
-				    case 2:	return protection ? Cursor::FIGHT2 : Cursor::MOVE2;
-				    case 3:	return protection ? Cursor::FIGHT3 : Cursor::MOVE3;
-				    default:	return protection ? Cursor::FIGHT4 : Cursor::MOVE4;
-				}
+				bool protection = Maps::TileUnderProtection(dst_index);
+
+				return Cursor::DistanceThemes((protection ? Cursor::FIGHT : Cursor::MOVE),
+								from_hero.GetRangeRouteDays(dst_index));
 			    }
 			    else
 				return Cursor::POINTER;
