@@ -1211,7 +1211,7 @@ u32 Army::army_t::GetSurrenderCost(void) const
     return res;
 }
 
-u8 Army::GetJoinSolution(const Heroes & hero, const Maps::Tiles & tile, u32 & join, u32 & cost)
+u8 Army::GetJoinSolution(const Heroes & hero, const Maps::Tiles & tile, u32 & join, s32 & cost)
 {
     const Army::Troop troop(tile);
 
