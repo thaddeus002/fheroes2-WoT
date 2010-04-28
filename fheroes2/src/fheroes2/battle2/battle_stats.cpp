@@ -2133,11 +2133,16 @@ u16 Battle2::Stats::AIGetAttackPosition(const std::vector<u16> & positions) cons
 	    std::vector<u16> passable;
 	    arena->GetPassableQualityPositions(*this, passable);
 
-	    std::vector<u16>::iterator it = results.begin();
-	    for(; it != results.end(); ++it)
-		if(passable.end() == std::find(passable.begin(), passable.end(), *it))
-		    results.erase(it);
-	
+	    std::vector<u16>::iterator it1 = results.begin();
+	    std::vector<u16>::iterator it3 = it1;
+
+	    for (; it1 != results.end(); ++it1)
+		if(passable.end() != std::find(passable.begin(), passable.end(), *it1))
+		    *it3++ = *it1;
+
+	    if(it3 != results.end())
+		results.resize(std::distance(results.begin(), it3));
+
 	    // get max quality
 	    if(results.size())
 	    {
