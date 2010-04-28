@@ -36,10 +36,11 @@
 #include "game_io.h"
 #include "bitmodes.h"
 
+#define FORMAT_VERSION_1861 0x0745
 #define FORMAT_VERSION_1859 0x0743
 #define FORMAT_VERSION_1735 0x06C7
 #define FORMAT_VERSION_1661 0x067D
-#define CURRENT_FORMAT_VERSION FORMAT_VERSION_1859
+#define CURRENT_FORMAT_VERSION FORMAT_VERSION_1861
 #define LAST_FORMAT_VERSION FORMAT_VERSION_1661
 
 #define ListMapsDirectory std::list<std::string>
@@ -100,6 +101,9 @@ public:
 	WORLD_NOREQ_FOR_ARTIFACTS	= 0x20000010,
 	WORLD_ARTIFACT_CRYSTAL_BALL	= 0x20000020,
 	WORLD_SCOUTING_EXTENDED		= 0x20000040,
+	UNIONS_ALLOW_HERO_MEETINGS	= 0x20001000,
+	UNIONS_ALLOW_CASTLE_VISITING	= 0x20002000,
+	UNIONS_ALLOW_VIEW_MAPS		= 0x20004000,
 	CASTLE_ALLOW_BUY_FROM_WELL	= 0x20100000,
 	HEROES_LEARN_SPELLS_WITH_DAY	= 0x20200000,
 
@@ -189,6 +193,9 @@ public:
     bool ExtNoRequirementsForArtifacts(void) const;
     bool ExtArtifactCrystalBall(void) const;
     bool ExtLearnSpellsWithDay(void) const;
+    bool ExtUnionsAllowCastleVisiting(void) const;
+    bool ExtUnionsAllowHeroesMeetings(void) const;
+    bool ExtUnionsAllowViewMaps(void) const;
     bool ExtBattleShowDamage(void) const;
     bool ExtBattleTroopDirection(void) const;
     bool ExtBattleSoftWait(void) const;
@@ -251,6 +258,8 @@ public:
     u8   GameType(void) const;
     void SetGameType(const Game::type_t type);
 
+    u8   GetUnions(u8 cl1) const;
+    bool IsUnions(u8 cl1, u8 cl2) const;
     Color::color_t CurrentColor(void) const;
     Color::color_t MyColor(void) const;
     void SetCurrentColor(const Color::color_t c);

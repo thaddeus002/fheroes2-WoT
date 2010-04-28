@@ -210,11 +210,13 @@ bool Game::IO::SaveBIN(QueueMessage & msg)
     msg.Push(conf.current_maps_file.loss2);
     // races
     msg.Push(static_cast<u16>(0xFF03));
-    for(u16 ii = 0; ii < KINGDOMMAX; ++ii)
+    msg.Push(static_cast<u32>(KINGDOMMAX));
+    for(u32 ii = 0; ii < KINGDOMMAX; ++ii)
 	msg.Push(conf.current_maps_file.races[ii]);
-    // aliases
-    for(u16 ii = 0; ii < KINGDOMMAX; ++ii)
-	msg.Push(conf.current_maps_file.aliases[ii]);
+    // unions
+    msg.Push(static_cast<u32>(KINGDOMMAX));
+    for(u32 ii = 0; ii < KINGDOMMAX; ++ii)
+	msg.Push(conf.current_maps_file.unions[ii]);
     // maps name
     msg.Push(conf.current_maps_file.name);
     // maps description
@@ -662,21 +664,30 @@ bool Game::IO::LoadBIN(QueueMessage & msg)
     msg.Pop(conf.current_maps_file.conditions_loss);
     msg.Pop(conf.current_maps_file.loss1);
     msg.Pop(conf.current_maps_file.loss2);
-    // races
+
     msg.Pop(byte16);
     if(byte16 != 0xFF03) DEBUG(DBG_GAME , DBG_WARN, "Game::IO::LoadBIN: 0xFF03");
-    for(u16 ii = 0; ii < KINGDOMMAX; ++ii)
+    // races
+    if(format < FORMAT_VERSION_1861)
+	byte32 = 6; // KINGDOMMAX;
+    else
+	msg.Pop(byte32);
+    for(u8 ii = 0; ii < byte32; ++ii)
     {
 	msg.Pop(byte8);
 	conf.current_maps_file.races[ii] = byte8;
     }
-    // aliases
+    // unions
+    if(format < FORMAT_VERSION_1861)
+	byte32 = 6; // KINGDOMMAX;
+    else
+	msg.Pop(byte32);
     if(format >= FORMAT_VERSION_1859)
     {
-	for(u16 ii = 0; ii < KINGDOMMAX; ++ii)
+	for(u16 ii = 0; ii < byte32; ++ii)
 	{
 	    msg.Pop(byte8);
-	    conf.current_maps_file.aliases[ii] = byte8;
+	    conf.current_maps_file.unions[ii] = byte8;
 	}
     }
     // maps name

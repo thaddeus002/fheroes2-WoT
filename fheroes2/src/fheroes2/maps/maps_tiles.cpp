@@ -2308,12 +2308,14 @@ bool Maps::Tiles::isFog(u8 color) const
 
 void Maps::Tiles::SetFog(u8 color)
 {
-    fogs |= color;
+    const Settings & conf = Settings::Get();
+    fogs |= (conf.ExtUnionsAllowViewMaps() ? conf.GetUnions(color) : color);
 }
 
 void Maps::Tiles::ClearFog(u8 color)
 {
-    if(fogs & color) fogs &= ~color;
+    const Settings & conf = Settings::Get();
+    fogs &= ~(conf.ExtUnionsAllowViewMaps() ? conf.GetUnions(color) : color);
 }
 
 bool Maps::Tiles::NeedRedraw(void) const

@@ -228,7 +228,9 @@ bool isNeedStayFrontObject(const Heroes & hero, const Maps::Tiles & next)
 	    {
 		const Castle *castle = world.GetCastle(next.GetIndex());
 
-		if(castle && hero.GetColor() != castle->GetColor()) return true;
+		return (castle &&
+			hero.GetColor() != castle->GetColor() &&
+		        !Settings::Get().IsUnions(hero.GetColor(), castle->GetColor()));
 	    }
 	    break;
 

@@ -103,6 +103,9 @@ static const settings_t settingsFHeroes2[] =
     { Settings::WORLD_ARTIFACT_CRYSTAL_BALL,	_("artifact: Crystal Ball also added Identify Hero and Visions spells"), },
     { Settings::CASTLE_ALLOW_BUY_FROM_WELL,	_("castle: allow buy from well"),			},
     { Settings::HEROES_LEARN_SPELLS_WITH_DAY,	_("heroes: learn new spells with day"),  		},
+    { Settings::UNIONS_ALLOW_HERO_MEETINGS,	_("unions: allow meeting heroes"),                      },
+    { Settings::UNIONS_ALLOW_CASTLE_VISITING,	_("unions: allow castle visiting"),                     },
+    { Settings::UNIONS_ALLOW_VIEW_MAPS,		_("unions: allow view maps"),                           },
     { Settings::BATTLE_SHOW_DAMAGE,		_("battle: show damage info"),    			},
     { Settings::BATTLE_TROOP_DIRECTION,		_("battle: troop direction to move"),			},
     { Settings::BATTLE_SOFT_WAITING,		_("battle: soft wait troop"),				},
@@ -843,6 +846,38 @@ u16 Settings::LossCountDays(void) const
     return current_maps_file.LossCountDays();
 }
 
+u8 Settings::GetUnions(u8 cl) const
+{
+    switch(cl)
+    {
+	case Color::BLUE:	return current_maps_file.unions[0];
+	case Color::GREEN:	return current_maps_file.unions[1];
+	case Color::RED:	return current_maps_file.unions[2];
+	case Color::YELLOW:	return current_maps_file.unions[3];
+	case Color::ORANGE:	return current_maps_file.unions[4];
+	case Color::PURPLE:	return current_maps_file.unions[5];
+	default: break;
+    }
+
+    return 0;
+}
+
+bool Settings::IsUnions(u8 cl1, u8 cl2) const
+{
+    switch(cl1)
+    {
+	case Color::BLUE:	return (current_maps_file.unions[0] & cl2);
+	case Color::GREEN:	return (current_maps_file.unions[1] & cl2);
+	case Color::RED:	return (current_maps_file.unions[2] & cl2);
+	case Color::YELLOW:	return (current_maps_file.unions[3] & cl2);
+	case Color::ORANGE:	return (current_maps_file.unions[4] & cl2);
+	case Color::PURPLE:	return (current_maps_file.unions[5] & cl2);
+	default: break;
+    }
+
+    return false;
+}
+
 void Settings::FixKingdomRandomRace(void)
 {
     for(Color::color_t color = Color::BLUE; color != Color::GRAY; ++color) if(KingdomColors(color))
@@ -1040,6 +1075,21 @@ bool Settings::ExtArtifactCrystalBall(void) const
 bool Settings::ExtLearnSpellsWithDay(void) const
 {
     return ExtModes(HEROES_LEARN_SPELLS_WITH_DAY);
+}
+
+bool Settings::ExtUnionsAllowCastleVisiting(void) const
+{
+    return ExtModes(UNIONS_ALLOW_CASTLE_VISITING);
+}
+
+bool Settings::ExtUnionsAllowHeroesMeetings(void) const
+{
+    return ExtModes(UNIONS_ALLOW_HERO_MEETINGS);
+}
+
+bool Settings::ExtUnionsAllowViewMaps(void) const
+{
+    return ExtModes(UNIONS_ALLOW_VIEW_MAPS);
 }
 
 bool Settings::ExtBattleShowDamage(void) const

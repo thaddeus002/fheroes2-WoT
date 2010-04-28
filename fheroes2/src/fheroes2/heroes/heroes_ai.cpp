@@ -285,13 +285,18 @@ void Heroes::AIAction(const u16 dst_index)
 
 void AIToHeroes(Heroes &hero, const u8 obj, const u16 dst_index)
 {
+    const Settings & conf = Settings::Get();
     Heroes *other_hero = world.GetHeroes(dst_index);
     if(! other_hero) return;
 
-    if(hero.GetColor() == other_hero->GetColor())
+    if(hero.GetColor() == other_hero->GetColor() ||
+	conf.IsUnions(hero.GetColor(), other_hero->GetColor()))
     {
         DEBUG(DBG_AI , DBG_INFO, "AIToHeroes: " << hero.GetName() << " meeting " << other_hero->GetName());
         VERBOSE("FIX: AI hero meeting");
+
+	//if(!conf.IsFrendly(hero.GetColor(), other_hero->GetColor()) ||
+        //    conf.ExtUnionsAllowHeroesMeetings());
         //hero.MeetingDialog(const_cast<Heroes &>(*other_hero));
     }
     else
@@ -333,14 +338,19 @@ void AIToHeroes(Heroes &hero, const u8 obj, const u16 dst_index)
 
 void AIToCastle(Heroes &hero, const u8 obj, const u16 dst_index)
 {
+    const Settings & conf = Settings::Get();
     Castle *castle = world.GetCastle(dst_index);
 
     if(! castle) return;
 
-    if(hero.GetColor() == castle->GetColor())
+    if(hero.GetColor() == castle->GetColor() ||
+	conf.IsUnions(hero.GetColor(), castle->GetColor()))
     {
         DEBUG(DBG_AI , DBG_INFO, "AIToCastle: " << hero.GetName() << " goto castle " << castle->GetName());
-	castle->GetMageGuild().EducateHero(hero);
+
+	if(!conf.IsUnions(hero.GetColor(), castle->GetColor()) ||
+    	    conf.ExtUnionsAllowCastleVisiting())
+		castle->GetMageGuild().EducateHero(hero);
     }
     else
     {
@@ -1549,16 +1559,22 @@ bool Heroes::AIPriorityObject(u16 index, u8 obj)
 	// capture enemy castle
 	case MP2::OBJ_CASTLE:
 	{
+	    const Settings & conf = Settings::Get();
 	    const Castle *castle = world.GetCastle(index);
-	    if(castle && GetColor() != castle->GetColor()) return true;
+	    if(castle && GetColor() != castle->GetColor())
+		// FIXME: AI skip visiting alliance
+		return conf.IsUnions(GetColor(), castle->GetColor()) ? false : true;
 	    break;
 	}
 
 	// kill enemy hero
 	case MP2::OBJ_HEROES:
 	{
+	    const Settings & conf = Settings::Get();
 	    const Heroes *hero = world.GetHeroes(index);
-	    if(hero && GetColor() != hero->GetColor()) return true;
+	    if(hero && GetColor() != hero->GetColor())
+		// FIXME: AI skip visiting alliance
+		return conf.IsUnions(GetColor(), hero->GetColor()) ? false : true;
 	    break;
 	}
 
@@ -1909,19 +1925,33 @@ bool Heroes::AIValidObject(u16 index, u8 obj)
 
 	case MP2::OBJ_CASTLE:
 	{
+	    const Settings & conf = Settings::Get();
 	    const Castle *castle = world.GetCastle(index);
-	    if(castle &&
-		(GetColor() == castle->GetColor() ||
-		(GetArmy().StrongerEnemyArmy(castle->GetActualArmy())))) return true;
+	    if(castle)
+	    {
+		if(GetColor() == castle->GetColor()) return true;
+		else
+		// FIXME: AI skip visiting alliance
+		if(conf.IsUnions(GetColor(), castle->GetColor())) return false;
+		else
+		if(GetArmy().StrongerEnemyArmy(castle->GetActualArmy())) return true;
+	    }
 	    break;
 	}
 
 	case MP2::OBJ_HEROES:
 	{
+	    const Settings & conf = Settings::Get();
 	    const Heroes *hero = world.GetHeroes(index);
-	    if(hero &&
-		(GetColor() == hero->GetColor() ||
-		 GetArmy().StrongerEnemyArmy(hero->GetArmy()))) return true;
+	    if(hero)
+	    {
+		if(GetColor() == hero->GetColor()) return true;
+		else
+		// FIXME: AI skip visiting alliance
+		if(conf.IsUnions(GetColor(), hero->GetColor())) return false;
+		else
+		if(GetArmy().StrongerEnemyArmy(hero->GetArmy())) return true;
+	    }
 	    break;
 	}
 

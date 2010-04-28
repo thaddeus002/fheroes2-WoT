@@ -136,7 +136,7 @@ public:
 
     void DrawImageCastle(const Point & pt);
 
-    Dialog::answer_t OpenDialog(bool fade = false);
+    Dialog::answer_t OpenDialog(bool readonly = false, bool fade = false);
 
     s8 GetAttackModificator(std::string *strs) const;
     s8 GetDefenseModificator(std::string *strs) const;

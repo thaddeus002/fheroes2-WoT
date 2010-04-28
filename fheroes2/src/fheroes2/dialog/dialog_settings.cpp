@@ -150,6 +150,11 @@ void Dialog::ExtSettings(void)
     states.push_back(Settings::HEROES_LEARN_SPELLS_WITH_DAY);
     if(conf.VideoMode().w >= 640 && conf.VideoMode().w >= 480)
 	states.push_back(Settings::CASTLE_ALLOW_BUY_FROM_WELL);
+
+    states.push_back(Settings::UNIONS_ALLOW_HERO_MEETINGS);
+    states.push_back(Settings::UNIONS_ALLOW_CASTLE_VISITING);
+    states.push_back(Settings::UNIONS_ALLOW_VIEW_MAPS);
+
     states.push_back(Settings::BATTLE_SHOW_DAMAGE);
     states.push_back(Settings::BATTLE_SOFT_WAITING);
     states.push_back(Settings::BATTLE_TROOP_DIRECTION);

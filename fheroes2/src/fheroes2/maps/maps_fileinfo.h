@@ -69,7 +69,7 @@ namespace Maps
     u8 size_h;
     u8 difficulty;
     u8 races[KINGDOMMAX];
-    u8 aliases[KINGDOMMAX];
+    u8 unions[KINGDOMMAX];
 
     u8 kingdom_colors;
     u8 allow_colors;

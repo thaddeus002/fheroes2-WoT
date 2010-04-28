@@ -65,14 +65,11 @@ Race::race_t ByteToRace(u8 byte)
 Maps::FileInfo::FileInfo() : difficulty(Difficulty::EASY),
     kingdom_colors(0), allow_colors(0), rnd_colors(0), rnd_races(0), localtime(0), with_heroes(false)
 {
-    for(u8 ii = 0; ii < KINGDOMMAX; ++ii) races[ii] = Race::BOMG;
-
-    aliases[0] = Color::BLUE;
-    aliases[1] = Color::GREEN;
-    aliases[2] = Color::RED;
-    aliases[3] = Color::YELLOW;
-    aliases[4] = Color::ORANGE;
-    aliases[5] = Color::PURPLE;
+    for(u8 ii = 0; ii < KINGDOMMAX; ++ii)
+    {
+	races[ii] = Race::BOMG;
+	unions[ii] = 0;
+    }
 }
 
 bool Maps::FileInfo::ReadSAV(const std::string & filename)
@@ -301,6 +298,35 @@ bool Maps::FileInfo::ReadMP2(const std::string & filename)
 
     fd.close();
     
+    //fill unions
+    if(4 == conditions_wins)
+    {
+	u16 index = 0;
+	u8 side1 = 0;
+	u8 side2 = 0;
+
+	for(Color::color_t cl = Color::BLUE; cl < Color::GRAY; ++cl, ++index) if(cl & kingdom_colors)
+	{
+	    if(index < wins3)
+		side1 |= cl;
+	    else
+		side2 |= cl;
+	}
+
+	for(u8 ii = 0; ii < KINGDOMMAX; ++ii)
+	{
+	    Color::color_t cl = Color::GetFromIndex(ii);
+	
+	    if(side1 & cl)
+		unions[ii] = side1;
+	    else
+	    if(side2 & cl)
+		unions[ii] = side2;
+	    else
+		unions[ii] = cl;
+	}
+    }
+
     return true;
 }
 

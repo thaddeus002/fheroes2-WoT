@@ -511,7 +511,8 @@ void Dialog::QuickInfo(const Castle & castle)
     text.Blit(dst_pt);
 
     u8 count = castle.GetArmy().GetCount();
-    bool hide = Settings::Get().MyColor() != castle.GetColor();
+    const Settings & conf = Settings::Get();
+    bool hide = Settings::Get().MyColor() != castle.GetColor() && !conf.IsUnions(conf.MyColor(), castle.GetColor());
 
     if(hide)
     {
@@ -703,11 +704,11 @@ void Dialog::QuickInfo(const Heroes & hero)
     text.Blit(dst_pt);
 
     // draw monster sprite in one string
-    const u8 mycolor = Settings::Get().MyColor();
-    bool hide = mycolor != hero.GetColor();
+    const Settings & conf = Settings::Get();
+    bool hide = conf.MyColor() != hero.GetColor() && !conf.IsUnions(conf.MyColor(), hero.GetColor());
 
     // check spell identify hero
-    if(hide && world.GetKingdom(mycolor).Modes(Kingdom::IDENTIFYHERO)) hide = false;
+    if(hide && world.GetKingdom(conf.MyColor()).Modes(Kingdom::IDENTIFYHERO)) hide = false;
 
     // check scouting expert
     if(hide)

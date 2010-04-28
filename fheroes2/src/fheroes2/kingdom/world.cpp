@@ -1928,8 +1928,18 @@ u16 World::CheckKingdomWins(const Kingdom & kingdom) const
 	}
     }
     else
-    if((conf.ConditionWins() & GameOver::WINS_SIDE) && CheckKingdomNormalVictory(kingdom))
-	return GameOver::WINS_ALL;
+    if(conf.ConditionWins() & GameOver::WINS_SIDE)
+    {
+	u8 side1 = conf.GetUnions(kingdom.GetColor());
+	u8 side2 = conf.KingdomColors() & ~side1;
+	u8 loss  = 0;
+
+        for(Color::color_t cl = Color::BLUE; cl < Color::GRAY; ++cl)
+    	    if(world.GetKingdom(cl).isLoss()) loss |= cl;
+
+	if(side2 == (loss & side2))
+	    return GameOver::WINS_SIDE;
+    }
     else
     if(conf.ConditionWins() & GameOver::WINS_GOLD)
     {
