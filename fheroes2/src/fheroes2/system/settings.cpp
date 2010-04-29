@@ -327,7 +327,7 @@ void Settings::Dump(std::ostream & stream) const
     stream << "fonts normal = " << font_normal << std::endl;
     stream << "fonts small = " << font_small << std::endl;
     if(force_lang.size())
-    stream << "force lang = " << force_lang << std::endl;
+    stream << "lang = " << force_lang << std::endl;
     stream << "fonts normal size = " << static_cast<int>(size_normal) << std::endl;
     stream << "fonts small size = " << static_cast<int>(size_small) << std::endl;
     stream << "unicode = " << (opt_global.Modes(GLOBAL_USEUNICODE) ? "on" : "off") << std::endl;

@@ -337,13 +337,13 @@ void SetTimidityEnvPath(const Settings & conf)
 void SetLangEnvPath(const Settings & conf)
 {
 #ifdef WITH_TTF
-    std::string strtmp;
     if(conf.ForceLang().size())
     {
-	strtmp = "LANG=" + conf.ForceLang();
-	putenv(const_cast<char *>(strtmp.c_str()));
+	static std::string language("LANGUAGE=" + conf.ForceLang());
+    	putenv(const_cast<char*>(language.c_str()));
     }
-    strtmp = conf.LocalPrefix() + SEPARATOR + "files" + SEPARATOR + "lang";
+
+    const std::string strtmp = conf.LocalPrefix() + SEPARATOR + "files" + SEPARATOR + "lang";
     setlocale(LC_ALL, "");
     bindtextdomain(GETTEXT_PACKAGE, strtmp.c_str());
     bind_textdomain_codeset(GETTEXT_PACKAGE, "UTF-8");
