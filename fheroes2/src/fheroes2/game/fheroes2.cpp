@@ -340,7 +340,9 @@ void SetLangEnvPath(const Settings & conf)
     if(conf.ForceLang().size())
     {
 	static std::string language("LANGUAGE=" + conf.ForceLang());
+	static std::string lang("LANG=" + conf.ForceLang());
     	putenv(const_cast<char*>(language.c_str()));
+    	putenv(const_cast<char*>(lang.c_str()));
     }
 
     const std::string strtmp = conf.LocalPrefix() + SEPARATOR + "files" + SEPARATOR + "lang";
