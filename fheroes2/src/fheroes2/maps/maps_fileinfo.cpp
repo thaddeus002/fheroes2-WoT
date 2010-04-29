@@ -68,7 +68,7 @@ Maps::FileInfo::FileInfo() : difficulty(Difficulty::EASY),
     for(u8 ii = 0; ii < KINGDOMMAX; ++ii)
     {
 	races[ii] = Race::BOMG;
-	unions[ii] = 0;
+	unions[ii] = Color::GetFromIndex(ii);
     }
 }
 
