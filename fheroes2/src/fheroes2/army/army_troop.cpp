@@ -129,8 +129,10 @@ void Army::Troop::BattleQuit(void)
     {
 	if(battle->dead > count)
 	{
+	    // here:
+	    // - skeletons up
+	    
 	    VERBOSE("Army::Troop::BattleQuit: " << GetName() << ", dead(" << battle->dead << ") > current(" << count << ") incorrect!! FIXME!");
-	    count = 0;
 	}
 	else
 	    count -= battle->dead;
