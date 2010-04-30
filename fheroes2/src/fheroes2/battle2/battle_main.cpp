@@ -43,7 +43,7 @@ namespace Battle2
 {
     void PickupArtifactsAction(HeroBase &, HeroBase &, bool);
     void EagleEyeSkillAction(HeroBase &, const std::vector<u8> &, bool);
-    void NecromancySkillAction(Army::army_t &, Army::army_t &, bool);
+    void NecromancySkillAction(Army::army_t &, u32, bool);
 }
 
 Battle2::Result Battle2::Loader(Army::army_t & army1, Army::army_t & army2, u16 mapsindex)
@@ -118,6 +118,11 @@ Battle2::Result Battle2::Loader(Army::army_t & army1, Army::army_t & army2, u16 
     // dialog summary
     if(local) arena.DialogBattleSummary(result);
 
+    const u32 killed2 = army_loss ? army_loss->BattleKilled() : 0;
+
+    army1.BattleQuit();
+    army2.BattleQuit();
+
     // pickup artifact
     if(army_wins && army_wins->GetCommander() &&
 	army_loss && army_loss->GetCommander() &&
@@ -133,12 +138,9 @@ Battle2::Result Battle2::Loader(Army::army_t & army1, Army::army_t & army2, u16 
 	    EagleEyeSkillAction(*army_wins->GetCommander(), arena.GetUsageSpells(), local && (Game::LOCAL == army_wins->GetControl()));
 
     // necromancy capability
-    if(army_wins && army_wins->GetCommander() && army_loss &&
+    if(army_wins && army_wins->GetCommander() &&
 	army_wins->GetCommander()->GetLevelSkill(Skill::Secondary::NECROMANCY))
-	    NecromancySkillAction(*army_wins, *army_loss, local && (Game::LOCAL == army_wins->GetControl()));
-
-    army1.BattleQuit();
-    army2.BattleQuit();
+	    NecromancySkillAction(*army_wins, killed2, local && (Game::LOCAL == army_wins->GetControl()));
 
     // update army
     if(army1.GetCommander() && Skill::Primary::HEROES == army1.GetCommander()->GetType())
@@ -259,9 +261,8 @@ void Battle2::EagleEyeSkillAction(HeroBase & hero, const std::vector<u8> & spell
     }
 }
 
-void Battle2::NecromancySkillAction(Army::army_t & army1, Army::army_t & army2, bool local)
+void Battle2::NecromancySkillAction(Army::army_t & army1, u32 killed, bool local)
 {
-    const u32 killed = army2.BattleKilled();
     if(0 == killed ||
 	(army1.GetCount() == army1.Size() && !army1.HasMonster(Monster::SKELETON))) return;
 
