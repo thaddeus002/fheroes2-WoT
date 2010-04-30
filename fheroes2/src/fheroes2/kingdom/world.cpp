@@ -1569,20 +1569,33 @@ void World::UpdateDwellingPopulation(void)
             case MP2::OBJ_CITYDEAD:
 	    {
 		const Monster m(Monster::FromObject(obj));
-        	// quantity4 - flag guardians beaten
-		count = (0 == tile.GetQuantity4() ? 0 : m.GetRNDSize(true));
+		count = m.GetRNDSize(true);
 		break;
 	    }
 
             case MP2::OBJ_DRAGONCITY:
-        	// quantity4 - flag guardians beaten
-        	count = (0 == tile.GetQuantity4() ? 0 : 1);
+        	count = 1;
         	break;
 
 	    default: break;
 	}
 
-	if(count) tile.SetCountMonster(tile.GetCountMonster() + static_cast<u16>(1 < day ? count : count * 3 / 2));
+	if(week == 1)
+	    count = count * 3 / 2;
+	else
+        // check guardians beaten
+	switch(obj)
+	{
+            case MP2::OBJ_TROLLBRIDGE:
+            case MP2::OBJ_CITYDEAD:
+            case MP2::OBJ_DRAGONCITY:
+		if(0 == tile.GetQuantity4()) count = 0;
+		break;
+
+	    default: break;
+	}
+		
+	if(count) tile.SetCountMonster(tile.GetCountMonster() + static_cast<u16>(count));
     }
 }
 
