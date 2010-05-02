@@ -859,24 +859,6 @@ u32 Battle2::Stats::ApplyDamage(Stats & enemy, u32 dmg)
         affected.RemoveMode(IS_PARALYZE_MAGIC);
     }
 
-    // remove blind action
-    if(enemy.isArchers() && Modes(SP_BLIND))
-    {
-    	SetModes(TR_RESPONSED);
-    	SetModes(TR_MOVED);
-        ResetModes(SP_BLIND);
-        affected.RemoveMode(SP_BLIND);
-    }
-    else
-    // remove after response, because SP_BLIND used in GetDamage
-    if(enemy.Modes(SP_BLIND))
-    {
-    	enemy.SetModes(TR_RESPONSED);
-    	enemy.SetModes(TR_MOVED);
-        enemy.ResetModes(SP_BLIND);
-        enemy.affected.RemoveMode(SP_BLIND);
-    }
-
     return killed;
 }
 
@@ -990,7 +972,7 @@ void Battle2::Stats::PostAttackAction(Stats & enemy)
 	if(!hero || !hero->HasArtifact(Artifact::AMMO_CART))
 	    --shots;
     }
-    
+
     // clean berserker spell
     if(Modes(SP_BERSERKER))
     {
@@ -1013,6 +995,17 @@ void Battle2::Stats::PostAttackAction(Stats & enemy)
     // clean luck capability
     ResetModes(LUCK_GOOD);
     ResetModes(LUCK_BAD);
+}
+
+void Battle2::Stats::ResetBlind(void)
+{
+    // remove blind action
+    if(Modes(SP_BLIND))
+    {
+    	SetModes(TR_MOVED);
+        ResetModes(SP_BLIND);
+        affected.RemoveMode(SP_BLIND);
+    }
 }
 
 u16 Battle2::Stats::GetAttack(void) const
@@ -1573,7 +1566,8 @@ u8 Battle2::Stats::GetMagicResist(u8 spell, u8 spower) const
 	// 25% unfortunatly
 	case Monster::DWARF:
 	case Monster::BATTLE_DWARF:
-            return 25;
+	    if(Spell::isDamage(spell) || Spell::isApplyToEnemies(spell)) return 25;
+            break;
 
         case Monster::GREEN_DRAGON:
         case Monster::RED_DRAGON:
@@ -1595,7 +1589,6 @@ u8 Battle2::Stats::GetMagicResist(u8 spell, u8 spower) const
             }
             break;
 
-        case Monster::PEASANT:
         case Monster::CRUSADER:
             switch(spell)
             {

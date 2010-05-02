@@ -151,6 +151,7 @@ namespace Battle2
 	bool	ApplySpell(u8, const HeroBase* hero, TargetInfo &);
 	bool	AllowApplySpell(u8, const HeroBase* hero, std::string* msg = NULL) const;
 	void	PostAttackAction(Stats &);
+	void	ResetBlind(void);
 	void	SpellModesAction(u8, u8, const HeroBase*);
 	void	SpellApplyDamage(u8, u8, const HeroBase*, TargetInfo &);
 	void	SpellRestoreAction(u8, u8, const HeroBase*);

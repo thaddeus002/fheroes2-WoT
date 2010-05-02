@@ -305,6 +305,8 @@ void Battle2::Arena::ApplyActionAttack(Action & action)
 		    b2->SetResponse();
 		}
 
+		if(b2->Modes(SP_BLIND)) b2->ResetBlind();
+
 		// twice attack
 		if(b1->isValid() && b1->isTwiceAttack())
 		    BattleProcess(*b1, *b2);
@@ -681,7 +683,7 @@ void Battle2::Arena::GetTargetsForSpells(const HeroBase* hero, const u8 spell, c
     }
 
     // resurrect spell? get target from graveyard
-    if(board.size() > dst && isAllowResurrectFromGraveyard(spell, dst))
+    if(NULL == target && isAllowResurrectFromGraveyard(spell, dst))
     {
         target = GetTroopID(graveyard.GetLastTroopIDFromCell(dst));
 

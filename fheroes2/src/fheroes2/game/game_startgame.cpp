@@ -720,6 +720,7 @@ Game::menu_t Game::HumanTurn(void)
 
     I.radar.SetHide(false);
     I.statusWindow.Reset();
+    I.gameArea.SetUpdateCursor();
     I.Redraw(REDRAW_GAMEAREA | REDRAW_RADAR | REDRAW_ICONS | REDRAW_BUTTONS | REDRAW_STATUS | REDRAW_BORDER);
 
     AGG::PlayMusic(MUS::FromGround(world.GetTiles(global_focus.Center()).GetGround()));
