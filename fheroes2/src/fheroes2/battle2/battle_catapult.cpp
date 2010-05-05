@@ -115,34 +115,34 @@ Point Battle2::Catapult::GetTargetPosition(u8 target) const
     return res;
 }
 
-u8 Battle2::Catapult::GetTarget(void) const
+u8 Battle2::Catapult::GetTarget(const std::vector<u8> & values) const
 {
     std::vector<u8> targets;
     targets.reserve(4);
 
     // check walls
-    if(0 != arena.board[8].object)  targets.push_back(CAT_WALL1);
-    if(0 != arena.board[29].object) targets.push_back(CAT_WALL2);
-    if(0 != arena.board[73].object) targets.push_back(CAT_WALL3);
-    if(0 != arena.board[96].object) targets.push_back(CAT_WALL4);
+    if(0 != values[CAT_WALL1]) targets.push_back(CAT_WALL1);
+    if(0 != values[CAT_WALL2]) targets.push_back(CAT_WALL2);
+    if(0 != values[CAT_WALL3]) targets.push_back(CAT_WALL3);
+    if(0 != values[CAT_WALL4]) targets.push_back(CAT_WALL4);
 
     // check right/left towers
     if(targets.empty())
     {
-	if(arena.towers[0] && arena.towers[0]->isValid()) targets.push_back(CAT_TOWER1);
-	if(arena.towers[2] && arena.towers[2]->isValid()) targets.push_back(CAT_TOWER2);
+	if(values[CAT_TOWER1]) targets.push_back(CAT_TOWER1);
+	if(values[CAT_TOWER2]) targets.push_back(CAT_TOWER2);
     }
 
     // check bridge
     if(targets.empty())
     {
-	if(arena.bridge->isValid()) targets.push_back(CAT_BRIDGE);
+	if(values[CAT_BRIDGE]) targets.push_back(CAT_BRIDGE);
     }
 
     // check general tower
     if(targets.empty())
     {
-	if(arena.towers[1] && arena.towers[1]->isValid()) targets.push_back(CAT_TOWER3);
+	if(values[CAT_TOWER3]) targets.push_back(CAT_TOWER3);
     }
 
     if(targets.size())
@@ -162,12 +162,26 @@ void Battle2::Catapult::Action(void)
     action.SetID(MSG_BATTLE_CATAPULT);
 
     u8 shots = GetShots();
+    std::vector<u8> values;
+    values.resize(CAT_MISS, 0);
+
+    values[CAT_WALL1] = arena.GetCastleTargetValue(CAT_WALL1);
+    values[CAT_WALL2] = arena.GetCastleTargetValue(CAT_WALL2);
+    values[CAT_WALL3] = arena.GetCastleTargetValue(CAT_WALL3);
+    values[CAT_WALL4] = arena.GetCastleTargetValue(CAT_WALL4);
+    values[CAT_TOWER1] = arena.GetCastleTargetValue(CAT_TOWER1);
+    values[CAT_TOWER2] = arena.GetCastleTargetValue(CAT_TOWER2);
+    values[CAT_TOWER3] = arena.GetCastleTargetValue(CAT_TOWER3);
+    values[CAT_BRIDGE] = arena.GetCastleTargetValue(CAT_BRIDGE);
+
     action.Push(shots);
     while(shots--)
     {
-	u8 target = GetTarget();
+	const u8 target = GetTarget(values);
+	const u8 damage = GetDamage(target);
 	action.Push(target);
-	action.Push(GetDamage(target));
+	action.Push(damage);
+	values[target] -= damage;
     }
 
     arena.ApplyAction(action);

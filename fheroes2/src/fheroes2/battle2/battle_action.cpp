@@ -848,9 +848,8 @@ void Battle2::Arena::ApplyActionCatapult(Action & action)
 	    {
 		if(interface) interface->RedrawActionCatapult(target);
 		SetCastleTargetValue(target, GetCastleTargetValue(target) - damage);
+		DEBUG(DBG_BATTLE, DBG_TRACE, "Battle2::Arena::ApplyActionCatapult: " << "target: " << static_cast<int>(target));
 	    }
-
-	    DEBUG(DBG_BATTLE, DBG_TRACE, "Battle2::Arena::ApplyActionCatapult: " << "target: " << static_cast<int>(target));
 	}
     }
     else

@@ -36,7 +36,7 @@ namespace Battle2
 
 	Point GetTargetPosition(u8) const;
 	u8 GetShots(void) const;
-	u8 GetTarget(void) const;
+	u8 GetTarget(const std::vector<u8> &) const;
 	u8 GetDamage(u8);
 	void Action(void);
 
