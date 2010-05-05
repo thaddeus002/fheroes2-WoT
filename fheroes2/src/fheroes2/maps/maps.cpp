@@ -356,6 +356,9 @@ void Maps::MinimizeAreaForCastle(const Point & center)
     {
         Maps::Tiles & tile = world.GetTiles((center.y + yy) * world.h() + center.x + xx);
 
+	// skip angle
+	if(yy == -1 && (xx == -2 || xx == 2)) continue;
+
         tile.SetObject(MP2::OBJN_CASTLE);
     }
 

@@ -184,7 +184,6 @@ public:
 
 private:
     void RedrawResourcePanel(const Point &);
-    void TownUpgradeToCastle(void);
     Rect GetCoordBuilding(building_t building, const Point & pt);
     u32  OpenTown(void);
     void OpenTavern(void);
