@@ -1601,11 +1601,12 @@ void Heroes::ActionNewPosition(void)
     // check around monster
     const u16 dst_around = Maps::TileUnderProtection(GetIndex());
 
-    for(Direction::vector_t dir = Direction::TOP_LEFT; dir < Direction::CENTER; ++dir) if(dst_around & dir)
+    if(dst_around)
     {
-	if(isFreeman())
-	    break;
-	else
+	SetMove(false);
+
+	for(Direction::vector_t dir = Direction::TOP_LEFT; dir < Direction::CENTER && !isFreeman(); ++dir)
+	    if(dst_around & dir)
 	{
 	    const u16 mons = Maps::GetDirectionIndex(GetIndex(), dir);
 
@@ -1614,13 +1615,15 @@ void Heroes::ActionNewPosition(void)
 	    {
 		Interface::Basic & I = Interface::Basic::Get();
 		Game::Focus & F = Game::Focus::Get();
+        	Cursor::Get().Hide();
 		I.gameArea.Center(F.Center());
 		F.SetRedraw();
 		I.Redraw();
+        	Cursor::Get().Show();
+		// force flip, for monster attack show sprite
+        	Display::Get().Flip();
 	    }
-
 	    Action(mons);
-	    SetMove(false);
 	}
     }
 
