@@ -58,6 +58,7 @@ namespace Battle2
 
     Result Loader(Army::army_t &, Army::army_t &, u16);
     void UpdateMonsterInfoAnimation(const std::string &);
+    void UpdateMonsterAttributes(const std::string &);
 
     enum direction_t
     {

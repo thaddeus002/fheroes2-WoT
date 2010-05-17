@@ -396,11 +396,17 @@ void LoadExternalResource(const Settings & conf)
     if(FilePresent(spec))
 	Game::UpdateGlobalDefines(spec);
     
+    // animations.xml
+    spec = conf.LocalPrefix() + SEPARATOR + "files" + SEPARATOR + "stats" + SEPARATOR + "animations.xml";
+
+    if(FilePresent(spec))
+	Battle2::UpdateMonsterInfoAnimation(spec);
+
     // battle.xml
     spec = conf.LocalPrefix() + SEPARATOR + "files" + SEPARATOR + "stats" + SEPARATOR + "battle.xml";
 
     if(FilePresent(spec))
-	Battle2::UpdateMonsterInfoAnimation(spec);
+	Battle2::UpdateMonsterAttributes(spec);
 
     // monsters.xml
     spec = conf.LocalPrefix() + SEPARATOR + "files" + SEPARATOR + "stats" + SEPARATOR + "monsters.xml";

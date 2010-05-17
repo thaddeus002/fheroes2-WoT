@@ -133,9 +133,11 @@ namespace Battle2
         { ICN::UNKNOWN , { 0, 0}, { 0, 0}, { 0, 0}, { 0, 0}, { 0, 0}, { 0, 0}, { 0, 0}, { 0, 0}, { 0, 0}, { 0, 0}, { 0, 0}, { 0, 0}, { 0, 0}, { 0, 0}, { 0, 0}, M82::UNKNOWN, M82::UNKNOWN, M82::UNKNOWN, M82::UNKNOWN },
 	{ ICN::UNKNOWN , { 0, 0}, { 0, 0}, { 0, 0}, { 0, 0}, { 0, 0}, { 0, 0}, { 0, 0}, { 0, 0}, { 0, 0}, { 0, 0}, { 0, 0}, { 0, 0}, { 0, 0}, { 0, 0}, { 0, 0}, M82::UNKNOWN, M82::UNKNOWN, M82::UNKNOWN, M82::UNKNOWN },
     };
+
+    static u8 genie_enemy_half_percent = 10;
 }
 
-void Battle2::UpdateMonsterInfoAnimation(const std::string & spec)
+void Battle2::UpdateMonsterAttributes(const std::string & spec)
 {
 #ifdef WITH_XML
     // parse battle.xml
@@ -145,7 +147,34 @@ void Battle2::UpdateMonsterInfoAnimation(const std::string & spec)
     if(doc.LoadFile(spec.c_str()) &&
         NULL != (xml_battle = doc.FirstChildElement("battle")))
     {
-        const TiXmlElement* xml_icn = xml_battle->FirstChildElement("icn");
+	const TiXmlElement* xml_element;
+	int value;
+
+        // genie
+        xml_element = xml_battle->FirstChildElement("genie");
+        if(xml_element)
+        {
+	    xml_element->Attribute("enemy_half_percent", &value);
+	    if(value > 100) value = 100;
+	    genie_enemy_half_percent = value;
+	}
+    }
+    else
+    VERBOSE(spec << ": " << doc.ErrorDesc());
+#endif
+}
+
+void Battle2::UpdateMonsterInfoAnimation(const std::string & spec)
+{
+#ifdef WITH_XML
+    // parse battle.xml
+    TiXmlDocument doc;
+    const TiXmlElement* xml_animation = NULL;
+
+    if(doc.LoadFile(spec.c_str()) &&
+        NULL != (xml_animation = doc.FirstChildElement("animations")))
+    {
+        const TiXmlElement* xml_icn = xml_animation->FirstChildElement("icn");
         for(; xml_icn; xml_icn = xml_icn->NextSiblingElement("icn"))
 	{
 	    std::string icn_name(xml_icn->Attribute("name"));
@@ -715,20 +744,32 @@ u32 Battle2::Stats::GetDamage(const Stats & enemy) const
 	    if(enemy.troop.isUndead()) dmg *= 2;
 	    break;
 
-	case Monster::GENIE:
-	    // 10% half
-	    if(7 == Rand::Get(1, 10)) dmg = enemy.hp / 2;
-	    break;
-
 	default: break;
     }
 
     // approximate.. from faq
     int r = GetAttack() - enemy.GetDefense();
-
     if(enemy.troop.isDragons() && Modes(SP_DRAGONSLAYER)) r+= Spell::GetExtraValue(Spell::DRAGONSLAYER);
-
     dmg *= 1 + (0 < r ? 0.1 * std::min(r,  20) : 0.05 * std::max(r, -15));
+
+    switch(troop())
+    {
+	case Monster::GENIE:
+	    // 10% half
+	    if(genie_enemy_half_percent >= Rand::Get(1, 100))
+	    {
+		dmg = enemy.hp / 2;
+		if(arena->interface)
+		{
+		    std::string str(_("%{name} half the enemy troops!"));
+		    String::Replace(str, "%{name}", GetName());
+		    arena->interface->SetStatus(str, true);
+		}
+	    }
+	    break;
+
+	default: break;
+    }
 
     return dmg < 1 ? 1 : static_cast<u32>(dmg);
 }
