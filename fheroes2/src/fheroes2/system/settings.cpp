@@ -213,7 +213,7 @@ bool Settings::Read(const std::string & filename)
 	    else
 	    if(lower_right == "off")
 	    {
-		if(left == "debug") debug = DEFAULT_DEBUG;
+		if(left == "debug") debug = 0;
 		else
 		{
 		    const settings_t* ptr = std::find(settingsGeneral,
