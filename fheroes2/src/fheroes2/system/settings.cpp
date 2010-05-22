@@ -24,6 +24,7 @@
 #include <fstream>
 #include <bitset>
 #include "maps.h"
+#include "tinyconfig.h"
 #include "settings.h"
 
 #define DEFAULT_PORT	5154
@@ -172,65 +173,234 @@ Settings & Settings::Get(void)
 
 bool Settings::Read(const std::string & filename)
 {
-    if(filename.empty()) return false;
+    Tiny::Config config;
+    const Tiny::Entry* entry = NULL;
+    config.SetSeparator('=');
+    config.SetComment('#');
+    if(! config.Load(filename.c_str())) return false;
 
-    // read
-    std::ifstream file(filename.c_str());
+    LocalEvent & le = LocalEvent::Get();
 
-    if(!file.is_open()) return false;
+    // debug
+    entry = config.Find("debug");
+    if(NULL == entry)
+	debug = DEFAULT_DEBUG;
+    else
+	debug = entry->IntParams();
 
-    std::string str;
-
-    while(std::getline(file, str))
+    // opt_globals
+    const settings_t* ptr = settingsGeneral;
+    while(ptr->id)
     {
-	if(String::Comment(str) || 0 == str.size()) continue;
-
-	const size_t pos = str.find('=');
-
-	if(std::string::npos != pos)
+	entry = config.Find(ptr->str);
+	if(entry)
 	{
-	    std::string left(str.substr(0, pos));
-	    std::string right(str.substr(pos + 1, str.length() - pos - 1));
-
-	    String::Trim(left);
-	    String::Trim(right);
-
-	    std::string lower_right(right);
-
-	    String::Lower(left);
-	    String::Lower(lower_right);
-
-	    if(lower_right == "on")
-	    {
-		if(left == "debug") debug = DEFAULT_DEBUG;
-		else
-		{
-		    const settings_t* ptr = std::find(settingsGeneral,
-				settingsGeneral + sizeof(settingsGeneral) / sizeof(settings_t) - 1, left);
-		    if(ptr->str) opt_global.SetModes(ptr->id);
-		}
-	    }
+	    if(0 == entry->IntParams())
+		opt_global.ResetModes(ptr->id);
 	    else
-	    if(lower_right == "off")
-	    {
-		if(left == "debug") debug = 0;
-		else
-		{
-		    const settings_t* ptr = std::find(settingsGeneral,
-				settingsGeneral + sizeof(settingsGeneral) / sizeof(settings_t) - 1, left);
-		    if(ptr->str) opt_global.ResetModes(ptr->id);
-		}
-	    }
+		opt_global.SetModes(ptr->id);
+	}
+	++ptr;
+    }
 
-	    Parse(left, right);
+    // maps directories
+    config.GetParams("maps", list_maps_directory);
+    list_maps_directory.sort();
+    list_maps_directory.unique();
+    
+    // data directory
+    entry = config.Find("data");
+    if(entry) path_data_directory = entry->StrParams();
+
+    // unicode
+    if(Unicode())
+    {
+	entry = config.Find("lang");
+	if(entry) force_lang = entry->StrParams();
+
+	entry = config.Find("fonts normal");
+	if(entry) font_normal = entry->StrParams();
+
+	entry = config.Find("fonts small");
+	if(entry) font_small = entry->StrParams();
+    
+	entry = config.Find("fonts normal size");
+	if(entry) size_normal = entry->IntParams();
+
+	entry = config.Find("fonts small size");
+	if(entry) size_small = entry->IntParams();
+
+	entry = config.Find("fonts render");
+	if(entry && entry->StrParams() == "blended") opt_global.SetModes(GLOBAL_FONTRENDERBLENDED);
+    }
+
+    // music
+    entry = config.Find("music");
+    if(entry)
+    {
+	if(entry->StrParams() == "midi")
+	{
+	    opt_global.ResetModes(GLOBAL_MUSIC);
+	    opt_global.SetModes(GLOBAL_MUSIC_MIDI);
+	}
+	else
+	if(entry->StrParams() == "cd")
+        {
+	    opt_global.ResetModes(GLOBAL_MUSIC);
+	    opt_global.SetModes(GLOBAL_MUSIC_CD);
+	}
+	else
+	if(entry->StrParams() == "ext")
+	{
+	    opt_global.ResetModes(GLOBAL_MUSIC);
+	    opt_global.SetModes(GLOBAL_MUSIC_EXT);
 	}
     }
 
-    file.close();
+    // sound volume
+    entry = config.Find("sound volume");
+    if(entry)
+    {
+	sound_volume = entry->IntParams();
+	if(sound_volume > 10) sound_volume = 10;
+    }
 
-    // remove dublicate dir
-    list_maps_directory.sort();
-    list_maps_directory.unique();
+    // music volume
+    entry = config.Find("music volume");
+    if(entry)
+    {
+	music_volume = entry->IntParams();
+	if(music_volume > 10) music_volume = 10;
+    }
+
+    // playmus command
+    entry = config.Find("playmus command");
+    if(entry) playmus_command = entry->StrParams();
+
+    // memory limit
+    entry = config.Find("memory limit");
+    if(entry) memory_limit = entry->IntParams();
+
+    // default depth
+    entry = config.Find("default depth");
+    if(entry) Surface::SetDefaultDepth(entry->IntParams());
+
+    // animation speed
+    entry = config.Find("animation");
+    if(entry) animation = entry->IntParams();
+
+    // network port
+    port = DEFAULT_PORT;
+    entry = config.Find("port");
+    if(entry) port = entry->IntParams();
+
+    // videodriver
+    entry = config.Find("videodriver");
+    if(entry) video_driver = entry->StrParams();
+
+    // pocketpc
+    if(PocketPC())
+    {
+	entry = config.Find("pointer offset x");
+	if(entry) le.SetMouseOffsetX(entry->IntParams());
+
+	entry = config.Find("pointer offset y");
+	if(entry) le.SetMouseOffsetY(entry->IntParams());
+
+	entry = config.Find("tap delay");
+	if(entry) le.SetTapDelayForRightClickEmulation(entry->IntParams());
+    }
+
+    // videomode
+    entry = config.Find("videomode");
+    if(entry)
+    {
+        // default
+	video_mode.w = 640;
+        video_mode.h = 480;
+
+        std::string value(entry->StrParams());
+        String::Lower(value);
+        const size_t pos = value.find('x');
+
+        if(std::string::npos != pos)
+        {
+    	    std::string width(value.substr(0, pos));
+	    std::string height(value.substr(pos + 1, value.length() - pos - 1));
+
+	    video_mode.w = String::ToInt(width);
+	    video_mode.h = String::ToInt(height);
+
+            if((video_mode.w % TILEWIDTH) || (video_mode.h % TILEWIDTH))
+            {
+                u16 possible_w = video_mode.w / TILEWIDTH;
+                u16 possible_h = video_mode.h / TILEWIDTH;
+
+		possible_w *= TILEWIDTH;
+                possible_h *= TILEWIDTH;
+
+#ifdef __SYMBIAN32__
+		if(possible_h == 224) possible_h = 240;
+                else
+                if(possible_h == 352) possible_h = 360;
+#endif
+                DEBUG(DBG_ENGINE , DBG_INFO, "Settings::Read: " << "videomode: " << video_mode.w << "x" << video_mode.h << ", current: " << value);
+                video_mode.w = possible_w;
+                video_mode.h = possible_h;
+	    }
+        }
+        else DEBUG(DBG_ENGINE , DBG_WARN, "Settings::Read: " << "unknown video mode: " << value);
+    }
+
+#ifdef WITHOUT_MOUSE
+    entry = config.Find("emulate mouse");
+    if(entry)
+    {
+	le.SetEmulateMouse(entry->IntParams());
+
+	entry = config.Find("emulate mouse up");
+	if(entry) le.SetEmulateMouseUpKey(entry->IntParams());
+
+	entry = config.Find("emulate mouse down");
+	if(entry) le.SetEmulateMouseDownKey(entry->IntParams());
+
+	entry = config.Find("emulate mouse left");
+	if(entry) le.SetEmulateMouseLeftKey(entry->IntParams());
+
+	entry = config.Find("emulate mouse right");
+	if(entry) le.SetEmulateMouseRightKey(entry->IntParams());
+
+	entry = config.Find("emulate mouse step");
+        if(entry) le.SetEmulateMouseStep(entry->IntParams());
+
+	entry = config.Find("emulate press left");
+	if(entry) le.SetEmulatePressLeftKey(entry->IntParams());
+
+	entry = config.Find("emulate press right");
+	if(entry) le.SetEmulatePressRightKey(entry->IntParams());
+    }
+#endif
+
+#ifdef WITH_KEYMAPPING
+    // load virtual key map
+    {
+	const Tiny::Entries & entries = config.GetEntries();
+	EntryConstIterator it1 = entries.begin();
+	EntryConstIterator it2 = entries.end();
+	for(; it1 != it2; ++it1)
+	{
+	    const std::string & key = (*it1).first;
+	    const std::string & val = (*it2).StrParams();
+	    if(4 < key.size() && 1 < value.size() && key.substr(0, 4) == "key_")
+	    {
+		int code = String::ToInt(key.substr(4));
+		DEBUG(DBG_ENGINE, DBG_INFO, "Settings::Read: " << key << ", set virtual key: " << code << ", to: " << KeySymFromChar(val[1]));
+		LocalEvent::Get().SetVirtualKey(code, KeySymFromChar(val[1]));
+	    }
+	}
+    }
+#endif
+
 
 #ifndef WITH_TTF
     opt_global.ResetModes(GLOBAL_USEUNICODE);
@@ -259,6 +429,10 @@ bool Settings::Read(const std::string & filename)
 	ExtResetModes(POCKETPC_HIDE_CURSOR);
 	ExtResetModes(POCKETPC_TAP_MODE);
 	ExtResetModes(POCKETPC_LOW_MEMORY);
+    }
+    else
+    {
+	opt_global.SetModes(GLOBAL_FULLSCREEN);
     }
 
     if(ExtModes(GAME_HIDE_INTERFACE))
@@ -446,172 +620,6 @@ bool Settings::NetworkLocalClient(void) const { return opt_global.Modes(GLOBAL_L
 
 /* get video mode */
 const Size & Settings::VideoMode(void) const { return video_mode; }
-
-void Settings::Parse(const std::string & left, const std::string & right)
-{
-    LocalEvent & le = LocalEvent::Get();
-
-    // debug
-    if(left == "debug") debug = String::ToInt(right);
-    else
-    //
-    if(left == "memory limit") memory_limit = String::ToInt(right);
-    else
-    // default depth
-    if(left == "default depth") Surface::SetDefaultDepth(String::ToInt(right));
-    else
-    // animation
-    if(left == "animation") animation = String::ToInt(right);
-    else
-    // playmus command
-    if(left == "playmus command") playmus_command = right;
-    // port
-    if(left == "port"){ port = String::ToInt(right); if(!port) port = DEFAULT_PORT; }
-    else
-    if(left == "videodriver") video_driver = right;
-    else
-    // font name
-    if(left == "lang") force_lang = right;
-    else
-    if(left == "fonts normal") font_normal = right;
-    else
-    if(left == "fonts small") font_small = right;
-    else
-    if(left == "fonts normal size") size_normal = String::ToInt(right);
-    else
-    if(left == "fonts small size") size_small = String::ToInt(right);
-    else
-    if(left == "fonts render" && right == "blended") opt_global.SetModes(GLOBAL_FONTRENDERBLENDED);
-    else
-    // data directory
-    if(left == "data") path_data_directory = right;
-    else
-    // maps directory
-    if(left == "maps") list_maps_directory.push_back(right);
-    else
-    if(left == "music")
-    {
-	std::string lower(right);
-	String::Lower(lower);
-
-        if(lower == "midi")
-        {
-            opt_global.ResetModes(GLOBAL_MUSIC);
-            opt_global.SetModes(GLOBAL_MUSIC_MIDI);
-        }
-        else if(lower == "cd")
-        {
-            opt_global.ResetModes(GLOBAL_MUSIC);
-            opt_global.SetModes(GLOBAL_MUSIC_CD);
-        }
-        else if(lower == "ext")
-        {
-            opt_global.ResetModes(GLOBAL_MUSIC);
-            opt_global.SetModes(GLOBAL_MUSIC_EXT);
-        }
-    }
-    else
-    // volume
-    if(left == "sound volume")
-    {
-	sound_volume = String::ToInt(right);
-	if(sound_volume > 10) sound_volume = 10;
-    }
-    else
-    // volume
-    if(left == "music volume")
-    {
-	music_volume = String::ToInt(right);
-	if(music_volume > 10) music_volume = 10;
-    }
-    else
-    // value
-    if(left == "videomode")
-    {
-	// default
-	video_mode.w = 640;
-	video_mode.h = 480;
-
-	std::string str(right);
-
-	String::Lower(str);
-
-	const size_t pos = str.find('x');
-
-	if("800x600" == right)
-	{
-	    video_mode.w = 800;
-	    video_mode.h = 576;
-	}
-	else
-	if(std::string::npos != pos)
-	{
-	    std::string left2(str.substr(0, pos));
-	    std::string right2(str.substr(pos + 1, str.length() - pos - 1));
-
-	    String::Trim(left2);
-	    String::Trim(right2);
-		
-	    video_mode.w = String::ToInt(left2);
-	    video_mode.h = String::ToInt(right2);
-
-	    if((video_mode.w % TILEWIDTH) || (video_mode.h % TILEWIDTH))
-	    {
-		u16 possible_w = video_mode.w / TILEWIDTH;
-		u16 possible_h = video_mode.h / TILEWIDTH;
-
-		possible_w *= TILEWIDTH;
-		possible_h *= TILEWIDTH;
-
-#ifdef __SYMBIAN32__
-		if(possible_h == 224) possible_h = 240;
-		else
-		if(possible_h == 352) possible_h = 360;
-#endif
-		DEBUG(DBG_ENGINE , DBG_INFO, "Settings::Parse: videomode: " << video_mode.w << "x" << video_mode.h << ", current: " << possible_w << "x" << possible_h);
-		video_mode.w = possible_w;
-		video_mode.h = possible_h;
-	    }
-	}
-	else DEBUG(DBG_ENGINE , DBG_WARN, "Settings::Parse: unknown video mode: " << right);
-    }
-    // offset mouse
-    else
-    if(left == "pointer offset x") le.SetMouseOffsetX(String::ToInt(right));
-    else
-    if(left == "pointer offset y") le.SetMouseOffsetY(String::ToInt(right));
-    // tap delay for right click emulation
-    else
-    if(left == "tap delay") le.SetTapDelayForRightClickEmulation(String::ToInt(right));
-#ifdef WITHOUT_MOUSE
-    else
-    if(left == "emulate mouse") le.SetEmulateMouse(right == "on");
-    else
-    if(left == "emulate mouse up") le.SetEmulateMouseUpKey(String::ToInt(right));
-    else
-    if(left == "emulate mouse down") le.SetEmulateMouseDownKey(String::ToInt(right));
-    else
-    if(left == "emulate mouse left") le.SetEmulateMouseLeftKey(String::ToInt(right));
-    else
-    if(left == "emulate mouse right") le.SetEmulateMouseRightKey(String::ToInt(right));
-    else
-    if(left == "emulate mouse step") le.SetEmulateMouseStep(String::ToInt(right));
-    else
-    if(left == "emulate press left") le.SetEmulatePressLeftKey(String::ToInt(right));
-    else
-    if(left == "emulate press right") le.SetEmulatePressRightKey(String::ToInt(right));
-#endif
-#ifdef WITH_KEYMAPPING
-    else
-    // load virtual key map
-    if(4 < left.size() && 1 < right.size() && left.substr(0, 4) == "key_")
-    {
-	int code = String::ToInt(left.substr(4));
-	DEBUG(DBG_ENGINE, DBG_INFO, "Settings::Parse: " << left << ", set virtual key: " << code << ", to: " << KeySymFromChar(right[1]));
-	LocalEvent::Get().SetVirtualKey(code, KeySymFromChar(right[1]));
-    }
-#endif
-}
 
 /* set level debug */
 void Settings::SetDebug(const u16 d)

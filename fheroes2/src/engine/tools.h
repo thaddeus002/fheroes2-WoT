@@ -29,7 +29,6 @@
 namespace String
 {
     void Trim(std::string &str);
-    bool Comment(std::string &str);
     void Lower(std::string &str);
     void Upper(std::string &str);
     void AddInt(std::string &str, int value);

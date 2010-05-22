@@ -46,22 +46,6 @@ void String::Trim(std::string & str)
     if(iter != str.end() - 1) str.erase(iter + 1, str.end());
 }
 
-/*true is comment */
-bool String::Comment(std::string & str)
-{
-    String::Trim(str);
-
-    switch(str[0]){
-    
-	case ';':
-	case '#':
-	    return true;
-	
-	default:
-	    return false;
-    }
-}
-
 /* convert to lower case */
 void String::Lower(std::string & str)
 {
@@ -83,15 +67,50 @@ void String::AddInt(std::string &str, int value)
     str += stream.str();
 }
 
-int String::ToInt(const std::string &str)
+int String::ToInt(const std::string & str)
 {
-    std::istringstream stream(str);
-    int res;
+    int res = 0;
 
-    if(std::string::npos == str.find('x'))
-	stream >> res;
+    // decimal
+    if(str.end() == std::find_if(str.begin(), str.end(), std::not1(std::ptr_fun<int, int>(std::isdigit))))
+    {
+        std::istringstream ss(str);
+        ss >> res;
+    }
     else
-	stream >> std::hex >> res;
+    // hex
+    if(str.size() > 3 && str.at(0) == '0' && std::tolower(str.at(1)) == 'x' &&
+        str.end() == std::find_if(str.begin() + 2, str.end(), std::not1(std::ptr_fun<int, int>(std::isxdigit))))
+    {
+        std::istringstream ss(str);
+        ss >> std::hex >> res;
+    }
+    else
+    // str
+    {
+        std::string lower(str);
+        String::Lower(lower);
+
+        if(lower == "on")       return 1;
+        else
+        if(lower == "one")      return 1;
+        else
+        if(lower == "two")      return 2;
+        else
+        if(lower == "three")    return 3;
+        else
+        if(lower == "four")     return 4;
+        else
+        if(lower == "five")     return 5;
+        else
+        if(lower == "six")      return 6;
+        else
+        if(lower == "seven")    return 7;
+        else
+        if(lower == "eight")    return 8;
+        else
+        if(lower == "nine")     return 9;
+    }
 
     return res;
 }

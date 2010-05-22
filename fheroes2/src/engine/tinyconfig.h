@@ -35,11 +35,11 @@ namespace Tiny
     struct Value
     {
 	Value();
-	Value(int val);
-	Value(const std::string & val);
+	Value(int);
+	Value(const char*);
 
-	void operator= (int val);
-	void operator= (const std::string & val);
+	void operator= (int);
+	void operator= (const char*);
 
 	int ival;
 	std::string sval;
@@ -48,16 +48,20 @@ namespace Tiny
     struct Entry : public std::pair<std::string, Value>
     {
 	Entry();
-	Entry(const std::string & key, const std::string & val);
-	Entry(const std::string & key, int val);
+	Entry(const char*, const char*);
+	Entry(const char*, int);
 
-	bool IsKey(const char* key) const;
-	bool IsValue(const char* val) const;
-	bool IsValue(int val) const;
+	const std::string & StrParams(void) const;
+	int IntParams(void) const;
+	
+	bool IsKey(const char*) const;
+	bool IsValue(const char*) const;
+	bool IsValue(int) const;
     };
 
-    std::ostream & operator<< (std::ostream & os, const Entry & en);
+    std::ostream & operator<< (std::ostream &, const Entry &);
 
+    typedef std::list<Entry> Entries;
     typedef std::list<Entry>::iterator EntryIterator;
     typedef std::list<Entry>::const_iterator EntryConstIterator;
 
@@ -68,25 +72,30 @@ namespace Tiny
 	~Config();
 
 	bool Load(const char*);
-	bool Save(const char* = NULL);
+	bool Save(const char*);
 	void Dump(std::ostream &);
 	void Clear(void);
 
 	void SetSeparator(char);
 	void SetComment(char);
 
-	int IntParams(const std::string &) const;
-	const char* StrParams(const std::string &) const;
+	int IntParams(const char*) const;
+	const char* StrParams(const char*) const;
+	void GetParams(const char*, std::list<std::string> &) const;
+
+    	void AddEntry(const char*, const char*, bool uniq = true);
+	void AddEntry(const char*, int, bool uniq = true);
+
+	const Entry* Find(const char*) const;
+	const Entries & GetEntries(void) const;
 
     protected:
 	EntryIterator FindEntry(std::string);
 	EntryConstIterator FindEntry(std::string) const;
-    	void AddEntry(const std::string &, const std::string &);
 
-	std::string filename;
 	char separator;
 	char comment;
-	std::list<Entry> entries;
+	Entries entries;
     };
 }
 
