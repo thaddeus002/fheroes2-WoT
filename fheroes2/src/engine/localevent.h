@@ -174,8 +174,8 @@ public:
 #endif
 
     static void SetStateDefaults(void);
-    static void SetState(u8 type, bool enable);
-    static u8   GetState(u8 type);
+    static void SetState(u32 type, bool enable);
+    static u8   GetState(u32 type);
 
     bool HandleEvents(bool delay = true);
 

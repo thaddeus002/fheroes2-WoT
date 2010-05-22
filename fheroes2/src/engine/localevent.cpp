@@ -699,12 +699,12 @@ int LocalEvent::GlobalFilterEvents(const SDL_Event *event)
     return 1;
 }
 
-void LocalEvent::SetState(u8 type, bool enable)
+void LocalEvent::SetState(u32 type, bool enable)
 {
     SDL_EventState(type, enable ? SDL_ENABLE : SDL_IGNORE);
 }
 
-u8 LocalEvent::GetState(u8 type)
+u8 LocalEvent::GetState(u32 type)
 {
     return SDL_EventState(type, SDL_QUERY);
 }
