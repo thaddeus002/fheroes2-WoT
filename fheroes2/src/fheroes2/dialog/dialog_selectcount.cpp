@@ -24,6 +24,7 @@
 #include "settings.h"
 #include "cursor.h"
 #include "button.h"
+#include "pocketpc.h"
 #include "dialog.h"
 
 bool Dialog::SelectCount(const std::string &header, u32 min, u32 max, u32 & cur)
@@ -220,6 +221,7 @@ bool Dialog::InputString(const std::string &header, std::string &res)
     Cursor::themes_t oldcursor = cursor.Themes();
     cursor.SetThemes(cursor.POINTER);
 
+    const bool pda = Settings::Get().PocketPC();
     if(res.size()) res.clear();
     res.reserve(48);
 
@@ -238,10 +240,10 @@ bool Dialog::InputString(const std::string &header, std::string &res)
     dst_pt.y = box_rt.y + 10 + textbox.h() + 10;
     dst_pt.x = box_rt.x + (box_rt.w - sprite.w()) / 2;
     display.Blit(sprite, dst_pt);
-    Point text_pt = dst_pt;
+    const Rect text_rt(dst_pt.x, dst_pt.y, sprite.w(), sprite.h());
 
     Text text("_", Font::BIG);
-    display.Blit(sprite, text_pt);
+    display.Blit(sprite, text_rt);
     text.Blit(dst_pt.x + (sprite.w() - text.w()) / 2, dst_pt.y - 1);
 
     dst_pt.x = box_rt.x;
@@ -260,12 +262,19 @@ bool Dialog::InputString(const std::string &header, std::string &res)
     display.Flip();
 
     LocalEvent & le = LocalEvent::Get();
+    bool redraw = true;
 
     // message loop
     while(le.HandleEvents())
     {
 	buttonOk.isEnable() && le.MousePressLeft(buttonOk) ? buttonOk.PressDraw() : buttonOk.ReleaseDraw();
         le.MousePressLeft(buttonCancel) ? buttonCancel.PressDraw() : buttonCancel.ReleaseDraw();
+
+	if(pda && le.MousePressLeft(text_rt))
+	{
+	    PocketPC::KeyboardDialog(res);
+	    redraw = true;
+	}
 
         if(le.KeyPress(KEY_RETURN) || (buttonOk.isEnable() && le.MouseClickLeft(buttonOk))) break;
 	else
@@ -274,19 +283,25 @@ bool Dialog::InputString(const std::string &header, std::string &res)
 	if(le.KeyPress())
 	{
 	    String::AppendKey(res, le.KeyValue(), le.KeyMod());
+	    redraw = true;
+	}
 
+	if(redraw)
+	{
 	    buttonOk.SetDisable(res.empty());
 	    buttonOk.Draw();
 
 	    text.Set(res + "_");
+
 	    if(text.w() < sprite.w() - 24)
 	    {
 		cursor.Hide();
-		display.Blit(sprite, text_pt);
-		text.Blit(text_pt.x + (sprite.w() - text.w()) / 2, text_pt.y - 1);
+		display.Blit(sprite, text_rt);
+		text.Blit(text_rt.x + (text_rt.w - text.w()) / 2, text_rt.y - 1);
 		cursor.Show();
 		display.Flip();
 	    }
+	    redraw = false;
 	}
     }
 

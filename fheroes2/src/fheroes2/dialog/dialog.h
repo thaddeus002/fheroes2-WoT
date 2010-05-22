@@ -166,29 +166,6 @@ private:
     Rect top;
 };
 
-class NetworkChat
-{
-public:
-    ~NetworkChat();
-
-    static NetworkChat & Get();
-
-    bool MessageReady(void);
-    const std::string & GetMessage(void) const;
-    void ResetMessage(void);
-    void PushMessage(const std::string &);
-
-    void Hide(void) const;
-    void Show(void) const;
-
-private:
-    NetworkChat();
-
-    std::string msg;
-    std::list<std::string> spool;
-    bool modify;
-};
-
 }
 
 #endif

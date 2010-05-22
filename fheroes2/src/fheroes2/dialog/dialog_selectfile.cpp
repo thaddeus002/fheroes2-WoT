@@ -31,6 +31,7 @@
 #include "settings.h"
 #include "maps_fileinfo.h"
 #include "interface_list.h"
+#include "pocketpc.h"
 #include "dialog.h"
 
 #ifdef __SYMBIAN32__
@@ -268,6 +269,7 @@ bool SelectFileListSimple(const std::string & header, MapsFileInfoList & lists, 
 	else
         if(le.MouseClickLeft(enter_field) && editor)
 	{
+	    if(pocket) PocketPC::KeyboardDialog(filename);
 	    edit_mode = true;
 	    cursor.Hide();
 	}
