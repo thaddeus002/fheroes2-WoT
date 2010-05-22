@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-04-28 16:17+0900\n"
+"POT-Creation-Date: 2010-05-22 17:10+0900\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -77,11 +77,11 @@ msgstr ""
 msgid "Some undead in groups -1"
 msgstr ""
 
-#: ../fheroes2/battle2/battle_action.cpp:907
+#: ../fheroes2/battle2/battle_action.cpp:908
 msgid "Summon Elemental spell failed!"
 msgstr ""
 
-#: ../fheroes2/battle2/battle_action.cpp:1003
+#: ../fheroes2/battle2/battle_action.cpp:1004
 msgid "Mirror Image spell failed!"
 msgstr ""
 
@@ -249,8 +249,8 @@ msgstr ""
 #: ../fheroes2/game/game_newgame.cpp:105 ../fheroes2/game/game_newgame.cpp:182
 #: ../fheroes2/game/game_newgame.cpp:239 ../fheroes2/game/game_newgame.cpp:307
 #: ../fheroes2/game/game_scenarioinfo.cpp:315
-#: ../fheroes2/pocketpc/pocketpc_mainmenu.cpp:161
-#: ../fheroes2/pocketpc/pocketpc_mainmenu.cpp:220
+#: ../fheroes2/pocketpc/pocketpc_mainmenu.cpp:163
+#: ../fheroes2/pocketpc/pocketpc_mainmenu.cpp:222
 msgid "Cancel"
 msgstr ""
 
@@ -451,29 +451,33 @@ msgstr ""
 msgid "You don't have enough gold!"
 msgstr ""
 
-#: ../fheroes2/battle2/battle_main.cpp:204
+#: ../fheroes2/battle2/battle_main.cpp:206
 msgid "You have captured an enemy artifact!"
 msgstr ""
 
-#: ../fheroes2/battle2/battle_main.cpp:252
+#: ../fheroes2/battle2/battle_main.cpp:254
 msgid ""
 "Through eagle-eyed observation, %{name} is able to learn the magic spell %"
 "{spell}."
 msgstr ""
 
-#: ../fheroes2/battle2/battle_main.cpp:290
+#: ../fheroes2/battle2/battle_main.cpp:291
 msgid ""
 "Practicing the dark arts of necromancy, you are able to raise %{count} of "
 "the enemy's dead to return under your service as %{monster}"
 msgstr ""
 
-#: ../fheroes2/battle2/battle_stats.cpp:923
+#: ../fheroes2/battle2/battle_stats.cpp:764
+msgid "%{name} half the enemy troops!"
+msgstr ""
+
+#: ../fheroes2/battle2/battle_stats.cpp:946
 msgid ""
 "The %{artifact} artifact is in effect for this battle, disabling %{spell} "
 "spell."
 msgstr ""
 
-#: ../fheroes2/battle2/battle_stats.cpp:1439
+#: ../fheroes2/battle2/battle_stats.cpp:1473
 msgid "%{count} %{name} rise(s) from the dead!"
 msgstr ""
 
@@ -1473,19 +1477,19 @@ msgstr ""
 msgid "Available: %{count}"
 msgstr ""
 
-#: ../fheroes2/dialog/dialog_selectfile.cpp:159
+#: ../fheroes2/dialog/dialog_selectfile.cpp:160
 msgid "File to Save:"
 msgstr ""
 
-#: ../fheroes2/dialog/dialog_selectfile.cpp:178
+#: ../fheroes2/dialog/dialog_selectfile.cpp:179
 msgid "File to Load:"
 msgstr ""
 
-#: ../fheroes2/dialog/dialog_selectfile.cpp:283
+#: ../fheroes2/dialog/dialog_selectfile.cpp:285
 msgid "Are you sure you want to delete file:"
 msgstr ""
 
-#: ../fheroes2/dialog/dialog_selectfile.cpp:286
+#: ../fheroes2/dialog/dialog_selectfile.cpp:288
 msgid "Warning!"
 msgstr ""
 
@@ -1813,7 +1817,7 @@ msgid "Cancel back to the main menu."
 msgstr ""
 
 #: ../fheroes2/editor/editor_startgame.cpp:175
-#: ../fheroes2/game/game_startgame.cpp:1344
+#: ../fheroes2/game/game_startgame.cpp:1345
 msgid "Are you sure you want to quit?"
 msgstr ""
 
@@ -2187,7 +2191,7 @@ msgid ""
 msgstr ""
 
 #: ../fheroes2/game/game_newgame.cpp:178
-#: ../fheroes2/pocketpc/pocketpc_mainmenu.cpp:149
+#: ../fheroes2/pocketpc/pocketpc_mainmenu.cpp:151
 msgid "Standard Game"
 msgstr ""
 
@@ -2196,7 +2200,7 @@ msgid "A single player game playing out a single map."
 msgstr ""
 
 #: ../fheroes2/game/game_newgame.cpp:179
-#: ../fheroes2/pocketpc/pocketpc_mainmenu.cpp:153
+#: ../fheroes2/pocketpc/pocketpc_mainmenu.cpp:155
 msgid "Campaign Game"
 msgstr ""
 
@@ -2205,7 +2209,7 @@ msgid "A single player game playing through a series of maps."
 msgstr ""
 
 #: ../fheroes2/game/game_newgame.cpp:180
-#: ../fheroes2/pocketpc/pocketpc_mainmenu.cpp:157
+#: ../fheroes2/pocketpc/pocketpc_mainmenu.cpp:159
 msgid "Multi-Player Game"
 msgstr ""
 
@@ -2225,7 +2229,7 @@ msgid "FHeroes2 game settings."
 msgstr ""
 
 #: ../fheroes2/game/game_newgame.cpp:237
-#: ../fheroes2/pocketpc/pocketpc_mainmenu.cpp:212
+#: ../fheroes2/pocketpc/pocketpc_mainmenu.cpp:214
 msgid "Hot Seat"
 msgstr ""
 
@@ -2236,7 +2240,7 @@ msgid ""
 msgstr ""
 
 #: ../fheroes2/game/game_newgame.cpp:238
-#: ../fheroes2/pocketpc/pocketpc_mainmenu.cpp:216
+#: ../fheroes2/pocketpc/pocketpc_mainmenu.cpp:218
 msgid "Network"
 msgstr ""
 
@@ -2497,79 +2501,79 @@ msgstr ""
 msgid "%{color} player's turn"
 msgstr ""
 
-#: ../fheroes2/game/game_startgame.cpp:1002
+#: ../fheroes2/game/game_startgame.cpp:1003
 msgid ""
 "%{color} player, you have lost your last town. If you do not conquer another "
 "town in next week, you will be eliminated."
 msgstr ""
 
-#: ../fheroes2/game/game_startgame.cpp:1029
+#: ../fheroes2/game/game_startgame.cpp:1030
 msgid "Try searching on clear ground."
 msgstr ""
 
-#: ../fheroes2/game/game_startgame.cpp:1043
+#: ../fheroes2/game/game_startgame.cpp:1044
 msgid "After spending many hours digging here, you have uncovered the "
 msgstr ""
 
-#: ../fheroes2/game/game_startgame.cpp:1045
+#: ../fheroes2/game/game_startgame.cpp:1046
 msgid "Congratulations!"
 msgstr ""
 
-#: ../fheroes2/game/game_startgame.cpp:1048
+#: ../fheroes2/game/game_startgame.cpp:1049
 msgid "Nothing here. Where could it be?"
 msgstr ""
 
-#: ../fheroes2/game/game_startgame.cpp:1056
+#: ../fheroes2/game/game_startgame.cpp:1057
 msgid "Digging for artifacts requires a whole day, try again tomorrow."
 msgstr ""
 
-#: ../fheroes2/game/game_startgame.cpp:1262
+#: ../fheroes2/game/game_startgame.cpp:1263
 msgid ""
 "One or more heroes may still move, are you sure you want to end your turn?"
 msgstr ""
 
-#: ../fheroes2/game/game_startgame.cpp:1294
+#: ../fheroes2/game/game_startgame.cpp:1295
 msgid "Are you sure you want to restart? (Your current game will be lost)"
 msgstr ""
 
-#: ../fheroes2/game/game_startgame.cpp:1381
+#: ../fheroes2/game/game_startgame.cpp:1382
 msgid "Game saved successfully."
 msgstr ""
 
-#: ../fheroes2/game/game_startgame.cpp:1396
+#: ../fheroes2/game/game_startgame.cpp:1397
 msgid ""
 "Are you sure you want to load a new game? (Your current game will be lost)"
 msgstr ""
 
-#: ../fheroes2/game/game_startgame.cpp:1505
+#: ../fheroes2/game/game_startgame.cpp:1506
 msgid "Astrologers proclaim month of the %{name}."
 msgstr ""
 
-#: ../fheroes2/game/game_startgame.cpp:1505
+#: ../fheroes2/game/game_startgame.cpp:1506
 msgid "Astrologers proclaim week of the %{name}."
 msgstr ""
 
-#: ../fheroes2/game/game_startgame.cpp:1509
+#: ../fheroes2/game/game_startgame.cpp:1510
 msgid " All populations are halved."
 msgstr ""
 
-#: ../fheroes2/game/game_startgame.cpp:1509
+#: ../fheroes2/game/game_startgame.cpp:1510
 msgid " All dwellings increase population."
 msgstr ""
 
-#: ../fheroes2/game/game_startgame.cpp:1540
+#: ../fheroes2/game/game_startgame.cpp:1541
 msgid ""
 "%{color} player, your heroes abandon you, and you are banished from this "
 "land."
 msgstr ""
 
-#: ../fheroes2/game/game_startgame.cpp:1549
+#: ../fheroes2/game/game_startgame.cpp:1550
 msgid ""
 "%{color} player, this is your last day to capture a town, or you will be "
 "banished from this land."
 msgstr ""
 
-#: ../fheroes2/game/game_startgame.cpp:1556
+#: ../fheroes2/game/game_startgame.cpp:1557
 msgid ""
 "%{color} player, you only have %{day} days left to capture a town, or you "
 "will be banished from this land."
@@ -6114,12 +6118,12 @@ msgstr ""
 #: ../fheroes2/network/localclient.cpp:409 ../fheroes2/network/server.cpp:436
 #: ../fheroes2/network/server.cpp:454 ../fheroes2/network/server.cpp:462
 #: ../fheroes2/network/server.cpp:473
-#: ../fheroes2/pocketpc/pocketpc_mainmenu.cpp:234
+#: ../fheroes2/pocketpc/pocketpc_mainmenu.cpp:236
 msgid "Error"
 msgstr ""
 
 #: ../fheroes2/network/localclient.cpp:409 ../fheroes2/network/server.cpp:473
-#: ../fheroes2/pocketpc/pocketpc_mainmenu.cpp:234
+#: ../fheroes2/pocketpc/pocketpc_mainmenu.cpp:236
 msgid "This release is compiled without network support."
 msgstr ""
 
@@ -12049,158 +12053,158 @@ msgstr ""
 msgid "Stone spell from Medusa."
 msgstr ""
 
-#: ../fheroes2/system/settings.cpp:91
+#: ../fheroes2/system/settings.cpp:92
 msgid "game: always confirm for rewrite savefile"
 msgstr ""
 
-#: ../fheroes2/system/settings.cpp:92
+#: ../fheroes2/system/settings.cpp:93
 msgid "game: also confirm autosave"
 msgstr ""
 
-#: ../fheroes2/system/settings.cpp:93
+#: ../fheroes2/system/settings.cpp:94
 msgid "game: fast load game dialog (L hot key)"
 msgstr ""
 
-#: ../fheroes2/system/settings.cpp:94
+#: ../fheroes2/system/settings.cpp:95
 msgid "game: remember last focus"
 msgstr ""
 
-#: ../fheroes2/system/settings.cpp:95
+#: ../fheroes2/system/settings.cpp:96
 msgid "game: hide AI move"
 msgstr ""
 
-#: ../fheroes2/system/settings.cpp:96
+#: ../fheroes2/system/settings.cpp:97
 msgid "game: remember last filename"
 msgstr ""
 
-#: ../fheroes2/system/settings.cpp:97
+#: ../fheroes2/system/settings.cpp:98
 msgid "world: show visited content from objects"
 msgstr ""
 
-#: ../fheroes2/system/settings.cpp:98
+#: ../fheroes2/system/settings.cpp:99
 msgid "world: scouting skill show extended content info"
 msgstr ""
 
-#: ../fheroes2/system/settings.cpp:99
+#: ../fheroes2/system/settings.cpp:100
 msgid "world: abandoned mine random resource"
 msgstr ""
 
-#: ../fheroes2/system/settings.cpp:100
+#: ../fheroes2/system/settings.cpp:101
 msgid "world: save count monster after battle"
 msgstr ""
 
-#: ../fheroes2/system/settings.cpp:101
+#: ../fheroes2/system/settings.cpp:102
 msgid "world: allow set guardian to objects"
 msgstr ""
 
-#: ../fheroes2/system/settings.cpp:102
+#: ../fheroes2/system/settings.cpp:103
 msgid "world: no in-built requirements or guardians for placed artifacts"
 msgstr ""
 
-#: ../fheroes2/system/settings.cpp:103
+#: ../fheroes2/system/settings.cpp:104
 msgid "artifact: Crystal Ball also added Identify Hero and Visions spells"
 msgstr ""
 
-#: ../fheroes2/system/settings.cpp:104
+#: ../fheroes2/system/settings.cpp:105
 msgid "castle: allow buy from well"
 msgstr ""
 
-#: ../fheroes2/system/settings.cpp:105
+#: ../fheroes2/system/settings.cpp:106
 msgid "heroes: learn new spells with day"
 msgstr ""
 
-#: ../fheroes2/system/settings.cpp:106
+#: ../fheroes2/system/settings.cpp:107
 msgid "unions: allow meeting heroes"
 msgstr ""
 
-#: ../fheroes2/system/settings.cpp:107
+#: ../fheroes2/system/settings.cpp:108
 msgid "unions: allow castle visiting"
 msgstr ""
 
-#: ../fheroes2/system/settings.cpp:108
+#: ../fheroes2/system/settings.cpp:109
 msgid "unions: allow view maps"
 msgstr ""
 
-#: ../fheroes2/system/settings.cpp:109
+#: ../fheroes2/system/settings.cpp:110
 msgid "battle: show damage info"
 msgstr ""
 
-#: ../fheroes2/system/settings.cpp:110
+#: ../fheroes2/system/settings.cpp:111
 msgid "battle: troop direction to move"
 msgstr ""
 
-#: ../fheroes2/system/settings.cpp:111
+#: ../fheroes2/system/settings.cpp:112
 msgid "battle: soft wait troop"
 msgstr ""
 
-#: ../fheroes2/system/settings.cpp:112
+#: ../fheroes2/system/settings.cpp:113
 msgid "battle: show grid"
 msgstr ""
 
-#: ../fheroes2/system/settings.cpp:113
+#: ../fheroes2/system/settings.cpp:114
 msgid "battle: show mouse shadow"
 msgstr ""
 
-#: ../fheroes2/system/settings.cpp:114
+#: ../fheroes2/system/settings.cpp:115
 msgid "battle: show move shadow"
 msgstr ""
 
-#: ../fheroes2/system/settings.cpp:115
+#: ../fheroes2/system/settings.cpp:116
 msgid "battle: high objects are an obstacle for archers"
 msgstr ""
 
-#: ../fheroes2/system/settings.cpp:116
+#: ../fheroes2/system/settings.cpp:117
 msgid "battle: merge armies for hero from castle"
 msgstr ""
 
-#: ../fheroes2/system/settings.cpp:117
+#: ../fheroes2/system/settings.cpp:118
 msgid "battle: archmage can resists (20%) bad spells"
 msgstr ""
 
-#: ../fheroes2/system/settings.cpp:118
+#: ../fheroes2/system/settings.cpp:119
 msgid "battle: magical creature resists (20%) the same magic"
 msgstr ""
 
-#: ../fheroes2/system/settings.cpp:119
+#: ../fheroes2/system/settings.cpp:120
 msgid "battle: skip increase +2 defense"
 msgstr ""
 
-#: ../fheroes2/system/settings.cpp:120
+#: ../fheroes2/system/settings.cpp:121
 msgid "game: show system info"
 msgstr ""
 
-#: ../fheroes2/system/settings.cpp:121
+#: ../fheroes2/system/settings.cpp:122
 msgid "game: autosave on"
 msgstr ""
 
-#: ../fheroes2/system/settings.cpp:122
+#: ../fheroes2/system/settings.cpp:123
 msgid "game: use fade"
 msgstr ""
 
-#: ../fheroes2/system/settings.cpp:123
+#: ../fheroes2/system/settings.cpp:124
 msgid "game: show SDL logo"
 msgstr ""
 
-#: ../fheroes2/system/settings.cpp:124
+#: ../fheroes2/system/settings.cpp:125
 msgid "game: use evil interface"
 msgstr ""
 
-#: ../fheroes2/system/settings.cpp:125
+#: ../fheroes2/system/settings.cpp:126
 msgid "game: hide interface"
 msgstr ""
 
-#: ../fheroes2/system/settings.cpp:126
+#: ../fheroes2/system/settings.cpp:127
 msgid "pocketpc: hide cursor"
 msgstr ""
 
-#: ../fheroes2/system/settings.cpp:127
+#: ../fheroes2/system/settings.cpp:128
 msgid "pocketpc: tap mode"
 msgstr ""
 
-#: ../fheroes2/system/settings.cpp:128
+#: ../fheroes2/system/settings.cpp:129
 msgid "pocketpc: low memory"
 msgstr ""
 
-#: ../fheroes2/system/settings.cpp:129
+#: ../fheroes2/system/settings.cpp:130
 msgid "pocketpc: very very slow"
 msgstr ""
