@@ -385,13 +385,13 @@ bool Settings::Read(const std::string & filename)
     // load virtual key map
     {
 	const Tiny::Entries & entries = config.GetEntries();
-	EntryConstIterator it1 = entries.begin();
-	EntryConstIterator it2 = entries.end();
+	Tiny::EntryConstIterator it1 = entries.begin();
+	Tiny::EntryConstIterator it2 = entries.end();
 	for(; it1 != it2; ++it1)
 	{
 	    const std::string & key = (*it1).first;
 	    const std::string & val = (*it2).StrParams();
-	    if(4 < key.size() && 1 < value.size() && key.substr(0, 4) == "key_")
+	    if(4 < key.size() && 1 < val.size() && key.substr(0, 4) == "key_")
 	    {
 		int code = String::ToInt(key.substr(4));
 		DEBUG(DBG_ENGINE, DBG_INFO, "Settings::Read: " << key << ", set virtual key: " << code << ", to: " << KeySymFromChar(val[1]));
