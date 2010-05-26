@@ -287,7 +287,7 @@ Heroes::Heroes(heroes_t ht, Race::race_t rc) : killer_color(Color::GRAY), experi
     move_point = GetMaxMovePoints();
 }
 
-void Heroes::LoadFromMP2(u16 map_index, const void *ptr, const Color::color_t cl)
+void Heroes::LoadFromMP2(u16 map_index, const void *ptr, const Color::color_t cl, const Race::race_t rc)
 {
     // reset modes
     modes = 0;
@@ -306,9 +306,11 @@ void Heroes::LoadFromMP2(u16 map_index, const void *ptr, const Color::color_t cl
     ++ptr8;
 
     // custom troops
+    bool custom_troop = false;
     if(*ptr8)
     {
         ++ptr8;
+	custom_troop = true;
 
         // monster1
         army.At(0).SetMonster(Monster::FromInt(*ptr8 + 1));
@@ -366,19 +368,13 @@ void Heroes::LoadFromMP2(u16 map_index, const void *ptr, const Color::color_t cl
     }
 
     // custom portrate
+    bool custom_portrait = false;
     if(*ptr8)
     {
+	custom_portrait = true;
 	++ptr8;
-
-	// index sprite portrate
-	heroes_t ht = ConvertID(*ptr8);
-	if(Heroes::UNKNOWN != ht)
-	{
-	    const Heroes* hero = world.GetHeroes(ht);
-	    if(hero && hero->isFreeman())
-	    portrait = static_cast<heroes_t>(*ptr8);
-	}
-
+	// index sprite portrait
+	if(portrait != ConvertID(*ptr8)) DEBUG(DBG_GAME, DBG_WARN, "Heroes::LoadFromMP2: " << "custom portrait incorrect");
 	++ptr8;
     }
     else
@@ -407,11 +403,11 @@ void Heroes::LoadFromMP2(u16 map_index, const void *ptr, const Color::color_t cl
     experience = byte32;
     ptr8 += 4;
 
-    bool skip_levelup_skill = false;
+    bool custom_secskill = false;
     // custom skill
     if(*ptr8)
     {
-	skip_levelup_skill = true;
+	custom_secskill = true;
 	++ptr8;
 
 	secondary_skills.clear();
@@ -440,6 +436,32 @@ void Heroes::LoadFromMP2(u16 map_index, const void *ptr, const Color::color_t cl
     if(*ptr8) name = std::string(_(reinterpret_cast<const char *>(ptr8 + 1)));
     ptr8 += 14;
 
+    // fixed race for custom portrait
+    if(custom_portrait && Settings::Get().ExtForceSelectRaceFromType())
+    {
+	if(Race::ALL & rc) race = rc;
+
+	// fixed default primary skills
+	u8 book, spell;
+	Skill::Primary::LoadDefaults(race, *this, book, spell);
+
+	// fixed default troop
+	if(!custom_troop)
+	    army.Reset(true);
+
+	// fixed default sec skills
+	if(!custom_secskill)
+	    Skill::Secondary::LoadDefaults(race, secondary_skills);
+
+	// fixed default spell
+	if(book)
+	{
+    	    SpellBookActivate();
+    	    AppendSpellToBook(Spell::FromInt(spell));
+    	    PickupArtifact(Artifact::MAGIC_BOOK);
+	}
+    }
+
     // patrol
     if(*ptr8)
     {
@@ -465,31 +487,14 @@ void Heroes::LoadFromMP2(u16 map_index, const void *ptr, const Color::color_t cl
     while(1 < level--)
     {
 	Skill::Primary::skill_t primary = LevelUpPrimarySkill();
-	if(!skip_levelup_skill) LevelUpSecondarySkill(primary, true);
+	if(!custom_secskill) LevelUpSecondarySkill(primary, true);
     }
 
     // other param
     SetSpellPoints(GetMaxSpellPoints());
     move_point = GetMaxMovePoints();
 
-    DEBUG(DBG_GAME , DBG_INFO, "add heroes: " << name << ", color: " << Color::String(color) << ", race: " << Race::String(race));
-}
-
-void Heroes::SetRace(Race::race_t r)
-{
-    switch(r)
-    {
-	case Race::KNGT:
-	case Race::BARB:
-	case Race::SORC:
-	case Race::WRLK:
-	case Race::WZRD:
-	case Race::NECR:
-	    race = r;
-	    break;
-	default:
-	    break;
-    }
+    DEBUG(DBG_GAME , DBG_INFO, "Heroes::LoadFromMP2: " << name << ", color: " << Color::String(color) << ", race: " << Race::String(race));
 }
 
 Heroes::heroes_t Heroes::GetID(void) const

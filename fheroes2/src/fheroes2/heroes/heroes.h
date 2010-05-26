@@ -95,9 +95,8 @@ public:
     const Castle* inCastle(void) const;
     Castle* inCastle(void);
 
-    void LoadFromMP2(u16 map_index, const void *ptr,  const Color::color_t cl);
-    void SetRace(Race::race_t);
-    
+    void LoadFromMP2(u16 map_index, const void *ptr,  const Color::color_t cl, const Race::race_t rc);
+
     void ResetStupidFlag(void) { ResetModes(STUPID); }
 
     Color::color_t GetColor(void) const{ return color; }

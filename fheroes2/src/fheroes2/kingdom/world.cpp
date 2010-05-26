@@ -633,7 +633,7 @@ void World::LoadMaps(const std::string &filename)
 
 			if(hero)
 			{
-			    hero->LoadFromMP2(*it_index, pblock, Color::GRAY);
+			    hero->LoadFromMP2(*it_index, pblock, Color::GRAY, hero->GetRace());
 			    hero->SetModes(Heroes::JAIL);
 			}
 		    }
@@ -697,8 +697,7 @@ void World::LoadMaps(const std::string &filename)
 			    if(hero)
 			    {
 				Heroes* herow = const_cast<Heroes *>(hero);
-			    	herow->LoadFromMP2(*it_index, pblock, color);
-			    	herow->SetRace(race);
+			    	herow->LoadFromMP2(*it_index, pblock, color, race);
 			    	kingdom.AddHeroes(herow);
 			    }
 			}

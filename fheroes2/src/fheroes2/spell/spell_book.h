@@ -41,7 +41,7 @@ public:
 	SpellBook(void);
 
 	Spell::spell_t Open(const HeroBase &, filter_t filt, bool canselect) const;
-	void Activate(void) { active = true; }
+	void Activate(void);
 	bool isActive(void) const { return active; }
 
 private:

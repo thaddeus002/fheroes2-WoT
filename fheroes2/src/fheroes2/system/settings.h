@@ -106,6 +106,7 @@ public:
 	UNIONS_ALLOW_VIEW_MAPS		= 0x20004000,
 	CASTLE_ALLOW_BUY_FROM_WELL	= 0x20100000,
 	HEROES_LEARN_SPELLS_WITH_DAY	= 0x20200000,
+	HEROES_FORCE_RACE_FROM_TYPE	= 0x20400000,
 
 	BATTLE_ARCHMAGE_RESIST_BAD_SPELL= 0x40001000,
 	BATTLE_MAGIC_TROOP_RESIST	= 0x40002000,
@@ -193,6 +194,7 @@ public:
     bool ExtNoRequirementsForArtifacts(void) const;
     bool ExtArtifactCrystalBall(void) const;
     bool ExtLearnSpellsWithDay(void) const;
+    bool ExtForceSelectRaceFromType(void) const;
     bool ExtUnionsAllowCastleVisiting(void) const;
     bool ExtUnionsAllowHeroesMeetings(void) const;
     bool ExtUnionsAllowViewMaps(void) const;

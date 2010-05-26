@@ -104,6 +104,7 @@ static const settings_t settingsFHeroes2[] =
     { Settings::WORLD_ARTIFACT_CRYSTAL_BALL,	_("artifact: Crystal Ball also added Identify Hero and Visions spells"), },
     { Settings::CASTLE_ALLOW_BUY_FROM_WELL,	_("castle: allow buy from well"),			},
     { Settings::HEROES_LEARN_SPELLS_WITH_DAY,	_("heroes: learn new spells with day"),  		},
+    { Settings::HEROES_FORCE_RACE_FROM_TYPE,	_("heroes: fixed race with custom portrait"),  		},
     { Settings::UNIONS_ALLOW_HERO_MEETINGS,	_("unions: allow meeting heroes"),                      },
     { Settings::UNIONS_ALLOW_CASTLE_VISITING,	_("unions: allow castle visiting"),                     },
     { Settings::UNIONS_ALLOW_VIEW_MAPS,		_("unions: allow view maps"),                           },
@@ -1085,6 +1086,11 @@ bool Settings::ExtArtifactCrystalBall(void) const
 bool Settings::ExtLearnSpellsWithDay(void) const
 {
     return ExtModes(HEROES_LEARN_SPELLS_WITH_DAY);
+}
+
+bool Settings::ExtForceSelectRaceFromType(void) const
+{
+    return ExtModes(HEROES_FORCE_RACE_FROM_TYPE);
 }
 
 bool Settings::ExtUnionsAllowCastleVisiting(void) const

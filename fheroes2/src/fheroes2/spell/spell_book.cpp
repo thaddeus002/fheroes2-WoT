@@ -53,6 +53,12 @@ SpellBook::SpellBook() : active(false)
 {
 }
 
+void SpellBook::Activate(void)
+{
+    active = true;
+    spells.clear();
+}
+
 Spell::spell_t SpellBook::Open(const HeroBase & hero, const filter_t filt, bool canselect) const
 {
     if(!active)

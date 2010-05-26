@@ -855,6 +855,8 @@ void Skill::Secondary::LoadDefaults(u8 race, std::vector<Secondary> & skills)
 {
     const skillstats_t* ptr = GetSkillStats(race);
 
+    if(skills.size()) skills.clear();
+
     if(ptr)
     {
 	if(ptr->initial_secondary.archery)	skills.push_back(Secondary(ARCHERY, static_cast<Skill::Level::type_t>(ptr->initial_secondary.archery)));
