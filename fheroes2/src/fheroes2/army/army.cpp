@@ -424,6 +424,15 @@ s8 Army::army_t::GetLuckModificator(std::string *strs) const
     return Luck::NORMAL;
 }
 
+bool Army::army_t::AllTroopsIsRace(u8 race) const
+{
+    std::vector<Troop>::const_iterator it1 = army.begin();
+    std::vector<Troop>::const_iterator it2 = army.end();
+    for(; it1 != it2; ++it1) if((*it1).isValid() && (*it1).GetRace() != race) return false;
+
+    return true;
+}
+
 s8 Army::army_t::GetMorale(void) const
 {
     return commander ? commander->GetMorale() : GetMoraleModificator(NULL);
@@ -498,6 +507,7 @@ s8 Army::army_t::GetMoraleModificator(std::string *strs) const
             	    strs->append(_("Entire unit is undead, so morale does not apply."));
             	    strs->append("\n");
             	}
+		return 0;
 	    }
             break;
         case 3:

@@ -286,6 +286,12 @@ s8 HeroBase::GetMoraleModificator(bool shipmaster, std::string* strs) const
 	result += castle->GetMoraleModificator(strs);
 
     // army modificator
+    if(GetArmy().AllTroopsIsRace(Race::NECR))
+    {
+	if(strs) strs->clear();
+	result = 0;
+    }
+
     result += GetArmy().GetMoraleModificator(strs);
 
     return result;

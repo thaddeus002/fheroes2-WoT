@@ -664,6 +664,8 @@ s8 Heroes::GetMoraleWithModificators(std::string *strs) const
     // bonus artifact
     result += GetMoraleModificator(isShipMaster(), strs);
 
+    if(army.AllTroopsIsRace(Race::NECR)) return Morale::NORMAL;
+
     // bonus leadership
     result += Skill::GetLeadershipModifiers(GetLevelSkill(Skill::Secondary::LEADERSHIP), strs);
 
