@@ -432,7 +432,9 @@ bool Settings::Read(const std::string & filename)
     }
     else
     {
-	opt_global.SetModes(GLOBAL_FULLSCREEN);
+	entry = config.Find("fullscreen");
+	if(!entry || entry->StrParams() != "off")
+	    opt_global.SetModes(GLOBAL_FULLSCREEN);
     }
 
     if(ExtModes(GAME_HIDE_INTERFACE))
