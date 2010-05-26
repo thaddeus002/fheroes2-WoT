@@ -118,6 +118,16 @@ void Castle::LoadFromMP2(const void *ptr)
 
         // default building
         building |= DWELLING_MONSTER1;
+        u8 dwelling2 = 0;
+        switch(Settings::Get().GameDifficulty())
+	{
+	    case Difficulty::EASY:	dwelling2 = 75; break;
+	    case Difficulty::NORMAL:	dwelling2 = 50; break;
+	    case Difficulty::HARD:	dwelling2 = 25; break;
+	    case Difficulty::EXPERT:	dwelling2 = 10; break;
+	    default: break;
+	}
+	if(dwelling2 && dwelling2 >= Rand::Get(1, 100)) building |= DWELLING_MONSTER2;
     }
 
     // custom troops
