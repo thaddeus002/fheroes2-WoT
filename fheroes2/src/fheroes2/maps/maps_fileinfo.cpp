@@ -440,7 +440,7 @@ bool Maps::FileInfo::isAllowCountPlayers(u8 colors) const
     const u8 human_only = Color::Count(human_colors & ~(human_colors & computer_colors));
     const u8 comp_human = Color::Count(human_colors & computer_colors);
 
-    return human_only >= colors && colors <= human_only + comp_human;
+    return human_only <= colors && colors <= human_only + comp_human;
 }
 
 bool Maps::FileInfo::isMultiPlayerMap(void) const
@@ -501,12 +501,12 @@ bool PrepareMapsFileInfoList(MapsFileInfoList & lists, bool multi)
 	if(multi == false)
 	{
 	    it = std::remove_if(lists.begin(), lists.end(), std::mem_fun_ref(&Maps::FileInfo::isMultiPlayerMap));
-	    lists.resize(std::distance(lists.begin(), it));
+	    if(it != lists.begin()) lists.resize(std::distance(lists.begin(), it));
 	}
 
 	it = std::remove_if(lists.begin(), lists.end(), std::not1(std::bind2nd(std::mem_fun_ref(&Maps::FileInfo::isAllowCountPlayers), conf.PreferablyCountPlayers())));
-	lists.resize(std::distance(lists.begin(), it));
+	if(it != lists.begin()) lists.resize(std::distance(lists.begin(), it));
     }
 
-    return true;
+    return lists.size();
 }

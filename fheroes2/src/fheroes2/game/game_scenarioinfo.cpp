@@ -59,7 +59,7 @@ Game::menu_t Game::ScenarioInfo(void)
     AGG::PlayMusic(MUS::MAINMENU);
 
     MapsFileInfoList lists;
-    if(!PrepareMapsFileInfoList(lists, false))
+    if(!PrepareMapsFileInfoList(lists, (conf.GameType() & Game::MULTI)))
     {
 	Dialog::Message(_("Warning"), _("No maps available!"), Font::BIG, Dialog::OK);
         return MAINMENU;
@@ -90,7 +90,7 @@ Game::menu_t Game::ScenarioInfo(void)
     // set first maps settings
     if(reset_starting_settings)
 	conf.LoadFileMapsMP2(lists.front().file);
-    
+
     const Point pointPanel(top.x + 204, top.y + 32);
     const Point pointDifficultyInfo(pointPanel.x + 24, pointPanel.y + 93);
     const Point pointOpponentInfo(pointPanel.x + 24, pointPanel.y + 202);
