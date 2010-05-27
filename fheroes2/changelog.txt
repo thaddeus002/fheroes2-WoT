@@ -1,4 +1,18 @@
-SVN - up to r1854
+SVN - up to r1895
+
+May, 27, 2010
++ Update translation files
++ Fixed: genie ability, added custom genie ability, rename battle.xml to animations.xml
++ Fixed: blind spell, dwarf magic resist, resurect dead troop
++ Fixed: necromancer morale info
++ Fixed: necromancer skeletons up
++ Fixed: battle catapult targets
++ Updated: diplomacy for surrender and join monster
++ Updated: gameover conditions (WINS_SIDE), added unions (alliance)
++ Added: pocketpc virtual keyboard
++ Fixed: dwelling count with begin week
++ Fixed: World::NewMonth actions
++ Fixed: multiplayer map filter
 
 Apr, 24, 2010
 + Added: extended scouting capability
