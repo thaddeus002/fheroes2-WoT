@@ -49,7 +49,7 @@ Game::menu_t PocketPC::SelectScenario(void)
     display.Blit(sprite, src_rt, 0, 0);
 
     MapsFileInfoList all;
-    if(!PrepareMapsFileInfoList(all))
+    if(!PrepareMapsFileInfoList(all, false))
     {
         Dialog::Message(_("Warning"), _("No maps available!"), Font::BIG, Dialog::OK);
         return Game::MAINMENU;

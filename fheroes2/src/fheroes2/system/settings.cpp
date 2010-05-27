@@ -22,7 +22,6 @@
 
 #include <algorithm>
 #include <fstream>
-#include <bitset>
 #include "maps.h"
 #include "tinyconfig.h"
 #include "settings.h"
@@ -528,14 +527,13 @@ bool Settings::LoadFileMapsMP2(const std::string & file)
     if(! current_maps_file.ReadMP2(file)) return false;
 
     // get first color
-    my_color = Color::Get(Color::GetFirst(current_maps_file.allow_colors));
+    my_color = Color::Get(Color::GetFirst(current_maps_file.human_colors));
 
     // game difficulty
     game_difficulty = Difficulty::NORMAL;
 
-    std::bitset<8> b(current_maps_file.allow_colors);
-    preferably_count_players = b.count();
-    
+    preferably_count_players = Color::Count(current_maps_file.human_colors);
+
     return true;
 }
 
@@ -759,22 +757,17 @@ u8 Settings::MapsWidth(void) const
 
 bool Settings::AllowColors(u8 f) const
 {
-    return current_maps_file.allow_colors & f;
+    return current_maps_file.human_colors & f;
 }
 
 Color::color_t Settings::FirstAllowColor(void) const
 {
-    return Color::Get(Color::GetFirst(current_maps_file.allow_colors));
+    return Color::Get(Color::GetFirst(current_maps_file.human_colors));
 }
 
 bool Settings::AllowChangeRace(u8 f) const
 {
     return current_maps_file.rnd_races & f;
-}
-
-void Settings::SetKingdomColors(u8 c)
-{
-    current_maps_file.kingdom_colors = c;
 }
 
 u8 Settings::KingdomColors(void) const
@@ -789,12 +782,12 @@ bool Settings::KingdomColors(u8 f) const
 
 u8 Settings::AllowColorsCount(void) const
 {
-    return current_maps_file.AllowColorsCount();
+    return Color::Count(current_maps_file.human_colors);
 }
 
 u8 Settings::KingdomColorsCount(void) const
 {
-    return current_maps_file.KingdomColorsCount();
+    return Color::Count(current_maps_file.kingdom_colors);
 }
 
 bool Settings::GameStartWithHeroes(void) const

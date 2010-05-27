@@ -20,6 +20,7 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
+#include <bitset>
 #include "color.h"
 
 const char* Color::String(u8 color)
@@ -55,6 +56,12 @@ u8 Color::GetIndex(color_t color)
 
     // GRAY
     return 6;
+}
+
+u8 Color::Count(u8 colors)
+{
+    const std::bitset<8> bset(colors);
+    return bset.count();
 }
 
 Color::color_t Color::GetFromIndex(u8 index)

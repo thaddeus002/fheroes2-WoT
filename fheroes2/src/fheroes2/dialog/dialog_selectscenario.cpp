@@ -38,7 +38,7 @@ void ScenarioListBox::RedrawItem(const Maps::FileInfo & info, u16 dstx, u16 dsty
 {
     Display & display = Display::Get();
     Text text;
-    u8 index = 19 + info.KingdomColorsCount();
+    u8 index = 19 + Color::Count(info.kingdom_colors);
 
     if(!Settings::Get().QVGA())
     {
@@ -91,7 +91,7 @@ void ScenarioListBox::RedrawBackground(const Point & dst)
 	{
 	    Text text;
 	    const Maps::FileInfo & info = *cur;
-	    u8 index = 19 + info.KingdomColorsCount();
+	    u8 index = 19 + Color::Count(info.kingdom_colors);
 
 	    const Sprite & spriteCount = AGG::GetICN(ICN::REQUESTS, index);
 	    display.Blit(spriteCount, dst.x + 65, dst.y + 265);

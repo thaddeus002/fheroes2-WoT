@@ -146,8 +146,8 @@ bool Game::LoadSAV2FileInfo(const std::string & fn,  Maps::FileInfo & maps_file)
     msg.Pop(str);
     msg.Pop(maps_file.difficulty);
     msg.Pop(maps_file.kingdom_colors);
-    msg.Pop(maps_file.allow_colors);
-    msg.Pop(maps_file.rnd_colors);
+    msg.Pop(maps_file.human_colors);
+    msg.Pop(maps_file.computer_colors);
     msg.Pop(maps_file.rnd_races);
     msg.Pop(maps_file.conditions_wins);
     msg.Pop(maps_file.wins1);
@@ -197,8 +197,8 @@ bool Game::IO::SaveBIN(QueueMessage & msg)
     msg.Push(GetBasename(conf.current_maps_file.file.c_str()));
     msg.Push(conf.current_maps_file.difficulty);
     msg.Push(conf.current_maps_file.kingdom_colors);
-    msg.Push(conf.current_maps_file.allow_colors);
-    msg.Push(conf.current_maps_file.rnd_colors);
+    msg.Push(conf.current_maps_file.human_colors);
+    msg.Push(conf.current_maps_file.computer_colors);
     msg.Push(conf.current_maps_file.rnd_races);
     msg.Push(conf.current_maps_file.conditions_wins);
     msg.Push(conf.current_maps_file.wins1);
@@ -653,8 +653,8 @@ bool Game::IO::LoadBIN(QueueMessage & msg)
     msg.Pop(conf.current_maps_file.file);
     msg.Pop(conf.current_maps_file.difficulty);
     msg.Pop(conf.current_maps_file.kingdom_colors);
-    msg.Pop(conf.current_maps_file.allow_colors);
-    msg.Pop(conf.current_maps_file.rnd_colors);
+    msg.Pop(conf.current_maps_file.human_colors);
+    msg.Pop(conf.current_maps_file.computer_colors);
     msg.Pop(conf.current_maps_file.rnd_races);
     msg.Pop(conf.current_maps_file.conditions_wins);
     msg.Pop(conf.current_maps_file.wins1);

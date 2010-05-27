@@ -145,7 +145,7 @@ bool FH2RemoteClient::ConnectionChat(void)
 
     // check color
     server.Lock();
-    player_color = Color::GetFirst(conf.CurrentFileInfo().allow_colors & (~conf.PlayersColors()));
+    player_color = Color::GetFirst(conf.CurrentFileInfo().human_colors & (~conf.PlayersColors()));
     conf.SetPlayersColors(server.GetPlayersColors());
     server.Unlock();
     if(0 == player_color)

@@ -35,7 +35,7 @@ Game::menu_t Game::Editor::LoadMaps(void)
     std::string filemaps;
     MapsFileInfoList lists;
 
-    if(! PrepareMapsFileInfoList(lists))
+    if(! PrepareMapsFileInfoList(lists, true))
     {
         Dialog::Message(_("Warning"), _("No maps available!"), Font::BIG, Dialog::OK);
         return MAINMENU;

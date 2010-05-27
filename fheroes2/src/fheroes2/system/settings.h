@@ -288,7 +288,6 @@ public:
     Color::color_t FirstAllowColor(void) const;
     bool KingdomColors(u8) const;
     u8 KingdomColors(void) const;
-    void SetKingdomColors(u8);
     bool AllowChangeRace(u8) const;
     u8 AllowColorsCount(void) const;
     u8 KingdomColorsCount(void) const;

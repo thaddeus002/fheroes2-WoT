@@ -187,6 +187,9 @@ Game::menu_t Game::NewGame(void)
 
 Game::menu_t Game::NewMulti(void)
 {
+    // reset prev. scenario info
+    Settings::Get().SetMyColor(Color::GRAY);
+
     if(Settings::Get().QVGA()) return PocketPC::NewMulti();
 
     // preload

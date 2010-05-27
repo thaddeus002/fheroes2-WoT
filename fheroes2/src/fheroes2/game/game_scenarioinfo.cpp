@@ -59,7 +59,7 @@ Game::menu_t Game::ScenarioInfo(void)
     AGG::PlayMusic(MUS::MAINMENU);
 
     MapsFileInfoList lists;
-    if(!PrepareMapsFileInfoList(lists))
+    if(!PrepareMapsFileInfoList(lists, false))
     {
 	Dialog::Message(_("Warning"), _("No maps available!"), Font::BIG, Dialog::OK);
         return MAINMENU;
@@ -394,6 +394,7 @@ void Game::Scenario::RedrawOpponentsInfo(const Point & dst, const std::vector<Pl
 
 	    if(!(conf.AllowColors(color)))
 	    {
+		// comp only
 		switch(color)
 		{
 		    case Color::BLUE:	index = players ? 39 : 15; break;
@@ -408,6 +409,7 @@ void Game::Scenario::RedrawOpponentsInfo(const Point & dst, const std::vector<Pl
 	    else
 	    if(conf.PlayersColors() & color)
 	    {
+		// cur player
 		switch(color)
 		{
 		    case Color::BLUE:	index = players ? 33 :  9; break;
@@ -421,6 +423,7 @@ void Game::Scenario::RedrawOpponentsInfo(const Point & dst, const std::vector<Pl
 	    }
 	    else
 	    {
+		// comp/human
 		switch(color)
 		{
 		    case Color::BLUE:	index = players ? 27 : 3; break;

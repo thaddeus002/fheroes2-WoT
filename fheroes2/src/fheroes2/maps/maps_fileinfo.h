@@ -41,10 +41,9 @@ namespace Maps
     static bool FileSorting(const FileInfo &, const FileInfo &);
     static bool NameCompare(const FileInfo &, const FileInfo &);
 
-    bool isAllowColorsCount(u8) const;
+    bool isAllowCountPlayers(u8) const;
+    bool isMultiPlayerMap(void) const;
 
-    u8 AllowColorsCount(void) const;
-    u8 KingdomColorsCount(void) const;
     u8 KingdomRace(u8) const;
 
     u16 ConditionWins(void) const;
@@ -72,8 +71,8 @@ namespace Maps
     u8 unions[KINGDOMMAX];
 
     u8 kingdom_colors;
-    u8 allow_colors;
-    u8 rnd_colors;
+    u8 human_colors;
+    u8 computer_colors;
     u8 rnd_races;
     u8 conditions_wins;
     u8 wins1;
@@ -92,6 +91,6 @@ namespace Maps
 
 typedef std::vector<Maps::FileInfo> MapsFileInfoList;
 
-bool PrepareMapsFileInfoList(MapsFileInfoList &);
+bool PrepareMapsFileInfoList(MapsFileInfoList &, bool multi);
 
 #endif

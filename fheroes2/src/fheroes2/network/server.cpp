@@ -51,7 +51,7 @@ FH2Server::FH2Server()
     AGG::Cache & cache = AGG::Cache::Get();
     if(! cache.ReadDataDir()) Error::Except("FH2Server::FH2Server: ", "AGG data files not found.");
 
-    if(!PrepareMapsFileInfoList(finfo_list) ||
+    if(!PrepareMapsFileInfoList(finfo_list, true) ||
        !Settings::Get().LoadFileMapsMP2(finfo_list.front().file)) DEBUG(DBG_NETWORK , DBG_WARN, "FH2Server::FH2Server: No maps available!");
 }
 
@@ -143,7 +143,7 @@ void FH2Server::ResetPlayers(u32 first_player)
     it1 = std::find_if(clients.begin(), clients.end(), std::bind2nd(std::mem_fun_ref(&Player::isID), first_player));
     if(it1 != clients.end())
     {
-        (*it1).player_color = Color::GetFirst(conf.CurrentFileInfo().allow_colors);
+        (*it1).player_color = Color::GetFirst(conf.CurrentFileInfo().human_colors);
         colors |= (*it1).player_color;
     }
 
@@ -152,7 +152,7 @@ void FH2Server::ResetPlayers(u32 first_player)
     it2 = clients.end();
     for(; it1 != it2; ++it1) if(0 == (*it1).player_color)
     {
-        const u8 color = Color::GetFirst(conf.CurrentFileInfo().allow_colors & (~colors));
+        const u8 color = Color::GetFirst(conf.CurrentFileInfo().human_colors & (~colors));
         if(color)
         {
             (*it1).player_color = color;
