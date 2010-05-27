@@ -762,6 +762,9 @@ bool Settings::AllowColors(u8 f) const
 
 Color::color_t Settings::FirstAllowColor(void) const
 {
+    if(current_maps_file.HumanOnlyColors())
+	return Color::Get(Color::GetFirst(current_maps_file.HumanOnlyColors()));
+
     return Color::Get(Color::GetFirst(current_maps_file.human_colors));
 }
 

@@ -117,8 +117,14 @@ Game::menu_t Game::ScenarioInfo(void)
     // first allow color
     if(reset_starting_settings)
     {
+	const Maps::FileInfo & info = conf.CurrentFileInfo();
+
+	if(info.HumanOnlyColors())
+	    conf.SetPlayersColors(info.HumanOnlyColors());
+	else
+	    conf.SetPlayersColors(conf.MyColor());
+
 	conf.SetMyColor(conf.FirstAllowColor());
-	conf.SetPlayersColors(conf.MyColor());
     }
 
     Scenario::RedrawStaticInfo(pointPanel);
@@ -179,8 +185,12 @@ Game::menu_t Game::ScenarioInfo(void)
 	    {
 		cursor.Hide();
 		levelCursor.Hide();
+		const Maps::FileInfo & info = conf.CurrentFileInfo();
+		if(info.HumanOnlyColors())
+		    conf.SetPlayersColors(info.HumanOnlyColors());
+		else
+		    conf.SetPlayersColors(conf.MyColor());
 		conf.SetMyColor(conf.FirstAllowColor());
-    		conf.SetPlayersColors(conf.MyColor());
 		Scenario::RedrawStaticInfo(pointPanel);
 		Scenario::RedrawDifficultyInfo(pointDifficultyInfo);
 		UpdateCoordOpponentsInfo(pointOpponentInfo, coordColors);
@@ -236,7 +246,13 @@ Game::menu_t Game::ScenarioInfo(void)
 	    if(coordColors.end() != (itr = std::find_if(coordColors.begin(), coordColors.end(), std::bind2nd(RectIncludePoint(), le.GetMouseCursor()))))
 	    {
 		Color::color_t color = Color::GetFromIndex(itr - coordColors.begin());
-		if(conf.KingdomColors(color) && conf.AllowColors(color))
+		const Maps::FileInfo & info = conf.CurrentFileInfo();
+		if(info.HumanOnlyColors() & color)
+		{
+		    // change human only color to other player
+		}
+		else
+		if(conf.AllowColors(color))
 		{
 		    cursor.Hide();
 		    switch(conf.GameType())
@@ -384,6 +400,7 @@ void Game::Scenario::RedrawOpponentsInfo(const Point & dst, const std::vector<Pl
 {
     const Settings & conf = Settings::Get();
     const u8 count = conf.KingdomColorsCount();
+
     u8 current = 0;
 
     for(Color::color_t color = Color::BLUE; color != Color::GRAY; ++color)

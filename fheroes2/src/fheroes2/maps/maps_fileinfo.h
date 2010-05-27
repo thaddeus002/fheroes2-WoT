@@ -43,6 +43,8 @@ namespace Maps
 
     bool isAllowCountPlayers(u8) const;
     bool isMultiPlayerMap(void) const;
+    u8   HumanOnlyColors(void) const;
+    u8   ComputerOnlyColors(void) const;
 
     u8 KingdomRace(u8) const;
 

@@ -435,9 +435,19 @@ u16 Maps::FileInfo::LossCountDays(void) const
     return loss1;
 }
 
+u8 Maps::FileInfo::HumanOnlyColors(void) const
+{
+    return human_colors & ~(human_colors & computer_colors);
+}
+
+u8 Maps::FileInfo::ComputerOnlyColors(void) const
+{
+    return computer_colors & ~(human_colors & computer_colors);
+}
+
 bool Maps::FileInfo::isAllowCountPlayers(u8 colors) const
 {
-    const u8 human_only = Color::Count(human_colors & ~(human_colors & computer_colors));
+    const u8 human_only = Color::Count(HumanOnlyColors());
     const u8 comp_human = Color::Count(human_colors & computer_colors);
 
     return human_only <= colors && colors <= human_only + comp_human;
@@ -445,7 +455,7 @@ bool Maps::FileInfo::isAllowCountPlayers(u8 colors) const
 
 bool Maps::FileInfo::isMultiPlayerMap(void) const
 {
-    return 1 < Color::Count(human_colors & ~(human_colors & computer_colors));
+    return 1 < Color::Count(HumanOnlyColors());
 }
 
 void Maps::FileInfo::Dump(void) const
@@ -493,18 +503,17 @@ bool PrepareMapsFileInfoList(MapsFileInfoList & lists, bool multi)
     std::sort(lists.begin(), lists.end(), Maps::FileInfo::NameSorting);
     lists.resize(std::unique(lists.begin(), lists.end(), Maps::FileInfo::NameCompare) - lists.begin());
 
+    if(multi == false)
+    {
+	MapsFileInfoList::iterator it = std::remove_if(lists.begin(), lists.end(), std::mem_fun_ref(&Maps::FileInfo::isMultiPlayerMap));
+	if(it != lists.begin()) lists.resize(std::distance(lists.begin(), it));
+    }
+
     // set preferably count filter
     if(conf.PreferablyCountPlayers())
     {
-	MapsFileInfoList::iterator it;
 
-	if(multi == false)
-	{
-	    it = std::remove_if(lists.begin(), lists.end(), std::mem_fun_ref(&Maps::FileInfo::isMultiPlayerMap));
-	    if(it != lists.begin()) lists.resize(std::distance(lists.begin(), it));
-	}
-
-	it = std::remove_if(lists.begin(), lists.end(), std::not1(std::bind2nd(std::mem_fun_ref(&Maps::FileInfo::isAllowCountPlayers), conf.PreferablyCountPlayers())));
+	MapsFileInfoList::iterator it = std::remove_if(lists.begin(), lists.end(), std::not1(std::bind2nd(std::mem_fun_ref(&Maps::FileInfo::isAllowCountPlayers), conf.PreferablyCountPlayers())));
 	if(it != lists.begin()) lists.resize(std::distance(lists.begin(), it));
     }
 
