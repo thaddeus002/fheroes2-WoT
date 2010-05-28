@@ -47,7 +47,7 @@ Object::~Object()
 {
 }
 
-bool Object::isPassable(const std::list<Maps::TilesAddon> & bottoms)
+bool Object::isPassable(const std::list<Maps::TilesAddon> & bottoms, const u16 maps_index)
 {
     if(bottoms.size())
     {
@@ -99,7 +99,7 @@ bool Object::isPassable(const std::list<Maps::TilesAddon> & bottoms)
 		case ICN::OBJNRSRC:	if(addon.index % 2) return false; break;
 
 		case ICN::OBJNTWBA:
-		case ICN::OBJNTOWN:	if(! ObjTown::isPassable(icn, addon.index)) return false; break;
+		case ICN::OBJNTOWN:	if(! ObjTown::isPassable(icn, addon.index, maps_index)) return false; break;
 
 		case ICN::X_LOC1:
 		case ICN::X_LOC2:

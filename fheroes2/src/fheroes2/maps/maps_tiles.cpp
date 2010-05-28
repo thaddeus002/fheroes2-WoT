@@ -915,7 +915,7 @@ bool Maps::Tiles::isPassable(const Heroes *hero, bool skipfog) const
 	}
     }
 
-    return Object::isPassable(addons_level1);
+    return Object::isPassable(addons_level1, maps_index);
 }
 
 /* check road */
