@@ -131,6 +131,8 @@ void Dialog::ExtSettings(void)
     states.push_back(Settings::GAME_REMEMBER_LAST_FILENAME);
     states.push_back(Settings::GAME_SHOW_SYSTEM_INFO);
     states.push_back(Settings::GAME_EVIL_INTERFACE);
+    if(!conf.PocketPC())
+	states.push_back(Settings::GAME_DYNAMIC_INTERFACE);
     if(conf.VideoMode().w >= 640 && conf.VideoMode().w >= 480)
 	states.push_back(Settings::GAME_HIDE_INTERFACE);
     states.push_back(Settings::GAME_AUTOSAVE_ON);

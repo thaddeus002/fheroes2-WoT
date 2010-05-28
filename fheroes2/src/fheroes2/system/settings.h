@@ -89,6 +89,7 @@ public:
 	GAME_HIDE_INTERFACE		= 0x10002000,
 	GAME_ALSO_CONFIRM_AUTOSAVE	= 0x10004000,
 	GAME_REMEMBER_LAST_FILENAME	= 0x10008000,
+	GAME_DYNAMIC_INTERFACE		= 0x10010000,
 	POCKETPC_HIDE_CURSOR		= 0x10400000,
 	POCKETPC_LOW_MEMORY		= 0x10800000,
 	POCKETPC_TAP_MODE		= 0x11000000,
@@ -221,6 +222,7 @@ public:
     bool ExtVeryVerySlow(void) const;
     bool ExtTapMode(void) const;
     bool EvilInterface(void) const;
+    bool DynamicInterface(void) const;
     bool HideInterface(void) const;
 
     bool NetworkDedicatedServer(void) const;

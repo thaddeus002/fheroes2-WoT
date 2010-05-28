@@ -123,6 +123,7 @@ static const settings_t settingsFHeroes2[] =
     { Settings::GAME_USE_FADE,			_("game: use fade"),					},
     { Settings::GAME_SHOW_SDL_LOGO,		_("game: show SDL logo"),				},
     { Settings::GAME_EVIL_INTERFACE,		_("game: use evil interface"),				},
+    { Settings::GAME_DYNAMIC_INTERFACE,		_("game: also use dynamic interface for castles"),	},
     { Settings::GAME_HIDE_INTERFACE,		_("game: hide interface"),				},
     { Settings::POCKETPC_HIDE_CURSOR,		_("pocketpc: hide cursor"),				},
     { Settings::POCKETPC_TAP_MODE,		_("pocketpc: tap mode"),				},
@@ -1207,6 +1208,11 @@ bool Settings::ExtShowSDL(void) const
 bool Settings::EvilInterface(void) const
 {
     return ExtModes(GAME_EVIL_INTERFACE);
+}
+
+bool Settings::DynamicInterface(void) const
+{
+    return ExtModes(GAME_DYNAMIC_INTERFACE);
 }
 
 bool Settings::HideInterface(void) const

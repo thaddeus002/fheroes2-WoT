@@ -208,7 +208,13 @@ void PackOrdersBuilding(const Castle & castle, std::vector<building_t> & orders_
 
 Dialog::answer_t Castle::OpenDialog(bool readonly, bool fade)
 {
-    if(Settings::Get().QVGA()) return PocketPC::CastleOpenDialog(*this);
+    Settings & conf = Settings::Get();
+    
+    if(conf.QVGA()) return PocketPC::CastleOpenDialog(*this);
+
+    const bool interface = conf.EvilInterface();
+    if(conf.DynamicInterface())
+    	conf.SetEvilInterface(GetRace() & (Race::BARB | Race::WRLK | Race::NECR));
 
     Display & display = Display::Get();
     castle_heroes = const_cast<Heroes*>(world.GetHeroes(mp.x, mp.y));
@@ -224,7 +230,7 @@ Dialog::answer_t Castle::OpenDialog(bool readonly, bool fade)
     background.Redraw();
 
     // fade
-    if(Settings::Get().ExtUseFade()) display.Fade();
+    if(conf.ExtUseFade()) display.Fade();
         
     const Point cur_pt(background.GetArea().x, background.GetArea().y);
     Point dst_pt(cur_pt);
@@ -469,7 +475,7 @@ Dialog::answer_t Castle::OpenDialog(bool readonly, bool fade)
 	else
 	if((building & BUILD_TAVERN) && le.MouseClickLeft(coordBuildingTavern))
 	{
-	    if(Race::NECR == race && Settings::Get().PriceLoyaltyVersion())
+	    if(Race::NECR == race && conf.PriceLoyaltyVersion())
 		Dialog::Message(GetStringBuilding(BUILD_TAVERN, race), GetDescriptionBuilding(BUILD_TAVERN, race), Font::BIG, Dialog::OK);
 	    else
 		OpenTavern();
@@ -957,6 +963,9 @@ Dialog::answer_t Castle::OpenDialog(bool readonly, bool fade)
 
 	++ticket;
     }
+
+    if(conf.DynamicInterface())
+	conf.SetEvilInterface(interface);
 
     return result;
 }
