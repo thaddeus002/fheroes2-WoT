@@ -701,7 +701,7 @@ Game::menu_t Game::HumanTurn(void)
     cursor.Hide();
     Interface::Basic & I = Interface::Basic::Get();
 
-    const Kingdom & myKingdom = world.GetMyKingdom();
+    Kingdom & myKingdom = world.GetMyKingdom();
     const std::vector<Castle *> & myCastles = myKingdom.GetCastles();
     const std::vector<Heroes *> & myHeroes = myKingdom.GetHeroes();
 
@@ -745,8 +745,8 @@ Game::menu_t Game::HumanTurn(void)
     // warning lost all town
     if(myCastles.empty()) ShowWarningLostTowns(res);
 
-    // check new monster aroute heroes
-    //std::for_each(myHeroes.begin(), myHeroes.end(), );
+    // check around actions (and skip for h2 orig, bug?)
+    if(!conf.ExtOnlyFirstMonsterAttack()) myKingdom.HeroesActionNewPosition();
 
     // frame count
     I.frames = 0;

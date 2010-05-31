@@ -102,6 +102,7 @@ public:
 	WORLD_NOREQ_FOR_ARTIFACTS	= 0x20000010,
 	WORLD_ARTIFACT_CRYSTAL_BALL	= 0x20000020,
 	WORLD_SCOUTING_EXTENDED		= 0x20000040,
+	WORLD_ONLY_FIRST_MONSTER_ATTACK	= 0x20000080,
 	UNIONS_ALLOW_HERO_MEETINGS	= 0x20001000,
 	UNIONS_ALLOW_CASTLE_VISITING	= 0x20002000,
 	UNIONS_ALLOW_VIEW_MAPS		= 0x20004000,
@@ -196,6 +197,7 @@ public:
     bool ExtArtifactCrystalBall(void) const;
     bool ExtLearnSpellsWithDay(void) const;
     bool ExtForceSelectRaceFromType(void) const;
+    bool ExtOnlyFirstMonsterAttack(void) const;
     bool ExtUnionsAllowCastleVisiting(void) const;
     bool ExtUnionsAllowHeroesMeetings(void) const;
     bool ExtUnionsAllowViewMaps(void) const;

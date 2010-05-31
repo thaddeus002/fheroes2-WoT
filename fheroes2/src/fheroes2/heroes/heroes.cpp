@@ -1605,6 +1605,7 @@ void Heroes::PreBattleAction(void)
 
 void Heroes::ActionNewPosition(void)
 {
+    const Settings & conf = Settings::Get();
     // check around monster
     const u16 dst_around = Maps::TileUnderProtection(GetIndex());
 
@@ -1618,7 +1619,7 @@ void Heroes::ActionNewPosition(void)
 	    const u16 mons = Maps::GetDirectionIndex(GetIndex(), dir);
 
     	    // redraw gamearea for monster action sprite
-	    if(Settings::Get().MyColor() == GetColor())
+	    if(conf.MyColor() == GetColor())
 	    {
 		Interface::Basic & I = Interface::Basic::Get();
 		Game::Focus & F = Game::Focus::Get();
@@ -1631,6 +1632,7 @@ void Heroes::ActionNewPosition(void)
         	Display::Get().Flip();
 	    }
 	    Action(mons);
+	    if(conf.ExtOnlyFirstMonsterAttack()) break;
 	}
     }
 

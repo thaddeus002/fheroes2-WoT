@@ -94,6 +94,7 @@ public:
     void AddHeroes(const Heroes *hero);
     void RemoveHeroes(const Heroes *hero);
     void ApplyPlayWithStartingHero(void);
+    void HeroesActionNewPosition(void);
 
     void AddCastle(const Castle *castle);
     void RemoveCastle(const Castle *castle);

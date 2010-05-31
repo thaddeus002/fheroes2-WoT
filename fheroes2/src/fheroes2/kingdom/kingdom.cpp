@@ -530,3 +530,20 @@ u8 Kingdom::GetMaxHeroes(void)
 {
     return max_heroes;
 }
+
+void Kingdom::HeroesActionNewPosition(void)
+{
+    // Heroes::ActionNewPosition: can ramove elements from heroes vector.
+    size_t size = heroes.size();
+    std::vector<Heroes *>::iterator it = heroes.begin();
+
+    while(it != heroes.end())
+    {
+	(**it).ActionNewPosition();
+
+	if(size != heroes.size())
+	    size = heroes.size();
+	else
+	    ++it;
+    }
+}
