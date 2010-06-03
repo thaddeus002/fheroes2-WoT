@@ -150,6 +150,8 @@ public:
     static bool isMassActions(u8);
     static bool isRaceCompatible(u8 spell, u8 race);
 
+    static bool AllowWithWisdom(u8 spell, u8 wisdom);
+
     /* return index sprite spells.icn */
     static u8 IndexSprite(spell_t);
     /* return index in spellinl.icn */

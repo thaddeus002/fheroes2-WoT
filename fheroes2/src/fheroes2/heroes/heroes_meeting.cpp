@@ -192,6 +192,10 @@ void Heroes::MeetingDialog(Heroes & heroes2)
     cursor.Show();
     display.Flip();
 
+    // scholar action
+    if(Settings::Get().ExtEyeEagleAsScholar())
+	Heroes::ScholarAction(*this, heroes2);
+
     LocalEvent & le = LocalEvent::Get();
 
     // message loop
@@ -321,4 +325,140 @@ void RedrawPrimarySkillInfo(const Point & cur_pt, const Skill::Primary & p1, con
     String::AddInt(message, p2.GetKnowledge());
     text.Set(message);
     text.Blit(cur_pt.x + 380 - text.w(), cur_pt.y + 160);
+}
+
+// spell_book.cpp
+void SpellBookSetFilter(const BagArtifacts &, const std::vector<Spell::spell_t> &, std::vector<Spell::spell_t> &, SpellBook::filter_t);
+
+bool CanTeachSpell(u8 sp, u8 scholar, u8 wisdom)
+{
+    // check wisdom
+    if(! Spell::AllowWithWisdom(sp, wisdom)) return false;
+
+    // FIXME: teach conditions for level5
+    if(4 < Spell::Level(sp))
+	return false;
+
+    return ((4 == Spell::Level(sp) && Skill::Level::EXPERT == scholar) ||
+	    (3 == Spell::Level(sp) && Skill::Level::ADVANCED <= scholar) ||
+	    (3 > Spell::Level(sp) && Skill::Level::BASIC <= scholar));
+}
+
+void Heroes::ScholarAction(Heroes & hero1, Heroes & hero2)
+{
+    const u8 scholar1 = hero1.GetLevelSkill(Skill::Secondary::EAGLEEYE);
+    const u8 scholar2 = hero2.GetLevelSkill(Skill::Secondary::EAGLEEYE);
+    u8 scholar = 0;
+
+    Heroes* teacher = NULL;
+    Heroes* learner = NULL;
+
+    if(! Settings::Get().ExtEyeEagleAsScholar())
+    {
+	VERBOSE("Heroes::ScholarDialog: " << "EyeEagleAsScholar settings disabled");
+	return;
+    }
+    else
+    if(scholar1 && scholar1 >= scholar2)
+    {
+	teacher = &hero1;
+	learner = &hero2;
+	scholar = scholar1;
+    }
+    else
+    if(scholar2 && scholar2 >= scholar1)
+    {
+	teacher = &hero2;
+	learner = &hero1;
+	scholar = scholar2;
+    }
+    else
+    {
+	VERBOSE("Heroes::ScholarDialog: " << "Eagle Eye skill not found");
+	return;
+    }
+
+    std::vector<Spell::spell_t> learn, teach;
+    std::vector<Spell::spell_t>::iterator res, it1, it2;
+
+
+    learn.reserve(15);
+    teach.reserve(15);
+
+    SpellBookSetFilter(teacher->bag_artifacts, teacher->spell_book.spells, teach, SpellBook::ALL);
+    SpellBookSetFilter(learner->bag_artifacts, learner->spell_book.spells, learn, SpellBook::ALL);
+
+    // remove_if for learn spells
+    if(learn.size())
+    {
+	it1 = learn.begin();
+	it2 = learn.end();
+	res = learn.begin();
+
+	const u8 wisdom = teacher->GetLevelSkill(Skill::Secondary::WISDOM);
+	for(; it1 != it2; ++it1)
+	    if(! teacher->HaveSpell(*it1) || CanTeachSpell(*it1, scholar, wisdom)) *res++ = *it1;
+
+	if(res != learn.begin()) learn.resize(res - learn.begin());
+    }
+
+    // remove_if for teach spells
+    if(teach.size())
+    {
+	it1 = teach.begin();
+	it2 = teach.end();
+	res = teach.begin();
+
+	const u8 wisdom = learner->GetLevelSkill(Skill::Secondary::WISDOM);
+	for(; it1 != it2; ++it1)
+	    if(! learner->HaveSpell(*it1) || CanTeachSpell(*it1, scholar, wisdom)) *res++ = *it1;
+
+	if(res != teach.begin()) teach.resize(res - teach.begin());
+    }
+
+    std::string message, spells1, spells2;
+
+    // learning
+    it1 = learn.begin();
+    it2 = learn.end();
+    for(; it1 != it2; ++it1)
+    {
+	teacher->AppendSpellToBook(*it1, true);
+	if(spells1.size())
+	    spells1.append(it1 + 1 == it2 ? _(" and ") : ", ");
+	spells1.append(Spell::GetName(*it1));
+    }
+
+    // teacher
+    it1 = teach.begin();
+    it2 = teach.end();
+    for(; it1 != it2; ++it1)
+    {
+	learner->AppendSpellToBook(*it1, true);
+	if(spells2.size())
+	    spells2.append(it1 + 1 == it2 ? _(" and ") : ", ");
+	spells2.append(Spell::GetName(*it1));
+    }
+
+    if(spells1.size() && spells2.size())
+	message = _("%{teacher}, whose %{level} %{scholar} knows many magical secrets, learns %{spells1} from %{learner}, and teaches %{spells2} to %{learner}.");
+    else
+    if(spells1.size())
+	message = _("%{teacher}, whose %{level} %{scholar} knows many magical secrets, learns %{spells1} from %{learner}.");
+    else
+    if(spells2.size())
+	message = _("%{teacher}, whose %{level} %{scholar} knows many magical secrets, teaches %{spells2} to %{learner}.");
+
+    if(message.size() &&
+	(Game::LOCAL == teacher->GetControl() || Game::LOCAL == learner->GetControl()))
+    {
+	String::Replace(message, "%{teacher}", teacher->GetName());
+	String::Replace(message, "%{learner}", learner->GetName());
+	String::Replace(message, "%{level}", Skill::Level::String(scholar));
+	String::Replace(message, "%{scholar}", Skill::Secondary::String(Skill::Secondary::EAGLEEYE));
+	String::Replace(message, "%{spells1}", spells1);
+	String::Replace(message, "%{spells2}", spells2);
+
+	Dialog::Message(_("Scholar Ability"), message, Font::BIG, Dialog::OK);
+    }
 }

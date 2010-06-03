@@ -59,16 +59,8 @@ void SpellStorage::GetSpells(std::vector<Spell::spell_t> & v, u8 lvl) const
 
 void SpellStorage::Append(const Spell::spell_t sp, u8 wisdom)
 {
-    if(spells.end() == std::find(spells.begin(), spells.end(), sp))
-    {
-	switch(Spell::Level(sp))
-	{
-	    case 3:  if(Skill::Level::BASIC <= wisdom)    spells.push_back(sp); break;
-	    case 4:  if(Skill::Level::ADVANCED <= wisdom) spells.push_back(sp); break;
-	    case 5:  if(Skill::Level::EXPERT == wisdom)   spells.push_back(sp); break;
-	    default: spells.push_back(sp); break;
-	}
-    }
+    if(spells.end() == std::find(spells.begin(), spells.end(), sp) && Spell::AllowWithWisdom(sp, wisdom))
+	spells.push_back(sp);
 }
 
 void SpellStorage::Append(const Spell::spell_t sp)

@@ -101,6 +101,7 @@ static const settings_t settingsFHeroes2[] =
     { Settings::WORLD_ALLOW_SET_GUARDIAN,	_("world: allow set guardian to objects"),		},
     { Settings::WORLD_NOREQ_FOR_ARTIFACTS,	_("world: no in-built requirements or guardians for placed artifacts"),	},
     { Settings::WORLD_ONLY_FIRST_MONSTER_ATTACK,_("world: only the first monster will attack (H2 bug)."), },
+    { Settings::WORLD_EYE_EAGLE_AS_SCHOLAR,	_("world: Eagle Eye also works like Scholar in H3."), },
     { Settings::WORLD_ARTIFACT_CRYSTAL_BALL,	_("artifact: Crystal Ball also added Identify Hero and Visions spells"), },
     { Settings::CASTLE_ALLOW_BUY_FROM_WELL,	_("castle: allow buy from well"),			},
     { Settings::HEROES_LEARN_SPELLS_WITH_DAY,	_("heroes: learn new spells with day"),  		},
@@ -1084,6 +1085,11 @@ bool Settings::ExtArtifactCrystalBall(void) const
 bool Settings::ExtOnlyFirstMonsterAttack(void) const
 {
     return ExtModes(WORLD_ONLY_FIRST_MONSTER_ATTACK);
+}
+
+bool Settings::ExtEyeEagleAsScholar(void) const
+{
+    return ExtModes(WORLD_EYE_EAGLE_AS_SCHOLAR);
 }
 
 bool Settings::ExtLearnSpellsWithDay(void) const

@@ -340,7 +340,7 @@ void AIToCastle(Heroes &hero, const u8 obj, const u16 dst_index)
     if(! castle) return;
 
     if(hero.GetColor() == castle->GetColor() ||
-	(conf.ExtUnionsAllowCastleVisiting() && conf.IsUnions(hero.GetColor(), castle->GetColor()))
+	(conf.ExtUnionsAllowCastleVisiting() && conf.IsUnions(hero.GetColor(), castle->GetColor())))
     {
         DEBUG(DBG_AI , DBG_INFO, "AIToCastle: " << hero.GetName() << " goto castle " << castle->GetName());
 	castle->GetMageGuild().EducateHero(hero);

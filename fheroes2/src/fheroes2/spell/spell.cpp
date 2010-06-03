@@ -876,3 +876,10 @@ u8 Spell::CalculateDimensionDoorDistance(u8 current_sp, u32 total_hp)
     // original h2 variant
     return 14;
 }
+
+bool Spell::AllowWithWisdom(u8 sp, u8 wisdom)
+{
+    return ((4 < Spell::Level(sp) && Skill::Level::EXPERT > wisdom) ||
+	    (3 < Spell::Level(sp) && Skill::Level::ADVANCED > wisdom) ||
+	    (2 < Spell::Level(sp) && Skill::Level::BASIC > wisdom) ? false : true);
+}
