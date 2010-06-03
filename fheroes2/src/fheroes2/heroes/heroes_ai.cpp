@@ -290,14 +290,10 @@ void AIToHeroes(Heroes &hero, const u8 obj, const u16 dst_index)
     if(! other_hero) return;
 
     if(hero.GetColor() == other_hero->GetColor() ||
-	conf.IsUnions(hero.GetColor(), other_hero->GetColor()))
+        (conf.ExtUnionsAllowHeroesMeetings() && conf.IsUnions(hero.GetColor(), other_hero->GetColor())))
     {
         DEBUG(DBG_AI , DBG_INFO, "AIToHeroes: " << hero.GetName() << " meeting " << other_hero->GetName());
-        VERBOSE("FIX: AI hero meeting");
-
-	//if(!conf.IsFrendly(hero.GetColor(), other_hero->GetColor()) ||
-        //    conf.ExtUnionsAllowHeroesMeetings());
-        //hero.MeetingDialog(const_cast<Heroes &>(*other_hero));
+        hero.AIMeeting(*other_hero);
     }
     else
     {
@@ -344,13 +340,10 @@ void AIToCastle(Heroes &hero, const u8 obj, const u16 dst_index)
     if(! castle) return;
 
     if(hero.GetColor() == castle->GetColor() ||
-	conf.IsUnions(hero.GetColor(), castle->GetColor()))
+	(conf.ExtUnionsAllowCastleVisiting() && conf.IsUnions(hero.GetColor(), castle->GetColor()))
     {
         DEBUG(DBG_AI , DBG_INFO, "AIToCastle: " << hero.GetName() << " goto castle " << castle->GetName());
-
-	if(!conf.IsUnions(hero.GetColor(), castle->GetColor()) ||
-    	    conf.ExtUnionsAllowCastleVisiting())
-		castle->GetMageGuild().EducateHero(hero);
+	castle->GetMageGuild().EducateHero(hero);
     }
     else
     {
@@ -2016,4 +2009,10 @@ void Heroes::AIRescueWhereMove(void)
     {
 	AIAction(GetIndex());
     }
+}
+
+void Heroes::AIMeeting(Heroes & heroes2)
+{
+    if(Settings::Get().ExtEyeEagleAsScholar())
+        Heroes::ScholarAction(*this, heroes2);
 }

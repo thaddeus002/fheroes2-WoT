@@ -676,13 +676,10 @@ void ActionToHeroes(Heroes &hero, const u8 obj, const u16 dst_index)
     if(! other_hero) return;
 
     if(hero.GetColor() == other_hero->GetColor() ||
-	conf.IsUnions(hero.GetColor(), other_hero->GetColor()))
+	(conf.ExtUnionsAllowHeroesMeetings() && conf.IsUnions(hero.GetColor(), other_hero->GetColor())))
     {
         DEBUG(DBG_GAME , DBG_INFO, "ActionToHeroes: " << hero.GetName() << " meeting " << other_hero->GetName());
-
-	if(!conf.IsUnions(hero.GetColor(), other_hero->GetColor()) ||
-    	    conf.ExtUnionsAllowHeroesMeetings())
-    		hero.MeetingDialog(*other_hero);
+	hero.MeetingDialog(*other_hero);
     }
     else
     {
@@ -729,18 +726,13 @@ void ActionToCastle(Heroes &hero, const u8 obj, const u16 dst_index)
     if(! castle) return;
 
     if(hero.GetColor() == castle->GetColor() ||
-	conf.IsUnions(hero.GetColor(), castle->GetColor()))
+	(conf.ExtUnionsAllowCastleVisiting() && conf.IsUnions(hero.GetColor(), castle->GetColor())))
     {
         DEBUG(DBG_GAME , DBG_INFO, "ActionToCastle: " << hero.GetName() << " goto castle " << castle->GetName());
-
-	if(!conf.IsUnions(hero.GetColor(), castle->GetColor()) ||
-    	    conf.ExtUnionsAllowCastleVisiting())
-	{
-	    Mixer::Reduce();
-    	    if(!conf.ExtLearnSpellsWithDay()) castle->GetMageGuild().EducateHero(hero);
-    	    Game::OpenCastle(castle);
-    	    Mixer::Enhance();
-    	}
+        Mixer::Reduce();
+	if(!conf.ExtLearnSpellsWithDay()) castle->GetMageGuild().EducateHero(hero);
+    	Game::OpenCastle(castle);
+    	Mixer::Enhance();
     }
     else
     {
