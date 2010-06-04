@@ -330,19 +330,31 @@ void RedrawPrimarySkillInfo(const Point & cur_pt, const Skill::Primary & p1, con
 // spell_book.cpp
 void SpellBookSetFilter(const BagArtifacts &, const std::vector<Spell::spell_t> &, std::vector<Spell::spell_t> &, SpellBook::filter_t);
 
-bool CanTeachSpell(u8 sp, u8 scholar, u8 wisdom)
+struct CanTeachSpell : std::binary_function<u8, Spell::spell_t, bool>
 {
-    // check wisdom
-    if(! Spell::AllowWithWisdom(sp, wisdom)) return false;
+    bool operator() (u8 scholar, Spell::spell_t spell) const
+    {
+	// FIXME: teach conditions for level5
+	if(4 < Spell::Level(spell))
+	    return false;
 
-    // FIXME: teach conditions for level5
-    if(4 < Spell::Level(sp))
+	if(4 == Spell::Level(spell))
+	    return Skill::Level::EXPERT == scholar;
+	else
+	if(3 == Spell::Level(spell))
+	    return Skill::Level::ADVANCED <= scholar;
+	else
+	if(3 > Spell::Level(spell))
+	    return Skill::Level::BASIC <= scholar;
+
 	return false;
+    };
+};
 
-    return ((4 == Spell::Level(sp) && Skill::Level::EXPERT == scholar) ||
-	    (3 == Spell::Level(sp) && Skill::Level::ADVANCED <= scholar) ||
-	    (3 > Spell::Level(sp) && Skill::Level::BASIC <= scholar));
-}
+struct HeroesHaveSpell : std::binary_function<const Heroes*, Spell::spell_t, bool>
+{
+    bool operator() (const Heroes* hero, Spell::spell_t spell) const { return hero->HaveSpell(spell); };
+};
 
 void Heroes::ScholarAction(Heroes & hero1, Heroes & hero2)
 {
@@ -387,7 +399,6 @@ void Heroes::ScholarAction(Heroes & hero1, Heroes & hero2)
     std::vector<Spell::spell_t> learn, teach;
     std::vector<Spell::spell_t>::iterator res, it1, it2;
 
-
     learn.reserve(15);
     teach.reserve(15);
 
@@ -397,29 +408,27 @@ void Heroes::ScholarAction(Heroes & hero1, Heroes & hero2)
     // remove_if for learn spells
     if(learn.size())
     {
-	it1 = learn.begin();
-	it2 = learn.end();
-	res = learn.begin();
+	res = std::remove_if(learn.begin(), learn.end(), std::bind1st(HeroesHaveSpell(), teacher));
+	learn.resize(std::distance(learn.begin(), res));
+    }
 
-	const u8 wisdom = teacher->GetLevelSkill(Skill::Secondary::WISDOM);
-	for(; it1 != it2; ++it1)
-	    if(! teacher->HaveSpell(*it1) || CanTeachSpell(*it1, scholar, wisdom)) *res++ = *it1;
-
-	if(res != learn.begin()) learn.resize(res - learn.begin());
+    if(learn.size())
+    {
+	res = std::remove_if(learn.begin(), learn.end(), std::not1(std::bind1st(CanTeachSpell(), scholar)));
+	learn.resize(std::distance(learn.begin(), res));
     }
 
     // remove_if for teach spells
     if(teach.size())
     {
-	it1 = teach.begin();
-	it2 = teach.end();
-	res = teach.begin();
+	res = std::remove_if(teach.begin(), teach.end(), std::bind1st(HeroesHaveSpell(), learner));
+	teach.resize(std::distance(teach.begin(), res));
+    }
 
-	const u8 wisdom = learner->GetLevelSkill(Skill::Secondary::WISDOM);
-	for(; it1 != it2; ++it1)
-	    if(! learner->HaveSpell(*it1) || CanTeachSpell(*it1, scholar, wisdom)) *res++ = *it1;
-
-	if(res != teach.begin()) teach.resize(res - teach.begin());
+    if(teach.size())
+    {
+	res = std::remove_if(teach.begin(), teach.end(), std::not1(std::bind1st(CanTeachSpell(), scholar)));
+	teach.resize(std::distance(teach.begin(), res));
     }
 
     std::string message, spells1, spells2;
@@ -429,7 +438,7 @@ void Heroes::ScholarAction(Heroes & hero1, Heroes & hero2)
     it2 = learn.end();
     for(; it1 != it2; ++it1)
     {
-	teacher->AppendSpellToBook(*it1, true);
+	teacher->AppendSpellToBook(*it1);
 	if(spells1.size())
 	    spells1.append(it1 + 1 == it2 ? _(" and ") : ", ");
 	spells1.append(Spell::GetName(*it1));
@@ -440,7 +449,7 @@ void Heroes::ScholarAction(Heroes & hero1, Heroes & hero2)
     it2 = teach.end();
     for(; it1 != it2; ++it1)
     {
-	learner->AppendSpellToBook(*it1, true);
+	learner->AppendSpellToBook(*it1);
 	if(spells2.size())
 	    spells2.append(it1 + 1 == it2 ? _(" and ") : ", ");
 	spells2.append(Spell::GetName(*it1));
