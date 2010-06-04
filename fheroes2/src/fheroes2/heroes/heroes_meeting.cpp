@@ -346,6 +346,18 @@ bool CanTeachSpell(u8 sp, u8 scholar, u8 wisdom)
 
 void Heroes::ScholarAction(Heroes & hero1, Heroes & hero2)
 {
+    if(! hero1.spell_book.isActive() || ! hero2.spell_book.isActive())
+    {
+	DEBUG(DBG_GAME, DBG_WARN, "Heroes::ScholarDialog: " << "EyeEagleAsScholar settings disabled");
+	return;
+    }
+    else
+    if(! Settings::Get().ExtEyeEagleAsScholar())
+    {
+	DEBUG(DBG_GAME, DBG_WARN, "Heroes::ScholarDialog: " << "EyeEagleAsScholar settings disabled");
+	return;
+    }
+
     const u8 scholar1 = hero1.GetLevelSkill(Skill::Secondary::EAGLEEYE);
     const u8 scholar2 = hero2.GetLevelSkill(Skill::Secondary::EAGLEEYE);
     u8 scholar = 0;
@@ -353,12 +365,6 @@ void Heroes::ScholarAction(Heroes & hero1, Heroes & hero2)
     Heroes* teacher = NULL;
     Heroes* learner = NULL;
 
-    if(! Settings::Get().ExtEyeEagleAsScholar())
-    {
-	VERBOSE("Heroes::ScholarDialog: " << "EyeEagleAsScholar settings disabled");
-	return;
-    }
-    else
     if(scholar1 && scholar1 >= scholar2)
     {
 	teacher = &hero1;
@@ -374,7 +380,7 @@ void Heroes::ScholarAction(Heroes & hero1, Heroes & hero2)
     }
     else
     {
-	VERBOSE("Heroes::ScholarDialog: " << "Eagle Eye skill not found");
+	DEBUG(DBG_GAME, DBG_WARN, "Heroes::ScholarDialog: " << "Eagle Eye skill not found");
 	return;
     }
 
