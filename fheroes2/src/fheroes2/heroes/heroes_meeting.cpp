@@ -348,7 +348,7 @@ void Heroes::ScholarAction(Heroes & hero1, Heroes & hero2)
 {
     if(! hero1.spell_book.isActive() || ! hero2.spell_book.isActive())
     {
-	DEBUG(DBG_GAME, DBG_WARN, "Heroes::ScholarDialog: " << "EyeEagleAsScholar settings disabled");
+	DEBUG(DBG_GAME, DBG_INFO, "Heroes::ScholarDialog: " << "heroes spell_book disabled");
 	return;
     }
     else
