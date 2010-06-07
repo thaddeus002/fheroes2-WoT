@@ -655,17 +655,12 @@ Dialog::answer_t Castle::OpenDialog(bool readonly, bool fade)
 	if((building & (BUILD_MAGEGUILD5 | BUILD_MAGEGUILD4 | BUILD_MAGEGUILD3 | BUILD_MAGEGUILD2 | BUILD_MAGEGUILD1)) &&
 	    le.MouseClickLeft(GetCoordBuilding(BUILD_MAGEGUILD5, cur_pt)))
 	{
-	    if(readonly)
-		Dialog::Message(GetStringBuilding(BUILD_MAGEGUILD1), GetDescriptionBuilding(BUILD_MAGEGUILD1), Font::BIG, Dialog::OK);
-	    else
-	    {
 		// buy spell book
 		if(!castle_heroes || (*castle_heroes).HasArtifact(Artifact::MAGIC_BOOK))
 		    OpenMageGuild();
 		else
 		if((*castle_heroes).BuySpellBook(*this))
 		    army_redraw = true;
-	    }
 	}
 	else
 	// left click dwelling monster
