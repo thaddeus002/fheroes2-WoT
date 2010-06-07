@@ -5,6 +5,9 @@
 
  <buy_boat gold="1000" wood="10" />
  <buy_spell_book gold="500" />
+ <buy_spell_book_from_shrine1 gold="1250" />
+ <buy_spell_book_from_shrine2 gold="1000" />
+ <buy_spell_book_from_shrine3 gold="750" />
  <recruit_hero gold="2500" />
 
 </payments>

@@ -853,7 +853,7 @@ screen_t CastleOpenDialog6(Castle & castle)
         // exit
         if(le.MouseClickLeft(rectExit) || le.KeyPress(KEY_ESCAPE)) break;
 	else
-	if(need_buy_book && le.MouseClickLeft(book_pos)) { const_cast<Heroes *>(hero)->BuySpellBook(castle); return SCREEN1; }
+	if(need_buy_book && le.MouseClickLeft(book_pos)) { const_cast<Heroes *>(hero)->BuySpellBook(&castle.GetMageGuild()); return SCREEN1; }
 
         spells1.QueueEventProcessing();
         spells2.QueueEventProcessing();

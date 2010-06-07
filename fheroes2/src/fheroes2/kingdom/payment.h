@@ -72,7 +72,7 @@ namespace PaymentConditions
     class BuySpellBook : public payment_t
     {
     public:
-	BuySpellBook();
+	BuySpellBook(u8 shrine = 0);
     };
 
     class RecruitHero : public payment_t

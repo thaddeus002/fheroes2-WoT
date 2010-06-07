@@ -41,6 +41,7 @@
 
 class Recruits;
 class Surface;
+class MageGuild;
 namespace Interface { class GameArea; }
 
 class Heroes : public HeroBase
@@ -179,7 +180,7 @@ public:
     void ActionNewMonth(void);
     void ActionAfterBattle(void);
 
-    bool BuySpellBook(const Castle &);
+    bool BuySpellBook(const MageGuild*, u8 shrine = 0);
 
     const Route::Path & GetPath(void) const{ return path; }
     Route::Path & GetPath(void) { return path; }

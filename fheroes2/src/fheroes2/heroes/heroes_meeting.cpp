@@ -75,7 +75,7 @@ void Heroes::MeetingDialog(Heroes & heroes2)
     dst_pt.y = cur_pt.y + 72;
     display.Blit(GetPortrait101x93(), dst_pt);
 
-    dst_pt.x = cur_pt.x + 447;
+    dst_pt.x = cur_pt.x + 445;
     dst_pt.y = cur_pt.y + 72;
     display.Blit(heroes2.GetPortrait101x93(), dst_pt);
 
@@ -406,6 +406,18 @@ void Heroes::ScholarAction(Heroes & hero1, Heroes & hero2)
     SpellBookSetFilter(teacher->bag_artifacts, teacher->spell_book.spells, teach, SpellBook::ALL);
     SpellBookSetFilter(learner->bag_artifacts, learner->spell_book.spells, learn, SpellBook::ALL);
 
+    VERBOSE(learner->GetName());
+    for(it1 = learn.begin(); it1 != learn.end(); ++it1)
+    {
+	VERBOSE(Spell::GetName(*it1) << "(" << static_cast<int>(Spell::Level(*it1)) << ")");
+    }
+
+    VERBOSE(teacher->GetName());
+    for(it1 = teach.begin(); it1 != teach.end(); ++it1)
+    {
+	VERBOSE(Spell::GetName(*it1) << "(" << static_cast<int>(Spell::Level(*it1)) << ")");
+    }
+
     // remove_if for learn spells
     if(learn.size())
     {
@@ -477,4 +489,6 @@ void Heroes::ScholarAction(Heroes & hero1, Heroes & hero2)
 
 	Dialog::Message(_("Scholar Ability"), message, Font::BIG, Dialog::OK);
     }
+
+    VERBOSE(message);
 }

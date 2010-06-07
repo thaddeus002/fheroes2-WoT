@@ -1103,38 +1103,44 @@ void ActionToShrine(Heroes &hero, const u8 obj, const u16 dst_index)
 	    break;
 	default: return;
     }
-    
+
     String::Replace(body, "%{spell}", spell.GetName());
 
     // check spell book
-    if(!hero.HasArtifact(Artifact::MAGIC_BOOK))
+    if(!hero.HaveSpellBook())
     {
-	PlaySoundFailure;
-	body += _("\nUnfortunately, you have no Magic Book to record the spell with.");
-	Dialog::Message(head, body, Font::BIG, Dialog::OK);
+	if(!Settings::Get().ExtBuySpellBookFromShrine() || !hero.BuySpellBook(NULL, spell_level))
+	{
+	    PlaySoundFailure;
+	    body += _("\nUnfortunately, you have no Magic Book to record the spell with.");
+	    Dialog::Message(head, body, Font::BIG, Dialog::OK);
+	}
     }
-    else
-    // check valid level spell and wisdom skill
-    if(3 == spell_level && Skill::Level::NONE == hero.GetLevelSkill(Skill::Secondary::WISDOM))
+
+    if(hero.HaveSpellBook())
     {
-	PlaySoundFailure;
-	body += _("\nUnfortunately, you do not have the wisdom to understand the spell, and you are unable to learn it.");
-	Dialog::Message(head, body, Font::BIG, Dialog::OK);
-    }
-    else
-    // already know
-    if(hero.HaveSpell(spell()))
-    {
-	PlaySoundFailure;
-	body += _("\nUnfortunately, you already have knowledge of this spell, so there is nothing more for them to teach you.");
-	Dialog::Message(head, body, Font::BIG, Dialog::OK);
-    }
-    else
-    {
-	PlaySoundSuccess;
-	hero.AppendSpellToBook(spell());
-	hero.SetVisited(dst_index, Visit::GLOBAL);
-	Dialog::SpellInfo(head, body, spell());
+	// check valid level spell and wisdom skill
+	if(3 == spell_level && Skill::Level::NONE == hero.GetLevelSkill(Skill::Secondary::WISDOM))
+	{
+	    PlaySoundFailure;
+	    body += _("\nUnfortunately, you do not have the wisdom to understand the spell, and you are unable to learn it.");
+	    Dialog::Message(head, body, Font::BIG, Dialog::OK);
+	}
+	else
+	// already know
+	if(hero.HaveSpell(spell()))
+	{
+	    PlaySoundFailure;
+	    body += _("\nUnfortunately, you already have knowledge of this spell, so there is nothing more for them to teach you.");
+	    Dialog::Message(head, body, Font::BIG, Dialog::OK);
+	}
+	else
+	{
+	    PlaySoundSuccess;
+	    hero.AppendSpellToBook(spell());
+	    hero.SetVisited(dst_index, Visit::GLOBAL);
+	    Dialog::SpellInfo(head, body, spell());
+	}
     }
 
     DEBUG(DBG_GAME , DBG_INFO, "ActionToShrine: " << hero.GetName());

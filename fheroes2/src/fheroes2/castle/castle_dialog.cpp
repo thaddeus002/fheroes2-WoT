@@ -659,7 +659,7 @@ Dialog::answer_t Castle::OpenDialog(bool readonly, bool fade)
 		if(!castle_heroes || (*castle_heroes).HasArtifact(Artifact::MAGIC_BOOK))
 		    OpenMageGuild();
 		else
-		if((*castle_heroes).BuySpellBook(*this))
+		if((*castle_heroes).BuySpellBook(&mageguild))
 		    army_redraw = true;
 	}
 	else

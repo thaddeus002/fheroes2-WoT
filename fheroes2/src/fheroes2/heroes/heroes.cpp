@@ -1094,11 +1094,11 @@ u32 Heroes::GetExperienceFromLevel(u8 lvl)
 }
 
 /* buy book */
-bool Heroes::BuySpellBook(const Castle & castle)
+bool Heroes::BuySpellBook(const MageGuild* mageguild, u8 shrine)
 {
     if(HaveSpellBook() || Color::GRAY == color) return false;
 
-    const payment_t payment = PaymentConditions::BuySpellBook();
+    const payment_t payment = PaymentConditions::BuySpellBook(shrine);
     Kingdom & kingdom = world.GetKingdom(color);
 
     std::string header = _("To cast spells, you must first buy a spell book for %{gold} gold.");
@@ -1133,8 +1133,9 @@ bool Heroes::BuySpellBook(const Castle & castle)
     {
 	kingdom.OddFundsResource(payment);
 	SpellBookActivate();
+
 	// add all spell to book
-	castle.GetMageGuild().EducateHero(*this);
+	if(mageguild) mageguild->EducateHero(*this);
 #ifdef WITH_NET
 	FH2LocalClient::SendHeroesBuyMagicBook(*this);
 #endif

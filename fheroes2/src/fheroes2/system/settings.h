@@ -104,6 +104,7 @@ public:
 	WORLD_SCOUTING_EXTENDED		= 0x20000040,
 	WORLD_ONLY_FIRST_MONSTER_ATTACK	= 0x20000080,
 	WORLD_EYE_EAGLE_AS_SCHOLAR	= 0x20000100,
+	WORLD_BUY_BOOK_FROM_SHRINES	= 0x20000200,
 	UNIONS_ALLOW_HERO_MEETINGS	= 0x20001000,
 	UNIONS_ALLOW_CASTLE_VISITING	= 0x20002000,
 	UNIONS_ALLOW_VIEW_MAPS		= 0x20004000,
@@ -200,6 +201,7 @@ public:
     bool ExtForceSelectRaceFromType(void) const;
     bool ExtOnlyFirstMonsterAttack(void) const;
     bool ExtEyeEagleAsScholar(void) const;
+    bool ExtBuySpellBookFromShrine(void) const;
     bool ExtUnionsAllowCastleVisiting(void) const;
     bool ExtUnionsAllowHeroesMeetings(void) const;
     bool ExtUnionsAllowViewMaps(void) const;

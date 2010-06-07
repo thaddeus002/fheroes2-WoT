@@ -41,6 +41,9 @@ struct paymentstats_t
 static paymentstats_t _payments[] = {
     { "buy_boat",       { 1000,10, 0, 0, 0, 0, 0 } },
     { "buy_spell_book", {  500, 0, 0, 0, 0, 0, 0 } },
+    { "buy_spell_book_from_shrine1", {  1250, 0, 0, 0, 0, 0, 0 } },
+    { "buy_spell_book_from_shrine2", {  1000, 0, 0, 0, 0, 0, 0 } },
+    { "buy_spell_book_from_shrine3", {   750, 0, 0, 0, 0, 0, 0 } },
     { "recruit_hero",   { 2500, 0, 0, 0, 0, 0, 0 } },
 
     { NULL, { 0, 0, 0, 0, 0, 0, 0 } },
@@ -123,11 +126,20 @@ PaymentConditions::BuyBoat::BuyBoat()
     if(ptr) PaymentLoadCost(*this, ptr->cost);
 }
 
-PaymentConditions::BuySpellBook::BuySpellBook()
+PaymentConditions::BuySpellBook::BuySpellBook(u8 shrine)
 {
     paymentstats_t* ptr = &_payments[0];
+    const char* skey = NULL;
 
-    while(ptr->id && std::strcmp("buy_spell_book", ptr->id)) ++ptr;
+    switch(shrine)
+    {
+	case 1:  skey = "buy_spell_book_from_shrine1"; break;
+	case 2:  skey = "buy_spell_book_from_shrine2"; break;
+	case 3:  skey = "buy_spell_book_from_shrine3"; break;
+	default: skey = "buy_spell_book"; break;
+    }
+
+    while(ptr->id && std::strcmp(skey, ptr->id)) ++ptr;
 
     if(ptr) PaymentLoadCost(*this, ptr->cost);
 }
