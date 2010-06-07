@@ -48,7 +48,7 @@ public:
     virtual u16 h(void) const = 0;
     virtual size_t Size(void) const = 0;
 
-    virtual void Blit(u16 ax, u16 ay, Surface & sf = Display::Get()) = 0;
+    virtual void Blit(u16 ax, u16 ay, const u16 maxw, Surface & sf = Display::Get()) = 0;
 
     Font::type_t font;
 };
@@ -70,7 +70,7 @@ public:
     u16 h(const u16) const;
     size_t Size(void) const;
 
-    void Blit(u16 ax, u16 ay, Surface & sf = Display::Get());
+    void Blit(u16 ax, u16 ay, const u16 maxw, Surface & sf = Display::Get());
     static u8 CharWidth(char, Font::type_t);
     static u8 CharHeight(Font::type_t);
     static u8 CharAscent(Font::type_t);
@@ -98,7 +98,7 @@ public:
     u16 h(const u16) const;
     size_t Size(void) const;
 
-    void Blit(u16 ax, u16 ay, Surface & sf = Display::Get());
+    void Blit(u16 ax, u16 ay, u16 maxw, Surface & sf = Display::Get());
 
     static bool isspace(u16);
     static u8 CharWidth(u16, Font::type_t);
@@ -135,6 +135,7 @@ public:
     u16 h(void) const{ return gh; }
 
     void Blit(u16 ax, u16 ay, Surface & sf = Display::Get()) const;
+    void Blit(u16 ax, u16 ay, u16 maxw, Surface & sf = Display::Get()) const;
     void Blit(const Point & dst_pt, Surface & sf = Display::Get()) const;
 
     static u16 width(const std::string &str, Font::type_t ft, u16 start = 0, u16 count = 0);

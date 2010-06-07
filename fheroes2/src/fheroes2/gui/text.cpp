@@ -136,16 +136,19 @@ u16 TextAscii::h(const u16 width) const
     return res;
 }
 
-void TextAscii::Blit(u16 ax, u16 ay, Surface & dst)
+void TextAscii::Blit(u16 ax, u16 ay, const u16 maxw, Surface & dst)
 {
     if(message.empty()) return;
 
     std::string::const_iterator it = message.begin();
     std::string::const_iterator it_end = message.end();
     s8 oy = 0;
+    const u16 sx = ax;
 
     for(; it != it_end; ++it)
     {
+	if(maxw && (ax - sx) >= maxw) break;
+
 	// space or unknown letter
 	if(*it < 0x21)
 	{
@@ -332,15 +335,18 @@ u16 TextUnicode::h(const u16 width) const
     return res;
 }
 
-void TextUnicode::Blit(u16 ax, u16 ay, Surface & dst)
+void TextUnicode::Blit(u16 ax, u16 ay, const u16 maxw, Surface & dst)
 {
     if(message.empty()) return;
 
     std::vector<u16>::const_iterator it = message.begin();
     std::vector<u16>::const_iterator it_end = message.end();
+    const u16 sx = ax;
 
     for(; it != it_end; ++it)
     {
+	if(maxw && (ax - sx) >= maxw) break;
+
 	// end string
 	if(0 == *it) continue;
 
@@ -468,12 +474,17 @@ size_t Text::Size(void) const
 
 void Text::Blit(const Point & dst_pt, Surface & dst) const
 {
-    return message->Blit(dst_pt.x, dst_pt.y, dst);
+    return message->Blit(dst_pt.x, dst_pt.y, 0, dst);
 }
 
 void Text::Blit(u16 ax, u16 ay, Surface & dst) const
 {
-    return message->Blit(ax, ay, dst);
+    return message->Blit(ax, ay, 0, dst);
+}
+
+void Text::Blit(u16 ax, u16 ay, u16 maxw, Surface & dst) const
+{
+    return message->Blit(ax, ay, maxw, dst);
 }
 
 u16 Text::width(const std::string &str, Font::type_t ft, u16 start, u16 count)
