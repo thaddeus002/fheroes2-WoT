@@ -395,7 +395,7 @@ bool Settings::Read(const std::string & filename)
 	for(; it1 != it2; ++it1)
 	{
 	    const std::string & key = (*it1).first;
-	    const std::string & val = (*it2).StrParams();
+	    const std::string & val = (*it1).StrParams();
 	    if(4 < key.size() && 1 < val.size() && key.substr(0, 4) == "key_")
 	    {
 		int code = String::ToInt(key.substr(4));
