@@ -22,12 +22,12 @@
  <spell cost="12" extra="50" />
  <!-- Resurrect True -->
  <spell cost="15" extra="50" />
- <!-- Haste (if set: current + extra) -->
- <spell cost="3" extra="2" />
+ <!-- Haste (if set: current + extra, or zero: default h2) -->
+ <spell cost="3" extra="0" />
  <!-- Mass Haste (extra used from Haste) -->
  <spell cost="10" />
- <!-- Slow (if set: current - extra) -->
- <spell cost="3" extra="2" />
+ <!-- Slow (if set: current - extra, or zero: default h2) -->
+ <spell cost="3" extra="0" />
  <!-- Mass Slow (extra used from Slow) -->
  <spell cost="15" />
  <!-- Blind  -->
