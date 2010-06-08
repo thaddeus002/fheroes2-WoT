@@ -684,7 +684,7 @@ void World::LoadMaps(const std::string &filename)
 			}
 
 			// check heroes max count
-			if(kingdom.AllowRecruitHero(false))
+			if(kingdom.AllowRecruitHero(false, 0))
 			{
 			    const Heroes * hero = NULL;
 

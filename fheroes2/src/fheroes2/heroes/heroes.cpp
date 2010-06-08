@@ -754,7 +754,7 @@ bool Heroes::Recruit(const Color::color_t cl, const Point & pt)
 
     Kingdom & kingdom = world.GetKingdom(cl);
 
-    if(kingdom.AllowRecruitHero(false))
+    if(kingdom.AllowRecruitHero(false, 0))
     {
 	Maps::Tiles & tiles = world.GetTiles(pt);
 	color = cl;

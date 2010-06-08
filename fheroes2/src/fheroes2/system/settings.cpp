@@ -107,6 +107,7 @@ static const settings_t settingsFHeroes2[] =
     { Settings::CASTLE_ALLOW_BUY_FROM_WELL,	_("castle: allow buy from well"),			},
     { Settings::HEROES_LEARN_SPELLS_WITH_DAY,	_("heroes: learn new spells with day"),  		},
     { Settings::HEROES_FORCE_RACE_FROM_TYPE,	_("heroes: fixed race with custom portrait"),  		},
+    { Settings::HEROES_COST_DEPENDED_FROM_LEVEL,_("heroes: recruit cost to be dependent on hero level"),},
     { Settings::UNIONS_ALLOW_HERO_MEETINGS,	_("unions: allow meeting heroes"),                      },
     { Settings::UNIONS_ALLOW_CASTLE_VISITING,	_("unions: allow castle visiting"),                     },
     { Settings::UNIONS_ALLOW_VIEW_MAPS,		_("unions: allow view maps"),                           },
@@ -1096,6 +1097,11 @@ bool Settings::ExtEyeEagleAsScholar(void) const
 bool Settings::ExtBuySpellBookFromShrine(void) const
 {
     return ExtModes(WORLD_BUY_BOOK_FROM_SHRINES);
+}
+
+bool Settings::ExtHeroRecruitCostDependedFromLevel(void) const
+{
+    return ExtModes(HEROES_COST_DEPENDED_FROM_LEVEL);
 }
 
 bool Settings::ExtLearnSpellsWithDay(void) const

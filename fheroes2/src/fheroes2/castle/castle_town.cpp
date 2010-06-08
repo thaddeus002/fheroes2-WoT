@@ -73,7 +73,7 @@ Dialog::answer_t Castle::DialogBuyHero(const Heroes* hero)
 
     TextBox box2(str, Font::BIG, BOXAREA_WIDTH);
 
-    Resource::BoxSprite rbs(PaymentConditions::RecruitHero(), BOXAREA_WIDTH);
+    Resource::BoxSprite rbs(PaymentConditions::RecruitHero(hero->GetLevel()), BOXAREA_WIDTH);
 
     Dialog::Box box(text.h() + spacer + portrait_frame.h() + spacer + box2.h() + spacer + rbs.GetArea().h, true);
     const Rect & box_rt = box.GetArea();
@@ -104,7 +104,7 @@ Dialog::answer_t Castle::DialogBuyHero(const Heroes* hero)
     dst_pt.y = box_rt.y + box_rt.h - AGG::GetICN(system, 1).h();
     Button button1(dst_pt, system, 1, 2);
 
-    if(! AllowBuyHero())
+    if(! AllowBuyHero(*hero))
     {
 	button1.Press();
 	button1.SetDisable(true);
@@ -353,11 +353,13 @@ u32 Castle::OpenTown(void)
 
     Kingdom & kingdom = world.GetKingdom(GetColor());
 
-    const bool many_hero = !kingdom.AllowRecruitHero(false);
-    const bool allow_buy_hero = AllowBuyHero();
-
     Heroes* hero1 = kingdom.GetRecruits().GetHero1();
     Heroes* hero2 = kingdom.GetRecruits().GetHero2();
+
+    const bool many_hero1 = hero1 ? !kingdom.AllowRecruitHero(false, hero1->GetLevel()) : false;
+    const bool many_hero2 = hero2 ? !kingdom.AllowRecruitHero(false, hero2->GetLevel()) : false;
+    const bool allow_buy_hero1 = hero1 ? AllowBuyHero(*hero1) : false;
+    const bool allow_buy_hero2 = hero2 ? AllowBuyHero(*hero2) : false;
 
     // first hero
     dst_pt.x = cur_pt.x + 443;
@@ -370,7 +372,7 @@ u32 Castle::OpenTown(void)
     else
 	display.FillRect(0, 0, 0, rectHero1);
     // indicator
-    if(many_hero || !allow_buy_hero)
+    if(many_hero1 || !allow_buy_hero1)
     {
 	dst_pt.x += 83;
 	dst_pt.y += 75;
@@ -388,7 +390,7 @@ u32 Castle::OpenTown(void)
     else
 	display.FillRect(0, 0, 0, rectHero2);
     // indicator
-    if(many_hero || !allow_buy_hero)
+    if(many_hero2 || !allow_buy_hero2)
     {
 	dst_pt.x += 83;
 	dst_pt.y += 75;
@@ -557,27 +559,36 @@ u32 Castle::OpenTown(void)
 	else
 	if(le.MouseCursor(buildingCaptain.GetArea())) buildingCaptain.SetStatusMessage(statusBar);
 	else
-	if((hero1 && le.MouseCursor(rectHero1)) ||
-	   (hero2 && le.MouseCursor(rectHero2)))
+	if(hero1 && le.MouseCursor(rectHero1))
 	{
-	    if(many_hero)
+	    if(many_hero1)
 		statusBar.ShowMessage(_("Cannot recruit - you have too many Heroes."));
 	    else
 	    if(castle_heroes)
 		statusBar.ShowMessage(_("Cannot recruit - you already have a Hero in this town."));
 	    else
-	    if(! allow_buy_hero)
+	    if(! allow_buy_hero1)
 		statusBar.ShowMessage(_("Cannot afford a Hero"));
 	    else
-	    if(le.MouseCursor(rectHero1))
 	    {
 		std::string str = _("Recruit %{name} the %{race}");
 		String::Replace(str, "%{name}", hero1->GetName());
 		String::Replace(str, "%{race}", Race::String(hero1->GetRace()));
 	    	statusBar.ShowMessage(str);
 	    }
+	}
+	else
+	if(hero2 && le.MouseCursor(rectHero2))
+	{
+	    if(many_hero2)
+		statusBar.ShowMessage(_("Cannot recruit - you have too many Heroes."));
 	    else
-	    if(le.MouseCursor(rectHero2))
+	    if(castle_heroes)
+		statusBar.ShowMessage(_("Cannot recruit - you already have a Hero in this town."));
+	    else
+	    if(! allow_buy_hero2)
+		statusBar.ShowMessage(_("Cannot afford a Hero"));
+	    else
 	    {
 		std::string str = _("Recruit %{name} the %{race}");
 		String::Replace(str, "%{name}", hero2->GetName());

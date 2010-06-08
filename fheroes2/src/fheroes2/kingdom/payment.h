@@ -78,7 +78,7 @@ namespace PaymentConditions
     class RecruitHero : public payment_t
     {
     public:
-	RecruitHero();
+	RecruitHero(u8 level);
     };
 
     void UpdateCosts(const std::string &);

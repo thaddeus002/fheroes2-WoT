@@ -154,6 +154,7 @@ void Dialog::ExtSettings(void)
     states.push_back(Settings::WORLD_BUY_BOOK_FROM_SHRINES);
     states.push_back(Settings::HEROES_FORCE_RACE_FROM_TYPE);
     states.push_back(Settings::HEROES_LEARN_SPELLS_WITH_DAY);
+    states.push_back(Settings::HEROES_COST_DEPENDED_FROM_LEVEL);
     if(conf.VideoMode().w >= 640 && conf.VideoMode().w >= 480)
 	states.push_back(Settings::CASTLE_ALLOW_BUY_FROM_WELL);
 

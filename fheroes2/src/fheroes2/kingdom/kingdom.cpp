@@ -487,9 +487,9 @@ bool Kingdom::IsVisitTravelersTent(u8 col) const
     return visited_tents_colors & col;
 }
 
-bool Kingdom::AllowRecruitHero(bool check_payment) const
+bool Kingdom::AllowRecruitHero(bool check_payment, u8 level) const
 {
-    return (heroes.size() < GetMaxHeroes()) && (!check_payment || AllowPayment(PaymentConditions::RecruitHero()));
+    return (heroes.size() < GetMaxHeroes()) && (!check_payment || AllowPayment(PaymentConditions::RecruitHero(level)));
 }
 
 void Kingdom::ApplyPlayWithStartingHero(void)
@@ -516,7 +516,7 @@ void Kingdom::ApplyPlayWithStartingHero(void)
 	if(Settings::Get().GameStartWithHeroes())
 	{
     	    Heroes *hero = world.GetFreemanHeroes((*it)->GetRace());
-	    if(hero && AllowRecruitHero(false)) hero->Recruit(**it);
+	    if(hero && AllowRecruitHero(false, 0)) hero->Recruit(**it);
 	}
     }
 }

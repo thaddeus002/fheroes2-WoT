@@ -547,16 +547,16 @@ const char* Castle::GetDescriptionBuilding(u32 build, Race::race_t race)
     return desc_build[13];
 }
 
-bool Castle::AllowBuyHero(void)
+bool Castle::AllowBuyHero(const Heroes & hero)
 {
-    return !GetHeroes() && world.GetKingdom(color).AllowRecruitHero(true);
+    return !GetHeroes() && world.GetKingdom(color).AllowRecruitHero(true, hero.GetLevel());
 }
 
 bool Castle::RecruitHero(Heroes* hero)
 {
-    if(! AllowBuyHero() || !hero || !hero->Recruit(*this)) return false;
+    if(!hero || !AllowBuyHero(*hero) || !hero->Recruit(*this)) return false;
 
-    world.GetKingdom(color).OddFundsResource(PaymentConditions::RecruitHero());
+    world.GetKingdom(color).OddFundsResource(PaymentConditions::RecruitHero(hero->GetLevel()));
     castle_heroes = hero;
 
     // update spell book

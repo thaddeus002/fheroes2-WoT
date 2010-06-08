@@ -8,6 +8,10 @@
  <buy_spell_book_from_shrine1 gold="1250" />
  <buy_spell_book_from_shrine2 gold="1000" />
  <buy_spell_book_from_shrine3 gold="750" />
+
+ <!-- recruit hero: main price -->
  <recruit_hero gold="2500" />
+ <!-- recruit hero: level price -->
+ <recruit_level gold="500" />
 
 </payments>

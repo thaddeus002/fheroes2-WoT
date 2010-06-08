@@ -45,6 +45,7 @@ static paymentstats_t _payments[] = {
     { "buy_spell_book_from_shrine2", {  1000, 0, 0, 0, 0, 0, 0 } },
     { "buy_spell_book_from_shrine3", {   750, 0, 0, 0, 0, 0, 0 } },
     { "recruit_hero",   { 2500, 0, 0, 0, 0, 0, 0 } },
+    { "recruit_level",   { 500, 0, 0, 0, 0, 0, 0 } },
 
     { NULL, { 0, 0, 0, 0, 0, 0, 0 } },
 };
@@ -144,11 +145,26 @@ PaymentConditions::BuySpellBook::BuySpellBook(u8 shrine)
     if(ptr) PaymentLoadCost(*this, ptr->cost);
 }
 
-PaymentConditions::RecruitHero::RecruitHero()
+PaymentConditions::RecruitHero::RecruitHero(u8 level)
 {
     paymentstats_t* ptr = &_payments[0];
-
     while(ptr->id && std::strcmp("recruit_hero", ptr->id)) ++ptr;
-
     if(ptr) PaymentLoadCost(*this, ptr->cost);
+
+    // level price
+    if(Settings::Get().ExtHeroRecruitCostDependedFromLevel())
+    {
+	ptr = &_payments[0];
+	while(ptr->id && std::strcmp("recruit_level", ptr->id)) ++ptr;
+	if(ptr && 1 < level)
+	{
+	    if(ptr->cost.gold) gold += (level - 1) * ptr->cost.gold;
+	    if(ptr->cost.wood) wood += (level - 1) * ptr->cost.wood;
+	    if(ptr->cost.mercury) mercury += (level - 1) * ptr->cost.mercury;
+	    if(ptr->cost.ore) ore += (level - 1) * ptr->cost.ore;
+	    if(ptr->cost.sulfur) sulfur += (level - 1) * ptr->cost.sulfur;
+	    if(ptr->cost.crystal) crystal += (level - 1) * ptr->cost.crystal;
+	    if(ptr->cost.gems) gems += (level - 1) * ptr->cost.gems;
+	}
+    }
 }

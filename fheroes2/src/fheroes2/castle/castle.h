@@ -99,7 +99,7 @@ public:
     bool HaveNearlySea(void) const;
     bool PresentBoat(void) const;
     bool RecruitMonster(u32 dw, u16 count);
-    bool AllowBuyHero(void);
+    bool AllowBuyHero(const Heroes &);
     bool ContainCoord(const u16 ax, const u16 ay) const;
     bool isNecromancyShrineBuild(void) const;
 

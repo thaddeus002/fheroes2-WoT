@@ -111,6 +111,7 @@ public:
 	CASTLE_ALLOW_BUY_FROM_WELL	= 0x20100000,
 	HEROES_LEARN_SPELLS_WITH_DAY	= 0x20200000,
 	HEROES_FORCE_RACE_FROM_TYPE	= 0x20400000,
+	HEROES_COST_DEPENDED_FROM_LEVEL = 0x20800000,
 
 	BATTLE_ARCHMAGE_RESIST_BAD_SPELL= 0x40001000,
 	BATTLE_MAGIC_TROOP_RESIST	= 0x40002000,
@@ -202,6 +203,7 @@ public:
     bool ExtOnlyFirstMonsterAttack(void) const;
     bool ExtEyeEagleAsScholar(void) const;
     bool ExtBuySpellBookFromShrine(void) const;
+    bool ExtHeroRecruitCostDependedFromLevel(void) const;
     bool ExtUnionsAllowCastleVisiting(void) const;
     bool ExtUnionsAllowHeroesMeetings(void) const;
     bool ExtUnionsAllowViewMaps(void) const;
