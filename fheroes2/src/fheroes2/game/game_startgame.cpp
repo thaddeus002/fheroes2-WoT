@@ -768,6 +768,9 @@ Game::menu_t Game::HumanTurn(void)
 	// hot keys
 	if(le.KeyPress()) switch(le.KeyValue())
 	{
+#ifdef WITHOUT_MOUSE
+	    case KEY_BACKSLASH:	le.ToggleEmulateMouse(); break;
+#endif
 	    // exit
 	    case KEY_q:
 	    case KEY_ESCAPE:	KeyPress_ESC(res); break;

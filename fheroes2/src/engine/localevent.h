@@ -235,6 +235,7 @@ public:
     u16	   KeyMod(void) const;
 
 #ifdef WITHOUT_MOUSE
+    void ToggleEmulateMouse(void);
     void SetEmulateMouse(bool);
     void SetEmulateMouseUpKey(int);
     void SetEmulateMouseDownKey(int);

@@ -6,7 +6,7 @@ TARGET := fheroes2
 SDL_LIBS := $(shell sdl-config --libs)
 SDL_FLAGS := $(shell sdl-config --cflags)
 
-CFLAGS := $(CFLAGS) -Wall -fsigned-char
+CFLAGS := $(CFLAGS) -Wall -fsigned-char -DWITH_KEYMAPPING
 LIBS :=
 
 ifdef DEBUG

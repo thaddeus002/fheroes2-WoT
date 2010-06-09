@@ -739,6 +739,11 @@ void LocalEvent::SetStateDefaults(void)
 }
 
 #ifdef WITHOUT_MOUSE
+void LocalEvent::ToggleEmulateMouse(void)
+{
+    emulate_mouse = emulate_mouse ? false : true;
+}
+
 void LocalEvent::SetEmulateMouse(bool f)
 {
     emulate_mouse = f;

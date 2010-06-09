@@ -23,6 +23,7 @@ Copy origin data/*.agg in to data directory.
 Copy maps files (*.mp2) in to maps directory.
 
 Hot keys:
+\		- enable/disable emulate mouse
 F4		- switch to fullscreen
 PrintScreen	- create screenshot
 Up		- move hero top
