@@ -1522,9 +1522,10 @@ void Heroes::SetFreeman(const u8 reason)
 {
     if(isFreeman()) return;
 
+    bool savepoints = false;
     if((Battle2::RESULT_RETREAT | Battle2::RESULT_SURRENDER) & reason)
     {
-	if(Settings::Get().ExtRememberPointsForHeroRetreating()) SetModes(SAVEPOINTS);
+	if(Settings::Get().ExtRememberPointsForHeroRetreating()) savepoints = true;
 	world.GetKingdom(color).GetRecruits().SetHero2(this);
     }
 
@@ -1542,6 +1543,7 @@ void Heroes::SetFreeman(const u8 reason)
     path.Reset();
     SetMove(false);
     SetModes(ACTION);
+    if(savepoints) SetModes(SAVEPOINTS);
 }
 
 bool Heroes::isShow(u8 color)
