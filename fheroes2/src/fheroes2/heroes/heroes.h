@@ -82,6 +82,7 @@ public:
 	STUPID		= 0x0040,
 	JAIL		= 0x0080,
 	ACTION		= 0x0100,
+	SAVEPOINTS	= 0x0200,
 	VISIONS		= 0x4000,
 	PATROL		= 0x8000
     };

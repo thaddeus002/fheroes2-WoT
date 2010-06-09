@@ -760,7 +760,7 @@ bool Heroes::Recruit(const Color::color_t cl, const Point & pt)
 	color = cl;
 	killer_color = Color::GRAY;
 	mp = pt;
-	move_point = GetMaxMovePoints();
+	if(!Modes(SAVEPOINTS)) move_point = GetMaxMovePoints();
 
 	if(!army.isValid()) army.Reset(false);
 
@@ -783,7 +783,7 @@ bool Heroes::Recruit(const Castle & castle)
 	if(castle.GetLevelMageGuild())
 	{
 	    // magic point
-	    SetSpellPoints(GetMaxSpellPoints());
+	    if(!Modes(SAVEPOINTS)) SetSpellPoints(GetMaxSpellPoints());
 	    // learn spell
 	    castle.GetMageGuild().EducateHero(*this);
 	}
@@ -865,6 +865,7 @@ void Heroes::ActionNewDay(void)
 
     // new day, new capacities
     ResetModes(STUPID);
+    ResetModes(SAVEPOINTS);
 }
 
 void Heroes::ActionNewWeek(void)
@@ -1521,7 +1522,11 @@ void Heroes::SetFreeman(const u8 reason)
 {
     if(isFreeman()) return;
 
-    if((Battle2::RESULT_RETREAT | Battle2::RESULT_SURRENDER) & reason) world.GetKingdom(color).GetRecruits().SetHero2(this);
+    if((Battle2::RESULT_RETREAT | Battle2::RESULT_SURRENDER) & reason)
+    {
+	if(Settings::Get().ExtRememberPointsForHeroRetreating()) SetModes(SAVEPOINTS);
+	world.GetKingdom(color).GetRecruits().SetHero2(this);
+    }
 
     if(!army.isValid() || (Battle2::RESULT_RETREAT & reason)) army.Reset(false);
     else
