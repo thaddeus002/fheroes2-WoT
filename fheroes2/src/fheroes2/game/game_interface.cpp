@@ -238,6 +238,8 @@ s16 Interface::Basic::GetDimensionDoorDestination(const u16 from, const u8 dista
     {
 	const Point & mp = le.GetMouseCursor();
 	dst = gameArea.GetIndexFromMousePoint(mp);
+	if(0 > dst) break;
+
 	const Maps::Tiles & tile = world.GetTiles(dst);
 
 	const bool valid = ((gameArea.GetArea() & mp) &&
