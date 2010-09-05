@@ -239,17 +239,7 @@ void MTrk::ImportXmiEVNT(const Chunk & evnt)
 	    // apply delta
 	    for(; it1 != it2; ++it1)
 	    {
-		if((*it1).duration < delta)
-		{
-		    buf[0] = (*it1).quantity;
-		    buf[1] = 0x7F;
-
-		    // note off
-		    events.push_back(new Event((*it1).duration - delta2, (*it1).command, 2, buf));
-		    delta2 += ((*it1).duration - delta2);
-		}
-		else
-		if((*it1).duration == delta)
+		if((*it1).duration <= delta)
 		{
 		    buf[0] = (*it1).quantity;
 		    buf[1] = 0x7F;
