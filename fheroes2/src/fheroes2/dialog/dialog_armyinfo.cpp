@@ -217,6 +217,14 @@ void DrawMonsterStats(const Point & dst, const Army::Troop & troop)
 	String::AddInt(message, troop.GetAttack());
 	message += ")";
     }
+    else
+    // added ext. battle info
+    if(battle && mons.GetAttack() != battle->GetAttack())
+    {
+	message += " (";
+	String::AddInt(message, battle->GetAttack());
+	message += ")";
+    }
 
     const u8 ox = 15;
 
@@ -239,6 +247,14 @@ void DrawMonsterStats(const Point & dst, const Army::Troop & troop)
     {
 	message += " (";
 	String::AddInt(message, troop.GetDefense());
+	message += ")";
+    }
+    else
+    // added ext. battle info
+    if(battle && mons.GetDefense() != battle->GetDefense())
+    {
+	message += " (";
+	String::AddInt(message, battle->GetDefense());
 	message += ")";
     }
 
