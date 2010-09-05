@@ -314,6 +314,7 @@ void LoadZLogo(void)
 		ii -= 10;
 	    }
 	}
+	delete zlogo;
     }
 #endif
 }
