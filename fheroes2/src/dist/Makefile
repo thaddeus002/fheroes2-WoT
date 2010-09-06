@@ -38,7 +38,7 @@ all: $(TARGET)
 
 $(TARGET): $(notdir $(patsubst %.cpp, %.o, $(wildcard $(SEARCH)))) $(LIBENGINE) $(RES)
 	@echo "lnk: $@"
-	$(CXX) $(CFLAGS) $^ $(RES) $(LIBS) -o $@
+	$(CXX) $(LDFLAGS) $^ $(RES) $(LIBS) -o $@
 
 pot: $(wildcard $(SEARCH))
 	@echo "gen: $(POT)"
