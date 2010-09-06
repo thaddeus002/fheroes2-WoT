@@ -72,6 +72,16 @@ int PrintHelp(const char *basename)
 
 int main(int argc, char **argv)
 {
+#ifndef BUILD_RELEASE
+        // force save logs
+	{
+	    const std::string strout = std::string(GetDirname(argv[0])) + SEPARATOR + "stdout.txt";
+	    const std::string strerr = std::string(GetDirname(argv[0])) + SEPARATOR + "stderr.txt";
+	    freopen(strout.c_str(), "w", stdout);
+	    freopen(strerr.c_str(), "w", stderr);
+	}
+#endif
+
 	Settings & conf = Settings::Get();
 	int test = 0;
 
@@ -111,7 +121,6 @@ int main(int argc, char **argv)
 
                     default:  break;
 		}
-
 	}
 
 	if(conf.SelectVideoDriver().size()) SetVideoDriver(conf.SelectVideoDriver());
