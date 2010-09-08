@@ -62,7 +62,10 @@ s32 Rand::Queue::Get(void)
 
     // set weight (from 100)
     it = begin();
-    for(; it != end(); ++it) (*it).second = 100 * (*it).second / max;
+    if(max)
+	for(; it != end(); ++it) (*it).second = 100 * (*it).second / max;
+    else
+	std::cerr << "Rand::Queue::Get:" << " max is 0" << std::endl;
 
     // get max
     max = 0;
@@ -79,6 +82,6 @@ s32 Rand::Queue::Get(void)
         if(rand <= amount) return (*it).first;
     }
 
-    std::cerr << "Rand::Queue::Get: weight not found, return 0" << std::endl;
+    std::cerr << "Rand::Queue::Get:" << " weight not found, return 0" << std::endl;
     return 0;
 }
