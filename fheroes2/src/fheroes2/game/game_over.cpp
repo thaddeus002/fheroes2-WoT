@@ -201,6 +201,7 @@ void GameOver::DialogLoss(u16 cond)
         case WINS_SIDE:
         {
     	    body = _("%{color} has fallen!\nAll is lost.");
+	    String::Replace(body, "%{color}", Color::String(conf.MyColor()));
     	    break;
     	}
 

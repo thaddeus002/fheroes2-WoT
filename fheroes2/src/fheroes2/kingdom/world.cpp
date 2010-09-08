@@ -1970,10 +1970,13 @@ u16 World::CheckKingdomLoss(const Kingdom & kingdom) const
 {
     const Settings & conf = Settings::Get();
 
-    // if other wins return false;
-    std::vector<Kingdom *>::const_iterator it = std::find_if(vec_kingdoms.begin(), vec_kingdoms.end(), WorldCheckKingdomLossWins);
-    if(vec_kingdoms.end() != it && *it && (*it)->GetColor() != kingdom.GetColor())
-	return CheckKingdomWins(**it);
+    // if other wins return false (skip for alianse)
+    if(!(conf.ConditionWins() & GameOver::WINS_SIDE))
+    {
+	std::vector<Kingdom *>::const_iterator it = std::find_if(vec_kingdoms.begin(), vec_kingdoms.end(), WorldCheckKingdomLossWins);
+	if(vec_kingdoms.end() != it && *it && (*it)->GetColor() != kingdom.GetColor())
+	    return CheckKingdomWins(**it);
+    }
 
     if(conf.ConditionLoss() & GameOver::LOSS_ALL)
     {
