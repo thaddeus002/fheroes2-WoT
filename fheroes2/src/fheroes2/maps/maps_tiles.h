@@ -82,7 +82,7 @@ namespace Maps
 	bool isPassable(const Heroes * hero = NULL, bool skipfog = false) const;
 	bool isRoad(const Direction::vector_t & direct = Direction::CENTER) const;
 	bool isStream(void) const;
-	bool GoodForUltimateArtifact(void) const{ return addons_level1.empty(); }
+	bool GoodForUltimateArtifact(void) const;
 	bool CheckEnemyGuardians(u8) const;
 
 	TilesAddon* FindAddonICN1(u16 icn1);

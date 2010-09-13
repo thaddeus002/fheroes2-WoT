@@ -882,6 +882,11 @@ MP2::object_t Maps::Tiles::GetObject(void) const
     return static_cast<MP2::object_t>(general);
 }
 
+bool Maps::Tiles::GoodForUltimateArtifact(void) const
+{
+    return Ground::WATER != Maps::Tiles::GetGround() && isPassable(NULL, true);
+}
+
 /* accept move */
 bool Maps::Tiles::isPassable(const Heroes *hero, bool skipfog) const
 {
@@ -911,7 +916,6 @@ bool Maps::Tiles::isPassable(const Heroes *hero, bool skipfog) const
 
 		default: break;
 	    }
-
 	}
     }
 
