@@ -195,7 +195,7 @@ bool Game::IO::SaveBIN(QueueMessage & msg)
     msg.Push(static_cast<u16>(0xFF02));
     msg.Push(conf.current_maps_file.size_w);
     msg.Push(conf.current_maps_file.size_h);
-    msg.Push(GetBasename(conf.current_maps_file.file.c_str()));
+    msg.Push(GetBasename(conf.current_maps_file.file));
     msg.Push(conf.current_maps_file.difficulty);
     msg.Push(conf.current_maps_file.kingdom_colors);
     msg.Push(conf.current_maps_file.human_colors);

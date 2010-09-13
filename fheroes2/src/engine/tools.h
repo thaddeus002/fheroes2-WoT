@@ -50,8 +50,9 @@ namespace String
 int Sign(int);
 KeySym KeySymFromChar(char);
 
-const char* GetDirname(const char *);
-const char* GetBasename(const char *);
+std::string GetDirname(const std::string &);
+std::string GetBasename(const std::string &);
+
 u32 GetMemoryUsage(void);
 
 bool StoreMemToFile(const std::vector<u8> &, const std::string &);

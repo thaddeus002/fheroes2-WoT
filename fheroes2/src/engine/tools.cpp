@@ -295,37 +295,44 @@ int Sign(int s)
     return (s < 0 ? -1 : (s > 0 ? 1 : 0));
 }
 
-#if defined __WIN32__  || defined __SYMBIAN32__
-const char *GetDirname(const char *path)
+std::string GetDirname(const std::string & str)
 {
-    static char buff[PATH_MAX];
-    strncpy(buff, path, PATH_MAX);
-    char *c = strrchr(buff, SEPARATOR);
-    if(!c) strcpy(buff, ".");
-    else *c = 0;
-    return buff;
+    if(str.size())
+    {
+	size_t pos = str.rfind(SEPARATOR);
+
+	if(std::string::npos == pos)
+	    return std::string(".");
+        else
+	if(pos == 0)
+	    return str;
+	else
+	if(pos == str.size() - 1)
+	    return GetDirname(str.substr(0, str.size() - 1));
+        else
+	    return str.substr(0, pos);
+    }
+
+    return str;
 }
 
-const char *GetBasename(const char *path)
+std::string GetBasename(const std::string & str)
 {
-    static char buff[FILENAME_MAX];
-    const char *c = strrchr(path, SEPARATOR);
-    if(!c) strncpy(buff, path, FILENAME_MAX);
-    else strcpy(buff, c + 1);
-    return buff;
-}
-#else
-#include <libgen.h>
-const char *GetDirname(const char *path)
-{
-    return dirname(const_cast<char *>(path));
-}
+    if(str.size())
+    {
+	size_t pos = str.rfind(SEPARATOR);
 
-const char *GetBasename(const char *path)
-{
-    return basename(const_cast<char *>(path));
+	if(std::string::npos == pos ||
+	    pos == 0) return str;
+	else
+	if(pos == str.size() - 1)
+	    return GetBasename(str.substr(0, str.size() - 1));
+	else
+	    return str.substr(pos + 1);
+    }
+
+    return str;
 }
-#endif
 
 #if defined __SYMBIAN32__
 u32 GetMemoryUsage(void)

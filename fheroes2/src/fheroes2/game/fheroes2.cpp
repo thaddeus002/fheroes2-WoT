@@ -50,7 +50,7 @@ void SetVideoDriver(const std::string &);
 void SetTimidityEnvPath(const Settings &);
 void SetLangEnvPath(const Settings &);
 void ReadConfigFile(Settings &);
-void LoadConfigFiles(Settings &, const char* dirname);
+void LoadConfigFiles(Settings &, const std::string &);
 void LoadExternalResource(const Settings &);
 
 int PrintHelp(const char *basename)
@@ -75,8 +75,8 @@ int main(int argc, char **argv)
 #ifndef BUILD_RELEASE
         // force save logs
 	{
-	    const std::string strout = std::string(GetDirname(argv[0])) + SEPARATOR + "stdout.txt";
-	    const std::string strerr = std::string(GetDirname(argv[0])) + SEPARATOR + "stderr.txt";
+	    const std::string strout = GetDirname(argv[0]) + SEPARATOR + "stdout.txt";
+	    const std::string strerr = GetDirname(argv[0]) + SEPARATOR + "stderr.txt";
 	    freopen(strout.c_str(), "w", stdout);
 	    freopen(strerr.c_str(), "w", stderr);
 	}
@@ -373,7 +373,7 @@ void ReadConfigFile(Settings & conf)
     }
 }
 
-void LoadConfigFiles(Settings & conf, const char* dirname)
+void LoadConfigFiles(Settings & conf, const std::string & dirname)
 {
     // prefix from build
 #ifdef CONFIGURE_FHEROES2_DATA
@@ -389,9 +389,9 @@ void LoadConfigFiles(Settings & conf, const char* dirname)
     }
 
     // prefix from dirname
-    if(conf.LocalPrefix().empty())
+    if(conf.LocalPrefix().empty() && dirname.size())
     {
-	conf.SetLocalPrefix(dirname);
+	conf.SetLocalPrefix(dirname.c_str());
 	ReadConfigFile(conf);
     }
 }

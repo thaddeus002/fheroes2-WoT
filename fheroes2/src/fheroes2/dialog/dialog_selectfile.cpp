@@ -65,7 +65,7 @@ void FileInfoListBox::RedrawItem(const Maps::FileInfo & info, u16 dstx, u16 dsty
          short_date[14] = 0;
 
     std::strftime(short_date, 14, "%b %d, %H:%M", std::localtime(&info.localtime));
-    std::string savname(GetBasename(info.file.c_str()));
+    std::string savname(GetBasename(info.file));
     
     if(savname.size())
     {
@@ -120,7 +120,7 @@ void FileInfoListBox::ActionListSingleClick(Maps::FileInfo &)
 
 void ResizeToShortName(const std::string & str, std::string & res)
 {
-    res.assign(GetBasename(str.c_str()));
+    res.assign(GetBasename(str));
     size_t it = res.find('.');
     if(std::string::npos != it) res.resize(it);
 }
@@ -288,7 +288,7 @@ bool SelectFileListSimple(const std::string & header, MapsFileInfoList & lists, 
 	{
 	    std::string msg(_("Are you sure you want to delete file:"));
 	    msg.append("\n \n");
-	    msg.append(GetBasename(listbox.GetCurrent().file.c_str()));
+	    msg.append(GetBasename(listbox.GetCurrent().file));
 	    if(Dialog::YES == Dialog::Message(_("Warning!"), msg, Font::BIG, Dialog::YES | Dialog::NO))
 	    {
 		unlink(listbox.GetCurrent().file.c_str());
