@@ -376,6 +376,23 @@ void SpellBookRedrawSpells(const std::vector<Spell::spell_t> & spells, std::vect
 
     	display.Blit(icon, rect.x, rect.y);
 
+	// multiple icons for mass spells
+	switch(spell)
+	{
+	    case Spell::MASSBLESS:
+            case Spell::MASSCURE:
+            case Spell::MASSHASTE:
+            case Spell::MASSSLOW:
+            case Spell::MASSCURSE:
+            case Spell::MASSDISPEL:
+            case Spell::MASSSHIELD:
+    		display.Blit(icon, rect.x - 10, rect.y + 8);
+    		display.Blit(icon, rect.x + 10, rect.y + 8);
+		break;
+
+	    default: break;
+	}
+
     	std::string str(Spell::GetName(spell));
     	str.append(" [");
 	String::AddInt(str, Spell::CostManaPoints(spell));
