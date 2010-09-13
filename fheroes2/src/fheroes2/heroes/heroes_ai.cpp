@@ -131,8 +131,25 @@ Skill::Primary::skill_t AISelectPrimarySkill(Heroes &hero)
     return Skill::Primary::UNKNOWN;
 }
 
-void AIBattleLose(Heroes &hero, u8 reason, Color::color_t color = Color::GRAY)
+void AIBattleLose(Heroes &hero, const Battle2::Result & res, bool attacker, Color::color_t color = Color::GRAY)
 {
+    u8 reason = attacker ? res.AttackerResult() : res.DefenderResult();
+
+    if(Settings::Get().ExtHeroSurrenderingGiveExp() &&
+	Battle2::RESULT_SURRENDER == reason)
+    {
+        const u32 & exp = attacker ? res.GetExperienceAttacker() : res.GetExperienceDefender();
+
+        if(Settings::Get().MyColor() == hero.GetColor())
+        {
+            std::string msg = _("Hero %{name} also got a %{count} experience.");
+            String::Replace(msg, "%{name}", hero.GetName());
+            String::Replace(msg, "%{count}", exp);
+            Dialog::Message("", msg, Font::BIG, Dialog::OK);
+        }
+        hero.IncreaseExperience(exp);
+    }
+
     hero.SetKillerColor(color);
     hero.SetFreeman(reason);
 }
@@ -310,23 +327,23 @@ void AIToHeroes(Heroes &hero, const u8 obj, const u16 dst_index)
 
             // loss defender
             if(!res.DefenderWins())
-               AIBattleLose(*other_hero, res.DefenderResult(), hero.GetColor());
+               AIBattleLose(*other_hero, res, false, hero.GetColor());
 
             // loss attacker
             if(!res.AttackerWins())
-                AIBattleLose(hero, res.AttackerResult(), other_hero->GetColor());
+                AIBattleLose(hero, res, true, other_hero->GetColor());
 
             // wins attacker
             if(res.AttackerWins())
             {
-                hero.IncreaseExperience(res.GetExperience());
+                hero.IncreaseExperience(res.GetExperienceAttacker());
                 hero.ActionAfterBattle();
             }
             else
             // wins defender
             if(res.DefenderWins())
             {
-                other_hero->IncreaseExperience(res.GetExperience());
+                other_hero->IncreaseExperience(res.GetExperienceDefender());
                 other_hero->ActionAfterBattle();
             }
     }
@@ -360,11 +377,11 @@ void AIToCastle(Heroes &hero, const u8 obj, const u16 dst_index)
 
             // loss defender
             if(!res.DefenderWins() && other_hero)
-               AIBattleLose(*other_hero, res.DefenderResult(), hero.GetColor());
+               AIBattleLose(*other_hero, res, false, hero.GetColor());
 
             // loss attacker
             if(!res.AttackerWins())
-                AIBattleLose(hero, res.AttackerResult(), castle->GetColor());
+                AIBattleLose(hero, res, true, castle->GetColor());
 
             // wins attacker
             if(res.AttackerWins())
@@ -376,14 +393,14 @@ void AIToCastle(Heroes &hero, const u8 obj, const u16 dst_index)
                 world.CaptureObject(dst_index, hero.GetColor());
     		castle->Scoute();
 
-                hero.IncreaseExperience(res.GetExperience());
+                hero.IncreaseExperience(res.GetExperienceAttacker());
                 hero.ActionAfterBattle();
             }
             else
             // wins defender
             if(res.DefenderWins() && other_hero)
             {
-                other_hero->IncreaseExperience(res.GetExperience());
+                other_hero->IncreaseExperience(res.GetExperienceDefender());
                 other_hero->ActionAfterBattle();
             }
 	}
@@ -450,13 +467,13 @@ void AIToMonster(Heroes &hero, const u8 obj, const u16 dst_index)
 
     	if(res.AttackerWins())
     	{
-    	    hero.IncreaseExperience(res.GetExperience());
+    	    hero.IncreaseExperience(res.GetExperienceAttacker());
     	    destroy = true;
     	    hero.ActionAfterBattle();
     	}
     	else
     	{
-    	    AIBattleLose(hero, res.AttackerResult());
+    	    AIBattleLose(hero, res, true);
     	    if(Settings::Get().ExtSaveMonsterBattle())
     	    {
             	tile.SetCountMonster(army.GetCountMonsters(troop()));
@@ -683,7 +700,7 @@ void AIToCaptureObject(Heroes &hero, const u8 obj, const u16 dst_index)
 
 	    if(result.AttackerWins())
 	    {
-		hero.IncreaseExperience(result.GetExperience());
+		hero.IncreaseExperience(result.GetExperienceAttacker());
 	        hero.ActionAfterBattle();
 
 		tile.ResetQuantity();
@@ -691,7 +708,7 @@ void AIToCaptureObject(Heroes &hero, const u8 obj, const u16 dst_index)
 	    else
 	    {
 		capture = false;
-	        AIBattleLose(hero, result.AttackerResult());
+	        AIBattleLose(hero, result, true);
 		if(Settings::Get().ExtSaveMonsterBattle())
 		    tile.SetCountMonster(army.GetCountMonsters(troop()));
 	    }
@@ -1049,7 +1066,7 @@ void AIToPoorMoraleObject(Heroes &hero, const u8 obj, const u16 dst_index)
 
     		if(res.AttackerWins())
 		{
-        	    hero.IncreaseExperience(res.GetExperience());
+        	    hero.IncreaseExperience(res.GetExperienceAttacker());
 	    	    complete = true;
 	    	    const Artifact art(Artifact::FromInt(tile.GetQuantity1()));
 	    	    Resource::funds_t resource;
@@ -1060,7 +1077,7 @@ void AIToPoorMoraleObject(Heroes &hero, const u8 obj, const u16 dst_index)
 		}
 		else
 		{
-	    	    AIBattleLose(hero, res.AttackerResult());
+	    	    AIBattleLose(hero, res, true);
 		}
 	}
 	break;
@@ -1086,7 +1103,7 @@ void AIToPoorMoraleObject(Heroes &hero, const u8 obj, const u16 dst_index)
 
     		    if(res.AttackerWins())
 		    {
-        		hero.IncreaseExperience(res.GetExperience());
+        		hero.IncreaseExperience(res.GetExperienceAttacker());
 	    		complete = true;
 			hero.PickupArtifact(art);
 	    		world.GetKingdom(hero.GetColor()).AddFundsResource(resource);
@@ -1094,7 +1111,7 @@ void AIToPoorMoraleObject(Heroes &hero, const u8 obj, const u16 dst_index)
 		    }
 		    else
 		    {
-	    		AIBattleLose(hero, res.AttackerResult());
+	    		AIBattleLose(hero, res, true);
 		    }
 	    }
 	    break;
@@ -1110,7 +1127,7 @@ void AIToPoorMoraleObject(Heroes &hero, const u8 obj, const u16 dst_index)
 
     		if(res.AttackerWins())
 		{
-        	    hero.IncreaseExperience(res.GetExperience());
+        	    hero.IncreaseExperience(res.GetExperienceAttacker());
 	    	    complete = true;
 	    	    Resource::funds_t resource;
 	    	    resource.gold = tile.GetQuantity2() * 100;
@@ -1119,7 +1136,7 @@ void AIToPoorMoraleObject(Heroes &hero, const u8 obj, const u16 dst_index)
 		}
 		else
 		{
-	    	    AIBattleLose(hero, res.AttackerResult());
+	    	    AIBattleLose(hero, res, true);
 		}
 	}
 	break;
@@ -1162,7 +1179,7 @@ void AIToPoorLuckObject(Heroes &hero, const u8 obj, const u16 dst_index)
 
     		if(res.AttackerWins())
 		{
-        	    hero.IncreaseExperience(res.GetExperience());
+        	    hero.IncreaseExperience(res.GetExperienceAttacker());
 		    complete = true;
 		    const Spell::spell_t spell(static_cast<Spell::spell_t>(tile.GetQuantity1()));
 		    // check magick book
@@ -1176,7 +1193,7 @@ void AIToPoorLuckObject(Heroes &hero, const u8 obj, const u16 dst_index)
 		}
 		else
 		{
-		    AIBattleLose(hero, res.AttackerResult());
+		    AIBattleLose(hero, res, true);
 		}
 	}
     	break;
@@ -1340,7 +1357,7 @@ void AIToAbandoneMine(Heroes &hero, const u8 obj, const u16 dst_index)
 
     	if(res.AttackerWins())
 	{
-            hero.IncreaseExperience(res.GetExperience());
+            hero.IncreaseExperience(res.GetExperienceAttacker());
             tile.SetQuantity1(0);
             tile.UpdateAbandoneMineSprite();
             world.CaptureObject(dst_index, hero.GetColor());
@@ -1349,7 +1366,7 @@ void AIToAbandoneMine(Heroes &hero, const u8 obj, const u16 dst_index)
         }
 	else
 	{
-	    AIBattleLose(hero, res.AttackerResult());
+	    AIBattleLose(hero, res, true);
 	}
 
     DEBUG(DBG_AI , DBG_INFO, "AIToAbandoneMine: " << hero.GetName());
@@ -1466,13 +1483,13 @@ void AIToArtifact(Heroes &hero, const u8 obj, const u16 dst_index)
 	    Battle2::Result res = Battle2::Loader(hero.GetArmy(), army, dst_index);
     	    if(res.AttackerWins())
     	    {
-		hero.IncreaseExperience(res.GetExperience());
+		hero.IncreaseExperience(res.GetExperienceAttacker());
 		conditions = true;
 		hero.ActionAfterBattle();
 	    }
 	    else
 	    {
-		AIBattleLose(hero, res.AttackerResult());
+		AIBattleLose(hero, res, true);
 	    }
 	    break;
 	}

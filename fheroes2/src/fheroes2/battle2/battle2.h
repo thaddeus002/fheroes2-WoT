@@ -43,17 +43,19 @@ namespace Battle2
 
     struct Result
     {
-	Result() : army1(0), army2(0), exp(0) {}
+	Result() : army1(0), army2(0), exp1(0), exp2(0) {}
 
 	bool AttackerWins(void) const;
 	bool DefenderWins(void) const;
 	u8   AttackerResult(void) const;
 	u8   DefenderResult(void) const;
-	u32  GetExperience(void) const;
+	u32  GetExperienceAttacker(void) const;
+	u32  GetExperienceDefender(void) const;
 
 	u8 army1;
 	u8 army2;
-	u32  exp;
+	u32  exp1;
+	u32  exp2;
     };
 
     Result Loader(Army::army_t &, Army::army_t &, u16);

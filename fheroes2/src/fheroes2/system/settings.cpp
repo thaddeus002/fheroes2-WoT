@@ -109,6 +109,7 @@ static const settings_t settingsFHeroes2[] =
     { Settings::HEROES_FORCE_RACE_FROM_TYPE,	_("heroes: fixed race with custom portrait"),  		},
     { Settings::HEROES_COST_DEPENDED_FROM_LEVEL,_("heroes: recruit cost to be dependent on hero level"),},
     { Settings::HEROES_REMEMBER_POINTS_RETREAT, _("heroes: remember MP/SP for retreat/surrender result"),},
+    { Settings::HEROES_SURRENDERING_GIVE_EXP,   _("heroes: surrendering gives some experience"),        },
     { Settings::UNIONS_ALLOW_HERO_MEETINGS,	_("unions: allow meeting heroes"),                      },
     { Settings::UNIONS_ALLOW_CASTLE_VISITING,	_("unions: allow castle visiting"),                     },
     { Settings::UNIONS_ALLOW_VIEW_MAPS,		_("unions: allow view maps"),                           },
@@ -1108,6 +1109,11 @@ bool Settings::ExtHeroRecruitCostDependedFromLevel(void) const
 bool Settings::ExtRememberPointsForHeroRetreating(void) const
 {
     return ExtModes(HEROES_REMEMBER_POINTS_RETREAT);
+}
+
+bool Settings::ExtHeroSurrenderingGiveExp(void) const
+{
+    return ExtModes(HEROES_SURRENDERING_GIVE_EXP);
 }
 
 bool Settings::ExtLearnSpellsWithDay(void) const

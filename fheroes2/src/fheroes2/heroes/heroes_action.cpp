@@ -259,8 +259,25 @@ u16 DialogLuck(const std::string & hdr, const std::string & msg, const bool good
     return Dialog::SpriteInfo(hdr, msg, image);
 }
 
-void BattleLose(Heroes &hero, u8 reason, Color::color_t color = Color::GRAY)
+void BattleLose(Heroes &hero, const Battle2::Result & res, bool attacker, Color::color_t color = Color::GRAY)
 {
+    u8 reason = attacker ? res.AttackerResult() : res.DefenderResult();
+
+    if(Settings::Get().ExtHeroSurrenderingGiveExp() &&
+	Battle2::RESULT_SURRENDER == reason)
+    {
+	const u32 & exp = attacker ? res.GetExperienceAttacker() : res.GetExperienceDefender();
+
+	if(Settings::Get().MyColor() == hero.GetColor())
+	{
+	    std::string msg = _("Hero %{name} also got a %{count} experience.");
+	    String::Replace(msg, "%{name}", hero.GetName());
+	    String::Replace(msg, "%{count}", exp);
+	    Dialog::Message("", msg, Font::BIG, Dialog::OK);
+	}
+	hero.IncreaseExperience(exp);
+    }
+
     AGG::PlaySound(M82::KILLFADE);
     hero.FadeOut();
     hero.SetKillerColor(color);
@@ -630,13 +647,13 @@ void ActionToMonster(Heroes &hero, const u8 obj, const u16 dst_index)
 
 	if(res.AttackerWins())
 	{
-    	    hero.IncreaseExperience(res.GetExperience());
+    	    hero.IncreaseExperience(res.GetExperienceAttacker());
     	    destroy = true;
     	    hero.ActionAfterBattle();
 	}
 	else
 	{
-    	    BattleLose(hero, res.AttackerResult());
+    	    BattleLose(hero, res, true);
     	    if(Settings::Get().ExtSaveMonsterBattle())
     	    {
         	tile.SetCountMonster(army.GetCountMonsters(troop()));
@@ -696,23 +713,23 @@ void ActionToHeroes(Heroes &hero, const u8 obj, const u16 dst_index)
 
 	// loss defender
 	if(!res.DefenderWins())
-               BattleLose(*other_hero, res.DefenderResult(), hero.GetColor());
+               BattleLose(*other_hero, res, false, hero.GetColor());
 
 	// loss attacker
 	if(!res.AttackerWins())
-                BattleLose(hero, res.AttackerResult(), other_hero->GetColor());
+                BattleLose(hero, res, true, other_hero->GetColor());
 
 	// wins attacker
 	if(res.AttackerWins())
 	{
-    	    hero.IncreaseExperience(res.GetExperience());
+    	    hero.IncreaseExperience(res.GetExperienceAttacker());
     	    hero.ActionAfterBattle();
 	}
 	else
 	// wins defender
 	if(res.DefenderWins())
 	{
-	    other_hero->IncreaseExperience(res.GetExperience());
+	    other_hero->IncreaseExperience(res.GetExperienceDefender());
     	    other_hero->ActionAfterBattle();
 	}
     }
@@ -749,11 +766,11 @@ void ActionToCastle(Heroes &hero, const u8 obj, const u16 dst_index)
 
 	    // loss defender
 	    if(!res.DefenderWins() && other_hero)
-               BattleLose(*other_hero, res.DefenderResult(), hero.GetColor());
+               BattleLose(*other_hero, res, false, hero.GetColor());
 
 	    // loss attacker
 	    if(!res.AttackerWins())
-                BattleLose(hero, res.AttackerResult(), castle->GetColor());
+                BattleLose(hero, res, true, castle->GetColor());
 
 	    // wins attacker
 	    if(res.AttackerWins())
@@ -766,14 +783,14 @@ void ActionToCastle(Heroes &hero, const u8 obj, const u16 dst_index)
         	castle->Scoute();
 		Interface::Basic::Get().SetRedraw(REDRAW_CASTLES);
 
-        	hero.IncreaseExperience(res.GetExperience());
+        	hero.IncreaseExperience(res.GetExperienceAttacker());
         	hero.ActionAfterBattle();
 	    }
 	    else
 	    // wins defender
 	    if(res.DefenderWins() && other_hero)
 	    {
-		other_hero->IncreaseExperience(res.GetExperience());
+		other_hero->IncreaseExperience(res.GetExperienceDefender());
         	other_hero->ActionAfterBattle();
 	    }
 	}
@@ -1251,7 +1268,7 @@ void ActionToPoorLuckObject(Heroes &hero, const u8 obj, const u16 dst_index)
     			if(res.AttackerWins())
     			{
 			    PlaySoundSuccess;
-        		    hero.IncreaseExperience(res.GetExperience());
+        		    hero.IncreaseExperience(res.GetExperienceAttacker());
 			    complete = true;
 			    const Spell::spell_t spell(static_cast<Spell::spell_t>(tile.GetQuantity1()));
 			    // check magick book
@@ -1270,7 +1287,7 @@ void ActionToPoorLuckObject(Heroes &hero, const u8 obj, const u16 dst_index)
     			}
     			else
     			{
-        		    BattleLose(hero, res.AttackerResult());
+        		    BattleLose(hero, res, true);
     			}
 		}
     	    }
@@ -1430,7 +1447,7 @@ void ActionToPoorMoraleObject(Heroes &hero, const u8 obj, const u16 dst_index)
 			Battle2::Result res = Battle2::Loader(hero.GetArmy(), army, dst_index);
     			if(res.AttackerWins())
     			{
-			    hero.IncreaseExperience(res.GetExperience());
+			    hero.IncreaseExperience(res.GetExperienceAttacker());
 			    complete = true;
 			    const Artifact::artifact_t art = Artifact::FromInt(tile.GetQuantity1());
 			    Resource::funds_t resource;
@@ -1443,7 +1460,7 @@ void ActionToPoorMoraleObject(Heroes &hero, const u8 obj, const u16 dst_index)
 			}
 			else
 			{
-			    BattleLose(hero, res.AttackerResult());
+			    BattleLose(hero, res, true);
 			}
     		}
     	    }
@@ -1474,7 +1491,7 @@ void ActionToPoorMoraleObject(Heroes &hero, const u8 obj, const u16 dst_index)
 			Battle2::Result res = Battle2::Loader(hero.GetArmy(), army, dst_index);
     			if(res.AttackerWins())
     			{
-			    hero.IncreaseExperience(res.GetExperience());
+			    hero.IncreaseExperience(res.GetExperienceAttacker());
 			    complete = true;
 			    PlaySoundSuccess;
 			    if(art == Artifact::UNKNOWN)
@@ -1489,7 +1506,7 @@ void ActionToPoorMoraleObject(Heroes &hero, const u8 obj, const u16 dst_index)
 			}
 			else
 			{
-			    BattleLose(hero, res.AttackerResult());
+			    BattleLose(hero, res, true);
 			}
     		}
     	    }
@@ -1510,7 +1527,7 @@ void ActionToPoorMoraleObject(Heroes &hero, const u8 obj, const u16 dst_index)
 			Battle2::Result res = Battle2::Loader(hero.GetArmy(), army, dst_index);
     			if(res.AttackerWins())
     			{
-			    hero.IncreaseExperience(res.GetExperience());
+			    hero.IncreaseExperience(res.GetExperienceAttacker());
 			    complete = true;
 			    Resource::funds_t resource;
 			    resource.gold = tile.GetQuantity2() * 100;
@@ -1521,7 +1538,7 @@ void ActionToPoorMoraleObject(Heroes &hero, const u8 obj, const u16 dst_index)
 			}
 			else
 			{
-			    BattleLose(hero, res.AttackerResult());
+			    BattleLose(hero, res, true);
 			}
     		}
     	    }
@@ -1823,7 +1840,7 @@ void ActionToArtifact(Heroes &hero, const u8 obj, const u16 dst_index)
 		Battle2::Result res = Battle2::Loader(hero.GetArmy(), army, dst_index);
     		if(res.AttackerWins())
     		{
-		    hero.IncreaseExperience(res.GetExperience());
+		    hero.IncreaseExperience(res.GetExperienceAttacker());
 		    conditions = true;
 		    PlaySoundSuccess;
 		    std::string str = _("Victorious, you take your prize, the %{art}.");
@@ -1833,7 +1850,7 @@ void ActionToArtifact(Heroes &hero, const u8 obj, const u16 dst_index)
 		}
 		else
 		{
-		    BattleLose(hero, res.AttackerResult());
+		    BattleLose(hero, res, true);
 		}
 	    }
 	    else
@@ -2101,7 +2118,7 @@ void ActionToAbandoneMine(Heroes &hero, const u8 obj, const u16 dst_index)
     	if(res.AttackerWins())
     	{
     	    payment_t info = ProfitConditions::FromMine(tile.GetQuantity4());
-	    hero.IncreaseExperience(res.GetExperience());
+	    hero.IncreaseExperience(res.GetExperienceAttacker());
 	    PlaySoundSuccess;
 	    std::string msg = _("You beat the Ghosts and are able to restore the mine to production.");
 	    DialogCaptureResourceObject(MP2::StringObject(obj), msg, tile.GetQuantity4());
@@ -2113,7 +2130,7 @@ void ActionToAbandoneMine(Heroes &hero, const u8 obj, const u16 dst_index)
 	}
 	else
 	{
-	    BattleLose(hero, res.AttackerResult());
+	    BattleLose(hero, res, true);
 	}
 
 	DEBUG(DBG_GAME , DBG_INFO, "ActionToAbandoneMine: " << hero.GetName());
@@ -2192,7 +2209,7 @@ void ActionToCaptureObject(Heroes &hero, const u8 obj, const u16 dst_index)
 
     	    if(result.AttackerWins())
     	    {
-        	hero.IncreaseExperience(result.GetExperience());
+        	hero.IncreaseExperience(result.GetExperienceAttacker());
         	hero.ActionAfterBattle();
 
 		tile.ResetQuantity();
@@ -2200,7 +2217,7 @@ void ActionToCaptureObject(Heroes &hero, const u8 obj, const u16 dst_index)
     	    else
     	    {
 		capture = false;
-        	BattleLose(hero, result.AttackerResult());
+        	BattleLose(hero, result, true);
 		if(Settings::Get().ExtSaveMonsterBattle())
             	    tile.SetCountMonster(army.GetCountMonsters(troop()));
     	    }
@@ -2419,7 +2436,7 @@ void ActionToDwellingBattleMonster(Heroes &hero, const u8 obj, const u16 dst_ind
 	    Battle2::Result res = Battle2::Loader(hero.GetArmy(), army, dst_index);
 	    if(res.AttackerWins())
 	    {
-		hero.IncreaseExperience(res.GetExperience());
+		hero.IncreaseExperience(res.GetExperienceAttacker());
 		world.CaptureObject(dst_index, hero.GetColor());
 		PlaySoundSuccess;
 		complete = (Dialog::YES == Dialog::Message(MP2::StringObject(obj), str_recr, Font::BIG, Dialog::YES | Dialog::NO));
@@ -2428,7 +2445,7 @@ void ActionToDwellingBattleMonster(Heroes &hero, const u8 obj, const u16 dst_ind
 	    }
 	    else
 	    {
-		BattleLose(hero, res.AttackerResult());
+		BattleLose(hero, res, true);
 	    }
 	}
     }
@@ -2820,7 +2837,7 @@ void ActionToDaemonCave(Heroes &hero, const u8 obj, const u16 dst_index)
 		    Battle2::Result res = Battle2::Loader(hero.GetArmy(), army, dst_index);
     		    if(res.AttackerWins())
     		    {
-			hero.IncreaseExperience(res.GetExperience());
+			hero.IncreaseExperience(res.GetExperienceAttacker());
 			hero.ActionAfterBattle();
 			resource.gold = 2500;
 			DialogWithGold("", _("Upon defeating the daemon's servants, you find a hidden cache with 2500 gold."), 2500);
@@ -2829,7 +2846,7 @@ void ActionToDaemonCave(Heroes &hero, const u8 obj, const u16 dst_index)
 		    }
 		    else
 		    {
-			BattleLose(hero, res.AttackerResult());
+			BattleLose(hero, res, true);
 		    }
 	    }
 	    // check variants
@@ -2880,7 +2897,12 @@ void ActionToDaemonCave(Heroes &hero, const u8 obj, const u16 dst_index)
 			else
 			    Dialog::Message("", _("Seeing that you do not have 2500 gold, the demon slashes you with its claws, and the last thing you see is a red haze."), Font::BIG, Dialog::OK);
 
-			if(remove) BattleLose(hero, Battle2::RESULT_LOSS);
+			if(remove)
+			{
+			    Battle2::Result res;
+			    res.army1 = Battle2::RESULT_LOSS;
+			    BattleLose(hero, res, true);
+			}
 			tile.SetQuantity2(0);
 			break;
 		    }
@@ -3080,7 +3102,9 @@ void ActionToShinx(Heroes &hero, const u8 obj, const u16 dst_index)
 	    else
 	    {
 		Dialog::Message("", _("\"You guessed incorrectly,\" the Sphinx says, smiling. The Sphinx swipes at you with a paw, knocking you to the ground. Another blow makes the world go black, and you know no more."), Font::BIG, Dialog::OK);
-		BattleLose(hero, Battle2::RESULT_LOSS);
+		Battle2::Result res;
+		res.army1 = Battle2::RESULT_LOSS;
+		BattleLose(hero, res, true);
 	    }
 	}
     }

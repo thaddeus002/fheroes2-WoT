@@ -201,7 +201,8 @@ bool FH2LocalClient::BattleLoop(Battle2::Arena & arena, Battle2::Result & result
 		{
 		    packet.Pop(result.army1);
 		    packet.Pop(result.army2);
-		    packet.Pop(result.exp);
+		    packet.Pop(result.exp1);
+		    packet.Pop(result.exp2);
 		    exit = true;
 		    break;
 		}

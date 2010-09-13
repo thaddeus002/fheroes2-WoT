@@ -110,6 +110,7 @@ public:
 	HEROES_FORCE_RACE_FROM_TYPE	= 0x20400000,
 	HEROES_COST_DEPENDED_FROM_LEVEL = 0x20800000,
 	HEROES_REMEMBER_POINTS_RETREAT  = 0x21000000,
+	HEROES_SURRENDERING_GIVE_EXP	= 0x22000000,
 
 	BATTLE_ARCHMAGE_RESIST_BAD_SPELL= 0x40001000,
 	BATTLE_MAGIC_TROOP_RESIST	= 0x40002000,
@@ -203,6 +204,7 @@ public:
     bool ExtBuySpellBookFromShrine(void) const;
     bool ExtHeroRecruitCostDependedFromLevel(void) const;
     bool ExtRememberPointsForHeroRetreating(void) const;
+    bool ExtHeroSurrenderingGiveExp(void) const;
     bool ExtUnionsAllowCastleVisiting(void) const;
     bool ExtUnionsAllowHeroesMeetings(void) const;
     bool ExtUnionsAllowViewMaps(void) const;

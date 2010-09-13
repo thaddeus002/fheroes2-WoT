@@ -183,25 +183,25 @@ void Battle2::Arena::DialogBattleSummary(const Result & res) const
 
     if((res.army1 & RESULT_WINS) && army1.GetCommander() && Game::AI != army1.GetCommander()->GetControl())
     {
-    	GetSummaryParams(res.army1, res.army2, army1.GetCommander()->GetName(), res.exp, icn_anim, msg);
+    	GetSummaryParams(res.army1, res.army2, army1.GetCommander()->GetName(), res.exp1, icn_anim, msg);
 	if(conf.Music()) AGG::PlayMusic(MUS::BATTLEWIN, false);
     }
     else
     if((res.army2 & RESULT_WINS) && army2.GetCommander() && Game::AI != army2.GetCommander()->GetControl())
     {
-    	GetSummaryParams(res.army2, res.army1, army2.GetCommander()->GetName(), res.exp, icn_anim, msg);
+    	GetSummaryParams(res.army2, res.army1, army2.GetCommander()->GetName(), res.exp2, icn_anim, msg);
 	if(conf.Music()) AGG::PlayMusic(MUS::BATTLEWIN, false);
     }
     else
     if(army1.GetCommander() && Game::AI != army1.GetCommander()->GetControl())
     {
-    	GetSummaryParams(res.army1, res.army2, army1.GetCommander()->GetName(), res.exp, icn_anim, msg);
+    	GetSummaryParams(res.army1, res.army2, army1.GetCommander()->GetName(), res.exp1, icn_anim, msg);
 	if(conf.Music()) AGG::PlayMusic(MUS::BATTLELOSE, false);
     }
     else
     if(army2.GetCommander() && Game::AI != army2.GetCommander()->GetControl())
     {
-    	GetSummaryParams(res.army2, res.army1, army2.GetCommander()->GetName(), res.exp, icn_anim, msg);
+    	GetSummaryParams(res.army2, res.army1, army2.GetCommander()->GetName(), res.exp2, icn_anim, msg);
 	if(conf.Music()) AGG::PlayMusic(MUS::BATTLELOSE, false);
     }
     else

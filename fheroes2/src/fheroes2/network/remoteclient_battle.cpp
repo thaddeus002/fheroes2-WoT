@@ -132,7 +132,8 @@ bool FH2RemoteClient::SendBattleResult(u8 color, const Battle2::Result & result)
 	remote->packet.SetID(MSG_BATTLE_RESULT);
 	remote->packet.Push(result.army1);
 	remote->packet.Push(result.army2);
-	remote->packet.Push(result.exp);
+	remote->packet.Push(result.exp1);
+	remote->packet.Push(result.exp2);
 	DEBUG(DBG_NETWORK, DBG_INFO, "FH2RemoteClient::SendBattleResult: ");
 	return remote->Send(remote->packet);
     }

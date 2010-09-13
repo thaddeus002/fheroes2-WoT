@@ -107,9 +107,11 @@ Battle2::Result Battle2::Loader(Army::army_t & army1, Army::army_t & army2, u16 
     // fix experience
     if(army_wins && army_loss)
     {
-	Army::army_t killed;
-	army_loss->BattleExportKilled(killed);
-	result.exp = killed.CalculateExperience();
+	Army::army_t killed1, killed2;
+	army1.BattleExportKilled(killed1);
+	army2.BattleExportKilled(killed2);
+	result.exp1 = killed2.CalculateExperience();
+	result.exp2 = killed1.CalculateExperience();
     }
 
     // fade arena
@@ -332,9 +334,14 @@ u8 Battle2::Result::DefenderResult(void) const
     return 0;
 }
 
-u32 Battle2::Result::GetExperience(void) const
+u32 Battle2::Result::GetExperienceAttacker(void) const
 {
-    return exp;
+    return exp1;
+}
+
+u32 Battle2::Result::GetExperienceDefender(void) const
+{
+    return exp2;
 }
 
 bool Battle2::Result::AttackerWins(void) const
