@@ -382,6 +382,7 @@ void SpellBookRedrawSpells(const std::vector<Spell::spell_t> & spells, std::vect
     	display.Blit(icon, rect.x, rect.y);
 
 	// multiple icons for mass spells
+	if(!small)
 	switch(spell)
 	{
 	    case Spell::MASSBLESS:
