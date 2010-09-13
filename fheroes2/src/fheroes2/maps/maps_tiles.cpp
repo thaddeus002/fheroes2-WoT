@@ -38,6 +38,8 @@
 #include "resource.h"
 #include "maps_tiles.h"
 
+static u8 monster_animation_cicle[] = { 0, 1, 2, 1, 0, 3, 4, 5, 4, 3 };
+
 Maps::TilesAddon::TilesAddon() : level(0), uniq(0), object(0), index(0)
 {
 }
@@ -415,7 +417,8 @@ void Maps::Tiles::RedrawMonster(Surface & dst, s16 px, s16 py, const Interface::
 	dst.Blit(sprite_first, src_rt, dst_pt);
 
 	// draw second sprite
-	const Sprite & sprite_next = AGG::GetICN(ICN::MINIMON, Monster::GetSpriteIndex(quantity3) * 9 + 1 + (Maps::AnimationTicket() % 6));
+	const Sprite & sprite_next = AGG::GetICN(ICN::MINIMON, Monster::GetSpriteIndex(quantity3) * 9 + 1 + 
+	    monster_animation_cicle[ (Maps::AnimationTicket() + px * 2 + py * 3) % (sizeof(monster_animation_cicle) / sizeof(monster_animation_cicle[0])) ]);
 
 	dst_pt.x = px + sprite_next.x() + 16;
 	dst_pt.y = py + TILEWIDTH + sprite_next.y();
