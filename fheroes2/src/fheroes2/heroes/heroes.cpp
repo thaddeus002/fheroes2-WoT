@@ -1014,6 +1014,24 @@ bool Heroes::PickupArtifact(const Artifact & art)
 
     *it = art;
 
+    // check: anduran garb
+    if(HasArtifact(Artifact::BREASTPLATE_ANDURAN) &&
+	HasArtifact(Artifact::HELMET_ANDURAN) &&
+	HasArtifact(Artifact::SWORD_ANDURAN))
+    {
+	it = std::find(bag_artifacts.begin(), bag_artifacts.end(), Artifact::BREASTPLATE_ANDURAN);
+	*it = Artifact::UNKNOWN;
+	it = std::find(bag_artifacts.begin(), bag_artifacts.end(), Artifact::HELMET_ANDURAN);
+	*it = Artifact::UNKNOWN;
+	it = std::find(bag_artifacts.begin(), bag_artifacts.end(), Artifact::SWORD_ANDURAN);
+	*it = Artifact::UNKNOWN;
+	it = std::find(bag_artifacts.begin(), bag_artifacts.end(), Artifact::UNKNOWN);
+	*it = Artifact::BATTLE_GARB;
+
+	if(Settings::Get().MyColor() == color)
+	    DialogWithArtifact("", _("The three Anduran artifacts magically combine into one."), Artifact::BATTLE_GARB);
+    }
+
     return true;
 }
 

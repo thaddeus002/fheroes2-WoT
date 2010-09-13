@@ -276,6 +276,11 @@ void SpellBookSetFilter(const BagArtifacts & bag, const std::vector<Spell::spell
 		}
 	    break;
 
+	    case Artifact::BATTLE_GARB:
+		    if(v.end() == std::find(v.begin(), v.end(), Spell::TOWNPORTAL))
+			v.push_back(Spell::TOWNPORTAL);
+	    break;
+
 	    default: break;
 	}
     }
