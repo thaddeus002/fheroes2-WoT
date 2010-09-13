@@ -669,27 +669,18 @@ bool Game::IO::LoadBIN(QueueMessage & msg)
     msg.Pop(byte16);
     if(byte16 != 0xFF03) DEBUG(DBG_GAME , DBG_WARN, "Game::IO::LoadBIN: 0xFF03");
     // races
-    if(format < FORMAT_VERSION_1861)
-	byte32 = 6; // KINGDOMMAX;
-    else
-	msg.Pop(byte32);
+    msg.Pop(byte32);
     for(u8 ii = 0; ii < byte32; ++ii)
     {
 	msg.Pop(byte8);
 	conf.current_maps_file.races[ii] = byte8;
     }
     // unions
-    if(format < FORMAT_VERSION_1861)
-	byte32 = 6; // KINGDOMMAX;
-    else
-	msg.Pop(byte32);
-    if(format >= FORMAT_VERSION_1859)
+    msg.Pop(byte32);
+    for(u16 ii = 0; ii < byte32; ++ii)
     {
-	for(u16 ii = 0; ii < byte32; ++ii)
-	{
-	    msg.Pop(byte8);
-	    conf.current_maps_file.unions[ii] = byte8;
-	}
+	msg.Pop(byte8);
+	conf.current_maps_file.unions[ii] = byte8;
     }
     // maps name
     msg.Pop(conf.current_maps_file.name);
@@ -709,29 +700,16 @@ bool Game::IO::LoadBIN(QueueMessage & msg)
 #else
     msg.Pop(conf.debug);
 #endif
-    if(format < FORMAT_VERSION_1661)
-    {
-	// settings: original
-	msg.Pop(byte8);
-    }
-    else
-    if(format < FORMAT_VERSION_1735)
-    {
-    	msg.Pop(byte32);
-    }
-    else
-    {
-    	msg.Pop(byte32);
-	// skip load interface options
-        //conf.opt_game.ResetModes(MODES_ALL);
-	//conf.opt_game.SetModes(byte32);
-    	msg.Pop(byte32);
-        conf.opt_world.ResetModes(MODES_ALL);
-	conf.opt_world.SetModes(byte32);
-    	msg.Pop(byte32);
-        conf.opt_battle.ResetModes(MODES_ALL);
-	conf.opt_battle.SetModes(byte32);
-    }
+    msg.Pop(byte32);
+    // skip load interface options
+    //conf.opt_game.ResetModes(MODES_ALL);
+    //conf.opt_game.SetModes(byte32);
+    msg.Pop(byte32);
+    conf.opt_world.ResetModes(MODES_ALL);
+    conf.opt_world.SetModes(byte32);
+    msg.Pop(byte32);
+    conf.opt_battle.ResetModes(MODES_ALL);
+    conf.opt_battle.SetModes(byte32);
 
     // world
     msg.Pop(byte16);
@@ -938,20 +916,6 @@ bool Game::IO::LoadBIN(QueueMessage & msg)
 
     // regenerate puzzle surface
     Interface::GameArea::GenerateUltimateArtifactAreaSurface(world.ultimate_artifact, world.puzzle_surface);
-
-    // fixed monster (prev. rev. 1614)
-    if(format < FORMAT_VERSION_1661)
-    {
-	for(u16 ii = 0; ii < world.vec_tiles.size(); ++ii)
-	{
-	    Maps::Tiles* tile =  world.vec_tiles[ii];
-	    if(tile && tile->general == MP2::OBJ_MONSTER && 0 == tile->quantity3)
-            {
-                const Maps::TilesAddon * addons = tile->FindMonster();
-        	tile->quantity3 = (addons ? Monster::FromInt(addons->index + 1) : Monster::UNKNOWN);
-            }
-        }
-    }
 
     return byte16 == 0xFFFF;
 }
