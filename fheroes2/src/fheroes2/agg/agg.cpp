@@ -449,6 +449,15 @@ void AGG::Cache::LoadOrgICN(Sprite & sp, const ICN::icn_t icn, const u16 index, 
 
     if(ReadChunk(ICN::GetString(icn), body))
     {
+	// hard fix artifact "ultimate stuff" sprite for loyalty version
+	if(Settings::Get().PriceLoyaltyVersion() &&
+	    ICN::ARTIFACT == icn &&
+	    Artifact::IndexSprite64(Artifact::ULTIMATE_STAFF) == index)
+	{
+	    body.clear();
+	    heroes2_agg.Read(ICN::GetString(icn), body);
+	}
+
 	// loading original
 	DEBUG(DBG_ENGINE, DBG_TRACE, "AGG::Cache::LoadOrgICN: " << ICN::GetString(icn) << ", " << index);
 
