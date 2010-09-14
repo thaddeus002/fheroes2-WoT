@@ -321,6 +321,7 @@ public:
 
 protected:
     void Parse(const std::string & left, const std::string & right);
+    void PostLoad(void);
 
 private:
     friend class Game::IO;

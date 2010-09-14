@@ -467,7 +467,8 @@ bool LocalEvent::MouseClickLeft(void)
 
 bool LocalEvent::MouseClickLeft(const Rect &rt)
 {
-    if(MouseReleaseLeft() && (rt & mouse_rl) && (CLICK_LEFT & modes) && ((modes & TAP_MODE) || (rt & mouse_pl)))
+    //if(MouseReleaseLeft() && (rt & mouse_rl) && (CLICK_LEFT & modes) && ((modes & TAP_MODE) || (rt & mouse_pl)))
+    if(MouseReleaseLeft() && (rt & mouse_pl) && (rt & mouse_rl) && (CLICK_LEFT & modes))
     {
 	ResetModes(CLICK_LEFT);
 	return true;

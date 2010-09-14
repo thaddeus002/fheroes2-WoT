@@ -463,6 +463,7 @@ bool Heroes::MoveStep(bool fast)
 	    }
 
 	    // AI: force scan resource around
+	    /*
 	    if(GetControl() == Game::AI)
 	    {
 		const u16 dst = Maps::ScanAroundObject(index_to, MP2::OBJ_RESOURCE);
@@ -474,6 +475,7 @@ bool Heroes::MoveStep(bool fast)
             		break;
         	}
 	    }
+	    */
 	}
 
 	return true;

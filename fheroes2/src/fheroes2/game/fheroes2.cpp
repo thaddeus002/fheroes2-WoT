@@ -72,16 +72,6 @@ int PrintHelp(const char *basename)
 
 int main(int argc, char **argv)
 {
-#ifndef BUILD_RELEASE
-        // force save logs
-	{
-	    const std::string strout = GetDirname(argv[0]) + SEPARATOR + "stdout.txt";
-	    const std::string strerr = GetDirname(argv[0]) + SEPARATOR + "stderr.txt";
-	    freopen(strout.c_str(), "w", stdout);
-	    freopen(strerr.c_str(), "w", stderr);
-	}
-#endif
-
 	Settings & conf = Settings::Get();
 	int test = 0;
 

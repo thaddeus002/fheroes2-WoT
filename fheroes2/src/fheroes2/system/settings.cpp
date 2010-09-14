@@ -432,6 +432,20 @@ bool Settings::Read(const std::string & filename)
     if(video_driver.size())
 	String::Lower(video_driver);
 
+    if(video_mode.w && video_mode.h) PostLoad();
+
+    if(opt_global.Modes(GLOBAL_POCKETPC))
+    {
+	entry = config.Find("fullscreen");
+	if(!entry || entry->StrParams() != "off")
+	    opt_global.SetModes(GLOBAL_FULLSCREEN);
+    }
+
+    return true;
+}
+
+void Settings::PostLoad(void)
+{
     if(QVGA())
     {
 	opt_global.SetModes(GLOBAL_POCKETPC);
@@ -444,12 +458,6 @@ bool Settings::Read(const std::string & filename)
 	ExtResetModes(POCKETPC_TAP_MODE);
 	ExtResetModes(POCKETPC_LOW_MEMORY);
     }
-    else
-    {
-	entry = config.Find("fullscreen");
-	if(!entry || entry->StrParams() != "off")
-	    opt_global.SetModes(GLOBAL_FULLSCREEN);
-    }
 
     if(ExtModes(GAME_HIDE_INTERFACE))
     {
@@ -459,8 +467,6 @@ bool Settings::Read(const std::string & filename)
        opt_global.ResetModes(GLOBAL_SHOWBUTTONS);
        opt_global.ResetModes(GLOBAL_SHOWSTATUS);
     }
-
-    return true;
 }
 
 bool Settings::CheckVideoMode(void) const
@@ -490,7 +496,19 @@ void Settings::AutoVideoMode(void)
 
     if(zero)
     {
-	video_mode = PocketPC() ? size : Size(640, 480);
+#ifdef _WIN32_WCE
+        if((size.w % TILEWIDTH) || (size.h % TILEWIDTH))
+        {
+            size.w = size.w / TILEWIDTH;
+            size.h = size.h / TILEWIDTH;
+	    size.w *= TILEWIDTH;
+    	    size.h *= TILEWIDTH;
+	}
+	video_mode = size;
+#else
+	// set default
+	video_mode = Size(640, 480);
+#endif
     }
     else
     if(size.w < video_mode.w || size.h < video_mode.h)
@@ -498,6 +516,8 @@ void Settings::AutoVideoMode(void)
         video_mode.w = size.w;
         video_mode.h = size.h;
     }
+
+    PostLoad();
 }
 
 bool Settings::Save(const std::string & filename) const

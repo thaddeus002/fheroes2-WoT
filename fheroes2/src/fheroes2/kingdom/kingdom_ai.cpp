@@ -270,7 +270,12 @@ void Kingdom::AIHeroesGetTask(Heroes & hero)
     if(task.empty() && hero.Modes(Heroes::PATROL)) return;
 
     // find passable index
-    while(task.size() && !hero.GetPath().Calculate(task.front())){ task.pop_front(); }
+    while(task.size() && !hero.GetPath().Calculate(task.front()))
+    {
+	const u16 & index = task.front();
+	DEBUG(DBG_AI , DBG_INFO, "AI::HeroesTask: " << Color::String(color) << ", Hero " << hero.GetName() << " say: unable get object: " << MP2::StringObject(ai_objects[index]) << ", index: " << index << ", remove task...");
+	task.pop_front();
+    }
 
     // success
     if(task.size())
