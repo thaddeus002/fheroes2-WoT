@@ -145,7 +145,7 @@ Settings::Settings() : major_version(MAJOR_VERSION), minor_version(MINOR_VERSION
 #ifdef SVN_REVISION
     svn_version(SVN_REVISION),
 #endif
-    debug(DEFAULT_DEBUG), video_mode(640, 480), game_difficulty(Difficulty::NORMAL),
+    debug(DEFAULT_DEBUG), video_mode(0, 0), game_difficulty(Difficulty::NORMAL),
     my_color(Color::GRAY), cur_color(Color::GRAY), path_data_directory("data"),
     font_normal("dejavusans.ttf"), font_small("dejavusans.ttf"), size_normal(15), size_small(10),
     sound_volume(6), music_volume(6), animation(6), game_type(0), players_colors(0), preferably_count_players(0),
@@ -357,6 +357,12 @@ bool Settings::Read(const std::string & filename)
                 video_mode.h = possible_h;
 	    }
         }
+	else
+	if(value == "auto")
+	{
+            video_mode.w = 0;
+            video_mode.h = 0;
+	}
         else DEBUG(DBG_ENGINE , DBG_WARN, "Settings::Read: " << "unknown video mode: " << value);
     }
 
@@ -457,6 +463,40 @@ bool Settings::Read(const std::string & filename)
     return true;
 }
 
+bool Settings::CheckVideoMode(void) const
+{
+    Size size;
+    Display::GetMaxMode(size, PocketPC());
+    
+    if(PocketPC() && video_mode.w < video_mode.h)
+    {
+	u16 tmp = size.w;
+	size.w = size.h;
+	size.h = tmp;
+    }
+
+    return video_mode.w && video_mode.h && size.w >= video_mode.w && size.h >= video_mode.h;
+}
+
+void Settings::AutoVideoMode(void)
+{
+    Size size;
+    Display::GetMaxMode(size, PocketPC());
+
+    bool zero = (video_mode.w == 0 || video_mode.h == 0);
+
+    if(zero)
+    {
+	video_mode = PocketPC() ? size : Size(640, 480);
+    }
+    else
+    if(size.w < video_mode.w || size.h < video_mode.h)
+    {
+        video_mode.w = size.w;
+        video_mode.h = size.h;
+    }
+}
+
 bool Settings::Save(const std::string & filename) const
 {
     if(filename.empty()) return false;
@@ -492,10 +532,15 @@ void Settings::Dump(std::ostream & stream) const
     for(; it1 != it2; ++it1)
     stream << "maps = " << *it1 << std::endl;
 
-    str.clear();
-    String::AddInt(str, video_mode.w);
-    str += "x";
-    String::AddInt(str, video_mode.h);
+    if(video_mode.w && video_mode.h)
+    {
+	str.clear();
+	String::AddInt(str, video_mode.w);
+	str += "x";
+	String::AddInt(str, video_mode.h);
+    }
+    else
+	str = "auto";
 
     stream << "videomode = " << str << std::endl;
     stream << "sound = " << (opt_global.Modes(GLOBAL_SOUND) ? "on"  : "off") << std::endl;
@@ -608,7 +653,7 @@ u8   Settings::Animation(void) const { return animation; }
 /* return full screen */
 bool Settings::FullScreen(void) const { return opt_global.Modes(GLOBAL_FULLSCREEN); }
 
-bool Settings::QVGA(void) const { return video_mode.w < 640 || video_mode.h < 480; }
+bool Settings::QVGA(void) const { return video_mode.w && video_mode.h && (video_mode.w < 640 || video_mode.h < 480); }
 
 bool Settings::UseAltResource(void) const { return opt_global.Modes(GLOBAL_ALTRESOURCE); }
 bool Settings::PriceLoyaltyVersion(void) const { return opt_global.Modes(GLOBAL_PRICELOYALTY); }

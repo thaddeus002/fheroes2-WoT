@@ -20,6 +20,7 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
+#include <iostream>
 #include <string>
 #include "rect.h"
 #include "types.h"
@@ -160,4 +161,45 @@ Display & Display::Get(void)
     if(! inside.surface) inside.surface = SDL_GetVideoSurface();
 
     return inside;
+}
+
+void Display::GetMaxMode(Size & result, bool rotate)
+{
+    SDL_Rect** modes = SDL_ListModes(NULL, SDL_ANYFORMAT);
+
+    if(modes == (SDL_Rect **) 0)
+    {
+        std::cerr <<  "Display::GetMaxMode: " << "no modes available" << std::endl;
+    }
+    else
+    if(modes == (SDL_Rect **) -1)
+    {
+        std::cout <<  "Display::GetMaxMode: " << "all modes available" << std::endl;
+	result.w = 1024;
+	result.h = 768;
+    }
+    else
+    {
+	int max = 0;
+	int cur = 0;
+
+	for(int ii = 0; modes[ii]; ++ii)
+	{
+	    if(max < modes[ii]->w * modes[ii]->h)
+	    {
+		max = modes[ii]->w * modes[ii]->h;
+		cur = ii;
+	    }
+	}
+
+	result.w = modes[cur]->w;
+	result.h = modes[cur]->h;
+
+	if(rotate && result.w < result.h)
+	{
+	    cur = result.w;
+	    result.w = result.h;
+	    result.h = cur;
+	}
+    }
 }

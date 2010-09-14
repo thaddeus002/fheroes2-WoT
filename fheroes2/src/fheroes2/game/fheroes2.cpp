@@ -167,6 +167,9 @@ int main(int argc, char **argv)
 
 	    std::string strtmp = "Free Heroes II, " + conf.BuildVersion();
 
+	    if(!conf.CheckVideoMode())
+		conf.AutoVideoMode();
+
             Display::SetVideoMode(conf.VideoMode().w, conf.VideoMode().h, conf.FullScreen());
 
 	    Display::HideCursor();

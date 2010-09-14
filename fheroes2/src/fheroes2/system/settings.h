@@ -240,6 +240,8 @@ public:
     bool NetworkLocalClient(void) const;
 
     const Size & VideoMode(void) const;
+    void AutoVideoMode(void);
+    bool CheckVideoMode(void) const;
 
     u8   SoundVolume(void) const;
     u8   MusicVolume(void) const;
