@@ -466,7 +466,9 @@ bool Settings::Read(const std::string & filename)
 bool Settings::CheckVideoMode(void) const
 {
     Size size;
+
     Display::GetMaxMode(size, PocketPC());
+    if(size.w == 0 || size.h == 0) size = Size(640, 480);
     
     if(PocketPC() && video_mode.w < video_mode.h)
     {
@@ -480,10 +482,11 @@ bool Settings::CheckVideoMode(void) const
 
 void Settings::AutoVideoMode(void)
 {
-    Size size;
-    Display::GetMaxMode(size, PocketPC());
-
     bool zero = (video_mode.w == 0 || video_mode.h == 0);
+    Size size;
+
+    Display::GetMaxMode(size, PocketPC());
+    if(size.w == 0 || size.h == 0) size = Size(640, 480);
 
     if(zero)
     {

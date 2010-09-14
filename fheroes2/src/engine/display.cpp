@@ -174,9 +174,9 @@ void Display::GetMaxMode(Size & result, bool rotate)
     else
     if(modes == (SDL_Rect **) -1)
     {
-        std::cout <<  "Display::GetMaxMode: " << "all modes available" << std::endl;
-	result.w = 1024;
-	result.h = 768;
+        //std::cout <<  "Display::GetMaxMode: " << "all modes available" << std::endl;
+	result.w = 0;
+	result.h = 0;
     }
     else
     {
