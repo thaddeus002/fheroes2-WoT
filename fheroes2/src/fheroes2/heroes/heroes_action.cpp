@@ -2260,6 +2260,8 @@ void ActionToDwellingJoinMonster(Heroes &hero, const u8 obj, const u16 dst_index
 
     if(count)
     {
+	hero.MovePointsScaleFixed();
+
 	const Monster monster(Monster::FromObject(obj));
         std::string message = _("A group of %{monster} with a desire for greater glory wish to join you. Do you accept?");
         String::Replace(message, "%{monster}", monster.GetMultiName());
@@ -2270,7 +2272,12 @@ void ActionToDwellingJoinMonster(Heroes &hero, const u8 obj, const u16 dst_index
 	    if(!hero.GetArmy().JoinTroop(monster, count))
 		Dialog::Message(monster.GetName(), _("You are unable to recruit at this time, your ranks are full."), Font::BIG, Dialog::OK);
 	    else
+	    {
 		tile.SetCountMonster(0);
+
+		if(Settings::Get().ExtHeroRecalculateMovement())
+		    hero.RecalculateMovePoints();
+	    }
 	}
     }
     else
@@ -2346,6 +2353,9 @@ void ActionToDwellingRecruitMonster(Heroes &hero, const u8 obj, const u16 dst_in
     if(count)
     {
 	const Monster monster(Monster::FromObject(obj));
+
+	hero.MovePointsScaleFixed();
+
 	if(Dialog::YES == Dialog::Message(name_object, msg_full, Font::BIG, Dialog::YES | Dialog::NO))
 	{
 	    const u16 recruit = Dialog::RecruitMonster(monster, count);
@@ -2354,10 +2364,15 @@ void ActionToDwellingRecruitMonster(Heroes &hero, const u8 obj, const u16 dst_in
 		if(!hero.GetArmy().JoinTroop(monster, recruit))
 		    Dialog::Message(name_object, _("You are unable to recruit at this time, your ranks are full."), Font::BIG, Dialog::OK);
 		else
+		{
 		    tile.SetCountMonster(count - recruit);
 
-		const payment_t paymentCosts(PaymentConditions::BuyMonster(monster()) * recruit);
-		world.GetKingdom(hero.GetColor()).OddFundsResource(paymentCosts);
+		    const payment_t paymentCosts(PaymentConditions::BuyMonster(monster()) * recruit);
+		    world.GetKingdom(hero.GetColor()).OddFundsResource(paymentCosts);
+
+		    if(Settings::Get().ExtHeroRecalculateMovement())
+			hero.RecalculateMovePoints();
+		}
 	    }
 	}
     }
@@ -2455,6 +2470,8 @@ void ActionToDwellingBattleMonster(Heroes &hero, const u8 obj, const u16 dst_ind
     {
 	if(count)
 	{
+	    hero.MovePointsScaleFixed();
+
 	    const Monster monster(Monster::FromObject(obj));
     	    const u16 recruit = Dialog::RecruitMonster(monster, count);
     	    if(recruit)
@@ -2462,10 +2479,15 @@ void ActionToDwellingBattleMonster(Heroes &hero, const u8 obj, const u16 dst_ind
     		if(!hero.GetArmy().JoinTroop(monster, recruit))
 		    Dialog::Message(monster.GetName(), _("You are unable to recruit at this time, your ranks are full."), Font::BIG, Dialog::OK);
     		else
-    		    tile.SetCountMonster(count - recruit);
+    		{
+		    tile.SetCountMonster(count - recruit);
 
-    		const payment_t paymentCosts(PaymentConditions::BuyMonster(monster()) * recruit);
-    		world.GetKingdom(hero.GetColor()).OddFundsResource(paymentCosts);
+    		    const payment_t paymentCosts(PaymentConditions::BuyMonster(monster()) * recruit);
+    		    world.GetKingdom(hero.GetColor()).OddFundsResource(paymentCosts);
+
+		    if(Settings::Get().ExtHeroRecalculateMovement())
+			hero.RecalculateMovePoints();
+		}
     	    }
 	}
 
@@ -2575,6 +2597,8 @@ void ActionToUpgradeArmyObject(Heroes &hero, const u8 obj, const u16 dst_index)
     std::vector<Monster::monster_t> mons;
     mons.reserve(3);
 
+    hero.MovePointsScaleFixed();
+
     switch(obj)
     {
 	case MP2::OBJ_HILLFORT:
@@ -2671,6 +2695,9 @@ void ActionToUpgradeArmyObject(Heroes &hero, const u8 obj, const u16 dst_index)
 	    ox += br.w() + 4;
 	}
 	Dialog::SpriteInfo(MP2::StringObject(obj), msg1, sf);
+
+	if(Settings::Get().ExtHeroRecalculateMovement())
+	    hero.RecalculateMovePoints();
     }
     else
     {

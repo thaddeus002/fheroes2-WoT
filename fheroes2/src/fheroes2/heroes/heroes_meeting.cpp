@@ -193,6 +193,9 @@ void Heroes::MeetingDialog(Heroes & heroes2)
     cursor.Show();
     display.Flip();
 
+    MovePointsScaleFixed();
+    heroes2.MovePointsScaleFixed();
+
     // scholar action
     if(Settings::Get().ExtEyeEagleAsScholar())
 	Heroes::ScholarAction(*this, heroes2);
@@ -255,6 +258,12 @@ void Heroes::MeetingDialog(Heroes & heroes2)
         if(le.MouseCursor(luckIndicator1.GetArea())) LuckIndicator::QueueEventProcessing(luckIndicator1);
         else
         if(le.MouseCursor(luckIndicator2.GetArea())) LuckIndicator::QueueEventProcessing(luckIndicator2);
+    }
+
+    if(Settings::Get().ExtHeroRecalculateMovement())
+    {
+	RecalculateMovePoints();
+	heroes2.RecalculateMovePoints();
     }
 
     cursor.Hide();

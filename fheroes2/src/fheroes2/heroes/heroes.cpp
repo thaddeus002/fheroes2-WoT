@@ -108,7 +108,7 @@ Heroes::Heroes() : army(this), path(*this)
 }
 
 Heroes::Heroes(heroes_t ht, Race::race_t rc) : killer_color(Color::GRAY), experience(0), move_point(0),
-    army(this), portrait(ht), race(rc),
+    move_point_scale(-1), army(this), portrait(ht), race(rc),
     save_maps_general(MP2::OBJ_ZERO), path(*this), direction(Direction::RIGHT), sprite_index(18), patrol_square(0)
 {
     name = _(HeroesName(ht));
@@ -761,6 +761,7 @@ bool Heroes::Recruit(const Color::color_t cl, const Point & pt)
 	killer_color = Color::GRAY;
 	mp = pt;
 	if(!Modes(SAVEPOINTS)) move_point = GetMaxMovePoints();
+	MovePointsScaleFixed();
 
 	if(!army.isValid()) army.Reset(false);
 
@@ -1558,6 +1559,7 @@ void Heroes::SetFreeman(const u8 reason)
     modes = 0;
     mp.x = -1;
     mp.y = -1;
+    move_point_scale = -1;
     path.Reset();
     SetMove(false);
     SetModes(ACTION);
@@ -1687,6 +1689,16 @@ bool Heroes::CanScouteTile(u16 index) const
 	return (dist > Maps::GetApproximateDistance(GetIndex(), tile.GetIndex()));
     }
     return false;
+}
+
+void Heroes::MovePointsScaleFixed(void)
+{
+    move_point_scale = move_point * 1000 / GetMaxMovePoints();
+}
+
+void Heroes::RecalculateMovePoints(void)
+{
+    if(0 <= move_point_scale) move_point = GetMaxMovePoints() * move_point_scale / 1000;
 }
 
 void Heroes::Dump(void) const

@@ -312,6 +312,7 @@ Dialog::answer_t Castle::OpenDialog(bool readonly, bool fade)
 
     if(castle_heroes)
     {
+	castle_heroes->MovePointsScaleFixed();
         selectHeroesArmy.SetArmy(castle_heroes->GetArmy());
         selectHeroesArmy.Redraw();
     }
@@ -958,6 +959,9 @@ Dialog::answer_t Castle::OpenDialog(bool readonly, bool fade)
 
 	++ticket;
     }
+
+    if(castle_heroes && conf.ExtHeroRecalculateMovement())
+	castle_heroes->RecalculateMovePoints();
 
     if(conf.DynamicInterface())
 	conf.SetEvilInterface(interface);
