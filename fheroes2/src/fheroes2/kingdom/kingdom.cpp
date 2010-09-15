@@ -547,3 +547,56 @@ void Kingdom::HeroesActionNewPosition(void)
 	    ++it;
     }
 }
+
+u32 Kingdom::GetIncome(void)
+{
+    Resource::funds_t resource;
+
+    // captured object
+    //resource += ProfitConditions::FromMine(Resource::WOOD) * world.CountCapturedObject(MP2::OBJ_SAWMILL, color);
+    //resource += ProfitConditions::FromMine(Resource::ORE) * world.CountCapturedMines(Resource::ORE, color);
+    //resource += ProfitConditions::FromMine(Resource::MERCURY) * world.CountCapturedObject(MP2::OBJ_ALCHEMYLAB, color);
+    //resource += ProfitConditions::FromMine(Resource::SULFUR) * world.CountCapturedMines(Resource::SULFUR, color);
+    //resource += ProfitConditions::FromMine(Resource::CRYSTAL) * world.CountCapturedMines(Resource::CRYSTAL, color);
+    //resource += ProfitConditions::FromMine(Resource::GEMS) * world.CountCapturedMines(Resource::GEMS, color);
+    resource += ProfitConditions::FromMine(Resource::GOLD) * world.CountCapturedMines(Resource::GOLD, color);
+
+    std::vector<Castle*>::const_iterator itc = castles.begin();
+    for(; itc != castles.end(); ++itc) if(*itc)
+    {
+        const Castle & castle = **itc;
+
+        // castle or town profit
+        resource += ProfitConditions::FromBuilding((castle.isCastle() ? BUILD_CASTLE : BUILD_TENT), 0);
+
+        // statue
+        if(castle.isBuild(BUILD_STATUE))
+                resource += ProfitConditions::FromBuilding(BUILD_STATUE, 0);
+
+        // dungeon for warlock
+	if(castle.isBuild(BUILD_SPEC) && Race::WRLK == castle.GetRace())
+                resource += ProfitConditions::FromBuilding(BUILD_SPEC, Race::WRLK);
+    }
+
+    std::vector<Heroes*>::const_iterator ith = heroes.begin();
+    for(; ith != heroes.end(); ++ith) if(*ith)
+    {
+	if((**ith).HasArtifact(Artifact::GOLDEN_GOOSE))           resource += ProfitConditions::FromArtifact(Artifact::GOLDEN_GOOSE);
+        if((**ith).HasArtifact(Artifact::ENDLESS_SACK_GOLD))      resource += ProfitConditions::FromArtifact(Artifact::ENDLESS_SACK_GOLD);
+	if((**ith).HasArtifact(Artifact::ENDLESS_BAG_GOLD))       resource += ProfitConditions::FromArtifact(Artifact::ENDLESS_BAG_GOLD);
+        if((**ith).HasArtifact(Artifact::ENDLESS_PURSE_GOLD))     resource += ProfitConditions::FromArtifact(Artifact::ENDLESS_PURSE_GOLD);
+	//if((**ith).HasArtifact(Artifact::ENDLESS_POUCH_SULFUR))   resource += ProfitConditions::FromArtifact(Artifact::ENDLESS_POUCH_SULFUR);
+	//if((**ith).HasArtifact(Artifact::ENDLESS_VIAL_MERCURY))   resource += ProfitConditions::FromArtifact(Artifact::ENDLESS_VIAL_MERCURY);
+	//if((**ith).HasArtifact(Artifact::ENDLESS_POUCH_GEMS))     resource += ProfitConditions::FromArtifact(Artifact::ENDLESS_POUCH_GEMS);
+	//if((**ith).HasArtifact(Artifact::ENDLESS_CORD_WOOD))      resource += ProfitConditions::FromArtifact(Artifact::ENDLESS_CORD_WOOD);
+	//if((**ith).HasArtifact(Artifact::ENDLESS_CART_ORE))       resource += ProfitConditions::FromArtifact(Artifact::ENDLESS_CART_ORE);
+	//if((**ith).HasArtifact(Artifact::ENDLESS_POUCH_CRYSTAL))  resource += ProfitConditions::FromArtifact(Artifact::ENDLESS_POUCH_CRYSTAL);
+
+	// estates skill bonus
+	resource.gold += (**ith).GetSecondaryValues(Skill::Secondary::ESTATES);
+
+	if((**ith).HasArtifact(Artifact::TAX_LIEN)) resource.gold -= 250;
+    }
+
+    return resource.gold;
+}

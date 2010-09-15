@@ -26,7 +26,216 @@
 #include "cursor.h"
 #include "settings.h"
 #include "text.h"
+#include "world.h"
+#include "kingdom.h"
 #include "dialog.h"
+
+struct ValueColors : std::pair<int, int>
+{
+    ValueColors() : std::pair<int, int>(0, 0){};
+    ValueColors(int v, int c) : std::pair<int, int>(v, c){};
+
+    bool IsValue(int v) const { return v == first; };
+    bool IsColor(Color::color_t c) const { return (c & second); };
+
+    static bool SortValueGreat(const ValueColors & v1, const ValueColors & v2) { return v1.first > v2.first; };
+};
+
+void GetTownsInfo(std::vector<ValueColors> & v)
+{
+    v.clear();
+
+    for(Color::color_t color = Color::BLUE; color != Color::GRAY; ++color)
+        if(Settings::Get().KingdomColors(color))
+	{
+	    int value = world.GetKingdom(color).GetCountTown();
+
+	    std::vector<ValueColors>::iterator it = 
+		std::find_if(v.begin(), v.end(), std::bind2nd(std::mem_fun_ref(&ValueColors::IsValue), value));
+
+	    if(it == v.end())
+		v.push_back(ValueColors(value, color));
+	    else
+		(*it).second |= color;
+	}
+
+    std::sort(v.begin(), v.end(), ValueColors::SortValueGreat);
+}
+
+void GetCastlesInfo(std::vector<ValueColors> & v)
+{
+    v.clear();
+
+    for(Color::color_t color = Color::BLUE; color != Color::GRAY; ++color)
+        if(Settings::Get().KingdomColors(color))
+	{
+	    int value = world.GetKingdom(color).GetCountCastle();
+
+	    std::vector<ValueColors>::iterator it = 
+		std::find_if(v.begin(), v.end(), std::bind2nd(std::mem_fun_ref(&ValueColors::IsValue), value));
+
+	    if(it == v.end())
+		v.push_back(ValueColors(value, color));
+	    else
+		(*it).second |= color;
+	}
+
+    std::sort(v.begin(), v.end(), ValueColors::SortValueGreat);
+}
+
+void GetHeroesInfo(std::vector<ValueColors> & v)
+{
+    v.clear();
+
+    for(Color::color_t color = Color::BLUE; color != Color::GRAY; ++color)
+        if(Settings::Get().KingdomColors(color))
+	{
+	    int value = world.GetKingdom(color).GetHeroes().size();
+
+	    std::vector<ValueColors>::iterator it = 
+		std::find_if(v.begin(), v.end(), std::bind2nd(std::mem_fun_ref(&ValueColors::IsValue), value));
+
+	    if(it == v.end())
+		v.push_back(ValueColors(value, color));
+	    else
+		(*it).second |= color;
+	}
+
+    std::sort(v.begin(), v.end(), ValueColors::SortValueGreat);
+}
+
+void GetGoldsInfo(std::vector<ValueColors> & v)
+{
+    v.clear();
+
+    for(Color::color_t color = Color::BLUE; color != Color::GRAY; ++color)
+        if(Settings::Get().KingdomColors(color))
+	{
+	    int value = world.GetKingdom(color).GetFundsGold();
+
+	    std::vector<ValueColors>::iterator it = 
+		std::find_if(v.begin(), v.end(), std::bind2nd(std::mem_fun_ref(&ValueColors::IsValue), value));
+
+	    if(it == v.end())
+		v.push_back(ValueColors(value, color));
+	    else
+		(*it).second |= color;
+	}
+
+    std::sort(v.begin(), v.end(), ValueColors::SortValueGreat);
+}
+
+void GetWoodOreInfo(std::vector<ValueColors> & v)
+{
+    v.clear();
+
+    for(Color::color_t color = Color::BLUE; color != Color::GRAY; ++color)
+        if(Settings::Get().KingdomColors(color))
+	{
+	    int value = world.GetKingdom(color).GetFundsWood() + world.GetKingdom(color).GetFundsOre();
+
+	    std::vector<ValueColors>::iterator it = 
+		std::find_if(v.begin(), v.end(), std::bind2nd(std::mem_fun_ref(&ValueColors::IsValue), value));
+
+	    if(it == v.end())
+		v.push_back(ValueColors(value, color));
+	    else
+		(*it).second |= color;
+	}
+
+    std::sort(v.begin(), v.end(), ValueColors::SortValueGreat);
+}
+
+void GetGemsCrSlfMerInfo(std::vector<ValueColors> & v)
+{
+    v.clear();
+
+    for(Color::color_t color = Color::BLUE; color != Color::GRAY; ++color)
+        if(Settings::Get().KingdomColors(color))
+	{
+	    int value = world.GetKingdom(color).GetFundsGems() +
+		world.GetKingdom(color).GetFundsCrystal() +
+		world.GetKingdom(color).GetFundsSulfur() +
+		world.GetKingdom(color).GetFundsMercury();
+
+	    std::vector<ValueColors>::iterator it = 
+		std::find_if(v.begin(), v.end(), std::bind2nd(std::mem_fun_ref(&ValueColors::IsValue), value));
+
+	    if(it == v.end())
+		v.push_back(ValueColors(value, color));
+	    else
+		(*it).second |= color;
+	}
+
+    std::sort(v.begin(), v.end(), ValueColors::SortValueGreat);
+}
+
+void GetObelisksInfo(std::vector<ValueColors> & v)
+{
+    v.clear();
+
+    for(Color::color_t color = Color::BLUE; color != Color::GRAY; ++color)
+        if(Settings::Get().KingdomColors(color))
+	{
+	    int value = world.GetKingdom(color).CountVisitedObjects(MP2::OBJ_OBELISK);
+
+	    std::vector<ValueColors>::iterator it = 
+		std::find_if(v.begin(), v.end(), std::bind2nd(std::mem_fun_ref(&ValueColors::IsValue), value));
+
+	    if(it == v.end())
+		v.push_back(ValueColors(value, color));
+	    else
+		(*it).second |= color;
+	}
+
+    std::sort(v.begin(), v.end(), ValueColors::SortValueGreat);
+}
+
+void GetIncomesInfo(std::vector<ValueColors> & v)
+{
+    v.clear();
+
+    for(Color::color_t color = Color::BLUE; color != Color::GRAY; ++color)
+        if(Settings::Get().KingdomColors(color))
+	{
+	    int value = world.GetKingdom(color).GetIncome();
+
+	    std::vector<ValueColors>::iterator it = 
+		std::find_if(v.begin(), v.end(), std::bind2nd(std::mem_fun_ref(&ValueColors::IsValue), value));
+
+	    if(it == v.end())
+		v.push_back(ValueColors(value, color));
+	    else
+		(*it).second |= color;
+	}
+
+    std::sort(v.begin(), v.end(), ValueColors::SortValueGreat);
+}
+
+
+void DrawFlags(const std::vector<ValueColors> & v, const Point & pos, const u16 width, const u8 count)
+{
+    Display & display = Display::Get();
+    const u16 chunk = width / count;
+
+    for(u8 ii = 0; ii < count; ++ii)
+    {
+	if(ii < v.size())
+	{
+	    const u8 colors = v[ii].second;
+	    const u8 items = Color::Count(colors);
+	    const u8 sw = AGG::GetICN(ICN::FLAG32, 1).w();
+	    u16 px = pos.x + chunk / 2 + ii * chunk - (items * sw) / 2;
+
+	    for(Color::color_t color = Color::BLUE; color != Color::GRAY; ++color) if(colors & color)
+	    {
+		const Sprite & flag = AGG::GetICN(ICN::FLAG32, Color::GetIndex(color) * 2 + 1);
+		display.Blit(flag, px, pos.y);
+		px = px + sw;
+	    }
+	}
+    }
+}
 
 void Dialog::ThievesGuild(u8 count)
 {
@@ -53,7 +262,33 @@ void Dialog::ThievesGuild(u8 count)
 
     display.Blit(AGG::GetICN(ICN::STONEBAK, 0), dst_pt);
 
+    std::vector<ValueColors> v;
+    v.reserve(KINGDOMMAX);
+    const u8 colors = Color::Count(Settings::Get().KingdomColors());
+    const u16 textx = 185;
+    const u16 startx = 210;
+    const u16 maxw = 430;
     Text text;
+
+    // head 1
+    u8 ii = 0;
+    for(ii = 0; ii < colors; ++ii)
+    {
+	switch(ii+1)
+	{
+	    case 1: text.Set(_("1st")); break;
+	    case 2: text.Set(_("2nd")); break;
+	    case 3: text.Set(_("3rd")); break;
+	    case 4: text.Set(_("4th")); break;
+	    case 5: text.Set(_("5th")); break;
+	    case 6: text.Set(_("6th")); break;
+	    default: break;
+	}
+
+	dst_pt.x = cur_pt.x + startx + maxw / (colors * 2) + ii * maxw / colors - text.w() / 2;
+	dst_pt.y = cur_pt.y + 5;
+	text.Blit(dst_pt);
+    }
 
     // bar
     dst_pt.x = cur_pt.x;
@@ -72,68 +307,112 @@ void Dialog::ThievesGuild(u8 count)
     Button buttonExit(dst_pt, ICN::WELLXTRA, 0, 1);
 
     text.Set(_("Number of Towns:"));
-    dst_pt.x = cur_pt.x + 208 - text.w();
+    dst_pt.x = cur_pt.x + textx - text.w();
     dst_pt.y = cur_pt.y + 28;
     text.Blit(dst_pt);
 
+    dst_pt.x = cur_pt.x + startx;
+    GetTownsInfo(v);
+    DrawFlags(v, dst_pt, maxw, colors);
+
     text.Set(_("Number of Castles:"));
-    dst_pt.x = cur_pt.x + 208 - text.w();
-    dst_pt.y = cur_pt.y + 52;
+    dst_pt.x = cur_pt.x + textx - text.w();
+    dst_pt.y = cur_pt.y + 54;
     text.Blit(dst_pt);
+
+    dst_pt.x = cur_pt.x + startx;
+    GetCastlesInfo(v);
+    DrawFlags(v, dst_pt, maxw, colors);
 
     text.Set(_("Number of Heroes:"));
-    dst_pt.x = cur_pt.x + 208 - text.w();
-    dst_pt.y = cur_pt.y + 76;
+    dst_pt.x = cur_pt.x + textx - text.w();
+    dst_pt.y = cur_pt.y + 80;
     text.Blit(dst_pt);
+
+    dst_pt.x = cur_pt.x + startx;
+    GetHeroesInfo(v);
+    DrawFlags(v, dst_pt, maxw, colors);
 
     text.Set(_("Gold in Treasury:"));
-    dst_pt.x = cur_pt.x + 208 - text.w();
-    dst_pt.y = cur_pt.y + 100;
+    dst_pt.x = cur_pt.x + textx - text.w();
+    dst_pt.y = cur_pt.y + 106;
     text.Blit(dst_pt);
+
+    dst_pt.x = cur_pt.x + startx;
+    GetGoldsInfo(v);
+    DrawFlags(v, dst_pt, maxw, colors);
 
     text.Set(_("Wood & Ore:"));
-    dst_pt.x = cur_pt.x + 208 - text.w();
-    dst_pt.y = cur_pt.y + 124;
+    dst_pt.x = cur_pt.x + textx - text.w();
+    dst_pt.y = cur_pt.y + 132;
     text.Blit(dst_pt);
+
+    dst_pt.x = cur_pt.x + startx;
+    GetWoodOreInfo(v);
+    DrawFlags(v, dst_pt, maxw, colors);
 
     text.Set(_("Gems, Cr, Slf & Mer:"));
-    dst_pt.x = cur_pt.x + 208 - text.w();
-    dst_pt.y = cur_pt.y + 148;
+    dst_pt.x = cur_pt.x + textx - text.w();
+    dst_pt.y = cur_pt.y + 158;
     text.Blit(dst_pt);
+
+    dst_pt.x = cur_pt.x + startx;
+    GetGemsCrSlfMerInfo(v);
+    DrawFlags(v, dst_pt, maxw, colors);
 
     text.Set(_("Obelisks Found:"));
-    dst_pt.x = cur_pt.x + 208 - text.w();
-    dst_pt.y = cur_pt.y + 172;
+    dst_pt.x = cur_pt.x + textx - text.w();
+    dst_pt.y = cur_pt.y + 184;
     text.Blit(dst_pt);
 
+    dst_pt.x = cur_pt.x + startx;
+    GetObelisksInfo(v);
+    DrawFlags(v, dst_pt, maxw, colors);
+
     text.Set(_("Total Army Strength:"));
-    dst_pt.x = cur_pt.x + 208 - text.w();
-    dst_pt.y = cur_pt.y + 196;
+    dst_pt.x = cur_pt.x + textx - text.w();
+    dst_pt.y = cur_pt.y + 210;
     text.Blit(dst_pt);
 
     text.Set(_("Income:"));
-    dst_pt.x = cur_pt.x + 208 - text.w();
-    dst_pt.y = cur_pt.y + 220;
+    dst_pt.x = cur_pt.x + textx - text.w();
+    dst_pt.y = cur_pt.y + 238;
     text.Blit(dst_pt);
 
+    dst_pt.x = cur_pt.x + startx;
+    GetIncomesInfo(v);
+    DrawFlags(v, dst_pt, maxw, colors);
+
+    // head 2
+    ii = 0;
+    for(Color::color_t color = Color::BLUE; color != Color::GRAY; ++color)
+	if(Settings::Get().KingdomColors() & color)
+    {
+	text.Set(Color::String(color));
+	dst_pt.x = cur_pt.x + startx + maxw / (colors * 2) + ii * maxw / colors - text.w() / 2;
+	dst_pt.y = cur_pt.y + 270;
+	text.Blit(dst_pt);
+	++ii;
+    }
+
     text.Set(_("Best Hero:"));
-    dst_pt.x = cur_pt.x + 208 - text.w();
+    dst_pt.x = cur_pt.x + textx - text.w();
     dst_pt.y = cur_pt.y + 306;
     text.Blit(dst_pt);
 
     text.Set(_("Best Hero Stats:"));
-    dst_pt.x = cur_pt.x + 208 - text.w();
-    dst_pt.y = cur_pt.y + 350;
+    dst_pt.x = cur_pt.x + textx - text.w();
+    dst_pt.y = cur_pt.y + 347;
     text.Blit(dst_pt);
 
     text.Set(_("Personality:"));
-    dst_pt.x = cur_pt.x + 208 - text.w();
-    dst_pt.y = cur_pt.y + 394;
+    dst_pt.x = cur_pt.x + textx - text.w();
+    dst_pt.y = cur_pt.y + 388;
     text.Blit(dst_pt);
 
     text.Set(_("Best Monster:"));
-    dst_pt.x = cur_pt.x + 208 - text.w();
-    dst_pt.y = cur_pt.y + 438;
+    dst_pt.x = cur_pt.x + textx - text.w();
+    dst_pt.y = cur_pt.y + 429;
     text.Blit(dst_pt);
 
     buttonExit.Draw();

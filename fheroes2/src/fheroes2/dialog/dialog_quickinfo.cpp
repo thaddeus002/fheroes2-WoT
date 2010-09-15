@@ -494,6 +494,7 @@ void Dialog::QuickInfo(const Castle & castle)
 	case Color::ORANGE:	index = 8; break;
 	case Color::PURPLE:	index = 10; break;
 	case Color::GRAY:	index = 12; break;
+	default: break;
     }
 
     const Sprite & l_flag = AGG::GetICN(ICN::FLAG32, index);
@@ -620,6 +621,7 @@ void Dialog::QuickInfo(const Heroes & hero)
 	case Color::ORANGE:	index = 8; break;
 	case Color::PURPLE:	index = 10; break;
 	case Color::GRAY:	index = 12; break;
+	default: break;
     }
 
     const Sprite & l_flag = AGG::GetICN(ICN::FLAG32, index);

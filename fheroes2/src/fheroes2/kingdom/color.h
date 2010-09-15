@@ -48,6 +48,7 @@ namespace Color
 {
     enum color_t
     {
+	NONE	= 0x00,
         BLUE    = 0x01,
         GREEN   = 0x02,
         RED     = 0x04,
