@@ -191,6 +191,27 @@ void GetObelisksInfo(std::vector<ValueColors> & v)
     std::sort(v.begin(), v.end(), ValueColors::SortValueGreat);
 }
 
+void GetArmyInfo(std::vector<ValueColors> & v)
+{
+    v.clear();
+
+    for(Color::color_t color = Color::BLUE; color != Color::GRAY; ++color)
+        if(Settings::Get().KingdomColors(color))
+	{
+	    int value = world.GetKingdom(color).GetArmiesStrength();
+
+	    std::vector<ValueColors>::iterator it = 
+		std::find_if(v.begin(), v.end(), std::bind2nd(std::mem_fun_ref(&ValueColors::IsValue), value));
+
+	    if(it == v.end())
+		v.push_back(ValueColors(value, color));
+	    else
+		(*it).second |= color;
+	}
+
+    std::sort(v.begin(), v.end(), ValueColors::SortValueGreat);
+}
+
 void GetIncomesInfo(std::vector<ValueColors> & v)
 {
     v.clear();
@@ -212,6 +233,17 @@ void GetIncomesInfo(std::vector<ValueColors> & v)
     std::sort(v.begin(), v.end(), ValueColors::SortValueGreat);
 }
 
+void GetBestHeroArmyInfo(std::vector<ValueColors> & v)
+{
+    v.clear();
+
+    for(Color::color_t color = Color::BLUE; color != Color::GRAY; ++color)
+	if(Settings::Get().KingdomColors() & color)
+    {
+	const Heroes* hero = world.GetKingdom(color).GetBestHero();
+	v.push_back(ValueColors(hero ? hero->GetID() : Heroes::UNKNOWN, color));
+    }
+}
 
 void DrawFlags(const std::vector<ValueColors> & v, const Point & pos, const u16 width, const u8 count)
 {
@@ -232,6 +264,29 @@ void DrawFlags(const std::vector<ValueColors> & v, const Point & pos, const u16 
 		const Sprite & flag = AGG::GetICN(ICN::FLAG32, Color::GetIndex(color) * 2 + 1);
 		display.Blit(flag, px, pos.y);
 		px = px + sw;
+	    }
+	}
+    }
+}
+
+void DrawHeroIcons(const std::vector<ValueColors> & v, const Point & pos, const u16 width)
+{
+    if(v.size())
+    {
+	Display & display = Display::Get();
+	const u16 chunk = width / v.size();
+
+	for(u8 ii = 0; ii < v.size(); ++ii)
+	{
+	    Heroes::heroes_t id = Heroes::ConvertID(v[ii].first);
+	    u16 px = pos.x + chunk / 2 + ii * chunk;
+
+	    if(Heroes::UNKNOWN != id)
+	    {
+		const Sprite & window = AGG::GetICN(ICN::LOCATORS, 22);
+		const Surface & icons = world.GetHeroes(id)->GetPortrait30x22();
+		display.Blit(window, px - window.w() / 2, pos.y - 4);
+		display.Blit(icons, px - icons.w() / 2, pos.y);
 	    }
 	}
     }
@@ -340,7 +395,7 @@ void Dialog::ThievesGuild(u8 count)
 
     dst_pt.x = cur_pt.x + startx;
     GetGoldsInfo(v);
-    DrawFlags(v, dst_pt, maxw, colors);
+    if(1 < count) DrawFlags(v, dst_pt, maxw, colors);
 
     text.Set(_("Wood & Ore:"));
     dst_pt.x = cur_pt.x + textx - text.w();
@@ -349,7 +404,7 @@ void Dialog::ThievesGuild(u8 count)
 
     dst_pt.x = cur_pt.x + startx;
     GetWoodOreInfo(v);
-    DrawFlags(v, dst_pt, maxw, colors);
+    if(1 < count) DrawFlags(v, dst_pt, maxw, colors);
 
     text.Set(_("Gems, Cr, Slf & Mer:"));
     dst_pt.x = cur_pt.x + textx - text.w();
@@ -358,7 +413,7 @@ void Dialog::ThievesGuild(u8 count)
 
     dst_pt.x = cur_pt.x + startx;
     GetGemsCrSlfMerInfo(v);
-    DrawFlags(v, dst_pt, maxw, colors);
+    if(1 < count) DrawFlags(v, dst_pt, maxw, colors);
 
     text.Set(_("Obelisks Found:"));
     dst_pt.x = cur_pt.x + textx - text.w();
@@ -367,12 +422,16 @@ void Dialog::ThievesGuild(u8 count)
 
     dst_pt.x = cur_pt.x + startx;
     GetObelisksInfo(v);
-    DrawFlags(v, dst_pt, maxw, colors);
+    if(2 < count) DrawFlags(v, dst_pt, maxw, colors);
 
     text.Set(_("Total Army Strength:"));
     dst_pt.x = cur_pt.x + textx - text.w();
     dst_pt.y = cur_pt.y + 210;
     text.Blit(dst_pt);
+
+    dst_pt.x = cur_pt.x + startx;
+    GetArmyInfo(v);
+    if(3 < count) DrawFlags(v, dst_pt, maxw, colors);
 
     text.Set(_("Income:"));
     dst_pt.x = cur_pt.x + textx - text.w();
@@ -381,7 +440,7 @@ void Dialog::ThievesGuild(u8 count)
 
     dst_pt.x = cur_pt.x + startx;
     GetIncomesInfo(v);
-    DrawFlags(v, dst_pt, maxw, colors);
+    if(4 < count) DrawFlags(v, dst_pt, maxw, colors);
 
     // head 2
     ii = 0;
@@ -400,20 +459,36 @@ void Dialog::ThievesGuild(u8 count)
     dst_pt.y = cur_pt.y + 306;
     text.Blit(dst_pt);
 
+    dst_pt.x = cur_pt.x + startx;
+    GetBestHeroArmyInfo(v);
+    DrawHeroIcons(v, dst_pt, maxw);
+
     text.Set(_("Best Hero Stats:"));
     dst_pt.x = cur_pt.x + textx - text.w();
     dst_pt.y = cur_pt.y + 347;
     text.Blit(dst_pt);
+
+    dst_pt.x = cur_pt.x + startx;
+    //GetBestHeroStatsInfo(v);
+    //if(1 < count) DrawHeroIcons(v, dst_pt, maxw);
 
     text.Set(_("Personality:"));
     dst_pt.x = cur_pt.x + textx - text.w();
     dst_pt.y = cur_pt.y + 388;
     text.Blit(dst_pt);
 
+    dst_pt.x = cur_pt.x + startx;
+    //GetPersonalityInfo(v);
+    //if(2 < count) DrawHeroIcons(v, dst_pt, maxw);
+
     text.Set(_("Best Monster:"));
     dst_pt.x = cur_pt.x + textx - text.w();
     dst_pt.y = cur_pt.y + 429;
     text.Blit(dst_pt);
+
+    dst_pt.x = cur_pt.x + startx;
+    //GetBestMonsterInfo(v);
+    //if(3 < count) DrawHeroIcons(v, dst_pt, maxw);
 
     buttonExit.Draw();
 

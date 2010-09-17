@@ -49,6 +49,11 @@ cost_t Kingdom::starting_resource[] = {
 #ifdef WITH_XML
 #include "xmlccwrap.h"
 
+bool HeroesStrongestArmy(const Heroes* h1, const Heroes* h2)
+{
+    return h1 && h2 && h2->GetArmy().StrongerEnemyArmy(h1->GetArmy());
+}
+
 void Kingdom::UpdateStartingResource(const TiXmlElement* xml_resource)
 {
     const TiXmlElement* xml_difficult;
@@ -599,4 +604,22 @@ u32 Kingdom::GetIncome(void)
     }
 
     return resource.gold;
+}
+
+const Heroes* Kingdom::GetBestHero(void) const
+{
+    return heroes.size() ? *std::max_element(heroes.begin(), heroes.end(), HeroesStrongestArmy) : NULL;
+}
+
+u32 Kingdom::GetArmiesStrength(void) const
+{
+    u32 res = 0;
+
+    std::vector<Heroes*>::const_iterator ith = heroes.begin();
+    for(; ith != heroes.end(); ++ith) if(*ith) res += (**ith).GetArmy().GetStrength();
+
+    std::vector<Castle*>::const_iterator itc = castles.begin();
+    for(; itc != castles.end(); ++itc) if(*itc) res += (**itc).GetArmy().GetStrength();
+
+    return res;
 }

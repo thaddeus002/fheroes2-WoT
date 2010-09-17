@@ -72,7 +72,10 @@ public:
     u16 GetFundsCrystal(void) const{ return resource.crystal; }
     u16 GetFundsGems(void) const{ return resource.gems; }
     u32 GetFundsGold(void) const{ return resource.gold; }
+
     u32 GetIncome(void);
+    const Heroes* GetBestHero(void) const;
+    u32 GetArmiesStrength(void) const;
 
     void AddFundsResource(const Resource::funds_t & funds);
     void OddFundsResource(const Resource::funds_t & funds);

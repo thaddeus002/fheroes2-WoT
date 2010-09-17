@@ -128,6 +128,7 @@ namespace Army
 	    u32		GetHitPoints(void) const;
 	    u32		GetDamageMin(void) const;
 	    u32		GetDamageMax(void) const;
+	    u32		GetStrength(void) const;
 
 	    bool	isValid(void) const;
 	    bool	HasMonster(const Monster &) const;
@@ -135,7 +136,7 @@ namespace Army
 	    bool	JoinTroop(const Troop & troop);
 	    bool	JoinTroop(const Monster::monster_t mon, const u32 count);
 	    bool	JoinTroop(const Monster & mon, const u32 count);
-	    bool	StrongerEnemyArmy(const army_t &);
+	    bool	StrongerEnemyArmy(const army_t &) const;
 	    bool	AllTroopsIsRace(u8) const;
 
 	    void	JoinStrongestFromArmy(army_t &);

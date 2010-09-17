@@ -1117,7 +1117,12 @@ u32 Army::army_t::GetDamageMax(void) const
     return count ? res / count : 0;
 }
 
-bool Army::army_t::StrongerEnemyArmy(const army_t & army2)
+u32 Army::army_t::GetStrength(void) const
+{
+    return (GetDamageMin() + GetDamageMax()) / 2 * GetHitPoints();
+}
+
+bool Army::army_t::StrongerEnemyArmy(const army_t & army2) const
 {
     const u16 a1 = GetAttack();
     const u16 d1 = GetDefense();
@@ -1137,8 +1142,8 @@ bool Army::army_t::StrongerEnemyArmy(const army_t & army2)
     else
         r2 = 1 + 0.05 * std::min(d1 - a2, 14);
 
-    r1 *= (GetDamageMin() + GetDamageMax()) / 2 * GetHitPoints();
-    r2 *= (army2.GetDamageMin() + army2.GetDamageMax()) / 2 * army2.GetHitPoints();
+    r1 *= GetStrength();
+    r2 *= army2.GetStrength();
 
     return 0 == r2 || 1 <= (r1 / r2);
 }
