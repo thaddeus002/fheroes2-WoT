@@ -221,7 +221,7 @@ bool Dialog::InputString(const std::string &header, std::string &res)
     Cursor::themes_t oldcursor = cursor.Themes();
     cursor.SetThemes(cursor.POINTER);
 
-    const bool pda = Settings::Get().PocketPC();
+    //const bool pda = Settings::Get().PocketPC();
     if(res.size()) res.clear();
     res.reserve(48);
 
@@ -270,7 +270,7 @@ bool Dialog::InputString(const std::string &header, std::string &res)
 	buttonOk.isEnable() && le.MousePressLeft(buttonOk) ? buttonOk.PressDraw() : buttonOk.ReleaseDraw();
         le.MousePressLeft(buttonCancel) ? buttonCancel.PressDraw() : buttonCancel.ReleaseDraw();
 
-	if(pda && le.MousePressLeft(text_rt))
+	if(Settings::Get().PocketPC() && le.MousePressLeft(text_rt))
 	{
 	    PocketPC::KeyboardDialog(res);
 	    redraw = true;

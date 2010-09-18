@@ -270,7 +270,7 @@ bool SelectFileListSimple(const std::string & header, MapsFileInfoList & lists, 
         if(le.MouseClickLeft(enter_field) && editor)
 	{
 	    edit_mode = true;
-	    if(pocket)
+	    if(Settings::Get().PocketPC())
 	    {
 		PocketPC::KeyboardDialog(filename);
     		buttonOk.SetDisable(filename.empty());
