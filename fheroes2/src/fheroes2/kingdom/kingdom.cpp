@@ -46,13 +46,13 @@ cost_t Kingdom::starting_resource[] = {
     { 10000, 30, 10, 30, 10, 10, 10 },
 };
 
-#ifdef WITH_XML
-#include "xmlccwrap.h"
-
 bool HeroesStrongestArmy(const Heroes* h1, const Heroes* h2)
 {
     return h1 && h2 && h2->GetArmy().StrongerEnemyArmy(h1->GetArmy());
 }
+
+#ifdef WITH_XML
+#include "xmlccwrap.h"
 
 void Kingdom::UpdateStartingResource(const TiXmlElement* xml_resource)
 {
