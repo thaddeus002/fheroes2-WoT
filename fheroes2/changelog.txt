@@ -1,4 +1,47 @@
-SVN - up to r1895
+SVN - up to r1945
+
+Sep, 18, 2010
++ Updated: Dialog::ThievesGuild
++ Fixed: wince double click, wince auto videomode
++ Updated translations: russian, swedish, spanish
++ Added options: "heroes: recalculate movement points after creatures movement"
++ Fixed Heroes::ActionToDwellingRecruitMonster and Heroes::ActionToDwellingBattleMonster
++ Added "Anduran Battle Garb" artifact combined
++ Added: multiple icons for mass spells
++ Added options: heroes: surrendering gives some experience
++ Updated monster animation on maps
++ Fixed "Ultimate Stuff" sprite for Loyalty version
++ Fixed Maps::Tiles::GoodForUltimateArtifact
++ Added stats files (stevenaus ver.)
++ Fixed result for wins side
++ Fixed race/skill weight is 0, Skill::Secondary::GetWeightSkillFromRace
++ Fixed out of range for Interface::Basic::GetDimensionDoorDestination
++ Fixed zlogo leak memory
++ Added switch on/off mouse emulation
++ Added option: remember mp/sp for surrendering/retreating heroes
++ Added option for recruit hero cost to be dependent on hero level
++ Fixed default extra haste, slow values
++ Added optins: allow buy spellbook from shrines
++ Added: allow buy spellbook and visit Mage Guild for unions
++ Fixed autosave remember
++ Fixed scholar repeat dialog
+
+Jun, 06, 2010
++ Added feature: Eagle Eye Scholar
++ Fixed heroes meetings and castle visit, with unions disabled
++ Added options: world: only the first monster will attack (H2 orig).
++ Added dynamic castle bottom passable check
++ Added dynamic intarface settings
++ Updated translation, update changelog, release out 1895
++ Fixed multiple maps: human only settings
++ Fixed multiplayer map filter
++ Fixed multiplayer map filter
++ Fixed necromancer morale info
++ Added fix for race with custom portrait
++ Added random dwelling2 builds for default castle
++ Fixed fullscreen options
++ Fixed pockept keyb, and fixed build
++ Added pocketpc virtual keyboard, remove dialog_chat.cpp
 
 May, 27, 2010
 + Update translation files
