@@ -472,7 +472,7 @@ Dialog::answer_t Castle::OpenDialog(bool readonly, bool fade)
 	else
 	// left click building
 	if((building & BUILD_THIEVESGUILD) && le.MouseClickLeft(coordBuildingThievesGuild))
-	    Dialog::ThievesGuild(0x01);
+	    Dialog::ThievesGuild(false);
 	else
 	if((building & BUILD_TAVERN) && le.MouseClickLeft(coordBuildingTavern))
 	{

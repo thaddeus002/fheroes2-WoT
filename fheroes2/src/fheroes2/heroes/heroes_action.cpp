@@ -2840,7 +2840,7 @@ void ActionToTreeKnowledge(Heroes &hero, const u8 obj, const u16 dst_index)
 
 void ActionToOracle(Heroes &hero, const u8 obj, const u16 dst_index)
 {
-    Dialog::ThievesGuild(0xFF);
+    Dialog::ThievesGuild(true);
     DEBUG(DBG_GAME , DBG_INFO, "ActionToOracle: " << hero.GetName());
 }
 

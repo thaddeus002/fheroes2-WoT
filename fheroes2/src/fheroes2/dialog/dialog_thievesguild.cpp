@@ -29,6 +29,8 @@
 #include "text.h"
 #include "world.h"
 #include "kingdom.h"
+#include "castle.h"
+#include "pocketpc.h"
 #include "dialog.h"
 
 struct ValueColors : std::pair<int, int>
@@ -250,6 +252,7 @@ void DrawFlags(const std::vector<ValueColors> & v, const Point & pos, const u16 
 {
     Display & display = Display::Get();
     const u16 chunk = width / count;
+    bool qvga = Settings::Get().QVGA();
 
     for(u8 ii = 0; ii < count; ++ii)
     {
@@ -257,13 +260,15 @@ void DrawFlags(const std::vector<ValueColors> & v, const Point & pos, const u16 
 	{
 	    const u8 colors = v[ii].second;
 	    const u8 items = Color::Count(colors);
-	    const u8 sw = AGG::GetICN(ICN::FLAG32, 1).w();
+	    const u8 sw = qvga ? AGG::GetICN(ICN::MISC6, 7).w() : AGG::GetICN(ICN::FLAG32, 1).w();
 	    u16 px = pos.x + chunk / 2 + ii * chunk - (items * sw) / 2;
 
 	    for(Color::color_t color = Color::BLUE; color != Color::GRAY; ++color) if(colors & color)
 	    {
-		const Sprite & flag = AGG::GetICN(ICN::FLAG32, Color::GetIndex(color) * 2 + 1);
-		display.Blit(flag, px, pos.y);
+		const Sprite & flag = qvga ?
+		    AGG::GetICN(ICN::MISC6, Color::GetIndex(color) + 7) :
+		    AGG::GetICN(ICN::FLAG32, Color::GetIndex(color) * 2 + 1);
+		display.Blit(flag, px, (qvga ? pos.y + 2 : pos.y));
 		px = px + sw;
 	    }
 	}
@@ -293,13 +298,12 @@ void DrawHeroIcons(const std::vector<ValueColors> & v, const Point & pos, const 
     }
 }
 
-void Dialog::ThievesGuild(u8 count)
+void Dialog::ThievesGuild(bool oracle)
 {
-    // FIXME: QVGA version
     if(Settings::Get().QVGA())
     {
-       Dialog::Message("", _("For the QVGA version is not available."), Font::SMALL, Dialog::OK);
-       return;
+	PocketPC::ThievesGuild(oracle);
+	return;
     }
 
     Display & display = Display::Get();
@@ -317,6 +321,8 @@ void Dialog::ThievesGuild(u8 count)
     Point dst_pt(cur_pt);
 
     display.Blit(AGG::GetICN(ICN::STONEBAK, 0), dst_pt);
+
+    const u8 count = oracle ? 0xFF : world.GetMyKingdom().GetCountBuilding(BUILD_THIEVESGUILD);
 
     std::vector<ValueColors> v;
     v.reserve(KINGDOMMAX);

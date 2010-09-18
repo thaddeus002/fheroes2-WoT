@@ -355,6 +355,11 @@ u8 Kingdom::GetCountNecromancyShrineBuild(void) const
     return std::count_if(castles.begin(), castles.end(), std::mem_fun(&Castle::isNecromancyShrineBuild));
 }
 
+u8 Kingdom::GetCountBuilding(u32 build) const
+{
+    return std::count_if(castles.begin(), castles.end(), std::bind2nd(std::mem_fun(&Castle::isBuild), build));
+}
+
 Race::race_t Kingdom::GetRace(void) const
 {
     return Settings::Get().KingdomRace(color);

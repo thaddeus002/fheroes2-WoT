@@ -86,6 +86,7 @@ public:
     u8 GetCountCapital(void) const;
     u8 GetLostTownDays(void) const;
     u8 GetCountNecromancyShrineBuild(void) const;
+    u8 GetCountBuilding(u32) const;
 
     Recruits & GetRecruits(void);
 

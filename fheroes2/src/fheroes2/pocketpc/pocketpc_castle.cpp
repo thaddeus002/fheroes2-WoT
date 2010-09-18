@@ -492,7 +492,16 @@ screen_t CastleOpenDialog3(Castle & castle)
 	else
 	if(le.MouseCursor(building2.GetArea()) && building2.QueueEventProcessing()) { AGG::PlaySound(M82::BUILDTWN); castle.BuyBuilding(building2()); return SCREEN1; }
 	else
-	if(le.MouseCursor(building3.GetArea()) && building3.QueueEventProcessing()) { AGG::PlaySound(M82::BUILDTWN); castle.BuyBuilding(building3()); return SCREEN1; }
+	if(le.MouseCursor(building3.GetArea()))
+	{
+	    // show thieves guild
+	    if(castle.isBuild(BUILD_THIEVESGUILD))
+	    {
+		if(le.MouseClickLeft(building3.GetArea())){ PocketPC::ThievesGuild(false); return SCREEN1; }
+	    }
+	    else
+	    if(building3.QueueEventProcessing()) { AGG::PlaySound(M82::BUILDTWN); castle.BuyBuilding(building3()); return SCREEN1; }
+	}
 	else
 	if(le.MouseCursor(building4.GetArea()))
 	{

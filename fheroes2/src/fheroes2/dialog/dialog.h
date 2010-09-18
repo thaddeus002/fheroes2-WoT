@@ -130,7 +130,7 @@ namespace Dialog
     void PuzzleMaps(void);
 
     // thieves guild
-    void ThievesGuild(u8);
+    void ThievesGuild(bool oracle);
 
     void GameInfo(void);
 
