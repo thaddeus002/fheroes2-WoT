@@ -190,6 +190,8 @@ bool Game::IO::SaveBIN(QueueMessage & msg)
     msg.Push(conf.svn_version);
     // time
     msg.Push(static_cast<u32>(std::time(NULL)));
+    // lang
+    msg.Push(conf.force_lang);
 
     // maps
     msg.Push(static_cast<u16>(0xFF02));
@@ -636,6 +638,7 @@ bool Game::IO::LoadBIN(QueueMessage & msg)
     	DEBUG(DBG_GAME , DBG_INFO, "Game::IO::LoadBIN: format: " << format);
     }
 
+
     // major version
     msg.Pop(byte8);
     // minor version
@@ -645,6 +648,19 @@ bool Game::IO::LoadBIN(QueueMessage & msg)
     msg.Pop(conf.svn_version);
     // time
     msg.Pop(byte32);
+    // lang
+    if(FORMAT_VERSION_1949 <= format)
+    {
+	msg.Pop(str);
+	if(str != "en" && str != conf.force_lang && !conf.Unicode())
+	{
+	    std::string msg("This is an saved game is localized for lang = ");
+	    msg.append(str);
+	    msg.append(", and most of the messages will be displayed incorrectly.\n \n");
+	    msg.append("(tip: set unicode = on)");
+	    Dialog::Message("Warning!", msg, Font::BIG, Dialog::OK);
+	}
+    }
 
     // maps
     msg.Pop(byte16);

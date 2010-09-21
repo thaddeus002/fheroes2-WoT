@@ -147,7 +147,7 @@ Settings::Settings() : major_version(MAJOR_VERSION), minor_version(MINOR_VERSION
 #endif
     debug(DEFAULT_DEBUG), video_mode(0, 0), game_difficulty(Difficulty::NORMAL),
     my_color(Color::GRAY), cur_color(Color::GRAY), path_data_directory("data"),
-    font_normal("dejavusans.ttf"), font_small("dejavusans.ttf"), size_normal(15), size_small(10),
+    font_normal("dejavusans.ttf"), font_small("dejavusans.ttf"), force_lang("en"), size_normal(15), size_small(10),
     sound_volume(6), music_volume(6), animation(6), game_type(0), players_colors(0), preferably_count_players(0),
     port(DEFAULT_PORT), memory_limit(0)
 {

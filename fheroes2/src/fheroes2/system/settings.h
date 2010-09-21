@@ -36,8 +36,9 @@
 #include "game_io.h"
 #include "bitmodes.h"
 
+#define FORMAT_VERSION_1949 0x079D
 #define FORMAT_VERSION_1861 0x0745
-#define CURRENT_FORMAT_VERSION FORMAT_VERSION_1861
+#define CURRENT_FORMAT_VERSION FORMAT_VERSION_1949
 #define LAST_FORMAT_VERSION FORMAT_VERSION_1861
 
 #define ListMapsDirectory std::list<std::string>
