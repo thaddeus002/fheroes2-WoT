@@ -469,53 +469,25 @@ void Settings::PostLoad(void)
     }
 }
 
-bool Settings::CheckVideoMode(void) const
+void Settings::SetAutoVideoMode(void)
 {
     Size size;
 
-    Display::GetMaxMode(size, PocketPC());
-    if(size.w == 0 || size.h == 0) size = Size(640, 480);
-    
-    if(PocketPC() && video_mode.w < video_mode.h)
+    switch(Display::GetMaxMode(size, PocketPC()))
     {
-	u16 tmp = size.w;
-	size.w = size.h;
-	size.h = tmp;
+	case 0:
+	    return;
+
+	case -1:
+	    video_mode.w = 1024;
+	    video_mode.h = 768;
+	    return;
+
+	default: break;
     }
 
-    return video_mode.w && video_mode.h && size.w >= video_mode.w && size.h >= video_mode.h;
-}
-
-void Settings::AutoVideoMode(void)
-{
-    bool zero = (video_mode.w == 0 || video_mode.h == 0);
-    Size size;
-
-    Display::GetMaxMode(size, PocketPC());
-    if(size.w == 0 || size.h == 0) size = Size(640, 480);
-
-    if(zero)
-    {
-#ifdef _WIN32_WCE
-        if((size.w % TILEWIDTH) || (size.h % TILEWIDTH))
-        {
-            size.w = size.w / TILEWIDTH;
-            size.h = size.h / TILEWIDTH;
-	    size.w *= TILEWIDTH;
-    	    size.h *= TILEWIDTH;
-	}
-	video_mode = size;
-#else
-	// set default
-	video_mode = Size(640, 480);
-#endif
-    }
-    else
-    if(size.w < video_mode.w || size.h < video_mode.h)
-    {
-        video_mode.w = size.w;
-        video_mode.h = size.h;
-    }
+    video_mode.w = size.w;
+    video_mode.h = size.h;
 
     PostLoad();
 }

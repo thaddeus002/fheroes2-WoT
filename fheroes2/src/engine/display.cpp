@@ -163,20 +163,20 @@ Display & Display::Get(void)
     return inside;
 }
 
-void Display::GetMaxMode(Size & result, bool rotate)
+int Display::GetMaxMode(Size & result, bool rotate)
 {
     SDL_Rect** modes = SDL_ListModes(NULL, SDL_ANYFORMAT);
 
     if(modes == (SDL_Rect **) 0)
     {
         std::cerr <<  "Display::GetMaxMode: " << "no modes available" << std::endl;
+	return 0;
     }
     else
     if(modes == (SDL_Rect **) -1)
     {
         //std::cout <<  "Display::GetMaxMode: " << "all modes available" << std::endl;
-	result.w = 0;
-	result.h = 0;
+	return -1;
     }
     else
     {
@@ -202,4 +202,5 @@ void Display::GetMaxMode(Size & result, bool rotate)
 	    result.h = cur;
 	}
     }
+    return 1;
 }
