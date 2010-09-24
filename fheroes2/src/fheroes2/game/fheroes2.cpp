@@ -70,8 +70,21 @@ int PrintHelp(const char *basename)
     return EXIT_SUCCESS;
 }
 
+std::string GetCaption(void)
+{
+    return std::string("Free Heroes II, " + Settings::Get().BuildVersion());
+}
+
+#ifdef _WIN32_WCE
+    bool wince_is_running(void);
+    void wince_create_icon_taskbar(void);
+#endif
+
 int main(int argc, char **argv)
 {
+#ifdef _WIN32_WCE
+	if(wince_is_running()) return EXIT_SUCCESS;
+#endif
 	Settings & conf = Settings::Get();
 	int test = 0;
 
@@ -155,15 +168,13 @@ int main(int argc, char **argv)
 		conf.ResetMusic();
 	    }
 
-	    std::string strtmp = "Free Heroes II, " + conf.BuildVersion();
-
 	    if(0 == conf.VideoMode().w || 0 == conf.VideoMode().h)
 	    	conf.SetAutoVideoMode();
 
             Display::SetVideoMode(conf.VideoMode().w, conf.VideoMode().h, conf.FullScreen());
 
 	    Display::HideCursor();
-	    Display::SetCaption(strtmp);
+	    Display::SetCaption(GetCaption());
 
     	    //Ensure the mouse position is updated to prevent bad initial values.
     	    LocalEvent::Get().GetMouseCursor();
@@ -447,3 +458,22 @@ void LoadExternalResource(const Settings & conf)
     if(FilePresent(spec))
 	Skill::UpdateStats(spec);
 }
+
+
+#ifdef _WIN32_WCE
+#include <windows.h>
+
+bool wince_is_running(void)
+{
+    HWND hwnd = FindWindow(NULL, L"SDL_app");
+
+    if(hwnd)
+    {
+	ShowWindow(hwnd, SW_SHOW);
+	SetForegroundWindow(hwnd);
+    }
+
+    return hwnd;
+}
+
+#endif
