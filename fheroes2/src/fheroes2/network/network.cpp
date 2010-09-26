@@ -44,28 +44,28 @@ const char* Network::GetMsgString(u16 msg)
 {
     switch(msg)
     {
-        case MSG_RAW:           return "MSG_RAW";
+        case MSG_RAW:           	return "MSG_RAW";
 
-        case MSG_PING:          return "MSG_PING";
-        case MSG_READY:         return "MSG_READY";
-        case MSG_MESSAGE:       return "MSG_MESSAGE";
+        case MSG_PING:          	return "MSG_PING";
+        case MSG_READY:         	return "MSG_READY";
+        case MSG_MESSAGE:       	return "MSG_MESSAGE";
 
-        case MSG_HELLO:         return "MSG_HELLO";
-        case MSG_LOGOUT:        return "MSG_LOGOUT";
-        case MSG_SHUTDOWN:      return "MSG_SHUTDOWN";
+        case MSG_HELLO:         	return "MSG_HELLO";
+        case MSG_LOGOUT:        	return "MSG_LOGOUT";
+        case MSG_SHUTDOWN:      	return "MSG_SHUTDOWN";
+        case MSG_ACCESS_DENIED:		return "MSG_ACCESS_DENIED";
 
-        case MSG_MAPS_INFO:     return "MSG_MAPS_INFO";
-        case MSG_MAPS_INFO_GET: return "MSG_MAPS_INFO_GET";
-        case MSG_MAPS_INFO_SET:	return "MSG_MAPS_INFO_SET";
+        case MSG_UPDATE_PLAYERS:	return "MSG_UPDATE_PLAYERS";
+        case MSG_GET_MAPS_LIST:		return "MSG_GET_MAPS_LIST";
+        case MSG_SET_CURRENT_MAP:	return "MSG_SET_CURRENT_MAP";
+        case MSG_CHANGE_COLORS:		return "MSG_CHANGE_COLORS";
+        case MSG_CHANGE_RACE:		return "MSG_CHANGE_RACE";
 
-        case MSG_MAPS_LOAD:	return "MSG_MAPS_LOAD";
-        case MSG_MAPS_LOAD_ERR:	return "MSG_MAPS_LOAD_ERR";
 
-        case MSG_MAPS_LIST:     return "MSG_MAPS_LIST";
-        case MSG_MAPS_LIST_GET: return "MSG_MAPS_LIST_GET";
+        case MSG_START_GAME:		return "MSG_START_GAME";
+        case MSG_MAPS_LOAD:		return "MSG_MAPS_LOAD";
+        case MSG_MAPS_LOAD_ERR:		return "MSG_MAPS_LOAD_ERR";
 
-        case MSG_PLAYERS:       return "MSG_PLAYERS";
-        case MSG_PLAYERS_GET:   return "MSG_PLAYERS_GET";
 
         case MSG_CASTLE_BUILD:		return "MSG_CASTLE_BUILD";
         case MSG_CASTLE_RECRUIT_HERO:	return "MSG_CASTLE_RECRUIT_HERO";
@@ -271,6 +271,34 @@ void Network::PacketPushPlayersInfo(QueueMessage & m, const std::vector<FH2Remot
 	    m.Push((*itc1).player_race);
     	    m.Push((*itc1).player_name);
 	    m.Push((*itc1).player_id);
+	    m.Push(static_cast<u8>((*itc1).Modes(ST_ADMIN)));
+	}
+    }
+}
+
+void Network::PackRaceColors(QueueMessage & m)
+{
+    m.Push(static_cast<u8>(KINGDOMMAX));
+
+    for(Color::color_t color = Color::BLUE; color != Color::GRAY; ++color)
+    {
+	m.Push(static_cast<u8>(color));
+	m.Push(static_cast<u8>(Settings::Get().KingdomRace(color)));
+    }
+}
+
+void Network::UnpackRaceColors(QueueMessage & m)
+{
+    u8 max, color, race;
+
+    m.Pop(max);
+    if(max == KINGDOMMAX)
+    {
+	for(u8 ii = 0; ii < max; ++ii)
+	{
+	    m.Pop(color);
+	    m.Pop(race);
+	    Settings::Get().SetKingdomRace(color, race);
 	}
     }
 }

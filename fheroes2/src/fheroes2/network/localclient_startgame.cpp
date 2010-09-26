@@ -78,7 +78,7 @@ bool FH2LocalClient::BattleLoop(Battle2::Arena & arena, Battle2::Result & result
 		Dialog::Message("Error", "FH2LocalClient::BattleLoop: recv: error", Font::BIG, Dialog::OK);
 		return false;
             }
-	    DEBUG(DBG_NETWORK , DBG_INFO, "FH2LocalClient::BattleLoop: " << "recv: " << Network::GetMsgString(packet.GetID()));
+	    DEBUG(DBG_NETWORK , DBG_INFO, "FH2LocalClient::" << "BattleLoop: " << "recv: " << Network::GetMsgString(packet.GetID()));
 
             switch(packet.GetID())
             {
@@ -124,7 +124,7 @@ bool FH2LocalClient::BattleLoop(Battle2::Arena & arena, Battle2::Result & result
 
 			default:
 			{
-			    DEBUG(DBG_NETWORK, DBG_INFO, "FH2LocalClient::BattleLoop: " << "cast spell: " << Spell::GetName(Spell::FromInt(spell)));
+			    DEBUG(DBG_NETWORK, DBG_INFO, "FH2LocalClient::" << "BattleLoop: " << "cast spell: " << Spell::GetName(Spell::FromInt(spell)));
 
 			    u8 color;
 			    u16 id;
@@ -136,7 +136,7 @@ bool FH2LocalClient::BattleLoop(Battle2::Arena & arena, Battle2::Result & result
 			    std::vector<Battle2::TargetInfo> targets;
 			    Battle2::TargetInfo target;
 
-			    DEBUG(DBG_NETWORK, DBG_INFO, "FH2LocalClient::BattleLoop: " << " targets size0: " << size);
+			    DEBUG(DBG_NETWORK, DBG_INFO, "FH2LocalClient::" << "BattleLoop: " << " targets size0: " << size);
 			    while(size--)
 			    {
 				packet.Pop(id);
@@ -145,7 +145,7 @@ bool FH2LocalClient::BattleLoop(Battle2::Arena & arena, Battle2::Result & result
 				target.defender = arena.GetTroopID(id);
 				targets.push_back(target);
 			    }
-			    DEBUG(DBG_NETWORK, DBG_INFO, "FH2LocalClient::BattleLoop: " << " targets size: " << targets.size());
+			    DEBUG(DBG_NETWORK, DBG_INFO, "FH2LocalClient::" << "BattleLoop: " << " targets size: " << targets.size());
 
 			    const HeroBase* hero = arena.GetArmy(color) ? arena.GetArmy(color)->GetCommander() : NULL;
 
@@ -184,7 +184,7 @@ bool FH2LocalClient::BattleLoop(Battle2::Arena & arena, Battle2::Result & result
 			if(interface) interface->RedrawActionAttackPart2(*attacker, targets);
 		    }
 		    else
-			DEBUG(DBG_NETWORK, DBG_INFO, "FH2LocalClient::BattleLoop: " << "incorrect param");
+			DEBUG(DBG_NETWORK, DBG_INFO, "FH2LocalClient::" << "BattleLoop: " << "incorrect param");
 		    break;
 		}
 
@@ -220,7 +220,7 @@ bool FH2LocalClient::BattleLoop(Battle2::Arena & arena, Battle2::Result & result
 
     			while(a.size())
     			{
-			    DEBUG(DBG_NETWORK , DBG_INFO, "FH2LocalClient::BattleLoop: send: " << Network::GetMsgString(a.front().GetID()));
+			    DEBUG(DBG_NETWORK , DBG_INFO, "FH2LocalClient::" << "BattleLoop: send: " << Network::GetMsgString(a.front().GetID()));
 			    if(!Send(a.front())) return false;
         		    a.pop_front();
     			}
@@ -319,10 +319,11 @@ bool FH2LocalClient::StartGame(void)
 		Dialog::Message("Error", "FH2LocalClient::StartGame: recv: error", Font::BIG, Dialog::OK);
 		return false;
             }
-	    DEBUG(DBG_NETWORK , DBG_INFO, "FH2LocalClient::StartGame: recv: " << Network::GetMsgString(packet.GetID()));
+	    DEBUG(DBG_NETWORK , DBG_INFO, "FH2LocalClient::" << "StartGame: " << "recv: " << Network::GetMsgString(packet.GetID()));
 
             switch(packet.GetID())
             {
+/*
 		case MSG_MAPS_LOAD:
 		{
 		    if(Game::IO::LoadBIN(packet))
@@ -332,10 +333,10 @@ bool FH2LocalClient::StartGame(void)
 			castleBar.Reset();
 		    }
             	    else
-            		DEBUG(DBG_NETWORK , DBG_WARN, "FH2LocalClient::StartGame: MSG_MAPS_LOAD error");
+            		DEBUG(DBG_NETWORK , DBG_WARN, "FH2LocalClient::" << "StartGame: " << "MSG_MAPS_LOAD error");
 		}
 		break;
-
+*/
 		case MSG_BATTLE:
 		{
 		    u8 id1, id2;
@@ -357,10 +358,10 @@ bool FH2LocalClient::StartGame(void)
 			    Battle2::Loader(hero1->GetArmy(), hero2->GetArmy(), dst);
 			}
 			else
-			    DEBUG(DBG_NETWORK , DBG_WARN, "FH2LocalClient::StartGame: MSG_BATTLE unknown param");
+			    DEBUG(DBG_NETWORK , DBG_WARN, "FH2LocalClient::" << "StartGame: " << "MSG_BATTLE unknown param");
 		    }
             	    else
-			DEBUG(DBG_NETWORK , DBG_WARN, "FH2LocalClient::StartGame: MSG_BATTLE unknown param");
+			DEBUG(DBG_NETWORK , DBG_WARN, "FH2LocalClient::" << "StartGame: " << "MSG_BATTLE unknown param");
 		}
 		break;
 /*
@@ -374,7 +375,7 @@ bool FH2LocalClient::StartGame(void)
 		    conf.SetCurrentColor(Color::Get(color));
 		    //Interface::Basic::SetTurnProgress(percent);
 
-		    DEBUG(DBG_NETWORK , DBG_INFO, "FH2LocalClient::StartGame: player: " << Color::String(color));
+		    DEBUG(DBG_NETWORK , DBG_INFO, "FH2LocalClient::" << "StartGame: player: " << Color::String(color));
 		    world.ClearFog(color);
 
 		    if(conf.MyColor() == color)
@@ -382,7 +383,7 @@ bool FH2LocalClient::StartGame(void)
 			if(Game::ENDTURN == Game::HumanTurn())
 			{
 			    //Network::PackKingdom(packet, kingdom);
-			    //DEBUG(DBG_NETWORK, DBG_INFO, "FH2LocalClient::StartGame: send MSG_KINGDOM");
+			    //DEBUG(DBG_NETWORK, DBG_INFO, "FH2LocalClient::" << "StartGame: send MSG_KINGDOM");
 			    //if(!Send(packet)) return false;
 			    
 			    // send all heroes
@@ -392,7 +393,7 @@ bool FH2LocalClient::StartGame(void)
 			    //for(; ith1 != ith2; ++ith1) if(*ith1)
 			    //{
 			    //	Network::PackHero(packet, **ith1);
-			    //	DEBUG(DBG_NETWORK, DBG_INFO, "FH2LocalClient::StartGame: send MSG_HEROES");
+			    //	DEBUG(DBG_NETWORK, DBG_INFO, "FH2LocalClient::" << "StartGame: send MSG_HEROES");
 			    //	if(!Send(packet)) return false;
 			    //}
 
@@ -403,13 +404,13 @@ bool FH2LocalClient::StartGame(void)
 			    //for(; itc1 != itc2; ++itc1) if(*itc1)
 			    //{
 			    //	Network::PackCastle(packet, **itc1);
-			    //	DEBUG(DBG_NETWORK, DBG_INFO, "FH2LocalClient::StartGame: send MSG_CASTLE");
+			    //	DEBUG(DBG_NETWORK, DBG_INFO, "FH2LocalClient::" << "StartGame: send MSG_CASTLE");
 			    //	if(!Send(packet)) return false;
 			    //}
 
 			    packet.Reset();
 			    packet.SetID(MSG_END_TURN);
-			    DEBUG(DBG_NETWORK, DBG_INFO, "FH2LocalClient::StartGame: send MSG_END_TURN");
+			    DEBUG(DBG_NETWORK, DBG_INFO, "FH2LocalClient::" << "StartGame: send MSG_END_TURN");
 			    if(!Send(packet)) return false;
 			}
 			else
@@ -479,7 +480,7 @@ void FH2LocalClient::SendCastleBuyBuilding(const Castle & castle, u32 build)
     packet.Push(castle.GetIndex());
     packet.Push(build);
 
-    DEBUG(DBG_NETWORK, DBG_INFO, "FH2LocalClient::SendCastleBuyBuilding: " << castle.GetName() << ", build: " << Castle::GetStringBuilding(build, castle.GetRace()));
+    DEBUG(DBG_NETWORK, DBG_INFO, "FH2LocalClient::" << "SendCastleBuyBuilding: " << castle.GetName() << ", build: " << Castle::GetStringBuilding(build, castle.GetRace()));
     client.Send(packet);
 }
 
@@ -494,7 +495,7 @@ void FH2LocalClient::SendCastleRecruitHero(const Castle & castle, const Heroes &
     packet.Push(castle.GetIndex());
     packet.Push(static_cast<u8>(hero.GetID()));
 
-    DEBUG(DBG_NETWORK, DBG_INFO, "FH2LocalClient::SendCastleRecruitHero: " << castle.GetName() << ", recruit: " << hero.GetName());
+    DEBUG(DBG_NETWORK, DBG_INFO, "FH2LocalClient::" << "SendCastleRecruitHero: " << castle.GetName() << ", recruit: " << hero.GetName());
     client.Send(packet);
 }
 
@@ -509,7 +510,7 @@ void FH2LocalClient::SendCastleBuyBoat(const Castle & castle, u16 index)
     packet.Push(castle.GetIndex());
     packet.Push(index);
 
-    DEBUG(DBG_NETWORK, DBG_INFO, "FH2LocalClient::SendCastleBuyBoat: " << castle.GetName() << ", index: " << index);
+    DEBUG(DBG_NETWORK, DBG_INFO, "FH2LocalClient::" << "SendCastleBuyBoat: " << castle.GetName() << ", index: " << index);
     client.Send(packet);
 }
 
@@ -525,7 +526,7 @@ void FH2LocalClient::SendCastleRecruitMonster(const Castle & castle, u32 dwellin
     packet.Push(dwelling);
     packet.Push(count);
 
-    DEBUG(DBG_NETWORK, DBG_INFO, "FH2LocalClient::SendCastleRecruitMonster: " << castle.GetName());
+    DEBUG(DBG_NETWORK, DBG_INFO, "FH2LocalClient::" << "SendCastleRecruitMonster: " << castle.GetName());
     client.Send(packet);
 }
 
@@ -542,7 +543,7 @@ void FH2LocalClient::SendMarketSellResource(const Kingdom & kingdom, u8 resource
     packet.Push(resource);
     packet.Push(count);
 
-    DEBUG(DBG_NETWORK, DBG_INFO, "FH2LocalClient::SendMarketSellResource: " << Resource::String(resource) << "(" << count << ")");
+    DEBUG(DBG_NETWORK, DBG_INFO, "FH2LocalClient::" << "SendMarketSellResource: " << Resource::String(resource) << "(" << count << ")");
     client.Send(packet);
 }
 
@@ -559,7 +560,7 @@ void FH2LocalClient::SendMarketBuyResource(const Kingdom & kingdom, u8 resource,
     packet.Push(resource);
     packet.Push(count);
 
-    DEBUG(DBG_NETWORK, DBG_INFO, "FH2LocalClient::SendMarketBuyResource: " << Resource::String(resource) << "(" << count << ")");
+    DEBUG(DBG_NETWORK, DBG_INFO, "FH2LocalClient::" << "SendMarketBuyResource: " << Resource::String(resource) << "(" << count << ")");
     client.Send(packet);
 }
 
@@ -573,7 +574,7 @@ void FH2LocalClient::SendHeroesBuyMagicBook(const Heroes & hero)
     packet.SetID(MSG_HEROES_BUY_MAGICBOOK);
     packet.Push(static_cast<u8>(hero.GetID()));
 
-    DEBUG(DBG_NETWORK, DBG_INFO, "FH2LocalClient::SendHeroesBuyMagicBook: " << hero.GetName());
+    DEBUG(DBG_NETWORK, DBG_INFO, "FH2LocalClient::" << "SendHeroesBuyMagicBook: " << hero.GetName());
     client.Send(packet);
 }
 
@@ -590,7 +591,7 @@ void FH2LocalClient::SendHeroesSwapArtifacts(const Heroes & hero1, u8 index1, co
     packet.Push(static_cast<u8>(hero2.GetID()));
     packet.Push(index2);
 
-    DEBUG(DBG_NETWORK, DBG_INFO, "FH2LocalClient::SendHeroesSwapArtifacts: ");
+    DEBUG(DBG_NETWORK, DBG_INFO, "FH2LocalClient::" << "SendHeroesSwapArtifacts: ");
     client.Send(packet);
 }
 
@@ -607,7 +608,7 @@ void FH2LocalClient::SendArmyUpgradeTroop(const Army::army_t & army, u8 index)
     packet.Push(commander->GetIndex());
     packet.Push(index);
 
-    DEBUG(DBG_NETWORK, DBG_INFO, "FH2LocalClient::SendArmyUpgradeTroop: ");
+    DEBUG(DBG_NETWORK, DBG_INFO, "FH2LocalClient::" << "SendArmyUpgradeTroop: ");
     client.Send(packet);
 }
 
@@ -624,7 +625,7 @@ void FH2LocalClient::SendArmyDismissTroop(const Army::army_t & army, u8 index)
     packet.Push(commander->GetIndex());
     packet.Push(index);
 
-    DEBUG(DBG_NETWORK, DBG_INFO, "FH2LocalClient::SendArmyDismissTroop: ");
+    DEBUG(DBG_NETWORK, DBG_INFO, "FH2LocalClient::" << "SendArmyDismissTroop: ");
     client.Send(packet);
 }
 
@@ -645,7 +646,7 @@ void FH2LocalClient::SendArmySwapTroops(const Army::army_t & army1, u8 index1, c
     packet.Push(commander2->GetIndex());
     packet.Push(index2);
 
-    DEBUG(DBG_NETWORK, DBG_INFO, "FH2LocalClient::SendArmySwapTroop: ");
+    DEBUG(DBG_NETWORK, DBG_INFO, "FH2LocalClient::" << "SendArmySwapTroop: ");
     client.Send(packet);
 }
 
@@ -667,7 +668,7 @@ void FH2LocalClient::SendArmySplitTroop(const Army::army_t & army1, u8 index1, c
     packet.Push(index2);
     packet.Push(count);
 
-    DEBUG(DBG_NETWORK, DBG_INFO, "FH2LocalClient::SendArmySplitTroop: ");
+    DEBUG(DBG_NETWORK, DBG_INFO, "FH2LocalClient::" << "SendArmySplitTroop: ");
     client.Send(packet);
 }
 
@@ -688,7 +689,7 @@ void FH2LocalClient::SendArmyJoinTroops(const Army::army_t & army1, u8 index1, c
     packet.Push(commander2->GetIndex());
     packet.Push(index2);
 
-    DEBUG(DBG_NETWORK, DBG_INFO, "FH2LocalClient::SendArmyJoinTroop: ");
+    DEBUG(DBG_NETWORK, DBG_INFO, "FH2LocalClient::" << "SendArmyJoinTroop: ");
     client.Send(packet);
 }
 
@@ -705,7 +706,7 @@ void FH2LocalClient::SendArmyCombatFormation(const Army::army_t & army)
     packet.Push(commander->GetIndex());
     packet.Push(army.GetCombatFormat());
 
-    DEBUG(DBG_NETWORK, DBG_INFO, "FH2LocalClient::SendArmyCombatFormation: ");
+    DEBUG(DBG_NETWORK, DBG_INFO, "FH2LocalClient::" << "SendArmyCombatFormation: ");
     client.Send(packet);
 }
 

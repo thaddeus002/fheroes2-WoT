@@ -421,7 +421,7 @@ void Game::IO::PackTile(QueueMessage & msg, const Maps::Tiles & tile)
     msg.Push(tile.flags);
 
     // addons 1
-    msg.Push(static_cast<u32>(tile.addons_level1.size()));
+    msg.Push(static_cast<u8>(tile.addons_level1.size()));
     std::list<Maps::TilesAddon>::const_iterator it1 = tile.addons_level1.begin();
     std::list<Maps::TilesAddon>::const_iterator it2 = tile.addons_level1.end();
     for(; it1 != it2; ++it1)
@@ -434,7 +434,7 @@ void Game::IO::PackTile(QueueMessage & msg, const Maps::Tiles & tile)
     }
 
     // addons 2
-    msg.Push(static_cast<u32>(tile.addons_level2.size()));
+    msg.Push(static_cast<u8>(tile.addons_level2.size()));
     it1 = tile.addons_level2.begin();
     it2 = tile.addons_level2.end();
     for(; it1 != it2; ++it1)
@@ -953,10 +953,17 @@ void Game::IO::UnpackTile(QueueMessage & msg, Maps::Tiles & tile, u16 check_vers
 #endif
 
     // addons 1
-    u32 size;
+    u8 size;
     tile.addons_level1.clear();
-    msg.Pop(size);
-    for(u32 ii = 0; ii < size; ++ii)
+    if(check_version >= FORMAT_VERSION_1954)
+	msg.Pop(size);
+    else
+    {
+	u32 size_old;
+	msg.Pop(size_old);
+	size = size_old;
+    }
+    for(u8 ii = 0; ii < size; ++ii)
     {
 	Maps::TilesAddon addon;
 	msg.Pop(addon.level);
@@ -968,8 +975,15 @@ void Game::IO::UnpackTile(QueueMessage & msg, Maps::Tiles & tile, u16 check_vers
 
     // addons 2
     tile.addons_level2.clear();
-    msg.Pop(size);
-    for(u32 ii = 0; ii < size; ++ii)
+    if(check_version >= FORMAT_VERSION_1954)
+	msg.Pop(size);
+    else
+    {
+	u32 size_old;
+	msg.Pop(size_old);
+	size = size_old;
+    }
+    for(u8 ii = 0; ii < size; ++ii)
     {
 	Maps::TilesAddon addon;
 	msg.Pop(addon.level);

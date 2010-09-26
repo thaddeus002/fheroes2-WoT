@@ -37,19 +37,18 @@ enum msg_t
     MSG_HELLO,
     MSG_LOGOUT,
     MSG_SHUTDOWN,
+    MSG_ACCESS_DENIED,
 
-    MSG_MAPS_INFO,
-    MSG_MAPS_INFO_GET,
-    MSG_MAPS_INFO_SET,
+    MSG_UPDATE_PLAYERS,
+    MSG_GET_MAPS_LIST,
+    MSG_SET_CURRENT_MAP,
+    MSG_CHANGE_COLORS,
+    MSG_CHANGE_RACE,
 
+    MSG_START_GAME,
     MSG_MAPS_LOAD,
     MSG_MAPS_LOAD_ERR,
 
-    MSG_MAPS_LIST,
-    MSG_MAPS_LIST_GET,
-
-    MSG_PLAYERS,
-    MSG_PLAYERS_GET,
 
     MSG_YOUR_TURN,
     MSG_END_TURN,
@@ -128,6 +127,9 @@ namespace Network
     void		PacketPushMapsFileInfo(QueueMessage &, const Maps::FileInfo &);
     void		PacketPopMapsFileInfo(QueueMessage &, Maps::FileInfo &);
     void		PacketPushPlayersInfo(QueueMessage &, const std::vector<FH2RemoteClient> &, u32 exclude = 0);
+
+    void		PackRaceColors(QueueMessage &);
+    void		UnpackRaceColors(QueueMessage &);
 
     u8			GetPlayersColors(const std::vector<FH2RemoteClient> &);
     

@@ -73,11 +73,12 @@ private:
     bool ScenarioInfoDialog(void);
     bool StartGame(void);
 
-    u8 GetPlayersColors(void) const;
+    void MsgUpdatePlayers(void);
     void PopPlayersInfo(QueueMessage &);
 
     std::string server;
     std::vector<Player> players;
+    u32 admin_id;
 };
 
 #endif

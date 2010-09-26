@@ -25,7 +25,7 @@
 #include "engine.h"
 
 #define MAJOR_VERSION 0
-#define MINOR_VERSION 5
+#define MINOR_VERSION 6
 
 #define ANIMATION_SPEED 23
 

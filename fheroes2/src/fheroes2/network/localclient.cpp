@@ -38,6 +38,12 @@
 
 #ifdef WITH_NET
 
+// game_scenarioinfo.cpp
+void UpdateCoordOpponentsInfo(const Point &, std::vector<Rect> &);
+void UpdateCoordClassInfo(const Point &, std::vector<Rect> &);
+
+
+
 FH2LocalClient & FH2LocalClient::Get(void)
 {
     static FH2LocalClient fh2localclient;
@@ -45,9 +51,19 @@ FH2LocalClient & FH2LocalClient::Get(void)
     return fh2localclient;
 }
 
-FH2LocalClient::FH2LocalClient()
+FH2LocalClient::FH2LocalClient() : admin_id(0)
 {
     players.reserve(6);
+}
+
+u8 GetPlayersColors(const std::vector<Player> & v)
+{
+    u8 res = 0;
+    std::vector<Player>::const_iterator it1 = v.begin();
+    std::vector<Player>::const_iterator it2 = v.end();
+    for(; it1 != it2; ++it1) if((*it1).player_id && (*it1).player_color) res |= (*it1).player_color;
+
+    return res;
 }
 
 bool FH2LocalClient::Connect(const std::string & srv, u16 port)
@@ -62,21 +78,12 @@ bool FH2LocalClient::Connect(const std::string & srv, u16 port)
     return false;
 }
 
-u8 FH2LocalClient::GetPlayersColors(void) const
-{
-    u8 res = 0;
-    std::vector<Player>::const_iterator it1 = players.begin();
-    std::vector<Player>::const_iterator it2 = players.end();
-    for(; it1 != it2; ++it1) if((*it1).player_id && (*it1).player_color) res |= (*it1).player_color;
-
-    return res;
-}
-
 void FH2LocalClient::PopPlayersInfo(QueueMessage & msg)
 {
     Player cur;
-    u8 size;
+    u8 size, admin;
     players.clear();
+    admin_id = 0;
     msg.Pop(size);
     for(u8 ii = 0; ii < size; ++ii)
     {
@@ -84,6 +91,8 @@ void FH2LocalClient::PopPlayersInfo(QueueMessage & msg)
         msg.Pop(cur.player_race);
         msg.Pop(cur.player_name);
         msg.Pop(cur.player_id);
+        msg.Pop(admin);
+	if(admin) admin_id = cur.player_id;
         if(cur.player_id) players.push_back(cur);
     }
 }
@@ -94,10 +103,24 @@ int FH2LocalClient::Main(void)
     {
 	if(ScenarioInfoDialog())
 	{
-    	    if(StartGame())
-    	    {
-        	// may be also
-    	    }
+	    Cursor & cursor = Cursor::Get();
+	    Display & display = Display::Get();
+
+	    cursor.Hide();
+    	    display.Fill(0, 0, 0);
+            TextBox(_("Please wait..."), Font::BIG, Rect(0, display.h()/2, display.w(), display.h()/2));
+            display.Flip();
+
+/*
+	    if(Game::IO::LoadBIN(packet))
+	    {
+			conf.SetMyColor(Color::Get(player_color));
+			cursor.Hide();
+			return true;
+	    }
+*/
+
+    	    StartGame();
 	}
     }
 
@@ -137,7 +160,7 @@ bool FH2LocalClient::ConnectionChat(void)
     player_id = 0;
 
     // recv ready, banner
-    DEBUG(DBG_NETWORK , DBG_INFO, "FH2LocalClient::ConnectionChat: wait ready");
+    DEBUG(DBG_NETWORK , DBG_INFO, "FH2LocalClient::" << "ConnectionChat: " << "wait ready");
     if(!Wait(packet, MSG_READY)) return false;
 
     // get banner
@@ -152,40 +175,26 @@ bool FH2LocalClient::ConnectionChat(void)
     packet.Reset();
     packet.SetID(MSG_HELLO);
     packet.Push(player_name);
-    DEBUG(DBG_NETWORK , DBG_INFO, "FH2LocalClient::ConnectionChat send hello");
+    DEBUG(DBG_NETWORK , DBG_INFO, "FH2LocalClient::" << "ConnectionChat: " << "send hello");
     if(!Send(packet)) return false;
 
-    // recv hello, modes, player_id
-    DEBUG(DBG_NETWORK , DBG_INFO, "FH2LocalClient::ConnectionChat: wait hello");
+    // recv hello, modes, player_id, cur maps
+    DEBUG(DBG_NETWORK , DBG_INFO, "FH2LocalClient::" << "ConnectionChat: " << "wait hello");
     if(!Wait(packet, MSG_HELLO)) return false;
     packet.Pop(modes);
     packet.Pop(player_id);
     packet.Pop(player_color);
-    if(0 == player_id || 0 == player_color) DEBUG(DBG_NETWORK , DBG_WARN, "FH2LocalClient::ConnectionChat: player zero values");
-    DEBUG(DBG_NETWORK , DBG_INFO, "FH2LocalClient::ConnectionChat: " << (Modes(ST_ADMIN) ? "admin" : "client") << " mode");
-    
-    // send get maps info
-    packet.Reset();
-    packet.SetID(MSG_MAPS_INFO_GET);
-    DEBUG(DBG_NETWORK , DBG_INFO,  "FH2LocalClient::ConnectionChat send get_maps_info");
-    if(!Send(packet)) return false;
+    if(0 == player_id || 0 == player_color) DEBUG(DBG_NETWORK , DBG_WARN, "FH2LocalClient::" << "ConnectionChat: " << "player zero values");
+    DEBUG(DBG_NETWORK , DBG_INFO, "FH2LocalClient::" << "ConnectionChat: " << (Modes(ST_ADMIN) ? "admin" : "client") << " mode");
 
-    // recv maps
-    DEBUG(DBG_NETWORK , DBG_INFO, "FH2LocalClient::ConnectionChat: wait maps_info");
-    if(!Wait(packet, MSG_MAPS_INFO)) return false;
-
+    // get cur maps
     Network::PacketPopMapsFileInfo(packet, conf.CurrentFileInfo());
 
-    // send get players
-    packet.Reset();
-    packet.SetID(MSG_PLAYERS_GET);
-    DEBUG(DBG_NETWORK , DBG_INFO, "FH2LocalClient::ConnectionChat send get_players");
-    if(!Send(packet)) return false;
+    // get players
+    DEBUG(DBG_NETWORK , DBG_INFO, "FH2LocalClient::" << "ConnectionChat: " << "wait players info");
+    if(!Wait(packet, MSG_UPDATE_PLAYERS)) return false;
 
-    // recv players
-    DEBUG(DBG_NETWORK , DBG_INFO,  "FH2LocalClient::ConnectionChat: wait players");
-    if(!Wait(packet, MSG_PLAYERS)) return false;
-    PopPlayersInfo(packet);
+    MsgUpdatePlayers();
 
     return true;
 }
@@ -193,8 +202,6 @@ bool FH2LocalClient::ConnectionChat(void)
 bool FH2LocalClient::ScenarioInfoDialog(void)
 {
     Settings & conf = Settings::Get();
-    bool change_players = false;
-    bool update_info    = false;
 
     // draw info dialog
     Cursor & cursor = Cursor::Get();
@@ -204,6 +211,15 @@ bool FH2LocalClient::ScenarioInfoDialog(void)
     const Point pointPanel(204, 32);
     const Point pointOpponentInfo(pointPanel.x + 24, pointPanel.y + 202);
     const Point pointClassInfo(pointPanel.x + 24, pointPanel.y + 282);
+    const Rect  box(pointOpponentInfo, 360, 180);
+
+    std::vector<Rect>::const_iterator itr;
+
+    std::vector<Rect> coordColors(KINGDOMMAX);
+    std::vector<Rect> coordRaces(KINGDOMMAX);
+
+    UpdateCoordOpponentsInfo(pointOpponentInfo, coordColors);
+    UpdateCoordClassInfo(pointClassInfo, coordRaces);
 
     Game::Scenario::RedrawStaticInfo(pointPanel);
     Game::Scenario::RedrawOpponentsInfo(pointOpponentInfo, &players);
@@ -213,7 +229,10 @@ bool FH2LocalClient::ScenarioInfoDialog(void)
     Button buttonOk(pointPanel.x + 31, pointPanel.y + 380, ICN::NGEXTRA, 66, 67);
     Button buttonCancel(pointPanel.x + 287, pointPanel.y + 380, ICN::NGEXTRA, 68, 69);
 
-    if(! Modes(ST_ADMIN & modes))
+    SpriteCursor sp;
+    sp.SetSprite(AGG::GetICN(ICN::NGEXTRA, 80));
+
+    if(! Modes(ST_ADMIN))
     {
 	buttonOk.Press();
 	buttonOk.SetDisable(true);
@@ -228,36 +247,52 @@ bool FH2LocalClient::ScenarioInfoDialog(void)
     display.Flip();
 
     bool exit = false;
-    DEBUG(DBG_NETWORK , DBG_INFO, "FH2LocalClient::ScenarioInfoDialog: start queue");
+    bool update_info = false;
+    u8 change_color = Color::NONE;
+    DEBUG(DBG_NETWORK , DBG_INFO, "FH2LocalClient::" << "ScenarioInfoDialog: " << "start queue");
 
     while(!exit && le.HandleEvents())
     {
         if(Ready())
 	{
 	    if(!Recv(packet)) return false;
-	    DEBUG(DBG_NETWORK , DBG_INFO, "FH2LocalClient::ScenarioInfoDialog: recv: " << Network::GetMsgString(packet.GetID()));
+	    DEBUG(DBG_NETWORK , DBG_INFO, "FH2LocalClient::" << "ScenarioInfoDialog: " << "recv: " << Network::GetMsgString(packet.GetID()));
 
 	    switch(packet.GetID())
     	    {
 		case MSG_READY:
 		    break;
 
-		case MSG_PLAYERS:
+		case MSG_CHANGE_RACE:
+		    Network::UnpackRaceColors(packet);
+		    update_info = true;
+		    break;
+
+		case MSG_UPDATE_PLAYERS:
 		{
-		    PopPlayersInfo(packet);
-		    conf.SetPlayersColors(GetPlayersColors());
-		    std::vector<Player>::iterator itp = std::find_if(players.begin(), players.end(), std::bind2nd(std::mem_fun_ref(&Player::isID), player_id));
-		    if(itp != players.end())
+		    MsgUpdatePlayers();
+		    if(Modes(ST_ADMIN))
 		    {
-			player_color = (*itp).player_color;
-			player_race = (*itp).player_race;
+			buttonOk.Release();
+			buttonOk.SetDisable(false);
+			buttonSelectMaps.Release();
+			buttonSelectMaps.SetDisable(false);
+		    }
+		    else
+		    {
+			buttonOk.Press();
+			buttonOk.SetDisable(true);
+			buttonSelectMaps.Press();
+			buttonSelectMaps.SetDisable(true);
 		    }
 		    update_info = true;
 		    break;
 		}
 
-		case MSG_MAPS_INFO:
+		case MSG_SET_CURRENT_MAP:
 		    Network::PacketPopMapsFileInfo(packet, conf.CurrentFileInfo());
+		    UpdateCoordOpponentsInfo(pointOpponentInfo, coordColors);
+		    UpdateCoordClassInfo(pointClassInfo, coordRaces);
 		    update_info = true;
 		    break;
 
@@ -268,23 +303,6 @@ bool FH2LocalClient::ScenarioInfoDialog(void)
 		    exit = true;
 		    break;
 
-		case MSG_MAPS_LOAD:
-		    cursor.Hide();
-        	    display.Fill(0, 0, 0);
-            	    TextBox(_("Maps Loading..."), Font::BIG, Rect(0, display.h()/2, display.w(), display.h()/2));
-                    display.Flip();
-
-		    if(Game::IO::LoadBIN(packet))
-		    {
-			conf.SetMyColor(Color::Get(player_color));
-			cursor.Hide();
-			return true;
-		    }
-		    else
-		    {
-			return false;
-		    }
-		    break;
 
 		default: break;
 	    }
@@ -304,22 +322,6 @@ bool FH2LocalClient::ScenarioInfoDialog(void)
 	    update_info = false;
 	}
 
-	if(change_players)
-	{
-	/*
-	    packet.Reset();
-	    packet.SetID(MSG_PLAYERS);
-	    Network::PacketPushPlayersInfo(packet, players);
-
-	    DEBUG(DBG_NETWORK , DBG_INFO, "FH2LocalClient::ScenarioInfoDialog: send players";
-	    if(!Send(packet)) return Dialog::CANCEL;
-
-	    conf.SetPlayersColors(Network::GetPlayersColors(players));
-	*/
-	    change_players = false;
-	    update_info = true;
-	}
-
 	// press button
         if(buttonSelectMaps.isEnable()) le.MousePressLeft(buttonSelectMaps) ? buttonSelectMaps.PressDraw() : buttonSelectMaps.ReleaseDraw();
         if(buttonOk.isEnable()) le.MousePressLeft(buttonOk) ? buttonOk.PressDraw() : buttonOk.ReleaseDraw();
@@ -328,29 +330,34 @@ bool FH2LocalClient::ScenarioInfoDialog(void)
 	// click select
 	if(le.KeyPress(KEY_s) || (buttonSelectMaps.isEnable() && le.MouseClickLeft(buttonSelectMaps)))
 	{
+	    cursor.Hide();
+	    sp.Hide();
+	    cursor.Show();
+
 	    // recv maps_info_list
 	    packet.Reset();
-	    packet.SetID(MSG_MAPS_LIST_GET);
-	    DEBUG(DBG_NETWORK , DBG_INFO, "FH2LocalClient::ScenarioInfoDialog: send get_maps_list");
+	    packet.SetID(MSG_GET_MAPS_LIST);
+	    DEBUG(DBG_NETWORK , DBG_INFO, "FH2LocalClient::" << "ScenarioInfoDialog: " << "send: " << Network::GetMsgString(packet.GetID()));
 	    if(!Send(packet)) return false;
 
-	    DEBUG(DBG_NETWORK , DBG_INFO,  "FH2LocalClient::ScenarioInfoDialog: wait maps_list");
-	    if(!Wait(packet, MSG_MAPS_LIST)) return false;
+	    DEBUG(DBG_NETWORK , DBG_INFO,  "FH2LocalClient::" << "ScenarioInfoDialog: " << "wait: " << Network::GetMsgString(MSG_GET_MAPS_LIST));
+	    if(Wait(packet, MSG_GET_MAPS_LIST))
+	    {
+		MapsFileInfoList lists;
+		Network::PacketPopMapsFileInfoList(packet, lists);
 
-	    MapsFileInfoList lists;
-	    Network::PacketPopMapsFileInfoList(packet, lists);
-
-            std::string filemaps;
-            if(Dialog::SelectScenario(lists, filemaps) && filemaps.size())
-            {
-		// send set_maps_info
-	        packet.Reset();
-		packet.SetID(MSG_MAPS_INFO_SET);
-	        packet.Push(filemaps);
-		DEBUG(DBG_NETWORK , DBG_INFO, "FH2LocalClient::ScenarioInfoDialog: send maps_info");
-	        if(!Send(packet)) return false;
+        	std::string filemaps;
+	        if(Dialog::SelectScenario(lists, filemaps) && filemaps.size())
+        	{
+		    // send set_maps_info
+	    	    packet.Reset();
+		    packet.SetID(MSG_SET_CURRENT_MAP);
+	    	    packet.Push(filemaps);
+		    DEBUG(DBG_NETWORK , DBG_INFO, "FH2LocalClient::" << "ScenarioInfoDialog: " << "send: " << Network::GetMsgString(packet.GetID()));
+	    	    if(!Send(packet)) return false;
+		}
+		update_info = true;
 	    }
-	    update_info = true;
 	}
 	else
 	// click cancel
@@ -360,16 +367,106 @@ bool FH2LocalClient::ScenarioInfoDialog(void)
         // click ok
         if(le.KeyPress(KEY_RETURN) || (buttonOk.isEnable() && le.MouseClickLeft(buttonOk)))
     	{
-           packet.Reset();
-           packet.SetID(MSG_MAPS_LOAD);
-           DEBUG(DBG_NETWORK , DBG_INFO, "FH2LocalClient::ScenarioInfoDialog: send maps_load");
-           if(!Send(packet)) return false;
+	    packet.Reset();
+	    packet.SetID(MSG_START_GAME);
+	    DEBUG(DBG_NETWORK , DBG_INFO, "FH2LocalClient::" << "ScenarioInfoDialog: " << "send: " << Network::GetMsgString(packet.GetID()));
+	    if(!Send(packet)) return false;
+	    cursor.Hide();
+	    return true;
+	}
+	else
+	if(Modes(ST_ADMIN) && le.MouseClickLeft(box))
+	{
+	    // click colors
+	    if(coordColors.end() !=
+		(itr = std::find_if(coordColors.begin(), coordColors.end(), std::bind2nd(RectIncludePoint(), le.GetMouseCursor()))))
+	    {
+		u8 color = Color::GetFromIndex(itr - coordColors.begin());
+		if((conf.PlayersColors() & color) && Color::NONE == change_color)
+		{
+		    cursor.Hide();
+		    sp.Move((*itr).x - 3, (*itr).y - 3);
+		    cursor.Show();
+		    display.Flip();
+		    change_color = color;
+		}
+		else
+		if(conf.AllowColors(color))
+		{
+		    cursor.Hide();
+		    sp.Hide();
+		    cursor.Show();
+		    display.Flip();
+		    if(Color::NONE != change_color)
+		    {
+			packet.Reset();
+			packet.SetID(MSG_CHANGE_COLORS);
+			packet.Push(change_color);
+			packet.Push(color);
+		        DEBUG(DBG_NETWORK , DBG_INFO, "FH2LocalClient::" << "ScenarioInfoDialog: " << "send: " << Network::GetMsgString(packet.GetID()));
+			if(!Send(packet)) return false;
+			change_color = Color::NONE;
+		    }
+		}
+	    }
+	    else
+	    // click races
+	    if(coordRaces.end() !=
+		(itr = std::find_if(coordRaces.begin(), coordRaces.end(), std::bind2nd(RectIncludePoint(), le.GetMouseCursor()))))
+	    {
+		u8 color = Color::GetFromIndex(itr - coordRaces.begin());
+		if(conf.AllowChangeRace(color))
+		{
+                    u8 race = conf.KingdomRace(color);
+                    switch(race)
+                    {
+                        case Race::KNGT: race = Race::BARB; break;
+                        case Race::BARB: race = Race::SORC; break;
+                        case Race::SORC: race = Race::WRLK; break;
+                        case Race::WRLK: race = Race::WZRD; break;
+                        case Race::WZRD: race = Race::NECR; break;
+                        case Race::NECR: race = Race::RAND; break;
+                        case Race::RAND: race = Race::KNGT; break;
+                        default: break;
+                    }
+		    if(change_color)
+		    {
+			cursor.Hide();
+			sp.Hide();
+			cursor.Show();
+			display.Flip();
+			change_color = Color::NONE;
+		    }
+		    if((race & Race::ALL) || race == Race::RAND)
+		    {
+			packet.Reset();
+			packet.SetID(MSG_CHANGE_RACE);
+			packet.Push(color);
+			packet.Push(race);
+		        DEBUG(DBG_NETWORK , DBG_INFO, "FH2LocalClient::" << "ScenarioInfoDialog: " << "send: " << Network::GetMsgString(packet.GetID()));
+			if(!Send(packet)) return false;
+		    }
+		}
+	    }
 	}
 
         DELAY(10);
     }
 
     return false;
+}
+
+void FH2LocalClient::MsgUpdatePlayers(void)
+{
+    PopPlayersInfo(packet);
+    Settings::Get().SetPlayersColors(GetPlayersColors(players));
+    std::vector<Player>::iterator itp = std::find_if(players.begin(), players.end(), std::bind2nd(std::mem_fun_ref(&Player::isID), player_id));
+    if(itp != players.end())
+    {
+	player_color = (*itp).player_color;
+	player_race = (*itp).player_race;
+	(admin_id == player_id ? SetModes(ST_ADMIN) : ResetModes(ST_ADMIN));
+    }
 }
 
 Game::menu_t Game::NetworkGuest(void)

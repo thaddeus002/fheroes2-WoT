@@ -45,9 +45,9 @@ public:
     FH2RemoteClient();
 
     int Main(void);
-    void Logout(const std::string &);
     bool ConnectionChat(void);
     bool StartGame(void);
+    void CloseConnection(void);
 
     void RunThread(void);
     void ShutdownThread(void);
@@ -55,12 +55,15 @@ public:
     void MsgBroadcast(void);
     void MsgPing(void);
     void MsgLogout(void);
-    bool MsgMapsInfoSet(void);
-    bool MsgMapsInfoGet(void);
-    bool MsgMapsListGet(void);
-    bool MsgPlayersGet(void);
+    void MsgChangeColors(void);
+    void MsgChangeRace(void);
 
     bool RecvBattleHumanTurn(const Battle2::Stats &, const Battle2::Arena & arena, Battle2::Actions &);
+
+    bool SendSetCurrentMap(void);
+    bool SendMapsInfoList(void);
+    bool SendAccessDenied(void);
+    void SendUpdatePlayers(u32 exclude);
 
     static bool SendBattleAction(u8, QueueMessage &);
     static bool SendBattleResult(u8, const Battle2::Result &);

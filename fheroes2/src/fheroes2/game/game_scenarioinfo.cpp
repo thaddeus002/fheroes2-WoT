@@ -279,17 +279,16 @@ Game::menu_t Game::ScenarioInfo(void)
 		if(conf.AllowChangeRace(color))
 		{
 		    cursor.Hide();
-		    u8 index = 0;
 		    Race::race_t race = conf.KingdomRace(color);
 		    switch(race)
 		    {
-			case Race::KNGT: index = 52; race = Race::BARB; break;
-			case Race::BARB: index = 53; race = Race::SORC; break;
-			case Race::SORC: index = 54; race = Race::WRLK; break;
-			case Race::WRLK: index = 55; race = Race::WZRD; break;
-			case Race::WZRD: index = 56; race = Race::NECR; break;
-			case Race::NECR: index = 58; race = Race::RAND; break;
-			case Race::RAND: index = 51; race = Race::KNGT; break;
+			case Race::KNGT: race = Race::BARB; break;
+			case Race::BARB: race = Race::SORC; break;
+			case Race::SORC: race = Race::WRLK; break;
+			case Race::WRLK: race = Race::WZRD; break;
+			case Race::WZRD: race = Race::NECR; break;
+			case Race::NECR: race = Race::RAND; break;
+			case Race::RAND: race = Race::KNGT; break;
 			default: break;
 		    }
 		    conf.SetKingdomRace(color, race);

@@ -52,6 +52,7 @@ void SetLangEnvPath(const Settings &);
 void ReadConfigFile(Settings &);
 void LoadConfigFiles(Settings &, const std::string &);
 void LoadExternalResource(const Settings &);
+bool FHeroes2Running(void);
 
 int PrintHelp(const char *basename)
 {
@@ -75,16 +76,10 @@ std::string GetCaption(void)
     return std::string("Free Heroes II, " + Settings::Get().BuildVersion());
 }
 
-#ifdef _WIN32_WCE
-    bool wince_is_running(void);
-    void wince_create_icon_taskbar(void);
-#endif
-
 int main(int argc, char **argv)
 {
-#ifdef _WIN32_WCE
-	if(wince_is_running()) return EXIT_SUCCESS;
-#endif
+	if(FHeroes2Running()) return EXIT_SUCCESS;
+
 	Settings & conf = Settings::Get();
 	int test = 0;
 
@@ -459,11 +454,10 @@ void LoadExternalResource(const Settings & conf)
 	Skill::UpdateStats(spec);
 }
 
-
-#ifdef _WIN32_WCE
+#if defined (_WIN32_WCE)
 #include <windows.h>
 
-bool wince_is_running(void)
+bool FHeroes2Running(void)
 {
     HWND hwnd = FindWindow(NULL, L"SDL_app");
 
@@ -475,5 +469,11 @@ bool wince_is_running(void)
 
     return hwnd;
 }
+#else
 
+bool FHeroes2Running(void)
+{
+    return false;
+}
 #endif
+

@@ -44,8 +44,13 @@ Game::menu_t Game::NewHotSeat(void)
 {
     Settings & conf = Settings::Get();
     conf.SetGameType(Game::HOTSEAT);
-    conf.SetPreferablyCountPlayers(conf.QVGA() ? 2 : SelectCountPlayers());
-    return Game::SELECTSCENARIO;
+    const u8 select = conf.QVGA() ? 2 : SelectCountPlayers();
+    if(select)
+    {
+	conf.SetPreferablyCountPlayers(select);
+	return Game::SELECTSCENARIO;
+    }
+    return Game::MAINMENU;
 }
 
 Game::menu_t Game::NewCampain(void)
@@ -219,8 +224,12 @@ Game::menu_t Game::NewMulti(void)
     Button buttonCancelGame(top.x + 455, top.y + 375, ICN::BTNMP, 8, 9);
 
     buttonHotSeat.Draw();
-    buttonNetwork.Draw();
     buttonCancelGame.Draw();
+#ifdef WITH_NET
+    buttonNetwork.Draw();
+#else
+    buttonNetwork.SetDisable(true);
+#endif
 
     cursor.Show();
     display.Flip();
@@ -229,18 +238,21 @@ Game::menu_t Game::NewMulti(void)
     while(le.HandleEvents())
     {
 	le.MousePressLeft(buttonHotSeat) ? buttonHotSeat.PressDraw() : buttonHotSeat.ReleaseDraw();
-	le.MousePressLeft(buttonNetwork) ? buttonNetwork.PressDraw() : buttonNetwork.ReleaseDraw();
 	le.MousePressLeft(buttonCancelGame) ? buttonCancelGame.PressDraw() : buttonCancelGame.ReleaseDraw();
 
 	if(le.MouseClickLeft(buttonHotSeat) || le.KeyPress(KEY_h)) return NEWHOTSEAT;
-	if(le.MouseClickLeft(buttonNetwork) || le.KeyPress(KEY_n)) return NEWNETWORK;
 	if(le.MouseClickLeft(buttonCancelGame) || le.KeyPress(KEY_ESCAPE)) return MAINMENU;
 
         // right info
 	if(le.MousePressRight(buttonHotSeat)) Dialog::Message(_("Hot Seat"), _("Play a Hot Seat game, where 2 to 4 players play around the same computer, switching into the 'Hot Seat' when it is their turn."), Font::BIG);
-	if(le.MousePressRight(buttonNetwork)) Dialog::Message(_("Network"), _("Play a network game, where 2 players use their own computers connected through a LAN (Local Area Network)."), Font::BIG);
 	if(le.MousePressRight(buttonCancelGame)) Dialog::Message(_("Cancel"), _("Cancel back to the main menu."), Font::BIG);
-		 
+	
+	if(buttonNetwork.isEnable())
+	{
+	    le.MousePressLeft(buttonNetwork) ? buttonNetwork.PressDraw() : buttonNetwork.ReleaseDraw();
+	    if(le.MouseClickLeft(buttonNetwork) || le.KeyPress(KEY_n)) return NEWNETWORK;
+	    if(le.MousePressRight(buttonNetwork)) Dialog::Message(_("Network"), _("Play a network game, where 2 players use their own computers connected through a LAN (Local Area Network)."), Font::BIG);
+	}
     }
 
     return QUITGAME;

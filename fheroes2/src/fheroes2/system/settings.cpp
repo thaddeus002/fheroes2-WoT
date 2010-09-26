@@ -803,6 +803,11 @@ u8 Settings::MapsWidth(void) const
     return current_maps_file.size_w;
 }
 
+u8 Settings::AllowColors(void) const
+{
+    return current_maps_file.human_colors;
+}
+
 bool Settings::AllowColors(u8 f) const
 {
     return current_maps_file.human_colors & f;

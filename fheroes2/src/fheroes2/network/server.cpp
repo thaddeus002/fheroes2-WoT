@@ -49,10 +49,10 @@ void SendPacketToAllClients(std::vector<FH2RemoteClient> & clients, const QueueM
 FH2Server::FH2Server()
 {
     AGG::Cache & cache = AGG::Cache::Get();
-    if(! cache.ReadDataDir()) Error::Except("FH2Server::FH2Server: ", "AGG data files not found.");
+    if(! cache.ReadDataDir()) Error::Except("FH2Server::", " AGG data files not found.");
 
     if(!PrepareMapsFileInfoList(finfo_list, true) ||
-       !Settings::Get().LoadFileMapsMP2(finfo_list.front().file)) DEBUG(DBG_NETWORK , DBG_WARN, "FH2Server::FH2Server: No maps available!");
+       !Settings::Get().LoadFileMapsMP2(finfo_list.front().file)) DEBUG(DBG_NETWORK , DBG_WARN, "FH2Server::" << " No maps available!");
 }
 
 FH2Server::~FH2Server()
@@ -100,7 +100,7 @@ void FH2Server::SetStartGame(void)
 
 void FH2Server::SendToAllClients(const QueueMessage & msg, u32 id)
 {
-    DEBUG(DBG_NETWORK , DBG_INFO, "FH2Server::PrepareSending: send msg: " << Network::GetMsgString(msg.GetID()));
+    DEBUG(DBG_NETWORK , DBG_INFO, "FH2Server::" << "SendToAllClients: " << Network::GetMsgString(msg.GetID()));
     SendPacketToAllClients(clients, msg, id);
 }
 
@@ -111,6 +111,45 @@ void FH2Server::PushMapsFileInfoList(QueueMessage & msg) const
     MapsFileInfoList::const_iterator it2 = finfo_list.end();
 
     for(; it1 != it2; ++it1) Network::PacketPushMapsFileInfo(msg, *it1);
+}
+
+void FH2Server::ChangeClientColors(u8 from, u8 to)
+{
+    std::vector<FH2RemoteClient>::iterator it1, it2;
+
+    it1 = std::find_if(clients.begin(), clients.end(), std::bind2nd(std::mem_fun_ref(&FH2RemoteClient::isColor), from));
+    it2 = std::find_if(clients.begin(), clients.end(), std::bind2nd(std::mem_fun_ref(&FH2RemoteClient::isColor), to));
+
+    if(it2 == clients.end())
+    {
+	(*it1).player_color = to;
+	Settings::Get().SetPlayersColors(GetPlayersColors());
+    }
+    else
+    if(it1 != clients.end())
+    {
+	std::swap((*it1).player_color, (*it2).player_color);
+    }
+}
+
+void FH2Server::ChangeClientRace(u8 color, u8 race)
+{
+    std::vector<FH2RemoteClient>::iterator it;
+
+    it = std::find_if(clients.begin(), clients.end(), std::bind2nd(std::mem_fun_ref(&FH2RemoteClient::isColor), color));
+    if(it != clients.end())
+	(*it).player_race = race;
+}
+
+void FH2Server::SetNewAdmin(u32 old_admin)
+{
+    std::vector<FH2RemoteClient>::iterator it;
+
+    it = std::find_if(clients.begin(), clients.end(), std::bind2nd(std::mem_fun_ref(&FH2RemoteClient::isID), old_admin));
+    if(it != clients.end()) (*it).ResetModes(ST_ADMIN);
+
+    it = std::find_if(clients.begin(), clients.end(), std::not1(std::bind2nd(std::mem_fun_ref(&FH2RemoteClient::isID), old_admin)));
+    if(it != clients.end()) (*it).SetModes(ST_ADMIN);
 }
 
 void FH2Server::PushPlayersInfo(QueueMessage & msg, u32 exclude) const
@@ -128,22 +167,27 @@ u8 FH2Server::GetPlayersColors(void) const
     return Network::GetPlayersColors(clients);
 }
 
-void FH2Server::ResetPlayers(u32 first_player)
+void FH2Server::ResetPlayers(void)
 {
     Settings & conf = Settings::Get();
 
     // reset all
     std::vector<FH2RemoteClient>::iterator it1 = clients.begin();
     std::vector<FH2RemoteClient>::const_iterator it2 = clients.end();
-    for(; it1 != it2; ++it1) (*it1).player_color = 0;
+    for(; it1 != it2; ++it1)
+    {
+	(*it1).player_color = 0;
+	(*it1).player_race = 0;
+    }
+
     conf.SetPlayersColors(0);
     u8 colors = 0;
 
-    // set first
-    it1 = std::find_if(clients.begin(), clients.end(), std::bind2nd(std::mem_fun_ref(&Player::isID), first_player));
+    // set first admin
+    it1 = std::find_if(clients.begin(), clients.end(), std::bind2nd(std::mem_fun_ref(&FH2RemoteClient::Modes), ST_ADMIN));
     if(it1 != clients.end())
     {
-        (*it1).player_color = Color::GetFirst(conf.CurrentFileInfo().human_colors);
+        (*it1).player_color = conf.FirstAllowColor();
         colors |= (*it1).player_color;
     }
 
@@ -152,11 +196,11 @@ void FH2Server::ResetPlayers(u32 first_player)
     it2 = clients.end();
     for(; it1 != it2; ++it1) if(0 == (*it1).player_color)
     {
-        const u8 color = Color::GetFirst(conf.CurrentFileInfo().human_colors & (~colors));
+        const u8 color = Color::GetFirst(conf.AllowColors() & (~colors));
         if(color)
         {
             (*it1).player_color = color;
-            colors |= (*it1).player_color;
+            colors |= color;
         }
         else
         // no free colors, shutdown client
@@ -175,9 +219,6 @@ void FH2Server::CloseClients(void)
 
 int FH2Server::Main(void)
 {
-    // start scan queue
-    //Timer::Run(timer, 5, TimerScanQueue, this);
-
     WaitClients();
     StartGame();
 
@@ -221,7 +262,7 @@ void FH2Server::WaitClients(void)
     	    // check admin allow connect
     		((clients.end() != it && (*it).Modes(ST_CONNECT)) && !(*it).Modes(ST_ALLOWPLAYERS)))
 	    {
-		DEBUG(DBG_NETWORK , DBG_INFO, "FH2Server::WaitClients: max players, current: " << static_cast<int>(conf.PreferablyCountPlayers()));
+		DEBUG(DBG_NETWORK, DBG_INFO, "FH2Server::" << "WaitClients: " << "max players, current: " << static_cast<int>(conf.PreferablyCountPlayers()));
 		Socket sct(csd);
 		// send message
 		sct.Close();
@@ -240,10 +281,7 @@ void FH2Server::WaitClients(void)
 
 		// first player: set admin mode
 		if(0 == players)
-		{
-		    admin_id = (*it).player_id;
 		    (*it).SetModes(ST_ADMIN);
-		}
 
         	(*it).Assign(csd);
     		(*it).RunThread();
@@ -269,6 +307,8 @@ void FH2Server::StartGame(void)
     for(Color::color_t color = Color::BLUE; color != Color::GRAY; ++color) if(color & conf.PlayersColors())
 	world.GetKingdom(color).SetControl(Game::REMOTE);
 
+    std::for_each(clients.begin(), clients.end(), std::bind2nd(std::mem_fun_ref(&FH2RemoteClient::SetModes), ST_INGAME));
+
     GameOver::Result::Get().Reset();
     std::vector<FH2RemoteClient>::iterator it;
 
@@ -281,7 +321,7 @@ void FH2Server::StartGame(void)
 	mutex.Lock();
 	packet.Reset();
 	Game::IO::SaveBIN(packet);
-	packet.SetID(MSG_MAPS_LOAD);
+	packet.SetID(MSG_LOAD_KINGDOM);
 	SendPacketToAllClients(clients, packet, 0);
 	mutex.Unlock();
 */

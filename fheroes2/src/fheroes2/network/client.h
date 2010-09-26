@@ -35,6 +35,7 @@
 enum status_t
 {
     ST_CONNECT          = 0x0001,
+    ST_INGAME           = 0x0002,
     ST_ADMIN            = 0x0008,
     ST_SHUTDOWN         = 0x0010,
     ST_ALLOWPLAYERS     = 0x0020,

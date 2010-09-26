@@ -46,8 +46,8 @@ FH2RemoteClient::FH2RemoteClient()
 
 void FH2RemoteClient::RunThread(void)
 {
-    if(!thread.IsRun())
-	thread.Create(callbackCreateThread, this);
+    if(thread.IsRun()) thread.Wait();
+    thread.Create(callbackCreateThread, this);
 }
 
 void FH2RemoteClient::ShutdownThread(void)
@@ -62,22 +62,13 @@ void FH2RemoteClient::ShutdownThread(void)
         packet.Reset();
 	packet.SetID(MSG_SHUTDOWN);
 	Network::SendMessage(*this, packet);
-        Close();
+        CloseConnection();
     }
     SetModes(0);
 }
 
-void FH2RemoteClient::Logout(const std::string & str)
+void FH2RemoteClient::CloseConnection(void)
 {
-    packet.Reset();
-    packet.SetID(MSG_LOGOUT);
-    packet.Push(std::string("logout: " + str));
-
-    FH2Server & server = FH2Server::Get();
-    server.Lock();
-    server.SendToAllClients(packet, player_id);
-    server.Unlock();
-
     Close();
 
     modes = 0;
@@ -87,22 +78,18 @@ void FH2RemoteClient::Logout(const std::string & str)
 
 int FH2RemoteClient::Main(void)
 {
-    std::string error;
-
     if(ConnectionChat())
     {
-// TEST BATTLE NETWORK
-//	if(StartGame())
-	{
-	    // may be also
-	}
-//	else
-	    error = "StartGame: lost connection";
-    }
-    else
-	error = "ConnectionChat: lost connection";
+	FH2Server & server = FH2Server::Get();
 
-//    Logout(error);
+	server.Lock();
+	server.SetStartGame();
+	server.Unlock();
+
+	StartGame();
+    }
+
+    CloseConnection();
 
     return 1;
 }
@@ -116,7 +103,7 @@ bool FH2RemoteClient::ConnectionChat(void)
     player_name.clear();
 
     // wait thread id
-    DEBUG(DBG_NETWORK , DBG_INFO, "FH2RemoteClient::ConnectionChat: wait start thread");
+    DEBUG(DBG_NETWORK , DBG_INFO, "FH2RemoteClient::" << "ConnectionChat: " << "wait start thread");
     while(0 == thread.GetID()){ DELAY(10); };
     player_id = thread.GetID();
 
@@ -131,60 +118,61 @@ bool FH2RemoteClient::ConnectionChat(void)
     packet.Push(banner.str());
 
     // send ready
-    DEBUG(DBG_NETWORK , DBG_INFO, "FH2RemoteClient::ConnectionChat: id: 0x" << std::hex << player_id << ", send ready");
+    DEBUG(DBG_NETWORK , DBG_INFO, "FH2RemoteClient::" << "ConnectionChat: " << "id: 0x" << std::hex << player_id << ", send ready");
     if(!Send(packet)) return false;
 
     // recv hello
-    DEBUG(DBG_NETWORK , DBG_INFO, "FH2RemoteClient::ConnectionChat: id: 0x" << std::hex << player_id << ", wait hello");
+    DEBUG(DBG_NETWORK , DBG_INFO, "FH2RemoteClient::" << "ConnectionChat: " << "id: 0x" << std::hex << player_id << ", wait hello");
     if(!Wait(packet, MSG_HELLO)) return false;
 
     packet.Pop(player_name);
-    DEBUG(DBG_NETWORK , DBG_INFO, "FH2RemoteClient::ConnectionChat: id: 0x" << std::hex << player_id << ", connected " << " player: " << player_name << ", host 0x" << std::hex << Host() << ":0x" << Port());
+    DEBUG(DBG_NETWORK , DBG_INFO, "FH2RemoteClient::" << "ConnectionChat: " << "id: 0x" << std::hex << player_id << ", connected " << " player: " << player_name << ", host 0x" << std::hex << Host() << ":0x" << Port());
 
     FH2Server & server = FH2Server::Get();
 
     // check color
     server.Lock();
     player_color = Color::GetFirst(conf.CurrentFileInfo().human_colors & (~conf.PlayersColors()));
-    conf.SetPlayersColors(server.GetPlayersColors());
     server.Unlock();
     if(0 == player_color)
     {
-	DEBUG(DBG_NETWORK , DBG_INFO, "FH2RemoteClient::ConnectionChat: id: 0x" << std::hex << player_id << ", player_color = 0, logout");
+	DEBUG(DBG_NETWORK , DBG_INFO, "FH2RemoteClient::" << "ConnectionChat: " << "id: 0x" << std::hex << player_id << ", player_color = 0, logout");
 	return false;
     }
-    // send update players
-    packet.Reset();
-    packet.SetID(MSG_PLAYERS);
-    server.Lock();
-    server.PushPlayersInfo(packet);
-    server.SendToAllClients(packet, player_id);
-    server.Unlock();
 
-    // send hello, modes, id, color
+    // send hello, modes, id, color, cur maps
     packet.Reset();
     packet.SetID(MSG_HELLO);
     packet.Push(modes);
     packet.Push(player_id);
     packet.Push(player_color);
-    DEBUG(DBG_NETWORK , DBG_INFO, "FH2RemoteClient::ConnectionChat: id: 0x" << std::hex << player_id << ", send hello");
+    // added cur maps info
+    Network::PacketPushMapsFileInfo(packet, conf.CurrentFileInfo());
+    // send
+    DEBUG(DBG_NETWORK, DBG_INFO, "FH2RemoteClient::" << "ConnectionChat: " << "id: 0x" << std::hex << player_id << ", send hello");
     if(!Send(packet)) return false;
-    DEBUG(DBG_NETWORK , DBG_INFO, "FH2RemoteClient::ConnectionChat: " << (Modes(ST_ADMIN) ? "admin" : "client") << " mode");
 
+    // update colors
+    server.Lock();
+    conf.SetPlayersColors(server.GetPlayersColors());
+    server.Unlock();
+
+    // send to all: update players
+    SendUpdatePlayers(0);
+
+    DEBUG(DBG_NETWORK, DBG_INFO, "FH2RemoteClient::" << "ConnectionChat: " << (Modes(ST_ADMIN) ? "admin" : "client") << " mode");
     if(Modes(ST_ADMIN)) SetModes(ST_ALLOWPLAYERS);
+    
+    DEBUG(DBG_NETWORK, DBG_INFO, "FH2RemoteClient::" << "ConnectionChat: " << "start queue");
 
-    DEBUG(DBG_NETWORK , DBG_INFO, "FH2RemoteClient::ConnectionChat start queue");
-
-    bool exit = false;
-
-    while(!exit)
+    while(1)
     {
         if(Modes(ST_SHUTDOWN)) return false;
 
 	if(Ready())
 	{
 	    if(!Recv(packet)) return false;
-            DEBUG(DBG_NETWORK , DBG_INFO, "FH2RemoteClient::ConnectionChat: recv: " << Network::GetMsgString(packet.GetID()));
+            DEBUG(DBG_NETWORK, DBG_INFO, "FH2RemoteClient::" << "ConnectionChat: " << "recv: " << Network::GetMsgString(packet.GetID()));
 
 	    // check broadcast
 	    MsgBroadcast();
@@ -200,31 +188,38 @@ bool FH2RemoteClient::ConnectionChat(void)
 		    MsgLogout();
 	    	    return false;
 
-    		case MSG_MAPS_INFO_SET:
-		    if(!MsgMapsInfoSet()) return false;
+    		case MSG_CHANGE_COLORS:
+		    if(Modes(ST_ADMIN)) MsgChangeColors();
 		    break;
 
-    		case MSG_MAPS_INFO_GET:
-		    if(!MsgMapsInfoGet()) return false;
+    		case MSG_CHANGE_RACE:
+		    if(Modes(ST_ADMIN)) MsgChangeRace();
 		    break;
 
-    		case MSG_MAPS_LIST_GET:
-		    if(!MsgMapsListGet()) return false;
+    		case MSG_SET_CURRENT_MAP:
+		    {
+			std::string str;
+			packet.Pop(str);
+
+			if(Modes(ST_ADMIN) &&
+			    Settings::Get().LoadFileMapsMP2(str) && !SendSetCurrentMap()) return false;
+		    }
 		    break;
 
-    		case MSG_MAPS_LOAD:
+    		case MSG_GET_MAPS_LIST:
 		    if(Modes(ST_ADMIN))
 		    {
-			server.Lock();
-			server.SetStartGame();
-			server.Unlock();
-			exit = true;
+			if(!SendMapsInfoList()) return false;
 		    }
-    		    break;
-
-    		case MSG_PLAYERS_GET:
-		    if(!MsgPlayersGet()) return false;
+		    else
+		    {
+			if(!SendAccessDenied()) return false;
+		    }
 		    break;
+
+    		case MSG_START_GAME:
+		    if(Modes(ST_ADMIN)) return true;
+    		    break;
 
     		default:
     		    break;
@@ -234,7 +229,7 @@ bool FH2RemoteClient::ConnectionChat(void)
         DELAY(100);
     }
 
-    return true;
+    return false;
 }
 
 bool FH2RemoteClient::StartGame(void)
@@ -250,7 +245,7 @@ bool FH2RemoteClient::StartGame(void)
 	if(Ready())
 	{
 	    if(!Recv(packet)) return false;
-            DEBUG(DBG_NETWORK , DBG_INFO, "FH2RemoteClient::StartGame: recv: " << Network::GetMsgString(packet.GetID()));
+            DEBUG(DBG_NETWORK , DBG_INFO, "FH2RemoteClient::" << "StartGame: " << "recv: " << Network::GetMsgString(packet.GetID()));
 
 	    // check broadcast
 	    MsgBroadcast();
@@ -312,7 +307,7 @@ void FH2RemoteClient::MsgBroadcast(void)
 
 void FH2RemoteClient::MsgPing(void)
 {
-    DEBUG(DBG_NETWORK , DBG_INFO, "FH2RemoteClient::MsgPing:");
+    DEBUG(DBG_NETWORK , DBG_INFO, "FH2RemoteClient::" << "MsgPing:");
     packet.Reset();
     packet.SetID(MSG_PING);
     Network::SendMessage(*this, packet);
@@ -331,87 +326,113 @@ void FH2RemoteClient::MsgLogout(void)
 
     server.Lock();
     server.SendToAllClients(packet, player_id);
+    if(Modes(ST_ADMIN)) server.SetNewAdmin(player_id);
+    server.Unlock();
     //
     conf.SetPlayersColors(server.GetPlayersColors() & (~player_color));
-    world.GetKingdom(player_color).SetControl(Game::AI);
+    if(Modes(ST_INGAME)) world.GetKingdom(player_color).SetControl(Game::AI); // FIXME: MSGLOGOUT: INGAME AND CURRENT TURN?
     // send players
-    packet.Reset();
-    packet.SetID(MSG_PLAYERS);
-    server.PushPlayersInfo(packet, player_id);
-    server.SendToAllClients(packet, player_id);
-    server.Unlock();
-    DEBUG(DBG_NETWORK , DBG_INFO, "FH2RemoteClient::MsgLogout: " << str);
+    SendUpdatePlayers(player_id);
+    DEBUG(DBG_NETWORK , DBG_INFO, "FH2RemoteClient::" << "MsgLogout: " << str);
 }
 
-bool FH2RemoteClient::MsgMapsInfoSet(void)
+void FH2RemoteClient::MsgChangeRace(void)
 {
     FH2Server & server = FH2Server::Get();
     Settings & conf = Settings::Get();
-    std::string str;
+    u8 color, race;
 
-    packet.Pop(str);
-    if(Modes(ST_ADMIN) && Settings::Get().LoadFileMapsMP2(str))
+    packet.Pop(color);
+    packet.Pop(race);
+
+    if(conf.AllowChangeRace(color))
     {
+	conf.SetKingdomRace(color, race);
 	packet.Reset();
-        packet.SetID(MSG_MAPS_INFO);
+	packet.SetID(MSG_CHANGE_RACE);
 	server.Lock();
-	Network::PacketPushMapsFileInfo(packet, conf.CurrentFileInfo());
-	server.SendToAllClients(packet, 0);
-	server.Unlock();
-	DEBUG(DBG_NETWORK , DBG_INFO, "FH2RemoteClient::MsgMapsInfoSet: send");
-	if(!Send(packet)) return false;
-
-	// reset players
-	server.Lock();
-	server.ResetPlayers(player_id);
-	server.Unlock();
-
-	// send players
-	packet.Reset();
-	packet.SetID(MSG_PLAYERS);
-	server.Lock();
-        server.PushPlayersInfo(packet);
-	server.SendToAllClients(packet, 0);
+	server.ChangeClientRace(color, race);
+	Network::PackRaceColors(packet);
+	server.SendToAllClients(packet);
 	server.Unlock();
     }
+}
+
+void FH2RemoteClient::MsgChangeColors(void)
+{
+    FH2Server & server = FH2Server::Get();
+    Settings & conf = Settings::Get();
+    u8 from, to;
+
+    packet.Pop(from);
+    packet.Pop(to);
+
+    if(conf.AllowColors(from) && conf.AllowColors(to))
+    {
+	server.Lock();
+	server.ChangeClientColors(from, to);
+	server.Unlock();
+	SendUpdatePlayers(0);
+    }
+}
+
+void FH2RemoteClient::SendUpdatePlayers(u32 exclude)
+{
+    FH2Server & server = FH2Server::Get();
+    packet.Reset();
+    packet.SetID(MSG_UPDATE_PLAYERS);
+    server.Lock();
+    server.PushPlayersInfo(packet, exclude);
+    server.SendToAllClients(packet, exclude);
+    server.Unlock();
+}
+
+bool FH2RemoteClient::SendSetCurrentMap(void)
+{
+    FH2Server & server = FH2Server::Get();
+    Settings & conf = Settings::Get();
+
+    packet.Reset();
+    packet.SetID(MSG_SET_CURRENT_MAP);
+    server.Lock();
+    Network::PacketPushMapsFileInfo(packet, conf.CurrentFileInfo());
+    server.SendToAllClients(packet, 0);
+    server.Unlock();
+    DEBUG(DBG_NETWORK , DBG_INFO, "FH2RemoteClient::" << "SendSetCurrentMap:");
+    if(!Send(packet)) return false;
+
+    // reset players
+    server.Lock();
+    server.ResetPlayers();
+    server.Unlock();
+
+    // send players
+    SendUpdatePlayers(0);
+
     return true;
 }
 
-bool FH2RemoteClient::MsgMapsInfoGet(void)
+bool FH2RemoteClient::SendAccessDenied(void)
 {
-    Settings & conf = Settings::Get();
-
     packet.Reset();
-    packet.SetID(MSG_MAPS_INFO);
-    Network::PacketPushMapsFileInfo(packet, conf.CurrentFileInfo());
-    DEBUG(DBG_NETWORK , DBG_INFO, "FH2RemoteClient::MsgMapsInfoGet: send");
+    packet.SetID(MSG_ACCESS_DENIED);
+
+    DEBUG(DBG_NETWORK , DBG_INFO, "FH2RemoteClient::" << "SendAccessDenied: ");
     return Send(packet);
 }
 
-bool FH2RemoteClient::MsgMapsListGet(void)
+bool FH2RemoteClient::SendMapsInfoList(void)
 {
     FH2Server & server = FH2Server::Get();
-    //Settings & conf = Settings::Get();
 
     packet.Reset();
-    packet.SetID(MSG_MAPS_LIST);
+    packet.SetID(MSG_GET_MAPS_LIST);
+
     server.Lock();
     server.PushMapsFileInfoList(packet);
     server.Unlock();
-    DEBUG(DBG_NETWORK , DBG_INFO, "FH2RemoteClient::MsgMapsListGet: send");
-    return Send(packet);
-}
 
-bool FH2RemoteClient::MsgPlayersGet(void)
-{
-    FH2Server & server = FH2Server::Get();
-
-    packet.Reset();
-    packet.SetID(MSG_PLAYERS);
-    server.Lock();
-    server.PushPlayersInfo(packet);
-    server.Unlock();
-    DEBUG(DBG_NETWORK , DBG_INFO, "FH2RemoteClient::MsgPlayersGet: send");
+    DEBUG(DBG_NETWORK , DBG_INFO, "FH2RemoteClient::" << "SendMapsInfoList: ");
     return Send(packet);
 }
 

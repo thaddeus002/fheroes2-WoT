@@ -47,10 +47,13 @@ public:
     void Unlock(void);
     void PushMapsFileInfoList(QueueMessage &) const;
     void PushPlayersInfo(QueueMessage &, u32 exclude = 0) const;
+    void SetNewAdmin(u32 old_admin);
     void PopMapsFileInfoList(QueueMessage &);
     u8 GetPlayersColors(void) const;
-    void ResetPlayers(u32 first_player);
+    void ResetPlayers(void);
     void SendToAllClients(const QueueMessage &, u32 = 0);
+    void ChangeClientColors(u8, u8);
+    void ChangeClientRace(u8 color, u8 race);
 
     FH2RemoteClient* GetRemoteClient(u8);
 
@@ -71,7 +74,6 @@ protected:
     std::vector<FH2RemoteClient> clients;
     bool exit;
     bool start_game;
-    u32 admin_id;
     MapsFileInfoList finfo_list;
 };
 
