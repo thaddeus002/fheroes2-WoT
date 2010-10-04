@@ -21,11 +21,176 @@
  ***************************************************************************/
 
 #include <iostream>
+#include <algorithm>
 #include <string>
 #include "rect.h"
 #include "types.h"
 #include "error.h"
 #include "display.h"
+
+UpdateRects::UpdateRects() : bits(NULL), len(0), bf(0), bw(0)
+{
+}
+
+UpdateRects::~UpdateRects()
+{
+    delete [] bits;
+}
+
+void UpdateRects::SetVideoMode(u16 dw, u16 dh)
+{
+    if(dw < 640)
+    {
+	bw = 4;
+	bf = 2;
+    }
+    else
+    if(dw > 640)
+    {
+	bw = 16;
+	bf = 4;
+    }
+    else
+    {
+	bw = 8;
+	bf = 3;
+    }
+
+    len = ((dw >> bf) * (dh >> bf)) >> 3;
+
+    if(bits) delete [] bits;
+    bits = new u8 [len];
+    std::fill(bits, bits + len, 0);
+
+    rects.reserve(len / 4);
+}
+
+size_t UpdateRects::Size(void) const
+{
+    return rects.size();
+}
+
+void UpdateRects::Clear(void)
+{
+    std::fill(bits, bits + len, 0);
+    rects.clear();
+}
+
+SDL_Rect* UpdateRects::Data(void)
+{
+    return rects.size() ? &rects[0] : NULL;
+}
+
+void UpdateRects::PushRect(s16 px, s16 py, u16 pw, u16 ph)
+{
+    Display & display = Display::Get();
+
+    if(0 != pw && 0 != ph &&
+	px + pw > 0 && py + ph > 0 &&
+	px < display.w() && py < display.h())
+    {
+	if(px < 0)
+	{
+	    pw += px;
+	    px = 0;
+	}
+
+	if(py < 0)
+	{
+	    ph += py;
+	    py = 0;
+	}
+
+	if(px + pw > display.w())
+	    pw = display.w() - px;
+
+	if(py + ph > display.h())
+	    ph = display.h() - py;
+
+	const u16 dw = display.w() >> bf;
+	s16 xx, yy;
+
+	for(yy = py; yy < py + ph; yy += bw)
+	    for(xx = px; xx < px + pw; xx += bw)
+		SetBit((yy >> bf) * dw + (xx >> bf), 1);
+
+	yy = py + ph - 1;
+	for(xx = px; xx < px + pw; xx += bw)
+	    SetBit((yy >> bf) * dw + (xx >> bf), 1);
+
+	xx = px + pw - 1;
+	for(yy = py; yy < py + ph; yy += bw)
+	    SetBit((yy >> bf) * dw + (xx >> bf), 1);
+
+	yy = py + ph - 1;
+	xx = px + pw - 1;
+	SetBit((yy >> bf) * dw + (xx >> bf), 1);
+    }
+}
+
+bool UpdateRects::BitsToRects(void)
+{
+    Display & display = Display::Get();
+
+    const u16 dbf = display.w() >> bf;
+    const size_t len2 = len << 3;
+    size_t index;
+    SDL_Rect rect;
+    SDL_Rect* prt = NULL;
+
+    for(index = 0; index < len2; ++index)
+    {
+	if(GetBit(index))
+	{
+    	    if(NULL != prt)
+	    {
+		if(static_cast<size_t>(rect.y) == (index / dbf) * bw)
+		    rect.w += bw;
+		else
+		{
+		    rects.push_back(*prt);
+		    prt = NULL;
+		}
+    	    }
+
+    	    if(NULL == prt)
+    	    {
+		rect.x = (index % dbf) * bw;
+		rect.y = (index / dbf) * bw;
+		rect.w = bw;
+		rect.h = bw;
+		prt = &rect;
+    	    }
+	}
+	else
+	{
+    	    if(prt)
+    	    {
+		rects.push_back(*prt);
+		prt = NULL;
+    	    }
+	}
+    }
+
+    if(prt)
+    {
+	rects.push_back(*prt);
+	prt = NULL;
+    }
+
+    return rects.size();
+}
+
+void UpdateRects::SetBit(u32 index, bool value)
+{
+    if(value != GetBit(index))
+	bits[index >> 3] ^= (1 << (index % 8));
+}
+
+bool UpdateRects::GetBit(u32 index) const
+{
+    return (bits[index >> 3] >> (index % 8));
+}
 
 Display::Display()
 {
@@ -53,16 +218,29 @@ void Display::SetVideoMode(const u16 w, const u16 h, bool fullscreen)
 
     if(display.isValid() && display.w() == w && display.h() == h) return;
 
-    u32 videoflags = SDL_HWPALETTE|SDL_HWSURFACE|SDL_DOUBLEBUF|SDL_HWACCEL;
+    u32 videoflags = SDL_HWSURFACE|SDL_SWSURFACE;
     if(fullscreen || (display.surface && (display.surface->flags & SDL_FULLSCREEN))) videoflags |= SDL_FULLSCREEN;
-    if(!SDL_SetVideoMode(w, h, 0, videoflags))
+    display.surface = SDL_SetVideoMode(w, h, 0, videoflags);
+
+    if(!display.surface)
 	Error::Except("SDL_SetVideoMode: ", SDL_GetError());
+
+    display.update_rects.SetVideoMode(display.w(), display.h());
 }
 
 /* flip */
 void Display::Flip()
 {
-    SDL_Flip(Display::Get().surface);
+    Display & display = Display::Get();
+
+    if(display.surface->flags & SDL_HWSURFACE)
+	SDL_Flip(display.surface);
+    else
+    if(display.update_rects.BitsToRects())
+    {
+	SDL_UpdateRects(display.surface, display.update_rects.Size(), display.update_rects.Data());
+	display.update_rects.Clear();
+    }
 }
 
 /* full screen */
@@ -157,9 +335,6 @@ bool Display::Rise(u8 riseTo)
 Display & Display::Get(void)
 {
     static Display inside;
-
-    if(! inside.surface) inside.surface = SDL_GetVideoSurface();
-
     return inside;
 }
 
@@ -203,4 +378,10 @@ int Display::GetMaxMode(Size & result, bool rotate)
 	}
     }
     return 1;
+}
+
+void Display::AddUpdateRect(s16 px, s16 py, u16 pw, u16 ph)
+{
+    if(0 == (surface->flags & SDL_HWSURFACE))
+	update_rects.PushRect(px, py, pw, ph);
 }

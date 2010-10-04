@@ -87,7 +87,8 @@ Surface::Surface(SDL_Surface* sf) : surface(NULL)
 
 Surface::~Surface()
 {
-    FreeSurface(*this);
+    if(! isDisplay())
+	FreeSurface(*this);
 }
 
 /* operator = */
@@ -202,6 +203,11 @@ void Surface::Set(const void* pixels, unsigned int width, unsigned int height, u
 	}
 	break;
     }
+}
+
+bool Surface::isDisplay(void) const
+{
+    return NULL != surface && Display::Get().surface == surface;
 }
 
 bool Surface::Load(const char* fn)
@@ -434,6 +440,7 @@ void Surface::SetPixel(u16 x, u16 y, u32 color)
 	case 4:	SetPixel4(x, y, color);	break;
 	default: break;
     }
+    if(isDisplay()) Display::Get().AddUpdateRect(x, y, 1, 1);
 }
 
 u32 Surface::GetPixel4(u16 x, u16 y) const
@@ -509,6 +516,7 @@ void Surface::Fill(u32 color)
     SDL_Rect dstrect = {0, 0, surface->w, surface->h};
 
     SDL_FillRect(surface, &dstrect, color);
+    if(isDisplay()) Display::Get().AddUpdateRect(0, 0, surface->w, surface->h);
 }
 
 /* rect fill colors surface */
@@ -516,20 +524,23 @@ void Surface::FillRect(u32 color, const Rect & rect)
 {
     SDL_Rect dstrect = {rect.x, rect.y, rect.w, rect.h};
     SDL_FillRect(surface, &dstrect, color);
+    if(isDisplay()) Display::Get().AddUpdateRect(rect.x, rect.y, rect.w, rect.h);
 }
 
 /* blit */
 void Surface::Blit(const Surface &src)
 {
     SDL_BlitSurface(src.surface, NULL, surface, NULL);
+    if(isDisplay()) Display::Get().AddUpdateRect(0, 0, src.w(), src.h());
 }
 
 /* blit */
 void Surface::Blit(const Surface &src, s16 dst_ox, s16 dst_oy)
 {
-    SDL_Rect dstrect = {dst_ox, dst_oy, surface->w, surface->h};
+    SDL_Rect dstrect = {dst_ox, dst_oy, src.surface->w, src.surface->h};
 
     SDL_BlitSurface(src.surface, NULL, surface, &dstrect);
+    if(isDisplay()) Display::Get().AddUpdateRect(dst_ox, dst_oy, src.surface->w, src.surface->h);
 }
 
 /* blit */
@@ -538,7 +549,8 @@ void Surface::Blit(const Surface &src, const Rect &src_rt, s16 dst_ox, s16 dst_o
     SDL_Rect dstrect = {dst_ox, dst_oy, src_rt.w, src_rt.h};
     SDL_Rect srcrect = {src_rt.x, src_rt.y, src_rt.w, src_rt.h};
 
-    SDL_BlitSurface(src.surface, &srcrect, surface, & dstrect);
+    SDL_BlitSurface(src.surface, &srcrect, surface, &dstrect);
+    if(isDisplay()) Display::Get().AddUpdateRect(dst_ox, dst_oy, src_rt.w, src_rt.h);
 }
 
 void Surface::Blit(const Surface &src, const Point &dst_pt)

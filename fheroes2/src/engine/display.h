@@ -26,6 +26,30 @@
 #include "surface.h"
 #include "rect.h"
 
+class UpdateRects
+{
+public:
+    UpdateRects();
+    ~UpdateRects();
+
+    void 	SetVideoMode(u16, u16);
+    void	PushRect(s16, s16, u16, u16);
+    void	Clear(void);
+    size_t	Size(void) const;
+    SDL_Rect*	Data(void);
+    bool	BitsToRects(void);
+
+protected:
+    void	SetBit(u32, bool);
+    bool	GetBit(u32) const;
+
+    std::vector<SDL_Rect>	rects;
+    u8*				bits;
+    u32				len;
+    u8				bf;
+    u8				bw;
+};
+
 class Display : public Surface
 {
 public:
@@ -42,6 +66,8 @@ public:
     static void		SetCaption(const std::string & caption);
     static void		SetIcons(const Surface & icons);
 
+    void		AddUpdateRect(s16, s16, u16, u16);
+
     static void		Flip();
     static void		FullScreen(void);
     
@@ -52,6 +78,8 @@ public:
 
 private:
     Display();
+
+    UpdateRects update_rects;
 };
 
 #endif

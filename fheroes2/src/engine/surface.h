@@ -68,6 +68,7 @@ public:
     u8  depth(void) const;
 
     bool isValid(void) const{ return surface ? true : false; };
+    bool isDisplay(void) const;
     bool isAlpha(void) const;
     u8  GetAlpha(void) const;
     u32 MapRGB(u8 r, u8 g, u8 b, u8 a = 0) const;
@@ -94,20 +95,11 @@ public:
     void SetColorKey(u32 color);
     void SetAlpha(u8 level);
     void ResetAlpha(void);
-    void SetPixel4(u16 x, u16 y, u32 color);
-    void SetPixel3(u16 x, u16 y, u32 color);
-    void SetPixel2(u16 x, u16 y, u32 color);
-    void SetPixel1(u16 x, u16 y, u32 color);
     void SetPixel(u16 x, u16 y, u32 color);
     
     void LoadPalette(void);
     u32 GetColorKey(void) const;
     u32 GetColor(u16) const;
-
-    u32 GetPixel4(u16 x, u16 y) const;
-    u32 GetPixel3(u16 x, u16 y) const;
-    u32 GetPixel2(u16 x, u16 y) const;
-    u32 GetPixel1(u16 x, u16 y) const;
     u32 GetPixel(u16 x, u16 y) const;
 
     void DrawLine(const Point &, const Point &, u32);
@@ -136,6 +128,14 @@ public:
     static void Swap(Surface &, Surface &);
     
 protected:
+    void SetPixel4(u16 x, u16 y, u32 color);
+    void SetPixel3(u16 x, u16 y, u32 color);
+    void SetPixel2(u16 x, u16 y, u32 color);
+    void SetPixel1(u16 x, u16 y, u32 color);
+    u32 GetPixel4(u16 x, u16 y) const;
+    u32 GetPixel3(u16 x, u16 y) const;
+    u32 GetPixel2(u16 x, u16 y) const;
+    u32 GetPixel1(u16 x, u16 y) const;
 #ifdef WITH_TTF
     friend class SDL::Font;
 #endif
