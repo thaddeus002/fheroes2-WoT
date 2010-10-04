@@ -252,7 +252,7 @@ int main(int argc, char **argv)
 		}
 	    }
 
-	    Display::ShowCursor();
+	    //Display::ShowCursor();
 	    if(Settings::Get().ExtUseFade()) Display::Fade();
 
 	} catch(std::bad_alloc)

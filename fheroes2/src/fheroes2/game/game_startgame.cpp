@@ -1333,7 +1333,7 @@ void Game::ButtonSystem(void)
     {
 	Interface::Basic & I = Interface::Basic::Get();
 
-        I.SetRedraw(REDRAW_ICONS | REDRAW_BUTTONS | REDRAW_BORDER);
+        I.SetRedraw(REDRAW_ICONS | REDRAW_BUTTONS | REDRAW_STATUS | REDRAW_BORDER);
     }
 }
 

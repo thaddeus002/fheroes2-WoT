@@ -59,29 +59,33 @@ const Rect & Interface::GameArea::GetRectMaps(void) const
 /* fixed src rect image */
 void Interface::GameArea::SrcRectFixed(Rect & src, Point & dst, const u16 rw, const u16 rh)
 {
-    src = Rect(0, 0, rw, rh);
+    src = Rect(0, 0, 0, 0);
     const Rect & rectArea = Interface::GameArea::Get().GetArea();
 
-    if(dst.x < rectArea.x)
+    if(0 != rw && 0 != rh &&
+        dst.x + rw > rectArea.x && dst.y + rh > rectArea.y &&
+        dst.x < rectArea.x + rectArea.w && dst.y < rectArea.y + rectArea.h)
     {
-        src.x = rectArea.x - dst.x;
-        dst.x = rectArea.x;
-    }
+	src.w = rw;
+	src.h = rh;
 
-    if(dst.y < rectArea.y)
-    {
-        src.y = rectArea.y - dst.y;
-        dst.y = rectArea.y;
-    }
+	if(dst.x < rectArea.x)
+	{
+    	    src.x = rectArea.x - dst.x;
+    	    dst.x = rectArea.x;
+	}
 
-    if(dst.x + rw > rectArea.x + rectArea.w)
-    {
-	src.w = rectArea.x + rectArea.w - dst.x;
-    }
+	if(dst.y < rectArea.y)
+	{
+    	    src.y = rectArea.y - dst.y;
+    	    dst.y = rectArea.y;
+	}
 
-    if(dst.y + rh > rectArea.y + rectArea.h)
-    {
-	src.h = rectArea.y + rectArea.h - dst.y;
+	if(dst.x + rw > rectArea.x + rectArea.w)
+	    src.w = rectArea.x + rectArea.w - dst.x;
+
+	if(dst.y + rh > rectArea.y + rectArea.h)
+	    src.h = rectArea.y + rectArea.h - dst.y;
     }
 }
 
@@ -108,6 +112,8 @@ void Interface::GameArea::SetAreaSize(s16 x, s16 y, u16 w, u16 h)
     rectArea.h = h;
     rectMaps.w = rectArea.w / TILEWIDTH;
     rectMaps.h = rectArea.h / TILEWIDTH;
+    if(rectMaps.w * TILEWIDTH < rectArea.w) rectMaps.w += 1;
+    if(rectMaps.h * TILEWIDTH < rectArea.h) rectMaps.h += 1;
 }
 
 void Interface::GameArea::Redraw(Surface & dst, u8 flag) const
