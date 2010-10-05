@@ -299,6 +299,7 @@ private:
 
     SDL::Time clock;
     u32 clock_delay;
+    u8  loop_delay;
 
 #ifdef WITHOUT_MOUSE
     bool emulate_mouse;

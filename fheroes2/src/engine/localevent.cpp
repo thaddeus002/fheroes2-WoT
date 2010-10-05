@@ -22,12 +22,15 @@
 
 #include "error.h"
 #include "display.h"
+#include "audio_music.h"
+#include "audio_mixer.h"
 #include "localevent.h"
 
 #define TAP_DELAY_EMULATE 1050
 
 LocalEvent::LocalEvent() : modes(0), key_value(KEY_NONE), mouse_state(0),
-    mouse_button(0), mouse_st(0, 0), redraw_cursor_func(NULL), keyboard_filter_func(NULL), clock_delay(TAP_DELAY_EMULATE)
+    mouse_button(0), mouse_st(0, 0), redraw_cursor_func(NULL), keyboard_filter_func(NULL),
+    clock_delay(TAP_DELAY_EMULATE), loop_delay(1)
 {
 #ifdef WITHOUT_MOUSE
     emulate_mouse = false;
@@ -271,6 +274,24 @@ bool LocalEvent::HandleEvents(bool delay)
     {
 	switch(event.type)
 	{
+	    case SDL_ACTIVEEVENT:
+		if(event.active.state & SDL_APPACTIVE)
+		{
+		    if(Mixer::isValid())
+		    {
+			//iconify
+			if(0 == event.active.gain)
+			{
+			    Mixer::Reset();
+			    Music::Pause();
+			    loop_delay = 100;
+			}
+			else
+			    loop_delay = 1;
+		    }
+		}
+		break;
+
 	    // keyboard
 	    case SDL_KEYDOWN:
 	    case SDL_KEYUP:
@@ -315,7 +336,7 @@ bool LocalEvent::HandleEvents(bool delay)
 	}
     }
 
-    if(delay) SDL_Delay(1);
+    if(delay) SDL_Delay(loop_delay);
 
     return true;
 }
@@ -713,6 +734,7 @@ u8 LocalEvent::GetState(u32 type)
 void LocalEvent::SetStateDefaults(void)
 {
     // enable events
+    SetState(SDL_ACTIVEEVENT, true);
     SetState(SDL_USEREVENT, true);
     SetState(SDL_KEYDOWN, true);
     SetState(SDL_KEYUP, true);
@@ -722,7 +744,6 @@ void LocalEvent::SetStateDefaults(void)
     SetState(SDL_QUIT, true);
 
     // ignore events
-    SetState(SDL_ACTIVEEVENT, false);
     SetState(SDL_JOYAXISMOTION, false);
     SetState(SDL_JOYBALLMOTION, false);
     SetState(SDL_JOYHATMOTION, false);

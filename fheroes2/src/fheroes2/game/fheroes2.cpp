@@ -139,6 +139,8 @@ int main(int argc, char **argv)
 	if(SDL::Init(subsystem))
 	try
 	{
+	    std::atexit(SDL::Quit);
+
 	    if(conf.Unicode()) SetLangEnvPath(conf);
 
 	    if(Mixer::isValid())
@@ -249,8 +251,6 @@ int main(int argc, char **argv)
 
 	    //Display::ShowCursor();
 	    if(Settings::Get().ExtUseFade()) Display::Fade();
-
-	    SDL::Quit();
 
 	} catch(std::bad_alloc)
 	{
