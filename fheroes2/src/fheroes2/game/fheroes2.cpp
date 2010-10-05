@@ -52,7 +52,6 @@ void SetLangEnvPath(const Settings &);
 void ReadConfigFile(Settings &);
 void LoadConfigFiles(Settings &, const std::string &);
 void LoadExternalResource(const Settings &);
-bool FHeroes2Running(void);
 
 int PrintHelp(const char *basename)
 {
@@ -78,8 +77,6 @@ std::string GetCaption(void)
 
 int main(int argc, char **argv)
 {
-	if(FHeroes2Running()) return EXIT_SUCCESS;
-
 	Settings & conf = Settings::Get();
 	int test = 0;
 
@@ -142,8 +139,6 @@ int main(int argc, char **argv)
 	if(SDL::Init(subsystem))
 	try
 	{
-	    std::atexit(SDL::Quit);
-
 	    if(conf.Unicode()) SetLangEnvPath(conf);
 
 	    if(Mixer::isValid())
@@ -254,6 +249,8 @@ int main(int argc, char **argv)
 
 	    //Display::ShowCursor();
 	    if(Settings::Get().ExtUseFade()) Display::Fade();
+
+	    SDL::Quit();
 
 	} catch(std::bad_alloc)
 	{
@@ -453,27 +450,3 @@ void LoadExternalResource(const Settings & conf)
     if(FilePresent(spec))
 	Skill::UpdateStats(spec);
 }
-
-#if defined (_WIN32_WCE)
-#include <windows.h>
-
-bool FHeroes2Running(void)
-{
-    HWND hwnd = FindWindow(NULL, L"SDL_app");
-
-    if(hwnd)
-    {
-	ShowWindow(hwnd, SW_SHOW);
-	SetForegroundWindow(hwnd);
-    }
-
-    return hwnd;
-}
-#else
-
-bool FHeroes2Running(void)
-{
-    return false;
-}
-#endif
-

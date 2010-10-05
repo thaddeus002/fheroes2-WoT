@@ -46,7 +46,7 @@ pot: $(wildcard $(SEARCH))
 
 $(RES): $(ICOFILE)
 	@echo "gen: $(RES)"
-	@echo "id ICON \"$(ICOFILE)\"" > $(TARGET).rc
+	@echo "$(IDICON) ICON \"$(ICOFILE)\"" > $(TARGET).rc
 	$(WINDRES) $(TARGET).rc -O coff -o $(TARGET).res
 
 VPATH := $(addprefix $(SOURCEROOT)/, $(SOURCEDIR))

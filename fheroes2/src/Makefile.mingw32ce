@@ -6,6 +6,12 @@ ifndef WITHOUT_UNICODE
 LIBS := $(LIBS) -lintl -lfreetype
 endif
 
+ifdef WITH_ICONS
+IDICON := 1099
+CFLAGS := $(CFLAGS) -DID_ICON=$(IDICON)
+export IDICON
+endif
+
 AR := arm-mingw32ce-ar
 CXX := arm-mingw32ce-g++
 WINDRES := arm-mingw32ce-windres
