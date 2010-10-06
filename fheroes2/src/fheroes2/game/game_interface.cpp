@@ -43,11 +43,12 @@ Interface::Basic::Basic() : gameArea(GameArea::Get()), radar(Radar::Get()),
     statusWindow(StatusWindow::Get()), borderWindow(BorderWindow::Get()),
     controlPanel(ControlPanel::Get()), redraw(0)
 {
+    Settings & conf = Settings::Get().Get();
     const Display & display = Display::Get();
     const u16 & px = display.w() - BORDERWIDTH - RADARWIDTH;
-    const u8 scroll_width = Settings::Get().QVGA() ? 12 : BORDERWIDTH;
+    const u8 scroll_width = conf.QVGA() ? 12 : BORDERWIDTH;
 
-    if(Settings::Get().QVGA())
+    if(conf.QVGA())
     {
         iconsPanel.SetCount(2);
 	radar.SetPos(BORDERWIDTH, BORDERWIDTH);
@@ -55,9 +56,10 @@ Interface::Basic::Basic() : gameArea(GameArea::Get()), radar(Radar::Get()),
 	buttonsArea.SetPos(BORDERWIDTH, BORDERWIDTH);
 	statusWindow.SetPos(BORDERWIDTH, BORDERWIDTH);
 	controlPanel.SetPos(display.w() - controlPanel.GetArea().w - scroll_width, 0);
+	conf.SetShowPanel(true);
     }
     else
-    if(Settings::Get().HideInterface())
+    if(conf.HideInterface())
     {
         iconsPanel.SetCount(2);
 	radar.SetPos(BORDERWIDTH, BORDERWIDTH);
@@ -65,6 +67,7 @@ Interface::Basic::Basic() : gameArea(GameArea::Get()), radar(Radar::Get()),
 	buttonsArea.SetPos(px - BORDERWIDTH, iconsPanel.GetArea().y + iconsPanel.GetArea().h);
 	statusWindow.SetPos(px - BORDERWIDTH, buttonsArea.GetArea().y + buttonsArea.GetArea().h);
 	controlPanel.SetPos(display.w() - controlPanel.GetArea().w - scroll_width, 0);
+	conf.SetShowPanel(true);
     }
     else
     {
@@ -80,7 +83,7 @@ Interface::Basic::Basic() : gameArea(GameArea::Get()), radar(Radar::Get()),
 
     scrollLeft = Rect(0, 0, scroll_width, display.h());
     scrollRight = Rect(display.w() - scroll_width, 0, scroll_width, display.h());
-    scrollTop = Settings::Get().QVGA() ? Rect(0, 0, controlPanel.GetArea().x, scroll_width) : Rect(0, 0, display.w() - radar.GetArea().w, scroll_width);
+    scrollTop = conf.QVGA() ? Rect(0, 0, controlPanel.GetArea().x, scroll_width) : Rect(0, 0, display.w() - radar.GetArea().w, scroll_width);
     scrollBottom = Rect(0, display.h() - scroll_width, display.w(), scroll_width);
     
     system_info.Set(Font::YELLOW_SMALL);
@@ -127,7 +130,7 @@ void Interface::Basic::Redraw(u8 force)
 {
     Settings & conf = Settings::Get();
 
-    if((redraw | force) & REDRAW_GAMEAREA) gameArea.Redraw(Display::Get());
+    if((redraw | force) & REDRAW_GAMEAREA) gameArea.Redraw(Display::Get(), LEVEL_ALL);
 
     if((conf.HideInterface() && conf.ShowRadar()) || ((redraw | force) & REDRAW_RADAR)) radar.Redraw();
 

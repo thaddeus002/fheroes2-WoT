@@ -32,7 +32,6 @@
 
 class Sprite;
 class Heroes;
-namespace Interface { class GameArea; }
 
 namespace Maps
 {
@@ -127,18 +126,13 @@ namespace Maps
 	bool ValidQuantity(void) const;
 	void CaptureFlags32(const MP2::object_t obj, const Color::color_t col);
 
-	void RedrawTile(void) const;
-	void RedrawTile(Surface &, s16, s16) const;
-	void RedrawBottom(void) const;
-	void RedrawBottom(Surface &, const Interface::GameArea &) const;
-	void RedrawBottom(Surface &, s16, s16, const TilesAddon* skip = NULL) const;
-	void RedrawBottom4Hero(Surface &, const Interface::GameArea &) const;
-	void RedrawTop(void) const;
-	void RedrawTop(Surface &, const Interface::GameArea &) const;
-	void RedrawTop(Surface &, s16, s16, const Interface::GameArea &, const TilesAddon* skip = NULL) const;
-	void RedrawTop4Hero(Surface &, const Interface::GameArea &, bool skip_ground) const;
-	void RedrawObjects(void) const;
-	void RedrawObjects(Surface &, s16, s16, const Interface::GameArea &) const;
+	void RedrawTile(Surface &) const;
+	void RedrawBottom(Surface &, const TilesAddon* skip = NULL) const;
+	void RedrawBottom4Hero(Surface &) const;
+	void RedrawTop(Surface &, const TilesAddon* skip = NULL) const;
+	void RedrawTop4Hero(Surface &, bool skip_ground) const;
+	void RedrawObjects(Surface &) const;
+	void RedrawFogs(Surface &, u8) const;
 
 	void AddonsPushLevel1(const MP2::mp2tile_t & mt);
 	void AddonsPushLevel1(const MP2::mp2addon_t & ma);
@@ -182,8 +176,8 @@ namespace Maps
 	void RemoveJailSprite(void);
 	void RemoveBarrierSprite(void);
 
-	void RedrawBoat(Surface &, s16, s16, const Interface::GameArea &) const;
-	void RedrawMonster(Surface &, s16, s16, const Interface::GameArea &) const;
+	void RedrawBoat(Surface &) const;
+	void RedrawMonster(Surface &) const;
 
     private:
 	friend class Game::IO;

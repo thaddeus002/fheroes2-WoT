@@ -67,7 +67,6 @@ namespace Maps
     u32 AnimationTicket(void);
     void IncreaseAnimationTicket(void);
 
-    u16 GetDirectionAroundFog(const u16 center, const u8 color);
     u16 GetDirectionAroundGround(const u16 center, const u16 ground);
     u8  GetCountAroundGround(const u16 center, const u16 ground);
     u16 GetMaxGroundAround(const u16 center);

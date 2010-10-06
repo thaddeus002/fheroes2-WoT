@@ -42,7 +42,6 @@
 class Recruits;
 class Surface;
 class MageGuild;
-namespace Interface { class GameArea; }
 
 class Heroes : public HeroBase
 {
@@ -219,8 +218,8 @@ public:
     void AIRescueWhereMove(void);
     bool AIPriorityObject(u16, u8);
 
-    void Redraw(Surface &, const Interface::GameArea &, bool) const;
-    void Redraw(Surface &, const s16, const s16, const Interface::GameArea &, bool) const;
+    void Redraw(Surface &, bool) const;
+    void Redraw(Surface &, const s16, const s16, bool) const;
     u8   GetSpriteIndex(void) const{ return sprite_index; }
     void FadeOut(void) const;
     void FadeIn(void) const;

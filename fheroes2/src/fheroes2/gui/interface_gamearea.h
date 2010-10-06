@@ -55,10 +55,10 @@ namespace Interface
     public:
 
 	static GameArea & Get(void);
-	void SetAreaSize(s16, s16, u16, u16);
 	void Build(void);
 
 	const Rect & GetArea(void) const;
+	const Rect & GetMapsPos(void) const;
 	const Rect & GetRectMaps(void) const;
 
 	Cursor::themes_t GetScrollCursor(void) const;
@@ -68,7 +68,12 @@ namespace Interface
 
 	void Center(s16, s16);
 	void Center(const Point &pt);
-	void Redraw(Surface & dst, u8 = LEVEL_ALL) const;
+
+	void Redraw(Surface & dst, u8) const;
+	void Redraw(Surface & dst, u8, const Rect &) const;
+
+	void BlitOnTile(Surface &, const Surface &, const s16, const s16, const Point &) const;
+	void BlitOnTile(Surface &, const Sprite &, const Point &) const;
 
 	void SetUpdateCursor(void);
         void QueueEventProcessing(void);
@@ -77,14 +82,19 @@ namespace Interface
 
 	static void GenerateUltimateArtifactAreaSurface(const u16, Sprite &);
 	static void SrcRectFixed(Rect & src, Point & dst, const u16 rw, const u16 rh);
+	static void SrcRectFixed(Rect & src, s16 & dstx, s16 & dsty, const u16 rw, const u16 rh);
 
     private:
+	void SetAreaPosition(s16, s16, u16, u16);
 	GameArea();
 
-	Rect	rectArea;
+	Rect	areaPosition;
+	Rect	mapsPosition;
 	Rect	rectMaps;
+	Point	scrollOffset;
 	u16	oldIndexPos;
 	u8	scrollDirection;
+	u8	scrollStep;
 	bool    updateCursor;
     };
 }

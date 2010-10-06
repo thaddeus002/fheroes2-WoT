@@ -333,7 +333,7 @@ void AnimationRemoveObject(const Maps::Tiles & tile)
     if(NULL == addon) return;
 
     const Interface::GameArea & gamearea = Interface::GameArea::Get();
-    const Rect & area = gamearea.GetArea();
+    const Point & area = gamearea.GetMapsPos();
     const Rect & rect = gamearea.GetRectMaps();
     const Point pos(tile.GetIndex() % world.w() - rect.x, tile.GetIndex() / world.w() - rect.y);
 
@@ -371,16 +371,16 @@ void AnimationRemoveObject(const Maps::Tiles & tile)
 	if(Game::ShouldAnimateInfrequent(ticket, 1))
         {
 	    cursor.Hide();
-	    tile.RedrawTile();
-	    tile.RedrawBottom(display, dstx, dsty, addon);
+	    tile.RedrawTile(display);
+	    tile.RedrawBottom(display, addon);
             sf.SetAlpha(alpha);
 	    display.Blit(sf, dstx, dsty);
 	    if(heroes.size())
 	    {
-		for(it = heroes.begin(); it != heroes.end(); ++it) if(*it) (*it)->Redraw(display, gamearea, false);
+		for(it = heroes.begin(); it != heroes.end(); ++it) if(*it) (*it)->Redraw(display, false);
 	    }
 	    else
-		tile.RedrawTop();
+		tile.RedrawTop(display);
             cursor.Show();
             display.Flip();
             alpha -= 20;

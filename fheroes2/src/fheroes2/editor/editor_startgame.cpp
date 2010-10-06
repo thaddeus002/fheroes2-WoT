@@ -56,6 +56,7 @@ Game::menu_t Game::Editor::StartGame()
 
     Display & display = Display::Get();
     Interface::GameArea & areaMaps = Interface::GameArea::Get();
+    const Rect & areaPos = areaMaps.GetArea();
     areaMaps.Build();
 
     Cursor & cursor = Cursor::Get();
@@ -66,10 +67,10 @@ Game::menu_t Game::Editor::StartGame()
     cursor.SetThemes(cursor.POINTER);
     I.Draw();
 
-    const Rect area_pos(BORDERWIDTH, BORDERWIDTH, areaMaps.GetArea().w, areaMaps.GetArea().h);
+    const Rect area_pos(BORDERWIDTH, BORDERWIDTH, areaPos.w, areaPos.h);
     const Rect areaScrollLeft(0, BORDERWIDTH, BORDERWIDTH / 2, display.h() - 2 * BORDERWIDTH);
     const Rect areaScrollRight(display.w() - BORDERWIDTH / 2, BORDERWIDTH, BORDERWIDTH / 2, display.h() - 2 * BORDERWIDTH);
-    const Rect areaScrollTop(BORDERWIDTH, 0, areaMaps.GetArea().w, BORDERWIDTH / 2);
+    const Rect areaScrollTop(BORDERWIDTH, 0, areaPos.w, BORDERWIDTH / 2);
     const Rect areaScrollBottom(2 * BORDERWIDTH, display.h() - BORDERWIDTH / 2, (areaMaps.GetRectMaps().w - 1) * TILEWIDTH, BORDERWIDTH / 2);
     const Rect areaLeftPanel(display.w() - 2 * BORDERWIDTH - RADARWIDTH, 0, BORDERWIDTH + RADARWIDTH, display.h());
 
@@ -84,7 +85,7 @@ Game::menu_t Game::Editor::StartGame()
     Interface::Radar & radar = I.radar;
     radar.Build();
 
-    areaMaps.Redraw(display);
+    areaMaps.Redraw(display, LEVEL_ALL);
     radar.RedrawArea();
 
     // Create radar cursor
@@ -204,7 +205,7 @@ Game::menu_t Game::Editor::StartGame()
 		radar.RedrawCursor();
 		EditorInterface::DrawTopNumberCell();
 		EditorInterface::DrawLeftNumberCell();
-                areaMaps.Redraw(display);
+                areaMaps.Redraw(display, LEVEL_ALL);
 		cursor.Show();
 		display.Flip();
 	    }
@@ -278,9 +279,9 @@ Game::menu_t Game::Editor::StartGame()
 			    default: break;
 			}
 
-			newtile.RedrawTile();
-			newtile.RedrawBottom();
-			newtile.RedrawTop();
+			newtile.RedrawTile(display);
+			newtile.RedrawBottom(display);
+			newtile.RedrawTop(display);
 		    }
 		}
 
@@ -900,7 +901,7 @@ Game::menu_t Game::Editor::StartGame()
 	    cursor.SetThemes(areaMaps.GetScrollCursor());
 	    areaMaps.Scroll();
 	    //I.Scroll(scrollDir);
-	    areaMaps.Redraw(display);
+	    areaMaps.Redraw(display, LEVEL_ALL);
 	    radar.RedrawCursor();
 	    cursor.Show();
 	    display.Flip();
@@ -916,6 +917,7 @@ void Game::Editor::ModifySingleTile(Maps::Tiles & tile)
     const u16 center = tile.GetIndex();
     const Maps::Ground::ground_t ground = tile.GetGround();
     const u16 max = Maps::GetMaxGroundAround(center);
+    Display & display = Display::Get();
 
     if(max & ground) return;
 
@@ -951,15 +953,16 @@ void Game::Editor::ModifySingleTile(Maps::Tiles & tile)
     if(index)
     {
 	tile.SetTile(Rand::Get(index, index + 7), 0);
-        tile.RedrawTile();
-        tile.RedrawBottom();
-    	tile.RedrawTop();
+        tile.RedrawTile(display);
+        tile.RedrawBottom(display);
+    	tile.RedrawTop(display);
     }
 }
 
 void Game::Editor::ModifyTileAbroad(Maps::Tiles & tile)
 {
     const u16 center = tile.GetIndex();
+    Display & display = Display::Get();
 
     // fix
     if(Maps::Ground::WATER != tile.GetGround()) return;
@@ -1044,9 +1047,9 @@ void Game::Editor::ModifyTileAbroad(Maps::Tiles & tile)
 	    if(fix)
 	    {
 		tile.SetTile(Rand::Get(index, index + 3), revert);
-                tile.RedrawTile();
-                tile.RedrawBottom();
-    		tile.RedrawTop();
+                tile.RedrawTile(display);
+                tile.RedrawBottom(display);
+    		tile.RedrawTop(display);
     	    }
     	}
     }

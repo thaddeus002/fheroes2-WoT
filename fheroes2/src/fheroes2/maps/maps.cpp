@@ -177,21 +177,6 @@ s16 Maps::GetIndexFromAbsPoint(s16 px, s16 py)
     return py * world.w() + px;
 }
 
-u16 Maps::GetDirectionAroundFog(const u16 center, const u8 color)
-{
-    if(!isValidAbsPoint(center % world.w(), center / world.h())) return 0;
-
-    u16 result = 0;
-
-    for(Direction::vector_t direct = Direction::TOP_LEFT; direct != Direction::CENTER; ++direct)
-	if(!isValidDirection(center, direct) ||
-	   world.GetTiles(GetDirectionIndex(center, direct)).isFog(color)) result |= direct;
-
-    if(world.GetTiles(center).isFog(color)) result |= Direction::CENTER;
-
-    return result;
-}
-
 u16 Maps::GetDirectionAroundGround(const u16 center, const u16 ground)
 {
     if(0 == ground || !isValidAbsPoint(center % world.w(), center / world.h())) return 0;

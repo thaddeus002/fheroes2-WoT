@@ -683,7 +683,7 @@ bool Game::ShouldAnimate(u32 ticket)
 bool Game::ShouldAnimateInfrequent(u32 ticket, u32 modifier)
 {
     //TODO: Use user-selected speed instead of medium by default
-    return !(ticket % (1 < modifier ? (ANIMATION_SPEED - (2 * Settings::Get().Animation())) * modifier : ANIMATION_SPEED - (2 * Settings::Get().Animation())));
+    return !(ticket % (modifier ? (ANIMATION_SPEED - (2 * Settings::Get().Animation())) * modifier : 11 - Settings::Get().Animation()));
 }
 
 Game::menu_t Game::HumanTurn(void)
@@ -753,7 +753,9 @@ Game::menu_t Game::HumanTurn(void)
     I.ticks.Start();
     u32 & ticket = I.frames;
 
-    const bool withdelay = !conf.ExtVeryVerySlow();
+    const u8 hero_move_speed = conf.PocketPC() ? (conf.ExtVeryVerySlow() ? 0 : 2) : 5;
+    const bool withdelay = true;
+    SDL::Time time;
 
     // startgame loop
     while(CANCEL == res && le.HandleEvents(withdelay))
@@ -833,6 +835,9 @@ Game::menu_t Game::HumanTurn(void)
 
 	if(conf.ExtTapMode())
 	{
+	    // disable right click emulation
+	    le.SetTapMode(false);
+
 	    // scroll area maps left
 	    if(le.MouseCursor(I.GetAreaScrollLeft()) && le.MousePressLeft()) I.gameArea.SetScroll(SCROLL_LEFT);
     	    else
@@ -921,27 +926,38 @@ Game::menu_t Game::HumanTurn(void)
     	    I.gameArea.QueueEventProcessing();
 	}
 
-	
-	// animation
-        if(Game::ShouldAnimateInfrequent(ticket, 1))
+        // fast scroll
+	if(I.gameArea.NeedScroll())
         {
-            if(I.gameArea.NeedScroll())
-            {
-		if(le.MouseCursor(I.GetAreaScrollLeft()) ||
+    	    cursor.Hide();
+
+	    if(le.MouseCursor(I.GetAreaScrollLeft()) ||
 		   le.MouseCursor(I.GetAreaScrollRight()) ||
 		   le.MouseCursor(I.GetAreaScrollTop()) ||
 		   le.MouseCursor(I.GetAreaScrollBottom()))
     		    cursor.SetThemes(I.gameArea.GetScrollCursor());
 
-    		I.gameArea.Scroll();
+    	    I.gameArea.Scroll();
 
-    		// need stop hero
-    		if(Game::Focus::HEROES == global_focus.Type() && global_focus.GetHeroes().isEnableMove())
+    	    // need stop hero
+    	    if(Game::Focus::HEROES == global_focus.Type() && global_focus.GetHeroes().isEnableMove())
     		    global_focus.GetHeroes().SetMove(false);
 
-		I.SetRedraw(REDRAW_GAMEAREA | REDRAW_RADAR);
-            }
-	    else
+	    I.SetRedraw(REDRAW_GAMEAREA|REDRAW_RADAR);
+    	    I.Redraw();
+    	    cursor.Show();
+    	    display.Flip();
+
+            // enable right click emulation
+	    if(conf.ExtTapMode())
+        	le.SetTapMode(true);
+
+	    continue;
+        }
+
+	// heroes move animation
+        if(Game::ShouldAnimateInfrequent(ticket, hero_move_speed))
+        {
     	    if(Game::Focus::HEROES == global_focus.Type())
 	    {
 		Heroes & hero = global_focus.GetHeroes();
@@ -975,6 +991,7 @@ Game::menu_t Game::HumanTurn(void)
     	    }
 	}
 
+	// slow maps objects animation
 	if(0 == (ticket % 400))
 	{
 	    Maps::IncreaseAnimationTicket();

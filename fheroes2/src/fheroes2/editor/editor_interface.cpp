@@ -70,6 +70,7 @@ void EditorInterface::Draw(void)
 {
     Display & display = Display::Get();
     Interface::GameArea & areaMaps = Interface::GameArea::Get();
+    const Rect & areaPos = areaMaps.GetArea();
 
     display.Fill(0x00, 0x00, 0x00);
 
@@ -82,7 +83,7 @@ void EditorInterface::Draw(void)
     // bottom scroll bar indicator
     const Sprite & spriteBottomBar(AGG::GetICN(ICN::ESCROLL, 0));
     dst_pt.x = BORDERWIDTH * 2;
-    dst_pt.y = BORDERWIDTH + areaMaps.GetArea().h;
+    dst_pt.y = BORDERWIDTH + areaPos.h;
     src_rt.x = 0;
     src_rt.y = 0;
     src_rt.w = TILEWIDTH;
@@ -99,7 +100,7 @@ void EditorInterface::Draw(void)
     display.Blit(spriteBottomBar, src_rt, dst_pt);
     // left scroll bar indicator
     const Sprite & spriteLeftBar(AGG::GetICN(ICN::ESCROLL, 1));
-    dst_pt.x = BORDERWIDTH + areaMaps.GetArea().w;
+    dst_pt.x = BORDERWIDTH + areaPos.w;
     dst_pt.y = BORDERWIDTH * 2;
     src_rt.x = 0;
     src_rt.y = 0;
@@ -124,7 +125,7 @@ void EditorInterface::Draw(void)
     src_rt.y = 0;
     src_rt.w = BORDERWIDTH + RADARWIDTH;
     src_rt.h = BORDERWIDTH;
-    dst_pt.x = 2 * BORDERWIDTH + areaMaps.GetArea().w;
+    dst_pt.x = 2 * BORDERWIDTH + areaPos.w;
     dst_pt.y = 0;
     display.Blit(spriteAdv, src_rt, dst_pt);
     // left bottom static border
@@ -132,8 +133,8 @@ void EditorInterface::Draw(void)
     src_rt.y = spriteAdv.h() - BORDERWIDTH;
     src_rt.w = BORDERWIDTH + RADARWIDTH;
     src_rt.h = BORDERWIDTH;
-    dst_pt.x = 2 * BORDERWIDTH + areaMaps.GetArea().w;
-    dst_pt.y = BORDERWIDTH + areaMaps.GetArea().h;
+    dst_pt.x = 2 * BORDERWIDTH + areaPos.w;
+    dst_pt.y = BORDERWIDTH + areaPos.h;
     display.Blit(spriteAdv, src_rt, dst_pt);
     // left static border
     src_rt.x = spriteAdv.w() - BORDERWIDTH;
@@ -166,14 +167,14 @@ void EditorInterface::Draw(void)
     Point pt_ssm, pt_sme, pt_sla, pt_smn, pt_zoo, pt_und, pt_new, pt_spe, pt_fil, pt_sys;
 
     // btn right top scroll
-    pt_rts.x = BORDERWIDTH + areaMaps.GetArea().w;
+    pt_rts.x = BORDERWIDTH + areaPos.w;
     pt_rts.y = 0;
     // btn top scroll
     pt_tsc.x = pt_rts.x;
     pt_tsc.y = BORDERWIDTH;
     // btn left bottom scroll
     pt_lbs.x = 0;
-    pt_lbs.y = BORDERWIDTH + areaMaps.GetArea().h;
+    pt_lbs.y = BORDERWIDTH + areaPos.h;
     // btn left scroll
     pt_lsc.x = BORDERWIDTH;
     pt_lsc.y = pt_lbs.y;
@@ -181,11 +182,11 @@ void EditorInterface::Draw(void)
     pt_rsc.x = 2 * BORDERWIDTH + (areaMaps.GetRectMaps().w - 1) * TILEWIDTH;
     pt_rsc.y = pt_lbs.y;
     // btn right bottom scroll
-    pt_rbs.x = BORDERWIDTH + areaMaps.GetArea().w;
+    pt_rbs.x = BORDERWIDTH + areaPos.w;
     pt_rbs.y = pt_lbs.y;
     // btn bottom scroll
     pt_bsc.x = pt_rbs.x;
-    pt_bsc.y = areaMaps.GetArea().h;
+    pt_bsc.y = areaPos.h;
     // btn select ground
     pt_sgr.x = display.w() - BORDERWIDTH - RADARWIDTH;
     pt_sgr.y = BORDERWIDTH + RADARWIDTH;
@@ -322,7 +323,7 @@ void EditorInterface::Draw(void)
     split_h.SetArea(Rect(2 * BORDERWIDTH + 3, display.h() - BORDERWIDTH + 4, (areaMaps.GetRectMaps().w - 1) * TILEWIDTH - 6, BORDERWIDTH - 8));
     split_h.SetOrientation(Splitter::HORIZONTAL);
 
-    split_v.SetArea(Rect(BORDERWIDTH + areaMaps.GetArea().w + 4, 2 * BORDERWIDTH + 3, BORDERWIDTH - 8, (areaMaps.GetRectMaps().h - 1) * TILEWIDTH - 6));
+    split_v.SetArea(Rect(BORDERWIDTH + areaPos.w + 4, 2 * BORDERWIDTH + 3, BORDERWIDTH - 8, (areaMaps.GetRectMaps().h - 1) * TILEWIDTH - 6));
     split_v.SetOrientation(Splitter::VERTICAL);
 
     split_h.SetRange(0, world.w() - areaMaps.GetRectMaps().w);

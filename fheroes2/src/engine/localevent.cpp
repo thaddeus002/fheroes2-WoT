@@ -80,7 +80,13 @@ const Point & LocalEvent::GetMouseReleaseRight(void) const
 
 void LocalEvent::SetTapMode(bool f)
 {
-    f ? SetModes(TAP_MODE) : ResetModes(TAP_MODE);
+    if(f)
+	SetModes(TAP_MODE);
+    else
+    {
+	ResetModes(TAP_MODE);
+	clock.Stop();
+    }
 }
 
 void LocalEvent::SetTapDelayForRightClickEmulation(u32 d)

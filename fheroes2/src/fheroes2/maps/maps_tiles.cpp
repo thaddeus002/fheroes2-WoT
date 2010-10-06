@@ -268,46 +268,22 @@ void Maps::Tiles::Remove(u32 uniq)
     }
 }
 
-void Maps::Tiles::RedrawTile(void) const
+void Maps::Tiles::RedrawTile(Surface & dst) const
 {
     const Interface::GameArea & area = Interface::GameArea::Get();
     const Point mp(maps_index % world.w(), maps_index / world.w());
 
     if(area.GetRectMaps() & mp)
-    {
-	const s16 & dstx = area.GetArea().x + TILEWIDTH * (mp.x - area.GetRectMaps().x);
-	const s16 & dsty = area.GetArea().y + TILEWIDTH * (mp.y - area.GetRectMaps().y);
-
-	RedrawTile(Display::Get(), dstx, dsty);
-    }
+	area.BlitOnTile(dst, GetTileSurface(), 0, 0, mp);
 }
 
-void Maps::Tiles::RedrawTile(Surface & dst, s16 dstx, s16 dsty) const
+void Maps::Tiles::RedrawBottom(Surface & dst, const TilesAddon* skip) const
 {
-    dst.Blit(GetTileSurface(), dstx, dsty);
-}
-
-void Maps::Tiles::RedrawBottom(void) const
-{
-    RedrawBottom(Display::Get(), Interface::GameArea::Get());
-}
-
-void Maps::Tiles::RedrawBottom(Surface & dst, const Interface::GameArea & area) const
-{
+    const Interface::GameArea & area = Interface::GameArea::Get();
     const Point mp(maps_index % world.w(), maps_index / world.w());
 
-    if(area.GetRectMaps() & mp)
-    {
-	const s16 & dstx = area.GetArea().x + TILEWIDTH * (mp.x - area.GetRectMaps().x);
-	const s16 & dsty = area.GetArea().y + TILEWIDTH * (mp.y - area.GetRectMaps().y);
-
-	RedrawBottom(dst, dstx, dsty);
-    }
-}
-
-void Maps::Tiles::RedrawBottom(Surface & dst, s16 dstx, s16 dsty, const TilesAddon* skip) const
-{
-    if(addons_level1.size())
+    if((area.GetRectMaps() & mp) &&
+	addons_level1.size())
     {
 	std::list<TilesAddon>::const_iterator it1 = addons_level1.begin();
 	std::list<TilesAddon>::const_iterator it2 = addons_level1.end();
@@ -323,51 +299,39 @@ void Maps::Tiles::RedrawBottom(Surface & dst, s16 dstx, s16 dsty, const TilesAdd
 	    if(ICN::UNKNOWN != icn && ICN::MINIHERO != icn && ICN::MONS32 != icn)
 	    {
 		const Sprite & sprite = AGG::GetICN(icn, index);
-		dst.Blit(sprite, dstx + sprite.x(), dsty + sprite.y());
+		area.BlitOnTile(dst, sprite, mp);
 
 		// possible anime
 		if(const u16 anime_index = ICN::AnimationFrame(icn, index, Maps::AnimationTicket(), quantity2))
 		{
 		    const Sprite & anime_sprite = AGG::GetICN(icn, anime_index);
-		    dst.Blit(anime_sprite, dstx + anime_sprite.x(), dsty + anime_sprite.y());
+		    area.BlitOnTile(dst, anime_sprite, mp);
 		}
 	    }
 	}
     }
 }
 
-void Maps::Tiles::RedrawObjects(void) const
-{
-    const Point mp(maps_index % world.w(), maps_index / world.w());
-    const Interface::GameArea & area = Interface::GameArea::Get();
-
-    if(area.GetRectMaps() & mp)
-    {
-	const s16 & dstx = area.GetArea().x + TILEWIDTH * (mp.x - area.GetRectMaps().x);
-	const s16 & dsty = area.GetArea().y + TILEWIDTH * (mp.y - area.GetRectMaps().y);
-
-	RedrawObjects(Display::Get(), dstx, dsty, area);
-    }
-}
-
-void Maps::Tiles::RedrawObjects(Surface & dst, s16 px, s16 py, const Interface::GameArea & area) const
+void Maps::Tiles::RedrawObjects(Surface & dst) const
 {
     switch(GetObject())
     {
         // boat
-        case MP2::OBJ_BOAT:	RedrawBoat(dst, px, py, area); break;
+        case MP2::OBJ_BOAT:	RedrawBoat(dst); break;
         // monster
-        case MP2::OBJ_MONSTER:	RedrawMonster(dst, px, py, area); break;
+        case MP2::OBJ_MONSTER:	RedrawMonster(dst); break;
 	//
 	default: break;
     }
 }
 
-void Maps::Tiles::RedrawMonster(Surface & dst, s16 px, s16 py, const Interface::GameArea & area) const
+void Maps::Tiles::RedrawMonster(Surface & dst) const
 {
-    Point dst_pt;
-    Rect src_rt;
+    const Point mp(maps_index % world.w(), maps_index / world.w());
+    const Interface::GameArea & area = Interface::GameArea::Get();
     u16 dst_index = MAXU16;
+
+    if(!(area.GetRectMaps() & mp)) return;
 
     // scan hero around
     const u16 dst_around = Maps::ScanAroundObject(maps_index, MP2::OBJ_HEROES);
@@ -398,61 +362,45 @@ void Maps::Tiles::RedrawMonster(Surface & dst, s16 px, s16 py, const Interface::
 	}
 
 	const Sprite & sprite_first = AGG::GetICN(ICN::MINIMON, Monster::GetSpriteIndex(quantity3) * 9 + (revert ? 8 : 7));
-
-	dst_pt.x = px + sprite_first.x() + 16;
-	dst_pt.y = py + TILEWIDTH + sprite_first.y();
-
-	area.SrcRectFixed(src_rt, dst_pt, sprite_first.w(), sprite_first.h());
-	dst.Blit(sprite_first, src_rt, dst_pt);
+	area.BlitOnTile(dst, sprite_first, sprite_first.x() + 16, TILEWIDTH + sprite_first.y(), mp);
     }
     else
     {
 	// draw first sprite
 	const Sprite & sprite_first = AGG::GetICN(ICN::MINIMON, Monster::GetSpriteIndex(quantity3) * 9);
-
-	dst_pt.x = px + sprite_first.x() + 16;
-	dst_pt.y = py + TILEWIDTH + sprite_first.y();
-
-	area.SrcRectFixed(src_rt, dst_pt, sprite_first.w(), sprite_first.h());
-	dst.Blit(sprite_first, src_rt, dst_pt);
+	area.BlitOnTile(dst, sprite_first, sprite_first.x() + 16, TILEWIDTH + sprite_first.y(), mp);
 
 	// draw second sprite
 	const Sprite & sprite_next = AGG::GetICN(ICN::MINIMON, Monster::GetSpriteIndex(quantity3) * 9 + 1 + 
-	    monster_animation_cicle[ (Maps::AnimationTicket() + px * 2 + py * 3) % (sizeof(monster_animation_cicle) / sizeof(monster_animation_cicle[0])) ]);
-
-	dst_pt.x = px + sprite_next.x() + 16;
-	dst_pt.y = py + TILEWIDTH + sprite_next.y();
-
-	area.SrcRectFixed(src_rt, dst_pt, sprite_next.w(), sprite_next.h());
-	dst.Blit(sprite_next, src_rt, dst_pt);
+	    monster_animation_cicle[ (Maps::AnimationTicket() + mp.x * mp.y) % (sizeof(monster_animation_cicle) / sizeof(monster_animation_cicle[0])) ]);
+	area.BlitOnTile(dst, sprite_next, sprite_next.x() + 16, TILEWIDTH + sprite_next.y(), mp);
     }
 }
 
-void Maps::Tiles::RedrawBoat(Surface & dst, s16 px, s16 py, const Interface::GameArea & area) const
+void Maps::Tiles::RedrawBoat(Surface & dst) const
 {
+    const Point mp(maps_index % world.w(), maps_index / world.w());
+    const Interface::GameArea & area = Interface::GameArea::Get();
+
+    if(!(area.GetRectMaps() & mp)) return;
+
     if(Settings::Get().Editor())
-        dst.Blit(AGG::GetICN(ICN::OBJNWAT2, 23), px, py);
+	area.BlitOnTile(dst, AGG::GetICN(ICN::OBJNWAT2, 23), 0, 0, mp);
     else
     {
         // FIXME: restore direction from Maps::Tiles
         const Sprite & sprite = AGG::GetICN(ICN::BOAT32, 18);
-        Point dst_pt(px + sprite.x(), py + sprite.y() + TILEWIDTH);
-        Rect src_rt;
-        area.SrcRectFixed(src_rt, dst_pt, sprite.w(), sprite.h());
-        dst.Blit(sprite, src_rt, dst_pt);
+	area.BlitOnTile(dst, sprite, sprite.x(), TILEWIDTH + sprite.y(), mp);
     }
 }
 
-void Maps::Tiles::RedrawBottom4Hero(Surface & dst, const Interface::GameArea & area) const
+void Maps::Tiles::RedrawBottom4Hero(Surface & dst) const
 {
+    const Interface::GameArea & area = Interface::GameArea::Get();
     const Point mp(maps_index % world.w(), maps_index / world.w());
 
-    if(!(area.GetRectMaps() & mp)) return;
-
-    const s16 & dstx = area.GetArea().x + TILEWIDTH * (mp.x - area.GetRectMaps().x);
-    const s16 & dsty = area.GetArea().y + TILEWIDTH * (mp.y - area.GetRectMaps().y);
-
-    if(addons_level1.size())
+    if((area.GetRectMaps() & mp) &&
+	addons_level1.size())
     {
 	std::list<TilesAddon>::const_iterator it1 = addons_level1.begin();
 	std::list<TilesAddon>::const_iterator it2 = addons_level1.end();
@@ -468,49 +416,33 @@ void Maps::Tiles::RedrawBottom4Hero(Surface & dst, const Interface::GameArea & a
 	    if(ICN::UNKNOWN != icn && ICN::MINIHERO != icn && ICN::MONS32 != icn)
 	    {
 		const Sprite & sprite = AGG::GetICN(icn, index);
-		dst.Blit(sprite, dstx + sprite.x(), dsty + sprite.y());
+		area.BlitOnTile(dst, sprite, mp);
 
 		// possible anime
 		if(const u16 anime_index = ICN::AnimationFrame(icn, index, Maps::AnimationTicket(), quantity2))
 		{
 		    const Sprite & anime_sprite = AGG::GetICN(icn, anime_index);
-		    dst.Blit(anime_sprite, dstx + anime_sprite.x(), dsty + anime_sprite.y());
+		    area.BlitOnTile(dst, anime_sprite, mp);
 		}
 	    }
 	}
     }
 }
 
-void Maps::Tiles::RedrawTop(void) const
+void Maps::Tiles::RedrawTop(Surface & dst, const TilesAddon* skip) const
 {
-    RedrawTop(Display::Get(), Interface::GameArea::Get());
-}
-
-void Maps::Tiles::RedrawTop(Surface & dst, const Interface::GameArea & area) const
-{
+    const Interface::GameArea & area = Interface::GameArea::Get();
     const Point mp(maps_index % world.w(), maps_index / world.w());
 
-    if(area.GetRectMaps() & mp)
-    {
-	const s16 & dstx = area.GetArea().x + TILEWIDTH * (mp.x - area.GetRectMaps().x);
-	const s16 & dsty = area.GetArea().y + TILEWIDTH * (mp.y - area.GetRectMaps().y);
+    if(!(area.GetRectMaps() & mp)) return;
 
-	RedrawTop(dst, dstx, dsty, area);
-    }
-}
-
-void Maps::Tiles::RedrawTop(Surface & dst, s16 dstx, s16 dsty, const Interface::GameArea & gamearea, const TilesAddon* skip) const
-{
     // fix for haut mine
     if(MP2::OBJ_MINES == general)
     {
 	if(quantity4 == Spell::HAUNT)
 	{
     	    const Sprite & anime_sprite = AGG::GetICN(ICN::OBJNHAUN,  Maps::AnimationTicket() % 15);
-	    Rect rt;
-	    Point pt(dstx + anime_sprite.x(), dsty + anime_sprite.y());
-	    gamearea.SrcRectFixed(rt, pt, anime_sprite.w(), anime_sprite.h());
-	    dst.Blit(anime_sprite, rt, pt);
+	    area.BlitOnTile(dst, anime_sprite, mp);
 	}
 	else
 	if(quantity4 >= Spell::SETEGUARDIAN && quantity4 <= Spell::SETWGUARDIAN)
@@ -524,7 +456,8 @@ void Maps::Tiles::RedrawTop(Surface & dst, s16 dstx, s16 dsty, const Interface::
 		case Spell::SETFGUARDIAN: mons = &AGG::GetICN(ICN::MONS32, Monster::GetSpriteIndex(Monster::FIRE_ELEMENT)); break;
 		default: break;
 	    }
-	    if(mons) dst.Blit(*mons, dstx + 32, dsty);
+	    if(mons)
+		area.BlitOnTile(dst, *mons, TILEWIDTH, 0, mp);
 	}
     }
 
@@ -544,37 +477,25 @@ void Maps::Tiles::RedrawTop(Surface & dst, s16 dstx, s16 dsty, const Interface::
 	    if(ICN::UNKNOWN != icn && ICN::MINIHERO != icn && ICN::MONS32 != icn)
 	    {
 		const Sprite & sprite = AGG::GetICN(icn, index);
-
-		// fix flags redraw
-		if(ICN::FLAG32 == icn)
-		{
-		    Rect rt;
-		    Point pt(dstx + sprite.x(), dsty + sprite.y());
-		    gamearea.SrcRectFixed(rt, pt, sprite.w(), sprite.h());
-		    dst.Blit(sprite, rt, pt);
-		}
-		else
-		    dst.Blit(sprite, dstx + sprite.x(), dsty + sprite.y());
+		area.BlitOnTile(dst, sprite, mp);
 
 		// possible anime
 		if(const u16 anime_index = ICN::AnimationFrame(icn, index, Maps::AnimationTicket()))
 		{
 		    const Sprite & anime_sprite = AGG::GetICN(icn, anime_index);
-		    dst.Blit(anime_sprite, dstx + anime_sprite.x(), dsty + anime_sprite.y());
+		    area.BlitOnTile(dst, anime_sprite, mp);
 		}
 	    }
 	}
     }
 }
 
-void Maps::Tiles::RedrawTop4Hero(Surface & dst, const Interface::GameArea & area, bool skip_ground) const
+void Maps::Tiles::RedrawTop4Hero(Surface & dst, bool skip_ground) const
 {
+    const Interface::GameArea & area = Interface::GameArea::Get();
     const Point mp(maps_index % world.w(), maps_index / world.w());
 
     if(!(area.GetRectMaps() & mp)) return;
-
-    const s16 & dstx = area.GetArea().x + TILEWIDTH * (mp.x - area.GetRectMaps().x);
-    const s16 & dsty = area.GetArea().y + TILEWIDTH * (mp.y - area.GetRectMaps().y);
 
     if(addons_level2.size())
     {
@@ -592,23 +513,13 @@ void Maps::Tiles::RedrawTop4Hero(Surface & dst, const Interface::GameArea & area
 	    if(ICN::HighlyObjectSprite(icn, index))
 	    {
 		const Sprite & sprite = AGG::GetICN(icn, index);
-
-		// fix flags redraw
-		if(ICN::FLAG32 == icn)
-		{
-		    Rect rt;
-		    Point pt(dstx + sprite.x(), dsty + sprite.y());
-		    area.SrcRectFixed(rt, pt, sprite.w(), sprite.h());
-		    dst.Blit(sprite, rt, pt);
-		}
-		else
-		    dst.Blit(sprite, dstx + sprite.x(), dsty + sprite.y());
+		area.BlitOnTile(dst, sprite, mp);
 
 		// possible anime
 		if(const u16 anime_index = ICN::AnimationFrame(icn, index, Maps::AnimationTicket()))
 		{
 		    const Sprite & anime_sprite = AGG::GetICN(icn, anime_index);
-		    dst.Blit(anime_sprite, dstx + anime_sprite.x(), dsty + anime_sprite.y());
+		    area.BlitOnTile(dst, anime_sprite, mp);
 		}
 	    }
 	}
@@ -2354,4 +2265,232 @@ bool Maps::Tiles::CheckEnemyGuardians(u8 color) const
     if(! MP2::isCaptureObject(general)) return false;
 
     return color != world.ColorCapturedObject(maps_index) && quantity3 && (quantity1 || quantity2);
+}
+
+void Maps::Tiles::RedrawFogs(Surface & dst, u8 color) const
+{
+    const Interface::GameArea & area = Interface::GameArea::Get();
+    const Point mp(maps_index % world.w(), maps_index / world.w());
+
+    // get direction around fogs
+    u16 around = 0;
+
+    for(Direction::vector_t direct = Direction::TOP_LEFT; direct != Direction::CENTER; ++direct)
+        if(!Maps::isValidDirection(maps_index, direct) ||
+           world.GetTiles(Maps::GetDirectionIndex(maps_index, direct)).isFog(color)) around |= direct;
+
+    if(isFog(color)) around |= Direction::CENTER;
+ 
+    // TIL::CLOF32
+    if(DIRECTION_ALL == around)
+    {
+	const Surface & sf = AGG::GetTIL(TIL::CLOF32, maps_index % 4, 0);
+	area.BlitOnTile(dst, sf, 0, 0, mp);
+    }
+    else
+    {
+	u8 index = 0;
+	bool revert = false;
+
+	// see ICN::CLOP32: sprite 10
+	if((around & Direction::CENTER) && !(around & (Direction::TOP | Direction::BOTTOM | Direction::LEFT | Direction::RIGHT)))
+	{ index = 10; revert = false; }
+	else
+	// see ICN::CLOP32: sprite 6, 7, 8
+	if(around & (Direction::CENTER | Direction::TOP) && !(around & (Direction::BOTTOM | Direction::LEFT | Direction::RIGHT)))
+	{ index = 6; revert = false; }
+	else
+	if(around & (Direction::CENTER | Direction::RIGHT) && !(around & (Direction::TOP | Direction::BOTTOM | Direction::LEFT)))
+	{ index = 7; revert = false; }
+	else
+	if(around & (Direction::CENTER | Direction::LEFT) && !(around & (Direction::TOP | Direction::BOTTOM | Direction::RIGHT)))
+	{ index = 7; revert = true; }
+	else
+	if(around & (Direction::CENTER | Direction::BOTTOM) && !(around & (Direction::TOP | Direction::LEFT | Direction::RIGHT)))
+	{ index = 8; revert = false; }
+	else
+	// see ICN::CLOP32: sprite 9, 29
+	if(around & (DIRECTION_CENTER_COL) && !(around & (Direction::LEFT | Direction::RIGHT)))
+	{ index = 9; revert = false; }
+	else
+	if(around & (DIRECTION_CENTER_ROW) && !(around & (Direction::TOP | Direction::BOTTOM)))
+	{ index = 29; revert = false; }
+	else
+	// see ICN::CLOP32: sprite 15, 22
+	if(around == (DIRECTION_ALL & (~Direction::TOP_RIGHT)))
+	{ index = 15; revert = false; }
+	else
+	if(around == (DIRECTION_ALL & (~Direction::TOP_LEFT)))
+	{ index = 15; revert = true; }
+	else
+	if(around == (DIRECTION_ALL & (~Direction::BOTTOM_RIGHT)))
+	{ index = 22; revert = false; }
+	else
+	if(around == (DIRECTION_ALL & (~Direction::BOTTOM_LEFT)))
+	{ index = 22; revert = true; }
+	else
+	// see ICN::CLOP32: sprite 16, 17, 18, 23
+	if(around == (DIRECTION_ALL & (~(Direction::TOP_RIGHT | Direction::BOTTOM_RIGHT))))
+	{ index = 16; revert = false; }
+	else
+	if(around == (DIRECTION_ALL & (~(Direction::TOP_LEFT | Direction::BOTTOM_LEFT))))
+	{ index = 16; revert = true; }
+	else
+	if(around == (DIRECTION_ALL & (~(Direction::TOP_RIGHT | Direction::BOTTOM_LEFT))))
+	{ index = 17; revert = false; }
+	else
+	if(around == (DIRECTION_ALL & (~(Direction::TOP_LEFT | Direction::BOTTOM_RIGHT))))
+	{ index = 17; revert = true; }
+	else
+	if(around == (DIRECTION_ALL & (~(Direction::TOP_LEFT | Direction::TOP_RIGHT))))
+	{ index = 18; revert = false; }
+	else
+	if(around == (DIRECTION_ALL & (~(Direction::BOTTOM_LEFT | Direction::BOTTOM_RIGHT))))
+	{ index = 23; revert = false; }
+	else
+	// see ICN::CLOP32: sprite 13, 14
+	if(around == (DIRECTION_ALL & (~DIRECTION_TOP_RIGHT_CORNER)))
+	{ index = 13; revert = false; }
+	else
+	if(around == (DIRECTION_ALL & (~DIRECTION_TOP_LEFT_CORNER)))
+	{ index = 13; revert = true; }
+	else
+	if(around == (DIRECTION_ALL & (~DIRECTION_BOTTOM_RIGHT_CORNER)))
+	{ index = 14; revert = false; }
+	else
+	if(around == (DIRECTION_ALL & (~DIRECTION_BOTTOM_LEFT_CORNER)))
+	{ index = 14; revert = true; }
+	else
+	// see ICN::CLOP32: sprite 11, 12
+	if(around & (Direction::CENTER | Direction::LEFT | Direction::BOTTOM_LEFT | Direction::BOTTOM) &&
+	 !(around & (Direction::TOP | Direction::TOP_RIGHT | Direction::RIGHT)))
+	{ index = 11; revert = false; }
+	else
+	if(around & (Direction::CENTER | Direction::RIGHT | Direction::BOTTOM_RIGHT | Direction::BOTTOM) &&
+	 !(around & (Direction::TOP | Direction::TOP_LEFT | Direction::LEFT)))
+	{ index = 11; revert = true; }
+	else
+	if(around & (Direction::CENTER | Direction::LEFT | Direction::TOP_LEFT | Direction::TOP) &&
+	 !(around & (Direction::BOTTOM | Direction::BOTTOM_RIGHT | Direction::RIGHT)))
+	{ index = 12; revert = false; }
+	else
+	if(around & (Direction::CENTER | Direction::RIGHT | Direction::TOP_RIGHT | Direction::TOP) &&
+	 !(around & (Direction::BOTTOM | Direction::BOTTOM_LEFT | Direction::LEFT)))
+	{ index = 12; revert = true; }
+	else
+	// see ICN::CLOP32: sprite 19, 20, 22
+	if(around & (DIRECTION_CENTER_ROW | Direction::BOTTOM | Direction::TOP | Direction::TOP_LEFT) &&
+	 !(around & (Direction::BOTTOM_LEFT | Direction::BOTTOM_RIGHT | Direction::TOP_RIGHT)))
+	{ index = 19; revert = false; }
+	else
+	if(around & (DIRECTION_CENTER_ROW | Direction::BOTTOM | Direction::TOP | Direction::TOP_RIGHT) &&
+	 !(around & (Direction::BOTTOM_LEFT | Direction::BOTTOM_RIGHT | Direction::TOP_LEFT)))
+	{ index = 19; revert = true; }
+	else
+	if(around & (DIRECTION_CENTER_ROW | Direction::BOTTOM | Direction::TOP | Direction::BOTTOM_LEFT) &&
+	 !(around & (Direction::TOP_RIGHT | Direction::BOTTOM_RIGHT | Direction::TOP_LEFT)))
+	{ index = 20; revert = false; }
+	else
+	if(around & (DIRECTION_CENTER_ROW | Direction::BOTTOM | Direction::TOP | Direction::BOTTOM_RIGHT) &&
+	 !(around & (Direction::TOP_RIGHT | Direction::BOTTOM_LEFT | Direction::TOP_LEFT)))
+	{ index = 20; revert = true; }
+	else
+	if(around & (DIRECTION_CENTER_ROW | Direction::BOTTOM | Direction::TOP) &&
+	 !(around & (Direction::TOP_RIGHT | Direction::BOTTOM_RIGHT | Direction::BOTTOM_LEFT | Direction::TOP_LEFT)))
+	{ index = 22; revert = false; }
+	else
+	// see ICN::CLOP32: sprite 24, 25, 26, 30
+	if(around & (DIRECTION_CENTER_ROW | Direction::BOTTOM | Direction::BOTTOM_LEFT) &&
+	 !(around & (Direction::TOP | Direction::BOTTOM_RIGHT)))
+	{ index = 24; revert = false; }
+	else
+	if(around & (DIRECTION_CENTER_ROW | Direction::BOTTOM | Direction::BOTTOM_RIGHT) &&
+	 !(around & (Direction::TOP | Direction::BOTTOM_LEFT)))
+	{ index = 24; revert = true; }
+	else
+	if(around & (DIRECTION_CENTER_COL | Direction::LEFT | Direction::TOP_LEFT) &&
+	 !(around & (Direction::RIGHT | Direction::BOTTOM_LEFT)))
+	{ index = 25; revert = false; }
+	else
+	if(around & (DIRECTION_CENTER_COL | Direction::RIGHT | Direction::TOP_RIGHT) &&
+	 !(around & (Direction::LEFT | Direction::BOTTOM_RIGHT)))
+	{ index = 25; revert = true; }
+	else
+	if(around & (DIRECTION_CENTER_COL | Direction::BOTTOM_LEFT | Direction::LEFT) &&
+	 !(around & (Direction::RIGHT | Direction::TOP_LEFT)))
+	{ index = 26; revert = false; }
+	else
+	if(around & (DIRECTION_CENTER_COL | Direction::BOTTOM_RIGHT | Direction::RIGHT) &&
+	 !(around & (Direction::LEFT | Direction::TOP_RIGHT)))
+	{ index = 26; revert = true; }
+	else
+	if(around & (DIRECTION_CENTER_ROW | Direction::TOP_LEFT | Direction::TOP) &&
+	 !(around & (Direction::BOTTOM | Direction::TOP_RIGHT)))
+	{ index = 30; revert = false; }
+	else
+	if(around & (DIRECTION_CENTER_ROW | Direction::TOP_RIGHT | Direction::TOP) &&
+	 !(around & (Direction::BOTTOM | Direction::TOP_LEFT)))
+	{ index = 30; revert = true; }
+	else
+	// see ICN::CLOP32: sprite 27, 28
+	if(around & (Direction::CENTER | Direction::BOTTOM | Direction::LEFT) &&
+	 !(around & (Direction::TOP | Direction::TOP_RIGHT | Direction::RIGHT | Direction::BOTTOM_LEFT)))
+	{ index = 27; revert = false; }
+	else
+	if(around & (Direction::CENTER | Direction::BOTTOM | Direction::RIGHT) &&
+	 !(around & (Direction::TOP | Direction::TOP_LEFT | Direction::LEFT | Direction::BOTTOM_RIGHT)))
+	{ index = 27; revert = true; }
+	else
+	if(around & (Direction::CENTER | Direction::LEFT | Direction::TOP) &&
+	 !(around & (Direction::TOP_LEFT | Direction::RIGHT | Direction::BOTTOM | Direction::BOTTOM_RIGHT)))
+	{ index = 28; revert = false; }
+	else
+	if(around & (Direction::CENTER | Direction::RIGHT | Direction::TOP) &&
+	 !(around & (Direction::TOP_RIGHT | Direction::LEFT | Direction::BOTTOM | Direction::BOTTOM_LEFT)))
+	{ index = 28; revert = true; }
+	else
+	// see ICN::CLOP32: sprite 31, 32, 33
+	if(around & (DIRECTION_CENTER_ROW | Direction::TOP) &&
+	 !(around & (Direction::BOTTOM | Direction::TOP_LEFT | Direction::TOP_RIGHT)))
+	{ index = 31; revert = false; }
+	else
+	if(around & (DIRECTION_CENTER_COL | Direction::RIGHT) &&
+	 !(around & (Direction::LEFT | Direction::TOP_RIGHT | Direction::BOTTOM_RIGHT)))
+	{ index = 32; revert = false; }
+	else
+	if(around & (DIRECTION_CENTER_COL | Direction::LEFT) &&
+	 !(around & (Direction::RIGHT | Direction::TOP_LEFT | Direction::BOTTOM_LEFT)))
+	{ index = 32; revert = true; }
+	else
+	if(around & (DIRECTION_CENTER_ROW | Direction::BOTTOM) &&
+	 !(around & (Direction::TOP | Direction::BOTTOM_LEFT | Direction::BOTTOM_RIGHT)))
+	{ index = 33; revert = false; }
+	else
+	// see ICN::CLOP32: sprite 0, 1, 2, 3, 4, 5
+	if(around & (DIRECTION_CENTER_ROW | DIRECTION_BOTTOM_ROW) &&
+	 !(around & (Direction::TOP)))
+	{ index = maps_index % 2 ? 0 : 1; revert = false; }
+	else
+	if(around & (DIRECTION_CENTER_ROW | DIRECTION_TOP_ROW) &&
+	 !(around & (Direction::BOTTOM)))
+	{ index = maps_index % 2 ? 4 : 5; revert = false; }
+	else
+	if(around & (DIRECTION_CENTER_COL | DIRECTION_LEFT_COL) &&
+	 !(around & (Direction::RIGHT)))
+	{ index = maps_index % 2 ? 2 : 3; revert = false; }
+	else
+	if(around & (DIRECTION_CENTER_COL | DIRECTION_RIGHT_COL) &&
+	 !(around & (Direction::LEFT)))
+	{ index = maps_index % 2 ? 2 : 3; revert = true; }
+	// unknown
+	else
+	{
+	    const Surface & sf = AGG::GetTIL(TIL::CLOF32, maps_index % 4, 0);
+	    area.BlitOnTile(dst, sf, 0, 0, mp);
+	    return;
+	}
+
+	const Sprite & sprite = AGG::GetICN(ICN::CLOP32, index, revert);
+	area.BlitOnTile(dst, sprite, (revert ? sprite.x() + TILEWIDTH - sprite.w() : sprite.x()), sprite.y(), mp);
+    }
 }

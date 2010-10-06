@@ -117,9 +117,9 @@ void Interface::Radar::Build(void)
     if(sf_black) delete sf_black;
 
     spriteArea = new Surface(w, h);
-    const Size & sizeArea = Interface::GameArea::Get().GetRectMaps();
-    const u16 & sw = static_cast<u16>(sizeArea.w * (w / static_cast<float>(world.w())));
-    const u16 & sh = static_cast<u16>(sizeArea.h * (h / static_cast<float>(world.h())));
+    const Size & rectMaps = Interface::GameArea::Get().GetRectMaps();
+    const u16 & sw = static_cast<u16>(rectMaps.w * (w / static_cast<float>(world.w())));
+    const u16 & sh = static_cast<u16>(rectMaps.h * (h / static_cast<float>(world.h())));
     spriteCursor = new Surface(sw, sh);
     cursorArea = new SpriteCursor(*spriteCursor, x, y);
 
@@ -277,10 +277,10 @@ void Interface::Radar::RedrawCursor(void)
     const Settings & conf = Settings::Get();
     if(conf.HideInterface() && !conf.ShowRadar()) return;
 
-    const Point & posArea = Interface::GameArea::Get().GetRectMaps();
+    const Point & rectMaps = Interface::GameArea::Get().GetRectMaps();
     cursorArea->Hide();
-    cursorArea->Move(x + posArea.x * w / world.w(),
-                y + posArea.y * h / world.h());
+    cursorArea->Move(x + rectMaps.x * w / world.w(),
+                y + rectMaps.y * h / world.h());
     cursorArea->Show();
 }
 
