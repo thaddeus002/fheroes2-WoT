@@ -224,7 +224,7 @@ void Kingdom::AIHeroesTurns(Heroes &hero)
 	    hero.Move(true);
 	}
 	else
-	if(Game::ShouldAnimateInfrequent(ticket, 1))
+	if(Game::ShouldAnimateInfrequent(ticket, 2))
 	{
 	    cursor.Hide();
 	    hero.Move();

@@ -27,8 +27,6 @@
 #define MAJOR_VERSION 0
 #define MINOR_VERSION 6
 
-#define ANIMATION_SPEED 23
-
 const char* strip_context(const char* c);
 
 #ifdef WITH_TTF

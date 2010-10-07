@@ -598,7 +598,7 @@ Dialog::answer_t Castle::OpenDialog(bool readonly, bool fade)
 
 		    while(le.HandleEvents() && alpha < 250)
 		    {
-    			if(Game::ShouldAnimateInfrequent(ticket, 1))
+    			if(Game::ShouldAnimateInfrequent(ticket, 2))
     			{
     			    cursor.Hide();
         		    sf.SetAlpha(alpha);
@@ -949,7 +949,7 @@ Dialog::answer_t Castle::OpenDialog(bool readonly, bool fade)
 	}
 	
 	// animation sprite
-	if(Game::ShouldAnimateInfrequent(ticket, 10))
+	if(Game::ShouldAnimateInfrequent(ticket, 20))
 	{
 	    cursor.Hide();
 	    RedrawAllBuilding(*this, cur_pt, orders_building);

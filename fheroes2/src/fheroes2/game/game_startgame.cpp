@@ -98,6 +98,8 @@ namespace Game
     void ShowWarningLostTowns(menu_t &);
 
     u32 UpdateFPS(u32, void *);
+
+    static u8 speed_animation_cicle[] = { 32, 24, 18, 13, 9, 6, 4, 3, 2, 1 };
 }
 
 void Game::MoveHeroFromArrowKeys(Heroes & hero, Direction::vector_t direct)
@@ -675,15 +677,10 @@ void Game::ShowPathOrStartMoveHero(Heroes *hero, const u16 dst_index)
     }
 }
 
-bool Game::ShouldAnimate(u32 ticket)
-{
-    return Game::ShouldAnimateInfrequent(ticket, 1);
-}
-
 bool Game::ShouldAnimateInfrequent(u32 ticket, u32 modifier)
 {
-    //TODO: Use user-selected speed instead of medium by default
-    return !(ticket % (modifier ? (ANIMATION_SPEED - (2 * Settings::Get().Animation())) * modifier : 11 - Settings::Get().Animation()));
+    const u8 & delay = speed_animation_cicle[(Settings::Get().Animation() - 1) % 10];
+    return !(ticket % (modifier ? delay * modifier : delay));
 }
 
 Game::menu_t Game::HumanTurn(void)
@@ -753,7 +750,6 @@ Game::menu_t Game::HumanTurn(void)
     I.ticks.Start();
     u32 & ticket = I.frames;
 
-    const u8 hero_move_speed = conf.PocketPC() ? (conf.ExtVeryVerySlow() ? 0 : 2) : 5;
     const bool withdelay = true;
     SDL::Time time;
 
@@ -956,7 +952,7 @@ Game::menu_t Game::HumanTurn(void)
         }
 
 	// heroes move animation
-        if(Game::ShouldAnimateInfrequent(ticket, hero_move_speed))
+        if(Game::ShouldAnimateInfrequent(ticket, 1))
         {
     	    if(Game::Focus::HEROES == global_focus.Type())
 	    {
@@ -992,7 +988,7 @@ Game::menu_t Game::HumanTurn(void)
 	}
 
 	// slow maps objects animation
-	if(0 == (ticket % 400))
+        if(Game::ShouldAnimateInfrequent(ticket, 40))
 	{
 	    Maps::IncreaseAnimationTicket();
 	    I.SetRedraw(REDRAW_GAMEAREA);

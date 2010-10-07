@@ -368,7 +368,7 @@ void AnimationRemoveObject(const Maps::Tiles & tile)
 
     while(le.HandleEvents() && alpha > 10)
     {
-	if(Game::ShouldAnimateInfrequent(ticket, 1))
+	if(Game::ShouldAnimateInfrequent(ticket, 2))
         {
 	    cursor.Hide();
 	    tile.RedrawTile(display);

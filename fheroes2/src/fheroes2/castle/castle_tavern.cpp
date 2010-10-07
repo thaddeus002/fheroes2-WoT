@@ -99,7 +99,7 @@ void Castle::OpenTavern(void)
 
 
         // animation
-	if(Game::ShouldAnimateInfrequent(speed, 8))
+	if(Game::ShouldAnimateInfrequent(speed, 6))
 	{
 	    cursor.Hide();
 

@@ -208,7 +208,7 @@ void PuzzlesDraw(const Puzzle & pzl, const Surface & sf, s16 dstx, s16 dsty)
     LocalEvent & le = LocalEvent::Get();
     while(le.HandleEvents() && 0 < alpha)
     {
-        if(Game::ShouldAnimateInfrequent(ticket, 1))
+        if(Game::ShouldAnimateInfrequent(ticket, 2))
         {
     	    cursor.Hide();
 	    display.Blit(sf, dstx, dsty);

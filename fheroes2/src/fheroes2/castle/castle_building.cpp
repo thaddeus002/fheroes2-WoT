@@ -487,7 +487,7 @@ void CastleRedrawCurrentBuilding(const Castle & castle, const Point & dst_pt, co
 
 	while(le.HandleEvents() && alpha < 250)
 	{
-    	    if(Game::ShouldAnimateInfrequent(ticket, 1))
+    	    if(Game::ShouldAnimateInfrequent(ticket, 2))
     	    {
     		cursor.Hide();
 
