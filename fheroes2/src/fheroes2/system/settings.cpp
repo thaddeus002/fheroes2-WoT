@@ -148,7 +148,7 @@ Settings::Settings() : major_version(MAJOR_VERSION), minor_version(MINOR_VERSION
     debug(DEFAULT_DEBUG), video_mode(0, 0), game_difficulty(Difficulty::NORMAL),
     my_color(Color::GRAY), cur_color(Color::GRAY), path_data_directory("data"),
     font_normal("dejavusans.ttf"), font_small("dejavusans.ttf"), force_lang("en"), size_normal(15), size_small(10),
-    sound_volume(6), music_volume(6), animation(6), game_type(0), players_colors(0), preferably_count_players(0),
+    sound_volume(6), music_volume(6), animation(DEFAULT_ANIMATION), performance(0), game_type(0), players_colors(0), preferably_count_players(0),
     port(DEFAULT_PORT), memory_limit(0)
 {
     build_version = "version: ";
@@ -296,6 +296,10 @@ bool Settings::Read(const std::string & filename)
     // animation speed
     entry = config.Find("animation");
     if(entry) animation = entry->IntParams();
+
+    // animation speed
+    entry = config.Find("force performance");
+    if(entry) performance = entry->IntParams();
 
     // network port
     port = DEFAULT_PORT;
@@ -626,6 +630,8 @@ bool Settings::CDMusic(void) const { return opt_global.Modes(GLOBAL_MUSIC_CD | G
 
 /* return animation */
 u8   Settings::Animation(void) const { return animation; }
+
+u8   Settings::Performance(void) const { return performance; }
 
 /* return full screen */
 bool Settings::FullScreen(void) const { return opt_global.Modes(GLOBAL_FULLSCREEN); }

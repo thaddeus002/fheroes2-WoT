@@ -624,7 +624,7 @@ void Heroes::FadeOut(void) const
 
     while(le.HandleEvents() && alpha > 0)
     {
-        if(Game::ShouldAnimateInfrequent(ticket, 2))
+        if(Game::AnimateInfrequent(ticket, Game::HEROES_FADE_ANIMATION))
         {
             Cursor::Get().Hide();
 
@@ -690,7 +690,7 @@ void Heroes::FadeIn(void) const
 
     while(le.HandleEvents() && alpha < 250)
     {
-        if(Game::ShouldAnimateInfrequent(ticket, 2))
+        if(Game::AnimateInfrequent(ticket, Game::HEROES_FADE_ANIMATION))
         {
             Cursor::Get().Hide();
 

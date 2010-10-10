@@ -168,7 +168,7 @@ Game::menu_t Game::MainMenu(void)
 	if(le.MousePressRight(buttonNewGame)) Dialog::Message(_("New Game"), _("Start a single or multi-player game."), Font::BIG);
 
 
-	if(Game::ShouldAnimateInfrequent(ticket, 10))
+	if(AnimateInfrequent(ticket, MAIN_MENU_ANIMATION))
 	{
 	    cursor.Hide();
 	    const Sprite & lantern12 = AGG::GetICN(ICN::SHNGANIM, ICN::AnimationFrame(ICN::SHNGANIM, 0, lantern_frame++));

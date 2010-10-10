@@ -135,6 +135,7 @@ u8 Dialog::SystemOptions(void)
 	    DrawSystemInfo(rb);
     	    cursor.Show();
     	    display.Flip();
+	    Game::SetDelayFromSettingsAnimation();
     	}
 
         // set interface

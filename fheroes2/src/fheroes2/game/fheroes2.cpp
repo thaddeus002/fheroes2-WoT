@@ -210,6 +210,8 @@ int main(int argc, char **argv)
 
 	    le.SetTapMode(conf.ExtTapMode());
 
+	    Game::SetDelayFromSettingsAnimation();
+
 	    // goto main menu
 #ifdef WITH_EDITOR
 	    Game::menu_t rs = (test ? Game::TESTING : (conf.Editor() ? Game::EDITMAINMENU : Game::MAINMENU));

@@ -564,26 +564,11 @@ const std::string & Battle2::Status::GetMessage(void) const
 }
 
 Battle2::Interface::Interface(Arena & a, u16 center) : arena(a), icn_cbkg(ICN::UNKNOWN), icn_frng(ICN::UNKNOWN), humanturn_spell(Spell::NONE),
-    humanturn_exit(true), humanturn_redraw(true), animation_delay(3), animation_frame(0), catapult_frame(0),
+    humanturn_exit(true), humanturn_redraw(true), animation_frame(0), catapult_frame(0),
     b_current(NULL), b_move(NULL), b_fly(NULL), b_current_sprite(NULL), teleport_src(MAXU16)
 {
     const Settings & conf = Settings::Get();
     bool pda = conf.QVGA();
-
-    switch(conf.Animation())
-    {
-	case 10:
-	case 9:  animation_delay = 1; break;
-	case 8:
-	case 7:  animation_delay = 2; break;
-	case 6:
-	case 5:  animation_delay = 3; break;  
-	case 4:
-	case 3:  animation_delay = 4; break;  
-	case 2:
-	case 1:  animation_delay = 5; break;
-	default: break;
-    }
 
     // border
     Display & display = Display::Get();
@@ -1866,7 +1851,7 @@ void Battle2::Interface::RedrawTroopFrameAnimation(Stats & b)
     {
 	CheckGlobalEvents(le, ticket);
 
-	if(Game::ShouldAnimateInfrequent(ticket, animation_delay))
+	if(Game::AnimateInfrequent(ticket, Game::BATTLE_FRAME_ANIMATION))
     	{
 	    cursor.Hide();
 	    Redraw();
@@ -1977,7 +1962,7 @@ void Battle2::Interface::RedrawActionAttackPart1(Stats & attacker, Stats & defen
 	attacker.ResetAnimFrame(action1);
 	RedrawTroopFrameAnimation(attacker);
     }
-    DELAY(animation_delay * 50);
+    DELAY(200);
 
     // draw missile animation
     if(archer)
@@ -2004,7 +1989,7 @@ void Battle2::Interface::RedrawActionAttackPart1(Stats & attacker, Stats & defen
 	{
 	    CheckGlobalEvents(le, ticket);
 
-	    if(Game::ShouldAnimateInfrequent(ticket, animation_delay))
+	    if(Game::AnimateInfrequent(ticket, Game::BATTLE_MISSILE_ANIMATION))
     	    {
 		cursor.Hide();
 		Redraw();
@@ -2139,7 +2124,7 @@ void Battle2::Interface::RedrawActionWinces(std::vector<TargetInfo> & targets)
     {
 	CheckGlobalEvents(le, ticket);
 
-	if(Game::ShouldAnimateInfrequent(ticket, animation_delay))
+	if(Game::AnimateInfrequent(ticket, Game::BATTLE_FRAME_ANIMATION))
     	{
 	    it = targets.begin();
 	    for(; it != targets.end(); ++it) if((*it).defender)
@@ -2168,7 +2153,7 @@ void Battle2::Interface::RedrawActionWinces(std::vector<TargetInfo> & targets)
 	++ticket;
     }
 
-    DELAY(animation_delay * 50);
+    DELAY(200);
 }
 
 void Battle2::Interface::RedrawActionKills(std::vector<TargetInfo> & targets)
@@ -2211,7 +2196,7 @@ void Battle2::Interface::RedrawActionKills(std::vector<TargetInfo> & targets)
     {
 	CheckGlobalEvents(le, ticket);
 
-	if(Game::ShouldAnimateInfrequent(ticket, animation_delay))
+	if(Game::AnimateInfrequent(ticket, Game::BATTLE_FRAME_ANIMATION))
     	{
 	    it = targets.begin();
 	    for(; it != targets.end(); ++it) if((*it).defender)
@@ -2568,7 +2553,7 @@ void Battle2::Interface::RedrawActionTowerPart1(Tower & tower, Stats & defender)
 	CheckGlobalEvents(le, ticket);
 
 	// fast draw
-	if(Game::ShouldAnimateInfrequent(ticket, animation_delay))
+	if(Game::AnimateInfrequent(ticket, Game::BATTLE_MISSILE_ANIMATION))
     	{
 	    cursor.Hide();
 	    Redraw();
@@ -2638,7 +2623,7 @@ void Battle2::Interface::RedrawActionCatapult(u8 target)
     {
 	CheckGlobalEvents(le, ticket);
 
-	if(Game::ShouldAnimateInfrequent(ticket, animation_delay))
+	if(Game::AnimateInfrequent(ticket, Game::BATTLE_CATAPULT_ANIMATION))
     	{
 	    cursor.Hide();
 	    Redraw();
@@ -2678,7 +2663,7 @@ void Battle2::Interface::RedrawActionCatapult(u8 target)
     {
 	CheckGlobalEvents(le, ticket);
 
-	if(Game::ShouldAnimateInfrequent(ticket, animation_delay))
+	if(Game::AnimateInfrequent(ticket, Game::BATTLE_CATAPULT2_ANIMATION))
 	{
 	    if(catapult_frame < 9) ++catapult_frame;
 
@@ -2702,7 +2687,7 @@ void Battle2::Interface::RedrawActionCatapult(u8 target)
     {
 	CheckGlobalEvents(le, ticket);
 
-	if(Game::ShouldAnimateInfrequent(ticket, animation_delay))
+	if(Game::AnimateInfrequent(ticket, Game::BATTLE_CATAPULT3_ANIMATION))
     	{
 	    if(catapult_frame < 9) ++catapult_frame;
 
@@ -2764,7 +2749,7 @@ void Battle2::Interface::RedrawActionArrowSpell(const Stats & target)
 	{
 	    CheckGlobalEvents(le, ticket);
 
-	    if(Game::ShouldAnimateInfrequent(ticket, animation_delay))
+	    if(Game::AnimateInfrequent(ticket, Game::BATTLE_MISSILE_ANIMATION))
     	    {
 		cursor.Hide();
 		Redraw();
@@ -2808,7 +2793,7 @@ void Battle2::Interface::RedrawActionTeleportSpell(Stats & target, const u16 dst
     {
 	CheckGlobalEvents(le, ticket);
 
-	if(Game::ShouldAnimateInfrequent(ticket, animation_delay))
+	if(Game::AnimateInfrequent(ticket, Game::BATTLE_SPELL_ANIMATION))
     	{
 	    cursor.Hide();
 	    sprite2.SetAlpha(alpha);
@@ -2833,7 +2818,7 @@ void Battle2::Interface::RedrawActionTeleportSpell(Stats & target, const u16 dst
     {
 	CheckGlobalEvents(le, ticket);
 
-	if(Game::ShouldAnimateInfrequent(ticket, animation_delay))
+	if(Game::AnimateInfrequent(ticket, Game::BATTLE_SPELL_ANIMATION))
     	{
 	    cursor.Hide();
 	    sprite2.SetAlpha(alpha);
@@ -2879,7 +2864,7 @@ void Battle2::Interface::RedrawActionSummonElementalSpell(const Stats & target)
     {
 	CheckGlobalEvents(le, ticket);
 
-	if(Game::ShouldAnimateInfrequent(ticket, animation_delay))
+	if(Game::AnimateInfrequent(ticket, Game::BATTLE_SPELL_ANIMATION))
     	{
 	    cursor.Hide();
 	    sprite2.SetAlpha(alpha);
@@ -2922,7 +2907,7 @@ void Battle2::Interface::RedrawActionMirrorImageSpell(const Stats & target, u16 
     {
 	CheckGlobalEvents(le, ticket);
 
-	if(Game::ShouldAnimateInfrequent(ticket, animation_delay))
+	if(Game::AnimateInfrequent(ticket, Game::BATTLE_SPELL_ANIMATION))
     	{
 	    cursor.Hide();
 
@@ -2990,7 +2975,7 @@ void Battle2::Interface::RedrawActionBloodLustSpell(Stats & target)
     {
 	CheckGlobalEvents(le, ticket);
 
-	if(Game::ShouldAnimateInfrequent(ticket, animation_delay))
+	if(Game::AnimateInfrequent(ticket, Game::BATTLE_SPELL_ANIMATION))
     	{
 	    cursor.Hide();
 	    sprite3.SetAlpha(alpha);
@@ -3055,7 +3040,7 @@ void Battle2::Interface::RedrawActionColdRaySpell(Stats & target)
     {
 	CheckGlobalEvents(le, ticket);
 
-	if(Game::ShouldAnimateInfrequent(ticket, animation_delay))
+	if(Game::AnimateInfrequent(ticket, Game::BATTLE_SPELL_ANIMATION))
     	{
 	    cursor.Hide();
 	    const Sprite & sprite = AGG::GetICN(icn, frame);
@@ -3099,7 +3084,7 @@ void Battle2::Interface::RedrawActionResurrectSpell(Stats & target, u8 spell)
 	{
 	    CheckGlobalEvents(le, ticket);
 
-	    if(Game::ShouldAnimateInfrequent(ticket, animation_delay))
+	    if(Game::AnimateInfrequent(ticket, Game::BATTLE_SPELL_ANIMATION))
     	    {
 		cursor.Hide();
 		Redraw();
@@ -3164,7 +3149,7 @@ void Battle2::Interface::RedrawActionDisruptingRaySpell(Stats & target)
     {
 	CheckGlobalEvents(le, ticket);
 
-	if(Game::ShouldAnimateInfrequent(ticket, 2))
+	if(Game::AnimateInfrequent(ticket, Game::BATTLE_SPELL_ANIMATION))
     	{
 	    cursor.Hide();
 	    const Sprite & sprite = AGG::GetICN(icn, frame);
@@ -3234,7 +3219,7 @@ void Battle2::Interface::RedrawActionColdRingSpell(const u16 dst, const std::vec
     {
 	CheckGlobalEvents(le, ticket);
 
-	if(Game::ShouldAnimateInfrequent(ticket, animation_delay))
+	if(Game::AnimateInfrequent(ticket, Game::BATTLE_SPELL_ANIMATION))
     	{
 	    cursor.Hide();
 	    Redraw();
@@ -3289,7 +3274,7 @@ void Battle2::Interface::RedrawActionElementalStormSpell(const std::vector<Targe
     {
 	CheckGlobalEvents(le, ticket);
 
-	if(Game::ShouldAnimateInfrequent(ticket, animation_delay))
+	if(Game::AnimateInfrequent(ticket, Game::BATTLE_SPELL_ANIMATION))
     	{
 	    cursor.Hide();
 	    Redraw();
@@ -3353,7 +3338,7 @@ void Battle2::Interface::RedrawActionArmageddonSpell(const std::vector<TargetInf
     {
 	CheckGlobalEvents(le, ticket);
 
-	if(Game::ShouldAnimateInfrequent(ticket, animation_delay))
+	if(Game::AnimateInfrequent(ticket, Game::BATTLE_SPELL_ANIMATION))
     	{
 	    cursor.Hide();
 	    sprite2.SetAlpha(alpha);
@@ -3379,7 +3364,7 @@ void Battle2::Interface::RedrawActionArmageddonSpell(const std::vector<TargetInf
     {
 	CheckGlobalEvents(le, ticket);
 
-	if(Game::ShouldAnimateInfrequent(ticket, animation_delay))
+	if(Game::AnimateInfrequent(ticket, Game::BATTLE_SPELL_ANIMATION))
     	{
 	    cursor.Hide();
 	    if(restore)
@@ -3444,7 +3429,7 @@ void Battle2::Interface::RedrawActionEarthQuakeSpell(const std::vector<u8> & tar
     {
 	CheckGlobalEvents(le, ticket);
 
-	if(Game::ShouldAnimateInfrequent(ticket, animation_delay))
+	if(Game::AnimateInfrequent(ticket, Game::BATTLE_SPELL_ANIMATION))
     	{
 	    cursor.Hide();
 	    if(restore)
@@ -3483,7 +3468,7 @@ void Battle2::Interface::RedrawActionEarthQuakeSpell(const std::vector<u8> & tar
     {
 	CheckGlobalEvents(le, ticket);
 
-	if(Game::ShouldAnimateInfrequent(ticket, animation_delay))
+	if(Game::AnimateInfrequent(ticket, Game::BATTLE_SPELL_ANIMATION))
     	{
 	    cursor.Hide();
 	    Redraw();
@@ -3543,7 +3528,7 @@ void Battle2::Interface::RedrawTargetsWithFrameAnimation(const u16 dst, const st
     {
 	CheckGlobalEvents(le, ticket);
 
-	if(Game::ShouldAnimateInfrequent(ticket, animation_delay))
+	if(Game::AnimateInfrequent(ticket, Game::BATTLE_SPELL_ANIMATION))
     	{
 	    cursor.Hide();
 	    Redraw();
@@ -3591,7 +3576,7 @@ void Battle2::Interface::RedrawTargetsWithFrameAnimation(const std::vector<Targe
     {
 	CheckGlobalEvents(le, ticket);
 
-	if(Game::ShouldAnimateInfrequent(ticket, animation_delay))
+	if(Game::AnimateInfrequent(ticket, Game::BATTLE_SPELL_ANIMATION))
     	{
 	    cursor.Hide();
 	    Redraw();
@@ -3646,7 +3631,7 @@ void Battle2::Interface::RedrawTroopWithFrameAnimation(Stats & b, ICN::icn_t icn
     {
 	CheckGlobalEvents(le, ticket);
 
-	if(Game::ShouldAnimateInfrequent(ticket, animation_delay))
+	if(Game::AnimateInfrequent(ticket, Game::BATTLE_SPELL_ANIMATION))
     	{
 	    cursor.Hide();
 	    Redraw();
@@ -3707,7 +3692,7 @@ void Battle2::Interface::RedrawBridgeAnimation(bool down)
 
 	CheckGlobalEvents(le, ticket);
 
-	if(Game::ShouldAnimateInfrequent(ticket, animation_delay))
+	if(Game::AnimateInfrequent(ticket, Game::BATTLE_BRIDGE_ANIMATION))
     	{
 	    cursor.Hide();
 	    Redraw();
@@ -3780,14 +3765,14 @@ bool Battle2::Interface::IdleTroopsAnimation(u32 ticket)
     bool res = false;
 
     // set animation
-    if(Game::ShouldAnimateInfrequent(ticket, 40 * animation_delay))
+    if(Game::AnimateInfrequent(ticket, Game::BATTLE_IDLE_ANIMATION))
     {
 	if(ArmySetIdleAnimation(arena.army1)) res = true;
 	if(ArmySetIdleAnimation(arena.army2)) res = true;
     }
     else
     // next animation
-    if(Game::ShouldAnimateInfrequent(ticket, 5 * animation_delay))
+    if(Game::AnimateInfrequent(ticket, Game::BATTLE_IDLE2_ANIMATION))
     {
 	if(ArmyNextIdleAnimation(arena.army1)) res = true;
 	if(ArmyNextIdleAnimation(arena.army2)) res = true;
@@ -3802,7 +3787,7 @@ void Battle2::Interface::CheckGlobalEvents(LocalEvent & le, u32 ticket)
     if(le.KeyPress() && Settings::Get().AutoBattle()) ResetAutoBattle();
 
     // animation opponents
-    if(Game::ShouldAnimateInfrequent(ticket, animation_delay * 2))
+    if(Game::AnimateInfrequent(ticket, Game::BATTLE_OPPONENTS_ANIMATION))
     {
 	if(opponent1)
 	{
@@ -3817,7 +3802,7 @@ void Battle2::Interface::CheckGlobalEvents(LocalEvent & le, u32 ticket)
     }
 
     // animation flags
-    if(Game::ShouldAnimateInfrequent(ticket, animation_delay * 5))
+    if(Game::AnimateInfrequent(ticket, Game::BATTLE_FLAGS_ANIMATION))
     {
 	if(opponent1 && opponent1->isFinishFrame()) opponent1->ResetAnimFrame(OP_IDLE);
 	if(opponent2 && opponent2->isFinishFrame()) opponent2->ResetAnimFrame(OP_IDLE);

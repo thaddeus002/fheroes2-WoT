@@ -69,7 +69,7 @@ void TestMonsterSprite(void)
     u8 start = 0;
     u8 count = AGG::GetICNCount(b.ICNFile());
     u8 frame = 0;
-    u8 speed = 10;
+    u8 speed = 100;
 
     str.clear();
     String::AddInt(str, frame);
@@ -158,7 +158,7 @@ void TestMonsterSprite(void)
 	    }
 	}
 
-        if(Game::ShouldAnimateInfrequent(ticket, speed))
+        if(0 == (ticket % speed))
         {
             cursor.Hide();
             const Sprite & sprite = AGG::GetICN(b.ICNFile(), frame);

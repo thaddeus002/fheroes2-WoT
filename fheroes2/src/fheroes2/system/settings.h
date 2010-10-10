@@ -143,6 +143,7 @@ public:
     u8 MinorVersion(void) const;
     u16 Debug(void) const;
     u8 Animation(void) const;
+    u8 Performance(void) const;
     u32 MemoryLimit(void) const;
 
     const std::string & BuildVersion(void) const;
@@ -364,6 +365,7 @@ private:
     u8 sound_volume;
     u8 music_volume;
     u8 animation;
+    u8 performance;
 
     u8 game_type;
     u8 players_colors;

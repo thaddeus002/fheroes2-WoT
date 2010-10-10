@@ -96,10 +96,6 @@ namespace Game
     void NewWeekDialog(void);
     void ShowEventDay(void);
     void ShowWarningLostTowns(menu_t &);
-
-    u32 UpdateFPS(u32, void *);
-
-    static u8 speed_animation_cicle[] = { 32, 24, 18, 13, 9, 6, 4, 3, 2, 1 };
 }
 
 void Game::MoveHeroFromArrowKeys(Heroes & hero, Direction::vector_t direct)
@@ -677,12 +673,6 @@ void Game::ShowPathOrStartMoveHero(Heroes *hero, const u16 dst_index)
     }
 }
 
-bool Game::ShouldAnimateInfrequent(u32 ticket, u32 modifier)
-{
-    const u8 & delay = speed_animation_cicle[(Settings::Get().Animation() - 1) % 10];
-    return !(ticket % (modifier ? delay * modifier : delay));
-}
-
 Game::menu_t Game::HumanTurn(void)
 {
     Game::Focus & global_focus = Focus::Get();
@@ -923,7 +913,7 @@ Game::menu_t Game::HumanTurn(void)
 	}
 
         // fast scroll
-	if(I.gameArea.NeedScroll())
+	if(I.gameArea.NeedScroll() && AnimateInfrequent(ticket, SCROLL_ANIMATION))
         {
     	    cursor.Hide();
 
@@ -952,7 +942,7 @@ Game::menu_t Game::HumanTurn(void)
         }
 
 	// heroes move animation
-        if(Game::ShouldAnimateInfrequent(ticket, 1))
+        if(AnimateInfrequent(ticket, HEROES_MOVE_ANIMATION))
         {
     	    if(Game::Focus::HEROES == global_focus.Type())
 	    {
@@ -988,7 +978,7 @@ Game::menu_t Game::HumanTurn(void)
 	}
 
 	// slow maps objects animation
-        if(Game::ShouldAnimateInfrequent(ticket, 40))
+        if(AnimateInfrequent(ticket, MAPS_ANIMATION))
 	{
 	    Maps::IncreaseAnimationTicket();
 	    I.SetRedraw(REDRAW_GAMEAREA);

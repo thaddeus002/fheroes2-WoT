@@ -224,14 +224,21 @@ void Kingdom::AIHeroesTurns(Heroes &hero)
 	    hero.Move(true);
 	}
 	else
-	if(Game::ShouldAnimateInfrequent(ticket, 2))
+	if(Game::AnimateInfrequent(ticket, Game::AI_MOVE_ANIMATION))
 	{
 	    cursor.Hide();
 	    hero.Move();
 
-    	    if(Game::ShouldAnimateInfrequent(ticket, 12)) Maps::IncreaseAnimationTicket();
-
 	    I.gameArea.Center(hero.GetCenter());
+	    I.Redraw(REDRAW_GAMEAREA);
+	    cursor.Show();
+	    display.Flip();
+	}
+
+    	if(Game::AnimateInfrequent(ticket, Game::MAPS_ANIMATION))
+	{
+	    Maps::IncreaseAnimationTicket();
+	    cursor.Hide();
 	    I.Redraw(REDRAW_GAMEAREA);
 	    cursor.Show();
 	    display.Flip();

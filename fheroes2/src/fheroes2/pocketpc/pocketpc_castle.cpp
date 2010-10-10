@@ -761,7 +761,7 @@ screen_t CastleOpenDialog5(Castle & castle)
 	}
 
         // animation
-        if(castle.isBuild(BUILD_TAVERN) && Game::ShouldAnimateInfrequent(ticket, 15))
+        if(castle.isBuild(BUILD_TAVERN) && Game::AnimateInfrequent(ticket, Game::CASTLE_TAVERN_ANIMATION))
         {
             cursor.Hide();
 	    const Sprite & s20 = AGG::GetICN(ICN::TAVWIN, 1);

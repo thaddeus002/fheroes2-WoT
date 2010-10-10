@@ -66,4 +66,7 @@ const char* strip_context(const char* c);
 #define RADARWIDTH			144
 #define BORDERWIDTH			16
 
+//
+#define DEFAULT_ANIMATION		6
+
 #endif

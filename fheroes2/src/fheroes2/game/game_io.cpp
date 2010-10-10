@@ -99,10 +99,7 @@ bool Game::Load(const std::string & fn)
     DEBUG(DBG_GAME , DBG_INFO, "Game::Load: " << fn);
 
     // loading info
-    Display & display = Display::Get();
-    display.Fill(0, 0, 0);
-    TextBox(_("Maps Loading..."), Font::BIG, Rect(0, display.h()/2, display.w(), display.h()/2));
-    display.Flip();
+    Game::ShowLoadMapsText();
 
     Game::IO msg;
     if(!msg.LoadSAV(fn) || !Game::IO::LoadBIN(msg)) return false;

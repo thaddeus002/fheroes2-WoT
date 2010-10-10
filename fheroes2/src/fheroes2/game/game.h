@@ -69,6 +69,38 @@ namespace Game
     enum control_t { NONE = 0, LOCAL = 1, REMOTE = 2, AI = 4 };
     enum distance_t { VIEW_TOWN  = 0, VIEW_CASTLE = 1, VIEW_HEROES = 2, VIEW_TELESCOPE = 3, VIEW_OBSERVATION_TOWER = 4, VIEW_MAGI_EYES = 5 };
 
+    enum delay_t
+    {
+	SCROLL_ANIMATION,
+	MAIN_MENU_ANIMATION,
+	MAPS_ANIMATION,
+	CASTLE_TAVERN_ANIMATION,
+	CASTLE_AROUND_ANIMATION,
+	CASTLE_BUYHERO_ANIMATION,
+	CASTLE_BUILD_ANIMATION,
+	AI_MOVE_ANIMATION,
+	HEROES_MOVE_ANIMATION,
+	HEROES_FADE_ANIMATION,
+	HEROES_PICKUP_ANIMATION,
+	PUZZLE_FADE_ANIMATION,
+	BATTLE_DIALOG_ANIMATION,
+	BATTLE_FRAME_ANIMATION,
+	BATTLE_MISSILE_ANIMATION,
+	BATTLE_SPELL_ANIMATION,
+	BATTLE_CATAPULT_ANIMATION,
+	BATTLE_CATAPULT2_ANIMATION,
+	BATTLE_CATAPULT3_ANIMATION,
+	BATTLE_BRIDGE_ANIMATION,
+	BATTLE_IDLE_ANIMATION,
+	BATTLE_IDLE2_ANIMATION,
+	BATTLE_OPPONENTS_ANIMATION,
+	BATTLE_FLAGS_ANIMATION,
+	LAST_ANIMATION
+    };
+
+    bool AnimateInfrequent(u32, delay_t);
+    void SetDelayFromSettingsAnimation(void);
+
     control_t GetControl(u8);
     type_t GetType(u8);
 
@@ -96,7 +128,6 @@ namespace Game
 
     void DrawInterface(void);
     
-    bool ShouldAnimateInfrequent(u32 ticket, u32 modifier);
     void SetFixVideoMode(void);
     
     void EnvironmentSoundMixer(void);

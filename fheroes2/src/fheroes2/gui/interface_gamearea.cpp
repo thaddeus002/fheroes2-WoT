@@ -30,7 +30,7 @@
 #include "route.h"
 #include "interface_gamearea.h"
 
-#define SCROLL_MIN	TILEWIDTH / 8
+#define SCROLL_MIN	8
 #define SCROLL_MAX	TILEWIDTH
 
 namespace Game

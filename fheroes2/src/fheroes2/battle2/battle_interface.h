@@ -199,7 +199,6 @@ namespace Battle2
 	u8   humanturn_spell;
 	bool humanturn_exit;
 	bool humanturn_redraw;
-	u8 animation_delay;
 	u32 animation_frame;
 	u8 catapult_frame;
 
