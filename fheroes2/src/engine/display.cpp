@@ -56,6 +56,13 @@ void UpdateRects::SetVideoMode(u16 dw, u16 dh)
 	bf = 3;
     }
 
+    // fix bw and bf
+    while(((dw % bw) || (dh % bw)) && 1 < bf)
+    {
+	bw >>= 1;
+	--bf;
+    }
+
     len = ((dw >> bf) * (dh >> bf)) >> 3;
 
     if(bits) delete [] bits;
