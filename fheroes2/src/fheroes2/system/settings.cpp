@@ -631,7 +631,7 @@ bool Settings::CDMusic(void) const { return opt_global.Modes(GLOBAL_MUSIC_CD | G
 /* return animation */
 u8   Settings::Animation(void) const { return animation; }
 
-u8   Settings::Performance(void) const { return performance; }
+u16  Settings::Performance(void) const { return performance; }
 
 /* return full screen */
 bool Settings::FullScreen(void) const { return opt_global.Modes(GLOBAL_FULLSCREEN); }

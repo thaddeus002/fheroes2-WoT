@@ -821,9 +821,6 @@ Game::menu_t Game::HumanTurn(void)
 
 	if(conf.ExtTapMode())
 	{
-	    // disable right click emulation
-	    le.SetTapMode(false);
-
 	    // scroll area maps left
 	    if(le.MouseCursor(I.GetAreaScrollLeft()) && le.MousePressLeft()) I.gameArea.SetScroll(SCROLL_LEFT);
     	    else
@@ -835,6 +832,10 @@ Game::menu_t Game::HumanTurn(void)
 	    else
 	    // scroll area maps bottom
 	    if(le.MouseCursor(I.GetAreaScrollBottom()) && le.MousePressLeft()) I.gameArea.SetScroll(SCROLL_BOTTOM);
+
+	    // disable right click emulation
+	    if(I.NeedRedraw())
+		le.SetTapMode(false);
 	}
 	else
 	{

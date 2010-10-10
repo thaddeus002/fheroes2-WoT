@@ -119,8 +119,10 @@ void Interface::GameArea::SetAreaPosition(s16 x, s16 y, u16 w, u16 h)
 
     rectMaps.x = 0;
     rectMaps.y = 0;
-    rectMaps.w = 1 + areaPosition.w / TILEWIDTH;
-    rectMaps.h = 1 + areaPosition.h / TILEWIDTH;
+    rectMaps.w = areaPosition.w / TILEWIDTH;
+    rectMaps.h = areaPosition.h / TILEWIDTH;
+    rectMaps.w += (areaPosition.w != rectMaps.w * TILEWIDTH ? 2 : 1);
+    rectMaps.h += (areaPosition.h != rectMaps.h * TILEWIDTH ? 2 : 1);
 
     scrollOffset.x = 0;
     scrollOffset.y = 0;

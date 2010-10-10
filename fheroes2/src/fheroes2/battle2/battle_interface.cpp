@@ -1975,13 +1975,13 @@ void Battle2::Interface::RedrawActionAttackPart1(Stats & attacker, Stats & defen
 	{
 	    const Point line_from(pos1.x + (attacker.isReflect() ? -5 : pos1.w), pos1.y + attacker.GetStartMissileOffset(action1) / 2);
 	    const Point line_to(pos2.x + (attacker.isReflect() ? pos1.w : 0), pos2.y);
-	    GetLinePoints(line_from, line_to, missile.w(), points);
+	    GetLinePoints(line_from, line_to, (missile.w() < 8 ? 8 : missile.w()), points);
 	}
 	else
 	{
 	    const Point line_from(pos1.x + (attacker.isReflect() ? -10 : pos1.w), pos1.y + attacker.GetStartMissileOffset(action1));
 	    const Point line_to(pos2.x + (attacker.isReflect() ? pos1.w : 0), pos2.y);
-	    GetLinePoints(line_from, line_to, missile.w(), points);
+	    GetLinePoints(line_from, line_to, (missile.w() < 8 ? 8 : missile.w()), points);
 	}
 
 	pnt = points.begin();
