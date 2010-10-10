@@ -116,7 +116,7 @@ Game::menu_t Game::Credits(void)
 
 bool Game::AnimateInfrequent(u32 tick, delay_t dl)
 {
-    return 0 == (tick % delays[dl]);
+    return 0 == delays[dl] || 0 == (tick % delays[dl]);
 }
 
 void Game::SetDelayFromSettingsAnimation(void)
