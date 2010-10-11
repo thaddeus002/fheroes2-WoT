@@ -3857,7 +3857,7 @@ void Battle2::Interface::ProcessingHeroDialogResult(u8 res, Actions & a)
 
 	// retreat
 	case 2:
-	    if(b_current->GetCommander() && 
+	    if(b_current->GetCommander() && arena.CanRetreatOpponent(b_current->GetColor()) &&
 		Dialog::YES == Dialog::Message("", _("Are you sure you want to retreat?"), Font::BIG, Dialog::YES | Dialog::NO))
 	    {
 		a.AddedRetreatAction();
