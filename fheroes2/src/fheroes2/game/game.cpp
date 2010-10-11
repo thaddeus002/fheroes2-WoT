@@ -55,22 +55,22 @@ namespace Game
     static u8 whirlpool_percent = 50;
     static u8 heroes_restore_spell_points_day = 1;
 
-    const static u16 performance0 = 172; // my athlon 64
+    const static u16 performance0 = 22; // ibm thinkpad x200 (linux)
     static u16 performance = 0;	// your performance
     static u16 delays[] = {
 	5,	// SCROLL_ANIMATION
-	150,	// MAIN_MENU_ANIMATION
+	400,	// MAIN_MENU_ANIMATION
 	1200,	// MAPS_ANIMATION
 	300,	// CASTLE_TAVERN_ANIMATION
 	300,	// CASTLE_AROUND_ANIMATION
 	100,	// CASTLE_BUYHERO_ANIMATION
 	100,	// CASTLE_BUILD_ANIMATION
-	30,	// HEROES_MOVE_ANIMATION
+	80,	// HEROES_MOVE_ANIMATION
 	50,	// HEROES_FADE_ANIMATION
 	50,	// HEROES_PICKUP_ANIMATION
 	50,	// PUZZLE_FADE_ANIMATION
 	300,	// BATTLE_DIALOG_ANIMATON
-	80,	// BATTLE_FRAME_ANIMATION
+	60,	// BATTLE_FRAME_ANIMATION
 	500,	// BATTLE_MISSILE_ANIMATION
 	300,	// BATTLE_SPELL_ANIMATION
 	4000,	// BATTLE_CATAPULT_ANIMATION  // catapult
@@ -85,37 +85,6 @@ namespace Game
 	0,	// CURRENT_AI_ANIMATION
 	0
     };
-/*
-    const static u16 performance0 = 22; // ibm thinkpad x200 (linux)
-    static u16 delays[] = {
-	5,	// SCROLL_ANIMATION
-	150,	// MAIN_MENU_ANIMATION
-	1200,	// MAPS_ANIMATION
-	300,	// CASTLE_TAVERN_ANIMATION
-	300,	// CASTLE_AROUND_ANIMATION
-	100,	// CASTLE_BUYHERO_ANIMATION
-	100,	// CASTLE_BUILD_ANIMATION
-	30,	// HEROES_MOVE_ANIMATION
-	50,	// HEROES_FADE_ANIMATION
-	50,	// HEROES_PICKUP_ANIMATION
-	50,	// PUZZLE_FADE_ANIMATION
-	300,	// BATTLE_DIALOG_ANIMATON
-	80,	// BATTLE_FRAME_ANIMATION
-	500,	// BATTLE_MISSILE_ANIMATION
-	300,	// BATTLE_SPELL_ANIMATION
-	4000,	// BATTLE_CATAPULT_ANIMATION  // catapult
-	2000,	// BATTLE_CATAPULT2_ANIMATION // boulder
-	100,	// BATTLE_CATAPULT3_ANIMATION // cloud
-	4000,	// BATTLE_BRIDGE_ANIMATION
-	1000,	// BATTLE_IDLE_ANIMATION
-	200,	// BATTLE_IDLE2_ANIMATION
-	200,	// BATTLE_OPPONENTS_ANIMATION
-	300,	// BATTLE_FLAGS_ANIMATION
-	0,	// CURRENT_HERO_ANIMATION
-	0,	// CURRENT_AI_ANIMATION
-	0
-    };
-*/
 }
 
 Game::menu_t Game::Testing(u8 t)
@@ -387,6 +356,7 @@ void Game::ShowLoadMapsText(void)
     TextBox text(_("Maps Loading..."), Font::BIG, pos.w);
 
     // blit test
+    display.Fill(0, 0, 0);
     text.Blit(pos, display);
     display.Flip();
 }
