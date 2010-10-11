@@ -14,6 +14,12 @@ ifndef WITHOUT_AUDIOCD
 CFLAGS := $(CFLAGS) -DWITH_AUDIOCD
 endif
 
+ifdef WITH_ICONS
+IDICON := 1099
+CFLAGS := $(CFLAGS) -DID_ICON=$(IDICON)
+export IDICON
+endif
+
 AR := i686-pc-mingw32-ar
 CXX := i686-pc-mingw32-g++
 WINDRES := i686-pc-mingw32-windres
