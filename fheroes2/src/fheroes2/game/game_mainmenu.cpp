@@ -94,6 +94,7 @@ Game::menu_t Game::MainMenu(void)
 
     u32 ticket = 0;
     u32 lantern_frame = 0;
+    SDL::Time tick;
 
     struct ButtonInfo
     {
@@ -170,11 +171,14 @@ Game::menu_t Game::MainMenu(void)
 
 	if(AnimateInfrequent(ticket, MAIN_MENU_ANIMATION))
 	{
+	    tick.Stop();
 	    cursor.Hide();
 	    const Sprite & lantern12 = AGG::GetICN(ICN::SHNGANIM, ICN::AnimationFrame(ICN::SHNGANIM, 0, lantern_frame++));
 	    display.Blit(lantern12, top.x + lantern12.x(), top.y + lantern12.y());
 	    cursor.Show();
 	    display.Flip();
+	    tick.Print();
+	    tick.Start();
 	}
 
 	++ticket;

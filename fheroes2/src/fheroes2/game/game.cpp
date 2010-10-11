@@ -55,8 +55,9 @@ namespace Game
     static u8 whirlpool_percent = 50;
     static u8 heroes_restore_spell_points_day = 1;
 
-    const static u16 performance0 = 22; // ibm thinkpad x200 (linux)
-    static u16 delays0[] = {
+    const static u16 performance0 = 172; // my athlon 64
+    static u16 performance = 0;	// your performance
+    static u16 delays[] = {
 	5,	// SCROLL_ANIMATION
 	150,	// MAIN_MENU_ANIMATION
 	1200,	// MAPS_ANIMATION
@@ -64,7 +65,6 @@ namespace Game
 	300,	// CASTLE_AROUND_ANIMATION
 	100,	// CASTLE_BUYHERO_ANIMATION
 	100,	// CASTLE_BUILD_ANIMATION
-	40,	// AI_MOVE_ANIMATION
 	30,	// HEROES_MOVE_ANIMATION
 	50,	// HEROES_FADE_ANIMATION
 	50,	// HEROES_PICKUP_ANIMATION
@@ -81,11 +81,41 @@ namespace Game
 	200,	// BATTLE_IDLE2_ANIMATION
 	200,	// BATTLE_OPPONENTS_ANIMATION
 	300,	// BATTLE_FLAGS_ANIMATION
+	0,	// CURRENT_HERO_ANIMATION
+	0,	// CURRENT_AI_ANIMATION
 	0
     };
-
-    static u16 performance = 0;	// your performance
-    static u16 delays[LAST_ANIMATION + 1];
+/*
+    const static u16 performance0 = 22; // ibm thinkpad x200 (linux)
+    static u16 delays[] = {
+	5,	// SCROLL_ANIMATION
+	150,	// MAIN_MENU_ANIMATION
+	1200,	// MAPS_ANIMATION
+	300,	// CASTLE_TAVERN_ANIMATION
+	300,	// CASTLE_AROUND_ANIMATION
+	100,	// CASTLE_BUYHERO_ANIMATION
+	100,	// CASTLE_BUILD_ANIMATION
+	30,	// HEROES_MOVE_ANIMATION
+	50,	// HEROES_FADE_ANIMATION
+	50,	// HEROES_PICKUP_ANIMATION
+	50,	// PUZZLE_FADE_ANIMATION
+	300,	// BATTLE_DIALOG_ANIMATON
+	80,	// BATTLE_FRAME_ANIMATION
+	500,	// BATTLE_MISSILE_ANIMATION
+	300,	// BATTLE_SPELL_ANIMATION
+	4000,	// BATTLE_CATAPULT_ANIMATION  // catapult
+	2000,	// BATTLE_CATAPULT2_ANIMATION // boulder
+	100,	// BATTLE_CATAPULT3_ANIMATION // cloud
+	4000,	// BATTLE_BRIDGE_ANIMATION
+	1000,	// BATTLE_IDLE_ANIMATION
+	200,	// BATTLE_IDLE2_ANIMATION
+	200,	// BATTLE_OPPONENTS_ANIMATION
+	300,	// BATTLE_FLAGS_ANIMATION
+	0,	// CURRENT_HERO_ANIMATION
+	0,	// CURRENT_AI_ANIMATION
+	0
+    };
+*/
 }
 
 Game::menu_t Game::Testing(u8 t)
@@ -119,29 +149,40 @@ bool Game::AnimateInfrequent(u32 tick, delay_t dl)
     return 0 == delays[dl] || 0 == (tick % delays[dl]);
 }
 
-void Game::SetDelayFromSettingsAnimation(void)
+void Game::SetPerformance(u16 val)
 {
-    if(0 == performance)
-    {
-	std::copy(delays0, delays0 + LAST_ANIMATION + 1, delays);
-    }
-    else
-    {
-	u8 delta = std::abs(Settings::Get().Animation() - DEFAULT_ANIMATION);
+    performance = val;
 
+    if(performance != performance0)
 	for(u8 ii = 0; ii < LAST_ANIMATION; ++ii)
-	{
-	    double value = delays0[ii] * delta * 10 / 100;
+	    delays[ii] = performance0 * delays[ii] / performance;
 
-	    if(Settings::Get().Animation() > DEFAULT_ANIMATION)
-		delays[ii] = delays0[ii] - value;
-	    else
-	    if(Settings::Get().Animation() < DEFAULT_ANIMATION)
-	        delays[ii] = delays0[ii] + value;
-	    else
-		delays[ii] = delays0[ii];
-	}
+    UpdateHeroesMoveSpeed();
+
+    if(IS_DEBUG(DBG_GAME, DBG_INFO))
+    {
+	VERBOSE("performance: " << performance);
+	for(int ii = 0; ii < LAST_ANIMATION; ++ii)
+	    VERBOSE("delays[" << ii << "] = " << delays[ii]);
     }
+}
+
+void Game::UpdateHeroesMoveSpeed(void)
+{
+    const Settings & conf = Settings::Get();
+
+    float hr_value = (conf.HeroesMoveSpeed() - DEFAULT_ANIMATION) * delays[HEROES_MOVE_ANIMATION] / DEFAULT_ANIMATION;
+    float ai_value = (conf.AIMoveSpeed() - DEFAULT_ANIMATION) * delays[HEROES_MOVE_ANIMATION] / DEFAULT_ANIMATION;
+
+    if(conf.HeroesMoveSpeed() == DEFAULT_ANIMATION)
+	delays[CURRENT_HERO_ANIMATION] = delays[HEROES_MOVE_ANIMATION];
+    else
+	delays[CURRENT_HERO_ANIMATION] = delays[HEROES_MOVE_ANIMATION] - static_cast<s16>(hr_value);
+
+    if(conf.AIMoveSpeed() == DEFAULT_ANIMATION)
+	delays[CURRENT_AI_ANIMATION] = delays[HEROES_MOVE_ANIMATION];
+    else
+	delays[CURRENT_AI_ANIMATION] = delays[HEROES_MOVE_ANIMATION] - static_cast<s16>(ai_value);
 }
 
 void Game::SetFixVideoMode(void)
@@ -341,47 +382,13 @@ void Game::KeyboardGlobalFilter(u32 sym, u16 mod)
 
 void Game::ShowLoadMapsText(void)
 {
-    SDL::Time time;
     Display & display = Display::Get();
     const Rect pos(0, display.h() / 2, display.w(), display.h() / 2);
     TextBox text(_("Maps Loading..."), Font::BIG, pos.w);
-    Surface sf1, sf2;
-    sf1.Set(display.w(), display.h());
-    sf2.Set(display.w(), display.h());
-    sf1.Fill(1, 1, 1);
-    sf2.Fill(2, 2, 2);
 
-    // blit test and check performance
-    for(int ii = 0; ii < 10; ++ii)
-    {
-        time.Start();
-	display.Blit(sf1);
-	text.Blit(pos, display);
-	display.Flip();
-	display.Blit(sf2);
-	text.Blit(pos, display);
-	display.Flip();
-        time.Stop();
-        performance += time.Get();
-    }
-    performance /= 10;
-
-    // set force performance
-    if(Settings::Get().Performance())
-	performance = Settings::Get().Performance();
-
-    if(performance != performance0)
-	for(u8 ii = 0; ii < LAST_ANIMATION; ++ii)
-	    delays0[ii] = performance0 * delays0[ii] / performance;
-
-    SetDelayFromSettingsAnimation();
-
-    if(IS_DEBUG(DBG_GAME, DBG_INFO))
-    {
-	VERBOSE("performance: " << performance);
-	for(int ii = 0; ii < LAST_ANIMATION; ++ii)
-	    VERBOSE("delays[" << ii << "] = " << delays[ii]);
-    }
+    // blit test
+    text.Blit(pos, display);
+    display.Flip();
 }
 
 u8 Game::GetLostTownDays(void)

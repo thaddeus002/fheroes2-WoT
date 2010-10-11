@@ -943,14 +943,14 @@ Game::menu_t Game::HumanTurn(void)
         }
 
 	// heroes move animation
-        if(AnimateInfrequent(ticket, HEROES_MOVE_ANIMATION))
+        if(AnimateInfrequent(ticket, CURRENT_HERO_ANIMATION))
         {
     	    if(Game::Focus::HEROES == global_focus.Type())
 	    {
 		Heroes & hero = global_focus.GetHeroes();
 		if(hero.isEnableMove())
 		{
-		    if(hero.Move())
+		    if(hero.Move(0 == conf.HeroesMoveSpeed()))
 		    {
             		I.gameArea.Center(global_focus.Center());
             		global_focus.Reset(Focus::HEROES);

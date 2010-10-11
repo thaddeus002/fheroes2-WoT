@@ -148,8 +148,8 @@ Settings::Settings() : major_version(MAJOR_VERSION), minor_version(MINOR_VERSION
     debug(DEFAULT_DEBUG), video_mode(0, 0), game_difficulty(Difficulty::NORMAL),
     my_color(Color::GRAY), cur_color(Color::GRAY), path_data_directory("data"),
     font_normal("dejavusans.ttf"), font_small("dejavusans.ttf"), force_lang("en"), size_normal(15), size_small(10),
-    sound_volume(6), music_volume(6), animation(DEFAULT_ANIMATION), performance(0), game_type(0), players_colors(0), preferably_count_players(0),
-    port(DEFAULT_PORT), memory_limit(0)
+    sound_volume(6), music_volume(6), heroes_speed(DEFAULT_ANIMATION), ai_speed(DEFAULT_ANIMATION), performance(0),
+    game_type(0), players_colors(0), preferably_count_players(0), port(DEFAULT_PORT), memory_limit(0)
 {
     build_version = "version: ";
     String::AddInt(build_version, MAJOR_VERSION);
@@ -295,9 +295,10 @@ bool Settings::Read(const std::string & filename)
 
     // animation speed
     entry = config.Find("animation");
-    if(entry) animation = entry->IntParams();
+    if(entry)
+	ai_speed = heroes_speed = entry->IntParams();
 
-    // animation speed
+    // set force performance
     entry = config.Find("force performance");
     if(entry) performance = entry->IntParams();
 
@@ -528,7 +529,6 @@ void Settings::Dump(std::ostream & stream) const
     stream << "music = " << (opt_global.Modes(GLOBAL_MUSIC_CD) ? "cd" : (opt_global.Modes(GLOBAL_MUSIC_MIDI) ? "midi" : (opt_global.Modes(GLOBAL_MUSIC_EXT) ? "ext" : "off"))) << std::endl;
     stream << "sound volume = " << static_cast<int>(sound_volume) << std::endl;
     stream << "music volume = " << static_cast<int>(music_volume) << std::endl;
-    stream << "animation = " << static_cast<int>(animation) << std::endl;
     stream << "fullscreen = " << (opt_global.Modes(GLOBAL_FULLSCREEN) ? "on"  : "off") << std::endl;
     stream << "alt resource = " << (opt_global.Modes(GLOBAL_ALTRESOURCE) ? "on"  : "off") << std::endl;
     stream << "debug = " << (debug ? "on"  : "off") << std::endl;
@@ -629,9 +629,19 @@ bool Settings::Music(void) const { return opt_global.Modes(GLOBAL_MUSIC); }
 bool Settings::CDMusic(void) const { return opt_global.Modes(GLOBAL_MUSIC_CD | GLOBAL_MUSIC_EXT); }
 
 /* return animation */
-u8   Settings::Animation(void) const { return animation; }
-
+u8   Settings::HeroesMoveSpeed(void) const { return heroes_speed; }
+u8   Settings::AIMoveSpeed(void) const { return ai_speed; }
 u16  Settings::Performance(void) const { return performance; }
+
+void Settings::SetAIMoveSpeed(u8 speed)
+{
+    ai_speed = (10 <= speed ? 10 : speed);
+}
+
+void Settings::SetHeroesMoveSpeed(u8 speed)
+{
+    heroes_speed = (10 <= speed ? 10 : speed);
+}
 
 /* return full screen */
 bool Settings::FullScreen(void) const { return opt_global.Modes(GLOBAL_FULLSCREEN); }
@@ -690,12 +700,6 @@ void Settings::SetSoundVolume(const u8 v)
 void Settings::SetMusicVolume(const u8 v)
 {
     music_volume = 10 <= v ? 10 : v;
-}
-
-/* animation speed: 1 - 10 */
-void Settings::SetAnimation(const u8 s)
-{
-    animation = 10 <= s ? 10 : s;
 }
 
 /* check game type */
@@ -1315,10 +1319,21 @@ void Settings::BinarySave(void) const
     const std::string binary = local_prefix + SEPARATOR + "fheroes2.bin";
     QueueMessage msg;
 
+    // version
     msg.Push(static_cast<u16>(CURRENT_FORMAT_VERSION));
+
+    // options
     msg.Push(opt_game());
     msg.Push(opt_world());
     msg.Push(opt_battle());
+
+    // volume
+    msg.Push(sound_volume);
+    msg.Push(music_volume);
+
+    // speed
+    msg.Push(heroes_speed);
+    msg.Push(ai_speed);
 
     msg.Save(binary.c_str());
 }
@@ -1349,6 +1364,17 @@ void Settings::BinaryLoad(void)
 
 	msg.Pop(byte32);
 	opt_battle.SetModes(byte32);
+
+	if(version > FORMAT_VERSION_1954)
+	{
+	    // volume
+	    msg.Pop(sound_volume);
+	    msg.Pop(music_volume);
+
+	    // speed
+	    msg.Pop(heroes_speed);
+	    msg.Pop(ai_speed);
+	}
     }
 }
 

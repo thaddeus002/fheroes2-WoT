@@ -71,7 +71,7 @@ u8 Dialog::SystemOptions(void)
     const Rect rect2(rb.x + 128, rb.y + 47,  64, 64);
     //const Rect rect3(rb.x + 220, rb.y + 47,  64, 64);
     const Rect rect4(rb.x + 36,  rb.y + 157, 64, 64);
-    //const Rect rect5(rb.x + 128, rb.y + 157, 64, 64);
+    const Rect rect5(rb.x + 128, rb.y + 157, 64, 64);
     //const Rect rect6(rb.x + 220, rb.y + 157, 64, 64);
     const Rect rect7(rb.x + 36,  rb.y + 267, 64, 64);
     //const Rect rect8(rb.x + 128, rb.y + 267, 64, 64);
@@ -125,17 +125,30 @@ u8 Dialog::SystemOptions(void)
     	    Music::Volume(Mixer::MaxVolume() * conf.MusicVolume() / 10);
     	}
 
-        // set animation
+        // set hero speed
         if(le.MouseClickLeft(rect4))
         {
-    	    conf.SetAnimation(10 > conf.Animation() ? conf.Animation() + 1 : 0);
+    	    conf.SetHeroesMoveSpeed(10 > conf.HeroesMoveSpeed() ? conf.HeroesMoveSpeed() + 1 : 0);
     	    result |= 0x01;
     	    cursor.Hide();
     	    display.Blit(back2, rb);
 	    DrawSystemInfo(rb);
     	    cursor.Show();
     	    display.Flip();
-	    Game::SetDelayFromSettingsAnimation();
+	    Game::UpdateHeroesMoveSpeed();
+    	}
+
+        // set ai speed
+        if(le.MouseClickLeft(rect5))
+        {
+    	    conf.SetAIMoveSpeed(10 > conf.AIMoveSpeed() ? conf.AIMoveSpeed() + 1 : 0);
+    	    result |= 0x01;
+    	    cursor.Hide();
+    	    display.Blit(back2, rb);
+	    DrawSystemInfo(rb);
+    	    cursor.Show();
+    	    display.Flip();
+	    Game::UpdateHeroesMoveSpeed();
     	}
 
         // set interface
@@ -209,27 +222,33 @@ void Dialog::DrawSystemInfo(const Point & dst)
     text.Set(str);
     text.Blit(rect3.x + (rect3.w - text.w()) / 2, rect3.y + rect3.h + 5);
 
-    // animation speed
-    const u8 is = conf.Animation() ? (conf.Animation() < 9 ? (conf.Animation() < 7 ? (conf.Animation() < 4 ? 4 : 5) : 6) : 7) : 9;
-    const Sprite & sprite4 = AGG::GetICN(ICN::SPANEL, is);
+    // hero move speed
+    const u8 is4 = conf.HeroesMoveSpeed() ? (conf.HeroesMoveSpeed() < 9 ? (conf.HeroesMoveSpeed() < 7 ? (conf.HeroesMoveSpeed() < 4 ? 4 : 5) : 6) : 7) : 9;
+    const Sprite & sprite4 = AGG::GetICN(ICN::SPANEL, is4);
     const Rect rect4(dst.x + 36, dst.y + 157, sprite4.w(), sprite4.h());
     display.Blit(sprite4, rect4);
     str.clear();
     str = _("animation");
     str += " ";
-    if(conf.Animation())
-	String::AddInt(str, conf.Animation());
+    if(conf.HeroesMoveSpeed())
+	String::AddInt(str, conf.HeroesMoveSpeed());
     else
 	str += _("off");
     text.Set(str);
     text.Blit(rect4.x + (rect4.w - text.w()) / 2, rect4.y + rect4.h + 5);
 
-    // unused
-    const Sprite & sprite5 = AGG::GetICN(ICN::SPANEL, 17);
+    // ai move speed
+    const u8 is5 = conf.AIMoveSpeed() ? (conf.AIMoveSpeed() < 9 ? (conf.AIMoveSpeed() < 7 ? (conf.AIMoveSpeed() < 4 ? 4 : 5) : 6) : 7) : 9;
+    const Sprite & sprite5 = AGG::GetICN(ICN::SPANEL, is5);
     const Rect rect5(dst.x + 128, dst.y + 157, sprite5.w(), sprite5.h());
-    display.Blit(black, rect5);
+    display.Blit(sprite5, rect5);
     str.clear();
-    str = "unused";
+    str = _("animation");
+    str += " ";
+    if(conf.AIMoveSpeed())
+	String::AddInt(str, conf.AIMoveSpeed());
+    else
+	str += _("off");
     text.Set(str);
     text.Blit(rect5.x + (rect5.w - text.w()) / 2, rect5.y + rect5.h + 5);
 

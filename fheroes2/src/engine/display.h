@@ -61,6 +61,7 @@ public:
     static void		SetVideoMode(const Size & mode, bool fullscreen = false);
     static int 		GetMaxMode(Size &, bool enable_rotate);
 
+    static u32		Performance(u16);
     static void		HideCursor(void);
     static void		ShowCursor(void);
     static void		SetCaption(const std::string & caption);

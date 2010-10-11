@@ -36,10 +36,11 @@
 #include "game_io.h"
 #include "bitmodes.h"
 
+#define FORMAT_VERSION_1966 0x07AE
 #define FORMAT_VERSION_1954 0x07A2
 #define FORMAT_VERSION_1949 0x079D
 #define FORMAT_VERSION_1861 0x0745
-#define CURRENT_FORMAT_VERSION FORMAT_VERSION_1954
+#define CURRENT_FORMAT_VERSION FORMAT_VERSION_1966
 #define LAST_FORMAT_VERSION FORMAT_VERSION_1861
 
 #define ListMapsDirectory std::list<std::string>
@@ -142,7 +143,8 @@ public:
     u8 MajorVersion(void) const;
     u8 MinorVersion(void) const;
     u16 Debug(void) const;
-    u8 Animation(void) const;
+    u8 HeroesMoveSpeed(void) const;
+    u8 AIMoveSpeed(void) const;
     u16 Performance(void) const;
     u32 MemoryLimit(void) const;
 
@@ -267,12 +269,13 @@ public:
     void SetNetworkLocalClient(bool);
     void SetNetworkDedicatedServer(bool);
     void SetMemoryLimit(u32);
+    void SetAIMoveSpeed(u8);
+    void SetHeroesMoveSpeed(u8);
 
     void SetSoundVolume(const u8 v);
     void SetMusicVolume(const u8 v);
     void ResetSound(void);
     void ResetMusic(void);
-    void SetAnimation(const u8 s);
     
     u8   GameType(void) const;
     void SetGameType(const Game::type_t type);
@@ -364,7 +367,8 @@ private:
 
     u8 sound_volume;
     u8 music_volume;
-    u8 animation;
+    u8 heroes_speed;
+    u8 ai_speed;
     u16 performance;
 
     u8 game_type;

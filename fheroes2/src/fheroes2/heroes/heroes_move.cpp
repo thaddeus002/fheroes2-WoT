@@ -42,7 +42,7 @@ void PlayWalkSound(Maps::Ground::ground_t ground)
 {
     M82::m82_t wav = M82::UNKNOWN;
 
-    const u8 speed = (4 > Settings::Get().Animation() ? 1 : (7 > Settings::Get().Animation() ? 2 : 3));
+    const u8 speed = (4 > Settings::Get().HeroesMoveSpeed() ? 1 : (7 > Settings::Get().HeroesMoveSpeed() ? 2 : 3));
 
     // play sound
     switch(ground)

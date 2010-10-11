@@ -78,7 +78,6 @@ namespace Game
 	CASTLE_AROUND_ANIMATION,
 	CASTLE_BUYHERO_ANIMATION,
 	CASTLE_BUILD_ANIMATION,
-	AI_MOVE_ANIMATION,
 	HEROES_MOVE_ANIMATION,
 	HEROES_FADE_ANIMATION,
 	HEROES_PICKUP_ANIMATION,
@@ -95,11 +94,15 @@ namespace Game
 	BATTLE_IDLE2_ANIMATION,
 	BATTLE_OPPONENTS_ANIMATION,
 	BATTLE_FLAGS_ANIMATION,
+	//
+	CURRENT_HERO_ANIMATION,
+	CURRENT_AI_ANIMATION,
 	LAST_ANIMATION
     };
 
     bool AnimateInfrequent(u32, delay_t);
-    void SetDelayFromSettingsAnimation(void);
+    void SetPerformance(u16);
+    void UpdateHeroesMoveSpeed(void);
 
     control_t GetControl(u8);
     type_t GetType(u8);

@@ -212,7 +212,7 @@ void Kingdom::AIHeroesTurns(Heroes &hero)
 	    display.Flip();
     }
 
-    bool hide_move = conf.ExtHideAIMove() ||
+    bool hide_move = (0 == conf.AIMoveSpeed()) || conf.ExtHideAIMove() ||
 	    (! IS_DEVEL() && !hero.isShow(Settings::Get().MyColor()));
 
     while(LocalEvent::Get().HandleEvents())
@@ -224,7 +224,7 @@ void Kingdom::AIHeroesTurns(Heroes &hero)
 	    hero.Move(true);
 	}
 	else
-	if(Game::AnimateInfrequent(ticket, Game::AI_MOVE_ANIMATION))
+	if(Game::AnimateInfrequent(ticket, Game::CURRENT_AI_ANIMATION))
 	{
 	    cursor.Hide();
 	    hero.Move();

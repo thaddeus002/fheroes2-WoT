@@ -67,6 +67,6 @@ const char* strip_context(const char* c);
 #define BORDERWIDTH			16
 
 //
-#define DEFAULT_ANIMATION		6
+#define DEFAULT_ANIMATION		5
 
 #endif
