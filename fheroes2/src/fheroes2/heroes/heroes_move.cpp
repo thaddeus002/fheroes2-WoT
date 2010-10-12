@@ -619,12 +619,11 @@ void Heroes::FadeOut(void) const
     gamearea.SrcRectFixed(src_rt, dst_pt1, sprite1.w(), sprite1.h());
 
     LocalEvent & le = LocalEvent::Get();
-    u32 ticket = 0;
     u8 alpha = 250;
 
     while(le.HandleEvents() && alpha > 0)
     {
-        if(Game::AnimateInfrequent(ticket, Game::HEROES_FADE_ANIMATION))
+        if(Game::AnimateInfrequent(Game::HEROES_FADE_DELAY))
         {
             Cursor::Get().Hide();
 
@@ -655,8 +654,6 @@ void Heroes::FadeOut(void) const
 	    display.Flip();
             alpha -= 10;
         }
-
-        ++ticket;
     }
 }
 
@@ -685,12 +682,11 @@ void Heroes::FadeIn(void) const
     gamearea.SrcRectFixed(src_rt, dst_pt1, sprite1.w(), sprite1.h());
 
     LocalEvent & le = LocalEvent::Get();
-    u32 ticket = 0;
     u8 alpha = 0;
 
     while(le.HandleEvents() && alpha < 250)
     {
-        if(Game::AnimateInfrequent(ticket, Game::HEROES_FADE_ANIMATION))
+        if(Game::AnimateInfrequent(Game::HEROES_FADE_DELAY))
         {
             Cursor::Get().Hide();
 
@@ -721,8 +717,6 @@ void Heroes::FadeIn(void) const
 	    display.Flip();
             alpha += 10;
         }
-
-        ++ticket;
     }
 }
 

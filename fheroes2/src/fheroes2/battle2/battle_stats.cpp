@@ -278,7 +278,12 @@ void Battle2::ModesAffected::AddMode(u32 mode, u16 duration)
 void Battle2::ModesAffected::RemoveMode(u32 mode)
 {
     iterator it = std::find_if(begin(), end(), std::bind2nd(std::mem_fun_ref(&ModeDuration::isMode), mode));
-    if(it != end()) erase(it);
+    if(it != end())
+    {
+	// erase(it)
+	if(it + 1 != end()) std::swap(*it, back());
+        pop_back();
+    }
 }
 
 void Battle2::ModesAffected::DecreaseDuration(void)

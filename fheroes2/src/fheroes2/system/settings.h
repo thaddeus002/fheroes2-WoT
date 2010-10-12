@@ -80,7 +80,7 @@ public:
 	GAME_FAST_LOAD_GAME_DIALOG	= 0x10000010,
 	GAME_REMEMBER_LAST_FOCUS	= 0x10000020,
 	GAME_SAVE_REWRITE_CONFIRM	= 0x10000040,
-	GAME_HIDE_AI_MOVE		= 0x10000080,
+	//GAME_UNUSED			= 0x10000080,
 	GAME_SHOW_SYSTEM_INFO		= 0x10000100,
 	GAME_AUTOSAVE_ON		= 0x10000200,
 	GAME_USE_FADE			= 0x10000400,
@@ -145,7 +145,6 @@ public:
     u16 Debug(void) const;
     u8 HeroesMoveSpeed(void) const;
     u8 AIMoveSpeed(void) const;
-    u16 Performance(void) const;
     u32 MemoryLimit(void) const;
 
     const std::string & BuildVersion(void) const;
@@ -226,7 +225,6 @@ public:
     bool ExtRewriteConfirm(void) const;
     bool ExtAutosaveConfirm(void) const;
     bool ExtHideCursor(void) const;
-    bool ExtHideAIMove(void) const;
     bool ExtBattleShowGrid(void) const;
     bool ExtBattleShowMouseShadow(void) const;
     bool ExtBattleShowMoveShadow(void) const;
@@ -333,6 +331,7 @@ private:
     friend class Game::IO;
 
     Settings();
+    ~Settings();
 
     BitModes opt_global;
 
@@ -369,7 +368,6 @@ private:
     u8 music_volume;
     u8 heroes_speed;
     u8 ai_speed;
-    u16 performance;
 
     u8 game_type;
     u8 players_colors;

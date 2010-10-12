@@ -397,7 +397,6 @@ Dialog::answer_t Castle::OpenDialog(bool readonly, bool fade)
     Dialog::answer_t result = Dialog::ZERO;
 
     bool army_redraw = false;
-    u32 ticket = 0;
 
     // dialog menu loop
     while(le.HandleEvents())
@@ -593,12 +592,11 @@ Dialog::answer_t Castle::OpenDialog(bool readonly, bool fade)
 		    RedrawResourcePanel(cur_pt);
 
 		    LocalEvent & le = LocalEvent::Get();
-		    u32 ticket = 0;
 		    u8 alpha = 0;
 
 		    while(le.HandleEvents() && alpha < 250)
 		    {
-    			if(Game::AnimateInfrequent(ticket, Game::CASTLE_BUYHERO_ANIMATION))
+    			if(Game::AnimateInfrequent(Game::CASTLE_BUYHERO_DELAY))
     			{
     			    cursor.Hide();
         		    sf.SetAlpha(alpha);
@@ -607,7 +605,6 @@ Dialog::answer_t Castle::OpenDialog(bool readonly, bool fade)
         		    display.Flip();
         		    alpha += 10;
     			}
-    			++ticket;
 		    }
 
 		    cursor.Hide();
@@ -949,15 +946,13 @@ Dialog::answer_t Castle::OpenDialog(bool readonly, bool fade)
 	}
 	
 	// animation sprite
-	if(Game::AnimateInfrequent(ticket, Game::CASTLE_AROUND_ANIMATION))
+	if(Game::AnimateInfrequent(Game::CASTLE_AROUND_DELAY))
 	{
 	    cursor.Hide();
 	    RedrawAllBuilding(*this, cur_pt, orders_building);
 	    cursor.Show();
 	    display.Flip();
 	}
-
-	++ticket;
     }
 
     if(castle_heroes && conf.ExtHeroRecalculateMovement())

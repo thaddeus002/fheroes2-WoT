@@ -293,7 +293,6 @@ void Battle2::Arena::DialogBattleSummary(const Result & res) const
     display.Flip();
 
     u32 frame = 0;
-    u32 ticket = 0;
 
     while(le.HandleEvents())
     {
@@ -303,7 +302,7 @@ void Battle2::Arena::DialogBattleSummary(const Result & res) const
 	if(le.KeyPress(KEY_ESCAPE) || le.KeyPress(KEY_RETURN) || le.MouseClickLeft(btn_ok)) break;
 
         // animation
-	if(!conf.QVGA() && Game::AnimateInfrequent(ticket, Game::BATTLE_DIALOG_ANIMATION))
+	if(!conf.QVGA() && Game::AnimateInfrequent(Game::BATTLE_DIALOG_DELAY))
         {
 	    const Sprite & sprite1 = AGG::GetICN(icn_anim, 0);
 	    const Sprite & sprite2 = AGG::GetICN(icn_anim, ICN::AnimationFrame(icn_anim, 1, frame));
@@ -315,8 +314,6 @@ void Battle2::Arena::DialogBattleSummary(const Result & res) const
 	    display.Flip();
 	    ++frame;
 	}
-
-	++ticket;
     }
 
     // restore background

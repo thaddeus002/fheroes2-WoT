@@ -159,8 +159,8 @@ namespace Battle2
 	void RedrawTargetsWithFrameAnimation(const std::vector<TargetInfo> &, ICN::icn_t, M82::m82_t, bool);
 	void RedrawBridgeAnimation(bool down);
 
-	bool IdleTroopsAnimation(u32);
-	void CheckGlobalEvents(LocalEvent &, u32);
+	bool IdleTroopsAnimation(void);
+	void CheckGlobalEvents(LocalEvent &);
 
 	void SetAutoBattle(const Stats &, Actions &);
 	void ResetAutoBattle(void);

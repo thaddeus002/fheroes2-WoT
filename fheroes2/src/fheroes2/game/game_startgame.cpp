@@ -694,8 +694,6 @@ Game::menu_t Game::HumanTurn(void)
 
     GameOver::Result & gameResult = GameOver::Result::Get();
 
-    bool autohide_status = conf.QVGA();
-
     // set focus
     if(Game::HOTSEAT == conf.GameType()) global_focus.Reset();
 
@@ -735,19 +733,15 @@ Game::menu_t Game::HumanTurn(void)
     // check around actions (and skip for h2 orig, bug?)
     if(!conf.ExtOnlyFirstMonsterAttack()) myKingdom.HeroesActionNewPosition();
 
-    // frame count
-    I.frames = 0;
-    I.ticks.Start();
-    u32 & ticket = I.frames;
-
-    const bool withdelay = true;
-    SDL::Time time;
+    // auto hide status
+    bool autohide_status = conf.QVGA() && conf.ShowStatus();
+    if(autohide_status) AnimateDelayReset(AUTOHIDE_STATUS_DELAY);
 
     // startgame loop
-    while(CANCEL == res && le.HandleEvents(withdelay))
+    while(CANCEL == res && le.HandleEvents())
     {
 	// for pocketpc: auto hide status if start turn
-	if(autohide_status && conf.ShowStatus() && ticket > 300)
+	if(autohide_status && AnimateInfrequent(AUTOHIDE_STATUS_DELAY))
 	{
 	    SwitchShowStatus();
 	    autohide_status = false;
@@ -835,7 +829,7 @@ Game::menu_t Game::HumanTurn(void)
 
 	    // disable right click emulation
 	    if(I.NeedRedraw())
-		le.SetTapMode(false);
+	    	le.SetTapMode(false);
 	}
 	else
 	{
@@ -914,7 +908,7 @@ Game::menu_t Game::HumanTurn(void)
 	}
 
         // fast scroll
-	if(I.gameArea.NeedScroll() && AnimateInfrequent(ticket, SCROLL_ANIMATION))
+	if(I.gameArea.NeedScroll() && AnimateInfrequent(SCROLL_DELAY))
         {
     	    cursor.Hide();
 
@@ -943,7 +937,7 @@ Game::menu_t Game::HumanTurn(void)
         }
 
 	// heroes move animation
-        if(AnimateInfrequent(ticket, CURRENT_HERO_ANIMATION))
+        if(AnimateInfrequent(CURRENT_HERO_DELAY))
         {
     	    if(Game::Focus::HEROES == global_focus.Type())
 	    {
@@ -979,7 +973,7 @@ Game::menu_t Game::HumanTurn(void)
 	}
 
 	// slow maps objects animation
-        if(AnimateInfrequent(ticket, MAPS_ANIMATION))
+        if(AnimateInfrequent(MAPS_DELAY))
 	{
 	    Maps::IncreaseAnimationTicket();
 	    I.SetRedraw(REDRAW_GAMEAREA);
@@ -998,8 +992,6 @@ Game::menu_t Game::HumanTurn(void)
     	    cursor.Show();
     	    display.Flip();
 	}
-
-	++ticket;
     }
 
     if(ENDTURN == res)

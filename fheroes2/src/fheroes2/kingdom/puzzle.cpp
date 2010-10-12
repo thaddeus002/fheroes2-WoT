@@ -204,11 +204,11 @@ void PuzzlesDraw(const Puzzle & pzl, const Surface & sf, s16 dstx, s16 dsty)
     if(IS_DEVEL()) return;
 
     u8 alpha = 250;
-    u32 ticket = 0;
     LocalEvent & le = LocalEvent::Get();
+
     while(le.HandleEvents() && 0 < alpha)
     {
-        if(Game::AnimateInfrequent(ticket, Game::PUZZLE_FADE_ANIMATION))
+        if(Game::AnimateInfrequent(Game::PUZZLE_FADE_DELAY))
         {
     	    cursor.Hide();
 	    display.Blit(sf, dstx, dsty);
@@ -238,8 +238,6 @@ void PuzzlesDraw(const Puzzle & pzl, const Surface & sf, s16 dstx, s16 dsty)
     	    display.Flip();
     	    alpha -= 10;
 	}
-
-	++ticket;
     }
     cursor.Hide();
 }

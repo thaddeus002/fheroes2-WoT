@@ -168,12 +168,6 @@ int main(int argc, char **argv)
 	    Display::HideCursor();
 	    Display::SetCaption(GetCaption());
 
-	    // set force performance
-	    if(0 == conf.Performance())
-		Game::SetPerformance(Display::Performance(1000));
-	    else
-		Game::SetPerformance(conf.Performance());
-
     	    //Ensure the mouse position is updated to prevent bad initial values.
     	    LocalEvent::Get().GetMouseCursor();
 
@@ -215,6 +209,8 @@ int main(int argc, char **argv)
 	    le.SetGlobalFilter(true);
 
 	    le.SetTapMode(conf.ExtTapMode());
+
+	    Game::AnimateDelaysInitialize();
 
 	    // goto main menu
 #ifdef WITH_EDITOR

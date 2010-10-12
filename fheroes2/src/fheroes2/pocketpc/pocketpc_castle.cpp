@@ -711,7 +711,6 @@ screen_t CastleOpenDialog5(Castle & castle)
     display.Blit(AGG::GetICN(ICN::REQUESTS, 24), rectScreen5.x, rectScreen5.y);
     if(castle.isBuild(BUILD_MAGEGUILD1)) display.Blit(AGG::GetICN(ICN::REQUESTS, 25), rectScreen6.x, rectScreen6.y);
 
-    u32 ticket = 0;
     u32 frame = 0;
     
     cursor.Show();
@@ -761,7 +760,7 @@ screen_t CastleOpenDialog5(Castle & castle)
 	}
 
         // animation
-        if(castle.isBuild(BUILD_TAVERN) && Game::AnimateInfrequent(ticket, Game::CASTLE_TAVERN_ANIMATION))
+        if(castle.isBuild(BUILD_TAVERN) && Game::AnimateInfrequent(Game::CASTLE_TAVERN_DELAY))
         {
             cursor.Hide();
 	    const Sprite & s20 = AGG::GetICN(ICN::TAVWIN, 1);
@@ -774,8 +773,6 @@ screen_t CastleOpenDialog5(Castle & castle)
     	    cursor.Show();
     	    display.Flip();
         }
-
-	++ticket;
     }
 
     return SCREENOUT;

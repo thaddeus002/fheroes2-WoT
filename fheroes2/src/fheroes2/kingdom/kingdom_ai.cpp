@@ -201,9 +201,8 @@ void Kingdom::AIHeroesTurns(Heroes &hero)
     Interface::Basic & I = Interface::Basic::Get();
 
     cursor.Hide();
-    u32 ticket = 0;
 
-    if(!Settings::Get().ExtHideAIMove() && hero.isShow(Settings::Get().MyColor()))
+    if(0 != conf.AIMoveSpeed() && hero.isShow(Settings::Get().MyColor()))
     {
 	    cursor.Hide();
 	    I.gameArea.Center(hero.GetCenter());
@@ -212,7 +211,7 @@ void Kingdom::AIHeroesTurns(Heroes &hero)
 	    display.Flip();
     }
 
-    bool hide_move = (0 == conf.AIMoveSpeed()) || conf.ExtHideAIMove() ||
+    bool hide_move = (0 == conf.AIMoveSpeed()) ||
 	    (! IS_DEVEL() && !hero.isShow(Settings::Get().MyColor()));
 
     while(LocalEvent::Get().HandleEvents())
@@ -224,7 +223,7 @@ void Kingdom::AIHeroesTurns(Heroes &hero)
 	    hero.Move(true);
 	}
 	else
-	if(Game::AnimateInfrequent(ticket, Game::CURRENT_AI_ANIMATION))
+	if(Game::AnimateInfrequent(Game::CURRENT_AI_DELAY))
 	{
 	    cursor.Hide();
 	    hero.Move();
@@ -235,7 +234,7 @@ void Kingdom::AIHeroesTurns(Heroes &hero)
 	    display.Flip();
 	}
 
-    	if(Game::AnimateInfrequent(ticket, Game::MAPS_ANIMATION))
+    	if(Game::AnimateInfrequent(Game::MAPS_DELAY))
 	{
 	    Maps::IncreaseAnimationTicket();
 	    cursor.Hide();
@@ -243,8 +242,6 @@ void Kingdom::AIHeroesTurns(Heroes &hero)
 	    cursor.Show();
 	    display.Flip();
 	}
-
-	++ticket;
     }
 
     // 0.2 sec delay for show enemy hero position

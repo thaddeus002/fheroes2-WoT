@@ -75,9 +75,6 @@ namespace Interface
 	BorderWindow & borderWindow;
 	ControlPanel & controlPanel;
 
-	u32 frames;
-	SDL::Time ticks;
-
     private:
 	Basic();
 	void RedrawSystemInfo(s16, s16, u32);

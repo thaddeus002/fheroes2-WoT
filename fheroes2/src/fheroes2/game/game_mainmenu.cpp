@@ -92,7 +92,6 @@ Game::menu_t Game::MainMenu(void)
     cursor.Show();
     display.Flip();
 
-    u32 ticket = 0;
     u32 lantern_frame = 0;
 
     struct ButtonInfo
@@ -166,7 +165,7 @@ Game::menu_t Game::MainMenu(void)
 	else
 	if(le.MousePressRight(buttonNewGame)) Dialog::Message(_("New Game"), _("Start a single or multi-player game."), Font::BIG);
 
-	if(AnimateInfrequent(ticket, MAIN_MENU_ANIMATION))
+	if(AnimateInfrequent(MAIN_MENU_DELAY))
 	{
 	    cursor.Hide();
 	    const Sprite & lantern12 = AGG::GetICN(ICN::SHNGANIM, ICN::AnimationFrame(ICN::SHNGANIM, 0, lantern_frame++));
@@ -174,8 +173,6 @@ Game::menu_t Game::MainMenu(void)
 	    cursor.Show();
 	    display.Flip();
 	}
-
-	++ticket;
     }
 
     return QUITGAME;

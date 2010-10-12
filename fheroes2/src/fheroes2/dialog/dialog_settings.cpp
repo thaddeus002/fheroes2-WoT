@@ -141,7 +141,6 @@ void Dialog::ExtSettings(void)
 #ifdef BUILD_RELEASE
     states.push_back(Settings::GAME_SHOW_SDL_LOGO);
 #endif
-    states.push_back(Settings::GAME_HIDE_AI_MOVE);
     states.push_back(Settings::WORLD_SHOW_VISITED_CONTENT);
     states.push_back(Settings::WORLD_ABANDONED_MINE_RANDOM);
     states.push_back(Settings::WORLD_SAVE_MONSTER_BATTLE);

@@ -54,37 +54,6 @@ namespace Game
     static u8 view_distance[] = { 4, 5, 4, 1, 10, 9 };
     static u8 whirlpool_percent = 50;
     static u8 heroes_restore_spell_points_day = 1;
-
-    const static u16 performance0 = 22; // ibm thinkpad x200 (linux)
-    static u16 performance = 0;	// your performance
-    static u16 delays[] = {
-	5,	// SCROLL_ANIMATION
-	400,	// MAIN_MENU_ANIMATION
-	1200,	// MAPS_ANIMATION
-	300,	// CASTLE_TAVERN_ANIMATION
-	300,	// CASTLE_AROUND_ANIMATION
-	100,	// CASTLE_BUYHERO_ANIMATION
-	100,	// CASTLE_BUILD_ANIMATION
-	80,	// HEROES_MOVE_ANIMATION
-	50,	// HEROES_FADE_ANIMATION
-	50,	// HEROES_PICKUP_ANIMATION
-	50,	// PUZZLE_FADE_ANIMATION
-	300,	// BATTLE_DIALOG_ANIMATON
-	60,	// BATTLE_FRAME_ANIMATION
-	500,	// BATTLE_MISSILE_ANIMATION
-	300,	// BATTLE_SPELL_ANIMATION
-	4000,	// BATTLE_CATAPULT_ANIMATION  // catapult
-	2000,	// BATTLE_CATAPULT2_ANIMATION // boulder
-	100,	// BATTLE_CATAPULT3_ANIMATION // cloud
-	4000,	// BATTLE_BRIDGE_ANIMATION
-	1000,	// BATTLE_IDLE_ANIMATION
-	200,	// BATTLE_IDLE2_ANIMATION
-	200,	// BATTLE_OPPONENTS_ANIMATION
-	300,	// BATTLE_FLAGS_ANIMATION
-	0,	// CURRENT_HERO_ANIMATION
-	0,	// CURRENT_AI_ANIMATION
-	0
-    };
 }
 
 Game::menu_t Game::Testing(u8 t)
@@ -111,47 +80,6 @@ Game::menu_t Game::Credits(void)
     //VERBOSE("Credits: under construction.");
 
     return Game::MAINMENU;
-}
-
-bool Game::AnimateInfrequent(u32 tick, delay_t dl)
-{
-    return 0 == delays[dl] || 0 == (tick % delays[dl]);
-}
-
-void Game::SetPerformance(u16 val)
-{
-    performance = val;
-
-    if(performance != performance0)
-	for(u8 ii = 0; ii < LAST_ANIMATION; ++ii)
-	    delays[ii] = performance0 * delays[ii] / performance;
-
-    UpdateHeroesMoveSpeed();
-
-    if(IS_DEBUG(DBG_GAME, DBG_INFO))
-    {
-	VERBOSE("performance: " << performance);
-	for(int ii = 0; ii < LAST_ANIMATION; ++ii)
-	    VERBOSE("delays[" << ii << "] = " << delays[ii]);
-    }
-}
-
-void Game::UpdateHeroesMoveSpeed(void)
-{
-    const Settings & conf = Settings::Get();
-
-    float hr_value = (conf.HeroesMoveSpeed() - DEFAULT_ANIMATION) * delays[HEROES_MOVE_ANIMATION] / DEFAULT_ANIMATION;
-    float ai_value = (conf.AIMoveSpeed() - DEFAULT_ANIMATION) * delays[HEROES_MOVE_ANIMATION] / DEFAULT_ANIMATION;
-
-    if(conf.HeroesMoveSpeed() == DEFAULT_ANIMATION)
-	delays[CURRENT_HERO_ANIMATION] = delays[HEROES_MOVE_ANIMATION];
-    else
-	delays[CURRENT_HERO_ANIMATION] = delays[HEROES_MOVE_ANIMATION] - static_cast<s16>(hr_value);
-
-    if(conf.AIMoveSpeed() == DEFAULT_ANIMATION)
-	delays[CURRENT_AI_ANIMATION] = delays[HEROES_MOVE_ANIMATION];
-    else
-	delays[CURRENT_AI_ANIMATION] = delays[HEROES_MOVE_ANIMATION] - static_cast<s16>(ai_value);
 }
 
 void Game::SetFixVideoMode(void)

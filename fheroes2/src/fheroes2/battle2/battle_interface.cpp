@@ -1353,7 +1353,6 @@ void Battle2::Interface::HumanTurn(const Stats & b, Actions & a)
 
     std::string msg;
     animation_frame = 0;
-    u32 ticket = 0;
 
     while(!humanturn_exit && le.HandleEvents())
     {
@@ -1370,9 +1369,9 @@ void Battle2::Interface::HumanTurn(const Stats & b, Actions & a)
 	}
 
 	// animation troops
-	if(IdleTroopsAnimation(ticket)) humanturn_redraw = true;
+	if(IdleTroopsAnimation()) humanturn_redraw = true;
 
-	CheckGlobalEvents(le, ticket);
+	CheckGlobalEvents(le);
 
 	// redraw arena
 	if(humanturn_redraw)
@@ -1389,8 +1388,6 @@ void Battle2::Interface::HumanTurn(const Stats & b, Actions & a)
             cursor.Show();
             display.Flip();
         }
-
-	++ticket;
     }
     
     b_current = NULL;
@@ -1845,13 +1842,11 @@ void Battle2::Interface::RedrawTroopFrameAnimation(Stats & b)
     Cursor & cursor = Cursor::Get();
     LocalEvent & le = LocalEvent::Get();
 
-    u32 ticket = 0;
-
     while(le.HandleEvents())
     {
-	CheckGlobalEvents(le, ticket);
+	CheckGlobalEvents(le);
 
-	if(Game::AnimateInfrequent(ticket, Game::BATTLE_FRAME_ANIMATION))
+	if(Game::AnimateInfrequent(Game::BATTLE_FRAME_DELAY))
     	{
 	    cursor.Hide();
 	    Redraw();
@@ -1860,7 +1855,6 @@ void Battle2::Interface::RedrawTroopFrameAnimation(Stats & b)
     	    if(b.isFinishAnimFrame()) break;
 	    b.IncreaseAnimFrame();
 	}
-	++ticket;
     }
 }
 
@@ -1891,7 +1885,6 @@ void Battle2::Interface::RedrawActionAttackPart1(Stats & attacker, Stats & defen
     b_move = &attacker;
     p_move = attacker.GetCellPosition();
 
-    u32 ticket = 0;
     u8 action0 = AS_ATTK0;
     u8 action1 = 0;
 
@@ -1987,9 +1980,9 @@ void Battle2::Interface::RedrawActionAttackPart1(Stats & attacker, Stats & defen
 	pnt = points.begin();
 	while(le.HandleEvents(false) && pnt != points.end())
 	{
-	    CheckGlobalEvents(le, ticket);
+	    CheckGlobalEvents(le);
 
-	    if(Game::AnimateInfrequent(ticket, Game::BATTLE_MISSILE_ANIMATION))
+	    if(Game::AnimateInfrequent(Game::BATTLE_MISSILE_DELAY))
     	    {
 		cursor.Hide();
 		Redraw();
@@ -1998,7 +1991,6 @@ void Battle2::Interface::RedrawActionAttackPart1(Stats & attacker, Stats & defen
 		display.Flip();
 		++pnt;
 	    }
-	    ++ticket;
 	}
     }
 
@@ -2100,7 +2092,6 @@ void Battle2::Interface::RedrawActionWinces(std::vector<TargetInfo> & targets)
     std::string msg;
     u16 py = (conf.QVGA() ? 20 : 50);
     u8 finish = 0;
-    u32 ticket = 0;
 
     for(; it != targets.end(); ++it) if((*it).defender)
     {
@@ -2122,9 +2113,9 @@ void Battle2::Interface::RedrawActionWinces(std::vector<TargetInfo> & targets)
     // targets damage animation loop
     while(le.HandleEvents() && finish != std::count_if(targets.begin(), targets.end(), std::mem_fun_ref(&TargetInfo::isFinishAnimFrame)))
     {
-	CheckGlobalEvents(le, ticket);
+	CheckGlobalEvents(le);
 
-	if(Game::AnimateInfrequent(ticket, Game::BATTLE_FRAME_ANIMATION))
+	if(Game::AnimateInfrequent(Game::BATTLE_FRAME_DELAY))
     	{
 	    it = targets.begin();
 	    for(; it != targets.end(); ++it) if((*it).defender)
@@ -2150,7 +2141,6 @@ void Battle2::Interface::RedrawActionWinces(std::vector<TargetInfo> & targets)
 	    }
 	    py += (conf.QVGA() ? 5 : 10);
 	}
-	++ticket;
     }
 
     DELAY(200);
@@ -2166,7 +2156,7 @@ void Battle2::Interface::RedrawActionKills(std::vector<TargetInfo> & targets)
     std::vector<TargetInfo>::iterator it = targets.begin();
     std::string msg;
     u8 finish = 0;
-    u32 ticket = 0;
+
     // targets killed animation
     it = targets.begin();
     finish = 0;
@@ -2194,9 +2184,9 @@ void Battle2::Interface::RedrawActionKills(std::vector<TargetInfo> & targets)
     // targets killed animation loop
     while(le.HandleEvents() && finish != std::count_if(targets.begin(), targets.end(), std::mem_fun_ref(&TargetInfo::isFinishAnimFrame)))
     {
-	CheckGlobalEvents(le, ticket);
+	CheckGlobalEvents(le);
 
-	if(Game::AnimateInfrequent(ticket, Game::BATTLE_FRAME_ANIMATION))
+	if(Game::AnimateInfrequent(Game::BATTLE_FRAME_DELAY))
     	{
 	    it = targets.begin();
 	    for(; it != targets.end(); ++it) if((*it).defender)
@@ -2211,7 +2201,6 @@ void Battle2::Interface::RedrawActionKills(std::vector<TargetInfo> & targets)
 		if(!target.defender->isValid()) target.defender->IncreaseAnimFrame();
 	    }
 	}
-	++ticket;
     }
 }
 
@@ -2533,7 +2522,6 @@ void Battle2::Interface::RedrawActionTowerPart1(Tower & tower, Stats & defender)
 
     cursor.SetThemes(Cursor::WAR_NONE);
     b_current = NULL;
-    u32 ticket = 0;
 
     const Point pos1 = tower.GetPortPosition();
     const Rect & pos2 = defender.GetCellPosition();
@@ -2550,10 +2538,10 @@ void Battle2::Interface::RedrawActionTowerPart1(Tower & tower, Stats & defender)
     pnt = points.begin();
     while(le.HandleEvents(false) && pnt != points.end())
     {
-	CheckGlobalEvents(le, ticket);
+	CheckGlobalEvents(le);
 
 	// fast draw
-	if(Game::AnimateInfrequent(ticket, Game::BATTLE_MISSILE_ANIMATION))
+	if(Game::AnimateInfrequent(Game::BATTLE_MISSILE_DELAY))
     	{
 	    cursor.Hide();
 	    Redraw();
@@ -2562,7 +2550,6 @@ void Battle2::Interface::RedrawActionTowerPart1(Tower & tower, Stats & defender)
 	    display.Flip();
 	    ++pnt;
 	}
-	++ticket;
     }
 }
 
@@ -2615,15 +2602,14 @@ void Battle2::Interface::RedrawActionCatapult(u8 target)
 
     std::vector<Point> points;
     std::vector<Point>::const_iterator pnt;
-    u32 ticket = 0;
     AGG::PlaySound(M82::CATSND00);
 
     // catapult animation
     while(le.HandleEvents(false) && catapult_frame < 6)
     {
-	CheckGlobalEvents(le, ticket);
+	CheckGlobalEvents(le);
 
-	if(Game::AnimateInfrequent(ticket, Game::BATTLE_CATAPULT_ANIMATION))
+	if(Game::AnimateInfrequent(Game::BATTLE_CATAPULT_DELAY))
     	{
 	    cursor.Hide();
 	    Redraw();
@@ -2631,7 +2617,6 @@ void Battle2::Interface::RedrawActionCatapult(u8 target)
 	    display.Flip();
 	    ++catapult_frame;
 	}
-	++ticket;
     }
 
     // boulder animation
@@ -2661,9 +2646,9 @@ void Battle2::Interface::RedrawActionCatapult(u8 target)
     pnt = points.begin();
     while(le.HandleEvents(false) && pnt != points.end())
     {
-	CheckGlobalEvents(le, ticket);
+	CheckGlobalEvents(le);
 
-	if(Game::AnimateInfrequent(ticket, Game::BATTLE_CATAPULT2_ANIMATION))
+	if(Game::AnimateInfrequent(Game::BATTLE_CATAPULT2_DELAY))
 	{
 	    if(catapult_frame < 9) ++catapult_frame;
 
@@ -2674,8 +2659,6 @@ void Battle2::Interface::RedrawActionCatapult(u8 target)
 	    display.Flip();
 	    ++pnt;
 	}
-
-	++ticket;
     }
 
     // clod
@@ -2685,9 +2668,9 @@ void Battle2::Interface::RedrawActionCatapult(u8 target)
 
     while(le.HandleEvents() && frame < AGG::GetICNCount(icn))
     {
-	CheckGlobalEvents(le, ticket);
+	CheckGlobalEvents(le);
 
-	if(Game::AnimateInfrequent(ticket, Game::BATTLE_CATAPULT3_ANIMATION))
+	if(Game::AnimateInfrequent(Game::BATTLE_CATAPULT3_DELAY))
     	{
 	    if(catapult_frame < 9) ++catapult_frame;
 
@@ -2700,8 +2683,6 @@ void Battle2::Interface::RedrawActionCatapult(u8 target)
 
 	    ++frame;
 	}
-
-	++ticket;
     }
 
     catapult_frame = 0;
@@ -2737,7 +2718,6 @@ void Battle2::Interface::RedrawActionArrowSpell(const Stats & target)
 	const Sprite & missile = AGG::GetICN(ICN::ARCH_MSL, ICN::GetMissIndex(ICN::ARCH_MSL, pt_from.x - pt_to.x, pt_from.y - pt_to.y), pt_from.x > pt_to.x);
 	std::vector<Point> points;
 	std::vector<Point>::const_iterator pnt;
-	u32 ticket = 0;
 
 	GetLinePoints(pt_from, pt_to, missile.w(), points);
 
@@ -2747,9 +2727,9 @@ void Battle2::Interface::RedrawActionArrowSpell(const Stats & target)
 	pnt = points.begin();
 	while(le.HandleEvents(false) && pnt != points.end())
 	{
-	    CheckGlobalEvents(le, ticket);
+	    CheckGlobalEvents(le);
 
-	    if(Game::AnimateInfrequent(ticket, Game::BATTLE_MISSILE_ANIMATION))
+	    if(Game::AnimateInfrequent(Game::BATTLE_MISSILE_DELAY))
     	    {
 		cursor.Hide();
 		Redraw();
@@ -2758,7 +2738,6 @@ void Battle2::Interface::RedrawActionArrowSpell(const Stats & target)
 		display.Flip();
 		++pnt;
 	    }
-	    ++ticket;
 	}
     }
 }
@@ -2769,7 +2748,6 @@ void Battle2::Interface::RedrawActionTeleportSpell(Stats & target, const u16 dst
     Cursor & cursor = Cursor::Get();
     LocalEvent & le = LocalEvent::Get();
 
-    u32 ticket = 0;
     u8 alpha = 250;
 
     const MonsterInfo & msi = target.GetMonsterInfo();
@@ -2791,9 +2769,9 @@ void Battle2::Interface::RedrawActionTeleportSpell(Stats & target, const u16 dst
 
     while(le.HandleEvents() && alpha > 30)
     {
-	CheckGlobalEvents(le, ticket);
+	CheckGlobalEvents(le);
 
-	if(Game::AnimateInfrequent(ticket, Game::BATTLE_SPELL_ANIMATION))
+	if(Game::AnimateInfrequent(Game::BATTLE_SPELL_DELAY))
     	{
 	    cursor.Hide();
 	    sprite2.SetAlpha(alpha);
@@ -2803,7 +2781,6 @@ void Battle2::Interface::RedrawActionTeleportSpell(Stats & target, const u16 dst
 
 	    alpha -= 20;
 	}
-	++ticket;
     }
 
     sprite2.SetAlpha(0);
@@ -2816,9 +2793,9 @@ void Battle2::Interface::RedrawActionTeleportSpell(Stats & target, const u16 dst
 
     while(le.HandleEvents() && alpha < 220)
     {
-	CheckGlobalEvents(le, ticket);
+	CheckGlobalEvents(le);
 
-	if(Game::AnimateInfrequent(ticket, Game::BATTLE_SPELL_ANIMATION))
+	if(Game::AnimateInfrequent(Game::BATTLE_SPELL_DELAY))
     	{
 	    cursor.Hide();
 	    sprite2.SetAlpha(alpha);
@@ -2828,7 +2805,6 @@ void Battle2::Interface::RedrawActionTeleportSpell(Stats & target, const u16 dst
 
 	    alpha += 20;
 	}
-	++ticket;
     }
 
     b_current = NULL;
@@ -2841,7 +2817,6 @@ void Battle2::Interface::RedrawActionSummonElementalSpell(const Stats & target)
     Cursor & cursor = Cursor::Get();
     LocalEvent & le = LocalEvent::Get();
 
-    u32 ticket = 0;
     u8 alpha = 0;
 
     const MonsterInfo & msi = target.GetMonsterInfo();
@@ -2862,9 +2837,9 @@ void Battle2::Interface::RedrawActionSummonElementalSpell(const Stats & target)
 
     while(le.HandleEvents() && alpha < 220)
     {
-	CheckGlobalEvents(le, ticket);
+	CheckGlobalEvents(le);
 
-	if(Game::AnimateInfrequent(ticket, Game::BATTLE_SPELL_ANIMATION))
+	if(Game::AnimateInfrequent(Game::BATTLE_SPELL_DELAY))
     	{
 	    cursor.Hide();
 	    sprite2.SetAlpha(alpha);
@@ -2874,7 +2849,6 @@ void Battle2::Interface::RedrawActionSummonElementalSpell(const Stats & target)
 
 	    alpha += 20;
 	}
-	++ticket;
     }
 
     b_current = NULL;
@@ -2887,7 +2861,6 @@ void Battle2::Interface::RedrawActionMirrorImageSpell(const Stats & target, u16 
     Cursor & cursor = Cursor::Get();
     LocalEvent & le = LocalEvent::Get();
 
-    u32 ticket = 0;
     const MonsterInfo & msi = target.GetMonsterInfo();
     const Sprite & sprite = AGG::GetICN(msi.icn_file, msi.frm_idle.start, target.reflect);
     std::vector<Point> points;
@@ -2905,9 +2878,9 @@ void Battle2::Interface::RedrawActionMirrorImageSpell(const Stats & target, u16 
     pnt = points.begin();
     while(le.HandleEvents() && pnt != points.end())
     {
-	CheckGlobalEvents(le, ticket);
+	CheckGlobalEvents(le);
 
-	if(Game::AnimateInfrequent(ticket, Game::BATTLE_SPELL_ANIMATION))
+	if(Game::AnimateInfrequent(Game::BATTLE_SPELL_DELAY))
     	{
 	    cursor.Hide();
 
@@ -2923,7 +2896,6 @@ void Battle2::Interface::RedrawActionMirrorImageSpell(const Stats & target, u16 
 
 	    ++pnt;
 	}
-	++ticket;
     }
 }
 
@@ -2951,7 +2923,6 @@ void Battle2::Interface::RedrawActionBloodLustSpell(Stats & target)
     Cursor & cursor = Cursor::Get();
     LocalEvent & le = LocalEvent::Get();
 
-    u32 ticket = 0;
     u8 alpha = 10;
 
     const MonsterInfo & msi = target.GetMonsterInfo();
@@ -2973,9 +2944,9 @@ void Battle2::Interface::RedrawActionBloodLustSpell(Stats & target)
 
     while(le.HandleEvents() && alpha < 120)
     {
-	CheckGlobalEvents(le, ticket);
+	CheckGlobalEvents(le);
 
-	if(Game::AnimateInfrequent(ticket, Game::BATTLE_SPELL_ANIMATION))
+	if(Game::AnimateInfrequent(Game::BATTLE_SPELL_DELAY))
     	{
 	    cursor.Hide();
 	    sprite3.SetAlpha(alpha);
@@ -2987,7 +2958,6 @@ void Battle2::Interface::RedrawActionBloodLustSpell(Stats & target)
 
 	    alpha += 10;
 	}
-	++ticket;
     }
 
     while(Mixer::isValid() && Mixer::isPlaying(-1)) DELAY(10);
@@ -3003,7 +2973,6 @@ void Battle2::Interface::RedrawActionColdRaySpell(Stats & target)
     LocalEvent & le = LocalEvent::Get();
 
     const ICN::icn_t icn = ICN::COLDRAY;
-    u32 ticket = 0;
     u8 frame = 0;
 
     std::vector<Point> points;
@@ -3038,9 +3007,9 @@ void Battle2::Interface::RedrawActionColdRaySpell(Stats & target)
     pnt = points.begin();
     while(le.HandleEvents() && frame < AGG::GetICNCount(icn) && pnt != points.end())
     {
-	CheckGlobalEvents(le, ticket);
+	CheckGlobalEvents(le);
 
-	if(Game::AnimateInfrequent(ticket, Game::BATTLE_SPELL_ANIMATION))
+	if(Game::AnimateInfrequent(Game::BATTLE_SPELL_DELAY))
     	{
 	    cursor.Hide();
 	    const Sprite & sprite = AGG::GetICN(icn, frame);
@@ -3051,7 +3020,6 @@ void Battle2::Interface::RedrawActionColdRaySpell(Stats & target)
 	    ++frame;
 	    ++pnt;
 	}
-	++ticket;
     }
 
     RedrawTroopWithFrameAnimation(target, ICN::ICECLOUD, M82::UNKNOWN, true);
@@ -3063,7 +3031,6 @@ void Battle2::Interface::RedrawActionResurrectSpell(Stats & target, u8 spell)
     Cursor & cursor = Cursor::Get();
     LocalEvent & le = LocalEvent::Get();
 
-    u32 ticket = 0;
     M82::m82_t wav = M82::UNKNOWN;
 
     switch(spell)
@@ -3082,9 +3049,9 @@ void Battle2::Interface::RedrawActionResurrectSpell(Stats & target, u8 spell)
 
 	while(le.HandleEvents() && !target.isFinishAnimFrame())
 	{
-	    CheckGlobalEvents(le, ticket);
+	    CheckGlobalEvents(le);
 
-	    if(Game::AnimateInfrequent(ticket, Game::BATTLE_SPELL_ANIMATION))
+	    if(Game::AnimateInfrequent(Game::BATTLE_SPELL_DELAY))
     	    {
 		cursor.Hide();
 		Redraw();
@@ -3092,7 +3059,6 @@ void Battle2::Interface::RedrawActionResurrectSpell(Stats & target, u8 spell)
 		display.Flip();
 		target.IncreaseAnimFrame();
 	    }
-	    ++ticket;
 	}
 
         target.animstep = 1;
@@ -3113,7 +3079,6 @@ void Battle2::Interface::RedrawActionDisruptingRaySpell(Stats & target)
     sprite2.SetOffset(sprite1.x(), sprite1.y());
 
     const ICN::icn_t icn = ICN::DISRRAY;
-    u32 ticket = 0;
     u8 frame = 0;
     std::vector<Point> points;
     std::vector<Point>::const_iterator pnt;
@@ -3147,9 +3112,9 @@ void Battle2::Interface::RedrawActionDisruptingRaySpell(Stats & target)
     pnt = points.begin();
     while(le.HandleEvents() && frame < AGG::GetICNCount(icn) && pnt != points.end())
     {
-	CheckGlobalEvents(le, ticket);
+	CheckGlobalEvents(le);
 
-	if(Game::AnimateInfrequent(ticket, Game::BATTLE_SPELL_ANIMATION))
+	if(Game::AnimateInfrequent(Game::BATTLE_SPELL_DELAY))
     	{
 	    cursor.Hide();
 	    const Sprite & sprite = AGG::GetICN(icn, frame);
@@ -3160,7 +3125,6 @@ void Battle2::Interface::RedrawActionDisruptingRaySpell(Stats & target)
 	    ++frame;
 	    ++pnt;
 	}
-	++ticket;
     }
 
     // part 2
@@ -3170,12 +3134,11 @@ void Battle2::Interface::RedrawActionDisruptingRaySpell(Stats & target)
     b_current_sprite = &sprite2;
     p_move = Point(0, 0);
 
-
     while(le.HandleEvents() && frame < 20)
     {
-	CheckGlobalEvents(le, ticket);
+	CheckGlobalEvents(le);
 
-	if(ticket % 3)
+	if(Game::AnimateInfrequent(Game::BATTLE_DISRUPTING_DELAY))
     	{
 	    cursor.Hide();
 	    sprite2.SetOffset(sprite1.x() + (frame % 2 ? -1 : 1), sprite1.y());
@@ -3185,7 +3148,6 @@ void Battle2::Interface::RedrawActionDisruptingRaySpell(Stats & target)
 
 	    ++frame;
 	}
-	++ticket;
     }
 
     b_current = old_current;
@@ -3201,7 +3163,6 @@ void Battle2::Interface::RedrawActionColdRingSpell(const u16 dst, const std::vec
     const ICN::icn_t icn = ICN::COLDRING;
     const M82::m82_t m82 = M82::FromSpell(Spell::COLDRING);
 
-    u32 ticket = 0;
     u8 frame = 0;
     std::vector<TargetInfo>::const_iterator it;
     const Rect & center = arena.board[dst].GetPos();
@@ -3217,9 +3178,9 @@ void Battle2::Interface::RedrawActionColdRingSpell(const u16 dst, const std::vec
 
     while(le.HandleEvents() && frame < AGG::GetICNCount(icn))
     {
-	CheckGlobalEvents(le, ticket);
+	CheckGlobalEvents(le);
 
-	if(Game::AnimateInfrequent(ticket, Game::BATTLE_SPELL_ANIMATION))
+	if(Game::AnimateInfrequent(Game::BATTLE_SPELL_DELAY))
     	{
 	    cursor.Hide();
 	    Redraw();
@@ -3235,7 +3196,6 @@ void Battle2::Interface::RedrawActionColdRingSpell(const u16 dst, const std::vec
 		(*it).defender->IncreaseAnimFrame(false);
 	    ++frame;
 	}
-	++ticket;
     }
 
 
@@ -3256,7 +3216,6 @@ void Battle2::Interface::RedrawActionElementalStormSpell(const std::vector<Targe
     const M82::m82_t m82 = M82::FromSpell(Spell::ELEMENTALSTORM);
     const Rect & area = border.GetArea();
 
-    u32 ticket = 0;
     u8 frame = 0;
     u8 repeat = 4;
     std::vector<TargetInfo>::const_iterator it;
@@ -3272,9 +3231,9 @@ void Battle2::Interface::RedrawActionElementalStormSpell(const std::vector<Targe
 
     while(le.HandleEvents() && frame < AGG::GetICNCount(icn))
     {
-	CheckGlobalEvents(le, ticket);
+	CheckGlobalEvents(le);
 
-	if(Game::AnimateInfrequent(ticket, Game::BATTLE_SPELL_ANIMATION))
+	if(Game::AnimateInfrequent(Game::BATTLE_SPELL_DELAY))
     	{
 	    cursor.Hide();
 	    Redraw();
@@ -3298,7 +3257,6 @@ void Battle2::Interface::RedrawActionElementalStormSpell(const std::vector<Targe
 		frame = 0;
 	    }
 	}
-	++ticket;
     }
 
 
@@ -3316,7 +3274,6 @@ void Battle2::Interface::RedrawActionArmageddonSpell(const std::vector<TargetInf
     LocalEvent & le = LocalEvent::Get();
     Rect area = border.GetArea();
 
-    u32 ticket = 0;
     u8 alpha = 10;
     area.h -= Settings::Get().QVGA() ? 18 : 36;
 
@@ -3336,9 +3293,9 @@ void Battle2::Interface::RedrawActionArmageddonSpell(const std::vector<TargetInf
 
     while(le.HandleEvents() && alpha < 180)
     {
-	CheckGlobalEvents(le, ticket);
+	CheckGlobalEvents(le);
 
-	if(Game::AnimateInfrequent(ticket, Game::BATTLE_SPELL_ANIMATION))
+	if(Game::AnimateInfrequent(Game::BATTLE_SPELL_DELAY))
     	{
 	    cursor.Hide();
 	    sprite2.SetAlpha(alpha);
@@ -3351,7 +3308,6 @@ void Battle2::Interface::RedrawActionArmageddonSpell(const std::vector<TargetInf
 
 	    alpha += 10;
 	}
-	++ticket;
     }
 
     cursor.Hide();
@@ -3362,9 +3318,9 @@ void Battle2::Interface::RedrawActionArmageddonSpell(const std::vector<TargetInf
 
     while(le.HandleEvents() && alpha < 20)
     {
-	CheckGlobalEvents(le, ticket);
+	CheckGlobalEvents(le);
 
-	if(Game::AnimateInfrequent(ticket, Game::BATTLE_SPELL_ANIMATION))
+	if(Game::AnimateInfrequent(Game::BATTLE_SPELL_DELAY))
     	{
 	    cursor.Hide();
 	    if(restore)
@@ -3392,7 +3348,6 @@ void Battle2::Interface::RedrawActionArmageddonSpell(const std::vector<TargetInf
 	    display.Flip();
 	    ++alpha;
 	}
-	++ticket;
     }
 
     while(Mixer::isValid() && Mixer::isPlaying(-1)) DELAY(10);
@@ -3405,7 +3360,6 @@ void Battle2::Interface::RedrawActionEarthQuakeSpell(const std::vector<u8> & tar
     LocalEvent & le = LocalEvent::Get();
     Rect area = border.GetArea();
 
-    u32 ticket = 0;
     u8 frame = 0;
     area.h -= Settings::Get().QVGA() ? 19 : 38;
 
@@ -3427,9 +3381,9 @@ void Battle2::Interface::RedrawActionEarthQuakeSpell(const std::vector<u8> & tar
 
     while(le.HandleEvents() && frame < 18)
     {
-	CheckGlobalEvents(le, ticket);
+	CheckGlobalEvents(le);
 
-	if(Game::AnimateInfrequent(ticket, Game::BATTLE_SPELL_ANIMATION))
+	if(Game::AnimateInfrequent(Game::BATTLE_SPELL_DELAY))
     	{
 	    cursor.Hide();
 	    if(restore)
@@ -3456,7 +3410,6 @@ void Battle2::Interface::RedrawActionEarthQuakeSpell(const std::vector<u8> & tar
 	    display.Flip();
 	    ++frame;
 	}
-	++ticket;
     }
 
     // clod
@@ -3466,9 +3419,9 @@ void Battle2::Interface::RedrawActionEarthQuakeSpell(const std::vector<u8> & tar
 
     while(le.HandleEvents() && frame < AGG::GetICNCount(icn))
     {
-	CheckGlobalEvents(le, ticket);
+	CheckGlobalEvents(le);
 
-	if(Game::AnimateInfrequent(ticket, Game::BATTLE_SPELL_ANIMATION))
+	if(Game::AnimateInfrequent(Game::BATTLE_SPELL_DELAY))
     	{
 	    cursor.Hide();
 	    Redraw();
@@ -3495,8 +3448,6 @@ void Battle2::Interface::RedrawActionEarthQuakeSpell(const std::vector<u8> & tar
 
 	    ++frame;
 	}
-
-	++ticket;
     }
 }
 
@@ -3511,7 +3462,6 @@ void Battle2::Interface::RedrawTargetsWithFrameAnimation(const u16 dst, const st
     Cursor & cursor = Cursor::Get();
     LocalEvent & le = LocalEvent::Get();
 
-    u32 ticket = 0;
     u8 frame = 0;
     std::vector<TargetInfo>::const_iterator it;
     const Rect & center = arena.board[dst].GetPos();
@@ -3526,9 +3476,9 @@ void Battle2::Interface::RedrawTargetsWithFrameAnimation(const u16 dst, const st
 
     while(le.HandleEvents() && frame < AGG::GetICNCount(icn))
     {
-	CheckGlobalEvents(le, ticket);
+	CheckGlobalEvents(le);
 
-	if(Game::AnimateInfrequent(ticket, Game::BATTLE_SPELL_ANIMATION))
+	if(Game::AnimateInfrequent(Game::BATTLE_SPELL_DELAY))
     	{
 	    cursor.Hide();
 	    Redraw();
@@ -3542,7 +3492,6 @@ void Battle2::Interface::RedrawTargetsWithFrameAnimation(const u16 dst, const st
 		(*it).defender->IncreaseAnimFrame(false);
 	    ++frame;
 	}
-	++ticket;
     }
 
     for(it = targets.begin(); it != targets.end(); ++it) if((*it).defender)
@@ -3558,7 +3507,6 @@ void Battle2::Interface::RedrawTargetsWithFrameAnimation(const std::vector<Targe
     Cursor & cursor = Cursor::Get();
     LocalEvent & le = LocalEvent::Get();
 
-    u32 ticket = 0;
     u8 frame = 0;
     std::vector<TargetInfo>::const_iterator it;
 
@@ -3574,9 +3522,9 @@ void Battle2::Interface::RedrawTargetsWithFrameAnimation(const std::vector<Targe
 
     while(le.HandleEvents() && frame < AGG::GetICNCount(icn))
     {
-	CheckGlobalEvents(le, ticket);
+	CheckGlobalEvents(le);
 
-	if(Game::AnimateInfrequent(ticket, Game::BATTLE_SPELL_ANIMATION))
+	if(Game::AnimateInfrequent(Game::BATTLE_SPELL_DELAY))
     	{
 	    cursor.Hide();
 	    Redraw();
@@ -3595,7 +3543,6 @@ void Battle2::Interface::RedrawTargetsWithFrameAnimation(const std::vector<Targe
 		(*it).defender->IncreaseAnimFrame(false);
 	    ++frame;
 	}
-	++ticket;
     }
 
     if(wnce)
@@ -3614,7 +3561,6 @@ void Battle2::Interface::RedrawTroopWithFrameAnimation(Stats & b, ICN::icn_t icn
 
     const Rect & pos = b.GetCellPosition();
 
-    u32 ticket = 0;
     u8 frame = 0;
 
     cursor.SetThemes(Cursor::WAR_NONE);
@@ -3629,9 +3575,9 @@ void Battle2::Interface::RedrawTroopWithFrameAnimation(Stats & b, ICN::icn_t icn
 
     while(le.HandleEvents() && frame < AGG::GetICNCount(icn))
     {
-	CheckGlobalEvents(le, ticket);
+	CheckGlobalEvents(le);
 
-	if(Game::AnimateInfrequent(ticket, Game::BATTLE_SPELL_ANIMATION))
+	if(Game::AnimateInfrequent(Game::BATTLE_SPELL_DELAY))
     	{
 	    cursor.Hide();
 	    Redraw();
@@ -3643,7 +3589,6 @@ void Battle2::Interface::RedrawTroopWithFrameAnimation(Stats & b, ICN::icn_t icn
     	    if(pain) b.IncreaseAnimFrame(false);
 	    ++frame;
 	}
-	++ticket;
     }
 
 
@@ -3662,7 +3607,6 @@ void Battle2::Interface::RedrawBridgeAnimation(bool down)
     const Point & topleft = border.GetArea();
 
     ICN::icn_t icn_castle  = ICN::UNKNOWN;
-    u32 ticket = 0;
 
     switch(arena.castle->GetRace())
     {
@@ -3690,9 +3634,9 @@ void Battle2::Interface::RedrawBridgeAnimation(bool down)
 	    if(frame > 23) break;
 	}
 
-	CheckGlobalEvents(le, ticket);
+	CheckGlobalEvents(le);
 
-	if(Game::AnimateInfrequent(ticket, Game::BATTLE_BRIDGE_ANIMATION))
+	if(Game::AnimateInfrequent(Game::BATTLE_BRIDGE_DELAY))
     	{
 	    cursor.Hide();
 	    Redraw();
@@ -3706,7 +3650,6 @@ void Battle2::Interface::RedrawBridgeAnimation(bool down)
 	    else
 		++frame;
 	}
-	++ticket;
     }
 
     if(!down) AGG::PlaySound(M82::DRAWBRG);
@@ -3760,19 +3703,19 @@ bool Battle2::ArmyNextIdleAnimation(Army::army_t & army)
     return res;
 }
 
-bool Battle2::Interface::IdleTroopsAnimation(u32 ticket)
+bool Battle2::Interface::IdleTroopsAnimation(void)
 {
     bool res = false;
 
     // set animation
-    if(Game::AnimateInfrequent(ticket, Game::BATTLE_IDLE_ANIMATION))
+    if(Game::AnimateInfrequent(Game::BATTLE_IDLE_DELAY))
     {
 	if(ArmySetIdleAnimation(arena.army1)) res = true;
 	if(ArmySetIdleAnimation(arena.army2)) res = true;
     }
     else
     // next animation
-    if(Game::AnimateInfrequent(ticket, Game::BATTLE_IDLE2_ANIMATION))
+    if(Game::AnimateInfrequent(Game::BATTLE_IDLE2_DELAY))
     {
 	if(ArmyNextIdleAnimation(arena.army1)) res = true;
 	if(ArmyNextIdleAnimation(arena.army2)) res = true;
@@ -3781,13 +3724,13 @@ bool Battle2::Interface::IdleTroopsAnimation(u32 ticket)
     return res;
 }
 
-void Battle2::Interface::CheckGlobalEvents(LocalEvent & le, u32 ticket)
+void Battle2::Interface::CheckGlobalEvents(LocalEvent & le)
 {
     // reset auto battle
     if(le.KeyPress() && Settings::Get().AutoBattle()) ResetAutoBattle();
 
     // animation opponents
-    if(Game::AnimateInfrequent(ticket, Game::BATTLE_OPPONENTS_ANIMATION))
+    if(Game::AnimateInfrequent(Game::BATTLE_OPPONENTS_DELAY))
     {
 	if(opponent1)
 	{
@@ -3802,7 +3745,7 @@ void Battle2::Interface::CheckGlobalEvents(LocalEvent & le, u32 ticket)
     }
 
     // animation flags
-    if(Game::AnimateInfrequent(ticket, Game::BATTLE_FLAGS_ANIMATION))
+    if(Game::AnimateInfrequent(Game::BATTLE_FLAGS_DELAY))
     {
 	if(opponent1 && opponent1->isFinishFrame()) opponent1->ResetAnimFrame(OP_IDLE);
 	if(opponent2 && opponent2->isFinishFrame()) opponent2->ResetAnimFrame(OP_IDLE);

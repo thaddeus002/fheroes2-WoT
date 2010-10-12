@@ -86,9 +86,7 @@ void Castle::OpenTavern(void)
     display.Flip();
 
     LocalEvent & le = LocalEvent::Get();
-
-    u32 speed = 0;
-    u32 ticket = 0;
+    u32 frame = 0;
 
     // message loop
     while(le.HandleEvents())
@@ -99,13 +97,13 @@ void Castle::OpenTavern(void)
 
 
         // animation
-	if(Game::AnimateInfrequent(speed, Game::CASTLE_TAVERN_ANIMATION))
+	if(Game::AnimateInfrequent(Game::CASTLE_TAVERN_DELAY))
 	{
 	    cursor.Hide();
 
 	    display.Blit(s20, dst_pt);
 
-	    if(const u16 index = ICN::AnimationFrame(tavwin, 0, ticket++))
+	    if(const u16 index = ICN::AnimationFrame(tavwin, 0, frame++))
 	    {
 		const Sprite & s22 = AGG::GetICN(tavwin, index);
 		display.Blit(s22, dst_pt.x + s22.x(), dst_pt.y + s22.y());
@@ -114,7 +112,5 @@ void Castle::OpenTavern(void)
 	    cursor.Show();
 	    display.Flip();
 	}
-
-	++speed;
     }
 }

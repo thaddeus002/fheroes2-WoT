@@ -92,7 +92,6 @@ static const settings_t settingsFHeroes2[] =
     { Settings::GAME_ALSO_CONFIRM_AUTOSAVE,	_("game: also confirm autosave"),			},
     { Settings::GAME_FAST_LOAD_GAME_DIALOG,	_("game: fast load game dialog (L hot key)"),		},
     { Settings::GAME_REMEMBER_LAST_FOCUS,	_("game: remember last focus"),				},
-    { Settings::GAME_HIDE_AI_MOVE,		_("game: hide AI move"),				},
     { Settings::GAME_REMEMBER_LAST_FILENAME,	_("game: remember last filename"),			},
     { Settings::WORLD_SHOW_VISITED_CONTENT,	_("world: show visited content from objects"),		},
     { Settings::WORLD_SCOUTING_EXTENDED,	_("world: scouting skill show extended content info"),  },
@@ -148,7 +147,7 @@ Settings::Settings() : major_version(MAJOR_VERSION), minor_version(MINOR_VERSION
     debug(DEFAULT_DEBUG), video_mode(0, 0), game_difficulty(Difficulty::NORMAL),
     my_color(Color::GRAY), cur_color(Color::GRAY), path_data_directory("data"),
     font_normal("dejavusans.ttf"), font_small("dejavusans.ttf"), force_lang("en"), size_normal(15), size_small(10),
-    sound_volume(6), music_volume(6), heroes_speed(DEFAULT_ANIMATION), ai_speed(DEFAULT_ANIMATION), performance(0),
+    sound_volume(6), music_volume(6), heroes_speed(DEFAULT_SPEED_DELAY), ai_speed(DEFAULT_SPEED_DELAY),
     game_type(0), players_colors(0), preferably_count_players(0), port(DEFAULT_PORT), memory_limit(0)
 {
     build_version = "version: ";
@@ -170,6 +169,11 @@ Settings::Settings() : major_version(MAJOR_VERSION), minor_version(MINOR_VERSION
     opt_global.SetModes(GLOBAL_SHOWICONS);
     opt_global.SetModes(GLOBAL_SHOWBUTTONS);
     opt_global.SetModes(GLOBAL_SHOWSTATUS);
+}
+
+Settings::~Settings()
+{
+    BinarySave();
 }
 
 Settings & Settings::Get(void)
@@ -293,14 +297,19 @@ bool Settings::Read(const std::string & filename)
     entry = config.Find("default depth");
     if(entry) Surface::SetDefaultDepth(entry->IntParams());
 
-    // animation speed
+    // deprecated: animation speed
     entry = config.Find("animation");
     if(entry)
 	ai_speed = heroes_speed = entry->IntParams();
 
-    // set force performance
-    entry = config.Find("force performance");
-    if(entry) performance = entry->IntParams();
+    // move speed
+    entry = config.Find("ai speed");
+    if(entry)
+	ai_speed = entry->IntParams();
+
+    entry = config.Find("heroes speed");
+    if(entry)
+	heroes_speed = entry->IntParams();
 
     // network port
     port = DEFAULT_PORT;
@@ -631,7 +640,6 @@ bool Settings::CDMusic(void) const { return opt_global.Modes(GLOBAL_MUSIC_CD | G
 /* return animation */
 u8   Settings::HeroesMoveSpeed(void) const { return heroes_speed; }
 u8   Settings::AIMoveSpeed(void) const { return ai_speed; }
-u16  Settings::Performance(void) const { return performance; }
 
 void Settings::SetAIMoveSpeed(u8 speed)
 {
@@ -1252,11 +1260,6 @@ bool Settings::ExtAutosaveConfirm(void) const
 bool Settings::ExtHideCursor(void) const
 {
     return ExtModes(POCKETPC_HIDE_CURSOR);
-}
-
-bool Settings::ExtHideAIMove(void) const
-{
-    return ExtModes(GAME_HIDE_AI_MOVE);
 }
 
 bool Settings::ExtShowSystemInfo(void) const

@@ -363,12 +363,11 @@ void AnimationRemoveObject(const Maps::Tiles & tile)
     }
 
     LocalEvent & le = LocalEvent::Get();
-    u32 ticket = 0;
     u8 alpha = 250;
 
     while(le.HandleEvents() && alpha > 10)
     {
-	if(Game::AnimateInfrequent(ticket, Game::HEROES_PICKUP_ANIMATION))
+	if(Game::AnimateInfrequent(Game::HEROES_PICKUP_DELAY))
         {
 	    cursor.Hide();
 	    tile.RedrawTile(display);
@@ -385,8 +384,6 @@ void AnimationRemoveObject(const Maps::Tiles & tile)
             display.Flip();
             alpha -= 20;
         }
-
-        ++ticket;
     }
 }
 

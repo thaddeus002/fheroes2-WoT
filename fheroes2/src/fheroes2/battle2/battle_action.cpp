@@ -796,7 +796,10 @@ void Battle2::Arena::GetTargetsForSpells(const HeroBase* hero, const u8 spell, c
 	if(0 < resist && 100 > resist && resist >= Rand::Get(1, 100))
 	{
 	    if(interface) interface->RedrawActionResistSpell(*(*it).defender);
-	    targets.erase(it);
+	
+	    // erase(it)
+	    if(it + 1 != targets.end()) std::swap(*it, targets.back());
+	    targets.pop_back();
 	}
 	else ++it;
     }
