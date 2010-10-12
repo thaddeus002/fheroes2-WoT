@@ -1,4 +1,18 @@
-SVN - up to r1945
+SVN - up to r1976
+
+Oct, 12, 2010
++ Fixed: spell cost for Summonig Elem. to 30 mp
++ Fixed: artifact "Book of Elements" action
++ Fixed: reflect sprite for Shield spell
++ Fixed: redraw status window after changed themes
++ Added: params "scroll speed", "ai speed" and "heroes speed" (see fheroes2.cfg)
++ Fixed: animations delays
++ Fixed: scroll gamearea code
++ Added: disable mixer for iconify window app.
++ Added: wince: added icon to toolbar, and added check running prog.
++ Added: fast blitting engine
++ Fixed: win32 binary dll
++ Fixed: ThievesGuild info depends from count guilds, added ThievesGuild for QVGA version
 
 Sep, 18, 2010
 + Updated: Dialog::ThievesGuild
