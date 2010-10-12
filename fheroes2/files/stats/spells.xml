@@ -91,13 +91,13 @@
  <!-- Mass Shield -->
  <spell cost="7" />
  <!-- Summon Earth Elemental -->
- <spell cost="25" extra="3" />
+ <spell cost="30" extra="3" />
  <!-- Summon Air Elemental -->
- <spell cost="25" extra="3" />
+ <spell cost="30" extra="3" />
  <!-- Summon Fire Elemental -->
- <spell cost="25" extra="3" />
+ <spell cost="30" extra="3" />
  <!-- Summon Water Elemental -->
- <spell cost="25" extra="3" />
+ <spell cost="30" extra="3" />
  <!-- Earthquake -->
  <spell cost="15" />
  <!-- View Mines -->
