@@ -894,8 +894,10 @@ void Battle2::Arena::SpellActionSummonElemental(const HeroBase* hero, u8 type)
         }
 
 	DEBUG(DBG_BATTLE, DBG_TRACE, "Battle2::Arena::SpellActionSummonElemental: " << Monster::GetName(mons) << ", position: " << pos);
+	u16 count = Spell::GetExtraValue(Spell::FromInt(type)) * hero->GetPower();
+	if(hero->HasArtifact(Artifact::BOOK_ELEMENTS)) count *= 2;
 
-        Stats* elem = army->BattleNewTroop(mons, Spell::GetExtraValue(Spell::FromInt(type)) * hero->GetPower()).GetBattleStats();
+        Stats* elem = army->BattleNewTroop(mons, count).GetBattleStats();
         elem->position = pos;
         elem->arena = this;
         elem->SetReflection(hero == army2.GetCommander());
