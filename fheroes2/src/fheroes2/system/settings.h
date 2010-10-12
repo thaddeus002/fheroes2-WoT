@@ -61,6 +61,14 @@ enum
     DBG_DEVEL	= 0x8000
 };
 
+enum
+{
+    SCROLL_SLOW   = 4,
+    SCROLL_NORMAL = 8,
+    SCROLL_FAST1  = 16,
+    SCROLL_FAST2  = 32
+};
+
 #ifdef __SYMBIAN32__
 #define VERBOSE(x)
 #define DEBUG(x, y, z)
@@ -145,6 +153,7 @@ public:
     u16 Debug(void) const;
     u8 HeroesMoveSpeed(void) const;
     u8 AIMoveSpeed(void) const;
+    u8 ScrollSpeed(void) const;
     u32 MemoryLimit(void) const;
 
     const std::string & BuildVersion(void) const;
@@ -268,6 +277,7 @@ public:
     void SetNetworkDedicatedServer(bool);
     void SetMemoryLimit(u32);
     void SetAIMoveSpeed(u8);
+    void SetScrollSpeed(u8);
     void SetHeroesMoveSpeed(u8);
 
     void SetSoundVolume(const u8 v);
@@ -368,6 +378,7 @@ private:
     u8 music_volume;
     u8 heroes_speed;
     u8 ai_speed;
+    u8 scroll_speed;
 
     u8 game_type;
     u8 players_colors;

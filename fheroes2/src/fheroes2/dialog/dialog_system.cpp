@@ -32,7 +32,7 @@ namespace Dialog
     void DrawSystemInfo(const Point & dst);
 }
 
-/* return 0x02 - change sound, 0x04 - change music, 0x08 - change interface */
+/* return 0x01 - change speed, 0x02 - change sound, 0x04 - change music, 0x08 - change interface, 0x10 - change scroll  */
 u8 Dialog::SystemOptions(void)
 {
     // FIXME: QVGA version
@@ -72,7 +72,7 @@ u8 Dialog::SystemOptions(void)
     //const Rect rect3(rb.x + 220, rb.y + 47,  64, 64);
     const Rect rect4(rb.x + 36,  rb.y + 157, 64, 64);
     const Rect rect5(rb.x + 128, rb.y + 157, 64, 64);
-    //const Rect rect6(rb.x + 220, rb.y + 157, 64, 64);
+    const Rect rect6(rb.x + 220, rb.y + 157, 64, 64);
     const Rect rect7(rb.x + 36,  rb.y + 267, 64, 64);
     //const Rect rect8(rb.x + 128, rb.y + 267, 64, 64);
     //const Rect rect9(rb.x + 220, rb.y + 267, 64, 64);
@@ -100,7 +100,7 @@ u8 Dialog::SystemOptions(void)
 
         if(le.MouseClickLeft(buttonOk)){ break; }
         if(le.KeyPress(KEY_ESCAPE)){ result = false; break; }
-        
+
         // set sound volume
         if(conf.Sound() && le.MouseClickLeft(rect1))
         {
@@ -149,6 +149,18 @@ u8 Dialog::SystemOptions(void)
     	    cursor.Show();
     	    display.Flip();
 	    Game::UpdateHeroesMoveSpeed();
+    	}
+
+        // set scroll speed
+        if(le.MouseClickLeft(rect6))
+        {
+    	    conf.SetScrollSpeed(SCROLL_FAST2 > conf.ScrollSpeed() ? conf.ScrollSpeed() << 1 : SCROLL_SLOW);
+    	    result |= 0x10;
+    	    cursor.Hide();
+    	    display.Blit(back2, rb);
+	    DrawSystemInfo(rb);
+    	    cursor.Show();
+    	    display.Flip();
     	}
 
         // set interface
@@ -228,7 +240,7 @@ void Dialog::DrawSystemInfo(const Point & dst)
     const Rect rect4(dst.x + 36, dst.y + 157, sprite4.w(), sprite4.h());
     display.Blit(sprite4, rect4);
     str.clear();
-    str = _("animation");
+    str = _("hero speed");
     str += " ";
     if(conf.HeroesMoveSpeed())
 	String::AddInt(str, conf.HeroesMoveSpeed());
@@ -243,7 +255,7 @@ void Dialog::DrawSystemInfo(const Point & dst)
     const Rect rect5(dst.x + 128, dst.y + 157, sprite5.w(), sprite5.h());
     display.Blit(sprite5, rect5);
     str.clear();
-    str = _("animation");
+    str = _("ai speed");
     str += " ";
     if(conf.AIMoveSpeed())
 	String::AddInt(str, conf.AIMoveSpeed());
@@ -252,12 +264,15 @@ void Dialog::DrawSystemInfo(const Point & dst)
     text.Set(str);
     text.Blit(rect5.x + (rect5.w - text.w()) / 2, rect5.y + rect5.h + 5);
 
-    // unused
-    const Sprite & sprite6 = AGG::GetICN(ICN::SPANEL, 17);
+    // scroll speed
+    const u8 is6 = (conf.ScrollSpeed() < SCROLL_FAST2 ? (conf.ScrollSpeed() < SCROLL_FAST1 ? (conf.ScrollSpeed() < SCROLL_NORMAL ? 4 : 5) : 6) : 7);
+    const Sprite & sprite6 = AGG::GetICN(ICN::SPANEL, is6);
     const Rect rect6(dst.x + 220, dst.y + 157, sprite6.w(), sprite6.h());
-    display.Blit(black, rect6);
+    display.Blit(sprite6, rect6);
     str.clear();
-    str = "unused";
+    str = _("scroll speed");
+    str += " ";
+    String::AddInt(str, conf.ScrollSpeed());
     text.Set(str);
     text.Blit(rect6.x + (rect6.w - text.w()) / 2, rect6.y + rect6.h + 5);
 

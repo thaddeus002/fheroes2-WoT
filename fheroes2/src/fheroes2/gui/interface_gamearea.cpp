@@ -126,7 +126,7 @@ void Interface::GameArea::SetAreaPosition(s16 x, s16 y, u16 w, u16 h)
 
     scrollOffset.x = 0;
     scrollOffset.y = 0;
-    scrollStep = SCROLL_MIN;
+    scrollStep = Settings::Get().ScrollSpeed();
 
     mapsPosition.x = areaPosition.x + scrollOffset.x;
     mapsPosition.y = areaPosition.y + scrollOffset.y;
@@ -378,7 +378,7 @@ void Interface::GameArea::Center(s16 px, s16 py)
 	mapsPosition.x = areaPosition.x + scrollOffset.x;
 	mapsPosition.y = areaPosition.y + scrollOffset.y;
 
-	scrollStep = SCROLL_MIN;
+	scrollStep = Settings::Get().ScrollSpeed();
     }
 
     if(scrollDirection) Scroll();

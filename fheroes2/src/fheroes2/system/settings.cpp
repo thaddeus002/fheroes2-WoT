@@ -147,7 +147,7 @@ Settings::Settings() : major_version(MAJOR_VERSION), minor_version(MINOR_VERSION
     debug(DEFAULT_DEBUG), video_mode(0, 0), game_difficulty(Difficulty::NORMAL),
     my_color(Color::GRAY), cur_color(Color::GRAY), path_data_directory("data"),
     font_normal("dejavusans.ttf"), font_small("dejavusans.ttf"), force_lang("en"), size_normal(15), size_small(10),
-    sound_volume(6), music_volume(6), heroes_speed(DEFAULT_SPEED_DELAY), ai_speed(DEFAULT_SPEED_DELAY),
+    sound_volume(6), music_volume(6), heroes_speed(DEFAULT_SPEED_DELAY), ai_speed(DEFAULT_SPEED_DELAY), scroll_speed(SCROLL_NORMAL),
     game_type(0), players_colors(0), preferably_count_players(0), port(DEFAULT_PORT), memory_limit(0)
 {
     build_version = "version: ";
@@ -297,11 +297,6 @@ bool Settings::Read(const std::string & filename)
     entry = config.Find("default depth");
     if(entry) Surface::SetDefaultDepth(entry->IntParams());
 
-    // deprecated: animation speed
-    entry = config.Find("animation");
-    if(entry)
-	ai_speed = heroes_speed = entry->IntParams();
-
     // move speed
     entry = config.Find("ai speed");
     if(entry)
@@ -310,6 +305,20 @@ bool Settings::Read(const std::string & filename)
     entry = config.Find("heroes speed");
     if(entry)
 	heroes_speed = entry->IntParams();
+
+    // scroll speed
+    entry = config.Find("scroll speed");
+    if(entry)
+    {
+	switch(entry->IntParams())
+	{
+	    case 1:	scroll_speed = SCROLL_SLOW; break;
+	    case 2:	scroll_speed = SCROLL_NORMAL; break;
+	    case 3:	scroll_speed = SCROLL_FAST1; break;
+	    case 4:	scroll_speed = SCROLL_FAST2; break;
+	    default:	scroll_speed = SCROLL_NORMAL; break;
+	}
+    }
 
     // network port
     port = DEFAULT_PORT;
@@ -637,18 +646,36 @@ bool Settings::Music(void) const { return opt_global.Modes(GLOBAL_MUSIC); }
 
 bool Settings::CDMusic(void) const { return opt_global.Modes(GLOBAL_MUSIC_CD | GLOBAL_MUSIC_EXT); }
 
-/* return animation */
+/* return move speed */
 u8   Settings::HeroesMoveSpeed(void) const { return heroes_speed; }
 u8   Settings::AIMoveSpeed(void) const { return ai_speed; }
 
+/* return scroll speed */
+u8   Settings::ScrollSpeed(void) const { return scroll_speed; }
+
+/* set ai speed: 0 - 10 */
 void Settings::SetAIMoveSpeed(u8 speed)
 {
     ai_speed = (10 <= speed ? 10 : speed);
 }
 
+/* set hero speed: 0 - 10 */
 void Settings::SetHeroesMoveSpeed(u8 speed)
 {
     heroes_speed = (10 <= speed ? 10 : speed);
+}
+
+/* set scroll speed: 1 - 4 */
+void Settings::SetScrollSpeed(u8 speed)
+{
+    switch(speed)
+    {
+	case SCROLL_SLOW:  scroll_speed = SCROLL_SLOW; break;
+	case SCROLL_NORMAL:scroll_speed = SCROLL_NORMAL; break;
+	case SCROLL_FAST1: scroll_speed = SCROLL_FAST1; break;
+	case SCROLL_FAST2: scroll_speed = SCROLL_FAST2; break;
+	default:           scroll_speed = SCROLL_NORMAL; break;
+    }
 }
 
 /* return full screen */

@@ -1324,13 +1324,19 @@ void Game::ButtonSystem(void)
 {
     // Change and save system settings
     const u8 changes = Dialog::SystemOptions();
-		
-    if(0x08 & changes)
-    {
-	Interface::Basic & I = Interface::Basic::Get();
+    Interface::Basic & I = Interface::Basic::Get();
 
-        I.SetRedraw(REDRAW_ICONS | REDRAW_BUTTONS | REDRAW_STATUS | REDRAW_BORDER);
+    if(0x10 & changes)
+    {
+	Game::Focus & focus = Game::Focus::Get();
+	// hardcore reset pos
+	I.gameArea.Center(0, 0);
+	I.gameArea.Center(focus.Center());
+        I.SetRedraw(REDRAW_GAMEAREA);
     }
+
+    if(0x08 & changes)
+        I.SetRedraw(REDRAW_ICONS | REDRAW_BUTTONS | REDRAW_STATUS | REDRAW_BORDER);
 }
 
 void Game::KeyPress_ESC(menu_t & ret)
