@@ -3532,7 +3532,15 @@ void Battle2::Interface::RedrawTargetsWithFrameAnimation(const std::vector<Targe
 	    for(it = targets.begin(); it != targets.end(); ++it) if((*it).defender)
 	    {
 		const Rect & pos = (*it).defender->GetCellPosition();
-		const Sprite & sprite = AGG::GetICN(icn, frame);
+		bool reflect = false;
+
+		switch(icn)
+		{
+		    case ICN::SHIELD: reflect = (*it).defender->isReflect(); break;
+		    default: break;
+		}
+
+		const Sprite & sprite = AGG::GetICN(icn, frame, reflect);
 		display.Blit(sprite, pos.x + ((*it).defender->isWide() ? ((*it).defender->isReflect() ? pos.w : 0) : pos.w / 2) + sprite.x(), pos.y + pos.h / 2 + sprite.y());
 	    }
 	    cursor.Show();
@@ -3562,6 +3570,13 @@ void Battle2::Interface::RedrawTroopWithFrameAnimation(Stats & b, ICN::icn_t icn
     const Rect & pos = b.GetCellPosition();
 
     u8 frame = 0;
+    bool reflect = false;
+
+    switch(icn)
+    {
+	case ICN::SHIELD: reflect = b.isReflect(); break;
+	default: break;
+    }
 
     cursor.SetThemes(Cursor::WAR_NONE);
 
@@ -3581,7 +3596,7 @@ void Battle2::Interface::RedrawTroopWithFrameAnimation(Stats & b, ICN::icn_t icn
     	{
 	    cursor.Hide();
 	    Redraw();
-	    const Sprite & sprite = AGG::GetICN(icn, frame);
+	    const Sprite & sprite = AGG::GetICN(icn, frame, reflect);
 	    display.Blit(sprite, pos.x + (b.isWide() ? (b.isReflect() ? pos.w : 0) : pos.w / 2) + sprite.x(), pos.y + pos.h / 2 + sprite.y());
 	    cursor.Show();
 	    display.Flip();
@@ -3590,7 +3605,6 @@ void Battle2::Interface::RedrawTroopWithFrameAnimation(Stats & b, ICN::icn_t icn
 	    ++frame;
 	}
     }
-
 
     if(pain)
     {
