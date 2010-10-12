@@ -1364,6 +1364,7 @@ void Settings::BinarySave(void) const
     // speed
     msg.Push(heroes_speed);
     msg.Push(ai_speed);
+    msg.Push(scroll_speed);
 
     msg.Save(binary.c_str());
 }
@@ -1404,6 +1405,12 @@ void Settings::BinaryLoad(void)
 	    // speed
 	    msg.Pop(heroes_speed);
 	    msg.Pop(ai_speed);
+	}
+
+	if(version > FORMAT_VERSION_1978)
+	{
+	    // restore scroll speed
+	    msg.Pop(scroll_speed);
 	}
     }
 }
