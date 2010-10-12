@@ -113,7 +113,7 @@ Time::Time()
 
 void Time::Start(void)
 {
-    tick1 = SDL_GetTicks();
+    tick2 = tick1 = SDL_GetTicks();
 }
 
 void Time::Stop(void)

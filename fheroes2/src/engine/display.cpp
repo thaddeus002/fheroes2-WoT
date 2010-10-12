@@ -392,34 +392,3 @@ void Display::AddUpdateRect(s16 px, s16 py, u16 pw, u16 ph)
     if(0 == (surface->flags & SDL_HWSURFACE))
 	update_rects.PushRect(px, py, pw, ph);
 }
-
-u32 Display::Performance(u16 iterations)
-{
-    Display & display = Display::Get();
-
-    Surface sf_red(71, 71);
-    Surface sf_gre(33, 33);
-    Surface sf_blu(57, 57);
-
-    Rect rt_red((display.w() - sf_red.w())/2, (display.h() - sf_red.h())/2, sf_red.w(), sf_red.h());
-    Rect rt_gre((display.w() - sf_gre.w())/2, (display.h() - sf_gre.h())/2, sf_gre.w(), sf_gre.h());
-    Rect rt_blu((display.w() - sf_blu.w())/2, (display.h() - sf_blu.h())/2, sf_blu.w(), sf_blu.h());
-
-    sf_red.Fill(255, 0, 0);
-    sf_gre.Fill(0, 255, 0);
-    sf_blu.Fill(0, 0, 255);
-
-    u32 tick = SDL_GetTicks();
-
-    display.Fill(200, 200, 200);
-    for(u16 ii = 0; ii < iterations; ++ii)
-    {
-	display.Blit(sf_red, rt_red);
-	display.Blit(sf_gre, rt_gre);
-	display.Blit(sf_blu, rt_blu);
-    }
-    tick = (SDL_GetTicks() - tick);
-
-    display.Fill(0, 0, 0);
-    return tick;
-}
