@@ -218,7 +218,7 @@ void Battle2::Arena::ApplyActionSpellCast(Action & action)
     const Spell::spell_t spell = Spell::FromInt(byte8);
     if(current_commander && !current_commander->Modes(Heroes::SPELLCASTED) &&
 	current_commander->HaveSpell(spell) &&
-	Spell::isCombat(spell) && current_commander->HaveSpellPoints(Spell::CostManaPoints(spell)))
+	Spell::isCombat(spell) && current_commander->HaveSpellPoints(Spell::CostManaPoints(spell, current_commander)))
     {
 	const u8 color = current_commander->GetColor();
 

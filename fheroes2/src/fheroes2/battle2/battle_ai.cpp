@@ -266,7 +266,7 @@ bool Battle2::isApplySpell(const Spell::spell_t spell, const Stats* b, const Her
 	default: break;
     }
 
-    if(hero.HaveSpell(spell) && hero.HaveSpellPoints(Spell::CostManaPoints(spell)) && (!b || b->AllowApplySpell(spell, &hero)))
+    if(hero.HaveSpell(spell) && hero.HaveSpellPoints(Spell::CostManaPoints(spell, &hero)) && (!b || b->AllowApplySpell(spell, &hero)))
     {
 	a.AddedCastAction(spell, (b ? b->GetPosition() : MAXU16));
 	return true;
