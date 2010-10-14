@@ -40,6 +40,11 @@
 #include "editor_interface.h"
 #include "game.h"
 
+struct GroundIndexAndRotate : std::pair<u16, u8>
+{
+    GroundIndexAndRotate() {};
+};
+
 namespace Game
 {
     namespace Editor
@@ -47,6 +52,7 @@ namespace Game
 	void ModifySingleTile(Maps::Tiles & center);
 	void ModifyTileAbroad(Maps::Tiles & center);
 	void SetGroundToTile(Maps::Tiles & tile, const Maps::Ground::ground_t ground);
+	GroundIndexAndRotate GetTileWithCorner(u16 around, const Maps::Ground::ground_t ground);
     }
 }
 
@@ -55,12 +61,19 @@ Game::menu_t Game::Editor::StartGame()
     Game::SetFixVideoMode();
 
     Display & display = Display::Get();
-    Interface::GameArea & areaMaps = Interface::GameArea::Get();
-    const Rect & areaPos = areaMaps.GetArea();
-    areaMaps.Build();
-
     Cursor & cursor = Cursor::Get();
     EditorInterface & I = EditorInterface::Get();
+
+    Interface::GameArea & areaMaps = Interface::GameArea::Get();
+    Interface::Radar & radar = Interface::Radar::Get();
+
+    Settings::Get().SetScrollSpeed(SCROLL_FAST2);
+    areaMaps.Build();
+
+    radar.SetPos(display.w() - BORDERWIDTH - RADARWIDTH, BORDERWIDTH);
+    radar.Build();
+
+    const Rect & areaPos = areaMaps.GetArea();
 
     // cursor
     cursor.Hide();
@@ -81,15 +94,6 @@ Game::menu_t Game::Editor::StartGame()
     const Sprite & spritePanelRoad = AGG::GetICN(ICN::EDITPANL, 4);
     const Sprite & spritePanelClear = AGG::GetICN(ICN::EDITPANL, 5);
 
-    // Create radar
-    Interface::Radar & radar = I.radar;
-    radar.Build();
-
-    areaMaps.Redraw(display, LEVEL_ALL);
-    radar.RedrawArea();
-
-    // Create radar cursor
-    radar.RedrawCursor();
 
     LocalEvent & le = LocalEvent::Get();
 
@@ -125,7 +129,6 @@ Game::menu_t Game::Editor::StartGame()
     btnSizeMedium.Draw();
 
     const Point dstPanel(btnSelectRiver.x, btnSelectRiver.y + btnSelectRiver.h);
-    display.Blit(spritePanelGround, dstPanel);
     
     SizeCursor sizeCursor;
     
@@ -158,12 +161,20 @@ Game::menu_t Game::Editor::StartGame()
     const Rect rectObjectResource(dstPanel.x + 101, dstPanel.y + 95, 28, 28);
 
     SpriteCursor selectTerrainCursor(AGG::GetICN(ICN::TERRAINS, 9), rectTerrainWater.x - 1, rectTerrainWater.y - 1);
-    selectTerrainCursor.Show();
+    selectTerrainCursor.Hide();
 
     SpriteCursor selectObjectCursor(AGG::GetICN(ICN::TERRAINS, 9), rectObjectWater.x - 1, rectObjectWater.y - 1);
+    selectTerrainCursor.Hide();
 
     u8 selectTerrain = 0;
     u8 selectObject = 0;
+
+    // redraw
+    areaMaps.Redraw(display, LEVEL_ALL);
+    radar.RedrawArea();
+    radar.RedrawCursor();
+    display.Blit(spritePanelGround, dstPanel);
+    selectTerrainCursor.Show();
 
     cursor.Show();
     display.Flip();
@@ -1058,40 +1069,61 @@ void Game::Editor::ModifyTileAbroad(Maps::Tiles & tile)
 /* set ground to tile */
 void Game::Editor::SetGroundToTile(Maps::Tiles & tile, const Maps::Ground::ground_t ground)
 {
-    u16 index_ground = 0;
+    const u16 around = Maps::GetDirectionAroundGround(tile.GetIndex(), ground);
+
+    // simply set
+    if(ground == around)
+    {
+	u16 index_ground = 0;
+
+	switch(ground)
+	{
+	    case Maps::Ground::WATER:		tile.SetTile(Rand::Get(16, 19), 0); return;
+	    case Maps::Ground::GRASS:		index_ground =  68; break;
+	    case Maps::Ground::SNOW:		index_ground = 130; break;
+	    case Maps::Ground::SWAMP:		index_ground = 184; break;
+	    case Maps::Ground::LAVA:		index_ground = 246; break;
+	    case Maps::Ground::DESERT:		index_ground = 300; break;
+	    case Maps::Ground::DIRT:		index_ground = 337; break;
+	    case Maps::Ground::WASTELAND:	index_ground = 399; break;
+	    case Maps::Ground::BEACH:		index_ground = 415; break;	
+	    default: break;
+	}
+
+	switch(Rand::Get(1, 7))
+	{
+	    // 85% simple ground
+    	    case 1:
+    	    case 2:
+    	    case 3:
+    	    case 4:
+    	    case 5:
+    	    case 6:
+		tile.SetTile(Rand::Get(index_ground, index_ground + 7), 0);
+		break;
+
+    	    // 15% extended ground
+    	    default:
+		tile.SetTile(Rand::Get(index_ground + 8, index_ground + 15), 0);
+		break;
+	}
+    }
+    else
+    {
+    }
+}
+
+GroundIndexAndRotate Game::Editor::GetTileWithCorner(u16 around, const Maps::Ground::ground_t ground)
+{
+    GroundIndexAndRotate result;
 
     switch(ground)
     {
-	case Maps::Ground::WATER:	tile.SetTile(Rand::Get(16, 19), 0); return;
-	case Maps::Ground::GRASS:	index_ground =  68; break;
-	case Maps::Ground::SNOW:	index_ground = 130; break;
-	case Maps::Ground::SWAMP:	index_ground = 184; break;
-	case Maps::Ground::LAVA:	index_ground = 246; break;
-	case Maps::Ground::DESERT:	index_ground = 300; break;
-	case Maps::Ground::DIRT:	index_ground = 337; break;
-	case Maps::Ground::WASTELAND:	index_ground = 399; break;
-	case Maps::Ground::BEACH:	index_ground = 415; break;
-	
+	case Maps::Ground::WATER:
 	default: break;
     }
 
-    switch(Rand::Get(1, 7))
-    {
-	// 85% simple ground
-        case 1:
-        case 2:
-        case 3:
-        case 4:
-        case 5:
-        case 6:
-	    tile.SetTile(Rand::Get(index_ground, index_ground + 7), 0);
-	    break;
-
-        // 15% extended ground
-        default:
-	    tile.SetTile(Rand::Get(index_ground + 8, index_ground + 15), 0);
-	    break;
-    }
+    return result;
 }
 
 #endif

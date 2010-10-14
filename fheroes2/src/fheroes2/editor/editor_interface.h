@@ -41,8 +41,6 @@ public:
 	void	Draw(void);
 	void	Scroll(const u8 scroll);
 
-	Interface::Radar radar;
-
 	Button btnLeftTopScroll;
         Button btnRightTopScroll;
         Button btnTopScroll;

@@ -93,7 +93,7 @@ int main(int argc, char **argv)
 #ifdef WITH_EDITOR
                     case 'e':
 			conf.SetEditor();
-			conf.SetDebug(DBG_GAME | DBG_INFO);
+			conf.SetDebug(DBG_DEVEL | DBG_GAME | DBG_INFO);
 			std::cout << "start: editor mode." << std::endl;
 			break;
 #endif			

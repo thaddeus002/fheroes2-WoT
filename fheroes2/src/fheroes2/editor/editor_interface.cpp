@@ -28,7 +28,7 @@
 #include "world.h"
 #include "editor_interface.h"
 
-EditorInterface::EditorInterface() : radar(Interface::Radar::Get())
+EditorInterface::EditorInterface()
 {
     btnLeftTopScroll.SetSprite(ICN::ESCROLL, 12, 13);
     btnRightTopScroll.SetSprite(ICN::ESCROLL, 14, 15);
@@ -90,7 +90,7 @@ void EditorInterface::Draw(void)
     src_rt.h = BORDERWIDTH;
     display.Blit(spriteBottomBar, src_rt, dst_pt);
     src_rt.x = TILEWIDTH;
-    for(u16 ii = 0; ii < (areaMaps.GetRectMaps().w - 3); ++ii)
+    for(u16 ii = 0; ii < (areaMaps.GetRectMaps().w - 4); ++ii)
     {
 	dst_pt.x += TILEWIDTH;
 	display.Blit(spriteBottomBar, src_rt, dst_pt);
@@ -108,7 +108,7 @@ void EditorInterface::Draw(void)
     src_rt.h = TILEWIDTH;
     display.Blit(spriteLeftBar, src_rt, dst_pt);
     src_rt.y = TILEWIDTH;
-    for(u16 ii = 0; ii < (areaMaps.GetRectMaps().h - 3); ++ii)
+    for(u16 ii = 0; ii < (areaMaps.GetRectMaps().h - 4); ++ii)
     {
 	dst_pt.y += TILEWIDTH;
 	display.Blit(spriteLeftBar, src_rt, dst_pt);
@@ -179,7 +179,7 @@ void EditorInterface::Draw(void)
     pt_lsc.x = BORDERWIDTH;
     pt_lsc.y = pt_lbs.y;
     // btn right scroll
-    pt_rsc.x = 2 * BORDERWIDTH + (areaMaps.GetRectMaps().w - 1) * TILEWIDTH;
+    pt_rsc.x = 2 * BORDERWIDTH + (areaMaps.GetRectMaps().w - 2) * TILEWIDTH;
     pt_rsc.y = pt_lbs.y;
     // btn right bottom scroll
     pt_rbs.x = BORDERWIDTH + areaPos.w;
@@ -320,10 +320,10 @@ void EditorInterface::Draw(void)
     DrawTopNumberCell();
     DrawLeftNumberCell();
 
-    split_h.SetArea(Rect(2 * BORDERWIDTH + 3, display.h() - BORDERWIDTH + 4, (areaMaps.GetRectMaps().w - 1) * TILEWIDTH - 6, BORDERWIDTH - 8));
+    split_h.SetArea(Rect(2 * BORDERWIDTH + 3, display.h() - BORDERWIDTH + 4, (areaMaps.GetRectMaps().w - 2) * TILEWIDTH - 6, BORDERWIDTH - 8));
     split_h.SetOrientation(Splitter::HORIZONTAL);
 
-    split_v.SetArea(Rect(BORDERWIDTH + areaPos.w + 4, 2 * BORDERWIDTH + 3, BORDERWIDTH - 8, (areaMaps.GetRectMaps().h - 1) * TILEWIDTH - 6));
+    split_v.SetArea(Rect(BORDERWIDTH + areaPos.w + 4, 2 * BORDERWIDTH + 3, BORDERWIDTH - 8, (areaMaps.GetRectMaps().h - 2) * TILEWIDTH - 6));
     split_v.SetOrientation(Splitter::VERTICAL);
 
     split_h.SetRange(0, world.w() - areaMaps.GetRectMaps().w);
@@ -366,7 +366,7 @@ void EditorInterface::DrawTopNumberCell(void)
     Point dst_pt;
 
     // top number cell
-    for(u16 ii = 0; ii < area.w; ++ii)
+    for(u16 ii = 0; ii < area.w - 1; ++ii)
     {
 	dst_pt.x = BORDERWIDTH + ii * TILEWIDTH;
 	dst_pt.y = 0;
@@ -387,7 +387,7 @@ void EditorInterface::DrawLeftNumberCell(void)
     Point dst_pt;
 
     // left number cell
-    for(u16 ii = 0; ii < area.h; ++ii)
+    for(u16 ii = 0; ii < area.h - 1; ++ii)
     {
 	dst_pt.x = 0;
 	dst_pt.y = BORDERWIDTH + ii * TILEWIDTH;

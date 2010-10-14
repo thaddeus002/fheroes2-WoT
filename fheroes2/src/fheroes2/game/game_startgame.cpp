@@ -828,8 +828,7 @@ Game::menu_t Game::HumanTurn(void)
 	    if(le.MouseCursor(I.GetAreaScrollBottom()) && le.MousePressLeft()) I.gameArea.SetScroll(SCROLL_BOTTOM);
 
 	    // disable right click emulation
-	    if(I.NeedRedraw())
-	    	le.SetTapMode(false);
+	    if(I.gameArea.NeedScroll()) le.SetTapMode(false);
 	}
 	else
 	{

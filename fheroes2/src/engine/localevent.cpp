@@ -85,6 +85,7 @@ void LocalEvent::SetTapMode(bool f)
     else
     {
 	ResetModes(TAP_MODE);
+	ResetModes(CLOCK_ON);
 	clock.Stop();
     }
 }

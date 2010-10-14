@@ -234,24 +234,26 @@ void Interface::GameArea::Redraw(Surface & dst, u8 flag, const Rect & rt) const
 	}
     }
 
-    // redraw grid
-    if((flag & LEVEL_ALL) && IS_DEVEL())
+    if(IS_DEVEL())
     {
-
-	for(s16 oy = rt.y; oy < rt.y + rt.h; ++oy)
-	    for(s16 ox = rt.x; ox < rt.x + rt.w; ++ox)
+	// redraw grid
+	if(flag & LEVEL_ALL)
 	{
-    	    const Point dstpt(mapsPosition.x + TILEWIDTH * ox,
+	    for(s16 oy = rt.y; oy < rt.y + rt.h; ++oy)
+		for(s16 ox = rt.x; ox < rt.x + rt.w; ++ox)
+	    {
+    		const Point dstpt(mapsPosition.x + TILEWIDTH * ox,
 				mapsPosition.y + TILEWIDTH * oy);
-	    if(areaPosition & dstpt)
-    	    {
-		dst.Lock();
-    		dst.SetPixel(dstpt.x, dstpt.y, dst.GetColor(0x40));
-    		dst.Unlock();
+		if(areaPosition & dstpt)
+    		{
+		    dst.Lock();
+    		    dst.SetPixel(dstpt.x, dstpt.y, dst.GetColor(0x40));
+    		    dst.Unlock();
+		}
 	    }
 	}
     }
-
+    else
     // redraw fog
     if(flag & LEVEL_FOG)
 	for(s16 oy = rt.y; oy < rt.y + rt.h; ++oy)
