@@ -43,9 +43,12 @@ void Interface::BorderWindow::Redraw(void)
     Display & display = Display::Get();
 
     const bool evil = Settings::Get().EvilInterface();
-    const u8 count_w = (display.w() - 640) / TILEWIDTH;
-    const u8 count_h = (display.h() - 480) / TILEWIDTH;
+    u8 count_w = (display.w() - 640) / TILEWIDTH;
+    u8 count_h = (display.h() - 480) / TILEWIDTH;
     const u8 count_icons = count_h > 3 ? 8 : ( count_h < 3 ? 4 : 7);
+
+    if(display.w() % TILEWIDTH) ++count_w;
+    if(display.h() % TILEWIDTH) ++count_h;
 
     Rect srcrt;
     Point dstpt;
@@ -72,26 +75,6 @@ void Interface::BorderWindow::Redraw(void)
     srcrt.w = icnadv.w() - srcrt.x;
     display.Blit(icnadv, srcrt, dstpt);
 
-    // BOTTOM BORDER
-    srcrt.x = 0;
-    srcrt.y = icnadv.h() - BORDERWIDTH;
-    srcrt.w = 223;
-    srcrt.h = BORDERWIDTH;
-    dstpt.x = srcrt.x;
-    dstpt.y = display.h() - BORDERWIDTH;
-    display.Blit(icnadv, srcrt, dstpt);
-    srcrt.x = 223;
-    srcrt.w = TILEWIDTH;
-    dstpt.x = srcrt.x;
-    dstpt.y = display.h() - BORDERWIDTH;
-    for(u8 ii = 0; ii < count_w + 1; ++ii)
-    {
-        display.Blit(icnadv, srcrt, dstpt);
-	dstpt.x += TILEWIDTH;
-    }
-    srcrt.x += TILEWIDTH;
-    srcrt.w = icnadv.w() - srcrt.x;
-    display.Blit(icnadv, srcrt, dstpt);
 
     // LEFT BORDER
     srcrt.x = 0;
@@ -154,6 +137,27 @@ void Interface::BorderWindow::Redraw(void)
     }
     srcrt.y += TILEWIDTH;
     srcrt.h = icnadv.h() - srcrt.y;
+    display.Blit(icnadv, srcrt, dstpt);
+
+    // BOTTOM BORDER
+    srcrt.x = 0;
+    srcrt.y = icnadv.h() - BORDERWIDTH;
+    srcrt.w = 223;
+    srcrt.h = BORDERWIDTH;
+    dstpt.x = srcrt.x;
+    dstpt.y = display.h() - BORDERWIDTH;
+    display.Blit(icnadv, srcrt, dstpt);
+    srcrt.x = 223;
+    srcrt.w = TILEWIDTH;
+    dstpt.x = srcrt.x;
+    dstpt.y = display.h() - BORDERWIDTH;
+    for(u8 ii = 0; ii < count_w + 1; ++ii)
+    {
+        display.Blit(icnadv, srcrt, dstpt);
+	dstpt.x += TILEWIDTH;
+    }
+    srcrt.x += TILEWIDTH;
+    srcrt.w = icnadv.w() - srcrt.x;
     display.Blit(icnadv, srcrt, dstpt);
 
     // ICON BORDER
