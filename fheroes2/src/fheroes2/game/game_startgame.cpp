@@ -493,6 +493,7 @@ Cursor::themes_t Game::GetCursor(const u16 dst_index)
 			    if(conf.IsUnions(from_hero.GetColor(), to_hero->GetColor()))
 			    	return conf.ExtUnionsAllowHeroesMeetings() ? Cursor::CHANGE : Cursor::POINTER;
 			    else
+			    if(to_hero->AllowBattle())
 				return Cursor::DistanceThemes(Cursor::FIGHT, from_hero.GetRangeRouteDays(dst_index));
 			}
     		    }

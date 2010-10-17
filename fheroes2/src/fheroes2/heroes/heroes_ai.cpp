@@ -309,8 +309,18 @@ void AIToHeroes(Heroes &hero, const u8 obj, const u16 dst_index)
     if(hero.GetColor() == other_hero->GetColor() ||
         (conf.ExtUnionsAllowHeroesMeetings() && conf.IsUnions(hero.GetColor(), other_hero->GetColor())))
     {
-        DEBUG(DBG_AI , DBG_INFO, "AIToHeroes: " << hero.GetName() << " meeting " << other_hero->GetName());
+        DEBUG(DBG_AI, DBG_INFO, "AIToHeroes: " << hero.GetName() << " meeting " << other_hero->GetName());
         hero.AIMeeting(*other_hero);
+    }
+    else
+    if(! hero.AllowBattle())
+    {
+        DEBUG(DBG_AI, DBG_INFO, "AIToHeroes: " << hero.GetName() << " currently can not allow battle");
+    }
+    else
+    if(! other_hero->AllowBattle())
+    {
+        DEBUG(DBG_AI, DBG_INFO, "AIToHeroes: " << other_hero->GetName() << " currently can not allow battle");
     }
     else
     {
@@ -1584,7 +1594,7 @@ bool Heroes::AIPriorityObject(u16 index, u8 obj)
 	    const Heroes *hero = world.GetHeroes(index);
 	    if(hero && GetColor() != hero->GetColor())
 		// FIXME: AI skip visiting alliance
-		return conf.IsUnions(GetColor(), hero->GetColor()) ? false : true;
+		return conf.IsUnions(GetColor(), hero->GetColor()) || !hero->AllowBattle() ? false : true;
 	    break;
 	}
 
@@ -1960,7 +1970,8 @@ bool Heroes::AIValidObject(u16 index, u8 obj)
 		// FIXME: AI skip visiting alliance
 		if(conf.IsUnions(GetColor(), hero->GetColor())) return false;
 		else
-		if(GetArmy().StrongerEnemyArmy(hero->GetArmy())) return true;
+		if(hero->AllowBattle() &&
+		    GetArmy().StrongerEnemyArmy(hero->GetArmy())) return true;
 	    }
 	    break;
 	}

@@ -1457,13 +1457,18 @@ u16 Battle2::Arena::GetNearestTroops(u16 pos, std::vector<u16> & res, const std:
 bool Battle2::Arena::CanSurrenderOpponent(u8 color) const
 {
     const Army::army_t* enemy = GetArmy(GetOppositeColor(color));
-    return enemy && enemy->GetCommander();
+    const Army::army_t* army = GetArmy(color);
+
+    return army && army->GetCommander() && army->GetCommander()->GetType() == Skill::Primary::HEROES &&
+           enemy && enemy->GetCommander();
 }
 
 bool Battle2::Arena::CanRetreatOpponent(u8 color) const
 {
     const Army::army_t* army = GetArmy(color);
-    return army && army->GetCommander() && army->GetCommander()->CanBattleRetreat();
+
+    return army && army->GetCommander() && army->GetCommander()->GetType() == Skill::Primary::HEROES &&
+	    NULL == army->GetCommander()->inCastle();
 }
 
 bool Battle2::Arena::isDisableCastSpell(u8 spell, std::string* msg) const

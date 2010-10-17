@@ -1622,9 +1622,15 @@ u8 Heroes::GetControl(void) const
     return world.GetKingdom(color).Control();
 }
 
-bool Heroes::CanBattleRetreat(void) const
+bool Heroes::AllowBattle(void) const
 {
-    return NULL == inCastle();
+    switch(save_maps_general)
+    {
+	case MP2::OBJ_TEMPLE: return false;
+	default: break;
+    }
+
+    return true;
 }
 
 void Heroes::PreBattleAction(void)

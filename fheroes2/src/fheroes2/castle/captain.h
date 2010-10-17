@@ -57,7 +57,6 @@ class Captain : public HeroBase
 
     u16 GetMaxSpellPoints(void) const;
 
-    bool CanBattleRetreat(void) const;
     void PreBattleAction(void);
 
   private:

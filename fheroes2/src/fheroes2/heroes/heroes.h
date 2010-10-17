@@ -235,12 +235,12 @@ public:
     void SaveUnderObject(MP2::object_t obj);
     MP2::object_t GetUnderObject(void) const;
 
-    bool CanBattleRetreat(void) const;
-
     u32 GetExperience(void) const;
     void IncreaseExperience(const u32 exp);
 
+    bool AllowBattle(void) const;
     void PreBattleAction(void);
+
     void Dump(void) const;
 
     static u8 GetLevelFromExperience(u32 exp);

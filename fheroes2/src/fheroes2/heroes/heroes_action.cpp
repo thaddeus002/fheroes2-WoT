@@ -692,8 +692,18 @@ void ActionToHeroes(Heroes &hero, const u8 obj, const u16 dst_index)
     if(hero.GetColor() == other_hero->GetColor() ||
 	(conf.ExtUnionsAllowHeroesMeetings() && conf.IsUnions(hero.GetColor(), other_hero->GetColor())))
     {
-        DEBUG(DBG_GAME , DBG_INFO, "ActionToHeroes: " << hero.GetName() << " meeting " << other_hero->GetName());
+        DEBUG(DBG_GAME, DBG_INFO, "ActionToHeroes: " << hero.GetName() << " meeting " << other_hero->GetName());
 	hero.MeetingDialog(*other_hero);
+    }
+    else
+    if(! hero.AllowBattle())
+    {
+        DEBUG(DBG_GAME, DBG_INFO, "ActionToHeroes: " << hero.GetName() << " currently can not allow battle");
+    }
+    else
+    if(! other_hero->AllowBattle())
+    {
+        DEBUG(DBG_GAME, DBG_INFO, "ActionToHeroes: " << other_hero->GetName() << " currently can not allow battle");
     }
     else
     {
@@ -703,7 +713,7 @@ void ActionToHeroes(Heroes &hero, const u8 obj, const u16 dst_index)
 	    return;
 	}
 
-        DEBUG(DBG_GAME , DBG_INFO, "ActionToHeroes: " << hero.GetName() << " attack enemy hero " << other_hero->GetName());
+        DEBUG(DBG_GAME, DBG_INFO, "ActionToHeroes: " << hero.GetName() << " attack enemy hero " << other_hero->GetName());
 
 	// new battle2
 	Battle2::Result res = Battle2::Loader(hero.GetArmy(), other_hero->GetArmy(), dst_index);

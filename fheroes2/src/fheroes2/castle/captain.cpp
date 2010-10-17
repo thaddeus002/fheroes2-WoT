@@ -162,11 +162,6 @@ u8 Captain::GetControl(void) const
     return home.GetControl();
 }
 
-bool Captain::CanBattleRetreat(void) const
-{
-    return false;
-}
-
 u16 Captain::GetIndex(void) const
 {
     return home.GetIndex();
