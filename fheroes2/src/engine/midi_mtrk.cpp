@@ -224,7 +224,7 @@ void MTrk::ImportXmiEVNT(const Chunk & evnt)
     std::list<meta_t> notesoff;
     std::list<meta_t>::iterator it1, it2;
 
-    while(ptr)
+    while(ptr && ptr < (evnt.data + evnt.size))
     {
 	// insert event: note off
 	if(delta)
@@ -308,7 +308,7 @@ void MTrk::ImportXmiEVNT(const Chunk & evnt)
 		    events.push_back(new Event(delta, *ptr, 2, ptr + 1));
 		    u32 duration = 0;
 		    const u8 s = MIDI::UnpackDelta(ptr + 3, duration);
-//		    notesoff.push_back(meta_t(*ptr - 0x10, *(ptr + 1), duration));
+		    notesoff.push_back(meta_t(*ptr - 0x10, *(ptr + 1), duration));
 		    ptr += 3 + s;
 		    delta = 0;
 		}

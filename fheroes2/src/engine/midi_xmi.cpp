@@ -42,7 +42,7 @@ bool Xmi::Read(const std::vector<u8> & body)
 {
     if(0 == body.size())
     {
-        std::cerr << "Xmi: incorrect size" << std::endl;
+        std::cerr << "Xmi: " << "incorrect size" << std::endl;
         return false;
     }
 
@@ -50,7 +50,7 @@ bool Xmi::Read(const std::vector<u8> & body)
 
     if(memcmp(ID_FORM, ptr, 4))
     {
-        std::cerr << "Xmi: incorrect id: " << ID_FORM << std::endl;
+        std::cerr << "Xmi: " << "incorrect id: " << ID_FORM << std::endl;
         return false;
     }
 
@@ -59,7 +59,7 @@ bool Xmi::Read(const std::vector<u8> & body)
 
     if(memcmp(ID_CAT, ptr, 4))
     {
-        std::cerr << "Xmi: incorrect id: " << ID_CAT<< std::endl;
+        std::cerr << "Xmi: " << "incorrect id: " << ID_CAT<< std::endl;
         return false;
     }
 
@@ -67,7 +67,7 @@ bool Xmi::Read(const std::vector<u8> & body)
 
     if(memcmp(ID_XMID, ptr, 4))
     {
-        std::cerr << "Xmi: incorrect cat id: " << ID_XMID << std::endl;
+        std::cerr << "Xmi: " << "incorrect cat id: " << ID_XMID << std::endl;
         return false;
     }
 
@@ -75,7 +75,7 @@ bool Xmi::Read(const std::vector<u8> & body)
 
     if(memcmp(ID_FORM, ptr, 4))
     {
-        std::cerr << "Xmi: incorrect xmid id: " << ID_FORM << std::endl;
+        std::cerr << "Xmi: " << "incorrect xmid id: " << ID_FORM << std::endl;
         return false;
     }
     else
@@ -83,7 +83,7 @@ bool Xmi::Read(const std::vector<u8> & body)
 
     if(memcmp(ID_XMID, ptr, 4))
     {
-        std::cerr << "Xmi: incorrect form id: " << ID_XMID << std::endl;
+        std::cerr << "Xmi: " << "incorrect form id: " << ID_XMID << std::endl;
         return false;
     }
 
@@ -91,7 +91,7 @@ bool Xmi::Read(const std::vector<u8> & body)
 
     if(memcmp(ID_TIMB, ptr, 4))
     {
-        std::cerr << "Xmi: incorrect id: " << ID_TIMB << std::endl;
+        std::cerr << "Xmi: " << "incorrect id: " << ID_TIMB << std::endl;
         return false;
     }
 
@@ -100,7 +100,7 @@ bool Xmi::Read(const std::vector<u8> & body)
 
     if(memcmp(ID_EVNT, ptr, 4))
     {
-        std::cerr << "Xmi: incorrect id: " << ID_EVNT << std::endl;
+        std::cerr << "Xmi: " << "incorrect id: " << ID_EVNT << std::endl;
         return false;
     }
 
@@ -115,7 +115,7 @@ bool Xmi::Read(const std::string & filename)
 
     if(!fd.is_open())
     {
-        std::cerr << "Xmi: error read: " << filename.c_str() << std::endl;
+        std::cerr << "Xmi: " << "error read: " << filename.c_str() << std::endl;
         return false;
     }
 

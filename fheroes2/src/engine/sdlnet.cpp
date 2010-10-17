@@ -320,14 +320,14 @@ bool Network::RecvMessage(const Network::Socket & csd, QueueMessage & msg, bool 
 	// check id
 	if((0xFF00 & Network::proto) != (0xFF00 & head))
 	{
-	    if(debug) std::cerr << "Network::QueueMessage::Recv: unknown packet id: 0x" << std::hex << head << std::endl;
+	    if(debug) std::cerr << "Network::QueueMessage::Recv: " << "unknown packet id: 0x" << std::hex << head << std::endl;
 	    return false;
 	}
 
 	// check ver
 	if((0x00FF & Network::proto) > (0x00FF & head))
 	{
-	    if(debug) std::cerr << "Network::QueueMessage::Recv: obsolete protocol ver: 0x" << std::hex << (0x00FF & head) << std::endl;
+	    if(debug) std::cerr << "Network::QueueMessage::Recv: " << "obsolete protocol ver: 0x" << std::hex << (0x00FF & head) << std::endl;
 	    return false;
 	}
 
@@ -445,7 +445,7 @@ bool Network::Socket::Recv(char *buf, size_t len) const
 	    len -= rcv;
 	}
 	if(rcv == static_cast<int>(len)) return true;
-	std::cerr << "Network::Socket::Recv: size: " << std::dec << len << ", receive: " << rcv << ", error: " << GetError() << std::endl;
+	std::cerr << "Network::Socket::Recv: " << "size: " << std::dec << len << ", receive: " << rcv << ", error: " << GetError() << std::endl;
     }
     return false;
 }

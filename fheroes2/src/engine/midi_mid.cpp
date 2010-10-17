@@ -77,7 +77,7 @@ bool Mid::Read(const std::vector<u8> & body)
 
     if(! mthd.isValid())
     {
-        std::cerr << "Mid: error format" << std::endl;
+        std::cerr << "Mid::Read: " << "error format" << std::endl;
 
         return false;
     }
@@ -89,7 +89,7 @@ bool Mid::Read(const std::vector<u8> & body)
     {
 	if(ptr >= &body[0] + body.size())
 	{
-    	    std::cerr << "Mid: error read chunk, total: " << count << ", current: " << ii << std::endl;
+    	    std::cerr << "Mid::Read: " << "error read chunk, total: " << count << ", current: " << ii << std::endl;
 
     	    return false;
 	}
@@ -111,7 +111,7 @@ bool Mid::Read(const std::string & filename)
 
     if(!fd.is_open())
     {
-        std::cerr << "Mid: error read: " << filename << std::endl;
+        std::cerr << "Mid::Read: " << "error read: " << filename << std::endl;
 
         return false;
     }
@@ -120,7 +120,7 @@ bool Mid::Read(const std::string & filename)
     
     if(! mthd.isValid())
     {
-        std::cerr << "Mid: error format: " << filename << std::endl;
+        std::cerr << "Mid::Read: " << "error format: " << filename << std::endl;
 
         return false;
     }
@@ -131,7 +131,7 @@ bool Mid::Read(const std::string & filename)
     {
 	if(fd.fail())
 	{
-    	    std::cerr << "Mid: error read chunk, total: " << count << ", current: " << ii << std::endl;
+    	    std::cerr << "Mid::Read: " << "error read chunk, total: " << count << ", current: " << ii << std::endl;
 
     	    return false;
 	}
@@ -187,7 +187,7 @@ bool Mid::Write(const std::string & filename)
 
     if(!fd.is_open())
     {
-        std::cerr << "error write: " << filename << std::endl;
+        std::cerr << "Mid::Write: " << "error write: " << filename << std::endl;
 
         return false;
     }

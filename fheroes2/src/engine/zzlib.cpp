@@ -40,9 +40,9 @@ bool ZLib::UnCompress(std::vector<char> & dst, const char* src, size_t srcsz, bo
 	switch(res)
 	{
 	    case Z_OK:  return true;
-	    case Z_MEM_ERROR: if(debug) std::cerr << "ZLib::UnCompress: Z_MEM_ERROR" << std::endl; return false;
-	    case Z_BUF_ERROR: if(debug) std::cerr << "ZLib::UnCompress: Z_BUF_ERROR" << std::endl; return false;
-	    case Z_DATA_ERROR:if(debug) std::cerr << "ZLib::UnCompress: Z_DATA_ERROR"<< std::endl; return false;
+	    case Z_MEM_ERROR: if(debug) std::cerr << "ZLib::UnCompress: " << "Z_MEM_ERROR" << std::endl; return false;
+	    case Z_BUF_ERROR: if(debug) std::cerr << "ZLib::UnCompress: " << "Z_BUF_ERROR" << std::endl; return false;
+	    case Z_DATA_ERROR:if(debug) std::cerr << "ZLib::UnCompress: " << "Z_DATA_ERROR"<< std::endl; return false;
 	    default: break;
 	}
 

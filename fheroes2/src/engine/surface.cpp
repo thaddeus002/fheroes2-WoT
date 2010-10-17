@@ -797,13 +797,13 @@ void Surface::TILReflect(Surface & sf_dst, const Surface & sf_src, const u8 shap
     // valid sf_src
     if(!sf_src.surface || sf_src.w() != sf_src.h())
     {
-	std::cerr << "Surface::TILReflect: incorrect size" << std::endl;
+	std::cerr << "Surface::TILReflect: " << "incorrect size" << std::endl;
 	return;
     }
 
     if(sf_src.depth() != 8)
     {
-	std::cerr << "Surface::TILReflect: incorrect depth, use only 8 bpp" << std::endl;
+	std::cerr << "Surface::TILReflect: " << "incorrect depth, use only 8 bpp" << std::endl;
 	return;
     }
 
@@ -905,14 +905,14 @@ u32 AVERAGE(SDL_PixelFormat* fm, u32 c1, u32 c2)
 /* scale surface */
 void Surface::ScaleMinifyByTwo(Surface & sf_dst, const Surface & sf_src, bool event)
 {
-    if(!sf_src.isValid()) { std::cerr << "Surface::ScaleMinifyByTwo: invalid surface" << std::endl; return; };
+    if(!sf_src.isValid()) { std::cerr << "Surface::ScaleMinifyByTwo: " << "invalid surface" << std::endl; return; };
     u16 x, y, x2, y2;
 
     u8 mul = 2;
     u16 w = sf_src.w() / mul;
     u16 h = sf_src.h() / mul;
 
-    if(2 > w || 2 > h){ std::cerr << "Surface::ScaleMinifyByTwo: small size" << std::endl; return; };
+    if(2 > w || 2 > h){ std::cerr << "Surface::ScaleMinifyByTwo: " << "small size" << std::endl; return; };
 
     sf_dst.Set(w, h, sf_src.depth(), SWSURFACE);
     sf_dst.SetColorKey();
