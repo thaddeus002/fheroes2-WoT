@@ -86,7 +86,7 @@ class Settings
 public:
     enum
     {
-	GAME_FAST_LOAD_GAME_DIALOG	= 0x10000010,
+	//GAME_UNUSED			= 0x10000010,
 	GAME_REMEMBER_LAST_FOCUS	= 0x10000020,
 	GAME_SAVE_REWRITE_CONFIRM	= 0x10000040,
 	//GAME_UNUSED			= 0x10000080,
@@ -204,7 +204,6 @@ public:
     bool ExtAllowBuyFromWell(void) const;
     bool ExtShowVisitedContent(void) const;
     bool ExtScouteExtended(void) const;
-    bool ExtFastLoadGameDialog(void) const;
     bool ExtRememberLastFocus(void) const;
     bool ExtRememberLastFilename(void) const;
     bool ExtAbandonedMineRandom(void) const;

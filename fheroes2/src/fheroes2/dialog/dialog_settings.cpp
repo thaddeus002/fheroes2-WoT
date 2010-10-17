@@ -124,7 +124,6 @@ void Dialog::ExtSettings(void)
 
     std::vector<u32> states;
 
-    states.push_back(Settings::GAME_FAST_LOAD_GAME_DIALOG);
     states.push_back(Settings::GAME_SAVE_REWRITE_CONFIRM);
     states.push_back(Settings::GAME_ALSO_CONFIRM_AUTOSAVE);
     states.push_back(Settings::GAME_REMEMBER_LAST_FOCUS);

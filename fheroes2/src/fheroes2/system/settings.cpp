@@ -90,7 +90,6 @@ static const settings_t settingsFHeroes2[] =
 {
     { Settings::GAME_SAVE_REWRITE_CONFIRM,	_("game: always confirm for rewrite savefile"),		},
     { Settings::GAME_ALSO_CONFIRM_AUTOSAVE,	_("game: also confirm autosave"),			},
-    { Settings::GAME_FAST_LOAD_GAME_DIALOG,	_("game: fast load game dialog (L hot key)"),		},
     { Settings::GAME_REMEMBER_LAST_FOCUS,	_("game: remember last focus"),				},
     { Settings::GAME_REMEMBER_LAST_FILENAME,	_("game: remember last filename"),			},
     { Settings::WORLD_SHOW_VISITED_CONTENT,	_("world: show visited content from objects"),		},
@@ -1122,11 +1121,6 @@ bool Settings::ExtShowVisitedContent(void) const
 bool Settings::ExtScouteExtended(void) const
 {
     return ExtModes(WORLD_SCOUTING_EXTENDED);
-}
-
-bool Settings::ExtFastLoadGameDialog(void) const
-{
-    return ExtModes(GAME_FAST_LOAD_GAME_DIALOG);
 }
 
 bool Settings::ExtRememberLastFocus(void) const

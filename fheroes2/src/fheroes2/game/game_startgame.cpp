@@ -1390,18 +1390,8 @@ void Game::KeyPress_s(void)
 
 void Game::KeyPress_l(menu_t & ret)
 {
-    if(Settings::Get().ExtFastLoadGameDialog())
-    {
-	// fast load
-	std::string filename;
-	if(Dialog::SelectFileLoad(filename) && filename.size())
-	    ret = Game::Load(filename) ? STARTGAME : MAINMENU;
-    }
-    else
-    {
-	if(Dialog::YES == Dialog::Message("", _("Are you sure you want to load a new game? (Your current game will be lost)"), Font::BIG, Dialog::YES|Dialog::NO))
-	ret = LOADGAME;
-    }
+    if(Dialog::YES == Dialog::Message("", _("Are you sure you want to load a new game? (Your current game will be lost)"), Font::BIG, Dialog::YES|Dialog::NO))
+    ret = LOADGAME;
 }
 
 void Game::KeyPress_p(void)
