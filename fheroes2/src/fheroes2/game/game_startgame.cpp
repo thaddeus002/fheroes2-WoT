@@ -1333,6 +1333,9 @@ void Game::ButtonSystem(void)
 	I.gameArea.Center(0, 0);
 	I.gameArea.Center(focus.Center());
         I.SetRedraw(REDRAW_GAMEAREA);
+
+	if(Settings::Get().HideInterface())
+	    I.controlPanel.ResetTheme();
     }
 
     if(0x08 & changes)

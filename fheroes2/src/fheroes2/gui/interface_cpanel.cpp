@@ -36,39 +36,46 @@ namespace Game
     void KeyPress_ESC(menu_t &);
 }
 
-Interface::ControlPanel::ControlPanel()
+Interface::ControlPanel::ControlPanel() : alpha(130)
 {
-    if(Display::Get().h() > 240)
-    {
-	w = 180;
-	h = 36;
-	rt_radr.w = 36;
-	rt_radr.h = 36;
-	rt_icon.w = 36;
-	rt_icon.h = 36;
-	rt_bttn.w = 36;
-	rt_bttn.h = 36;
-	rt_stat.w = 36;
-	rt_stat.h = 36;
-	rt_quit.w = 36;
-	rt_quit.h = 36;
-    }
-    else
-    {
-	const Sprite & sf = AGG::GetICN(ICN::CELLWIN, 11);
-	w = sf.w();
-	h = sf.h();
-	rt_radr.w = 17;
-	rt_radr.h = 17;
-	rt_icon.w = 17;
-	rt_icon.h = 17;
-	rt_bttn.w = 17;
-	rt_bttn.h = 17;
-	rt_stat.w = 17;
-	rt_stat.h = 17;
-	rt_quit.w = 17;
-	rt_quit.h = 17;
-    }
+    w = 180;
+    h = 36;
+
+    rt_radr.w = 36;
+    rt_radr.h = 36;
+    rt_icon.w = 36;
+    rt_icon.h = 36;
+    rt_bttn.w = 36;
+    rt_bttn.h = 36;
+    rt_stat.w = 36;
+    rt_stat.h = 36;
+    rt_quit.w = 36;
+    rt_quit.h = 36;
+
+    btn_radr.Set(h, h);
+    btn_icon.Set(h, h);
+    btn_bttn.Set(h, h);
+    btn_stat.Set(h, h);
+    btn_quit.Set(h, h);
+
+    ResetTheme();
+}
+
+void Interface::ControlPanel::ResetTheme(void)
+{
+    ICN::icn_t icn = Settings::Get().EvilInterface() ? ICN::ADVEBTNS : ICN::ADVBTNS;
+
+    btn_radr.Blit(AGG::GetICN(icn, 4));
+    btn_icon.Blit(AGG::GetICN(icn, 0));
+    btn_bttn.Blit(AGG::GetICN(icn, 12));
+    btn_stat.Blit(AGG::GetICN(icn, 10));
+    btn_quit.Blit(AGG::GetICN(icn, 8));
+
+    btn_radr.SetAlpha(alpha);
+    btn_icon.SetAlpha(alpha);
+    btn_bttn.SetAlpha(alpha);
+    btn_stat.SetAlpha(alpha);
+    btn_quit.SetAlpha(alpha);
 }
 
 Interface::ControlPanel & Interface::ControlPanel::Get(void)
@@ -86,57 +93,28 @@ void Interface::ControlPanel::SetPos(s16 ox, s16 oy)
 {
     x = ox;
     y = oy;
-    if(Display::Get().h() > 240)
-    {
-	rt_radr.x = x;
-	rt_radr.y = y;
-	rt_icon.x = x + 36;
-	rt_icon.y = y;
-	rt_bttn.x = x + 72;
-	rt_bttn.y = y;
-	rt_stat.x = x + 108;
-	rt_stat.y = y;
-	rt_quit.x = x + 144;
-	rt_quit.y = y;
-    }
-    else
-    {
-	rt_radr.x = x + 2;
-	rt_radr.y = y + 3;
-	rt_icon.x = x + 20;
-	rt_icon.y = y + 3;
-	rt_bttn.x = x + 38;
-	rt_bttn.y = y + 3;
-	rt_stat.x = x + 56;
-	rt_stat.y = y + 3;
-	rt_quit.x = x + 74;
-	rt_quit.y = y + 3;
-    }
+
+    rt_radr.x = x;
+    rt_radr.y = y;
+    rt_icon.x = x + 36;
+    rt_icon.y = y;
+    rt_bttn.x = x + 72;
+    rt_bttn.y = y;
+    rt_stat.x = x + 108;
+    rt_stat.y = y;
+    rt_quit.x = x + 144;
+    rt_quit.y = y;
 }
 
 void Interface::ControlPanel::Redraw(void)
 {
     Display & display = Display::Get();
 
-    if(Display::Get().h() > 240)
-    {
-	ICN::icn_t icn = Settings::Get().EvilInterface() ? ICN::ADVEBTNS : ICN::ADVBTNS;
-	display.Blit(AGG::GetICN(icn, 4),  x, y);
-	display.Blit(AGG::GetICN(icn, 0),  x + 36, y);
-	display.Blit(AGG::GetICN(icn, 12), x + 72, y);
-	display.Blit(AGG::GetICN(icn, 10), x + 108, y);
-	display.Blit(AGG::GetICN(icn, 8),  x + 144, y);
-    }
-    else
-    {
-	const Sprite & sf = AGG::GetICN(ICN::CELLWIN, 11);
-	display.Blit(sf, x, y);
-	display.Blit(AGG::GetICN(ICN::REQUESTS, 31), x + 2, y + 3);
-	display.Blit(AGG::GetICN(ICN::REQUESTS, 32), x + 20, y + 3);
-	display.Blit(AGG::GetICN(ICN::REQUESTS, 34), x + 38, y + 3);
-	display.Blit(AGG::GetICN(ICN::REQUESTS, 35), x + 56, y + 3);
-	display.Blit(AGG::GetICN(ICN::REQUESTS, 39), x + 74, y + 3);
-    }
+    display.Blit(btn_radr,  x, y);
+    display.Blit(btn_icon,  x + 36, y);
+    display.Blit(btn_bttn, x + 72, y);
+    display.Blit(btn_stat, x + 108, y);
+    display.Blit(btn_quit,  x + 144, y);
 }
 
 void Interface::ControlPanel::QueueEventProcessing(Game::menu_t & ret)
