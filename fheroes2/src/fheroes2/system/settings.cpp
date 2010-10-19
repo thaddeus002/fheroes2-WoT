@@ -1395,16 +1395,6 @@ void Settings::BinaryLoad(void)
 	    // volume
 	    msg.Pop(sound_volume);
 	    msg.Pop(music_volume);
-
-	    // speed
-	    msg.Pop(heroes_speed);
-	    msg.Pop(ai_speed);
-	}
-
-	if(version > FORMAT_VERSION_1978)
-	{
-	    // restore scroll speed
-	    msg.Pop(scroll_speed);
 	}
     }
 }

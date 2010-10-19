@@ -26,19 +26,19 @@
 #include "settings.h"
 #include "game.h"
 
-struct TimeDelay : std::pair<SDL::Time, u32>
+struct TimeDelay : std::pair<SDL::Time, int>
 {
-    TimeDelay(u32 dl)
+    TimeDelay(int dl)
     {
 	second = dl;
     }
 
-    u32 operator() (void) const
+    int operator() (void) const
     {
 	return second;
     }
 
-    void operator= (u32 dl)
+    void operator= (int dl)
     {
 	second = dl;
     }
@@ -51,7 +51,7 @@ struct TimeDelay : std::pair<SDL::Time, u32>
     bool Trigger(void)
     {
 	first.Stop();
-	if(first.Get() < second) return false;
+	if(first.Get() < static_cast<u32>(second)) return false;
 
 	first.Start();
 	return true;
@@ -116,16 +116,20 @@ void Game::UpdateHeroesMoveSpeed(void)
     TimeDelay & td_hero = delays[CURRENT_HERO_DELAY];
     TimeDelay & td_ai   = delays[CURRENT_AI_DELAY];
 
-    float hr_value = (conf.HeroesMoveSpeed() - DEFAULT_SPEED_DELAY) * td_etalon() / DEFAULT_SPEED_DELAY;
-    float ai_value = (conf.AIMoveSpeed() - DEFAULT_SPEED_DELAY) * td_etalon() / DEFAULT_SPEED_DELAY;
+    const int hr_value = conf.HeroesMoveSpeed() ?
+	((conf.HeroesMoveSpeed() - DEFAULT_SPEED_DELAY) * td_etalon()) / DEFAULT_SPEED_DELAY :
+	td_etalon();
+    const int ai_value = conf.AIMoveSpeed() ?
+	((conf.AIMoveSpeed() - DEFAULT_SPEED_DELAY) * td_etalon()) / DEFAULT_SPEED_DELAY :
+	td_etalon();
 
     if(conf.HeroesMoveSpeed() == DEFAULT_SPEED_DELAY)
 	td_hero = td_etalon();
     else
-	td_hero = td_etalon() - static_cast<s16>(hr_value);
+	td_hero = td_etalon() - hr_value;
 
     if(conf.AIMoveSpeed() == DEFAULT_SPEED_DELAY)
 	td_ai   = td_etalon();
     else
-	td_ai   = td_etalon() - static_cast<s16>(ai_value);
+	td_ai   = td_etalon() - ai_value;
 }
