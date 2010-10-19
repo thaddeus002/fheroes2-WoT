@@ -874,20 +874,20 @@ void Skill::Secondary::LoadDefaults(u8 race, std::vector<Secondary> & skills)
 
     if(ptr)
     {
-	if(ptr->initial_secondary.archery)	skills.push_back(Secondary(ARCHERY, static_cast<Skill::Level::type_t>(ptr->initial_secondary.archery)));
-	if(ptr->initial_secondary.ballistics)	skills.push_back(Secondary(BALLISTICS, static_cast<Skill::Level::type_t>(ptr->initial_secondary.ballistics)));
-	if(ptr->initial_secondary.diplomacy)	skills.push_back(Secondary(DIPLOMACY, static_cast<Skill::Level::type_t>(ptr->initial_secondary.diplomacy)));
-	if(ptr->initial_secondary.eagleeye)	skills.push_back(Secondary(EAGLEEYE, static_cast<Skill::Level::type_t>(ptr->initial_secondary.eagleeye)));
-	if(ptr->initial_secondary.estates)	skills.push_back(Secondary(ESTATES, static_cast<Skill::Level::type_t>(ptr->initial_secondary.estates)));
-	if(ptr->initial_secondary.leadership)	skills.push_back(Secondary(LEADERSHIP, static_cast<Skill::Level::type_t>(ptr->initial_secondary.leadership)));
-	if(ptr->initial_secondary.logistics)	skills.push_back(Secondary(LOGISTICS, static_cast<Skill::Level::type_t>(ptr->initial_secondary.logistics)));
-	if(ptr->initial_secondary.luck)		skills.push_back(Secondary(LUCK, static_cast<Skill::Level::type_t>(ptr->initial_secondary.luck)));
-	if(ptr->initial_secondary.mysticism)	skills.push_back(Secondary(MYSTICISM, static_cast<Skill::Level::type_t>(ptr->initial_secondary.mysticism)));
-	if(ptr->initial_secondary.navigation)	skills.push_back(Secondary(NAVIGATION, static_cast<Skill::Level::type_t>(ptr->initial_secondary.navigation)));
-	if(ptr->initial_secondary.necromancy)	skills.push_back(Secondary(NECROMANCY, static_cast<Skill::Level::type_t>(ptr->initial_secondary.necromancy)));
-	if(ptr->initial_secondary.pathfinding)	skills.push_back(Secondary(PATHFINDING, static_cast<Skill::Level::type_t>(ptr->initial_secondary.pathfinding)));
-	if(ptr->initial_secondary.scouting)	skills.push_back(Secondary(SCOUTING, static_cast<Skill::Level::type_t>(ptr->initial_secondary.scouting)));
-	if(ptr->initial_secondary.wisdom)	skills.push_back(Secondary(WISDOM, static_cast<Skill::Level::type_t>(ptr->initial_secondary.wisdom)));
+	if(ptr->initial_secondary.archery)	skills.push_back(Secondary(ARCHERY, Level::FromMP2(ptr->initial_secondary.archery)));
+	if(ptr->initial_secondary.ballistics)	skills.push_back(Secondary(BALLISTICS, Level::FromMP2(ptr->initial_secondary.ballistics)));
+	if(ptr->initial_secondary.diplomacy)	skills.push_back(Secondary(DIPLOMACY, Level::FromMP2(ptr->initial_secondary.diplomacy)));
+	if(ptr->initial_secondary.eagleeye)	skills.push_back(Secondary(EAGLEEYE, Level::FromMP2(ptr->initial_secondary.eagleeye)));
+	if(ptr->initial_secondary.estates)	skills.push_back(Secondary(ESTATES, Level::FromMP2(ptr->initial_secondary.estates)));
+	if(ptr->initial_secondary.leadership)	skills.push_back(Secondary(LEADERSHIP, Level::FromMP2(ptr->initial_secondary.leadership)));
+	if(ptr->initial_secondary.logistics)	skills.push_back(Secondary(LOGISTICS, Level::FromMP2(ptr->initial_secondary.logistics)));
+	if(ptr->initial_secondary.luck)		skills.push_back(Secondary(LUCK, Level::FromMP2(ptr->initial_secondary.luck)));
+	if(ptr->initial_secondary.mysticism)	skills.push_back(Secondary(MYSTICISM, Level::FromMP2(ptr->initial_secondary.mysticism)));
+	if(ptr->initial_secondary.navigation)	skills.push_back(Secondary(NAVIGATION, Level::FromMP2(ptr->initial_secondary.navigation)));
+	if(ptr->initial_secondary.necromancy)	skills.push_back(Secondary(NECROMANCY, Level::FromMP2(ptr->initial_secondary.necromancy)));
+	if(ptr->initial_secondary.pathfinding)	skills.push_back(Secondary(PATHFINDING, Level::FromMP2(ptr->initial_secondary.pathfinding)));
+	if(ptr->initial_secondary.scouting)	skills.push_back(Secondary(SCOUTING, Level::FromMP2(ptr->initial_secondary.scouting)));
+	if(ptr->initial_secondary.wisdom)	skills.push_back(Secondary(WISDOM, Level::FromMP2(ptr->initial_secondary.wisdom)));
     }
 }
 

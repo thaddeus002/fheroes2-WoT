@@ -415,7 +415,7 @@ void Game::IO::PackTile(QueueMessage & msg, const Maps::Tiles & tile)
     msg.Push(tile.quantity3);
     msg.Push(tile.quantity4);
     msg.Push(tile.fogs);
-    msg.Push(tile.flags);
+    msg.Push(tile.unused);
 
     // addons 1
     msg.Push(static_cast<u8>(tile.addons_level1.size()));
@@ -943,7 +943,7 @@ void Game::IO::UnpackTile(QueueMessage & msg, Maps::Tiles & tile, u16 check_vers
     msg.Pop(tile.quantity3);
     msg.Pop(tile.quantity4);
     msg.Pop(tile.fogs);
-    msg.Pop(tile.flags);
+    msg.Pop(tile.unused);
 
 #ifdef WITH_DEBUG
     if(IS_DEVEL()) tile.fogs &= ~Settings::Get().MyColor();

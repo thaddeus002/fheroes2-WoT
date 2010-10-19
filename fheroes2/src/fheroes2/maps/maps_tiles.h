@@ -56,13 +56,6 @@ namespace Maps
         u8	index;
     };
 
-    enum flags_t
-    {
-	REDRAW	= 0x01,	// reserved
-	USR4	= 0x04,
-	USR8	= 0x08
-    };
-
     class Tiles
     {
     public:
@@ -151,9 +144,6 @@ namespace Maps
 	void SetFog(u8 color);
 	void ClearFog(u8 color);
 
-	bool NeedRedraw(void) const;
-	void SetRedraw(bool);
-
 	void FixLoyaltyVersion(void);
 
 	u8   GetMinesType(void) const;
@@ -193,9 +183,9 @@ namespace Maps
         u8      quantity1;
         u8      quantity2;
 	u8	quantity3;
-	u8	quantity4;	/* memory align */
+	u8	quantity4;
         u8	fogs;
-	u8	flags;
+	u8	unused; /* memory align */
     };
 }
 

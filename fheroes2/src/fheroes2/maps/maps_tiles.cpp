@@ -143,13 +143,13 @@ bool Maps::TilesAddon::isStream(const TilesAddon & ta)
 
 Maps::Tiles::Tiles(u16 index) : maps_index(index), tile_index(0),
     shape(0), general(0), quantity1(0), quantity2(0),
-    fogs(0xFF), flags(REDRAW)
+    fogs(0xFF), unused(0)
 {
 }
 
 Maps::Tiles::Tiles(u16 mi, const MP2::mp2tile_t & mp2tile) : maps_index(mi), tile_index(mp2tile.tileIndex),
     shape(mp2tile.shape), general(mp2tile.generalObject), quantity1(mp2tile.quantity1), quantity2(mp2tile.quantity2),
-    quantity3(0), quantity4(0), fogs(0xFF), flags(REDRAW)
+    quantity3(0), quantity4(0), fogs(0xFF), unused(0)
 {
     AddonsPushLevel1(mp2tile);
     AddonsPushLevel2(mp2tile);
@@ -2234,16 +2234,6 @@ void Maps::Tiles::ClearFog(u8 color)
 {
     const Settings & conf = Settings::Get();
     fogs &= ~(conf.ExtUnionsAllowViewMaps() ? conf.GetUnions(color) : color);
-}
-
-bool Maps::Tiles::NeedRedraw(void) const
-{
-    return flags & REDRAW;
-}
-
-void Maps::Tiles::SetRedraw(bool f)
-{
-    f ? flags |= REDRAW : flags &= ~REDRAW;
 }
 
 void Maps::Tiles::ResetQuantity(void)

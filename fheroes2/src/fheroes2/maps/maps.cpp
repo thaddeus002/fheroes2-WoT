@@ -288,7 +288,6 @@ bool Maps::ScanDistanceObject(const u16 center, const u8 obj, const u16 dist, st
 
     const s16 cx = center % world.w();
     const s16 cy = center / world.w();
-    u16 res = 0;
 
     // from center to abroad
     for(u16 ii = 1; ii <= dist; ++ii)
@@ -304,11 +303,11 @@ bool Maps::ScanDistanceObject(const u16 center, const u8 obj, const u16 dist, st
 	{
 	    if(ty < iy && iy < my && tx < ix && ix < mx) continue;
 
-	    res = GetIndexFromAbsPoint(ix, iy);
+	    const s16 index = GetIndexFromAbsPoint(ix, iy);
 
-	    if(isValidAbsPoint(ix, iy) &&
-		obj == world.GetTiles(res).GetObject())
-		    results.push_back(res);
+           if(isValidAbsIndex(index) &&
+               obj == world.GetTiles(index).GetObject())
+                   results.push_back(index);
 	}
     }
 
