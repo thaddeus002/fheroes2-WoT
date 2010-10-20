@@ -60,6 +60,8 @@ struct TimeDelay : std::pair<SDL::Time, int>
 
 namespace Game
 {
+    void AnimateDelaysInitialize(void);
+
     TimeDelay delays[] = {
 	20,	// SCROLL_DELAY
 	400,	// MAIN_MENU_DELAY

@@ -49,6 +49,7 @@ namespace String
 
 int Sign(int);
 KeySym KeySymFromChar(char);
+KeySym KeySymFromInt(int);
 
 std::string GetDirname(const std::string &);
 std::string GetBasename(const std::string &);

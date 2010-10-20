@@ -39,12 +39,8 @@ LocalEvent::LocalEvent() : modes(0), key_value(KEY_NONE), mouse_state(0),
     emulate_mouse_left = KEY_LEFT;
     emulate_mouse_right = KEY_RIGHT;
     emulate_mouse_step = 10;
-    emulate_press_left = KEY_1;
-    emulate_press_right = KEY_2;
-#endif
-
-#ifdef WITH_KEYMAPPING
-    vkey.reserve(12);
+    emulate_press_left = KEY_NONE;
+    emulate_press_right = KEY_NONE;
 #endif
 }
 
@@ -245,24 +241,6 @@ KeySym SDLToKeySym(SDLKey key)
     return KEY_NONE;
 }
 
-#ifdef WITH_KEYMAPPING
-#include <algorithm>
-void LocalEvent::SetVirtualKey(int sym1, KeySym sym2)
-{
-    std::vector<KeyMap>::iterator it = std::find_if(vkey.begin(), vkey.end(), std::bind2nd(std::mem_fun_ref(&KeyMap::isKey), sym1));
-    if(vkey.end() != it)
-	(*it).second = sym2;
-    else
-	vkey.push_back(KeyMap(sym1, sym2));
-}
-
-KeySym LocalEvent::GetVirtualKey(KeySym sym) const
-{
-    std::vector<KeyMap>::const_iterator it = std::find_if(vkey.begin(), vkey.end(), std::bind2nd(std::mem_fun_ref(&KeyMap::isKey), sym));
-    return vkey.end() == it ? sym : (*it).second;
-}
-#endif
-
 LocalEvent & LocalEvent::Get(void)
 {
     static LocalEvent le;
@@ -399,9 +377,6 @@ void LocalEvent::HandleKeyboardEvent(SDL_KeyboardEvent & event)
 #endif
 
 	key_value = SDLToKeySym(event.keysym.sym);
-#ifdef WITH_KEYMAPPING
-	key_value = GetVirtualKey(key_value);
-#endif
     }
 }
 
@@ -779,24 +754,24 @@ void LocalEvent::SetEmulateMouse(bool f)
     if(f) mouse_cu = Point(0, 0);
 }
 
-void LocalEvent::SetEmulateMouseUpKey(int k)
+void LocalEvent::SetEmulateMouseUpKey(KeySym k)
 {
-    emulate_mouse_up = static_cast<KeySym>(k);
+    emulate_mouse_up = k;
 }
 
-void LocalEvent::SetEmulateMouseDownKey(int k)
+void LocalEvent::SetEmulateMouseDownKey(KeySym k)
 {
-    emulate_mouse_down = static_cast<KeySym>(k);
+    emulate_mouse_down = k;
 }
 
-void LocalEvent::SetEmulateMouseLeftKey(int k)
+void LocalEvent::SetEmulateMouseLeftKey(KeySym k)
 {
-    emulate_mouse_left = static_cast<KeySym>(k);
+    emulate_mouse_left = k;
 }
 
-void LocalEvent::SetEmulateMouseRightKey(int k)
+void LocalEvent::SetEmulateMouseRightKey(KeySym k)
 {
-    emulate_mouse_right = static_cast<KeySym>(k);
+    emulate_mouse_right = k;
 }
                                 
 void LocalEvent::SetEmulateMouseStep(u8 s)
@@ -804,14 +779,14 @@ void LocalEvent::SetEmulateMouseStep(u8 s)
     emulate_mouse_step = s;
 }
 
-void LocalEvent::SetEmulatePressLeftKey(int k)
+void LocalEvent::SetEmulatePressLeftKey(KeySym k)
 {
-    emulate_press_left = static_cast<KeySym>(k);
+    emulate_press_left = k;
 }
 
-void LocalEvent::SetEmulatePressRightKey(int k)
+void LocalEvent::SetEmulatePressRightKey(KeySym k)
 {
-    emulate_press_right = static_cast<KeySym>(k);
+    emulate_press_right = k;
 }
 
 bool LocalEvent::EmulateMouseAction(KeySym key)

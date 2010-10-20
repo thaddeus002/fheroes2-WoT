@@ -62,36 +62,12 @@ namespace Game
     void FocusCastleClickLeftAction(Castle &, u16);
     void MouseCursorAreaPressRight(u16);
 
-    void ButtonNextHero(void);
-    void ButtonMovement(void);
-    void ButtonKingdom(void);
-    void ButtonSpell(void);
-    void ButtonEndTurn(Game::menu_t &);
-    void ButtonAdventure(Game::menu_t &);
-    void ButtonFile(Game::menu_t &);
-    void ButtonSystem(void);
-    void StartNewGame(Game::menu_t &);
+    void StartNewGame(menu_t &);
 
-    void KeyPress_ESC(menu_t &);
-    void KeyPress_e(menu_t &);
-    void KeyPress_t(void);
-    void KeyPress_s(void);
-    void KeyPress_l(menu_t &);
-    void KeyPress_p(void);
-    void KeyPress_i(void);
-    void KeyPress_d(menu_t &);
-    void KeyPress_SPACE(void);
-    void KeyPress_RETURN(void);
     void KeyPress_LEFT(void);
     void KeyPress_RIGHT(void);
     void KeyPress_TOP(void);
     void KeyPress_BOTTOM(void);
-
-    void SwitchShowRadar(void);
-    void SwitchShowStatus(void);
-    void SwitchShowButtons(void);
-    void SwitchShowIcons(void);
-    void SwitchShowControlPanel(void);
 
     void NewWeekDialog(void);
     void ShowEventDay(void);
@@ -744,74 +720,73 @@ Game::menu_t Game::HumanTurn(void)
 	// for pocketpc: auto hide status if start turn
 	if(autohide_status && AnimateInfrequent(AUTOHIDE_STATUS_DELAY))
 	{
-	    SwitchShowStatus();
+	    EventSwitchShowStatus();
 	    autohide_status = false;
 	}
 
 	// hot keys
-	if(le.KeyPress()) switch(le.KeyValue())
+	if(le.KeyPress()) switch(HotKeysGetEvent(le.KeyValue()))
 	{
 #ifdef WITHOUT_MOUSE
-	    case KEY_BACKSLASH:	le.ToggleEmulateMouse(); break;
+	    case EVENT_EMULATETOGGLE:	le.ToggleEmulateMouse(); break;
 #endif
-	    // exit
-	    case KEY_q:
-	    case KEY_ESCAPE:	KeyPress_ESC(res); break;
+	    // exit dialog
+	    case EVENT_EXIT:		EventExit(res); break;
     	    // end turn
-	    case KEY_e:		KeyPress_e(res); break;
+	    case EVENT_ENDTURN:		EventEndTurn(res); break;
     	    // next hero
-	    case KEY_h:		ButtonNextHero(); break;
+	    case EVENT_NEXTHERO:	EventNextHero(); break;
     	    // next town
-	    case KEY_t:		KeyPress_t(); break;
-	    // save game
-	    case KEY_s:		KeyPress_s(); break;
-	    // load game
-	    case KEY_l:		KeyPress_l(res); break;
-	    // file options
-	    case KEY_f:		ButtonFile(res); break;
-	    // puzzle map
-	    case KEY_p:		KeyPress_p(); break;
-	    // info game
-	    case KEY_i:		KeyPress_i(); break;
-	    // dig artifact
-	    case KEY_d:		KeyPress_d(res); break;
-	    // cast spell
-	    case KEY_a:		ButtonSpell(); break;
-	    // default action
-	    case KEY_SPACE:	KeyPress_SPACE(); break;
-	    // hero/town dialog
-	    case KEY_n:
-	    case KEY_RETURN:	KeyPress_RETURN(); break;
+	    case EVENT_NEXTTOWN:	EventNextTown(); break;
 	    // hero movement
-	    case KEY_m:		ButtonMovement(); break;
+	    case EVENT_CONTINUE:	EventContinueMovement(); break;
+	    // save game
+	    case EVENT_SAVEGAME:	EventSaveGame(); break;
+	    // load game
+	    case EVENT_LOADGAME:	EventLoadGame(res); break;
+	    // file options
+	    case EVENT_FILEOPTIONS:	EventFileDialog(res); break;
 	    // system options
-	    case KEY_o:		ButtonSystem(); break;
-	    // scroll or move
-    	    case KEY_LEFT:	KeyPress_LEFT(); break;
-	    case KEY_RIGHT:	KeyPress_RIGHT(); break;
-	    case KEY_UP:	KeyPress_TOP(); break;
-	    case KEY_DOWN:	KeyPress_BOTTOM(); break;
-	    // scroll
-	    case KEY_COMMA:	I.gameArea.SetScroll(SCROLL_LEFT); break;
-    	    case KEY_PERIOD:	I.gameArea.SetScroll(SCROLL_RIGHT); break;
-    	    case KEY_SEMICOLON:	I.gameArea.SetScroll(SCROLL_TOP); break;
-    	    case KEY_SLASH:	I.gameArea.SetScroll(SCROLL_BOTTOM); break;
-
+	    case EVENT_SYSTEMOPTIONS:	EventSystemDialog(); break;
+	    // puzzle map
+	    case EVENT_PUZZLEMAPS:	EventPuzzleMaps(); break;
+	    // info game
+	    case EVENT_INFOGAME:	EventGameInfo(); break;
+	    // dig artifact
+	    case EVENT_DIGARTIFACT:	EventDigArtifact(res); break;
+	    // cast spell
+	    case EVENT_CASTSPELL:	EventCastSpell(); break;
     	    // show/hide control panel
-	    case KEY_1:		SwitchShowControlPanel(); break;
+	    case EVENT_CTRLPANEL:	EventSwitchShowControlPanel(); break;
 	    // hide/show radar
-	    case KEY_9:		SwitchShowRadar(); break;
+	    case EVENT_SHOWRADAR:	EventSwitchShowRadar(); break;
 	    // hide/show buttons
-	    case KEY_3:		SwitchShowButtons(); break;
+	    case EVENT_SHOWBUTTONS:	EventSwitchShowButtons(); break;
 	    // hide/show status window
-	    case KEY_7:		SwitchShowStatus(); break;
+	    case EVENT_SHOWSTATUS:	EventSwitchShowStatus(); break;
 	    // hide/show hero/town icons
-	    case KEY_5:		SwitchShowIcons(); break;
+	    case EVENT_SHOWICONS:	EventSwitchShowIcons(); break;
+	    // move hero
+	    case EVENT_MOVELEFT:	KeyPress_LEFT(); break;
+	    case EVENT_MOVERIGHT:	KeyPress_RIGHT(); break;
+	    case EVENT_MOVEUP:		KeyPress_TOP(); break;
+	    case EVENT_MOVEDOWN:	KeyPress_BOTTOM(); break;
+	    // scroll maps
+	    case EVENT_SCROLLLEFT:	I.gameArea.SetScroll(SCROLL_LEFT); break;
+	    case EVENT_SCROLLRIGHT:	I.gameArea.SetScroll(SCROLL_RIGHT); break;
+	    case EVENT_SCROLLUP:	I.gameArea.SetScroll(SCROLL_TOP); break;
+	    case EVENT_SCROLLDOWN:	I.gameArea.SetScroll(SCROLL_BOTTOM); break;
+	    // default action
+	    case EVENT_DEFAULTACTION:	EventDefaultAction(); break;
+	    // open focus
+	    case EVENT_OPENFOCUS:	EventOpenFocus(); break;
+	    // switch group
+	    case EVENT_SWITCHGROUP:	EventSwitchGroup(); break;
 
 	    default: break;
 	}
 
-	// fast break (or crash after KeyPress_L)
+	// fast break (or crash after EventLoadGame)
 	if(res != CANCEL) break;
 
 	if(conf.ExtTapMode())
@@ -1201,7 +1176,7 @@ void Game::MouseCursorAreaPressRight(u16 index_maps)
     }
 }
 
-void Game::ButtonNextHero(void)
+void Game::EventNextHero(void)
 {
     Game::Focus & global_focus = Focus::Get();
 
@@ -1224,7 +1199,7 @@ void Game::ButtonNextHero(void)
     global_focus.SetRedraw();
 }
 
-void Game::ButtonMovement(void)
+void Game::EventContinueMovement(void)
 {
     Game::Focus & global_focus = Focus::Get();
     if(Game::Focus::HEROES == global_focus.Type() &&
@@ -1232,11 +1207,11 @@ void Game::ButtonMovement(void)
 	global_focus.GetHeroes().SetMove(!global_focus.GetHeroes().isEnableMove());
 }
 
-void Game::ButtonKingdom(void)
+void Game::EventKingdomInfo(void)
 {
 }
 
-void Game::ButtonSpell(void)
+void Game::EventCastSpell(void)
 {
     Game::Focus & global_focus = Focus::Get();
     Interface::Basic & I = Interface::Basic::Get();
@@ -1250,7 +1225,7 @@ void Game::ButtonSpell(void)
     }
 }
 
-void Game::ButtonEndTurn(Game::menu_t & ret)
+void Game::EventEndTurn(Game::menu_t & ret)
 {
     Game::Focus & global_focus = Focus::Get();
     const Kingdom & myKingdom = world.GetMyKingdom();
@@ -1263,7 +1238,7 @@ void Game::ButtonEndTurn(Game::menu_t & ret)
 	ret = ENDTURN;
 }
 
-void Game::ButtonAdventure(Game::menu_t & ret)
+void Game::EventAdventureDialog(Game::menu_t & ret)
 {
     Game::Focus & global_focus = Focus::Get();
     Mixer::Reduce();
@@ -1273,15 +1248,15 @@ void Game::ButtonAdventure(Game::menu_t & ret)
 	    break;
 
 	case Dialog::PUZZLE: 
-	    KeyPress_p();
+	    EventPuzzleMaps();
 	    break;
 
 	case Dialog::INFO:
-	    KeyPress_i();
+	    EventGameInfo();
 	    break;
 
 	case Dialog::DIG:
-	    KeyPress_d(ret);
+	    EventDigArtifact(ret);
 	    break;
 
 	default: break;
@@ -1295,7 +1270,7 @@ void Game::StartNewGame(Game::menu_t & ret)
 	ret = NEWGAME;
 }
 
-void Game::ButtonFile(Game::menu_t & ret)
+void Game::EventFileDialog(Game::menu_t & ret)
 {
     switch(Dialog::FileOptions())
     {
@@ -1308,11 +1283,11 @@ void Game::ButtonFile(Game::menu_t & ret)
 	    break;
 
 	case LOADGAME:
-	    KeyPress_l(ret);
+	    EventLoadGame(ret);
 	    break;
 
 	case SAVEGAME:
-	    KeyPress_s();
+	    EventSaveGame();
 	    break;
 
 	default:
@@ -1320,7 +1295,7 @@ void Game::ButtonFile(Game::menu_t & ret)
     }
 }
 
-void Game::ButtonSystem(void)
+void Game::EventSystemDialog(void)
 {
     // Change and save system settings
     const u8 changes = Dialog::SystemOptions();
@@ -1342,7 +1317,7 @@ void Game::ButtonSystem(void)
         I.SetRedraw(REDRAW_ICONS | REDRAW_BUTTONS | REDRAW_STATUS | REDRAW_BORDER);
 }
 
-void Game::KeyPress_ESC(menu_t & ret)
+void Game::EventExit(menu_t & ret)
 {
     Focus & global_focus = Focus::Get();
 
@@ -1354,12 +1329,7 @@ void Game::KeyPress_ESC(menu_t & ret)
 	ret = QUITGAME;
 }
 
-void Game::KeyPress_e(menu_t & ret)
-{
-    ButtonEndTurn(ret);
-}
-
-void Game::KeyPress_t(void)
+void Game::EventNextTown(void)
 {
     Kingdom & myKingdom = world.GetMyKingdom();
     std::vector<Castle *> & myCastles = myKingdom.GetCastles();
@@ -1381,7 +1351,7 @@ void Game::KeyPress_t(void)
     }
 }
 
-void Game::KeyPress_s(void)
+void Game::EventSaveGame(void)
 {
     std::string filename;
     if(Dialog::SelectFileSave(filename) && filename.size())
@@ -1391,23 +1361,23 @@ void Game::KeyPress_s(void)
     }
 }
 
-void Game::KeyPress_l(menu_t & ret)
+void Game::EventLoadGame(menu_t & ret)
 {
     if(Dialog::YES == Dialog::Message("", _("Are you sure you want to load a new game? (Your current game will be lost)"), Font::BIG, Dialog::YES|Dialog::NO))
     ret = LOADGAME;
 }
 
-void Game::KeyPress_p(void)
+void Game::EventPuzzleMaps(void)
 {
     world.GetMyKingdom().PuzzleMaps().ShowMapsDialog();
 }
 
-void Game::KeyPress_i(void)
+void Game::EventGameInfo(void)
 {
     Dialog::GameInfo();
 }
 
-void Game::KeyPress_d(menu_t & ret)
+void Game::EventDigArtifact(menu_t & ret)
 {
     Focus & global_focus = Focus::Get();
     if(Game::Focus::HEROES == global_focus.Type())
@@ -1418,27 +1388,43 @@ void Game::KeyPress_d(menu_t & ret)
     }
 }
 
-void Game::KeyPress_SPACE(void)
+void Game::EventDefaultAction(void)
 {
     Focus & global_focus = Focus::Get();
     if(Game::Focus::HEROES == global_focus.Type())
     {
 	Heroes & hero = global_focus.GetHeroes();
 	Interface::Basic & I = Interface::Basic::Get();
-	hero.SetMove(false);
-	hero.GetPath().Reset();
-	I.SetRedraw(REDRAW_GAMEAREA);
+
+	// 1. continue
+        if(global_focus.GetHeroes().GetPath().isValid())
+    	    global_focus.GetHeroes().SetMove(true);
+	else
+	// 2. action object
 	if(MP2::isActionObject(hero.GetUnderObject(), hero.isShipMaster()))
-	    hero.Action(hero.GetIndex());
-	if(MP2::OBJ_STONELIGHTS == hero.GetUnderObject() || MP2::OBJ_WHIRLPOOL == hero.GetUnderObject())
 	{
-	    hero.ApplyPenaltyMovement();
-	    I.SetRedraw(REDRAW_HEROES);
+	    hero.Action(hero.GetIndex());
+	    if(MP2::OBJ_STONELIGHTS == hero.GetUnderObject() || MP2::OBJ_WHIRLPOOL == hero.GetUnderObject())
+	    {
+		hero.ApplyPenaltyMovement();
+		I.SetRedraw(REDRAW_HEROES);
+	    }
+	    I.SetRedraw(REDRAW_GAMEAREA);
 	}
+	else
+	// 3. hero dialog
+	    OpenHeroes(&hero);
+    }
+    else
+    // 4. town dialog
+    if(Game::Focus::CASTLE == global_focus.Type())
+    {
+	Castle & castl = global_focus.GetCastle();
+	OpenCastle(&castl);
     }
 }
 
-void Game::KeyPress_RETURN(void)
+void Game::EventOpenFocus(void)
 {
     Focus & global_focus = Focus::Get();
     if(Game::Focus::HEROES == global_focus.Type())
@@ -1459,7 +1445,8 @@ void Game::KeyPress_LEFT(void)
     Focus & global_focus = Focus::Get();
     LocalEvent & le = LocalEvent::Get();
     // scroll map
-    if((MOD_CTRL & le.KeyMod())) Interface::GameArea::Get().SetScroll(SCROLL_LEFT);
+    if((MOD_CTRL & le.KeyMod()) ||
+	Focus::HEROES != global_focus.Type()) Interface::GameArea::Get().SetScroll(SCROLL_LEFT);
     else
     // move hero
     if(Focus::HEROES == global_focus.Type()) MoveHeroFromArrowKeys(global_focus.GetHeroes(), Direction::LEFT);
@@ -1470,7 +1457,8 @@ void Game::KeyPress_RIGHT(void)
     Focus & global_focus = Focus::Get();
     LocalEvent & le = LocalEvent::Get();
     // scroll map
-    if((MOD_CTRL & le.KeyMod())) Interface::GameArea::Get().SetScroll(SCROLL_RIGHT);
+    if((MOD_CTRL & le.KeyMod()) ||
+	Focus::HEROES != global_focus.Type()) Interface::GameArea::Get().SetScroll(SCROLL_RIGHT);
     else
     // move hero
     if(Focus::HEROES == global_focus.Type()) MoveHeroFromArrowKeys(global_focus.GetHeroes(), Direction::RIGHT);
@@ -1481,7 +1469,8 @@ void Game::KeyPress_TOP(void)
     Focus & global_focus = Focus::Get();
     LocalEvent & le = LocalEvent::Get();
     // scroll map
-    if((MOD_CTRL & le.KeyMod())) Interface::GameArea::Get().SetScroll(SCROLL_TOP);
+    if((MOD_CTRL & le.KeyMod()) ||
+	Focus::HEROES != global_focus.Type()) Interface::GameArea::Get().SetScroll(SCROLL_TOP);
     else
     // move hero
     if(Focus::HEROES == global_focus.Type()) MoveHeroFromArrowKeys(global_focus.GetHeroes(), Direction::TOP);
@@ -1492,7 +1481,8 @@ void Game::KeyPress_BOTTOM(void)
     Focus & global_focus = Focus::Get();
     LocalEvent & le = LocalEvent::Get();
     // scroll map
-    if((MOD_CTRL & le.KeyMod())) Interface::GameArea::Get().SetScroll(SCROLL_BOTTOM);
+    if((MOD_CTRL & le.KeyMod()) ||
+	Focus::HEROES != global_focus.Type()) Interface::GameArea::Get().SetScroll(SCROLL_BOTTOM);
     else
     // move hero
     if(Focus::HEROES == global_focus.Type()) MoveHeroFromArrowKeys(global_focus.GetHeroes(), Direction::BOTTOM);
@@ -1559,7 +1549,7 @@ void Game::ShowWarningLostTowns(menu_t & ret)
     }
 }
 
-void Game::SwitchShowRadar(void)
+void Game::EventSwitchShowRadar(void)
 {
     Settings & conf = Settings::Get();
 
@@ -1585,7 +1575,7 @@ void Game::SwitchShowRadar(void)
     }
 }
 
-void Game::SwitchShowButtons(void)
+void Game::EventSwitchShowButtons(void)
 {
     Settings & conf = Settings::Get();
 
@@ -1611,7 +1601,7 @@ void Game::SwitchShowButtons(void)
     }
 }
 
-void Game::SwitchShowStatus(void)
+void Game::EventSwitchShowStatus(void)
 {
     Settings & conf = Settings::Get();
 
@@ -1637,7 +1627,7 @@ void Game::SwitchShowStatus(void)
     }
 }
 
-void Game::SwitchShowIcons(void)
+void Game::EventSwitchShowIcons(void)
 {
     Settings & conf = Settings::Get();
 
@@ -1663,7 +1653,7 @@ void Game::SwitchShowIcons(void)
     }
 }
 
-void Game::SwitchShowControlPanel(void)
+void Game::EventSwitchShowControlPanel(void)
 {
     Settings & conf = Settings::Get();
 

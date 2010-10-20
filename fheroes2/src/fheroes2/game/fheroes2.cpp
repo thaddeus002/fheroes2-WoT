@@ -35,13 +35,6 @@
 #include "sdlnet.h"
 #include "images_pack.h"
 #include "localclient.h"
-#include "monster.h"
-#include "spell.h"
-#include "battle2.h"
-#include "payment.h"
-#include "profit.h"
-#include "buildinginfo.h"
-#include "skill.h"
 
 #include "zzlib.h"
 
@@ -51,7 +44,6 @@ void SetTimidityEnvPath(const Settings &);
 void SetLangEnvPath(const Settings &);
 void ReadConfigFile(Settings &);
 void LoadConfigFiles(Settings &, const std::string &);
-void LoadExternalResource(const Settings &);
 
 int PrintHelp(const char *basename)
 {
@@ -188,8 +180,6 @@ int main(int argc, char **argv)
 	    // load font
 	    cache.LoadFNT();
 
-	    if(conf.UseAltResource()) LoadExternalResource(conf);
-
 #ifdef WITH_ZLIB
 	    LoadZLogo();
 #endif
@@ -198,19 +188,8 @@ int main(int argc, char **argv)
 	    Cursor::Get().SetThemes(Cursor::POINTER);
 	    AGG::ICNRegistryEnable(true);
 
-	    LocalEvent & le = LocalEvent::Get();
-
-	    // default events
-	    le.SetStateDefaults();
-
-	    // set global events
-	    le.SetGlobalFilterMouseEvents(Cursor::Redraw);
-	    le.SetGlobalFilterKeysEvents(Game::KeyboardGlobalFilter);
-	    le.SetGlobalFilter(true);
-
-	    le.SetTapMode(conf.ExtTapMode());
-
-	    Game::AnimateDelaysInitialize();
+	    // init game data
+	    Game::Init();
 
 	    // goto main menu
 #ifdef WITH_EDITOR
@@ -392,63 +371,4 @@ void LoadConfigFiles(Settings & conf, const std::string & dirname)
 	conf.SetLocalPrefix(dirname.c_str());
 	ReadConfigFile(conf);
     }
-}
-
-void LoadExternalResource(const Settings & conf)
-{
-    std::string spec;
-
-    // globals.xml
-    spec = conf.LocalPrefix() + SEPARATOR + "files" + SEPARATOR + "stats" + SEPARATOR + "globals.xml";
-
-    if(FilePresent(spec))
-	Game::UpdateGlobalDefines(spec);
-    
-    // animations.xml
-    spec = conf.LocalPrefix() + SEPARATOR + "files" + SEPARATOR + "stats" + SEPARATOR + "animations.xml";
-
-    if(FilePresent(spec))
-	Battle2::UpdateMonsterInfoAnimation(spec);
-
-    // battle.xml
-    spec = conf.LocalPrefix() + SEPARATOR + "files" + SEPARATOR + "stats" + SEPARATOR + "battle.xml";
-
-    if(FilePresent(spec))
-	Battle2::UpdateMonsterAttributes(spec);
-
-    // monsters.xml
-    spec = conf.LocalPrefix() + SEPARATOR + "files" + SEPARATOR + "stats" + SEPARATOR + "monsters.xml";
-
-    if(FilePresent(spec))
-	Monster::UpdateStats(spec);
-
-    // spells.xml
-    spec = conf.LocalPrefix() + SEPARATOR + "files" + SEPARATOR + "stats" + SEPARATOR + "spells.xml";
-
-    if(FilePresent(spec))
-	Spell::UpdateStats(spec);
-
-    // buildings.xml
-    spec = conf.LocalPrefix() + SEPARATOR + "files" + SEPARATOR + "stats" + SEPARATOR + "buildings.xml";
-
-    if(FilePresent(spec))
-	BuildingInfo::UpdateCosts(spec);
-
-    // payments.xml
-    spec = conf.LocalPrefix() + SEPARATOR + "files" + SEPARATOR + "stats" + SEPARATOR + "payments.xml";
-
-    if(FilePresent(spec))
-	PaymentConditions::UpdateCosts(spec);
-
-    // profits.xml
-    spec = conf.LocalPrefix() + SEPARATOR + "files" + SEPARATOR + "stats" + SEPARATOR + "profits.xml";
-
-    if(FilePresent(spec))
-	ProfitConditions::UpdateCosts(spec);
-
-    // skills.xml
-    spec = conf.LocalPrefix() + SEPARATOR + "files" + SEPARATOR + "stats" + SEPARATOR + "skills.xml";
-
-    if(FilePresent(spec))
-	Skill::UpdateStats(spec);
 }

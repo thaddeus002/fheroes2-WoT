@@ -15,6 +15,6 @@ endif
 AR := arm-mingw32ce-ar
 CXX := arm-mingw32ce-g++
 WINDRES := arm-mingw32ce-windres
-CFLAGS := $(CFLAGS) -ffunction-sections -DWITH_KEYMAPPING -DWITHOUT_MOUSE -Os -static
+CFLAGS := $(CFLAGS) -ffunction-sections -DWITHOUT_MOUSE -Os -static
 LIBS := -Wl,-Bstatic $(LIBS) -lmmtimer
 LDFLAGS := -static $(LDFLAGS) -Wl,--gc-sections

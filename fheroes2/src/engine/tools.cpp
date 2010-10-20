@@ -448,6 +448,11 @@ KeySym KeySymFromChar(char c)
     return KEY_NONE;
 }
 
+KeySym KeySymFromInt(int i)
+{
+    return KEY_NONE > i || KEY_LAST < i ? KEY_NONE : static_cast<KeySym>(i);
+}
+
 bool FilePresent(const std::string & file)
 {
     std::ifstream fs;

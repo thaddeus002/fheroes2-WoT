@@ -27,19 +27,6 @@
 #include "game_interface.h"
 #include "interface_buttons.h"
 
-namespace Game
-{
-    // game_startgame.cpp
-    void ButtonNextHero(void);
-    void ButtonMovement(void);
-    void ButtonKingdom(void);
-    void ButtonSpell(void);
-    void ButtonEndTurn(Game::menu_t &);
-    void ButtonAdventure(Game::menu_t &);
-    void ButtonFile(Game::menu_t &);
-    void ButtonSystem(void);
-}
-
 Interface::ButtonsArea::ButtonsArea() : Rect(0, 0, 144, 72)
 {
 }
@@ -178,56 +165,56 @@ void Interface::ButtonsArea::QueueEventProcessing(Game::menu_t & ret)
     {
         // for QVGA: auto hide buttons after click
         if(conf.QVGA()) conf.SetShowButtons(false);
-	Game::ButtonNextHero();
+	Game::EventNextHero();
     }
     else
     if(le.MouseClickLeft(buttonMovement))
     {
         // for QVGA: auto hide buttons after click
         if(conf.QVGA()) conf.SetShowButtons(false);
-	Game::ButtonMovement();
+	Game::EventContinueMovement();
     }
     else
     if(le.MouseClickLeft(buttonKingdom))
     {
         // for QVGA: auto hide buttons after click
         if(conf.QVGA()) conf.SetShowButtons(false);
-	Game::ButtonKingdom();
+	Game::EventKingdomInfo();
     }
     else
     if(le.MouseClickLeft(buttonSpell))
     {
         // for QVGA: auto hide buttons after click
         if(conf.QVGA()) conf.SetShowButtons(false);
-	Game::ButtonSpell();
+	Game::EventCastSpell();
     }
     else
     if(le.MouseClickLeft(buttonEndTur))
     {
         // for QVGA: auto hide buttons after click
         if(conf.QVGA()) conf.SetShowButtons(false);
-	Game::ButtonEndTurn(ret);
+	Game::EventEndTurn(ret);
     }
     else
     if(le.MouseClickLeft(buttonAdventure))
     {
         // for QVGA: auto hide buttons after click
         if(conf.QVGA()) conf.SetShowButtons(false);
-	Game::ButtonAdventure(ret);
+	Game::EventAdventureDialog(ret);
     }
     else
     if(le.MouseClickLeft(buttonFile))
     {
         // for QVGA: auto hide buttons after click
         if(conf.QVGA()) conf.SetShowButtons(false);
-	Game::ButtonFile(ret);
+	Game::EventFileDialog(ret);
     }
     else
     if(le.MouseClickLeft(buttonSystem))
     {
         // for QVGA: auto hide buttons after click
         if(conf.QVGA()) conf.SetShowButtons(false);
-	Game::ButtonSystem();
+	Game::EventSystemDialog();
     }
 
     if(le.MousePressRight(buttonNextHero)) Dialog::Message(_("Next Hero"), _("Select the next Hero."), Font::BIG);

@@ -27,6 +27,7 @@
 #include <algorithm>
 
 #include "gamedefs.h"
+#include "tinyconfig.h"
 #include "settings.h"
 #include "game_focus.h"
 #include "maps_tiles.h"
@@ -37,6 +38,14 @@
 #include "mp2.h"
 #include "agg.h"
 #include "test.h"
+#include "cursor.h"
+#include "monster.h"
+#include "spell.h"
+#include "payment.h"
+#include "profit.h"
+#include "buildinginfo.h"
+#include "skill.h"
+#include "battle2.h"
 #include "game.h"
 
 #ifdef WITH_XML
@@ -46,6 +55,13 @@
 namespace Game
 {
     u8 GetMixerChannelFromObject(const Maps::Tiles &);
+    void AnimateDelaysInitialize(void);
+    void KeyboardGlobalFilter(u32, u16);
+    void UpdateGlobalDefines(const std::string &);
+    void LoadExternalResource(const Settings &);
+
+    void HotKeysDefaults(void);
+    void HotKeysLoad(const std::string &);
 
     static u8 lost_town_days(7);
     static u16 reserved_vols[LOOPXX_COUNT];
@@ -80,6 +96,34 @@ Game::menu_t Game::Credits(void)
     //VERBOSE("Credits: under construction.");
 
     return Game::MAINMENU;
+}
+
+void Game::Init(void)
+{
+    Settings & conf = Settings::Get();
+    LocalEvent & le = LocalEvent::Get();
+
+    // update all global defines
+    if(conf.UseAltResource()) LoadExternalResource(conf);
+
+    // default events
+    le.SetStateDefaults();
+
+    // set global events
+    le.SetGlobalFilterMouseEvents(Cursor::Redraw);
+    le.SetGlobalFilterKeysEvents(Game::KeyboardGlobalFilter);
+    le.SetGlobalFilter(true);
+
+    le.SetTapMode(conf.ExtTapMode());
+
+    Game::AnimateDelaysInitialize();
+
+    HotKeysDefaults();
+
+    const std::string hotkeys = conf.LocalPrefix() + SEPARATOR + "fheroes2.key";
+
+    if(FilePresent(hotkeys))
+	Game::HotKeysLoad(hotkeys);
 }
 
 void Game::SetFixVideoMode(void)
@@ -349,7 +393,6 @@ void Game::UpdateGlobalDefines(const std::string & spec)
 	    Kingdom::SetMaxHeroes(value);
 	}
 
-
 	// game_over
 	xml_element = xml_globals->FirstChildElement("game_over");
 	if(xml_element)
@@ -394,4 +437,63 @@ u8 Game::GetWhirlpoolPercent(void)
 u8 Game::GetHeroRestoreSpellPointsPerDay(void)
 {
     return heroes_restore_spell_points_day;
+}
+
+void Game::LoadExternalResource(const Settings & conf)
+{
+    std::string spec;
+
+    // globals.xml
+    spec = conf.LocalPrefix() + SEPARATOR + "files" + SEPARATOR + "stats" + SEPARATOR + "globals.xml";
+
+    if(FilePresent(spec))
+	Game::UpdateGlobalDefines(spec);
+
+    // animations.xml
+    spec = conf.LocalPrefix() + SEPARATOR + "files" + SEPARATOR + "stats" + SEPARATOR + "animations.xml";
+
+    if(FilePresent(spec))
+	Battle2::UpdateMonsterInfoAnimation(spec);
+
+    // battle.xml
+    spec = conf.LocalPrefix() + SEPARATOR + "files" + SEPARATOR + "stats" + SEPARATOR + "battle.xml";
+
+    if(FilePresent(spec))
+	Battle2::UpdateMonsterAttributes(spec);
+
+    // monsters.xml
+    spec = conf.LocalPrefix() + SEPARATOR + "files" + SEPARATOR + "stats" + SEPARATOR + "monsters.xml";
+
+    if(FilePresent(spec))
+	Monster::UpdateStats(spec);
+
+    // spells.xml
+    spec = conf.LocalPrefix() + SEPARATOR + "files" + SEPARATOR + "stats" + SEPARATOR + "spells.xml";
+
+    if(FilePresent(spec))
+	Spell::UpdateStats(spec);
+
+    // buildings.xml
+    spec = conf.LocalPrefix() + SEPARATOR + "files" + SEPARATOR + "stats" + SEPARATOR + "buildings.xml";
+
+    if(FilePresent(spec))
+	BuildingInfo::UpdateCosts(spec);
+
+    // payments.xml
+    spec = conf.LocalPrefix() + SEPARATOR + "files" + SEPARATOR + "stats" + SEPARATOR + "payments.xml";
+
+    if(FilePresent(spec))
+	PaymentConditions::UpdateCosts(spec);
+
+    // profits.xml
+    spec = conf.LocalPrefix() + SEPARATOR + "files" + SEPARATOR + "stats" + SEPARATOR + "profits.xml";
+
+    if(FilePresent(spec))
+	ProfitConditions::UpdateCosts(spec);
+
+    // skills.xml
+    spec = conf.LocalPrefix() + SEPARATOR + "files" + SEPARATOR + "stats" + SEPARATOR + "skills.xml";
+
+    if(FilePresent(spec))
+	Skill::UpdateStats(spec);
 }

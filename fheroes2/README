@@ -1,4 +1,4 @@
-Free Heroes2 Engine (is not playable version.)
+Free Heroes2 Engine
 
 Prerequisites:
 
@@ -19,49 +19,27 @@ SDL libraries can be found at http://www.libsdl.org .
 Sourcecode you can get it here: http://sourceforge.net/projects/fheroes2/
 And translations: http://translations.launchpad.net/fheroes2
 
+For play:
 Copy origin data/*.agg in to data directory.
 Copy maps files (*.mp2) in to maps directory.
 
-Hot keys:
-\		- enable/disable emulate mouse
+Global hot keys:
 F4		- switch to fullscreen
 PrintScreen	- create screenshot
-Up		- move hero top
-Down		- move hero bottom
-Left		- move hero left
-Right		- move hero right
-Ctrl + Up	- scroll map top    (alt. key ';')
-Ctrl + Down 	- scroll map bottom (alt. key '/')
-Ctrl + Left	- scroll map left   (alt. key ',')
-Ctrl + Right	- scroll map right  (alt. key '.')
-escape or q	- quit game
-e		- end turn
-t		- next town
-h		- next hero
-m		- move hero
-s		- save game to fheroes2.sav
-f		- file options
-l		- load game
-i		- game info
-p		- puzzle dialog
-d		- digging artifact for current hero
-space or a	- default action
-return or n	- open dialog
-o		- system dialog
 
-1		- show/hide control panel
-9		- show/hide radar (only for option: hide interface = on)
-3		- show/hide buttons (only for option: hide interface = on)
-7		- show/hide status window (only for option: hide interface = on)
-5		- show/hide hero/town icons (only for option: hide interface = on)
+Hot keys for system dialogues:
+esc		- 'no', 'cancel', 'exit' buttons
+space, return	- 'yes', 'ok' buttons
+y		- 'yes' button
+n		- 'no' button
 
-Main menu:
+Main menu hot keys:
 n		- new game
 s		- standard game
 c		- campaign game
 m		- multi-player game
 
-Battle:
+Battle hot keys:
 Esc		- fast retreat
 space		- skip turn (soft: heroes3 version)
 s		- skip turn (hard)
@@ -69,3 +47,6 @@ o		- options dialog
 a		- set auto battle
 c		- show spell book
 h		- show heroes dialog
+
+Game hot keys:
+all game hotkeys may be redefined (see fheroes2.key)

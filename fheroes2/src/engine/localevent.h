@@ -144,16 +144,7 @@ enum KeySym
     KEY_LAST
 };
 
-#ifdef WITH_KEYMAPPING
-#include <vector>
-#include <utility>
-
-struct KeyMap : std::pair<int, KeySym>
-{
-    KeyMap(int i = 0, KeySym s = KEY_NONE) : std::pair<int, KeySym>(i, s){};
-    bool isKey(int k) const{ return first == k; };
-};
-#endif
+KeySym KeySymInt(int);
 
 class LocalEvent
 {
@@ -167,11 +158,6 @@ public:
     void SetTapDelayForRightClickEmulation(u32);
     void SetMouseOffsetX(s16);
     void SetMouseOffsetY(s16);
-
-#ifdef WITH_KEYMAPPING
-    void   SetVirtualKey(int, KeySym);
-    KeySym GetVirtualKey(KeySym) const;
-#endif
 
     static void SetStateDefaults(void);
     static void SetState(u32 type, bool enable);
@@ -237,13 +223,13 @@ public:
 #ifdef WITHOUT_MOUSE
     void ToggleEmulateMouse(void);
     void SetEmulateMouse(bool);
-    void SetEmulateMouseUpKey(int);
-    void SetEmulateMouseDownKey(int);
-    void SetEmulateMouseLeftKey(int);
-    void SetEmulateMouseRightKey(int);
+    void SetEmulateMouseUpKey(KeySym);
+    void SetEmulateMouseDownKey(KeySym);
+    void SetEmulateMouseLeftKey(KeySym);
+    void SetEmulateMouseRightKey(KeySym);
     void SetEmulateMouseStep(u8);
-    void SetEmulatePressLeftKey(int);
-    void SetEmulatePressRightKey(int);
+    void SetEmulatePressLeftKey(KeySym);
+    void SetEmulatePressRightKey(KeySym);
     bool EmulateMouseAction(KeySym);
 #endif
 
@@ -310,10 +296,6 @@ private:
     u8 emulate_mouse_step;
     KeySym emulate_press_left;
     KeySym emulate_press_right;
-#endif
-
-#ifdef WITH_KEYMAPPING
-    std::vector<KeyMap> vkey;
 #endif
 };
 

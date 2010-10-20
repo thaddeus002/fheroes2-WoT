@@ -25,17 +25,6 @@
 #include "game_interface.h"
 #include "interface_cpanel.h"
 
-namespace Game
-{
-    // game_startgame.cpp
-    void SwitchShowRadar(void);
-    void SwitchShowStatus(void);
-    void SwitchShowButtons(void);
-    void SwitchShowIcons(void);
-    void KeyPress_e(menu_t &);
-    void KeyPress_ESC(menu_t &);
-}
-
 Interface::ControlPanel::ControlPanel() : alpha(130)
 {
     w = 180;
@@ -121,14 +110,13 @@ void Interface::ControlPanel::QueueEventProcessing(Game::menu_t & ret)
 {
     LocalEvent & le = LocalEvent::Get();
 
-    if(le.MouseClickLeft(rt_radr))	Game::SwitchShowRadar();
+    if(le.MouseClickLeft(rt_radr))	Game::EventSwitchShowRadar();
     else
-    if(le.MouseClickLeft(rt_icon))	Game::SwitchShowIcons();
+    if(le.MouseClickLeft(rt_icon))	Game::EventSwitchShowIcons();
     else
-    if(le.MouseClickLeft(rt_bttn))	Game::SwitchShowButtons();
+    if(le.MouseClickLeft(rt_bttn))	Game::EventSwitchShowButtons();
     else
-    if(le.MouseClickLeft(rt_stat))	Game::SwitchShowStatus();
+    if(le.MouseClickLeft(rt_stat))	Game::EventSwitchShowStatus();
     else
-    if(le.MouseClickLeft(rt_quit))	Game::KeyPress_e(ret);
-    //if(le.MouseClickLeft(rt_quit))	Game::KeyPress_ESC(ret);
+    if(le.MouseClickLeft(rt_quit))	Game::EventEndTurn(ret);
 }

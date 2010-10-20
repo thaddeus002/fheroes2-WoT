@@ -65,9 +65,51 @@ namespace Game
 	TESTING
     };
 
+    void Init(void);
+
     enum type_t { UNKNOWN = 0, STANDARD = 1, CAMPAIGN = 2, HOTSEAT = 4, NETWORK = 8, MULTI = HOTSEAT | NETWORK };
     enum control_t { NONE = 0, LOCAL = 1, REMOTE = 2, AI = 4 };
     enum distance_t { VIEW_TOWN  = 0, VIEW_CASTLE = 1, VIEW_HEROES = 2, VIEW_TELESCOPE = 3, VIEW_OBSERVATION_TOWER = 4, VIEW_MAGI_EYES = 5 };
+
+    enum events_t
+    {
+	EVENT_NONE,
+	EVENT_EXIT,
+	EVENT_ENDTURN,
+	EVENT_NEXTHERO,
+	EVENT_NEXTTOWN,
+	EVENT_CONTINUE,
+	EVENT_SAVEGAME,
+	EVENT_LOADGAME,
+	EVENT_FILEOPTIONS,
+	EVENT_PUZZLEMAPS,
+	EVENT_INFOGAME,
+	EVENT_DIGARTIFACT,
+	EVENT_CASTSPELL,
+	EVENT_DEFAULTACTION,
+	EVENT_OPENFOCUS,
+	EVENT_SYSTEMOPTIONS,
+	EVENT_MOVELEFT,
+	EVENT_MOVERIGHT,
+	EVENT_MOVEUP,
+	EVENT_MOVEDOWN,
+	EVENT_SCROLLLEFT,
+	EVENT_SCROLLRIGHT,
+	EVENT_SCROLLUP,
+	EVENT_SCROLLDOWN,
+	EVENT_CTRLPANEL,
+	EVENT_SHOWRADAR,
+	EVENT_SHOWBUTTONS,
+	EVENT_SHOWSTATUS,
+	EVENT_SHOWICONS,
+	EVENT_SWITCHGROUP,
+	EVENT_EMULATETOGGLE,
+	EVENT_LAST
+    };
+
+    events_t & operator++ (events_t &);
+
+    events_t HotKeysGetEvent(int);
 
     enum delay_t
     {
@@ -105,7 +147,6 @@ namespace Game
 
     bool AnimateInfrequent(delay_t);
     void AnimateDelayReset(delay_t);
-    void AnimateDelaysInitialize(void);
     void UpdateHeroesMoveSpeed(void);
 
     control_t GetControl(u8);
@@ -146,10 +187,31 @@ namespace Game
     u8  GetWhirlpoolPercent(void);
     u8  GetHeroRestoreSpellPointsPerDay(void);
 
-    void UpdateGlobalDefines(const std::string &);
-
-    void KeyboardGlobalFilter(u32, u16);
     void ShowLoadMapsText(void);
+
+    void EventEndTurn(menu_t &);
+    void EventExit(menu_t &);
+    void EventNextHero(void);
+    void EventNextTown(void);
+    void EventDefaultAction(void);
+    void EventOpenFocus(void);
+    void EventSaveGame(void);
+    void EventLoadGame(menu_t &);
+    void EventContinueMovement(void);
+    void EventKingdomInfo(void);
+    void EventCastSpell(void);
+    void EventPuzzleMaps(void);
+    void EventGameInfo(void);
+    void EventDigArtifact(menu_t &);
+    void EventAdventureDialog(menu_t &);
+    void EventFileDialog(menu_t &);
+    void EventSystemDialog(void);
+    void EventSwitchShowRadar(void);
+    void EventSwitchShowStatus(void);
+    void EventSwitchShowButtons(void);
+    void EventSwitchShowIcons(void);
+    void EventSwitchShowControlPanel(void);
+    void EventSwitchGroup(void);
 
     namespace Scenario
     {

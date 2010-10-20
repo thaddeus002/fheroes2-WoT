@@ -375,49 +375,10 @@ bool Settings::Read(const std::string & filename)
     {
 	le.SetEmulateMouse(entry->IntParams());
 
-	entry = config.Find("emulate mouse up");
-	if(entry) le.SetEmulateMouseUpKey(entry->IntParams());
-
-	entry = config.Find("emulate mouse down");
-	if(entry) le.SetEmulateMouseDownKey(entry->IntParams());
-
-	entry = config.Find("emulate mouse left");
-	if(entry) le.SetEmulateMouseLeftKey(entry->IntParams());
-
-	entry = config.Find("emulate mouse right");
-	if(entry) le.SetEmulateMouseRightKey(entry->IntParams());
-
 	entry = config.Find("emulate mouse step");
         if(entry) le.SetEmulateMouseStep(entry->IntParams());
-
-	entry = config.Find("emulate press left");
-	if(entry) le.SetEmulatePressLeftKey(entry->IntParams());
-
-	entry = config.Find("emulate press right");
-	if(entry) le.SetEmulatePressRightKey(entry->IntParams());
     }
 #endif
-
-#ifdef WITH_KEYMAPPING
-    // load virtual key map
-    {
-	const Tiny::Entries & entries = config.GetEntries();
-	Tiny::EntryConstIterator it1 = entries.begin();
-	Tiny::EntryConstIterator it2 = entries.end();
-	for(; it1 != it2; ++it1)
-	{
-	    const std::string & key = (*it1).first;
-	    const std::string & val = (*it1).StrParams();
-	    if(4 < key.size() && 1 < val.size() && key.substr(0, 4) == "key_")
-	    {
-		int code = String::ToInt(key.substr(4));
-		DEBUG(DBG_ENGINE, DBG_INFO, "Settings::Read: " << key << ", set virtual key: " << code << ", to: " << KeySymFromChar(val[1]));
-		LocalEvent::Get().SetVirtualKey(code, KeySymFromChar(val[1]));
-	    }
-	}
-    }
-#endif
-
 
 #ifndef WITH_TTF
     opt_global.ResetModes(GLOBAL_USEUNICODE);
