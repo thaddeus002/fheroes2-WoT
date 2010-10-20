@@ -102,7 +102,6 @@ public:
 	POCKETPC_HIDE_CURSOR		= 0x10400000,
 	POCKETPC_LOW_MEMORY		= 0x10800000,
 	POCKETPC_TAP_MODE		= 0x11000000,
-	POCKETPC_VERY_VERY_SLOW		= 0x12000000,
 
 	WORLD_SHOW_VISITED_CONTENT	= 0x20000001,
 	WORLD_ABANDONED_MINE_RANDOM	= 0x20000002,
@@ -242,7 +241,6 @@ public:
     bool ExtUseFade(void) const;
     bool ExtShowSDL(void) const;
     bool ExtLowMemory(void) const;
-    bool ExtVeryVerySlow(void) const;
     bool ExtTapMode(void) const;
     bool EvilInterface(void) const;
     bool DynamicInterface(void) const;

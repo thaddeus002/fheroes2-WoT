@@ -181,7 +181,6 @@ void Dialog::ExtSettings(void)
 	states.push_back(Settings::POCKETPC_HIDE_CURSOR);
 	states.push_back(Settings::POCKETPC_TAP_MODE);
 	states.push_back(Settings::POCKETPC_LOW_MEMORY);
-	states.push_back(Settings::POCKETPC_VERY_VERY_SLOW);
     }
 
     SettingsListBox listbox(area);

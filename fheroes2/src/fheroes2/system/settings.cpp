@@ -133,7 +133,6 @@ static const settings_t settingsFHeroes2[] =
     { Settings::POCKETPC_HIDE_CURSOR,		_("pocketpc: hide cursor"),				},
     { Settings::POCKETPC_TAP_MODE,		_("pocketpc: tap mode"),				},
     { Settings::POCKETPC_LOW_MEMORY,		_("pocketpc: low memory"),				},
-    { Settings::POCKETPC_VERY_VERY_SLOW,	_("pocketpc: very very slow"),				},
 
     { 0, NULL },
 };
@@ -1331,11 +1330,6 @@ bool Settings::ExtLowMemory(void) const
 bool Settings::ExtTapMode(void) const
 {
     return ExtModes(POCKETPC_TAP_MODE);
-}
-
-bool Settings::ExtVeryVerySlow(void) const
-{
-    return ExtModes(POCKETPC_VERY_VERY_SLOW);
 }
 
 void Settings::BinarySave(void) const
