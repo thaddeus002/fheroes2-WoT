@@ -1345,15 +1345,6 @@ void Settings::BinarySave(void) const
     msg.Push(opt_world());
     msg.Push(opt_battle());
 
-    // volume
-    msg.Push(sound_volume);
-    msg.Push(music_volume);
-
-    // speed
-    msg.Push(heroes_speed);
-    msg.Push(ai_speed);
-    msg.Push(scroll_speed);
-
     msg.Save(binary.c_str());
 }
 
@@ -1383,13 +1374,6 @@ void Settings::BinaryLoad(void)
 
 	msg.Pop(byte32);
 	opt_battle.SetModes(byte32);
-
-	if(version > FORMAT_VERSION_1954)
-	{
-	    // volume
-	    msg.Pop(sound_volume);
-	    msg.Pop(music_volume);
-	}
     }
 }
 
