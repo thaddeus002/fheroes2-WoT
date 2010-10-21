@@ -165,6 +165,7 @@ KeySym SDLToKeySym(SDLKey key)
 	case SDLK_RCTRL:	return KEY_CONTROL;
 	case SDLK_LSHIFT:	return KEY_SHIFT;
 	case SDLK_RSHIFT:	return KEY_SHIFT;
+	case SDLK_TAB:          return KEY_TAB;
 	case SDLK_SPACE:	return KEY_SPACE;
 	case SDLK_DELETE:	return KEY_DELETE;
 	case SDLK_PAGEUP:	return KEY_PAGEUP;
