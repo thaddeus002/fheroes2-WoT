@@ -173,6 +173,16 @@ public:
     u8 FontsSmallSize(void) const;
     bool FontsRenderBlended(void) const;
 
+    const Point & PosRadar(void) const;
+    const Point & PosButtons(void) const;
+    const Point & PosIcons(void) const;
+    const Point & PosStatus(void) const;
+
+    void SetPosRadar(const Point &);
+    void SetPosButtons(const Point &);
+    void SetPosIcons(const Point &);
+    void SetPosStatus(const Point &);
+
     bool QVGA(void) const;
     bool Editor(void) const;
     bool Sound(void) const;
@@ -388,6 +398,11 @@ private:
     u16 port;
     
     u32 memory_limit;
+
+    Point pos_radr;
+    Point pos_bttn;
+    Point pos_icon;
+    Point pos_stat;
 };
 
 #endif

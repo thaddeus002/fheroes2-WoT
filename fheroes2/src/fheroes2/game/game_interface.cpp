@@ -48,26 +48,30 @@ Interface::Basic::Basic() : gameArea(GameArea::Get()), radar(Radar::Get()),
     const u16 & px = display.w() - BORDERWIDTH - RADARWIDTH;
     const u8 scroll_width = conf.QVGA() ? 12 : BORDERWIDTH;
 
-    if(conf.QVGA())
-    {
-        iconsPanel.SetCount(2);
-	radar.SetPos(BORDERWIDTH, BORDERWIDTH);
-	iconsPanel.SetPos(BORDERWIDTH, BORDERWIDTH);
-	buttonsArea.SetPos(BORDERWIDTH, BORDERWIDTH);
-	statusWindow.SetPos(BORDERWIDTH, BORDERWIDTH);
-	controlPanel.SetPos(display.w() - controlPanel.GetArea().w - scroll_width, 0);
-	conf.SetShowPanel(true);
-    }
-    else
     if(conf.HideInterface())
     {
         iconsPanel.SetCount(2);
-	radar.SetPos(BORDERWIDTH, BORDERWIDTH);
-	iconsPanel.SetPos(px - BORDERWIDTH, radar.GetArea().y + radar.GetArea().h);
-	buttonsArea.SetPos(px - BORDERWIDTH, iconsPanel.GetArea().y + iconsPanel.GetArea().h);
-	statusWindow.SetPos(px - BORDERWIDTH, buttonsArea.GetArea().y + buttonsArea.GetArea().h);
-	controlPanel.SetPos(display.w() - controlPanel.GetArea().w - scroll_width, 0);
 	conf.SetShowPanel(true);
+
+	Point pos_radr = conf.PosRadar();
+	Point pos_bttn = conf.PosButtons();
+	Point pos_icon = conf.PosIcons();
+	Point pos_stat = conf.PosStatus();
+
+	if(0 == pos_radr.x && 0 == pos_radr.y)
+	    pos_radr = Point(BORDERWIDTH, conf.QVGA() ? TILEWIDTH : BORDERWIDTH);
+	if(0 == pos_icon.x && 0 == pos_icon.y)
+	    pos_icon = Point(conf.QVGA() ? BORDERWIDTH : px - BORDERWIDTH, conf.QVGA() ? TILEWIDTH : radar.GetArea().y + radar.GetArea().h);
+	if(0 == pos_bttn.x && 0 == pos_bttn.y)
+	    pos_bttn = Point(conf.QVGA() ? BORDERWIDTH : px - BORDERWIDTH, conf.QVGA() ? TILEWIDTH : iconsPanel.GetArea().y + iconsPanel.GetArea().h);
+	if(0 == pos_stat.x && 0 == pos_stat.y)
+	    pos_stat = Point(conf.QVGA() ? BORDERWIDTH : px - BORDERWIDTH, conf.QVGA() ? TILEWIDTH : buttonsArea.GetArea().y + buttonsArea.GetArea().h);
+
+	controlPanel.SetPos(display.w() - controlPanel.GetArea().w - scroll_width, 0);
+	radar.SetPos(pos_radr.x, pos_radr.y);
+	iconsPanel.SetPos(pos_icon.x, pos_icon.y);
+	buttonsArea.SetPos(pos_bttn.x, pos_bttn.y);
+	statusWindow.SetPos(pos_stat.x, pos_stat.y);
     }
     else
     {

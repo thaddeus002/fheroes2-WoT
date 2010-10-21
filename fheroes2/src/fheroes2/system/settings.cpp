@@ -1293,6 +1293,16 @@ bool Settings::ExtTapMode(void) const
     return ExtModes(POCKETPC_TAP_MODE);
 }
 
+const Point & Settings::PosRadar(void) const { return pos_radr; }
+const Point & Settings::PosButtons(void) const { return pos_bttn; }
+const Point & Settings::PosIcons(void) const { return pos_icon; }
+const Point & Settings::PosStatus(void) const { return pos_stat; }
+
+void Settings::SetPosRadar(const Point & pt) { pos_radr = pt; }
+void Settings::SetPosButtons(const Point & pt) { pos_bttn = pt; }
+void Settings::SetPosIcons(const Point & pt) { pos_icon = pt; }
+void Settings::SetPosStatus(const Point & pt) { pos_stat = pt; }
+
 void Settings::BinarySave(void) const
 {
     const std::string binary = local_prefix + SEPARATOR + "fheroes2.bin";
@@ -1306,6 +1316,22 @@ void Settings::BinarySave(void) const
     msg.Push(opt_world());
     msg.Push(opt_battle());
 
+    // radar position
+    msg.Push(static_cast<u16>(pos_radr.x));
+    msg.Push(static_cast<u16>(pos_radr.y));
+
+    // buttons position
+    msg.Push(static_cast<u16>(pos_bttn.x));
+    msg.Push(static_cast<u16>(pos_bttn.y));
+
+    // icons position
+    msg.Push(static_cast<u16>(pos_icon.x));
+    msg.Push(static_cast<u16>(pos_icon.y));
+
+    // status position
+    msg.Push(static_cast<u16>(pos_stat.x));
+    msg.Push(static_cast<u16>(pos_stat.y));
+
     msg.Save(binary.c_str());
 }
 
@@ -1317,7 +1343,7 @@ void Settings::BinaryLoad(void)
     {
 	QueueMessage msg;
 	u32 byte32;
-	u16 version;
+	u16 byte16, version;
 
 	msg.Load(binary.c_str());
 
@@ -1335,6 +1361,26 @@ void Settings::BinaryLoad(void)
 
 	msg.Pop(byte32);
 	opt_battle.SetModes(byte32);
+
+	msg.Pop(byte16);
+	pos_radr.x = byte16;
+        msg.Pop(byte16);
+	pos_radr.y = byte16;
+
+	msg.Pop(byte16);
+	pos_bttn.x = byte16;
+	msg.Pop(byte16);
+	pos_bttn.y = byte16;
+
+	msg.Pop(byte16);
+	pos_icon.x = byte16;
+        msg.Pop(byte16);
+	pos_icon.y = byte16;
+
+	msg.Pop(byte16);
+	pos_stat.x = byte16;
+	msg.Pop(byte16);
+	pos_stat.y = byte16;
     }
 }
 

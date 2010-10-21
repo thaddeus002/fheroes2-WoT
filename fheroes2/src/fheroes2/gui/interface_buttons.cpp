@@ -87,6 +87,8 @@ void Interface::ButtonsArea::SetPos(s16 ox, s16 oy)
     buttonAdventure.SetPos(buttonEndTur.x + buttonEndTur.w, oy);
     buttonFile.SetPos(buttonAdventure.x + buttonAdventure.w, oy);
     buttonSystem.SetPos(buttonFile.x + buttonFile.w, oy);
+
+    Settings::Get().SetPosButtons(*this);
 }
 
 void Interface::ButtonsArea::Redraw(void)

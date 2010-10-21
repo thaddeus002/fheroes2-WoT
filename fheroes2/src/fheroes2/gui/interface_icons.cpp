@@ -666,6 +666,8 @@ void Interface::IconsPanel::SetPos(s16 ox, s16 oy)
     buttonScrollCastleUp.SetPos(ox + 2 * ICONS_CURSOR_WIDTH + buttonScrollHeroesUp.w + 3, oy + 1);
 
     SetCount(count_icons);
+
+    Settings::Get().SetPosButtons(*this);
 }
 
 void Interface::IconsPanel::SetCount(u8 count)

@@ -100,6 +100,8 @@ void Interface::StatusWindow::SetPos(s16 px, s16 py)
 	Rect::y = py;
 	Rect::h = Display::Get().h() - py - BORDERWIDTH;
     }
+
+    Settings::Get().SetPosButtons(*this);
 }
 
 const Rect & Interface::StatusWindow::GetArea(void) const
