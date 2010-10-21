@@ -64,10 +64,7 @@ namespace Game
 
     void StartNewGame(menu_t &);
 
-    void KeyPress_LEFT(void);
-    void KeyPress_RIGHT(void);
-    void KeyPress_TOP(void);
-    void KeyPress_BOTTOM(void);
+    void KeyArrowPress(Direction::vector_t);
 
     void NewWeekDialog(void);
     void ShowEventDay(void);
@@ -767,10 +764,14 @@ Game::menu_t Game::HumanTurn(void)
 	    // hide/show hero/town icons
 	    case EVENT_SHOWICONS:	EventSwitchShowIcons(); break;
 	    // move hero
-	    case EVENT_MOVELEFT:	KeyPress_LEFT(); break;
-	    case EVENT_MOVERIGHT:	KeyPress_RIGHT(); break;
-	    case EVENT_MOVEUP:		KeyPress_TOP(); break;
-	    case EVENT_MOVEDOWN:	KeyPress_BOTTOM(); break;
+	    case EVENT_MOVELEFT:	KeyArrowPress(Direction::LEFT); break;
+	    case EVENT_MOVERIGHT:	KeyArrowPress(Direction::RIGHT); break;
+	    case EVENT_MOVETOP:		KeyArrowPress(Direction::TOP); break;
+	    case EVENT_MOVEBOTTOM:	KeyArrowPress(Direction::BOTTOM); break;
+	    case EVENT_MOVETOPLEFT:	KeyArrowPress(Direction::TOP_LEFT); break;
+	    case EVENT_MOVETOPRIGHT:	KeyArrowPress(Direction::TOP_RIGHT); break;
+	    case EVENT_MOVEBOTTOMLEFT:	KeyArrowPress(Direction::BOTTOM_LEFT); break;
+	    case EVENT_MOVEBOTTOMRIGHT:	KeyArrowPress(Direction::BOTTOM_RIGHT); break;
 	    // scroll maps
 	    case EVENT_SCROLLLEFT:	I.gameArea.SetScroll(SCROLL_LEFT); break;
 	    case EVENT_SCROLLRIGHT:	I.gameArea.SetScroll(SCROLL_RIGHT); break;
@@ -1440,52 +1441,31 @@ void Game::EventOpenFocus(void)
     }
 }
 
-void Game::KeyPress_LEFT(void)
+void Game::KeyArrowPress(Direction::vector_t dir)
 {
     Focus & global_focus = Focus::Get();
+    Interface::GameArea & area = Interface::GameArea::Get();
     LocalEvent & le = LocalEvent::Get();
     // scroll map
     if((MOD_CTRL & le.KeyMod()) ||
-	Focus::HEROES != global_focus.Type()) Interface::GameArea::Get().SetScroll(SCROLL_LEFT);
+	Focus::HEROES != global_focus.Type())
+    {
+	switch(dir)
+	{
+	    case Direction::TOP_LEFT:		area.SetScroll(SCROLL_TOP); area.SetScroll(SCROLL_LEFT); break;
+	    case Direction::TOP:		area.SetScroll(SCROLL_TOP); break;
+            case Direction::TOP_RIGHT:		area.SetScroll(SCROLL_TOP); area.SetScroll(SCROLL_RIGHT); break;
+            case Direction::RIGHT:		area.SetScroll(SCROLL_RIGHT); break;
+            case Direction::BOTTOM_RIGHT:	area.SetScroll(SCROLL_BOTTOM); area.SetScroll(SCROLL_RIGHT); break;
+            case Direction::BOTTOM:		area.SetScroll(SCROLL_BOTTOM); break;
+            case Direction::BOTTOM_LEFT:	area.SetScroll(SCROLL_BOTTOM); area.SetScroll(SCROLL_LEFT); break;
+            case Direction::LEFT:		area.SetScroll(SCROLL_LEFT); break;
+	    default: break;
+	}
+    }
     else
     // move hero
-    if(Focus::HEROES == global_focus.Type()) MoveHeroFromArrowKeys(global_focus.GetHeroes(), Direction::LEFT);
-}
-
-void Game::KeyPress_RIGHT(void)
-{
-    Focus & global_focus = Focus::Get();
-    LocalEvent & le = LocalEvent::Get();
-    // scroll map
-    if((MOD_CTRL & le.KeyMod()) ||
-	Focus::HEROES != global_focus.Type()) Interface::GameArea::Get().SetScroll(SCROLL_RIGHT);
-    else
-    // move hero
-    if(Focus::HEROES == global_focus.Type()) MoveHeroFromArrowKeys(global_focus.GetHeroes(), Direction::RIGHT);
-}
-
-void Game::KeyPress_TOP(void)
-{
-    Focus & global_focus = Focus::Get();
-    LocalEvent & le = LocalEvent::Get();
-    // scroll map
-    if((MOD_CTRL & le.KeyMod()) ||
-	Focus::HEROES != global_focus.Type()) Interface::GameArea::Get().SetScroll(SCROLL_TOP);
-    else
-    // move hero
-    if(Focus::HEROES == global_focus.Type()) MoveHeroFromArrowKeys(global_focus.GetHeroes(), Direction::TOP);
-}
-
-void Game::KeyPress_BOTTOM(void)
-{
-    Focus & global_focus = Focus::Get();
-    LocalEvent & le = LocalEvent::Get();
-    // scroll map
-    if((MOD_CTRL & le.KeyMod()) ||
-	Focus::HEROES != global_focus.Type()) Interface::GameArea::Get().SetScroll(SCROLL_BOTTOM);
-    else
-    // move hero
-    if(Focus::HEROES == global_focus.Type()) MoveHeroFromArrowKeys(global_focus.GetHeroes(), Direction::BOTTOM);
+    if(Focus::HEROES == global_focus.Type()) MoveHeroFromArrowKeys(global_focus.GetHeroes(), dir);
 }
 
 void Game::NewWeekDialog(void)

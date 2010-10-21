@@ -62,8 +62,12 @@ const char* Game::EventsName(events_t evnt)
 	case EVENT_DEFAULTACTION:	return "default action";
 	case EVENT_MOVELEFT:		return "move left";
 	case EVENT_MOVERIGHT:		return "move right";
-	case EVENT_MOVEUP:		return "move up";
-	case EVENT_MOVEDOWN:		return "move down";
+	case EVENT_MOVETOP:		return "move top";
+	case EVENT_MOVEBOTTOM:		return "move bottom";
+        case EVENT_MOVETOPLEFT:		return "move top left";
+        case EVENT_MOVETOPRIGHT:	return "move top right";
+        case EVENT_MOVEBOTTOMLEFT:	return "move bottom left";
+        case EVENT_MOVEBOTTOMRIGHT:	return "move bottom right";
 	case EVENT_OPENFOCUS:		return "open focus";
 	case EVENT_SCROLLLEFT:		return "scroll left";
 	case EVENT_SCROLLRIGHT:		return "scroll right";
@@ -116,8 +120,12 @@ void Game::HotKeysDefaults(void)
     // move hero
     key_events[EVENT_MOVELEFT] = KEY_LEFT;
     key_events[EVENT_MOVERIGHT] = KEY_RIGHT;
-    key_events[EVENT_MOVEUP] = KEY_UP;
-    key_events[EVENT_MOVEDOWN] = KEY_DOWN;
+    key_events[EVENT_MOVETOP] = KEY_UP;
+    key_events[EVENT_MOVEBOTTOM] = KEY_DOWN;
+    //key_events[EVENT_MOVEBOTTOM] = KEVENT_MOVETOPLEFT] = KEY_NONE;
+    //key_events[EVENT_MOVEBOTTOM] = KEVENT_MOVETOPRIGHT] = KEY_NONE;
+    //key_events[EVENT_MOVEBOTTOM] = KEVENT_MOVEBOTTOMLEFT] = KEY_NONE;
+    //key_events[EVENT_MOVEBOTTOM] = KEVENT_MOVEBOTTOMRIGHT] = KEY_NONE;
     // open focus
     // key_events[EVENT_OPENFOCUS] = KEY_NONE;
     // scroll

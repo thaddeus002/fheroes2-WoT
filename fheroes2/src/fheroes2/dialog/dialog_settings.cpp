@@ -191,8 +191,8 @@ void Dialog::ExtSettings(void)
     listbox.SetScrollButtonUp(ICN::DROPLISL, 6, 7, Point(area.x + 295, area.y + 25));
     listbox.SetScrollButtonDn(ICN::DROPLISL, 8, 9, Point(area.x + 295, area.y + ah + 5));
     listbox.SetScrollSplitter(AGG::GetICN(ICN::DROPLISL, 13), Rect(area.x + 300, area.y + 49, 12, ah - 48));
-    listbox.SetAreaMaxItems(ah / 28);
-    listbox.SetAreaItems(Rect(area.x + 15, area.y + 25, 280, ah));
+    listbox.SetAreaMaxItems(ah / 36);
+    listbox.SetAreaItems(Rect(area.x + 10, area.y + 30, 290, ah));
     listbox.SetListContent(states);
     listbox.Redraw();
 
