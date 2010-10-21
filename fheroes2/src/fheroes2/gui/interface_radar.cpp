@@ -95,7 +95,7 @@ void Interface::Radar::SetPos(s16 px, s16 py)
 	Rect::y = py;
     }
 
-    Settings::Get().SetPosButtons(*this);
+    Settings::Get().SetPosRadar(*this);
 }
 
 const Rect & Interface::Radar::GetArea(void) const

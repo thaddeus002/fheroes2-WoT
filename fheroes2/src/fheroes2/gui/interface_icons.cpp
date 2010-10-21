@@ -667,7 +667,7 @@ void Interface::IconsPanel::SetPos(s16 ox, s16 oy)
 
     SetCount(count_icons);
 
-    Settings::Get().SetPosButtons(*this);
+    Settings::Get().SetPosIcons(*this);
 }
 
 void Interface::IconsPanel::SetCount(u8 count)
