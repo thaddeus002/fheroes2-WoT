@@ -1445,27 +1445,23 @@ void Game::KeyArrowPress(Direction::vector_t dir)
 {
     Focus & global_focus = Focus::Get();
     Interface::GameArea & area = Interface::GameArea::Get();
-    LocalEvent & le = LocalEvent::Get();
-    // scroll map
-    if((MOD_CTRL & le.KeyMod()) ||
-	Focus::HEROES != global_focus.Type())
-    {
-	switch(dir)
-	{
-	    case Direction::TOP_LEFT:		area.SetScroll(SCROLL_TOP); area.SetScroll(SCROLL_LEFT); break;
-	    case Direction::TOP:		area.SetScroll(SCROLL_TOP); break;
-            case Direction::TOP_RIGHT:		area.SetScroll(SCROLL_TOP); area.SetScroll(SCROLL_RIGHT); break;
-            case Direction::RIGHT:		area.SetScroll(SCROLL_RIGHT); break;
-            case Direction::BOTTOM_RIGHT:	area.SetScroll(SCROLL_BOTTOM); area.SetScroll(SCROLL_RIGHT); break;
-            case Direction::BOTTOM:		area.SetScroll(SCROLL_BOTTOM); break;
-            case Direction::BOTTOM_LEFT:	area.SetScroll(SCROLL_BOTTOM); area.SetScroll(SCROLL_LEFT); break;
-            case Direction::LEFT:		area.SetScroll(SCROLL_LEFT); break;
-	    default: break;
-	}
-    }
-    else
+
     // move hero
     if(Focus::HEROES == global_focus.Type()) MoveHeroFromArrowKeys(global_focus.GetHeroes(), dir);
+    else
+    // scroll map
+    switch(dir)
+    {
+	case Direction::TOP_LEFT:	area.SetScroll(SCROLL_TOP); area.SetScroll(SCROLL_LEFT); break;
+	case Direction::TOP:		area.SetScroll(SCROLL_TOP); break;
+        case Direction::TOP_RIGHT:	area.SetScroll(SCROLL_TOP); area.SetScroll(SCROLL_RIGHT); break;
+        case Direction::RIGHT:		area.SetScroll(SCROLL_RIGHT); break;
+        case Direction::BOTTOM_RIGHT:	area.SetScroll(SCROLL_BOTTOM); area.SetScroll(SCROLL_RIGHT); break;
+        case Direction::BOTTOM:		area.SetScroll(SCROLL_BOTTOM); break;
+        case Direction::BOTTOM_LEFT:	area.SetScroll(SCROLL_BOTTOM); area.SetScroll(SCROLL_LEFT); break;
+        case Direction::LEFT:		area.SetScroll(SCROLL_LEFT); break;
+	default: break;
+    }
 }
 
 void Game::NewWeekDialog(void)
