@@ -212,6 +212,13 @@ screen_t CastleOpenDialog1(Castle & castle)
     if(castle.isBuild(BUILD_MAGEGUILD1))
 	display.Blit(AGG::GetICN(ICN::REQUESTS, 25), rectScreen6.x, rectScreen6.y);
 
+    // update extra description
+    std::string description_castle = castle.GetDescriptionBuilding(BUILD_CASTLE, castle.GetRace());
+    {
+        payment_t profit;
+        String::Replace(description_castle, "%{count}", profit.gold);
+    }
+
     Button buttonPrev(dst_rt.x + 64, dst_rt.y + 5, ICN::TRADPOST, 3, 4);
     Button buttonNext(dst_rt.x + 245, dst_rt.y + 5, ICN::TRADPOST, 5, 6);
     if(2 > world.GetMyKingdom().GetCastles().size())
@@ -254,7 +261,7 @@ screen_t CastleOpenDialog1(Castle & castle)
 	if(le.MouseClickLeft(rectTown))
 	{
 	    if(castle.isBuild(BUILD_CASTLE))
-		Dialog::Message(castle.GetStringBuilding(BUILD_CASTLE), castle.GetDescriptionBuilding(BUILD_CASTLE), Font::BIG, Dialog::OK);
+		Dialog::Message(castle.GetStringBuilding(BUILD_CASTLE), description_castle, Font::BIG, Dialog::OK);
 	    else
 	    if(!castle.Modes(Castle::ALLOWCASTLE))
         	Dialog::Message(_("Town"), _("This town may not be upgraded to a castle."), Font::BIG, Dialog::OK);
@@ -705,9 +712,12 @@ screen_t CastleOpenDialog5(Castle & castle)
     const Rect rectScreen6(dst_rt.x + dst_rt.w - 27, dst_rt.y + 162, 25, 25);
 
     display.Blit(AGG::GetICN(ICN::REQUESTS, 20), rectScreen1.x, rectScreen1.y);
-    display.Blit(AGG::GetICN(ICN::REQUESTS, 21), rectScreen2.x, rectScreen2.y);
-    display.Blit(AGG::GetICN(ICN::REQUESTS, 22), rectScreen3.x, rectScreen3.y);
-    display.Blit(AGG::GetICN(ICN::REQUESTS, 23), rectScreen4.x, rectScreen4.y);
+    if(castle.isBuild(BUILD_CASTLE))
+    {
+	display.Blit(AGG::GetICN(ICN::REQUESTS, 21), rectScreen2.x, rectScreen2.y);
+	display.Blit(AGG::GetICN(ICN::REQUESTS, 22), rectScreen3.x, rectScreen3.y);
+	display.Blit(AGG::GetICN(ICN::REQUESTS, 23), rectScreen4.x, rectScreen4.y);
+    }
     display.Blit(AGG::GetICN(ICN::REQUESTS, 24), rectScreen5.x, rectScreen5.y);
     if(castle.isBuild(BUILD_MAGEGUILD1)) display.Blit(AGG::GetICN(ICN::REQUESTS, 25), rectScreen6.x, rectScreen6.y);
 
@@ -834,9 +844,12 @@ screen_t CastleOpenDialog6(Castle & castle)
     const Rect rectScreen6(dst_rt.x + dst_rt.w - 27, dst_rt.y + 162, 25, 25);
 
     display.Blit(AGG::GetICN(ICN::REQUESTS, 20), rectScreen1.x, rectScreen1.y);
-    display.Blit(AGG::GetICN(ICN::REQUESTS, 21), rectScreen2.x, rectScreen2.y);
-    display.Blit(AGG::GetICN(ICN::REQUESTS, 22), rectScreen3.x, rectScreen3.y);
-    display.Blit(AGG::GetICN(ICN::REQUESTS, 23), rectScreen4.x, rectScreen4.y);
+    if(castle.isBuild(BUILD_CASTLE))
+    {
+	display.Blit(AGG::GetICN(ICN::REQUESTS, 21), rectScreen2.x, rectScreen2.y);
+	display.Blit(AGG::GetICN(ICN::REQUESTS, 22), rectScreen3.x, rectScreen3.y);
+	display.Blit(AGG::GetICN(ICN::REQUESTS, 23), rectScreen4.x, rectScreen4.y);
+    }
     if(castle.isBuild(BUILD_CASTLE) || castle.isBuild(BUILD_TAVERN))
 	display.Blit(AGG::GetICN(ICN::REQUESTS, 24), rectScreen5.x, rectScreen5.y);
     display.Blit(AGG::GetICN(ICN::REQUESTS, 25), rectScreen6.x, rectScreen6.y);
