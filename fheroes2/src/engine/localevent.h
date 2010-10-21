@@ -145,7 +145,7 @@ enum KeySym
     KEY_LAST
 };
 
-KeySym KeySymInt(int);
+const char* KeySymGetName(KeySym);
 
 class LocalEvent
 {

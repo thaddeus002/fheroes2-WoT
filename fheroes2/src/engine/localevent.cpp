@@ -118,6 +118,11 @@ void LocalEvent::SetGlobalFilter(bool f)
     f ? SetModes(GLOBAL_FILTER) : ResetModes(GLOBAL_FILTER);
 }
 
+const char* KeySymGetName(KeySym sym)
+{
+    return SDL_GetKeyName(static_cast<SDLKey>(sym));
+}
+
 KeySym SDLToKeySym(SDLKey key)
 {
     switch(key)

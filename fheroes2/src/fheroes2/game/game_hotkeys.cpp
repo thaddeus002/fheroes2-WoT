@@ -172,12 +172,9 @@ void Game::HotKeysLoad(const std::string & hotkeys)
 		entry = config.Find(name);
 		if(entry)
 		{
-		    if(KEY_NONE != entry->IntParams())
-			key_events[evnt] = KeySymFromInt(entry->IntParams());
-		    else
-		    {
-			VERBOSE("Game::HotKeysLoad: events: " << EventsName(evnt) << ", unknown key: " << entry->IntParams());
-		    }
+		    const KeySym sym = KeySymFromInt(entry->IntParams());
+		    key_events[evnt] = sym;
+		    DEBUG(DBG_GAME, DBG_INFO, "Game::HotKeysLoad: events: " << EventsName(evnt) << ", key: " << KeySymGetName(sym));
 		}
 	    }
 	}
