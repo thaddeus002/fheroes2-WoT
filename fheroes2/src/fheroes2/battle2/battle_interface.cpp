@@ -3541,7 +3541,8 @@ void Battle2::Interface::RedrawTargetsWithFrameAnimation(const std::vector<Targe
 		}
 
 		const Sprite & sprite = AGG::GetICN(icn, frame, reflect);
-		display.Blit(sprite, pos.x + ((*it).defender->isWide() ? ((*it).defender->isReflect() ? pos.w : 0) : pos.w / 2) + sprite.x(), pos.y + pos.h / 2 + sprite.y());
+		display.Blit(sprite, pos.x + ((*it).defender->isWide() ? ((*it).defender->isReflect() ? pos.w : 0) : pos.w / 2) + sprite.x() - (reflect ? pos.w : 0),
+				pos.y + pos.h / 2 + sprite.y());
 	    }
 	    cursor.Show();
 	    display.Flip();
@@ -3597,7 +3598,8 @@ void Battle2::Interface::RedrawTroopWithFrameAnimation(Stats & b, ICN::icn_t icn
 	    cursor.Hide();
 	    Redraw();
 	    const Sprite & sprite = AGG::GetICN(icn, frame, reflect);
-	    display.Blit(sprite, pos.x + (b.isWide() ? (b.isReflect() ? pos.w : 0) : pos.w / 2) + sprite.x(), pos.y + pos.h / 2 + sprite.y());
+	    display.Blit(sprite, pos.x + (b.isWide() ? (b.isReflect() ? pos.w : 0) : pos.w / 2) + sprite.x() - (reflect ? pos.w : 0),
+		    pos.y + pos.h / 2 + sprite.y());
 	    cursor.Show();
 	    display.Flip();
 
