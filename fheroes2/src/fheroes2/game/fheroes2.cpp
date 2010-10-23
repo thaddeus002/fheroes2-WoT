@@ -155,7 +155,7 @@ int main(int argc, char **argv)
 	    if(0 == conf.VideoMode().w || 0 == conf.VideoMode().h)
 	    	conf.SetAutoVideoMode();
 
-            Display::SetVideoMode(conf.VideoMode().w, conf.VideoMode().h, conf.FullScreen());
+            Display::SetVideoMode(conf.VideoMode().w, conf.VideoMode().h, conf.DisplayFlags());
 
 	    Display::HideCursor();
 	    Display::SetCaption(GetCaption());

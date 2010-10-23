@@ -48,6 +48,7 @@ enum
 
     GLOBAL_FONTRENDERBLENDED = 0x00020000,
     GLOBAL_FULLSCREEN        = 0x00400000,
+    GLOBAL_USESWSURFACE      = 0x00800000,
 
     GLOBAL_SOUND             = 0x01000000,
     GLOBAL_MUSIC_EXT         = 0x02000000,
@@ -81,7 +82,7 @@ static const settings_t settingsGeneral[] =
     { GLOBAL_ALTRESOURCE, "alt resource", },
     { GLOBAL_POCKETPC,    "pocketpc",     },
     { GLOBAL_POCKETPC,    "pocket pc",    },
-
+    { GLOBAL_USESWSURFACE,"use swsurface only",},
     { 0, NULL, },
 };
 
@@ -638,8 +639,6 @@ void Settings::SetScrollSpeed(u8 speed)
 }
 
 /* return full screen */
-bool Settings::FullScreen(void) const { return opt_global.Modes(GLOBAL_FULLSCREEN); }
-
 bool Settings::QVGA(void) const { return video_mode.w && video_mode.h && (video_mode.w < 640 || video_mode.h < 480); }
 
 bool Settings::UseAltResource(void) const { return opt_global.Modes(GLOBAL_ALTRESOURCE); }
@@ -1392,4 +1391,12 @@ void Settings::SetMemoryLimit(u32 limit)
 u32 Settings::MemoryLimit(void) const
 {
     return memory_limit;
+}
+
+u32 Settings::DisplayFlags(void) const
+{
+    u32 flags = opt_global.Modes(GLOBAL_USESWSURFACE) ? SDL_SWSURFACE : SDL_SWSURFACE | SDL_HWSURFACE;
+    if(opt_global.Modes(GLOBAL_FULLSCREEN)) flags |= SDL_FULLSCREEN;
+
+    return flags;
 }

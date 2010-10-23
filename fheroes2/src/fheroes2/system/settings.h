@@ -183,12 +183,13 @@ public:
     void SetPosIcons(const Point &);
     void SetPosStatus(const Point &);
 
+    u32  DisplayFlags(void) const;
+
     bool QVGA(void) const;
     bool Editor(void) const;
     bool Sound(void) const;
     bool Music(void) const;
     bool CDMusic(void) const;
-    bool FullScreen(void) const;
     bool ShowControlPanel(void) const;
     bool ShowRadar(void) const;
     bool ShowIcons(void) const;

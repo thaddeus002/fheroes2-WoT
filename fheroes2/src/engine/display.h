@@ -57,8 +57,7 @@ public:
 
     static Display &	Get(void);
 
-    static void		SetVideoMode(const u16 w, const u16 h, bool fullscreen = false);
-    static void		SetVideoMode(const Size & mode, bool fullscreen = false);
+    static void		SetVideoMode(const u16 w, const u16 h, u32 flags);
     static int 		GetMaxMode(Size &, bool enable_rotate);
 
     static void		HideCursor(void);

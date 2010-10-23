@@ -215,20 +215,14 @@ Display & Display::operator= (const Display & dp)
     return *this;
 }
 
-void Display::SetVideoMode(const Size & mode, bool fullscreen)
-{
-    SetVideoMode(mode.w, mode.h, fullscreen);
-}
-
-void Display::SetVideoMode(const u16 w, const u16 h, bool fullscreen)
+void Display::SetVideoMode(const u16 w, const u16 h, u32 flags)
 {
     Display & display = Display::Get();
 
     if(display.isValid() && display.w() == w && display.h() == h) return;
 
-    u32 videoflags = SDL_HWSURFACE|SDL_SWSURFACE;
-    if(fullscreen || (display.surface && (display.surface->flags & SDL_FULLSCREEN))) videoflags |= SDL_FULLSCREEN;
-    display.surface = SDL_SetVideoMode(w, h, 0, videoflags);
+    if(display.surface && (display.surface->flags & SDL_FULLSCREEN)) flags |= SDL_FULLSCREEN;
+    display.surface = SDL_SetVideoMode(w, h, 0, flags);
 
     if(!display.surface)
 	Error::Except("SDL_SetVideoMode: ", SDL_GetError());

@@ -43,7 +43,7 @@ Game::menu_t Game::Editor::MainMenu(void)
     cursor.Hide();
     cursor.SetThemes(cursor.POINTER);
 
-    Display::SetVideoMode(640, 480);
+    Display::SetVideoMode(640, 480, Settings::Get().DisplayFlags());
 
     // image background
     const Sprite &back = AGG::GetICN(ICN::EDITOR, 0);
