@@ -27,6 +27,7 @@
 #include "dialog.h"
 #include "cursor.h"
 #include "button.h"
+#include "settings.h"
 #include "game.h"
 
 Game::menu_t Game::Editor::MainMenu(void)
