@@ -98,8 +98,6 @@ bool Dialog::SelectCount(const std::string &header, u32 min, u32 max, u32 & cur)
     buttonOk.Draw();
     buttonCancel.Draw();
 
-    bool zero = false;
-    bool first = true;
     bool redraw_count = false;
     cursor.Show();
     display.Flip();
@@ -117,30 +115,15 @@ bool Dialog::SelectCount(const std::string &header, u32 min, u32 max, u32 & cur)
 	    if(min < cur)
 	    {
 		cur /= 10;
-		if(cur < min)
-		{
-		    cur = min;
-		    zero = true;
-		    first = true;
-		}
+		if(cur < min) cur = min;
 	    }
 	    redraw_count = true;
 	}
 	else
 	if(le.KeyPress() && KEY_0 <= le.KeyValue() && KEY_9 >= le.KeyValue())
 	{
-	    if(first)
-	    {
-		cur = 0;
-		first = false;
-	    }
 	    if(max > cur)
 	    {
-		if(zero)
-		{
-		    cur = 0;
-		    zero = false;
-		}
 		cur *= 10;
 		switch(le.KeyValue())
 		{

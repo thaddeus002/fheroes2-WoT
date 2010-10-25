@@ -324,7 +324,6 @@ u16 Dialog::RecruitMonster(const Monster & monster, u16 available)
     cursor.Show();
     display.Flip();
 
-    bool first = true;
     bool redraw = false;
 
     // str loop
@@ -341,7 +340,6 @@ u16 Dialog::RecruitMonster(const Monster & monster, u16 available)
 	    if(0 < result)
 	    {
 		result /= 10;
-		if(0 == result) first = true;
 	    }
 
 	    paymentCosts = paymentMonster * result;
@@ -350,11 +348,6 @@ u16 Dialog::RecruitMonster(const Monster & monster, u16 available)
 	else
 	if(le.KeyPress() && KEY_0 <= le.KeyValue() && KEY_9 >= le.KeyValue())
 	{
-	    if(first)
-	    {
-		result = 0;
-		first = false;
-	    }
 	    if(max > result)
 	    {
 		result *= 10;
