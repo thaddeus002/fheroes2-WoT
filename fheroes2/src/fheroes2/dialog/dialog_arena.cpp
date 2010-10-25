@@ -101,13 +101,13 @@ Skill::Primary::skill_t Dialog::SelectSkillFromArena(void)
     {
 	le.MousePressLeft(buttonOk) ? buttonOk.PressDraw() : buttonOk.ReleaseDraw();
 
-	if(le.KeyPress(KEY_LEFT) && Skill::Primary::UNKNOWN != InfoSkillPrev(res))
+	if(Game::HotKeyPress(Game::EVENT_DEFAULT_LEFT) && Skill::Primary::UNKNOWN != InfoSkillPrev(res))
 	{
 	    res = InfoSkillPrev(res);
 	    redraw = true;
 	}
 	else
-	if(le.KeyPress(KEY_RIGHT) && Skill::Primary::UNKNOWN != InfoSkillNext(res))
+	if(Game::HotKeyPress(Game::EVENT_DEFAULT_RIGHT) && Skill::Primary::UNKNOWN != InfoSkillNext(res))
 	{
 	    res = InfoSkillNext(res);
 	    redraw = true;
@@ -147,7 +147,7 @@ Skill::Primary::skill_t Dialog::SelectSkillFromArena(void)
 	    redraw = false;
 	}
 
-        if(le.KeyPress(KEY_RETURN) || le.MouseClickLeft(buttonOk)) break;
+        if(Game::HotKeyPress(Game::EVENT_DEFAULT_READY) || le.MouseClickLeft(buttonOk)) break;
     }
 
     cursor.Hide();

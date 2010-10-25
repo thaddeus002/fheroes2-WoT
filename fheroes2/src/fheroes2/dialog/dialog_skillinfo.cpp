@@ -111,7 +111,7 @@ void Dialog::SecondarySkillInfo(const std::string &header, const std::string &me
 
         if(button && le.MouseClickLeft(*button)){ break; }
 
-	if(le.KeyPress(KEY_RETURN) || le.KeyPress(KEY_ESCAPE)){ break; }
+	if(HotKeyCloseWindow){ break; }
     }
 
     cursor.Hide();
@@ -211,7 +211,7 @@ void Dialog::PrimarySkillInfo(const std::string &header, const std::string &mess
 
         if(le.MouseClickLeft(button)){ break; }
 
-	if(le.KeyPress(KEY_RETURN) || le.KeyPress(KEY_ESCAPE)){ break; }
+	if(HotKeyCloseWindow){ break; }
     }
 
     cursor.Hide();

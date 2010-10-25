@@ -144,15 +144,15 @@ Game::menu_t Game::MainMenu(void)
             }
         }
 
-	if(le.KeyPress(KEY_n) || le.MouseClickLeft(buttonNewGame)) return NEWGAME;
+	if(HotKeyPress(EVENT_MENU_NEWGAME) || le.MouseClickLeft(buttonNewGame)) return NEWGAME;
 	else
-	if(le.KeyPress(KEY_l) || le.MouseClickLeft(buttonLoadGame)) return LOADGAME;
+	if(HotKeyPress(EVENT_MENU_LOADGAME) || le.MouseClickLeft(buttonLoadGame)) return LOADGAME;
 	else
-	if(le.KeyPress(KEY_h) || le.MouseClickLeft(buttonHighScores)) return HIGHSCORES;
+	if(HotKeyPress(EVENT_MENU_HIGHSCORES) || le.MouseClickLeft(buttonHighScores)) return HIGHSCORES;
 	else
-	if(le.KeyPress(KEY_c) || le.MouseClickLeft(buttonCredits)) return CREDITS;
+	if(HotKeyPress(EVENT_MENU_CREDITS) || le.MouseClickLeft(buttonCredits)) return CREDITS;
 	else
-	if(le.KeyPress(KEY_q) || le.MouseClickLeft(buttonQuit) || le.KeyPress(KEY_ESCAPE)) return QUITGAME;
+	if(HotKeyPress(EVENT_DEFAULT_EXIT) || le.MouseClickLeft(buttonQuit)) return QUITGAME;
 
 	// right info
 	if(le.MousePressRight(buttonQuit)) Dialog::Message(_("Quit"), _("Quit Heroes of Might and Magic and return to the operating system."), Font::BIG);

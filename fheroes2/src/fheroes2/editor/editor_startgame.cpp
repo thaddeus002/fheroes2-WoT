@@ -184,7 +184,7 @@ Game::menu_t Game::Editor::StartGame()
     while(le.HandleEvents())
     {
 	// ESC
-	if(le.KeyPress(KEY_ESCAPE) && (Dialog::YES & Dialog::Message("", _("Are you sure you want to quit?"), Font::BIG, Dialog::YES|Dialog::NO))) return QUITGAME;
+	if(HotKeyPress(EVENT_DEFAULT_EXIT) && (Dialog::YES & Dialog::Message("", _("Are you sure you want to quit?"), Font::BIG, Dialog::YES|Dialog::NO))) return QUITGAME;
 
 	// scroll area maps left
 	if(le.MouseCursor(areaScrollLeft))	areaMaps.SetScroll(SCROLL_LEFT);

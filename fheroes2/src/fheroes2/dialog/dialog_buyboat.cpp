@@ -95,10 +95,10 @@ Dialog::answer_t Dialog::BuyBoat(bool enable)
         if(button1.isEnable()) le.MousePressLeft(button1) ? button1.PressDraw() : button1.ReleaseDraw();
         le.MousePressLeft(button2) ? button2.PressDraw() : button2.ReleaseDraw();
 
-        if(le.KeyPress(KEY_RETURN) ||
-    	    (button1.isEnable() && le.MouseClickLeft(button1))) return Dialog::OK;
+        if(button1.isEnable() &&
+	    (Game::HotKeyPress(Game::EVENT_DEFAULT_READY) ||le.MouseClickLeft(button1))) return Dialog::OK;
 
-        if(le.KeyPress(KEY_ESCAPE) ||
+        if(Game::HotKeyPress(Game::EVENT_DEFAULT_EXIT) ||
     	    le.MouseClickLeft(button2)) return Dialog::CANCEL;
     }
 

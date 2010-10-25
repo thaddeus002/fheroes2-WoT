@@ -208,7 +208,7 @@ Game::menu_t Game::ScenarioInfo(void)
 	}
 	else
 	// click cancel
-	if(le.MouseClickLeft(buttonCancel) || le.KeyPress(KEY_ESCAPE))
+	if(HotKeyPress(EVENT_DEFAULT_EXIT) || le.MouseClickLeft(buttonCancel))
 	{
 	    Settings::Get().SetGameType(Game::UNKNOWN);
 	    result = MAINMENU;
@@ -216,7 +216,7 @@ Game::menu_t Game::ScenarioInfo(void)
 	}
 	else
 	// click ok
-	if(le.KeyPress(KEY_RETURN) || le.MouseClickLeft(buttonOk))
+	if(HotKeyPress(EVENT_DEFAULT_READY) || le.MouseClickLeft(buttonOk))
 	{
 	    DEBUG(DBG_GAME , DBG_INFO, "Game::ScenarioInfo: select maps: " << conf.MapsFile() << \
 		    ", difficulty: " << Difficulty::String(conf.GameDifficulty()));

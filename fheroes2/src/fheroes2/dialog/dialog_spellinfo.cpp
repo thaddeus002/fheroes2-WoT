@@ -109,7 +109,7 @@ void Dialog::SpellInfo(const std::string &header, const std::string &message, co
 
         if(button && le.MouseClickLeft(*button)){ break; }
 
-	if(le.KeyPress(KEY_RETURN) || le.KeyPress(KEY_ESCAPE)){ break; }
+	if(HotKeyCloseWindow){ break; }
     }
 
     cursor.Hide();

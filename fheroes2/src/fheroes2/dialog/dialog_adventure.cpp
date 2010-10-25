@@ -87,7 +87,7 @@ Dialog::answer_t Dialog::AdventureOptions(const bool enabledig)
         if(le.MouseClickLeft(buttonPuzzle)){ result = Dialog::PUZZLE; break; }
         if(le.MouseClickLeft(buttonInfo)){ result = Dialog::INFO; break; }
         if(le.MouseClickLeft(buttonDig) && buttonDig.isEnable()){ result = Dialog::DIG; break; }
-        if(le.MouseClickLeft(buttonCancel) || le.KeyPress(KEY_ESCAPE)){ result = Dialog::CANCEL; break; }
+        if(le.MouseClickLeft(buttonCancel) || Game::HotKeyPress(Game::EVENT_DEFAULT_EXIT)){ result = Dialog::CANCEL; break; }
 
 	// right info
         if(le.MousePressRight(buttonWorld)) Dialog::Message("", _("View the entire world."), Font::BIG);

@@ -113,8 +113,8 @@ Skill::Secondary::skill_t Dialog::LevelUpSelectSkill(const std::string & header,
 	le.MousePressLeft(button_learn1) ? button_learn1.PressDraw() : button_learn1.ReleaseDraw();
 	le.MousePressLeft(button_learn2) ? button_learn2.PressDraw() : button_learn2.ReleaseDraw();
 
-        if(le.MouseClickLeft(button_learn1)){ result = sec1.Skill(); break; }
-        if(le.MouseClickLeft(button_learn2)){ result = sec2.Skill(); break; }
+        if(le.MouseClickLeft(button_learn1) || Game::HotKeyPress(Game::EVENT_DEFAULT_LEFT)){ result = sec1.Skill(); break; }
+        if(le.MouseClickLeft(button_learn2) || Game::HotKeyPress(Game::EVENT_DEFAULT_RIGHT)){ result = sec2.Skill(); break; }
 
 	if(le.MouseClickLeft(rect_image1)){ cursor.Hide(); SecondarySkillInfo(sec1.Skill(), sec1.Level()); cursor.Show(); display.Flip(); }
 	else

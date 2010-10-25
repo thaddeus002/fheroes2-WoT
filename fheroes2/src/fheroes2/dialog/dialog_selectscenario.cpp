@@ -241,13 +241,13 @@ bool Dialog::SelectScenario(const MapsFileInfoList & all, std::string & filename
 	le.MousePressLeft(buttonSelectXLarge) && buttonSelectXLarge.isEnable() ? buttonSelectXLarge.PressDraw() : buttonSelectXLarge.ReleaseDraw();
 	le.MousePressLeft(buttonSelectAll) ? buttonSelectAll.PressDraw() : buttonSelectAll.ReleaseDraw();
 
-        if((buttonOk.isEnable() && le.MouseClickLeft(buttonOk)) || le.KeyPress(KEY_RETURN))
+        if((buttonOk.isEnable() && le.MouseClickLeft(buttonOk)) || Game::HotKeyPress(Game::EVENT_DEFAULT_READY))
 	{
 	    filename = listbox.GetCurrent().file;
 	    break;
 	}
 	else
-        if(le.KeyPress(KEY_ESCAPE))
+        if(Game::HotKeyPress(Game::EVENT_DEFAULT_EXIT))
 	{
 	    filename.clear();
 	    break;

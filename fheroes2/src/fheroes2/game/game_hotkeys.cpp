@@ -46,7 +46,20 @@ const char* Game::EventsName(events_t evnt)
 {
     switch(evnt)
     {
-	case EVENT_EXIT:		return "exit";
+        case EVENT_MENU_NEWGAME:	return "menu new game";
+        case EVENT_MENU_LOADGAME:	return "menu load game";
+        case EVENT_MENU_HIGHSCORES:	return "menu high scores";
+        case EVENT_MENU_CREDITS:	return "menu credits";
+        case EVENT_MENU_STANDARD:	return "menu standard game";
+        case EVENT_MENU_CAMPAIN:	return "menu campain game";
+        case EVENT_MENU_MULTI:		return "menu multi game";
+        case EVENT_MENU_SETTINGS:	return "menu settings";
+
+	case EVENT_DEFAULT_READY:	return "default ready";
+	case EVENT_DEFAULT_EXIT:	return "default exit";
+	case EVENT_DEFAULT_LEFT:	return "default left";
+	case EVENT_DEFAULT_RIGHT:	return "default right";
+
 	case EVENT_ENDTURN:		return "end turn";
 	case EVENT_NEXTHERO:		return "next hero";
 	case EVENT_NEXTTOWN:		return "next town";
@@ -89,8 +102,22 @@ void Game::HotKeysDefaults(void)
 {
     std::fill(&key_events[0], &key_events[EVENT_LAST], KEY_NONE);
 
-    // system
-    key_events[EVENT_EXIT] = KEY_ESCAPE;
+    // main menu
+    key_events[EVENT_MENU_NEWGAME] = KEY_n;
+    key_events[EVENT_MENU_LOADGAME] = KEY_l;
+    key_events[EVENT_MENU_HIGHSCORES] = KEY_h;
+    key_events[EVENT_MENU_CREDITS] = KEY_c;
+    key_events[EVENT_MENU_STANDARD] = KEY_s;
+    key_events[EVENT_MENU_CAMPAIN] = KEY_c;
+    key_events[EVENT_MENU_MULTI] = KEY_m;
+    key_events[EVENT_MENU_SETTINGS] = KEY_t;
+
+    // default
+    key_events[EVENT_DEFAULT_READY] = KEY_RETURN;
+    key_events[EVENT_DEFAULT_EXIT] = KEY_ESCAPE;
+    key_events[EVENT_DEFAULT_LEFT] = KEY_NONE;
+    key_events[EVENT_DEFAULT_RIGHT] = KEY_NONE;
+
     // end turn
     key_events[EVENT_ENDTURN] = KEY_e;
     // next hero
@@ -139,6 +166,7 @@ void Game::HotKeysDefaults(void)
     key_events[EVENT_SHOWBUTTONS] = KEY_3;
     key_events[EVENT_SHOWSTATUS] = KEY_4;
     key_events[EVENT_SHOWICONS] = KEY_5;
+    // system:
     // emulate mouse
     // key_events[EVENT_EMULATETOGGLE] = KEY_NONE;
     // switch group
@@ -160,6 +188,12 @@ Game::events_t Game::HotKeysGetEvent(int sym)
 	return it != end ? static_cast<events_t>(it - begin) : EVENT_NONE;
     }
     return  EVENT_NONE;
+}
+
+bool Game::HotKeyPress(events_t evnt)
+{
+    LocalEvent & le = LocalEvent::Get();
+    return le.KeyPress() && le.KeyValue() == key_events[evnt];
 }
 
 void Game::HotKeysLoad(const std::string & hotkeys)

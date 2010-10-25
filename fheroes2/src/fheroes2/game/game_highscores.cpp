@@ -299,7 +299,7 @@ Game::menu_t Game::HighScores(void)
 	le.MousePressLeft(buttonCampain) ? buttonCampain.PressDraw() : buttonCampain.ReleaseDraw();
 	le.MousePressLeft(buttonExit) ? buttonExit.PressDraw() : buttonExit.ReleaseDraw();
 
-	if(le.MouseClickLeft(buttonExit) || le.KeyPress(KEY_ESCAPE) || le.KeyPress(KEY_RETURN)) return MAINMENU;
+	if(le.MouseClickLeft(buttonExit) || HotKeyCloseWindow) return MAINMENU;
     }
 
     return QUITGAME;

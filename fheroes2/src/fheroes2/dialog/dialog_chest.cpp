@@ -102,8 +102,8 @@ bool Dialog::SelectGoldOrExp(const std::string &header, const std::string &messa
 	le.MousePressLeft(button_yes) ? button_yes.PressDraw() : button_yes.ReleaseDraw();
 	le.MousePressLeft(button_no) ? button_no.PressDraw() : button_no.ReleaseDraw();
 
-        if(le.KeyPress(KEY_RETURN) || le.MouseClickLeft(button_yes)){ result = true; break; }
-        if(le.KeyPress(KEY_ESCAPE) || le.MouseClickLeft(button_no)){ result = false; break; }
+        if(Game::HotKeyPress(Game::EVENT_DEFAULT_READY) || le.MouseClickLeft(button_yes)){ result = true; break; }
+        if(Game::HotKeyPress(Game::EVENT_DEFAULT_EXIT) || le.MouseClickLeft(button_no)){ result = false; break; }
     }
 
     cursor.Hide();

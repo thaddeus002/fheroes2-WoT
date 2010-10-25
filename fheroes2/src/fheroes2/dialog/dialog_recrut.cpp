@@ -325,6 +325,7 @@ u16 Dialog::RecruitMonster(const Monster & monster, u16 available)
     display.Flip();
 
     bool first = true;
+    bool redraw = false;
 
     // str loop
     while(le.HandleEvents())
@@ -344,30 +345,16 @@ u16 Dialog::RecruitMonster(const Monster & monster, u16 available)
 	    }
 
 	    paymentCosts = paymentMonster * result;
-	    cursor.Hide();
-	    static_info.Restore();
-	    RedrawCurrentInfo;
-	    cursor.Show();
-	    display.Flip();
+	    redraw = true;
 	}
-
-	if(le.KeyPress(KEY_0) ||
-	   le.KeyPress(KEY_1) ||
-	   le.KeyPress(KEY_2) ||
-	   le.KeyPress(KEY_3) ||
-	   le.KeyPress(KEY_4) ||
-	   le.KeyPress(KEY_5) ||
-	   le.KeyPress(KEY_6) ||
-	   le.KeyPress(KEY_7) ||
-	   le.KeyPress(KEY_8) ||
-	   le.KeyPress(KEY_9))
+	else
+	if(le.KeyPress() && KEY_0 <= le.KeyValue() && KEY_9 >= le.KeyValue())
 	{
 	    if(first)
 	    {
 		result = 0;
 		first = false;
 	    }
-
 	    if(max > result)
 	    {
 		result *= 10;
@@ -388,49 +375,43 @@ u16 Dialog::RecruitMonster(const Monster & monster, u16 available)
 	    }
 
 	    paymentCosts = paymentMonster * result;
-	    cursor.Hide();
-	    static_info.Restore();
-	    RedrawCurrentInfo;
-	    cursor.Show();
-	    display.Flip();
+	    redraw = true;
 	}
 
 	if(le.MouseClickLeft(buttonUp) && result < max)
 	{
 	    ++result;
 	    paymentCosts += paymentMonster;
-	    cursor.Hide();
-	    static_info.Restore();
-	    RedrawCurrentInfo;
-	    cursor.Show();
-	    display.Flip();
+	    redraw = true;
 	}
-
+	else
 	if(le.MouseClickLeft(buttonDn) && result)
 	{
 	    --result;
 	    paymentCosts -= paymentMonster;
-	    cursor.Hide();
-	    static_info.Restore();
-	    RedrawCurrentInfo;
-	    cursor.Show();
-	    display.Flip();
+	    redraw = true;
 	}
-
+	else
 	if(le.MouseClickLeft(buttonMax) && result != max)
 	{
 	    result = max;
 	    paymentCosts = paymentMonster * max;
+	    redraw = true;
+	}
+
+	if(redraw)
+	{
 	    cursor.Hide();
 	    static_info.Restore();
 	    RedrawCurrentInfo;
 	    cursor.Show();
 	    display.Flip();
+	    redraw = false;
 	}
+
+	if(le.MouseClickLeft(buttonOk) || Game::HotKeyPress(Game::EVENT_DEFAULT_READY)) break;
 	
-	if(le.MouseClickLeft(buttonOk) || le.KeyPress(KEY_RETURN)) break;
-	
-	if(le.MouseClickLeft(buttonCancel) || le.KeyPress(KEY_ESCAPE)){ result = 0; break; }
+	if(le.MouseClickLeft(buttonCancel) || Game::HotKeyPress(Game::EVENT_DEFAULT_EXIT)){ result = 0; break; }
     }
 
     cursor.Hide();

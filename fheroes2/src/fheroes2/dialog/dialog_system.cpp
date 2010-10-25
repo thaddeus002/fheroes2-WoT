@@ -98,8 +98,8 @@ u8 Dialog::SystemOptions(void)
     {
         le.MousePressLeft(buttonOk) ? buttonOk.PressDraw() : buttonOk.ReleaseDraw();
 
-        if(le.MouseClickLeft(buttonOk)){ break; }
-        if(le.KeyPress(KEY_ESCAPE)){ result = false; break; }
+        if(le.MouseClickLeft(buttonOk) || Game::HotKeyPress(Game::EVENT_DEFAULT_READY)){ break; }
+        if(Game::HotKeyPress(Game::EVENT_DEFAULT_EXIT)){ result = false; break; }
 
         // set sound volume
         if(conf.Sound() && le.MouseClickLeft(rect1))

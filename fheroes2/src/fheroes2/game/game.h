@@ -74,7 +74,18 @@ namespace Game
     enum events_t
     {
 	EVENT_NONE,
-	EVENT_EXIT,
+	EVENT_MENU_NEWGAME,
+	EVENT_MENU_LOADGAME,
+	EVENT_MENU_HIGHSCORES,
+	EVENT_MENU_CREDITS,
+	EVENT_MENU_STANDARD,
+	EVENT_MENU_CAMPAIN,
+	EVENT_MENU_MULTI,
+	EVENT_MENU_SETTINGS,
+	EVENT_DEFAULT_READY,
+	EVENT_DEFAULT_EXIT,
+	EVENT_DEFAULT_LEFT,
+	EVENT_DEFAULT_RIGHT,
 	EVENT_ENDTURN,
 	EVENT_NEXTHERO,
 	EVENT_NEXTTOWN,
@@ -114,6 +125,7 @@ namespace Game
     events_t & operator++ (events_t &);
 
     events_t HotKeysGetEvent(int);
+    bool HotKeyPress(events_t);
 
     enum delay_t
     {
@@ -234,5 +246,7 @@ namespace Game
 	Game::menu_t StartGame(void);
     }
 }
+
+#define HotKeyCloseWindow (Game::HotKeyPress(Game::EVENT_DEFAULT_EXIT) || Game::HotKeyPress(Game::EVENT_DEFAULT_READY))
 
 #endif

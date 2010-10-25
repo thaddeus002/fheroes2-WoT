@@ -197,20 +197,21 @@ u16 ButtonGroups::QueueEventProcessing(void)
 
     if(button1 && button2)
     {
-	if(le.KeyPress(KEY_RETURN)) return result1;
+	if(buttons == (Dialog::YES|Dialog::NO) ||
+	    buttons == (Dialog::OK|Dialog::CANCEL))
+	{
+	    if(Game::HotKeyPress(Game::EVENT_DEFAULT_READY)) return result1;
+    	    if(Game::HotKeyPress(Game::EVENT_DEFAULT_EXIT)) return result2;
+	}
+
+	if(Game::HotKeyPress(Game::EVENT_DEFAULT_LEFT)) return result1;
 	else
-	if(le.KeyPress(KEY_ESCAPE)) return result2;
+	if(Game::HotKeyPress(Game::EVENT_DEFAULT_RIGHT)) return result2;
     }
     else
     // one button
     {
-	if(le.KeyPress(KEY_ESCAPE) || le.KeyPress(KEY_SPACE) || le.KeyPress(KEY_RETURN)) return buttons;
-    }
-
-    if(buttons == (Dialog::YES|Dialog::NO))
-    {
-	if(le.KeyPress(KEY_y)) return result1;
-    	if(le.KeyPress(KEY_n)) return result2;
+	if(HotKeyCloseWindow) return buttons;
     }
 
     return Dialog::ZERO;

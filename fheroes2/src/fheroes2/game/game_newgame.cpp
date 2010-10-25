@@ -102,7 +102,7 @@ Game::menu_t Game::NewNetwork(void)
 
 	if(le.MouseClickLeft(buttonHost) || le.KeyPress(KEY_h)) return NetworkHost();
 	if(le.MouseClickLeft(buttonGuest) || le.KeyPress(KEY_g)) return NetworkGuest();
-	if(le.MouseClickLeft(buttonCancelGame) || le.KeyPress(KEY_ESCAPE)) return MAINMENU;
+	if(HotKeyPress(EVENT_DEFAULT_EXIT) || le.MouseClickLeft(buttonCancelGame)) return MAINMENU;
 
         // right info
 	if(le.MousePressRight(buttonHost)) Dialog::Message(_("Host"), _("The host sets up the game options. There can only be one host per network game."), Font::BIG);
@@ -173,11 +173,11 @@ Game::menu_t Game::NewGame(void)
 	le.MousePressLeft(buttonCancelGame) ? buttonCancelGame.PressDraw() : buttonCancelGame.ReleaseDraw();
 	le.MousePressLeft(buttonSettings) ? buttonSettings.PressDraw() : buttonSettings.ReleaseDraw();
 
-	if(le.KeyPress(KEY_s) || le.MouseClickLeft(buttonStandartGame)) return NEWSTANDARD;
-	if(le.KeyPress(KEY_c) || le.MouseClickLeft(buttonCampainGame)) return NEWCAMPAIN;
-	if(le.KeyPress(KEY_m) || le.MouseClickLeft(buttonMultiGame)) return NEWMULTI;
-	if(le.MouseClickLeft(buttonCancelGame) || le.KeyPress(KEY_ESCAPE)) return MAINMENU;
-	if(le.MouseClickLeft(buttonSettings)){ Dialog::ExtSettings(); cursor.Show(); display.Flip(); }
+	if(HotKeyPress(EVENT_MENU_STANDARD) || le.MouseClickLeft(buttonStandartGame)) return NEWSTANDARD;
+	if(HotKeyPress(EVENT_MENU_CAMPAIN) || le.MouseClickLeft(buttonCampainGame)) return NEWCAMPAIN;
+	if(HotKeyPress(EVENT_MENU_MULTI) || le.MouseClickLeft(buttonMultiGame)) return NEWMULTI;
+	if(HotKeyPress(EVENT_MENU_SETTINGS) || le.MouseClickLeft(buttonSettings)){ Dialog::ExtSettings(); cursor.Show(); display.Flip(); }
+	if(HotKeyPress(EVENT_DEFAULT_EXIT) || le.MouseClickLeft(buttonCancelGame)) return MAINMENU;
 
         // right info
 	if(le.MousePressRight(buttonStandartGame)) Dialog::Message(_("Standard Game"), _("A single player game playing out a single map."), Font::BIG);
@@ -241,7 +241,7 @@ Game::menu_t Game::NewMulti(void)
 	le.MousePressLeft(buttonCancelGame) ? buttonCancelGame.PressDraw() : buttonCancelGame.ReleaseDraw();
 
 	if(le.MouseClickLeft(buttonHotSeat) || le.KeyPress(KEY_h)) return NEWHOTSEAT;
-	if(le.MouseClickLeft(buttonCancelGame) || le.KeyPress(KEY_ESCAPE)) return MAINMENU;
+	if(HotKeyPress(EVENT_DEFAULT_EXIT) || le.MouseClickLeft(buttonCancelGame)) return MAINMENU;
 
         // right info
 	if(le.MousePressRight(buttonHotSeat)) Dialog::Message(_("Hot Seat"), _("Play a Hot Seat game, where 2 to 4 players play around the same computer, switching into the 'Hot Seat' when it is their turn."), Font::BIG);
@@ -311,7 +311,7 @@ u8 SelectCountPlayers(void)
 	if(le.MouseClickLeft(button5Players) || le.KeyPress(KEY_5)) return 5;
 	if(le.MouseClickLeft(button6Players) || le.KeyPress(KEY_6)) return 6;
 
-	if(le.MouseClickLeft(buttonCancel) || le.KeyPress(KEY_ESCAPE)) return 0;
+	if(Game::HotKeyPress(Game::EVENT_DEFAULT_EXIT) || le.MouseClickLeft(buttonCancel)) return 0;
 
         // right info
 	if(le.MousePressRight(button2Players)) Dialog::Message(_("2 Players"), _("Play with 2 human players, and optionally, up, to 4 additional computer players."), Font::BIG);

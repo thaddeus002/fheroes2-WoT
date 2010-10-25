@@ -126,7 +126,7 @@ bool Dialog::SelectCount(const std::string &header, u32 min, u32 max, u32 & cur)
 	    }
 	    redraw_count = true;
 	}
-
+	else
 	if(le.KeyPress() && KEY_0 <= le.KeyValue() && KEY_9 >= le.KeyValue())
 	{
 	    if(first)
@@ -134,7 +134,6 @@ bool Dialog::SelectCount(const std::string &header, u32 min, u32 max, u32 & cur)
 		cur = 0;
 		first = false;
 	    }
-
 	    if(max > cur)
 	    {
 		if(zero)
@@ -203,9 +202,9 @@ bool Dialog::SelectCount(const std::string &header, u32 min, u32 max, u32 & cur)
 	    redraw_count = false;
 	}
 
-        if(le.KeyPress(KEY_RETURN) || le.MouseClickLeft(buttonOk)){ cursor.Hide(); return true; }
+        if(Game::HotKeyPress(Game::EVENT_DEFAULT_READY) || le.MouseClickLeft(buttonOk)){ cursor.Hide(); return true; }
 	else
-	if(le.KeyPress(KEY_ESCAPE) || le.MouseClickLeft(buttonCancel)){ cur = 0;  break; }
+	if(Game::HotKeyPress(Game::EVENT_DEFAULT_EXIT) || le.MouseClickLeft(buttonCancel)){ cur = 0;  break; }
     }
     cursor.Hide();
     return false;
@@ -276,9 +275,9 @@ bool Dialog::InputString(const std::string &header, std::string &res)
 	    redraw = true;
 	}
 
-        if(le.KeyPress(KEY_RETURN) || (buttonOk.isEnable() && le.MouseClickLeft(buttonOk))) break;
+        if(Game::HotKeyPress(Game::EVENT_DEFAULT_READY) || (buttonOk.isEnable() && le.MouseClickLeft(buttonOk))) break;
 	else
-	if(le.KeyPress(KEY_ESCAPE) || le.MouseClickLeft(buttonCancel)){ res.clear(); break; }
+	if(Game::HotKeyPress(Game::EVENT_DEFAULT_EXIT) || le.MouseClickLeft(buttonCancel)){ res.clear(); break; }
 	else
 	if(le.KeyPress())
 	{

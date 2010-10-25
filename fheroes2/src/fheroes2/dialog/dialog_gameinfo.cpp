@@ -133,8 +133,7 @@ void Dialog::GameInfo(void)
 	le.MousePressLeft(button) ? button.PressDraw() : button.ReleaseDraw();
 
         if(le.MouseClickLeft(button) ||
-	   le.KeyPress(KEY_RETURN) ||
-           le.KeyPress(KEY_ESCAPE)) break;
+	   HotKeyCloseWindow) break;
     }
 
     cursor.Hide();

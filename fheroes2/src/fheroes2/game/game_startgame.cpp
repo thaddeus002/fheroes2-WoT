@@ -728,7 +728,7 @@ Game::menu_t Game::HumanTurn(void)
 	    case EVENT_EMULATETOGGLE:	le.ToggleEmulateMouse(); break;
 #endif
 	    // exit dialog
-	    case EVENT_EXIT:		EventExit(res); break;
+	    case EVENT_DEFAULT_EXIT:	EventExit(res); break;
     	    // end turn
 	    case EVENT_ENDTURN:		EventEndTurn(res); break;
     	    // next hero

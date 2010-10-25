@@ -253,7 +253,7 @@ bool SelectFileListSimple(const std::string & header, MapsFileInfoList & lists, 
 
 	listbox.QueueEventProcessing();
 
-        if((buttonOk.isEnable() && le.MouseClickLeft(buttonOk)) || le.KeyPress(KEY_RETURN))
+        if((buttonOk.isEnable() && le.MouseClickLeft(buttonOk)) || Game::HotKeyPress(Game::EVENT_DEFAULT_READY))
         {
     	    if(filename.size())
 		result = Settings::Get().LocalPrefix() + SEPARATOR + "files" + SEPARATOR + "save" + SEPARATOR + filename + ".sav";
@@ -262,7 +262,7 @@ bool SelectFileListSimple(const std::string & header, MapsFileInfoList & lists, 
     		result = listbox.GetCurrent().file;
     	}
     	else
-        if(le.MouseClickLeft(buttonCancel) || le.KeyPress(KEY_ESCAPE))
+        if(le.MouseClickLeft(buttonCancel) || Game::HotKeyPress(Game::EVENT_DEFAULT_EXIT))
         {
     	    break;
 	}

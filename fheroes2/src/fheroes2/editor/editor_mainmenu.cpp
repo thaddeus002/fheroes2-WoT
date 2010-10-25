@@ -73,9 +73,9 @@ Game::menu_t Game::Editor::MainMenu(void)
 	le.MousePressLeft(buttonLoadMap) ? buttonLoadMap.PressDraw() : buttonLoadMap.ReleaseDraw();
 	le.MousePressLeft(buttonCancelGame) ? buttonCancelGame.PressDraw() : buttonCancelGame.ReleaseDraw();
 
-	if(le.MouseClickLeft(buttonNewMap)) return EDITNEWMAP;
-	if(le.MouseClickLeft(buttonLoadMap)) return EDITLOADMAP;
-	if(le.MouseClickLeft(buttonCancelGame) || le.KeyPress(KEY_ESCAPE)) return QUITGAME;
+	if(le.MouseClickLeft(buttonNewMap) || HotKeyPress(EVENT_MENU_NEWGAME)) return EDITNEWMAP;
+	if(le.MouseClickLeft(buttonLoadMap) || HotKeyPress(EVENT_MENU_LOADGAME)) return EDITLOADMAP;
+	if(le.MouseClickLeft(buttonCancelGame) || HotKeyPress(EVENT_DEFAULT_EXIT)) return QUITGAME;
 
         // right info
 	if(le.MousePressRight(buttonNewMap)) Dialog::Message(_("New Map"), _("Create a new map, either from scratch or using the random map generator."), Font::BIG);
