@@ -494,3 +494,42 @@ bool StoreFileToMem(std::vector<u8> & data, const std::string & file)
     }
     return false;
 }
+
+bool PressIntKey(u32 min, u32 max, u32 & result)
+{
+    LocalEvent & le = LocalEvent::Get();
+
+    if(le.KeyPress(KEY_BACKSPACE))
+    {
+            if(min < result)
+            {
+                result /= 10;
+                if(result < min) result = min;
+            }
+            return true;
+    }
+    else
+    if(le.KeyPress() && KEY_0 <= le.KeyValue() && KEY_9 >= le.KeyValue())
+    {
+	if(max > result)
+        {
+            result *= 10;
+            switch(le.KeyValue())
+            {
+                    case KEY_1: result += 1; break;
+                    case KEY_2: result += 2; break;
+                    case KEY_3: result += 3; break;
+                    case KEY_4: result += 4; break;
+                    case KEY_5: result += 5; break;
+                    case KEY_6: result += 6; break;
+                    case KEY_7: result += 7; break;
+                    case KEY_8: result += 8; break;
+                    case KEY_9: result += 9; break;
+                    default: break;
+            }
+            if(result > max) result = max;
+	}
+        return true;
+    }
+    return false;
+}

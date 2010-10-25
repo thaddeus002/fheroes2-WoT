@@ -110,38 +110,8 @@ bool Dialog::SelectCount(const std::string &header, u32 min, u32 max, u32 & cur)
 	le.MousePressLeft(buttonUp) ? buttonUp.PressDraw() : buttonUp.ReleaseDraw();
 	le.MousePressLeft(buttonDn) ? buttonDn.PressDraw() : buttonDn.ReleaseDraw();
 
-	if(le.KeyPress(KEY_BACKSPACE))
-	{
-	    if(min < cur)
-	    {
-		cur /= 10;
-		if(cur < min) cur = min;
-	    }
+	if(PressIntKey(min, max, cur))
 	    redraw_count = true;
-	}
-	else
-	if(le.KeyPress() && KEY_0 <= le.KeyValue() && KEY_9 >= le.KeyValue())
-	{
-	    if(max > cur)
-	    {
-		cur *= 10;
-		switch(le.KeyValue())
-		{
-		    case KEY_1:	cur += 1; break;
-		    case KEY_2:	cur += 2; break;
-		    case KEY_3:	cur += 3; break;
-		    case KEY_4:	cur += 4; break;
-		    case KEY_5:	cur += 5; break;
-		    case KEY_6:	cur += 6; break;
-		    case KEY_7:	cur += 7; break;
-		    case KEY_8:	cur += 8; break;
-		    case KEY_9:	cur += 9; break;
-		    default: break;
-		}
-		if(cur > max) cur = max;
-	    }
-	    redraw_count = true;
-	}
 
         // max
         if(le.MouseClickLeft(rectMax))

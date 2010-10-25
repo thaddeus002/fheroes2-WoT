@@ -41,12 +41,12 @@ u16 Dialog::RecruitMonster(const Monster & monster, u16 available)
     cursor.SetThemes(Cursor::POINTER);
     
     // calculate max count
-    u16 max = 0;
+    u32 max = 0;
     const PaymentConditions::BuyMonster paymentMonster(monster());
     const Resource::funds_t & kingdomResource = world.GetMyKingdom().GetFundsResource();
     while(Resource::funds_t(paymentMonster * max) <= kingdomResource && max <= available) ++max;
 
-    u16 result = --max;
+    u32 result = --max;
 
     payment_t paymentCosts(paymentMonster * result);
 
@@ -335,38 +335,8 @@ u16 Dialog::RecruitMonster(const Monster & monster, u16 available)
 	le.MousePressLeft(buttonUp) ? buttonUp.PressDraw() : buttonUp.ReleaseDraw();
 	le.MousePressLeft(buttonDn) ? buttonDn.PressDraw() : buttonDn.ReleaseDraw();
 
-	if(le.KeyPress(KEY_BACKSPACE))
+	if(PressIntKey(0, max, result))
 	{
-	    if(0 < result)
-	    {
-		result /= 10;
-	    }
-
-	    paymentCosts = paymentMonster * result;
-	    redraw = true;
-	}
-	else
-	if(le.KeyPress() && KEY_0 <= le.KeyValue() && KEY_9 >= le.KeyValue())
-	{
-	    if(max > result)
-	    {
-		result *= 10;
-		switch(le.KeyValue())
-		{
-		    case KEY_1:	result += 1; break;
-		    case KEY_2:	result += 2; break;
-		    case KEY_3:	result += 3; break;
-		    case KEY_4:	result += 4; break;
-		    case KEY_5:	result += 5; break;
-		    case KEY_6:	result += 6; break;
-		    case KEY_7:	result += 7; break;
-		    case KEY_8:	result += 8; break;
-		    case KEY_9:	result += 9; break;
-		    default: break;
-		}
-		if(result > max) result = max;
-	    }
-
 	    paymentCosts = paymentMonster * result;
 	    redraw = true;
 	}
