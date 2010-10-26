@@ -58,7 +58,7 @@ namespace Interface
 	void Build(void);
 
 	const Rect & GetArea(void) const;
-	const Rect & GetMapsPos(void) const;
+	const Point& GetMapsPos(void) const;
 	const Rect & GetRectMaps(void) const;
 
 	Cursor::themes_t GetScrollCursor(void) const;
@@ -89,8 +89,8 @@ namespace Interface
 	GameArea();
 
 	Rect	areaPosition;
-	Rect	mapsPosition;
 	Rect	rectMaps;
+	Point	rectMapsPosition;
 	Point	scrollOffset;
 	u16	oldIndexPos;
 	u8	scrollDirection;

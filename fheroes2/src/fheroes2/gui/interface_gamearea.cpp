@@ -54,8 +54,8 @@ Interface::GameArea::GameArea() : oldIndexPos(0), updateCursor(false)
 const Rect & Interface::GameArea::GetArea(void) const
 { return areaPosition; }
 
-const Rect & Interface::GameArea::GetMapsPos(void) const
-{ return mapsPosition; }
+const Point& Interface::GameArea::GetMapsPos(void) const
+{ return rectMapsPosition; }
 
 const Rect & Interface::GameArea::GetRectMaps(void) const
 { return rectMaps; }
@@ -119,19 +119,15 @@ void Interface::GameArea::SetAreaPosition(s16 x, s16 y, u16 w, u16 h)
 
     rectMaps.x = 0;
     rectMaps.y = 0;
-    rectMaps.w = areaPosition.w / TILEWIDTH;
-    rectMaps.h = areaPosition.h / TILEWIDTH;
-    rectMaps.w += (areaPosition.w != rectMaps.w * TILEWIDTH ? 2 : 1);
-    rectMaps.h += (areaPosition.h != rectMaps.h * TILEWIDTH ? 2 : 1);
+    rectMaps.w = (areaPosition.w / TILEWIDTH) + 2; //(areaPosition.w % TILEWIDTH ? 2 : 1);
+    rectMaps.h = (areaPosition.h / TILEWIDTH) + 2; //(areaPosition.h % TILEWIDTH ? 2 : 1);
 
     scrollOffset.x = 0;
     scrollOffset.y = 0;
     scrollStep = Settings::Get().ScrollSpeed();
 
-    mapsPosition.x = areaPosition.x + scrollOffset.x;
-    mapsPosition.y = areaPosition.y + scrollOffset.y;
-    mapsPosition.w = rectMaps.w * TILEWIDTH;
-    mapsPosition.h = rectMaps.h * TILEWIDTH;
+    rectMapsPosition.x = areaPosition.x + scrollOffset.x;
+    rectMapsPosition.y = areaPosition.y + scrollOffset.y;
 }
 
 void Interface::GameArea::BlitOnTile(Surface & dst, const Sprite & src, const Point & mp) const
@@ -141,12 +137,12 @@ void Interface::GameArea::BlitOnTile(Surface & dst, const Sprite & src, const Po
 
 void Interface::GameArea::BlitOnTile(Surface & dst, const Surface & src, const s16 ox, const s16 oy, const Point & mp) const
 {
-    const s16 & dstx = mapsPosition.x + TILEWIDTH * (mp.x - rectMaps.x);
-    const s16 & dsty = mapsPosition.y + TILEWIDTH * (mp.y - rectMaps.y);
+    const s16 & dstx = rectMapsPosition.x + TILEWIDTH * (mp.x - rectMaps.x);
+    const s16 & dsty = rectMapsPosition.y + TILEWIDTH * (mp.y - rectMaps.y);
 
     Point dstpt(dstx + ox, dsty + oy);
 
-    if(mapsPosition & dstpt)
+    if(areaPosition & Rect(dstpt, src.w(), src.h()))
     {
 	Rect srcrt;
 	SrcRectFixed(srcrt, dstpt, src.w(), src.h());
@@ -193,7 +189,7 @@ void Interface::GameArea::Redraw(Surface & dst, u8 flag, const Rect & rt) const
 	if(tile.GetObject() == MP2::OBJ_HEROES && (flag & LEVEL_HEROES))
 	{
 	    const Heroes *hero = world.GetHeroes(tile.GetIndex());
-	    if(hero) hero->Redraw(dst, mapsPosition.x + TILEWIDTH * ox, mapsPosition.y + TILEWIDTH * oy, true);
+	    if(hero) hero->Redraw(dst, rectMapsPosition.x + TILEWIDTH * ox, rectMapsPosition.y + TILEWIDTH * oy, true);
 	}
     }
 
@@ -242,8 +238,8 @@ void Interface::GameArea::Redraw(Surface & dst, u8 flag, const Rect & rt) const
 	    for(s16 oy = rt.y; oy < rt.y + rt.h; ++oy)
 		for(s16 ox = rt.x; ox < rt.x + rt.w; ++ox)
 	    {
-    		const Point dstpt(mapsPosition.x + TILEWIDTH * ox,
-				mapsPosition.y + TILEWIDTH * oy);
+    		const Point dstpt(rectMapsPosition.x + TILEWIDTH * ox,
+				rectMapsPosition.y + TILEWIDTH * oy);
 		if(areaPosition & dstpt)
     		{
 		    dst.Lock();
@@ -268,52 +264,56 @@ void Interface::GameArea::Redraw(Surface & dst, u8 flag, const Rect & rt) const
 /* scroll area */
 void Interface::GameArea::Scroll(void)
 {
-    if(scrollDirection & SCROLL_LEFT && 0 < rectMaps.x)
+    if(scrollDirection & SCROLL_LEFT)
     {
-	if(0 > scrollOffset.x && scrollStep < SCROLL_MAX)
-	    scrollOffset.x += scrollStep;
+	if(0 < scrollOffset.x)
+	    scrollOffset.x -= scrollStep;
 	else
+	if(0 < rectMaps.x)
 	{
-	    scrollOffset.x = -SCROLL_MAX + scrollStep;
+	    scrollOffset.x = SCROLL_MAX - scrollStep;
 	    --rectMaps.x;
 	}
     }
     else
-    if(scrollDirection & SCROLL_RIGHT && world.w() - rectMaps.w > rectMaps.x)
+    if(scrollDirection & SCROLL_RIGHT)
     {
-	if(-SCROLL_MAX < scrollOffset.x && scrollStep < SCROLL_MAX)
-	    scrollOffset.x -= scrollStep;
+	if(scrollOffset.x < SCROLL_MAX * 2)
+	    scrollOffset.x += scrollStep;
 	else
+	if(world.w() - rectMaps.w > rectMaps.x)
 	{
-	    scrollOffset.x = -scrollStep;
+	    scrollOffset.x = SCROLL_MAX + scrollStep;
 	    ++rectMaps.x;
 	}
     }
 
-    if(scrollDirection & SCROLL_TOP && 0 < rectMaps.y)
+    if(scrollDirection & SCROLL_TOP)
     {
-	if(0 > scrollOffset.y && scrollStep < SCROLL_MAX)
-	    scrollOffset.y += scrollStep;
+	if(0 < scrollOffset.y)
+	    scrollOffset.y -= scrollStep;
 	else
+	if(0 < rectMaps.y)
 	{
-	    scrollOffset.y = -SCROLL_MAX + scrollStep;
+	    scrollOffset.y = SCROLL_MAX - scrollStep;
 	    --rectMaps.y;
 	}
     }
     else
-    if(scrollDirection & SCROLL_BOTTOM && world.h() - rectMaps.h > rectMaps.y)
+    if(scrollDirection & SCROLL_BOTTOM)
     {
-	if(-SCROLL_MAX < scrollOffset.y && scrollStep < SCROLL_MAX)
-	    scrollOffset.y -= scrollStep;
+	if(scrollOffset.y < SCROLL_MAX * 2)
+	    scrollOffset.y += scrollStep;
 	else
+	if(world.h() - rectMaps.h > rectMaps.y)
 	{
-	    scrollOffset.y = -scrollStep;
+	    scrollOffset.y = SCROLL_MAX + scrollStep;
 	    ++rectMaps.y;
 	}
     }
 
-    mapsPosition.x = areaPosition.x + scrollOffset.x;
-    mapsPosition.y = areaPosition.y + scrollOffset.y;
+    rectMapsPosition.x = areaPosition.x - scrollOffset.x;
+    rectMapsPosition.y = areaPosition.y - scrollOffset.y;
 
     scrollDirection = 0;
 }
@@ -374,11 +374,11 @@ void Interface::GameArea::Center(s16 px, s16 py)
 	rectMaps.y = pos.y;
 	scrollDirection = 0;
 
-	scrollOffset.x = 0;
-	scrollOffset.y = 0;
+	scrollOffset.x = SCROLL_MAX;
+	scrollOffset.y = SCROLL_MAX;
 
-	mapsPosition.x = areaPosition.x + scrollOffset.x;
-	mapsPosition.y = areaPosition.y + scrollOffset.y;
+	rectMapsPosition.x = areaPosition.x - scrollOffset.x;
+	rectMapsPosition.y = areaPosition.y - scrollOffset.y;
 
 	scrollStep = Settings::Get().ScrollSpeed();
     }
@@ -459,20 +459,47 @@ void Interface::GameArea::SetScroll(scroll_t direct)
 {
     switch(direct)
     {
-	case SCROLL_LEFT:	if(0 < rectMaps.x)                      scrollDirection |= direct;	break;
-	case SCROLL_RIGHT:	if(world.w() - rectMaps.w > rectMaps.x) scrollDirection |= direct;	break;
-	case SCROLL_TOP:	if(0 < rectMaps.y)                      scrollDirection |= direct;	break;
-	case SCROLL_BOTTOM:	if(world.h() - rectMaps.h > rectMaps.y) scrollDirection |= direct;	break;
+	case SCROLL_LEFT:
+	    if(0 < rectMaps.x || 0 < scrollOffset.x)
+	    {
+	    	scrollDirection |= direct;
+		updateCursor = true;
+	    }
+	    break;
+
+	case SCROLL_RIGHT:
+	    if(world.w() - rectMaps.w > rectMaps.x || SCROLL_MAX * 2 > scrollOffset.x)
+	    {
+		scrollDirection |= direct;
+		updateCursor = true;
+	    }
+	    break;
+
+	case SCROLL_TOP:
+	    if(0 < rectMaps.y || 0 < scrollOffset.y)
+	    {
+		scrollDirection |= direct;
+		updateCursor = true;
+	    }
+	    break;
+
+	case SCROLL_BOTTOM:
+	    if(world.h() - rectMaps.h > rectMaps.y || SCROLL_MAX * 2 > scrollOffset.y)
+	    {
+		scrollDirection |= direct;
+		updateCursor = true;
+	    }
+	    break;
+
 	default: break;
     }
-    SetUpdateCursor();
 }
 
 /* convert area point to index maps */
 s16 Interface::GameArea::GetIndexFromMousePoint(const Point & pt) const
 {
-    s16 result = (rectMaps.y + (pt.y - mapsPosition.y) / TILEWIDTH) * world.w() +
-		    rectMaps.x + (pt.x - mapsPosition.x) / TILEWIDTH;
+    s16 result = (rectMaps.y + (pt.y - rectMapsPosition.y) / TILEWIDTH) * world.w() +
+		    rectMaps.x + (pt.x - rectMapsPosition.x) / TILEWIDTH;
     const u16 & max = world.w() * world.h() - 1;
 
     return result > max || result < Maps::GetIndexFromAbsPoint(rectMaps.x, rectMaps.y) ? -1 : result;
@@ -495,8 +522,8 @@ void Interface::GameArea::QueueEventProcessing(void)
     // out of range
     if(index < 0) return;
 
-    const Rect tile_pos(mapsPosition.x + ((u16) (mp.x - mapsPosition.x) / TILEWIDTH) * TILEWIDTH,
-	                mapsPosition.y + ((u16) (mp.y - mapsPosition.y) / TILEWIDTH) * TILEWIDTH,
+    const Rect tile_pos(rectMapsPosition.x + ((u16) (mp.x - rectMapsPosition.x) / TILEWIDTH) * TILEWIDTH,
+	                rectMapsPosition.y + ((u16) (mp.y - rectMapsPosition.y) / TILEWIDTH) * TILEWIDTH,
 	                TILEWIDTH, TILEWIDTH);
 
     // change cusor if need
