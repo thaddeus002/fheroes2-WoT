@@ -166,8 +166,8 @@ namespace Battle2
 	void ResetAutoBattle(void);
 	void ProcessingHeroDialogResult(u8, Actions &);
 
-	void KeyPress_a(const Stats &, Actions &);
-	void KeyPress_o(void);
+	void EventAutoSwitch(const Stats &, Actions &);
+	void EventShowOptions(void);
 	void ButtonAutoAction(const Stats &, Actions &);
 	void ButtonSettingsAction(void);
 	void ButtonSkipAction(Actions &);

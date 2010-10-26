@@ -226,10 +226,26 @@ void Battle2::Cell::SetPassabilityAbroad(const Stats & b, std::vector<u16> & ope
     for(direction_t dir = TOP_LEFT; dir < CENTER; ++dir)
     {
 	Cell* cell = arena->GetCell(index, dir);
-        if(cell && cell->isPassable(b, *this) && UNKNOWN == cell->direction)
+        if(cell && UNKNOWN == cell->direction && cell->isPassable(b, *this))
 	{
 	    cell->direction = Board::GetReflectDirection(dir);
 	    opens.push_back(cell->index);
+	}
+    }
+
+    if(b.isWide())
+    {
+	Cell* tail = arena->GetCell(b.GetTailIndex());
+
+	if(tail)
+	for(direction_t dir = TOP_LEFT; dir < CENTER; ++dir)
+	{
+	    Cell* cell = arena->GetCell(tail->index, dir);
+    	    if(cell && UNKNOWN == cell->direction && cell->isPassable(b, *tail))
+	    {
+		cell->direction = Board::GetReflectDirection(dir);
+		opens.push_back(cell->index);
+	    }
 	}
     }
 }

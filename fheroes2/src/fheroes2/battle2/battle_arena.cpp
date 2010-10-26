@@ -959,6 +959,8 @@ void Battle2::Arena::Turns(u16 turn, Result & result)
 		actions.AddedMoraleAction(*current_troop, true);
 	}
 
+	ResetBoard();
+
 	// current troop moved!
 	if(current_troop->Modes(TR_SKIPMOVE | TR_MOVED)) current_troop = NULL;
 

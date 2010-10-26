@@ -113,7 +113,7 @@ void Battle2::DialogBattleSettings(void)
 	}
 	
         // exit
-	if(le.KeyPress(KEY_ESCAPE) || le.MouseClickLeft(btn_ok)) break;
+	if(Game::HotKeyPress(Game::EVENT_DEFAULT_EXIT) || le.MouseClickLeft(btn_ok)) break;
     }
 
     // restore background
@@ -299,7 +299,7 @@ void Battle2::Arena::DialogBattleSummary(const Result & res) const
 	le.MousePressLeft(btn_ok) ? btn_ok.PressDraw() : btn_ok.ReleaseDraw();
 
         // exit
-	if(le.KeyPress(KEY_ESCAPE) || le.KeyPress(KEY_RETURN) || le.MouseClickLeft(btn_ok)) break;
+	if(HotKeyCloseWindow || le.MouseClickLeft(btn_ok)) break;
 
         // animation
 	if(!conf.QVGA() && Game::AnimateInfrequent(Game::BATTLE_DIALOG_DELAY))
@@ -442,9 +442,14 @@ u8 Battle2::Arena::DialogBattleHero(const HeroBase & hero) const
 	btnSurrender.isEnable() && le.MousePressLeft(btnSurrender) ? btnSurrender.PressDraw() : btnSurrender.ReleaseDraw();
 	le.MousePressLeft(btnClose) ? btnClose.PressDraw() : btnClose.ReleaseDraw();
 
-	if(le.KeyPress(KEY_c) || (btnCast.isEnable() && le.MouseClickLeft(btnCast))) result = 1;
-	if(le.KeyPress(KEY_r) || (btnRetreat.isEnable() && le.MouseClickLeft(btnRetreat))) result = 2;
-	if(le.KeyPress(KEY_s) || (btnSurrender.isEnable() && le.MouseClickLeft(btnSurrender))) result = 3;
+	if(Game::HotKeyPress(Game::EVENT_BATTLE_CASTSPELL) ||
+		(btnCast.isEnable() && le.MouseClickLeft(btnCast))) result = 1;
+
+	if(Game::HotKeyPress(Game::EVENT_BATTLE_RETREAT) ||
+		(btnRetreat.isEnable() && le.MouseClickLeft(btnRetreat))) result = 2;
+
+	if(Game::HotKeyPress(Game::EVENT_BATTLE_SURRENDER) ||
+		(btnSurrender.isEnable() && le.MouseClickLeft(btnSurrender))) result = 3;
 
 	if(le.MousePressRight(btnCast))
 	    Dialog::Message(_("Cast Spell"), _("Cast a magical spell. You may only cast one spell per combat round. The round is reset when every creature has had a turn"), Font::BIG);
@@ -459,7 +464,7 @@ u8 Battle2::Arena::DialogBattleHero(const HeroBase & hero) const
 	    Dialog::Message(_("Cancel"), _("Return to the battle."), Font::BIG);
 
         // exit
-	if(le.KeyPress(KEY_ESCAPE) || le.KeyPress(KEY_RETURN) || le.MouseClickLeft(btnClose)) break;
+	if(HotKeyCloseWindow || le.MouseClickLeft(btnClose)) break;
     }
 
     cursor.Hide();
@@ -528,7 +533,7 @@ bool Battle2::DialogBattleSurrender(const HeroBase & hero, u32 cost)
 	if(le.MouseClickLeft(btnAccept)) result = 1;
 
         // exit
-	if(le.KeyPress(KEY_ESCAPE) || le.MouseClickLeft(btnDecline)) break;
+	if(Game::HotKeyPress(Game::EVENT_DEFAULT_EXIT) || le.MouseClickLeft(btnDecline)) break;
     }
 
     cursor.Hide();

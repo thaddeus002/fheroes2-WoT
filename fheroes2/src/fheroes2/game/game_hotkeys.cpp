@@ -73,6 +73,15 @@ const char* Game::EventsName(events_t evnt)
 	case EVENT_DIGARTIFACT:		return "dig artifact";
 	case EVENT_CASTSPELL:		return "cast spell";
 	case EVENT_DEFAULTACTION:	return "default action";
+
+	case EVENT_BATTLE_CASTSPELL:	return "battle cast spell";
+	case EVENT_BATTLE_RETREAT:	return "battle retreat";
+	case EVENT_BATTLE_SURRENDER:	return "battle surrender";
+	case EVENT_BATTLE_AUTOSWITCH:	return "battle auto switch";
+	case EVENT_BATTLE_OPTIONS:	return "battle options";
+	case EVENT_BATTLE_HARDSKIP:	return "battle hard skip";
+	case EVENT_BATTLE_SOFTSKIP:	return "battle soft skip";
+
 	case EVENT_MOVELEFT:		return "move left";
 	case EVENT_MOVERIGHT:		return "move right";
 	case EVENT_MOVETOP:		return "move top";
@@ -118,6 +127,15 @@ void Game::HotKeysDefaults(void)
     key_events[EVENT_DEFAULT_LEFT] = KEY_NONE;
     key_events[EVENT_DEFAULT_RIGHT] = KEY_NONE;
 
+    // battle
+    key_events[EVENT_BATTLE_CASTSPELL] = KEY_c;
+    key_events[EVENT_BATTLE_RETREAT] = KEY_ESCAPE;
+    key_events[EVENT_BATTLE_SURRENDER] = KEY_s;
+    key_events[EVENT_BATTLE_AUTOSWITCH] = KEY_a;
+    key_events[EVENT_BATTLE_OPTIONS] = KEY_o;
+    key_events[EVENT_BATTLE_HARDSKIP] = KEY_h;
+    key_events[EVENT_BATTLE_SOFTSKIP] = KEY_SPACE;
+
     // end turn
     key_events[EVENT_ENDTURN] = KEY_e;
     // next hero
@@ -141,7 +159,7 @@ void Game::HotKeysDefaults(void)
     // dig artifact
     key_events[EVENT_DIGARTIFACT] = KEY_d;
     // cast spell
-    key_events[EVENT_CASTSPELL] = KEY_a;
+    key_events[EVENT_CASTSPELL] = KEY_c;
     // default action
     key_events[EVENT_DEFAULTACTION] = KEY_RETURN;
     // move hero

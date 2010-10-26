@@ -1402,38 +1402,44 @@ void Battle2::Interface::HumanBattleTurn(const Stats & b, Actions & a, std::stri
     if(le.KeyPress())
     {
 	// press key action
-	switch(le.KeyValue())
+	if(le.KeyPress()) switch(Game::HotKeysGetEvent(le.KeyValue()))
     	{
-	    // fast retreat
-	    case KEY_ESCAPE:	ProcessingHeroDialogResult(2, a); break;
-
 	    // skip
-	    case KEY_s:		a.AddedSkipAction(b, true); humanturn_exit = true; break;
-    	    case KEY_SPACE:
-    		if(conf.ExtBattleSoftWait()) { a.AddedSkipAction(b, false); humanturn_exit = true; }
-    		break;
+	    case Game::EVENT_DEFAULT_EXIT:
+		a.AddedSkipAction(b, true); humanturn_exit = true; break;
+
+	    // soft skip
+    	    case Game::EVENT_BATTLE_SOFTSKIP:
+		a.AddedSkipAction(b, !conf.ExtBattleSoftWait()); humanturn_exit = true; break;
 
 	    // options
-	    case KEY_o:		KeyPress_o(); break;
-	    // auto
-	    case KEY_a:		KeyPress_a(b, a); break;
+	    case Game::EVENT_BATTLE_OPTIONS:
+		EventShowOptions(); break;
+
+	    // auto switch
+	    case Game::EVENT_BATTLE_AUTOSWITCH:
+		EventAutoSwitch(b, a); break;
+
 	    // cast
-	    case KEY_c:		ProcessingHeroDialogResult(1, a); break;
+	    case Game::EVENT_BATTLE_CASTSPELL:
+		ProcessingHeroDialogResult(1, a); break;
 
-	    // hero
-	    case KEY_h:
-	    {
-		const HeroBase* base = conf.MyColor() == arena.army1.GetColor() ? arena.army1.GetCommander() : arena.army2.GetCommander();
-		if(base)
-		{
-		    ProcessingHeroDialogResult(arena.DialogBattleHero(*base), a);
-		    humanturn_redraw = true;
-		}
-	    }
-		break;
+	    // retreat
+	    case Game::EVENT_BATTLE_RETREAT:
+		ProcessingHeroDialogResult(2, a); break;
 
+	    // surrender
+	    case Game::EVENT_BATTLE_SURRENDER:
+		ProcessingHeroDialogResult(3, a); break;
+
+    	    default: break;
+    	}
+
+	// debug only
+	if(IS_DEVEL()) switch(le.KeyValue())
+	{
 	    case KEY_w:
-		if(IS_DEVEL() && arena.result_game)
+		if(arena.result_game)
 		{
 		    // fast wins game
 		    arena.result_game->army1 = RESULT_WINS;
@@ -1442,7 +1448,7 @@ void Battle2::Interface::HumanBattleTurn(const Stats & b, Actions & a, std::stri
 		break;
 
 	    case KEY_l:
-		if(IS_DEVEL() && arena.result_game)
+		if(arena.result_game)
 		{
 		    // fast loss game
 		    arena.result_game->army1 = RESULT_LOSS;
@@ -1661,7 +1667,7 @@ void Battle2::Interface::ResetAutoBattle(void)
     humanturn_redraw = true;
 }
 
-void Battle2::Interface::KeyPress_o(void)
+void Battle2::Interface::EventShowOptions(void)
 {
     btn_settings.PressDraw();
     DialogBattleSettings();
@@ -1669,7 +1675,7 @@ void Battle2::Interface::KeyPress_o(void)
     humanturn_redraw = true;
 }
 
-void Battle2::Interface::KeyPress_a(const Stats & b, Actions & a)
+void Battle2::Interface::EventAutoSwitch(const Stats & b, Actions & a)
 {
     btn_auto.PressDraw();
     if(Settings::Get().AutoBattle())
