@@ -61,6 +61,7 @@ struct TimeDelay : std::pair<SDL::Time, int>
 namespace Game
 {
     void AnimateDelaysInitialize(void);
+    void UpdateBattleSpeed();
 
     TimeDelay delays[] = {
 	20,	// SCROLL_DELAY
@@ -98,6 +99,7 @@ void Game::AnimateDelaysInitialize(void)
 {
     std::for_each(&delays[0], &delays[LAST_DELAY], std::mem_fun_ref(&TimeDelay::Reset));
     UpdateHeroesMoveSpeed();
+    UpdateBattleSpeed();
 }
 
 void Game::AnimateDelayReset(delay_t dl)
@@ -121,6 +123,7 @@ void Game::UpdateHeroesMoveSpeed(void)
     const int hr_value = conf.HeroesMoveSpeed() ?
 	((conf.HeroesMoveSpeed() - DEFAULT_SPEED_DELAY) * td_etalon()) / DEFAULT_SPEED_DELAY :
 	td_etalon();
+
     const int ai_value = conf.AIMoveSpeed() ?
 	((conf.AIMoveSpeed() - DEFAULT_SPEED_DELAY) * td_etalon()) / DEFAULT_SPEED_DELAY :
 	td_etalon();
@@ -134,4 +137,18 @@ void Game::UpdateHeroesMoveSpeed(void)
 	td_ai   = td_etalon();
     else
 	td_ai   = td_etalon() - ai_value;
+}
+
+void Game::UpdateBattleSpeed(void)
+{
+    const Settings & conf = Settings::Get();
+
+    delays[BATTLE_FRAME_DELAY] = 80 - (conf.BattleSpeed() - DEFAULT_SPEED_DELAY) * 15;
+    delays[BATTLE_MISSILE_DELAY] = 40 - (conf.BattleSpeed() - DEFAULT_SPEED_DELAY) * 7;
+    delays[BATTLE_SPELL_DELAY] = 90 - (conf.BattleSpeed() - DEFAULT_SPEED_DELAY) * 17;
+    delays[BATTLE_DISRUPTING_DELAY] = 20 - (conf.BattleSpeed() - DEFAULT_SPEED_DELAY) * 3;
+    delays[BATTLE_CATAPULT_DELAY] = 90 - (conf.BattleSpeed() - DEFAULT_SPEED_DELAY) * 17;
+    delays[BATTLE_CATAPULT2_DELAY] = 40 - (conf.BattleSpeed() - DEFAULT_SPEED_DELAY) * 7;
+    delays[BATTLE_CATAPULT3_DELAY] = 40 - (conf.BattleSpeed() - DEFAULT_SPEED_DELAY) * 7;
+    delays[BATTLE_BRIDGE_DELAY] = 90 - (conf.BattleSpeed() - DEFAULT_SPEED_DELAY) * 17;
 }

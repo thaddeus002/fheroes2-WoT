@@ -153,6 +153,7 @@ public:
     u16 Debug(void) const;
     u8 HeroesMoveSpeed(void) const;
     u8 AIMoveSpeed(void) const;
+    u8 BattleSpeed(void) const;
     u8 ScrollSpeed(void) const;
     u32 MemoryLimit(void) const;
 
@@ -288,6 +289,7 @@ public:
     void SetAIMoveSpeed(u8);
     void SetScrollSpeed(u8);
     void SetHeroesMoveSpeed(u8);
+    void SetBattleSpeed(u8);
 
     void SetSoundVolume(const u8 v);
     void SetMusicVolume(const u8 v);
@@ -388,6 +390,7 @@ private:
     u8 heroes_speed;
     u8 ai_speed;
     u8 scroll_speed;
+    u8 battle_speed;
 
     u8 game_type;
     u8 players_colors;

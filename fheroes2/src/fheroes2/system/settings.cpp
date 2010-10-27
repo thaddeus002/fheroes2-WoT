@@ -146,7 +146,7 @@ Settings::Settings() : major_version(MAJOR_VERSION), minor_version(MINOR_VERSION
     debug(DEFAULT_DEBUG), video_mode(0, 0), game_difficulty(Difficulty::NORMAL),
     my_color(Color::GRAY), cur_color(Color::GRAY), path_data_directory("data"),
     font_normal("dejavusans.ttf"), font_small("dejavusans.ttf"), force_lang("en"), size_normal(15), size_small(10),
-    sound_volume(6), music_volume(6), heroes_speed(DEFAULT_SPEED_DELAY), ai_speed(DEFAULT_SPEED_DELAY), scroll_speed(SCROLL_NORMAL),
+    sound_volume(6), music_volume(6), heroes_speed(DEFAULT_SPEED_DELAY), ai_speed(DEFAULT_SPEED_DELAY), scroll_speed(SCROLL_NORMAL), battle_speed(DEFAULT_SPEED_DELAY),
     game_type(0), players_colors(0), preferably_count_players(0), port(DEFAULT_PORT), memory_limit(0)
 {
     build_version = "version: ";
@@ -299,11 +299,17 @@ bool Settings::Read(const std::string & filename)
     // move speed
     entry = config.Find("ai speed");
     if(entry)
+    {
 	ai_speed = entry->IntParams();
+	if(10 < ai_speed) ai_speed = 10;
+    }
 
     entry = config.Find("heroes speed");
     if(entry)
+    {
 	heroes_speed = entry->IntParams();
+	if(10 < heroes_speed) heroes_speed = 10;
+    }
 
     // scroll speed
     entry = config.Find("scroll speed");
@@ -317,6 +323,13 @@ bool Settings::Read(const std::string & filename)
 	    case 4:	scroll_speed = SCROLL_FAST2; break;
 	    default:	scroll_speed = SCROLL_NORMAL; break;
 	}
+    }
+
+    entry = config.Find("battle speed");
+    if(entry)
+    {
+	battle_speed = entry->IntParams();
+	if(10 < battle_speed) battle_speed = 10;
     }
 
     // network port
@@ -609,6 +622,7 @@ bool Settings::CDMusic(void) const { return opt_global.Modes(GLOBAL_MUSIC_CD | G
 /* return move speed */
 u8   Settings::HeroesMoveSpeed(void) const { return heroes_speed; }
 u8   Settings::AIMoveSpeed(void) const { return ai_speed; }
+u8   Settings::BattleSpeed(void) const { return battle_speed; }
 
 /* return scroll speed */
 u8   Settings::ScrollSpeed(void) const { return scroll_speed; }
@@ -623,6 +637,12 @@ void Settings::SetAIMoveSpeed(u8 speed)
 void Settings::SetHeroesMoveSpeed(u8 speed)
 {
     heroes_speed = (10 <= speed ? 10 : speed);
+}
+
+/* set battle speed: 0 - 10 */
+void Settings::SetBattleSpeed(u8 speed)
+{
+    battle_speed = (10 <= speed ? 10 : speed);
 }
 
 /* set scroll speed: 1 - 4 */
