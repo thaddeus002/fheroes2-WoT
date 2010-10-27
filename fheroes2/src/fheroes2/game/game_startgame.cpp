@@ -722,73 +722,105 @@ Game::menu_t Game::HumanTurn(void)
 	}
 
 	// hot keys
-	if(le.KeyPress()) switch(HotKeysGetEvent(le.KeyValue()))
+	if(le.KeyPress())
 	{
 #ifdef WITHOUT_MOUSE
-	    case EVENT_EMULATETOGGLE:	le.ToggleEmulateMouse(); break;
+	    if(HotKeyPress(EVENT_EMULATETOGGLE)) le.ToggleEmulateMouse();
+	    else
 #endif
 	    // exit dialog
-	    case EVENT_DEFAULT_EXIT:	EventExit(res); break;
+	    if(HotKeyPress(EVENT_DEFAULT_EXIT)) EventExit(res);
+	    else
     	    // end turn
-	    case EVENT_ENDTURN:		EventEndTurn(res); break;
+	    if(HotKeyPress(EVENT_ENDTURN)) EventEndTurn(res);
+	    else
     	    // next hero
-	    case EVENT_NEXTHERO:	EventNextHero(); break;
+	    if(HotKeyPress(EVENT_NEXTHERO)) EventNextHero();
+	    else
     	    // next town
-	    case EVENT_NEXTTOWN:	EventNextTown(); break;
+	    if(HotKeyPress(EVENT_NEXTTOWN)) EventNextTown();
+	    else
 	    // hero movement
-	    case EVENT_CONTINUE:	EventContinueMovement(); break;
+	    if(HotKeyPress(EVENT_CONTINUE)) EventContinueMovement();
+	    else
 	    // save game
-	    case EVENT_SAVEGAME:	EventSaveGame(); break;
+	    if(HotKeyPress(EVENT_SAVEGAME)) EventSaveGame();
+	    else
 	    // load game
-	    case EVENT_LOADGAME:	EventLoadGame(res); break;
+	    if(HotKeyPress(EVENT_LOADGAME))
+	    {
+		EventLoadGame(res);
+		if(res != CANCEL) break;
+	    }
+	    else
 	    // file options
-	    case EVENT_FILEOPTIONS:	EventFileDialog(res); break;
+	    if(HotKeyPress(EVENT_FILEOPTIONS)) EventFileDialog(res);
+	    else
 	    // system options
-	    case EVENT_SYSTEMOPTIONS:	EventSystemDialog(); break;
+	    if(HotKeyPress(EVENT_SYSTEMOPTIONS)) EventSystemDialog();
+	    else
 	    // puzzle map
-	    case EVENT_PUZZLEMAPS:	EventPuzzleMaps(); break;
+	    if(HotKeyPress(EVENT_PUZZLEMAPS)) EventPuzzleMaps();
+	    else
 	    // info game
-	    case EVENT_INFOGAME:	EventGameInfo(); break;
+	    if(HotKeyPress(EVENT_INFOGAME)) EventGameInfo();
+	    else
 	    // dig artifact
-	    case EVENT_DIGARTIFACT:	EventDigArtifact(res); break;
+	    if(HotKeyPress(EVENT_DIGARTIFACT)) EventDigArtifact(res);
+	    else
 	    // cast spell
-	    case EVENT_CASTSPELL:	EventCastSpell(); break;
+	    if(HotKeyPress(EVENT_CASTSPELL)) EventCastSpell();
+	    else
     	    // show/hide control panel
-	    case EVENT_CTRLPANEL:	EventSwitchShowControlPanel(); break;
+	    if(HotKeyPress(EVENT_CTRLPANEL)) EventSwitchShowControlPanel();
+	    else
 	    // hide/show radar
-	    case EVENT_SHOWRADAR:	EventSwitchShowRadar(); break;
+	    if(HotKeyPress(EVENT_SHOWRADAR)) EventSwitchShowRadar();
+	    else
 	    // hide/show buttons
-	    case EVENT_SHOWBUTTONS:	EventSwitchShowButtons(); break;
+	    if(HotKeyPress(EVENT_SHOWBUTTONS)) EventSwitchShowButtons();
+	    else
 	    // hide/show status window
-	    case EVENT_SHOWSTATUS:	EventSwitchShowStatus(); break;
+	    if(HotKeyPress(EVENT_SHOWSTATUS)) EventSwitchShowStatus();
+	    else
 	    // hide/show hero/town icons
-	    case EVENT_SHOWICONS:	EventSwitchShowIcons(); break;
+	    if(HotKeyPress(EVENT_SHOWICONS)) EventSwitchShowIcons();
+	    else
 	    // move hero
-	    case EVENT_MOVELEFT:	KeyArrowPress(Direction::LEFT); break;
-	    case EVENT_MOVERIGHT:	KeyArrowPress(Direction::RIGHT); break;
-	    case EVENT_MOVETOP:		KeyArrowPress(Direction::TOP); break;
-	    case EVENT_MOVEBOTTOM:	KeyArrowPress(Direction::BOTTOM); break;
-	    case EVENT_MOVETOPLEFT:	KeyArrowPress(Direction::TOP_LEFT); break;
-	    case EVENT_MOVETOPRIGHT:	KeyArrowPress(Direction::TOP_RIGHT); break;
-	    case EVENT_MOVEBOTTOMLEFT:	KeyArrowPress(Direction::BOTTOM_LEFT); break;
-	    case EVENT_MOVEBOTTOMRIGHT:	KeyArrowPress(Direction::BOTTOM_RIGHT); break;
+	    if(HotKeyPress(EVENT_MOVELEFT)) KeyArrowPress(Direction::LEFT);
+	    else
+	    if(HotKeyPress(EVENT_MOVERIGHT)) KeyArrowPress(Direction::RIGHT);
+	    else
+	    if(HotKeyPress(EVENT_MOVETOP)) KeyArrowPress(Direction::TOP);
+	    else
+	    if(HotKeyPress(EVENT_MOVEBOTTOM)) KeyArrowPress(Direction::BOTTOM);
+	    else
+	    if(HotKeyPress(EVENT_MOVETOPLEFT)) KeyArrowPress(Direction::TOP_LEFT);
+	    else
+	    if(HotKeyPress(EVENT_MOVETOPRIGHT)) KeyArrowPress(Direction::TOP_RIGHT);
+	    else
+	    if(HotKeyPress(EVENT_MOVEBOTTOMLEFT)) KeyArrowPress(Direction::BOTTOM_LEFT);
+	    else
+	    if(HotKeyPress(EVENT_MOVEBOTTOMRIGHT)) KeyArrowPress(Direction::BOTTOM_RIGHT);
+	    else
 	    // scroll maps
-	    case EVENT_SCROLLLEFT:	I.gameArea.SetScroll(SCROLL_LEFT); break;
-	    case EVENT_SCROLLRIGHT:	I.gameArea.SetScroll(SCROLL_RIGHT); break;
-	    case EVENT_SCROLLUP:	I.gameArea.SetScroll(SCROLL_TOP); break;
-	    case EVENT_SCROLLDOWN:	I.gameArea.SetScroll(SCROLL_BOTTOM); break;
+	    if(HotKeyPress(EVENT_SCROLLLEFT)) I.gameArea.SetScroll(SCROLL_LEFT);
+	    else
+	    if(HotKeyPress(EVENT_SCROLLRIGHT)) I.gameArea.SetScroll(SCROLL_RIGHT);
+	    else
+	    if(HotKeyPress(EVENT_SCROLLUP)) I.gameArea.SetScroll(SCROLL_TOP);
+	    else
+	    if(HotKeyPress(EVENT_SCROLLDOWN)) I.gameArea.SetScroll(SCROLL_BOTTOM);
 	    // default action
-	    case EVENT_DEFAULTACTION:	EventDefaultAction(); break;
+	    else
+	    if(HotKeyPress(EVENT_DEFAULTACTION)) EventDefaultAction();
 	    // open focus
-	    case EVENT_OPENFOCUS:	EventOpenFocus(); break;
+	    else
+	    if(HotKeyPress(EVENT_OPENFOCUS)) EventOpenFocus();
 	    // switch group
-	    case EVENT_SWITCHGROUP:	EventSwitchGroup(); break;
-
-	    default: break;
+	    else
+	    if(HotKeyPress(EVENT_SWITCHGROUP)) EventSwitchGroup();
 	}
-
-	// fast break (or crash after EventLoadGame)
-	if(res != CANCEL) break;
 
 	if(conf.ExtTapMode())
 	{

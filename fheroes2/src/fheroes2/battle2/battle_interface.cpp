@@ -1401,39 +1401,39 @@ void Battle2::Interface::HumanBattleTurn(const Stats & b, Actions & a, std::stri
 
     if(le.KeyPress())
     {
-	// press key action
-	if(le.KeyPress()) switch(Game::HotKeysGetEvent(le.KeyValue()))
-    	{
-	    // skip
-	    case Game::EVENT_DEFAULT_EXIT:
-		a.AddedSkipAction(b, true); humanturn_exit = true; break;
-
-	    // soft skip
-    	    case Game::EVENT_BATTLE_SOFTSKIP:
-		a.AddedSkipAction(b, !conf.ExtBattleSoftWait()); humanturn_exit = true; break;
-
-	    // options
-	    case Game::EVENT_BATTLE_OPTIONS:
-		EventShowOptions(); break;
-
-	    // auto switch
-	    case Game::EVENT_BATTLE_AUTOSWITCH:
-		EventAutoSwitch(b, a); break;
-
-	    // cast
-	    case Game::EVENT_BATTLE_CASTSPELL:
-		ProcessingHeroDialogResult(1, a); break;
-
-	    // retreat
-	    case Game::EVENT_BATTLE_RETREAT:
-		ProcessingHeroDialogResult(2, a); break;
-
-	    // surrender
-	    case Game::EVENT_BATTLE_SURRENDER:
-		ProcessingHeroDialogResult(3, a); break;
-
-    	    default: break;
-    	}
+        // skip
+	if(Game::HotKeyPress(Game::EVENT_BATTLE_HARDSKIP))
+	{
+	    a.AddedSkipAction(b, true);
+	    humanturn_exit = true;
+	}
+	else
+	// soft skip
+	if(Game::HotKeyPress(Game::EVENT_BATTLE_SOFTSKIP))
+	{
+	    a.AddedSkipAction(b, !conf.ExtBattleSoftWait());
+	    humanturn_exit = true;
+	}
+	else
+	// options
+	if(Game::HotKeyPress(Game::EVENT_BATTLE_OPTIONS))
+	    EventShowOptions();
+	else
+	// auto switch
+	if(Game::HotKeyPress(Game::EVENT_BATTLE_AUTOSWITCH))
+	    EventAutoSwitch(b, a);
+	else
+	// cast
+	if(Game::HotKeyPress(Game::EVENT_BATTLE_CASTSPELL))
+	    ProcessingHeroDialogResult(1, a);
+	else
+	// retreat
+	if(Game::HotKeyPress(Game::EVENT_BATTLE_RETREAT))
+	    ProcessingHeroDialogResult(2, a);
+	else
+	// surrender
+	if(Game::HotKeyPress(Game::EVENT_BATTLE_SURRENDER))
+	    ProcessingHeroDialogResult(3, a);
 
 	// debug only
 	if(IS_DEVEL()) switch(le.KeyValue())
