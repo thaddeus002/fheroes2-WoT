@@ -125,7 +125,7 @@ Heroes::Heroes(heroes_t ht, Race::race_t rc) : killer_color(Color::GRAY), experi
     {
         SpellBookActivate();
         AppendSpellToBook(Spell::FromInt(spell));
-        PickupArtifact(Artifact::MAGIC_BOOK);
+        if(!HasArtifact(Artifact::MAGIC_BOOK)) PickupArtifact(Artifact::MAGIC_BOOK);
     }
 
     // hero is freeman
@@ -458,7 +458,7 @@ void Heroes::LoadFromMP2(u16 map_index, const void *ptr, const Color::color_t cl
 	{
     	    SpellBookActivate();
     	    AppendSpellToBook(Spell::FromInt(spell));
-    	    PickupArtifact(Artifact::MAGIC_BOOK);
+    	    if(!HasArtifact(Artifact::MAGIC_BOOK)) PickupArtifact(Artifact::MAGIC_BOOK);
 	}
     }
 
@@ -1015,6 +1015,10 @@ bool Heroes::PickupArtifact(const Artifact & art)
 
     *it = art;
 
+    // book insert first
+    if(art == Artifact::MAGIC_BOOK &&
+	it != bag_artifacts.begin()) std::swap(*it, bag_artifacts.front());
+
     // check: anduran garb
     if(HasArtifact(Artifact::BREASTPLATE_ANDURAN) &&
 	HasArtifact(Artifact::HELMET_ANDURAN) &&
@@ -1149,7 +1153,7 @@ bool Heroes::BuySpellBook(const MageGuild* mageguild, u8 shrine)
 	if(Dialog::NO == Dialog::SpriteInfo("", header, sprite, Dialog::YES | Dialog::NO)) return false;
     }
 
-    if(PickupArtifact(Artifact::MAGIC_BOOK))
+    if(!HasArtifact(Artifact::MAGIC_BOOK) && PickupArtifact(Artifact::MAGIC_BOOK))
     {
 	kingdom.OddFundsResource(payment);
 	SpellBookActivate();
