@@ -796,7 +796,7 @@ void Battle2::Interface::RedrawTroopSprite(const Stats & b, const Rect & rt) con
 		const s16 cx = p_move.x - pos.x;
 		const s16 cy = p_move.y - pos.y;
 
-	        sy += Sign(cy) * (b_move->animframe - frm.start) * (pos.h / frm.count);
+	        sy += ((b_move->animframe - frm.start) * cy) / frm.count;
 		if(0 != Sign(cy)) sx -= Sign(cx) * ox / 2;
 	    }
 	}
