@@ -81,24 +81,22 @@ u32 Interface::StatusWindow::ResetResourceStatus(u32 tick, void *ptr)
     return tick;
 }
 
-void Interface::StatusWindow::SetPos(s16 px, s16 py)
+void Interface::StatusWindow::SetPos(s16 ox, s16 oy)
 {
     if(Settings::Get().HideInterface())
     {
-        // fix out of range
-        Display & display = Display::Get();
-        if(px + Rect::w < 0 || px > display.w()) px = 0;
-        if(py + Rect::h < 0 || py > display.h()) py = 0;
+	FixOutOfDisplay(*this, ox, oy); 
 
-	Rect::x = px + BORDERWIDTH;
-	Rect::y = py + BORDERWIDTH;
-	border.SetPosition(px, py, Rect::w, Rect::h);
+	Rect::x = ox + BORDERWIDTH;
+	Rect::y = oy + BORDERWIDTH;
+
+	border.SetPosition(ox, oy, Rect::w, Rect::h);
     }
     else
     {
-	Rect::x = px;
-	Rect::y = py;
-	Rect::h = Display::Get().h() - py - BORDERWIDTH;
+	Rect::x = ox;
+	Rect::y = oy;
+	Rect::h = Display::Get().h() - oy - BORDERWIDTH;
     }
 
     Settings::Get().SetPosStatus(*this);

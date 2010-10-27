@@ -222,6 +222,7 @@ bool Dialog::SelectScenario(const MapsFileInfoList & all, std::string & filename
     listbox.Redraw();
 
     buttonOk.Draw();
+    buttonSelectSmall.Draw();
     buttonSelectMedium.Draw();
     buttonSelectLarge.Draw();
     buttonSelectXLarge.Draw();

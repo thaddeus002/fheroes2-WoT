@@ -47,13 +47,11 @@ void Interface::ButtonsArea::SetPos(s16 ox, s16 oy)
 {
     if(Settings::Get().HideInterface())
     {
-        // fix out of range
-        Display & display = Display::Get();
-        if(ox + Rect::w < 0 || ox > display.w()) ox = 0;
-        if(oy + Rect::h < 0 || oy > display.h()) oy = 0;
-    
+	FixOutOfDisplay(*this, ox, oy);
+
 	Rect::x = ox + BORDERWIDTH;
         Rect::y = oy + BORDERWIDTH;
+
         border.SetPosition(ox, oy, Rect::w, Rect::h);
     }
     else

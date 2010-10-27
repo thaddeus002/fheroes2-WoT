@@ -271,3 +271,16 @@ s16 Interface::Basic::GetDimensionDoorDestination(const u16 from, const u8 dista
 
     return -1;
 }
+
+void Interface::FixOutOfDisplay(const Rect & rt, s16 & ox, s16 & oy)
+{
+    Display & display = Display::Get();
+
+    if(ox + rt.w < 0) ox = 0;
+    else
+    if(ox > display.w() - rt.w + BORDERWIDTH) ox = display.w() - rt.w;
+
+    if(oy + rt.h < 0) oy = 0;
+    else
+    if(oy > display.h() - rt.h + BORDERWIDTH) oy = display.h() - rt.h;
+}

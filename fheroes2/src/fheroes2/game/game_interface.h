@@ -51,6 +51,8 @@ namespace Interface
 {
     bool NoGUI(void);
 
+    void FixOutOfDisplay(const Rect &, s16 & , s16 &);
+
     class Basic
     {
     public:
