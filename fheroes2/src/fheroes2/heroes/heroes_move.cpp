@@ -733,6 +733,8 @@ bool Heroes::Move(bool fast)
 	{
 	    direction = path.GetFrontDirection();
     	    MoveStep(true);
+
+	    return true;
 	}
 	else
 	{
