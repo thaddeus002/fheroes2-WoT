@@ -23,30 +23,5 @@ For play:
 Copy origin data/*.agg in to data directory.
 Copy maps files (*.mp2) in to maps directory.
 
-Global hot keys:
-F4		- switch to fullscreen
-PrintScreen	- create screenshot
-
-Hot keys for system dialogues:
-esc		- 'no', 'cancel', 'exit' buttons
-space, return	- 'yes', 'ok' buttons
-y		- 'yes' button
-n		- 'no' button
-
-Main menu hot keys:
-n		- new game
-s		- standard game
-c		- campaign game
-m		- multi-player game
-
-Battle hot keys:
-Esc		- fast retreat
-space		- skip turn (soft: heroes3 version)
-s		- skip turn (hard)
-o		- options dialog
-a		- set auto battle
-c		- show spell book
-h		- show heroes dialog
-
-Game hot keys:
-all game hotkeys may be redefined (see fheroes2.key)
+Hot keys:
+all hotkeys may be redefined (see fheroes2.key)

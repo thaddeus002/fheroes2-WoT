@@ -21,8 +21,6 @@
  ***************************************************************************/
 
 #include <map>
-#include <sstream>
-#include <ctime>
 #include <cstdlib>
 #include <algorithm>
 
@@ -291,34 +289,6 @@ u16 Game::GetGameOverScores(void)
     }
 
     return GetRating() * (200 - nk) / 100;
-}
-
-void Game::KeyboardGlobalFilter(u32 sym, u16 mod)
-{
-    Display & display = Display::Get();
-
-    switch(sym)
-    {
-	case SDLK_F4:
-    	    display.FullScreen();
-            break;
-
-	case SDLK_PRINT:
-        {
-            std::ostringstream stream;
-            stream << Settings::Get().LocalPrefix() << SEPARATOR << "files" << SEPARATOR << "save" << SEPARATOR << "screenshot_" << std::time(0);
-#ifndef WITH_IMAGE
-                stream << ".bmp";
-#else
-                stream << ".png";
-#endif
-	    if(display.Save(stream.str().c_str())) DEBUG(DBG_GAME , DBG_INFO, "Game::KeyboardGlobalFilter: save: " << stream.str());
-        }
-	    break;
-
-	default:
-	    break;
-    }
 }
 
 void Game::ShowLoadMapsText(void)

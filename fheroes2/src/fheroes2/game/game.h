@@ -86,6 +86,8 @@ namespace Game
 	EVENT_DEFAULT_EXIT,
 	EVENT_DEFAULT_LEFT,
 	EVENT_DEFAULT_RIGHT,
+	EVENT_SYSTEM_FULLSCREEN,
+	EVENT_SYSTEM_SCREENSHOT,
 	EVENT_ENDTURN,
 	EVENT_NEXTHERO,
 	EVENT_NEXTTOWN,
@@ -131,7 +133,6 @@ namespace Game
 
     events_t & operator++ (events_t &);
 
-    events_t HotKeysGetEvent(int);
     bool HotKeyPress(events_t);
 
     enum delay_t

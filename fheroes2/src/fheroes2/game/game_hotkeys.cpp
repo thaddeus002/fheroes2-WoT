@@ -20,6 +20,9 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
+#include <sstream>
+#include <ctime>
+#include <cstdlib>
 #include <algorithm>
 
 #include "gamedefs.h"
@@ -32,6 +35,7 @@ namespace Game
     void HotKeysDefaults(void);
     void HotKeysLoad(const std::string &);
     const char* EventsName(events_t);
+    void KeyboardGlobalFilter(u32, u16);
 
     events_t & operator++ (events_t & evnt)
     {
@@ -59,6 +63,9 @@ const char* Game::EventsName(events_t evnt)
 	case EVENT_DEFAULT_EXIT:	return "default exit";
 	case EVENT_DEFAULT_LEFT:	return "default left";
 	case EVENT_DEFAULT_RIGHT:	return "default right";
+
+	case EVENT_SYSTEM_FULLSCREEN:	return "system fullscreen";
+	case EVENT_SYSTEM_SCREENSHOT:	return "system screenshot";
 
 	case EVENT_ENDTURN:		return "end turn";
 	case EVENT_NEXTHERO:		return "next hero";
@@ -126,6 +133,10 @@ void Game::HotKeysDefaults(void)
     key_events[EVENT_DEFAULT_EXIT] = KEY_ESCAPE;
     key_events[EVENT_DEFAULT_LEFT] = KEY_NONE;
     key_events[EVENT_DEFAULT_RIGHT] = KEY_NONE;
+
+    // system
+    key_events[EVENT_SYSTEM_FULLSCREEN] = KEY_F4;
+    key_events[EVENT_SYSTEM_SCREENSHOT] = KEY_PRINT;
 
     // battle
     key_events[EVENT_BATTLE_CASTSPELL] = KEY_c;
@@ -196,18 +207,6 @@ void Game::EventSwitchGroup(void)
     ++key_groups;
 }
 
-Game::events_t Game::HotKeysGetEvent(int sym)
-{
-    if(sym != KEY_NONE)
-    {
-	const KeySym* begin = &key_events[0];
-	const KeySym* end = &key_events[EVENT_LAST];
-	const KeySym* it = std::find(begin, end, sym);
-	return it != end ? static_cast<events_t>(it - begin) : EVENT_NONE;
-    }
-    return  EVENT_NONE;
-}
-
 bool Game::HotKeyPress(events_t evnt)
 {
     LocalEvent & le = LocalEvent::Get();
@@ -260,5 +259,27 @@ void Game::HotKeysLoad(const std::string & hotkeys)
         entry = config.Find("emulate press right");
         if(entry) le.SetEmulatePressRightKey(KeySymFromInt(entry->IntParams()));
 #endif
+    }
+}
+
+void Game::KeyboardGlobalFilter(u32 sym, u16 mod)
+{
+    Display & display = Display::Get();
+
+    // system hotkeys
+    if(sym == key_events[EVENT_SYSTEM_FULLSCREEN])
+	display.FullScreen();
+    else
+    if(sym == key_events[EVENT_SYSTEM_SCREENSHOT])
+    {
+        std::ostringstream stream;
+        stream << Settings::Get().LocalPrefix() << SEPARATOR << "files" << SEPARATOR << "save" << SEPARATOR << "screenshot_" << std::time(0);
+
+#ifndef WITH_IMAGE
+        stream << ".bmp";
+#else
+        stream << ".png";
+#endif
+        if(display.Save(stream.str().c_str())) DEBUG(DBG_GAME , DBG_INFO, "Game::KeyboardGlobalFilter: save: " << stream.str());
     }
 }
