@@ -493,6 +493,8 @@ void Interface::GameArea::SetScroll(scroll_t direct)
 
 	default: break;
     }
+
+    scrollTime.Start();
 }
 
 /* convert area point to index maps */
@@ -536,6 +538,13 @@ void Interface::GameArea::QueueEventProcessing(void)
 
     // fixed pocket pc tap mode
     if(conf.HideInterface() && conf.ShowControlPanel() && le.MouseCursor(Interface::ControlPanel::Get().GetArea())) return;
+
+    // fixed pocket pc: click on maps after scroll (pause: ~800 ms)
+    if(conf.ExtTapMode())
+    {
+	scrollTime.Stop();
+	if(800 > scrollTime.Get()) return;
+    }
 
     if(le.MouseClickLeft(tile_pos) && Cursor::POINTER != cursor.Themes())
         Game::MouseCursorAreaClickLeft(index);

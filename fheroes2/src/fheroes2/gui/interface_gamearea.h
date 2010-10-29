@@ -96,6 +96,8 @@ namespace Interface
 	u8	scrollDirection;
 	u8	scrollStep;
 	bool    updateCursor;
+
+	SDL::Time scrollTime;
     };
 }
 
