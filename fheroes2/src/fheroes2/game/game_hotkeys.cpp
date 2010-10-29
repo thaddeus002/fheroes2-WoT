@@ -27,6 +27,7 @@
 
 #include "gamedefs.h"
 #include "tinyconfig.h"
+#include "agg.h"
 #include "settings.h"
 #include "game.h"
 
@@ -66,6 +67,8 @@ const char* Game::EventsName(events_t evnt)
 
 	case EVENT_SYSTEM_FULLSCREEN:	return "system fullscreen";
 	case EVENT_SYSTEM_SCREENSHOT:	return "system screenshot";
+	case EVENT_SYSTEM_DEBUG1:	return "system debug1";
+	case EVENT_SYSTEM_DEBUG2:	return "system debug2";
 
 	case EVENT_ENDTURN:		return "end turn";
 	case EVENT_NEXTHERO:		return "next hero";
@@ -137,6 +140,8 @@ void Game::HotKeysDefaults(void)
     // system
     key_events[EVENT_SYSTEM_FULLSCREEN] = KEY_F4;
     key_events[EVENT_SYSTEM_SCREENSHOT] = KEY_PRINT;
+    key_events[EVENT_SYSTEM_DEBUG1] = KEY_NONE;
+    key_events[EVENT_SYSTEM_DEBUG2] = KEY_NONE;
 
     // battle
     key_events[EVENT_BATTLE_CASTSPELL] = KEY_c;
@@ -231,7 +236,7 @@ void Game::HotKeysLoad(const std::string & hotkeys)
 		entry = config.Find(name);
 		if(entry)
 		{
-		    const KeySym sym = KeySymFromInt(entry->IntParams());
+		    const KeySym sym = GetKeySym(entry->IntParams());
 		    key_events[evnt] = sym;
 		    DEBUG(DBG_GAME, DBG_INFO, "Game::HotKeysLoad: events: " << EventsName(evnt) << ", key: " << KeySymGetName(sym));
 		}
@@ -242,22 +247,22 @@ void Game::HotKeysLoad(const std::string & hotkeys)
 	LocalEvent & le = LocalEvent::Get();
 
 	entry = config.Find("emulate mouse up");
-        if(entry) le.SetEmulateMouseUpKey(KeySymFromInt(entry->IntParams()));
+        if(entry) le.SetEmulateMouseUpKey(GetKeySym(entry->IntParams()));
 
         entry = config.Find("emulate mouse down");
-        if(entry) le.SetEmulateMouseDownKey(KeySymFromInt(entry->IntParams()));
+        if(entry) le.SetEmulateMouseDownKey(GetKeySym(entry->IntParams()));
 
         entry = config.Find("emulate mouse left");
-        if(entry) le.SetEmulateMouseLeftKey(KeySymFromInt(entry->IntParams()));
+        if(entry) le.SetEmulateMouseLeftKey(GetKeySym(entry->IntParams()));
 
         entry = config.Find("emulate mouse right");
-        if(entry) le.SetEmulateMouseRightKey(KeySymFromInt(entry->IntParams()));
+        if(entry) le.SetEmulateMouseRightKey(GetKeySym(entry->IntParams()));
 
         entry = config.Find("emulate press left");
-        if(entry) le.SetEmulatePressLeftKey(KeySymFromInt(entry->IntParams()));
+        if(entry) le.SetEmulatePressLeftKey(GetKeySym(entry->IntParams()));
 
         entry = config.Find("emulate press right");
-        if(entry) le.SetEmulatePressRightKey(KeySymFromInt(entry->IntParams()));
+        if(entry) le.SetEmulatePressRightKey(GetKeySym(entry->IntParams()));
 #endif
     }
 }
@@ -281,5 +286,14 @@ void Game::KeyboardGlobalFilter(u32 sym, u16 mod)
         stream << ".png";
 #endif
         if(display.Save(stream.str().c_str())) DEBUG(DBG_GAME , DBG_INFO, "Game::KeyboardGlobalFilter: save: " << stream.str());
+    }
+    else
+    if(sym == key_events[EVENT_SYSTEM_DEBUG1])
+    {
+	AGG::Cache::Get().Dump();
+    }
+    else
+    if(sym == key_events[EVENT_SYSTEM_DEBUG2])
+    {
     }
 }

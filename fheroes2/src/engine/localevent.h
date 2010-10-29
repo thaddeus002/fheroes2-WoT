@@ -31,7 +31,9 @@ enum KeyMod { MOD_NONE = KMOD_NONE, MOD_CTRL = KMOD_CTRL, MOD_SHIFT = KMOD_SHIFT
 
 enum KeySym
 {
-    KEY_NONE		= SDLK_UNKNOWN,
+    KEY_NONE		= -1,
+
+    KEY_UNKNOWN		= SDLK_UNKNOWN,
 
     KEY_BACKSPACE	= SDLK_BACKSPACE,
     KEY_RETURN		= SDLK_RETURN,
@@ -146,6 +148,7 @@ enum KeySym
 };
 
 const char* KeySymGetName(KeySym);
+KeySym GetKeySym(int);
 
 class LocalEvent
 {

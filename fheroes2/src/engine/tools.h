@@ -49,7 +49,6 @@ namespace String
 
 int Sign(int);
 KeySym KeySymFromChar(char);
-KeySym KeySymFromInt(int);
 bool PressIntKey(u32 min, u32 max, u32 & result);
 
 std::string GetDirname(const std::string &);

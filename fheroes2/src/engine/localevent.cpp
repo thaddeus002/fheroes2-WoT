@@ -123,7 +123,7 @@ const char* KeySymGetName(KeySym sym)
     return SDL_GetKeyName(static_cast<SDLKey>(sym));
 }
 
-KeySym SDLToKeySym(SDLKey key)
+KeySym GetKeySym(int key)
 {
     switch(key)
     {
@@ -374,15 +374,15 @@ bool LocalEvent::MouseReleaseRight(void) const
 
 void LocalEvent::HandleKeyboardEvent(SDL_KeyboardEvent & event)
 {
-    if(KEY_NONE != SDLToKeySym(event.keysym.sym))
+    if(KEY_NONE != GetKeySym(event.keysym.sym))
     {
 	(event.type == SDL_KEYDOWN) ? SetModes(KEY_PRESSED) : ResetModes(KEY_PRESSED);
 
 #ifdef WITHOUT_MOUSE
-	if(emulate_mouse && EmulateMouseAction(SDLToKeySym(event.keysym.sym))) return;
+	if(emulate_mouse && EmulateMouseAction(GetKeySym(event.keysym.sym))) return;
 #endif
 
-	key_value = SDLToKeySym(event.keysym.sym);
+	key_value = GetKeySym(event.keysym.sym);
     }
 }
 
