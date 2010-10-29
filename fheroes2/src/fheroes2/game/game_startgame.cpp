@@ -157,16 +157,14 @@ Game::menu_t Game::StartGame(void)
     global_focus.Reset();
 
     Interface::Radar & radar = I.radar;
-    Interface::HeroesIcons & heroesBar = I.iconsPanel.GetHeroesBar();
-    Interface::CastleIcons & castleBar = I.iconsPanel.GetCastleBar();
     Interface::StatusWindow& statusWin = I.statusWindow;
-    heroesBar.Reset();
-    castleBar.Reset();
+
+    I.iconsPanel.ResetIcons();
+
     radar.Build();
 
     I.Redraw(REDRAW_ICONS | REDRAW_BUTTONS | REDRAW_BORDER);
-    castleBar.Hide();
-    heroesBar.Hide();
+    I.iconsPanel.HideIcons();
 
     Game::menu_t m = ENDTURN;
 
@@ -197,18 +195,17 @@ Game::menu_t Game::StartGame(void)
 		    {
 			cursor.Hide();
 			conf.SetMyColor(Color::GRAY);
-			castleBar.Hide();
-			heroesBar.Hide();
+			I.iconsPanel.HideIcons();
 			statusWin.Reset();
-			I.SetRedraw(REDRAW_GAMEAREA | REDRAW_STATUS);
+			I.SetRedraw(REDRAW_GAMEAREA | REDRAW_STATUS | REDRAW_ICONS);
 			I.Redraw();
 			display.Flip();
 			std::string str = _("%{color} player's turn");
 			String::Replace(str, "%{color}", Color::String(color));
 			DialogPlayers(color, str);
 		    }
-		    castleBar.Show();
-		    heroesBar.Show();
+		    I.SetRedraw(REDRAW_ICONS);
+		    I.iconsPanel.ShowIcons();
 		    conf.SetMyColor(color);
 		    m = HumanTurn();
 		    if(m == ENDTURN && conf.LoadedGameVersion()) conf.SetLoadedGameVersion(false);
@@ -317,7 +314,7 @@ void Game::OpenCastle(Castle *castle)
     if(it != myCastles.end())
     {
 	globalfocus.Set(*it);
-	if(Heroes *hero = const_cast<Heroes *>((*it)->GetHeroes())) globalfocus.Set(hero);
+	if(const Heroes *hero = (*it)->GetHeroes()) globalfocus.Set(hero);
     }
     globalfocus.SetRedraw();
 
@@ -1056,7 +1053,7 @@ bool Game::DiggingForArtifacts(const Heroes & hero)
 	    Dialog::Message("", _("Nothing here. Where could it be?"), Font::BIG, Dialog::OK);
 
 	Cursor::Get().Hide();
-	Interface::IconsPanel::Get().GetHeroesBar().Redraw();
+	Interface::IconsPanel::Get().RedrawIcons(ICON_HEROES);
 	Cursor::Get().Show();
 	Display::Get().Flip();
     }
@@ -1638,13 +1635,14 @@ void Game::EventSwitchShowStatus(void)
 void Game::EventSwitchShowIcons(void)
 {
     Settings & conf = Settings::Get();
+    Interface::Basic & I = Interface::Basic::Get();
 
     if(conf.HideInterface())
     {
 	if(conf.ShowIcons())
 	{
 	    conf.SetShowIcons(false);
-	    Interface::Basic::Get().SetRedraw(REDRAW_GAMEAREA);
+	    I.SetRedraw(REDRAW_GAMEAREA);
 	}
 	else
 	{
@@ -1653,10 +1651,11 @@ void Game::EventSwitchShowIcons(void)
 		conf.SetShowButtons(false);
 		conf.SetShowRadar(false);
 		conf.SetShowStatus(false);
-		Interface::Basic::Get().SetRedraw(REDRAW_GAMEAREA);
+		I.SetRedraw(REDRAW_GAMEAREA);
 	    }
 	    conf.SetShowIcons(true);
-	    Interface::Basic::Get().SetRedraw(REDRAW_ICONS);
+	    I.iconsPanel.SetCurrentVisible();
+	    I.SetRedraw(REDRAW_ICONS);
 	}
     }
 }

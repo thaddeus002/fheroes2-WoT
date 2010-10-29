@@ -33,16 +33,17 @@ class SettingsListBox : public Interface::ListBox<u32>
 public:
     SettingsListBox(const Point & pt) : Interface::ListBox<u32>(pt) {};
 
-    void RedrawItem(const u32 &, u16, u16, bool);
+    void RedrawItem(const u32 &, s16, s16, bool);
     void RedrawBackground(const Point &);
 
-    void ActionCurrentUp(void);
-    void ActionCurrentDn(void);
+    void ActionCurrentUp(void){};
+    void ActionCurrentDn(void){};
     void ActionListDoubleClick(u32 &);
     void ActionListSingleClick(u32 &);
+    void ActionListPressRight(u32 &){};
 };
 
-void SettingsListBox::RedrawItem(const u32 & item, u16 ox, u16 oy, bool current)
+void SettingsListBox::RedrawItem(const u32 & item, s16 ox, s16 oy, bool current)
 {
     Display & display = Display::Get();
     const Settings & conf = Settings::Get();
@@ -77,14 +78,6 @@ void SettingsListBox::RedrawBackground(const Point & top)
 
     display.Blit(AGG::GetICN(ICN::DROPLISL, 10), top.x + 295, top.y + 46);
     display.Blit(AGG::GetICN(ICN::DROPLISL, 12), top.x + 295, top.y + ah - 14);
-}
-
-void SettingsListBox::ActionCurrentUp(void)
-{
-}
-
-void SettingsListBox::ActionCurrentDn(void)
-{
 }
 
 void SettingsListBox::ActionListDoubleClick(u32 & item)

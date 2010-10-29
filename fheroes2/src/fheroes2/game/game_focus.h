@@ -43,6 +43,8 @@ namespace Game
 	void		SetRedraw(void);
 	void		Reset(const focus_t priority = UNSEL);
 
+	void		CheckIconsPanel(void);
+
 	const Point &	Center(void) const;
 
 	focus_t		Type(void) const;

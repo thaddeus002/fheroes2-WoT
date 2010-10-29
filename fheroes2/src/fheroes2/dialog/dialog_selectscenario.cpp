@@ -34,7 +34,7 @@
 void LossConditionInfo(const Maps::FileInfo &);
 void VictoryConditionInfo(const Maps::FileInfo &);
 
-void ScenarioListBox::RedrawItem(const Maps::FileInfo & info, u16 dstx, u16 dsty, bool current)
+void ScenarioListBox::RedrawItem(const Maps::FileInfo & info, s16 dstx, s16 dsty, bool current)
 {
     Display & display = Display::Get();
     Text text;
@@ -71,6 +71,11 @@ void ScenarioListBox::RedrawItem(const Maps::FileInfo & info, u16 dstx, u16 dsty
     index = 36 + info.conditions_loss;
     const Sprite & spriteLoss = AGG::GetICN(ICN::REQUESTS, index);
     display.Blit(spriteLoss, dstx + 224 + spriteWins.w() + 2, dsty);
+}
+
+void ScenarioListBox::ActionListDoubleClick(Maps::FileInfo &)
+{
+    selectOk = true;
 }
 
 void ScenarioListBox::RedrawBackground(const Point & dst)
@@ -129,22 +134,6 @@ void ScenarioListBox::RedrawBackground(const Point & dst)
 	    box.Blit(dst.x + 45, dst.y + 320);
 	}
     }
-}
-
-void ScenarioListBox::ActionCurrentUp(void)
-{
-}
-
-void ScenarioListBox::ActionCurrentDn(void)
-{
-}
-
-void ScenarioListBox::ActionListDoubleClick(Maps::FileInfo &)
-{
-}
-
-void ScenarioListBox::ActionListSingleClick(Maps::FileInfo &)
-{
 }
 
 bool Dialog::SelectScenario(const MapsFileInfoList & all, std::string & filename)
@@ -242,7 +231,9 @@ bool Dialog::SelectScenario(const MapsFileInfoList & all, std::string & filename
 	le.MousePressLeft(buttonSelectXLarge) && buttonSelectXLarge.isEnable() ? buttonSelectXLarge.PressDraw() : buttonSelectXLarge.ReleaseDraw();
 	le.MousePressLeft(buttonSelectAll) ? buttonSelectAll.PressDraw() : buttonSelectAll.ReleaseDraw();
 
-        if((buttonOk.isEnable() && le.MouseClickLeft(buttonOk)) || Game::HotKeyPress(Game::EVENT_DEFAULT_READY))
+        if((buttonOk.isEnable() && le.MouseClickLeft(buttonOk)) ||
+	    Game::HotKeyPress(Game::EVENT_DEFAULT_READY) ||
+	    listbox.selectOk)
 	{
 	    filename = listbox.GetCurrent().file;
 	    break;

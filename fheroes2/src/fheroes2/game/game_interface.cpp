@@ -140,9 +140,9 @@ void Interface::Basic::Redraw(u8 force)
 
     if((conf.HideInterface() && conf.ShowIcons()) || ((redraw | force) & REDRAW_ICONS)) iconsPanel.Redraw();
     else
-    if((redraw | force) & REDRAW_HEROES) iconsPanel.GetHeroesBar().Redraw();
+    if((redraw | force) & REDRAW_HEROES) iconsPanel.RedrawIcons(ICON_HEROES);
     else
-    if((redraw | force) & REDRAW_CASTLES) iconsPanel.GetCastleBar().Redraw();
+    if((redraw | force) & REDRAW_CASTLES) iconsPanel.RedrawIcons(ICON_CASTLES);
 
     if((conf.HideInterface() && conf.ShowButtons()) || ((redraw | force) & REDRAW_BUTTONS)) buttonsArea.Redraw();
 

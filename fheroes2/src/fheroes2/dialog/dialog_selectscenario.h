@@ -29,15 +29,18 @@
 class ScenarioListBox : public Interface::ListBox<Maps::FileInfo>
 {
 public:
-    ScenarioListBox(const Point & pt) : Interface::ListBox<Maps::FileInfo>(pt) {};
+    ScenarioListBox(const Point & pt) : Interface::ListBox<Maps::FileInfo>(pt), selectOk(false) {};
 
-    void RedrawItem(const Maps::FileInfo &, u16, u16, bool);
+    void RedrawItem(const Maps::FileInfo &, s16, s16, bool);
     void RedrawBackground(const Point &);
 
-    void ActionCurrentUp(void);
-    void ActionCurrentDn(void);
+    void ActionCurrentUp(void){};
+    void ActionCurrentDn(void){};
     void ActionListDoubleClick(Maps::FileInfo &);
-    void ActionListSingleClick(Maps::FileInfo &);
+    void ActionListSingleClick(Maps::FileInfo &){};
+    void ActionListPressRight(Maps::FileInfo &){};
+
+    bool selectOk;
 };
 
 namespace Dialog

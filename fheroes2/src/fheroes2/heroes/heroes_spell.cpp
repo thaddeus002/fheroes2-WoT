@@ -56,18 +56,19 @@ class CastleIndexListBox : public Interface::ListBox<u16>
 public:
     CastleIndexListBox(const Point & pt, u16 & res) : Interface::ListBox<u16>(pt), result(res) {};
 
-    void RedrawItem(const u16 &, u16, u16, bool);
+    void RedrawItem(const u16 &, s16, s16, bool);
     void RedrawBackground(const Point &);
 
-    void ActionCurrentUp(void);
-    void ActionCurrentDn(void);
-    void ActionListDoubleClick(u16 &);
-    void ActionListSingleClick(u16 &);
+    void ActionCurrentUp(void){};
+    void ActionCurrentDn(void){};
+    void ActionListDoubleClick(u16 &){ result = Dialog::OK; };
+    void ActionListSingleClick(u16 &){};
+    void ActionListPressRight(u16 &){};
 
     u16 & result;
 };
 
-void CastleIndexListBox::RedrawItem(const u16 & index, u16 dstx, u16 dsty, bool current)
+void CastleIndexListBox::RedrawItem(const u16 & index, s16 dstx, s16 dsty, bool current)
 {
     const Castle* castle =world.GetCastle(index);
 
@@ -97,23 +98,6 @@ void CastleIndexListBox::RedrawBackground(const Point & dst)
     for(u8 ii = 1; ii < 3; ++ii)
 	display.Blit(AGG::GetICN(ICN::LISTBOX, 8), dst.x + 256, dst.y + 74 + (ii * 19));
     display.Blit(AGG::GetICN(ICN::LISTBOX, 9), dst.x + 256, dst.y + 126);
-}
-
-void CastleIndexListBox::ActionCurrentUp(void)
-{
-}
-
-void CastleIndexListBox::ActionCurrentDn(void)
-{
-}
-
-void CastleIndexListBox::ActionListDoubleClick(u16 &)
-{
-    result = Dialog::OK;
-}
-
-void CastleIndexListBox::ActionListSingleClick(u16 &)
-{
 }
 
 bool Heroes::ActionSpellCast(Spell::spell_t spell)

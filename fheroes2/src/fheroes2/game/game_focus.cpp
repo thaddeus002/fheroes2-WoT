@@ -58,12 +58,8 @@ void Game::Focus::Set(const Heroes *hr)
     heroes->ShowPath(true);
 
     Interface::Basic & I = Interface::Basic::Get();
-    Interface::HeroesIcons & heroesBar = I.iconsPanel.GetHeroesBar();
-    Interface::CastleIcons & castleBar = I.iconsPanel.GetCastleBar();
-
-    castleBar.Unselect();
-    heroesBar.Select(hr);
-
+    
+    I.iconsPanel.Select(*heroes);
     I.gameArea.Center(heroes->GetCenter());
 
     AGG::PlayMusic(MUS::FromGround(world.GetTiles(hr->GetCenter()).GetGround()));
@@ -86,12 +82,8 @@ void Game::Focus::Set(const Castle *cs)
     heroes = NULL;
 
     Interface::Basic & I = Interface::Basic::Get();
-    Interface::HeroesIcons & heroesBar = I.iconsPanel.GetHeroesBar();
-    Interface::CastleIcons & castleBar = I.iconsPanel.GetCastleBar();
 
-    heroesBar.Unselect();
-    castleBar.Select(cs);
-
+    I.iconsPanel.Select(*castle);
     I.gameArea.Center(castle->GetCenter());
 
     AGG::PlayMusic(MUS::FromGround(world.GetTiles(cs->GetCenter()).GetGround()));
@@ -105,11 +97,8 @@ void Game::Focus::Reset(const focus_t priority)
     Kingdom & myKingdom = world.GetMyKingdom();
 
     Interface::Basic & I = Interface::Basic::Get();
-    Interface::HeroesIcons & heroesBar = I.iconsPanel.GetHeroesBar();
-    Interface::CastleIcons & castleBar = I.iconsPanel.GetCastleBar();
 
-    heroesBar.Reset();
-    castleBar.Reset();
+    I.iconsPanel.ResetIcons();
 
     switch(priority)
     {
@@ -204,14 +193,40 @@ const Point & Game::Focus::Center(void) const
     return center;
 }
 
+void Game::Focus::CheckIconsPanel(void)
+{
+    Interface::Basic & I = Interface::Basic::Get();
+
+    if(!heroes && I.iconsPanel.IsSelected(ICON_HEROES))
+    {
+	I.iconsPanel.ResetIcons(ICON_HEROES);
+	I.SetRedraw(REDRAW_ICONS);
+    }
+    else
+    if(heroes && !I.iconsPanel.IsSelected(ICON_HEROES))
+    {
+	I.iconsPanel.Select(*heroes);
+	I.SetRedraw(REDRAW_ICONS);
+    }
+
+    if(!castle && I.iconsPanel.IsSelected(ICON_CASTLES))
+    {
+	I.iconsPanel.ResetIcons(ICON_CASTLES);
+	I.SetRedraw(REDRAW_ICONS);
+    }
+    else
+    if(castle && !I.iconsPanel.IsSelected(ICON_CASTLES))
+    {
+	I.iconsPanel.Select(*castle);
+	I.SetRedraw(REDRAW_ICONS);
+    }
+}
+
 void Game::Focus::SetRedraw(void)
 {
     Interface::Basic & I = Interface::Basic::Get();
-    Interface::HeroesIcons & heroesBar = I.iconsPanel.GetHeroesBar();
-    Interface::CastleIcons & castleBar = I.iconsPanel.GetCastleBar();
 
-    if(!heroes && heroesBar.isSelected()) heroesBar.Reset();
-    if(!castle && castleBar.isSelected()) castleBar.Reset();
+    CheckIconsPanel();
 
     I.SetRedraw(REDRAW_GAMEAREA | REDRAW_RADAR);
 

@@ -46,19 +46,20 @@ class FileInfoListBox : public Interface::ListBox<Maps::FileInfo>
 public:
     FileInfoListBox(const Point & pt, std::string & res, bool & edit) : Interface::ListBox<Maps::FileInfo>(pt), result(res), edit_mode(edit) {};
 
-    void RedrawItem(const Maps::FileInfo &, u16, u16, bool);
+    void RedrawItem(const Maps::FileInfo &, s16, s16, bool);
     void RedrawBackground(const Point &);
 
     void ActionCurrentUp(void);
     void ActionCurrentDn(void);
     void ActionListDoubleClick(Maps::FileInfo &);
     void ActionListSingleClick(Maps::FileInfo &);
+    void ActionListPressRight(Maps::FileInfo &){};
 
     std::string & result;
     bool & edit_mode;
 };
 
-void FileInfoListBox::RedrawItem(const Maps::FileInfo & info, u16 dstx, u16 dsty, bool current)
+void FileInfoListBox::RedrawItem(const Maps::FileInfo & info, s16 dstx, s16 dsty, bool current)
 {
 
     char short_date[15];

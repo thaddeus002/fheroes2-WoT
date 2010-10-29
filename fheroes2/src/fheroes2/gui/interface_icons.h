@@ -24,99 +24,64 @@
 #define H2INTERFACE_ICONS_H
 
 #include "gamedefs.h"
-#include "button.h"
+#include "interface_list.h"
 #include "dialog.h"
-#include "splitter.h"
+
+enum icons_t { ICON_HEROES = 0x01, ICON_CASTLES = 0x02, ICON_ANY = ICON_HEROES|ICON_CASTLES };
 
 namespace Interface
 {
+    typedef Heroes* HEROES;
+    typedef Castle* CASTLE;
+
     class IconsBar
     {
     public:
-	IconsBar();
+	IconsBar(const u8 & count, const Surface & sf) : icons(count), marker(sf), show(true){};
 
-	void            SetPos(s16, s16);
-	void            SetCount(u8);
-	void            Redraw(void) const;
+	void SetShow(bool f) { show = f; };
+	bool IsShow(void) const { return show; };
 
-	const std::vector<Rect> & GetCoords(void) const;
-        const Rect &    GetArea(void) const;
-        Splitter &      GetSplitter(void);
-        SpriteCursor &  GetCursor(void);
+	void RedrawBackground(const Point &);
 
     protected:
-	std::vector<Rect> coords;
-        Rect              area;
-        Surface           sf_cursor;
-        SpriteCursor      sp_cursor;
-        Splitter          splitter;
-        bool              selected;
+	const u8 & icons;
+        const Surface & marker;
+	bool show;
     };
 
-    class HeroesIcons : public IconsBar
+    class HeroesIcons : public Interface::ListBox<HEROES>, public IconsBar
     {
     public:
-        HeroesIcons();
+	HeroesIcons(const u8 & count, const Surface & sf) : IconsBar(count, sf) {};
 
-	void		SetPos(s16, s16);
-	u32             Size(void) const;
+	void SetPos(s16, s16);
 
-        void            Redraw(void);
-
-        void            Reset(void);
-        bool            Prev(void);
-        bool            Next(void);
-        void            SetTop(const u8 index);
-        void            Hide(void);
-        void            Show(void);
-        void            Unselect(void);
-        bool            isSelected(void) const;
-
-        void            Select(const Heroes *hero);
-        const Heroes *  Selected(void) const;
-
-        const Heroes *  MouseClickLeft(void) const;
-        const Heroes *  MousePressRight(void) const;
-
-
-    private:
-        static void RedrawIcon(const Heroes & hero, const Rect & dst);
-        std::vector<Heroes *>::const_iterator it_top;
-        std::vector<Heroes *>::const_iterator it_cur;
-	bool hide;
+    protected:
+	void ActionCurrentUp(void);
+	void ActionCurrentDn(void);
+	void ActionListDoubleClick(HEROES &);
+	void ActionListSingleClick(HEROES &);
+	void ActionListPressRight(HEROES &);
+	void RedrawItem(const HEROES &, s16 ox, s16 oy, bool current);
+	void RedrawBackground(const Point &);
     };
 
-
-    class CastleIcons : public IconsBar
+    class CastleIcons : public Interface::ListBox<CASTLE>, public IconsBar
     {
     public:
-	CastleIcons();
+	CastleIcons(const u8 & count, const Surface & sf) : IconsBar(count, sf) {};
 
-	void		SetPos(s16, s16);
-	u32             Size(void) const;
+	void SetPos(s16, s16);
 
-        void            Redraw(void);
-
-        void            Reset(void);
-        bool            Prev(void);
-        bool            Next(void);
-        void            SetTop(const u8 index);
-        void            Hide(void);
-        void            Show(void);
-        void            Unselect(void);
-        bool            isSelected(void) const;
-
-	void            Select(const Castle *castle);
-        const Castle *  Selected(void) const;
-
-        const Castle *  MouseClickLeft(void) const;
-        const Castle *  MousePressRight(void) const;
-
-    private:
-        static void RedrawIcon(const Castle & castle, const Rect & dst);
-        std::vector<Castle *>::const_iterator it_top;
-        std::vector<Castle *>::const_iterator it_cur;
-	bool hide;
+    protected:
+	void ActionCurrentUp(void);
+	void ActionCurrentDn(void);
+	void ActionListDoubleClick(CASTLE &);
+	void ActionListSingleClick(CASTLE &);
+	void ActionListPressRight(CASTLE &);
+	void RedrawItem(const CASTLE &, s16 ox, s16 oy, bool current);
+	void RedrawBackground(const Point &);
     };
 
     class IconsPanel : protected Rect
@@ -132,22 +97,26 @@ namespace Interface
         const Rect & GetArea(void) const;
         u8           CountIcons(void) const;
 
-	HeroesIcons & GetHeroesBar(void);
-	CastleIcons & GetCastleBar(void);
+	void Select(const Heroes &);
+	void Select(const Castle &);
+
+	bool IsSelected(icons_t) const;
+	void ResetIcons(icons_t = ICON_ANY);
+	void HideIcons(icons_t = ICON_ANY);
+	void ShowIcons(icons_t = ICON_ANY);
+	void RedrawIcons(icons_t = ICON_ANY);
+	void SetCurrentVisible(void);
 
     private:
 	IconsPanel();
 
-	Button	buttonScrollHeroesUp;
-	Button	buttonScrollCastleUp;
-	Button	buttonScrollHeroesDown;
-	Button	buttonScrollCastleDown;
-	
-	HeroesIcons heroesIcons;
-	CastleIcons castleIcons;
-
-	u8      count_icons;
+	u8 icons;
 	Dialog::FrameBorder border;
+
+        Surface sfMarker;
+
+	CastleIcons castleIcons;
+	HeroesIcons heroesIcons;
     };
 }
 

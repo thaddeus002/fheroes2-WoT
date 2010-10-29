@@ -285,11 +285,8 @@ bool FH2LocalClient::StartGame(void)
     global_focus.Reset();
 
     //Interface::Radar & radar = I.radar;
-    Interface::HeroesIcons & heroesBar = I.iconsPanel.GetHeroesBar();
-    Interface::CastleIcons & castleBar = I.iconsPanel.GetCastleBar();
     //Interface::StatusWindow& statusWin = I.statusWindow;
-    heroesBar.Reset();
-    castleBar.Reset();
+    I.iconsPanel.ResetIcons();
 
 /*
     radar.Build();

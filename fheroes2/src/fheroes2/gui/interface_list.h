@@ -39,18 +39,21 @@ namespace Interface
 	typedef std::vector<Item> Items;
 	typedef typename std::vector<Item>::iterator ItemsIterator;
 
-	ListBox(const Point & pt) : ptRedraw(pt), maxItems(0), content(NULL) {}
+	ListBox(const Point & pt) : ptRedraw(pt), maxItems(0), useHotkeys(true), content(NULL) {}
+	ListBox() : maxItems(0), content(NULL) {}
 	virtual ~ListBox(){}
 
-	virtual void RedrawItem(const Item &, u16, u16, bool) = 0;
+	virtual void RedrawItem(const Item &, s16 ox, s16 oy, bool current) = 0;
 	virtual void RedrawBackground(const Point &) = 0;
 
 	virtual void ActionCurrentUp(void) = 0;
 	virtual void ActionCurrentDn(void) = 0;
 	virtual void ActionListDoubleClick(Item &) = 0;
 	virtual void ActionListSingleClick(Item &) = 0;
+	virtual void ActionListPressRight(Item &) = 0;
 
 	/*
+	void SetTopLeft(const Point & top);
 	void SetScrollButtonUp(const ICN::icn_t, const u16, const u16, const Point &);
 	void SetScrollButtonDn(const ICN::icn_t, const u16, const u16, const Point &);
 	void SetScrollSplitter(const Sprite &, const Rect &);
@@ -58,12 +61,22 @@ namespace Interface
 	void SetAreaItems(const Rect &);
 	void SetListContent(std::vector<Item> &);
 	void Redraw(void);
-	void QueueEventProcessing(void);
+	bool QueueEventProcessing(void);
 	Item & GetCurrent(void);
+	void SetCurrent(size_t);
+	void SetCurrent(const Item &);
+	void SetCurrentVisible(void);
 	void RemoveSelected(void);
+	void DisableHotkeys(bool);
 	bool isSelected(void) const;
 	void Unselect(void);
+	void Reset(void);
 	*/
+
+	void SetTopLeft(const Point & tl)
+	{
+	    ptRedraw = tl;
+	}
 
 	void SetScrollButtonUp(const ICN::icn_t icn, const u16 index1, const u16 index2, const Point & pos)
 	{
@@ -102,6 +115,21 @@ namespace Interface
 	    splitter.SetRange(0, (maxItems < list.size() ? list.size() - maxItems : 0));
 	}
 
+	void Reset(void)
+	{
+	    if(content)
+	    {
+		cur = content->end();
+		top = content->begin();
+		splitter.Move(0);
+	    }
+	}
+
+	void DisableHotkeys(bool f)
+	{
+	    useHotkeys = !f;
+	}
+
 	void Redraw(void)
 	{
 	    Cursor::Get().Hide();
@@ -133,7 +161,26 @@ namespace Interface
 
 	void SetCurrent(size_t pos)
 	{
-	    if(pos < content->size()) cur = content->begin() + pos;
+	    if(pos < content->size())
+		cur = content->begin() + pos;
+
+	    SetCurrentVisible();
+	}
+
+	void SetCurrentVisible(void)
+	{
+	    if(top > cur || top + maxItems <= cur)
+	    {
+		top = cur + maxItems > content->end() ? content->end() - maxItems : cur;
+		if(top < content->begin()) top = content->begin();
+    		splitter.Move(top - content->begin());
+	    }
+	}
+
+	void SetCurrent(const Item & item)
+	{
+	    cur = std::find(content->begin(), content->end(), item);
+	    SetCurrentVisible();
 	}
 
 	void RemoveSelected(void)
@@ -151,7 +198,7 @@ namespace Interface
 	    if(content) cur = content->end();
 	}
 
-	void QueueEventProcessing(void)
+	bool QueueEventProcessing(void)
 	{
 	    LocalEvent & le = LocalEvent::Get();
 	    Cursor & cursor = Cursor::Get();
@@ -159,51 +206,43 @@ namespace Interface
 	    le.MousePressLeft(buttonPgUp) ? buttonPgUp.PressDraw() : buttonPgUp.ReleaseDraw();
 	    le.MousePressLeft(buttonPgDn) ? buttonPgDn.PressDraw() : buttonPgDn.ReleaseDraw();
     
-	    if(!content) return;
+	    if(!content) return false;
 
-	    if((le.MouseClickLeft(buttonPgUp) || le.KeyPress(KEY_PAGEUP)) && (top > content->begin()))
+	    if((le.MouseClickLeft(buttonPgUp) || (useHotkeys && le.KeyPress(KEY_PAGEUP))) &&
+		    (top > content->begin()))
 	    {
 		cursor.Hide();
 		top = (top - content->begin() > maxItems ? top - maxItems : content->begin());
     		splitter.Move(top - content->begin());
+		return true;
 	    }
 	    else
-	    if((le.MouseClickLeft(buttonPgDn) || le.KeyPress(KEY_PAGEDOWN)) && (top + maxItems < content->end()))
+	    if((le.MouseClickLeft(buttonPgDn) || (useHotkeys && le.KeyPress(KEY_PAGEDOWN))) &&
+		    (top + maxItems < content->end()))
 	    {
 		cursor.Hide();
 		top += maxItems;
 		if(top + maxItems > content->end()) top = content->end() - maxItems;
 		splitter.Move(top - content->begin());
+		return true;
 	    }
 	    else
-	    if(le.KeyPress(KEY_UP) && (cur > content->begin()))
+	    if(useHotkeys && le.KeyPress(KEY_UP) && (cur > content->begin()))
 	    {
 		cursor.Hide();
 		--cur;
-		if((cur < top) || (cur > top + maxItems - 1))
-		{
-		    top = cur;
-		    if(top + maxItems > content->end()) top = content->end() - maxItems;
-		}
-		splitter.Move(top - content->begin());
-
+		SetCurrentVisible();
 		ActionCurrentUp();
+		return true;
 	    }
 	    else
-	    if(le.KeyPress(KEY_DOWN) && (cur < (content->end() - 1)))
+	    if(useHotkeys && le.KeyPress(KEY_DOWN) && (cur < (content->end() - 1)))
 	    {
 		cursor.Hide();
 		++cur;
-		if((cur < top) || (cur > top + maxItems - 1))
-		{
-		    top = cur - maxItems + 1;
-		    if(top + maxItems > content->end()) top = content->end() - maxItems;
-		    else
-		    if(top < content->begin()) top = content->begin();
-		}
-		splitter.Move(top - content->begin());
-
+		SetCurrentVisible();
 		ActionCurrentDn();
+		return true;
 	    }
 	    else
 	    if((le.MouseWheelUp(rtAreaItems) || le.MouseWheelUp(splitter.GetRect())) && (top > content->begin()))
@@ -211,6 +250,7 @@ namespace Interface
 		cursor.Hide();
 		--top;
 		splitter.Backward();
+		return true;
 	    }
 	    else
 	    if((le.MouseWheelDn(rtAreaItems) || le.MouseWheelDn(splitter.GetRect())) && (top < (content->end() - maxItems)))
@@ -218,6 +258,7 @@ namespace Interface
 		cursor.Hide();
     		++top;
 		splitter.Forward();
+		return true;
 	    }
 	    else
 	    if(le.MousePressLeft(splitter.GetRect()) && (content->size() > maxItems))
@@ -229,6 +270,7 @@ namespace Interface
 		if(seek > splitter.Max()) seek = splitter.Max();
 		top = content->begin() + seek;
 		splitter.Move(seek);
+		return true;
 	    }
 	    else
 	    if(le.MouseClickLeft(rtAreaItems) && content->size())
@@ -252,9 +294,30 @@ namespace Interface
 			    cur = click;
 			    ActionListSingleClick(*cur);
 			}
+			return true;
 		    }
 		}
 	    }
+	    else
+	    if(le.MousePressRight(rtAreaItems) && content->size())
+	    {
+		float offset = (le.GetMouseCursor().y - rtAreaItems.y) * maxItems / rtAreaItems.h;
+
+		if(offset >= 0)
+		{
+		    cursor.Hide();
+
+		    ItemsIterator click = top + static_cast<size_t>(offset);
+
+		    if(click >= content->begin() && click < content->end())
+		    {
+			ActionListPressRight(*click);
+			return true;
+		    }
+		}
+	    }
+
+	    return false;
 	}
 
     protected:
@@ -267,6 +330,7 @@ namespace Interface
 	Splitter splitter;
 
 	u8 maxItems;
+	bool useHotkeys;
 
 	Items *content;
 	ItemsIterator cur;
