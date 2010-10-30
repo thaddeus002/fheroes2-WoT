@@ -51,14 +51,19 @@ const char* Game::EventsName(events_t evnt)
 {
     switch(evnt)
     {
-        case EVENT_MENU_NEWGAME:	return "menu new game";
-        case EVENT_MENU_LOADGAME:	return "menu load game";
-        case EVENT_MENU_HIGHSCORES:	return "menu high scores";
-        case EVENT_MENU_CREDITS:	return "menu credits";
-        case EVENT_MENU_STANDARD:	return "menu standard game";
-        case EVENT_MENU_CAMPAIN:	return "menu campain game";
-        case EVENT_MENU_MULTI:		return "menu multi game";
-        case EVENT_MENU_SETTINGS:	return "menu settings";
+        case EVENT_BUTTON_NEWGAME:	return "button newgame";
+        case EVENT_BUTTON_LOADGAME:	return "button loadgame";
+        case EVENT_BUTTON_HIGHSCORES:	return "button highscores";
+        case EVENT_BUTTON_CREDITS:	return "button credits";
+        case EVENT_BUTTON_STANDARD:	return "button standard";
+        case EVENT_BUTTON_CAMPAIN:	return "button campain";
+        case EVENT_BUTTON_MULTI:	return "button multigame";
+        case EVENT_BUTTON_SETTINGS:	return "button settings";
+	case EVENT_BUTTON_SELECT:	return "button select";
+	case EVENT_BUTTON_HOTSEAT:	return "button hotseat";
+	case EVENT_BUTTON_NETWORK:	return "button network";
+	case EVENT_BUTTON_HOST:		return "button host";
+	case EVENT_BUTTON_GUEST:	return "button guest";
 
 	case EVENT_DEFAULT_READY:	return "default ready";
 	case EVENT_DEFAULT_EXIT:	return "default exit";
@@ -122,14 +127,19 @@ void Game::HotKeysDefaults(void)
     std::fill(&key_events[0], &key_events[EVENT_LAST], KEY_NONE);
 
     // main menu
-    key_events[EVENT_MENU_NEWGAME] = KEY_n;
-    key_events[EVENT_MENU_LOADGAME] = KEY_l;
-    key_events[EVENT_MENU_HIGHSCORES] = KEY_h;
-    key_events[EVENT_MENU_CREDITS] = KEY_c;
-    key_events[EVENT_MENU_STANDARD] = KEY_s;
-    key_events[EVENT_MENU_CAMPAIN] = KEY_c;
-    key_events[EVENT_MENU_MULTI] = KEY_m;
-    key_events[EVENT_MENU_SETTINGS] = KEY_t;
+    key_events[EVENT_BUTTON_NEWGAME] = KEY_n;
+    key_events[EVENT_BUTTON_LOADGAME] = KEY_l;
+    key_events[EVENT_BUTTON_HIGHSCORES] = KEY_h;
+    key_events[EVENT_BUTTON_CREDITS] = KEY_c;
+    key_events[EVENT_BUTTON_STANDARD] = KEY_s;
+    key_events[EVENT_BUTTON_CAMPAIN] = KEY_c;
+    key_events[EVENT_BUTTON_MULTI] = KEY_m;
+    key_events[EVENT_BUTTON_SETTINGS] = KEY_t;
+    key_events[EVENT_BUTTON_SELECT] = KEY_s;
+    key_events[EVENT_BUTTON_HOTSEAT] = KEY_h;
+    key_events[EVENT_BUTTON_NETWORK] = KEY_n;
+    key_events[EVENT_BUTTON_HOST] = KEY_h;
+    key_events[EVENT_BUTTON_GUEST] = KEY_g;
 
     // default
     key_events[EVENT_DEFAULT_READY] = KEY_RETURN;

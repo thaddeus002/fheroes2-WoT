@@ -180,7 +180,8 @@ Spell::spell_t SpellBook::Open(const HeroBase & hero, const filter_t filt, bool 
 	    display.Flip();
 	}
 	else
-	if(le.MouseClickLeft(clos_rt) || le.KeyPress(KEY_ESCAPE)) break;
+	if(le.MouseClickLeft(clos_rt) ||
+		Game::HotKeyPress(Game::EVENT_DEFAULT_EXIT)) break;
 	else
 	if(le.MouseClickLeft(pos))
 	{

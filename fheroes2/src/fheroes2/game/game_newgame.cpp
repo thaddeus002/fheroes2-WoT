@@ -100,8 +100,8 @@ Game::menu_t Game::NewNetwork(void)
 	le.MousePressLeft(buttonGuest) ? buttonGuest.PressDraw() : buttonGuest.ReleaseDraw();
 	le.MousePressLeft(buttonCancelGame) ? buttonCancelGame.PressDraw() : buttonCancelGame.ReleaseDraw();
 
-	if(le.MouseClickLeft(buttonHost) || le.KeyPress(KEY_h)) return NetworkHost();
-	if(le.MouseClickLeft(buttonGuest) || le.KeyPress(KEY_g)) return NetworkGuest();
+	if(le.MouseClickLeft(buttonHost) || HotKeyPress(EVENT_BUTTON_HOST)) return NetworkHost();
+	if(le.MouseClickLeft(buttonGuest) || HotKeyPress(EVENT_BUTTON_GUEST)) return NetworkGuest();
 	if(HotKeyPress(EVENT_DEFAULT_EXIT) || le.MouseClickLeft(buttonCancelGame)) return MAINMENU;
 
         // right info
@@ -173,10 +173,10 @@ Game::menu_t Game::NewGame(void)
 	le.MousePressLeft(buttonCancelGame) ? buttonCancelGame.PressDraw() : buttonCancelGame.ReleaseDraw();
 	le.MousePressLeft(buttonSettings) ? buttonSettings.PressDraw() : buttonSettings.ReleaseDraw();
 
-	if(HotKeyPress(EVENT_MENU_STANDARD) || le.MouseClickLeft(buttonStandartGame)) return NEWSTANDARD;
-	if(HotKeyPress(EVENT_MENU_CAMPAIN) || le.MouseClickLeft(buttonCampainGame)) return NEWCAMPAIN;
-	if(HotKeyPress(EVENT_MENU_MULTI) || le.MouseClickLeft(buttonMultiGame)) return NEWMULTI;
-	if(HotKeyPress(EVENT_MENU_SETTINGS) || le.MouseClickLeft(buttonSettings)){ Dialog::ExtSettings(); cursor.Show(); display.Flip(); }
+	if(HotKeyPress(EVENT_BUTTON_STANDARD) || le.MouseClickLeft(buttonStandartGame)) return NEWSTANDARD;
+	if(HotKeyPress(EVENT_BUTTON_CAMPAIN) || le.MouseClickLeft(buttonCampainGame)) return NEWCAMPAIN;
+	if(HotKeyPress(EVENT_BUTTON_MULTI) || le.MouseClickLeft(buttonMultiGame)) return NEWMULTI;
+	if(HotKeyPress(EVENT_BUTTON_SETTINGS) || le.MouseClickLeft(buttonSettings)){ Dialog::ExtSettings(); cursor.Show(); display.Flip(); }
 	if(HotKeyPress(EVENT_DEFAULT_EXIT) || le.MouseClickLeft(buttonCancelGame)) return MAINMENU;
 
         // right info
@@ -240,7 +240,7 @@ Game::menu_t Game::NewMulti(void)
 	le.MousePressLeft(buttonHotSeat) ? buttonHotSeat.PressDraw() : buttonHotSeat.ReleaseDraw();
 	le.MousePressLeft(buttonCancelGame) ? buttonCancelGame.PressDraw() : buttonCancelGame.ReleaseDraw();
 
-	if(le.MouseClickLeft(buttonHotSeat) || le.KeyPress(KEY_h)) return NEWHOTSEAT;
+	if(le.MouseClickLeft(buttonHotSeat) || HotKeyPress(EVENT_BUTTON_HOTSEAT)) return NEWHOTSEAT;
 	if(HotKeyPress(EVENT_DEFAULT_EXIT) || le.MouseClickLeft(buttonCancelGame)) return MAINMENU;
 
         // right info
@@ -250,7 +250,7 @@ Game::menu_t Game::NewMulti(void)
 	if(buttonNetwork.isEnable())
 	{
 	    le.MousePressLeft(buttonNetwork) ? buttonNetwork.PressDraw() : buttonNetwork.ReleaseDraw();
-	    if(le.MouseClickLeft(buttonNetwork) || le.KeyPress(KEY_n)) return NEWNETWORK;
+	    if(le.MouseClickLeft(buttonNetwork) || HotKeyPress(EVENT_BUTTON_NETWORK)) return NEWNETWORK;
 	    if(le.MousePressRight(buttonNetwork)) Dialog::Message(_("Network"), _("Play a network game, where 2 players use their own computers connected through a LAN (Local Area Network)."), Font::BIG);
 	}
     }

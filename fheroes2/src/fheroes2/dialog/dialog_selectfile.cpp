@@ -61,11 +61,10 @@ public:
 
 void FileInfoListBox::RedrawItem(const Maps::FileInfo & info, s16 dstx, s16 dsty, bool current)
 {
+    char short_date[20];
 
-    char short_date[15];
-         short_date[14] = 0;
-
-    std::strftime(short_date, 14, "%b %d, %H:%M", std::localtime(&info.localtime));
+    std::fill(short_date, short_date + sizeof(short_date), 0);
+    std::strftime(short_date, sizeof(short_date) - 1, "%b %d, %H:%M", std::localtime(&info.localtime));
     std::string savname(GetBasename(info.file));
     
     if(savname.size())
@@ -272,10 +271,8 @@ bool SelectFileListSimple(const std::string & header, MapsFileInfoList & lists, 
 	{
 	    edit_mode = true;
 	    if(Settings::Get().PocketPC())
-	    {
 		PocketPC::KeyboardDialog(filename);
-    		buttonOk.SetDisable(filename.empty());
-	    }
+    	    buttonOk.SetDisable(filename.empty());
 	    cursor.Hide();
 	}
 	else

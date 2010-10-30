@@ -103,17 +103,23 @@ Game::menu_t PocketPC::MainMenu(void)
     // mainmenu loop
     while(le.HandleEvents())
     {
-	if(le.KeyPress(KEY_n) || le.MouseClickLeft(rectNewGame)) return Game::NEWGAME;
+	if(Game::HotKeyPress(Game::EVENT_BUTTON_NEWGAME) ||
+		le.MouseClickLeft(rectNewGame)) return Game::NEWGAME;
 	else
-	if(le.KeyPress(KEY_l) || le.MouseClickLeft(rectLoadGame)) return Game::LOADGAME;
+	if(Game::HotKeyPress(Game::EVENT_BUTTON_LOADGAME) ||
+		le.MouseClickLeft(rectLoadGame)) return Game::LOADGAME;
 	else
-	if(le.KeyPress(KEY_s) || le.MouseClickLeft(rectSettings)){ Dialog::ExtSettings(); cursor.Show(); display.Flip(); }
+	if(Game::HotKeyPress(Game::EVENT_BUTTON_SETTINGS) ||
+		le.MouseClickLeft(rectSettings)){ Dialog::ExtSettings(); cursor.Show(); display.Flip(); }
 	else
-	if(le.KeyPress(KEY_c) || le.MouseClickLeft(rectCredits)) return Game::CREDITS;
+	if(Game::HotKeyPress(Game::EVENT_BUTTON_CREDITS) ||
+		le.MouseClickLeft(rectCredits)) return Game::CREDITS;
 	else
-	if(le.KeyPress(KEY_h) || le.MouseClickLeft(rectHighScores)) return Game::HIGHSCORES;
+	if(Game::HotKeyPress(Game::EVENT_BUTTON_HIGHSCORES) ||
+		le.MouseClickLeft(rectHighScores)) return Game::HIGHSCORES;
 	else
-	if(le.KeyPress(KEY_q) || le.MouseClickLeft(rectQuitGame) || le.KeyPress(KEY_ESCAPE)) return Game::QUITGAME;
+	if(Game::HotKeyPress(Game::EVENT_DEFAULT_EXIT) ||
+		le.MouseClickLeft(rectQuitGame)) return Game::QUITGAME;
     }
 
     return Game::QUITGAME;
@@ -170,13 +176,17 @@ Game::menu_t PocketPC::NewGame(void)
     // mainmenu loop
     while(le.HandleEvents())
     {
-	if(le.KeyPress(KEY_s) || le.MouseClickLeft(rectStandardGame)) return Game::NEWSTANDARD;
+	if(Game::HotKeyPress(Game::EVENT_BUTTON_STANDARD) ||
+		le.MouseClickLeft(rectStandardGame)) return Game::NEWSTANDARD;
 	else
-	if(le.KeyPress(KEY_c) || le.MouseClickLeft(rectCampaignGame)) return Game::MAINMENU;
+	if(Game::HotKeyPress(Game::EVENT_BUTTON_CAMPAIN) ||
+		le.MouseClickLeft(rectCampaignGame)) return Game::MAINMENU;
 	else
-	if(le.KeyPress(KEY_m) || le.MouseClickLeft(rectMultiGame)) return Game::NEWMULTI;
+	if(Game::HotKeyPress(Game::EVENT_BUTTON_MULTI) ||
+		le.MouseClickLeft(rectMultiGame)) return Game::NEWMULTI;
 	else
-	if(le.MouseClickLeft(rectCancel) || le.KeyPress(KEY_ESCAPE)) return Game::MAINMENU;
+	if(Game::HotKeyPress(Game::EVENT_DEFAULT_EXIT) ||
+		le.MouseClickLeft(rectCancel)) return Game::MAINMENU;
     }
 
     return Game::QUITGAME;
@@ -229,15 +239,18 @@ Game::menu_t PocketPC::NewMulti(void)
     // mainmenu loop
     while(le.HandleEvents())
     {
-	if(le.KeyPress(KEY_h) || le.MouseClickLeft(rectHotSeat)) return Game::NEWHOTSEAT;
+	if(Game::HotKeyPress(Game::EVENT_BUTTON_HOTSEAT) ||
+		le.MouseClickLeft(rectHotSeat)) return Game::NEWHOTSEAT;
 	else
-	if(le.KeyPress(KEY_n) || le.MouseClickLeft(rectNetwork))
+	if(Game::HotKeyPress(Game::EVENT_BUTTON_NETWORK) ||
+		le.MouseClickLeft(rectNetwork))
 	{
 	    Dialog::Message(_("Error"), _("This release is compiled without network support."), Font::BIG, Dialog::OK);
 	    return Game::MAINMENU;
 	}
 	else
-	if(le.MouseClickLeft(rectCancel) || le.KeyPress(KEY_ESCAPE)) return Game::MAINMENU;
+	if(Game::HotKeyPress(Game::EVENT_DEFAULT_EXIT) ||
+	    le.MouseClickLeft(rectCancel)) return Game::MAINMENU;
     }
 
     return Game::QUITGAME;

@@ -93,7 +93,7 @@ void Castle::OpenTavern(void)
     {
         le.MousePressLeft(buttonYes) ? buttonYes.PressDraw() : buttonYes.ReleaseDraw();
 
-        if(le.MouseClickLeft(buttonYes) || le.KeyPress(KEY_RETURN) || le.KeyPress(KEY_ESCAPE)) break;
+        if(le.MouseClickLeft(buttonYes) || HotKeyCloseWindow) break;
 
 
         // animation

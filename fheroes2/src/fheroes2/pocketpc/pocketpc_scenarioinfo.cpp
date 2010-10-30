@@ -105,7 +105,8 @@ Game::menu_t PocketPC::ScenarioInfo(void)
         le.MousePressLeft(buttonCancel) ? buttonCancel.PressDraw() : buttonCancel.ReleaseDraw();
 
         // click cancel
-        if(le.MouseClickLeft(buttonCancel) || le.KeyPress(KEY_ESCAPE))
+        if(le.MouseClickLeft(buttonCancel) ||
+		Game::HotKeyPress(Game::EVENT_DEFAULT_EXIT))
         {
             Settings::Get().SetGameType(Game::UNKNOWN);
             return Game::MAINMENU;
@@ -113,7 +114,8 @@ Game::menu_t PocketPC::ScenarioInfo(void)
         }
         else
 	// click ok
-        if(le.KeyPress(KEY_RETURN) || le.MouseClickLeft(buttonOk))
+        if(le.MouseClickLeft(buttonOk) ||
+		Game::HotKeyPress(Game::EVENT_DEFAULT_READY))
         {
             DEBUG(DBG_GAME , DBG_INFO, "PocketPC::ScenarioInfo: select maps: " << conf.MapsFile() \
 		    << ", difficulty: " << Difficulty::String(conf.GameDifficulty()) << ", select color: " << Color::String(conf.MyColor()));

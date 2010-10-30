@@ -615,10 +615,11 @@ bool BuildingInfo::DialogBuyBuilding(bool buttons) const
         le.MousePressLeft(button1) ? button1.PressDraw() : button1.ReleaseDraw();
         le.MousePressLeft(button2) ? button2.PressDraw() : button2.ReleaseDraw();
 
-        if(button1.isEnable() && (le.KeyPress(KEY_RETURN) ||
+        if(button1.isEnable() &&
+	    (Game::HotKeyPress(Game::EVENT_DEFAULT_READY) ||
     	    le.MouseClickLeft(button1))) return true;
 
-        if(le.KeyPress(KEY_ESCAPE) ||
+        if(Game::HotKeyPress(Game::EVENT_DEFAULT_EXIT) ||
     	    le.MouseClickLeft(button2)) break;
     }
 

@@ -122,7 +122,7 @@ Dialog::answer_t PocketPC::DialogArmyInfo(const Army::Troop & troop, u16 flags)
         else
         if(buttonDismiss.isEnable() && le.MouseClickLeft(buttonDismiss)) return Dialog::DISMISS;
         else
-        if(le.MouseClickLeft(buttonExit) || le.KeyPress(KEY_ESCAPE)) return Dialog::CANCEL;
+        if(le.MouseClickLeft(buttonExit) || Game::HotKeyPress(Game::EVENT_DEFAULT_EXIT)) return Dialog::CANCEL;
     }
 
     return Dialog::ZERO;

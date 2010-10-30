@@ -178,7 +178,7 @@ Game::menu_t Game::ScenarioInfo(void)
 	le.MousePressLeft(buttonCancel) ? buttonCancel.PressDraw() : buttonCancel.ReleaseDraw();
 
 	// click select
-	if(le.KeyPress(KEY_s) || le.MouseClickLeft(buttonSelectMaps))
+	if(Game::HotKeyPress(Game::EVENT_BUTTON_SELECT) || le.MouseClickLeft(buttonSelectMaps))
 	{
 	    std::string filemaps;
 	    if(Dialog::SelectScenario(lists, filemaps) && conf.LoadFileMapsMP2(filemaps))

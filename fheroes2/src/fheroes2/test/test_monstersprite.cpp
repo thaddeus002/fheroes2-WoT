@@ -93,7 +93,7 @@ void TestMonsterSprite(void)
     // mainmenu loop
     while(le.HandleEvents())
     {
-	if(le.KeyPress(KEY_ESCAPE)) break;
+	if(Game::HotKeyPress(Game::EVENT_DEFAULT_EXIT)) break;
 
 	if(le.MouseClickLeft(pos))
 	{

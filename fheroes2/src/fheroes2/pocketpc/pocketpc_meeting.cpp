@@ -121,7 +121,7 @@ void PocketPC::HeroesMeeting(Heroes & hero1, Heroes & hero2)
     while(le.HandleEvents())
     {
         // exit
-        if(le.MouseClickLeft(rectExit) || le.KeyPress(KEY_ESCAPE)) break;
+        if(le.MouseClickLeft(rectExit) || HotKeyCloseWindow) break;
 
 	if(SelectArmyBar::QueueEventProcessing(selectArmy1, selectArmy2))
 	{

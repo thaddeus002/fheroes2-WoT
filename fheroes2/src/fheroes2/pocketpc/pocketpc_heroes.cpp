@@ -200,7 +200,8 @@ Dialog::answer_t PocketPC::HeroesOpenDialog(Heroes & hero, bool readonly)
         if(buttonPrev.isEnable() && le.MouseClickLeft(buttonPrev)) return Dialog::PREV;
 	else
         // exit
-        if(le.MouseClickLeft(buttonExit) || le.KeyPress(KEY_ESCAPE)) return Dialog::CANCEL;
+        if(le.MouseClickLeft(buttonExit) ||
+		Game::HotKeyPress(Game::EVENT_DEFAULT_EXIT)) return Dialog::CANCEL;
 	else
         // dismiss
 	if(buttonDismiss.isEnable() && le.MouseClickLeft(buttonDismiss) &&

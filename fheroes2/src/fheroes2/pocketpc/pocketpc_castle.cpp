@@ -252,7 +252,7 @@ screen_t CastleOpenDialog1(Castle & castle)
         if(castle.isBuild(BUILD_MAGEGUILD1) && le.MouseClickLeft(rectScreen6)) return SCREEN6;
         else
         // exit
-        if(le.MouseClickLeft(rectExit) || le.KeyPress(KEY_ESCAPE)) break;
+        if(le.MouseClickLeft(rectExit) || Game::HotKeyPress(Game::EVENT_DEFAULT_EXIT)) break;
 	else
         if(buttonNext.isEnable() && le.MouseClickLeft(buttonNext)) return SCREENOUT_NEXT;
         else
@@ -389,7 +389,7 @@ screen_t CastleOpenDialog2(Castle & castle)
         if(castle.isBuild(BUILD_MAGEGUILD1) && le.MouseClickLeft(rectScreen6)) return SCREEN6;
         else
         // exit
-        if(le.MouseClickLeft(rectExit) || le.KeyPress(KEY_ESCAPE)) break;
+        if(le.MouseClickLeft(rectExit) || Game::HotKeyPress(Game::EVENT_DEFAULT_EXIT)) break;
 
 	if(le.MouseCursor(dwelling1.GetArea()) && dwelling1.QueueEventProcessing()) { AGG::PlaySound(M82::BUILDTWN); castle.BuyBuilding(dwelling1()); return SCREEN1; }
 	else
@@ -493,7 +493,7 @@ screen_t CastleOpenDialog3(Castle & castle)
         if(castle.isBuild(BUILD_MAGEGUILD1) && le.MouseClickLeft(rectScreen6)) return SCREEN6;
         else
         // exit
-        if(le.MouseClickLeft(rectExit) || le.KeyPress(KEY_ESCAPE)) break;
+        if(le.MouseClickLeft(rectExit) || Game::HotKeyPress(Game::EVENT_DEFAULT_EXIT)) break;
 
 	if(le.MouseCursor(building1.GetArea()) && building1.QueueEventProcessing()) { AGG::PlaySound(M82::BUILDTWN); castle.BuyBuilding(building1()); return SCREEN1; }
 	else
@@ -614,7 +614,7 @@ screen_t CastleOpenDialog4(Castle & castle)
         if(castle.isBuild(BUILD_MAGEGUILD1) && le.MouseClickLeft(rectScreen6)) return SCREEN6;
         else
         // exit
-        if(le.MouseClickLeft(rectExit) || le.KeyPress(KEY_ESCAPE)) break;
+        if(le.MouseClickLeft(rectExit) || Game::HotKeyPress(Game::EVENT_DEFAULT_EXIT)) break;
 
 	if(le.MouseCursor(building1.GetArea()) && building1.QueueEventProcessing()) { AGG::PlaySound(M82::BUILDTWN); castle.BuyBuilding(building1()); return SCREEN1; }
 	else
@@ -739,7 +739,7 @@ screen_t CastleOpenDialog5(Castle & castle)
         if(castle.isBuild(BUILD_MAGEGUILD1) && le.MouseClickLeft(rectScreen6)) return SCREEN6;
         else
         // exit
-        if(le.MouseClickLeft(rectExit) || le.KeyPress(KEY_ESCAPE)) break;
+        if(le.MouseClickLeft(rectExit) || Game::HotKeyPress(Game::EVENT_DEFAULT_EXIT)) break;
 	else
 	if(hero1 && le.MouseClickLeft(rectRecruit1) &&
 	    Dialog::OK == castle.DialogBuyHero(hero1))
@@ -870,7 +870,7 @@ screen_t CastleOpenDialog6(Castle & castle)
         if(le.MouseClickLeft(rectScreen5)) return SCREEN5;
         else
         // exit
-        if(le.MouseClickLeft(rectExit) || le.KeyPress(KEY_ESCAPE)) break;
+        if(le.MouseClickLeft(rectExit) || Game::HotKeyPress(Game::EVENT_DEFAULT_EXIT)) break;
 	else
 	if(need_buy_book && le.MouseClickLeft(book_pos)) { const_cast<Heroes *>(hero)->BuySpellBook(&castle.GetMageGuild()); return SCREEN1; }
 

@@ -209,7 +209,7 @@ void Castle::OpenMageGuild(void)
     {
         le.MousePressLeft(buttonExit) ? buttonExit.PressDraw() : buttonExit.ReleaseDraw();
 
-        if(le.MouseClickLeft(buttonExit) || le.KeyPress(KEY_RETURN) || le.KeyPress(KEY_ESCAPE)) break;
+        if(le.MouseClickLeft(buttonExit) || HotKeyCloseWindow) break;
 
         spells1.QueueEventProcessing();
         spells2.QueueEventProcessing();

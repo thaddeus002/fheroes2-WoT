@@ -406,7 +406,7 @@ void PocketPC::KeyboardDialog(std::string & str)
     // mainmenu loop
     while(le.HandleEvents())
     {
-        if(le.MouseClickLeft(rectClose) || le.KeyPress(KEY_ESCAPE))
+        if(le.MouseClickLeft(rectClose) || Game::HotKeyPress(Game::EVENT_DEFAULT_EXIT))
 	{
 	    str.clear();
 	    break;

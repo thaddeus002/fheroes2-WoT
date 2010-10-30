@@ -128,10 +128,10 @@ Dialog::answer_t Castle::DialogBuyHero(const Heroes* hero)
 
         if(button1.isEnable() &&
     	    (le.MouseClickLeft(button1) ||
-    	    le.KeyPress(KEY_RETURN))) return Dialog::OK;
+    	    Game::HotKeyPress(Game::EVENT_DEFAULT_READY))) return Dialog::OK;
 
         if(le.MouseClickLeft(button2) ||
-    	    le.KeyPress(KEY_ESCAPE)) break;
+    	    Game::HotKeyPress(Game::EVENT_DEFAULT_EXIT)) break;
     }
 
     return Dialog::CANCEL;
@@ -426,7 +426,7 @@ u32 Castle::OpenTown(void)
     {
         le.MousePressLeft(buttonExit) ? buttonExit.PressDraw() : buttonExit.ReleaseDraw();
 
-        if(le.MouseClickLeft(buttonExit) || le.KeyPress(KEY_RETURN) || le.KeyPress(KEY_ESCAPE)) break;
+        if(le.MouseClickLeft(buttonExit) || HotKeyCloseWindow) break;
 
 	// click left
         if(le.MouseCursor(dwelling1.GetArea()) && dwelling1.QueueEventProcessing()) return dwelling1();

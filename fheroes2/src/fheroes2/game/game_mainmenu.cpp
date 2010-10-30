@@ -144,13 +144,13 @@ Game::menu_t Game::MainMenu(void)
             }
         }
 
-	if(HotKeyPress(EVENT_MENU_NEWGAME) || le.MouseClickLeft(buttonNewGame)) return NEWGAME;
+	if(HotKeyPress(EVENT_BUTTON_NEWGAME) || le.MouseClickLeft(buttonNewGame)) return NEWGAME;
 	else
-	if(HotKeyPress(EVENT_MENU_LOADGAME) || le.MouseClickLeft(buttonLoadGame)) return LOADGAME;
+	if(HotKeyPress(EVENT_BUTTON_LOADGAME) || le.MouseClickLeft(buttonLoadGame)) return LOADGAME;
 	else
-	if(HotKeyPress(EVENT_MENU_HIGHSCORES) || le.MouseClickLeft(buttonHighScores)) return HIGHSCORES;
+	if(HotKeyPress(EVENT_BUTTON_HIGHSCORES) || le.MouseClickLeft(buttonHighScores)) return HIGHSCORES;
 	else
-	if(HotKeyPress(EVENT_MENU_CREDITS) || le.MouseClickLeft(buttonCredits)) return CREDITS;
+	if(HotKeyPress(EVENT_BUTTON_CREDITS) || le.MouseClickLeft(buttonCredits)) return CREDITS;
 	else
 	if(HotKeyPress(EVENT_DEFAULT_EXIT) || le.MouseClickLeft(buttonQuit)) return QUITGAME;
 

@@ -256,6 +256,6 @@ void PocketPC::ThievesGuild(bool oracle)
     // message loop
     while(le.HandleEvents())
     {
-        if(le.MouseClickLeft(rectExit) || le.KeyPress(KEY_RETURN) || le.KeyPress(KEY_ESCAPE)) break;
+        if(le.MouseClickLeft(rectExit) || HotKeyCloseWindow) break;
     }
 }

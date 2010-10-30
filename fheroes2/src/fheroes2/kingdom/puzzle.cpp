@@ -147,7 +147,7 @@ void ShowStandardDialog(const Puzzle & pzl, const Surface & sf)
     while(le.HandleEvents())
     {
         le.MousePressLeft(buttonExit) ? buttonExit.PressDraw() : buttonExit.ReleaseDraw();
-        if(le.MouseClickLeft(buttonExit) || le.KeyPress(KEY_RETURN) || le.KeyPress(KEY_ESCAPE)) break;
+        if(le.MouseClickLeft(buttonExit) || HotKeyCloseWindow) break;
     }
 
     Interface::Basic::Get().SetRedraw(REDRAW_RADAR);
@@ -190,7 +190,7 @@ void ShowExtendedDialog(const Puzzle & pzl, const Surface & sf)
     while(le.HandleEvents())
     {
         le.MousePressLeft(buttonExit) ? buttonExit.PressDraw() : buttonExit.ReleaseDraw();
-        if(le.MouseClickLeft(buttonExit) || le.KeyPress(KEY_RETURN) || le.KeyPress(KEY_ESCAPE)) break;
+        if(le.MouseClickLeft(buttonExit) || HotKeyCloseWindow) break;
         if(Settings::Get().QVGA() && le.MouseClickLeft(frameborder.GetArea())) break;
     }
 }

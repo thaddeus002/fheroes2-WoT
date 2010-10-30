@@ -354,7 +354,7 @@ Dialog::answer_t Heroes::OpenDialog(bool readonly, bool fade)
 	}
 
         // exit
-	if(le.MouseClickLeft(buttonExit) || le.KeyPress(KEY_ESCAPE)) return Dialog::CANCEL;
+	if(le.MouseClickLeft(buttonExit) || Game::HotKeyPress(Game::EVENT_DEFAULT_EXIT)) return Dialog::CANCEL;
 
         // heroes troops
         if(le.MouseCursor(selectArmy.GetArea()))

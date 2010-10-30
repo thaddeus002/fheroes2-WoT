@@ -328,7 +328,8 @@ bool FH2LocalClient::ScenarioInfoDialog(void)
         le.MousePressLeft(buttonCancel) ? buttonCancel.PressDraw() : buttonCancel.ReleaseDraw();
 
 	// click select
-	if(le.KeyPress(KEY_s) || (buttonSelectMaps.isEnable() && le.MouseClickLeft(buttonSelectMaps)))
+	if(Game::HotKeyPress(Game::EVENT_BUTTON_SELECT) ||
+	    (buttonSelectMaps.isEnable() && le.MouseClickLeft(buttonSelectMaps)))
 	{
 	    cursor.Hide();
 	    sp.Hide();
@@ -361,11 +362,11 @@ bool FH2LocalClient::ScenarioInfoDialog(void)
 	}
 	else
 	// click cancel
-        if(le.MouseClickLeft(buttonCancel) || le.KeyPress(KEY_ESCAPE))
+        if(le.MouseClickLeft(buttonCancel) || Game::HotKeyPress(Game::EVENT_DEFAULT_EXIT))
     	    return false;
         else
         // click ok
-        if(le.KeyPress(KEY_RETURN) || (buttonOk.isEnable() && le.MouseClickLeft(buttonOk)))
+        if(Game::HotKeyPress(Game::EVENT_DEFAULT_READY) || (buttonOk.isEnable() && le.MouseClickLeft(buttonOk)))
     	{
 	    packet.Reset();
 	    packet.SetID(MSG_START_GAME);

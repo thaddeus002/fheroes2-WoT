@@ -73,8 +73,8 @@ Game::menu_t Game::Editor::MainMenu(void)
 	le.MousePressLeft(buttonLoadMap) ? buttonLoadMap.PressDraw() : buttonLoadMap.ReleaseDraw();
 	le.MousePressLeft(buttonCancelGame) ? buttonCancelGame.PressDraw() : buttonCancelGame.ReleaseDraw();
 
-	if(le.MouseClickLeft(buttonNewMap) || HotKeyPress(EVENT_MENU_NEWGAME)) return EDITNEWMAP;
-	if(le.MouseClickLeft(buttonLoadMap) || HotKeyPress(EVENT_MENU_LOADGAME)) return EDITLOADMAP;
+	if(le.MouseClickLeft(buttonNewMap) || HotKeyPress(EVENT_BUTTON_NEWGAME)) return EDITNEWMAP;
+	if(le.MouseClickLeft(buttonLoadMap) || HotKeyPress(EVENT_BUTTON_LOADGAME)) return EDITLOADMAP;
 	if(le.MouseClickLeft(buttonCancelGame) || HotKeyPress(EVENT_DEFAULT_EXIT)) return QUITGAME;
 
         // right info
