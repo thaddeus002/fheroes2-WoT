@@ -654,41 +654,39 @@ void Skill::Secondary::FillStandard(std::vector<skill_t> & v)
 u8 Skill::Secondary::GetWeightSkillFromRace(u8 race, u8 skill)
 {
     const skillstats_t* ptr = GetSkillStats(race);
-    u8 result = 0;
 
     if(ptr)
     {
-	if(skill == PATHFINDING)	result = ptr->mature_secondary.pathfinding;
+	if(skill == PATHFINDING)	return ptr->mature_secondary.pathfinding;
 	else
-	if(skill == ARCHERY)		result = ptr->mature_secondary.archery;
+	if(skill == ARCHERY)		return ptr->mature_secondary.archery;
 	else
-	if(skill == LOGISTICS)		result = ptr->mature_secondary.logistics;
+	if(skill == LOGISTICS)		return ptr->mature_secondary.logistics;
 	else
-	if(skill == SCOUTING)		result = ptr->mature_secondary.scouting;
+	if(skill == SCOUTING)		return ptr->mature_secondary.scouting;
 	else
-	if(skill == DIPLOMACY)		result = ptr->mature_secondary.diplomacy;
+	if(skill == DIPLOMACY)		return ptr->mature_secondary.diplomacy;
 	else
-	if(skill == NAVIGATION)		result = ptr->mature_secondary.navigation;
+	if(skill == NAVIGATION)		return ptr->mature_secondary.navigation;
 	else
-	if(skill == LEADERSHIP)		result = ptr->mature_secondary.leadership;
+	if(skill == LEADERSHIP)		return ptr->mature_secondary.leadership;
 	else
-	if(skill == WISDOM)		result = ptr->mature_secondary.wisdom;
+	if(skill == WISDOM)		return ptr->mature_secondary.wisdom;
 	else
-	if(skill == MYSTICISM)		result = ptr->mature_secondary.mysticism;
+	if(skill == MYSTICISM)		return ptr->mature_secondary.mysticism;
 	else
-	if(skill == LUCK)		result = ptr->mature_secondary.luck;
+	if(skill == LUCK)		return ptr->mature_secondary.luck;
 	else
-	if(skill == BALLISTICS)		result = ptr->mature_secondary.ballistics;
+	if(skill == BALLISTICS)		return ptr->mature_secondary.ballistics;
 	else
-	if(skill == EAGLEEYE)		result = ptr->mature_secondary.eagleeye;
+	if(skill == EAGLEEYE)		return ptr->mature_secondary.eagleeye;
 	else
-	if(skill == NECROMANCY)		result = ptr->mature_secondary.necromancy;
+	if(skill == NECROMANCY)		return ptr->mature_secondary.necromancy;
 	else
-	if(skill == ESTATES)		result = ptr->mature_secondary.estates;
+	if(skill == ESTATES)		return ptr->mature_secondary.estates;
     }
 
-    // return 1 because: allows manual set of skills
-    return 0 == result ? 1 : result;
+    return 0;
 }
 
 Skill::Secondary::skill_t Skill::Secondary::PriorityFromRace(u8 race, const std::vector<skill_t>& exclude)

@@ -43,7 +43,8 @@ void Rand::Queue::Reset(void)
 
 void Rand::Queue::Push(s32 value, u32 percent)
 {
-    push_back(std::make_pair(value, percent));
+    if(percent)
+	push_back(std::make_pair(value, percent));
 }
 
 size_t Rand::Queue::Size(void) const
@@ -62,10 +63,7 @@ s32 Rand::Queue::Get(void)
 
     // set weight (from 100)
     it = begin();
-    if(max)
-	for(; it != end(); ++it) (*it).second = 100 * (*it).second / max;
-    else
-	std::cerr << "Rand::Queue::Get:" << " max is 0" << std::endl;
+    for(; it != end(); ++it) (*it).second = 100 * (*it).second / max;
 
     // get max
     max = 0;
