@@ -36,7 +36,7 @@ namespace Game
     void HotKeysDefaults(void);
     void HotKeysLoad(const std::string &);
     const char* EventsName(events_t);
-    void KeyboardGlobalFilter(u32, u16);
+    void KeyboardGlobalFilter(int, u16);
 
     events_t & operator++ (events_t & evnt)
     {
@@ -277,7 +277,7 @@ void Game::HotKeysLoad(const std::string & hotkeys)
     }
 }
 
-void Game::KeyboardGlobalFilter(u32 sym, u16 mod)
+void Game::KeyboardGlobalFilter(int sym, u16 mod)
 {
     Display & display = Display::Get();
 

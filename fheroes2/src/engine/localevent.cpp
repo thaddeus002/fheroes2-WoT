@@ -671,7 +671,7 @@ void LocalEvent::SetGlobalFilterMouseEvents(void (*pf)(u16, u16))
     redraw_cursor_func = pf;
 }
 
-void LocalEvent::SetGlobalFilterKeysEvents(void (*pf)(u32, u16))
+void LocalEvent::SetGlobalFilterKeysEvents(void (*pf)(int, u16))
 {
     keyboard_filter_func = pf;
 }

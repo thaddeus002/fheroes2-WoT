@@ -54,7 +54,7 @@ namespace Game
 {
     u8 GetMixerChannelFromObject(const Maps::Tiles &);
     void AnimateDelaysInitialize(void);
-    void KeyboardGlobalFilter(u32, u16);
+    void KeyboardGlobalFilter(int, u16);
     void UpdateGlobalDefines(const std::string &);
     void LoadExternalResource(const Settings &);
 
