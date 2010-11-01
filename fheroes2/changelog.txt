@@ -1,4 +1,14 @@
-SVN - up to r1976
+SVN - up to r2021
+
+Nov, 1, 2010
++ Fixed: localized date/time string (load/save dialog)
++ Fixed: scroll and left click for pocketpc
++ Fixed: initial double spell book (occurrence possibility)
++ Fixed: battle move troops
++ Added: "battle speed" settings
++ Added: new hotkeys engine, added fheroes2.key
++ Fixed: battle retreat/surrender with captain
++ Fixed: temple - protects from participation in battle
 
 Oct, 12, 2010
 + Fixed: spell cost for Summonig Elem. to 30 mp
