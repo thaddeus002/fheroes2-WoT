@@ -308,7 +308,7 @@ void Battle2::Arena::ApplyActionAttack(Action & action)
 		if(b2->Modes(SP_BLIND)) b2->ResetBlind();
 
 		// twice attack
-		if(b1->isValid() && b1->isTwiceAttack())
+		if(b1->isValid() && b1->isTwiceAttack() && !b1->Modes(IS_PARALYZE_MAGIC))
 		    BattleProcess(*b1, *b2);
 	    }
 	}
