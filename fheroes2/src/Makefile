@@ -22,8 +22,8 @@ SDL_LIBS := $(SDL_LIBS) -lSDL_mixer
 endif
 
 ifndef WITHOUT_IMAGE
-CFLAGS := $(CFLAGS) -DWITH_IMAGE $(shell libpng12-config --cflags) -DWITH_ZLIB
-SDL_LIBS := $(SDL_LIBS) -lSDL_image $(shell libpng12-config --libs) -lz
+CFLAGS := $(CFLAGS) -DWITH_IMAGE $(shell libpng-config --cflags) -DWITH_ZLIB
+SDL_LIBS := $(SDL_LIBS) -lSDL_image $(shell libpng-config --libs) -lz
 endif
 
 ifndef WITHOUT_UNICODE
