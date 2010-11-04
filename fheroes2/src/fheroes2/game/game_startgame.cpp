@@ -314,7 +314,7 @@ void Game::OpenCastle(Castle *castle)
     if(it != myCastles.end())
     {
 	globalfocus.Set(*it);
-	if(const Heroes *hero = (*it)->GetHeroes()) globalfocus.Set(hero);
+	globalfocus.Set((*it)->GetHeroes());
     }
     globalfocus.SetRedraw();
 

@@ -38,8 +38,8 @@ namespace Game
 
    	static Focus &	Get(void);
 
-	void		Set(const Heroes *hr);
-	void		Set(const Castle *cs);
+	void		Set(Heroes *hr);
+	void		Set(Castle *cs);
 	void		SetRedraw(void);
 	void		Reset(const focus_t priority = UNSEL);
 

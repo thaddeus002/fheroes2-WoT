@@ -41,19 +41,20 @@ Game::Focus & Game::Focus::Get(void)
     return gfocus;
 }
 
-void Game::Focus::Set(const Heroes *hr)
+void Game::Focus::Set(Heroes *hero2)
 {
-    if(NULL == hr) return;
+    if(NULL == hero2) return;
 
-    if(heroes && hr != heroes)
+    if(castle)
+	castle = NULL;
+
+    if(heroes && hero2 != heroes)
     {
 	heroes->SetMove(false);
         heroes->ShowPath(false);
     }
 
-    heroes = const_cast<Heroes *>(hr);
-    castle = NULL;
-
+    heroes = hero2;
     heroes->RescanPath();
     heroes->ShowPath(true);
 
@@ -61,35 +62,33 @@ void Game::Focus::Set(const Heroes *hr)
     
     I.iconsPanel.Select(*heroes);
     I.gameArea.Center(heroes->GetCenter());
-
-    AGG::PlayMusic(MUS::FromGround(world.GetTiles(hr->GetCenter()).GetGround()));
-    Game::EnvironmentSoundMixer();
-    
     I.statusWindow.SetState(STATUS_ARMY);
+
+    AGG::PlayMusic(MUS::FromGround(world.GetTiles(heroes->GetCenter()).GetGround()));
+    Game::EnvironmentSoundMixer();    
 }
 
-void Game::Focus::Set(const Castle *cs)
+void Game::Focus::Set(Castle *castle2)
 {
-    if(NULL == cs) return;
+    if(NULL == castle2) return;
 
     if(heroes)
     {
 	heroes->SetMove(false);
         heroes->ShowPath(false);
+	heroes = NULL;
     }
 
-    castle = const_cast<Castle *>(cs);
-    heroes = NULL;
+    castle = castle2;
 
     Interface::Basic & I = Interface::Basic::Get();
 
     I.iconsPanel.Select(*castle);
     I.gameArea.Center(castle->GetCenter());
-
-    AGG::PlayMusic(MUS::FromGround(world.GetTiles(cs->GetCenter()).GetGround()));
-    Game::EnvironmentSoundMixer();
-
     I.statusWindow.SetState(STATUS_FUNDS);
+
+    AGG::PlayMusic(MUS::FromGround(world.GetTiles(castle->GetCenter()).GetGround()));
+    Game::EnvironmentSoundMixer();
 }
 
 void Game::Focus::Reset(const focus_t priority)

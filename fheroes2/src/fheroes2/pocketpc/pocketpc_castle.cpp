@@ -34,7 +34,7 @@
 #include "world.h"
 #include "selectarmybar.h"
 #include "buildinginfo.h"
-#include "portrait.h"
+#include "profit.h"
 #include "pocketpc.h"
 
 class DwellingBar : protected Rect
@@ -215,7 +215,7 @@ screen_t CastleOpenDialog1(Castle & castle)
     // update extra description
     std::string description_castle = castle.GetDescriptionBuilding(BUILD_CASTLE, castle.GetRace());
     {
-        payment_t profit;
+        payment_t profit = ProfitConditions::FromBuilding(BUILD_CASTLE, castle.GetRace());
         String::Replace(description_castle, "%{count}", profit.gold);
     }
 
