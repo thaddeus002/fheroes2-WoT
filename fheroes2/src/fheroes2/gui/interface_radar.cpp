@@ -86,14 +86,13 @@ void Interface::Radar::SetPos(s16 ox, s16 oy)
 	Rect::y = oy + BORDERWIDTH;
 
 	border.SetPosition(ox, oy, Rect::w, Rect::h);
+	Settings::Get().SetPosRadar(*this);
     }
     else
     {
 	Rect::x = ox;
 	Rect::y = oy;
     }
-
-    Settings::Get().SetPosRadar(*this);
 }
 
 const Rect & Interface::Radar::GetArea(void) const
@@ -354,7 +353,7 @@ void Interface::Radar::QueueEventProcessing(void)
 	}
 	cursor.Hide();
 	SetPos(mp.x - ox, mp.y - oy);
-	cursorArea->Show();
+	RedrawCursor();
     	Interface::Basic::Get().SetRedraw(REDRAW_GAMEAREA);
     }
     else

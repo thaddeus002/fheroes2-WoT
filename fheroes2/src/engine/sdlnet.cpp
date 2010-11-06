@@ -128,12 +128,22 @@ void QueueMessage::SoftReset(void)
     itd1 = data;
 }
 
+void QueueMessage::Push(s8 byte8)
+{
+    Push(static_cast<u8>(byte8));
+}
+
 void QueueMessage::Push(u8 byte8)
 {
     if(data + dtsz < itd2 + 1) Resize(1);
 
     *itd2 = byte8;
     ++itd2;
+}
+
+void QueueMessage::Push(s16 byte16)
+{
+    Push(static_cast<u16>(byte16));
 }
 
 void QueueMessage::Push(u16 byte16)
@@ -145,6 +155,11 @@ void QueueMessage::Push(u16 byte16)
 
     *itd2 = 0x00FF & byte16;
     ++itd2;
+}
+
+void QueueMessage::Push(s32 byte32)
+{
+    Push(static_cast<u32>(byte32));
 }
 
 void QueueMessage::Push(u32 byte32)

@@ -1117,9 +1117,9 @@ u32 Army::army_t::GetDamageMax(void) const
     return count ? res / count : 0;
 }
 
-u32 Army::army_t::GetStrength(void) const
+double Army::army_t::GetStrength(void) const
 {
-    return (GetDamageMin() + GetDamageMax()) / 2 * GetHitPoints();
+    return (GetDamageMin() + GetDamageMax()) / static_cast<double>(2 * GetHitPoints());
 }
 
 bool Army::army_t::StrongerEnemyArmy(const army_t & army2) const
@@ -1133,17 +1133,24 @@ bool Army::army_t::StrongerEnemyArmy(const army_t & army2) const
     double r2 = 0;
 
     if(a1 > d2)
-        r1 = 1 + 0.1 * std::min(a1 - d2, 20);
+        r1 = 1 + 0.1 * static_cast<double>(std::min(a1 - d2, 20));
     else
-        r1 = 1 + 0.05 * std::min(d2 - a1, 14);
+        r1 = 1 + 0.05 * static_cast<double>(std::min(d2 - a1, 14));
 
     if(a2 > d1)
-        r2 = 1 + 0.1 * std::min(a2 - d1, 20);
+        r2 = 1 + 0.1 * static_cast<double>(std::min(a2 - d1, 20));
     else
-        r2 = 1 + 0.05 * std::min(d1 - a2, 14);
+        r2 = 1 + 0.05 * static_cast<double>(std::min(d1 - a2, 14));
 
     r1 *= GetStrength();
     r2 *= army2.GetStrength();
+
+    if(IS_DEBUG(DBG_GAME, DBG_INFO))
+    {
+	Dump();
+	army2.Dump();
+	VERBOSE("Army::StrongerEnemyArmy: " << "army1: " << r1 << ", army2: " << r2);
+    }
 
     return 0 == r2 || 1 <= (r1 / r2);
 }

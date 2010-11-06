@@ -96,8 +96,11 @@ public:
     void	SetID(u16);
 
     void	Push(u8);
+    void	Push(s8);
     void	Push(u16);
+    void	Push(s16);
     void	Push(u32);
+    void	Push(s32);
     void	Push(const std::string &);
     void	Push(const char*);
 

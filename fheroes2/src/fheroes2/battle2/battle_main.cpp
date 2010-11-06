@@ -149,9 +149,6 @@ Battle2::Result Battle2::Loader(Army::army_t & army1, Army::army_t & army2, u16 
     {
 	// hard reset army
 	if(!army1.isValid() || (result.army1 & RESULT_RETREAT)) army1.Reset(false);
-        else
-        // FIX: surrender cost
-        if(result.army1 & RESULT_SURRENDER);
     }
 
     // update army
@@ -159,9 +156,6 @@ Battle2::Result Battle2::Loader(Army::army_t & army1, Army::army_t & army2, u16 
     {
 	// hard reset army
         if(!army2.isValid() || (result.army2 & RESULT_RETREAT)) army2.Reset(false);
-	else
-        // FIX: surrender cost
-        if(result.army2 & RESULT_SURRENDER);
     }
 
     if(conf.ExtLowMemory())

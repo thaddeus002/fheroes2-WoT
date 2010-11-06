@@ -310,6 +310,24 @@ void Resource::BoxSprite::SetPos(s16 px, s16 py)
     y = py;
 }
 
+void RedrawResourceSprite(const Surface & sf, const Point & pos,
+		    u8 count, u16 width, u8 offset, s32 value)
+{
+    Display & display = Display::Get();
+    Point dst_pt;
+    std::string str;
+    Text text;
+
+    dst_pt.x = pos.x + width / 2 + count * width;
+    dst_pt.y = pos.y + offset;
+
+    display.Blit(sf, dst_pt.x - sf.w() / 2, dst_pt.y - sf.h());
+
+    String::AddInt(str, value);
+    text.Set(str, Font::SMALL);
+    text.Blit(dst_pt.x - text.w() / 2, dst_pt.y + 2);
+}
+
 void Resource::BoxSprite::Redraw(void) const
 {
     const u8 valid_resource = rs.GetValidItems();
@@ -320,58 +338,24 @@ void Resource::BoxSprite::Redraw(void) const
     u8 count = 0;
     u8 offset = 35;
 
-    std::string str;
-    Point dst_pt;
-    Display & display = Display::Get();
-
     if(rs.wood)
     {
 	const Sprite & sprite = AGG::GetICN(ICN::RESOURCE, 0);
-	dst_pt.x = x + width / 2 + count * width - sprite.w() / 2;
-	dst_pt.y = y - sprite.h() + offset;
-	display.Blit(sprite, dst_pt);
-
-	str.clear();
-	String::AddInt(str, rs.wood);
-	Text text(str, Font::SMALL);
-	dst_pt.x = x + width / 2 + count * width - text.w() / 2;
-	dst_pt.y = y + 2 + offset;
-	text.Blit(dst_pt);
-
+	RedrawResourceSprite(sprite, Point(x, y), count, width, offset, rs.wood);
 	++count;
     }
 
     if(rs.ore)
     {
 	const Sprite & sprite = AGG::GetICN(ICN::RESOURCE, 2);
-	dst_pt.x = x + width / 2 + count * width - sprite.w() / 2;
-	dst_pt.y = y - sprite.h() + offset;
-	display.Blit(sprite, dst_pt);
-
-	str.clear();
-	String::AddInt(str, rs.ore);
-	Text text(str, Font::SMALL);
-	dst_pt.x = x + width / 2 + count * width - text.w() / 2;
-	dst_pt.y = y + 2 + offset;
-	text.Blit(dst_pt);
-
+	RedrawResourceSprite(sprite, Point(x, y), count, width, offset, rs.ore);
 	++count;
     }
 
     if(rs.mercury)
     {
 	const Sprite & sprite = AGG::GetICN(ICN::RESOURCE, 1);
-	dst_pt.x = x + width / 2 + count * width - sprite.w() / 2;
-	dst_pt.y = y - sprite.h() + offset;
-	display.Blit(sprite, dst_pt);
-
-	str.clear();
-	String::AddInt(str, rs.mercury);
-	Text text(str, Font::SMALL);
-	dst_pt.x = x + width / 2 + count * width - text.w() / 2;
-	dst_pt.y = y + 2 + offset;
-	text.Blit(dst_pt);
-
+	RedrawResourceSprite(sprite, Point(x, y), count, width, offset, rs.mercury);
 	++count;
     }
 
@@ -380,17 +364,7 @@ void Resource::BoxSprite::Redraw(void) const
     if(rs.sulfur)
     {
 	const Sprite & sprite = AGG::GetICN(ICN::RESOURCE, 3);
-	dst_pt.x = x + width / 2 + count * width - sprite.w() / 2;
-	dst_pt.y = y - sprite.h() + offset;
-	display.Blit(sprite, dst_pt);
-
-	str.clear();
-	String::AddInt(str, rs.sulfur);
-	Text text(str, Font::SMALL);
-	dst_pt.x = x + width / 2 + count * width - text.w() / 2;
-	dst_pt.y = y + 2 + offset;
-	text.Blit(dst_pt);
-
+	RedrawResourceSprite(sprite, Point(x, y), count, width, offset, rs.sulfur);
 	++count;
     }
 
@@ -398,17 +372,7 @@ void Resource::BoxSprite::Redraw(void) const
     if(rs.crystal)
     {
 	const Sprite & sprite = AGG::GetICN(ICN::RESOURCE, 4);
-	dst_pt.x = x + width / 2 + count * width - sprite.w() / 2;
-	dst_pt.y = y - sprite.h()  + offset;
-	display.Blit(sprite, dst_pt);
-
-	str.clear();
-	String::AddInt(str, rs.crystal);
-	Text text(str, Font::SMALL);
-	dst_pt.x = x + width / 2 + count * width - text.w() / 2;
-	dst_pt.y = y + 2 + offset;
-	text.Blit(dst_pt);
-
+	RedrawResourceSprite(sprite, Point(x, y), count, width, offset, rs.crystal);
 	++count;
     }
 
@@ -416,17 +380,7 @@ void Resource::BoxSprite::Redraw(void) const
     if(rs.gems)
     {
 	const Sprite & sprite = AGG::GetICN(ICN::RESOURCE, 5);
-	dst_pt.x = x + width / 2 + count * width - sprite.w() / 2;
-	dst_pt.y = y - sprite.h() + offset;
-	display.Blit(sprite, dst_pt);
-
-	str.clear();
-	String::AddInt(str, rs.gems);
-	Text text(str, Font::SMALL);
-	dst_pt.x = x + width / 2 + count * width - text.w() / 2;
-	dst_pt.y = y + 2 + offset;
-	text.Blit(dst_pt);
-
+	RedrawResourceSprite(sprite, Point(x, y), count, width, offset, rs.gems);
 	++count;
     }
 
@@ -435,15 +389,6 @@ void Resource::BoxSprite::Redraw(void) const
     {
 	const Sprite & sprite = AGG::GetICN(ICN::RESOURCE, 6);
 	if(! count) width = w;
-	dst_pt.x = x + width / 2 + count * width - sprite.w() / 2;
-	dst_pt.y = y - sprite.h() + offset;
-	display.Blit(sprite, dst_pt);
-
-	str.clear();
-	String::AddInt(str, rs.gold);
-	Text text(str, Font::SMALL);
-	dst_pt.x = x + width / 2 + count * width - text.w() / 2;
-	dst_pt.y = y + 2 + offset;
-	text.Blit(dst_pt);
+	RedrawResourceSprite(sprite, Point(x, y), count, width, offset, rs.gold);
     }
 }

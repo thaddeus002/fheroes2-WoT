@@ -29,6 +29,75 @@
 #include "kingdom.h"
 #include "dialog.h"
 
+void RedrawCurrentInfo(const Point & pos, u16 available, u32 result,
+	    const payment_t & paymentMonster, const payment_t & paymentCosts)
+{
+    std::string str;
+    Text text;
+
+    str = _("Available: %{count}");
+    String::Replace(str, "%{count}", available);
+    text.Set(str, Font::SMALL);
+    text.Blit(pos.x + 70 - text.w() / 2, pos.y + 130);
+    str.clear();
+    String::AddInt(str, result);
+    text.Set(str, Font::BIG);
+    text.Blit(pos.x + 167 - text.w() / 2, pos.y + 160);
+    if(paymentMonster.ore ||
+       paymentMonster.wood ||
+       paymentMonster.mercury ||
+       paymentMonster.crystal ||
+       paymentMonster.sulfur ||
+       paymentMonster.gems)
+    {
+	str.clear();
+	String::AddInt(str, paymentCosts.gold);
+	text.Set(str, Font::SMALL);
+	text.Blit(pos.x + 133 - text.w() / 2, pos.y + 228);
+	str.clear();
+	if(paymentMonster.ore) String::AddInt(str, paymentCosts.ore); 
+        else
+	if(paymentMonster.wood) String::AddInt(str, paymentCosts.wood);
+        else
+        if(paymentMonster.mercury) String::AddInt(str, paymentCosts.mercury);
+        else
+        if(paymentMonster.crystal) String::AddInt(str, paymentCosts.crystal);
+        else
+        if(paymentMonster.sulfur) String::AddInt(str, paymentCosts.sulfur);
+        else
+        if(paymentMonster.gems) String::AddInt(str, paymentCosts.gems);
+	text.Set(str, Font::SMALL);
+	text.Blit(pos.x + 195 - text.w() / 2, pos.y + 228);
+    }
+    else
+    {
+	str.clear();
+	String::AddInt(str, paymentCosts.gold);
+	text.Set(str, Font::SMALL);
+	text.Blit(pos.x + 160 - text.w() / 2, pos.y + 228);
+    }
+}
+
+void RedrawResourceInfo(const Surface & sres, const Point & pos, s32 value,
+	u8 px1, u8 py1, u8 px2, u8 py2)
+{
+    Display & display = Display::Get();
+    Point dst_pt;
+    std::string str;
+    Text text;
+
+    dst_pt.x = pos.x + px1;
+    dst_pt.y = pos.y + py1;
+    display.Blit(sres, dst_pt);
+
+    String::AddInt(str, value);
+    text.Set(str, Font::SMALL);
+
+    dst_pt.x = pos.x + px2 - text.w() / 2;
+    dst_pt.y = pos.y + py2;
+    text.Blit(dst_pt);
+}
+
 u16 Dialog::RecruitMonster(const Monster & monster, u16 available)
 {
     Display & display = Display::Get();
@@ -125,120 +194,66 @@ u16 Dialog::RecruitMonster(const Monster & monster, u16 available)
     if(paymentMonster.crystal)
     {
         const Sprite & sres = AGG::GetICN(ICN::RESOURCE, 4);
-        dst_pt.x = pos.x + 225;
-        dst_pt.y = pos.y + 75;
-        display.Blit(sres, dst_pt);
-
-        dst_pt.x = pos.x + 180;
-        dst_pt.y = pos.y + 200;
-        display.Blit(sres, dst_pt);
-
-        str.clear();
-        String::AddInt(str, paymentMonster.crystal);
-	text.Set(str);
-        dst_pt.x = pos.x + 240 - text.w() / 2;
-        dst_pt.y = pos.y + 103;
-        text.Blit(dst_pt);
+	RedrawResourceInfo(sres, pos, paymentMonster.crystal,
+				225, 75, 240, 103);
+	dst_pt.x = pos.x + 180;
+	dst_pt.y = pos.y + 200;
+	display.Blit(sres, dst_pt);
     }
     else
     // mercury
     if(paymentMonster.mercury)
     {
         const Sprite & sres = AGG::GetICN(ICN::RESOURCE, 1);
-        dst_pt.x = pos.x + 225;
-        dst_pt.y = pos.y + 72;
-        display.Blit(sres, dst_pt);
-
-        dst_pt.x = pos.x + 180;
-        dst_pt.y = pos.y + 197;
-        display.Blit(sres, dst_pt);
-
-        str.clear();
-        String::AddInt(str, paymentMonster.mercury);
-	text.Set(str);
-        dst_pt.x = pos.x + 240 - text.w() / 2;
-        dst_pt.y = pos.y + 103;
-        text.Blit(dst_pt);
+	RedrawResourceInfo(sres, pos, paymentMonster.mercury,
+				225, 72, 240, 103);
+	dst_pt.x = pos.x + 180;
+	dst_pt.y = pos.y + 197;
+	display.Blit(sres, dst_pt);
     }
     else
     // wood
     if(paymentMonster.wood)
     {
         const Sprite & sres = AGG::GetICN(ICN::RESOURCE, 0);
-        dst_pt.x = pos.x + 225;
-        dst_pt.y = pos.y + 72;
-        display.Blit(sres, dst_pt);
-
-        dst_pt.x = pos.x + 180;
-        dst_pt.y = pos.y + 197;
-        display.Blit(sres, dst_pt);
-
-        str.clear();
-        String::AddInt(str, paymentMonster.wood);
-	text.Set(str);
-        dst_pt.x = pos.x + 240 - text.w() / 2;
-        dst_pt.y = pos.y + 103;
-        text.Blit(dst_pt);
+	RedrawResourceInfo(sres, pos, paymentMonster.wood,
+				225, 72, 240, 103);
+	dst_pt.x = pos.x + 180;
+	dst_pt.y = pos.y + 197;
+	display.Blit(sres, dst_pt);
     }
     else
     // ore
     if(paymentMonster.ore)
     {
         const Sprite & sres = AGG::GetICN(ICN::RESOURCE, 2);
-        dst_pt.x = pos.x + 225;
-        dst_pt.y = pos.y + 72;
-        display.Blit(sres, dst_pt);
-
-        dst_pt.x = pos.x + 180;
-        dst_pt.y = pos.y + 197;
-        display.Blit(sres, dst_pt);
-
-        str.clear();
-        String::AddInt(str, paymentMonster.ore);
-	text.Set(str);
-        dst_pt.x = pos.x + 240 - text.w() / 2;
-        dst_pt.y = pos.y + 103;
-        text.Blit(dst_pt);
+	RedrawResourceInfo(sres, pos, paymentMonster.ore,
+				225, 72, 240, 103);
+	dst_pt.x = pos.x + 180;
+	dst_pt.y = pos.y + 197;
+	display.Blit(sres, dst_pt);
     }
     else
     // sulfur
     if(paymentMonster.sulfur)
     {
         const Sprite & sres = AGG::GetICN(ICN::RESOURCE, 3);
-        dst_pt.x = pos.x + 225;
-        dst_pt.y = pos.y + 75;
-        display.Blit(sres, dst_pt);
-
-        dst_pt.x = pos.x + 180;
-        dst_pt.y = pos.y + 200;
-        display.Blit(sres, dst_pt);
-
-        str.clear();
-        String::AddInt(str, paymentMonster.sulfur);
-	text.Set(str);
-        dst_pt.x = pos.x + 240 - text.w() / 2;
-        dst_pt.y = pos.y + 103;
-        text.Blit(dst_pt);
+	RedrawResourceInfo(sres, pos, paymentMonster.sulfur,
+				225, 75, 240, 103);
+	dst_pt.x = pos.x + 180;
+	dst_pt.y = pos.y + 200;
+	display.Blit(sres, dst_pt);
     }
     else
     // gems
     if(paymentMonster.gems)
     {
         const Sprite & sres = AGG::GetICN(ICN::RESOURCE, 5);
-        dst_pt.x = pos.x + 225;
-        dst_pt.y = pos.y + 75;
-        display.Blit(sres, dst_pt);
-
-        dst_pt.x = pos.x + 180;
-        dst_pt.y = pos.y + 200;
-        display.Blit(sres, dst_pt);
-
-        str.clear();
-        String::AddInt(str, paymentMonster.gems);
-	text.Set(str);
-        dst_pt.x = pos.x + 240 - text.w() / 2;
-        dst_pt.y = pos.y + 103;
-        text.Blit(dst_pt);
+	RedrawResourceInfo(sres, pos, paymentMonster.gems,
+				225, 75, 240, 103);
+	dst_pt.x = pos.x + 180;
+	dst_pt.y = pos.y + 200;
+	display.Blit(sres, dst_pt);
     }
 
     // text number buy
@@ -250,50 +265,7 @@ u16 Dialog::RecruitMonster(const Monster & monster, u16 available)
     Background static_info(Rect(pos.x + 16, pos.y + 125, pos.w - 32, 122));
     static_info.Save();
 
-#define RedrawCurrentInfo \
-    str = _("Available: %{count}"); \
-    String::Replace(str, "%{count}", available); \
-    text.Set(str, Font::SMALL); \
-    text.Blit(pos.x + 70 - text.w() / 2, pos.y + 130); \
-    str.clear(); \
-    String::AddInt(str, result); \
-    text.Set(str, Font::BIG); \
-    text.Blit(pos.x + 167 - text.w() / 2, pos.y + 160); \
-    if(paymentMonster.ore || \
-       paymentMonster.wood || \
-       paymentMonster.mercury || \
-       paymentMonster.crystal || \
-       paymentMonster.sulfur || \
-       paymentMonster.gems) \
-    { \
-	str.clear(); \
-	String::AddInt(str, paymentCosts.gold); \
-	text.Set(str, Font::SMALL); \
-	text.Blit(pos.x + 133 - text.w() / 2, pos.y + 228); \
-	str.clear(); \
-	if(paymentMonster.ore) String::AddInt(str, paymentCosts.ore); \
-        else \
-	if(paymentMonster.wood) String::AddInt(str, paymentCosts.wood); \
-        else \
-        if(paymentMonster.mercury) String::AddInt(str, paymentCosts.mercury); \
-        else \
-        if(paymentMonster.crystal) String::AddInt(str, paymentCosts.crystal); \
-        else \
-        if(paymentMonster.sulfur) String::AddInt(str, paymentCosts.sulfur); \
-        else \
-        if(paymentMonster.gems) String::AddInt(str, paymentCosts.gems); \
-	text.Set(str, Font::SMALL); \
-	text.Blit(pos.x + 195 - text.w() / 2, pos.y + 228); \
-    } \
-    else \
-    { \
-	str.clear(); \
-	String::AddInt(str, paymentCosts.gold); \
-	text.Set(str, Font::SMALL); \
-	text.Blit(pos.x + 160 - text.w() / 2, pos.y + 228); \
-    }
-
-    RedrawCurrentInfo;
+    RedrawCurrentInfo(pos, available, result, paymentMonster, paymentCosts);
 
     // buttons
     dst_pt.x = pos.x + 34;
@@ -366,7 +338,7 @@ u16 Dialog::RecruitMonster(const Monster & monster, u16 available)
 	{
 	    cursor.Hide();
 	    static_info.Restore();
-	    RedrawCurrentInfo;
+	    RedrawCurrentInfo(pos, available, result, paymentMonster, paymentCosts);
 	    cursor.Show();
 	    display.Flip();
 	    redraw = false;
@@ -453,96 +425,48 @@ void Dialog::DwellingInfo(const Monster & monster, u16 available)
     if(paymentMonster.crystal)
     {
 	const Sprite & sres = AGG::GetICN(ICN::RESOURCE, 4);
-	dst_pt.x = pos.x + 225;
-	dst_pt.y = pos.y + 75;
-	display.Blit(sres, dst_pt);
-
-	str.clear();
-	String::AddInt(str, paymentMonster.crystal);
-	text.Set(str);
-	dst_pt.x = pos.x + 240 - text.w() / 2;
-	dst_pt.y = pos.y + 103;
-	text.Blit(dst_pt);
+	RedrawResourceInfo(sres, pos, paymentMonster.crystal,
+				225, 75, 240, 103);
     }
     else
     // mercury
     if(paymentMonster.mercury)
     {
 	const Sprite & sres = AGG::GetICN(ICN::RESOURCE, 1);
-	dst_pt.x = pos.x + 225;
-	dst_pt.y = pos.y + 72;
-	display.Blit(sres, dst_pt);
-
-	str.clear();
-	String::AddInt(str, paymentMonster.mercury);
-	text.Set(str);
-	dst_pt.x = pos.x + 240 - text.w() / 2;
-	dst_pt.y = pos.y + 103;
-	text.Blit(dst_pt);
+	RedrawResourceInfo(sres, pos, paymentMonster.mercury,
+				225, 72, 240, 103);
     }
     else
     // wood
     if(paymentMonster.wood)
     {
 	const Sprite & sres = AGG::GetICN(ICN::RESOURCE, 0);
-	dst_pt.x = pos.x + 225;
-	dst_pt.y = pos.y + 72;
-	display.Blit(sres, dst_pt);
-
-	str.clear();
-	String::AddInt(str, paymentMonster.wood);
-	text.Set(str);
-	dst_pt.x = pos.x + 240 - text.w() / 2;
-	dst_pt.y = pos.y + 103;
-	text.Blit(dst_pt);
+	RedrawResourceInfo(sres, pos, paymentMonster.wood,
+				225, 72, 240, 103);
     }
     else
     // ore
     if(paymentMonster.ore)
     {
 	const Sprite & sres = AGG::GetICN(ICN::RESOURCE, 2);
-	dst_pt.x = pos.x + 225;
-	dst_pt.y = pos.y + 72;
-	display.Blit(sres, dst_pt);
-
-	str.clear();
-	String::AddInt(str, paymentMonster.ore);
-	text.Set(str);
-	dst_pt.x = pos.x + 240 - text.w() / 2;
-	dst_pt.y = pos.y + 103;
-	text.Blit(dst_pt);
+	RedrawResourceInfo(sres, pos, paymentMonster.ore,
+				225, 72, 240, 103);
     }
     else
     // sulfur
     if(paymentMonster.sulfur)
     {
 	const Sprite & sres = AGG::GetICN(ICN::RESOURCE, 3);
-	dst_pt.x = pos.x + 225;
-	dst_pt.y = pos.y + 75;
-	display.Blit(sres, dst_pt);
-
-	str.clear();
-	String::AddInt(str, paymentMonster.sulfur);
-	text.Set(str);
-	dst_pt.x = pos.x + 240 - text.w() / 2;
-	dst_pt.y = pos.y + 103;
-	text.Blit(dst_pt);
+	RedrawResourceInfo(sres, pos, paymentMonster.sulfur,
+				225, 75, 240, 103);
     }
     else
     // gems
     if(paymentMonster.gems)
     {
 	const Sprite & sres = AGG::GetICN(ICN::RESOURCE, 5);
-	dst_pt.x = pos.x + 225;
-	dst_pt.y = pos.y + 75;
-	display.Blit(sres, dst_pt);
-
-	str.clear();
-	String::AddInt(str, paymentMonster.gems);
-	text.Set(str);
-	dst_pt.x = pos.x + 240 - text.w() / 2;
-	dst_pt.y = pos.y + 103;
-	text.Blit(dst_pt);
+	RedrawResourceInfo(sres, pos, paymentMonster.gems,
+				225, 75, 240, 103);
     }
 
     // text available

@@ -91,6 +91,7 @@ void Interface::StatusWindow::SetPos(s16 ox, s16 oy)
 	Rect::y = oy + BORDERWIDTH;
 
 	border.SetPosition(ox, oy, Rect::w, Rect::h);
+	Settings::Get().SetPosStatus(*this);
     }
     else
     {
@@ -98,8 +99,6 @@ void Interface::StatusWindow::SetPos(s16 ox, s16 oy)
 	Rect::y = oy;
 	Rect::h = Display::Get().h() - oy - BORDERWIDTH;
     }
-
-    Settings::Get().SetPosStatus(*this);
 }
 
 const Rect & Interface::StatusWindow::GetArea(void) const

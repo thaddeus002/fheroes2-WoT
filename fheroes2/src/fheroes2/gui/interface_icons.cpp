@@ -323,6 +323,7 @@ void Interface::IconsPanel::SetPos(s16 ox, s16 oy)
         Rect::y = oy + BORDERWIDTH;
 
         border.SetPosition(ox, oy, Rect::w, Rect::h);
+	Settings::Get().SetPosIcons(*this);
     }
     else
     {
@@ -331,7 +332,6 @@ void Interface::IconsPanel::SetPos(s16 ox, s16 oy)
     }
 
     SetCount(icons);
-    Settings::Get().SetPosIcons(*this);
 }
 
 void Interface::IconsPanel::SetCount(u8 count)

@@ -929,6 +929,8 @@ u8 Settings::GetUnions(u8 cl) const
 
 bool Settings::IsUnions(u8 cl1, u8 cl2) const
 {
+    if(cl1 == cl2) return true;
+    else
     switch(cl1)
     {
 	case Color::BLUE:	return (current_maps_file.unions[0] & cl2);
@@ -1336,20 +1338,20 @@ void Settings::BinarySave(void) const
     msg.Push(opt_battle());
 
     // radar position
-    msg.Push(static_cast<u16>(pos_radr.x));
-    msg.Push(static_cast<u16>(pos_radr.y));
+    msg.Push(pos_radr.x);
+    msg.Push(pos_radr.y);
 
     // buttons position
-    msg.Push(static_cast<u16>(pos_bttn.x));
-    msg.Push(static_cast<u16>(pos_bttn.y));
+    msg.Push(pos_bttn.x);
+    msg.Push(pos_bttn.y);
 
     // icons position
-    msg.Push(static_cast<u16>(pos_icon.x));
-    msg.Push(static_cast<u16>(pos_icon.y));
+    msg.Push(pos_icon.x);
+    msg.Push(pos_icon.y);
 
     // status position
-    msg.Push(static_cast<u16>(pos_stat.x));
-    msg.Push(static_cast<u16>(pos_stat.y));
+    msg.Push(pos_stat.x);
+    msg.Push(pos_stat.y);
 
     msg.Save(binary.c_str());
 }

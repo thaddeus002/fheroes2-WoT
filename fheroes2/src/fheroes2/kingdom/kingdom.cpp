@@ -618,7 +618,7 @@ const Heroes* Kingdom::GetBestHero(void) const
 
 u32 Kingdom::GetArmiesStrength(void) const
 {
-    u32 res = 0;
+    double res = 0;
 
     std::vector<Heroes*>::const_iterator ith = heroes.begin();
     for(; ith != heroes.end(); ++ith) if(*ith) res += (**ith).GetArmy().GetStrength();

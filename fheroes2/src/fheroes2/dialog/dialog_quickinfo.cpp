@@ -134,7 +134,7 @@ void Dialog::QuickInfo(const Maps::Tiles & tile)
 	name_object = _("Unchartered Territory");
     else
     // check guardians mine
-    if(MP2::OBJ_ABANDONEDMINE == tile.GetObject() || tile.CheckEnemyGuardians(0))
+    if(MP2::OBJ_ABANDONEDMINE == tile.GetObject() || tile.CheckEnemyGuardians())
     {
 	const Army::Troop troop(tile);
 
