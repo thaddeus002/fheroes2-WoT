@@ -1523,17 +1523,25 @@ void AIToBoat(Heroes &hero, const u8 obj, const u16 dst_index)
 {
     if(hero.isShipMaster()) return;
 
-    const u16 from_index = Maps::GetIndexFromAbsPoint(hero.GetCenter());
+    const u16 from_index = hero.GetIndex();
 
     Maps::Tiles & tiles_from = world.GetTiles(from_index);
     Maps::Tiles & tiles_to = world.GetTiles(dst_index);
-                
+
+    // disabled nearest coasts (on week MP2::isWeekLife)
+    std::vector<u16> coasts;
+    Maps::ScanDistanceObject(from_index, MP2::OBJ_COAST, 4, coasts);
+    coasts.push_back(from_index);
+    for(std::vector<u16>::const_iterator
+	it = coasts.begin(); it != coasts.end(); ++it) hero.SetVisited(*it);
+
     hero.ResetMovePoints();
     tiles_from.SetObject(MP2::OBJ_COAST);
     hero.SetCenter(dst_index);
     hero.SetShipMaster(true);
     tiles_to.SetObject(MP2::OBJ_HEROES);
     hero.SaveUnderObject(MP2::OBJ_ZERO);
+    hero.ClearAITasks();
 
     DEBUG(DBG_AI, DBG_INFO, "AIToBoat: " << hero.GetName());
 }
@@ -1553,6 +1561,7 @@ void AIToCoast(Heroes &hero, const u8 obj, const u16 dst_index)
     hero.SetShipMaster(false);
     tiles_to.SetObject(MP2::OBJ_HEROES);
     hero.SaveUnderObject(MP2::OBJ_ZERO);
+    hero.ClearAITasks();
 
     hero.ActionNewPosition();
 
@@ -1571,91 +1580,65 @@ void AIToCoast(Heroes &hero, const u8 obj, const u16 dst_index)
 
 
 
-/* after AIValidObject, get priority object for AI independent of distance (1 day) */
-bool Heroes::AIPriorityObject(u16 index, u8 obj)
+/* get priority object for AI independent of distance (1 day) */
+bool Heroes::AIPriorityObject(u16 index)
 {
-    switch(obj)
-    {
-	// capture enemy castle
-	case MP2::OBJ_CASTLE:
+    const Settings & conf = Settings::Get();
+    Maps::Tiles & tile = world.GetTiles(index);
+
+    if(Modes(HUNTER))
+	switch(tile.GetObject())
 	{
-	    const Settings & conf = Settings::Get();
-	    const Castle *castle = world.GetCastle(index);
-	    if(castle && GetColor() != castle->GetColor())
-		// FIXME: AI skip visiting alliance
-		return conf.IsUnions(GetColor(), castle->GetColor()) ? false : true;
+	    // capture enemy castle
+	    case MP2::OBJ_CASTLE:
+	    {
+		const Castle *castle = world.GetCastle(index);
+		return castle &&
+		    !conf.IsUnions(GetColor(), castle->GetColor()) &&
+		    AIValidObject(index);
+	    }
 	    break;
+
+	    // kill enemy hero
+	    case MP2::OBJ_HEROES:
+	    {
+		const Heroes *hero = world.GetHeroes(index);
+		return hero &&
+		    !conf.IsUnions(GetColor(), hero->GetColor()) &&
+		    AIValidObject(index);
+	    }
+	    break;
+
+	    case MP2::OBJ_MONSTER:
+		return AIValidObject(index);
+
+	    default: break;
 	}
 
-	// kill enemy hero
-	case MP2::OBJ_HEROES:
+    if(Modes(SCOUTER))
+	switch(tile.GetObject())
 	{
-	    const Settings & conf = Settings::Get();
-	    const Heroes *hero = world.GetHeroes(index);
-	    if(hero && GetColor() != hero->GetColor())
-		// FIXME: AI skip visiting alliance
-		return conf.IsUnions(GetColor(), hero->GetColor()) || !hero->AllowBattle() ? false : true;
-	    break;
+	    case MP2::OBJ_ARTIFACT:
+	    // resource
+	    case MP2::OBJ_RESOURCE:
+	    case MP2::OBJ_CAMPFIRE:
+	    case MP2::OBJ_TREASURECHEST:
+	    // free mines
+	    case MP2::OBJ_SAWMILL:
+	    case MP2::OBJ_MINES:
+	    case MP2::OBJ_ALCHEMYLAB:
+		return AIValidObject(index);
+
+	    default: break;
 	}
-
-	// resource
-	case MP2::OBJ_RESOURCE:
-	case MP2::OBJ_CAMPFIRE:
-	case MP2::OBJ_TREASURECHEST:
-	    return true;
-
-	// free mines
-	case MP2::OBJ_SAWMILL:
-	case MP2::OBJ_MINES:
-	case MP2::OBJ_ALCHEMYLAB:
-	    if(world.ColorCapturedObject(index) != GetColor()) return true;
-	    break;
-
-	default: break;
-    }
 
     return false;
 }
 
-bool Heroes::AIValidObject(u16 index, u8 obj)
+bool Heroes::AIValidObject(u16 index)
 {
-    // check guardians only (from capture objects)
     Maps::Tiles & tile = world.GetTiles(index);
-
-    switch(obj)
-    {
-	case MP2::OBJ_ARTIFACT:
-	    // 6 - 50 rogues, 7 - 1 gin, 8,9,10,11,12,13 - 1 monster level4
-	    if(6 > tile.GetQuantity2() || 13 < tile.GetQuantity2()) break;
-
-	// poor object
-	case MP2::OBJ_SHIPWRECK:
-        case MP2::OBJ_GRAVEYARD:
-	case MP2::OBJ_DERELICTSHIP:
-
-	// monster
-	case MP2::OBJ_MONSTER:
-
-	// capture object
-	case MP2::OBJ_SAWMILL:
-	case MP2::OBJ_MINES:
-	case MP2::OBJ_ALCHEMYLAB:
-	case MP2::OBJ_STONELIGHTS:
-
-	    if(world.ColorCapturedObject(index) != GetColor())
-	    {
-		if(tile.CheckEnemyGuardians(GetColor()))
-		{
-		    Army::army_t enemy;
-		    enemy.FromGuardian(tile);
-		    if(enemy.isValid() && !GetArmy().StrongerEnemyArmy(enemy)) return false;
-		}
-	    }
-	    break;
-
-
-	default: break;
-    }
+    const u8 obj = tile.GetObject();
 
     // check other
     switch(obj)
@@ -1679,7 +1662,17 @@ bool Heroes::AIValidObject(u16 index, u8 obj)
 	case MP2::OBJ_SAWMILL:
 	case MP2::OBJ_MINES:
 	case MP2::OBJ_ALCHEMYLAB:
-	    return world.ColorCapturedObject(index) != GetColor();
+	    if(GetColor() != world.ColorCapturedObject(tile.GetIndex()))
+	    {
+		if(tile.CheckEnemyGuardians(GetColor()))
+		{
+		    Army::army_t enemy;
+		    enemy.FromGuardian(tile);
+		    return !enemy.isValid() || GetArmy().StrongerEnemyArmy(enemy);
+		}
+		else return true;
+	    }
+	    break;
 
 	// pickup object
 	case MP2::OBJ_WAGON:
@@ -1726,12 +1719,14 @@ bool Heroes::AIValidObject(u16 index, u8 obj)
 	    {
 		return HasSecondarySkill(4 == tile.GetQuantity2() ? Skill::Secondary::WISDOM : Skill::Secondary::LEADERSHIP);
 	    }
-	    //else
-	    // 6 - 50 rogues, 7 - 1 gin, 8,9,10,11,12,13 - 1 monster level4
-	    //if(5 < tile.GetQuantity2() && 14 > tile.GetQuantity2())
-	    //	return true
 	    else
-		return true;
+	    // 6 - 50 rogues, 7 - 1 gin, 8,9,10,11,12,13 - 1 monster level4
+	    if(5 < tile.GetQuantity2() && 14 > tile.GetQuantity2())
+	    {
+		Army::army_t enemy;
+		enemy.FromGuardian(tile);
+		return !enemy.isValid() || GetArmy().StrongerEnemyArmy(enemy);
+	    }
 	}
 	break;
 
@@ -1927,7 +1922,16 @@ bool Heroes::AIValidObject(u16 index, u8 obj)
 	case MP2::OBJ_SHIPWRECK:
         case MP2::OBJ_GRAVEYARD:
 	case MP2::OBJ_DERELICTSHIP:
-	    return true;
+	    if(! isVisited(tile, Visit::GLOBAL))
+	    {
+		if(tile.CheckEnemyGuardians(GetColor()))
+		{
+		    Army::army_t enemy;
+		    enemy.FromGuardian(tile);
+		    return enemy.isValid() && GetArmy().StrongerEnemyArmy(enemy);
+		}
+	    }
+	    break;
 
 	//case MP2::OBJ_PYRAMID:
 
@@ -1936,7 +1940,12 @@ bool Heroes::AIValidObject(u16 index, u8 obj)
 	    break;
 
 	case MP2::OBJ_MONSTER:
-	    return true;
+	{
+	    Army::army_t enemy;
+	    enemy.FromGuardian(tile);
+	    return !enemy.isValid() || GetArmy().StrongerEnemyArmy(enemy);
+	}
+	break;
 
 	// sign
 	case MP2::OBJ_SIGN:
@@ -1949,7 +1958,8 @@ bool Heroes::AIValidObject(u16 index, u8 obj)
 	    const Castle *castle = world.GetCastle(index);
 	    if(castle)
 	    {
-		if(GetColor() == castle->GetColor()) return true;
+		if(GetColor() == castle->GetColor())
+		    return NULL == castle->GetHeroes() && ! isVisited(tile);
 		else
 		// FIXME: AI skip visiting alliance
 		if(conf.IsUnions(GetColor(), castle->GetColor())) return false;
@@ -1966,8 +1976,8 @@ bool Heroes::AIValidObject(u16 index, u8 obj)
 	    if(hero)
 	    {
 		if(GetColor() == hero->GetColor()) return true;
-		else
 		// FIXME: AI skip visiting alliance
+		else
 		if(conf.IsUnions(GetColor(), hero->GetColor())) return false;
 		else
 		if(hero->AllowBattle() &&
@@ -1997,7 +2007,8 @@ void Heroes::AIRescueWhereMove(void)
 
     switch(Settings::Get().GameDifficulty())
     {
-        case Difficulty::HARD:      scoute += 2; break;
+        case Difficulty::NORMAL:    scoute += 2; break;
+        case Difficulty::HARD:      scoute += 3; break;
         case Difficulty::EXPERT:    scoute += 4; break;
         case Difficulty::IMPOSSIBLE:scoute += 6; break;
         default: break;
@@ -2006,16 +2017,16 @@ void Heroes::AIRescueWhereMove(void)
     scoute += 1;
 
     // find unchartered territory
-    for(u16 ii = 1; ii <= scoute; ++ii)
+    for(u8 ii = 1; ii <= scoute; ++ii)
     {
-        const s16 tx = mp.x - ii;
-        const s16 ty = mp.y - ii;
+        const s32 tx = mp.x - ii;
+        const s32 ty = mp.y - ii;
 
-        const s16 mx = tx + 2 * ii;
-        const s16 my = ty + 2 * ii;
+        const s32 mx = tx + 2 * ii;
+        const s32 my = ty + 2 * ii;
 
-        for(s16 iy = ty; iy <= my; ++iy)
-            for(s16 ix = tx; ix <= mx; ++ix)
+        for(s32 iy = ty; iy <= my; ++iy)
+            for(s32 ix = tx; ix <= mx; ++ix)
         {
             if(ty < iy && iy < my && tx < ix && ix < mx) continue;
 
@@ -2026,7 +2037,11 @@ void Heroes::AIRescueWhereMove(void)
                 world.GetTiles(res).isPassable(this, true) &&
 		GetPath().Calculate(res))
             {
-                sheduled_visit.push_back(res);
+                ai_sheduled_visit.push_back(res);
+
+		DEBUG(DBG_AI , DBG_INFO, "Heroes::AIRescueMove: " << Color::String(GetColor()) <<
+                	", hero: " << GetName() << ", added task: " << res);
+
                 return;
             }
         }
@@ -2043,4 +2058,10 @@ void Heroes::AIMeeting(Heroes & heroes2)
 {
     if(Settings::Get().ExtEyeEagleAsScholar())
         Heroes::ScholarAction(*this, heroes2);
+
+    if(Modes(HUNTER))
+	GetArmy().JoinStrongestFromArmy(heroes2.GetArmy());
+    else
+    if(heroes2.Modes(HUNTER))
+	heroes2.GetArmy().JoinStrongestFromArmy(GetArmy());
 }

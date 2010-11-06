@@ -1254,7 +1254,7 @@ void ActionToGoodLuckObject(Heroes &hero, const u8 obj, const u16 dst_index)
 void ActionToPoorLuckObject(Heroes &hero, const u8 obj, const u16 dst_index)
 {
     Maps::Tiles & tile = world.GetTiles(dst_index);
-    const bool battle = tile.GetQuantity1();
+    const bool battle = tile.CheckEnemyGuardians();
     bool complete = false;
     std::string body;
 
@@ -1277,7 +1277,7 @@ void ActionToPoorLuckObject(Heroes &hero, const u8 obj, const u16 dst_index)
 			    PlaySoundSuccess;
         		    hero.IncreaseExperience(res.GetExperienceAttacker());
 			    complete = true;
-			    const Spell::spell_t spell(static_cast<Spell::spell_t>(tile.GetQuantity1()));
+			    const Spell::spell_t spell(Spell::FromInt(tile.GetQuantity1()));
 			    // check magick book
 			    if(!hero.HasArtifact(Artifact::MAGIC_BOOK))
 				Dialog::Message(MP2::StringObject(obj), _("Unfortunately, you have no Magic Book to record the spell with."), Font::BIG, Dialog::OK);
@@ -1307,8 +1307,7 @@ void ActionToPoorLuckObject(Heroes &hero, const u8 obj, const u16 dst_index)
 
     if(complete)
     {
-	tile.SetQuantity1(0);
-	tile.SetQuantity2(0);
+	tile.ResetQuantity();
     }
     else
     if(!battle && !hero.isVisited(obj))
@@ -1558,8 +1557,7 @@ void ActionToPoorMoraleObject(Heroes &hero, const u8 obj, const u16 dst_index)
 
     if(complete)
     {
-	tile.SetQuantity1(0);
-	tile.SetQuantity2(0);
+	tile.ResetQuantity();
     }
     else
     if(!battle && !hero.isVisited(obj))
@@ -2208,8 +2206,8 @@ void ActionToCaptureObject(Heroes &hero, const u8 obj, const u16 dst_index)
 	if(tile.CheckEnemyGuardians(hero.GetColor()))
 	{
 	    const Army::Troop troop(tile);
-    	    Army::army_t army;
-    	    army.JoinTroop(troop);
+	    Army::army_t army;
+	    army.JoinTroop(troop);
 	    army.SetColor(world.ColorCapturedObject(dst_index));
 
     	    Battle2::Result result = Battle2::Loader(hero.GetArmy(), army, dst_index);

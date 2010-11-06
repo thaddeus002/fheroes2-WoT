@@ -256,7 +256,8 @@ void Maps::ClearFog(u16 index, u8 scoute, const u8 color)
     {
 	switch(Settings::Get().GameDifficulty())
 	{
-    	    case Difficulty::HARD:	scoute += 2; break;
+    	    case Difficulty::NORMAL:	scoute += 2; break;
+    	    case Difficulty::HARD:	scoute += 3; break;
     	    case Difficulty::EXPERT:	scoute += 4; break;
     	    case Difficulty::IMPOSSIBLE:scoute += 6; break;
 	    default: break;

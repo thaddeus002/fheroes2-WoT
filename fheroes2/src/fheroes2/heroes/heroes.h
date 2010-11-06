@@ -196,7 +196,7 @@ public:
     void SetVisited(const u16 index, const Visit::type_t type = Visit::LOCAL);
     bool isVisited(const u8 object, const Visit::type_t type = Visit::LOCAL) const;
     bool isVisited(const Maps::Tiles & tile, const Visit::type_t type = Visit::LOCAL) const;
-    std::deque<u16> & GetSheduledVisit(void) { return sheduled_visit; }
+
 
     void SetCenter(const Point& pt){ mp = pt; }
     void SetCenter(const u16 index);
@@ -214,9 +214,14 @@ public:
     bool ActionSpellCast(Spell::spell_t);
 
     void AIAction(const u16 dst_index);
-    bool AIValidObject(u16, u8);
+    bool AIValidObject(u16);
     void AIRescueWhereMove(void);
-    bool AIPriorityObject(u16, u8);
+    bool AIPriorityObject(u16);
+
+    std::deque<u16> & GetAITasks(void) { return ai_sheduled_visit; }
+    void ClearAITasks(void) { ai_sheduled_visit.clear(); }
+    s32 GetPrimaryTarget(void) const { return ai_primary_target; }
+    void SetPrimaryTarget(s32 target) { ai_primary_target = target; }
 
     void Redraw(Surface &, bool) const;
     void Redraw(Surface &, const s16, const s16, bool) const;
@@ -284,7 +289,8 @@ private:
     u8 patrol_square;
 
     std::list<IndexObject> visit_object;
-    std::deque<u16> sheduled_visit;
+    std::deque<u16> ai_sheduled_visit;
+    s32 ai_primary_target;
 };
 
 #endif

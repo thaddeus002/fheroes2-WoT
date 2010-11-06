@@ -102,14 +102,17 @@ Heroes::heroes_t Heroes::ConvertID(u8 index)
     return index > UNKNOWN ? UNKNOWN : static_cast<heroes_t>(index);
 }
 
-Heroes::Heroes() : army(this), path(*this)
+Heroes::Heroes() : move_point_scale(-1), army(this), path(*this), 
+    direction(Direction::RIGHT), sprite_index(18), patrol_square(0),
+    ai_primary_target(-1)
 {
     bag_artifacts.assign(HEROESMAXARTIFACT, Artifact::UNKNOWN);
 }
 
 Heroes::Heroes(heroes_t ht, Race::race_t rc) : killer_color(Color::GRAY), experience(0), move_point(0),
     move_point_scale(-1), army(this), portrait(ht), race(rc),
-    save_maps_general(MP2::OBJ_ZERO), path(*this), direction(Direction::RIGHT), sprite_index(18), patrol_square(0)
+    save_maps_general(MP2::OBJ_ZERO), path(*this), direction(Direction::RIGHT), sprite_index(18), patrol_square(0),
+    ai_primary_target(-1)
 {
     name = _(HeroesName(ht));
 
@@ -1725,15 +1728,16 @@ void Heroes::Dump(void) const
     std::cout << "max move point  : " << GetMaxMovePoints() << std::endl;
     std::cout << "direction       : " << Direction::String(direction) << std::endl;
     std::cout << "index sprite    : " << static_cast<u16>(sprite_index) << std::endl;
-    std::cout << "flags           : " << (Modes(SHIPMASTER) ? "SHIPMATER," : ",") <<
+    std::cout << "flags           : " << (Modes(SHIPMASTER) ? "SHIPMASTER," : ",") <<
                                          (Modes(SCOUTER) ? "SCOUTER," : ",") <<
                                          (Modes(HUNTER) ? "HUNTER," : ",") <<
                                          (Modes(PATROL) ? "PATROL," : ",") <<
                                          (Modes(STUPID) ? "STUPID," : ",") << std::endl;
 
-    std::cout << "sheduled visit  : ";
-    std::deque<u16>::const_iterator it1 = sheduled_visit.begin();
-    std::deque<u16>::const_iterator it2 = sheduled_visit.end();
+    std::cout << "ai primary target: " << ai_primary_target << std::endl;
+    std::cout << "ai sheduled visit: ";
+    std::deque<u16>::const_iterator it1 = ai_sheduled_visit.begin();
+    std::deque<u16>::const_iterator it2 = ai_sheduled_visit.end();
     for(; it1 != it2; ++it1) std::cout << *it1 << "(" << MP2::StringObject(world.GetTiles(*it1).GetObject()) << "), ";
     std::cout << std::endl;
 }

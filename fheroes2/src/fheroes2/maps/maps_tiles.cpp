@@ -1773,7 +1773,7 @@ void Maps::Tiles::UpdateQuantity(void)
 	case MP2::OBJ_PYRAMID:
 	    // random spell level 5
 	    quantity1 = (Rand::Get(1) ? Spell::RandCombat(5) : Spell::RandAdventure(5));
-	    quantity2 = 0;
+	    quantity2 = 1;
 	break;
 
 	case MP2::OBJ_DAEMONCAVE:
@@ -1829,6 +1829,41 @@ bool Maps::Tiles::ValidQuantity(void) const
 
     return false;
 }
+
+bool Maps::Tiles::CheckEnemyGuardians(u8 color) const
+{
+    switch(general)
+    {
+	case MP2::OBJ_ARTIFACT:
+	    return quantity1 > 5 || quantity1 < 14;
+
+	case MP2::OBJ_DERELICTSHIP:
+	case MP2::OBJ_SHIPWRECK:
+	case MP2::OBJ_GRAVEYARD:
+	    return quantity2;
+
+	case MP2::OBJ_PYRAMID:
+	case MP2::OBJ_DAEMONCAVE:
+	    return quantity2;
+
+	case MP2::OBJ_MONSTER:
+	case MP2::OBJ_ABANDONEDMINE:
+	    return GetCountMonster();
+
+	default:
+	    break;
+    }
+
+    if(color &&
+	(MP2::isCaptureObject(general) ||
+	(MP2::OBJ_HEROES == general && world.GetHeroes(maps_index) && 
+	    MP2::isCaptureObject(world.GetHeroes(maps_index)->GetUnderObject()))) &&
+	color != world.ColorCapturedObject(maps_index))
+	    return quantity3 && GetCountMonster();
+
+    return false;
+}
+
 
 void Maps::Tiles::RemoveObjectSprite(void)
 {
@@ -2242,19 +2277,6 @@ void Maps::Tiles::ResetQuantity(void)
     quantity2 = 0;
     quantity3 = 0;
     quantity4 = 0;
-}
-
-bool Maps::Tiles::CheckEnemyGuardians(u8 color) const
-{
-    if(MP2::OBJ_HEROES == general)
-    {
-	const Heroes* hero = world.GetHeroes(maps_index);
-	if(! hero || ! MP2::isCaptureObject(hero->GetUnderObject())) return false;
-    }
-    else
-    if(! MP2::isCaptureObject(general)) return false;
-
-    return color != world.ColorCapturedObject(maps_index) && quantity3 && (quantity1 || quantity2);
 }
 
 void Maps::Tiles::RedrawFogs(Surface & dst, u8 color) const
