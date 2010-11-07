@@ -105,8 +105,11 @@ public:
     void	Push(const char*);
 
     bool	Pop(u8 &);
+    bool	Pop(s8 &);
     bool	Pop(u16 &);
+    bool	Pop(s16 &);
     bool	Pop(u32 &);
+    bool	Pop(s32 &);
     bool	Pop(std::string &);
 
     void	SoftReset(void);

@@ -196,6 +196,17 @@ void QueueMessage::Push(const char* str)
     ++itd2;
 }
 
+bool QueueMessage::Pop(s8 & byte8)
+{
+    u8 tmp;
+    if((tmp))
+    {
+	byte8 = tmp;
+	return true;
+    }
+    return false;
+}
+
 bool QueueMessage::Pop(u8 & byte8)
 {
     if(itd1 + 1 > itd2) return false;
@@ -204,6 +215,17 @@ bool QueueMessage::Pop(u8 & byte8)
     ++itd1;
 
     return true;
+}
+
+bool QueueMessage::Pop(s16 & byte16)
+{
+    u16 tmp;
+    if(Pop(tmp))
+    {
+	byte16 = tmp;
+	return true;
+    }
+    return false;
 }
 
 bool QueueMessage::Pop(u16 & byte16)
@@ -218,6 +240,17 @@ bool QueueMessage::Pop(u16 & byte16)
     ++itd1;
 
     return true;
+}
+
+bool QueueMessage::Pop(s32 & byte32)
+{
+    u32 tmp;
+    if(Pop(tmp))
+    {
+	byte32 = tmp;
+	return true;
+    }
+    return false;
 }
 
 bool QueueMessage::Pop(u32 & byte32)
