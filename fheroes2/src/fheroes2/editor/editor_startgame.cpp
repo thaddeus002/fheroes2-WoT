@@ -233,10 +233,11 @@ Game::menu_t Game::Editor::StartGame()
 	}
 	else
 	// cursor over game area
-	if(le.MouseCursor(area_pos))
+	if(le.MouseCursor(area_pos) &&
+	    Maps::isValidAbsIndex(areaMaps.GetIndexFromMousePoint(le.GetMouseCursor())))
 	{
             const Point & mouse_coord = le.GetMouseCursor();
-            const u16 index_maps = areaMaps.GetIndexFromMousePoint(mouse_coord);
+            const s32 index_maps = areaMaps.GetIndexFromMousePoint(mouse_coord);
             Maps::Tiles & tile = world.GetTiles(index_maps);
             const Rect tile_pos(BORDERWIDTH + ((u16) (mouse_coord.x - BORDERWIDTH) / TILEWIDTH) * TILEWIDTH, BORDERWIDTH + ((u16) (mouse_coord.y - BORDERWIDTH) / TILEWIDTH) * TILEWIDTH, TILEWIDTH, TILEWIDTH);
             //u8 object = tile.GetObject();
@@ -297,10 +298,10 @@ Game::menu_t Game::Editor::StartGame()
 		}
 
 		// modify single tiles
-		for(u16 ii = 0; ii < world.w() * world.h(); ++ii) ModifySingleTile(world.GetTiles(ii));
+		for(int ii = 0; ii < world.w() * world.h(); ++ii) ModifySingleTile(world.GetTiles(ii));
 
 		// modify all tiles abroad
-		for(u16 ii = 0; ii < world.w() * world.h(); ++ii) ModifyTileAbroad(world.GetTiles(ii));
+		for(int ii = 0; ii < world.w() * world.h(); ++ii) ModifyTileAbroad(world.GetTiles(ii));
         
 		sizeCursor.Show();
 		cursor.Show();

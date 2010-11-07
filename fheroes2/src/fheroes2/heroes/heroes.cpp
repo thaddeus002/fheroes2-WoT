@@ -111,7 +111,7 @@ Heroes::Heroes() : move_point_scale(-1), army(this), path(*this),
 
 Heroes::Heroes(heroes_t ht, Race::race_t rc) : killer_color(Color::GRAY), experience(0), move_point(0),
     move_point_scale(-1), army(this), portrait(ht), race(rc),
-    save_maps_general(MP2::OBJ_ZERO), path(*this), direction(Direction::RIGHT), sprite_index(18), patrol_square(0),
+    save_maps_object(MP2::OBJ_ZERO), path(*this), direction(Direction::RIGHT), sprite_index(18), patrol_square(0),
     ai_primary_target(-1)
 {
     name = _(HeroesName(ht));
@@ -290,13 +290,12 @@ Heroes::Heroes(heroes_t ht, Race::race_t rc) : killer_color(Color::GRAY), experi
     move_point = GetMaxMovePoints();
 }
 
-void Heroes::LoadFromMP2(u16 map_index, const void *ptr, const Color::color_t cl, const Race::race_t rc)
+void Heroes::LoadFromMP2(s32 map_index, const void *ptr, const Color::color_t cl, const Race::race_t rc)
 {
     // reset modes
     modes = 0;
 
-    mp.x = map_index % world.w();
-    mp.y = map_index / world.h();
+    SetIndex(map_index);
 
     color = cl;
     killer_color = Color::GRAY;
@@ -469,7 +468,7 @@ void Heroes::LoadFromMP2(u16 map_index, const void *ptr, const Color::color_t cl
     if(*ptr8)
     {
 	SetModes(PATROL);
-	patrol_center = mp;
+	patrol_center = GetCenter();
     }
     ++ptr8;
 
@@ -480,7 +479,7 @@ void Heroes::LoadFromMP2(u16 map_index, const void *ptr, const Color::color_t cl
     // end
 
     // save general object
-    save_maps_general = MP2::OBJ_ZERO;
+    save_maps_object = MP2::OBJ_ZERO;
 
     // fix zero army
     if(!army.isValid()) army.Reset(true);
@@ -504,12 +503,6 @@ Heroes::heroes_t Heroes::GetID(void) const
 {
     return portrait;
 }
-
-const Point & Heroes::GetCenter(void) const
-{ return mp; }
-
-u16 Heroes::GetIndex(void) const
-{ return Maps::GetIndexFromAbsPoint(mp); }
 
 u8 Heroes::GetMobilityIndexSprite(void) const
 {
@@ -762,14 +755,14 @@ bool Heroes::Recruit(const Color::color_t cl, const Point & pt)
 	Maps::Tiles & tiles = world.GetTiles(pt);
 	color = cl;
 	killer_color = Color::GRAY;
-	mp = pt;
+	SetCenter(pt);
 	if(!Modes(SAVEPOINTS)) move_point = GetMaxMovePoints();
 	MovePointsScaleFixed();
 
 	if(!army.isValid()) army.Reset(false);
 
 	// save general object
-	save_maps_general = tiles.GetObject();
+	save_maps_object = tiles.GetObject();
 	tiles.SetObject(MP2::OBJ_HEROES);
 
 	kingdom.AddHeroes(this);
@@ -895,7 +888,7 @@ void Heroes::ActionAfterBattle(void)
     SetModes(ACTION);
 }
 
-u16 Heroes::FindPath(u16 dst_index) const
+s32 Heroes::FindPath(s32 dst_index) const
 {
     Route::Path route(*this);
 
@@ -927,7 +920,7 @@ const Castle* Heroes::inCastle(void) const
     std::vector<Castle *>::const_iterator it1 = castles.begin();
     std::vector<Castle *>::const_iterator it2 = castles.end();
 
-    for(; it1 != it2; ++it1) if((**it1).GetCenter() == mp) return *it1;
+    for(; it1 != it2; ++it1) if((**it1).GetCenter() == GetCenter()) return *it1;
 
     return NULL;
 }
@@ -941,7 +934,7 @@ Castle* Heroes::inCastle(void)
     std::vector<Castle *>::const_iterator it1 = castles.begin();
     std::vector<Castle *>::const_iterator it2 = castles.end();
 
-    for(; it1 != it2; ++it1) if((**it1).GetCenter() == mp) return *it1;
+    for(; it1 != it2; ++it1) if((**it1).GetCenter() == GetCenter()) return *it1;
 
     return NULL;
 }
@@ -966,7 +959,7 @@ bool Heroes::isVisited(const u8 object, const Visit::type_t type) const
 }
 
 /* set visited cell */
-void Heroes::SetVisited(const u16 index, const Visit::type_t type)
+void Heroes::SetVisited(const s32 index, const Visit::type_t type)
 {
     const Maps::Tiles & tile = world.GetTiles(index);
 
@@ -1210,12 +1203,12 @@ void Heroes::SetMove(bool f)
 
 void Heroes::SaveUnderObject(MP2::object_t obj)
 {
-    save_maps_general = obj;
+    save_maps_object = obj;
 }
 
 MP2::object_t Heroes::GetUnderObject(void) const
 {
-    return save_maps_general;
+    return save_maps_object;
 }
 
 bool Heroes::isShipMaster(void) const
@@ -1229,19 +1222,19 @@ bool Heroes::CanPassToShipMaster(const Heroes & hero) const
     {
 	Route::Path route(*this);
 
-	const s16 & cx = hero.mp.x;
-	const s16 & cy = hero.mp.y;
+	const s16 & cx = hero.GetCenter().x;
+	const s16 & cy = hero.GetCenter().y;
 	const bool full = false;
-	u16 coast = 0;
+	s32 coast = 0;
 
-	for(s16 y = -1; y <= 1; ++y)
-    	    for(s16 x = -1; x <= 1; ++x)
+	for(s8 y = -1; y <= 1; ++y)
+    	    for(s8 x = -1; x <= 1; ++x)
 	{
             if((!y && !x) || (y && x && !full)) continue;
 
             coast = Maps::GetIndexFromAbsPoint(cx + x, cy + y);
 
-            if(Maps::isValidAbsPoint(cx + x, cy + y) &&
+            if(Maps::isValidAbsIndex(coast) &&
                 MP2::OBJ_COAST == world.GetTiles(coast).GetObject() && FindPath(coast)) return true;
 	}
     }
@@ -1333,15 +1326,8 @@ u8 Heroes::GetVisionsDistance(void) const
     return dist;
 }
 
-/* set cente from index maps */
-void Heroes::SetCenter(const u16 index)
-{
-    mp.x = index % world.w();
-    mp.y = index / world.h();
-}
-
 /* return route range in days */
-u8 Heroes::GetRangeRouteDays(const u16 dst) const
+u8 Heroes::GetRangeRouteDays(const s32 dst) const
 {
     const u32 max = GetMaxMovePoints();
     const u16 limit = max * 5 / 100; // limit ~5 day
@@ -1516,11 +1502,9 @@ void Heroes::LevelUpSecondarySkill(const Skill::Primary::skill_t primary1, bool 
 /* apply penalty */
 bool Heroes::ApplyPenaltyMovement(void)
 {
-    const u16 center = Maps::GetIndexFromAbsPoint(mp);
-
     const u16 penalty = path.isValid() ?
 	    path.GetFrontPenalty() :
-	    Maps::Ground::GetPenalty(center, Direction::CENTER, GetLevelSkill(Skill::Secondary::PATHFINDING));
+	    Maps::Ground::GetPenalty(GetIndex(), Direction::CENTER, GetLevelSkill(Skill::Secondary::PATHFINDING));
 
     if(move_point >= penalty) move_point -= penalty;
     else return false;
@@ -1562,10 +1546,9 @@ void Heroes::SetFreeman(const u8 reason)
     if(color != Color::GRAY) world.GetKingdom(color).RemoveHeroes(this);
 
     color = Color::GRAY;
-    world.GetTiles(mp).SetObject(save_maps_general);
+    world.GetTiles(GetIndex()).SetObject(save_maps_object);
     modes = 0;
-    mp.x = -1;
-    mp.y = -1;
+    SetIndex(-1);
     move_point_scale = -1;
     path.Reset();
     SetMove(false);
@@ -1575,12 +1558,12 @@ void Heroes::SetFreeman(const u8 reason)
 
 bool Heroes::isShow(u8 color)
 {
-    const u16 index_from = GetIndex();
+    const s32 index_from = GetIndex();
     const Maps::Tiles & tile_from = world.GetTiles(index_from);
 
     if(path.isValid())
     {
-        const u16 index_to = Maps::GetDirectionIndex(index_from, path.GetFrontDirection());
+        const s32 index_to = Maps::GetDirectionIndex(index_from, path.GetFrontDirection());
         const Maps::Tiles & tile_to = world.GetTiles(index_to);
 
         return !tile_from.isFog(color) && !tile_to.isFog(color);
@@ -1631,7 +1614,7 @@ u8 Heroes::GetControl(void) const
 
 bool Heroes::AllowBattle(void) const
 {
-    switch(save_maps_general)
+    switch(save_maps_object)
     {
 	case MP2::OBJ_TEMPLE: return false;
 	default: break;
@@ -1657,7 +1640,7 @@ void Heroes::ActionNewPosition(void)
 	for(Direction::vector_t dir = Direction::TOP_LEFT; dir < Direction::CENTER && !isFreeman(); ++dir)
 	    if(dst_around & dir)
 	{
-	    const u16 mons = Maps::GetDirectionIndex(GetIndex(), dir);
+	    const s32 mons = Maps::GetDirectionIndex(GetIndex(), dir);
 
     	    // redraw gamearea for monster action sprite
 	    if(conf.MyColor() == GetColor())
@@ -1690,7 +1673,7 @@ u8 Heroes::GetSquarePatrol(void) const
     return patrol_square;
 }
 
-bool Heroes::CanScouteTile(u16 index) const
+bool Heroes::CanScouteTile(s32 index) const
 {
     if(Settings::Get().ExtScouteExtended())
     {
@@ -1721,8 +1704,8 @@ void Heroes::Dump(void) const
     std::cout << "color           : " << Color::String(color) << std::endl;
     std::cout << "experience      : " << experience << std::endl;
     std::cout << "magic point     : " << GetSpellPoints() << std::endl;
-    std::cout << "position x      : " << mp.x << std::endl;
-    std::cout << "position y      : " << mp.y << std::endl;
+    std::cout << "position x      : " << GetCenter().x << std::endl;
+    std::cout << "position y      : " << GetCenter().y << std::endl;
     std::cout << "move point      : " << move_point << std::endl;
     std::cout << "max magic point : " << GetMaxSpellPoints() << std::endl;
     std::cout << "max move point  : " << GetMaxMovePoints() << std::endl;
@@ -1736,8 +1719,8 @@ void Heroes::Dump(void) const
 
     std::cout << "ai primary target: " << ai_primary_target << std::endl;
     std::cout << "ai sheduled visit: ";
-    std::deque<u16>::const_iterator it1 = ai_sheduled_visit.begin();
-    std::deque<u16>::const_iterator it2 = ai_sheduled_visit.end();
+    std::deque<s32>::const_iterator it1 = ai_sheduled_visit.begin();
+    std::deque<s32>::const_iterator it2 = ai_sheduled_visit.end();
     for(; it1 != it2; ++it1) std::cout << *it1 << "(" << MP2::StringObject(world.GetTiles(*it1).GetObject()) << "), ";
     std::cout << std::endl;
 }

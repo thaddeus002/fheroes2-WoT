@@ -25,7 +25,6 @@
 #include <vector>
 #include <bitset>
 #include <string>
-#include "gamedefs.h"
 #include "mageguild.h"
 #include "color.h"
 #include "captain.h"
@@ -35,6 +34,7 @@
 #include "bitmodes.h"
 #include "heroes.h"
 #include "game_io.h"
+#include "position.h"
 
 class Heroes;
 namespace Maps { class Tiles; }
@@ -76,7 +76,7 @@ enum building_t
     DWELLING_UPGRADE7       = 0x80000000        // black dragon
 };
 
-class Castle : public BitModes
+class Castle : public Maps::Position, public BitModes
 {
 public:
     enum flags_t
@@ -124,9 +124,6 @@ public:
     u16 GetDwellingLivedCount(u32) const;
     u32 GetActualDwelling(u32) const;
     void RecruitAllMonster(void);
-
-    const Point & GetCenter(void) const;
-    u16 GetIndex(void) const;
 
     void ChangeColor(Color::color_t cl);
 
@@ -197,7 +194,6 @@ private:
 private:
     friend class Game::IO;
 
-    Point		mp;
     Race::race_t	race;
     Captain		captain;
 

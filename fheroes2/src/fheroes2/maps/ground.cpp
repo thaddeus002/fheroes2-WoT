@@ -47,7 +47,7 @@ const char* Maps::Ground::String(u16 ground)
     return str_ground[8];
 }
 
-u16 Maps::Ground::GetBasePenalty(const u16 index, const u8 pathfinding)
+u16 Maps::Ground::GetBasePenalty(const s32 index, const u8 pathfinding)
 {
     const Maps::Tiles & tile = world.GetTiles(index);
 
@@ -99,7 +99,7 @@ u16 Maps::Ground::GetBasePenalty(const u16 index, const u8 pathfinding)
     return 100;
 }
 
-u16 Maps::Ground::GetPenalty(const u16 index, const Direction::vector_t direct, const u8 pathfinding)
+u16 Maps::Ground::GetPenalty(const s32 index, const Direction::vector_t direct, const u8 pathfinding)
 {
     if(Direction::UNKNOWN == direct) return MAXU16;
 

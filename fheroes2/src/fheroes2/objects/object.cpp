@@ -47,7 +47,7 @@ Object::~Object()
 {
 }
 
-bool Object::isPassable(const std::list<Maps::TilesAddon> & bottoms, const u16 maps_index)
+bool Object::isPassable(const std::list<Maps::TilesAddon> & bottoms, const s32 maps_index)
 {
     if(bottoms.size())
     {

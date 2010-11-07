@@ -563,7 +563,7 @@ const std::string & Battle2::Status::GetMessage(void) const
     return message;
 }
 
-Battle2::Interface::Interface(Arena & a, u16 center) : arena(a), icn_cbkg(ICN::UNKNOWN), icn_frng(ICN::UNKNOWN), humanturn_spell(Spell::NONE),
+Battle2::Interface::Interface(Arena & a, s32 center) : arena(a), icn_cbkg(ICN::UNKNOWN), icn_frng(ICN::UNKNOWN), humanturn_spell(Spell::NONE),
     humanturn_exit(true), humanturn_redraw(true), animation_frame(0), catapult_frame(0),
     b_current(NULL), b_move(NULL), b_fly(NULL), b_current_sprite(NULL), teleport_src(MAXU16)
 {

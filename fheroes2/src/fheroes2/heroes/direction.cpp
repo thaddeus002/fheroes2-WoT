@@ -45,33 +45,33 @@ const char* Direction::String(vector_t direct)
 }
 
 
-Direction::vector_t Direction::Get(u16 from, u16 to)
+Direction::vector_t Direction::Get(s32 from, s32 to)
 {
     if(to == from)
 	return CENTER;
     else
-    if(to == Maps::GetTopIndex(from))
+    if(to == Maps::GetDirectionIndex(from, TOP))
 	return TOP;
     else
-    if(to == Maps::GetTopRightIndex(from))
+    if(to == Maps::GetDirectionIndex(from, TOP_RIGHT))
     	return TOP_RIGHT;
     else
-    if(to == Maps::GetRightIndex(from))
+    if(to == Maps::GetDirectionIndex(from, RIGHT))
     	return RIGHT;
     else
-    if(to == Maps::GetBottomRightIndex(from))
+    if(to == Maps::GetDirectionIndex(from, BOTTOM_RIGHT))
     	return BOTTOM_RIGHT;
     else
-    if(to == Maps::GetBottomIndex(from))
+    if(to == Maps::GetDirectionIndex(from, BOTTOM))
     	return BOTTOM;
     else
-    if(to == Maps::GetBottomLeftIndex(from))
+    if(to == Maps::GetDirectionIndex(from, BOTTOM_LEFT))
     	return BOTTOM_LEFT;
     else
-    if(to == Maps::GetLeftIndex(from))
+    if(to == Maps::GetDirectionIndex(from, LEFT))
     	return LEFT;
     else
-    if(to == Maps::GetTopLeftIndex(from))
+    if(to == Maps::GetDirectionIndex(from, TOP_LEFT))
     	return TOP_LEFT;
 
     return UNKNOWN;

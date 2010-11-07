@@ -51,24 +51,24 @@ bool ActionSpellTownPortal(Heroes &);
 bool ActionSpellVisions(Heroes &);
 bool ActionSpellSetGuardian(Heroes &, Monster::monster_t);
 
-class CastleIndexListBox : public Interface::ListBox<u16>
+class CastleIndexListBox : public Interface::ListBox<s32>
 {
 public:
-    CastleIndexListBox(const Point & pt, u16 & res) : Interface::ListBox<u16>(pt), result(res) {};
+    CastleIndexListBox(const Point & pt, u16 & res) : Interface::ListBox<s32>(pt), result(res) {};
 
-    void RedrawItem(const u16 &, s16, s16, bool);
+    void RedrawItem(const s32 &, s16, s16, bool);
     void RedrawBackground(const Point &);
 
     void ActionCurrentUp(void){};
     void ActionCurrentDn(void){};
-    void ActionListDoubleClick(u16 &){ result = Dialog::OK; };
-    void ActionListSingleClick(u16 &){};
-    void ActionListPressRight(u16 &){};
+    void ActionListDoubleClick(s32 &){ result = Dialog::OK; };
+    void ActionListSingleClick(s32 &){};
+    void ActionListPressRight(s32 &){};
 
     u16 & result;
 };
 
-void CastleIndexListBox::RedrawItem(const u16 & index, s16 dstx, s16 dsty, bool current)
+void CastleIndexListBox::RedrawItem(const s32 & index, s16 dstx, s16 dsty, bool current)
 {
     const Castle* castle =world.GetCastle(index);
 
@@ -153,15 +153,18 @@ bool HeroesTownGate(Heroes & hero, const Castle* castle)
 	Interface::Basic & I = Interface::Basic::Get();
 	Game::Focus & F = Game::Focus::Get();
 
-	const u16 src = hero.GetIndex();
-	const u16 dst = castle->GetIndex();
+	const s32 src = hero.GetIndex();
+	const s32 dst = castle->GetIndex();
+
+	if(!Maps::isValidAbsIndex(src) || !Maps::isValidAbsIndex(dst))
+		return false;
 
 	AGG::PlaySound(M82::KILLFADE);
 	hero.GetPath().Hide();
 	hero.FadeOut();
 
 	Cursor::Get().Hide();
-	hero.SetCenter(dst);
+	hero.SetIndex(dst);
 	hero.Scoute();
 
 	world.GetTiles(src).SetObject(hero.GetUnderObject());
@@ -254,21 +257,22 @@ bool ActionSpellSummonBoat(Heroes & hero)
     }
 
 
-    const u16 center = hero.GetIndex();
+    const s32 center = hero.GetIndex();
 
     // find water
     u16 around_zero = Maps::ScanAroundObject(center, MP2::OBJ_ZERO);
-    u16 dst_water = MAXU16;
+    s32 dst_water = -1;
     for(Direction::vector_t dir = Direction::TOP_LEFT; dir < Direction::CENTER; ++dir) if(around_zero & dir)
     {
-	const u16 dst = Maps::GetDirectionIndex(center, dir);
+	const s32 dst = Maps::GetDirectionIndex(center, dir);
         if(Maps::Ground::WATER == world.GetTiles(dst).GetGround()){ dst_water = dst; break; }
     }
 
     // find boat
-    const u16 src = world.GetNearestObject(center, MP2::OBJ_BOAT);
+    const s32 src = world.GetNearestObject(center, MP2::OBJ_BOAT);
 
-    if(Rand::Get(1, 100) <= chance && MAXU16 != src && dst_water != MAXU16)
+    if(Rand::Get(1, 100) <= chance &&
+	Maps::isValidAbsIndex(src) && Maps::isValidAbsIndex(dst_water))
     {
 	world.GetTiles(src).SetObject(MP2::OBJ_ZERO);
 	world.GetTiles(dst_water).SetObject(MP2::OBJ_BOAT);
@@ -293,18 +297,18 @@ bool ActionSpellDimensionDoor(Heroes & hero)
     F.SetRedraw();
     I.Redraw();
 
-    const u16 src = hero.GetIndex();
+    const s32 src = hero.GetIndex();
     // get destination
-    const s16 dst = I.GetDimensionDoorDestination(src, distance);
+    const s32 dst = I.GetDimensionDoorDestination(src, distance);
 
-    if(dst >= 0)
+    if(Maps::isValidAbsIndex(src) && Maps::isValidAbsIndex(dst))
     {
 	AGG::PlaySound(M82::KILLFADE);
 	hero.GetPath().Hide();
 	hero.FadeOut();
 
 	cursor.Hide();
-	hero.SetCenter(dst);
+	hero.SetIndex(dst);
 	hero.Scoute();
 
 	world.GetTiles(src).SetObject(hero.GetUnderObject());
@@ -330,12 +334,13 @@ bool ActionSpellDimensionDoor(Heroes & hero)
 
 bool ActionSpellTownGate(Heroes & hero)
 {
-    const u16 center = hero.GetIndex();
     const Kingdom & kingdom = world.GetKingdom(hero.GetColor());
     const std::vector<Castle *> & castles = kingdom.GetCastles();
     std::vector<Castle*>::const_iterator it;
-    u16 min = MAXU16;
+
     const Castle* castle = NULL;
+    const s32 center = hero.GetIndex();
+    s32 min = -1;
 
     // find the nearest castle
     for(it = castles.begin(); it != castles.end(); ++it) if(*it && !(*it)->GetHeroes())
@@ -370,7 +375,7 @@ bool ActionSpellTownGate(Heroes & hero)
 bool ActionSpellTownPortal(Heroes & hero)
 {
     const Kingdom & kingdom = world.GetKingdom(hero.GetColor());
-    std::vector<u16> castles;
+    std::vector<s32> castles;
 
     Display & display = Display::Get();
     Cursor & cursor = Cursor::Get();
@@ -443,13 +448,13 @@ bool ActionSpellTownPortal(Heroes & hero)
 
 bool ActionSpellVisions(Heroes & hero)
 {
-    std::vector<u16> monsters;
+    std::vector<s32> monsters;
 
     const u8 dist = hero.GetVisionsDistance();
 
     if(Maps::ScanDistanceObject(hero.GetIndex(), MP2::OBJ_MONSTER, dist, monsters))
     {
-	for(std::vector<u16>::const_iterator it = monsters.begin(); it != monsters.end(); ++it)
+	for(std::vector<s32>::const_iterator it = monsters.begin(); it != monsters.end(); ++it)
 	{
 	    const Maps::Tiles & tile = world.GetTiles(*it);
 	    const Army::Troop troop(tile);
@@ -516,7 +521,9 @@ bool ActionSpellSetGuardian(Heroes & hero, Monster::monster_t m)
 	return false;
     }
 
-    const u16 index = hero.GetIndex();
+    const s32 index = hero.GetIndex();
+    if(!Maps::isValidAbsIndex(index)) return false;
+
     Spell::spell_t spell = Spell::NONE;
 
     switch(m)

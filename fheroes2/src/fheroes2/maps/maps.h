@@ -32,51 +32,43 @@ class Castle;
 
 namespace Maps
 {
-
     enum mapsize_t
     {
 	ZERO	= 0,
         SMALL	= 36,
         MEDIUM	= 72,
         LARGE	= 108,
-        XLARGE	= 144
+        XLARGE	= 144,
+	XLARGE2 = 256,
+	XLARGE3	= 320
     };
 
-    const char* SizeString(u8);
+    const char* SizeString(u16);
     const char* GetMinesName(u8);
 
-    u16 GetDirectionIndex(u16 from, Direction::vector_t vector);
-    bool isValidDirection(u16 from, Direction::vector_t vector);
+    s32 GetDirectionIndex(s32 from, Direction::vector_t vector);
+    bool isValidDirection(s32 from, Direction::vector_t vector);
 
-    bool isValidAbsIndex(const s16);
+    bool isValidAbsIndex(s32);
     bool isValidAbsPoint(const Point & pt);
-    bool isValidAbsPoint(const s16 x, const s16 y);
+    bool isValidAbsPoint(s16 x, s16 y);
 
-    u16 GetTopIndex(u16 from);
-    u16 GetTopRightIndex(u16 from);
-    u16 GetRightIndex(u16 from);
-    u16 GetBottomRightIndex(u16 from);
-    u16 GetBottomIndex(u16 from);
-    u16 GetBottomLeftIndex(u16 from);
-    u16 GetLeftIndex(u16 from);
-    u16 GetTopLeftIndex(u16 from);
-
-    s16 GetIndexFromAbsPoint(const Point & mp);
-    s16 GetIndexFromAbsPoint(s16 px, s16 py);
+    s32 GetIndexFromAbsPoint(const Point & mp);
+    s32 GetIndexFromAbsPoint(s16 px, s16 py);
 
     u32 AnimationTicket(void);
     void IncreaseAnimationTicket(void);
 
-    u16 GetDirectionAroundGround(const u16 center, const u16 ground);
-    u8  GetCountAroundGround(const u16 center, const u16 ground);
-    u16 GetMaxGroundAround(const u16 center);
+    u16 GetDirectionAroundGround(const s32 center, const u16 ground);
+    u8  GetCountAroundGround(const s32 center, const u16 ground);
+    u16 GetMaxGroundAround(const s32 center);
 
-    u16  ScanAroundObject(const u16 center, const u8 obj, const u16 exclude = 0);
-    bool ScanDistanceObject(const u16 center, const u8 obj, const u16 dist, std::vector<u16> &);
-    u16  TileUnderProtection(const u16 center);
+    u16  ScanAroundObject(const s32 center, const u8 obj, const u16 exclude = 0);
+    bool ScanDistanceObject(const s32 center, const u8 obj, const u16 dist, std::vector<s32> &);
+    u16  TileUnderProtection(const s32 center);
 
-    void ClearFog(u16 center, u8 scoute, const u8 color);
-    u16 GetApproximateDistance(const u16 index1, const u16 index2);
+    void ClearFog(s32 center, u8 scoute, const u8 color);
+    u16 GetApproximateDistance(const s32 index1, const s32 index2);
 
 
     void UpdateRNDSpriteForCastle(const Point & center, u8 race, bool castle);

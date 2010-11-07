@@ -96,7 +96,7 @@ public:
     const Castle* inCastle(void) const;
     Castle* inCastle(void);
 
-    void LoadFromMP2(u16 map_index, const void *ptr,  const Color::color_t cl, const Race::race_t rc);
+    void LoadFromMP2(s32 map_index, const void *ptr,  const Color::color_t cl, const Race::race_t rc);
 
     void ResetStupidFlag(void) { ResetModes(STUPID); }
 
@@ -112,9 +112,6 @@ public:
     const Surface & GetPortrait30x22(void) const;
     const Surface & GetPortrait50x46(void) const;
     const Surface & GetPortrait101x93(void) const;
-
-    const Point & GetCenter(void) const;
-    u16 GetIndex(void) const;
 
     const Army::army_t & GetArmy(void) const{ return army; }
     Army::army_t & GetArmy(void) { return army; }
@@ -186,20 +183,17 @@ public:
 
     const Route::Path & GetPath(void) const{ return path; }
     Route::Path & GetPath(void) { return path; }
-    u16 FindPath(u16 dst_index) const;
-    u8 GetRangeRouteDays(const u16 dst) const;
+    s32 FindPath(s32 dst_index) const;
+    u8 GetRangeRouteDays(const s32 dst) const;
     void ShowPath(bool f){ f ? path.Show() : path.Hide(); }
     void RescanPath(void);
 
     Direction::vector_t GetDirection(void) const{ return direction; }
 
-    void SetVisited(const u16 index, const Visit::type_t type = Visit::LOCAL);
+    void SetVisited(const s32 index, const Visit::type_t type = Visit::LOCAL);
     bool isVisited(const u8 object, const Visit::type_t type = Visit::LOCAL) const;
     bool isVisited(const Maps::Tiles & tile, const Visit::type_t type = Visit::LOCAL) const;
 
-
-    void SetCenter(const Point& pt){ mp = pt; }
-    void SetCenter(const u16 index);
 
     bool Move(bool fast = false);
     bool isShow(u8 color);
@@ -208,17 +202,17 @@ public:
     void SetMove(bool f);
     bool isAction(void) const { return Modes(ACTION); }
     void ResetAction(void) { ResetModes(ACTION); }
-    void Action(const u16 dst_index);
+    void Action(const s32 dst_index);
     void ActionNewPosition(void);
     bool ApplyPenaltyMovement(void);
     bool ActionSpellCast(Spell::spell_t);
 
-    void AIAction(const u16 dst_index);
-    bool AIValidObject(u16);
+    void AIAction(const s32 dst_index);
+    bool AIValidObject(s32);
     void AIRescueWhereMove(void);
-    bool AIPriorityObject(u16);
+    bool AIPriorityObject(s32);
 
-    std::deque<u16> & GetAITasks(void) { return ai_sheduled_visit; }
+    std::deque<s32> & GetAITasks(void) { return ai_sheduled_visit; }
     void ClearAITasks(void) { ai_sheduled_visit.clear(); }
     s32 GetPrimaryTarget(void) const { return ai_primary_target; }
     void SetPrimaryTarget(s32 target) { ai_primary_target = target; }
@@ -230,7 +224,7 @@ public:
     void FadeIn(void) const;
     void Scoute(void);
     u8   GetScoute(void) const;
-    bool CanScouteTile(u16) const;
+    bool CanScouteTile(s32) const;
     u8   GetVisionsDistance(void) const;
 
     bool isShipMaster(void) const;
@@ -277,9 +271,8 @@ private:
     heroes_t		portrait;
     Race::race_t	race;
 
-    MP2::object_t	save_maps_general;
+    MP2::object_t	save_maps_object;
 
-    Point		mp;
     Route::Path		path;
 
     Direction::vector_t direction;
@@ -289,7 +282,7 @@ private:
     u8 patrol_square;
 
     std::list<IndexObject> visit_object;
-    std::deque<u16> ai_sheduled_visit;
+    std::deque<s32> ai_sheduled_visit;
     s32 ai_primary_target;
 };
 

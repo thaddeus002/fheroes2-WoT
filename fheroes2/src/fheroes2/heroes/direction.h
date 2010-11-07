@@ -47,7 +47,7 @@ namespace Direction
     const char* String(vector_t direct);
 
     vector_t FromInt(u16);
-    vector_t Get(u16 from, u16 to);
+    vector_t Get(s32 from, s32 to);
     vector_t Reflect(vector_t from);
 
     bool ShortDistanceClockWise(const vector_t from, const vector_t to);

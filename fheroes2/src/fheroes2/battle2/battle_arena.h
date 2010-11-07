@@ -69,7 +69,7 @@ namespace Battle2
 	Rect GetArea(void) const;
 	void SetEnemyQuality(const Stats &);
 	void SetPositionQuality(const Stats &);
-	void SetCobjObjects(u16);
+	void SetCobjObjects(s32);
 	void SetCobjObject(u16, u16);
 	void SetCovrObjects(u16);
 
@@ -104,7 +104,7 @@ namespace Battle2
     class Arena
     {
     public:
-	Arena(Army::army_t &, Army::army_t &, u16, bool);
+	Arena(Army::army_t &, Army::army_t &, s32, bool);
 	~Arena();
 
 	void Turns(u16, Result &);

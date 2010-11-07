@@ -33,7 +33,7 @@
 
 /* construct */
 Route::Path::Path(const Heroes & h)
-    : hero(h), dst(Maps::GetIndexFromAbsPoint(h.GetCenter())), hide(true)
+    : hero(h), dst(h.GetIndex()), hide(true)
 {
 }
 
@@ -53,22 +53,22 @@ void Route::Path::PopFront(void)
 }
 
 /* return length path */
-u16 Route::Path::Calculate(const u16 dst_index, const u16 limit)
+s32 Route::Path::Calculate(const s32 dst_index, const u16 limit)
 {
     clear();
 
     Algorithm::PathFind(this, hero.GetIndex(), dst_index, limit, &hero);
 
-    dst = dst_index;
+    dst = empty() ? hero.GetIndex() : dst_index;
 
-    return size();
+    return !empty();
 }
 
 void Route::Path::Reset(void)
 {
     if(empty()) return;
 
-    dst = Maps::GetIndexFromAbsPoint(hero.GetCenter());
+    dst = hero.GetIndex();
 
     clear();
 
@@ -257,10 +257,10 @@ void Route::Path::Dump(void) const
     for(; it1 != it2; ++it1) std::cout << "Path::Dump: " << Direction::String((*it1).Direction()) << ", " << (*it1).Penalty() << std::endl;
 }
 
-u16 Route::Path::isUnderProtection(u16 & pos) const
+u16 Route::Path::isUnderProtection(s32 & pos) const
 {
     const_iterator it = begin();
-    u16 next = hero.GetIndex();
+    s32 next = hero.GetIndex();
 
     for(; it != end(); ++it)
     {
@@ -279,10 +279,10 @@ u16 Route::Path::isUnderProtection(u16 & pos) const
     return 0;
 }
 
-bool Route::Path::hasObstacle(u16* res) const
+bool Route::Path::hasObstacle(s32* res) const
 {
     const_iterator it = begin();
-    u16 next = hero.GetIndex();
+    s32 next = hero.GetIndex();
 
     for(; it != end(); ++it)
     {
@@ -309,8 +309,8 @@ bool Route::Path::hasObstacle(u16* res) const
 void Route::Path::ScanObstacleAndReduce(void)
 {
     iterator it = begin();
-    u16 next = hero.GetIndex();
-    
+    s32 next = hero.GetIndex();
+
     for(; it != end(); ++it)
     {
 	if(Maps::isValidDirection(next, (*it).Direction()))

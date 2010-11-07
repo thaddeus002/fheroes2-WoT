@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2009 by Andrey Afletdinov <fheroes2@gmail.com>          *
+ *   Copyright (C) 2010 by Andrey Afletdinov <fheroes2@gmail.com>          *
  *                                                                         *
  *   Part of the Free Heroes2 Engine:                                      *
  *   http://sourceforge.net/projects/fheroes2                              *
@@ -19,20 +19,29 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef H2ALGORITHM_H
-#define H2ALGORITHM_H
 
-#include <list>
+#ifndef H2POSITION_H
+#define H2POSITION_H
+
 #include "gamedefs.h"
-#include "skill.h"
-#include "mp2.h"
 
-namespace Route { class Step; }
-class Heroes;
-
-namespace Algorithm
+namespace Maps
 {
-    bool PathFind(std::list<Route::Step> *result, const s32 from, const s32 to, const u16 limit = MAXU16, const Heroes * = NULL);
+    class Position
+    {
+    public:
+	Position() {};
+	Position(const Point &);
+
+	const Point & GetCenter(void) const;
+	s32 GetIndex(void) const;
+
+	void SetCenter(const Point &);
+	void SetIndex(s32);
+
+    protected:
+	Point center;
+    };
 }
 
 #endif

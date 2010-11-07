@@ -60,11 +60,11 @@ class Coord
 {
 public:
     Coord();
-    Coord(u16 index, const void *ptr);
+    Coord(s32 index, const void *ptr);
 
     bool AllowComputer(void) const{ return computer; }
     const Resource::funds_t & GetResource(void) const{ return resource; }
-    u16 GetIndex(void) const{ return index_map; }
+    s32 GetIndex(void) const{ return index_map; }
     u8  GetColors(void) const{ return colors; }
     const std::string & GetMessage(void) const{ return message; }
     Artifact::artifact_t GetArtifact(void) const {return artifact; }
@@ -72,7 +72,7 @@ public:
 private:
     friend class Game::IO;
 
-    u16 index_map;
+    s32 index_map;
     Resource::funds_t resource;
     Artifact::artifact_t artifact;
     bool computer;
@@ -85,12 +85,12 @@ class Riddle
 {
 public:
     Riddle();
-    Riddle(u16 index, const void *ptr);
+    Riddle(s32 index, const void *ptr);
 
     const Resource::funds_t & GetResource(void) const{ return resource; }
     Artifact::artifact_t GetArtifact(void) const {return artifact; }
     bool AnswerCorrect(const std::string & answer);
-    u16 GetIndex(void) const{ return index_map; }
+    s32 GetIndex(void) const{ return index_map; }
     const std::string & GetMessage(void) const{ return message; }
     bool isValid(void) const;
     void SetQuiet(void);
@@ -98,7 +98,7 @@ public:
 private:
     friend class Game::IO;
 
-    u16 index_map;
+    s32 index_map;
     Resource::funds_t resource;
     Artifact::artifact_t artifact;
     std::vector<std::string> answers;

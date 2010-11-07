@@ -39,7 +39,7 @@
 
 void Kingdom::AIDumpCacheObjects(const IndexDistance & id) const
 {
-    std::map<u16, MP2::object_t>::const_iterator it = ai_objects.find(id.first);
+    std::map<s32, MP2::object_t>::const_iterator it = ai_objects.find(id.first);
     if(it != ai_objects.end())
     DEBUG(DBG_AI , DBG_TRACE, "AIDumpCacheObjects: " << MP2::StringObject((*it).second) << ", maps index: " << id.first << ", dist: " << id.second);
 }
@@ -260,9 +260,9 @@ void Kingdom::AIHeroesNoGUITurns(Heroes &hero)
 
 void Kingdom::AIHeroesGetTask(Heroes & hero)
 {
-    std::deque<u16> & task = hero.GetAITasks();
+    std::deque<s32> & task = hero.GetAITasks();
 
-    std::vector<u16> results;
+    std::vector<s32> results;
     results.reserve(5);
 
     // patrol task
@@ -277,7 +277,7 @@ void Kingdom::AIHeroesGetTask(Heroes & hero)
 	if(Maps::ScanDistanceObject(Maps::GetIndexFromAbsPoint(hero.GetCenterPatrol()),
 				    MP2::OBJ_HEROES, hero.GetSquarePatrol(), results))
 	{
-	    std::vector<u16>::const_iterator it = results.begin();
+	    std::vector<s32>::const_iterator it = results.begin();
 	    for(; it != results.end(); ++it)
 	    {
 		const Heroes* enemy = world.GetHeroes(*it);
@@ -315,7 +315,7 @@ void Kingdom::AIHeroesGetTask(Heroes & hero)
 	if(Maps::ScanDistanceObject(hero.GetIndex(), MP2::OBJ_CASTLE, hero.GetScoute(), results) ||
     	    Maps::ScanDistanceObject(hero.GetIndex(), MP2::OBJ_HEROES, hero.GetScoute(), results))
 	{
-	    std::vector<u16>::const_iterator it = results.begin();
+	    std::vector<s32>::const_iterator it = results.begin();
 
 	    for(; it != results.end(); ++it)
 		if(hero.AIPriorityObject(*it) &&
@@ -355,7 +355,7 @@ void Kingdom::AIHeroesGetTask(Heroes & hero)
     	    Maps::ScanDistanceObject(hero.GetIndex(), MP2::OBJ_MINES, 3, results) ||
     	    Maps::ScanDistanceObject(hero.GetIndex(), MP2::OBJ_ALCHEMYLAB, 3, results))
 	{
-	    std::vector<u16>::const_iterator it = results.begin();
+	    std::vector<s32>::const_iterator it = results.begin();
 	    for(; it != results.end(); ++it)
     		if(hero.AIPriorityObject(*it) &&
 		    hero.GetPath().Calculate(*it))
@@ -388,7 +388,7 @@ void Kingdom::AIHeroesGetTask(Heroes & hero)
     // find passable index
     while(task.size())
     {
-	const u16 & index = task.front();
+	const s32 & index = task.front();
 
 	if(hero.GetPath().Calculate(index)) break;
 
@@ -403,14 +403,15 @@ void Kingdom::AIHeroesGetTask(Heroes & hero)
     // success
     if(task.size())
     {
-	const u16 index = task.front();
+	const s32 & index = task.front();
 
 	DEBUG(DBG_AI , DBG_INFO, "AI::HeroesTask: " << Color::String(color) <<
 	", Hero " << hero.GetName() << " say: go to object: " <<
 	MP2::StringObject(world.GetTiles(index).GetObject()) << ", index: " << index);
 
-	task.pop_front();
 	ai_objects.erase(index);
+	task.pop_front();
+
 	if(IS_DEBUG(DBG_AI, DBG_TRACE)) hero.GetPath().Dump();
     }
     else
@@ -427,7 +428,7 @@ void Kingdom::AIHeroesPrepareTask(Heroes & hero)
 {
     if(hero.GetPath().isValid()) return;
 
-    std::deque<u16> & task = hero.GetAITasks();
+    std::deque<s32> & task = hero.GetAITasks();
 
     Castle *castle = hero.inCastle();
 
@@ -452,7 +453,7 @@ void Kingdom::AIHeroesPrepareTask(Heroes & hero)
     std::vector<IndexDistance> objs;
     objs.reserve(ai_objects.size());
 
-    for(std::map<u16, MP2::object_t>::const_iterator
+    for(std::map<s32, MP2::object_t>::const_iterator
 	it = ai_objects.begin(); it != ai_objects.end(); ++it)
     {
 	if(hero.isShipMaster())
@@ -482,7 +483,7 @@ void Kingdom::AIHeroesPrepareTask(Heroes & hero)
 	if(hero.AIValidObject((*it).first) &&
 	    hero.GetPath().Calculate((*it).first))
 	{
-	    u16 pos = 0;
+	    s32 pos = 0;
 
 	    // path dangerous
 	    if(u16 around = hero.GetPath().isUnderProtection(pos))
@@ -491,7 +492,7 @@ void Kingdom::AIHeroesPrepareTask(Heroes & hero)
     		for(Direction::vector_t
         	    dir = Direction::TOP_LEFT; dir < Direction::CENTER && !skip; ++dir) if(around & dir)
     		{
-        	    const u16 dst = Maps::GetDirectionIndex(pos, dir);
+        	    const s32 dst = Maps::GetDirectionIndex(pos, dir);
         	    Army::army_t enemy;
         	    enemy.FromGuardian(world.GetTiles(dst));
         	    if(enemy.isValid() && enemy.StrongerEnemyArmy(hero.GetArmy())) skip = true;

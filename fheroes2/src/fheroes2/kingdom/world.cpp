@@ -184,7 +184,7 @@ void World::NewMaps(const u16 sw, const u16 sh)
     vec_tiles.resize(width * height);
 
     // init all tiles
-    for(u16 ii = 0; ii < width * height; ++ii)
+    for(int ii = 0; ii < width * height; ++ii)
     {
 	MP2::mp2tile_t mp2tile;
 	
@@ -219,7 +219,7 @@ void World::LoadMaps(const std::string &filename)
     u8   byte8;
     u16  byte16;
     u32  byte32;
-    std::vector<u16> vec_object; // index maps for OBJ_CASTLE, OBJ_HEROES, OBJ_SIGN, OBJ_BOTTLE, OBJ_EVENT
+    std::vector<s32> vec_object; // index maps for OBJ_CASTLE, OBJ_HEROES, OBJ_SIGN, OBJ_BOTTLE, OBJ_EVENT
     vec_object.reserve(100);
 
     // endof
@@ -303,7 +303,7 @@ void World::LoadMaps(const std::string &filename)
     vec_tiles.resize(width * height, NULL);
 
     // read all tiles
-    for(u16 ii = 0; ii < width * height; ++ii)
+    for(int ii = 0; ii < width * height; ++ii)
     {
 	MP2::mp2tile_t mp2tile;
 
@@ -542,7 +542,7 @@ void World::LoadMaps(const std::string &filename)
 	// read block
 	fd.read(reinterpret_cast<char *>(pblock), sizeblock);
 
-	std::vector<u16>::const_iterator it_index = vec_object.begin();
+	std::vector<s32>::const_iterator it_index = vec_object.begin();
 	bool findobject = false;
 
 	while(it_index != vec_object.end())
@@ -762,9 +762,9 @@ void World::LoadMaps(const std::string &filename)
     fd.close();
 
     // modify other objects
-    const u16 vec_size = vec_tiles.size();
+    const s32 vec_size = vec_tiles.size();
 
-    for(u16 ii = 0; ii < vec_size; ++ii)
+    for(s32 ii = 0; ii < vec_size; ++ii)
     {
 	Maps::Tiles & tile = *vec_tiles[ii];
 	const Maps::TilesAddon *addon = NULL;
@@ -939,9 +939,9 @@ void World::LoadMaps(const std::string &filename)
     }
 
     // generate position for ultimate
-    if(MAXU16 == ultimate_artifact)
+    if(-1 == ultimate_artifact)
     {
-	std::vector<u16> pools;
+	std::vector<s32> pools;
 	pools.reserve(vec_tiles.size());
 
 	for(u16 ii = 0; ii < vec_tiles.size(); ++ii)
@@ -954,13 +954,14 @@ void World::LoadMaps(const std::string &filename)
 
 	if(pools.size())
 	{
-	    const u16 pos = *Rand::Get(pools);
+	    const s32 pos = *Rand::Get(pools);
 	    ultimate_artifact = pos;
 	    vec_tiles[pos]->SetQuantity1(Artifact::RandUltimate());
 	}
     }
 
-    Interface::GameArea::GenerateUltimateArtifactAreaSurface(ultimate_artifact, puzzle_surface);
+    if(Maps::isValidAbsIndex(ultimate_artifact))
+	Interface::GameArea::GenerateUltimateArtifactAreaSurface(ultimate_artifact, puzzle_surface);
 
     // update wins, loss conditions
     if(GameOver::WINS_HERO & Settings::Get().ConditionWins())
@@ -1022,18 +1023,18 @@ const Kingdom & World::GetKingdom(u8 color) const
 }
 
 /* get castle from index maps */
-Castle * World::GetCastle(u16 maps_index)
+Castle * World::GetCastle(s32 maps_index)
 {
     return GetCastle(maps_index % width, maps_index / height);
 }
 
-const Castle * World::GetCastle(u16 maps_index) const
+const Castle * World::GetCastle(s32 maps_index) const
 {
     return GetCastle(maps_index % width, maps_index / height);
 }
 
 /* get castle from coord maps */
-Castle * World::GetCastle(u8 ax, u8 ay) const
+Castle * World::GetCastle(u16 ax, u16 ay) const
 {
     std::vector<Castle *>::const_iterator it1 = vec_castles.begin();
     std::vector<Castle *>::const_iterator it2 = vec_castles.end();
@@ -1041,7 +1042,7 @@ Castle * World::GetCastle(u8 ax, u8 ay) const
     for(; it1 != it2; ++it1)
         if(*it1 && (*it1)->ContainCoord(ax, ay)) return *it1;
 
-    DEBUG(DBG_GAME, DBG_TRACE, "World::GetCastle: return NULL pointer, x: " << static_cast<int>(ax) << ", y: " << static_cast<int>(ay));
+    DEBUG(DBG_GAME, DBG_TRACE, "World::GetCastle: " << "return NULL pointer" << ", x: " << ax << ", y: " << ay);
 
     return NULL;
 }
@@ -1057,24 +1058,26 @@ const Heroes * World::GetHeroes(Heroes::heroes_t id) const
 }
 
 /* get heroes from index maps */
-Heroes * World::GetHeroes(u16 maps_index)
+Heroes * World::GetHeroes(s32 maps_index)
 {
     return GetHeroes(maps_index % width, maps_index / height);
 }
 
-const Heroes * World::GetHeroes(u16 maps_index) const
+const Heroes * World::GetHeroes(s32 maps_index) const
 {
     return GetHeroes(maps_index % width, maps_index / height);
 }
 
 /* get heroes from coord maps */
-Heroes * World::GetHeroes(u8 ax, u8 ay) const
+Heroes * World::GetHeroes(u16 ax, u16 ay) const
 {
     std::vector<Heroes *>::const_iterator it1 = vec_heroes.begin();
     std::vector<Heroes *>::const_iterator it2 = vec_heroes.end();
 
     for(; it1 != it2; ++it1)
         if(*it1 && (*it1)->GetCenter().x == ax && (*it1)->GetCenter().y == ay) return *it1;
+
+    DEBUG(DBG_GAME, DBG_TRACE, "World::GetHeroes: " << "return NULL pointer" << ", x: " << ax << ", y: " << ay);
 
     return NULL;
 }
@@ -1207,7 +1210,7 @@ void World::Reset(void)
     map_sign.clear();
     map_captureobj.clear();
 
-    ultimate_artifact = 0xFFFF;
+    ultimate_artifact = -1;
     Surface::FreeSurface(puzzle_surface);
 
     day = 0;
@@ -1302,9 +1305,9 @@ const std::string & World::GetRumors(void)
 }
 
 /* return random teleport destination */
-u16 World::NextTeleport(const u16 index) const
+s32 World::NextTeleport(const s32 index) const
 {
-    std::vector<u16> vec_teleports;
+    std::vector<s32> vec_teleports;
     
     vec_teleports.reserve(10);
     GetObjectIndexes(vec_teleports, MP2::OBJ_STONELIGHTS, false);
@@ -1317,10 +1320,10 @@ u16 World::NextTeleport(const u16 index) const
 
     const u8 type = GetTiles(index).GetQuantity1();
 
-    std::vector<u16> v;
+    std::vector<s32> v;
     v.reserve(vec_teleports.size());
 
-    for(std::vector<u16>::const_iterator itv = vec_teleports.begin(); itv != vec_teleports.end(); ++itv)
+    for(std::vector<s32>::const_iterator itv = vec_teleports.begin(); itv != vec_teleports.end(); ++itv)
 	if(type == GetTiles(*itv).GetQuantity1()) v.push_back(*itv);
 
     if(v.empty()) DEBUG(DBG_GAME , DBG_WARN, "World::NextTeleport: not found.");
@@ -1329,15 +1332,15 @@ u16 World::NextTeleport(const u16 index) const
 }
 
 /* return random whirlpools destination */
-u16 World::NextWhirlpool(const u16 index)
+s32 World::NextWhirlpool(const s32 index)
 {
-    std::vector<u16> whilrpools;
-    std::vector<u16>::const_iterator itv;
+    std::vector<s32> whilrpools;
+    std::vector<s32>::const_iterator itv;
 
     whilrpools.reserve(40);
     GetObjectIndexes(whilrpools, MP2::OBJ_WHIRLPOOL, false);
 
-    std::map<u32, std::vector<u16> > uniq_whirlpools;
+    std::map<s32, std::vector<s32> > uniq_whirlpools;
 
     for(itv = whilrpools.begin(); itv != whilrpools.end(); ++itv)
     {
@@ -1358,8 +1361,8 @@ u16 World::NextWhirlpool(const u16 index)
 
     if(addon)
     {
-	std::map<u32, std::vector<u16> >::const_iterator it1 = uniq_whirlpools.begin();
-	std::map<u32, std::vector<u16> >::const_iterator it2 = uniq_whirlpools.end();
+	std::map<s32, std::vector<s32> >::const_iterator it1 = uniq_whirlpools.begin();
+	std::map<s32, std::vector<s32> >::const_iterator it2 = uniq_whirlpools.end();
 	for(; it1 != it2; ++it1)
 	{
 	    const u32 & uniq = (*it1).first;
@@ -1368,7 +1371,7 @@ u16 World::NextWhirlpool(const u16 index)
 	}
     }
 
-    std::vector<u16> & dest = uniq_whirlpools[*Rand::Get(uniqs)];
+    std::vector<s32> & dest = uniq_whirlpools[*Rand::Get(uniqs)];
     uniqs.clear();
 
     if(dest.empty()) DEBUG(DBG_GAME , DBG_WARN, "World::NextWhirlpool: is full.");
@@ -1377,7 +1380,7 @@ u16 World::NextWhirlpool(const u16 index)
 }
 
 /* return message from sign */
-const std::string & World::MessageSign(const u16 index)
+const std::string & World::MessageSign(const s32 index)
 {
     return map_sign[index];
 }
@@ -1385,8 +1388,8 @@ const std::string & World::MessageSign(const u16 index)
 /* return count captured object */
 u16 World::CountCapturedObject(const MP2::object_t obj, const Color::color_t col) const
 {
-    std::map<u16, ObjectColor>::const_iterator it1 = map_captureobj.begin();
-    std::map<u16, ObjectColor>::const_iterator it2 = map_captureobj.end();
+    std::map<s32, ObjectColor>::const_iterator it1 = map_captureobj.begin();
+    std::map<s32, ObjectColor>::const_iterator it2 = map_captureobj.end();
 
     u16 result = 0;
     for(; it1 != it2; ++it1) if((*it1).second.isObject(obj) && (*it1).second.isColor(col)) ++result;
@@ -1397,8 +1400,8 @@ u16 World::CountCapturedObject(const MP2::object_t obj, const Color::color_t col
 /* return count captured mines */
 u16 World::CountCapturedMines(const Resource::resource_t res, const Color::color_t col) const
 {
-    std::map<u16, ObjectColor>::const_iterator it1 = map_captureobj.begin();
-    std::map<u16, ObjectColor>::const_iterator it2 = map_captureobj.end();
+    std::map<s32, ObjectColor>::const_iterator it1 = map_captureobj.begin();
+    std::map<s32, ObjectColor>::const_iterator it2 = map_captureobj.end();
 
     u16 result = 0;
 
@@ -1427,7 +1430,7 @@ u16 World::CountCapturedMines(const Resource::resource_t res, const Color::color
 }
 
 /* capture object */
-void World::CaptureObject(const u16 index, const Color::color_t col)
+void World::CaptureObject(const s32 index, const Color::color_t col)
 {
     MP2::object_t obj = GetTiles(index).GetObject();
     
@@ -1452,10 +1455,10 @@ void World::CaptureObject(const u16 index, const Color::color_t col)
 }
 
 /* return color captured object */
-Color::color_t World::ColorCapturedObject(const u16 index) const
+Color::color_t World::ColorCapturedObject(const s32 index) const
 {
-    std::map<u16, ObjectColor>::const_iterator it1 = map_captureobj.begin();
-    std::map<u16, ObjectColor>::const_iterator it2 = map_captureobj.end();
+    std::map<s32, ObjectColor>::const_iterator it1 = map_captureobj.begin();
+    std::map<s32, ObjectColor>::const_iterator it2 = map_captureobj.end();
 
     for(; it1 != it2; ++it1) if((*it1).first == index) return (*it1).second.second;
 
@@ -1483,8 +1486,8 @@ void World::ClearFog(const u8 color)
     }
 
     // clear abroad objects
-    std::map<u16, ObjectColor>::const_iterator it1 = map_captureobj.begin();
-    std::map<u16, ObjectColor>::const_iterator it2 = map_captureobj.end();
+    std::map<s32, ObjectColor>::const_iterator it1 = map_captureobj.begin();
+    std::map<s32, ObjectColor>::const_iterator it2 = map_captureobj.end();
 
     for(; it1 != it2; ++it1)
 	if(color & (*it1).second.second)
@@ -1617,7 +1620,7 @@ void World::UpdateMonsterPopulation(void)
 
 Artifact::artifact_t World::GetUltimateArtifact(void) const
 {
-    return ultimate_artifact < vec_tiles.size() ? Artifact::FromInt(vec_tiles[ultimate_artifact]->GetQuantity1()) : Artifact::UNKNOWN;
+    return Maps::isValidAbsIndex(ultimate_artifact) ? Artifact::FromInt(vec_tiles[ultimate_artifact]->GetQuantity1()) : Artifact::UNKNOWN;
 }
 
 bool World::DiggingForUltimateArtifact(const Point & center)
@@ -1650,10 +1653,12 @@ void World::ActionForMagellanMaps(u8 color)
     for(; it1 != it2; ++it1) if(*it1 && Maps::Ground::WATER == (*it1)->GetGround()) (*it1)->ClearFog(color);
 }
 
-u16 World::GetNearestObject(const u16 center, const MP2::object_t obj)
+s32 World::GetNearestObject(const s32 center, const MP2::object_t obj)
 {
-    u16 res = MAXU16;
-    u16 min = MAXU16;
+    if(!Maps::isValidAbsIndex(center)) return -1;
+
+    s32 res = -1;
+    s32 min = -1;
 
     std::vector<Maps::Tiles *>::const_iterator it1 = vec_tiles.begin();
     std::vector<Maps::Tiles *>::const_iterator it2 = vec_tiles.end();
@@ -1692,7 +1697,7 @@ void  World::GetEventDay(const Color::color_t c, std::vector<GameEvent::Day *> &
     }
 }
 
-const GameEvent::Coord* World::GetEventMaps(const Color::color_t c, const u16 index) const
+const GameEvent::Coord* World::GetEventMaps(const Color::color_t c, const s32 index) const
 {
     if(vec_eventsmap.size())
     {
@@ -1706,7 +1711,7 @@ const GameEvent::Coord* World::GetEventMaps(const Color::color_t c, const u16 in
     return NULL;
 }
 
-void World::StoreActionObject(const u8 color, std::map<u16, MP2::object_t> & store)
+void World::StoreActionObject(const u8 color, std::map<s32, MP2::object_t> & store)
 {
     std::vector<Maps::Tiles *>::const_iterator it1 = vec_tiles.begin();
     std::vector<Maps::Tiles *>::const_iterator it2 = vec_tiles.end();
@@ -1749,11 +1754,6 @@ void World::DateDump(void) const
     std::cout << "World::Date: month: " << static_cast<int>(GetMonth()) <<  ", week " << static_cast<int>(GetWeek()) << ", day: " << static_cast<int>(GetDay()) << std::endl;
 }
 
-u16 World::GetUltimateArtifactIndex(void)
-{
-    return ultimate_artifact;
-}
-
 u16 World::CountObeliskOnMaps(void)
 {
     std::vector<Maps::Tiles *>::const_iterator it1 = vec_tiles.begin();
@@ -1786,8 +1786,8 @@ void World::KingdomLoss(const Color::color_t color)
     for(; itc1 != itc2; ++itc1) if(*itc1 && (*itc1)->GetColor() == color) (*itc1)->ChangeColor(color);
 
     // capture object
-    std::map<u16, ObjectColor>::iterator it1 = map_captureobj.begin();
-    std::map<u16, ObjectColor>::const_iterator it2 = map_captureobj.end();
+    std::map<s32, ObjectColor>::iterator it1 = map_captureobj.begin();
+    std::map<s32, ObjectColor>::const_iterator it2 = map_captureobj.end();
     for(; it1 != it2; ++it1)
     {
 	ObjectColor & pair = (*it1).second;
@@ -1799,7 +1799,7 @@ void World::KingdomLoss(const Color::color_t color)
     }
 }
 
-Heroes* World::FromJail(u16 index)
+Heroes* World::FromJail(s32 index)
 {
     std::vector<Heroes *>::iterator ith1 = vec_heroes.begin();
     std::vector<Heroes *>::const_iterator ith2 = vec_heroes.end();
@@ -1810,20 +1810,20 @@ Heroes* World::FromJail(u16 index)
 
 void World::ActionToEyeMagi(const Color::color_t color) const
 {
-    std::vector<u16> vec_eyes;
+    std::vector<s32> vec_eyes;
     vec_eyes.reserve(10);
     GetObjectIndexes(vec_eyes, MP2::OBJ_EYEMAGI, true);
 
     if(vec_eyes.size())
     {
-	std::vector<u16>::const_iterator it1 = vec_eyes.begin();
-	std::vector<u16>::const_iterator it2 = vec_eyes.end();
+	std::vector<s32>::const_iterator it1 = vec_eyes.begin();
+	std::vector<s32>::const_iterator it2 = vec_eyes.end();
 
 	for(; it1 != it2; ++it1) Maps::ClearFog(*it1, Game::GetViewDistance(Game::VIEW_MAGI_EYES), color);
     }
 }
 
-GameEvent::Riddle* World::GetSphinx(const u16 index) const
+GameEvent::Riddle* World::GetSphinx(const s32 index) const
 {
     std::vector<GameEvent::Riddle *>::const_iterator it1 = vec_riddles.begin();
     std::vector<GameEvent::Riddle *>::const_iterator it2 = vec_riddles.end();
@@ -1833,7 +1833,7 @@ GameEvent::Riddle* World::GetSphinx(const u16 index) const
     return NULL;
 }
 
-void World::GetObjectIndexes(std::vector<u16> & v, MP2::object_t obj, bool check_hero) const
+void World::GetObjectIndexes(std::vector<s32> & v, MP2::object_t obj, bool check_hero) const
 {
     std::vector<Maps::Tiles *>::const_iterator it1 = vec_tiles.begin();
     std::vector<Maps::Tiles *>::const_iterator it2 = vec_tiles.end();

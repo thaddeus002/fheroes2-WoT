@@ -58,7 +58,7 @@ namespace Battle2
 	u32  exp2;
     };
 
-    Result Loader(Army::army_t &, Army::army_t &, u16);
+    Result Loader(Army::army_t &, Army::army_t &, s32);
     void UpdateMonsterInfoAnimation(const std::string &);
     void UpdateMonsterAttributes(const std::string &);
 

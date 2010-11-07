@@ -117,7 +117,7 @@ bool Game::LoadSAV2FileInfo(const std::string & fn,  Maps::FileInfo & maps_file)
     if(!msg.LoadSAV(fn)) return false;
 
     u8 byte8;
-    u16 byte16;
+    u16 byte16, version;
     u32 byte32;
     std::string str;
 
@@ -126,7 +126,7 @@ bool Game::LoadSAV2FileInfo(const std::string & fn,  Maps::FileInfo & maps_file)
     msg.Pop(byte16);
     if(byte16 != 0xFF01) return false;
     // format version
-    msg.Pop(byte16);
+    msg.Pop(version);
     // major version
     msg.Pop(byte8);
     // minor version
@@ -139,8 +139,16 @@ bool Game::LoadSAV2FileInfo(const std::string & fn,  Maps::FileInfo & maps_file)
 
     // maps
     msg.Pop(byte16);
-    msg.Pop(maps_file.size_w);
-    msg.Pop(maps_file.size_h);
+    if(FORMAT_VERSION_2030 <= version)
+    {
+	msg.Pop(maps_file.size_w);
+	msg.Pop(maps_file.size_h);
+    }
+    else
+    {
+	msg.Pop(byte8); maps_file.size_w = byte8;
+	msg.Pop(byte8); maps_file.size_h = byte8;
+    }
     msg.Pop(str);
     msg.Pop(maps_file.difficulty);
     msg.Pop(maps_file.kingdom_colors);
@@ -288,8 +296,8 @@ bool Game::IO::SaveBIN(QueueMessage & msg)
     msg.Push(static_cast<u16>(0xFF0A));
     msg.Push(static_cast<u32>(world.map_sign.size()));
     {
-        std::map<u16, std::string>::const_iterator it1 = world.map_sign.begin();
-	std::map<u16, std::string>::const_iterator it2 = world.map_sign.end();
+        std::map<s32, std::string>::const_iterator it1 = world.map_sign.begin();
+	std::map<s32, std::string>::const_iterator it2 = world.map_sign.end();
 	for(; it1 != it2; ++it1)
 	{
 	    msg.Push((*it1).first);
@@ -301,8 +309,8 @@ bool Game::IO::SaveBIN(QueueMessage & msg)
     msg.Push(static_cast<u16>(0xFF0B));
     msg.Push(static_cast<u32>(world.map_captureobj.size()));
     {
-	std::map<u16, ObjectColor>::const_iterator it1 = world.map_captureobj.begin();
-	std::map<u16, ObjectColor>::const_iterator it2 = world.map_captureobj.end();
+	std::map<s32, ObjectColor>::const_iterator it1 = world.map_captureobj.begin();
+	std::map<s32, ObjectColor>::const_iterator it2 = world.map_captureobj.end();
 	for(; it1 != it2; ++it1)
 	{
 	    msg.Push((*it1).first);
@@ -330,13 +338,13 @@ bool Game::IO::SaveBIN(QueueMessage & msg)
 	{
 	    if(NULL == *it1){ DEBUG(DBG_GAME , DBG_WARN, "Game::IO::SaveBIN: eventday is NULL"); return false; }
 
-	    msg.Push(static_cast<u32>((*it1)->resource.wood));
-	    msg.Push(static_cast<u32>((*it1)->resource.mercury));
-	    msg.Push(static_cast<u32>((*it1)->resource.ore));
-	    msg.Push(static_cast<u32>((*it1)->resource.sulfur));
-	    msg.Push(static_cast<u32>((*it1)->resource.crystal));
-	    msg.Push(static_cast<u32>((*it1)->resource.gems));
-	    msg.Push(static_cast<u32>((*it1)->resource.gold));
+	    msg.Push((*it1)->resource.wood);
+	    msg.Push((*it1)->resource.mercury);
+	    msg.Push((*it1)->resource.ore);
+	    msg.Push((*it1)->resource.sulfur);
+	    msg.Push((*it1)->resource.crystal);
+	    msg.Push((*it1)->resource.gems);
+	    msg.Push((*it1)->resource.gold);
 	    msg.Push(static_cast<u8>((*it1)->computer));
 	    msg.Push((*it1)->first);
 	    msg.Push((*it1)->subsequent);
@@ -356,13 +364,13 @@ bool Game::IO::SaveBIN(QueueMessage & msg)
 	    if(NULL == *it1){ DEBUG(DBG_GAME , DBG_WARN, "Game::IO::SaveBIN: eventmaps is NULL"); return false; }
 
 	    msg.Push((*it1)->index_map);
-	    msg.Push(static_cast<u32>((*it1)->resource.wood));
-	    msg.Push(static_cast<u32>((*it1)->resource.mercury));
-	    msg.Push(static_cast<u32>((*it1)->resource.ore));
-	    msg.Push(static_cast<u32>((*it1)->resource.sulfur));
-	    msg.Push(static_cast<u32>((*it1)->resource.crystal));
-	    msg.Push(static_cast<u32>((*it1)->resource.gems));
-	    msg.Push(static_cast<u32>((*it1)->resource.gold));
+	    msg.Push((*it1)->resource.wood);
+	    msg.Push((*it1)->resource.mercury);
+	    msg.Push((*it1)->resource.ore);
+	    msg.Push((*it1)->resource.sulfur);
+	    msg.Push((*it1)->resource.crystal);
+	    msg.Push((*it1)->resource.gems);
+	    msg.Push((*it1)->resource.gold);
 	    msg.Push(static_cast<u8>((*it1)->artifact));
 	    msg.Push(static_cast<u8>((*it1)->computer));
 	    msg.Push(static_cast<u8>((*it1)->cancel));
@@ -382,13 +390,13 @@ bool Game::IO::SaveBIN(QueueMessage & msg)
 	    if(NULL == *it1){ DEBUG(DBG_GAME , DBG_WARN, "Game::IO::SaveBIN: riddles is NULL"); return false; }
 
 	    msg.Push((*it1)->index_map);
-	    msg.Push(static_cast<u32>((*it1)->resource.wood));
-	    msg.Push(static_cast<u32>((*it1)->resource.mercury));
-	    msg.Push(static_cast<u32>((*it1)->resource.ore));
-	    msg.Push(static_cast<u32>((*it1)->resource.sulfur));
-	    msg.Push(static_cast<u32>((*it1)->resource.crystal));
-	    msg.Push(static_cast<u32>((*it1)->resource.gems));
-	    msg.Push(static_cast<u32>((*it1)->resource.gold));
+	    msg.Push((*it1)->resource.wood);
+	    msg.Push((*it1)->resource.mercury);
+	    msg.Push((*it1)->resource.ore);
+	    msg.Push((*it1)->resource.sulfur);
+	    msg.Push((*it1)->resource.crystal);
+	    msg.Push((*it1)->resource.gems);
+	    msg.Push((*it1)->resource.gold);
 	    msg.Push(static_cast<u8>((*it1)->artifact));
 	    msg.Push(static_cast<u8>((*it1)->quiet));
 
@@ -407,15 +415,17 @@ bool Game::IO::SaveBIN(QueueMessage & msg)
 
 void Game::IO::PackTile(QueueMessage & msg, const Maps::Tiles & tile)
 {
-    msg.Push(tile.tile_index);
-    msg.Push(tile.shape);
-    msg.Push(tile.general);
+    msg.Push(tile.tile_sprite_index);
+    msg.Push(tile.tile_sprite_shape);
+    msg.Push(tile.mp2_object);
     msg.Push(tile.quantity1);
     msg.Push(tile.quantity2);
     msg.Push(tile.quantity3);
     msg.Push(tile.quantity4);
     msg.Push(tile.fogs);
-    msg.Push(tile.unused);
+    msg.Push(tile.unused1);
+    msg.Push(tile.unused2);
+    msg.Push(tile.unused3);
 
     // addons 1
     msg.Push(static_cast<u8>(tile.addons_level1.size()));
@@ -454,13 +464,13 @@ void Game::IO::PackKingdom(QueueMessage & msg, const Kingdom & kingdom)
     msg.Push(static_cast<u16>(kingdom.ai_capital ? kingdom.ai_capital->GetIndex() : 0));
 
     // funds
-    msg.Push(static_cast<u32>(kingdom.resource.wood));
-    msg.Push(static_cast<u32>(kingdom.resource.mercury));
-    msg.Push(static_cast<u32>(kingdom.resource.ore));
-    msg.Push(static_cast<u32>(kingdom.resource.sulfur));
-    msg.Push(static_cast<u32>(kingdom.resource.crystal));
-    msg.Push(static_cast<u32>(kingdom.resource.gems));
-    msg.Push(static_cast<u32>(kingdom.resource.gold));
+    msg.Push(kingdom.resource.wood);
+    msg.Push(kingdom.resource.mercury);
+    msg.Push(kingdom.resource.ore);
+    msg.Push(kingdom.resource.sulfur);
+    msg.Push(kingdom.resource.crystal);
+    msg.Push(kingdom.resource.gems);
+    msg.Push(kingdom.resource.gold);
 
     // visit objects
     msg.Push(static_cast<u32>(kingdom.visit_object.size()));
@@ -485,8 +495,8 @@ void Game::IO::PackKingdom(QueueMessage & msg, const Kingdom & kingdom)
 
 void Game::IO::PackCastle(QueueMessage & msg, const Castle & castle)
 {
-    msg.Push(static_cast<u16>(castle.mp.x));
-    msg.Push(static_cast<u16>(castle.mp.y));
+    msg.Push(castle.GetCenter().x);
+    msg.Push(castle.GetCenter().y);
     msg.Push(static_cast<u8>(castle.race));
 
     msg.Push(castle.modes);
@@ -542,9 +552,9 @@ void Game::IO::PackHeroes(QueueMessage & msg, const Heroes & hero)
     msg.Push(hero.move_point);
     msg.Push(static_cast<u16>(hero.direction));
     msg.Push(hero.sprite_index);
-    msg.Push(static_cast<u8>(hero.save_maps_general));
-    msg.Push(static_cast<u16>(hero.mp.x));
-    msg.Push(static_cast<u16>(hero.mp.y));
+    msg.Push(static_cast<u8>(hero.save_maps_object));
+    msg.Push(hero.center.x);
+    msg.Push(hero.center.y);
 
     // sec skills
     msg.Push(static_cast<u32>(hero.secondary_skills.size()));
@@ -646,24 +656,30 @@ bool Game::IO::LoadBIN(QueueMessage & msg)
     // time
     msg.Pop(byte32);
     // lang
-    if(FORMAT_VERSION_1949 <= format)
+    msg.Pop(str);
+    if(str != "en" && str != conf.force_lang && !conf.Unicode())
     {
-	msg.Pop(str);
-	if(str != "en" && str != conf.force_lang && !conf.Unicode())
-	{
-	    std::string msg("This is an saved game is localized for lang = ");
-	    msg.append(str);
-	    msg.append(", and most of the messages will be displayed incorrectly.\n \n");
-	    msg.append("(tip: set unicode = on)");
-	    Dialog::Message("Warning!", msg, Font::BIG, Dialog::OK);
-	}
+	std::string msg("This is an saved game is localized for lang = ");
+	msg.append(str);
+	msg.append(", and most of the messages will be displayed incorrectly.\n \n");
+	msg.append("(tip: set unicode = on)");
+	Dialog::Message("Warning!", msg, Font::BIG, Dialog::OK);
     }
 
     // maps
     msg.Pop(byte16);
     if(byte16 != 0xFF02) DEBUG(DBG_GAME , DBG_WARN, "Game::IO::LoadBIN: 0xFF02");
-    msg.Pop(conf.current_maps_file.size_w);
-    msg.Pop(conf.current_maps_file.size_h);
+
+    if(FORMAT_VERSION_2030 <= format)
+    {
+	msg.Pop(conf.current_maps_file.size_w);
+	msg.Pop(conf.current_maps_file.size_h);
+    }
+    else
+    {
+	msg.Pop(byte8); conf.current_maps_file.size_w = byte8;
+	msg.Pop(byte8); conf.current_maps_file.size_h = byte8;
+    }
     msg.Pop(conf.current_maps_file.file);
     msg.Pop(conf.current_maps_file.difficulty);
     msg.Pop(conf.current_maps_file.kingdom_colors);
@@ -729,7 +745,15 @@ bool Game::IO::LoadBIN(QueueMessage & msg)
     if(byte16 != 0xFF05) DEBUG(DBG_GAME , DBG_WARN, "Game::IO::LoadBIN: 0xFF05");
     msg.Pop(world.width);
     msg.Pop(world.height);
-    msg.Pop(world.ultimate_artifact);
+
+    if(FORMAT_VERSION_2030 <= format)
+    {
+	msg.Pop(world.ultimate_artifact);
+    }
+    else
+    {
+	msg.Pop(byte16); world.ultimate_artifact = byte16;
+    }
     msg.Pop(world.uniq0);
     msg.Pop(byte8); world.week_name = Week::Get(byte8);
     msg.Pop(byte8); world.heroes_cond_wins = Heroes::ConvertID(byte8);
@@ -789,26 +813,57 @@ bool Game::IO::LoadBIN(QueueMessage & msg)
     // signs
     msg.Pop(byte16);
     if(byte16 != 0xFF0A) DEBUG(DBG_GAME , DBG_WARN, "Game::IO::LoadBIN: 0xFF0A");
-    msg.Pop(byte32);
-    world.map_sign.clear();
-    for(u32 ii = 0; ii < byte32; ++ii)
+    if(FORMAT_VERSION_2030 <= format)
     {
-	msg.Pop(byte16);
-	msg.Pop(str);
-	world.map_sign[byte16] = str;
+	msg.Pop(byte32);
+	byte16 = byte32;
+	world.map_sign.clear();
+	for(u16 ii = 0; ii < byte16; ++ii)
+	{
+	    msg.Pop(byte32);
+	    msg.Pop(str);
+	    world.map_sign[byte32] = str;
+	}
+    }
+    else
+    {
+	msg.Pop(byte32);
+	world.map_sign.clear();
+	for(u32 ii = 0; ii < byte32; ++ii)
+	{
+	    msg.Pop(byte16);
+	    msg.Pop(str);
+	    world.map_sign[byte16] = str;
+	}
     }
 
     // captured object
     msg.Pop(byte16);
     if(byte16 != 0xFF0B) DEBUG(DBG_GAME , DBG_WARN, "Game::IO::LoadBIN: 0xFF0B");
-    msg.Pop(byte32);
-    world.map_captureobj.clear();
-    for(u32 ii = 0; ii < byte32; ++ii)
+    if(FORMAT_VERSION_2030 <= format)
     {
-	msg.Pop(byte16);
-	ObjectColor & value = world.map_captureobj[byte16];
-	msg.Pop(byte8); value.first = static_cast<MP2::object_t>(byte8);
-	msg.Pop(byte8); value.second = Color::Get(byte8);
+	msg.Pop(byte32);
+	byte16 = byte32;
+	world.map_captureobj.clear();
+	for(u16 ii = 0; ii < byte16; ++ii)
+	{
+	    msg.Pop(byte32);
+	    ObjectColor & value = world.map_captureobj[byte32];
+	    msg.Pop(byte8); value.first = static_cast<MP2::object_t>(byte8);
+	    msg.Pop(byte8); value.second = Color::Get(byte8);
+	}
+    }
+    else
+    {
+	msg.Pop(byte32);
+	world.map_captureobj.clear();
+	for(u32 ii = 0; ii < byte32; ++ii)
+	{
+	    msg.Pop(byte16);
+	    ObjectColor & value = world.map_captureobj[byte16];
+	    msg.Pop(byte8); value.first = static_cast<MP2::object_t>(byte8);
+	    msg.Pop(byte8); value.second = Color::Get(byte8);
+	}
     }
 
     // rumors
@@ -861,7 +916,14 @@ bool Game::IO::LoadBIN(QueueMessage & msg)
 	GameEvent::Coord *event = new GameEvent::Coord();
 	u32 size;
 
-	msg.Pop(event->index_map);
+	if(FORMAT_VERSION_2030 <= format)
+	{
+	    msg.Pop(size); event->index_map = size;
+	}
+	else
+	{
+	    msg.Pop(byte16); event->index_map = byte16;
+	}
 	msg.Pop(size); event->resource.wood = size;
 	msg.Pop(size); event->resource.mercury = size;
 	msg.Pop(size); event->resource.ore = size;
@@ -890,7 +952,14 @@ bool Game::IO::LoadBIN(QueueMessage & msg)
 	GameEvent::Riddle *riddle = new GameEvent::Riddle();
 	u32 size;
 	
-	msg.Pop(riddle->index_map);
+	if(FORMAT_VERSION_2030 <= format)
+	{
+	    msg.Pop(size); riddle->index_map = size;
+	}
+	else
+	{
+	    msg.Pop(byte16); riddle->index_map = byte16;
+	}
 	msg.Pop(size); riddle->resource.wood = size;
 	msg.Pop(size); riddle->resource.mercury = size;
 	msg.Pop(size); riddle->resource.ore = size;
@@ -935,15 +1004,20 @@ bool Game::IO::LoadBIN(QueueMessage & msg)
 
 void Game::IO::UnpackTile(QueueMessage & msg, Maps::Tiles & tile, u16 check_version)
 {
-    msg.Pop(tile.tile_index);
-    msg.Pop(tile.shape);
-    msg.Pop(tile.general);
+    msg.Pop(tile.tile_sprite_index);
+    msg.Pop(tile.tile_sprite_shape);
+    msg.Pop(tile.mp2_object);
     msg.Pop(tile.quantity1);
     msg.Pop(tile.quantity2);
     msg.Pop(tile.quantity3);
     msg.Pop(tile.quantity4);
     msg.Pop(tile.fogs);
-    msg.Pop(tile.unused);
+    msg.Pop(tile.unused1);
+    if(FORMAT_VERSION_2030 <= check_version)
+    {
+	msg.Pop(tile.unused2);
+	msg.Pop(tile.unused3);
+    }
 
 #ifdef WITH_DEBUG
     if(IS_DEVEL()) tile.fogs &= ~Settings::Get().MyColor();
@@ -952,14 +1026,7 @@ void Game::IO::UnpackTile(QueueMessage & msg, Maps::Tiles & tile, u16 check_vers
     // addons 1
     u8 size;
     tile.addons_level1.clear();
-    if(check_version >= FORMAT_VERSION_1954)
-	msg.Pop(size);
-    else
-    {
-	u32 size_old;
-	msg.Pop(size_old);
-	size = size_old;
-    }
+    msg.Pop(size);
     for(u8 ii = 0; ii < size; ++ii)
     {
 	Maps::TilesAddon addon;
@@ -972,14 +1039,7 @@ void Game::IO::UnpackTile(QueueMessage & msg, Maps::Tiles & tile, u16 check_vers
 
     // addons 2
     tile.addons_level2.clear();
-    if(check_version >= FORMAT_VERSION_1954)
-	msg.Pop(size);
-    else
-    {
-	u32 size_old;
-	msg.Pop(size_old);
-	size = size_old;
-    }
+    msg.Pop(size);
     for(u8 ii = 0; ii < size; ++ii)
     {
 	Maps::TilesAddon addon;
@@ -1023,7 +1083,14 @@ void Game::IO::UnpackKingdom(QueueMessage & msg, Kingdom & kingdom, u16 check_ve
     for(u32 jj = 0; jj < byte32; ++jj)
     {
 	IndexObject io;
-	msg.Pop(io.first);
+	if(FORMAT_VERSION_2030 <= check_version)
+	{
+	    msg.Pop(io.first);
+	}
+	else
+	{
+	    msg.Pop(byte16); io.first = byte16;
+	}
 	msg.Pop(byte8);
 	io.second = static_cast<MP2::object_t>(byte8);
 	kingdom.visit_object.push_back(io);
@@ -1049,8 +1116,16 @@ void Game::IO::UnpackCastle(QueueMessage & msg, Castle & castle, u16 check_versi
     u16 byte16;
     u32 byte32;
 
-    msg.Pop(byte16); castle.mp.x = byte16;
-    msg.Pop(byte16); castle.mp.y = byte16;
+    if(FORMAT_VERSION_2030 <= check_version)
+    {
+	msg.Pop(castle.center.x);
+	msg.Pop(castle.center.y);
+    }
+    else
+    {
+	msg.Pop(byte16); castle.center.x = byte16;
+	msg.Pop(byte16); castle.center.y = byte16;
+    }
 
     msg.Pop(byte8); castle.race = Race::Get(byte8);
 
@@ -1113,9 +1188,17 @@ void Game::IO::UnpackHeroes(QueueMessage & msg, Heroes & hero, u16 check_version
     msg.Pop(hero.move_point);
     msg.Pop(byte16); hero.direction = Direction::FromInt(byte16);
     msg.Pop(hero.sprite_index);
-    msg.Pop(byte8); hero.save_maps_general = static_cast<MP2::object_t>(byte8);
-    msg.Pop(byte16); hero.mp.x = static_cast<s16>(byte16);
-    msg.Pop(byte16); hero.mp.y = static_cast<s16>(byte16);
+    msg.Pop(byte8); hero.save_maps_object = static_cast<MP2::object_t>(byte8);
+    if(FORMAT_VERSION_2030 <= check_version)
+    {
+	msg.Pop(hero.center.x);
+	msg.Pop(hero.center.y);
+    }
+    else
+    {
+	msg.Pop(byte16); hero.center.x = byte16;
+	msg.Pop(byte16); hero.center.y = byte16;
+    }
 
     // sec skills
     hero.secondary_skills.clear();
@@ -1170,14 +1253,29 @@ void Game::IO::UnpackHeroes(QueueMessage & msg, Heroes & hero, u16 check_version
     for(u32 jj = 0; jj < byte32; ++jj)
     {
 	IndexObject io;
-	msg.Pop(io.first);
+	if(FORMAT_VERSION_2030 <= check_version)
+	{
+	    msg.Pop(io.first);
+	}
+	else
+	{
+	    msg.Pop(byte16); io.first = byte16;
+	}
 	msg.Pop(byte8);
 	io.second = static_cast<MP2::object_t>(byte8);
 	hero.visit_object.push_back(io);
     }
 
     // route path
-    msg.Pop(hero.path.dst);
+    if(FORMAT_VERSION_2030 <= check_version)
+    {
+	msg.Pop(hero.path.dst);
+    }
+    else
+    {
+	msg.Pop(byte16);
+	hero.path.dst = byte16;
+    }
     msg.Pop(byte8);
     hero.path.hide = byte8;
     msg.Pop(byte32);

@@ -92,7 +92,7 @@ namespace Battle2
     class Interface
     {
     public:
-	Interface(Arena &, u16);
+	Interface(Arena &, s32);
 	~Interface();
 
 	void Redraw(void);

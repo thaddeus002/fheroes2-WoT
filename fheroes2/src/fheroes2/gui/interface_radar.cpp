@@ -161,7 +161,7 @@ void Interface::Radar::Generate(void)
     const u8 n = world.w() == Maps::SMALL ? 4 : 2;
     Surface tile_surface(n, n);
 
-    for(u16 index = 0; index < world_w * world_h; ++index)
+    for(s32 index = 0; index < world_w * world_h; ++index)
     {
 	const Maps::Tiles & tile = world.GetTiles(index);
 	u32 color = COLOR_ROAD;
@@ -221,7 +221,7 @@ void Interface::Radar::RedrawArea(const u8 color)
     cursorArea->Hide();
     display.Blit(*spriteArea, x, y);
 
-    for(u16 index = 0; index < world_w * world_h; ++index)
+    for(s32 index = 0; index < world_w * world_h; ++index)
     {
 	const Maps::Tiles & tile = world.GetTiles(index);
 

@@ -33,9 +33,9 @@ namespace Maps
     static u32 animation_ticket = 0;
 }
 
-const char* Maps::SizeString(u8 s)
+const char* Maps::SizeString(u16 s)
 {
-    const char* mapsize[] = { "Unknown", _("maps|Small"), _("maps|Medium"), _("maps|Large"), _("maps|Extra Large") };
+    const char* mapsize[] = { "Unknown", _("maps|Small"), _("maps|Medium"), _("maps|Large"), _("maps|Extra Large"), "size256", "size320" };
 
     switch(s)
     {
@@ -43,6 +43,8 @@ const char* Maps::SizeString(u8 s)
 	case MEDIUM:	return mapsize[2];
 	case LARGE:	return mapsize[3];
 	case XLARGE:	return mapsize[4];
+	case XLARGE2:	return mapsize[5];
+	case XLARGE3:	return mapsize[6];
         default: break;
     }
 
@@ -74,37 +76,37 @@ void Maps::IncreaseAnimationTicket(void)
     ++animation_ticket;
 }
 
-u16 Maps::GetDirectionIndex(u16 from, Direction::vector_t vector)
+s32 Maps::GetDirectionIndex(s32 from, Direction::vector_t vector)
 {
     switch(vector)
     {
-	case Direction::TOP:		return GetTopIndex(from);
-	case Direction::TOP_RIGHT:	return GetTopRightIndex(from);
-	case Direction::RIGHT:		return GetRightIndex(from);
-	case Direction::BOTTOM_RIGHT:	return GetBottomRightIndex(from);
-	case Direction::BOTTOM:		return GetBottomIndex(from);
-	case Direction::BOTTOM_LEFT:	return GetBottomLeftIndex(from);
-	case Direction::LEFT:		return GetLeftIndex(from);
-	case Direction::TOP_LEFT:	return GetTopLeftIndex(from);
+	case Direction::TOP:		return from - world.w();
+	case Direction::TOP_RIGHT:	return from - world.w() + 1;
+	case Direction::RIGHT:		return from + 1;
+	case Direction::BOTTOM_RIGHT:	return from + world.w() + 1;
+	case Direction::BOTTOM:		return from + world.w();
+	case Direction::BOTTOM_LEFT:	return from + world.w() - 1;
+	case Direction::LEFT:		return from - 1;
+	case Direction::TOP_LEFT:	return from - world.w() - 1;
 	default: break;
     }
 
-    return MAXU16;
+    return -1;
 }
 
 // check bound
-bool Maps::isValidDirection(u16 from, Direction::vector_t vector)
+bool Maps::isValidDirection(s32 from, Direction::vector_t vector)
 {
     switch(vector)
     {
-	case Direction::TOP:		return (!(from < world.w()));
-	case Direction::TOP_RIGHT:	return (!(from < world.w()) && (world.w() - 1 > (from % world.w())));
-	case Direction::RIGHT:		return (world.w() - 1 > (from % world.w()));
-	case Direction::BOTTOM_RIGHT:	return ((from < world.w() * (world.h() - 1)) && (world.w() - 1 > (from % world.w())));
-	case Direction::BOTTOM:		return (from < world.w() * (world.h() - 1));
-	case Direction::BOTTOM_LEFT:	return ((from < world.w() * (world.h() - 1)) && (from % world.w()));
-	case Direction::LEFT:		return (from % world.w());
-	case Direction::TOP_LEFT:	return (!(from < world.w()) && (from % world.w()));
+	case Direction::TOP:            return (!(from < world.w()));
+	case Direction::TOP_RIGHT:      return (!(from < world.w()) && (world.w() - 1 > (from % world.w())));
+	case Direction::RIGHT:          return (world.w() - 1 > (from % world.w()));
+	case Direction::BOTTOM_RIGHT:   return ((from < world.w() * (world.h() - 1)) && (world.w() - 1 > (from % world.w())));
+	case Direction::BOTTOM:         return (from < world.w() * (world.h() - 1));
+	case Direction::BOTTOM_LEFT:    return ((from < world.w() * (world.h() - 1)) && (from % world.w()));
+	case Direction::LEFT:           return (from % world.w());
+	case Direction::TOP_LEFT:       return (!(from < world.w()) && (from % world.w()));
 	default: break;
     }
 
@@ -116,70 +118,37 @@ bool Maps::isValidAbsPoint(const Point & pt)
     return isValidAbsPoint(pt.x, pt.y);
 }
 
-bool Maps::isValidAbsIndex(const s16 i)
+bool Maps::isValidAbsIndex(s32 i)
 {
     return 0 <= i && i < world.w() * world.h();
 }
 
-bool Maps::isValidAbsPoint(const s16 x, const s16 y)
+bool Maps::isValidAbsPoint(s16 x, s16 y)
 {
     return 0 <= x && world.w() > x && 0 <= y && world.h() > y;
 }
-    
-u16 Maps::GetTopIndex(u16 from)
-{
-    return from - world.w();
-}
-
-u16 Maps::GetTopRightIndex(u16 from)
-{
-    return from - world.w() + 1;    
-}
-
-u16 Maps::GetRightIndex(u16 from)
-{
-    return from + 1;
-}
-
-u16 Maps::GetBottomRightIndex(u16 from)
-{
-    return from + world.w() + 1;
-}
-
-u16 Maps::GetBottomIndex(u16 from)
-{
-    return from + world.w();
-}
-
-u16 Maps::GetBottomLeftIndex(u16 from)
-{
-    return from + world.w() - 1;
-}
-
-u16 Maps::GetLeftIndex(u16 from)
-{
-    return from - 1;
-}
-
-u16 Maps::GetTopLeftIndex(u16 from)
-{
-    return from - world.w() - 1;
-}
 
 /* convert maps point to index maps */
-s16 Maps::GetIndexFromAbsPoint(const Point & mp)
+s32 Maps::GetIndexFromAbsPoint(const Point & mp)
 {
     return GetIndexFromAbsPoint(mp.x, mp.y);
 }
 
-s16 Maps::GetIndexFromAbsPoint(s16 px, s16 py)
+s32 Maps::GetIndexFromAbsPoint(s16 px, s16 py)
 {
-    return py * world.w() + px;
+    s32 res = py * world.w() + px;
+
+    if(px < 0 || py < 0)
+    {
+	VERBOSE("Maps::GetIndexFromAbsPoint: return " << res);
+    }
+
+    return res;
 }
 
-u16 Maps::GetDirectionAroundGround(const u16 center, const u16 ground)
+u16 Maps::GetDirectionAroundGround(const s32 center, const u16 ground)
 {
-    if(0 == ground || !isValidAbsPoint(center % world.w(), center / world.h())) return 0;
+    if(0 == ground || !isValidAbsIndex(center)) return 0;
 
     u16 result = 0;
 
@@ -192,9 +161,9 @@ u16 Maps::GetDirectionAroundGround(const u16 center, const u16 ground)
     return result;
 }
 
-u8 Maps::GetCountAroundGround(const u16 center, const u16 ground)
+u8 Maps::GetCountAroundGround(const s32 center, const u16 ground)
 {
-    if(0 == ground || !isValidAbsPoint(center % world.w(), center / world.h())) return 0;
+    if(0 == ground || !isValidAbsIndex(center)) return 0;
 
     u8 result = 0;
 
@@ -207,14 +176,17 @@ u8 Maps::GetCountAroundGround(const u16 center, const u16 ground)
     return result;
 }
 
-u16 Maps::GetMaxGroundAround(const u16 center)
+u16 Maps::GetMaxGroundAround(const s32 center)
 {
+    if(!isValidAbsIndex(center)) return 0;
+
     std::vector<u8> grounds(9, 0);
     u16 result = 0;
 
     for(Direction::vector_t direct = Direction::TOP_LEFT; direct != Direction::CENTER; ++direct)
     {
-    	const Maps::Tiles & tile = (Maps::isValidDirection(center, direct) ? world.GetTiles(GetDirectionIndex(center, direct)) : world.GetTiles(center));
+    	const Maps::Tiles & tile = (isValidDirection(center, direct) ?
+			    world.GetTiles(GetDirectionIndex(center, direct)) : world.GetTiles(center));
 
 	switch(tile.GetGround())
 	{
@@ -246,9 +218,9 @@ u16 Maps::GetMaxGroundAround(const u16 center)
     return result;
 }
 
-void Maps::ClearFog(u16 index, u8 scoute, const u8 color)
+void Maps::ClearFog(s32 index, u8 scoute, const u8 color)
 {
-    if(0 == scoute) return;
+    if(0 == scoute || !isValidAbsIndex(index)) return;
     const Point center(index % world.w(), index / world.w());
 
     // AI advantage
@@ -270,8 +242,10 @@ void Maps::ClearFog(u16 index, u8 scoute, const u8 color)
                 world.GetTiles(GetIndexFromAbsPoint(x, y)).ClearFog(color);
 }
 
-u16 Maps::ScanAroundObject(const u16 center, const u8 obj, const u16 exclude)
+u16 Maps::ScanAroundObject(const s32 center, const u8 obj, const u16 exclude)
 {
+    if(!isValidAbsIndex(center)) return 0;
+
     u16 result = 0;
 
     for(Direction::vector_t dir = Direction::TOP_LEFT; dir < Direction::CENTER; ++dir)
@@ -283,8 +257,9 @@ u16 Maps::ScanAroundObject(const u16 center, const u8 obj, const u16 exclude)
     return result;
 }
 
-bool Maps::ScanDistanceObject(const u16 center, const u8 obj, const u16 dist, std::vector<u16> & results)
+bool Maps::ScanDistanceObject(const s32 center, const u8 obj, const u16 dist, std::vector<s32> & results)
 {
+    if(!isValidAbsIndex(center)) return false;
     if(results.size()) results.clear();
 
     const s16 cx = center % world.w();
@@ -304,7 +279,7 @@ bool Maps::ScanDistanceObject(const u16 center, const u8 obj, const u16 dist, st
 	{
 	    if(ty < iy && iy < my && tx < ix && ix < mx) continue;
 
-	    const s16 index = GetIndexFromAbsPoint(ix, iy);
+	    const s32 index = GetIndexFromAbsPoint(ix, iy);
 
            if(isValidAbsIndex(index) &&
                obj == world.GetTiles(index).GetObject())
@@ -315,10 +290,10 @@ bool Maps::ScanDistanceObject(const u16 center, const u8 obj, const u16 dist, st
     return results.size();
 }
 
-u16 Maps::GetApproximateDistance(const u16 index1, const u16 index2)
+u16 Maps::GetApproximateDistance(const s32 index1, const s32 index2)
 {
-    return std::max(std::abs(static_cast<s32>(index1 % world.w()) - static_cast<s32>(index2 % world.w())), 
-	            std::abs(static_cast<s32>(index1 / world.w()) - static_cast<s32>(index2 / world.w())));
+    return std::max(std::abs((index1 % world.w()) - (index2 % world.w())), 
+	            std::abs((index1 / world.w()) - (index2 / world.w())));
 }
 
 
@@ -363,7 +338,7 @@ castle size: T and B - sprite, S - shadow, XX - center
       S3S3B1B1XXB1B1
         S4B2B2  B2B2
 */
-    std::vector<u16> coords;
+    std::vector<s32> coords;
     coords.reserve(21);
 
     // T0
@@ -408,8 +383,8 @@ castle size: T and B - sprite, S - shadow, XX - center
     }
 
     // modify all rnd sprites
-    std::vector<u16>::const_iterator it1 = coords.begin();
-    std::vector<u16>::const_iterator it2 = coords.end();
+    std::vector<s32>::const_iterator it1 = coords.begin();
+    std::vector<s32>::const_iterator it2 = coords.end();
 
     for(; it1 != it2; ++it1) if(isValidAbsIndex(*it1))
     {
@@ -435,7 +410,7 @@ castle size: T and B - sprite, S - shadow, XX - center
 void Maps::UpdateSpritesFromTownToCastle(const Point & center)
 {
     // correct area maps sprites
-    std::vector<u16> coords;
+    std::vector<s32> coords;
     coords.reserve(15);
 
     // T1
@@ -458,8 +433,8 @@ void Maps::UpdateSpritesFromTownToCastle(const Point & center)
     coords.push_back(GetIndexFromAbsPoint(center.x + 2, center.y));
 
     // modify all town sprites
-    std::vector<u16>::const_iterator it1 = coords.begin();
-    std::vector<u16>::const_iterator it2 = coords.end();
+    std::vector<s32>::const_iterator it1 = coords.begin();
+    std::vector<s32>::const_iterator it2 = coords.end();
     for(; it1 != it2; ++it1) if(isValidAbsIndex(*it1))
     {
 	TilesAddon *addon = world.GetTiles(*it1).FindCastle();
@@ -475,11 +450,14 @@ void Maps::UpdateSpritesFromTownToCastle(const Point & center)
     }
 }
 
-u16 Maps::TileUnderProtection(const u16 center)
+u16 Maps::TileUnderProtection(const s32 center)
 {
+    if(!isValidAbsIndex(center)) return 0;
+
     u16 result = 0;
     const u16 dst_around = Maps::ScanAroundObject(center, MP2::OBJ_MONSTER);
-    const u8  obj = MP2::OBJ_HEROES == world.GetTiles(center).GetObject() ? world.GetHeroes(center)->GetUnderObject() : world.GetTiles(center).GetObject();
+    const u8  obj = MP2::OBJ_HEROES == world.GetTiles(center).GetObject() && world.GetHeroes(center) ?
+	    world.GetHeroes(center)->GetUnderObject() : world.GetTiles(center).GetObject();
 
     for(Direction::vector_t dir = Direction::TOP_LEFT; dir < Direction::CENTER; ++dir) if(dst_around & dir)
     {

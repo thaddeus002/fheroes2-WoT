@@ -294,7 +294,7 @@ void Battle2::Board::GetAbroadPositions(u16 center, u8 radius, std::vector<u16> 
     }
 }
 
-void Battle2::Board::SetCobjObjects(u16 center)
+void Battle2::Board::SetCobjObjects(s32 center)
 {
 //    bool trees = Maps::ScanAroundObject(center, MP2::OBJ_TREES, false);
     const Heroes* hero = world.GetHeroes(center);
@@ -622,7 +622,7 @@ void Battle2::GraveyardTroop::RemoveTroopID(u16 id)
     }
 }
 
-Battle2::Arena::Arena(Army::army_t & a1, Army::army_t & a2, u16 index, bool local) :
+Battle2::Arena::Arena(Army::army_t & a1, Army::army_t & a2, s32 index, bool local) :
 	army1(a1), army2(a2), castle(NULL), current_commander(NULL), catapult(NULL), bridge(NULL), interface(NULL), result_game(NULL), graveyard(*this),
 	icn_covr(ICN::UNKNOWN)
 {

@@ -66,8 +66,8 @@ namespace Maps
     std::string name;
     std::string description;
 
-    u8 size_w;
-    u8 size_h;
+    u16 size_w;
+    u16 size_h;
     u8 difficulty;
     u8 races[KINGDOMMAX];
     u8 unions[KINGDOMMAX];

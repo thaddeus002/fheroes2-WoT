@@ -33,16 +33,16 @@
 
 struct cell_t
 {
-    cell_t() : cost_g(MAXU16), cost_t(MAXU16), cost_d(MAXU16), parent(MAXU16), open(true){};
+    cell_t() : cost_g(MAXU16), cost_t(MAXU16), cost_d(MAXU16), parent(-1), open(true){};
 
     u16		cost_g;
     u16		cost_t;
     u16		cost_d;
-    u16		parent;
+    s32		parent;
     bool	open;
 };
 
-bool ImpassableCorners(const u16 from, const Direction::vector_t to, const Heroes *hero)
+bool ImpassableCorners(const s32 from, const Direction::vector_t to, const Heroes *hero)
 {
     if( to & (Direction::TOP | Direction::BOTTOM | Direction::LEFT | Direction::RIGHT)) return false;
 
@@ -73,21 +73,15 @@ bool ImpassableCorners(const u16 from, const Direction::vector_t to, const Heroe
     return false;
 }
 
-u16 PathGetApproximateDistance(const u16 index1, const u16 index2)
+u32 GetCurrentLength(std::map<s32, cell_t> & list, s32 cur)
 {
-    return std::abs(static_cast<s16>(index1 % world.w()) - static_cast<s16>(index2 % world.w())) +
-        std::abs(static_cast<s16>(index1 / world.w()) - static_cast<s16>(index2 / world.w()));
-}
-
-u16 GetCurrentLength(std::map<u16, cell_t> & list, u16 cur)
-{
-    u16 res = 0;
+    u32 res = 0;
     const cell_t* cell = &list[cur];
-    while(MAXU16 != cell->parent){ cell = &list[cell->parent]; ++res; };
+    while(-1 != cell->parent){ cell = &list[cell->parent]; ++res; };
     return res;
 }
 
-bool MonsterDestination(const u16 from, const u16 around, const u16 dst)
+bool MonsterDestination(const s32 from, const u16 around, const s32 dst)
 {
     for(Direction::vector_t dir = Direction::TOP_LEFT; dir < Direction::CENTER; ++dir)
 	if((around & dir) && dst == Maps::GetDirectionIndex(from, dir))
@@ -96,22 +90,22 @@ bool MonsterDestination(const u16 from, const u16 around, const u16 dst)
     return false;
 }
 
-bool Algorithm::PathFind(std::list<Route::Step> *result, const u16 from, const u16 to, const u16 limit, const Heroes *hero)
+bool Algorithm::PathFind(std::list<Route::Step> *result, const s32 from, const s32 to, const u16 limit, const Heroes *hero)
 {
     const u8 pathfinding = (hero ? hero->GetLevelSkill(Skill::Secondary::PATHFINDING) : Skill::Level::NONE);
     const u8 under = (hero ? hero->GetUnderObject() : MP2::OBJ_ZERO);
 
-    u16 cur = from;
-    u16 alt = 0;
-    u16 tmp = 0;
-    std::map<u16, cell_t> list;
-    std::map<u16, cell_t>::iterator it1 = list.begin();
-    std::map<u16, cell_t>::iterator it2 = list.end();
+    s32 cur = from;
+    s32 alt = 0;
+    s32 tmp = 0;
+    std::map<s32, cell_t> list;
+    std::map<s32, cell_t>::iterator it1 = list.begin();
+    std::map<s32, cell_t>::iterator it2 = list.end();
     Direction::vector_t direct = Direction::CENTER;
 
     list[cur].cost_g = 0;
     list[cur].cost_t = 0;
-    list[cur].parent = MAXU16;
+    list[cur].parent = -1;
     list[cur].open   = false;
 
     u16 mons = 0;
@@ -130,13 +124,13 @@ bool Algorithm::PathFind(std::list<Route::Step> *result, const u16 from, const u
 		if(list[tmp].open)
 		{
 		    // new
-		    if(MAXU16 == list[tmp].parent)
+		    if(-1 == list[tmp].parent)
 		    {
 	    		cell.cost_g = Maps::Ground::GetPenalty(tmp, direct, pathfinding);
 			cell.parent = cur;
 			cell.open = true;
 	    		cell.cost_t = cell.cost_g + list[cur].cost_t;
-			cell.cost_d = 50 * PathGetApproximateDistance(tmp, to);
+			cell.cost_d = 50 * Maps::GetApproximateDistance(tmp, to);
 
 			if(MAXU16 == cell.cost_g) continue;
 
@@ -178,7 +172,8 @@ bool Algorithm::PathFind(std::list<Route::Step> *result, const u16 from, const u
 	DEBUG(DBG_GAME , DBG_TRACE, "Algorithm::PathFind: route, from: " << cur);
 
 	it1 = list.begin();
-	alt = tmp = MAXU16;
+	alt = -1;
+	tmp = MAXU16;
 	
 	// find minimal cost
 	for(; it1 != it2; ++it1) if((*it1).second.open)
@@ -207,7 +202,7 @@ bool Algorithm::PathFind(std::list<Route::Step> *result, const u16 from, const u
 	}
 
 	// not found, and exception
-	if(MAXU16 == tmp || MAXU16 == alt || (limit && GetCurrentLength(list, cur) > limit)) break;
+	if(MAXU16 == tmp || -1 == alt || (limit && GetCurrentLength(list, cur) > limit)) break;
 	else
 	DEBUG(DBG_GAME , DBG_TRACE, "Algorithm::PathFind: select: " << alt);
 
@@ -219,7 +214,7 @@ bool Algorithm::PathFind(std::list<Route::Step> *result, const u16 from, const u
     {
 	while(cur != from)
 	{
-	    if(MAXU16 == list[cur].parent) break;
+	    if(-1 == list[cur].parent) break;
 	    alt = cur;
     	    cur = list[alt].parent;
 	    if(result) result->push_front(Route::Step(Direction::Get(cur, alt), list[alt].cost_g));

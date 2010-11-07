@@ -141,15 +141,14 @@ bool Maps::TilesAddon::isStream(const TilesAddon & ta)
     return ICN::STREAM == MP2::GetICNObject(ta.object);
 }
 
-Maps::Tiles::Tiles(u16 index) : maps_index(index), tile_index(0),
-    shape(0), general(0), quantity1(0), quantity2(0),
-    fogs(0xFF), unused(0)
+Maps::Tiles::Tiles(s32 index) : maps_index(index), tile_sprite_index(0), tile_sprite_shape(0),
+    mp2_object(0), quantity1(0), quantity2(0), fogs(0xFF), unused1(0), unused2(0), unused3(0)
 {
 }
 
-Maps::Tiles::Tiles(u16 mi, const MP2::mp2tile_t & mp2tile) : maps_index(mi), tile_index(mp2tile.tileIndex),
-    shape(mp2tile.shape), general(mp2tile.generalObject), quantity1(mp2tile.quantity1), quantity2(mp2tile.quantity2),
-    quantity3(0), quantity4(0), fogs(0xFF), unused(0)
+Maps::Tiles::Tiles(s32 mi, const MP2::mp2tile_t & mp2tile) : maps_index(mi), tile_sprite_index(mp2tile.tileIndex),
+    tile_sprite_shape(mp2tile.shape), mp2_object(mp2tile.generalObject), quantity1(mp2tile.quantity1), quantity2(mp2tile.quantity2),
+    quantity3(0), quantity4(0), fogs(0xFF), unused1(0), unused2(0), unused3(0)
 {
     AddonsPushLevel1(mp2tile);
     AddonsPushLevel2(mp2tile);
@@ -157,15 +156,15 @@ Maps::Tiles::Tiles(u16 mi, const MP2::mp2tile_t & mp2tile) : maps_index(mi), til
     if(IS_DEVEL()) ClearFog(Settings::Get().MyColor());
 }
 
-void Maps::Tiles::SetTile(const u16 index, const u8 sh)
+void Maps::Tiles::SetTile(const u16 sprite_index, const u8 sh)
 {
-    tile_index = index;
-    shape = sh;
+    tile_sprite_index = sprite_index;
+    tile_sprite_shape = sh;
 }
 
 const Surface & Maps::Tiles::GetTileSurface(void) const
 {
-    return AGG::GetTIL(TIL::GROUND32, tile_index, shape);
+    return AGG::GetTIL(TIL::GROUND32, tile_sprite_index, tile_sprite_shape);
 }
 
 void Maps::Tiles::AddonsPushLevel1(const MP2::mp2tile_t & mt)
@@ -204,46 +203,46 @@ void Maps::Tiles::AddonsPushLevel2(const TilesAddon & ta)
 
 void Maps::Tiles::AddonsSort(void)
 {
-    if(addons_level1.size()) addons_level1.sort(Maps::TilesAddon::PredicateSortRules1);
+    if(!addons_level1.empty()) addons_level1.sort(Maps::TilesAddon::PredicateSortRules1);
 
-    if(addons_level2.size()) addons_level2.sort(Maps::TilesAddon::PredicateSortRules2);
+    if(!addons_level2.empty()) addons_level2.sort(Maps::TilesAddon::PredicateSortRules2);
 }
 
 Maps::Ground::ground_t Maps::Tiles::GetGround(void) const
 {
     // list grounds from GROUND32.TIL
-    if(30 > tile_index)
+    if(30 > tile_sprite_index)
         return Maps::Ground::WATER;
         
-    else if(92 > tile_index)
+    else if(92 > tile_sprite_index)
         return Maps::Ground::GRASS;
 
-    else if(146 > tile_index)
+    else if(146 > tile_sprite_index)
         return Maps::Ground::SNOW;
 
-    else if(208 > tile_index)
+    else if(208 > tile_sprite_index)
         return Maps::Ground::SWAMP;
 
-    else if(262 > tile_index)
+    else if(262 > tile_sprite_index)
         return Maps::Ground::LAVA;
 
-    else if(321 > tile_index)
+    else if(321 > tile_sprite_index)
         return Maps::Ground::DESERT;
 
-    else if(361 > tile_index)
+    else if(361 > tile_sprite_index)
         return Maps::Ground::DIRT;
 
-    else if(415 > tile_index)
+    else if(415 > tile_sprite_index)
         return Maps::Ground::WASTELAND;
 
-    //else if(432 > tile_index)
+    //else if(432 > tile_sprite_index)
 
 	return Maps::Ground::BEACH;
 }
 
 void Maps::Tiles::Remove(u32 uniq)
 {
-    if(addons_level1.size())
+    if(!addons_level1.empty())
     {
 	std::list<TilesAddon>::iterator       it1 = addons_level1.begin();
 	std::list<TilesAddon>::const_iterator it2 = addons_level1.end();
@@ -255,7 +254,7 @@ void Maps::Tiles::Remove(u32 uniq)
 		++it1;
     }
 
-    if(addons_level2.size())
+    if(!addons_level2.empty())
     {
 	std::list<TilesAddon>::iterator       it1 = addons_level2.begin();
 	std::list<TilesAddon>::const_iterator it2 = addons_level2.end();
@@ -283,7 +282,7 @@ void Maps::Tiles::RedrawBottom(Surface & dst, const TilesAddon* skip) const
     const Point mp(maps_index % world.w(), maps_index / world.w());
 
     if((area.GetRectMaps() & mp) &&
-	addons_level1.size())
+	!addons_level1.empty())
     {
 	std::list<TilesAddon>::const_iterator it1 = addons_level1.begin();
 	std::list<TilesAddon>::const_iterator it2 = addons_level1.end();
@@ -329,7 +328,7 @@ void Maps::Tiles::RedrawMonster(Surface & dst) const
 {
     const Point mp(maps_index % world.w(), maps_index / world.w());
     const Interface::GameArea & area = Interface::GameArea::Get();
-    u16 dst_index = MAXU16;
+    s32 dst_index = -1;
 
     if(!(area.GetRectMaps() & mp)) return;
 
@@ -343,13 +342,13 @@ void Maps::Tiles::RedrawMonster(Surface & dst) const
 	if(!hero ||
 	    // skip bottom, bottom_right, bottom_left with ground objects
 	    (((Direction::BOTTOM | Direction::BOTTOM_LEFT | Direction::BOTTOM_RIGHT) & dir) && MP2::isGroundObject(hero->GetUnderObject())))
-	    dst_index = MAXU16;
+	    dst_index = -1;
 	else
 	    break;
     }
 
     // draw attack sprite
-    if(MAXU16 != dst_index)
+    if(-1 != dst_index)
     {
 	bool revert = false;
 
@@ -400,7 +399,7 @@ void Maps::Tiles::RedrawBottom4Hero(Surface & dst) const
     const Point mp(maps_index % world.w(), maps_index / world.w());
 
     if((area.GetRectMaps() & mp) &&
-	addons_level1.size())
+	!addons_level1.empty())
     {
 	std::list<TilesAddon>::const_iterator it1 = addons_level1.begin();
 	std::list<TilesAddon>::const_iterator it2 = addons_level1.end();
@@ -437,7 +436,7 @@ void Maps::Tiles::RedrawTop(Surface & dst, const TilesAddon* skip) const
     if(!(area.GetRectMaps() & mp)) return;
 
     // fix for haut mine
-    if(MP2::OBJ_MINES == general)
+    if(MP2::OBJ_MINES == mp2_object)
     {
 	if(quantity4 == Spell::HAUNT)
 	{
@@ -461,7 +460,7 @@ void Maps::Tiles::RedrawTop(Surface & dst, const TilesAddon* skip) const
 	}
     }
 
-    if(addons_level2.size())
+    if(!addons_level2.empty())
     {
 	std::list<TilesAddon>::const_iterator it1 = addons_level2.begin();
 	std::list<TilesAddon>::const_iterator it2 = addons_level2.end();
@@ -497,7 +496,7 @@ void Maps::Tiles::RedrawTop4Hero(Surface & dst, bool skip_ground) const
 
     if(!(area.GetRectMaps() & mp)) return;
 
-    if(addons_level2.size())
+    if(!addons_level2.empty())
     {
 	std::list<TilesAddon>::const_iterator it1 = addons_level2.begin();
 	std::list<TilesAddon>::const_iterator it2 = addons_level2.end();
@@ -528,7 +527,7 @@ void Maps::Tiles::RedrawTop4Hero(Surface & dst, bool skip_ground) const
 
 Maps::TilesAddon * Maps::Tiles::FindAddonICN1(u16 icn1)
 {
-    if(addons_level1.size())
+    if(!addons_level1.empty())
     {
 	std::list<TilesAddon>::iterator it1 = addons_level1.begin();
 	std::list<TilesAddon>::const_iterator it2 = addons_level1.end();
@@ -546,7 +545,7 @@ Maps::TilesAddon * Maps::Tiles::FindAddonICN1(u16 icn1)
 
 Maps::TilesAddon * Maps::Tiles::FindAddonICN2(u16 icn2)
 {
-    if(addons_level2.size())
+    if(!addons_level2.empty())
     {
 	std::list<TilesAddon>::iterator it1 = addons_level2.begin();
 	std::list<TilesAddon>::const_iterator it2 = addons_level2.end();
@@ -564,7 +563,7 @@ Maps::TilesAddon * Maps::Tiles::FindAddonICN2(u16 icn2)
 
 Maps::TilesAddon * Maps::Tiles::FindAddonLevel1(u32 uniq1)
 {
-    if(addons_level1.size())
+    if(!addons_level1.empty())
     {
 	std::list<TilesAddon>::iterator it1 = addons_level1.begin();
 	std::list<TilesAddon>::const_iterator it2 = addons_level1.end();
@@ -582,7 +581,7 @@ Maps::TilesAddon * Maps::Tiles::FindAddonLevel1(u32 uniq1)
 
 Maps::TilesAddon * Maps::Tiles::FindAddonLevel2(u32 uniq2)
 {
-    if(addons_level2.size())
+    if(!addons_level2.empty())
     {
 	std::list<TilesAddon>::iterator it1 = addons_level2.begin();
 	std::list<TilesAddon>::const_iterator it2 = addons_level2.end();
@@ -613,7 +612,7 @@ void Maps::Tiles::DebugInfo(void) const
     
     value.clear();
     
-    String::AddInt(value, tile_index);
+    String::AddInt(value, tile_sprite_index);
 
     std::cout << "tile            : " << value << std::endl;
     
@@ -630,9 +629,9 @@ void Maps::Tiles::DebugInfo(void) const
 
     value.clear();
     
-    String::AddInt(value, general);
-    value += ", (" + std::string(MP2::StringObject(general)) + ")";
-    std::cout << "general object  : " << value << std::endl;
+    String::AddInt(value, mp2_object);
+    value += ", (" + std::string(MP2::StringObject(mp2_object)) + ")";
+    std::cout << "mp2 object      : " << value << std::endl;
 
     value.clear();
     
@@ -656,7 +655,7 @@ void Maps::Tiles::DebugInfo(void) const
 
     value.clear();
 
-    if(addons_level1.size())
+    if(!addons_level1.empty())
     {
 	it1 = addons_level1.begin();
 	it2 = addons_level1.end();
@@ -693,7 +692,7 @@ void Maps::Tiles::DebugInfo(void) const
 	}
     }
 
-    if(addons_level2.size())
+    if(!addons_level2.empty())
     {
 	it1 = addons_level2.begin();
 	it2 = addons_level2.end();
@@ -733,7 +732,7 @@ void Maps::Tiles::DebugInfo(void) const
     std::cout << "----------------I--------" << std::endl;
 
     // extra obj info
-    switch(general)
+    switch(mp2_object)
     {
 	// dwelling
         case MP2::OBJ_RUINS:
@@ -793,7 +792,7 @@ void Maps::Tiles::DebugInfo(void) const
 
 MP2::object_t Maps::Tiles::GetObject(void) const
 {
-    return static_cast<MP2::object_t>(general);
+    return static_cast<MP2::object_t>(mp2_object);
 }
 
 bool Maps::Tiles::GoodForUltimateArtifact(void) const
@@ -812,7 +811,7 @@ bool Maps::Tiles::isPassable(const Heroes *hero, bool skipfog) const
 	{
     	    if(Ground::WATER != Maps::Tiles::GetGround()) return false;
 
-    	    switch(general)
+    	    switch(mp2_object)
 	    {
 		case MP2::OBJ_BOAT:
         	case MP2::OBJ_HEROES:	return false;
@@ -824,7 +823,7 @@ bool Maps::Tiles::isPassable(const Heroes *hero, bool skipfog) const
 	{
 	    if(Ground::WATER == Maps::Tiles::GetGround()) return false;
 
-    	    switch(general)
+    	    switch(mp2_object)
 	    {
         	case MP2::OBJ_HEROES:	return false;
 
@@ -847,7 +846,7 @@ bool Maps::Tiles::isRoad(const Direction::vector_t & direct) const
 	default: break;
     }
 
-    if(addons_level1.size())
+    if(!addons_level1.empty())
     {
 	std::list<TilesAddon>::const_iterator it1 = addons_level1.begin();
 	std::list<TilesAddon>::const_iterator it2 = addons_level1.end();
@@ -865,7 +864,7 @@ bool Maps::Tiles::isStream(void) const
 
 Maps::TilesAddon * Maps::Tiles::FindWaterResource(void)
 {
-    if(addons_level1.size())
+    if(!addons_level1.empty())
     {
 	std::list<TilesAddon>::iterator it1 = addons_level1.begin();
 	std::list<TilesAddon>::const_iterator it2 = addons_level1.end();
@@ -889,7 +888,7 @@ Maps::TilesAddon * Maps::Tiles::FindWaterResource(void)
 
 const Maps::TilesAddon* Maps::Tiles::FindWhirlpools(void) const
 {
-    if(addons_level1.size())
+    if(!addons_level1.empty())
     {
 	std::list<TilesAddon>::const_iterator it1 = addons_level1.begin();
 	std::list<TilesAddon>::const_iterator it2 = addons_level1.end();
@@ -907,7 +906,7 @@ const Maps::TilesAddon* Maps::Tiles::FindWhirlpools(void) const
 
 const Maps::TilesAddon* Maps::Tiles::FindStandingStones(void) const
 {
-    if(addons_level1.size())
+    if(!addons_level1.empty())
     {
 	std::list<TilesAddon>::const_iterator it1 = addons_level1.begin();
 	std::list<TilesAddon>::const_iterator it2 = addons_level1.end();
@@ -925,7 +924,7 @@ const Maps::TilesAddon* Maps::Tiles::FindStandingStones(void) const
 
 const Maps::TilesAddon* Maps::Tiles::FindArtesianSpring(void) const
 {
-    if(addons_level1.size())
+    if(!addons_level1.empty())
     {
 	std::list<TilesAddon>::const_iterator it1 = addons_level1.begin();
 	std::list<TilesAddon>::const_iterator it2 = addons_level1.end();
@@ -943,7 +942,7 @@ const Maps::TilesAddon* Maps::Tiles::FindArtesianSpring(void) const
 
 const Maps::TilesAddon* Maps::Tiles::FindOasis(void) const
 {
-    if(addons_level1.size())
+    if(!addons_level1.empty())
     {
 	std::list<TilesAddon>::const_iterator it1 = addons_level1.begin();
 	std::list<TilesAddon>::const_iterator it2 = addons_level1.end();
@@ -961,7 +960,7 @@ const Maps::TilesAddon* Maps::Tiles::FindOasis(void) const
 
 Maps::TilesAddon * Maps::Tiles::FindResource(void)
 {
-    if(addons_level1.size())
+    if(!addons_level1.empty())
     {
 	std::list<TilesAddon>::iterator it1 = addons_level1.begin();
 	std::list<TilesAddon>::const_iterator it2 = addons_level1.end();
@@ -983,7 +982,7 @@ Maps::TilesAddon * Maps::Tiles::FindResource(void)
 
 Maps::TilesAddon * Maps::Tiles::FindRNDResource(void)
 {
-    if(addons_level1.size())
+    if(!addons_level1.empty())
     {
 	std::list<TilesAddon>::iterator it1 = addons_level1.begin();
 	std::list<TilesAddon>::const_iterator it2 = addons_level1.end();
@@ -1002,7 +1001,7 @@ Maps::TilesAddon * Maps::Tiles::FindRNDResource(void)
 
 Maps::TilesAddon * Maps::Tiles::FindArtifact(void)
 {
-    if(addons_level1.size())
+    if(!addons_level1.empty())
     {
 	std::list<TilesAddon>::iterator it1 = addons_level1.begin();
 	std::list<TilesAddon>::const_iterator it2 = addons_level1.end();
@@ -1031,7 +1030,7 @@ Maps::TilesAddon * Maps::Tiles::FindRNDArtifact(const u8 level)
 	default: break;
     }
 
-    if(addons_level1.size())
+    if(!addons_level1.empty())
     {
 	std::list<TilesAddon>::iterator it1 = addons_level1.begin();
 	std::list<TilesAddon>::const_iterator it2 = addons_level1.end();
@@ -1050,7 +1049,7 @@ Maps::TilesAddon * Maps::Tiles::FindRNDArtifact(const u8 level)
 
 Maps::TilesAddon * Maps::Tiles::FindUltimateArtifact(void)
 {
-    if(addons_level1.size())
+    if(!addons_level1.empty())
     {
 	std::list<TilesAddon>::iterator it1 = addons_level1.begin();
 	std::list<TilesAddon>::const_iterator it2 = addons_level1.end();
@@ -1069,7 +1068,7 @@ Maps::TilesAddon * Maps::Tiles::FindUltimateArtifact(void)
 
 Maps::TilesAddon * Maps::Tiles::FindMiniHero(void)
 {
-    if(addons_level1.size())
+    if(!addons_level1.empty())
     {
 	std::list<TilesAddon>::iterator it1 = addons_level1.begin();
 	std::list<TilesAddon>::const_iterator it2 = addons_level1.end();
@@ -1088,7 +1087,7 @@ Maps::TilesAddon * Maps::Tiles::FindMiniHero(void)
 
 Maps::TilesAddon * Maps::Tiles::FindEvent(void)
 {
-    if(addons_level1.size())
+    if(!addons_level1.empty())
     {
 	std::list<TilesAddon>::iterator it1 = addons_level1.begin();
 	std::list<TilesAddon>::const_iterator it2 = addons_level1.end();
@@ -1107,7 +1106,7 @@ Maps::TilesAddon * Maps::Tiles::FindEvent(void)
 
 Maps::TilesAddon * Maps::Tiles::FindBoat(void)
 {
-    if(addons_level1.size())
+    if(!addons_level1.empty())
     {
 	std::list<TilesAddon>::iterator it1 = addons_level1.begin();
 	std::list<TilesAddon>::const_iterator it2 = addons_level1.end();
@@ -1126,7 +1125,7 @@ Maps::TilesAddon * Maps::Tiles::FindBoat(void)
 
 Maps::TilesAddon * Maps::Tiles::FindCastle(void)
 {
-    if(addons_level1.size())
+    if(!addons_level1.empty())
     {
 	std::list<TilesAddon>::iterator it1 = addons_level1.begin();
 	std::list<TilesAddon>::const_iterator it2 = addons_level1.end();
@@ -1140,7 +1139,7 @@ Maps::TilesAddon * Maps::Tiles::FindCastle(void)
 	}
     }
 
-    if(addons_level2.size())
+    if(!addons_level2.empty())
     {
 	std::list<TilesAddon>::iterator it1 = addons_level2.begin();
 	std::list<TilesAddon>::const_iterator it2 = addons_level2.end();
@@ -1159,7 +1158,7 @@ Maps::TilesAddon * Maps::Tiles::FindCastle(void)
 
 Maps::TilesAddon * Maps::Tiles::FindRNDCastle(void)
 {
-    if(addons_level1.size())
+    if(!addons_level1.empty())
     {
 	std::list<TilesAddon>::iterator it1 = addons_level1.begin();
 	std::list<TilesAddon>::const_iterator it2 = addons_level1.end();
@@ -1173,7 +1172,7 @@ Maps::TilesAddon * Maps::Tiles::FindRNDCastle(void)
 	}
     }
 
-    if(addons_level2.size())
+    if(!addons_level2.empty())
     {
 	std::list<TilesAddon>::iterator it1 = addons_level2.begin();
 	std::list<TilesAddon>::const_iterator it2 = addons_level2.end();
@@ -1194,7 +1193,7 @@ Maps::TilesAddon* Maps::Tiles::FindFlags(void)
 {
     Maps::TilesAddon* res = NULL;
 
-    if(addons_level1.size())
+    if(!addons_level1.empty())
     {
 	std::list<TilesAddon>::iterator it1 = addons_level1.begin();
 	std::list<TilesAddon>::const_iterator it2 = addons_level1.end();
@@ -1209,7 +1208,7 @@ Maps::TilesAddon* Maps::Tiles::FindFlags(void)
 	}
     }
 
-    if(addons_level2.size())
+    if(!addons_level2.empty())
     {
 	std::list<TilesAddon>::iterator it1 = addons_level2.begin();
 	std::list<TilesAddon>::const_iterator it2 = addons_level2.end();
@@ -1229,7 +1228,7 @@ Maps::TilesAddon* Maps::Tiles::FindFlags(void)
 
 Maps::TilesAddon * Maps::Tiles::FindJail(void)
 {
-    if(addons_level1.size())
+    if(!addons_level1.empty())
     {
 	std::list<TilesAddon>::iterator it1 = addons_level1.begin();
 	std::list<TilesAddon>::const_iterator it2 = addons_level1.end();
@@ -1247,7 +1246,7 @@ Maps::TilesAddon * Maps::Tiles::FindJail(void)
 
 Maps::TilesAddon * Maps::Tiles::FindBarrier(void)
 {
-    if(addons_level1.size())
+    if(!addons_level1.empty())
     {
 	std::list<TilesAddon>::iterator it1 = addons_level1.begin();
 	std::list<TilesAddon>::const_iterator it2 = addons_level1.end();
@@ -1273,7 +1272,7 @@ Maps::TilesAddon * Maps::Tiles::FindBarrier(void)
 
 Maps::TilesAddon * Maps::Tiles::FindRNDMonster(void)
 {
-    if(addons_level1.size())
+    if(!addons_level1.empty())
     {
 	std::list<TilesAddon>::iterator it1 = addons_level1.begin();
 	std::list<TilesAddon>::const_iterator it2 = addons_level1.end();
@@ -1293,7 +1292,7 @@ Maps::TilesAddon * Maps::Tiles::FindRNDMonster(void)
 
 Maps::TilesAddon * Maps::Tiles::FindMonster(void)
 {
-    if(addons_level1.size())
+    if(!addons_level1.empty())
     {
 	std::list<TilesAddon>::iterator it1 = addons_level1.begin();
 	std::list<TilesAddon>::const_iterator it2 = addons_level1.end();
@@ -1312,7 +1311,7 @@ Maps::TilesAddon * Maps::Tiles::FindMonster(void)
 
 Maps::TilesAddon * Maps::Tiles::FindCampFire(void)
 {
-    if(addons_level1.size())
+    if(!addons_level1.empty())
     {
 	std::list<TilesAddon>::iterator it1 = addons_level1.begin();
 	std::list<TilesAddon>::const_iterator it2 = addons_level1.end();
@@ -1337,7 +1336,7 @@ Maps::TilesAddon * Maps::Tiles::FindCampFire(void)
 
 const Maps::TilesAddon * Maps::Tiles::FindMines(void) const
 {
-    if(addons_level1.size())
+    if(!addons_level1.empty())
     {
 	std::list<TilesAddon>::const_iterator it1 = addons_level1.begin();
 	std::list<TilesAddon>::const_iterator it2 = addons_level1.end();
@@ -1441,7 +1440,7 @@ void Maps::Tiles::CorrectFlags32(const u8 index, bool up)
 
 void Maps::Tiles::FixLoyaltyVersion(void)
 {
-    switch(general)
+    switch(mp2_object)
     {
 	case MP2::OBJ_UNKNW_79:
         case MP2::OBJ_UNKNW_7A:
@@ -1461,7 +1460,7 @@ void Maps::Tiles::FixLoyaltyVersion(void)
 		    ICN::X_LOC3 == MP2::GetICNObject(addon.object))
 		{
 		    const u8 newobj = ObjLoyalty::LearnObject(addon);
-		    if(MP2::OBJ_ZERO != newobj) general = newobj;
+		    if(MP2::OBJ_ZERO != newobj) mp2_object = newobj;
 		    return;
 		}
 	    }
@@ -1479,7 +1478,7 @@ void Maps::Tiles::FixLoyaltyVersion(void)
 		    ICN::X_LOC3 == MP2::GetICNObject(addon.object))
 		{
 		    const u8 newobj = ObjLoyalty::LearnObject(addon);
-		    if(MP2::OBJ_ZERO != newobj) general = newobj;
+		    if(MP2::OBJ_ZERO != newobj) mp2_object = newobj;
 		    return;
 		}
 	    }
@@ -1513,7 +1512,7 @@ void Maps::Tiles::UpdateQuantity(void)
 {
     const TilesAddon * addon = NULL;
 
-    switch(general)
+    switch(mp2_object)
     {
         case MP2::OBJ_WITCHSHUT:
                 quantity1 = Skill::Secondary::RandForWitchsHut();
@@ -1824,7 +1823,7 @@ void Maps::Tiles::UpdateQuantity(void)
 
 bool Maps::Tiles::ValidQuantity(void) const
 {
-    if(MP2::isQuantityObject(general))
+    if(MP2::isQuantityObject(mp2_object))
 	    return quantity1 || quantity2;
 
     return false;
@@ -1832,7 +1831,7 @@ bool Maps::Tiles::ValidQuantity(void) const
 
 bool Maps::Tiles::CheckEnemyGuardians(u8 color) const
 {
-    switch(general)
+    switch(mp2_object)
     {
 	case MP2::OBJ_ARTIFACT:
 	    return quantity1 > 5 || quantity1 < 14;
@@ -1855,8 +1854,8 @@ bool Maps::Tiles::CheckEnemyGuardians(u8 color) const
     }
 
     if(color &&
-	(MP2::isCaptureObject(general) ||
-	(MP2::OBJ_HEROES == general && world.GetHeroes(maps_index) && 
+	(MP2::isCaptureObject(mp2_object) ||
+	(MP2::OBJ_HEROES == mp2_object && world.GetHeroes(maps_index) && 
 	    MP2::isCaptureObject(world.GetHeroes(maps_index)->GetUnderObject()))) &&
 	color != world.ColorCapturedObject(maps_index))
 	    return quantity3 && GetCountMonster();
@@ -1869,7 +1868,7 @@ void Maps::Tiles::RemoveObjectSprite(void)
 {
     const Maps::TilesAddon *addon = NULL;
 
-    switch(general)
+    switch(mp2_object)
     {
 	case MP2::OBJ_ARTIFACT:		addon = FindArtifact(); break;
 	case MP2::OBJ_CAMPFIRE:		addon = FindCampFire(); break;
@@ -1909,7 +1908,7 @@ void Maps::Tiles::RemoveBarrierSprite(void)
         // remove left sprite
         if(Maps::isValidDirection(maps_index, Direction::LEFT))
     	{
-	    const u16 left = Maps::GetDirectionIndex(maps_index, Direction::LEFT);
+	    const s32 left = Maps::GetDirectionIndex(maps_index, Direction::LEFT);
 	    world.GetTiles(left).Remove(addon->uniq);
 	}
 
@@ -1926,7 +1925,7 @@ void Maps::Tiles::RemoveJailSprite(void)
         // remove left sprite
         if(Maps::isValidDirection(maps_index, Direction::LEFT))
     	{
-	    const u16 left = Maps::GetDirectionIndex(maps_index, Direction::LEFT);
+	    const s32 left = Maps::GetDirectionIndex(maps_index, Direction::LEFT);
 	    world.GetTiles(left).Remove(addon->uniq);
 
     	    // remove left left sprite
@@ -1937,7 +1936,7 @@ void Maps::Tiles::RemoveJailSprite(void)
         // remove top sprite
         if(Maps::isValidDirection(maps_index, Direction::TOP))
     	{
-	    const u16 top = Maps::GetDirectionIndex(maps_index, Direction::TOP);
+	    const s32 top = Maps::GetDirectionIndex(maps_index, Direction::TOP);
 	    world.GetTiles(top).Remove(addon->uniq);
 	    world.GetTiles(top).SetObject(MP2::OBJ_ZERO);
 
@@ -1966,7 +1965,7 @@ void Maps::Tiles::SetCountMonster(const u16 count)
 
 void Maps::Tiles::UpdateMonsterInfo(void)
 {
-    switch(general)
+    switch(mp2_object)
     {
 	case MP2::OBJ_RNDMONSTER:
         case MP2::OBJ_RNDMONSTER1:
@@ -2020,7 +2019,7 @@ void Maps::Tiles::UpdateRNDMonsterSprite(void)
 
     if(addon)
     {
-	switch(general)
+	switch(mp2_object)
 	{
     	    case MP2::OBJ_RNDMONSTER:       addon->index = Monster::Rand(); break;
     	    case MP2::OBJ_RNDMONSTER1:      addon->index = Monster::Rand(Monster::LEVEL1); break;
@@ -2034,7 +2033,7 @@ void Maps::Tiles::UpdateRNDMonsterSprite(void)
 	// ICN::MONS32 start from PEASANT
         addon->index = addon->index - 1;
 
-	general = MP2::OBJ_MONSTER;
+	mp2_object = MP2::OBJ_MONSTER;
     }
     else
         DEBUG(DBG_GAME , DBG_WARN, "Maps::Tiles::UpdateRNDMonsterSprite: FindRNDMonster return is NULL, index: " << maps_index);
@@ -2044,7 +2043,7 @@ void Maps::Tiles::UpdateAbandoneMineSprite(void)
 {
     u32 uniq = 0;
 
-    if(addons_level1.size())
+    if(!addons_level1.empty())
     {
 	std::list<TilesAddon>::iterator it1 = addons_level1.begin();
 	std::list<TilesAddon>::iterator it2 = addons_level1.end();
@@ -2101,37 +2100,37 @@ void Maps::Tiles::UpdateAbandoneMineSprite(void)
 		mines->index = 83;
 	    }
 	}
-	if(tile.general == MP2::OBJN_ABANDONEDMINE) tile.general = MP2::OBJN_MINES;
+	if(tile.mp2_object == MP2::OBJN_ABANDONEDMINE) tile.mp2_object = MP2::OBJN_MINES;
     }
 
     if(Maps::isValidDirection(maps_index, Direction::LEFT))
     {
         Tiles & tile = world.GetTiles(Maps::GetDirectionIndex(maps_index, Direction::LEFT));
-	if(tile.general == MP2::OBJN_ABANDONEDMINE) tile.general = MP2::OBJN_MINES;
+	if(tile.mp2_object == MP2::OBJN_ABANDONEDMINE) tile.mp2_object = MP2::OBJN_MINES;
     }
 
     if(Maps::isValidDirection(maps_index, Direction::TOP))
     {
         Tiles & tile = world.GetTiles(Maps::GetDirectionIndex(maps_index, Direction::TOP));
-	if(tile.general == MP2::OBJN_ABANDONEDMINE) tile.general = MP2::OBJN_MINES;
+	if(tile.mp2_object == MP2::OBJN_ABANDONEDMINE) tile.mp2_object = MP2::OBJN_MINES;
 
 	if(Maps::isValidDirection(tile.maps_index, Direction::LEFT))
 	{
     	    Tiles & tile2 = world.GetTiles(Maps::GetDirectionIndex(tile.maps_index, Direction::LEFT));
-	    if(tile2.general == MP2::OBJN_ABANDONEDMINE) tile2.general = MP2::OBJN_MINES;
+	    if(tile2.mp2_object == MP2::OBJN_ABANDONEDMINE) tile2.mp2_object = MP2::OBJN_MINES;
 	}
 
 	if(Maps::isValidDirection(tile.maps_index, Direction::RIGHT))
 	{
     	    Tiles & tile2 = world.GetTiles(Maps::GetDirectionIndex(tile.maps_index, Direction::RIGHT));
-	    if(tile2.general == MP2::OBJN_ABANDONEDMINE) tile2.general = MP2::OBJN_MINES;
+	    if(tile2.mp2_object == MP2::OBJN_ABANDONEDMINE) tile2.mp2_object = MP2::OBJN_MINES;
 	}
     }
 }
 
 void Maps::Tiles::UpdateStoneLightsSprite(void)
 {
-    if(addons_level1.size())
+    if(!addons_level1.empty())
     {
 	std::list<TilesAddon>::iterator it1 = addons_level1.begin();
 	std::list<TilesAddon>::iterator it2 = addons_level1.end();
@@ -2157,7 +2156,7 @@ void Maps::Tiles::UpdateRNDArtifactSprite(void)
     TilesAddon *addon = NULL;
     u8 index = 0;
 
-    switch(general)
+    switch(mp2_object)
     {
         case MP2::OBJ_RNDARTIFACT:
             addon = FindRNDArtifact(MP2::OBJ_RNDARTIFACT);
@@ -2181,7 +2180,7 @@ void Maps::Tiles::UpdateRNDArtifactSprite(void)
     if(addon)
     {
         addon->index = index;
-        general = MP2::OBJ_ARTIFACT;
+        mp2_object = MP2::OBJ_ARTIFACT;
 
         // replace shadow artifact
         if(Maps::isValidDirection(maps_index, Direction::LEFT))
@@ -2201,7 +2200,7 @@ void Maps::Tiles::UpdateRNDResourceSprite(void)
     if(addon)
     {
         addon->index = Resource::GetIndexSprite(Resource::Rand());
-        general = MP2::OBJ_RESOURCE;
+        mp2_object = MP2::OBJ_RESOURCE;
 
         // replace shadow artifact
         if(Maps::isValidDirection(maps_index, Direction::LEFT))
@@ -2216,7 +2215,7 @@ void Maps::Tiles::UpdateRNDResourceSprite(void)
 
 void Maps::Tiles::UpdateFountainSprite(void)
 {
-    if(addons_level1.size())
+    if(!addons_level1.empty())
     {
 	std::list<TilesAddon>::iterator it1 = addons_level1.begin();
 	std::list<TilesAddon>::iterator it2 = addons_level1.end();
@@ -2236,7 +2235,7 @@ void Maps::Tiles::UpdateFountainSprite(void)
 
 void Maps::Tiles::UpdateTreasureChestSprite(void)
 {
-    if(addons_level1.size())
+    if(!addons_level1.empty())
     {
 	std::list<TilesAddon>::iterator it1 = addons_level1.begin();
 	std::list<TilesAddon>::iterator it2 = addons_level1.end();

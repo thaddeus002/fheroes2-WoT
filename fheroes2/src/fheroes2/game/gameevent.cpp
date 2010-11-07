@@ -134,11 +134,11 @@ GameEvent::Day::Day(const void *ptr)
     DEBUG(DBG_GAME , DBG_INFO, "GameEvent::Day: add: " << message);
 }
 
-GameEvent::Coord::Coord() : index_map(0), artifact(Artifact::UNKNOWN), computer(false), cancel(true), colors(0)
+GameEvent::Coord::Coord() : index_map(-1), artifact(Artifact::UNKNOWN), computer(false), cancel(true), colors(0)
 {
 }
 
-GameEvent::Coord::Coord(u16 index, const void *ptr) : index_map(index)
+GameEvent::Coord::Coord(s32 index, const void *ptr) : index_map(index)
 {
     const u8  *ptr8  = static_cast<const u8 *>(ptr);
     u16 byte16 = 0;
@@ -227,11 +227,11 @@ GameEvent::Coord::Coord(u16 index, const void *ptr) : index_map(index)
     DEBUG(DBG_GAME , DBG_INFO, "GameEvent::Coord: add: " << message);
 }
 
-GameEvent::Riddle::Riddle() : index_map(MAXU16), artifact(Artifact::UNKNOWN), quiet(true)
+GameEvent::Riddle::Riddle() : index_map(-1), artifact(Artifact::UNKNOWN), quiet(true)
 {
 }
 
-GameEvent::Riddle::Riddle(u16 index, const void *ptr) : index_map(index), quiet(true)
+GameEvent::Riddle::Riddle(s32 index, const void *ptr) : index_map(index), quiet(true)
 {
     const u8  *ptr8  = static_cast<const u8 *>(ptr);
     u16 byte16 = 0;

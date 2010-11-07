@@ -376,7 +376,7 @@ bool Kingdom::isVisited(const Maps::Tiles & tile) const
     return isVisited(tile.GetIndex(), tile.GetObject());
 }
 
-bool Kingdom::isVisited(u16 index, u8 object) const
+bool Kingdom::isVisited(s32 index, u8 object) const
 {
     std::list<IndexObject>::const_iterator it = std::find_if(visit_object.begin(), visit_object.end(), std::bind2nd(std::mem_fun_ref(&IndexObject::isIndex), index));
     return visit_object.end() != it && (*it).isObject(object);
@@ -394,7 +394,7 @@ u16 Kingdom::CountVisitedObjects(const MP2::object_t object) const
 }
 
 /* set visited cell */
-void Kingdom::SetVisited(const u16 index, const MP2::object_t object)
+void Kingdom::SetVisited(const s32 index, const MP2::object_t object)
 {
     if(!isVisited(index, object) && object != MP2::OBJ_ZERO) visit_object.push_front(IndexObject(index, object));
 }
@@ -626,5 +626,5 @@ u32 Kingdom::GetArmiesStrength(void) const
     std::vector<Castle*>::const_iterator itc = castles.begin();
     for(; itc != castles.end(); ++itc) if(*itc) res += (**itc).GetArmy().GetStrength();
 
-    return res;
+    return static_cast<u32>(res);
 }

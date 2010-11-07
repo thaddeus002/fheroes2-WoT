@@ -63,10 +63,10 @@ public:
 
     const Maps::Tiles & GetTiles(const Point & pt) const{ return GetTiles(pt.y * width + pt.x); }
     const Maps::Tiles & GetTiles(u16 ax, u16 ay) const{ return GetTiles(ay * width + ax); }
-    const Maps::Tiles & GetTiles(u16 index) const{ return *vec_tiles.at(index); }
+    const Maps::Tiles & GetTiles(s32 index) const{ return *vec_tiles.at(index); }
     Maps::Tiles & GetTiles(const Point & pt) { return GetTiles(pt.y * width + pt.x); }
     Maps::Tiles & GetTiles(u16 ax, u16 ay) { return GetTiles(ay * width + ax); }
-    Maps::Tiles & GetTiles(u16 index){ return *vec_tiles.at(index); }
+    Maps::Tiles & GetTiles(s32 index){ return *vec_tiles.at(index); }
 
     Kingdom & GetMyKingdom(void);
     Kingdom & GetKingdom(u8 color);
@@ -74,23 +74,20 @@ public:
     const Kingdom & GetKingdom(u8 color) const;
     void KingdomLoss(const Color::color_t);
 
-    const Castle * GetCastle(u16 maps_index) const;
-    const Castle * GetCastle(const Point & pt) const{ return GetCastle(pt.x, pt.y); }
-    Castle * GetCastle(u16 maps_index);
-    Castle * GetCastle(u8 ax, u8 ay) const;
+    const Castle * GetCastle(s32 maps_index) const;
+    Castle * GetCastle(s32 maps_index);
+    Castle * GetCastle(u16 ax, u16 ay) const;
 
     const Heroes * GetHeroes(Heroes::heroes_t) const;
-    const Heroes * GetHeroes(u16 maps_index) const;
-    const Heroes * GetHeroes(const Point & pt) const{ return GetHeroes(pt.x, pt.y); }
+    const Heroes * GetHeroes(s32 maps_index) const;
     Heroes * GetHeroes(Heroes::heroes_t);
-    Heroes * GetHeroes(u16 maps_index);
-    Heroes * GetHeroes(u8 ax, u8 ay) const;
-    Heroes * FromJail(u16);
+    Heroes * GetHeroes(s32 maps_index);
+    Heroes * GetHeroes(u16 ax, u16 ay) const;
+    Heroes * FromJail(s32);
     const Heroes * GetHeroesCondWins(void) const;
     const Heroes * GetHeroesCondLoss(void) const;
 
     const Surface & GetPuzzleSurface(void) const;
-    u16 GetUltimateArtifactIndex(void);
     Artifact::artifact_t GetUltimateArtifact(void) const;
     bool DiggingForUltimateArtifact(const Point & center);
     void ActionForMagellanMaps(u8 color);
@@ -113,17 +110,17 @@ public:
 
     const std::string & GetRumors(void);
     
-    u16 NextTeleport(const u16 index) const;
-    u16 NextWhirlpool(const u16 index);
+    s32 NextTeleport(const s32 index) const;
+    s32 NextWhirlpool(const s32 index);
 
-    const std::string & MessageSign(const u16 index);
+    const std::string & MessageSign(const s32 index);
 
-    u16 GetNearestObject(const u16 center, const MP2::object_t obj);
-    void CaptureObject(const u16 index, const Color::color_t col);
+    s32 GetNearestObject(const s32 center, const MP2::object_t obj);
+    void CaptureObject(const s32 index, const Color::color_t col);
     u16 CountCapturedObject(const MP2::object_t obj, const Color::color_t col) const;
     u16 CountCapturedMines(const Resource::resource_t res, const Color::color_t col) const;
-    Color::color_t ColorCapturedObject(const u16 index) const;
-    void StoreActionObject(const u8 color, std::map<u16, MP2::object_t> & store);
+    Color::color_t ColorCapturedObject(const s32 index) const;
+    void StoreActionObject(const u8 color, std::map<s32, MP2::object_t> & store);
 
     void ActionToEyeMagi(const Color::color_t) const;
 
@@ -135,8 +132,8 @@ public:
     u16 CheckKingdomLoss(const Kingdom &) const;
 
     void GetEventDay(const Color::color_t, std::vector<GameEvent::Day *> &) const;
-    const GameEvent::Coord* GetEventMaps(const Color::color_t c, const u16 index) const;
-    GameEvent::Riddle* GetSphinx(const u16 index) const;
+    const GameEvent::Coord* GetEventMaps(const Color::color_t c, const s32 index) const;
+    GameEvent::Riddle* GetSphinx(const s32 index) const;
 
     Heroes* GetFreemanHeroes(Race::race_t rc = Race::BOMG) const;
     void UpdateRecruits(Recruits &) const;
@@ -146,7 +143,7 @@ public:
 protected:
     void UpdateDwellingPopulation(void);
     void UpdateMonsterPopulation(void);
-    void GetObjectIndexes(std::vector<u16> &, MP2::object_t, bool) const;
+    void GetObjectIndexes(std::vector<s32> &, MP2::object_t, bool) const;
     bool CheckKingdomNormalVictory(const Kingdom &) const;
 
 private:
@@ -167,12 +164,12 @@ private:
     std::vector<Castle *>               vec_castles;
     std::vector<Heroes *>               vec_heroes;
 
-    std::map<u16, std::string>		map_sign;
+    std::map<s32, std::string>		map_sign;
 
     // index, object, color
-    std::map<u16, ObjectColor> map_captureobj;
+    std::map<s32, ObjectColor> map_captureobj;
 
-    u16 ultimate_artifact;
+    s32 ultimate_artifact;
 
     u16 & width;
     u16 & height;
@@ -186,7 +183,7 @@ private:
     Heroes::heroes_t heroes_cond_wins;
     Heroes::heroes_t heroes_cond_loss;
 
-    Sprite puzzle_surface;
+    Surface puzzle_surface;
 
     static u32 uniq0;
 };

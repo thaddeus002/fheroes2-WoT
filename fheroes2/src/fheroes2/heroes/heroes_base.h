@@ -29,13 +29,13 @@
 #include "spell_book.h"
 #include "artifact.h"
 #include "color.h"
-#include "gamedefs.h"
+#include "position.h"
 
 typedef std::vector<Artifact> BagArtifacts;
 
 namespace Army { class army_t; }
 
-class HeroBase : public Skill::Primary, public BitModes
+class HeroBase : public Skill::Primary, public Maps::Position, public BitModes
 {
 public:
     HeroBase();
@@ -43,7 +43,6 @@ public:
     virtual const std::string & GetName(void) const = 0;
     virtual Color::color_t GetColor(void) const = 0;
     virtual u8 GetControl(void) const = 0;
-    virtual u16 GetIndex(void) const = 0;
     virtual bool isValid(void) const = 0;
 
     virtual const Army::army_t & GetArmy(void) const = 0;

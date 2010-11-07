@@ -48,19 +48,19 @@ u16 DialogWithArtifact(const std::string & hdr, const std::string & msg, const A
 
 namespace Game
 {
-    Cursor::themes_t GetCursor(const u16);
+    Cursor::themes_t GetCursor(const s32);
     void OpenCastle(Castle *castle);
     void OpenHeroes(Heroes *heroes);
-    void ShowPathOrStartMoveHero(Heroes *hero, const u16 dst_index);
+    void ShowPathOrStartMoveHero(Heroes *hero, const s32 dst_index);
     menu_t HumanTurn(void);
     bool DiggingForArtifacts(const Heroes & hero);
     void DialogPlayers(const Color::color_t, const std::string &);
     void MoveHeroFromArrowKeys(Heroes & hero, Direction::vector_t direct);
 
-    void MouseCursorAreaClickLeft(u16);
-    void FocusHeroesClickLeftAction(Heroes &, u16);
-    void FocusCastleClickLeftAction(Castle &, u16);
-    void MouseCursorAreaPressRight(u16);
+    void MouseCursorAreaClickLeft(s32);
+    void FocusHeroesClickLeftAction(Heroes &, s32);
+    void FocusCastleClickLeftAction(Castle &, s32);
+    void MouseCursorAreaPressRight(s32);
 
     void StartNewGame(menu_t &);
 
@@ -75,7 +75,7 @@ void Game::MoveHeroFromArrowKeys(Heroes & hero, Direction::vector_t direct)
 {
     if(Maps::isValidDirection(hero.GetIndex(), direct))
     {
-	u16 dst = Maps::GetDirectionIndex(hero.GetIndex(), direct);
+	s32 dst = Maps::GetDirectionIndex(hero.GetIndex(), direct);
 	const Maps::Tiles & tile = world.GetTiles(dst);
 	bool allow = false;
 
@@ -407,7 +407,7 @@ void Game::OpenHeroes(Heroes *hero)
 }
 
 /* return changee cursor */
-Cursor::themes_t Game::GetCursor(const u16 dst_index)
+Cursor::themes_t Game::GetCursor(const s32 dst_index)
 {
     const Maps::Tiles & tile = world.GetTiles(dst_index);
     if(tile.isFog(Settings::Get().MyColor())) return Cursor::POINTER;
@@ -615,7 +615,7 @@ Cursor::themes_t Game::GetCursor(const u16 dst_index)
     return Cursor::POINTER;
 }
 
-void Game::ShowPathOrStartMoveHero(Heroes *hero, const u16 dst_index)
+void Game::ShowPathOrStartMoveHero(Heroes *hero, const s32 dst_index)
 {
     if(!hero) return;
 
@@ -1063,7 +1063,7 @@ bool Game::DiggingForArtifacts(const Heroes & hero)
     return false;
 }
 
-void Game::MouseCursorAreaClickLeft(u16 index_maps)
+void Game::MouseCursorAreaClickLeft(s32 index_maps)
 {
     Game::Focus & global_focus = Focus::Get();
     switch(global_focus.Type())
@@ -1074,7 +1074,7 @@ void Game::MouseCursorAreaClickLeft(u16 index_maps)
     }
 }
 
-void Game::FocusHeroesClickLeftAction(Heroes & from_hero, u16 index_maps)
+void Game::FocusHeroesClickLeftAction(Heroes & from_hero, s32 index_maps)
 {
     Game::Focus & global_focus = Focus::Get();
     Maps::Tiles & tile = world.GetTiles(index_maps);
@@ -1093,7 +1093,7 @@ void Game::FocusHeroesClickLeftAction(Heroes & from_hero, u16 index_maps)
 		global_focus.SetRedraw();
 	    }
 	    else
-		ShowPathOrStartMoveHero(&from_hero, Maps::GetIndexFromAbsPoint(to_castle->GetCenter()));
+		ShowPathOrStartMoveHero(&from_hero, to_castle->GetIndex());
 	}
 	break;
 
@@ -1117,7 +1117,7 @@ void Game::FocusHeroesClickLeftAction(Heroes & from_hero, u16 index_maps)
     }
 }
 
-void Game::FocusCastleClickLeftAction(Castle & from_castle, u16 index_maps)
+void Game::FocusCastleClickLeftAction(Castle & from_castle, s32 index_maps)
 {
     Game::Focus & global_focus = Focus::Get();
     Maps::Tiles & tile = world.GetTiles(index_maps);
@@ -1162,7 +1162,7 @@ void Game::FocusCastleClickLeftAction(Castle & from_castle, u16 index_maps)
     }
 }
 
-void Game::MouseCursorAreaPressRight(u16 index_maps)
+void Game::MouseCursorAreaPressRight(s32 index_maps)
 {
     Focus & global_focus = Focus::Get();
 

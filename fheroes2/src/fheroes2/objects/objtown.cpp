@@ -28,7 +28,7 @@
 #include "direction.h"
 #include "objtown.h"
 
-bool ObjTown::isPassable(const u16 icn, const u8 index, const u16 maps_index)
+bool ObjTown::isPassable(const u16 icn, const u8 index, const s32 maps_index)
 {
     switch(icn)
     {

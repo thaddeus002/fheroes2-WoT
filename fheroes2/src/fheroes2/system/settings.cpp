@@ -803,7 +803,7 @@ Difficulty::difficulty_t Settings::MapsDifficulty(void) const
     return Difficulty::Get(current_maps_file.difficulty);
 }
 
-u8 Settings::MapsWidth(void) const
+u16 Settings::MapsWidth(void) const
 {
     return current_maps_file.size_w;
 }

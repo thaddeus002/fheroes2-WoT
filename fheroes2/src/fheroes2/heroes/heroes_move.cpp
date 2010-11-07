@@ -242,6 +242,7 @@ bool isNeedStayFrontObject(const Heroes & hero, const Maps::Tiles & next)
 
 void Heroes::Redraw(Surface & dst, bool with_shadow) const
 {
+    const Point & mp = GetCenter();
     const Interface::GameArea & gamearea = Interface::GameArea::Get();
     s16 dx = gamearea.GetMapsPos().x + TILEWIDTH * (mp.x - gamearea.GetRectMaps().x);
     s16 dy = gamearea.GetMapsPos().y + TILEWIDTH * (mp.y - gamearea.GetRectMaps().y);
@@ -251,6 +252,7 @@ void Heroes::Redraw(Surface & dst, bool with_shadow) const
 
 void Heroes::Redraw(Surface & dst, const s16 dx, const s16 dy, bool with_shadow) const
 {
+    const Point & mp = GetCenter();
     const Interface::GameArea & gamearea = Interface::GameArea::Get();
     if(!(gamearea.GetRectMaps() & mp)) return;
 
@@ -320,8 +322,8 @@ void Heroes::Redraw(Surface & dst, const s16 dx, const s16 dy, bool with_shadow)
     dst.Blit(sprite2, src_rt, dst_pt2);
 
     // redraw dependences tiles
-    const u16 center = GetIndex();
-    bool skip_ground = MP2::isActionObject(save_maps_general, isShipMaster());
+    const s32 center = GetIndex();
+    bool skip_ground = MP2::isActionObject(save_maps_object, isShipMaster());
 
     world.GetTiles(center).RedrawTop(dst);
 
@@ -365,9 +367,10 @@ void Heroes::Redraw(Surface & dst, const s16 dx, const s16 dy, bool with_shadow)
 
 bool Heroes::MoveStep(bool fast)
 {
-    u16 index_from = GetIndex();
-    u16 index_to = Maps::GetDirectionIndex(index_from, path.GetFrontDirection());
-    u16 index_dst = path.GetDestinationIndex();
+    s32 index_from = GetIndex();
+    s32 index_to = Maps::GetDirectionIndex(index_from, path.GetFrontDirection());
+    s32 index_dst = path.GetDestinationIndex();
+    const Point & mp = GetCenter();
 
     if(fast)
     {
@@ -383,16 +386,16 @@ bool Heroes::MoveStep(bool fast)
 	    Maps::Tiles & tiles_from = world.GetTiles(index_from);
 	    Maps::Tiles & tiles_to = world.GetTiles(index_to);
 
-	    if(MP2::OBJ_HEROES != save_maps_general) tiles_from.SetObject(save_maps_general);
+	    if(MP2::OBJ_HEROES != save_maps_object) tiles_from.SetObject(save_maps_object);
 
-	    SetCenter(index_to);
-	    save_maps_general = tiles_to.GetObject();
+	    SetIndex(index_to);
+	    save_maps_object = tiles_to.GetObject();
 	    tiles_to.SetObject(MP2::OBJ_HEROES);
 	    Scoute();
 	    ApplyPenaltyMovement();
 	    path.PopFront();
 
-	    if(MP2::OBJ_EVENT == save_maps_general)
+	    if(MP2::OBJ_EVENT == save_maps_object)
 	    {
 		Action(index_to);
 		SetMove(false);
@@ -438,17 +441,17 @@ bool Heroes::MoveStep(bool fast)
 	Maps::Tiles & tiles_from = world.GetTiles(index_from);
 	Maps::Tiles & tiles_to = world.GetTiles(index_to);
 
-	if(MP2::OBJ_HEROES != save_maps_general) tiles_from.SetObject(save_maps_general);
+	if(MP2::OBJ_HEROES != save_maps_object) tiles_from.SetObject(save_maps_object);
 
-	SetCenter(index_to);
-	save_maps_general = tiles_to.GetObject();
+	SetIndex(index_to);
+	save_maps_object = tiles_to.GetObject();
 	tiles_to.SetObject(MP2::OBJ_HEROES);
 	Scoute();
 	ApplyPenaltyMovement();
 	sprite_index -= 8;
 	path.PopFront();
 
-	if(MP2::OBJ_EVENT == save_maps_general)
+	if(MP2::OBJ_EVENT == save_maps_object)
 	{
 	    Action(index_to);
 	    SetMove(false);
@@ -466,21 +469,6 @@ bool Heroes::MoveStep(bool fast)
 		Action(index_to);
 		SetMove(false);
 	    }
-
-	    // AI: force scan resource around
-	    /*
-	    if(GetControl() == Game::AI)
-	    {
-		const u16 dst = Maps::ScanAroundObject(index_to, MP2::OBJ_RESOURCE);
-		for(Direction::vector_t dir = Direction::TOP_LEFT; dir < Direction::CENTER; ++dir) if(dst & dir)
-		{
-            	    if(CanMove())
-            		Action(Maps::GetDirectionIndex(index_to, dir));
-            	    else
-            		break;
-        	}
-	    }
-	    */
 	}
 
 	return true;
@@ -596,6 +584,7 @@ void Heroes::AngleStep(const Direction::vector_t to_direct)
 
 void Heroes::FadeOut(void) const
 {
+    const Point & mp = GetCenter();
     const Interface::GameArea & gamearea = Interface::GameArea::Get();
 
     if(!(gamearea.GetRectMaps() & mp)) return;
@@ -659,6 +648,7 @@ void Heroes::FadeOut(void) const
 
 void Heroes::FadeIn(void) const
 {
+    const Point & mp = GetCenter();
     const Interface::GameArea & gamearea = Interface::GameArea::Get();
 
     if(!(gamearea.GetRectMaps() & mp)) return;

@@ -358,7 +358,7 @@ void Network::PackTile(QueueMessage & msg, const Maps::Tiles & tile)
 
 void Network::UnpackTile(QueueMessage & msg)
 {
-    u16 tile_index;
+    s32 tile_index;
     msg.Pop(tile_index);
     Maps::Tiles & tile = world.GetTiles(tile_index);
     Game::IO::UnpackTile(msg, tile);
@@ -374,7 +374,7 @@ void Network::PackCastle(QueueMessage & msg, const Castle & castle)
 
 void Network::UnpackCastle(QueueMessage & msg)
 {
-    u16 castle_index;
+    s32 castle_index;
     msg.Pop(castle_index);
     Castle *castle = world.GetCastle(castle_index);
     if(castle)

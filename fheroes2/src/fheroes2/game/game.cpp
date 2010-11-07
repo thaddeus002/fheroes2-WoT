@@ -129,27 +129,7 @@ void Game::SetFixVideoMode(void)
     const Settings & conf = Settings::Get();
 
     Size fixsize(conf.VideoMode());
-    u32 max = 0;
-
-    switch(conf.MapsWidth())
-    {
-	default:
-	case Maps::SMALL:
-	    max = (6 + 36) * TILEWIDTH;
-	    break;
-
-	case Maps::MEDIUM:
-	    max = (6 + 72) * TILEWIDTH;
-	    break;
-
-	case Maps::LARGE:
-	    max = (6 + 108) * TILEWIDTH;
-	    break;
-
-	case Maps::XLARGE:
-	    max = (6 + 144) * TILEWIDTH;
-	    break;
-    }
+    u32 max = (6 + conf.MapsWidth()) * TILEWIDTH;
 
     if(conf.VideoMode().w > max) fixsize.w = max;
     if(conf.VideoMode().h > max) fixsize.h = max;

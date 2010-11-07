@@ -59,10 +59,10 @@ namespace Maps
     class Tiles
     {
     public:
-	Tiles(u16);
-	Tiles(u16 mi, const MP2::mp2tile_t & mp2tile);
+	Tiles(s32);
+	Tiles(s32 mi, const MP2::mp2tile_t & mp2tile);
 
-	u16 GetIndex(void) const{ return maps_index; }
+	s32 GetIndex(void) const{ return maps_index; }
 	MP2::object_t GetObject(void) const;
 	u8 GetQuantity1(void) const{ return quantity1; }
 	u8 GetQuantity2(void) const{ return quantity2; }
@@ -106,14 +106,14 @@ namespace Maps
 	TilesAddon* FindJail(void);
 	TilesAddon* FindBarrier(void);
 
-	void SetTile(const u16 index, const u8 shape);
+	void SetTile(const u16 sprite_index, const u8 shape);
 
 	void SetQuantity1(u8 val){ quantity1 = val; }
 	void SetQuantity2(u8 val){ quantity2 = val; }
 	void SetQuantity3(u8 val){ quantity3 = val; }
 	void SetQuantity4(u8 val){ quantity4 = val; }
 	void ResetQuantity(void);
-	void SetObject(MP2::object_t object){ general = object; }
+	void SetObject(MP2::object_t object){ mp2_object = object; }
 
 	void UpdateQuantity(void);
 	bool ValidQuantity(void) const;
@@ -175,17 +175,21 @@ namespace Maps
         std::list<TilesAddon> addons_level1;
         std::list<TilesAddon> addons_level2;
 
-	const u16 maps_index;
-	u16	tile_index;
+	const s32 maps_index;
 
-	u8	shape;
-        u8      general;
+	u16	tile_sprite_index;
+	u8	tile_sprite_shape;
+
+        u8      mp2_object;
         u8      quantity1;
         u8      quantity2;
 	u8	quantity3;
 	u8	quantity4;
         u8	fogs;
-	u8	unused; /* memory align */
+
+	u8	unused1; /* memory align */
+	u8	unused2; /* memory align */
+	u8	unused3; /* memory align */
     };
 }
 

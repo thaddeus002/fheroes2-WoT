@@ -46,7 +46,7 @@ namespace Battle2
     void NecromancySkillAction(Army::army_t &, u32, bool);
 }
 
-Battle2::Result Battle2::Loader(Army::army_t & army1, Army::army_t & army2, u16 mapsindex)
+Battle2::Result Battle2::Loader(Army::army_t & army1, Army::army_t & army2, s32 mapsindex)
 {
     Settings & conf = Settings::Get();
     Color::color_t mycolor = conf.MyColor();

@@ -26,25 +26,25 @@
 #include <utility>
 #include "maps_tiles.h"
 
-class IndexDistance : public std::pair<u16, u16>
+class IndexDistance : public std::pair<s32, u16>
 {
     public:
-    IndexDistance() : std::pair<u16, u16>(MAXU16, 0) {};
-    IndexDistance(u16 i, u16 d) : std::pair<u16, u16>(i, d) {};
+    IndexDistance() : std::pair<s32, u16>(-1, 0) {};
+    IndexDistance(s32 i, u16 d) : std::pair<s32, u16>(i, d) {};
 
     static bool Shortest(const IndexDistance & id1, const IndexDistance & id2){ return id1.second < id2.second; };
     static bool Longest(const IndexDistance & id1, const IndexDistance & id2){ return id1.second > id2.second; };
 };
 
-class IndexObject : public std::pair<u16, MP2::object_t>
+class IndexObject : public std::pair<s32, MP2::object_t>
 {
     public:
-    IndexObject() : std::pair<u16, MP2::object_t>(MAXU16, MP2::OBJ_ZERO) {};
-    IndexObject(const std::pair<u16, MP2::object_t> & pair) : std::pair<u16, MP2::object_t>(pair) {};
-    IndexObject(const u16 index, const MP2::object_t object) : std::pair<u16, MP2::object_t>(index, object) {};
-    IndexObject(const Maps::Tiles & tile) : std::pair<u16, MP2::object_t>(tile.GetIndex(), tile.GetObject()) {};
+    IndexObject() : std::pair<s32, MP2::object_t>(-1, MP2::OBJ_ZERO) {};
+    IndexObject(const std::pair<s32, MP2::object_t> & pair) : std::pair<s32, MP2::object_t>(pair) {};
+    IndexObject(const s32 index, const MP2::object_t object) : std::pair<s32, MP2::object_t>(index, object) {};
+    IndexObject(const Maps::Tiles & tile) : std::pair<s32, MP2::object_t>(tile.GetIndex(), tile.GetObject()) {};
 
-    bool isIndex(u16 index) const { return index == first; };
+    bool isIndex(s32 index) const { return index == first; };
     bool isObject(u8 object) const { return object == second; };
 };
 

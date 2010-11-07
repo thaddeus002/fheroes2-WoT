@@ -217,7 +217,7 @@ Dialog::answer_t Castle::OpenDialog(bool readonly, bool fade)
     	conf.SetEvilInterface(GetRace() & (Race::BARB | Race::WRLK | Race::NECR));
 
     Display & display = Display::Get();
-    castle_heroes = const_cast<Heroes*>(world.GetHeroes(mp.x, mp.y));
+    castle_heroes = GetHeroes();
 
     // cursor
     Cursor & cursor = Cursor::Get();

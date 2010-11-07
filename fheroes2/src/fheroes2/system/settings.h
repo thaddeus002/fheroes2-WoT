@@ -36,13 +36,11 @@
 #include "game_io.h"
 #include "bitmodes.h"
 
+#define FORMAT_VERSION_2031 0x07EF
 #define FORMAT_VERSION_1978 0x07BA
 #define FORMAT_VERSION_1966 0x07AE
-#define FORMAT_VERSION_1954 0x07A2
-#define FORMAT_VERSION_1949 0x079D
-#define FORMAT_VERSION_1861 0x0745
-#define CURRENT_FORMAT_VERSION FORMAT_VERSION_1978
-#define LAST_FORMAT_VERSION FORMAT_VERSION_1861
+#define CURRENT_FORMAT_VERSION FORMAT_VERSION_2031
+#define LAST_FORMAT_VERSION FORMAT_VERSION_1966
 
 #define ListMapsDirectory std::list<std::string>
 
@@ -322,7 +320,7 @@ public:
     const std::string & MapsName(void) const;
     const std::string & MapsDescription(void) const;
     Difficulty::difficulty_t MapsDifficulty(void) const;
-    u8 MapsWidth(void) const;
+    u16 MapsWidth(void) const;
     bool AllowColors(u8) const;
     u8   AllowColors(void) const;
     Color::color_t FirstAllowColor(void) const;

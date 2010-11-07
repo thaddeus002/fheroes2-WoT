@@ -231,13 +231,13 @@ void Interface::Basic::RedrawSystemInfo(s16 cx, s16 cy, u32 usage)
     system_info.Blit(cx, cy);
 }
 
-s16 Interface::Basic::GetDimensionDoorDestination(const u16 from, const u8 distance) const
+s32 Interface::Basic::GetDimensionDoorDestination(const s32 from, const u8 distance) const
 {
     Cursor & cursor = Cursor::Get();
     Display & display = Display::Get();
     Settings & conf = Settings::Get();
     LocalEvent & le = LocalEvent::Get();
-    s16 dst = -1;
+    s32 dst = -1;
 
     while(le.HandleEvents())
     {

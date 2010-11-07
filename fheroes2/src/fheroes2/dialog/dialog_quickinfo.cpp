@@ -99,9 +99,9 @@ void Dialog::QuickInfo(const Maps::Tiles & tile)
     const Point & mp = le.GetMouseCursor();
     
     Rect pos; 
-    u16 mx = (mp.x - BORDERWIDTH) / TILEWIDTH;
+    s16 mx = (mp.x - BORDERWIDTH) / TILEWIDTH;
     mx *= TILEWIDTH;
-    u16 my = (mp.y - BORDERWIDTH) / TILEWIDTH;
+    s16 my = (mp.y - BORDERWIDTH) / TILEWIDTH;
     my *= TILEWIDTH;
 
     // top left
@@ -425,9 +425,9 @@ void Dialog::QuickInfo(const Castle & castle)
     const Point & mp = le.GetMouseCursor();
     
     Rect cur_rt; 
-    u16 mx = (mp.x - BORDERWIDTH) / TILEWIDTH;
+    s16 mx = (mp.x - BORDERWIDTH) / TILEWIDTH;
     mx *= TILEWIDTH;
-    u16 my = (mp.y - BORDERWIDTH) / TILEWIDTH;
+    s16 my = (mp.y - BORDERWIDTH) / TILEWIDTH;
     my *= TILEWIDTH;
 
     // top left
@@ -563,9 +563,9 @@ void Dialog::QuickInfo(const Heroes & hero)
     const Point & mp = le.GetMouseCursor();
     
     Rect cur_rt; 
-    u16 mx = (mp.x - BORDERWIDTH) / TILEWIDTH;
+    s16 mx = (mp.x - BORDERWIDTH) / TILEWIDTH;
     mx *= TILEWIDTH;
-    u16 my = (mp.y - BORDERWIDTH) / TILEWIDTH;
+    s16 my = (mp.y - BORDERWIDTH) / TILEWIDTH;
     my *= TILEWIDTH;
 
     // top left

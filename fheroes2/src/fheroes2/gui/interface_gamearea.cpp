@@ -36,9 +36,9 @@
 namespace Game
 {
     // game_startgame.cpp
-    Cursor::themes_t GetCursor(u16);
-    void MouseCursorAreaClickLeft(u16);
-    void MouseCursorAreaPressRight(u16);
+    Cursor::themes_t GetCursor(s32);
+    void MouseCursorAreaClickLeft(s32);
+    void MouseCursorAreaPressRight(s32);
 }
 
 Interface::GameArea & Interface::GameArea::Get(void)
@@ -201,7 +201,7 @@ void Interface::GameArea::Redraw(Surface & dst, u8 flag, const Rect & rt) const
 	focus.GetHeroes().GetPath().isShow())
     {
 	const Heroes & hero = focus.GetHeroes();
-	u16 from = Maps::GetIndexFromAbsPoint(hero.GetCenter());
+	s32 from = hero.GetIndex();
 	s16 green = hero.GetPath().GetAllowStep();
 
 	const bool skipfirst = hero.isEnableMove() && 45 > hero.GetSpriteIndex() && 2 < (hero.GetSpriteIndex() % 9);
@@ -380,14 +380,14 @@ void Interface::GameArea::Center(s16 px, s16 py)
 	if(pos.x == world.w() - rectMaps.w)
 	    scrollOffset.x = SCROLL_MAX * 2;
 	else
-	    scrollOffset.x = SCROLL_MAX;
+	    scrollOffset.x = SCROLL_MAX + TILEWIDTH / 2;
 
 	if(pos.y == 0) scrollOffset.y = 0;
 	else
 	if(pos.y == world.h() - rectMaps.h)
 	    scrollOffset.y = SCROLL_MAX * 2;
 	else
-	    scrollOffset.y = SCROLL_MAX;
+	    scrollOffset.y = SCROLL_MAX + TILEWIDTH / 2;
 
 	rectMapsPosition.x = areaPosition.x - scrollOffset.x;
 	rectMapsPosition.y = areaPosition.y - scrollOffset.y;
@@ -398,7 +398,7 @@ void Interface::GameArea::Center(s16 px, s16 py)
     if(scrollDirection) Scroll();
 }
 
-void Interface::GameArea::GenerateUltimateArtifactAreaSurface(const u16 index, Sprite & sf)
+void Interface::GameArea::GenerateUltimateArtifactAreaSurface(const s32 index, Surface & sf)
 {
     if(Interface::NoGUI()) return;
 
@@ -435,7 +435,11 @@ void Interface::GameArea::GenerateUltimateArtifactAreaSurface(const u16 index, S
 	Settings::Get().EvilInterface() ? sf.GrayScale() : sf.Sepia();
 
 	if(Settings::Get().QVGA())
-    	    sf.ScaleMinifyByTwo();
+	{
+    	    Surface sf2;
+    	    Surface::ScaleMinifyByTwo(sf2, sf);
+    	    Surface::Swap(sf2, sf);
+	}
 
 	gamearea.SetAreaPosition(origPosition.x, origPosition.y, origPosition.w, origPosition.h);
     }
@@ -510,11 +514,11 @@ void Interface::GameArea::SetScroll(scroll_t direct)
 }
 
 /* convert area point to index maps */
-s16 Interface::GameArea::GetIndexFromMousePoint(const Point & pt) const
+s32 Interface::GameArea::GetIndexFromMousePoint(const Point & pt) const
 {
-    s16 result = (rectMaps.y + (pt.y - rectMapsPosition.y) / TILEWIDTH) * world.w() +
+    s32 result = (rectMaps.y + (pt.y - rectMapsPosition.y) / TILEWIDTH) * world.w() +
 		    rectMaps.x + (pt.x - rectMapsPosition.x) / TILEWIDTH;
-    const u16 & max = world.w() * world.h() - 1;
+    const s32 & max = world.w() * world.h() - 1;
 
     return result > max || result < Maps::GetIndexFromAbsPoint(rectMaps.x, rectMaps.y) ? -1 : result;
 }
@@ -531,7 +535,7 @@ void Interface::GameArea::QueueEventProcessing(void)
     LocalEvent & le = LocalEvent::Get();
     const Point & mp = le.GetMouseCursor();
 
-    s16 index = GetIndexFromMousePoint(mp);
+    s32 index = GetIndexFromMousePoint(mp);
     
     // out of range
     if(index < 0) return;

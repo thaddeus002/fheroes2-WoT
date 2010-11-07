@@ -39,7 +39,7 @@ Castle::Castle() : captain(*this), mageguild(*this), army(&captain), castle_hero
 {
 }
 
-Castle::Castle(s16 cx, s16 cy, const Race::race_t rc) : mp(cx, cy), race(rc), captain(*this),
+Castle::Castle(s16 cx, s16 cy, const Race::race_t rc) : Position(Point(cx, cy)), race(rc), captain(*this),
     color(Color::GRAY), building(0), mageguild(*this),
     army(NULL), castle_heroes(NULL)
 {
@@ -290,14 +290,9 @@ u32 Castle::CountBuildings(void) const
     return requires.count();
 }
 
-const Point & Castle::GetCenter(void) const
-{ return mp; }
-
-u16 Castle::GetIndex(void) const
-{ return Maps::GetIndexFromAbsPoint(mp); }
-
 bool Castle::ContainCoord(const u16 ax, const u16 ay) const
 {
+    const Point & mp = GetCenter();
     return ((mp.x == ax && mp.y - 3 == ay) || (ax >= mp.x - 2 && ax <= mp.x + 2 && ay >= mp.y - 2 && ay <= mp.y + 1));
 }
 
@@ -1024,7 +1019,7 @@ bool Castle::BuyBuilding(u32 build)
 /* draw image castle to position */
 void Castle::DrawImageCastle(const Point & pt)
 {
-    const Maps::Tiles & tile = world.GetTiles(mp.x, mp.y);
+    const Maps::Tiles & tile = world.GetTiles(GetCenter());
     Display & display = Display::Get();
 
     u8 index = 0;
@@ -1348,19 +1343,20 @@ ICN::icn_t Castle::GetICNBuilding(u32 build, Race::race_t race)
 
 const Heroes* Castle::GetHeroes(void) const
 {
-    const Heroes* hero = world.GetHeroes(mp.x, mp.y);
+    const Heroes* hero = world.GetHeroes(GetIndex());
     return hero && Color::GRAY != hero->GetColor() ? hero : NULL;
 }
 
 Heroes* Castle::GetHeroes(void)
 {
-    return const_cast<Heroes *>(world.GetHeroes(mp.x, mp.y));
+    Heroes* hero = world.GetHeroes(GetIndex());
+    return hero && Color::GRAY != hero->GetColor() ? hero : NULL;
 }
 
 bool Castle::HaveNearlySea(void) const
 {
     // check nearest ocean
-    const u16 index = GetIndex() + world.w() * 2;
+    const s32 index = GetIndex() + world.w() * 2;
     const Maps::Tiles & left = world.GetTiles(index - 1);
     const Maps::Tiles & right = world.GetTiles(index + 1);
     const Maps::Tiles & center = world.GetTiles(index);
@@ -1377,7 +1373,7 @@ bool TilePresentBoat(const Maps::Tiles & tile)
 bool Castle::PresentBoat(void) const
 {
     // 2 cell down
-    const u16 index = GetIndex() + world.w() * 2;
+    const s32 index = GetIndex() + world.w() * 2;
     const u16 max = world.w() * world.h();
 
     if(index + 1 < max)
@@ -1655,7 +1651,7 @@ bool Castle::BuyBoat(void)
     if(!AllowBuyBoat()) return false;
     if(Game::LOCAL == world.GetKingdom(color).Control()) AGG::PlaySound(M82::BUILDTWN);
 
-    const u16 index = GetIndex() + world.w() * 2;
+    const s32 index = GetIndex() + world.w() * 2;
     Maps::Tiles & left = world.GetTiles(index - 1);
     Maps::Tiles & right = world.GetTiles(index + 1);
     Maps::Tiles & center = world.GetTiles(index);
