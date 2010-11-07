@@ -199,7 +199,7 @@ void QueueMessage::Push(const char* str)
 bool QueueMessage::Pop(s8 & byte8)
 {
     u8 tmp;
-    if((tmp))
+    if(Pop(tmp))
     {
 	byte8 = tmp;
 	return true;

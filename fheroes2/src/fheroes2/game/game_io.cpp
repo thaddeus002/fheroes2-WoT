@@ -139,7 +139,7 @@ bool Game::LoadSAV2FileInfo(const std::string & fn,  Maps::FileInfo & maps_file)
 
     // maps
     msg.Pop(byte16);
-    if(FORMAT_VERSION_2030 <= version)
+    if(FORMAT_VERSION_2031 <= version)
     {
 	msg.Pop(maps_file.size_w);
 	msg.Pop(maps_file.size_h);
@@ -670,7 +670,7 @@ bool Game::IO::LoadBIN(QueueMessage & msg)
     msg.Pop(byte16);
     if(byte16 != 0xFF02) DEBUG(DBG_GAME , DBG_WARN, "Game::IO::LoadBIN: 0xFF02");
 
-    if(FORMAT_VERSION_2030 <= format)
+    if(FORMAT_VERSION_2031 <= format)
     {
 	msg.Pop(conf.current_maps_file.size_w);
 	msg.Pop(conf.current_maps_file.size_h);
@@ -746,7 +746,7 @@ bool Game::IO::LoadBIN(QueueMessage & msg)
     msg.Pop(world.width);
     msg.Pop(world.height);
 
-    if(FORMAT_VERSION_2030 <= format)
+    if(FORMAT_VERSION_2031 <= format)
     {
 	msg.Pop(world.ultimate_artifact);
     }
@@ -813,7 +813,7 @@ bool Game::IO::LoadBIN(QueueMessage & msg)
     // signs
     msg.Pop(byte16);
     if(byte16 != 0xFF0A) DEBUG(DBG_GAME , DBG_WARN, "Game::IO::LoadBIN: 0xFF0A");
-    if(FORMAT_VERSION_2030 <= format)
+    if(FORMAT_VERSION_2031 <= format)
     {
 	msg.Pop(byte32);
 	byte16 = byte32;
@@ -840,7 +840,7 @@ bool Game::IO::LoadBIN(QueueMessage & msg)
     // captured object
     msg.Pop(byte16);
     if(byte16 != 0xFF0B) DEBUG(DBG_GAME , DBG_WARN, "Game::IO::LoadBIN: 0xFF0B");
-    if(FORMAT_VERSION_2030 <= format)
+    if(FORMAT_VERSION_2031 <= format)
     {
 	msg.Pop(byte32);
 	byte16 = byte32;
@@ -916,7 +916,7 @@ bool Game::IO::LoadBIN(QueueMessage & msg)
 	GameEvent::Coord *event = new GameEvent::Coord();
 	u32 size;
 
-	if(FORMAT_VERSION_2030 <= format)
+	if(FORMAT_VERSION_2031 <= format)
 	{
 	    msg.Pop(size); event->index_map = size;
 	}
@@ -952,7 +952,7 @@ bool Game::IO::LoadBIN(QueueMessage & msg)
 	GameEvent::Riddle *riddle = new GameEvent::Riddle();
 	u32 size;
 	
-	if(FORMAT_VERSION_2030 <= format)
+	if(FORMAT_VERSION_2031 <= format)
 	{
 	    msg.Pop(size); riddle->index_map = size;
 	}
@@ -1013,7 +1013,7 @@ void Game::IO::UnpackTile(QueueMessage & msg, Maps::Tiles & tile, u16 check_vers
     msg.Pop(tile.quantity4);
     msg.Pop(tile.fogs);
     msg.Pop(tile.unused1);
-    if(FORMAT_VERSION_2030 <= check_version)
+    if(FORMAT_VERSION_2031 <= check_version)
     {
 	msg.Pop(tile.unused2);
 	msg.Pop(tile.unused3);
@@ -1083,7 +1083,7 @@ void Game::IO::UnpackKingdom(QueueMessage & msg, Kingdom & kingdom, u16 check_ve
     for(u32 jj = 0; jj < byte32; ++jj)
     {
 	IndexObject io;
-	if(FORMAT_VERSION_2030 <= check_version)
+	if(FORMAT_VERSION_2031 <= check_version)
 	{
 	    msg.Pop(io.first);
 	}
@@ -1116,7 +1116,7 @@ void Game::IO::UnpackCastle(QueueMessage & msg, Castle & castle, u16 check_versi
     u16 byte16;
     u32 byte32;
 
-    if(FORMAT_VERSION_2030 <= check_version)
+    if(FORMAT_VERSION_2031 <= check_version)
     {
 	msg.Pop(castle.center.x);
 	msg.Pop(castle.center.y);
@@ -1189,7 +1189,7 @@ void Game::IO::UnpackHeroes(QueueMessage & msg, Heroes & hero, u16 check_version
     msg.Pop(byte16); hero.direction = Direction::FromInt(byte16);
     msg.Pop(hero.sprite_index);
     msg.Pop(byte8); hero.save_maps_object = static_cast<MP2::object_t>(byte8);
-    if(FORMAT_VERSION_2030 <= check_version)
+    if(FORMAT_VERSION_2031 <= check_version)
     {
 	msg.Pop(hero.center.x);
 	msg.Pop(hero.center.y);
@@ -1253,7 +1253,7 @@ void Game::IO::UnpackHeroes(QueueMessage & msg, Heroes & hero, u16 check_version
     for(u32 jj = 0; jj < byte32; ++jj)
     {
 	IndexObject io;
-	if(FORMAT_VERSION_2030 <= check_version)
+	if(FORMAT_VERSION_2031 <= check_version)
 	{
 	    msg.Pop(io.first);
 	}
@@ -1267,7 +1267,7 @@ void Game::IO::UnpackHeroes(QueueMessage & msg, Heroes & hero, u16 check_version
     }
 
     // route path
-    if(FORMAT_VERSION_2030 <= check_version)
+    if(FORMAT_VERSION_2031 <= check_version)
     {
 	msg.Pop(hero.path.dst);
     }
