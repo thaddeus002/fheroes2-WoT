@@ -155,7 +155,7 @@ namespace Battle2
 	void	SpellModesAction(u8, u8, const HeroBase*);
 	void	SpellApplyDamage(u8, u8, const HeroBase*, TargetInfo &);
 	void	SpellRestoreAction(u8, u8, const HeroBase*);
-	u32	Resurrect(u32, bool);
+	u32	Resurrect(u32, bool, bool);
 
 	Monster GetMonster(void) const;
 	const MonsterInfo & GetMonsterInfo(void) const;

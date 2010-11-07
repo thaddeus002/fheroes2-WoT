@@ -3070,7 +3070,7 @@ void Battle2::Interface::RedrawActionResurrectSpell(Stats & target, u8 spell)
         target.animstep = 1;
     }
 
-    RedrawTroopWithFrameAnimation(target, ICN::MAGIC08, M82::UNKNOWN, false);
+    RedrawTroopWithFrameAnimation(target, ICN::YINYANG, M82::UNKNOWN, false);
 }
 
 void Battle2::Interface::RedrawActionDisruptingRaySpell(Stats & target)

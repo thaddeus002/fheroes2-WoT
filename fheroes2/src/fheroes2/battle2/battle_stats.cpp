@@ -852,13 +852,12 @@ void Battle2::Stats::PostKilledAction(void)
     // possible also..
 }
 
-u32 Battle2::Stats::Resurrect(u32 points, bool allow_overflow)
+u32 Battle2::Stats::Resurrect(u32 points, bool allow_overflow, bool skip_dead)
 {
-    const u32 resurrect = Monster::GetCountFromHitPoints(troop(), hp + points) - count;
+    u32 resurrect = Monster::GetCountFromHitPoints(troop(), hp + points) - count;
 
     count += resurrect;
     hp += points;
-    dead -= (resurrect < dead ? resurrect : dead);
 
     if(allow_overflow)
     {
@@ -867,10 +866,13 @@ u32 Battle2::Stats::Resurrect(u32 points, bool allow_overflow)
     else
     if(count > troop.count)
     {
+	resurrect -= count - troop.count;
 	count = troop.count;
 	hp = count * GetMonster().GetHitPoints();
     }
 
+    if(!skip_dead)
+	dead -= (resurrect < dead ? resurrect : dead);
 
     return resurrect;
 }
@@ -883,13 +885,13 @@ u32 Battle2::Stats::ApplyDamage(Stats & enemy, u32 dmg)
     {
 	case Monster::GHOST:
 	    // grow troop
-	    enemy.Resurrect(killed * enemy.GetMonster().GetHitPoints(), true);
+	    enemy.Resurrect(killed * enemy.GetMonster().GetHitPoints(), true, false);
 	    DEBUG(DBG_BATTLE, DBG_TRACE, "Battle2::Stats::ApplyDamage: " << enemy.GetName() << " capability");
 	    break;
 
 	case Monster::VAMPIRE_LORD:
 	    // restore hit points
-	    enemy.Resurrect(killed * GetMonster().GetHitPoints(), false);
+	    enemy.Resurrect(killed * GetMonster().GetHitPoints(), false, false);
 	    DEBUG(DBG_BATTLE, DBG_TRACE, "Battle2::Stats::ApplyDamage: " << enemy.GetName() << " capability");
 	    break;
 
@@ -1468,10 +1470,7 @@ void Battle2::Stats::SpellRestoreAction(u8 spell, u8 spoint, const HeroBase* her
 	    // restore hp
 	    if(hero && hero->HasArtifact(Artifact::ANKH)) restore *= 2;
 
-	    const u16 res = Resurrect(restore, false);
-
-	    // Spell::RESURRECT it is not full resurrect
-	    if(Spell::RESURRECT == spell) dead += res;
+	    const u16 res = Resurrect(restore, false, (Spell::RESURRECT == spell));
 
 	    if(arena->interface)
 	    {
