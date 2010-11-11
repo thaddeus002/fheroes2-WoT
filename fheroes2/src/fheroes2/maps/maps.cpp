@@ -452,7 +452,7 @@ void Maps::UpdateSpritesFromTownToCastle(const Point & center)
 
 u16 Maps::TileUnderProtection(const s32 center)
 {
-    if(!isValidAbsIndex(center)) return 0;
+    if(!isValidAbsIndex(center) || Ground::WATER == world.GetTiles(center).GetGround()) return 0;
 
     u16 result = 0;
     const u16 dst_around = Maps::ScanAroundObject(center, MP2::OBJ_MONSTER);
