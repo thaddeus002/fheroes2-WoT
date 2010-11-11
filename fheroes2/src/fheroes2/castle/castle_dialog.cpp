@@ -944,7 +944,12 @@ Dialog::answer_t Castle::OpenDialog(bool readonly, bool fade)
 		    statusBar.ShowMessage(str);
 	    }
 	}
-	
+	else
+	{
+	    str = _("Empty");
+	    statusBar.ShowMessage(str);
+	}
+
 	// animation sprite
 	if(Game::AnimateInfrequent(Game::CASTLE_AROUND_DELAY))
 	{
