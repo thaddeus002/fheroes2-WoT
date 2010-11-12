@@ -391,7 +391,7 @@ void AnimationRemoveObject(const Maps::Tiles & tile)
 // action to next cell
 void Heroes::Action(const s32 dst_index)
 {
-    if(Game::AI == world.GetKingdom(GetColor()).Control()) return AIAction(dst_index);
+    if(Game::AI == world.GetKingdom(GetColor()).Control()) return AI::HeroesAction(*this, dst_index);
 
     const MP2::object_t object = (dst_index == GetIndex() ?
 				    GetUnderObject() : world.GetTiles(dst_index).GetObject());

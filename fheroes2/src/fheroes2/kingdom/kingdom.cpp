@@ -101,7 +101,7 @@ Kingdom::Kingdom()
 {
 }
 
-Kingdom::Kingdom(const Color::color_t cl) : color(cl), control(Game::AI), flags(0), lost_town_days(0), ai_capital(NULL), visited_tents_colors(0)
+Kingdom::Kingdom(const Color::color_t cl) : color(cl), control(Game::AI), flags(0), lost_town_days(0), visited_tents_colors(0)
 {
     const Settings & conf = Settings::Get();
 
@@ -301,35 +301,49 @@ void Kingdom::ActionNewMonth(void)
 
 void Kingdom::AddHeroes(const Heroes *hero)
 {
-    if(hero && heroes.end() == std::find(heroes.begin(), heroes.end(), hero))
-	heroes.push_back(const_cast<Heroes *>(hero));
+    if(hero)
+    {
+	if(heroes.end() == std::find(heroes.begin(), heroes.end(), hero))
+	    heroes.push_back(const_cast<Heroes *>(hero));
+
+	AI::AddHeroes(*hero);
+    }
 }
 
 void Kingdom::RemoveHeroes(const Heroes *hero)
 {
-    if(hero && heroes.size())
-	heroes.erase(std::find(heroes.begin(), heroes.end(), hero));
+    if(hero)
+    {
+	if(heroes.size())
+	    heroes.erase(std::find(heroes.begin(), heroes.end(), hero));
+
+	AI::RemoveHeroes(*hero);
+    }
 
     if(isLoss()) LossPostActions();
 }
 
 void Kingdom::AddCastle(const Castle *castle)
 {
-    if(castle && castles.end() == std::find(castles.begin(), castles.end(), castle))
-	castles.push_back(const_cast<Castle *>(castle));
+    if(castle)
+    {
+	if(castles.end() == std::find(castles.begin(), castles.end(), castle))
+	    castles.push_back(const_cast<Castle *>(castle));
+
+	AI::AddCastle(*castle);
+    }
 
     lost_town_days = Game::GetLostTownDays() + 1;
 }
 
 void Kingdom::RemoveCastle(const Castle *castle)
 {
-    if(castle && castles.size())
-	castles.erase(std::find(castles.begin(), castles.end(), castle));
-
-    if(ai_capital == castle)
+    if(castle)
     {
-	const_cast<Castle *>(castle)->ResetModes(Castle::CAPITAL);
-	ai_capital = NULL;
+	if(castles.size())
+	    castles.erase(std::find(castles.begin(), castles.end(), castle));
+
+	AI::RemoveCastle(*castle);
     }
 
     if(isLoss()) LossPostActions();

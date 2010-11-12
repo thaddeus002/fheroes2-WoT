@@ -207,16 +207,6 @@ public:
     bool ApplyPenaltyMovement(void);
     bool ActionSpellCast(Spell::spell_t);
 
-    void AIAction(const s32 dst_index);
-    bool AIValidObject(s32);
-    void AIRescueWhereMove(void);
-    bool AIPriorityObject(s32);
-
-    std::deque<s32> & GetAITasks(void) { return ai_sheduled_visit; }
-    void ClearAITasks(void) { ai_sheduled_visit.clear(); }
-    s32 GetPrimaryTarget(void) const { return ai_primary_target; }
-    void SetPrimaryTarget(s32 target) { ai_primary_target = target; }
-
     void Redraw(Surface &, bool) const;
     void Redraw(Surface &, const s16, const s16, bool) const;
     u8   GetSpriteIndex(void) const{ return sprite_index; }
@@ -282,8 +272,6 @@ private:
     u8 patrol_square;
 
     std::list<IndexObject> visit_object;
-    std::deque<s32> ai_sheduled_visit;
-    s32 ai_primary_target;
 };
 
 #endif

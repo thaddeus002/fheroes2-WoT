@@ -461,7 +461,8 @@ void Game::IO::PackKingdom(QueueMessage & msg, const Kingdom & kingdom)
 
     msg.Push(kingdom.flags);
     msg.Push(kingdom.lost_town_days);
-    msg.Push(static_cast<u16>(kingdom.ai_capital ? kingdom.ai_capital->GetIndex() : 0));
+    // unused
+    msg.Push(static_cast<u16>(0));
 
     // funds
     msg.Push(kingdom.resource.wood);
@@ -1065,8 +1066,8 @@ void Game::IO::UnpackKingdom(QueueMessage & msg, Kingdom & kingdom, u16 check_ve
 
     msg.Pop(kingdom.flags);
     msg.Pop(kingdom.lost_town_days);
+    // unused
     msg.Pop(byte16);
-    kingdom.ai_capital = byte16 ? world.GetCastle(byte16) : NULL;
 
     // funds
     msg.Pop(byte32); kingdom.resource.wood = byte32;

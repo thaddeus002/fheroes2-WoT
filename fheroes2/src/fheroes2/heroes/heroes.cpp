@@ -103,16 +103,14 @@ Heroes::heroes_t Heroes::ConvertID(u8 index)
 }
 
 Heroes::Heroes() : move_point_scale(-1), army(this), path(*this), 
-    direction(Direction::RIGHT), sprite_index(18), patrol_square(0),
-    ai_primary_target(-1)
+    direction(Direction::RIGHT), sprite_index(18), patrol_square(0)
 {
     bag_artifacts.assign(HEROESMAXARTIFACT, Artifact::UNKNOWN);
 }
 
 Heroes::Heroes(heroes_t ht, Race::race_t rc) : killer_color(Color::GRAY), experience(0), move_point(0),
     move_point_scale(-1), army(this), portrait(ht), race(rc),
-    save_maps_object(MP2::OBJ_ZERO), path(*this), direction(Direction::RIGHT), sprite_index(18), patrol_square(0),
-    ai_primary_target(-1)
+    save_maps_object(MP2::OBJ_ZERO), path(*this), direction(Direction::RIGHT), sprite_index(18), patrol_square(0)
 {
     name = _(HeroesName(ht));
 
@@ -1717,10 +1715,5 @@ void Heroes::Dump(void) const
                                          (Modes(PATROL) ? "PATROL," : ",") <<
                                          (Modes(STUPID) ? "STUPID," : ",") << std::endl;
 
-    std::cout << "ai primary target: " << ai_primary_target << std::endl;
-    std::cout << "ai sheduled visit: ";
-    std::deque<s32>::const_iterator it1 = ai_sheduled_visit.begin();
-    std::deque<s32>::const_iterator it2 = ai_sheduled_visit.end();
-    for(; it1 != it2; ++it1) std::cout << *it1 << "(" << MP2::StringObject(world.GetTiles(*it1).GetObject()) << "), ";
     std::cout << std::endl;
 }

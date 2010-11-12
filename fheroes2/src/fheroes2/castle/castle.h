@@ -35,6 +35,7 @@
 #include "heroes.h"
 #include "game_io.h"
 #include "position.h"
+#include "ai.h"
 
 class Heroes;
 namespace Maps { class Tiles; }
@@ -171,10 +172,6 @@ public:
 
     void Dump(void) const;
 
-    void AIDefense(void);
-    void AIDevelopment(void);
-    void AIJoinRNDArmy(void);
-
     Dialog::answer_t DialogBuyHero(const Heroes*);
     Dialog::answer_t DialogBuyCaptain(bool fixed = true) const;
     Dialog::answer_t DialogBuyCastle(bool fixed = true) const;
@@ -193,6 +190,7 @@ private:
 
 private:
     friend class Game::IO;
+    friend class AI;
 
     Race::race_t	race;
     Captain		captain;

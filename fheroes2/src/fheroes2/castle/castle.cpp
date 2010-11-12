@@ -265,7 +265,7 @@ void Castle::LoadFromMP2(const void *ptr)
 
     // AI troops auto pack
     if(!custom_troops && Game::AI == GetControl())
-	AIJoinRNDArmy();
+	AI::JoinRNDArmy(*this);
 
     // fix shipyard
     if(!HaveNearlySea()) building &= ~(BUILD_SHIPYARD);

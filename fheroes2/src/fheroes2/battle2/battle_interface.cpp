@@ -1655,7 +1655,7 @@ void Battle2::Interface::SetAutoBattle(const Stats & b, Actions & a)
     Settings::Get().SetAutoBattle(true);
     Cursor::Get().SetThemes(Cursor::WAR_NONE);
     status.SetMessage(_("Set auto battle on"), true);
-    arena.AITurn(b, a);
+    AI::BattleTurn(arena, b, a);
     humanturn_redraw = true;
     humanturn_exit = true;
 }

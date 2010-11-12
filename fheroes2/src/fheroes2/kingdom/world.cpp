@@ -38,6 +38,7 @@
 #include "game_over.h"
 #include "interface_gamearea.h"
 #include "world.h"
+#include "ai.h"
 
 bool PredicateHeroesIsFreeman(const Heroes *h)
 {
@@ -1135,7 +1136,7 @@ void World::NewWeek(void)
 
     // added army for gray castle
     std::vector<Castle *>::const_iterator itc = vec_castles.begin();
-    for(; itc != vec_castles.end(); ++itc) if(*itc && Color::GRAY == (*itc)->GetColor()) (*itc)->AIJoinRNDArmy();
+    for(; itc != vec_castles.end(); ++itc) if(*itc && Color::GRAY == (*itc)->GetColor()) AI::JoinRNDArmy(**itc);
 
     // TODO:: action for week type: PLAGUE and MONSTERS
 }

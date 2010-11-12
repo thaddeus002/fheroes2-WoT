@@ -187,10 +187,6 @@ namespace Battle2
 	void SpellActionEarthQuake(void);
 	void SpellActionMirrorImage(Stats &);
 
-	// battle_ai
-	void AITurn(const Stats &, Actions &);
-	void AIMagicAction(const Stats &, Actions &, const Stats*);
-
 	// battle_action
 	void ApplyActionRetreat(Action &);
 	void ApplyActionSurrender(Action &);
@@ -212,6 +208,7 @@ namespace Battle2
 	friend class Tower;
 	friend class Bridge;
 	friend class Catapult;
+	friend class AI;
 
 	Army::army_t & army1;
         Army::army_t & army2;

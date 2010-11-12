@@ -941,7 +941,7 @@ void Battle2::Arena::Turns(u16 turn, Result & result)
 	{
     	    case Game::REMOTE:	RemoteTurn(*current_troop, actions); break;
     	    case Game::LOCAL:   HumanTurn(*current_troop, actions); break;
-    	    default:		AITurn(*current_troop, actions); break;
+    	    default:		AI::BattleTurn(*this, *current_troop, actions); break;
 	}
 
 	// apply task
@@ -1000,7 +1000,7 @@ void Battle2::Arena::RemoteTurn(const Stats & b, Actions & a)
     }
 #endif
     DEBUG(DBG_BATTLE, DBG_WARN, "Battle2::Arena::RemoteTurn: " << "AI turn");
-    AITurn(b, a);
+    AI::BattleTurn(*this, b, a);
 }
 
 void Battle2::Arena::HumanTurn(const Stats & b, Actions & a)
@@ -1010,7 +1010,7 @@ void Battle2::Arena::HumanTurn(const Stats & b, Actions & a)
     conf.SetMyColor(Color::Get(b.GetColor()));
 
     if(conf.AutoBattle())
-        AITurn(b, a);
+        AI::BattleTurn(*this, b, a);
     else
     if(interface)
         interface->HumanTurn(b, a);

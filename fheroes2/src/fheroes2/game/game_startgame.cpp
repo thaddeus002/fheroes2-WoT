@@ -231,7 +231,7 @@ Game::menu_t Game::StartGame(void)
 			cursor.Show();
 			display.Flip();
 
-			kingdom.AITurns();
+			AI::KingdomTurn(kingdom);
 		    }
 		break;
 	    }

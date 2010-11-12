@@ -33,6 +33,7 @@
 #include "pairs.h"
 #include "game_io.h"
 #include "heroes_recruits.h"
+#include "ai.h"
 
 class Castle;
 class Heroes;
@@ -104,7 +105,6 @@ public:
     void AddCastle(const Castle *castle);
     void RemoveCastle(const Castle *castle);
     
-    void AITurns(void);
     void ActionBeforeTurn(void);
     void ActionNewDay(void);
     void ActionNewWeek(void);
@@ -135,16 +135,10 @@ public:
 
 private:
     friend class Game::IO;
+    friend class AI;
 
     void UpdateRecruits(void);
     void LossPostActions(void);
-
-    void AICastlesTurns(void);
-    void AIHeroesTurns(Heroes &);
-    void AIHeroesNoGUITurns(Heroes &);
-    void AIHeroesGetTask(Heroes &);
-    void AIHeroesPrepareTask(Heroes &);
-    void AIDumpCacheObjects(const IndexDistance &) const;
 
     Color::color_t color;
     Game::control_t control;
@@ -158,16 +152,12 @@ private:
 
     Recruits recruits;
 
-    Castle *ai_capital;
-    std::map<s32, MP2::object_t> ai_objects;
-
     std::list<IndexObject> visit_object;
 
     Puzzle puzzle_maps;
     u8 visited_tents_colors;
 
     static cost_t starting_resource[];
-
     static u8 max_heroes;
 };
 
