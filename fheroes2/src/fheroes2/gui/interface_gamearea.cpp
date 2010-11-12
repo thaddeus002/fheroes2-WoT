@@ -128,6 +128,13 @@ void Interface::GameArea::SetAreaPosition(s16 x, s16 y, u16 w, u16 h)
 
     rectMapsPosition.x = areaPosition.x + scrollOffset.x;
     rectMapsPosition.y = areaPosition.y + scrollOffset.y;
+
+    if(Settings::Get().Editor())
+    {
+	rectMaps.w = (areaPosition.w / TILEWIDTH);
+	rectMaps.h = (areaPosition.h / TILEWIDTH);
+	scrollStep = SCROLL_MAX;
+    }
 }
 
 void Interface::GameArea::BlitOnTile(Surface & dst, const Sprite & src, const Point & mp) const
@@ -380,14 +387,20 @@ void Interface::GameArea::Center(s16 px, s16 py)
 	if(pos.x == world.w() - rectMaps.w)
 	    scrollOffset.x = SCROLL_MAX * 2;
 	else
-	    scrollOffset.x = SCROLL_MAX + TILEWIDTH / 2;
+	{
+ 	    scrollOffset.x = rectMaps.w % 2 == 0 ?
+		    SCROLL_MAX + TILEWIDTH / 2 : SCROLL_MAX;
+	}
 
 	if(pos.y == 0) scrollOffset.y = 0;
 	else
 	if(pos.y == world.h() - rectMaps.h)
 	    scrollOffset.y = SCROLL_MAX * 2;
 	else
-	    scrollOffset.y = SCROLL_MAX + TILEWIDTH / 2;
+	{
+ 	    scrollOffset.y = rectMaps.h % 2 == 0 ?
+		    SCROLL_MAX + TILEWIDTH / 2 : SCROLL_MAX;
+	}
 
 	rectMapsPosition.x = areaPosition.x - scrollOffset.x;
 	rectMapsPosition.y = areaPosition.y - scrollOffset.y;
@@ -429,7 +442,8 @@ void Interface::GameArea::GenerateUltimateArtifactAreaSurface(const s32 index, S
 	    break;
 	}
 	const Sprite & marker = AGG::GetICN(ICN::ROUTE, 0);
-	const Point dst(areaPosition.x + pt.x * TILEWIDTH, areaPosition.y + pt.y * TILEWIDTH);
+	const Point dst(areaPosition.x + pt.x * TILEWIDTH - gamearea.scrollOffset.x,
+			    areaPosition.y + pt.y * TILEWIDTH - gamearea.scrollOffset.y);
 	sf.Blit(marker, dst.x, dst.y + 8);
 
 	Settings::Get().EvilInterface() ? sf.GrayScale() : sf.Sepia();
