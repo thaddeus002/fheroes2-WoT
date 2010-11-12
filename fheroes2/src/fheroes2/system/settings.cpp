@@ -424,6 +424,11 @@ bool Settings::Read(const std::string & filename)
 
 void Settings::PostLoad(void)
 {
+    if(opt_global.Modes(GLOBAL_EDITOR))
+    {
+       ExtResetModes(GAME_HIDE_INTERFACE);
+    }
+
     if(QVGA())
     {
 	opt_global.SetModes(GLOBAL_POCKETPC);

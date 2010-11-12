@@ -203,6 +203,12 @@ void World::NewMaps(const u16 sw, const u16 sh)
 
 	vec_tiles[ii] = new Maps::Tiles(ii, mp2tile);
     }
+
+    Maps::FileInfo & fi = Settings::Get().CurrentFileInfo();
+
+    // reset current maps info
+    fi.size_w = width;
+    fi.size_h = height;
 }
 
 /* load maps */

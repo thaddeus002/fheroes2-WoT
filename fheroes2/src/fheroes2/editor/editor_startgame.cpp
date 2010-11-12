@@ -58,34 +58,28 @@ namespace Game
 
 Game::menu_t Game::Editor::StartGame()
 {
-    Game::SetFixVideoMode();
-
     Display & display = Display::Get();
     Cursor & cursor = Cursor::Get();
     EditorInterface & I = EditorInterface::Get();
+    LocalEvent & le = LocalEvent::Get();
 
-    Interface::GameArea & areaMaps = Interface::GameArea::Get();
-    Interface::Radar & radar = Interface::Radar::Get();
-
-    Settings::Get().SetScrollSpeed(SCROLL_FAST2);
-    areaMaps.Build();
-
-    radar.SetPos(display.w() - BORDERWIDTH - RADARWIDTH, BORDERWIDTH);
-    radar.Build();
-
-    const Rect & areaPos = areaMaps.GetArea();
-
-    // cursor
     cursor.Hide();
     cursor.SetThemes(cursor.POINTER);
-    I.Draw();
 
-    const Rect area_pos(BORDERWIDTH, BORDERWIDTH, areaPos.w, areaPos.h);
-    const Rect areaScrollLeft(0, BORDERWIDTH, BORDERWIDTH / 2, display.h() - 2 * BORDERWIDTH);
-    const Rect areaScrollRight(display.w() - BORDERWIDTH / 2, BORDERWIDTH, BORDERWIDTH / 2, display.h() - 2 * BORDERWIDTH);
-    const Rect areaScrollTop(BORDERWIDTH, 0, areaPos.w, BORDERWIDTH / 2);
-    const Rect areaScrollBottom(2 * BORDERWIDTH, display.h() - BORDERWIDTH / 2, (areaMaps.GetRectMaps().w - 1) * TILEWIDTH, BORDERWIDTH / 2);
-    const Rect areaLeftPanel(display.w() - 2 * BORDERWIDTH - RADARWIDTH, 0, BORDERWIDTH + RADARWIDTH, display.h());
+    Game::SetFixVideoMode();
+    Settings::Get().SetScrollSpeed(SCROLL_FAST2);
+
+    Interface::GameArea & gameArea = I.gameArea;
+    Interface::Radar & radar = I.radar;
+
+    I.Build();
+
+    const Rect & areaPos = gameArea.GetArea();
+
+    const Rect & areaScrollLeft = I.scrollLeft;
+    const Rect & areaScrollRight = I.scrollRight;
+    const Rect & areaScrollTop = I.scrollTop;
+    const Rect & areaScrollBottom = I.scrollBottom;
 
     const Sprite & spritePanelGround = AGG::GetICN(ICN::EDITPANL, 0);
     const Sprite & spritePanelObject = AGG::GetICN(ICN::EDITPANL, 1);
@@ -94,8 +88,7 @@ Game::menu_t Game::Editor::StartGame()
     const Sprite & spritePanelRoad = AGG::GetICN(ICN::EDITPANL, 4);
     const Sprite & spritePanelClear = AGG::GetICN(ICN::EDITPANL, 5);
 
-
-    LocalEvent & le = LocalEvent::Get();
+    const Rect areaLeftPanel(display.w() - 2 * BORDERWIDTH - RADARWIDTH, 0, BORDERWIDTH + RADARWIDTH, display.h());
 
     Button &btnLeftTopScroll = I.btnLeftTopScroll;
     Button &btnRightTopScroll = I.btnRightTopScroll;
@@ -121,6 +114,8 @@ Game::menu_t Game::Editor::StartGame()
     Button &btnSpec = I.btnSpec;
     Button &btnFile = I.btnFile;
     Button &btnSystem = I.btnSystem;
+
+    I.Draw();
 
     btnSelectGround.Press();
     btnSizeMedium.Press();
@@ -170,7 +165,7 @@ Game::menu_t Game::Editor::StartGame()
     u8 selectObject = 0;
 
     // redraw
-    areaMaps.Redraw(display, LEVEL_ALL);
+    gameArea.Redraw(display, LEVEL_ALL);
     radar.RedrawArea();
     radar.RedrawCursor();
     display.Blit(spritePanelGround, dstPanel);
@@ -187,36 +182,36 @@ Game::menu_t Game::Editor::StartGame()
 	if(HotKeyPress(EVENT_DEFAULT_EXIT) && (Dialog::YES & Dialog::Message("", _("Are you sure you want to quit?"), Font::BIG, Dialog::YES|Dialog::NO))) return QUITGAME;
 
 	// scroll area maps left
-	if(le.MouseCursor(areaScrollLeft))	areaMaps.SetScroll(SCROLL_LEFT);
+	if(le.MouseCursor(areaScrollLeft))	gameArea.SetScroll(SCROLL_LEFT);
 	else
 	// scroll area maps right
-	if(le.MouseCursor(areaScrollRight))	areaMaps.SetScroll(SCROLL_RIGHT);
+	if(le.MouseCursor(areaScrollRight))	gameArea.SetScroll(SCROLL_RIGHT);
 
 	// scroll area maps top
-	if(le.MouseCursor(areaScrollTop))	areaMaps.SetScroll(SCROLL_TOP);
+	if(le.MouseCursor(areaScrollTop))	gameArea.SetScroll(SCROLL_TOP);
 	else
 	// scroll area maps bottom
-	if(le.MouseCursor(areaScrollBottom))	areaMaps.SetScroll(SCROLL_BOTTOM);
+	if(le.MouseCursor(areaScrollBottom))	gameArea.SetScroll(SCROLL_BOTTOM);
 
 	// point radar
 	if(le.MouseCursor(radar.GetArea()) &&
 	    (le.MouseClickLeft(radar.GetArea()) ||
 		le.MousePressLeft(radar.GetArea())))
 	{
-	    const Point prev(areaMaps.GetRectMaps());
+	    const Point prev(gameArea.GetRectMaps());
             const Point & pt = le.GetMouseCursor();
-            areaMaps.Center((pt.x - radar.GetArea().x) * world.w() / RADARWIDTH, (pt.y - radar.GetArea().y) * world.h() / RADARWIDTH);
-	    if(prev != areaMaps.GetRectMaps())
+            gameArea.Center((pt.x - radar.GetArea().x) * world.w() / RADARWIDTH, (pt.y - radar.GetArea().y) * world.h() / RADARWIDTH);
+	    if(prev != gameArea.GetRectMaps())
 	    {
 		cursor.Hide();
 		cursor.SetThemes(cursor.POINTER);
 		sizeCursor.Hide();
-		I.split_h.Move(areaMaps.GetRectMaps().x);
-		I.split_v.Move(areaMaps.GetRectMaps().y);
+		I.split_h.Move(gameArea.GetRectMaps().x);
+		I.split_v.Move(gameArea.GetRectMaps().y);
 		radar.RedrawCursor();
 		EditorInterface::DrawTopNumberCell();
 		EditorInterface::DrawLeftNumberCell();
-                areaMaps.Redraw(display, LEVEL_ALL);
+                gameArea.Redraw(display, LEVEL_ALL);
 		cursor.Show();
 		display.Flip();
 	    }
@@ -233,23 +228,23 @@ Game::menu_t Game::Editor::StartGame()
 	}
 	else
 	// cursor over game area
-	if(le.MouseCursor(area_pos) &&
-	    Maps::isValidAbsIndex(areaMaps.GetIndexFromMousePoint(le.GetMouseCursor())))
+	if(le.MouseCursor(areaPos) &&
+	    Maps::isValidAbsIndex(gameArea.GetIndexFromMousePoint(le.GetMouseCursor())))
 	{
             const Point & mouse_coord = le.GetMouseCursor();
-            const s32 index_maps = areaMaps.GetIndexFromMousePoint(mouse_coord);
+            const s32 index_maps = gameArea.GetIndexFromMousePoint(mouse_coord);
             Maps::Tiles & tile = world.GetTiles(index_maps);
             const Rect tile_pos(BORDERWIDTH + ((u16) (mouse_coord.x - BORDERWIDTH) / TILEWIDTH) * TILEWIDTH, BORDERWIDTH + ((u16) (mouse_coord.y - BORDERWIDTH) / TILEWIDTH) * TILEWIDTH, TILEWIDTH, TILEWIDTH);
             //u8 object = tile.GetObject();
 
     	    cursor.SetThemes(cursor.POINTER);
 
-	    const u16 div_x = mouse_coord.x < BORDERWIDTH + TILEWIDTH * (areaMaps.GetRectMaps().w - sizeCursor.w()) ?
+	    const u16 div_x = mouse_coord.x < BORDERWIDTH + TILEWIDTH * (gameArea.GetRectMaps().w - sizeCursor.w()) ?
 			    (u16) ((mouse_coord.x - BORDERWIDTH) / TILEWIDTH) * TILEWIDTH + BORDERWIDTH :
-			    BORDERWIDTH + (areaMaps.GetRectMaps().w - sizeCursor.w()) * TILEWIDTH;
-	    const u16 div_y = mouse_coord.y < BORDERWIDTH + TILEWIDTH * (areaMaps.GetRectMaps().h - sizeCursor.h()) ?
+			    BORDERWIDTH + (gameArea.GetRectMaps().w - sizeCursor.w()) * TILEWIDTH;
+	    const u16 div_y = mouse_coord.y < BORDERWIDTH + TILEWIDTH * (gameArea.GetRectMaps().h - sizeCursor.h()) ?
 			    (u16) ((mouse_coord.y - BORDERWIDTH) / TILEWIDTH) * TILEWIDTH + BORDERWIDTH :
-			    BORDERWIDTH + (areaMaps.GetRectMaps().h - sizeCursor.h()) * TILEWIDTH;
+			    BORDERWIDTH + (gameArea.GetRectMaps().h - sizeCursor.h()) * TILEWIDTH;
 
 	    if(! sizeCursor.isVisible() || sizeCursor.GetPos().x != div_x || sizeCursor.GetPos().y != div_y)
 	    {
@@ -266,10 +261,9 @@ Game::menu_t Game::Editor::StartGame()
 		sizeCursor.Hide();
 
 
-		const Point topleft(areaMaps.GetRectMaps().x + (div_x - BORDERWIDTH) / 32,
-				    areaMaps.GetRectMaps().y + (div_y - BORDERWIDTH) / 32);
+		const Point topleft(gameArea.GetRectMaps().x + (div_x - BORDERWIDTH) / 32,
+				    gameArea.GetRectMaps().y + (div_y - BORDERWIDTH) / 32);
 
-		
 		for(u8 iy = 0; iy < sizeCursor.h(); ++iy)
 		{
 		    for(u8 ix = 0; ix < sizeCursor.w(); ++ix)
@@ -906,14 +900,18 @@ Game::menu_t Game::Editor::StartGame()
 	if(btnSelectObject.isPressed() && le.MousePressRight(rectObjectResource))
 	    Dialog::Message(_("Treasures"), _("Used to place a resource or treasure."), Font::BIG);
 
-	if(areaMaps.NeedScroll())
+	if(gameArea.NeedScroll())
 	{
 	    cursor.Hide();
 	    sizeCursor.Hide();
-	    cursor.SetThemes(areaMaps.GetScrollCursor());
-	    areaMaps.Scroll();
+	    cursor.SetThemes(gameArea.GetScrollCursor());
+	    gameArea.Scroll();
 	    //I.Scroll(scrollDir);
-	    areaMaps.Redraw(display, LEVEL_ALL);
+	    I.split_h.Move(gameArea.GetRectMaps().x);
+	    I.split_v.Move(gameArea.GetRectMaps().y);
+	    EditorInterface::DrawTopNumberCell();
+	    EditorInterface::DrawLeftNumberCell();
+	    gameArea.Redraw(display, LEVEL_ALL);
 	    radar.RedrawCursor();
 	    cursor.Show();
 	    display.Flip();

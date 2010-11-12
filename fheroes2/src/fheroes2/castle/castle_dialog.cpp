@@ -946,8 +946,7 @@ Dialog::answer_t Castle::OpenDialog(bool readonly, bool fade)
 	}
 	else
 	{
-	    str = _("Empty");
-	    statusBar.ShowMessage(str);
+	    statusBar.ShowMessage(_("Empty"));
 	}
 
 	// animation sprite

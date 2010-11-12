@@ -24,12 +24,32 @@
 
 #include "agg.h"
 #include "settings.h"
-#include "interface_gamearea.h"
 #include "world.h"
 #include "editor_interface.h"
 
-EditorInterface::EditorInterface()
+EditorInterface::EditorInterface() :
+    gameArea(Interface::GameArea::Get()), radar(Interface::Radar::Get())
 {
+}
+
+void EditorInterface::Build(void)
+{
+    Display & display = Display::Get();
+
+    Game::SetFixVideoMode();
+    radar.SetPos(display.w() - BORDERWIDTH - RADARWIDTH, BORDERWIDTH);
+
+    gameArea.Build();
+    radar.Build();
+
+    const Rect & areaPos = gameArea.GetArea();
+    const Rect & areaMaps= gameArea.GetRectMaps();
+
+    scrollLeft = Rect(0, BORDERWIDTH, BORDERWIDTH / 2, display.h() - 2 * BORDERWIDTH);
+    scrollRight = Rect(display.w() - BORDERWIDTH / 2, BORDERWIDTH, BORDERWIDTH / 2, display.h() - 2 * BORDERWIDTH);
+    scrollTop = Rect(BORDERWIDTH, 0, areaPos.w, BORDERWIDTH / 2);
+    scrollBottom = Rect(2 * BORDERWIDTH, display.h() - BORDERWIDTH / 2, (gameArea.GetRectMaps().w - 1) * TILEWIDTH, BORDERWIDTH / 2);
+
     btnLeftTopScroll.SetSprite(ICN::ESCROLL, 12, 13);
     btnRightTopScroll.SetSprite(ICN::ESCROLL, 14, 15);
     btnTopScroll.SetSprite(ICN::ESCROLL, 4, 5);
@@ -69,8 +89,9 @@ EditorInterface & EditorInterface::Get(void)
 void EditorInterface::Draw(void)
 {
     Display & display = Display::Get();
-    Interface::GameArea & areaMaps = Interface::GameArea::Get();
-    const Rect & areaPos = areaMaps.GetArea();
+    Interface::GameArea & gamearea = Interface::GameArea::Get();
+    const Rect & areaPos  = gamearea.GetArea();
+    const Rect & areaMaps = gamearea.GetRectMaps();
 
     display.Fill(0x00, 0x00, 0x00);
 
@@ -90,7 +111,7 @@ void EditorInterface::Draw(void)
     src_rt.h = BORDERWIDTH;
     display.Blit(spriteBottomBar, src_rt, dst_pt);
     src_rt.x = TILEWIDTH;
-    for(u16 ii = 0; ii < (areaMaps.GetRectMaps().w - 4); ++ii)
+    for(u16 ii = 0; ii < (areaMaps.w - 3); ++ii)
     {
 	dst_pt.x += TILEWIDTH;
 	display.Blit(spriteBottomBar, src_rt, dst_pt);
@@ -98,6 +119,7 @@ void EditorInterface::Draw(void)
     dst_pt.x += TILEWIDTH;
     src_rt.x = spriteBottomBar.w() - TILEWIDTH;
     display.Blit(spriteBottomBar, src_rt, dst_pt);
+
     // left scroll bar indicator
     const Sprite & spriteLeftBar(AGG::GetICN(ICN::ESCROLL, 1));
     dst_pt.x = BORDERWIDTH + areaPos.w;
@@ -108,7 +130,7 @@ void EditorInterface::Draw(void)
     src_rt.h = TILEWIDTH;
     display.Blit(spriteLeftBar, src_rt, dst_pt);
     src_rt.y = TILEWIDTH;
-    for(u16 ii = 0; ii < (areaMaps.GetRectMaps().h - 4); ++ii)
+    for(u16 ii = 0; ii < (areaMaps.h - 3); ++ii)
     {
 	dst_pt.y += TILEWIDTH;
 	display.Blit(spriteLeftBar, src_rt, dst_pt);
@@ -136,6 +158,7 @@ void EditorInterface::Draw(void)
     dst_pt.x = 2 * BORDERWIDTH + areaPos.w;
     dst_pt.y = BORDERWIDTH + areaPos.h;
     display.Blit(spriteAdv, src_rt, dst_pt);
+
     // left static border
     src_rt.x = spriteAdv.w() - BORDERWIDTH;
     src_rt.y = 0;
@@ -166,6 +189,7 @@ void EditorInterface::Draw(void)
     Point pt_rts, pt_tsc, pt_lbs, pt_lsc, pt_rsc, pt_rbs, pt_bsc, pt_sgr, pt_sob, pt_sin, pt_sri, pt_sro, pt_scl;
     Point pt_ssm, pt_sme, pt_sla, pt_smn, pt_zoo, pt_und, pt_new, pt_spe, pt_fil, pt_sys;
 
+
     // btn right top scroll
     pt_rts.x = BORDERWIDTH + areaPos.w;
     pt_rts.y = 0;
@@ -179,7 +203,7 @@ void EditorInterface::Draw(void)
     pt_lsc.x = BORDERWIDTH;
     pt_lsc.y = pt_lbs.y;
     // btn right scroll
-    pt_rsc.x = 2 * BORDERWIDTH + (areaMaps.GetRectMaps().w - 2) * TILEWIDTH;
+    pt_rsc.x = areaPos.w;
     pt_rsc.y = pt_lbs.y;
     // btn right bottom scroll
     pt_rbs.x = BORDERWIDTH + areaPos.w;
@@ -262,25 +286,27 @@ void EditorInterface::Draw(void)
     btnSystem.SetPos(pt_sys);
 
     // bottom static
-    var1 = (display.h() - 480) / TILEWIDTH - 2;
-
-    src_rt.x = 0;
-    src_rt.y = 0;
-    src_rt.w = spriteBac.w();
-    src_rt.h = TILEWIDTH;
-    dst_pt.x = btnSpec.x;
-    dst_pt.y = btnSpec.y + btnSpec.h;
-    if(var1) display.Blit(spriteBac, src_rt, dst_pt);
-    src_rt.y = TILEWIDTH;
-    dst_pt.y += TILEWIDTH;
-    for(u8 ii = 0; ii < var1; ++ii)
+    if(display.h() > 480)
     {
-	display.Blit(spriteBac, src_rt, dst_pt);
-	dst_pt.y += TILEWIDTH;
-    }
-    src_rt.y = spriteBac.h() - TILEWIDTH;
-    if(var1) display.Blit(spriteBac, src_rt, dst_pt);
+	var1 = (display.h() - 480) / TILEWIDTH - 2;
 
+	src_rt.x = 0;
+	src_rt.y = 0;
+	src_rt.w = spriteBac.w();
+	src_rt.h = TILEWIDTH;
+	dst_pt.x = btnSpec.x;
+	dst_pt.y = btnSpec.y + btnSpec.h;
+	if(var1) display.Blit(spriteBac, src_rt, dst_pt);
+	src_rt.y = TILEWIDTH;
+	dst_pt.y += TILEWIDTH;
+	for(u8 ii = 0; ii < var1; ++ii)
+	{
+	    display.Blit(spriteBac, src_rt, dst_pt);
+	    dst_pt.y += TILEWIDTH;
+	}
+	src_rt.y = spriteBac.h() - TILEWIDTH;
+	if(var1) display.Blit(spriteBac, src_rt, dst_pt);
+    }
 /*
     const Point dstPanel(btnSelectRiver.x, btnSelectRiver.y + btnSelectRiver.h);
     const Sprite & spritePanelGround = AGG::GetICN(ICN::EDITPANL, 0);
@@ -320,17 +346,17 @@ void EditorInterface::Draw(void)
     DrawTopNumberCell();
     DrawLeftNumberCell();
 
-    split_h.SetArea(Rect(2 * BORDERWIDTH + 3, display.h() - BORDERWIDTH + 4, (areaMaps.GetRectMaps().w - 2) * TILEWIDTH - 6, BORDERWIDTH - 8));
+    split_h.SetArea(Rect(2 * BORDERWIDTH + 3, display.h() - BORDERWIDTH + 4, (areaMaps.w - 1) * TILEWIDTH - 6, BORDERWIDTH - 8));
     split_h.SetOrientation(Splitter::HORIZONTAL);
 
-    split_v.SetArea(Rect(BORDERWIDTH + areaPos.w + 4, 2 * BORDERWIDTH + 3, BORDERWIDTH - 8, (areaMaps.GetRectMaps().h - 2) * TILEWIDTH - 6));
+    split_v.SetArea(Rect(BORDERWIDTH + areaPos.w + 4, 2 * BORDERWIDTH + 3, BORDERWIDTH - 8, (areaMaps.h - 1) * TILEWIDTH - 6));
     split_v.SetOrientation(Splitter::VERTICAL);
 
-    split_h.SetRange(0, world.w() - areaMaps.GetRectMaps().w);
-    split_v.SetRange(0, world.h() - areaMaps.GetRectMaps().h);
+    split_h.SetRange(0, world.w() - areaMaps.w);
+    split_v.SetRange(0, world.h() - areaMaps.h);
 
-    split_h.Move(areaMaps.GetRectMaps().x);
-    split_v.Move(areaMaps.GetRectMaps().y);
+    split_h.Move(areaMaps.x);
+    split_v.Move(areaMaps.y);
 }
 
 void EditorInterface::Scroll(const u8 scroll)
@@ -366,7 +392,7 @@ void EditorInterface::DrawTopNumberCell(void)
     Point dst_pt;
 
     // top number cell
-    for(u16 ii = 0; ii < area.w - 1; ++ii)
+    for(u16 ii = 0; ii < area.w; ++ii)
     {
 	dst_pt.x = BORDERWIDTH + ii * TILEWIDTH;
 	dst_pt.y = 0;
@@ -387,7 +413,7 @@ void EditorInterface::DrawLeftNumberCell(void)
     Point dst_pt;
 
     // left number cell
-    for(u16 ii = 0; ii < area.h - 1; ++ii)
+    for(u16 ii = 0; ii < area.h; ++ii)
     {
 	dst_pt.x = 0;
 	dst_pt.y = BORDERWIDTH + ii * TILEWIDTH;

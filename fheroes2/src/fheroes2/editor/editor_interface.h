@@ -29,6 +29,7 @@
 #include "button.h"
 #include "splitter.h"
 #include "interface_radar.h"
+#include "interface_gamearea.h"
 
 class EditorInterface
 {
@@ -38,6 +39,7 @@ public:
 	static void	DrawTopNumberCell(void);
 	static void	DrawLeftNumberCell(void);
 
+	void	Build(void);
 	void	Draw(void);
 	void	Scroll(const u8 scroll);
 
@@ -66,8 +68,16 @@ public:
         Button btnFile;
         Button btnSystem;
 
+	Rect scrollTop;
+	Rect scrollBottom;
+	Rect scrollLeft;
+	Rect scrollRight;
+
 	Splitter split_h;
 	Splitter split_v;
+
+	Interface::GameArea & gameArea;
+	Interface::Radar & radar;
 
 private:
 	EditorInterface();
