@@ -23,6 +23,11 @@
 #include <vector>
 #include <algorithm>
 
+#ifdef AI
+#undef AI
+#endif
+
+#include "ai.h"
 #include "agg.h"
 #include "engine.h"
 #include "button.h"
@@ -231,7 +236,7 @@ Game::menu_t Game::StartGame(void)
 			cursor.Show();
 			display.Flip();
 
-			AI::KingdomTurn(kingdom);
+			::AI::KingdomTurn(kingdom);
 		    }
 		break;
 	    }

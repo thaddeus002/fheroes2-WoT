@@ -60,7 +60,7 @@ void AI::KingdomTurn(Kingdom &)
     ShowWarning();
 }
 
-void AI::BattleTurn(class Battle2::Arena &, const Battle2::Stats &, Battle2::Actions &)
+void AI::BattleTurn(Battle2::Arena &, const Battle2::Stats &, Battle2::Actions &)
 {
     ShowWarning();
 }

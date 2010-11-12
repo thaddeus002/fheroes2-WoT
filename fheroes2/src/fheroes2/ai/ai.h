@@ -38,7 +38,7 @@ struct AI
     static void RemoveHeroes(const Heroes &);
 
     static void KingdomTurn(Kingdom &);
-    static void BattleTurn(class Battle2::Arena &, const Battle2::Stats &, Battle2::Actions &);
+    static void BattleTurn(Battle2::Arena &, const Battle2::Stats &, Battle2::Actions &);
     static void JoinRNDArmy(Castle &);
     static void HeroesAction(Heroes &, s32);
 };
