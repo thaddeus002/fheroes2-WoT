@@ -33,7 +33,6 @@
 #include "pairs.h"
 #include "game_io.h"
 #include "heroes_recruits.h"
-#include "ai.h"
 
 class Castle;
 class Heroes;
@@ -126,6 +125,9 @@ public:
 
     void Dump(void) const;
 
+    void UpdateRecruits(void);
+    void LossPostActions(void);
+
 #ifdef WITH_XML
     static void UpdateStartingResource(const TiXmlElement*);
 #endif
@@ -135,10 +137,6 @@ public:
 
 private:
     friend class Game::IO;
-    friend class AI;
-
-    void UpdateRecruits(void);
-    void LossPostActions(void);
 
     Color::color_t color;
     Game::control_t control;

@@ -35,7 +35,6 @@
 #include "heroes.h"
 #include "game_io.h"
 #include "position.h"
-#include "ai.h"
 
 class Heroes;
 namespace Maps { class Tiles; }
@@ -190,7 +189,6 @@ private:
 
 private:
     friend class Game::IO;
-    friend class AI;
 
     Race::race_t	race;
     Captain		captain;

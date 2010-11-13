@@ -1718,44 +1718,6 @@ const GameEvent::Coord* World::GetEventMaps(const Color::color_t c, const s32 in
     return NULL;
 }
 
-void World::StoreActionObject(const u8 color, std::map<s32, MP2::object_t> & store)
-{
-    std::vector<Maps::Tiles *>::const_iterator it1 = vec_tiles.begin();
-    std::vector<Maps::Tiles *>::const_iterator it2 = vec_tiles.end();
-
-    for(; it1 != it2; ++it1) if(*it1)
-    {
-	const Maps::Tiles & tile = **it1;
-	if(tile.isFog(color)) continue;
-
-	if(MP2::isGroundObject(tile.GetObject()) || MP2::isWaterObject(tile.GetObject()) || MP2::OBJ_HEROES == tile.GetObject())
-	{
-	    // if quantity object is empty
-	    if(MP2::isQuantityObject(tile.GetObject()) && !tile.ValidQuantity()) continue;
-
-	    // skip for meeting heroes
-	    if(MP2::OBJ_HEROES == tile.GetObject())
-	    {
-		const Heroes* hero = GetHeroes(tile.GetIndex());
-		if(hero && color == hero->GetColor()) continue;
-	    }
-
-	    // check: is visited objects
-	    switch(tile.GetObject())
-	    {
-                case MP2::OBJ_MAGELLANMAPS:
-                case MP2::OBJ_OBSERVATIONTOWER:
-		    if(world.GetKingdom(color).isVisited(tile)) continue;
-		    break;
-
-		default: break;
-	    }
-
-	    store[tile.GetIndex()] = tile.GetObject();
-	}
-    }
-}
-
 void World::DateDump(void) const
 {
     std::cout << "World::Date: month: " << static_cast<int>(GetMonth()) <<  ", week " << static_cast<int>(GetWeek()) << ", day: " << static_cast<int>(GetDay()) << std::endl;

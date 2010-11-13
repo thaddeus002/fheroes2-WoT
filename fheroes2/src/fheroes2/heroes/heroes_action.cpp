@@ -37,6 +37,7 @@
 #include "payment.h"
 #include "profit.h"
 #include "gameevent.h"
+#include "ai.h"
 
 #define PlayMusicReplacement(m82) if(MUS::FromMapObject((MP2::object_t)obj) == MUS::UNKNOWN) \
                                       AGG::PlaySound(m82)

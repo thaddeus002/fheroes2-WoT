@@ -33,6 +33,7 @@
 #include "visit.h"
 #include "battle2.h"
 #include "kingdom.h"
+#include "ai.h"
 
 u8 Kingdom::max_heroes = 8;
 

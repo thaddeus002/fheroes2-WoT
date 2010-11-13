@@ -25,7 +25,6 @@
 
 #include <string>
 #include <vector>
-#include <deque>
 #include <list>
 #include "spell.h"
 #include "mp2.h"
@@ -169,7 +168,6 @@ public:
 
     Dialog::answer_t OpenDialog(bool readonly = false, bool fade = false);
     void MeetingDialog(Heroes &);
-    void AIMeeting(Heroes &);
 
     bool Recruit(const Color::color_t cl, const Point & pt);
     bool Recruit(const Castle & castle);

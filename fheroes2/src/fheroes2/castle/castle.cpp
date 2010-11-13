@@ -31,6 +31,7 @@
 #include "maps_tiles.h"
 #include "castle.h"
 #include "localclient.h"
+#include "ai.h"
 
 u8 Castle::grown_well(2);
 u8 Castle::grown_wel2(8);

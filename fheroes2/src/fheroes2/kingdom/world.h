@@ -120,7 +120,6 @@ public:
     u16 CountCapturedObject(const MP2::object_t obj, const Color::color_t col) const;
     u16 CountCapturedMines(const Resource::resource_t res, const Color::color_t col) const;
     Color::color_t ColorCapturedObject(const s32 index) const;
-    void StoreActionObject(const u8 color, std::map<s32, MP2::object_t> & store);
 
     void ActionToEyeMagi(const Color::color_t) const;
 
