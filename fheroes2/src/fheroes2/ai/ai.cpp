@@ -24,6 +24,8 @@
 #include "castle.h"
 #include "heroes.h"
 #include "dialog.h"
+#include "battle2.h"
+#include "battle_arena.h"
 #include "ai.h"
 
 void ShowWarning(void)
@@ -60,7 +62,13 @@ void AI::KingdomTurn(Kingdom &)
     ShowWarning();
 }
 
-void AI::BattleTurn(Battle2::Arena &, const Battle2::Stats &, Battle2::Actions &)
+void AI::BattleTurn(Battle2::Arena &, const Battle2::Stats & b, Battle2::Actions & a)
 {
     ShowWarning();
+
+    a.AddedEndAction(b);
+}
+
+void AI::BattleMagicTurn(Battle2::Arena &, const Battle2::Stats &, Battle2::Actions &, const Battle2::Stats*)
+{
 }

@@ -28,6 +28,7 @@
 
 #include "battle2.h"
 #include "gamedefs.h"
+#include "ai.h"
 
 #define ARENAW 11
 #define ARENAH 9
@@ -208,7 +209,7 @@ namespace Battle2
 	friend class Tower;
 	friend class Bridge;
 	friend class Catapult;
-	friend class AI;
+	friend class ::AI;
 
 	Army::army_t & army1;
         Army::army_t & army2;
