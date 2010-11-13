@@ -16,6 +16,10 @@ else
 CFLAGS := $(CFLAGS) -O2
 endif
 
+ifndef WITH_AI
+CFLAGS := $(CFLAGS) -DAI_EMPTY
+endif
+
 ifndef WITHOUT_MIXER
 CFLAGS := $(CFLAGS) -DWITH_MIXER
 SDL_LIBS := $(SDL_LIBS) -lSDL_mixer

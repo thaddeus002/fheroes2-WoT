@@ -1,4 +1,4 @@
-/***************************************************************************
+/**************************************************************************
  *   Copyright (C) 2009 by Andrey Afletdinov <fheroes2@gmail.com>          *
  *                                                                         *
  *   Part of the Free Heroes2 Engine:                                      *
@@ -266,7 +266,7 @@ void Castle::LoadFromMP2(const void *ptr)
 
     // AI troops auto pack
     if(!custom_troops && Game::AI == GetControl())
-	AI::JoinRNDArmy(*this);
+	JoinRNDArmy();
 
     // fix shipyard
     if(!HaveNearlySea()) building &= ~(BUILD_SHIPYARD);
@@ -1729,3 +1729,35 @@ void Castle::UpdateExtraGrowth(const TiXmlElement* xml)
     grown_wel2 = value;
 }
 #endif
+
+void Castle::JoinRNDArmy(void)
+{
+    const Monster mon1(race, DWELLING_MONSTER1);
+    const Monster mon2(race, DWELLING_MONSTER2);
+    const Monster mon3(race, DWELLING_MONSTER3);
+
+    switch(Rand::Get(1, 4))
+    {
+        case 1:
+            army.JoinTroop(mon1, mon1.GetRNDSize(false) * 3);
+            army.JoinTroop(mon2, mon2.GetRNDSize(false));
+            break;
+
+        case 2:
+            army.JoinTroop(mon1, mon1.GetRNDSize(false) * 2);
+            army.JoinTroop(mon2, mon2.GetRNDSize(false) * 2);
+            break;
+
+        case 3:
+
+            army.JoinTroop(mon1, mon1.GetRNDSize(false) * 2);
+            army.JoinTroop(mon2, mon2.GetRNDSize(false));
+            army.JoinTroop(mon3, mon3.GetRNDSize(false) * 2 / 3);
+            break;
+
+	default:
+	    army.JoinTroop(mon1, mon1.GetRNDSize(false));
+            army.JoinTroop(mon3, mon3.GetRNDSize(false));
+            break;
+    }
+}

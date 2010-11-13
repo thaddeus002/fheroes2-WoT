@@ -1136,7 +1136,7 @@ void World::NewWeek(void)
 
     // added army for gray castle
     std::vector<Castle *>::const_iterator itc = vec_castles.begin();
-    for(; itc != vec_castles.end(); ++itc) if(*itc && Color::GRAY == (*itc)->GetColor()) AI::JoinRNDArmy(**itc);
+    for(; itc != vec_castles.end(); ++itc) if(*itc && Color::GRAY == (*itc)->GetColor()) (*itc)->JoinRNDArmy();
 
     // TODO:: action for week type: PLAGUE and MONSTERS
 }

@@ -31,8 +31,14 @@ endif
 SOURCEROOT := ../fheroes2
 SOURCEDIR  := $(shell ls $(SOURCEROOT))
 POT        := $(TARGET).pot
+SRCDIRLIST := $(addprefix $(SOURCEROOT)/, $(SOURCEDIR))
 
-SEARCH := $(addprefix $(SOURCEROOT)/, $(addsuffix /*.cpp, $(SOURCEDIR)))
+ifdef WITH_AI
+SRCDIRLIST := $(SRCDIRLIST) $(WITH_AI)
+endif
+
+SEARCH     := $(addsuffix /*.cpp, $(SRCDIRLIST))
+
 
 all: $(TARGET)
 
@@ -49,11 +55,11 @@ $(RES): $(ICOFILE)
 	@echo "$(IDICON) ICON \"$(ICOFILE)\"" > $(TARGET).rc
 	$(WINDRES) $(TARGET).rc -O coff -o $(TARGET).res
 
-VPATH := $(addprefix $(SOURCEROOT)/, $(SOURCEDIR))
+VPATH := $(SRCDIRLIST)
 
 %.o: %.cpp
 	@echo "cxx: $@"
-	@$(CXX) -c -MD $(addprefix -I$(SOURCEROOT)/, $(SOURCEDIR)) $< $(CFLAGS)
+	@$(CXX) -c -MD $(addprefix -I, $(SRCDIRLIST)) $< $(CFLAGS)
 
 include $(wildcard *.d)
 

@@ -20,6 +20,8 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
+#ifdef AI_EMPTY
+
 #include "kingdom.h"
 #include "castle.h"
 #include "heroes.h"
@@ -49,10 +51,6 @@ void AI::RemoveHeroes(const Heroes &)
 {
 }
 
-void AI::JoinRNDArmy(Castle &)
-{
-}
-
 void AI::HeroesAction(Heroes &, s32)
 {
 }
@@ -72,3 +70,5 @@ void AI::BattleTurn(Battle2::Arena &, const Battle2::Stats & b, Battle2::Actions
 void AI::BattleMagicTurn(Battle2::Arena &, const Battle2::Stats &, Battle2::Actions &, const Battle2::Stats*)
 {
 }
+
+#endif

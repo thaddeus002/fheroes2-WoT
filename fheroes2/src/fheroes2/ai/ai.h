@@ -40,7 +40,6 @@ struct AI
     static void KingdomTurn(Kingdom &);
     static void BattleTurn(Battle2::Arena &, const Battle2::Stats &, Battle2::Actions &);
     static void BattleMagicTurn(Battle2::Arena &, const Battle2::Stats &, Battle2::Actions &, const Battle2::Stats*);
-    static void JoinRNDArmy(Castle &);
     static void HeroesAction(Heroes &, s32);
 };
 
