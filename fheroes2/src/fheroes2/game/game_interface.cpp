@@ -165,7 +165,7 @@ void Interface::Basic::Redraw(u8 force)
 	    Cursor & cursor = Cursor::Get();
 
 	    cursor.Hide();
-	    Mixer::Reset();
+	    AGG::ResetMixer();
 
 	    Rect rect((display.w() - 90) / 2, (display.h() - 30) / 2, 90, 45);
 	    TextBox text("memory limit\nclear cache\nwaiting...", Font::SMALL, rect.w);

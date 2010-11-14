@@ -150,7 +150,7 @@ Game::menu_t Game::StartGame(void)
     AGG::ICNRegistryFreeObjects();
     AGG::ICNRegistryEnable(false);
 
-    AGG::Cache::Get().ResetMixer();
+    AGG::ResetMixer();
 
     // draw interface
     Interface::Basic & I = Interface::Basic::Get();
@@ -255,7 +255,7 @@ void Game::OpenCastle(Castle *castle)
 {
     if(! castle) return;
 
-    Mixer::Reduce();
+    Mixer::Pause();
 
     Cursor & cursor = Cursor::Get();
     Kingdom & myKingdom = world.GetMyKingdom();
@@ -316,22 +316,20 @@ void Game::OpenCastle(Castle *castle)
 	}
     }
 
+    Music::Reset();
+
     if(it != myCastles.end())
     {
 	globalfocus.Set(*it);
 	globalfocus.Set((*it)->GetHeroes());
     }
     globalfocus.SetRedraw();
-
-    Mixer::Enhance();
 }
 
 /* open heroes wrapper */
 void Game::OpenHeroes(Heroes *hero)
 {
     if(! hero) return;
-
-    Mixer::Reduce();
 
     Cursor & cursor = Cursor::Get();
     Kingdom & myKingdom = world.GetMyKingdom();
@@ -407,8 +405,6 @@ void Game::OpenHeroes(Heroes *hero)
     else
         globalfocus.Reset(Game::Focus::HEROES);
     globalfocus.SetRedraw();
-
-    Mixer::Enhance();
 }
 
 /* return changee cursor */

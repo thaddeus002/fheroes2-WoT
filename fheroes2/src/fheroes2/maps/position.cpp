@@ -35,7 +35,7 @@ const Point & Maps::Position::GetCenter(void) const
 
 s32 Maps::Position::GetIndex(void) const
 {
-    return Maps::GetIndexFromAbsPoint(center);
+    return center.x < 0 && center.y < 0 ? -1 : Maps::GetIndexFromAbsPoint(center);
 }
 
 void Maps::Position::SetCenter(const Point & pt)

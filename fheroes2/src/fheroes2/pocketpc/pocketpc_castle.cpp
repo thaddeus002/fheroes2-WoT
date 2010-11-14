@@ -66,7 +66,6 @@ screen_t CastleOpenDialog6(Castle &);
 
 Dialog::answer_t PocketPC::CastleOpenDialog(Castle & castle)
 {
-    Mixer::Reset();
     AGG::PlayMusic(MUS::FromRace(castle.GetRace()));
 
     screen_t screen = CastleOpenDialog1(castle);

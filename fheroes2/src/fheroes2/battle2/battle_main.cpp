@@ -64,7 +64,7 @@ Battle2::Result Battle2::Loader(Army::army_t & army1, Army::army_t & army2, s32 
     if(conf.ExtLowMemory())
         AGG::ICNRegistryEnable(true);
 
-    Mixer::Reset();
+    AGG::ResetMixer();
     bool local = Game::LOCAL == army1.GetControl() || Game::LOCAL == army2.GetControl();
 #ifdef WITH_NET
     if(Network::isLocalClient()) local = true;
@@ -98,7 +98,7 @@ Battle2::Result Battle2::Loader(Army::army_t & army1, Army::army_t & army2, s32 
     }
 #endif
 
-    if(conf.Music()) Mixer::Reset();
+    AGG::ResetMixer();
     conf.SetMyColor(mycolor);
 
     Army::army_t *army_wins = (result.army1 & RESULT_WINS ? &army1 : (result.army2 & RESULT_WINS ? &army2 : NULL));

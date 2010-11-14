@@ -1282,3 +1282,8 @@ const Surface & AGG::GetLetter(char ch, u8 ft)
 
     return AGG::GetICN(ICN::SMALFONT, ch - 0x20);
 }
+
+void AGG::ResetMixer(void)
+{
+    AGG::Cache::Get().ResetMixer();
+}

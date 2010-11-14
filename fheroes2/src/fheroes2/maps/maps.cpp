@@ -140,7 +140,8 @@ s32 Maps::GetIndexFromAbsPoint(s16 px, s16 py)
 
     if(px < 0 || py < 0)
     {
-	VERBOSE("Maps::GetIndexFromAbsPoint: return " << res);
+	VERBOSE("Maps::GetIndexFromAbsPoint: error coods, " << "x: " << px << ", y: " << py);
+	return -1;
     }
 
     return res;
@@ -279,11 +280,13 @@ bool Maps::ScanDistanceObject(const s32 center, const u8 obj, const u16 dist, st
 	{
 	    if(ty < iy && iy < my && tx < ix && ix < mx) continue;
 
-	    const s32 index = GetIndexFromAbsPoint(ix, iy);
+	    if(isValidAbsPoint(ix, iy))
+	    {
+		const s32 index = GetIndexFromAbsPoint(ix, iy);
 
-           if(isValidAbsIndex(index) &&
-               obj == world.GetTiles(index).GetObject())
-                   results.push_back(index);
+		if(obj == world.GetTiles(index).GetObject())
+    		    results.push_back(index);
+	    }
 	}
     }
 
