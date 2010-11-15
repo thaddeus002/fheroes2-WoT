@@ -492,120 +492,60 @@ void RedrawFromResource(const Point & pt, const Resource::funds_t & rs)
     const ICN::icn_t tradpost = Settings::Get().EvilInterface() ? ICN::TRADPOSE : ICN::TRADPOST;
 
     // wood
-    RedrawResourceSprite(AGG::GetICN(tradpost, 7), 0, 0, rs.wood);
+    RedrawResourceSprite(AGG::GetICN(tradpost, 7), pt.x, pt.y, rs.wood);
     // mercury
-    RedrawResourceSprite(AGG::GetICN(tradpost, 8), 37, 0, rs.mercury);
+    RedrawResourceSprite(AGG::GetICN(tradpost, 8), pt.x + 37, pt.y, rs.mercury);
     // ore
-    RedrawResourceSprite(AGG::GetICN(tradpost, 9), 74, 0, rs.ore);
+    RedrawResourceSprite(AGG::GetICN(tradpost, 9), pt.x + 74, pt.y, rs.ore);
     // sulfur
-    RedrawResourceSprite(AGG::GetICN(tradpost, 10), 0, 37, rs.sulfur);
+    RedrawResourceSprite(AGG::GetICN(tradpost, 10), pt.x, pt.y + 37, rs.sulfur);
     // crystal
-    RedrawResourceSprite(AGG::GetICN(tradpost, 11), 37, 37, rs.crystal);
+    RedrawResourceSprite(AGG::GetICN(tradpost, 11), pt.x + 37, pt.y + 37, rs.crystal);
     // gems
-    RedrawResourceSprite(AGG::GetICN(tradpost, 12), 74, 37, rs.gems);
+    RedrawResourceSprite(AGG::GetICN(tradpost, 12), pt.x + 74, pt.y + 37, rs.gems);
     // gold
-    RedrawResourceSprite(AGG::GetICN(tradpost, 13), 37, 74, rs.gold);
+    RedrawResourceSprite(AGG::GetICN(tradpost, 13), pt.x + 37, pt.y + 74, rs.gold);
+}
+
+void RedrawResourceSprite2(const Surface & sf, s16 px, s16 py, bool show, u8 from, Resource::resource_t res, bool trading)
+{
+    Display & display = Display::Get();
+    Point dst_pt(px, py);
+
+    display.Blit(sf, dst_pt);
+
+    if(show)
+    {
+	std::string str;
+	Text text;
+
+	GetStringTradeCosts(str, from, res, trading);
+	text.Set(str, Font::SMALL);
+	dst_pt.x += (34 - text.w()) / 2;
+	dst_pt.y += 21;
+	text.Blit(dst_pt);
+    }
+
 }
 
 void RedrawToResource(const Point & pt, bool showcost, bool tradingPost, u8 from_resource)
 {
-    Display & display = Display::Get();
     const ICN::icn_t tradpost = Settings::Get().EvilInterface() ? ICN::TRADPOSE : ICN::TRADPOST;
-    std::string str;
-    Point dst_pt;
-    Text text;
-    text.Set(Font::SMALL);
 
     // wood
-    dst_pt.x = pt.x;
-    dst_pt.y = pt.y;
-    display.Blit(AGG::GetICN(tradpost, 7), dst_pt);
-    if(showcost)
-    {
-	GetStringTradeCosts(str, from_resource, Resource::WOOD, tradingPost);
-	text.Set(str);
-	dst_pt.x += (34 - text.w()) / 2;
-	dst_pt.y += 21;
-	text.Blit(dst_pt);
-    }
-    
+    RedrawResourceSprite2(AGG::GetICN(tradpost, 7), pt.x, pt.y, showcost, from_resource, Resource::WOOD, tradingPost);
     // mercury
-    dst_pt.x = pt.x + 37;
-    dst_pt.y = pt.y;
-    display.Blit(AGG::GetICN(tradpost, 8), dst_pt);
-    if(showcost)
-    {
-	GetStringTradeCosts(str, from_resource, Resource::MERCURY, tradingPost);
-	text.Set(str);
-	dst_pt.x += (34 - text.w()) / 2;
-	dst_pt.y += 21;
-	text.Blit(dst_pt);
-    }
-
+    RedrawResourceSprite2(AGG::GetICN(tradpost, 8), pt.x + 37, pt.y, showcost, from_resource, Resource::MERCURY, tradingPost);
     // ore
-    dst_pt.x = pt.x + 74;
-    dst_pt.y = pt.y;
-    display.Blit(AGG::GetICN(tradpost, 9), dst_pt);
-    if(showcost)
-    {
-	GetStringTradeCosts(str, from_resource, Resource::ORE, tradingPost);
-	text.Set(str);
-	dst_pt.x += (34 - text.w()) / 2;
-	dst_pt.y += 21;
-	text.Blit(dst_pt);
-    }
-
+    RedrawResourceSprite2(AGG::GetICN(tradpost, 9), pt.x + 74, pt.y, showcost, from_resource, Resource::ORE, tradingPost);
     // sulfur
-    dst_pt.x = pt.x;
-    dst_pt.y = pt.y + 37;
-    display.Blit(AGG::GetICN(tradpost, 10), dst_pt);
-    if(showcost)
-    {
-	GetStringTradeCosts(str, from_resource, Resource::SULFUR, tradingPost);
-	text.Set(str);
-	dst_pt.x += (34 - text.w()) / 2;
-	dst_pt.y += 21;
-	text.Blit(dst_pt);
-    }
-
+    RedrawResourceSprite2(AGG::GetICN(tradpost, 10), pt.x, pt.y + 37, showcost, from_resource, Resource::SULFUR, tradingPost);
     // crystal
-    dst_pt.x = pt.x + 37;
-    dst_pt.y = pt.y + 37;
-    display.Blit(AGG::GetICN(tradpost, 11), dst_pt);
-    if(showcost)
-    {
-	GetStringTradeCosts(str, from_resource, Resource::CRYSTAL, tradingPost);
-	text.Set(str);
-	dst_pt.x += (34 - text.w()) / 2;
-	dst_pt.y += 21;
-	text.Blit(dst_pt);
-    }
-
+    RedrawResourceSprite2(AGG::GetICN(tradpost, 11), pt.x + 37, pt.y + 37, showcost, from_resource, Resource::CRYSTAL, tradingPost);
     // gems
-    dst_pt.x = pt.x + 74;
-    dst_pt.y = pt.y + 37;
-    display.Blit(AGG::GetICN(tradpost, 12), dst_pt);
-    if(showcost)
-    {
-	GetStringTradeCosts(str, from_resource, Resource::GEMS, tradingPost);
-	text.Set(str);
-	dst_pt.x += (34 - text.w()) / 2;
-	dst_pt.y += 21;
-	text.Blit(dst_pt);
-    }
-
+    RedrawResourceSprite2(AGG::GetICN(tradpost, 12), pt.x + 74, pt.y + 37, showcost, from_resource, Resource::GEMS, tradingPost);
     // gold
-    dst_pt.x = pt.x + 37;
-    dst_pt.y = pt.y + 74;
-    display.Blit(AGG::GetICN(tradpost, 13), dst_pt);
-    if(showcost)
-    {
-	GetStringTradeCosts(str, from_resource, Resource::GOLD, tradingPost);
-	text.Set(str);
-	dst_pt.x += (34 - text.w()) / 2;
-	dst_pt.y += 21;
-	text.Blit(dst_pt);
-    }
+    RedrawResourceSprite2(AGG::GetICN(tradpost, 13), pt.x + 37, pt.y + 74, showcost, from_resource, Resource::GOLD, tradingPost);
 }
 
 void GetStringTradeCosts(std::string & str, u8 rs_from, u8 rs_to, bool tradingPost)
