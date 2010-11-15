@@ -1,5 +1,15 @@
 SVN - up to r2021
 
+Nov, 15, 2010
++ Fixed: mixer sound interrupt
++ Fixed: focus::center, fixed ultimate artifact draw positions
++ Fixed: when an army of monsters on the grond and close by hero chipmaster on sea
++ Fixed: resurrect spell - count, animation, status info
++ Fixed: update AI engine
++ Fixed: save gui position and scroll maps offset
++ Fixed: status bar info for castle and pocketpc vers.
++ Fixed: twice attack after paralize stats
+
 Nov, 1, 2010
 + Fixed: localized date/time string (load/save dialog)
 + Fixed: scroll and left click for pocketpc
