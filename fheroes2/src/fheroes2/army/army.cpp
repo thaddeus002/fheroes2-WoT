@@ -1071,26 +1071,26 @@ void Army::army_t::Dump(void) const
     std::cout << std::endl;
 }
 
-u16 Army::army_t::GetAttack(void) const
+u16 Army::army_t::GetAttack(bool hero) const
 {
     std::vector<Troop>::const_iterator it1 = army.begin();
     std::vector<Troop>::const_iterator it2 = army.end();
     u16 res = 0;
     u8 count = 0;
 
-    for(; it1 != it2; ++it1) if((*it1).isValid()){ res += (*it1).GetAttack(); ++count; }
+    for(; it1 != it2; ++it1) if((*it1).isValid()){ res += (*it1).GetAttack(hero); ++count; }
 
     return count ? res / count : 0;
 }
 
-u16 Army::army_t::GetDefense(void) const
+u16 Army::army_t::GetDefense(bool hero) const
 {
     std::vector<Troop>::const_iterator it1 = army.begin();
     std::vector<Troop>::const_iterator it2 = army.end();
     u16 res = 0;
     u8 count = 0;
 
-    for(; it1 != it2; ++it1) if((*it1).isValid()){ res += (*it1).GetDefense(); ++count; }
+    for(; it1 != it2; ++it1) if((*it1).isValid()){ res += (*it1).GetDefense(hero); ++count; }
 
     return count ? res / count : 0;
 }
@@ -1137,12 +1137,12 @@ double Army::army_t::GetStrength(void) const
 
 bool Army::army_t::StrongerEnemyArmy(const army_t & army2) const
 {
-    const u16 a1 = GetAttack();
-    const u16 d1 = GetDefense();
+    const u16 a1 = GetAttack(false);
+    const u16 d1 = GetDefense(false);
     double r1 = 0;
 
-    const u16 a2 = army2.GetAttack();
-    const u16 d2 = army2.GetDefense();
+    const u16 a2 = army2.GetAttack(false);
+    const u16 d2 = army2.GetDefense(false);
     double r2 = 0;
 
     if(a1 > d2)

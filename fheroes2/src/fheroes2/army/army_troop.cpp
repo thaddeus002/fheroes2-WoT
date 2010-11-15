@@ -203,16 +203,16 @@ u32 Army::Troop::GetCount(void) const
     return count;
 }
 
-u8 Army::Troop::GetAttack(void) const
+u8 Army::Troop::GetAttack(bool hero) const
 {
     return battle ? battle->GetAttack() : Monster::GetAttack() +
-            (army && army->commander ? army->commander->GetAttack() : 0);
+            (army && hero && army->commander ? army->commander->GetAttack() : 0);
 }
 
-u8 Army::Troop::GetDefense(void) const
+u8 Army::Troop::GetDefense(bool hero) const
 {
     return battle ? battle->GetDefense() : Monster::GetDefense() +
-            (army && army->commander ? army->commander->GetDefense() : 0);
+            (army && hero && army->commander ? army->commander->GetDefense() : 0);
 }
 
 Color::color_t Army::Troop::GetColor(void) const

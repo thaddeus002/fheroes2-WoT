@@ -123,8 +123,8 @@ namespace Army
 	    u32		ActionToSirens(void);
 	    u32		GetSurrenderCost(void) const;
 
-	    u16		GetAttack(void) const;
-	    u16		GetDefense(void) const;
+	    u16		GetAttack(bool = true) const;
+	    u16		GetDefense(bool = true) const;
 	    u32		GetHitPoints(void) const;
 	    u32		GetDamageMin(void) const;
 	    u32		GetDamageMax(void) const;

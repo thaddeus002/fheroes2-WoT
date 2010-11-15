@@ -71,8 +71,8 @@ namespace Army
         u32 		Count(void) const { return GetCount(); }
         u32 		GetCount(void) const;
         
-	u8		GetAttack(void) const;
-	u8		GetDefense(void) const;
+	u8		GetAttack(bool = true) const;
+	u8		GetDefense(bool = true) const;
 	u32		GetHitPoints(void) const;
 
 	Color::color_t	GetColor(void) const;
