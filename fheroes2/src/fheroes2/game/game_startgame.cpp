@@ -171,6 +171,7 @@ Game::menu_t Game::StartGame(void)
     I.Redraw(REDRAW_ICONS | REDRAW_BUTTONS | REDRAW_BORDER);
     I.iconsPanel.HideIcons();
 
+    GameOver::Result & gameResult = GameOver::Result::Get();
     Game::menu_t m = ENDTURN;
 
     while(m == ENDTURN)
@@ -241,7 +242,7 @@ Game::menu_t Game::StartGame(void)
 		break;
 	    }
 
-	    if(m != ENDTURN) break;
+	    if(gameResult.CheckGameOver(m)) break;
 	}
 
 	DELAY(10);
