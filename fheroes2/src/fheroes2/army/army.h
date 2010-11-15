@@ -128,7 +128,7 @@ namespace Army
 	    u32		GetHitPoints(void) const;
 	    u32		GetDamageMin(void) const;
 	    u32		GetDamageMax(void) const;
-	    double	GetStrength(void) const;
+	    u32		GetStrength(void) const;
 
 	    bool	isValid(void) const;
 	    bool	HasMonster(const Monster &) const;
