@@ -144,6 +144,13 @@ Battle2::Result Battle2::Loader(Army::army_t & army1, Army::army_t & army2, s32 
 	army_wins->GetCommander()->GetLevelSkill(Skill::Secondary::NECROMANCY))
 	    NecromancySkillAction(*army_wins, killed2, local && (Game::LOCAL == army_wins->GetControl()));
 
+    if(IS_DEBUG(DBG_BATTLE , DBG_INFO))
+    {
+	VERBOSE("Battle2::Loader: end, army1(" << Color::String(army1.GetColor()) << "), army2(" << Color::String(army2.GetColor()) << ")");
+	army1.Dump();
+	army2.Dump();
+    }
+
     // update army
     if(army1.GetCommander() && Skill::Primary::HEROES == army1.GetCommander()->GetType())
     {
@@ -162,13 +169,6 @@ Battle2::Result Battle2::Loader(Army::army_t & army1, Army::army_t & army2, s32 
     {
         AGG::ICNRegistryEnable(false);
         AGG::ICNRegistryFreeObjects();
-    }
-
-    if(IS_DEBUG(DBG_BATTLE , DBG_INFO))
-    {
-	VERBOSE("Battle2::Loader: end, army1(" << Color::String(army1.GetColor()) << "), army2(" << Color::String(army2.GetColor()) << ")");
-	army1.Dump();
-	army2.Dump();
     }
 
     DEBUG(DBG_BATTLE, DBG_INFO, "Battle2::Result: army1: " << (result.army1 & RESULT_WINS ? "wins" : "loss") << ", army2: " << (result.army2 & RESULT_WINS ? "wins" : "loss"));

@@ -905,6 +905,8 @@ void Army::army_t::JoinStrongestFromArmy(army_t & army2)
     std::vector<Troop>::iterator it1 = army.begin();
     std::vector<Troop>::const_iterator it2 = army.end();
     
+    bool save_last = army2.commander && Skill::Primary::HEROES == army2.commander->GetType();
+
     for(; it1 != it2; ++it1)
     {
 	Troop & troop = *it1;
@@ -949,13 +951,12 @@ void Army::army_t::JoinStrongestFromArmy(army_t & army2)
     }
 
     // save half weak of strongest to army2
-    if(Size() > army2.army.size())
+    if(save_last && !army2.isValid())
     {
 	Troop & last = priority.back();
-
-	army2.JoinTroop(last, last.GetCount() - last.GetCount() / 2);
-	JoinTroop(last, last.GetCount() / 2);
-	priority.pop_back();
+	u32 count = last.GetCount() / 2;
+	army2.JoinTroop(last, last.GetCount() - count);
+	last.SetCount(count);
     }
 
     // strongest to army
@@ -973,6 +974,8 @@ void Army::army_t::KeepOnlyWeakestTroops(army_t & army2)
 
     std::vector<Troop>::iterator it1 = army.begin();
     std::vector<Troop>::const_iterator it2 = army.end();
+
+    bool save_last = commander && Skill::Primary::HEROES == commander->GetType();
     
     for(; it1 != it2; ++it1)
     {
@@ -1007,20 +1010,29 @@ void Army::army_t::KeepOnlyWeakestTroops(army_t & army2)
 	troop.Reset();
     }
 
-    // sort: weakest
-    std::sort(priority.begin(), priority.end(), WeakestTroop);
+    // sort: strongest
+    std::sort(priority.begin(), priority.end(), StrongestTroop);
 
-    // strongest to army2
-    while(1 < priority.size() && Size() > army2.GetCount())
+    // weakest to army
+    while(Size() < priority.size())
     {
-	army2.JoinTroop(priority.back());
+	JoinTroop(priority.back());
 	priority.pop_back();
     }
 
-    // weakest to army
+    // save half weak of strongest to army
+    if(save_last && !isValid())
+    {
+	Troop & last = priority.back();
+	u32 count = last.GetCount() / 2;
+	JoinTroop(last, last.GetCount() - count);
+	last.SetCount(count);
+    }
+
+    // strongest to army2
     while(priority.size())
     {
-	JoinTroop(priority.back());
+	army2.JoinTroop(priority.back());
 	priority.pop_back();
     }
 }
@@ -1054,6 +1066,7 @@ void Army::army_t::Dump(void) const
     std::vector<Troop>::const_iterator it2 = army.end();
     
     for(; it1 != it2; ++it1) if((*it1).isValid()) std::cout << (*it1).GetName() << "(" << std::dec << (*it1).GetCount() << "), ";
+    if(commander) std::cout << "commander (" << commander->GetName() << ")";
 
     std::cout << std::endl;
 }
