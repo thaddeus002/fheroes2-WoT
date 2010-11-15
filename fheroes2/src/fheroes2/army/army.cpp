@@ -1132,7 +1132,13 @@ u32 Army::army_t::GetDamageMax(void) const
 
 u32 Army::army_t::GetStrength(void) const
 {
-    return (GetDamageMin() + GetDamageMax()) >> 1;
+    std::vector<Troop>::const_iterator it1 = army.begin();
+    std::vector<Troop>::const_iterator it2 = army.end();
+    u32 res = 0;
+
+    for(; it1 != it2; ++it1) if((*it1).isValid()){ res += (*it1).GetStrength(); }
+
+    return res;
 }
 
 bool Army::army_t::StrongerEnemyArmy(const army_t & army2) const
@@ -1155,8 +1161,20 @@ bool Army::army_t::StrongerEnemyArmy(const army_t & army2) const
     else
         r2 = 1 + 0.05 * static_cast<double>(std::min(d1 - a2, 14));
 
-    r1 *= GetStrength() / static_cast<double>(army2.GetHitPoints());
-    r2 *= army2.GetStrength() / static_cast<double>(GetHitPoints());
+    const u32 s1 = GetStrength();
+    const u32 s2 = army2.GetStrength();
+
+    const double h1 = GetHitPoints();
+    const double h2 = army2.GetHitPoints();
+
+    if(IS_DEBUG(DBG_AI, DBG_INFO))
+    {
+	VERBOSE("Army::StrongerEnemyArmy: " << "r1: " << r1 << ", s1: " << s1 << ", h1: " << h1 \
+			<< ", r2: " << r2 << ", s2: " << s2 << ", h2: " << h2);
+    }
+
+    r1 *= s1 / h2;
+    r2 *= s2 / h1;
 
     if(IS_DEBUG(DBG_GAME, DBG_INFO))
     {

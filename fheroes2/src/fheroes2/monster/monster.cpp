@@ -481,6 +481,22 @@ bool Monster::isAllowUpgrade(void) const
     return id != Upgrade(id);
 }
 
+bool Monster::isHideAttack(void) const
+{
+    switch(id)
+    {
+        case Monster::ROGUE:
+        case Monster::SPRITE:
+        case Monster::VAMPIRE:
+        case Monster::VAMPIRE_LORD:
+        case Monster::HYDRA: return true;
+
+        default: break;
+    }
+
+    return false;
+}
+
 bool Monster::isTwiceAttack(void) const
 {
     switch(id)

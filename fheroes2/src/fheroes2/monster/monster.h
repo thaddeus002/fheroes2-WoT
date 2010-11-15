@@ -164,6 +164,7 @@ public:
     bool isArchers(void) const;
     bool isAllowUpgrade(void) const;
     bool isTwiceAttack(void) const;
+    bool isHideAttack(void) const;
     bool isDragons(void) const;
 
     ICN::icn_t ICNMonh(void) const;

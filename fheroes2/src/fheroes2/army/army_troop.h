@@ -82,6 +82,7 @@ namespace Army
 	Battle2::Stats*	GetBattleStats(void);
         u32		GetDamageMin(void) const;
 	u32		GetDamageMax(void) const;
+	u32		GetStrength(void) const;
 
         s8		GetMorale(void) const;
 	s8		GetLuck(void) const;

@@ -235,6 +235,18 @@ u32 Army::Troop::GetDamageMax(void) const
     return Monster::GetDamageMax() * count;
 }
 
+u32 Army::Troop::GetStrength(void) const
+{
+    double res = (GetDamageMin() + GetDamageMax()) >> 1;
+
+    if(isFly())		res += res * 0.25;
+    if(isArchers())	res += res * 0.25;
+    if(isTwiceAttack())	res += res * 0.25;
+    if(isHideAttack())	res += res * 0.25;
+
+    return static_cast<u32>(res);
+}
+
 u8 Army::Troop::GetSpeed(void) const
 {
     return battle ? battle->GetSpeed() : Monster::GetSpeed();

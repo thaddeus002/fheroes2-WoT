@@ -1490,11 +1490,6 @@ bool Battle2::Stats::isTwiceAttack(void) const
 {
     switch(troop())
     {
-        case Monster::WOLF:
-        case Monster::PALADIN:
-        case Monster::CRUSADER:
-	    return true;
-
         case Monster::ELF:
         case Monster::GRAND_ELF:
         case Monster::RANGER:
@@ -1503,7 +1498,7 @@ bool Battle2::Stats::isTwiceAttack(void) const
         default: break;
     }
 
-    return false;
+    return troop.isTwiceAttack();
 }
 
 bool Battle2::Stats::isResurectLife(void) const
@@ -1553,19 +1548,7 @@ bool Battle2::Stats::isMultiCellAttack(void) const
 
 bool Battle2::Stats::isHideAttack(void) const
 {
-    switch(troop())
-    {
-	case Monster::ROGUE:
-	case Monster::SPRITE:
-	case Monster::VAMPIRE:
-	case Monster::VAMPIRE_LORD:
-        case Monster::HYDRA:
-            return true;
-
-        default: break;
-    }
-
-    return false;
+    return troop.isHideAttack();
 }
 
 bool Battle2::Stats::isAlwayResponse(void) const
