@@ -55,6 +55,14 @@ void AI::HeroesAction(Heroes &, s32)
 {
 }
 
+void AI::HeroesDumpInfo(const Heroes &)
+{
+}
+
+void AI::HeroesLevelUp(Heroes &)
+{
+}
+
 void AI::KingdomTurn(Kingdom &)
 {
     ShowWarning();

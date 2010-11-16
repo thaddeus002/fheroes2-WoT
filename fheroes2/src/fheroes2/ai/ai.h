@@ -41,6 +41,8 @@ struct AI
     static void BattleTurn(Battle2::Arena &, const Battle2::Stats &, Battle2::Actions &);
     static void BattleMagicTurn(Battle2::Arena &, const Battle2::Stats &, Battle2::Actions &, const Battle2::Stats*);
     static void HeroesAction(Heroes &, s32);
+    static void HeroesLevelUp(Heroes &);
+    static void HeroesDumpInfo(const Heroes &);
 };
 
 #endif

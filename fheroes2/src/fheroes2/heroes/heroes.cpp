@@ -41,6 +41,7 @@
 #include "localclient.h"
 #include "game_focus.h"
 #include "game_interface.h"
+#include "ai.h"
 
 // heroes_action.cpp
 u16 DialogWithArtifact(const std::string & hdr, const std::string & msg, const Artifact::artifact_t art, const u16 buttons = Dialog::OK);
@@ -1399,6 +1400,7 @@ void Heroes::FindSkillsForLevelUp(Skill::Secondary & sec1, Skill::Secondary & se
 void Heroes::LevelUp(bool autoselect)
 {
     LevelUpSecondarySkill(LevelUpPrimarySkill(), autoselect);
+    AI::HeroesLevelUp(*this);
 }
 
 Skill::Primary::skill_t Heroes::LevelUpPrimarySkill(void)
@@ -1701,6 +1703,7 @@ void Heroes::Dump(void) const
     std::cout << "race            : " << Race::String(race) << std::endl;
     std::cout << "color           : " << Color::String(color) << std::endl;
     std::cout << "experience      : " << experience << std::endl;
+    std::cout << "level           : " << static_cast<int>(GetLevel()) << std::endl;
     std::cout << "magic point     : " << GetSpellPoints() << std::endl;
     std::cout << "position x      : " << GetCenter().x << std::endl;
     std::cout << "position y      : " << GetCenter().y << std::endl;
@@ -1714,6 +1717,8 @@ void Heroes::Dump(void) const
                                          (Modes(HUNTER) ? "HUNTER," : ",") <<
                                          (Modes(PATROL) ? "PATROL," : ",") <<
                                          (Modes(STUPID) ? "STUPID," : ",") << std::endl;
+    if(GetControl() == Game::AI)
+	AI::HeroesDumpInfo(*this);
 
     std::cout << std::endl;
 }
