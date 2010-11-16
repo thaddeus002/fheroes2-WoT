@@ -921,6 +921,35 @@ bool MP2::isPickupObject(const u8 obj)
     return false;
 }
 
+bool MP2::isNeedStayFront(const u8 obj)
+{
+    switch(obj)
+    {
+        case MP2::OBJ_WATERCHEST:
+        case MP2::OBJ_SHIPWRECKSURVIROR:
+        case MP2::OBJ_FLOTSAM:
+        case MP2::OBJ_BOTTLE:
+        case MP2::OBJ_COAST:
+        case MP2::OBJ_TREASURECHEST:
+        case MP2::OBJ_ANCIENTLAMP:
+        case MP2::OBJ_CAMPFIRE:
+        case MP2::OBJ_MONSTER:
+        case MP2::OBJ_RESOURCE:
+        case MP2::OBJ_ARTIFACT:
+        case MP2::OBJ_HEROES:
+        case MP2::OBJ_BOAT:
+        case MP2::OBJ_BARRIER:
+        case MP2::OBJ_JAIL:
+	    return true;
+
+	default: break;
+    }
+
+    return false;
+}
+
+
+
 bool MP2::isClearGroundObject(const u8 obj)
 {
     switch(obj)

@@ -196,48 +196,16 @@ const Sprite & SpriteFroth(const Heroes & hero, const u8 index, const bool refle
 
 bool isNeedStayFrontObject(const Heroes & hero, const Maps::Tiles & next)
 {
-    if(hero.isShipMaster())
-        switch(next.GetObject())
-        {
-            case MP2::OBJ_WATERCHEST:
-            case MP2::OBJ_SHIPWRECKSURVIROR:
-            case MP2::OBJ_FLOTSAM:
-            case MP2::OBJ_BOTTLE:
-            case MP2::OBJ_COAST:
-            case MP2::OBJ_HEROES:
-            return true;
+    if(next.GetObject() == MP2::OBJ_CASTLE)
+    {
+	const Castle *castle = world.GetCastle(next.GetIndex());
 
-            default: break;
-        }
-    else
-        switch(next.GetObject())
-        {
-            case MP2::OBJ_TREASURECHEST:
-            case MP2::OBJ_ANCIENTLAMP:
-            case MP2::OBJ_CAMPFIRE:
-            case MP2::OBJ_MONSTER:
-            case MP2::OBJ_RESOURCE:
-            case MP2::OBJ_ARTIFACT:
-            case MP2::OBJ_HEROES:
-            case MP2::OBJ_BOAT:
-	    case MP2::OBJ_BARRIER:
-            case MP2::OBJ_JAIL:
-            return true;
+	return (castle &&
+		hero.GetColor() != castle->GetColor() &&
+		    !Settings::Get().IsUnions(hero.GetColor(), castle->GetColor()));
+    }
 
-            case MP2::OBJ_CASTLE:
-	    {
-		const Castle *castle = world.GetCastle(next.GetIndex());
-
-		return (castle &&
-			hero.GetColor() != castle->GetColor() &&
-		        !Settings::Get().IsUnions(hero.GetColor(), castle->GetColor()));
-	    }
-	    break;
-
-            default: break;
-        }
-
-    return false;
+    return MP2::isNeedStayFront(next.GetObject());
 }
 
 void Heroes::Redraw(Surface & dst, bool with_shadow) const

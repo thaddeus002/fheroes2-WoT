@@ -1853,6 +1853,9 @@ bool Maps::Tiles::CheckEnemyGuardians(u8 color) const
 	    break;
     }
 
+    if(MP2::isNeedStayFront(mp2_object))
+	return false;
+
     if(color &&
 	(MP2::isCaptureObject(mp2_object) ||
 	(MP2::OBJ_HEROES == mp2_object && world.GetHeroes(maps_index) && 
