@@ -35,6 +35,20 @@
 #include "battle_arena.h"
 #include "battle2.h"
 
+void BattleSpeedRedraw(const Point & dst)
+{
+    Display & display = Display::Get();
+    u8 speed = Settings::Get().BattleSpeed();
+    std::string str = _("speed: %{speed}");
+
+    String::Replace(str, "%{speed}", speed);
+    Text text(str, Font::SMALL);
+    const Sprite & sprite = AGG::GetICN(ICN::CSPANEL, (speed < 3 ? 0 : (speed < 7 ? 1 : 2)));
+
+    display.Blit(sprite, dst);
+    text.Blit(dst.x + (sprite.w() - text.w()) / 2, dst.y + sprite.h() - 15);
+}
+
 void Battle2::DialogBattleSettings(void)
 {
     Display & display = Display::Get();
@@ -60,6 +74,7 @@ void Battle2::DialogBattleSettings(void)
     
     Button btn_ok(pos_rt.x + 113, pos_rt.y + 252, (conf.EvilInterface() ? ICN::CSPANBTE : ICN::CSPANBTN), 0, 1);
 
+    Rect   opt_speed(pos_rt.x + 36, pos_rt.y + 47, AGG::GetICN(ICN::CSPANEL, 0).w(), AGG::GetICN(ICN::CSPANEL, 0).h());
     Button opt_grid(pos_rt.x + 36, pos_rt.y + 157, ICN::CSPANEL, 8, 9);
     Button opt_shadow_movement(pos_rt.x + 128, pos_rt.y + 157, ICN::CSPANEL, 10, 11);
     Button opt_shadow_cursor(pos_rt.x + 220, pos_rt.y + 157, ICN::CSPANEL, 12, 13);
@@ -69,6 +84,8 @@ void Battle2::DialogBattleSettings(void)
     if(conf.ExtBattleShowGrid()) opt_grid.Press();
     if(conf.ExtBattleShowMoveShadow()) opt_shadow_movement.Press();
     if(conf.ExtBattleShowMouseShadow()) opt_shadow_cursor.Press();
+
+    BattleSpeedRedraw(opt_speed);
 
     opt_grid.Draw();
     opt_shadow_movement.Draw();
@@ -81,6 +98,16 @@ void Battle2::DialogBattleSettings(void)
     while(le.HandleEvents())
     {
 	le.MousePressLeft(btn_ok) ? btn_ok.PressDraw() : btn_ok.ReleaseDraw();
+
+	if(le.MouseClickLeft(opt_speed))
+	{
+	    conf.SetBattleSpeed((conf.BattleSpeed() + 1) % 11);
+	    Game::UpdateBattleSpeed();
+	    cursor.Hide();
+	    BattleSpeedRedraw(opt_speed);
+	    cursor.Show();
+	    display.Flip();
+	}
 
 	if(le.MouseClickLeft(opt_grid))
 	{

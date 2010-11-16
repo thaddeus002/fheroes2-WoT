@@ -179,6 +179,7 @@ namespace Game
     bool AnimateInfrequent(delay_t);
     void AnimateDelayReset(delay_t);
     void UpdateHeroesMoveSpeed(void);
+    void UpdateBattleSpeed(void);
 
     control_t GetControl(u8);
     type_t GetType(u8);
