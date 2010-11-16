@@ -1257,7 +1257,7 @@ void ActionToGoodLuckObject(Heroes &hero, const u8 obj, const s32 dst_index)
 void ActionToPoorLuckObject(Heroes &hero, const u8 obj, const s32 dst_index)
 {
     Maps::Tiles & tile = world.GetTiles(dst_index);
-    const bool battle = tile.CheckEnemyGuardians();
+    const bool battle = tile.OtherObjectsIsProtection();
     bool complete = false;
     std::string body;
 
@@ -2206,7 +2206,7 @@ void ActionToCaptureObject(Heroes &hero, const u8 obj, const s32 dst_index)
 	bool capture = true;
 
 	// check guardians
-	if(tile.CheckEnemyGuardians(hero.GetColor()))
+	if(tile.CaptureObjectIsProtection(hero.GetColor()))
 	{
 	    const Army::Troop troop(tile);
 	    Army::army_t army;

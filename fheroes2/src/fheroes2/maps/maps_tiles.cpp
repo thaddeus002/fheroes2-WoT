@@ -1829,9 +1829,14 @@ bool Maps::Tiles::ValidQuantity(void) const
     return false;
 }
 
-bool Maps::Tiles::CheckEnemyGuardians(u8 color) const
+bool Maps::Tiles::OtherObjectsIsProtection(void) const
 {
-    switch(mp2_object)
+    u8 object = mp2_object;
+
+    if(MP2::OBJ_HEROES == mp2_object && world.GetHeroes(maps_index))
+	object = world.GetHeroes(maps_index)->GetUnderObject();
+
+    switch(object)
     {
 	case MP2::OBJ_ARTIFACT:
 	    return quantity1 > 5 && quantity1 < 14;
@@ -1853,19 +1858,32 @@ bool Maps::Tiles::CheckEnemyGuardians(u8 color) const
 	    break;
     }
 
-    if(MP2::isNeedStayFront(mp2_object))
-	return false;
-
-    if(color &&
-	(MP2::isCaptureObject(mp2_object) ||
-	(MP2::OBJ_HEROES == mp2_object && world.GetHeroes(maps_index) && 
-	    MP2::isCaptureObject(world.GetHeroes(maps_index)->GetUnderObject()))) &&
-	color != world.ColorCapturedObject(maps_index))
-	    return quantity3 && GetCountMonster();
-
     return false;
 }
 
+bool Maps::Tiles::CaptureObjectIsProtection(u8 color) const
+{
+    u8 object = mp2_object;
+
+    if(MP2::OBJ_HEROES == mp2_object && world.GetHeroes(maps_index))
+	object = world.GetHeroes(maps_index)->GetUnderObject();
+
+    if(color &&
+	MP2::isCaptureObject(object)  &&
+	! Settings::Get().IsUnions(color, world.ColorCapturedObject(maps_index)))
+    {
+	if(MP2::OBJ_CASTLE == object)
+	{
+	    Castle* castle = world.GetCastle(maps_index);
+	    if(castle)
+		return castle->GetArmy().isValid();
+	}
+	else
+            return quantity3 && GetCountMonster();
+    }
+
+    return false;
+}
 
 void Maps::Tiles::RemoveObjectSprite(void)
 {

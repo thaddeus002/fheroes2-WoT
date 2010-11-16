@@ -75,7 +75,9 @@ namespace Maps
 	bool isRoad(const Direction::vector_t & direct = Direction::CENTER) const;
 	bool isStream(void) const;
 	bool GoodForUltimateArtifact(void) const;
-	bool CheckEnemyGuardians(u8 color = 0) const;
+
+	bool OtherObjectsIsProtection(void) const;
+	bool CaptureObjectIsProtection(u8 color) const;
 
 	TilesAddon* FindAddonICN1(u16 icn1);
 	TilesAddon* FindAddonICN2(u16 icn2);

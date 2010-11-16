@@ -563,7 +563,8 @@ Cursor::themes_t Game::GetCursor(const s32 dst_index)
 			if(MP2::isGroundObject(tile.GetObject()))
 			{
 				bool protection = (MP2::isPickupObject(tile.GetObject()) ? false :
-					(Maps::TileUnderProtection(dst_index) || tile.CheckEnemyGuardians(from_hero.GetColor())));
+					(Maps::TileUnderProtection(dst_index) ||
+					 tile.CaptureObjectIsProtection(from_hero.GetColor())));
 
 				return Cursor::DistanceThemes((protection ? Cursor::FIGHT : Cursor::ACTION),
 								from_hero.GetRangeRouteDays(dst_index));
