@@ -1834,7 +1834,7 @@ bool Maps::Tiles::CheckEnemyGuardians(u8 color) const
     switch(mp2_object)
     {
 	case MP2::OBJ_ARTIFACT:
-	    return quantity1 > 5 || quantity1 < 14;
+	    return quantity1 > 5 && quantity1 < 14;
 
 	case MP2::OBJ_DERELICTSHIP:
 	case MP2::OBJ_SHIPWRECK:
