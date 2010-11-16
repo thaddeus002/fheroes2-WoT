@@ -1514,7 +1514,7 @@ bool Heroes::ApplyPenaltyMovement(void)
 
 bool Heroes::MayStillMove(void) const
 {
-    if(Modes(STUPID) || isFreeman()) return false;
+    if(Modes(STUPID) || Modes(AIWAITING) || isFreeman()) return false;
     return path.isValid() ? (move_point >= path.GetFrontPenalty()) : CanMove();
 }
 
@@ -1716,6 +1716,7 @@ void Heroes::Dump(void) const
                                          (Modes(SCOUTER) ? "SCOUTER," : ",") <<
                                          (Modes(HUNTER) ? "HUNTER," : ",") <<
                                          (Modes(PATROL) ? "PATROL," : ",") <<
+                                         (Modes(AIWAITING) ? "WAITING," : ",") <<
                                          (Modes(STUPID) ? "STUPID," : ",") << std::endl;
     if(GetControl() == Game::AI)
 	AI::HeroesDumpInfo(*this);

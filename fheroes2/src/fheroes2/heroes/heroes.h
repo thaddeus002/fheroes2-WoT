@@ -72,7 +72,7 @@ public:
     enum flags_t
     {
 	SHIPMASTER	= 0x0001,
-	//		= 0x0002,
+	AIWAITING	= 0x0002,
 	SPELLCASTED	= 0x0004,
 	ENABLEMOVE	= 0x0008,
 	HUNTER		= 0x0010,
