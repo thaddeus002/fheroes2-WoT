@@ -227,6 +227,17 @@ void String::AppendKey(std::string & res, KeySym sym, u16 mod)
         case KEY_9:     res += (MOD_SHIFT & mod ? '(' : '9'); break;
         case KEY_0:     res += (MOD_SHIFT & mod ? ')' : '0'); break;
 
+	case KEY_KP0:	if(MOD_NUM & mod) res += '0'; break;
+	case KEY_KP1:	if(MOD_NUM & mod) res += '1'; break;
+	case KEY_KP2:	if(MOD_NUM & mod) res += '2'; break;
+	case KEY_KP3:	if(MOD_NUM & mod) res += '3'; break;
+	case KEY_KP4:	if(MOD_NUM & mod) res += '4'; break;
+	case KEY_KP5:	if(MOD_NUM & mod) res += '5'; break;
+	case KEY_KP6:	if(MOD_NUM & mod) res += '6'; break;
+	case KEY_KP7:	if(MOD_NUM & mod) res += '7'; break;
+	case KEY_KP8:	if(MOD_NUM & mod) res += '8'; break;
+	case KEY_KP9:	if(MOD_NUM & mod) res += '9'; break;
+
         case KEY_MINUS:         res += (MOD_SHIFT & mod ? '_' : '-'); break;
         case KEY_EQUALS:        res += (MOD_SHIFT & mod ? '+' : '='); break;
 	case KEY_BACKSLASH:     res += (MOD_SHIFT & mod ? '|' : '\\'); break;
@@ -520,6 +531,17 @@ bool PressIntKey(u32 min, u32 max, u32 & result)
                     case KEY_7: result += 7; break;
                     case KEY_8: result += 8; break;
                     case KEY_9: result += 9; break;
+
+		    case KEY_KP1: result += 1; break;
+		    case KEY_KP2: result += 2; break;
+		    case KEY_KP3: result += 3; break;
+		    case KEY_KP4: result += 4; break;
+		    case KEY_KP5: result += 5; break;
+		    case KEY_KP6: result += 6; break;
+		    case KEY_KP7: result += 7; break;
+		    case KEY_KP8: result += 8; break;
+		    case KEY_KP9: result += 9; break;
+
                     default: break;
             }
             if(result > max) result = max;

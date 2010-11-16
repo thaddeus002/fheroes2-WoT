@@ -136,7 +136,6 @@ KeySym GetKeySym(int key)
 	case SDLK_DOWN:		return KEY_DOWN;
 
 	case SDLK_ESCAPE:	return KEY_ESCAPE;
-	case SDLK_KP_ENTER:	return KEY_RETURN;
 	case SDLK_BACKSPACE:	return KEY_BACKSPACE;
 	case SDLK_EXCLAIM:    	return KEY_EXCLAIM;
 	case SDLK_QUOTEDBL:    	return KEY_QUOTEDBL;
@@ -224,6 +223,24 @@ KeySym GetKeySym(int key)
 	case SDLK_x:		return KEY_x;
 	case SDLK_y:		return KEY_y;
 	case SDLK_z:		return KEY_z;
+
+	case SDLK_KP0:		return KEY_KP0;
+	case SDLK_KP1:		return KEY_KP1;
+	case SDLK_KP2:		return KEY_KP2;
+	case SDLK_KP3:		return KEY_KP3;
+	case SDLK_KP4:		return KEY_KP4;
+	case SDLK_KP5:		return KEY_KP5;
+	case SDLK_KP6:		return KEY_KP6;
+	case SDLK_KP7:		return KEY_KP7;
+	case SDLK_KP8:		return KEY_KP8;
+	case SDLK_KP9:		return KEY_KP9;
+	case SDLK_KP_PERIOD:	return KEY_KP_PERIOD;
+	case SDLK_KP_DIVIDE:	return KEY_KP_DIVIDE;
+	case SDLK_KP_MULTIPLY:	return KEY_KP_MULTIPLY;
+	case SDLK_KP_MINUS:	return KEY_KP_MINUS;
+	case SDLK_KP_PLUS:	return KEY_KP_PLUS;
+	case SDLK_KP_ENTER:	return KEY_KP_ENTER;
+	case SDLK_KP_EQUALS:	return KEY_KP_EQUALS;
 
 #ifdef _WIN32_WCE
 	case 0xC1: return KEY_APP01;
