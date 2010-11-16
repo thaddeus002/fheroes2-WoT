@@ -250,7 +250,6 @@ Game::menu_t Game::HighScores(void)
     const Sprite &back = AGG::GetICN(ICN::HSBKG, 0);
 
     cursor.Hide();
-    display.Fill(0, 0, 0);
     const Point top((display.w() - back.w()) / 2, (display.h() - back.h()) / 2);
 
     hgs.RedrawList(top.x, top.y);

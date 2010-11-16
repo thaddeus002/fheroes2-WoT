@@ -398,7 +398,7 @@ bool Game::IO::SaveBIN(QueueMessage & msg)
 	    msg.Push((*it1)->resource.gems);
 	    msg.Push((*it1)->resource.gold);
 	    msg.Push(static_cast<u8>((*it1)->artifact));
-	    msg.Push(static_cast<u8>((*it1)->quiet));
+	    msg.Push(static_cast<u8>((*it1)->valid));
 
 	    msg.Push(static_cast<u32>((*it1)->answers.size()));
 	    std::vector<std::string>::const_iterator ita1 = (*it1)->answers.begin();
@@ -969,7 +969,7 @@ bool Game::IO::LoadBIN(QueueMessage & msg)
 	msg.Pop(size); riddle->resource.gems = size;
 	msg.Pop(size); riddle->resource.gold = size;
 	msg.Pop(byte8);riddle->artifact = Artifact::FromInt(byte8);
-	msg.Pop(byte8);riddle->quiet = byte8;
+	msg.Pop(byte8);riddle->valid = byte8;
 
 	msg.Pop(size);
 	riddle->answers.reserve(size);

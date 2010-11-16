@@ -227,11 +227,11 @@ GameEvent::Coord::Coord(s32 index, const void *ptr) : index_map(index)
     DEBUG(DBG_GAME , DBG_INFO, "GameEvent::Coord: add: " << message);
 }
 
-GameEvent::Riddle::Riddle() : index_map(-1), artifact(Artifact::UNKNOWN), quiet(true)
+GameEvent::Riddle::Riddle() : index_map(-1), artifact(Artifact::UNKNOWN), valid(false)
 {
 }
 
-GameEvent::Riddle::Riddle(s32 index, const void *ptr) : index_map(index), quiet(true)
+GameEvent::Riddle::Riddle(s32 index, const void *ptr) : index_map(index), valid(false)
 {
     const u8  *ptr8  = static_cast<const u8 *>(ptr);
     u16 byte16 = 0;
@@ -297,6 +297,8 @@ GameEvent::Riddle::Riddle(s32 index, const void *ptr) : index_map(index), quiet(
     // message
     message = std::string(_(reinterpret_cast<const char *>(ptr8)));
     
+    valid = true;
+
     DEBUG(DBG_GAME , DBG_INFO, "GameEvent::Riddle: add: " << message);
 }
 
@@ -307,12 +309,12 @@ bool GameEvent::Riddle::AnswerCorrect(const std::string & answer)
 
 bool GameEvent::Riddle::isValid(void) const
 {
-    return !quiet;
+    return valid;
 }
 
 void GameEvent::Riddle::SetQuiet(void)
 {
-    quiet = true;
+    valid = false;
     artifact = Artifact::UNKNOWN;
     resource = Resource::funds_t();
 }

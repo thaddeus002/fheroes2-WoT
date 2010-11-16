@@ -54,8 +54,6 @@ Game::menu_t Game::MainMenu(void)
 
     Display & display = Display::Get();
 
-    display.Fill(0, 0, 0);
-
     // image background
     const Sprite &sprite = AGG::GetICN(ICN::HEROES, 0);
     const Point top((display.w() - sprite.w()) / 2, (display.h() - sprite.h()) / 2);

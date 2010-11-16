@@ -103,7 +103,7 @@ private:
     Artifact::artifact_t artifact;
     std::vector<std::string> answers;
     std::string message;
-    bool quiet;
+    bool valid;
 };
 
 }

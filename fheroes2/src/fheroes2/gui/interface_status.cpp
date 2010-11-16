@@ -368,22 +368,35 @@ void Interface::StatusWindow::DrawBackground(void) const
         srcrt.x = 0;
         srcrt.y = 0;
         srcrt.w = icnston.w();
-        srcrt.h = 12;
+        srcrt.h = 16;
         display.Blit(icnston, srcrt, dstpt);
 
-        srcrt.y = 12;
+        srcrt.y = 16;
         srcrt.h = 32;
-        dstpt.y = dstpt.y + 12;
+        dstpt.y = dstpt.y + 16;
 
-        for(u8 ii = 0; ii < h / TILEWIDTH; ++ii)
+	u16 body = h - 32;
+
+        for(u8 ii = 0; ii < body / 32; ++ii)
         {
             display.Blit(icnston, srcrt, dstpt);
-    	    dstpt.y = dstpt.y + TILEWIDTH;
+    	    dstpt.y = dstpt.y + srcrt.h;
         }
 
-        dstpt.y = display.h() - BORDERWIDTH - 12;
-        srcrt.y = icnston.h() - 12;
-        display.Blit(icnston, srcrt, dstpt);
+	if(body % 32)
+	{
+    	    dstpt.y = display.h() - BORDERWIDTH - 48;
+    	    srcrt.y = icnston.h() - 48;
+    	    srcrt.h = 48;
+    	    display.Blit(icnston, srcrt, dstpt);
+	}
+	else
+	{
+	    dstpt.y = display.h() - BORDERWIDTH - 16;
+    	    srcrt.y = icnston.h() - 16;
+    	    srcrt.h = 16;
+    	    display.Blit(icnston, srcrt, dstpt);
+	}
     }
     else
 	display.Blit(icnston, x, y);

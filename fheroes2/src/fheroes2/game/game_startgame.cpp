@@ -47,6 +47,7 @@
 #include "game_focus.h"
 #include "kingdom.h"
 #include "localclient.h"
+#include "ai.h"
 
 // heroes_action.cpp
 u16 DialogWithArtifact(const std::string & hdr, const std::string & msg, const Artifact::artifact_t art, const u16 buttons = Dialog::OK);
@@ -137,6 +138,7 @@ void Game::DialogPlayers(const Color::color_t color, const std::string & str)
 Game::menu_t Game::StartGame(void)
 {
     SetFixVideoMode();
+    AI::Init();
 
     // cursor
     Cursor & cursor = Cursor::Get();
@@ -247,6 +249,8 @@ Game::menu_t Game::StartGame(void)
 
 	DELAY(10);
     }
+
+    display.Fill(0, 0, 0);
 
     return m == ENDTURN ? QUITGAME : m;
 }

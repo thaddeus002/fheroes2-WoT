@@ -37,6 +37,8 @@ struct AI
     static void AddHeroes(const Heroes &);
     static void RemoveHeroes(const Heroes &);
 
+    static void Init(void);
+
     static void KingdomTurn(Kingdom &);
     static void BattleTurn(Battle2::Arena &, const Battle2::Stats &, Battle2::Actions &);
     static void BattleMagicTurn(Battle2::Arena &, const Battle2::Stats &, Battle2::Actions &, const Battle2::Stats*);

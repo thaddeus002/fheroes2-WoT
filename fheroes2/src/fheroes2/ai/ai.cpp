@@ -79,4 +79,8 @@ void AI::BattleMagicTurn(Battle2::Arena &, const Battle2::Stats &, Battle2::Acti
 {
 }
 
+void AI::Init(void)
+{
+}
+
 #endif
