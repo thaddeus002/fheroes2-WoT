@@ -61,6 +61,7 @@ namespace Maps
     u16 LossCountDays(void) const;
 
     void Dump(void) const;
+    void Reset(void);
 
     std::string file;
     std::string name;

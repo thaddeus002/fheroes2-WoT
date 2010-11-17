@@ -64,6 +64,11 @@ Race::race_t ByteToRace(u8 byte)
 Maps::FileInfo::FileInfo() : difficulty(Difficulty::EASY),
     kingdom_colors(0), human_colors(0), computer_colors(0), rnd_races(0), localtime(0), with_heroes(false)
 {
+    Reset();
+}
+
+void Maps::FileInfo::Reset(void)
+{
     for(u8 ii = 0; ii < KINGDOMMAX; ++ii)
     {
 	races[ii] = Race::BOMG;
@@ -73,12 +78,15 @@ Maps::FileInfo::FileInfo() : difficulty(Difficulty::EASY),
 
 bool Maps::FileInfo::ReadSAV(const std::string & filename)
 {
+    Reset();
     return Game::LoadSAV2FileInfo(filename,  *this);
 }
 
 bool Maps::FileInfo::ReadMP2(const std::string & filename)
 {
     if(filename.empty()) return false;
+
+    Reset();
 
     std::ifstream fd(filename.c_str(), std::ios::binary);
 
