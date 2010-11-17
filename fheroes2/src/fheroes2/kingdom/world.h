@@ -115,7 +115,10 @@ public:
 
     const std::string & MessageSign(const s32 index);
 
-    s32 GetNearestObject(const s32 center, const MP2::object_t obj);
+    bool GetObjectPositions(MP2::object_t, std::vector<s32> &, bool check_hero = false) const;
+    bool GetObjectPositions(s32 center, MP2::object_t, std::vector<IndexDistance> &, bool check_hero = false) const;
+    s32 GetNearestObject(s32 center, MP2::object_t, bool check_hero = false) const;
+
     void CaptureObject(const s32 index, const Color::color_t col);
     u16 CountCapturedObject(const MP2::object_t obj, const Color::color_t col) const;
     u16 CountCapturedMines(const Resource::resource_t res, const Color::color_t col) const;
@@ -142,7 +145,6 @@ public:
 protected:
     void UpdateDwellingPopulation(void);
     void UpdateMonsterPopulation(void);
-    void GetObjectIndexes(std::vector<s32> &, MP2::object_t, bool) const;
     bool CheckKingdomNormalVictory(const Kingdom &) const;
 
 private:

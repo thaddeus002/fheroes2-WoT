@@ -105,7 +105,7 @@ public:
 
     u32 CountBuildings(void) const;
 
-    bool RecruitHero(Heroes*);
+    Heroes* RecruitHero(Heroes*);
     const Heroes* GetHeroes(void) const;
     Heroes* GetHeroes(void);
 

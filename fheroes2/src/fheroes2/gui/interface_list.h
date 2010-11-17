@@ -23,6 +23,8 @@
 #ifndef H2INTERFACE_LIST_H
 #define H2INTERFACE_LIST_H
 
+#include <algorithm>
+
 #include "icn.h"
 #include "button.h"
 #include "splitter.h"

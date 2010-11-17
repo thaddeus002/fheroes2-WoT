@@ -239,10 +239,14 @@ u32 Army::Troop::GetStrength(void) const
 {
     double res = (GetDamageMin() + GetDamageMax()) >> 1;
 
-    if(isFly())		res += res * 0.25;
-    if(isArchers())	res += res * 0.25;
-    if(isTwiceAttack())	res += res * 0.25;
-    if(isHideAttack())	res += res * 0.25;
+    // increase strength
+    if(isFly())		res += res * 0.5;
+    if(isArchers())	res += res * 0.5;
+    if(isTwiceAttack())	res += res * 0.5;
+    if(isHideAttack())	res += res * 0.5;
+
+    // slowly: decrease strength
+    if((!isFly() && !isArchers()) && Speed::AVERAGE > GetSpeed()) res -= res * 0.5;
 
     return static_cast<u32>(res);
 }

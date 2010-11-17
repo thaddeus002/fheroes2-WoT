@@ -1317,7 +1317,7 @@ s32 World::NextTeleport(const s32 index) const
     std::vector<s32> vec_teleports;
     
     vec_teleports.reserve(10);
-    GetObjectIndexes(vec_teleports, MP2::OBJ_STONELIGHTS, false);
+    GetObjectPositions(MP2::OBJ_STONELIGHTS, vec_teleports);
 
     if(2 > vec_teleports.size())
     {
@@ -1345,7 +1345,7 @@ s32 World::NextWhirlpool(const s32 index)
     std::vector<s32>::const_iterator itv;
 
     whilrpools.reserve(40);
-    GetObjectIndexes(whilrpools, MP2::OBJ_WHIRLPOOL, false);
+    GetObjectPositions(MP2::OBJ_WHIRLPOOL, whilrpools);
 
     std::map<s32, std::vector<s32> > uniq_whirlpools;
 
@@ -1660,27 +1660,19 @@ void World::ActionForMagellanMaps(u8 color)
     for(; it1 != it2; ++it1) if(*it1 && Maps::Ground::WATER == (*it1)->GetGround()) (*it1)->ClearFog(color);
 }
 
-s32 World::GetNearestObject(const s32 center, const MP2::object_t obj)
+s32 World::GetNearestObject(s32 center, MP2::object_t obj, bool check_hero) const
 {
-    if(!Maps::isValidAbsIndex(center)) return -1;
+    std::vector<IndexDistance> resv;
+    resv.reserve(10);
 
-    s32 res = -1;
-    s32 min = -1;
-
-    std::vector<Maps::Tiles *>::const_iterator it1 = vec_tiles.begin();
-    std::vector<Maps::Tiles *>::const_iterator it2 = vec_tiles.end();
-
-    for(; it1 != it2; ++it1) if(*it1 && obj == (*it1)->GetObject())
+    if(Maps::isValidAbsIndex(center) &&
+	GetObjectPositions(center, obj, resv, check_hero))
     {
-	const u16 min2 = Maps::GetApproximateDistance(center, (*it1)->GetIndex());
-	if(min2 < min)
-	{
-	    min = min2;
-	    res = (*it1)->GetIndex();
-	}
+	std::sort(resv.begin(), resv.end(), IndexDistance::Shortest);
+	return resv.front().first;
     }
 
-    return res;
+    return -1;
 }
 
 void  World::GetEventDay(const Color::color_t c, std::vector<GameEvent::Day *> & v) const
@@ -1781,7 +1773,7 @@ void World::ActionToEyeMagi(const Color::color_t color) const
 {
     std::vector<s32> vec_eyes;
     vec_eyes.reserve(10);
-    GetObjectIndexes(vec_eyes, MP2::OBJ_EYEMAGI, true);
+    GetObjectPositions(MP2::OBJ_EYEMAGI, vec_eyes, true);
 
     if(vec_eyes.size())
     {
@@ -1802,19 +1794,43 @@ GameEvent::Riddle* World::GetSphinx(const s32 index) const
     return NULL;
 }
 
-void World::GetObjectIndexes(std::vector<s32> & v, MP2::object_t obj, bool check_hero) const
+bool World::GetObjectPositions(s32 center, MP2::object_t obj, std::vector<IndexDistance> & v, bool check_hero) const
 {
+    if(v.size()) v.clear();
+
     std::vector<Maps::Tiles *>::const_iterator it1 = vec_tiles.begin();
     std::vector<Maps::Tiles *>::const_iterator it2 = vec_tiles.end();
 
-    for(; it1 != it2; ++it1)
-	if(*it1 && obj == (*it1)->GetObject()) v.push_back((*it1)->GetIndex());
-	else
-	if(check_hero && *it1 && MP2::OBJ_HEROES == (*it1)->GetObject())
-	{
-	    const Heroes* hero = GetHeroes((*it1)->GetIndex());
-	    if(hero && obj == hero->GetUnderObject()) v.push_back((*it1)->GetIndex());
-	}
+    for(; it1 != it2; ++it1) if(*it1)
+    {
+	MP2::object_t obj2 = check_hero && MP2::OBJ_HEROES == (*it1)->GetObject() && GetHeroes((*it1)->GetIndex()) ?
+		GetHeroes((*it1)->GetIndex())->GetUnderObject() : (*it1)->GetObject();
+
+	if(obj == obj2)
+		v.push_back(IndexDistance((*it1)->GetIndex(),
+			Maps::GetApproximateDistance(center, (*it1)->GetIndex())));
+    }
+
+    return v.size();
+}
+
+bool World::GetObjectPositions(MP2::object_t obj, std::vector<s32> & v, bool check_hero) const
+{
+    if(v.size()) v.clear();
+
+    std::vector<Maps::Tiles *>::const_iterator it1 = vec_tiles.begin();
+    std::vector<Maps::Tiles *>::const_iterator it2 = vec_tiles.end();
+
+    for(; it1 != it2; ++it1) if(*it1)
+    {
+	MP2::object_t obj2 = check_hero && MP2::OBJ_HEROES == (*it1)->GetObject() && GetHeroes((*it1)->GetIndex()) ?
+		GetHeroes((*it1)->GetIndex())->GetUnderObject() : (*it1)->GetObject();
+
+	if(obj == obj2)
+		v.push_back((*it1)->GetIndex());
+    }
+
+    return v.size();
 }
 
 void World::UpdateRecruits(Recruits & recruits) const

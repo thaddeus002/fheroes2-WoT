@@ -256,7 +256,6 @@ bool ActionSpellSummonBoat(Heroes & hero)
 	default: chance = 30; break;
     }
 
-
     const s32 center = hero.GetIndex();
 
     // find water
@@ -270,6 +269,8 @@ bool ActionSpellSummonBoat(Heroes & hero)
 
     // find boat
     const s32 src = world.GetNearestObject(center, MP2::OBJ_BOAT);
+    if(src < 0)
+	DEBUG(DBG_GAME, DBG_WARN, "ActionSpellSummonBoat: " << "free boat not found");
 
     if(Rand::Get(1, 100) <= chance &&
 	Maps::isValidAbsIndex(src) && Maps::isValidAbsIndex(dst_water))

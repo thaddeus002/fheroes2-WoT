@@ -929,7 +929,6 @@ bool MP2::isNeedStayFront(const u8 obj)
         case MP2::OBJ_SHIPWRECKSURVIROR:
         case MP2::OBJ_FLOTSAM:
         case MP2::OBJ_BOTTLE:
-        case MP2::OBJ_COAST:
         case MP2::OBJ_TREASURECHEST:
         case MP2::OBJ_ANCIENTLAMP:
         case MP2::OBJ_CAMPFIRE:

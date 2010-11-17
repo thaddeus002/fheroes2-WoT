@@ -548,9 +548,9 @@ bool Castle::AllowBuyHero(const Heroes & hero)
     return !GetHeroes() && world.GetKingdom(color).AllowRecruitHero(true, hero.GetLevel());
 }
 
-bool Castle::RecruitHero(Heroes* hero)
+Heroes* Castle::RecruitHero(Heroes* hero)
 {
-    if(!hero || !AllowBuyHero(*hero) || !hero->Recruit(*this)) return false;
+    if(!hero || !AllowBuyHero(*hero) || !hero->Recruit(*this)) return NULL;
 
     world.GetKingdom(color).OddFundsResource(PaymentConditions::RecruitHero(hero->GetLevel()));
     castle_heroes = hero;
@@ -563,7 +563,7 @@ bool Castle::RecruitHero(Heroes* hero)
 #ifdef WITH_NET
     FH2LocalClient::SendCastleRecruitHero(*this, *castle_heroes);
 #endif
-    return true;
+    return hero;
 }
 
 /* recruit monster from building to castle army */

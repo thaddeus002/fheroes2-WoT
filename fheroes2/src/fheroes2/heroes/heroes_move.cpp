@@ -204,6 +204,11 @@ bool isNeedStayFrontObject(const Heroes & hero, const Maps::Tiles & next)
 		hero.GetColor() != castle->GetColor() &&
 		    !Settings::Get().IsUnions(hero.GetColor(), castle->GetColor()));
     }
+    else
+    // to coast action
+    if(hero.isShipMaster() &&
+	next.GetObject() == MP2::OBJ_COAST)
+	return true;
 
     return MP2::isNeedStayFront(next.GetObject());
 }
