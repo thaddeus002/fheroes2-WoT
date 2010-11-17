@@ -346,7 +346,7 @@ bool ActionSpellTownGate(Heroes & hero)
     for(it = castles.begin(); it != castles.end(); ++it) if(*it && !(*it)->GetHeroes())
     {
 	const u16 min2 = Maps::GetApproximateDistance(center, (*it)->GetIndex());
-	if(min2 < min)
+	if(0 > min || min2 < min)
 	{
 	    min = min2;
 	    castle = *it;
