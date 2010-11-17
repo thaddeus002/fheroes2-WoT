@@ -39,17 +39,17 @@ Route::Path::Path(const Heroes & h)
 
 Direction::vector_t Route::Path::GetFrontDirection(void) const
 {
-    return size() ? front().Direction() : Direction::CENTER;
+    return empty() ? Direction::CENTER : front().Direction();
 }
 
 u16 Route::Path::GetFrontPenalty(void) const
 {
-    return size() ? front().Penalty() : 0;
+    return empty() ? 0 : front().Penalty();
 }
 
 void Route::Path::PopFront(void)
 {
-    if(size()) pop_front();
+    if(!empty()) pop_front();
 }
 
 /* return length path */
@@ -66,13 +66,12 @@ s32 Route::Path::Calculate(const s32 dst_index, const u16 limit)
 
 void Route::Path::Reset(void)
 {
-    if(empty()) return;
-
     dst = hero.GetIndex();
-
-    clear();
-
-    hide = true;
+    if(!empty())
+    {
+	clear();
+	hide = true;
+    }
 }
 
 u16 Route::Path::GetIndexSprite(const Direction::vector_t & from, const Direction::vector_t & to, u8 mod)

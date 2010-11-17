@@ -834,6 +834,9 @@ void ActionToBoat(Heroes &hero, const u8 obj, const s32 dst_index)
     tiles_to.SetObject(MP2::OBJ_HEROES);
     hero.SaveUnderObject(MP2::OBJ_ZERO);
 
+    hero.GetPath().Reset();
+    hero.ActionNewPosition();
+
     DEBUG(DBG_GAME , DBG_INFO, "ActionToBoat: " << hero.GetName());
 }
 
@@ -856,6 +859,7 @@ void ActionToCoast(Heroes &hero, const u8 obj, const s32 dst_index)
     hero.GetPath().Hide();
     hero.FadeIn();
 
+    hero.GetPath().Reset();
     hero.ActionNewPosition();
 
     DEBUG(DBG_GAME , DBG_INFO, "ActionToCoast: " << hero.GetName());
@@ -2061,6 +2065,7 @@ void ActionToTeleports(Heroes &hero, const s32 index_from)
     hero.GetPath().Hide();
     hero.FadeIn();
 
+    hero.GetPath().Reset();
     hero.ActionNewPosition();
 
     DEBUG(DBG_GAME , DBG_INFO, "ActionToStoneLights: " << hero.GetName());
@@ -2107,6 +2112,9 @@ void ActionToWhirlpools(Heroes &hero, const u8 obj, const s32 index_from)
 	Dialog::Message(_("A whirlpool engulfs your ship."), _("Some of your army has fallen overboard."), Font::BIG, Dialog::OK);
 	troops.SetCount(Monster::GetCountFromHitPoints(troops(), troops.GetHitPoints() - troops.GetHitPoints() * Game::GetWhirlpoolPercent() / 100));
     }
+
+    hero.GetPath().Reset();
+    hero.ActionNewPosition();
 
     DEBUG(DBG_GAME , DBG_INFO, "ActionToWhirlpools: " << hero.GetName());
 }

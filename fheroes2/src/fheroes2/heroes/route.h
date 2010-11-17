@@ -57,7 +57,7 @@ namespace Route
 	    void	PopFront(void);
 	    void	ScanObstacleAndReduce(void);
 
-	    bool	isValid(void) const { return size(); }
+	    bool	isValid(void) const { return !(dst < 0 || empty()); }
 	    bool	isShow(void) const { return !hide; }
 	    u16		isUnderProtection(s32 & pos) const;
 	    bool	hasObstacle(s32* res = NULL) const;

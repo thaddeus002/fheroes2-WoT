@@ -807,6 +807,8 @@ bool Maps::Tiles::isPassable(const Heroes *hero, bool skipfog) const
 
     if(hero)
     {
+	if(hero->GetIndex() == maps_index) return true;
+
 	if(hero->isShipMaster())
 	{
     	    if(Ground::WATER != Maps::Tiles::GetGround()) return false;
