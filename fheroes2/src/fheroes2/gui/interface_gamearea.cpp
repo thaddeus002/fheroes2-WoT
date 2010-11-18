@@ -119,15 +119,15 @@ void Interface::GameArea::SetAreaPosition(s16 x, s16 y, u16 w, u16 h)
 
     rectMaps.x = 0;
     rectMaps.y = 0;
-    rectMaps.w = (areaPosition.w / TILEWIDTH) + 2;
-    rectMaps.h = (areaPosition.h / TILEWIDTH) + 2;
+    rectMaps.w = (areaPosition.w / TILEWIDTH) + (areaPosition.w % TILEWIDTH ? 3 : 2);
+    rectMaps.h = (areaPosition.h / TILEWIDTH) + (areaPosition.h % TILEWIDTH ? 3 : 2);
 
     scrollOffset.x = 0;
     scrollOffset.y = 0;
     scrollStep = Settings::Get().ScrollSpeed();
 
-    rectMapsPosition.x = areaPosition.x + scrollOffset.x;
-    rectMapsPosition.y = areaPosition.y + scrollOffset.y;
+    rectMapsPosition.x = areaPosition.x - scrollOffset.x;
+    rectMapsPosition.y = areaPosition.y - scrollOffset.y;
 
     if(Settings::Get().Editor())
     {
