@@ -268,6 +268,10 @@ u16 Route::Path::isUnderProtection(s32 & pos) const
 
 	const u16 res = Maps::TileUnderProtection(next);
 
+	if(res == dst &&
+	    MP2::isPickupObject(world.GetTiles(dst).GetObject()))
+	    return 0;
+
 	if(res)
 	{
 	    pos = next;

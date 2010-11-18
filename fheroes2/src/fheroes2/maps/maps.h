@@ -39,8 +39,8 @@ namespace Maps
         MEDIUM	= 72,
         LARGE	= 108,
         XLARGE	= 144,
-	XLARGE2 = 256,
-	XLARGE3	= 320
+	XLARGE2 = 252,
+	XLARGE3	= 324
     };
 
     const char* SizeString(u16);
