@@ -140,14 +140,15 @@ namespace Battle2
 	const char* GetPluralName(u32) const;
 	u8	GetControl(void) const;
 	u32	GetDamage(const Stats &) const;
-	u32	GetDamageMin(void) const;
-	u32	GetDamageMax(void) const;
 	u16	GetScoreQuality(const Stats &) const;
 	u32	GetHitPoints(void) const;
 	u8	GetShots(void) const;
 	u16	GetPosition(void) const;
 	u32	ApplyDamage(Stats &, u32);
 	u32	ApplyDamage(u32);
+	u32	GetDamageMin(const Stats &) const;
+	u32	GetDamageMax(const Stats &) const;
+	u32     CalculateDamageStats(const Stats &, double) const;
 	bool	ApplySpell(u8, const HeroBase* hero, TargetInfo &);
 	bool	AllowApplySpell(u8, const HeroBase* hero, std::string* msg = NULL) const;
 	void	PostAttackAction(Stats &);

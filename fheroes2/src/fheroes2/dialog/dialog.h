@@ -154,6 +154,7 @@ public:
 
     bool isValid(void) const;
 
+    void SetBorder(u8);
     void SetSize(u16, u16);
     void SetPosition(s16, s16, u16 = 0, u16 = 0);
     void Redraw(void);
@@ -165,6 +166,7 @@ public:
 private:
     Rect area;
     Rect top;
+    u8 border;
 };
 
 }

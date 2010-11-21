@@ -109,7 +109,6 @@ namespace Battle2
 	    const Sprite & sp1 = AGG::GetICN(ICN::DROPLISL, 10);
 	    const Sprite & sp2 = AGG::GetICN(ICN::DROPLISL, 12);
 	    const Sprite & sp3 = AGG::GetICN(ICN::DROPLISL, 11);
-	    const Rect & area = border.GetArea();
 	    const u16 ax = buttonPgUp.x;
 	    const u16 ah = buttonPgDn.y - (buttonPgUp.y + buttonPgUp.h);
 
@@ -132,6 +131,27 @@ namespace Battle2
 	Dialog::FrameBorder border;
 	std::vector<std::string> messages;
     };
+}
+
+bool CursorAttack(u16 theme)
+{
+    switch(theme)
+    {
+        case Cursor::WAR_ARROW:
+        case Cursor::WAR_BROKENARROW:
+        case Cursor::SWORD_TOPRIGHT:
+        case Cursor::SWORD_RIGHT:
+        case Cursor::SWORD_BOTTOMRIGHT:
+        case Cursor::SWORD_BOTTOMLEFT:
+        case Cursor::SWORD_LEFT:
+        case Cursor::SWORD_TOPLEFT:
+        case Cursor::SWORD_TOP:
+        case Cursor::SWORD_BOTTOM:
+	    return true;
+	default: break;
+    }
+
+    return false;
 }
 
 void DrawHexagon(Surface & sf, u8 index_color)
@@ -763,13 +783,18 @@ void Battle2::Interface::Redraw(void)
 
 void Battle2::Interface::RedrawInterface(void)
 {
+    const Settings & conf = Settings::Get();
+
     status.Redraw();
 
     btn_auto.Draw();
     btn_settings.Draw();
 
-    if(Settings::Get().ExtBattleSoftWait()) btn_wait.Draw();
+    if(conf.ExtBattleSoftWait()) btn_wait.Draw();
     btn_skip.Draw();
+
+    if(!conf.QVGA() && !conf.ExtLowMemory())
+	popup.Redraw(rectBoard.x + rectBoard.w + 60, rectBoard.y + rectBoard.h);
 
     if(openlog && listlog)
 	listlog->Redraw();
@@ -1332,6 +1357,7 @@ u16 Battle2::Interface::GetBattleCursor(const Point & mouse, std::string & statu
 		    status = _("Shot %{monster} (%{count} shot(s) left)");
 		    String::Replace(status, "%{monster}", b_enemy->GetName());
 		    String::Replace(status, "%{count}", b_current->GetShots());
+
 		    return b_enemy->GetObstaclesPenalty(*b_current) ? Cursor::WAR_BROKENARROW : Cursor::WAR_ARROW;
 		}
 		else
@@ -1349,6 +1375,7 @@ u16 Battle2::Interface::GetBattleCursor(const Point & mouse, std::string & statu
 			{
 			    status = _("Attack %{monster}");
 			    String::Replace(status, "%{monster}", b_enemy->GetName());
+
 			    return cursor;
 			}
 		    }
@@ -1461,6 +1488,8 @@ void Battle2::Interface::HumanTurn(const Stats & b, Actions & a)
 	listlog->AddMessage(msg);
     }
 
+    popup.Reset();
+
     // safe position coord
     CursorPosition cursorPosition;
 
@@ -1508,6 +1537,7 @@ void Battle2::Interface::HumanTurn(const Stats & b, Actions & a)
         }
     }
     
+    popup.Reset();
     b_current = NULL;
 }
 
@@ -1684,6 +1714,17 @@ void Battle2::Interface::HumanBattleTurn(const Stats & b, Actions & a, std::stri
 
 	if(cursor.Themes() != themes)
 	    cursor.SetThemes(themes);
+
+	if(CursorAttack(themes))
+	{
+	    s16 index = arena.board.GetIndexAbsPosition(le.GetMouseCursor());
+	    const Cell* cell = index < 0 ? NULL : &arena.board[index];
+	    const Stats* b_enemy = arena.GetTroopBoard(index);
+	    popup.SetInfo(cell, b_current, b_enemy);
+	}
+	else
+	    popup.Reset();
+
 
 	if(le.MouseClickLeft())
 	    MouseLeftClickBoardAction(themes, arena.board.GetIndexAbsPosition(le.GetMouseCursor()), a);
@@ -4018,5 +4059,100 @@ void Battle2::Interface::ProcessingHeroDialogResult(u8 res, Actions & a)
         break;
 
 	default: break;
+    }
+}
+
+Battle2::PopupDamageInfo::PopupDamageInfo() : attacker(NULL), defender(NULL), redraw(false)
+{
+    SetBorder(5);
+    SetSize(20, 20);
+}
+
+void Battle2::PopupDamageInfo::SetInfo(const Cell* c, const Stats* a, const Stats* b)
+{
+    if(Game::AnimateInfrequent(Game::BATTLE_POPUP_DELAY) &&
+      (!cell || (c && cell != c) ||
+	!attacker || (a && attacker != a) ||
+	!defender || (b && defender != b)))
+    {
+	redraw = true;
+	cell = c;
+	attacker = a;
+	defender = b;
+
+	const Rect & rt = cell->GetPos();
+	SetPosition(rt.x + rt.w, rt.y);
+    }
+}
+
+void Battle2::PopupDamageInfo::Reset(void)
+{
+    if(redraw)
+    {
+	Cursor::Get().Hide();
+	Restore();
+	redraw = false;
+	cell = NULL;
+	attacker = NULL;
+        defender = NULL;
+    }
+    Game::AnimateDelayReset(Game::BATTLE_POPUP_DELAY);
+}
+
+void Battle2::PopupDamageInfo::Redraw(u16 maxw, u16 maxh)
+{
+    if(redraw)
+    {
+	Cursor::Get().Hide();
+
+	Text text1, text2;
+	std::string str = _("Damage: %{min} - %{max}");
+
+	u32 dmg1 = attacker->GetDamageMin(*defender);
+	u32 dmg2 = attacker->GetDamageMax(*defender);
+
+	u32 kil1 = defender->HowMuchWillKilled(dmg1);
+	u32 kil2 = defender->HowMuchWillKilled(dmg2);
+
+	if(kil1 > defender->GetCount()) kil1 = defender->GetCount();
+	if(kil2 > defender->GetCount()) kil2 = defender->GetCount();
+
+	String::Replace(str, "%{min}", dmg1);
+	String::Replace(str, "%{max}", dmg2);
+
+	text1.Set(str, Font::SMALL);
+
+	str = kil1 == kil2 ? _("Perished: %{max}") : _("Perished: %{min} - %{max}");
+	String::Replace(str, "%{min}", kil1);
+	String::Replace(str, "%{max}", kil2);
+
+	text2.Set(str, Font::SMALL);
+
+	u16 tw = 5 + (text1.w() > text2.w() ? text1.w() : text2.w());
+	u16 th = (text1.h() + text2.h());
+
+	const Rect & area = GetArea();
+	const Rect & rect = GetRect();
+	const Rect & pos = cell->GetPos();
+
+	if(area.w != tw || area.h != th)
+	    SetSize(tw, th);
+
+	u16 tx = rect.x;
+	u16 ty = rect.y;
+
+	if(rect.x + rect.w > maxw)
+	{
+	    tx = maxw - rect.w - 5;
+	    ty = pos.y - pos.h;
+	}
+
+	if(rect.x != tx || rect.y != ty)
+	    SetPosition(tx, ty);
+
+	Dialog::FrameBorder::Redraw(AGG::GetICN(ICN::CELLWIN, 1));
+
+	text1.Blit(area.x, area.y);
+	text2.Blit(area.x, area.y + area.h/2);
     }
 }

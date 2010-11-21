@@ -25,14 +25,23 @@
 #include "cursor.h"
 #include "dialog.h"
 
-#define  LIMITWIDTH BORDERWIDTH * 4
 #define  ANGLEWIDTH 44
 
 void DrawBorder1(s16, s16, u16, u16, Surface &);
 void DrawBorder2(s16, s16, u16, u16, const Surface &, Surface &);
 
-Dialog::FrameBorder::FrameBorder()
+Dialog::FrameBorder::FrameBorder() : border(BORDERWIDTH)
 {
+}
+
+void Dialog::FrameBorder::SetBorder(u8 b)
+{
+    border = b;
+
+    area.x = Rect::x + b;
+    area.y = Rect::y + b;
+    area.w = Rect::w > 2 * b ? Rect::w - 2 * b : 0;
+    area.h = Rect::h > 2 * b ? Rect::h - 2 * b : 0;
 }
 
 bool Dialog::FrameBorder::isValid(void) const
@@ -43,11 +52,12 @@ bool Dialog::FrameBorder::isValid(void) const
 void Dialog::FrameBorder::SetSize(u16 encw, u16 ench)
 {
     Display & display = Display::Get();
-    if(display.w() < encw || display.h() < ench || encw < LIMITWIDTH || ench < LIMITWIDTH)
+
+    if(display.w() < encw || display.h() < ench || encw < (border * 4) || ench < (border * 4))
     DEBUG(DBG_GAME , DBG_WARN, "Dialog::FrameBorder: size out of range");
 
-    Rect::w = encw + 2 * BORDERWIDTH;
-    Rect::h = ench + 2 * BORDERWIDTH;
+    Rect::w = encw + 2 * border;
+    Rect::h = ench + 2 * border;
     area.w = encw;
     area.h = ench;
 }
@@ -58,16 +68,16 @@ void Dialog::FrameBorder::SetPosition(s16 posx, s16 posy, u16 encw, u16 ench)
 
     if(encw && ench)
     {
-    	Background::Save(posx, posy, encw + 2 * BORDERWIDTH, ench + 2 * BORDERWIDTH);
+    	Background::Save(posx, posy, encw + 2 * border, ench + 2 * border);
 	area.w = encw;
 	area.h = ench;
     }
     else
     	Background::Save(posx, posy);
 
-    area.x = posx + BORDERWIDTH;
-    area.y = posy + BORDERWIDTH;
-    top = Rect(posx, posy, area.w, BORDERWIDTH);
+    area.x = posx + border;
+    area.y = posy + border;
+    top = Rect(posx, posy, area.w, border);
 }
 
 const Rect & Dialog::FrameBorder::GetTop(void) const

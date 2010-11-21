@@ -678,28 +678,18 @@ u8 Battle2::Stats::GetSpeed(bool skip_standing_check) const
     return speed;
 }
 
-u32 Battle2::Stats::GetDamageMin(void) const
+u32 Battle2::Stats::GetDamageMin(const Stats & enemy) const
 {
-    return GetMonster().GetDamageMin() * count;
+    return CalculateDamageStats(enemy, GetMonster().GetDamageMin() * count);
 }
 
-u32 Battle2::Stats::GetDamageMax(void) const
+u32 Battle2::Stats::GetDamageMax(const Stats & enemy) const
 {
-    return GetMonster().GetDamageMax() * count;
+    return CalculateDamageStats(enemy, GetMonster().GetDamageMax() * count);
 }
 
-u32 Battle2::Stats::GetDamage(const Stats & enemy) const
+u32 Battle2::Stats::CalculateDamageStats(const Stats & enemy, double dmg) const
 {
-    double dmg = 0;
-
-    if(Modes(SP_BLESS))
-	dmg = GetDamageMax();
-    else
-    if(Modes(SP_CURSE))
-    	dmg = GetDamageMin();
-    else
-    	dmg = Rand::Get(GetDamageMin(), GetDamageMax());
-
     if(troop.isArchers())
     {
     	if(isHandFighting())
@@ -751,6 +741,21 @@ u32 Battle2::Stats::GetDamage(const Stats & enemy) const
 
 	default: break;
     }
+
+    return dmg;
+}
+
+u32 Battle2::Stats::GetDamage(const Stats & enemy) const
+{
+    double dmg = 0;
+
+    if(Modes(SP_BLESS))
+	dmg = GetDamageMax(enemy);
+    else
+    if(Modes(SP_CURSE))
+    	dmg = GetDamageMin(enemy);
+    else
+    	dmg = Rand::Get(GetDamageMin(enemy), GetDamageMax(enemy));
 
     // approximate.. from faq
     int r = GetAttack() - enemy.GetDefense();

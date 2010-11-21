@@ -25,11 +25,11 @@
 
 #include <string>
 #include "icn.h"
-#include "dialog.h"
 #include "button.h"
 #include "text.h"
 #include "statusbar.h"
 #include "gamedefs.h"
+#include "dialog.h"
 
 namespace Battle2
 {
@@ -41,6 +41,7 @@ namespace Battle2
     struct TargetInfo;
     struct Result;
     class StatusListBox;
+    class Cell;
 
     void DialogBattleSettings(void);
     bool DialogBattleSurrender(const HeroBase &, u32);
@@ -89,6 +90,22 @@ namespace Battle2
         const Sprite & back2;
         std::string message;
 	StatusListBox* listlog;
+    };
+
+    class PopupDamageInfo : public Dialog::FrameBorder
+    {
+    public:
+        PopupDamageInfo();
+
+        void SetInfo(const Cell*, const Stats*, const Stats*);
+        void Reset(void);
+        void Redraw(u16, u16);
+
+    protected:
+        const Cell*  cell;
+        const Stats* attacker;
+        const Stats* defender;
+        bool   redraw;
     };
 
     class Interface
@@ -182,6 +199,8 @@ namespace Battle2
 	u8 GetAllowSwordDirection(u16);
 
     protected:
+	void CreateDamageInfoPopup(s16, s16, const Stats &, const Stats &);
+
 	Arena & arena;
 	Dialog::FrameBorder border;
 	Surface sf_hexagon;
@@ -219,6 +238,8 @@ namespace Battle2
 	bool openlog;
 	StatusListBox* listlog;
 	u16 turn;
+
+	PopupDamageInfo popup;
     };
 }
 
