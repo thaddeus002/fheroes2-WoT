@@ -28,7 +28,8 @@
 #define  LIMITWIDTH BORDERWIDTH * 4
 #define  ANGLEWIDTH 44
 
-void DrawBorder(s16, s16, u16, u16, Surface &);
+void DrawBorder1(s16, s16, u16, u16, Surface &);
+void DrawBorder2(s16, s16, u16, u16, const Surface &, Surface &);
 
 Dialog::FrameBorder::FrameBorder()
 {
@@ -86,7 +87,12 @@ const Rect & Dialog::FrameBorder::GetArea(void) const
 
 void Dialog::FrameBorder::Redraw(void)
 {
-    DrawBorder(GetRect().x, GetRect().y, GetRect().w, GetRect().h, Display::Get());
+    DrawBorder1(GetRect().x, GetRect().y, GetRect().w, GetRect().h, Display::Get());
+}
+
+void Dialog::FrameBorder::Redraw(const Surface & sf)
+{
+    DrawBorder2(GetRect().x, GetRect().y, GetRect().w, GetRect().h, sf, Display::Get());
 }
 
 Dialog::FrameBorder::~FrameBorder()
@@ -95,7 +101,7 @@ Dialog::FrameBorder::~FrameBorder()
     Background::Restore();
 }
 
-void DrawBorder(s16 posx, s16 posy, u16 posw, u16 posh, Surface & sf)
+void DrawBorder1(s16 posx, s16 posy, u16 posw, u16 posh, Surface & sf)
 {
     const Sprite & surdbkg = (Settings::Get().EvilInterface() ? AGG::GetICN(ICN::SURDRBKE, 0) : AGG::GetICN(ICN::SURDRBKG, 0));
     Rect  src_rt;
@@ -176,4 +182,77 @@ void DrawBorder(s16 posx, s16 posy, u16 posw, u16 posh, Surface & sf)
     src_rt = Rect(surdbkg.w() - BORDERWIDTH, surdbkg.h() - SHADOWWIDTH - ANGLEWIDTH, BORDERWIDTH, ANGLEWIDTH);
     dst_pt = Point(posx + posw - src_rt.w, posy + posh - src_rt.h);
     sf.Blit(surdbkg, src_rt, dst_pt);
+}
+
+void DrawBorder2(s16 posx, s16 posy, u16 posw, u16 posh, const Surface & bk, Surface & sf)
+{
+    Rect  src_rt;
+    Point dst_pt;
+
+    u16 cw = bk.w() / 3;
+    u16 ch = bk.h() / 3;
+
+    u16 bw = bk.w() - (cw * 2);
+    u16 bh = bk.h() - (ch * 2);
+
+    if(posw < cw)
+    {
+	cw = posw / 2 - 4;
+	bw = 2;
+    }
+
+    if(posh < ch)
+    {
+	ch = posh / 2 - 4;
+	bh = 4;
+    }
+
+    const u16 ox = (posw - (posw / bw) * bw) / 2;
+    const u16 oy = (posh - (posh / bh) * bh) / 2;
+
+    // body
+    if(bw < posw && bh < posh)
+    {
+	for(u16 yy = 0; yy < (posh / bh); ++yy)
+	{
+	    for(u16 xx = 0; xx < (posw / bw); ++xx)
+	    {
+		sf.Blit(bk, Rect(cw, ch, bw, bh), posx + ox + xx * bw, posy + oy + yy * bh);
+	    }
+	}
+    }
+
+    // top, bottom bar
+    for(u16 xx = 0; xx < (posw / bw); ++xx)
+    {
+	sf.Blit(bk, Rect(cw, 0, bw, ch), posx + ox + xx * bw, posy);
+	sf.Blit(bk, Rect(cw, bk.h() - ch, bw, ch), posx + ox + xx * bw, posy + posh - ch);
+    }
+
+    // left, right bar
+    for(u16 yy = 0; yy < (posh / bh); ++yy)
+    {
+	sf.Blit(bk, Rect(0, ch, bw, ch), posx, posy + oy + yy * bh);
+	sf.Blit(bk, Rect(bk.w() - cw, ch, bw, ch), posx + posw - cw, posy + oy + yy * bh);
+    }
+
+    // top left angle
+    src_rt = Rect(0, 0, cw, ch);
+    dst_pt = Point(posx, posy);
+    sf.Blit(bk, src_rt, dst_pt);
+
+    // top right angle
+    src_rt = Rect(bk.w() - cw, 0, cw,ch);
+    dst_pt = Point(posx + posw - src_rt.w, posy);
+    sf.Blit(bk, src_rt, dst_pt);
+
+    // bottom left angle
+    src_rt = Rect(0, bk.h() - ch, cw, ch);
+    dst_pt = Point(posx, posy + posh - src_rt.h);
+    sf.Blit(bk, src_rt, dst_pt);
+
+    // bottom right angle
+    src_rt = Rect(bk.w() - cw, bk.h() - ch, cw, ch);
+    dst_pt = Point(posx + posw - src_rt.w, posy + posh - src_rt.h);
+    sf.Blit(bk, src_rt, dst_pt);
 }

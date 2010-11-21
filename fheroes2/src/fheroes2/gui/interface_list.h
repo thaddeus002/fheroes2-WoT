@@ -42,7 +42,7 @@ namespace Interface
 	typedef typename std::vector<Item>::iterator ItemsIterator;
 
 	ListBox(const Point & pt) : ptRedraw(pt), maxItems(0), useHotkeys(true), content(NULL) {}
-	ListBox() : maxItems(0), content(NULL) {}
+	ListBox() : maxItems(0), useHotkeys(true), content(NULL) {}
 	virtual ~ListBox(){}
 
 	virtual void RedrawItem(const Item &, s16 ox, s16 oy, bool current) = 0;
