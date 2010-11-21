@@ -624,7 +624,7 @@ void Battle2::GraveyardTroop::RemoveTroopID(u16 id)
 
 Battle2::Arena::Arena(Army::army_t & a1, Army::army_t & a2, s32 index, bool local) :
 	army1(a1), army2(a2), castle(NULL), current_commander(NULL), catapult(NULL), bridge(NULL), interface(NULL), result_game(NULL), graveyard(*this),
-	icn_covr(ICN::UNKNOWN)
+	icn_covr(ICN::UNKNOWN), current_turn(0)
 {
     const Settings & conf = Settings::Get();
     usage_spells.reserve(10);
@@ -762,6 +762,7 @@ void Battle2::Arena::Turns(u16 turn, Result & result)
     DEBUG(DBG_BATTLE , DBG_TRACE, "Battle2::Arena::Turns: " << turn);
 
     result_game = &result;
+    current_turn = turn;
 
     army1.BattleNewTurn();
     army2.BattleNewTurn();

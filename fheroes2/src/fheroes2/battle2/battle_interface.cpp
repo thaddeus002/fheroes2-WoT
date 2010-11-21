@@ -37,6 +37,7 @@
 #include "battle_tower.h"
 #include "battle_bridge.h"
 #include "battle_catapult.h"
+#include "interface_list.h"
 #include "battle_interface.h"
 
 namespace Battle2
@@ -56,6 +57,80 @@ namespace Battle2
 
 	Point coord;
 	s16 index;
+    };
+
+    class StatusListBox : public ::Interface::ListBox<std::string>
+    {
+    public:
+	StatusListBox() {};
+
+	void SetPosition(u16 px, u16 py)
+	{
+	    const u8 mx = 6;
+	    const u16 sw = 640;
+	    const u16 sh = mx * 20;
+	    border.SetPosition(px, py - sh - 2, sw - 30, sh - 30);
+	    const Rect & area = border.GetArea();
+	    const u16 ax = area.x + area.w - 20;
+
+	    SetTopLeft(area);
+	    SetAreaMaxItems(mx);
+
+	    SetScrollButtonUp(ICN::DROPLISL, 6, 7, Point(ax, area.y));
+	    SetScrollButtonDn(ICN::DROPLISL, 8, 9, Point(ax, area.y + area.h - 20));
+	    SetScrollSplitter(AGG::GetICN(ICN::DROPLISL, 13),
+		Rect(ax + 5, buttonPgUp.y + buttonPgUp.h + 3, 12, buttonPgDn.y - (buttonPgUp.y + buttonPgUp.h) - 6));
+	    splitter.Hide();
+	    SetAreaItems(Rect(area.x, area.y, area.w - 10, area.h));
+	    SetListContent(messages);
+	};
+
+	const Rect & GetArea(void) const
+	{
+	    return border.GetRect();
+	};
+
+	void AddMessage(const std::string & str)
+	{
+	    messages.push_back(str);
+	    SetListContent(messages);
+	};
+
+	void RedrawItem(const std::string & str, s16 px, s16 py, bool f)
+	{
+	    Text text(str, Font::BIG);
+	    text.Blit(px, py);
+	};
+
+	void RedrawBackground(const Point & pt)
+	{
+	    Display & display = Display::Get();
+
+	    const Sprite & sp1 = AGG::GetICN(ICN::DROPLISL, 10);
+	    const Sprite & sp2 = AGG::GetICN(ICN::DROPLISL, 12);
+	    const Sprite & sp3 = AGG::GetICN(ICN::DROPLISL, 11);
+	    const Rect & area = border.GetArea();
+	    const u16 ax = buttonPgUp.x;
+	    const u16 ah = buttonPgDn.y - (buttonPgUp.y + buttonPgUp.h);
+
+	    border.Redraw(AGG::GetICN(ICN::TEXTBAK2, 0));
+
+	    for(u16 ii = 0; ii < (ah / sp3.h()); ++ii)
+    		display.Blit(sp3, ax, buttonPgUp.y + buttonPgUp.h + (sp3.h() * ii));
+
+	    display.Blit(sp1, ax, buttonPgUp.y + buttonPgUp.h);
+	    display.Blit(sp2, ax, buttonPgDn.y - sp2.h());
+	};
+
+	void ActionCurrentUp(void){};
+	void ActionCurrentDn(void){};
+	void ActionListDoubleClick(std::string &) {};
+	void ActionListSingleClick(std::string &) {};
+	void ActionListPressRight(std::string &) {};
+
+    private:
+	Dialog::FrameBorder border;
+	std::vector<std::string> messages;
     };
 }
 
@@ -522,23 +597,29 @@ void Battle2::OpponentSprite::Redraw(void) const
     Display::Get().Blit(AGG::GetICN(icn, animframe, reflect), pos.x, pos.y);
 }
 
-Battle2::Status::Status() : back1(AGG::GetICN(ICN::TEXTBAR, 8)), back2(AGG::GetICN(ICN::TEXTBAR, 9))
+Battle2::Status::Status() : back1(AGG::GetICN(ICN::TEXTBAR, 8)), back2(AGG::GetICN(ICN::TEXTBAR, 9)), listlog(NULL)
 {
+    Rect::w = back1.w();
+    Rect::h = back1.h() + back2.h();
+
     bar1.Set(Settings::Get().QVGA() ? Font::SMALL : Font::BIG);
     bar2.Set(Settings::Get().QVGA() ? Font::SMALL : Font::BIG);
 }
 
 void Battle2::Status::SetPosition(s16 cx, s16 cy)
 {
-    pos.x = cx;
-    pos.y = cy;
+    Rect::x = cx;
+    Rect::y = cy;
 }
 
 void Battle2::Status::SetMessage(const std::string & str, bool top)
 {
 
     if(top)
+    {
 	bar1.Set(str);
+	if(listlog) listlog->AddMessage(str);
+    }
     else
     if(str != message)
     {
@@ -551,11 +632,11 @@ void Battle2::Status::Redraw(void)
 {
     Display & display = Display::Get();
 
-    display.Blit(back1, pos.x, pos.y);
-    display.Blit(back2, pos.x, pos.y + back1.h());
+    display.Blit(back1, x, y);
+    display.Blit(back2, x, y + back1.h());
 
-    if(bar1.Size()) bar1.Blit(pos.x + (back1.w() - bar1.w()) / 2, pos.y + (Settings::Get().QVGA() ? -1 : 3));
-    if(bar2.Size()) bar2.Blit(pos.x + (back2.w() - bar2.w()) / 2, pos.y + back1.h() + (Settings::Get().QVGA() ? -3 : 0));
+    if(bar1.Size()) bar1.Blit(x + (back1.w() - bar1.w()) / 2, y + (Settings::Get().QVGA() ? -1 : 3));
+    if(bar2.Size()) bar2.Blit(x + (back2.w() - bar2.w()) / 2, y + back1.h() + (Settings::Get().QVGA() ? -3 : 0));
 }
 
 const std::string & Battle2::Status::GetMessage(void) const
@@ -565,7 +646,8 @@ const std::string & Battle2::Status::GetMessage(void) const
 
 Battle2::Interface::Interface(Arena & a, s32 center) : arena(a), icn_cbkg(ICN::UNKNOWN), icn_frng(ICN::UNKNOWN), humanturn_spell(Spell::NONE),
     humanturn_exit(true), humanturn_redraw(true), animation_frame(0), catapult_frame(0),
-    b_current(NULL), b_move(NULL), b_fly(NULL), b_current_sprite(NULL), teleport_src(MAXU16)
+    b_current(NULL), b_move(NULL), b_fly(NULL), b_current_sprite(NULL), teleport_src(MAXU16),
+    openlog(false), listlog(NULL), turn(0)
 {
     const Settings & conf = Settings::Get();
     bool pda = conf.QVGA();
@@ -609,13 +691,32 @@ Battle2::Interface::Interface(Arena & a, s32 center) : arena(a), icn_cbkg(ICN::U
 
     btn_auto.SetSprite(ICN::TEXTBAR, 4, 5);
     btn_settings.SetSprite(ICN::TEXTBAR, 6, 7);
-    btn_skip.SetSprite(ICN::TEXTBAR, 0, 1);
 
     btn_auto.SetPos(area.x, area.y + area.h - btn_settings.h - btn_auto.h);
     btn_settings.SetPos(area.x, area.y + area.h - btn_settings.h);
-    btn_skip.SetPos(area.x + area.w - btn_skip.w, area.y + area.h - btn_skip.h);
+
+    if(conf.ExtBattleSoftWait())
+    {
+	btn_wait.SetSprite(ICN::BATTLEWAIT, 0, 1);
+	btn_skip.SetSprite(ICN::BATTLESKIP, 0, 1);
+
+	btn_wait.SetPos(area.x + area.w - btn_wait.w, area.y + area.h - btn_skip.h - btn_wait.h);
+	btn_skip.SetPos(area.x + area.w - btn_skip.w, area.y + area.h - btn_skip.h);
+    }
+    else
+    {
+	btn_skip.SetSprite(ICN::TEXTBAR, 0, 1);
+	btn_skip.SetPos(area.x + area.w - btn_skip.w, area.y + area.h - btn_skip.h);
+    }
 
     status.SetPosition(area.x + btn_auto.w, btn_auto.y);
+
+    if(!conf.QVGA() && !conf.ExtLowMemory())
+	listlog = new StatusListBox();
+
+    if(listlog)
+	listlog->SetPosition(area.x, btn_auto.y);
+    status.SetLogs(listlog);
 
     // opponents
     opponent1 = arena.army1.GetCommander() ? new OpponentSprite(area, arena.army1.GetCommander(), false) : NULL;
@@ -624,6 +725,7 @@ Battle2::Interface::Interface(Arena & a, s32 center) : arena(a), icn_cbkg(ICN::U
 
 Battle2::Interface::~Interface()
 {
+    if(listlog) delete listlog;
     if(opponent1) delete opponent1;
     if(opponent2) delete opponent2;
     if(Settings::Get().AutoBattle()) Settings::Get().SetAutoBattle(false);
@@ -665,7 +767,12 @@ void Battle2::Interface::RedrawInterface(void)
 
     btn_auto.Draw();
     btn_settings.Draw();
+
+    if(Settings::Get().ExtBattleSoftWait()) btn_wait.Draw();
     btn_skip.Draw();
+
+    if(openlog && listlog)
+	listlog->Redraw();
 }
 
 void Battle2::Interface::RedrawArmies(void) const
@@ -1257,6 +1364,9 @@ u16 Battle2::Interface::GetBattleCursor(const Point & mouse, std::string & statu
 	}
     }
 
+    status = _("Turn %{turn}");
+    String::Replace(status, "%{turn}", arena.current_turn);
+
     return Cursor::WAR_NONE;
 }
 
@@ -1341,6 +1451,14 @@ void Battle2::Interface::HumanTurn(const Stats & b, Actions & a)
     	const Sprite & book = AGG::GetICN(ICN::ARTFX, 81);
 	const u16 ox = (arena.army1.GetColor() == arena.current_commander->GetColor() ? 0 : 320 - book.w());
 	pocket_book = Rect(area.x + ox, area.y + area.h - 19 - book.h(), book.w(), book.h());
+    }
+
+    if(listlog && turn != arena.current_turn)
+    {
+	turn = arena.current_turn;
+	std::string msg = _("Turn %{turn}");
+	String::Replace(msg, "%{turn}", turn);
+	listlog->AddMessage(msg);
     }
 
     // safe position coord
@@ -1486,6 +1604,14 @@ void Battle2::Interface::HumanBattleTurn(const Stats & b, Actions & a, std::stri
 	ButtonSettingsAction();
     }
     else
+    if(conf.ExtBattleSoftWait() &&
+	le.MouseCursor(btn_wait))
+    {
+	cursor.SetThemes(Cursor::WAR_POINTER);
+	msg = _("Wait this unit");
+	ButtonWaitAction(a);
+    }
+    else
     if(le.MouseCursor(btn_skip))
     {
 	cursor.SetThemes(Cursor::WAR_POINTER);
@@ -1545,6 +1671,13 @@ void Battle2::Interface::HumanBattleTurn(const Stats & b, Actions & a, std::stri
 	}
     }
     else
+    if(listlog && openlog &&
+	le.MouseCursor(listlog->GetArea()))
+    {
+	cursor.SetThemes(Cursor::WAR_POINTER);
+	listlog->QueueEventProcessing();
+    }
+    else
     if(le.MouseCursor(rectBoard))
     {
 	const u16 themes = GetBattleCursor(le.GetMouseCursor(), msg);
@@ -1557,6 +1690,18 @@ void Battle2::Interface::HumanBattleTurn(const Stats & b, Actions & a, std::stri
 	else
 	if(le.MousePressRight())
 	    MousePressRightBoardAction(themes, arena.board.GetIndexAbsPosition(le.GetMouseCursor()), a);
+    }
+    else
+    if(le.MouseCursor(status))
+    {
+	if(listlog)
+	{
+	    msg = (openlog ? _("Hide logs") : _("Show logs"));
+	    if(le.MouseClickLeft())
+		openlog = !openlog;
+	}
+	cursor.SetThemes(Cursor::WAR_POINTER);
+	humanturn_redraw = true;
     }
     else
     {
@@ -1588,6 +1733,15 @@ void Battle2::Interface::HumanCastSpellTurn(const Stats & b, Actions & a, std::s
 	    {
 		DEBUG(DBG_BATTLE, DBG_WARN, "Battle2::Interface::HumanCastSpellTurn: " << " dst out of range");
 		return;
+	    }
+
+	    if(listlog)
+	    {
+		std::string str = _("%{color} cast spell: %{spell}");
+		if(arena.current_commander)
+		String::Replace(str, "%{color}", Color::String(arena.current_commander->GetColor()));
+		String::Replace(str, "%{spell}", Spell::GetName(Spell::FromInt(humanturn_spell)));
+		listlog->AddMessage(str);
 	    }
 
 	    if(Cursor::SP_TELEPORT == cursor.Themes())
@@ -1713,8 +1867,20 @@ void Battle2::Interface::ButtonSettingsAction(void)
     }
 }
 
-void Battle2::Interface::ButtonSkipAction(Actions & a)
+void Battle2::Interface::ButtonWaitAction(Actions & a)
+{
+    LocalEvent & le = LocalEvent::Get();
 
+    le.MousePressLeft(btn_wait) ? btn_wait.PressDraw() : btn_wait.ReleaseDraw();
+
+    if(le.MouseClickLeft(btn_wait) && b_current)
+    {
+	a.AddedSkipAction(*b_current, false);
+	humanturn_exit = true;
+    }
+}
+
+void Battle2::Interface::ButtonSkipAction(Actions & a)
 {
     LocalEvent & le = LocalEvent::Get();
 

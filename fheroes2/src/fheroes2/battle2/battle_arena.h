@@ -229,6 +229,8 @@ namespace Battle2
 
 	Board board;
 	ICN::icn_t icn_covr;
+
+	u16 current_turn;
     };
 }
 

@@ -915,6 +915,8 @@ namespace ICN
 	{ TREASURE,	"MANUAL.ICN" },
 	{ YELLOW_FONT,	"MANUAL.ICN" },
 	{ YELLOW_SMALFONT,"MANUAL.ICN" },
+	{ BATTLESKIP,   "MANUAL.ICN" },
+	{ BATTLEWAIT,   "MANUAL.ICN" },
 
 	{ UNKNOWN,	"UNKNOWN.ICN" },
     };
@@ -1632,6 +1634,9 @@ ICN::icn_t ICN::PORTxxxx(u8 id)
 
 bool ICN::NeedMinify4PocketPC(icn_t icn, u16 index)
 {
+    if(Settings::Get().ExtBattleSoftWait() &&
+	icn == TEXTBAR && (index == 0 || index == 1)) return false;
+
     switch(icn)
     {
 	case TOWNWIND:
@@ -1776,6 +1781,9 @@ bool ICN::NeedMinify4PocketPC(icn_t icn, u16 index)
 	case COBJ0030:
 	case COBJ0031:
 
+	case BATTLESKIP:
+	case BATTLEWAIT:
+
 	    return true;
 
 	case TEXTBAR:
@@ -1878,6 +1886,8 @@ bool ICN::isModifiedSprite(const ICN::icn_t icn)
         case TELEPORT3:
         case FOUNTAIN:
         case TREASURE:
+	case BATTLESKIP:
+	case BATTLEWAIT:
 	    return true;
 
 	default: break;

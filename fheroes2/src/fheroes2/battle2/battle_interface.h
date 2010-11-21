@@ -40,6 +40,7 @@ namespace Battle2
     class Tower;
     struct TargetInfo;
     struct Result;
+    class StatusListBox;
 
     void DialogBattleSettings(void);
     bool DialogBattleSurrender(const HeroBase &, u32);
@@ -70,23 +71,24 @@ namespace Battle2
         Rect pos;
     };
 
-    struct Status
+    class Status : public Rect
     {
     public:
 	Status();
     
         void SetPosition(s16, s16);
+	void SetLogs(StatusListBox* logs) {listlog = logs; };
         void SetMessage(const std::string &, bool = false);
         void Redraw(void);
 	const std::string & GetMessage(void) const;
 
     protected:
-	Point pos;
 	Text bar1;
         Text bar2;
         const Sprite & back1;
         const Sprite & back2;
         std::string message;
+	StatusListBox* listlog;
     };
 
     class Interface
@@ -171,6 +173,7 @@ namespace Battle2
 	void ButtonAutoAction(const Stats &, Actions &);
 	void ButtonSettingsAction(void);
 	void ButtonSkipAction(Actions &);
+	void ButtonWaitAction(Actions &);
 	void MouseLeftClickBoardAction(u16, s16, Actions &);
 	void MousePressRightBoardAction(u16, s16, Actions &);
 
@@ -190,6 +193,7 @@ namespace Battle2
 	Button btn_auto;
 	Button btn_settings;
 	Button btn_skip;
+	Button btn_wait;
 	Status status;
 
 	OpponentSprite* opponent1;
@@ -211,6 +215,10 @@ namespace Battle2
 
 	u16 teleport_src;
 	Rect pocket_book;
+
+	bool openlog;
+	StatusListBox* listlog;
+	u16 turn;
     };
 }
 

@@ -302,6 +302,8 @@ void AGG::Cache::LoadExtICN(icn_cache_t & v, const ICN::icn_t icn, const u16 ind
 	case ICN::ROUTERED:  count = 145; break;
 	case ICN::YELLOW_FONT:
 	case ICN::YELLOW_SMALFONT: count = 96; break;
+	case ICN::BATTLESKIP:
+	case ICN::BATTLEWAIT:  count = 2; break;
 
 	default: break;
     }
@@ -313,6 +315,42 @@ void AGG::Cache::LoadExtICN(icn_cache_t & v, const ICN::icn_t icn, const u16 ind
 	v.count = count;
     }
 
+    // simple modify
+    switch(icn)
+    {
+	case ICN::BATTLESKIP:
+	if(index < count)
+	{
+	    Sprite & sprite = reflect ? v.reflect[index] : v.sprites[index];
+	    LoadOrgICN(sprite, ICN::TEXTBAR, 4 + index, false);
+	    // clean
+	    sprite.Blit(GetICN(ICN::SYSTEM, 11 + index), Rect(3, 8, 43, 14), 3, 1);
+	    // skip
+	    sprite.Blit(GetICN(ICN::TEXTBAR, index), Rect(3, 8, 43, 14), 3, 0);
+	}
+	break;
+
+	case ICN::BATTLEWAIT:
+	if(index < count)
+	{
+	    Sprite & sprite = reflect ? v.reflect[index] : v.sprites[index];
+	    LoadOrgICN(sprite, ICN::TEXTBAR, 4 + index, false);
+	    // clean
+	    sprite.Blit(GetICN(ICN::SYSTEM, 11 + index), Rect(3, 8, 43, 14), 3, 1);
+	    // wait
+	    Surface src, dst;
+	    src.Set(28, 28);
+	    src.Blit(GetICN(ICN::ADVBTNS, 8 + index), Rect(5, 4, 28, 28), 0, 0);
+	    Surface::ScaleMinifyByTwo(dst, src);
+	    sprite.Blit(dst, (sprite.w() - dst.w()) / 2, 2);
+	}
+	break;
+
+	default: break;
+    }
+
+
+    // change color
     for(u8 ii = 0; ii < count; ++ii)
     {
 	Sprite & sprite = reflect ? v.reflect[ii] : v.sprites[ii];
