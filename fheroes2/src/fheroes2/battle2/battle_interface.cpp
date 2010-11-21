@@ -4070,7 +4070,8 @@ Battle2::PopupDamageInfo::PopupDamageInfo() : attacker(NULL), defender(NULL), re
 
 void Battle2::PopupDamageInfo::SetInfo(const Cell* c, const Stats* a, const Stats* b)
 {
-    if(Game::AnimateInfrequent(Game::BATTLE_POPUP_DELAY) &&
+    if(Settings::Get().ExtBattleShowDamage() &&
+      Game::AnimateInfrequent(Game::BATTLE_POPUP_DELAY) &&
       (!cell || (c && cell != c) ||
 	!attacker || (a && attacker != a) ||
 	!defender || (b && defender != b)))
@@ -4106,25 +4107,28 @@ void Battle2::PopupDamageInfo::Redraw(u16 maxw, u16 maxh)
 	Cursor::Get().Hide();
 
 	Text text1, text2;
-	std::string str = _("Damage: %{min} - %{max}");
+	std::string str;
 
-	u32 dmg1 = attacker->GetDamageMin(*defender);
-	u32 dmg2 = attacker->GetDamageMax(*defender);
+	u32 tmp1 = attacker->GetDamageMin(*defender);
+	u32 tmp2 = attacker->GetDamageMax(*defender);
 
-	u32 kil1 = defender->HowMuchWillKilled(dmg1);
-	u32 kil2 = defender->HowMuchWillKilled(dmg2);
+	str = tmp1 == tmp2 ? _("Damage: %{max}") : _("Damage: %{min} - %{max}");
 
-	if(kil1 > defender->GetCount()) kil1 = defender->GetCount();
-	if(kil2 > defender->GetCount()) kil2 = defender->GetCount();
-
-	String::Replace(str, "%{min}", dmg1);
-	String::Replace(str, "%{max}", dmg2);
+	String::Replace(str, "%{min}", tmp1);
+	String::Replace(str, "%{max}", tmp2);
 
 	text1.Set(str, Font::SMALL);
 
-	str = kil1 == kil2 ? _("Perished: %{max}") : _("Perished: %{min} - %{max}");
-	String::Replace(str, "%{min}", kil1);
-	String::Replace(str, "%{max}", kil2);
+	tmp1 = defender->HowMuchWillKilled(tmp1);
+	tmp2 = defender->HowMuchWillKilled(tmp2);
+
+	if(tmp1 > defender->GetCount()) tmp1 = defender->GetCount();
+	if(tmp2 > defender->GetCount()) tmp2 = defender->GetCount();
+
+	str = tmp1 == tmp2 ? _("Perished: %{max}") : _("Perished: %{min} - %{max}");
+
+	String::Replace(str, "%{min}", tmp1);
+	String::Replace(str, "%{max}", tmp2);
 
 	text2.Set(str, Font::SMALL);
 
