@@ -700,10 +700,10 @@ Game::menu_t Game::HumanTurn(void)
 
 	// show event day
 	 ShowEventDay();
-
-	// check game over
-	gameResult.CheckGameOver(res);
     }
+
+    // check game over
+    gameResult.CheckGameOver(res);
 
     // warning lost all town
     if(myCastles.empty()) ShowWarningLostTowns(res);

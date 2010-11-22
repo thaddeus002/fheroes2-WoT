@@ -1036,6 +1036,15 @@ void Game::IO::UnpackTile(QueueMessage & msg, Maps::Tiles & tile, u16 check_vers
 	msg.Pop(addon.object);
 	msg.Pop(addon.index);
 	tile.addons_level1.push_back(addon);
+
+	// fix bug: #3113888 (empty treasure chest) - unknown case?
+	if(ICN::TREASURE == MP2::GetICNObject(addon.object) &&
+	    0 == addon.index &&
+	    MP2::OBJ_TREASURECHEST != tile.mp2_object)
+	{
+	    VERBOSE("Game::IO::UnpackTile: " << "fix bug: #3113888 (empty treasure chest)");
+	    tile.mp2_object = MP2::OBJ_TREASURECHEST;
+	}
     }
 
     // addons 2
