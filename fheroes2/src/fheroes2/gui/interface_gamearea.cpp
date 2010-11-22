@@ -119,12 +119,16 @@ void Interface::GameArea::SetAreaPosition(s16 x, s16 y, u16 w, u16 h)
 
     rectMaps.x = 0;
     rectMaps.y = 0;
-    rectMaps.w = (areaPosition.w / TILEWIDTH) + (areaPosition.w % TILEWIDTH ? 3 : 2);
-    rectMaps.h = (areaPosition.h / TILEWIDTH) + (areaPosition.h % TILEWIDTH ? 3 : 2);
+
+    rectMaps.w = (areaPosition.w / TILEWIDTH) + 2;
+    rectMaps.h = (areaPosition.h / TILEWIDTH) + 2;
 
     scrollOffset.x = 0;
     scrollOffset.y = 0;
     scrollStep = Settings::Get().ScrollSpeed();
+
+    tailX = areaPosition.w - TILEWIDTH * (areaPosition.w / TILEWIDTH);
+    tailY = areaPosition.h - TILEWIDTH * (areaPosition.h / TILEWIDTH);
 
     rectMapsPosition.x = areaPosition.x - scrollOffset.x;
     rectMapsPosition.y = areaPosition.y - scrollOffset.y;
@@ -285,12 +289,12 @@ void Interface::GameArea::Scroll(void)
     else
     if(scrollDirection & SCROLL_RIGHT)
     {
-	if(scrollOffset.x < SCROLL_MAX * 2)
+	if(scrollOffset.x < SCROLL_MAX * 2 - tailX)
 	    scrollOffset.x += scrollStep;
 	else
 	if(world.w() - rectMaps.w > rectMaps.x)
 	{
-	    scrollOffset.x = SCROLL_MAX + scrollStep;
+	    scrollOffset.x = SCROLL_MAX + scrollStep - tailX;
 	    ++rectMaps.x;
 	}
     }
@@ -309,12 +313,12 @@ void Interface::GameArea::Scroll(void)
     else
     if(scrollDirection & SCROLL_BOTTOM)
     {
-	if(scrollOffset.y < SCROLL_MAX * 2)
+	if(scrollOffset.y < SCROLL_MAX * 2 - tailY)
 	    scrollOffset.y += scrollStep;
 	else
 	if(world.h() - rectMaps.h > rectMaps.y)
 	{
-	    scrollOffset.y = SCROLL_MAX + scrollStep;
+	    scrollOffset.y = SCROLL_MAX + scrollStep - tailY;
 	    ++rectMaps.y;
 	}
     }
@@ -385,7 +389,9 @@ void Interface::GameArea::Center(s16 px, s16 py)
 	if(pos.x == 0) scrollOffset.x = 0;
 	else
 	if(pos.x == world.w() - rectMaps.w)
-	    scrollOffset.x = SCROLL_MAX * 2;
+	{
+	    scrollOffset.x = tailX ? SCROLL_MAX * 2 - tailX : SCROLL_MAX * 2;
+	}
 	else
 	{
  	    scrollOffset.x = rectMaps.w % 2 == 0 ?
@@ -395,7 +401,9 @@ void Interface::GameArea::Center(s16 px, s16 py)
 	if(pos.y == 0) scrollOffset.y = 0;
 	else
 	if(pos.y == world.h() - rectMaps.h)
-	    scrollOffset.y = SCROLL_MAX * 2;
+	{
+	    scrollOffset.y = tailY ? SCROLL_MAX * 2 - tailY : SCROLL_MAX * 2;
+	}
 	else
 	{
  	    scrollOffset.y = rectMaps.h % 2 == 0 ?

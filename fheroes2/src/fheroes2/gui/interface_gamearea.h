@@ -95,6 +95,8 @@ namespace Interface
 	u16	oldIndexPos;
 	u8	scrollDirection;
 	u8	scrollStep;
+	u8	tailX;
+	u8	tailY;
 	bool    updateCursor;
 
 	SDL::Time scrollTime;
