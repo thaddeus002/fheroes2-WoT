@@ -48,7 +48,7 @@ void EditorInterface::Build(void)
     scrollLeft = Rect(0, BORDERWIDTH, BORDERWIDTH / 2, display.h() - 2 * BORDERWIDTH);
     scrollRight = Rect(display.w() - BORDERWIDTH / 2, BORDERWIDTH, BORDERWIDTH / 2, display.h() - 2 * BORDERWIDTH);
     scrollTop = Rect(BORDERWIDTH, 0, areaPos.w, BORDERWIDTH / 2);
-    scrollBottom = Rect(2 * BORDERWIDTH, display.h() - BORDERWIDTH / 2, (gameArea.GetRectMaps().w - 1) * TILEWIDTH, BORDERWIDTH / 2);
+    scrollBottom = Rect(2 * BORDERWIDTH, display.h() - BORDERWIDTH / 2, areaPos.w - TILEWIDTH, BORDERWIDTH / 2);
 
     btnLeftTopScroll.SetSprite(ICN::ESCROLL, 12, 13);
     btnRightTopScroll.SetSprite(ICN::ESCROLL, 14, 15);
@@ -111,7 +111,7 @@ void EditorInterface::Draw(void)
     src_rt.h = BORDERWIDTH;
     display.Blit(spriteBottomBar, src_rt, dst_pt);
     src_rt.x = TILEWIDTH;
-    for(u16 ii = 0; ii < (areaMaps.w - 3); ++ii)
+    for(u16 ii = 0; ii < (areaPos.w / TILEWIDTH) - 3; ++ii)
     {
 	dst_pt.x += TILEWIDTH;
 	display.Blit(spriteBottomBar, src_rt, dst_pt);
@@ -120,7 +120,7 @@ void EditorInterface::Draw(void)
     src_rt.x = spriteBottomBar.w() - TILEWIDTH;
     display.Blit(spriteBottomBar, src_rt, dst_pt);
 
-    // left scroll bar indicator
+    // right scroll bar indicator
     const Sprite & spriteLeftBar(AGG::GetICN(ICN::ESCROLL, 1));
     dst_pt.x = BORDERWIDTH + areaPos.w;
     dst_pt.y = BORDERWIDTH * 2;
@@ -130,7 +130,7 @@ void EditorInterface::Draw(void)
     src_rt.h = TILEWIDTH;
     display.Blit(spriteLeftBar, src_rt, dst_pt);
     src_rt.y = TILEWIDTH;
-    for(u16 ii = 0; ii < (areaMaps.h - 3); ++ii)
+    for(u16 ii = 0; ii < (areaPos.h / TILEWIDTH) - 3; ++ii)
     {
 	dst_pt.y += TILEWIDTH;
 	display.Blit(spriteLeftBar, src_rt, dst_pt);
@@ -346,14 +346,14 @@ void EditorInterface::Draw(void)
     DrawTopNumberCell();
     DrawLeftNumberCell();
 
-    split_h.SetArea(Rect(2 * BORDERWIDTH + 3, display.h() - BORDERWIDTH + 4, (areaMaps.w - 1) * TILEWIDTH - 6, BORDERWIDTH - 8));
+    split_h.SetArea(Rect(2 * BORDERWIDTH + 3, display.h() - BORDERWIDTH + 4, areaPos.w - TILEWIDTH - 6, BORDERWIDTH - 8));
     split_h.SetOrientation(Splitter::HORIZONTAL);
 
-    split_v.SetArea(Rect(BORDERWIDTH + areaPos.w + 4, 2 * BORDERWIDTH + 3, BORDERWIDTH - 8, (areaMaps.h - 1) * TILEWIDTH - 6));
+    split_v.SetArea(Rect(BORDERWIDTH + areaPos.w + 4, 2 * BORDERWIDTH + 3, BORDERWIDTH - 8, areaPos.h - TILEWIDTH - 6));
     split_v.SetOrientation(Splitter::VERTICAL);
 
-    split_h.SetRange(0, world.w() - areaMaps.w);
-    split_v.SetRange(0, world.h() - areaMaps.h);
+    split_h.SetRange(0, world.w() - areaPos.w / TILEWIDTH - 1);
+    split_v.SetRange(0, world.h() - areaPos.h / TILEWIDTH - 1);
 
     split_h.Move(areaMaps.x);
     split_v.Move(areaMaps.y);
@@ -388,11 +388,12 @@ void EditorInterface::Scroll(const u8 scroll)
 
 void EditorInterface::DrawTopNumberCell(void)
 {
-    const Rect & area = Interface::GameArea::Get().GetRectMaps();
+    const Rect & areaPos  = Interface::GameArea::Get().GetArea();
+    const Rect & areaMaps = Interface::GameArea::Get().GetRectMaps();
     Point dst_pt;
 
     // top number cell
-    for(u16 ii = 0; ii < area.w; ++ii)
+    for(u16 ii = 0; ii < (areaPos.w / TILEWIDTH); ++ii)
     {
 	dst_pt.x = BORDERWIDTH + ii * TILEWIDTH;
 	dst_pt.y = 0;
@@ -400,7 +401,7 @@ void EditorInterface::DrawTopNumberCell(void)
 	Display::Get().Blit(AGG::GetICN(ICN::EDITBTNS, 34), dst_pt);
 
 	std::string number;
-	String::AddInt(number, area.x + ii);
+	String::AddInt(number, areaMaps.x + ii);
 
 	Text text(number, Font::SMALL);
 	text.Blit(2 * BORDERWIDTH + ii * TILEWIDTH - text.w() / 2, 2);
@@ -409,11 +410,12 @@ void EditorInterface::DrawTopNumberCell(void)
 
 void EditorInterface::DrawLeftNumberCell(void)
 {
-    const Rect & area = Interface::GameArea::Get().GetRectMaps();
+    const Rect & areaPos  = Interface::GameArea::Get().GetArea();
+    const Rect & areaMaps = Interface::GameArea::Get().GetRectMaps();
     Point dst_pt;
 
     // left number cell
-    for(u16 ii = 0; ii < area.h; ++ii)
+    for(u16 ii = 0; ii < (areaPos.h / TILEWIDTH); ++ii)
     {
 	dst_pt.x = 0;
 	dst_pt.y = BORDERWIDTH + ii * TILEWIDTH;
@@ -421,7 +423,7 @@ void EditorInterface::DrawLeftNumberCell(void)
 	Display::Get().Blit(AGG::GetICN(ICN::EDITBTNS, 33), dst_pt);
 
 	std::string number;
-	String::AddInt(number, area.y + ii);
+	String::AddInt(number, areaMaps.y + ii);
 
 	Text text(number, Font::SMALL);
  	text.Blit(BORDERWIDTH / 2 - text.w() / 2 - 1, BORDERWIDTH + ii * TILEWIDTH + BORDERWIDTH - 5);

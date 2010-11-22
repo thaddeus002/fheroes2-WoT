@@ -426,7 +426,9 @@ void Settings::PostLoad(void)
 {
     if(opt_global.Modes(GLOBAL_EDITOR))
     {
-       ExtResetModes(GAME_HIDE_INTERFACE);
+	ExtResetModes(GAME_HIDE_INTERFACE);
+	if(video_mode.w % TILEWIDTH) video_mode.w = TILEWIDTH * (video_mode.w / TILEWIDTH);
+	if(video_mode.h % TILEWIDTH) video_mode.h = TILEWIDTH * (video_mode.h / TILEWIDTH);
     }
 
     if(QVGA())
@@ -962,6 +964,7 @@ void Settings::FixKingdomRandomRace(void)
 void Settings::SetEditor(void)
 {
     opt_global.SetModes(GLOBAL_EDITOR);
+    PostLoad();
 }
 
 void Settings::SetUnicode(bool f)

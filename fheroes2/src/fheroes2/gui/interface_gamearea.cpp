@@ -127,18 +127,18 @@ void Interface::GameArea::SetAreaPosition(s16 x, s16 y, u16 w, u16 h)
     scrollOffset.y = 0;
     scrollStep = Settings::Get().ScrollSpeed();
 
-    tailX = areaPosition.w - TILEWIDTH * (areaPosition.w / TILEWIDTH);
-    tailY = areaPosition.h - TILEWIDTH * (areaPosition.h / TILEWIDTH);
-
-    rectMapsPosition.x = areaPosition.x - scrollOffset.x;
-    rectMapsPosition.y = areaPosition.y - scrollOffset.y;
-
     if(Settings::Get().Editor())
     {
 	rectMaps.w = (areaPosition.w / TILEWIDTH);
 	rectMaps.h = (areaPosition.h / TILEWIDTH);
 	scrollStep = SCROLL_MAX;
     }
+
+    tailX = areaPosition.w - TILEWIDTH * (areaPosition.w / TILEWIDTH);
+    tailY = areaPosition.h - TILEWIDTH * (areaPosition.h / TILEWIDTH);
+
+    rectMapsPosition.x = areaPosition.x - scrollOffset.x;
+    rectMapsPosition.y = areaPosition.y - scrollOffset.y;
 }
 
 void Interface::GameArea::BlitOnTile(Surface & dst, const Sprite & src, const Point & mp) const
@@ -275,6 +275,8 @@ void Interface::GameArea::Redraw(Surface & dst, u8 flag, const Rect & rt) const
 /* scroll area */
 void Interface::GameArea::Scroll(void)
 {
+    const Settings & conf = Settings::Get();
+
     if(scrollDirection & SCROLL_LEFT)
     {
 	if(0 < scrollOffset.x)
@@ -282,19 +284,20 @@ void Interface::GameArea::Scroll(void)
 	else
 	if(0 < rectMaps.x)
 	{
-	    scrollOffset.x = SCROLL_MAX - scrollStep;
+	    scrollOffset.x = conf.Editor() ? 0 : SCROLL_MAX - scrollStep;
 	    --rectMaps.x;
 	}
     }
     else
     if(scrollDirection & SCROLL_RIGHT)
     {
-	if(scrollOffset.x < SCROLL_MAX * 2 - tailX)
+	if(!conf.Editor() &&
+	    scrollOffset.x < SCROLL_MAX * 2 - tailX)
 	    scrollOffset.x += scrollStep;
 	else
 	if(world.w() - rectMaps.w > rectMaps.x)
 	{
-	    scrollOffset.x = SCROLL_MAX + scrollStep - tailX;
+	    scrollOffset.x = conf.Editor() ? 0 : SCROLL_MAX + scrollStep - tailX;
 	    ++rectMaps.x;
 	}
     }
@@ -306,19 +309,20 @@ void Interface::GameArea::Scroll(void)
 	else
 	if(0 < rectMaps.y)
 	{
-	    scrollOffset.y = SCROLL_MAX - scrollStep;
+	    scrollOffset.y = conf.Editor() ? 0 : SCROLL_MAX - scrollStep;
 	    --rectMaps.y;
 	}
     }
     else
     if(scrollDirection & SCROLL_BOTTOM)
     {
-	if(scrollOffset.y < SCROLL_MAX * 2 - tailY)
+	if(!conf.Editor() &&
+	    scrollOffset.y < SCROLL_MAX * 2 - tailY)
 	    scrollOffset.y += scrollStep;
 	else
 	if(world.h() - rectMaps.h > rectMaps.y)
 	{
-	    scrollOffset.y = SCROLL_MAX + scrollStep - tailY;
+	    scrollOffset.y = conf.Editor() ? 0 : SCROLL_MAX + scrollStep - tailY;
 	    ++rectMaps.y;
 	}
     }
@@ -390,24 +394,30 @@ void Interface::GameArea::Center(s16 px, s16 py)
 	else
 	if(pos.x == world.w() - rectMaps.w)
 	{
-	    scrollOffset.x = tailX ? SCROLL_MAX * 2 - tailX : SCROLL_MAX * 2;
+	    scrollOffset.x = SCROLL_MAX * 2 - tailX;
 	}
 	else
 	{
- 	    scrollOffset.x = rectMaps.w % 2 == 0 ?
-		    SCROLL_MAX + TILEWIDTH / 2 : SCROLL_MAX;
+ 	    scrollOffset.x = (rectMaps.w % 2 == 0 ?
+		    SCROLL_MAX + TILEWIDTH / 2 : SCROLL_MAX) - tailX;
 	}
 
 	if(pos.y == 0) scrollOffset.y = 0;
 	else
 	if(pos.y == world.h() - rectMaps.h)
 	{
-	    scrollOffset.y = tailY ? SCROLL_MAX * 2 - tailY : SCROLL_MAX * 2;
+	    scrollOffset.y = SCROLL_MAX * 2 - tailY;
 	}
 	else
 	{
- 	    scrollOffset.y = rectMaps.h % 2 == 0 ?
-		    SCROLL_MAX + TILEWIDTH / 2 : SCROLL_MAX;
+ 	    scrollOffset.y = (rectMaps.h % 2 == 0 ?
+		    SCROLL_MAX + TILEWIDTH / 2 : SCROLL_MAX) - tailY;
+	}
+
+	if(Settings::Get().Editor())
+	{
+	    scrollOffset.x = 0;
+	    scrollOffset.y = 0;
 	}
 
 	rectMapsPosition.x = areaPosition.x - scrollOffset.x;
