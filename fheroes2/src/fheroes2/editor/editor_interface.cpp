@@ -43,7 +43,7 @@ void EditorInterface::Build(void)
     radar.Build();
 
     const Rect & areaPos = gameArea.GetArea();
-    const Rect & areaMaps= gameArea.GetRectMaps();
+    //const Rect & areaMaps= gameArea.GetRectMaps();
 
     scrollLeft = Rect(0, BORDERWIDTH, BORDERWIDTH / 2, display.h() - 2 * BORDERWIDTH);
     scrollRight = Rect(display.w() - BORDERWIDTH / 2, BORDERWIDTH, BORDERWIDTH / 2, display.h() - 2 * BORDERWIDTH);

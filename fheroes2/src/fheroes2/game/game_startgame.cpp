@@ -138,7 +138,7 @@ void Game::DialogPlayers(const Color::color_t color, const std::string & str)
 Game::menu_t Game::StartGame(void)
 {
     SetFixVideoMode();
-    AI::Init();
+    ::AI::Init();
 
     // cursor
     Cursor & cursor = Cursor::Get();

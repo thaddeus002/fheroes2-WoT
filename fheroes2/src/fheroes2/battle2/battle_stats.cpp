@@ -744,7 +744,7 @@ u32 Battle2::Stats::CalculateDamageStats(const Stats & enemy, double dmg) const
 	default: break;
     }
 
-    return dmg;
+    return static_cast<u32>(dmg);
 }
 
 u32 Battle2::Stats::GetDamage(const Stats & enemy) const
