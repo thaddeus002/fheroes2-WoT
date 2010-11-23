@@ -35,8 +35,6 @@ void UpdateCoordClassInfo(const Point &, std::vector<Rect> &);
 
 Game::menu_t PocketPC::ScenarioInfo(void)
 {
-    Game::SetFixVideoMode();
-
     Cursor & cursor = Cursor::Get();
     Display & display = Display::Get();
     Settings & conf = Settings::Get();

@@ -34,8 +34,6 @@
 
 Game::menu_t PocketPC::SelectScenario(void)
 {
-    Game::SetFixVideoMode();
-
     Settings & conf = Settings::Get();
     Cursor & cursor = Cursor::Get();
     Display & display = Display::Get();

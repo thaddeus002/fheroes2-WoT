@@ -48,8 +48,6 @@ Game::menu_t PocketPC::LoadGame(void)
 
 Game::menu_t PocketPC::MainMenu(void)
 {
-    Game::SetFixVideoMode();
-
     Cursor & cursor = Cursor::Get();
     Display & display = Display::Get();
     LocalEvent & le = LocalEvent::Get();
@@ -127,8 +125,6 @@ Game::menu_t PocketPC::MainMenu(void)
 
 Game::menu_t PocketPC::NewGame(void)
 {
-    Game::SetFixVideoMode();
-
     Cursor & cursor = Cursor::Get();
     Display & display = Display::Get();
     Settings & conf = Settings::Get();
@@ -194,8 +190,6 @@ Game::menu_t PocketPC::NewGame(void)
 
 Game::menu_t PocketPC::NewMulti(void)
 {
-    Game::SetFixVideoMode();
-
     Cursor & cursor = Cursor::Get();
     Display & display = Display::Get();
     Settings & conf = Settings::Get();
