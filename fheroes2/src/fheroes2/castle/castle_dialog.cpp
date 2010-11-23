@@ -411,14 +411,20 @@ Dialog::answer_t Castle::OpenDialog(bool readonly, bool fade)
        // selector troops event
         if(castle_heroes && selectHeroesArmy.isValid())
         {
-            if(le.MouseCursor(selectCaptainArmy.GetArea()) || le.MouseCursor(selectHeroesArmy.GetArea()))
-                SelectArmyBar::QueueEventProcessing(selectCaptainArmy, selectHeroesArmy);
+            if((le.MouseCursor(selectCaptainArmy.GetArea()) || le.MouseCursor(selectHeroesArmy.GetArea())) &&
+                SelectArmyBar::QueueEventProcessing(selectCaptainArmy, selectHeroesArmy))
+	    {
+		RedrawResourcePanel(cur_pt);
+	    }
         }
         else
         {
-            if(le.MouseCursor(selectCaptainArmy.GetArea()))
-                SelectArmyBar::QueueEventProcessing(selectCaptainArmy);
-        }
+            if(le.MouseCursor(selectCaptainArmy.GetArea()) && 
+                SelectArmyBar::QueueEventProcessing(selectCaptainArmy))
+	    {
+		RedrawResourcePanel(cur_pt);
+    	    }
+	}
 
 	// view hero
 	if(!readonly && castle_heroes && le.MouseClickLeft(rectHeroPortrait))
