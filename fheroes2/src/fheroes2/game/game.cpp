@@ -85,9 +85,15 @@ Game::menu_t Game::Credits(void)
     const Settings & conf = Settings::Get();
 
     std::string str = conf.BuildVersion();
-
     str.append("\n \n");
-    str.append("Site project: https://sf.net/projects/fheroes2");
+    str.append("This program is distributed under the terms of the GPL v2.");
+    str.append("\n \n");
+    str.append("Site project:\n");
+    str.append("http://sf.net/projects/fheroes2");
+    str.append("\n \n");
+    str.append("Authors:\n");
+    str.append("Andrey Afletdinov, maintainer\n");
+    str.append("email: fheroes2 at gmail.com\n");
 
     Dialog::Message("Free Heroes II Engine", str, Font::SMALL, Dialog::OK);
 
@@ -129,6 +135,7 @@ void Game::SetFixVideoMode(void)
     const Settings & conf = Settings::Get();
 
     Size fixsize(conf.VideoMode());
+
     u32 max = (6 + conf.MapsWidth()) * TILEWIDTH;
 
     if(conf.VideoMode().w > max) fixsize.w = max;
