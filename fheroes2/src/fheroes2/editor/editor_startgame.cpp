@@ -924,7 +924,7 @@ Game::menu_t Game::Editor::StartGame()
 void Game::Editor::ModifySingleTile(Maps::Tiles & tile)
 {
     //u8 count = Maps::GetCountAroundGround(tile.GetIndex(), tile.GetGround());
-    const u16 center = tile.GetIndex();
+    const s32 center = tile.GetIndex();
     const Maps::Ground::ground_t ground = tile.GetGround();
     const u16 max = Maps::GetMaxGroundAround(center);
     Display & display = Display::Get();
@@ -971,7 +971,7 @@ void Game::Editor::ModifySingleTile(Maps::Tiles & tile)
 
 void Game::Editor::ModifyTileAbroad(Maps::Tiles & tile)
 {
-    const u16 center = tile.GetIndex();
+    const s32 center = tile.GetIndex();
     Display & display = Display::Get();
 
     // fix

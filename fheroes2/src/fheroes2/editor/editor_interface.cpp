@@ -36,7 +36,6 @@ void EditorInterface::Build(void)
 {
     Display & display = Display::Get();
 
-    Game::SetFixVideoMode();
     radar.SetPos(display.w() - BORDERWIDTH - RADARWIDTH, BORDERWIDTH);
 
     gameArea.Build();
