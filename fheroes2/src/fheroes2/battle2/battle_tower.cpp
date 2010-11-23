@@ -71,9 +71,9 @@ Point Battle2::Tower::GetPortPosition(void) const
     return res;
 }
 
-void Battle2::Tower::Action(void) const
+void Battle2::Tower::Action(void)
 {
-    const Stats* b = GetBattleStats();
+    Stats* b = GetBattleStats();
 
     arena.ResetBoard();
     arena.board.SetEnemyQuality(*b);

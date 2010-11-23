@@ -165,7 +165,7 @@ namespace Battle2
         u8 GetCastleTargetValue(u8) const;
         void SetCastleTargetValue(u8, u8);
 
-	bool isDisableCastSpell(u8 spell, std::string *msg) const;
+	bool isDisableCastSpell(u8 spell, std::string *msg);
 	bool isAllowResurrectFromGraveyard(u8, u16) const;
 
 	u8 GetOppositeColor(u8) const;

@@ -31,6 +31,7 @@ namespace Battle2
 {
     class Arena;
     class Stats;
+    class Armies;
 }
 
 namespace Maps { class Tiles; }
@@ -93,18 +94,13 @@ namespace Army
 
 	bool		BattleInit(void);
 	void		BattleQuit(void);
-	void		BattleNewTurn(void);
-	void		BattleSetModes(u32);
-	void		BattleResetModes(u32);
-	bool		BattleFindModes(u32) const;
-	bool		BattleIsDragons(void) const;
-	bool		BattleIsArchers(void) const;
 	u32		BattleKilled(void) const;
 	s8		GetArmyIndex(void) const;
 
       protected:
         friend class army_t;
         friend class Battle2::Stats;
+        friend class Battle2::Armies;
         friend class Battle2::Arena;
 
         u32		count;

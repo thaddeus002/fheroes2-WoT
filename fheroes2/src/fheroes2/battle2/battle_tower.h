@@ -40,7 +40,7 @@ namespace Battle2
 	u8   GetColor(void) const;
 
 	void SetDestroy(void);
-	void Action(void) const;
+	void Action(void);
 	Point GetPortPosition(void) const;
 
     private:

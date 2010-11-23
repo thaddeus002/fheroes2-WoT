@@ -452,6 +452,21 @@ bool Battle2::Stats::isWide(void) const
     return troop.isWide();
 }
 
+bool Battle2::Stats::isUndead(void) const
+{
+    return troop.isUndead();
+}
+
+bool Battle2::Stats::isAlive(void) const
+{
+    return !isUndead() && !isElemental();
+}
+
+bool Battle2::Stats::isElemental(void) const
+{
+    return troop.isElemental();
+}
+
 bool Battle2::Stats::isValid(void) const
 {
     return count;
@@ -2180,4 +2195,104 @@ u16 Battle2::Stats::AIGetAttackPosition(const std::vector<u16> & positions) cons
     }
 
     return res != MAXU16 ? res : Arena::GetShortDistance(position, positions);
+}
+
+
+namespace Battle2
+{
+    bool SlowestStats(const Stats* b1, const Stats* b2)
+    {
+	return Army::SlowestTroop(b1->troop, b2->troop);
+    }
+
+    bool FastestStats(const Stats* b1, const Stats* b2)
+    {
+	return SlowestStats(b2, b1);
+    }
+
+    bool StrongestStats(const Stats* b1, const Stats* b2)
+    {
+	return Army::StrongestTroop(b1->troop, b2->troop);
+    }
+
+    bool WeakestStats(const Stats* b1, const Stats* b2)
+    {
+	return Army::WeakestTroop(b1->troop, b2->troop);
+    }
+}
+
+Battle2::Armies::Armies(Army::army_t & a) : parent(a)
+{
+    reserve(a.army.size());
+
+    for(std::vector<Army::Troop>::const_iterator
+        it = a.army.begin(); it != a.army.end(); ++it)
+            if((*it).isValid() && (*it).battle)
+                push_back((*it).battle);
+}
+
+Battle2::Stats* Battle2::Armies::GetRandom(void)
+{
+    return *Rand::Get(*this);
+}
+
+void Battle2::Armies::SortSlowest(void)
+{
+    std::sort(begin(), end(), SlowestStats);
+}
+
+void Battle2::Armies::SortFastest(void)
+{
+    std::sort(begin(), end(), FastestStats);
+}
+
+void Battle2::Armies::SortStrongest(void)
+{
+    std::sort(begin(), end(), StrongestStats);
+}
+
+void Battle2::Armies::SortWeakest(void)
+{
+    std::sort(begin(), end(), WeakestStats);
+}
+
+void Battle2::Armies::NewTurn(void)
+{
+    if(parent.commander)
+	parent.commander->ResetModes(Heroes::SPELLCASTED);
+
+    std::for_each(begin(), end(), std::mem_fun(&Stats::NewTurn));
+}
+
+Battle2::Stats* Battle2::Armies::FindMode(u32 mod)
+{
+    Armies::iterator it = std::find_if(begin(), end(),                                                
+				std::bind2nd(std::mem_fun(&Stats::Modes), mod));
+
+    return it == end() ? NULL : *it;
+}
+
+Battle2::Stats* Battle2::Armies::CreateNewStats(Monster::monster_t id, u32 count)
+{
+    std::vector<Army::Troop> & armies = parent.army;
+    std::vector<Army::Troop>::iterator it = armies.begin();
+
+    // find free invalid
+    while(it != armies.end() && (*it).battle) ++it;
+
+    if(armies.end() == it)
+    {
+        armies.resize(armies.size() + 1);
+        it = armies.end() - 1;
+    }
+
+    (*it).id = id;
+    (*it).count = count;
+    (*it).army = &parent;
+
+    (*it).BattleInit();
+
+    push_back((*it).battle);
+
+    return (*it).battle;
 }

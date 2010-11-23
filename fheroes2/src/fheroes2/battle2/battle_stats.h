@@ -119,6 +119,9 @@ namespace Battle2
 	bool	isArchers(void) const;
 	bool	isFly(void) const;
 	bool	isWide(void) const;
+	bool	isUndead(void) const;
+	bool	isAlive(void) const;
+	bool	isElemental(void) const;
 	bool	isValid(void) const;
 	bool	isHandFighting(void) const;
 	bool	isReflect(void) const;
@@ -237,6 +240,26 @@ namespace Battle2
 
 	ModesAffected affected;
 	Sprite* contours[4];
+    };
+
+    struct Armies : public std::vector<Stats*>
+    {
+	Armies(Army::army_t &);
+
+	Stats* GetRandom(void);
+	Stats* FindMode(u32);
+	Stats* SummonElemental(void);
+	Stats* CreateNewStats(Monster::monster_t, u32);
+
+
+	void SortSlowest(void);
+	void SortFastest(void);
+	void SortStrongest(void);
+	void SortWeakest(void);
+
+	void NewTurn(void);
+
+	Army::army_t & parent;
     };
 }
 

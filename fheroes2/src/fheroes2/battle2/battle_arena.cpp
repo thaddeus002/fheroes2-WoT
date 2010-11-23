@@ -764,12 +764,15 @@ void Battle2::Arena::Turns(u16 turn, Result & result)
     result_game = &result;
     current_turn = turn;
 
-    army1.BattleNewTurn();
-    army2.BattleNewTurn();
+    Armies armies1(army1);
+    Armies armies2(army2);
+
+    armies1.NewTurn();
+    armies2.NewTurn();
 
     Actions actions;
     Stats* current_troop = NULL;
-    u8 equal_color = 0;
+    u8 friends_color = 0;
     u8 current_color = 0;
     bool tower_moved = false;
     bool catapult_moved = false;
@@ -791,38 +794,38 @@ void Battle2::Arena::Turns(u16 turn, Result & result)
 		{
 		    current_troop = btroop1;
 		    current_color = army1.GetColor();
-		    equal_color = 0;
+		    friends_color = 0;
 		}
 		else
 		if(btroop1->GetSpeed() < btroop2->GetSpeed())
 		{
 		    current_troop = btroop2;
 		    current_color = army2.GetColor();
-		    equal_color = 0;
+		    friends_color = 0;
 		}
 		else
 		// equal speed
 		{
 		    // first attacker moved
-		    if(0 == equal_color)
+		    if(0 == friends_color)
 		    {
 			current_troop = btroop1;
 			current_color = army1.GetColor();
-			equal_color = army1.GetColor();
+			friends_color = army1.GetColor();
 		    }
 		    else
 		    // changed
-		    if(equal_color == army1.GetColor())
+		    if(friends_color == army1.GetColor())
 		    {
 			current_troop = btroop2;
 			current_color = army2.GetColor();
-			equal_color = army2.GetColor();
+			friends_color = army2.GetColor();
 		    }
 		    else
 		    {
 			current_troop = btroop1;
 			current_color = army1.GetColor();
-			equal_color = army1.GetColor();
+			friends_color = army1.GetColor();
 		    }
 		}
 	    }
@@ -849,38 +852,38 @@ void Battle2::Arena::Turns(u16 turn, Result & result)
 		    {
 		    	current_troop = btroop1;
 			current_color = army1.GetColor();
-			equal_color = 0;
+			friends_color = 0;
 		    }
 		    else
 		    if(btroop1->GetSpeed() > btroop2->GetSpeed())
 		    {
 		    	current_troop = btroop2;
 			current_color = army2.GetColor();
-			equal_color = 0;
+			friends_color = 0;
 		    }
 		    else
 		    // equal speed
 		    {
 			// first defender moved (attacker have priority)
-			if(0 == equal_color)
+			if(0 == friends_color)
 			{
 			    current_troop = btroop2;
 			    current_color = army2.GetColor();
-			    equal_color = army2.GetColor();
+			    friends_color = army2.GetColor();
 			}
 			else
 			// changed
-			if(equal_color == army1.GetColor())
+			if(friends_color == army1.GetColor())
 			{
 			    current_troop = btroop2;
 			    current_color = army2.GetColor();
-			    equal_color = army2.GetColor();
+			    friends_color = army2.GetColor();
 			}
 			else
 			{
 			    current_troop = btroop1;
 			    current_color = army1.GetColor();
-			    equal_color = army1.GetColor();
+			    friends_color = army1.GetColor();
 			}
 		    }
 		}
@@ -1474,7 +1477,7 @@ bool Battle2::Arena::CanRetreatOpponent(u8 color) const
 	    NULL == army->GetCommander()->inCastle();
 }
 
-bool Battle2::Arena::isDisableCastSpell(u8 spell, std::string* msg) const
+bool Battle2::Arena::isDisableCastSpell(u8 spell, std::string* msg)
 {
     const HeroBase* hero1 = army1.GetCommander();
     const HeroBase* hero2 = army2.GetCommander();
@@ -1504,8 +1507,11 @@ bool Battle2::Arena::isDisableCastSpell(u8 spell, std::string* msg) const
 	else
 	if(Spell::isSummon(spell))
 	{
-	    const Army::Troop* elem = GetArmy(current_commander->GetColor())->BattleFindModes(CAP_SUMMONELEM);
+	    Armies friends(*GetArmy(current_commander->GetColor()));
+
+	    const Stats* elem = friends.FindMode(CAP_SUMMONELEM);
 	    bool affect = true;
+
 	    if(elem) switch(spell)
 	    {
 		case Spell::SUMMONEELEMENT: if(elem->GetID() != Monster::EARTH_ELEMENT) affect = false; break;

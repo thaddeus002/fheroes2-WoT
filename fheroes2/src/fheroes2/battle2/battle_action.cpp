@@ -866,14 +866,17 @@ void Battle2::Arena::SpellActionSummonElemental(const HeroBase* hero, u8 type)
 
     if(army && 0 != pos)
     {
-        const Army::Troop* other = army->BattleFindModes(CAP_SUMMONELEM);
+	Armies friends(*army);
+
+	Stats* elem = friends.FindMode(CAP_SUMMONELEM);
         bool affect = true;
-        if(other) switch(type)
+
+        if(elem) switch(type)
         {
-            case Spell::SUMMONEELEMENT: if(other->GetID() != Monster::EARTH_ELEMENT) affect = false; break;
-            case Spell::SUMMONAELEMENT: if(other->GetID() != Monster::AIR_ELEMENT) affect = false; break;
-            case Spell::SUMMONFELEMENT: if(other->GetID() != Monster::FIRE_ELEMENT) affect = false; break;
-            case Spell::SUMMONWELEMENT: if(other->GetID() != Monster::WATER_ELEMENT) affect = false; break;
+            case Spell::SUMMONEELEMENT: if(elem->GetID() != Monster::EARTH_ELEMENT) affect = false; break;
+            case Spell::SUMMONAELEMENT: if(elem->GetID() != Monster::AIR_ELEMENT) affect = false; break;
+            case Spell::SUMMONFELEMENT: if(elem->GetID() != Monster::FIRE_ELEMENT) affect = false; break;
+            case Spell::SUMMONWELEMENT: if(elem->GetID() != Monster::WATER_ELEMENT) affect = false; break;
             default: break;
         }
 
@@ -897,7 +900,7 @@ void Battle2::Arena::SpellActionSummonElemental(const HeroBase* hero, u8 type)
 	u16 count = Spell::GetExtraValue(Spell::FromInt(type)) * hero->GetPower();
 	if(hero->HasArtifact(Artifact::BOOK_ELEMENTS)) count *= 2;
 
-        Stats* elem = army->BattleNewTroop(mons, count).GetBattleStats();
+        elem = friends.CreateNewStats(mons, count);
         elem->position = pos;
         elem->arena = this;
         elem->SetReflection(hero == army2.GetCommander());
@@ -993,7 +996,8 @@ void Battle2::Arena::SpellActionMirrorImage(Stats & b)
     	DEBUG(DBG_BATTLE, DBG_TRACE, "Battle2::Arena::SpellCreateMirrorImage: " << "set position: " << *it1);
 	if(interface) interface->RedrawActionMirrorImageSpell(b, *it1);
 
-    	Stats* image = b.GetArmy()->BattleNewTroop(b.troop(), b.count).GetBattleStats();
+	Armies friends(*b.GetArmy());
+	Stats* image = friends.CreateNewStats(b.troop(), b.count);
 
     	b.mirror = image;
     	image->position = *it1;

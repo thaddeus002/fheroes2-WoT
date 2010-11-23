@@ -140,39 +140,9 @@ void Army::Troop::BattleQuit(void)
     }
 }
 
-void Army::Troop::BattleNewTurn(void)
-{
-    if(isValid() && battle) battle->NewTurn();
-}
-
 u32 Army::Troop::BattleKilled(void) const
 {
     return battle ? battle->dead : 0;
-}
-
-void Army::Troop::BattleSetModes(u32 f)
-{
-    if(battle) battle->SetModes(f);
-}
-
-bool Army::Troop::BattleFindModes(u32 f) const
-{
-    return battle && battle->isValid() && battle->Modes(f);
-}
-
-void Army::Troop::BattleResetModes(u32 f)
-{
-    if(battle) battle->ResetModes(f);
-}
-
-bool Army::Troop::BattleIsDragons(void) const
-{
-    return battle && battle->isValid() && isDragons();
-}
-
-bool Army::Troop::BattleIsArchers(void) const
-{
-    return battle && battle->isValid() && battle->isArchers();
 }
 
 const Skill::Primary* Army::Troop::MasterSkill(void) const

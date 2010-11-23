@@ -720,55 +720,6 @@ void Army::army_t::BattleQuit(void)
     if(army.size() > ARMYMAXTROOPS) army.resize(ARMYMAXTROOPS);
 }
 
-void Army::army_t::BattleNewTurn(void)
-{
-    std::for_each(army.begin(), army.end(), std::mem_fun_ref(&Troop::BattleNewTurn));
-    if(commander) commander->ResetModes(Heroes::SPELLCASTED);
-}
-
-void Army::army_t::BattleSetModes(u32 f)
-{
-    std::for_each(army.begin(), army.end(), std::bind2nd(std::mem_fun_ref(&Troop::BattleSetModes), f));
-}
-
-void Army::army_t::BattleResetModes(u32 f)
-{
-    std::for_each(army.begin(), army.end(), std::bind2nd(std::mem_fun_ref(&Troop::BattleResetModes), f));
-}
-
-Army::Troop* Army::army_t::BattleFindModes(u32 f)
-{
-    std::vector<Troop>::iterator it = std::find_if(army.begin(), army.end(), std::bind2nd(std::mem_fun_ref(&Troop::BattleFindModes), f));
-    return it != army.end() ? &(*it) : NULL;
-}
-
-const Army::Troop* Army::army_t::BattleFindModes(u32 f) const
-{
-    std::vector<Troop>::const_iterator it = std::find_if(army.begin(), army.end(), std::bind2nd(std::mem_fun_ref(&Troop::BattleFindModes), f));
-    return it != army.end() ? &(*it) : NULL;
-}
-
-Army::Troop & Army::army_t::BattleNewTroop(Monster::monster_t id, u32 count)
-{
-    // find free invalid
-    std::vector<Troop>::iterator it = army.begin();
-    while(it != army.end() && NULL != (*it).GetBattleStats()) ++it;
-
-    if(army.end() == it)
-    {
-	army.resize(army.size() + 1);
-	it = army.end() - 1;
-    }
-
-    (*it).id = id;
-    (*it).count = count;
-    (*it).army = this;
-
-    (*it).BattleInit();
-
-    return *it;
-}
-
 u32 Army::army_t::BattleKilled(void) const
 {
     u32 res = 0;
@@ -776,38 +727,6 @@ u32 Army::army_t::BattleKilled(void) const
     for(; it != army.end(); ++it) res += (*it).BattleKilled();
 
     return res;
-}
-
-u8 Army::army_t::BattleUndeadTroopCount(void) const
-{
-    return std::count_if(army.begin(), army.end(), std::mem_fun_ref(&Troop::isUndead));
-}
-
-u8 Army::army_t::BattleLifeTroopCount(void) const
-{
-    return GetCount() - std::count_if(army.begin(), army.end(), std::mem_fun_ref(&Troop::isUndead)) -
-	std::count_if(army.begin(), army.end(), std::mem_fun_ref(&Troop::isElemental));
-}
-
-const Battle2::Stats* Army::army_t::BattleRandomTroop(void) const
-{
-    std::vector<const Battle2::Stats*> v;
-
-    std::vector<Troop>::const_iterator it = army.begin();
-    for(; it != army.end(); ++it) if((*it).isValid())
-	v.push_back((*it).GetBattleStats());
-
-    return v.size() ? *Rand::Get(v) : NULL;
-}
-
-bool Army::army_t::BattleArchersPresent(void) const
-{
-    return army.end() != std::find_if(army.begin(), army.end(), std::mem_fun_ref(&Troop::BattleIsArchers));
-}
-
-bool Army::army_t::BattleDragonsPresent(void) const
-{
-    return army.end() != std::find_if(army.begin(), army.end(), std::mem_fun_ref(&Troop::BattleIsDragons));
 }
 
 Battle2::Stats* Army::army_t::BattleFastestTroop(bool skipmove)
@@ -1058,15 +977,25 @@ void Army::army_t::UpgradeTroops(const Castle & castle)
     }
 }
 
-void Army::army_t::Dump(void) const
+void Army::army_t::Dump(const char* prefix) const
 {
-    std::cout << "Army::Dump: " << Color::String(commander ? commander->GetColor() : color) << ": ";
+    if(prefix)
+	std::cout << prefix;
+    else
+    {
+	std::cout << "Army::Dump: " <<
+	    "color(" << Color::String(commander ? commander->GetColor() : color) << ")";
 
-    std::vector<Troop>::const_iterator it1 = army.begin();
-    std::vector<Troop>::const_iterator it2 = army.end();
-    
-    for(; it1 != it2; ++it1) if((*it1).isValid()) std::cout << (*it1).GetName() << "(" << std::dec << (*it1).GetCount() << "), ";
-    if(commander) std::cout << "commander (" << commander->GetName() << ")";
+	if(commander)
+	    std::cout << ", commander(" << commander->GetName() << ")";
+
+	std::cout << " :";
+    }
+
+    for(std::vector<Troop>::const_iterator
+	    it = army.begin(); it != army.end(); ++it)
+	if((*it).isValid())
+	    std::cout << (*it).GetName() << "(" << std::dec << (*it).GetCount() << "), ";
 
     std::cout << std::endl;
 }
@@ -1143,6 +1072,8 @@ u32 Army::army_t::GetStrength(void) const
 
 bool Army::army_t::StrongerEnemyArmy(const army_t & army2) const
 {
+    if(! army2.isValid()) return true;
+
     const u16 a1 = GetAttack(false);
     const u16 d1 = GetDefense(false);
     double r1 = 0;

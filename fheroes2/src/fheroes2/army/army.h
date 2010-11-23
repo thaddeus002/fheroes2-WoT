@@ -32,7 +32,7 @@
 class Castle;
 class Heroes;
 namespace Maps { class Tiles; }
-namespace Battle2 { class Stats; }
+namespace Battle2 { class Stats; class Armies; }
 namespace Resource { struct funds_t; }
 
 namespace Army
@@ -78,20 +78,9 @@ namespace Army
 	    void	Reset(bool = false);	// reset: soft or hard
 
 	    void	BattleExportKilled(army_t &) const;
-	    void	BattleSetModes(u32);
-	    void	BattleResetModes(u32);
-	    Troop*      BattleFindModes(u32);
-	    const Troop*BattleFindModes(u32) const;
 	    void	BattleInit(void);
 	    void	BattleQuit(void);
-	    void	BattleNewTurn(void);
-	    Troop &     BattleNewTroop(Monster::monster_t, u32);
-	    bool	BattleArchersPresent(void) const;
-	    bool	BattleDragonsPresent(void) const;
 	    u32		BattleKilled(void) const;
-	    u8		BattleUndeadTroopCount(void) const;
-	    u8		BattleLifeTroopCount(void) const;
-	    const Battle2::Stats* BattleRandomTroop(void) const;
 	    Battle2::Stats* BattleSlowestTroop(bool skipmove);
 	    Battle2::Stats* BattleFastestTroop(bool skipmove);
 
@@ -144,7 +133,7 @@ namespace Army
 	    void	UpgradeTroops(const Castle &);
 	    void	ArrangeForBattle(void);
 
-	    void	Dump(void) const;
+	    void	Dump(const char* prefix = NULL) const;
 
 	    const HeroBase* GetCommander(void) const;
 	    HeroBase* GetCommander(void);
@@ -155,6 +144,8 @@ namespace Army
 
 	protected:
 	    friend class Troop;
+	    friend class Battle2::Armies;
+
 	    void	Import(army_t &);
 	    void	Import(const std::vector<Troop> &);
 	    s8		GetTroopIndex(const Troop &) const;
