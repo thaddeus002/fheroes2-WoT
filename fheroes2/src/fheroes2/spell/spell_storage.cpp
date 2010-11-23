@@ -73,3 +73,15 @@ bool SpellStorage::isPresentSpell(Spell::spell_t spell) const
 {
     return spells.end() != std::find(spells.begin(), spells.end(), spell);
 }
+
+void SpellStorage::Dump(void) const
+{
+    if(spells.size())
+    {
+	for(std::vector<Spell::spell_t>::const_iterator
+	    it = spells.begin(); it != spells.end(); ++it)
+		    std::cout << Spell::GetName((*it)) << ", ";
+
+	std::cout << std::endl;
+    }
+}

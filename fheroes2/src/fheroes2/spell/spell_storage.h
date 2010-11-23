@@ -39,6 +39,7 @@ public:
 	void Append(const Spell::spell_t sp, u8 wisdom);
 	void Append(const Spell::spell_t sp);
 	bool isPresentSpell(Spell::spell_t) const;
+	void Dump(void) const;
 
 /* protected: */
 	friend class Game::IO;

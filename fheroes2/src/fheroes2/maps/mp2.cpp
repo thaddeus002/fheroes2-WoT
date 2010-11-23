@@ -670,7 +670,9 @@ bool MP2::isWeekLife(const u8 obj)
         case OBJ_TROLLBRIDGE:
 
 	// for AI
-	case MP2::OBJ_COAST:
+	case OBJ_COAST:
+	// for AI
+        case OBJ_CASTLE:
 
 	    return true;
 
@@ -685,9 +687,6 @@ bool MP2::isMonthLife(const u8 obj)
     // FIXME: list month object life
     switch(obj)
     {
-	// for AI
-        case OBJ_CASTLE:
-
 	default: break;
     }
 

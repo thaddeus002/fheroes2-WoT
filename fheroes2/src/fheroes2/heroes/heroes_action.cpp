@@ -346,9 +346,9 @@ void AnimationRemoveObject(const Maps::Tiles & tile)
 
     std::vector<const Heroes *> heroes;
     std::vector<const Heroes *>::const_iterator it;
-    u16 index = Maps::ScanAroundObject(tile.GetIndex(), MP2::OBJ_HEROES);
+    const u16 around = Maps::ScanAroundObject(tile.GetIndex(), MP2::OBJ_HEROES);
     for(Direction::vector_t dir = Direction::TOP_LEFT; dir < Direction::CENTER; ++dir)
-	if(index & dir)
+	if(around & dir)
 	    heroes.push_back(world.GetHeroes(Maps::GetDirectionIndex(tile.GetIndex(), dir)));
 
     const Surface & st = tile.GetTileSurface();
@@ -358,6 +358,7 @@ void AnimationRemoveObject(const Maps::Tiles & tile)
     sf.Blit(sprite, sprite.x(), sprite.y());
 
     // if animation sprite
+    u16 index;
     if(0 != (index = ICN::AnimationFrame(MP2::GetICNObject(addon->object), addon->index)))
     {
 	const Sprite & sprite = AGG::GetICN(MP2::GetICNObject(addon->object), index);
@@ -1974,8 +1975,9 @@ void ActionToTreasureChest(Heroes &hero, const u8 obj, const s32 dst_index)
 		message = _("After scouring the area, you fall upon a hidden chest, containing the %{gold} gold pieces.");
 		String::Replace(message, "%{gold}", resource.gold);
 		DialogWithGold(_("Treasure Chest"), message, resource.gold);
+
+		world.GetKingdom(hero.GetColor()).AddFundsResource(resource);
 	    }
-	    world.GetKingdom(hero.GetColor()).AddFundsResource(resource);
 	}
 	else
 	if(resource.gold >= 1000)

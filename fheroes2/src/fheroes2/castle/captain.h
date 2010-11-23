@@ -45,7 +45,7 @@ class Captain : public HeroBase
     const std::string & GetName(void) const;
     u8 GetType(void) const;
     u8 GetControl(void) const;
-    u16 GetIndex(void) const;
+    s32 GetIndex(void) const;
 
     const Castle* inCastle(void) const;
 

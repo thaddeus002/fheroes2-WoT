@@ -941,7 +941,7 @@ Castle* Heroes::inCastle(void)
 /* is visited cell */
 bool Heroes::isVisited(const Maps::Tiles & tile, const Visit::type_t type) const
 {
-    const u16 & index = tile.GetIndex();
+    const s32 & index = tile.GetIndex();
     const MP2::object_t object = (tile.GetObject() == MP2::OBJ_HEROES ? GetUnderObject() : tile.GetObject());
 
     if(Visit::GLOBAL == type) return world.GetKingdom(color).isVisited(index, object);
@@ -950,7 +950,7 @@ bool Heroes::isVisited(const Maps::Tiles & tile, const Visit::type_t type) const
 }
 
 /* return true if object visited */
-bool Heroes::isVisited(const u8 object, const Visit::type_t type) const
+bool Heroes::isVisited(const MP2::object_t object, const Visit::type_t type) const
 {
     if(Visit::GLOBAL == type) return world.GetKingdom(color).isVisited(object);
 
@@ -1719,7 +1719,18 @@ void Heroes::Dump(void) const
                                          (Modes(AIWAITING) ? "WAITING," : ",") <<
                                          (Modes(STUPID) ? "STUPID," : ",") << std::endl;
     if(GetControl() == Game::AI)
+    {
+	std::cout << "spell book      : ";
+
+	if(spell_book.isActive())
+	    spell_book.Dump();
+	else
+	    std::cout << "disabled" << std::endl;
+
+	GetArmy().Dump("army dump       : ");
+
 	AI::HeroesDumpInfo(*this);
+    }
 
     std::cout << std::endl;
 }

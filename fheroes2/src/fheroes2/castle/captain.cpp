@@ -162,7 +162,7 @@ u8 Captain::GetControl(void) const
     return home.GetControl();
 }
 
-u16 Captain::GetIndex(void) const
+s32 Captain::GetIndex(void) const
 {
     return home.GetIndex();
 }
