@@ -248,9 +248,7 @@ namespace Battle2
 
 	Stats* GetRandom(void);
 	Stats* FindMode(u32);
-	Stats* SummonElemental(void);
 	Stats* CreateNewStats(Monster::monster_t, u32);
-
 
 	void SortSlowest(void);
 	void SortFastest(void);

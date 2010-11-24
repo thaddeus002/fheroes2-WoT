@@ -218,6 +218,12 @@ u32 Army::Troop::GetStrength(void) const
     // slowly: decrease strength
     if((!isFly() && !isArchers()) && Speed::AVERAGE > GetSpeed()) res -= res * 0.5;
 
+    switch(GetID())
+    {
+	case Monster::GHOST: res *= 2; break;
+
+	default: break;
+    }
     return static_cast<u32>(res);
 }
 
