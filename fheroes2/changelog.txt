@@ -1,4 +1,19 @@
-SVN - up to r2044
+SVN - up to r2070
+
+Nov, 22, 2010
++ Fixed: castle dialog: resource bar redraw
++ Fixed: bugs #3113888 empty treasure chest, fixed GameResult::CheckGameOver for load game
++ Fixed: redraw gamearea with non standard display size
++ Added: popup damage info for battle
++ Added: wait button for battle interface, also added list logs
++ Fixed: fix sphinx meeting
++ Added: Battle::Speed gui settings
++ Fixed: objects quickinfo dialog
++ Added: numpad keys support
++ Updated: AI update, AI strength update
++ Fixed: AI wins and game over
++ Fixed: marketplace dialog
++ Fixed: crash, empty army after ai::meetings
 
 Nov, 15, 2010
 + Fixed: mixer sound interrupt
