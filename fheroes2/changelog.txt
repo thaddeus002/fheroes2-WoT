@@ -1,6 +1,6 @@
-SVN - up to r2070
+SVN - up to r2080
 
-Nov, 22, 2010
+Nov, 24, 2010
 + Fixed: castle dialog: resource bar redraw
 + Fixed: bugs #3113888 empty treasure chest, fixed GameResult::CheckGameOver for load game
 + Fixed: redraw gamearea with non standard display size

@@ -25,3 +25,11 @@ Copy maps files (*.mp2) in to maps directory.
 
 Hot keys:
 all hotkeys may be redefined (see fheroes2.key)
+
+License:
+The game's license is described in COPYING.
+All rights to the resource file HEROES2.AGG is owned by Ubisoft.
+
+Please!
+Do not make the official packages for assembly fheroes2 together with the original version of resources heroes2.agg,
+it violates the license GPL2.
