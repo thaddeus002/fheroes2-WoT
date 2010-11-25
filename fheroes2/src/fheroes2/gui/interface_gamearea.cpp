@@ -63,39 +63,14 @@ const Rect & Interface::GameArea::GetRectMaps(void) const
 /* fixed src rect image */
 void Interface::GameArea::SrcRectFixed(Rect & src, Point & dst, const u16 rw, const u16 rh)
 {
-    SrcRectFixed(src, dst.x, dst.y, rw, rh);
+    const Rect & areaPosition = Interface::GameArea::Get().GetArea();
+    ToolsSrcRectFixed(src, dst.x, dst.y, rw, rh, areaPosition);
 }
 
 void Interface::GameArea::SrcRectFixed(Rect & src, s16 & dst_x, s16 & dst_y, const u16 rw, const u16 rh)
 {
-    src = Rect(0, 0, 0, 0);
     const Rect & areaPosition = Interface::GameArea::Get().GetArea();
-
-    if(0 != rw && 0 != rh &&
-        dst_x + rw > areaPosition.x && dst_y + rh > areaPosition.y &&
-        dst_x < areaPosition.x + areaPosition.w && dst_y < areaPosition.y + areaPosition.h)
-    {
-	src.w = rw;
-	src.h = rh;
-
-	if(dst_x < areaPosition.x)
-	{
-    	    src.x = areaPosition.x - dst_x;
-    	    dst_x = areaPosition.x;
-	}
-
-	if(dst_y < areaPosition.y)
-	{
-    	    src.y = areaPosition.y - dst_y;
-    	    dst_y = areaPosition.y;
-	}
-
-	if(dst_x + rw > areaPosition.x + areaPosition.w)
-	    src.w = areaPosition.x + areaPosition.w - dst_x;
-
-	if(dst_y + rh > areaPosition.y + areaPosition.h)
-	    src.h = areaPosition.y + areaPosition.h - dst_y;
-    }
+    ToolsSrcRectFixed(src, dst_x, dst_y, rw, rh, areaPosition);
 }
 
 void Interface::GameArea::Build(void)

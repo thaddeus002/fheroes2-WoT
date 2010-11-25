@@ -550,3 +550,34 @@ bool PressIntKey(u32 min, u32 max, u32 & result)
     }
     return false;
 }
+
+void ToolsSrcRectFixed(Rect & src, s16 & rx, s16 & ry, const u16 rw, const u16 rh, const Rect & max)
+{
+    src = Rect(0, 0, 0, 0);
+
+    if(0 != rw && 0 != rh &&
+        rx + rw > max.x && ry + rh > max.y &&
+        rx < max.x + max.w && ry < max.y + max.h)
+    {
+        src.w = rw;
+        src.h = rh;
+
+        if(rx < max.x)
+        {
+            src.x = max.x - rx;
+            rx = max.x;
+        }
+
+        if(ry < max.y)
+        {
+            src.y = max.y - ry;
+            ry = max.y;
+        }
+
+        if(rx + rw > max.x + max.w)
+            src.w = max.x + max.w - rx;
+
+        if(ry + rh > max.y + max.h)
+            src.h = max.y + max.h - ry;
+    }
+}
