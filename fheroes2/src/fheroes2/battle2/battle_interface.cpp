@@ -2140,22 +2140,9 @@ void Battle2::Interface::RedrawActionAttackPart1(Stats & attacker, Stats & defen
 
     // redraw luck animation
     if(attacker.Modes(LUCK_GOOD))
-    {
-	std::string msg = _("Good luck shines on the  %{attacker}");
-	String::Replace(msg, "%{attacker}", attacker.GetName());
-	status.SetMessage(msg, true);
-	status.SetMessage("", false);
-
-	RedrawTroopWithFrameAnimation(attacker, ICN::BLESS, M82::FromSpell(Spell::BLESS), false);
-    }
+	RedrawActionLuck(attacker, true);
     else
-    if(attacker.Modes(LUCK_BAD))
-    {
-	std::string msg = _("Bad luck descends on the %{attacker}");
-	String::Replace(msg, "%{attacker}", attacker.GetName());
-	status.SetMessage(msg, true);
-	status.SetMessage("", false);
-    }
+	RedrawActionLuck(attacker, false);
 
     AGG::PlaySound(attacker.M82Attk());
 
@@ -2704,6 +2691,69 @@ void Battle2::Interface::RedrawActionMonsterSpellCastStatus(const Stats & attack
 
 	status.SetMessage(str, true);
 	status.SetMessage("", false);
+    }
+}
+
+void Battle2::Interface::RedrawActionLuck(Stats & b, bool good)
+{
+    std::string msg;
+
+    if(good)
+    {
+	std::string msg = _("Good luck shines on the  %{attacker}");
+	String::Replace(msg, "%{attacker}", b.GetName());
+	status.SetMessage(msg, true);
+
+	Display & display = Display::Get();
+	Cursor & cursor = Cursor::Get();
+	LocalEvent & le = LocalEvent::Get();
+
+	const M82::m82_t m82 = M82::FromSpell(Spell::BLESS);
+	const Sprite & sunbow = AGG::GetICN(ICN::EXPMRL, 0);
+
+	const Rect & pos = b.GetCellPosition();
+
+	const MonsterInfo & msi = b.GetMonsterInfo();
+	const Sprite & troop = AGG::GetICN(msi.icn_file, msi.frm_idle.start, b.reflect);
+
+	u8 width = 2;
+
+	Rect src(0, 0, width, sunbow.h());
+	     src.x = (sunbow.w() - src.w) / 2;
+
+	cursor.SetThemes(Cursor::WAR_NONE);
+
+	if(M82::UNKNOWN != m82) AGG::PlaySound(m82);
+
+	while(le.HandleEvents() && width < sunbow.w())
+	{
+	    CheckGlobalEvents(le);
+
+	    if(Game::AnimateInfrequent(Game::BATTLE_MISSILE_DELAY))
+    	    {
+		cursor.Hide();
+		Redraw();
+
+		display.Blit(sunbow, src, pos.x + (b.isWide() ? (b.isReflect() ? pos.w : 0) : pos.w / 2) - src.w/2,
+		    pos.y + pos.h - troop.h() - src.h);
+
+		cursor.Show();
+		display.Flip();
+
+		src.w = width;
+		src.x = (sunbow.w() - src.w) / 2;
+
+		width += 3;
+	    }
+	}
+
+	DELAY(400);
+    }
+    else
+    {
+	std::string msg = _("Bad luck descends on the %{attacker}");
+	String::Replace(msg, "%{attacker}", b.GetName());
+	status.SetMessage(msg, true);
     }
 }
 
@@ -4125,7 +4175,7 @@ void Battle2::PopupDamageInfo::Redraw(u16 maxw, u16 maxh)
 	if(tmp1 > defender->GetCount()) tmp1 = defender->GetCount();
 	if(tmp2 > defender->GetCount()) tmp2 = defender->GetCount();
 
-	str = tmp1 == tmp2 ? _("Perished: %{max}") : _("Perished: %{min} - %{max}");
+	str = tmp1 == tmp2 ? _("Kills: %{max}") : _("Kills: %{min} - %{max}");
 
 	String::Replace(str, "%{min}", tmp1);
 	String::Replace(str, "%{max}", tmp2);
