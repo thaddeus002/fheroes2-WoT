@@ -759,21 +759,6 @@ u32 Battle2::Stats::CalculateDamageStats(const Stats & enemy, double dmg) const
 	default: break;
     }
 
-    return static_cast<u32>(dmg);
-}
-
-u32 Battle2::Stats::GetDamage(const Stats & enemy) const
-{
-    double dmg = 0;
-
-    if(Modes(SP_BLESS))
-	dmg = GetDamageMax(enemy);
-    else
-    if(Modes(SP_CURSE))
-    	dmg = GetDamageMin(enemy);
-    else
-    	dmg = Rand::Get(GetDamageMin(enemy), GetDamageMax(enemy));
-
     // approximate.. from faq
     int r = GetAttack() - enemy.GetDefense();
     if(enemy.troop.isDragons() && Modes(SP_DRAGONSLAYER)) r+= Spell::GetExtraValue(Spell::DRAGONSLAYER);
@@ -798,7 +783,18 @@ u32 Battle2::Stats::GetDamage(const Stats & enemy) const
 	default: break;
     }
 
-    return dmg < 1 ? 1 : static_cast<u32>(dmg);
+    return static_cast<u32>(dmg) < 1 ? 1 : static_cast<u32>(dmg);
+}
+
+u32 Battle2::Stats::GetDamage(const Stats & enemy) const
+{
+    if(Modes(SP_BLESS))
+	return GetDamageMax(enemy);
+    else
+    if(Modes(SP_CURSE))
+    	return GetDamageMin(enemy);
+
+    return Rand::Get(GetDamageMin(enemy), GetDamageMax(enemy));
 }
 
 u32 Battle2::Stats::HowMuchWillKilled(u32 dmg) const
