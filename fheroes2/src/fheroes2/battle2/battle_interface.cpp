@@ -94,6 +94,7 @@ namespace Battle2
 	{
 	    messages.push_back(str);
 	    SetListContent(messages);
+	    SetCurrent(messages.size()-1);
 	};
 
 	void RedrawItem(const std::string & str, s16 px, s16 py, bool f)
