@@ -31,7 +31,7 @@ const Surface & Portrait::Get(const HeroBase &hero, const Portrait::size_t sz)
 {
     if(hero.GetType() == Skill::Primary::CAPTAIN)
         return Captain(hero.GetRace(), sz);
-    else return Hero(dynamic_cast<const Heroes &>(hero), sz);
+    else return Hero(reinterpret_cast<const Heroes &>(hero), sz);
 }
 
 const Surface & Portrait::Captain(const Race::race_t rc, const Portrait::size_t sz)

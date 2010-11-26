@@ -21,6 +21,7 @@
  ***************************************************************************/
 
 #include <algorithm>
+#include <cctype>
 #include "agg.h"
 #include "settings.h"
 #include "text.h"

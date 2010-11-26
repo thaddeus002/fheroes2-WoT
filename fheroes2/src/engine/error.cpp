@@ -23,10 +23,19 @@
 #include <stdexcept>
 #include <iostream>
 #include "error.h"
+#ifdef ANDROID
+#include <android/log.h>
+#endif
 
 /* exception */
 void Error::Except(const char* message, const char* cstr)
 {
+#ifndef ANDROID
     std::cerr << "Error::Except: " << message << cstr << std::endl;
     throw Exception();
+#else
+ __android_log_print(ANDROID_LOG_FATAL, "fheroes2", "======");
+ __android_log_print(ANDROID_LOG_FATAL, "fheroes2", "Error: %s: %s", message, cstr);
+ __android_log_print(ANDROID_LOG_FATAL, "fheroes2", "======");
+#endif
 }

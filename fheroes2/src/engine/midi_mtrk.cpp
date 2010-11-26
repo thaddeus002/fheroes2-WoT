@@ -258,7 +258,12 @@ void MTrk::ImportXmiEVNT(const Chunk & evnt)
 	    if(delta2) delta -= delta2;
 
 	    // decrease duration
+#ifdef ANDROID
+	    for( std::list<meta_t> :: iterator it = notesoff.begin(); it != notesoff.end(); it++ )
+		it->decrease_duration(delta);
+#else
 	    std::for_each(notesoff.begin(), notesoff.end(), std::bind2nd(std::mem_fun_ref(&meta_t::decrease_duration), delta));
+#endif
 	}
 
 	// interval

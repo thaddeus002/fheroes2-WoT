@@ -25,7 +25,9 @@
 #include <fstream>
 #include <iostream>
 #include <cstring>
+#include <locale>
 #include <climits>
+#include <cctype>
 #include "error.h"
 #include "types.h"
 #include "tools.h"

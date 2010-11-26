@@ -1428,5 +1428,9 @@ u32 Settings::DisplayFlags(void) const
     u32 flags = opt_global.Modes(GLOBAL_USESWSURFACE) ? SDL_SWSURFACE : SDL_SWSURFACE | SDL_HWSURFACE;
     if(opt_global.Modes(GLOBAL_FULLSCREEN)) flags |= SDL_FULLSCREEN;
 
+#ifdef ANDROID
+    flags = SDL_SWSURFACE;
+#endif
+
     return flags;
 }

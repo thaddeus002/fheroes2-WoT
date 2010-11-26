@@ -47,17 +47,17 @@ void LoadConfigFiles(Settings &, const std::string &);
 
 int PrintHelp(const char *basename)
 {
-    std::cout << "Usage: " << basename << " [OPTIONS]" << std::endl;
+    VERBOSE("Usage: " << basename << " [OPTIONS]");
 #ifdef WITH_EDITOR
-    std::cout << "  -e\teditors mode" << std::endl;
+    VERBOSE("  -e\teditors mode");
 #endif
 #ifndef BUILD_RELEASE
-    std::cout << "  -d\tdebug mode" << std::endl;
+    VERBOSE("  -d\tdebug mode");
 #endif
 #ifdef WITH_NET
-    std::cout << "  -s\tdedicated server" << std::endl;
+    VERBOSE("  -s\tdedicated server");
 #endif
-    std::cout << "  -h\tprint this help and exit" << std::endl;
+    VERBOSE("  -h\tprint this help and exit");
 
     return EXIT_SUCCESS;
 }
@@ -72,7 +72,7 @@ int main(int argc, char **argv)
 	Settings & conf = Settings::Get();
 	int test = 0;
 
-	std::cout << "Free Heroes II, " + conf.BuildVersion() << std::endl;
+	VERBOSE("Free Heroes II, " + conf.BuildVersion());
 
 	LoadConfigFiles(conf, GetDirname(argv[0]));
 
@@ -129,7 +129,9 @@ int main(int argc, char **argv)
 #endif
 
 	if(SDL::Init(subsystem))
+#ifndef ANDROID
 	try
+#endif
 	{
 	    std::atexit(SDL::Quit);
 
@@ -233,7 +235,9 @@ int main(int argc, char **argv)
 	    //Display::ShowCursor();
 	    if(Settings::Get().ExtUseFade()) Display::Fade();
 
-	} catch(std::bad_alloc)
+	}
+#ifndef ANDROID
+	catch(std::bad_alloc)
 	{
 	    DEBUG(DBG_GAME, DBG_WARN, "std::bad_alloc");
     	    AGG::Cache::Get().Dump();
@@ -246,7 +250,7 @@ int main(int argc, char **argv)
     	    AGG::Cache::Get().Dump();
 	    conf.Dump();
 	}
-
+#endif
 	return EXIT_SUCCESS;
 }
 
@@ -345,7 +349,7 @@ void ReadConfigFile(Settings & conf)
     std::string strtmp = conf.LocalPrefix() + SEPARATOR + "fheroes2.cfg";
     if(FilePresent(strtmp))
     {
-	std::cout << "config: " << strtmp << " load." << std::endl;
+	VERBOSE("config: " << strtmp << " load.");
 	conf.Read(strtmp);
     }
 }

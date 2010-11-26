@@ -27,6 +27,7 @@
 #include <list>
 #include <iostream>
 #include <iomanip>
+#include <sstream>
 #include "gamedefs.h"
 #include "difficulty.h"
 #include "race.h"
@@ -35,6 +36,10 @@
 #include "game.h"
 #include "game_io.h"
 #include "bitmodes.h"
+
+#ifdef ANDROID
+#include <android/log.h>
+#endif
 
 #define FORMAT_VERSION_2031 0x07EF
 #define FORMAT_VERSION_1978 0x07BA
@@ -71,6 +76,9 @@ enum
 #ifdef __SYMBIAN32__
 #define VERBOSE(x)
 #define DEBUG(x, y, z)
+#elif defined(ANDROID)
+#define VERBOSE(x) { std::ostringstream osss; osss << x; __android_log_print(ANDROID_LOG_INFO, "FHeroes", "%s", osss.str().c_str()); }
+#define DEBUG(x, y, z) if(IS_DEBUG((x), (y))) VERBOSE(z)
 #else
 #define VERBOSE(x) std::cout << x << std::endl
 #define DEBUG(x, y, z) if(IS_DEBUG((x), (y))) VERBOSE(z)
