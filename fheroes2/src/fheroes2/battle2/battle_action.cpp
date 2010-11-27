@@ -137,6 +137,10 @@ void Battle2::Arena::BattleProcess(Stats & attacker, Stats & defender)
     std::vector<TargetInfo> targets;
 
     GetTargetsForDamage(attacker, defender, targets);
+
+    attacker.UpdateDirection(defender);
+    defender.UpdateDirection(attacker);
+
     if(interface) interface->RedrawActionAttackPart1(attacker, defender, targets);
 
     TargetsApplyDamage(attacker, defender, targets);
@@ -290,9 +294,6 @@ void Battle2::Arena::ApplyActionAttack(Action & action)
 	// check position
 	if(b1->isArchers() || handfighting)
 	{
-	    b1->UpdateDirection(*b2);
-	    b2->UpdateDirection(*b1);
-
 	    // attack
 	    BattleProcess(*b1, *b2);
 
@@ -576,7 +577,7 @@ void Battle2::Arena::GetTargetsForDamage(Stats & attacker, Stats & defender, std
     if(attacker.isDoubleCellAttack())
     {
         const direction_t dir = Board::GetDirection(attacker.position, defender.position);
-        if((!defender.isWide() || 0 == ((RIGHT | LEFT) & dir)))
+        if(!defender.isWide() || 0 == ((RIGHT | LEFT) & dir))
 	{
 	    if(NULL != (cell = GetCell(defender.position, dir)) &&
 		NULL != (enemy = GetTroopBoard(cell->index)) && enemy != &defender)
