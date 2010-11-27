@@ -1644,8 +1644,10 @@ void Maps::Tiles::UpdateQuantity(void)
 
 	case MP2::OBJ_WINDMILL:
 	    // 2 rnd resource
-	    quantity1 = Resource::Rand();
 	    quantity2 = 2;
+	    quantity1 = Resource::WOOD;
+	    // except: wood, bugs: #3117478
+	    while(quantity1 != Resource::WOOD) quantity1 = Resource::Rand();
 	break;
 
 	case MP2::OBJ_LEANTO:
