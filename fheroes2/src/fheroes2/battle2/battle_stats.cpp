@@ -477,6 +477,19 @@ bool Battle2::Stats::isReflect(void) const
     return reflect;
 }
 
+bool Battle2::Stats::OutOfWalls(void) const
+{
+    return ((position <=  8) ||
+    	    (11 <= position && position <= 19) ||
+    	    (22 <= position && position <= 29) ||
+    	    (33 <= position && position <= 40) ||
+    	    (44 <= position && position <= 50) ||
+    	    (55 <= position && position <= 62) ||
+    	    (66 <= position && position <= 73) ||
+    	    (77 <= position && position <= 85) ||
+    	    (88 <= position && position <= 96));
+}
+
 u8 Battle2::Stats::GetObstaclesPenalty(const Stats & attacker) const
 {
     if(!arena || Modes(CAP_TOWER) || attacker.Modes(CAP_TOWER)) return 0;
@@ -493,15 +506,8 @@ u8 Battle2::Stats::GetObstaclesPenalty(const Stats & attacker) const
 	if(enemy && Skill::Level::NONE != enemy->GetLevelSkill(Skill::Secondary::ARCHERY)) return 0;
 
 	// check out of walls
-	if((position <=  8) ||
-    	    (11 <= position && position <= 19) ||
-    	    (22 <= position && position <= 29) ||
-    	    (33 <= position && position <= 40) ||
-    	    (44 <= position && position <= 50) ||
-    	    (55 <= position && position <= 62) ||
-    	    (66 <= position && position <= 73) ||
-    	    (77 <= position && position <= 85) ||
-    	    (88 <= position && position <= 96)) return 0;
+	if(attacker.OutOfWalls() & OutOfWalls())
+	    return 0;
 
 	// check castle walls defensed
 	if(troop.GetColor() == arena->army2.GetColor())

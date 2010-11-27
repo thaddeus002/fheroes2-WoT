@@ -211,6 +211,7 @@ namespace Battle2
 	u8	GetSpellMagic(bool force = false) const;
 	bool	isHaveDamage(void) const;
 	u8	GetObstaclesPenalty(const Stats &) const;
+	bool	OutOfWalls(void) const;
 
 	const Army::army_t* GetArmy(void) const;
 	Army::army_t*       GetArmy(void);
