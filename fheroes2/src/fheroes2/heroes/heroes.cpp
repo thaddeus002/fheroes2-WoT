@@ -1547,7 +1547,8 @@ void Heroes::SetFreeman(const u8 reason)
 
     color = Color::GRAY;
     world.GetTiles(GetIndex()).SetObject(save_maps_object);
-    modes = 0;
+    // save patrol and other flags, see: Kingdom::ApplyPlayWithStartingHero
+    if(reason) modes = 0;
     SetIndex(-1);
     move_point_scale = -1;
     path.Reset();
