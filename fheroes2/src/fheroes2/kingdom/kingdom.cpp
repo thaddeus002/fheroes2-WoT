@@ -533,8 +533,15 @@ void Kingdom::ApplyPlayWithStartingHero(void)
     	    // and move manual set hero to castle
     	    if(hero && hero->GetColor() == GetColor())
     	    {
+		bool patrol = hero->Modes(Heroes::PATROL);
     		hero->SetFreeman(0);
     		hero->Recruit(**it);
+
+		if(patrol)
+		{
+		    hero->SetModes(Heroes::PATROL);
+		    hero->SetCenterPatrol(cp);
+		}
     	    }
 	}
 	else

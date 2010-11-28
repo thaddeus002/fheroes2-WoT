@@ -136,6 +136,7 @@ public:
     u8 GetLevel(void) const;
 
     const Point & GetCenterPatrol(void) const;
+    void SetCenterPatrol(const Point &);
     u8 GetSquarePatrol(void) const;
 
     u16 GetMaxSpellPoints(void) const;

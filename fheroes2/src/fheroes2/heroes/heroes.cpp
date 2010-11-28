@@ -1547,8 +1547,7 @@ void Heroes::SetFreeman(const u8 reason)
 
     color = Color::GRAY;
     world.GetTiles(GetIndex()).SetObject(save_maps_object);
-    // save patrol and other flags, see: Kingdom::ApplyPlayWithStartingHero
-    if(reason) modes = 0;
+    modes = 0;
     SetIndex(-1);
     move_point_scale = -1;
     path.Reset();
@@ -1668,6 +1667,11 @@ void Heroes::ActionNewPosition(void)
     }
 
     ResetModes(VISIONS);
+}
+
+void Heroes::SetCenterPatrol(const Point & pt)
+{
+    patrol_center = pt;
 }
 
 const Point & Heroes::GetCenterPatrol(void) const
