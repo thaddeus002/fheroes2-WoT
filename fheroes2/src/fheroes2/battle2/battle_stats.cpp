@@ -505,13 +505,15 @@ u8 Battle2::Stats::GetObstaclesPenalty(const Stats & attacker) const
 	// archery skill
 	if(enemy && Skill::Level::NONE != enemy->GetLevelSkill(Skill::Secondary::ARCHERY)) return 0;
 
-	// check out of walls
-	if(attacker.OutOfWalls() & OutOfWalls())
+	if(attacker.troop.GetColor() == arena->army2.GetColor())
 	    return 0;
 
 	// check castle walls defensed
 	if(troop.GetColor() == arena->army2.GetColor())
 	{
+	    if(attacker.OutOfWalls() & OutOfWalls())
+		return 0;
+
 	    const Rect & pos1 = attacker.GetCellPosition();
 	    const Rect & pos2 = GetCellPosition();
 	    std::vector<Point> points;
@@ -1460,6 +1462,7 @@ void Battle2::Stats::SpellApplyDamage(u8 spell, u8 spoint, const HeroBase* hero,
     {
 	target.damage = dmg;
 	target.killed = ApplyDamage(dmg);
+	if(target.defender && target.defender->Modes(SP_BLIND)) target.defender->ResetBlind();
     }
 }
 

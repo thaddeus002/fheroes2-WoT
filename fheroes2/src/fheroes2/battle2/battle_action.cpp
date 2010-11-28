@@ -830,6 +830,8 @@ void Battle2::Arena::ApplyActionTower(Action & action)
 	if(interface) interface->RedrawActionTowerPart1(*tower, *b2);
 	target.killed = b2->ApplyDamage(*b1, target.damage);
 	if(interface) interface->RedrawActionTowerPart2(*tower, target);
+
+	if(b2->Modes(SP_BLIND)) b2->ResetBlind();
     }
     else
 	DEBUG(DBG_BATTLE, DBG_WARN, "Battle2::Arena::ApplyActionTower: " << "incorrect param: " << "tower: " << static_cast<int>(type) << ", id: " << id);
