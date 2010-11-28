@@ -105,7 +105,7 @@ void GameOver::GetActualDescription(u16 cond, std::string & msg)
     else
     if(LOSS_TOWN & cond)
     {
-	const Castle *town = world.GetCastle(conf.WinsMapsIndexObject());
+	const Castle *town = world.GetCastle(conf.LossMapsIndexObject());
 	if(town)
 	{
     	    msg = town->isCastle() ? _("Lose the castle '%{name}'.") : _("Lose the town '%{name}'.");
@@ -115,7 +115,7 @@ void GameOver::GetActualDescription(u16 cond, std::string & msg)
     else
     if(LOSS_HERO & cond)
     {
-    	const Heroes *hero = world.GetHeroesCondWins();
+    	const Heroes *hero = world.GetHeroesCondLoss();
 	if(hero)
 	{
 	    msg = _("Lose the hero '%{name}'.");

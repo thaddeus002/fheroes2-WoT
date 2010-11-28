@@ -923,6 +923,18 @@ void World::LoadMaps(const std::string &filename)
     for(; itc1 != itc2; ++itc1)
 	if(*itc1) GetKingdom((*itc1)->GetColor()).AddCastle(*itc1);
 
+    // update wins, loss conditions
+    if(GameOver::WINS_HERO & Settings::Get().ConditionWins())
+    {
+	const Heroes* hero = GetHeroes(Settings::Get().WinsMapsIndexObject());
+	heroes_cond_wins = hero ? hero->GetID() : Heroes::UNKNOWN;
+    }
+    if(GameOver::LOSS_HERO & Settings::Get().ConditionLoss())
+    {
+	const Heroes* hero = GetHeroes(Settings::Get().LossMapsIndexObject());
+	heroes_cond_loss = hero ? hero->GetID() : Heroes::UNKNOWN;
+    }
+
     // play with hero
     std::for_each(vec_kingdoms.begin(), vec_kingdoms.end(), std::mem_fun(&Kingdom::ApplyPlayWithStartingHero));
 
@@ -969,18 +981,6 @@ void World::LoadMaps(const std::string &filename)
 
     if(Maps::isValidAbsIndex(ultimate_artifact))
 	Interface::GameArea::GenerateUltimateArtifactAreaSurface(ultimate_artifact, puzzle_surface);
-
-    // update wins, loss conditions
-    if(GameOver::WINS_HERO & Settings::Get().ConditionWins())
-    {
-	const Heroes* hero = GetHeroes(Settings::Get().WinsMapsIndexObject());
-	heroes_cond_wins = hero ? hero->GetID() : Heroes::UNKNOWN;
-    }
-    if(GameOver::LOSS_HERO & Settings::Get().ConditionLoss())
-    {
-	const Heroes* hero = GetHeroes(Settings::Get().LossMapsIndexObject());
-	heroes_cond_loss = hero ? hero->GetID() : Heroes::UNKNOWN;
-    }
 
     DEBUG(DBG_GAME , DBG_INFO, "World::LoadMaps: end load.");
 }
