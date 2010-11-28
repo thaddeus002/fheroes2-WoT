@@ -1660,6 +1660,12 @@ void Heroes::ActionNewPosition(void)
 	}
     }
 
+    if(MP2::OBJ_EVENT == save_maps_object)
+    {
+	Action(GetIndex());
+	SetMove(false);
+    }
+
     ResetModes(VISIONS);
 }
 

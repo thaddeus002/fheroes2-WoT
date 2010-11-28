@@ -2751,6 +2751,8 @@ void ActionToEvent(Heroes &hero, const u8 obj, const s32 dst_index)
     const GameEvent::Coord* event_maps = world.GetEventMaps(hero.GetColor(), dst_index);
     if(event_maps)
     {
+	hero.SetMove(false);
+
         if(event_maps->GetResource().GetValidItems())
         {
     	    world.GetKingdom(hero.GetColor()).AddFundsResource(event_maps->GetResource());

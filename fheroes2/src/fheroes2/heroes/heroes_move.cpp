@@ -337,6 +337,44 @@ void Heroes::Redraw(Surface & dst, const s16 dx, const s16 dy, bool with_shadow)
     }
 }
 
+void Heroes::MoveStep(Heroes & hero, s32 index_from, s32 index_to, bool newpos)
+{
+    if(newpos)
+    {
+	Maps::Tiles & tiles_from = world.GetTiles(index_from);
+	Maps::Tiles & tiles_to = world.GetTiles(index_to);
+
+	if(MP2::OBJ_HEROES != hero.GetUnderObject()) tiles_from.SetObject(hero.GetUnderObject());
+
+	hero.SetIndex(index_to);
+	hero.SaveUnderObject(tiles_to.GetObject());
+	tiles_to.SetObject(MP2::OBJ_HEROES);
+	hero.Scoute();
+	hero.ApplyPenaltyMovement();
+	hero.GetPath().PopFront();
+
+	// check protection tile
+	hero.ActionNewPosition();
+
+	// possible hero is die
+	if(!hero.isFreeman())
+	{
+	    if(index_to == hero.GetPath().GetDestinationIndex())
+	    {
+		hero.GetPath().Reset();
+		hero.Action(index_to);
+		hero.SetMove(false);
+	    }
+	}
+    }
+    else
+    {
+	hero.ApplyPenaltyMovement();
+	hero.GetPath().Reset();
+	hero.Action(index_to);
+	hero.SetMove(false);
+    }
+}
 
 bool Heroes::MoveStep(bool fast)
 {
@@ -348,46 +386,10 @@ bool Heroes::MoveStep(bool fast)
     if(fast)
     {
 	if(index_to == index_dst && isNeedStayFrontObject(*this, world.GetTiles(index_to)))
-	{
-	    ApplyPenaltyMovement();
-	    path.Reset();
-	    Action(index_to);
-	    SetMove(false);
-	}
+	    MoveStep(*this, index_from, index_to, false);
 	else
-	{
-	    Maps::Tiles & tiles_from = world.GetTiles(index_from);
-	    Maps::Tiles & tiles_to = world.GetTiles(index_to);
+	    MoveStep(*this, index_from, index_to, true);
 
-	    if(MP2::OBJ_HEROES != save_maps_object) tiles_from.SetObject(save_maps_object);
-
-	    SetIndex(index_to);
-	    save_maps_object = tiles_to.GetObject();
-	    tiles_to.SetObject(MP2::OBJ_HEROES);
-	    Scoute();
-	    ApplyPenaltyMovement();
-	    path.PopFront();
-
-	    if(MP2::OBJ_EVENT == save_maps_object)
-	    {
-		Action(index_to);
-		SetMove(false);
-	    }
-
-	    // check protection tile
-	    ActionNewPosition();
-
-	    // possible hero is die
-	    if(!isFreeman())
-	    {
-		if(index_to == index_dst)
-		{
-		    path.Reset();
-		    Action(index_to);
-		    SetMove(false);
-		}
-	    }
-	}
 	return true;
     }
     else
@@ -395,10 +397,8 @@ bool Heroes::MoveStep(bool fast)
     {
 	if(index_to == index_dst && isNeedStayFrontObject(*this, world.GetTiles(index_to)))
 	{
-	    ApplyPenaltyMovement();
-	    path.Reset();
-	    Action(index_to);
-	    SetMove(false);
+	    MoveStep(*this, index_from, index_to, false);
+
 	    return true;
 	}
 	else
@@ -411,38 +411,8 @@ bool Heroes::MoveStep(bool fast)
     else
     if(8 == sprite_index % 9)
     {
-	Maps::Tiles & tiles_from = world.GetTiles(index_from);
-	Maps::Tiles & tiles_to = world.GetTiles(index_to);
-
-	if(MP2::OBJ_HEROES != save_maps_object) tiles_from.SetObject(save_maps_object);
-
-	SetIndex(index_to);
-	save_maps_object = tiles_to.GetObject();
-	tiles_to.SetObject(MP2::OBJ_HEROES);
-	Scoute();
-	ApplyPenaltyMovement();
 	sprite_index -= 8;
-	path.PopFront();
-
-	if(MP2::OBJ_EVENT == save_maps_object)
-	{
-	    Action(index_to);
-	    SetMove(false);
-	}
-
-	// check protection tile
-	ActionNewPosition();
-
-	// possible hero is die
-	if(!isFreeman())
-	{
-	    if(index_to == index_dst)
-	    {
-		path.Reset();
-		Action(index_to);
-		SetMove(false);
-	    }
-	}
+	MoveStep(*this, index_from, index_to, true);
 
 	return true;
     }

@@ -243,6 +243,7 @@ private:
     void LevelUpSecondarySkill(const Skill::Primary::skill_t, bool autoselect = false);
     void AngleStep(const Direction::vector_t to_direct);
     bool MoveStep(bool fast = false);
+    static void MoveStep(Heroes &, s32 from, s32 to, bool newpos);
 
     std::string		name;
     Color::color_t	color;
