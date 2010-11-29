@@ -1,4 +1,16 @@
-SVN - up to r2080
+SVN - up to r2095
+
+Fixed: patrol mode, with Kingdom::ApplyPlayWithStartingHero
+Fixed: event maps for protection tile (first will be a battle)
+Fixed: battle blind spell (clean after tower attack and damage spell)
+Fixed: gameover conditions (defeat/loss hero)
+Fixed: windmill resource (remove wood)
+Fixed: archers damage with castle walls
+Fixed: battle attack for wide troop
+Fixed: battle info damage range correctted
+Added: 900 ms delay for battle info popup, open log window with last message currently
+Added: battle luck animation (rainbow)
+Added: ANDROID build support
 
 Nov, 24, 2010
 + Fixed: castle dialog: resource bar redraw
