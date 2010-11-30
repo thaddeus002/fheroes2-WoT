@@ -744,9 +744,6 @@ Game::menu_t Game::HumanTurn(void)
     	    // next town
 	    if(HotKeyPress(EVENT_NEXTTOWN)) EventNextTown();
 	    else
-	    // hero movement
-	    if(HotKeyPress(EVENT_CONTINUE)) EventContinueMovement();
-	    else
 	    // save game
 	    if(HotKeyPress(EVENT_SAVEGAME)) EventSaveGame();
 	    else
@@ -769,12 +766,6 @@ Game::menu_t Game::HumanTurn(void)
 	    // info game
 	    if(HotKeyPress(EVENT_INFOGAME)) EventGameInfo();
 	    else
-	    // dig artifact
-	    if(HotKeyPress(EVENT_DIGARTIFACT)) EventDigArtifact(res);
-	    else
-	    // sleep hero
-	    if(HotKeyPress(EVENT_SLEEPHERO)) EventSwitchHeroSleeping();
-	    else
 	    // cast spell
 	    if(HotKeyPress(EVENT_CASTSPELL)) EventCastSpell();
 	    else
@@ -793,22 +784,35 @@ Game::menu_t Game::HumanTurn(void)
 	    // hide/show hero/town icons
 	    if(HotKeyPress(EVENT_SHOWICONS)) EventSwitchShowIcons();
 	    else
-	    // move hero
-	    if(HotKeyPress(EVENT_MOVELEFT)) KeyArrowPress(Direction::LEFT);
-	    else
-	    if(HotKeyPress(EVENT_MOVERIGHT)) KeyArrowPress(Direction::RIGHT);
-	    else
-	    if(HotKeyPress(EVENT_MOVETOP)) KeyArrowPress(Direction::TOP);
-	    else
-	    if(HotKeyPress(EVENT_MOVEBOTTOM)) KeyArrowPress(Direction::BOTTOM);
-	    else
-	    if(HotKeyPress(EVENT_MOVETOPLEFT)) KeyArrowPress(Direction::TOP_LEFT);
-	    else
-	    if(HotKeyPress(EVENT_MOVETOPRIGHT)) KeyArrowPress(Direction::TOP_RIGHT);
-	    else
-	    if(HotKeyPress(EVENT_MOVEBOTTOMLEFT)) KeyArrowPress(Direction::BOTTOM_LEFT);
-	    else
-	    if(HotKeyPress(EVENT_MOVEBOTTOMRIGHT)) KeyArrowPress(Direction::BOTTOM_RIGHT);
+	    // heroes event
+    	    if(Game::Focus::HEROES == global_focus.Type())
+	    {
+		// hero movement
+		if(HotKeyPress(EVENT_CONTINUE)) EventContinueMovement();
+		else
+		// dig artifact
+		if(HotKeyPress(EVENT_DIGARTIFACT)) EventDigArtifact(res);
+		else
+		// sleep hero
+		if(HotKeyPress(EVENT_SLEEPHERO)) EventSwitchHeroSleeping();
+		else
+		// move hero
+		if(HotKeyPress(EVENT_MOVELEFT)) KeyArrowPress(Direction::LEFT);
+		else
+		if(HotKeyPress(EVENT_MOVERIGHT)) KeyArrowPress(Direction::RIGHT);
+		else
+		if(HotKeyPress(EVENT_MOVETOP)) KeyArrowPress(Direction::TOP);
+		else
+		if(HotKeyPress(EVENT_MOVEBOTTOM)) KeyArrowPress(Direction::BOTTOM);
+		else
+		if(HotKeyPress(EVENT_MOVETOPLEFT)) KeyArrowPress(Direction::TOP_LEFT);
+		else
+		if(HotKeyPress(EVENT_MOVETOPRIGHT)) KeyArrowPress(Direction::TOP_RIGHT);
+		else
+		if(HotKeyPress(EVENT_MOVEBOTTOMLEFT)) KeyArrowPress(Direction::BOTTOM_LEFT);
+		else
+		if(HotKeyPress(EVENT_MOVEBOTTOMRIGHT)) KeyArrowPress(Direction::BOTTOM_RIGHT);
+	    }
 	    else
 	    // scroll maps
 	    if(HotKeyPress(EVENT_SCROLLLEFT)) I.gameArea.SetScroll(SCROLL_LEFT);
