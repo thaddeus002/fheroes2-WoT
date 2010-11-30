@@ -95,6 +95,7 @@ namespace Game
 	EVENT_SYSTEM_SCREENSHOT,
 	EVENT_SYSTEM_DEBUG1,
 	EVENT_SYSTEM_DEBUG2,
+	EVENT_SLEEPHERO,
 	EVENT_ENDTURN,
 	EVENT_NEXTHERO,
 	EVENT_NEXTTOWN,
@@ -222,6 +223,7 @@ namespace Game
 
     void ShowLoadMapsText(void);
 
+    void EventSwitchHeroSleeping(void);
     void EventEndTurn(menu_t &);
     void EventExit(menu_t &);
     void EventNextHero(void);

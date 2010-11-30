@@ -75,6 +75,7 @@ const char* Game::EventsName(events_t evnt)
 	case EVENT_SYSTEM_DEBUG1:	return "system debug1";
 	case EVENT_SYSTEM_DEBUG2:	return "system debug2";
 
+	case EVENT_SLEEPHERO:		return "sleep hero";
 	case EVENT_ENDTURN:		return "end turn";
 	case EVENT_NEXTHERO:		return "next hero";
 	case EVENT_NEXTTOWN:		return "next town";
@@ -162,6 +163,8 @@ void Game::HotKeysDefaults(void)
     key_events[EVENT_BATTLE_HARDSKIP] = KEY_h;
     key_events[EVENT_BATTLE_SOFTSKIP] = KEY_SPACE;
 
+    // sleep hero
+    key_events[EVENT_SLEEPHERO] = KEY_z;
     // end turn
     key_events[EVENT_ENDTURN] = KEY_e;
     // next hero

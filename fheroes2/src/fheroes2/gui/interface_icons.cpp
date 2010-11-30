@@ -94,6 +94,10 @@ void RedrawHeroesIcon(const Heroes & hero, s16 sx, s16 sy)
     // mana
     display.FillRect(blue, Rect(sx + barw + port.w() + 2, sy, barw, ICONS_HEIGHT));
     display.Blit(mana, sx + barw + port.w() + 2, sy + mana.y());
+
+    // heroes sleeper marker
+    if(hero.Modes(Heroes::SLEEPER))
+        display.Blit(AGG::GetICN(ICN::MISC4, 14), sx + 36, sy - 2);
 }
 
 void Interface::IconsBar::RedrawBackground(const Point & pos)

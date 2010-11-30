@@ -81,6 +81,7 @@ public:
 	JAIL		= 0x0080,
 	ACTION		= 0x0100,
 	SAVEPOINTS	= 0x0200,
+	SLEEPER		= 0x0400,
 	VISIONS		= 0x4000,
 	PATROL		= 0x8000
     };

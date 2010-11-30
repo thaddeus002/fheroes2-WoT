@@ -1514,7 +1514,7 @@ bool Heroes::ApplyPenaltyMovement(void)
 
 bool Heroes::MayStillMove(void) const
 {
-    if(Modes(STUPID) || isFreeman()) return false;
+    if(Modes(SLEEPER) || Modes(STUPID) || isFreeman()) return false;
     return path.isValid() ? (move_point >= path.GetFrontPenalty()) : CanMove();
 }
 

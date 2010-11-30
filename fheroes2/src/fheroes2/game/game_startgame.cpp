@@ -772,6 +772,9 @@ Game::menu_t Game::HumanTurn(void)
 	    // dig artifact
 	    if(HotKeyPress(EVENT_DIGARTIFACT)) EventDigArtifact(res);
 	    else
+	    // sleep hero
+	    if(HotKeyPress(EVENT_SLEEPHERO)) EventSwitchHeroSleeping();
+	    else
 	    // cast spell
 	    if(HotKeyPress(EVENT_CASTSPELL)) EventCastSpell();
 	    else
@@ -1412,6 +1415,24 @@ void Game::EventPuzzleMaps(void)
 void Game::EventGameInfo(void)
 {
     Dialog::GameInfo();
+}
+
+void Game::EventSwitchHeroSleeping(void)
+{
+    Focus & global_focus = Focus::Get();
+
+    if(Game::Focus::HEROES == global_focus.Type())
+    {
+	Interface::Basic & I = Interface::Basic::Get();
+	Heroes & hero = global_focus.GetHeroes();
+
+	if(hero.Modes(Heroes::SLEEPER))
+	    hero.ResetModes(Heroes::SLEEPER);
+	else
+	    hero.SetModes(Heroes::SLEEPER);
+
+	I.SetRedraw(REDRAW_HEROES);
+    }
 }
 
 void Game::EventDigArtifact(menu_t & ret)
