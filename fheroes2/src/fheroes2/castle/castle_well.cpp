@@ -29,8 +29,19 @@
 #include "castle.h"
 #include "text.h"
 
+struct dwelling_t : public std::pair<u32, u16>
+{
+    dwelling_t(u32 type, u16 count) : std::pair<u32, u16>(type, count){};
+};
+
+struct dwellings_t : public std::vector<dwelling_t>
+{
+    dwellings_t() { reserve(6); };
+};
+
 void Castle::OpenWell(void)
 {
+    const Settings & conf = Settings::Get();
     Display & display = Display::Get();
     // cursor
     Cursor & cursor = Cursor::Get();
@@ -50,6 +61,10 @@ void Castle::OpenWell(void)
     dst_pt.y = cur_pt.y + 461;
     Button buttonExit(dst_pt, ICN::WELLXTRA, 0, 1);
 
+    dst_pt.x = cur_pt.x + -5;
+    dst_pt.y = cur_pt.y + 461;
+    Button buttonMax(dst_pt, ICN::RECRUIT, 4, 5);
+    
     const Rect rectMonster1(cur_pt.x + 20, cur_pt.y + 18, 288, 124);
     const Rect rectMonster2(cur_pt.x + 20, cur_pt.y + 168, 288, 124);
     const Rect rectMonster3(cur_pt.x + 20, cur_pt.y + 318, 288, 124);
@@ -61,9 +76,24 @@ void Castle::OpenWell(void)
 
     WellRedrawInfoArea(cur_pt);
 
+    if(! conf.ExtAllowBuyFromWell())
+	buttonMax.SetDisable(true);
+    else
+	buttonMax.Draw();
+
+    std::vector<u32> alldwellings;
+    alldwellings.reserve(6);
+    alldwellings.push_back(DWELLING_MONSTER6);
+    alldwellings.push_back(DWELLING_MONSTER5);
+    alldwellings.push_back(DWELLING_MONSTER4);
+    alldwellings.push_back(DWELLING_MONSTER3);
+    alldwellings.push_back(DWELLING_MONSTER2);
+    alldwellings.push_back(DWELLING_MONSTER1);
+
     cursor.Show();
     display.Flip();
 
+    bool redraw = false;
     LocalEvent & le = LocalEvent::Get();
 
     // loop
@@ -71,71 +101,81 @@ void Castle::OpenWell(void)
     {
         le.MousePressLeft(buttonExit) ? buttonExit.PressDraw() : buttonExit.ReleaseDraw();
 
+	buttonMax.isEnable() &&
+        le.MousePressLeft(buttonMax) ? buttonMax.PressDraw() : buttonMax.ReleaseDraw();
+
         if(le.MouseClickLeft(buttonExit) || HotKeyCloseWindow) break;
 
         // extended version (click - buy dialog monster)
-        if(Settings::Get().ExtAllowBuyFromWell())
+        if(conf.ExtAllowBuyFromWell())
         {
+	    if(le.MouseClickLeft(buttonMax))
+	    {
+		dwellings_t results;
+		std::string str;
+		Resource::funds_t cur, total;
+		u16 can_recruit;
+
+		for(std::vector<u32>::const_iterator
+		    it = alldwellings.begin(); it != alldwellings.end(); ++it)
+		    if(0 != (can_recruit = HowManyRecruitMonster(*it, &cur)))
+		{
+		    results.push_back(dwelling_t(*it, can_recruit));
+		    total += cur;
+		    const Monster ms(race, GetActualDwelling(*it));
+		    str.append(ms.GetPluralName(can_recruit));
+		    str.append(" - ");
+		    String::AddInt(str, can_recruit);
+		    str.append("\n");
+		}
+
+		if(Dialog::YES ==
+		    Dialog::ResourceInfo(_("Buy Monsters:"), str, total, Dialog::YES|Dialog::NO))
+		{
+		    for(dwellings_t::const_iterator
+			it = results.begin(); it != results.end(); ++it)
+		    {
+			const dwelling_t & dw = *it;
+			RecruitMonster(dw.first, dw.second);
+		    }
+		    redraw = true;
+		}
+	    }
+
     	    if(building & DWELLING_MONSTER1 && le.MouseClickLeft(rectMonster1) &&
-    		Castle::RecruitMonster(DWELLING_MONSTER1, Dialog::RecruitMonster(
-            	    Monster(race, DWELLING_MONSTER1), dwelling[0])))
-    	    {
-        	cursor.Hide();
-		WellRedrawInfoArea(cur_pt);
-		cursor.Show();
-        	display.Flip();
-    	    }
+    		RecruitMonster(DWELLING_MONSTER1, Dialog::RecruitMonster(
+            	    Monster(race, DWELLING_MONSTER1), dwelling[0]))) redraw = true;
     	    else
     	    if(building & DWELLING_MONSTER2 && le.MouseClickLeft(rectMonster2) &&
-    		Castle::RecruitMonster(DWELLING_MONSTER2, Dialog::RecruitMonster(
-            	    Monster(race, GetActualDwelling(DWELLING_MONSTER2)), dwelling[1])))
-    	    {
-        	cursor.Hide();
-		WellRedrawInfoArea(cur_pt);
-		cursor.Show();
-        	display.Flip();
-    	    }
+    		RecruitMonster(DWELLING_MONSTER2, Dialog::RecruitMonster(
+            	    Monster(race, GetActualDwelling(DWELLING_MONSTER2)), dwelling[1]))) redraw = true;
     	    else
     	    if(building & DWELLING_MONSTER3 && le.MouseClickLeft(rectMonster3) &&
-    		Castle::RecruitMonster(DWELLING_MONSTER3, Dialog::RecruitMonster(
-            	    Monster(race, GetActualDwelling(DWELLING_MONSTER3)), dwelling[2])))
-    	    {
-        	cursor.Hide();
-		WellRedrawInfoArea(cur_pt);
-		cursor.Show();
-        	display.Flip();
-    	    }
+    		RecruitMonster(DWELLING_MONSTER3, Dialog::RecruitMonster(
+            	    Monster(race, GetActualDwelling(DWELLING_MONSTER3)), dwelling[2]))) redraw = true;
     	    else
     	    if(building & DWELLING_MONSTER4 && le.MouseClickLeft(rectMonster4) &&
-    		Castle::RecruitMonster(DWELLING_MONSTER4, Dialog::RecruitMonster(
-            	    Monster(race, GetActualDwelling(DWELLING_MONSTER4)), dwelling[3])))
-    	    {
-        	cursor.Hide();
-		WellRedrawInfoArea(cur_pt);
-		cursor.Show();
-        	display.Flip();
-    	    }
+    		RecruitMonster(DWELLING_MONSTER4, Dialog::RecruitMonster(
+            	    Monster(race, GetActualDwelling(DWELLING_MONSTER4)), dwelling[3]))) redraw = true;
     	    else
     	    if(building & DWELLING_MONSTER5 && le.MouseClickLeft(rectMonster5) &&
-    		Castle::RecruitMonster(DWELLING_MONSTER5, Dialog::RecruitMonster(
-            	    Monster(race, GetActualDwelling(DWELLING_MONSTER5)), dwelling[4])))
-    	    {
-        	cursor.Hide();
-		WellRedrawInfoArea(cur_pt);
-		cursor.Show();
-        	display.Flip();
-    	    }
+    		RecruitMonster(DWELLING_MONSTER5, Dialog::RecruitMonster(
+            	    Monster(race, GetActualDwelling(DWELLING_MONSTER5)), dwelling[4]))) redraw = true;
     	    else
     	    if(building & DWELLING_MONSTER6 && le.MouseClickLeft(rectMonster6) &&
-                Castle::RecruitMonster(DWELLING_MONSTER6, Dialog::RecruitMonster(
-                    Monster(race, GetActualDwelling(DWELLING_MONSTER6)), dwelling[5])))
-    	    {
+                RecruitMonster(DWELLING_MONSTER6, Dialog::RecruitMonster(
+                    Monster(race, GetActualDwelling(DWELLING_MONSTER6)), dwelling[5]))) redraw = true;
+
+	    if(redraw)
+	    {
         	cursor.Hide();
 		WellRedrawInfoArea(cur_pt);
+		buttonMax.Draw();
 		cursor.Show();
         	display.Flip();
-    	    }
-	}        
+		redraw = false;
+	    }
+	}
     }
 }
 
@@ -144,8 +184,16 @@ void Castle::WellRedrawInfoArea(const Point & cur_pt)
     Display & display = Display::Get();
     display.Blit(AGG::GetICN(ICN::WELLBKG, 0), cur_pt);
 
+
     Text text;
     Point dst_pt, pt;
+
+    if(Settings::Get().ExtAllowBuyFromWell())
+    {
+	const Sprite & button = AGG::GetICN(ICN::RECRUIT, 4);
+	Rect src_rt(0, 461, button.w() - 5, 19);
+	display.Blit(AGG::GetICN(ICN::WELLBKG, 0), src_rt, cur_pt.x + button.w() - 5, cur_pt.y + 461);
+    }
 
     text.Set(_("Town Population Information and Statistics"), Font::BIG);
     dst_pt.x = cur_pt.x + 280 - text.w() / 2;

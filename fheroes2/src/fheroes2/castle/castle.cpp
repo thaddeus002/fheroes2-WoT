@@ -605,6 +605,43 @@ bool Castle::RecruitMonster(u32 dw, u16 count)
     return true;
 }
 
+u16 Castle::HowManyRecruitMonster(u32 dw, Resource::funds_t* res) const
+{
+    u8 dw_index = 0;
+
+    switch(dw)
+    {
+	case DWELLING_MONSTER1: dw_index = 0; break;
+	case DWELLING_MONSTER2: dw_index = 1; break;
+	case DWELLING_MONSTER3: dw_index = 2; break;
+	case DWELLING_MONSTER4: dw_index = 3; break;
+	case DWELLING_MONSTER5: dw_index = 4; break;
+	case DWELLING_MONSTER6: dw_index = 5; break;	
+	default: return 0;
+    }
+
+    const Monster ms(race, GetActualDwelling(dw));
+    const Kingdom & kingdom = world.GetKingdom(color);
+
+    if(!army.CanJoinTroop(ms())) return 0;
+
+    u16 count = dwelling[dw_index];
+    Resource::funds_t payment;
+
+    while(count)
+    {
+	payment = PaymentConditions::BuyMonster(ms());
+	payment *= count;
+	if(kingdom.AllowPayment(payment)) break;
+	--count;
+    }
+
+    if(count && res)
+	*res = payment;
+
+    return count;
+}
+
 /* return current count monster in dwelling */
 u16 Castle::GetDwellingLivedCount(u32 dw) const
 {

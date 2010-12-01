@@ -98,7 +98,6 @@ public:
     bool isCapital(void) const{ return Modes(CAPITAL); }
     bool HaveNearlySea(void) const;
     bool PresentBoat(void) const;
-    bool RecruitMonster(u32 dw, u16 count);
     bool AllowBuyHero(const Heroes &);
     bool ContainCoord(const u16 ax, const u16 ay) const;
     bool isNecromancyShrineBuild(void) const;
@@ -124,6 +123,9 @@ public:
     void JoinRNDArmy(void);
     u16 GetDwellingLivedCount(u32) const;
     u32 GetActualDwelling(u32) const;
+
+    bool RecruitMonster(u32 dw, u16 count);
+    u16  HowManyRecruitMonster(u32 dw, Resource::funds_t* res = NULL) const;
     void RecruitAllMonster(void);
 
     void ChangeColor(Color::color_t cl);

@@ -370,6 +370,16 @@ bool Army::army_t::JoinTroop(const Troop & troop)
     return false;
 }
 
+bool Army::army_t::CanJoinTroop(const Monster::monster_t mon) const
+{
+    std::vector<Troop>::const_iterator it;
+    it = std::find_if(army.begin(), army.end(), std::bind2nd(std::mem_fun_ref(&Troop::HasMonster), mon));
+
+    if(it == army.end()) it = std::find_if(army.begin(), army.end(), std::not1(std::mem_fun_ref(&Troop::isValid)));
+
+    return it != army.end();
+}
+
 bool Army::army_t::isValid(void) const
 {
     return army.end() != std::find_if(army.begin(),army.end(), Army::isValidTroop);
