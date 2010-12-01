@@ -2709,7 +2709,7 @@ void Battle2::Interface::RedrawActionLuck(Stats & b, bool good)
 	Cursor & cursor = Cursor::Get();
 	LocalEvent & le = LocalEvent::Get();
 
-	const M82::m82_t m82 = M82::FromSpell(Spell::BLESS);
+	const M82::m82_t m82 = M82::GOODLUCK;
 	const Sprite & sunbow = AGG::GetICN(ICN::EXPMRL, 0);
 
 	const Rect & pos = b.GetCellPosition();

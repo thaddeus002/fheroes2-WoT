@@ -1179,7 +1179,10 @@ bool Heroes::CanMove(void) const
 void Heroes::SetMove(bool f)
 {
     if(f)
+    {
 	SetModes(ENABLEMOVE);
+	ResetModes(SLEEPER);
+    }
     else
     {
 	ResetModes(ENABLEMOVE);
