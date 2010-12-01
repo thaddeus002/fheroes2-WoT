@@ -31,7 +31,7 @@
 #include "SDL.h"
 #include "engine.h"
 
-void DrawICN(Surface & sf, u32 size, const u8 *vdata, bool rledebug);
+void DrawICN(Surface & sf, u32 size, const u8 *vdata, bool rledebug, bool);
 
 class icnheader
 {
@@ -71,22 +71,33 @@ int main(int argc, char **argv)
 {
     if(argc < 3)
     {
-	std::cout << argv[0] << " [-d] infile.icn extract_to_dir" << std::endl;
+	std::cout << argv[0] << " [-s (skip shadow)] [-d (debug on)] infile.icn extract_to_dir" << std::endl;
 
 	return EXIT_SUCCESS;
     }
 
-    std::string prefix(argv[2]);
-    std::string shortname(argv[1]);
-    
     bool debug = false;
-    
-    if(shortname == "-d")
+    bool shadow = true;
+
+    char** ptr = argv;
+    ++ptr;
+
+    while(ptr && *ptr)
     {
-	shortname = prefix;
-	prefix = std::string(argv[3]);
-	debug = true;
+	if(0 == strcmp("-d", *ptr))
+	    debug = true;
+	else
+	if(0 == strcmp("-s", *ptr))
+	    shadow = false;
+	else
+	    break;
+
+	++ptr;
     }
+    
+    std::string shortname(*ptr);
+    ++ptr;
+    std::string prefix(*ptr);
 
     std::fstream fd_data(shortname.c_str(), std::ios::in | std::ios::binary);
 
@@ -146,7 +157,7 @@ int main(int argc, char **argv)
 
 	sf.Fill(0xff, 0xff, 0xff);
 
-	DrawICN(sf, data_size, reinterpret_cast<const u8*>(buf), debug);
+	DrawICN(sf, data_size, reinterpret_cast<const u8*>(buf), debug, shadow);
 
         delete [] buf;
 
@@ -190,7 +201,7 @@ int main(int argc, char **argv)
 }
 
 /* draw RLE ICN to surface */
-void DrawICN(Surface & sf, u32 size, const u8 *vdata, bool rledebug)
+void DrawICN(Surface & sf, u32 size, const u8 *vdata, bool rledebug, bool allow_shadow)
 {
     u8 i, count;
     u16 x = 0;
@@ -211,7 +222,7 @@ void DrawICN(Surface & sf, u32 size, const u8 *vdata, bool rledebug)
 	{
 	    ++y;
 	    x = 0;
-	    std::cerr << " M:00" << std::endl;
+	    if(rledebug) std::cerr << " M:00" << std::endl;
 	    ++index;
 	    continue;
 	}
@@ -260,8 +271,11 @@ void DrawICN(Surface & sf, u32 size, const u8 *vdata, bool rledebug)
 		++index;
 		for(i = 0; i < vdata[index]; ++i)
 		{
-		    sf.SetPixel(x++, y, shadow);
-		    if(rledebug) std::cerr << ":0x" << std::setw(2) << static_cast<int>(count);
+		    if(allow_shadow)
+		    {
+			sf.SetPixel(x++, y, shadow);
+			if(rledebug) std::cerr << ":0x" << std::setw(2) << static_cast<int>(count);
+		    }
 		}
 		++index;
 		continue;
@@ -272,8 +286,11 @@ void DrawICN(Surface & sf, u32 size, const u8 *vdata, bool rledebug)
 		count = vdata[index];
 		for(i = 0; i < vdata[index] % 4; ++i)
 		{
-		    sf.SetPixel(x++, y, shadow);
-		    if(rledebug) std::cerr << ":0x" << std::setw(2) << static_cast<int>(count);
+		    if(allow_shadow)
+		    {
+			sf.SetPixel(x++, y, shadow);
+			if(rledebug) std::cerr << ":0x" << std::setw(2) << static_cast<int>(count);
+		    }
 		}
 		++index;
 		continue;

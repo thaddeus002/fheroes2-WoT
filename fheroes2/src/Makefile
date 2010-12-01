@@ -88,11 +88,7 @@ ifndef WITHOUT_UNICODE
 endif
 
 clean:
-ifndef WITHOUT_XML
 	$(MAKE) -C xmlccwrap clean
-endif
-ifdef WITH_TOOLS
 	$(MAKE) -C tools clean
-endif
 	$(MAKE) -C dist clean
 	$(MAKE) -C engine clean
