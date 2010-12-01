@@ -2140,10 +2140,8 @@ void Battle2::Interface::RedrawActionAttackPart1(Stats & attacker, Stats & defen
     }
 
     // redraw luck animation
-    if(attacker.Modes(LUCK_GOOD))
-	RedrawActionLuck(attacker, true);
-    else
-	RedrawActionLuck(attacker, false);
+    if(attacker.Modes(LUCK_GOOD|LUCK_BAD))
+	RedrawActionLuck(attacker);
 
     AGG::PlaySound(attacker.M82Attk());
 
@@ -2695,11 +2693,11 @@ void Battle2::Interface::RedrawActionMonsterSpellCastStatus(const Stats & attack
     }
 }
 
-void Battle2::Interface::RedrawActionLuck(Stats & b, bool good)
+void Battle2::Interface::RedrawActionLuck(Stats & b)
 {
     std::string msg;
 
-    if(good)
+    if(b.Modes(LUCK_GOOD))
     {
 	std::string msg = _("Good luck shines on the  %{attacker}");
 	String::Replace(msg, "%{attacker}", b.GetName());
@@ -2751,6 +2749,7 @@ void Battle2::Interface::RedrawActionLuck(Stats & b, bool good)
 	DELAY(400);
     }
     else
+    if(b.Modes(LUCK_BAD))
     {
 	std::string msg = _("Bad luck descends on the %{attacker}");
 	String::Replace(msg, "%{attacker}", b.GetName());

@@ -131,7 +131,7 @@ namespace Battle2
         void RedrawActionMove(Stats &, const std::vector<u16> &);
         void RedrawActionFly(Stats &, u16);
         void RedrawActionMorale(Stats &, bool);
-	void RedrawActionLuck(Stats &, bool);
+	void RedrawActionLuck(Stats &);
 	void RedrawActionTowerPart1(Tower &, Stats &);
 	void RedrawActionTowerPart2(Tower &, TargetInfo &);
 	void RedrawActionCatapult(u8);
