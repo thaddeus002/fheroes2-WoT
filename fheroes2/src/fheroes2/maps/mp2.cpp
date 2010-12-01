@@ -920,6 +920,20 @@ bool MP2::isPickupObject(const u8 obj)
     return false;
 }
 
+bool MP2::isRemoveObject(const u8 obj)
+{
+    switch(obj)
+    {
+        case MP2::OBJ_MONSTER:
+        case MP2::OBJ_BARRIER:
+	    return true;
+
+	default: break;
+    }
+
+    return isPickupObject(obj);
+}
+
 bool MP2::isNeedStayFront(const u8 obj)
 {
     switch(obj)

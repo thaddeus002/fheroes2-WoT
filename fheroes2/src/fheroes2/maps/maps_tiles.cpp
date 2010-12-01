@@ -23,6 +23,7 @@
 #include <list>
 #include <iostream>
 #include <algorithm>
+#include <functional>
 #include "agg.h"
 #include "world.h"
 #include "race.h"
@@ -139,6 +140,172 @@ u16 Maps::TilesAddon::isRoad(const TilesAddon & ta)
 bool Maps::TilesAddon::isStream(const TilesAddon & ta)
 {
     return ICN::STREAM == MP2::GetICNObject(ta.object);
+}
+
+bool Maps::TilesAddon::isWaterResource(const TilesAddon & ta)
+{
+    return (ICN::OBJNWATR == MP2::GetICNObject(ta.object) &&
+                (0 == ta.index ||    // buttle
+                19 == ta.index ||    // chest
+                45 == ta.index ||    // flotsam
+                111 == ta.index)     // surviror
+            );
+}
+
+bool Maps::TilesAddon::isWhirlPool(const TilesAddon & ta)
+{
+    return (ICN::OBJNWATR == MP2::GetICNObject(ta.object) &&
+                (ta.index >= 202 && ta.index <= 225));
+}
+
+bool Maps::TilesAddon::isStandingStone(const TilesAddon & ta)
+{
+    return (ICN::OBJNMULT == MP2::GetICNObject(ta.object) &&
+                (ta.index == 84 || ta.index == 85));
+}
+
+bool Maps::TilesAddon::isResource(const TilesAddon & ta)
+{
+            // OBJNRSRC
+    return ((ICN::OBJNRSRC == MP2::GetICNObject(ta.object) && (ta.index % 2)) ||
+            // TREASURE
+            (ICN::TREASURE == MP2::GetICNObject(ta.object)));
+}
+
+bool Maps::TilesAddon::isRandomResource(const TilesAddon & ta)
+{
+	    // OBJNRSRC
+    return (ICN::OBJNRSRC == MP2::GetICNObject(ta.object) && 17 == ta.index);
+}
+
+bool Maps::TilesAddon::isArtifact(const TilesAddon & ta)
+{
+	    // OBJNARTI
+    return (ICN::OBJNARTI == MP2::GetICNObject(ta.object) && (ta.index % 2));
+}
+
+bool Maps::TilesAddon::isRandomArtifact(const TilesAddon & ta)
+{
+    // OBJNARTI
+    return (ICN::OBJNARTI == MP2::GetICNObject(ta.object) && 0xA3 == ta.index);
+}
+
+bool Maps::TilesAddon::isRandomArtifact1(const TilesAddon & ta)
+{
+    // OBJNARTI
+    return (ICN::OBJNARTI == MP2::GetICNObject(ta.object) && 0xA7 == ta.index);
+}
+
+bool Maps::TilesAddon::isRandomArtifact2(const TilesAddon & ta)
+{
+    // OBJNARTI
+    return (ICN::OBJNARTI == MP2::GetICNObject(ta.object) && 0xA9 == ta.index);
+}
+
+bool Maps::TilesAddon::isRandomArtifact3(const TilesAddon & ta)
+{
+    // OBJNARTI
+    return (ICN::OBJNARTI == MP2::GetICNObject(ta.object) && 0xAB == ta.index);
+}
+
+bool Maps::TilesAddon::isUltimateArtifact(const TilesAddon & ta)
+{
+    // OBJNARTI
+    return (ICN::OBJNARTI == MP2::GetICNObject(ta.object) && 0xA4 == ta.index);
+}
+
+bool Maps::TilesAddon::isCampFire(const TilesAddon & ta)
+{
+	    // MTNDSRT
+    return ((ICN::OBJNDSRT == MP2::GetICNObject(ta.object) && 61 == ta.index) ||
+	    // OBJNMULT
+            (ICN::OBJNMULT == MP2::GetICNObject(ta.object) && 131 == ta.index) ||
+	    // OBJNSNOW
+            (ICN::OBJNSNOW == MP2::GetICNObject(ta.object) && 4 == ta.index));
+}
+
+bool Maps::TilesAddon::isMonster(const TilesAddon & ta)
+{
+	    // MONS32
+    return (ICN::MONS32 == MP2::GetICNObject(ta.object));
+}
+
+bool Maps::TilesAddon::isArtesianSpring(const TilesAddon & ta)
+{
+    return (ICN::OBJNCRCK == MP2::GetICNObject(ta.object) &&
+	    (ta.index == 3 || ta.index == 4));
+}
+
+bool Maps::TilesAddon::isOasis(const TilesAddon & ta)
+{
+    return (ICN::OBJNDSRT == MP2::GetICNObject(ta.object) &&
+		(ta.index == 108 || ta.index == 109));
+}
+
+bool Maps::TilesAddon::isJail(const TilesAddon & ta)
+{
+    return (ICN::X_LOC2 == MP2::GetICNObject(ta.object) && 0x09 == ta.index);
+}
+
+bool Maps::TilesAddon::isEvent(const TilesAddon & ta)
+{
+    // OBJNMUL2
+    return (ICN::OBJNMUL2 == MP2::GetICNObject(ta.object) && 0xA3 == ta.index);
+}
+
+bool Maps::TilesAddon::isMine(const TilesAddon & ta)
+{
+    // EXTRAOVR
+    return (ICN::EXTRAOVR == MP2::GetICNObject(ta.object));
+}
+
+bool Maps::TilesAddon::isBoat(const TilesAddon & ta)
+{
+    // OBJNWAT2
+    return (ICN::OBJNWAT2 == MP2::GetICNObject(ta.object) && 0x17 == ta.index);
+}
+
+bool Maps::TilesAddon::isMiniHero(const TilesAddon & ta)
+{
+    // MINIHERO
+    return (ICN::MINIHERO == MP2::GetICNObject(ta.object));
+}
+
+bool Maps::TilesAddon::isCastle(const TilesAddon & ta)
+{
+    // OBJNTOWN
+    return (ICN::OBJNTOWN == MP2::GetICNObject(ta.object));
+}
+
+bool Maps::TilesAddon::isRandomCastle(const TilesAddon & ta)
+{
+    // OBJNTWRD
+    return (ICN::OBJNTWRD == MP2::GetICNObject(ta.object) && 32 > ta.index);
+}
+
+bool Maps::TilesAddon::isRandomMonster(const TilesAddon & ta)
+{
+    // MONS32
+    return(ICN::MONS32 == MP2::GetICNObject(ta.object) &&
+	    (0x41 < ta.index && 0x47 > ta.index));
+}
+
+bool Maps::TilesAddon::isBarrier(const TilesAddon & ta)
+{
+    return (ICN::X_LOC3 == MP2::GetICNObject(ta.object) && 
+		(60 == ta.index ||
+		66 == ta.index ||
+		72 == ta.index ||
+		78 == ta.index ||
+		84 == ta.index ||
+		90 == ta.index ||
+		96 == ta.index ||
+		102 == ta.index));
+}
+
+bool Maps::TilesAddon::isFlag32(const TilesAddon & ta)
+{
+    return ICN::FLAG32 == MP2::GetICNObject(ta.object);
 }
 
 Maps::Tiles::Tiles(s32 index) : maps_index(index), tile_sprite_index(0), tile_sprite_shape(0),
@@ -276,7 +443,7 @@ void Maps::Tiles::RedrawTile(Surface & dst) const
 	area.BlitOnTile(dst, GetTileSurface(), 0, 0, mp);
 }
 
-void Maps::Tiles::RedrawBottom(Surface & dst, const TilesAddon* skip) const
+void Maps::Tiles::RedrawBottom(Surface & dst, bool skip_objs) const
 {
     const Interface::GameArea & area = Interface::GameArea::Get();
     const Point mp(maps_index % world.w(), maps_index / world.w());
@@ -289,7 +456,10 @@ void Maps::Tiles::RedrawBottom(Surface & dst, const TilesAddon* skip) const
 
 	for(; it1 != it2; ++it1)
 	{
-	    if(skip && skip == &(*it1)) continue;
+	    // skip
+	    if(skip_objs &&
+		MP2::isRemoveObject(mp2_object) &&
+		FindObject(mp2_object) == &(*it1)) continue;
 
 	    const u8 & object = (*it1).object;
 	    const u8 & index  = (*it1).index;
@@ -864,495 +1034,272 @@ bool Maps::Tiles::isStream(void) const
     return addons_level1.end() != std::find_if(addons_level1.begin(), addons_level1.end(), TilesAddon::isStream);
 }
 
-Maps::TilesAddon * Maps::Tiles::FindWaterResource(void)
+Maps::TilesAddon* Maps::Tiles::FindObject(u8 objs)
 {
-    if(!addons_level1.empty())
+    std::list<TilesAddon>::iterator it = addons_level1.begin();
+
+    switch(objs)
     {
-	std::list<TilesAddon>::iterator it1 = addons_level1.begin();
-	std::list<TilesAddon>::const_iterator it2 = addons_level1.end();
+	case MP2::OBJ_CAMPFIRE:
+	    it = std::find_if(addons_level1.begin(), addons_level1.end(), TilesAddon::isCampFire);
+	    break;
 
-	for(; it1 != it2; ++it1)
-	{
-	    TilesAddon & addon = *it1;
+        case MP2::OBJ_TREASURECHEST:
+        case MP2::OBJ_ANCIENTLAMP:
+        case MP2::OBJ_RESOURCE:
+	    it = std::find_if(addons_level1.begin(), addons_level1.end(), TilesAddon::isResource);
+	    break;
 
-	    // OBJNWATR
-	    if(ICN::OBJNWATR == MP2::GetICNObject(addon.object) && 
-		(0 == addon.index ||	// buttle
-		19 == addon.index ||	// chest
-		45 == addon.index ||	// flotsam
-		111 == addon.index))	// surviror
-				return &addon;
-	}
-    }
+        case MP2::OBJ_RNDRESOURCE:
+	    it = std::find_if(addons_level1.begin(), addons_level1.end(), TilesAddon::isRandomResource);
+	    break;
 
-    return NULL;
-}
+        case MP2::OBJ_FLOTSAM:
+        case MP2::OBJ_SHIPWRECKSURVIROR:
+        case MP2::OBJ_WATERCHEST:
+        case MP2::OBJ_BOTTLE:
+	    it = std::find_if(addons_level1.begin(), addons_level1.end(), TilesAddon::isWaterResource);
+	    break;
 
-const Maps::TilesAddon* Maps::Tiles::FindWhirlpools(void) const
-{
-    if(!addons_level1.empty())
-    {
-	std::list<TilesAddon>::const_iterator it1 = addons_level1.begin();
-	std::list<TilesAddon>::const_iterator it2 = addons_level1.end();
+	case MP2::OBJ_ARTIFACT:
+	    it = std::find_if(addons_level1.begin(), addons_level1.end(), TilesAddon::isArtifact);
+	    break;
 
-	for(; it1 != it2; ++it1)
-	{
-	    const TilesAddon & addon = *it1;
+	case MP2::OBJ_RNDARTIFACT:
+	    it = std::find_if(addons_level1.begin(), addons_level1.end(), TilesAddon::isRandomArtifact);
+	    break;
 
-	    if(ICN::OBJNWATR == MP2::GetICNObject(addon.object) && (addon.index >= 202 && addon.index <= 225)) return &addon;
-	}
-    }
+	case MP2::OBJ_RNDARTIFACT1:
+	    it = std::find_if(addons_level1.begin(), addons_level1.end(), TilesAddon::isRandomArtifact1);
+	    break;
 
-    return NULL;
-}
+	case MP2::OBJ_RNDARTIFACT2:
+	    it = std::find_if(addons_level1.begin(), addons_level1.end(), TilesAddon::isRandomArtifact2);
+	    break;
 
-const Maps::TilesAddon* Maps::Tiles::FindStandingStones(void) const
-{
-    if(!addons_level1.empty())
-    {
-	std::list<TilesAddon>::const_iterator it1 = addons_level1.begin();
-	std::list<TilesAddon>::const_iterator it2 = addons_level1.end();
+	case MP2::OBJ_RNDARTIFACT3:
+	    it = std::find_if(addons_level1.begin(), addons_level1.end(), TilesAddon::isRandomArtifact3);
+	    break;
 
-	for(; it1 != it2; ++it1)
-	{
-	    const TilesAddon & addon = *it1;
+	case MP2::OBJ_RNDULTIMATEARTIFACT:
+	    it = std::find_if(addons_level1.begin(), addons_level1.end(), TilesAddon::isUltimateArtifact);
+	    break;
 
-	    if(ICN::OBJNMULT == MP2::GetICNObject(addon.object) && (addon.index == 84 || addon.index == 85)) return &addon;
-	}
-    }
+	case MP2::OBJ_MONSTER:
+	    it = std::find_if(addons_level1.begin(), addons_level1.end(), TilesAddon::isMonster);
+	    break;
 
-    return NULL;
-}
+	case MP2::OBJ_WHIRLPOOL:
+	    it = std::find_if(addons_level1.begin(), addons_level1.end(), TilesAddon::isWhirlPool);
+	    break;
 
-const Maps::TilesAddon* Maps::Tiles::FindArtesianSpring(void) const
-{
-    if(!addons_level1.empty())
-    {
-	std::list<TilesAddon>::const_iterator it1 = addons_level1.begin();
-	std::list<TilesAddon>::const_iterator it2 = addons_level1.end();
+	case MP2::OBJ_STANDINGSTONES:
+	    it = std::find_if(addons_level1.begin(), addons_level1.end(), TilesAddon::isStandingStone);
+	    break;
 
-	for(; it1 != it2; ++it1)
-	{
-	    const TilesAddon & addon = *it1;
+	case MP2::OBJ_ARTESIANSPRING:
+	    it = std::find_if(addons_level1.begin(), addons_level1.end(), TilesAddon::isArtesianSpring);
+	    break;
 
-	    if(ICN::OBJNCRCK == MP2::GetICNObject(addon.object) && (addon.index == 3 || addon.index == 4)) return &addon;
-	}
-    }
+	case MP2::OBJ_OASIS:
+	    it = std::find_if(addons_level1.begin(), addons_level1.end(), TilesAddon::isOasis);
+	    break;
 
-    return NULL;
-}
+	case MP2::OBJ_MINES:
+	    it = std::find_if(addons_level1.begin(), addons_level1.end(), TilesAddon::isMine);
+	    break;
 
-const Maps::TilesAddon* Maps::Tiles::FindOasis(void) const
-{
-    if(!addons_level1.empty())
-    {
-	std::list<TilesAddon>::const_iterator it1 = addons_level1.begin();
-	std::list<TilesAddon>::const_iterator it2 = addons_level1.end();
+	case MP2::OBJ_JAIL:
+	    it = std::find_if(addons_level1.begin(), addons_level1.end(), TilesAddon::isJail);
+	    break;
 
-	for(; it1 != it2; ++it1)
-	{
-	    const TilesAddon & addon = *it1;
+	case MP2::OBJ_EVENT:
+	    it = std::find_if(addons_level1.begin(), addons_level1.end(), TilesAddon::isEvent);
+	    break;
 
-	    if(ICN::OBJNDSRT == MP2::GetICNObject(addon.object) && (addon.index == 108 || addon.index == 109)) return &addon;
-	}
-    }
+	case MP2::OBJ_BOAT:
+	    it = std::find_if(addons_level1.begin(), addons_level1.end(), TilesAddon::isBoat);
+	    break;
 
-    return NULL;
-}
+	case MP2::OBJ_BARRIER:
+	    it = std::find_if(addons_level1.begin(), addons_level1.end(), TilesAddon::isBarrier);
+	    break;
 
-Maps::TilesAddon * Maps::Tiles::FindResource(void)
-{
-    if(!addons_level1.empty())
-    {
-	std::list<TilesAddon>::iterator it1 = addons_level1.begin();
-	std::list<TilesAddon>::const_iterator it2 = addons_level1.end();
+	case MP2::OBJ_HEROES:
+	    it = std::find_if(addons_level1.begin(), addons_level1.end(), TilesAddon::isMiniHero);
+	    break;
 
-	for(; it1 != it2; ++it1)
-	{
-	    TilesAddon & addon = *it1;
+	case MP2::OBJ_CASTLE:
+	    it = std::find_if(addons_level1.begin(), addons_level1.end(), TilesAddon::isCastle);
+	    if(it == addons_level1.end())
+	    {
+		it = std::find_if(addons_level2.begin(), addons_level2.end(), TilesAddon::isCastle);
+		return addons_level2.end() != it ? &(*it) : NULL;
+	    }
+	    break;
 
-	    // OBJNRSRC
-	    if(ICN::OBJNRSRC == MP2::GetICNObject(addon.object) && (addon.index % 2)) return &addon;
-	    else
-	    // TREASURE
-	    if(ICN::TREASURE == MP2::GetICNObject(addon.object)) return &addon;
-	}
-    }
+	case MP2::OBJ_RNDCASTLE:
+	    it = std::find_if(addons_level1.begin(), addons_level1.end(), TilesAddon::isRandomCastle);
+	    if(it == addons_level1.end())
+	    {
+		it = std::find_if(addons_level2.begin(), addons_level2.end(), TilesAddon::isRandomCastle);
+		return addons_level2.end() != it ? &(*it) : NULL;
+	    }
+	    break;
 
-    return NULL;
-}
+	case MP2::OBJ_RNDMONSTER:
+	case MP2::OBJ_RNDMONSTER1:
+	case MP2::OBJ_RNDMONSTER2:
+	case MP2::OBJ_RNDMONSTER3:
+	case MP2::OBJ_RNDMONSTER4:
+	    it = std::find_if(addons_level1.begin(), addons_level1.end(), TilesAddon::isRandomMonster);
+	    break;
 
-Maps::TilesAddon * Maps::Tiles::FindRNDResource(void)
-{
-    if(!addons_level1.empty())
-    {
-	std::list<TilesAddon>::iterator it1 = addons_level1.begin();
-	std::list<TilesAddon>::const_iterator it2 = addons_level1.end();
-
-	for(; it1 != it2; ++it1)
-	{
-	    TilesAddon & addon = *it1;
-
-	    // OBJNRSRC
-	    if(ICN::OBJNRSRC == MP2::GetICNObject(addon.object) && 17 == addon.index) return &addon;
-	}
-    }
-
-    return NULL;
-}
-
-Maps::TilesAddon * Maps::Tiles::FindArtifact(void)
-{
-    if(!addons_level1.empty())
-    {
-	std::list<TilesAddon>::iterator it1 = addons_level1.begin();
-	std::list<TilesAddon>::const_iterator it2 = addons_level1.end();
-
-	for(; it1 != it2; ++it1)
-	{
-	    TilesAddon & addon = *it1;
-
-	    // OBJNARTI
-	    if(ICN::OBJNARTI == MP2::GetICNObject(addon.object) && (addon.index % 2)) return &addon;
-	}
-    }
-
-    return NULL;
-}
-
-Maps::TilesAddon * Maps::Tiles::FindRNDArtifact(const u8 level)
-{
-    u8 index = 0xA3;
-
-    switch(level)
-    {
-	case MP2::OBJ_RNDARTIFACT1: index = 0xA7; break;
-	case MP2::OBJ_RNDARTIFACT2: index = 0xA9; break;
-	case MP2::OBJ_RNDARTIFACT3: index = 0xAB; break;
 	default: break;
     }
 
-    if(!addons_level1.empty())
-    {
-	std::list<TilesAddon>::iterator it1 = addons_level1.begin();
-	std::list<TilesAddon>::const_iterator it2 = addons_level1.end();
-
-	for(; it1 != it2; ++it1)
-	{
-	    TilesAddon & addon = *it1;
-
-	    // OBJNARTI
-	    if(ICN::OBJNARTI == MP2::GetICNObject(addon.object) && index == addon.index) return &addon;
-	}
-    }
-
-    return NULL;
+    return addons_level1.end() != it ? &(*it) : NULL;
 }
 
-Maps::TilesAddon * Maps::Tiles::FindUltimateArtifact(void)
+const Maps::TilesAddon* Maps::Tiles::FindObject(u8 objs) const
 {
-    if(!addons_level1.empty())
+    std::list<TilesAddon>::const_iterator it = addons_level1.begin();
+
+    switch(objs)
     {
-	std::list<TilesAddon>::iterator it1 = addons_level1.begin();
-	std::list<TilesAddon>::const_iterator it2 = addons_level1.end();
+	case MP2::OBJ_CAMPFIRE:
+	    it = std::find_if(addons_level1.begin(), addons_level1.end(), TilesAddon::isCampFire);
+	    break;
 
-	for(; it1 != it2; ++it1)
-	{
-	    TilesAddon & addon = *it1;
+        case MP2::OBJ_TREASURECHEST:
+        case MP2::OBJ_ANCIENTLAMP:
+        case MP2::OBJ_RESOURCE:
+	    it = std::find_if(addons_level1.begin(), addons_level1.end(), TilesAddon::isResource);
+	    break;
 
-	    // OBJNARTI
-	    if(ICN::OBJNARTI == MP2::GetICNObject(addon.object) && 0xA4 == addon.index) return &addon;
-	}
+        case MP2::OBJ_RNDRESOURCE:
+	    it = std::find_if(addons_level1.begin(), addons_level1.end(), TilesAddon::isRandomResource);
+	    break;
+
+        case MP2::OBJ_FLOTSAM:
+        case MP2::OBJ_SHIPWRECKSURVIROR:
+        case MP2::OBJ_WATERCHEST:
+        case MP2::OBJ_BOTTLE:
+	    it = std::find_if(addons_level1.begin(), addons_level1.end(), TilesAddon::isWaterResource);
+	    break;
+
+	case MP2::OBJ_ARTIFACT:
+	    it = std::find_if(addons_level1.begin(), addons_level1.end(), TilesAddon::isArtifact);
+	    break;
+
+	case MP2::OBJ_RNDARTIFACT:
+	    it = std::find_if(addons_level1.begin(), addons_level1.end(), TilesAddon::isRandomArtifact);
+	    break;
+
+	case MP2::OBJ_RNDARTIFACT1:
+	    it = std::find_if(addons_level1.begin(), addons_level1.end(), TilesAddon::isRandomArtifact1);
+	    break;
+
+	case MP2::OBJ_RNDARTIFACT2:
+	    it = std::find_if(addons_level1.begin(), addons_level1.end(), TilesAddon::isRandomArtifact2);
+	    break;
+
+	case MP2::OBJ_RNDARTIFACT3:
+	    it = std::find_if(addons_level1.begin(), addons_level1.end(), TilesAddon::isRandomArtifact3);
+	    break;
+
+	case MP2::OBJ_RNDULTIMATEARTIFACT:
+	    it = std::find_if(addons_level1.begin(), addons_level1.end(), TilesAddon::isUltimateArtifact);
+	    break;
+
+	case MP2::OBJ_MONSTER:
+	    it = std::find_if(addons_level1.begin(), addons_level1.end(), TilesAddon::isMonster);
+	    break;
+
+	case MP2::OBJ_WHIRLPOOL:
+	    it = std::find_if(addons_level1.begin(), addons_level1.end(), TilesAddon::isWhirlPool);
+	    break;
+
+	case MP2::OBJ_STANDINGSTONES:
+	    it = std::find_if(addons_level1.begin(), addons_level1.end(), TilesAddon::isStandingStone);
+	    break;
+
+	case MP2::OBJ_ARTESIANSPRING:
+	    it = std::find_if(addons_level1.begin(), addons_level1.end(), TilesAddon::isArtesianSpring);
+	    break;
+
+	case MP2::OBJ_OASIS:
+	    it = std::find_if(addons_level1.begin(), addons_level1.end(), TilesAddon::isOasis);
+	    break;
+
+	case MP2::OBJ_MINES:
+	    it = std::find_if(addons_level1.begin(), addons_level1.end(), TilesAddon::isMine);
+	    break;
+
+	case MP2::OBJ_JAIL:
+	    it = std::find_if(addons_level1.begin(), addons_level1.end(), TilesAddon::isJail);
+	    break;
+
+	case MP2::OBJ_EVENT:
+	    it = std::find_if(addons_level1.begin(), addons_level1.end(), TilesAddon::isEvent);
+	    break;
+
+	case MP2::OBJ_BOAT:
+	    it = std::find_if(addons_level1.begin(), addons_level1.end(), TilesAddon::isBoat);
+	    break;
+
+	case MP2::OBJ_BARRIER:
+	    it = std::find_if(addons_level1.begin(), addons_level1.end(), TilesAddon::isBarrier);
+	    break;
+
+	case MP2::OBJ_HEROES:
+	    it = std::find_if(addons_level1.begin(), addons_level1.end(), TilesAddon::isMiniHero);
+	    break;
+
+	case MP2::OBJ_CASTLE:
+	    it = std::find_if(addons_level1.begin(), addons_level1.end(), TilesAddon::isCastle);
+	    if(it == addons_level1.end())
+	    {
+		it = std::find_if(addons_level2.begin(), addons_level2.end(), TilesAddon::isCastle);
+		return addons_level2.end() != it ? &(*it) : NULL;
+	    }
+	    break;
+
+	case MP2::OBJ_RNDCASTLE:
+	    it = std::find_if(addons_level1.begin(), addons_level1.end(), TilesAddon::isRandomCastle);
+	    if(it == addons_level1.end())
+	    {
+		it = std::find_if(addons_level2.begin(), addons_level2.end(), TilesAddon::isRandomCastle);
+		return addons_level2.end() != it ? &(*it) : NULL;
+	    }
+	    break;
+
+	case MP2::OBJ_RNDMONSTER:
+	case MP2::OBJ_RNDMONSTER1:
+	case MP2::OBJ_RNDMONSTER2:
+	case MP2::OBJ_RNDMONSTER3:
+	case MP2::OBJ_RNDMONSTER4:
+	    it = std::find_if(addons_level1.begin(), addons_level1.end(), TilesAddon::isRandomMonster);
+	    break;
+
+	default: break;
     }
 
-    return NULL;
-}
-
-Maps::TilesAddon * Maps::Tiles::FindMiniHero(void)
-{
-    if(!addons_level1.empty())
-    {
-	std::list<TilesAddon>::iterator it1 = addons_level1.begin();
-	std::list<TilesAddon>::const_iterator it2 = addons_level1.end();
-
-	for(; it1 != it2; ++it1)
-	{
-	    TilesAddon & addon = *it1;
-
-	    // MINIHERO
-	    if(ICN::MINIHERO == MP2::GetICNObject(addon.object)) return &addon;
-	}
-    }
-
-    return NULL;
-}
-
-Maps::TilesAddon * Maps::Tiles::FindEvent(void)
-{
-    if(!addons_level1.empty())
-    {
-	std::list<TilesAddon>::iterator it1 = addons_level1.begin();
-	std::list<TilesAddon>::const_iterator it2 = addons_level1.end();
-
-	for(; it1 != it2; ++it1)
-	{
-	    TilesAddon & addon = *it1;
-
-	    // OBJNMUL2
-            if(ICN::OBJNMUL2 == MP2::GetICNObject(addon.object) && 0xA3 == addon.index) return &addon;
-	}
-    }
-
-    return NULL;
-}
-
-Maps::TilesAddon * Maps::Tiles::FindBoat(void)
-{
-    if(!addons_level1.empty())
-    {
-	std::list<TilesAddon>::iterator it1 = addons_level1.begin();
-	std::list<TilesAddon>::const_iterator it2 = addons_level1.end();
-
-	for(; it1 != it2; ++it1)
-	{
-	    TilesAddon & addon = *it1;
-
-	    // OBJNWAT2
-            if(ICN::OBJNWAT2 == MP2::GetICNObject(addon.object) && 0x17 == addon.index) return &addon;
-	}
-    }
-
-    return NULL;
-}
-
-Maps::TilesAddon * Maps::Tiles::FindCastle(void)
-{
-    if(!addons_level1.empty())
-    {
-	std::list<TilesAddon>::iterator it1 = addons_level1.begin();
-	std::list<TilesAddon>::const_iterator it2 = addons_level1.end();
-
-	for(; it1 != it2; ++it1)
-	{
-	    TilesAddon & addon = *it1;
-
-	    // OBJNTOWN
-            if(ICN::OBJNTOWN == MP2::GetICNObject(addon.object)) return &addon;
-	}
-    }
-
-    if(!addons_level2.empty())
-    {
-	std::list<TilesAddon>::iterator it1 = addons_level2.begin();
-	std::list<TilesAddon>::const_iterator it2 = addons_level2.end();
-
-	for(; it1 != it2; ++it1)
-	{
-	    TilesAddon & addon = *it1;
-
-	    // OBJNTOWN
-            if(ICN::OBJNTOWN == MP2::GetICNObject(addon.object)) return &addon;
-	}
-    }
-
-    return NULL;
-}
-
-Maps::TilesAddon * Maps::Tiles::FindRNDCastle(void)
-{
-    if(!addons_level1.empty())
-    {
-	std::list<TilesAddon>::iterator it1 = addons_level1.begin();
-	std::list<TilesAddon>::const_iterator it2 = addons_level1.end();
-
-	for(; it1 != it2; ++it1)
-	{
-	    TilesAddon & addon = *it1;
-
-	    // OBJNTWRD
-            if(ICN::OBJNTWRD == MP2::GetICNObject(addon.object) && 32 > addon.index) return &addon;
-	}
-    }
-
-    if(!addons_level2.empty())
-    {
-	std::list<TilesAddon>::iterator it1 = addons_level2.begin();
-	std::list<TilesAddon>::const_iterator it2 = addons_level2.end();
-
-	for(; it1 != it2; ++it1)
-	{
-	    TilesAddon & addon = *it1;
-
-	    // OBJNTWRD
-            if(ICN::OBJNTWRD == MP2::GetICNObject(addon.object)  && 32 > addon.index) return &addon;
-	}
-    }
-
-    return NULL;
+    return addons_level1.end() != it ? &(*it) : NULL;
 }
 
 Maps::TilesAddon* Maps::Tiles::FindFlags(void)
 {
-    Maps::TilesAddon* res = NULL;
+    std::list<TilesAddon>::iterator it =
+	std::find_if(addons_level1.begin(), addons_level1.end(), TilesAddon::isFlag32);
 
-    if(!addons_level1.empty())
+    if(it == addons_level1.end())
     {
-	std::list<TilesAddon>::iterator it1 = addons_level1.begin();
-	std::list<TilesAddon>::const_iterator it2 = addons_level1.end();
-
-	for(; it1 != it2; ++it1)
-	{
-	    TilesAddon & addon = *it1;
-
-	    // FLAG32
-            //if(ICN::FLAG32 == MP2::GetICNObject(addon.object)) return &addon;
-            if(ICN::FLAG32 == MP2::GetICNObject(addon.object)) res = &addon;
-	}
+	it = std::find_if(addons_level2.begin(), addons_level2.end(), TilesAddon::isFlag32);
+	return addons_level2.end() != it ? &(*it) : NULL;
     }
 
-    if(!addons_level2.empty())
-    {
-	std::list<TilesAddon>::iterator it1 = addons_level2.begin();
-	std::list<TilesAddon>::const_iterator it2 = addons_level2.end();
-
-	for(; it1 != it2; ++it1)
-	{
-	    TilesAddon & addon = *it1;
-
-	    // FLAG32
-            //if(ICN::FLAG32 == MP2::GetICNObject(addon.object)) return &addon;
-            if(ICN::FLAG32 == MP2::GetICNObject(addon.object)) res = &addon;
-	}
-    }
-
-    return res;
-}
-
-Maps::TilesAddon * Maps::Tiles::FindJail(void)
-{
-    if(!addons_level1.empty())
-    {
-	std::list<TilesAddon>::iterator it1 = addons_level1.begin();
-	std::list<TilesAddon>::const_iterator it2 = addons_level1.end();
-
-	for(; it1 != it2; ++it1)
-	{
-	    TilesAddon & addon = *it1;
-
-	    if(ICN::X_LOC2 == MP2::GetICNObject(addon.object) && 0x09 == addon.index) return &addon;
-	}
-    }
-
-    return NULL;
-}
-
-Maps::TilesAddon * Maps::Tiles::FindBarrier(void)
-{
-    if(!addons_level1.empty())
-    {
-	std::list<TilesAddon>::iterator it1 = addons_level1.begin();
-	std::list<TilesAddon>::const_iterator it2 = addons_level1.end();
-
-	for(; it1 != it2; ++it1)
-	{
-	    TilesAddon & addon = *it1;
-
-	    if(ICN::X_LOC3 == MP2::GetICNObject(addon.object) && 
-		(60 == addon.index ||
-		66 == addon.index ||
-		72 == addon.index ||
-		78 == addon.index ||
-		84 == addon.index ||
-		90 == addon.index ||
-		96 == addon.index ||
-		102 == addon.index)) return &addon;
-	}
-    }
-
-    return NULL;
-}
-
-Maps::TilesAddon * Maps::Tiles::FindRNDMonster(void)
-{
-    if(!addons_level1.empty())
-    {
-	std::list<TilesAddon>::iterator it1 = addons_level1.begin();
-	std::list<TilesAddon>::const_iterator it2 = addons_level1.end();
-
-	for(; it1 != it2; ++it1)
-	{
-	    TilesAddon & addon = *it1;
-
-	    // MONS32
-	    if(ICN::MONS32 == MP2::GetICNObject(addon.object) &&
-	    (0x41 < addon.index && 0x47 > addon.index)) return &addon;
-	}
-    }
-
-    return NULL;
-}
-
-Maps::TilesAddon * Maps::Tiles::FindMonster(void)
-{
-    if(!addons_level1.empty())
-    {
-	std::list<TilesAddon>::iterator it1 = addons_level1.begin();
-	std::list<TilesAddon>::const_iterator it2 = addons_level1.end();
-
-	for(; it1 != it2; ++it1)
-	{
-	    TilesAddon & addon = *it1;
-
-	    // MONS32
-	    if(ICN::MONS32 == MP2::GetICNObject(addon.object)) return &addon;
-	}
-    }
-
-    return NULL;
-}
-
-Maps::TilesAddon * Maps::Tiles::FindCampFire(void)
-{
-    if(!addons_level1.empty())
-    {
-	std::list<TilesAddon>::iterator it1 = addons_level1.begin();
-	std::list<TilesAddon>::const_iterator it2 = addons_level1.end();
-
-	for(; it1 != it2; ++it1)
-	{
-	    TilesAddon & addon = *it1;
-
-	    // MTNDSRT
-            if(ICN::OBJNDSRT == MP2::GetICNObject(addon.object) && 61 == addon.index) return &addon;
-	    else
-	    // OBJNMULT
-            if(ICN::OBJNMULT == MP2::GetICNObject(addon.object) && 131 == addon.index) return &addon;
-	    else
-	    // OBJNSNOW
-            if(ICN::OBJNSNOW == MP2::GetICNObject(addon.object) && 4 == addon.index) return &addon;
-	}
-    }
-
-    return NULL;
-}
-
-const Maps::TilesAddon * Maps::Tiles::FindMines(void) const
-{
-    if(!addons_level1.empty())
-    {
-	std::list<TilesAddon>::const_iterator it1 = addons_level1.begin();
-	std::list<TilesAddon>::const_iterator it2 = addons_level1.end();
-
-	for(; it1 != it2; ++it1)
-	{
-	    const TilesAddon & addon = *it1;
-
-	    // EXTRAOVR
-	    if(ICN::EXTRAOVR == MP2::GetICNObject(addon.object)) return &addon;
-	}
-    }
-
-    return NULL;
+    return addons_level1.end() != it ? &(*it) : NULL;
 }
 
 /* ICN::FLAGS32 version */
@@ -1495,7 +1442,7 @@ void Maps::Tiles::FixLoyaltyVersion(void)
 
 u8 Maps::Tiles::GetMinesType(void) const
 {
-    const TilesAddon * taddon = FindMines();
+    const TilesAddon* taddon = FindObject(MP2::OBJ_MINES);
 
     if(taddon) switch(taddon->index)
     {
@@ -1582,7 +1529,7 @@ void Maps::Tiles::UpdateQuantity(void)
 	    // 1,2,3 - 2000g, 2500g+3res, 3000g+5res,
 	    // 4,5 - need have skill wisard or leadership,
 	    // 6 - 50 rogues, 7 - 1 gin, 8,9,10,11,12,13 - 1 monster level4, other - none
-	    addon = FindArtifact();
+	    addon = FindObject(MP2::OBJ_ARTIFACT);
 	    if(addon)
 	    {
 		Artifact::artifact_t art = Artifact::FromIndexSprite(addon->index);
@@ -1612,7 +1559,7 @@ void Maps::Tiles::UpdateQuantity(void)
 	break;
 
 	case MP2::OBJ_RESOURCE:
-	    addon = FindResource();
+	    addon = FindObject(MP2::OBJ_RESOURCE);
 	    if(addon)
 	    {
 		quantity1 = Resource::FromIndexSprite(addon->index);
@@ -1895,17 +1842,15 @@ void Maps::Tiles::RemoveObjectSprite(void)
 
     switch(mp2_object)
     {
-	case MP2::OBJ_ARTIFACT:		addon = FindArtifact(); break;
-	case MP2::OBJ_CAMPFIRE:		addon = FindCampFire(); break;
-
 	case MP2::OBJ_WATERCHEST:
 	case MP2::OBJ_BOTTLE:
 	case MP2::OBJ_FLOTSAM:
-	case MP2::OBJ_SHIPWRECKSURVIROR:addon = FindWaterResource(); break;
-
+	case MP2::OBJ_SHIPWRECKSURVIROR:
 	case MP2::OBJ_TREASURECHEST:
 	case MP2::OBJ_ANCIENTLAMP:
-	case MP2::OBJ_RESOURCE:		addon = FindResource(); break;
+	case MP2::OBJ_RESOURCE:
+	case MP2::OBJ_ARTIFACT:
+	case MP2::OBJ_CAMPFIRE:		addon = FindObject(mp2_object); break;
 
 	case MP2::OBJ_JAIL:		RemoveJailSprite(); return;
 
@@ -1926,7 +1871,7 @@ void Maps::Tiles::RemoveObjectSprite(void)
 
 void Maps::Tiles::RemoveBarrierSprite(void)
 {
-    const Maps::TilesAddon *addon = FindBarrier();
+    const Maps::TilesAddon *addon = FindObject(MP2::OBJ_BARRIER);
 
     if(addon)
     {
@@ -1943,7 +1888,7 @@ void Maps::Tiles::RemoveBarrierSprite(void)
 
 void Maps::Tiles::RemoveJailSprite(void)
 {
-    const Maps::TilesAddon *addon = FindJail();
+    const Maps::TilesAddon *addon = FindObject(MP2::OBJ_JAIL);
 
     if(addon)
     {
@@ -2001,7 +1946,7 @@ void Maps::Tiles::UpdateMonsterInfo(void)
 	default: break;
     }
 
-    const TilesAddon* addons = FindMonster();
+    const TilesAddon* addons = FindObject(MP2::OBJ_MONSTER);
     const Monster m(addons ? Monster::FromInt(addons->index + 1) : Monster::UNKNOWN);
     bool  fixed = false;
 
@@ -2040,7 +1985,7 @@ void Maps::Tiles::UpdateMonsterInfo(void)
 
 void Maps::Tiles::UpdateRNDMonsterSprite(void)
 {
-    Maps::TilesAddon *addon = FindRNDMonster();
+    Maps::TilesAddon *addon = FindObject(MP2::OBJ_RNDMONSTER);
 
     if(addon)
     {
@@ -2052,7 +1997,7 @@ void Maps::Tiles::UpdateRNDMonsterSprite(void)
     	    case MP2::OBJ_RNDMONSTER3:      addon->index = Monster::Rand(Monster::LEVEL3); break;
     	    case MP2::OBJ_RNDMONSTER4:      addon->index = Monster::Rand(Monster::LEVEL4); break;
 
-	    default: DEBUG(DBG_GAME , DBG_WARN, "Maps::Tiles::UpdateRNDMonsterSprite: unknown object, index: " << maps_index); return;
+	    default: DEBUG(DBG_GAME , DBG_WARN, "Maps::Tiles::UpdateRNDMonsterSprite: " << "unknown object, index: " << maps_index); return;
 	}
 
 	// ICN::MONS32 start from PEASANT
@@ -2061,7 +2006,7 @@ void Maps::Tiles::UpdateRNDMonsterSprite(void)
 	mp2_object = MP2::OBJ_MONSTER;
     }
     else
-        DEBUG(DBG_GAME , DBG_WARN, "Maps::Tiles::UpdateRNDMonsterSprite: FindRNDMonster return is NULL, index: " << maps_index);
+        DEBUG(DBG_GAME , DBG_WARN, "Maps::Tiles::UpdateRNDMonsterSprite: " << "FindRNDMonster return is NULL, index: " << maps_index);
 }
 
 void Maps::Tiles::UpdateAbandoneMineSprite(void)
@@ -2184,19 +2129,19 @@ void Maps::Tiles::UpdateRNDArtifactSprite(void)
     switch(mp2_object)
     {
         case MP2::OBJ_RNDARTIFACT:
-            addon = FindRNDArtifact(MP2::OBJ_RNDARTIFACT);
+            addon = FindObject(MP2::OBJ_RNDARTIFACT);
             index = Artifact::IndexSprite(Artifact::Rand());
             break;
         case MP2::OBJ_RNDARTIFACT1:
-            addon = FindRNDArtifact(MP2::OBJ_RNDARTIFACT1);
+            addon = FindObject(MP2::OBJ_RNDARTIFACT1);
             index = Artifact::IndexSprite(Artifact::Rand1());
             break;
         case MP2::OBJ_RNDARTIFACT2:
-            addon = FindRNDArtifact(MP2::OBJ_RNDARTIFACT2);
+            addon = FindObject(MP2::OBJ_RNDARTIFACT2);
             index = Artifact::IndexSprite(Artifact::Rand2());
             break;
         case MP2::OBJ_RNDARTIFACT3:
-            addon = FindRNDArtifact(MP2::OBJ_RNDARTIFACT3);
+            addon = FindObject(MP2::OBJ_RNDARTIFACT3);
             index = Artifact::IndexSprite(Artifact::Rand3());
             break;
         default: return;
@@ -2220,7 +2165,7 @@ void Maps::Tiles::UpdateRNDArtifactSprite(void)
 
 void Maps::Tiles::UpdateRNDResourceSprite(void)
 {
-    TilesAddon *addon = FindRNDResource();
+    TilesAddon *addon = FindObject(MP2::OBJ_RNDRESOURCE);
 
     if(addon)
     {

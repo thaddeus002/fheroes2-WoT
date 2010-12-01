@@ -152,7 +152,7 @@ void Interface::GameArea::Redraw(Surface & dst, u8 flag, const Rect & rt) const
     if(flag & LEVEL_BOTTOM)
     for(s16 oy = rt.y; oy < rt.y + rt.h; ++oy)
 	for(s16 ox = rt.x; ox < rt.x + rt.w; ++ox)
-	    world.GetTiles(rectMaps.x + ox, rectMaps.y + oy).RedrawBottom(dst);
+	    world.GetTiles(rectMaps.x + ox, rectMaps.y + oy).RedrawBottom(dst, !(flag & LEVEL_OBJECTS));
 
     // ext object
     if(flag & LEVEL_OBJECTS)

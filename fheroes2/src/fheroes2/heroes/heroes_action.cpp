@@ -307,29 +307,9 @@ void PlayPickupSound(void)
     AGG::PlaySound(wav);
 }
 
-void AnimationRemoveObject(const Maps::Tiles & tile)
+void AnimationRemoveObject(Maps::Tiles & tile)
 {
-    Maps::TilesAddon *addon = NULL;
-
-    switch(tile.GetObject())
-    {
-	case MP2::OBJ_FLOTSAM:
-	case MP2::OBJ_SHIPWRECKSURVIROR:
-        case MP2::OBJ_WATERCHEST:
-	case MP2::OBJ_BOTTLE:	addon = const_cast<Maps::Tiles &>(tile).FindWaterResource(); break;
-
-        case MP2::OBJ_TREASURECHEST:
-        case MP2::OBJ_ANCIENTLAMP:
-	case MP2::OBJ_RESOURCE:	addon = const_cast<Maps::Tiles &>(tile).FindResource(); break;
-
-	case MP2::OBJ_ARTIFACT:	addon = const_cast<Maps::Tiles &>(tile).FindArtifact(); break;
-	case MP2::OBJ_CAMPFIRE:	addon = const_cast<Maps::Tiles &>(tile).FindCampFire(); break;
-	case MP2::OBJ_MONSTER:  addon = const_cast<Maps::Tiles &>(tile).FindMonster(); break;
-
-	case MP2::OBJ_BARRIER:	addon = const_cast<Maps::Tiles &>(tile).FindBarrier(); break;
-
-	default: break;
-    }
+    Maps::TilesAddon *addon = MP2::isRemoveObject(tile.GetObject()) ? tile.FindObject(tile.GetObject()) : NULL;
 
     if(NULL == addon) return;
 
@@ -374,7 +354,7 @@ void AnimationRemoveObject(const Maps::Tiles & tile)
         {
 	    cursor.Hide();
 	    tile.RedrawTile(display);
-	    tile.RedrawBottom(display, addon);
+	    tile.RedrawBottom(display, true);
             sf.SetAlpha(alpha);
 	    display.Blit(sf, dstx, dsty);
 	    if(heroes.size())
@@ -669,7 +649,7 @@ void ActionToMonster(Heroes &hero, const u8 obj, const s32 dst_index)
 
     if(destroy)
     {
-        Maps::TilesAddon *addon = tile.FindMonster();
+        Maps::TilesAddon *addon = tile.FindObject(MP2::OBJ_MONSTER);
 	if(addon)
 	{
             AGG::PlaySound(M82::KILLFADE);
@@ -1425,7 +1405,7 @@ void ActionToPrimarySkillObject(Heroes &hero, const u8 obj, const s32 dst_index)
 	// fix double action tile
 	if(obj == MP2::OBJ_STANDINGSTONES)
 	{
-	    const Maps::TilesAddon* addon = tile.FindStandingStones();
+	    const Maps::TilesAddon* addon = tile.FindObject(MP2::OBJ_STANDINGSTONES);
 	    
 	    if(addon && Maps::isValidDirection(tile.GetIndex(), Direction::LEFT) &&
 		world.GetTiles(Maps::GetDirectionIndex(tile.GetIndex(), Direction::LEFT)).FindAddonLevel1(addon->uniq)) hero.SetVisited(Maps::GetDirectionIndex(tile.GetIndex(), Direction::LEFT));
@@ -1632,7 +1612,7 @@ void ActionToGoodMoraleObject(Heroes &hero, const u8 obj, const s32 dst_index)
 	// fix double action tile
 	if(obj == MP2::OBJ_OASIS)
 	{
-	    const Maps::TilesAddon* addon = tile.FindOasis();
+	    const Maps::TilesAddon* addon = tile.FindObject(MP2::OBJ_OASIS);
 
 	    if(addon && Maps::isValidDirection(tile.GetIndex(), Direction::LEFT) &&
 		world.GetTiles(Maps::GetDirectionIndex(tile.GetIndex(), Direction::LEFT)).FindAddonLevel1(addon->uniq)) hero.SetVisited(Maps::GetDirectionIndex(tile.GetIndex(), Direction::LEFT));
@@ -2548,7 +2528,7 @@ void ActionToArtesianSpring(Heroes &hero, const u8 obj, const s32 dst_index)
 	// fix double action tile
 	{
 	    const Maps::Tiles & tile = world.GetTiles(dst_index);
-	    const Maps::TilesAddon* addon = tile.FindArtesianSpring();
+	    const Maps::TilesAddon* addon = tile.FindObject(MP2::OBJ_ARTESIANSPRING);
 
 	    if(addon && Maps::isValidDirection(tile.GetIndex(), Direction::LEFT) &&
 		world.GetTiles(Maps::GetDirectionIndex(tile.GetIndex(), Direction::LEFT)).FindAddonLevel1(addon->uniq)) hero.SetVisited(Maps::GetDirectionIndex(tile.GetIndex(), Direction::LEFT));

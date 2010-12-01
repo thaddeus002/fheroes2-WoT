@@ -652,7 +652,7 @@ void World::LoadMaps(const std::string &filename)
 			DEBUG(DBG_GAME , DBG_WARN, "World::World: read heroes: incorrect size block. " << sizeblock);
 		    }
 		    else
-		    if(NULL != (addon = tile.FindMiniHero()))
+		    if(NULL != (addon = tile.FindObject(MP2::OBJ_HEROES)))
 		    {
 			// calculate color
 			const u8 index_name = addon->index;
@@ -799,7 +799,7 @@ void World::LoadMaps(const std::string &filename)
 
 	    case MP2::OBJ_EVENT:
 		// remove event sprite
-		if(NULL != (addon = tile.FindEvent()))
+		if(NULL != (addon = tile.FindObject(MP2::OBJ_EVENT)))
 		{
 		    tile.Remove(addon->uniq);
 		}
@@ -807,7 +807,7 @@ void World::LoadMaps(const std::string &filename)
 	
     	    case MP2::OBJ_BOAT:
 		// remove small sprite boat
-		if(NULL != (addon = tile.FindBoat()))
+		if(NULL != (addon = tile.FindObject(MP2::OBJ_BOAT)))
 		{
 		    tile.Remove(addon->uniq);
 		}
@@ -815,7 +815,7 @@ void World::LoadMaps(const std::string &filename)
 
     	    case MP2::OBJ_RNDULTIMATEARTIFACT:
 		// remove ultimate artifact sprite
-		if(NULL != (addon = tile.FindUltimateArtifact()))
+		if(NULL != (addon = tile.FindObject(MP2::OBJ_RNDULTIMATEARTIFACT)))
 		{
 		    tile.SetQuantity1(Artifact::FromIndexSprite(addon->index));
 		    tile.Remove(addon->uniq);
@@ -1351,7 +1351,7 @@ s32 World::NextWhirlpool(const s32 index)
 
     for(itv = whilrpools.begin(); itv != whilrpools.end(); ++itv)
     {
-    	const Maps::TilesAddon* addon = GetTiles(*itv).FindWhirlpools();
+    	const Maps::TilesAddon* addon = GetTiles(*itv).FindObject(MP2::OBJ_WHIRLPOOL);
 	if(addon) uniq_whirlpools[addon->uniq].push_back(*itv);
     }
     whilrpools.clear();
@@ -1362,7 +1362,7 @@ s32 World::NextWhirlpool(const s32 index)
 	return index;
     }
 
-    const Maps::TilesAddon* addon = GetTiles(index).FindWhirlpools();
+    const Maps::TilesAddon* addon = GetTiles(index).FindObject(MP2::OBJ_WHIRLPOOL);
     std::vector<u32> uniqs;
     uniqs.reserve(uniq_whirlpools.size());
 
@@ -1416,7 +1416,7 @@ u16 World::CountCapturedMines(const Resource::resource_t res, const Color::color
 	if((*it1).second.isObject(MP2::OBJ_MINES) || (*it1).second.isObject(MP2::OBJ_HEROES))
     {
 	    // scan for find mines
-	    const Maps::TilesAddon * addon = GetTiles((*it1).first).FindMines();
+	    const Maps::TilesAddon * addon = GetTiles((*it1).first).FindObject(MP2::OBJ_MINES);
 
 	    if(addon)
 	    {

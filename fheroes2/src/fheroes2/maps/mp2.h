@@ -547,6 +547,7 @@ namespace MP2
     bool isQuantityObject(const u8 obj);
     bool isCaptureObject(const u8 obj);
     bool isPickupObject(const u8 obj);
+    bool isRemoveObject(const u8 obj);
 
     bool isNeedStayFront(const u8 obj);
     bool isClearGroundObject(const u8 obj);

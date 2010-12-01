@@ -391,7 +391,7 @@ castle size: T and B - sprite, S - shadow, XX - center
 
     for(; it1 != it2; ++it1) if(isValidAbsIndex(*it1))
     {
-	Maps::TilesAddon *addon = world.GetTiles(*it1).FindRNDCastle();
+	Maps::TilesAddon *addon = world.GetTiles(*it1).FindObject(MP2::OBJ_RNDCASTLE);
 	if(addon)
 	{
     	    addon->object -= 12;
@@ -440,14 +440,14 @@ void Maps::UpdateSpritesFromTownToCastle(const Point & center)
     std::vector<s32>::const_iterator it2 = coords.end();
     for(; it1 != it2; ++it1) if(isValidAbsIndex(*it1))
     {
-	TilesAddon *addon = world.GetTiles(*it1).FindCastle();
+	TilesAddon *addon = world.GetTiles(*it1).FindObject(MP2::OBJ_CASTLE);
 	if(addon) addon->index -= 16;
     }
 
     // T0
     if(isValidAbsIndex(GetIndexFromAbsPoint(center.x, center.y - 3) && isValidAbsIndex(GetIndexFromAbsPoint(center.x, center.y - 2))))
     {
-	TilesAddon *addon = world.GetTiles(GetIndexFromAbsPoint(center.x, center.y - 2)).FindCastle();
+	TilesAddon *addon = world.GetTiles(GetIndexFromAbsPoint(center.x, center.y - 2)).FindObject(MP2::OBJ_CASTLE);
 	if(addon)
 	    world.GetTiles(GetIndexFromAbsPoint(center.x, center.y - 3)).AddonsPushLevel2(TilesAddon(addon->level, addon->uniq, addon->object, addon->index - 3));
     }

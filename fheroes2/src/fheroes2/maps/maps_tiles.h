@@ -45,8 +45,35 @@ namespace Maps
 
 	TilesAddon & operator= (const TilesAddon & ta);
 
-	static u16 isRoad(const TilesAddon & ta);
-	static bool isStream(const TilesAddon & ta);
+	static u16 isRoad(const TilesAddon &);
+	static bool isStream(const TilesAddon &);
+
+	static bool isResource(const TilesAddon &);
+	static bool isWaterResource(const TilesAddon &);
+	static bool isWhirlPool(const TilesAddon &);
+	static bool isStandingStone(const TilesAddon &);
+	static bool isArtifact(const TilesAddon &);
+	static bool isCampFire(const TilesAddon &);
+	static bool isMonster(const TilesAddon &);
+	static bool isBarrier(const TilesAddon &);
+	static bool isArtesianSpring(const TilesAddon &);
+	static bool isOasis(const TilesAddon &);
+	static bool isJail(const TilesAddon &);
+	static bool isMine(const TilesAddon &);
+	static bool isEvent(const TilesAddon &);
+	static bool isBoat(const TilesAddon &);
+	static bool isMiniHero(const TilesAddon &);
+	static bool isRandomResource(const TilesAddon &);
+	static bool isRandomArtifact(const TilesAddon &);
+	static bool isRandomArtifact1(const TilesAddon &);
+	static bool isRandomArtifact2(const TilesAddon &);
+	static bool isRandomArtifact3(const TilesAddon &);
+	static bool isUltimateArtifact(const TilesAddon &);
+	static bool isCastle(const TilesAddon &);
+	static bool isRandomCastle(const TilesAddon &);
+	static bool isRandomMonster(const TilesAddon &);
+	static bool isFlag32(const TilesAddon &);
+
 	static bool PredicateSortRules1(const TilesAddon & ta1, const TilesAddon & ta2);
 	static bool PredicateSortRules2(const TilesAddon & ta1, const TilesAddon & ta2);
 
@@ -85,28 +112,8 @@ namespace Maps
 	TilesAddon* FindAddonLevel1(u32 uniq1);
 	TilesAddon* FindAddonLevel2(u32 uniq2);
 
-	TilesAddon* FindCampFire(void);
-	TilesAddon* FindWaterResource(void);
-	TilesAddon* FindResource(void);
-	TilesAddon* FindRNDResource(void);
-	TilesAddon* FindArtifact(void);
-	TilesAddon* FindRNDArtifact(const u8 level = 0);
-	TilesAddon* FindUltimateArtifact(void);
-	TilesAddon* FindMiniHero(void);
-	TilesAddon* FindEvent(void);
-	TilesAddon* FindBoat(void);
-	TilesAddon* FindCastle(void);
-	TilesAddon* FindRNDCastle(void);
-	TilesAddon* FindFlags(void);
-	TilesAddon* FindRNDMonster(void);
-	TilesAddon* FindMonster(void);
-	const TilesAddon* FindMines(void) const;
-	const TilesAddon* FindStandingStones(void) const;
-	const TilesAddon* FindArtesianSpring(void) const;
-	const TilesAddon* FindWhirlpools(void) const;
-	const TilesAddon* FindOasis(void) const;
-	TilesAddon* FindJail(void);
-	TilesAddon* FindBarrier(void);
+	TilesAddon* FindObject(u8);
+	const TilesAddon* FindObject(u8) const;
 
 	void SetTile(const u16 sprite_index, const u8 shape);
 
@@ -122,7 +129,7 @@ namespace Maps
 	void CaptureFlags32(const MP2::object_t obj, const Color::color_t col);
 
 	void RedrawTile(Surface &) const;
-	void RedrawBottom(Surface &, const TilesAddon* skip = NULL) const;
+	void RedrawBottom(Surface &, bool skip_objs = false) const;
 	void RedrawBottom4Hero(Surface &) const;
 	void RedrawTop(Surface &, const TilesAddon* skip = NULL) const;
 	void RedrawTop4Hero(Surface &, bool skip_ground) const;
@@ -164,6 +171,7 @@ namespace Maps
 	void UpdateTreasureChestSprite(void);
 
     private:
+	TilesAddon* FindFlags(void);
 	void CorrectFlags32(const u8 index, bool);
 	void RemoveJailSprite(void);
 	void RemoveBarrierSprite(void);
