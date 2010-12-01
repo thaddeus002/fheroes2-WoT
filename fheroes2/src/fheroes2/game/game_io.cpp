@@ -487,8 +487,20 @@ void Game::IO::PackKingdom(QueueMessage & msg, const Kingdom & kingdom)
     msg.Push(static_cast<u8>(kingdom.recruits.GetID1()));
     msg.Push(static_cast<u8>(kingdom.recruits.GetID2()));
 
+    const Puzzle & pzl = kingdom.puzzle_maps;
+
     // puzzle
-    msg.Push(kingdom.puzzle_maps.to_string<char,std::char_traits<char>,std::allocator<char> >());
+    msg.Push(pzl.to_string<char,std::char_traits<char>,std::allocator<char> >());
+
+    // puzzle orders
+    msg.Push(static_cast<u32>(sizeof(pzl.zone1_order)));
+    for(size_t ii = 0; ii < sizeof(pzl.zone1_order); ++ii) msg.Push(pzl.zone1_order[ii]);
+    msg.Push(static_cast<u32>(sizeof(pzl.zone2_order)));
+    for(size_t ii = 0; ii < sizeof(pzl.zone2_order); ++ii) msg.Push(pzl.zone2_order[ii]);
+    msg.Push(static_cast<u32>(sizeof(pzl.zone3_order)));
+    for(size_t ii = 0; ii < sizeof(pzl.zone3_order); ++ii) msg.Push(pzl.zone3_order[ii]);
+    msg.Push(static_cast<u32>(sizeof(pzl.zone4_order)));
+    for(size_t ii = 0; ii < sizeof(pzl.zone4_order); ++ii) msg.Push(pzl.zone4_order[ii]);
 
     // tents colors
     msg.Push(kingdom.visited_tents_colors);
@@ -1113,8 +1125,29 @@ void Game::IO::UnpackKingdom(QueueMessage & msg, Kingdom & kingdom, u16 check_ve
     std::string str;
 
     // puzzle
+    Puzzle & pzl = kingdom.puzzle_maps;
     msg.Pop(str);
-    kingdom.puzzle_maps = str.c_str();
+    pzl = str.c_str();
+
+    // puzzle orders
+    if(check_version < FORMAT_VERSION_2100)
+    {
+	pzl.was_saved = false;
+    }
+    else
+    {
+	u32 size;
+	msg.Pop(size);
+	for(u32 ii = 0; ii < size; ++ii) msg.Pop(pzl.zone1_order[ii]);
+	msg.Pop(size);
+	for(u32 ii = 0; ii < size; ++ii) msg.Pop(pzl.zone2_order[ii]);
+	msg.Pop(size);
+	for(u32 ii = 0; ii < size; ++ii) msg.Pop(pzl.zone3_order[ii]);
+	msg.Pop(size);
+	for(u32 ii = 0; ii < size; ++ii) msg.Pop(pzl.zone4_order[ii]);
+
+	pzl.was_saved = true;
+    }
 
     // visited tents
     msg.Pop(kingdom.visited_tents_colors);

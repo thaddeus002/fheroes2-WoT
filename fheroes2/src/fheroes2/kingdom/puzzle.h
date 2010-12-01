@@ -36,6 +36,14 @@ public:
 
     void Update(u8, u8);
     void ShowMapsDialog(void) const;
+
+    u8 zone1_order[24];
+    u8 zone2_order[16];
+    u8 zone3_order[4];
+    u8 zone4_order[4];
+
+    // compat save flag
+    bool was_saved;
 };
 
 #endif

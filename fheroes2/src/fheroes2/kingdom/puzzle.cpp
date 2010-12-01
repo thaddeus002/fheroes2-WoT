@@ -21,6 +21,7 @@
  ***************************************************************************/
 
 #include <vector>
+#include <algorithm>
 #include "cursor.h"
 #include "settings.h"
 #include "agg.h"
@@ -31,14 +32,29 @@
 #include "world.h"
 #include "puzzle.h"
 
+const u8 zone1_index[] = { 0, 1, 2, 3, 4, 5, 6, 11, 12, 17, 18, 23, 24, 29, 30, 35, 36, 41, 42, 43, 44, 45, 46, 47 };
+const u8 zone2_index[] = { 7, 8, 9, 10, 13, 16, 19, 22, 25, 28, 31, 34, 37, 38, 39, 40 };
+const u8 zone3_index[] = { 14, 15, 32, 33 };
+const u8 zone4_index[] = { 20, 21, 26, 27 };
+
 bool ClosedTilesExists(const Puzzle &, const u8*, const u8*);
+void ZoneOpenFirstTiles(Puzzle &, u8 &, const u8*, const u8*);
 void ZoneOpenRandomTiles(Puzzle &, u8 &, const u8*, const u8*);
 void ShowStandardDialog(const Puzzle &, const Surface &);
 void ShowExtendedDialog(const Puzzle &, const Surface &);
 void PuzzlesDraw(const Puzzle &, const Surface &, s16, s16);
 
-Puzzle::Puzzle()
+Puzzle::Puzzle() : was_saved(true)
 {
+    std::copy(zone1_index, zone1_index + sizeof(zone1_index), zone1_order);
+    std::copy(zone2_index, zone2_index + sizeof(zone2_index), zone2_order);
+    std::copy(zone3_index, zone3_index + sizeof(zone3_index), zone3_order);
+    std::copy(zone4_index, zone4_index + sizeof(zone4_index), zone4_order);
+
+    std::random_shuffle(zone1_order, zone1_order + sizeof(zone1_order));
+    std::random_shuffle(zone2_order, zone2_order + sizeof(zone2_order));
+    std::random_shuffle(zone3_order, zone3_order + sizeof(zone3_order));
+    std::random_shuffle(zone4_order, zone4_order + sizeof(zone4_order));
 }
 
 Puzzle & Puzzle::operator= (const char* str)
@@ -58,22 +74,34 @@ void Puzzle::Update(u8 open_obelisk, u8 total_obelisk)
     u8 open_puzzle = open_obelisk * PUZZLETILES / total_obelisk;
     u8 need_puzzle = open_puzzle > count() ? open_puzzle - count() : 0;
 
-    const u8 zone1_index[] = { 0, 1, 2, 3, 4, 5, 6, 11, 12, 17, 18, 23, 24, 29, 30, 35, 36, 41, 42, 43, 44, 45, 46, 47 };
-    const u8 zone2_index[] = { 7, 8, 9, 10, 13, 16, 19, 22, 25, 28, 31, 34, 37, 38, 39, 40 };
-    const u8 zone3_index[] = { 14, 15, 32, 33 };
-    const u8 zone4_index[] = { 20, 21, 26, 27 };
+    if(was_saved)
+    {
+	if(need_puzzle && ClosedTilesExists(*this, zone1_order, zone1_order + sizeof(zone1_order)))
+	    ZoneOpenFirstTiles(*this, need_puzzle, zone1_order, zone1_order + sizeof(zone1_order));
 
-    if(need_puzzle && ClosedTilesExists(*this, &zone1_index[0], &zone1_index[23]))
-	ZoneOpenRandomTiles(*this, need_puzzle, &zone1_index[0], &zone1_index[23]);
+	if(need_puzzle && ClosedTilesExists(*this, zone2_order, zone2_order + sizeof(zone2_order)))
+	    ZoneOpenFirstTiles(*this, need_puzzle, zone2_order, zone2_order + sizeof(zone2_order));
 
-    if(need_puzzle && ClosedTilesExists(*this, &zone2_index[0], &zone2_index[15]))
-	ZoneOpenRandomTiles(*this, need_puzzle, &zone2_index[0], &zone2_index[15]);
+	if(need_puzzle && ClosedTilesExists(*this, zone3_order, zone3_order + sizeof(zone3_order)))
+	    ZoneOpenFirstTiles(*this, need_puzzle, zone3_order, zone3_order + sizeof(zone3_order));
 
-    if(need_puzzle && ClosedTilesExists(*this, &zone3_index[0], &zone3_index[3]))
-	ZoneOpenRandomTiles(*this, need_puzzle, &zone3_index[0], &zone3_index[3]);
+	if(need_puzzle && ClosedTilesExists(*this, zone4_order, zone4_order + sizeof(zone4_order)))
+	    ZoneOpenFirstTiles(*this, need_puzzle, zone4_order, zone4_order + sizeof(zone4_order));
+    }
+    else
+    {
+	if(need_puzzle && ClosedTilesExists(*this, zone1_index, zone1_index + sizeof(zone1_index)))
+	    ZoneOpenRandomTiles(*this, need_puzzle, zone1_index, zone1_index + sizeof(zone1_index));
 
-    if(need_puzzle && ClosedTilesExists(*this, &zone4_index[0], &zone4_index[3]))
-	ZoneOpenRandomTiles(*this, need_puzzle, &zone4_index[0], &zone4_index[3]);
+	if(need_puzzle && ClosedTilesExists(*this, zone2_index, zone2_index + sizeof(zone2_index)))
+	    ZoneOpenRandomTiles(*this, need_puzzle, zone2_index, zone2_index + sizeof(zone2_index));
+
+	if(need_puzzle && ClosedTilesExists(*this, zone3_index, zone3_index + sizeof(zone3_index)))
+	    ZoneOpenRandomTiles(*this, need_puzzle, zone3_index, zone3_index + sizeof(zone3_index));
+
+	if(need_puzzle && ClosedTilesExists(*this, zone4_index, zone4_index + sizeof(zone4_index)))
+	    ZoneOpenRandomTiles(*this, need_puzzle, zone4_index, zone4_index + sizeof(zone4_index));
+    }
 }
 
 void Puzzle::ShowMapsDialog(void) const
@@ -98,8 +126,27 @@ void Puzzle::ShowMapsDialog(void) const
 
 bool ClosedTilesExists(const Puzzle & pzl, const u8* it1, const u8* it2)
 {
-    while(it1 && it2 && it1 <= it2) if(! pzl.test(*it1++)) return true;
+    while(it1 < it2) if(! pzl.test(*it1++)) return true;
     return false;
+}
+
+void ZoneOpenFirstTiles(Puzzle & pzl, u8 & opens, const u8* it1, const u8* it2)
+{
+    const u8* it = NULL;
+
+    while(opens)
+    {
+	it = it1;
+	while(it < it2 && pzl.test(*it)) ++it;
+
+	if(it != it2)
+	{
+	    pzl.set(*it);
+	    --opens;
+	}
+	else
+	    break;
+    }
 }
 
 void ZoneOpenRandomTiles(Puzzle & pzl, u8 & opens, const u8* it1, const u8* it2)
@@ -112,7 +159,7 @@ void ZoneOpenRandomTiles(Puzzle & pzl, u8 & opens, const u8* it1, const u8* it2)
     {
 	values.clear();
 	it = it1;
-	while(it && it2 && it <= it2){ if(! pzl.test(*it)) values.push_back(*it); ++it; }
+	while(it < it2){ if(! pzl.test(*it)) values.push_back(*it); ++it; }
 	if(values.empty()) break;
 	pzl.set(*Rand::Get(values));
 	--opens;
