@@ -605,7 +605,7 @@ bool Castle::RecruitMonster(u32 dw, u16 count)
     return true;
 }
 
-u16 Castle::HowManyRecruitMonster(u32 dw, Resource::funds_t* res) const
+u16 Castle::HowManyRecruitMonster(u32 dw, const Resource::funds_t* add, Resource::funds_t* res) const
 {
     u8 dw_index = 0;
 
@@ -632,12 +632,11 @@ u16 Castle::HowManyRecruitMonster(u32 dw, Resource::funds_t* res) const
     {
 	payment = PaymentConditions::BuyMonster(ms());
 	payment *= count;
+	if(res) *res = payment;
+	if(add) payment += *add;
 	if(kingdom.AllowPayment(payment)) break;
 	--count;
     }
-
-    if(count && res)
-	*res = payment;
 
     return count;
 }

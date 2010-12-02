@@ -61,9 +61,9 @@ void Castle::OpenWell(void)
     dst_pt.y = cur_pt.y + 461;
     Button buttonExit(dst_pt, ICN::WELLXTRA, 0, 1);
 
-    dst_pt.x = cur_pt.x + -5;
+    dst_pt.x = cur_pt.x;
     dst_pt.y = cur_pt.y + 461;
-    Button buttonMax(dst_pt, ICN::RECRUIT, 4, 5);
+    Button buttonMax(dst_pt, ICN::BUYMAX, 0, 1);
     
     const Rect rectMonster1(cur_pt.x + 20, cur_pt.y + 18, 288, 124);
     const Rect rectMonster2(cur_pt.x + 20, cur_pt.y + 168, 288, 124);
@@ -118,7 +118,7 @@ void Castle::OpenWell(void)
 
 		for(std::vector<u32>::const_iterator
 		    it = alldwellings.begin(); it != alldwellings.end(); ++it)
-		    if(0 != (can_recruit = HowManyRecruitMonster(*it, &cur)))
+		if(0 != (can_recruit = HowManyRecruitMonster(*it, &total, &cur)))
 		{
 		    results.push_back(dwelling_t(*it, can_recruit));
 		    total += cur;
@@ -190,9 +190,9 @@ void Castle::WellRedrawInfoArea(const Point & cur_pt)
 
     if(Settings::Get().ExtAllowBuyFromWell())
     {
-	const Sprite & button = AGG::GetICN(ICN::RECRUIT, 4);
-	Rect src_rt(0, 461, button.w() - 5, 19);
-	display.Blit(AGG::GetICN(ICN::WELLBKG, 0), src_rt, cur_pt.x + button.w() - 5, cur_pt.y + 461);
+	const Sprite & button = AGG::GetICN(ICN::BUYMAX, 0);
+	Rect src_rt(0, 461, button.w(), 19);
+	display.Blit(AGG::GetICN(ICN::WELLBKG, 0), src_rt, cur_pt.x + button.w(), cur_pt.y + 461);
     }
 
     text.Set(_("Town Population Information and Statistics"), Font::BIG);

@@ -917,6 +917,7 @@ namespace ICN
 	{ YELLOW_SMALFONT,"MANUAL.ICN" },
 	{ BATTLESKIP,   "MANUAL.ICN" },
 	{ BATTLEWAIT,   "MANUAL.ICN" },
+	{ BUYMAX,       "MANUAL.ICN" },
 
 	{ UNKNOWN,	"UNKNOWN.ICN" },
     };
@@ -1783,6 +1784,7 @@ bool ICN::NeedMinify4PocketPC(icn_t icn, u16 index)
 
 	case BATTLESKIP:
 	case BATTLEWAIT:
+	case BUYMAX:
 
 	    return true;
 
@@ -1888,6 +1890,7 @@ bool ICN::isModifiedSprite(const ICN::icn_t icn)
         case TREASURE:
 	case BATTLESKIP:
 	case BATTLEWAIT:
+	case BUYMAX:
 	    return true;
 
 	default: break;
