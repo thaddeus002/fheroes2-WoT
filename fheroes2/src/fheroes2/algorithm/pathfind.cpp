@@ -81,19 +81,40 @@ u32 GetCurrentLength(std::map<s32, cell_t> & list, s32 cur)
     return res;
 }
 
-bool MonsterDestination(const s32 from, const u16 around, const s32 dst)
+bool FromTileToMonster(const s32 from, const s32 to)
 {
-    for(Direction::vector_t dir = Direction::TOP_LEFT; dir < Direction::CENTER; ++dir)
-	if((around & dir) && dst == Maps::GetDirectionIndex(from, dir))
-	    return true;
+    return 1 == Maps::GetApproximateDistance(from, to) &&
+	MP2::OBJ_MONSTER == world.GetTiles(to).GetObject();
+}
 
-    return false;
+bool PassableFromToTile(const Heroes* hero, const s32 from, const s32 to, const Direction::vector_t direct, const s32 dst)
+{
+    if(to != dst)
+    {
+	const u16 mons = Maps::TileUnderProtection(to);
+	// check monster protection
+	if(mons &&
+	    ! FromTileToMonster(to, dst)) return false;
+    }
+
+    // check direct from object
+    if(hero && hero->GetIndex() == from &&
+	! Object::AllowDirect(hero->GetUnderObject(), direct)) return false;
+
+    // check obstacles as corners
+    //if(ImpassableCorners(from, direct, hero)) return false;  // disable, need fix more objects with passable option
+
+    const Maps::Tiles & toTile = world.GetTiles(to);
+
+    // check direct to object
+    if(! Object::AllowDirect(toTile.GetObject(), Direction::Reflect(direct))) return false;
+
+    return toTile.isPassable(hero) || to == dst;
 }
 
 bool Algorithm::PathFind(std::list<Route::Step> *result, const s32 from, const s32 to, const u16 limit, const Heroes *hero)
 {
     const u8 pathfinding = (hero ? hero->GetLevelSkill(Skill::Secondary::PATHFINDING) : Skill::Level::NONE);
-    const u8 under = (hero ? hero->GetUnderObject() : MP2::OBJ_ZERO);
 
     s32 cur = from;
     s32 alt = 0;
@@ -107,9 +128,6 @@ bool Algorithm::PathFind(std::list<Route::Step> *result, const s32 from, const s
     list[cur].cost_t = 0;
     list[cur].parent = -1;
     list[cur].open   = false;
-
-    u16 mons = 0;
-    cell_t cell;
 
     while(cur != to)
     {
@@ -126,35 +144,25 @@ bool Algorithm::PathFind(std::list<Route::Step> *result, const s32 from, const s
 		    // new
 		    if(-1 == list[tmp].parent)
 		    {
-	    		cell.cost_g = Maps::Ground::GetPenalty(tmp, direct, pathfinding);
-			cell.parent = cur;
-			cell.open = true;
-	    		cell.cost_t = cell.cost_g + list[cur].cost_t;
-			cell.cost_d = 50 * Maps::GetApproximateDistance(tmp, to);
+	    		const u16 costg = Maps::Ground::GetPenalty(tmp, direct, pathfinding);
+			if(MAXU16 == costg) continue;
 
-			if(MAXU16 == cell.cost_g) continue;
-
-			// check monster protection
-			if(tmp != to && (mons = Maps::TileUnderProtection(tmp)) && ! MonsterDestination(tmp, mons, to)) continue;
-
-			// check direct from object
-			const Maps::Tiles & tile1 = world.GetTiles(cur);
-			if(MP2::OBJ_ZERO != under && MP2::OBJ_HEROES == tile1.GetObject() &&  ! Object::AllowDirect(under, direct)) continue;
-
-			// check obstacles as corners
-			//if(ImpassableCorners(cur, direct, hero)) continue;  // disable, need fix more objects with passable option
-
-			// check direct to object
-			const Maps::Tiles & tile2 = world.GetTiles(tmp);
-			if(! Object::AllowDirect(tile2.GetObject(), Direction::Reflect(direct))) continue;
-
-			if(tile2.isPassable(hero) || tmp == to) list[tmp] = cell;
+			if(PassableFromToTile(hero, cur, tmp, direct, to))
+			{
+			    cell_t & cell = list[tmp];
+	    		    cell.cost_g = costg;
+			    cell.parent = cur;
+			    cell.open = true;
+	    		    cell.cost_t = cell.cost_g + list[cur].cost_t;
+			    cell.cost_d = 50 * Maps::GetApproximateDistance(tmp, to);
+			}
 		    }
 		    // check alt
 		    else
 		    {
 			alt = Maps::Ground::GetPenalty(cur, direct, pathfinding);
-			if(list[tmp].cost_t > list[cur].cost_t + alt)
+			if(list[tmp].cost_t > list[cur].cost_t + alt &&
+			   PassableFromToTile(hero, cur, tmp, direct, to))
 			{
 			    list[tmp].parent = cur;
 			    list[tmp].cost_g = alt;
