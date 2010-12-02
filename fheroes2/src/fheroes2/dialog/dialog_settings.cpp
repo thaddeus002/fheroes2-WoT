@@ -149,6 +149,7 @@ void Dialog::ExtSettings(void)
     states.push_back(Settings::HEROES_REMEMBER_POINTS_RETREAT);
     states.push_back(Settings::HEROES_SURRENDERING_GIVE_EXP);
     states.push_back(Settings::HEROES_RECALCULATE_MOVEMENT);
+    states.push_back(Settings::HEROES_PATROL_ALLOW_PICKUP);
 
     if(conf.VideoMode().w >= 640 && conf.VideoMode().w >= 480)
 	states.push_back(Settings::CASTLE_ALLOW_BUY_FROM_WELL);

@@ -110,6 +110,7 @@ static const settings_t settingsFHeroes2[] =
     { Settings::HEROES_REMEMBER_POINTS_RETREAT, _("heroes: remember MP/SP for retreat/surrender result"),},
     { Settings::HEROES_SURRENDERING_GIVE_EXP,   _("heroes: surrendering gives some experience"),        },
     { Settings::HEROES_RECALCULATE_MOVEMENT,    _("heroes: recalculate movement points after creatures movement"), },
+    { Settings::HEROES_PATROL_ALLOW_PICKUP,     _("heroes: allow pickup objects for patrol"),           },
     { Settings::UNIONS_ALLOW_HERO_MEETINGS,	_("unions: allow meeting heroes"),                      },
     { Settings::UNIONS_ALLOW_CASTLE_VISITING,	_("unions: allow castle visiting"),                     },
     { Settings::UNIONS_ALLOW_VIEW_MAPS,		_("unions: allow view maps"),                           },
@@ -1160,6 +1161,11 @@ bool Settings::ExtBuySpellBookFromShrine(void) const
 bool Settings::ExtHeroRecruitCostDependedFromLevel(void) const
 {
     return ExtModes(HEROES_COST_DEPENDED_FROM_LEVEL);
+}
+
+bool Settings::ExtHeroPatrolAllowPickup(void) const
+{
+    return ExtModes(HEROES_PATROL_ALLOW_PICKUP);
 }
 
 bool Settings::ExtRememberPointsForHeroRetreating(void) const
