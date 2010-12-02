@@ -1,9 +1,7 @@
 Free Heroes2 Engine
 
 Prerequisites:
-
 You need to have these libraries (with equivalent devel versions) to build fHeroes2:
-
 - SDL
 
 optional library:
@@ -13,7 +11,6 @@ optional library:
 - SDL_net or build WITHOUT_NETWORK
 - libogg
 - libpng
-- gettext
 
 SDL libraries can be found at http://www.libsdl.org .
 Sourcecode you can get it here: http://sourceforge.net/projects/fheroes2/
@@ -27,9 +24,56 @@ Hot keys:
 all hotkeys may be redefined (see fheroes2.key)
 
 License:
-The game's license is described in COPYING.
+The game's license is GPL2 (described in COPYING).
 All rights to the resource file HEROES2.AGG is owned by Ubisoft.
 
 Please!
 Do not make the official packages for assembly fheroes2 together with the original version of resources heroes2.agg,
 it violates the license GPL2.
+
+All possibilities of fheroes2:
+- game: always confirm for rewrite savefile
+- game: also confirm autosave
+- game: remember last focus
+- game: remember last filename
+- game: show system info
+- game: autosave on
+- game: use fade
+- game: show SDL logo
+- game: use evil interface
+- game: also use dynamic interface for castles
+- game: hide interface
+- world: show visited content from objects
+- world: scouting skill show extended content info
+- world: abandoned mine random resource
+- world: save count monster after battle
+- world: allow set guardian to objects
+- world: no in-built requirements or guardians for placed artifacts
+- world: only the first monster will attack (H2 bug).
+- world: Eagle Eye also works like Scholar in H3.
+- world: allow buy a spellbook from Shrines
+- artifact: Crystal Ball also added Identify Hero and Visions spells
+- castle: allow buy from well
+- heroes: learn new spells with day
+- heroes: fixed race with custom portrait
+- heroes: recruit cost to be dependent on hero level
+- heroes: remember MP/SP for retreat/surrender result
+- heroes: surrendering gives some experience
+- heroes: recalculate movement points after creatures movement
+- unions: allow meeting heroes
+- unions: allow castle visiting
+- unions: allow view maps
+- battle: show damage info
+- battle: troop direction to move
+- battle: soft wait troop
+- battle: show grid
+- battle: show mouse shadow
+- battle: show move shadow
+- battle: high objects are an obstacle for archers
+- battle: merge armies for hero from castle
+- battle: archmage can resists (20%) bad spells
+- battle: magical creature resists (20%) the same magic
+- battle: skip increase +2 defense
+- pocketpc: hide cursor
+- pocketpc: tap mode
+- pocketpc: low memory
