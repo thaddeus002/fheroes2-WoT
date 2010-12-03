@@ -757,6 +757,61 @@ Battle2::Interface* Battle2::Arena::GetInterface(void)
     return interface;
 }
 
+void Battle2::Arena::TurnTroop(Stats* current_troop)
+{
+    Actions actions;
+    bool end_turn = false;
+
+    DEBUG(DBG_BATTLE , DBG_TRACE, "Battle2::Arena::TurnTroop: " << current_troop->GetName() << ", color: " << \
+	    Color::String(current_troop->GetColor()) << ", speed: " << Speed::String(current_troop->GetSpeed()) << "(" << static_cast<int>(current_troop->GetSpeed()) << ")");
+
+    while(! end_turn)
+    {
+	// bad morale
+	if(current_troop->Modes(MORALE_BAD))
+	{
+    	    actions.AddedMoraleAction(*current_troop, false);
+	    end_turn = true;
+	}
+	else
+	// turn opponents
+	switch(current_troop->GetControl())
+	{
+    	    case Game::REMOTE:	RemoteTurn(*current_troop, actions); break;
+    	    case Game::LOCAL:	HumanTurn(*current_troop, actions); break;
+    	    default:		AI::BattleTurn(*this, *current_troop, actions); break;
+	}
+
+	// apply task
+	while(actions.size())
+	{
+	    if(MSG_BATTLE_END_TURN == actions.front().GetID())
+		    end_turn = true;
+
+	    ApplyAction(actions.front());
+	    actions.pop_front();
+
+	    // good morale
+	    if(end_turn &&
+		    !current_troop->Modes(TR_SKIPMOVE) &&
+		    current_troop->Modes(TR_MOVED) &&
+		    current_troop->Modes(MORALE_GOOD) &&
+		    army1.isValid() && army2.isValid() &&
+		    0 == result_game->army1 && 0 == result_game->army2)
+	    {
+		actions.AddedMoraleAction(*current_troop, true);
+		end_turn = false;
+	    }
+	}
+
+	if(current_troop->Modes(TR_SKIPMOVE | TR_MOVED))
+	    end_turn = true;
+
+	ResetBoard();
+	DELAY(10);
+    }
+}
+
 void Battle2::Arena::Turns(u16 turn, Result & result)
 {
     DEBUG(DBG_BATTLE , DBG_TRACE, "Battle2::Arena::Turns: " << turn);
@@ -764,162 +819,32 @@ void Battle2::Arena::Turns(u16 turn, Result & result)
     result_game = &result;
     current_turn = turn;
 
-    Armies armies1(army1);
-    Armies armies2(army2);
+    SpeedOrderArmies armies(army1, army2);
 
-    armies1.NewTurn();
-    armies2.NewTurn();
-
-    Actions actions;
-    Stats* current_troop = NULL;
-    u8 friends_color = 0;
-    u8 current_color = 0;
     bool tower_moved = false;
     bool catapult_moved = false;
 
     // turn
-    while(1)
+    for(SpeedOrderArmies::iterator it = armies.begin(); it != armies.end(); ++it)
     {
-	// check exit
-    	if(!army1.isValid() || !army2.isValid() || result.army1 || result.army2) break;
+	// end battle
+	if(!army1.isValid() || !army2.isValid() || result_game->army1 || result_game->army2) break;
 
-	if(NULL == current_troop)
-	{
-	    Battle2::Stats* btroop1 = army1.BattleFastestTroop(false);
-	    Battle2::Stats* btroop2 = army2.BattleFastestTroop(false);
+	// invalid
+	if(! *it || ! (*it)->isValid() || Speed::STANDING == (*it)->GetSpeed()) continue;
 
-	    if(btroop1 && btroop2)
-	    {
-		if(btroop1->GetSpeed() > btroop2->GetSpeed())
-		{
-		    current_troop = btroop1;
-		    current_color = army1.GetColor();
-		    friends_color = 0;
-		}
-		else
-		if(btroop1->GetSpeed() < btroop2->GetSpeed())
-		{
-		    current_troop = btroop2;
-		    current_color = army2.GetColor();
-		    friends_color = 0;
-		}
-		else
-		// equal speed
-		{
-		    // first attacker moved
-		    if(0 == friends_color)
-		    {
-			current_troop = btroop1;
-			current_color = army1.GetColor();
-			friends_color = army1.GetColor();
-		    }
-		    else
-		    // changed
-		    if(friends_color == army1.GetColor())
-		    {
-			current_troop = btroop2;
-			current_color = army2.GetColor();
-			friends_color = army2.GetColor();
-		    }
-		    else
-		    {
-			current_troop = btroop1;
-			current_color = army1.GetColor();
-			friends_color = army1.GetColor();
-		    }
-		}
-	    }
-	    else
-	    if(btroop1)
-	    {
-	    	current_troop = btroop1;
-		current_color = army1.GetColor();
-	    }
-	    else
-	    if(btroop2)
-	    {
-	    	current_troop = btroop2;
-		current_color = army2.GetColor();
-	    }
-	    else
-	    {
-		btroop1 = army1.BattleSlowestTroop(true);
-		btroop2 = army2.BattleSlowestTroop(true);
-
-		if(btroop1 && btroop2)
-		{
-		    if(btroop1->GetSpeed() < btroop2->GetSpeed())
-		    {
-		    	current_troop = btroop1;
-			current_color = army1.GetColor();
-			friends_color = 0;
-		    }
-		    else
-		    if(btroop1->GetSpeed() > btroop2->GetSpeed())
-		    {
-		    	current_troop = btroop2;
-			current_color = army2.GetColor();
-			friends_color = 0;
-		    }
-		    else
-		    // equal speed
-		    {
-			// first defender moved (attacker have priority)
-			if(0 == friends_color)
-			{
-			    current_troop = btroop2;
-			    current_color = army2.GetColor();
-			    friends_color = army2.GetColor();
-			}
-			else
-			// changed
-			if(friends_color == army1.GetColor())
-			{
-			    current_troop = btroop2;
-			    current_color = army2.GetColor();
-			    friends_color = army2.GetColor();
-			}
-			else
-			{
-			    current_troop = btroop1;
-			    current_color = army1.GetColor();
-			    friends_color = army1.GetColor();
-			}
-		    }
-		}
-		else
-		if(btroop1)
-		{
-		    current_troop = btroop1;
-		    current_color = army1.GetColor();
-		}
-		else
-		if(btroop2)
-		{
-		    current_troop = btroop2;
-		    current_color = army2.GetColor();
-		}
-	    }
-
-	    // end turns
-	    if(!current_troop) break;
-	}
-
-	DEBUG(DBG_BATTLE , DBG_TRACE, "Battle2::Arena::Turns: " << current_troop->GetName() << ", color: " << \
-	    Color::String(current_troop->GetColor()) << ", speed: " << Speed::String(current_troop->GetSpeed()) << "(" << static_cast<int>(current_troop->GetSpeed()) << ")");
-
-	current_commander = current_troop->GetCommander();
+	current_commander = (*it)->GetCommander();
 
 	// first turn: castle and catapult action
 	if(castle)
 	{
-	    if(!catapult_moved && current_color == army1.GetColor())
+	    if(!catapult_moved && (*it)->GetColor() == army1.GetColor())
 	    {
 		catapult->Action();
 		catapult_moved = true;
 	    }
 
-	    if(!tower_moved && current_color == army2.GetColor())
+	    if(!tower_moved && (*it)->GetColor() == army2.GetColor())
 	    {
 		if(towers[0] && towers[0]->isValid()) towers[0]->Action();
 		if(towers[1] && towers[1]->isValid()) towers[1]->Action();
@@ -932,43 +857,28 @@ void Battle2::Arena::Turns(u16 turn, Result & result)
 	}
 
 	// set bridge passable
-	if(bridge && bridge->isValid() && !bridge->isDown()) bridge->SetPassable(*current_troop);
+	if(bridge && bridge->isValid() && !bridge->isDown()) bridge->SetPassable(**it);
 
-	// bad morale
-	if(current_troop->Modes(MORALE_BAD))
-	{
-    	    actions.AddedMoraleAction(*current_troop, false);
-	}
-	else
-	// turn opponents
-	switch(current_troop->GetControl())
-	{
-    	    case Game::REMOTE:	RemoteTurn(*current_troop, actions); break;
-    	    case Game::LOCAL:   HumanTurn(*current_troop, actions); break;
-    	    default:		AI::BattleTurn(*this, *current_troop, actions); break;
-	}
+	// turn troop
+	TurnTroop(*it);
+    }
 
-	// apply task
-	while(actions.size())
-	{
-	    bool check_morale = (MSG_BATTLE_END_TURN == actions.front().GetID());
+    // can skip move ?
+    if(Settings::Get().ExtBattleSoftWait())
+    for(SpeedOrderArmies::reverse_iterator it = armies.rbegin(); it != armies.rend(); ++it)
+	if((*it)->Modes(TR_SKIPMOVE))
+    {
+	// end battle
+	if(!army1.isValid() || !army2.isValid() || result_game->army1 || result_game->army2) break;
 
-	    ApplyAction(actions.front());
-	    actions.pop_front();
+	// invalid
+	if(! *it || ! (*it)->isValid() || Speed::STANDING == (*it)->GetSpeed()) continue;
 
-	    // good morale
-	    if(check_morale && !current_troop->Modes(TR_SKIPMOVE) &&
-		current_troop->Modes(TR_MOVED) && current_troop->Modes(MORALE_GOOD) && army1.isValid() && army2.isValid() &&
-		0 == result.army1 && 0 == result.army2)
-		actions.AddedMoraleAction(*current_troop, true);
-	}
+	// set bridge passable
+	if(bridge && bridge->isValid() && !bridge->isDown()) bridge->SetPassable(**it);
 
-	ResetBoard();
-
-	// current troop moved!
-	if(current_troop->Modes(TR_SKIPMOVE | TR_MOVED)) current_troop = NULL;
-
-	DELAY(10);
+	// turn troop
+	TurnTroop(*it);
     }
 
     // end turn: fix result

@@ -211,6 +211,8 @@ namespace Battle2
 	friend class Catapult;
 	friend class ::AI;
 
+	void TurnTroop(Stats*);
+
 	Army::army_t & army1;
         Army::army_t & army2;
 

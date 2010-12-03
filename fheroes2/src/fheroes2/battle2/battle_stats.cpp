@@ -2301,3 +2301,58 @@ Battle2::Stats* Battle2::Armies::CreateNewStats(Monster::monster_t id, u32 count
 
     return (*it).battle;
 }
+
+Battle2::SpeedOrderArmies::SpeedOrderArmies(Army::army_t & a1, Army::army_t & a2)
+{
+    Armies armies1(a1);
+    Armies armies2(a2);
+
+    reserve(armies1.size() + armies2.size());
+
+    armies1.NewTurn();
+    armies2.NewTurn();
+
+    armies1.SortFastest();
+    armies2.SortFastest();
+
+    Armies::iterator it1 = armies1.begin();
+    Armies::iterator it2 = armies2.begin();
+
+    while(it1 != armies1.end() &&
+	    it2 != armies2.end())
+    {
+	if((*it1)->GetSpeed() > (*it2)->GetSpeed())
+	{
+	    for(; it1 != armies1.end() &&
+		(*it1)->GetSpeed() > (*it2)->GetSpeed(); ++it1)
+		    push_back(*it1);
+	}
+	else
+	if((*it2)->GetSpeed() > (*it1)->GetSpeed())
+	{
+	    for(; it2 != armies2.end() &&
+		(*it2)->GetSpeed() > (*it1)->GetSpeed(); ++it2)
+		    push_back(*it2);
+	}
+	else
+	{
+	    if(empty() ||
+		a2.GetColor() == back()->GetColor())
+	    {
+		push_back(*it1);
+		push_back(*it2);
+	    }
+	    else
+	    {
+		push_back(*it2);
+		push_back(*it1);
+	    }
+
+	    ++it1;
+	    ++it2;
+	}
+    }
+
+    for(; it1 != armies1.end(); ++it1) push_back(*it1);
+    for(; it2 != armies2.end(); ++it2) push_back(*it2);
+}

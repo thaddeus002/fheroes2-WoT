@@ -260,6 +260,11 @@ namespace Battle2
 
 	Army::army_t & parent;
     };
+
+    struct SpeedOrderArmies : public std::vector<Stats*>
+    {
+        SpeedOrderArmies(Army::army_t &, Army::army_t &);
+    };
 }
 
 #endif

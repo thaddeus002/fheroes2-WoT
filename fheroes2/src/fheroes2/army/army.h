@@ -81,8 +81,6 @@ namespace Army
 	    void	BattleInit(void);
 	    void	BattleQuit(void);
 	    u32		BattleKilled(void) const;
-	    Battle2::Stats* BattleSlowestTroop(bool skipmove);
-	    Battle2::Stats* BattleFastestTroop(bool skipmove);
 
 	    void	DrawMons32Line(s16, s16, u16, u8 = 0, u8 = 0, bool = false) const;
 

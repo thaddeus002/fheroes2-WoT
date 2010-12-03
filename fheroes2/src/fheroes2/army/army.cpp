@@ -739,42 +739,6 @@ u32 Army::army_t::BattleKilled(void) const
     return res;
 }
 
-Battle2::Stats* Army::army_t::BattleFastestTroop(bool skipmove)
-{
-    std::vector<Troop>::iterator it = army.begin();
-    Battle2::Stats* cur = NULL;
-
-    for(; it != army.end(); ++it) if((*it).isValid())
-    {
-	Battle2::Stats* b = (*it).GetBattleStats();
-
-	if(b && !b->Modes(Battle2::TR_MOVED) &&
-	   ((skipmove && b->Modes(Battle2::TR_SKIPMOVE)) || (!skipmove && !b->Modes(Battle2::TR_SKIPMOVE))) &&
-	   Speed::STANDING < b->GetSpeed() &&
-	   (NULL == cur || b->GetSpeed() > cur->GetSpeed())) cur = b;
-    }
-
-    return cur;
-}
-
-Battle2::Stats* Army::army_t::BattleSlowestTroop(bool skipmove)
-{
-    std::vector<Troop>::iterator it = army.begin();
-    Battle2::Stats* cur = NULL;
-
-    for(; it != army.end(); ++it) if((*it).isValid())
-    {
-	Battle2::Stats* b = (*it).GetBattleStats();
-
-	if(b && !b->Modes(Battle2::TR_MOVED) &&
-	   ((skipmove && b->Modes(Battle2::TR_SKIPMOVE)) ||(!skipmove && !b->Modes(Battle2::TR_SKIPMOVE))) &&
-	   Speed::STANDING < b->GetSpeed() &&
-	   (NULL == cur || b->GetSpeed() < cur->GetSpeed())) cur = b;
-    }
-
-    return cur;
-}
-
 void Army::army_t::Clear(void)
 {
     std::for_each(army.begin(), army.end(), std::mem_fun_ref(&Troop::Reset));
