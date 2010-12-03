@@ -67,6 +67,15 @@ std::string GetCaption(void)
     return std::string("Free Heroes II, " + Settings::Get().BuildVersion());
 }
 
+bool RunEditor(const char* name)
+{
+    const char* feditor2 = "feditor2";
+    std::string namelower = GetBasename(name);
+    String::Lower(namelower);
+
+    return 0 == namelower.compare(0, strlen(feditor2), feditor2);
+}
+
 int main(int argc, char **argv)
 {
 	Settings & conf = Settings::Get();
@@ -75,6 +84,11 @@ int main(int argc, char **argv)
 	VERBOSE("Free Heroes II, " + conf.BuildVersion());
 
 	LoadConfigFiles(conf, GetDirname(argv[0]));
+
+
+#ifdef WITH_EDITOR
+	if(RunEditor(argv[0])) conf.SetEditor();
+#endif
 
 	// getopt
 	{
@@ -85,8 +99,6 @@ int main(int argc, char **argv)
 #ifdef WITH_EDITOR
                     case 'e':
 			conf.SetEditor();
-			conf.SetDebug(DBG_DEVEL | DBG_GAME | DBG_INFO);
-			std::cout << "start: editor mode." << std::endl;
 			break;
 #endif			
 #ifndef BUILD_RELEASE
