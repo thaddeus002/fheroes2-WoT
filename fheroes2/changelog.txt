@@ -1,4 +1,14 @@
-SVN - up to r2095
+SVN - up to r2110
+
+Added: new option "fonts small render" and "fonts normal render"
+fixed: battle order troops move
+Added: random move for hero with patrol mode
+Added: "buy all monster" to castle well dialog, (work with option "buy from well")
+Fixed: bad luck message
+Added: store puzzle orders to savefile
+Fixed: ultimate artifact puzzle image (remove objects)
+Fixed: goodluck sound for battle
+Added: heroes sleeping mode (default key: z)
 
 Fixed: patrol mode, with Kingdom::ApplyPlayWithStartingHero
 Fixed: event maps for protection tile (first will be a battle)
