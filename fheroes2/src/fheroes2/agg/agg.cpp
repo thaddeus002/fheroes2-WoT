@@ -304,7 +304,8 @@ void AGG::Cache::LoadExtICN(icn_cache_t & v, const ICN::icn_t icn, const u16 ind
 	case ICN::YELLOW_SMALFONT: count = 96; break;
 	case ICN::BATTLESKIP:
 	case ICN::BATTLEWAIT:
-	case ICN::BUYMAX:  count = 2; break;
+	case ICN::BUYMAX:
+	case ICN::BTNCONFIG:  count = 2; break;
 
 	default: break;
     }
@@ -319,6 +320,16 @@ void AGG::Cache::LoadExtICN(icn_cache_t & v, const ICN::icn_t icn, const u16 ind
     // simple modify
     switch(icn)
     {
+	case ICN::BTNCONFIG:
+	if(index < count)
+	{
+	    Sprite & sprite = reflect ? v.reflect[index] : v.sprites[index];
+	    LoadOrgICN(sprite, ICN::SYSTEM, 11 + index, false);
+	    // config
+	    sprite.Blit(GetICN(ICN::BTNDCCFG, 4 + index), Rect(30, 20, 80, 16), 8, 5);
+	}
+	break;
+
 	case ICN::BUYMAX:
 	if(index < count)
 	{
@@ -326,7 +337,7 @@ void AGG::Cache::LoadExtICN(icn_cache_t & v, const ICN::icn_t icn, const u16 ind
 	    LoadOrgICN(sprite, ICN::WELLXTRA, index, false);
 	    // clean
 	    sprite.Blit(GetICN(ICN::SYSTEM, 11 + index), Rect(10, 6, 52, 14), 6, 2);
-	    // skip
+	    // max
 	    sprite.Blit(GetICN(ICN::RECRUIT, 4 + index), Rect(12, 6, 50, 12), 7, 3);
 	}
 	break;

@@ -31,7 +31,7 @@
 class SettingsListBox : public Interface::ListBox<u32>
 {
 public:
-    SettingsListBox(const Point & pt) : Interface::ListBox<u32>(pt) {};
+    SettingsListBox(const Point & pt, bool f) : Interface::ListBox<u32>(pt), readonly(f) {};
 
     void RedrawItem(const u32 &, s16, s16, bool);
     void RedrawBackground(const Point &);
@@ -41,6 +41,8 @@ public:
     void ActionListDoubleClick(u32 &);
     void ActionListSingleClick(u32 &);
     void ActionListPressRight(u32 &){};
+
+    bool readonly;
 };
 
 void SettingsListBox::RedrawItem(const u32 & item, s16 ox, s16 oy, bool current)
@@ -87,11 +89,14 @@ void SettingsListBox::ActionListDoubleClick(u32 & item)
 
 void SettingsListBox::ActionListSingleClick(u32 & item)
 {
-    Settings & conf = Settings::Get();
-    conf.ExtModes(item) ? conf.ExtResetModes(item) : conf.ExtSetModes(item);
+    if(!readonly)
+    {
+	Settings & conf = Settings::Get();
+	conf.ExtModes(item) ? conf.ExtResetModes(item) : conf.ExtSetModes(item);
+    }
 }
 
-void Dialog::ExtSettings(void)
+void Dialog::ExtSettings(bool readonly)
 {
     Display & display = Display::Get();
     const Settings & conf = Settings::Get();
@@ -177,7 +182,7 @@ void Dialog::ExtSettings(void)
 	states.push_back(Settings::POCKETPC_LOW_MEMORY);
     }
 
-    SettingsListBox listbox(area);
+    SettingsListBox listbox(area, readonly);
 
     const u16 ah = window_h - 54;
 

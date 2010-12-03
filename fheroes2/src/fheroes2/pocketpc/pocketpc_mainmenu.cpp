@@ -108,7 +108,7 @@ Game::menu_t PocketPC::MainMenu(void)
 		le.MouseClickLeft(rectLoadGame)) return Game::LOADGAME;
 	else
 	if(Game::HotKeyPress(Game::EVENT_BUTTON_SETTINGS) ||
-		le.MouseClickLeft(rectSettings)){ Dialog::ExtSettings(); cursor.Show(); display.Flip(); }
+		le.MouseClickLeft(rectSettings)){ Dialog::ExtSettings(false); cursor.Show(); display.Flip(); }
 	else
 	if(Game::HotKeyPress(Game::EVENT_BUTTON_CREDITS) ||
 		le.MouseClickLeft(rectCredits)) return Game::CREDITS;

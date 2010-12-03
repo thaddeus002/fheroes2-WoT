@@ -119,8 +119,11 @@ void Dialog::GameInfo(void)
     text.Set(str, Font::YELLOW_SMALL, 80);
     text.Blit(pt.x + 415 - text.w(), pt.y + 434);
 
-    Button button(pt.x + 180, pt.y + 425, ICN::SYSTEM, 1, 2);
-    button.Draw();
+    Button buttonOk(pt.x + 180, pt.y + 425, ICN::SYSTEM, 1, 2);
+    Button buttonCfg(pt.x + 50, pt.y + 425, ICN::BTNCONFIG, 0, 1);
+
+    buttonOk.Draw();
+    buttonCfg.Draw();
 
     cursor.Show();
     display.Flip();
@@ -130,9 +133,17 @@ void Dialog::GameInfo(void)
     // message loop
     while(le.HandleEvents())
     {
-	le.MousePressLeft(button) ? button.PressDraw() : button.ReleaseDraw();
+	le.MousePressLeft(buttonOk) ? buttonOk.PressDraw() : buttonOk.ReleaseDraw();
+	le.MousePressLeft(buttonCfg) ? buttonCfg.PressDraw() : buttonCfg.ReleaseDraw();
 
-        if(le.MouseClickLeft(button) ||
+        if(le.MouseClickLeft(buttonCfg))
+	{
+	    Dialog::ExtSettings(true);
+	    Cursor::Get().Show();
+	    Display::Flip();
+	}
+
+        if(le.MouseClickLeft(buttonOk) ||
 	   HotKeyCloseWindow) break;
     }
 

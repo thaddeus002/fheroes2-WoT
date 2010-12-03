@@ -93,7 +93,7 @@ namespace Dialog
     // buttons: OK : CANCEL : OK|CANCEL : YES|NO
     u16 Message(const std::string &header, const std::string &message, Font::type_t ft, u16 buttons = 0);
 
-    void ExtSettings(void);
+    void ExtSettings(bool);
 
     // other info
     Skill::Secondary::skill_t LevelUpSelectSkill(const std::string &header, const Skill::Secondary & sec1, const Skill::Secondary & sec2);
