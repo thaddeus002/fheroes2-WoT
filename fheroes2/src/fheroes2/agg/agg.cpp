@@ -814,14 +814,14 @@ void AGG::Cache::LoadFNT(u16 ch)
         const Colors yellow= { 0xFF, 0xFF, 0x00, 0x00 };
 
 	// small
-	font_small.RenderUnicodeChar(fnt_cache[ch].small_white, ch, white, conf.FontsRenderBlended() ? SDL::Font::BLENDED : SDL::Font::SOLID);
-	font_small.RenderUnicodeChar(fnt_cache[ch].small_yellow, ch, yellow, conf.FontsRenderBlended() ? SDL::Font::BLENDED : SDL::Font::SOLID);
+	font_small.RenderUnicodeChar(fnt_cache[ch].small_white, ch, white, conf.FontSmallRenderBlended() ? SDL::Font::BLENDED : SDL::Font::SOLID);
+	font_small.RenderUnicodeChar(fnt_cache[ch].small_yellow, ch, yellow, conf.FontSmallRenderBlended() ? SDL::Font::BLENDED : SDL::Font::SOLID);
 
 	// medium
 	if(!(conf.QVGA() && !conf.Unicode()))
 	{
-	    font_medium.RenderUnicodeChar(fnt_cache[ch].medium_white, ch, white, conf.FontsRenderBlended() ? SDL::Font::BLENDED : SDL::Font::SOLID);
-	    font_medium.RenderUnicodeChar(fnt_cache[ch].medium_yellow, ch, yellow, conf.FontsRenderBlended() ? SDL::Font::BLENDED : SDL::Font::SOLID);
+	    font_medium.RenderUnicodeChar(fnt_cache[ch].medium_white, ch, white, conf.FontNormalRenderBlended() ? SDL::Font::BLENDED : SDL::Font::SOLID);
+	    font_medium.RenderUnicodeChar(fnt_cache[ch].medium_yellow, ch, yellow, conf.FontNormalRenderBlended() ? SDL::Font::BLENDED : SDL::Font::SOLID);
 	}
 
 	DEBUG(DBG_ENGINE , DBG_TRACE, "AGG::LoadChar: 0x" << std::hex << static_cast<int>(ch));

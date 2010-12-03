@@ -180,7 +180,8 @@ public:
     const std::string & FontsSmall(void) const;
     u8 FontsNormalSize(void) const;
     u8 FontsSmallSize(void) const;
-    bool FontsRenderBlended(void) const;
+    bool FontSmallRenderBlended(void) const;
+    bool FontNormalRenderBlended(void) const;
 
     const Point & PosRadar(void) const;
     const Point & PosButtons(void) const;

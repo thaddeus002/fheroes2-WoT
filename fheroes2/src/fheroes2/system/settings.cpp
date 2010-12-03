@@ -46,7 +46,8 @@ enum
 
     GLOBAL_AUTOBATTLE        = 0x00010000,
 
-    GLOBAL_FONTRENDERBLENDED = 0x00020000,
+    GLOBAL_FONTRENDERBLENDED1= 0x00020000,
+    GLOBAL_FONTRENDERBLENDED2= 0x00040000,
     GLOBAL_FULLSCREEN        = 0x00400000,
     GLOBAL_USESWSURFACE      = 0x00800000,
 
@@ -242,8 +243,14 @@ bool Settings::Read(const std::string & filename)
 	entry = config.Find("fonts small size");
 	if(entry) size_small = entry->IntParams();
 
-	entry = config.Find("fonts render");
-	if(entry && entry->StrParams() == "blended") opt_global.SetModes(GLOBAL_FONTRENDERBLENDED);
+	entry = config.Find("fonts render"); // compat only
+	if(entry && entry->StrParams() == "blended") opt_global.SetModes(GLOBAL_FONTRENDERBLENDED1|GLOBAL_FONTRENDERBLENDED2);
+
+	entry = config.Find("fonts small render");
+	if(entry && entry->StrParams() == "blended") opt_global.SetModes(GLOBAL_FONTRENDERBLENDED1);
+
+	entry = config.Find("fonts normal render");
+	if(entry && entry->StrParams() == "blended") opt_global.SetModes(GLOBAL_FONTRENDERBLENDED2);
     }
 
     // music
@@ -598,7 +605,8 @@ const std::string & Settings::FontsSmall(void) const { return font_small; }
 const std::string & Settings::ForceLang(void) const { return force_lang; }
 u8 Settings::FontsNormalSize(void) const { return size_normal; }
 u8 Settings::FontsSmallSize(void) const { return size_small; }
-bool Settings::FontsRenderBlended(void) const { return opt_global.Modes(GLOBAL_FONTRENDERBLENDED); }
+bool Settings::FontSmallRenderBlended(void) const { return opt_global.Modes(GLOBAL_FONTRENDERBLENDED1); }
+bool Settings::FontNormalRenderBlended(void) const { return opt_global.Modes(GLOBAL_FONTRENDERBLENDED2); }
 
 const std::string & Settings::BuildVersion(void) const { return build_version; }
 
@@ -965,6 +973,7 @@ void Settings::FixKingdomRandomRace(void)
 void Settings::SetEditor(void)
 {
     opt_global.SetModes(GLOBAL_EDITOR);
+    SetDebug(DBG_DEVEL | DBG_GAME | DBG_INFO);
     PostLoad();
 }
 
