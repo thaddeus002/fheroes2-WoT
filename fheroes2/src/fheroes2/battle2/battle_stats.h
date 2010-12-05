@@ -247,6 +247,8 @@ namespace Battle2
     {
 	Armies(Army::army_t &);
 
+	void Init(void);
+
 	Stats* GetRandom(void);
 	Stats* FindMode(u32);
 	Stats* CreateNewStats(Monster::monster_t, u32);
@@ -258,12 +260,10 @@ namespace Battle2
 
 	void NewTurn(void);
 
-	Army::army_t & parent;
-    };
+	static Stats* GetStatsPart1(Armies &, Armies &, Stats* last);
+	static Stats* GetStatsPart2(Armies &, Armies &, Stats* last);
 
-    struct SpeedOrderArmies : public std::vector<Stats*>
-    {
-        SpeedOrderArmies(Army::army_t &, Army::army_t &);
+	Army::army_t & parent;
     };
 }
 

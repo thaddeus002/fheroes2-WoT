@@ -819,32 +819,34 @@ void Battle2::Arena::Turns(u16 turn, Result & result)
     result_game = &result;
     current_turn = turn;
 
-    SpeedOrderArmies armies(army1, army2);
+    Armies armies1(army1);
+    Armies armies2(army2);
+
+    armies1.NewTurn();
+    armies2.NewTurn();
 
     bool tower_moved = false;
     bool catapult_moved = false;
 
-    // turn
-    for(SpeedOrderArmies::iterator it = armies.begin(); it != armies.end(); ++it)
+    Stats* current_troop = NULL;
+
+    while(NULL != (current_troop = Armies::GetStatsPart1(armies1, armies2, current_troop)))
     {
 	// end battle
 	if(!army1.isValid() || !army2.isValid() || result_game->army1 || result_game->army2) break;
 
-	// invalid
-	if(! *it || ! (*it)->isValid() || Speed::STANDING == (*it)->GetSpeed()) continue;
-
-	current_commander = (*it)->GetCommander();
+	current_commander = current_troop->GetCommander();
 
 	// first turn: castle and catapult action
 	if(castle)
 	{
-	    if(!catapult_moved && (*it)->GetColor() == army1.GetColor())
+	    if(!catapult_moved && current_troop->GetColor() == army1.GetColor())
 	    {
 		catapult->Action();
 		catapult_moved = true;
 	    }
 
-	    if(!tower_moved && (*it)->GetColor() == army2.GetColor())
+	    if(!tower_moved && current_troop->GetColor() == army2.GetColor())
 	    {
 		if(towers[0] && towers[0]->isValid()) towers[0]->Action();
 		if(towers[1] && towers[1]->isValid()) towers[1]->Action();
@@ -857,28 +859,28 @@ void Battle2::Arena::Turns(u16 turn, Result & result)
 	}
 
 	// set bridge passable
-	if(bridge && bridge->isValid() && !bridge->isDown()) bridge->SetPassable(**it);
+	if(bridge && bridge->isValid() && !bridge->isDown()) bridge->SetPassable(*current_troop);
 
 	// turn troop
-	TurnTroop(*it);
+	TurnTroop(current_troop);
     }
+
+    current_troop = NULL;
 
     // can skip move ?
     if(Settings::Get().ExtBattleSoftWait())
-    for(SpeedOrderArmies::reverse_iterator it = armies.rbegin(); it != armies.rend(); ++it)
-	if((*it)->Modes(TR_SKIPMOVE))
+    while(NULL != (current_troop = Armies::GetStatsPart2(armies1, armies2, current_troop)))
     {
 	// end battle
 	if(!army1.isValid() || !army2.isValid() || result_game->army1 || result_game->army2) break;
 
-	// invalid
-	if(! *it || ! (*it)->isValid() || Speed::STANDING == (*it)->GetSpeed()) continue;
+	current_commander = current_troop->GetCommander();
 
 	// set bridge passable
-	if(bridge && bridge->isValid() && !bridge->isDown()) bridge->SetPassable(**it);
+	if(bridge && bridge->isValid() && !bridge->isDown()) bridge->SetPassable(*current_troop);
 
 	// turn troop
-	TurnTroop(*it);
+	TurnTroop(current_troop);
     }
 
     // end turn: fix result

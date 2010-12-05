@@ -2224,16 +2224,31 @@ namespace Battle2
     {
 	return Army::WeakestTroop(b1->troop, b2->troop);
     }
+
+    bool AllowPart1(const Stats* b)
+    {
+	return ! b->Modes(TR_SKIPMOVE) && Speed::STANDING < b->GetSpeed();
+    }
+
+    bool AllowPart2(const Stats* b)
+    {
+	return b->Modes(TR_SKIPMOVE) && Speed::STANDING < b->GetSpeed();
+    }
 }
 
 Battle2::Armies::Armies(Army::army_t & a) : parent(a)
 {
     reserve(a.army.size());
+    Init();
+}
+
+void Battle2::Armies::Init(void)
+{
+    clear();
 
     for(std::vector<Army::Troop>::const_iterator
-        it = a.army.begin(); it != a.army.end(); ++it)
-            if((*it).isValid() && (*it).battle)
-                push_back((*it).battle);
+        it = parent.army.begin(); it != parent.army.end(); ++it)
+            if((*it).isValid() && (*it).battle) push_back((*it).battle);
 }
 
 Battle2::Stats* Battle2::Armies::GetRandom(void)
@@ -2302,57 +2317,106 @@ Battle2::Stats* Battle2::Armies::CreateNewStats(Monster::monster_t id, u32 count
     return (*it).battle;
 }
 
-Battle2::SpeedOrderArmies::SpeedOrderArmies(Army::army_t & a1, Army::army_t & a2)
+Battle2::Stats* Battle2::Armies::GetStatsPart1(Armies & armies1, Armies & armies2, Stats* last)
 {
-    Armies armies1(a1);
-    Armies armies2(a2);
-
-    reserve(armies1.size() + armies2.size());
-
-    armies1.NewTurn();
-    armies2.NewTurn();
+    armies1.Init();
+    armies2.Init();
 
     armies1.SortFastest();
     armies2.SortFastest();
 
-    Armies::iterator it1 = armies1.begin();
-    Armies::iterator it2 = armies2.begin();
+    Stats* result = NULL;
 
-    while(it1 != armies1.end() &&
-	    it2 != armies2.end())
+    Armies::iterator it1 = std::find_if(armies1.begin(), armies1.end(), AllowPart1);
+    Armies::iterator it2 = std::find_if(armies2.begin(), armies2.end(), AllowPart1);
+
+    if(it1 != armies1.end() &&
+	it2 != armies2.end())
     {
+	// attacker first
 	if((*it1)->GetSpeed() > (*it2)->GetSpeed())
 	{
-	    for(; it1 != armies1.end() &&
-		(*it1)->GetSpeed() > (*it2)->GetSpeed(); ++it1)
-		    push_back(*it1);
+	    result = *it1;
 	}
 	else
 	if((*it2)->GetSpeed() > (*it1)->GetSpeed())
 	{
-	    for(; it2 != armies2.end() &&
-		(*it2)->GetSpeed() > (*it1)->GetSpeed(); ++it2)
-		    push_back(*it2);
+	    result = *it2;
 	}
 	else
 	{
-	    if(empty() ||
-		a2.GetColor() == back()->GetColor())
+	    // attacker first
+	    if(!last ||
+		armies2.parent.GetColor() == last->GetColor())
 	    {
-		push_back(*it1);
-		push_back(*it2);
+		result = *it1;
 	    }
 	    else
 	    {
-		push_back(*it2);
-		push_back(*it1);
+		result = *it2;
 	    }
-
-	    ++it1;
-	    ++it2;
 	}
     }
+    else
+    if(it1 != armies1.end())
+	result = *it1;
+    else
+    if(it2 != armies2.end())
+	result = *it2;
 
-    for(; it1 != armies1.end(); ++it1) push_back(*it1);
-    for(; it2 != armies2.end(); ++it2) push_back(*it2);
+    return result &&
+	result->isValid() &&
+	result->GetSpeed() > Speed::STANDING ? result : NULL;
+}
+
+Battle2::Stats* Battle2::Armies::GetStatsPart2(Armies & armies1, Armies & armies2, Stats* last)
+{
+    armies1.Init();
+    armies2.Init();
+
+    armies1.SortFastest();
+    armies2.SortFastest();
+
+    Stats* result = NULL;
+
+    Armies::reverse_iterator it1 = std::find_if(armies1.rbegin(), armies1.rend(), AllowPart2);
+    Armies::reverse_iterator it2 = std::find_if(armies2.rbegin(), armies2.rend(), AllowPart2);
+
+    if(it1 != armies1.rend() &&
+	it2 != armies2.rend())
+    {
+	// defender first
+	if((*it2)->GetSpeed() < (*it1)->GetSpeed())
+	{
+	    result = *it2;
+	}
+	else
+	if((*it1)->GetSpeed() < (*it2)->GetSpeed())
+	{
+	    result = *it1;
+	}
+	else
+	{
+	    // defender first
+	    if(!last ||
+		armies1.parent.GetColor() == last->GetColor())
+	    {
+		result = *it2;
+	    }
+	    else
+	    {
+		result = *it1;
+	    }
+	}
+    }
+    else
+    if(it1 != armies1.rend())
+	result = *it1;
+    else
+    if(it2 != armies2.rend())
+	result = *it2;
+
+    return result &&
+	result->isValid() &&
+	result->GetSpeed() > Speed::STANDING ? result : NULL;
 }
