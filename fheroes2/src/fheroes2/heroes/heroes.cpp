@@ -1732,6 +1732,12 @@ void Heroes::Dump(void) const
                                          (Modes(PATROL) ? "PATROL," : ",") <<
                                          (Modes(AIWAITING) ? "WAITING," : ",") <<
                                          (Modes(STUPID) ? "STUPID," : ",") << std::endl;
+    if(Modes(PATROL))
+    {
+	std::cout << "patrol square   : " << static_cast<u16>(patrol_square) << std::endl;
+	
+    }
+
     if(GetControl() == Game::AI)
     {
 	std::cout << "spell book      : ";

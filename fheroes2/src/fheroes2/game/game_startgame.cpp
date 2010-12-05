@@ -676,10 +676,23 @@ Game::menu_t Game::HumanTurn(void)
     if(Game::HOTSEAT == conf.GameType()) global_focus.Reset();
 
     if(!conf.ExtRememberLastFocus() && myHeroes.size())
-	global_focus.Set(myHeroes.front());
+    {
+	// skip sleeping
+	std::vector<Heroes *>::const_iterator it =
+	    std::find_if(myHeroes.begin(), myHeroes.end(),
+		std::not1(std::bind2nd(std::mem_fun(&Heroes::Modes), Heroes::SLEEPER)));
+
+	if(it != myHeroes.end())
+	    global_focus.Set(*it);
+	else
+	    global_focus.Reset(Focus::CASTLE);
+    }
     else
 	global_focus.Reset(Focus::HEROES);
-    if(Focus::HEROES == global_focus.Type() && global_focus.GetHeroes().GetPath().isValid()) global_focus.GetHeroes().GetPath().Show();
+
+    // and show path
+    if(Focus::HEROES == global_focus.Type() &&
+	global_focus.GetHeroes().GetPath().isValid()) global_focus.GetHeroes().GetPath().Show();
 
     I.radar.SetHide(false);
     I.statusWindow.Reset();
