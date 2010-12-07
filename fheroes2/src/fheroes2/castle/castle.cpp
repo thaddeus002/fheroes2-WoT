@@ -609,7 +609,10 @@ bool Castle::RecruitMonster(u32 dw, u16 count)
     const Resource::funds_t paymentCosts(PaymentConditions::BuyMonster(ms()) * count);
     Kingdom & kingdom = world.GetKingdom(color);
 
-    if(! kingdom.AllowPayment(paymentCosts) || !army.JoinTroop(ms, count)) return false;
+    // may be guardian present
+    Army::army_t & army2 = GetArmy();
+
+    if(! kingdom.AllowPayment(paymentCosts) || !army2.JoinTroop(ms, count)) return false;
 
     kingdom.OddFundsResource(paymentCosts);
     dwelling[dw_index] -= count;

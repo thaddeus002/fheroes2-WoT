@@ -511,16 +511,49 @@ void Dialog::QuickInfo(const Castle & castle)
     dst_pt.y += sprite.h() + 5;
     text.Blit(dst_pt);
 
+    //
     u8 count = castle.GetArmy().GetCount();
     const Settings & conf = Settings::Get();
-    bool hide = Settings::Get().MyColor() != castle.GetColor() && !conf.IsUnions(conf.MyColor(), castle.GetColor());
 
-    if(hide)
+    bool hide_count, hide_guardians;
+
+    hide_count = hide_guardians = conf.MyColor() != castle.GetColor() &&
+		    !conf.IsUnions(conf.MyColor(), castle.GetColor());
+
+    const Heroes* hero = Game::Focus::HEROES == Game::Focus::Get().Type() ?
+			    &Game::Focus::Get().GetHeroes() : NULL;
+
+    // show guardians (scouting: advanced)
+    if(hide_guardians &&
+	hero &&
+	Skill::Level::ADVANCED <= hero->GetSecondaryValues(Skill::Secondary::SCOUTING))
+		hide_guardians = false;
+
+    // show count (scouting: expert)
+    if(hide_count &&
+	hero &&
+	Skill::Level::EXPERT == hero->GetSecondaryValues(Skill::Secondary::SCOUTING))
+		hide_count = false;
+
+    // draw guardian portrait
+    const Heroes* guardian = castle.GetGuardians();
+    if(guardian &&
+	! hide_guardians)
     {
-	const Heroes* hero = (Game::Focus::HEROES == Game::Focus::Get().Type() ? &Game::Focus::Get().GetHeroes() : NULL);
-	if(hero && Skill::Level::EXPERT == hero->GetSecondaryValues(Skill::Secondary::SCOUTING)) hide = false;
+	// heroes name
+	text.Set(guardian->GetName(), Font::SMALL);
+	dst_pt.x = cur_rt.x + (cur_rt.w - text.w()) / 2;
+	dst_pt.y += 10;
+	text.Blit(dst_pt);
+
+	// mini port heroes
+	const Surface & port = guardian->GetPortrait30x22();
+	dst_pt.x = cur_rt.x + (cur_rt.w - port.w()) / 2;
+	dst_pt.y += 15;
+	display.Blit(port, dst_pt);
     }
 
+    // draw defenders
     if(! count)
     {
 	text.Set(_("None"));
@@ -529,7 +562,7 @@ void Dialog::QuickInfo(const Castle & castle)
 	text.Blit(dst_pt);
     }
     else
-	castle.GetArmy().DrawMons32Line(cur_rt.x - 5, cur_rt.y + 100, 192, 0, 0, hide);
+	castle.GetArmy().DrawMons32Line(cur_rt.x - 5, cur_rt.y + 100, 192, 0, 0, hide_count);
 
     cursor.Show();
     display.Flip();

@@ -305,7 +305,13 @@ Dialog::answer_t Castle::OpenDialog(bool readonly, bool fade)
     dst_pt.y = cur_pt.y + 262;
 
     SelectArmyBar selectArmy1;
-    selectArmy1.SetArmy(castle_guardians ? castle_guardians->GetArmy() : army);
+    if(castle_guardians)
+    {
+	selectArmy1.SetArmy(castle_guardians->GetArmy());
+	selectArmy1.SetSaveLastTroop();
+    }
+    else
+	selectArmy1.SetArmy(army);
     selectArmy1.SetPos(dst_pt);
     selectArmy1.SetInterval(6);
     selectArmy1.SetBackgroundSprite(AGG::GetICN(ICN::STRIP, 2));
