@@ -58,6 +58,7 @@ namespace Maps
 	static bool isBarrier(const TilesAddon &);
 	static bool isArtesianSpring(const TilesAddon &);
 	static bool isOasis(const TilesAddon &);
+	static bool isWateringHole(const TilesAddon &);
 	static bool isJail(const TilesAddon &);
 	static bool isMine(const TilesAddon &);
 	static bool isEvent(const TilesAddon &);

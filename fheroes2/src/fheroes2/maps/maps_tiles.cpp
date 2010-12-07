@@ -242,6 +242,12 @@ bool Maps::TilesAddon::isOasis(const TilesAddon & ta)
 		(ta.index == 108 || ta.index == 109));
 }
 
+bool Maps::TilesAddon::isWateringHole(const TilesAddon & ta)
+{
+    return (ICN::OBJNCRCK == MP2::GetICNObject(ta.object) &&
+		(ta.index >= 217 && ta.index <= 220));
+}
+
 bool Maps::TilesAddon::isJail(const TilesAddon & ta)
 {
     return (ICN::X_LOC2 == MP2::GetICNObject(ta.object) && 0x09 == ta.index);
@@ -1105,6 +1111,10 @@ Maps::TilesAddon* Maps::Tiles::FindObject(u8 objs)
 	    it = std::find_if(addons_level1.begin(), addons_level1.end(), TilesAddon::isOasis);
 	    break;
 
+	case MP2::OBJ_WATERINGHOLE:
+	    it = std::find_if(addons_level1.begin(), addons_level1.end(), TilesAddon::isWateringHole);
+	    break;
+
 	case MP2::OBJ_MINES:
 	    it = std::find_if(addons_level1.begin(), addons_level1.end(), TilesAddon::isMine);
 	    break;
@@ -1230,6 +1240,10 @@ const Maps::TilesAddon* Maps::Tiles::FindObject(u8 objs) const
 
 	case MP2::OBJ_OASIS:
 	    it = std::find_if(addons_level1.begin(), addons_level1.end(), TilesAddon::isOasis);
+	    break;
+
+	case MP2::OBJ_WATERINGHOLE:
+	    it = std::find_if(addons_level1.begin(), addons_level1.end(), TilesAddon::isWateringHole);
 	    break;
 
 	case MP2::OBJ_MINES:
