@@ -1608,11 +1608,26 @@ void ActionToGoodMoraleObject(Heroes &hero, const u8 obj, const s32 dst_index)
 	if(obj == MP2::OBJ_OASIS)
 	{
 	    const Maps::TilesAddon* addon = tile.FindObject(MP2::OBJ_OASIS);
+	    if(addon)
+	    {
+		if(Maps::isValidAbsIndex(tile.GetIndex() - 1) &&
+		    world.GetTiles(tile.GetIndex() - 1).FindAddonLevel1(addon->uniq)) hero.SetVisited(tile.GetIndex() - 1);
 
-	    if(addon && Maps::isValidDirection(tile.GetIndex(), Direction::LEFT) &&
-		world.GetTiles(Maps::GetDirectionIndex(tile.GetIndex(), Direction::LEFT)).FindAddonLevel1(addon->uniq)) hero.SetVisited(Maps::GetDirectionIndex(tile.GetIndex(), Direction::LEFT));
-	    if(addon && Maps::isValidDirection(tile.GetIndex(), Direction::RIGHT) &&
-		world.GetTiles(Maps::GetDirectionIndex(tile.GetIndex(), Direction::RIGHT)).FindAddonLevel1(addon->uniq)) hero.SetVisited(Maps::GetDirectionIndex(tile.GetIndex(), Direction::RIGHT));
+		if(Maps::isValidAbsIndex(tile.GetIndex() + 1) &&
+		    world.GetTiles(tile.GetIndex() + 1).FindAddonLevel1(addon->uniq)) hero.SetVisited(tile.GetIndex() + 1);
+	    }
+	}
+	else
+	if(obj == MP2::OBJ_WATERINGHOLE)
+	{
+	    const Maps::TilesAddon* addon = tile.FindObject(MP2::OBJ_WATERINGHOLE);
+	    if(addon)
+	    {
+		// 4 tiles width
+		for(s32 ii = tile.GetIndex() - 3; ii < tile.GetIndex() + 4; ++ii)
+		    if(Maps::isValidAbsIndex(ii) &&
+			world.GetTiles(ii).FindAddonLevel1(addon->uniq)) hero.SetVisited(ii);
+	    }
 	}
     }
 
