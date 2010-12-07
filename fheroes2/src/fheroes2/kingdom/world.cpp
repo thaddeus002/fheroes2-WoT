@@ -41,21 +41,21 @@
 #include "world.h"
 #include "ai.h"
 
-struct InCastleAndGuardian : public std::binary_function <const Castle &, Heroes*, bool>
+struct InCastleAndGuardian : public std::binary_function <const Castle*, Heroes*, bool>
 {
-    bool operator() (const Castle & castle, Heroes* hero) const
+    bool operator() (const Castle* castle, Heroes* hero) const
     {
-	const Point & cpt = castle.GetCenter();
+	const Point & cpt = castle->GetCenter();
 	const Point & hpt = hero->GetCenter();
 	return cpt.x == hpt.x && cpt.y == hpt.y + 1 && hero->Modes(Heroes::GUARDIAN);
     }
 };
 
-struct InCastleNotGuardian : public std::binary_function <const Castle &, Heroes*, bool>
+struct InCastleNotGuardian : public std::binary_function <const Castle*, Heroes*, bool>
 {
-    bool operator() (const Castle & castle, Heroes* hero) const
+    bool operator() (const Castle* castle, Heroes* hero) const
     {
-	return castle.GetCenter() == hero->GetCenter() && !hero->Modes(Heroes::GUARDIAN);
+	return castle->GetCenter() == hero->GetCenter() && !hero->Modes(Heroes::GUARDIAN);
     }
 };
 
@@ -1053,22 +1053,22 @@ Castle* World::GetCastle(s32 maps_index)
 {
     const Point center(maps_index % width, maps_index / height);
 
-    std::vector<Castle *>::iterator it =
-	std::find_if(vec_castles.begin(), vec_castles.end(),
-	    std::bind2nd(std::mem_fun(&Castle::isPosition), center));
+    for(std::vector<Castle *>::iterator
+	it = vec_castles.begin(); it != vec_castles.end(); ++it)
+	    if((*it)->isPosition(center)) return *it;
 
-    return vec_castles.end() != it ? *it : NULL;
+    return NULL;
 }
 
 const Castle* World::GetCastle(s32 maps_index) const
 {
     const Point center(maps_index % width, maps_index / height);
 
-    std::vector<Castle *>::const_iterator it =
-	std::find_if(vec_castles.begin(), vec_castles.end(),
-	    std::bind2nd(std::mem_fun(&Castle::isPosition), center));
+    for(std::vector<Castle *>::const_iterator
+	it = vec_castles.begin(); it != vec_castles.end(); ++it)
+	    if((*it)->isPosition(center)) return *it;
 
-    return vec_castles.end() != it ? *it : NULL;
+    return NULL;
 }
 
 Heroes* World::GetHeroes(Heroes::heroes_t id)
@@ -1109,14 +1109,14 @@ const Heroes* World::GetHeroes(const Castle & castle, bool force_guardian) const
 
     if(force_guardian)
     {
-	it = std::find_if(vec_heroes.begin(), vec_heroes.end(), std::bind1st(InCastleAndGuardian(), castle));
+	it = std::find_if(vec_heroes.begin(), vec_heroes.end(), std::bind1st(InCastleAndGuardian(), &castle));
     }
     else
     {
-	it = std::find_if(vec_heroes.begin(), vec_heroes.end(), std::bind1st(InCastleNotGuardian(), castle));
+	it = std::find_if(vec_heroes.begin(), vec_heroes.end(), std::bind1st(InCastleNotGuardian(), &castle));
 
 	if(vec_heroes.end() == it)
-	    it = std::find_if(vec_heroes.begin(), vec_heroes.end(), std::bind1st(InCastleAndGuardian(), castle));
+	    it = std::find_if(vec_heroes.begin(), vec_heroes.end(), std::bind1st(InCastleAndGuardian(), &castle));
     }
 
     return vec_heroes.end() != it ? *it : NULL;
@@ -1131,14 +1131,14 @@ Heroes* World::GetHeroes(const Castle & castle, bool force_guardian)
 
     if(force_guardian)
     {
-	it = std::find_if(vec_heroes.begin(), vec_heroes.end(), std::bind1st(InCastleAndGuardian(), castle));
+	it = std::find_if(vec_heroes.begin(), vec_heroes.end(), std::bind1st(InCastleAndGuardian(), &castle));
     }
     else
     {
-	it = std::find_if(vec_heroes.begin(), vec_heroes.end(), std::bind1st(InCastleNotGuardian(), castle));
+	it = std::find_if(vec_heroes.begin(), vec_heroes.end(), std::bind1st(InCastleNotGuardian(), &castle));
 
 	if(vec_heroes.end() == it)
-	    it = std::find_if(vec_heroes.begin(), vec_heroes.end(), std::bind1st(InCastleAndGuardian(), castle));
+	    it = std::find_if(vec_heroes.begin(), vec_heroes.end(), std::bind1st(InCastleAndGuardian(), &castle));
     }
 
     return vec_heroes.end() != it ? *it : NULL;
