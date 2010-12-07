@@ -100,8 +100,8 @@ void RowSpells::Redraw(void)
 	    {
 		display.Blit(icon, dst.x + 5 + (dst.w - icon.w()) / 2, dst.y + 40 - icon.h() / 2);
 
-		TextBox text(Spell::GetName(spell), Font::SMALL, 73);
-		text.Blit(dst.x + 19, dst.y + 62);
+		TextBox text(Spell::GetName(spell), Font::SMALL, 78);
+		text.Blit(dst.x + 18, dst.y + 62);
 	    }
 	}
     }
