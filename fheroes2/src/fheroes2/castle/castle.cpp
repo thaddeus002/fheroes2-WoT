@@ -36,13 +36,12 @@
 u8 Castle::grown_well(2);
 u8 Castle::grown_wel2(8);
 
-Castle::Castle() : captain(*this), mageguild(*this), army(&captain), castle_heroes(NULL)
+Castle::Castle() : captain(*this), mageguild(*this), army(&captain)
 {
 }
 
 Castle::Castle(s16 cx, s16 cy, const Race::race_t rc) : Position(Point(cx, cy)), race(rc), captain(*this),
-    color(Color::GRAY), building(0), mageguild(*this),
-    army(NULL), castle_heroes(NULL)
+    color(Color::GRAY), building(0), mageguild(*this), army(NULL)
 {
     std::fill(dwelling, dwelling + CASTLEMAXMONSTER, 0);
     SetModes(ALLOWBUILD);
@@ -242,7 +241,7 @@ void Castle::LoadFromMP2(const void *ptr)
 
     // MageGuild
     mageguild.Builds();
-    if(captain.isValid()) mageguild.EducateHero(captain);
+    EducateHeroes();
 
     // fix upgrade dwelling dependend from race
     switch(race)
@@ -291,19 +290,39 @@ u32 Castle::CountBuildings(void) const
     return requires.count();
 }
 
-bool Castle::ContainCoord(const u16 ax, const u16 ay) const
+bool Castle::isPosition(const Point & pt) const
 {
     const Point & mp = GetCenter();
-    return ((mp.x == ax && mp.y - 3 == ay) || (ax >= mp.x - 2 && ax <= mp.x + 2 && ay >= mp.y - 2 && ay <= mp.y + 1));
+
+    return ((mp.x == pt.x && mp.y - 3 == pt.y) ||
+	    (pt.x >= mp.x - 2 && pt.x <= mp.x + 2 && pt.y >= mp.y - 2 && pt.y <= mp.y + 1));
+}
+
+void Castle::EducateHeroes(void)
+{
+    // for learns new spells need 1 day
+    if(GetLevelMageGuild())
+    {
+	Heroes* castle_heroes = world.GetHeroes(*this);
+
+	if(castle_heroes)
+	{
+	    mageguild.EducateHero(*castle_heroes);
+
+	    // guardian
+	    if(Settings::Get().ExtAllowCastleGuardians() &&
+		!castle_heroes->Modes(Heroes::GUARDIAN) && NULL != (castle_heroes = world.GetHeroes(*this, true)))
+		mageguild.EducateHero(*castle_heroes);
+	}
+
+	// captain
+	if(captain.isValid()) mageguild.EducateHero(captain);
+    }
 }
 
 void Castle::ActionNewDay(void)
 {
-    castle_heroes = GetHeroes();
-
-    // for learns new spells need 1 day
-    if(castle_heroes &&
-	GetLevelMageGuild()) mageguild.EducateHero(*castle_heroes);
+    EducateHeroes();
 
     SetModes(ALLOWBUILD);
 }
@@ -553,15 +572,14 @@ Heroes* Castle::RecruitHero(Heroes* hero)
     if(!hero || !AllowBuyHero(*hero) || !hero->Recruit(*this)) return NULL;
 
     world.GetKingdom(color).OddFundsResource(PaymentConditions::RecruitHero(hero->GetLevel()));
-    castle_heroes = hero;
 
     // update spell book
-    if(GetLevelMageGuild()) mageguild.EducateHero(*castle_heroes);
+    if(GetLevelMageGuild()) mageguild.EducateHero(*hero);
 
-    DEBUG(DBG_GAME , DBG_INFO, "Castle::RecruitHero: " << name << ", recruit: " << castle_heroes->GetName());
+    DEBUG(DBG_GAME , DBG_INFO, "Castle::RecruitHero: " << name << ", recruit: " << hero->GetName());
 
 #ifdef WITH_NET
-    FH2LocalClient::SendCastleRecruitHero(*this, *castle_heroes);
+    FH2LocalClient::SendCastleRecruitHero(*this, *hero);
 #endif
     return hero;
 }
@@ -1019,8 +1037,7 @@ bool Castle::BuyBuilding(u32 build)
 	    case BUILD_MAGEGUILD3:
 	    case BUILD_MAGEGUILD4:
 	    case BUILD_MAGEGUILD5:
-		if(captain.isValid()) mageguild.EducateHero(captain);
-		if(castle_heroes) mageguild.EducateHero(*castle_heroes);
+		EducateHeroes();
 		break;
 
 	    case BUILD_CAPTAIN:
@@ -1031,10 +1048,7 @@ bool Castle::BuyBuilding(u32 build)
             case BUILD_SPEC:
         	// build library
 		if(mageguild.HaveLibraryCapability())
-		{
-		    if(captain.isValid()) mageguild.EducateHero(captain);
-		    if(castle_heroes) mageguild.EducateHero(*castle_heroes);
-		}
+		    EducateHeroes();
 		break;
 
 	    case DWELLING_MONSTER1: dwelling[0] = Monster(race, DWELLING_MONSTER1).GetGrown(); break;
@@ -1380,14 +1394,22 @@ ICN::icn_t Castle::GetICNBuilding(u32 build, Race::race_t race)
 
 const Heroes* Castle::GetHeroes(void) const
 {
-    const Heroes* hero = world.GetHeroes(GetIndex());
-    return hero && Color::GRAY != hero->GetColor() ? hero : NULL;
+    return world.GetHeroes(*this, false);
+}
+
+const Heroes* Castle::GetGuardians(void) const
+{
+    return world.GetHeroes(*this, true);
 }
 
 Heroes* Castle::GetHeroes(void)
 {
-    Heroes* hero = world.GetHeroes(GetIndex());
-    return hero && Color::GRAY != hero->GetColor() ? hero : NULL;
+    return world.GetHeroes(*this, false);
+}
+
+Heroes* Castle::GetGuardians(void)
+{
+    return world.GetHeroes(*this, true);
 }
 
 bool Castle::HaveNearlySea(void) const
@@ -1649,12 +1671,14 @@ void Castle::RecruitAllMonster(void)
 
 const Army::army_t & Castle::GetArmy(void) const
 {
-    return army;
+    const Heroes *hero = GetGuardians();
+    return hero ? hero->GetArmy() : army;
 }
 
 Army::army_t & Castle::GetArmy(void)
 {
-    return army;
+    Heroes *hero = GetGuardians();
+    return hero ? hero->GetArmy() : army;
 }
 
 void Castle::MergeArmies(void)

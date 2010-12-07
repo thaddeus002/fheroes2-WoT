@@ -48,3 +48,8 @@ void Maps::Position::SetIndex(s32 index)
     center = Maps::isValidAbsIndex(index) ?
 		Point(index % world.w(), index / world.w()) : Point(-1, -1);
 }
+
+bool Maps::Position::isPosition(s32 index) const
+{
+    return index == GetIndex();
+}

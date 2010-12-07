@@ -156,8 +156,11 @@ void Dialog::ExtSettings(bool readonly)
     states.push_back(Settings::HEROES_RECALCULATE_MOVEMENT);
     states.push_back(Settings::HEROES_PATROL_ALLOW_PICKUP);
 
-    if(conf.VideoMode().w >= 640 && conf.VideoMode().w >= 480)
+    if(! conf.QVGA())
+    {
+	states.push_back(Settings::CASTLE_ALLOW_GUARDIANS);
 	states.push_back(Settings::CASTLE_ALLOW_BUY_FROM_WELL);
+    }
 
     states.push_back(Settings::UNIONS_ALLOW_HERO_MEETINGS);
     states.push_back(Settings::UNIONS_ALLOW_CASTLE_VISITING);

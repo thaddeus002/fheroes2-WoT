@@ -46,7 +46,8 @@ public:
     bool	SaveLastTroop(void) const;
     bool	isValid(void) const;
 
-    void 	SetArmy(Army::army_t &);
+    void 	SetArmy(Army::army_t&);
+    void 	ResetArmy(void);
     void 	SetPos(const Point &);
     void 	SetPos(s16, s16);
     void 	SetBackgroundSprite(const Surface &);
@@ -63,10 +64,13 @@ public:
     void 	Reset(void);
     void	Select(u8);
 
-    static bool QueueEventProcessing(SelectArmyBar &);
-    static bool QueueEventProcessing(SelectArmyBar &, SelectArmyBar &);
+    static bool QueueEventProcessing(SelectArmyBar &, std::string* msg = NULL);
+    static bool QueueEventProcessing(SelectArmyBar &, SelectArmyBar &, std::string* msg = NULL);
 
 private:
+    static void StatusMessageEvent1(const SelectArmyBar &, u8, const Army::Troop &, std::string &);
+    static void StatusMessageEvent2(u8, u8, const Army::Troop &, const Army::Troop &, bool, std::string &);
+
     Army::army_t *	army;
     Rect		pos;
     u8			interval;

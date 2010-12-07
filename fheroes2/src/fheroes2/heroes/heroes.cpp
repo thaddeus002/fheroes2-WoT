@@ -912,30 +912,14 @@ void Heroes::RescanPath(void)
 /* if hero in castle */
 const Castle* Heroes::inCastle(void) const
 {
-    if(Color::GRAY == color) return false;
-
-    const std::vector<Castle *> & castles = world.GetKingdom(color).GetCastles();
-    
-    std::vector<Castle *>::const_iterator it1 = castles.begin();
-    std::vector<Castle *>::const_iterator it2 = castles.end();
-
-    for(; it1 != it2; ++it1) if((**it1).GetCenter() == GetCenter()) return *it1;
-
-    return NULL;
+    const s32 & index = GetIndex();
+    return Color::GRAY != color ? world.GetCastle(index) : NULL;
 }
 
 Castle* Heroes::inCastle(void)
 {
-    if(Color::GRAY == color) return false;
-
-    const std::vector<Castle *> & castles = world.GetKingdom(color).GetCastles();
-    
-    std::vector<Castle *>::const_iterator it1 = castles.begin();
-    std::vector<Castle *>::const_iterator it2 = castles.end();
-
-    for(; it1 != it2; ++it1) if((**it1).GetCenter() == GetCenter()) return *it1;
-
-    return NULL;
+    const s32 & index = GetIndex();
+    return Color::GRAY != color ? world.GetCastle(index) : NULL;
 }
 
 /* is visited cell */
@@ -1181,7 +1165,6 @@ void Heroes::SetMove(bool f)
     if(f)
     {
 	SetModes(ENABLEMOVE);
-	ResetModes(SLEEPER);
     }
     else
     {
@@ -1517,7 +1500,7 @@ bool Heroes::ApplyPenaltyMovement(void)
 
 bool Heroes::MayStillMove(void) const
 {
-    if(Modes(SLEEPER) || Modes(STUPID) || isFreeman()) return false;
+    if(Modes(SLEEPER|GUARDIAN|STUPID) || isFreeman()) return false;
     return path.isValid() ? (move_point >= path.GetFrontPenalty()) : CanMove();
 }
 

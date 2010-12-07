@@ -160,6 +160,8 @@ u32 Castle::OpenTown(void)
 
     display.Blit(AGG::GetICN(ICN::CASLWIND, 0), dst_pt);
 
+    const Heroes* castle_heroes = GetHeroes();
+
     // hide captain options
     if(! (building & BUILD_CAPTAIN))
     {

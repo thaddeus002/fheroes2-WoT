@@ -81,9 +81,15 @@ s8 SelectArmyBar::GetIndexFromCoord(const Point & coord)
     return -1;
 }
 
-void SelectArmyBar::SetArmy(Army::army_t & a)
+void SelectArmyBar::SetArmy(Army::army_t& a)
 {
     army = &a;
+}
+
+void SelectArmyBar::ResetArmy(void)
+{
+    army = NULL;
+    flags &= ~FLAGS_SAVELAST;
 }
 
 void SelectArmyBar::SetPos(const Point & pt)
@@ -247,7 +253,45 @@ void SelectArmyBar::Select(u8 index)
     }
 }
 
-bool SelectArmyBar::QueueEventProcessing(SelectArmyBar & bar)
+void SelectArmyBar::StatusMessageEvent2(u8 index1, u8 index2, const Army::Troop & troop1, const Army::Troop & troop2, bool different, std::string & res)
+{
+    if(!different && index1 == index2)
+    {
+	res = _("View %{name}");
+	String::Replace(res, "%{name}", troop1.GetName());
+    }
+    else
+    if(troop1.isValid() && troop2.isValid())
+    {
+	res = troop1() == troop2() ? _("Combine %{name} armies") : _("Exchange %{name2} with %{name}");
+	String::Replace(res, "%{name}", troop1.GetName());
+	String::Replace(res, "%{name2}", troop2.GetName());
+    }
+    else
+    {
+	res = _("Move and right click Redistribute %{name}");
+	String::Replace(res, "%{name}", troop2.GetName());
+    }
+}
+
+void SelectArmyBar::StatusMessageEvent1(const SelectArmyBar & bar, u8 index1, const Army::Troop & troop1, std::string & res)
+{
+    if(bar.isSelected())
+    {
+	const s8 index2 = bar.Selected();
+	Army::Troop & troop2 = bar.army->At(index2);
+
+	StatusMessageEvent2(index1, index2, troop1, troop2, false, res);
+    }
+    else
+    if(troop1.isValid())
+    {
+	res = _("Select %{name}");
+	String::Replace(res, "%{name}", troop1.GetName());
+    }
+}
+
+bool SelectArmyBar::QueueEventProcessing(SelectArmyBar & bar, std::string* msg)
 {
     LocalEvent & le = LocalEvent::Get();
 
@@ -377,13 +421,15 @@ bool SelectArmyBar::QueueEventProcessing(SelectArmyBar & bar)
 	}
     }
 
+    if(msg) StatusMessageEvent1(bar, index1, troop1, *msg);
+
     Cursor::Get().Show();
     Display::Get().Flip();
 
     return change;
 }
 
-bool SelectArmyBar::QueueEventProcessing(SelectArmyBar & bar1, SelectArmyBar & bar2)
+bool SelectArmyBar::QueueEventProcessing(SelectArmyBar & bar1, SelectArmyBar & bar2, std::string* msg)
 {
     LocalEvent & le = LocalEvent::Get();
 
@@ -391,10 +437,10 @@ bool SelectArmyBar::QueueEventProcessing(SelectArmyBar & bar1, SelectArmyBar & b
     bool change = false;
 
     if((bar1.isSelected() || (!bar1.isSelected() && !bar2.isSelected())) && le.MouseCursor(bar1.GetArea()))
-	    return QueueEventProcessing(bar1);
+	    return QueueEventProcessing(bar1, msg);
     else
     if((bar2.isSelected() || (!bar1.isSelected() && !bar2.isSelected())) && le.MouseCursor(bar2.GetArea()))
-	    return QueueEventProcessing(bar2);
+	    return QueueEventProcessing(bar2, msg);
     else
     if(bar1.isSelected() && le.MouseCursor(bar2.GetArea()))
     {
@@ -459,6 +505,8 @@ bool SelectArmyBar::QueueEventProcessing(SelectArmyBar & bar1, SelectArmyBar & b
 		bar2.Redraw();
 	    }
 	}
+
+	if(msg) StatusMessageEvent2(index1, index2, troop1, troop2, true, *msg);
 
 	Cursor::Get().Show();
 	Display::Get().Flip();
@@ -528,9 +576,12 @@ bool SelectArmyBar::QueueEventProcessing(SelectArmyBar & bar1, SelectArmyBar & b
 	    }
 	}
 
+	if(msg) StatusMessageEvent2(index1, index2, troop1, troop2, true, *msg);
+
 	Cursor::Get().Show();
 	Display::Get().Flip();
     }
+
 
     return change;
 }

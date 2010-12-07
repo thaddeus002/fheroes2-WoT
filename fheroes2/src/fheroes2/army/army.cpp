@@ -380,6 +380,31 @@ bool Army::army_t::CanJoinTroop(const Monster::monster_t mon) const
     return it != army.end();
 }
 
+bool Army::army_t::CanJoinArmy(const Army::army_t & army2) const
+{
+    Army::army_t army1(*this);
+
+    for(std::vector<Troop>::const_iterator
+	it = army2.army.begin(); it != army2.army.end(); ++it)
+	    if((*it).isValid() && ! army1.JoinTroop(*it)) return false;
+
+    return true;
+}
+
+bool Army::army_t::JoinArmy(Army::army_t & army2)
+{
+    for(std::vector<Troop>::iterator
+	it = army2.army.begin(); it != army2.army.end(); ++it) if((*it).isValid())
+    {
+	if(JoinTroop(*it))
+	    (*it).Reset();
+	else
+	    return false;
+    }
+
+    return true;
+}
+
 bool Army::army_t::isValid(void) const
 {
     return army.end() != std::find_if(army.begin(),army.end(), Army::isValidTroop);

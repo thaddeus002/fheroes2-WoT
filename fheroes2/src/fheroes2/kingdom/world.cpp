@@ -22,6 +22,7 @@
 
 #include <cstdlib> 
 #include <fstream>
+#include <functional>
 #include <algorithm>
 #include "agg.h" 
 #include "artifact.h"
@@ -39,6 +40,24 @@
 #include "interface_gamearea.h"
 #include "world.h"
 #include "ai.h"
+
+struct InCastleAndGuardian : public std::binary_function <const Castle &, Heroes*, bool>
+{
+    bool operator() (const Castle & castle, Heroes* hero) const
+    {
+	const Point & cpt = castle.GetCenter();
+	const Point & hpt = hero->GetCenter();
+	return cpt.x == hpt.x && cpt.y == hpt.y + 1 && hero->Modes(Heroes::GUARDIAN);
+    }
+};
+
+struct InCastleNotGuardian : public std::binary_function <const Castle &, Heroes*, bool>
+{
+    bool operator() (const Castle & castle, Heroes* hero) const
+    {
+	return castle.GetCenter() == hero->GetCenter() && !hero->Modes(Heroes::GUARDIAN);
+    }
+};
 
 bool PredicateHeroesIsFreeman(const Heroes *h)
 {
@@ -1030,63 +1049,99 @@ const Kingdom & World::GetKingdom(u8 color) const
 }
 
 /* get castle from index maps */
-Castle * World::GetCastle(s32 maps_index)
+Castle* World::GetCastle(s32 maps_index)
 {
-    return GetCastle(maps_index % width, maps_index / height);
+    const Point center(maps_index % width, maps_index / height);
+
+    std::vector<Castle *>::iterator it =
+	std::find_if(vec_castles.begin(), vec_castles.end(),
+	    std::bind2nd(std::mem_fun(&Castle::isPosition), center));
+
+    return vec_castles.end() != it ? *it : NULL;
 }
 
-const Castle * World::GetCastle(s32 maps_index) const
+const Castle* World::GetCastle(s32 maps_index) const
 {
-    return GetCastle(maps_index % width, maps_index / height);
+    const Point center(maps_index % width, maps_index / height);
+
+    std::vector<Castle *>::const_iterator it =
+	std::find_if(vec_castles.begin(), vec_castles.end(),
+	    std::bind2nd(std::mem_fun(&Castle::isPosition), center));
+
+    return vec_castles.end() != it ? *it : NULL;
 }
 
-/* get castle from coord maps */
-Castle * World::GetCastle(u16 ax, u16 ay) const
-{
-    std::vector<Castle *>::const_iterator it1 = vec_castles.begin();
-    std::vector<Castle *>::const_iterator it2 = vec_castles.end();
-
-    for(; it1 != it2; ++it1)
-        if(*it1 && (*it1)->ContainCoord(ax, ay)) return *it1;
-
-    DEBUG(DBG_GAME, DBG_TRACE, "World::GetCastle: " << "return NULL pointer" << ", x: " << ax << ", y: " << ay);
-
-    return NULL;
-}
-
-Heroes * World::GetHeroes(Heroes::heroes_t id)
+Heroes* World::GetHeroes(Heroes::heroes_t id)
 {
     return vec_heroes[id];
 }
 
-const Heroes * World::GetHeroes(Heroes::heroes_t id) const
+const Heroes* World::GetHeroes(Heroes::heroes_t id) const
 {
     return vec_heroes[id];
 }
 
 /* get heroes from index maps */
-Heroes * World::GetHeroes(s32 maps_index)
+Heroes* World::GetHeroes(s32 maps_index)
 {
-    return GetHeroes(maps_index % width, maps_index / height);
+    std::vector<Heroes *>::iterator it =
+	std::find_if(vec_heroes.begin(), vec_heroes.end(), 
+	    std::bind2nd(std::mem_fun(&Heroes::isPosition), maps_index));
+
+    return vec_heroes.end() != it ? *it : NULL;
 }
 
-const Heroes * World::GetHeroes(s32 maps_index) const
+const Heroes* World::GetHeroes(s32 maps_index) const
 {
-    return GetHeroes(maps_index % width, maps_index / height);
+    std::vector<Heroes *>::const_iterator it =
+	std::find_if(vec_heroes.begin(), vec_heroes.end(),
+	    std::bind2nd(std::mem_fun(&Heroes::isPosition), maps_index));
+
+    return vec_heroes.end() != it ? *it : NULL;
 }
 
-/* get heroes from coord maps */
-Heroes * World::GetHeroes(u16 ax, u16 ay) const
+const Heroes* World::GetHeroes(const Castle & castle, bool force_guardian) const
 {
-    std::vector<Heroes *>::const_iterator it1 = vec_heroes.begin();
-    std::vector<Heroes *>::const_iterator it2 = vec_heroes.end();
+    if(!Settings::Get().ExtAllowCastleGuardians())
+	return force_guardian ? NULL : GetHeroes(castle.GetIndex());
 
-    for(; it1 != it2; ++it1)
-        if(*it1 && (*it1)->GetCenter().x == ax && (*it1)->GetCenter().y == ay) return *it1;
+    std::vector<Heroes *>::const_iterator it;
 
-    DEBUG(DBG_GAME, DBG_TRACE, "World::GetHeroes: " << "return NULL pointer" << ", x: " << ax << ", y: " << ay);
+    if(force_guardian)
+    {
+	it = std::find_if(vec_heroes.begin(), vec_heroes.end(), std::bind1st(InCastleAndGuardian(), castle));
+    }
+    else
+    {
+	it = std::find_if(vec_heroes.begin(), vec_heroes.end(), std::bind1st(InCastleNotGuardian(), castle));
 
-    return NULL;
+	if(vec_heroes.end() == it)
+	    it = std::find_if(vec_heroes.begin(), vec_heroes.end(), std::bind1st(InCastleAndGuardian(), castle));
+    }
+
+    return vec_heroes.end() != it ? *it : NULL;
+}
+
+Heroes* World::GetHeroes(const Castle & castle, bool force_guardian)
+{
+    if(!Settings::Get().ExtAllowCastleGuardians())
+	return force_guardian ? NULL : GetHeroes(castle.GetIndex());
+
+    std::vector<Heroes *>::const_iterator it;
+
+    if(force_guardian)
+    {
+	it = std::find_if(vec_heroes.begin(), vec_heroes.end(), std::bind1st(InCastleAndGuardian(), castle));
+    }
+    else
+    {
+	it = std::find_if(vec_heroes.begin(), vec_heroes.end(), std::bind1st(InCastleNotGuardian(), castle));
+
+	if(vec_heroes.end() == it)
+	    it = std::find_if(vec_heroes.begin(), vec_heroes.end(), std::bind1st(InCastleAndGuardian(), castle));
+    }
+
+    return vec_heroes.end() != it ? *it : NULL;
 }
 
 /* new day */

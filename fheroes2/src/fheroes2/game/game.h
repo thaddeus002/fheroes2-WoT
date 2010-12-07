@@ -248,6 +248,9 @@ namespace Game
     void EventSwitchShowControlPanel(void);
     void EventSwitchGroup(void);
 
+    void OpenHeroesDialog(Heroes*);
+    void OpenCastleDialog(Castle*);
+
     namespace Scenario
     {
 	void RedrawStaticInfo(const Point &);

@@ -99,7 +99,7 @@ public:
     bool HaveNearlySea(void) const;
     bool PresentBoat(void) const;
     bool AllowBuyHero(const Heroes &);
-    bool ContainCoord(const u16 ax, const u16 ay) const;
+    bool isPosition(const Point &) const;
     bool isNecromancyShrineBuild(void) const;
 
     u32 CountBuildings(void) const;
@@ -107,6 +107,8 @@ public:
     Heroes* RecruitHero(Heroes*);
     const Heroes* GetHeroes(void) const;
     Heroes* GetHeroes(void);
+    const Heroes* GetGuardians(void) const;
+    Heroes* GetGuardians(void);
 
     Race::race_t GetRace(void) const{ return race; }
     Color::color_t GetColor(void) const{ return color; }
@@ -179,6 +181,7 @@ public:
     Dialog::answer_t DialogBuyCastle(bool fixed = true) const;
 
 private:
+    void EducateHeroes(void);
     void RedrawResourcePanel(const Point &);
     Rect GetCoordBuilding(building_t building, const Point & pt);
     u32  OpenTown(void);
@@ -203,7 +206,6 @@ private:
     MageGuild		mageguild;
     u16			dwelling[CASTLEMAXMONSTER];
     Army::army_t        army;
-    Heroes * 		castle_heroes;
     
     static u8 grown_well;
     static u8 grown_wel2;

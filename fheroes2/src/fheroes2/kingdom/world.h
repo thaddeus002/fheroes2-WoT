@@ -74,18 +74,19 @@ public:
     const Kingdom & GetKingdom(u8 color) const;
     void KingdomLoss(const Color::color_t);
 
-    const Castle * GetCastle(s32 maps_index) const;
-    Castle * GetCastle(s32 maps_index);
-    Castle * GetCastle(u16 ax, u16 ay) const;
+    const Castle* GetCastle(s32 maps_index) const;
+    Castle* GetCastle(s32 maps_index);
 
-    const Heroes * GetHeroes(Heroes::heroes_t) const;
-    const Heroes * GetHeroes(s32 maps_index) const;
-    Heroes * GetHeroes(Heroes::heroes_t);
-    Heroes * GetHeroes(s32 maps_index);
-    Heroes * GetHeroes(u16 ax, u16 ay) const;
-    Heroes * FromJail(s32);
-    const Heroes * GetHeroesCondWins(void) const;
-    const Heroes * GetHeroesCondLoss(void) const;
+    const Heroes* GetHeroes(Heroes::heroes_t) const;
+    const Heroes* GetHeroes(s32 maps_index) const;
+    const Heroes* GetHeroes(const Castle &, bool force_guardian = false) const;
+    Heroes* GetHeroes(Heroes::heroes_t);
+    Heroes* GetHeroes(s32 maps_index);
+    Heroes* GetHeroes(const Castle &, bool force_guardian = false);
+
+    Heroes* FromJail(s32);
+    const Heroes* GetHeroesCondWins(void) const;
+    const Heroes* GetHeroesCondLoss(void) const;
 
     const Surface & GetPuzzleSurface(void) const;
     Artifact::artifact_t GetUltimateArtifact(void) const;

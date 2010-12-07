@@ -55,8 +55,6 @@ u16 DialogWithArtifact(const std::string & hdr, const std::string & msg, const A
 namespace Game
 {
     Cursor::themes_t GetCursor(const s32);
-    void OpenCastle(Castle *castle);
-    void OpenHeroes(Heroes *heroes);
     void ShowPathOrStartMoveHero(Heroes *hero, const s32 dst_index);
     menu_t HumanTurn(void);
     bool DiggingForArtifacts(const Heroes & hero);
@@ -256,13 +254,13 @@ Game::menu_t Game::StartGame(void)
 }
 
 /* open castle wrapper */
-void Game::OpenCastle(Castle *castle)
+void Game::OpenCastleDialog(Castle *castle)
 {
     if(! castle) return;
 
     Mixer::Pause();
 
-    Cursor & cursor = Cursor::Get();
+    //Cursor & cursor = Cursor::Get();
     Kingdom & myKingdom = world.GetMyKingdom();
     const Settings & conf = Settings::Get();
     std::vector<Castle *> & myCastles = myKingdom.GetCastles();
@@ -270,8 +268,7 @@ void Game::OpenCastle(Castle *castle)
     std::vector<Castle *>::const_iterator it = std::find(myCastles.begin(), myCastles.end(), castle);
     Game::Focus & globalfocus = Game::Focus::Get();
     Interface::StatusWindow::ResetTimer();
-    bool show_position = !Settings::Get().QVGA() && (640 != display.w() || 480 != display.h());
-    bool need_fade = !show_position;
+    bool need_fade = conf.ExtUseFade() && 640 == display.w() && 480 == display.h();
 
     if(it != myCastles.end() || conf.IsUnions(conf.MyColor(), castle->GetColor()))
     {
@@ -279,6 +276,7 @@ void Game::OpenCastle(Castle *castle)
 
 	while(Dialog::CANCEL != result)
 	{
+/*
 	    if(show_position)
 	    {
 		globalfocus.Set(*it);
@@ -289,7 +287,7 @@ void Game::OpenCastle(Castle *castle)
 		display.Flip();
 		DELAY(100);
 	    }
-
+*/
 	    if(Settings::Get().ExtLowMemory())
     		AGG::ICNRegistryEnable(true);
 
@@ -325,27 +323,32 @@ void Game::OpenCastle(Castle *castle)
 
     if(it != myCastles.end())
     {
-	globalfocus.Set(*it);
-	globalfocus.Set((*it)->GetHeroes());
+	// focus priority: castle heroes
+	Heroes* hero = (*it)->GetHeroes();
+
+	if(hero && !hero->Modes(Heroes::GUARDIAN))
+	    globalfocus.Set(hero);
+	else
+	    globalfocus.Set(*it);
     }
     globalfocus.SetRedraw();
 }
 
 /* open heroes wrapper */
-void Game::OpenHeroes(Heroes *hero)
+void Game::OpenHeroesDialog(Heroes *hero)
 {
     if(! hero) return;
 
-    Cursor & cursor = Cursor::Get();
+    //Cursor & cursor = Cursor::Get();
     Kingdom & myKingdom = world.GetMyKingdom();
+    const Settings & conf = Settings::Get();
     std::vector<Heroes *> & myHeroes = myKingdom.GetHeroes();
     Display & display = Display::Get();
     std::vector<Heroes *>::const_iterator it = std::find(myHeroes.begin(), myHeroes.end(), hero);
     Game::Focus & globalfocus = Game::Focus::Get();
     Interface::StatusWindow::ResetTimer();
     Interface::Basic & I = Interface::Basic::Get();
-    bool show_position = !Settings::Get().QVGA() && (640 != display.w() || 480 != display.h());
-    bool need_fade = !show_position;
+    bool need_fade = conf.ExtUseFade() && 640 == display.w() && 480 == display.h();
 
     if(it != myHeroes.end())
     {
@@ -353,17 +356,6 @@ void Game::OpenHeroes(Heroes *hero)
 
 	while(Dialog::CANCEL != result)
 	{
-	    if(show_position)
-	    {
-		globalfocus.Set(*it);
-		globalfocus.SetRedraw();
-		cursor.Hide();
-		I.Redraw();
-		cursor.Show();
-		display.Flip();
-		DELAY(100);
-	    }
-
 	    if(Settings::Get().ExtLowMemory())
 		AGG::ICNRegistryEnable(true);
 
@@ -420,7 +412,7 @@ Cursor::themes_t Game::GetCursor(const s32 dst_index)
 
     const Game::Focus & focus = Game::Focus::Get();
     const Settings & conf = Settings::Get();
-    
+
     switch(focus.Type())
     {
 	case Focus::HEROES:
@@ -493,7 +485,8 @@ Cursor::themes_t Game::GetCursor(const s32 dst_index)
 		switch(tile.GetObject())
 		{
     		    case MP2::OBJ_MONSTER:
-    			return Cursor::DistanceThemes(Cursor::FIGHT, from_hero.GetRangeRouteDays(dst_index));
+    			return from_hero.Modes(Heroes::GUARDIAN) ? Cursor::POINTER :
+				Cursor::DistanceThemes(Cursor::FIGHT, from_hero.GetRangeRouteDays(dst_index));
 
 		    case MP2::OBJN_CASTLE:
     		    {
@@ -503,6 +496,9 @@ Cursor::themes_t Game::GetCursor(const s32 dst_index)
 			{
 			    if(from_hero.GetColor() == castle->GetColor())
 				return Cursor::CASTLE;
+			    else
+			    if(from_hero.Modes(Heroes::GUARDIAN))
+				return Cursor::POINTER;
 			    else
 			    if(conf.IsUnions(from_hero.GetColor(), castle->GetColor()))
 			    	return conf.ExtUnionsAllowCastleVisiting() ? Cursor::ACTION : Cursor::POINTER;
@@ -521,6 +517,9 @@ Cursor::themes_t Game::GetCursor(const s32 dst_index)
 
     			if(NULL != castle)
 			{
+			    if(from_hero.Modes(Heroes::GUARDIAN))
+				return from_hero.GetColor() == castle->GetColor() ? Cursor::CASTLE : Cursor::POINTER;
+			    else
 			    if(from_hero.GetColor() == castle->GetColor())
 				return Cursor::DistanceThemes(Cursor::ACTION, from_hero.GetRangeRouteDays(dst_index));
 			    else
@@ -537,11 +536,14 @@ Cursor::themes_t Game::GetCursor(const s32 dst_index)
 
 		    case MP2::OBJ_HEROES:
 		    {
-			const Heroes * to_hero = world.GetHeroes(dst_index);
+			const Heroes* to_hero = world.GetHeroes(dst_index);
 
     			if(NULL != to_hero && (!to_hero->isShipMaster() ||
 			    from_hero.CanPassToShipMaster(*to_hero)))
     			{
+			    if(from_hero.Modes(Heroes::GUARDIAN))
+				return from_hero.GetColor() == to_hero->GetColor() ? Cursor::HEROES : Cursor::POINTER;
+			    else
 			    if(to_hero->GetCenter() == from_hero.GetCenter())
 				return Cursor::HEROES;
 			    else
@@ -557,9 +559,13 @@ Cursor::themes_t Game::GetCursor(const s32 dst_index)
     		    break;
 
     		    case MP2::OBJ_BOAT:
-    			return Cursor::DistanceThemes(Cursor::BOAT, from_hero.GetRangeRouteDays(dst_index));
+    			return from_hero.Modes(Heroes::GUARDIAN) ? Cursor::POINTER :
+				    Cursor::DistanceThemes(Cursor::BOAT, from_hero.GetRangeRouteDays(dst_index));
 
 		    default:
+			if(from_hero.Modes(Heroes::GUARDIAN))
+			    return Cursor::POINTER;
+			else
 			if(MP2::isGroundObject(tile.GetObject()))
 			{
 				bool protection = (MP2::isPickupObject(tile.GetObject()) ? false :
@@ -624,7 +630,7 @@ Cursor::themes_t Game::GetCursor(const s32 dst_index)
 
 void Game::ShowPathOrStartMoveHero(Heroes *hero, const s32 dst_index)
 {
-    if(!hero) return;
+    if(!hero || hero->Modes(Heroes::GUARDIAN)) return;
 
     Route::Path & path = hero->GetPath();
     Interface::Basic & I = Interface::Basic::Get();
@@ -633,6 +639,8 @@ void Game::ShowPathOrStartMoveHero(Heroes *hero, const s32 dst_index)
     // show path
     if(path.GetDestinationIndex() != dst_index)
     {
+        hero->ResetModes(Heroes::SLEEPER);
+        
         hero->SetMove(false);
 	path.Calculate(dst_index);
         if(IS_DEBUG(DBG_GAME, DBG_TRACE)) path.Dump();
@@ -1111,12 +1119,12 @@ void Game::FocusHeroesClickLeftAction(Heroes & from_hero, s32 index_maps)
 	// from hero to castle
 	case MP2::OBJN_CASTLE:
 	{
-    	    const Castle *to_castle = world.GetCastle(index_maps);
+    	    Castle* to_castle = world.GetCastle(index_maps);
 	    if(NULL == to_castle) break;
 	    else
 	    if(from_hero.GetColor() == to_castle->GetColor())
 	    {
-		global_focus.Set(const_cast<Castle *>(to_castle));
+		global_focus.Set(to_castle);
 		global_focus.SetRedraw();
 	    }
 	    else
@@ -1127,11 +1135,17 @@ void Game::FocusHeroesClickLeftAction(Heroes & from_hero, s32 index_maps)
     	// from hero to hero
     	case MP2::OBJ_HEROES:
 	{
-	    const Heroes * to_hero = world.GetHeroes(index_maps);
+	    Heroes* to_hero = world.GetHeroes(index_maps);
 	    if(NULL == to_hero) break;
 	    else
+	    if(from_hero.Modes(Heroes::GUARDIAN))
+	    {
+    		global_focus.Set(to_hero);
+    		global_focus.SetRedraw();
+	    }
+	    else
 	    if(from_hero.GetCenter() == to_hero->GetCenter())
-		OpenHeroes(&from_hero);
+		OpenHeroesDialog(&from_hero);
 	    else
 		ShowPathOrStartMoveHero(&from_hero, index_maps);
     	}
@@ -1155,17 +1169,17 @@ void Game::FocusCastleClickLeftAction(Castle & from_castle, s32 index_maps)
 	case MP2::OBJN_CASTLE:
 	case MP2::OBJ_CASTLE:
 	{
-	    const Castle *to_castle = world.GetCastle(index_maps);
+	    Castle* to_castle = world.GetCastle(index_maps);
 	    if(NULL != to_castle &&
 		from_castle.GetColor() == to_castle->GetColor())
     	    {
 		// is selected open dialog
 		if(from_castle.GetCenter() == to_castle->GetCenter())
-		    OpenCastle(&from_castle);
+		    OpenCastleDialog(&from_castle);
 		// select other castle
 		else
 		{
-		    global_focus.Set(const_cast<Castle *>(to_castle));
+		    global_focus.Set(to_castle);
 		    global_focus.SetRedraw();
 		}
 	    }
@@ -1175,11 +1189,11 @@ void Game::FocusCastleClickLeftAction(Castle & from_castle, s32 index_maps)
 	// from castle to heroes
 	case MP2::OBJ_HEROES:
 	{
-	    const Heroes *to_hero = world.GetHeroes(index_maps);
+	    Heroes* to_hero = world.GetHeroes(index_maps);
 	    if(NULL != to_hero &&
 		from_castle.GetColor() == to_hero->GetColor())
 	    {
-    		global_focus.Set(const_cast<Heroes *>(to_hero));
+    		global_focus.Set(to_hero);
     		global_focus.SetRedraw();
     	    }
 	}
@@ -1446,7 +1460,10 @@ void Game::EventSwitchHeroSleeping(void)
 	if(hero.Modes(Heroes::SLEEPER))
 	    hero.ResetModes(Heroes::SLEEPER);
 	else
+	{
 	    hero.SetModes(Heroes::SLEEPER);
+	    hero.GetPath().Reset();
+	}
 
 	I.SetRedraw(REDRAW_HEROES);
     }
@@ -1488,14 +1505,14 @@ void Game::EventDefaultAction(void)
 	}
 	else
 	// 3. hero dialog
-	    OpenHeroes(&hero);
+	    OpenHeroesDialog(&hero);
     }
     else
     // 4. town dialog
     if(Game::Focus::CASTLE == global_focus.Type())
     {
 	Castle & castl = global_focus.GetCastle();
-	OpenCastle(&castl);
+	OpenCastleDialog(&castl);
     }
 }
 
@@ -1505,13 +1522,13 @@ void Game::EventOpenFocus(void)
     if(Game::Focus::HEROES == global_focus.Type())
     {
 	Heroes & hero = global_focus.GetHeroes();
-	OpenHeroes(&hero);
+	OpenHeroesDialog(&hero);
     }
     else
     if(Game::Focus::CASTLE == global_focus.Type())
     {
 	Castle & castl = global_focus.GetCastle();
-	OpenCastle(&castl);
+	OpenCastleDialog(&castl);
     }
 }
 

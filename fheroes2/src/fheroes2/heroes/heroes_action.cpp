@@ -46,11 +46,6 @@
 #define PlaySoundFailure	PlayMusicReplacement(M82::H2MINE)
 #define PlaySoundVisited	PlayMusicReplacement(M82::RSBRYFZL)
 
-namespace Game
-{
-    void OpenCastle(Castle *);
-}
-
 void ActionToCastle(Heroes &hero, const u8 obj, const s32 dst_index);
 void ActionToHeroes(Heroes &hero, const u8 obj, const s32 dst_index);
 void ActionToMonster(Heroes &hero, const u8 obj, const s32 dst_index);
@@ -739,7 +734,7 @@ void ActionToCastle(Heroes &hero, const u8 obj, const s32 dst_index)
         DEBUG(DBG_GAME , DBG_INFO, "ActionToCastle: " << hero.GetName() << " goto castle " << castle->GetName());
         Mixer::Reduce();
 	if(!conf.ExtLearnSpellsWithDay()) castle->GetMageGuild().EducateHero(hero);
-    	Game::OpenCastle(castle);
+    	Game::OpenCastleDialog(castle);
     	Mixer::Enhance();
     }
     else

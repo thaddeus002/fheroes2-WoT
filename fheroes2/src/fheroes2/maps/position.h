@@ -39,6 +39,8 @@ namespace Maps
 	void SetCenter(const Point &);
 	void SetIndex(s32);
 
+	bool isPosition(s32) const;
+
     protected:
 	Point center;
     };

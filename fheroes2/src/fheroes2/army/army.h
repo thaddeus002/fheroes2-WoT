@@ -123,7 +123,9 @@ namespace Army
 	    bool	JoinTroop(const Troop & troop);
 	    bool	JoinTroop(const Monster::monster_t mon, const u32 count);
 	    bool	JoinTroop(const Monster & mon, const u32 count);
+	    bool 	JoinArmy(Army::army_t &);
 	    bool	CanJoinTroop(const Monster::monster_t mon) const;
+	    bool	CanJoinArmy(const Army::army_t &) const;
 	    bool	StrongerEnemyArmy(const army_t &) const;
 	    bool	AllTroopsIsRace(u8) const;
 

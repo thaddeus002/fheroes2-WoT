@@ -35,13 +35,6 @@
 #include "game_interface.h"
 #include "interface_icons.h"
 
-namespace Game
-{
-    // game_startgame.cpp
-    void OpenCastle(Castle *);
-    void OpenHeroes(Heroes *);
-}
-
 #define ICONS_WIDTH             46
 #define ICONS_HEIGHT            22
 #define ICONS_CURSOR_WIDTH      56
@@ -95,9 +88,12 @@ void RedrawHeroesIcon(const Heroes & hero, s16 sx, s16 sy)
     display.FillRect(blue, Rect(sx + barw + port.w() + 2, sy, barw, ICONS_HEIGHT));
     display.Blit(mana, sx + barw + port.w() + 2, sy + mana.y());
 
-    // heroes sleeper marker
+    // heroes marker
     if(hero.Modes(Heroes::SLEEPER))
         display.Blit(AGG::GetICN(ICN::MISC4, 14), sx + 36, sy - 2);
+    else
+    if(hero.Modes(Heroes::GUARDIAN))
+        display.Blit(AGG::GetICN(ICN::MISC6, 11), sx + 38, sy);
 }
 
 void Interface::IconsBar::RedrawBackground(const Point & pos)
@@ -167,7 +163,7 @@ void Interface::CastleIcons::ActionListDoubleClick(CASTLE & item)
 {
     if(item)
     {
-        Game::OpenCastle(item);
+        Game::OpenCastleDialog(item);
 
 	// for QVGA: auto hide icons after click
 	if(Settings::Get().QVGA()) Settings::Get().SetShowIcons(false);
@@ -245,7 +241,10 @@ void Interface::HeroesIcons::ActionListDoubleClick(HEROES & item)
 {
     if(item)
     {
-	Game::OpenHeroes(item);
+	if(item->Modes(Heroes::GUARDIAN))
+	    Game::OpenCastleDialog(world.GetCastle(item->GetIndex()));
+	else
+	    Game::OpenHeroesDialog(item);
 
 	// for QVGA: auto hide icons after click
 	if(Settings::Get().QVGA()) Settings::Get().SetShowIcons(false);
