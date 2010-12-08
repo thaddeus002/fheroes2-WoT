@@ -1,26 +1,35 @@
-SVN - up to r2110
+SVN - up to r2122
 
-Added: new option "fonts small render" and "fonts normal render"
-fixed: battle order troops move
-Added: random move for hero with patrol mode
-Added: "buy all monster" to castle well dialog, (work with option "buy from well")
-Fixed: bad luck message
-Added: store puzzle orders to savefile
-Fixed: ultimate artifact puzzle image (remove objects)
-Fixed: goodluck sound for battle
-Added: heroes sleeping mode (default key: z)
+Dec, 08, 2010
++ Fixed: disable save binary for loaded game
++ Fixed: WateringHole action
++ Added: hero to castle guardians feature
++ Fixed: spell name width (Armageddon and other)
++ Fixed: AI patrol mode
++ Fixed: battle turn orders
++ Added: show game settings from game
 
-Fixed: patrol mode, with Kingdom::ApplyPlayWithStartingHero
-Fixed: event maps for protection tile (first will be a battle)
-Fixed: battle blind spell (clean after tower attack and damage spell)
-Fixed: gameover conditions (defeat/loss hero)
-Fixed: windmill resource (remove wood)
-Fixed: archers damage with castle walls
-Fixed: battle attack for wide troop
-Fixed: battle info damage range correctted
-Added: 900 ms delay for battle info popup, open log window with last message currently
-Added: battle luck animation (rainbow)
-Added: ANDROID build support
++ Added: new option "fonts small render" and "fonts normal render"
++ fixed: battle order troops move
++ Added: random move for hero with patrol mode
++ Added: "buy all monster" to castle well dialog, (work with option "buy from well")
++ Fixed: bad luck message
++ Added: store puzzle orders to savefile
++ Fixed: ultimate artifact puzzle image (remove objects)
++ Fixed: goodluck sound for battle
++ Added: heroes sleeping mode (default key: z)
+
++ Fixed: patrol mode, with Kingdom::ApplyPlayWithStartingHero
++ Fixed: event maps for protection tile (first will be a battle)
++ Fixed: battle blind spell (clean after tower attack and damage spell)
++ Fixed: gameover conditions (defeat/loss hero)
++ Fixed: windmill resource (remove wood)
++ Fixed: archers damage with castle walls
++ Fixed: battle attack for wide troop
++ Fixed: battle info damage range correctted
++ Added: 900 ms delay for battle info popup, open log window with last message currently
++ Added: battle luck animation (rainbow)
++ Added: ANDROID build support
 
 Nov, 24, 2010
 + Fixed: castle dialog: resource bar redraw
