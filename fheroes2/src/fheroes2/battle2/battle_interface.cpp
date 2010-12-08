@@ -1773,7 +1773,7 @@ void Battle2::Interface::HumanCastSpellTurn(const Stats & b, Actions & a, std::s
 
 	    if(index < 0)
 	    {
-		DEBUG(DBG_BATTLE, DBG_WARN, "Battle2::Interface::HumanCastSpellTurn: " << " dst out of range");
+		DEBUG(DBG_BATTLE, DBG_WARN, "Battle2::Interface::" << "HumanCastSpellTurn: " << " dst out of range");
 		return;
 	    }
 
@@ -1792,7 +1792,7 @@ void Battle2::Interface::HumanCastSpellTurn(const Stats & b, Actions & a, std::s
 		    teleport_src = index;
 		else
 		{
-		    DEBUG(DBG_BATTLE, DBG_TRACE, "Battle2::Interface::HumanCastSpellTurn: " << Spell::GetName(Spell::FromInt(humanturn_spell)) << ", dst: " << index);
+		    DEBUG(DBG_BATTLE, DBG_TRACE, "Battle2::Interface::" << "HumanCastSpellTurn: " << Spell::GetName(Spell::FromInt(humanturn_spell)) << ", dst: " << index);
 		    a.AddedCastTeleportAction(teleport_src, index);
 		    humanturn_spell = Spell::NONE;
 		    humanturn_exit = true;
@@ -1801,7 +1801,7 @@ void Battle2::Interface::HumanCastSpellTurn(const Stats & b, Actions & a, std::s
 	    }
 	    else
 	    {
-		DEBUG(DBG_BATTLE, DBG_TRACE, "Battle2::Interface::HumanCastSpellTurn: " << Spell::GetName(Spell::FromInt(humanturn_spell)) << ", dst: " << index);
+		DEBUG(DBG_BATTLE, DBG_TRACE, "Battle2::Interface::" << "HumanCastSpellTurn: " << Spell::GetName(Spell::FromInt(humanturn_spell)) << ", dst: " << index);
 		a.AddedCastAction(humanturn_spell, index);
 		humanturn_spell = Spell::NONE;
 		humanturn_exit = true;
@@ -3716,7 +3716,7 @@ void Battle2::Interface::RedrawActionEarthQuakeSpell(const std::vector<u8> & tar
 
 void Battle2::Interface::RedrawActionRemoveMirrorImage(const Stats & mirror)
 {
-    DEBUG(DBG_BATTLE, DBG_WARN, "Battle2::Interface::RedrawActionRemoveMirrorImage: FIXME");
+    DEBUG(DBG_BATTLE, DBG_WARN, "Battle2::Interface::" << "RedrawActionRemoveMirrorImage: " << "FIXME");
 }
 
 void Battle2::Interface::RedrawTargetsWithFrameAnimation(const u16 dst, const std::vector<TargetInfo> & targets, ICN::icn_t icn, M82::m82_t m82)

@@ -127,8 +127,7 @@ namespace Battle2
 	bool	isReflect(void) const;
 	bool	AllowResponse(void) const;
 
-	void	Dump(void) const;
-
+	std::string Info(bool more = false) const;
 
 	u16	GetID(void) const;
 

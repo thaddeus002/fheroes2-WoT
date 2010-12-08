@@ -226,7 +226,7 @@ void Battle2::Arena::ApplyActionSpellCast(Action & action)
     {
 	const u8 color = current_commander->GetColor();
 
-	DEBUG(DBG_BATTLE, DBG_TRACE, "Battle2::Arena::ApplyActionSpellCast: " << \
+	DEBUG(DBG_BATTLE, DBG_TRACE, "Battle2::Arena::" << "ApplyActionSpellCast: " << \
 	    current_commander->GetName() << ", color: " << Color::String(color) << ", spell: " << Spell::GetName(spell) << ", dst: " << dst);
 
 	// uniq spells action
@@ -269,7 +269,7 @@ void Battle2::Arena::ApplyActionSpellCast(Action & action)
 	current_commander->TakeSpellPoints(Spell::CostManaPoints(spell, current_commander));
     }
     else
-	DEBUG(DBG_BATTLE, DBG_TRACE, "Battle2::Arena::ApplyActionSpellCast: " << "incorrect param: ");
+	DEBUG(DBG_BATTLE, DBG_TRACE, "Battle2::Arena::" << "ApplyActionSpellCast: " << "incorrect param: ");
 }
 
 void Battle2::Arena::ApplyActionAttack(Action & action)
@@ -286,9 +286,8 @@ void Battle2::Arena::ApplyActionAttack(Action & action)
 	b2 && b2->isValid() &&
 	(b1->GetColor() != b2->GetColor() || b2->Modes(SP_HYPNOTIZE)))
     {
-	DEBUG(DBG_BATTLE, DBG_TRACE, "Battle2::Arena::ApplyActionAttack: " << \
-	    b1->GetName() << "(color: " << Color::String(b1->GetColor()) << ", pos: " << b1->position << ") to " << \
-	    b2->GetName() << "(color: " << Color::String(b2->GetColor()) << ", pos: " << b2->position << ")");
+	DEBUG(DBG_BATTLE, DBG_TRACE, "Battle2::Arena::" << "ApplyActionAttack: " << \
+	    b1->Info() << " to " << b2->Info());
 
 	const bool handfighting = Stats::isHandFighting(*b1, *b2);
 	// check position
@@ -310,14 +309,16 @@ void Battle2::Arena::ApplyActionAttack(Action & action)
 
 		// twice attack
 		if(b1->isValid() && b1->isTwiceAttack() && !b1->Modes(IS_PARALYZE_MAGIC))
+		{
+		    DEBUG(DBG_BATTLE, DBG_TRACE, "Battle2::Arena::" << "ApplyActionAttack: " << "twice attack");
 		    BattleProcess(*b1, *b2);
+		}
 	    }
 	}
 	else
 	{
 	    DEBUG(DBG_BATTLE, DBG_WARN, "Battle2::Arena::ApplyActionAttack: " << "incorrect position: " << \
-		b1->GetName() << "(color: " << Color::String(b1->GetColor()) << ", pos: " << b1->position << ") to " << \
-		b2->GetName() << "(color: " << Color::String(b2->GetColor()) << ", pos: " << b2->position << ")");
+		b1->Info() << " to " << b2->Info());
 	}
 
 	if(!Settings::Get().ExtBattleTroopDirection())
@@ -327,7 +328,7 @@ void Battle2::Arena::ApplyActionAttack(Action & action)
 	}
     }
     else
-    	DEBUG(DBG_BATTLE, DBG_WARN, "Battle2::Arena::ApplyActionAttack: " << "incorrect param: " << "id1: " << id1 << ", id2: " << id2);
+    	DEBUG(DBG_BATTLE, DBG_WARN, "Battle2::Arena::" << "ApplyActionAttack: " << "incorrect param: " << "id1: " << id1 << ", id2: " << id2);
 }
 
 void Battle2::Arena::ApplyActionMove(Action & action)
@@ -353,6 +354,9 @@ void Battle2::Arena::ApplyActionMove(Action & action)
 	    cell = GetCell(dst);
 	}
 
+	DEBUG(DBG_BATTLE, DBG_TRACE, "Battle2::Arena::" << "ApplyActionMove: " << \
+	    b->Info() << " to " << "dst: " << dst);
+
 	// force check fly
 	if(b->troop.isFly())
 	{
@@ -375,8 +379,7 @@ void Battle2::Arena::ApplyActionMove(Action & action)
 
 	    if(path.empty())
 	    {
-		DEBUG(DBG_BATTLE, DBG_WARN, "Battle2::Arena::ApplyActionMove: " << "ERROR empty path, " << \
-		    b->GetName() << "(color: " << Color::String(b->GetColor()) << ", pos: " << b->GetPosition() << ") to " << "dst: " << dst);
+		DEBUG(DBG_BATTLE, DBG_WARN, "Battle2::Arena::" << "ApplyActionMove: " << "empty path for " << b->Info() << " to " << "dst: " << dst);
 		return;
 	    }
 
@@ -394,13 +397,10 @@ void Battle2::Arena::ApplyActionMove(Action & action)
 
 	b->position = dst;
 	b->UpdateDirection();
-
-	DEBUG(DBG_BATTLE, DBG_TRACE, "Battle2::Arena::ApplyActionMove: " << \
-	    b->GetName() << "(color: " << Color::String(b->GetColor()) << ", pos: " << b->GetPosition() << ") to " << "dst: " << dst);
     }
     else
     {
-    	DEBUG(DBG_BATTLE, DBG_WARN, "Battle2::Arena::ApplyActionMove: " << "incorrect param: " << "id: " << id << ", dst: " << dst);
+    	DEBUG(DBG_BATTLE, DBG_WARN, "Battle2::Arena::" << "ApplyActionMove: " << "incorrect param: " << "id: " << id << ", dst: " << dst);
     }
 }
 
@@ -425,11 +425,10 @@ void Battle2::Arena::ApplyActionSkip(Action & action)
 
 	if(interface) interface->RedrawActionSkipStatus(*battle);
 
-	DEBUG(DBG_BATTLE, DBG_TRACE, "Battle2::Arena::ApplyActionSkip: " << \
-	    battle->GetName() << "(color: " << Color::String(battle->GetColor()) << ", pos: " << battle->position << ")");
+	DEBUG(DBG_BATTLE, DBG_TRACE, "Battle2::Arena::" << "ApplyActionSkip: " << battle->Info());
     }
     else
-	DEBUG(DBG_BATTLE, DBG_WARN, "Battle2::Arena::ApplyActionSkip: " << "incorrect param: " << "id: " << id);
+	DEBUG(DBG_BATTLE, DBG_WARN, "Battle2::Arena::" << "ApplyActionSkip: " << "incorrect param: " << "id: " << id);
 }
 
 void Battle2::Arena::ApplyActionEnd(Action & action)
@@ -446,11 +445,10 @@ void Battle2::Arena::ApplyActionEnd(Action & action)
 
 	if(battle->Modes(TR_SKIPMOVE) && interface) interface->RedrawActionSkipStatus(*battle);
 
-	DEBUG(DBG_BATTLE, DBG_TRACE, "Battle2::Arena::ApplyActionEnd: " << \
-	    battle->GetName() << "(color: " << Color::String(battle->GetColor()) << ", pos: " << battle->position << ")");
+	DEBUG(DBG_BATTLE, DBG_TRACE, "Battle2::Arena::" << "ApplyActionEnd: " << battle->Info());
     }
     else
-	DEBUG(DBG_BATTLE, DBG_WARN, "Battle2::Arena::ApplyActionEnd: " << "incorrect param: " << "id: " << id);
+	DEBUG(DBG_BATTLE, DBG_WARN, "Battle2::Arena::" << "ApplyActionEnd: " << "incorrect param: " << "id: " << id);
 }
 
 void Battle2::Arena::ApplyActionMorale(Action & action)
@@ -481,10 +479,10 @@ void Battle2::Arena::ApplyActionMorale(Action & action)
 
 	if(interface) interface->RedrawActionMorale(*b, morale);
 
-	DEBUG(DBG_BATTLE, DBG_TRACE, "Battle2::Arena::ApplyActionMorale: " << (morale ? "good" : "bad"));
+	DEBUG(DBG_BATTLE, DBG_TRACE, "Battle2::Arena::" << "ApplyActionMorale: " << (morale ? "good" : "bad") << " to " << b->Info());
     }
     else
-	DEBUG(DBG_BATTLE, DBG_WARN, "Battle2::Arena::ApplyActionMorale: " << "incorrect param: " << "id: " << id);
+	DEBUG(DBG_BATTLE, DBG_WARN, "Battle2::Arena::" << "ApplyActionMorale: " << "incorrect param: " << "id: " << id);
 }
 
 void Battle2::Arena::ApplyActionRetreat(Action & action)
@@ -504,10 +502,10 @@ void Battle2::Arena::ApplyActionRetreat(Action & action)
     	{
     	    result_game->army2 = RESULT_RETREAT;
     	}
-	DEBUG(DBG_BATTLE, DBG_TRACE, "Battle2::Arena::ApplyActionRetreat: " << "color: " << Color::String(color));
+	DEBUG(DBG_BATTLE, DBG_TRACE, "Battle2::Arena::" << "ApplyActionRetreat: " << "color: " << Color::String(color));
     }
     else
-	DEBUG(DBG_BATTLE, DBG_WARN, "Battle2::Arena::ApplyActionRetreat: " << "incorrect param: ");
+	DEBUG(DBG_BATTLE, DBG_WARN, "Battle2::Arena::" << "ApplyActionRetreat: " << "incorrect param: ");
 }
 
 void Battle2::Arena::ApplyActionSurrender(Action & action)
@@ -541,11 +539,11 @@ void Battle2::Arena::ApplyActionSurrender(Action & action)
 		    world.GetKingdom(color).OddFundsResource(cost);
 		    world.GetKingdom(army1.GetColor()).AddFundsResource(cost);
 	    }
-	    DEBUG(DBG_BATTLE, DBG_TRACE, "Battle2::Arena::ApplyActionSurrender: " << "color: " << Color::String(color));
+	    DEBUG(DBG_BATTLE, DBG_TRACE, "Battle2::Arena::" << "ApplyActionSurrender: " << "color: " << Color::String(color));
     	}
     }
     else
-	DEBUG(DBG_BATTLE, DBG_WARN, "Battle2::Arena::ApplyActionSurrender: " << "incorrect param: ");
+	DEBUG(DBG_BATTLE, DBG_WARN, "Battle2::Arena::" << "ApplyActionSurrender: " << "incorrect param: ");
 }
 
 void Battle2::Arena::TargetsApplyDamage(Stats & attacker, Stats & defender, std::vector<TargetInfo> & targets)
@@ -638,7 +636,7 @@ void Battle2::Arena::GetTargetsForDamage(Stats & attacker, Stats & defender, std
 
 void Battle2::Arena::TargetsApplySpell(const HeroBase* hero, const u8 spell, std::vector<TargetInfo> & targets)
 {
-    DEBUG(DBG_BATTLE, DBG_TRACE, "Battle2::Arena::TargetsApplySpell: " << "targets: " << targets.size());
+    DEBUG(DBG_BATTLE, DBG_TRACE, "Battle2::Arena::" << "TargetsApplySpell: " << "targets: " << targets.size());
 
     if(Spell::isSummon(spell))
     {
@@ -819,8 +817,8 @@ void Battle2::Arena::ApplyActionTower(Action & action)
 
     if(b2 && b2->isValid() && tower)
     {
-	DEBUG(DBG_BATTLE, DBG_TRACE, "Battle2::Arena::ApplyActionTower: " << "tower: " << static_cast<int>(type) << \
-		", attack pos: " << b2->position << ", troop: " << b2->GetName());
+	DEBUG(DBG_BATTLE, DBG_TRACE, "Battle2::Arena::" << "ApplyActionTower: " << "tower: " << static_cast<int>(type) << \
+		", attack to " << b2->Info());
 
 	Stats* b1 = tower->GetBattleStats();
 	TargetInfo target;
@@ -834,7 +832,7 @@ void Battle2::Arena::ApplyActionTower(Action & action)
 	if(b2->Modes(SP_BLIND)) b2->ResetBlind();
     }
     else
-	DEBUG(DBG_BATTLE, DBG_WARN, "Battle2::Arena::ApplyActionTower: " << "incorrect param: " << "tower: " << static_cast<int>(type) << ", id: " << id);
+	DEBUG(DBG_BATTLE, DBG_WARN, "Battle2::Arena::" << "ApplyActionTower: " << "incorrect param: " << "tower: " << static_cast<int>(type) << ", id: " << id);
 }
 
 void Battle2::Arena::ApplyActionCatapult(Action & action)
@@ -854,12 +852,12 @@ void Battle2::Arena::ApplyActionCatapult(Action & action)
 	    {
 		if(interface) interface->RedrawActionCatapult(target);
 		SetCastleTargetValue(target, GetCastleTargetValue(target) - damage);
-		DEBUG(DBG_BATTLE, DBG_TRACE, "Battle2::Arena::ApplyActionCatapult: " << "target: " << static_cast<int>(target));
+		DEBUG(DBG_BATTLE, DBG_TRACE, "Battle2::Arena::" << "ApplyActionCatapult: " << "target: " << static_cast<int>(target));
 	    }
 	}
     }
     else
-	DEBUG(DBG_BATTLE, DBG_WARN, "Battle2::Arena::ApplyActionCatapult: " << "incorrect param: ");
+	DEBUG(DBG_BATTLE, DBG_WARN, "Battle2::Arena::" << "ApplyActionCatapult: " << "incorrect param: ");
 }
 
 void Battle2::Arena::SpellActionSummonElemental(const HeroBase* hero, u8 type)
@@ -885,7 +883,7 @@ void Battle2::Arena::SpellActionSummonElemental(const HeroBase* hero, u8 type)
 
 	if(!affect)
 	{
-	    DEBUG(DBG_BATTLE, DBG_WARN, "Battle2::Arena::SpellActionSummonElemental: " << "incorrect elemental");
+	    DEBUG(DBG_BATTLE, DBG_WARN, "Battle2::Arena::" << "SpellActionSummonElemental: " << "incorrect elemental");
 	    return;
 	}
 
@@ -899,7 +897,7 @@ void Battle2::Arena::SpellActionSummonElemental(const HeroBase* hero, u8 type)
             default: break;
         }
 
-	DEBUG(DBG_BATTLE, DBG_TRACE, "Battle2::Arena::SpellActionSummonElemental: " << Monster::GetName(mons) << ", position: " << pos);
+	DEBUG(DBG_BATTLE, DBG_TRACE, "Battle2::Arena::" << "SpellActionSummonElemental: " << Monster::GetName(mons) << ", position: " << pos);
 	u16 count = Spell::GetExtraValue(Spell::FromInt(type)) * hero->GetPower();
 	if(hero->HasArtifact(Artifact::BOOK_ELEMENTS)) count *= 2;
 
@@ -917,7 +915,7 @@ void Battle2::Arena::SpellActionSummonElemental(const HeroBase* hero, u8 type)
     else
     {
     	if(interface) interface->SetStatus(_("Summon Elemental spell failed!"), true);
-	DEBUG(DBG_BATTLE, DBG_WARN, "Battle2::Arena::SpellActionSummonElemental: " << "incorrect param");
+	DEBUG(DBG_BATTLE, DBG_WARN, "Battle2::Arena::" << "SpellActionSummonElemental: " << "incorrect param");
     }
 }
 
@@ -996,7 +994,7 @@ void Battle2::Arena::SpellActionMirrorImage(Stats & b)
 
     if(it1 != v.end())
     {
-    	DEBUG(DBG_BATTLE, DBG_TRACE, "Battle2::Arena::SpellCreateMirrorImage: " << "set position: " << *it1);
+    	DEBUG(DBG_BATTLE, DBG_TRACE, "Battle2::Arena::" << "SpellCreateMirrorImage: " << "set position: " << *it1);
 	if(interface) interface->RedrawActionMirrorImageSpell(b, *it1);
 
 	Armies friends(*b.GetArmy());
@@ -1014,7 +1012,7 @@ void Battle2::Arena::SpellActionMirrorImage(Stats & b)
     else
     {
     	if(interface) interface->SetStatus(_("Mirror Image spell failed!"), true);
-        DEBUG(DBG_BATTLE, DBG_WARN, "Battle2::Arena::SpellCreateMirrorImage: " << "new position not found!");
+        DEBUG(DBG_BATTLE, DBG_WARN, "Battle2::Arena::" << "SpellCreateMirrorImage: " << "new position not found!");
     }
 }
 

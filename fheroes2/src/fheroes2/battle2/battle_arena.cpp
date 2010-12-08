@@ -776,8 +776,7 @@ void Battle2::Arena::TurnTroop(Stats* current_troop)
     Actions actions;
     bool end_turn = false;
 
-    DEBUG(DBG_BATTLE , DBG_TRACE, "Battle2::Arena::TurnTroop: " << current_troop->GetName() << ", color: " << \
-	    Color::String(current_troop->GetColor()) << ", speed: " << Speed::String(current_troop->GetSpeed()) << "(" << static_cast<int>(current_troop->GetSpeed()) << ")");
+    DEBUG(DBG_BATTLE, DBG_TRACE, "Battle2::Arena::" << "Turn: " << current_troop->Info(true));
 
     while(! end_turn)
     {
@@ -828,7 +827,7 @@ void Battle2::Arena::TurnTroop(Stats* current_troop)
 
 void Battle2::Arena::Turns(u16 turn, Result & result)
 {
-    DEBUG(DBG_BATTLE , DBG_TRACE, "Battle2::Arena::Turns: " << turn);
+    DEBUG(DBG_BATTLE, DBG_TRACE, "Battle2::Arena::" << "Turn: " << turn);
 
     result_game = &result;
     current_turn = turn;
@@ -922,14 +921,14 @@ void Battle2::Arena::RemoteTurn(const Stats & b, Actions & a)
 	    remote->RecvBattleHumanTurn(b, *this, a);
 	    return;
 	}
-	DEBUG(DBG_BATTLE, DBG_WARN, "Battle2::Arena::RemoteTurn: " << "remote client is NULL");
+	DEBUG(DBG_BATTLE, DBG_WARN, "Battle2::Arena::" << "RemoteTurn: " << "remote client is NULL");
     }
     else
     {
-	DEBUG(DBG_BATTLE, DBG_WARN, "Battle2::Arena::RemoteTurn: " << "current commander is NULL");
+	DEBUG(DBG_BATTLE, DBG_WARN, "Battle2::Arena::" << "RemoteTurn: " << "current commander is NULL");
     }
 #endif
-    DEBUG(DBG_BATTLE, DBG_WARN, "Battle2::Arena::RemoteTurn: " << "AI turn");
+    DEBUG(DBG_BATTLE, DBG_WARN, "Battle2::Arena::" << "RemoteTurn: " << "AI turn");
     AI::BattleTurn(*this, b, a);
 }
 
@@ -1036,7 +1035,7 @@ u16 Battle2::Arena::GetShortDistance(u16 from, const std::vector<u16> & dst)
 	}
     }
 
-    DEBUG(DBG_BATTLE, DBG_TRACE, "Battle2::Arena::GetShortDistance: " << res);
+    DEBUG(DBG_BATTLE, DBG_TRACE, "Battle2::Arena::" << "GetShortDistance: " << res);
 
     return res;
 }
@@ -1068,9 +1067,9 @@ u16 Battle2::Arena::GetPath(const Stats & b, u16 to, std::vector<u16> & v)
 
     if(IS_DEBUG(DBG_BATTLE, DBG_TRACE))
     {
-	std::cout << "Battle2::Arena::GetPath: from: " << b.GetPosition() << ", to: " << to << " :: ";
-	for(u16 ii = 0; ii < v.size(); ++ii) std::cout << v[ii] << ", ";
-	std::cout << std::endl;
+	std::stringstream ss;
+	for(u16 ii = 0; ii < v.size(); ++ii) ss << v[ii] << ", ";
+	VERBOSE("Battle2::Arena::" << "GetPath: " << "from: " << b.GetPosition() << ", to: " << to << " :: " << ss.str());
     }
 
     return v.size();
@@ -1089,10 +1088,11 @@ void Battle2::Arena::GetPassableQualityPositions(const Stats & b, std::vector<u1
 
     if(IS_DEBUG(DBG_BATTLE, DBG_TRACE))
     {
-        std::cout << "Battle2::Arena::GetPassableQualityPositions: ";
-        if(v.empty()) std::cout << "empty";
-        for(u16 ii = 0; ii < v.size(); ++ii) std::cout << v[ii] << ", ";
-        std::cout << std::endl;
+	std::stringstream ss;
+        if(v.empty()) ss << "empty";
+        else
+	for(u16 ii = 0; ii < v.size(); ++ii) ss << v[ii] << ", ";
+        VERBOSE("Battle2::Arena::" << "GetPassableQualityPositions: " << ss.str());
     }
 }
 
@@ -1338,10 +1338,11 @@ void Battle2::Arena::DumpBoard(void) const
 {
     Board::const_iterator it1 = board.begin();
     Board::const_iterator it2 = board.end();
+    VERBOSE("Battle2::Arena::DumpBoard: ");
     for(; it1 != it2; ++it1)
     {
 	const Battle2::Stats* b = GetTroopBoard((*it1).index);
-	if(b) b->Dump();
+	if(b) VERBOSE("\t" << b->Info(true));
     }
 }
 
@@ -1604,5 +1605,5 @@ void Battle2::Arena::UnpackBoard(Action & msg)
         }
     }
     else
-	DEBUG(DBG_BATTLE, DBG_WARN, "Battle2::Arena::UnpackBoard: " << "incorrect param");
+	DEBUG(DBG_BATTLE, DBG_WARN, "Battle2::Arena::" << "UnpackBoard: " << "incorrect param");
 }

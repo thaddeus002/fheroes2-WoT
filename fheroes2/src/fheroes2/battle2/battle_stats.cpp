@@ -404,9 +404,15 @@ u16 Battle2::Stats::GetPosition(void) const
 
 u16 Battle2::Stats::GetTailIndex(void) const
 {
-    return (isWide() &&
-	Board::isValidDirection(position, reflect ? RIGHT : LEFT) ?
-	    Board::GetIndexDirection(position, reflect ? RIGHT : LEFT) : MAXU16);
+    if(isWide())
+    {
+	if(Board::isValidDirection(position, reflect ? RIGHT : LEFT))
+	    return Board::GetIndexDirection(position, reflect ? RIGHT : LEFT);
+
+	DEBUG(DBG_BATTLE, DBG_WARN, "Battle2::Stats::" << "GetTailIndex: " << "error: "<< "out of range");
+    }
+
+    return MAXU16;
 }
 
 void Battle2::Stats::SetMorale(s8 f)
@@ -826,10 +832,7 @@ u32 Battle2::Stats::ApplyDamage(u32 dmg)
     	    mirror = NULL;
 	}
 
-	DEBUG(DBG_BATTLE, DBG_TRACE, "Battle2::Stats::ApplyDamage: " << \
-			    GetName() << "(color: " << Color::String(GetColor()) << \
-			    ", pos: " << position << ", count: " << count << ", hp: " << hp << ")" << \
-			    " get damage: " << dmg << ", killed: " << killed);
+	DEBUG(DBG_BATTLE, DBG_TRACE, "Battle2::Stats::" << " ApplyDamage: " << dmg << " to " << Info() << " and killed: " << killed);
 
 	dead += (killed >= count ? count : killed);
 	count -= (killed >= count ? count : killed);
@@ -874,7 +877,7 @@ void Battle2::Stats::PostKilledAction(void)
     if(!Modes(CAP_MIRRORIMAGE) && !Modes(CAP_SUMMONELEM))
 	arena->graveyard.AddTroopID(id);
 
-    DEBUG(DBG_BATTLE, DBG_TRACE, "Battle2::Stats::KilledAction: " << GetName() << " is killed");
+    DEBUG(DBG_BATTLE, DBG_TRACE, "Battle2::Stats::" << "KilledAction: " << Info() << " is dead...");
     // possible also..
 }
 
@@ -906,19 +909,22 @@ u32 Battle2::Stats::Resurrect(u32 points, bool allow_overflow, bool skip_dead)
 u32 Battle2::Stats::ApplyDamage(Stats & enemy, u32 dmg)
 {
     const u32 killed = ApplyDamage(dmg);
-    
+    u32 resurrect;
+
     if(killed) switch(enemy.troop())
     {
 	case Monster::GHOST:
+	    resurrect = killed * enemy.GetMonster().GetHitPoints();
+	    DEBUG(DBG_BATTLE, DBG_TRACE, "Battle2::Stats::" << "ApplyDamage: " << Info() << ", enemy: " << enemy.Info() << " resurrect: " << resurrect);
 	    // grow troop
-	    enemy.Resurrect(killed * enemy.GetMonster().GetHitPoints(), true, false);
-	    DEBUG(DBG_BATTLE, DBG_TRACE, "Battle2::Stats::ApplyDamage: " << enemy.GetName() << " capability");
+	    enemy.Resurrect(resurrect, true, false);
 	    break;
 
 	case Monster::VAMPIRE_LORD:
+	    resurrect = killed * GetMonster().GetHitPoints();
+	    DEBUG(DBG_BATTLE, DBG_TRACE, "Battle2::Stats::" << "ApplyDamage: " << Info() << ", enemy: " << enemy.Info() << " resurrect: " << resurrect);
 	    // restore hit points
-	    enemy.Resurrect(killed * GetMonster().GetHitPoints(), false, false);
-	    DEBUG(DBG_BATTLE, DBG_TRACE, "Battle2::Stats::ApplyDamage: " << enemy.GetName() << " capability");
+	    enemy.Resurrect(resurrect, false, false);
 	    break;
 
 	default: break;
@@ -990,7 +996,7 @@ bool Battle2::Stats::ApplySpell(u8 spell, const HeroBase* hero, TargetInfo & tar
 {
     if(! AllowApplySpell(spell, hero)) return false;
 
-    DEBUG(DBG_BATTLE, DBG_TRACE, "Battle2::Stats::ApplySpell: " << Spell::GetName(Spell::FromInt(spell)));
+    DEBUG(DBG_BATTLE, DBG_TRACE, "Battle2::Stats::" << "ApplySpell: " << Spell::GetName(Spell::FromInt(spell)) << " to " << Info());
 
     // save spell for "eagle eye" capability
     arena->AddSpell(spell);
@@ -1010,10 +1016,25 @@ bool Battle2::Stats::ApplySpell(u8 spell, const HeroBase* hero, TargetInfo & tar
     return true;
 }
 
-void Battle2::Stats::Dump(void) const
+std::string Battle2::Stats::Info(bool more) const
 {
-    VERBOSE("\t" << GetName() << "(color: " << Color::String(GetColor()) << \
-			    ", pos: " << position << ", reflect: " << (reflect ? "true" : "false") << ", count: " << count << ", cell quality: " << GetCellQuality() << ")");
+    std::stringstream ss;
+
+    ss << "Troop: " <<
+	// id
+	"0x" << std::setw(4) << std::setfill('0') << std::hex << id << std::dec <<
+	// info
+	" [ " << count << " " << GetName() << ", " << Color::String(GetColor());
+
+    if(more)
+	ss <<
+	", pos(" << position << (reflect ? ", reflect)" : ")") <<
+	", speed(" << Speed::String(GetSpeed()) << ", " << static_cast<int>(GetSpeed()) << ")" <<
+	", hp(" << hp << ")" << ", die(" << dead << ")" << ", cell(" << GetCellQuality() << ")";
+
+    ss << " ]";
+
+    return ss.str();
 }
 
 bool Battle2::Stats::AllowResponse(void) const

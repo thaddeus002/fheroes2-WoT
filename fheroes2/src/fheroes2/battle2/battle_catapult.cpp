@@ -78,14 +78,14 @@ u8 Battle2::Catapult::GetDamage(u8 target)
 		if(cat_first == 100 || cat_first >= Rand::Get(1, 100))
 		{
 		    // value = value;
-		    DEBUG(DBG_BATTLE, DBG_TRACE, "Battle2::Catapult::GetDamage: " << "from one blow capability");
+		    DEBUG(DBG_BATTLE, DBG_TRACE, "Battle2::Catapult::" << "GetDamage: " << "from one blow capability");
 		}
 		else
 		    value = 1;
 	    }
 	    break;
 
-	case CAT_MISS: DEBUG(DBG_BATTLE, DBG_TRACE, "Battle2::Catapult::GetDamage: " << " miss!"); break;
+	case CAT_MISS: DEBUG(DBG_BATTLE, DBG_TRACE, "Battle2::Catapult::" << "GetDamage: " << " miss!"); break;
 
 	default: break;
     }
@@ -151,7 +151,7 @@ u8 Battle2::Catapult::GetTarget(const std::vector<u8> & values) const
 	return cat_miss && 7 > Rand::Get(1, 20) ? CAT_MISS : (1 < targets.size() ? *Rand::Get(targets) : targets.front());
     }
 
-    DEBUG(DBG_BATTLE, DBG_TRACE, "Battle2::Catapult::ApplyDamage: " << "target not found..");
+    DEBUG(DBG_BATTLE, DBG_TRACE, "Battle2::Catapult::" << "ApplyDamage: " << "target not found..");
 
     return 0;
 }
