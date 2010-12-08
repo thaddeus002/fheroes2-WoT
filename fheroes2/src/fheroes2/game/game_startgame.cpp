@@ -56,7 +56,7 @@ namespace Game
 {
     Cursor::themes_t GetCursor(const s32);
     void ShowPathOrStartMoveHero(Heroes *hero, const s32 dst_index);
-    menu_t HumanTurn(void);
+    menu_t HumanTurn(bool);
     bool DiggingForArtifacts(const Heroes & hero);
     void DialogPlayers(const Color::color_t, const std::string &);
     void MoveHeroFromArrowKeys(Heroes & hero, Direction::vector_t direct);
@@ -171,20 +171,20 @@ Game::menu_t Game::StartGame(void)
     I.Redraw(REDRAW_ICONS | REDRAW_BUTTONS | REDRAW_BORDER);
     I.iconsPanel.HideIcons();
 
+    bool skip_turns = conf.LoadedGameVersion();
     GameOver::Result & gameResult = GameOver::Result::Get();
     Game::menu_t m = ENDTURN;
 
     while(m == ENDTURN)
     {
-	if(!conf.LoadedGameVersion())
-	world.NewDay();
+	if(!skip_turns) world.NewDay();
 
 	for(Color::color_t color = Color::BLUE; color != Color::GRAY; ++color)
 	{
 	    Kingdom & kingdom = world.GetKingdom(color);
 
 	    if(!kingdom.isPlay() ||
-	    (conf.LoadedGameVersion() && color != conf.MyColor())) continue;
+	    (skip_turns && color != conf.MyColor())) continue;
 
 	    if(IS_DEBUG(DBG_GAME, DBG_INFO)) kingdom.Dump();
 
@@ -213,8 +213,8 @@ Game::menu_t Game::StartGame(void)
 		    I.SetRedraw(REDRAW_ICONS);
 		    I.iconsPanel.ShowIcons();
 		    conf.SetMyColor(color);
-		    m = HumanTurn();
-		    if(m == ENDTURN && conf.LoadedGameVersion()) conf.SetLoadedGameVersion(false);
+		    m = HumanTurn(skip_turns);
+		    skip_turns = false;
 		break;
 
 		// AI turn
@@ -659,7 +659,7 @@ void Game::ShowPathOrStartMoveHero(Heroes *hero, const s32 dst_index)
     }
 }
 
-Game::menu_t Game::HumanTurn(void)
+Game::menu_t Game::HumanTurn(bool isload)
 {
     Game::Focus & global_focus = Focus::Get();
 
@@ -713,7 +713,7 @@ Game::menu_t Game::HumanTurn(void)
     cursor.Show();
     display.Flip();
 
-    if(!conf.LoadedGameVersion())
+    if(!isload)
     {
 	// new week dialog
 	if(1 < world.CountWeek() && world.BeginWeek())

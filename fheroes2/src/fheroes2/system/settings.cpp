@@ -175,7 +175,7 @@ Settings::Settings() : major_version(MAJOR_VERSION), minor_version(MINOR_VERSION
 
 Settings::~Settings()
 {
-    BinarySave();
+    if(!LoadedGameVersion()) BinarySave();
 }
 
 Settings & Settings::Get(void)
