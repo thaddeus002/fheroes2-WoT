@@ -936,11 +936,6 @@ bool Heroes::isVisited(const Maps::Tiles & tile, const Visit::type_t type) const
 /* return true if object visited */
 bool Heroes::isVisited(const u8 object, const Visit::type_t type) const
 {
-    return isVisited(static_cast<MP2::object_t>(object), type);
-}
-
-bool Heroes::isVisited(const MP2::object_t object, const Visit::type_t type) const
-{
     if(Visit::GLOBAL == type) return world.GetKingdom(color).isVisited(object);
 
     return visit_object.end() != std::find_if(visit_object.begin(), visit_object.end(), std::bind2nd(std::mem_fun_ref(&IndexObject::isObject), object));
