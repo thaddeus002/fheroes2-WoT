@@ -934,6 +934,11 @@ bool Heroes::isVisited(const Maps::Tiles & tile, const Visit::type_t type) const
 }
 
 /* return true if object visited */
+bool Heroes::isVisited(const u8 object, const Visit::type_t type) const
+{
+    return isVisited(static_cast<MP2::object_t>(object), type);
+}
+
 bool Heroes::isVisited(const MP2::object_t object, const Visit::type_t type) const
 {
     if(Visit::GLOBAL == type) return world.GetKingdom(color).isVisited(object);
@@ -1719,6 +1724,17 @@ void Heroes::Dump(void) const
     {
 	std::cout << "patrol square   : " << static_cast<u16>(patrol_square) << std::endl;
 	
+    }
+
+    if(! visit_object.empty())
+    {
+	std::cout << "visit objects   : ";
+
+	for(std::list<IndexObject>::const_iterator
+	    it = visit_object.begin(); it != visit_object.end(); ++it)
+		std::cout << MP2::StringObject((*it).second) << "(" << (*it).first << "), ";
+
+	std::cout << std::endl;
     }
 
     if(GetControl() == Game::AI)
