@@ -752,9 +752,9 @@ u32 Battle2::Stats::CalculateDamageStats(const Stats & enemy, double dmg) const
     }
 
     // check luck x2
-    if(Modes(LUCK_GOOD)) dmg *= 2;
+    if(Modes(LUCK_GOOD) && !Modes(SP_BLESS)) dmg *= 2;
     else
-    if(Modes(LUCK_BAD)) dmg /= 2;
+    if(Modes(LUCK_BAD) && !Modes(SP_CURSE)) dmg /= 2;
 
     // after blind
     if(Modes(SP_BLIND)) dmg /= 2;
@@ -782,7 +782,8 @@ u32 Battle2::Stats::CalculateDamageStats(const Stats & enemy, double dmg) const
     {
 	case Monster::GENIE:
 	    // 10% half
-	    if(genie_enemy_half_percent >= Rand::Get(1, 100))
+	    if(dmg < enemy.hp / 2 &&
+	       genie_enemy_half_percent >= Rand::Get(1, 100))
 	    {
 		dmg = enemy.hp / 2;
 		if(arena->interface)
