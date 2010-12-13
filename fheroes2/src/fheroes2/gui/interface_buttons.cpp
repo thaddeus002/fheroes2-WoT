@@ -54,7 +54,7 @@ void Interface::ButtonsArea::SetPos(s16 ox, s16 oy)
 
         border.SetPosition(ox, oy, Rect::w, Rect::h);
 
-	Settings::Get().SetPosButtons(*this);
+	Settings::Get().SetPosButtons(Point(ox, oy));
     }
     else
     {

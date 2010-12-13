@@ -91,7 +91,7 @@ void Interface::StatusWindow::SetPos(s16 ox, s16 oy)
 	Rect::y = oy + BORDERWIDTH;
 
 	border.SetPosition(ox, oy, Rect::w, Rect::h);
-	Settings::Get().SetPosStatus(*this);
+	Settings::Get().SetPosStatus(Point(ox, oy));
     }
     else
     {

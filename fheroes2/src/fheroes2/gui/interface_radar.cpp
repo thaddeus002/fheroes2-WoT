@@ -86,7 +86,7 @@ void Interface::Radar::SetPos(s16 ox, s16 oy)
 	Rect::y = oy + BORDERWIDTH;
 
 	border.SetPosition(ox, oy, Rect::w, Rect::h);
-	Settings::Get().SetPosRadar(*this);
+	Settings::Get().SetPosRadar(Point(ox, oy));
     }
     else
     {
