@@ -183,8 +183,6 @@ void HGSData::ScoreRegistry(const std::string & p, const std::string & m, u16 r,
     h.days = r;
     h.rating = s;
 
-    if(IS_DEVEL()) h.player+= " (+)";
-
     if(list.end() == std::find(list.begin(), list.end(), h)) list.push_back(h);
     if(list.size() > HGS_MAX) list.resize(HGS_MAX);
 }
@@ -233,6 +231,14 @@ void HGSData::RedrawList(s16 ox, s16 oy)
 
 Game::menu_t Game::HighScores(void)
 {
+    if(IS_DEVEL())
+    {
+	std::string msg = "Your result: ";
+	String::AddInt(msg, GetGameOverScores());
+	Dialog::Message("High Scores", msg, Font::BIG, Dialog::OK);
+	return MAINMENU;
+    }
+
     const Settings & conf = Settings::Get();
     HGSData hgs;
 
