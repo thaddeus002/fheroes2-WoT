@@ -1484,11 +1484,7 @@ void Game::EventDefaultAction(void)
 	Heroes & hero = global_focus.GetHeroes();
 	Interface::Basic & I = Interface::Basic::Get();
 
-	// 1. continue
-        if(global_focus.GetHeroes().GetPath().isValid())
-    	    global_focus.GetHeroes().SetMove(true);
-	else
-	// 2. action object
+	// 1. action object
 	if(MP2::isActionObject(hero.GetUnderObject(), hero.isShipMaster()))
 	{
 	    hero.Action(hero.GetIndex());
@@ -1499,6 +1495,10 @@ void Game::EventDefaultAction(void)
 	    }
 	    I.SetRedraw(REDRAW_GAMEAREA);
 	}
+	else
+	// 2. continue
+        if(global_focus.GetHeroes().GetPath().isValid())
+    	    global_focus.GetHeroes().SetMove(true);
 	else
 	// 3. hero dialog
 	    OpenHeroesDialog(&hero);
