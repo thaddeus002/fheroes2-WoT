@@ -804,6 +804,10 @@ void Battle2::Arena::TurnTroop(Stats* current_troop)
 	    ApplyAction(actions.front());
 	    actions.pop_front();
 
+    	    // check end battle
+    	    if(!army1.isValid() || !army2.isValid() || result_game->army1 || result_game->army2)
+		end_turn = true;
+
 	    // good morale
 	    if(end_turn &&
 		    !current_troop->Modes(TR_SKIPMOVE) &&
