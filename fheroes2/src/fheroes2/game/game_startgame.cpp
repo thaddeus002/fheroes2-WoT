@@ -805,10 +805,7 @@ Game::menu_t Game::HumanTurn(bool isload)
 	    // hide/show hero/town icons
 	    if(HotKeyPress(EVENT_SHOWICONS)) EventSwitchShowIcons();
 	    else
-	    // heroes event
-    	    if(Game::Focus::HEROES == global_focus.Type())
-	    {
-		// hero movement
+	    	// hero movement
 		if(HotKeyPress(EVENT_CONTINUE)) EventContinueMovement();
 		else
 		// dig artifact
@@ -833,7 +830,6 @@ Game::menu_t Game::HumanTurn(bool isload)
 		if(HotKeyPress(EVENT_MOVEBOTTOMLEFT)) KeyArrowPress(Direction::BOTTOM_LEFT);
 		else
 		if(HotKeyPress(EVENT_MOVEBOTTOMRIGHT)) KeyArrowPress(Direction::BOTTOM_RIGHT);
-	    }
 	    else
 	    // scroll maps
 	    if(HotKeyPress(EVENT_SCROLLLEFT)) I.gameArea.SetScroll(SCROLL_LEFT);
