@@ -1767,7 +1767,8 @@ const GameEvent::Coord* World::GetEventMaps(const Color::color_t c, const s32 in
 
 void World::DateDump(void) const
 {
-    std::cout << "World::Date: month: " << static_cast<int>(GetMonth()) <<  ", week " << static_cast<int>(GetWeek()) << ", day: " << static_cast<int>(GetDay()) << std::endl;
+    VERBOSE("World::Date: month: " << static_cast<int>(GetMonth()) <<
+	    ", week " << static_cast<int>(GetWeek()) << ", day: " << static_cast<int>(GetDay()));
 }
 
 u16 World::CountObeliskOnMaps(void)

@@ -193,11 +193,11 @@ bool Algorithm::PathFind(std::list<Route::Step> *result, const s32 from, const s
 		direct = Direction::Get(cur, (*it1).first);
 		if(Direction::UNKNOWN != direct)
 		{
-		    std::cout << "  direct: " << Direction::String(direct);
-		    std::cout << ", index: " << (*it1).first;
-		    std::cout << ", cost g: " << cell2.cost_g;
-		    std::cout << ", cost t: " << cell2.cost_t;
-		    std::cout << ", cost d: " << cell2.cost_d << std::endl;
+		    VERBOSE("  direct: " << Direction::String(direct) <<
+			    ", index: " << (*it1).first <<
+			    ", cost g: " << cell2.cost_g <<
+			    ", cost t: " << cell2.cost_t <<
+			    ", cost d: " << cell2.cost_d);
 		}
 	    }
 

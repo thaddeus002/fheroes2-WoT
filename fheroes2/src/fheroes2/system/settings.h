@@ -76,12 +76,15 @@ enum
 
 #ifdef __SYMBIAN32__
 #define VERBOSE(x)
+#define VERBOSN(x)
 #define DEBUG(x, y, z)
 #elif defined(ANDROID)
 #define VERBOSE(x) { std::ostringstream osss; osss << x; __android_log_print(ANDROID_LOG_INFO, "FHeroes", "%s", osss.str().c_str()); }
+#define VERBOSN(x) { std::ostringstream osss; osss << x; __android_log_print(ANDROID_LOG_INFO, "FHeroes", "%s", osss.str().c_str()); }
 #define DEBUG(x, y, z) if(IS_DEBUG((x), (y))) VERBOSE(z)
 #else
 #define VERBOSE(x) std::cout << x << std::endl
+#define VERBOSN(x) std::cout << x
 #define DEBUG(x, y, z) if(IS_DEBUG((x), (y))) VERBOSE(z)
 #endif
 

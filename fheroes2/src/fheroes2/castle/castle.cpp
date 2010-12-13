@@ -1390,7 +1390,8 @@ ICN::icn_t Castle::GetICNBuilding(u32 build, Race::race_t race)
 	}
     }
 
-    std::cout << "Castle::GetICNBuilding: return unknown, race: " << Race::String(race) << ", build: " << Castle::GetStringBuilding(build, race) << ", " << build << std::endl;
+    DEBUG(DBG_GAME, DBG_WARN, "Castle::GetICNBuilding: return unknown, race: " <<
+		Race::String(race) << ", build: " << Castle::GetStringBuilding(build, race) << ", " << build);
 
     return ICN::UNKNOWN;
 }
@@ -1570,14 +1571,14 @@ bool Castle::PredicateIsBuildMarketplace(const Castle* castle)
 
 void Castle::Dump(void) const
 {
-    std::cout << "name            : " << name << std::endl;
-    std::cout << "race            : " << Race::String(race) << std::endl;
-    std::cout << "color           : " << Color::String(color) << std::endl;
-    std::cout << "build           : " << "0x" << std::hex << building << std::dec << std::endl;
-    std::cout << "present heroes  : " << (GetHeroes() ? "yes" : "no") << std::endl;
-    std::cout << "present boat    : " << (PresentBoat() ? "yes" : "no") << std::endl;
-    std::cout << "nearly sea      : " << (HaveNearlySea() ? "yes" : "no") << std::endl;
-    std::cout << "is castle       : " << (isCastle() ? "yes" : "no") << std::endl;
+    VERBOSE("name            : " << name);
+    VERBOSE("race            : " << Race::String(race));
+    VERBOSE("color           : " << Color::String(color));
+    VERBOSE("build           : " << "0x" << std::hex << building << std::dec);
+    VERBOSE("present heroes  : " << (GetHeroes() ? "yes" : "no"));
+    VERBOSE("present boat    : " << (PresentBoat() ? "yes" : "no"));
+    VERBOSE("nearly sea      : " << (HaveNearlySea() ? "yes" : "no"));
+    VERBOSE("is castle       : " << (isCastle() ? "yes" : "no"));
 }
 
 s8 Castle::GetAttackModificator(std::string *strs) const

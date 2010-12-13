@@ -22,6 +22,7 @@
 
 #include <list>
 #include <iostream>
+#include <iomanip>
 #include <algorithm>
 #include <functional>
 #include "agg.h"
@@ -47,6 +48,16 @@ Maps::TilesAddon::TilesAddon() : level(0), uniq(0), object(0), index(0)
 
 Maps::TilesAddon::TilesAddon(u8 lv, u32 gid, u8 obj, u8 ii) : level(lv), uniq(gid), object(obj), index(ii)
 {
+}
+
+void Maps::TilesAddon::DebugInfo(int level) const
+{
+    VERBOSE("----------------" << level << "--------");
+    VERBOSE("object          : " << "0x" << std::setw(2) << std::setfill('0') << static_cast<int>(object) <<
+				", (" << ICN::GetString(MP2::GetICNObject(object)) << ")");
+    VERBOSE("index           : " << static_cast<int>(index));
+    VERBOSE("uniq            : " << uniq);
+    VERBOSE("level           : " << static_cast<int>(level));
 }
 
 Maps::TilesAddon & Maps::TilesAddon::operator= (const Maps::TilesAddon & ta)
@@ -773,139 +784,26 @@ Maps::TilesAddon * Maps::Tiles::FindAddonLevel2(u32 uniq2)
     return NULL;
 }
 
+
 void Maps::Tiles::DebugInfo(void) const
 {
-    std::list<TilesAddon>::const_iterator it1;
-    std::list<TilesAddon>::const_iterator it2;
+    VERBOSE("----------------:--------");
+    VERBOSE("maps index      : " << maps_index);
+    VERBOSE("tile            : " << tile_sprite_index);
+    VERBOSN("ground          : " << Ground::String(GetGround()));
+    VERBOSE((isRoad() ? ", (road)" : ""));
+    VERBOSE("passable        : " << (isPassable() ? "true" : "false"));
+    VERBOSE("mp2 object      : " << "0x" << std::setw(2) << std::setfill('0') << static_cast<int>(mp2_object) <<
+				    ", (" << MP2::StringObject(mp2_object) << ")");
+    VERBOSE("quantity 1      : " << static_cast<int>(quantity1));
+    VERBOSE("quantity 2      : " << static_cast<int>(quantity2));
+    VERBOSE("quantity 3      : " << static_cast<int>(quantity3));
+    VERBOSE("quantity 4      : " << static_cast<int>(quantity4));
 
-    std::cout << std::endl << "----------------:--------" << std::endl;
+    std::for_each(addons_level1.begin(), addons_level1.end(), std::bind2nd(std::mem_fun_ref(&TilesAddon::DebugInfo), 1));
+    std::for_each(addons_level1.begin(), addons_level1.end(), std::bind2nd(std::mem_fun_ref(&TilesAddon::DebugInfo), 2));
 
-    std::string value;
-
-    String::AddInt(value, maps_index);
-
-    std::cout << "maps index      : " << value << std::endl;
-    
-    value.clear();
-    
-    String::AddInt(value, tile_sprite_index);
-
-    std::cout << "tile            : " << value << std::endl;
-    
-    value.clear();
-
-    value = Ground::String(GetGround());
-    if(isRoad()) value += ", (road)";
-    std::cout << "ground          : " << value << std::endl;
-
-    value.clear();
-
-    value = isPassable() ? "true" : "false";
-    std::cout << "passable        : " << value << std::endl;
-
-    value.clear();
-    
-    String::AddInt(value, mp2_object);
-    value += ", (" + std::string(MP2::StringObject(mp2_object)) + ")";
-    std::cout << "mp2 object      : " << value << std::endl;
-
-    value.clear();
-    
-    String::AddInt(value, quantity1);
-    std::cout << "quantity 1      : " << value << std::endl;
-
-    value.clear();
-    
-    String::AddInt(value, quantity2);
-    std::cout << "quantity 2      : " << value << std::endl;
-
-    value.clear();
-
-    String::AddInt(value, quantity3);
-    std::cout << "quantity 3      : " << value << std::endl;
-
-    value.clear();
-
-    String::AddInt(value, quantity4);
-    std::cout << "quantity 4      : " << value << std::endl;
-
-    value.clear();
-
-    if(!addons_level1.empty())
-    {
-	it1 = addons_level1.begin();
-	it2 = addons_level1.end();
-	
-	for(; it1 != it2; ++it1)
-	{
-	    const TilesAddon & addon = *it1;
-
-	    std::cout << "----------------1--------" << std::endl;
-
-	    value.clear();
-    
-	    String::AddInt(value, addon.object);
-    
-	    std::cout << "object          : " << value << " (" << ICN::GetString(MP2::GetICNObject(addon.object)) << ")" << std::endl;
-
-	    value.clear();
-    
-	    String::AddInt(value, addon.index);
-    
-	    std::cout << "index           : " << value << std::endl;
-
-	    value.clear();
-    
-	    String::AddInt(value, addon.uniq);
-    
-	    std::cout << "uniq            : " << value << std::endl;
-
-	    value.clear();
-    
-	    String::AddInt(value, addon.level);
-    
-	    std::cout << "level           : " << value << std::endl;
-	}
-    }
-
-    if(!addons_level2.empty())
-    {
-	it1 = addons_level2.begin();
-	it2 = addons_level2.end();
-	
-	for(; it1 != it2; ++it1)
-	{
-	    const TilesAddon & addon = *it1;
-
-	    std::cout << "----------------2--------" << std::endl;
-
-	    value.clear();
-    
-	    String::AddInt(value, addon.object);
-    
-	    std::cout << "object          : " << value << " (" << ICN::GetString(MP2::GetICNObject(addon.object)) << ")" << std::endl;
-
-	    value.clear();
-    
-	    String::AddInt(value, addon.index);
-    
-	    std::cout << "index           : " << value << std::endl;
-
-	    value.clear();
-    
-	    String::AddInt(value, addon.uniq);
-    
-	    std::cout << "uniq            : " << value << std::endl;
-
-	    value.clear();
-    
-	    String::AddInt(value, addon.level);
-    
-	    std::cout << "level           : " << value << std::endl;
-	}
-    }
-
-    std::cout << "----------------I--------" << std::endl;
+    VERBOSE("----------------I--------");
 
     // extra obj info
     switch(mp2_object)
@@ -931,7 +829,7 @@ void Maps::Tiles::DebugInfo(void) const
         case MP2::OBJ_THATCHEDHUT:
 	//
 	case MP2::OBJ_MONSTER:
-	    std::cout << "count           : " << GetCountMonster() << std::endl;
+	    VERBOSE("count           : " << GetCountMonster());
 	    break;
 
 	case MP2::OBJ_HEROES:
@@ -954,16 +852,17 @@ void Maps::Tiles::DebugInfo(void) const
 	    const u16 dst_around = Maps::TileUnderProtection(maps_index);
 	    if(dst_around)
 	    {
-		std::cout << "protection      : ";
+		VERBOSN("protection      : ");
 		for(Direction::vector_t dir = Direction::TOP_LEFT; dir < Direction::CENTER; ++dir)
 		    if(dst_around & dir)
-			std::cout << Maps::GetDirectionIndex(maps_index, dir) << std::endl;
+			VERBOSN(Maps::GetDirectionIndex(maps_index, dir) << ", ");
+		VERBOSE("");
 	    }
 	    break;
 	}
     }
 
-    std::cout << "----------------:--------" << std::endl << std::endl;
+    VERBOSE("----------------:--------");
 }
 
 MP2::object_t Maps::Tiles::GetObject(void) const

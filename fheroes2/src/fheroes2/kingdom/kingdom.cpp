@@ -422,15 +422,15 @@ bool Kingdom::HeroesMayStillMove(void) const
 void Kingdom::Dump(void) const
 {
     world.DateDump();
-    std::cout << "Kingdom::Dump: " << "color: " << Color::String(color) <<
-    ", resource: " << 
-    "ore(" << resource.ore << ")," <<
-    "wood(" << resource.wood << ")," <<
-    "mercury(" << resource.mercury << ")," <<
-    "sulfur(" << resource.sulfur << ")," <<
-    "crystal(" << resource.crystal << ")," <<
-    "gems(" << resource.gems << ")," <<
-    "gold(" << resource.gold << ")" << std::endl;
+    VERBOSE("Kingdom::Dump: " << "color: " << Color::String(color) <<
+	", resource: " << 
+	"ore(" << resource.ore << ")," <<
+	"wood(" << resource.wood << ")," <<
+	"mercury(" << resource.mercury << ")," <<
+	"sulfur(" << resource.sulfur << ")," <<
+	"crystal(" << resource.crystal << ")," <<
+	"gems(" << resource.gems << ")," <<
+	"gold(" << resource.gold << ")");
 }
 
 u8 Kingdom::GetCountCapital(void) const

@@ -45,6 +45,8 @@ namespace Maps
 
 	TilesAddon & operator= (const TilesAddon & ta);
 
+	void DebugInfo(int level) const;
+
 	static u16 isRoad(const TilesAddon &);
 	static bool isStream(const TilesAddon &);
 

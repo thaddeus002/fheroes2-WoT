@@ -1023,7 +1023,7 @@ void AGG::Cache::ICNRegistryFreeObjects(void)
 
 void AGG::Cache::Dump(void) const
 {
-    std::cout << "AGG::Cache::Dump:" << std::endl; 
+    VERBOSE("AGG::Cache::Dump:");
     u32 total1 = 0;
     u32 total2 = 0;
 
@@ -1037,10 +1037,10 @@ void AGG::Cache::Dump(void) const
         	for(u16 jj = 0; jj < icn_cache[ii].count; ++jj)
 		    total2 += (icn_cache[ii].sprites[jj].GetSize() + icn_cache[ii].reflect[jj].GetSize());
 	    if(icn_cache[ii].count)
-		std::cout << "ICN: " << ICN::GetString((ICN::icn_t) ii) << ", count: " << icn_cache[ii].count << ", total: " << total2 << std::endl;
+		VERBOSE("ICN: " << ICN::GetString((ICN::icn_t) ii) << ", count: " << icn_cache[ii].count << ", total: " << total2);
 	    total1 += total2;
         }
-	std::cout << "ICN: " << " total: " << total1 << std::endl;
+	VERBOSE("ICN: " << " total: " << total1);
     }
 
     if(til_cache)
@@ -1053,10 +1053,10 @@ void AGG::Cache::Dump(void) const
         	for(u16 jj = 0; jj < til_cache[ii].count; ++jj)
         	    total2 += til_cache[ii].sprites[jj].GetSize();
 	    if(til_cache[ii].count)
-		std::cout << "TIL: " << TIL::GetString((TIL::til_t) ii) << ", count: " << til_cache[ii].count << ", total: " << total2 << std::endl;
+		VERBOSE("TIL: " << TIL::GetString((TIL::til_t) ii) << ", count: " << til_cache[ii].count << ", total: " << total2);
 	    total1 += total2;
         }
-	std::cout << "TIL: " << " total: " << total1 << std::endl;
+	VERBOSE("TIL: " << " total: " << total1);
     }
 
     if(wav_cache.size())
@@ -1067,10 +1067,10 @@ void AGG::Cache::Dump(void) const
 	for(; it1 != it2; ++it1)
 	{
 	    if((*it1).second.size())
-	    	std::cout << "M82: " << M82::GetString((*it1).first) << ", size: " << (*it1).second.size() << std::endl;
+	    	VERBOSE("M82: " << M82::GetString((*it1).first) << ", size: " << (*it1).second.size());
 	    total1 += (*it1).second.size();
 	}
-	std::cout << "M82: " << " total: " << total1 << std::endl;
+	VERBOSE("M82: " << " total: " << total1);
     }
 
     if(mid_cache.size())
@@ -1081,10 +1081,10 @@ void AGG::Cache::Dump(void) const
 	for(; it1 != it2; ++it1)
 	{
 	    if((*it1).second.size())
-	    	std::cout << "XMI: " << XMI::GetString((*it1).first) << ", size: " << (*it1).second.size() << std::endl;
+	    	VERBOSE("XMI: " << XMI::GetString((*it1).first) << ", size: " << (*it1).second.size());
 	    total1 += (*it1).second.size();
 	}
-	std::cout << "XMI: " << " total: " << total1 << std::endl;
+	VERBOSE("XMI: " << " total: " << total1);
     }
 
 #ifdef WITH_TTF
@@ -1096,7 +1096,7 @@ void AGG::Cache::Dump(void) const
 	for(; it1 != it2; ++it1)
 	    total1 += ((*it1).second.medium_white.GetSize() + (*it1).second.medium_yellow.GetSize() + (*it1).second.small_white.GetSize() + (*it1).second.small_yellow.GetSize());
 
-	std::cout << "FNT: " << " total: " << total1 << std::endl;
+	VERBOSE("FNT: " << " total: " << total1);
     }
 #endif
 }

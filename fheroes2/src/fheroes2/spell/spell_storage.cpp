@@ -22,6 +22,7 @@
 
 #include <algorithm>
 #include "skill.h"
+#include "settings.h"
 #include "spell_storage.h"
 
 struct SpellEqualLevel : std::binary_function<Spell::spell_t, u8, bool>
@@ -80,8 +81,8 @@ void SpellStorage::Dump(void) const
     {
 	for(std::vector<Spell::spell_t>::const_iterator
 	    it = spells.begin(); it != spells.end(); ++it)
-		    std::cout << Spell::GetName((*it)) << ", ";
+		    VERBOSN(Spell::GetName((*it)) << ", ");
 
-	std::cout << std::endl;
+	VERBOSE("");
     }
 }

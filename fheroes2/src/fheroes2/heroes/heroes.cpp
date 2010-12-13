@@ -1696,55 +1696,54 @@ void Heroes::RecalculateMovePoints(void)
 
 void Heroes::Dump(void) const
 {
-    std::cout << "name            : " << name << std::endl;
-    std::cout << "race            : " << Race::String(race) << std::endl;
-    std::cout << "color           : " << Color::String(color) << std::endl;
-    std::cout << "experience      : " << experience << std::endl;
-    std::cout << "level           : " << static_cast<int>(GetLevel()) << std::endl;
-    std::cout << "magic point     : " << GetSpellPoints() << std::endl;
-    std::cout << "position x      : " << GetCenter().x << std::endl;
-    std::cout << "position y      : " << GetCenter().y << std::endl;
-    std::cout << "move point      : " << move_point << std::endl;
-    std::cout << "max magic point : " << GetMaxSpellPoints() << std::endl;
-    std::cout << "max move point  : " << GetMaxMovePoints() << std::endl;
-    std::cout << "direction       : " << Direction::String(direction) << std::endl;
-    std::cout << "index sprite    : " << static_cast<u16>(sprite_index) << std::endl;
-    std::cout << "flags           : " << (Modes(SHIPMASTER) ? "SHIPMASTER," : ",") <<
+    VERBOSE("name            : " << name);
+    VERBOSE("race            : " << Race::String(race));
+    VERBOSE("color           : " << Color::String(color));
+    VERBOSE("experience      : " << experience);
+    VERBOSE("level           : " << static_cast<int>(GetLevel()));
+    VERBOSE("magic point     : " << GetSpellPoints());
+    VERBOSE("position x      : " << GetCenter().x);
+    VERBOSE("position y      : " << GetCenter().y);
+    VERBOSE("move point      : " << move_point);
+    VERBOSE("max magic point : " << GetMaxSpellPoints());
+    VERBOSE("max move point  : " << GetMaxMovePoints());
+    VERBOSE("direction       : " << Direction::String(direction));
+    VERBOSE("index sprite    : " << static_cast<u16>(sprite_index));
+    VERBOSE("flags           : " << (Modes(SHIPMASTER) ? "SHIPMASTER," : ",") <<
                                          (Modes(SCOUTER) ? "SCOUTER," : ",") <<
                                          (Modes(HUNTER) ? "HUNTER," : ",") <<
                                          (Modes(PATROL) ? "PATROL," : ",") <<
                                          (Modes(AIWAITING) ? "WAITING," : ",") <<
-                                         (Modes(STUPID) ? "STUPID," : ",") << std::endl;
+                                         (Modes(STUPID) ? "STUPID," : ","));
     if(Modes(PATROL))
     {
-	std::cout << "patrol square   : " << static_cast<u16>(patrol_square) << std::endl;
-	
+	VERBOSE("patrol square   : " << static_cast<u16>(patrol_square));
     }
 
     if(! visit_object.empty())
     {
-	std::cout << "visit objects   : ";
+	VERBOSN("visit objects   : ");
 
 	for(std::list<IndexObject>::const_iterator
 	    it = visit_object.begin(); it != visit_object.end(); ++it)
-		std::cout << MP2::StringObject((*it).second) << "(" << (*it).first << "), ";
+		VERBOSN(MP2::StringObject((*it).second) << "(" << (*it).first << "), ");
 
-	std::cout << std::endl;
+	VERBOSE("");
     }
 
     if(GetControl() == Game::AI)
     {
-	std::cout << "spell book      : ";
+	VERBOSN("spell book      : ");
 
 	if(spell_book.isActive())
 	    spell_book.Dump();
 	else
-	    std::cout << "disabled" << std::endl;
+	    VERBOSE("disabled");
 
 	GetArmy().Dump("army dump       : ");
 
 	AI::HeroesDumpInfo(*this);
     }
 
-    std::cout << std::endl;
+    VERBOSE("");
 }

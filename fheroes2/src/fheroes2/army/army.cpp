@@ -979,24 +979,24 @@ void Army::army_t::UpgradeTroops(const Castle & castle)
 void Army::army_t::Dump(const char* prefix) const
 {
     if(prefix)
-	std::cout << prefix;
+	VERBOSN(prefix);
     else
     {
-	std::cout << "Army::Dump: " <<
-	    "color(" << Color::String(commander ? commander->GetColor() : color) << ")";
+	VERBOSN("Army::Dump: " <<
+	    "color(" << Color::String(commander ? commander->GetColor() : color) << ")");
 
 	if(commander)
-	    std::cout << ", commander(" << commander->GetName() << ")";
+	    VERBOSN(", commander(" << commander->GetName() << ")");
 
-	std::cout << " :";
+	VERBOSN(" :");
     }
 
     for(std::vector<Troop>::const_iterator
 	    it = army.begin(); it != army.end(); ++it)
 	if((*it).isValid())
-	    std::cout << (*it).GetName() << "(" << std::dec << (*it).GetCount() << "), ";
+	    VERBOSN((*it).GetName() << "(" << std::dec << (*it).GetCount() << "), ");
 
-    std::cout << std::endl;
+    VERBOSE("");
 }
 
 u16 Army::army_t::GetAttack(bool hero) const
