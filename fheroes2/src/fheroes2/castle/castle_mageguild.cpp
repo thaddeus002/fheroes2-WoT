@@ -107,27 +107,30 @@ void RowSpells::Redraw(void)
     }
 }
 
-void RowSpells::QueueEventProcessing(void)
+bool RowSpells::QueueEventProcessing(void)
 {
     LocalEvent & le = LocalEvent::Get();
     Display & display = Display::Get();
     Cursor & cursor = Cursor::Get();
 
+    std::vector<Rect>::const_iterator it = std::find_if(coords.begin(), coords.end(),
+					    std::bind2nd(RectIncludePoint(), le.GetMouseCursor()));
+    if(it == coords.end())
+	return false;
+
     if(le.MouseClickLeft() || le.MousePressRight())
     {
-	std::vector<Rect>::const_iterator it = std::find_if(coords.begin(), coords.end(), std::bind2nd(RectIncludePoint(), le.GetMouseCursor()));
-	if(it != coords.end())
+	const Spell::spell_t & spell = spells[it - coords.begin()];
+	if(Spell::NONE != spell)
 	{
-	    const Spell::spell_t & spell = spells[it - coords.begin()];
-	    if(Spell::NONE != spell)
-	    {
-    		cursor.Hide();
-    		Dialog::SpellInfo(spell, !le.MousePressRight());
-    		cursor.Show();
-    		display.Flip();
-	    }
+    	    cursor.Hide();
+    	    Dialog::SpellInfo(spell, !le.MousePressRight());
+    	    cursor.Show();
+    	    display.Flip();
 	}
     }
+
+    return true;
 }
 
 void Castle::OpenMageGuild(void)
@@ -211,10 +214,10 @@ void Castle::OpenMageGuild(void)
 
         if(le.MouseClickLeft(buttonExit) || HotKeyCloseWindow) break;
 
-        spells1.QueueEventProcessing();
-        spells2.QueueEventProcessing();
-        spells3.QueueEventProcessing();
-        spells4.QueueEventProcessing();
-        spells5.QueueEventProcessing();
+        if(spells1.QueueEventProcessing() ||
+    	    spells2.QueueEventProcessing() ||
+    	    spells3.QueueEventProcessing() ||
+    	    spells4.QueueEventProcessing() ||
+    	    spells5.QueueEventProcessing());
     }
 }
