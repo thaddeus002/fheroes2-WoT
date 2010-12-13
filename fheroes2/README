@@ -54,6 +54,7 @@ All possibilities of fheroes2:
 - world: allow buy a spellbook from Shrines
 - artifact: Crystal Ball also added Identify Hero and Visions spells
 - castle: allow buy from well
+- castle: allow guardians
 - heroes: learn new spells with day
 - heroes: fixed race with custom portrait
 - heroes: recruit cost to be dependent on hero level
