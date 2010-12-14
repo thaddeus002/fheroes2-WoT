@@ -149,9 +149,9 @@ bool Battle2::Cell::isPassable(const Stats & b, bool check_reflect) const
     return isPassable();
 }
 
-bool Battle2::Cell::isPassable(void) const
+bool Battle2::Cell::isPassable(bool check_troop) const
 {
-    return NULL == arena->GetTroopBoard(index) && 0 == object;
+    return (!check_troop || NULL == arena->GetTroopBoard(index)) && 0 == object;
 }
 
 void Battle2::Cell::Reset(void)

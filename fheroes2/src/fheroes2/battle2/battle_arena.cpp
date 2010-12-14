@@ -266,7 +266,7 @@ bool Battle2::Board::isMoatIndex(u16 ii)
     return false;
 }
 
-void Battle2::Board::GetAbroadPositions(u16 center, u8 radius, std::vector<u16> & positions) const
+void Battle2::Board::GetAbroadPositions(u16 center, u8 radius, bool skiptroop, std::vector<u16> & positions) const
 {
     if(center < size())
     {
@@ -289,7 +289,7 @@ void Battle2::Board::GetAbroadPositions(u16 center, u8 radius, std::vector<u16> 
 		{
 		    const u16 index = GetIndexDirection(*it, dir);
 		    // skip
-		    if(! at(index).isPassable()) continue;
+		    if(! at(index).isPassable(skiptroop)) continue;
 		    if(v1.end() == std::find(v1.begin(), v1.end(), index) &&
 			positions.end() == std::find(positions.begin(), positions.end(), index) &&
 			center != index)
@@ -1075,7 +1075,7 @@ u16 Battle2::Arena::GetPath(const Stats & b, u16 to, std::vector<u16> & v)
 	    // find nearest
 	    std::vector<u16> abroad;
 	    abroad.resize(6);
-	    board.GetAbroadPositions(cur, 1, abroad);
+	    board.GetAbroadPositions(cur, 1, true, abroad);
 	    if(abroad.size())
 	    {
 		CenterBoardNearest BoardNearest(b.GetPosition(), board);

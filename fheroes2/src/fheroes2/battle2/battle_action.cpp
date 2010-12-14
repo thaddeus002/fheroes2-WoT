@@ -739,7 +739,7 @@ void Battle2::Arena::GetTargetsForSpells(const HeroBase* hero, const u8 spell, c
 	{
 	    std::vector<u16> positions;
 	    u8 radius = (Spell::FIREBLAST == spell ? 2 : 1);
-	    board.GetAbroadPositions(dst, radius, positions);
+	    board.GetAbroadPositions(dst, radius, false, positions);
 	    std::vector<u16>::const_iterator it1 = positions.begin();
 	    std::vector<u16>::const_iterator it2 = positions.end();
             for(; it1 != it2; ++it1)
@@ -975,7 +975,7 @@ void Battle2::Arena::SpellActionEarthQuake(void)
 void Battle2::Arena::SpellActionMirrorImage(Stats & b)
 {
     std::vector<u16> v;
-    board.GetAbroadPositions(b.position, 4, v);
+    board.GetAbroadPositions(b.position, 4, true, v);
 
     std::vector<u16>::const_iterator it1 = v.begin();
     std::vector<u16>::const_iterator it2 = v.end();

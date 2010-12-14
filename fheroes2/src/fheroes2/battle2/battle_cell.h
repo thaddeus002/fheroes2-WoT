@@ -40,7 +40,7 @@ namespace Battle2
 	void SetPositionQuality(const Stats &);
 	bool isPassable(const Stats &, const Cell &) const;
 	bool isPassable(const Stats &, bool check_reflect) const;
-	bool isPassable(void) const;
+	bool isPassable(bool check = true) const;
 	bool isPositionIncludePoint(const Point &) const;
 	u16 GetIndex(void) const;
 	u8 GetDirection(void) const;

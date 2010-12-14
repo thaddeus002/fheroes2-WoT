@@ -74,7 +74,7 @@ namespace Battle2
 	void SetCobjObject(u16, u16);
 	void SetCovrObjects(u16);
 
-	void GetAbroadPositions(u16, u8, std::vector<u16> &) const;
+	void GetAbroadPositions(u16, u8, bool, std::vector<u16> &) const;
 	void GetIndexesFromAbsPoints(std::vector<u16> &, const std::vector<Point> &) const;
 
 	static bool inCastle(u16);
