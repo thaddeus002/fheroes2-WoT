@@ -4007,7 +4007,8 @@ bool Battle2::Interface::IdleTroopsAnimation(void)
 void Battle2::Interface::CheckGlobalEvents(LocalEvent & le)
 {
     // reset auto battle
-    if(le.KeyPress() && Settings::Get().AutoBattle(b_current->GetColor())) ResetAutoBattle(*b_current);
+    if(le.KeyPress() && b_current &&
+	Settings::Get().AutoBattle(b_current->GetColor())) ResetAutoBattle(*b_current);
 
     // animation opponents
     if(Game::AnimateInfrequent(Game::BATTLE_OPPONENTS_DELAY))

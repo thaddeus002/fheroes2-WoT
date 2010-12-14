@@ -98,7 +98,7 @@ bool Battle2::Cell::isPassable(const Stats & b, const Cell & from) const
 	    {
 		if(CENTER == from.direction && b.isReflect()) return false;
 		else
-		if(GetReflectFromDirection(Board::GetReflectDirection(from.direction))) return false;
+		if(CENTER != from.direction && GetReflectFromDirection(Board::GetReflectDirection(from.direction))) return false;
 		const Cell* cell2 = arena->GetCell(index, LEFT);
 		return cell2 && cell2->isPassable() && isPassable();
 	    }
@@ -108,7 +108,7 @@ bool Battle2::Cell::isPassable(const Stats & b, const Cell & from) const
 	    {
 		if(CENTER == from.direction && !b.isReflect()) return false;
 		else
-		if(!GetReflectFromDirection(Board::GetReflectDirection(from.direction))) return false;
+		if(CENTER != from.direction && !GetReflectFromDirection(Board::GetReflectDirection(from.direction))) return false;
 		const Cell* cell2 = arena->GetCell(index, RIGHT);
 		return cell2 && cell2->isPassable() && isPassable();
 	    }
