@@ -212,7 +212,7 @@ public:
     bool Unicode(void) const;
     bool PocketPC(void) const;
     bool UseAltResource(void) const;
-    bool AutoBattle(void) const;
+    bool AutoBattle(u8) const;
     bool PriceLoyaltyVersion(void) const;
     bool LoadedGameVersion(void) const;
     bool MusicExt(void) const;
@@ -288,7 +288,7 @@ public:
     void SetPriceLoyaltyVersion(void);
     void SetGameDifficulty(const Difficulty::difficulty_t d);
     void SetEvilInterface(bool);
-    void SetAutoBattle(bool);
+    void SetAutoBattle(u8, bool);
     void SetBattleGrid(bool);
     void SetBattleMovementShaded(bool);
     void SetBattleMouseShaded(bool);
@@ -410,6 +410,7 @@ private:
     u8 game_type;
     u8 players_colors;
     u8 preferably_count_players;
+    u8 auto_battle_on;
 
     std::string playmus_command;
     std::string video_driver;

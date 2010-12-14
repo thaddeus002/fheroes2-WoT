@@ -183,7 +183,7 @@ namespace Battle2
 	void CheckGlobalEvents(LocalEvent &);
 
 	void SetAutoBattle(const Stats &, Actions &);
-	void ResetAutoBattle(void);
+	void ResetAutoBattle(const Stats &);
 	void ProcessingHeroDialogResult(u8, Actions &);
 
 	void EventAutoSwitch(const Stats &, Actions &);

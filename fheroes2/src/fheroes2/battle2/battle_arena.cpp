@@ -40,6 +40,18 @@
 #include "battle_bridge.h"
 #include "battle_interface.h"
 
+namespace Battle2
+{
+    struct CenterBoardNearest : std::binary_function<u16, u16, bool>
+    {
+	CenterBoardNearest(u16 c, const Board & b) : center(c), board(b) {};
+	bool operator() (u16 a, u16 b) const { return board.GetDistance(center, a) < board.GetDistance(center, b); };
+
+	u16 center;
+	const Board & board;
+    };
+}
+
 ICN::icn_t GetCovr(u16 ground)
 {
     std::vector<ICN::icn_t> covrs;
@@ -276,6 +288,8 @@ void Battle2::Board::GetAbroadPositions(u16 center, u8 radius, std::vector<u16> 
 		for(direction_t dir = TOP_LEFT; dir < CENTER; ++dir) if(isValidDirection(*it, dir))
 		{
 		    const u16 index = GetIndexDirection(*it, dir);
+		    // skip
+		    if(! at(index).isPassable()) continue;
 		    if(v1.end() == std::find(v1.begin(), v1.end(), index) &&
 			positions.end() == std::find(positions.begin(), positions.end(), index) &&
 			center != index)
@@ -942,7 +956,7 @@ void Battle2::Arena::HumanTurn(const Stats & b, Actions & a)
 
     conf.SetMyColor(Color::Get(b.GetColor()));
 
-    if(conf.AutoBattle())
+    if(conf.AutoBattle(b.GetColor()))
         AI::BattleTurn(*this, b, a);
     else
     if(interface)
@@ -1044,6 +1058,7 @@ u16 Battle2::Arena::GetShortDistance(u16 from, const std::vector<u16> & dst)
     return res;
 }
 
+
 u16 Battle2::Arena::GetPath(const Stats & b, u16 to, std::vector<u16> & v)
 {
     if(v.size()) v.clear();
@@ -1054,6 +1069,24 @@ u16 Battle2::Arena::GetPath(const Stats & b, u16 to, std::vector<u16> & v)
 	ScanPassabilityBoard(b, true);
 
 	u16 cur = to;
+
+	if(UNKNOWN == board[cur].direction)
+	{
+	    // find nearest
+	    std::vector<u16> abroad;
+	    abroad.resize(6);
+	    board.GetAbroadPositions(cur, 1, abroad);
+	    if(abroad.size())
+	    {
+		CenterBoardNearest BoardNearest(b.GetPosition(), board);
+		std::vector<u16>::const_iterator it =
+		    std::min_element(abroad.begin(), abroad.end(), BoardNearest);
+		if(it != abroad.end())
+		    cur = *it;
+	    }
+	    DEBUG(DBG_BATTLE, DBG_WARN, "Battle2::Arena::" << "GetPath: " << "dst is busy, corrected: " << cur);
+	}
+
 	while(CENTER != board[cur].direction && UNKNOWN != board[cur].direction){ v.push_back(cur); cur = Board::GetIndexDirection(cur, board[cur].direction); }
     }
 

@@ -44,8 +44,6 @@ enum
     GLOBAL_SHOWBUTTONS       = 0x00000800,
     GLOBAL_SHOWSTATUS        = 0x00001000,
 
-    GLOBAL_AUTOBATTLE        = 0x00010000,
-
     GLOBAL_FONTRENDERBLENDED1= 0x00020000,
     GLOBAL_FONTRENDERBLENDED2= 0x00040000,
     GLOBAL_FULLSCREEN        = 0x00400000,
@@ -756,9 +754,9 @@ void Settings::SetPlayersColors(u8 c)
     players_colors = c;
 }
 
-bool Settings::AutoBattle(void) const
+bool Settings::AutoBattle(u8 color) const
 {
-    return opt_global.Modes(GLOBAL_AUTOBATTLE);
+    return auto_battle_on & color;
 }
 
 void Settings::SetPreferablyCountPlayers(u8 c)
@@ -988,9 +986,12 @@ void Settings::SetPriceLoyaltyVersion(void)
     opt_global.SetModes(GLOBAL_PRICELOYALTY);
 }
 
-void Settings::SetAutoBattle(bool f)
+void Settings::SetAutoBattle(u8 color, bool f)
 {
-    f ? opt_global.SetModes(GLOBAL_AUTOBATTLE) : opt_global.ResetModes(GLOBAL_AUTOBATTLE);
+    if(f)
+	auto_battle_on |= color;
+    else
+	auto_battle_on &= ~color;
 }
 
 void Settings::SetEvilInterface(bool f)

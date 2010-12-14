@@ -749,7 +749,8 @@ Battle2::Interface::~Interface()
     if(listlog) delete listlog;
     if(opponent1) delete opponent1;
     if(opponent2) delete opponent2;
-    if(Settings::Get().AutoBattle()) Settings::Get().SetAutoBattle(false);
+    // reset all
+    Settings::Get().SetAutoBattle(0xFF, false);
 }
 
 const Rect & Battle2::Interface::GetArea(void) const
@@ -1848,7 +1849,7 @@ u8 Battle2::GetIndexIndicator(const Stats & b)
 
 void Battle2::Interface::SetAutoBattle(const Stats & b, Actions & a)
 {
-    Settings::Get().SetAutoBattle(true);
+    Settings::Get().SetAutoBattle(b.GetColor(), true);
     Cursor::Get().SetThemes(Cursor::WAR_NONE);
     status.SetMessage(_("Set auto battle on"), true);
     AI::BattleTurn(arena, b, a);
@@ -1856,9 +1857,9 @@ void Battle2::Interface::SetAutoBattle(const Stats & b, Actions & a)
     humanturn_exit = true;
 }
 
-void Battle2::Interface::ResetAutoBattle(void)
+void Battle2::Interface::ResetAutoBattle(const Stats & b)
 {
-    Settings::Get().SetAutoBattle(false);
+    Settings::Get().SetAutoBattle(b.GetColor(), false);
     status.SetMessage(_("Set auto battle off"), true);
     humanturn_redraw = true;
 }
@@ -1874,8 +1875,8 @@ void Battle2::Interface::EventShowOptions(void)
 void Battle2::Interface::EventAutoSwitch(const Stats & b, Actions & a)
 {
     btn_auto.PressDraw();
-    if(Settings::Get().AutoBattle())
-	ResetAutoBattle();
+    if(Settings::Get().AutoBattle(b.GetColor()))
+	ResetAutoBattle(b);
     else
 	SetAutoBattle(b, a);
     btn_auto.ReleaseDraw();
@@ -1889,8 +1890,8 @@ void Battle2::Interface::ButtonAutoAction(const Stats & b, Actions & a)
 
     if(le.MouseClickLeft(btn_auto))
     {
-	if(Settings::Get().AutoBattle())
-	    ResetAutoBattle();
+	if(Settings::Get().AutoBattle(b.GetColor()))
+	    ResetAutoBattle(b);
 	else
 	    SetAutoBattle(b, a);
     }
@@ -4006,7 +4007,7 @@ bool Battle2::Interface::IdleTroopsAnimation(void)
 void Battle2::Interface::CheckGlobalEvents(LocalEvent & le)
 {
     // reset auto battle
-    if(le.KeyPress() && Settings::Get().AutoBattle()) ResetAutoBattle();
+    if(le.KeyPress() && Settings::Get().AutoBattle(b_current->GetColor())) ResetAutoBattle(*b_current);
 
     // animation opponents
     if(Game::AnimateInfrequent(Game::BATTLE_OPPONENTS_DELAY))
