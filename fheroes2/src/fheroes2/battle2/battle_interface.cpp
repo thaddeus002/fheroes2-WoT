@@ -806,7 +806,6 @@ void Battle2::Interface::RedrawArmies(void) const
 {
     for(u16 ii = 0; ii < arena.board.size(); ++ii)
     {
-        if(arena.castle) RedrawCastle2(ii);
 	RedrawObjects(ii);
 
 	const Stats* b = arena.GetTroopBoard(ii);
@@ -821,6 +820,12 @@ void Battle2::Interface::RedrawArmies(void) const
 	    if(b_move != b)
 		RedrawTroopCount(*b, cell.pos);
 	}
+    }
+
+    if(arena.castle)
+    for(u16 ii = 0; ii < arena.board.size(); ++ii)
+    {
+	RedrawCastle2(ii);
     }
 
     if(b_fly)
@@ -3161,6 +3166,8 @@ void Battle2::Interface::RedrawActionMirrorImageSpell(const Stats & target, u16 
 	    ++pnt;
 	}
     }
+
+    status.SetMessage(_("MirrorImage created"), true);
 }
 
 void Battle2::Interface::RedrawActionLightningBoltSpell(Stats & target)
@@ -3718,6 +3725,7 @@ void Battle2::Interface::RedrawActionEarthQuakeSpell(const std::vector<u8> & tar
 void Battle2::Interface::RedrawActionRemoveMirrorImage(const Stats & mirror)
 {
     DEBUG(DBG_BATTLE, DBG_WARN, "Battle2::Interface::" << "RedrawActionRemoveMirrorImage: " << "FIXME");
+    status.SetMessage(_("MirrorImage ended"), true);
 }
 
 void Battle2::Interface::RedrawTargetsWithFrameAnimation(const u16 dst, const std::vector<TargetInfo> & targets, ICN::icn_t icn, M82::m82_t m82)
