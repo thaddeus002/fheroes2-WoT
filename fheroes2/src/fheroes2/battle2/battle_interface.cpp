@@ -3827,6 +3827,13 @@ void Battle2::Interface::RedrawTargetsWithFrameAnimation(const std::vector<Targe
     }
 }
 
+void RedrawSparksEffects(const Point & src, const Point & dst)
+{
+    Display & display = Display::Get();
+    u32 yellow = display.MapRGB(0xFF, 0xFF, 0);
+    display.DrawLine(src.x, src.y, dst.x, dst.y, yellow);
+}
+
 void Battle2::Interface::RedrawTroopWithFrameAnimation(Stats & b, ICN::icn_t icn, M82::m82_t m82, bool pain)
 {
     Display & display = Display::Get();
@@ -3834,6 +3841,7 @@ void Battle2::Interface::RedrawTroopWithFrameAnimation(Stats & b, ICN::icn_t icn
     LocalEvent & le = LocalEvent::Get();
 
     const Rect & pos = b.GetCellPosition();
+    const Rect & rectArea = border.GetArea();
 
     u8 frame = 0;
     bool reflect = false;
@@ -3854,6 +3862,7 @@ void Battle2::Interface::RedrawTroopWithFrameAnimation(Stats & b, ICN::icn_t icn
 
     if(M82::UNKNOWN != m82) AGG::PlaySound(m82);
 
+
     while(le.HandleEvents() && frame < AGG::GetICNCount(icn))
     {
 	CheckGlobalEvents(le);
@@ -3862,9 +3871,16 @@ void Battle2::Interface::RedrawTroopWithFrameAnimation(Stats & b, ICN::icn_t icn
     	{
 	    cursor.Hide();
 	    Redraw();
+
 	    const Sprite & sprite = AGG::GetICN(icn, frame, reflect);
-	    display.Blit(sprite, pos.x + (b.isWide() ? (b.isReflect() ? pos.w : 0) : pos.w / 2) + sprite.x() - (reflect ? pos.w : 0),
-		    pos.y + pos.h / 2 + sprite.y());
+
+	    const Point sprite_pos(pos.x + (b.isWide() ? (b.isReflect() ? pos.w : 0) : pos.w / 2) + sprite.x() - (reflect ? pos.w : 0),
+				pos.y + pos.h / 2 + sprite.y());
+
+	    if(icn == ICN::SPARKS)
+		RedrawSparksEffects(Point(rectArea.x + rectArea.w / 2, rectArea.y), sprite_pos);
+
+	    display.Blit(sprite, sprite_pos);
 	    cursor.Show();
 	    display.Flip();
 
