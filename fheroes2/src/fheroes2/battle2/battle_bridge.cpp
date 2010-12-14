@@ -23,6 +23,7 @@
 #include "castle.h"
 #include "battle_stats.h"
 #include "battle_cell.h"
+#include "battle_interface.h"
 #include "battle_bridge.h"
 
 Battle2::Bridge::Bridge(Arena & a) : arena(a), destroy(false), down(false)
@@ -60,12 +61,12 @@ void Battle2::Bridge::SetDown(bool f)
     down = f;
 }
 
-bool Battle2::Bridge::AllowUp(void)
+bool Battle2::Bridge::AllowUp(void) const
 {
     return NULL == arena.GetTroopBoard(49) && NULL == arena.GetTroopBoard(50);
 }
 
-bool Battle2::Bridge::NeedDown(const Stats & b, u16 pos2)
+bool Battle2::Bridge::NeedDown(const Stats & b, u16 pos2) const
 {
     const u16 pos1 = b.GetPosition();
 
@@ -107,4 +108,24 @@ void Battle2::Bridge::SetPassable(const Stats & b)
 	arena.board[49].object = 1;
 	arena.board[50].object = 1;
     }
+}
+
+
+bool Battle2::Bridge::NeedAction(const Stats & b, u16 dst) const
+{
+    return (!isDown() && NeedDown(b, dst)) ||
+	    (isValid() && isDown() && AllowUp());
+}
+
+void Battle2::Bridge::Action(const Stats & b, u16 dst)
+{
+    bool action_down = false;
+
+    if(!isDown() && NeedDown(b, dst))
+	action_down = true;
+
+    if(arena.interface)
+	arena.interface->RedrawBridgeAnimation(action_down);
+
+    SetDown(action_down);
 }

@@ -2424,19 +2424,12 @@ void Battle2::Interface::RedrawActionMove(Stats & b, const std::vector<u16> & pa
 	const Cell & cell = arena.board[*dst];
 	p_move = cell.pos;
     
-	if(arena.bridge)
+	if(arena.bridge && arena.bridge->NeedAction(b, *dst))
 	{
-	    if(!arena.bridge->isDown() && arena.bridge->NeedDown(b, *dst))
-	    {
-		RedrawBridgeAnimation(true);
-		arena.bridge->SetDown(true);
-	    }
-	    else
-	    if(arena.bridge->isValid() && arena.bridge->isDown() && arena.bridge->AllowUp())
-	    {
-		RedrawBridgeAnimation(false);
-		arena.bridge->SetDown(false);
-	    }
+	    b_move = NULL;
+	    b.ResetAnimFrame(AS_IDLE);
+	    arena.bridge->Action(b, *dst);
+	    b_move = &b;
 	}
 
 	if(b.isWide() && b.GetTailIndex() == *dst)

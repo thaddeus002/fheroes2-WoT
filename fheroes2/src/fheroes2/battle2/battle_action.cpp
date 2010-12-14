@@ -387,11 +387,10 @@ void Battle2::Arena::ApplyActionMove(Action & action)
 	    else
     	    if(bridge)
     	    {
-        	if(!bridge->isDown() && bridge->NeedDown(*b, dst))
-        	    bridge->SetDown(true);
-        	else
-        	if(bridge->isDown() && bridge->AllowUp())
-    		    bridge->SetDown(false);
+		for(std::vector<u16>::const_iterator
+		    it = path.begin(); it != path.end(); ++it)
+		    if(bridge->NeedAction(*b, *it))
+			bridge->Action(*b, *it);
 	    }
 	}
 

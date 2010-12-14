@@ -35,12 +35,15 @@ namespace Battle2
     public:
 	Bridge(Arena & a);
 
+	bool NeedAction(const Stats &, u16) const;
+	void Action(const Stats &, u16);
+
 	void SetDestroy(void);
 	void SetDown(bool);
 	void SetPassable(const Stats &);
 
-	bool AllowUp(void);
-	bool NeedDown(const Stats &, u16);
+	bool AllowUp(void) const;
+	bool NeedDown(const Stats &, u16) const;
 	bool isPassable(u8) const;
 	bool isValid(void) const;
 	bool isDestroy(void) const;
