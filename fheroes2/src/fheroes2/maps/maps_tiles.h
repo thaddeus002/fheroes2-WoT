@@ -23,6 +23,7 @@
 #define H2TILES_H
 
 #include <list>
+#include <functional>
 #include "ground.h"
 #include "mp2.h"
 #include "direction.h"
@@ -203,6 +204,11 @@ namespace Maps
 	u8	unused1; /* memory align */
 	u8	unused2; /* memory align */
 	u8	unused3; /* memory align */
+    };
+
+    struct TilesIsPassable : public std::binary_function<s32, const Heroes*, bool>
+    {
+	bool operator() (s32, const Heroes*) const;
     };
 }
 

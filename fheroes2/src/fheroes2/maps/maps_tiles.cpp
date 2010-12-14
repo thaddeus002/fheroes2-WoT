@@ -42,6 +42,12 @@
 
 static u8 monster_animation_cicle[] = { 0, 1, 2, 1, 0, 3, 4, 5, 4, 3 };
 
+
+bool Maps::TilesIsPassable::operator() (s32 index, const Heroes* hero) const
+{
+    return isValidAbsIndex(index) && world.GetTiles(index).isPassable(hero, true);
+}
+
 Maps::TilesAddon::TilesAddon() : level(0), uniq(0), object(0), index(0)
 {
 }
