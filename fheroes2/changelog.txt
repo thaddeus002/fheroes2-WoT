@@ -1,4 +1,19 @@
-SVN - up to r2122
+SVN - up to r2145
+
+Dec, 15, 2010
++ Added: new ttf fonts
++ Fixed: battle: auto battle switch for all players
++ Fixed: battle: simple animation for lightning spells
++ Fixed: battle: bridge animation
++ Fixed: battle: castle walls redraw
++ Fixed: battle: wide troop move
++ Fixed: battle: end game with damage spells
++ Fixed: battle: bless spell exclude good luck, and curse spell exclude bad luck
++ Fixed: battle: genie damage - if genies can kill all then his ability will disabled
++ Fixed: passable for "Lean To" object
++ Fixed: mageguild: click info
++ Fixed: save GUI positions
++ Fixed: heroes visiting objects
 
 Dec, 08, 2010
 + Fixed: disable save binary for loaded game
