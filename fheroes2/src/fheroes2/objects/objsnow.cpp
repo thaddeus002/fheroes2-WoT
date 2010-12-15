@@ -34,6 +34,9 @@ bool ObjSnow::isPassable(const u16 icn, const u8 index)
 	    // camp fire
 	    if(4 == index) return false;
 	    else
+	    // learn to
+	    if(13 == index) return false;
+	    else
 	    // rock
 	    if(22 == index || (25 < index && index < 29) || 30 == index ||
 	    32 == index || (33 < index && index < 36) || (36 < index && index < 40)) return false;
