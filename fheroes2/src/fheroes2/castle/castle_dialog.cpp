@@ -210,32 +210,67 @@ void RedrawIcons(const Castle & castle, const Heroes* hero1, const Heroes* hero2
 {
     Display & display = Display::Get();
 
-    display.Blit(AGG::GetICN(ICN::STRIP, 0), pt.x, pt.y + 256);
+    if(Settings::Get().QVGA())
+    {
+	display.Blit(AGG::GetICN(ICN::SWAPWIN, 0), Rect(36, 267, 43, 43), pt.x + 2, pt.y + 79);
 
-    const Surface & sprite1 = hero1 ? Portrait::Hero(*hero1, Portrait::BIG) :
-	AGG::GetICN(ICN::CREST, Color::GetIndex(castle.GetColor()));
+	if(hero1 || !castle.isBuild(BUILD_CAPTAIN))
+	{
+    	    const Surface & icon = hero1 ? Portrait::Hero(*hero1, Portrait::MEDIUM) :
+					    AGG::GetICN(ICN::BRCREST, Color::GetIndex(castle.GetColor()));
+    	    display.Blit(icon, Rect((icon.w() - 41) / 2, (icon.h() - 41) / 2, 41, 41), pt.x + 3, pt.y + 80);
+	}
+	else
+	if(castle.isBuild(BUILD_CAPTAIN))
+	{
+    	    const Surface & icon = Portrait::Captain(castle.GetRace(), Portrait::BIG);
+    	    display.Blit(icon, Rect((icon.w() - 41) / 2, 15, 41, 41), pt.x + 3, pt.y + 80);
+	}
 
-    // icons 1
-    display.Blit(sprite1, pt.x + 5, pt.y + 262);
+	display.Blit(AGG::GetICN(ICN::SWAPWIN, 0), Rect(36, 267, 43, 43), pt.x + 2, pt.y + 132);
 
+        if(hero2)
+	{
+    	    const Surface & icon = Portrait::Hero(*hero2, Portrait::MEDIUM);
+    	    display.Blit(icon, Rect((icon.w() - 41) / 2, (icon.h() - 41) / 2, 41, 41), pt.x + 3, pt.y + 133);
+	}
+	else
+	{
+    	    const Sprite & crest = AGG::GetICN(ICN::BRCREST, Color::GetIndex(castle.GetColor()));
+    	    display.Blit(crest, Rect((crest.w() - 41) / 2, (crest.h() - 41) / 2, 41, 41), pt.x + 3, pt.y + 133);
 
-    const Surface & sprite2 = hero2 ? Portrait::Hero(*hero2, Portrait::BIG) :
-	(castle.isBuild(BUILD_CAPTAIN) && !hero1 ? Portrait::Captain(castle.GetRace(), Portrait::BIG) :
-	    AGG::GetICN(ICN::STRIP, 3));
+	    //
+	    display.Blit(AGG::GetICN(ICN::STONEBAK, 0), Rect(0, 0, 223, 53), pt.x + 47, pt.y + 132);
+	}
+    }
+    else
+    {
+	display.Blit(AGG::GetICN(ICN::STRIP, 0), pt.x, pt.y + 256);
 
-    // icons 2
-    display.Blit(sprite2, pt.x + 5, pt.y + 361);
+	const Surface & sprite1 = hero1 ? Portrait::Hero(*hero1, Portrait::BIG) :
+	    (castle.isBuild(BUILD_CAPTAIN) ? Portrait::Captain(castle.GetRace(), Portrait::BIG) :
+		AGG::GetICN(ICN::CREST, Color::GetIndex(castle.GetColor())));
 
-    // ext
-    if(! hero2)
-    display.Blit(AGG::GetICN(ICN::STRIP, 11), pt.x + 112, pt.y + 361);
+	// icons 1
+	display.Blit(sprite1, pt.x + 5, pt.y + 262);
+
+	const Surface & sprite2 = hero2 ? Portrait::Hero(*hero2, Portrait::BIG) :
+					    AGG::GetICN(ICN::STRIP, 3);
+
+	// icons 2
+	display.Blit(sprite2, pt.x + 5, pt.y + 361);
+
+	// ext
+	if(! hero2)
+        display.Blit(AGG::GetICN(ICN::STRIP, 11), pt.x + 112, pt.y + 361);
+    }
 }
 
 Dialog::answer_t Castle::OpenDialog(bool readonly, bool fade)
 {
     Settings & conf = Settings::Get();
     
-    if(conf.QVGA()) return PocketPC::CastleOpenDialog(*this);
+    if(conf.QVGA()) return PocketPC::CastleOpenDialog(*this, readonly);
 
     const bool interface = conf.EvilInterface();
     if(conf.DynamicInterface())
@@ -317,6 +352,7 @@ Dialog::answer_t Castle::OpenDialog(bool readonly, bool fade)
     selectArmy1.SetBackgroundSprite(AGG::GetICN(ICN::STRIP, 2));
     selectArmy1.SetCursorSprite(AGG::GetICN(ICN::STRIP, 1));
     selectArmy1.SetCastle(*this);
+    if(readonly) selectArmy1.SetReadOnly();
     selectArmy1.Redraw();
 
     // portrait heroes or captain or sign
@@ -494,20 +530,7 @@ Dialog::answer_t Castle::OpenDialog(bool readonly, bool fade)
 		display.Flip();
 	    }
 	}
-
-	// view guardian
-	if(!readonly && castle_guardians && le.MouseClickLeft(rectSign1))
-	{
-	    Game::OpenHeroesDialog(castle_guardians);
-
-	    cursor.Hide();
-            if(selectArmy1.isSelected()) selectArmy1.Reset();
-            if(selectArmy2.isSelected()) selectArmy2.Reset();
-            selectArmy2.Redraw();
-	    cursor.Show();
-	    display.Flip();
-	}
-
+	else
 	// move guardian to hero
 	if(conf.ExtAllowCastleGuardians() && !readonly && !castle_heroes && castle_guardians && le.MouseClickLeft(rectSign2))
 	{
@@ -538,6 +561,19 @@ Dialog::answer_t Castle::OpenDialog(bool readonly, bool fade)
 	    display.Flip();
 	}
 
+	// view guardian
+	if(!readonly && castle_guardians && le.MouseClickLeft(rectSign1))
+	{
+	    Game::OpenHeroesDialog(castle_guardians);
+
+	    cursor.Hide();
+            if(selectArmy1.isSelected()) selectArmy1.Reset();
+            if(selectArmy2.isSelected()) selectArmy2.Reset();
+            selectArmy2.Redraw();
+	    cursor.Show();
+	    display.Flip();
+	}
+	else
 	// view hero
 	if(!readonly && castle_heroes && le.MouseClickLeft(rectSign2))
 	{
@@ -647,8 +683,8 @@ Dialog::answer_t Castle::OpenDialog(bool readonly, bool fade)
 		BuyBuilding(build);
 		RedrawResourcePanel(cur_pt);
 
-		if(BUILD_CAPTAIN == build && ! castle_heroes && ! castle_guardians)
-		    display.Blit(Portrait::Captain(race, Portrait::BIG), cur_pt.x + 5, cur_pt.y + 361);
+		if(BUILD_CAPTAIN == build)
+		    RedrawIcons(*this, castle_guardians, castle_heroes, cur_pt);
 
     		// RedrawResourcePanel destroy sprite buttonExit
 		if(buttonExit.isPressed()) buttonExit.Draw();
@@ -696,8 +732,7 @@ Dialog::answer_t Castle::OpenDialog(bool readonly, bool fade)
 		    }
 
 		    cursor.Hide();
-            	    display.Blit(AGG::GetICN(ICN::STRIP, 0), cur_pt.x, cur_pt.y + 256);
-            	    display.Blit(Portrait::Hero((*castle_heroes), Portrait::BIG), cur_pt.x + 5, cur_pt.y + 361);
+		    RedrawIcons(*this, castle_guardians, castle_heroes, cur_pt);
             	    selectArmy2.Redraw();
 		}
 

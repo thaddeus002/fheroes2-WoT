@@ -54,25 +54,26 @@ private:
 void RedrawTownSprite(const Rect &, const Castle &);
 void RedrawBackground(const Rect &, const Castle &);
 void RedrawResourceBar(const Point &, const Resource::funds_t &);
+void RedrawIcons(const Castle & castle, const Heroes* hero1, const Heroes* hero2, const Point & pt);
 
 enum screen_t { SCREENOUT, SCREENOUT_PREV, SCREENOUT_NEXT, SCREEN1, SCREEN2, SCREEN3, SCREEN4, SCREEN5, SCREEN6 };
 
-screen_t CastleOpenDialog1(Castle &);
+screen_t CastleOpenDialog1(Castle &, bool);
 screen_t CastleOpenDialog2(Castle &);
 screen_t CastleOpenDialog3(Castle &);
 screen_t CastleOpenDialog4(Castle &);
 screen_t CastleOpenDialog5(Castle &);
 screen_t CastleOpenDialog6(Castle &);
 
-Dialog::answer_t PocketPC::CastleOpenDialog(Castle & castle)
+Dialog::answer_t PocketPC::CastleOpenDialog(Castle & castle, bool readonly)
 {
     AGG::PlayMusic(MUS::FromRace(castle.GetRace()));
 
-    screen_t screen = CastleOpenDialog1(castle);
+    screen_t screen = CastleOpenDialog1(castle, readonly);
     while(SCREENOUT != screen)
 	switch(screen)
 	{
-	    case SCREEN1: screen = CastleOpenDialog1(castle); break;
+	    case SCREEN1: screen = CastleOpenDialog1(castle, readonly); break;
 	    case SCREEN2: screen = CastleOpenDialog2(castle); break;
 	    case SCREEN3: screen = CastleOpenDialog3(castle); break;
 	    case SCREEN4: screen = CastleOpenDialog4(castle); break;
@@ -85,11 +86,18 @@ Dialog::answer_t PocketPC::CastleOpenDialog(Castle & castle)
     return Dialog::CANCEL;
 }
 
-screen_t CastleOpenDialog1(Castle & castle)
+screen_t CastleOpenDialog1(Castle & castle, bool readonly)
 {
     Cursor & cursor = Cursor::Get();
     Display & display = Display::Get();
     LocalEvent & le = LocalEvent::Get();
+    const Settings & conf = Settings::Get();
+
+    Heroes* castle_guardians = world.GetHeroes(castle, true);
+    Heroes* castle_heroes = world.GetHeroes(castle, false);
+
+   if(castle_guardians && castle_heroes == castle_guardians)
+        castle_heroes = NULL;
 
     cursor.Hide();
     cursor.SetThemes(cursor.POINTER);
@@ -121,68 +129,50 @@ screen_t CastleOpenDialog1(Castle & castle)
     DwellingBar dwbar(Point(dst_rt.x + 2, dst_rt.y + 34), castle);
     dwbar.Redraw();
 
-    Point pt;
+    RedrawIcons(castle, castle_guardians, castle_heroes, dst_rt);
+
+    const Rect rectSign1(dst_rt.x + 3, dst_rt.y + 80, 41, 41);
+    const Rect rectSign2(dst_rt.x + 3, dst_rt.y + 133, 41, 41);
 
     // castle army bar
-    pt.x = dst_rt.x + 2;
-    pt.y = dst_rt.y + 79;
-
-    display.Blit(AGG::GetICN(ICN::SWAPWIN, 0), Rect(36, 267, 43, 43), pt.x, pt.y);
-    if(castle.isBuild(BUILD_CAPTAIN))
-    {
-	const Surface & icon = Portrait::Captain(castle.GetRace(), Portrait::BIG);
-	display.Blit(icon, Rect((icon.w() - 41) / 2, 15, 41, 41), pt.x + 1, pt.y + 1);
-    }
-    else
-    {
-	const Sprite & crest = AGG::GetICN(ICN::BRCREST, Color::GetIndex(castle.GetColor()));
-	display.Blit(crest, Rect((crest.w() - 41) / 2, (crest.h() - 41) / 2, 41, 41), pt.x + 1, pt.y + 1);
-    }
-
     const Rect rt1(36, 267, 43, 53);
     Surface sfb1(rt1.w, rt1.h);
     sfb1.Blit(backSprite, rt1, 0, 0);
     Surface sfc1(rt1.w, rt1.h - 10);
     Cursor::DrawCursor(sfc1, 0x10, true);
 
-    SelectArmyBar selectCastleArmy;
-    selectCastleArmy.SetArmy(castle.GetArmy());
-    selectCastleArmy.SetPos(pt.x + 45, pt.y);
-    selectCastleArmy.SetInterval(2);
-    selectCastleArmy.SetBackgroundSprite(sfb1);
-    selectCastleArmy.SetCursorSprite(sfc1);
-    selectCastleArmy.SetUseMons32Sprite();
-    selectCastleArmy.SetCastle(castle);
-    selectCastleArmy.Redraw();
-
-    // hero army bar
-    pt.x = dst_rt.x + 2;
-    pt.y = dst_rt.y + 132;
-    const Heroes* hero = castle.GetHeroes();
-
-    SelectArmyBar selectHeroesArmy;
-    selectHeroesArmy.SetPos(pt.x + 45, pt.y);
-    selectHeroesArmy.SetInterval(2);
-    selectHeroesArmy.SetBackgroundSprite(sfb1);
-    selectHeroesArmy.SetCursorSprite(sfc1);
-    selectHeroesArmy.SetUseMons32Sprite();
-    selectHeroesArmy.SetSaveLastTroop();
-    selectHeroesArmy.SetCastle(castle);
-
-    display.Blit(AGG::GetICN(ICN::SWAPWIN, 0), Rect(36, 267, 43, 43), pt.x, pt.y);
-    const Rect heroSign(pt.x + 1, pt.y + 1, 41, 41);
-    if(hero)
+    SelectArmyBar selectArmy1;
+    if(castle_guardians)
     {
-	const Surface & icon = Portrait::Hero(*hero, Portrait::MEDIUM);
-	display.Blit(icon, Rect((icon.w() - 41) / 2, (icon.h() - 41) / 2, 41, 41), heroSign);
-
-	selectHeroesArmy.SetArmy(const_cast<Army::army_t &>(hero->GetArmy()));
-	selectHeroesArmy.Redraw();
+        selectArmy1.SetArmy(castle_guardians->GetArmy());
+        selectArmy1.SetSaveLastTroop();
     }
     else
+        selectArmy1.SetArmy(castle.GetArmy());
+    selectArmy1.SetPos(dst_rt.x + 47, dst_rt.y + 79);
+    selectArmy1.SetInterval(2);
+    selectArmy1.SetBackgroundSprite(sfb1);
+    selectArmy1.SetCursorSprite(sfc1);
+    selectArmy1.SetUseMons32Sprite();
+    selectArmy1.SetCastle(castle);
+    if(readonly) selectArmy1.SetReadOnly();
+    selectArmy1.Redraw();
+
+    // hero army bar
+    SelectArmyBar selectArmy2;
+    selectArmy2.SetPos(dst_rt.x + 47, dst_rt.y + 132);
+    selectArmy2.SetInterval(2);
+    selectArmy2.SetBackgroundSprite(sfb1);
+    selectArmy2.SetCursorSprite(sfc1);
+    selectArmy2.SetUseMons32Sprite();
+    selectArmy2.SetSaveLastTroop();
+    selectArmy2.SetCastle(castle);
+
+    if(castle_heroes)
     {
-	const Sprite & crest = AGG::GetICN(ICN::BRCREST, Color::GetIndex(castle.GetColor()));
-	display.Blit(crest, Rect((crest.w() - 41) / 2, (crest.h() - 41) / 2, 41, 41), heroSign);
+        castle_heroes->MovePointsScaleFixed();
+        selectArmy2.SetArmy(castle_heroes->GetArmy());
+        selectArmy2.Redraw();
     }
 
     // resource bar
@@ -200,16 +190,19 @@ screen_t CastleOpenDialog1(Castle & castle)
 
     display.Blit(AGG::GetICN(ICN::REQUESTS, 20), rectScreen1.x, rectScreen1.y);
 
-    if(castle.isBuild(BUILD_CASTLE))
+    if(!readonly)
     {
-	display.Blit(AGG::GetICN(ICN::REQUESTS, 21), rectScreen2.x, rectScreen2.y);
-	display.Blit(AGG::GetICN(ICN::REQUESTS, 22), rectScreen3.x, rectScreen3.y);
-	display.Blit(AGG::GetICN(ICN::REQUESTS, 23), rectScreen4.x, rectScreen4.y);
+	if(castle.isBuild(BUILD_CASTLE))
+	{
+	    display.Blit(AGG::GetICN(ICN::REQUESTS, 21), rectScreen2.x, rectScreen2.y);
+	    display.Blit(AGG::GetICN(ICN::REQUESTS, 22), rectScreen3.x, rectScreen3.y);
+	    display.Blit(AGG::GetICN(ICN::REQUESTS, 23), rectScreen4.x, rectScreen4.y);
+	}
+	if(castle.isBuild(BUILD_CASTLE) || castle.isBuild(BUILD_TAVERN))
+	    display.Blit(AGG::GetICN(ICN::REQUESTS, 24), rectScreen5.x, rectScreen5.y);
+	if(castle.isBuild(BUILD_MAGEGUILD1))
+	    display.Blit(AGG::GetICN(ICN::REQUESTS, 25), rectScreen6.x, rectScreen6.y);
     }
-    if(castle.isBuild(BUILD_CASTLE) || castle.isBuild(BUILD_TAVERN))
-	display.Blit(AGG::GetICN(ICN::REQUESTS, 24), rectScreen5.x, rectScreen5.y);
-    if(castle.isBuild(BUILD_MAGEGUILD1))
-	display.Blit(AGG::GetICN(ICN::REQUESTS, 25), rectScreen6.x, rectScreen6.y);
 
     // update extra description
     std::string description_castle = castle.GetDescriptionBuilding(BUILD_CASTLE, castle.GetRace());
@@ -240,24 +233,24 @@ screen_t CastleOpenDialog1(Castle & castle)
 
         //if(le.MouseClickLeft(rectScreen1)) return SCREEN1;
         //else
-        if(castle.isBuild(BUILD_CASTLE) && le.MouseClickLeft(rectScreen2)) return SCREEN2;
+        if(!readonly && castle.isBuild(BUILD_CASTLE) && le.MouseClickLeft(rectScreen2)) return SCREEN2;
         else
-        if(castle.isBuild(BUILD_CASTLE) && le.MouseClickLeft(rectScreen3)) return SCREEN3;
+        if(!readonly && castle.isBuild(BUILD_CASTLE) && le.MouseClickLeft(rectScreen3)) return SCREEN3;
         else
-        if(castle.isBuild(BUILD_CASTLE) && le.MouseClickLeft(rectScreen4)) return SCREEN4;
+        if(!readonly && castle.isBuild(BUILD_CASTLE) && le.MouseClickLeft(rectScreen4)) return SCREEN4;
         else
-        if(castle.isBuild(BUILD_CASTLE) && le.MouseClickLeft(rectScreen5)) return SCREEN5;
+        if(!readonly && castle.isBuild(BUILD_CASTLE) && le.MouseClickLeft(rectScreen5)) return SCREEN5;
         else
-        if(castle.isBuild(BUILD_MAGEGUILD1) && le.MouseClickLeft(rectScreen6)) return SCREEN6;
+        if(!readonly && castle.isBuild(BUILD_MAGEGUILD1) && le.MouseClickLeft(rectScreen6)) return SCREEN6;
         else
         // exit
         if(le.MouseClickLeft(rectExit) || Game::HotKeyPress(Game::EVENT_DEFAULT_EXIT)) break;
 	else
-        if(buttonNext.isEnable() && le.MouseClickLeft(buttonNext)) return SCREENOUT_NEXT;
+        if(!readonly && buttonNext.isEnable() && le.MouseClickLeft(buttonNext)) return SCREENOUT_NEXT;
         else
-        if(buttonPrev.isEnable() && le.MouseClickLeft(buttonPrev)) return SCREENOUT_PREV;
+        if(!readonly && buttonPrev.isEnable() && le.MouseClickLeft(buttonPrev)) return SCREENOUT_PREV;
     	else
-	if(le.MouseClickLeft(rectTown))
+	if(!readonly && le.MouseClickLeft(rectTown))
 	{
 	    if(castle.isBuild(BUILD_CASTLE))
 		Dialog::Message(castle.GetStringBuilding(BUILD_CASTLE), description_castle, Font::BIG, Dialog::OK);
@@ -277,35 +270,120 @@ screen_t CastleOpenDialog1(Castle & castle)
             }
 	}
 	else
-	if(le.MouseClickLeft(dwbar.GetArea()) && dwbar.QueueEventProcessing())
+	if(!readonly && le.MouseClickLeft(dwbar.GetArea()) && dwbar.QueueEventProcessing())
 	{
 	    cursor.Hide();
 	    dwbar.Redraw();
-	    selectCastleArmy.Redraw();
+	    selectArmy1.Redraw();
 	    RedrawResourceBar(Point(dst_rt.x + 4, dst_rt.y + 181), world.GetMyKingdom().GetFundsResource());
 	    cursor.Show();
 	    display.Flip();
 	}
 	else
-	if(hero && le.MouseClickLeft(heroSign))
+	if(!readonly && castle_guardians && le.MouseClickLeft(rectSign1))
 	{
 	    cursor.Hide();
-	    const_cast<Heroes *>(hero)->OpenDialog(false, false);
+	    castle_guardians->OpenDialog(false, false);
+            if(selectArmy1.isSelected()) selectArmy1.Reset();
+            if(selectArmy2.isSelected()) selectArmy2.Reset();
+            selectArmy2.Redraw();
+	    cursor.Show();
+	    display.Flip();
+	}
+	else
+	if(!readonly && castle_heroes && le.MouseClickLeft(rectSign2))
+	{
+	    cursor.Hide();
+	    castle_heroes->OpenDialog(false, false);
+            if(selectArmy1.isSelected()) selectArmy1.Reset();
+            if(selectArmy2.isSelected()) selectArmy2.Reset();
+            selectArmy2.Redraw();
 	    cursor.Show();
 	    display.Flip();
 	}
 
 	// troops event
-        if(hero && selectHeroesArmy.isValid())
+        if(castle_heroes && selectArmy2.isValid())
         {
-    	    if(le.MouseCursor(selectCastleArmy.GetArea()) || le.MouseCursor(selectHeroesArmy.GetArea()))
-    		SelectArmyBar::QueueEventProcessing(selectCastleArmy, selectHeroesArmy);
+    	    if(le.MouseCursor(selectArmy1.GetArea()) || le.MouseCursor(selectArmy2.GetArea()))
+    		SelectArmyBar::QueueEventProcessing(selectArmy1, selectArmy2);
 	}
         else
         {
-    	    if(le.MouseCursor(selectCastleArmy.GetArea()))
-    		SelectArmyBar::QueueEventProcessing(selectCastleArmy);
+    	    if(le.MouseCursor(selectArmy1.GetArea()))
+    		SelectArmyBar::QueueEventProcessing(selectArmy1);
 	}
+
+	// move hero to guardian
+        if(conf.ExtAllowCastleGuardians() && !readonly && castle_heroes && !castle_guardians && le.MouseClickLeft(rectSign1))
+        {
+            if(! castle_heroes->GetArmy().CanJoinArmy(castle.GetArmy()))
+            {
+                // FIXME: correct message
+                Dialog::Message("Join Error", "Army is full", Font::BIG, Dialog::OK);
+            }
+            else
+            {
+                castle_heroes->SetModes(Heroes::GUARDIAN);
+                castle_heroes->ResetModes(Heroes::SLEEPER);
+                castle_guardians = castle_heroes;
+                castle_guardians->GetPath().Reset();
+                castle_guardians->GetArmy().JoinArmy(castle.GetArmy());
+
+                castle_heroes = NULL;
+
+                world.GetTiles(castle.GetCenter()).SetObject(MP2::OBJ_CASTLE);
+                castle_guardians->SaveUnderObject(MP2::OBJ_ZERO);
+
+                // free position
+                Point position(castle_guardians->GetCenter());
+                position.y -= 1;
+                castle_guardians->SetCenter(position);
+
+                cursor.Hide();
+                if(selectArmy1.isSelected()) selectArmy1.Reset();
+                if(selectArmy2.isSelected()) selectArmy2.Reset();
+                selectArmy2.ResetArmy();
+                selectArmy1.SetArmy(castle_guardians->GetArmy());
+                selectArmy1.SetSaveLastTroop();
+                RedrawIcons(castle, castle_guardians, castle_heroes, dst_rt);
+                selectArmy2.Redraw();
+                selectArmy1.Redraw();
+                cursor.Show();
+                display.Flip();
+            }
+        }
+	else
+	// move guardian to hero
+        if(conf.ExtAllowCastleGuardians() && !readonly && !castle_heroes && castle_guardians && le.MouseClickLeft(rectSign2))
+        {
+            castle_guardians->ResetModes(Heroes::GUARDIAN);
+            castle_heroes = castle_guardians;
+
+            castle_guardians = NULL;
+
+            // restore position
+            Point position(castle_heroes->GetCenter());
+            position.y += 1;
+            castle_heroes->SetCenter(position);
+
+            world.GetTiles(castle.GetCenter()).SetObject(MP2::OBJ_HEROES);
+            castle_heroes->SaveUnderObject(MP2::OBJ_CASTLE);
+
+            cursor.Hide();
+            if(selectArmy1.isSelected()) selectArmy1.Reset();
+            if(selectArmy2.isSelected()) selectArmy2.Reset();
+            selectArmy1.ResetArmy();
+            selectArmy1.SetArmy(castle.GetArmy());
+            selectArmy2.SetArmy(castle_heroes->GetArmy());
+            selectArmy2.SetSaveLastTroop();
+            RedrawIcons(castle, castle_guardians, castle_heroes, dst_rt);
+            selectArmy1.Redraw();
+            selectArmy2.Redraw();
+            cursor.Show();
+            display.Flip();
+        }
+
     }
     return SCREENOUT;
 }
