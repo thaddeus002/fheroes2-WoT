@@ -95,7 +95,7 @@ void ActionToSirens(Heroes &hero, const u8 obj, const s32 dst_index);
 void ActionToJail(Heroes &hero, const u8 obj, const s32 dst_index);
 void ActionToHutMagi(Heroes &hero, const u8 obj, const s32 dst_index);
 void ActionToEyeMagi(Heroes &hero, const u8 obj, const s32 dst_index);
-void ActionToShinx(Heroes &hero, const u8 obj, const s32 dst_index);
+void ActionToSphinx(Heroes &hero, const u8 obj, const s32 dst_index);
 void ActionToBarrier(Heroes &hero, const u8 obj, const s32 dst_index);
 void ActionToTravellersTent(Heroes &hero, const u8 obj, const s32 dst_index);
 
@@ -504,7 +504,7 @@ void Heroes::Action(const s32 dst_index)
         case MP2::OBJ_TREEKNOWLEDGE:	ActionToTreeKnowledge(*this, object, dst_index); break;
 
 	case MP2::OBJ_ORACLE:		ActionToOracle(*this, object, dst_index); break;
-        case MP2::OBJ_SPHINX:		ActionToShinx(*this, object, dst_index); break;
+        case MP2::OBJ_SPHINX:		ActionToSphinx(*this, object, dst_index); break;
 
 	// loyalty version
         case MP2::OBJ_WATERALTAR:
@@ -2881,7 +2881,7 @@ void ActionToDaemonCave(Heroes &hero, const u8 obj, const s32 dst_index)
 			world.GetKingdom(hero.GetColor()).AddFundsResource(resource);
 			tile.SetQuantity2(0);
 		    }
-		    else
+    		    else
 		    {
 			BattleLose(hero, res, true);
 		    }
@@ -3101,7 +3101,7 @@ void ActionToEyeMagi(Heroes &hero, const u8 obj, const s32 dst_index)
     DEBUG(DBG_GAME , DBG_INFO, "ActionToEyeMagi: " << hero.GetName());
 }
 
-void ActionToShinx(Heroes &hero, const u8 obj, const s32 dst_index)
+void ActionToSphinx(Heroes &hero, const u8 obj, const s32 dst_index)
 {
     GameEvent::Riddle* riddle = world.GetSphinx(dst_index);
 
@@ -3135,6 +3135,12 @@ void ActionToShinx(Heroes &hero, const u8 obj, const s32 dst_index)
 
 		riddle->SetQuiet();
 		hero.SetVisited(dst_index, Visit::GLOBAL);
+
+		if(Artifact::UNKNOWN != art)
+    		    hero.PickupArtifact(art);
+
+		if(count)
+		    world.GetKingdom(hero.GetColor()).AddFundsResource(res);
 	    }
 	    else
 	    {
