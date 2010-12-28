@@ -220,11 +220,6 @@ void Game::HotKeysDefaults(void)
     // key_events[EVENT_SWITCHGROUP] = KEY_NONE;
 }
 
-void Game::EventSwitchGroup(void)
-{
-    ++key_groups;
-}
-
 bool Game::HotKeyPress(events_t evnt)
 {
     LocalEvent & le = LocalEvent::Get();
@@ -300,6 +295,15 @@ void Game::KeyboardGlobalFilter(int sym, u16 mod)
 #endif
         if(display.Save(stream.str().c_str())) DEBUG(DBG_GAME , DBG_INFO, "Game::KeyboardGlobalFilter: save: " << stream.str());
     }
+#ifdef WITHOUT_MOUSE
+    else
+    if(sym == key_events[EVENT_EMULATETOGGLE])
+        LocalEvent::Get().ToggleEmulateMouse();
+#endif
+    else
+    // reserved
+    if(sym == key_events[EVENT_SWITCHGROUP])
+	++key_groups;
     else
     if(sym == key_events[EVENT_SYSTEM_DEBUG1])
     {

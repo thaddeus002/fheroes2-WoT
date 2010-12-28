@@ -749,10 +749,6 @@ Game::menu_t Game::HumanTurn(bool isload)
 	// hot keys
 	if(le.KeyPress())
 	{
-#ifdef WITHOUT_MOUSE
-	    if(HotKeyPress(EVENT_EMULATETOGGLE)) le.ToggleEmulateMouse();
-	    else
-#endif
 	    // exit dialog
 	    if(HotKeyPress(EVENT_DEFAULT_EXIT)) EventExit(res);
 	    else
@@ -845,9 +841,6 @@ Game::menu_t Game::HumanTurn(bool isload)
 	    // open focus
 	    else
 	    if(HotKeyPress(EVENT_OPENFOCUS)) EventOpenFocus();
-	    // switch group
-	    else
-	    if(HotKeyPress(EVENT_SWITCHGROUP)) EventSwitchGroup();
 	}
 
 	if(conf.ExtTapMode())

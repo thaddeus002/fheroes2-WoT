@@ -246,7 +246,6 @@ namespace Game
     void EventSwitchShowButtons(void);
     void EventSwitchShowIcons(void);
     void EventSwitchShowControlPanel(void);
-    void EventSwitchGroup(void);
 
     void OpenHeroesDialog(Heroes*);
     void OpenCastleDialog(Castle*);
