@@ -134,6 +134,7 @@ static const settings_t settingsFHeroes2[] =
     { Settings::GAME_HIDE_INTERFACE,		_("game: hide interface"),				},
     { Settings::POCKETPC_HIDE_CURSOR,		_("pocketpc: hide cursor"),				},
     { Settings::POCKETPC_TAP_MODE,		_("pocketpc: tap mode"),				},
+    { Settings::POCKETPC_DRAG_DROP_SCROLL,	_("pocketpc: drag&drop gamearea as scroll"),		},
     { Settings::POCKETPC_LOW_MEMORY,		_("pocketpc: low memory"),				},
 
     { 0, NULL },
@@ -1342,6 +1343,11 @@ bool Settings::ExtLowMemory(void) const
 bool Settings::ExtTapMode(void) const
 {
     return ExtModes(POCKETPC_TAP_MODE);
+}
+
+bool Settings::ExtDragDropScroll(void) const
+{
+    return ExtModes(POCKETPC_DRAG_DROP_SCROLL);
 }
 
 const Point & Settings::PosRadar(void) const { return pos_radr; }

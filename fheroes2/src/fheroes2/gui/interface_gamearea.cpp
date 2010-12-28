@@ -538,6 +538,7 @@ void Interface::GameArea::SetUpdateCursor(void)
 void Interface::GameArea::QueueEventProcessing(void)
 {
     const Settings & conf = Settings::Get();
+    Display & display = Display::Get();
     Cursor & cursor = Cursor::Get();
     LocalEvent & le = LocalEvent::Get();
     const Point & mp = le.GetMouseCursor();
@@ -562,9 +563,54 @@ void Interface::GameArea::QueueEventProcessing(void)
     // fixed pocket pc tap mode
     if(conf.HideInterface() && conf.ShowControlPanel() && le.MouseCursor(Interface::ControlPanel::Get().GetArea())) return;
 
-    // fixed pocket pc: click on maps after scroll (pause: ~800 ms)
+
+
     if(conf.ExtTapMode())
     {
+	// drag&drop gamearea: scroll
+	if(conf.ExtDragDropScroll() && le.MousePressLeft())
+	{
+	    Point pt1 = le.GetMouseCursor();
+	    Interface::Basic & I = Interface::Basic::Get();
+
+    	    while(le.HandleEvents() && le.MousePressLeft())
+	    {
+		const Point & pt2 = le.GetMouseCursor();
+
+		if(pt1 != pt2)
+		{
+		    s16 dx = pt2.x - pt1.x;
+		    s16 dy = pt2.y - pt1.y;
+		    s16 dd = scrollStep;
+
+		    while(1)
+		    {
+			if(dd <= dx){ SetScroll(SCROLL_LEFT); dx -= dd; }
+			else
+			if(-dd >= dx){ SetScroll(SCROLL_RIGHT); dx += dd; }
+
+			if(dd <= dy){ SetScroll(SCROLL_TOP); dy -= dd; }
+			else
+			if(-dd >= dy){ SetScroll(SCROLL_BOTTOM); dy += dd; }
+
+			if(NeedScroll())
+			{
+			    cursor.Hide();
+			    Scroll();
+			    I.SetRedraw(REDRAW_GAMEAREA);
+			    I.Redraw();
+			    cursor.Show();
+			    display.Flip();
+			}
+			else break;
+		    }
+		}
+
+		DELAY(10);
+	    }
+	}
+
+	// fixed pocket pc: click on maps after scroll (pause: ~800 ms)
 	scrollTime.Stop();
 	if(800 > scrollTime.Get()) return;
     }
