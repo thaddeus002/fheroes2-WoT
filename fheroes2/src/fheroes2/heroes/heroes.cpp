@@ -973,6 +973,8 @@ bool Heroes::IsFullBagArtifacts(void) const
 
 bool Heroes::PickupArtifact(const Artifact::artifact_t art)
 {
+    if(Artifact::MAGIC_BOOK == art) SpellBookActivate();
+
     return PickupArtifact(Artifact(art));
 }
 
