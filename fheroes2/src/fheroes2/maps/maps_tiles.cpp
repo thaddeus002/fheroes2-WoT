@@ -1513,7 +1513,7 @@ void Maps::Tiles::UpdateQuantity(void)
 	    quantity2 = 2;
 	    quantity1 = Resource::WOOD;
 	    // except: wood, bugs: #3117478
-	    while(quantity1 != Resource::WOOD) quantity1 = Resource::Rand();
+	    while(quantity1 == Resource::WOOD) quantity1 = Resource::Rand();
 	break;
 
 	case MP2::OBJ_LEANTO:

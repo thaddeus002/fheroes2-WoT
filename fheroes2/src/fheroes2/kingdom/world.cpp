@@ -1173,18 +1173,22 @@ void World::NewDay(void)
     }
 }
 
+void WeekLifeUpdateQuantity(Maps::Tiles* tile)
+{
+    if(MP2::isWeekLife(tile->GetObject())) tile->UpdateQuantity();
+}
+
 void World::NewWeek(void)
 {
     UpdateDwellingPopulation();
 
-    if(1 < week) UpdateMonsterPopulation();
+    if(1 < week)
+    {
+	UpdateMonsterPopulation();
 
-    // update week object
-    std::vector<Maps::Tiles *>::const_iterator it1 = vec_tiles.begin();
-    std::vector<Maps::Tiles *>::const_iterator it2 = vec_tiles.end();
-
-    for(; it1 != it2; ++it1)
-	if(*it1 && MP2::isWeekLife((*it1)->GetObject())) (*it1)->UpdateQuantity();
+	// update week object
+	std::for_each(vec_tiles.begin(), vec_tiles.end(), WeekLifeUpdateQuantity);
+    }
 
     // update week type
     week_name = BeginMonth() ? Week::MonthRand() : Week::WeekRand();
