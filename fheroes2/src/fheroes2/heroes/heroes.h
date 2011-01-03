@@ -259,6 +259,7 @@ private:
 
     Army::army_t        army;
 
+    heroes_t		hid;
     heroes_t		portrait;
     Race::race_t	race;
 

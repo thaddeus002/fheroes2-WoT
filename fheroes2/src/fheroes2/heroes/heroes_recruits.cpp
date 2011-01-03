@@ -69,12 +69,12 @@ Heroes* Recruits::GetHero2(void)
 
 void Recruits::SetHero1(const Heroes* hero)
 {
-    first = hero ? hero->portrait : Heroes::UNKNOWN;
+    first = hero ? hero->hid : Heroes::UNKNOWN;
 }
 
 void Recruits::SetHero2(const Heroes* hero)
 {
-    second = hero ? hero->portrait : Heroes::UNKNOWN;
+    second = hero ? hero->hid : Heroes::UNKNOWN;
 }
 
 void Recruits::SetHero1(Heroes::heroes_t id)

@@ -110,7 +110,7 @@ Heroes::Heroes() : move_point_scale(-1), army(this), path(*this),
 }
 
 Heroes::Heroes(heroes_t ht, Race::race_t rc) : killer_color(Color::GRAY), experience(0), move_point(0),
-    move_point_scale(-1), army(this), portrait(ht), race(rc),
+    move_point_scale(-1), army(this), hid(ht), portrait(ht), race(rc),
     save_maps_object(MP2::OBJ_ZERO), path(*this), direction(Direction::RIGHT), sprite_index(18), patrol_square(0)
 {
     name = _(HeroesName(ht));
@@ -137,7 +137,7 @@ Heroes::Heroes(heroes_t ht, Race::race_t rc) : killer_color(Color::GRAY), experi
     army.Reset(true);
 
     // extra hero
-    switch(portrait)
+    switch(hid)
     {
         case ROLAND:
             attack    = 0;
@@ -375,7 +375,12 @@ void Heroes::LoadFromMP2(s32 map_index, const void *ptr, const Color::color_t cl
 	custom_portrait = true;
 	++ptr8;
 	// index sprite portrait
-	if(portrait != ConvertID(*ptr8)) DEBUG(DBG_GAME, DBG_WARN, "Heroes::LoadFromMP2: " << "custom portrait incorrect");
+	portrait = ConvertID(*ptr8);
+	if(UNKNOWN == portrait)
+	{
+	    DEBUG(DBG_GAME, DBG_WARN, "Heroes::LoadFromMP2: " << "custom portrait incorrect: " << static_cast<int>(portrait));
+	    portrait = hid;
+	}
 	++ptr8;
     }
     else
@@ -500,7 +505,7 @@ void Heroes::LoadFromMP2(s32 map_index, const void *ptr, const Color::color_t cl
 
 Heroes::heroes_t Heroes::GetID(void) const
 {
-    return portrait;
+    return hid;
 }
 
 u8 Heroes::GetMobilityIndexSprite(void) const

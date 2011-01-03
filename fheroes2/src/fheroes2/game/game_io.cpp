@@ -550,6 +550,7 @@ void Game::IO::PackCastle(QueueMessage & msg, const Castle & castle)
 
 void Game::IO::PackHeroes(QueueMessage & msg, const Heroes & hero)
 {
+    msg.Push(static_cast<u8>(hero.hid));
     msg.Push(static_cast<u8>(hero.portrait));
     msg.Push(static_cast<u8>(hero.race));
 
@@ -1216,6 +1217,10 @@ void Game::IO::UnpackHeroes(QueueMessage & msg, Heroes & hero, u16 check_version
     u16 byte16;
     u32 byte32;
 
+    if(FORMAT_VERSION_2154 <= check_version)
+    {
+	msg.Pop(byte8); hero.hid = Heroes::ConvertID(byte8);
+    }
     msg.Pop(byte8); hero.portrait = Heroes::ConvertID(byte8);
     msg.Pop(byte8); hero.race = Race::Get(byte8);
 
