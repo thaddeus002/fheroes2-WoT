@@ -911,14 +911,24 @@ void Heroes::RescanPath(void)
 /* if hero in castle */
 const Castle* Heroes::inCastle(void) const
 {
-    const s32 & index = GetIndex();
-    return Color::GRAY != color ? world.GetCastle(index) : NULL;
+    if(Color::GRAY != color)
+    {
+	const Castle* castle = world.GetCastle(GetIndex());
+	if(castle && this == world.GetHeroes(*castle, false))
+	    return castle;
+    }
+    return NULL;
 }
 
 Castle* Heroes::inCastle(void)
 {
-    const s32 & index = GetIndex();
-    return Color::GRAY != color ? world.GetCastle(index) : NULL;
+    if(Color::GRAY != color)
+    {
+	Castle* castle = world.GetCastle(GetIndex());
+	if(castle && this == world.GetHeroes(*castle, false))
+	    return castle;
+    }
+    return NULL;
 }
 
 /* is visited cell */

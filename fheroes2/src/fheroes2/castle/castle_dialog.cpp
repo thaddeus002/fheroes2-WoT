@@ -668,6 +668,7 @@ Dialog::answer_t Castle::OpenDialog(bool readonly, bool fade)
 	{
 	    const Heroes * prev = castle_heroes;
 	    const u32 build = OpenTown();
+	    castle_heroes = world.GetHeroes(*this, false);
 	    const bool buyhero = ((castle_heroes != prev) && (castle_heroes != NULL));
 
 	    if(BUILD_NOTHING != build)
