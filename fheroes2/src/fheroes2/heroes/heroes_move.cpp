@@ -357,14 +357,12 @@ void Heroes::MoveStep(Heroes & hero, s32 index_from, s32 index_to, bool newpos)
 	hero.ActionNewPosition();
 
 	// possible hero is die
-	if(!hero.isFreeman())
+	if(!hero.isFreeman() &&
+	    index_to == hero.GetPath().GetDestinationIndex())
 	{
-	    if(index_to == hero.GetPath().GetDestinationIndex())
-	    {
-		hero.GetPath().Reset();
-		hero.Action(index_to);
-		hero.SetMove(false);
-	    }
+	    hero.GetPath().Reset();
+	    hero.Action(index_to);
+	    hero.SetMove(false);
 	}
     }
     else

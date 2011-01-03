@@ -744,8 +744,14 @@ bool MP2::isWaterObject(const u8 obj)
 	    case OBJ_MAGELLANMAPS:
 	    case OBJ_COAST:
 
-    	    case MP2::OBJ_MERMAID:
-    	    case MP2::OBJ_SIRENS:
+    	    case OBJ_MERMAID:
+    	    case OBJ_SIRENS:
+
+    	    // hack (bug: #3142729)
+	    case OBJ_MONSTER:
+	    case OBJ_ARTIFACT:
+	    case OBJ_RESOURCE:
+
             return true;
 
         default: break;

@@ -55,6 +55,10 @@ u16 DialogWithArtifact(const std::string & hdr, const std::string & msg, const A
 namespace Game
 {
     Cursor::themes_t GetCursor(const s32);
+    Cursor::themes_t GetCursorFocusCastle(const Castle &, const Maps::Tiles &);
+    Cursor::themes_t GetCursorFocusHeroes(const Heroes &, const Maps::Tiles &);
+    Cursor::themes_t GetCursorFocusShipmaster(const Heroes &, const Maps::Tiles &);
+
     void ShowPathOrStartMoveHero(Heroes *hero, const s32 dst_index);
     menu_t HumanTurn(bool);
     bool DiggingForArtifacts(const Heroes & hero);
@@ -405,224 +409,227 @@ void Game::OpenHeroesDialog(Heroes *hero)
 }
 
 /* return changee cursor */
+Cursor::themes_t Game::GetCursorFocusCastle(const Castle & from_castle, const Maps::Tiles & tile)
+{
+    switch(tile.GetObject())
+    {
+    	case MP2::OBJN_CASTLE:
+    	case MP2::OBJ_CASTLE:
+    	{
+    	    const Castle *to_castle = world.GetCastle(tile.GetIndex());
+
+    	    if(NULL != to_castle)
+    		return to_castle->GetColor() == from_castle.GetColor() ? Cursor::CASTLE : Cursor::POINTER;
+	}
+	break;
+
+	case MP2::OBJ_HEROES:
+    	{
+    	    const Heroes *heroes = world.GetHeroes(tile.GetIndex());
+
+	    if(NULL != heroes)
+    		return heroes->GetColor() == from_castle.GetColor() ? Cursor::HEROES : Cursor::POINTER;
+	}
+	break;
+
+	default: break;
+    }
+
+    return Cursor::POINTER;
+}
+
+Cursor::themes_t Game::GetCursorFocusShipmaster(const Heroes & from_hero, const Maps::Tiles & tile)
+{
+    const Settings & conf = Settings::Get();
+
+    switch(tile.GetObject())
+    {
+	case MP2::OBJ_MONSTER:
+    	    return from_hero.Modes(Heroes::GUARDIAN) ? Cursor::POINTER :
+		    Cursor::DistanceThemes(Cursor::FIGHT, from_hero.GetRangeRouteDays(tile.GetIndex()));
+
+	case MP2::OBJ_BOAT:
+	    return Cursor::POINTER;
+
+	case MP2::OBJN_CASTLE:
+    	case MP2::OBJ_CASTLE:
+	{
+    	    const Castle *castle = world.GetCastle(tile.GetIndex());
+
+    	    if(NULL != castle)
+    		return from_hero.GetColor() == castle->GetColor() ? Cursor::CASTLE : Cursor::POINTER;
+    	}
+    	break;
+
+	case MP2::OBJ_HEROES:
+	{
+	    const Heroes * to_hero = world.GetHeroes(tile.GetIndex());
+
+    	    if(NULL != to_hero && to_hero->isShipMaster())
+    	    {
+		if(to_hero->GetCenter() == from_hero.GetCenter())
+		    return Cursor::HEROES;
+		else
+		if(from_hero.GetColor() == to_hero->GetColor())
+		    return Cursor::DistanceThemes(Cursor::CHANGE, from_hero.GetRangeRouteDays(tile.GetIndex()));
+		else
+		if(conf.IsUnions(from_hero.GetColor(), to_hero->GetColor()))
+		    return conf.ExtUnionsAllowHeroesMeetings() ? Cursor::CHANGE : Cursor::POINTER;
+		else
+		if(to_hero->AllowBattle())
+		    return Cursor::DistanceThemes(Cursor::FIGHT, from_hero.GetRangeRouteDays(tile.GetIndex()));
+	    }
+    	}
+    	break;
+
+	case MP2::OBJ_COAST:
+	    return Cursor::DistanceThemes(Cursor::ANCHOR, from_hero.GetRangeRouteDays(tile.GetIndex()));
+
+	default:
+	    if(MP2::isWaterObject(tile.GetObject()))
+		return Cursor::DistanceThemes(Cursor::REDBOAT, from_hero.GetRangeRouteDays(tile.GetIndex()));
+	    else
+	    if(tile.isPassable(&from_hero))
+		return Cursor::DistanceThemes(Cursor::BOAT, from_hero.GetRangeRouteDays(tile.GetIndex()));
+	break;
+    }
+
+    return Cursor::POINTER;
+}
+
+Cursor::themes_t Game::GetCursorFocusHeroes(const Heroes & from_hero, const Maps::Tiles & tile)
+{
+    const Settings & conf = Settings::Get();
+
+    if(from_hero.Modes(Heroes::ENABLEMOVE))
+	return Cursor::Get().Themes();
+    else
+    if(from_hero.isShipMaster())
+	return GetCursorFocusShipmaster(from_hero, tile);
+
+    switch(tile.GetObject())
+    {
+	case MP2::OBJ_MONSTER:
+    	    return from_hero.Modes(Heroes::GUARDIAN) ? Cursor::POINTER :
+		    Cursor::DistanceThemes(Cursor::FIGHT, from_hero.GetRangeRouteDays(tile.GetIndex()));
+
+	case MP2::OBJN_CASTLE:
+    	{
+    	    const Castle *castle = world.GetCastle(tile.GetIndex());
+
+    	    if(NULL != castle)
+	    {
+		if(from_hero.GetColor() == castle->GetColor())
+		    return Cursor::CASTLE;
+		else
+		if(from_hero.Modes(Heroes::GUARDIAN))
+		    return Cursor::POINTER;
+		else
+		if(conf.IsUnions(from_hero.GetColor(), castle->GetColor()))
+		    return conf.ExtUnionsAllowCastleVisiting() ? Cursor::ACTION : Cursor::POINTER;
+		else
+		if(castle->GetArmy().isValid())
+		    return Cursor::DistanceThemes(Cursor::FIGHT, from_hero.GetRangeRouteDays(tile.GetIndex()));
+		else
+		    return Cursor::DistanceThemes(Cursor::ACTION, from_hero.GetRangeRouteDays(tile.GetIndex()));
+	    }
+    	}
+    	break;
+
+    	case MP2::OBJ_CASTLE:
+    	{
+    	    const Castle *castle = world.GetCastle(tile.GetIndex());
+
+    	    if(NULL != castle)
+	    {
+		if(from_hero.Modes(Heroes::GUARDIAN))
+		    return from_hero.GetColor() == castle->GetColor() ? Cursor::CASTLE : Cursor::POINTER;
+		else
+		if(from_hero.GetColor() == castle->GetColor())
+		    return Cursor::DistanceThemes(Cursor::ACTION, from_hero.GetRangeRouteDays(tile.GetIndex()));
+		else
+		if(conf.IsUnions(from_hero.GetColor(), castle->GetColor()))
+		    return conf.ExtUnionsAllowCastleVisiting() ? Cursor::ACTION : Cursor::POINTER;
+		else
+		if(castle->GetArmy().isValid())
+		    return Cursor::DistanceThemes(Cursor::FIGHT, from_hero.GetRangeRouteDays(tile.GetIndex()));
+		else
+		    return Cursor::DistanceThemes(Cursor::ACTION, from_hero.GetRangeRouteDays(tile.GetIndex()));
+	    }
+        }
+        break;
+
+	case MP2::OBJ_HEROES:
+	{
+	    const Heroes* to_hero = world.GetHeroes(tile.GetIndex());
+
+    	    if(NULL != to_hero && (!to_hero->isShipMaster() ||
+			from_hero.CanPassToShipMaster(*to_hero)))
+    	    {
+		if(from_hero.Modes(Heroes::GUARDIAN))
+		    return from_hero.GetColor() == to_hero->GetColor() ? Cursor::HEROES : Cursor::POINTER;
+		else
+		if(to_hero->GetCenter() == from_hero.GetCenter())
+		    return Cursor::HEROES;
+		else
+		if(from_hero.GetColor() == to_hero->GetColor())
+		    return Cursor::DistanceThemes(Cursor::CHANGE, from_hero.GetRangeRouteDays(tile.GetIndex()));
+		else
+		if(conf.IsUnions(from_hero.GetColor(), to_hero->GetColor()))
+		    return conf.ExtUnionsAllowHeroesMeetings() ? Cursor::CHANGE : Cursor::POINTER;
+		else
+		    return Cursor::DistanceThemes(Cursor::FIGHT, from_hero.GetRangeRouteDays(tile.GetIndex()));
+	    }
+    	}
+    	break;
+
+    	case MP2::OBJ_BOAT:
+    		return from_hero.Modes(Heroes::GUARDIAN) ? Cursor::POINTER :
+			Cursor::DistanceThemes(Cursor::BOAT, from_hero.GetRangeRouteDays(tile.GetIndex()));
+
+	default:
+	    if(from_hero.Modes(Heroes::GUARDIAN))
+		return Cursor::POINTER;
+	    else
+	    if(MP2::isGroundObject(tile.GetObject()))
+	    {
+		bool protection = (MP2::isPickupObject(tile.GetObject()) ? false :
+				(Maps::TileUnderProtection(tile.GetIndex()) ||
+					 tile.CaptureObjectIsProtection(from_hero.GetColor())));
+
+		return Cursor::DistanceThemes((protection ? Cursor::FIGHT : Cursor::ACTION),
+						from_hero.GetRangeRouteDays(tile.GetIndex()));
+	    }
+	    else
+	    if(tile.isPassable(&from_hero))
+	    {
+		bool protection = Maps::TileUnderProtection(tile.GetIndex());
+
+		return Cursor::DistanceThemes((protection ? Cursor::FIGHT : Cursor::MOVE),
+	    					from_hero.GetRangeRouteDays(tile.GetIndex()));
+	    }
+	break;
+    }
+
+    return Cursor::POINTER;
+}
+
 Cursor::themes_t Game::GetCursor(const s32 dst_index)
 {
     const Maps::Tiles & tile = world.GetTiles(dst_index);
     if(tile.isFog(Settings::Get().MyColor())) return Cursor::POINTER;
 
     const Game::Focus & focus = Game::Focus::Get();
-    const Settings & conf = Settings::Get();
 
     switch(focus.Type())
     {
 	case Focus::HEROES:
-	{
-	    const Heroes & from_hero = focus.GetHeroes();
-
-	    if(from_hero.Modes(Heroes::ENABLEMOVE)) return Cursor::Get().Themes();
-
-	    if(from_hero.isShipMaster())
-	    {
-		switch(tile.GetObject())
-		{
-		    case MP2::OBJ_BOAT:
-    			return Cursor::POINTER;
-
-		    case MP2::OBJN_CASTLE:
-    		    {
-    			const Castle *castle = world.GetCastle(dst_index);
-
-    			if(NULL != castle)
-    			    return from_hero.GetColor() == castle->GetColor() ? Cursor::CASTLE : Cursor::POINTER;
-    		    }
-    		    break;
-
-    		    case MP2::OBJ_CASTLE:
-    		    {
-    			const Castle *castle = world.GetCastle(dst_index);
-
-    			if(NULL != castle)
-			    return from_hero.GetColor() == castle->GetColor() ? Cursor::CASTLE : Cursor::POINTER;
-        	    }
-        	    break;
-
-		    case MP2::OBJ_HEROES:
-		    {
-			const Heroes * to_hero = world.GetHeroes(dst_index);
-
-    			if(NULL != to_hero && to_hero->isShipMaster())
-    			{
-			    if(to_hero->GetCenter() == from_hero.GetCenter())
-				return Cursor::HEROES;
-			    else
-			    if(from_hero.GetColor() == to_hero->GetColor())
-				return Cursor::DistanceThemes(Cursor::CHANGE, from_hero.GetRangeRouteDays(dst_index));
-			    else
-			    if(conf.IsUnions(from_hero.GetColor(), to_hero->GetColor()))
-			    	return conf.ExtUnionsAllowHeroesMeetings() ? Cursor::CHANGE : Cursor::POINTER;
-			    else
-			    if(to_hero->AllowBattle())
-				return Cursor::DistanceThemes(Cursor::FIGHT, from_hero.GetRangeRouteDays(dst_index));
-			}
-    		    }
-    		    break;
-
-		    case MP2::OBJ_COAST:
-			return Cursor::DistanceThemes(Cursor::ANCHOR, from_hero.GetRangeRouteDays(dst_index));
-
-		    default:
-			if(MP2::isWaterObject(tile.GetObject()))
-			    return Cursor::DistanceThemes(Cursor::REDBOAT, from_hero.GetRangeRouteDays(dst_index));
-			else
-			if(tile.isPassable(&from_hero))
-			    return Cursor::DistanceThemes(Cursor::BOAT, from_hero.GetRangeRouteDays(dst_index));
-			else
-			    return Cursor::POINTER;
-		}
-	    }
-	    else
-	    {
-		switch(tile.GetObject())
-		{
-    		    case MP2::OBJ_MONSTER:
-    			return from_hero.Modes(Heroes::GUARDIAN) ? Cursor::POINTER :
-				Cursor::DistanceThemes(Cursor::FIGHT, from_hero.GetRangeRouteDays(dst_index));
-
-		    case MP2::OBJN_CASTLE:
-    		    {
-    			const Castle *castle = world.GetCastle(dst_index);
-
-    			if(NULL != castle)
-			{
-			    if(from_hero.GetColor() == castle->GetColor())
-				return Cursor::CASTLE;
-			    else
-			    if(from_hero.Modes(Heroes::GUARDIAN))
-				return Cursor::POINTER;
-			    else
-			    if(conf.IsUnions(from_hero.GetColor(), castle->GetColor()))
-			    	return conf.ExtUnionsAllowCastleVisiting() ? Cursor::ACTION : Cursor::POINTER;
-			    else
-			    if(castle->GetArmy().isValid())
-				return Cursor::DistanceThemes(Cursor::FIGHT, from_hero.GetRangeRouteDays(dst_index));
-			    else
-				return Cursor::DistanceThemes(Cursor::ACTION, from_hero.GetRangeRouteDays(dst_index));
-			}
-    		    }
-    		    break;
-
-    		    case MP2::OBJ_CASTLE:
-    		    {
-    			const Castle *castle = world.GetCastle(dst_index);
-
-    			if(NULL != castle)
-			{
-			    if(from_hero.Modes(Heroes::GUARDIAN))
-				return from_hero.GetColor() == castle->GetColor() ? Cursor::CASTLE : Cursor::POINTER;
-			    else
-			    if(from_hero.GetColor() == castle->GetColor())
-				return Cursor::DistanceThemes(Cursor::ACTION, from_hero.GetRangeRouteDays(dst_index));
-			    else
-			    if(conf.IsUnions(from_hero.GetColor(), castle->GetColor()))
-			    	return conf.ExtUnionsAllowCastleVisiting() ? Cursor::ACTION : Cursor::POINTER;
-			    else
-			    if(castle->GetArmy().isValid())
-				return Cursor::DistanceThemes(Cursor::FIGHT, from_hero.GetRangeRouteDays(dst_index));
-			    else
-				return Cursor::DistanceThemes(Cursor::ACTION, from_hero.GetRangeRouteDays(dst_index));
-			}
-        	    }
-        	    break;
-
-		    case MP2::OBJ_HEROES:
-		    {
-			const Heroes* to_hero = world.GetHeroes(dst_index);
-
-    			if(NULL != to_hero && (!to_hero->isShipMaster() ||
-			    from_hero.CanPassToShipMaster(*to_hero)))
-    			{
-			    if(from_hero.Modes(Heroes::GUARDIAN))
-				return from_hero.GetColor() == to_hero->GetColor() ? Cursor::HEROES : Cursor::POINTER;
-			    else
-			    if(to_hero->GetCenter() == from_hero.GetCenter())
-				return Cursor::HEROES;
-			    else
-			    if(from_hero.GetColor() == to_hero->GetColor())
-				return Cursor::DistanceThemes(Cursor::CHANGE, from_hero.GetRangeRouteDays(dst_index));
-			    else
-			    if(conf.IsUnions(from_hero.GetColor(), to_hero->GetColor()))
-			    	return conf.ExtUnionsAllowHeroesMeetings() ? Cursor::CHANGE : Cursor::POINTER;
-			    else
-				return Cursor::DistanceThemes(Cursor::FIGHT, from_hero.GetRangeRouteDays(dst_index));
-			}
-    		    }
-    		    break;
-
-    		    case MP2::OBJ_BOAT:
-    			return from_hero.Modes(Heroes::GUARDIAN) ? Cursor::POINTER :
-				    Cursor::DistanceThemes(Cursor::BOAT, from_hero.GetRangeRouteDays(dst_index));
-
-		    default:
-			if(from_hero.Modes(Heroes::GUARDIAN))
-			    return Cursor::POINTER;
-			else
-			if(MP2::isGroundObject(tile.GetObject()))
-			{
-				bool protection = (MP2::isPickupObject(tile.GetObject()) ? false :
-					(Maps::TileUnderProtection(dst_index) ||
-					 tile.CaptureObjectIsProtection(from_hero.GetColor())));
-
-				return Cursor::DistanceThemes((protection ? Cursor::FIGHT : Cursor::ACTION),
-								from_hero.GetRangeRouteDays(dst_index));
-			}
-			else
-			if(tile.isPassable(&from_hero))
-			{
-				bool protection = Maps::TileUnderProtection(dst_index);
-
-				return Cursor::DistanceThemes((protection ? Cursor::FIGHT : Cursor::MOVE),
-								from_hero.GetRangeRouteDays(dst_index));
-			}
-			else
-				return Cursor::POINTER;
-		}
-	    }
-	}
-	break;
+	    return GetCursorFocusHeroes(focus.GetHeroes(), tile);
 
 	case Focus::CASTLE:
-	{
-	    const Castle & from_castle = focus.GetCastle();
+	    return GetCursorFocusCastle(focus.GetCastle(), tile);
 
-	    switch(tile.GetObject())
-	    {
-    		case MP2::OBJN_CASTLE:
-    		case MP2::OBJ_CASTLE:
-    		{
-    		    const Castle *to_castle = world.GetCastle(dst_index);
-
-    		    if(NULL != to_castle)
-    			return to_castle->GetColor() == from_castle.GetColor() ? Cursor::CASTLE : Cursor::POINTER;
-		}
-		break;
-
-		case MP2::OBJ_HEROES:
-    		{
-    		    const Heroes *heroes = world.GetHeroes(dst_index);
-
-		    if(NULL != heroes)
-    			return heroes->GetColor() == from_castle.GetColor() ? Cursor::HEROES : Cursor::POINTER;
-		}
-		break;
-
-		default:
-		    return Cursor::POINTER;
-	    }
-	}
-	break;
-
-    	default:
-    	break;
+    	default: break;
     }
 
     return Cursor::POINTER;
