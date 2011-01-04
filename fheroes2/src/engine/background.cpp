@@ -49,8 +49,8 @@ void Background::Save(void)
 
     if(! Surface::isValid()) Set(Rect::w, Rect::h, false);
 
-    Blit(Display::Get(), *this, 0, 0);
     SetDisplayFormat();
+    Blit(Display::Get(), *this, 0, 0);
 }
 
 void Background::Save(s16 ax, s16 ay)
