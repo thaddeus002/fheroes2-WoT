@@ -782,7 +782,7 @@ u32 Battle2::Stats::CalculateDamageStats(const Stats & enemy, double dmg) const
     {
 	case Monster::GENIE:
 	    // 10% half
-	    if(dmg < enemy.hp / 2 &&
+	    if(dmg < enemy.hp &&
 	       genie_enemy_half_percent >= Rand::Get(1, 100))
 	    {
 		dmg = enemy.hp / 2;
