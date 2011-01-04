@@ -326,7 +326,7 @@ const Rect & BuildingInfo::GetArea(void) const
 
 bool BuildingInfo::AllowBuy(void) const
 {
-    return castle.AllowBuyBuilding(building);
+    return castle.isCastle() && castle.AllowBuyBuilding(building);
 }
 
 bool BuildingInfo::IsDisable(void) const

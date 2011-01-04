@@ -59,11 +59,85 @@ void RedrawIcons(const Castle & castle, const Heroes* hero1, const Heroes* hero2
 enum screen_t { SCREENOUT, SCREENOUT_PREV, SCREENOUT_NEXT, SCREEN1, SCREEN2, SCREEN3, SCREEN4, SCREEN5, SCREEN6 };
 
 screen_t CastleOpenDialog1(Castle &, bool);
-screen_t CastleOpenDialog2(Castle &);
-screen_t CastleOpenDialog3(Castle &);
-screen_t CastleOpenDialog4(Castle &);
-screen_t CastleOpenDialog5(Castle &);
-screen_t CastleOpenDialog6(Castle &);
+screen_t CastleOpenDialog2(Castle &, bool);
+screen_t CastleOpenDialog3(Castle &, bool);
+screen_t CastleOpenDialog4(Castle &, bool);
+screen_t CastleOpenDialog5(Castle &, bool);
+screen_t CastleOpenDialog6(Castle &, bool);
+
+class ScreenSwitch
+{
+public:
+    ScreenSwitch(const Castle &, const Rect &, bool);
+
+    void Redraw(void);
+    bool QueueEventProcessing(void);
+
+    const Castle & castle;
+    const Rect rtScreen1;
+    const Rect rtScreen2;
+    const Rect rtScreen3;
+    const Rect rtScreen4;
+    const Rect rtScreen5;
+    const Rect rtScreen6;
+    const bool readonly;
+    screen_t result;
+};
+
+ScreenSwitch::ScreenSwitch(const Castle & cstl, const Rect & rt, bool ronly) :
+    castle(cstl),
+    rtScreen1(rt.x + rt.w - 27, rt.y + 32, 25, 25),
+    rtScreen2(rt.x + rt.w - 27, rt.y + 58, 25, 25),
+    rtScreen3(rt.x + rt.w - 27, rt.y + 84, 25, 25),
+    rtScreen4(rt.x + rt.w - 27, rt.y + 110, 25, 25),
+    rtScreen5(rt.x + rt.w - 27, rt.y + 136, 25, 25),
+    rtScreen6(rt.x + rt.w - 27, rt.y + 162, 25, 25),
+    readonly(ronly),
+    result(SCREENOUT)
+{
+}
+
+void ScreenSwitch::Redraw(void)
+{
+    Display & display = Display::Get();
+
+    display.Blit(AGG::GetICN(ICN::REQUESTS, 20), rtScreen1.x, rtScreen1.y);
+
+    if(!readonly)
+    {
+	if(castle.isBuild(BUILD_CASTLE))
+	{
+	    display.Blit(AGG::GetICN(ICN::REQUESTS, 21), rtScreen2.x, rtScreen2.y);
+	    display.Blit(AGG::GetICN(ICN::REQUESTS, 22), rtScreen3.x, rtScreen3.y);
+	    display.Blit(AGG::GetICN(ICN::REQUESTS, 23), rtScreen4.x, rtScreen4.y);
+	}
+
+	if(castle.isBuild(BUILD_MAGEGUILD1))
+	    display.Blit(AGG::GetICN(ICN::REQUESTS, 24), rtScreen5.x, rtScreen5.y);
+
+	display.Blit(AGG::GetICN(ICN::REQUESTS, 25), rtScreen6.x, rtScreen6.y);
+    }
+}
+
+bool ScreenSwitch::QueueEventProcessing(void)
+{
+    LocalEvent & le = LocalEvent::Get();
+    result = SCREENOUT;
+
+    if(le.MouseClickLeft(rtScreen1)) result = SCREEN1;
+    else
+    if(castle.isBuild(BUILD_CASTLE) && le.MouseClickLeft(rtScreen2)) result = SCREEN2;
+    else
+    if(castle.isBuild(BUILD_CASTLE) && le.MouseClickLeft(rtScreen3)) result = SCREEN3;
+    else
+    if(castle.isBuild(BUILD_CASTLE) && le.MouseClickLeft(rtScreen4)) result = SCREEN4;
+    else
+    if(castle.isBuild(BUILD_MAGEGUILD1) && le.MouseClickLeft(rtScreen5)) result = SCREEN5;
+    else
+    if(le.MouseClickLeft(rtScreen6)) result = SCREEN6;
+
+    return result != SCREENOUT;
+}
 
 Dialog::answer_t PocketPC::CastleOpenDialog(Castle & castle, bool readonly)
 {
@@ -74,11 +148,11 @@ Dialog::answer_t PocketPC::CastleOpenDialog(Castle & castle, bool readonly)
 	switch(screen)
 	{
 	    case SCREEN1: screen = CastleOpenDialog1(castle, readonly); break;
-	    case SCREEN2: screen = CastleOpenDialog2(castle); break;
-	    case SCREEN3: screen = CastleOpenDialog3(castle); break;
-	    case SCREEN4: screen = CastleOpenDialog4(castle); break;
-	    case SCREEN5: screen = CastleOpenDialog5(castle); break;
-	    case SCREEN6: screen = CastleOpenDialog6(castle); break;
+	    case SCREEN2: screen = CastleOpenDialog2(castle, readonly); break;
+	    case SCREEN3: screen = CastleOpenDialog3(castle, readonly); break;
+	    case SCREEN4: screen = CastleOpenDialog4(castle, readonly); break;
+	    case SCREEN5: screen = CastleOpenDialog5(castle, readonly); break;
+	    case SCREEN6: screen = CastleOpenDialog6(castle, readonly); break;
 	    case SCREENOUT_PREV: return Dialog::PREV;
 	    case SCREENOUT_NEXT: return Dialog::NEXT;
 	    default: break;
@@ -181,28 +255,8 @@ screen_t CastleOpenDialog1(Castle & castle, bool readonly)
     const Rect rectExit(dst_rt.x + dst_rt.w - 26, dst_rt.y + 7, 25, 25);
     display.Blit(AGG::GetICN(ICN::TOWNWIND, 12), rectExit.x, rectExit.y);
 
-    const Rect rectScreen1(dst_rt.x + dst_rt.w - 27, dst_rt.y + 32, 25, 25);
-    const Rect rectScreen2(dst_rt.x + dst_rt.w - 27, dst_rt.y + 58, 25, 25);
-    const Rect rectScreen3(dst_rt.x + dst_rt.w - 27, dst_rt.y + 84, 25, 25);
-    const Rect rectScreen4(dst_rt.x + dst_rt.w - 27, dst_rt.y + 110, 25, 25);
-    const Rect rectScreen5(dst_rt.x + dst_rt.w - 27, dst_rt.y + 136, 25, 25);
-    const Rect rectScreen6(dst_rt.x + dst_rt.w - 27, dst_rt.y + 162, 25, 25);
-
-    display.Blit(AGG::GetICN(ICN::REQUESTS, 20), rectScreen1.x, rectScreen1.y);
-
-    if(!readonly)
-    {
-	if(castle.isBuild(BUILD_CASTLE))
-	{
-	    display.Blit(AGG::GetICN(ICN::REQUESTS, 21), rectScreen2.x, rectScreen2.y);
-	    display.Blit(AGG::GetICN(ICN::REQUESTS, 22), rectScreen3.x, rectScreen3.y);
-	    display.Blit(AGG::GetICN(ICN::REQUESTS, 23), rectScreen4.x, rectScreen4.y);
-	}
-	if(castle.isBuild(BUILD_CASTLE) || castle.isBuild(BUILD_TAVERN))
-	    display.Blit(AGG::GetICN(ICN::REQUESTS, 24), rectScreen5.x, rectScreen5.y);
-	if(castle.isBuild(BUILD_MAGEGUILD1))
-	    display.Blit(AGG::GetICN(ICN::REQUESTS, 25), rectScreen6.x, rectScreen6.y);
-    }
+    ScreenSwitch screenSwitch(castle, dst_rt, readonly);
+    screenSwitch.Redraw();
 
     // update extra description
     std::string description_castle = castle.GetDescriptionBuilding(BUILD_CASTLE, castle.GetRace());
@@ -231,17 +285,8 @@ screen_t CastleOpenDialog1(Castle & castle, bool readonly)
         le.MousePressLeft(buttonNext) ? buttonNext.PressDraw() : buttonNext.ReleaseDraw();
         le.MousePressLeft(buttonPrev) ? buttonPrev.PressDraw() : buttonPrev.ReleaseDraw();
 
-        //if(le.MouseClickLeft(rectScreen1)) return SCREEN1;
-        //else
-        if(!readonly && castle.isBuild(BUILD_CASTLE) && le.MouseClickLeft(rectScreen2)) return SCREEN2;
-        else
-        if(!readonly && castle.isBuild(BUILD_CASTLE) && le.MouseClickLeft(rectScreen3)) return SCREEN3;
-        else
-        if(!readonly && castle.isBuild(BUILD_CASTLE) && le.MouseClickLeft(rectScreen4)) return SCREEN4;
-        else
-        if(!readonly && castle.isBuild(BUILD_CASTLE) && le.MouseClickLeft(rectScreen5)) return SCREEN5;
-        else
-        if(!readonly && castle.isBuild(BUILD_MAGEGUILD1) && le.MouseClickLeft(rectScreen6)) return SCREEN6;
+	if(!readonly && screenSwitch.QueueEventProcessing() && SCREEN1 != screenSwitch.result)
+	    return screenSwitch.result;
         else
         // exit
         if(le.MouseClickLeft(rectExit) || Game::HotKeyPress(Game::EVENT_DEFAULT_EXIT)) break;
@@ -388,7 +433,7 @@ screen_t CastleOpenDialog1(Castle & castle, bool readonly)
     return SCREENOUT;
 }
 
-screen_t CastleOpenDialog2(Castle & castle)
+screen_t CastleOpenDialog2(Castle & castle, bool readonly)
 {
     Cursor & cursor = Cursor::Get();
     Display & display = Display::Get();
@@ -412,19 +457,8 @@ screen_t CastleOpenDialog2(Castle & castle)
     const Rect rectExit(dst_rt.x + dst_rt.w - 26, dst_rt.y + 7, 25, 25);
     display.Blit(AGG::GetICN(ICN::TOWNWIND, 12), rectExit.x, rectExit.y);
 
-    const Rect rectScreen1(dst_rt.x + dst_rt.w - 27, dst_rt.y + 32, 25, 25);
-    const Rect rectScreen2(dst_rt.x + dst_rt.w - 27, dst_rt.y + 58, 25, 25);
-    const Rect rectScreen3(dst_rt.x + dst_rt.w - 27, dst_rt.y + 84, 25, 25);
-    const Rect rectScreen4(dst_rt.x + dst_rt.w - 27, dst_rt.y + 110, 25, 25);
-    const Rect rectScreen5(dst_rt.x + dst_rt.w - 27, dst_rt.y + 136, 25, 25);
-    const Rect rectScreen6(dst_rt.x + dst_rt.w - 27, dst_rt.y + 162, 25, 25);
-
-    display.Blit(AGG::GetICN(ICN::REQUESTS, 20), rectScreen1.x, rectScreen1.y);
-    display.Blit(AGG::GetICN(ICN::REQUESTS, 21), rectScreen2.x, rectScreen2.y);
-    display.Blit(AGG::GetICN(ICN::REQUESTS, 22), rectScreen3.x, rectScreen3.y);
-    display.Blit(AGG::GetICN(ICN::REQUESTS, 23), rectScreen4.x, rectScreen4.y);
-    display.Blit(AGG::GetICN(ICN::REQUESTS, 24), rectScreen5.x, rectScreen5.y);
-    if(castle.isBuild(BUILD_MAGEGUILD1)) display.Blit(AGG::GetICN(ICN::REQUESTS, 25), rectScreen6.x, rectScreen6.y);
+    ScreenSwitch screenSwitch(castle, dst_rt, readonly);
+    screenSwitch.Redraw();
 
     BuildingInfo dwelling1(castle, DWELLING_MONSTER1);
     dwelling1.SetPos(dst_rt.x + 2, dst_rt.y + 2);
@@ -455,15 +489,8 @@ screen_t CastleOpenDialog2(Castle & castle)
 
     while(le.HandleEvents())
     {
-        if(le.MouseClickLeft(rectScreen1)) return SCREEN1;
-        else
-        if(le.MouseClickLeft(rectScreen3)) return SCREEN3;
-        else
-        if(le.MouseClickLeft(rectScreen4)) return SCREEN4;
-        else
-        if(le.MouseClickLeft(rectScreen5)) return SCREEN5;
-        else
-        if(castle.isBuild(BUILD_MAGEGUILD1) && le.MouseClickLeft(rectScreen6)) return SCREEN6;
+	if(!readonly && screenSwitch.QueueEventProcessing() && SCREEN2 != screenSwitch.result)
+	    return screenSwitch.result;
         else
         // exit
         if(le.MouseClickLeft(rectExit) || Game::HotKeyPress(Game::EVENT_DEFAULT_EXIT)) break;
@@ -483,7 +510,7 @@ screen_t CastleOpenDialog2(Castle & castle)
     return SCREENOUT;
 }
 
-screen_t CastleOpenDialog3(Castle & castle)
+screen_t CastleOpenDialog3(Castle & castle, bool readonly)
 {
     Cursor & cursor = Cursor::Get();
     Display & display = Display::Get();
@@ -506,19 +533,8 @@ screen_t CastleOpenDialog3(Castle & castle)
     const Rect rectExit(dst_rt.x + dst_rt.w - 26, dst_rt.y + 7, 25, 25);
     display.Blit(AGG::GetICN(ICN::TOWNWIND, 12), rectExit.x, rectExit.y);
 
-    const Rect rectScreen1(dst_rt.x + dst_rt.w - 27, dst_rt.y + 32, 25, 25);
-    const Rect rectScreen2(dst_rt.x + dst_rt.w - 27, dst_rt.y + 58, 25, 25);
-    const Rect rectScreen3(dst_rt.x + dst_rt.w - 27, dst_rt.y + 84, 25, 25);
-    const Rect rectScreen4(dst_rt.x + dst_rt.w - 27, dst_rt.y + 110, 25, 25);
-    const Rect rectScreen5(dst_rt.x + dst_rt.w - 27, dst_rt.y + 136, 25, 25);
-    const Rect rectScreen6(dst_rt.x + dst_rt.w - 27, dst_rt.y + 162, 25, 25);
-
-    display.Blit(AGG::GetICN(ICN::REQUESTS, 20), rectScreen1.x, rectScreen1.y);
-    display.Blit(AGG::GetICN(ICN::REQUESTS, 21), rectScreen2.x, rectScreen2.y);
-    display.Blit(AGG::GetICN(ICN::REQUESTS, 22), rectScreen3.x, rectScreen3.y);
-    display.Blit(AGG::GetICN(ICN::REQUESTS, 23), rectScreen4.x, rectScreen4.y);
-    display.Blit(AGG::GetICN(ICN::REQUESTS, 24), rectScreen5.x, rectScreen5.y);
-    if(castle.isBuild(BUILD_MAGEGUILD1)) display.Blit(AGG::GetICN(ICN::REQUESTS, 25), rectScreen6.x, rectScreen6.y);
+    ScreenSwitch screenSwitch(castle, dst_rt, readonly);
+    screenSwitch.Redraw();
 
     building_t level = BUILD_NOTHING;
     switch(castle.GetLevelMageGuild())
@@ -559,62 +575,34 @@ screen_t CastleOpenDialog3(Castle & castle)
 
     while(le.HandleEvents())
     {
-        if(le.MouseClickLeft(rectScreen1)) return SCREEN1;
-        else
-        if(le.MouseClickLeft(rectScreen2)) return SCREEN2;
-        else
-        if(le.MouseClickLeft(rectScreen4)) return SCREEN4;
-        else
-        if(le.MouseClickLeft(rectScreen5)) return SCREEN5;
-        else
-        if(castle.isBuild(BUILD_MAGEGUILD1) && le.MouseClickLeft(rectScreen6)) return SCREEN6;
+	if(!readonly && screenSwitch.QueueEventProcessing() && SCREEN3 != screenSwitch.result)
+	    return screenSwitch.result;
         else
         // exit
         if(le.MouseClickLeft(rectExit) || Game::HotKeyPress(Game::EVENT_DEFAULT_EXIT)) break;
 
-	if(le.MouseCursor(building1.GetArea()) && building1.QueueEventProcessing()) { AGG::PlaySound(M82::BUILDTWN); castle.BuyBuilding(building1()); return SCREEN1; }
+	if(le.MouseCursor(building1.GetArea()) && building1.QueueEventProcessing())
+	    { AGG::PlaySound(M82::BUILDTWN); castle.BuyBuilding(building1()); return SCREEN1; }
 	else
-	if(le.MouseCursor(building2.GetArea()) && building2.QueueEventProcessing()) { AGG::PlaySound(M82::BUILDTWN); castle.BuyBuilding(building2()); return SCREEN1; }
+	if(le.MouseCursor(building2.GetArea()) && building2.QueueEventProcessing())
+	    { AGG::PlaySound(M82::BUILDTWN); castle.BuyBuilding(building2()); return SCREEN1; }
 	else
-	if(le.MouseCursor(building3.GetArea()))
-	{
-	    // show thieves guild
-	    if(castle.isBuild(BUILD_THIEVESGUILD))
-	    {
-		if(le.MouseClickLeft(building3.GetArea())){ PocketPC::ThievesGuild(false); return SCREEN1; }
-	    }
-	    else
-	    if(building3.QueueEventProcessing()) { AGG::PlaySound(M82::BUILDTWN); castle.BuyBuilding(building3()); return SCREEN1; }
-	}
+	if(le.MouseCursor(building3.GetArea()) && building3.QueueEventProcessing())
+	    { AGG::PlaySound(M82::BUILDTWN); castle.BuyBuilding(building3()); return SCREEN1; }
 	else
-	if(le.MouseCursor(building4.GetArea()))
-	{
-	    // buy boat
-	    if(castle.isBuild(BUILD_SHIPYARD))
-	    {
-		if(le.MouseClickLeft(building4.GetArea()) && Dialog::OK == Dialog::BuyBoat(castle.AllowBuyBoat())) castle.BuyBoat();
-	    }
-	    else
-	    if(building4.QueueEventProcessing()) { AGG::PlaySound(M82::BUILDTWN); castle.BuyBuilding(building4()); return SCREEN1; }
-	}
+	if(le.MouseCursor(building4.GetArea()) && building4.QueueEventProcessing())
+	    { AGG::PlaySound(M82::BUILDTWN); castle.BuyBuilding(building4()); return SCREEN1; }
 	else
-	if(le.MouseCursor(building5.GetArea()) && building5.QueueEventProcessing()) { AGG::PlaySound(M82::BUILDTWN); castle.BuyBuilding(building5()); return SCREEN1; }
+	if(le.MouseCursor(building5.GetArea()) && building5.QueueEventProcessing())
+	    { AGG::PlaySound(M82::BUILDTWN); castle.BuyBuilding(building5()); return SCREEN1; }
 	else
-	if(le.MouseCursor(building6.GetArea()))
-	{
-	    // show marketplace
-	    if(castle.isBuild(BUILD_MARKETPLACE))
-	    {
-		if(le.MouseClickLeft(building6.GetArea())) Dialog::Marketplace();
-	    }
-	    else
-	    if(building6.QueueEventProcessing()) { AGG::PlaySound(M82::BUILDTWN); castle.BuyBuilding(building6()); return SCREEN1; }
-	}
+	if(le.MouseCursor(building6.GetArea()) && building6.QueueEventProcessing())
+	    { AGG::PlaySound(M82::BUILDTWN); castle.BuyBuilding(building6()); return SCREEN1; }
     }
     return SCREENOUT;
 }
 
-screen_t CastleOpenDialog4(Castle & castle)
+screen_t CastleOpenDialog4(Castle & castle, bool readonly)
 {
     Cursor & cursor = Cursor::Get();
     Display & display = Display::Get();
@@ -637,19 +625,8 @@ screen_t CastleOpenDialog4(Castle & castle)
     const Rect rectExit(dst_rt.x + dst_rt.w - 26, dst_rt.y + 7, 25, 25);
     display.Blit(AGG::GetICN(ICN::TOWNWIND, 12), rectExit.x, rectExit.y);
 
-    const Rect rectScreen1(dst_rt.x + dst_rt.w - 27, dst_rt.y + 32, 25, 25);
-    const Rect rectScreen2(dst_rt.x + dst_rt.w - 27, dst_rt.y + 58, 25, 25);
-    const Rect rectScreen3(dst_rt.x + dst_rt.w - 27, dst_rt.y + 84, 25, 25);
-    const Rect rectScreen4(dst_rt.x + dst_rt.w - 27, dst_rt.y + 110, 25, 25);
-    const Rect rectScreen5(dst_rt.x + dst_rt.w - 27, dst_rt.y + 136, 25, 25);
-    const Rect rectScreen6(dst_rt.x + dst_rt.w - 27, dst_rt.y + 162, 25, 25);
-
-    display.Blit(AGG::GetICN(ICN::REQUESTS, 20), rectScreen1.x, rectScreen1.y);
-    display.Blit(AGG::GetICN(ICN::REQUESTS, 21), rectScreen2.x, rectScreen2.y);
-    display.Blit(AGG::GetICN(ICN::REQUESTS, 22), rectScreen3.x, rectScreen3.y);
-    display.Blit(AGG::GetICN(ICN::REQUESTS, 23), rectScreen4.x, rectScreen4.y);
-    display.Blit(AGG::GetICN(ICN::REQUESTS, 24), rectScreen5.x, rectScreen5.y);
-    if(castle.isBuild(BUILD_MAGEGUILD1)) display.Blit(AGG::GetICN(ICN::REQUESTS, 25), rectScreen6.x, rectScreen6.y);
+    ScreenSwitch screenSwitch(castle, dst_rt, readonly);
+    screenSwitch.Redraw();
 
     BuildingInfo building1(castle, BUILD_WELL);
     building1.SetPos(dst_rt.x + 2, dst_rt.y + 2);
@@ -680,15 +657,8 @@ screen_t CastleOpenDialog4(Castle & castle)
 
     while(le.HandleEvents())
     {
-        if(le.MouseClickLeft(rectScreen1)) return SCREEN1;
-        else
-        if(le.MouseClickLeft(rectScreen2)) return SCREEN2;
-        else
-        if(le.MouseClickLeft(rectScreen3)) return SCREEN3;
-        else
-        if(le.MouseClickLeft(rectScreen5)) return SCREEN5;
-        else
-        if(castle.isBuild(BUILD_MAGEGUILD1) && le.MouseClickLeft(rectScreen6)) return SCREEN6;
+	if(!readonly && screenSwitch.QueueEventProcessing() && SCREEN4 != screenSwitch.result)
+	    return screenSwitch.result;
         else
         // exit
         if(le.MouseClickLeft(rectExit) || Game::HotKeyPress(Game::EVENT_DEFAULT_EXIT)) break;
@@ -708,7 +678,81 @@ screen_t CastleOpenDialog4(Castle & castle)
     return SCREENOUT;
 }
 
-screen_t CastleOpenDialog5(Castle & castle)
+screen_t CastleOpenDialog5(Castle & castle, bool readonly)
+{
+    Cursor & cursor = Cursor::Get();
+    Display & display = Display::Get();
+    LocalEvent & le = LocalEvent::Get();
+
+    cursor.Hide();
+    cursor.SetThemes(cursor.POINTER);
+
+    const u16 window_w = 320;
+    const u16 window_h = 224;
+
+    Dialog::FrameBorder frameborder;
+    frameborder.SetPosition((display.w() - window_w) / 2 - BORDERWIDTH, (display.h() - window_h) / 2 - BORDERWIDTH, window_w, window_h);
+    frameborder.Redraw();
+
+    const Rect & dst_rt = frameborder.GetArea();
+    const Sprite & background = AGG::GetICN(ICN::STONEBAK, 0);
+    display.Blit(background, Rect(0, 0, window_w, window_h), dst_rt);
+
+
+    RowSpells spells1(Point(dst_rt.x + 38, dst_rt.y + 220 - 44), castle.GetMageGuild(), 1);
+    RowSpells spells2(Point(dst_rt.x + 38, dst_rt.y + 220 - 44 * 2), castle.GetMageGuild(), 2);
+    RowSpells spells3(Point(dst_rt.x + 38, dst_rt.y + 220 - 44 * 3), castle.GetMageGuild(), 3);
+    RowSpells spells4(Point(dst_rt.x + 38, dst_rt.y + 220 - 44 * 4), castle.GetMageGuild(), 4);
+    RowSpells spells5(Point(dst_rt.x + 38, dst_rt.y + 220 - 44 * 5), castle.GetMageGuild(), 5);
+
+    spells1.Redraw();
+    spells2.Redraw();
+    spells3.Redraw();
+    spells4.Redraw();
+    spells5.Redraw();
+
+    // magic book sprite
+    const Heroes* hero = castle.GetHeroes();
+    bool need_buy_book = hero && !hero->HasArtifact(Artifact::MAGIC_BOOK) && castle.GetLevelMageGuild();
+    const Rect book_pos(dst_rt.x + 250, dst_rt.y + 5, 32, 32);
+    if(need_buy_book)
+    {
+	display.Blit(AGG::GetICN(ICN::ARTFX, 81), book_pos);
+	Text text(_("buy"), Font::SMALL);
+	text.Blit(book_pos.x + (book_pos.w - text.w()) / 2, book_pos.y + book_pos.h - 12);
+    }
+
+    // buttons
+    const Rect rectExit(dst_rt.x + dst_rt.w - 26, dst_rt.y + 7, 25, 25);
+    display.Blit(AGG::GetICN(ICN::TOWNWIND, 12), rectExit.x, rectExit.y);
+
+    ScreenSwitch screenSwitch(castle, dst_rt, readonly);
+    screenSwitch.Redraw();
+
+    cursor.Show();
+    display.Flip();
+
+    while(le.HandleEvents())
+    {
+	if(!readonly && screenSwitch.QueueEventProcessing() && SCREEN5 != screenSwitch.result)
+	    return screenSwitch.result;
+        else
+        // exit
+        if(le.MouseClickLeft(rectExit) || Game::HotKeyPress(Game::EVENT_DEFAULT_EXIT)) break;
+	else
+	if(need_buy_book && le.MouseClickLeft(book_pos)) { const_cast<Heroes *>(hero)->BuySpellBook(&castle.GetMageGuild()); return SCREEN1; }
+
+        spells1.QueueEventProcessing();
+        spells2.QueueEventProcessing();
+        spells3.QueueEventProcessing();
+        spells4.QueueEventProcessing();
+        spells5.QueueEventProcessing();
+    }
+
+    return SCREENOUT;
+}
+
+screen_t CastleOpenDialog6(Castle & castle, bool readonly)
 {
     Cursor & cursor = Cursor::Get();
     Display & display = Display::Get();
@@ -777,26 +821,36 @@ screen_t CastleOpenDialog5(Castle & castle)
         display.Blit(captain, Rect((captain.w() - 50) / 2, 15, 50, 47), rectCaptain.x + 4, rectCaptain.y + 4);
     }
 
+    // shipyard, shieves guild, marketplace
+    const Sprite & spriteX = AGG::GetICN(ICN::CASLXTRA, 1);
+    const Rect rt1(dst_rt.x + 180, dst_rt.y + 180, spriteX.w(), spriteX.h());
+    if(castle.isBuild(BUILD_MARKETPLACE))
+    {
+	Text txt(castle.GetStringBuilding(BUILD_MARKETPLACE), Font::SMALL);
+	display.Blit(spriteX, rt1);
+	txt.Blit(rt1.x + (rt1.w - txt.w()) / 2, rt1.y + 1);
+    }
+    const Rect rt2(dst_rt.x + 180, dst_rt.y + 195, spriteX.w(), spriteX.h());
+    if(castle.isBuild(BUILD_THIEVESGUILD))
+    {
+	Text txt(castle.GetStringBuilding(BUILD_THIEVESGUILD), Font::SMALL);
+	display.Blit(spriteX, rt2);
+	txt.Blit(rt2.x + (rt2.w - txt.w()) / 2, rt2.y + 1);
+    }
+    const Rect rt3(dst_rt.x + 180, dst_rt.y + 210, spriteX.w(), spriteX.h());
+    if(castle.isBuild(BUILD_SHIPYARD))
+    {
+	Text txt(castle.GetStringBuilding(BUILD_SHIPYARD), Font::SMALL);
+	display.Blit(spriteX, rt3);
+	txt.Blit(rt3.x + (rt3.w - txt.w()) / 2, rt3.y + 1);
+    }
+
     // buttons
     const Rect rectExit(dst_rt.x + dst_rt.w - 26, dst_rt.y + 7, 25, 25);
     display.Blit(AGG::GetICN(ICN::TOWNWIND, 12), rectExit.x, rectExit.y);
 
-    const Rect rectScreen1(dst_rt.x + dst_rt.w - 27, dst_rt.y + 32, 25, 25);
-    const Rect rectScreen2(dst_rt.x + dst_rt.w - 27, dst_rt.y + 58, 25, 25);
-    const Rect rectScreen3(dst_rt.x + dst_rt.w - 27, dst_rt.y + 84, 25, 25);
-    const Rect rectScreen4(dst_rt.x + dst_rt.w - 27, dst_rt.y + 110, 25, 25);
-    const Rect rectScreen5(dst_rt.x + dst_rt.w - 27, dst_rt.y + 136, 25, 25);
-    const Rect rectScreen6(dst_rt.x + dst_rt.w - 27, dst_rt.y + 162, 25, 25);
-
-    display.Blit(AGG::GetICN(ICN::REQUESTS, 20), rectScreen1.x, rectScreen1.y);
-    if(castle.isBuild(BUILD_CASTLE))
-    {
-	display.Blit(AGG::GetICN(ICN::REQUESTS, 21), rectScreen2.x, rectScreen2.y);
-	display.Blit(AGG::GetICN(ICN::REQUESTS, 22), rectScreen3.x, rectScreen3.y);
-	display.Blit(AGG::GetICN(ICN::REQUESTS, 23), rectScreen4.x, rectScreen4.y);
-    }
-    display.Blit(AGG::GetICN(ICN::REQUESTS, 24), rectScreen5.x, rectScreen5.y);
-    if(castle.isBuild(BUILD_MAGEGUILD1)) display.Blit(AGG::GetICN(ICN::REQUESTS, 25), rectScreen6.x, rectScreen6.y);
+    ScreenSwitch screenSwitch(castle, dst_rt, readonly);
+    screenSwitch.Redraw();
 
     u32 frame = 0;
     
@@ -805,15 +859,8 @@ screen_t CastleOpenDialog5(Castle & castle)
 
     while(le.HandleEvents())
     {
-        if(le.MouseClickLeft(rectScreen1)) return SCREEN1;
-        else
-        if(le.MouseClickLeft(rectScreen2)) return SCREEN2;
-        else
-        if(le.MouseClickLeft(rectScreen3)) return SCREEN3;
-        else
-        if(le.MouseClickLeft(rectScreen4)) return SCREEN4;
-        else
-        if(castle.isBuild(BUILD_MAGEGUILD1) && le.MouseClickLeft(rectScreen6)) return SCREEN6;
+	if(!readonly && screenSwitch.QueueEventProcessing() && SCREEN6 != screenSwitch.result)
+	    return screenSwitch.result;
         else
         // exit
         if(le.MouseClickLeft(rectExit) || Game::HotKeyPress(Game::EVENT_DEFAULT_EXIT)) break;
@@ -845,6 +892,18 @@ screen_t CastleOpenDialog5(Castle & castle)
 		return SCREEN1;
 	    }
 	}
+	else
+	// show marketplace
+    	if(castle.isBuild(BUILD_MARKETPLACE) && le.MouseClickLeft(rt1)) Dialog::Marketplace();
+	else
+        // buy boat
+	if(castle.isBuild(BUILD_SHIPYARD) && le.MouseClickLeft(rt3) &&
+	    Dialog::OK == Dialog::BuyBoat(castle.AllowBuyBoat())) castle.BuyBoat();
+	else
+	// show thieves guild
+	if(castle.isBuild(BUILD_THIEVESGUILD) && le.MouseClickLeft(rt2))
+	{ PocketPC::ThievesGuild(false); return SCREEN1; }
+
 
         // animation
         if(castle.isBuild(BUILD_TAVERN) && Game::AnimateInfrequent(Game::CASTLE_TAVERN_DELAY))
@@ -860,102 +919,6 @@ screen_t CastleOpenDialog5(Castle & castle)
     	    cursor.Show();
     	    display.Flip();
         }
-    }
-
-    return SCREENOUT;
-}
-
-screen_t CastleOpenDialog6(Castle & castle)
-{
-    Cursor & cursor = Cursor::Get();
-    Display & display = Display::Get();
-    LocalEvent & le = LocalEvent::Get();
-
-    cursor.Hide();
-    cursor.SetThemes(cursor.POINTER);
-
-    const u16 window_w = 320;
-    const u16 window_h = 224;
-
-    Dialog::FrameBorder frameborder;
-    frameborder.SetPosition((display.w() - window_w) / 2 - BORDERWIDTH, (display.h() - window_h) / 2 - BORDERWIDTH, window_w, window_h);
-    frameborder.Redraw();
-
-    const Rect & dst_rt = frameborder.GetArea();
-    const Sprite & background = AGG::GetICN(ICN::STONEBAK, 0);
-    display.Blit(background, Rect(0, 0, window_w, window_h), dst_rt);
-
-
-    RowSpells spells1(Point(dst_rt.x + 38, dst_rt.y + 220 - 44), castle.GetMageGuild(), 1);
-    RowSpells spells2(Point(dst_rt.x + 38, dst_rt.y + 220 - 44 * 2), castle.GetMageGuild(), 2);
-    RowSpells spells3(Point(dst_rt.x + 38, dst_rt.y + 220 - 44 * 3), castle.GetMageGuild(), 3);
-    RowSpells spells4(Point(dst_rt.x + 38, dst_rt.y + 220 - 44 * 4), castle.GetMageGuild(), 4);
-    RowSpells spells5(Point(dst_rt.x + 38, dst_rt.y + 220 - 44 * 5), castle.GetMageGuild(), 5);
-
-    spells1.Redraw();
-    spells2.Redraw();
-    spells3.Redraw();
-    spells4.Redraw();
-    spells5.Redraw();
-
-    // magic book sprite
-    const Heroes* hero = castle.GetHeroes();
-    bool need_buy_book = hero && !hero->HasArtifact(Artifact::MAGIC_BOOK) && castle.GetLevelMageGuild();
-    const Rect book_pos(dst_rt.x + 250, dst_rt.y + 5, 32, 32);
-    if(need_buy_book)
-    {
-	display.Blit(AGG::GetICN(ICN::ARTFX, 81), book_pos);
-	Text text(_("buy"), Font::SMALL);
-	text.Blit(book_pos.x + (book_pos.w - text.w()) / 2, book_pos.y + book_pos.h - 12);
-    }
-
-    // buttons
-    const Rect rectExit(dst_rt.x + dst_rt.w - 26, dst_rt.y + 7, 25, 25);
-    display.Blit(AGG::GetICN(ICN::TOWNWIND, 12), rectExit.x, rectExit.y);
-
-    const Rect rectScreen1(dst_rt.x + dst_rt.w - 27, dst_rt.y + 32, 25, 25);
-    const Rect rectScreen2(dst_rt.x + dst_rt.w - 27, dst_rt.y + 58, 25, 25);
-    const Rect rectScreen3(dst_rt.x + dst_rt.w - 27, dst_rt.y + 84, 25, 25);
-    const Rect rectScreen4(dst_rt.x + dst_rt.w - 27, dst_rt.y + 110, 25, 25);
-    const Rect rectScreen5(dst_rt.x + dst_rt.w - 27, dst_rt.y + 136, 25, 25);
-    const Rect rectScreen6(dst_rt.x + dst_rt.w - 27, dst_rt.y + 162, 25, 25);
-
-    display.Blit(AGG::GetICN(ICN::REQUESTS, 20), rectScreen1.x, rectScreen1.y);
-    if(castle.isBuild(BUILD_CASTLE))
-    {
-	display.Blit(AGG::GetICN(ICN::REQUESTS, 21), rectScreen2.x, rectScreen2.y);
-	display.Blit(AGG::GetICN(ICN::REQUESTS, 22), rectScreen3.x, rectScreen3.y);
-	display.Blit(AGG::GetICN(ICN::REQUESTS, 23), rectScreen4.x, rectScreen4.y);
-    }
-    if(castle.isBuild(BUILD_CASTLE) || castle.isBuild(BUILD_TAVERN))
-	display.Blit(AGG::GetICN(ICN::REQUESTS, 24), rectScreen5.x, rectScreen5.y);
-    display.Blit(AGG::GetICN(ICN::REQUESTS, 25), rectScreen6.x, rectScreen6.y);
-
-    cursor.Show();
-    display.Flip();
-
-    while(le.HandleEvents())
-    {
-        if(le.MouseClickLeft(rectScreen1)) return SCREEN1;
-        else
-        if(le.MouseClickLeft(rectScreen2)) return SCREEN2;
-        else
-        if(le.MouseClickLeft(rectScreen3)) return SCREEN3;
-        else
-        if(le.MouseClickLeft(rectScreen4)) return SCREEN4;
-        else
-        if(le.MouseClickLeft(rectScreen5)) return SCREEN5;
-        else
-        // exit
-        if(le.MouseClickLeft(rectExit) || Game::HotKeyPress(Game::EVENT_DEFAULT_EXIT)) break;
-	else
-	if(need_buy_book && le.MouseClickLeft(book_pos)) { const_cast<Heroes *>(hero)->BuySpellBook(&castle.GetMageGuild()); return SCREEN1; }
-
-        spells1.QueueEventProcessing();
-        spells2.QueueEventProcessing();
-        spells3.QueueEventProcessing();
-        spells4.QueueEventProcessing();
-        spells5.QueueEventProcessing();
     }
 
     return SCREENOUT;
@@ -1124,6 +1087,8 @@ bool DwellingBar::QueueEventProcessing(void)
 	    const u16 recruit = Dialog::RecruitMonster(Monster(castle.GetRace(), castle.GetActualDwelling(dwelling)), castle.GetDwellingLivedCount(dwelling));
             return const_cast<Castle &>(castle).RecruitMonster(dwelling, recruit);
 	}
+        if(!castle.isBuild(BUILD_CASTLE))
+            Dialog::Message("", _("For this action it is necessary first to build a castle."), Font::BIG, Dialog::OK);
 	else
 	{
 	    BuildingInfo dwelling2(castle, static_cast<building_t>(dwelling));
