@@ -423,9 +423,9 @@ void Game::IO::PackTile(QueueMessage & msg, const Maps::Tiles & tile)
     msg.Push(tile.quantity3);
     msg.Push(tile.quantity4);
     msg.Push(tile.fogs);
-    msg.Push(tile.unused1);
-    msg.Push(tile.unused2);
-    msg.Push(tile.unused3);
+    msg.Push(tile.quantity5);
+    msg.Push(tile.quantity6);
+    msg.Push(tile.quantity7);
 
     // addons 1
     msg.Push(static_cast<u8>(tile.addons_level1.size()));
@@ -1026,11 +1026,11 @@ void Game::IO::UnpackTile(QueueMessage & msg, Maps::Tiles & tile, u16 check_vers
     msg.Pop(tile.quantity3);
     msg.Pop(tile.quantity4);
     msg.Pop(tile.fogs);
-    msg.Pop(tile.unused1);
+    msg.Pop(tile.quantity5);
     if(FORMAT_VERSION_2031 <= check_version)
     {
-	msg.Pop(tile.unused2);
-	msg.Pop(tile.unused3);
+	msg.Pop(tile.quantity6);
+	msg.Pop(tile.quantity7);
     }
 
 #ifdef WITH_DEBUG
@@ -1220,8 +1220,13 @@ void Game::IO::UnpackHeroes(QueueMessage & msg, Heroes & hero, u16 check_version
     if(FORMAT_VERSION_2154 <= check_version)
     {
 	msg.Pop(byte8); hero.hid = Heroes::ConvertID(byte8);
+	msg.Pop(byte8); hero.portrait = Heroes::ConvertID(byte8);
     }
-    msg.Pop(byte8); hero.portrait = Heroes::ConvertID(byte8);
+    else
+    {
+	msg.Pop(byte8); hero.portrait = Heroes::ConvertID(byte8);
+	hero.hid = hero.portrait;
+    }
     msg.Pop(byte8); hero.race = Race::Get(byte8);
 
     msg.Pop(hero.modes);

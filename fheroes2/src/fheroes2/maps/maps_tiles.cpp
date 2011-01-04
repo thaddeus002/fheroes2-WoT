@@ -332,13 +332,13 @@ bool Maps::TilesAddon::isFlag32(const TilesAddon & ta)
 }
 
 Maps::Tiles::Tiles(s32 index) : maps_index(index), tile_sprite_index(0), tile_sprite_shape(0),
-    mp2_object(0), quantity1(0), quantity2(0), fogs(0xFF), unused1(0), unused2(0), unused3(0)
+    mp2_object(0), quantity1(0), quantity2(0), quantity3(0), quantity4(0), fogs(0xFF), quantity5(0), quantity6(0), quantity7(0)
 {
 }
 
 Maps::Tiles::Tiles(s32 mi, const MP2::mp2tile_t & mp2tile) : maps_index(mi), tile_sprite_index(mp2tile.tileIndex),
     tile_sprite_shape(mp2tile.shape), mp2_object(mp2tile.generalObject), quantity1(mp2tile.quantity1), quantity2(mp2tile.quantity2),
-    quantity3(0), quantity4(0), fogs(0xFF), unused1(0), unused2(0), unused3(0)
+    quantity3(0), quantity4(0), fogs(0xFF), quantity5(0), quantity6(0), quantity7(0)
 {
     AddonsPushLevel1(mp2tile);
     AddonsPushLevel2(mp2tile);
@@ -1841,6 +1841,11 @@ void Maps::Tiles::RemoveJailSprite(void)
     }
 }
 
+bool Maps::Tiles::FixedCountMonster(void) const
+{
+    return quantity5;
+}
+
 u16 Maps::Tiles::GetCountMonster(void) const
 {
     return quantity2 * 0xFF + quantity1;
@@ -1867,7 +1872,8 @@ void Maps::Tiles::UpdateMonsterInfo(void)
 
     const TilesAddon* addons = FindObject(MP2::OBJ_MONSTER);
     const Monster m(addons ? Monster::FromInt(addons->index + 1) : Monster::UNKNOWN);
-    bool  fixed = false;
+    // fixed count
+    quantity5 = 0;
 
     // update random count
     if(0 == quantity1 && 0 == quantity2)
@@ -1881,7 +1887,7 @@ void Maps::Tiles::UpdateMonsterInfo(void)
 	    count >>= 3;
 
         SetCountMonster(count);
-	fixed = true;
+	quantity5 = 1;
     }
 
     // set monster
@@ -1894,7 +1900,7 @@ void Maps::Tiles::UpdateMonsterInfo(void)
     if(m() == Monster::GHOST || m.isElemental())
 	quantity4 = 0;
     else
-    if(fixed)
+    if(FixedCountMonster())
 	// for money
 	quantity4 = 1;
     else
@@ -2165,6 +2171,9 @@ void Maps::Tiles::ResetQuantity(void)
     quantity2 = 0;
     quantity3 = 0;
     quantity4 = 0;
+    quantity5 = 0;
+    quantity6 = 0;
+    quantity7 = 0;
 }
 
 void Maps::Tiles::RedrawFogs(Surface & dst, u8 color) const

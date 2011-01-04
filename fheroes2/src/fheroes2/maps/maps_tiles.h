@@ -161,6 +161,7 @@ namespace Maps
 
 	u8   GetMinesType(void) const;
 
+	bool FixedCountMonster(void) const;
 	u16 GetCountMonster(void) const;
 	void SetCountMonster(const u16 count);
 	void UpdateRNDMonsterSprite(void);
@@ -201,9 +202,9 @@ namespace Maps
 	u8	quantity4;
         u8	fogs;
 
-	u8	unused1; /* memory align */
-	u8	unused2; /* memory align */
-	u8	unused3; /* memory align */
+	u8	quantity5;
+	u8	quantity6; /* unused: memory align */
+	u8	quantity7; /* unused: memory align */
     };
 
     struct TilesIsPassable : public std::binary_function<s32, const Heroes*, bool>

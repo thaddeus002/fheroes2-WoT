@@ -1680,6 +1680,7 @@ void World::UpdateMonsterPopulation(void)
 	if(0 == troop.GetCount())
 	    tile.SetCountMonster(troop.GetRNDSize(false));
 	else
+	if(! tile.FixedCountMonster())
 	    tile.SetCountMonster(troop.GetCount() * 8 / 7);
     }
 }
