@@ -103,6 +103,7 @@ Battle2::Result Battle2::Loader(Army::army_t & army1, Army::army_t & army2, s32 
 
     Army::army_t *army_wins = (result.army1 & RESULT_WINS ? &army1 : (result.army2 & RESULT_WINS ? &army2 : NULL));
     Army::army_t *army_loss = (result.army1 & RESULT_LOSS ? &army1 : (result.army2 & RESULT_LOSS ? &army2 : NULL));
+    const u8 loss_result =  result.army1 & RESULT_LOSS ? result.army1 : result.army2;
 
     // fix experience
     if(army_wins && army_loss)
@@ -128,6 +129,7 @@ Battle2::Result Battle2::Loader(Army::army_t & army1, Army::army_t & army2, s32 
     // pickup artifact
     if(army_wins && army_wins->GetCommander() &&
 	army_loss && army_loss->GetCommander() &&
+	!((RESULT_RETREAT | RESULT_SURRENDER) & loss_result) &&
 	Skill::Primary::HEROES == army_wins->GetCommander()->GetType() &&
 	Skill::Primary::HEROES == army_loss->GetCommander()->GetType())
 	PickupArtifactsAction(*army_wins->GetCommander(), *army_loss->GetCommander(), local && (Game::LOCAL == army_wins->GetControl()));
