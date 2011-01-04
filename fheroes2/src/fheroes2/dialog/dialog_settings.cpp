@@ -160,6 +160,7 @@ void Dialog::ExtSettings(bool readonly)
     {
 	states.push_back(Settings::CASTLE_ALLOW_GUARDIANS);
 	states.push_back(Settings::CASTLE_ALLOW_BUY_FROM_WELL);
+	states.push_back(Settings::CASTLE_ALLOW_FLASH_BUILDING);
     }
 
     states.push_back(Settings::UNIONS_ALLOW_HERO_MEETINGS);

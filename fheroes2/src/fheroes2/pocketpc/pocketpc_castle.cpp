@@ -112,7 +112,7 @@ void ScreenSwitch::Redraw(void)
 	    display.Blit(AGG::GetICN(ICN::REQUESTS, 23), rtScreen4.x, rtScreen4.y);
 	}
 
-	if(castle.isBuild(BUILD_MAGEGUILD1))
+	if(castle.GetLevelMageGuild())
 	    display.Blit(AGG::GetICN(ICN::REQUESTS, 24), rtScreen5.x, rtScreen5.y);
 
 	display.Blit(AGG::GetICN(ICN::REQUESTS, 25), rtScreen6.x, rtScreen6.y);
@@ -132,7 +132,7 @@ bool ScreenSwitch::QueueEventProcessing(void)
     else
     if(castle.isBuild(BUILD_CASTLE) && le.MouseClickLeft(rtScreen4)) result = SCREEN4;
     else
-    if(castle.isBuild(BUILD_MAGEGUILD1) && le.MouseClickLeft(rtScreen5)) result = SCREEN5;
+    if(castle.GetLevelMageGuild() && le.MouseClickLeft(rtScreen5)) result = SCREEN5;
     else
     if(le.MouseClickLeft(rtScreen6)) result = SCREEN6;
 

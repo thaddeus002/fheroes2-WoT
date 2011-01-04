@@ -34,6 +34,7 @@
 #include "bitmodes.h"
 #include "heroes.h"
 #include "game_io.h"
+#include "sprite.h"
 #include "position.h"
 
 class Heroes;
@@ -61,6 +62,7 @@ enum building_t
     BUILD_MAGEGUILD3        = 0x00010000,
     BUILD_MAGEGUILD4        = 0x00020000,
     BUILD_MAGEGUILD5        = 0x00040000,
+    BUILD_MAGEGUILD         = BUILD_MAGEGUILD1 | BUILD_MAGEGUILD2 | BUILD_MAGEGUILD3 | BUILD_MAGEGUILD4 | BUILD_MAGEGUILD5,
     BUILD_TENT              = 0x00080000,	// deprecated
     DWELLING_MONSTER1       = 0x00100000,
     DWELLING_MONSTER2       = 0x00200000,
@@ -183,15 +185,12 @@ public:
 private:
     void EducateHeroes(void);
     void RedrawResourcePanel(const Point &);
-    Rect GetCoordBuilding(building_t building, const Point & pt);
     u32  OpenTown(void);
     void OpenTavern(void);
     void OpenThievesGuild(void);
     void OpenWell(void);
     void OpenMageGuild(void);
     void WellRedrawInfoArea(const Point & cur_pt);
-    static void RedrawAllBuilding(const Castle &, const Point &, const std::vector<building_t> &);
-    static void RedrawAnimationBuilding(const Castle &, const Point &, const std::vector<building_t> &, u32 build);
 
 private:
     friend class Game::IO;
@@ -210,5 +209,29 @@ private:
     static u8 grown_well;
     static u8 grown_wel2;
 };
+
+namespace CastleDialog
+{
+    struct builds_t
+    {
+	builds_t(building_t b, const Rect & r) : id(b), coord(r) {};
+
+	bool operator== (u32 b) const { return b == id; };
+
+	building_t  id;
+	Rect        coord;
+	Sprite      contour;
+    };
+
+    struct CacheBuildings : std::vector<builds_t>
+    {
+	CacheBuildings(const Castle &, const Point &);
+	const Rect & GetRect(building_t);
+    };
+
+    void RedrawAllBuilding(const Castle &, const Point &, const CacheBuildings &, u32 flash = BUILD_NOTHING);
+    void RedrawAnimationBuilding(const Castle &, const Point &, const CacheBuildings &, u32 build);
+    void RedrawBuildingSpriteToArea(const Sprite &, s16, s16, const Rect &);
+}
 
 #endif

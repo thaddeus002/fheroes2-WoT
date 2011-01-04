@@ -128,6 +128,7 @@ public:
 	UNIONS_ALLOW_HERO_MEETINGS	= 0x20001000,
 	UNIONS_ALLOW_CASTLE_VISITING	= 0x20002000,
 	UNIONS_ALLOW_VIEW_MAPS		= 0x20004000,
+	CASTLE_ALLOW_FLASH_BUILDING	= 0x20040000,
 	CASTLE_ALLOW_GUARDIANS		= 0x20080000,
 	CASTLE_ALLOW_BUY_FROM_WELL	= 0x20100000,
 	HEROES_LEARN_SPELLS_WITH_DAY	= 0x20200000,
@@ -251,6 +252,7 @@ public:
     bool ExtUnionsAllowHeroesMeetings(void) const;
     bool ExtUnionsAllowViewMaps(void) const;
     bool ExtAllowCastleGuardians(void) const;
+    bool ExtCastleAllowFlash(void) const;
     bool ExtBattleShowDamage(void) const;
     bool ExtBattleTroopDirection(void) const;
     bool ExtBattleSoftWait(void) const;

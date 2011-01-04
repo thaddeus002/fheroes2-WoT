@@ -104,6 +104,7 @@ static const settings_t settingsFHeroes2[] =
     { Settings::WORLD_ARTIFACT_CRYSTAL_BALL,	_("artifact: Crystal Ball also added Identify Hero and Visions spells"), },
     { Settings::CASTLE_ALLOW_BUY_FROM_WELL,	_("castle: allow buy from well"),			},
     { Settings::CASTLE_ALLOW_GUARDIANS,		_("castle: allow guardians"),				},
+    { Settings::CASTLE_ALLOW_FLASH_BUILDING,	_("castle: allow flash building"),			},
     { Settings::HEROES_LEARN_SPELLS_WITH_DAY,	_("heroes: learn new spells with day"),  		},
     { Settings::HEROES_FORCE_RACE_FROM_TYPE,	_("heroes: fixed race with custom portrait"),  		},
     { Settings::HEROES_COST_DEPENDED_FROM_LEVEL,_("heroes: recruit cost to be dependent on hero level"),},
@@ -1113,6 +1114,11 @@ void Settings::ExtResetModes(u32 f)
 bool Settings::ExtAllowBuyFromWell(void) const
 {
     return ExtModes(CASTLE_ALLOW_BUY_FROM_WELL);
+}
+
+bool Settings::ExtCastleAllowFlash(void) const
+{
+    return ExtModes(CASTLE_ALLOW_FLASH_BUILDING);
 }
 
 bool Settings::ExtAllowCastleGuardians(void) const

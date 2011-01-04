@@ -42,170 +42,97 @@
 #include "selectarmybar.h"
 #include "pocketpc.h"
 
-void PackOrdersBuilding(const Castle & castle, std::vector<building_t> & orders_building)
+bool AllowFlashBuilding(u32 build)
 {
-    switch(castle.GetRace())
+    switch(build)
     {
-	case Race::KNGT:
-	    orders_building.push_back(BUILD_CASTLE);
-	    orders_building.push_back(BUILD_WEL2);
-	    orders_building.push_back(BUILD_CAPTAIN);
-	    orders_building.push_back(BUILD_LEFTTURRET);
-	    orders_building.push_back(BUILD_RIGHTTURRET);
-	    orders_building.push_back(BUILD_MOAT);
-	    orders_building.push_back(BUILD_MARKETPLACE);
-	    orders_building.push_back(DWELLING_MONSTER2);
-	    orders_building.push_back(BUILD_THIEVESGUILD);
-	    orders_building.push_back(BUILD_TAVERN);
-	    orders_building.push_back(BUILD_MAGEGUILD1);
-	    orders_building.push_back(BUILD_MAGEGUILD2);
-	    orders_building.push_back(BUILD_MAGEGUILD3);
-	    orders_building.push_back(BUILD_MAGEGUILD4);
-	    orders_building.push_back(BUILD_MAGEGUILD5);
-	    orders_building.push_back(DWELLING_MONSTER5);
-	    orders_building.push_back(DWELLING_MONSTER6);
-	    orders_building.push_back(DWELLING_MONSTER1);
-	    orders_building.push_back(DWELLING_MONSTER3);
-	    orders_building.push_back(DWELLING_MONSTER4);
-	    orders_building.push_back(BUILD_WELL);
-	    orders_building.push_back(BUILD_STATUE);
-	    orders_building.push_back(BUILD_SHIPYARD);
-	    break;
-	case Race::BARB:
-	    orders_building.push_back(BUILD_SPEC);
-	    orders_building.push_back(BUILD_WEL2);
-	    orders_building.push_back(DWELLING_MONSTER6);
-	    orders_building.push_back(BUILD_MAGEGUILD1);
-	    orders_building.push_back(BUILD_MAGEGUILD2);
-	    orders_building.push_back(BUILD_MAGEGUILD3);
-	    orders_building.push_back(BUILD_MAGEGUILD4);
-	    orders_building.push_back(BUILD_MAGEGUILD5);
-	    orders_building.push_back(BUILD_CAPTAIN);
-	    orders_building.push_back(BUILD_CASTLE);
-	    orders_building.push_back(BUILD_LEFTTURRET);
-	    orders_building.push_back(BUILD_RIGHTTURRET);
-	    orders_building.push_back(BUILD_MOAT);
-	    orders_building.push_back(DWELLING_MONSTER3);
-	    orders_building.push_back(BUILD_THIEVESGUILD);
-	    orders_building.push_back(BUILD_TAVERN);
-	    orders_building.push_back(DWELLING_MONSTER1);
-	    orders_building.push_back(BUILD_MARKETPLACE);
-	    orders_building.push_back(DWELLING_MONSTER2);
-	    orders_building.push_back(DWELLING_MONSTER4);
-	    orders_building.push_back(DWELLING_MONSTER5);
-	    orders_building.push_back(BUILD_WELL);
-	    orders_building.push_back(BUILD_STATUE);
-	    orders_building.push_back(BUILD_SHIPYARD);
-	    break;
-	case Race::SORC:
-	    orders_building.push_back(BUILD_SPEC);
-	    orders_building.push_back(DWELLING_MONSTER6);
-	    orders_building.push_back(BUILD_MAGEGUILD1);
-	    orders_building.push_back(BUILD_MAGEGUILD2);
-	    orders_building.push_back(BUILD_MAGEGUILD3);
-	    orders_building.push_back(BUILD_MAGEGUILD4);
-	    orders_building.push_back(BUILD_MAGEGUILD5);
-	    orders_building.push_back(BUILD_CAPTAIN);
-	    orders_building.push_back(BUILD_CASTLE);
-	    orders_building.push_back(BUILD_LEFTTURRET);
-	    orders_building.push_back(BUILD_RIGHTTURRET);
-	    orders_building.push_back(BUILD_MOAT);
-	    orders_building.push_back(DWELLING_MONSTER3);
-	    orders_building.push_back(BUILD_SHIPYARD);
-	    orders_building.push_back(BUILD_MARKETPLACE);
-	    orders_building.push_back(DWELLING_MONSTER2);
-	    orders_building.push_back(BUILD_THIEVESGUILD);
-	    orders_building.push_back(DWELLING_MONSTER1);
-	    orders_building.push_back(BUILD_TAVERN);
-	    orders_building.push_back(BUILD_STATUE);
-	    orders_building.push_back(BUILD_WEL2);
-	    orders_building.push_back(DWELLING_MONSTER4);
-	    orders_building.push_back(BUILD_WELL);
-	    orders_building.push_back(DWELLING_MONSTER5);
-	    break;
-	case Race::WRLK:
-	    orders_building.push_back(DWELLING_MONSTER5);
-	    orders_building.push_back(DWELLING_MONSTER3);
-	    orders_building.push_back(BUILD_CASTLE);
-	    orders_building.push_back(BUILD_LEFTTURRET);
-	    orders_building.push_back(BUILD_RIGHTTURRET);
-	    orders_building.push_back(BUILD_CAPTAIN);
-	    orders_building.push_back(BUILD_MOAT);
-	    orders_building.push_back(BUILD_SHIPYARD);
-	    orders_building.push_back(BUILD_MAGEGUILD1);
-	    orders_building.push_back(BUILD_MAGEGUILD2);
-	    orders_building.push_back(BUILD_MAGEGUILD3);
-	    orders_building.push_back(BUILD_MAGEGUILD4);
-	    orders_building.push_back(BUILD_MAGEGUILD5);
-	    orders_building.push_back(BUILD_TAVERN);
-	    orders_building.push_back(BUILD_THIEVESGUILD);
-	    orders_building.push_back(BUILD_MARKETPLACE);
-	    orders_building.push_back(BUILD_STATUE);
-	    orders_building.push_back(DWELLING_MONSTER1);
-	    orders_building.push_back(BUILD_WEL2);
-	    orders_building.push_back(BUILD_SPEC);
-	    orders_building.push_back(DWELLING_MONSTER4);
-	    orders_building.push_back(DWELLING_MONSTER2);
-	    orders_building.push_back(DWELLING_MONSTER6);
-	    orders_building.push_back(BUILD_WELL);
-	    break;
-	case Race::WZRD:
-	    orders_building.push_back(DWELLING_MONSTER6);
-	    orders_building.push_back(BUILD_CASTLE);
-	    orders_building.push_back(BUILD_LEFTTURRET);
-	    orders_building.push_back(BUILD_RIGHTTURRET);
-	    orders_building.push_back(BUILD_MOAT);
-	    orders_building.push_back(BUILD_CAPTAIN);
-	    orders_building.push_back(DWELLING_MONSTER2);
-	    orders_building.push_back(BUILD_THIEVESGUILD);
-	    orders_building.push_back(BUILD_TAVERN);
-	    orders_building.push_back(BUILD_SHIPYARD);
-	    orders_building.push_back(BUILD_WELL);
-	    orders_building.push_back(BUILD_SPEC);
-	    orders_building.push_back(DWELLING_MONSTER3);
-	    orders_building.push_back(DWELLING_MONSTER5);
-	    orders_building.push_back(BUILD_MAGEGUILD1);
-	    orders_building.push_back(BUILD_MAGEGUILD2);
-	    orders_building.push_back(BUILD_MAGEGUILD3);
-	    orders_building.push_back(BUILD_MAGEGUILD4);
-	    orders_building.push_back(BUILD_MAGEGUILD5);
-	    orders_building.push_back(BUILD_STATUE);
-	    orders_building.push_back(DWELLING_MONSTER1);
-	    orders_building.push_back(DWELLING_MONSTER4);
-	    orders_building.push_back(BUILD_MARKETPLACE);
-	    orders_building.push_back(BUILD_WEL2);
-	    break;
-	case Race::NECR:
-	    orders_building.push_back(BUILD_SPEC);
-	    if(Settings::Get().PriceLoyaltyVersion()) orders_building.push_back(BUILD_TAVERN); // shrine
-	    orders_building.push_back(BUILD_CASTLE);
-	    orders_building.push_back(BUILD_CAPTAIN);
-	    orders_building.push_back(BUILD_LEFTTURRET);
-	    orders_building.push_back(BUILD_RIGHTTURRET);
-	    orders_building.push_back(DWELLING_MONSTER6);
-	    orders_building.push_back(BUILD_MOAT);
-	    orders_building.push_back(DWELLING_MONSTER1);
-	    orders_building.push_back(BUILD_SHIPYARD);
-	    orders_building.push_back(BUILD_THIEVESGUILD);
-	    orders_building.push_back(BUILD_TAVERN);
-	    orders_building.push_back(DWELLING_MONSTER3);
-	    orders_building.push_back(DWELLING_MONSTER5);
-	    orders_building.push_back(DWELLING_MONSTER2);
-	    orders_building.push_back(DWELLING_MONSTER4);
-	    orders_building.push_back(BUILD_MAGEGUILD1);
-	    orders_building.push_back(BUILD_MAGEGUILD2);
-	    orders_building.push_back(BUILD_MAGEGUILD3);
-	    orders_building.push_back(BUILD_MAGEGUILD4);
-	    orders_building.push_back(BUILD_MAGEGUILD5);
-	    orders_building.push_back(BUILD_WEL2);
-	    orders_building.push_back(BUILD_MARKETPLACE);
-	    orders_building.push_back(BUILD_STATUE);
-	    orders_building.push_back(BUILD_WELL);
-	    break;
+	case BUILD_TAVERN:
+	case BUILD_SHIPYARD:
+	case BUILD_WELL:
+	case BUILD_STATUE:
+	case BUILD_LEFTTURRET:
+	case BUILD_RIGHTTURRET:
+	case BUILD_MARKETPLACE:
+	case BUILD_WEL2:
+	case BUILD_MOAT:
+	case BUILD_SPEC:
+	case BUILD_CASTLE:
+	case BUILD_CAPTAIN:
+	case BUILD_SHRINE:
+	case BUILD_MAGEGUILD1:
+	case BUILD_MAGEGUILD2:
+	case BUILD_MAGEGUILD3:
+	case BUILD_MAGEGUILD4:
+	case BUILD_MAGEGUILD5:
+	case BUILD_TENT:
+	case DWELLING_MONSTER1:
+	case DWELLING_MONSTER2:
+	case DWELLING_MONSTER3:
+	case DWELLING_MONSTER4:
+	case DWELLING_MONSTER5:
+	case DWELLING_MONSTER6:
+	return true;
+
 	default: break;
     }
+
+    return false;
 }
 
+const Sprite & GetActualSpriteBuilding(const Castle & castle, u32 build)
+{
+    u8 index = 0;
+    // correct index (mage guild)
+    switch(build)
+    {
+	case BUILD_MAGEGUILD1: index = 0; break;
+    	case BUILD_MAGEGUILD2: index = Race::NECR == castle.GetRace() ? 6 : 1; break;
+    	case BUILD_MAGEGUILD3: index = Race::NECR == castle.GetRace() ? 12 : 2; break;
+    	case BUILD_MAGEGUILD4: index = Race::NECR == castle.GetRace() ? 18 : 3; break;
+    	case BUILD_MAGEGUILD5: index = Race::NECR == castle.GetRace() ? 24 : 4; break;
+    	default: break;
+    }
+
+    return AGG::GetICN(castle.GetICNBuilding(build, castle.GetRace()), index);
+}
+
+building_t GetCurrentFlash(const Castle & castle, CastleDialog::CacheBuildings & cache)
+{
+    LocalEvent & le = LocalEvent::Get();
+    CastleDialog::CacheBuildings::iterator it;
+    building_t flash = BUILD_NOTHING;
+
+
+    for(it = cache.begin(); it != cache.end(); ++it)
+	if(castle.isBuild((*it).id) && ((*it).coord & le.GetMouseCursor()) &&
+		AllowFlashBuilding((*it).id))
+	{
+	    if((*it).id & BUILD_MAGEGUILD)
+	    {
+		const u8 & lvl = castle.GetLevelMageGuild();
+
+		if(((*it).id == BUILD_MAGEGUILD1 && lvl > 1) ||
+		   ((*it).id == BUILD_MAGEGUILD2 && lvl > 2) ||
+		   ((*it).id == BUILD_MAGEGUILD3 && lvl > 3) ||
+		   ((*it).id == BUILD_MAGEGUILD4 && lvl > 4)) continue;
+	    }
+	    break;
+	}
+
+    if(it != cache.end())
+    {
+	flash = (*it).id;
+
+	if(! (*it).contour.isValid())
+        {
+            const Sprite & sprite = GetActualSpriteBuilding(castle, flash);
+    	    Surface::MakeContour((*it).contour, sprite, sprite.GetColor(0xDA));
+	    (*it).contour.SetOffset(sprite.x() - 1, sprite.y() - 1);
+	}
+    }
+
+    return flash;
+}
 void RedrawIcons(const Castle & castle, const Heroes* hero1, const Heroes* hero2, const Point & pt)
 {
     Display & display = Display::Get();
@@ -388,31 +315,32 @@ Dialog::answer_t Castle::OpenDialog(bool readonly, bool fade)
     dst_pt.y = cur_pt.y + 428;
     Button buttonExit(dst_pt, ICN::SWAPBTN, 0, 1);
 
-    const Rect coordBuildingThievesGuild(GetCoordBuilding(BUILD_THIEVESGUILD, cur_pt));
-    const Rect coordBuildingTavern(GetCoordBuilding(BUILD_TAVERN, cur_pt));
-    const Rect coordBuildingShipyard(GetCoordBuilding(BUILD_SHIPYARD, cur_pt));
-    const Rect coordBuildingWell(GetCoordBuilding(BUILD_WELL, cur_pt));
-    const Rect coordBuildingStatue(GetCoordBuilding(BUILD_STATUE, cur_pt));
-    const Rect coordBuildingMarketplace(GetCoordBuilding(BUILD_MARKETPLACE, cur_pt));
-    const Rect coordBuildingWel2(GetCoordBuilding(BUILD_WEL2, cur_pt));
-    const Rect coordBuildingMoat(GetCoordBuilding(BUILD_MOAT, cur_pt));
-    const Rect coordBuildingSpec(GetCoordBuilding(BUILD_SPEC, cur_pt));
-    const Rect coordBuildingCastle(GetCoordBuilding(BUILD_CASTLE, cur_pt));
-    const Rect coordBuildingCaptain(GetCoordBuilding(BUILD_CAPTAIN, cur_pt));
-    const Rect coordBuildingTent(GetCoordBuilding(BUILD_TENT, cur_pt));
+    // fill cache buildings
+    CastleDialog::CacheBuildings cacheBuildings(*this, cur_pt);
 
-    const Rect coordDwellingMonster1(GetCoordBuilding(DWELLING_MONSTER1, cur_pt));
-    const Rect coordDwellingMonster2(GetCoordBuilding(DWELLING_MONSTER2, cur_pt));
-    const Rect coordDwellingMonster3(GetCoordBuilding(DWELLING_MONSTER3, cur_pt));
-    const Rect coordDwellingMonster4(GetCoordBuilding(DWELLING_MONSTER4, cur_pt));
-    const Rect coordDwellingMonster5(GetCoordBuilding(DWELLING_MONSTER5, cur_pt));
-    const Rect coordDwellingMonster6(GetCoordBuilding(DWELLING_MONSTER6, cur_pt));
-
-    // orders draw building
-    std::vector<building_t> orders_building;
-    orders_building.reserve(25);
-
-    PackOrdersBuilding(*this, orders_building);
+    const Rect & coordBuildingThievesGuild = cacheBuildings.GetRect(BUILD_THIEVESGUILD);
+    const Rect & coordBuildingTavern = cacheBuildings.GetRect(BUILD_TAVERN);
+    const Rect & coordBuildingShipyard = cacheBuildings.GetRect(BUILD_SHIPYARD);
+    const Rect & coordBuildingWell = cacheBuildings.GetRect(BUILD_WELL);
+    const Rect & coordBuildingStatue = cacheBuildings.GetRect(BUILD_STATUE);
+    const Rect & coordBuildingMarketplace = cacheBuildings.GetRect(BUILD_MARKETPLACE);
+    const Rect & coordBuildingWel2 = cacheBuildings.GetRect(BUILD_WEL2);
+    const Rect & coordBuildingMoat = cacheBuildings.GetRect(BUILD_MOAT);
+    const Rect & coordBuildingSpec = cacheBuildings.GetRect(BUILD_SPEC);
+    const Rect & coordBuildingCastle = cacheBuildings.GetRect(BUILD_CASTLE);
+    const Rect & coordBuildingCaptain = cacheBuildings.GetRect(BUILD_CAPTAIN);
+    const Rect & coordBuildingTent = cacheBuildings.GetRect(BUILD_TENT);
+    const Rect coordMageGuild1 = cacheBuildings.GetRect(BUILD_MAGEGUILD1);
+    const Rect coordMageGuild2 = cacheBuildings.GetRect(BUILD_MAGEGUILD2);
+    const Rect coordMageGuild3 = cacheBuildings.GetRect(BUILD_MAGEGUILD3);
+    const Rect coordMageGuild4 = cacheBuildings.GetRect(BUILD_MAGEGUILD4);
+    const Rect coordMageGuild5 = cacheBuildings.GetRect(BUILD_MAGEGUILD5);
+    const Rect & coordDwellingMonster1 = cacheBuildings.GetRect(DWELLING_MONSTER1);
+    const Rect & coordDwellingMonster2 = cacheBuildings.GetRect(DWELLING_MONSTER2);
+    const Rect & coordDwellingMonster3 = cacheBuildings.GetRect(DWELLING_MONSTER3);
+    const Rect & coordDwellingMonster4 = cacheBuildings.GetRect(DWELLING_MONSTER4);
+    const Rect & coordDwellingMonster5 = cacheBuildings.GetRect(DWELLING_MONSTER5);
+    const Rect & coordDwellingMonster6 = cacheBuildings.GetRect(DWELLING_MONSTER6);
 
     // update extra description
     payment_t profit;
@@ -431,7 +359,7 @@ Dialog::answer_t Castle::OpenDialog(bool readonly, bool fade)
     String::Replace(description_spec, "%{count}", profit.gold);
 
     // draw building
-    RedrawAllBuilding(*this, cur_pt, orders_building);
+    CastleDialog::RedrawAllBuilding(*this, cur_pt, cacheBuildings);
 
     if(2 > world.GetMyKingdom().GetCastles().size() || readonly)
     {
@@ -680,7 +608,7 @@ Dialog::answer_t Castle::OpenDialog(bool readonly, bool fade)
 		// play sound
     		AGG::PlaySound(M82::BUILDTWN);
 
-		RedrawAnimationBuilding(*this, cur_pt, orders_building, build);
+		CastleDialog::RedrawAnimationBuilding(*this, cur_pt, cacheBuildings, build);
 		BuyBuilding(build);
 		RedrawResourcePanel(cur_pt);
 
@@ -757,7 +685,7 @@ Dialog::answer_t Castle::OpenDialog(bool readonly, bool fade)
 		// play sound
     		AGG::PlaySound(M82::BUILDTWN);
 
-		RedrawAnimationBuilding(*this, cur_pt, orders_building, BUILD_CASTLE);
+		CastleDialog::RedrawAnimationBuilding(*this, cur_pt, cacheBuildings, BUILD_CASTLE);
 		BuyBuilding(BUILD_CASTLE);
 		RedrawResourcePanel(cur_pt);
 
@@ -774,8 +702,8 @@ Dialog::answer_t Castle::OpenDialog(bool readonly, bool fade)
 	    Dialog::Message(GetStringBuilding(BUILD_CAPTAIN), GetDescriptionBuilding(BUILD_CAPTAIN), Font::BIG, Dialog::OK);
 	else
 	// left click mage guild
-	if((building & (BUILD_MAGEGUILD5 | BUILD_MAGEGUILD4 | BUILD_MAGEGUILD3 | BUILD_MAGEGUILD2 | BUILD_MAGEGUILD1)) &&
-	    le.MouseClickLeft(GetCoordBuilding(BUILD_MAGEGUILD5, cur_pt)))
+	if((building & BUILD_MAGEGUILD) &&
+	    le.MouseClickLeft(coordMageGuild5))
 	{
 		// buy spell book
 		if(!castle_heroes || (*castle_heroes).HasArtifact(Artifact::MAGIC_BOOK))
@@ -848,8 +776,8 @@ Dialog::answer_t Castle::OpenDialog(bool readonly, bool fade)
 	if(building & BUILD_CAPTAIN && le.MousePressRight(coordBuildingCaptain)) Dialog::Message(GetStringBuilding(BUILD_CAPTAIN), GetDescriptionBuilding(BUILD_CAPTAIN), Font::BIG);
 	else
 	// right press mage guild
-	if(building & (BUILD_MAGEGUILD5 | BUILD_MAGEGUILD4 | BUILD_MAGEGUILD3 | BUILD_MAGEGUILD2 | BUILD_MAGEGUILD1) &&
-	    le.MousePressRight(GetCoordBuilding(BUILD_MAGEGUILD5, cur_pt))) Dialog::Message(GetStringBuilding(BUILD_MAGEGUILD1), GetDescriptionBuilding(BUILD_MAGEGUILD1), Font::BIG);
+	if(building & BUILD_MAGEGUILD &&
+	    le.MousePressRight(coordMageGuild5)) Dialog::Message(GetStringBuilding(BUILD_MAGEGUILD1), GetDescriptionBuilding(BUILD_MAGEGUILD1), Font::BIG);
 	else
 	// right press dwelling monster
 	if(building & DWELLING_MONSTER1 && le.MousePressRight(coordDwellingMonster1))
@@ -923,15 +851,15 @@ Dialog::answer_t Castle::OpenDialog(bool readonly, bool fade)
 	if(building & BUILD_CAPTAIN && le.MouseCursor(coordBuildingCaptain)) statusBar.ShowMessage(GetStringBuilding(BUILD_CAPTAIN));
 	else
 	// mage guild
-	if(building & BUILD_MAGEGUILD5 && le.MouseCursor(GetCoordBuilding(BUILD_MAGEGUILD5, cur_pt))) statusBar.ShowMessage(GetStringBuilding(BUILD_MAGEGUILD5));
+	if(building & BUILD_MAGEGUILD5 && le.MouseCursor(coordMageGuild5)) statusBar.ShowMessage(GetStringBuilding(BUILD_MAGEGUILD5));
 	else
-	if(building & BUILD_MAGEGUILD4 && le.MouseCursor(GetCoordBuilding(BUILD_MAGEGUILD4, cur_pt))) statusBar.ShowMessage(GetStringBuilding(BUILD_MAGEGUILD4));
+	if(building & BUILD_MAGEGUILD4 && le.MouseCursor(coordMageGuild4)) statusBar.ShowMessage(GetStringBuilding(BUILD_MAGEGUILD4));
 	else
-	if(building & BUILD_MAGEGUILD3 && le.MouseCursor(GetCoordBuilding(BUILD_MAGEGUILD3, cur_pt))) statusBar.ShowMessage(GetStringBuilding(BUILD_MAGEGUILD3));
+	if(building & BUILD_MAGEGUILD3 && le.MouseCursor(coordMageGuild3)) statusBar.ShowMessage(GetStringBuilding(BUILD_MAGEGUILD3));
 	else
-	if(building & BUILD_MAGEGUILD2 && le.MouseCursor(GetCoordBuilding(BUILD_MAGEGUILD2, cur_pt))) statusBar.ShowMessage(GetStringBuilding(BUILD_MAGEGUILD2));
+	if(building & BUILD_MAGEGUILD2 && le.MouseCursor(coordMageGuild2)) statusBar.ShowMessage(GetStringBuilding(BUILD_MAGEGUILD2));
 	else
-	if(building & BUILD_MAGEGUILD1 && le.MouseCursor(GetCoordBuilding(BUILD_MAGEGUILD1, cur_pt))) statusBar.ShowMessage(GetStringBuilding(BUILD_MAGEGUILD1));
+	if(building & BUILD_MAGEGUILD1 && le.MouseCursor(coordMageGuild1)) statusBar.ShowMessage(GetStringBuilding(BUILD_MAGEGUILD1));
 	else
 	// dwelling monster
 	if(building & DWELLING_MONSTER1 && le.MouseCursor(coordDwellingMonster1)) statusBar.ShowMessage(Monster(race, DWELLING_MONSTER1).GetName());
@@ -954,7 +882,8 @@ Dialog::answer_t Castle::OpenDialog(bool readonly, bool fade)
 	if(Game::AnimateInfrequent(Game::CASTLE_AROUND_DELAY))
 	{
 	    cursor.Hide();
-	    RedrawAllBuilding(*this, cur_pt, orders_building);
+	    CastleDialog::RedrawAllBuilding(*this, cur_pt, cacheBuildings,
+			(conf.ExtCastleAllowFlash() ? GetCurrentFlash(*this, cacheBuildings) : BUILD_NOTHING));
 	    cursor.Show();
 	    display.Flip();
 	}

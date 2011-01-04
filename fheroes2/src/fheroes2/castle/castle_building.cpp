@@ -28,11 +28,308 @@
 #include "game.h"
 
 void CastleRedrawTownName(const Castle &, const Point &);
-void CastleRedrawCurrentBuilding(const Castle &, const Point &, const std::vector<building_t> &, u32 build);
+void CastleRedrawCurrentBuilding(const Castle &, const Point &, const CastleDialog::CacheBuildings &, u32 build, u32 flash);
 void CastleRedrawBuilding(const Castle &, const Point &, u32 build, u32 frame, u8 alpha);
 void CastleRedrawBuildingExtended(const Castle &, const Point &, u32 build, u32 frame);
+Rect CastleGetCoordBuilding(Race::race_t, building_t, const Point &);
+void CastlePackOrdersBuildings(const Castle &, std::vector<building_t> &);
+Rect CastleGetMaxArea(const Castle &, const Point &);
 
-Rect Castle::GetCoordBuilding(building_t building, const Point & pt)
+void CastleDialog::RedrawBuildingSpriteToArea(const Sprite & sprite, s16 dst_x, s16 dst_y, const Rect & max)
+{
+    Display & display = Display::Get();
+    Rect src;
+
+    ToolsSrcRectFixed(src, dst_x, dst_y, sprite.w(), sprite.h(), max);
+    display.Blit(sprite, src, dst_x, dst_y);
+}
+
+CastleDialog::CacheBuildings::CacheBuildings(const Castle & castle, const Point & top)
+{
+    std::vector<building_t> ordersBuildings;
+
+    ordersBuildings.reserve(25);
+    reserve(25);
+
+    CastlePackOrdersBuildings(castle, ordersBuildings);
+
+    for(std::vector<building_t>::const_iterator
+        it = ordersBuildings.begin(); it != ordersBuildings.end(); ++it)
+    {
+        push_back(builds_t(*it, CastleGetCoordBuilding(castle.GetRace(), *it, top)));
+    }
+}
+
+const Rect & CastleDialog::CacheBuildings::GetRect(building_t b)
+{
+    iterator it = std::find(begin(), end(), b);
+    return (*it).coord;
+}
+
+void CastleDialog::RedrawAnimationBuilding(const Castle & castle, const Point & dst_pt, const CacheBuildings & orders, u32 build)
+{
+    CastleRedrawCurrentBuilding(castle, dst_pt, orders, build, BUILD_NOTHING);
+}
+
+void CastleDialog::RedrawAllBuilding(const Castle & castle, const Point & dst_pt, const CacheBuildings & orders, u32 flash)
+{
+    CastleRedrawCurrentBuilding(castle, dst_pt, orders, BUILD_NOTHING, flash);
+    CastleRedrawTownName(castle, dst_pt);
+}
+
+void CastleRedrawTownName(const Castle & castle, const Point & dst)
+{
+    const Sprite & ramka = AGG::GetICN(ICN::TOWNNAME, 0);
+    Point dst_pt(dst.x + 320 - ramka.w() / 2, dst.y + 248);
+    Display::Get().Blit(ramka, dst_pt);
+
+    Text text(castle.GetName(), Font::SMALL);
+    dst_pt.x = dst.x + 320 - text.w() / 2;
+    dst_pt.y = dst.y + 248;
+    text.Blit(dst_pt);
+}
+
+void CastleRedrawCurrentBuilding(const Castle & castle, const Point & dst_pt,
+				const CastleDialog::CacheBuildings & orders, u32 build, u32 flash)
+{
+    static u32 frame = 0;
+
+    Display & display = Display::Get();
+    Cursor & cursor = Cursor::Get();
+
+    const Sprite* townbkg = NULL;
+
+    // before redraw
+    switch(castle.GetRace())
+    {
+	case Race::KNGT: townbkg = &AGG::GetICN(ICN::TOWNBKG0, 0); break;
+	case Race::BARB: townbkg = &AGG::GetICN(ICN::TOWNBKG1, 0); break;
+	case Race::SORC: townbkg = &AGG::GetICN(ICN::TOWNBKG2, 0); break;
+	case Race::WRLK: townbkg = &AGG::GetICN(ICN::TOWNBKG3, 0); break;
+	case Race::WZRD: townbkg = &AGG::GetICN(ICN::TOWNBKG4, 0); break;
+	case Race::NECR: townbkg = &AGG::GetICN(ICN::TOWNBKG5, 0); break;
+	default: break;
+    }
+
+    const Rect max = CastleGetMaxArea(castle, dst_pt);
+
+    if(townbkg)
+	display.Blit(*townbkg, dst_pt.x, dst_pt.y);
+
+    if(Race::BARB == castle.GetRace())
+    {
+	const Sprite & sprite0 = AGG::GetICN(ICN::TWNBEXT1, 1 + frame % 5);
+	display.Blit(sprite0, dst_pt.x + sprite0.x(), dst_pt.y + sprite0.y());
+    }
+
+    // sea anime
+    if(Race::WZRD == castle.GetRace() || (!castle.isBuild(BUILD_SHIPYARD) && castle.HaveNearlySea()))
+    {
+    	const Sprite * sprite50 = NULL;
+    	const Sprite * sprite51 = NULL;
+
+    	switch(castle.GetRace())
+    	{
+    	    case Race::KNGT:
+    		sprite50 = &AGG::GetICN(ICN::TWNKEXT0, 0);
+    		sprite51 = &AGG::GetICN(ICN::TWNKEXT0, 1 + frame % 5);
+    		break;
+    	    case Race::BARB:
+    		sprite50 = &AGG::GetICN(ICN::TWNBEXT0, 0);
+    		sprite51 = &AGG::GetICN(ICN::TWNBEXT0, 1 + frame % 5);
+    		break;
+    	    case Race::SORC:
+    		sprite50 = &AGG::GetICN(ICN::TWNSEXT0, 0);
+    		sprite51 = &AGG::GetICN(ICN::TWNSEXT0, 1 + frame % 5);
+    		break;
+    	    case Race::NECR:
+    		sprite50 = &AGG::GetICN(ICN::TWNNEXT0, 0);
+    		sprite51 = &AGG::GetICN(ICN::TWNNEXT0, 1 + frame % 5);
+    		break;
+    	    case Race::WRLK:
+    		sprite50 = &AGG::GetICN(ICN::TWNWEXT0, 0);
+    		sprite51 = &AGG::GetICN(ICN::TWNWEXT0, 1 + frame % 5);
+    		break;
+    	    case Race::WZRD:
+    		sprite50 = &AGG::GetICN(ICN::TWNZEXT0, 0);
+    		sprite51 = &AGG::GetICN(ICN::TWNZEXT0, 1 + frame % 5);
+    		break;
+    	    default:
+    		break;
+    	}
+
+	if(sprite50)
+	    CastleDialog::RedrawBuildingSpriteToArea(*sprite50, dst_pt.x + sprite50->x(), dst_pt.y + sprite50->y(), max);
+
+	if(sprite51)
+	    CastleDialog::RedrawBuildingSpriteToArea(*sprite51, dst_pt.x + sprite51->x(), dst_pt.y + sprite51->y(), max);
+    }
+
+    // redraw all builds
+    if(BUILD_NOTHING == build)
+    {
+	for(CastleDialog::CacheBuildings::const_iterator
+	    it = orders.begin(); it != orders.end(); ++it)
+	{
+	    if(castle.isBuild((*it).id))
+	    {
+		CastleRedrawBuilding(castle, dst_pt, (*it).id, frame, 0);
+
+		if(flash == (*it).id)
+		{
+		    CastleDialog::RedrawBuildingSpriteToArea((*it).contour, 
+			dst_pt.x + (*it).contour.x(), dst_pt.y + (*it).contour.y(), max);
+		}
+		CastleRedrawBuildingExtended(castle, dst_pt, (*it).id, frame);
+	    }
+	}
+    }
+    // redraw build with alpha 
+    else
+    if(orders.end() != std::find(orders.begin(), orders.end(), build))
+    {
+	LocalEvent & le = LocalEvent::Get();
+	u8 alpha = 1;
+
+	while(le.HandleEvents() && alpha < 250)
+	{
+    	    if(Game::AnimateInfrequent(Game::CASTLE_BUILD_DELAY))
+    	    {
+    		cursor.Hide();
+
+		for(CastleDialog::CacheBuildings::const_iterator
+		    it = orders.begin(); it != orders.end(); ++it)
+		{
+		    const u32 & build2 = (*it).id;
+
+		    if(castle.isBuild(build2))
+		    {
+			CastleRedrawBuilding(castle, dst_pt, build2, frame, 0);
+			CastleRedrawBuildingExtended(castle, dst_pt, build2, frame);
+		    }
+		    else
+		    if(build2 == build)
+		    {
+			CastleRedrawBuilding(castle, dst_pt, build2, frame, alpha);
+			CastleRedrawTownName(castle, dst_pt);
+			alpha += 10;
+		    }
+		}
+
+		CastleRedrawTownName(castle, dst_pt);
+
+		cursor.Show();
+    		display.Flip();
+	    }
+	    ++frame;
+	}
+
+	cursor.Hide();
+    }
+
+    ++frame;
+}
+
+void CastleRedrawBuilding(const Castle & castle, const Point & dst_pt, u32 build, u32 frame, u8 alpha)
+{
+    const Rect max = CastleGetMaxArea(castle, dst_pt);
+
+    // correct build
+    switch(build)
+    {
+	case DWELLING_MONSTER2:
+	case DWELLING_MONSTER3:
+	case DWELLING_MONSTER4:
+	case DWELLING_MONSTER5:
+	case DWELLING_MONSTER6: build = castle.GetActualDwelling(build); break;
+
+	default: break;
+    }
+
+    const ICN::icn_t icn = Castle::GetICNBuilding(build, castle.GetRace());
+    u8 index = 0;
+    	    
+    // correct index (mage guild)
+    switch(build)
+    {
+        case BUILD_MAGEGUILD1: index = 0; break;
+        case BUILD_MAGEGUILD2: index = Race::NECR == castle.GetRace() ? 6 : 1; break;
+        case BUILD_MAGEGUILD3: index = Race::NECR == castle.GetRace() ? 12 : 2; break;
+        case BUILD_MAGEGUILD4: index = Race::NECR == castle.GetRace() ? 18 : 3; break;
+        case BUILD_MAGEGUILD5: index = Race::NECR == castle.GetRace() ? 24 : 4; break;
+        default: break;
+    }
+
+    Display & display = Display::Get();
+
+    // simple first sprite
+    const Sprite & sprite1 = AGG::GetICN(icn, index);
+
+    if(alpha)
+	sprite1.BlitSpriteWithAlpha(display, alpha, dst_pt.x + sprite1.x(), dst_pt.y + sprite1.y());
+    else
+	CastleDialog::RedrawBuildingSpriteToArea(sprite1, dst_pt.x + sprite1.x(), dst_pt.y + sprite1.y(), max);
+
+    // second anime sprite
+    if(const u16 index2 = ICN::AnimationFrame(icn, index, frame))
+    {
+	const Sprite & sprite2 = AGG::GetICN(icn, index2);
+	if(alpha)
+	    sprite2.BlitSpriteWithAlpha(display, alpha, dst_pt.x + sprite2.x(), dst_pt.y + sprite2.y());
+	else
+	    CastleDialog::RedrawBuildingSpriteToArea(sprite2, dst_pt.x + sprite2.x(), dst_pt.y + sprite2.y(), max);
+    }
+}
+
+void CastleRedrawBuildingExtended(const Castle & castle, const Point & dst_pt, u32 build, u32 frame)
+{
+    const Rect max = CastleGetMaxArea(castle, dst_pt);
+    ICN::icn_t icn = Castle::GetICNBuilding(build, castle.GetRace());
+
+    // shipyard
+    if(BUILD_SHIPYARD == build)
+    {
+	// boat
+	if(castle.PresentBoat())
+	{
+	    const ICN::icn_t icn2 = castle.GetICNBoat(castle.GetRace());
+
+    	    const Sprite & sprite40 = AGG::GetICN(icn2, 0);
+	    CastleDialog::RedrawBuildingSpriteToArea(sprite40, dst_pt.x + sprite40.x(), dst_pt.y + sprite40.y(), max);
+
+    	    if(const u16 index2 = ICN::AnimationFrame(icn2, 0, frame))
+	    {
+		const Sprite & sprite41 = AGG::GetICN(icn2, index2);
+		CastleDialog::RedrawBuildingSpriteToArea(sprite41, dst_pt.x + sprite41.x(), dst_pt.y + sprite41.y(), max);
+	    }
+	}
+	else
+	{
+    	    if(const u16 index2 = ICN::AnimationFrame(icn, 0, frame))
+	    {
+		const Sprite & sprite3 = AGG::GetICN(icn, index2);
+		CastleDialog::RedrawBuildingSpriteToArea(sprite3, dst_pt.x + sprite3.x(), dst_pt.y + sprite3.y(), max);
+	    }
+	}
+    }
+    else
+    // sorc and anime wel2 or statue
+    if(Race::SORC == castle.GetRace() && BUILD_WEL2 == build)
+    {
+	const ICN::icn_t icn2 = castle.isBuild(BUILD_STATUE) ? ICN::TWNSEXT1 : icn;
+
+    	const Sprite & sprite20 = AGG::GetICN(icn2, 0);
+	CastleDialog::RedrawBuildingSpriteToArea(sprite20, dst_pt.x + sprite20.x(), dst_pt.y + sprite20.y(), max);
+
+    	if(const u16 index2 = ICN::AnimationFrame(icn2, 0, frame))
+	{
+	    const Sprite & sprite21 = AGG::GetICN(icn2, index2);
+	    CastleDialog::RedrawBuildingSpriteToArea(sprite21, dst_pt.x + sprite21.x(), dst_pt.y + sprite21.y(), max);
+	}
+    }
+}
+
+Rect CastleGetCoordBuilding(Race::race_t race, building_t building, const Point & pt)
 {
     switch(building)
     {
@@ -348,273 +645,191 @@ Rect Castle::GetCoordBuilding(building_t building, const Point & pt)
     return Rect();
 }
 
-void Castle::RedrawAnimationBuilding(const Castle & castle, const Point & dst_pt, const std::vector<building_t> & orders, u32 build)
+void CastlePackOrdersBuildings(const Castle & castle, std::vector<building_t> & ordersBuildings)
 {
-    CastleRedrawCurrentBuilding(castle, dst_pt, orders, build);
-}
-
-void Castle::RedrawAllBuilding(const Castle & castle, const Point & dst_pt, const std::vector<building_t> & orders)
-{
-    CastleRedrawCurrentBuilding(castle, dst_pt, orders, BUILD_NOTHING);
-    CastleRedrawTownName(castle, dst_pt);
-}
-
-void CastleRedrawTownName(const Castle & castle, const Point & dst)
-{
-    const Sprite & ramka = AGG::GetICN(ICN::TOWNNAME, 0);
-    Point dst_pt(dst.x + 320 - ramka.w() / 2, dst.y + 248);
-    Display::Get().Blit(ramka, dst_pt);
-
-    Text text(castle.GetName(), Font::SMALL);
-    dst_pt.x = dst.x + 320 - text.w() / 2;
-    dst_pt.y = dst.y + 248;
-    text.Blit(dst_pt);
-}
-
-void CastleRedrawCurrentBuilding(const Castle & castle, const Point & dst_pt, const std::vector<building_t> & orders, u32 build)
-{
-    static u32 frame = 0;
-
-    Display & display = Display::Get();
-    Cursor & cursor = Cursor::Get();
-
-    // before redraw
     switch(castle.GetRace())
     {
 	case Race::KNGT:
-	{
-	    const Sprite & townbkg = AGG::GetICN(ICN::TOWNBKG0, 0);
-	    display.Blit(townbkg, dst_pt);
-	}
-	break;
+	    ordersBuildings.push_back(BUILD_CASTLE);
+	    ordersBuildings.push_back(BUILD_SPEC);
+	    ordersBuildings.push_back(BUILD_WEL2);
+	    ordersBuildings.push_back(BUILD_CAPTAIN);
+	    ordersBuildings.push_back(BUILD_LEFTTURRET);
+	    ordersBuildings.push_back(BUILD_RIGHTTURRET);
+	    ordersBuildings.push_back(BUILD_MOAT);
+	    ordersBuildings.push_back(BUILD_MARKETPLACE);
+	    ordersBuildings.push_back(DWELLING_MONSTER2);
+	    ordersBuildings.push_back(BUILD_THIEVESGUILD);
+	    ordersBuildings.push_back(BUILD_TAVERN);
+	    ordersBuildings.push_back(BUILD_MAGEGUILD1);
+	    ordersBuildings.push_back(BUILD_MAGEGUILD2);
+	    ordersBuildings.push_back(BUILD_MAGEGUILD3);
+	    ordersBuildings.push_back(BUILD_MAGEGUILD4);
+	    ordersBuildings.push_back(BUILD_MAGEGUILD5);
+	    ordersBuildings.push_back(DWELLING_MONSTER5);
+	    ordersBuildings.push_back(DWELLING_MONSTER6);
+	    ordersBuildings.push_back(DWELLING_MONSTER1);
+	    ordersBuildings.push_back(DWELLING_MONSTER3);
+	    ordersBuildings.push_back(DWELLING_MONSTER4);
+	    ordersBuildings.push_back(BUILD_WELL);
+	    ordersBuildings.push_back(BUILD_STATUE);
+	    ordersBuildings.push_back(BUILD_SHIPYARD);
+	    break;
 	case Race::BARB:
-	{
-	    const Sprite & townbkg = AGG::GetICN(ICN::TOWNBKG1, 0);
-	    display.Blit(townbkg, dst_pt);
-
-    	    const Sprite & sprite0 = AGG::GetICN(ICN::TWNBEXT1, 1 + frame % 5);
-	    display.Blit(sprite0, dst_pt.x + sprite0.x(), dst_pt.y + sprite0.y());
-	}
-	break;
+	    ordersBuildings.push_back(BUILD_SPEC);
+	    ordersBuildings.push_back(BUILD_WEL2);
+	    ordersBuildings.push_back(DWELLING_MONSTER6);
+	    ordersBuildings.push_back(BUILD_MAGEGUILD1);
+	    ordersBuildings.push_back(BUILD_MAGEGUILD2);
+	    ordersBuildings.push_back(BUILD_MAGEGUILD3);
+	    ordersBuildings.push_back(BUILD_MAGEGUILD3);
+	    ordersBuildings.push_back(BUILD_MAGEGUILD4);
+	    ordersBuildings.push_back(BUILD_CAPTAIN);
+	    ordersBuildings.push_back(BUILD_CASTLE);
+	    ordersBuildings.push_back(BUILD_LEFTTURRET);
+	    ordersBuildings.push_back(BUILD_RIGHTTURRET);
+	    ordersBuildings.push_back(BUILD_MOAT);
+	    ordersBuildings.push_back(DWELLING_MONSTER3);
+	    ordersBuildings.push_back(BUILD_THIEVESGUILD);
+	    ordersBuildings.push_back(BUILD_TAVERN);
+	    ordersBuildings.push_back(DWELLING_MONSTER1);
+	    ordersBuildings.push_back(BUILD_MARKETPLACE);
+	    ordersBuildings.push_back(DWELLING_MONSTER2);
+	    ordersBuildings.push_back(DWELLING_MONSTER4);
+	    ordersBuildings.push_back(DWELLING_MONSTER5);
+	    ordersBuildings.push_back(BUILD_WELL);
+	    ordersBuildings.push_back(BUILD_STATUE);
+	    ordersBuildings.push_back(BUILD_SHIPYARD);
+	    break;
 	case Race::SORC:
-	{
-	    const Sprite & townbkg = AGG::GetICN(ICN::TOWNBKG2, 0);
-	    display.Blit(townbkg, dst_pt);
-	}
-	break;
+	    ordersBuildings.push_back(BUILD_SPEC);
+	    ordersBuildings.push_back(DWELLING_MONSTER6);
+	    ordersBuildings.push_back(BUILD_MAGEGUILD1);
+	    ordersBuildings.push_back(BUILD_MAGEGUILD2);
+	    ordersBuildings.push_back(BUILD_MAGEGUILD3);
+	    ordersBuildings.push_back(BUILD_MAGEGUILD3);
+	    ordersBuildings.push_back(BUILD_MAGEGUILD4);
+	    ordersBuildings.push_back(BUILD_CAPTAIN);
+	    ordersBuildings.push_back(BUILD_CASTLE);
+	    ordersBuildings.push_back(BUILD_LEFTTURRET);
+	    ordersBuildings.push_back(BUILD_RIGHTTURRET);
+	    ordersBuildings.push_back(BUILD_MOAT);
+	    ordersBuildings.push_back(DWELLING_MONSTER3);
+	    ordersBuildings.push_back(BUILD_SHIPYARD);
+	    ordersBuildings.push_back(BUILD_MARKETPLACE);
+	    ordersBuildings.push_back(DWELLING_MONSTER2);
+	    ordersBuildings.push_back(BUILD_THIEVESGUILD);
+	    ordersBuildings.push_back(DWELLING_MONSTER1);
+	    ordersBuildings.push_back(BUILD_TAVERN);
+	    ordersBuildings.push_back(BUILD_STATUE);
+	    ordersBuildings.push_back(BUILD_WEL2);
+	    ordersBuildings.push_back(DWELLING_MONSTER4);
+	    ordersBuildings.push_back(BUILD_WELL);
+	    ordersBuildings.push_back(DWELLING_MONSTER5);
+	    break;
 	case Race::WRLK:
-	{
-	    const Sprite & townbkg = AGG::GetICN(ICN::TOWNBKG3, 0);
-	    display.Blit(townbkg, dst_pt);
-	}
-	break;
+	    ordersBuildings.push_back(DWELLING_MONSTER5);
+	    ordersBuildings.push_back(DWELLING_MONSTER3);
+	    ordersBuildings.push_back(BUILD_CASTLE);
+	    ordersBuildings.push_back(BUILD_LEFTTURRET);
+	    ordersBuildings.push_back(BUILD_RIGHTTURRET);
+	    ordersBuildings.push_back(BUILD_CAPTAIN);
+	    ordersBuildings.push_back(BUILD_MOAT);
+	    ordersBuildings.push_back(BUILD_SHIPYARD);
+	    ordersBuildings.push_back(BUILD_MAGEGUILD1);
+	    ordersBuildings.push_back(BUILD_MAGEGUILD2);
+	    ordersBuildings.push_back(BUILD_MAGEGUILD3);
+	    ordersBuildings.push_back(BUILD_MAGEGUILD3);
+	    ordersBuildings.push_back(BUILD_MAGEGUILD4);
+	    ordersBuildings.push_back(BUILD_TAVERN);
+	    ordersBuildings.push_back(BUILD_THIEVESGUILD);
+	    ordersBuildings.push_back(BUILD_MARKETPLACE);
+	    ordersBuildings.push_back(BUILD_STATUE);
+	    ordersBuildings.push_back(DWELLING_MONSTER1);
+	    ordersBuildings.push_back(BUILD_WEL2);
+	    ordersBuildings.push_back(BUILD_SPEC);
+	    ordersBuildings.push_back(DWELLING_MONSTER4);
+	    ordersBuildings.push_back(DWELLING_MONSTER2);
+	    ordersBuildings.push_back(DWELLING_MONSTER6);
+	    ordersBuildings.push_back(BUILD_WELL);
+	    break;
 	case Race::WZRD:
-	{
-	    const Sprite & townbkg = AGG::GetICN(ICN::TOWNBKG4, 0);
-	    display.Blit(townbkg, dst_pt);
-	}
-	break;
+	    ordersBuildings.push_back(DWELLING_MONSTER6);
+	    ordersBuildings.push_back(BUILD_CASTLE);
+	    ordersBuildings.push_back(BUILD_LEFTTURRET);
+	    ordersBuildings.push_back(BUILD_RIGHTTURRET);
+	    ordersBuildings.push_back(BUILD_MOAT);
+	    ordersBuildings.push_back(BUILD_CAPTAIN);
+	    ordersBuildings.push_back(DWELLING_MONSTER2);
+	    ordersBuildings.push_back(BUILD_THIEVESGUILD);
+	    ordersBuildings.push_back(BUILD_TAVERN);
+	    ordersBuildings.push_back(BUILD_SHIPYARD);
+	    ordersBuildings.push_back(BUILD_WELL);
+	    ordersBuildings.push_back(BUILD_SPEC);
+	    ordersBuildings.push_back(DWELLING_MONSTER3);
+	    ordersBuildings.push_back(DWELLING_MONSTER5);
+	    ordersBuildings.push_back(BUILD_MAGEGUILD1);
+	    ordersBuildings.push_back(BUILD_MAGEGUILD2);
+	    ordersBuildings.push_back(BUILD_MAGEGUILD3);
+	    ordersBuildings.push_back(BUILD_MAGEGUILD4);
+	    ordersBuildings.push_back(BUILD_MAGEGUILD5);
+	    ordersBuildings.push_back(BUILD_STATUE);
+	    ordersBuildings.push_back(DWELLING_MONSTER1);
+	    ordersBuildings.push_back(DWELLING_MONSTER4);
+	    ordersBuildings.push_back(BUILD_MARKETPLACE);
+	    ordersBuildings.push_back(BUILD_WEL2);
+	    break;
 	case Race::NECR:
-	{
-	    const Sprite & townbkg = AGG::GetICN(ICN::TOWNBKG5, 0);
-	    display.Blit(townbkg, dst_pt);
-	}
-	break;
+	    ordersBuildings.push_back(BUILD_SPEC);
+	    if(Settings::Get().PriceLoyaltyVersion()) ordersBuildings.push_back(BUILD_TAVERN); // shrine
+	    ordersBuildings.push_back(BUILD_CASTLE);
+	    ordersBuildings.push_back(BUILD_CAPTAIN);
+	    ordersBuildings.push_back(BUILD_LEFTTURRET);
+	    ordersBuildings.push_back(BUILD_RIGHTTURRET);
+	    ordersBuildings.push_back(DWELLING_MONSTER6);
+	    ordersBuildings.push_back(BUILD_MOAT);
+	    ordersBuildings.push_back(DWELLING_MONSTER1);
+	    ordersBuildings.push_back(BUILD_SHIPYARD);
+	    ordersBuildings.push_back(BUILD_THIEVESGUILD);
+	    ordersBuildings.push_back(DWELLING_MONSTER3);
+	    ordersBuildings.push_back(DWELLING_MONSTER5);
+	    ordersBuildings.push_back(DWELLING_MONSTER2);
+	    ordersBuildings.push_back(DWELLING_MONSTER4);
+	    ordersBuildings.push_back(BUILD_MAGEGUILD1);
+	    ordersBuildings.push_back(BUILD_MAGEGUILD2);
+	    ordersBuildings.push_back(BUILD_MAGEGUILD3);
+	    ordersBuildings.push_back(BUILD_MAGEGUILD4);
+	    ordersBuildings.push_back(BUILD_MAGEGUILD5);
+	    ordersBuildings.push_back(BUILD_WEL2);
+	    ordersBuildings.push_back(BUILD_MARKETPLACE);
+	    ordersBuildings.push_back(BUILD_STATUE);
+	    ordersBuildings.push_back(BUILD_WELL);
+	    break;
 	default: break;
-    }
-
-    // sea anime
-    if(Race::WZRD == castle.GetRace() || (!castle.isBuild(BUILD_SHIPYARD) && castle.HaveNearlySea()))
-    {
-    	const Sprite * sprite50 = NULL;
-    	const Sprite * sprite51 = NULL;
-
-    	switch(castle.GetRace())
-    	{
-    	    case Race::KNGT:
-    		sprite50 = &AGG::GetICN(ICN::TWNKEXT0, 0);
-    		sprite51 = &AGG::GetICN(ICN::TWNKEXT0, 1 + frame % 5);
-    		break;
-    	    case Race::BARB:
-    		sprite50 = &AGG::GetICN(ICN::TWNBEXT0, 0);
-    		sprite51 = &AGG::GetICN(ICN::TWNBEXT0, 1 + frame % 5);
-    		break;
-    	    case Race::SORC:
-    		sprite50 = &AGG::GetICN(ICN::TWNSEXT0, 0);
-    		sprite51 = &AGG::GetICN(ICN::TWNSEXT0, 1 + frame % 5);
-    		break;
-    	    case Race::NECR:
-    		sprite50 = &AGG::GetICN(ICN::TWNNEXT0, 0);
-    		sprite51 = &AGG::GetICN(ICN::TWNNEXT0, 1 + frame % 5);
-    		break;
-    	    case Race::WRLK:
-    		sprite50 = &AGG::GetICN(ICN::TWNWEXT0, 0);
-    		sprite51 = &AGG::GetICN(ICN::TWNWEXT0, 1 + frame % 5);
-    		break;
-    	    case Race::WZRD:
-    		sprite50 = &AGG::GetICN(ICN::TWNZEXT0, 0);
-    		sprite51 = &AGG::GetICN(ICN::TWNZEXT0, 1 + frame % 5);
-    		break;
-    	    default:
-    		break;
-    	}
-
-	if(sprite50) display.Blit(*sprite50, dst_pt.x + sprite50->x(), dst_pt.y + sprite50->y());
-
-	if(sprite51) display.Blit(*sprite51, dst_pt.x + sprite51->x(), dst_pt.y + sprite51->y());
-    }
-
-    // redraw all builds
-    if(BUILD_NOTHING == build)
-    {
-	for(u8 ii = 0; ii < orders.size(); ++ii)
-	{
-	    const u32 & build2 = orders[ii];
-
-	    if(castle.isBuild(build2))
-	    {
-		CastleRedrawBuilding(castle, dst_pt, build2, frame, 0);
-		CastleRedrawBuildingExtended(castle, dst_pt, build2, frame);
-	    }
-	}
-    }
-    // redraw build with alpha 
-    else
-    if(orders.end() != std::find(orders.begin(), orders.end(), build))
-    {
-	LocalEvent & le = LocalEvent::Get();
-	u8 alpha = 1;
-
-	while(le.HandleEvents() && alpha < 250)
-	{
-    	    if(Game::AnimateInfrequent(Game::CASTLE_BUILD_DELAY))
-    	    {
-    		cursor.Hide();
-
-		for(u8 ii = 0; ii < orders.size(); ++ii)
-		{
-		    const u32 & build2 = orders[ii];
-
-		    if(castle.isBuild(build2))
-		    {
-			CastleRedrawBuilding(castle, dst_pt, build2, frame, 0);
-			CastleRedrawBuildingExtended(castle, dst_pt, build2, frame);
-		    }
-		    else
-		    if(build2 == build)
-		    {
-			CastleRedrawBuilding(castle, dst_pt, build2, frame, alpha);
-			CastleRedrawTownName(castle, dst_pt);
-			alpha += 10;
-		    }
-		}
-
-		CastleRedrawTownName(castle, dst_pt);
-
-		cursor.Show();
-    		display.Flip();
-	    }
-	    ++frame;
-	}
-
-	cursor.Hide();
-    }
-
-    ++frame;
-}
-
-void CastleRedrawBuilding(const Castle & castle, const Point & dst_pt, u32 build, u32 frame, u8 alpha)
-{
-    Display & display = Display::Get();
-
-    // correct build
-    switch(build)
-    {
-	case DWELLING_MONSTER2:
-	case DWELLING_MONSTER3:
-	case DWELLING_MONSTER4:
-	case DWELLING_MONSTER5:
-	case DWELLING_MONSTER6: build = castle.GetActualDwelling(build); break;
-
-	default: break;
-    }
-
-    const ICN::icn_t icn = Castle::GetICNBuilding(build, castle.GetRace());
-    u8 index = 0;
-    	    
-    // correct index
-    switch(build)
-    {
-        case BUILD_MAGEGUILD1: index = 0; break;
-        case BUILD_MAGEGUILD2: index = Race::NECR == castle.GetRace() ? 6 : 1; break;
-        case BUILD_MAGEGUILD3: index = Race::NECR == castle.GetRace() ? 12 : 2; break;
-        case BUILD_MAGEGUILD4: index = Race::NECR == castle.GetRace() ? 18 : 3; break;
-        case BUILD_MAGEGUILD5: index = Race::NECR == castle.GetRace() ? 24 : 4; break;
-        default: break;
-    }
-
-    // simple first sprite
-    const Sprite & sprite1 = AGG::GetICN(icn, index);
-    if(alpha)
-	sprite1.BlitSpriteWithAlpha(display, alpha, dst_pt.x + sprite1.x(), dst_pt.y + sprite1.y());
-    else
-	display.Blit(sprite1, dst_pt.x + sprite1.x(), dst_pt.y + sprite1.y());
-
-    // second anime sprite
-    if(const u16 index2 = ICN::AnimationFrame(icn, index, frame))
-    {
-	const Sprite & sprite2 = AGG::GetICN(icn, index2);
-	if(alpha)
-	    sprite2.BlitSpriteWithAlpha(display, alpha, dst_pt.x + sprite2.x(), dst_pt.y + sprite2.y());
-	else
-	    display.Blit(sprite2, dst_pt.x + sprite2.x(), dst_pt.y + sprite2.y());
     }
 }
 
-void CastleRedrawBuildingExtended(const Castle & castle, const Point & dst_pt, u32 build, u32 frame)
+Rect CastleGetMaxArea(const Castle & castle, const Point & top)
 {
-    Display & display = Display::Get();
-    ICN::icn_t icn = Castle::GetICNBuilding(build, castle.GetRace());
+    Rect res(top, 0, 0);
+    const Sprite* townbkg = NULL;
 
-    // shipyard
-    if(BUILD_SHIPYARD == build)
+    switch(castle.GetRace())
     {
-	// boat
-	if(castle.PresentBoat())
-	{
-	    const ICN::icn_t icn2 = castle.GetICNBoat(castle.GetRace());
-
-    	    const Sprite & sprite40 = AGG::GetICN(icn2, 0);
-	    display.Blit(sprite40, dst_pt.x + sprite40.x(), dst_pt.y + sprite40.y());
-
-    	    if(const u16 index2 = ICN::AnimationFrame(icn2, 0, frame))
-	    {
-		const Sprite & sprite41 = AGG::GetICN(icn2, index2);
-		display.Blit(sprite41, dst_pt.x + sprite41.x(), dst_pt.y + sprite41.y());
-	    }
-	}
-	else
-	{
-    	    if(const u16 index2 = ICN::AnimationFrame(icn, 0, frame))
-	    {
-		const Sprite & sprite3 = AGG::GetICN(icn, index2);
-		display.Blit(sprite3, dst_pt.x + sprite3.x(), dst_pt.y + sprite3.y());
-	    }
-	}
+	case Race::KNGT: townbkg = &AGG::GetICN(ICN::TOWNBKG0, 0); break;
+	case Race::BARB: townbkg = &AGG::GetICN(ICN::TOWNBKG1, 0); break;
+	case Race::SORC: townbkg = &AGG::GetICN(ICN::TOWNBKG2, 0); break;
+	case Race::WRLK: townbkg = &AGG::GetICN(ICN::TOWNBKG3, 0); break;
+	case Race::WZRD: townbkg = &AGG::GetICN(ICN::TOWNBKG4, 0); break;
+	case Race::NECR: townbkg = &AGG::GetICN(ICN::TOWNBKG5, 0); break;
+	default: break;
     }
-    else
-    // sorc and anime wel2 or statue
-    if(Race::SORC == castle.GetRace() && BUILD_WEL2 == build)
+
+    if(townbkg)
     {
-	const ICN::icn_t icn2 = castle.isBuild(BUILD_STATUE) ? ICN::TWNSEXT1 : icn;
-
-    	const Sprite & sprite20 = AGG::GetICN(icn2, 0);
-	display.Blit(sprite20, dst_pt.x + sprite20.x(), dst_pt.y + sprite20.y());
-
-    	if(const u16 index2 = ICN::AnimationFrame(icn2, 0, frame))
-	{
-	    const Sprite & sprite21 = AGG::GetICN(icn2, index2);
-	    display.Blit(sprite21, dst_pt.x + sprite21.x(), dst_pt.y + sprite21.y());
-	}
+	res.w = townbkg->w();
+	res.h = townbkg->h();
     }
+
+    return res;
 }
