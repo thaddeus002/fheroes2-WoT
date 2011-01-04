@@ -192,7 +192,6 @@ namespace Battle2
 	void	SetResponse(void);
 	void	ResetAnimFrame(u8);
 	void	UpdateDirection(void);
-	void	UpdateDirection(const Stats &);
 	bool	UpdateDirection(const Cell &);
 	void	PostKilledAction(void);
 

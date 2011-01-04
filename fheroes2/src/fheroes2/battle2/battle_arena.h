@@ -58,7 +58,7 @@ namespace Battle2
         void AddedSkipAction(const Stats &, bool);
         void AddedMoveAction(const Stats &, u16);
         void AddedMoveAction(const Stats &, const std::vector<u16> &);
-        void AddedAttackAction(const Stats &, const Stats &);
+        void AddedAttackAction(const Stats &, const Stats &, u16);
         void AddedMoraleAction(const Stats &, u8);
     };
 
@@ -153,7 +153,7 @@ namespace Battle2
 
 	void ApplyAction(Action &);
 
-	void GetTargetsForDamage(Stats &, Stats &, std::vector<TargetInfo> &);
+	void GetTargetsForDamage(Stats &, Stats &, u16, std::vector<TargetInfo> &);
 	void TargetsApplyDamage(Stats &, Stats &, std::vector<TargetInfo> &);
 
 	void GetTargetsForSpells(const HeroBase*, const u8, const u16, std::vector<TargetInfo> &);
@@ -200,7 +200,7 @@ namespace Battle2
 	void ApplyActionSpellCast(Action &);
 	void ApplyActionTower(Action &);
 	void ApplyActionCatapult(Action &);
-	void BattleProcess(Stats &, Stats &);
+	void BattleProcess(Stats &, Stats &, u16);
 
     protected:
 	friend class Interface;

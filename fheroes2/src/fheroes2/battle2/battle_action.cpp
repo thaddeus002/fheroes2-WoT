@@ -112,12 +112,13 @@ void Battle2::Actions::AddedMoveAction(const Stats & b, const std::vector<u16> &
     push_back(action);
 }
 
-void Battle2::Actions::AddedAttackAction(const Stats & a, const Stats & d)
+void Battle2::Actions::AddedAttackAction(const Stats & a, const Stats & d, u16 dst)
 {
     Action action;
     action.SetID(MSG_BATTLE_ATTACK);
     action.Push(a.id);
     action.Push(d.id);
+    action.Push(dst);
 
     push_back(action);
 }
@@ -132,14 +133,15 @@ void Battle2::Actions::AddedMoraleAction(const Stats & b, u8 state)
     push_back(action);
 }
 
-void Battle2::Arena::BattleProcess(Stats & attacker, Stats & defender)
+void Battle2::Arena::BattleProcess(Stats & attacker, Stats & defender, u16 dst)
 {
     std::vector<TargetInfo> targets;
 
-    GetTargetsForDamage(attacker, defender, targets);
+    GetTargetsForDamage(attacker, defender, dst, targets);
 
-    attacker.UpdateDirection(defender);
-    defender.UpdateDirection(attacker);
+    attacker.UpdateDirection(board[dst]);
+    if(!attacker.isWide())
+    defender.UpdateDirection(board[attacker.position]);
 
     if(interface) interface->RedrawActionAttackPart1(attacker, defender, targets);
 
@@ -274,10 +276,11 @@ void Battle2::Arena::ApplyActionSpellCast(Action & action)
 
 void Battle2::Arena::ApplyActionAttack(Action & action)
 {
-    u16 id1, id2;
+    u16 id1, id2, dst;
 
     action.Pop(id1);
     action.Pop(id2);
+    action.Pop(dst);
 
     Battle2::Stats* b1 = GetTroopID(id1);
     Battle2::Stats* b2 = GetTroopID(id2);
@@ -289,6 +292,10 @@ void Battle2::Arena::ApplyActionAttack(Action & action)
 	DEBUG(DBG_BATTLE, DBG_TRACE, "Battle2::Arena::" << "ApplyActionAttack: " << \
 	    b1->Info() << " to " << b2->Info());
 
+	// fix dst
+	if(dst != b2->GetPosition() && dst != b2->GetTailIndex())
+	    dst = b2->GetPosition();
+
 	// reset blind
 	if(b2->Modes(SP_BLIND)) b2->ResetBlind();
 
@@ -297,14 +304,14 @@ void Battle2::Arena::ApplyActionAttack(Action & action)
 	if(b1->isArchers() || handfighting)
 	{
 	    // attack
-	    BattleProcess(*b1, *b2);
+	    BattleProcess(*b1, *b2, dst);
 
 	    if(b2->isValid())
 	    {
 		// defense answer
 		if(handfighting && !b1->isHideAttack() && b2->AllowResponse())
 		{
-		    BattleProcess(*b2, *b1);
+		    BattleProcess(*b2, *b1, dst);
 		    b2->SetResponse();
 		}
 
@@ -312,7 +319,7 @@ void Battle2::Arena::ApplyActionAttack(Action & action)
 		if(b1->isValid() && b1->isTwiceAttack() && !b1->Modes(IS_PARALYZE_MAGIC))
 		{
 		    DEBUG(DBG_BATTLE, DBG_TRACE, "Battle2::Arena::" << "ApplyActionAttack: " << "twice attack");
-		    BattleProcess(*b1, *b2);
+		    BattleProcess(*b1, *b2, dst);
 		}
 	    }
 	}
@@ -557,7 +564,7 @@ void Battle2::Arena::TargetsApplyDamage(Stats & attacker, Stats & defender, std:
     }
 }
 
-void Battle2::Arena::GetTargetsForDamage(Stats & attacker, Stats & defender, std::vector<TargetInfo> & targets)
+void Battle2::Arena::GetTargetsForDamage(Stats & attacker, Stats & defender, u16 dst, std::vector<TargetInfo> & targets)
 {
     if(targets.size()) targets.clear();
     targets.reserve(8);
@@ -574,10 +581,10 @@ void Battle2::Arena::GetTargetsForDamage(Stats & attacker, Stats & defender, std
     // long distance attack
     if(attacker.isDoubleCellAttack())
     {
-        const direction_t dir = Board::GetDirection(attacker.position, defender.position);
+        const direction_t dir = Board::GetDirection(attacker.position, dst);
         if(!defender.isWide() || 0 == ((RIGHT | LEFT) & dir))
 	{
-	    if(NULL != (cell = GetCell(defender.position, dir)) &&
+	    if(NULL != (cell = GetCell(dst, dir)) &&
 		NULL != (enemy = GetTroopBoard(cell->index)) && enemy != &defender)
     	    {
 		res.defender = enemy;

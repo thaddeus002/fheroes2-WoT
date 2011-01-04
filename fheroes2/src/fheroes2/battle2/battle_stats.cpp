@@ -2011,11 +2011,6 @@ void Battle2::Stats::UpdateDirection(void)
 	SetReflection(true);
 }
 
-void Battle2::Stats::UpdateDirection(const Stats & b)
-{
-    UpdateDirection(arena->board[b.position]);
-}
-
 bool Battle2::Stats::UpdateDirection(const Cell & cell)
 {
     bool need = arena && arena->board[position].pos.x > cell.pos.x;
