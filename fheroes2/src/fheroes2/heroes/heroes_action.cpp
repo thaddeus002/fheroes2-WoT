@@ -748,7 +748,7 @@ void ActionToCastle(Heroes &hero, const u8 obj, const s32 dst_index)
 	{
 	    // new battle2
 	    Battle2::Result res = Battle2::Loader(hero.GetArmy(), army, dst_index);
-    	    Heroes *other_hero = world.GetHeroes(dst_index);
+    	    Heroes *other_hero =  world.GetHeroes(*castle, false);
 
 	    // loss defender
 	    if(!res.DefenderWins() && other_hero)
