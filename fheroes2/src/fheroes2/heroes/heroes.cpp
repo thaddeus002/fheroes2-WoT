@@ -126,8 +126,8 @@ Heroes::Heroes(heroes_t ht, Race::race_t rc) : killer_color(Color::GRAY), experi
     if(book)
     {
         SpellBookActivate();
-        AppendSpellToBook(Spell::FromInt(spell));
         if(!HasArtifact(Artifact::MAGIC_BOOK)) PickupArtifact(Artifact::MAGIC_BOOK);
+        AppendSpellToBook(Spell::FromInt(spell));
     }
 
     // hero is freeman
@@ -988,8 +988,6 @@ bool Heroes::IsFullBagArtifacts(void) const
 
 bool Heroes::PickupArtifact(const Artifact::artifact_t art)
 {
-    if(Artifact::MAGIC_BOOK == art) SpellBookActivate();
-
     return PickupArtifact(Artifact(art));
 }
 
@@ -1011,8 +1009,12 @@ bool Heroes::PickupArtifact(const Artifact & art)
     *it = art;
 
     // book insert first
-    if(art == Artifact::MAGIC_BOOK &&
-	it != bag_artifacts.begin()) std::swap(*it, bag_artifacts.front());
+    if(art == Artifact::MAGIC_BOOK)
+    {
+	if(it != bag_artifacts.begin()) std::swap(*it, bag_artifacts.front());
+
+	SpellBookActivate();
+    }
 
     // check: anduran garb
     if(HasArtifact(Artifact::BREASTPLATE_ANDURAN) &&
