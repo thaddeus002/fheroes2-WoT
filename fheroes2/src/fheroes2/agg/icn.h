@@ -949,6 +949,10 @@ namespace ICN
     bool HighlyObjectSprite(icn_t, u16);
 
     bool SkipRegistryFree(icn_t);
+
+    icn_t Get4Captain(u8 race);
+    icn_t Get4Building(u8 race);
+    icn_t Get4Castle(u8 race);
 }
 
 #endif

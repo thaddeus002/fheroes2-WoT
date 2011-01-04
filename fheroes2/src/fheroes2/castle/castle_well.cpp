@@ -264,23 +264,10 @@ void Castle::WellRedrawInfoArea(const Point & cur_pt)
 
 	const Monster monster(race, dw_orig);
 
-	ICN::icn_t icnname = ICN::UNKNOWN;
-
-	switch(race)
-	{
-    	    case Race::BARB: icnname = ICN::CSTLBARB; break;
-    	    case Race::KNGT: icnname = ICN::CSTLKNGT; break;
-    	    case Race::SORC: icnname = ICN::CSTLSORC; break;
-    	    case Race::WRLK: icnname = ICN::CSTLWRLK; break;
-    	    case Race::WZRD: icnname = ICN::CSTLWZRD; break;
-    	    case Race::NECR: icnname = ICN::CSTLNECR; break;
-    	    default: break;
-	}
-
 	// sprite
 	dst_pt.x = pt.x + 21;
 	dst_pt.y = pt.y + 35;
-	display.Blit(AGG::GetICN(icnname, icnindex), dst_pt);
+	display.Blit(AGG::GetICN(ICN::Get4Building(race), icnindex), dst_pt);
 	// text
 	text.Set(GetStringBuilding(dw_orig, race), Font::SMALL);
 	dst_pt.x = pt.x + 86 - text.w() / 2;

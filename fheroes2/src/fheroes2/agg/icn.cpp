@@ -2064,3 +2064,51 @@ bool ICN::HighlyObjectSprite(ICN::icn_t icn, u16 index)
     }
     return false;
 }
+
+ICN::icn_t ICN::Get4Captain(u8 race)
+{
+    switch(race)
+    {
+        case Race::BARB: return CSTLCAPB;
+        case Race::KNGT: return CSTLCAPK;
+        case Race::NECR: return CSTLCAPN;
+        case Race::SORC: return CSTLCAPS;
+        case Race::WRLK: return CSTLCAPW;
+        case Race::WZRD: return CSTLCAPZ;
+        default: break;
+    }
+
+    return UNKNOWN;
+}
+
+ICN::icn_t ICN::Get4Building(u8 race)
+{
+    switch(race)
+    {
+        case Race::BARB: return CSTLBARB;
+        case Race::KNGT: return CSTLKNGT;
+        case Race::NECR: return CSTLNECR;
+        case Race::SORC: return CSTLSORC;
+        case Race::WRLK: return CSTLWRLK;
+        case Race::WZRD: return CSTLWZRD;
+        default: break;
+    }
+
+    return UNKNOWN;
+}
+
+ICN::icn_t ICN::Get4Castle(u8 race)
+{
+    switch(race)
+    {
+        case Race::BARB: return CASTLEB;
+        case Race::KNGT: return CASTLEK;
+        case Race::NECR: return CASTLEN;
+        case Race::SORC: return CASTLES;
+        case Race::WRLK: return CASTLEW;
+        case Race::WZRD: return CASTLEZ;
+        default: break;
+    }
+
+    return UNKNOWN;
+}

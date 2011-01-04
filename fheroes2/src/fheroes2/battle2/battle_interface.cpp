@@ -1072,7 +1072,6 @@ void Battle2::Interface::RedrawCastle1(void) const
     const bool fortification = arena.castle && (Race::KNGT == arena.castle->GetRace()) && arena.castle->isBuild(BUILD_SPEC);
 
     ICN::icn_t icn_castbkg = ICN::UNKNOWN;
-    ICN::icn_t icn_castle  = ICN::UNKNOWN;
 
     switch(arena.castle->GetRace())
     {
@@ -1083,17 +1082,6 @@ void Battle2::Interface::RedrawCastle1(void) const
         case Race::SORC: icn_castbkg = ICN::CASTBKGS; break;
         case Race::WRLK: icn_castbkg = ICN::CASTBKGW; break;
         case Race::WZRD: icn_castbkg = ICN::CASTBKGZ; break;
-    }
-
-    switch(arena.castle->GetRace())
-    {
-        default:
-        case Race::BARB: icn_castle = ICN::CASTLEB; break;
-        case Race::KNGT: icn_castle = ICN::CASTLEK; break;
-        case Race::NECR: icn_castle = ICN::CASTLEN; break;
-        case Race::SORC: icn_castle = ICN::CASTLES; break;
-        case Race::WRLK: icn_castle = ICN::CASTLEW; break;
-        case Race::WZRD: icn_castle = ICN::CASTLEZ; break;
     }
 
     // castle cover
@@ -1114,7 +1102,8 @@ void Battle2::Interface::RedrawCastle1(void) const
     // bridge
     if(arena.bridge->isDown())
     {
-    	const Sprite & sprite3 = AGG::GetICN(icn_castle, arena.bridge->isDestroy() ? 24 : 21);
+    	const Sprite & sprite3 = AGG::GetICN(ICN::Get4Castle(arena.castle->GetRace()),
+						arena.bridge->isDestroy() ? 24 : 21);
     	display.Blit(sprite3, sprite3.x() + topleft.x, sprite3.y() + topleft.y);
     }
 }
@@ -1124,18 +1113,7 @@ void Battle2::Interface::RedrawCastle2(const u16 cell_index) const
     const Settings & conf = Settings::Get();
     Display & display = Display::Get();
     const Point & topleft = border.GetArea();
-    ICN::icn_t icn_castle  = ICN::UNKNOWN;
-
-    switch(arena.castle->GetRace())
-    {
-        default:
-        case Race::BARB: icn_castle = ICN::CASTLEB; break;
-        case Race::KNGT: icn_castle = ICN::CASTLEK; break;
-        case Race::NECR: icn_castle = ICN::CASTLEN; break;
-        case Race::SORC: icn_castle = ICN::CASTLES; break;
-        case Race::WRLK: icn_castle = ICN::CASTLEW; break;
-        case Race::WZRD: icn_castle = ICN::CASTLEZ; break;
-    }
+    const ICN::icn_t icn_castle  = ICN::Get4Castle(arena.castle->GetRace());
 
     // catapult
     if(77 == cell_index)
@@ -1232,20 +1210,8 @@ void Battle2::Interface::RedrawCastle3(void) const
     //const Settings & conf = Settings::Get();
     Display & display = Display::Get();
     const Point & topleft = border.GetArea();
-    ICN::icn_t icn_castle  = ICN::UNKNOWN;
-
-    switch(arena.castle->GetRace())
-    {
-        default:
-        case Race::BARB: icn_castle = ICN::CASTLEB; break;
-        case Race::KNGT: icn_castle = ICN::CASTLEK; break;
-        case Race::NECR: icn_castle = ICN::CASTLEN; break;
-        case Race::SORC: icn_castle = ICN::CASTLES; break;
-        case Race::WRLK: icn_castle = ICN::CASTLEW; break;
-        case Race::WZRD: icn_castle = ICN::CASTLEZ; break;
-    }
-
-    const Sprite & sprite = AGG::GetICN(icn_castle, (arena.towers[1]->isValid() ? 20 : 26));
+    const Sprite & sprite = AGG::GetICN(ICN::Get4Castle(arena.castle->GetRace()),
+					(arena.towers[1]->isValid() ? 20 : 26));
 
     display.Blit(sprite, topleft.x + sprite.x() ,topleft.y + sprite.y());
 }
@@ -3903,19 +3869,6 @@ void Battle2::Interface::RedrawBridgeAnimation(bool down)
     LocalEvent & le = LocalEvent::Get();
     const Point & topleft = border.GetArea();
 
-    ICN::icn_t icn_castle  = ICN::UNKNOWN;
-
-    switch(arena.castle->GetRace())
-    {
-        default:
-        case Race::BARB: icn_castle = ICN::CASTLEB; break;
-        case Race::KNGT: icn_castle = ICN::CASTLEK; break;
-        case Race::NECR: icn_castle = ICN::CASTLEN; break;
-        case Race::SORC: icn_castle = ICN::CASTLES; break;
-        case Race::WRLK: icn_castle = ICN::CASTLEW; break;
-        case Race::WZRD: icn_castle = ICN::CASTLEZ; break;
-    }
-
     u8 frame = down ? 23 : 21;
 
     if(down) AGG::PlaySound(M82::DRAWBRG);
@@ -3937,7 +3890,7 @@ void Battle2::Interface::RedrawBridgeAnimation(bool down)
     	{
 	    cursor.Hide();
 	    Redraw();
-    	    const Sprite & sprite = AGG::GetICN(icn_castle, frame);
+    	    const Sprite & sprite = AGG::GetICN(ICN::Get4Castle(arena.castle->GetRace()), frame);
     	    display.Blit(sprite, sprite.x() + topleft.x, sprite.y() + topleft.y);
 	    cursor.Show();
 	    display.Flip();

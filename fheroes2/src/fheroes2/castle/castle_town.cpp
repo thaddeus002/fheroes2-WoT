@@ -180,19 +180,6 @@ u32 Castle::OpenTown(void)
     DrawImageCastle(dst_pt);
 
     //
-    ICN::icn_t icn = ICN::UNKNOWN;
-    
-    switch(race)
-    {
-        case Race::BARB: icn = ICN::CSTLBARB; break;
-        case Race::KNGT: icn = ICN::CSTLKNGT; break;
-        case Race::NECR: icn = ICN::CSTLNECR; break;
-        case Race::SORC: icn = ICN::CSTLSORC; break;
-        case Race::WRLK: icn = ICN::CSTLWRLK; break;
-        case Race::WZRD: icn = ICN::CSTLWZRD; break;
-	default: return BUILD_NOTHING;
-    }
-
     BuildingInfo dwelling1(*this, DWELLING_MONSTER1);
     dwelling1.SetPos(cur_pt.x + 5, cur_pt.y + 2);
     dwelling1.Redraw();

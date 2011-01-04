@@ -102,8 +102,8 @@ void RunTest3(void)
     army1.Clear();
     //army1.JoinTroop(Monster::PHOENIX, 10);
     //army1.JoinTroop(Monster::RANGER, 80);
-    army1.At(0) = Army::Troop(Monster::RANGER, 50);
     //army1.JoinTroop(Monster::GARGOYLE, 100);
+    army1.At(0) = Army::Troop(Monster::GREEN_DRAGON, 10);
 
     //army1.JoinTroop(Monster::Rand(Monster::LEVEL1), 30);
     //army1.JoinTroop(Monster::Rand(Monster::LEVEL2), 20);
@@ -111,11 +111,12 @@ void RunTest3(void)
 
     army2.Clear();
 //    army2.At(0) = Army::Troop(Monster::OGRE, 1);
-    army2.At(0) = Army::Troop(Monster::DWARF, 2);
-    army2.At(1) = Army::Troop(Monster::DWARF, 2);
-    army2.At(2) = Army::Troop(Monster::DWARF, 2);
-    army2.At(3) = Army::Troop(Monster::DWARF, 2);
-    army2.At(4) = Army::Troop(Monster::DWARF, 2);
+    army2.At(0) = Army::Troop(Monster::CAVALRY, 20);
+    army2.At(1) = Army::Troop(Monster::CAVALRY, 20);
+//    army2.At(1) = Army::Troop(Monster::DWARF, 2);
+//    army2.At(2) = Army::Troop(Monster::DWARF, 2);
+//    army2.At(3) = Army::Troop(Monster::DWARF, 2);
+//    army2.At(4) = Army::Troop(Monster::DWARF, 2);
 //    army2.JoinTroop(static_cast<Monster::monster_t>(1), 10);
 //    army2.JoinTroop(static_cast<Monster::monster_t>(4), 10);
 //    army2.JoinTroop(static_cast<Monster::monster_t>(6), 10);
@@ -123,7 +124,7 @@ void RunTest3(void)
 
 //    kingdom2.Dump();
     
-    Battle2::Loader(army1, army2, castle->GetIndex());
+    Battle2::Loader(army1, army2, hero1.GetIndex());
 }
 
 #endif

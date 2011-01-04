@@ -291,18 +291,8 @@ BuildingInfo::BuildingInfo(const Castle & c, building_t b) : castle(c), building
 
     if(b == BUILD_CAPTAIN)
     {
-	ICN::icn_t icn = ICN::UNKNOWN;
-	switch(castle.GetRace())
-	{
-    	    case Race::BARB: icn = ICN::CSTLCAPB; break;
-    	    case Race::KNGT: icn = ICN::CSTLCAPK; break;
-    	    case Race::NECR: icn = ICN::CSTLCAPN; break;
-    	    case Race::SORC: icn = ICN::CSTLCAPS; break;
-    	    case Race::WRLK: icn = ICN::CSTLCAPW; break;
-    	    case Race::WZRD: icn = ICN::CSTLCAPZ; break;
-    	    default: break;
-	}
-	const Sprite & sprite = AGG::GetICN(icn, (building & BUILD_CAPTAIN ? 1 : 0));
+	const Sprite & sprite = AGG::GetICN(ICN::Get4Captain(castle.GetRace()),
+						(building & BUILD_CAPTAIN ? 1 : 0));
 	area.w = sprite.w();
 	area.h = sprite.h();
     }
@@ -360,16 +350,8 @@ void BuildingInfo::RedrawCaptain(void)
 {
     Display & display = Display::Get();
 
-    switch(castle.GetRace())
-    {
-        case Race::BARB: display.Blit(AGG::GetICN(ICN::CSTLCAPB, (building & BUILD_CAPTAIN ? 1 : 0)), area.x, area.y); break;
-        case Race::KNGT: display.Blit(AGG::GetICN(ICN::CSTLCAPK, (building & BUILD_CAPTAIN ? 1 : 0)), area.x, area.y); break;
-        case Race::NECR: display.Blit(AGG::GetICN(ICN::CSTLCAPN, (building & BUILD_CAPTAIN ? 1 : 0)), area.x, area.y); break;
-        case Race::SORC: display.Blit(AGG::GetICN(ICN::CSTLCAPS, (building & BUILD_CAPTAIN ? 1 : 0)), area.x, area.y); break;
-        case Race::WRLK: display.Blit(AGG::GetICN(ICN::CSTLCAPW, (building & BUILD_CAPTAIN ? 1 : 0)), area.x, area.y); break;
-        case Race::WZRD: display.Blit(AGG::GetICN(ICN::CSTLCAPZ, (building & BUILD_CAPTAIN ? 1 : 0)), area.x, area.y); break;
-        default: break;
-    }
+    display.Blit(AGG::GetICN(ICN::Get4Captain(castle.GetRace()),
+				(building & BUILD_CAPTAIN ? 1 : 0)), area.x, area.y);
 
     const Sprite & sprite_allow = AGG::GetICN(ICN::TOWNWIND, 11);
     const Sprite & sprite_deny  = AGG::GetICN(ICN::TOWNWIND, 12);
@@ -410,16 +392,8 @@ void BuildingInfo::Redraw(void)
 	return;
     }
 
-    switch(castle.GetRace())
-    {
-        case Race::BARB: display.Blit(AGG::GetICN(ICN::CSTLBARB, index), area.x + 1, area.y + 1); break;
-        case Race::KNGT: display.Blit(AGG::GetICN(ICN::CSTLKNGT, index), area.x + 1, area.y + 1); break;
-        case Race::NECR: display.Blit(AGG::GetICN(ICN::CSTLNECR, index), area.x + 1, area.y + 1); break;
-        case Race::SORC: display.Blit(AGG::GetICN(ICN::CSTLSORC, index), area.x + 1, area.y + 1); break;
-        case Race::WRLK: display.Blit(AGG::GetICN(ICN::CSTLWRLK, index), area.x + 1, area.y + 1); break;
-        case Race::WZRD: display.Blit(AGG::GetICN(ICN::CSTLWZRD, index), area.x + 1, area.y + 1); break;
-        default: break;
-    }
+    display.Blit(AGG::GetICN(ICN::Get4Building(castle.GetRace()), index),
+			area.x + 1, area.y + 1);
 
     const Sprite & sprite_allow = AGG::GetICN(ICN::TOWNWIND, 11);
     const Sprite & sprite_deny  = AGG::GetICN(ICN::TOWNWIND, 12);
@@ -537,19 +511,6 @@ bool BuildingInfo::DialogBuyBuilding(bool buttons) const
     const u8 space = Settings::Get().QVGA() ? 5 : 10;
     Dialog::Box box(space + window_icons.h() + space + box1.h() + space + (requires_true ? requires_text.h() + box2.h() + space : 0) + rbs.GetArea().h, buttons);
     const Rect & box_rt = box.GetArea();
-    ICN::icn_t cstl_icn = ICN::UNKNOWN;
-
-    switch(castle.GetRace())
-    {
-        case Race::KNGT: cstl_icn = ICN::CSTLKNGT; break;
-        case Race::BARB: cstl_icn = ICN::CSTLBARB; break;
-        case Race::SORC: cstl_icn = ICN::CSTLSORC; break;
-        case Race::WRLK: cstl_icn = ICN::CSTLWRLK; break;
-        case Race::WZRD: cstl_icn = ICN::CSTLWZRD; break;
-        case Race::NECR: cstl_icn = ICN::CSTLNECR; break;
-        default: return Dialog::CANCEL;
-    }
-
     LocalEvent & le = LocalEvent::Get();
 
     Point dst_pt;
@@ -566,7 +527,8 @@ bool BuildingInfo::DialogBuyBuilding(bool buttons) const
     dst_pt.y = box_rt.y + space;
     display.Blit(window_icons, dst_pt);
 
-    const Sprite & building_icons = AGG::GetICN(cstl_icn, GetIndexBuildingSprite(building));
+    const Sprite & building_icons = AGG::GetICN(ICN::Get4Building(castle.GetRace()),
+					    GetIndexBuildingSprite(building));
     dst_pt.x = box_rt.x + (box_rt.w - building_icons.w()) / 2;
     dst_pt.y += 1;
     display.Blit(building_icons, dst_pt);
