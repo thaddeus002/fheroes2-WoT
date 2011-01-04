@@ -1853,8 +1853,16 @@ u16 Maps::Tiles::GetCountMonster(void) const
 
 void Maps::Tiles::SetCountMonster(const u16 count)
 {
-    quantity1 = count % 0xFF;
-    quantity2 = count / 0xFF;
+    if(count > 0xFF * 0xFF + 0xFF - 1)
+    {
+	quantity1 = 0xFF;
+	quantity2 = 0xFF;
+    }
+    else
+    {
+	quantity1 = count % 0xFF;
+	quantity2 = count / 0xFF;
+    }
 }
 
 void Maps::Tiles::UpdateMonsterInfo(void)
