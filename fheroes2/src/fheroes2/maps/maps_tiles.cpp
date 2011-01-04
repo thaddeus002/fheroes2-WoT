@@ -1709,7 +1709,7 @@ bool Maps::Tiles::OtherObjectsIsProtection(void) const
     switch(object)
     {
 	case MP2::OBJ_ARTIFACT:
-	    return quantity1 > 5 && quantity1 < 14;
+	    return quantity2 > 5 && quantity2 < 14;
 
 	case MP2::OBJ_DERELICTSHIP:
 	case MP2::OBJ_SHIPWRECK:
