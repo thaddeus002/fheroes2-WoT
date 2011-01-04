@@ -289,6 +289,9 @@ void Battle2::Arena::ApplyActionAttack(Action & action)
 	DEBUG(DBG_BATTLE, DBG_TRACE, "Battle2::Arena::" << "ApplyActionAttack: " << \
 	    b1->Info() << " to " << b2->Info());
 
+	// reset blind
+	if(b2->Modes(SP_BLIND)) b2->ResetBlind();
+
 	const bool handfighting = Stats::isHandFighting(*b1, *b2);
 	// check position
 	if(b1->isArchers() || handfighting)
@@ -304,8 +307,6 @@ void Battle2::Arena::ApplyActionAttack(Action & action)
 		    BattleProcess(*b2, *b1);
 		    b2->SetResponse();
 		}
-
-		if(b2->Modes(SP_BLIND)) b2->ResetBlind();
 
 		// twice attack
 		if(b1->isValid() && b1->isTwiceAttack() && !b1->Modes(IS_PARALYZE_MAGIC))
