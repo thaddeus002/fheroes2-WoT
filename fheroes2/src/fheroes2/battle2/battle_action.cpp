@@ -133,9 +133,10 @@ void Battle2::Actions::AddedMoraleAction(const Stats & b, u8 state)
     push_back(action);
 }
 
-void Battle2::Arena::BattleProcess(Stats & attacker, Stats & defender, u16 dst)
+void Battle2::Arena::BattleProcess(Stats & attacker, Stats & defender, s16 dst)
 {
     std::vector<TargetInfo> targets;
+    if(0 > dst) dst = defender.GetPosition();
 
     GetTargetsForDamage(attacker, defender, dst, targets);
 
@@ -311,7 +312,7 @@ void Battle2::Arena::ApplyActionAttack(Action & action)
 		// defense answer
 		if(handfighting && !b1->isHideAttack() && b2->AllowResponse())
 		{
-		    BattleProcess(*b2, *b1, dst);
+		    BattleProcess(*b2, *b1);
 		    b2->SetResponse();
 		}
 
@@ -319,7 +320,7 @@ void Battle2::Arena::ApplyActionAttack(Action & action)
 		if(b1->isValid() && b1->isTwiceAttack() && !b1->Modes(IS_PARALYZE_MAGIC))
 		{
 		    DEBUG(DBG_BATTLE, DBG_TRACE, "Battle2::Arena::" << "ApplyActionAttack: " << "twice attack");
-		    BattleProcess(*b1, *b2, dst);
+		    BattleProcess(*b1, *b2);
 		}
 	    }
 	}

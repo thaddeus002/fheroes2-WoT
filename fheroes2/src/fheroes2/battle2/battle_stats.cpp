@@ -446,6 +446,12 @@ void Battle2::Stats::SetLuck(s8 f)
         case Luck::IRISH:       if(9 > Rand::Get(1, 16)) SetModes(LUCK_GOOD); break;      // 50%
         default: break;
     }
+
+    if(Modes(SP_BLESS) && Modes(LUCK_GOOD))
+	ResetModes(LUCK_GOOD);
+    else
+    if(Modes(SP_CURSE) && Modes(LUCK_BAD))
+	ResetModes(LUCK_BAD);
 }
 
 bool Battle2::Stats::isFly(void) const
@@ -752,9 +758,9 @@ u32 Battle2::Stats::CalculateDamageStats(const Stats & enemy, double dmg) const
     }
 
     // check luck x2
-    if(Modes(LUCK_GOOD) && !Modes(SP_BLESS)) dmg *= 2;
+    if(Modes(LUCK_GOOD)) dmg *= 2;
     else
-    if(Modes(LUCK_BAD) && !Modes(SP_CURSE)) dmg /= 2;
+    if(Modes(LUCK_BAD)) dmg /= 2;
 
     // after blind
     if(Modes(SP_BLIND)) dmg /= 2;
