@@ -39,7 +39,10 @@ Route::Path::Path(const Heroes & h)
 
 Direction::vector_t Route::Path::GetFrontDirection(void) const
 {
-    return empty() ? Direction::CENTER : front().Direction();
+    if(!empty())
+	return front().Direction();
+
+    return isValid0() ? Direction::Get(dst, dst0) : Direction::CENTER;
 }
 
 u16 Route::Path::GetFrontPenalty(void) const
@@ -59,19 +62,24 @@ s32 Route::Path::Calculate(const s32 dst_index, const u16 limit)
 
     Algorithm::PathFind(this, hero.GetIndex(), dst_index, limit, &hero);
 
-    dst = empty() ? hero.GetIndex() : dst_index;
+    dst0 = dst = empty() ? hero.GetIndex() : dst_index;
 
     return !empty();
 }
 
 void Route::Path::Reset(void)
 {
-    dst = hero.GetIndex();
+    dst0 = dst = hero.GetIndex();
     if(!empty())
     {
 	clear();
 	hide = true;
     }
+}
+
+bool Route::Path::isValid0(void) const
+{
+    return empty() && dst != dst0;
 }
 
 u16 Route::Path::GetIndexSprite(const Direction::vector_t & from, const Direction::vector_t & to, u8 mod)

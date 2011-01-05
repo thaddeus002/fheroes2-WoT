@@ -325,6 +325,7 @@ bool ActionSpellDimensionDoor(Heroes & hero)
 	hero.FadeIn();
 
 	hero.ApplyPenaltyMovement();
+	hero.GetPath().Reset();
 	hero.ActionNewPosition();
 
 	return true;

@@ -1169,7 +1169,7 @@ bool Heroes::BuySpellBook(const MageGuild* mageguild, u8 shrine)
 /* return true is move enable */
 bool Heroes::isEnableMove(void) const
 {
-    return Modes(ENABLEMOVE) && path.isValid() && path.GetFrontPenalty() <= move_point;
+    return Modes(ENABLEMOVE) && (path.isValid() || path.isValid0()) && path.GetFrontPenalty() <= move_point;
 }
 
 bool Heroes::CanMove(void) const
@@ -1632,36 +1632,54 @@ void Heroes::PreBattleAction(void)
 {
 }
 
+void RedrawGameAreaAndHeroAttackMonster(Heroes & hero, s32 dst)
+{
+    const Settings & conf = Settings::Get();
+
+    // redraw gamearea for monster action sprite
+    if(conf.MyColor() == hero.GetColor())
+    {
+	Interface::Basic & I = Interface::Basic::Get();
+	Game::Focus & F = Game::Focus::Get();
+        Cursor::Get().Hide();
+	I.gameArea.Center(F.Center());
+	F.SetRedraw();
+	I.Redraw();
+        Cursor::Get().Show();
+	// force flip, for monster attack show sprite
+	Display::Get().Flip();
+    }
+    hero.Action(dst);
+}
+
 void Heroes::ActionNewPosition(void)
 {
     const Settings & conf = Settings::Get();
     // check around monster
-    const u16 dst_around = Maps::TileUnderProtection(GetIndex());
+    u16 dst_around = Maps::TileUnderProtection(GetIndex());
 
     if(dst_around)
     {
+	bool skip_battle = false;
 	SetMove(false);
+	GetPath().Hide();
 
-	for(Direction::vector_t dir = Direction::TOP_LEFT; dir < Direction::CENTER && !isFreeman(); ++dir)
-	    if(dst_around & dir)
+	// first target
+	Direction::vector_t dir = Direction::Get(GetIndex(), GetPath().GetDestinationIndex0());
+
+	if(dst_around & dir)
 	{
-	    const s32 mons = Maps::GetDirectionIndex(GetIndex(), dir);
+	    RedrawGameAreaAndHeroAttackMonster(*this, Maps::GetDirectionIndex(GetIndex(), dir));
+	    dst_around &= ~dir;
+	    if(conf.ExtOnlyFirstMonsterAttack()) skip_battle = true;
+	}
 
-    	    // redraw gamearea for monster action sprite
-	    if(conf.MyColor() == GetColor())
-	    {
-		Interface::Basic & I = Interface::Basic::Get();
-		Game::Focus & F = Game::Focus::Get();
-        	Cursor::Get().Hide();
-		I.gameArea.Center(F.Center());
-		F.SetRedraw();
-		I.Redraw();
-        	Cursor::Get().Show();
-		// force flip, for monster attack show sprite
-        	Display::Get().Flip();
-	    }
-	    Action(mons);
-	    if(conf.ExtOnlyFirstMonsterAttack()) break;
+	// other around targets
+	for(dir = Direction::TOP_LEFT;
+	    dir < Direction::CENTER && !isFreeman() && !skip_battle; ++dir) if(dst_around & dir) 
+	{
+	    RedrawGameAreaAndHeroAttackMonster(*this, Maps::GetDirectionIndex(GetIndex(), dir));
+	    if(conf.ExtOnlyFirstMonsterAttack()) skip_battle = true;
 	}
     }
 

@@ -47,6 +47,7 @@ namespace Route
 	    Path(const Heroes & h);
 
 	    s32		GetDestinationIndex(void) const{ return dst; }
+	    s32		GetDestinationIndex0(void) const{ return dst0; }
 	    Direction::vector_t GetFrontDirection(void) const;
 	    u16		GetFrontPenalty(void) const;
 	    s32		Calculate(const s32 dst_index, const u16 limit = MAXU16);
@@ -57,6 +58,7 @@ namespace Route
 	    void	PopFront(void);
 	    void	ScanObstacleAndReduce(void);
 
+	    bool	isValid0(void) const;
 	    bool	isValid(void) const { return !(dst < 0 || empty()); }
 	    bool	isShow(void) const { return !hide; }
 	    u16		isUnderProtection(s32 & pos) const;
@@ -76,6 +78,7 @@ namespace Route
 	    friend class Game::IO;
 	    const Heroes & hero;
 	    s32		dst;
+	    s32		dst0;
 	    bool	hide;
     };
 }

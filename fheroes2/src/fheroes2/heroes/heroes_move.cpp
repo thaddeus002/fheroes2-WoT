@@ -378,7 +378,7 @@ bool Heroes::MoveStep(bool fast)
 {
     s32 index_from = GetIndex();
     s32 index_to = Maps::GetDirectionIndex(index_from, path.GetFrontDirection());
-    s32 index_dst = path.GetDestinationIndex();
+    s32 index_dst = path.isValid() ? path.GetDestinationIndex() : path.GetDestinationIndex0();
     const Point & mp = GetCenter();
 
     if(fast)
@@ -656,7 +656,7 @@ bool Heroes::Move(bool fast)
     if(Modes(ACTION)) ResetModes(ACTION);
 
     // move hero
-    if(path.isValid() &&
+    if((path.isValid() || path.isValid0()) &&
            (isEnableMove() || (GetSpriteIndex() < 45 && GetSpriteIndex() % 9) || GetSpriteIndex() >= 45))
     {
 	// fast move for hide AI

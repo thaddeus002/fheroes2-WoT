@@ -1776,27 +1776,24 @@ void World::DateDump(void) const
 	    ", week " << static_cast<int>(GetWeek()) << ", day: " << static_cast<int>(GetDay()));
 }
 
+bool IsObeliskOnMaps(const Maps::Tiles* tile)
+{
+    switch(tile->GetObject())
+    {
+	case MP2::OBJ_OBELISK:	return true;
+	case MP2::OBJ_HEROES:
+	{
+	    const Heroes* hero = world.GetHeroes(tile->GetIndex());
+	    if(hero && MP2::OBJ_OBELISK == hero->GetUnderObject()) return true;
+	}
+	default: break;
+    }
+    return false;
+}
+
 u16 World::CountObeliskOnMaps(void)
 {
-    std::vector<Maps::Tiles *>::const_iterator it1 = vec_tiles.begin();
-    std::vector<Maps::Tiles *>::const_iterator it2 = vec_tiles.end();
-    u16 res = 0;
-
-    for(; it1 != it2; ++it1) if(*it1)
-    {
-	switch((*it1)->GetObject())
-	{
-		case MP2::OBJ_OBELISK:	++res; break;
-		case MP2::OBJ_HEROES:
-		{
-		    const Heroes* hero = GetHeroes((*it1)->GetIndex());
-		    if(hero && MP2::OBJ_OBELISK == hero->GetUnderObject()) ++res;
-		    break;
-		}
-		default: break;
-	}
-    }
-
+    u16 res = std::count_if(vec_tiles.begin(), vec_tiles.end(), IsObeliskOnMaps);
     return res ? res : 6;
 }
 

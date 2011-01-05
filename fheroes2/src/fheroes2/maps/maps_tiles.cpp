@@ -519,6 +519,7 @@ void Maps::Tiles::RedrawObjects(Surface & dst) const
 
 void Maps::Tiles::RedrawMonster(Surface & dst) const
 {
+    const Settings & conf = Settings::Get();
     const Point mp(maps_index % world.w(), maps_index / world.w());
     const Interface::GameArea & area = Interface::GameArea::Get();
     s32 dst_index = -1;
@@ -541,7 +542,7 @@ void Maps::Tiles::RedrawMonster(Surface & dst) const
     }
 
     // draw attack sprite
-    if(-1 != dst_index)
+    if(-1 != dst_index && !conf.ExtOnlyFirstMonsterAttack())
     {
 	bool revert = false;
 
