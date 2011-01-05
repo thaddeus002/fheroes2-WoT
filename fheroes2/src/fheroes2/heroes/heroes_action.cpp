@@ -675,12 +675,12 @@ void ActionToHeroes(Heroes &hero, const u8 obj, const s32 dst_index)
 	hero.MeetingDialog(*other_hero);
     }
     else
-    if(! hero.AllowBattle())
+    if(! hero.AllowBattle(true))
     {
         DEBUG(DBG_GAME, DBG_INFO, "ActionToHeroes: " << hero.GetName() << " currently can not allow battle");
     }
     else
-    if(! other_hero->AllowBattle())
+    if(! other_hero->AllowBattle(false))
     {
         DEBUG(DBG_GAME, DBG_INFO, "ActionToHeroes: " << other_hero->GetName() << " currently can not allow battle");
     }

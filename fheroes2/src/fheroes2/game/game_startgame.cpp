@@ -454,7 +454,7 @@ Cursor::themes_t Game::GetCursorFocusShipmaster(const Heroes & from_hero, const 
 	case MP2::OBJN_CASTLE:
     	case MP2::OBJ_CASTLE:
 	{
-    	    const Castle *castle = world.GetCastle(tile.GetIndex());
+    	    const Castle* castle = world.GetCastle(tile.GetIndex());
 
     	    if(NULL != castle)
     		return from_hero.GetColor() == castle->GetColor() ? Cursor::CASTLE : Cursor::POINTER;
@@ -463,7 +463,7 @@ Cursor::themes_t Game::GetCursorFocusShipmaster(const Heroes & from_hero, const 
 
 	case MP2::OBJ_HEROES:
 	{
-	    const Heroes * to_hero = world.GetHeroes(tile.GetIndex());
+	    const Heroes* to_hero = world.GetHeroes(tile.GetIndex());
 
     	    if(NULL != to_hero && to_hero->isShipMaster())
     	    {
@@ -476,7 +476,7 @@ Cursor::themes_t Game::GetCursorFocusShipmaster(const Heroes & from_hero, const 
 		if(conf.IsUnions(from_hero.GetColor(), to_hero->GetColor()))
 		    return conf.ExtUnionsAllowHeroesMeetings() ? Cursor::CHANGE : Cursor::POINTER;
 		else
-		if(to_hero->AllowBattle())
+		if(to_hero->AllowBattle(false))
 		    return Cursor::DistanceThemes(Cursor::FIGHT, from_hero.GetRangeRouteDays(tile.GetIndex()));
 	    }
     	}

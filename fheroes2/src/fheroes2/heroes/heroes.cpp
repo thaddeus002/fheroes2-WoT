@@ -1616,8 +1616,9 @@ u8 Heroes::GetControl(void) const
     return world.GetKingdom(color).Control();
 }
 
-bool Heroes::AllowBattle(void) const
+bool Heroes::AllowBattle(bool attacker) const
 {
+    if(!attacker)
     switch(save_maps_object)
     {
 	case MP2::OBJ_TEMPLE: return false;

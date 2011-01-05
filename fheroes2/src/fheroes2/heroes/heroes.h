@@ -227,7 +227,7 @@ public:
     u32 GetExperience(void) const;
     void IncreaseExperience(const u32 exp);
 
-    bool AllowBattle(void) const;
+    bool AllowBattle(bool attacker) const;
     void PreBattleAction(void);
 
     void Dump(void) const;
