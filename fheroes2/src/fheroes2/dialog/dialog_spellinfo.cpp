@@ -30,7 +30,17 @@ void Dialog::SpellInfo(const Spell::spell_t spell, const bool ok_button)
 {
     std::string msg = Spell::GetDescription(spell);
 
-    const u8 extra = Spell::GetExtraValue(spell);
+    u8 extra = Spell::GetExtraValue(spell);
+
+    switch(spell)
+    {
+	case Spell::HASTE:
+	case Spell::MASSHASTE:
+	    if(0 == extra) extra = 2;
+	    break;
+
+	default: break;
+    }
 
     if(1 == extra)
         String::Replace(msg, "%{count}", _("one"));
