@@ -650,6 +650,7 @@ void CastlePackOrdersBuildings(const Castle & castle, std::vector<building_t> & 
     switch(castle.GetRace())
     {
 	case Race::KNGT:
+	    ordersBuildings.push_back(BUILD_TENT);
 	    ordersBuildings.push_back(BUILD_CASTLE);
 	    ordersBuildings.push_back(BUILD_SPEC);
 	    ordersBuildings.push_back(BUILD_WEL2);
@@ -685,6 +686,7 @@ void CastlePackOrdersBuildings(const Castle & castle, std::vector<building_t> & 
 	    ordersBuildings.push_back(BUILD_MAGEGUILD3);
 	    ordersBuildings.push_back(BUILD_MAGEGUILD4);
 	    ordersBuildings.push_back(BUILD_CAPTAIN);
+	    ordersBuildings.push_back(BUILD_TENT);
 	    ordersBuildings.push_back(BUILD_CASTLE);
 	    ordersBuildings.push_back(BUILD_LEFTTURRET);
 	    ordersBuildings.push_back(BUILD_RIGHTTURRET);
@@ -710,6 +712,7 @@ void CastlePackOrdersBuildings(const Castle & castle, std::vector<building_t> & 
 	    ordersBuildings.push_back(BUILD_MAGEGUILD3);
 	    ordersBuildings.push_back(BUILD_MAGEGUILD4);
 	    ordersBuildings.push_back(BUILD_CAPTAIN);
+	    ordersBuildings.push_back(BUILD_TENT);
 	    ordersBuildings.push_back(BUILD_CASTLE);
 	    ordersBuildings.push_back(BUILD_LEFTTURRET);
 	    ordersBuildings.push_back(BUILD_RIGHTTURRET);
@@ -730,6 +733,7 @@ void CastlePackOrdersBuildings(const Castle & castle, std::vector<building_t> & 
 	case Race::WRLK:
 	    ordersBuildings.push_back(DWELLING_MONSTER5);
 	    ordersBuildings.push_back(DWELLING_MONSTER3);
+	    ordersBuildings.push_back(BUILD_TENT);
 	    ordersBuildings.push_back(BUILD_CASTLE);
 	    ordersBuildings.push_back(BUILD_LEFTTURRET);
 	    ordersBuildings.push_back(BUILD_RIGHTTURRET);
@@ -755,6 +759,7 @@ void CastlePackOrdersBuildings(const Castle & castle, std::vector<building_t> & 
 	    break;
 	case Race::WZRD:
 	    ordersBuildings.push_back(DWELLING_MONSTER6);
+	    ordersBuildings.push_back(BUILD_TENT);
 	    ordersBuildings.push_back(BUILD_CASTLE);
 	    ordersBuildings.push_back(BUILD_LEFTTURRET);
 	    ordersBuildings.push_back(BUILD_RIGHTTURRET);
@@ -782,6 +787,7 @@ void CastlePackOrdersBuildings(const Castle & castle, std::vector<building_t> & 
 	case Race::NECR:
 	    ordersBuildings.push_back(BUILD_SPEC);
 	    if(Settings::Get().PriceLoyaltyVersion()) ordersBuildings.push_back(BUILD_TAVERN); // shrine
+	    ordersBuildings.push_back(BUILD_TENT);
 	    ordersBuildings.push_back(BUILD_CASTLE);
 	    ordersBuildings.push_back(BUILD_CAPTAIN);
 	    ordersBuildings.push_back(BUILD_LEFTTURRET);
