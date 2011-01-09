@@ -737,7 +737,17 @@ void ActionToCastle(Heroes &hero, const u8 obj, const s32 dst_index)
     else
     {
         DEBUG(DBG_GAME , DBG_INFO, "ActionToCastle: " << hero.GetName() << " attack enemy castle " << castle->GetName());
-        
+
+        Heroes *other_guardian =  world.GetHeroes(*castle, true);
+        Heroes *other_hero =  world.GetHeroes(*castle, false);
+
+	// first attack to guest hero
+	if(other_guardian != other_hero)
+	{
+	    ActionToHeroes(hero, MP2::OBJ_HEROES, hero.GetIndex());
+	    return;
+	}
+
         Army::army_t & army = castle->GetActualArmy();
     
 	if(army.isValid())
@@ -746,7 +756,6 @@ void ActionToCastle(Heroes &hero, const u8 obj, const s32 dst_index)
 
 	    // new battle2
 	    Battle2::Result res = Battle2::Loader(hero.GetArmy(), army, dst_index);
-    	    Heroes *other_hero =  world.GetHeroes(*castle, false);
 
     	    castle->ActionAfterBattle(res.AttackerWins());
 
