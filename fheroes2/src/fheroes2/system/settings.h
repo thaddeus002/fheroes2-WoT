@@ -149,6 +149,7 @@ public:
         BATTLE_SHOW_MOVE_SHADOW		= 0x40080000,
         BATTLE_MERGE_ARMIES		= 0x40100000,
         BATTLE_SKIP_INCREASE_DEFENSE	= 0x40200000,
+	BATTLE_AUTO_MOVE_HERO_CASTLE	= 0x40400000,
 	BATTLE_OBJECTS_ARCHERS_PENALTY	= 0x42000000,
 
 	SETTINGS_LAST
@@ -261,6 +262,7 @@ public:
     bool ExtBattleObjectsArchersPenalty(void) const;
     bool ExtBattleMergeArmies(void) const;
     bool ExtBattleSkipIncreaseDefense(void) const;
+    bool ExtBattleAutoMoveHero2Castle(void) const;
     bool ExtRewriteConfirm(void) const;
     bool ExtAutosaveConfirm(void) const;
     bool ExtHideCursor(void) const;

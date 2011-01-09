@@ -777,6 +777,20 @@ void ActionToCastle(Heroes &hero, const u8 obj, const s32 dst_index)
 		Interface::Basic::Get().SetRedraw(REDRAW_CASTLES);
 
         	hero.IncreaseExperience(res.GetExperienceAttacker());
+
+		// auto move hero to castle
+		if(conf.ExtBattleAutoMoveHero2Castle())
+		{
+		    Maps::Tiles & tiles_from = world.GetTiles(hero.GetIndex());
+		    Maps::Tiles & tiles_to = world.GetTiles(dst_index);
+
+		    tiles_from.SetObject(hero.GetUnderObject());
+		    hero.SetIndex(dst_index);
+		    tiles_to.SetObject(MP2::OBJ_HEROES);
+		    hero.SaveUnderObject(MP2::OBJ_CASTLE);
+
+		    ActionToCastle(hero, MP2::OBJ_CASTLE, dst_index);
+		}
 	    }
 	    else
 	    // wins defender
