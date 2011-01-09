@@ -528,7 +528,7 @@ Cursor::themes_t Game::GetCursorFocusHeroes(const Heroes & from_hero, const Maps
 		if(conf.IsUnions(from_hero.GetColor(), castle->GetColor()))
 		    return conf.ExtUnionsAllowCastleVisiting() ? Cursor::ACTION : Cursor::POINTER;
 		else
-		if(castle->GetArmy().isValid())
+		if(castle->GetActualArmy().isValid())
 		    return Cursor::DistanceThemes(Cursor::FIGHT, from_hero.GetRangeRouteDays(tile.GetIndex()));
 		else
 		    return Cursor::DistanceThemes(Cursor::ACTION, from_hero.GetRangeRouteDays(tile.GetIndex()));
@@ -551,7 +551,7 @@ Cursor::themes_t Game::GetCursorFocusHeroes(const Heroes & from_hero, const Maps
 		if(conf.IsUnions(from_hero.GetColor(), castle->GetColor()))
 		    return conf.ExtUnionsAllowCastleVisiting() ? Cursor::ACTION : Cursor::POINTER;
 		else
-		if(castle->GetArmy().isValid())
+		if(castle->GetActualArmy().isValid())
 		    return Cursor::DistanceThemes(Cursor::FIGHT, from_hero.GetRangeRouteDays(tile.GetIndex()));
 		else
 		    return Cursor::DistanceThemes(Cursor::ACTION, from_hero.GetRangeRouteDays(tile.GetIndex()));
