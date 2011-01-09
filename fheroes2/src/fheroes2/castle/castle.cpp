@@ -1675,34 +1675,24 @@ void Castle::RecruitAllMonster(void)
 
 const Army::army_t & Castle::GetArmy(void) const
 {
-    const Heroes *hero = GetGuardians();
-    return hero ? hero->GetArmy() : army;
+    return army;
 }
 
 Army::army_t & Castle::GetArmy(void)
 {
-    Heroes *hero = GetGuardians();
-    return hero ? hero->GetArmy() : army;
-}
-
-void Castle::MergeArmies(void)
-{
-    Heroes *hero = GetHeroes();
-
-    if(hero && army.isValid() && (GetControl() == Game::AI || Settings::Get().ExtBattleMergeArmies()))
-	hero->GetArmy().JoinStrongestFromArmy(army);
+    return army;
 }
 
 const Army::army_t & Castle::GetActualArmy(void) const
 {
-    const Heroes *heroes = GetHeroes();
-    return heroes ? heroes->GetArmy() : army;
+    const Heroes *hero = GetGuardians();
+    return hero ? hero->GetArmy() : army;
 }
 
 Army::army_t & Castle::GetActualArmy(void)
 {
-    Heroes *heroes = GetHeroes();
-    return heroes ? heroes->GetArmy() : army;
+    Heroes *hero = GetGuardians();
+    return hero ? hero->GetArmy() : army;
 }
 
 bool Castle::AllowBuyBoat(void) const
@@ -1823,5 +1813,28 @@ void Castle::JoinRNDArmy(void)
 	    army.JoinTroop(mon1, mon1.GetRNDSize(false));
             army.JoinTroop(mon3, mon3.GetRNDSize(false));
             break;
+    }
+}
+
+void Castle::ActionPreBattle(void)
+{
+    if(Game::AI == GetControl())
+	AI::CastlePreBattle(*this);
+    else
+    {
+	Heroes *hero = GetGuardians();
+	if(hero && army.isValid() && Settings::Get().ExtBattleMergeArmies())
+	    hero->GetArmy().JoinStrongestFromArmy(army);
+    }
+}
+
+void Castle::ActionAfterBattle(bool attacker_wins)
+{
+    if(Game::AI == GetControl())
+	AI::CastleAfterBattle(*this, attacker_wins);
+    else
+    if(attacker_wins)
+    {
+	army.Clear();
     }
 }

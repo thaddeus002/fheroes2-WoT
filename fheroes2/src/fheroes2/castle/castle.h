@@ -123,7 +123,6 @@ public:
     Army::army_t & GetArmy(void);
     const Army::army_t & GetActualArmy(void) const;
     Army::army_t & GetActualArmy(void);
-    void MergeArmies(void);
     void JoinRNDArmy(void);
     u16 GetDwellingLivedCount(u32) const;
     u32 GetActualDwelling(u32) const;
@@ -137,6 +136,9 @@ public:
     void ActionNewDay(void);
     void ActionNewWeek(void);
     void ActionNewMonth(void);
+
+    void ActionPreBattle(void);
+    void ActionAfterBattle(bool attacker_wins);
 
     void DrawImageCastle(const Point & pt);
 

@@ -83,4 +83,12 @@ void AI::Init(void)
 {
 }
 
+void AI::CastlePreBattle(Castle &)
+{
+}
+
+void AI::CastleAfterBattle(Castle &, bool attacker_wins)
+{
+}
+
 #endif

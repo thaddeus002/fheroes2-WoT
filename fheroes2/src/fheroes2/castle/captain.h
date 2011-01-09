@@ -57,7 +57,8 @@ class Captain : public HeroBase
 
     u16 GetMaxSpellPoints(void) const;
 
-    void PreBattleAction(void);
+    void ActionPreBattle(void);
+    void ActionAfterBattle(void);
 
   private:
     const Castle & home;

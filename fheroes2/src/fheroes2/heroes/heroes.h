@@ -179,6 +179,7 @@ public:
     void ActionNewWeek(void);
     void ActionNewMonth(void);
     void ActionAfterBattle(void);
+    void ActionPreBattle(void);
 
     bool BuySpellBook(const MageGuild*, u8 shrine = 0);
 
@@ -228,7 +229,6 @@ public:
     void IncreaseExperience(const u32 exp);
 
     bool AllowBattle(bool attacker) const;
-    void PreBattleAction(void);
 
     void Dump(void) const;
 

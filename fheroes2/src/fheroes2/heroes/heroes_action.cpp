@@ -625,7 +625,6 @@ void ActionToMonster(Heroes &hero, const u8 obj, const s32 dst_index)
 	{
     	    hero.IncreaseExperience(res.GetExperienceAttacker());
     	    destroy = true;
-    	    hero.ActionAfterBattle();
 	}
 	else
 	{
@@ -709,14 +708,12 @@ void ActionToHeroes(Heroes &hero, const u8 obj, const s32 dst_index)
 	if(res.AttackerWins())
 	{
     	    hero.IncreaseExperience(res.GetExperienceAttacker());
-    	    hero.ActionAfterBattle();
 	}
 	else
 	// wins defender
 	if(res.DefenderWins())
 	{
 	    other_hero->IncreaseExperience(res.GetExperienceDefender());
-    	    other_hero->ActionAfterBattle();
 	}
     }
 }
@@ -741,14 +738,17 @@ void ActionToCastle(Heroes &hero, const u8 obj, const s32 dst_index)
     {
         DEBUG(DBG_GAME , DBG_INFO, "ActionToCastle: " << hero.GetName() << " attack enemy castle " << castle->GetName());
         
-    	castle->MergeArmies();
         Army::army_t & army = castle->GetActualArmy();
-        
+    
 	if(army.isValid())
 	{
+    	    castle->ActionPreBattle();
+
 	    // new battle2
 	    Battle2::Result res = Battle2::Loader(hero.GetArmy(), army, dst_index);
     	    Heroes *other_hero =  world.GetHeroes(*castle, false);
+
+    	    castle->ActionAfterBattle(res.AttackerWins());
 
 	    // loss defender
 	    if(!res.DefenderWins() && other_hero)
@@ -761,8 +761,6 @@ void ActionToCastle(Heroes &hero, const u8 obj, const s32 dst_index)
 	    // wins attacker
 	    if(res.AttackerWins())
 	    {
-		castle->GetArmy().Clear();
-
                 world.GetKingdom(castle->GetColor()).RemoveCastle(castle);
                 world.GetKingdom(hero.GetColor()).AddCastle(castle);
                 world.CaptureObject(dst_index, hero.GetColor());
@@ -770,14 +768,12 @@ void ActionToCastle(Heroes &hero, const u8 obj, const s32 dst_index)
 		Interface::Basic::Get().SetRedraw(REDRAW_CASTLES);
 
         	hero.IncreaseExperience(res.GetExperienceAttacker());
-        	hero.ActionAfterBattle();
 	    }
 	    else
 	    // wins defender
 	    if(res.DefenderWins() && other_hero)
 	    {
 		other_hero->IncreaseExperience(res.GetExperienceDefender());
-        	other_hero->ActionAfterBattle();
 	    }
 	}
 	else
@@ -1273,7 +1269,6 @@ void ActionToPoorLuckObject(Heroes &hero, const u8 obj, const s32 dst_index)
 				Dialog::SpellInfo(Spell::GetName(spell), _("Upon defeating the monsters, you decipher an ancient glyph on the wall, telling the secret of the spell."), spell, true);
 				hero.AppendSpellToBook(spell);
 			    }
-			    hero.ActionAfterBattle();
     			}
     			else
     			{
@@ -1445,7 +1440,6 @@ void ActionToPoorMoraleObject(Heroes &hero, const u8 obj, const s32 dst_index)
 			    DialogWithArtifactAndGold(MP2::StringObject(obj), _("Upon defeating the zomies you search the graves and find something!"), art, resource.gold);
 			    hero.PickupArtifact(art);
 			    world.GetKingdom(hero.GetColor()).AddFundsResource(resource);
-			    hero.ActionAfterBattle();
 			}
 			else
 			{
@@ -1491,7 +1485,6 @@ void ActionToPoorMoraleObject(Heroes &hero, const u8 obj, const s32 dst_index)
 				hero.PickupArtifact(art);
 			    }
 			    world.GetKingdom(hero.GetColor()).AddFundsResource(resource);
-			    hero.ActionAfterBattle();
 			}
 			else
 			{
@@ -1523,7 +1516,6 @@ void ActionToPoorMoraleObject(Heroes &hero, const u8 obj, const s32 dst_index)
 			    PlaySoundSuccess;
 			    DialogWithGold(MP2::StringObject(obj), _("Upon defeating the Skeletons you sift through the debris and find something!"), resource.gold);
 			    world.GetKingdom(hero.GetColor()).AddFundsResource(resource);
-			    hero.ActionAfterBattle();
 			}
 			else
 			{
@@ -1849,7 +1841,6 @@ void ActionToArtifact(Heroes &hero, const u8 obj, const s32 dst_index)
 		    std::string str = _("Victorious, you take your prize, the %{art}.");
 		    String::Replace(str, "%{art}", art.GetName());
 		    DialogWithArtifact(MP2::StringObject(obj), str, art());
-		    hero.ActionAfterBattle();
 		}
 		else
 		{
@@ -2134,7 +2125,6 @@ void ActionToAbandoneMine(Heroes &hero, const u8 obj, const s32 dst_index)
 	    tile.ResetQuantity();
 	    hero.SaveUnderObject(MP2::OBJ_MINES);
 	    world.CaptureObject(dst_index, hero.GetColor());
-	    hero.ActionAfterBattle();
 	}
 	else
 	{
@@ -2218,8 +2208,6 @@ void ActionToCaptureObject(Heroes &hero, const u8 obj, const s32 dst_index)
     	    if(result.AttackerWins())
     	    {
         	hero.IncreaseExperience(result.GetExperienceAttacker());
-        	hero.ActionAfterBattle();
-
 		tile.ResetQuantity();
     	    }
     	    else
@@ -2463,7 +2451,6 @@ void ActionToDwellingBattleMonster(Heroes &hero, const u8 obj, const s32 dst_ind
 		world.CaptureObject(dst_index, hero.GetColor());
 		PlaySoundSuccess;
 		complete = (Dialog::YES == Dialog::Message(MP2::StringObject(obj), str_recr, Font::BIG, Dialog::YES | Dialog::NO));
-		hero.ActionAfterBattle();
 		tile.SetQuantity4(hero.GetColor());
 	    }
 	    else
@@ -2875,7 +2862,6 @@ void ActionToDaemonCave(Heroes &hero, const u8 obj, const s32 dst_index)
     		    if(res.AttackerWins())
     		    {
 			hero.IncreaseExperience(res.GetExperienceAttacker());
-			hero.ActionAfterBattle();
 			resource.gold = 2500;
 			DialogWithGold("", _("Upon defeating the daemon's servants, you find a hidden cache with 2500 gold."), 2500);
 			world.GetKingdom(hero.GetColor()).AddFundsResource(resource);

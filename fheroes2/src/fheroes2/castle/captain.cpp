@@ -167,7 +167,12 @@ s32 Captain::GetIndex(void) const
     return home.GetIndex();
 }
 
-void Captain::PreBattleAction(void)
+void Captain::ActionAfterBattle(void)
+{
+    SetSpellPoints(GetMaxSpellPoints());
+}
+
+void Captain::ActionPreBattle(void)
 {
     SetSpellPoints(GetMaxSpellPoints());
 }

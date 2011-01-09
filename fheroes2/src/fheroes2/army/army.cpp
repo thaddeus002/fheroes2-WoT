@@ -733,7 +733,7 @@ void Army::army_t::BattleInit(void)
     if(commander)
     {
 	army.reserve(ARMYMAXTROOPS * 2);
-	commander->PreBattleAction();
+	commander->ActionPreBattle();
     }
 }
 
@@ -741,6 +741,8 @@ void Army::army_t::BattleQuit(void)
 {
     std::for_each(army.begin(), army.end(), std::mem_fun_ref(&Troop::BattleQuit));
     if(army.size() > ARMYMAXTROOPS) army.resize(ARMYMAXTROOPS);
+    if(commander)
+	commander->ActionAfterBattle();
 }
 
 u32 Army::army_t::BattleKilled(void) const

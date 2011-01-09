@@ -1628,7 +1628,7 @@ bool Heroes::AllowBattle(bool attacker) const
     return true;
 }
 
-void Heroes::PreBattleAction(void)
+void Heroes::ActionPreBattle(void)
 {
 }
 

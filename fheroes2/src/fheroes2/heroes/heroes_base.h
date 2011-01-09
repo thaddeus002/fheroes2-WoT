@@ -53,7 +53,8 @@ public:
     virtual u8 GetLevelSkill(const Skill::Secondary::skill_t) const = 0;
     virtual u8 GetSecondaryValues(const Skill::Secondary::skill_t) const = 0;
 
-    virtual void PreBattleAction(void) = 0;
+    virtual void ActionAfterBattle(void) = 0;
+    virtual void ActionPreBattle(void) = 0;
 
     virtual const Castle* inCastle(void) const = 0;
 

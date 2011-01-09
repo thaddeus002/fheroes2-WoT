@@ -45,6 +45,9 @@ struct AI
     static void HeroesAction(Heroes &, s32);
     static void HeroesLevelUp(Heroes &);
     static void HeroesDumpInfo(const Heroes &);
+
+    static void CastlePreBattle(Castle &);
+    static void CastleAfterBattle(Castle &, bool attacker_wins);
 };
 
 #endif
