@@ -226,6 +226,7 @@ u8 GetIndexBuildingSprite(u32 build)
 	case BUILD_MAGEGUILD4:
 	case BUILD_MAGEGUILD5:	return 0;
 	case BUILD_THIEVESGUILD:return 1;
+	case BUILD_SHRINE:
 	case BUILD_TAVERN:	return 2;
 	case BUILD_SHIPYARD:	return 3;
 	case BUILD_WELL:	return 4;
@@ -286,7 +287,7 @@ BuildingInfo::BuildingInfo(const Castle & c, building_t b) : castle(c), building
     }
 
     // necr and tavern check
-    if(Race::NECR == castle.GetRace() && BUILD_TAVERN == building && !Settings::Get().PriceLoyaltyVersion())
+    if(BUILD_SHRINE == building && (Race::NECR != castle.GetRace() || !Settings::Get().PriceLoyaltyVersion()))
 	disable = true;
 
     if(b == BUILD_CAPTAIN)

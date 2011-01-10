@@ -354,8 +354,14 @@ Rect CastleGetCoordBuilding(Race::race_t race, building_t building, const Point 
 		case Race::SORC:	return Rect(pt.x + 494, pt.y + 140, 131, 87);
 		case Race::WRLK:	return Rect(pt.x + 479, pt.y + 100, 39, 52);
 		case Race::WZRD:	return Rect(pt.x, pt.y + 160, 118, 50);
-		// shrine
-		case Race::NECR:	if(Settings::Get().PriceLoyaltyVersion()) return Rect(pt.x + 453, pt.y + 36, 55, 96);
+		default: break;
+	    }
+	    break;
+
+	case BUILD_SHRINE:
+	    switch(race)
+	    {
+		case Race::NECR:	return Rect(pt.x + 453, pt.y + 36, 55, 96);
 		default: break;
 	    }
 	    break;
@@ -786,7 +792,8 @@ void CastlePackOrdersBuildings(const Castle & castle, std::vector<building_t> & 
 	    break;
 	case Race::NECR:
 	    ordersBuildings.push_back(BUILD_SPEC);
-	    if(Settings::Get().PriceLoyaltyVersion()) ordersBuildings.push_back(BUILD_TAVERN); // shrine
+	    if(Settings::Get().PriceLoyaltyVersion())
+		ordersBuildings.push_back(BUILD_SHRINE);
 	    ordersBuildings.push_back(BUILD_TENT);
 	    ordersBuildings.push_back(BUILD_CASTLE);
 	    ordersBuildings.push_back(BUILD_CAPTAIN);

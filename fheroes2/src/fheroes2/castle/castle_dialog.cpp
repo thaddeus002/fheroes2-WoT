@@ -47,6 +47,7 @@ bool AllowFlashBuilding(u32 build)
     switch(build)
     {
 	case BUILD_TAVERN:
+	case BUILD_SHRINE:
 	case BUILD_SHIPYARD:
 	case BUILD_WELL:
 	case BUILD_STATUE:
@@ -58,7 +59,6 @@ bool AllowFlashBuilding(u32 build)
 	case BUILD_SPEC:
 	case BUILD_CASTLE:
 	case BUILD_CAPTAIN:
-	case BUILD_SHRINE:
 	case BUILD_MAGEGUILD1:
 	case BUILD_MAGEGUILD2:
 	case BUILD_MAGEGUILD3:
@@ -319,7 +319,7 @@ Dialog::answer_t Castle::OpenDialog(bool readonly, bool fade)
     CastleDialog::CacheBuildings cacheBuildings(*this, cur_pt);
 
     const Rect & coordBuildingThievesGuild = cacheBuildings.GetRect(BUILD_THIEVESGUILD);
-    const Rect & coordBuildingTavern = cacheBuildings.GetRect(BUILD_TAVERN);
+    const Rect & coordBuildingTavern = cacheBuildings.GetRect(race == Race::NECR ? BUILD_SHRINE : BUILD_TAVERN);
     const Rect & coordBuildingShipyard = cacheBuildings.GetRect(BUILD_SHIPYARD);
     const Rect & coordBuildingWell = cacheBuildings.GetRect(BUILD_WELL);
     const Rect & coordBuildingStatue = cacheBuildings.GetRect(BUILD_STATUE);
@@ -525,13 +525,11 @@ Dialog::answer_t Castle::OpenDialog(bool readonly, bool fade)
 	if((building & BUILD_THIEVESGUILD) && le.MouseClickLeft(coordBuildingThievesGuild))
 	    Dialog::ThievesGuild(false);
 	else
+	if((building & BUILD_SHRINE) && le.MouseClickLeft(coordBuildingTavern))
+	    Dialog::Message(GetStringBuilding(BUILD_SHRINE, race), GetDescriptionBuilding(BUILD_SHRINE, race), Font::BIG, Dialog::OK);
+	else
 	if((building & BUILD_TAVERN) && le.MouseClickLeft(coordBuildingTavern))
-	{
-	    if(Race::NECR == race && conf.PriceLoyaltyVersion())
-		Dialog::Message(GetStringBuilding(BUILD_TAVERN, race), GetDescriptionBuilding(BUILD_TAVERN, race), Font::BIG, Dialog::OK);
-	    else
-		OpenTavern();
-	}
+	    OpenTavern();
 	else
 	if(!readonly && (building & BUILD_SHIPYARD) && le.MouseClickLeft(coordBuildingShipyard))
 	{
@@ -753,6 +751,8 @@ Dialog::answer_t Castle::OpenDialog(bool readonly, bool fade)
 	// right press building
 	if(building & BUILD_THIEVESGUILD && le.MousePressRight(coordBuildingThievesGuild)) Dialog::Message(GetStringBuilding(BUILD_THIEVESGUILD), GetDescriptionBuilding(BUILD_THIEVESGUILD), Font::BIG);
 	else
+	if(building & BUILD_SHRINE && le.MousePressRight(coordBuildingTavern)) Dialog::Message(GetStringBuilding(BUILD_SHRINE, race), GetDescriptionBuilding(BUILD_SHRINE, race), Font::BIG);
+	else
 	if(building & BUILD_TAVERN && le.MousePressRight(coordBuildingTavern)) Dialog::Message(GetStringBuilding(BUILD_TAVERN, race), GetDescriptionBuilding(BUILD_TAVERN, race), Font::BIG);
 	else
 	if(building & BUILD_SHIPYARD && le.MousePressRight(coordBuildingShipyard)) Dialog::Message(GetStringBuilding(BUILD_SHIPYARD), GetDescriptionBuilding(BUILD_SHIPYARD), Font::BIG);
@@ -827,6 +827,8 @@ Dialog::answer_t Castle::OpenDialog(bool readonly, bool fade)
 	else
 	// building
 	if(building & BUILD_THIEVESGUILD && le.MouseCursor(coordBuildingThievesGuild)) statusBar.ShowMessage(GetStringBuilding(BUILD_THIEVESGUILD));
+	else
+	if(building & BUILD_SHRINE && le.MouseCursor(coordBuildingTavern)) statusBar.ShowMessage(GetStringBuilding(BUILD_SHRINE, race));
 	else
 	if(building & BUILD_TAVERN && le.MouseCursor(coordBuildingTavern)) statusBar.ShowMessage(GetStringBuilding(BUILD_TAVERN, race));
 	else

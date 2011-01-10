@@ -271,8 +271,12 @@ void Castle::LoadFromMP2(const void *ptr)
     if(!HaveNearlySea()) building &= ~(BUILD_SHIPYARD);
 
     // remove tavern from necromancer castle
-    if(Race::NECR == race && !Settings::Get().PriceLoyaltyVersion())
+    if(Race::NECR == race && (building & BUILD_TAVERN))
+    {
     	building &= ~BUILD_TAVERN;
+	if(Settings::Get().PriceLoyaltyVersion())
+	    building |= BUILD_SHRINE;
+    }
 
     // end
     DEBUG(DBG_GAME , DBG_INFO, "Castle::LoadFromMP2: " << (building & BUILD_CASTLE ? "castle" : "town") << ": " << name << ", color: " << Color::String(color) << ", race: " << Race::String(race));
@@ -280,7 +284,9 @@ void Castle::LoadFromMP2(const void *ptr)
 
 u32 Castle::CountBuildings(void) const
 {
-    std::bitset<32> requires(building & (BUILD_THIEVESGUILD | BUILD_TAVERN | BUILD_SHIPYARD | BUILD_WELL |
+    const u32 tavern = (race == Race::NECR ? (Settings::Get().PriceLoyaltyVersion() ? BUILD_SHRINE : 0) : BUILD_TAVERN);
+
+    std::bitset<32> requires(building & (BUILD_THIEVESGUILD | tavern | BUILD_SHIPYARD | BUILD_WELL |
                     BUILD_STATUE | BUILD_LEFTTURRET | BUILD_RIGHTTURRET |
                     BUILD_MARKETPLACE | BUILD_WEL2 | BUILD_MOAT | BUILD_SPEC |
                     BUILD_CAPTAIN | BUILD_CASTLE | BUILD_MAGEGUILD1 | DWELLING_MONSTER1 |
@@ -438,10 +444,9 @@ const char* Castle::GetStringBuilding(u32 build, Race::race_t race)
 	default: break;
     }
 
-    if(Settings::Get().PriceLoyaltyVersion() && race == Race::NECR && build == BUILD_TAVERN) return shrine;
-
     switch(build)
     {
+	case BUILD_SHRINE:	return shrine;
         case BUILD_THIEVESGUILD:return str_build[0];
         case BUILD_TAVERN:	return str_build[1];
         case BUILD_SHIPYARD:	return str_build[2];
@@ -531,10 +536,9 @@ const char* Castle::GetDescriptionBuilding(u32 build, Race::race_t race)
 	default: break;
     }
 
-    if(Settings::Get().PriceLoyaltyVersion() && race == Race::NECR && build == BUILD_TAVERN) return shrine_descr;
-    
     switch(build)
     {
+	case BUILD_SHRINE:	return shrine_descr;
         case BUILD_THIEVESGUILD:return desc_build[0];
         case BUILD_TAVERN:	return desc_build[1];
         case BUILD_SHIPYARD:	return desc_build[2];
@@ -1258,8 +1262,7 @@ ICN::icn_t Castle::GetICNBuilding(u32 build, Race::race_t race)
 	case BUILD_MARKETPLACE:	return ICN::TWNNMARK;
 	case BUILD_THIEVESGUILD:return ICN::TWNNTHIE;
 	// shrine
-	case BUILD_TAVERN:	if(Settings::Get().PriceLoyaltyVersion()) return ICN::TWNNTVRN;
-				break;
+	case BUILD_SHRINE:	return ICN::TWNNTVRN;
 	case BUILD_WELL:	return ICN::TWNNWELL;
 	case BUILD_STATUE:	return ICN::TWNNSTAT;
 	case BUILD_SHIPYARD:	return ICN::TWNNDOCK;
@@ -1619,7 +1622,7 @@ s8 Castle::GetMoraleModificator(std::string *strs) const
     s8 result(Morale::NORMAL);
 
     // and tavern
-    if(Race::NECR != race && isBuild(BUILD_TAVERN))
+    if(isBuild(BUILD_TAVERN))
     {
 	const u8 mod = 1;
         result += mod;
@@ -1751,8 +1754,7 @@ u8 Castle::GetControl(void) const
 
 bool Castle::isNecromancyShrineBuild(void) const
 {
-    return Settings::Get().PriceLoyaltyVersion() &&
-	race == Race::NECR && (BUILD_TAVERN & building);
+    return race == Race::NECR && (BUILD_SHRINE & building);
 }
 
 u8 Castle::GetGrownWell(void)
