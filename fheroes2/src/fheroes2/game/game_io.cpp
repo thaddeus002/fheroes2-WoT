@@ -569,6 +569,9 @@ void Game::IO::PackHeroes(QueueMessage & msg, const Heroes & hero)
     msg.Push(static_cast<u8>(hero.save_maps_object));
     msg.Push(hero.center.x);
     msg.Push(hero.center.y);
+    msg.Push(hero.patrol_center.x);
+    msg.Push(hero.patrol_center.y);
+    msg.Push(hero.patrol_square);
 
     // sec skills
     msg.Push(static_cast<u32>(hero.secondary_skills.size()));
@@ -1251,6 +1254,12 @@ void Game::IO::UnpackHeroes(QueueMessage & msg, Heroes & hero, u16 check_version
     {
 	msg.Pop(byte16); hero.center.x = byte16;
 	msg.Pop(byte16); hero.center.y = byte16;
+    }
+    if(FORMAT_VERSION_2178 <= check_version)
+    {
+	msg.Pop(hero.patrol_center.x);
+	msg.Pop(hero.patrol_center.y);
+	msg.Pop(hero.patrol_square);
     }
 
     // sec skills
