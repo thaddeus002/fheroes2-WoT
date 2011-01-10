@@ -129,6 +129,7 @@ public:
 	UNIONS_ALLOW_HERO_MEETINGS	= 0x20001000,
 	UNIONS_ALLOW_CASTLE_VISITING	= 0x20002000,
 	UNIONS_ALLOW_VIEW_MAPS		= 0x20004000,
+	HEROES_AUTO_MOVE_BATTLE_DST	= 0x20008000,
 	CASTLE_ALLOW_FLASH_BUILDING	= 0x20040000,
 	CASTLE_ALLOW_GUARDIANS		= 0x20080000,
 	CASTLE_ALLOW_BUY_FROM_WELL	= 0x20100000,
@@ -150,7 +151,6 @@ public:
         BATTLE_SHOW_MOVE_SHADOW		= 0x40080000,
         BATTLE_MERGE_ARMIES		= 0x40100000,
         BATTLE_SKIP_INCREASE_DEFENSE	= 0x40200000,
-	BATTLE_AUTO_MOVE_HERO_CASTLE	= 0x40400000,
 	BATTLE_OBJECTS_ARCHERS_PENALTY	= 0x42000000,
 
 	SETTINGS_LAST
@@ -250,6 +250,7 @@ public:
     bool ExtHeroSurrenderingGiveExp(void) const;
     bool ExtHeroRecalculateMovement(void) const;
     bool ExtHeroPatrolAllowPickup(void) const;
+    bool ExtHeroAutoMove2BattleTarget(void) const;
     bool ExtUnionsAllowCastleVisiting(void) const;
     bool ExtUnionsAllowHeroesMeetings(void) const;
     bool ExtUnionsAllowViewMaps(void) const;
@@ -263,7 +264,6 @@ public:
     bool ExtBattleObjectsArchersPenalty(void) const;
     bool ExtBattleMergeArmies(void) const;
     bool ExtBattleSkipIncreaseDefense(void) const;
-    bool ExtBattleAutoMoveHero2Castle(void) const;
     bool ExtRewriteConfirm(void) const;
     bool ExtAutosaveConfirm(void) const;
     bool ExtHideCursor(void) const;

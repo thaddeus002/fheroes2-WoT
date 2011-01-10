@@ -365,6 +365,18 @@ void AnimationRemoveObject(Maps::Tiles & tile)
     }
 }
 
+void MoveHero2Dest(Heroes & hero, s32 dst_index, MP2::object_t from_obj, MP2::object_t under_obj)
+{
+    Maps::Tiles & tiles_from = world.GetTiles(hero.GetIndex());
+    Maps::Tiles & tiles_to = world.GetTiles(dst_index);
+
+    tiles_from.SetObject(from_obj);
+    hero.SetIndex(dst_index);
+    hero.Scoute();
+    hero.SaveUnderObject(under_obj);
+    tiles_to.SetObject(MP2::OBJ_HEROES);
+}
+
 // action to next cell
 void Heroes::Action(const s32 dst_index)
 {
@@ -534,6 +546,7 @@ void ActionToMonster(Heroes &hero, const u8 obj, const s32 dst_index)
     bool destroy = false;
     Maps::Tiles & tile = world.GetTiles(dst_index);
     const Army::Troop troop(tile);
+    const Settings & conf = Settings::Get();
 
 
     u32 join = 0;
@@ -610,6 +623,8 @@ void ActionToMonster(Heroes &hero, const u8 obj, const s32 dst_index)
 	    reason = 0;
     }
 
+    bool allow_move = false;
+
     // fight
     if(0 == reason)
     {
@@ -625,6 +640,7 @@ void ActionToMonster(Heroes &hero, const u8 obj, const s32 dst_index)
 	{
     	    hero.IncreaseExperience(res.GetExperienceAttacker());
     	    destroy = true;
+	    allow_move = true;
 	}
 	else
 	{
@@ -656,6 +672,12 @@ void ActionToMonster(Heroes &hero, const u8 obj, const s32 dst_index)
             // remove shadow from left cell
             if(Maps::isValidDirection(dst_index, Direction::LEFT))
                 world.GetTiles(Maps::GetDirectionIndex(dst_index, Direction::LEFT)).Remove(uniq);
+	}
+
+	// auto move hero
+	if(conf.ExtHeroAutoMove2BattleTarget() && allow_move)
+	{
+	    MoveHero2Dest(hero, dst_index, hero.GetUnderObject(), tile.GetObject());
 	}
     }
 }
@@ -708,6 +730,12 @@ void ActionToHeroes(Heroes &hero, const u8 obj, const s32 dst_index)
 	if(res.AttackerWins())
 	{
     	    hero.IncreaseExperience(res.GetExperienceAttacker());
+
+	    // auto move hero
+	    if(conf.ExtHeroAutoMove2BattleTarget())
+	    {
+		MoveHero2Dest(hero, dst_index, hero.GetUnderObject(), world.GetTiles(dst_index).GetObject());
+	    }
 	}
 	else
 	// wins defender
@@ -749,7 +777,8 @@ void ActionToCastle(Heroes &hero, const u8 obj, const s32 dst_index)
 	}
 
         Army::army_t & army = castle->GetActualArmy();
-    
+	bool allow_enter = true;
+
 	if(army.isValid())
 	{
     	    castle->ActionPreBattle();
@@ -777,26 +806,13 @@ void ActionToCastle(Heroes &hero, const u8 obj, const s32 dst_index)
 		Interface::Basic::Get().SetRedraw(REDRAW_CASTLES);
 
         	hero.IncreaseExperience(res.GetExperienceAttacker());
-
-		// auto move hero to castle
-		if(conf.ExtBattleAutoMoveHero2Castle())
-		{
-		    Maps::Tiles & tiles_from = world.GetTiles(hero.GetIndex());
-		    Maps::Tiles & tiles_to = world.GetTiles(dst_index);
-
-		    tiles_from.SetObject(hero.GetUnderObject());
-		    hero.SetIndex(dst_index);
-		    tiles_to.SetObject(MP2::OBJ_HEROES);
-		    hero.SaveUnderObject(MP2::OBJ_CASTLE);
-
-		    ActionToCastle(hero, MP2::OBJ_CASTLE, dst_index);
-		}
 	    }
 	    else
 	    // wins defender
 	    if(res.DefenderWins() && other_hero)
 	    {
 		other_hero->IncreaseExperience(res.GetExperienceDefender());
+		allow_enter = false;
 	    }
 	}
 	else
@@ -807,6 +823,13 @@ void ActionToCastle(Heroes &hero, const u8 obj, const s32 dst_index)
             castle->Scoute();
 	    Interface::Basic::Get().SetRedraw(REDRAW_CASTLES);
 	}
+
+	// auto move hero to castle
+	if(conf.ExtHeroAutoMove2BattleTarget() && allow_enter)
+	{
+	    MoveHero2Dest(hero, dst_index, hero.GetUnderObject(), MP2::OBJ_CASTLE);
+	    ActionToCastle(hero, MP2::OBJ_CASTLE, dst_index);
+	}
     }
 }
 
@@ -814,20 +837,12 @@ void ActionToBoat(Heroes &hero, const u8 obj, const s32 dst_index)
 {
     if(hero.isShipMaster()) return;
 
-    const s32 from_index = hero.GetIndex();
-
-    Maps::Tiles & tiles_from = world.GetTiles(from_index);
-    Maps::Tiles & tiles_to = world.GetTiles(dst_index);
-
     AGG::PlaySound(M82::KILLFADE);
     hero.GetPath().Hide();
     hero.FadeOut();
     hero.ResetMovePoints();
-    tiles_from.SetObject(MP2::OBJ_COAST);
-    hero.SetIndex(dst_index);
+    MoveHero2Dest(hero, dst_index, MP2::OBJ_COAST, MP2::OBJ_ZERO);
     hero.SetShipMaster(true);
-    tiles_to.SetObject(MP2::OBJ_HEROES);
-    hero.SaveUnderObject(MP2::OBJ_ZERO);
 
     hero.GetPath().Reset();
     hero.ActionNewPosition();
@@ -839,17 +854,9 @@ void ActionToCoast(Heroes &hero, const u8 obj, const s32 dst_index)
 {
     if(! hero.isShipMaster()) return;
 
-    s32 from_index = hero.GetIndex();
-
-    Maps::Tiles & tiles_from = world.GetTiles(from_index);
-    Maps::Tiles & tiles_to = world.GetTiles(dst_index);
-
     hero.ResetMovePoints();
-    tiles_from.SetObject(MP2::OBJ_BOAT);
-    hero.SetIndex(dst_index);
+    MoveHero2Dest(hero, dst_index, MP2::OBJ_BOAT, MP2::OBJ_ZERO);
     hero.SetShipMaster(false);
-    tiles_to.SetObject(MP2::OBJ_HEROES);
-    hero.SaveUnderObject(MP2::OBJ_ZERO);
     AGG::PlaySound(M82::KILLFADE);
     hero.GetPath().Hide();
     hero.FadeIn();
@@ -2055,11 +2062,8 @@ void ActionToTeleports(Heroes &hero, const s32 index_from)
     hero.FadeOut();
 
     Cursor::Get().Hide();
-    hero.SetIndex(index_to);
-    hero.Scoute();
 
-    world.GetTiles(index_from).SetObject(MP2::OBJ_STONELIGHTS);
-    world.GetTiles(index_to).SetObject(MP2::OBJ_HEROES);
+    MoveHero2Dest(hero, index_to, MP2::OBJ_STONELIGHTS, MP2::OBJ_STONELIGHTS);
 
     Interface::Basic & I = Interface::Basic::Get();
     Game::Focus & F = Game::Focus::Get();
@@ -2094,11 +2098,8 @@ void ActionToWhirlpools(Heroes &hero, const u8 obj, const s32 index_from)
     hero.FadeOut();
 
     Cursor::Get().Hide();
-    hero.SetIndex(index_to);
-    hero.Scoute();
 
-    world.GetTiles(index_from).SetObject(MP2::OBJ_WHIRLPOOL);
-    world.GetTiles(index_to).SetObject(MP2::OBJ_HEROES);
+    MoveHero2Dest(hero, index_to, MP2::OBJ_WHIRLPOOL, MP2::OBJ_WHIRLPOOL);
 
     Interface::Basic & I = Interface::Basic::Get();
     Game::Focus & F = Game::Focus::Get();

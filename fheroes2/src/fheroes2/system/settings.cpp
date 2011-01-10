@@ -112,6 +112,7 @@ static const settings_t settingsFHeroes2[] =
     { Settings::HEROES_SURRENDERING_GIVE_EXP,   _("heroes: surrendering gives some experience"),        },
     { Settings::HEROES_RECALCULATE_MOVEMENT,    _("heroes: recalculate movement points after creatures movement"), },
     { Settings::HEROES_PATROL_ALLOW_PICKUP,     _("heroes: allow pickup objects for patrol"),           },
+    { Settings::HEROES_AUTO_MOVE_BATTLE_DST,	_("heroes: after battle move to target cell"),		},
     { Settings::UNIONS_ALLOW_HERO_MEETINGS,	_("unions: allow meeting heroes"),                      },
     { Settings::UNIONS_ALLOW_CASTLE_VISITING,	_("unions: allow castle visiting"),                     },
     { Settings::UNIONS_ALLOW_VIEW_MAPS,		_("unions: allow view maps"),                           },
@@ -126,7 +127,6 @@ static const settings_t settingsFHeroes2[] =
     { Settings::BATTLE_ARCHMAGE_RESIST_BAD_SPELL,_("battle: archmage can resists (20%) bad spells"),     },
     { Settings::BATTLE_MAGIC_TROOP_RESIST,	_("battle: magical creature resists (20%) the same magic"),},
     { Settings::BATTLE_SKIP_INCREASE_DEFENSE,	_("battle: skip increase +2 defense"), 			},
-    { Settings::BATTLE_AUTO_MOVE_HERO_CASTLE,	_("battle: auto move heroes to castle"),		},
     { Settings::GAME_SHOW_SYSTEM_INFO,		_("game: show system info"),				},
     { Settings::GAME_AUTOSAVE_ON,		_("game: autosave on"),					},
     { Settings::GAME_USE_FADE,			_("game: use fade"),					},
@@ -1247,9 +1247,9 @@ bool Settings::ExtBattleSkipIncreaseDefense(void) const
     return ExtModes(BATTLE_SKIP_INCREASE_DEFENSE);
 }
 
-bool Settings::ExtBattleAutoMoveHero2Castle(void) const
+bool Settings::ExtHeroAutoMove2BattleTarget(void) const
 {
-    return ExtModes(BATTLE_AUTO_MOVE_HERO_CASTLE);
+    return ExtModes(HEROES_AUTO_MOVE_BATTLE_DST);
 }
 
 bool Settings::ExtBattleSoftWait(void) const
