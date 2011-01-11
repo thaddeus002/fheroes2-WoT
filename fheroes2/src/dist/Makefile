@@ -34,7 +34,9 @@ POT        := $(TARGET).pot
 SRCDIRLIST := $(addprefix $(SOURCEROOT)/, $(SOURCEDIR))
 
 ifdef WITH_AI
-SRCDIRLIST := $(SRCDIRLIST) $(WITH_AI)
+SRCDIRLIST := $(SRCDIRLIST) $(SOURCEROOT)/ai/$(WITH_AI)
+else
+SRCDIRLIST := $(SRCDIRLIST) $(SOURCEROOT)/ai/empty
 endif
 
 SEARCH     := $(addsuffix /*.cpp, $(SRCDIRLIST))
