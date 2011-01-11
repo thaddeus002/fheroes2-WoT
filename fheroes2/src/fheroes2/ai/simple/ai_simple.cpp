@@ -20,28 +20,10 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#ifdef AI_EMPTY
-
-#include "kingdom.h"
-#include "castle.h"
+#include <algorithm>
 #include "heroes.h"
-#include "dialog.h"
-#include "battle2.h"
-#include "battle_arena.h"
-#include "ai.h"
-
-void ShowWarning(void)
-{
-    Dialog::Message("Warning!", "I removed the AI code.\nBecause there are scammers who use this free project in their commercial purposes.\nFor all the official binary releases will present my original version of AI.\nSo are you able to make their version of AI.", Font::BIG, Dialog::OK);
-}
-
-void AI::AddCastle(const Castle &)
-{
-}
-
-void AI::RemoveCastle(const Castle &)
-{
-}
+#include "castle.h"
+#include "ai_simple.h"
 
 void AI::AddHeroes(const Heroes &)
 {
@@ -51,44 +33,28 @@ void AI::RemoveHeroes(const Heroes &)
 {
 }
 
-void AI::HeroesAction(Heroes &, s32)
+void AI::AddCastle(const Castle &)
 {
 }
 
-void AI::HeroesDumpInfo(const Heroes &)
+void AI::RemoveCastle(const Castle & castle)
 {
-}
+    AIKingdom & ai = AIKingdoms::Get(castle.GetColor());
 
-void AI::HeroesLevelUp(Heroes &)
-{
-}
-
-void AI::KingdomTurn(Kingdom &)
-{
-    ShowWarning();
-}
-
-void AI::BattleTurn(Battle2::Arena &, const Battle2::Stats & b, Battle2::Actions & a)
-{
-    ShowWarning();
-
-    a.AddedEndAction(b);
-}
-
-void AI::BattleMagicTurn(Battle2::Arena &, const Battle2::Stats &, Battle2::Actions &, const Battle2::Stats*)
-{
+    if(ai.capital == &castle)
+    {
+        ai.capital->ResetModes(Castle::CAPITAL);
+        ai.capital = NULL;
+    }
 }
 
 void AI::Init(void)
 {
+    AIKingdoms::Reset();
+    AIHeroes::Reset();
 }
 
-void AI::CastlePreBattle(Castle &)
+bool Queue::isPresent(s32 index) const
 {
+    return end() != std::find(begin(), end(), index);
 }
-
-void AI::CastleAfterBattle(Castle &, bool attacker_wins)
-{
-}
-
-#endif
