@@ -33,7 +33,7 @@
 
 /* construct */
 Route::Path::Path(const Heroes & h)
-    : hero(h), dst(h.GetIndex()), hide(true)
+    : hero(h), dst(h.GetIndex()), dst0(dst), hide(true)
 {
 }
 

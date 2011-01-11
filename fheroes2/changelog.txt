@@ -1,4 +1,26 @@
-SVN - up to r2145
+SVN - up to r2187
+
+Jan, 11, 2011
++ Fixed: ai: patrol mode
++ Fixed: castle: necromancer shrine building
++ Fixed: battle: disable luck animation with bless mode (and reverse)
++ Fixed: battle: skip pickup artifacts for retreat/surrender result
++ Fixed: battle: double cell attack for wide troop
++ Fixed: battle: for genie damage abil.
++ Fixed: battle: unicorn blind
++ Fixed: pocketpc: castle dialog
++ Fixed: world: attack to castle with two hero (guest and guardian)
++ Fixed: world: attack few monsters, first monster attack
++ Fixed: world: allow attack from temple
++ Fixed: world: Windmill wood resource
++ Fixed: world: monster count with custom value
++ Fixed: world: initial spell book for barbs and knights
++ Fixed: game: global hostkeys
++ Fixed: heroes: action to sphinx
++ Added: pocketpc: drag drop scroll
++ Added: pocketpc: castle guardians support
++ Added: castle: flash curent building
++ Added: options: "heroes: after battle move to target cell"
 
 Dec, 15, 2010
 + Added: new ttf fonts
