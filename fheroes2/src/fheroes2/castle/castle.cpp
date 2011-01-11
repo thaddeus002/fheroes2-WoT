@@ -1823,20 +1823,21 @@ void Castle::ActionPreBattle(void)
     if(Game::AI == GetControl())
 	AI::CastlePreBattle(*this);
     else
+    if(Settings::Get().ExtBattleMergeArmies())
     {
 	Heroes *hero = GetGuardians();
-	if(hero && army.isValid() && Settings::Get().ExtBattleMergeArmies())
+	if(hero && army.isValid())
 	    hero->GetArmy().JoinStrongestFromArmy(army);
     }
 }
 
 void Castle::ActionAfterBattle(bool attacker_wins)
 {
-    if(Game::AI == GetControl())
-	AI::CastleAfterBattle(*this, attacker_wins);
-    else
     if(attacker_wins)
     {
 	army.Clear();
     }
+
+    if(Game::AI == GetControl())
+	AI::CastleAfterBattle(*this, attacker_wins);
 }

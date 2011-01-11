@@ -777,7 +777,7 @@ void ActionToCastle(Heroes &hero, const u8 obj, const s32 dst_index)
 	}
 
         Army::army_t & army = castle->GetActualArmy();
-	bool allow_enter = true;
+	bool allow_enter = false;
 
 	if(army.isValid())
 	{
@@ -806,13 +806,13 @@ void ActionToCastle(Heroes &hero, const u8 obj, const s32 dst_index)
 		Interface::Basic::Get().SetRedraw(REDRAW_CASTLES);
 
         	hero.IncreaseExperience(res.GetExperienceAttacker());
+		allow_enter = true;
 	    }
 	    else
 	    // wins defender
 	    if(res.DefenderWins() && other_hero)
 	    {
 		other_hero->IncreaseExperience(res.GetExperienceDefender());
-		allow_enter = false;
 	    }
 	}
 	else
@@ -822,6 +822,7 @@ void ActionToCastle(Heroes &hero, const u8 obj, const s32 dst_index)
             world.CaptureObject(dst_index, hero.GetColor());
             castle->Scoute();
 	    Interface::Basic::Get().SetRedraw(REDRAW_CASTLES);
+	    allow_enter = true;
 	}
 
 	// auto move hero to castle

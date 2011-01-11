@@ -1460,7 +1460,7 @@ void Maps::Tiles::UpdateQuantity(void)
 		    Spell::spell_t spell = Spell::FromInt(1 + (quantity2 * 256 + quantity1) / 8);
 		    quantity1 = art;
 		    // always available
-		    quantity2 = 15;
+		    quantity2 = 0;
 		    quantity3 = (spell == Spell::NONE ? Spell::FIREBALL : spell);
 		}
 		else
@@ -1472,6 +1472,7 @@ void Maps::Tiles::UpdateQuantity(void)
 		    if(quantity2 == 2 || quantity2 == 3)
 			quantity4 = Resource::Rand();
 
+		    // always available
 		    if(Settings::Get().ExtNoRequirementsForArtifacts())
 			quantity2 = 0;
 		}
