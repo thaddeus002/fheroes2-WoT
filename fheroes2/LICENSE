@@ -29,7 +29,7 @@ Other components:
      src/src/xmlccwrap/gzstream.h
      src/src/xmlccwrap/gzstream.cpp
 
-- tinyxml 3.5.3, xml parser
+- tinyxml 2.5.3, xml parser
     authors: Lee Thomason
     license: zlib license
     files:
