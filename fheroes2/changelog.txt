@@ -1,4 +1,10 @@
-SVN - up to r2187
+SVN - up to r2192
+
+Jan, 12, 2011
++ Added: update translations
++ Fixed: heroes: disable auto move for hero vs monster
++ Fixed: pocketpc: change monster and update resource bar
++ Fixed: battle: attack castle heroes
 
 Jan, 11, 2011
 + Fixed: ai: patrol mode
