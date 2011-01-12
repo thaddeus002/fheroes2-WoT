@@ -675,10 +675,13 @@ void ActionToMonster(Heroes &hero, const u8 obj, const s32 dst_index)
 	}
 
 	// auto move hero
+	// disable: https://sourceforge.net/tracker/index.php?func=detail&aid=3155230&group_id=96859&atid=616180
+	/*
 	if(conf.ExtHeroAutoMove2BattleTarget() && allow_move)
 	{
 	    MoveHero2Dest(hero, dst_index, hero.GetUnderObject(), tile.GetObject());
 	}
+	*/
     }
 }
 
