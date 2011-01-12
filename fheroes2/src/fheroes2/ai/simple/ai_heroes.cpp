@@ -368,10 +368,14 @@ void AIToHeroes(Heroes &hero, const u8 obj, const s32 dst_index)
     else
     {
         if(other_hero->GetUnderObject() == MP2::OBJ_CASTLE)
-    	{
-    	    AIToCastle(hero, MP2::OBJ_CASTLE, dst_index);
-    	    return;
-    	}
+        {
+            Castle *castle = world.GetCastle(dst_index);
+            if(castle && &hero == castle->GetHeroes().GuardFirst())
+            {
+                AIToCastle(hero, MP2::OBJ_CASTLE, dst_index);
+                return;
+            }
+        }
 
         DEBUG(DBG_AI , DBG_INFO, "AIToHeroes: " << hero.GetName() << " attack enemy hero " << other_hero->GetName());
 
