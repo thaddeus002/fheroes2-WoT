@@ -351,12 +351,18 @@ screen_t CastleOpenDialog1(Castle & castle, bool readonly)
         if(castle_heroes && selectArmy2.isValid())
         {
     	    if(le.MouseCursor(selectArmy1.GetArea()) || le.MouseCursor(selectArmy2.GetArea()))
-    		SelectArmyBar::QueueEventProcessing(selectArmy1, selectArmy2);
+    	    {
+		if(SelectArmyBar::QueueEventProcessing(selectArmy1, selectArmy2))
+		    RedrawResourceBar(Point(dst_rt.x + 4, dst_rt.y + 181), world.GetMyKingdom().GetFundsResource());
+	    }
 	}
         else
         {
     	    if(le.MouseCursor(selectArmy1.GetArea()))
-    		SelectArmyBar::QueueEventProcessing(selectArmy1);
+	    {
+    		if(SelectArmyBar::QueueEventProcessing(selectArmy1))
+		    RedrawResourceBar(Point(dst_rt.x + 4, dst_rt.y + 181), world.GetMyKingdom().GetFundsResource());
+	    }
 	}
 
 	// move hero to guardian
