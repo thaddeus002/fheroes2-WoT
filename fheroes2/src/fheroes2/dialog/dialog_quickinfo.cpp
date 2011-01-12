@@ -536,7 +536,7 @@ void Dialog::QuickInfo(const Castle & castle)
 		hide_count = false;
 
     // draw guardian portrait
-    const Heroes* guardian = castle.GetGuardians();
+    const Heroes* guardian = castle.GetHeroes().Guard();
     if(guardian &&
 	! hide_guardians)
     {

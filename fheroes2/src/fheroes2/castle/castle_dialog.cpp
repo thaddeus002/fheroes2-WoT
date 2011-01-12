@@ -133,9 +133,13 @@ building_t GetCurrentFlash(const Castle & castle, CastleDialog::CacheBuildings &
 
     return flash;
 }
-void RedrawIcons(const Castle & castle, const Heroes* hero1, const Heroes* hero2, const Point & pt)
+
+void RedrawIcons(const Castle & castle, const CastleHeroes & heroes, const Point & pt)
 {
     Display & display = Display::Get();
+
+    const Heroes* hero1 = heroes.Guard();
+    const Heroes* hero2 = heroes.Guest();
 
     if(Settings::Get().QVGA())
     {
@@ -205,11 +209,7 @@ Dialog::answer_t Castle::OpenDialog(bool readonly, bool fade)
 
     Display & display = Display::Get();
 
-    Heroes* castle_guardians = world.GetHeroes(*this, true);
-    Heroes* castle_heroes = world.GetHeroes(*this, false);
-
-    if(castle_guardians && castle_heroes == castle_guardians)
-	castle_heroes = NULL;
+    CastleHeroes heroes = world.GetHeroes(*this);
 
     // cursor
     Cursor & cursor = Cursor::Get();
@@ -260,16 +260,16 @@ Dialog::answer_t Castle::OpenDialog(bool readonly, bool fade)
     dst_pt.y = cur_pt.y + 262;
     const Rect rectSign1(dst_pt, crest.w(), crest.h());
 
-    RedrawIcons(*this, castle_guardians, castle_heroes, cur_pt);
+    RedrawIcons(*this, heroes, cur_pt);
 
     // castle troops selector
     dst_pt.x = cur_pt.x + 112;
     dst_pt.y = cur_pt.y + 262;
 
     SelectArmyBar selectArmy1;
-    if(castle_guardians)
+    if(heroes.Guard())
     {
-	selectArmy1.SetArmy(castle_guardians->GetArmy());
+	selectArmy1.SetArmy(heroes.Guard()->GetArmy());
 	selectArmy1.SetSaveLastTroop();
     }
     else
@@ -300,10 +300,10 @@ Dialog::answer_t Castle::OpenDialog(bool readonly, bool fade)
     selectArmy2.SetSaveLastTroop();
     selectArmy2.SetCastle(*this);
 
-    if(castle_heroes)
+    if(heroes.Guest())
     {
-	castle_heroes->MovePointsScaleFixed();
-        selectArmy2.SetArmy(castle_heroes->GetArmy());
+	heroes.Guest()->MovePointsScaleFixed();
+        selectArmy2.SetArmy(heroes.Guest()->GetArmy());
         selectArmy2.Redraw();
     }
     
@@ -398,7 +398,7 @@ Dialog::answer_t Castle::OpenDialog(bool readonly, bool fade)
         le.MousePressLeft(buttonExit) ? buttonExit.PressDraw() : buttonExit.ReleaseDraw();
 
        // selector troops event
-        if(castle_heroes && selectArmy2.isValid())
+        if(heroes.Guest() && selectArmy2.isValid())
         {
             if(le.MouseCursor(selectArmy1.GetArea()) || le.MouseCursor(selectArmy2.GetArea()))
 	    {
@@ -420,38 +420,36 @@ Dialog::answer_t Castle::OpenDialog(bool readonly, bool fade)
 	}
 
 	// move hero to guardian
-	if(conf.ExtAllowCastleGuardians() && !readonly && castle_heroes && !castle_guardians && le.MouseClickLeft(rectSign1))
+	if(conf.ExtAllowCastleGuardians() && !readonly && heroes.Guest() && !heroes.Guard() && le.MouseClickLeft(rectSign1))
 	{
-	    if(! castle_heroes->GetArmy().CanJoinArmy(army))
+	    if(! heroes.Guest()->GetArmy().CanJoinArmy(army))
 	    {
 		// FIXME: correct message
 		Dialog::Message("Join Error", "Army is full", Font::BIG, Dialog::OK);
 	    }
 	    else
 	    {
-		castle_heroes->SetModes(Heroes::GUARDIAN);
-		castle_heroes->ResetModes(Heroes::SLEEPER);
-		castle_guardians = castle_heroes;
-		castle_guardians->GetPath().Reset();
-		castle_guardians->GetArmy().JoinArmy(army);
-
-		castle_heroes = NULL;
+		heroes.Guest()->SetModes(Heroes::GUARDIAN);
+		heroes.Guest()->ResetModes(Heroes::SLEEPER);
+		heroes.Swap();
+		heroes.Guard()->GetPath().Reset();
+		heroes.Guard()->GetArmy().JoinArmy(army);
 
 		world.GetTiles(center).SetObject(MP2::OBJ_CASTLE);
-		castle_guardians->SaveUnderObject(MP2::OBJ_ZERO);
+		heroes.Guard()->SaveUnderObject(MP2::OBJ_ZERO);
 
 		// free position
-		Point position(castle_guardians->GetCenter());
+		Point position(heroes.Guard()->GetCenter());
 		position.y -= 1;
-		castle_guardians->SetCenter(position);
+		heroes.Guard()->SetCenter(position);
 
 		cursor.Hide();
         	if(selectArmy1.isSelected()) selectArmy1.Reset();
         	if(selectArmy2.isSelected()) selectArmy2.Reset();
 		selectArmy2.ResetArmy();
-		selectArmy1.SetArmy(castle_guardians->GetArmy());
+		selectArmy1.SetArmy(heroes.Guard()->GetArmy());
 		selectArmy1.SetSaveLastTroop();
-		RedrawIcons(*this, castle_guardians, castle_heroes, cur_pt);
+		RedrawIcons(*this, heroes, cur_pt);
         	selectArmy2.Redraw();
         	selectArmy1.Redraw();
 		cursor.Show();
@@ -460,29 +458,27 @@ Dialog::answer_t Castle::OpenDialog(bool readonly, bool fade)
 	}
 	else
 	// move guardian to hero
-	if(conf.ExtAllowCastleGuardians() && !readonly && !castle_heroes && castle_guardians && le.MouseClickLeft(rectSign2))
+	if(conf.ExtAllowCastleGuardians() && !readonly && !heroes.Guest() && heroes.Guard() && le.MouseClickLeft(rectSign2))
 	{
-	    castle_guardians->ResetModes(Heroes::GUARDIAN);
-	    castle_heroes = castle_guardians;
-
-	    castle_guardians = NULL;
+	    heroes.Guard()->ResetModes(Heroes::GUARDIAN);
+	    heroes.Swap();
 
 	    // restore position
-	    Point position(castle_heroes->GetCenter());
+	    Point position(heroes.Guest()->GetCenter());
 	    position.y += 1;
-	    castle_heroes->SetCenter(position);
+	    heroes.Guest()->SetCenter(position);
 
 	    world.GetTiles(center).SetObject(MP2::OBJ_HEROES);
-	    castle_heroes->SaveUnderObject(MP2::OBJ_CASTLE);
+	    heroes.Guest()->SaveUnderObject(MP2::OBJ_CASTLE);
 
 	    cursor.Hide();
     	    if(selectArmy1.isSelected()) selectArmy1.Reset();
     	    if(selectArmy2.isSelected()) selectArmy2.Reset();
 	    selectArmy1.ResetArmy();
 	    selectArmy1.SetArmy(army);
-	    selectArmy2.SetArmy(castle_heroes->GetArmy());
+	    selectArmy2.SetArmy(heroes.Guest()->GetArmy());
 	    selectArmy2.SetSaveLastTroop();
-	    RedrawIcons(*this, castle_guardians, castle_heroes, cur_pt);
+	    RedrawIcons(*this, heroes, cur_pt);
     	    selectArmy1.Redraw();
     	    selectArmy2.Redraw();
 	    cursor.Show();
@@ -490,9 +486,9 @@ Dialog::answer_t Castle::OpenDialog(bool readonly, bool fade)
 	}
 
 	// view guardian
-	if(!readonly && castle_guardians && le.MouseClickLeft(rectSign1))
+	if(!readonly && heroes.Guard() && le.MouseClickLeft(rectSign1))
 	{
-	    Game::OpenHeroesDialog(castle_guardians);
+	    Game::OpenHeroesDialog(heroes.Guard());
 
 	    cursor.Hide();
             if(selectArmy1.isSelected()) selectArmy1.Reset();
@@ -503,9 +499,9 @@ Dialog::answer_t Castle::OpenDialog(bool readonly, bool fade)
 	}
 	else
 	// view hero
-	if(!readonly && castle_heroes && le.MouseClickLeft(rectSign2))
+	if(!readonly && heroes.Guest() && le.MouseClickLeft(rectSign2))
 	{
-	    Game::OpenHeroesDialog(castle_heroes);
+	    Game::OpenHeroesDialog(heroes.Guest());
 
 	    cursor.Hide();
             if(selectArmy1.isSelected()) selectArmy1.Reset();
@@ -592,10 +588,10 @@ Dialog::answer_t Castle::OpenDialog(bool readonly, bool fade)
 	else
 	if(building & BUILD_CASTLE && le.MouseClickLeft(coordBuildingCastle))
 	{
-	    const Heroes * prev = castle_heroes;
+	    const Heroes* prev = heroes.Guest();
 	    const u32 build = OpenTown();
-	    castle_heroes = world.GetHeroes(*this, false);
-	    const bool buyhero = ((castle_heroes != prev) && (castle_heroes != NULL));
+	    heroes = world.GetHeroes(*this);
+	    const bool buyhero = (heroes.Guest() && (heroes.Guest() != prev));
 
 	    if(BUILD_NOTHING != build)
 	    {
@@ -611,7 +607,7 @@ Dialog::answer_t Castle::OpenDialog(bool readonly, bool fade)
 		RedrawResourcePanel(cur_pt);
 
 		if(BUILD_CAPTAIN == build)
-		    RedrawIcons(*this, castle_guardians, castle_heroes, cur_pt);
+		    RedrawIcons(*this, heroes, cur_pt);
 
     		// RedrawResourcePanel destroy sprite buttonExit
 		if(buttonExit.isPressed()) buttonExit.Draw();
@@ -620,7 +616,7 @@ Dialog::answer_t Castle::OpenDialog(bool readonly, bool fade)
 		display.Flip();
 	    }
 
-	    if(castle_heroes)
+	    if(heroes.Guest())
 	    {
 		cursor.Hide();
 
@@ -632,9 +628,9 @@ Dialog::answer_t Castle::OpenDialog(bool readonly, bool fade)
 		    Surface sf(rt.w, rt.h);
 		    sf.SetColorKey();
             	    sf.Blit(AGG::GetICN(ICN::STRIP, 0), rt, 0, 0);
-		    const Surface & port = Portrait::Hero((*castle_heroes), Portrait::BIG);
+		    const Surface & port = Portrait::Hero((*heroes.Guest()), Portrait::BIG);
 		    sf.Blit(port, 6, 6);
-            	    selectArmy2.SetArmy(castle_heroes->GetArmy());
+            	    selectArmy2.SetArmy(heroes.Guest()->GetArmy());
 		    selectArmy2.SetPos(112, 5);
 		    selectArmy2.Redraw(sf);
 		    selectArmy2.SetPos(cur_pt.x + 112, cur_pt.y + 361);
@@ -659,7 +655,7 @@ Dialog::answer_t Castle::OpenDialog(bool readonly, bool fade)
 		    }
 
 		    cursor.Hide();
-		    RedrawIcons(*this, castle_guardians, castle_heroes, cur_pt);
+		    RedrawIcons(*this, heroes, cur_pt);
             	    selectArmy2.Redraw();
 		}
 
@@ -704,10 +700,10 @@ Dialog::answer_t Castle::OpenDialog(bool readonly, bool fade)
 	    le.MouseClickLeft(coordMageGuild5))
 	{
 		// buy spell book
-		if(!castle_heroes || (*castle_heroes).HasArtifact(Artifact::MAGIC_BOOK))
+		if(!heroes.Guest() || heroes.Guest()->HasArtifact(Artifact::MAGIC_BOOK))
 		    OpenMageGuild();
 		else
-		if((*castle_heroes).BuySpellBook(&mageguild))
+		if(heroes.Guest()->BuySpellBook(&mageguild))
 		    army_redraw = true;
 	}
 	else
@@ -800,7 +796,7 @@ Dialog::answer_t Castle::OpenDialog(bool readonly, bool fade)
 
 	// status armybar
         if((le.MouseCursor(selectArmy1.GetArea()) || le.MouseCursor(selectArmy2.GetArea())) &&
-	    castle_heroes)
+	    heroes.Guest())
 	{
 	    statusBar.ShowMessage(msg_army);
 	}
@@ -820,10 +816,10 @@ Dialog::answer_t Castle::OpenDialog(bool readonly, bool fade)
 	if(le.MouseCursor(buttonNextCastle)) statusBar.ShowMessage(_("Show next town"));
 	else
 	// status message over sign
-	if(castle_guardians && le.MouseCursor(rectSign1)) statusBar.ShowMessage(_("View Hero"));
+	if(heroes.Guard() && le.MouseCursor(rectSign1)) statusBar.ShowMessage(_("View Hero"));
 	else
 	// status message view hero
-	if(castle_heroes && le.MouseCursor(rectSign2)) statusBar.ShowMessage(_("View Hero"));
+	if(heroes.Guest() && le.MouseCursor(rectSign2)) statusBar.ShowMessage(_("View Hero"));
 	else
 	// building
 	if(building & BUILD_THIEVESGUILD && le.MouseCursor(coordBuildingThievesGuild)) statusBar.ShowMessage(GetStringBuilding(BUILD_THIEVESGUILD));
@@ -891,8 +887,8 @@ Dialog::answer_t Castle::OpenDialog(bool readonly, bool fade)
 	}
     }
 
-    if(castle_heroes && conf.ExtHeroRecalculateMovement())
-	castle_heroes->RecalculateMovePoints();
+    if(heroes.Guest() && conf.ExtHeroRecalculateMovement())
+	heroes.Guest()->RecalculateMovePoints();
 
     if(conf.DynamicInterface())
 	conf.SetEvilInterface(interface);

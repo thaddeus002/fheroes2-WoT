@@ -778,7 +778,7 @@ bool Heroes::Recruit(const Color::color_t cl, const Point & pt)
 
 bool Heroes::Recruit(const Castle & castle)
 {
-    if(NULL == castle.GetHeroes() &&
+    if(NULL == castle.GetHeroes().Guest() &&
 	Recruit(castle.GetColor(), castle.GetCenter()))
     {
 	if(castle.GetLevelMageGuild())
@@ -916,24 +916,14 @@ void Heroes::RescanPath(void)
 /* if hero in castle */
 const Castle* Heroes::inCastle(void) const
 {
-    if(Color::GRAY != color)
-    {
-	const Castle* castle = world.GetCastle(GetIndex());
-	if(castle && this == world.GetHeroes(*castle, false))
-	    return castle;
-    }
-    return NULL;
+    const Castle* castle = Color::GRAY != color ? world.GetCastle(GetIndex()) : NULL;
+    return castle && castle->GetHeroes() == this ? castle : NULL;
 }
 
 Castle* Heroes::inCastle(void)
 {
-    if(Color::GRAY != color)
-    {
-	Castle* castle = world.GetCastle(GetIndex());
-	if(castle && this == world.GetHeroes(*castle, false))
-	    return castle;
-    }
-    return NULL;
+    Castle* castle = Color::GRAY != color ? world.GetCastle(GetIndex()) : NULL;
+    return castle && castle->GetHeroes() == this ? castle : NULL;
 }
 
 /* is visited cell */

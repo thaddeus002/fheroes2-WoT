@@ -1100,48 +1100,16 @@ const Heroes* World::GetHeroes(s32 maps_index) const
     return vec_heroes.end() != it ? *it : NULL;
 }
 
-const Heroes* World::GetHeroes(const Castle & castle, bool force_guardian) const
+CastleHeroes World::GetHeroes(const Castle & castle) const
 {
-    if(!Settings::Get().ExtAllowCastleGuardians())
-	return force_guardian ? NULL : GetHeroes(castle.GetIndex());
+    std::vector<Heroes *>::const_iterator guest, guard;
 
-    std::vector<Heroes *>::const_iterator it;
+    guest = std::find_if(vec_heroes.begin(), vec_heroes.end(), std::bind1st(InCastleNotGuardian(), &castle));
+    guard = Settings::Get().ExtAllowCastleGuardians() ?
+	std::find_if(vec_heroes.begin(), vec_heroes.end(), std::bind1st(InCastleAndGuardian(), &castle)) : vec_heroes.end();
 
-    if(force_guardian)
-    {
-	it = std::find_if(vec_heroes.begin(), vec_heroes.end(), std::bind1st(InCastleAndGuardian(), &castle));
-    }
-    else
-    {
-	it = std::find_if(vec_heroes.begin(), vec_heroes.end(), std::bind1st(InCastleNotGuardian(), &castle));
-
-	if(vec_heroes.end() == it)
-	    it = std::find_if(vec_heroes.begin(), vec_heroes.end(), std::bind1st(InCastleAndGuardian(), &castle));
-    }
-
-    return vec_heroes.end() != it ? *it : NULL;
-}
-
-Heroes* World::GetHeroes(const Castle & castle, bool force_guardian)
-{
-    if(!Settings::Get().ExtAllowCastleGuardians())
-	return force_guardian ? NULL : GetHeroes(castle.GetIndex());
-
-    std::vector<Heroes *>::const_iterator it;
-
-    if(force_guardian)
-    {
-	it = std::find_if(vec_heroes.begin(), vec_heroes.end(), std::bind1st(InCastleAndGuardian(), &castle));
-    }
-    else
-    {
-	it = std::find_if(vec_heroes.begin(), vec_heroes.end(), std::bind1st(InCastleNotGuardian(), &castle));
-
-	if(vec_heroes.end() == it)
-	    it = std::find_if(vec_heroes.begin(), vec_heroes.end(), std::bind1st(InCastleAndGuardian(), &castle));
-    }
-
-    return vec_heroes.end() != it ? *it : NULL;
+    return CastleHeroes((guest != vec_heroes.end() ? *guest : NULL),
+			    (guard != vec_heroes.end() ? *guard : NULL));
 }
 
 /* new day */

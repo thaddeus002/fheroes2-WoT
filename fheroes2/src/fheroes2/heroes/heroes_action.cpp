@@ -546,7 +546,7 @@ void ActionToMonster(Heroes &hero, const u8 obj, const s32 dst_index)
     bool destroy = false;
     Maps::Tiles & tile = world.GetTiles(dst_index);
     const Army::Troop troop(tile);
-    const Settings & conf = Settings::Get();
+    //const Settings & conf = Settings::Get();
 
 
     u32 join = 0;
@@ -712,8 +712,12 @@ void ActionToHeroes(Heroes &hero, const u8 obj, const s32 dst_index)
     {
 	if(other_hero->GetUnderObject() == MP2::OBJ_CASTLE)
 	{
-    	    ActionToCastle(hero, MP2::OBJ_CASTLE, dst_index);
-	    return;
+	    Castle *castle = world.GetCastle(dst_index);
+	    if(castle && &hero == castle->GetHeroes().GuardFirst())
+    	    {
+		ActionToCastle(hero, MP2::OBJ_CASTLE, dst_index);
+		return;
+	    }
 	}
 
         DEBUG(DBG_GAME, DBG_INFO, "ActionToHeroes: " << hero.GetName() << " attack enemy hero " << other_hero->GetName());
@@ -769,13 +773,12 @@ void ActionToCastle(Heroes &hero, const u8 obj, const s32 dst_index)
     {
         DEBUG(DBG_GAME , DBG_INFO, "ActionToCastle: " << hero.GetName() << " attack enemy castle " << castle->GetName());
 
-        Heroes *other_guardian =  world.GetHeroes(*castle, true);
-        Heroes *other_hero =  world.GetHeroes(*castle, false);
+	CastleHeroes heroes = castle->GetHeroes();
 
 	// first attack to guest hero
-	if(other_guardian != other_hero)
+	if(heroes.FullHouse())
 	{
-	    ActionToHeroes(hero, MP2::OBJ_HEROES, hero.GetIndex());
+	    ActionToHeroes(hero, MP2::OBJ_HEROES, dst_index);
 	    return;
 	}
 
@@ -784,6 +787,7 @@ void ActionToCastle(Heroes &hero, const u8 obj, const s32 dst_index)
 
 	if(army.isValid())
 	{
+	    Heroes* defender = heroes.GuardFirst();
     	    castle->ActionPreBattle();
 
 	    // new battle2
@@ -792,8 +796,8 @@ void ActionToCastle(Heroes &hero, const u8 obj, const s32 dst_index)
     	    castle->ActionAfterBattle(res.AttackerWins());
 
 	    // loss defender
-	    if(!res.DefenderWins() && other_hero)
-               BattleLose(*other_hero, res, false, hero.GetColor());
+	    if(!res.DefenderWins() && defender)
+               BattleLose(*defender, res, false, hero.GetColor());
 
 	    // loss attacker
 	    if(!res.AttackerWins())
@@ -813,9 +817,9 @@ void ActionToCastle(Heroes &hero, const u8 obj, const s32 dst_index)
 	    }
 	    else
 	    // wins defender
-	    if(res.DefenderWins() && other_hero)
+	    if(res.DefenderWins() && defender)
 	    {
-		other_hero->IncreaseExperience(res.GetExperienceDefender());
+		defender->IncreaseExperience(res.GetExperienceDefender());
 	    }
 	}
 	else

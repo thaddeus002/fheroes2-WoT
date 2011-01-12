@@ -328,7 +328,7 @@ void Game::OpenCastleDialog(Castle *castle)
     if(it != myCastles.end())
     {
 	// focus priority: castle heroes
-	Heroes* hero = (*it)->GetHeroes();
+	Heroes* hero = (*it)->GetHeroes().Guest();
 
 	if(hero && !hero->Modes(Heroes::GUARDIAN))
 	    globalfocus.Set(hero);

@@ -33,6 +33,7 @@
 #include "week.h"
 #include "color.h"
 #include "sprite.h"
+#include "castle_heroes.h"
 #include "game_io.h"
 
 class Heroes;
@@ -79,10 +80,9 @@ public:
 
     const Heroes* GetHeroes(Heroes::heroes_t) const;
     const Heroes* GetHeroes(s32 maps_index) const;
-    const Heroes* GetHeroes(const Castle &, bool force_guardian = false) const;
     Heroes* GetHeroes(Heroes::heroes_t);
     Heroes* GetHeroes(s32 maps_index);
-    Heroes* GetHeroes(const Castle &, bool force_guardian = false);
+    CastleHeroes GetHeroes(const Castle &) const;
 
     Heroes* FromJail(s32);
     const Heroes* GetHeroesCondWins(void) const;

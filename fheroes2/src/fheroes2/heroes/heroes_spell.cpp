@@ -345,7 +345,7 @@ bool ActionSpellTownGate(Heroes & hero)
     s32 min = -1;
 
     // find the nearest castle
-    for(it = castles.begin(); it != castles.end(); ++it) if(*it && !(*it)->GetHeroes())
+    for(it = castles.begin(); it != castles.end(); ++it) if(*it && !(*it)->GetHeroes().Guest())
     {
 	const u16 min2 = Maps::GetApproximateDistance(center, (*it)->GetIndex());
 	if(0 > min || min2 < min)
@@ -387,7 +387,7 @@ bool ActionSpellTownPortal(Heroes & hero)
     cursor.SetThemes(cursor.POINTER);
 
     for(std::vector<Castle *>::const_iterator it = kingdom.GetCastles().begin(); it != kingdom.GetCastles().end(); ++it)
-	if(*it && !(*it)->GetHeroes()) castles.push_back((**it).GetIndex());
+	if(*it && !(*it)->GetHeroes().Guest()) castles.push_back((**it).GetIndex());
 
     if(castles.empty())
     {

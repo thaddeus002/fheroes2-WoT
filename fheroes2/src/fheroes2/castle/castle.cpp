@@ -309,17 +309,16 @@ void Castle::EducateHeroes(void)
     // for learns new spells need 1 day
     if(GetLevelMageGuild())
     {
-	Heroes* castle_heroes = world.GetHeroes(*this);
+	CastleHeroes heroes = world.GetHeroes(*this);
 
-	if(castle_heroes)
+	if(heroes.FullHouse())
 	{
-	    mageguild.EducateHero(*castle_heroes);
-
-	    // guardian
-	    if(Settings::Get().ExtAllowCastleGuardians() &&
-		!castle_heroes->Modes(Heroes::GUARDIAN) && NULL != (castle_heroes = world.GetHeroes(*this, true)))
-		mageguild.EducateHero(*castle_heroes);
+	    mageguild.EducateHero(*heroes.Guest());
+	    mageguild.EducateHero(*heroes.Guard());
 	}
+	else
+	if(heroes.IsValid())
+	    mageguild.EducateHero(*heroes.GuestFirst());
 
 	// captain
 	if(captain.isValid()) mageguild.EducateHero(captain);
@@ -568,7 +567,8 @@ const char* Castle::GetDescriptionBuilding(u32 build, Race::race_t race)
 
 bool Castle::AllowBuyHero(const Heroes & hero)
 {
-    return !GetHeroes() && world.GetKingdom(color).AllowRecruitHero(true, hero.GetLevel());
+    CastleHeroes heroes = world.GetHeroes(*this);
+    return !heroes.Guest() && world.GetKingdom(color).AllowRecruitHero(true, hero.GetLevel());
 }
 
 Heroes* Castle::RecruitHero(Heroes* hero)
@@ -1399,24 +1399,9 @@ ICN::icn_t Castle::GetICNBuilding(u32 build, Race::race_t race)
     return ICN::UNKNOWN;
 }
 
-const Heroes* Castle::GetHeroes(void) const
+CastleHeroes Castle::GetHeroes(void) const
 {
-    return world.GetHeroes(*this, false);
-}
-
-const Heroes* Castle::GetGuardians(void) const
-{
-    return world.GetHeroes(*this, true);
-}
-
-Heroes* Castle::GetHeroes(void)
-{
-    return world.GetHeroes(*this, false);
-}
-
-Heroes* Castle::GetGuardians(void)
-{
-    return world.GetHeroes(*this, true);
+    return world.GetHeroes(*this);
 }
 
 bool Castle::HaveNearlySea(void) const
@@ -1574,11 +1559,14 @@ bool Castle::PredicateIsBuildMarketplace(const Castle* castle)
 
 void Castle::Dump(void) const
 {
+    const CastleHeroes heroes = GetHeroes();
+
     VERBOSE("name            : " << name);
     VERBOSE("race            : " << Race::String(race));
     VERBOSE("color           : " << Color::String(color));
     VERBOSE("build           : " << "0x" << std::hex << building << std::dec);
-    VERBOSE("present heroes  : " << (GetHeroes() ? "yes" : "no"));
+    VERBOSE("present guest   : " << (heroes.Guest() ? "yes" : "no"));
+    VERBOSE("present guard   : " << (heroes.Guard() ? "yes" : "no"));
     VERBOSE("present boat    : " << (PresentBoat() ? "yes" : "no"));
     VERBOSE("nearly sea      : " << (HaveNearlySea() ? "yes" : "no"));
     VERBOSE("is castle       : " << (isCastle() ? "yes" : "no"));
@@ -1688,13 +1676,15 @@ Army::army_t & Castle::GetArmy(void)
 
 const Army::army_t & Castle::GetActualArmy(void) const
 {
-    const Heroes *hero = GetGuardians();
+    CastleHeroes heroes = world.GetHeroes(*this);
+    const Heroes *hero = heroes.GuardFirst();
     return hero ? hero->GetArmy() : army;
 }
 
 Army::army_t & Castle::GetActualArmy(void)
 {
-    Heroes *hero = GetGuardians();
+    CastleHeroes heroes = world.GetHeroes(*this);
+    Heroes *hero = heroes.GuardFirst();
     return hero ? hero->GetArmy() : army;
 }
 
@@ -1825,7 +1815,8 @@ void Castle::ActionPreBattle(void)
     else
     if(Settings::Get().ExtBattleMergeArmies())
     {
-	Heroes *hero = GetGuardians();
+        CastleHeroes heroes = world.GetHeroes(*this);
+	Heroes *hero = heroes.GuardFirst();
 	if(hero && army.isValid())
 	    hero->GetArmy().JoinStrongestFromArmy(army);
     }

@@ -35,6 +35,7 @@
 #include "heroes.h"
 #include "game_io.h"
 #include "sprite.h"
+#include "castle_heroes.h"
 #include "position.h"
 
 class Heroes;
@@ -107,10 +108,7 @@ public:
     u32 CountBuildings(void) const;
 
     Heroes* RecruitHero(Heroes*);
-    const Heroes* GetHeroes(void) const;
-    Heroes* GetHeroes(void);
-    const Heroes* GetGuardians(void) const;
-    Heroes* GetGuardians(void);
+    CastleHeroes GetHeroes(void) const;
 
     Race::race_t GetRace(void) const{ return race; }
     Color::color_t GetColor(void) const{ return color; }

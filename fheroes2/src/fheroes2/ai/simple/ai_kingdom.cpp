@@ -192,7 +192,7 @@ void AI::KingdomTurn(Kingdom & kingdom)
 	if(heroes.empty())
 	    modes = Heroes::HUNTER|Heroes::SCOUTER;
 	else
-	if((!ai.capital->GetHeroes() && heroes.size() < maxhero) ||
+	if((!ai.capital->GetHeroes().Guest() && heroes.size() < maxhero) ||
 	    0 == std::count_if(heroes.begin(), heroes.end(), std::bind2nd(std::mem_fun(&Heroes::Modes), Heroes::SCOUTER)))
 	    modes = Heroes::SCOUTER;
 
@@ -228,7 +228,7 @@ void AI::KingdomTurn(Kingdom & kingdom)
 				std::not1(std::bind2nd(std::mem_fun(&Heroes::Modes), Heroes::PATROL)));
 
 	    if(it != heroes.end() &&
-		! ai.capital->GetHeroes())
+		! ai.capital->GetHeroes().Guest())
 		AIHeroesSetHunterWithTarget((*it), ai.capital->GetIndex());
 	}
 	else
@@ -240,7 +240,7 @@ void AI::KingdomTurn(Kingdom & kingdom)
 			std::bind2nd(std::mem_fun(&Heroes::Modes), Heroes::HUNTER));
 
 	    if(it != heroes.end() &&
-		! ai.capital->GetHeroes())
+		! ai.capital->GetHeroes().Guest())
 		AIHeroesSetHunterWithTarget(*it, ai.capital->GetIndex());
 	}
     }

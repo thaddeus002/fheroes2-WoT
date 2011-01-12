@@ -39,7 +39,7 @@ void AICastleDefense(Castle & c)
         if(!c.isBuild(BUILD_MOAT))
     		c.BuyBuilding(BUILD_MOAT);
 
-        if(!c.isBuild(BUILD_CAPTAIN) && NULL == c.GetHeroes())
+        if(!c.isBuild(BUILD_CAPTAIN) && NULL == c.GetHeroes().Guest())
 		c.BuyBuilding(BUILD_CAPTAIN);
 
         if(!c.isBuild(BUILD_TAVERN) && Race::KNGT == c.GetRace())
@@ -183,7 +183,7 @@ void AICastleTurn(Castle* castle)
 	    castle->GetArmy().isValid() &&
 	    castle->GetArmy().StrongerEnemyArmy(enemy->GetArmy()))
 	{
-    	    if(! castle->GetHeroes() && can_recruit)
+    	    if(!castle->GetHeroes().Guest() && can_recruit)
     	    {
         	Recruits & rec = kingdom.GetRecruits();
                                                                                                                               
@@ -192,15 +192,15 @@ void AICastleTurn(Castle* castle)
         	if(rec.GetHero2()) castle->RecruitHero(rec.GetHero2());
     	    }
 
-    	    if(castle->GetHeroes())
-		castle->GetHeroes()->SetModes(Heroes::HUNTER);
+    	    if(castle->GetHeroes().Guest())
+		castle->GetHeroes().Guest()->SetModes(Heroes::HUNTER);
 	}
 
 	// part III
 	AIKingdom & ai = AIKingdoms::Get(castle->GetColor());
 	if(ai.capital != castle &&
 	    castle->GetArmy().isValid() &&
-	    ! castle->GetHeroes() &&
+	    ! castle->GetHeroes().Guest() &&
 	    2 < castle->GetArmy().GetCount() &&
 	    150 < castle->GetArmy().GetHitPoints() &&
 	    can_recruit)
@@ -211,15 +211,15 @@ void AICastleTurn(Castle* castle)
     	    else
     	    if(rec.GetHero2()) castle->RecruitHero(rec.GetHero2());
 
-    	    if(castle->GetHeroes())
-		castle->GetHeroes()->SetModes(Heroes::HUNTER|Heroes::SCOUTER);
+    	    if(castle->GetHeroes().Guest())
+		castle->GetHeroes().Guest()->SetModes(Heroes::HUNTER|Heroes::SCOUTER);
 	}
     }
 }
 
 void AI::CastlePreBattle(Castle & castle)
 {
-    Heroes *hero = castle.GetGuardians();
+    Heroes *hero = castle.GetHeroes().GuardFirst();
     if(hero && castle.GetArmy().isValid())
 	hero->GetArmy().JoinStrongestFromArmy(castle.GetArmy());
 }

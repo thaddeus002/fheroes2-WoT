@@ -54,7 +54,7 @@ private:
 void RedrawTownSprite(const Rect &, const Castle &);
 void RedrawBackground(const Rect &, const Castle &);
 void RedrawResourceBar(const Point &, const Resource::funds_t &);
-void RedrawIcons(const Castle & castle, const Heroes* hero1, const Heroes* hero2, const Point & pt);
+void RedrawIcons(const Castle & castle, const CastleHeroes & hero, const Point & pt);
 
 enum screen_t { SCREENOUT, SCREENOUT_PREV, SCREENOUT_NEXT, SCREEN1, SCREEN2, SCREEN3, SCREEN4, SCREEN5, SCREEN6 };
 
@@ -167,11 +167,7 @@ screen_t CastleOpenDialog1(Castle & castle, bool readonly)
     LocalEvent & le = LocalEvent::Get();
     const Settings & conf = Settings::Get();
 
-    Heroes* castle_guardians = world.GetHeroes(castle, true);
-    Heroes* castle_heroes = world.GetHeroes(castle, false);
-
-   if(castle_guardians && castle_heroes == castle_guardians)
-        castle_heroes = NULL;
+    CastleHeroes heroes = world.GetHeroes(castle);
 
     cursor.Hide();
     cursor.SetThemes(cursor.POINTER);
@@ -203,7 +199,7 @@ screen_t CastleOpenDialog1(Castle & castle, bool readonly)
     DwellingBar dwbar(Point(dst_rt.x + 2, dst_rt.y + 34), castle);
     dwbar.Redraw();
 
-    RedrawIcons(castle, castle_guardians, castle_heroes, dst_rt);
+    RedrawIcons(castle, heroes, dst_rt);
 
     const Rect rectSign1(dst_rt.x + 3, dst_rt.y + 80, 41, 41);
     const Rect rectSign2(dst_rt.x + 3, dst_rt.y + 133, 41, 41);
@@ -216,9 +212,9 @@ screen_t CastleOpenDialog1(Castle & castle, bool readonly)
     Cursor::DrawCursor(sfc1, 0x10, true);
 
     SelectArmyBar selectArmy1;
-    if(castle_guardians)
+    if(heroes.Guard())
     {
-        selectArmy1.SetArmy(castle_guardians->GetArmy());
+        selectArmy1.SetArmy(heroes.Guard()->GetArmy());
         selectArmy1.SetSaveLastTroop();
     }
     else
@@ -242,10 +238,10 @@ screen_t CastleOpenDialog1(Castle & castle, bool readonly)
     selectArmy2.SetSaveLastTroop();
     selectArmy2.SetCastle(castle);
 
-    if(castle_heroes)
+    if(heroes.Guest())
     {
-        castle_heroes->MovePointsScaleFixed();
-        selectArmy2.SetArmy(castle_heroes->GetArmy());
+        heroes.Guest()->MovePointsScaleFixed();
+        selectArmy2.SetArmy(heroes.Guest()->GetArmy());
         selectArmy2.Redraw();
     }
 
@@ -325,10 +321,10 @@ screen_t CastleOpenDialog1(Castle & castle, bool readonly)
 	    display.Flip();
 	}
 	else
-	if(!readonly && castle_guardians && le.MouseClickLeft(rectSign1))
+	if(!readonly && heroes.Guard() && le.MouseClickLeft(rectSign1))
 	{
 	    cursor.Hide();
-	    castle_guardians->OpenDialog(false, false);
+	    heroes.Guard()->OpenDialog(false, false);
             if(selectArmy1.isSelected()) selectArmy1.Reset();
             if(selectArmy2.isSelected()) selectArmy2.Reset();
             selectArmy2.Redraw();
@@ -336,10 +332,10 @@ screen_t CastleOpenDialog1(Castle & castle, bool readonly)
 	    display.Flip();
 	}
 	else
-	if(!readonly && castle_heroes && le.MouseClickLeft(rectSign2))
+	if(!readonly && heroes.Guest() && le.MouseClickLeft(rectSign2))
 	{
 	    cursor.Hide();
-	    castle_heroes->OpenDialog(false, false);
+	    heroes.Guest()->OpenDialog(false, false);
             if(selectArmy1.isSelected()) selectArmy1.Reset();
             if(selectArmy2.isSelected()) selectArmy2.Reset();
             selectArmy2.Redraw();
@@ -348,7 +344,7 @@ screen_t CastleOpenDialog1(Castle & castle, bool readonly)
 	}
 
 	// troops event
-        if(castle_heroes && selectArmy2.isValid())
+        if(heroes.Guest() && selectArmy2.isValid())
         {
     	    if(le.MouseCursor(selectArmy1.GetArea()) || le.MouseCursor(selectArmy2.GetArea()))
     	    {
@@ -366,38 +362,36 @@ screen_t CastleOpenDialog1(Castle & castle, bool readonly)
 	}
 
 	// move hero to guardian
-        if(conf.ExtAllowCastleGuardians() && !readonly && castle_heroes && !castle_guardians && le.MouseClickLeft(rectSign1))
+        if(conf.ExtAllowCastleGuardians() && !readonly && heroes.Guest() && !heroes.Guard() && le.MouseClickLeft(rectSign1))
         {
-            if(! castle_heroes->GetArmy().CanJoinArmy(castle.GetArmy()))
+            if(! heroes.Guest()->GetArmy().CanJoinArmy(castle.GetArmy()))
             {
                 // FIXME: correct message
                 Dialog::Message("Join Error", "Army is full", Font::BIG, Dialog::OK);
             }
             else
             {
-                castle_heroes->SetModes(Heroes::GUARDIAN);
-                castle_heroes->ResetModes(Heroes::SLEEPER);
-                castle_guardians = castle_heroes;
-                castle_guardians->GetPath().Reset();
-                castle_guardians->GetArmy().JoinArmy(castle.GetArmy());
-
-                castle_heroes = NULL;
+                heroes.Guest()->SetModes(Heroes::GUARDIAN);
+                heroes.Guest()->ResetModes(Heroes::SLEEPER);
+		heroes.Swap();
+                heroes.Guard()->GetPath().Reset();
+                heroes.Guard()->GetArmy().JoinArmy(castle.GetArmy());
 
                 world.GetTiles(castle.GetCenter()).SetObject(MP2::OBJ_CASTLE);
-                castle_guardians->SaveUnderObject(MP2::OBJ_ZERO);
+                heroes.Guard()->SaveUnderObject(MP2::OBJ_ZERO);
 
                 // free position
-                Point position(castle_guardians->GetCenter());
+                Point position(heroes.Guard()->GetCenter());
                 position.y -= 1;
-                castle_guardians->SetCenter(position);
+                heroes.Guard()->SetCenter(position);
 
                 cursor.Hide();
                 if(selectArmy1.isSelected()) selectArmy1.Reset();
                 if(selectArmy2.isSelected()) selectArmy2.Reset();
                 selectArmy2.ResetArmy();
-                selectArmy1.SetArmy(castle_guardians->GetArmy());
+                selectArmy1.SetArmy(heroes.Guard()->GetArmy());
                 selectArmy1.SetSaveLastTroop();
-                RedrawIcons(castle, castle_guardians, castle_heroes, dst_rt);
+                RedrawIcons(castle, heroes, dst_rt);
                 selectArmy2.Redraw();
                 selectArmy1.Redraw();
                 cursor.Show();
@@ -406,29 +400,27 @@ screen_t CastleOpenDialog1(Castle & castle, bool readonly)
         }
 	else
 	// move guardian to hero
-        if(conf.ExtAllowCastleGuardians() && !readonly && !castle_heroes && castle_guardians && le.MouseClickLeft(rectSign2))
+        if(conf.ExtAllowCastleGuardians() && !readonly && !heroes.Guest() && heroes.Guard() && le.MouseClickLeft(rectSign2))
         {
-            castle_guardians->ResetModes(Heroes::GUARDIAN);
-            castle_heroes = castle_guardians;
-
-            castle_guardians = NULL;
+            heroes.Guard()->ResetModes(Heroes::GUARDIAN);
+	    heroes.Swap();
 
             // restore position
-            Point position(castle_heroes->GetCenter());
+            Point position(heroes.Guest()->GetCenter());
             position.y += 1;
-            castle_heroes->SetCenter(position);
+            heroes.Guest()->SetCenter(position);
 
             world.GetTiles(castle.GetCenter()).SetObject(MP2::OBJ_HEROES);
-            castle_heroes->SaveUnderObject(MP2::OBJ_CASTLE);
+            heroes.Guest()->SaveUnderObject(MP2::OBJ_CASTLE);
 
             cursor.Hide();
             if(selectArmy1.isSelected()) selectArmy1.Reset();
             if(selectArmy2.isSelected()) selectArmy2.Reset();
             selectArmy1.ResetArmy();
             selectArmy1.SetArmy(castle.GetArmy());
-            selectArmy2.SetArmy(castle_heroes->GetArmy());
+            selectArmy2.SetArmy(heroes.Guest()->GetArmy());
             selectArmy2.SetSaveLastTroop();
-            RedrawIcons(castle, castle_guardians, castle_heroes, dst_rt);
+            RedrawIcons(castle, heroes, dst_rt);
             selectArmy1.Redraw();
             selectArmy2.Redraw();
             cursor.Show();
@@ -718,7 +710,7 @@ screen_t CastleOpenDialog5(Castle & castle, bool readonly)
     spells5.Redraw();
 
     // magic book sprite
-    const Heroes* hero = castle.GetHeroes();
+    const Heroes* hero = castle.GetHeroes().GuestFirst();
     bool need_buy_book = hero && !hero->HasArtifact(Artifact::MAGIC_BOOK) && castle.GetLevelMageGuild();
     const Rect book_pos(dst_rt.x + 250, dst_rt.y + 5, 32, 32);
     if(need_buy_book)

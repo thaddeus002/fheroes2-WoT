@@ -685,16 +685,13 @@ Battle2::Arena::Arena(Army::army_t & a1, Army::army_t & a2, s32 index, bool loca
 
     if(castle)
     {
-	// skip if present guardian and castle hero
-	const Heroes* hero1 = castle->GetHeroes();
-	const Heroes* hero2 = castle->GetGuardians();
-	if(hero2 && hero1 && hero1 != hero2) castle = NULL;
+	CastleHeroes heroes = world.GetHeroes(*castle);
+
+	// skip if present guard and guest
+	if(heroes.FullHouse()) castle = NULL;
 
 	// skip for town
 	if(castle && !castle->isCastle()) castle = NULL;
-
-	// check position
-	if(castle && !hero2 && castle->GetIndex() != index) castle = NULL;
     }
 
     towers[0] = NULL;

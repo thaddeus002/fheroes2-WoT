@@ -424,13 +424,12 @@ void AIToCastle(Heroes &hero, const u8 obj, const s32 dst_index)
     {
         DEBUG(DBG_AI , DBG_INFO, "AIToCastle: " << hero.GetName() << " attack enemy castle " << castle->GetName());
 
-	Heroes *other_guardian =  world.GetHeroes(*castle, true);
-        Heroes *other_hero =  world.GetHeroes(*castle, false);
+        CastleHeroes heroes = castle->GetHeroes();
 
         // first attack to guest hero
-        if(other_guardian != other_hero)
+        if(heroes.FullHouse())
         {
-            AIToHeroes(hero, MP2::OBJ_HEROES, hero.GetIndex());
+            AIToHeroes(hero, MP2::OBJ_HEROES, dst_index);
             return;
         }
 
@@ -439,6 +438,7 @@ void AIToCastle(Heroes &hero, const u8 obj, const s32 dst_index)
 
 	if(army.isValid())
 	{
+	    Heroes* defender = heroes.GuardFirst();
 	    castle->ActionPreBattle();
 
             // new battle2
@@ -447,8 +447,8 @@ void AIToCastle(Heroes &hero, const u8 obj, const s32 dst_index)
 	    castle->ActionAfterBattle(res.AttackerWins());
 
             // loss defender
-            if(!res.DefenderWins() && other_hero)
-               AIBattleLose(*other_hero, res, false, hero.GetColor());
+            if(!res.DefenderWins() && defender)
+               AIBattleLose(*defender, res, false, hero.GetColor());
 
             // loss attacker
             if(!res.AttackerWins())
@@ -467,9 +467,9 @@ void AIToCastle(Heroes &hero, const u8 obj, const s32 dst_index)
             }
             else
             // wins defender
-            if(res.DefenderWins() && other_hero)
+            if(res.DefenderWins() && defender)
             {
-                other_hero->IncreaseExperience(res.GetExperienceDefender());
+                defender->IncreaseExperience(res.GetExperienceDefender());
             }
 	}
 	else
@@ -495,7 +495,7 @@ void AIToMonster(Heroes &hero, const u8 obj, const s32 dst_index)
     bool destroy = false;
     Maps::Tiles & tile = world.GetTiles(dst_index);
     const Army::Troop troop(tile);
-    const Settings & conf = Settings::Get();
+    //const Settings & conf = Settings::Get();
 
     u32 join = 0;
     Resource::funds_t cost;
@@ -2019,7 +2019,7 @@ bool AIHeroesValidObject(const Heroes & hero, s32 index)
 	    if(castle)
 	    {
 		if(hero.GetColor() == castle->GetColor())
-		    return NULL == castle->GetHeroes() && ! hero.isVisited(tile);
+		    return NULL == castle->GetHeroes().Guest() && ! hero.isVisited(tile);
 		else
 		// FIXME: AI skip visiting alliance
 		if(conf.IsUnions(hero.GetColor(), castle->GetColor())) return false;
@@ -2380,7 +2380,7 @@ void AIHeroesGetTask(Heroes & hero)
 	    ai_hero.primary_target = -1;
 	else
 	if(NULL != (castle = world.GetCastle(ai_hero.primary_target)) &&
-	    NULL != castle->GetHeroes())
+	    NULL != castle->GetHeroes().Guest())
 	    hero.SetModes(Heroes::AIWAITING);
 	else
 	if(ai_hero.primary_target != hero.GetPath().GetDestinationIndex() &&
