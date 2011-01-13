@@ -1666,12 +1666,14 @@ void Castle::RecruitAllMonster(void)
 
 const Army::army_t & Castle::GetArmy(void) const
 {
-    return army;
+    const CastleHeroes heroes = world.GetHeroes(*this);
+    return heroes.Guard() ? heroes.Guard()->GetArmy() : army;
 }
 
 Army::army_t & Castle::GetArmy(void)
 {
-    return army;
+    CastleHeroes heroes = world.GetHeroes(*this);
+    return heroes.Guard() ? heroes.Guard()->GetArmy() : army;
 }
 
 const Army::army_t & Castle::GetActualArmy(void) const
