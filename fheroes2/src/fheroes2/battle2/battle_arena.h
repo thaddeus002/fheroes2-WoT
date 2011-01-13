@@ -58,7 +58,7 @@ namespace Battle2
         void AddedSkipAction(const Stats &, bool);
         void AddedMoveAction(const Stats &, u16);
         void AddedMoveAction(const Stats &, const std::vector<u16> &);
-        void AddedAttackAction(const Stats &, const Stats &, u16);
+        void AddedAttackAction(const Stats &, const Stats &, u16, u8);
         void AddedMoraleAction(const Stats &, u8);
     };
 
@@ -77,8 +77,10 @@ namespace Battle2
 	void GetAbroadPositions(u16, u8, bool, std::vector<u16> &) const;
 	void GetIndexesFromAbsPoints(std::vector<u16> &, const std::vector<Point> &) const;
 
+	static bool NearCells(u16, u16);
 	static bool inCastle(u16);
 	static bool isMoatIndex(u16);
+	static bool isReflectDirection(u8);
 	static direction_t GetReflectDirection(u8);
 	static direction_t GetDirection(u16, u16);
 	static u16 GetDistance(u16, u16);
@@ -200,7 +202,7 @@ namespace Battle2
 	void ApplyActionSpellCast(Action &);
 	void ApplyActionTower(Action &);
 	void ApplyActionCatapult(Action &);
-	void BattleProcess(Stats &, Stats & b2, s16 = -1);
+	void BattleProcess(Stats &, Stats & b2, s16 = -1, u8 = 0);
 
     protected:
 	friend class Interface;

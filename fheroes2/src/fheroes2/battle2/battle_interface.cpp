@@ -1987,7 +1987,7 @@ void Battle2::Interface::MouseLeftClickBoardAction(u16 themes, s16 index, Action
 		const u16 move = Board::GetIndexDirection(index, dir);
 		if(b_current->GetPosition() != move)
 		    a.AddedMoveAction(*b_current, move);
-		a.AddedAttackAction(*b_current, *enemy, index);
+		a.AddedAttackAction(*b_current, *enemy, index, Board::GetReflectDirection(dir));
 		a.AddedEndAction(*b_current);
 		humanturn_exit = true;
 	    }
@@ -2000,7 +2000,7 @@ void Battle2::Interface::MouseLeftClickBoardAction(u16 themes, s16 index, Action
 	    const Stats* enemy = arena.GetTroopBoard(index);
 	    if(enemy)
 	    {
-		a.AddedAttackAction(*b_current, *enemy, index);
+		a.AddedAttackAction(*b_current, *enemy, index, 0);
 		a.AddedEndAction(*b_current);
 		humanturn_exit = true;
 	    }

@@ -121,7 +121,7 @@ void AI::BattleTurn(Arena & arena, const Stats & b, Actions & a)
 
     if(enemy)
     {
-	if(attack) a.AddedAttackAction(b, *enemy, enemy->GetPosition());
+	if(attack) a.AddedAttackAction(b, *enemy, enemy->GetPosition(), 0);
     }
     else
     if(IS_DEBUG(DBG_BATTLE, DBG_TRACE))

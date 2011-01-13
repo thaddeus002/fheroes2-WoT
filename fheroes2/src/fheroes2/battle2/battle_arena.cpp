@@ -154,6 +154,12 @@ Battle2::direction_t Battle2::Board::GetDirection(u16 from, u16 to)
     return UNKNOWN;
 }
 
+bool Battle2::Board::NearCells(u16 index1, u16 index2)
+{
+    direction_t res = GetDirection(index1, index2);
+    return res != UNKNOWN && res != CENTER;
+}
+
 Battle2::direction_t Battle2::Board::GetReflectDirection(u8 d)
 {
     switch(d)
@@ -168,6 +174,19 @@ Battle2::direction_t Battle2::Board::GetReflectDirection(u8 d)
     }
 
     return UNKNOWN;
+}
+
+bool Battle2::Board::isReflectDirection(u8 d)
+{
+    switch(d)
+    {
+        case TOP_LEFT:
+        case LEFT:
+        case BOTTOM_LEFT:	return true;
+	default:		break;
+    }
+
+    return false;
 }
 
 bool Battle2::Board::isValidDirection(u16 i, u8 d)

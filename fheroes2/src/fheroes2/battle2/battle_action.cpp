@@ -112,13 +112,14 @@ void Battle2::Actions::AddedMoveAction(const Stats & b, const std::vector<u16> &
     push_back(action);
 }
 
-void Battle2::Actions::AddedAttackAction(const Stats & a, const Stats & d, u16 dst)
+void Battle2::Actions::AddedAttackAction(const Stats & a, const Stats & d, u16 dst, u8 dir)
 {
     Action action;
     action.SetID(MSG_BATTLE_ATTACK);
     action.Push(a.id);
     action.Push(d.id);
     action.Push(dst);
+    action.Push(dir);
 
     push_back(action);
 }
@@ -133,16 +134,32 @@ void Battle2::Actions::AddedMoraleAction(const Stats & b, u8 state)
     push_back(action);
 }
 
-void Battle2::Arena::BattleProcess(Stats & attacker, Stats & defender, s16 dst)
+void Battle2::Arena::BattleProcess(Stats & attacker, Stats & defender, s16 dst, u8 dir)
 {
     std::vector<TargetInfo> targets;
     if(0 > dst) dst = defender.GetPosition();
 
+    if(dir)
+    {
+	if(attacker.isWide())
+	{
+	    if(!Board::NearCells(attacker.GetPosition(), dst))
+		attacker.UpdateDirection(board[dst]);
+	    if(defender.AllowResponse())
+		defender.UpdateDirection(board[attacker.GetPosition()]);
+	}
+	else
+	{
+	    attacker.UpdateDirection(board[dst]);
+	    if(defender.AllowResponse())
+		defender.UpdateDirection(board[attacker.GetPosition()]);
+	}
+    }
+
     GetTargetsForDamage(attacker, defender, dst, targets);
 
-    attacker.UpdateDirection(board[dst]);
-    if(!attacker.isWide())
-    defender.UpdateDirection(board[attacker.position]);
+    if(Board::isReflectDirection(dir) != attacker.isReflect())
+	attacker.UpdateDirection(board[dst]);
 
     if(interface) interface->RedrawActionAttackPart1(attacker, defender, targets);
 
@@ -278,10 +295,12 @@ void Battle2::Arena::ApplyActionSpellCast(Action & action)
 void Battle2::Arena::ApplyActionAttack(Action & action)
 {
     u16 id1, id2, dst;
+    u8 dir;
 
     action.Pop(id1);
     action.Pop(id2);
     action.Pop(dst);
+    action.Pop(dir);
 
     Battle2::Stats* b1 = GetTroopID(id1);
     Battle2::Stats* b2 = GetTroopID(id2);
@@ -305,7 +324,7 @@ void Battle2::Arena::ApplyActionAttack(Action & action)
 	if(b1->isArchers() || handfighting)
 	{
 	    // attack
-	    BattleProcess(*b1, *b2, dst);
+	    BattleProcess(*b1, *b2, dst, dir);
 
 	    if(b2->isValid())
 	    {
