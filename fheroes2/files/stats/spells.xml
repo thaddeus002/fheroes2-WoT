@@ -1,8 +1,8 @@
 <?xml version="1.0" ?>
 <spells>
 
- <!-- first: unknown spell -->
- <spell skip="0" cost="1" />
+ <!-- first: unknown spell, skip: skip read line, disable: spell not used in game (only for random spells) -->
+ <spell skip="0" disable="0" cost="1" />
 
  <!-- Fireball -->
  <spell cost="9" extra="10" />
