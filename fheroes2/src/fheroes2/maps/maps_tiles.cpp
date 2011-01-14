@@ -1411,9 +1411,9 @@ void Maps::Tiles::UpdateQuantity(void)
 	    {
 		switch(Rand::Get(1, 3))
 		{
-		    case 1: quantity1 = Artifact::Rand1(); break;
-		    case 2: quantity1 = Artifact::Rand2();  break;
-		    case 3: quantity1 = Artifact::Rand3(); break;
+		    case 1: quantity1 = Artifact::Rand(Artifact::ART_LEVEL1); break;
+		    case 2: quantity1 = Artifact::Rand(Artifact::ART_LEVEL2); break;
+		    case 3: quantity1 = Artifact::Rand(Artifact::ART_LEVEL3); break;
 		    default: break;
 		}
 	    }
@@ -1433,7 +1433,7 @@ void Maps::Tiles::UpdateQuantity(void)
 	    switch(percents.Get())
 	    {
 		case 1:
-            	    quantity1 = (1 == Rand::Get(1, 2) ? Artifact::Rand1() : Artifact::Rand2());
+            	    quantity1 = Artifact::Rand(1 == Rand::Get(1, 2) ? Artifact::ART_LEVEL1 : Artifact::ART_LEVEL2);
 		    break;
 		case 2:
 		    quantity1 = Resource::Rand();
@@ -1566,9 +1566,9 @@ void Maps::Tiles::UpdateQuantity(void)
 	    // variant
 	    switch(percents.Get())
 	    {
-		case 1: quantity1 = Artifact::Rand1(); break;
-		case 2: quantity1 = Artifact::Rand2();  break;
-		case 3: quantity1 = Artifact::Rand3(); break;
+		case 1: quantity1 = Artifact::Rand(Artifact::ART_LEVEL1); break;
+		case 2: quantity1 = Artifact::Rand(Artifact::ART_LEVEL2); break;
+		case 3: quantity1 = Artifact::Rand(Artifact::ART_LEVEL3); break;
 		default: break;
 	    }
 	}
@@ -1588,7 +1588,7 @@ void Maps::Tiles::UpdateQuantity(void)
 	    switch(percents.Get())
 	    {
 		case 1: quantity2 = 15; break;
-		case 2: quantity2 = 10; quantity1 = Artifact::Rand1(); break;
+		case 2: quantity2 = 10; quantity1 = Artifact::Rand(Artifact::ART_LEVEL1); break;
 		default: break;
 	    }
 	}
@@ -1612,7 +1612,7 @@ void Maps::Tiles::UpdateQuantity(void)
 		case 1: quantity2 = 20; break;
 		case 2: quantity2 = 15; break;
 		case 3: quantity2 = 10; break;
-		case 4: quantity1 = Artifact::Rand1(); break;
+		case 4: quantity1 = Artifact::Rand(Artifact::ART_LEVEL1); break;
 		default: break;
 	    }
 	}
@@ -1630,14 +1630,15 @@ void Maps::Tiles::UpdateQuantity(void)
 		case 1: quantity2 = 10; break;
 		case 2: quantity2 = 15; break;
 		case 3: quantity2 = 25; break;
-		case 4: quantity1 = Artifact::Rand(); quantity2 = 50; break;
+		case 4: quantity1 = Artifact::Rand(Artifact::ART_LEVEL123);
+		        quantity2 = 50; break;
 		default: break;
 	    }
 	break;
 
 	case MP2::OBJ_GRAVEYARD:
 	    // 1000 gold + art
-		quantity1 = Artifact::Rand();
+		quantity1 = Artifact::Rand(Artifact::ART_LEVEL123);
 		quantity2 = 10;
 	break;
 
@@ -1650,7 +1651,7 @@ void Maps::Tiles::UpdateQuantity(void)
 	case MP2::OBJ_DAEMONCAVE:
 	    // 1000 exp or 1000 exp + 2500 gold or 1000 exp + art or (-2500 or remove hero)
 	    quantity2 = Rand::Get(1, 4);
-	    quantity1 = Artifact::Rand();
+	    quantity1 = Artifact::Rand(Artifact::ART_LEVEL123);
 	break;
 
 	// aband mines
@@ -2065,19 +2066,19 @@ void Maps::Tiles::UpdateRNDArtifactSprite(void)
     {
         case MP2::OBJ_RNDARTIFACT:
             addon = FindObject(MP2::OBJ_RNDARTIFACT);
-            index = Artifact::IndexSprite(Artifact::Rand());
+            index = Artifact::IndexSprite(Artifact::Rand(Artifact::ART_LEVEL123));
             break;
         case MP2::OBJ_RNDARTIFACT1:
             addon = FindObject(MP2::OBJ_RNDARTIFACT1);
-            index = Artifact::IndexSprite(Artifact::Rand1());
+            index = Artifact::IndexSprite(Artifact::Rand(Artifact::ART_LEVEL1));
             break;
         case MP2::OBJ_RNDARTIFACT2:
             addon = FindObject(MP2::OBJ_RNDARTIFACT2);
-            index = Artifact::IndexSprite(Artifact::Rand2());
+            index = Artifact::IndexSprite(Artifact::Rand(Artifact::ART_LEVEL2));
             break;
         case MP2::OBJ_RNDARTIFACT3:
             addon = FindObject(MP2::OBJ_RNDARTIFACT3);
-            index = Artifact::IndexSprite(Artifact::Rand3());
+            index = Artifact::IndexSprite(Artifact::Rand(Artifact::ART_LEVEL3));
             break;
         default: return;
     }

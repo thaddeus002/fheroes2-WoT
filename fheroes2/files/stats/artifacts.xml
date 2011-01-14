@@ -1,0 +1,213 @@
+<?xml version="1.0" ?>
+<spells>
+
+ <!-- disable: artifact not used in game (only for random artifact), extra: extended value -->
+
+ <!-- Ultimate Book of Knowledge, extra: increase knowledge -->
+ <artifact extra="12" />
+ <!-- Ultimate Sword of Dominion, extra: increase attack -->
+ <artifact extra="12" />
+ <!-- Ultimate Cloak of Protection, extra: increase defense -->
+ <artifact extra="12" />
+ <!-- Ultimate Wand of Magic, extra: increase power -->
+ <artifact extra="12" />
+ <!-- Ultimate Shield, extra: increase attack and defense -->
+ <artifact extra="6" />
+ <!-- Ultimate Staff, extra: increase power and knowledge -->
+ <artifact extra="6" />
+ <!-- Ultimate Crown, extra: increase basic skills -->
+ <artifact extra="4" />
+ <!-- Golden Goose, extra: increase income *1000 gold -->
+ <artifact extra="10" />
+ <!-- Arcane Necklace of Magic -->
+ <artifact />
+ <!-- Caster's Bracelet of Magic -->
+ <artifact />
+ <!-- Mage's Ring of Power -->
+ <artifact />
+ <!-- Witch's Broach of Magic -->
+ <artifact />
+ <!-- Medal of Valor -->
+ <artifact />
+ <!-- Medal of Courage -->
+ <artifact />
+ <!-- Medal of Honor -->
+ <artifact />
+ <!-- Medal of Distinction -->
+ <artifact />
+ <!-- Fizbin of Misfortune -->
+ <artifact />
+ <!-- Thunder Mace of Dominion -->
+ <artifact />
+ <!-- Armored Gauntlets of Protection -->
+ <artifact />
+ <!-- Defender Helm of Protection -->
+ <artifact />
+ <!-- Giant Flail of Dominion -->
+ <artifact />
+ <!-- Ballista of Quickness -->
+ <artifact />
+ <!-- Stealth Shield of Protection -->
+ <artifact />
+ <!-- Dragon Sword of Dominion -->
+ <artifact />
+ <!-- Power Axe of Dominion -->
+ <artifact />
+ <!-- Divine Breastplate of Protection -->
+ <artifact />
+ <!-- Minor Scroll of Knowledge -->
+ <artifact />
+ <!-- Major Scroll of Knowledge -->
+ <artifact />
+ <!-- Superior Scroll of Knowledge -->
+ <artifact />
+ <!-- Foremost Scroll of Knowledge -->
+ <artifact />
+ <!-- Endless Sack of Gold -->
+ <artifact />
+ <!-- Endless Bag of Gold -->
+ <artifact />
+ <!-- Endless Purse of Gold -->
+ <artifact />
+ <!-- Nomad Boots of Mobility -->
+ <artifact />
+ <!-- Traveler's Boots of Mobility -->
+ <artifact />
+ <!-- Lucky Rabbit's Foot -->
+ <artifact />
+ <!-- Golden Horseshoe -->
+ <artifact />
+ <!-- Gambler's Lucky Coin -->
+ <artifact />
+ <!-- Four-Leaf Clover -->
+ <artifact />
+ <!-- True Compass of Mobility -->
+ <artifact />
+ <!-- Sailor's Astrolabe of Mobility -->
+ <artifact />
+ <!-- Evil Eye -->
+ <artifact />
+ <!-- Enchanted Hourglass -->
+ <artifact />
+ <!-- Gold Watch -->
+ <artifact />
+ <!-- Skullcap -->
+ <artifact />
+ <!-- Ice Cloak -->
+ <artifact />
+ <!-- Fire Cloak -->
+ <artifact />
+ <!-- Lightning Helm -->
+ <artifact />
+ <!-- Evercold Icicle -->
+ <artifact />
+ <!-- Everhot Lava Rock -->
+ <artifact />
+ <!-- Lightning Rod -->
+ <artifact />
+ <!-- Snake-Ring -->
+ <artifact />
+ <!-- Ankh -->
+ <artifact />
+ <!-- Book of Elements -->
+ <artifact />
+ <!-- Elemental Ring -->
+ <artifact />
+ <!-- Holy Pendant -->
+ <artifact />
+ <!-- Pendant of Free Will -->
+ <artifact />
+ <!-- Pendant of Life -->
+ <artifact />
+ <!-- Serenity Pendant -->
+ <artifact />
+ <!-- Seeing-eye Pendant -->
+ <artifact />
+ <!-- Kinetic Pendant -->
+ <artifact />
+ <!-- Pendant of Death -->
+ <artifact />
+ <!-- Wand of Negation -->
+ <artifact />
+ <!-- Golden Bow -->
+ <artifact />
+ <!-- Telescope -->
+ <artifact />
+ <!-- Statesman's Quill -->
+ <artifact />
+ <!-- Wizard's Hat -->
+ <artifact />
+ <!-- Power Ring -->
+ <artifact />
+ <!-- Ammo Cart -->
+ <artifact />
+ <!-- Tax Lien -->
+ <artifact />
+ <!-- Hideous Mask -->
+ <artifact />
+ <!-- Endless Pouch of Sulfur -->
+ <artifact />
+ <!-- Endless Vial of Mercury -->
+ <artifact />
+ <!-- Endless Pouch of Gems -->
+ <artifact />
+ <!-- Endless Cord of Wood -->
+ <artifact />
+ <!-- Endless Cart of Ore -->
+ <artifact />
+ <!-- Endless Pouch of Crystal -->
+ <artifact />
+ <!-- Spiked Helm -->
+ <artifact />
+ <!-- Spiked Shield -->
+ <artifact />
+ <!-- White Pearl -->
+ <artifact />
+ <!-- Black Pearl -->
+ <artifact />
+ <!-- Magic Book -->
+ <artifact />
+ <!-- Dummy 1 -->
+ <artifact />
+ <!-- Dummy 2 -->
+ <artifact />
+ <!-- Dummy 3 -->
+ <artifact />
+ <!-- Dummy 4 -->
+ <artifact />
+ <!-- Spell Scroll -->
+ <artifact />
+ <!-- Arm of the Martyr -->
+ <artifact />
+ <!-- Breastplate of Anduran -->
+ <artifact />
+ <!-- Broach of Shielding -->
+ <artifact />
+ <!-- Battle Garb of Anduran -->
+ <artifact />
+ <!-- Crystal Ball -->
+ <artifact />
+ <!-- Heart of Fire -->
+ <artifact />
+ <!-- Heart of Ice -->
+ <artifact />
+ <!-- Helmet of Anduran -->
+ <artifact />
+ <!-- Holy Hammer -->
+ <artifact />
+ <!-- Legendary Scepter -->
+ <artifact />
+ <!-- Masthead -->
+ <artifact />
+ <!-- Sphere of Negation -->
+ <artifact />
+ <!-- Staff of Wizardry -->
+ <artifact />
+ <!-- Sword Breaker -->
+ <artifact />
+ <!-- Sword of Anduran -->
+ <artifact />
+ <!-- Spade of Necromancy -->
+ <artifact />
+
+<artifacts/>

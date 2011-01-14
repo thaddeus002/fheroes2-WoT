@@ -20,129 +20,169 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#include <bitset>
 #include <string>
 #include <vector>
 #include "settings.h"
 #include "world.h"
 #include "artifact.h"
 
-static std::bitset<Artifact::UNKNOWN + 1> used;
+#ifdef WITH_XML
+#include "xmlccwrap.h"
+#endif
 
-static struct
+enum { ART_DISABLED = 0x01, ART_RNDUSED = 0x02 };
+
+struct artifactstats_t
 {
+    u8 bits;
+    u8 extra;
     const char* name;
     const char* description;
-} artifacts[] = {
-	{ _("Ultimate Book of Knowledge"), _("The Ultimate Book of Knowledge increases your knowledge by 12.") },
-	{ _("Ultimate Sword of Dominion"), _("The Ultimate Sword of Dominion increases your attack skill by 12.") },
-	{ _("Ultimate Cloak of Protection"), _("The Ultimate Cloak of Protection increases your defense skill by 12.") },
-	{ _("Ultimate Wand of Magic"), _("The Ultimate Wand of Magic increases your spell power by 12.") },
-	{ _("Ultimate Shield"), _("The Ultimate Shield increases your attack and defense skills by 6 each.") },
-	{ _("Ultimate Staff"), _("The Ultimate Staff increases your spell power and knowledge by 6 each.") },
-	{ _("Ultimate Crown"), _("The Ultimate Crown increases each of your basic skills by 4 points.") },
-	{ _("Golden Goose"), _("The Golden Goose brings in an income of 10,000 gold per turn.") },
-	{ _("Arcane Necklace of Magic"), _("The Arcane Necklace of Magic increases your spell power by 4.") },
-	{ _("Caster's Bracelet of Magic"), _("The Caster's Bracelet of Magic increases your spell power by 2.") },
-	{ _("Mage's Ring of Power"), _("The Mage's Ring of Power increases your spell power by 2.") },
-	{ _("Witch's Broach of Magic"), _("The Witch's Broach of Magic increases your spell power by 3.") },
-	{ _("Medal of Valor"), _("The Medal of Valor increases your morale.") },
-	{ _("Medal of Courage"), _("The Medal of Courage increases your morale.") },
-	{ _("Medal of Honor"), _("The Medal of Honor increases your morale.") },
-	{ _("Medal of Distinction"), _("The Medal of Distinction increases your morale.") },
-	{ _("Fizbin of Misfortune"), _("The Fizbin of Misfortune greatly decreases your morale.") },
-	{ _("Thunder Mace of Dominion"), _("The Thunder Mace of Dominion increases your attack skill by 1.") },
-	{ _("Armored Gauntlets of Protection"), _("The Armored Gauntlets of Protection increase your defense skill by 1.") },
-	{ _("Defender Helm of Protection"), _("The Defender Helm of Protection increases your defense skill by 1.") },
-	{ _("Giant Flail of Dominion"), _("The Giant Flail of Dominion increases your attack skill by 1.") },
-	{ _("Ballista of Quickness"), _("The Ballista of Quickness lets your catapult fire twice per combat round.") },
-	{ _("Stealth Shield of Protection"), _("The Stealth Shield of Protection increases your defense skill by 2.") },
-	{ _("Dragon Sword of Dominion"), _("The Dragon Sword of Dominion increases your attack skill by 3.") },
-	{ _("Power Axe of Dominion"), _("The Power Axe of Dominion increases your attack skill by 2.") },
-	{ _("Divine Breastplate of Protection"), _("The Divine Breastplate of Protection increases your defense skill by 3.") },
-	{ _("Minor Scroll of Knowledge"), _("The Minor Scroll of Knowledge increases your knowledge by 2.") },
-	{ _("Major Scroll of Knowledge"), _("The Major Scroll of Knowledge increases your knowledge by 3.") },
-	{ _("Superior Scroll of Knowledge"), _("The Superior Scroll of Knowledge increases your knowledge by 4.") },
-	{ _("Foremost Scroll of Knowledge"), _("The Foremost Scroll of Knowledge increases your knowledge by 5.") },
-	{ _("Endless Sack of Gold"), _("The Endless Sack of Gold provides you with 1000 gold per day.") },
-	{ _("Endless Bag of Gold"), _("The Endless Bag of Gold provides you with 750 gold per day.") },
-	{ _("Endless Purse of Gold"), _("The Endless Purse of Gold provides you with 500 gold per day.") },
-	{ _("Nomad Boots of Mobility"), _("The Nomad Boots of Mobility increase your movement on land.") },
-	{ _("Traveler's Boots of Mobility"), _("The Traveler's Boots of Mobility increase your movement on land.") },
-	{ _("Lucky Rabbit's Foot"), _("The Lucky Rabbit's Foot increases your luck in combat.") },
-	{ _("Golden Horseshoe"), _("The Golden Horseshoe increases your luck in combat.") },
-	{ _("Gambler's Lucky Coin"), _("The Gambler's Lucky Coin increases your luck in combat.") },
-	{ _("Four-Leaf Clover"), _("The Four-Leaf Clover increases your luck in combat.") },
-	{ _("True Compass of Mobility"), _("The True Compass of Mobility increases your movement on land and sea.") },
-	{ _("Sailor's Astrolabe of Mobility"), _("The Sailors' Astrolabe of Mobility increases your movement on sea.") },
-	{ _("Evil Eye"), _("The Evil Eye reduces the casting cost of curse spells by half.") },
-	{ _("Enchanted Hourglass"), _("The Enchanted Hourglass extends the duration of all your spells by 2 turns.") },
-	{ _("Gold Watch"), _("The Gold Watch doubles the effectiveness of your hypnotize spells.") },
-	{ _("Skullcap"), _("The Skullcap halves the casting cost of all mind influencing spells.") },
-	{ _("Ice Cloak"), _("The Ice Cloak halves all damage your troops take from cold spells.") },
-	{ _("Fire Cloak"), _("The Fire Cloak halves all damage your troops take from fire spells.") },
-	{ _("Lightning Helm"), _("The Lightning Helm halves all damage your troops take from lightning spells.") },
-	{ _("Evercold Icicle"), _("The Evercold Icicle causes your cold spells to do 50 percent more damage to enemy troops.") },
-	{ _("Everhot Lava Rock"), _("The Everhot Lava Rock causes your fire spells to do 50 percent more damage to enemy troops.") },
-	{ _("Lightning Rod"), _("The Lightning Rod causes your lightning spells to do 50 percent more damage to enemy troops.") },
-	{ _("Snake-Ring"), _("The Snake Ring halves the casting cost of all your bless spells.") },
-	{ _("Ankh"), _("The Ankh doubles the effectiveness of all your resurrect and animate spells.") },
-	{ _("Book of Elements"), _("The Book of Elements doubles the effectiveness of all your summoning spells.") },
-	{ _("Elemental Ring"), _("The Elemental Ring halves the casting cost of all summoning spells.") },
-	{ _("Holy Pendant"), _("The Holy Pendant makes all your troops immune to curse spells.") },
-	{ _("Pendant of Free Will"), _("The Pendant of Free Will makes all your troops immune to hypnotize spells.") },
-	{ _("Pendant of Life"), _("The Pendant of Life makes all your troops immune to death spells.") },
-	{ _("Serenity Pendant"), _("The Serenity Pendant makes all your troops immune to berserk spells.") },
-	{ _("Seeing-eye Pendant"), _("The Seeing-eye Pendant makes all your troops immune to blindness spells.") },
-	{ _("Kinetic Pendant"), _("The Kinetic Pendant makes all your troops immune to paralyze spells.") },
-	{ _("Pendant of Death"), _("The Pendant of Death makes all your troops immune to holy spells.") },
-	{ _("Wand of Negation"), _("The Wand of Negation protects your troops from the Dispel Magic spell.") },
-	{ _("Golden Bow"), _("The Golden Bow eliminates the 50 percent penalty for your troops shooting past obstacles. (e.g. castle walls)") },
-	{ _("Telescope"), _("The Telescope increases the amount of terrain your hero reveals when adventuring by 1 extra square.") },
-	{ _("Statesman's Quill"), _("The Statesman's Quill reduces the cost of surrender to 10 percent of the total cost of troops you have in your army.") },
-	{ _("Wizard's Hat"), _("The Wizard's Hat increases the duration of your spells by 10 turns!") },
-	{ _("Power Ring"), _("The Power Ring returns 2 extra power points/turn to your hero.") },
-	{ _("Ammo Cart"), _("The Ammo Cart provides endless ammunition for all your troops that shoot.") },
-	{ _("Tax Lien"), _("The Tax Lien costs you 250 gold pieces/turn.") },
-	{ _("Hideous Mask"), _("The Hideous Mask prevents all 'wandering' armies from joining your hero.") },
-	{ _("Endless Pouch of Sulfur"), _("The Endless Pouch of Sulfur provides 1 unit of sulfur per day.") },
-	{ _("Endless Vial of Mercury"), _("The Endless Vial of Mercury provides 1 unit of mercury per day.") },
-	{ _("Endless Pouch of Gems"), _("The Endless Pouch of Gems provides 1 unit of gems per day.") },
-	{ _("Endless Cord of Wood"), _("The Endless Cord of Wood provides 1 unit of wood per day.") },
-	{ _("Endless Cart of Ore"), _("The Endless Cart of Ore provides 1 unit of ore per day.") },
-	{ _("Endless Pouch of Crystal"), _("The Endless Pouch of Crystal provides 1 unit of crystal/day.") },
-	{ _("Spiked Helm"), _("The Spiked Helm increases your attack and defense skills by 1 each.") },
-	{ _("Spiked Shield"), _("The Spiked Shield increases your attack and defense skills by 2 each.") },
-	{ _("White Pearl"), _("The White Pearl increases your spell power and knowledge by 1 each.") },
-	{ _("Black Pearl"), _("The Black Pearl increases your spell power and knowledge by 2 each.") },
-
-	{ _("Magic Book"), _("The Magic Book enables you to cast spells.") },
-	
-	{ "Dummy 1", "The reserved artifact." },
-	{ "Dummy 2", "The reserved artifact." },
-	{ "Dummy 3", "The reserved artifact." },
-	{ "Dummy 4", "The reserved artifact." },
-
-	{ _("Spell Scroll"), _("This Spell Scroll gives your hero the ability to cast the %{spell} spell.") },
-	{ _("Arm of the Martyr"), _("The Arm of the Martyr increases your spell power by 3 but adds the undead morale penalty.") },
-	{ _("Breastplate of Anduran"), _("The Breastplate increases your defense by 5.") },
-	{ _("Broach of Shielding"), _("The Broach of Shielding provides 50 percent protection from Armageddon and Elemental Storm, but decreases spell power by 2.") },
-	{ _("Battle Garb of Anduran"), _("The Battle Garb of Anduran combines the powers of the three Anduran artifacts.  It provides maximum luck and morale for your troops and gives you the Town Portal spell.") },
-	{ _("Crystal Ball"), _("The Crystal Ball lets you get more specific information about monsters, enemy heroes, and castles nearby the hero who holds it.") },
-	{ _("Heart of Fire"), _("The Heart of Fire provides 50 percent protection from fire, but doubles the damage taken from cold.") },
-	{ _("Heart of Ice"), _("The Heart of Ice provides 50 percent protection from cold, but doubles the damage taken from fire.") },
-	{ _("Helmet of Anduran"), _("The Helmet increases your spell power by 5.") },
-	{ _("Holy Hammer"), _("The Holy Hammer increases your attack skill by 5.") },
-	{ _("Legendary Scepter"), _("The Legendary Scepter adds 2 points to all attributes.") },
-	{ _("Masthead"), _("The Masthead boosts your luck and morale by 1 each in sea combat.") },
-	{ _("Sphere of Negation"), _("The Sphere of Negation disables all spell casting, for both sides, in combat.") },
-	{ _("Staff of Wizardry"), _("The Staff of Wizardry boosts your spell power by 5.") },
-	{ _("Sword Breaker"), _("The Sword Breaker increases your defense by 4 and attack by 1.") },
-	{ _("Sword of Anduran"), _("The Sword increases your attack skill by 5.") },
-	{ _("Spade of Necromancy"), _("The Spade gives you increased necromancy skill.") },
-
-	{ "Unknown", "Unknown" },
 };
+
+artifactstats_t artifacts[] = {
+	{ 0,12, _("Ultimate Book of Knowledge"), _("The Ultimate Book of Knowledge increases your knowledge by 12.") },
+	{ 0,12, _("Ultimate Sword of Dominion"), _("The Ultimate Sword of Dominion increases your attack skill by 12.") },
+	{ 0,12, _("Ultimate Cloak of Protection"), _("The Ultimate Cloak of Protection increases your defense skill by 12.") },
+	{ 0,12, _("Ultimate Wand of Magic"), _("The Ultimate Wand of Magic increases your spell power by 12.") },
+	{ 0, 6, _("Ultimate Shield"), _("The Ultimate Shield increases your attack and defense skills by 6 each.") },
+	{ 0, 6, _("Ultimate Staff"), _("The Ultimate Staff increases your spell power and knowledge by 6 each.") },
+	{ 0, 4, _("Ultimate Crown"), _("The Ultimate Crown increases each of your basic skills by 4 points.") },
+	{ 0,10, _("Golden Goose"), _("The Golden Goose brings in an income of 10,000 gold per turn.") },
+	{ 0, 4, _("Arcane Necklace of Magic"), _("The Arcane Necklace of Magic increases your spell power by 4.") },
+	{ 0, 2, _("Caster's Bracelet of Magic"), _("The Caster's Bracelet of Magic increases your spell power by 2.") },
+	{ 0, 2, _("Mage's Ring of Power"), _("The Mage's Ring of Power increases your spell power by 2.") },
+	{ 0, 3, _("Witch's Broach of Magic"), _("The Witch's Broach of Magic increases your spell power by 3.") },
+	{ 0, 1, _("Medal of Valor"), _("The Medal of Valor increases your morale.") },
+	{ 0, 1, _("Medal of Courage"), _("The Medal of Courage increases your morale.") },
+	{ 0, 1, _("Medal of Honor"), _("The Medal of Honor increases your morale.") },
+	{ 0, 1, _("Medal of Distinction"), _("The Medal of Distinction increases your morale.") },
+	{ 0, 1, _("Fizbin of Misfortune"), _("The Fizbin of Misfortune greatly decreases your morale.") },
+	{ 0, 1, _("Thunder Mace of Dominion"), _("The Thunder Mace of Dominion increases your attack skill by 1.") },
+	{ 0, 1, _("Armored Gauntlets of Protection"), _("The Armored Gauntlets of Protection increase your defense skill by 1.") },
+	{ 0, 1, _("Defender Helm of Protection"), _("The Defender Helm of Protection increases your defense skill by 1.") },
+	{ 0, 1, _("Giant Flail of Dominion"), _("The Giant Flail of Dominion increases your attack skill by 1.") },
+	{ 0, 2, _("Ballista of Quickness"), _("The Ballista of Quickness lets your catapult fire twice per combat round.") },
+	{ 0, 2, _("Stealth Shield of Protection"), _("The Stealth Shield of Protection increases your defense skill by 2.") },
+	{ 0, 3, _("Dragon Sword of Dominion"), _("The Dragon Sword of Dominion increases your attack skill by 3.") },
+	{ 0, 2, _("Power Axe of Dominion"), _("The Power Axe of Dominion increases your attack skill by 2.") },
+	{ 0, 3, _("Divine Breastplate of Protection"), _("The Divine Breastplate of Protection increases your defense skill by 3.") },
+	{ 0, 2, _("Minor Scroll of Knowledge"), _("The Minor Scroll of Knowledge increases your knowledge by 2.") },
+	{ 0, 3, _("Major Scroll of Knowledge"), _("The Major Scroll of Knowledge increases your knowledge by 3.") },
+	{ 0, 4, _("Superior Scroll of Knowledge"), _("The Superior Scroll of Knowledge increases your knowledge by 4.") },
+	{ 0, 5, _("Foremost Scroll of Knowledge"), _("The Foremost Scroll of Knowledge increases your knowledge by 5.") },
+	{ 0, 100, _("Endless Sack of Gold"), _("The Endless Sack of Gold provides you with 1000 gold per day.") },
+	{ 0, 75, _("Endless Bag of Gold"), _("The Endless Bag of Gold provides you with 750 gold per day.") },
+	{ 0, 50, _("Endless Purse of Gold"), _("The Endless Purse of Gold provides you with 500 gold per day.") },
+	{ 0, 0, _("Nomad Boots of Mobility"), _("The Nomad Boots of Mobility increase your movement on land.") },
+	{ 0, 0, _("Traveler's Boots of Mobility"), _("The Traveler's Boots of Mobility increase your movement on land.") },
+	{ 0, 1, _("Lucky Rabbit's Foot"), _("The Lucky Rabbit's Foot increases your luck in combat.") },
+	{ 0, 1, _("Golden Horseshoe"), _("The Golden Horseshoe increases your luck in combat.") },
+	{ 0, 1, _("Gambler's Lucky Coin"), _("The Gambler's Lucky Coin increases your luck in combat.") },
+	{ 0, 1, _("Four-Leaf Clover"), _("The Four-Leaf Clover increases your luck in combat.") },
+	{ 0, 0, _("True Compass of Mobility"), _("The True Compass of Mobility increases your movement on land and sea.") },
+	{ 0, 0, _("Sailor's Astrolabe of Mobility"), _("The Sailors' Astrolabe of Mobility increases your movement on sea.") },
+	{ 0, 0, _("Evil Eye"), _("The Evil Eye reduces the casting cost of curse spells by half.") },
+	{ 0, 2, _("Enchanted Hourglass"), _("The Enchanted Hourglass extends the duration of all your spells by 2 turns.") },
+	{ 0, 0, _("Gold Watch"), _("The Gold Watch doubles the effectiveness of your hypnotize spells.") },
+	{ 0, 0, _("Skullcap"), _("The Skullcap halves the casting cost of all mind influencing spells.") },
+	{ 0, 0, _("Ice Cloak"), _("The Ice Cloak halves all damage your troops take from cold spells.") },
+	{ 0, 0, _("Fire Cloak"), _("The Fire Cloak halves all damage your troops take from fire spells.") },
+	{ 0, 0, _("Lightning Helm"), _("The Lightning Helm halves all damage your troops take from lightning spells.") },
+	{ 0, 50, _("Evercold Icicle"), _("The Evercold Icicle causes your cold spells to do 50 percent more damage to enemy troops.") },
+	{ 0, 50, _("Everhot Lava Rock"), _("The Everhot Lava Rock causes your fire spells to do 50 percent more damage to enemy troops.") },
+	{ 0, 50, _("Lightning Rod"), _("The Lightning Rod causes your lightning spells to do 50 percent more damage to enemy troops.") },
+	{ 0, 0, _("Snake-Ring"), _("The Snake Ring halves the casting cost of all your bless spells.") },
+	{ 0, 0, _("Ankh"), _("The Ankh doubles the effectiveness of all your resurrect and animate spells.") },
+	{ 0, 0, _("Book of Elements"), _("The Book of Elements doubles the effectiveness of all your summoning spells.") },
+	{ 0, 0, _("Elemental Ring"), _("The Elemental Ring halves the casting cost of all summoning spells.") },
+	{ 0, 0, _("Holy Pendant"), _("The Holy Pendant makes all your troops immune to curse spells.") },
+	{ 0, 0, _("Pendant of Free Will"), _("The Pendant of Free Will makes all your troops immune to hypnotize spells.") },
+	{ 0, 0, _("Pendant of Life"), _("The Pendant of Life makes all your troops immune to death spells.") },
+	{ 0, 0, _("Serenity Pendant"), _("The Serenity Pendant makes all your troops immune to berserk spells.") },
+	{ 0, 0, _("Seeing-eye Pendant"), _("The Seeing-eye Pendant makes all your troops immune to blindness spells.") },
+	{ 0, 0, _("Kinetic Pendant"), _("The Kinetic Pendant makes all your troops immune to paralyze spells.") },
+	{ 0, 0, _("Pendant of Death"), _("The Pendant of Death makes all your troops immune to holy spells.") },
+	{ 0, 0, _("Wand of Negation"), _("The Wand of Negation protects your troops from the Dispel Magic spell.") },
+	{ 0, 50, _("Golden Bow"), _("The Golden Bow eliminates the 50 percent penalty for your troops shooting past obstacles. (e.g. castle walls)") },
+	{ 0, 1, _("Telescope"), _("The Telescope increases the amount of terrain your hero reveals when adventuring by 1 extra square.") },
+	{ 0, 10, _("Statesman's Quill"), _("The Statesman's Quill reduces the cost of surrender to 10 percent of the total cost of troops you have in your army.") },
+	{ 0, 10, _("Wizard's Hat"), _("The Wizard's Hat increases the duration of your spells by 10 turns!") },
+	{ 0, 2, _("Power Ring"), _("The Power Ring returns 2 extra power points/turn to your hero.") },
+	{ 0, 0, _("Ammo Cart"), _("The Ammo Cart provides endless ammunition for all your troops that shoot.") },
+	{ 0, 25, _("Tax Lien"), _("The Tax Lien costs you 250 gold pieces/turn.") },
+	{ 0, 0, _("Hideous Mask"), _("The Hideous Mask prevents all 'wandering' armies from joining your hero.") },
+	{ 0, 1, _("Endless Pouch of Sulfur"), _("The Endless Pouch of Sulfur provides 1 unit of sulfur per day.") },
+	{ 0, 1, _("Endless Vial of Mercury"), _("The Endless Vial of Mercury provides 1 unit of mercury per day.") },
+	{ 0, 1, _("Endless Pouch of Gems"), _("The Endless Pouch of Gems provides 1 unit of gems per day.") },
+	{ 0, 1, _("Endless Cord of Wood"), _("The Endless Cord of Wood provides 1 unit of wood per day.") },
+	{ 0, 1, _("Endless Cart of Ore"), _("The Endless Cart of Ore provides 1 unit of ore per day.") },
+	{ 0, 1, _("Endless Pouch of Crystal"), _("The Endless Pouch of Crystal provides 1 unit of crystal/day.") },
+	{ 0, 1, _("Spiked Helm"), _("The Spiked Helm increases your attack and defense skills by 1 each.") },
+	{ 0, 2, _("Spiked Shield"), _("The Spiked Shield increases your attack and defense skills by 2 each.") },
+	{ 0, 1, _("White Pearl"), _("The White Pearl increases your spell power and knowledge by 1 each.") },
+	{ 0, 2, _("Black Pearl"), _("The Black Pearl increases your spell power and knowledge by 2 each.") },
+
+	{ 0, 0, _("Magic Book"), _("The Magic Book enables you to cast spells.") },
+
+	{ 0, 0, "Dummy 1", "The reserved artifact." },
+	{ 0, 0, "Dummy 2", "The reserved artifact." },
+	{ 0, 0, "Dummy 3", "The reserved artifact." },
+	{ 0, 0, "Dummy 4", "The reserved artifact." },
+
+	{ 0, 0, _("Spell Scroll"), _("This Spell Scroll gives your hero the ability to cast the %{spell} spell.") },
+	{ 0, 3, _("Arm of the Martyr"), _("The Arm of the Martyr increases your spell power by 3 but adds the undead morale penalty.") },
+	{ 0, 5, _("Breastplate of Anduran"), _("The Breastplate increases your defense by 5.") },
+	{ 0, 50, _("Broach of Shielding"), _("The Broach of Shielding provides 50 percent protection from Armageddon and Elemental Storm, but decreases spell power by 2.") },
+	{ 0, 0, _("Battle Garb of Anduran"), _("The Battle Garb of Anduran combines the powers of the three Anduran artifacts.  It provides maximum luck and morale for your troops and gives you the Town Portal spell.") },
+	{ 0, 0, _("Crystal Ball"), _("The Crystal Ball lets you get more specific information about monsters, enemy heroes, and castles nearby the hero who holds it.") },
+	{ 0, 50, _("Heart of Fire"), _("The Heart of Fire provides 50 percent protection from fire, but doubles the damage taken from cold.") },
+	{ 0, 50, _("Heart of Ice"), _("The Heart of Ice provides 50 percent protection from cold, but doubles the damage taken from fire.") },
+	{ 0, 5, _("Helmet of Anduran"), _("The Helmet increases your spell power by 5.") },
+	{ 0, 5, _("Holy Hammer"), _("The Holy Hammer increases your attack skill by 5.") },
+	{ 0, 2, _("Legendary Scepter"), _("The Legendary Scepter adds 2 points to all attributes.") },
+	{ 0, 1, _("Masthead"), _("The Masthead boosts your luck and morale by 1 each in sea combat.") },
+	{ 0, 0, _("Sphere of Negation"), _("The Sphere of Negation disables all spell casting, for both sides, in combat.") },
+	{ 0, 5, _("Staff of Wizardry"), _("The Staff of Wizardry boosts your spell power by 5.") },
+	{ 0, 4, _("Sword Breaker"), _("The Sword Breaker increases your defense by 4 and attack by 1.") },
+	{ 0, 5, _("Sword of Anduran"), _("The Sword increases your attack skill by 5.") },
+	{ 0, 0, _("Spade of Necromancy"), _("The Spade gives you increased necromancy skill.") },
+
+	{ 0, 0, "Unknown", "Unknown" },
+};
+
+void Artifact::UpdateStats(const std::string & spec)
+{
+#ifdef WITH_XML
+    // parse artifacts.xml
+    TiXmlDocument doc;
+    const TiXmlElement* xml_artifacts = NULL;
+    artifactstats_t* ptr = &artifacts[0];
+
+    if(doc.LoadFile(spec.c_str()) &&
+        NULL != (xml_artifacts = doc.FirstChildElement("artifacts")))
+    {
+        const TiXmlElement* xml_artifact = xml_artifacts->FirstChildElement("artifact");
+        for(; xml_artifact; xml_artifact = xml_artifact->NextSiblingElement("artifact"))
+        {
+            int value;
+
+            xml_artifact->Attribute("disable", &value);
+            if(value) ptr->bits |= ART_DISABLED;
+
+            xml_artifact->Attribute("extra", &value);
+	    if(value) ptr->extra = value;
+
+            ++ptr;
+
+            // out of range
+            if((ptr - &artifacts[0]) >= UNKNOWN) break;
+        }
+    }
+    else
+    VERBOSE(spec << ": " << doc.ErrorDesc());
+#endif
+}
 
 Artifact::Artifact() : id(Artifact::UNKNOWN), ext(0)
 {
@@ -225,233 +265,186 @@ u8 Artifact::GetIndexSprite64(void) const
     return IndexSprite64(id);
 }
 
-Artifact::artifact_t Artifact::RandUltimate(void)
-{
-    switch(Rand::Get(1, 8))
-    {
-	case 1: return Artifact::ULTIMATE_BOOK;
-        case 2: return Artifact::ULTIMATE_SWORD;
-        case 3: return Artifact::ULTIMATE_CLOAK;
-        case 4: return Artifact::ULTIMATE_WAND;
-        case 5: return Artifact::ULTIMATE_SHIELD;
-        case 6: return Artifact::ULTIMATE_STAFF;
-        case 7: return Artifact::ULTIMATE_CROWN;
-	default: break;
-    }
-    return Artifact::GOLDEN_GOOSE;
-}
-
 /* get rand all artifact */
-Artifact::artifact_t Artifact::Rand(bool uniq)
+Artifact::artifact_t Artifact::Rand(level_t lvl)
 {
-    switch(Rand::Get(1, 3))
+    std::vector<artifact_t> v;
+    v.reserve(25);
+
+    // if possibly: make unique on map
+    for(u8 art = ULTIMATE_BOOK; art < UNKNOWN; ++art)
+        if((lvl & GetLevel(FromInt(art))) &&
+            !(artifacts[art].bits & ART_DISABLED) &&
+	    !(artifacts[art].bits & ART_RNDUSED)) v.push_back(FromInt(art));
+
+    //
+    if(v.empty())
     {
-	case 1: return Artifact::Rand1();
-	case 2: return Artifact::Rand2();
+	for(u8 art = ULTIMATE_BOOK; art < UNKNOWN; ++art)
+    	if((lvl & GetLevel(FromInt(art))) &&
+            !(artifacts[art].bits & ART_DISABLED)) v.push_back(FromInt(art));
+    }
+
+    artifact_t res = v.size() ? *Rand::Get(v) : Artifact::UNKNOWN;
+    artifacts[res].bits |= ART_RNDUSED;
+
+    return res;
+}
+
+u8 Artifact::GetLevelLoyalty(artifact_t art)
+{
+    switch(art)
+    {
+        case MASTHEAD:
+        case SPADE_NECROMANCY:
+        case CRYSTAL_BALL:
+	    return ART_LEVEL2;
+
+        case BREASTPLATE_ANDURAN:
+        case BATTLE_GARB:
+        case HELMET_ANDURAN:
+        case HOLY_HAMMER:
+        case LEGENDARY_SCEPTER:
+        case SPHERE_NEGATION:
+        case STAFF_WIZARDRY:
+        case SWORD_BREAKER:
+        case SWORD_ANDURAN:
+	    return ART_LEVEL3;
+
+	case SPELL_SCROLL:
+        case ARM_MARTYR:
+        case BROACH_SHIELDING:
+        case HEART_FIRE:
+        case HEART_ICE:
+	    return ART_NOLEVEL;
+
 	default: break;
     }
 
-    return Artifact::Rand3();
+    return ART_NONE;
 }
 
-/* get rand level 1 artifact */
-Artifact::artifact_t Artifact::Rand1(bool uniq)
+u8 Artifact::GetLevel(artifact_t art)
 {
-    std::vector<artifact_t> arts;
-    arts.reserve(27);
-
-    if(uniq)
+    switch(art)
     {
-        if(!used.test(MEDAL_VALOR)) arts.push_back(MEDAL_VALOR);
-        if(!used.test(MEDAL_COURAGE)) arts.push_back(MEDAL_COURAGE);
-        if(!used.test(MEDAL_HONOR)) arts.push_back(MEDAL_HONOR);
-        if(!used.test(MEDAL_DISTINCTION)) arts.push_back(MEDAL_DISTINCTION);
-        if(!used.test(THUNDER_MACE)) arts.push_back(THUNDER_MACE);
-        if(!used.test(ARMORED_GAUNTLETS)) arts.push_back(ARMORED_GAUNTLETS);
-        if(!used.test(DEFENDER_HELM)) arts.push_back(DEFENDER_HELM);
-        if(!used.test(GIANT_FLAIL)) arts.push_back(GIANT_FLAIL);
-        if(!used.test(RABBIT_FOOT)) arts.push_back(RABBIT_FOOT);
-        if(!used.test(GOLDEN_HORSESHOE)) arts.push_back(GOLDEN_HORSESHOE);
-        if(!used.test(GAMBLER_LUCKY_COIN)) arts.push_back(GAMBLER_LUCKY_COIN);
-        if(!used.test(FOUR_LEAF_CLOVER)) arts.push_back(FOUR_LEAF_CLOVER);
-        if(!used.test(ENCHANTED_HOURGLASS)) arts.push_back(ENCHANTED_HOURGLASS);
-        if(!used.test(ICE_CLOAK)) arts.push_back(ICE_CLOAK);
-        if(!used.test(FIRE_CLOAK)) arts.push_back(FIRE_CLOAK);
-        if(!used.test(LIGHTNING_HELM)) arts.push_back(LIGHTNING_HELM);
-        if(!used.test(SNAKE_RING)) arts.push_back(SNAKE_RING);
-        if(!used.test(HOLY_PENDANT)) arts.push_back(HOLY_PENDANT);
-        if(!used.test(PENDANT_FREE_WILL)) arts.push_back(PENDANT_FREE_WILL);
-        if(!used.test(PENDANT_LIFE)) arts.push_back(PENDANT_LIFE);
-        if(!used.test(PENDANT_DEATH)) arts.push_back(PENDANT_DEATH);
-        if(!used.test(GOLDEN_BOW)) arts.push_back(GOLDEN_BOW);
-        if(!used.test(TELESCOPE)) arts.push_back(TELESCOPE);
-        if(!used.test(SERENITY_PENDANT)) arts.push_back(SERENITY_PENDANT);
-        if(!used.test(STATESMAN_QUILL)) arts.push_back(STATESMAN_QUILL);
-        if(!used.test(KINETIC_PENDANT)) arts.push_back(KINETIC_PENDANT);
-	if(!used.test(SEEING_EYE_PENDANT)) arts.push_back(SEEING_EYE_PENDANT);
-    }
-    else
-    {
-        arts.push_back(MEDAL_VALOR);
-        arts.push_back(MEDAL_COURAGE);
-        arts.push_back(MEDAL_HONOR);
-        arts.push_back(MEDAL_DISTINCTION);
-        arts.push_back(THUNDER_MACE);
-        arts.push_back(ARMORED_GAUNTLETS);
-        arts.push_back(DEFENDER_HELM);
-        arts.push_back(GIANT_FLAIL);
-        arts.push_back(RABBIT_FOOT);
-        arts.push_back(GOLDEN_HORSESHOE);
-        arts.push_back(GAMBLER_LUCKY_COIN);
-        arts.push_back(FOUR_LEAF_CLOVER);
-        arts.push_back(ENCHANTED_HOURGLASS);
-        arts.push_back(ICE_CLOAK);
-        arts.push_back(FIRE_CLOAK);
-        arts.push_back(LIGHTNING_HELM);
-        arts.push_back(SNAKE_RING);
-        arts.push_back(HOLY_PENDANT);
-        arts.push_back(PENDANT_FREE_WILL);
-        arts.push_back(PENDANT_LIFE);
-        arts.push_back(PENDANT_DEATH);
-        arts.push_back(GOLDEN_BOW);
-        arts.push_back(TELESCOPE);
-        arts.push_back(SERENITY_PENDANT);
-        arts.push_back(STATESMAN_QUILL);
-        arts.push_back(KINETIC_PENDANT);
-	arts.push_back(SEEING_EYE_PENDANT);
-    }
+        case MEDAL_VALOR:
+        case MEDAL_COURAGE:
+        case MEDAL_HONOR:
+        case MEDAL_DISTINCTION:
+        case THUNDER_MACE:
+        case ARMORED_GAUNTLETS:
+        case DEFENDER_HELM:
+        case GIANT_FLAIL:
+        case RABBIT_FOOT:
+        case GOLDEN_HORSESHOE:
+        case GAMBLER_LUCKY_COIN:
+        case FOUR_LEAF_CLOVER:
+        case ENCHANTED_HOURGLASS:
+        case ICE_CLOAK:
+        case FIRE_CLOAK:
+        case LIGHTNING_HELM:
+        case SNAKE_RING:
+        case HOLY_PENDANT:
+        case PENDANT_FREE_WILL:
+        case PENDANT_LIFE:
+        case PENDANT_DEATH:
+        case GOLDEN_BOW:
+        case TELESCOPE:
+        case SERENITY_PENDANT:
+        case STATESMAN_QUILL:
+        case KINETIC_PENDANT:
+	case SEEING_EYE_PENDANT:
+	    return ART_LEVEL1;
 
-    if(arts.empty()) return Rand1(false);
-    const artifact_t res = *Rand::Get(arts);
-    used.set(res);
+        case CASTER_BRACELET:
+        case MAGE_RING:
+        case STEALTH_SHIELD:
+        case POWER_AXE:
+        case MINOR_SCROLL:
+        case ENDLESS_PURSE_GOLD:
+        case SAILORS_ASTROLABE_MOBILITY:
+        case ENDLESS_CORD_WOOD:
+        case ENDLESS_CART_ORE:
+        case SPIKED_HELM:
+        case WHITE_PEARL:
+        case EVIL_EYE:
+        case GOLD_WATCH:
+        case ANKH:
+        case BOOK_ELEMENTS:
+        case ELEMENTAL_RING:
+        case SKULLCAP:
+        case EVERCOLD_ICICLE:
+        case POWER_RING:
+        case AMMO_CART:
+        case EVERHOT_LAVA_ROCK:
+	    return ART_LEVEL2;
 
-    return res;
-}
+        case ARCANE_NECKLACE:
+        case WITCHES_BROACH:
+        case BALLISTA:
+        case DRAGON_SWORD:
+        case DIVINE_BREASTPLATE:
+        case MAJOR_SCROLL:
+        case SUPERIOR_SCROLL:
+        case FOREMOST_SCROLL:
+        case ENDLESS_SACK_GOLD:
+        case ENDLESS_BAG_GOLD:
+        case NOMAD_BOOTS_MOBILITY:
+        case TRAVELER_BOOTS_MOBILITY:
+        case TRUE_COMPASS_MOBILITY:
+        case ENDLESS_POUCH_SULFUR:
+        case ENDLESS_POUCH_GEMS:
+        case ENDLESS_POUCH_CRYSTAL:
+        case ENDLESS_VIAL_MERCURY:
+        case SPIKED_SHIELD:
+        case BLACK_PEARL:
+        case LIGHTNING_ROD:
+        case WAND_NEGATION:
+        case WIZARD_HAT:
+	    return ART_LEVEL3;
 
-/* get rand level 2 artifact */
-Artifact::artifact_t Artifact::Rand2(bool uniq)
-{
-    std::vector<artifact_t> arts;
-    arts.reserve(21);
+        case ULTIMATE_BOOK:
+        case ULTIMATE_SWORD:
+        case ULTIMATE_CLOAK:
+        case ULTIMATE_WAND:
+        case ULTIMATE_SHIELD:
+        case ULTIMATE_STAFF:
+        case ULTIMATE_CROWN:
+        case GOLDEN_GOOSE:
+	    return ART_ULTIMATE;
 
-    if(uniq)
-    {
-        if(!used.test(CASTER_BRACELET)) arts.push_back(CASTER_BRACELET);
-        if(!used.test(MAGE_RING)) arts.push_back(MAGE_RING);
-        if(!used.test(STEALTH_SHIELD)) arts.push_back(STEALTH_SHIELD);
-        if(!used.test(POWER_AXE)) arts.push_back(POWER_AXE);
-        if(!used.test(MINOR_SCROLL)) arts.push_back(MINOR_SCROLL);
-        if(!used.test(ENDLESS_PURSE_GOLD)) arts.push_back(ENDLESS_PURSE_GOLD);
-        if(!used.test(SAILORS_ASTROLABE_MOBILITY)) arts.push_back(SAILORS_ASTROLABE_MOBILITY);
-        if(!used.test(ENDLESS_CORD_WOOD)) arts.push_back(ENDLESS_CORD_WOOD);
-        if(!used.test(ENDLESS_CART_ORE)) arts.push_back(ENDLESS_CART_ORE);
-        if(!used.test(SPIKED_HELM)) arts.push_back(SPIKED_HELM);
-        if(!used.test(WHITE_PEARL)) arts.push_back(WHITE_PEARL);
-        if(!used.test(EVIL_EYE)) arts.push_back(EVIL_EYE);
-        if(!used.test(GOLD_WATCH)) arts.push_back(GOLD_WATCH);
-        if(!used.test(ANKH)) arts.push_back(ANKH);
-        if(!used.test(BOOK_ELEMENTS)) arts.push_back(BOOK_ELEMENTS);
-        if(!used.test(ELEMENTAL_RING)) arts.push_back(ELEMENTAL_RING);
-        if(!used.test(SKULLCAP)) arts.push_back(SKULLCAP);
-        if(!used.test(EVERCOLD_ICICLE)) arts.push_back(EVERCOLD_ICICLE);
-        if(!used.test(POWER_RING)) arts.push_back(POWER_RING);
-        if(!used.test(AMMO_CART)) arts.push_back(AMMO_CART);
-        if(!used.test(EVERHOT_LAVA_ROCK)) arts.push_back(EVERHOT_LAVA_ROCK);
-    }
-    else
-    {
-        arts.push_back(CASTER_BRACELET);
-        arts.push_back(MAGE_RING);
-        arts.push_back(STEALTH_SHIELD);
-        arts.push_back(POWER_AXE);
-        arts.push_back(MINOR_SCROLL);
-        arts.push_back(ENDLESS_PURSE_GOLD);
-        arts.push_back(SAILORS_ASTROLABE_MOBILITY);
-        arts.push_back(ENDLESS_CORD_WOOD);
-        arts.push_back(ENDLESS_CART_ORE);
-        arts.push_back(SPIKED_HELM);
-        arts.push_back(WHITE_PEARL);
-        arts.push_back(EVIL_EYE);
-        arts.push_back(GOLD_WATCH);
-        arts.push_back(ANKH);
-        arts.push_back(BOOK_ELEMENTS);
-        arts.push_back(ELEMENTAL_RING);
-        arts.push_back(SKULLCAP);
-        arts.push_back(EVERCOLD_ICICLE);
-        arts.push_back(POWER_RING);
-        arts.push_back(AMMO_CART);
-        arts.push_back(EVERHOT_LAVA_ROCK);
+	// no level
+	case MAGIC_BOOK:
+	case FIZBIN_MISFORTUNE:
+	case TAX_LIEN:
+	case HIDEOUS_MASK:
+	    return ART_NOLEVEL;
+
+	// price loyalty
+	case SPELL_SCROLL:
+        case ARM_MARTYR:
+        case BREASTPLATE_ANDURAN:
+        case BROACH_SHIELDING:
+        case BATTLE_GARB:
+        case CRYSTAL_BALL:
+        case HEART_FIRE:
+        case HEART_ICE:
+        case HELMET_ANDURAN:
+        case HOLY_HAMMER:
+        case LEGENDARY_SCEPTER:
+        case MASTHEAD:
+        case SPHERE_NEGATION:
+        case STAFF_WIZARDRY:
+        case SWORD_BREAKER:
+        case SWORD_ANDURAN:
+        case SPADE_NECROMANCY:
+	    return Settings::Get().PriceLoyaltyVersion() ? ART_LOYALTY | GetLevelLoyalty(art) : ART_LOYALTY;
+
+	default: break;
     }
 
-    if(arts.empty()) return Rand2(false);
-    const artifact_t res = *Rand::Get(arts);
-    used.set(res);
-
-    return res;
-}
-
-/* get rand level 3 artifact */
-Artifact::artifact_t Artifact::Rand3(bool uniq)
-{
-    std::vector<artifact_t> arts;
-    arts.reserve(22);
-
-    if(uniq)
-    {
-        if(!used.test(ARCANE_NECKLACE)) arts.push_back(ARCANE_NECKLACE);
-        if(!used.test(WITCHES_BROACH)) arts.push_back(WITCHES_BROACH);
-        if(!used.test(BALLISTA)) arts.push_back(BALLISTA);
-        if(!used.test(DRAGON_SWORD)) arts.push_back(DRAGON_SWORD);
-        if(!used.test(DIVINE_BREASTPLATE)) arts.push_back(DIVINE_BREASTPLATE);
-        if(!used.test(MAJOR_SCROLL)) arts.push_back(MAJOR_SCROLL);
-        if(!used.test(SUPERIOR_SCROLL)) arts.push_back(SUPERIOR_SCROLL);
-        if(!used.test(FOREMOST_SCROLL)) arts.push_back(FOREMOST_SCROLL);
-        if(!used.test(ENDLESS_SACK_GOLD)) arts.push_back(ENDLESS_SACK_GOLD);
-        if(!used.test(ENDLESS_BAG_GOLD)) arts.push_back(ENDLESS_BAG_GOLD);
-        if(!used.test(NOMAD_BOOTS_MOBILITY)) arts.push_back(NOMAD_BOOTS_MOBILITY);
-        if(!used.test(TRAVELER_BOOTS_MOBILITY)) arts.push_back(TRAVELER_BOOTS_MOBILITY);
-        if(!used.test(TRUE_COMPASS_MOBILITY)) arts.push_back(TRUE_COMPASS_MOBILITY);
-        if(!used.test(ENDLESS_POUCH_SULFUR)) arts.push_back(ENDLESS_POUCH_SULFUR);
-        if(!used.test(ENDLESS_POUCH_GEMS)) arts.push_back(ENDLESS_POUCH_GEMS);
-        if(!used.test(ENDLESS_POUCH_CRYSTAL)) arts.push_back(ENDLESS_POUCH_CRYSTAL);
-        if(!used.test(ENDLESS_VIAL_MERCURY)) arts.push_back(ENDLESS_VIAL_MERCURY);
-        if(!used.test(SPIKED_SHIELD)) arts.push_back(SPIKED_SHIELD);
-        if(!used.test(BLACK_PEARL)) arts.push_back(BLACK_PEARL);
-        if(!used.test(LIGHTNING_ROD)) arts.push_back(LIGHTNING_ROD);
-        if(!used.test(WAND_NEGATION)) arts.push_back(WAND_NEGATION);
-        if(!used.test(WIZARD_HAT)) arts.push_back(WIZARD_HAT);
-    }
-    else
-    {
-        arts.push_back(ARCANE_NECKLACE);
-        arts.push_back(WITCHES_BROACH);
-        arts.push_back(BALLISTA);
-        arts.push_back(DRAGON_SWORD);
-        arts.push_back(DIVINE_BREASTPLATE);
-        arts.push_back(MAJOR_SCROLL);
-        arts.push_back(SUPERIOR_SCROLL);
-        arts.push_back(FOREMOST_SCROLL);
-        arts.push_back(ENDLESS_SACK_GOLD);
-        arts.push_back(ENDLESS_BAG_GOLD);
-        arts.push_back(NOMAD_BOOTS_MOBILITY);
-        arts.push_back(TRAVELER_BOOTS_MOBILITY);
-        arts.push_back(TRUE_COMPASS_MOBILITY);
-        arts.push_back(ENDLESS_POUCH_SULFUR);
-        arts.push_back(ENDLESS_POUCH_GEMS);
-        arts.push_back(ENDLESS_POUCH_CRYSTAL);
-        arts.push_back(ENDLESS_VIAL_MERCURY);
-        arts.push_back(SPIKED_SHIELD);
-        arts.push_back(BLACK_PEARL);
-        arts.push_back(LIGHTNING_ROD);
-        arts.push_back(WAND_NEGATION);
-        arts.push_back(WIZARD_HAT);
-    }
-
-    if(arts.empty()) return Rand3(false);
-    const artifact_t res = *Rand::Get(arts);
-    used.set(res);
-
-    return res;
+    return ART_NONE;
 }
 
 const char* Artifact::GetName(artifact_t a)
@@ -462,6 +455,21 @@ const char* Artifact::GetName(artifact_t a)
 const char* Artifact::GetDescription(artifact_t a)
 {
     return _(artifacts[a].description);
+}
+
+u8 Artifact::GetExtraValue(artifact_t a)
+{
+    return artifacts[a].extra;
+}
+
+u8 Artifact::GetExt(void) const
+{
+    return ext;
+}
+
+void Artifact::SetExt(u8 v)
+{
+    ext = v;
 }
 
 Artifact::artifact_t Artifact::FromInt(u16 index)
@@ -475,15 +483,15 @@ Artifact::artifact_t Artifact::FromIndexSprite(u8 index)
     else
     if(Settings::Get().PriceLoyaltyVersion() && 0xAB < index && 0xCE > index) return Artifact::FromInt((index - 1)/2);
     else
-    if(0xA3 == index) return Artifact::Rand();
+    if(0xA3 == index) return Rand(ART_LEVEL123);
     else
-    if(0xA4 == index) return Artifact::RandUltimate();
+    if(0xA4 == index) return Rand(ART_ULTIMATE);
     else
-    if(0xA7 == index) return Artifact::Rand1();
+    if(0xA7 == index) return Rand(ART_LEVEL1);
     else
-    if(0xA9 == index) return Artifact::Rand2();
+    if(0xA9 == index) return Rand(ART_LEVEL2);
     else
-    if(0xAB == index) return Artifact::Rand3();
+    if(0xAB == index) return Rand(ART_LEVEL3);
     else
 	DEBUG(DBG_GAME , DBG_WARN, "Artifact::FromIndexSprite: unknown: " << static_cast<int>(index));
 
@@ -631,16 +639,6 @@ u8 Artifact::IndexSprite64(Artifact::artifact_t a)
     return a + 1;
 }
 
-void Artifact::SetExt(u8 v)
-{
-    ext = v;
-}
-
-u8 Artifact::GetExt(void) const
-{
-    return ext;
-}
-
 const char* Artifact::GetScenario(artifact_t art)
 {
     switch(art)
@@ -668,3 +666,4 @@ const char* Artifact::GetScenario(artifact_t art)
 
     return NULL;
 }
+

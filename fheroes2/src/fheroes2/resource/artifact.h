@@ -27,6 +27,18 @@
 class Artifact
 {
 public:
+    enum level_t
+    {
+	ART_NONE	= 0,
+	ART_LEVEL1	= 0x01,
+	ART_LEVEL2	= 0x02,
+	ART_LEVEL3	= 0x04,
+	ART_LEVEL123	= ART_LEVEL1|ART_LEVEL2|ART_LEVEL3,
+	ART_ULTIMATE	= 0x08,
+	ART_LOYALTY	= 0x10,
+	ART_NOLEVEL	= 0x20
+    };
+
     enum artifact_t
     {
 	ULTIMATE_BOOK,
@@ -165,11 +177,10 @@ public:
     void SetExt(u8);
     u8 GetExt(void) const;
 
-    static artifact_t RandUltimate(void);
-    static artifact_t Rand(bool uniq = true);
-    static artifact_t Rand1(bool uniq = true);
-    static artifact_t Rand2(bool uniq = true);
-    static artifact_t Rand3(bool uniq = true);
+    static artifact_t Rand(level_t);
+    static u8 GetLevel(artifact_t);
+    static u8 GetLevelLoyalty(artifact_t);
+    static u8 GetExtraValue(artifact_t);
 
     static const char* GetName(artifact_t);
     static const char* GetDescription(artifact_t);
@@ -186,9 +197,11 @@ public:
 
     static const char* GetScenario(artifact_t);
 
+    static void UpdateStats(const std::string &);
+
 private:
     artifact_t id;
-    u8 ext; /* spell for scrolls, and other */
+    u8 ext;
 };
 
 #endif

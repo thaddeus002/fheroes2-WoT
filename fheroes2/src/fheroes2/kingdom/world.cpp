@@ -994,7 +994,7 @@ void World::LoadMaps(const std::string &filename)
 	{
 	    const s32 pos = *Rand::Get(pools);
 	    ultimate_artifact = pos;
-	    vec_tiles[pos]->SetQuantity1(Artifact::RandUltimate());
+	    vec_tiles[pos]->SetQuantity1(Artifact::Rand(Artifact::ART_ULTIMATE));
 	}
     }
 
