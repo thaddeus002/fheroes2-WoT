@@ -197,6 +197,34 @@ void RedrawIcons(const Castle & castle, const CastleHeroes & heroes, const Point
     }
 }
 
+u32 GetMageGuildBuilding(const Castle & castle)
+{
+    switch(castle.GetLevelMageGuild())
+    {
+	case 1: return BUILD_MAGEGUILD1;
+	case 2: return BUILD_MAGEGUILD2;
+	case 3: return BUILD_MAGEGUILD3;
+	case 4: return BUILD_MAGEGUILD4;
+	case 5: return BUILD_MAGEGUILD5;
+	default: break;
+    }
+    return BUILD_NOTHING;
+}
+
+const Rect* GetMageGuildCoord(const Castle & castle, const CastleDialog::CacheBuildings & cacheBuildings)
+{
+    switch(castle.GetLevelMageGuild())
+    {
+	case 1: return &cacheBuildings.GetRect(BUILD_MAGEGUILD1);
+	case 2: return &cacheBuildings.GetRect(BUILD_MAGEGUILD2);
+	case 3: return &cacheBuildings.GetRect(BUILD_MAGEGUILD3);
+	case 4: return &cacheBuildings.GetRect(BUILD_MAGEGUILD4);
+	case 5: return &cacheBuildings.GetRect(BUILD_MAGEGUILD5);
+	default: break;
+    }
+    return NULL;
+}
+
 Dialog::answer_t Castle::OpenDialog(bool readonly, bool fade)
 {
     Settings & conf = Settings::Get();
@@ -330,17 +358,14 @@ Dialog::answer_t Castle::OpenDialog(bool readonly, bool fade)
     const Rect & coordBuildingCastle = cacheBuildings.GetRect(BUILD_CASTLE);
     const Rect & coordBuildingCaptain = cacheBuildings.GetRect(BUILD_CAPTAIN);
     const Rect & coordBuildingTent = cacheBuildings.GetRect(BUILD_TENT);
-    const Rect coordMageGuild1 = cacheBuildings.GetRect(BUILD_MAGEGUILD1);
-    const Rect coordMageGuild2 = cacheBuildings.GetRect(BUILD_MAGEGUILD2);
-    const Rect coordMageGuild3 = cacheBuildings.GetRect(BUILD_MAGEGUILD3);
-    const Rect coordMageGuild4 = cacheBuildings.GetRect(BUILD_MAGEGUILD4);
-    const Rect coordMageGuild5 = cacheBuildings.GetRect(BUILD_MAGEGUILD5);
     const Rect & coordDwellingMonster1 = cacheBuildings.GetRect(DWELLING_MONSTER1);
     const Rect & coordDwellingMonster2 = cacheBuildings.GetRect(DWELLING_MONSTER2);
     const Rect & coordDwellingMonster3 = cacheBuildings.GetRect(DWELLING_MONSTER3);
     const Rect & coordDwellingMonster4 = cacheBuildings.GetRect(DWELLING_MONSTER4);
     const Rect & coordDwellingMonster5 = cacheBuildings.GetRect(DWELLING_MONSTER5);
     const Rect & coordDwellingMonster6 = cacheBuildings.GetRect(DWELLING_MONSTER6);
+
+    const Rect*	coordMageGuild = GetMageGuildCoord(*this, cacheBuildings);
 
     // update extra description
     payment_t profit;
@@ -614,6 +639,9 @@ Dialog::answer_t Castle::OpenDialog(bool readonly, bool fade)
 
 		cursor.Show();
 		display.Flip();
+
+		// update mage guild coord
+		coordMageGuild = GetMageGuildCoord(*this, cacheBuildings);
 	    }
 
 	    if(heroes.Guest())
@@ -696,8 +724,7 @@ Dialog::answer_t Castle::OpenDialog(bool readonly, bool fade)
 	    Dialog::Message(GetStringBuilding(BUILD_CAPTAIN), GetDescriptionBuilding(BUILD_CAPTAIN), Font::BIG, Dialog::OK);
 	else
 	// left click mage guild
-	if((building & BUILD_MAGEGUILD) &&
-	    le.MouseClickLeft(coordMageGuild5))
+	if(coordMageGuild && le.MouseClickLeft(*coordMageGuild))
 	{
 		// buy spell book
 		if(!heroes.Guest() || heroes.Guest()->HasArtifact(Artifact::MAGIC_BOOK))
@@ -772,8 +799,9 @@ Dialog::answer_t Castle::OpenDialog(bool readonly, bool fade)
 	if(building & BUILD_CAPTAIN && le.MousePressRight(coordBuildingCaptain)) Dialog::Message(GetStringBuilding(BUILD_CAPTAIN), GetDescriptionBuilding(BUILD_CAPTAIN), Font::BIG);
 	else
 	// right press mage guild
-	if(building & BUILD_MAGEGUILD &&
-	    le.MousePressRight(coordMageGuild5)) Dialog::Message(GetStringBuilding(BUILD_MAGEGUILD1), GetDescriptionBuilding(BUILD_MAGEGUILD1), Font::BIG);
+	if(coordMageGuild &&
+	    le.MousePressRight(*coordMageGuild))
+		Dialog::Message(GetStringBuilding(GetMageGuildBuilding(*this)), GetDescriptionBuilding(GetMageGuildBuilding(*this)), Font::BIG);
 	else
 	// right press dwelling monster
 	if(building & DWELLING_MONSTER1 && le.MousePressRight(coordDwellingMonster1))
@@ -849,15 +877,7 @@ Dialog::answer_t Castle::OpenDialog(bool readonly, bool fade)
 	if(building & BUILD_CAPTAIN && le.MouseCursor(coordBuildingCaptain)) statusBar.ShowMessage(GetStringBuilding(BUILD_CAPTAIN));
 	else
 	// mage guild
-	if(building & BUILD_MAGEGUILD5 && le.MouseCursor(coordMageGuild5)) statusBar.ShowMessage(GetStringBuilding(BUILD_MAGEGUILD5));
-	else
-	if(building & BUILD_MAGEGUILD4 && le.MouseCursor(coordMageGuild4)) statusBar.ShowMessage(GetStringBuilding(BUILD_MAGEGUILD4));
-	else
-	if(building & BUILD_MAGEGUILD3 && le.MouseCursor(coordMageGuild3)) statusBar.ShowMessage(GetStringBuilding(BUILD_MAGEGUILD3));
-	else
-	if(building & BUILD_MAGEGUILD2 && le.MouseCursor(coordMageGuild2)) statusBar.ShowMessage(GetStringBuilding(BUILD_MAGEGUILD2));
-	else
-	if(building & BUILD_MAGEGUILD1 && le.MouseCursor(coordMageGuild1)) statusBar.ShowMessage(GetStringBuilding(BUILD_MAGEGUILD1));
+	if(coordMageGuild && le.MouseCursor(*coordMageGuild)) statusBar.ShowMessage(GetStringBuilding(GetMageGuildBuilding(*this)));
 	else
 	// dwelling monster
 	if(building & DWELLING_MONSTER1 && le.MouseCursor(coordDwellingMonster1)) statusBar.ShowMessage(Monster(race, DWELLING_MONSTER1).GetName());

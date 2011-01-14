@@ -226,7 +226,7 @@ namespace CastleDialog
     struct CacheBuildings : std::vector<builds_t>
     {
 	CacheBuildings(const Castle &, const Point &);
-	const Rect & GetRect(building_t);
+	const Rect & GetRect(building_t) const;
     };
 
     void RedrawAllBuilding(const Castle &, const Point &, const CacheBuildings &, u32 flash = BUILD_NOTHING);

@@ -60,9 +60,9 @@ CastleDialog::CacheBuildings::CacheBuildings(const Castle & castle, const Point 
     }
 }
 
-const Rect & CastleDialog::CacheBuildings::GetRect(building_t b)
+const Rect & CastleDialog::CacheBuildings::GetRect(building_t b) const
 {
-    iterator it = std::find(begin(), end(), b);
+    const_iterator it = std::find(begin(), end(), b);
     return (*it).coord;
 }
 
