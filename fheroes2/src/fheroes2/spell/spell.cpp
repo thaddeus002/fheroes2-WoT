@@ -303,7 +303,7 @@ u8 Spell::CostManaPoints(spell_t spell, const HeroBase* hero)
 
 u8 Spell::Level(u8 spell)
 {
-    return spell > STONE ? spells[spell].lvl : 0;
+    return spell < STONE ? spells[spell].lvl : 0;
 }
 
 bool Spell::isCombat(u8 spell)
@@ -453,30 +453,27 @@ const char* Spell::GetDescription(spell_t spell)
     return _(spells[spell].description);
 }
 
-Spell::spell_t Spell::RandCombat(u8 lvl)
+Spell::spell_t Spell::Rand(u8 lvl, bool adv)
 {
     std::vector<spell_t> v;
     v.reserve(15);
 
     for(u8 sp = NONE; sp < STONE; ++sp)
-	if(isCombat(sp) &&
+	if((adv && !isCombat(sp) || (!adv && isCombat(sp))) &&
 	    lvl == spells[sp].lvl &&
 	    !(spells[sp].bits & SP_DISABLE)) v.push_back(static_cast<spell_t>(sp));
 
     return v.size() ? *Rand::Get(v) : Spell::NONE;
 }
 
+Spell::spell_t Spell::RandCombat(u8 lvl)
+{
+    return Rand(lvl, false);
+}
+
 Spell::spell_t Spell::RandAdventure(u8 lvl)
 {
-    std::vector<spell_t> v;
-    v.reserve(10);
-
-    for(u8 sp = NONE; sp < STONE; ++sp)
-	if(!isCombat(sp) &&
-	    lvl == spells[sp].lvl &&
-	    !(spells[sp].bits & SP_DISABLE)) v.push_back(static_cast<spell_t>(sp));
-
-    return v.size() ? *Rand::Get(v) : Spell::NONE;
+    return Rand(lvl, true);
 }
 
 bool Spell::isMindInfluence(u8 spell)

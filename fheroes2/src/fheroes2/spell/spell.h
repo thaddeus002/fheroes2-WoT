@@ -164,6 +164,7 @@ public:
 
     static spell_t RandCombat(u8);
     static spell_t RandAdventure(u8);
+    static spell_t Rand(u8, bool adv);
 
     static void UpdateStats(const std::string &);
     static u8 CalculateDimensionDoorDistance(u8 current_sp, u32 total_hp);
