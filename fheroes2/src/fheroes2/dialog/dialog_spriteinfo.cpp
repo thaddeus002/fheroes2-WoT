@@ -26,6 +26,16 @@
 #include "button.h"
 #include "dialog.h"
 
+u16 Dialog::ArtifactInfo(const std::string & hdr, const std::string & msg, const Artifact::artifact_t art, const u16 buttons)
+{
+    const Sprite & border = AGG::GetICN(ICN::RESOURCE, 7);
+    const Sprite & artifact = AGG::GetICN(ICN::ARTIFACT, Artifact::IndexSprite64(art));
+    Surface image(border.w(), border.h());
+    image.Blit(border);
+    image.Blit(artifact, 5, 5);
+    return Dialog::SpriteInfo(hdr, msg, image, buttons);
+}
+
 u16 Dialog::SpriteInfo(const std::string &header, const std::string &message, const Surface & sprite, u16 buttons)
 {
     Display & display = Display::Get();

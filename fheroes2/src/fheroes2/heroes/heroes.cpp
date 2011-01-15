@@ -44,7 +44,6 @@
 #include "ai.h"
 
 // heroes_action.cpp
-u16 DialogWithArtifact(const std::string & hdr, const std::string & msg, const Artifact::artifact_t art, const u16 buttons = Dialog::OK);
 void PlayPickupSound(void);
 
 const char* HeroesName(Heroes::heroes_t id)
@@ -1008,7 +1007,7 @@ bool Heroes::PickupArtifact(const Artifact & art)
     else
     if(conf.ExtHeroPickupArtifactWithInfoDialog() &&
        conf.MyColor() == color)
-	DialogWithArtifact(art.GetName(), Artifact::GetDescription(art), art());
+	Dialog::ArtifactInfo(art.GetName(), Artifact::GetDescription(art), art());
 
     // check: anduran garb
     if(HasArtifact(Artifact::BREASTPLATE_ANDURAN) &&
@@ -1025,7 +1024,7 @@ bool Heroes::PickupArtifact(const Artifact & art)
 	*it = Artifact::BATTLE_GARB;
 
 	if(conf.MyColor() == color)
-	    DialogWithArtifact("", _("The three Anduran artifacts magically combine into one."), Artifact::BATTLE_GARB);
+	    Dialog::ArtifactInfo("", _("The three Anduran artifacts magically combine into one."), Artifact::BATTLE_GARB);
     }
 
     return true;

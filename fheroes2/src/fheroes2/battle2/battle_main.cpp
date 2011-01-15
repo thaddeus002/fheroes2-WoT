@@ -36,7 +36,6 @@
 #include "localclient.h"
 #include "battle2.h"
 
-u16 DialogWithArtifact(const std::string &, const std::string &, const Artifact::artifact_t, const u16 = Dialog::OK);
 void PlayPickupSound(void);
 
 namespace Battle2
@@ -201,7 +200,7 @@ void Battle2::PickupArtifactsAction(HeroBase & hero1, HeroBase & hero2, bool loc
         	if(local)
 		{
 		    PlayPickupSound();
-		    DialogWithArtifact(_("You have captured an enemy artifact!"), art.GetName(), art());
+		    Dialog::ArtifactInfo(_("You have captured an enemy artifact!"), art.GetName(), art());
 		}
     	    }
     	    art = Artifact::UNKNOWN;

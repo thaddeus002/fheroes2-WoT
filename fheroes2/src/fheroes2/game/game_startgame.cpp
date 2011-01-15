@@ -49,9 +49,6 @@
 #include "localclient.h"
 #include "ai.h"
 
-// heroes_action.cpp
-u16 DialogWithArtifact(const std::string & hdr, const std::string & msg, const Artifact::artifact_t art, const u16 buttons = Dialog::OK);
-
 namespace Game
 {
     Cursor::themes_t GetCursor(const s32);
@@ -1077,7 +1074,7 @@ bool Game::DiggingForArtifacts(const Heroes & hero)
 	    const_cast<Heroes &>(hero).PickupArtifact(ultimate());
 	    std::string msg(_("After spending many hours digging here, you have uncovered the "));
 	    msg.append(ultimate.GetName());
-	    DialogWithArtifact(_("Congratulations!"), msg, ultimate());
+	    Dialog::ArtifactInfo(_("Congratulations!"), msg, ultimate());
 	}
 	else
 	    Dialog::Message("", _("Nothing here. Where could it be?"), Font::BIG, Dialog::OK);
