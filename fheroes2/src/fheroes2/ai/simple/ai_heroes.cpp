@@ -1620,7 +1620,7 @@ void AIToBoat(Heroes &hero, const u8 obj, const s32 dst_index)
 	it = coasts.begin(); it != coasts.end(); ++it) hero.SetVisited(*it);
 
     hero.ResetMovePoints();
-    MoveHero2Dest(hero, dst_index, MP2::OBJ_COAST, MP2::OBJ_ZERO);
+    MoveHero2Dest(hero, dst_index, hero.GetUnderObject(), MP2::OBJ_ZERO);
     hero.SetShipMaster(true);
 
     AIHeroes::Get(hero).ClearTasks();

@@ -839,7 +839,7 @@ void ActionToBoat(Heroes &hero, const u8 obj, const s32 dst_index)
     hero.GetPath().Hide();
     hero.FadeOut();
     hero.ResetMovePoints();
-    MoveHero2Dest(hero, dst_index, MP2::OBJ_COAST, MP2::OBJ_ZERO);
+    MoveHero2Dest(hero, dst_index, hero.GetUnderObject(), MP2::OBJ_ZERO);
     hero.SetShipMaster(true);
 
     hero.GetPath().Reset();
