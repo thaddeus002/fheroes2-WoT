@@ -216,7 +216,7 @@ public:
     void Scoute(void);
     u8   GetScoute(void) const;
     bool CanScouteTile(s32) const;
-    u8   GetVisionsDistance(void) const;
+    u16  GetVisionsDistance(void) const;
 
     bool isShipMaster(void) const;
     bool CanPassToShipMaster(const Heroes &) const;

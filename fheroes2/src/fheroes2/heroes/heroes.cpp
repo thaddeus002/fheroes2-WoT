@@ -1004,10 +1004,12 @@ bool Heroes::PickupArtifact(const Artifact & art)
 
 	SpellBookActivate();
     }
+/*
     else
     if(conf.ExtHeroPickupArtifactWithInfoDialog() &&
        conf.MyColor() == color)
 	Dialog::ArtifactInfo(art.GetName(), Artifact::GetDescription(art), art());
+*/
 
     // check: anduran garb
     if(HasArtifact(Artifact::BREASTPLATE_ANDURAN) &&
@@ -1312,9 +1314,9 @@ u8 Heroes::GetScoute(void) const
 	Game::GetViewDistance(Game::VIEW_HEROES) + GetSecondaryValues(Skill::Secondary::SCOUTING);
 }
 
-u8 Heroes::GetVisionsDistance(void) const
+u16 Heroes::GetVisionsDistance(void) const
 {
-    u8 dist = Spell::GetExtraValue(Spell::VISIONS);
+    u16 dist = Spell::GetExtraValue(Spell::VISIONS);
 
     if(HasArtifact(Artifact::CRYSTAL_BALL))
         dist = Settings::Get().UseAltResource() ? dist * 2 + 2 : 8;
@@ -1700,17 +1702,53 @@ u8 Heroes::GetSquarePatrol(void) const
     return patrol_square;
 }
 
-bool Heroes::CanScouteTile(s32 index) const
+bool Heroes::CanScouteTile(s32 dst) const
 {
-    if(Settings::Get().ExtScouteExtended())
+    bool army_info = false;
+
+    switch(world.GetTiles(dst).GetObject())
     {
-	const Maps::Tiles & tile = world.GetTiles(index);
-
-	u8 dist = GetSecondaryValues(Skill::Secondary::SCOUTING) ? GetScoute() : 0;
-	if(Modes(VISIONS) && dist < GetVisionsDistance()) dist = GetVisionsDistance();
-
-	return (dist > Maps::GetApproximateDistance(GetIndex(), tile.GetIndex()));
+	case MP2::OBJ_MONSTER:
+	case MP2::OBJ_CASTLE:
+	case MP2::OBJ_HEROES:
+	    army_info = true;
+	default: break;
     }
+
+    if(army_info)
+    {
+	// depends from distance
+	if(Maps::GetApproximateDistance(GetIndex(), dst) <= GetVisionsDistance())
+	{
+	    // check crystal ball
+	    if(HasArtifact(Artifact::CRYSTAL_BALL))
+		return true;
+
+	    // check scouting expert
+	    if(Skill::Level::EXPERT == GetSecondaryValues(Skill::Secondary::SCOUTING))
+		return true;
+	}
+	else
+	{
+	    // check spell identify hero
+	    if(world.GetKingdom(GetColor()).Modes(Kingdom::IDENTIFYHERO) &&
+		MP2::OBJ_HEROES == world.GetTiles(dst).GetObject())
+		return true;
+	}
+    }
+    else
+    {
+	if(Settings::Get().ExtScouteExtended())
+	{
+	    const Maps::Tiles & tile = world.GetTiles(dst);
+
+	    u16 dist = GetSecondaryValues(Skill::Secondary::SCOUTING) ? GetScoute() : 0;
+	    if(Modes(VISIONS) && dist < GetVisionsDistance()) dist = GetVisionsDistance();
+
+	    return (dist > Maps::GetApproximateDistance(GetIndex(), dst));
+	}
+    }
+
     return false;
 }
 
@@ -1777,3 +1815,4 @@ void Heroes::Dump(void) const
 
     VERBOSE("");
 }
+

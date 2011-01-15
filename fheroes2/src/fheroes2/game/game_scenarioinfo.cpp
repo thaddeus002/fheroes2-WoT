@@ -335,7 +335,8 @@ Game::menu_t Game::ScenarioInfo(void)
 
     if(result == STARTGAME)
     {
-	if(Settings::Get().ExtUseFade()) display.Fade();
+	conf.SetMyColor(Color::GRAY);
+	if(conf.ExtUseFade()) display.Fade();
 	Game::ShowLoadMapsText();
 	// Load maps
 	world.LoadMaps(conf.MapsFile());

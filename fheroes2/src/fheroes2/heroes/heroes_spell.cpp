@@ -452,7 +452,7 @@ bool ActionSpellVisions(Heroes & hero)
 {
     std::vector<s32> monsters;
 
-    const u8 dist = hero.GetVisionsDistance();
+    const u16 dist = hero.GetVisionsDistance();
 
     if(Maps::ScanDistanceObject(hero.GetIndex(), MP2::OBJ_MONSTER, dist, monsters))
     {
