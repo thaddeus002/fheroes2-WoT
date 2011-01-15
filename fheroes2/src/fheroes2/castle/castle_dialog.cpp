@@ -65,6 +65,12 @@ bool AllowFlashBuilding(u32 build)
 	case BUILD_MAGEGUILD4:
 	case BUILD_MAGEGUILD5:
 	case BUILD_TENT:
+	case DWELLING_UPGRADE2:
+	case DWELLING_UPGRADE3:
+	case DWELLING_UPGRADE4:
+	case DWELLING_UPGRADE5:
+	case DWELLING_UPGRADE6:
+	case DWELLING_UPGRADE7:
 	case DWELLING_MONSTER1:
 	case DWELLING_MONSTER2:
 	case DWELLING_MONSTER3:
@@ -104,6 +110,7 @@ building_t GetCurrentFlash(const Castle & castle, CastleDialog::CacheBuildings &
 
 
     for(it = cache.begin(); it != cache.end(); ++it)
+    {
 	if(castle.isBuild((*it).id) && ((*it).coord & le.GetMouseCursor()) &&
 		AllowFlashBuilding((*it).id))
 	{
@@ -118,9 +125,11 @@ building_t GetCurrentFlash(const Castle & castle, CastleDialog::CacheBuildings &
 	    }
 	    break;
 	}
+    }
 
     if(it != cache.end())
     {
+
 	flash = (*it).id;
 
 	if(! (*it).contour.isValid())
