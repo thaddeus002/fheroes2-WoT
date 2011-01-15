@@ -160,7 +160,6 @@ public:
     artifact_t GetID(void) const;
 
     const char* GetName(void) const;
-    const char* GetDescription(void) const;
 
     void Set(artifact_t);
 
@@ -183,7 +182,7 @@ public:
     static u16 GetExtraValue(artifact_t);
 
     static const char* GetName(artifact_t);
-    static const char* GetDescription(artifact_t);
+    static std::string GetDescription(const Artifact &);
 
     static artifact_t FromInt(u16);
     static artifact_t FromIndexSprite(u8);

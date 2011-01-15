@@ -130,6 +130,7 @@ public:
 	UNIONS_ALLOW_CASTLE_VISITING	= 0x20002000,
 	UNIONS_ALLOW_VIEW_MAPS		= 0x20004000,
 	HEROES_AUTO_MOVE_BATTLE_DST	= 0x20008000,
+	HEROES_PICKUP_ARTIFACT_INFO	= 0x20010000,
 	CASTLE_ALLOW_FLASH_BUILDING	= 0x20040000,
 	CASTLE_ALLOW_GUARDIANS		= 0x20080000,
 	CASTLE_ALLOW_BUY_FROM_WELL	= 0x20100000,
@@ -251,6 +252,7 @@ public:
     bool ExtHeroRecalculateMovement(void) const;
     bool ExtHeroPatrolAllowPickup(void) const;
     bool ExtHeroAutoMove2BattleTarget(void) const;
+    bool ExtHeroPickupArtifactWithInfoDialog(void) const;
     bool ExtUnionsAllowCastleVisiting(void) const;
     bool ExtUnionsAllowHeroesMeetings(void) const;
     bool ExtUnionsAllowViewMaps(void) const;

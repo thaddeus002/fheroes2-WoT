@@ -24,6 +24,7 @@
 #include <vector>
 #include "settings.h"
 #include "world.h"
+#include "spell.h"
 #include "artifact.h"
 
 #ifdef WITH_XML
@@ -255,9 +256,21 @@ const char* Artifact::GetName(void) const
     return GetName(id);
 }
 
-const char* Artifact::GetDescription(void) const
+const char* Artifact::GetName(artifact_t a)
 {
-    return GetDescription(id);
+    return _(artifacts[a].name);
+}
+
+std::string Artifact::GetDescription(const Artifact & art)
+{
+    std::string str = _(artifacts[art()].description);
+
+    if(art == Artifact::SPELL_SCROLL)
+        String::Replace(str, "%{spell}", Spell::GetName(Spell::FromInt(art.GetExt())));
+    else
+        String::Replace(str, "%{count}", Artifact::GetExtraValue(art()));
+
+    return str;
 }
 
 bool Artifact::isUltimate(void) const
@@ -478,16 +491,6 @@ u8 Artifact::GetLevel(artifact_t art)
     }
 
     return ART_NONE;
-}
-
-const char* Artifact::GetName(artifact_t a)
-{
-    return _(artifacts[a].name);
-}
-
-const char* Artifact::GetDescription(artifact_t a)
-{
-    return _(artifacts[a].description);
 }
 
 u16 Artifact::GetExtraValue(artifact_t a)

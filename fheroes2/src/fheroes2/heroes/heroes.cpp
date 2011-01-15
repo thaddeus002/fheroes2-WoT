@@ -982,11 +982,12 @@ bool Heroes::PickupArtifact(const Artifact::artifact_t art)
 
 bool Heroes::PickupArtifact(const Artifact & art)
 {
+    const Settings & conf = Settings::Get();
     BagArtifacts::iterator it = std::find(bag_artifacts.begin(), bag_artifacts.end(), Artifact::UNKNOWN);
 
     if(bag_artifacts.end() == it)
     {
-	if(Settings::Get().MyColor() == color)
+	if(conf.MyColor() == color)
 	{
 	    art == Artifact::MAGIC_BOOK ?
 	    Dialog::Message("", _("You must purchase a spell book to use the mage guild, but you currently have no room for a spell book. Try giving one of your artifacts to another hero."), Font::BIG, Dialog::OK) :
@@ -1004,6 +1005,10 @@ bool Heroes::PickupArtifact(const Artifact & art)
 
 	SpellBookActivate();
     }
+    else
+    if(conf.ExtHeroPickupArtifactWithInfoDialog() &&
+       conf.MyColor() == color)
+	DialogWithArtifact(art.GetName(), Artifact::GetDescription(art), art());
 
     // check: anduran garb
     if(HasArtifact(Artifact::BREASTPLATE_ANDURAN) &&
@@ -1019,7 +1024,7 @@ bool Heroes::PickupArtifact(const Artifact & art)
 	it = std::find(bag_artifacts.begin(), bag_artifacts.end(), Artifact::UNKNOWN);
 	*it = Artifact::BATTLE_GARB;
 
-	if(Settings::Get().MyColor() == color)
+	if(conf.MyColor() == color)
 	    DialogWithArtifact("", _("The three Anduran artifacts magically combine into one."), Artifact::BATTLE_GARB);
     }
 

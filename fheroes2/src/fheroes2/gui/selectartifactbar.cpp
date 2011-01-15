@@ -41,18 +41,6 @@ enum
     FLAGS_USEART32	= 0x02
 };
 
-std::string ArtifactDescription(const Artifact & art)
-{
-    std::string str = art.GetDescription();
-
-    if(art == Artifact::SPELL_SCROLL)
-	String::Replace(str, "%{spell}", Spell::GetName(Spell::FromInt(art.GetExt())));
-    else
-	String::Replace(str, "%{count}", Artifact::GetExtraValue(art()));
-
-    return str;
-}
-
 SelectArtifactsBar::SelectArtifactsBar(Heroes &h) : hero(h), interval(0), selected(-1), flags(0), background(NULL)
 {
 }
@@ -255,7 +243,7 @@ bool SelectArtifactsBar::QueueEventProcessing(SelectArtifactsBar & bar)
 		if(art1 == Artifact::MAGIC_BOOK)
 		    bar.hero.OpenSpellBook(SpellBook::ALL, false);
 		else
-		    Dialog::Message(art1.GetName(), ArtifactDescription(art1), Font::BIG, Dialog::OK);
+		    Dialog::Message(art1.GetName(), Artifact::GetDescription(art1), Font::BIG, Dialog::OK);
 	    }
 	    // exchange
 	    else
@@ -285,7 +273,7 @@ bool SelectArtifactsBar::QueueEventProcessing(SelectArtifactsBar & bar)
         bar.Reset();
 	// show quick info
 	if(art1 != Artifact::UNKNOWN)
-	    Dialog::Message(art1.GetName(), ArtifactDescription(art1), Font::BIG);
+	    Dialog::Message(art1.GetName(), Artifact::GetDescription(art1), Font::BIG);
     }
 
     Cursor::Get().Show();
@@ -345,7 +333,7 @@ bool SelectArtifactsBar::QueueEventProcessing(SelectArtifactsBar & bar1, SelectA
 	if(le.MousePressRight(bar2.GetArea()))
 	{
 	    bar1.Reset();
-	    Dialog::Message(art2.GetName(), ArtifactDescription(art2), Font::BIG);
+	    Dialog::Message(art2.GetName(), Artifact::GetDescription(art2), Font::BIG);
 	}
 
 	Cursor::Get().Show();
@@ -390,7 +378,7 @@ bool SelectArtifactsBar::QueueEventProcessing(SelectArtifactsBar & bar1, SelectA
 	if(le.MousePressRight(bar1.GetArea()))
 	{
 	    bar2.Reset();
-	    Dialog::Message(art1.GetName(), ArtifactDescription(art1), Font::BIG);
+	    Dialog::Message(art1.GetName(), Artifact::GetDescription(art1), Font::BIG);
 	}
 
 	Cursor::Get().Show();
