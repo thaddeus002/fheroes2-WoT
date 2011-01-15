@@ -116,6 +116,13 @@ static skillvalues_t _skillvalues[] = {
     { NULL,          {  0,  0,  0} },
 };
 
+static secondary_t _from_witchs_hut = {
+    /* archery */   1, /* ballistics */ 1, /* diplomacy */ 1, /* eagleeye */    1,
+    /* estates */   1, /* leadership */ 0, /* logistics */ 1, /* luck */        1,
+    /* mysticism */ 1, /* navigation */ 1, /* necromancy*/ 0, /* pathfinding */ 1,
+    /* scouting */  1, /* wisdom */ 1
+};
+
 const skillstats_t* GetSkillStats(u8 race)
 {
     const char* id = NULL;
@@ -242,6 +249,10 @@ void Skill::UpdateStats(const std::string & spec)
 		++ptr2;
 	    }
 	}
+
+	const TiXmlElement* xml_witchs_hut = xml_skills->FirstChildElement("witchs_hut");
+	if(xml_witchs_hut)
+	    LoadSecondarySection(xml_witchs_hut, _from_witchs_hut);
     }
     else
     VERBOSE(spec << ": " << doc.ErrorDesc());
@@ -436,25 +447,25 @@ Skill::Secondary::skill_t Skill::Secondary::FromMP2(const u8 byte)
 
 Skill::Secondary::skill_t Skill::Secondary::RandForWitchsHut(void)
 {
-    switch(Rand::Get(11))
-    {
-	case 0:		return PATHFINDING;
-        case 1:		return ARCHERY;
-        case 2:		return LOGISTICS;
-        case 3:		return SCOUTING;
-        case 4:		return DIPLOMACY;
-        case 5:		return NAVIGATION;
-        case 6:		return WISDOM;
-        case 7:		return MYSTICISM;
-        case 8:		return LUCK;
-        case 9:		return BALLISTICS;
-        case 10:	return EAGLEEYE;
-        case 11:	return ESTATES;
+    std::vector<skill_t> v;
+    v.reserve(14);
 
-        default: break;
-    }
+    if(_from_witchs_hut.archery) v.push_back(ARCHERY);
+    if(_from_witchs_hut.ballistics) v.push_back(BALLISTICS);
+    if(_from_witchs_hut.diplomacy) v.push_back(DIPLOMACY);
+    if(_from_witchs_hut.eagleeye) v.push_back(EAGLEEYE);
+    if(_from_witchs_hut.estates) v.push_back(ESTATES);
+    if(_from_witchs_hut.leadership) v.push_back(LEADERSHIP);
+    if(_from_witchs_hut.logistics) v.push_back(LOGISTICS);
+    if(_from_witchs_hut.luck) v.push_back(LUCK);
+    if(_from_witchs_hut.mysticism) v.push_back(MYSTICISM);
+    if(_from_witchs_hut.navigation) v.push_back(NAVIGATION);
+    if(_from_witchs_hut.necromancy) v.push_back(NECROMANCY);
+    if(_from_witchs_hut.pathfinding) v.push_back(PATHFINDING);
+    if(_from_witchs_hut.scouting) v.push_back(SCOUTING);
+    if(_from_witchs_hut.wisdom) v.push_back(WISDOM);
 
-    return UNKNOWN;
+    return v.empty() ? UNKNOWN : *Rand::Get(v);
 }
 
 /* index sprite from SECSKILL */

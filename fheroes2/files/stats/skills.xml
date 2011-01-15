@@ -47,7 +47,7 @@
    </over>
   </primary>
   <secondary>
-   <!--         total sum: 32 -->
+   <!--         total sum: 32, and disable: 0 -->
    <knight      archery="2" ballistics="4" diplomacy="3" eagleeye="1" estates="3" leadership="5" logistics="3" luck="1" mysticism="1" navigation="2" necromancy="0" pathfinding="3" scouting="2" wisdom="2" />
    <barbarian   archery="3" ballistics="3" diplomacy="2" eagleeye="1" estates="2" leadership="3" logistics="3" luck="2" mysticism="1" navigation="3" necromancy="0" pathfinding="4" scouting="4" wisdom="1" />
    <sorceress   archery="3" ballistics="3" diplomacy="2" eagleeye="2" estates="2" leadership="1" logistics="2" luck="3" mysticism="3" navigation="4" necromancy="0" pathfinding="2" scouting="1" wisdom="4" />
@@ -56,6 +56,8 @@
    <necromancer archery="1" ballistics="3" diplomacy="2" eagleeye="3" estates="2" leadership="0" logistics="2" luck="1" mysticism="3" navigation="2" necromancy="5" pathfinding="3" scouting="1" wisdom="4" />
   </secondary>
  </maturity>
+
+ <witch_huts archery="1" ballistics="1" diplomacy="1" eagleeye="1" estates="1" leadership="0" logistics="1" luck="1" mysticism="1" navigation="1" necromancy="0" pathfinding="1" scouting="1" wisdom="1" />
 
  <secondary>
 <!--
