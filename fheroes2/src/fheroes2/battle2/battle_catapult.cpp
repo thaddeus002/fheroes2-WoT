@@ -55,7 +55,7 @@ Battle2::Catapult::Catapult(const HeroBase & hero, bool fortification, Arena & a
 	default: break;
     }
 
-    if(hero.HasArtifact(Artifact::BALLISTA)) cat_shots += 1;
+    if(hero.HasArtifact(Artifact::BALLISTA)) cat_shots += Artifact::GetExtraValue(Artifact::BALLISTA);
 }
 
 u8 Battle2::Catapult::GetShots(void) const

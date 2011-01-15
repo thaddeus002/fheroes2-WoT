@@ -20,9 +20,9 @@
  <endless_sack_gold gold="1000" />
  <endless_bag_gold gold="750" />
  <endless_purse_gold gold="500" />
- <endless_cord_wood wood="2" />
+ <endless_cord_wood wood="1" />
  <endless_vial_mercury mercury="1" />
- <endless_cart_ore ore="2" />
+ <endless_cart_ore ore="1" />
  <endless_pouch_sulfur sulfur="1" />
  <endless_pouch_crystal crystal="1" />
  <endless_pouch_gems gems="1" />

@@ -1,5 +1,5 @@
 <?xml version="1.0" ?>
-<spells>
+<artifacts>
 
  <!-- disable: artifact not used in game (only for random artifact), extra: extended value -->
 
@@ -17,57 +17,57 @@
  <artifact extra="6" />
  <!-- Ultimate Crown, extra: increase basic skills -->
  <artifact extra="4" />
- <!-- Golden Goose, extra: increase income *1000 gold -->
- <artifact extra="10" />
- <!-- Arcane Necklace of Magic -->
+ <!-- Golden Goose, see profits.xml -->
  <artifact />
- <!-- Caster's Bracelet of Magic -->
- <artifact />
- <!-- Mage's Ring of Power -->
- <artifact />
- <!-- Witch's Broach of Magic -->
- <artifact />
- <!-- Medal of Valor -->
- <artifact />
- <!-- Medal of Courage -->
- <artifact />
- <!-- Medal of Honor -->
- <artifact />
- <!-- Medal of Distinction -->
- <artifact />
- <!-- Fizbin of Misfortune -->
- <artifact />
- <!-- Thunder Mace of Dominion -->
- <artifact />
- <!-- Armored Gauntlets of Protection -->
- <artifact />
- <!-- Defender Helm of Protection -->
- <artifact />
- <!-- Giant Flail of Dominion -->
- <artifact />
+ <!-- Arcane Necklace of Magic, extra: increase power -->
+ <artifact extra="4" />
+ <!-- Caster's Bracelet of Magic, extra: increase power -->
+ <artifact extra="2" />
+ <!-- Mage's Ring of Power, extra: increase power -->
+ <artifact extra="2" />
+ <!-- Witch's Broach of Magic, extra: increase power -->
+ <artifact extra="3" />
+ <!-- Medal of Valor, extra: increase morale -->
+ <artifact extra="1" />
+ <!-- Medal of Courage, extra: increase morale -->
+ <artifact extra="1" />
+ <!-- Medal of Honor, extra: increase morale -->
+ <artifact extra="1" />
+ <!-- Medal of Distinction, extra: increase morale -->
+ <artifact extra="1" />
+ <!-- Fizbin of Misfortune, extra: decrease morale -->
+ <artifact extra="2" />
+ <!-- Thunder Mace of Dominion, extra: increase attack -->
+ <artifact extra="1" />
+ <!-- Armored Gauntlets of Protection, extra: increase defense -->
+ <artifact extra="1" />
+ <!-- Defender Helm of Protection, extra: increase defense -->
+ <artifact extra="1" />
+ <!-- Giant Flail of Dominion, extra: increase attack -->
+ <artifact extra="1" />
  <!-- Ballista of Quickness -->
  <artifact />
- <!-- Stealth Shield of Protection -->
+ <!-- Stealth Shield of Protection, extra: increase defense -->
+ <artifact extra="2" />
+ <!-- Dragon Sword of Dominion, extra: increase attack -->
+ <artifact extra="3" />
+ <!-- Power Axe of Dominion, extra: increase attack -->
+ <artifact extra="2" />
+ <!-- Divine Breastplate of Protection, extra: increase defense -->
+ <artifact extra="3" />
+ <!-- Minor Scroll of Knowledge, extra: increase knowledge -->
+ <artifact extra="2" />
+ <!-- Major Scroll of Knowledge, extra: increase knowledge -->
+ <artifact extra="3" />
+ <!-- Superior Scroll of Knowledge, extra: increase knowledge -->
+ <artifact extra="4" />
+ <!-- Foremost Scroll of Knowledge, extra: increase knowledge -->
+ <artifact extra="5" />
+ <!-- Endless Sack of Gold, see profits.xml -->
  <artifact />
- <!-- Dragon Sword of Dominion -->
+ <!-- Endless Bag of Gold, see profits.xml -->
  <artifact />
- <!-- Power Axe of Dominion -->
- <artifact />
- <!-- Divine Breastplate of Protection -->
- <artifact />
- <!-- Minor Scroll of Knowledge -->
- <artifact />
- <!-- Major Scroll of Knowledge -->
- <artifact />
- <!-- Superior Scroll of Knowledge -->
- <artifact />
- <!-- Foremost Scroll of Knowledge -->
- <artifact />
- <!-- Endless Sack of Gold -->
- <artifact />
- <!-- Endless Bag of Gold -->
- <artifact />
- <!-- Endless Purse of Gold -->
+ <!-- Endless Purse of Gold, see profits.xml -->
  <artifact />
  <!-- Nomad Boots of Mobility -->
  <artifact />
@@ -87,8 +87,8 @@
  <artifact />
  <!-- Evil Eye -->
  <artifact />
- <!-- Enchanted Hourglass -->
- <artifact />
+ <!-- Enchanted Hourglass, extra: extends the duration -->
+ <artifact extra="2" />
  <!-- Gold Watch -->
  <artifact />
  <!-- Skullcap -->
@@ -99,12 +99,12 @@
  <artifact />
  <!-- Lightning Helm -->
  <artifact />
- <!-- Evercold Icicle -->
- <artifact />
- <!-- Everhot Lava Rock -->
- <artifact />
- <!-- Lightning Rod -->
- <artifact />
+ <!-- Evercold Icicle, extra: increase cold spells damage -->
+ <artifact extra="50" />
+ <!-- Everhot Lava Rock, extra: increase fire spells damage  -->
+ <artifact extra="50" />
+ <!-- Lightning Rod, extra: increase lightning spells damage  -->
+ <artifact extra="50" />
  <!-- Snake-Ring -->
  <artifact />
  <!-- Ankh -->
@@ -131,40 +131,40 @@
  <artifact />
  <!-- Golden Bow -->
  <artifact />
- <!-- Telescope -->
+ <!-- Telescope, see globals.xml -->
  <artifact />
- <!-- Statesman's Quill -->
- <artifact />
- <!-- Wizard's Hat -->
- <artifact />
- <!-- Power Ring -->
- <artifact />
+ <!-- Statesman's Quill, extra: reduces the cost of surrender -->
+ <artifact extra="10" />
+ <!-- Wizard's Hat, extra: increases the duration -->
+ <artifact extra="10" />
+ <!-- Power Ring, extra: restore power points/day -->
+ <artifact extra="2" />
  <!-- Ammo Cart -->
  <artifact />
- <!-- Tax Lien -->
+ <!-- Tax Lien, see profits.xml -->
  <artifact />
  <!-- Hideous Mask -->
  <artifact />
- <!-- Endless Pouch of Sulfur -->
+ <!-- Endless Pouch of Sulfur, see profits.xml -->
  <artifact />
- <!-- Endless Vial of Mercury -->
+ <!-- Endless Vial of Mercury, see profits.xml -->
  <artifact />
- <!-- Endless Pouch of Gems -->
+ <!-- Endless Pouch of Gems, see profits.xml -->
  <artifact />
- <!-- Endless Cord of Wood -->
+ <!-- Endless Cord of Wood, see profits.xml -->
  <artifact />
- <!-- Endless Cart of Ore -->
+ <!-- Endless Cart of Ore, see profits.xml -->
  <artifact />
- <!-- Endless Pouch of Crystal -->
+ <!-- Endless Pouch of Crystal, see profits.xml -->
  <artifact />
- <!-- Spiked Helm -->
- <artifact />
- <!-- Spiked Shield -->
- <artifact />
- <!-- White Pearl -->
- <artifact />
- <!-- Black Pearl -->
- <artifact />
+ <!-- Spiked Helm, extra: increases attack and defense -->
+ <artifact extra="1" />
+ <!-- Spiked Shield, extra: increases attack and defense -->
+ <artifact extra="2" />
+ <!-- White Pearl, extra: increases power and knowledge -->
+ <artifact extra="1" />
+ <!-- Black Pearl, extra: increases power and knowledge -->
+ <artifact extra="2" />
  <!-- Magic Book -->
  <artifact />
  <!-- Dummy 1 -->
@@ -177,37 +177,37 @@
  <artifact />
  <!-- Spell Scroll -->
  <artifact />
- <!-- Arm of the Martyr -->
- <artifact />
- <!-- Breastplate of Anduran -->
- <artifact />
- <!-- Broach of Shielding -->
- <artifact />
- <!-- Battle Garb of Anduran -->
- <artifact />
+ <!-- Arm of the Martyr, extra: increase power -->
+ <artifact extra="3" />
+ <!-- Breastplate of Anduran, extra: increase defense -->
+ <artifact extra="5" />
+ <!-- Broach of Shielding, extra: armageddon protection percent -->
+ <artifact extra="50" />
+ <!-- Battle Garb of Anduran, extra: increase basic skills -->
+ <artifact extra="5" />
  <!-- Crystal Ball -->
  <artifact />
- <!-- Heart of Fire -->
- <artifact />
- <!-- Heart of Ice -->
- <artifact />
- <!-- Helmet of Anduran -->
- <artifact />
- <!-- Holy Hammer -->
- <artifact />
- <!-- Legendary Scepter -->
- <artifact />
- <!-- Masthead -->
- <artifact />
+ <!-- Heart of Fire, extra: fire protection percent -->
+ <artifact extra="50" />
+ <!-- Heart of Ice, extra: cold protection percent -->
+ <artifact extra="50" />
+ <!-- Helmet of Anduran, extra: increase power -->
+ <artifact extra="5" />
+ <!-- Holy Hammer, extra: increase attack -->
+ <artifact extra="5" />
+ <!-- Legendary Scepter, extra: increase basic skills -->
+ <artifact extra="2" />
+ <!-- Masthead, extra: increase luck and morale -->
+ <artifact extra="1" />
  <!-- Sphere of Negation -->
  <artifact />
- <!-- Staff of Wizardry -->
- <artifact />
- <!-- Sword Breaker -->
- <artifact />
- <!-- Sword of Anduran -->
- <artifact />
+ <!-- Staff of Wizardry, extra: increase power -->
+ <artifact extra="5" />
+ <!-- Sword Breaker, extra: increase defense -->
+ <artifact extra="4" />
+ <!-- Sword of Anduran, extra: increase attack -->
+ <artifact extra="5" />
  <!-- Spade of Necromancy -->
  <artifact />
 
-<artifacts/>
+</artifacts>

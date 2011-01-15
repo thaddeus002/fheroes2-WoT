@@ -41,39 +41,39 @@ struct artifactstats_t
 };
 
 artifactstats_t artifacts[] = {
-	{ 0,12, _("Ultimate Book of Knowledge"), _("The Ultimate Book of Knowledge increases your knowledge by 12.") },
-	{ 0,12, _("Ultimate Sword of Dominion"), _("The Ultimate Sword of Dominion increases your attack skill by 12.") },
-	{ 0,12, _("Ultimate Cloak of Protection"), _("The Ultimate Cloak of Protection increases your defense skill by 12.") },
-	{ 0,12, _("Ultimate Wand of Magic"), _("The Ultimate Wand of Magic increases your spell power by 12.") },
-	{ 0, 6, _("Ultimate Shield"), _("The Ultimate Shield increases your attack and defense skills by 6 each.") },
-	{ 0, 6, _("Ultimate Staff"), _("The Ultimate Staff increases your spell power and knowledge by 6 each.") },
-	{ 0, 4, _("Ultimate Crown"), _("The Ultimate Crown increases each of your basic skills by 4 points.") },
-	{ 0,10, _("Golden Goose"), _("The Golden Goose brings in an income of 10,000 gold per turn.") },
-	{ 0, 4, _("Arcane Necklace of Magic"), _("The Arcane Necklace of Magic increases your spell power by 4.") },
-	{ 0, 2, _("Caster's Bracelet of Magic"), _("The Caster's Bracelet of Magic increases your spell power by 2.") },
-	{ 0, 2, _("Mage's Ring of Power"), _("The Mage's Ring of Power increases your spell power by 2.") },
-	{ 0, 3, _("Witch's Broach of Magic"), _("The Witch's Broach of Magic increases your spell power by 3.") },
+	{ 0,12, _("Ultimate Book of Knowledge"), _("The Ultimate Book of Knowledge increases your knowledge by %{count}.") },
+	{ 0,12, _("Ultimate Sword of Dominion"), _("The Ultimate Sword of Dominion increases your attack skill by %{count}.") },
+	{ 0,12, _("Ultimate Cloak of Protection"), _("The Ultimate Cloak of Protection increases your defense skill by %{count}.") },
+	{ 0,12, _("Ultimate Wand of Magic"), _("The Ultimate Wand of Magic increases your spell power by %{count}.") },
+	{ 0, 6, _("Ultimate Shield"), _("The Ultimate Shield increases your attack and defense skills by %{count} each.") },
+	{ 0, 6, _("Ultimate Staff"), _("The Ultimate Staff increases your spell power and knowledge by %{count} each.") },
+	{ 0, 4, _("Ultimate Crown"), _("The Ultimate Crown increases each of your basic skills by %{count} points.") },
+	{ 0,10, _("Golden Goose"), _("The Golden Goose brings in an income of %{count} gold per turn.") },
+	{ 0, 4, _("Arcane Necklace of Magic"), _("The Arcane Necklace of Magic increases your spell power by %{count}.") },
+	{ 0, 2, _("Caster's Bracelet of Magic"), _("The Caster's Bracelet of Magic increases your spell power by %{count}.") },
+	{ 0, 2, _("Mage's Ring of Power"), _("The Mage's Ring of Power increases your spell power by %{count}.") },
+	{ 0, 3, _("Witch's Broach of Magic"), _("The Witch's Broach of Magic increases your spell power by %{count}.") },
 	{ 0, 1, _("Medal of Valor"), _("The Medal of Valor increases your morale.") },
 	{ 0, 1, _("Medal of Courage"), _("The Medal of Courage increases your morale.") },
 	{ 0, 1, _("Medal of Honor"), _("The Medal of Honor increases your morale.") },
 	{ 0, 1, _("Medal of Distinction"), _("The Medal of Distinction increases your morale.") },
-	{ 0, 1, _("Fizbin of Misfortune"), _("The Fizbin of Misfortune greatly decreases your morale.") },
-	{ 0, 1, _("Thunder Mace of Dominion"), _("The Thunder Mace of Dominion increases your attack skill by 1.") },
-	{ 0, 1, _("Armored Gauntlets of Protection"), _("The Armored Gauntlets of Protection increase your defense skill by 1.") },
-	{ 0, 1, _("Defender Helm of Protection"), _("The Defender Helm of Protection increases your defense skill by 1.") },
-	{ 0, 1, _("Giant Flail of Dominion"), _("The Giant Flail of Dominion increases your attack skill by 1.") },
+	{ 0, 2, _("Fizbin of Misfortune"), _("The Fizbin of Misfortune greatly decreases your morale.") },
+	{ 0, 1, _("Thunder Mace of Dominion"), _("The Thunder Mace of Dominion increases your attack skill by %{count}.") },
+	{ 0, 1, _("Armored Gauntlets of Protection"), _("The Armored Gauntlets of Protection increase your defense skill by %{count}.") },
+	{ 0, 1, _("Defender Helm of Protection"), _("The Defender Helm of Protection increases your defense skill by %{count}.") },
+	{ 0, 1, _("Giant Flail of Dominion"), _("The Giant Flail of Dominion increases your attack skill by %{count}.") },
 	{ 0, 2, _("Ballista of Quickness"), _("The Ballista of Quickness lets your catapult fire twice per combat round.") },
-	{ 0, 2, _("Stealth Shield of Protection"), _("The Stealth Shield of Protection increases your defense skill by 2.") },
-	{ 0, 3, _("Dragon Sword of Dominion"), _("The Dragon Sword of Dominion increases your attack skill by 3.") },
-	{ 0, 2, _("Power Axe of Dominion"), _("The Power Axe of Dominion increases your attack skill by 2.") },
-	{ 0, 3, _("Divine Breastplate of Protection"), _("The Divine Breastplate of Protection increases your defense skill by 3.") },
-	{ 0, 2, _("Minor Scroll of Knowledge"), _("The Minor Scroll of Knowledge increases your knowledge by 2.") },
-	{ 0, 3, _("Major Scroll of Knowledge"), _("The Major Scroll of Knowledge increases your knowledge by 3.") },
-	{ 0, 4, _("Superior Scroll of Knowledge"), _("The Superior Scroll of Knowledge increases your knowledge by 4.") },
-	{ 0, 5, _("Foremost Scroll of Knowledge"), _("The Foremost Scroll of Knowledge increases your knowledge by 5.") },
-	{ 0, 100, _("Endless Sack of Gold"), _("The Endless Sack of Gold provides you with 1000 gold per day.") },
-	{ 0, 75, _("Endless Bag of Gold"), _("The Endless Bag of Gold provides you with 750 gold per day.") },
-	{ 0, 50, _("Endless Purse of Gold"), _("The Endless Purse of Gold provides you with 500 gold per day.") },
+	{ 0, 2, _("Stealth Shield of Protection"), _("The Stealth Shield of Protection increases your defense skill by %{count}.") },
+	{ 0, 3, _("Dragon Sword of Dominion"), _("The Dragon Sword of Dominion increases your attack skill by %{count}.") },
+	{ 0, 2, _("Power Axe of Dominion"), _("The Power Axe of Dominion increases your attack skill by %{count}.") },
+	{ 0, 3, _("Divine Breastplate of Protection"), _("The Divine Breastplate of Protection increases your defense skill by %{count}.") },
+	{ 0, 2, _("Minor Scroll of Knowledge"), _("The Minor Scroll of Knowledge increases your knowledge by %{count}.") },
+	{ 0, 3, _("Major Scroll of Knowledge"), _("The Major Scroll of Knowledge increases your knowledge by %{count}.") },
+	{ 0, 4, _("Superior Scroll of Knowledge"), _("The Superior Scroll of Knowledge increases your knowledge by %{count}.") },
+	{ 0, 5, _("Foremost Scroll of Knowledge"), _("The Foremost Scroll of Knowledge increases your knowledge by %{count}.") },
+	{ 0, 100, _("Endless Sack of Gold"), _("The Endless Sack of Gold provides you with %{count} gold per day.") },
+	{ 0, 75, _("Endless Bag of Gold"), _("The Endless Bag of Gold provides you with %{count} gold per day.") },
+	{ 0, 50, _("Endless Purse of Gold"), _("The Endless Purse of Gold provides you with %{count} gold per day.") },
 	{ 0, 0, _("Nomad Boots of Mobility"), _("The Nomad Boots of Mobility increase your movement on land.") },
 	{ 0, 0, _("Traveler's Boots of Mobility"), _("The Traveler's Boots of Mobility increase your movement on land.") },
 	{ 0, 1, _("Lucky Rabbit's Foot"), _("The Lucky Rabbit's Foot increases your luck in combat.") },
@@ -83,15 +83,15 @@ artifactstats_t artifacts[] = {
 	{ 0, 0, _("True Compass of Mobility"), _("The True Compass of Mobility increases your movement on land and sea.") },
 	{ 0, 0, _("Sailor's Astrolabe of Mobility"), _("The Sailors' Astrolabe of Mobility increases your movement on sea.") },
 	{ 0, 0, _("Evil Eye"), _("The Evil Eye reduces the casting cost of curse spells by half.") },
-	{ 0, 2, _("Enchanted Hourglass"), _("The Enchanted Hourglass extends the duration of all your spells by 2 turns.") },
+	{ 0, 2, _("Enchanted Hourglass"), _("The Enchanted Hourglass extends the duration of all your spells by %{count} turns.") },
 	{ 0, 0, _("Gold Watch"), _("The Gold Watch doubles the effectiveness of your hypnotize spells.") },
 	{ 0, 0, _("Skullcap"), _("The Skullcap halves the casting cost of all mind influencing spells.") },
 	{ 0, 0, _("Ice Cloak"), _("The Ice Cloak halves all damage your troops take from cold spells.") },
 	{ 0, 0, _("Fire Cloak"), _("The Fire Cloak halves all damage your troops take from fire spells.") },
 	{ 0, 0, _("Lightning Helm"), _("The Lightning Helm halves all damage your troops take from lightning spells.") },
-	{ 0, 50, _("Evercold Icicle"), _("The Evercold Icicle causes your cold spells to do 50 percent more damage to enemy troops.") },
-	{ 0, 50, _("Everhot Lava Rock"), _("The Everhot Lava Rock causes your fire spells to do 50 percent more damage to enemy troops.") },
-	{ 0, 50, _("Lightning Rod"), _("The Lightning Rod causes your lightning spells to do 50 percent more damage to enemy troops.") },
+	{ 0, 50, _("Evercold Icicle"), _("The Evercold Icicle causes your cold spells to do %{count} percent more damage to enemy troops.") },
+	{ 0, 50, _("Everhot Lava Rock"), _("The Everhot Lava Rock causes your fire spells to do %{count} percent more damage to enemy troops.") },
+	{ 0, 50, _("Lightning Rod"), _("The Lightning Rod causes your lightning spells to do %{count} percent more damage to enemy troops.") },
 	{ 0, 0, _("Snake-Ring"), _("The Snake Ring halves the casting cost of all your bless spells.") },
 	{ 0, 0, _("Ankh"), _("The Ankh doubles the effectiveness of all your resurrect and animate spells.") },
 	{ 0, 0, _("Book of Elements"), _("The Book of Elements doubles the effectiveness of all your summoning spells.") },
@@ -104,24 +104,24 @@ artifactstats_t artifacts[] = {
 	{ 0, 0, _("Kinetic Pendant"), _("The Kinetic Pendant makes all your troops immune to paralyze spells.") },
 	{ 0, 0, _("Pendant of Death"), _("The Pendant of Death makes all your troops immune to holy spells.") },
 	{ 0, 0, _("Wand of Negation"), _("The Wand of Negation protects your troops from the Dispel Magic spell.") },
-	{ 0, 50, _("Golden Bow"), _("The Golden Bow eliminates the 50 percent penalty for your troops shooting past obstacles. (e.g. castle walls)") },
-	{ 0, 1, _("Telescope"), _("The Telescope increases the amount of terrain your hero reveals when adventuring by 1 extra square.") },
-	{ 0, 10, _("Statesman's Quill"), _("The Statesman's Quill reduces the cost of surrender to 10 percent of the total cost of troops you have in your army.") },
-	{ 0, 10, _("Wizard's Hat"), _("The Wizard's Hat increases the duration of your spells by 10 turns!") },
-	{ 0, 2, _("Power Ring"), _("The Power Ring returns 2 extra power points/turn to your hero.") },
+	{ 0, 50, _("Golden Bow"), _("The Golden Bow eliminates the %{count} percent penalty for your troops shooting past obstacles. (e.g. castle walls)") },
+	{ 0, 1, _("Telescope"), _("The Telescope increases the amount of terrain your hero reveals when adventuring by %{count} extra square.") },
+	{ 0, 10, _("Statesman's Quill"), _("The Statesman's Quill reduces the cost of surrender to %{count} percent of the total cost of troops you have in your army.") },
+	{ 0, 10, _("Wizard's Hat"), _("The Wizard's Hat increases the duration of your spells by %{count} turns!") },
+	{ 0, 2, _("Power Ring"), _("The Power Ring returns %{count} extra power points/turn to your hero.") },
 	{ 0, 0, _("Ammo Cart"), _("The Ammo Cart provides endless ammunition for all your troops that shoot.") },
-	{ 0, 25, _("Tax Lien"), _("The Tax Lien costs you 250 gold pieces/turn.") },
+	{ 0, 25, _("Tax Lien"), _("The Tax Lien costs you %{count} gold pieces/turn.") },
 	{ 0, 0, _("Hideous Mask"), _("The Hideous Mask prevents all 'wandering' armies from joining your hero.") },
-	{ 0, 1, _("Endless Pouch of Sulfur"), _("The Endless Pouch of Sulfur provides 1 unit of sulfur per day.") },
-	{ 0, 1, _("Endless Vial of Mercury"), _("The Endless Vial of Mercury provides 1 unit of mercury per day.") },
-	{ 0, 1, _("Endless Pouch of Gems"), _("The Endless Pouch of Gems provides 1 unit of gems per day.") },
-	{ 0, 1, _("Endless Cord of Wood"), _("The Endless Cord of Wood provides 1 unit of wood per day.") },
-	{ 0, 1, _("Endless Cart of Ore"), _("The Endless Cart of Ore provides 1 unit of ore per day.") },
-	{ 0, 1, _("Endless Pouch of Crystal"), _("The Endless Pouch of Crystal provides 1 unit of crystal/day.") },
-	{ 0, 1, _("Spiked Helm"), _("The Spiked Helm increases your attack and defense skills by 1 each.") },
-	{ 0, 2, _("Spiked Shield"), _("The Spiked Shield increases your attack and defense skills by 2 each.") },
-	{ 0, 1, _("White Pearl"), _("The White Pearl increases your spell power and knowledge by 1 each.") },
-	{ 0, 2, _("Black Pearl"), _("The Black Pearl increases your spell power and knowledge by 2 each.") },
+	{ 0, 1, _("Endless Pouch of Sulfur"), _("The Endless Pouch of Sulfur provides %{count} unit of sulfur per day.") },
+	{ 0, 1, _("Endless Vial of Mercury"), _("The Endless Vial of Mercury provides %{count} unit of mercury per day.") },
+	{ 0, 1, _("Endless Pouch of Gems"), _("The Endless Pouch of Gems provides %{count} unit of gems per day.") },
+	{ 0, 1, _("Endless Cord of Wood"), _("The Endless Cord of Wood provides %{count} unit of wood per day.") },
+	{ 0, 1, _("Endless Cart of Ore"), _("The Endless Cart of Ore provides %{count} unit of ore per day.") },
+	{ 0, 1, _("Endless Pouch of Crystal"), _("The Endless Pouch of Crystal provides %{count} unit of crystal/day.") },
+	{ 0, 1, _("Spiked Helm"), _("The Spiked Helm increases your attack and defense skills by %{count} each.") },
+	{ 0, 2, _("Spiked Shield"), _("The Spiked Shield increases your attack and defense skills by %{count} each.") },
+	{ 0, 1, _("White Pearl"), _("The White Pearl increases your spell power and knowledge by %{count} each.") },
+	{ 0, 2, _("Black Pearl"), _("The Black Pearl increases your spell power and knowledge by %{count} each.") },
 
 	{ 0, 0, _("Magic Book"), _("The Magic Book enables you to cast spells.") },
 
@@ -131,29 +131,60 @@ artifactstats_t artifacts[] = {
 	{ 0, 0, "Dummy 4", "The reserved artifact." },
 
 	{ 0, 0, _("Spell Scroll"), _("This Spell Scroll gives your hero the ability to cast the %{spell} spell.") },
-	{ 0, 3, _("Arm of the Martyr"), _("The Arm of the Martyr increases your spell power by 3 but adds the undead morale penalty.") },
-	{ 0, 5, _("Breastplate of Anduran"), _("The Breastplate increases your defense by 5.") },
-	{ 0, 50, _("Broach of Shielding"), _("The Broach of Shielding provides 50 percent protection from Armageddon and Elemental Storm, but decreases spell power by 2.") },
-	{ 0, 0, _("Battle Garb of Anduran"), _("The Battle Garb of Anduran combines the powers of the three Anduran artifacts.  It provides maximum luck and morale for your troops and gives you the Town Portal spell.") },
+	{ 0, 3, _("Arm of the Martyr"), _("The Arm of the Martyr increases your spell power by %{count} but adds the undead morale penalty.") },
+	{ 0, 5, _("Breastplate of Anduran"), _("The Breastplate increases your defense by %{count}.") },
+	{ 0, 50, _("Broach of Shielding"), _("The Broach of Shielding provides %{count} percent protection from Armageddon and Elemental Storm, but decreases spell power by 2.") },
+	{ 0, 5, _("Battle Garb of Anduran"), _("The Battle Garb of Anduran combines the powers of the three Anduran artifacts.  It provides maximum luck and morale for your troops and gives you the Town Portal spell.") },
 	{ 0, 0, _("Crystal Ball"), _("The Crystal Ball lets you get more specific information about monsters, enemy heroes, and castles nearby the hero who holds it.") },
-	{ 0, 50, _("Heart of Fire"), _("The Heart of Fire provides 50 percent protection from fire, but doubles the damage taken from cold.") },
-	{ 0, 50, _("Heart of Ice"), _("The Heart of Ice provides 50 percent protection from cold, but doubles the damage taken from fire.") },
-	{ 0, 5, _("Helmet of Anduran"), _("The Helmet increases your spell power by 5.") },
-	{ 0, 5, _("Holy Hammer"), _("The Holy Hammer increases your attack skill by 5.") },
-	{ 0, 2, _("Legendary Scepter"), _("The Legendary Scepter adds 2 points to all attributes.") },
-	{ 0, 1, _("Masthead"), _("The Masthead boosts your luck and morale by 1 each in sea combat.") },
+	{ 0, 50, _("Heart of Fire"), _("The Heart of Fire provides %{count} percent protection from fire, but doubles the damage taken from cold.") },
+	{ 0, 50, _("Heart of Ice"), _("The Heart of Ice provides %{count} percent protection from cold, but doubles the damage taken from fire.") },
+	{ 0, 5, _("Helmet of Anduran"), _("The Helmet increases your spell power by %{count}.") },
+	{ 0, 5, _("Holy Hammer"), _("The Holy Hammer increases your attack skill by %{count}.") },
+	{ 0, 2, _("Legendary Scepter"), _("The Legendary Scepter adds %{count} points to all attributes.") },
+	{ 0, 1, _("Masthead"), _("The Masthead boosts your luck and morale by %{count} each in sea combat.") },
 	{ 0, 0, _("Sphere of Negation"), _("The Sphere of Negation disables all spell casting, for both sides, in combat.") },
-	{ 0, 5, _("Staff of Wizardry"), _("The Staff of Wizardry boosts your spell power by 5.") },
-	{ 0, 4, _("Sword Breaker"), _("The Sword Breaker increases your defense by 4 and attack by 1.") },
-	{ 0, 5, _("Sword of Anduran"), _("The Sword increases your attack skill by 5.") },
+	{ 0, 5, _("Staff of Wizardry"), _("The Staff of Wizardry boosts your spell power by %{count}.") },
+	{ 0, 4, _("Sword Breaker"), _("The Sword Breaker increases your defense by %{count} and attack by 1.") },
+	{ 0, 5, _("Sword of Anduran"), _("The Sword increases your attack skill by %{count}.") },
 	{ 0, 0, _("Spade of Necromancy"), _("The Spade gives you increased necromancy skill.") },
 
 	{ 0, 0, "Unknown", "Unknown" },
 };
 
+bool SkipExtra(u8 art)
+{
+    switch(art)
+    {
+	case Artifact::BALLISTA:
+        case Artifact::NOMAD_BOOTS_MOBILITY:
+        case Artifact::TRAVELER_BOOTS_MOBILITY:
+        case Artifact::RABBIT_FOOT:
+        case Artifact::GOLDEN_HORSESHOE:
+        case Artifact::GAMBLER_LUCKY_COIN:
+        case Artifact::FOUR_LEAF_CLOVER:
+        case Artifact::TRUE_COMPASS_MOBILITY:
+        case Artifact::SAILORS_ASTROLABE_MOBILITY:
+        case Artifact::EVIL_EYE:
+	case Artifact::GOLD_WATCH:
+        case Artifact::SKULLCAP:
+        case Artifact::ICE_CLOAK:
+        case Artifact::FIRE_CLOAK:
+        case Artifact::LIGHTNING_HELM:
+	case Artifact::GOLDEN_BOW:
+	case Artifact::TELESCOPE:
+
+	    return true;
+
+	default: break;
+    }
+
+    return false;
+}
+
 void Artifact::UpdateStats(const std::string & spec)
 {
 #ifdef WITH_XML
+VERBOSE("!!!!!!!!!!!!!!!!!!!");
     // parse artifacts.xml
     TiXmlDocument doc;
     const TiXmlElement* xml_artifacts = NULL;
@@ -166,17 +197,19 @@ void Artifact::UpdateStats(const std::string & spec)
         for(; xml_artifact; xml_artifact = xml_artifact->NextSiblingElement("artifact"))
         {
             int value;
+	    int art = (ptr - &artifacts[0]) / sizeof(artifactstats_t);
 
             xml_artifact->Attribute("disable", &value);
             if(value) ptr->bits |= ART_DISABLED;
 
             xml_artifact->Attribute("extra", &value);
-	    if(value) ptr->extra = value;
+	    if(value && !SkipExtra(art)) ptr->extra = value;
 
             ++ptr;
 
+	    
             // out of range
-            if((ptr - &artifacts[0]) >= UNKNOWN) break;
+            if(art >= UNKNOWN) break;
         }
     }
     else
@@ -457,8 +490,22 @@ const char* Artifact::GetDescription(artifact_t a)
     return _(artifacts[a].description);
 }
 
-u8 Artifact::GetExtraValue(artifact_t a)
+u16 Artifact::GetExtraValue(artifact_t a)
 {
+    switch(a)
+    {
+	case GOLDEN_GOOSE:
+	    return 1000 * artifacts[a].extra;
+
+        case ENDLESS_SACK_GOLD:
+        case ENDLESS_BAG_GOLD:
+        case ENDLESS_PURSE_GOLD:
+	case TAX_LIEN:
+	    return 10 * artifacts[a].extra;
+
+	default: break;
+    }
+
     return artifacts[a].extra;
 }
 

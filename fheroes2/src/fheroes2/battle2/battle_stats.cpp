@@ -1223,8 +1223,8 @@ void Battle2::Stats::SpellModesAction(u8 spell, u8 duration, const HeroBase* her
 {
     if(hero)
     {
-	if(hero->HasArtifact(Artifact::WIZARD_HAT)) duration += 10;
-	if(hero->HasArtifact(Artifact::ENCHANTED_HOURGLASS)) duration += 2;
+	if(hero->HasArtifact(Artifact::WIZARD_HAT)) duration += Artifact::GetExtraValue(Artifact::WIZARD_HAT);
+	if(hero->HasArtifact(Artifact::ENCHANTED_HOURGLASS)) duration += Artifact::GetExtraValue(Artifact::ENCHANTED_HOURGLASS);
     }
 
     switch(spell)
@@ -1433,10 +1433,10 @@ void Battle2::Stats::SpellApplyDamage(u8 spell, u8 spoint, const HeroBase* hero,
             case Spell::COLDRAY:
             case Spell::COLDRING:
 		// +50%
-    		if(hero->HasArtifact(Artifact::EVERCOLD_ICICLE)) dmg += dmg / 2;
+    		if(hero->HasArtifact(Artifact::EVERCOLD_ICICLE)) dmg += dmg * Artifact::GetExtraValue(Artifact::EVERCOLD_ICICLE) / 100;
 		// -50%
     		if(myhero && myhero->HasArtifact(Artifact::ICE_CLOAK)) dmg /= 2;
-    		if(myhero && myhero->HasArtifact(Artifact::HEART_ICE)) dmg /= 2;
+    		if(myhero && myhero->HasArtifact(Artifact::HEART_ICE)) dmg -= dmg * Artifact::GetExtraValue(Artifact::HEART_ICE) / 100;
     		// 100%
     		if(myhero && myhero->HasArtifact(Artifact::HEART_FIRE)) dmg *= 2;
     		break;
@@ -1444,17 +1444,17 @@ void Battle2::Stats::SpellApplyDamage(u8 spell, u8 spoint, const HeroBase* hero,
             case Spell::FIREBALL:
             case Spell::FIREBLAST:
 		// +50%
-    		if(hero->HasArtifact(Artifact::EVERHOT_LAVA_ROCK)) dmg += dmg / 2;
+    		if(hero->HasArtifact(Artifact::EVERHOT_LAVA_ROCK)) dmg += dmg * Artifact::GetExtraValue(Artifact::EVERHOT_LAVA_ROCK) / 100;
 		// -50%
     		if(myhero && myhero->HasArtifact(Artifact::FIRE_CLOAK)) dmg /= 2;
-    		if(myhero && myhero->HasArtifact(Artifact::HEART_FIRE)) dmg /= 2;
+    		if(myhero && myhero->HasArtifact(Artifact::HEART_FIRE)) dmg -= dmg * Artifact::GetExtraValue(Artifact::HEART_FIRE) / 100;
     		// 100%
     		if(myhero && myhero->HasArtifact(Artifact::HEART_ICE)) dmg *= 2;
     		break;
 
             case Spell::LIGHTNINGBOLT:
 		// +50%
-    		if(hero->HasArtifact(Artifact::LIGHTNING_ROD)) dmg += dmg / 2;
+    		if(hero->HasArtifact(Artifact::LIGHTNING_ROD)) dmg += dmg * Artifact::GetExtraValue(Artifact::LIGHTNING_ROD) / 100;
 		// -50%
     		if(myhero && myhero->HasArtifact(Artifact::LIGHTNING_HELM)) dmg /= 2;
 		break;

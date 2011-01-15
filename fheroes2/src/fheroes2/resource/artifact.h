@@ -180,7 +180,7 @@ public:
     static artifact_t Rand(level_t);
     static u8 GetLevel(artifact_t);
     static u8 GetLevelLoyalty(artifact_t);
-    static u8 GetExtraValue(artifact_t);
+    static u16 GetExtraValue(artifact_t);
 
     static const char* GetName(artifact_t);
     static const char* GetDescription(artifact_t);

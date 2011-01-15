@@ -1151,7 +1151,7 @@ u32 Army::army_t::GetSurrenderCost(void) const
     std::vector<Troop>::const_iterator it1 = army.begin();
     std::vector<Troop>::const_iterator it2 = army.end();
 
-    u32 res = 0;
+    double res = 0;
 
     for(; it1 != it2; ++it1) if((*it1).isValid())
     {
@@ -1175,13 +1175,13 @@ u32 Army::army_t::GetSurrenderCost(void) const
 	}
 
 	if(commander->HasArtifact(Artifact::STATESMAN_QUILL))
-	    res /= 5;
+	    res -= res * Artifact::GetExtraValue(Artifact::STATESMAN_QUILL) / 100;
     }
 
     // limit
-    if(res < 100) res = 100;
+    if(res < 100) res = 100.0;
 
-    return res;
+    return static_cast<u32>(res);
 }
 
 u8 Army::GetJoinSolution(const Heroes & hero, const Maps::Tiles & tile, u32 & join, s32 & cost)

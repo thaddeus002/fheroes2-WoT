@@ -430,8 +430,8 @@ void Game::LoadExternalResource(const Settings & conf)
     if(FilePresent(spec))
 	Spell::UpdateStats(spec);
 
-    // artifact.xml
-    spec = conf.LocalPrefix() + SEPARATOR + "files" + SEPARATOR + "stats" + SEPARATOR + "artifact.xml";
+    // artifacts.xml
+    spec = conf.LocalPrefix() + SEPARATOR + "files" + SEPARATOR + "stats" + SEPARATOR + "artifacts.xml";
 
     if(FilePresent(spec))
 	Artifact::UpdateStats(spec);

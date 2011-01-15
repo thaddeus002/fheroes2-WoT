@@ -819,8 +819,7 @@ void Heroes::ActionNewDay(void)
 
     if(HasArtifact(Artifact::TAX_LIEN))
     {
-	resource.Reset();
-	resource.gold = 250;
+	resource = ProfitConditions::FromArtifact(Artifact::TAX_LIEN);
 	world.GetKingdom(GetColor()).OddFundsResource(resource);
     }
 
@@ -849,7 +848,7 @@ void Heroes::ActionNewDay(void)
 	    // everyday
 	    curr += Game::GetHeroRestoreSpellPointsPerDay();
 
-	    if(HasArtifact(Artifact::POWER_RING)) curr += 2;
+	    if(HasArtifact(Artifact::POWER_RING)) curr += Artifact::GetExtraValue(Artifact::POWER_RING);
 
 	    // secondary skill
 	    curr += GetSecondaryValues(Skill::Secondary::MYSTICISM);

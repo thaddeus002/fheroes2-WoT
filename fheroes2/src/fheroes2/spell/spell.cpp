@@ -134,6 +134,7 @@ void Spell::UpdateStats(const std::string & spec)
         for(; xml_spell; xml_spell = xml_spell->NextSiblingElement("spell"))
         {
             int value;
+	    int spell = (ptr - &spells[0]) / sizeof(spellstats_t);
 
             xml_spell->Attribute("skip", &value);
             if(0 == value)
@@ -149,7 +150,7 @@ void Spell::UpdateStats(const std::string & spec)
 	    }
 
             // load dimension door params
-            if((ptr - &spells[0]) == DIMENSIONDOOR)
+            if(spell == DIMENSIONDOOR)
             {
 		xml_spell->Attribute("distance", &value); dd_distance = value;
 		xml_spell->Attribute("sp", &value); dd_sp = value;
@@ -159,7 +160,7 @@ void Spell::UpdateStats(const std::string & spec)
 	    ++ptr;
 
             // out of range
-            if((ptr - &spells[0]) >= STONE) break;
+            if(spell >= STONE) break;
 	}
     }
     else
@@ -543,7 +544,7 @@ Spell::spell_t Spell::Rand(u8 lvl, bool adv)
     v.reserve(15);
 
     for(u8 sp = NONE; sp < STONE; ++sp)
-	if((adv && !isCombat(sp) || (!adv && isCombat(sp))) &&
+	if(((adv && !isCombat(sp)) || (!adv && isCombat(sp))) &&
 	    lvl == Level(sp) &&
 	    !(spells[sp].bits & SP_DISABLE)) v.push_back(static_cast<spell_t>(sp));
 

@@ -52,12 +52,13 @@ static profitstats_t _profits[] = {
     { "mine_gold",    {1000, 0, 0, 0, 0, 0, 0 } },
 
     { "ultimate_golden_goose", {10000, 0, 0, 0, 0, 0, 0 } },
+    { "tax_lien",              { 250, 0, 0, 0, 0, 0, 0 } },
     { "endless_sack_gold",     {1000, 0, 0, 0, 0, 0, 0 } },
     { "endless_bag_gold",      { 750, 0, 0, 0, 0, 0, 0 } },
     { "endless_purse_gold",    { 500, 0, 0, 0, 0, 0, 0 } },
-    { "endless_cord_wood",     { 0, 2, 0, 0, 0, 0, 0 } },
+    { "endless_cord_wood",     { 0, 1, 0, 0, 0, 0, 0 } },
     { "endless_vial_mercury",  { 0, 0, 1, 0, 0, 0, 0 } },
-    { "endless_cart_ore",      { 0, 0, 0, 2, 0, 0, 0 } },
+    { "endless_cart_ore",      { 0, 0, 0, 1, 0, 0, 0 } },
     { "endless_pouch_sulfur",  { 0, 0, 0, 0, 1, 0, 0 } },
     { "endless_pouch_crystal", { 0, 0, 0, 0, 0, 1, 0 } },
     { "endless_pouch_gems",    { 0, 0, 0, 0, 0, 0, 1 } },
@@ -117,6 +118,7 @@ ProfitConditions::FromArtifact::FromArtifact(u8 artifact)
 
     switch(artifact)
     {
+	case Artifact::TAX_LIEN: id = "tax_lien"; break;
 	case Artifact::GOLDEN_GOOSE: id = "ultimate_golden_goose"; break;
 	case Artifact::ENDLESS_SACK_GOLD: id = "endless_sack_gold"; break;
 	case Artifact::ENDLESS_BAG_GOLD: id = "endless_bag_gold"; break;

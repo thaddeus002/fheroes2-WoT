@@ -133,22 +133,18 @@ s8 HeroBase::GetAttackModificator(std::string* strs) const
 
     if(modifiers.empty())
     {
-	modifiers.reserve(14);
+	const Artifact::artifact_t arts[] = {
+	    Artifact::SPIKED_HELM, Artifact::THUNDER_MACE, Artifact::GIANT_FLAIL,
+	    Artifact::SWORD_BREAKER, Artifact::SPIKED_SHIELD, Artifact::POWER_AXE,
+	    Artifact::LEGENDARY_SCEPTER, Artifact::DRAGON_SWORD, Artifact::ULTIMATE_CROWN,
+	    Artifact::BATTLE_GARB, Artifact::SWORD_ANDURAN, Artifact::HOLY_HAMMER,
+	    Artifact::ULTIMATE_SHIELD, Artifact::ULTIMATE_SWORD };
 
-	modifiers.push_back(std::make_pair(Artifact::SPIKED_HELM, 1));
-	modifiers.push_back(std::make_pair(Artifact::THUNDER_MACE, 1));
-	modifiers.push_back(std::make_pair(Artifact::GIANT_FLAIL, 1));
-	modifiers.push_back(std::make_pair(Artifact::SWORD_BREAKER, 1));
-	modifiers.push_back(std::make_pair(Artifact::SPIKED_SHIELD, 2));
-	modifiers.push_back(std::make_pair(Artifact::POWER_AXE, 2));
-	modifiers.push_back(std::make_pair(Artifact::LEGENDARY_SCEPTER, 2));
-	modifiers.push_back(std::make_pair(Artifact::DRAGON_SWORD, 3));
-	modifiers.push_back(std::make_pair(Artifact::ULTIMATE_CROWN, 4));
-	modifiers.push_back(std::make_pair(Artifact::BATTLE_GARB, 5));
-	modifiers.push_back(std::make_pair(Artifact::SWORD_ANDURAN, 5));
-	modifiers.push_back(std::make_pair(Artifact::HOLY_HAMMER, 5));
-	modifiers.push_back(std::make_pair(Artifact::ULTIMATE_SHIELD, 6));
-	modifiers.push_back(std::make_pair(Artifact::ULTIMATE_SWORD, 12));
+	const u8 size = sizeof(arts) / sizeof(Artifact::artifact_t);
+
+	modifiers.reserve(size);
+	for(u8 ii = 0; ii < size; ++ii) 
+	    modifiers.push_back(std::make_pair(arts[ii], Artifact::GetExtraValue(arts[ii])));
     }
 
     s8 result = GetResultModifiers(modifiers, *this, strs);
@@ -168,21 +164,18 @@ s8 HeroBase::GetDefenseModificator(std::string* strs) const
 
     if(modifiers.empty())
     {
-	modifiers.reserve(13);
+	const Artifact::artifact_t arts[] = {
+	    Artifact::SPIKED_HELM, Artifact::ARMORED_GAUNTLETS, Artifact::DEFENDER_HELM,
+	    Artifact::SPIKED_SHIELD, Artifact::STEALTH_SHIELD, Artifact::LEGENDARY_SCEPTER,
+	    Artifact::DIVINE_BREASTPLATE, Artifact::ULTIMATE_CROWN,
+	    Artifact::SWORD_BREAKER, Artifact::BREASTPLATE_ANDURAN, Artifact::BATTLE_GARB,
+	    Artifact::ULTIMATE_SHIELD, Artifact::ULTIMATE_CLOAK };
 
-	modifiers.push_back(std::make_pair(Artifact::SPIKED_HELM, 1));
-	modifiers.push_back(std::make_pair(Artifact::ARMORED_GAUNTLETS, 1));
-	modifiers.push_back(std::make_pair(Artifact::DEFENDER_HELM, 1));
-	modifiers.push_back(std::make_pair(Artifact::SPIKED_SHIELD, 2));
-	modifiers.push_back(std::make_pair(Artifact::STEALTH_SHIELD, 2));
-	modifiers.push_back(std::make_pair(Artifact::LEGENDARY_SCEPTER, 2));
-	modifiers.push_back(std::make_pair(Artifact::DIVINE_BREASTPLATE, 3));
-	modifiers.push_back(std::make_pair(Artifact::ULTIMATE_CROWN, 4));
-	modifiers.push_back(std::make_pair(Artifact::SWORD_BREAKER, 4));
-	modifiers.push_back(std::make_pair(Artifact::BREASTPLATE_ANDURAN, 5));
-	modifiers.push_back(std::make_pair(Artifact::BATTLE_GARB, 5));
-	modifiers.push_back(std::make_pair(Artifact::ULTIMATE_SHIELD, 6));
-	modifiers.push_back(std::make_pair(Artifact::ULTIMATE_CLOAK, 12));
+	const u8 size = sizeof(arts) / sizeof(Artifact::artifact_t);
+
+	modifiers.reserve(size);
+	for(u8 ii = 0; ii < size; ++ii) 
+	    modifiers.push_back(std::make_pair(arts[ii], Artifact::GetExtraValue(arts[ii])));
     }
 
     s8 result = GetResultModifiers(modifiers, *this, strs);
@@ -202,23 +195,20 @@ s8 HeroBase::GetPowerModificator(std::string* strs) const
 
     if(modifiers.empty())
     {
-	modifiers.reserve(15);
+	const Artifact::artifact_t arts[] = {
+	    Artifact::WHITE_PEARL, Artifact::BLACK_PEARL, Artifact::CASTER_BRACELET,
+	    Artifact::MAGE_RING, Artifact::LEGENDARY_SCEPTER, Artifact::WITCHES_BROACH,
+	    Artifact::ARM_MARTYR, Artifact::ULTIMATE_CROWN, Artifact::ARCANE_NECKLACE,
+	    Artifact::BATTLE_GARB, Artifact::STAFF_WIZARDRY, Artifact::HELMET_ANDURAN,
+	    Artifact::ULTIMATE_STAFF, Artifact::ULTIMATE_WAND };
+
+	const u8 size = sizeof(arts) / sizeof(Artifact::artifact_t);
+
+	modifiers.reserve(size + 1);
+	for(u8 ii = 0; ii < size; ++ii) 
+	    modifiers.push_back(std::make_pair(arts[ii], Artifact::GetExtraValue(arts[ii])));
 
 	modifiers.push_back(std::make_pair(Artifact::BROACH_SHIELDING, -1));
-	modifiers.push_back(std::make_pair(Artifact::WHITE_PEARL, 1));
-	modifiers.push_back(std::make_pair(Artifact::BLACK_PEARL, 2));
-	modifiers.push_back(std::make_pair(Artifact::CASTER_BRACELET, 2));
-	modifiers.push_back(std::make_pair(Artifact::MAGE_RING, 2));
-	modifiers.push_back(std::make_pair(Artifact::LEGENDARY_SCEPTER, 2));
-	modifiers.push_back(std::make_pair(Artifact::WITCHES_BROACH, 3));
-	modifiers.push_back(std::make_pair(Artifact::ARM_MARTYR, 3));
-	modifiers.push_back(std::make_pair(Artifact::ULTIMATE_CROWN, 4));
-	modifiers.push_back(std::make_pair(Artifact::ARCANE_NECKLACE, 4));
-        modifiers.push_back(std::make_pair(Artifact::BATTLE_GARB, 5));
-	modifiers.push_back(std::make_pair(Artifact::STAFF_WIZARDRY, 5));
-	modifiers.push_back(std::make_pair(Artifact::HELMET_ANDURAN, 5));
-	modifiers.push_back(std::make_pair(Artifact::ULTIMATE_STAFF, 6));
-	modifiers.push_back(std::make_pair(Artifact::ULTIMATE_WAND, 12));
     }
 
     s8 result = GetResultModifiers(modifiers, *this, strs);
@@ -238,18 +228,17 @@ s8 HeroBase::GetKnowledgeModificator(std::string* strs) const
 
     if(modifiers.empty())
     {
-	modifiers.reserve(10);
+	const Artifact::artifact_t arts[] = {
+	    Artifact::WHITE_PEARL, Artifact::BLACK_PEARL, Artifact::MINOR_SCROLL,
+	    Artifact::MAJOR_SCROLL, Artifact::SUPERIOR_SCROLL, Artifact::FOREMOST_SCROLL,
+	    Artifact::LEGENDARY_SCEPTER, Artifact::ULTIMATE_CROWN,
+	    Artifact::ULTIMATE_STAFF, Artifact::ULTIMATE_BOOK };
 
-	modifiers.push_back(std::make_pair(Artifact::WHITE_PEARL, 1));
-	modifiers.push_back(std::make_pair(Artifact::BLACK_PEARL, 2));
-	modifiers.push_back(std::make_pair(Artifact::MINOR_SCROLL, 2));
-	modifiers.push_back(std::make_pair(Artifact::LEGENDARY_SCEPTER, 2));
-	modifiers.push_back(std::make_pair(Artifact::MAJOR_SCROLL, 3));
-	modifiers.push_back(std::make_pair(Artifact::ULTIMATE_CROWN, 4));
-	modifiers.push_back(std::make_pair(Artifact::SUPERIOR_SCROLL, 4));
-	modifiers.push_back(std::make_pair(Artifact::FOREMOST_SCROLL, 5));
-	modifiers.push_back(std::make_pair(Artifact::ULTIMATE_STAFF, 6));
-	modifiers.push_back(std::make_pair(Artifact::ULTIMATE_BOOK, 12));
+	const u8 size = sizeof(arts) / sizeof(Artifact::artifact_t);
+
+	modifiers.reserve(size);
+	for(u8 ii = 0; ii < size; ++ii) 
+	    modifiers.push_back(std::make_pair(arts[ii], Artifact::GetExtraValue(arts[ii])));
     }
 
     s8 result = GetResultModifiers(modifiers, *this, strs);
@@ -269,13 +258,14 @@ s8 HeroBase::GetMoraleModificator(bool shipmaster, std::string* strs) const
 
     modifiers.reserve(7);
 
-    modifiers.push_back(std::make_pair(Artifact::MEDAL_VALOR, 1));
-    modifiers.push_back(std::make_pair(Artifact::MEDAL_COURAGE, 1));
-    modifiers.push_back(std::make_pair(Artifact::MEDAL_HONOR, 1));
-    modifiers.push_back(std::make_pair(Artifact::MEDAL_DISTINCTION, 1));
-    modifiers.push_back(std::make_pair(Artifact::FIZBIN_MISFORTUNE, -2));
+    modifiers.push_back(std::make_pair(Artifact::MEDAL_VALOR, Artifact::GetExtraValue(Artifact::MEDAL_VALOR)));
+    modifiers.push_back(std::make_pair(Artifact::MEDAL_COURAGE, Artifact::GetExtraValue(Artifact::MEDAL_COURAGE)));
+    modifiers.push_back(std::make_pair(Artifact::MEDAL_HONOR, Artifact::GetExtraValue(Artifact::MEDAL_HONOR)));
+    modifiers.push_back(std::make_pair(Artifact::MEDAL_DISTINCTION, Artifact::GetExtraValue(Artifact::MEDAL_DISTINCTION)));
     modifiers.push_back(std::make_pair(Artifact::BATTLE_GARB, 10));
-    if(shipmaster) modifiers.push_back(std::make_pair(Artifact::MASTHEAD, 1));
+
+    if(shipmaster) modifiers.push_back(std::make_pair(Artifact::MASTHEAD, Artifact::GetExtraValue(Artifact::MASTHEAD)));
+    modifiers.push_back(std::make_pair(Artifact::FIZBIN_MISFORTUNE, -Artifact::GetExtraValue(Artifact::FIZBIN_MISFORTUNE)));
 
     s8 result = GetResultModifiers(modifiers, *this, strs);
 
@@ -303,12 +293,12 @@ s8 HeroBase::GetLuckModificator(bool shipmaster, std::string* strs) const
 
     modifiers.reserve(6);
 
-    modifiers.push_back(std::make_pair(Artifact::RABBIT_FOOT, 1));
-    modifiers.push_back(std::make_pair(Artifact::GOLDEN_HORSESHOE, 1));
-    modifiers.push_back(std::make_pair(Artifact::GAMBLER_LUCKY_COIN, 1));
-    modifiers.push_back(std::make_pair(Artifact::FOUR_LEAF_CLOVER, 1));
+    modifiers.push_back(std::make_pair(Artifact::RABBIT_FOOT, Artifact::GetExtraValue(Artifact::RABBIT_FOOT)));
+    modifiers.push_back(std::make_pair(Artifact::GOLDEN_HORSESHOE, Artifact::GetExtraValue(Artifact::GOLDEN_HORSESHOE)));
+    modifiers.push_back(std::make_pair(Artifact::GAMBLER_LUCKY_COIN, Artifact::GetExtraValue(Artifact::GAMBLER_LUCKY_COIN)));
+    modifiers.push_back(std::make_pair(Artifact::FOUR_LEAF_CLOVER, Artifact::GetExtraValue(Artifact::FOUR_LEAF_CLOVER)));
     modifiers.push_back(std::make_pair(Artifact::BATTLE_GARB, 10));
-    if(shipmaster) modifiers.push_back(std::make_pair(Artifact::MASTHEAD, 1));
+    if(shipmaster) modifiers.push_back(std::make_pair(Artifact::MASTHEAD, Artifact::GetExtraValue(Artifact::MASTHEAD)));
 
     s8 result = GetResultModifiers(modifiers, *this, strs);
 
