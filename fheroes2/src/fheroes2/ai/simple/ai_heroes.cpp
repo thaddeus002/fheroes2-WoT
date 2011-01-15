@@ -2346,6 +2346,8 @@ void AIHeroesGetTask(Heroes & hero)
 	}
 
 	// random move
+	/*
+	// disable move: https://sourceforge.net/tracker/?func=detail&aid=3157397&group_id=96859&atid=616180
 	{
 	    Maps::ScanDistanceObject(hero.GetIndex(), MP2::OBJ_ZERO, hero.GetSquarePatrol(), results);
 	    if(results.size())
@@ -2362,6 +2364,7 @@ void AIHeroesGetTask(Heroes & hero)
 		}
 	    }
 	}
+	*/
 
 	hero.SetModes(Heroes::STUPID);
 	return;
