@@ -190,7 +190,7 @@ void Game::HotKeysDefaults(void)
     // cast spell
     key_events[EVENT_CASTSPELL] = KEY_c;
     // default action
-    key_events[EVENT_DEFAULTACTION] = KEY_RETURN;
+    key_events[EVENT_DEFAULTACTION] = KEY_SPACE;
     // move hero
     key_events[EVENT_MOVELEFT] = KEY_LEFT;
     key_events[EVENT_MOVERIGHT] = KEY_RIGHT;
