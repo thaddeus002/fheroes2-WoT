@@ -439,6 +439,9 @@ Cursor::themes_t Game::GetCursorFocusShipmaster(const Heroes & from_hero, const 
 {
     const Settings & conf = Settings::Get();
 
+    if(tile.GetGround() != Maps::Ground::WATER)
+	return Cursor::POINTER;
+
     switch(tile.GetObject())
     {
 	case MP2::OBJ_MONSTER:
