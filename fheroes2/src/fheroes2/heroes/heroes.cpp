@@ -830,31 +830,33 @@ void Heroes::ActionNewDay(void)
     // recovery spell points
     if(HaveSpellBook())
     {
-	// possible visit arteian spring 2 * max
-	const u16 prev = GetSpellPoints();
+	u16 curr = GetSpellPoints();
+	u16 maxp = GetMaxSpellPoints();
 	const Castle* castle = inCastle();
 
-	// in castle?
-	if(castle && castle->GetLevelMageGuild())
+	// possible visit arteian spring 2 * max
+	if(curr < maxp)
 	{
-	    //restore from mage guild
-	    if(prev < GetMaxSpellPoints()) SetSpellPoints(GetMaxSpellPoints());
-	}
-	else
-	{
-	    u16 curr = GetSpellPoints();
+	    // in castle?
+	    if(castle && castle->GetLevelMageGuild())
+	    {
+		//restore from mage guild
+		SetSpellPoints(maxp);
+	    }
+	    else
+	    {
+		// everyday
+		curr += Game::GetHeroRestoreSpellPointsPerDay();
 
-	    // everyday
-	    curr += Game::GetHeroRestoreSpellPointsPerDay();
+		// power ring action
+	        if(HasArtifact(Artifact::POWER_RING))
+		    curr += Artifact::GetExtraValue(Artifact::POWER_RING);
 
-	    if(HasArtifact(Artifact::POWER_RING)) curr += Artifact::GetExtraValue(Artifact::POWER_RING);
+		// secondary skill
+	        curr += GetSecondaryValues(Skill::Secondary::MYSTICISM);
 
-	    // secondary skill
-	    curr += GetSecondaryValues(Skill::Secondary::MYSTICISM);
-
-	    if((curr > GetMaxSpellPoints()) && (curr > prev)) curr = prev;
-
-	    SetSpellPoints(curr);
+		SetSpellPoints(curr > maxp ? maxp : curr);
+	    }
 	}
     }
 
