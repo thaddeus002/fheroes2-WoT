@@ -4147,7 +4147,7 @@ void Battle2::PopupDamageInfo::Redraw(u16 maxw, u16 maxh)
 	if(tmp1 > defender->GetCount()) tmp1 = defender->GetCount();
 	if(tmp2 > defender->GetCount()) tmp2 = defender->GetCount();
 
-	str = tmp1 == tmp2 ? _("Kills: %{max}") : _("Kills: %{min} - %{max}");
+	str = tmp1 == tmp2 ? _("Perish: %{max}") : _("Perish: %{min} - %{max}");
 
 	String::Replace(str, "%{min}", tmp1);
 	String::Replace(str, "%{max}", tmp2);
