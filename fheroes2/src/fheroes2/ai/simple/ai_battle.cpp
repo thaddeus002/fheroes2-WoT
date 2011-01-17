@@ -35,9 +35,78 @@
 namespace Battle2
 {
     bool isApplySpell(const Spell::spell_t, const Stats*, const HeroBase &, Actions &);
+    u16  AIGetAttackPosition(Arena &, const Stats &, const std::vector<u16> &);
 }
 
 using namespace Battle2;
+
+u16 Battle2::AIGetAttackPosition(Arena & arena, const Stats & b, const std::vector<u16> & positions)
+{
+    u16 res = MAXU16;
+
+    if(b.isMultiCellAttack())
+    {
+        res = arena.GetMaxQualityPosition(positions);
+    }
+    else
+    if(b.isDoubleCellAttack())
+    {
+        std::vector<u16> enemies, results;
+
+        enemies.reserve(6);
+        results.reserve(12);
+
+        arena.GetArmyPositions(arena.GetOppositeColor(b.GetColor()), enemies);
+
+        // get actual coord if enemy troop near placed
+        while(1 < enemies.size())
+        {
+            const u16 cur = enemies.back();
+            enemies.pop_back();
+
+            std::vector<u16>::const_iterator it1 = enemies.begin();
+            std::vector<u16>::const_iterator it2 = enemies.end();
+            for(; it1 != it2; ++it1)
+            {
+                // get near placed enemies
+                const direction_t dir = Board::GetDirection(cur, *it1);
+
+                if(UNKNOWN != dir)
+                {
+                    if(Board::isValidDirection(cur, Board::GetReflectDirection(dir)))
+                        results.push_back(Board::GetIndexDirection(cur, Board::GetReflectDirection(dir)));
+                    if(Board::isValidDirection(*it1, dir))
+                        results.push_back(Board::GetIndexDirection(*it1, dir));
+                }
+            }
+        }
+
+        if(results.size())
+        {
+            // find passable results
+            std::vector<u16> passable;
+            arena.GetPassableQualityPositions(b, passable);
+
+            std::vector<u16>::iterator it1 = results.begin();
+            std::vector<u16>::iterator it3 = it1;
+
+            for (; it1 != results.end(); ++it1)
+                if(passable.end() != std::find(passable.begin(), passable.end(), *it1))
+                    *it3++ = *it1;
+
+            if(it3 != results.end())
+                results.resize(std::distance(results.begin(), it3));
+
+            // get max quality
+            if(results.size())
+            {
+                res = arena.GetMaxQualityPosition(results);
+            }
+        }
+    }
+
+    return res != MAXU16 ? res : Arena::GetShortDistance(b.GetPosition(), positions);
+}
 
 
 void AI::BattleTurn(Arena & arena, const Stats & b, Actions & a)
@@ -88,7 +157,7 @@ void AI::BattleTurn(Arena & arena, const Stats & b, Actions & a)
 	    attack = true;
 
 	    if(positions.size())
-		move = b.AIGetAttackPosition(positions);
+		move = AIGetAttackPosition(arena, b, positions);
 	}
 
 	if(MAXU16 != move)

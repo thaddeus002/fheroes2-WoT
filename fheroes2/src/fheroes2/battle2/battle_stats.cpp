@@ -1151,8 +1151,9 @@ const char* Battle2::Stats::GetPluralName(u32 count) const
 
 u16 Battle2::Stats::GetScoreQuality(const Stats & enemy) const
 {
-    u16 res = 0;
+    float res = 0;
 
+    // level priority
     switch(troop.GetLevel())
     {
         case Monster::LEVEL1:   res = 8; break;
@@ -1160,6 +1161,14 @@ u16 Battle2::Stats::GetScoreQuality(const Stats & enemy) const
         case Monster::LEVEL3:   res = 24; break;
         case Monster::LEVEL4:   res = 36; break;
         default: break;
+    }
+
+    switch(troop())
+    {
+	// for ghosts: count priority
+	case Monster::GHOST:	res = 8; break;
+
+	default: break;
     }
 
     if(troop.isFly()) res += res * 3 / 10;
@@ -1189,7 +1198,7 @@ u16 Battle2::Stats::GetScoreQuality(const Stats & enemy) const
 	default: break;
     }
 
-    return res ? res : 1;
+    return res > 1.0 ? static_cast<u16>(res) : 1;
 }
 
 s32 Battle2::Stats::GetExtraQuality(s32 quality) const
@@ -2156,75 +2165,6 @@ HeroBase* Battle2::Stats::GetCommander(void)
 {
     return GetArmy() ? GetArmy()->GetCommander() : NULL;
 }
-
-u16 Battle2::Stats::AIGetAttackPosition(const std::vector<u16> & positions) const
-{
-    u16 res = MAXU16;
-
-    if(isMultiCellAttack())
-    {
-	res = arena->GetMaxQualityPosition(positions);
-    }
-    else
-    if(isDoubleCellAttack())
-    {
-	std::vector<u16> enemies, results;
-
-	enemies.reserve(6);
-	results.reserve(12);
-
-	arena->GetArmyPositions(arena->GetOppositeColor(GetColor()), enemies);
-
-	// get actual coord if enemy troop near placed
-	while(1 < enemies.size())
-	{
-	    const u16 cur = enemies.back();
-	    enemies.pop_back();
-
-	    std::vector<u16>::const_iterator it1 = enemies.begin();
-	    std::vector<u16>::const_iterator it2 = enemies.end();
-	    for(; it1 != it2; ++it1)
-	    {
-		// get near placed enemies
-		const direction_t dir = Board::GetDirection(cur, *it1);
-
-		if(UNKNOWN != dir)
-		{
-		    if(Board::isValidDirection(cur, Board::GetReflectDirection(dir)))
-			results.push_back(Board::GetIndexDirection(cur, Board::GetReflectDirection(dir)));
-		    if(Board::isValidDirection(*it1, dir))
-			results.push_back(Board::GetIndexDirection(*it1, dir));
-		}
-	    }
-	}
-
-	if(results.size())
-	{
-	    // find passable results
-	    std::vector<u16> passable;
-	    arena->GetPassableQualityPositions(*this, passable);
-
-	    std::vector<u16>::iterator it1 = results.begin();
-	    std::vector<u16>::iterator it3 = it1;
-
-	    for (; it1 != results.end(); ++it1)
-		if(passable.end() != std::find(passable.begin(), passable.end(), *it1))
-		    *it3++ = *it1;
-
-	    if(it3 != results.end())
-		results.resize(std::distance(results.begin(), it3));
-
-	    // get max quality
-	    if(results.size())
-	    {
-		res = arena->GetMaxQualityPosition(results);
-	    }
-	}
-    }
-
-    return res != MAXU16 ? res : Arena::GetShortDistance(position, positions);
-}
-
 
 namespace Battle2
 {

@@ -187,7 +187,6 @@ namespace Battle2
 	const Rect & GetCellPosition(void) const;
 
 	u32	HowMuchWillKilled(u32) const;
-	u16	AIGetAttackPosition(const std::vector<u16> &) const;
 
 	void	SetResponse(void);
 	void	ResetAnimFrame(u8);
