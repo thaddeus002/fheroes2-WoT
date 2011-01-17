@@ -828,7 +828,7 @@ void Heroes::ActionNewDay(void)
     if(isVisited(MP2::OBJ_STABLES)) move_point += 400;
 
     // recovery spell points
-    if(HaveSpellBook())
+    //if(HaveSpellBook())
     {
 	u16 curr = GetSpellPoints();
 	u16 maxp = GetMaxSpellPoints();
