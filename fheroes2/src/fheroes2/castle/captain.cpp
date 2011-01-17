@@ -28,6 +28,7 @@
 
 Captain::Captain(const Castle & c) : home(c)
 {
+    center = home.GetCenter();
 }
 
 void Captain::LoadDefaults(void)

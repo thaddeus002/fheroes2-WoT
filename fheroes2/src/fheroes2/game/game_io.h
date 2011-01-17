@@ -31,6 +31,7 @@ namespace Maps {class Tiles; }
 class Kingdom;
 class Castle;
 class Heroes;
+class HeroBase;
 
 namespace Game
 {
@@ -48,11 +49,13 @@ namespace Game
 	static void PackKingdom(QueueMessage &, const Kingdom &);
 	static void PackCastle(QueueMessage &, const Castle &);
 	static void PackHeroes(QueueMessage &, const Heroes &);
+	static void PackHeroBase(QueueMessage &, const HeroBase &);
 
 	static void UnpackTile(QueueMessage &, Maps::Tiles &, u16 = 0);
 	static void UnpackKingdom(QueueMessage &, Kingdom &, u16 = 0);
 	static void UnpackCastle(QueueMessage &, Castle &, u16 = 0);
 	static void UnpackHeroes(QueueMessage &, Heroes &, u16 = 0);
+	static void UnpackHeroBase(QueueMessage &, HeroBase &, u16 = 0);
 
 	static std::string last_name;
     };

@@ -29,6 +29,7 @@
 #include "spell_book.h"
 #include "artifact.h"
 #include "color.h"
+#include "game_io.h"
 #include "position.h"
 
 typedef std::vector<Artifact> BagArtifacts;
@@ -81,6 +82,8 @@ public:
     bool HasArtifact(Artifact::artifact_t) const;
 
 protected:
+    friend class Game::IO;
+
     u16 magic_point;
     SpellBook spell_book;
     BagArtifacts bag_artifacts;
