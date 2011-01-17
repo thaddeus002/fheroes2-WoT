@@ -686,7 +686,14 @@ Game::menu_t Game::HumanTurn(bool isload)
     // set focus
     if(Game::HOTSEAT == conf.GameType()) global_focus.Reset();
 
-    if(!conf.ExtRememberLastFocus() && myHeroes.size())
+    if(conf.ExtRememberLastFocus())
+    {
+	if(Focus::HEROES == global_focus.Type())
+	    global_focus.Reset(Focus::HEROES);
+	else
+	    global_focus.Reset(Focus::CASTLE);
+    }
+    else
     {
 	// skip sleeping
 	std::vector<Heroes *>::const_iterator it =
@@ -698,8 +705,6 @@ Game::menu_t Game::HumanTurn(bool isload)
 	else
 	    global_focus.Reset(Focus::CASTLE);
     }
-    else
-	global_focus.Reset(Focus::HEROES);
 
     // and show path
     if(Focus::HEROES == global_focus.Type() &&

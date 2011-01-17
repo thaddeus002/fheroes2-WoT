@@ -982,11 +982,13 @@ bool Heroes::PickupArtifact(const Artifact::artifact_t art)
 bool Heroes::PickupArtifact(const Artifact & art)
 {
     const Settings & conf = Settings::Get();
+    bool interface = (conf.MyColor() == color && conf.CurrentColor() == color);
+
     BagArtifacts::iterator it = std::find(bag_artifacts.begin(), bag_artifacts.end(), Artifact::UNKNOWN);
 
     if(bag_artifacts.end() == it)
     {
-	if(conf.MyColor() == color)
+	if(interface)
 	{
 	    art == Artifact::MAGIC_BOOK ?
 	    Dialog::Message("", _("You must purchase a spell book to use the mage guild, but you currently have no room for a spell book. Try giving one of your artifacts to another hero."), Font::BIG, Dialog::OK) :
@@ -1004,12 +1006,9 @@ bool Heroes::PickupArtifact(const Artifact & art)
 
 	SpellBookActivate();
     }
-/*
     else
-    if(conf.ExtHeroPickupArtifactWithInfoDialog() &&
-       conf.MyColor() == color)
+    if(conf.ExtHeroPickupArtifactWithInfoDialog() && interface)
 	Dialog::ArtifactInfo(art.GetName(), Artifact::GetDescription(art), art());
-*/
 
     // check: anduran garb
     if(HasArtifact(Artifact::BREASTPLATE_ANDURAN) &&
@@ -1740,7 +1739,7 @@ bool Heroes::CanScouteTile(s32 dst) const
     {
 	if(Settings::Get().ExtScouteExtended())
 	{
-	    const Maps::Tiles & tile = world.GetTiles(dst);
+	    //const Maps::Tiles & tile = world.GetTiles(dst);
 
 	    u16 dist = GetSecondaryValues(Skill::Secondary::SCOUTING) ? GetScoute() : 0;
 	    if(Modes(VISIONS) && dist < GetVisionsDistance()) dist = GetVisionsDistance();

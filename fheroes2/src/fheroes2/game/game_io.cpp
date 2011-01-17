@@ -737,7 +737,7 @@ bool Game::IO::LoadBIN(QueueMessage & msg)
     if(byte16 != 0xFF04) DEBUG(DBG_GAME , DBG_WARN, "Game::IO::LoadBIN: 0xFF04");
     msg.Pop(byte8); conf.game_difficulty = Difficulty::Get(byte8);
     msg.Pop(byte8); conf.my_color = Color::Get(byte8);
-    msg.Pop(byte8); conf.cur_color = Color::Get(byte8);
+    msg.Pop(byte8); conf.cur_color = Color::NONE;
     msg.Pop(conf.game_type);
     msg.Pop(conf.players_colors);
     msg.Pop(conf.preferably_count_players);
