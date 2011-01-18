@@ -961,6 +961,29 @@ void Heroes::SetVisited(const s32 index, const Visit::type_t type)
     if(MP2::OBJ_ZERO != object) visit_object.push_front(IndexObject(index, object));
 }
 
+void Heroes::SetVisitedWideTile(const s32 index, const u8 object, const Visit::type_t type)
+{
+    const Maps::Tiles & tile = world.GetTiles(index);
+    const Maps::TilesAddon* addon = tile.FindObject(object);
+    u8 wide = 0;
+
+    switch(object)
+    {
+	case MP2::OBJ_OASIS:
+	case MP2::OBJ_STANDINGSTONES:
+	case MP2::OBJ_ARTESIANSPRING:	wide = 2; break;
+	case MP2::OBJ_WATERINGHOLE:	wide = 4; break;
+	default: break;
+    }
+
+    if(addon && wide)
+    {
+	for(s32 ii = tile.GetIndex() - (wide - 1); ii <= tile.GetIndex() + (wide - 1); ++ii)
+	    if(Maps::isValidAbsIndex(ii) &&
+		world.GetTiles(ii).FindAddonLevel1(addon->uniq)) SetVisited(ii);
+    }
+}
+
 u8 Heroes::GetCountArtifacts(void) const
 {
     return std::count_if(bag_artifacts.begin(), bag_artifacts.end(), std::mem_fun_ref(&Artifact::isValid));

@@ -916,19 +916,10 @@ void AIToPrimarySkillObject(Heroes &hero, const u8 obj, const s32 dst_index)
     {
 	// increase skill
 	hero.IncreasePrimarySkill(skill);
-	hero.SetVisited(dst_index);
+	hero.SetVisited(dst_index, (MP2::OBJ_ARENA == obj ? Visit::GLOBAL : Visit::LOCAL));
 
         // fix double action tile
-        if(obj == MP2::OBJ_STANDINGSTONES)
-        {
-            const Maps::TilesAddon* addon = tile.FindObject(MP2::OBJ_STANDINGSTONES);
-
-            if(addon && Maps::isValidDirection(tile.GetIndex(), Direction::LEFT) &&
-        	world.GetTiles(Maps::GetDirectionIndex(tile.GetIndex(), Direction::LEFT)).FindAddonLevel1(addon->uniq)) hero.SetVisited(Maps::GetDirectionIndex(tile.GetIndex(), Direction::LEFT));
-
-            if(addon && Maps::isValidDirection(tile.GetIndex(), Direction::RIGHT) &&
-                world.GetTiles(Maps::GetDirectionIndex(tile.GetIndex(), Direction::RIGHT)).FindAddonLevel1(addon->uniq)) hero.SetVisited(Maps::GetDirectionIndex(tile.GetIndex(), Direction::RIGHT));
-        }
+	hero.SetVisitedWideTile(dst_index, obj);
     }
 
     DEBUG(DBG_AI , DBG_INFO, "AIToPrimarySkillObject: " << hero.GetName());
@@ -994,8 +985,6 @@ void AIToGoodLuckObject(Heroes &hero, const u8 obj, const s32 dst_index)
 
 void AIToGoodMoraleObject(Heroes &hero, const u8 obj, const s32 dst_index)
 {
-    const Maps::Tiles & tile = world.GetTiles(dst_index);
-
     u16 move = 0;
 
     switch(obj)
@@ -1013,30 +1002,7 @@ void AIToGoodMoraleObject(Heroes &hero, const u8 obj, const s32 dst_index)
         hero.IncreaseMovePoints(move);
 
         // fix double action tile
-        if(obj == MP2::OBJ_OASIS)
-        {
-    	    const Maps::TilesAddon* addon = tile.FindObject(MP2::OBJ_OASIS);
-	    if(addon)
-            {
-                if(Maps::isValidAbsIndex(tile.GetIndex() - 1) &&
-                    world.GetTiles(tile.GetIndex() - 1).FindAddonLevel1(addon->uniq)) hero.SetVisited(tile.GetIndex() - 1);
-
-                if(Maps::isValidAbsIndex(tile.GetIndex() + 1) &&
-                    world.GetTiles(tile.GetIndex() + 1).FindAddonLevel1(addon->uniq)) hero.SetVisited(tile.GetIndex() + 1);
-            }
-        }
-	else
-        if(obj == MP2::OBJ_WATERINGHOLE)
-        {
-            const Maps::TilesAddon* addon = tile.FindObject(MP2::OBJ_WATERINGHOLE);
-            if(addon)
-            {
-                // 4 tiles width
-                for(s32 ii = tile.GetIndex() - 3; ii < tile.GetIndex() + 4; ++ii)
-                    if(Maps::isValidAbsIndex(ii) &&
-                        world.GetTiles(ii).FindAddonLevel1(addon->uniq)) hero.SetVisited(ii);
-            }
-	}
+	hero.SetVisitedWideTile(dst_index, obj);
     }
 
     DEBUG(DBG_AI , DBG_INFO, "AIToGoodMoraleObject: " << hero.GetName());
@@ -1064,19 +1030,10 @@ void AIToArtesianSpring(Heroes &hero, const u8 obj, const s32 dst_index)
     if(!hero.isVisited(MP2::OBJ_ARTESIANSPRING) &&
        hero.GetSpellPoints() < max * 2)
     {
-	hero.SetVisited(dst_index);
 	hero.SetSpellPoints(max * 2);
 
         // fix double action tile
-        {
-	    const Maps::Tiles & tile = world.GetTiles(dst_index);
-	    const Maps::TilesAddon* addon = tile.FindObject(MP2::OBJ_ARTESIANSPRING);
-
-            if(addon && Maps::isValidDirection(tile.GetIndex(), Direction::LEFT) &&
-                world.GetTiles(Maps::GetDirectionIndex(tile.GetIndex(), Direction::LEFT)).FindAddonLevel1(addon->uniq)) hero.SetVisited(Maps::GetDirectionIndex(tile.GetIndex(), Direction::LEFT));
-            if(addon && Maps::isValidDirection(tile.GetIndex(), Direction::RIGHT) &&
-                world.GetTiles(Maps::GetDirectionIndex(tile.GetIndex(), Direction::RIGHT)).FindAddonLevel1(addon->uniq)) hero.SetVisited(Maps::GetDirectionIndex(tile.GetIndex(), Direction::RIGHT));
-        }
+	hero.SetVisitedWideTile(dst_index, obj);
     }
 
     DEBUG(DBG_AI , DBG_INFO, "AIToArtesianSpring: " << hero.GetName());

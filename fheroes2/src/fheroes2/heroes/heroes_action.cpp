@@ -1421,15 +1421,7 @@ void ActionToPrimarySkillObject(Heroes &hero, const u8 obj, const s32 dst_index)
 	Dialog::PrimarySkillInfo(MP2::StringObject(obj), body_true, skill);
 
 	// fix double action tile
-	if(obj == MP2::OBJ_STANDINGSTONES)
-	{
-	    const Maps::TilesAddon* addon = tile.FindObject(MP2::OBJ_STANDINGSTONES);
-	    
-	    if(addon && Maps::isValidDirection(tile.GetIndex(), Direction::LEFT) &&
-		world.GetTiles(Maps::GetDirectionIndex(tile.GetIndex(), Direction::LEFT)).FindAddonLevel1(addon->uniq)) hero.SetVisited(Maps::GetDirectionIndex(tile.GetIndex(), Direction::LEFT));
-	    if(addon && Maps::isValidDirection(tile.GetIndex(), Direction::RIGHT) &&
-		world.GetTiles(Maps::GetDirectionIndex(tile.GetIndex(), Direction::RIGHT)).FindAddonLevel1(addon->uniq)) hero.SetVisited(Maps::GetDirectionIndex(tile.GetIndex(), Direction::RIGHT));
-	}
+	hero.SetVisitedWideTile(dst_index, obj);
     }
 
     DEBUG(DBG_GAME , DBG_INFO, "ActionToPrimarySkillObject: " << hero.GetName());
@@ -1577,8 +1569,6 @@ void ActionToPoorMoraleObject(Heroes &hero, const u8 obj, const s32 dst_index)
 
 void ActionToGoodMoraleObject(Heroes &hero, const u8 obj, const s32 dst_index)
 {
-    const Maps::Tiles & tile = world.GetTiles(dst_index);
-
     std::string body_true;
     std::string body_false;
     u16 move = 0;
@@ -1625,30 +1615,7 @@ void ActionToGoodMoraleObject(Heroes &hero, const u8 obj, const s32 dst_index)
         hero.IncreaseMovePoints(move);
 
 	// fix double action tile
-	if(obj == MP2::OBJ_OASIS)
-	{
-	    const Maps::TilesAddon* addon = tile.FindObject(MP2::OBJ_OASIS);
-	    if(addon)
-	    {
-		if(Maps::isValidAbsIndex(tile.GetIndex() - 1) &&
-		    world.GetTiles(tile.GetIndex() - 1).FindAddonLevel1(addon->uniq)) hero.SetVisited(tile.GetIndex() - 1);
-
-		if(Maps::isValidAbsIndex(tile.GetIndex() + 1) &&
-		    world.GetTiles(tile.GetIndex() + 1).FindAddonLevel1(addon->uniq)) hero.SetVisited(tile.GetIndex() + 1);
-	    }
-	}
-	else
-	if(obj == MP2::OBJ_WATERINGHOLE)
-	{
-	    const Maps::TilesAddon* addon = tile.FindObject(MP2::OBJ_WATERINGHOLE);
-	    if(addon)
-	    {
-		// 4 tiles width
-		for(s32 ii = tile.GetIndex() - 3; ii < tile.GetIndex() + 4; ++ii)
-		    if(Maps::isValidAbsIndex(ii) &&
-			world.GetTiles(ii).FindAddonLevel1(addon->uniq)) hero.SetVisited(ii);
-	    }
-	}
+	hero.SetVisitedWideTile(dst_index, obj);
     }
 
     DEBUG(DBG_GAME , DBG_INFO, "ActionToGoodMoraleObject: " << hero.GetName());
@@ -2540,20 +2507,11 @@ void ActionToArtesianSpring(Heroes &hero, const u8 obj, const s32 dst_index)
     else
     {
 	PlaySoundSuccess;
-	hero.SetVisited(dst_index);
 	hero.SetSpellPoints(max * 2);
 	Dialog::Message(name, _("A drink from the spring fills your blood with magic! You have twice your normal spell points in reserve."), Font::BIG, Dialog::OK);
 
 	// fix double action tile
-	{
-	    const Maps::Tiles & tile = world.GetTiles(dst_index);
-	    const Maps::TilesAddon* addon = tile.FindObject(MP2::OBJ_ARTESIANSPRING);
-
-	    if(addon && Maps::isValidDirection(tile.GetIndex(), Direction::LEFT) &&
-		world.GetTiles(Maps::GetDirectionIndex(tile.GetIndex(), Direction::LEFT)).FindAddonLevel1(addon->uniq)) hero.SetVisited(Maps::GetDirectionIndex(tile.GetIndex(), Direction::LEFT));
-	    if(addon && Maps::isValidDirection(tile.GetIndex(), Direction::RIGHT) &&
-		world.GetTiles(Maps::GetDirectionIndex(tile.GetIndex(), Direction::RIGHT)).FindAddonLevel1(addon->uniq)) hero.SetVisited(Maps::GetDirectionIndex(tile.GetIndex(), Direction::RIGHT));
-	}
+	hero.SetVisitedWideTile(dst_index, obj);
     }
 
     DEBUG(DBG_GAME , DBG_INFO, "ActionToArtesianSpring: " << hero.GetName());
@@ -3025,7 +2983,7 @@ void ActionToArena(Heroes &hero, const u8 obj, const s32 dst_index)
     }
     else
     {
-	hero.SetVisited(dst_index);
+	hero.SetVisited(dst_index, Visit::GLOBAL);
 	PlaySoundSuccess;
 	hero.IncreasePrimarySkill(Dialog::SelectSkillFromArena());
     }
