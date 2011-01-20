@@ -1,4 +1,29 @@
-SVN - up to r2192
+SVN - up to r2227
+
+Jan, 20, 2011
+
++ Fixed: pocketpc: show army info dialog
++ Fixed heroes: auto move hero after battle
++ Fixed: heroes: restore spell points
++ Fixed: heroes: switch combat formation
++ Fixed: heroes: restore spell points
++ Fixed: heroes: ActionToBoat
++ Fixed: castle: area detect
++ Fixed: castle: open mage guild
++ Fixed: castle: GetArmy with guard hero
++ Fixed: battle: reflect wide troops attack
++ Fixed: battle: Roc and Ghost hit animations
++ Fixed: battle: update ghost attack priority
++ Fixed: world: Arena visit, update visit wide objects
++ Fixed: world: artifact "crystall ball" action
++ Fixed: game: high score window
++ Fixed: game: cursor for shimaster
+
++ Added: game: localize maps support, add option: "maps charset ="
++ Added: world: customize sec. skills for Witchs Hut
++ Added: world: disable spells support (spells.xml)
++ Added: world: artifacts.xml customize value
++ Added: options: "heroes: pickup artifact + info dialog"
 
 Jan, 12, 2011
 + Added: update translations
