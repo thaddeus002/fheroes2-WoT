@@ -593,12 +593,14 @@ std::string EncodeString(const std::string & str, const char* charset)
     SDL_iconv_t cd = charset ? SDL_iconv_open("utf8", charset) : (SDL_iconv_t)(-1);
     std::string res;
 
-    if((SDL_iconv_t)(-1) != cd && inbytesleft)
+    if((SDL_iconv_t)(-1) != cd)
     {
-	inbuf1 = inbuf2 = strndup(str.c_str(), inbytesleft);
+	inbuf1 = inbuf2 = (char*) calloc(inbytesleft + 1, 1);
 	outbuf1 = outbuf2 = (char*) calloc(outbytesleft, 1);
 
-	reslen = SDL_iconv(cd, &inbuf1, &inbytesleft, &outbuf1, &outbytesleft);
+	std::strcpy(inbuf1, str.c_str());
+
+	reslen = SDL_iconv(cd, (const char**) &inbuf1, &inbytesleft, &outbuf1, &outbytesleft);
 	SDL_iconv_close(cd);
 
 	if(reslen != (size_t)(-1))
