@@ -710,6 +710,7 @@ void ActionToHeroes(Heroes &hero, const u8 obj, const s32 dst_index)
 	    }
 	}
 
+	bool disable_auto_move = hero.isShipMaster() || other_hero->isShipMaster() || other_hero->inCastle();
         DEBUG(DBG_GAME, DBG_INFO, "ActionToHeroes: " << hero.GetName() << " attack enemy hero " << other_hero->GetName());
 
 	// new battle2
@@ -729,7 +730,7 @@ void ActionToHeroes(Heroes &hero, const u8 obj, const s32 dst_index)
     	    hero.IncreaseExperience(res.GetExperienceAttacker());
 
 	    // auto move hero
-	    if(conf.ExtHeroAutoMove2BattleTarget())
+	    if(conf.ExtHeroAutoMove2BattleTarget() && !disable_auto_move)
 	    {
 		MoveHero2Dest(hero, dst_index, hero.GetUnderObject(), world.GetTiles(dst_index).GetObject());
 	    }
