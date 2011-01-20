@@ -1954,7 +1954,7 @@ void Battle2::Interface::MousePressRightBoardAction(u16 themes, s16 index, Actio
 		case Cursor::SWORD_BOTTOMLEFT:  MouseLeftClickBoardAction(Cursor::SWORD_BOTTOMLEFT, index, a); break;
 		case Cursor::SWORD_LEFT:        MouseLeftClickBoardAction(Cursor::SWORD_LEFT, index, a); break;
 	
-		default: Dialog::ArmyInfo(b->troop, Dialog::READONLY); break;
+		default: Dialog::ArmyInfo(b->troop, Dialog::READONLY|Dialog::BUTTONS); break;
 	    }
 	}
     }
