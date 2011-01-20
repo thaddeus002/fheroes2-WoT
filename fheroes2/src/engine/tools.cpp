@@ -600,7 +600,11 @@ std::string EncodeString(const std::string & str, const char* charset)
 
 	std::strcpy(inbuf1, str.c_str());
 
-	reslen = SDL_iconv(cd, (const char**) &inbuf1, &inbytesleft, &outbuf1, &outbytesleft);
+#if SDL_VERSION_ATLEAST(1, 2, 12)
+	reslen = SDL_iconv(cd, (const char**) (&inbuf1), &inbytesleft, &outbuf1, &outbytesleft);
+#else
+	reslen = SDL_iconv(cd, &inbuf1, &inbytesleft, &outbuf1, &outbytesleft);
+#endif
 	SDL_iconv_close(cd);
 
 	if(reslen != (size_t)(-1))
