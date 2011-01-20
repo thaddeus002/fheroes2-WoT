@@ -30,6 +30,7 @@
 #include "world.h"
 #include "settings.h"
 #include "dir.h"
+#include "tools.h"
 #include "maps_fileinfo.h"
 
 #define LENGTHNAME		16
@@ -85,6 +86,7 @@ bool Maps::FileInfo::ReadSAV(const std::string & filename)
 bool Maps::FileInfo::ReadMP2(const std::string & filename)
 {
     if(filename.empty()) return false;
+    const Settings & conf = Settings::Get();
 
     Reset();
 
@@ -296,12 +298,20 @@ bool Maps::FileInfo::ReadMP2(const std::string & filename)
     bufname[LENGTHNAME - 1] = 0;
     name = _(bufname);
 
+    // encode maps name
+    if(conf.Unicode() && name.size() && conf.MapsCharset().size())
+	name = EncodeString(name, conf.MapsCharset().c_str());
+
     // description
     char bufdescription[LENGTHDESCRIPTION];
     fd.seekg(0x76, std::ios_base::beg);
     fd.read(bufdescription, LENGTHDESCRIPTION);
     bufdescription[LENGTHDESCRIPTION - 1] = 0;
     description = _(bufdescription);
+
+    // encode maps description
+    if(conf.Unicode() && description.size() && conf.MapsCharset().size())
+	description = EncodeString(description, conf.MapsCharset().c_str());
 
     fd.close();
     

@@ -231,6 +231,9 @@ bool Settings::Read(const std::string & filename)
     // unicode
     if(Unicode())
     {
+	entry = config.Find("maps charset");
+	if(entry) maps_charset = entry->StrParams();
+
 	entry = config.Find("lang");
 	if(entry) force_lang = entry->StrParams();
 
@@ -606,6 +609,7 @@ const std::string & Settings::SelectVideoDriver(void) const { return video_drive
 const std::string & Settings::FontsNormal(void) const { return font_normal; }
 const std::string & Settings::FontsSmall(void) const { return font_small; }
 const std::string & Settings::ForceLang(void) const { return force_lang; }
+const std::string & Settings::MapsCharset(void) const { return maps_charset; }
 u8 Settings::FontsNormalSize(void) const { return size_normal; }
 u8 Settings::FontsSmallSize(void) const { return size_small; }
 bool Settings::FontSmallRenderBlended(void) const { return opt_global.Modes(GLOBAL_FONTRENDERBLENDED1); }

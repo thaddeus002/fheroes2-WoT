@@ -583,3 +583,30 @@ void ToolsSrcRectFixed(Rect & src, s16 & rx, s16 & ry, const u16 rw, const u16 r
             src.h = max.y + max.h - ry;
     }
 }
+
+std::string EncodeString(const std::string & str, const char* charset)
+{
+    size_t inbytesleft = str.size();
+    size_t outbytesleft = inbytesleft * 2 + 1;
+    size_t reslen = 0;
+    char *inbuf1, *inbuf2, *outbuf1, *outbuf2;
+    SDL_iconv_t cd = charset ? SDL_iconv_open("utf8", charset) : (SDL_iconv_t)(-1);
+    std::string res;
+
+    if((SDL_iconv_t)(-1) != cd && inbytesleft)
+    {
+	inbuf1 = inbuf2 = strndup(str.c_str(), inbytesleft);
+	outbuf1 = outbuf2 = (char*) calloc(outbytesleft, 1);
+
+	reslen = SDL_iconv(cd, &inbuf1, &inbytesleft, &outbuf1, &outbytesleft);
+	SDL_iconv_close(cd);
+
+	if(reslen != (size_t)(-1))
+	    res = std::string(outbuf2, outbuf1 - outbuf2);
+
+	free(inbuf2);
+	free(outbuf2);
+    }
+
+    return res;
+}

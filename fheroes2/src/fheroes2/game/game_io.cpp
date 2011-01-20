@@ -1100,7 +1100,7 @@ void Game::IO::UnpackKingdom(QueueMessage & msg, Kingdom & kingdom, u16 check_ve
 void Game::IO::UnpackCastle(QueueMessage & msg, Castle & castle, u16 check_version)
 {
     u8 byte8;
-    u16 byte16;
+    //u16 byte16;
     u32 byte32;
 
     msg.Pop(castle.center.x);

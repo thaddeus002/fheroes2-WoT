@@ -60,6 +60,8 @@ bool StoreMemToFile(const std::vector<u8> &, const std::string &);
 bool StoreFileToMem(std::vector<u8> &, const std::string &);
 bool FilePresent(const std::string &);
 
+std::string EncodeString(const std::string & str, const char* charset);
+
 void ToolsSrcRectFixed(Rect &, s16 &, s16 &, const u16, const u16, const Rect &);
 
 #endif
