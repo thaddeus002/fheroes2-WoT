@@ -61,7 +61,7 @@ bool hgs_t::operator== (const hgs_t & h) const
 
 bool RatingSort(const hgs_t & h1, const hgs_t & h2)
 {
-    return h1.rating < h2.rating;
+    return h1.rating > h2.rating;
 }
 
 class HGSData : public QueueMessage
@@ -183,8 +183,12 @@ void HGSData::ScoreRegistry(const std::string & p, const std::string & m, u16 r,
     h.days = r;
     h.rating = s;
 
-    if(list.end() == std::find(list.begin(), list.end(), h)) list.push_back(h);
-    if(list.size() > HGS_MAX) list.resize(HGS_MAX);
+    if(list.end() == std::find(list.begin(), list.end(), h))
+    {
+	list.push_back(h);
+	std::sort(list.begin(), list.end(), RatingSort);
+	if(list.size() > HGS_MAX) list.resize(HGS_MAX);
+    }
 }
 
 void HGSData::RedrawList(s16 ox, s16 oy)
@@ -195,6 +199,9 @@ void HGSData::RedrawList(s16 ox, s16 oy)
     // image background
     const Sprite &back = AGG::GetICN(ICN::HSBKG, 0);
     display.Blit(back, ox, oy);
+
+    const Sprite &head = AGG::GetICN(ICN::HISCORE, 6);
+    display.Blit(head, ox + 50, oy + 31);
 
     std::sort(list.begin(), list.end(), RatingSort);
 
