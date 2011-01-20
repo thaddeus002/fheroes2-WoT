@@ -202,7 +202,6 @@ Dialog::answer_t Heroes::OpenDialog(bool readonly, bool fade)
     luckIndicator.Redraw();
 
     // army format spread
-    const bool combat_format = (Army::FORMAT_SPREAD == army.GetCombatFormat());
     dst_pt.x = cur_pt.x + 515;
     dst_pt.y = cur_pt.y + 63;
     const Sprite & sprite1 = AGG::GetICN(ICN::HSICONS, 9);
@@ -223,8 +222,8 @@ Dialog::answer_t Heroes::OpenDialog(bool readonly, bool fade)
     const Point army2_pt(dst_pt.x - 1, dst_pt.y - 1);
 
     // cursor format
-    SpriteCursor cursorFormat(AGG::GetICN(ICN::HSICONS, 11), combat_format ? army1_pt : army2_pt);
-    cursorFormat.Show(combat_format ? army1_pt : army2_pt);
+    SpriteCursor cursorFormat(AGG::GetICN(ICN::HSICONS, 11), Army::FORMAT_SPREAD == army.GetCombatFormat() ? army1_pt : army2_pt);
+    cursorFormat.Show(Army::FORMAT_SPREAD == army.GetCombatFormat() ? army1_pt : army2_pt);
 
     // experience
     ExperienceIndicator experienceInfo(*this);
@@ -409,7 +408,7 @@ Dialog::answer_t Heroes::OpenDialog(bool readonly, bool fade)
         else
         if(le.MouseClickLeft(rectKnowledgeSkill)) Dialog::Message(_("Knowledge"), knowledgeDescription, Font::BIG, Dialog::OK);
 	else
-        if(!readonly && le.MouseClickLeft(rectSpreadArmyFormat) && !combat_format)
+        if(!readonly && le.MouseClickLeft(rectSpreadArmyFormat) && Army::FORMAT_SPREAD != army.GetCombatFormat())
         {
 	    cursor.Hide();
 	    cursorFormat.Move(army1_pt);
@@ -421,7 +420,7 @@ Dialog::answer_t Heroes::OpenDialog(bool readonly, bool fade)
 #endif
         }
 	else
-        if(!readonly && le.MouseClickLeft(rectGroupedArmyFormat) && combat_format)
+        if(!readonly && le.MouseClickLeft(rectGroupedArmyFormat) && Army::FORMAT_SPREAD == army.GetCombatFormat())
         {
 	    cursor.Hide();
 	    cursorFormat.Move(army2_pt);
