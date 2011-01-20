@@ -185,7 +185,6 @@ bool SkipExtra(u8 art)
 void Artifact::UpdateStats(const std::string & spec)
 {
 #ifdef WITH_XML
-VERBOSE("!!!!!!!!!!!!!!!!!!!");
     // parse artifacts.xml
     TiXmlDocument doc;
     const TiXmlElement* xml_artifacts = NULL;
@@ -343,7 +342,6 @@ u8 Artifact::GetLevelLoyalty(artifact_t art)
     {
         case MASTHEAD:
         case SPADE_NECROMANCY:
-        case CRYSTAL_BALL:
 	    return ART_LEVEL2;
 
         case BREASTPLATE_ANDURAN:
@@ -355,6 +353,7 @@ u8 Artifact::GetLevelLoyalty(artifact_t art)
         case STAFF_WIZARDRY:
         case SWORD_BREAKER:
         case SWORD_ANDURAN:
+        case CRYSTAL_BALL:
 	    return ART_LEVEL3;
 
 	case SPELL_SCROLL:
