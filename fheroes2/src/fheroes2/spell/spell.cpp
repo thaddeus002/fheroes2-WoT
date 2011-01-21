@@ -558,7 +558,8 @@ Spell::spell_t Spell::RandCombat(u8 lvl)
 
 Spell::spell_t Spell::RandAdventure(u8 lvl)
 {
-    return Rand(lvl, true);
+    spell_t res = Rand(lvl, true);
+    return NONE != res ? res : RandCombat(lvl);
 }
 
 bool Spell::isMindInfluence(u8 spell)
