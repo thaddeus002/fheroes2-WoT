@@ -290,8 +290,6 @@ Heroes::Heroes(heroes_t ht, Race::race_t rc) : killer_color(Color::GRAY), experi
 
 void Heroes::LoadFromMP2(s32 map_index, const void *ptr, const Color::color_t cl, const Race::race_t rc)
 {
-    const Settings & conf = Settings::Get();
-
     // reset modes
     modes = 0;
 
@@ -440,12 +438,8 @@ void Heroes::LoadFromMP2(s32 map_index, const void *ptr, const Color::color_t cl
     ++ptr8;
 
     // custom name
-    if(*ptr8) name = std::string(_(reinterpret_cast<const char *>(ptr8 + 1)));
+    if(*ptr8) name = Game::GetEncodeString(reinterpret_cast<const char *>(ptr8 + 1));
     ptr8 += 14;
-
-    // encode custom name
-    if(conf.Unicode() && name.size() && conf.MapsCharset().size())
-        name = EncodeString(name, conf.MapsCharset().c_str());
 
     // fixed race for custom portrait
     if(custom_portrait && Settings::Get().ExtForceSelectRaceFromType())

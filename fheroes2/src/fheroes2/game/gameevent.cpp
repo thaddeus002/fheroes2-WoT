@@ -24,7 +24,6 @@
 #include "color.h"
 #include "dialog.h"
 #include "settings.h"
-#include "tools.h"
 #include "gameevent.h"
 
 #define SIZEMESSAGE 400
@@ -35,7 +34,6 @@ GameEvent::Day::Day() : computer(false), first(MAXU16), subsequent(0), colors(0)
 
 GameEvent::Day::Day(const void *ptr)
 {
-    const Settings & conf = Settings::Get();
     const u8  *ptr8  = static_cast<const u8 *>(ptr);
     u16 byte16 = 0;
     u32 byte32 = 0;
@@ -129,11 +127,7 @@ GameEvent::Day::Day(const void *ptr)
     ++ptr8;
 
     // message
-    message = std::string(_(reinterpret_cast<const char *>(ptr8)));
-
-    // encode custom message
-    if(conf.Unicode() && message.size() && conf.MapsCharset().size())
-        message = EncodeString(message, conf.MapsCharset().c_str());
+    message = Game::GetEncodeString(reinterpret_cast<const char *>(ptr8));
 
     //if(SIZEMESSAGE < message.size()) DEBUG(DBG_GAME , DBG_WARN, "GameEvent::Day: long message, incorrect block?");
 
@@ -146,7 +140,6 @@ GameEvent::Coord::Coord() : index_map(-1), artifact(Artifact::UNKNOWN), computer
 
 GameEvent::Coord::Coord(s32 index, const void *ptr) : index_map(index)
 {
-    const Settings & conf = Settings::Get();
     const u8  *ptr8  = static_cast<const u8 *>(ptr);
     u16 byte16 = 0;
     u32 byte32 = 0;
@@ -229,11 +222,7 @@ GameEvent::Coord::Coord(s32 index, const void *ptr) : index_map(index)
     ++ptr8;
 
     // message
-    message = std::string(_(reinterpret_cast<const char *>(ptr8)));
-
-    // encode custom message
-    if(conf.Unicode() && message.size() && conf.MapsCharset().size())
-        message = EncodeString(message, conf.MapsCharset().c_str());
+    message = Game::GetEncodeString(reinterpret_cast<const char *>(ptr8));
 
     DEBUG(DBG_GAME , DBG_INFO, "GameEvent::Coord: add: " << message);
 }
@@ -244,7 +233,6 @@ GameEvent::Riddle::Riddle() : index_map(-1), artifact(Artifact::UNKNOWN), valid(
 
 GameEvent::Riddle::Riddle(s32 index, const void *ptr) : index_map(index), valid(false)
 {
-    const Settings & conf = Settings::Get();
     const u8  *ptr8  = static_cast<const u8 *>(ptr);
     u16 byte16 = 0;
     u32 byte32 = 0;
@@ -302,30 +290,18 @@ GameEvent::Riddle::Riddle(s32 index, const void *ptr) : index_map(index), valid(
     {
 	std::string str(reinterpret_cast<const char *>(ptr8));
 	String::Lower(str);
+
 	if(count-- && str.size())
 	{
-	    answers.push_back(str);
-
-	    // encode custom riddle
-	    if(conf.Unicode() && conf.MapsCharset().size())
-    		answers.back() = EncodeString(answers.back(), conf.MapsCharset().c_str());
-
-	    answers.push_back(_(reinterpret_cast<const char *>(ptr8)));
-
-	    // encode custom answers
-	    if(conf.Unicode() && answers.back().size() && conf.MapsCharset().size())
-    		answers.back() = EncodeString(answers.back(), conf.MapsCharset().c_str());
+	    answers.push_back(Game::GetEncodeString(str.c_str()));
+	    answers.push_back(Game::GetEncodeString(reinterpret_cast<const char *>(ptr8)));
 	};
 	ptr8 += 13;
     }
 
     // message
-    message = std::string(_(reinterpret_cast<const char *>(ptr8)));
+    message = Game::GetEncodeString(reinterpret_cast<const char *>(ptr8));
 
-    // encode custom message
-    if(conf.Unicode() && message.size() && conf.MapsCharset().size())
-        message = EncodeString(message, conf.MapsCharset().c_str());
-    
     valid = true;
 
     DEBUG(DBG_GAME , DBG_INFO, "GameEvent::Riddle: add: " << message);

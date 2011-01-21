@@ -250,6 +250,8 @@ namespace Game
     void OpenHeroesDialog(Heroes*);
     void OpenCastleDialog(Castle*);
 
+    std::string GetEncodeString(const char*);
+
     namespace Scenario
     {
 	void RedrawStaticInfo(const Point &);

@@ -737,16 +737,7 @@ void World::LoadMaps(const std::string &filename)
 		case MP2::OBJ_BOTTLE:
 		    // add sign or buttle
 		    if(SIZEOFMP2SIGN - 1 < sizeblock && 0x01 == pblock[0])
-		    {
-			const Settings & conf = Settings::Get();
-			std::string sign(_(reinterpret_cast<char *>(&pblock[9])));
-
-		        // encode custom name
-		        if(conf.Unicode() && sign.size() && conf.MapsCharset().size())
-		            sign = EncodeString(sign, conf.MapsCharset().c_str());
-
-			map_sign[*it_index] = sign;
-		    }
+			map_sign[*it_index] = Game::GetEncodeString(reinterpret_cast<char *>(&pblock[9]));
 		    break;
 		case MP2::OBJ_EVENT:
 		    // add event maps
@@ -775,14 +766,7 @@ void World::LoadMaps(const std::string &filename)
 	    {
 		if(pblock[8])
 		{
-		    const Settings & conf = Settings::Get();
-		    std::string rumor = _(reinterpret_cast<char *>(&pblock[8]));
-
-		    // encode rumor
-		    if(conf.Unicode() && rumor.size() && conf.MapsCharset().size())
-		        rumor = EncodeString(rumor, conf.MapsCharset().c_str());
-
-		    vec_rumors.push_back(rumor);
+		    vec_rumors.push_back(Game::GetEncodeString(reinterpret_cast<char *>(&pblock[8])));
 		    DEBUG(DBG_GAME , DBG_INFO, "add Rumors: " << vec_rumors.back());
 		}
 	    }

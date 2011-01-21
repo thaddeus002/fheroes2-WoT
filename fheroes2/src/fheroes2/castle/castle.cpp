@@ -51,7 +51,6 @@ Castle::Castle(s16 cx, s16 cy, const Race::race_t rc) : Position(Point(cx, cy)),
 
 void Castle::LoadFromMP2(const void *ptr)
 {
-    const Settings & conf = Settings::Get();
     const u8  *ptr8  = static_cast<const u8 *>(ptr);
     u16 byte16 = 0;
 
@@ -198,12 +197,8 @@ void Castle::LoadFromMP2(const void *ptr)
     
     // custom name
     ++ptr8;
-    name = std::string(_(reinterpret_cast<const char *>(ptr8)));
+    name = Game::GetEncodeString(reinterpret_cast<const char*>(ptr8));
     ptr8 += 13;
-
-    // encode custom name
-    if(conf.Unicode() && name.size() && conf.MapsCharset().size())
-        name = EncodeString(name, conf.MapsCharset().c_str());
 
     // race
     const Race::race_t kingdom_race = Settings::Get().KingdomRace(color);

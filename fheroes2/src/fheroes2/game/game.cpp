@@ -44,6 +44,7 @@
 #include "buildinginfo.h"
 #include "skill.h"
 #include "battle2.h"
+#include "tools.h"
 #include "game.h"
 
 #ifdef WITH_XML
@@ -459,4 +460,18 @@ void Game::LoadExternalResource(const Settings & conf)
 
     if(FilePresent(spec))
 	Skill::UpdateStats(spec);
+}
+
+std::string Game::GetEncodeString(const char* str)
+{
+    const Settings & conf = Settings::Get();
+    std::string str1(str);
+    std::string str2(_(str));
+
+    // encode name
+    if(str1 == str2 && str1.size() &&
+       conf.Unicode() && conf.MapsCharset().size())
+	str2 = EncodeString(str1, conf.MapsCharset().c_str());
+
+    return str2;
 }

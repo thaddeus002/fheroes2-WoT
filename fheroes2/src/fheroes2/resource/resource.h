@@ -40,6 +40,14 @@ namespace Resource
         GOLD	= 0x40
     };
 
+    struct single_t
+    {
+	single_t(resource_t rs = UNKNOWN, u32 sz = 0) : type(rs), count(sz) {};
+
+	resource_t type;
+	u32 count;
+    };
+
     struct funds_t
     {
 	funds_t() : wood(0), mercury(0), ore(0), sulfur(0), crystal(0), gems(0), gold(0) {};

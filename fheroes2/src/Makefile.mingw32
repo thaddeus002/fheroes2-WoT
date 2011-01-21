@@ -8,6 +8,10 @@ endif
 
 ifndef WITHOUT_UNICODE
 LIBS := $(LIBS) -lintl -lfreetype
+ifdef WITH_ICONV
+CFLAGS := $(CFLAGS) -DWITH_ICONV
+LIBS := $(LIBS) -liconv
+endif
 endif
 
 ifndef WITHOUT_AUDIOCD

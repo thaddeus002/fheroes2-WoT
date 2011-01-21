@@ -232,7 +232,11 @@ bool Settings::Read(const std::string & filename)
     if(Unicode())
     {
 	entry = config.Find("maps charset");
-	if(entry) maps_charset = entry->StrParams();
+	if(entry)
+	{
+	    maps_charset = entry->StrParams();
+	    String::Lower(maps_charset);
+	}
 
 	entry = config.Find("lang");
 	if(entry) force_lang = entry->StrParams();
