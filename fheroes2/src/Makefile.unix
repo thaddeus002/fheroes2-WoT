@@ -1,2 +1,3 @@
 AR := ar
 CXX := g++
+CFLAGS := $(CFLAGS) -DWITH_ICONV
