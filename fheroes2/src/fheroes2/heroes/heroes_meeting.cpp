@@ -415,18 +415,6 @@ void Heroes::ScholarAction(Heroes & hero1, Heroes & hero2)
     SpellBookSetFilter(teacher->bag_artifacts, teacher->spell_book.spells, teach, SpellBook::ALL);
     SpellBookSetFilter(learner->bag_artifacts, learner->spell_book.spells, learn, SpellBook::ALL);
 
-    VERBOSE(learner->GetName());
-    for(it1 = learn.begin(); it1 != learn.end(); ++it1)
-    {
-	VERBOSE(Spell::GetName(*it1) << "(" << static_cast<int>(Spell::Level(*it1)) << ")");
-    }
-
-    VERBOSE(teacher->GetName());
-    for(it1 = teach.begin(); it1 != teach.end(); ++it1)
-    {
-	VERBOSE(Spell::GetName(*it1) << "(" << static_cast<int>(Spell::Level(*it1)) << ")");
-    }
-
     // remove_if for learn spells
     if(learn.size())
     {
@@ -477,27 +465,28 @@ void Heroes::ScholarAction(Heroes & hero1, Heroes & hero2)
 	spells2.append(Spell::GetName(*it1));
     }
 
-    if(spells1.size() && spells2.size())
-	message = _("%{teacher}, whose %{level} %{scholar} knows many magical secrets, learns %{spells1} from %{learner}, and teaches %{spells2} to %{learner}.");
-    else
-    if(spells1.size())
-	message = _("%{teacher}, whose %{level} %{scholar} knows many magical secrets, learns %{spells1} from %{learner}.");
-    else
-    if(spells2.size())
-	message = _("%{teacher}, whose %{level} %{scholar} knows many magical secrets, teaches %{spells2} to %{learner}.");
 
-    if(message.size() &&
-	(Game::LOCAL == teacher->GetControl() || Game::LOCAL == learner->GetControl()))
+    if(Game::LOCAL == teacher->GetControl() || Game::LOCAL == learner->GetControl())
     {
-	String::Replace(message, "%{teacher}", teacher->GetName());
-	String::Replace(message, "%{learner}", learner->GetName());
-	String::Replace(message, "%{level}", Skill::Level::String(scholar));
-	String::Replace(message, "%{scholar}", Skill::Secondary::String(Skill::Secondary::EAGLEEYE));
-	String::Replace(message, "%{spells1}", spells1);
-	String::Replace(message, "%{spells2}", spells2);
+	if(spells1.size() && spells2.size())
+	    message = _("%{teacher}, whose %{level} %{scholar} knows many magical secrets, learns %{spells1} from %{learner}, and teaches %{spells2} to %{learner}.");
+	else
+	if(spells1.size())
+	    message = _("%{teacher}, whose %{level} %{scholar} knows many magical secrets, learns %{spells1} from %{learner}.");
+	else
+	if(spells2.size())
+	    message = _("%{teacher}, whose %{level} %{scholar} knows many magical secrets, teaches %{spells2} to %{learner}.");
 
-	Dialog::Message(_("Scholar Ability"), message, Font::BIG, Dialog::OK);
+	if(message.size())
+	{
+	    String::Replace(message, "%{teacher}", teacher->GetName());
+	    String::Replace(message, "%{learner}", learner->GetName());
+	    String::Replace(message, "%{level}", Skill::Level::String(scholar));
+	    String::Replace(message, "%{scholar}", Skill::Secondary::String(Skill::Secondary::EAGLEEYE));
+	    String::Replace(message, "%{spells1}", spells1);
+	    String::Replace(message, "%{spells2}", spells2);
+
+	    Dialog::Message(_("Scholar Ability"), message, Font::BIG, Dialog::OK);
+	}
     }
-
-    VERBOSE(message);
 }

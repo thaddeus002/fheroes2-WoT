@@ -438,15 +438,15 @@ Cursor::themes_t Game::GetCursorFocusCastle(const Castle & from_castle, const Ma
 Cursor::themes_t Game::GetCursorFocusShipmaster(const Heroes & from_hero, const Maps::Tiles & tile)
 {
     const Settings & conf = Settings::Get();
-
-    if(tile.GetGround() != Maps::Ground::WATER)
-	return Cursor::POINTER;
+    const bool water = tile.GetGround() == Maps::Ground::WATER;
 
     switch(tile.GetObject())
     {
 	case MP2::OBJ_MONSTER:
-    	    return from_hero.Modes(Heroes::GUARDIAN) ? Cursor::POINTER :
+	    if(water)
+    		return from_hero.Modes(Heroes::GUARDIAN) ? Cursor::POINTER :
 		    Cursor::DistanceThemes(Cursor::FIGHT, from_hero.GetRangeRouteDays(tile.GetIndex()));
+	    break;
 
 	case MP2::OBJ_BOAT:
 	    return Cursor::POINTER;
@@ -486,11 +486,14 @@ Cursor::themes_t Game::GetCursorFocusShipmaster(const Heroes & from_hero, const 
 	    return Cursor::DistanceThemes(Cursor::ANCHOR, from_hero.GetRangeRouteDays(tile.GetIndex()));
 
 	default:
-	    if(MP2::isWaterObject(tile.GetObject()))
-		return Cursor::DistanceThemes(Cursor::REDBOAT, from_hero.GetRangeRouteDays(tile.GetIndex()));
-	    else
-	    if(tile.isPassable(&from_hero))
-		return Cursor::DistanceThemes(Cursor::BOAT, from_hero.GetRangeRouteDays(tile.GetIndex()));
+	    if(water)
+	    {
+		if(MP2::isWaterObject(tile.GetObject()))
+		    return Cursor::DistanceThemes(Cursor::REDBOAT, from_hero.GetRangeRouteDays(tile.GetIndex()));
+		else
+		if(tile.isPassable(&from_hero))
+		    return Cursor::DistanceThemes(Cursor::BOAT, from_hero.GetRangeRouteDays(tile.GetIndex()));
+	    }
 	break;
     }
 

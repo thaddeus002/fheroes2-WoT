@@ -44,6 +44,8 @@ Game::menu_t Game::LoadMulti(void)
 
 Game::menu_t Game::LoadGame(void)
 {
+    return LOADSTANDARD;
+/*
     Mixer::Pause();
     AGG::PlayMusic(MUS::MAINMENU);
 
@@ -99,6 +101,7 @@ Game::menu_t Game::LoadGame(void)
     }
 
     return QUITGAME;
+*/
 }
 
 Game::menu_t Game::LoadStandard(void)

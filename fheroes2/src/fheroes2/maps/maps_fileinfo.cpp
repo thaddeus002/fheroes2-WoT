@@ -85,7 +85,6 @@ bool Maps::FileInfo::ReadSAV(const std::string & filename)
 bool Maps::FileInfo::ReadMP2(const std::string & filename)
 {
     if(filename.empty()) return false;
-    const Settings & conf = Settings::Get();
 
     Reset();
 

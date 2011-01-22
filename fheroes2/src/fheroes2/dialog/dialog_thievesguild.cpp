@@ -312,6 +312,7 @@ void Dialog::ThievesGuild(bool oracle)
     Cursor & cursor = Cursor::Get();
 
     cursor.Hide();
+    cursor.SetThemes(Cursor::POINTER);
 
     Dialog::FrameBorder frameborder;
     frameborder.SetPosition((display.w() - 640 - BORDERWIDTH * 2) / 2, (display.h() - 480 - BORDERWIDTH * 2) / 2, 640, 480);
