@@ -2118,7 +2118,7 @@ void AIHeroesAddedRescueTask(Heroes & hero)
         	const s32 res = Maps::GetIndexFromAbsPoint(ix, iy);
 
         	if(world.GetTiles(res).isFog(hero.GetColor()) &&
-            	    world.GetTiles(res).isPassable(&hero, true) &&
+            	    world.GetTiles(res).isPassable(&hero, Direction::UNKNOWN, true) &&
 		    hero.GetPath().Calculate(res))
         	{
             	    task.push_back(res);
@@ -2313,7 +2313,7 @@ void AIHeroesGetTask(Heroes & hero)
 		std::random_shuffle(results.begin(), results.end());
 		std::vector<s32>::const_iterator it = results.begin();
 		for(; it != results.end(); ++it)
-		    if(world.GetTiles(*it).isPassable(&hero, true) &&
+		    if(world.GetTiles(*it).isPassable(&hero, Direction::UNKNOWN, true) &&
 			hero.GetPath().Calculate(*it))
 		{
 		    DEBUG(DBG_AI , DBG_INFO, "AI::HeroesTask: " << Color::String(hero.GetColor()) <<
