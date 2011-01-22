@@ -23,7 +23,7 @@
 #include "icn.h"
 #include "objcrck.h"
 
-bool ObjWasteLand::isPassable(const u16 icn, const u8 index)
+bool ObjWasteLand::isPassable(const u16 icn, const u8 index, const Direction::vector_t direct)
 {
     switch(icn)
     {
@@ -60,19 +60,29 @@ bool ObjWasteLand::isPassable(const u16 icn, const u8 index)
 		170 == index || 181 == index) return false;
 	    else
 	    // troll bridge
-	    if(181 < index && index < 190) return false;
+	    if(181 < index && index < 188) return false;
+	    else
+	    if(188 == index)
+                return (direct & (Direction::RIGHT | DIRECTION_BOTTOM_ROW));
+	    else
+	    if(189 == index)
+                return (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
 	    else
 	    // market
 	    if(202 == index || 213 == index) return false;
 	    else
 	    // watering hole
-	    if(216 < index && index < 221) return false;
+	    if(216 < index && index < 221)
+                return (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
 	    else
 	    // obelisk
 	    if(238 == index) return false;
 	    else
 	    // saw mill
-	    if(240 < index && index < 246) return false;
+	    if(240 < index && index < 243) return false;
+	    else
+	    if(242 < index && index < 247)
+                return (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
 
 	    else return true;
 

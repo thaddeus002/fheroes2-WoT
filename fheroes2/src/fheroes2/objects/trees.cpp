@@ -38,7 +38,7 @@ Trees::Trees(const ICN::icn_t icn) : Object(MP2::OBJ_TREES, icn)
     }
 }
 
-bool Trees::isPassable(const u16 icn, const u8 index)
+bool Trees::isPassable(const u16 icn, const u8 index, const Direction::vector_t direct)
 {
     switch(icn)
     {

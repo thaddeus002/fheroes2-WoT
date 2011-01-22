@@ -23,13 +23,14 @@
 #include "icn.h"
 #include "objdirt.h"
 
-bool ObjDirt::isPassable(const u16 icn, const u8 index)
+bool ObjDirt::isPassable(const u16 icn, const u8 index, const Direction::vector_t direct)
 {
     switch(icn)
     {
 	case ICN::OBJNDIRT:
 	    // abandone mines
-	    if(6 < index && index < 10) return false;
+	    if(6 < index && index < 10)
+		return Mines::isPassable(index, 8, direct);
 	    else
 	    // mound
 	    if((11 < index && index < 14) || (14 < index && index < 17)) return false;
@@ -53,22 +54,30 @@ bool ObjDirt::isPassable(const u16 icn, const u8 index)
 	    if(118 == index || 123  == index || 127 == index)  return false;
 	    else
 	    // faerie ring
-	    if(128 < index && index < 131)  return false;
+	    if(128 < index && index < 131)
+		return (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
 	    else
 	    // hill fort
-	    if(132 < index && index < 136)  return false;
+	    if(132 < index && index < 134)  return false;
+	    else
+	    if(134 == index || index == 135)
+		return (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
 	    else
 	    // halfling hole
-	    if(136 < index && index < 140)  return false;
+	    if(136 < index && index < 140)
+		return (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
 	    else
 	    // tree city
-	    if(150 < index && index < 153)  return false;
+	    if(150 < index && index < 153)
+		return (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
 	    else
 	    // wind mill
-	    if(185 == index || 189 == index) return false;
+	    if(185 == index || 189 == index)
+		return (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
 	    else
 	    // oracul
-	    if(196 < index && index < 199)  return false;
+	    if(196 < index && index < 199)
+		return (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
 	    else
 	    // obelisk
 	    if(201 == index)  return false;

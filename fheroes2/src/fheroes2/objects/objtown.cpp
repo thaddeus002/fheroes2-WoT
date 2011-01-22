@@ -28,7 +28,7 @@
 #include "direction.h"
 #include "objtown.h"
 
-bool ObjTown::isPassable(const u16 icn, const u8 index, const s32 maps_index)
+bool ObjTown::isPassable(const u16 icn, const u8 index, const Direction::vector_t direct, const s32 maps_index)
 {
     switch(icn)
     {
@@ -38,7 +38,7 @@ bool ObjTown::isPassable(const u16 icn, const u8 index, const s32 maps_index)
 		if(!Maps::isValidDirection(maps_index, Direction::BOTTOM)) return false;
 		const Maps::Tiles & tiles = world.GetTiles(Maps::GetDirectionIndex(maps_index, Direction::BOTTOM));
 		Game::Focus & focus = Game::Focus::Get();
-		return tiles.isPassable((Game::Focus::HEROES == focus.Type() ? &focus.GetHeroes() : NULL), false);
+		return tiles.isPassable((Game::Focus::HEROES == focus.Type() ? &focus.GetHeroes() : NULL), Direction::UNKNOWN, false);
 	    }
 
             if(index < 5 || ( 9 < index && index < 15) || (19 < index && index < 25) ||

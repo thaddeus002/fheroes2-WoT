@@ -23,7 +23,7 @@
 #include "icn.h"
 #include "objwatr.h"
 
-bool ObjWater::isPassable(const u16 icn, const u8 index)
+bool ObjWater::isPassable(const u16 icn, const u8 index, const Direction::vector_t direct)
 {
     switch(icn)
     {

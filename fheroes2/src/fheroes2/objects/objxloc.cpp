@@ -25,7 +25,7 @@
 #include "maps_tiles.h"
 #include "objxloc.h"
 
-bool ObjLoyalty::isPassable(const u16 icn, const u8 index)
+bool ObjLoyalty::isPassable(const u16 icn, const u8 index, const Direction::vector_t direct)
 {
     switch(icn)
     {

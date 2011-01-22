@@ -105,7 +105,8 @@ void Game::MoveHeroFromArrowKeys(Heroes & hero, Direction::vector_t direct)
 		break;
 
 	    default:
-		allow = (tile.isPassable(&hero) || MP2::isActionObject(tile.GetObject(), hero.isShipMaster()));
+		allow = (tile.isPassable(&hero, Direction::UNKNOWN, false) ||
+				MP2::isActionObject(tile.GetObject(), hero.isShipMaster()));
 		break;
 	}
 
@@ -215,7 +216,7 @@ Game::menu_t Game::StartGame(void)
 		    I.iconsPanel.ShowIcons();
 		    conf.SetMyColor(color);
 		    m = HumanTurn(skip_turns);
-		    skip_turns = false;
+		    if(skip_turns) skip_turns = false;
 		break;
 
 		// AI turn
@@ -491,7 +492,7 @@ Cursor::themes_t Game::GetCursorFocusShipmaster(const Heroes & from_hero, const 
 		if(MP2::isWaterObject(tile.GetObject()))
 		    return Cursor::DistanceThemes(Cursor::REDBOAT, from_hero.GetRangeRouteDays(tile.GetIndex()));
 		else
-		if(tile.isPassable(&from_hero))
+		if(tile.isPassable(&from_hero, Direction::UNKNOWN, false))
 		    return Cursor::DistanceThemes(Cursor::BOAT, from_hero.GetRangeRouteDays(tile.GetIndex()));
 	    }
 	break;
@@ -603,7 +604,7 @@ Cursor::themes_t Game::GetCursorFocusHeroes(const Heroes & from_hero, const Maps
 						from_hero.GetRangeRouteDays(tile.GetIndex()));
 	    }
 	    else
-	    if(tile.isPassable(&from_hero))
+	    if(tile.isPassable(&from_hero, Direction::UNKNOWN, false))
 	    {
 		bool protection = Maps::TileUnderProtection(tile.GetIndex());
 
@@ -1154,8 +1155,9 @@ void Game::FocusHeroesClickLeftAction(Heroes & from_hero, s32 index_maps)
 	break;
 
 	default:
-	    if(tile.isPassable(&from_hero) || MP2::isActionObject(tile.GetObject(), from_hero.isShipMaster()))
-		ShowPathOrStartMoveHero(&from_hero, index_maps);
+	    if(tile.isPassable(&from_hero, Direction::UNKNOWN, false) ||
+		    MP2::isActionObject(tile.GetObject(), from_hero.isShipMaster()))
+			ShowPathOrStartMoveHero(&from_hero, index_maps);
 	    break;
     }
 }

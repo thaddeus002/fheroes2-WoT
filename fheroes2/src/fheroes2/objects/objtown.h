@@ -23,11 +23,11 @@
 #ifndef H2OBJTOWN_H
 #define H2OBJTOWN_H
 
-#include "gamedefs.h"
+#include "object.h"
 
 namespace ObjTown
 {
-    bool	isPassable(const u16 icn, const u8 index, const s32 maps_index);
+    bool	isPassable(const u16 icn, const u8 index, const Direction::vector_t, const s32 maps_index);
 }
 
 #endif

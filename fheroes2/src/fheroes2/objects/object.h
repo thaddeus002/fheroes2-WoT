@@ -24,9 +24,15 @@
 #define H2OBJECT_H
 
 #include "mp2.h"
+#include "direction.h"
 #include "gamedefs.h"
 
 namespace Maps { class TilesAddon; }
+
+namespace Mines
+{
+	bool		isPassable(u8 index, u8 center, Direction::vector_t);
+}
 
 class Object
 {
@@ -34,7 +40,7 @@ class Object
 	Object(const MP2::object_t obj = MP2::OBJ_ZERO, const u16 sicn = ICN::UNKNOWN, const u32 uid = 0);
 	~Object();
 
-	static bool		isPassable(const std::list<Maps::TilesAddon> & bottoms, const s32 maps_index);
+	static bool		isPassable(const std::list<Maps::TilesAddon> & bottoms, Direction::vector_t, const s32 maps_index);
 	static bool		AllowDirect(const u8 general, const u16 direct);
 
 	const MP2::object_t	object;

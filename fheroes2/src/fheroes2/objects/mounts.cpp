@@ -40,7 +40,7 @@ Mounts::Mounts(const ICN::icn_t icn) : Object(MP2::OBJ_MOUNTS, icn)
     }
 }
 
-bool Mounts::isPassable(const u16 icn, const u8 index)
+bool Mounts::isPassable(const u16 icn, const u8 index, const Direction::vector_t direct)
 {
     // bug fix
     switch(icn)

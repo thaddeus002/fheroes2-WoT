@@ -23,11 +23,11 @@
 #ifndef H2OBJWATR_H
 #define H2OBJWATR_H
 
-#include "gamedefs.h"
+#include "object.h"
 
 namespace ObjWater
 {
-    bool	isPassable(const u16 icn, const u8 index);
+    bool	isPassable(const u16 icn, const u8 index, const Direction::vector_t = Direction::UNKNOWN);
 }
 
 #endif

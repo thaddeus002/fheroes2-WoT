@@ -23,7 +23,7 @@
 #include "icn.h"
 #include "objswmp.h"
 
-bool ObjSwamp::isPassable(const u16 icn, const u8 index)
+bool ObjSwamp::isPassable(const u16 icn, const u8 index, const Direction::vector_t direct)
 {
     switch(icn)
     {
@@ -35,10 +35,12 @@ bool ObjSwamp::isPassable(const u16 icn, const u8 index)
 	    if((31 < index && index < 34)) return false;
 	    else
 	    // xanadu
-	    if(67 == index || 74 == index || (80 < index && index < 83)) return false;
+	    if(67 == index || 74 == index || (80 < index && index < 83))
+		return (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
 	    else
 	    // faerie ring
-	    if((83 < index && index < 86)) return false;
+	    if((83 < index && index < 86))
+		return (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
 	    else
 	    // lake
 	    if((87 < index && index < 92) || (93 < index && index < 99) || (100 < index && index < 106)) return false;

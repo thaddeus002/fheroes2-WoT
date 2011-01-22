@@ -23,19 +23,21 @@
 #include "icn.h"
 #include "objsnow.h"
 
-bool ObjSnow::isPassable(const u16 icn, const u8 index)
+bool ObjSnow::isPassable(const u16 icn, const u8 index, const Direction::vector_t direct)
 {
     switch(icn)
     {
 	case ICN::OBJNSNOW:
 	    // cave for centaur
-	    if((1 < index && index < 4)) return false;
+	    if((1 < index && index < 4))
+		return (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
 	    else
 	    // camp fire
 	    if(4 == index) return false;
 	    else
 	    // learn to
-	    if(13 == index) return false;
+	    if(12 == index || 13 == index)
+		return (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
 	    else
 	    // rock
 	    if(22 == index || (25 < index && index < 29) || 30 == index ||
@@ -53,7 +55,8 @@ bool ObjSnow::isPassable(const u16 icn, const u8 index)
 	    if((80 < index && index < 93) || (93 < index && index < 96)) return false;
 	    else
 	    //wind mill
-	    if(128 == index || 132 == index) return false;
+	    if(128 == index || 132 == index)
+		return (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
 	    else
 	    // watch tower
 	    if(138 == index) return false;
@@ -65,20 +68,25 @@ bool ObjSnow::isPassable(const u16 icn, const u8 index)
 	    if(143 == index) return false;
 	    else
 	    // alchemy tower
-	    if(148 < index && index < 152) return false;
+	    if(148 < index && index < 152)
+		return (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
 	    else
 	    // graveyard
-	    if((158 < index && index < 161) || (207 < index && index < 211)) return false;
+	    if((158 < index && index < 161) || (207 < index && index < 211))
+		return (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
 	    else
 	    // water mill
-	    if(177 == index || 184 == index || 191 == index) return false;
+	    if(177 == index || 184 == index || 191 == index)
+		return (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
 	    else
 	    // well
 	    if(194 == index) return false;
 	    else
 	    // saw mill
-	    if((196 < index && index < 202)) return false;
-
+	    if(196 < index && index < 199) return false;
+	    else
+	    if(198 < index && index < 202)
+		return (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
 	    else return true;	    
 
 	default: break;

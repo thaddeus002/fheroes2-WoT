@@ -22,23 +22,28 @@
 
 #include "icn.h"
 #include "objgras.h"
+#include <iostream>
 
-bool ObjGrass::isPassable(const u16 icn, const u8 index)
+bool ObjGrass::isPassable(const u16 icn, const u8 index, const Direction::vector_t direct)
 {
     switch(icn)
     {
 	case ICN::OBJNGRA2:
 	    // hill fort
-	    if(1 < index && index < 5) return false;
+	    if(1 < index && index < 5)
+		return (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
 	    else
 	    // halfling hole
-	    if(5 < index && index < 9) return false;
+	    if(5 < index && index < 9)
+		return (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
 	    else
 	    // tree city
-	    if(20 < index && index < 23) return false;
+	    if(20 < index && index < 23)
+		return (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
 	    else
 	    // wind mill
-	    if(55 == index || 59 == index) return false;
+	    if(55 == index || 59 == index)
+		return (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
 	    else
 	    // archer house
 	    if(84 == index) return false;
@@ -50,7 +55,8 @@ bool ObjGrass::isPassable(const u16 icn, const u8 index)
 	    if(114 == index) return false;
 	    else
 	    // oracul
-	    if(124 < index && index < 127) return false;
+	    if(124 < index && index < 127)
+		return (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
 	    else
 	    // obelisk
 	    if(129 == index) return false;
@@ -58,10 +64,15 @@ bool ObjGrass::isPassable(const u16 icn, const u8 index)
 
 	case ICN::OBJNGRAS:
 	    // abandoned mines
-	    if(3 == index || (4 < index && index < 8)) return false;
+	    if(3 == index)
+		return false;
+	    else
+	    if(4 < index && index < 8)
+		return Mines::isPassable(index, 6, direct);
 	    else
 	    // faerie ring
-	    if(29 < index && index < 32) return false;
+	    if(29 < index && index < 32)
+		return (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
 	    else
 	    // rock
 	    if((32 < index && index < 35) || (36 < index && index < 39) || (39 < index && index < 42) ||

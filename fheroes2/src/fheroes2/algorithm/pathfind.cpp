@@ -42,6 +42,7 @@ struct cell_t
     bool	open;
 };
 
+/*
 bool ImpassableCorners(const s32 from, const Direction::vector_t to, const Heroes *hero)
 {
     if( to & (Direction::TOP | Direction::BOTTOM | Direction::LEFT | Direction::RIGHT)) return false;
@@ -72,6 +73,7 @@ bool ImpassableCorners(const s32 from, const Direction::vector_t to, const Heroe
 
     return false;
 }
+*/
 
 u32 GetCurrentLength(std::map<s32, cell_t> & list, s32 cur)
 {
@@ -109,7 +111,7 @@ bool PassableFromToTile(const Heroes* hero, const s32 from, const s32 to, const 
     // check direct to object
     if(! Object::AllowDirect(toTile.GetObject(), Direction::Reflect(direct))) return false;
 
-    return toTile.isPassable(hero) || to == dst;
+    return toTile.isPassable(hero, Direction::Reflect(direct), false) || to == dst;
 }
 
 bool Algorithm::PathFind(std::list<Route::Step> *result, const s32 from, const s32 to, const u16 limit, const Heroes *hero)

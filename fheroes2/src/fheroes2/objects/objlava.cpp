@@ -23,7 +23,7 @@
 #include "icn.h"
 #include "objlava.h"
 
-bool ObjLava::isPassable(const u16 icn, const u8 index)
+bool ObjLava::isPassable(const u16 icn, const u8 index, const Direction::vector_t direct)
 {
     switch(icn)
     {
@@ -52,13 +52,17 @@ bool ObjLava::isPassable(const u16 icn, const u8 index)
 	    if(110 == index) return false;
 	    else
 	    // daemon cave
-	    if(113 < index && index < 116) return false;
+	    if(113 < index && index < 116)
+		return (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
 	    else
 	    // sign
 	    if(117 == index) return false;
 	    else
 	    // saw mill
-	    if(119 < index && index < 125) return false;
+	    if(119 < index && index < 122) return false;
+	    else
+	    if(121 < index && index < 127)
+		return (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
 
 	    else return true;
 

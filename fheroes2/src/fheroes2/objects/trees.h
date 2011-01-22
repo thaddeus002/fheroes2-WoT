@@ -32,7 +32,7 @@ class Trees : public Object
     public:
 	Trees(const ICN::icn_t icn);
 
-	static bool	isPassable(const u16 icn, const u8 index);
+	static bool	isPassable(const u16 icn, const u8 index, const Direction::vector_t = Direction::UNKNOWN);
 
     private:
 };
