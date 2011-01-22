@@ -305,6 +305,7 @@ void AGG::Cache::LoadExtICN(icn_cache_t & v, const ICN::icn_t icn, const u16 ind
 	case ICN::BATTLESKIP:
 	case ICN::BATTLEWAIT:
 	case ICN::BUYMAX:
+	case ICN::BTNBATTLEONLY:
 	case ICN::BTNCONFIG:  count = 2; break;
 
 	default: break;
@@ -320,6 +321,31 @@ void AGG::Cache::LoadExtICN(icn_cache_t & v, const ICN::icn_t icn, const u16 ind
     // simple modify
     switch(icn)
     {
+	case ICN::BTNBATTLEONLY:
+	if(index < count)
+	{
+	    Sprite & sprite = reflect ? v.reflect[index] : v.sprites[index];
+	    LoadOrgICN(sprite, ICN::BTNNEWGM, 2 + index, false);
+	    // clean
+	    sprite.Blit(GetICN(ICN::SYSTEM, 11 + index), Rect(10, 6, 55, 14), 15, 13);
+	    sprite.Blit(GetICN(ICN::SYSTEM, 11 + index), Rect(10, 6, 55, 14), 70, 13);
+	    sprite.Blit(GetICN(ICN::SYSTEM, 11 + index), Rect(10, 6, 55, 14), 42, 28);
+	    // ba
+	    sprite.Blit(GetICN(ICN::BTNCMPGN, index), Rect(41, 28, 28, 14), 30, 13);
+	    // tt
+	    sprite.Blit(GetICN(ICN::BTNNEWGM, index), Rect(25, 13, 13, 14), 57, 13);
+	    sprite.Blit(GetICN(ICN::BTNNEWGM, index), Rect(25, 13, 13, 14), 70, 13);
+	    // le
+	    sprite.Blit(GetICN(ICN::BTNNEWGM, 6 + index), Rect(97, 21, 13, 14), 83, 13);
+	    sprite.Blit(GetICN(ICN::BTNNEWGM, 6 + index), Rect(86, 21, 13, 14), 96, 13);
+	    // on
+	    sprite.Blit(GetICN(ICN::BTNDCCFG, 4 + index), Rect(44, 21, 31, 14), 40, 28);
+	    // ly
+	    sprite.Blit(GetICN(ICN::BTNHOTST, index), Rect(47, 21, 13, 13), 71, 28);
+	    sprite.Blit(GetICN(ICN::BTNHOTST, index), Rect(72, 21, 13, 13), 84, 28);
+	}
+	break;
+
 	case ICN::BTNCONFIG:
 	if(index < count)
 	{

@@ -919,6 +919,7 @@ namespace ICN
 	{ BATTLEWAIT,   "MANUAL.ICN" },
 	{ BUYMAX,       "MANUAL.ICN" },
 	{ BTNCONFIG,    "MANUAL.ICN" },
+	{ BTNBATTLEONLY,"MANUAL.ICN" },
 
 	{ UNKNOWN,	"UNKNOWN.ICN" },
     };
@@ -1787,6 +1788,7 @@ bool ICN::NeedMinify4PocketPC(icn_t icn, u16 index)
 	case BATTLEWAIT:
 	case BUYMAX:
 	case BTNCONFIG:
+	case BTNBATTLEONLY:
 
 	    return true;
 
@@ -1894,6 +1896,7 @@ bool ICN::isModifiedSprite(const ICN::icn_t icn)
 	case BATTLEWAIT:
 	case BUYMAX:
 	case BTNCONFIG:
+	case BTNBATTLEONLY:
 	    return true;
 
 	default: break;
