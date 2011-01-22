@@ -181,8 +181,6 @@ bool Object::AllowDirect(const u8 general, const u16 direct)
 	case MP2::OBJ_MERCENARYCAMP:
 	case MP2::OBJ_WINDMILL:
 	case MP2::OBJ_TROLLBRIDGE:
-	    return (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
-
 	case MP2::OBJ_TRADINGPOST:
 	case MP2::OBJ_EXCAVATION:
 	case MP2::OBJ_DESERTTENT:
@@ -190,14 +188,10 @@ bool Object::AllowDirect(const u8 general, const u16 direct)
 	case MP2::OBJ_PYRAMID:
 	case MP2::OBJ_FORT:
 	case MP2::OBJ_RUINS:
-	case MP2::OBJ_WATERWHEEL:
 	case MP2::OBJ_HILLFORT:
 	case MP2::OBJ_FREEMANFOUNDRY:
 	case MP2::OBJ_SAWMILL:
-	    return (direct & (Direction::RIGHT | DIRECTION_BOTTOM_ROW));
-
 	case MP2::OBJ_TREECITY:
-	case MP2::OBJ_MAGELLANMAPS:
 	case MP2::OBJ_SPHINX:
 	case MP2::OBJ_TEMPLE:
 	case MP2::OBJ_FAERIERING:
@@ -205,8 +199,6 @@ bool Object::AllowDirect(const u8 general, const u16 direct)
 	case MP2::OBJ_STABLES:
 	case MP2::OBJ_ABANDONEDMINE:
 	case MP2::OBJ_MINES:
-	    return (direct & (Direction::LEFT | DIRECTION_BOTTOM_ROW));
-
 	case MP2::OBJ_ALCHEMYLAB:
 	case MP2::OBJ_CAVE:
 	case MP2::OBJ_CITYDEAD:
@@ -222,7 +214,13 @@ bool Object::AllowDirect(const u8 general, const u16 direct)
 	case MP2::OBJ_ARENA:
 	case MP2::OBJ_SIRENS:
 	case MP2::OBJ_MERMAID:
-	    return (direct & (DIRECTION_BOTTOM_ROW));
+	    return (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
+
+	case MP2::OBJ_WATERWHEEL:
+	    return (direct & (Direction::RIGHT | DIRECTION_BOTTOM_ROW));
+
+	case MP2::OBJ_MAGELLANMAPS:
+	    return (direct & (Direction::LEFT | DIRECTION_BOTTOM_ROW));
 
 	case MP2::OBJ_CASTLE:
 	    return (direct & Direction::BOTTOM);
