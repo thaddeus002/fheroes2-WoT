@@ -77,7 +77,7 @@ bool Mounts::isPassable(const u16 icn, const u8 index, const Direction::vector_t
     	    else
     	    if((98 < index && index < 101) || (101 < index && index < 104)) return false;			// SMALL RIGHT
     	    else
-    	    if(110 < index && index < 114) return false; 							// MINES
+    	    if(110 < index && index < 114) return Mines::isPassable(index, 112, direct);			// MINES
     	    else return true;
 
         // 83 sprites
@@ -101,7 +101,7 @@ bool Mounts::isPassable(const u16 icn, const u8 index, const Direction::vector_t
     	    else
     	    if((68 < index && index < 71) || (71 < index && index < 74)) return false;				// SMALL RIGHT
     	    else
-    	    if(80 < index && index < 84) return false; 								// MINES
+    	    if(80 < index && index < 84) return Mines::isPassable(index, 82, direct);				// MINES
     	    else return true;
 
         default: break;

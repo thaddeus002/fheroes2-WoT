@@ -34,37 +34,47 @@ bool ObjLoyalty::isPassable(const u16 icn, const u8 index, const Direction::vect
 	    if(3 == index) return false;
 	    else
 	    // arena
-	    if(31 == index || 40 == index || (48 < index && index < 51) ||
-		(68 < index && index < 72)) return false;
+	    if(31 == index || 40 == index || (48 < index && index < 51)) return false;
+	    else
+	    if(68 < index && index < 72)
+		return (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
 	    else
 	    // barrow mounds
-	    if(74 < index && index < 78) return false;
+	    if(74 < index && index < 78)
+		return (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
 	    else
 	    // eath altar
-	    if(85 == index || 94 == index || 103 == index) return false;
+	    if(85 == index || 94 == index || 103 == index)
+		return (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
 	    else
 	    // air altar
-	    if(116 < index && index < 120) return false;
+	    if(116 < index && index < 120)
+		return (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
 	    else
-	    // air altar
-	    if(125 < index && index < 129) return false;
+	    // fire altar
+	    if(125 < index && index < 129)
+		return (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
 	    else
 	    // water altar
-	    if(133 < index && index < 137) return false;
+	    if(133 < index && index < 137)
+		return (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
 	    else return true;
 
 	case ICN::X_LOC2:
 	    // stables
-	    if(2 < index && index < 5) return false;
+	    if(2 < index && index < 5)
+		return (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
 	    else
 	    // jail
 	    if(9 == index) return false;
 	    else
 	    // mermaid
-	    if(28 == index || 37 == index || 46 == index) return false;
+	    if(28 == index || 37 == index || 46 == index)
+		return (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
 	    else
 	    // sirens
-	    if(92 == index || (100 < index && index < 103)) return false;
+	    if(92 == index || (100 < index && index < 103))
+		return (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
 	    else
 	    // reefs
 	    if(110 < index && index < 136) return false;
