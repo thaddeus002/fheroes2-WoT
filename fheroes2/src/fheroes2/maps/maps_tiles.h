@@ -102,7 +102,7 @@ namespace Maps
 	Ground::ground_t GetGround(void) const;
 	const Surface & GetTileSurface(void) const;
 
-	bool isPassable(const Heroes * hero = NULL, bool skipfog = false) const;
+	bool isPassable(const Heroes*, Direction::vector_t, bool skipfog) const;
 	bool isRoad(const Direction::vector_t & direct = Direction::CENTER) const;
 	bool isStream(void) const;
 	bool GoodForUltimateArtifact(void) const;
@@ -205,11 +205,6 @@ namespace Maps
 	u8	quantity5;
 	u8	quantity6; /* unused: memory align */
 	u8	quantity7; /* unused: memory align */
-    };
-
-    struct TilesIsPassable : public std::binary_function<s32, const Heroes*, bool>
-    {
-	bool operator() (s32, const Heroes*) const;
     };
 }
 

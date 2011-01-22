@@ -42,12 +42,6 @@
 
 static u8 monster_animation_cicle[] = { 0, 1, 2, 1, 0, 3, 4, 5, 4, 3 };
 
-
-bool Maps::TilesIsPassable::operator() (s32 index, const Heroes* hero) const
-{
-    return isValidAbsIndex(index) && world.GetTiles(index).isPassable(hero, true);
-}
-
 Maps::TilesAddon::TilesAddon() : level(0), uniq(0), object(0), index(0)
 {
 }
@@ -799,7 +793,7 @@ void Maps::Tiles::DebugInfo(void) const
     VERBOSE("tile            : " << tile_sprite_index);
     VERBOSN("ground          : " << Ground::String(GetGround()));
     VERBOSE((isRoad() ? ", (road)" : ""));
-    VERBOSE("passable        : " << (isPassable() ? "true" : "false"));
+    VERBOSE("passable        : " << (isPassable(NULL, Direction::UNKNOWN, false) ? "true" : "false"));
     VERBOSE("mp2 object      : " << "0x" << std::setw(2) << std::setfill('0') << static_cast<int>(mp2_object) <<
 				    ", (" << MP2::StringObject(mp2_object) << ")");
     VERBOSE("quantity 1      : " << static_cast<int>(quantity1));
@@ -879,44 +873,45 @@ MP2::object_t Maps::Tiles::GetObject(void) const
 
 bool Maps::Tiles::GoodForUltimateArtifact(void) const
 {
-    return Ground::WATER != Maps::Tiles::GetGround() && isPassable(NULL, true);
+    return Ground::WATER != Maps::Tiles::GetGround() && isPassable(NULL, Direction::UNKNOWN, true);
 }
 
 /* accept move */
-bool Maps::Tiles::isPassable(const Heroes *hero, bool skipfog) const
+bool Maps::Tiles::isPassable(const Heroes* hero, Direction::vector_t direct, bool skipfog) const
 {
-    if(!skipfog && isFog(Settings::Get().CurrentColor())) return false;
+    if(!skipfog && isFog(Settings::Get().CurrentColor()))
+	return false;
 
     if(hero)
     {
-	if(hero->GetIndex() == maps_index) return true;
+       if(hero->GetIndex() == maps_index) return true;
 
-	if(hero->isShipMaster())
-	{
-    	    if(Ground::WATER != Maps::Tiles::GetGround()) return false;
+       if(hero->isShipMaster())
+       {
+           if(Ground::WATER != Maps::Tiles::GetGround()) return false;
 
-    	    switch(mp2_object)
-	    {
-		case MP2::OBJ_BOAT:
-        	case MP2::OBJ_HEROES:	return false;
+           switch(mp2_object)
+           {
+               case MP2::OBJ_BOAT:
+               case MP2::OBJ_HEROES:   return false;
 
-		default: break;
-	    }
-	}
-	else
-	{
-	    if(Ground::WATER == Maps::Tiles::GetGround()) return false;
+               default: break;
+           }
+       }
+       else
+       {
+           if(Ground::WATER == Maps::Tiles::GetGround()) return false;
 
-    	    switch(mp2_object)
-	    {
-        	case MP2::OBJ_HEROES:	return false;
+           switch(mp2_object)
+           {
+               case MP2::OBJ_HEROES:   return false;
 
-		default: break;
-	    }
-	}
+               default: break;
+           }
+       }
     }
 
-    return Object::isPassable(addons_level1, maps_index);
+    return Object::isPassable(addons_level1, direct, maps_index);
 }
 
 /* check road */
