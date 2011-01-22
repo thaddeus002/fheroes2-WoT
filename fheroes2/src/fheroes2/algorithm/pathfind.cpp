@@ -106,10 +106,13 @@ bool PassableFromToTile(const Heroes* hero, const s32 from, const s32 to, const 
     // check obstacles as corners
     //if(ImpassableCorners(from, direct, hero)) return false;  // disable, need fix more objects with passable option
 
+    const Maps::Tiles & fromTile = world.GetTiles(from);
     const Maps::Tiles & toTile = world.GetTiles(to);
 
     // check direct to object
     if(! Object::AllowDirect(toTile.GetObject(), Direction::Reflect(direct))) return false;
+
+    if(! fromTile.isPassable(hero, direct, false)) return false;
 
     return toTile.isPassable(hero, Direction::Reflect(direct), false) || to == dst;
 }
