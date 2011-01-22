@@ -1,4 +1,10 @@
-SVN - up to r2227
+SVN - up to r2241
+
++ Fixed: artifact: crystal ball level
++ Added: game: localized maps support, add iconv support
++ Update: Spell::RandAdventure
++ Fixed: game: update shipmaster cursor, upgrade monster button, dialog thievesguild reset cursor, hidden campaign button
++ Update: world: passable objects
 
 Jan, 20, 2011
 
