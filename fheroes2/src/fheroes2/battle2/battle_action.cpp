@@ -155,6 +155,8 @@ void Battle2::Arena::BattleProcess(Stats & attacker, Stats & defender, s16 dst, 
 		defender.UpdateDirection(board[attacker.GetPosition()]);
 	}
     }
+    else
+	attacker.UpdateDirection(board[dst]);
 
     GetTargetsForDamage(attacker, defender, dst, targets);
 
