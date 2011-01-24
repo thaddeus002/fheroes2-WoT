@@ -523,7 +523,7 @@ u8 Battle2::Stats::GetObstaclesPenalty(const Stats & attacker) const
 	// check castle walls defensed
 	if(troop.GetColor() == arena->army2.GetColor())
 	{
-	    if(attacker.OutOfWalls() & OutOfWalls())
+	    if(!attacker.OutOfWalls() || OutOfWalls())
 		return 0;
 
 	    const Rect & pos1 = attacker.GetCellPosition();
@@ -818,7 +818,12 @@ u32 Battle2::Stats::GetDamage(const Stats & enemy) const
     return Rand::Get(GetDamageMin(enemy), GetDamageMax(enemy));
 }
 
-u32 Battle2::Stats::HowMuchWillKilled(u32 dmg) const
+u32 Battle2::Stats::HowManyCanKill(const Stats & b) const
+{
+    return b.HowManyWillKilled((GetDamageMin(b) + GetDamageMin(b)) / 2);
+}
+
+u32 Battle2::Stats::HowManyWillKilled(u32 dmg) const
 {
     return dmg >= hp ? count : count - Monster::GetCountFromHitPoints(troop(), hp - dmg);
 }
@@ -827,7 +832,7 @@ u32 Battle2::Stats::ApplyDamage(u32 dmg)
 {
     if(dmg && count)
     {
-	u32 killed = HowMuchWillKilled(dmg);
+	u32 killed = HowManyWillKilled(dmg);
 
 	// kill mirror image (slave)
 	if(Modes(CAP_MIRRORIMAGE))

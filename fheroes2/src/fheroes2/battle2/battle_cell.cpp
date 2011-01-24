@@ -171,7 +171,7 @@ void Battle2::Cell::SetEnemyQuality(const Stats & my)
     if(b && b->GetColor() != my.GetColor() && my.isValid())
     {
 	// strength monster quality
-	quality = b->GetScoreQuality(my) * b->HowMuchWillKilled(my.GetDamage(*b));
+	quality = b->GetScoreQuality(my) * b->HowManyWillKilled(my.GetDamage(*b));
 	quality += b->GetExtraQuality(quality);
 
 	if(quality < 1) quality = 1;

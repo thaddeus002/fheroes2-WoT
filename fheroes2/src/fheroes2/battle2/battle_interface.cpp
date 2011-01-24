@@ -2134,18 +2134,19 @@ void Battle2::Interface::RedrawActionAttackPart1(Stats & attacker, Stats & defen
 	const Sprite & missile = AGG::GetICN(attacker.ICNMiss(), ICN::GetMissIndex(attacker.ICNMiss(), pos1.x - pos2.x, pos1.y - pos2.y), pos1.x > pos2.x);
 	std::vector<Point> points;
 	std::vector<Point>::const_iterator pnt;
-	
+	const u8 step = (missile.w() < 16 ? 16 : missile.w());
+
 	if(Settings::Get().QVGA())
 	{
 	    const Point line_from(pos1.x + (attacker.isReflect() ? -5 : pos1.w), pos1.y + attacker.GetStartMissileOffset(action1) / 2);
 	    const Point line_to(pos2.x + (attacker.isReflect() ? pos1.w : 0), pos2.y);
-	    GetLinePoints(line_from, line_to, (missile.w() < 8 ? 8 : missile.w()), points);
+	    GetLinePoints(line_from, line_to, step, points);
 	}
 	else
 	{
 	    const Point line_from(pos1.x + (attacker.isReflect() ? -10 : pos1.w), pos1.y + attacker.GetStartMissileOffset(action1));
 	    const Point line_to(pos2.x + (attacker.isReflect() ? pos1.w : 0), pos2.y);
-	    GetLinePoints(line_from, line_to, (missile.w() < 8 ? 8 : missile.w()), points);
+	    GetLinePoints(line_from, line_to, step, points);
 	}
 
 	pnt = points.begin();
@@ -4141,8 +4142,8 @@ void Battle2::PopupDamageInfo::Redraw(u16 maxw, u16 maxh)
 
 	text1.Set(str, Font::SMALL);
 
-	tmp1 = defender->HowMuchWillKilled(tmp1);
-	tmp2 = defender->HowMuchWillKilled(tmp2);
+	tmp1 = defender->HowManyWillKilled(tmp1);
+	tmp2 = defender->HowManyWillKilled(tmp2);
 
 	if(tmp1 > defender->GetCount()) tmp1 = defender->GetCount();
 	if(tmp2 > defender->GetCount()) tmp2 = defender->GetCount();
