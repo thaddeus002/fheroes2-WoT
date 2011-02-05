@@ -51,11 +51,11 @@ namespace Game
 	static void PackHeroes(QueueMessage &, const Heroes &);
 	static void PackHeroBase(QueueMessage &, const HeroBase &);
 
-	static void UnpackTile(QueueMessage &, Maps::Tiles &, u16 = 0);
-	static void UnpackKingdom(QueueMessage &, Kingdom &, u16 = 0);
-	static void UnpackCastle(QueueMessage &, Castle &, u16 = 0);
-	static void UnpackHeroes(QueueMessage &, Heroes &, u16 = 0);
-	static void UnpackHeroBase(QueueMessage &, HeroBase &, u16 = 0);
+	static void UnpackTile(QueueMessage &, Maps::Tiles &, u16 = -1);
+	static void UnpackKingdom(QueueMessage &, Kingdom &, u16 = -1);
+	static void UnpackCastle(QueueMessage &, Castle &, u16 = -1);
+	static void UnpackHeroes(QueueMessage &, Heroes &, u16 = -1);
+	static void UnpackHeroBase(QueueMessage &, HeroBase &, u16 = -1);
 
 	static std::string last_name;
     };

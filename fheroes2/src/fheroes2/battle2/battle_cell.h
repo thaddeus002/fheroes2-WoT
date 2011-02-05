@@ -34,7 +34,7 @@ namespace Battle2
     {
     public:
 	Cell(u16, const Rect*, Arena &);
-	void Reset(void);
+	void ResetQuality(void);
 	void ResetDirection(void);
 	void SetEnemyQuality(const Stats &);
 	void SetPositionQuality(const Stats &);

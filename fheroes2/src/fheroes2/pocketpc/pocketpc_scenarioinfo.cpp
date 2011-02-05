@@ -106,7 +106,6 @@ Game::menu_t PocketPC::ScenarioInfo(void)
         if(le.MouseClickLeft(buttonCancel) ||
 		Game::HotKeyPress(Game::EVENT_DEFAULT_EXIT))
         {
-            Settings::Get().SetGameType(Game::UNKNOWN);
             return Game::MAINMENU;
             break;
         }

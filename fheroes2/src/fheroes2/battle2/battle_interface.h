@@ -39,6 +39,7 @@ namespace Battle2
     class Actions;
     class Tower;
     struct TargetInfo;
+    struct TargetsInfo;
     struct Result;
     class StatusListBox;
     class Cell;
@@ -116,16 +117,17 @@ namespace Battle2
 
 	void Redraw(void);
 	void HumanTurn(const Stats &, Actions &);
+	bool NetworkTurn(Result &);
 
 	const Rect & GetArea(void) const;
 
 	void SetStatus(const std::string &, bool = false);
 	void FadeArena(void);
 
-        void RedrawActionAttackPart1(Stats &, Stats &, const std::vector<TargetInfo> &);
-        void RedrawActionAttackPart2(Stats &, std::vector<TargetInfo> &);
-        void RedrawActionSpellCastPart1(u8, u16, const std::string & name, const std::vector<TargetInfo> &);
-        void RedrawActionSpellCastPart2(u8, std::vector<TargetInfo> &);
+        void RedrawActionAttackPart1(Stats &, Stats &, const TargetsInfo &);
+        void RedrawActionAttackPart2(Stats &, TargetsInfo &);
+        void RedrawActionSpellCastPart1(u8, u16, const std::string & name, const TargetsInfo &);
+        void RedrawActionSpellCastPart2(u8, TargetsInfo &);
         void RedrawActionResistSpell(const Stats &);
         void RedrawActionMonsterSpellCastStatus(const Stats &, const TargetInfo &);
         void RedrawActionMove(Stats &, const std::vector<u16> &);
@@ -160,23 +162,23 @@ namespace Battle2
 	void RedrawTroopCount(const Stats &, const Rect &) const;
 	void RedrawPocketControls(void) const;
 
-	void RedrawActionWinces(std::vector<TargetInfo> &);
-	void RedrawActionKills(std::vector<TargetInfo> &);
+	void RedrawActionWinces(TargetsInfo &);
+	void RedrawActionKills(TargetsInfo &);
 	void RedrawActionArrowSpell(const Stats &);
 	void RedrawActionColdRaySpell(Stats &);
 	void RedrawActionDisruptingRaySpell(Stats &);
 	void RedrawActionBloodLustSpell(Stats &);
-	void RedrawActionColdRingSpell(const u16, const std::vector<TargetInfo> &);
-	void RedrawActionElementalStormSpell(const std::vector<TargetInfo> &);
-	void RedrawActionArmageddonSpell(const std::vector<TargetInfo> &);
+	void RedrawActionColdRingSpell(const u16, const TargetsInfo &);
+	void RedrawActionElementalStormSpell(const TargetsInfo &);
+	void RedrawActionArmageddonSpell(const TargetsInfo &);
 	void RedrawActionResurrectSpell(Stats &, u8);
 	void RedrawActionLightningBoltSpell(Stats &);
-        void RedrawActionChainLightningSpell(const std::vector<TargetInfo> &);
+        void RedrawActionChainLightningSpell(const TargetsInfo &);
 
 	void RedrawTroopFrameAnimation(Stats &);
 	void RedrawTroopWithFrameAnimation(Stats &, ICN::icn_t, M82::m82_t, bool);
-	void RedrawTargetsWithFrameAnimation(const u16, const std::vector<TargetInfo> &, ICN::icn_t, M82::m82_t);
-	void RedrawTargetsWithFrameAnimation(const std::vector<TargetInfo> &, ICN::icn_t, M82::m82_t, bool);
+	void RedrawTargetsWithFrameAnimation(const u16, const TargetsInfo &, ICN::icn_t, M82::m82_t);
+	void RedrawTargetsWithFrameAnimation(const TargetsInfo &, ICN::icn_t, M82::m82_t, bool);
 	void RedrawBridgeAnimation(bool down);
 
 	bool IdleTroopsAnimation(void);

@@ -104,6 +104,7 @@ public:
     Color::color_t GetColor(void) const{ return color; }
     Race::race_t GetRace(void) const{ return race; }
     const std::string & GetName(void) const{ return name; }
+    static const char* GetName(Heroes::heroes_t);
     u8 GetType(void) const { return Skill::Primary::HEROES; }
     u8 GetControl(void) const;
 
@@ -113,6 +114,10 @@ public:
     const Surface & GetPortrait30x22(void) const;
     const Surface & GetPortrait50x46(void) const;
     const Surface & GetPortrait101x93(void) const;
+
+    static const Surface & GetPortrait30x22(heroes_t);
+    static const Surface & GetPortrait50x46(heroes_t);
+    static const Surface & GetPortrait101x93(heroes_t);
 
     const Army::army_t & GetArmy(void) const{ return army; }
     Army::army_t & GetArmy(void) { return army; }
@@ -241,6 +246,9 @@ public:
 private:
     friend class Recruits;
     friend class Game::IO;
+#ifdef BUILD_BATTLEONLY
+    friend struct BattleOnly;
+#endif
 
     void LevelUp(bool autoselect = false);
     Skill::Primary::skill_t LevelUpPrimarySkill(void);

@@ -38,6 +38,7 @@ namespace Army { class army_t; }
 namespace Battle2
 {
     struct Stats;
+    class Arena;
 
     enum { RESULT_LOSS = 0x01, RESULT_RETREAT = 0x02, RESULT_SURRENDER = 0x04, RESULT_WINS = 0x80 };
 
@@ -131,6 +132,8 @@ namespace Battle2
         M82::m82_t m82_wnce;
     };
 
+    typedef QueueMessage Action;
+
     struct TargetInfo
     {
 	TargetInfo() : defender(NULL), damage(0), killed(0), resist(false) {};
@@ -141,9 +144,19 @@ namespace Battle2
 	bool resist;
 
         bool isFinishAnimFrame(void) const;
+
+	void Pack(Action &) const;
+	void Unpack(Action &, Arena &);
     };
 
-    typedef QueueMessage Action;
+    struct TargetsInfo : public std::vector<TargetInfo>
+    {
+	TargetsInfo() {};
+	TargetsInfo(Action & a, Arena & arena){ Unpack(a, arena); }
+
+	void Pack(Action &) const;
+	void Unpack(Action &, Arena &);
+    };
 }
 
 #endif

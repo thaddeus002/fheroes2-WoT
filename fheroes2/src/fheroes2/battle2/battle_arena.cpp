@@ -31,7 +31,6 @@
 #include "speed.h"
 #include "army_troop.h"
 #include "server.h"
-#include "remoteclient.h"
 #include "battle_arena.h"
 #include "battle_cell.h"
 #include "battle_stats.h"
@@ -103,6 +102,43 @@ ICN::icn_t GetCovr(u16 ground)
 u16 GetObstaclePosition(void)
 {
     return Rand::Get(3, 6) + (11 * Rand::Get(1, 7));
+}
+
+void Battle2::TargetInfo::Pack(Action & a) const
+{
+    const u16 id = defender ? defender->GetID() : 0;
+    a.Push(id);                                                                                 
+    a.Push(damage);                                                                      
+    a.Push(killed);
+    a.Push(static_cast<u8>(resist));
+}
+
+void Battle2::TargetInfo::Unpack(Action & a, Arena & arena)
+{
+    u8 fl;
+    u16 id;
+    a.Pop(id);
+    defender = id ? arena.GetTroopID(id) : NULL;
+    a.Pop(damage);
+    a.Pop(killed);
+    a.Pop(fl); resist = fl;
+}
+
+void Battle2::TargetsInfo::Pack(Action & a) const
+{
+    a.Push(static_cast<u32>(size()));
+
+    for(const_iterator it = begin(); it != end(); ++it)
+	(*it).Pack(a);
+}
+
+void Battle2::TargetsInfo::Unpack(Action & a, Arena & arena)
+{
+    u32 size;
+    a.Pop(size);
+    resize(size);
+    for(iterator it = begin(); it != end(); ++it)
+	(*it).Unpack(a, arena);
 }
 
 Battle2::Board::Board()
@@ -656,7 +692,7 @@ void Battle2::GraveyardTroop::RemoveTroopID(u16 id)
 }
 
 Battle2::Arena::Arena(Army::army_t & a1, Army::army_t & a2, s32 index, bool local) :
-	army1(a1), army2(a2), castle(NULL), current_commander(NULL), catapult(NULL), bridge(NULL), interface(NULL), result_game(NULL), graveyard(*this),
+	army1(a1), army2(a2), castle(NULL), current_color(0), catapult(NULL), bridge(NULL), interface(NULL), result_game(NULL), graveyard(*this),
 	icn_covr(ICN::UNKNOWN), current_turn(0)
 {
     const Settings & conf = Settings::Get();
@@ -762,8 +798,13 @@ Battle2::Arena::Arena(Army::army_t & a1, Army::army_t & a2, s32 index, bool loca
 #ifdef WITH_NET
     if(Network::isRemoteClient())
     {
-    	if(Game::REMOTE == army1.GetControl()) FH2RemoteClient::SendBattleBoard(army1.GetColor(), *this);
-	if(Game::REMOTE == army2.GetControl()) FH2RemoteClient::SendBattleBoard(army2.GetColor(), *this);
+	FH2Server & server = FH2Server::Get();
+
+	// sync clients ~10 sec
+	server.WaitReadyClients(10000);
+
+    	if(Game::REMOTE == army1.GetControl()) server.BattleSendBoard(army1.GetColor(), *this);
+	if(Game::REMOTE == army2.GetControl()) server.BattleSendBoard(army2.GetColor(), *this);
     }
 #endif
 
@@ -872,6 +913,14 @@ void Battle2::Arena::Turns(u16 turn, Result & result)
     armies1.NewTurn();
     armies2.NewTurn();
 
+#ifdef WITH_NET
+    if(Network::isRemoteClient())
+    {
+    	if(Game::REMOTE == army1.GetControl()) FH2Server::Get().BattleSendBoard(army1.GetColor(), *this);
+	if(Game::REMOTE == army2.GetControl()) FH2Server::Get().BattleSendBoard(army2.GetColor(), *this);
+    }
+#endif
+
     bool tower_moved = false;
     bool catapult_moved = false;
 
@@ -882,7 +931,7 @@ void Battle2::Arena::Turns(u16 turn, Result & result)
 	// end battle
 	if(!army1.isValid() || !army2.isValid() || result_game->army1 || result_game->army2) break;
 
-	current_commander = current_troop->GetCommander();
+	current_color = current_troop->GetArmyColor();
 
 	// first turn: castle and catapult action
 	if(castle)
@@ -921,7 +970,7 @@ void Battle2::Arena::Turns(u16 turn, Result & result)
 	// end battle
 	if(!army1.isValid() || !army2.isValid() || result_game->army1 || result_game->army2) break;
 
-	current_commander = current_troop->GetCommander();
+	current_color = current_troop->GetArmyColor();
 
 	// set bridge passable
 	if(bridge && bridge->isValid() && !bridge->isDown()) bridge->SetPassable(*current_troop);
@@ -947,15 +996,10 @@ void Battle2::Arena::Turns(u16 turn, Result & result)
 void Battle2::Arena::RemoteTurn(const Stats & b, Actions & a)
 {
 #ifdef WITH_NET
-    if(current_commander)
+    if(Network::isRemoteClient())
     {
-	FH2RemoteClient* remote = FH2Server::Get().GetRemoteClient(current_commander->GetColor());
-	if(remote)
-	{
-	    remote->RecvBattleHumanTurn(b, *this, a);
-	    return;
-	}
-	DEBUG(DBG_BATTLE, DBG_WARN, "Battle2::Arena::" << "RemoteTurn: " << "remote client is NULL");
+	FH2Server::Get().BattleRecvTurn(current_color, b, *this, a);
+	return;
     }
     else
     {
@@ -1007,7 +1051,8 @@ Battle2::Cell* Battle2::Arena::GetCell(u16 position, direction_t dir)
 
 void Battle2::Arena::ResetBoard(void)
 {
-    std::for_each(board.begin(), board.end(), std::mem_fun_ref(&Cell::Reset));
+    std::for_each(board.begin(), board.end(), std::mem_fun_ref(&Cell::ResetDirection));
+    std::for_each(board.begin(), board.end(), std::mem_fun_ref(&Cell::ResetQuality));
 }
 
 void Battle2::Arena::ScanPassabilityBoard(const Stats & b, bool skip_speed)
@@ -1177,19 +1222,23 @@ const Battle2::Stats* Battle2::Arena::GetTroopBoard(u16 index) const
 
 const Army::army_t* Battle2::Arena::GetArmy(u8 color) const
 {
-    if(army1.GetColor() == color) return &army1;
-    else
-    if(army2.GetColor() == color) return &army2;
-
+    if(color)
+    {
+	if(army1.GetColor() == color) return &army1;
+	else
+	if(army2.GetColor() == color) return &army2;
+    }
     return NULL;
 }
 
 Army::army_t* Battle2::Arena::GetArmy(u8 color)
 {
-    if(army1.GetColor() == color) return &army1;
-    else
-    if(army2.GetColor() == color) return &army2;
-
+    if(color)
+    {
+	if(army1.GetColor() == color) return &army1;
+	else
+	if(army2.GetColor() == color) return &army2;
+    }
     return NULL;
 }
 
@@ -1391,7 +1440,7 @@ void Battle2::Arena::DumpBoard(void) const
 {
     Board::const_iterator it1 = board.begin();
     Board::const_iterator it2 = board.end();
-    VERBOSE("Battle2::Arena::DumpBoard: ");
+    VERBOSE("Battle2::Arena::" << " dump board");
     for(; it1 != it2; ++it1)
     {
 	const Battle2::Stats* b = GetTroopBoard((*it1).index);
@@ -1442,25 +1491,22 @@ u16 Battle2::Arena::GetNearestTroops(u16 pos, std::vector<u16> & res, const std:
 
 bool Battle2::Arena::CanSurrenderOpponent(u8 color) const
 {
-    const Army::army_t* enemy = GetArmy(GetOppositeColor(color));
-    const Army::army_t* army = GetArmy(color);
-
-    return army && army->GetCommander() && army->GetCommander()->GetType() == Skill::Primary::HEROES &&
-           enemy && enemy->GetCommander();
+    const HeroBase* hero1 = GetCommander(color);
+    const HeroBase* hero2 = GetCommander(GetOppositeColor(color));
+    return hero1 && hero1->GetType() == Skill::Primary::HEROES && hero2;
 }
 
 bool Battle2::Arena::CanRetreatOpponent(u8 color) const
 {
-    const Army::army_t* army = GetArmy(color);
-
-    return army && army->GetCommander() && army->GetCommander()->GetType() == Skill::Primary::HEROES &&
-	    NULL == army->GetCommander()->inCastle();
+    const HeroBase* hero = GetCommander(color);
+    return hero && hero->GetType() == Skill::Primary::HEROES && NULL == hero->inCastle();
 }
 
 bool Battle2::Arena::isDisableCastSpell(u8 spell, std::string* msg)
 {
     const HeroBase* hero1 = army1.GetCommander();
     const HeroBase* hero2 = army2.GetCommander();
+    const HeroBase* current_commander = GetCurrentCommander();
 
     // check sphere negation (only for heroes)
     if((hero1 && hero1->HasArtifact(Artifact::SPHERE_NEGATION)) ||
@@ -1487,7 +1533,7 @@ bool Battle2::Arena::isDisableCastSpell(u8 spell, std::string* msg)
 	else
 	if(Spell::isSummon(spell))
 	{
-	    Armies friends(*GetArmy(current_commander->GetColor()));
+	    Armies friends(*GetArmy(current_color));
 
 	    const Stats* elem = friends.FindMode(CAP_SUMMONELEM);
 	    bool affect = true;
@@ -1506,7 +1552,7 @@ bool Battle2::Arena::isDisableCastSpell(u8 spell, std::string* msg)
 		return true;
 	    }
 
-	    if(0 == GetFreePositionNearHero(current_commander->GetColor()))
+	    if(0 == GetFreePositionNearHero(current_color))
 	    {
 		*msg = _("There is no open space adjacent to your hero to summon an Elemental to.");
 		return true;
@@ -1553,6 +1599,8 @@ bool Battle2::Arena::isAllowResurrectFromGraveyard(u8 spell, u16 cell) const
 	graveyard.GetClosedCells(closed);
 
 	it_closed = std::find(closed.begin(), closed.end(), cell);
+
+	const HeroBase* current_commander = GetCurrentCommander();
 
 	if(current_commander && it_closed != closed.end())
 	{
@@ -1634,9 +1682,34 @@ void Battle2::Arena::PackBoard(Action & msg) const
     {
         msg.Push((*it).object);
         msg.Push((*it).direction);
-        msg.Push(static_cast<u32>((*it).quality));
+        msg.Push((*it).quality);
         ++it;
     }
+
+    Armies armies1(army1);
+    armies1.PackStats(msg);
+
+    Armies armies2(army2);
+    armies2.PackStats(msg);
+
+    const HeroBase* hero1 = army1.GetCommander();
+    const HeroBase* hero2 = army2.GetCommander();
+
+    if(hero1)
+    {
+	msg.Push(hero1->GetType());
+	Game::IO::PackHeroBase(msg, *hero1);
+    }
+    else
+	msg.Push(static_cast<u8>(Skill::Primary::UNDEFINED));
+
+    if(hero2)
+    {
+	msg.Push(hero1->GetType());
+	Game::IO::PackHeroBase(msg, *hero2);
+    }
+    else
+	msg.Push(static_cast<u8>(Skill::Primary::UNDEFINED));
 }
 
 void Battle2::Arena::UnpackBoard(Action & msg)
@@ -1649,14 +1722,55 @@ void Battle2::Arena::UnpackBoard(Action & msg)
 	Board::iterator it = board.begin();
         while(it != board.end())
         {
-	    u32 byte32;
             msg.Pop((*it).object);
     	    msg.Pop((*it).direction);
-    	    msg.Pop(byte32);
-	    (*it).quality = byte32;
+    	    msg.Pop((*it).quality);
             ++it;
         }
     }
-    else
-	DEBUG(DBG_BATTLE, DBG_WARN, "Battle2::Arena::" << "UnpackBoard: " << "incorrect param");
+
+    Armies armies1(army1);
+    armies1.UnpackStats(msg);
+
+    Armies armies2(army2);
+    armies2.UnpackStats(msg);
+
+    u8 type;
+    HeroBase* hero1 = army1.GetCommander();
+    HeroBase* hero2 = army2.GetCommander();
+
+    msg.Pop(type);
+    if(hero1 && type == hero1->GetType())
+	Game::IO::UnpackHeroBase(msg, *hero1);
+
+    msg.Pop(type);
+    if(hero2 && type == hero2->GetType())
+	Game::IO::UnpackHeroBase(msg, *hero2);
+}
+
+const HeroBase* Battle2::Arena::GetCommander(u8 color) const
+{
+    const Army::army_t* army = GetArmy(color);
+    return army ? army->GetCommander() : NULL;
+}
+
+HeroBase* Battle2::Arena::GetCommander(u8 color)
+{
+    Army::army_t* army = GetArmy(color);
+    return army ? army->GetCommander() : NULL;
+}
+
+const HeroBase* Battle2::Arena::GetCurrentCommander(void) const
+{
+    return GetCommander(current_color);
+}
+
+HeroBase* Battle2::Arena::GetCurrentCommander(void)
+{
+    return GetCommander(current_color);
+}
+
+bool Battle2::Arena::NetworkTurn(Result & result)
+{
+    return interface && interface->NetworkTurn(result);
 }

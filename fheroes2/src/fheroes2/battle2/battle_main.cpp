@@ -32,7 +32,7 @@
 #include "agg.h"
 #include "world.h"
 #include "kingdom.h"
-#include "remoteclient.h"
+#include "server.h"
 #include "localclient.h"
 #include "battle2.h"
 
@@ -77,7 +77,7 @@ Battle2::Result Battle2::Loader(Army::army_t & army1, Army::army_t & army2, s32 
 
 #ifdef WITH_NET
     if(Network::isLocalClient())
-	FH2LocalClient::Get().BattleLoop(arena, result);
+	arena.NetworkTurn(result);
     else
 #endif
     while(1)
@@ -92,8 +92,8 @@ Battle2::Result Battle2::Loader(Army::army_t & army1, Army::army_t & army2, s32 
 #ifdef WITH_NET
     if(Network::isRemoteClient())
     {
-        if(Game::REMOTE == army1.GetControl()) FH2RemoteClient::SendBattleResult(army1.GetColor(), result);
-        if(Game::REMOTE == army2.GetControl()) FH2RemoteClient::SendBattleResult(army2.GetColor(), result);
+        if(Game::REMOTE == army1.GetControl()) FH2Server::Get().BattleSendResult(army1.GetColor(), result);
+        if(Game::REMOTE == army2.GetControl()) FH2Server::Get().BattleSendResult(army2.GetColor(), result);
     }
 #endif
 

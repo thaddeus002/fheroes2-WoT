@@ -31,7 +31,6 @@
 
 Game::menu_t Game::LoadCampain(void)
 {
-    Settings::Get().SetGameType(Game::CAMPAIGN);
     VERBOSE("Load Campain Game: under construction.");
     return Game::LOADGAME;
 }
@@ -106,8 +105,6 @@ Game::menu_t Game::LoadGame(void)
 
 Game::menu_t Game::LoadStandard(void)
 {
-    Settings::Get().SetGameType(Game::STANDARD);
-
     // preload
     AGG::PreloadObject(ICN::HEROES);
 

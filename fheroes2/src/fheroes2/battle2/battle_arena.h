@@ -57,7 +57,6 @@ namespace Battle2
         void AddedEndAction(const Stats &);
         void AddedSkipAction(const Stats &, bool);
         void AddedMoveAction(const Stats &, u16);
-        void AddedMoveAction(const Stats &, const std::vector<u16> &);
         void AddedAttackAction(const Stats &, const Stats &, u16, u8);
         void AddedMoraleAction(const Stats &, u8);
     };
@@ -155,11 +154,11 @@ namespace Battle2
 
 	void ApplyAction(Action &);
 
-	void GetTargetsForDamage(Stats &, Stats &, u16, std::vector<TargetInfo> &);
-	void TargetsApplyDamage(Stats &, Stats &, std::vector<TargetInfo> &);
+	TargetsInfo GetTargetsForDamage(Stats &, Stats &, u16);
+	void TargetsApplyDamage(Stats &, Stats &, TargetsInfo &);
 
-	void GetTargetsForSpells(const HeroBase*, const u8, const u16, std::vector<TargetInfo> &);
-	void TargetsApplySpell(const HeroBase*, const u8, std::vector<TargetInfo> &);
+	TargetsInfo GetTargetsForSpells(const HeroBase*, const u8, const u16);
+	void TargetsApplySpell(const HeroBase*, const u8, TargetsInfo &);
 
 	void UnpackBoard(Action &);
 	void PackBoard(Action &) const;
@@ -186,9 +185,10 @@ namespace Battle2
 
 	// uniq spells
 	void SpellActionSummonElemental(const HeroBase*, u8);
-	void SpellActionTeleport(u16, u16);
-	void SpellActionEarthQuake(void);
 	void SpellActionMirrorImage(Stats &);
+	void SpellActionTeleport(Action &);
+	void SpellActionEarthQuake(Action &);
+	void SpellActionDefaults(Action &, u8);
 
 	// battle_action
 	void ApplyActionRetreat(Action &);
@@ -203,6 +203,14 @@ namespace Battle2
 	void ApplyActionTower(Action &);
 	void ApplyActionCatapult(Action &);
 	void BattleProcess(Stats &, Stats & b2, s16 = -1, u8 = 0);
+
+	HeroBase* GetCurrentCommander(void);
+	const HeroBase* GetCurrentCommander(void) const;
+
+	HeroBase* GetCommander(u8);
+	const HeroBase* GetCommander(u8) const;
+
+	bool NetworkTurn(Result &);
 
     protected:
 	friend class Interface;
@@ -219,7 +227,7 @@ namespace Battle2
         Army::army_t & army2;
 
 	const Castle* castle;
-	HeroBase* current_commander;
+	u8 current_color;
 
 	Tower* towers[3];
 	Catapult* catapult;

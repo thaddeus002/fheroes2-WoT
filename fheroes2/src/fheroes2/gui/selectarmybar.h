@@ -42,6 +42,7 @@ public:
     s8		GetIndexFromCoord(const Point &);
     s8		Selected(void) const;
 
+    bool	ChangeMode(void) const;
     bool	ReadOnly(void) const;
     bool	SaveLastTroop(void) const;
     bool	isValid(void) const;
@@ -55,6 +56,7 @@ public:
     void 	SetInterval(u8);
     void	SetCastle(const Castle &);
 
+    void	SetChangeMode(void);
     void	SetReadOnly(void);
     void	SetSaveLastTroop(void);
     void 	SetUseMons32Sprite(void);	// second variant: for small sprite ICN::MONS32

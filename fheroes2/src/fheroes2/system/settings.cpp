@@ -31,7 +31,6 @@
 
 enum
 {
-    GLOBAL_LOADGAME          = 0x00000001,
     GLOBAL_PRICELOYALTY      = 0x00000004,
 
     GLOBAL_POCKETPC          = 0x00000010,
@@ -690,7 +689,7 @@ bool Settings::QVGA(void) const { return video_mode.w && video_mode.h && (video_
 
 bool Settings::UseAltResource(void) const { return opt_global.Modes(GLOBAL_ALTRESOURCE); }
 bool Settings::PriceLoyaltyVersion(void) const { return opt_global.Modes(GLOBAL_PRICELOYALTY); }
-bool Settings::LoadedGameVersion(void) const { return opt_global.Modes(GLOBAL_LOADGAME); }
+bool Settings::LoadedGameVersion(void) const { return game_type & Game::LOADFILE; }
 
 bool Settings::ShowControlPanel(void) const { return opt_global.Modes(GLOBAL_SHOWCPANEL); }
 bool Settings::ShowRadar(void) const { return opt_global.Modes(GLOBAL_SHOWRADAR); }
@@ -749,7 +748,7 @@ u8 Settings::GameType(void) const
 }
 
 /* set game type */
-void Settings::SetGameType(const Game::type_t type)
+void Settings::SetGameType(u8 type)
 {
     game_type = type;
 }
@@ -1034,11 +1033,6 @@ void Settings::ResetSound(void)
 void Settings::ResetMusic(void)
 {
     opt_global.ResetModes(GLOBAL_MUSIC);
-}
-
-void Settings::SetLoadedGameVersion(bool f)
-{
-    f ? opt_global.SetModes(GLOBAL_LOADGAME) : opt_global.ResetModes(GLOBAL_LOADGAME);
 }
 
 void Settings::SetShowPanel(bool f)

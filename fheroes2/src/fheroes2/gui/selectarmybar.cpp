@@ -32,6 +32,7 @@
 #include "tools.h"
 #include "castle.h"
 #include "localclient.h"
+#include "editor_dialogs.h"
 #include "selectarmybar.h"
 
 void DialogRedistributeArmy(Army::army_t &, u8, Army::army_t &, u8);
@@ -41,7 +42,8 @@ enum
     FLAGS_READONLY	= 0x01,
     FLAGS_USEMONS32	= 0x02,
     FLAGS_SAVELAST	= 0x04,
-    FLAGS_COUNT2SPRITE	= 0x08
+    FLAGS_COUNT2SPRITE	= 0x08,
+    FLAGS_CHANGEMODE	= 0x10
 };
 
 SelectArmyBar::SelectArmyBar() : army(NULL), interval(0), selected(-1), flags(0), background(NULL), castle(NULL)
@@ -138,6 +140,11 @@ void SelectArmyBar::SetSaveLastTroop(void)
     flags |= FLAGS_SAVELAST;
 }
 
+void SelectArmyBar::SetChangeMode(void)
+{
+    flags |= FLAGS_CHANGEMODE;
+}
+
 void SelectArmyBar::SetReadOnly(void)
 {
     flags |= FLAGS_READONLY;
@@ -161,6 +168,11 @@ void SelectArmyBar::SetCastle(const Castle & c)
 bool SelectArmyBar::SaveLastTroop(void) const
 {
     return (flags & FLAGS_SAVELAST) && army && (1 == army->GetCount());
+}
+
+bool SelectArmyBar::ChangeMode(void) const
+{
+    return flags & FLAGS_CHANGEMODE;
 }
 
 bool SelectArmyBar::ReadOnly(void) const
@@ -398,6 +410,34 @@ bool SelectArmyBar::QueueEventProcessing(SelectArmyBar & bar, std::string* msg)
 	    bar.Select(index1);
 	    change = true;
 	}
+	// add any troop
+	else
+	if(bar.ChangeMode() && ! troop1.isValid())
+	{
+	    Monster::monster_t mons = Monster::UNKNOWN;
+
+	    if(bar.army->GetCommander())
+	    switch(bar.army->GetCommander()->GetRace())
+	    {
+		case Race::KNGT: mons = Monster::PEASANT; break;
+		case Race::BARB: mons = Monster::GOBLIN; break;
+		case Race::SORC: mons = Monster::SPRITE; break;
+		case Race::WRLK: mons = Monster::CENTAUR; break;
+		case Race::WZRD: mons = Monster::HALFLING; break;
+		case Race::NECR: mons = Monster::SKELETON; break;
+		default: break;
+	    }
+
+	    if(Monster::UNKNOWN != (mons = Dialog::SelectMonster(mons)))
+	    {
+		u32 count = 1;
+		if(Dialog::SelectCount("Set Count", 1, 500000, count))
+		{
+		    troop1.Set(mons, count);
+		    change = true;
+		}
+	    }
+	}
     }
     else
     // press right
@@ -407,7 +447,13 @@ bool SelectArmyBar::QueueEventProcessing(SelectArmyBar & bar, std::string* msg)
 	if(troop1.isValid())
 	{
 	    bar.Reset();
-	    Dialog::ArmyInfo(troop1, 0);
+	    if(bar.ChangeMode() && ! bar.SaveLastTroop())
+	    {
+		troop1.Reset();
+		change = true;
+	    }
+	    else
+		Dialog::ArmyInfo(troop1, 0);
 	}
 	else
 	// empty troops - redistribute troops
@@ -420,6 +466,7 @@ bool SelectArmyBar::QueueEventProcessing(SelectArmyBar & bar, std::string* msg)
 
 	    bar.Reset();
 	    bar.Redraw();
+	    change = true;
 	}
     }
 
@@ -505,6 +552,8 @@ bool SelectArmyBar::QueueEventProcessing(SelectArmyBar & bar1, SelectArmyBar & b
 
 		bar1.Redraw();
 		bar2.Redraw();
+
+		change = true;
 	    }
 	}
 
@@ -575,6 +624,8 @@ bool SelectArmyBar::QueueEventProcessing(SelectArmyBar & bar1, SelectArmyBar & b
 
 		bar1.Redraw();
 		bar2.Redraw();
+
+		change = true;
 	    }
 	}
 

@@ -105,7 +105,9 @@ bool Game::Load(const std::string & fn)
     if(!msg.LoadSAV(fn) || !Game::IO::LoadBIN(msg)) return false;
 
     Game::IO::last_name = fn;
-    Settings::Get().SetLoadedGameVersion(true);
+    Settings & conf = Settings::Get();
+
+    conf.SetGameType(conf.GameType() | Game::LOADFILE);
 
     return true;
 }

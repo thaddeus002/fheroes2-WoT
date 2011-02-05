@@ -87,11 +87,11 @@ const std::string & HeroesIndicator::GetDescriptions(void) const
     return descriptions;
 }
 
-void HeroesIndicator::SetPos(const Point & pt)
+void HeroesIndicator::SetPos(const Point & pt, bool skip_back)
 {
     area.x = pt.x;
     area.y = pt.y;
-    back.Save(area);
+    if(! skip_back) back.Save(area);
 }
 
 LuckIndicator::LuckIndicator(const Heroes & h) : HeroesIndicator(h)

@@ -40,7 +40,10 @@ Game::menu_t Game::MainMenu(void)
     Mixer::Pause();
     AGG::PlayMusic(MUS::MAINMENU);
 
-    if(Settings::Get().QVGA()) return PocketPC::MainMenu();
+    Settings & conf = Settings::Get();
+
+    conf.SetGameType(MENU);
+    if(conf.QVGA()) return PocketPC::MainMenu();
 
     // preload
     AGG::PreloadObject(ICN::HEROES);

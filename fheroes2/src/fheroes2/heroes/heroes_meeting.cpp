@@ -36,7 +36,7 @@
 #include "pocketpc.h"
 #include "game_interface.h"
 
-void RedrawPrimarySkillInfo(const Point &, const Skill::Primary &, const Skill::Primary &);
+void RedrawPrimarySkillInfo(const Point &, const Skill::Primary*, const Skill::Primary*);
 
 void Heroes::MeetingDialog(Heroes & heroes2)
 {
@@ -106,7 +106,7 @@ void Heroes::MeetingDialog(Heroes & heroes2)
     // primary skill
     Background backPrimary(cur_pt.x + 255, cur_pt.y + 50, 130, 135);
     backPrimary.Save();
-    RedrawPrimarySkillInfo(cur_pt, *this, heroes2);
+    RedrawPrimarySkillInfo(cur_pt, this, &heroes2);
 
     // secondary skill
     SecondarySkillBar secskill_bar1;
@@ -238,7 +238,7 @@ void Heroes::MeetingDialog(Heroes & heroes2)
 	    {
 		cursor.Hide();
 		backPrimary.Restore();
-		RedrawPrimarySkillInfo(cur_pt, *this, heroes2);
+		RedrawPrimarySkillInfo(cur_pt, this, &heroes2);
 		moraleIndicator1.Redraw();
 		moraleIndicator2.Redraw();
 		luckIndicator1.Redraw();
@@ -272,7 +272,7 @@ void Heroes::MeetingDialog(Heroes & heroes2)
     display.Flip();
 }
 
-void RedrawPrimarySkillInfo(const Point & cur_pt, const Skill::Primary & p1, const Skill::Primary & p2)
+void RedrawPrimarySkillInfo(const Point & cur_pt, const Skill::Primary* p1, const Skill::Primary* p2)
 {
     std::string message;
 
@@ -281,60 +281,66 @@ void RedrawPrimarySkillInfo(const Point & cur_pt, const Skill::Primary & p1, con
     Text text(message, Font::SMALL);
     text.Blit(cur_pt.x + 320 - text.w() / 2, cur_pt.y + 64);
 
-    message.clear();
-    String::AddInt(message, p1.GetAttack());
-    text.Set(message);
-    text.Blit(cur_pt.x + 260 - text.w() / 2, cur_pt.y + 64);
-
-    message.clear();
-    String::AddInt(message, p2.GetAttack());
-    text.Set(message);
-    text.Blit(cur_pt.x + 380 - text.w(), cur_pt.y + 64);
-
     // defense skill
     message = _("Defense Skill");
     text.Set(message);
     text.Blit(cur_pt.x + 320 - text.w() / 2, cur_pt.y + 96);
-
-    message.clear();
-    String::AddInt(message, p1.GetDefense());
-    text.Set(message);
-    text.Blit(cur_pt.x + 260 - text.w() / 2, cur_pt.y + 96);
-
-    message.clear();
-    String::AddInt(message, p2.GetDefense());
-    text.Set(message);
-    text.Blit(cur_pt.x + 380 - text.w(), cur_pt.y + 96);
 
     // spell power
     message = _("Spell Power");
     text.Set(message);
     text.Blit(cur_pt.x + 320 - text.w() / 2, cur_pt.y + 128);
 
-    message.clear();
-    String::AddInt(message, p1.GetPower());
-    text.Set(message);
-    text.Blit(cur_pt.x + 260 - text.w() / 2, cur_pt.y + 128);
-
-    message.clear();
-    String::AddInt(message, p2.GetPower());
-    text.Set(message);
-    text.Blit(cur_pt.x + 380 - text.w(), cur_pt.y + 128);
-
     // knowledge
     message = _("Knowledge");
     text.Set(message);
     text.Blit(cur_pt.x + 320 - text.w() / 2, cur_pt.y + 160);
 
-    message.clear();
-    String::AddInt(message, p1.GetKnowledge());
-    text.Set(message);
-    text.Blit(cur_pt.x + 260 - text.w() / 2, cur_pt.y + 160);
+    if(p1)
+    {
+	message.clear();
+	String::AddInt(message, p1->GetAttack());
+	text.Set(message);
+	text.Blit(cur_pt.x + 260 - text.w() / 2, cur_pt.y + 64);
 
-    message.clear();
-    String::AddInt(message, p2.GetKnowledge());
-    text.Set(message);
-    text.Blit(cur_pt.x + 380 - text.w(), cur_pt.y + 160);
+	message.clear();
+	String::AddInt(message, p1->GetDefense());
+	text.Set(message);
+	text.Blit(cur_pt.x + 260 - text.w() / 2, cur_pt.y + 96);
+
+	message.clear();
+	String::AddInt(message, p1->GetPower());
+	text.Set(message);
+        text.Blit(cur_pt.x + 260 - text.w() / 2, cur_pt.y + 128);
+
+	message.clear();
+	String::AddInt(message, p1->GetKnowledge());
+	text.Set(message);
+	text.Blit(cur_pt.x + 260 - text.w() / 2, cur_pt.y + 160);
+    }
+
+    if(p2)
+    {
+	message.clear();
+	String::AddInt(message, p2->GetAttack());
+	text.Set(message);
+	text.Blit(cur_pt.x + 380 - text.w(), cur_pt.y + 64);
+
+	message.clear();
+	String::AddInt(message, p2->GetDefense());
+	text.Set(message);
+	text.Blit(cur_pt.x + 380 - text.w(), cur_pt.y + 96);
+
+	message.clear();
+	String::AddInt(message, p2->GetPower());
+	text.Set(message);
+	text.Blit(cur_pt.x + 380 - text.w(), cur_pt.y + 128);
+
+	message.clear();
+	String::AddInt(message, p2->GetKnowledge());
+	text.Set(message);
+	text.Blit(cur_pt.x + 380 - text.w(), cur_pt.y + 160);
+    }
 }
 
 // spell_book.cpp

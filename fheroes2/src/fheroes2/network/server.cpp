@@ -1,4 +1,4 @@
-/***************************************************************************
+/**************************************************************************
  *   Copyright (C) 2009 by Andrey Afletdinov <fheroes2@gmail.com>          *
  *                                                                         *
  *   Part of the Free Heroes2 Engine:                                      *
@@ -31,19 +31,32 @@
 #include "world.h"
 #include "kingdom.h"
 #include "battle2.h"
+#include "battle_stats.h"
+#include "heroes_recruits.h"
 #include "server.h"
 
 #ifdef WITH_NET
 
-u8 SelectCountPlayers(void);
+u32 RemoteMessage::sid = 1001;
 
-void SendPacketToAllClients(std::vector<FH2RemoteClient> & clients, const QueueMessage & msg, u32 owner)
+void RemoteMessage::InitMutex(void)
 {
-    static const QueueMessage ready(MSG_READY);
+    mutexReady.Create();
+}
 
-    std::vector<FH2RemoteClient>::iterator it = clients.begin();
-    for(; it != clients.end(); ++it) if((*it).IsConnected())
-	(*it).player_id != owner ? Network::SendMessage(*it, msg) : Network::SendMessage(*it, ready);
+bool RemoteMessage::IsReady(void) const
+{
+    mutexReady.Lock();
+    bool res = ready;
+    mutexReady.Unlock();
+    return res;
+}
+
+void RemoteMessage::SetReady(void)
+{
+    mutexReady.Lock();
+    ready = true;
+    mutexReady.Unlock();
 }
 
 FH2Server::FH2Server()
@@ -51,8 +64,13 @@ FH2Server::FH2Server()
     AGG::Cache & cache = AGG::Cache::Get();
     if(! cache.ReadDataDir()) Error::Except("FH2Server::", " AGG data files not found.");
 
-    if(!PrepareMapsFileInfoList(finfo_list, true) ||
-       !Settings::Get().LoadFileMapsMP2(finfo_list.front().file)) DEBUG(DBG_NETWORK , DBG_WARN, "FH2Server::" << " No maps available!");
+    if(!PrepareMapsFileInfoList(finfoList, true) ||
+       !Settings::Get().LoadFileMapsMP2(finfoList.front().file))
+	    DEBUG(DBG_NETWORK, DBG_WARN, "FH2Server::" << " No maps available!");
+
+    mutexConf.Create();
+    mutexSpool.Create();
+    mutexModes.Create();
 }
 
 FH2Server::~FH2Server()
@@ -62,411 +80,758 @@ FH2Server::~FH2Server()
 FH2Server & FH2Server::Get(void)
 {
     static FH2Server fh2server;
-
     return fh2server;
-}
-
-int FH2Server::callbackCreateThread(void *ptr)
-{
-    return ptr ? reinterpret_cast<FH2Server *>(ptr)->Main() : -1;
 }
 
 bool FH2Server::Bind(u16 port)
 {
     IPaddress ip;
-
     return Network::ResolveHost(ip, NULL, port) && Open(ip);
 }
 
-void FH2Server::Lock(void)
+void FH2Server::SetModes(u32 f)
 {
-    mutex.Lock();
+    mutexModes.Lock();
+    BitModes::SetModes(f);
+    mutexModes.Unlock();
 }
 
-void FH2Server::Unlock(void)
+bool FH2Server::Modes(u32 f) const
 {
-    mutex.Unlock();
+    mutexModes.Lock();
+    bool res = BitModes::Modes(f);
+    mutexModes.Unlock();
+    return res;
 }
 
-void FH2Server::SetExit(void)
+RemoteMessage* FH2Server::FindRemoteReady(void)
 {
-    exit = true;
+    mutexSpool.Lock();
+    // find ready
+    std::list<RemoteMessage>::iterator it = std::find_if(spool.begin(), spool.end(),
+				std::mem_fun_ref(&RemoteMessage::IsReady));
+    mutexSpool.Unlock();
+    return it != spool.end() ? &(*it) : NULL;
 }
 
-void FH2Server::SetStartGame(void)
+int FH2Server::Main(void* ptr)
 {
-    start_game = true;
+    Settings & conf = Settings::Get();
+    FH2Server & server = Get();
+    SDL::Thread threadConnections;
+
+    threadConnections.Create(FH2Server::WaitClients, NULL);
+
+    Recruits heroes;
+
+    while(! server.Modes(ST_SHUTDOWN))
+    {
+	RemoteMessage* rm = server.FindRemoteReady();
+	//
+	if(rm)
+	{
+	    FH2RemoteClient* client = rm->own;
+
+	    if(client)
+	    {
+		QueueMessage & msg = rm->packet;
+		bool clientResult = true;
+
+		switch(Network::GetMsg(msg.GetID()))
+		{
+		    case MSG_MAPS_LOAD:
+			server.MsgLoadMaps(msg, *client);
+			break;
+
+		    case MSG_ACCESS_DENIED:
+			server.SetModes(ST_FULLHOUSE);
+			break;
+
+		    case MSG_LOGOUT:
+			server.MsgLogout(msg, *client);
+			server.clients.Dump();
+			break;
+
+    		    case MSG_GET_GAME_TYPE:
+			server.MsgGetGameType(msg, *client);
+			break;
+
+    		    case MSG_SHUTDOWN:
+                        if(client->Modes(ST_ADMIN))
+			    server.MsgShutdown(msg);
+			break;
+
+    		    case MSG_UPDATE_PLAYERS:
+			server.SendUpdatePlayers(msg, 0);
+			break;
+
+    		    case MSG_GET_CURRENT_MAP:
+			clientResult = client->SendCurrentMapInfo(msg);
+                	break;
+
+		    case MSG_SET_CURRENT_MAP:
+                        if(client->Modes(ST_ADMIN))
+			    server.SetCurrentMap(msg);
+			break;
+
+		    case MSG_GET_CURRENT_COLOR:
+                	clientResult = client->SendCurrentColor(msg);
+                	break;
+
+            	    case MSG_GET_MAPS_LIST:
+                    	clientResult = client->Modes(ST_ADMIN) ? client->SendMapsInfoList(msg) :
+					client->SendAccessDenied(msg);
+                	break;
+
+            	    case MSG_CHANGE_COLORS:
+                	if(client->Modes(ST_ADMIN))
+			    server.MsgChangeColors(msg);
+                	break;
+
+            	    case MSG_CHANGE_RACE:
+                	if(client->Modes(ST_ADMIN))
+			    server.MsgChangeRaces(msg);
+                	break;
+
+		    case MSG_UPDATE_BATTLEONLY:
+		    {
+			server.mutexConf.Lock();
+			Network::UnpackBattleOnly(msg, heroes);
+			server.clients.Send2All(msg, 0);
+			server.mutexConf.Unlock();
+			break;
+		    }
+
+		    case MSG_START_BATTLEONLY:
+                	if(client->Modes(ST_ADMIN))
+			{
+			    server.clients.Send2All(msg, 0);
+			    Heroes* hero1 = heroes.GetHero1();
+			    Heroes* hero2 = heroes.GetHero2();
+			    if(hero1 && hero2)
+			    {
+				Color::color_t color1 = Color::BLUE;
+				Color::color_t color2 = Color::RED;
+
+				Kingdom* kingdom1 = &world.GetKingdom(color1);
+				Kingdom* kingdom2 = &world.GetKingdom(color2);
+
+				kingdom1->SetControl(Game::REMOTE);
+				kingdom2->SetControl(Game::REMOTE);
+
+				conf.SetKingdomRace(color1, hero1->GetRace());
+				conf.SetKingdomRace(color2, hero2->GetRace());
+				conf.SetPlayersColors(color1 | color2);
+
+				hero1->SetSpellPoints(hero1->GetMaxSpellPoints());
+				hero1->Recruit(color1, Point(5, 5));
+				hero2->SetSpellPoints(hero2->GetMaxSpellPoints());
+				hero2->Recruit(color2, Point(5, 6));
+
+				Battle2::Loader(hero1->GetArmy(), hero2->GetArmy(), hero1->GetIndex() + 1);
+			    }
+			    server.MsgShutdown(msg);
+			}
+			break;
+
+		    default:
+			DEBUG(DBG_NETWORK, DBG_INFO, "FH2Server::" << "Main:" << " unused: " << Network::GetMsgString(msg.GetID()));
+			break;
+		}
+
+		if(!clientResult)
+		{
+		    DEBUG(DBG_NETWORK, DBG_WARN, "FH2Server::" << "Main: " << "client shutdown: " << "id: 0x" << std::hex << client->player_id);
+		    client->ShutdownThread();
+		}
+
+		server.RemoveMessage(*rm);
+	    }
+	}
+
+	DELAY(100);
+    }
+
+    server.clients.Shutdown();
+
+    if(threadConnections.IsRun()) threadConnections.Wait();
+
+    server.Close();
+
+    return 1;
 }
 
-void FH2Server::SendToAllClients(const QueueMessage & msg, u32 id)
+bool FH2Server::BattleRecvTurn(u8 color, const Battle2::Stats & b, const Battle2::Arena & arena, Battle2::Actions & a)
 {
-    DEBUG(DBG_NETWORK , DBG_INFO, "FH2Server::" << "SendToAllClients: " << Network::GetMsgString(msg.GetID()));
-    SendPacketToAllClients(clients, msg, id);
+    // FIXME: check client
+    FH2RemoteClient* client = clients.GetClient(color);
+
+    QueueMessage msg(MSG_BATTLE_TURN);
+    msg.Push(b.GetID());
+
+    // send battle turn
+    DEBUG(DBG_NETWORK, DBG_INFO, "FH2Server::" << "BattleTurn: " << "id: 0x" << b.GetID() << ", send turn");
+    if(!client->Send(msg)) return false;
+
+    bool exit = false;
+
+    while(! Modes(ST_SHUTDOWN) && ! exit)
+    {
+	RemoteMessage* rm = FindRemoteReady();
+	//
+	if(rm)
+	{
+	    FH2RemoteClient* client = rm->own;
+
+	    if(client)
+	    {
+		QueueMessage & msg = rm->packet;
+
+		switch(Network::GetMsg(msg.GetID()))
+		{
+		    case MSG_BATTLE_CAST:
+		    case MSG_BATTLE_SKIP:
+		    case MSG_BATTLE_END_TURN:
+			exit = true;
+			a.push_back(msg);
+			break;
+
+		    case MSG_BATTLE_MOVE:
+		    case MSG_BATTLE_ATTACK:
+		    case MSG_BATTLE_DEFENSE:
+		    case MSG_BATTLE_DAMAGE:
+		    case MSG_BATTLE_MORALE:
+		    case MSG_BATTLE_LUCK:
+		    case MSG_BATTLE_CATAPULT:
+		    case MSG_BATTLE_TOWER:
+		    case MSG_BATTLE_RETREAT:
+		    case MSG_BATTLE_SURRENDER:
+			a.push_back(msg);
+			break;
+
+		    default:
+			DEBUG(DBG_NETWORK, DBG_INFO, "FH2Server::" << "BattleTurn:" << " unused: " << Network::GetMsgString(msg.GetID()));
+			break;
+		}
+
+		RemoveMessage(*rm);
+	    }
+	}
+	DELAY(100);
+    }
+
+    // FIXME: need send board?
+    // send board
+    DEBUG(DBG_NETWORK, DBG_INFO, "FH2Server::" << "BattleTurn: " << "id: 0x" << b.GetID() << ", send board");
+    if(! BattleSendBoard(color, arena)) return false;
+
+    return true;
+}
+
+int FH2Server::WaitClients(void* ptr)
+{
+    FH2Server & server = Get();
+    FH2RemoteClients & clients = server.clients;
+    size_t preferablyPlayers = Settings::Get().PreferablyCountPlayers();
+
+    DEBUG(DBG_NETWORK, DBG_INFO, "FH2Server::" << "WaitClients: " << "start");
+
+    // wait players
+    while(! server.Modes(ST_SHUTDOWN))
+    {
+	if(TCPsocket csd = server.Accept())
+    	{
+	    size_t connectedPlayers = clients.GetConnected();
+
+    	    // request admin
+	    FH2RemoteClient* client = clients.GetAdmin();
+
+	    // check count players
+    	    if(preferablyPlayers <= connectedPlayers ||
+		server.Modes(ST_FULLHOUSE))
+	    {
+		DEBUG(DBG_NETWORK, DBG_INFO, "FH2Server::" << "WaitClients: " << "full house");
+		Socket sct(csd);
+		sct.Close();
+	    }
+	    else
+	    // connect
+    	    {
+		client = clients.GetNewClient();
+
+		client->Reset();
+
+		// first player: set admin mode
+		if(0 == connectedPlayers)
+		    client->SetModes(ST_ADMIN);
+
+        	client->Assign(csd);
+    		client->RunThread();
+
+		DELAY(200);
+		server.clients.Dump();
+	    }
+	}
+
+	DELAY(100);
+    }
+
+    DEBUG(DBG_NETWORK, DBG_INFO, "FH2Server::" << "WaitClients: " << "shutdown");
+
+    return 1;
+}
+
+bool FH2Server::WaitReadyClients(u32 ms)
+{
+    const u16 magick = Rand::Get(0xFFFF);
+    u8 remains = clients.GetPlayersColors();
+    SDL::Time time;
+
+    QueueMessage msg(MSG_PING);
+    msg.Push(magick);
+
+    DEBUG(DBG_NETWORK, DBG_INFO, "FH2Server::" << "WaitReadyClients: " << "waiting " << ms);
+
+    time.Start();
+
+    while(remains)
+    {
+	time.Stop();
+	if(ms && time.Get() >= ms) break;
+
+	clients.Send2All(msg, 0);
+
+	DELAY(100);
+
+	while(RemoteMessage* rm = FindRemoteReady())
+	{
+	    QueueMessage & msg = rm->packet;
+
+	    if(msg.GetID() == MSG_PING)
+	    {
+		u16 reply;
+		msg.Pop(reply);
+		if(reply == magick)
+		    remains &= (~rm->own->player_color);
+	    }
+
+	    RemoveMessage(*rm);
+	}
+    }
+
+    if(remains)
+    {
+	DEBUG(DBG_NETWORK, DBG_WARN, "FH2Server::" << "WaitReadyClients: " << "false");
+    }
+    else
+    {
+	DEBUG(DBG_NETWORK, DBG_INFO, "FH2Server::" << "WaitReadyClients: " << "reply " << time.Get());
+    }
+
+    return remains ? false : true;
+}
+
+RemoteMessage & FH2Server::GetNewMessage(FH2RemoteClient & rc)
+{
+    mutexSpool.Lock();
+    spool.push_back(RemoteMessage(&rc));
+    spool.back().InitMutex();
+    mutexSpool.Unlock();
+    return spool.back();
+}
+
+void FH2Server::UpdateColors(void)
+{
+    Settings & conf = Settings::Get();
+
+    mutexConf.Lock();
+    conf.SetPlayersColors(clients.GetPlayersColors());
+    mutexConf.Unlock();
+}
+
+u8 FH2Server::GetFreeColor(bool admin)
+{
+    Settings & conf = Settings::Get();
+    u8 res = 0;
+
+    if(Game::STANDARD & conf.GameType())
+    {
+        // check color
+        mutexConf.Lock();
+        res = Color::GetFirst(conf.CurrentFileInfo().human_colors & (~clients.GetPlayersColors()));
+        mutexConf.Unlock();
+    }
+    else
+    if(Game::BATTLEONLY & conf.GameType())
+    {
+        res = admin ? Color::BLUE : Color::RED;
+    }
+
+    return res;
+}
+
+void FH2Server::RemoveMessage(const RemoteMessage & rm)
+{
+    mutexSpool.Lock();
+    std::list<RemoteMessage>::iterator it = std::find(spool.begin(), spool.end(), rm);
+    if(it != spool.end()) spool.erase(it);
+    mutexSpool.Unlock();
+}
+
+void FH2Server::PushPlayersInfo(QueueMessage & msg) const
+{
+    clients.PushPlayersInfo(msg);
 }
 
 void FH2Server::PushMapsFileInfoList(QueueMessage & msg) const
 {
-    msg.Push(static_cast<u16>(finfo_list.size()));
-    MapsFileInfoList::const_iterator it1 = finfo_list.begin();
-    MapsFileInfoList::const_iterator it2 = finfo_list.end();
-
-    for(; it1 != it2; ++it1) Network::PacketPushMapsFileInfo(msg, *it1);
+    mutexConf.Lock();
+    msg.Push(static_cast<u16>(finfoList.size()));
+    for(MapsFileInfoList::const_iterator
+	it = finfoList.begin(); it != finfoList.end(); ++it)
+	    Network::PacketPushMapsFileInfo(msg, *it);
+    mutexConf.Unlock();
 }
 
-void FH2Server::ChangeClientColors(u8 from, u8 to)
+void FH2Server::SendUpdatePlayers(QueueMessage & msg, u32 exclude)
 {
-    std::vector<FH2RemoteClient>::iterator it1, it2;
-
-    it1 = std::find_if(clients.begin(), clients.end(), std::bind2nd(std::mem_fun_ref(&FH2RemoteClient::isColor), from));
-    it2 = std::find_if(clients.begin(), clients.end(), std::bind2nd(std::mem_fun_ref(&FH2RemoteClient::isColor), to));
-
-    if(it2 == clients.end())
-    {
-	(*it1).player_color = to;
-	Settings::Get().SetPlayersColors(GetPlayersColors());
-    }
-    else
-    if(it1 != clients.end())
-    {
-	std::swap((*it1).player_color, (*it2).player_color);
-    }
-}
-
-void FH2Server::ChangeClientRace(u8 color, u8 race)
-{
-    std::vector<FH2RemoteClient>::iterator it;
-
-    it = std::find_if(clients.begin(), clients.end(), std::bind2nd(std::mem_fun_ref(&FH2RemoteClient::isColor), color));
-    if(it != clients.end())
-	(*it).player_race = race;
-}
-
-void FH2Server::SetNewAdmin(u32 old_admin)
-{
-    std::vector<FH2RemoteClient>::iterator it;
-
-    it = std::find_if(clients.begin(), clients.end(), std::bind2nd(std::mem_fun_ref(&FH2RemoteClient::isID), old_admin));
-    if(it != clients.end()) (*it).ResetModes(ST_ADMIN);
-
-    it = std::find_if(clients.begin(), clients.end(), std::not1(std::bind2nd(std::mem_fun_ref(&FH2RemoteClient::isID), old_admin)));
-    if(it != clients.end()) (*it).SetModes(ST_ADMIN);
-}
-
-void FH2Server::PushPlayersInfo(QueueMessage & msg, u32 exclude) const
-{
-    Network::PacketPushPlayersInfo(msg, clients, exclude);
-}
-
-void FH2Server::PopMapsFileInfoList(QueueMessage & msg)
-{
-    Network::PacketPopMapsFileInfoList(msg, finfo_list);
-}
-
-u8 FH2Server::GetPlayersColors(void) const
-{
-    return Network::GetPlayersColors(clients);
+    msg.Reset();
+    msg.SetID(MSG_UPDATE_PLAYERS);
+    PushPlayersInfo(msg);
+    clients.Send2All(msg, exclude);
 }
 
 void FH2Server::ResetPlayers(void)
 {
     Settings & conf = Settings::Get();
 
-    // reset all
-    std::vector<FH2RemoteClient>::iterator it1 = clients.begin();
-    std::vector<FH2RemoteClient>::const_iterator it2 = clients.end();
-    for(; it1 != it2; ++it1)
-    {
-	(*it1).player_color = 0;
-	(*it1).player_race = 0;
-    }
-
+    mutexConf.Lock();
     conf.SetPlayersColors(0);
-    u8 colors = 0;
-
-    // set first admin
-    it1 = std::find_if(clients.begin(), clients.end(), std::bind2nd(std::mem_fun_ref(&FH2RemoteClient::Modes), ST_ADMIN));
-    if(it1 != clients.end())
-    {
-        (*it1).player_color = conf.FirstAllowColor();
-        colors |= (*it1).player_color;
-    }
-
-    // set other
-    it1 = clients.begin();
-    it2 = clients.end();
-    for(; it1 != it2; ++it1) if(0 == (*it1).player_color)
-    {
-        const u8 color = Color::GetFirst(conf.AllowColors() & (~colors));
-        if(color)
-        {
-            (*it1).player_color = color;
-            colors |= color;
-        }
-        else
-        // no free colors, shutdown client
-        {
-            (*it1).SetModes(ST_SHUTDOWN);
-        }
-    }
-
-    conf.SetPlayersColors(colors);
+    conf.SetPlayersColors(clients.ResetPlayersColors());
+    mutexConf.Unlock();
 }
 
-void FH2Server::CloseClients(void)
-{
-    std::for_each(clients.begin(), clients.end(), std::mem_fun_ref(&FH2RemoteClient::ShutdownThread));
-}
-
-int FH2Server::Main(void)
-{
-    WaitClients();
-    StartGame();
-
-    // stop scan queue
-    //Timer::Remove(timer);
-
-    CloseClients();
-
-    Close();
-
-    return 1;
-}
-
-bool FH2Server::IsRun(void) const
-{
-    return !exit;
-}
-
-void FH2Server::WaitClients(void)
+void FH2Server::SetCurrentMap(QueueMessage & msg)
 {
     Settings & conf = Settings::Get();
-    std::vector<FH2RemoteClient>::iterator it;
-    QueueMessage packet(MSG_UNKNOWN);
+    std::string str;
 
-    clients.reserve(8);
-    exit = false;
-    start_game = false;
+    msg.Pop(str);
 
-    // wait players
-    while(!exit && !start_game)
+    if(conf.LoadFileMapsMP2(str))
     {
-    	if(TCPsocket csd = Accept())
-    	{
-	    const u8 players = std::count_if(clients.begin(), clients.end(), std::mem_fun_ref(&FH2RemoteClient::IsConnected));
+	msg.Reset();
+	msg.SetID(MSG_SET_CURRENT_MAP);
 
-    	    // request admin
-	    it = std::find_if(clients.begin(), clients.end(), std::bind2nd(std::mem_fun_ref(&FH2RemoteClient::Modes), ST_ADMIN));
+	mutexConf.Lock();
+	Network::PacketPushMapsFileInfo(msg, conf.CurrentFileInfo());
+	mutexConf.Unlock();
 
-	    // check count players
-    	    if((conf.PreferablyCountPlayers() <= players) ||
-    	    // check admin allow connect
-    		((clients.end() != it && (*it).Modes(ST_CONNECT)) && !(*it).Modes(ST_ALLOWPLAYERS)))
-	    {
-		DEBUG(DBG_NETWORK, DBG_INFO, "FH2Server::" << "WaitClients: " << "max players, current: " << static_cast<int>(conf.PreferablyCountPlayers()));
-		Socket sct(csd);
-		// send message
-		sct.Close();
-	    }
-	    else
-	    // connect
-    	    {
-    		// find free socket
-    		it = std::find_if(clients.begin(), clients.end(), std::not1(std::mem_fun_ref(&FH2RemoteClient::IsConnected)));
-    		if(it == clients.end())
-    		{
-            	    clients.push_back(FH2RemoteClient());
-            	    it = clients.end();
-            	    --it;
-        	}
-
-		// first player: set admin mode
-		if(0 == players)
-		    (*it).SetModes(ST_ADMIN);
-
-        	(*it).Assign(csd);
-    		(*it).RunThread();
-	    }
-	}
-
-	DELAY(100);
+	clients.Send2All(msg, 0);
+	ResetPlayers();
+	SendUpdatePlayers(msg, 0);
     }
 }
 
-void FH2Server::StartGame(void)
+void FH2Server::MsgChangeColors(QueueMessage & msg)
 {
     Settings & conf = Settings::Get();
+    u8 from, to;
 
-    conf.FixKingdomRandomRace();
-    std::for_each(clients.begin(), clients.end(), Player::FixRandomRace);
-    conf.SetPlayersColors(Network::GetPlayersColors(clients));
+    msg.Pop(from);
+    msg.Pop(to);
 
-    QueueMessage packet;
-
-    world.LoadMaps(conf.MapsFile());
-
-    for(Color::color_t color = Color::BLUE; color != Color::GRAY; ++color) if(color & conf.PlayersColors())
-	world.GetKingdom(color).SetControl(Game::REMOTE);
-
-    std::for_each(clients.begin(), clients.end(), std::bind2nd(std::mem_fun_ref(&FH2RemoteClient::SetModes), ST_INGAME));
-
-    GameOver::Result::Get().Reset();
-    std::vector<FH2RemoteClient>::iterator it;
-
-/*
-    while(!exit && conf.PlayersColors())
+    if(conf.AllowColors(from) && conf.AllowColors(to))
     {
-	world.NewDay();
+	if(! clients.ChangeColors(from, to))
+	    UpdateColors();
+	SendUpdatePlayers(msg, 0);
+    }
+}
 
-	// sync world
-	mutex.Lock();
-	packet.Reset();
-	Game::IO::SaveBIN(packet);
-	packet.SetID(MSG_LOAD_KINGDOM);
-	SendPacketToAllClients(clients, packet, 0);
-	mutex.Unlock();
-*/
+void FH2Server::MsgChangeRaces(QueueMessage & msg)
+{
+    Settings & conf = Settings::Get();
+    u8 color, race;
 
-    // TEST BATTLE NETWORK
-    it = std::find_if(clients.begin(), clients.end(), std::bind2nd(std::mem_fun_ref(&FH2RemoteClient::Modes), ST_ADMIN));
-    Kingdom & kingdom = world.GetKingdom((*it).player_color);
+    msg.Pop(color);
+    msg.Pop(race);
 
-    Heroes & hero1 = *world.GetHeroes(Heroes::SANDYSANDY);
-    Heroes & hero2 = *world.GetHeroes(Heroes::RIALDO);
+    if(conf.AllowChangeRace(color))
+    {
+        conf.SetKingdomRace(color, race);
+        msg.Reset();
+        msg.SetID(MSG_CHANGE_RACE);
+        clients.ChangeRace(color, race);
+        Network::PackRaceColors(msg);
+        clients.Send2All(msg, 0);
+    }
+}
 
-    hero1.SetSpellPoints(150);
-    hero1.Recruit(kingdom.GetColor(), Point(20, 20));
-    hero2.Recruit(Color::GRAY, Point(20, 21));
+void FH2Server::MsgLogout(QueueMessage & msg, FH2RemoteClient & client)
+{
+    std::string str, err;
 
-    Army::army_t & army1 = hero1.GetArmy();
-    Army::army_t & army2 = hero2.GetArmy();
+    msg.Pop(err);
 
-    army1.Clear();
-    army1.JoinTroop(Monster::PHOENIX, 10);
-    army1.JoinTroop(Monster::RANGER, 80);
+    // send message
+    msg.Reset();
+    msg.SetID(MSG_MESSAGE);
+    str = "logout player: " + client.player_name;
+    if(err.size())
+    {
+	str.append("\n");
+	str.append(err);
+    }
+    msg.Push(str);
 
-    army2.Clear();
-    army2.At(0) = Army::Troop(Monster::SKELETON, 400);
-    army2.At(2) = Army::Troop(Monster::SKELETON, 400);
-    army2.At(4) = Army::Troop(Monster::SKELETON, 400);
+    clients.Send2All(msg, client.player_id);
 
-    // sync world
-    mutex.Lock();
-    packet.Reset();
-    Game::IO::SaveBIN(packet);
-    packet.SetID(MSG_MAPS_LOAD);
-    SendPacketToAllClients(clients, packet, 0);
-    mutex.Unlock();
+    if(client.Modes(ST_ADMIN)) clients.SetNewAdmin(client.player_id);
 
-    const u16 index = 33;
+    client.SetModes(ST_SHUTDOWN);
 
-    packet.Reset();
-    packet.SetID(MSG_BATTLE);
-    // attacker monster oor hero
-    packet.Push(static_cast<u8>(1));
-    packet.Push(hero1.GetIndex());
-    // defender monster, hero or castle
-    packet.Push(static_cast<u8>(1));
-    packet.Push(hero2.GetIndex());
-    packet.Push(index);
+    DELAY(100);
 
-    Lock();
-    SendToAllClients(packet);
-    Unlock();
+    // send players
+    UpdateColors();
+    SendUpdatePlayers(msg, client.player_id);
 
-    Battle2::Loader(army1, army2, index);
+    // FIXME: logout
+    // if(Modes(ST_INGAME)) world.GetKingdom(player_color).SetControl(Game::AI); // FIXME: MSGLOGOUT: INGAME AND CURRENT TURN?    
+}
 
-/*
-	// send all tiles
-	// send action new day
-	
-	for(Color::color_t color = Color::BLUE; color != Color::GRAY && !exit; ++color)
+void FH2Server::MsgShutdown(QueueMessage & msg)
+{
+    // send message
+    msg.Reset();
+    msg.SetID(MSG_MESSAGE);
+    std::string str = "server shutdown";
+    msg.Push(str);
+
+    clients.Send2All(msg, 0);
+
+    SetModes(ST_SHUTDOWN);
+}
+
+void FH2Server::MsgGetGameType(QueueMessage & msg, FH2RemoteClient & client)
+{
+    Settings & conf = Settings::Get();
+    u8 type;
+    msg.Pop(type);
+
+    if(client.Modes(ST_ADMIN))
+    {
+	if(type & Game::STANDARD)
+	    conf.SetGameType(Game::STANDARD | Game::NETWORK);
+	else
+	if(type & Game::BATTLEONLY)
 	{
-	    Kingdom & kingdom = world.GetKingdom(color);
+	    conf.SetGameType(Game::BATTLEONLY | Game::NETWORK);
+	    world.NewMaps(10, 10);
+	}
+    }
 
-	    if(!kingdom.isPlay()) continue;
+    type = conf.GameType();
+    msg.Reset();
+    msg.SetID(MSG_GET_GAME_TYPE);
+    msg.Push(type);
 
-	    conf.SetCurrentColor(color);
-	    world.ClearFog(color);
+    if(client.Modes(ST_ADMIN))
+	clients.Send2All(msg, 0);
+    else
+	client.Send(msg);
+}
 
-	    // send turn
-	    mutex.Lock();
-	    packet.Reset();
-	    packet.SetID(MSG_YOUR_TURN);
-    	    packet.Push(static_cast<u8>(color));
-	    packet.Push(static_cast<u8>(0));
-	    SendPacketToAllClients(clients, packet, 0);
-	    mutex.Unlock();
+void FH2Server::MsgLoadMaps(QueueMessage & msg, FH2RemoteClient & client)
+{
+    Settings & conf = Settings::Get();
+    u8 toAll, forceLoad;
+    msg.Pop(forceLoad);
+    msg.Pop(toAll);
 
-	    switch(kingdom.Control())
-	    {
-		default:
-		    conf.SetMyColor(color);
+    // load maps
+    if(client.Modes(ST_ADMIN) && forceLoad)
+    {
+	mutexConf.Lock();
 
-		    it = std::find_if(clients.begin(), clients.end(), std::bind2nd(std::mem_fun_ref(&FH2RemoteClient::isColor), color));
-		    if(it == clients.end()) break;
+	conf.SetPlayersColors(clients.GetPlayersColors());
 
-		    (*it).SetModes(ST_TURN);
-		    DEBUG(DBG_NETWORK, DBG_INFO, "Server: Player turn: " << Color::String(color));
-		    // wait turn
-		    while(!exit && (*it).Modes(ST_TURN)) DELAY(100);
-		    // lost connection
-		    if(!(*it).Modes(ST_CONNECT))
-		    {
-    			mutex.Lock();
-			world.GetKingdom(color).SetControl(Game::AI);
-			conf.SetPlayersColors(conf.PlayersColors() & (~color));
-			mutex.Unlock();
-		    }
-		    break;
-
-		case Game::AI:
-		    DEBUG(DBG_NETWORK, DBG_INFO, "Server: AI turn: " << Color::String(color));
-        	    kingdom.AITurns();
-
-        	    //packet.Reset();
-        	    //packet.SetID(MSG_KINGDOM);
-        	    //packet.Push(static_cast<u8>(kingdom.GetColor()));
-        	    //Game::IO::PackKingdom(packet, kingdom);
-        	    //Lock();
-        	    //SendToAllClients(packet);
-        	    //Unlock();
-		    break;
-	    }
+	if(Game::STANDARD & conf.GameType())
+	{
+	    // disable connect
+	    // SetModes(ST_FULLHOUSE);
+	    //world.LoadMaps(conf.MapsFile());
+	}
+	else
+	if(Game::BATTLEONLY & conf.GameType())
+	{
+	    // FIXME
+	    //world.NewMaps(10, 10);
 	}
 
-	DELAY(100);
+	// set control
+	for(Color::color_t color = Color::BLUE; color != Color::GRAY; ++color)
+	    if(color & conf.PlayersColors())
+    		world.GetKingdom(color).SetControl(Game::REMOTE);
+
+	mutexConf.Unlock();
     }
-*/
+
+    msg.Reset();
+    msg.SetID(MSG_MAPS_LOAD);
+    Game::IO::SaveBIN(msg);
+
+    if(client.Modes(ST_ADMIN) && toAll)
+	clients.Send2All(msg, 0);
+    else
+	client.Send(msg);
 }
 
-
-FH2RemoteClient* FH2Server::GetRemoteClient(u8 color)
+bool FH2Server::BattleSendAction(u8 color, QueueMessage & msg)
 {
-    std::vector<FH2RemoteClient>::iterator it;
-    it = std::find_if(clients.begin(), clients.end(), std::bind2nd(std::mem_fun_ref(&FH2RemoteClient::isColor), color));
-
-    return it != clients.end() ? &(*it) : NULL;
+    FH2RemoteClient* client = clients.GetClient(color);
+    if(client)
+    {
+	DEBUG(DBG_NETWORK, DBG_INFO, "FH2Server::" << "BattleSendAction: " << Network::GetMsgString(msg.GetID()));
+	return client->Send(msg);
+    }
+    return false;
 }
+
+bool FH2Server::BattleSendResult(u8 color, const Battle2::Result & res)
+{
+    FH2RemoteClient* client = clients.GetClient(color);
+    if(client)
+    {
+	QueueMessage msg(MSG_BATTLE_RESULT);
+	msg.Push(res.army1);
+	msg.Push(res.army2);
+	msg.Push(res.exp1);
+	msg.Push(res.exp2);
+
+	DEBUG(DBG_NETWORK, DBG_INFO, "FH2Server::" << "SendBattleResult: ");
+	return client->Send(msg);
+    }
+    return false;
+}
+
+bool FH2Server::BattleSendAttack(u8 color, const Battle2::Stats & attacker, const Battle2::Stats & defender, u16 dst, const Battle2::TargetsInfo & targets)
+{
+    FH2RemoteClient* client = clients.GetClient(color);
+    if(client)
+    {
+	QueueMessage msg(MSG_BATTLE_ATTACK);
+	msg.Push(attacker.GetID());
+	attacker.Pack(msg);
+	msg.Push(defender.GetID());
+	defender.Pack(msg);
+	msg.Push(dst);
+	targets.Pack(msg);
+
+	DEBUG(DBG_NETWORK, DBG_INFO, "FH2Server::" << "SendBattleAttack: ");
+	return client->Send(msg);
+    }
+    return false;
+}
+
+bool FH2Server::BattleSendBoard(u8 color, const Battle2::Arena & a)
+{
+    FH2RemoteClient* client = clients.GetClient(color);
+    if(client)
+    {
+	QueueMessage msg(MSG_BATTLE_BOARD);
+	a.PackBoard(msg);
+
+	DEBUG(DBG_NETWORK, DBG_INFO, "FH2Server::" << "SendBattleBoard: " << msg.DtSz() << "bytes");
+	return client->Send(msg);
+    }
+    return false;
+}
+
+bool FH2Server::BattleSendSpell(u8 color, u16 who, u16 dst, u8 spell, const Battle2::TargetsInfo & targets)
+{
+    FH2RemoteClient* client = clients.GetClient(color);
+    if(client)
+    {
+	QueueMessage msg(MSG_BATTLE_CAST);
+	msg.Push(spell);
+	msg.Push(who);
+	msg.Push(dst);
+	msg.Push(color);
+	targets.Pack(msg);
+
+	DEBUG(DBG_NETWORK, DBG_INFO, "FH2Server::" << "BattleSendSpell: " << Spell::GetName(Spell::FromInt(spell)));
+	return client->Send(msg);
+    }
+    return false;
+}
+
+bool FH2Server::BattleSendTeleportSpell(u8 color, u16 src, u16 dst)
+{
+    FH2RemoteClient* client = clients.GetClient(color);
+    if(client)
+    {
+	QueueMessage msg(MSG_BATTLE_CAST);
+	msg.Push(static_cast<u8>(Spell::TELEPORT));
+	msg.Push(src);
+	msg.Push(dst);
+	//msg.Push(color); // unused
+	//msg.Push(static_cast<u32>(0)); // empty TargetsInfo // unused
+
+	DEBUG(DBG_NETWORK, DBG_INFO, "FH2Server::" << "BattleSendSpell: " << Spell::GetName(Spell::TELEPORT));
+	return client->Send(msg);
+    }
+    return false;
+}
+
+bool FH2Server::BattleSendEarthQuakeSpell(u8 color, const std::vector<u8> & targets)
+{
+    FH2RemoteClient* client = clients.GetClient(color);
+    if(client)
+    {
+	QueueMessage msg(MSG_BATTLE_CAST);
+	msg.Push(static_cast<u8>(Spell::EARTHQUAKE));
+	msg.Push(static_cast<u32>(targets.size()));
+
+	for(std::vector<u8>::const_iterator
+	    it = targets.begin(); it != targets.end(); ++it)
+	    msg.Push(*it);
+
+	DEBUG(DBG_NETWORK, DBG_INFO, "FH2Server::" << "BattleSendSpell: " << Spell::GetName(Spell::EARTHQUAKE));
+	return client->Send(msg);
+    }
+    return false;
+}
+
+
+
+
 
 Game::menu_t Game::NetworkHost(void)
 {
     Settings & conf = Settings::Get();
-    Display & display = Display::Get();
-    Cursor & cursor = Cursor::Get();
 
-    // select count players
-    const u8 max_players = SelectCountPlayers();
+    if(conf.GameType() & Game::STANDARD)
+    {
+	// select count players
+	const u8 max_players = Game::SelectCountPlayers();
 
-    if(2 > max_players) return Game::MAINMENU;
-    conf.SetPreferablyCountPlayers(max_players);
-    conf.SetGameType(Game::NETWORK);
+	if(2 > max_players) return Game::MAINMENU;
+	conf.SetPreferablyCountPlayers(max_players);
 
-    // clear background
-    const Sprite &back = AGG::GetICN(ICN::HEROES, 0);
-    cursor.Hide();
-    display.Blit(back);
-    cursor.Show();
-    display.Flip();
+	Display & display = Display::Get();
+	Cursor & cursor = Cursor::Get();
+
+	// clear background
+	cursor.Hide();
+	display.Blit(AGG::GetICN(ICN::HEROES, 0));
+	cursor.Show();
+	display.Flip();
+    }
+    else
+    if(conf.GameType() & Game::BATTLEONLY)
+	conf.SetPreferablyCountPlayers(2);
 
     // create local server
     FH2Server & server = FH2Server::Get();
@@ -478,7 +843,7 @@ Game::menu_t Game::NetworkHost(void)
     }
 
     SDL::Thread thread;
-    thread.Create(FH2Server::callbackCreateThread, &server);
+    thread.Create(FH2Server::Main, NULL);
 
     // create local client
     const std::string localhost("127.0.0.1");
@@ -493,9 +858,7 @@ Game::menu_t Game::NetworkHost(void)
     else
         Dialog::Message(_("Error"), Network::GetError(), Font::BIG, Dialog::OK);
 
-    server.Lock();
-    server.SetExit();
-    server.Unlock();
+    server.SetModes(ST_SHUTDOWN);
 
     if(0 > thread.Wait())
     {

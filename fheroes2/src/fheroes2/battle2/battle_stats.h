@@ -130,12 +130,14 @@ namespace Battle2
 	std::string Info(bool more = false) const;
 
 	u16	GetID(void) const;
+	bool	isID(u16) const;
 
 	u32	GetCount(void) const;
 	s32	GetExtraQuality(s32) const;
 	u16	GetTailIndex(void) const;
 	u16	GetAttack(void) const;
 	u16	GetDefense(void) const;
+	u8	GetArmyColor(void) const;
 	u8	GetColor(void) const;
 	u8	GetSpeed(bool skip_standing_check = false) const;
 	const char* GetName(void) const;
@@ -217,6 +219,9 @@ namespace Battle2
 	const HeroBase* GetCommander(void) const;
 	HeroBase*       GetCommander(void);
 
+	void	Pack(Action &) const;
+	void	Unpack(Action &);
+
 	static bool isHandFighting(const Stats &, const Stats &);
 
 	Army::Troop & troop;
@@ -249,6 +254,7 @@ namespace Battle2
 
 	Stats* GetRandom(void);
 	Stats* FindMode(u32);
+	Stats* FindID(u16);
 	Stats* CreateNewStats(Monster::monster_t, u32);
 
 	void SortSlowest(void);
@@ -257,6 +263,9 @@ namespace Battle2
 	void SortWeakest(void);
 
 	void NewTurn(void);
+
+	void	PackStats(Action &) const;
+	void	UnpackStats(Action &);
 
 	static Stats* GetStatsPart1(Armies &, Armies &, Stats* last);
 	static Stats* GetStatsPart2(Armies &, Armies &, Stats* last);

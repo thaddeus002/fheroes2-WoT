@@ -49,198 +49,11 @@ namespace Game
     menu_t HumanTurn(void);
 }
 
-bool FH2LocalClient::BattleLoop(Battle2::Arena & arena, Battle2::Result & result)
-{
-    Battle2::Interface* interface = arena.GetInterface();
-    if(! interface) return false;
-
-    Cursor & cursor = Cursor::Get();
-    Display & display = Display::Get();
-    //LocalEvent & le = LocalEvent::Get();
-    //Settings & conf = Settings::Get();
-
-    cursor.SetThemes(Cursor::WAIT);
-
-    cursor.Hide();
-    interface->Redraw();
-    cursor.Show();
-    display.Flip();
-
-    bool exit = false;
-    QueueMessage packet;
-
-    while(!exit && LocalEvent::Get().HandleEvents())
-    {
-	if(Ready())
-        {
-	    if(!Recv(packet))
-	    {
-		Dialog::Message("Error", "FH2LocalClient::BattleLoop: recv: error", Font::BIG, Dialog::OK);
-		return false;
-            }
-	    DEBUG(DBG_NETWORK , DBG_INFO, "FH2LocalClient::" << "BattleLoop: " << "recv: " << Network::GetMsgString(packet.GetID()));
-
-            switch(packet.GetID())
-            {
-    		case MSG_BATTLE_BOARD:
-		{
-		    arena.UnpackBoard(packet);
-		    break;
-		}
-
-    		case MSG_BATTLE_CAST:
-		{
-		    u8 spell;
-		    packet.Pop(spell);
-
-		    switch(spell)
-		    {
-			case Spell::TELEPORT:
-        		{
-            		    u16 src, dst;
-            		    packet.Pop(src);
-            		    packet.Pop(dst);
-
-			    arena.SpellActionTeleport(src, dst);
-            		    break;
-        		}
-
-        		case Spell::EARTHQUAKE:
-			{
-			    u8 id;
-			    u32 size;
-			    packet.Pop(size);
-
-			    std::vector<u8> targets;
-			    while(size--)
-			    {
-				packet.Pop(id);
-				targets.push_back(id);
-			    }
-
-			    if(interface) interface->RedrawActionEarthQuakeSpell(targets);
-			    break;
-			}
-
-			default:
-			{
-			    DEBUG(DBG_NETWORK, DBG_INFO, "FH2LocalClient::" << "BattleLoop: " << "cast spell: " << Spell::GetName(Spell::FromInt(spell)));
-
-			    u8 color;
-			    u16 id;
-			    u32 size;
-
-			    packet.Pop(color);
-			    packet.Pop(size);
-
-			    std::vector<Battle2::TargetInfo> targets;
-			    Battle2::TargetInfo target;
-
-			    DEBUG(DBG_NETWORK, DBG_INFO, "FH2LocalClient::" << "BattleLoop: " << " targets size0: " << size);
-			    while(size--)
-			    {
-				packet.Pop(id);
-				packet.Pop(target.damage);
-				packet.Pop(target.killed);
-				target.defender = arena.GetTroopID(id);
-				targets.push_back(target);
-			    }
-			    DEBUG(DBG_NETWORK, DBG_INFO, "FH2LocalClient::" << "BattleLoop: " << " targets size: " << targets.size());
-
-			    const HeroBase* hero = arena.GetArmy(color) ? arena.GetArmy(color)->GetCommander() : NULL;
-
-			    arena.TargetsApplySpell(hero, spell, targets);
-			    if(interface) interface->RedrawActionSpellCastPart2(spell, targets);
-			    break;
-			}
-		    }
-		    // end MSG_BATTLE_CAST
-		    break;
-		}
-    		case MSG_BATTLE_ATTACK:
-		{
-		    u16 id1, id2;
-		    u32 size; //, damage, killed;
-		    packet.Pop(id1);
-		    packet.Pop(size);
-		    std::vector<Battle2::TargetInfo> targets;
-		    Battle2::TargetInfo target;
-
-		    while(size--)
-		    {
-			packet.Pop(id2);
-			packet.Pop(target.damage);
-			packet.Pop(target.killed);
-			target.defender = arena.GetTroopID(id2);
-			targets.push_back(target);
-		    }
-
-		    Battle2::Stats* attacker = arena.GetTroopID(id1);
-		    Battle2::Stats* defender = targets.size() ? targets.front().defender : NULL;
-		    if(attacker && defender)
-		    {
-			if(interface) interface->RedrawActionAttackPart1(*attacker, *defender, targets);
-			arena.TargetsApplyDamage(*attacker, *defender, targets);
-			if(interface) interface->RedrawActionAttackPart2(*attacker, targets);
-		    }
-		    else
-			DEBUG(DBG_NETWORK, DBG_INFO, "FH2LocalClient::" << "BattleLoop: " << "incorrect param");
-		    break;
-		}
-
-    		case MSG_BATTLE_END_TURN:
-    		case MSG_BATTLE_MOVE:
-    		case MSG_BATTLE_SKIP:
-    		case MSG_BATTLE_MORALE:
-    		case MSG_BATTLE_TOWER:
-    		case MSG_BATTLE_CATAPULT:
-		    arena.ApplyAction(packet);
-		    break;
-
-		case MSG_BATTLE_RESULT:
-		{
-		    packet.Pop(result.army1);
-		    packet.Pop(result.army2);
-		    packet.Pop(result.exp1);
-		    packet.Pop(result.exp2);
-		    exit = true;
-		    break;
-		}
-
-		case MSG_BATTLE_TURN:
-		{
-		    u16 id;
-		    packet.Pop(id);
-		    const Battle2::Stats* b = arena.GetTroopID(id);
-
-		    if(b)
-		    {
-    			Battle2::Actions a;
-    			interface->HumanTurn(*b, a);
-
-    			while(a.size())
-    			{
-			    DEBUG(DBG_NETWORK , DBG_INFO, "FH2LocalClient::" << "BattleLoop: send: " << Network::GetMsgString(a.front().GetID()));
-			    if(!Send(a.front())) return false;
-        		    a.pop_front();
-    			}
-		    }
-		    break;
-		}
-
-		default: break;
-	    }
-	}
-    }
-
-    return true;
-}
-
 bool FH2LocalClient::StartGame(void)
 {
     Game::SetFixVideoMode();
 
-    Settings & conf = Settings::Get();
+//    Settings & conf = Settings::Get();
 
 /* TEST FOR BATTLE
     // cursor
@@ -316,7 +129,7 @@ bool FH2LocalClient::StartGame(void)
 		Dialog::Message("Error", "FH2LocalClient::StartGame: recv: error", Font::BIG, Dialog::OK);
 		return false;
             }
-	    DEBUG(DBG_NETWORK , DBG_INFO, "FH2LocalClient::" << "StartGame: " << "recv: " << Network::GetMsgString(packet.GetID()));
+	    DEBUG(DBG_NETWORK, DBG_INFO, "FH2LocalClient::" << "StartGame: " << "recv: " << Network::GetMsgString(packet.GetID()));
 
             switch(packet.GetID())
             {
@@ -330,7 +143,7 @@ bool FH2LocalClient::StartGame(void)
 			castleBar.Reset();
 		    }
             	    else
-            		DEBUG(DBG_NETWORK , DBG_WARN, "FH2LocalClient::" << "StartGame: " << "MSG_MAPS_LOAD error");
+            		DEBUG(DBG_NETWORK, DBG_WARN, "FH2LocalClient::" << "StartGame: " << "MSG_MAPS_LOAD error");
 		}
 		break;
 */
@@ -355,10 +168,10 @@ bool FH2LocalClient::StartGame(void)
 			    Battle2::Loader(hero1->GetArmy(), hero2->GetArmy(), dst);
 			}
 			else
-			    DEBUG(DBG_NETWORK , DBG_WARN, "FH2LocalClient::" << "StartGame: " << "MSG_BATTLE unknown param");
+			    DEBUG(DBG_NETWORK, DBG_WARN, "FH2LocalClient::" << "StartGame: " << "MSG_BATTLE unknown param");
 		    }
             	    else
-			DEBUG(DBG_NETWORK , DBG_WARN, "FH2LocalClient::" << "StartGame: " << "MSG_BATTLE unknown param");
+			DEBUG(DBG_NETWORK, DBG_WARN, "FH2LocalClient::" << "StartGame: " << "MSG_BATTLE unknown param");
 		}
 		break;
 /*
@@ -372,7 +185,7 @@ bool FH2LocalClient::StartGame(void)
 		    conf.SetCurrentColor(Color::Get(color));
 		    //Interface::Basic::SetTurnProgress(percent);
 
-		    DEBUG(DBG_NETWORK , DBG_INFO, "FH2LocalClient::" << "StartGame: player: " << Color::String(color));
+		    DEBUG(DBG_NETWORK, DBG_INFO, "FH2LocalClient::" << "StartGame: player: " << Color::String(color));
 		    world.ClearFog(color);
 
 		    if(conf.MyColor() == color)
@@ -704,6 +517,18 @@ void FH2LocalClient::SendArmyCombatFormation(const Army::army_t & army)
     packet.Push(army.GetCombatFormat());
 
     DEBUG(DBG_NETWORK, DBG_INFO, "FH2LocalClient::" << "SendArmyCombatFormation: ");
+    client.Send(packet);
+}
+
+void FH2LocalClient::SendUpdateBattleOnlySettings(const BattleOnly & b)
+{
+    FH2LocalClient & client = FH2LocalClient::Get();
+    QueueMessage packet;
+
+    packet.SetID(MSG_UPDATE_BATTLEONLY);
+    Network::PackBattleOnly(packet, b);
+
+    DEBUG(DBG_NETWORK, DBG_INFO, "FH2LocalClient::" << "SendUpdateBattleOnlySettings: ");
     client.Send(packet);
 }
 

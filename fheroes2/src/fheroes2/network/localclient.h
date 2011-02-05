@@ -44,9 +44,9 @@ public:
 
     int Main(void);
     bool Connect(const std::string &, u16);
-    void Logout(void);
+    void Logout(const std::string &);
 
-    bool BattleLoop(Battle2::Arena &, Battle2::Result &);
+    const Player* FindPlayer(u8 color) const;
 
     static void SendCastleBuyBuilding(const Castle &, u32);
     static void SendCastleRecruitHero(const Castle &, const Heroes &);
@@ -66,19 +66,30 @@ public:
     static void SendArmyJoinTroops(const Army::army_t &, u8, const Army::army_t &, u8);
     static void SendArmyCombatFormation(const Army::army_t &);
 
-private:
-    FH2LocalClient();
+    static void SendUpdateBattleOnlySettings(const BattleOnly &);
+
 
     bool ConnectionChat(void);
+    bool GetCurrentMapInfo(void);
+    bool GetPlayersInfo(void);
+    bool GetGameType(void);
+    bool GetLoadMaps(bool, bool);
     bool ScenarioInfoDialog(void);
+    bool Prepare4BattleOnly(void);
+    bool SendWait(QueueMessage &, u16, const char*);
+    bool WaitSend(QueueMessage &, u16, const char*);
+    bool SendStartBattleOnly(void);
     bool StartGame(void);
 
-    void MsgUpdatePlayers(void);
+    void MsgUpdatePlayers(QueueMessage &);
     void PopPlayersInfo(QueueMessage &);
 
     std::string server;
     std::vector<Player> players;
     u32 admin_id;
+
+private:
+    FH2LocalClient();
 };
 
 #endif

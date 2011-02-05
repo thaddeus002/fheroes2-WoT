@@ -40,12 +40,12 @@ enum status_t
     ST_SHUTDOWN         = 0x0010,
     ST_ALLOWPLAYERS     = 0x0020,
     ST_LOCALSERVER      = 0x0040,
-    ST_TURN		= 0x0080
+    ST_TURN		= 0x0080,
+    ST_FULLHOUSE	= 0x0100
 };
 
-class FH2Client : public Network::Socket, public BitModes, public Player
+struct FH2Client : public Network::Socket, public BitModes, public Player
 {
-public:
     FH2Client();
 
     virtual ~FH2Client(){};
@@ -55,8 +55,6 @@ public:
     bool Wait(QueueMessage &, u16);
     bool Send(QueueMessage &);
     bool Recv(QueueMessage &);
-
-    QueueMessage packet;
 };
 
 #endif

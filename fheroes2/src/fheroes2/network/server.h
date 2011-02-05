@@ -27,54 +27,82 @@
 
 #ifdef WITH_NET
 
-#include <vector>
 #include "network.h"
 #include "remoteclient.h"
 #include "maps_fileinfo.h"
 
-class FH2Server : public Network::Server
+struct RemoteMessage
+{
+    RemoteMessage(FH2RemoteClient* ptr) : uid(sid++), own(ptr), ready(false) {};
+
+    void InitMutex(void);
+    bool IsReady(void) const;
+    void SetReady(void);
+
+    bool operator== (const RemoteMessage & rm) const { return rm.uid == uid; }
+
+    u32 uid;
+    FH2RemoteClient* own;
+    QueueMessage packet;
+    SDL::Mutex mutexReady;
+    bool ready;
+
+    static u32 sid;
+};
+
+class FH2Server : public Network::Server, public BitModes
 {
 public:
     static FH2Server & Get(void);
-    static int callbackCreateThread(void *);
 
     ~FH2Server();
 
     bool Bind(u16);
+    bool WaitReadyClients(u32 ms);
 
-    bool IsRun(void) const;
-    void Lock(void);
-    void Unlock(void);
+    void UpdateColors(void);
+    u8 GetFreeColor(bool);
+
+    RemoteMessage & GetNewMessage(FH2RemoteClient &);
+
+    void SetModes(u32);
+    bool Modes(u32) const;
+
+    void PushPlayersInfo(QueueMessage &) const;
     void PushMapsFileInfoList(QueueMessage &) const;
-    void PushPlayersInfo(QueueMessage &, u32 exclude = 0) const;
-    void SetNewAdmin(u32 old_admin);
-    void PopMapsFileInfoList(QueueMessage &);
-    u8 GetPlayersColors(void) const;
+    void SendUpdatePlayers(QueueMessage &, u32 exclude);
     void ResetPlayers(void);
-    void SendToAllClients(const QueueMessage &, u32 = 0);
-    void ChangeClientColors(u8, u8);
-    void ChangeClientRace(u8 color, u8 race);
 
-    FH2RemoteClient* GetRemoteClient(u8);
+    static int Main(void*);
+    static int WaitClients(void*);
 
-    void SetExit(void);
-    void SetStartGame(void);
+    bool BattleSendAction(u8, QueueMessage &);
+    bool BattleSendAttack(u8, const Battle2::Stats &, const Battle2::Stats &, u16, const Battle2::TargetsInfo &);
+    bool BattleSendSpell(u8, u16, u16, u8, const Battle2::TargetsInfo &);
+    bool BattleSendTeleportSpell(u8, u16, u16);
+    bool BattleSendEarthQuakeSpell(u8, const std::vector<u8> &);
+    bool BattleSendBoard(u8, const Battle2::Arena &);
+    bool BattleSendResult(u8, const Battle2::Result &);
+    bool BattleRecvTurn(u8, const Battle2::Stats &, const Battle2::Arena &, Battle2::Actions &);
 
 protected:
-    void ScanQueue(void);
-
     FH2Server();
-    int Main(void);
-    void WaitClients(void);
-    void CloseClients(void);
-    void StartGame(void);
+    RemoteMessage* FindRemoteReady(void);
+    void RemoveMessage(const RemoteMessage &);
+    void SetCurrentMap(QueueMessage &);
+    void MsgChangeColors(QueueMessage &);
+    void MsgChangeRaces(QueueMessage &);
+    void MsgLogout(QueueMessage &, FH2RemoteClient &);
+    void MsgShutdown(QueueMessage &);
+    void MsgGetGameType(QueueMessage &, FH2RemoteClient &);
+    void MsgLoadMaps(QueueMessage &, FH2RemoteClient &);
 
-    SDL::Mutex mutex;
-    SDL::Timer timer;
-    std::vector<FH2RemoteClient> clients;
-    bool exit;
-    bool start_game;
-    MapsFileInfoList finfo_list;
+    FH2RemoteClients clients;
+    MapsFileInfoList finfoList;
+    std::list<RemoteMessage> spool;
+    SDL::Mutex mutexConf;
+    SDL::Mutex mutexSpool;
+    SDL::Mutex mutexModes;
 };
 
 #endif

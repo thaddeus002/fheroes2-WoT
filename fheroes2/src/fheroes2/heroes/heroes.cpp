@@ -46,7 +46,7 @@
 // heroes_action.cpp
 void PlayPickupSound(void);
 
-const char* HeroesName(Heroes::heroes_t id)
+const char* Heroes::GetName(heroes_t id)
 {
     const char* names[] = {
 	// knight
@@ -112,7 +112,7 @@ Heroes::Heroes(heroes_t ht, Race::race_t rc) : killer_color(Color::GRAY), experi
     move_point_scale(-1), army(this), hid(ht), portrait(ht), race(rc),
     save_maps_object(MP2::OBJ_ZERO), path(*this), direction(Direction::RIGHT), sprite_index(18), patrol_square(0)
 {
-    name = _(HeroesName(ht));
+    name = _(Heroes::GetName(ht));
 
     bag_artifacts.assign(HEROESMAXARTIFACT, Artifact::UNKNOWN);
 
@@ -1595,29 +1595,44 @@ bool Heroes::isShow(u8 color)
     return !tile_from.isFog(color);
 }
 
-const Surface & Heroes::GetPortrait30x22(void) const
+const Surface & Heroes::GetPortrait30x22(heroes_t hid)
 {
-    if(Heroes::SANDYSANDY > portrait) return AGG::GetICN(ICN::MINIPORT, portrait);
+    if(Heroes::SANDYSANDY > hid) return AGG::GetICN(ICN::MINIPORT, hid);
     else
-    if(Heroes::SANDYSANDY == portrait) return AGG::GetICN(ICN::MINIPORT, BAX);
+    if(Heroes::SANDYSANDY == hid) return AGG::GetICN(ICN::MINIPORT, BAX);
 
     return AGG::GetICN(ICN::MINIPORT, 0);
 }
 
-const Surface & Heroes::GetPortrait50x46(void) const
+const Surface & Heroes::GetPortrait50x46(heroes_t hid)
 {
-    if(Heroes::SANDYSANDY > portrait) return AGG::GetICN(ICN::PORTMEDI, portrait + 1);
+    if(Heroes::SANDYSANDY > hid) return AGG::GetICN(ICN::PORTMEDI, hid + 1);
     else
-    if(Heroes::SANDYSANDY == portrait) return AGG::GetICN(ICN::PORTMEDI, BAX + 1);
+    if(Heroes::SANDYSANDY == hid) return AGG::GetICN(ICN::PORTMEDI, BAX + 1);
 
     return AGG::GetICN(ICN::PORTMEDI, 0);
 }
 
-const Surface & Heroes::GetPortrait101x93(void) const
+const Surface & Heroes::GetPortrait101x93(heroes_t hid)
 {
-    ICN::icn_t icn = ICN::PORTxxxx(portrait);
+    ICN::icn_t icn = ICN::PORTxxxx(hid);
 
     return AGG::GetICN(ICN::UNKNOWN != icn ? icn : ICN::PORT0000, 0);
+}
+
+const Surface & Heroes::GetPortrait30x22(void) const
+{
+    return GetPortrait30x22(portrait);
+}
+
+const Surface & Heroes::GetPortrait50x46(void) const
+{
+    return GetPortrait50x46(portrait);
+}
+
+const Surface & Heroes::GetPortrait101x93(void) const
+{
+    return GetPortrait101x93(portrait);
 }
 
 void Heroes::SetKillerColor(Color::color_t c)

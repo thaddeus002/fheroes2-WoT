@@ -38,6 +38,7 @@
 #include "battle_bridge.h"
 #include "battle_catapult.h"
 #include "interface_list.h"
+#include "localclient.h"
 #include "battle_interface.h"
 
 namespace Battle2
@@ -1438,18 +1439,23 @@ void Battle2::Interface::HumanTurn(const Stats & b, Actions & a)
     humanturn_exit = false;
     catapult_frame = 0;
 
+    // may be: network client: fix current color
+    if(arena.current_color != b.GetArmyColor())
+	arena.current_color = b.GetArmyColor();
+
     arena.ResetBoard();
     arena.ScanPassabilityBoard(b);
 
     rectBoard = arena.board.GetArea();
+    const HeroBase* current_commander = arena.GetCurrentCommander();
 
     if(conf.Music() && !Music::isPlaying()) AGG::PlayMusic(MUS::GetBattleRandom(), false);
 
-    if(conf.QVGA() && arena.current_commander && arena.current_commander->HaveSpellBook())
+    if(conf.QVGA() && current_commander && current_commander->HaveSpellBook())
     {
 	const Rect & area = border.GetArea();
     	const Sprite & book = AGG::GetICN(ICN::ARTFX, 81);
-	const u16 ox = (arena.army1.GetColor() == arena.current_commander->GetColor() ? 0 : 320 - book.w());
+	const u16 ox = (arena.army1.GetColor() == current_commander->GetColor() ? 0 : 320 - book.w());
 	pocket_book = Rect(area.x + ox, area.y + area.h - 19 - book.h(), book.w(), book.h());
     }
 
@@ -1480,6 +1486,9 @@ void Battle2::Interface::HumanTurn(const Stats & b, Actions & a)
 	    HumanCastSpellTurn(b, a, msg);
 	else
 	    HumanBattleTurn(b, a, msg);
+
+	if(humanturn_exit)
+	    cursor.SetThemes(Cursor::WAIT);
 
 	// update status
 	if(msg != status.GetMessage())
@@ -1557,8 +1566,23 @@ void Battle2::Interface::HumanBattleTurn(const Stats & b, Actions & a, std::stri
 	    ProcessingHeroDialogResult(3, a);
 
 	// debug only
-	if(IS_DEVEL()) switch(le.KeyValue())
+	//if(IS_DEVEL()) 
+	switch(le.KeyValue())
 	{
+	    case KEY_r:
+		cursor.Hide();
+		Redraw();
+		cursor.Show();
+		Display::Get().Flip();
+		VERBOSE("redraw");
+		break;
+
+	    case KEY_n:
+		arena.ResetBoard();
+		arena.ScanPassabilityBoard(b);
+		VERBOSE("scan");
+		break;
+
 	    case KEY_w:
 		if(arena.result_game)
 		{
@@ -1752,8 +1776,9 @@ void Battle2::Interface::HumanCastSpellTurn(const Stats & b, Actions & a, std::s
 	    if(listlog)
 	    {
 		std::string str = _("%{color} cast spell: %{spell}");
-		if(arena.current_commander)
-		String::Replace(str, "%{color}", Color::String(arena.current_commander->GetColor()));
+		const HeroBase* current_commander = arena.GetCurrentCommander();
+		if(current_commander)
+		    String::Replace(str, "%{color}", Color::String(current_commander->GetColor()));
 		String::Replace(str, "%{spell}", Spell::GetName(Spell::FromInt(humanturn_spell)));
 		listlog->AddMessage(str);
 	    }
@@ -2059,7 +2084,7 @@ void Battle2::Interface::RedrawActionSkipStatus(const Stats & attacker)
     status.SetMessage(msg, true);
 }
 
-void Battle2::Interface::RedrawActionAttackPart1(Stats & attacker, Stats & defender, const std::vector<TargetInfo> & targets)
+void Battle2::Interface::RedrawActionAttackPart1(Stats & attacker, Stats & defender, const TargetsInfo & targets)
 {
     Display & display = Display::Get();
     LocalEvent & le = LocalEvent::Get();
@@ -2184,7 +2209,7 @@ void Battle2::Interface::RedrawActionAttackPart1(Stats & attacker, Stats & defen
     }
 }
 
-void Battle2::Interface::RedrawActionAttackPart2(Stats & attacker, std::vector<TargetInfo> & targets)
+void Battle2::Interface::RedrawActionAttackPart2(Stats & attacker, TargetsInfo & targets)
 {
     // targets damage animation
     RedrawActionWinces(targets);
@@ -2199,9 +2224,13 @@ void Battle2::Interface::RedrawActionAttackPart2(Stats & attacker, std::vector<T
 	{
 	    u32 killed = 0;
 	    u32 damage = 0;
-	    std::vector<TargetInfo>::const_iterator it1 = targets.begin();
-	    std::vector<TargetInfo>::const_iterator it2 = targets.end();
-	    for(; it1 != it2; ++it1){ killed += (*it1).killed; damage += (*it1).damage; }
+
+	    for(TargetsInfo::const_iterator
+		it = targets.begin(); it != targets.end(); ++it)
+	    {
+		killed += (*it).killed;
+		damage += (*it).damage;
+	    }
 
 	    String::Replace(msg, "%{damage}", damage);
 
@@ -2234,8 +2263,8 @@ void Battle2::Interface::RedrawActionAttackPart2(Stats & attacker, std::vector<T
     RedrawActionKills(targets);
 
     // restore
-    std::vector<TargetInfo>::iterator it = targets.begin();
-    for(; it != targets.end(); ++it) if((*it).defender)
+    for(TargetsInfo::iterator
+	it = targets.begin(); it != targets.end(); ++it) if((*it).defender)
     {
 	TargetInfo & target = *it;
 	if(!target.defender->isValid())
@@ -2252,7 +2281,7 @@ void Battle2::Interface::RedrawActionAttackPart2(Stats & attacker, std::vector<T
     attacker.ResetAnimFrame(AS_IDLE);
 }
 
-void Battle2::Interface::RedrawActionWinces(std::vector<TargetInfo> & targets)
+void Battle2::Interface::RedrawActionWinces(TargetsInfo & targets)
 {
     const Settings & conf = Settings::Get();
     Display & display = Display::Get();
@@ -2260,12 +2289,12 @@ void Battle2::Interface::RedrawActionWinces(std::vector<TargetInfo> & targets)
     Cursor & cursor = Cursor::Get();
 
     // targets damage animation
-    std::vector<TargetInfo>::iterator it = targets.begin();
     std::string msg;
     u16 py = (conf.QVGA() ? 20 : 50);
     u8 finish = 0;
 
-    for(; it != targets.end(); ++it) if((*it).defender)
+    for(TargetsInfo::iterator
+	it = targets.begin(); it != targets.end(); ++it) if((*it).defender)
     {
 	if((*it).damage)
 	{
@@ -2289,8 +2318,8 @@ void Battle2::Interface::RedrawActionWinces(std::vector<TargetInfo> & targets)
 
 	if(Game::AnimateInfrequent(Game::BATTLE_FRAME_DELAY))
     	{
-	    it = targets.begin();
-	    for(; it != targets.end(); ++it) if((*it).defender)
+	    for(TargetsInfo::iterator
+		it = targets.begin(); it != targets.end(); ++it) if((*it).defender)
 	    {
 		TargetInfo & target = *it;
 		const Rect & pos = target.defender->GetCellPosition();
@@ -2318,21 +2347,20 @@ void Battle2::Interface::RedrawActionWinces(std::vector<TargetInfo> & targets)
     DELAY(200);
 }
 
-void Battle2::Interface::RedrawActionKills(std::vector<TargetInfo> & targets)
+void Battle2::Interface::RedrawActionKills(TargetsInfo & targets)
 {
     Display & display = Display::Get();
     LocalEvent & le = LocalEvent::Get();
     Cursor & cursor = Cursor::Get();
 
     // targets damage animation
-    std::vector<TargetInfo>::iterator it = targets.begin();
     std::string msg;
     u8 finish = 0;
 
     // targets killed animation
-    it = targets.begin();
     finish = 0;
-    for(; it != targets.end(); ++it) if((*it).defender)
+    for(TargetsInfo::iterator
+	it = targets.begin(); it != targets.end(); ++it) if((*it).defender)
     {
 	TargetInfo & target = *it;
 
@@ -2360,8 +2388,8 @@ void Battle2::Interface::RedrawActionKills(std::vector<TargetInfo> & targets)
 
 	if(Game::AnimateInfrequent(Game::BATTLE_FRAME_DELAY))
     	{
-	    it = targets.begin();
-	    for(; it != targets.end(); ++it) if((*it).defender)
+	    for(TargetsInfo::iterator
+		it = targets.begin(); it != targets.end(); ++it) if((*it).defender)
 	    {
 		TargetInfo & target = *it;
 
@@ -2486,7 +2514,7 @@ void Battle2::Interface::RedrawActionResistSpell(const Stats & target)
     status.SetMessage("", false);
 }
 
-void Battle2::Interface::RedrawActionSpellCastPart1(u8 spell2, u16 dst, const std::string & name, const std::vector<TargetInfo> & targets)
+void Battle2::Interface::RedrawActionSpellCastPart1(u8 spell2, u16 dst, const std::string & name, const TargetsInfo & targets)
 {
     Spell::spell_t spell = Spell::FromInt(spell2);
     std::string msg;
@@ -2574,7 +2602,7 @@ void Battle2::Interface::RedrawActionSpellCastPart1(u8 spell2, u16 dst, const st
     }
 }
 
-void Battle2::Interface::RedrawActionSpellCastPart2(u8 spell, std::vector<TargetInfo> & targets)
+void Battle2::Interface::RedrawActionSpellCastPart2(u8 spell, TargetsInfo & targets)
 {
     if(Spell::isDamage(spell))
     {
@@ -2583,9 +2611,13 @@ void Battle2::Interface::RedrawActionSpellCastPart2(u8 spell, std::vector<Target
 
 	u32 killed = 0;
 	u32 damage = 0;
-	std::vector<TargetInfo>::const_iterator it1 = targets.begin();
-	std::vector<TargetInfo>::const_iterator it2 = targets.end();
-	for(; it1 != it2; ++it1){ killed += (*it1).killed; damage += (*it1).damage; }
+
+	for(TargetsInfo::const_iterator
+	    it = targets.begin(); it != targets.end(); ++it)
+	{
+	    killed += (*it).killed;
+	    damage += (*it).damage;
+	}
 
 	if(damage)
 	{
@@ -2617,8 +2649,8 @@ void Battle2::Interface::RedrawActionSpellCastPart2(u8 spell, std::vector<Target
     status.SetMessage(" ", false);
 
     // restore
-    std::vector<TargetInfo>::iterator it = targets.begin();
-    for(; it != targets.end(); ++it) if((*it).defender)
+    for(TargetsInfo::iterator
+	it = targets.begin(); it != targets.end(); ++it) if((*it).defender)
     {
 	TargetInfo & target = *it;
 	if(!target.defender->isValid())
@@ -2784,7 +2816,7 @@ void Battle2::Interface::RedrawActionTowerPart1(Tower & tower, Stats & defender)
 
 void Battle2::Interface::RedrawActionTowerPart2(Tower & tower, TargetInfo & target)
 {
-    std::vector<TargetInfo> targets;
+    TargetsInfo targets;
     targets.push_back(target);
 
     // targets damage animation
@@ -2922,12 +2954,13 @@ void Battle2::Interface::RedrawActionArrowSpell(const Stats & target)
     Display & display = Display::Get();
     LocalEvent & le = LocalEvent::Get();
     Cursor & cursor = Cursor::Get();
+    const HeroBase* current_commander = arena.GetCurrentCommander();
 
-    if(arena.current_commander)
+    if(current_commander)
     {
 	Point pt_from, pt_to;
 
-	if(arena.current_commander == opponent1->GetHero())
+	if(current_commander == opponent1->GetHero())
 	{
 	    const Rect & pos1 = opponent1->GetArea();
 	    pt_from = Point(pos1.x + pos1.w, pos1.y + pos1.h / 2);
@@ -3136,16 +3169,14 @@ void Battle2::Interface::RedrawActionLightningBoltSpell(Stats & target)
     RedrawTroopWithFrameAnimation(target, ICN::SPARKS, M82::FromSpell(Spell::LIGHTNINGBOLT), true);
 }
 
-void Battle2::Interface::RedrawActionChainLightningSpell(const std::vector<TargetInfo> & targets)
+void Battle2::Interface::RedrawActionChainLightningSpell(const TargetsInfo & targets)
 {
-    std::vector<TargetInfo>::const_iterator it1 = targets.begin();
-    std::vector<TargetInfo>::const_iterator it2 = targets.end();
-
     // FIX: ChainLightning draw
     //AGG::PlaySound(targets.size() > 1 ? M82::CHAINLTE : M82::LIGHTBLT);
 
-    for(; it1 != it2; ++it1)
-	RedrawTroopWithFrameAnimation(*(it1->defender), ICN::SPARKS, M82::FromSpell(Spell::LIGHTNINGBOLT), true);
+    for(TargetsInfo::const_iterator
+	it = targets.begin(); it != targets.end(); ++it)
+	RedrawTroopWithFrameAnimation(*(it->defender), ICN::SPARKS, M82::FromSpell(Spell::LIGHTNINGBOLT), true);
 }
 
 void Battle2::Interface::RedrawActionBloodLustSpell(Stats & target)
@@ -3209,8 +3240,9 @@ void Battle2::Interface::RedrawActionColdRaySpell(Stats & target)
     std::vector<Point> points;
     std::vector<Point>::const_iterator pnt;
     Point pt_from, pt_to;
+    const HeroBase* current_commander = arena.GetCurrentCommander();
 
-    if(arena.current_commander == opponent1->GetHero())
+    if(current_commander == opponent1->GetHero())
     {
 	const Rect & pos1 = opponent1->GetArea();
 	pt_from = Point(pos1.x + pos1.w, pos1.y + pos1.h / 2);
@@ -3314,8 +3346,9 @@ void Battle2::Interface::RedrawActionDisruptingRaySpell(Stats & target)
     std::vector<Point> points;
     std::vector<Point>::const_iterator pnt;
     Point pt_from, pt_to;
+    const HeroBase* current_commander = arena.GetCurrentCommander();
 
-    if(arena.current_commander == opponent1->GetHero())
+    if(current_commander == opponent1->GetHero())
     {
 	const Rect & pos1 = opponent1->GetArea();
 	pt_from = Point(pos1.x + pos1.w, pos1.y + pos1.h / 2);
@@ -3385,7 +3418,7 @@ void Battle2::Interface::RedrawActionDisruptingRaySpell(Stats & target)
     b_current_sprite = NULL;
 }
 
-void Battle2::Interface::RedrawActionColdRingSpell(const u16 dst, const std::vector<TargetInfo> & targets)
+void Battle2::Interface::RedrawActionColdRingSpell(const u16 dst, const TargetsInfo & targets)
 {
     Display & display = Display::Get();
     Cursor & cursor = Cursor::Get();
@@ -3393,16 +3426,15 @@ void Battle2::Interface::RedrawActionColdRingSpell(const u16 dst, const std::vec
 
     const ICN::icn_t icn = ICN::COLDRING;
     const M82::m82_t m82 = M82::FromSpell(Spell::COLDRING);
-
     u8 frame = 0;
-    std::vector<TargetInfo>::const_iterator it;
     const Rect & center = arena.board[dst].GetPos();
 
     cursor.SetThemes(Cursor::WAR_NONE);
 
     // set WNCE
     b_current = NULL;
-    for(it = targets.begin(); it != targets.end(); ++it)
+    for(TargetsInfo::const_iterator
+	it = targets.begin(); it != targets.end(); ++it)
 	if((*it).defender && (*it).damage) (*it).defender->ResetAnimFrame(AS_WNCE);
 
     if(M82::UNKNOWN != m82) AGG::PlaySound(m82);
@@ -3423,21 +3455,22 @@ void Battle2::Interface::RedrawActionColdRingSpell(const u16 dst, const std::vec
 	    cursor.Show();
 	    display.Flip();
 
-	    for(it = targets.begin(); it != targets.end(); ++it) if((*it).defender && (*it).damage)
+	    for(TargetsInfo::const_iterator
+		it = targets.begin(); it != targets.end(); ++it) if((*it).defender && (*it).damage)
 		(*it).defender->IncreaseAnimFrame(false);
 	    ++frame;
 	}
     }
 
-
-    for(it = targets.begin(); it != targets.end(); ++it) if((*it).defender)
+    for(TargetsInfo::const_iterator
+	it = targets.begin(); it != targets.end(); ++it) if((*it).defender)
     {
         (*it).defender->ResetAnimFrame(AS_IDLE);
 	b_current = NULL;
     }
 }
 
-void Battle2::Interface::RedrawActionElementalStormSpell(const std::vector<TargetInfo> & targets)
+void Battle2::Interface::RedrawActionElementalStormSpell(const TargetsInfo & targets)
 {
     Display & display = Display::Get();
     Cursor & cursor = Cursor::Get();
@@ -3449,13 +3482,13 @@ void Battle2::Interface::RedrawActionElementalStormSpell(const std::vector<Targe
 
     u8 frame = 0;
     u8 repeat = 4;
-    std::vector<TargetInfo>::const_iterator it;
     Point center;
 
     cursor.SetThemes(Cursor::WAR_NONE);
 
     b_current = NULL;
-    for(it = targets.begin(); it != targets.end(); ++it)
+    for(TargetsInfo::const_iterator
+	it = targets.begin(); it != targets.end(); ++it)
 	if((*it).defender && (*it).damage) (*it).defender->ResetAnimFrame(AS_WNCE);
 
     if(M82::UNKNOWN != m82) AGG::PlaySound(m82);
@@ -3478,7 +3511,8 @@ void Battle2::Interface::RedrawActionElementalStormSpell(const std::vector<Targe
 	    cursor.Show();
 	    display.Flip();
 
-	    for(it = targets.begin(); it != targets.end(); ++it) if((*it).defender && (*it).damage)
+	    for(TargetsInfo::const_iterator
+		it = targets.begin(); it != targets.end(); ++it) if((*it).defender && (*it).damage)
 		(*it).defender->IncreaseAnimFrame(false);
 	    ++frame;
 
@@ -3491,14 +3525,15 @@ void Battle2::Interface::RedrawActionElementalStormSpell(const std::vector<Targe
     }
 
 
-    for(it = targets.begin(); it != targets.end(); ++it) if((*it).defender)
+    for(TargetsInfo::const_iterator
+	it = targets.begin(); it != targets.end(); ++it) if((*it).defender)
     {
         (*it).defender->ResetAnimFrame(AS_IDLE);
 	b_current = NULL;
     }
 }
 
-void Battle2::Interface::RedrawActionArmageddonSpell(const std::vector<TargetInfo> & targets)
+void Battle2::Interface::RedrawActionArmageddonSpell(const TargetsInfo & targets)
 {
     Display & display = Display::Get();
     Cursor & cursor = Cursor::Get();
@@ -3688,20 +3723,20 @@ void Battle2::Interface::RedrawActionRemoveMirrorImage(const Stats & mirror)
     status.SetMessage(_("MirrorImage ended"), true);
 }
 
-void Battle2::Interface::RedrawTargetsWithFrameAnimation(const u16 dst, const std::vector<TargetInfo> & targets, ICN::icn_t icn, M82::m82_t m82)
+void Battle2::Interface::RedrawTargetsWithFrameAnimation(const u16 dst, const TargetsInfo & targets, ICN::icn_t icn, M82::m82_t m82)
 {
     Display & display = Display::Get();
     Cursor & cursor = Cursor::Get();
     LocalEvent & le = LocalEvent::Get();
 
     u8 frame = 0;
-    std::vector<TargetInfo>::const_iterator it;
     const Rect & center = arena.board[dst].GetPos();
 
     cursor.SetThemes(Cursor::WAR_NONE);
 
     b_current = NULL;
-    for(it = targets.begin(); it != targets.end(); ++it)
+    for(TargetsInfo::const_iterator
+	it = targets.begin(); it != targets.end(); ++it)
 	if((*it).defender && (*it).damage) (*it).defender->ResetAnimFrame(AS_WNCE);
 
     if(M82::UNKNOWN != m82) AGG::PlaySound(m82);
@@ -3720,34 +3755,36 @@ void Battle2::Interface::RedrawTargetsWithFrameAnimation(const u16 dst, const st
 	    cursor.Show();
 	    display.Flip();
 
-	    for(it = targets.begin(); it != targets.end(); ++it) if((*it).defender && (*it).damage)
+	    for(TargetsInfo::const_iterator
+		it = targets.begin(); it != targets.end(); ++it) if((*it).defender && (*it).damage)
 		(*it).defender->IncreaseAnimFrame(false);
 	    ++frame;
 	}
     }
 
-    for(it = targets.begin(); it != targets.end(); ++it) if((*it).defender)
+    for(TargetsInfo::const_iterator
+	it = targets.begin(); it != targets.end(); ++it) if((*it).defender)
     {
         (*it).defender->ResetAnimFrame(AS_IDLE);
 	b_current = NULL;
     }
 }
 
-void Battle2::Interface::RedrawTargetsWithFrameAnimation(const std::vector<TargetInfo> & targets, ICN::icn_t icn, M82::m82_t m82, bool wnce)
+void Battle2::Interface::RedrawTargetsWithFrameAnimation(const TargetsInfo & targets, ICN::icn_t icn, M82::m82_t m82, bool wnce)
 {
     Display & display = Display::Get();
     Cursor & cursor = Cursor::Get();
     LocalEvent & le = LocalEvent::Get();
 
     u8 frame = 0;
-    std::vector<TargetInfo>::const_iterator it;
-
+    
     cursor.SetThemes(Cursor::WAR_NONE);
 
     b_current = NULL;
 
     if(wnce)
-    for(it = targets.begin(); it != targets.end(); ++it)
+    for(TargetsInfo::const_iterator
+	it = targets.begin(); it != targets.end(); ++it)
 	if((*it).defender && (*it).damage) (*it).defender->ResetAnimFrame(AS_WNCE);
 
     if(M82::UNKNOWN != m82) AGG::PlaySound(m82);
@@ -3761,7 +3798,8 @@ void Battle2::Interface::RedrawTargetsWithFrameAnimation(const std::vector<Targe
 	    cursor.Hide();
 	    Redraw();
 
-	    for(it = targets.begin(); it != targets.end(); ++it) if((*it).defender)
+	    for(TargetsInfo::const_iterator
+		it = targets.begin(); it != targets.end(); ++it) if((*it).defender)
 	    {
 		const Rect & pos = (*it).defender->GetCellPosition();
 		bool reflect = false;
@@ -3780,14 +3818,16 @@ void Battle2::Interface::RedrawTargetsWithFrameAnimation(const std::vector<Targe
 	    display.Flip();
 
 	    if(wnce)
-	    for(it = targets.begin(); it != targets.end(); ++it) if((*it).defender && (*it).damage)
+	    for(TargetsInfo::const_iterator
+		it = targets.begin(); it != targets.end(); ++it) if((*it).defender && (*it).damage)
 		(*it).defender->IncreaseAnimFrame(false);
 	    ++frame;
 	}
     }
 
     if(wnce)
-    for(it = targets.begin(); it != targets.end(); ++it) if((*it).defender)
+    for(TargetsInfo::const_iterator
+	it = targets.begin(); it != targets.end(); ++it) if((*it).defender)
     {
         (*it).defender->ResetAnimFrame(AS_IDLE);
 	b_current = NULL;
@@ -4182,4 +4222,161 @@ void Battle2::PopupDamageInfo::Redraw(u16 maxw, u16 maxh)
 	text1.Blit(area.x, area.y);
 	text2.Blit(area.x, area.y + area.h/2);
     }
+}
+
+bool Battle2::Interface::NetworkTurn(Result & result)
+{
+#ifndef WITH_NET
+    return false;
+#else
+    Cursor & cursor = Cursor::Get();
+    Display & display = Display::Get();
+    LocalEvent & le = LocalEvent::Get();
+    //Settings & conf = Settings::Get();
+    FH2LocalClient & client = FH2LocalClient::Get();
+
+    cursor.SetThemes(Cursor::WAIT);
+
+    bool exit = false;
+    bool redraw = false;
+    Action msg;
+
+    cursor.Hide();
+    Redraw();
+    cursor.Show();
+    display.Flip();
+
+    while(!exit && le.HandleEvents())
+    {
+	if(client.Ready())
+        {
+	    if(!client.Recv(msg))
+	    {
+		Dialog::Message("NetworkTurn: ", "socket: error", Font::BIG, Dialog::OK);
+		return false;
+            }
+	    DEBUG(DBG_NETWORK, DBG_INFO, "NetworkTurn: " << "recv: " << Network::GetMsgString(msg.GetID()));
+
+            switch(msg.GetID())
+            {
+		case MSG_PING:
+		    if(!client.Send(msg)) return false;
+		    break;
+
+    		case MSG_BATTLE_BOARD:
+		    arena.UnpackBoard(msg);
+		    redraw = true;
+		    break;
+
+    		case MSG_BATTLE_CAST:
+		{
+		    u8 spell;
+		    msg.Pop(spell);
+
+		    switch(spell)
+		    {
+			case Spell::TELEPORT:
+			    arena.SpellActionTeleport(msg);
+            		    break;
+
+        		case Spell::EARTHQUAKE:
+			    arena.SpellActionEarthQuake(msg);
+			    break;
+
+			default:
+			    arena.SpellActionDefaults(msg, spell);
+			    break;
+		    }
+		    redraw = true;
+		    break;
+		}
+
+    		case MSG_BATTLE_ATTACK:
+		{
+		    u16 id, dst;
+
+		    msg.Pop(id);
+		    Stats* attacker = arena.GetTroopID(id);
+		    if(attacker) attacker->Unpack(msg);
+
+		    msg.Pop(id);
+		    Stats* defender = arena.GetTroopID(id);
+		    if(defender) defender->Unpack(msg);
+
+		    msg.Pop(dst);
+
+		    TargetsInfo targets(msg, arena);
+
+		    if(attacker && defender)
+		    {
+			RedrawActionAttackPart1(*attacker, *defender, targets);
+			arena.TargetsApplyDamage(*attacker, *defender, targets);
+			RedrawActionAttackPart2(*attacker, targets);
+		    }
+		    else
+			DEBUG(DBG_NETWORK, DBG_INFO, "NetworkTurn: " << "incorrect attack");
+		    break;
+		}
+
+    		case MSG_BATTLE_END_TURN:
+    		case MSG_BATTLE_SKIP:
+		    arena.ApplyAction(msg);
+		    cursor.SetThemes(Cursor::WAIT);
+		    redraw = true;
+		    break;
+
+    		case MSG_BATTLE_MOVE:
+    		case MSG_BATTLE_MORALE:
+    		case MSG_BATTLE_TOWER:
+    		case MSG_BATTLE_CATAPULT:
+		    arena.ApplyAction(msg);
+		    redraw = true;
+		    break;
+
+		case MSG_BATTLE_RESULT:
+		    msg.Pop(result.army1);
+		    msg.Pop(result.army2);
+		    msg.Pop(result.exp1);
+		    msg.Pop(result.exp2);
+		    exit = true;
+		    break;
+
+		case MSG_BATTLE_TURN:
+		{
+		    u16 id;
+		    msg.Pop(id);
+		    const Stats* b = arena.GetTroopID(id);
+
+		    if(b)
+		    {
+    			Actions a;
+    			HumanTurn(*b, a);
+
+    			while(a.size())
+    			{
+			    DEBUG(DBG_NETWORK, DBG_INFO, "NetworkTurn: " << "send: " <<
+							Network::GetMsgString(a.front().GetID()));
+			    if(!client.Send(a.front())) return false;
+        		    a.pop_front();
+    			}
+		    }
+		    break;
+		}
+
+		default: break;
+	    }
+	}
+
+	if(redraw)
+	{
+	    cursor.Hide();
+	    Redraw();
+	    cursor.Show();
+	    display.Flip();
+	    redraw = false;
+	}
+    }
+
+    return true;
+#endif
 }

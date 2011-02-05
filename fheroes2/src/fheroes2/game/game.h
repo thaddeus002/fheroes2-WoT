@@ -49,6 +49,7 @@ namespace Game
         NEWMULTI,
         NEWHOTSEAT,
         NEWNETWORK,
+	NEWBATTLEONLY,
         LOADSTANDARD,
         LOADCAMPAIN,
         LOADMULTI,
@@ -67,7 +68,7 @@ namespace Game
 
     void Init(void);
 
-    enum type_t { UNKNOWN = 0, STANDARD = 1, CAMPAIGN = 2, HOTSEAT = 4, NETWORK = 8, MULTI = HOTSEAT | NETWORK };
+    enum type_t { MENU = 0, STANDARD = 0x01, CAMPAIGN = 0x02, HOTSEAT = 0x04, NETWORK = 0x08, BATTLEONLY = 0x10, LOADFILE = 0x80, MULTI = HOTSEAT | NETWORK };
     enum control_t { NONE = 0, LOCAL = 1, REMOTE = 2, AI = 4 };
     enum distance_t { VIEW_TOWN  = 0, VIEW_CASTLE = 1, VIEW_HEROES = 2, VIEW_TELESCOPE = 3, VIEW_OBSERVATION_TOWER = 4, VIEW_MAGI_EYES = 5 };
 
@@ -184,7 +185,6 @@ namespace Game
     void UpdateBattleSpeed(void);
 
     control_t GetControl(u8);
-    type_t GetType(u8);
 
     menu_t MainMenu(void);
     menu_t NewGame(void);
@@ -196,12 +196,14 @@ namespace Game
     menu_t NewMulti(void);
     menu_t NewHotSeat(void);
     menu_t NewNetwork(void);
+    menu_t NewBattleOnly(void);
     menu_t LoadStandard(void);
     menu_t LoadCampain(void);
     menu_t LoadMulti(void);
     menu_t ScenarioInfo(void);
     menu_t SelectScenario(void);
     menu_t StartGame(void);
+    menu_t StartBattleOnly(void);
 
     menu_t NetworkHost(void);
     menu_t NetworkGuest(void);
@@ -220,6 +222,7 @@ namespace Game
     u8  GetViewDistance(distance_t);
     u8  GetWhirlpoolPercent(void);
     u8  GetHeroRestoreSpellPointsPerDay(void);
+    u8  SelectCountPlayers(void);
 
     void ShowLoadMapsText(void);
 

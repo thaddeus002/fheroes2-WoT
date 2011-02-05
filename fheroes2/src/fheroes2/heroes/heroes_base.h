@@ -32,6 +32,10 @@
 #include "game_io.h"
 #include "position.h"
 
+#ifdef BUILD_BATTLEONLY
+struct BattleOnly;
+#endif
+
 typedef std::vector<Artifact> BagArtifacts;
 
 namespace Army { class army_t; }
@@ -83,6 +87,9 @@ public:
 
 protected:
     friend class Game::IO;
+#ifdef BUILD_BATTLEONLY
+    friend struct BattleOnly;
+#endif
 
     u16 magic_point;
     SpellBook spell_book;

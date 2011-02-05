@@ -301,7 +301,6 @@ public:
     void SetBattleGrid(bool);
     void SetBattleMovementShaded(bool);
     void SetBattleMouseShaded(bool);
-    void SetLoadedGameVersion(bool);
     void SetShowPanel(bool);
     void SetShowRadar(bool);
     void SetShowIcons(bool);
@@ -321,7 +320,7 @@ public:
     void ResetMusic(void);
     
     u8   GameType(void) const;
-    void SetGameType(const Game::type_t type);
+    void SetGameType(u8);
 
     u8   GetUnions(u8 cl1) const;
     bool IsUnions(u8 cl1, u8 cl2) const;

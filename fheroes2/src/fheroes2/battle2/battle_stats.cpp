@@ -327,6 +327,11 @@ Battle2::Stats::~Stats()
     }
 }
 
+bool Battle2::Stats::isID(u16 v) const
+{
+    return id == v;
+}
+
 u16 Battle2::Stats::GetID(void) const
 {
     return id;
@@ -432,7 +437,7 @@ void Battle2::Stats::SetMorale(s8 f)
 void Battle2::Stats::SetLuck(s8 f)
 {
     //check bone dragon
-    const Army::army_t* enemy = arena->GetArmy(arena->GetOppositeColor(GetColor()));
+    const Army::army_t* enemy = arena->GetArmy(arena->GetOppositeColor(troop.GetColor()));
 
     if(enemy && enemy->HasMonster(Monster::BONE_DRAGON)) --f;
 
@@ -1039,7 +1044,8 @@ std::string Battle2::Stats::Info(bool more) const
 	" [ " << count << " " << GetName() << ", " << Color::String(GetColor());
 
     if(more)
-	ss <<
+	ss << ", mode(0x" << std::hex << modes <<
+	std::dec <<
 	", pos(" << position << (reflect ? ", reflect)" : ")") <<
 	", speed(" << Speed::String(GetSpeed()) << ", " << static_cast<int>(GetSpeed()) << ")" <<
 	", hp(" << hp << ")" << ", die(" << dead << ")" << ", cell(" << GetCellQuality() << ")";
@@ -1047,6 +1053,48 @@ std::string Battle2::Stats::Info(bool more) const
     ss << " ]";
 
     return ss.str();
+}
+
+void Battle2::Stats::Pack(Action & msg) const
+{
+    msg.Push(modes);
+    msg.Push(position);
+    msg.Push(hp);
+    msg.Push(count);
+    msg.Push(dead);
+    msg.Push(shots);
+    msg.Push(disruptingray);
+    msg.Push(static_cast<u8>(reflect));
+    msg.Push(mirror ? mirror->GetID() : static_cast<u16>(0));
+    msg.Push(static_cast<u32>(affected.size()));
+    for(size_t ii = 0; ii < affected.size(); ++ii)
+    {
+	msg.Push(affected[ii].first);
+	msg.Push(affected[ii].second);
+    }
+}
+
+void Battle2::Stats::Unpack(Action & msg)
+{
+    u8 byte8; u16 byte16; u32 byte32;
+
+    msg.Pop(modes);
+    msg.Pop(position);
+    msg.Pop(hp);
+    msg.Pop(count);
+    msg.Pop(dead);
+    msg.Pop(shots);
+    msg.Pop(disruptingray);
+    msg.Pop(byte8); reflect = byte8;
+    msg.Pop(byte16); if(byte16) mirror = arena->GetTroopID(byte16);
+    msg.Pop(byte32); affected.clear();
+    for(size_t ii = 0; ii < byte32; ++ii)
+    {
+	ModeDuration md;
+	msg.Pop(md.first);
+	msg.Pop(md.second);
+	affected.push_back(md);
+    }
 }
 
 bool Battle2::Stats::AllowResponse(void) const
@@ -2146,6 +2194,11 @@ s8 Battle2::Stats::GetStartMissileOffset(u8 state) const
     return 0;
 }
 
+u8 Battle2::Stats::GetArmyColor(void) const
+{
+    return troop.GetColor();
+}
+
 u8 Battle2::Stats::GetColor(void) const
 {
     return (Modes(SP_BERSERKER) ? 0 : Modes(SP_HYPNOTIZE) ? arena->GetOppositeColor(troop.GetColor()) : troop.GetColor());
@@ -2153,12 +2206,12 @@ u8 Battle2::Stats::GetColor(void) const
 
 const Army::army_t* Battle2::Stats::GetArmy(void) const
 {
-    return arena ? arena->GetArmy(GetColor()) : NULL;
+    return arena ? arena->GetArmy(troop.GetColor()) : NULL;
 }
 
 Army::army_t* Battle2::Stats::GetArmy(void)
 {
-    return arena ? arena->GetArmy(GetColor()) : NULL;
+    return arena ? arena->GetArmy(troop.GetColor()) : NULL;
 }
 
 const HeroBase* Battle2::Stats::GetCommander(void) const
@@ -2250,6 +2303,14 @@ void Battle2::Armies::NewTurn(void)
 	parent.commander->ResetModes(Heroes::SPELLCASTED);
 
     std::for_each(begin(), end(), std::mem_fun(&Stats::NewTurn));
+}
+
+Battle2::Stats* Battle2::Armies::FindID(u16 id)
+{
+    Armies::iterator it = std::find_if(begin(), end(),
+				std::bind2nd(std::mem_fun(&Stats::isID), id));
+
+    return it == end() ? NULL : *it;
 }
 
 Battle2::Stats* Battle2::Armies::FindMode(u32 mod)
@@ -2387,4 +2448,28 @@ Battle2::Stats* Battle2::Armies::GetStatsPart2(Armies & armies1, Armies & armies
     return result &&
 	result->isValid() &&
 	result->GetSpeed() > Speed::STANDING ? result : NULL;
+}
+
+void Battle2::Armies::PackStats(Action & msg) const
+{
+    msg.Push(static_cast<u32>(size()));
+    for(const_iterator it = begin(); it != end(); ++it)
+    {
+	const Stats & b = (**it);
+	msg.Push(b.GetID());
+	b.Pack(msg);
+    }
+}
+
+void Battle2::Armies::UnpackStats(Action & msg)
+{
+    u32 size;
+    msg.Pop(size);
+    for(u32 ii = 0; ii < size; ++ii)
+    {
+	u16 id;
+	msg.Pop(id);
+	Stats* b = FindID(id);
+	if(b) b->Unpack(msg);
+    }
 }

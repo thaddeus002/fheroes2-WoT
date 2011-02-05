@@ -25,6 +25,7 @@
 
 #ifdef WITH_NET
 
+#include <vector>
 #include "gamedefs.h"
 #include "thread.h"
 #include "network.h"
@@ -37,45 +38,65 @@ namespace Battle2
     class Stats;
     struct Result;
     struct TargetInfo;
+    struct TargetsInfo;
 }
 
-class FH2RemoteClient : public FH2Client
+struct FH2RemoteClient : public FH2Client
 {
-public:
     FH2RemoteClient();
 
+    void InitMutex(void);
     int Main(void);
     bool ConnectionChat(void);
-    bool StartGame(void);
     void CloseConnection(void);
 
     void RunThread(void);
     void ShutdownThread(void);
 
-    void MsgBroadcast(void);
-    void MsgPing(void);
-    void MsgLogout(void);
+    void SetModes(u32);
+    bool Modes(u32) const;
+
+    bool SendCurrentMapInfo(QueueMessage &);
+    bool SendCurrentColor(QueueMessage &);
+    bool SendMapsInfoList(QueueMessage &);
+    bool SendAccessDenied(QueueMessage &);
     void MsgChangeColors(void);
     void MsgChangeRace(void);
 
-    bool RecvBattleHumanTurn(const Battle2::Stats &, const Battle2::Arena & arena, Battle2::Actions &);
+    void Dump(void) const;
+    void Reset(void);
 
-    bool SendSetCurrentMap(void);
-    bool SendMapsInfoList(void);
-    bool SendAccessDenied(void);
-    void SendUpdatePlayers(u32 exclude);
+    static int callbackCreateThread(void*);
 
-    static bool SendBattleAction(u8, QueueMessage &);
-    static bool SendBattleResult(u8, const Battle2::Result &);
-    static bool SendBattleAttack(u8, u16, const std::vector<Battle2::TargetInfo> &);
-    static bool SendBattleBoard(u8, const Battle2::Arena &);
-    static bool SendBattleSpell(u8, u8, u8, const std::vector<Battle2::TargetInfo> &);
-    static bool SendBattleTeleportSpell(u8, u16, u16);
-    static bool SendBattleEarthQuakeSpell(u8, const std::vector<u8> &);
-
-    static int callbackCreateThread(void *);
+    bool UpdateColors(void);
 
     SDL::Thread thread;
+    SDL::Mutex mutexModes;
+};
+
+class FH2RemoteClients
+{
+public:
+    FH2RemoteClients();
+
+    void InitMutex(void);
+    size_t GetConnected(void) const;
+    FH2RemoteClient* GetAdmin(void);
+    FH2RemoteClient* GetNewClient(void);
+    u8 GetPlayersColors(void) const;
+    void Shutdown(void);
+    FH2RemoteClient* GetClient(u8);
+    void PushPlayersInfo(QueueMessage &) const;
+    void Send2All(const QueueMessage &, u32 exclude);
+    u8 ResetPlayersColors(void);
+    bool ChangeColors(u8 color1, u8 color2);
+    void ChangeRace(u8 color, u8 race);
+    void SetNewAdmin(u32 old_rid);
+    void Dump(void) const;
+
+private:
+    std::vector<FH2RemoteClient> clients;
+    SDL::Mutex mutexClients;
 };
 
 #endif

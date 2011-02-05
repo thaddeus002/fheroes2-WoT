@@ -40,10 +40,15 @@ enum msg_t
     MSG_ACCESS_DENIED,
 
     MSG_UPDATE_PLAYERS,
+    MSG_GET_GAME_TYPE,
     MSG_GET_MAPS_LIST,
     MSG_SET_CURRENT_MAP,
+    MSG_GET_CURRENT_MAP,
+    MSG_GET_CURRENT_COLOR,
     MSG_CHANGE_COLORS,
     MSG_CHANGE_RACE,
+    MSG_UPDATE_BATTLEONLY,
+    MSG_START_BATTLEONLY,
 
     MSG_START_GAME,
     MSG_MAPS_LOAD,
@@ -109,9 +114,10 @@ typedef std::pair<QueueMessage, u32> MessageID;
 class FH2RemoteClient;
 class Kingdom;
 class Heroes;
+class Recruits;
 class Castle;
 namespace Maps { class Tiles; }
-
+struct BattleOnly;
 
 namespace Network
 {
@@ -126,13 +132,10 @@ namespace Network
     void		PacketPopMapsFileInfoList(QueueMessage &, MapsFileInfoList &);
     void		PacketPushMapsFileInfo(QueueMessage &, const Maps::FileInfo &);
     void		PacketPopMapsFileInfo(QueueMessage &, Maps::FileInfo &);
-    void		PacketPushPlayersInfo(QueueMessage &, const std::vector<FH2RemoteClient> &, u32 exclude = 0);
 
     void		PackRaceColors(QueueMessage &);
     void		UnpackRaceColors(QueueMessage &);
 
-    u8			GetPlayersColors(const std::vector<FH2RemoteClient> &);
-    
     void		PackKingdom(QueueMessage &, const Kingdom &);
     void		UnpackKingdom(QueueMessage &);
 
@@ -144,6 +147,10 @@ namespace Network
 
     void		PackCastle(QueueMessage &, const Castle &);
     void		UnpackCastle(QueueMessage &);
+
+    void		PackBattleOnly(QueueMessage &, const BattleOnly &);
+    void		UnpackBattleOnly(QueueMessage &, BattleOnly &);
+    void		UnpackBattleOnly(QueueMessage &, Recruits &);
 }
 
 #endif

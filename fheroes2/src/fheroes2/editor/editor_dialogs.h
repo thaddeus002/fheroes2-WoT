@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2009 by Andrey Afletdinov <fheroes2@gmail.com>          *
+ *   Copyright (C) 2011 by Andrey Afletdinov <fheroes2@gmail.com>          *
  *                                                                         *
  *   Part of the Free Heroes2 Engine:                                      *
  *   http://sourceforge.net/projects/fheroes2                              *
@@ -20,62 +20,17 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#ifdef WITH_NET
+#ifndef H2EDITOR_DIALOGS_H
+#define H2EDITOR_DIALOGS_H
 
-#include "settings.h"
-#include "localevent.h"
-#include "client.h"
+#include "dialog.h"
+#include "heroes.h"
+#include "monster.h"
 
-FH2Client::FH2Client()
+namespace Dialog
 {
-}
-
-bool FH2Client::IsConnected(void) const
-{
-    return Modes(ST_CONNECT) && sd;
-}
-
-bool FH2Client::Wait(QueueMessage & packet, u16 id)
-{
-    while(LocalEvent::Get().HandleEvents())
-    {
-        if(Ready())
-        {
-            if(!Network::RecvMessage(*this, packet))
-            {
-                //Close();
-		DEBUG(DBG_NETWORK, DBG_TRACE, "FH2Client::Wait: error");
-                return false;
-            }
-            if(id == packet.GetID()) break;
-        }
-	DELAY(50);
-    }
-    return true;
-}
-
-bool FH2Client::Send(QueueMessage & packet)
-{
-    if(!Network::SendMessage(*this, packet))
-    {
-	packet.Dump();
-        //Close();
-	DEBUG(DBG_NETWORK, DBG_TRACE, "FH2Client::Send: error");
-        return false;
-    }
-    return true;
-}
-
-bool FH2Client::Recv(QueueMessage & packet)
-{
-    if(!Network::RecvMessage(*this, packet))
-    {
-	packet.Dump();
-        //Close();
-	DEBUG(DBG_NETWORK, DBG_TRACE, "FH2Client::Recv: error");
-        return false;
-    }
-    return true;
+    Monster::monster_t	SelectMonster(Monster::monster_t cur = Monster::UNKNOWN);
+    Heroes::heroes_t	SelectHeroes(Heroes::heroes_t cur = Heroes::UNKNOWN);
 }
 
 #endif

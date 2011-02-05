@@ -64,7 +64,11 @@ public:
 
     const Maps::Tiles & GetTiles(const Point & pt) const{ return GetTiles(pt.y * width + pt.x); }
     const Maps::Tiles & GetTiles(u16 ax, u16 ay) const{ return GetTiles(ay * width + ax); }
+#ifdef WITH_DEBUG
     const Maps::Tiles & GetTiles(s32 index) const{ return *vec_tiles.at(index); }
+#else
+    const Maps::Tiles & GetTiles(s32 index) const{ return *vec_tiles[index]; }
+#endif
     Maps::Tiles & GetTiles(const Point & pt) { return GetTiles(pt.y * width + pt.x); }
     Maps::Tiles & GetTiles(u16 ax, u16 ay) { return GetTiles(ay * width + ax); }
     Maps::Tiles & GetTiles(s32 index){ return *vec_tiles.at(index); }

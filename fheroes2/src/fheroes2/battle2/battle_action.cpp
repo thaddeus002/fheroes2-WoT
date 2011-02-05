@@ -31,7 +31,7 @@
 #include "battle_bridge.h"
 #include "battle_catapult.h"
 #include "battle_interface.h"
-#include "remoteclient.h"
+#include "server.h"
 
 void Battle2::Actions::AddedSurrenderAction(void)
 {
@@ -54,6 +54,7 @@ void Battle2::Actions::AddedCastAction(u8 spell, u16 dst)
     Action action;
     action.SetID(MSG_BATTLE_CAST);
     action.Push(spell);
+    action.Push(static_cast<u16>(0));
     action.Push(dst);
 
     push_back(action);
@@ -100,18 +101,6 @@ void Battle2::Actions::AddedMoveAction(const Stats & b, u16 dst)
     push_back(action);
 }
 
-void Battle2::Actions::AddedMoveAction(const Stats & b, const std::vector<u16> & path)
-{
-    Action action;
-    action.SetID(MSG_BATTLE_MOVE);
-    action.Push(b.id);
-    action.Push(path.back());
-    action.Push(static_cast<u16>(path.size()));
-    for(u16 ii = 0; ii < path.size(); ++ii) action.Push(path[ii]);
-
-    push_back(action);
-}
-
 void Battle2::Actions::AddedAttackAction(const Stats & a, const Stats & d, u16 dst, u8 dir)
 {
     Action action;
@@ -136,7 +125,6 @@ void Battle2::Actions::AddedMoraleAction(const Stats & b, u8 state)
 
 void Battle2::Arena::BattleProcess(Stats & attacker, Stats & defender, s16 dst, u8 dir)
 {
-    std::vector<TargetInfo> targets;
     if(0 > dst) dst = defender.GetPosition();
 
     if(dir)
@@ -158,7 +146,15 @@ void Battle2::Arena::BattleProcess(Stats & attacker, Stats & defender, s16 dst, 
     else
 	attacker.UpdateDirection(board[dst]);
 
-    GetTargetsForDamage(attacker, defender, dst, targets);
+    TargetsInfo targets = GetTargetsForDamage(attacker, defender, dst);
+
+#ifdef WITH_NET
+    if(Network::isRemoteClient())
+    {
+	if(Game::REMOTE == army1.GetControl()) FH2Server::Get().BattleSendAttack(army1.GetColor(), attacker, defender, dst, targets);
+	if(Game::REMOTE == army2.GetControl()) FH2Server::Get().BattleSendAttack(army2.GetColor(), attacker, defender, dst, targets);
+    }
+#endif
 
     if(Board::isReflectDirection(dir) != attacker.isReflect())
 	attacker.UpdateDirection(board[dst]);
@@ -175,7 +171,7 @@ void Battle2::Arena::BattleProcess(Stats & attacker, Stats & defender, s16 dst, 
     {
 	const std::string name(attacker.GetName());
 
-	GetTargetsForSpells(attacker.GetCommander(), spell, defender.GetPosition(), targets);
+	targets = GetTargetsForSpells(attacker.GetCommander(), spell, defender.GetPosition());
 	if(interface) interface->RedrawActionSpellCastPart1(spell, defender.GetPosition(), name, targets);
 
 	// magic attack not depends from hero
@@ -184,8 +180,11 @@ void Battle2::Arena::BattleProcess(Stats & attacker, Stats & defender, s16 dst, 
 	if(interface) interface->RedrawActionMonsterSpellCastStatus(attacker, targets.front());
 
 #ifdef WITH_NET
-	if(Game::REMOTE == army1.GetControl()) FH2RemoteClient::SendBattleSpell(army1.GetColor(), spell, attacker.GetColor(), targets);
-	if(Game::REMOTE == army2.GetControl()) FH2RemoteClient::SendBattleSpell(army2.GetColor(), spell, attacker.GetColor(), targets);
+	if(Network::isRemoteClient())
+    	{
+	    if(Game::REMOTE == army1.GetControl()) FH2Server::Get().BattleSendSpell(army1.GetColor(), attacker.GetID(), defender.GetPosition(), spell, targets);
+	    if(Game::REMOTE == army2.GetControl()) FH2Server::Get().BattleSendSpell(army2.GetColor(), attacker.GetID(), defender.GetPosition(), spell, targets);
+	}
 #endif
     }
 
@@ -223,8 +222,8 @@ void Battle2::Arena::ApplyAction(Action & action)
 	case MSG_BATTLE_CATAPULT:
 	    if(Network::isRemoteClient())
     	    {
-		if(Game::REMOTE == army1.GetControl()) FH2RemoteClient::SendBattleAction(army1.GetColor(), action);
-    		if(Game::REMOTE == army2.GetControl()) FH2RemoteClient::SendBattleAction(army2.GetColor(), action);
+		if(Game::REMOTE == army1.GetControl()) FH2Server::Get().BattleSendAction(army1.GetColor(), action);
+    		if(Game::REMOTE == army2.GetControl()) FH2Server::Get().BattleSendAction(army2.GetColor(), action);
 	    }
 	    break;
 
@@ -236,12 +235,11 @@ void Battle2::Arena::ApplyAction(Action & action)
 void Battle2::Arena::ApplyActionSpellCast(Action & action)
 {
     u8 byte8;
-    u16 dst;
-
     action.Pop(byte8);
-    action.Pop(dst);
 
     const Spell::spell_t spell = Spell::FromInt(byte8);
+    HeroBase* current_commander = GetCurrentCommander();
+
     if(current_commander && !current_commander->Modes(Heroes::SPELLCASTED) &&
 	current_commander->HaveSpell(spell) &&
 	Spell::isCombat(spell) && current_commander->HaveSpellPoints(Spell::CostManaPoints(spell, current_commander)))
@@ -249,46 +247,34 @@ void Battle2::Arena::ApplyActionSpellCast(Action & action)
 	const u8 color = current_commander->GetColor();
 
 	DEBUG(DBG_BATTLE, DBG_TRACE, "Battle2::Arena::" << "ApplyActionSpellCast: " << \
-	    current_commander->GetName() << ", color: " << Color::String(color) << ", spell: " << Spell::GetName(spell) << ", dst: " << dst);
+	    current_commander->GetName() << ", color: " << Color::String(color) << ", spell: " << Spell::GetName(spell));
 
 	// uniq spells action
 	switch(spell)
 	{
 	    case Spell::TELEPORT:
-	    {
-		u16 src = dst;
-		action.Pop(dst);
-		SpellActionTeleport(src, dst);
-#ifdef WITH_NET
-		if(Game::REMOTE == army1.GetControl()) FH2RemoteClient::SendBattleTeleportSpell(army1.GetColor(), src, dst);
-		if(Game::REMOTE == army2.GetControl()) FH2RemoteClient::SendBattleTeleportSpell(army2.GetColor(), src, dst);
-#endif
+		SpellActionTeleport(action);
 		break;
-	    }
 
 	    case Spell::EARTHQUAKE:
-		SpellActionEarthQuake();
+		SpellActionEarthQuake(action);
 		break;
 
 	    default:
-	    {
-		std::vector<TargetInfo> targets;
-
-		GetTargetsForSpells(current_commander, spell, dst, targets);
-		if(interface) interface->RedrawActionSpellCastPart1(spell, dst, current_commander->GetName(), targets);
-
-		TargetsApplySpell(current_commander, spell, targets);
-		if(interface) interface->RedrawActionSpellCastPart2(spell, targets);
-#ifdef WITH_NET
-		if(Game::REMOTE == army1.GetControl()) FH2RemoteClient::SendBattleSpell(army1.GetColor(), spell, current_commander->GetColor(), targets);
-		if(Game::REMOTE == army2.GetControl()) FH2RemoteClient::SendBattleSpell(army2.GetColor(), spell, current_commander->GetColor(), targets);
-#endif
-	    }
-	    break;
+		SpellActionDefaults(action, spell);
+		break;
 	}
 
 	current_commander->SetModes(Heroes::SPELLCASTED);
 	current_commander->TakeSpellPoints(Spell::CostManaPoints(spell, current_commander));
+
+#ifdef WITH_NET
+	if(Network::isRemoteClient())
+	{
+	    if(Game::REMOTE == army1.GetControl()) FH2Server::Get().BattleSendBoard(army1.GetColor(), *this);
+	    if(Game::REMOTE == army2.GetControl()) FH2Server::Get().BattleSendBoard(army2.GetColor(), *this);
+	}
+#endif
     }
     else
 	DEBUG(DBG_BATTLE, DBG_TRACE, "Battle2::Arena::" << "ApplyActionSpellCast: " << "incorrect param: ");
@@ -356,6 +342,14 @@ void Battle2::Arena::ApplyActionAttack(Action & action)
 	    b1->UpdateDirection();
 	    b2->UpdateDirection();
 	}
+
+#ifdef WITH_NET
+	if(Network::isRemoteClient())
+	{
+	    if(Game::REMOTE == army1.GetControl()) FH2Server::Get().BattleSendBoard(army1.GetColor(), *this);
+	    if(Game::REMOTE == army2.GetControl()) FH2Server::Get().BattleSendBoard(army2.GetColor(), *this);
+	}
+#endif
     }
     else
     	DEBUG(DBG_BATTLE, DBG_WARN, "Battle2::Arena::" << "ApplyActionAttack: " << "incorrect param: " << "id1: " << id1 << ", id2: " << id2);
@@ -397,9 +391,17 @@ void Battle2::Arena::ApplyActionMove(Action & action)
 	    std::vector<u16> path;
 
 	    // check path
-	    if(b->GetControl() != Game::AI || 0 == size)
+	    if(0 == size)
 	    {
 		GetPath(*b, dst, path);
+		size = path.size();
+		action.Reset();
+		action.SetID(MSG_BATTLE_MOVE);
+		action.Push(b->GetID());
+		action.Push(dst);
+		action.Push(size);
+		for(u16 ii = 0; ii < size; ++ii)
+		    action.Push(path[ii]);
 	    }
 	    else
 	    {
@@ -409,7 +411,7 @@ void Battle2::Arena::ApplyActionMove(Action & action)
 
 	    if(path.empty())
 	    {
-		DEBUG(DBG_BATTLE, DBG_WARN, "Battle2::Arena::" << "ApplyActionMove: " << "empty path for " << b->Info() << " to " << "dst: " << dst);
+		DEBUG(DBG_BATTLE, DBG_WARN, "Battle2::Arena::" << "ApplyActionMove: " << "invalid path for " << b->Info() << " to " << "dst: " << dst);
 		return;
 	    }
 
@@ -441,20 +443,27 @@ void Battle2::Arena::ApplyActionSkip(Action & action)
     action.Pop(hard);
 
     Battle2::Stats* battle = GetTroopID(id);
-    if(battle && battle->isValid() && !battle->Modes(TR_MOVED))
+    if(battle && battle->isValid())
     {
-	if(hard)
+	if(!battle->Modes(TR_MOVED))
 	{
-	    battle->SetModes(TR_HARDSKIP);
-	    battle->SetModes(TR_SKIPMOVE);
-	    battle->SetModes(TR_MOVED);
+	    if(hard)
+	    {
+		battle->SetModes(TR_HARDSKIP);
+		battle->SetModes(TR_SKIPMOVE);
+		battle->SetModes(TR_MOVED);
+	    }
+	    else
+		battle->SetModes(battle->Modes(TR_SKIPMOVE) ? TR_MOVED : TR_SKIPMOVE);
+
+	    if(interface) interface->RedrawActionSkipStatus(*battle);
+
+	    DEBUG(DBG_BATTLE, DBG_TRACE, "Battle2::Arena::" << "ApplyActionSkip: " << battle->Info());
 	}
 	else
-	    battle->SetModes(battle->Modes(TR_SKIPMOVE) ? TR_MOVED : TR_SKIPMOVE);
-
-	if(interface) interface->RedrawActionSkipStatus(*battle);
-
-	DEBUG(DBG_BATTLE, DBG_TRACE, "Battle2::Arena::" << "ApplyActionSkip: " << battle->Info());
+	{
+	    DEBUG(DBG_BATTLE, DBG_WARN, "Battle2::Arena::" << "ApplyActionSkip: " << "id: " << id << " moved");
+	}
     }
     else
 	DEBUG(DBG_BATTLE, DBG_WARN, "Battle2::Arena::" << "ApplyActionSkip: " << "incorrect param: " << "id: " << id);
@@ -468,13 +477,20 @@ void Battle2::Arena::ApplyActionEnd(Action & action)
 
     Battle2::Stats* battle = GetTroopID(id);
 
-    if(battle && !battle->Modes(TR_MOVED))
+    if(battle)
     {
-	battle->SetModes(TR_MOVED);
+	if(!battle->Modes(TR_MOVED))
+	{
+	    battle->SetModes(TR_MOVED);
 
-	if(battle->Modes(TR_SKIPMOVE) && interface) interface->RedrawActionSkipStatus(*battle);
+	    if(battle->Modes(TR_SKIPMOVE) && interface) interface->RedrawActionSkipStatus(*battle);
 
-	DEBUG(DBG_BATTLE, DBG_TRACE, "Battle2::Arena::" << "ApplyActionEnd: " << battle->Info());
+	    DEBUG(DBG_BATTLE, DBG_TRACE, "Battle2::Arena::" << "ApplyActionEnd: " << battle->Info());
+	}
+	else
+	{
+	    DEBUG(DBG_BATTLE, DBG_WARN, "Battle2::Arena::" << "ApplyActionEnd: " << "id: " << id << " moved");
+	}
     }
     else
 	DEBUG(DBG_BATTLE, DBG_WARN, "Battle2::Arena::" << "ApplyActionEnd: " << "incorrect param: " << "id: " << id);
@@ -516,22 +532,20 @@ void Battle2::Arena::ApplyActionMorale(Action & action)
 
 void Battle2::Arena::ApplyActionRetreat(Action & action)
 {
-    if(!result_game || !current_commander) return;
+    if(!result_game || !GetCurrentCommander()) return;
 
-    const u8 color = current_commander->GetColor();
-
-    if(CanRetreatOpponent(color))
+    if(CanRetreatOpponent(current_color))
     {
-	if(army1.GetColor() == color && result_game)
+	if(army1.GetColor() == current_color && result_game)
     	{
     	    result_game->army1 = RESULT_RETREAT;
     	}
     	else
-    	if(army2.GetColor() == color && result_game)
+    	if(army2.GetColor() == current_color && result_game)
     	{
     	    result_game->army2 = RESULT_RETREAT;
     	}
-	DEBUG(DBG_BATTLE, DBG_TRACE, "Battle2::Arena::" << "ApplyActionRetreat: " << "color: " << Color::String(color));
+	DEBUG(DBG_BATTLE, DBG_TRACE, "Battle2::Arena::" << "ApplyActionRetreat: " << "color: " << Color::String(current_color));
     }
     else
 	DEBUG(DBG_BATTLE, DBG_WARN, "Battle2::Arena::" << "ApplyActionRetreat: " << "incorrect param: ");
@@ -539,45 +553,43 @@ void Battle2::Arena::ApplyActionRetreat(Action & action)
 
 void Battle2::Arena::ApplyActionSurrender(Action & action)
 {
-    if(!result_game || !current_commander) return;
+    if(!result_game || !GetCurrentCommander()) return;
 
-    const u8 color = current_commander->GetColor();
-
-    if(CanSurrenderOpponent(color))
+    if(CanSurrenderOpponent(current_color))
     {
 	Resource::funds_t cost;
 
-    	if(army1.GetColor() == color)
+    	if(army1.GetColor() == current_color)
 		cost.gold = army1.GetSurrenderCost();
     	else
-    	if(army2.GetColor() == color)
+    	if(army2.GetColor() == current_color)
 		cost.gold = army2.GetSurrenderCost();
         
-    	if(world.GetKingdom(color).AllowPayment(cost))
+    	if(world.GetKingdom(current_color).AllowPayment(cost))
     	{
-	    if(army1.GetColor() == color)
+	    if(army1.GetColor() == current_color)
     	    {
 		    result_game->army1 = RESULT_SURRENDER;
-		    world.GetKingdom(color).OddFundsResource(cost);
+		    world.GetKingdom(current_color).OddFundsResource(cost);
 		    world.GetKingdom(army2.GetColor()).AddFundsResource(cost);
 	    }
 	    else
-	    if(army2.GetColor() == color)
+	    if(army2.GetColor() == current_color)
 	    {
 		    result_game->army2 = RESULT_SURRENDER;
-		    world.GetKingdom(color).OddFundsResource(cost);
+		    world.GetKingdom(current_color).OddFundsResource(cost);
 		    world.GetKingdom(army1.GetColor()).AddFundsResource(cost);
 	    }
-	    DEBUG(DBG_BATTLE, DBG_TRACE, "Battle2::Arena::" << "ApplyActionSurrender: " << "color: " << Color::String(color));
+	    DEBUG(DBG_BATTLE, DBG_TRACE, "Battle2::Arena::" << "ApplyActionSurrender: " << "color: " << Color::String(current_color));
     	}
     }
     else
 	DEBUG(DBG_BATTLE, DBG_WARN, "Battle2::Arena::" << "ApplyActionSurrender: " << "incorrect param: ");
 }
 
-void Battle2::Arena::TargetsApplyDamage(Stats & attacker, Stats & defender, std::vector<TargetInfo> & targets)
+void Battle2::Arena::TargetsApplyDamage(Stats & attacker, Stats & defender, TargetsInfo & targets)
 {
-    std::vector<TargetInfo>::iterator it = targets.begin();
+    TargetsInfo::iterator it = targets.begin();
 
     for(; it != targets.end(); ++it)
     {
@@ -586,9 +598,9 @@ void Battle2::Arena::TargetsApplyDamage(Stats & attacker, Stats & defender, std:
     }
 }
 
-void Battle2::Arena::GetTargetsForDamage(Stats & attacker, Stats & defender, u16 dst, std::vector<TargetInfo> & targets)
+Battle2::TargetsInfo Battle2::Arena::GetTargetsForDamage(Stats & attacker, Stats & defender, u16 dst)
 {
-    if(targets.size()) targets.clear();
+    TargetsInfo targets;
     targets.reserve(8);
 
     Stats* enemy = NULL;
@@ -657,13 +669,10 @@ void Battle2::Arena::GetTargetsForDamage(Stats & attacker, Stats & defender, u16
 	}
     }
 
-#ifdef WITH_NET
-    if(Game::REMOTE == army1.GetControl()) FH2RemoteClient::SendBattleAttack(army1.GetColor(), attacker.GetID(), targets);
-    if(Game::REMOTE == army2.GetControl()) FH2RemoteClient::SendBattleAttack(army2.GetColor(), attacker.GetID(), targets);
-#endif
+    return targets;
 }
 
-void Battle2::Arena::TargetsApplySpell(const HeroBase* hero, const u8 spell, std::vector<TargetInfo> & targets)
+void Battle2::Arena::TargetsApplySpell(const HeroBase* hero, const u8 spell, TargetsInfo & targets)
 {
     DEBUG(DBG_BATTLE, DBG_TRACE, "Battle2::Arena::" << "TargetsApplySpell: " << "targets: " << targets.size());
 
@@ -673,7 +682,7 @@ void Battle2::Arena::TargetsApplySpell(const HeroBase* hero, const u8 spell, std
     }
     else
     {
-	std::vector<TargetInfo>::iterator it = targets.begin();
+	TargetsInfo::iterator it = targets.begin();
 
 	for(; it != targets.end(); ++it)
 	{
@@ -683,9 +692,9 @@ void Battle2::Arena::TargetsApplySpell(const HeroBase* hero, const u8 spell, std
     }
 }
 
-void Battle2::Arena::GetTargetsForSpells(const HeroBase* hero, const u8 spell, const u16 dst, std::vector<TargetInfo> & targets)
+Battle2::TargetsInfo Battle2::Arena::GetTargetsForSpells(const HeroBase* hero, const u8 spell, const u16 dst)
 {
-    if(targets.size()) targets.clear();
+    TargetsInfo targets;
     targets.reserve(8);
 
     TargetInfo res;
@@ -816,7 +825,7 @@ void Battle2::Arena::GetTargetsForSpells(const HeroBase* hero, const u8 spell, c
     }
 
     // remove resistent magic troop
-    std::vector<TargetInfo>::iterator it = targets.begin();
+    TargetsInfo::iterator it = targets.begin();
     while(it != targets.end())
     {
 	const u8 resist = (*it).defender->GetMagicResist(spell, hero ? hero->GetPower() : 0);
@@ -831,6 +840,8 @@ void Battle2::Arena::GetTargetsForSpells(const HeroBase* hero, const u8 spell, c
 	}
 	else ++it;
     }
+
+    return targets;
 }
 
 void Battle2::Arena::ApplyActionTower(Action & action)
@@ -948,56 +959,150 @@ void Battle2::Arena::SpellActionSummonElemental(const HeroBase* hero, u8 type)
     }
 }
 
-void Battle2::Arena::SpellActionTeleport(u16 src, u16 dst)
+void Battle2::Arena::SpellActionDefaults(Action & a, u8 spell)
 {
+#ifdef WITH_NET
+    if(Network::isRemoteClient())
+    {
+#endif
+        const HeroBase* current_commander = GetCurrentCommander();
+	if(!current_commander) return;
+
+	u16 id, dst;
+	a.Pop(id);
+	a.Pop(dst);
+
+	TargetsInfo targets = GetTargetsForSpells(current_commander, spell, dst);
+	if(interface) interface->RedrawActionSpellCastPart1(spell, dst, current_commander->GetName(), targets);
+
+    	TargetsApplySpell(current_commander, spell, targets);
+	if(interface) interface->RedrawActionSpellCastPart2(spell, targets);
+
+#ifdef WITH_NET
+	if(Game::REMOTE == army1.GetControl()) FH2Server::Get().BattleSendSpell(army1.GetColor(), 0, dst, spell, targets);
+	if(Game::REMOTE == army2.GetControl()) FH2Server::Get().BattleSendSpell(army2.GetColor(), 0, dst, spell, targets);
+    }
+    else
+    {
+	u16 id, dst;
+	u8 color;
+	std::string name;
+
+	a.Pop(id);
+	a.Pop(dst);
+	a.Pop(color);
+        TargetsInfo targets(a, *this);
+
+        Stats* monster = id ? GetTroopID(id) : NULL;
+        const HeroBase* hero = id == 0 && color ? GetCommander(color) : NULL;
+
+        if(monster)
+            name = monster->GetName();
+        else
+        if(hero)
+            name = hero->GetName();
+
+	if(interface)
+	{
+	    interface->RedrawActionSpellCastPart1(spell, dst, name, targets);
+    	    if(monster && targets.size())
+        	interface->RedrawActionMonsterSpellCastStatus(*monster, targets.front());
+        }
+	TargetsApplySpell(hero, spell, targets);
+        if(interface) interface->RedrawActionSpellCastPart2(spell, targets);
+    }
+#endif
+}
+
+void Battle2::Arena::SpellActionTeleport(Action & a)
+{
+    u16 src, dst;
+
+    a.Pop(dst);
+    a.Pop(src);
+
     Stats* b = GetTroopBoard(src);
     Cell* cell = GetCell(dst);
+    const char* name = Spell::GetName(Spell::TELEPORT);
 
     if(b)
     {
         if(b->isWide() && !cell->isPassable(*b, true))
-	{
 	    dst = Board::GetIndexDirection(dst, b->isReflect() ? LEFT : RIGHT);
-	}
+
 	if(interface) interface->RedrawActionTeleportSpell(*b, dst);
 	b->position = dst;
 	b->UpdateDirection();
+
+	DEBUG(DBG_BATTLE, DBG_TRACE, "Battle2::Arena::" << "SpellAction: " << \
+	    ", spell: " << name << ", src: " << src << ", dst: " << dst);
     }
-}
-
-void Battle2::Arena::SpellActionEarthQuake(void)
-{
-    std::vector<u8> targets;
-
-    // check walls
-    if(0 != board[8].object)  targets.push_back(CAT_WALL1);
-    if(0 != board[29].object) targets.push_back(CAT_WALL2);
-    if(0 != board[73].object) targets.push_back(CAT_WALL3);
-    if(0 != board[96].object) targets.push_back(CAT_WALL4);
-
-    // check right/left towers
-    if(towers[0] && towers[0]->isValid()) targets.push_back(CAT_TOWER1);
-    if(towers[2] && towers[2]->isValid()) targets.push_back(CAT_TOWER2);
-
-    if(interface) interface->RedrawActionEarthQuakeSpell(targets);
-
-    // FIXME: Arena::SpellActionEarthQuake: check hero spell power
-
-    // apply random damage
-    if(0 != board[8].object)  board[8].object = Rand::Get(board[8].object);
-    if(0 != board[29].object) board[29].object = Rand::Get(board[29].object);
-    if(0 != board[73].object) board[73].object = Rand::Get(board[73].object);
-    if(0 != board[96].object) board[96].object = Rand::Get(board[96].object);
-
-    if(towers[0] && towers[0]->isValid() && Rand::Get(1)) towers[0]->SetDestroy();
-    if(towers[2] && towers[2]->isValid() && Rand::Get(1)) towers[2]->SetDestroy();
+    else
+    {
+	DEBUG(DBG_BATTLE, DBG_WARN, "Battle2::Arena::" << "SpellAction: " << \
+	    ", spell: " << name << " false");
+    }
 
 #ifdef WITH_NET
-    if(Game::REMOTE == army1.GetControl()) FH2RemoteClient::SendBattleEarthQuakeSpell(army1.GetColor(), targets);
-    if(Game::REMOTE == army2.GetControl()) FH2RemoteClient::SendBattleEarthQuakeSpell(army2.GetColor(), targets);
+    if(Network::isRemoteClient())
+    {
+	if(Game::REMOTE == army1.GetControl()) FH2Server::Get().BattleSendTeleportSpell(army1.GetColor(), src, dst);
+	if(Game::REMOTE == army2.GetControl()) FH2Server::Get().BattleSendTeleportSpell(army2.GetColor(), src, dst);
+    }
+#endif
+}
 
-    if(Game::REMOTE == army1.GetControl()) FH2RemoteClient::SendBattleBoard(army1.GetColor(), *this);
-    if(Game::REMOTE == army2.GetControl()) FH2RemoteClient::SendBattleBoard(army2.GetColor(), *this);
+void Battle2::Arena::SpellActionEarthQuake(Action & a)
+{
+#ifdef WITH_NET
+    if(Network::isRemoteClient())
+    {
+#endif
+	std::vector<u8> targets;
+	targets.reserve(8);
+
+	// check walls
+	if(0 != board[8].object)  targets.push_back(CAT_WALL1);
+	if(0 != board[29].object) targets.push_back(CAT_WALL2);
+	if(0 != board[73].object) targets.push_back(CAT_WALL3);
+	if(0 != board[96].object) targets.push_back(CAT_WALL4);
+
+	// check right/left towers
+	if(towers[0] && towers[0]->isValid()) targets.push_back(CAT_TOWER1);
+	if(towers[2] && towers[2]->isValid()) targets.push_back(CAT_TOWER2);
+
+	if(interface) interface->RedrawActionEarthQuakeSpell(targets);
+
+	// FIXME: Arena::SpellActionEarthQuake: check hero spell power
+
+	// apply random damage
+	if(0 != board[8].object)  board[8].object = Rand::Get(board[8].object);
+	if(0 != board[29].object) board[29].object = Rand::Get(board[29].object);
+	if(0 != board[73].object) board[73].object = Rand::Get(board[73].object);
+	if(0 != board[96].object) board[96].object = Rand::Get(board[96].object);
+
+	if(towers[0] && towers[0]->isValid() && Rand::Get(1)) towers[0]->SetDestroy();
+	if(towers[2] && towers[2]->isValid() && Rand::Get(1)) towers[2]->SetDestroy();
+
+	DEBUG(DBG_BATTLE, DBG_TRACE, "Battle2::Arena::" << "SpellAction: " << \
+	    ", spell: " << Spell::GetName(Spell::EARTHQUAKE) << ", targets: " << targets.size());
+
+#ifdef WITH_NET
+	if(Game::REMOTE == army1.GetControl()) FH2Server::Get().BattleSendEarthQuakeSpell(army1.GetColor(), targets);
+	if(Game::REMOTE == army2.GetControl()) FH2Server::Get().BattleSendEarthQuakeSpell(army2.GetColor(), targets);
+    }
+    else
+    {
+        u32 size;
+        a.Pop(size);
+
+	std::vector<u8> targets(size);
+	for(std::vector<u8>::iterator
+	    it = targets.begin(); it != targets.end(); ++it)
+            a.Pop(*it);
+
+	if(interface) interface->RedrawActionEarthQuakeSpell(targets);
+    }
 #endif
 }
 

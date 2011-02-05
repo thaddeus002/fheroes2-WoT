@@ -28,9 +28,8 @@
 #include "button.h"
 #include "network.h"
 #include "pocketpc.h"
+#include "world.h"
 #include "game.h"
-
-u8 SelectCountPlayers(void);
 
 Game::menu_t Game::NewStandard(void)
 {
@@ -40,15 +39,33 @@ Game::menu_t Game::NewStandard(void)
     return Game::SELECTSCENARIO;
 }
 
+Game::menu_t Game::NewBattleOnly(void)
+{
+    Settings & conf = Settings::Get();
+    conf.SetGameType(Game::BATTLEONLY);
+
+    return Game::NEWMULTI;
+}
+
 Game::menu_t Game::NewHotSeat(void)
 {
     Settings & conf = Settings::Get();
-    conf.SetGameType(Game::HOTSEAT);
-    const u8 select = conf.QVGA() ? 2 : SelectCountPlayers();
-    if(select)
+    conf.SetGameType(conf.GameType() | Game::HOTSEAT);
+
+    if(Game::BATTLEONLY & conf.GameType())
     {
-	conf.SetPreferablyCountPlayers(select);
-	return Game::SELECTSCENARIO;
+	conf.SetPreferablyCountPlayers(2);
+	world.NewMaps(10, 10);
+	return StartBattleOnly();
+    }
+    else
+    {
+	const u8 select = conf.QVGA() ? 2 : SelectCountPlayers();
+	if(select)
+	{
+	    conf.SetPreferablyCountPlayers(select);
+	    return Game::SELECTSCENARIO;
+	}
     }
     return Game::MAINMENU;
 }
@@ -62,15 +79,16 @@ Game::menu_t Game::NewCampain(void)
 
 Game::menu_t Game::NewNetwork(void)
 {
+    Settings & conf = Settings::Get();
+    conf.SetGameType(conf.GameType() | Game::NETWORK);
+
     // cursor
     Cursor & cursor = Cursor::Get();
     cursor.Hide();
     cursor.SetThemes(cursor.POINTER);
 
     Display & display = Display::Get();
-    Settings & conf = Settings::Get();
-
-    conf.SetGameType(Game::NETWORK);
+    //Settings & conf = Settings::Get();
 
     // image background
     const Sprite &back = AGG::GetICN(ICN::HEROES, 0);
@@ -120,7 +138,6 @@ Game::menu_t Game::NewGame(void)
     Settings & conf = Settings::Get();
 
     Game::IO::last_name.clear();
-    conf.SetLoadedGameVersion(false);
 
     if(Settings::Get().QVGA()) return PocketPC::NewGame();
   
@@ -151,8 +168,10 @@ Game::menu_t Game::NewGame(void)
 
     Button buttonStandartGame(top.x + 455, top.y + 45, ICN::BTNNEWGM, 0, 1);
     Button buttonMultiGame(top.x + 455, top.y + 110, ICN::BTNNEWGM, 4, 5);
-    Button buttonSettings(top.x + 455, top.y + 175, ICN::BTNDCCFG, 4, 5);
+    Button buttonSettings(top.x + 455, top.y + 240, ICN::BTNDCCFG, 4, 5);
     Button buttonCancelGame(top.x + 455, top.y + 375, ICN::BTNNEWGM, 6, 7);
+    Button buttonBattleGame(top.x + 455, top.y + 175, ICN::BTNBATTLEONLY, 0, 1);
+
 
     //Button buttonCampainGame(top.x + 455, top.y + 110, ICN::BTNNEWGM, 2, 3);
     //Button buttonMultiGame(top.x + 455, top.y + 175, ICN::BTNNEWGM, 4, 5);
@@ -165,6 +184,12 @@ Game::menu_t Game::NewGame(void)
     buttonCancelGame.Draw();
     buttonSettings.Draw();
 
+#ifdef BUILD_BATTLEONLY
+    buttonBattleGame.Draw();
+#else
+    buttonBattleGame.SetDisable(true);
+#endif
+
     cursor.Show();
     display.Flip();
 
@@ -176,10 +201,12 @@ Game::menu_t Game::NewGame(void)
 	le.MousePressLeft(buttonMultiGame) ? buttonMultiGame.PressDraw() : buttonMultiGame.ReleaseDraw();
 	le.MousePressLeft(buttonCancelGame) ? buttonCancelGame.PressDraw() : buttonCancelGame.ReleaseDraw();
 	le.MousePressLeft(buttonSettings) ? buttonSettings.PressDraw() : buttonSettings.ReleaseDraw();
+	buttonBattleGame.isEnable() && le.MousePressLeft(buttonBattleGame) ? buttonBattleGame.PressDraw() : buttonBattleGame.ReleaseDraw();
 
 	if(HotKeyPress(EVENT_BUTTON_STANDARD) || le.MouseClickLeft(buttonStandartGame)) return NEWSTANDARD;
 	//if(HotKeyPress(EVENT_BUTTON_CAMPAIN) || le.MouseClickLeft(buttonCampainGame)) return NEWCAMPAIN;
 	if(HotKeyPress(EVENT_BUTTON_MULTI) || le.MouseClickLeft(buttonMultiGame)) return NEWMULTI;
+	if(buttonBattleGame.isEnable() && le.MouseClickLeft(buttonBattleGame)) return NEWBATTLEONLY;
 	if(HotKeyPress(EVENT_BUTTON_SETTINGS) || le.MouseClickLeft(buttonSettings)){ Dialog::ExtSettings(false); cursor.Show(); display.Flip(); }
 	if(HotKeyPress(EVENT_DEFAULT_EXIT) || le.MouseClickLeft(buttonCancelGame)) return MAINMENU;
 
@@ -196,10 +223,15 @@ Game::menu_t Game::NewGame(void)
 
 Game::menu_t Game::NewMulti(void)
 {
-    // reset prev. scenario info
-    Settings::Get().SetMyColor(Color::GRAY);
+    Settings & conf = Settings::Get();
 
-    if(Settings::Get().QVGA()) return PocketPC::NewMulti();
+    if(! (conf.GameType() & Game::BATTLEONLY))
+	conf.SetGameType(Game::STANDARD);
+
+    // reset prev. scenario info
+    conf.SetMyColor(Color::GRAY);
+
+    if(conf.QVGA()) return PocketPC::NewMulti();
 
     // preload
     AGG::PreloadObject(ICN::HEROES);
@@ -262,7 +294,7 @@ Game::menu_t Game::NewMulti(void)
     return QUITGAME;
 }
 
-u8 SelectCountPlayers(void)
+u8 Game::SelectCountPlayers(void)
 {
     // cursor
     Cursor & cursor = Cursor::Get();

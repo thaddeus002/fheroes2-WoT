@@ -210,7 +210,6 @@ Game::menu_t Game::ScenarioInfo(void)
 	// click cancel
 	if(HotKeyPress(EVENT_DEFAULT_EXIT) || le.MouseClickLeft(buttonCancel))
 	{
-	    Settings::Get().SetGameType(Game::UNKNOWN);
 	    result = MAINMENU;
 	    break;
 	}

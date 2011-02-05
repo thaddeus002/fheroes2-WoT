@@ -232,6 +232,7 @@ int main(int argc, char **argv)
 	    		case Game::NEWMULTI:       rs = Game::NewMulti();		break;
 			case Game::NEWHOTSEAT:     rs = Game::NewHotSeat();		break;
 		        case Game::NEWNETWORK:     rs = Game::NewNetwork();		break;
+		        case Game::NEWBATTLEONLY:  rs = Game::NewBattleOnly();		break;
 	    		case Game::LOADSTANDARD:   rs = Game::LoadStandard();		break;
 	    		case Game::LOADCAMPAIN:    rs = Game::LoadCampain();		break;
 	    		case Game::LOADMULTI:      rs = Game::LoadMulti();		break;
@@ -257,7 +258,7 @@ int main(int argc, char **argv)
 	{
 	    DEBUG(DBG_GAME, DBG_WARN, "Error::Exception");
 #ifdef WITH_NET
-            if(Game::NETWORK == conf.GameType()) FH2LocalClient::Get().Logout();
+            if(Game::NETWORK == conf.GameType()) FH2LocalClient::Get().Logout("internal error");
 #endif
     	    AGG::Cache::Get().Dump();
 	    conf.Dump();

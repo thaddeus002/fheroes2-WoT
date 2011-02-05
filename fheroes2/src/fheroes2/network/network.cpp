@@ -56,10 +56,15 @@ const char* Network::GetMsgString(u16 msg)
         case MSG_ACCESS_DENIED:		return "MSG_ACCESS_DENIED";
 
         case MSG_UPDATE_PLAYERS:	return "MSG_UPDATE_PLAYERS";
+        case MSG_GET_GAME_TYPE:		return "MSG_GET_GAME_TYPE";
         case MSG_GET_MAPS_LIST:		return "MSG_GET_MAPS_LIST";
         case MSG_SET_CURRENT_MAP:	return "MSG_SET_CURRENT_MAP";
+        case MSG_GET_CURRENT_MAP:	return "MSG_GET_CURRENT_MAP";
+        case MSG_GET_CURRENT_COLOR:	return "MSG_GET_CURRENT_COLOR";
         case MSG_CHANGE_COLORS:		return "MSG_CHANGE_COLORS";
         case MSG_CHANGE_RACE:		return "MSG_CHANGE_RACE";
+	case MSG_UPDATE_BATTLEONLY:	return "MSG_UPDATE_BATTLEONLY";
+	case MSG_START_BATTLEONLY:	return "MSG_START_BATTLEONLY";
 
 
         case MSG_START_GAME:		return "MSG_START_GAME";
@@ -127,13 +132,13 @@ msg_t Network::GetMsg(u16 msg)
 bool Network::isLocalClient(void)
 {
     Settings & conf = Settings::Get();
-    return conf.GameType() == Game::NETWORK && conf.NetworkLocalClient() && !conf.NetworkDedicatedServer();
+    return (conf.GameType() & Game::NETWORK) && conf.NetworkLocalClient() && !conf.NetworkDedicatedServer();
 }
 
 bool Network::isRemoteClient(void)
 {
     Settings & conf = Settings::Get();
-    return conf.GameType() == Game::NETWORK && !isLocalClient();
+    return (conf.GameType() & Game::NETWORK) && (!conf.NetworkLocalClient() || conf.NetworkDedicatedServer());
 }
 
 bool Network::MsgIsBroadcast(u16 msg)
@@ -162,14 +167,15 @@ int Network::RunDedicatedServer(void)
 
         if(! server.Bind(conf.GetPort()))
         {
-            DEBUG(DBG_NETWORK , DBG_WARN, "Network::RunDedicatedServer: " << Network::GetError());
+            DEBUG(DBG_NETWORK, DBG_WARN, "Network::RunDedicatedServer: " << Network::GetError());
             return -1;
         }
 
 	conf.SetNetworkDedicatedServer(true);
-	conf.SetGameType(Game::NETWORK);
+	conf.SetGameType(Game::STANDARD|Game::NETWORK);
+	conf.SetPreferablyCountPlayers(2);
 
-        return FH2Server::callbackCreateThread(&server);
+        return FH2Server::Main(NULL);
     }
     catch(std::bad_alloc)
     {
@@ -256,26 +262,6 @@ void Network::PacketPopMapsFileInfo(QueueMessage & packet, Maps::FileInfo & fi)
     fi.with_heroes = byte8;
 }
 
-void Network::PacketPushPlayersInfo(QueueMessage & m, const std::vector<FH2RemoteClient> & v, u32 exclude)
-{
-    u8 count = std::count_if(v.begin(), v.end(), std::not1(std::bind2nd(std::mem_fun_ref(&Player::isID), 0)));
-    m.Push(count);
-    
-    if(count)
-    {
-	std::vector<FH2RemoteClient>::const_iterator itc1 = v.begin();
-	std::vector<FH2RemoteClient>::const_iterator itc2 = v.end();
-	for(; itc1 != itc2; ++itc1) if((*itc1).player_id && (*itc1).player_id != exclude)
-	{
-	    m.Push((*itc1).player_color);
-	    m.Push((*itc1).player_race);
-    	    m.Push((*itc1).player_name);
-	    m.Push((*itc1).player_id);
-	    m.Push(static_cast<u8>((*itc1).Modes(ST_ADMIN)));
-	}
-    }
-}
-
 void Network::PackRaceColors(QueueMessage & m)
 {
     m.Push(static_cast<u8>(KINGDOMMAX));
@@ -301,16 +287,6 @@ void Network::UnpackRaceColors(QueueMessage & m)
 	    Settings::Get().SetKingdomRace(color, race);
 	}
     }
-}
-
-u8 Network::GetPlayersColors(const std::vector<FH2RemoteClient> & v)
-{
-    u8 res = 0;
-    std::vector<FH2RemoteClient>::const_iterator it1 = v.begin();
-    std::vector<FH2RemoteClient>::const_iterator it2 = v.end();
-    for(; it1 != it2; ++it1) if((*it1).player_id && (*it1).player_color) res |= (*it1).player_color;
-                
-    return res;
 }
 
 void Network::PackKingdom(QueueMessage & msg, const Kingdom & kingdom)

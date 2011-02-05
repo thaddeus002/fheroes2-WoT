@@ -177,7 +177,7 @@ void AI::BattleTurn(Arena & arena, const Stats & b, Actions & a)
 		{
 		    enemy = arena.GetEnemyAbroadMaxQuality(path.back(), b.GetColor());
 		    BattleMagicTurn(arena, b, a, enemy);
-	    	    a.AddedMoveAction(b, path);
+	    	    a.AddedMoveAction(b, path.back());
 
 		    // archers move and short attack only
 		    attack = b.isArchers() ? false : true;

@@ -26,9 +26,8 @@
 #include <string>
 #include "gamedefs.h"
 
-class Player
+struct Player
 {
-public:
     Player() : player_color(0) {}
 
     bool isID(u32 id) const { return id == player_id; }

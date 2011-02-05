@@ -154,9 +154,8 @@ bool Battle2::Cell::isPassable(bool check_troop) const
     return (!check_troop || NULL == arena->GetTroopBoard(index)) && 0 == object;
 }
 
-void Battle2::Cell::Reset(void)
+void Battle2::Cell::ResetQuality(void)
 {
-    direction = UNKNOWN;
     quality = 0;
 }
 
