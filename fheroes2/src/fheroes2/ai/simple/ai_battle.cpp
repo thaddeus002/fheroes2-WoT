@@ -235,6 +235,10 @@ void AI::BattleMagicTurn(Arena & arena, const Stats & b, Actions & a, const Stat
     // if handfighting
     if(enemy)
     {
+	// kill dragons
+	if(enemy->troop.isDragons() &&
+	    !b.Modes(SP_DRAGONSLAYER) && isApplySpell(Spell::DRAGONSLAYER, &b, *hero, a)) return;
+
 	// curse
 	if(!enemy->Modes(SP_CURSE) && isApplySpell(Spell::CURSE, enemy, *hero, a)) return;
 	// enemy good spell - clean
@@ -243,10 +247,6 @@ void AI::BattleMagicTurn(Arena & arena, const Stats & b, Actions & a, const Stat
 	// up defense
 	if(!b.Modes(SP_STEELSKIN) && !b.Modes(SP_STONESKIN) && isApplySpell(Spell::STEELSKIN, &b, *hero, a)) return;
 	if(!b.Modes(SP_STONESKIN) && !b.Modes(SP_STEELSKIN) && isApplySpell(Spell::STONESKIN, &b, *hero, a)) return;
-
-	// kill dragons
-	if(enemy->troop.isDragons() &&
-	    !b.Modes(SP_DRAGONSLAYER) && isApplySpell(Spell::DRAGONSLAYER, &b, *hero, a)) return;
     }
 
     // my army blessing

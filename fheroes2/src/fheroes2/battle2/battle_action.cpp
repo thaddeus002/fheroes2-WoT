@@ -962,7 +962,7 @@ void Battle2::Arena::SpellActionSummonElemental(const HeroBase* hero, u8 type)
 void Battle2::Arena::SpellActionDefaults(Action & a, u8 spell)
 {
 #ifdef WITH_NET
-    if(Network::isRemoteClient())
+    if((Settings::Get().GameType() & Game::LOCAL) || Network::isRemoteClient())
     {
 #endif
         const HeroBase* current_commander = GetCurrentCommander();
@@ -983,6 +983,7 @@ void Battle2::Arena::SpellActionDefaults(Action & a, u8 spell)
 	if(Game::REMOTE == army2.GetControl()) FH2Server::Get().BattleSendSpell(army2.GetColor(), 0, dst, spell, targets);
     }
     else
+    if(Network::isLocalClient())
     {
 	u16 id, dst;
 	u8 color;
@@ -1055,7 +1056,7 @@ void Battle2::Arena::SpellActionTeleport(Action & a)
 void Battle2::Arena::SpellActionEarthQuake(Action & a)
 {
 #ifdef WITH_NET
-    if(Network::isRemoteClient())
+    if((Settings::Get().GameType() & Game::LOCAL) || Network::isRemoteClient())
     {
 #endif
 	std::vector<u8> targets;
@@ -1092,6 +1093,7 @@ void Battle2::Arena::SpellActionEarthQuake(Action & a)
 	if(Game::REMOTE == army2.GetControl()) FH2Server::Get().BattleSendEarthQuakeSpell(army2.GetColor(), targets);
     }
     else
+    if(Network::isLocalClient())
     {
         u32 size;
         a.Pop(size);

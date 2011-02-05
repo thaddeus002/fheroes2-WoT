@@ -78,10 +78,11 @@ void RunTest3(void)
     Kingdom & kingdom2 = world.GetKingdom(Color::YELLOW);
 
     conf.SetMyColor(Color::RED);
+    conf.SetGameType(Game::BATTLEONLY | Game::LOCAL);
 
     hero1.SetSpellPoints(150);
 
-    kingdom1.SetControl(Game::LOCAL);
+    kingdom1.SetControl(Game::AI);
     kingdom2.SetControl(Game::LOCAL);
 
     if(kingdom1.GetCastles().size())
@@ -103,16 +104,16 @@ void RunTest3(void)
     //army1.JoinTroop(Monster::PHOENIX, 10);
     //army1.JoinTroop(Monster::RANGER, 80);
     //army1.JoinTroop(Monster::GARGOYLE, 100);
-    army1.At(0) = Army::Troop(Monster::GREEN_DRAGON, 10);
+    army1.At(0) = Army::Troop(Monster::CAVALRY, 20);
+    army1.At(1) = Army::Troop(Monster::CAVALRY, 20);
 
     //army1.JoinTroop(Monster::Rand(Monster::LEVEL1), 30);
     //army1.JoinTroop(Monster::Rand(Monster::LEVEL2), 20);
     //army1.JoinTroop(Monster::Rand(Monster::LEVEL3), 10);
 
     army2.Clear();
+    army2.At(0) = Army::Troop(Monster::GREEN_DRAGON, 10);
 //    army2.At(0) = Army::Troop(Monster::OGRE, 1);
-    army2.At(0) = Army::Troop(Monster::CAVALRY, 20);
-    army2.At(1) = Army::Troop(Monster::CAVALRY, 20);
 //    army2.At(1) = Army::Troop(Monster::DWARF, 2);
 //    army2.At(2) = Army::Troop(Monster::DWARF, 2);
 //    army2.At(3) = Army::Troop(Monster::DWARF, 2);
