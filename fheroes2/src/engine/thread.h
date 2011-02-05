@@ -35,6 +35,9 @@ class Thread
 public:
     Thread();
     ~Thread();
+    Thread(const Thread &);
+
+    Thread & operator= (const Thread &);
 
     void	Create(int (*)(void *), void *param = NULL);
     int		Wait(void);
@@ -51,13 +54,18 @@ private:
 class Mutex
 {
 public:
-    Mutex();
+    Mutex(bool init = false);
+    Mutex(const Mutex &);
     ~Mutex();
 
+    Mutex & operator= (const Mutex &);
+
+    void Create(void);
     bool Lock(void) const;
     bool Unlock(void) const;
 
 private:
+
     SDL_mutex *mutex;
 };
 

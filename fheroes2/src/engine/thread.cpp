@@ -34,6 +34,15 @@ Thread::~Thread()
     Kill();
 }
 
+Thread::Thread(const Thread &) : thread(NULL)
+{
+}
+
+Thread & Thread::operator= (const Thread &)
+{
+    return *this;
+}
+
 void Thread::Create(int (*fn)(void *), void *param)
 {
     thread = SDL_CreateThread(fn, param);
@@ -55,7 +64,7 @@ void Thread::Kill(void)
 
 bool Thread::IsRun(void) const
 {
-    return thread;
+    return GetID();
 }
 
 u32 Thread::GetID(void) const
@@ -63,13 +72,28 @@ u32 Thread::GetID(void) const
     return thread ? SDL_GetThreadID(thread) : 0;
 }
 
-Mutex::Mutex() : mutex(SDL_CreateMutex())
+Mutex::Mutex(bool init) : mutex(init ? SDL_CreateMutex() : NULL)
+{
+}
+
+Mutex::Mutex(const Mutex &) : mutex(NULL)
 {
 }
 
 Mutex::~Mutex()
 {
     if(mutex) SDL_DestroyMutex(mutex);
+}
+
+Mutex & Mutex::operator= (const Mutex &)
+{
+    return *this;
+}
+
+void Mutex::Create(void)
+{
+    if(mutex) SDL_DestroyMutex(mutex);
+    mutex = SDL_CreateMutex();
 }
 
 bool Mutex::Lock(void) const

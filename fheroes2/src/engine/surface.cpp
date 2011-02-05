@@ -331,9 +331,12 @@ void Surface::LoadPalette(void)
 /* format surface */
 void Surface::SetDisplayFormat(void)
 {
-    SDL_Surface *osurface = surface;
-    surface = SDL_DisplayFormatAlpha(osurface);
-    if(osurface) SDLFreeSurface(osurface);
+    if(surface)
+    {
+	SDL_Surface *osurface = surface;
+	surface = SDL_DisplayFormatAlpha(osurface);
+	if(osurface) SDLFreeSurface(osurface);
+    }
 }
 
 u32 Surface::GetColor(u16 index) const
