@@ -486,8 +486,7 @@ bool BattleOnly::ChangeSettings(void)
 	    QueueMessage packet;
 
 	    if(!local.Recv(packet)) return false;
-	    DEBUG(DBG_NETWORK, DBG_INFO, "FH2LocalClient::" << "BattleOnly::ChangeSettings: " << "recv: " <<
-								Network::GetMsgString(packet.GetID()));
+	    DEBUG(DBG_NETWORK, DBG_INFO, "recv: " << Network::GetMsgString(packet.GetID()));
 	    switch(packet.GetID())
 	    {
 		case MSG_START_BATTLEONLY:
@@ -812,14 +811,14 @@ void Network::UnpackBattleOnly(QueueMessage & msg, BattleOnly & b)
     if(b.hero1)
         Game::IO::UnpackHeroes(msg, *b.hero1);
     else
-	DEBUG(DBG_NETWORK, DBG_WARN, "Network::UnpackHero: unknown hero id");
+	DEBUG(DBG_NETWORK, DBG_WARN, "unknown id");
 
     msg.Pop(id);
     b.hero2 = world.GetHeroes(Heroes::ConvertID(id));
     if(b.hero2)
         Game::IO::UnpackHeroes(msg, *b.hero2);
     else
-	DEBUG(DBG_NETWORK, DBG_WARN, "Network::UnpackHero: unknown hero id");
+	DEBUG(DBG_NETWORK, DBG_WARN, "unknown id");
 
     msg.Pop(id); b.color1 = Color::Get(id);
     msg.Pop(id); b.color2 = Color::Get(id);

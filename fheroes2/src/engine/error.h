@@ -32,7 +32,7 @@ public:
     ~Error(){};
 
     class Exception{};
-    static void Except(const char*, const char*);
+    static void Except(const char*);
 };
 
 #endif

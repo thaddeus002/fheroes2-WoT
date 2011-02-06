@@ -345,7 +345,7 @@ ICN::icn_t MP2::GetICNObject(const u8 type)
 	    break;
     }
 
-    DEBUG(DBG_GAME , DBG_WARN, "MP2::GetICNObject: unknown type: " << static_cast<int>(type));
+    DEBUG(DBG_GAME, DBG_WARN, "unknown type: " << static_cast<int>(type));
 
     return ICN::UNKNOWN;
 }
@@ -614,7 +614,7 @@ const char* MP2::StringObject(u8 object)
 	case MP2::OBJ_UNKNW_FA:		return "OBJ_UNKNW_FA";
 
 	default:
-	    DEBUG(DBG_GAME , DBG_WARN, "MP2::Object: unknown, " << static_cast<int>(object));
+	    DEBUG(DBG_GAME, DBG_WARN, "unknown object: " << static_cast<int>(object));
 	    break;
     }
     

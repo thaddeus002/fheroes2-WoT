@@ -54,7 +54,7 @@ void Dialog::FrameBorder::SetSize(u16 encw, u16 ench)
     Display & display = Display::Get();
 
     if(display.w() < encw || display.h() < ench || encw < (border * 4) || ench < (border * 4))
-    DEBUG(DBG_GAME , DBG_WARN, "Dialog::FrameBorder: size out of range");
+    DEBUG(DBG_GAME, DBG_WARN, "size: " << "out of range");
 
     Rect::w = encw + 2 * border;
     Rect::h = ench + 2 * border;

@@ -182,30 +182,29 @@ bool Algorithm::PathFind(std::list<Route::Step> *result, const s32 from, const s
 	else
 	list[cur].open = false;
 
-	DEBUG(DBG_GAME , DBG_TRACE, "Algorithm::PathFind: route, from: " << cur);
-
 	it1 = list.begin();
 	alt = -1;
 	tmp = MAXU16;
+
+	DEBUG(DBG_OTHER, DBG_TRACE, "route, from: " << cur);
 	
 	// find minimal cost
 	for(; it1 != it2; ++it1) if((*it1).second.open)
 	{
 	    const cell_t & cell2 = (*it1).second;
 
-	    if(IS_DEBUG(DBG_GAME, DBG_TRACE) && cell2.cost_g != MAXU16)
+	    if(IS_DEBUG(DBG_OTHER, DBG_TRACE) && cell2.cost_g != MAXU16)
 	    {
 		direct = Direction::Get(cur, (*it1).first);
 		if(Direction::UNKNOWN != direct)
 		{
-		    VERBOSE("  direct: " << Direction::String(direct) <<
+		    VERBOSE("\t\tdirect: " << Direction::String(direct) <<
 			    ", index: " << (*it1).first <<
 			    ", cost g: " << cell2.cost_g <<
 			    ", cost t: " << cell2.cost_t <<
 			    ", cost d: " << cell2.cost_d);
 		}
 	    }
-
 
 	    if(cell2.cost_t + cell2.cost_d < tmp)
 	    {
@@ -217,7 +216,7 @@ bool Algorithm::PathFind(std::list<Route::Step> *result, const s32 from, const s
 	// not found, and exception
 	if(MAXU16 == tmp || -1 == alt || (limit && GetCurrentLength(list, cur) > limit)) break;
 	else
-	DEBUG(DBG_GAME , DBG_TRACE, "Algorithm::PathFind: select: " << alt);
+	DEBUG(DBG_OTHER, DBG_TRACE, "select: " << alt);
 
 	cur = alt;
     }
@@ -235,7 +234,7 @@ bool Algorithm::PathFind(std::list<Route::Step> *result, const s32 from, const s
         return true;
     }
 
-    DEBUG(DBG_GAME , DBG_TRACE, "Algorithm::PathFind: not found, from:" << from << ", to: " << to);
+    DEBUG(DBG_OTHER, DBG_TRACE, "not found" << ", from:" << from << ", to: " << to);
     list.clear();
 
     return false;

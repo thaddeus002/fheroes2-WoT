@@ -49,7 +49,7 @@ void Test::Run(int num)
 
 	case 9: TestMonsterSprite(); break;
 
-	default: DEBUG(DBG_ENGINE , DBG_WARN, "Test::Run: unknown test."); break;
+	default: DEBUG(DBG_ENGINE, DBG_WARN, "unknown test"); break;
     }
 }
 

@@ -847,7 +847,7 @@ void Battle2::Arena::TurnTroop(Stats* current_troop)
     Actions actions;
     bool end_turn = false;
 
-    DEBUG(DBG_BATTLE, DBG_TRACE, "Battle2::Arena::" << "Turn: " << current_troop->Info(true));
+    DEBUG(DBG_BATTLE, DBG_TRACE, current_troop->Info(true));
 
     while(! end_turn)
     {
@@ -902,7 +902,7 @@ void Battle2::Arena::TurnTroop(Stats* current_troop)
 
 void Battle2::Arena::Turns(u16 turn, Result & result)
 {
-    DEBUG(DBG_BATTLE, DBG_TRACE, "Battle2::Arena::" << "Turn: " << turn);
+    DEBUG(DBG_BATTLE, DBG_TRACE, turn);
 
     result_game = &result;
     current_turn = turn;
@@ -1001,12 +1001,8 @@ void Battle2::Arena::RemoteTurn(const Stats & b, Actions & a)
 	FH2Server::Get().BattleRecvTurn(current_color, b, *this, a);
 	return;
     }
-    else
-    {
-	DEBUG(DBG_BATTLE, DBG_WARN, "Battle2::Arena::" << "RemoteTurn: " << "current commander is NULL");
-    }
 #endif
-    DEBUG(DBG_BATTLE, DBG_WARN, "Battle2::Arena::" << "RemoteTurn: " << "AI turn");
+    DEBUG(DBG_BATTLE, DBG_WARN, "switch to AI turn");
     AI::BattleTurn(*this, b, a);
 }
 
@@ -1114,7 +1110,7 @@ u16 Battle2::Arena::GetShortDistance(u16 from, const std::vector<u16> & dst)
 	}
     }
 
-    DEBUG(DBG_BATTLE, DBG_TRACE, "Battle2::Arena::" << "GetShortDistance: " << res);
+    DEBUG(DBG_BATTLE, DBG_TRACE, res);
 
     return res;
 }
@@ -1145,7 +1141,7 @@ u16 Battle2::Arena::GetPath(const Stats & b, u16 to, std::vector<u16> & v)
 		if(it != abroad.end())
 		    cur = *it;
 	    }
-	    DEBUG(DBG_BATTLE, DBG_WARN, "Battle2::Arena::" << "GetPath: " << "dst is busy, corrected: " << cur);
+	    DEBUG(DBG_BATTLE, DBG_WARN, "dst is busy, corrected: " << cur);
 	}
 
 	while(CENTER != board[cur].direction && UNKNOWN != board[cur].direction){ v.push_back(cur); cur = Board::GetIndexDirection(cur, board[cur].direction); }
@@ -1167,7 +1163,7 @@ u16 Battle2::Arena::GetPath(const Stats & b, u16 to, std::vector<u16> & v)
     {
 	std::stringstream ss;
 	for(u16 ii = 0; ii < v.size(); ++ii) ss << v[ii] << ", ";
-	VERBOSE("Battle2::Arena::" << "GetPath: " << "from: " << b.GetPosition() << ", to: " << to << " :: " << ss.str());
+	DEBUG(DBG_BATTLE, DBG_TRACE, "from: " << b.GetPosition() << ", to: " << to << " :: " << ss.str());
     }
 
     return v.size();
@@ -1190,7 +1186,7 @@ void Battle2::Arena::GetPassableQualityPositions(const Stats & b, std::vector<u1
         if(v.empty()) ss << "empty";
         else
 	for(u16 ii = 0; ii < v.size(); ++ii) ss << v[ii] << ", ";
-        VERBOSE("Battle2::Arena::" << "GetPassableQualityPositions: " << ss.str());
+        DEBUG(DBG_BATTLE, DBG_TRACE, ss.str());
     }
 }
 

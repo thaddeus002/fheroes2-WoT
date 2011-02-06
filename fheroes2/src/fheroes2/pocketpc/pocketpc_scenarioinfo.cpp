@@ -114,8 +114,8 @@ Game::menu_t PocketPC::ScenarioInfo(void)
         if(le.MouseClickLeft(buttonOk) ||
 		Game::HotKeyPress(Game::EVENT_DEFAULT_READY))
         {
-            DEBUG(DBG_GAME , DBG_INFO, "PocketPC::ScenarioInfo: select maps: " << conf.MapsFile() \
-		    << ", difficulty: " << Difficulty::String(conf.GameDifficulty()) << ", select color: " << Color::String(conf.MyColor()));
+            DEBUG(DBG_GAME, DBG_INFO, "select maps: " << conf.MapsFile() << ", difficulty: " << 
+		Difficulty::String(conf.GameDifficulty()) << ", select color: " << Color::String(conf.MyColor()));
             conf.FixKingdomRandomRace();
     	    Game::ShowLoadMapsText();
 	    cursor.Hide();

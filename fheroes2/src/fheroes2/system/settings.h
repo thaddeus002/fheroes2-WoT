@@ -54,17 +54,28 @@ enum
 {
     DBG_WARN	= 0x0001,
     DBG_INFO	= 0x0002,
-    DBG_TRACE	= 0x0004,
+    DBG_TRACE	= 0x0003,
 
-    DBG_ENGINE	= 0x0010,
-    DBG_GAME	= 0x0020,
-    DBG_BATTLE	= 0x0040,
-    DBG_AI	= 0x0080,
-    DBG_NETWORK	= 0x0100,
+    DBG_ENGINE	= 0x000C,
+    DBG_GAME	= 0x0030,
+    DBG_BATTLE	= 0x00C0,
+    DBG_AI	= 0x0300,
+    DBG_NETWORK	= 0x0C00,
+    DBG_OTHER	= 0x3000,
+    DBG_DEVEL	= 0xC000,
 
+    DBG_ENGINE_WARN = 0x0004,
+    DBG_GAME_WARN   = 0x0010,
+    DBG_BATTLE_WARN = 0x0040,
+    DBG_AI_WARN     = 0x0100,
+    DBG_NETWORK_WARN= 0x0400,
+    DBG_OTHER_WARN  = 0x1000,
 
-    DBG_DEVEL	= 0x8000
+    DBG_ALL = DBG_ENGINE | DBG_GAME | DBG_BATTLE | DBG_AI | DBG_NETWORK | DBG_OTHER,
+    DBG_ALL_WARN = DBG_ENGINE_WARN | DBG_GAME_WARN | DBG_BATTLE_WARN | DBG_AI_WARN | DBG_NETWORK_WARN | DBG_OTHER_WARN
 };
+
+const char* StringDebug(int);
 
 enum
 {
@@ -74,22 +85,28 @@ enum
     SCROLL_FAST2  = 32
 };
 
-#ifdef __SYMBIAN32__
-#define VERBOSE(x)
-#define VERBOSN(x)
-#define DEBUG(x, y, z)
+#if defined(__SYMBIAN32__)
+ #define VERBOSE(x)
+ #define VERBOSN(x)
+ #undef DEBUG
+ #define DEBUG(x, y, z)
 #elif defined(ANDROID)
-#define VERBOSE(x) { std::ostringstream osss; osss << x; __android_log_print(ANDROID_LOG_INFO, "FHeroes", "%s", osss.str().c_str()); }
-#define VERBOSN(x) { std::ostringstream osss; osss << x; __android_log_print(ANDROID_LOG_INFO, "FHeroes", "%s", osss.str().c_str()); }
-#define DEBUG(x, y, z) if(IS_DEBUG((x), (y))) VERBOSE(z)
+ #define VERBOSE(x) { std::ostringstream osss; osss << x; __android_log_print(ANDROID_LOG_INFO, "FHeroes", "%s", osss.str().c_str()); }
+ #define VERBOSN(x) { std::ostringstream osss; osss << x; __android_log_print(ANDROID_LOG_INFO, "FHeroes", "%s", osss.str().c_str()); }
 #else
-#define VERBOSE(x) std::cout << x << std::endl
-#define VERBOSN(x) std::cout << x
-#define DEBUG(x, y, z) if(IS_DEBUG((x), (y))) VERBOSE(z)
+ #define VERBOSE(x) std::cout << x << std::endl
+ #define VERBOSN(x) std::cout << x
 #endif
 
-#define IS_DEVEL() (DBG_DEVEL & Settings::Get().Debug())
-#define IS_DEBUG(x, y) (((x) & Settings::Get().Debug()) && ((0x000F & (y)) <= (0x000F & Settings::Get().Debug())))
+#ifdef WITH_DEBUG
+ #define DEBUG(x, y, z) if(IS_DEBUG(x, y)) VERBOSE(String::GetTime() << ": [" << StringDebug(x) << "]\t" << __FUNCTION__ << ":  " << z)
+#else
+ #define DEBUG(x, y, z)
+#endif
+
+#define IS_DEVEL() IS_DEBUG(DBG_DEVEL, DBG_TRACE)
+
+bool IS_DEBUG(int name, int level);
 
 class Settings
 {

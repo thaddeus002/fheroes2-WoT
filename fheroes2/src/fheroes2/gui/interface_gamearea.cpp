@@ -451,7 +451,7 @@ void Interface::GameArea::GenerateUltimateArtifactAreaSurface(const s32 index, S
 	gamearea.SetAreaPosition(origPosition.x, origPosition.y, origPosition.w, origPosition.h);
     }
     else
-    DEBUG(DBG_ENGINE , DBG_WARN, "Interface::GameArea::GenerateUltimateArtifactAreaSurface: artifact not found");
+    DEBUG(DBG_ENGINE, DBG_WARN, "artifact not found");
 }
 
 bool Interface::GameArea::NeedScroll(void) const

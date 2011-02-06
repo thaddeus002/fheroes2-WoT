@@ -66,7 +66,7 @@ const Surface & Portrait::Captain(const Race::race_t rc, const Portrait::size_t 
 	    break;
     }
 
-    DEBUG(DBG_GAME , DBG_WARN, "Portrait::Captain: unknown race.");
+    DEBUG(DBG_GAME, DBG_WARN, "unknown race");
 
     return AGG::GetICN(ICN::PORT0090, 0);
 }

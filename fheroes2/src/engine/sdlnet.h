@@ -101,6 +101,7 @@ public:
     void	Push(s16);
     void	Push(u32);
     void	Push(s32);
+    void	Push(bool);
     void	Push(const std::string &);
     void	Push(const char*);
 
@@ -110,6 +111,7 @@ public:
     bool	Pop(s16 &);
     bool	Pop(u32 &);
     bool	Pop(s32 &);
+    bool	Pop(bool &);
     bool	Pop(std::string &);
 
     void	SoftReset(void);

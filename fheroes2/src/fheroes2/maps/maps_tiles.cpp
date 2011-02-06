@@ -1347,7 +1347,7 @@ void Maps::Tiles::FixLoyaltyVersion(void)
 		}
 	    }
 
-	    DEBUG(DBG_GAME , DBG_WARN, "Maps::Tiles::FixLoyaltyVersion: index: " << maps_index);
+	    DEBUG(DBG_GAME, DBG_WARN, "index: " << maps_index);
 
 	} break;
 
@@ -1928,7 +1928,7 @@ void Maps::Tiles::UpdateRNDMonsterSprite(void)
     	    case MP2::OBJ_RNDMONSTER3:      addon->index = Monster::Rand(Monster::LEVEL3); break;
     	    case MP2::OBJ_RNDMONSTER4:      addon->index = Monster::Rand(Monster::LEVEL4); break;
 
-	    default: DEBUG(DBG_GAME , DBG_WARN, "Maps::Tiles::UpdateRNDMonsterSprite: " << "unknown object, index: " << maps_index); return;
+	    default: DEBUG(DBG_GAME, DBG_WARN, "unknown object" << ", index: " << maps_index); return;
 	}
 
 	// ICN::MONS32 start from PEASANT
@@ -1937,7 +1937,7 @@ void Maps::Tiles::UpdateRNDMonsterSprite(void)
 	mp2_object = MP2::OBJ_MONSTER;
     }
     else
-        DEBUG(DBG_GAME , DBG_WARN, "Maps::Tiles::UpdateRNDMonsterSprite: " << "FindRNDMonster return is NULL, index: " << maps_index);
+        DEBUG(DBG_GAME, DBG_WARN, "is NULL" << ", index: " << maps_index);
 }
 
 void Maps::Tiles::UpdateAbandoneMineSprite(void)

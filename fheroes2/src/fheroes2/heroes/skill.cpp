@@ -136,7 +136,7 @@ const skillstats_t* GetSkillStats(u8 race)
 	case Race::WZRD:	id = "wizard"; break;
 	case Race::NECR:	id = "necromancer"; break;
 	default:
-	    DEBUG(DBG_GAME, DBG_WARN, "GetSkillStats:: return is NULL"); break;
+	    DEBUG(DBG_GAME, DBG_WARN, "is NULL"); break;
     }
 
     const skillstats_t* ptr = &_skillstats[0];
@@ -309,7 +309,7 @@ Skill::Primary::skill_t Skill::Primary::FromLevelUp(const u8 race, const u8 leve
 	default: break;
     }
 
-    DEBUG(DBG_GAME , DBG_WARN, "Skill::Primary::LevelUp: unknown result.");
+    DEBUG(DBG_GAME, DBG_WARN, "unknown result");
     return UNKNOWN;
 }
 
@@ -517,7 +517,7 @@ u8 Skill::Secondary::GetIndexSprite2(const skill_t skill)
         default: break;
     }
 
-    DEBUG(DBG_GAME , DBG_WARN, "Skill::Secondary::GetIndexSprite2: unknown skill, index out of range");
+    DEBUG(DBG_GAME, DBG_WARN, "index out of range");
 
     return 0xff;
 }

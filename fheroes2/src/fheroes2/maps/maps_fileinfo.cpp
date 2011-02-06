@@ -92,7 +92,7 @@ bool Maps::FileInfo::ReadMP2(const std::string & filename)
 
     if(!fd.is_open())
     {
-	DEBUG(DBG_GAME , DBG_WARN, "Maps::FileInfo::ReadMP2: file not found " << filename);
+	DEBUG(DBG_GAME, DBG_WARN, "file not found " << filename);
 	return false;
     }
 
@@ -113,7 +113,7 @@ bool Maps::FileInfo::ReadMP2(const std::string & filename)
 
     if(byte32 != 0x0000005C)
     {
-	DEBUG(DBG_GAME , DBG_WARN, "Maps::FileInfo::ReadMP2: incorrect maps file " << filename);
+	DEBUG(DBG_GAME, DBG_WARN, "incorrect maps file " << filename);
 	fd.close();
 	return false;
     }
@@ -141,8 +141,8 @@ bool Maps::FileInfo::ReadMP2(const std::string & filename)
 	    break;
 
 	default:
-	    DEBUG(DBG_GAME , DBG_WARN, "Maps::FileInfo::ReadMP2: incorrect difficulty, maps: " << filename << ". Load EASY default.");
-	break;
+	    DEBUG(DBG_GAME, DBG_WARN, "incorrect difficulty" << ", maps: " << filename << ", load easy default");
+	    break;
     }
 
     // width

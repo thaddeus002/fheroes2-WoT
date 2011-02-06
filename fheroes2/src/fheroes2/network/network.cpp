@@ -167,7 +167,7 @@ int Network::RunDedicatedServer(void)
 
         if(! server.Bind(conf.GetPort()))
         {
-            DEBUG(DBG_NETWORK, DBG_WARN, "Network::RunDedicatedServer: " << Network::GetError());
+            DEBUG(DBG_NETWORK, DBG_WARN, Network::GetError());
             return -1;
         }
 
@@ -321,7 +321,7 @@ void Network::UnpackHero(QueueMessage & msg)
     if(hero)
 	Game::IO::UnpackHeroes(msg, *hero);
     else
-	DEBUG(DBG_NETWORK, DBG_WARN, "Network::UnpackHero: unknown hero id");
+	DEBUG(DBG_NETWORK, DBG_WARN, "unknown id");
 }
 
 void Network::PackTile(QueueMessage & msg, const Maps::Tiles & tile)
@@ -356,7 +356,7 @@ void Network::UnpackCastle(QueueMessage & msg)
     if(castle)
 	Game::IO::UnpackCastle(msg, *castle);
     else
-	DEBUG(DBG_NETWORK, DBG_WARN, "Network::UnpackCastle: unknown index id");
+	DEBUG(DBG_NETWORK, DBG_WARN, "unknown id");
 }
 
 #endif

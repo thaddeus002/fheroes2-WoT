@@ -542,7 +542,7 @@ Artifact::artifact_t Artifact::FromIndexSprite(u8 index)
     else
     if(0xAB == index) return Rand(ART_LEVEL3);
     else
-	DEBUG(DBG_GAME , DBG_WARN, "Artifact::FromIndexSprite: unknown: " << static_cast<int>(index));
+	DEBUG(DBG_GAME, DBG_WARN, "unknown index: " << static_cast<int>(index));
 
     return Artifact::UNKNOWN;
 }
@@ -672,7 +672,7 @@ u8 Artifact::IndexSprite(Artifact::artifact_t a)
 	default: break;
     }
 
-    DEBUG(DBG_GAME , DBG_WARN, "Artifact::IndexSprite: unknown:" <<  static_cast<int>(a));
+    DEBUG(DBG_GAME, DBG_WARN, "unknown index:" <<  static_cast<int>(a));
 
     // null sprite
     return 0;

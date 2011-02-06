@@ -352,18 +352,18 @@ void AIToHeroes(Heroes &hero, const u8 obj, const s32 dst_index)
     if(hero.GetColor() == other_hero->GetColor() ||
         (conf.ExtUnionsAllowHeroesMeetings() && conf.IsUnions(hero.GetColor(), other_hero->GetColor())))
     {
-        DEBUG(DBG_AI, DBG_INFO, "AIToHeroes: " << hero.GetName() << " meeting " << other_hero->GetName());
+        DEBUG(DBG_AI, DBG_INFO, hero.GetName() << " meeting " << other_hero->GetName());
         AIMeeting(hero, *other_hero);
     }
     else
     if(! hero.AllowBattle(true))
     {
-        DEBUG(DBG_AI, DBG_INFO, "AIToHeroes: " << hero.GetName() << " currently can not allow battle");
+        DEBUG(DBG_AI, DBG_INFO, hero.GetName() << " currently can not allow battle");
     }
     else
     if(! other_hero->AllowBattle(false))
     {
-        DEBUG(DBG_AI, DBG_INFO, "AIToHeroes: " << other_hero->GetName() << " currently can not allow battle");
+        DEBUG(DBG_AI, DBG_INFO, other_hero->GetName() << " currently can not allow battle");
     }
     else
     {
@@ -378,7 +378,7 @@ void AIToHeroes(Heroes &hero, const u8 obj, const s32 dst_index)
         }
 
 	bool disable_auto_move = hero.isShipMaster() || other_hero->isShipMaster() || other_hero->inCastle();
-        DEBUG(DBG_AI , DBG_INFO, "AIToHeroes: " << hero.GetName() << " attack enemy hero " << other_hero->GetName());
+        DEBUG(DBG_AI, DBG_INFO, hero.GetName() << " attack enemy hero " << other_hero->GetName());
 
             // new battle2
             Battle2::Result res = Battle2::Loader(hero.GetArmy(), other_hero->GetArmy(), dst_index);
@@ -421,13 +421,13 @@ void AIToCastle(Heroes &hero, const u8 obj, const s32 dst_index)
     if(hero.GetColor() == castle->GetColor() ||
 	(conf.ExtUnionsAllowCastleVisiting() && conf.IsUnions(hero.GetColor(), castle->GetColor())))
     {
-        DEBUG(DBG_AI , DBG_INFO, "AIToCastle: " << hero.GetName() << " goto castle " << castle->GetName());
+        DEBUG(DBG_AI, DBG_INFO, hero.GetName() << " goto castle " << castle->GetName());
 	castle->GetMageGuild().EducateHero(hero);
 	hero.SetVisited(dst_index);
     }
     else
     {
-        DEBUG(DBG_AI , DBG_INFO, "AIToCastle: " << hero.GetName() << " attack enemy castle " << castle->GetName());
+        DEBUG(DBG_AI, DBG_INFO, hero.GetName() << " attack enemy castle " << castle->GetName());
 
         CastleHeroes heroes = castle->GetHeroes();
 
@@ -513,7 +513,7 @@ void AIToMonster(Heroes &hero, const u8 obj, const s32 dst_index)
     	// join if ranged or flying monsters present
     	if(hero.GetArmy().HasMonster(troop()) || troop.isArchers() || troop.isFly())
     	{
-    	    DEBUG(DBG_AI , DBG_INFO, "AIToMonster: " << hero.GetName() << " join monster " << troop.GetName());
+    	    DEBUG(DBG_AI, DBG_INFO, hero.GetName() << " join monster " << troop.GetName());
     	    hero.GetArmy().JoinTroop(troop);
 	    destroy = true;
     	}
@@ -527,7 +527,7 @@ void AIToMonster(Heroes &hero, const u8 obj, const s32 dst_index)
     	// join if archers or fly or present
     	if(hero.GetArmy().HasMonster(troop()) || troop.isArchers() || troop.isFly())
     	{
-    	    DEBUG(DBG_AI , DBG_INFO, "AIToMonster: " << hero.GetName() << " join monster " << troop.GetName() << ", count: " << join << ", cost: " << cost.gold);
+    	    DEBUG(DBG_AI, DBG_INFO, hero.GetName() << " join monster " << troop.GetName() << ", count: " << join << ", cost: " << cost.gold);
     	    hero.GetArmy().JoinTroop(troop(), join);
 	    world.GetKingdom(hero.GetColor()).OddFundsResource(cost);
 	    destroy = true;
@@ -541,7 +541,7 @@ void AIToMonster(Heroes &hero, const u8 obj, const s32 dst_index)
     // fight
     if(0 == reason)
     {
-	DEBUG(DBG_AI , DBG_INFO, "AIToMonster: " << hero.GetName() << " attack monster " << troop.GetName());
+	DEBUG(DBG_AI, DBG_INFO, hero.GetName() << " attack monster " << troop.GetName());
 
 	Army::army_t army;
 	army.JoinTroop(troop);
@@ -630,7 +630,7 @@ void AIToPickupResource(Heroes &hero, const u8 obj, const s32 dst_index)
     hero.GetPath().Reset();
 
     tile.SetObject(MP2::OBJ_ZERO);
-    DEBUG(DBG_AI , DBG_INFO, "AIToPickupResource: " << hero.GetName() << " pickup small resource");
+    DEBUG(DBG_AI, DBG_INFO, hero.GetName() << " pickup small resource");
 }
 
 void AIToTreasureChest(Heroes &hero, const u8 obj, const s32 dst_index)
@@ -677,7 +677,7 @@ void AIToTreasureChest(Heroes &hero, const u8 obj, const s32 dst_index)
     tile.RemoveObjectSprite();
     tile.SetObject(MP2::OBJ_ZERO);
 
-    DEBUG(DBG_AI , DBG_INFO, "AIToTreasureChest: " << hero.GetName());
+    DEBUG(DBG_AI, DBG_INFO, hero.GetName());
 }
 
 void AIToResource(Heroes &hero, const u8 obj, const s32 dst_index)
@@ -705,7 +705,7 @@ void AIToResource(Heroes &hero, const u8 obj, const s32 dst_index)
     tile.SetQuantity1(0);
     tile.SetQuantity2(0);
 
-    DEBUG(DBG_AI , DBG_INFO, "AIToResource: " << hero.GetName());
+    DEBUG(DBG_AI, DBG_INFO, hero.GetName());
 }
 
 void AIToSkeleton(Heroes &hero, const u8 obj, const s32 dst_index)
@@ -724,7 +724,7 @@ void AIToSkeleton(Heroes &hero, const u8 obj, const s32 dst_index)
 	}
     }
 
-    DEBUG(DBG_AI , DBG_INFO, "AIToSkeleton: " << hero.GetName());
+    DEBUG(DBG_AI, DBG_INFO, hero.GetName());
 }
 
 void AIToWagon(Heroes &hero, const u8 obj, const s32 dst_index)
@@ -763,7 +763,7 @@ void AIToWagon(Heroes &hero, const u8 obj, const s32 dst_index)
 	tile.SetQuantity2(0);
     }
 
-    DEBUG(DBG_AI , DBG_INFO, "AIToWagon: " << hero.GetName());
+    DEBUG(DBG_AI, DBG_INFO, hero.GetName());
 }
 
 void AIToCaptureObject(Heroes &hero, const u8 obj, const s32 dst_index)
@@ -810,7 +810,7 @@ void AIToCaptureObject(Heroes &hero, const u8 obj, const s32 dst_index)
 	if(capture) world.CaptureObject(dst_index, hero.GetColor());
     }
 
-    DEBUG(DBG_AI , DBG_INFO, "AIToCaptureObject: " << hero.GetName() << " captured: " << MP2::StringObject(obj));
+    DEBUG(DBG_AI, DBG_INFO, hero.GetName() << " captured: " << MP2::StringObject(obj));
 }
 
 void AIToFlotSam(Heroes &hero, const u8 obj, const s32 dst_index)
@@ -826,20 +826,20 @@ void AIToFlotSam(Heroes &hero, const u8 obj, const s32 dst_index)
     tile.RemoveObjectSprite();
     tile.SetObject(MP2::OBJ_ZERO);
 
-    DEBUG(DBG_AI , DBG_INFO, "AIToFlotSam: " << hero.GetName());
+    DEBUG(DBG_AI, DBG_INFO, hero.GetName());
 }
 
 void AIToSign(Heroes &hero, const u8 obj, const s32 dst_index)
 {
     hero.SetVisited(dst_index, Visit::LOCAL);
-    DEBUG(DBG_AI , DBG_INFO, "AIToSign: " << hero.GetName());
+    DEBUG(DBG_AI, DBG_INFO, hero.GetName());
 }
 
 void AIToObservationTower(Heroes &hero, const u8 obj, const s32 dst_index)
 {
     Maps::ClearFog(dst_index, Game::GetViewDistance(Game::VIEW_OBSERVATION_TOWER), hero.GetColor());
     hero.SetVisited(dst_index, Visit::GLOBAL);
-    DEBUG(DBG_AI , DBG_INFO, "AIToObservationTower: " << hero.GetName());
+    DEBUG(DBG_AI, DBG_INFO, hero.GetName());
 }
 
 void AIToMagellanMaps(Heroes &hero, const u8 obj, const s32 dst_index)
@@ -850,7 +850,7 @@ void AIToMagellanMaps(Heroes &hero, const u8 obj, const s32 dst_index)
 	world.ActionForMagellanMaps(hero.GetColor());
     }
 
-    DEBUG(DBG_AI , DBG_INFO, "AIToMagellanMaps: " << hero.GetName());
+    DEBUG(DBG_AI, DBG_INFO, hero.GetName());
 }
 
 void AIToTeleports(Heroes &hero, const s32 index_from)
@@ -860,7 +860,7 @@ void AIToTeleports(Heroes &hero, const s32 index_from)
 
     if(index_from == index_to)
     {
-	DEBUG(DBG_AI , DBG_WARN, "AIToTeleports: action unsuccessfully...");
+	DEBUG(DBG_AI, DBG_WARN, "action unsuccessfully...");
 	return;
     }
 
@@ -869,7 +869,7 @@ void AIToTeleports(Heroes &hero, const s32 index_from)
     hero.GetPath().Reset();
     hero.ActionNewPosition();
 
-    DEBUG(DBG_AI , DBG_INFO, "AIToStoneLights: " << hero.GetName());
+    DEBUG(DBG_AI, DBG_INFO, hero.GetName());
 }
 
 void AIToWhirlpools(Heroes &hero, const s32 index_from)
@@ -879,7 +879,7 @@ void AIToWhirlpools(Heroes &hero, const s32 index_from)
 
     if(index_from == index_to)
     {
-	DEBUG(DBG_AI , DBG_WARN, "AIToWhirlpools: action unsuccessfully...");
+	DEBUG(DBG_AI, DBG_WARN, "action unsuccessfully...");
 	return;
     }
 
@@ -893,7 +893,7 @@ void AIToWhirlpools(Heroes &hero, const s32 index_from)
     hero.GetPath().Reset();
     hero.ActionNewPosition();
 
-    DEBUG(DBG_AI , DBG_INFO, "AIToWhirlpools: " << hero.GetName());
+    DEBUG(DBG_AI, DBG_INFO, hero.GetName());
 }
 
 void AIToPrimarySkillObject(Heroes &hero, const u8 obj, const s32 dst_index)
@@ -923,7 +923,7 @@ void AIToPrimarySkillObject(Heroes &hero, const u8 obj, const s32 dst_index)
 	hero.SetVisitedWideTile(dst_index, obj);
     }
 
-    DEBUG(DBG_AI , DBG_INFO, "AIToPrimarySkillObject: " << hero.GetName());
+    DEBUG(DBG_AI, DBG_INFO, hero.GetName());
 }
 
 void AIToExperienceObject(Heroes &hero, const u8 obj, const s32 dst_index)
@@ -945,7 +945,7 @@ void AIToExperienceObject(Heroes &hero, const u8 obj, const s32 dst_index)
 	hero.IncreaseExperience(exp);
     }
 
-    DEBUG(DBG_AI , DBG_INFO, "AIToExperienceObject: " << hero.GetName());
+    DEBUG(DBG_AI, DBG_INFO, hero.GetName());
 }
 
 void AIToWitchsHut(Heroes &hero, const u8 obj, const s32 dst_index)
@@ -957,7 +957,7 @@ void AIToWitchsHut(Heroes &hero, const u8 obj, const s32 dst_index)
 	hero.LearnBasicSkill(skill);
 
     hero.SetVisited(dst_index);
-    DEBUG(DBG_AI , DBG_INFO, "AIToWitchsHut: " << hero.GetName());
+    DEBUG(DBG_AI, DBG_INFO, hero.GetName());
 }
 
 void AIToShrine(Heroes &hero, const u8 obj, const s32 dst_index)
@@ -974,14 +974,14 @@ void AIToShrine(Heroes &hero, const u8 obj, const s32 dst_index)
 	hero.AppendSpellToBook(spell);
 	hero.SetVisited(dst_index);
     }
-    DEBUG(DBG_AI , DBG_INFO, "AIToShrine: " << hero.GetName());
+    DEBUG(DBG_AI, DBG_INFO, hero.GetName());
 }
 
 void AIToGoodLuckObject(Heroes &hero, const u8 obj, const s32 dst_index)
 {
     // check already visited
     if(!hero.isVisited(obj)) hero.SetVisited(dst_index);
-    DEBUG(DBG_AI , DBG_INFO, "AIToGoodLuckObject: " << hero.GetName());
+    DEBUG(DBG_AI, DBG_INFO, hero.GetName());
 }
 
 void AIToGoodMoraleObject(Heroes &hero, const u8 obj, const s32 dst_index)
@@ -1006,7 +1006,7 @@ void AIToGoodMoraleObject(Heroes &hero, const u8 obj, const s32 dst_index)
 	hero.SetVisitedWideTile(dst_index, obj);
     }
 
-    DEBUG(DBG_AI , DBG_INFO, "AIToGoodMoraleObject: " << hero.GetName());
+    DEBUG(DBG_AI, DBG_INFO, hero.GetName());
 }
 
 void AIToMagicWell(Heroes &hero, const u8 obj, const s32 dst_index)
@@ -1021,7 +1021,7 @@ void AIToMagicWell(Heroes &hero, const u8 obj, const s32 dst_index)
 	hero.SetSpellPoints(max);
     }
 
-    DEBUG(DBG_AI , DBG_INFO, "AIToMagicWell: " << hero.GetName());
+    DEBUG(DBG_AI, DBG_INFO, hero.GetName());
 }
 
 void AIToArtesianSpring(Heroes &hero, const u8 obj, const s32 dst_index)
@@ -1037,7 +1037,7 @@ void AIToArtesianSpring(Heroes &hero, const u8 obj, const s32 dst_index)
 	hero.SetVisitedWideTile(dst_index, obj);
     }
 
-    DEBUG(DBG_AI , DBG_INFO, "AIToArtesianSpring: " << hero.GetName());
+    DEBUG(DBG_AI, DBG_INFO, hero.GetName());
 }
 
 void AIToXanadu(Heroes &hero, const u8 obj, const s32 dst_index)
@@ -1059,7 +1059,7 @@ void AIToXanadu(Heroes &hero, const u8 obj, const s32 dst_index)
 	hero.SetVisited(dst_index);
     }
 
-    DEBUG(DBG_AI , DBG_INFO, "AIToXanadu: " << hero.GetName());
+    DEBUG(DBG_AI, DBG_INFO, hero.GetName());
 }
 
 void AIToEvent(Heroes &hero, const u8 obj, const s32 dst_index)
@@ -1076,7 +1076,7 @@ void AIToEvent(Heroes &hero, const u8 obj, const s32 dst_index)
 
     hero.SaveUnderObject(MP2::OBJ_ZERO);
 
-    DEBUG(DBG_AI , DBG_INFO, "AIToEvent: " << hero.GetName());
+    DEBUG(DBG_AI, DBG_INFO, hero.GetName());
 }
 
 void AIToUpgradeArmyObject(Heroes &hero, const u8 obj, const s32 dst_index)
@@ -1104,7 +1104,7 @@ void AIToUpgradeArmyObject(Heroes &hero, const u8 obj, const s32 dst_index)
 	default: break;
     }
 
-    DEBUG(DBG_AI , DBG_INFO, "AIToUpgradeArmyObject: " << hero.GetName());
+    DEBUG(DBG_AI, DBG_INFO, hero.GetName());
 }
 
 void AIToPoorMoraleObject(Heroes &hero, const u8 obj, const s32 dst_index)
@@ -1155,7 +1155,7 @@ void AIToPoorMoraleObject(Heroes &hero, const u8 obj, const s32 dst_index)
             	    case 15: resource.gold = 2000; break;
             	    case 25: resource.gold = 5000; break;
             	    case 50: resource.gold = 2000; art = Artifact::FromInt(tile.GetQuantity1()); break;
-            	    default: DEBUG(DBG_AI , DBG_WARN, "ActionToPoorMoraleObject: unknown variant for ShipWreck, index: " << dst_index); break;
+            	    default: DEBUG(DBG_AI, DBG_WARN, "unknown variant:" << static_cast<int>(tile.GetQuantity2()) << ", index: " << dst_index); break;
                 }
 
     		    // new battle2
@@ -1214,7 +1214,7 @@ void AIToPoorMoraleObject(Heroes &hero, const u8 obj, const s32 dst_index)
 	hero.SetVisited(dst_index);
     }
 
-    DEBUG(DBG_AI , DBG_INFO, "AIToPoorMoraleObject: " << hero.GetName());
+    DEBUG(DBG_AI, DBG_INFO, hero.GetName());
 }
 
 void AIToPoorLuckObject(Heroes &hero, const u8 obj, const s32 dst_index)
@@ -1270,7 +1270,7 @@ void AIToPoorLuckObject(Heroes &hero, const u8 obj, const s32 dst_index)
         hero.SetVisited(dst_index);
     }
 
-    DEBUG(DBG_AI , DBG_INFO, "AIToPoorLuckObject: " << hero.GetName());
+    DEBUG(DBG_AI, DBG_INFO, hero.GetName());
 }
 
 void AIToObelisk(Heroes &hero, const u8 obj, const s32 dst_index)
@@ -1282,7 +1282,7 @@ void AIToObelisk(Heroes &hero, const u8 obj, const s32 dst_index)
         kingdom.PuzzleMaps().Update(kingdom.CountVisitedObjects(MP2::OBJ_OBELISK), world.CountObeliskOnMaps());
     }
 
-    DEBUG(DBG_AI , DBG_INFO, "AIToObelisk: " << hero.GetName());
+    DEBUG(DBG_AI, DBG_INFO, hero.GetName());
 }
 
 void AIToTreeKnowledge(Heroes &hero, const u8 obj, const s32 dst_index)
@@ -1307,7 +1307,7 @@ void AIToTreeKnowledge(Heroes &hero, const u8 obj, const s32 dst_index)
 	}
     }
 
-    DEBUG(DBG_AI , DBG_INFO, "AIToTreeKnowledge: " << hero.GetName());
+    DEBUG(DBG_AI, DBG_INFO, hero.GetName());
 }
 
 
@@ -1346,7 +1346,7 @@ void AIToDaemonCave(Heroes &hero, const u8 obj, const s32 dst_index)
 	}
     }
 
-    DEBUG(DBG_AI , DBG_INFO, "AIToDaemonCave: " << hero.GetName());
+    DEBUG(DBG_AI, DBG_INFO, hero.GetName());
 }
 
 void AIToDwellingJoinMonster(Heroes &hero, const u8 obj, const s32 dst_index)
@@ -1356,7 +1356,7 @@ void AIToDwellingJoinMonster(Heroes &hero, const u8 obj, const s32 dst_index)
 
     if(count && hero.GetArmy().JoinTroop(Monster(Monster::FromObject(obj)), count)) tile.SetCountMonster(0);
 
-    DEBUG(DBG_AI , DBG_INFO, "AIToDwellingJoinMonster: " << hero.GetName());
+    DEBUG(DBG_AI, DBG_INFO, hero.GetName());
 }
 
 void AIToDwellingRecruitMonster(Heroes &hero, const u8 obj, const s32 dst_index)
@@ -1385,7 +1385,7 @@ void AIToDwellingRecruitMonster(Heroes &hero, const u8 obj, const s32 dst_index)
 	}
     }
 
-    DEBUG(DBG_AI , DBG_INFO, "AIToDwellingJoinMonster: " << hero.GetName());
+    DEBUG(DBG_AI, DBG_INFO, hero.GetName());
 }
 
 void AIToStables(Heroes &hero, const u8 obj, const s32 dst_index)
@@ -1399,7 +1399,7 @@ void AIToStables(Heroes &hero, const u8 obj, const s32 dst_index)
 
     if(hero.GetArmy().HasMonster(Monster::CAVALRY)) hero.GetArmy().UpgradeMonsters(Monster::CAVALRY);
                                                                 
-    DEBUG(DBG_AI , DBG_INFO, "AIToStables: " << hero.GetName());
+    DEBUG(DBG_AI, DBG_INFO, hero.GetName());
 }
 
 void AIToAbandoneMine(Heroes &hero, const u8 obj, const s32 dst_index)
@@ -1425,7 +1425,7 @@ void AIToAbandoneMine(Heroes &hero, const u8 obj, const s32 dst_index)
 	    AIBattleLose(hero, res, true);
 	}
 
-    DEBUG(DBG_AI , DBG_INFO, "AIToAbandoneMine: " << hero.GetName());
+    DEBUG(DBG_AI, DBG_INFO, hero.GetName());
 }
 
 void AIToBarrier(Heroes &hero, const u8 obj, const s32 dst_index)
@@ -1439,7 +1439,7 @@ void AIToBarrier(Heroes &hero, const u8 obj, const s32 dst_index)
         tile.SetObject(MP2::OBJ_ZERO);
     }
 
-    DEBUG(DBG_AI , DBG_INFO, "AIToBarrier: " << hero.GetName());
+    DEBUG(DBG_AI, DBG_INFO, hero.GetName());
 }
 
 void AIToTravellersTent(Heroes &hero, const u8 obj, const s32 dst_index)
@@ -1449,7 +1449,7 @@ void AIToTravellersTent(Heroes &hero, const u8 obj, const s32 dst_index)
 
     kingdom.SetVisitTravelersTent(tile.GetQuantity1());
 
-    DEBUG(DBG_AI , DBG_INFO, "AIToTravellersTent: " << hero.GetName());
+    DEBUG(DBG_AI, DBG_INFO, hero.GetName());
 }
 
 void AIToShipwreckSurvivor(Heroes &hero, const u8 obj, const s32 dst_index)
@@ -1467,7 +1467,7 @@ void AIToShipwreckSurvivor(Heroes &hero, const u8 obj, const s32 dst_index)
     tile.SetQuantity1(0);
     tile.SetObject(MP2::OBJ_ZERO);
 
-    DEBUG(DBG_AI , DBG_INFO, "AIToShipwreckSurvivor: " << hero.GetName());
+    DEBUG(DBG_AI, DBG_INFO, hero.GetName());
 }
 
 void AIToArtifact(Heroes &hero, const u8 obj, const s32 dst_index)
@@ -1561,7 +1561,7 @@ void AIToArtifact(Heroes &hero, const u8 obj, const s32 dst_index)
 	tile.ResetQuantity();
     }
 
-    DEBUG(DBG_AI , DBG_INFO, "AIToArtifact: " << hero.GetName());
+    DEBUG(DBG_AI, DBG_INFO, hero.GetName());
 }
 
 void AIToBoat(Heroes &hero, const u8 obj, const s32 dst_index)
@@ -1586,7 +1586,7 @@ void AIToBoat(Heroes &hero, const u8 obj, const s32 dst_index)
     hero.GetPath().Reset();
     hero.ActionNewPosition();
 
-    DEBUG(DBG_AI, DBG_INFO, "AIToBoat: " << hero.GetName());
+    DEBUG(DBG_AI, DBG_INFO, hero.GetName());
 }
 
 void AIToCoast(Heroes &hero, const u8 obj, const s32 dst_index)
@@ -1602,7 +1602,7 @@ void AIToCoast(Heroes &hero, const u8 obj, const s32 dst_index)
     hero.GetPath().Reset();
     hero.ActionNewPosition();
 
-    DEBUG(DBG_AI, DBG_INFO, "AIToCoast: " << hero.GetName());
+    DEBUG(DBG_AI, DBG_INFO, hero.GetName());
 }
 
 void AIMeeting(Heroes & hero1, Heroes & hero2)
@@ -2123,7 +2123,7 @@ void AIHeroesAddedRescueTask(Heroes & hero)
         	{
             	    task.push_back(res);
 
-		    DEBUG(DBG_AI , DBG_INFO, "Heroes::AIRescueMove: " << Color::String(hero.GetColor()) <<
+		    DEBUG(DBG_AI, DBG_INFO, Color::String(hero.GetColor()) <<
                 	", hero: " << hero.GetName() << ", added task: " << res);
 
             	    return;
@@ -2150,7 +2150,7 @@ void AIHeroesAddedTask(Heroes & hero)
     IndexObjectMap & ai_objects = ai_kingdom.scans;
 
 
-    DEBUG(DBG_AI , DBG_INFO, "Kingdom::AIHeroesTask: " << Color::String(hero.GetColor()) <<
+    DEBUG(DBG_AI, DBG_INFO, Color::String(hero.GetColor()) <<
 		    ", hero: " << hero.GetName() << ", task prepare");
 
     // load minimal distance tasks
@@ -2204,7 +2204,7 @@ void AIHeroesAddedTask(Heroes & hero)
 		if(skip) continue;
 	    }
 
-	    DEBUG(DBG_AI , DBG_INFO, "Kingdom::AIHeroesTask: " << Color::String(hero.GetColor()) <<
+	    DEBUG(DBG_AI, DBG_INFO, Color::String(hero.GetColor()) <<
 		    ", hero: " << hero.GetName() << ", added tasks: " << 
 		    MP2::StringObject(ai_objects[(*it).first]) << ", index: " << (*it).first <<
 		    ", distance: " << (*it).second);
@@ -2214,7 +2214,7 @@ void AIHeroesAddedTask(Heroes & hero)
 	}
 	else
 	{
-	    DEBUG(DBG_AI , DBG_TRACE, "Kingdom::AIHeroesTask: " << Color::String(hero.GetColor()) <<
+	    DEBUG(DBG_AI, DBG_TRACE, Color::String(hero.GetColor()) <<
 		    ", hero: " << hero.GetName() << (!AIHeroesValidObject(hero, (*it).first) ? ", invalid: " : ", impossible: ") << 
 		    MP2::StringObject(ai_objects[(*it).first]) << ", index: " << (*it).first <<
 		    ", distance: " << (*it).second);
@@ -2296,7 +2296,7 @@ void AIHeroesGetTask(Heroes & hero)
 	    {
 		ai_objects.erase(*it);
 
-		DEBUG(DBG_AI , DBG_INFO, "AI::HeroesTask: " << Color::String(hero.GetColor()) <<
+		DEBUG(DBG_AI, DBG_INFO, Color::String(hero.GetColor()) <<
 			", Patrol " << hero.GetName() << ": find object: " <<
 			MP2::StringObject(world.GetTiles(*it).GetObject()) << "(" << *it << ")");
 		return;
@@ -2316,7 +2316,7 @@ void AIHeroesGetTask(Heroes & hero)
 		    if(world.GetTiles(*it).isPassable(&hero, Direction::UNKNOWN, true) &&
 			hero.GetPath().Calculate(*it))
 		{
-		    DEBUG(DBG_AI , DBG_INFO, "AI::HeroesTask: " << Color::String(hero.GetColor()) <<
+		    DEBUG(DBG_AI, Color::String(hero.GetColor()) <<
 			", Patrol " << hero.GetName() << ": move: " << *it);
 		    return;
 		}
@@ -2330,7 +2330,7 @@ void AIHeroesGetTask(Heroes & hero)
 
     if(ai_hero.fix_loop > 3)
     {
-	DEBUG(DBG_AI , DBG_TRACE, "AI::HeroesTask: " << Color::String(hero.GetColor()) <<
+	DEBUG(DBG_AI, DBG_TRACE, Color::String(hero.GetColor()) <<
 	    ", Hero " << hero.GetName() << ": loop");
 	hero.SetModes(hero.Modes(Heroes::AIWAITING) ? Heroes::STUPID : Heroes::AIWAITING);
 	return;
@@ -2351,7 +2351,7 @@ void AIHeroesGetTask(Heroes & hero)
 	if(ai_hero.primary_target != hero.GetPath().GetDestinationIndex() &&
 	    !hero.GetPath().Calculate(ai_hero.primary_target))
 	{
-	    DEBUG(DBG_AI , DBG_INFO, "AI::HeroesTask: " << Color::String(hero.GetColor()) <<
+	    DEBUG(DBG_AI, DBG_INFO, Color::String(hero.GetColor()) <<
 	    ", Hero " << hero.GetName() << ": path unknown, primary target reset");
 
 	    ai_hero.primary_target = -1;
@@ -2371,7 +2371,7 @@ void AIHeroesGetTask(Heroes & hero)
 		if(AIHeroesPriorityObject(hero, *it) &&
 		    hero.GetPath().Calculate(*it))
 	    {
-		DEBUG(DBG_AI , DBG_INFO, "AI::HeroesTask: " << Color::String(hero.GetColor()) <<
+		DEBUG(DBG_AI, DBG_INFO, Color::String(hero.GetColor()) <<
 		", Hero " << hero.GetName() << ": set primary target: " <<
 		MP2::StringObject(world.GetTiles(*it).GetObject()) << "(" << *it << ")");
 
@@ -2388,7 +2388,7 @@ void AIHeroesGetTask(Heroes & hero)
 	else
 	if(hero.GetPath().size() < 5)
 	{
-	    DEBUG(DBG_AI , DBG_INFO, "AI::HeroesTask: " << Color::String(hero.GetColor()) <<
+	    DEBUG(DBG_AI, DBG_INFO, Color::String(hero.GetColor()) <<
 		", Hero " << hero.GetName() << ": continue" << " short");
 	    ai_hero.fix_loop++;
 	    return;
@@ -2409,7 +2409,7 @@ void AIHeroesGetTask(Heroes & hero)
 	    {
 		ai_objects.erase(*it);
 
-		DEBUG(DBG_AI , DBG_INFO, "AI::HeroesTask: " << Color::String(hero.GetColor()) <<
+		DEBUG(DBG_AI, DBG_INFO, Color::String(hero.GetColor()) <<
 		", Hero " << hero.GetName() << ": find object: " <<
 		MP2::StringObject(world.GetTiles(*it).GetObject()) << "(" << *it << ")");
 
@@ -2419,7 +2419,7 @@ void AIHeroesGetTask(Heroes & hero)
 
     if(hero.GetPath().isValid())
     {
-	DEBUG(DBG_AI , DBG_INFO, "AI::HeroesTask: " << Color::String(hero.GetColor()) <<
+	DEBUG(DBG_AI, DBG_INFO, Color::String(hero.GetColor()) <<
 		", Hero " << hero.GetName() << ": continue");
         ai_hero.fix_loop++;
 	return;
@@ -2448,7 +2448,7 @@ void AIHeroesGetTask(Heroes & hero)
 
 	if(hero.GetPath().Calculate(index)) break;
 
-	DEBUG(DBG_AI , DBG_INFO, "AI::HeroesTask: " << Color::String(hero.GetColor()) <<
+	DEBUG(DBG_AI, DBG_INFO, Color::String(hero.GetColor()) <<
 	", Hero " << hero.GetName() << " say: unable get object: " <<
 	MP2::StringObject(world.GetTiles(index).GetObject()) << ", index: " <<
 	index << ", remove task...");
@@ -2461,7 +2461,7 @@ void AIHeroesGetTask(Heroes & hero)
     {
 	const s32 & index = task.front();
 
-	DEBUG(DBG_AI , DBG_INFO, "AI::HeroesTask: " << Color::String(hero.GetColor()) <<
+	DEBUG(DBG_AI, DBG_INFO, Color::String(hero.GetColor()) <<
 	", Hero " << hero.GetName() << " say: go to object: " <<
 	MP2::StringObject(world.GetTiles(index).GetObject()) << ", index: " << index);
 
@@ -2474,7 +2474,7 @@ void AIHeroesGetTask(Heroes & hero)
     if(hero.Modes(Heroes::AIWAITING))
     {
 	hero.GetPath().Reset();
-	DEBUG(DBG_AI , DBG_INFO, "AI::HeroesTask: " << Color::String(hero.GetColor()) <<
+	DEBUG(DBG_AI, DBG_INFO, Color::String(hero.GetColor()) <<
 	", Hero " << hero.GetName() << " say: unknown task., help my please..");
 
 	hero.ResetModes(Heroes::AIWAITING);
@@ -2482,7 +2482,7 @@ void AIHeroesGetTask(Heroes & hero)
     }
     else
     {
-	DEBUG(DBG_AI , DBG_INFO, "AI::HeroesTask: " << Color::String(hero.GetColor()) <<
+	DEBUG(DBG_AI, DBG_INFO, Color::String(hero.GetColor()) <<
 	", Hero " << hero.GetName() << " say: waiting...");
 
 	hero.SetModes(Heroes::AIWAITING);
@@ -2566,7 +2566,7 @@ void AIHeroesTurn(Heroes* hero)
 {
     if(hero)
     {
-	DEBUG(DBG_AI, DBG_TRACE, "AIHeroesTurn: " << hero->GetName());
+	DEBUG(DBG_AI, DBG_TRACE, hero->GetName());
 
 	Interface::StatusWindow *status = Interface::NoGUI() ? NULL : &Interface::StatusWindow::Get();
 
@@ -2640,7 +2640,7 @@ void AIHeroesEnd(Heroes* hero)
 	while(ai_objects.end() != (it = std::find_if(ai_objects.begin(), ai_objects.end(),
 		    std::bind2nd(std::ptr_fun(&IsPriorityAndNotVisitAndNotPresent), hero))))
 	{
-	    DEBUG(DBG_AI, DBG_TRACE, "AIHeroesEnd: " << hero->GetName() << ", added priority object: " << MP2::StringObject((*it).second));
+	    DEBUG(DBG_AI, DBG_TRACE, hero->GetName() << ", added priority object: " << MP2::StringObject((*it).second));
 	    task.push_front((*it).first);
 	    ai_objects.erase((*it).first);
 	}
@@ -2676,7 +2676,7 @@ void AIHeroesCaptureNearestTown(Heroes* hero)
 
 	    if(world.GetObjectPositions(hero->GetIndex(), MP2::OBJ_CASTLE, pos_castles, false))
 	    {
-		DEBUG(DBG_AI, DBG_TRACE, "AIHeroesCaptureNearestTown: " << hero->GetName());
+		DEBUG(DBG_AI, DBG_TRACE, hero->GetName());
 
     		std::sort(pos_castles.begin(), pos_castles.end(), IndexDistance::Shortest);
 
@@ -2687,14 +2687,14 @@ void AIHeroesCaptureNearestTown(Heroes* hero)
 		    const Castle* castle = world.GetCastle(id.first);
 
 		    if(castle)
-		    DEBUG(DBG_AI, DBG_TRACE, "AIHeroesCaptureNearestTown: " << hero->GetName() << ", to castle: " << castle->GetName());
+		    DEBUG(DBG_AI, DBG_TRACE, hero->GetName() << ", to castle: " << castle->GetName());
 
 		    if(castle &&
 			hero->GetArmy().StrongerEnemyArmy(castle->GetArmy()))
 		    {
 			ai_hero.primary_target = id.first;
 
-			DEBUG(DBG_AI , DBG_INFO, "AI::HeroesCaptureNearestTown: " << Color::String(hero->GetColor()) <<
+			DEBUG(DBG_AI, DBG_INFO, Color::String(hero->GetColor()) <<
 			    ", Hero " << hero->GetName() << " set primary target: " << id.first);
 			break;
 		    }

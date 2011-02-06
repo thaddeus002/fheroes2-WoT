@@ -38,7 +38,7 @@ Resource::funds_t::funds_t(u8 rs, u32 count) : wood(0), mercury(0), ore(0), sulf
 	case CRYSTAL:	crystal = count;break;
 	case GOLD:	gold = count;	break;
 
-	default:	DEBUG(DBG_GAME , DBG_WARN, "Resource::funds_t::funds_t: unknown resource"); break;
+	default:	DEBUG(DBG_GAME, DBG_WARN, "unknown resource"); break;
     }
 }
 
@@ -212,6 +212,19 @@ bool Resource::funds_t::operator>= (const funds_t & pm) const
                 gold >= pm.gold;
 }
 
+std::string Resource::funds_t::Dump(void) const
+{
+    std::ostringstream os;
+    os << "ore: " << ore <<
+	", wood: " << wood <<
+	", mercury: " << mercury <<
+	", sulfur: " << sulfur <<
+	", crystal: " << crystal <<
+	", gems: " << gems <<
+	", gold: " << gold;
+    return os.str();
+}
+
 /* name resource */
 const char* Resource::String(u8 resource)
 {
@@ -243,7 +256,7 @@ u8 Resource::GetIndexSprite(u8 resource)
         case Resource::GEMS:	return  11;
 	case Resource::GOLD:	return  13;
         default: 
-	    DEBUG(DBG_GAME , DBG_WARN, "Resource::GetIndexSprite: unknown resource");
+	    DEBUG(DBG_GAME, DBG_WARN, "unknown resource");
     }
 
     return 0;
@@ -261,7 +274,7 @@ u8 Resource::GetIndexSprite2(u8 resource)
         case Resource::GEMS:	return  5;
 	case Resource::GOLD:	return  6;
         default: 
-	    DEBUG(DBG_GAME , DBG_WARN, "Resource::GetIndexSprite2: unknown resource");
+	    DEBUG(DBG_GAME, DBG_WARN, "unknown resource");
     }
 
     return 0;

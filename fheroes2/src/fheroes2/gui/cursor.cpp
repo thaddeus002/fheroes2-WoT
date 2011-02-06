@@ -55,17 +55,17 @@ bool Cursor::SetThemes(u16 name, bool force)
 	{
 	    case 0x3000:
             SetSprite(AGG::GetICN(ICN::SPELCO, 0xFF & name));
-		DEBUG(DBG_ENGINE , DBG_TRACE, "Cursor::Set: SPELCO.ICN, " << static_cast<int>(0xFF & name));
+		DEBUG(DBG_ENGINE, DBG_TRACE, ICN::GetString(ICN::SPELCO) << ", " << static_cast<int>(0xFF & name));
 		break;
 	    
 	    case 0x2000:
             SetSprite(AGG::GetICN(ICN::CMSECO, 0xFF & name));
-		DEBUG(DBG_ENGINE , DBG_TRACE, "Cursor::Set: CMSECO.ICN, " << static_cast<int>(0xFF & name));
+		DEBUG(DBG_ENGINE , DBG_TRACE, ICN::GetString(ICN::CMSECO) << ", " << static_cast<int>(0xFF & name));
 		break;
 	    
 	    case 0x1000:
             SetSprite(AGG::GetICN(ICN::ADVMCO, 0xFF & name));
-		DEBUG(DBG_ENGINE , DBG_TRACE, "Cursor::Set: ADVMCO.ICN, " << static_cast<int>(0xFF & name));
+		DEBUG(DBG_ENGINE , DBG_TRACE, ICN::GetString(ICN::ADVMCO) << ", " << static_cast<int>(0xFF & name));
 		break;
 
 	    default:

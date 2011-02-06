@@ -279,7 +279,7 @@ void Castle::LoadFromMP2(const void *ptr)
     }
 
     // end
-    DEBUG(DBG_GAME , DBG_INFO, "Castle::LoadFromMP2: " << (building & BUILD_CASTLE ? "castle" : "town") << ": " << name << ", color: " << Color::String(color) << ", race: " << Race::String(race));
+    DEBUG(DBG_GAME , DBG_INFO, (building & BUILD_CASTLE ? "castle" : "town") << ": " << name << ", color: " << Color::String(color) << ", race: " << Race::String(race));
 }
 
 u32 Castle::CountBuildings(void) const
@@ -587,7 +587,7 @@ Heroes* Castle::RecruitHero(Heroes* hero)
     // update spell book
     if(GetLevelMageGuild()) mageguild.EducateHero(*hero);
 
-    DEBUG(DBG_GAME , DBG_INFO, "Castle::RecruitHero: " << name << ", recruit: " << hero->GetName());
+    DEBUG(DBG_GAME , DBG_INFO, name << ", recruit: " << hero->GetName());
 
 #ifdef WITH_NET
     FH2LocalClient::SendCastleRecruitHero(*this, *hero);
@@ -628,7 +628,7 @@ bool Castle::RecruitMonster(u32 dw, u16 count)
     kingdom.OddFundsResource(paymentCosts);
     dwelling[dw_index] -= count;
 
-    DEBUG(DBG_GAME , DBG_INFO, "Castle::RecruitMonster: " << name);
+    DEBUG(DBG_GAME , DBG_INFO, name);
 
 #ifdef WITH_NET
     FH2LocalClient::SendCastleRecruitMonster(*this, dw, count);
@@ -1078,7 +1078,7 @@ bool Castle::BuyBuilding(u32 build)
     // disable day build
     ResetModes(ALLOWBUILD);
 
-    DEBUG(DBG_GAME , DBG_INFO, "Castle::BuyBuilding: " << name << " build " << GetStringBuilding(build, race));
+    DEBUG(DBG_GAME , DBG_INFO, name << " build " << GetStringBuilding(build, race));
     return true;
 }
 
@@ -1174,7 +1174,7 @@ ICN::icn_t Castle::GetICNBoat(const Race::race_t & race)
 	default: break;
     }
 
-    DEBUG(DBG_GAME , DBG_WARN, "Castle::GetICNBoat: return unknown");
+    DEBUG(DBG_GAME , DBG_WARN, "return unknown");
     return ICN::UNKNOWN;
 }
 
@@ -1401,7 +1401,7 @@ ICN::icn_t Castle::GetICNBuilding(u32 build, Race::race_t race)
 	}
     }
 
-    DEBUG(DBG_GAME, DBG_WARN, "Castle::GetICNBuilding: return unknown, race: " <<
+    DEBUG(DBG_GAME, DBG_WARN, "return unknown" << ", race: " <<
 		Race::String(race) << ", build: " << Castle::GetStringBuilding(build, race) << ", " << build);
 
     return ICN::UNKNOWN;

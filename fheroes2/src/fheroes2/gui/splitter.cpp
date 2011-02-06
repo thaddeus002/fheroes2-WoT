@@ -74,7 +74,7 @@ void Splitter::Move(u16 pos)
 {
     if(pos && cur == pos) return;
 
-    if(pos > max || pos < min){ DEBUG(DBG_ENGINE , DBG_WARN, "Splitter::Move: out of range. min: " << min << ", max: " << max << ", cur: " << cur << ", step: " << step); return; }
+    if(pos > max || pos < min){ DEBUG(DBG_ENGINE, DBG_WARN, "out of range" << ", min: " << min << ", max: " << max << ", cur: " << cur << ", step: " << step); return; }
 
     Point pt(GetRect().x, GetRect().y);
 

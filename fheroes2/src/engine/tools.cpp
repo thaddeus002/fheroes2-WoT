@@ -303,6 +303,20 @@ void String::AppendKey(std::string & res, KeySym sym, u16 mod)
     }
 }
 
+std::string String::GetTime(void)
+{
+    time_t raw;
+    struct tm* tmi;
+    char buf [10] = { 0 };
+
+    std::time(&raw);
+    tmi = std::localtime(&raw);
+
+    std::strftime(buf, sizeof(buf) - 1, "%X", tmi);
+
+    return std::string(buf);
+}
+
 int Sign(int s)
 {
     return (s < 0 ? -1 : (s > 0 ? 1 : 0));
@@ -474,7 +488,7 @@ bool FilePresent(const std::string & file)
     return false;
 }
 
-bool StoreMemToFile(const std::vector<u8> & data, const std::string & file)
+bool SaveMemToFile(const std::vector<u8> & data, const std::string & file)
 {
     std::ofstream fs;
     fs.open(file.c_str(), std::ios::binary);
@@ -487,7 +501,7 @@ bool StoreMemToFile(const std::vector<u8> & data, const std::string & file)
     return false;
 }
 
-bool StoreFileToMem(std::vector<u8> & data, const std::string & file)
+bool LoadFileToMem(std::vector<u8> & data, const std::string & file)
 {
     std::ifstream fs;
     fs.open(file.c_str(), std::ios::binary);

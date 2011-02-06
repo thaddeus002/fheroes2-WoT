@@ -195,7 +195,7 @@ void AI::BattleTurn(Arena & arena, const Stats & b, Actions & a)
     else
     if(IS_DEBUG(DBG_BATTLE, DBG_TRACE))
     {
-	VERBOSE("AI::BattleTurn: " << "enemy is NULL");
+	DEBUG(DBG_BATTLE, DBG_TRACE, "is NULL");
 	arena.DumpBoard();
     }
 

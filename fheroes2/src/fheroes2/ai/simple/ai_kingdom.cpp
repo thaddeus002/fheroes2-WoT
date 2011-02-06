@@ -74,7 +74,7 @@ void IndexObjectMap::DumpObjects(const IndexDistance & id)
     IndexObjectMap::const_iterator it = find(id.first);
 
     if(it != end())
-    DEBUG(DBG_AI , DBG_TRACE, "IndexObjectMap::DumpObjects: " << MP2::StringObject((*it).second) \
+    DEBUG(DBG_AI, DBG_TRACE, MP2::StringObject((*it).second) \
 			<< ", maps index: " << id.first << ", dist: " << id.second);
 }
 
@@ -140,7 +140,7 @@ void AI::KingdomTurn(Kingdom & kingdom)
     // scan map
     ai.scans.clear();
     WorldStoreObjects(color, ai.scans);
-    DEBUG(DBG_AI , DBG_INFO, "AI::Turns: " << Color::String(color) << ", size cache objects: " << ai.scans.size());
+    DEBUG(DBG_AI, DBG_INFO, Color::String(color) << ", size cache objects: " << ai.scans.size());
 
     // set capital
     if(NULL == ai.capital && castles.size())
@@ -298,5 +298,5 @@ void AI::KingdomTurn(Kingdom & kingdom)
     // turn indicator
     if(status) status->RedrawTurnProgress(9);
 
-    DEBUG(DBG_AI , DBG_INFO, "Kingdom::AITurns: " << Color::String(color) << " moved");
+    DEBUG(DBG_AI, DBG_INFO, Color::String(color) << " moved");
 }

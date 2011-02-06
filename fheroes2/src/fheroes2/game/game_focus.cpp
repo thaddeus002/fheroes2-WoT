@@ -157,28 +157,28 @@ Game::Focus::focus_t Game::Focus::Type(void) const
 
 const Castle & Game::Focus::GetCastle(void) const
 {
-    if(NULL == castle) DEBUG(DBG_GAME , DBG_WARN, "Game::Focus::GetCastle: is NULL");
+    if(NULL == castle) DEBUG(DBG_GAME, DBG_WARN, "is NULL");
 
     return *castle;
 }
 
 Castle & Game::Focus::GetCastle(void)
 {
-    if(NULL == castle) DEBUG(DBG_GAME , DBG_WARN, "Game::Focus::GetCastle: is NULL");
+    if(NULL == castle) DEBUG(DBG_GAME, DBG_WARN, "is NULL");
 
     return *castle;
 }
 
 const Heroes & Game::Focus::GetHeroes(void) const
 {
-    if(NULL == heroes) DEBUG(DBG_GAME , DBG_WARN, "Game::Focus::GetHeroes: is NULL");
+    if(NULL == heroes) DEBUG(DBG_GAME, DBG_WARN, "is NULL");
 
     return *heroes;
 }
 
 Heroes & Game::Focus::GetHeroes(void)
 {
-    if(NULL == heroes) DEBUG(DBG_GAME , DBG_WARN, "Game::Focus::GetHeroes: is NULL");
+    if(NULL == heroes) DEBUG(DBG_GAME, DBG_WARN, "is NULL");
 
     return *heroes;
 }

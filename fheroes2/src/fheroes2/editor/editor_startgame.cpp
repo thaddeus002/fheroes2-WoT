@@ -398,7 +398,7 @@ Game::menu_t Game::Editor::StartGame()
 		btnSelectGround.Draw();
 
 		display.Blit(spritePanelGround, dstPanel);
-		DEBUG(DBG_GAME , DBG_INFO, "Game::Editor::StartGame: select Terrain Mode");
+		DEBUG(DBG_GAME, DBG_INFO, "select Terrain Mode");
 		selectTerrainCursor.Move(rectTerrainWater.x - 1, rectTerrainWater.y - 1);
 	    }
 	    else
@@ -415,7 +415,7 @@ Game::menu_t Game::Editor::StartGame()
 		btnSelectObject.Draw();
 
 		display.Blit(spritePanelObject, dstPanel);
-		DEBUG(DBG_GAME , DBG_INFO, "Game::Editor::StartGame: select Object Mode");
+		DEBUG(DBG_GAME , DBG_INFO, "select Object Mode");
 		selectObjectCursor.Move(rectObjectWater.x - 1, rectObjectWater.y - 1);
 	    }
 	    else
@@ -438,7 +438,7 @@ Game::menu_t Game::Editor::StartGame()
 		btnSelectInfo.Draw();
 
 		display.Blit(spritePanelInfo, dstPanel);
-		DEBUG(DBG_GAME , DBG_INFO, "Game::Editor::StartGame: select Detail Mode");
+		DEBUG(DBG_GAME , DBG_INFO, "select Detail Mode");
 	    }
 	    else
 	    if(le.MouseCursor(btnSelectRiver))
@@ -452,7 +452,7 @@ Game::menu_t Game::Editor::StartGame()
 		btnSelectRiver.Draw();
 
 		display.Blit(spritePanelRiver, dstPanel);
-		DEBUG(DBG_GAME , DBG_INFO, "Game::Editor::StartGame: select Stream Mode");
+		DEBUG(DBG_GAME , DBG_INFO, "select Stream Mode");
 	    }
 	    else
 	    if(le.MouseCursor(btnSelectRoad))
@@ -466,7 +466,7 @@ Game::menu_t Game::Editor::StartGame()
 		btnSelectRoad.Draw();
 
 		display.Blit(spritePanelRoad, dstPanel);		
-		DEBUG(DBG_GAME , DBG_INFO, "Game::Editor::StartGame: select Road Mode");
+		DEBUG(DBG_GAME , DBG_INFO, "select Road Mode");
 	    }
 	    else
 	    if(le.MouseCursor(btnSelectClear))
@@ -480,7 +480,7 @@ Game::menu_t Game::Editor::StartGame()
 		btnSelectClear.Draw();
 
 		display.Blit(spritePanelClear, dstPanel);
-		DEBUG(DBG_GAME , DBG_INFO, "Game::Editor::StartGame: select Erase Mode");
+		DEBUG(DBG_GAME , DBG_INFO, "Erase Mode");
 	    }
 		
 
@@ -536,7 +536,7 @@ Game::menu_t Game::Editor::StartGame()
 	    selectTerrainCursor.Move(rectTerrainWater.x - 1, rectTerrainWater.y - 1);
 	    cursor.Show();
 	    display.Flip();
-	    DEBUG(DBG_GAME , DBG_INFO, "Game::Editor::StartGame: select terrain: water");
+	    DEBUG(DBG_GAME , DBG_INFO, "select terrain: " << "water");
 	}
 	else
 	if(btnSelectGround.isPressed() && le.MouseClickLeft(rectTerrainGrass))
@@ -546,7 +546,7 @@ Game::menu_t Game::Editor::StartGame()
 	    selectTerrainCursor.Move(rectTerrainGrass.x - 1, rectTerrainGrass.y - 1);
 	    cursor.Show();
 	    display.Flip();
-	    DEBUG(DBG_GAME , DBG_INFO, "Game::Editor::StartGame: select terrain: grass");
+	    DEBUG(DBG_GAME , DBG_INFO, "select terrain: " << "grass");
 	}
 	else
 	if(btnSelectGround.isPressed() && le.MouseClickLeft(rectTerrainSnow))
@@ -556,7 +556,7 @@ Game::menu_t Game::Editor::StartGame()
 	    selectTerrainCursor.Move(rectTerrainSnow.x - 1, rectTerrainSnow.y - 1);
 	    cursor.Show();
 	    display.Flip();
-	    DEBUG(DBG_GAME , DBG_INFO, "Game::Editor::StartGame: select terrain: snow");
+	    DEBUG(DBG_GAME , DBG_INFO, "select terrain: " << "snow");
 	}
 	else
 	if(btnSelectGround.isPressed() && le.MouseClickLeft(rectTerrainSwamp))
@@ -566,7 +566,7 @@ Game::menu_t Game::Editor::StartGame()
 	    selectTerrainCursor.Move(rectTerrainSwamp.x - 1, rectTerrainSwamp.y - 1);
 	    cursor.Show();
 	    display.Flip();
-	    DEBUG(DBG_GAME , DBG_INFO, "Game::Editor::StartGame: select terrain: swamp");
+	    DEBUG(DBG_GAME , DBG_INFO, "select terrain: " << "swamp");
 	}
 	else
 	if(btnSelectGround.isPressed() && le.MouseClickLeft(rectTerrainLava))
@@ -576,7 +576,7 @@ Game::menu_t Game::Editor::StartGame()
 	    selectTerrainCursor.Move(rectTerrainLava.x - 1, rectTerrainLava.y - 1);
 	    cursor.Show();
 	    display.Flip();
-	    DEBUG(DBG_GAME , DBG_INFO, "Game::Editor::StartGame: select terrain: lava");
+	    DEBUG(DBG_GAME , DBG_INFO, "select terrain: " << "lava");
 	}
 	else
 	if(btnSelectGround.isPressed() && le.MouseClickLeft(rectTerrainBeach))
@@ -586,7 +586,7 @@ Game::menu_t Game::Editor::StartGame()
 	    selectTerrainCursor.Move(rectTerrainBeach.x - 1, rectTerrainBeach.y - 1);
 	    cursor.Show();
 	    display.Flip();
-	    DEBUG(DBG_GAME , DBG_INFO, "Game::Editor::StartGame: select terrain: beach");
+	    DEBUG(DBG_GAME , DBG_INFO, "select terrain: " << "beach");
 	}
 	else
 	if(btnSelectGround.isPressed() && le.MouseClickLeft(rectTerrainDirt))
@@ -596,7 +596,7 @@ Game::menu_t Game::Editor::StartGame()
 	    selectTerrainCursor.Move(rectTerrainDirt.x - 1, rectTerrainDirt.y - 1);
 	    cursor.Show();
 	    display.Flip();
-	    DEBUG(DBG_GAME , DBG_INFO, "Game::Editor::StartGame: select terrain: dirt");
+	    DEBUG(DBG_GAME , DBG_INFO, "select terrain: " << "dirt");
 	}
 	else
 	if(btnSelectGround.isPressed() && le.MouseClickLeft(rectTerrainWasteland))
@@ -606,7 +606,7 @@ Game::menu_t Game::Editor::StartGame()
 	    selectTerrainCursor.Move(rectTerrainWasteland.x - 1, rectTerrainWasteland.y - 1);
 	    cursor.Show();
 	    display.Flip(); 
-	    DEBUG(DBG_GAME , DBG_INFO, "Game::Editor::StartGame: select terrain: wasteland");
+	    DEBUG(DBG_GAME , DBG_INFO, "select terrain: " << "wasteland");
 	}
 	else
 	if(btnSelectGround.isPressed() && le.MouseClickLeft(rectTerrainDesert))
@@ -616,7 +616,7 @@ Game::menu_t Game::Editor::StartGame()
 	    selectTerrainCursor.Move(rectTerrainDesert.x - 1, rectTerrainDesert.y - 1);
 	    cursor.Show();
 	    display.Flip();
-	    DEBUG(DBG_GAME , DBG_INFO, "Game::Editor::StartGame: select terrain: desert");
+	    DEBUG(DBG_GAME , DBG_INFO, "select terrain: " << "desert");
 	}
 
 	// click select object
@@ -627,7 +627,7 @@ Game::menu_t Game::Editor::StartGame()
 	    selectObjectCursor.Move(rectObjectWater.x - 1, rectObjectWater.y - 1);
 	    cursor.Show();
 	    display.Flip();
-	    DEBUG(DBG_GAME , DBG_INFO, "Game::Editor::StartGame: select object: water");
+	    DEBUG(DBG_GAME , DBG_INFO, "select object: " << "water");
 	}
 	else
 	if(btnSelectObject.isPressed() && le.MouseClickLeft(rectObjectGrass))
@@ -637,7 +637,7 @@ Game::menu_t Game::Editor::StartGame()
 	    selectObjectCursor.Move(rectObjectGrass.x - 1, rectObjectGrass.y - 1);
 	    cursor.Show();
 	    display.Flip();
-	    DEBUG(DBG_GAME , DBG_INFO, "Game::Editor::StartGame: select object: grass");
+	    DEBUG(DBG_GAME , DBG_INFO, "select object: " << "grass");
 	}
 	else
 	if(btnSelectObject.isPressed() && le.MouseClickLeft(rectObjectSnow))
@@ -647,7 +647,7 @@ Game::menu_t Game::Editor::StartGame()
 	    selectObjectCursor.Move(rectObjectSnow.x - 1, rectObjectSnow.y - 1);
 	    cursor.Show();
 	    display.Flip();
-	    DEBUG(DBG_GAME , DBG_INFO, "Game::Editor::StartGame: select object: snow");
+	    DEBUG(DBG_GAME , DBG_INFO, "select object: " << "snow");
 	}
 	else
 	if(btnSelectObject.isPressed() && le.MouseClickLeft(rectObjectSwamp))
@@ -657,7 +657,7 @@ Game::menu_t Game::Editor::StartGame()
 	    selectObjectCursor.Move(rectObjectSwamp.x - 1, rectObjectSwamp.y - 1);
 	    cursor.Show();
 	    display.Flip();
-	    DEBUG(DBG_GAME , DBG_INFO, "Game::Editor::StartGame: select object: swamp");
+	    DEBUG(DBG_GAME , DBG_INFO, "select object: " << "swamp");
 	}
 	else
 	if(btnSelectObject.isPressed() && le.MouseClickLeft(rectObjectLava))
@@ -667,7 +667,7 @@ Game::menu_t Game::Editor::StartGame()
 	    selectObjectCursor.Move(rectObjectLava.x - 1, rectObjectLava.y - 1);
 	    cursor.Show();
 	    display.Flip();
-	    DEBUG(DBG_GAME , DBG_INFO, "Game::Editor::StartGame: select object: lava");
+	    DEBUG(DBG_GAME , DBG_INFO, "select object: " << "lava");
 	}
 	else
 	if(btnSelectObject.isPressed() && le.MouseClickLeft(rectObjectDesert))
@@ -677,7 +677,7 @@ Game::menu_t Game::Editor::StartGame()
 	    selectObjectCursor.Move(rectObjectDesert.x - 1, rectObjectDesert.y - 1);
 	    cursor.Show();
 	    display.Flip();
-	    DEBUG(DBG_GAME , DBG_INFO, "Game::Editor::StartGame: select object: desert");
+	    DEBUG(DBG_GAME , DBG_INFO, "select object: " << "desert");
 	}
 	else
 	if(btnSelectObject.isPressed() && le.MouseClickLeft(rectObjectDirt))
@@ -687,7 +687,7 @@ Game::menu_t Game::Editor::StartGame()
 	    selectObjectCursor.Move(rectObjectDirt.x - 1, rectObjectDirt.y - 1);
 	    cursor.Show();
 	    display.Flip();
-	    DEBUG(DBG_GAME , DBG_INFO, "Game::Editor::StartGame: select object: dirt");
+	    DEBUG(DBG_GAME , DBG_INFO, "select object: " << "dirt");
 	}
 	else
 	if(btnSelectObject.isPressed() && le.MouseClickLeft(rectObjectWasteland))
@@ -697,7 +697,7 @@ Game::menu_t Game::Editor::StartGame()
 	    selectObjectCursor.Move(rectObjectWasteland.x - 1, rectObjectWasteland.y - 1);
 	    cursor.Show();
 	    display.Flip();
-	    DEBUG(DBG_GAME , DBG_INFO, "Game::Editor::StartGame: select object: wasteland");
+	    DEBUG(DBG_GAME , DBG_INFO, "select object: " << "wasteland");
 	}
 	else
 	if(btnSelectObject.isPressed() && le.MouseClickLeft(rectObjectBeach))
@@ -707,7 +707,7 @@ Game::menu_t Game::Editor::StartGame()
 	    selectObjectCursor.Move(rectObjectBeach.x - 1, rectObjectBeach.y - 1);
 	    cursor.Show();
 	    display.Flip();
-	    DEBUG(DBG_GAME , DBG_INFO, "Game::Editor::StartGame: select object: beach");
+	    DEBUG(DBG_GAME , DBG_INFO, "select object: " << "beach");
 	}
 	else
 	if(btnSelectObject.isPressed() && le.MouseClickLeft(rectObjectTown))
@@ -717,7 +717,7 @@ Game::menu_t Game::Editor::StartGame()
 	    selectObjectCursor.Move(rectObjectTown.x - 1, rectObjectTown.y - 1);
 	    cursor.Show();
 	    display.Flip();
-	    DEBUG(DBG_GAME , DBG_INFO, "Game::Editor::StartGame: select object: town");
+	    DEBUG(DBG_GAME , DBG_INFO, "select object: " << "town");
 	}
 	else
 	if(btnSelectObject.isPressed() && le.MouseClickLeft(rectObjectMonster))
@@ -727,7 +727,7 @@ Game::menu_t Game::Editor::StartGame()
 	    selectObjectCursor.Move(rectObjectMonster.x - 1, rectObjectMonster.y - 1);
 	    cursor.Show();
 	    display.Flip();
-	    DEBUG(DBG_GAME , DBG_INFO, "Game::Editor::StartGame: select object: monster");
+	    DEBUG(DBG_GAME , DBG_INFO, "select object: " << "monster");
 	}
 	else
 	if(btnSelectObject.isPressed() && le.MouseClickLeft(rectObjectHero))
@@ -737,7 +737,7 @@ Game::menu_t Game::Editor::StartGame()
 	    selectObjectCursor.Move(rectObjectHero.x - 1, rectObjectHero.y - 1);
 	    cursor.Show();
 	    display.Flip();
-	    DEBUG(DBG_GAME , DBG_INFO, "Game::Editor::StartGame: select object: hero");
+	    DEBUG(DBG_GAME , DBG_INFO, "select object: " << "hero");
 	}
 	else
 	if(btnSelectObject.isPressed() && le.MouseClickLeft(rectObjectArtifact))
@@ -747,7 +747,7 @@ Game::menu_t Game::Editor::StartGame()
 	    selectObjectCursor.Move(rectObjectArtifact.x - 1, rectObjectArtifact.y - 1);
 	    cursor.Show();
 	    display.Flip();
-	    DEBUG(DBG_GAME , DBG_INFO, "Game::Editor::StartGame: select object: artifact");
+	    DEBUG(DBG_GAME , DBG_INFO, "select object: " << "artifact");
 	}
 	else
 	if(btnSelectObject.isPressed() && le.MouseClickLeft(rectObjectResource))
@@ -757,7 +757,7 @@ Game::menu_t Game::Editor::StartGame()
 	    selectObjectCursor.Move(rectObjectResource.x - 1, rectObjectResource.y - 1);
 	    cursor.Show();
 	    display.Flip();
-	    DEBUG(DBG_GAME , DBG_INFO, "Game::Editor::StartGame: select object: resource");
+	    DEBUG(DBG_GAME , DBG_INFO, "select object: " << "resource");
 	}
 
 	// button click

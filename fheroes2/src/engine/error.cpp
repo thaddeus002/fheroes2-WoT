@@ -28,14 +28,14 @@
 #endif
 
 /* exception */
-void Error::Except(const char* message, const char* cstr)
+void Error::Except(const char* message)
 {
 #ifndef ANDROID
-    std::cerr << "Error::Except: " << message << cstr << std::endl;
+    std::cerr << "exception: " << (message ? message : "") << std::endl;
     throw Exception();
 #else
  __android_log_print(ANDROID_LOG_FATAL, "fheroes2", "======");
- __android_log_print(ANDROID_LOG_FATAL, "fheroes2", "Error: %s: %s", message, cstr);
+ __android_log_print(ANDROID_LOG_FATAL, "fheroes2", "Error: %s", message);
  __android_log_print(ANDROID_LOG_FATAL, "fheroes2", "======");
 #endif
 }

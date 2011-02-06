@@ -44,7 +44,7 @@ bool FH2Client::Wait(QueueMessage & packet, u16 id)
             if(!Network::RecvMessage(*this, packet))
             {
                 //Close();
-		DEBUG(DBG_NETWORK, DBG_TRACE, "FH2Client::Wait: error");
+		DEBUG(DBG_NETWORK, DBG_TRACE, "error");
                 return false;
             }
             if(id == packet.GetID()) break;
@@ -60,7 +60,7 @@ bool FH2Client::Send(QueueMessage & packet)
     {
 	packet.Dump();
         //Close();
-	DEBUG(DBG_NETWORK, DBG_TRACE, "FH2Client::Send: error");
+	DEBUG(DBG_NETWORK, DBG_TRACE, "error");
         return false;
     }
     return true;
@@ -72,7 +72,7 @@ bool FH2Client::Recv(QueueMessage & packet)
     {
 	packet.Dump();
         //Close();
-	DEBUG(DBG_NETWORK, DBG_TRACE, "FH2Client::Recv: error");
+	DEBUG(DBG_NETWORK, DBG_TRACE, "error");
         return false;
     }
     return true;

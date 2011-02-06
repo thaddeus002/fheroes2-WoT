@@ -266,15 +266,9 @@ void Kingdom::ActionNewWeek(void)
 	// debug an gift
 	if(IS_DEVEL() && Game::LOCAL == Control())
 	{
-	    DEBUG(DBG_GAME , DBG_INFO, "Kingdom::ActionNewWeek: for the best debugging, God has sent you a gift.");
-
-	    resource.wood += 20;
-	    resource.ore += 20;
-	    resource.sulfur += 10;
-	    resource.crystal += 10;
-	    resource.gems += 10;
-	    resource.mercury += 10;
-	    resource.gold += 5000;
+	    Resource::funds_t gift(20, 20, 10, 10, 10, 10, 5000);
+	    DEBUG(DBG_GAME, DBG_INFO, "debug gift: " << gift.Dump());
+	    resource += gift;
 	}
     }
 
@@ -422,15 +416,7 @@ bool Kingdom::HeroesMayStillMove(void) const
 void Kingdom::Dump(void) const
 {
     world.DateDump();
-    VERBOSE("Kingdom::Dump: " << "color: " << Color::String(color) <<
-	", resource: " << 
-	"ore(" << resource.ore << ")," <<
-	"wood(" << resource.wood << ")," <<
-	"mercury(" << resource.mercury << ")," <<
-	"sulfur(" << resource.sulfur << ")," <<
-	"crystal(" << resource.crystal << ")," <<
-	"gems(" << resource.gems << ")," <<
-	"gold(" << resource.gold << ")");
+    DEBUG(DBG_GAME, DBG_INFO, "color: " << Color::String(color) << ", resource: " << resource.Dump());
 }
 
 u8 Kingdom::GetCountCapital(void) const

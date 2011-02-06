@@ -217,13 +217,13 @@ Game::menu_t Game::ScenarioInfo(void)
 	// click ok
 	if(HotKeyPress(EVENT_DEFAULT_READY) || le.MouseClickLeft(buttonOk))
 	{
-	    DEBUG(DBG_GAME , DBG_INFO, "Game::ScenarioInfo: select maps: " << conf.MapsFile() << \
+	    DEBUG(DBG_GAME, DBG_INFO, "select maps: " << conf.MapsFile() << \
 		    ", difficulty: " << Difficulty::String(conf.GameDifficulty()));
 	    conf.FixKingdomRandomRace();
 	    if(Game::HOTSEAT == conf.GameType())
 		conf.SetMyColor(Color::GRAY);
 	    else
-	    DEBUG(DBG_GAME , DBG_INFO, "Game::ScenarioInfo: select color: " << Color::String(conf.MyColor()));
+	    DEBUG(DBG_GAME, DBG_INFO, "select color: " << Color::String(conf.MyColor()));
 	    result = STARTGAME;
 	    break;
 	}

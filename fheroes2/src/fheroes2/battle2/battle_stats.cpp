@@ -414,7 +414,7 @@ u16 Battle2::Stats::GetTailIndex(void) const
 	if(Board::isValidDirection(position, reflect ? RIGHT : LEFT))
 	    return Board::GetIndexDirection(position, reflect ? RIGHT : LEFT);
 
-	DEBUG(DBG_BATTLE, DBG_WARN, "Battle2::Stats::" << "GetTailIndex: " << "error: "<< "out of range");
+	DEBUG(DBG_BATTLE, DBG_WARN, "error: "<< "out of range");
     }
 
     return MAXU16;
@@ -849,7 +849,7 @@ u32 Battle2::Stats::ApplyDamage(u32 dmg)
     	    mirror = NULL;
 	}
 
-	DEBUG(DBG_BATTLE, DBG_TRACE, "Battle2::Stats::" << " ApplyDamage: " << dmg << " to " << Info() << " and killed: " << killed);
+	DEBUG(DBG_BATTLE, DBG_TRACE, dmg << " to " << Info() << " and killed: " << killed);
 
 	dead += (killed >= count ? count : killed);
 	count -= (killed >= count ? count : killed);
@@ -894,7 +894,7 @@ void Battle2::Stats::PostKilledAction(void)
     if(!Modes(CAP_MIRRORIMAGE) && !Modes(CAP_SUMMONELEM))
 	arena->graveyard.AddTroopID(id);
 
-    DEBUG(DBG_BATTLE, DBG_TRACE, "Battle2::Stats::" << "KilledAction: " << Info() << " is dead...");
+    DEBUG(DBG_BATTLE, DBG_TRACE, Info() << "is dead...");
     // possible also..
 }
 
@@ -932,14 +932,14 @@ u32 Battle2::Stats::ApplyDamage(Stats & enemy, u32 dmg)
     {
 	case Monster::GHOST:
 	    resurrect = killed * enemy.GetMonster().GetHitPoints();
-	    DEBUG(DBG_BATTLE, DBG_TRACE, "Battle2::Stats::" << "ApplyDamage: " << Info() << ", enemy: " << enemy.Info() << " resurrect: " << resurrect);
+	    DEBUG(DBG_BATTLE, DBG_TRACE, Info() << ", enemy: " << enemy.Info() << " resurrect: " << resurrect);
 	    // grow troop
 	    enemy.Resurrect(resurrect, true, false);
 	    break;
 
 	case Monster::VAMPIRE_LORD:
 	    resurrect = killed * GetMonster().GetHitPoints();
-	    DEBUG(DBG_BATTLE, DBG_TRACE, "Battle2::Stats::" << "ApplyDamage: " << Info() << ", enemy: " << enemy.Info() << " resurrect: " << resurrect);
+	    DEBUG(DBG_BATTLE, DBG_TRACE, Info() << ", enemy: " << enemy.Info() << " resurrect: " << resurrect);
 	    // restore hit points
 	    enemy.Resurrect(resurrect, false, false);
 	    break;
@@ -1013,7 +1013,7 @@ bool Battle2::Stats::ApplySpell(u8 spell, const HeroBase* hero, TargetInfo & tar
 {
     if(! AllowApplySpell(spell, hero)) return false;
 
-    DEBUG(DBG_BATTLE, DBG_TRACE, "Battle2::Stats::" << "ApplySpell: " << Spell::GetName(Spell::FromInt(spell)) << " to " << Info());
+    DEBUG(DBG_BATTLE, DBG_TRACE, Spell::GetName(Spell::FromInt(spell)) << " to " << Info());
 
     // save spell for "eagle eye" capability
     arena->AddSpell(spell);

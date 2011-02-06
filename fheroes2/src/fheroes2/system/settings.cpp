@@ -27,7 +27,36 @@
 #include "settings.h"
 
 #define DEFAULT_PORT	5154
-#define DEFAULT_DEBUG	(DBG_ENGINE | DBG_GAME | DBG_BATTLE | DBG_AI | DBG_NETWORK | DBG_WARN)
+#define DEFAULT_DEBUG	DBG_ALL_WARN
+
+bool IS_DEBUG(int name, int level)
+{
+    const u16 debug = Settings::Get().Debug();
+    return
+        ((DBG_ENGINE & name) && ((DBG_ENGINE & debug) >> 2) == level) ||
+        ((DBG_GAME & name) && ((DBG_GAME & debug) >> 4) == level) ||
+        ((DBG_BATTLE & name) && ((DBG_BATTLE & debug) >> 6) == level) ||
+        ((DBG_AI & name) && ((DBG_AI & debug) >> 8) == level) ||
+        ((DBG_NETWORK & name) && ((DBG_NETWORK & debug) >> 10) == level);
+}
+
+const char* StringDebug(int name)
+{
+    if(name & DBG_ENGINE)	return "DBG_ENGINE";
+    else
+    if(name & DBG_GAME)		return "DBG_GAME";
+    else
+    if(name & DBG_BATTLE)	return "DBG_BATTLE";
+    else
+    if(name & DBG_AI)		return "DBG_AI";
+    else
+    if(name & DBG_NETWORK)	return "DBG_NETWORK";
+    else
+    if(name & DBG_NETWORK)	return "DBG_OTHER";
+    else
+    if(name & DBG_NETWORK)	return "DBG_DEVEL";
+    return "";
+}
 
 enum
 {
@@ -198,10 +227,17 @@ bool Settings::Read(const std::string & filename)
 
     // debug
     entry = config.Find("debug");
-    if(NULL == entry)
-	debug = DEFAULT_DEBUG;
-    else
-	debug = entry->IntParams();
+    if(entry)
+    {
+	const std::string & str = entry->StrParams();
+	if(str == "on")
+	    debug = DEFAULT_DEBUG;
+	else
+	if(str == "off")
+	    debug = 0;
+	else
+	    debug = entry->IntParams();
+    }
 
     // opt_globals
     const settings_t* ptr = settingsGeneral;
@@ -397,7 +433,7 @@ bool Settings::Read(const std::string & filename)
             video_mode.w = 0;
             video_mode.h = 0;
 	}
-        else DEBUG(DBG_ENGINE , DBG_WARN, "Settings::Read: " << "unknown video mode: " << value);
+        else DEBUG(DBG_ENGINE, DBG_WARN, "unknown video mode: " << value);
     }
 
 #ifdef WITHOUT_MOUSE
@@ -418,8 +454,8 @@ bool Settings::Read(const std::string & filename)
     if(font_normal.empty() || font_small.empty()) opt_global.ResetModes(GLOBAL_USEUNICODE);
 
 #ifdef BUILD_RELEASE
-    debug &= 0x000F;
-    debug |= (DBG_ENGINE | DBG_GAME | DBG_BATTLE | DBG_AI | DBG_NETWORK);
+    // reset devel
+    debug &= ~(DBG_DEVEL);
 #endif
 
     BinaryLoad();
@@ -976,7 +1012,7 @@ void Settings::FixKingdomRandomRace(void)
     for(Color::color_t color = Color::BLUE; color != Color::GRAY; ++color) if(KingdomColors(color))
     {
         if(Race::RAND == KingdomRace(color)) SetKingdomRace(color, Race::Rand());
-        DEBUG(DBG_GAME , DBG_INFO, "Settings::FixKingdomRandomRace: " << Color::String(color) << ": " << Race::String(KingdomRace(color)));
+        DEBUG(DBG_GAME, DBG_INFO, Color::String(color) << ": " << Race::String(KingdomRace(color)));
     }
 }
 

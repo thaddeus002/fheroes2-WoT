@@ -174,7 +174,7 @@ void Battle2::Cell::SetEnemyQuality(const Stats & my)
 	quality += b->GetExtraQuality(quality);
 
 	if(quality < 1) quality = 1;
-	DEBUG(DBG_BATTLE, DBG_TRACE, "Battle2::Cell::" << "SetEnemyQuality: " << quality << " for " << b->Info());
+	DEBUG(DBG_BATTLE, DBG_TRACE, quality << " for " << b->Info());
     }
 }
 

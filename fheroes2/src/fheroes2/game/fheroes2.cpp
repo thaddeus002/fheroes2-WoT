@@ -81,7 +81,7 @@ int main(int argc, char **argv)
 	Settings & conf = Settings::Get();
 	int test = 0;
 
-	VERBOSE("Free Heroes II, " + conf.BuildVersion());
+	DEBUG(DBG_ALL, DBG_INFO, "Free Heroes II, " + conf.BuildVersion());
 
 	LoadConfigFiles(conf, GetDirname(argv[0]));
 
@@ -184,7 +184,11 @@ int main(int argc, char **argv)
 	    AGG::Cache & cache = AGG::Cache::Get();
 
 	    // read data dir
-	    if(! cache.ReadDataDir()) Error::Except("FHeroes2: ", "AGG data files not found.");
+	    if(! cache.ReadDataDir())
+	    {
+		DEBUG(DBG_GAME, DBG_WARN, "data files not found");
+		return EXIT_FAILURE;
+	    }
 
             if(IS_DEBUG(DBG_GAME, DBG_INFO)) conf.Dump();
 
@@ -252,15 +256,14 @@ int main(int argc, char **argv)
 #ifndef ANDROID
 	catch(std::bad_alloc)
 	{
-	    DEBUG(DBG_GAME, DBG_WARN, "std::bad_alloc");
     	    AGG::Cache::Get().Dump();
+	    DEBUG(DBG_GAME, DBG_WARN, "std::bad_alloc");
 	} catch(Error::Exception)
 	{
-	    DEBUG(DBG_GAME, DBG_WARN, "Error::Exception");
+    	    AGG::Cache::Get().Dump();
 #ifdef WITH_NET
             if(Game::NETWORK == conf.GameType()) FH2LocalClient::Get().Logout("internal error");
 #endif
-    	    AGG::Cache::Get().Dump();
 	    conf.Dump();
 	}
 #endif

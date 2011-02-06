@@ -377,7 +377,7 @@ void Heroes::LoadFromMP2(s32 map_index, const void *ptr, const Color::color_t cl
 	portrait = ConvertID(*ptr8);
 	if(UNKNOWN == portrait)
 	{
-	    DEBUG(DBG_GAME, DBG_WARN, "Heroes::LoadFromMP2: " << "custom portrait incorrect: " << static_cast<int>(portrait));
+	    DEBUG(DBG_GAME, DBG_WARN, "custom portrait incorrect: " << static_cast<int>(portrait));
 	    portrait = hid;
 	}
 	++ptr8;
@@ -499,7 +499,7 @@ void Heroes::LoadFromMP2(s32 map_index, const void *ptr, const Color::color_t cl
     SetSpellPoints(GetMaxSpellPoints());
     move_point = GetMaxMovePoints();
 
-    DEBUG(DBG_GAME , DBG_INFO, "Heroes::LoadFromMP2: " << name << ", color: " << Color::String(color) << ", race: " << Race::String(race));
+    DEBUG(DBG_GAME , DBG_INFO, name << ", color: " << Color::String(color) << ", race: " << Race::String(race));
 }
 
 Heroes::heroes_t Heroes::GetID(void) const
@@ -747,7 +747,7 @@ bool Heroes::Recruit(const Color::color_t cl, const Point & pt)
 {
     if(color != Color::GRAY)
     {
-	DEBUG(DBG_GAME , DBG_WARN, "Heroes::Recrut: hero not freeman!");
+	DEBUG(DBG_GAME, DBG_WARN, "not freeman");
 	return false;
     }
 
@@ -1357,7 +1357,7 @@ u8 Heroes::GetRangeRouteDays(const s32 dst) const
     // approximate distance, this restriction calculation
     if((4 * max / 100) < Maps::GetApproximateDistance(GetIndex(), dst))
     {
-	DEBUG(DBG_GAME , DBG_INFO, "Heroes::GetRangeRouteDays: distance limit");
+	DEBUG(DBG_GAME, DBG_INFO, "distance limit");
 	return 0;
     }
 
@@ -1377,7 +1377,7 @@ u8 Heroes::GetRangeRouteDays(const s32 dst) const
 	return 4;
     }
     else
-    DEBUG(DBG_GAME , DBG_INFO, "Heroes::GetRangeRouteDays: iteration limit: " << limit);
+    DEBUG(DBG_GAME, DBG_INFO, "iteration limit: " << limit);
 
     return 0;
 }
@@ -1439,7 +1439,7 @@ Skill::Primary::skill_t Heroes::LevelUpPrimarySkill(void)
 	case Skill::Primary::KNOWLEDGE:	++knowledge; break;
 	default: break;
     }
-    DEBUG(DBG_GAME , DBG_INFO, "Heroes::LevelUpPrimarySkill: for " << GetName() << ", up " << Skill::Primary::String(primary1));
+    DEBUG(DBG_GAME, DBG_INFO, "for " << GetName() << ", up " << Skill::Primary::String(primary1));
 
     return primary1;
 }
@@ -1450,8 +1450,8 @@ void Heroes::LevelUpSecondarySkill(const Skill::Primary::skill_t primary1, bool 
     Skill::Secondary sec2;
 
     FindSkillsForLevelUp(sec1, sec2);
-    DEBUG(DBG_GAME, DBG_INFO, "Heroes::LevelUpSecondarySkill: " << GetName() << " select " << Skill::Secondary::String(sec1.Skill()) << " or " << Skill::Secondary::String(sec2.Skill()));
-
+    DEBUG(DBG_GAME, DBG_INFO, GetName() << " select " << Skill::Secondary::String(sec1.Skill()) <<
+						    " or " << Skill::Secondary::String(sec2.Skill()));
     std::string header;
     std::string message;
 

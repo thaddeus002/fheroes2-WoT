@@ -36,7 +36,7 @@ Mounts::Mounts(const ICN::icn_t icn) : Object(MP2::OBJ_MOUNTS, icn)
         case ICN::MTNMULT:
         case ICN::MTNGRAS: break;
 
-        default: DEBUG(DBG_GAME , DBG_WARN, "Mounts::Mounts: unknown type"); break;
+        default: DEBUG(DBG_GAME, DBG_WARN, "unknown type"); break;
     }
 }
 

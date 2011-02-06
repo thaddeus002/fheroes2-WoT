@@ -41,7 +41,7 @@ GameEvent::Day::Day(const void *ptr)
     // id
     if(0x00 != *ptr8)
     {
-	DEBUG(DBG_GAME , DBG_WARN, "GameEvent::Day: unknown magic id");
+	DEBUG(DBG_GAME , DBG_WARN, "unknown id");
 	return;
     }
     ++ptr8;
@@ -129,9 +129,9 @@ GameEvent::Day::Day(const void *ptr)
     // message
     message = Game::GetEncodeString(reinterpret_cast<const char *>(ptr8));
 
-    //if(SIZEMESSAGE < message.size()) DEBUG(DBG_GAME , DBG_WARN, "GameEvent::Day: long message, incorrect block?");
+    //if(SIZEMESSAGE < message.size()) DEBUG(DBG_GAME , DBG_WARN, "long message, incorrect block?");
 
-    DEBUG(DBG_GAME , DBG_INFO, "GameEvent::Day: add: " << message);
+    DEBUG(DBG_GAME, DBG_INFO, "add: " << message);
 }
 
 GameEvent::Coord::Coord() : index_map(-1), artifact(Artifact::UNKNOWN), computer(false), cancel(true), colors(0)
@@ -147,7 +147,7 @@ GameEvent::Coord::Coord(s32 index, const void *ptr) : index_map(index)
     // id
     if(0x01 != *ptr8)
     {
-	DEBUG(DBG_GAME , DBG_WARN, "GameEvent::Coord: unknown magic id");
+	DEBUG(DBG_GAME, DBG_WARN, "unknown id");
 	return;
     }
     ++ptr8;
@@ -224,7 +224,7 @@ GameEvent::Coord::Coord(s32 index, const void *ptr) : index_map(index)
     // message
     message = Game::GetEncodeString(reinterpret_cast<const char *>(ptr8));
 
-    DEBUG(DBG_GAME , DBG_INFO, "GameEvent::Coord: add: " << message);
+    DEBUG(DBG_GAME , DBG_INFO, "add: " << message);
 }
 
 GameEvent::Riddle::Riddle() : index_map(-1), artifact(Artifact::UNKNOWN), valid(false)
@@ -241,7 +241,7 @@ GameEvent::Riddle::Riddle(s32 index, const void *ptr) : index_map(index), valid(
     // id
     if(0x00 != *ptr8)
     {
-	DEBUG(DBG_GAME , DBG_WARN, "GameEvent::Day: unknown magic id");
+	DEBUG(DBG_GAME , DBG_WARN, "unknown id");
 	return;
     }
     ++ptr8;
@@ -304,7 +304,7 @@ GameEvent::Riddle::Riddle(s32 index, const void *ptr) : index_map(index), valid(
 
     valid = true;
 
-    DEBUG(DBG_GAME , DBG_INFO, "GameEvent::Riddle: add: " << message);
+    DEBUG(DBG_GAME, DBG_INFO, "add: " << message);
 }
 
 bool GameEvent::Riddle::AnswerCorrect(const std::string & answer)

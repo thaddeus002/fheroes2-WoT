@@ -275,10 +275,10 @@ void FH2RemoteClient::RunThread(void)
 {
     if(thread.IsRun())
     {
-	DEBUG(DBG_NETWORK, DBG_INFO, "FH2RemoteClient::" << " wait thread");
+	DEBUG(DBG_NETWORK, DBG_INFO, "wait thread");
 	thread.Wait();
     }
-    DEBUG(DBG_NETWORK, DBG_INFO, "FH2RemoteClient::" << " run thread");
+    DEBUG(DBG_NETWORK, DBG_INFO, "run thread");
     thread.Create(callbackCreateThread, this);
 }
 
@@ -287,7 +287,7 @@ int FH2RemoteClient::Main(void)
     // wait thread id
     if(0 == thread.GetID())
     {
-	DEBUG(DBG_NETWORK, DBG_INFO, "FH2RemoteClient::" << "Main: " << "wait start thread");
+	DEBUG(DBG_NETWORK, DBG_INFO, "wait start thread");
 	while(0 == thread.GetID()){ DELAY(30); };
     }
 
@@ -301,7 +301,7 @@ int FH2RemoteClient::Main(void)
 	    server.SendUpdatePlayers(msg, player_id);
 	}
 
-	DEBUG(DBG_NETWORK, DBG_INFO, "FH2RemoteClient::" << "Main: " << "start queue");
+	DEBUG(DBG_NETWORK, DBG_INFO, "start queue");
 
 	while(! Modes(ST_SHUTDOWN))
 	{
@@ -312,7 +312,7 @@ int FH2RemoteClient::Main(void)
 
 		if(!Recv(packet)) return -1;
 
-        	DEBUG(DBG_NETWORK, DBG_INFO, "FH2RemoteClient::" << "Main: " << "recv: " <<
+        	DEBUG(DBG_NETWORK, DBG_INFO, "recv: " <<
 			Network::GetMsgString(packet.GetID()));
 
 		msg.SetReady();
@@ -341,7 +341,7 @@ void FH2RemoteClient::ShutdownThread(void)
 	Network::SendMessage(*this, packet);
     }
 
-    DEBUG(DBG_NETWORK, DBG_INFO, "FH2RemoteClient::" << " shutdown thread");
+    DEBUG(DBG_NETWORK, DBG_INFO, "shutdown thread");
 
     Reset();
 }
@@ -352,7 +352,7 @@ void FH2RemoteClient::CloseConnection(void)
 
     Reset();
 
-    DEBUG(DBG_NETWORK, DBG_INFO, "FH2RemoteClient::" << " close connection");
+    DEBUG(DBG_NETWORK, DBG_INFO, "close connection");
 }
 
 bool FH2RemoteClient::ConnectionChat(void)
@@ -374,30 +374,26 @@ bool FH2RemoteClient::ConnectionChat(void)
     packet.Push(banner.str());
 
     // send ready
-    DEBUG(DBG_NETWORK, DBG_INFO, "FH2RemoteClient::" << "ConnectionChat: " << "id: 0x" <<
-							std::hex << player_id << ", send ready");
+    DEBUG(DBG_NETWORK, DBG_INFO, "id: 0x" << std::hex << player_id << ", send ready");
     if(!Send(packet)) return false;
 
     // recv hello
-    DEBUG(DBG_NETWORK, DBG_INFO, "FH2RemoteClient::" << "ConnectionChat: " << "id: 0x" <<
-							std::hex << player_id << ", wait hello");
+    DEBUG(DBG_NETWORK, DBG_INFO, "id: 0x" << std::hex << player_id << ", wait hello");
     if(!Wait(packet, MSG_HELLO)) return false;
 
     packet.Pop(player_name);
-    DEBUG(DBG_NETWORK, DBG_INFO, "FH2RemoteClient::" << "ConnectionChat: " << "id: 0x" << 
-			std::hex << player_id << ", connected " << " player: " << player_name <<
-						", host 0x" << std::hex << Host() << ":0x" << Port());
+    DEBUG(DBG_NETWORK, DBG_INFO, "id: 0x" << std::hex << player_id << ", connected " << 
+			" player: " << player_name << ", host 0x" << std::hex << Host() << ":0x" << Port());
     // send hello, modes, id
     packet.Reset();
     packet.SetID(MSG_HELLO);
     packet.Push(modes);
     packet.Push(player_id);
     // send
-    DEBUG(DBG_NETWORK, DBG_INFO, "FH2RemoteClient::" << "ConnectionChat: " << "id: 0x" <<
-							std::hex << player_id << ", send hello");
+    DEBUG(DBG_NETWORK, DBG_INFO, "id: 0x" << std::hex << player_id << ", send hello");
     if(!Send(packet)) return false;
 
-    DEBUG(DBG_NETWORK, DBG_INFO, "FH2RemoteClient::" << "ConnectionChat: " << (Modes(ST_ADMIN) ? "admin" : "client") << " mode");
+    DEBUG(DBG_NETWORK, DBG_INFO, (Modes(ST_ADMIN) ? "admin" : "client") << " mode");
 
     // update colors
     return UpdateColors();
@@ -413,8 +409,7 @@ bool FH2RemoteClient::UpdateColors(void)
 
     if(0 == player_color)
     {
-	DEBUG(DBG_NETWORK, DBG_INFO, "FH2RemoteClient::" << "UpdateColors: " << "id: 0x" <<
-			std::hex << player_id << " invalid color");
+	DEBUG(DBG_NETWORK, DBG_INFO, "id: 0x" << std::hex << player_id << " invalid color");
 	err = "full house";
     }
 
@@ -432,7 +427,7 @@ bool FH2RemoteClient::SendAccessDenied(QueueMessage & msg)
     msg.Reset();
     msg.SetID(MSG_ACCESS_DENIED);
 
-    DEBUG(DBG_NETWORK, DBG_INFO, "FH2RemoteClient::" << "SendAccessDenied: ");
+    DEBUG(DBG_NETWORK, DBG_INFO, "");
     return Send(msg);
 }
 
@@ -444,7 +439,7 @@ bool FH2RemoteClient::SendMapsInfoList(QueueMessage & msg)
     msg.SetID(MSG_GET_MAPS_LIST);
     server.PushMapsFileInfoList(msg);
 
-    DEBUG(DBG_NETWORK, DBG_INFO, "FH2RemoteClient::" << "SendMapsInfoList: ");
+    DEBUG(DBG_NETWORK, DBG_INFO, "");
     return Send(msg);
 }
 
@@ -460,7 +455,7 @@ bool FH2RemoteClient::SendCurrentColor(QueueMessage & msg)
     // players info
     server.PushPlayersInfo(msg);
 
-    DEBUG(DBG_NETWORK, DBG_INFO, "FH2RemoteClient::" << "SendCurrentColor: ");
+    DEBUG(DBG_NETWORK, DBG_INFO, "");
     return Send(msg);
 }
 
@@ -474,7 +469,7 @@ bool FH2RemoteClient::SendCurrentMapInfo(QueueMessage & msg)
     // added cur maps info
     Network::PacketPushMapsFileInfo(msg, conf.CurrentFileInfo());
 
-    DEBUG(DBG_NETWORK, DBG_INFO, "FH2RemoteClient::" << "SendCurrentMapInfo: ");
+    DEBUG(DBG_NETWORK, DBG_INFO, "");
     return Send(msg);
 }
 

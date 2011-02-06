@@ -304,7 +304,7 @@ void Surface::CreateSurface(u16 sw, u16 sh, u8 dp, u32 fl)
     if(!surface)
     {
 	std::cerr << "w: " << sw << ", h: " << sh << std::endl;
-	Error::Except("Surface::CreateSurface: empty surface, error:", SDL_GetError());
+	Error::Except(SDL_GetError());
     }
 }
 

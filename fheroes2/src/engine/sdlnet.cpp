@@ -179,6 +179,11 @@ void QueueMessage::Push(u32 byte32)
     ++itd2;
 }
 
+void QueueMessage::Push(bool f)
+{
+    Push(static_cast<u8>(f));
+}
+
 void QueueMessage::Push(const std::string & str)
 {
     Push(str.c_str());
@@ -273,6 +278,17 @@ bool QueueMessage::Pop(u32 & byte32)
     ++itd1;
 
     return true;
+}
+
+bool QueueMessage::Pop(bool & f)
+{
+    u8 tmp;
+    if(Pop(tmp))
+    {
+	f = tmp;
+	return true;
+    }
+    return false;
 }
 
 bool QueueMessage::Pop(std::string & str)

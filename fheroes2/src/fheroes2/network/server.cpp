@@ -62,11 +62,15 @@ void RemoteMessage::SetReady(void)
 FH2Server::FH2Server()
 {
     AGG::Cache & cache = AGG::Cache::Get();
-    if(! cache.ReadDataDir()) Error::Except("FH2Server::", " AGG data files not found.");
+    if(! cache.ReadDataDir())
+    {
+	DEBUG(DBG_NETWORK|DBG_GAME, DBG_WARN, "data files not found");
+	Error::Except("create server");
+    }
 
     if(!PrepareMapsFileInfoList(finfoList, true) ||
        !Settings::Get().LoadFileMapsMP2(finfoList.front().file))
-	    DEBUG(DBG_NETWORK, DBG_WARN, "FH2Server::" << " No maps available!");
+	    DEBUG(DBG_NETWORK, DBG_WARN, "maps not found");
 
     mutexConf.Create();
     mutexSpool.Create();
@@ -235,13 +239,13 @@ int FH2Server::Main(void* ptr)
 			break;
 
 		    default:
-			DEBUG(DBG_NETWORK, DBG_INFO, "FH2Server::" << "Main:" << " unused: " << Network::GetMsgString(msg.GetID()));
+			DEBUG(DBG_NETWORK, DBG_INFO, "unused: " << Network::GetMsgString(msg.GetID()));
 			break;
 		}
 
 		if(!clientResult)
 		{
-		    DEBUG(DBG_NETWORK, DBG_WARN, "FH2Server::" << "Main: " << "client shutdown: " << "id: 0x" << std::hex << client->player_id);
+		    DEBUG(DBG_NETWORK, DBG_WARN, "client shutdown: " << "id: 0x" << std::hex << client->player_id);
 		    client->ShutdownThread();
 		}
 
@@ -270,7 +274,7 @@ bool FH2Server::BattleRecvTurn(u8 color, const Battle2::Stats & b, const Battle2
     msg.Push(b.GetID());
 
     // send battle turn
-    DEBUG(DBG_NETWORK, DBG_INFO, "FH2Server::" << "BattleTurn: " << "id: 0x" << b.GetID() << ", send turn");
+    DEBUG(DBG_NETWORK, DBG_INFO, "id: 0x" << b.GetID() << ", send turn");
     if(!client->Send(msg)) return false;
 
     bool exit = false;
@@ -310,7 +314,7 @@ bool FH2Server::BattleRecvTurn(u8 color, const Battle2::Stats & b, const Battle2
 			break;
 
 		    default:
-			DEBUG(DBG_NETWORK, DBG_INFO, "FH2Server::" << "BattleTurn:" << " unused: " << Network::GetMsgString(msg.GetID()));
+			DEBUG(DBG_NETWORK, DBG_INFO, "unused: " << Network::GetMsgString(msg.GetID()));
 			break;
 		}
 
@@ -322,7 +326,7 @@ bool FH2Server::BattleRecvTurn(u8 color, const Battle2::Stats & b, const Battle2
 
     // FIXME: need send board?
     // send board
-    DEBUG(DBG_NETWORK, DBG_INFO, "FH2Server::" << "BattleTurn: " << "id: 0x" << b.GetID() << ", send board");
+    DEBUG(DBG_NETWORK, DBG_INFO, "id: 0x" << b.GetID() << ", send board");
     if(! BattleSendBoard(color, arena)) return false;
 
     return true;
@@ -334,7 +338,7 @@ int FH2Server::WaitClients(void* ptr)
     FH2RemoteClients & clients = server.clients;
     size_t preferablyPlayers = Settings::Get().PreferablyCountPlayers();
 
-    DEBUG(DBG_NETWORK, DBG_INFO, "FH2Server::" << "WaitClients: " << "start");
+    DEBUG(DBG_NETWORK, DBG_INFO, "start");
 
     // wait players
     while(! server.Modes(ST_SHUTDOWN))
@@ -350,7 +354,7 @@ int FH2Server::WaitClients(void* ptr)
     	    if(preferablyPlayers <= connectedPlayers ||
 		server.Modes(ST_FULLHOUSE))
 	    {
-		DEBUG(DBG_NETWORK, DBG_INFO, "FH2Server::" << "WaitClients: " << "full house");
+		DEBUG(DBG_NETWORK, DBG_INFO, "full house");
 		Socket sct(csd);
 		sct.Close();
 	    }
@@ -376,7 +380,7 @@ int FH2Server::WaitClients(void* ptr)
 	DELAY(100);
     }
 
-    DEBUG(DBG_NETWORK, DBG_INFO, "FH2Server::" << "WaitClients: " << "shutdown");
+    DEBUG(DBG_NETWORK, DBG_INFO, "shutdown");
 
     return 1;
 }
@@ -390,7 +394,7 @@ bool FH2Server::WaitReadyClients(u32 ms)
     QueueMessage msg(MSG_PING);
     msg.Push(magick);
 
-    DEBUG(DBG_NETWORK, DBG_INFO, "FH2Server::" << "WaitReadyClients: " << "waiting " << ms);
+    DEBUG(DBG_NETWORK, DBG_INFO, "waiting " << ms);
 
     time.Start();
 
@@ -421,11 +425,11 @@ bool FH2Server::WaitReadyClients(u32 ms)
 
     if(remains)
     {
-	DEBUG(DBG_NETWORK, DBG_WARN, "FH2Server::" << "WaitReadyClients: " << "false");
+	DEBUG(DBG_NETWORK, DBG_WARN, "false");
     }
     else
     {
-	DEBUG(DBG_NETWORK, DBG_INFO, "FH2Server::" << "WaitReadyClients: " << "reply " << time.Get());
+	DEBUG(DBG_NETWORK, DBG_INFO, "reply " << time.Get());
     }
 
     return remains ? false : true;
@@ -693,7 +697,7 @@ bool FH2Server::BattleSendAction(u8 color, QueueMessage & msg)
     FH2RemoteClient* client = clients.GetClient(color);
     if(client)
     {
-	DEBUG(DBG_NETWORK, DBG_INFO, "FH2Server::" << "BattleSendAction: " << Network::GetMsgString(msg.GetID()));
+	DEBUG(DBG_NETWORK, DBG_INFO, Network::GetMsgString(msg.GetID()));
 	return client->Send(msg);
     }
     return false;
@@ -710,7 +714,7 @@ bool FH2Server::BattleSendResult(u8 color, const Battle2::Result & res)
 	msg.Push(res.exp1);
 	msg.Push(res.exp2);
 
-	DEBUG(DBG_NETWORK, DBG_INFO, "FH2Server::" << "SendBattleResult: ");
+	DEBUG(DBG_NETWORK, DBG_INFO, "");
 	return client->Send(msg);
     }
     return false;
@@ -729,7 +733,7 @@ bool FH2Server::BattleSendAttack(u8 color, const Battle2::Stats & attacker, cons
 	msg.Push(dst);
 	targets.Pack(msg);
 
-	DEBUG(DBG_NETWORK, DBG_INFO, "FH2Server::" << "SendBattleAttack: ");
+	DEBUG(DBG_NETWORK, DBG_INFO, "");
 	return client->Send(msg);
     }
     return false;
@@ -743,7 +747,7 @@ bool FH2Server::BattleSendBoard(u8 color, const Battle2::Arena & a)
 	QueueMessage msg(MSG_BATTLE_BOARD);
 	a.PackBoard(msg);
 
-	DEBUG(DBG_NETWORK, DBG_INFO, "FH2Server::" << "SendBattleBoard: " << msg.DtSz() << "bytes");
+	DEBUG(DBG_NETWORK, DBG_INFO, msg.DtSz() << " bytes");
 	return client->Send(msg);
     }
     return false;
@@ -761,7 +765,7 @@ bool FH2Server::BattleSendSpell(u8 color, u16 who, u16 dst, u8 spell, const Batt
 	msg.Push(color);
 	targets.Pack(msg);
 
-	DEBUG(DBG_NETWORK, DBG_INFO, "FH2Server::" << "BattleSendSpell: " << Spell::GetName(Spell::FromInt(spell)));
+	DEBUG(DBG_NETWORK, DBG_INFO, Spell::GetName(Spell::FromInt(spell)));
 	return client->Send(msg);
     }
     return false;
@@ -779,7 +783,7 @@ bool FH2Server::BattleSendTeleportSpell(u8 color, u16 src, u16 dst)
 	//msg.Push(color); // unused
 	//msg.Push(static_cast<u32>(0)); // empty TargetsInfo // unused
 
-	DEBUG(DBG_NETWORK, DBG_INFO, "FH2Server::" << "BattleSendSpell: " << Spell::GetName(Spell::TELEPORT));
+	DEBUG(DBG_NETWORK, DBG_INFO, Spell::GetName(Spell::TELEPORT));
 	return client->Send(msg);
     }
     return false;
@@ -798,7 +802,7 @@ bool FH2Server::BattleSendEarthQuakeSpell(u8 color, const std::vector<u8> & targ
 	    it = targets.begin(); it != targets.end(); ++it)
 	    msg.Push(*it);
 
-	DEBUG(DBG_NETWORK, DBG_INFO, "FH2Server::" << "BattleSendSpell: " << Spell::GetName(Spell::EARTHQUAKE));
+	DEBUG(DBG_NETWORK, DBG_INFO, Spell::GetName(Spell::EARTHQUAKE));
 	return client->Send(msg);
     }
     return false;

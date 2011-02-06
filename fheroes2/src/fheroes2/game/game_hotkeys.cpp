@@ -246,7 +246,7 @@ void Game::HotKeysLoad(const std::string & hotkeys)
 		{
 		    const KeySym sym = GetKeySym(entry->IntParams());
 		    key_events[evnt] = sym;
-		    DEBUG(DBG_GAME, DBG_INFO, "Game::HotKeysLoad: events: " << EventsName(evnt) << ", key: " << KeySymGetName(sym));
+		    DEBUG(DBG_GAME, DBG_INFO, "events: " << EventsName(evnt) << ", key: " << KeySymGetName(sym));
 		}
 	    }
 	}
@@ -293,7 +293,7 @@ void Game::KeyboardGlobalFilter(int sym, u16 mod)
 #else
         stream << ".png";
 #endif
-        if(display.Save(stream.str().c_str())) DEBUG(DBG_GAME , DBG_INFO, "Game::KeyboardGlobalFilter: save: " << stream.str());
+        if(display.Save(stream.str().c_str())) DEBUG(DBG_GAME, DBG_INFO, "save: " << stream.str());
     }
 #ifdef WITHOUT_MOUSE
     else

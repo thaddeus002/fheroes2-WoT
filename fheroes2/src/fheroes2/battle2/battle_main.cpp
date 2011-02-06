@@ -55,7 +55,7 @@ Battle2::Result Battle2::Loader(Army::army_t & army1, Army::army_t & army2, s32 
 
     if(IS_DEBUG(DBG_BATTLE , DBG_INFO))
     {
-	VERBOSE("Battle2::Loader: start, army1(" << Color::String(army1.GetColor()) << "), army2(" << Color::String(army2.GetColor()) << ")");
+	DEBUG(DBG_BATTLE, DBG_INFO, "start");
 	army1.Dump();
 	army2.Dump();
     }
@@ -147,7 +147,7 @@ Battle2::Result Battle2::Loader(Army::army_t & army1, Army::army_t & army2, s32 
 
     if(IS_DEBUG(DBG_BATTLE , DBG_INFO))
     {
-	VERBOSE("Battle2::Loader: end, army1(" << Color::String(army1.GetColor()) << "), army2(" << Color::String(army2.GetColor()) << ")");
+	DEBUG(DBG_BATTLE, DBG_INFO, "end");
 	army1.Dump();
 	army2.Dump();
     }
@@ -172,7 +172,7 @@ Battle2::Result Battle2::Loader(Army::army_t & army1, Army::army_t & army2, s32 
         AGG::ICNRegistryFreeObjects();
     }
 
-    DEBUG(DBG_BATTLE, DBG_INFO, "Battle2::Result: army1: " << (result.army1 & RESULT_WINS ? "wins" : "loss") << ", army2: " << (result.army2 & RESULT_WINS ? "wins" : "loss"));
+    DEBUG(DBG_BATTLE, DBG_INFO, "army1: " << (result.army1 & RESULT_WINS ? "wins" : "loss") << ", army2: " << (result.army2 & RESULT_WINS ? "wins" : "loss"));
 
     return result;
 }
@@ -279,17 +279,17 @@ void Battle2::NecromancySkillAction(Army::army_t & army1, u32 killed, bool local
     // hard fix overflow
     if(percent > 90) percent = 90;
 
-    const Monster skeleton(Monster::SKELETON);
-    const u32 count = Monster::GetCountFromHitPoints(Monster::SKELETON, skeleton.GetHitPoints() * killed * percent / 100);
-    army1.JoinTroop(skeleton, count);
+    const Monster mons(Monster::SKELETON);
+    const u32 count = Monster::GetCountFromHitPoints(Monster::SKELETON, mons.GetHitPoints() * killed * percent / 100);
+    army1.JoinTroop(mons, count);
 
     if(local)
     {
 	std::string msg = _("Practicing the dark arts of necromancy, you are able to raise %{count} of the enemy's dead to return under your service as %{monster}");
 	String::Replace(msg, "%{count}", count);
-	String::Replace(msg, "%{monster}", skeleton.GetMultiName());
+	String::Replace(msg, "%{monster}", mons.GetMultiName());
 	Surface sf1(40, 45);
-	const Sprite & sf2 = AGG::GetICN(ICN::MONS32, Monster::GetSpriteIndex(skeleton()));
+	const Sprite & sf2 = AGG::GetICN(ICN::MONS32, Monster::GetSpriteIndex(mons()));
 	sf1.SetColorKey();
 	sf1.Blit(sf2, (sf1.w() - sf2.w()) / 2, 0);
 	std::string str;
@@ -300,7 +300,7 @@ void Battle2::NecromancySkillAction(Army::army_t & army1, u32 killed, bool local
 	Dialog::SpriteInfo("", msg, sf1);
     }
 
-    DEBUG(DBG_BATTLE, DBG_TRACE, "Battle2::NecromancySkillAction: raise skeletons: " << count);
+    DEBUG(DBG_BATTLE, DBG_TRACE, "raise: " << count << mons.GetMultiName());
 }
 
 u8 Battle2::Result::AttackerResult(void) const

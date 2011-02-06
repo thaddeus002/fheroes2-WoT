@@ -102,7 +102,7 @@ void Army::Troop::Reset(void)
 
 const Battle2::Stats* Army::Troop::GetBattleStats(void) const
 {
-    if(!battle) DEBUG(DBG_GAME, DBG_INFO, "Army::Troop::GetBattleStats: return NULL");
+    if(!battle) DEBUG(DBG_GAME, DBG_WARN, "return NULL");
     return battle;
 }
 
@@ -119,7 +119,7 @@ bool Army::Troop::BattleInit(void)
 	battle = new Battle2::Stats(*this);
 	return battle;
     }
-    DEBUG(DBG_BATTLE, DBG_WARN, "Army::Troop::BattleInit: invalid troop");
+    DEBUG(DBG_BATTLE, DBG_WARN, "invalid troop");
     return false;
 }
 

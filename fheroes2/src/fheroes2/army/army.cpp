@@ -245,7 +245,7 @@ Army::Troop & Army::army_t::FirstValid(void)
 
     if(it == army.end())
     {
-	DEBUG(DBG_GAME , DBG_WARN, "Army::FirstValid: not found, return first..");
+	DEBUG(DBG_GAME, DBG_WARN, "not found" << ", return first..");
 	it = army.begin();
     }
 
@@ -327,7 +327,7 @@ bool Army::army_t::JoinTroop(const Troop & troop)
 	    (*it).SetCount((*it).GetCount() + troop.GetCount());
 	else
 	    (*it).Set(troop, troop.GetCount());
-	DEBUG(DBG_GAME , DBG_INFO, "Army::JoinTroop: monster: " << troop.GetName() << ", count: " << std::dec << troop.GetCount() << ", commander: " << (commander ? commander->GetName() : "unknown"));
+	DEBUG(DBG_GAME, DBG_INFO, "monster: " << troop.GetName() << ", count: " << std::dec << troop.GetCount() << ", commander: " << (commander ? commander->GetName() : "unknown"));
 	return true;
     }
 
@@ -406,7 +406,7 @@ Race::race_t Army::army_t::GetRace(void) const
 
     if(races.empty())
     {
-        DEBUG(DBG_GAME , DBG_WARN, "Army::GetRaceArmy: empty");
+        DEBUG(DBG_GAME, DBG_WARN, "empty");
         return Race::MULT;
     }
 
@@ -1087,11 +1087,8 @@ bool Army::army_t::StrongerEnemyArmy(const army_t & army2) const
     const double h1 = GetHitPoints();
     const double h2 = army2.GetHitPoints();
 
-    if(IS_DEBUG(DBG_AI, DBG_INFO))
-    {
-	VERBOSE("Army::StrongerEnemyArmy: " << "r1: " << r1 << ", s1: " << s1 << ", h1: " << h1 \
+    DEBUG(DBG_AI, DBG_INFO, "r1: " << r1 << ", s1: " << s1 << ", h1: " << h1 \
 			<< ", r2: " << r2 << ", s2: " << s2 << ", h2: " << h2);
-    }
 
     r1 *= s1 / h2;
     r2 *= s2 / h1;
@@ -1100,7 +1097,7 @@ bool Army::army_t::StrongerEnemyArmy(const army_t & army2) const
     {
 	Dump();
 	army2.Dump();
-	VERBOSE("Army::StrongerEnemyArmy: " << "army1: " << r1 << ", army2: " << r2);
+	DEBUG(DBG_GAME, DBG_INFO, "army1: " << r1 << ", army2: " << r2);
     }
 
     return 0 == r2 || 1 <= (r1 / r2);

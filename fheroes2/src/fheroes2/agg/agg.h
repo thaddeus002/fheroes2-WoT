@@ -48,7 +48,7 @@ namespace AGG
 	u32 offset;
 	u32 size;
 
-	void Dump(const std::string & n) const;
+	std::string Info(void) const;
     };
 
     class File
@@ -65,13 +65,13 @@ namespace AGG
 
 	bool Read(const std::string & key, std::vector<u8> & body);
 
-	void Dump(void) const;
-
     private:
 	std::string filename;
 	std::map<std::string, FAT> fat;
 	u16 count_items;
 	std::ifstream* stream;
+	std::string last_key;
+	std::vector<u8> last_body;
     };
 
     struct icn_cache_t

@@ -50,6 +50,7 @@ namespace Resource
 
     struct funds_t
     {
+	funds_t(s32 o, s32 w, s32 m, s32 s, s32 c, s32 g, s32 l) : wood(w), mercury(m), ore(o), sulfur(0), crystal(c), gems(g), gold(l) {};
 	funds_t() : wood(0), mercury(0), ore(0), sulfur(0), crystal(0), gems(0), gold(0) {};
 	funds_t(u8 rs, u32 count);
 
@@ -67,6 +68,7 @@ namespace Resource
 
 	u8 GetValidItems(void) const;
 	void Reset(void);
+	std::string Dump(void) const;
 
         s32 wood;
         s32 mercury;

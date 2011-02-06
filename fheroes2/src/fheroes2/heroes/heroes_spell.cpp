@@ -139,7 +139,7 @@ bool Heroes::ActionSpellCast(Spell::spell_t spell)
 
     if(apply)
     {
-	DEBUG(DBG_GAME, DBG_INFO, "ActionSpell: " << GetName() << " cast spell: " << Spell::GetName(spell));
+	DEBUG(DBG_GAME, DBG_INFO, GetName() << " cast spell: " << Spell::GetName(spell));
 	TakeSpellPoints(Spell::CostManaPoints(spell, this));
 	return true;
     }
@@ -270,7 +270,7 @@ bool ActionSpellSummonBoat(Heroes & hero)
     // find boat
     const s32 src = world.GetNearestObject(center, MP2::OBJ_BOAT);
     if(src < 0)
-	DEBUG(DBG_GAME, DBG_WARN, "ActionSpellSummonBoat: " << "free boat not found");
+	DEBUG(DBG_GAME, DBG_WARN, "free boat: " << "not found");
 
     if(Rand::Get(1, 100) <= chance &&
 	Maps::isValidAbsIndex(src) && Maps::isValidAbsIndex(dst_water))

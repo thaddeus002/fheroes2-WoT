@@ -475,7 +475,7 @@ void Dialog::QuickInfo(const Castle & castle)
 	case Race::WRLK: index = (castle.isCastle() ? 12 : 18); break;
 	case Race::WZRD: index = (castle.isCastle() ? 13 : 19); break;
 	case Race::NECR: index = (castle.isCastle() ? 14 : 20); break;
-	default: DEBUG(DBG_GAME , DBG_WARN, "Dialog::QuickInfo: unknown race."); return;
+	default: DEBUG(DBG_GAME, DBG_WARN, "unknown race"); return;
     }
     
     // castle icon

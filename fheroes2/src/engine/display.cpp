@@ -225,7 +225,7 @@ void Display::SetVideoMode(const u16 w, const u16 h, u32 flags)
     display.surface = SDL_SetVideoMode(w, h, 0, flags);
 
     if(!display.surface)
-	Error::Except("SDL_SetVideoMode: ", SDL_GetError());
+	Error::Except(SDL_GetError());
 
     display.update_rects.SetVideoMode(display.w(), display.h());
 }

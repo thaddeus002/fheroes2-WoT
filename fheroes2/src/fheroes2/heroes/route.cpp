@@ -256,12 +256,17 @@ u16 Route::Path::GetAllowStep(void) const
 
 void Route::Path::Dump(void) const
 {
-    VERBOSE("Path::Dump: from: " << hero.GetIndex() << ", to: " << dst << ", obj: " << MP2::StringObject(world.GetTiles(dst).GetObject()));
+    std::ostringstream os;
 
-    const_iterator it1 = begin();
-    const_iterator it2 = end();
+    for(const_iterator
+	it = begin(); it != end(); ++it)
+    {
+	os << Direction::String((*it).Direction()) << "(" << (*it).Penalty() << ")" << ", ";
+    }
+    os << "end";
 
-    for(; it1 != it2; ++it1) VERBOSE("Path::Dump: " << Direction::String((*it1).Direction()) << ", " << (*it1).Penalty());
+    DEBUG(DBG_GAME, DBG_TRACE, "from: " << hero.GetIndex() << ", to: " << dst <<
+	", obj: " << MP2::StringObject(world.GetTiles(dst).GetObject()) << "\n\t\t" << os.str());
 }
 
 u16 Route::Path::isUnderProtection(s32 & pos) const

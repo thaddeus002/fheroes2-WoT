@@ -45,6 +45,7 @@ namespace String
     void UTF8_to_UNICODE(u16 *unicode, const char *utf8, int len);
     void UNICODE_to_UTF8(std::string & utf8, const u16 *unicode, size_t len);
 
+    std::string GetTime(void);
 }
 
 int Sign(int);
@@ -56,8 +57,8 @@ std::string GetBasename(const std::string &);
 
 u32 GetMemoryUsage(void);
 
-bool StoreMemToFile(const std::vector<u8> &, const std::string &);
-bool StoreFileToMem(std::vector<u8> &, const std::string &);
+bool SaveMemToFile(const std::vector<u8> &, const std::string &);
+bool LoadFileToMem(std::vector<u8> &, const std::string &);
 bool FilePresent(const std::string &);
 
 std::string EncodeString(const std::string & str, const char* charset);

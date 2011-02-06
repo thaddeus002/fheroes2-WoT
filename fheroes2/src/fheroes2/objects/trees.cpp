@@ -34,7 +34,7 @@ Trees::Trees(const ICN::icn_t icn) : Object(MP2::OBJ_TREES, icn)
         case ICN::TREFALL:
         case ICN::TREDECI: break;
 
-        default: DEBUG(DBG_GAME , DBG_WARN, "Trees::Trees: unknown type"); break;
+        default: DEBUG(DBG_GAME, DBG_WARN, "unknown type"); break;
     }
 }
 

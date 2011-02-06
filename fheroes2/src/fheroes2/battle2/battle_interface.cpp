@@ -1566,23 +1566,9 @@ void Battle2::Interface::HumanBattleTurn(const Stats & b, Actions & a, std::stri
 	    ProcessingHeroDialogResult(3, a);
 
 	// debug only
-	//if(IS_DEVEL()) 
+	if(IS_DEVEL()) 
 	switch(le.KeyValue())
 	{
-	    case KEY_r:
-		cursor.Hide();
-		Redraw();
-		cursor.Show();
-		Display::Get().Flip();
-		VERBOSE("redraw");
-		break;
-
-	    case KEY_n:
-		arena.ResetBoard();
-		arena.ScanPassabilityBoard(b);
-		VERBOSE("scan");
-		break;
-
 	    case KEY_w:
 		if(arena.result_game)
 		{
@@ -1769,7 +1755,7 @@ void Battle2::Interface::HumanCastSpellTurn(const Stats & b, Actions & a, std::s
 
 	    if(index < 0)
 	    {
-		DEBUG(DBG_BATTLE, DBG_WARN, "Battle2::Interface::" << "HumanCastSpellTurn: " << " dst out of range");
+		DEBUG(DBG_BATTLE, DBG_WARN, "dst: " << "out of range");
 		return;
 	    }
 
@@ -1789,7 +1775,7 @@ void Battle2::Interface::HumanCastSpellTurn(const Stats & b, Actions & a, std::s
 		    teleport_src = index;
 		else
 		{
-		    DEBUG(DBG_BATTLE, DBG_TRACE, "Battle2::Interface::" << "HumanCastSpellTurn: " << Spell::GetName(Spell::FromInt(humanturn_spell)) << ", dst: " << index);
+		    DEBUG(DBG_BATTLE, DBG_TRACE, Spell::GetName(Spell::FromInt(humanturn_spell)) << ", dst: " << index);
 		    a.AddedCastTeleportAction(teleport_src, index);
 		    humanturn_spell = Spell::NONE;
 		    humanturn_exit = true;
@@ -1798,7 +1784,7 @@ void Battle2::Interface::HumanCastSpellTurn(const Stats & b, Actions & a, std::s
 	    }
 	    else
 	    {
-		DEBUG(DBG_BATTLE, DBG_TRACE, "Battle2::Interface::" << "HumanCastSpellTurn: " << Spell::GetName(Spell::FromInt(humanturn_spell)) << ", dst: " << index);
+		DEBUG(DBG_BATTLE, DBG_TRACE, Spell::GetName(Spell::FromInt(humanturn_spell)) << ", dst: " << index);
 		a.AddedCastAction(humanturn_spell, index);
 		humanturn_spell = Spell::NONE;
 		humanturn_exit = true;
@@ -3719,7 +3705,7 @@ void Battle2::Interface::RedrawActionEarthQuakeSpell(const std::vector<u8> & tar
 
 void Battle2::Interface::RedrawActionRemoveMirrorImage(const Stats & mirror)
 {
-    DEBUG(DBG_BATTLE, DBG_WARN, "Battle2::Interface::" << "RedrawActionRemoveMirrorImage: " << "FIXME");
+    DEBUG(DBG_BATTLE, DBG_WARN, "FIXME");
     status.SetMessage(_("MirrorImage ended"), true);
 }
 
@@ -4255,7 +4241,7 @@ bool Battle2::Interface::NetworkTurn(Result & result)
 		Dialog::Message("NetworkTurn: ", "socket: error", Font::BIG, Dialog::OK);
 		return false;
             }
-	    DEBUG(DBG_NETWORK, DBG_INFO, "NetworkTurn: " << "recv: " << Network::GetMsgString(msg.GetID()));
+	    DEBUG(DBG_NETWORK, DBG_INFO, "recv: " << Network::GetMsgString(msg.GetID()));
 
             switch(msg.GetID())
             {
@@ -4314,7 +4300,7 @@ bool Battle2::Interface::NetworkTurn(Result & result)
 			RedrawActionAttackPart2(*attacker, targets);
 		    }
 		    else
-			DEBUG(DBG_NETWORK, DBG_INFO, "NetworkTurn: " << "incorrect attack");
+			DEBUG(DBG_NETWORK, DBG_WARN, "incorrect attack");
 		    break;
 		}
 
@@ -4354,7 +4340,7 @@ bool Battle2::Interface::NetworkTurn(Result & result)
 
     			while(a.size())
     			{
-			    DEBUG(DBG_NETWORK, DBG_INFO, "NetworkTurn: " << "send: " <<
+			    DEBUG(DBG_NETWORK, DBG_INFO, "send: " <<
 							Network::GetMsgString(a.front().GetID()));
 			    if(!client.Send(a.front())) return false;
         		    a.pop_front();

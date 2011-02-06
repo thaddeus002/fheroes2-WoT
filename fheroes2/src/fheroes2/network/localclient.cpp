@@ -174,12 +174,10 @@ bool FH2LocalClient::SendWait(QueueMessage & msg, u16 id, const char* str)
     if(msg.GetID() != id)
 	msg.SetID(id);
 
-    DEBUG(DBG_NETWORK, DBG_INFO, "FH2LocalClient::" << str <<
-				    " send: " << Network::GetMsgString(id));
+    DEBUG(DBG_NETWORK, DBG_INFO, str << " send: " << Network::GetMsgString(id));
     if(!Send(msg)) return false;
 
-    DEBUG(DBG_NETWORK, DBG_INFO, "FH2LocalClient::" << str <<
-				    " wait: " << Network::GetMsgString(id));
+    DEBUG(DBG_NETWORK, DBG_INFO, str << " wait: " << Network::GetMsgString(id));
     if(!Wait(msg, id)) return false;
 
     return true;
@@ -187,12 +185,10 @@ bool FH2LocalClient::SendWait(QueueMessage & msg, u16 id, const char* str)
 
 bool FH2LocalClient::WaitSend(QueueMessage & msg, u16 id, const char* str)
 {
-    DEBUG(DBG_NETWORK, DBG_INFO, "FH2LocalClient::" << str <<
-				    " wait: " << Network::GetMsgString(id));
+    DEBUG(DBG_NETWORK, DBG_INFO, str << " wait: " << Network::GetMsgString(id));
     if(!Wait(msg, id)) return false;
 
-    DEBUG(DBG_NETWORK, DBG_INFO, "FH2LocalClient::" << str <<
-				    " send: " << Network::GetMsgString(id));
+    DEBUG(DBG_NETWORK, DBG_INFO, str << " send: " << Network::GetMsgString(id));
     if(!Send(msg)) return false;
 
     return true;
@@ -208,7 +204,7 @@ bool FH2LocalClient::ConnectionChat(void)
     player_id = 0;
 
     // recv ready, banner
-    DEBUG(DBG_NETWORK, DBG_INFO, "FH2LocalClient::" << "ConnectionChat: " << "wait ready");
+    DEBUG(DBG_NETWORK, DBG_INFO, "wait ready");
     if(!Wait(packet, MSG_READY)) return false;
 
     // get banner
@@ -229,10 +225,10 @@ bool FH2LocalClient::ConnectionChat(void)
 
     packet.Pop(modes);
     packet.Pop(player_id);
-    DEBUG(DBG_NETWORK, DBG_INFO, "FH2LocalClient::" << "ConnectionChat: " << (Modes(ST_ADMIN) ? "admin" : "client") << " mode");
+    DEBUG(DBG_NETWORK, DBG_INFO, (Modes(ST_ADMIN) ? "admin" : "client") << " mode");
 
     // ready
-    DEBUG(DBG_NETWORK, DBG_INFO, "FH2LocalClient::" << "ConnectionChat: " << "wait: " << Network::GetMsgString(MSG_READY));
+    DEBUG(DBG_NETWORK, DBG_INFO, "wait: " << Network::GetMsgString(MSG_READY));
     if(!Wait(packet, MSG_READY)) return false;
     packet.Pop(str);
 
@@ -304,8 +300,7 @@ bool FH2LocalClient::Prepare4BattleOnly(void)
 
 	QueueMessage packet;
 
-	DEBUG(DBG_NETWORK, DBG_INFO, "FH2LocalClient::" << "Prepare4BattleOnly: " <<
-		    "wait: " << Network::GetMsgString(MSG_UPDATE_PLAYERS));
+	DEBUG(DBG_NETWORK, DBG_INFO, "wait: " << Network::GetMsgString(MSG_UPDATE_PLAYERS));
 
 	while(le.HandleEvents())
 	{
@@ -340,7 +335,7 @@ bool FH2LocalClient::GetLoadMaps(bool forceLoad, bool sendAll)
     if(Game::IO::LoadBIN(packet))
 	return true;
 
-    DEBUG(DBG_NETWORK, DBG_WARN, "FH2LocalClient::" << "LoadMaps: " << "error");
+    DEBUG(DBG_NETWORK, DBG_WARN, "error");
     return false;
 }
 
@@ -348,7 +343,7 @@ bool FH2LocalClient::SendStartBattleOnly(void)
 {
     QueueMessage packet(MSG_START_BATTLEONLY);
 
-    DEBUG(DBG_NETWORK, DBG_INFO, "FH2LocalClient::" << "SendStartBattleOnly");
+    DEBUG(DBG_NETWORK, DBG_INFO, "");
     if(!Send(packet)) return false;
     return true;
 }
@@ -364,7 +359,7 @@ bool FH2LocalClient::GetPlayersInfo(void)
 
     if(0 == player_color)
     {
-	DEBUG(DBG_NETWORK, DBG_WARN, "FH2LocalClient::" << "GetPlayersInfo: " << "invalid color");
+	DEBUG(DBG_NETWORK, DBG_WARN, "unknown color");
 	return false;
     }
 
@@ -423,7 +418,7 @@ bool FH2LocalClient::ScenarioInfoDialog(void)
     bool exit = false;
     bool update_info = false;
     u8 change_color = Color::NONE;
-    DEBUG(DBG_NETWORK, DBG_INFO, "FH2LocalClient::" << "ScenarioInfoDialog: " << "start queue");
+    DEBUG(DBG_NETWORK, DBG_INFO, "start queue");
 
     while(!exit && le.HandleEvents())
     {
@@ -432,8 +427,7 @@ bool FH2LocalClient::ScenarioInfoDialog(void)
 	    QueueMessage packet;
 
 	    if(!Recv(packet)) return false;
-	    DEBUG(DBG_NETWORK, DBG_INFO, "FH2LocalClient::" << "ScenarioInfoDialog: " << "recv: " <<
-								Network::GetMsgString(packet.GetID()));
+	    DEBUG(DBG_NETWORK, DBG_INFO, "recv: " << Network::GetMsgString(packet.GetID()));
 
 	    switch(packet.GetID())
     	    {
@@ -526,7 +520,7 @@ bool FH2LocalClient::ScenarioInfoDialog(void)
 	    	    packet.Reset();
 		    packet.SetID(MSG_SET_CURRENT_MAP);
 	    	    packet.Push(filemaps);
-		    DEBUG(DBG_NETWORK, DBG_INFO, "FH2LocalClient::" << "ScenarioInfoDialog: " << "send: " << Network::GetMsgString(packet.GetID()));
+		    DEBUG(DBG_NETWORK, DBG_INFO, "send: " << Network::GetMsgString(packet.GetID()));
 	    	    if(!Send(packet)) return false;
 		}
 		update_info = true;
@@ -543,7 +537,7 @@ bool FH2LocalClient::ScenarioInfoDialog(void)
 /*
 	    packet.Reset();
 	    packet.SetID(MSG_START_GAME);
-	    DEBUG(DBG_NETWORK, DBG_INFO, "FH2LocalClient::" << "ScenarioInfoDialog: " << "send: " << Network::GetMsgString(packet.GetID()));
+	    DEBUG(DBG_NETWORK, DBG_INFO, "send: " << Network::GetMsgString(packet.GetID()));
 	    if(!Send(packet)) return false;
 	    cursor.Hide();
 	    return true;
@@ -577,7 +571,7 @@ bool FH2LocalClient::ScenarioInfoDialog(void)
 			QueueMessage packet(MSG_CHANGE_COLORS);
 			packet.Push(change_color);
 			packet.Push(color);
-		        DEBUG(DBG_NETWORK, DBG_INFO, "FH2LocalClient::" << "ScenarioInfoDialog: " << "send: " << Network::GetMsgString(packet.GetID()));
+		        DEBUG(DBG_NETWORK, DBG_INFO, "send: " << Network::GetMsgString(packet.GetID()));
 			if(!Send(packet)) return false;
 			change_color = Color::NONE;
 		    }
@@ -616,8 +610,7 @@ bool FH2LocalClient::ScenarioInfoDialog(void)
 			QueueMessage packet(MSG_CHANGE_RACE);
 			packet.Push(color);
 			packet.Push(race);
-		        DEBUG(DBG_NETWORK, DBG_INFO, "FH2LocalClient::" << "ScenarioInfoDialog: " <<
-							"send: " << Network::GetMsgString(packet.GetID()));
+		        DEBUG(DBG_NETWORK, DBG_INFO, "send: " << Network::GetMsgString(packet.GetID()));
 			if(!Send(packet)) return false;
 		    }
 		}

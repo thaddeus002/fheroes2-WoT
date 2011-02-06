@@ -319,7 +319,7 @@ bool LocalEvent::HandleEvents(bool delay)
 	
 	    // exit
 	    case SDL_QUIT:
-		Error::Except("LocalEvent::HandleEvents: ", "quit event: ok.");
+		Error::Except("get event: SDL_QUIT");
 		return false;
 
 	    default:
