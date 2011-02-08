@@ -389,10 +389,14 @@ bool FH2RemoteClient::ConnectionChat(void)
     packet.Pop(player_name);
     DEBUG(DBG_NETWORK, DBG_INFO, "id: 0x" << std::hex << player_id << ", connected " << 
 			" player: " << player_name << ", host 0x" << std::hex << Host() << ":0x" << Port());
+
+    if(Modes(ST_ADMIN) && conf.GameType() != game_type) SetGameType(game_type);
+
     // send hello, modes, id
     packet.Reset();
     packet.SetID(MSG_HELLO);
     packet.Push(modes);
+    packet.Push(conf.GameType());
     packet.Push(player_id);
     // send
     DEBUG(DBG_NETWORK, DBG_INFO, "id: 0x" << std::hex << player_id << ", send hello");
@@ -400,7 +404,6 @@ bool FH2RemoteClient::ConnectionChat(void)
 
     DEBUG(DBG_NETWORK, DBG_INFO, (Modes(ST_ADMIN) ? "admin" : "client") << " mode");
 
-    if(Modes(ST_ADMIN) && conf.GameType() != game_type) SetGameType(game_type);
 
     // update colors
     return UpdateColors();
@@ -413,7 +416,7 @@ void FH2RemoteClient::SetGameType(u8 type)
     RemoteMessage & msg = server.GetNewMessage(*this);
     QueueMessage & packet = msg.packet;
 
-    packet.setID(MSG_SET_GAMETYPE);
+    packet.SetID(MSG_SET_GAMETYPE);
     packet.Push(type);
     msg.SetReady();
 }

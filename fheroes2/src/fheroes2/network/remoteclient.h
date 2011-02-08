@@ -62,6 +62,7 @@ struct FH2RemoteClient : public FH2Client
     bool SendAccessDenied(QueueMessage &);
     void MsgChangeColors(void);
     void MsgChangeRace(void);
+    void SetGameType(u8 type);
 
     void Dump(void) const;
     void Reset(void);

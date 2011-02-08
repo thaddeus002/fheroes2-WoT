@@ -643,16 +643,6 @@ void FH2Server::MsgSetGameType(QueueMessage & msg, FH2RemoteClient & client)
 	    world.NewMaps(10, 10);
 	}
     }
-
-    type = conf.GameType();
-    msg.Reset();
-    msg.SetID(MSG_GET_GAME_TYPE);
-    msg.Push(type);
-
-    if(client.Modes(ST_ADMIN))
-	clients.Send2All(msg, 0);
-    else
-	client.Send(msg);
 }
 
 void FH2Server::MsgLoadMaps(QueueMessage & msg, FH2RemoteClient & client)

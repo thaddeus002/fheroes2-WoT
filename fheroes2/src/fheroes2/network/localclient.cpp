@@ -197,7 +197,7 @@ bool FH2LocalClient::WaitSend(QueueMessage & msg, u16 id, const char* str)
 
 bool FH2LocalClient::ConnectionChat(void)
 {
-    const Settings & conf = Settings::Get();
+    Settings & conf = Settings::Get();
     QueueMessage packet;
 
     player_color = 0;
@@ -226,9 +226,15 @@ bool FH2LocalClient::ConnectionChat(void)
     if(!SendWait(packet, MSG_HELLO, "ConnectionChat: "))
 	return false;
 
+    u8 game_type;
+
     packet.Pop(modes);
+    packet.Pop(game_type);
     packet.Pop(player_id);
     DEBUG(DBG_NETWORK, DBG_INFO, (Modes(ST_ADMIN) ? "admin" : "client") << " mode");
+
+    if(conf.GameType() != game_type)
+	conf.SetGameType(game_type);
 
     // ready
     DEBUG(DBG_NETWORK, DBG_INFO, "wait: " << Network::GetMsgString(MSG_READY));
