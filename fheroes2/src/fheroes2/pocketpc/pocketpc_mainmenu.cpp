@@ -102,7 +102,7 @@ Game::menu_t PocketPC::MainMenu(void)
     while(le.HandleEvents())
     {
 	if(Game::HotKeyPress(Game::EVENT_BUTTON_NEWGAME) ||
-		le.MouseClickLeft(rectNewGame)) return Game::NEWGAME;
+		le.MouseClickLeft(rectNewGame)) return Game::NEWSTANDARD; //NEWGAME;
 	else
 	if(Game::HotKeyPress(Game::EVENT_BUTTON_LOADGAME) ||
 		le.MouseClickLeft(rectLoadGame)) return Game::LOADGAME;

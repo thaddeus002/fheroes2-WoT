@@ -21,7 +21,6 @@
  ***************************************************************************/
 
 #include "engine.h"
-#include "gamedefs.h"
 #include "race.h"
 
 const char* Race::String(u8 race)
@@ -46,9 +45,10 @@ const char* Race::String(u8 race)
     return str_race[8];
 }
 
-Race::race_t Race::Rand(void)
+u8 Race::Rand(void)
 {
-    switch(Rand::Get(1, 6)){
+    switch(Rand::Get(1, 6))
+    {
         case 1: return Race::KNGT;
         case 2: return Race::BARB;
         case 3: return Race::SORC;
@@ -60,7 +60,7 @@ Race::race_t Race::Rand(void)
     return Race::NECR;
 }
 
-Race::race_t Race::Get(u8 index)
+u8 Race::Get(u8 index)
 {
     switch(index)
     {

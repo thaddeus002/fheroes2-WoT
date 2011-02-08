@@ -98,13 +98,35 @@ Color::color_t Color::Get(u8 index)
 
 u8 Color::GetFirst(u8 colors)
 {
-    Color::color_t color = Color::BLUE;
-    for(; color != Color::GRAY; ++color) if(color & colors) return color;
+    if(colors & BLUE) return BLUE;
+    else
+    if(colors & GREEN) return GREEN;
+    else
+    if(colors & RED) return RED;
+    else
+    if(colors & YELLOW) return YELLOW;
+    else
+    if(colors & ORANGE) return ORANGE;
+    else
+    if(colors & PURPLE) return PURPLE;
 
     return 0;
 }
 
-const char* Barrier::Color(u8 val)
+Color::Colors Color::GetColors(u8 all)
+{
+    Colors colors;
+    colors.reserve(6);
+    if(all & BLUE) colors.push_back(BLUE);
+    if(all & GREEN) colors.push_back(GREEN);
+    if(all & RED) colors.push_back(RED);
+    if(all & YELLOW) colors.push_back(YELLOW);
+    if(all & ORANGE) colors.push_back(ORANGE);
+    if(all & PURPLE) colors.push_back(PURPLE);
+    return colors;
+}
+
+const char* BarrierColor::String(u8 val)
 {
     switch(val)
     {
@@ -122,7 +144,7 @@ const char* Barrier::Color(u8 val)
     return "None";
 }
 
-Barrier::color_t Barrier::FromMP2(u8 val)
+u8 BarrierColor::FromMP2(u8 val)
 {
     switch(val)
     {

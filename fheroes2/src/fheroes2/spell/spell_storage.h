@@ -28,23 +28,23 @@
 #include "game_io.h"
 #include "gamedefs.h"
 
-class SpellStorage
+class Artifact;
+class BagArtifacts;
+
+class SpellStorage : public std::vector<Spell>
 {
 public:
 	SpellStorage();
 
 	u8 Size(u8 lvl = 0) const;
 
-	void GetSpells(std::vector<Spell::spell_t> &, u8) const;
-	void Append(const Spell::spell_t sp, u8 wisdom);
-	void Append(const Spell::spell_t sp);
-	bool isPresentSpell(Spell::spell_t) const;
-	void Dump(void) const;
-
-/* protected: */
-	friend class Game::IO;
-
-	std::vector<Spell::spell_t> spells;
+	SpellStorage GetSpells(u8) const;
+	void Append(const SpellStorage &);
+	void Append(const Spell &, u8 wisdom = 0);
+	void Append(const BagArtifacts &);
+	void Append(const Artifact &);
+	bool isPresentSpell(const Spell &) const;
+	std::string String(void) const;
 };
 
 #endif

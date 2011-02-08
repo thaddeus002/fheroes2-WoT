@@ -23,6 +23,7 @@
 #include <algorithm>
 #include <fstream>
 #include "maps.h"
+#include "race.h"
 #include "tinyconfig.h"
 #include "settings.h"
 
@@ -33,11 +34,12 @@ bool IS_DEBUG(int name, int level)
 {
     const u16 debug = Settings::Get().Debug();
     return
-        ((DBG_ENGINE & name) && ((DBG_ENGINE & debug) >> 2) == level) ||
-        ((DBG_GAME & name) && ((DBG_GAME & debug) >> 4) == level) ||
-        ((DBG_BATTLE & name) && ((DBG_BATTLE & debug) >> 6) == level) ||
+        ((DBG_ENGINE & name) && ((DBG_ENGINE & debug) >> 2) >= level) ||
+        ((DBG_GAME & name) && ((DBG_GAME & debug) >> 4) >= level) ||
+        ((DBG_BATTLE & name) && ((DBG_BATTLE & debug) >> 6) >= level) ||
         ((DBG_AI & name) && ((DBG_AI & debug) >> 8) == level) ||
-        ((DBG_NETWORK & name) && ((DBG_NETWORK & debug) >> 10) == level);
+        ((DBG_NETWORK & name) && ((DBG_NETWORK & debug) >> 10) >= level) ||
+        ((DBG_DEVEL & name) && ((DBG_DEVEL & debug) >> 12) >= level);
 }
 
 const char* StringDebug(int name)
@@ -229,14 +231,22 @@ bool Settings::Read(const std::string & filename)
     entry = config.Find("debug");
     if(entry)
     {
-	const std::string & str = entry->StrParams();
-	if(str == "on")
-	    debug = DEFAULT_DEBUG;
-	else
-	if(str == "off")
-	    debug = 0;
-	else
-	    debug = entry->IntParams();
+	debug = entry->IntParams();
+
+	switch(debug)
+	{
+	    case 0:	debug = DBG_ALL_WARN; break;
+	    case 1:	debug = DBG_ENGINE_INFO; break;
+	    case 2:	debug = DBG_ENGINE_INFO | DBG_GAME_INFO; break;
+	    case 3:	debug = DBG_ENGINE_INFO | DBG_BATTLE_INFO; break;
+	    case 4:	debug = DBG_ENGINE_INFO | DBG_BATTLE_INFO | DBG_AI_INFO; break;
+	    case 5:	debug = DBG_ALL_INFO; break;
+	    case 6:	debug = DBG_GAME_TRACE; break;
+	    case 7:	debug = DBG_GAME_TRACE | DBG_AI_TRACE; break;
+	    case 8:	debug = DBG_ENGINE_TRACE | DBG_GAME_TRACE | DBG_AI_TRACE; break;
+	    case 9:	debug = DBG_ALL_TRACE; break;
+	    default: break;
+	}
     }
 
     // opt_globals
@@ -801,11 +811,6 @@ void Settings::SetPlayersColors(u8 c)
     players_colors = c;
 }
 
-bool Settings::AutoBattle(u8 color) const
-{
-    return auto_battle_on & color;
-}
-
 void Settings::SetPreferablyCountPlayers(u8 c)
 {
     preferably_count_players = 6 < c ? 6 : c;
@@ -826,7 +831,7 @@ u16 Settings::GetPort(void) const
     return port;
 }
 
-Race::race_t Settings::KingdomRace(u8 color) const
+u8 Settings::KingdomRace(u8 color) const
 {
     return Race::Get(current_maps_file.KingdomRace(color));
 }
@@ -938,9 +943,9 @@ bool Settings::WinsAllowNormalVictory(void) const
     return current_maps_file.WinsAllowNormalVictory();
 }
 
-Artifact::artifact_t Settings::WinsFindArtifact(void) const
+u8 Settings::WinsFindArtifactID(void) const
 {
-    return current_maps_file.WinsFindArtifact();
+    return current_maps_file.WinsFindArtifactID();
 }
 
 bool Settings::WinsFindUltimateArtifact(void) const
@@ -1009,10 +1014,13 @@ bool Settings::IsUnions(u8 cl1, u8 cl2) const
 
 void Settings::FixKingdomRandomRace(void)
 {
-    for(Color::color_t color = Color::BLUE; color != Color::GRAY; ++color) if(KingdomColors(color))
+    Color::Colors colors = Color::GetColors();
+    for(Color::Colors::iterator
+	it = colors.begin(); it != colors.end(); ++it)
+    if(KingdomColors(*it))
     {
-        if(Race::RAND == KingdomRace(color)) SetKingdomRace(color, Race::Rand());
-        DEBUG(DBG_GAME, DBG_INFO, Color::String(color) << ": " << Race::String(KingdomRace(color)));
+        if(Race::RAND == KingdomRace(*it)) SetKingdomRace(*it, Race::Rand());
+        DEBUG(DBG_GAME, DBG_INFO, Color::String(*it) << ": " << Race::String(KingdomRace(*it)));
     }
 }
 
@@ -1031,14 +1039,6 @@ void Settings::SetUnicode(bool f)
 void Settings::SetPriceLoyaltyVersion(void)
 {
     opt_global.SetModes(GLOBAL_PRICELOYALTY);
-}
-
-void Settings::SetAutoBattle(u8 color, bool f)
-{
-    if(f)
-	auto_battle_on |= color;
-    else
-	auto_battle_on &= ~color;
 }
 
 void Settings::SetEvilInterface(bool f)

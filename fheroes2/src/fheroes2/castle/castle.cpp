@@ -1,4 +1,4 @@
-/**************************************************************************
+/*************************************************************************
  *   Copyright (C) 2009 by Andrey Afletdinov <fheroes2@gmail.com>          *
  *                                                                         *
  *   Part of the Free Heroes2 Engine:                                      *
@@ -26,6 +26,7 @@
 #include "payment.h"
 #include "world.h"
 #include "luck.h"
+#include "race.h"
 #include "morale.h"
 #include "kingdom.h"
 #include "maps_tiles.h"
@@ -40,7 +41,7 @@ Castle::Castle() : captain(*this), mageguild(*this), army(&captain)
 {
 }
 
-Castle::Castle(s16 cx, s16 cy, const Race::race_t rc) : Position(Point(cx, cy)), race(rc), captain(*this),
+Castle::Castle(s16 cx, s16 cy, const u8 rc) : Position(Point(cx, cy)), race(rc), captain(*this),
     color(Color::GRAY), building(0), mageguild(*this), army(NULL)
 {
     std::fill(dwelling, dwelling + CASTLEMAXMONSTER, 0);
@@ -201,7 +202,7 @@ void Castle::LoadFromMP2(const void *ptr)
     ptr8 += 13;
 
     // race
-    const Race::race_t kingdom_race = Settings::Get().KingdomRace(color);
+    const u8 kingdom_race = Settings::Get().KingdomRace(color);
     switch(*ptr8)
     { 	 
 	case 0x00: race = Race::KNGT; break; 	 
@@ -409,7 +410,7 @@ const MageGuild & Castle::GetMageGuild(void) const
     return mageguild;
 }
 
-const char* Castle::GetStringBuilding(u32 build, Race::race_t race)
+const char* Castle::GetStringBuilding(u32 build, u8 race)
 {
     const char* str_build[] = { _("Thieves' Guild"), _("Tavern"), _("Shipyard"), _("Well"), _("Statue"), _("Left Turret"),
 	_("Right Turret"), _("Marketplace"), _("Moat"), _("Castle"), _("Tent"), _("Captain's Quarters"), _("Mage Guild, Level 1"), 
@@ -494,7 +495,7 @@ const char* Castle::GetStringBuilding(u32 build, Race::race_t race)
     return str_build[17];
 }
 
-const char* Castle::GetDescriptionBuilding(u32 build, Race::race_t race)
+const char* Castle::GetDescriptionBuilding(u32 build, u8 race)
 {
     const char* desc_build[] = {
 	_("The Thieves' Guild provides information on enemy players. Thieves' Guilds can also provide scouting information on enemy towns."),
@@ -1161,7 +1162,7 @@ void Castle::DrawImageCastle(const Point & pt)
     }
 }
 
-ICN::icn_t Castle::GetICNBoat(const Race::race_t & race)
+ICN::icn_t Castle::GetICNBoat(const u8 & race)
 {
     switch(race)
     {
@@ -1179,7 +1180,7 @@ ICN::icn_t Castle::GetICNBoat(const Race::race_t & race)
 }
 
 /* get building name ICN */
-ICN::icn_t Castle::GetICNBuilding(u32 build, Race::race_t race)
+ICN::icn_t Castle::GetICNBuilding(u32 build, u8 race)
 {
     if(Race::BARB == race)
     {

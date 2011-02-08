@@ -34,6 +34,7 @@
 #include "payment.h"
 #include "profit.h"
 #include "kingdom.h"
+#include "race.h"
 #include "tools.h"
 #include "text.h"
 #include "portrait.h"
@@ -736,7 +737,7 @@ Dialog::answer_t Castle::OpenDialog(bool readonly, bool fade)
 	if(coordMageGuild && le.MouseClickLeft(*coordMageGuild))
 	{
 		// buy spell book
-		if(!heroes.Guest() || heroes.Guest()->HasArtifact(Artifact::MAGIC_BOOK))
+		if(!heroes.Guest() || heroes.Guest()->HaveSpellBook())
 		    OpenMageGuild();
 		else
 		if(heroes.Guest()->BuySpellBook(&mageguild))

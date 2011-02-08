@@ -30,7 +30,7 @@ namespace Portrait
 
     const Surface & Get(const HeroBase & hero, const Portrait::size_t sz);
     const Surface & Hero(const Heroes & hero, const Portrait::size_t sz);
-    const Surface & Captain(const Race::race_t rs, const Portrait::size_t sz);
+    const Surface & Captain(const u8 rs, const Portrait::size_t sz);
 }
 
 #endif

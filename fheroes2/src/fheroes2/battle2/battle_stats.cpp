@@ -710,10 +710,19 @@ u8 Battle2::Stats::GetSpeed(bool skip_standing_check) const
     if(!skip_standing_check && (!count || Modes(TR_MOVED | SP_BLIND | IS_PARALYZE_MAGIC))) return Speed::STANDING;
 
     const u8 speed = GetMonster().GetSpeed();
+    Spell spell;
 
-    if(Modes(SP_HASTE)) return (Spell::GetExtraValue(Spell::HASTE) ? speed + Spell::GetExtraValue(Spell::HASTE) : Speed::GetOriginalFast(speed));
+    if(Modes(SP_HASTE))
+    {
+	spell = Spell::HASTE;
+	return spell.ExtraValue() ? speed + spell.ExtraValue() : Speed::GetOriginalFast(speed);
+    }
     else
-    if(Modes(SP_SLOW)) return (Spell::GetExtraValue(Spell::SLOW) ? speed - Spell::GetExtraValue(Spell::SLOW) : Speed::GetOriginalSlow(speed));
+    if(Modes(SP_SLOW))
+    {
+	spell = Spell::SLOW;
+	return spell.ExtraValue() ? speed - spell.ExtraValue() : Speed::GetOriginalSlow(speed);
+    }
 
     return speed;
 }
@@ -758,7 +767,7 @@ u32 Battle2::Stats::CalculateDamageStats(const Stats & enemy, double dmg) const
 	    if(enemy.GetObstaclesPenalty(*this)) dmg /= 2;
 
 	    // check spell shield
-	    if(enemy.Modes(SP_SHIELD)) dmg /= Spell::GetExtraValue(Spell::SHIELD);
+	    if(enemy.Modes(SP_SHIELD)) dmg /= Spell(Spell::SHIELD).ExtraValue();
 	}
     }
 
@@ -786,7 +795,7 @@ u32 Battle2::Stats::CalculateDamageStats(const Stats & enemy, double dmg) const
 
     // approximate.. from faq
     int r = GetAttack() - enemy.GetDefense();
-    if(enemy.troop.isDragons() && Modes(SP_DRAGONSLAYER)) r+= Spell::GetExtraValue(Spell::DRAGONSLAYER);
+    if(enemy.troop.isDragons() && Modes(SP_DRAGONSLAYER)) r+= Spell(Spell::DRAGONSLAYER).ExtraValue();
     dmg *= 1 + (0 < r ? 0.1 * std::min(r,  20) : 0.05 * std::max(r, -15));
 
     switch(troop())
@@ -959,7 +968,7 @@ u32 Battle2::Stats::ApplyDamage(Stats & enemy, u32 dmg)
     return killed;
 }
 
-bool Battle2::Stats::AllowApplySpell(u8 spell, const HeroBase* hero, std::string *msg) const
+bool Battle2::Stats::AllowApplySpell(const Spell & spell, const HeroBase* hero, std::string *msg) const
 {
     if(Modes(SP_ANTIMAGIC)) return false;
 
@@ -969,16 +978,16 @@ bool Battle2::Stats::AllowApplySpell(u8 spell, const HeroBase* hero, std::string
     // check global
     // if(arena->DisableCastSpell(spell, msg)) return false; // disable - recursion!
 
-    if(hero && Spell::isApplyToFriends(spell) && GetColor() != hero->GetColor()) return false;
-    if(hero && Spell::isApplyToEnemies(spell) && GetColor() == hero->GetColor()) return false;
+    if(hero && spell.isApplyToFriends() && GetColor() != hero->GetColor()) return false;
+    if(hero && spell.isApplyToEnemies() && GetColor() == hero->GetColor()) return false;
     if(isMagicResist(spell, (hero ? hero->GetPower() : 0))) return false;
 
     const HeroBase* myhero = GetCommander();
     if(!myhero) return true;
 
     // check artifact
-    Artifact::artifact_t guard_art = Artifact::UNKNOWN;
-    switch(spell)
+    Artifact guard_art(Artifact::UNKNOWN);
+    switch(spell())
     {
 	case Spell::CURSE:
 	case Spell::MASSCURSE:	guard_art = Artifact::HOLY_PENDANT; break;
@@ -995,13 +1004,13 @@ bool Battle2::Stats::AllowApplySpell(u8 spell, const HeroBase* hero, std::string
 	default: break;
     }
 
-    if(Artifact::UNKNOWN != guard_art && myhero->HasArtifact(guard_art))
+    if(guard_art.isValid() && myhero->HasArtifact(guard_art))
     {
 	if(msg)
 	{
 	    *msg = _("The %{artifact} artifact is in effect for this battle, disabling %{spell} spell.");
-	    String::Replace(*msg, "%{artifact}", Artifact::GetName(guard_art));
-	    String::Replace(*msg, "%{spell}", Spell::GetName(Spell::FromInt(spell)));
+	    String::Replace(*msg, "%{artifact}", guard_art.GetName());
+	    String::Replace(*msg, "%{spell}", spell.GetName());
 	}
 	return false;
     }
@@ -1009,21 +1018,21 @@ bool Battle2::Stats::AllowApplySpell(u8 spell, const HeroBase* hero, std::string
     return true;
 }
 
-bool Battle2::Stats::ApplySpell(u8 spell, const HeroBase* hero, TargetInfo & target)
+bool Battle2::Stats::ApplySpell(const Spell & spell, const HeroBase* hero, TargetInfo & target)
 {
     if(! AllowApplySpell(spell, hero)) return false;
 
-    DEBUG(DBG_BATTLE, DBG_TRACE, Spell::GetName(Spell::FromInt(spell)) << " to " << Info());
+    DEBUG(DBG_BATTLE, DBG_TRACE, spell.GetName() << " to " << Info());
 
     // save spell for "eagle eye" capability
     arena->AddSpell(spell);
 
     u16 spoint = hero ? hero->GetPower() : 3;
 
-    if(Spell::isDamage(spell))
+    if(spell.isDamage())
 	SpellApplyDamage(spell, spoint, hero, target);
     else
-    if(Spell::isRestore(spell))
+    if(spell.isRestore())
 	SpellRestoreAction(spell, spoint, hero);
     else
     {
@@ -1168,7 +1177,7 @@ u16 Battle2::Stats::GetAttack(void) const
     u16 res = GetMonster().GetAttack() +
 	(GetCommander() ? GetCommander()->GetAttack() : 0);
 
-    if(Modes(SP_BLOODLUST)) res += Spell::GetExtraValue(Spell::BLOODLUST);
+    if(Modes(SP_BLOODLUST)) res += Spell(Spell::BLOODLUST).ExtraValue();
 
     return res;
 }
@@ -1178,15 +1187,15 @@ u16 Battle2::Stats::GetDefense(void) const
     s16 res = GetMonster().GetDefense() +
 	(GetCommander() ? GetCommander()->GetDefense() : 0);
 
-    if(Modes(SP_STONESKIN)) res += Spell::GetExtraValue(Spell::STONESKIN);
+    if(Modes(SP_STONESKIN)) res += Spell(Spell::STONESKIN).ExtraValue();
     else
-    if(Modes(SP_STEELSKIN)) res += Spell::GetExtraValue(Spell::STEELSKIN);
+    if(Modes(SP_STEELSKIN)) res += Spell(Spell::STEELSKIN).ExtraValue();
 
     // extra
     if(Modes(TR_HARDSKIP) && Settings::Get().ExtBattleSkipIncreaseDefense()) res += 2;
 
     // disrupting ray accumulate effect
-    if(disruptingray) res -= disruptingray * Spell::GetExtraValue(Spell::DISRUPTINGRAY);
+    if(disruptingray) res -= disruptingray * Spell(Spell::DISRUPTINGRAY).ExtraValue();
     if(0 > res) res = 1;
 
     return res;
@@ -1281,15 +1290,15 @@ bool Battle2::Stats::isArchers(void) const
     return troop.isArchers() && shots;
 }
 
-void Battle2::Stats::SpellModesAction(u8 spell, u8 duration, const HeroBase* hero)
+void Battle2::Stats::SpellModesAction(const Spell & spell, u8 duration, const HeroBase* hero)
 {
     if(hero)
     {
-	if(hero->HasArtifact(Artifact::WIZARD_HAT)) duration += Artifact::GetExtraValue(Artifact::WIZARD_HAT);
-	if(hero->HasArtifact(Artifact::ENCHANTED_HOURGLASS)) duration += Artifact::GetExtraValue(Artifact::ENCHANTED_HOURGLASS);
+	if(hero->HasArtifact(Artifact::WIZARD_HAT)) duration += Artifact(Artifact::WIZARD_HAT).ExtraValue();
+	if(hero->HasArtifact(Artifact::ENCHANTED_HOURGLASS)) duration += Artifact(Artifact::ENCHANTED_HOURGLASS).ExtraValue();
     }
 
-    switch(spell)
+    switch(spell())
     {
 	case Spell::BLESS:
 	case Spell::MASSBLESS:
@@ -1424,15 +1433,15 @@ void Battle2::Stats::SpellModesAction(u8 spell, u8 duration, const HeroBase* her
     }
 }
 
-void Battle2::Stats::SpellApplyDamage(u8 spell, u8 spoint, const HeroBase* hero, TargetInfo & target)
+void Battle2::Stats::SpellApplyDamage(const Spell & spell, u8 spoint, const HeroBase* hero, TargetInfo & target)
 {
-    u32 dmg = Spell::Damage(spell) * spoint;
+    u32 dmg = spell.Damage() * spoint;
 
     switch(troop())
     {
 	case Monster::IRON_GOLEM:
 	case Monster::STEEL_GOLEM:
-	    switch(spell)
+	    switch(spell())
 	    {
 		// 50% damage
                 case Spell::COLDRAY:
@@ -1449,7 +1458,7 @@ void Battle2::Stats::SpellApplyDamage(u8 spell, u8 spoint, const HeroBase* hero,
 	    break;
 
         case Monster::WATER_ELEMENT:
-	    switch(spell)
+	    switch(spell())
 	    {
 		// 200% damage
                 case Spell::FIREBALL:
@@ -1460,7 +1469,7 @@ void Battle2::Stats::SpellApplyDamage(u8 spell, u8 spoint, const HeroBase* hero,
 	    break;
 
 	case Monster::AIR_ELEMENT:
-	    switch(spell)
+	    switch(spell())
 	    {
 		// 200% damage
                 case Spell::ELEMENTALSTORM:
@@ -1472,7 +1481,7 @@ void Battle2::Stats::SpellApplyDamage(u8 spell, u8 spoint, const HeroBase* hero,
 	    break;
 
 	case Monster::FIRE_ELEMENT:
-	    switch(spell)
+	    switch(spell())
 	    {
 		// 200% damage
                 case Spell::COLDRAY:
@@ -1490,15 +1499,15 @@ void Battle2::Stats::SpellApplyDamage(u8 spell, u8 spoint, const HeroBase* hero,
     {
 	const HeroBase* myhero = GetCommander();
 
-	switch(spell)
+	switch(spell())
 	{
             case Spell::COLDRAY:
             case Spell::COLDRING:
 		// +50%
-    		if(hero->HasArtifact(Artifact::EVERCOLD_ICICLE)) dmg += dmg * Artifact::GetExtraValue(Artifact::EVERCOLD_ICICLE) / 100;
+    		if(hero->HasArtifact(Artifact::EVERCOLD_ICICLE)) dmg += dmg * Artifact(Artifact::EVERCOLD_ICICLE).ExtraValue() / 100;
 		// -50%
     		if(myhero && myhero->HasArtifact(Artifact::ICE_CLOAK)) dmg /= 2;
-    		if(myhero && myhero->HasArtifact(Artifact::HEART_ICE)) dmg -= dmg * Artifact::GetExtraValue(Artifact::HEART_ICE) / 100;
+    		if(myhero && myhero->HasArtifact(Artifact::HEART_ICE)) dmg -= dmg * Artifact(Artifact::HEART_ICE).ExtraValue() / 100;
     		// 100%
     		if(myhero && myhero->HasArtifact(Artifact::HEART_FIRE)) dmg *= 2;
     		break;
@@ -1506,17 +1515,17 @@ void Battle2::Stats::SpellApplyDamage(u8 spell, u8 spoint, const HeroBase* hero,
             case Spell::FIREBALL:
             case Spell::FIREBLAST:
 		// +50%
-    		if(hero->HasArtifact(Artifact::EVERHOT_LAVA_ROCK)) dmg += dmg * Artifact::GetExtraValue(Artifact::EVERHOT_LAVA_ROCK) / 100;
+    		if(hero->HasArtifact(Artifact::EVERHOT_LAVA_ROCK)) dmg += dmg * Artifact(Artifact::EVERHOT_LAVA_ROCK).ExtraValue() / 100;
 		// -50%
     		if(myhero && myhero->HasArtifact(Artifact::FIRE_CLOAK)) dmg /= 2;
-    		if(myhero && myhero->HasArtifact(Artifact::HEART_FIRE)) dmg -= dmg * Artifact::GetExtraValue(Artifact::HEART_FIRE) / 100;
+    		if(myhero && myhero->HasArtifact(Artifact::HEART_FIRE)) dmg -= dmg * Artifact(Artifact::HEART_FIRE).ExtraValue() / 100;
     		// 100%
     		if(myhero && myhero->HasArtifact(Artifact::HEART_ICE)) dmg *= 2;
     		break;
 
             case Spell::LIGHTNINGBOLT:
 		// +50%
-    		if(hero->HasArtifact(Artifact::LIGHTNING_ROD)) dmg += dmg * Artifact::GetExtraValue(Artifact::LIGHTNING_ROD) / 100;
+    		if(hero->HasArtifact(Artifact::LIGHTNING_ROD)) dmg += dmg * Artifact(Artifact::LIGHTNING_ROD).ExtraValue() / 100;
 		// -50%
     		if(myhero && myhero->HasArtifact(Artifact::LIGHTNING_HELM)) dmg /= 2;
 		break;
@@ -1556,9 +1565,9 @@ void Battle2::Stats::SpellApplyDamage(u8 spell, u8 spoint, const HeroBase* hero,
     }
 }
 
-void Battle2::Stats::SpellRestoreAction(u8 spell, u8 spoint, const HeroBase* hero)
+void Battle2::Stats::SpellRestoreAction(const Spell & spell, u8 spoint, const HeroBase* hero)
 {
-    switch(spell)
+    switch(spell())
     {
 	case Spell::CURE:
 	case Spell::MASSCURE:
@@ -1569,7 +1578,7 @@ void Battle2::Stats::SpellRestoreAction(u8 spell, u8 spoint, const HeroBase* her
 		affected.RemoveMode(IS_BAD_MAGIC);
 	    }
 	    // restore
-	    hp += (Spell::Restore(spell) * spoint);
+	    hp += (spell.Restore() * spoint);
 	    if(hp > count * GetMonster().GetHitPoints()) hp = count * GetMonster().GetHitPoints();
 	    break;
 
@@ -1577,7 +1586,7 @@ void Battle2::Stats::SpellRestoreAction(u8 spell, u8 spoint, const HeroBase* her
 	case Spell::ANIMATEDEAD:
         case Spell::RESURRECTTRUE:
 	{
-	    u32 restore = Spell::Resurrect(spell) * spoint;
+	    u32 restore = spell.Resurrect() * spoint;
 	    // remove from graveyard
 	    if(!isValid())
 	    {
@@ -1587,7 +1596,7 @@ void Battle2::Stats::SpellRestoreAction(u8 spell, u8 spoint, const HeroBase* her
 	    // restore hp
 	    if(hero && hero->HasArtifact(Artifact::ANKH)) restore *= 2;
 
-	    const u16 res = Resurrect(restore, false, (Spell::RESURRECT == spell));
+	    const u16 res = Resurrect(restore, false, (spell == Spell::RESURRECT));
 
 	    if(arena->interface)
 	    {
@@ -1681,21 +1690,21 @@ bool Battle2::Stats::isAlwayResponse(void) const
     return false;
 }
 
-bool Battle2::Stats::isMagicResist(u8 spell, u8 spower) const
+bool Battle2::Stats::isMagicResist(const Spell & spell, u8 spower) const
 {
-    return 100 == GetMagicResist(spell, spower);
+    return 100 <= GetMagicResist(spell, spower);
 }
 
-u8 Battle2::Stats::GetMagicResist(u8 spell, u8 spower) const
+u8 Battle2::Stats::GetMagicResist(const Spell & spell, u8 spower) const
 {
-    if(Spell::isMindInfluence(spell) &&
+    if(spell.isMindInfluence() &&
         (troop.isUndead() || troop.isElemental() ||
     	troop() == Monster::GIANT || troop() == Monster::TITAN)) return 100;
 
-    if(Spell::isALiveOnly(spell) &&
+    if(spell.isALiveOnly() &&
         troop.isUndead()) return 100;
 
-    if(Spell::isUndeadOnly(spell) &&
+    if(spell.isUndeadOnly() &&
         !troop.isUndead()) return 100;
 
     if(Settings::Get().ExtBattleMagicTroopCanResist() && spell == GetSpellMagic(true))
@@ -1705,13 +1714,13 @@ u8 Battle2::Stats::GetMagicResist(u8 spell, u8 spower) const
     {
         case Monster::ARCHMAGE:
 	    if(Settings::Get().ExtBattleArchmageCanResistBadMagic() &&
-		(Spell::isDamage(spell) || Spell::isApplyToEnemies(spell))) return 20;
+		(spell.isDamage() || spell.isApplyToEnemies())) return 20;
 	    break;
 
 	// 25% unfortunatly
 	case Monster::DWARF:
 	case Monster::BATTLE_DWARF:
-	    if(Spell::isDamage(spell) || Spell::isApplyToEnemies(spell)) return 25;
+	    if(spell.isDamage() || spell.isApplyToEnemies()) return 25;
             break;
 
         case Monster::GREEN_DRAGON:
@@ -1720,7 +1729,7 @@ u8 Battle2::Stats::GetMagicResist(u8 spell, u8 spower) const
             return 100;
 
         case Monster::PHOENIX:
-            switch(spell)
+            switch(spell())
             {
                 case Spell::COLDRAY:
                 case Spell::COLDRING:
@@ -1735,7 +1744,7 @@ u8 Battle2::Stats::GetMagicResist(u8 spell, u8 spower) const
             break;
 
         case Monster::CRUSADER:
-            switch(spell)
+            switch(spell())
             {
                 case Spell::CURSE:
                 case Spell::MASSCURSE:
@@ -1745,7 +1754,7 @@ u8 Battle2::Stats::GetMagicResist(u8 spell, u8 spower) const
             break;
 
         case Monster::EARTH_ELEMENT:
-            switch(spell)
+            switch(spell())
             {
                 case Spell::METEORSHOWER:
                 case Spell::LIGHTNINGBOLT:
@@ -1756,7 +1765,7 @@ u8 Battle2::Stats::GetMagicResist(u8 spell, u8 spower) const
             break;
 
         case Monster::AIR_ELEMENT:
-            switch(spell)
+            switch(spell())
             {
                 case Spell::METEORSHOWER:
                     return 100;
@@ -1765,7 +1774,7 @@ u8 Battle2::Stats::GetMagicResist(u8 spell, u8 spower) const
             break;
 
         case Monster::FIRE_ELEMENT:
-            switch(spell)
+            switch(spell())
             {
                 case Spell::FIREBALL:
                 case Spell::FIREBLAST:
@@ -1775,7 +1784,7 @@ u8 Battle2::Stats::GetMagicResist(u8 spell, u8 spower) const
             break;
 
         case Monster::WATER_ELEMENT:
-            switch(spell)
+            switch(spell())
             {
                 case Spell::COLDRAY:
                 case Spell::COLDRING:
@@ -1787,7 +1796,7 @@ u8 Battle2::Stats::GetMagicResist(u8 spell, u8 spower) const
         default: break;
     }
 
-    switch(spell)
+    switch(spell())
     {
 	case Spell::CURE:
 	case Spell::MASSCURE:
@@ -1806,7 +1815,7 @@ u8 Battle2::Stats::GetMagicResist(u8 spell, u8 spower) const
 	    break;
 
 	case Spell::HYPNOTIZE:
-	    if(Spell::GetExtraValue(Spell::FromInt(spell)) * spower < hp) return 100;
+	    if(spell.ExtraValue() * spower < hp) return 100;
 	    break;
 
 	default: break;

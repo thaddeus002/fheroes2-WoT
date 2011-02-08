@@ -36,8 +36,6 @@
 struct BattleOnly;
 #endif
 
-typedef std::vector<Artifact> BagArtifacts;
-
 namespace Army { class army_t; }
 
 class HeroBase : public Skill::Primary, public Maps::Position, public BitModes
@@ -75,15 +73,17 @@ public:
     void SetSpellPoints(u16);
     void TakeSpellPoints(u16);
 
-    Spell::spell_t OpenSpellBook(SpellBook::filter_t, bool) const;
+    Spell OpenSpellBook(SpellBook::filter_t, bool) const;
     bool HaveSpellBook(void) const;
-    bool HaveSpell(Spell::spell_t) const;
-    void SpellBookActivate(void);
-    void AppendSpellToBook(Spell::spell_t, bool without_wisdom = false);
+    bool HaveSpell(const Spell &) const;
+    void AppendSpellToBook(const Spell &, bool without_wisdom = false);
+    void AppendSpellsToBook(const SpellStorage &, bool without_wisdom = false);
+    bool SpellBookActivate(void);
 
     BagArtifacts & GetBagArtifacts(void);
     const BagArtifacts & GetBagArtifacts(void) const;
-    bool HasArtifact(Artifact::artifact_t) const;
+    bool HasArtifact(const Artifact &) const;
+    bool PickupArtifact(const Artifact &);
 
 protected:
     friend class Game::IO;

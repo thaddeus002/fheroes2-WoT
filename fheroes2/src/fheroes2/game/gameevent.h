@@ -26,27 +26,15 @@
 #include <string>
 #include "resource.h"
 #include "artifact.h"
-#include "game_io.h"
+#include "position.h"
 #include "gamedefs.h"
 
-namespace GameEvent
+struct EventDate
 {
+    EventDate() {}
+    EventDate(const void *ptr);
 
-class Day
-{
-public:
-    Day();
-    Day(const void *ptr);
-    
-    bool AllowComputer(void) const{ return computer; }
-    const Resource::funds_t & GetResource(void) const{ return resource; }
-    u16 GetFirst(void) const{ return first; }
-    u16 GetSubsequent(void) const{ return subsequent; }
-    u8  GetColors(void) const{ return colors; }
-    const std::string & GetMessage(void) const{ return message; }
-
-private:
-    friend class Game::IO;
+    bool isAllow(u8 color, u16 date) const;
 
     Resource::funds_t resource;
     bool computer;
@@ -56,56 +44,33 @@ private:
     std::string message;
 };
 
-class Coord
+struct EventMaps : public Maps::Position
 {
-public:
-    Coord();
-    Coord(s32 index, const void *ptr);
+    EventMaps() {}
+    EventMaps(s32 index, const void *ptr);
 
-    bool AllowComputer(void) const{ return computer; }
-    const Resource::funds_t & GetResource(void) const{ return resource; }
-    s32 GetIndex(void) const{ return index_map; }
-    u8  GetColors(void) const{ return colors; }
-    const std::string & GetMessage(void) const{ return message; }
-    Artifact::artifact_t GetArtifact(void) const {return artifact; }
-
-private:
-    friend class Game::IO;
-
-    s32 index_map;
     Resource::funds_t resource;
-    Artifact::artifact_t artifact;
+    Artifact artifact;
     bool computer;
     bool cancel;
     u8 colors;
     std::string message;
 };
 
-class Riddle
+struct Riddle : public Maps::Position
 {
-public:
-    Riddle();
+    Riddle() {}
     Riddle(s32 index, const void *ptr);
 
-    const Resource::funds_t & GetResource(void) const{ return resource; }
-    Artifact::artifact_t GetArtifact(void) const {return artifact; }
     bool AnswerCorrect(const std::string & answer);
-    s32 GetIndex(void) const{ return index_map; }
-    const std::string & GetMessage(void) const{ return message; }
-    bool isValid(void) const;
     void SetQuiet(void);
-
-private:
-    friend class Game::IO;
 
     s32 index_map;
     Resource::funds_t resource;
-    Artifact::artifact_t artifact;
+    Artifact artifact;
     std::vector<std::string> answers;
     std::string message;
     bool valid;
 };
-
-}
 
 #endif

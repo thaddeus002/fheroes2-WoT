@@ -29,7 +29,6 @@
 #include "color.h"
 #include "captain.h"
 #include "dialog.h"
-#include "race.h"
 #include "army.h"
 #include "bitmodes.h"
 #include "heroes.h"
@@ -92,7 +91,7 @@ public:
     };
 
     Castle();
-    Castle(s16 cx, s16 cy, const Race::race_t rs);
+    Castle(s16 cx, s16 cy, const u8 rs);
     void LoadFromMP2(const void *ptr);
 
     Captain &GetCaptain() { return captain; }
@@ -110,7 +109,7 @@ public:
     Heroes* RecruitHero(Heroes*);
     CastleHeroes GetHeroes(void) const;
 
-    Race::race_t GetRace(void) const{ return race; }
+    u8 GetRace(void) const{ return race; }
     Color::color_t GetColor(void) const{ return color; }
     const std::string & GetName(void) const{ return name; }
     u8 GetControl(void) const;
@@ -159,10 +158,10 @@ public:
 
     void Scoute(void) const;
     
-    static const char* GetStringBuilding(u32, Race::race_t = Race::BOMG);
-    static const char* GetDescriptionBuilding(u32, Race::race_t = Race::BOMG);
-    static ICN::icn_t GetICNBuilding(u32, Race::race_t);
-    static ICN::icn_t GetICNBoat(const Race::race_t & race);
+    static const char* GetStringBuilding(u32, u8 race = 0);
+    static const char* GetDescriptionBuilding(u32, u8 race = 0);
+    static ICN::icn_t GetICNBuilding(u32, u8);
+    static ICN::icn_t GetICNBoat(const u8 & race);
     u32 GetUpgradeBuilding(u32) const;
     
     static bool PredicateIsCastle(const Castle *castle);
@@ -195,7 +194,7 @@ private:
 private:
     friend class Game::IO;
 
-    Race::race_t	race;
+    u8			race;
     Captain		captain;
 
     Color::color_t	color;

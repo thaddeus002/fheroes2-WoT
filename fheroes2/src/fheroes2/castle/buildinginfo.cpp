@@ -27,6 +27,7 @@
 #include "cursor.h"
 #include "button.h"
 #include "world.h"
+#include "race.h"
 #include "kingdom.h"
 #include "payment.h"
 #include "profit.h"

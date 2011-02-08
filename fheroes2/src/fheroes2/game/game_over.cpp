@@ -87,8 +87,9 @@ void GameOver::GetActualDescription(u16 cond, std::string & msg)
 	    msg = _("Find the ultimate artifact");
 	else
 	{
+	    const Artifact art = conf.WinsFindArtifactID();
 	    msg = _("Find the '%{name}' artifact");
-	    String::Replace(msg, "%{name}", Artifact::GetName(conf.WinsFindArtifact()));
+	    String::Replace(msg, "%{name}", art.GetName());
 	}
     }
     else
@@ -161,8 +162,13 @@ void GameOver::DialogWins(u16 cond)
 	case WINS_ARTIFACT:
 	{
 	    body = _("You have found the %{name}.\nYour quest is complete.");
-	    const Artifact::artifact_t art = conf.WinsFindUltimateArtifact() ? world.GetUltimateArtifact() : conf.WinsFindArtifact();
-	    String::Replace(body, "%{name}", (conf.WinsFindUltimateArtifact() ? "Ultimate Artifact" : Artifact::GetName(art)));
+	    if(conf.WinsFindUltimateArtifact())
+		String::Replace(body, "%{name}", "Ultimate Artifact");
+	    else
+	    {
+		const Artifact art = conf.WinsFindArtifactID();
+		String::Replace(body, "%{name}", art.GetName());
+	    }
 	    break;
         }
 
@@ -193,8 +199,8 @@ void GameOver::DialogLoss(u16 cond)
 	case WINS_ARTIFACT:
 	{
 	    body = _("The enemy has found the %{name}.\nYour quest is a failure.");
-	    const Artifact::artifact_t art = conf.WinsFindArtifact();
-	    String::Replace(body, "%{name}", Artifact::GetName(art));
+	    const Artifact art = conf.WinsFindArtifactID();
+	    String::Replace(body, "%{name}", art.GetName());
 	    break;
         }
 
@@ -274,13 +280,16 @@ namespace Game
 
 bool GameOver::Result::CheckGameOver(Game::menu_t & res)
 {
-    for(Color::color_t c = Color::BLUE; c != Color::GRAY; ++c)
-        if(!world.GetKingdom(c).isPlay() && (colors & c))
+    Color::Colors colors2 = Color::GetColors(colors);
+
+    for(Color::Colors::iterator
+	it = colors2.begin(); it != colors2.end(); ++it)
+    if(! world.GetKingdom(*it).isPlay())
     {
         std::string message(_("%{color} has been vanquished!"));
-        String::Replace(message, "%{color}", Color::String(c));
-        Game::DialogPlayers(c, message);
-        colors &= (~c);
+        String::Replace(message, "%{color}", Color::String(*it));
+        Game::DialogPlayers(*it, message);
+        colors &= (~*it);
     }
 
     const Kingdom & myKingdom = world.GetMyKingdom();

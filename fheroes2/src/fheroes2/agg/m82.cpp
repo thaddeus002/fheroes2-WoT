@@ -389,7 +389,7 @@ M82::m82_t M82::FromSpell(u8 spell)
 	case Spell::DEATHRIPPLE:	return MNRDEATH;
 	case Spell::DRAGONSLAYER:	return DRGNSLAY;
 	case Spell::BLOODLUST:		return BLOODLUS;
-	case Spell::ANIMATEDEAD:	return RESURECT;
+	case Spell::ANIMATEDEAD:	return MNRDEATH;
 	case Spell::MIRRORIMAGE:	return MIRRORIM;
 	case Spell::SHIELD:		return SHIELD;
 	case Spell::MASSSHIELD:		return MASSSHIE;
@@ -400,7 +400,6 @@ M82::m82_t M82::FromSpell(u8 spell)
 	case Spell::EARTHQUAKE:		return ERTHQUAK;
 	case Spell::HAUNT:		return H2MINE;
 	case Spell::STONE:		return PARALIZE;
-
 	default: break;
     }
 

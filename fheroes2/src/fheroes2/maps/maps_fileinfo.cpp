@@ -30,6 +30,7 @@
 #include "world.h"
 #include "settings.h"
 #include "dir.h"
+#include "artifact.h"
 #include "maps_fileinfo.h"
 
 #define LENGTHNAME		16
@@ -42,7 +43,7 @@ bool AlphabeticalCompare(const std::basic_string<CharType> & lhs, const std::bas
 		    rhs.data(), rhs.data() + rhs.size() ) == -1;
 }
 
-Race::race_t ByteToRace(u8 byte)
+u8 ByteToRace(u8 byte)
 {
     switch(byte)
     {
@@ -312,13 +313,10 @@ bool Maps::FileInfo::ReadMP2(const std::string & filename)
 	u8 side1 = 0;
 	u8 side2 = 0;
 
-	for(Color::color_t cl = Color::BLUE; cl < Color::GRAY; ++cl, ++index) if(cl & kingdom_colors)
-	{
-	    if(index < wins3)
-		side1 |= cl;
-	    else
-		side2 |= cl;
-	}
+	if(index < wins3)
+	    side1 |= Color::ALL & kingdom_colors;
+	else
+	    side2 |= Color::ALL & kingdom_colors;
 
 	for(u8 ii = 0; ii < KINGDOMMAX; ++ii)
 	{
@@ -407,9 +405,9 @@ bool Maps::FileInfo::WinsAllowNormalVictory(void) const
     return ((GameOver::WINS_TOWN | GameOver::WINS_ARTIFACT | GameOver::WINS_GOLD) & ConditionWins()) && wins2;
 }
 
-Artifact::artifact_t Maps::FileInfo::WinsFindArtifact(void) const
+u8 Maps::FileInfo::WinsFindArtifactID(void) const
 {
-    return wins3 ? Artifact::FromInt(wins3 - 1) : Artifact::UNKNOWN;
+    return wins3 ? wins3 - 1 : Artifact::UNKNOWN;
 }
 
 bool Maps::FileInfo::WinsFindUltimateArtifact(void) const

@@ -34,6 +34,7 @@
 #include "speed.h"
 #include "castle.h"
 #include "heroes.h"
+#include "race.h"
 #include "battle_stats.h"
 #include "tools.h"
 #include "army.h"
@@ -394,11 +395,11 @@ void Army::army_t::SetColor(Color::color_t cl)
     color = cl;
 }
 
-Race::race_t Army::army_t::GetRace(void) const
+u8 Army::army_t::GetRace(void) const
 {
     std::vector<Troop>::const_iterator it1 = army.begin();
     std::vector<Troop>::const_iterator it2 = army.end();
-    std::vector<Race::race_t> races;
+    std::vector<u8> races;
     races.reserve(ARMYMAXTROOPS);
 
     for(; it1 != it2; ++it1) if((*it1).isValid()) races.push_back((*it1).GetRace());
@@ -470,7 +471,7 @@ s8 Army::army_t::GetMoraleModificator(std::string *strs) const
         if(*it1 == Monster::GHOST) ghost_present = true;
     }
 
-    Race::race_t r = Race::MULT;
+    u8 r = Race::MULT;
     if(count_kngt){ ++count; r = Race::KNGT; }
     if(count_barb){ ++count; r = Race::BARB; }
     if(count_sorc){ ++count; r = Race::SORC; }
@@ -1171,8 +1172,9 @@ u32 Army::army_t::GetSurrenderCost(void) const
 	    default: res = res * 50 / 100; break;
 	}
 
-	if(commander->HasArtifact(Artifact::STATESMAN_QUILL))
-	    res -= res * Artifact::GetExtraValue(Artifact::STATESMAN_QUILL) / 100;
+	Artifact art(Artifact::STATESMAN_QUILL);
+	if(commander->HasArtifact(art))
+	    res -= res * art.ExtraValue() / 100;
     }
 
     // limit

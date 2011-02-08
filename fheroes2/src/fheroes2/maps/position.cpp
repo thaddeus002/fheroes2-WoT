@@ -28,6 +28,11 @@ Maps::Position::Position(const Point & pt) : center(pt)
 {
 }
 
+bool Maps::Position::operator== (s32 index) const
+{
+    return index == GetIndex();
+}
+
 const Point & Maps::Position::GetCenter(void) const
 {
     return center;

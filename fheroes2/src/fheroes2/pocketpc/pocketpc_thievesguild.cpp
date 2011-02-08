@@ -44,18 +44,18 @@ struct ValueColors : std::pair<int, int>
     static bool SortValueGreat(const ValueColors & v1, const ValueColors & v2);
 };
 
-void GetTownsInfo(std::vector<ValueColors> & v);
-void GetCastlesInfo(std::vector<ValueColors> & v);
-void GetHeroesInfo(std::vector<ValueColors> & v);
-void GetGoldsInfo(std::vector<ValueColors> & v);
-void GetWoodOreInfo(std::vector<ValueColors> & v);
-void GetGemsCrSlfMerInfo(std::vector<ValueColors> & v);
-void GetObelisksInfo(std::vector<ValueColors> & v);
-void GetArmyInfo(std::vector<ValueColors> & v);
-void GetIncomesInfo(std::vector<ValueColors> & v);
-void GetBestHeroArmyInfo(std::vector<ValueColors> & v);
-void DrawFlags(const std::vector<ValueColors> & v, const Point & pos, const u16 width, const u8 count);
-void DrawHeroIcons(const std::vector<ValueColors> & v, const Point & pos, const u16 width);
+void GetTownsInfo(std::vector<ValueColors> &, const Color::Colors &);
+void GetCastlesInfo(std::vector<ValueColors> &, const Color::Colors &);
+void GetHeroesInfo(std::vector<ValueColors> &, const Color::Colors &);
+void GetGoldsInfo(std::vector<ValueColors> &, const Color::Colors &);
+void GetWoodOreInfo(std::vector<ValueColors> &, const Color::Colors &);
+void GetGemsCrSlfMerInfo(std::vector<ValueColors> &, const Color::Colors &);
+void GetObelisksInfo(std::vector<ValueColors> &, const Color::Colors &);
+void GetArmyInfo(std::vector<ValueColors> &, const Color::Colors &);
+void GetIncomesInfo(std::vector<ValueColors> &, const Color::Colors &);
+void GetBestHeroArmyInfo(std::vector<ValueColors> &, const Color::Colors &);
+void DrawFlags(const std::vector<ValueColors> &, const Point &, const u16 width, const u8 count);
+void DrawHeroIcons(const std::vector<ValueColors> &, const Point &, const u16 width);
 
 void PocketPC::ThievesGuild(bool oracle)
 {
@@ -84,7 +84,7 @@ void PocketPC::ThievesGuild(bool oracle)
 
     std::vector<ValueColors> v;
     v.reserve(KINGDOMMAX);
-    const u8 colors = Color::Count(Settings::Get().KingdomColors());
+    Color::Colors colors = Color::GetColors(Settings::Get().KingdomColors());
     u16 textx = 115;
     u16 startx = 120;
     u16 maxw = 200;
@@ -93,7 +93,7 @@ void PocketPC::ThievesGuild(bool oracle)
 
     // head 1
     u8 ii = 0;
-    for(ii = 0; ii < colors; ++ii)
+    for(ii = 0; ii < colors.size(); ++ii)
     {
 	switch(ii+1)
 	{
@@ -106,7 +106,7 @@ void PocketPC::ThievesGuild(bool oracle)
 	    default: break;
 	}
 
-	dst_pt.x = cur_pt.x + startx + maxw / (colors * 2) + ii * maxw / colors - text.w() / 2;
+	dst_pt.x = cur_pt.x + startx + maxw / (colors.size() * 2) + ii * maxw / colors.size() - text.w() / 2;
 	dst_pt.y = cur_pt.y + 25;
 	text.Blit(dst_pt);
     }
@@ -121,8 +121,8 @@ void PocketPC::ThievesGuild(bool oracle)
     text.Blit(dst_pt);
 
     dst_pt.x = cur_pt.x + startx;
-    GetTownsInfo(v);
-    DrawFlags(v, dst_pt, maxw, colors);
+    GetTownsInfo(v, colors);
+    DrawFlags(v, dst_pt, maxw, colors.size());
 
     text.Set(_("Number of Castles:"));
     dst_pt.x = cur_pt.x + textx - text.w();
@@ -130,8 +130,8 @@ void PocketPC::ThievesGuild(bool oracle)
     text.Blit(dst_pt);
 
     dst_pt.x = cur_pt.x + startx;
-    GetCastlesInfo(v);
-    DrawFlags(v, dst_pt, maxw, colors);
+    GetCastlesInfo(v, colors);
+    DrawFlags(v, dst_pt, maxw, colors.size());
 
     text.Set(_("Number of Heroes:"));
     dst_pt.x = cur_pt.x + textx - text.w();
@@ -139,8 +139,8 @@ void PocketPC::ThievesGuild(bool oracle)
     text.Blit(dst_pt);
 
     dst_pt.x = cur_pt.x + startx;
-    GetHeroesInfo(v);
-    DrawFlags(v, dst_pt, maxw, colors);
+    GetHeroesInfo(v, colors);
+    DrawFlags(v, dst_pt, maxw, colors.size());
 
     text.Set(_("Gold in Treasury:"));
     dst_pt.x = cur_pt.x + textx - text.w();
@@ -148,8 +148,8 @@ void PocketPC::ThievesGuild(bool oracle)
     text.Blit(dst_pt);
 
     dst_pt.x = cur_pt.x + startx;
-    GetGoldsInfo(v);
-    if(1 < count) DrawFlags(v, dst_pt, maxw, colors);
+    GetGoldsInfo(v, colors);
+    if(1 < count) DrawFlags(v, dst_pt, maxw, colors.size());
 
     text.Set(_("Wood & Ore:"));
     dst_pt.x = cur_pt.x + textx - text.w();
@@ -157,8 +157,8 @@ void PocketPC::ThievesGuild(bool oracle)
     text.Blit(dst_pt);
 
     dst_pt.x = cur_pt.x + startx;
-    GetWoodOreInfo(v);
-    if(1 < count) DrawFlags(v, dst_pt, maxw, colors);
+    GetWoodOreInfo(v, colors);
+    if(1 < count) DrawFlags(v, dst_pt, maxw, colors.size());
 
     text.Set(_("Gems, Cr, Slf & Mer:"));
     dst_pt.x = cur_pt.x + textx - text.w();
@@ -166,8 +166,8 @@ void PocketPC::ThievesGuild(bool oracle)
     text.Blit(dst_pt);
 
     dst_pt.x = cur_pt.x + startx;
-    GetGemsCrSlfMerInfo(v);
-    if(1 < count) DrawFlags(v, dst_pt, maxw, colors);
+    GetGemsCrSlfMerInfo(v, colors);
+    if(1 < count) DrawFlags(v, dst_pt, maxw, colors.size());
 
     text.Set(_("Obelisks Found:"));
     dst_pt.x = cur_pt.x + textx - text.w();
@@ -175,8 +175,8 @@ void PocketPC::ThievesGuild(bool oracle)
     text.Blit(dst_pt);
 
     dst_pt.x = cur_pt.x + startx;
-    GetObelisksInfo(v);
-    if(2 < count) DrawFlags(v, dst_pt, maxw, colors);
+    GetObelisksInfo(v, colors);
+    if(2 < count) DrawFlags(v, dst_pt, maxw, colors.size());
 
     text.Set(_("Total Army Strength:"));
     dst_pt.x = cur_pt.x + textx - text.w();
@@ -184,8 +184,8 @@ void PocketPC::ThievesGuild(bool oracle)
     text.Blit(dst_pt);
 
     dst_pt.x = cur_pt.x + startx;
-    GetArmyInfo(v);
-    if(3 < count) DrawFlags(v, dst_pt, maxw, colors);
+    GetArmyInfo(v, colors);
+    if(3 < count) DrawFlags(v, dst_pt, maxw, colors.size());
 
     text.Set(_("Income:"));
     dst_pt.x = cur_pt.x + textx - text.w();
@@ -193,8 +193,8 @@ void PocketPC::ThievesGuild(bool oracle)
     text.Blit(dst_pt);
 
     dst_pt.x = cur_pt.x + startx;
-    GetIncomesInfo(v);
-    if(4 < count) DrawFlags(v, dst_pt, maxw, colors);
+    GetIncomesInfo(v, colors);
+    if(4 < count) DrawFlags(v, dst_pt, maxw, colors.size());
 
     textx = 75;
     startx = 80;
@@ -202,11 +202,11 @@ void PocketPC::ThievesGuild(bool oracle)
 
     // head 2
     ii = 0;
-    for(Color::color_t color = Color::BLUE; color != Color::GRAY; ++color)
-	if(Settings::Get().KingdomColors() & color)
+    for(Color::Colors::iterator
+	color = colors.begin(); color != colors.end(); ++color)
     {
-	text.Set(Color::String(color), Font::SMALL);
-	dst_pt.x = cur_pt.x + startx + maxw / (colors * 2) + ii * maxw / colors - text.w() / 2;
+	text.Set(Color::String(*color), Font::SMALL);
+	dst_pt.x = cur_pt.x + startx + maxw / (colors.size() * 2) + ii * maxw / colors.size() - text.w() / 2;
 	dst_pt.y = cur_pt.y + 145;
 	text.Blit(dst_pt);
 	++ii;
@@ -218,7 +218,7 @@ void PocketPC::ThievesGuild(bool oracle)
     text.Blit(dst_pt);
 
     dst_pt.x = cur_pt.x + startx;
-    GetBestHeroArmyInfo(v);
+    GetBestHeroArmyInfo(v, colors);
     DrawHeroIcons(v, dst_pt, maxw);
 
     text.Set(_("Best Hero Stats:"));

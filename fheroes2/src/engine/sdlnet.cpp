@@ -308,7 +308,7 @@ bool QueueMessage::Pop(std::string & str)
 
 void QueueMessage::Dump(std::ostream & stream) const
 {
-    stream << "Network::QueueMessage::Dump: type: 0x" << std::hex << type << ", size: " << std::dec << DtSz();
+    stream << "network packet: " << "type: 0x" << std::hex << type << ", size: " << std::dec << DtSz();
 
     stream << ", data:";
     const char* cur = itd1;

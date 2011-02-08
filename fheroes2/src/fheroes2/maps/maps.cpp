@@ -25,6 +25,7 @@
 #include "world.h"
 #include "settings.h"
 #include "maps.h"
+#include "race.h"
 #include "kingdom.h"
 #include "maps_tiles.h"
 

@@ -30,7 +30,7 @@ class HeroBase;
 class Spell
 {
 public:
-    enum spell_t
+    enum
     {
 	NONE		= 0,
 	FIREBALL,
@@ -102,75 +102,57 @@ public:
 	STONE
     };
 
-    Spell();
-    Spell(spell_t);
-    Spell(u8);
+    Spell(u8 = NONE);
 
-    bool operator== (u8) const;
-    bool operator!= (u8) const;
-    spell_t operator() (void) const;
-    spell_t GetID(void) const;
-
-    void Set(spell_t);
+    bool operator< (const Spell &) const;
+    bool operator== (const Spell &) const;
+    bool operator!= (const Spell &) const;
+    u8 operator() (void) const;
 
     const char* GetName(void) const;
     const char* GetDescription(void) const;
 
-    u8 GetCostManaPoints(void) const;
-    u8 GetLevel(void) const;
-    u8 GetDamage(void) const;
+    u8 CostManaPoints(const HeroBase* hero = NULL) const;
+    u8 Level(void) const;
+    u8 Damage(void) const;
+    u8 Restore(void) const;
+    u8 Resurrect(void) const;
+
+    u8 ExtraValue(void) const;
+    
+    bool isValid(void) const;
+    bool isLevel(u8) const;
     bool isCombat(void) const;
     bool isAdventure(void) const;
     bool isDamage(void) const;
+    bool isRestore(void) const;
+    bool isResurrect(void) const;
     bool isMindInfluence(void) const;
+    bool isUndeadOnly(void) const;
+    bool isALiveOnly(void) const;
+    bool isSummon(void) const;
+    bool isApplyWithoutFocusObject(void) const;
+    bool isApplyToAnyTroops(void) const;
+    bool isApplyToFriends(void) const;
+    bool isApplyToEnemies(void) const;
+    bool isMassActions(void) const;
+    bool isRaceCompatible(u8 race) const;
+    bool isAllowWithWisdom(u8 wisdom) const;
 
     /* return index sprite spells.icn */
-    u8 GetIndexSprite(void) const;
+    u8 IndexSprite(void) const;
     /* return index in spellinl.icn */
-    u8 GetInlIndexSprite(void) const;
+    u8 InlIndexSprite(void) const;
 
-    static spell_t FromInt(u8);
-    static u8 Level(u8);
-    static bool isCombat(u8);
-    static u8 Damage(u8);
-    static u8 Restore(u8);
-    static u8 Resurrect(u8);
-    static bool isDamage(u8);
-    static bool isRestore(u8);
-    static bool isResurrect(u8);
-    static bool isMindInfluence(u8);
-    static bool isUndeadOnly(u8);
-    static bool isALiveOnly(u8);
-    static bool isSummon(u8);
-
-    static bool isApplyWithoutFocusObject(u8);
-    static bool isApplyToAnyTroops(u8);
-    static bool isApplyToFriends(u8);
-    static bool isApplyToEnemies(u8);
-    static bool isMassActions(u8);
-    static bool isRaceCompatible(u8 spell, u8 race);
-
-    static bool AllowWithWisdom(u8 spell, u8 wisdom);
-
-    /* return index sprite spells.icn */
-    static u8 IndexSprite(spell_t);
-    /* return index in spellinl.icn */
-    static u8 InlIndexSprite(u8);
-
-    static u8 CostManaPoints(spell_t, const HeroBase* hero = NULL);
-    static u8 GetExtraValue(spell_t);
-    static const char* GetName(spell_t);
-    static const char* GetDescription(spell_t);
-
-    static spell_t RandCombat(u8);
-    static spell_t RandAdventure(u8);
-    static spell_t Rand(u8, bool adv);
+    static Spell RandCombat(u8);
+    static Spell RandAdventure(u8);
+    static Spell Rand(u8, bool adv);
 
     static void UpdateStats(const std::string &);
     static u8 CalculateDimensionDoorDistance(u8 current_sp, u32 total_hp);
 
 private:
-    spell_t id;
+    u8 id;
     
     static u16 dd_distance;
     static u16 dd_sp;

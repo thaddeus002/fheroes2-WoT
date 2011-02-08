@@ -24,15 +24,16 @@
 #include "settings.h"
 #include "cursor.h"
 #include "button.h"
+#include "spell.h"
 #include "dialog.h"
 
-void Dialog::SpellInfo(const Spell::spell_t spell, const bool ok_button)
+void Dialog::SpellInfo(const Spell & spell, const bool ok_button)
 {
-    std::string msg = Spell::GetDescription(spell);
+    std::string msg = spell.GetDescription();
 
-    u8 extra = Spell::GetExtraValue(spell);
+    u8 extra = spell.ExtraValue();
 
-    switch(spell)
+    switch(spell())
     {
 	case Spell::HASTE:
 	case Spell::MASSHASTE:
@@ -50,10 +51,10 @@ void Dialog::SpellInfo(const Spell::spell_t spell, const bool ok_button)
     else
 	String::Replace(msg, "%{count}", extra);
 
-    Dialog::SpellInfo(Spell::GetName(spell), msg, spell, ok_button);
+    Dialog::SpellInfo(spell.GetName(), msg, spell, ok_button);
 }
 
-void Dialog::SpellInfo(const std::string &header, const std::string &message, const Spell::spell_t spell, const bool ok_button)
+void Dialog::SpellInfo(const std::string &header, const std::string &message, const Spell & spell, const bool ok_button)
 {
     Display & display = Display::Get();
     const ICN::icn_t system = Settings::Get().EvilInterface() ? ICN::SYSTEME : ICN::SYSTEM;
@@ -69,9 +70,9 @@ void Dialog::SpellInfo(const std::string &header, const std::string &message, co
 
     TextBox box1(header, Font::YELLOW_BIG, BOXAREA_WIDTH);
     TextBox box2(message, Font::BIG, BOXAREA_WIDTH);
-    Text text(Spell::GetName(spell), Font::SMALL);
+    Text text(spell.GetName(), Font::SMALL);
 
-    const Sprite & sprite = AGG::GetICN(ICN::SPELLS, Spell::IndexSprite(spell));
+    const Sprite & sprite = AGG::GetICN(ICN::SPELLS, spell.IndexSprite());
     const u8 spacer = Settings::Get().QVGA() ? 5 : 10;
 
     Box box(box1.h() + spacer + box2.h() + spacer + sprite.h() + 2 + text.h(), ok_button);

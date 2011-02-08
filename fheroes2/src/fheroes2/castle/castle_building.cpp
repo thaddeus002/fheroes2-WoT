@@ -25,13 +25,14 @@
 #include "castle.h"
 #include "settings.h"
 #include "cursor.h"
+#include "race.h"
 #include "game.h"
 
 void CastleRedrawTownName(const Castle &, const Point &);
 void CastleRedrawCurrentBuilding(const Castle &, const Point &, const CastleDialog::CacheBuildings &, u32 build, u32 flash);
 void CastleRedrawBuilding(const Castle &, const Point &, u32 build, u32 frame, u8 alpha);
 void CastleRedrawBuildingExtended(const Castle &, const Point &, u32 build, u32 frame);
-Rect CastleGetCoordBuilding(Race::race_t, building_t, const Point &);
+Rect CastleGetCoordBuilding(u8, building_t, const Point &);
 void CastlePackOrdersBuildings(const Castle &, std::vector<building_t> &);
 Rect CastleGetMaxArea(const Castle &, const Point &);
 
@@ -328,7 +329,7 @@ void CastleRedrawBuildingExtended(const Castle & castle, const Point & dst_pt, u
     }
 }
 
-Rect CastleGetCoordBuilding(Race::race_t race, building_t building, const Point & pt)
+Rect CastleGetCoordBuilding(u8 race, building_t building, const Point & pt)
 {
     switch(building)
     {

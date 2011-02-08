@@ -254,7 +254,7 @@ u16 Route::Path::GetAllowStep(void) const
     return green;
 }
 
-void Route::Path::Dump(void) const
+void Route::Path::DumpPath(void) const
 {
     std::ostringstream os;
 
@@ -265,8 +265,8 @@ void Route::Path::Dump(void) const
     }
     os << "end";
 
-    DEBUG(DBG_GAME, DBG_TRACE, "from: " << hero.GetIndex() << ", to: " << dst <<
-	", obj: " << MP2::StringObject(world.GetTiles(dst).GetObject()) << "\n\t\t" << os.str());
+    DEBUG(DBG_GAME, DBG_TRACE, hero.GetName() << ", from: " << hero.GetIndex() << ", to: " << dst <<
+	", obj: " << MP2::StringObject(world.GetTiles(dst).GetObject()) << ", dump: " << os.str());
 }
 
 u16 Route::Path::isUnderProtection(s32 & pos) const

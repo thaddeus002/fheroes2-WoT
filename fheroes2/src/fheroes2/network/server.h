@@ -31,6 +31,8 @@
 #include "remoteclient.h"
 #include "maps_fileinfo.h"
 
+class Spell;
+
 struct RemoteMessage
 {
     RemoteMessage(FH2RemoteClient* ptr) : uid(sid++), own(ptr), ready(false) {};
@@ -78,7 +80,7 @@ public:
 
     bool BattleSendAction(u8, QueueMessage &);
     bool BattleSendAttack(u8, const Battle2::Stats &, const Battle2::Stats &, u16, const Battle2::TargetsInfo &);
-    bool BattleSendSpell(u8, u16, u16, u8, const Battle2::TargetsInfo &);
+    bool BattleSendSpell(u8, u16, u16, const Spell &, const Battle2::TargetsInfo &);
     bool BattleSendTeleportSpell(u8, u16, u16);
     bool BattleSendEarthQuakeSpell(u8, const std::vector<u8> &);
     bool BattleSendBoard(u8, const Battle2::Arena &);

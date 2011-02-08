@@ -32,6 +32,7 @@
 #include "dialog.h"
 #include "heroes.h"
 #include "text.h"
+#include "race.h"
 #include "statusbar.h"
 #include "payment.h"
 #include "buildinginfo.h"

@@ -29,8 +29,10 @@
 #include "world.h"
 #include "agg.h"
 #include "speed.h"
+#include "race.h"
 #include "army_troop.h"
 #include "server.h"
+#include "spell_storage.h"
 #include "battle_arena.h"
 #include "battle_cell.h"
 #include "battle_stats.h"
@@ -693,10 +695,10 @@ void Battle2::GraveyardTroop::RemoveTroopID(u16 id)
 
 Battle2::Arena::Arena(Army::army_t & a1, Army::army_t & a2, s32 index, bool local) :
 	army1(a1), army2(a2), castle(NULL), current_color(0), catapult(NULL), bridge(NULL), interface(NULL), result_game(NULL), graveyard(*this),
-	icn_covr(ICN::UNKNOWN), current_turn(0)
+	icn_covr(ICN::UNKNOWN), current_turn(0), auto_battle(0)
 {
     const Settings & conf = Settings::Get();
-    usage_spells.reserve(10);
+    usage_spells.reserve(20);
 
     interface = local ? new Interface(*this, index) : NULL;
 
@@ -858,12 +860,17 @@ void Battle2::Arena::TurnTroop(Stats* current_troop)
 	    end_turn = true;
 	}
 	else
-	// turn opponents
-	switch(current_troop->GetControl())
 	{
-    	    case Game::REMOTE:	RemoteTurn(*current_troop, actions); break;
-    	    case Game::LOCAL:	HumanTurn(*current_troop, actions); break;
-    	    default:		AI::BattleTurn(*this, *current_troop, actions); break;
+	    if(current_troop->GetColor() & auto_battle)
+		AI::BattleTurn(*this, *current_troop, actions);
+	    else
+	    // turn opponents
+	    switch(current_troop->GetControl())
+	    {
+    		case Game::REMOTE:	RemoteTurn(*current_troop, actions); break;
+    		case Game::LOCAL:	HumanTurn(*current_troop, actions); break;
+    		default:		AI::BattleTurn(*this, *current_troop, actions); break;
+	    }
 	}
 
 	// apply task
@@ -1012,9 +1019,6 @@ void Battle2::Arena::HumanTurn(const Stats & b, Actions & a)
 
     conf.SetMyColor(Color::Get(b.GetColor()));
 
-    if(conf.AutoBattle(b.GetColor()))
-        AI::BattleTurn(*this, b, a);
-    else
     if(interface)
         interface->HumanTurn(b, a);
 }
@@ -1407,14 +1411,14 @@ void Battle2::Arena::FadeArena(void) const
     if(interface) interface->FadeArena();
 }
 
-const std::vector<u8> & Battle2::Arena::GetUsageSpells(void) const
+const SpellStorage & Battle2::Arena::GetUsageSpells(void) const
 {
     return usage_spells;
 }
 
-void Battle2::Arena::AddSpell(u8 spell)
+void Battle2::Arena::AddSpell(const Spell & spell)
 {
-    if(usage_spells.end() == std::find(usage_spells.begin(), usage_spells.end(), spell)) usage_spells.push_back(spell);
+    usage_spells.Append(spell);
 }
 
 u16 Battle2::Arena::GetFreePositionNearHero(u8 color) const
@@ -1498,7 +1502,7 @@ bool Battle2::Arena::CanRetreatOpponent(u8 color) const
     return hero && hero->GetType() == Skill::Primary::HEROES && NULL == hero->inCastle();
 }
 
-bool Battle2::Arena::isDisableCastSpell(u8 spell, std::string* msg)
+bool Battle2::Arena::isDisableCastSpell(const Spell & spell, std::string* msg)
 {
     const HeroBase* hero1 = army1.GetCommander();
     const HeroBase* hero2 = army2.GetCommander();
@@ -1527,14 +1531,14 @@ bool Battle2::Arena::isDisableCastSpell(u8 spell, std::string* msg)
 	    return true;
 	}
 	else
-	if(Spell::isSummon(spell))
+	if(spell.isSummon())
 	{
 	    Armies friends(*GetArmy(current_color));
 
 	    const Stats* elem = friends.FindMode(CAP_SUMMONELEM);
 	    bool affect = true;
 
-	    if(elem) switch(spell)
+	    if(elem) switch(spell())
 	    {
 		case Spell::SUMMONEELEMENT: if(elem->GetID() != Monster::EARTH_ELEMENT) affect = false; break;
 		case Spell::SUMMONAELEMENT: if(elem->GetID() != Monster::AIR_ELEMENT) affect = false; break;
@@ -1555,7 +1559,7 @@ bool Battle2::Arena::isDisableCastSpell(u8 spell, std::string* msg)
 	    }
 	}
 	else
-	if(spell != Spell::NONE)
+	if(spell.isValid())
 	{
 	    // check army
 	    Board::const_iterator it1 = board.begin();
@@ -1586,9 +1590,9 @@ bool Battle2::Arena::isDisableCastSpell(u8 spell, std::string* msg)
     return false;
 }
 
-bool Battle2::Arena::isAllowResurrectFromGraveyard(u8 spell, u16 cell) const
+bool Battle2::Arena::isAllowResurrectFromGraveyard(const Spell & spell, u16 cell) const
 {
-    if(Spell::isResurrect(spell))
+    if(spell.isResurrect())
     {
 	std::vector<u16> closed;
 	std::vector<u16>::const_iterator it_closed;
@@ -1770,3 +1774,18 @@ bool Battle2::Arena::NetworkTurn(Result & result)
 {
     return interface && interface->NetworkTurn(result);
 }
+
+/*
+void Settings::SetAutoBattle(u8 color, bool f)                                                                                 
+{                                                                                                                              
+    if(f)                                                                                                                      
+        auto_battle_on |= color;                                                                                               
+    else                                                                                                                       
+        auto_battle_on &= ~color;                                                                                              
+}                                                                                                                              
+
+bool Settings::AutoBattle(u8 color) const                                                                                      
+{                                                                                                                              
+    return auto_battle_on & color;                                                                                             
+}                                                                                                                              
+*/

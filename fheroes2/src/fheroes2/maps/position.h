@@ -33,6 +33,8 @@ namespace Maps
 	Position() {};
 	Position(const Point &);
 
+	bool operator== (s32) const;
+
 	const Point & GetCenter(void) const;
 	s32 GetIndex(void) const;
 

@@ -191,8 +191,8 @@ bool Maps::TilesAddon::isRandomResource(const TilesAddon & ta)
 
 bool Maps::TilesAddon::isArtifact(const TilesAddon & ta)
 {
-	    // OBJNARTI
-    return (ICN::OBJNARTI == MP2::GetICNObject(ta.object) && (ta.index % 2));
+    // OBJNARTI (skip ultimate)
+    return (ICN::OBJNARTI == MP2::GetICNObject(ta.object) && (ta.index > 0x10) && (ta.index % 2));
 }
 
 bool Maps::TilesAddon::isRandomArtifact(const TilesAddon & ta)
@@ -1379,19 +1379,19 @@ void Maps::Tiles::UpdateQuantity(void)
     switch(mp2_object)
     {
         case MP2::OBJ_WITCHSHUT:
-                quantity1 = Skill::Secondary::RandForWitchsHut();
-	break;
+            quantity1 = Skill::Secondary::RandForWitchsHut();
+	    break;
 
 	case MP2::OBJ_SHRINE1:
-                quantity1 = Rand::Get(10) % 2 ? Spell::RandCombat(1) : Spell::RandAdventure(1);
+            quantity1 = Rand::Get(10) % 2 ? Spell::RandCombat(1)() : Spell::RandAdventure(1)();
             break;
 
         case MP2::OBJ_SHRINE2:
-                quantity1 = Rand::Get(10) % 2 ? Spell::RandCombat(2) : Spell::RandAdventure(2);
+            quantity1 = Rand::Get(10) % 2 ? Spell::RandCombat(2)() : Spell::RandAdventure(2)();
             break;
 
         case MP2::OBJ_SHRINE3:
-                quantity1 = Rand::Get(10) % 2 ? Spell::RandCombat(3) : Spell::RandAdventure(3);
+            quantity1 = Rand::Get(10) % 2 ? Spell::RandCombat(3)() : Spell::RandAdventure(3)();
             break;
 
 	case MP2::OBJ_SKELETON:
@@ -1447,20 +1447,20 @@ void Maps::Tiles::UpdateQuantity(void)
 	    addon = FindObject(MP2::OBJ_ARTIFACT);
 	    if(addon)
 	    {
-		Artifact::artifact_t art = Artifact::FromIndexSprite(addon->index);
+		Artifact art = Artifact::FromMP2IndexSprite(addon->index);
 
-		if(Artifact::SPELL_SCROLL == art)
+		if(art() == Artifact::SPELL_SCROLL)
 		{
 		    // spell from origin mp2
-		    Spell::spell_t spell = Spell::FromInt(1 + (quantity2 * 256 + quantity1) / 8);
-		    quantity1 = art;
+		    Spell spell(1 + (quantity2 * 256 + quantity1) / 8);
+		    quantity1 = art();
 		    // always available
 		    quantity2 = 0;
-		    quantity3 = (spell == Spell::NONE ? Spell::FIREBALL : spell);
+		    quantity3 = spell();
 		}
 		else
 		{
-		    quantity1 = art;
+		    quantity1 = art();
 		    // conditions: 70% empty
 		    quantity2 = Rand::Get(1, 10) < 4 ? Rand::Get(1, 13) : 0;
 		    //  added resource
@@ -1639,7 +1639,7 @@ void Maps::Tiles::UpdateQuantity(void)
 
 	case MP2::OBJ_PYRAMID:
 	    // random spell level 5
-	    quantity1 = (Rand::Get(1) ? Spell::RandCombat(5) : Spell::RandAdventure(5));
+	    quantity1 = (Rand::Get(1) ? Spell::RandCombat(5)() : Spell::RandAdventure(5)());
 	    quantity2 = 1;
 	break;
 
@@ -1682,7 +1682,7 @@ void Maps::Tiles::UpdateQuantity(void)
 
         case MP2::OBJ_BARRIER:
         case MP2::OBJ_TRAVELLERTENT:
-	    quantity1 = Barrier::FromMP2(quantity1);
+	    quantity1 = BarrierColor::FromMP2(quantity1);
 	break;
 
 	default: break;
@@ -2056,24 +2056,29 @@ void Maps::Tiles::UpdateRNDArtifactSprite(void)
 {
     TilesAddon *addon = NULL;
     u8 index = 0;
+    Artifact art;
 
     switch(mp2_object)
     {
         case MP2::OBJ_RNDARTIFACT:
             addon = FindObject(MP2::OBJ_RNDARTIFACT);
-            index = Artifact::IndexSprite(Artifact::Rand(Artifact::ART_LEVEL123));
+	    art = Artifact::Rand(Artifact::ART_LEVEL123);
+            index = art.IndexSprite();
             break;
         case MP2::OBJ_RNDARTIFACT1:
             addon = FindObject(MP2::OBJ_RNDARTIFACT1);
-            index = Artifact::IndexSprite(Artifact::Rand(Artifact::ART_LEVEL1));
+	    art = Artifact::Rand(Artifact::ART_LEVEL1);
+            index = art.IndexSprite();
             break;
         case MP2::OBJ_RNDARTIFACT2:
             addon = FindObject(MP2::OBJ_RNDARTIFACT2);
-            index = Artifact::IndexSprite(Artifact::Rand(Artifact::ART_LEVEL2));
+	    art = Artifact::Rand(Artifact::ART_LEVEL2);
+            index = art.IndexSprite();
             break;
         case MP2::OBJ_RNDARTIFACT3:
             addon = FindObject(MP2::OBJ_RNDARTIFACT3);
-            index = Artifact::IndexSprite(Artifact::Rand(Artifact::ART_LEVEL3));
+	    art = Artifact::Rand(Artifact::ART_LEVEL3);
+            index = art.IndexSprite();
             break;
         default: return;
     }

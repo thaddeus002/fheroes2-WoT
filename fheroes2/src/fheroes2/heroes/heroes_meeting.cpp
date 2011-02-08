@@ -344,37 +344,37 @@ void RedrawPrimarySkillInfo(const Point & cur_pt, const Skill::Primary* p1, cons
 }
 
 // spell_book.cpp
-void SpellBookSetFilter(const BagArtifacts &, const std::vector<Spell::spell_t> &, std::vector<Spell::spell_t> &, SpellBook::filter_t);
+void SpellBookSetFilter(const BagArtifacts &, const SpellStorage &, SpellStorage &, SpellBook::filter_t);
 
-struct CanTeachSpell : std::binary_function<u8, Spell::spell_t, bool>
+struct CanTeachSpell : std::binary_function<u8, Spell, bool>
 {
-    bool operator() (u8 scholar, Spell::spell_t spell) const
+    bool operator() (u8 scholar, Spell spell) const
     {
 	// FIXME: teach conditions for level5
-	if(4 < Spell::Level(spell))
+	if(4 < spell.Level())
 	    return false;
 
-	if(4 == Spell::Level(spell))
+	if(4 == spell.Level())
 	    return Skill::Level::EXPERT == scholar;
 	else
-	if(3 == Spell::Level(spell))
+	if(3 == spell.Level())
 	    return Skill::Level::ADVANCED <= scholar;
 	else
-	if(3 > Spell::Level(spell))
+	if(3 > spell.Level())
 	    return Skill::Level::BASIC <= scholar;
 
 	return false;
     };
 };
 
-struct HeroesHaveSpell : std::binary_function<const Heroes*, Spell::spell_t, bool>
+struct HeroesHaveSpell : std::binary_function<const Heroes*, Spell, bool>
 {
-    bool operator() (const Heroes* hero, Spell::spell_t spell) const { return hero->HaveSpell(spell); };
+    bool operator() (const Heroes* hero, Spell spell) const { return hero->HaveSpell(spell); };
 };
 
 void Heroes::ScholarAction(Heroes & hero1, Heroes & hero2)
 {
-    if(! hero1.spell_book.isActive() || ! hero2.spell_book.isActive())
+    if(! hero1.HaveSpellBook() || ! hero2.HaveSpellBook())
     {
 	DEBUG(DBG_GAME, DBG_INFO, "spell_book disabled");
 	return;
@@ -412,63 +412,64 @@ void Heroes::ScholarAction(Heroes & hero1, Heroes & hero2)
 	return;
     }
 
-    std::vector<Spell::spell_t> learn, teach;
-    std::vector<Spell::spell_t>::iterator res, it1, it2;
+    SpellStorage learn, teach;
 
     learn.reserve(15);
     teach.reserve(15);
 
-    SpellBookSetFilter(teacher->bag_artifacts, teacher->spell_book.spells, teach, SpellBook::ALL);
-    SpellBookSetFilter(learner->bag_artifacts, learner->spell_book.spells, learn, SpellBook::ALL);
+    SpellBookSetFilter(teacher->bag_artifacts, teacher->spell_book, teach, SpellBook::ALL);
+    SpellBookSetFilter(learner->bag_artifacts, learner->spell_book, learn, SpellBook::ALL);
 
     // remove_if for learn spells
     if(learn.size())
     {
-	res = std::remove_if(learn.begin(), learn.end(), std::bind1st(HeroesHaveSpell(), teacher));
+	SpellStorage::iterator
+	    res = std::remove_if(learn.begin(), learn.end(), std::bind1st(HeroesHaveSpell(), teacher));
 	learn.resize(std::distance(learn.begin(), res));
     }
 
     if(learn.size())
     {
-	res = std::remove_if(learn.begin(), learn.end(), std::not1(std::bind1st(CanTeachSpell(), scholar)));
+	SpellStorage::iterator
+	    res = std::remove_if(learn.begin(), learn.end(), std::not1(std::bind1st(CanTeachSpell(), scholar)));
 	learn.resize(std::distance(learn.begin(), res));
     }
 
     // remove_if for teach spells
     if(teach.size())
     {
-	res = std::remove_if(teach.begin(), teach.end(), std::bind1st(HeroesHaveSpell(), learner));
+	SpellStorage::iterator
+	    res = std::remove_if(teach.begin(), teach.end(), std::bind1st(HeroesHaveSpell(), learner));
 	teach.resize(std::distance(teach.begin(), res));
     }
 
     if(teach.size())
     {
-	res = std::remove_if(teach.begin(), teach.end(), std::not1(std::bind1st(CanTeachSpell(), scholar)));
+	SpellStorage::iterator
+	    res = std::remove_if(teach.begin(), teach.end(), std::not1(std::bind1st(CanTeachSpell(), scholar)));
 	teach.resize(std::distance(teach.begin(), res));
     }
 
     std::string message, spells1, spells2;
 
     // learning
-    it1 = learn.begin();
-    it2 = learn.end();
-    for(; it1 != it2; ++it1)
+    for(SpellStorage::const_iterator
+	it = learn.begin(); it != learn.end(); ++it)
     {
-	teacher->AppendSpellToBook(*it1);
+	teacher->AppendSpellToBook(*it);
 	if(spells1.size())
-	    spells1.append(it1 + 1 == it2 ? _(" and ") : ", ");
-	spells1.append(Spell::GetName(*it1));
+	    spells1.append(it + 1 == learn.end() ? _(" and ") : ", ");
+	spells1.append((*it).GetName());
     }
 
     // teacher
-    it1 = teach.begin();
-    it2 = teach.end();
-    for(; it1 != it2; ++it1)
+    for(SpellStorage::const_iterator
+	it = teach.begin(); it != teach.end(); ++it)
     {
-	learner->AppendSpellToBook(*it1);
+	learner->AppendSpellToBook(*it);
 	if(spells2.size())
-	    spells2.append(it1 + 1 == it2 ? _(" and ") : ", ");
-	spells2.append(Spell::GetName(*it1));
+	    spells2.append(it + 1 == teach.end() ? _(" and ") : ", ");
+	spells2.append((*it).GetName());
     }
 
 

@@ -34,7 +34,7 @@
 #include "interface_list.h"
 #include "heroes.h"
 
-void DialogSpellFailed(Spell::spell_t);
+void DialogSpellFailed(const Spell &);
 void DialogNotAvailable(void);
 
 bool ActionSpellViewMines(Heroes &);
@@ -100,7 +100,7 @@ void CastleIndexListBox::RedrawBackground(const Point & dst)
     display.Blit(AGG::GetICN(ICN::LISTBOX, 9), dst.x + 256, dst.y + 126);
 }
 
-bool Heroes::ActionSpellCast(Spell::spell_t spell)
+bool Heroes::ActionSpellCast(const Spell & spell)
 {
     if(! CanMove())
     {
@@ -108,14 +108,14 @@ bool Heroes::ActionSpellCast(Spell::spell_t spell)
 	return false;
     }
     else
-    if(Spell::NONE == spell || Spell::isCombat(spell) || ! HaveSpellPoints(Spell::CostManaPoints(spell, this)))
+    if(spell == Spell::NONE || spell.isCombat() || ! HaveSpellPoints(spell.CostManaPoints(this)))
     {
 	return false;
     }
 
     bool apply = false;
 
-    switch(spell)
+    switch(spell())
     {
 	case Spell::VIEWMINES:		apply = ActionSpellViewMines(*this); break;
 	case Spell::VIEWRESOURCES:	apply = ActionSpellViewResources(*this); break;
@@ -139,8 +139,8 @@ bool Heroes::ActionSpellCast(Spell::spell_t spell)
 
     if(apply)
     {
-	DEBUG(DBG_GAME, DBG_INFO, GetName() << " cast spell: " << Spell::GetName(spell));
-	TakeSpellPoints(Spell::CostManaPoints(spell, this));
+	DEBUG(DBG_GAME, DBG_INFO, GetName() << " cast spell: " << spell.GetName());
+	TakeSpellPoints(spell.CostManaPoints(this));
 	return true;
     }
     return false;
@@ -187,11 +187,11 @@ bool HeroesTownGate(Heroes & hero, const Castle* castle)
     return false;
 }
 
-void DialogSpellFailed(Spell::spell_t spell)
+void DialogSpellFailed(const Spell & spell)
 {
     // failed
     std::string str = "%{spell} failed!!!";
-    String::Replace(str, "%{spell}", Spell::GetName(spell));
+    String::Replace(str, "%{spell}", spell.GetName());
     Dialog::Message("", str, Font::BIG, Dialog::OK);
 }
 
@@ -526,7 +526,7 @@ bool ActionSpellSetGuardian(Heroes & hero, Monster::monster_t m)
     const s32 index = hero.GetIndex();
     if(!Maps::isValidAbsIndex(index)) return false;
 
-    Spell::spell_t spell = Spell::NONE;
+    Spell spell(Spell::NONE);
 
     switch(m)
     {
@@ -539,7 +539,7 @@ bool ActionSpellSetGuardian(Heroes & hero, Monster::monster_t m)
     }
 
 
-    const u16 count = hero.GetPower() * Spell::GetExtraValue(spell);
+    const u16 count = hero.GetPower() * spell.ExtraValue();
 
     if(count)
     {
@@ -549,14 +549,14 @@ bool ActionSpellSetGuardian(Heroes & hero, Monster::monster_t m)
 	if(spell != tile.GetQuantity3()) tile.ResetQuantity();
 
 	tile.SetQuantity3(m);
-	tile.SetQuantity4(spell);
+	tile.SetQuantity4(spell());
 
 	//if(Settings::Get().OriginalVersion())
 	    tile.SetCountMonster(count);
 	//else
 	//    tile.SetCountMonster(count + tile.GetCountMonster());
 
-	if(Spell::HAUNT == spell)
+	if(spell == Spell::HAUNT)
 	    world.CaptureObject(index, Color::GRAY);
     }
 

@@ -32,6 +32,7 @@
 #include "button.h"
 #include "world.h"
 #include "agg.h"
+#include "race.h"
 #include "zzlib.h"
 #include "dialog_selectscenario.h"
 #include "server.h"
@@ -315,7 +316,7 @@ bool FH2LocalClient::Prepare4BattleOnly(void)
         	if(MSG_UPDATE_PLAYERS == packet.GetID())
 		    break;
     	    }
-    	    DELAY(100);
+    	    DELAY(10);
 	}
 
 	MsgUpdatePlayers(packet);

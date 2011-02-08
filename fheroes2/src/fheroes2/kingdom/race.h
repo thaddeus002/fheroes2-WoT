@@ -27,7 +27,7 @@
 
 namespace Race
 {
-    enum race_t
+    enum
     {
         KNGT    = 0x01,
         BARB    = 0x02,
@@ -42,8 +42,8 @@ namespace Race
     };
 
     const char* String(u8);
-    race_t Rand(void);
-    race_t Get(u8);
+    u8 Rand(void);
+    u8 Get(u8);
 }
 
 #endif

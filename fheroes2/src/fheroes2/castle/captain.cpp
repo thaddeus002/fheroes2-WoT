@@ -23,6 +23,7 @@
 #include "castle.h"
 #include "luck.h"
 #include "morale.h"
+#include "race.h"
 #include "captain.h"
 #include "settings.h"
 
@@ -35,7 +36,8 @@ void Captain::LoadDefaults(void)
 {
     if(Race::ALL & home.GetRace())
     {
-	u8 book, spell;
+	u8 book;
+	Spell spell;
 	Skill::Primary::LoadDefaults(home.GetRace(), *this, book, spell);
 	SpellBookActivate();
 	if(home.GetLevelMageGuild()) home.GetMageGuild().EducateHero(*this);
@@ -113,7 +115,7 @@ s8 Captain::GetLuck(void) const
     return Luck::IRISH;
 }
 
-Race::race_t Captain::GetRace(void) const
+u8 Captain::GetRace(void) const
 {
     return home.GetRace();
 }

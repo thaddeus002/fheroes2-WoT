@@ -22,7 +22,11 @@
 #ifndef H2ARTIFACT_H
 #define H2ARTIFACT_H
 
+#include<vector>
+#include "game_io.h"
 #include "gamedefs.h"
+
+class Spell;
 
 class Artifact
 {
@@ -39,7 +43,7 @@ public:
 	ART_NOLEVEL	= 0x20
     };
 
-    enum artifact_t
+    enum
     {
 	ULTIMATE_BOOK,
 	ULTIMATE_SWORD,
@@ -151,56 +155,58 @@ public:
 	UNKNOWN
     };
 
-    Artifact();
-    Artifact(artifact_t);
+    Artifact(u8 = UNKNOWN);
 
-    bool operator== (artifact_t) const;
-    bool operator!= (artifact_t) const;
-    artifact_t operator() (void) const;
-    artifact_t GetID(void) const;
-
-    const char* GetName(void) const;
-
-    void Set(artifact_t);
+    bool operator== (const Spell &) const;
+    bool operator== (const Artifact &) const;
+    bool operator!= (const Artifact &) const;
+    u8 operator() (void) const;
 
     bool isUltimate(void) const;
     bool isValid(void) const;
 
-    /* objnarti.icn */
-    u8 GetIndexSprite(void) const;
-    /* artfx.icn */
-    u8 GetIndexSprite32(void) const;
-    /* artifact.icn */
-    u8 GetIndexSprite64(void) const;
-
-    void SetExt(u8);
-    u8 GetExt(void) const;
-
-    static artifact_t Rand(level_t);
-    static u8 GetLevel(artifact_t);
-    static u8 GetLevelLoyalty(artifact_t);
-    static u16 GetExtraValue(artifact_t);
-
-    static const char* GetName(artifact_t);
-    static std::string GetDescription(const Artifact &);
-
-    static artifact_t FromInt(u16);
-    static artifact_t FromIndexSprite(u8);
+    u16 ExtraValue(void) const;
+    u8 Level(void) const;
+    u8 LoyaltyLevel(void) const;
 
     /* objnarti.icn */
-    static u8 IndexSprite(artifact_t);
+    u8 IndexSprite(void) const;
     /* artfx.icn */
-    static u8 IndexSprite32(artifact_t);
+    u8 IndexSprite32(void) const;
     /* artifact.icn */
-    static u8 IndexSprite64(artifact_t);
+    u8 IndexSprite64(void) const;
 
-    static const char* GetScenario(artifact_t);
+    void SetSpell(u8);
+    u8 GetSpell(void) const;
 
+    const char* GetName(void) const;
+    std::string GetDescription(void) const;
+
+
+    static u8 Rand(level_t);
+    static Artifact FromMP2IndexSprite(u8);
+    static const char* GetScenario(const Artifact &);
     static void UpdateStats(const std::string &);
 
 private:
-    artifact_t id;
+    friend class Game::IO;
+
+    u8 id;
     u8 ext;
+};
+
+struct BagArtifacts : std::vector<Artifact>
+{
+    BagArtifacts();
+
+    bool ContainSpell(const Spell &) const;
+    bool isPresentArtifact(const Artifact &) const;
+    bool PushArtifact(const Artifact &);
+    bool isFull(void) const;
+    bool MakeBattleGarb(void);
+    bool ContainUltimateArtifact(void) const;
+
+    u8   CountArtifacts(void) const;
 };
 
 #endif

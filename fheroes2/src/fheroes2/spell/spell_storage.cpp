@@ -21,68 +21,98 @@
  ***************************************************************************/
 
 #include <algorithm>
+#include <sstream>
 #include "skill.h"
 #include "settings.h"
+#include "artifact.h"
 #include "spell_storage.h"
-
-struct SpellEqualLevel : std::binary_function<Spell::spell_t, u8, bool>
-{
-    bool operator() (Spell::spell_t s, u8 l) const { return Spell::Level(s) == l; };
-};
 
 SpellStorage::SpellStorage()
 {
-    spells.reserve(67);
+    reserve(67);
 }
 
 u8 SpellStorage::Size(u8 lvl) const
 {
     switch(lvl)
     {
-	case 1:	return std::count_if(spells.begin(), spells.end(), std::bind2nd(SpellEqualLevel(), 1));
-	case 2:	return std::count_if(spells.begin(), spells.end(), std::bind2nd(SpellEqualLevel(), 2));
-	case 3:	return std::count_if(spells.begin(), spells.end(), std::bind2nd(SpellEqualLevel(), 3));
-	case 4:	return std::count_if(spells.begin(), spells.end(), std::bind2nd(SpellEqualLevel(), 4));
-	case 5:	return std::count_if(spells.begin(), spells.end(), std::bind2nd(SpellEqualLevel(), 5));
+	case 1:	return std::count_if(begin(), end(), std::bind2nd(std::mem_fun_ref(&Spell::isLevel), 1));
+	case 2:	return std::count_if(begin(), end(), std::bind2nd(std::mem_fun_ref(&Spell::isLevel), 2));
+	case 3:	return std::count_if(begin(), end(), std::bind2nd(std::mem_fun_ref(&Spell::isLevel), 3));
+	case 4:	return std::count_if(begin(), end(), std::bind2nd(std::mem_fun_ref(&Spell::isLevel), 4));
+	case 5:	return std::count_if(begin(), end(), std::bind2nd(std::mem_fun_ref(&Spell::isLevel), 5));
 
 	default: break;
     }
 
-    return spells.size();
+    return size();
 }
 
-void SpellStorage::GetSpells(std::vector<Spell::spell_t> & v, u8 lvl) const
+SpellStorage SpellStorage::GetSpells(u8 lvl) const
 {
-    std::vector<Spell::spell_t>::const_iterator it1 = spells.begin();
-    std::vector<Spell::spell_t>::const_iterator it2 = spells.end();
-    for(; it1 != it2; ++it1) if(lvl == Spell::Level(*it1)) v.push_back(*it1);
+    SpellStorage result;
+    result.reserve(20);
+    for(const_iterator it = begin(); it != end(); ++it)
+	if((*it).isLevel(lvl)) result.push_back(*it);
+    return result;
 }
 
-void SpellStorage::Append(const Spell::spell_t sp, u8 wisdom)
+void SpellStorage::Append(const Spell & sp, u8 wisdom)
 {
-    if(spells.end() == std::find(spells.begin(), spells.end(), sp) && Spell::AllowWithWisdom(sp, wisdom))
-	spells.push_back(sp);
+    if(sp != Spell::NONE &&
+	end() == std::find(begin(), end(), sp) && (0 == wisdom || sp.isAllowWithWisdom(wisdom)))
+	push_back(sp);
 }
 
-void SpellStorage::Append(const Spell::spell_t sp)
+void SpellStorage::Append(const SpellStorage & st)
 {
-    if(spells.end() == std::find(spells.begin(), spells.end(), sp))
-	spells.push_back(sp);
+    insert(end(), st.begin(), st.end());
+    std::sort(begin(), end());
+    resize(std::unique(begin(), end()) - begin());
 }
 
-bool SpellStorage::isPresentSpell(Spell::spell_t spell) const
+bool SpellStorage::isPresentSpell(const Spell & spell) const
 {
-    return spells.end() != std::find(spells.begin(), spells.end(), spell);
+    return end() != std::find(begin(), end(), spell);
 }
 
-void SpellStorage::Dump(void) const
+std::string SpellStorage::String(void) const
 {
-    if(spells.size())
+    std::ostringstream os;
+
+    for(const_iterator it = begin(); it != end(); ++it)
+	os << (*it).GetName() << ", ";
+
+    return os.str();
+}
+
+void SpellStorage::Append(const BagArtifacts & bag)
+{
+    for(BagArtifacts::const_iterator
+	it = bag.begin(); it != bag.end(); ++it)
+	Append(*it);
+}
+
+void SpellStorage::Append(const Artifact & art)
+{
+    switch(art())
     {
-	for(std::vector<Spell::spell_t>::const_iterator
-	    it = spells.begin(); it != spells.end(); ++it)
-		    VERBOSN(Spell::GetName((*it)) << ", ");
+        case Artifact::SPELL_SCROLL:
+    	    Append(Spell(art.GetSpell()));
+    	    break;
 
-	VERBOSE("");
+        case Artifact::CRYSTAL_BALL:
+    	    if(Settings::Get().ExtArtifactCrystalBall())
+            {
+                Append(Spell(Spell::IDENTIFYHERO));
+                Append(Spell(Spell::VISIONS));
+            }
+            break;
+
+        case Artifact::BATTLE_GARB:
+    	    Append(Spell(Spell::TOWNPORTAL));
+            break;
+
+        default: break;
     }
 }

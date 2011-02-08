@@ -33,6 +33,7 @@
 #include "objlava.h"
 #include "objsnow.h"
 #include "objswmp.h"
+#include "race.h"
 #include "icn.h"
 
 namespace ICN
@@ -1644,6 +1645,9 @@ bool ICN::NeedMinify4PocketPC(icn_t icn, u16 index)
     {
 	case TOWNWIND:
 	    return index == 0 || index == 1;
+
+	case HISCORE:
+	    return index == 6;
 	//
 	case PUZZLE:
 	case HSBKG:

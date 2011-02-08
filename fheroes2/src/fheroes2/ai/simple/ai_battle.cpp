@@ -34,7 +34,7 @@
 
 namespace Battle2
 {
-    bool isApplySpell(const Spell::spell_t, const Stats*, const HeroBase &, Actions &);
+    bool isApplySpell(const Spell &, const Stats*, const HeroBase &, Actions &);
     u16  AIGetAttackPosition(Arena &, const Stats &, const std::vector<u16> &);
 }
 
@@ -353,9 +353,9 @@ void AI::BattleMagicTurn(Arena & arena, const Stats & b, Actions & a, const Stat
     if(isApplySpell(Spell::ELEMENTALSTORM, NULL, *hero, a)) return;
 }
 
-bool Battle2::isApplySpell(const Spell::spell_t spell, const Stats* b, const HeroBase & hero, Actions & a)
+bool Battle2::isApplySpell(const Spell & spell, const Stats* b, const HeroBase & hero, Actions & a)
 {
-    switch(spell)
+    switch(spell())
     {
         case Spell::CURE:	if(isApplySpell(Spell::MASSCURE, b, hero, a)) return true; break;
         case Spell::HASTE:	if(isApplySpell(Spell::MASSHASTE, b, hero, a)) return true; break;
@@ -368,7 +368,7 @@ bool Battle2::isApplySpell(const Spell::spell_t spell, const Stats* b, const Her
 	default: break;
     }
 
-    if(hero.HaveSpell(spell) && hero.HaveSpellPoints(Spell::CostManaPoints(spell, &hero)) && (!b || b->AllowApplySpell(spell, &hero)))
+    if(hero.HaveSpell(spell) && hero.HaveSpellPoints(spell.CostManaPoints(&hero)) && (!b || b->AllowApplySpell(spell, &hero)))
     {
 	a.AddedCastAction(spell, (b ? b->GetPosition() : MAXU16));
 	return true;

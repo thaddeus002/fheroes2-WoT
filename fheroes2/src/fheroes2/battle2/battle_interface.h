@@ -126,8 +126,8 @@ namespace Battle2
 
         void RedrawActionAttackPart1(Stats &, Stats &, const TargetsInfo &);
         void RedrawActionAttackPart2(Stats &, TargetsInfo &);
-        void RedrawActionSpellCastPart1(u8, u16, const std::string & name, const TargetsInfo &);
-        void RedrawActionSpellCastPart2(u8, TargetsInfo &);
+        void RedrawActionSpellCastPart1(const Spell &, u16, const std::string & name, const TargetsInfo &);
+        void RedrawActionSpellCastPart2(const Spell &, TargetsInfo &);
         void RedrawActionResistSpell(const Stats &);
         void RedrawActionMonsterSpellCastStatus(const Stats &, const TargetInfo &);
         void RedrawActionMove(Stats &, const std::vector<u16> &);
@@ -171,7 +171,7 @@ namespace Battle2
 	void RedrawActionColdRingSpell(const u16, const TargetsInfo &);
 	void RedrawActionElementalStormSpell(const TargetsInfo &);
 	void RedrawActionArmageddonSpell(const TargetsInfo &);
-	void RedrawActionResurrectSpell(Stats &, u8);
+	void RedrawActionResurrectSpell(Stats &, const Spell &);
 	void RedrawActionLightningBoltSpell(Stats &);
         void RedrawActionChainLightningSpell(const TargetsInfo &);
 
@@ -184,8 +184,6 @@ namespace Battle2
 	bool IdleTroopsAnimation(void);
 	void CheckGlobalEvents(LocalEvent &);
 
-	void SetAutoBattle(const Stats &, Actions &);
-	void ResetAutoBattle(const Stats &);
 	void ProcessingHeroDialogResult(u8, Actions &);
 
 	void EventAutoSwitch(const Stats &, Actions &);
@@ -222,7 +220,7 @@ namespace Battle2
 	OpponentSprite* opponent2;
 
 	Rect rectBoard;
-	u8   humanturn_spell;
+	Spell humanturn_spell;
 	bool humanturn_exit;
 	bool humanturn_redraw;
 	u32 animation_frame;

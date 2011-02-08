@@ -30,7 +30,6 @@
 #include <sstream>
 #include "gamedefs.h"
 #include "difficulty.h"
-#include "race.h"
 #include "color.h"
 #include "maps_fileinfo.h"
 #include "game.h"
@@ -41,11 +40,12 @@
 #include <android/log.h>
 #endif
 
+#define FORMAT_VERSION_2248 0x08C8
 #define FORMAT_VERSION_2213 0x08A5
 #define FORMAT_VERSION_2178 0x0882
 #define FORMAT_VERSION_2154 0x086A
 #define FORMAT_VERSION_2100 0x0834
-#define CURRENT_FORMAT_VERSION FORMAT_VERSION_2213
+#define CURRENT_FORMAT_VERSION FORMAT_VERSION_2248
 #define LAST_FORMAT_VERSION FORMAT_VERSION_2100
 
 #define ListMapsDirectory std::list<std::string>
@@ -71,8 +71,25 @@ enum
     DBG_NETWORK_WARN= 0x0400,
     DBG_OTHER_WARN  = 0x1000,
 
+    DBG_ENGINE_INFO = 0x0008,
+    DBG_GAME_INFO   = 0x0020,
+    DBG_BATTLE_INFO = 0x0080,
+    DBG_AI_INFO     = 0x0200,
+    DBG_NETWORK_INFO= 0x0800,
+    DBG_OTHER_INFO  = 0x2000,
+
+    DBG_ENGINE_TRACE = DBG_ENGINE,
+    DBG_GAME_TRACE   = DBG_GAME,
+    DBG_BATTLE_TRACE = DBG_BATTLE,
+    DBG_AI_TRACE     = DBG_AI,
+    DBG_NETWORK_TRACE= DBG_NETWORK,
+    DBG_OTHER_TRACE  = DBG_OTHER,
+
     DBG_ALL = DBG_ENGINE | DBG_GAME | DBG_BATTLE | DBG_AI | DBG_NETWORK | DBG_OTHER,
-    DBG_ALL_WARN = DBG_ENGINE_WARN | DBG_GAME_WARN | DBG_BATTLE_WARN | DBG_AI_WARN | DBG_NETWORK_WARN | DBG_OTHER_WARN
+
+    DBG_ALL_WARN = DBG_ENGINE_WARN | DBG_GAME_WARN | DBG_BATTLE_WARN | DBG_AI_WARN | DBG_NETWORK_WARN | DBG_OTHER_WARN,
+    DBG_ALL_INFO = DBG_ENGINE_INFO | DBG_GAME_INFO | DBG_BATTLE_INFO | DBG_AI_INFO | DBG_NETWORK_INFO | DBG_OTHER_INFO,
+    DBG_ALL_TRACE= DBG_ENGINE_TRACE | DBG_GAME_TRACE | DBG_BATTLE_TRACE | DBG_AI_TRACE | DBG_NETWORK_TRACE | DBG_OTHER_TRACE
 };
 
 const char* StringDebug(int);
@@ -104,7 +121,7 @@ enum
  #define DEBUG(x, y, z)
 #endif
 
-#define IS_DEVEL() IS_DEBUG(DBG_DEVEL, DBG_TRACE)
+#define IS_DEVEL() IS_DEBUG(DBG_DEVEL, DBG_INFO)
 
 bool IS_DEBUG(int name, int level);
 
@@ -234,7 +251,6 @@ public:
     bool Unicode(void) const;
     bool PocketPC(void) const;
     bool UseAltResource(void) const;
-    bool AutoBattle(u8) const;
     bool PriceLoyaltyVersion(void) const;
     bool LoadedGameVersion(void) const;
     bool MusicExt(void) const;
@@ -314,7 +330,6 @@ public:
     void SetPriceLoyaltyVersion(void);
     void SetGameDifficulty(const Difficulty::difficulty_t d);
     void SetEvilInterface(bool);
-    void SetAutoBattle(u8, bool);
     void SetBattleGrid(bool);
     void SetBattleMovementShaded(bool);
     void SetBattleMouseShaded(bool);
@@ -355,7 +370,7 @@ public:
     u16	GetPort(void) const;
 
     // from maps info
-    Race::race_t KingdomRace(u8) const;
+    u8 KingdomRace(u8) const;
     void SetKingdomRace(u8, u8);
     void FixKingdomRandomRace(void);
     const std::string & MapsFile(void) const;
@@ -376,7 +391,7 @@ public:
     u16 ConditionLoss(void) const;
     bool WinsCompAlsoWins(void) const;
     bool WinsAllowNormalVictory(void) const;
-    Artifact::artifact_t WinsFindArtifact(void) const;
+    u8 WinsFindArtifactID(void) const;
     bool WinsFindUltimateArtifact(void) const;
     u16 WinsSidePart(void) const;
     u32 WinsAccumulateGold(void) const;
@@ -436,7 +451,6 @@ private:
     u8 game_type;
     u8 players_colors;
     u8 preferably_count_players;
-    u8 auto_battle_on;
 
     std::string playmus_command;
     std::string video_driver;

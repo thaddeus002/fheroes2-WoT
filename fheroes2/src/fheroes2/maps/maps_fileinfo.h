@@ -26,7 +26,6 @@
 #include <vector>
 #include "gamedefs.h"
 #include "game_over.h"
-#include "artifact.h"
 
 namespace Maps
 {
@@ -52,7 +51,7 @@ namespace Maps
     u16 ConditionLoss(void) const;
     bool WinsCompAlsoWins(void) const;
     bool WinsAllowNormalVictory(void) const;
-    Artifact::artifact_t WinsFindArtifact(void) const;
+    u8   WinsFindArtifactID(void) const;
     bool WinsFindUltimateArtifact(void) const;
     u16 WinsSidePart(void) const;
     u32 WinsAccumulateGold(void) const;

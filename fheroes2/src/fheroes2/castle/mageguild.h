@@ -41,7 +41,7 @@ class MageGuild
 	bool isLibraryBuild(void) const;
 	bool HaveLibraryCapability(void) const;
 	u8   GetLevel(void) const;
-	void GetSpells(std::vector<Spell::spell_t> &, u8) const;
+	SpellStorage GetSpells(u8) const;
 
     private:
 	friend class Game::IO;
@@ -61,7 +61,7 @@ public:
 
 private:
     std::vector<Rect> coords;
-    std::vector<Spell::spell_t> spells;
+    SpellStorage spells;
 };
 
 #endif

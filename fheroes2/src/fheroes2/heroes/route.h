@@ -64,7 +64,7 @@ namespace Route
 	    u16		isUnderProtection(s32 & pos) const;
 	    bool	hasObstacle(s32* res = NULL) const;
 
-	    void	Dump(void) const;
+	    void	DumpPath(void) const;
 
 	    u16		GetAllowStep(void) const;
 	    u32		TotalPenalty(void) const;

@@ -29,6 +29,7 @@
 #include "agg.h"
 #include "speed.h"
 #include "luck.h"
+#include "race.h"
 #include "morale.h"
 #include "monster.h"
 #include "payment.h"
@@ -105,10 +106,9 @@ Heroes::heroes_t Heroes::ConvertID(u8 index)
 Heroes::Heroes() : move_point_scale(-1), army(this), path(*this), 
     direction(Direction::RIGHT), sprite_index(18), patrol_square(0)
 {
-    bag_artifacts.assign(HEROESMAXARTIFACT, Artifact::UNKNOWN);
 }
 
-Heroes::Heroes(heroes_t ht, Race::race_t rc) : killer_color(Color::GRAY), experience(0), move_point(0),
+Heroes::Heroes(heroes_t ht, u8 rc) : killer_color(Color::GRAY), experience(0), move_point(0),
     move_point_scale(-1), army(this), hid(ht), portrait(ht), race(rc),
     save_maps_object(MP2::OBJ_ZERO), path(*this), direction(Direction::RIGHT), sprite_index(18), patrol_square(0)
 {
@@ -116,7 +116,8 @@ Heroes::Heroes(heroes_t ht, Race::race_t rc) : killer_color(Color::GRAY), experi
 
     bag_artifacts.assign(HEROESMAXARTIFACT, Artifact::UNKNOWN);
 
-    u8 book, spell;
+    u8 book;
+    Spell spell;
     Skill::Primary::LoadDefaults(race, *this, book, spell);
 
     secondary_skills.reserve(HEROESMAXSKILL);
@@ -125,8 +126,7 @@ Heroes::Heroes(heroes_t ht, Race::race_t rc) : killer_color(Color::GRAY), experi
     if(book)
     {
         SpellBookActivate();
-        if(!HasArtifact(Artifact::MAGIC_BOOK)) PickupArtifact(Artifact::MAGIC_BOOK);
-        AppendSpellToBook(Spell::FromInt(spell));
+        AppendSpellToBook(spell);
     }
 
     // hero is freeman
@@ -278,7 +278,7 @@ Heroes::Heroes(heroes_t ht, Race::race_t rc) : killer_color(Color::GRAY), experi
 	    experience = 777;
 
 	    // all spell in magic book
-	    for(u8 spell = Spell::FIREBALL; spell < Spell::STONE; ++spell) AppendSpellToBook(Spell::FromInt(spell), true);
+	    for(u8 spell = Spell::FIREBALL; spell < Spell::STONE; ++spell) AppendSpellToBook(Spell(spell), true);
 	    break;
 
 	default: break;
@@ -288,7 +288,7 @@ Heroes::Heroes(heroes_t ht, Race::race_t rc) : killer_color(Color::GRAY), experi
     move_point = GetMaxMovePoints();
 }
 
-void Heroes::LoadFromMP2(s32 map_index, const void *ptr, const Color::color_t cl, const Race::race_t rc)
+void Heroes::LoadFromMP2(s32 map_index, const void *ptr, const Color::color_t cl, const u8 rc)
 {
     // reset modes
     modes = 0;
@@ -385,19 +385,16 @@ void Heroes::LoadFromMP2(s32 map_index, const void *ptr, const Color::color_t cl
     else
 	ptr8 += 2;
 
-    // artifacts
-    Artifact::artifact_t artifact = Artifact::UNKNOWN;
-
     // artifact 1
-    if(Artifact::UNKNOWN != (artifact = Artifact::FromInt(*ptr8))) PickupArtifact(artifact);
+    PickupArtifact(Artifact(*ptr8));
     ++ptr8;
 
     // artifact 2
-    if(Artifact::UNKNOWN != (artifact = Artifact::FromInt(*ptr8))) PickupArtifact(artifact);
+    PickupArtifact(Artifact(*ptr8));
     ++ptr8;
 
     // artifact 3
-    if(Artifact::UNKNOWN != (artifact = Artifact::FromInt(*ptr8))) PickupArtifact(artifact);
+    PickupArtifact(Artifact(*ptr8));
     ++ptr8;
 
     // unknown byte
@@ -447,7 +444,8 @@ void Heroes::LoadFromMP2(s32 map_index, const void *ptr, const Color::color_t cl
 	if(Race::ALL & rc) race = rc;
 
 	// fixed default primary skills
-	u8 book, spell;
+	u8 book;
+	Spell spell;
 	Skill::Primary::LoadDefaults(race, *this, book, spell);
 
 	// fixed default troop
@@ -462,8 +460,7 @@ void Heroes::LoadFromMP2(s32 map_index, const void *ptr, const Color::color_t cl
 	if(book)
 	{
     	    SpellBookActivate();
-    	    AppendSpellToBook(Spell::FromInt(spell));
-    	    if(!HasArtifact(Artifact::MAGIC_BOOK)) PickupArtifact(Artifact::MAGIC_BOOK);
+    	    AppendSpellToBook(spell);
 	}
     }
 
@@ -850,7 +847,7 @@ void Heroes::ActionNewDay(void)
 
 		// power ring action
 	        if(HasArtifact(Artifact::POWER_RING))
-		    curr += Artifact::GetExtraValue(Artifact::POWER_RING);
+		    curr += Artifact(Artifact::POWER_RING).ExtraValue();
 
 		// secondary skill
 	        curr += GetSecondaryValues(Skill::Secondary::MYSTICISM);
@@ -986,22 +983,17 @@ void Heroes::SetVisitedWideTile(const s32 index, const u8 object, const Visit::t
 
 u8 Heroes::GetCountArtifacts(void) const
 {
-    return std::count_if(bag_artifacts.begin(), bag_artifacts.end(), std::mem_fun_ref(&Artifact::isValid));
+    return bag_artifacts.CountArtifacts();
 }
 
 bool Heroes::HasUltimateArtifact(void) const
 {
-    return bag_artifacts.end() != std::find_if(bag_artifacts.begin(), bag_artifacts.end(), std::mem_fun_ref(&Artifact::isUltimate));
+    return bag_artifacts.ContainUltimateArtifact();
 }
 
 bool Heroes::IsFullBagArtifacts(void) const
 {
-    return bag_artifacts.end() == std::find(bag_artifacts.begin(), bag_artifacts.end(), Artifact::UNKNOWN);
-}
-
-bool Heroes::PickupArtifact(const Artifact::artifact_t art)
-{
-    return PickupArtifact(Artifact(art));
+    return bag_artifacts.isFull();
 }
 
 bool Heroes::PickupArtifact(const Artifact & art)
@@ -1009,47 +1001,25 @@ bool Heroes::PickupArtifact(const Artifact & art)
     const Settings & conf = Settings::Get();
     bool interface = (conf.MyColor() == color && conf.CurrentColor() == color);
 
-    BagArtifacts::iterator it = std::find(bag_artifacts.begin(), bag_artifacts.end(), Artifact::UNKNOWN);
-
-    if(bag_artifacts.end() == it)
+    if(! bag_artifacts.PushArtifact(art))
     {
 	if(interface)
 	{
-	    art == Artifact::MAGIC_BOOK ?
+	    art() == Artifact::MAGIC_BOOK ?
 	    Dialog::Message("", _("You must purchase a spell book to use the mage guild, but you currently have no room for a spell book. Try giving one of your artifacts to another hero."), Font::BIG, Dialog::OK) :
 	    Dialog::Message(art.GetName(), _("You have no room to carry another artifact!"), Font::BIG, Dialog::OK);
 	}
 	return false;
     }
 
-    *it = art;
-
-    // book insert first
-    if(art == Artifact::MAGIC_BOOK)
-    {
-	if(it != bag_artifacts.begin()) std::swap(*it, bag_artifacts.front());
-
-	SpellBookActivate();
-    }
-    else
-    if(conf.ExtHeroPickupArtifactWithInfoDialog() && interface)
-	Dialog::ArtifactInfo(art.GetName(), Artifact::GetDescription(art), art());
+    if(conf.ExtHeroPickupArtifactWithInfoDialog() &&
+	art() != Artifact::MAGIC_BOOK && interface)
+	Dialog::ArtifactInfo(art.GetName(), art.GetDescription(), art);
 
     // check: anduran garb
-    if(HasArtifact(Artifact::BREASTPLATE_ANDURAN) &&
-	HasArtifact(Artifact::HELMET_ANDURAN) &&
-	HasArtifact(Artifact::SWORD_ANDURAN))
+    if(bag_artifacts.MakeBattleGarb())
     {
-	it = std::find(bag_artifacts.begin(), bag_artifacts.end(), Artifact::BREASTPLATE_ANDURAN);
-	*it = Artifact::UNKNOWN;
-	it = std::find(bag_artifacts.begin(), bag_artifacts.end(), Artifact::HELMET_ANDURAN);
-	*it = Artifact::UNKNOWN;
-	it = std::find(bag_artifacts.begin(), bag_artifacts.end(), Artifact::SWORD_ANDURAN);
-	*it = Artifact::UNKNOWN;
-	it = std::find(bag_artifacts.begin(), bag_artifacts.end(), Artifact::UNKNOWN);
-	*it = Artifact::BATTLE_GARB;
-
-	if(conf.MyColor() == color)
+	if(interface)
 	    Dialog::ArtifactInfo("", _("The three Anduran artifacts magically combine into one."), Artifact::BATTLE_GARB);
     }
 
@@ -1161,7 +1131,7 @@ bool Heroes::BuySpellBook(const MageGuild* mageguild, u8 shrine)
 	Surface sprite(border.w(), border.h());
 
 	sprite.Blit(border);
-	sprite.Blit(AGG::GetICN(ICN::ARTIFACT, Artifact::IndexSprite64(Artifact::MAGIC_BOOK)), 5, 5);
+	sprite.Blit(AGG::GetICN(ICN::ARTIFACT, Artifact(Artifact::MAGIC_BOOK).IndexSprite64()), 5, 5);
 
 	header.append(". ");
 	header.append(_("Do you wish to buy one?"));
@@ -1169,10 +1139,9 @@ bool Heroes::BuySpellBook(const MageGuild* mageguild, u8 shrine)
 	if(Dialog::NO == Dialog::SpriteInfo("", header, sprite, Dialog::YES | Dialog::NO)) return false;
     }
 
-    if(!HasArtifact(Artifact::MAGIC_BOOK) && PickupArtifact(Artifact::MAGIC_BOOK))
+    if(SpellBookActivate())
     {
 	kingdom.OddFundsResource(payment);
-	SpellBookActivate();
 
 	// add all spell to book
 	if(mageguild) mageguild->EducateHero(*this);
@@ -1340,7 +1309,7 @@ u8 Heroes::GetScoute(void) const
 
 u16 Heroes::GetVisionsDistance(void) const
 {
-    u16 dist = Spell::GetExtraValue(Spell::VISIONS);
+    u16 dist = Spell(Spell::VISIONS).ExtraValue();
 
     if(HasArtifact(Artifact::CRYSTAL_BALL))
         dist = Settings::Get().UseAltResource() ? dist * 2 + 2 : 8;
@@ -1841,12 +1810,7 @@ void Heroes::Dump(void) const
 
     if(GetControl() == Game::AI)
     {
-	VERBOSN("spell book      : ");
-
-	if(spell_book.isActive())
-	    spell_book.Dump();
-	else
-	    VERBOSE("disabled");
+	VERBOSE("spell book      : " << (HaveSpellBook() ? spell_book.String() : "disabled"));
 
 	GetArmy().Dump("army dump       : ");
 
@@ -1855,4 +1819,3 @@ void Heroes::Dump(void) const
 
     VERBOSE("");
 }
-

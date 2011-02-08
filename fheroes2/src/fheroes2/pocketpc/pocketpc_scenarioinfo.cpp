@@ -28,6 +28,7 @@
 #include "button.h"
 #include "difficulty.h"
 #include "world.h"
+#include "race.h"
 #include "pocketpc.h"
 
 void UpdateCoordOpponentsInfo(const Point &, std::vector<Rect> &);
@@ -168,7 +169,7 @@ Game::menu_t PocketPC::ScenarioInfo(void)
 		{
 		    cursor.Hide();
 		    u8 index = 0;
-		    Race::race_t race = conf.KingdomRace(color);
+		    u8 race = conf.KingdomRace(color);
 		    switch(race)
 		    {
 			case Race::KNGT: index = 52; race = Race::BARB; break;

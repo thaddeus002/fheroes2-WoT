@@ -27,6 +27,7 @@
 #include "button.h"
 #include "cursor.h"
 #include "castle.h"
+#include "race.h"
 #include "settings.h"
 #include "mageguild.h"
 #include "text.h"
@@ -61,7 +62,8 @@ RowSpells::RowSpells(const Point & pos, const MageGuild & guild, u8 lvl)
 	    coords.push_back(Rect(pos.x + coords.size() * (Settings::Get().QVGA() ? 72 : 110) - roll_hide.w() / 2, pos.y, roll_hide.w(), roll_hide.h()));
     }
 
-    guild.GetSpells(spells, lvl);
+    spells.reserve(6);
+    spells = guild.GetSpells(lvl);
     spells.resize(coords.size(), Spell::NONE);
 }
 
@@ -78,10 +80,10 @@ void RowSpells::Redraw(void)
     for(; it1 != it2; ++it1)
     {
 	const Rect & dst = (*it1);
-	const Spell::spell_t & spell = spells[it1 - coords.begin()];
+	const Spell & spell = spells[it1 - coords.begin()];
 
 	// roll hide
-	if(dst.w < roll_show.w() || Spell::NONE == spell)
+	if(dst.w < roll_show.w() || spell == Spell::NONE)
 	{
 	    display.Blit(roll_hide, dst);
 	}
@@ -90,7 +92,7 @@ void RowSpells::Redraw(void)
 	{
 	    display.Blit(roll_show, dst);
 
-	    const Sprite & icon = AGG::GetICN(ICN::SPELLS, Spell::IndexSprite(spell));
+	    const Sprite & icon = AGG::GetICN(ICN::SPELLS, spell.IndexSprite());
 
 	    if(Settings::Get().QVGA())
 	    {
@@ -100,7 +102,7 @@ void RowSpells::Redraw(void)
 	    {
 		display.Blit(icon, dst.x + 5 + (dst.w - icon.w()) / 2, dst.y + 40 - icon.h() / 2);
 
-		TextBox text(Spell::GetName(spell), Font::SMALL, 78);
+		TextBox text(spell.GetName(), Font::SMALL, 78);
 		text.Blit(dst.x + 18, dst.y + 62);
 	    }
 	}
@@ -120,8 +122,8 @@ bool RowSpells::QueueEventProcessing(void)
 
     if(le.MouseClickLeft() || le.MousePressRight())
     {
-	const Spell::spell_t & spell = spells[it - coords.begin()];
-	if(Spell::NONE != spell)
+	const Spell & spell = spells[it - coords.begin()];
+	if(spell != Spell::NONE)
 	{
     	    cursor.Hide();
     	    Dialog::SpellInfo(spell, !le.MousePressRight());

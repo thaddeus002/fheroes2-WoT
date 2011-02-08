@@ -28,11 +28,7 @@
 
 #define SIZEMESSAGE 400
 
-GameEvent::Day::Day() : computer(false), first(MAXU16), subsequent(0), colors(0)
-{
-}
-
-GameEvent::Day::Day(const void *ptr)
+EventDate::EventDate(const void *ptr)
 {
     const u8  *ptr8  = static_cast<const u8 *>(ptr);
     u16 byte16 = 0;
@@ -134,12 +130,17 @@ GameEvent::Day::Day(const void *ptr)
     DEBUG(DBG_GAME, DBG_INFO, "add: " << message);
 }
 
-GameEvent::Coord::Coord() : index_map(-1), artifact(Artifact::UNKNOWN), computer(false), cancel(true), colors(0)
+bool EventDate::isAllow(u8 col, u16 date) const
 {
+    return ((first == date ||
+	    (subsequent && (first < date && 0 == ((date - first) % subsequent)))) &&
+	    (col & colors));
 }
 
-GameEvent::Coord::Coord(s32 index, const void *ptr) : index_map(index)
+EventMaps::EventMaps(s32 index, const void *ptr)
 {
+    SetIndex(index);
+
     const u8  *ptr8  = static_cast<const u8 *>(ptr);
     u16 byte16 = 0;
     u32 byte32 = 0;
@@ -185,7 +186,7 @@ GameEvent::Coord::Coord(s32 index, const void *ptr) : index_map(index)
     byte16 = ReadLE16(ptr8);
     ++ptr8;
     ++ptr8;
-    artifact = (0xffff != byte16 && Artifact::MAGIC_BOOK > byte16 ? Artifact::FromInt(byte16) : Artifact::UNKNOWN);
+    artifact = byte16;
 
     // allow computer
     computer = *ptr8;
@@ -227,12 +228,10 @@ GameEvent::Coord::Coord(s32 index, const void *ptr) : index_map(index)
     DEBUG(DBG_GAME , DBG_INFO, "add: " << message);
 }
 
-GameEvent::Riddle::Riddle() : index_map(-1), artifact(Artifact::UNKNOWN), valid(false)
+Riddle::Riddle(s32 index, const void *ptr) : valid(false)
 {
-}
+    SetIndex(index);
 
-GameEvent::Riddle::Riddle(s32 index, const void *ptr) : index_map(index), valid(false)
-{
     const u8  *ptr8  = static_cast<const u8 *>(ptr);
     u16 byte16 = 0;
     u32 byte32 = 0;
@@ -279,7 +278,7 @@ GameEvent::Riddle::Riddle(s32 index, const void *ptr) : index_map(index), valid(
     byte16 = ReadLE16(ptr8);
     ++ptr8;
     ++ptr8;
-    artifact = (0xffff != byte16 && Artifact::MAGIC_BOOK > byte16 ? Artifact::FromInt(byte16) : Artifact::UNKNOWN);
+    artifact = byte16;
 
     // count answers
     u8 count = *ptr8;
@@ -307,19 +306,14 @@ GameEvent::Riddle::Riddle(s32 index, const void *ptr) : index_map(index), valid(
     DEBUG(DBG_GAME, DBG_INFO, "add: " << message);
 }
 
-bool GameEvent::Riddle::AnswerCorrect(const std::string & answer)
+bool Riddle::AnswerCorrect(const std::string & answer)
 {
     return answers.end() != std::find(answers.begin(), answers.end(), answer);
 }
 
-bool GameEvent::Riddle::isValid(void) const
-{
-    return valid;
-}
-
-void GameEvent::Riddle::SetQuiet(void)
+void Riddle::SetQuiet(void)
 {
     valid = false;
     artifact = Artifact::UNKNOWN;
-    resource = Resource::funds_t();
+    resource.Reset();
 }

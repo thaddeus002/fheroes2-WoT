@@ -23,8 +23,9 @@
 #include "heroes_base.h"
 #include "artifact.h"
 #include "settings.h"
-#include "spell.h"
+#include "race.h"
 #include "army.h"
+#include "spell.h"
 
 #ifdef WITH_XML
 #include "xmlccwrap.h"
@@ -168,142 +169,85 @@ void Spell::UpdateStats(const std::string & spec)
 #endif
 }
 
-Spell::Spell() : id(NONE)
+Spell::Spell(u8 s) : id(s > STONE ? NONE : s)
 {
 }
 
-Spell::Spell(spell_t s) : id(s)
+bool Spell::operator< (const Spell & s) const
 {
+    return id < s.id;
 }
 
-Spell::Spell(u8 s) : id(FromInt(s))
+bool Spell::operator== (const Spell & s) const
 {
+    return s.id == id;
 }
 
-bool Spell::operator== (u8 s) const
+bool Spell::operator!= (const Spell & s) const
 {
-    return s == id;
+    return s.id != id;
 }
 
-bool Spell::operator!= (u8 s) const
+bool Spell::isValid(void) const
 {
-    return id != s;
+    return id != Spell::NONE;
 }
 
-Spell::spell_t Spell::operator() (void) const
+u8 Spell::operator() (void) const
 {
     return id;
-}
-
-Spell::spell_t Spell::GetID(void) const
-{
-    return id;
-}
-
-void Spell::Set(spell_t s)
-{
-    id = s;
 }
 
 const char* Spell::GetName(void) const
 {
-    return GetName(id);
+    return _(spells[id].name);
 }
 
 const char* Spell::GetDescription(void) const
 {
-    return GetDescription(id);
+    return _(spells[id].description);
 }
 
-u8 Spell::GetCostManaPoints(void) const
-{
-    return CostManaPoints(id);
-}
-
-u8 Spell::GetLevel(void) const
-{
-    return Level(id);
-}
-
-bool Spell::isCombat(void) const
-{
-    return isCombat(id);
-}
-
-bool Spell::isAdventure(void) const
-{
-    return !isCombat(id);
-}
-
-bool Spell::isDamage(void) const
-{
-    return isDamage(id);
-}
-
-u8 Spell::GetDamage(void) const
-{
-    return Damage(id);
-}
-
-bool Spell::isMindInfluence(void) const
-{
-    return isMindInfluence(id);
-}
-
-
-/* ---------- */
-
-
-u8 Spell::GetIndexSprite(void) const
-{
-    return IndexSprite(id);
-}
-
-u8 Spell::GetInlIndexSprite(void) const
-{
-    return InlIndexSprite(id);
-}
-
-Spell::spell_t Spell::FromInt(u8 index)
-{
-    return index > STONE ? NONE : static_cast<spell_t>(index);
-}
-
-u8 Spell::CostManaPoints(spell_t spell, const HeroBase* hero)
+u8 Spell::CostManaPoints(const HeroBase* hero) const
 {
     if(hero)
     {
-	switch(spell)
+	switch(id)
 	{
 	    case BLESS:
 	    case MASSBLESS:
-	    if(hero->HasArtifact(Artifact::SNAKE_RING)) return spells[spell].mana / 2;
+	    if(hero->HasArtifact(Artifact::SNAKE_RING)) return spells[id].mana / 2;
 	    break;
 
 	    case SUMMONEELEMENT:
 	    case SUMMONAELEMENT:
 	    case SUMMONFELEMENT:
 	    case SUMMONWELEMENT:
-	    if(hero->HasArtifact(Artifact::ELEMENTAL_RING)) return spells[spell].mana / 2;
+	    if(hero->HasArtifact(Artifact::ELEMENTAL_RING)) return spells[id].mana / 2;
 	    break;
 
 	    case CURSE:
 	    case MASSCURSE:
-	    if(hero->HasArtifact(Artifact::EVIL_EYE)) return spells[spell].mana / 2;
+	    if(hero->HasArtifact(Artifact::EVIL_EYE)) return spells[id].mana / 2;
 	    break;
 
 	    default: break;
 	}
 
-	if(isMindInfluence(spell) && hero->HasArtifact(Artifact::SKULLCAP)) return spells[spell].mana / 2;
+	if(isMindInfluence() && hero->HasArtifact(Artifact::SKULLCAP)) return spells[id].mana / 2;
     }
 
-    return spells[spell].mana;
+    return spells[id].mana;
 }
 
-u8 Spell::Level(u8 spell)
+bool Spell::isLevel(u8 lvl) const
 {
-    switch(spell)
+    return Level() == lvl;
+}
+
+u8 Spell::Level(void) const
+{
+    switch(id)
     {
         case BLESS:
         case BLOODLUST:
@@ -391,9 +335,9 @@ u8 Spell::Level(u8 spell)
     return 0;
 }
 
-bool Spell::isCombat(u8 spell)
+bool Spell::isCombat(void) const
 {
-    switch(spell)
+    switch(id)
     {
 	case NONE:
 	case VIEWMINES:
@@ -418,9 +362,19 @@ bool Spell::isCombat(u8 spell)
     return true;
 }
 
-u8 Spell::Damage(u8 spell)
+bool Spell::isAdventure(void) const
 {
-    switch(spell)
+    return !isCombat();
+}
+
+bool Spell::isDamage(void) const
+{
+    return Damage();
+}
+
+u8 Spell::Damage(void) const
+{
+    switch(id)
     {
 	case ARROW:
 	case FIREBALL:
@@ -436,7 +390,7 @@ u8 Spell::Damage(u8 spell)
 	case COLDRAY:
 	case HOLYSHOUT:
 	case DEATHRIPPLE:
-	    return spells[spell].extra;
+	    return spells[id].extra;
 
 	default: break;
     }
@@ -444,58 +398,29 @@ u8 Spell::Damage(u8 spell)
     return 0;
 }
 
-bool Spell::isDamage(u8 spell)
+bool Spell::isMindInfluence(void) const
 {
-    return Damage(spell);
-}
-
-u8 Spell::Restore(u8 spell)
-{
-    switch(spell)
+    switch(id)
     {
-        case Spell::CURE:
-        case Spell::MASSCURE:
-	    return spells[spell].extra;
+	case BLIND:
+	case PARALYZE:
+	case BERSERKER:
+	case HYPNOTIZE: return true;
 
 	default: break;
     }
 
-    return Resurrect(spell);
+    return false;
 }
 
-u8 Spell::Resurrect(u8 spell)
+u8 Spell::IndexSprite(void) const
 {
-    switch(spell)
-    {
-	case Spell::ANIMATEDEAD:
-        case Spell::RESURRECT:
-        case Spell::RESURRECTTRUE:
-	    return spells[spell].extra;
-
-	default: break;
-    }
-
-    return 0;
+    return spells[id].sprite;
 }
 
-bool Spell::isRestore(u8 spell)
+u8 Spell::InlIndexSprite(void) const
 {
-    return Restore(spell);
-}
-
-bool Spell::isResurrect(u8 spell)
-{
-    return Resurrect(spell);
-}
-
-u8 Spell::IndexSprite(spell_t spell)
-{
-    return spells[spell].sprite;
-}
-
-u8 Spell::InlIndexSprite(u8 spell)
-{
-    switch(spell)
+    switch(id)
     {
 	case HASTE:
 	case MASSHASTE:		return 0;
@@ -523,63 +448,80 @@ u8 Spell::InlIndexSprite(u8 spell)
     return 0;
 }
 
-u8 Spell::GetExtraValue(spell_t spell)
-{ 
-    return spells[spell].extra;
-}
-
-const char* Spell::GetName(spell_t spell)
-{ 
-    return _(spells[spell].name);
-}
-
-const char* Spell::GetDescription(spell_t spell)
+u8 Spell::Restore(void) const
 {
-    return _(spells[spell].description);
-}
-
-Spell::spell_t Spell::Rand(u8 lvl, bool adv)
-{
-    std::vector<spell_t> v;
-    v.reserve(15);
-
-    for(u8 sp = NONE; sp < STONE; ++sp)
-	if(((adv && !isCombat(sp)) || (!adv && isCombat(sp))) &&
-	    lvl == Level(sp) &&
-	    !(spells[sp].bits & SP_DISABLE)) v.push_back(static_cast<spell_t>(sp));
-
-    return v.size() ? *Rand::Get(v) : Spell::NONE;
-}
-
-Spell::spell_t Spell::RandCombat(u8 lvl)
-{
-    return Rand(lvl, false);
-}
-
-Spell::spell_t Spell::RandAdventure(u8 lvl)
-{
-    spell_t res = Rand(lvl, true);
-    return NONE != res ? res : RandCombat(lvl);
-}
-
-bool Spell::isMindInfluence(u8 spell)
-{
-    switch(spell)
+    switch(id)
     {
-	case BLIND:
-	case PARALYZE:
-	case BERSERKER:
-	case HYPNOTIZE: return true;
+        case Spell::CURE:
+        case Spell::MASSCURE:
+	    return spells[id].extra;
 
 	default: break;
     }
 
-    return false;
+    return Resurrect();
 }
 
-bool Spell::isUndeadOnly(u8 spell)
+u8 Spell::Resurrect(void) const
 {
-    switch(spell)
+    switch(id)
+    {
+	case Spell::ANIMATEDEAD:
+        case Spell::RESURRECT:
+        case Spell::RESURRECTTRUE:
+	    return spells[id].extra;
+
+	default: break;
+    }
+
+    return 0;
+}
+
+bool Spell::isRestore(void) const
+{
+    return Restore();
+}
+
+bool Spell::isResurrect(void) const
+{
+    return Resurrect();
+}
+
+
+u8 Spell::ExtraValue(void) const
+{
+    return spells[id].extra;
+}
+
+Spell Spell::Rand(u8 lvl, bool adv)
+{
+    std::vector<Spell> v;
+    v.reserve(15);
+
+    for(u8 sp = NONE; sp < STONE; ++sp)
+    {
+	const Spell spell(sp);
+	if(((adv && !spell.isCombat()) || (!adv && spell.isCombat())) &&
+	    lvl == spell.Level() &&
+	    !(spells[sp].bits & SP_DISABLE)) v.push_back(spell);
+    }
+    return v.size() ? *Rand::Get(v) : Spell(Spell::NONE);
+}
+
+Spell Spell::RandCombat(u8 lvl)
+{
+    return Rand(lvl, false);
+}
+
+Spell Spell::RandAdventure(u8 lvl)
+{
+    Spell res = Rand(lvl, true);
+    return res.isValid() ? res : RandCombat(lvl);
+}
+
+bool Spell::isUndeadOnly(void) const
+{
+    switch(id)
     {
 	case ANIMATEDEAD:
 	case HOLYWORD:
@@ -592,9 +534,9 @@ bool Spell::isUndeadOnly(u8 spell)
     return false;
 }
 
-bool Spell::isALiveOnly(u8 spell)
+bool Spell::isALiveOnly(void) const
 {
-    switch(spell)
+    switch(id)
     {
 	case BLESS:
 	case MASSBLESS:
@@ -612,12 +554,12 @@ bool Spell::isALiveOnly(u8 spell)
     return false;
 }
 
-bool Spell::isApplyWithoutFocusObject(u8 spell)
+bool Spell::isApplyWithoutFocusObject(void) const
 {
-    if(isMassActions(spell) || isSummon(spell))
+    if(isMassActions() || isSummon())
 	return true;
     else
-    switch(spell)
+    switch(id)
     {
 	case DEATHRIPPLE:
 	case DEATHWAVE:
@@ -634,9 +576,9 @@ bool Spell::isApplyWithoutFocusObject(u8 spell)
     return false;
 }
 
-bool Spell::isSummon(u8 spell)
+bool Spell::isSummon(void) const
 {
-    switch(spell)
+    switch(id)
     {
 	case SUMMONEELEMENT:
         case SUMMONAELEMENT:
@@ -650,9 +592,9 @@ bool Spell::isSummon(u8 spell)
     return false;
 }
 
-bool Spell::isApplyToAnyTroops(u8 spell)
+bool Spell::isApplyToAnyTroops(void) const
 {
-    switch(spell)
+    switch(id)
     {
 	case DISPEL:
 	case MASSDISPEL:
@@ -664,9 +606,9 @@ bool Spell::isApplyToAnyTroops(u8 spell)
     return false;
 }
 
-bool Spell::isApplyToFriends(u8 spell)
+bool Spell::isApplyToFriends(void) const
 {
-    switch(spell)
+    switch(id)
     {
 	case BLESS:
 	case BLOODLUST:
@@ -695,9 +637,9 @@ bool Spell::isApplyToFriends(u8 spell)
     return false;
 }
 
-bool Spell::isMassActions(u8 spell)
+bool Spell::isMassActions(void) const
 {
-    switch(spell)
+    switch(id)
     {
 	case MASSCURE:
 	case MASSHASTE:
@@ -714,9 +656,9 @@ bool Spell::isMassActions(u8 spell)
     return false;
 }
 
-bool Spell::isApplyToEnemies(u8 spell)
+bool Spell::isApplyToEnemies(void) const
 {
-    switch(spell)
+    switch(id)
     {
 	case MASSSLOW:
 	case MASSCURSE:
@@ -740,9 +682,9 @@ bool Spell::isApplyToEnemies(u8 spell)
     return false;
 }
 
-bool Spell::isRaceCompatible(u8 spell, u8 race)
+bool Spell::isRaceCompatible(u8 race) const
 {
-    switch(spell)
+    switch(id)
     {
 	case MASSCURE:
 	case MASSBLESS:
@@ -777,9 +719,9 @@ u8 Spell::CalculateDimensionDoorDistance(u8 current_sp, u32 total_hp)
     return 14;
 }
 
-bool Spell::AllowWithWisdom(u8 sp, u8 wisdom)
+bool Spell::isAllowWithWisdom(u8 wisdom) const
 {
-    return ((4 < Spell::Level(sp) && Skill::Level::EXPERT > wisdom) ||
-	    (3 < Spell::Level(sp) && Skill::Level::ADVANCED > wisdom) ||
-	    (2 < Spell::Level(sp) && Skill::Level::BASIC > wisdom) ? false : true);
+    return ((4 < Level() && Skill::Level::EXPERT > wisdom) ||
+	    (3 < Level() && Skill::Level::ADVANCED > wisdom) ||
+	    (2 < Level() && Skill::Level::BASIC > wisdom) ? false : true);
 }

@@ -106,6 +106,7 @@ const char* Network::GetMsgString(u16 msg)
         case MSG_BATTLE_SURRENDER:	return "MSG_BATTLE_SURRENDER";
         case MSG_BATTLE_TURN:		return "MSG_BATTLE_TURN";
         case MSG_BATTLE_RESULT:		return "MSG_BATTLE_RESULT";
+        case MSG_BATTLE_AUTO:		return "MSG_BATTLE_AUTO";
 
         case MSG_YOUR_TURN:     return "MSG_YOUR_TURN";
         case MSG_END_TURN:      return "MSG_END_TURN";
@@ -266,10 +267,12 @@ void Network::PackRaceColors(QueueMessage & m)
 {
     m.Push(static_cast<u8>(KINGDOMMAX));
 
-    for(Color::color_t color = Color::BLUE; color != Color::GRAY; ++color)
+    Color::Colors colors = Color::GetColors();
+    for(Color::Colors::iterator
+	it = colors.begin(); it != colors.end(); ++it)
     {
-	m.Push(static_cast<u8>(color));
-	m.Push(static_cast<u8>(Settings::Get().KingdomRace(color)));
+	m.Push(static_cast<u8>(*it));
+	m.Push(Settings::Get().KingdomRace(*it));
     }
 }
 

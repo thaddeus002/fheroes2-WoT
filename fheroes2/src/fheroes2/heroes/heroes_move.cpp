@@ -24,6 +24,7 @@
 #include "agg.h"
 #include "cursor.h"
 #include "settings.h"
+#include "race.h"
 #include "game_interface.h"
 #include "kingdom.h"
 #include "maps_tiles.h"

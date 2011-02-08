@@ -30,6 +30,7 @@
 #include "portrait.h"
 #include "morale.h"
 #include "luck.h"
+#include "race.h"
 #include "heroes.h"
 #include "battle_interface.h"
 #include "battle_arena.h"

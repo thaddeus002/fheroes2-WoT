@@ -40,7 +40,7 @@ class Captain : public HeroBase
     u8 GetKnowledge(void) const;
     s8 GetMorale(void) const;
     s8 GetLuck(void) const;
-    Race::race_t GetRace(void) const;
+    u8 GetRace(void) const;
     Color::color_t GetColor(void) const;
     const std::string & GetName(void) const;
     u8 GetType(void) const;

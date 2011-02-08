@@ -30,6 +30,7 @@
 #include "server.h"
 #include "client.h"
 #include "kingdom.h"
+#include "race.h"
 #include "battle2.h"
 #include "battle_stats.h"
 #include "remoteclient.h"

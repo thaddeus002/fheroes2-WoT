@@ -141,7 +141,7 @@ public:
     u8 GetKnowledge(void) const;
     s8 GetMorale(void) const;
     s8 GetLuck(void) const;
-    Race::race_t GetRace(void) const;
+    u8 GetRace(void) const;
     u8 GetType(void) const;
 
     u8  GetDamageMin(void) const;

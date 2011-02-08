@@ -27,13 +27,13 @@
 #include <string>
 #include "gamedefs.h"
 #include "maps.h"
-#include "race.h"
 #include "maps_tiles.h"
 #include "heroes.h"
 #include "week.h"
 #include "color.h"
 #include "sprite.h"
 #include "castle_heroes.h"
+#include "gameevent.h"
 #include "game_io.h"
 
 class Heroes;
@@ -41,13 +41,11 @@ class Castle;
 class Kingdom;
 class Recruits;
 class Radar;
+class Artifact;
 
-namespace GameEvent
-{
-    class Day;
-    class Coord;
-    class Riddle;
-}
+typedef std::vector<EventDate> EventsDate;
+typedef std::vector<EventMaps> EventsMaps;
+typedef std::vector<Riddle>    Riddles;
 
 class World : protected Size
 {
@@ -93,7 +91,7 @@ public:
     const Heroes* GetHeroesCondLoss(void) const;
 
     const Surface & GetPuzzleSurface(void) const;
-    Artifact::artifact_t GetUltimateArtifact(void) const;
+    Artifact GetUltimateArtifact(void) const;
     bool DiggingForUltimateArtifact(const Point & center);
     void ActionForMagellanMaps(u8 color);
 
@@ -138,11 +136,11 @@ public:
     u16  CheckKingdomWins(const Kingdom &) const;
     u16 CheckKingdomLoss(const Kingdom &) const;
 
-    void GetEventDay(const Color::color_t, std::vector<GameEvent::Day *> &) const;
-    const GameEvent::Coord* GetEventMaps(const Color::color_t c, const s32 index) const;
-    GameEvent::Riddle* GetSphinx(const s32 index) const;
+    EventsDate GetEventsDate(const Color::color_t) const;
+    const EventMaps* GetEventMaps(const Color::color_t c, const s32 index) const;
+    Riddle* GetSphinx(const s32 index);
 
-    Heroes* GetFreemanHeroes(Race::race_t rc = Race::BOMG) const;
+    Heroes* GetFreemanHeroes(u8 rc = 0) const;
     void UpdateRecruits(Recruits &) const;
 
     static u32 GetUniq(void){ return ++uniq0; };
@@ -163,19 +161,19 @@ private:
 
     std::vector<Maps::Tiles *>          vec_tiles;
     std::vector<Kingdom *>              vec_kingdoms;
-    std::vector<GameEvent::Day *>       vec_eventsday;
-    std::vector<GameEvent::Coord *>     vec_eventsmap;
-    std::vector<GameEvent::Riddle *>    vec_riddles;
     std::vector<std::string>     	vec_rumors;
     std::vector<Castle *>               vec_castles;
     std::vector<Heroes *>               vec_heroes;
+    EventsDate                          vec_eventsday;
+    EventsMaps                          vec_eventsmap;
+    Riddles				vec_riddles;
 
     std::map<s32, std::string>		map_sign;
 
     // index, object, color
     std::map<s32, ObjectColor> map_captureobj;
 
-    s32 ultimate_artifact;
+    s32 ultimate_index;
 
     u16 & width;
     u16 & height;

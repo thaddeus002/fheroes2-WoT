@@ -26,7 +26,6 @@
 #include <string>
 #include <vector>
 #include <list>
-#include "spell.h"
 #include "mp2.h"
 #include "dialog.h"
 #include "route.h"
@@ -88,7 +87,7 @@ public:
     };
 
     Heroes();
-    Heroes(heroes_t ht, Race::race_t rc);
+    Heroes(heroes_t ht, u8 rc);
 
     bool isValid(void) const;
     bool isFreeman(void) const;
@@ -97,12 +96,12 @@ public:
     const Castle* inCastle(void) const;
     Castle* inCastle(void);
 
-    void LoadFromMP2(s32 map_index, const void *ptr,  const Color::color_t cl, const Race::race_t rc);
+    void LoadFromMP2(s32 map_index, const void *ptr,  const Color::color_t cl, const u8 rc);
 
     void ResetStupidFlag(void) { ResetModes(STUPID); }
 
     Color::color_t GetColor(void) const{ return color; }
-    Race::race_t GetRace(void) const{ return race; }
+    u8 GetRace(void) const{ return race; }
     const std::string & GetName(void) const{ return name; }
     static const char* GetName(Heroes::heroes_t);
     u8 GetType(void) const { return Skill::Primary::HEROES; }
@@ -165,7 +164,6 @@ public:
     const std::vector<Skill::Secondary>	& GetSecondarySkills(void) const;
     u8   GetSecondaryValues(const Skill::Secondary::skill_t) const;
 
-    bool PickupArtifact(const Artifact::artifact_t);
     bool PickupArtifact(const Artifact &);
     bool HasUltimateArtifact(void) const;
     u8 GetCountArtifacts(void) const;
@@ -212,7 +210,7 @@ public:
     void Action(const s32 dst_index);
     void ActionNewPosition(void);
     bool ApplyPenaltyMovement(void);
-    bool ActionSpellCast(Spell::spell_t);
+    bool ActionSpellCast(const Spell &);
 
     void Redraw(Surface &, bool) const;
     void Redraw(Surface &, const s16, const s16, bool) const;
@@ -270,7 +268,7 @@ private:
 
     heroes_t		hid;
     heroes_t		portrait;
-    Race::race_t	race;
+    u8	race;
 
     MP2::object_t	save_maps_object;
 

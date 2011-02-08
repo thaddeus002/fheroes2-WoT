@@ -31,6 +31,7 @@
 #include "army.h"
 #include "tools.h"
 #include "castle.h"
+#include "race.h"
 #include "localclient.h"
 #include "editor_dialogs.h"
 #include "selectarmybar.h"

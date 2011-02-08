@@ -24,6 +24,7 @@
 #include "settings.h"
 #include "world.h"
 #include "kingdom.h"
+#include "spell.h"
 #include "battle_cell.h"
 #include "battle_stats.h"
 #include "battle_arena.h"
@@ -32,6 +33,15 @@
 #include "battle_catapult.h"
 #include "battle_interface.h"
 #include "server.h"
+
+void Battle2::Actions::AddedAutoBattleAction(u8 color)
+{
+    Action action;
+    action.SetID(MSG_BATTLE_AUTO);
+    action.Push(color);
+
+    push_back(action);
+}
 
 void Battle2::Actions::AddedSurrenderAction(void)
 {
@@ -49,11 +59,11 @@ void Battle2::Actions::AddedRetreatAction(void)
     push_back(action);
 }
 
-void Battle2::Actions::AddedCastAction(u8 spell, u16 dst)
+void Battle2::Actions::AddedCastAction(const Spell & spell, u16 dst)
 {
     Action action;
     action.SetID(MSG_BATTLE_CAST);
-    action.Push(spell);
+    action.Push(spell());
     action.Push(static_cast<u16>(0));
     action.Push(dst);
 
@@ -164,10 +174,10 @@ void Battle2::Arena::BattleProcess(Stats & attacker, Stats & defender, s16 dst, 
     TargetsApplyDamage(attacker, defender, targets);
     if(interface) interface->RedrawActionAttackPart2(attacker, targets);
 
-    const u8 spell = attacker.GetSpellMagic();
+    const Spell spell = attacker.GetSpellMagic();
 
     // magic attack
-    if(defender.isValid() && Spell::NONE != spell)
+    if(defender.isValid() && spell.isValid())
     {
 	const std::string name(attacker.GetName());
 
@@ -208,6 +218,8 @@ void Battle2::Arena::ApplyAction(Action & action)
 	case MSG_BATTLE_RETREAT:	ApplyActionRetreat(action); break;
 	case MSG_BATTLE_SURRENDER:	ApplyActionSurrender(action); break;
 
+	case MSG_BATTLE_AUTO:		ApplyActionAutoBattle(action); break;
+
 	default: break;
     }
 
@@ -237,18 +249,18 @@ void Battle2::Arena::ApplyActionSpellCast(Action & action)
     u8 byte8;
     action.Pop(byte8);
 
-    const Spell::spell_t spell = Spell::FromInt(byte8);
+    const Spell spell(byte8);
     HeroBase* current_commander = GetCurrentCommander();
 
     if(current_commander && !current_commander->Modes(Heroes::SPELLCASTED) &&
 	current_commander->HaveSpell(spell) &&
-	Spell::isCombat(spell) && current_commander->HaveSpellPoints(Spell::CostManaPoints(spell, current_commander)))
+	spell.isCombat() && current_commander->HaveSpellPoints(spell.CostManaPoints(current_commander)))
     {
 	DEBUG(DBG_BATTLE, DBG_TRACE, current_commander->GetName() << ", color: " << \
-	    Color::String(current_commander->GetColor()) << ", spell: " << Spell::GetName(spell));
+	    Color::String(current_commander->GetColor()) << ", spell: " << spell.GetName());
 
 	// uniq spells action
-	switch(spell)
+	switch(spell())
 	{
 	    case Spell::TELEPORT:
 		SpellActionTeleport(action);
@@ -264,7 +276,7 @@ void Battle2::Arena::ApplyActionSpellCast(Action & action)
 	}
 
 	current_commander->SetModes(Heroes::SPELLCASTED);
-	current_commander->TakeSpellPoints(Spell::CostManaPoints(spell, current_commander));
+	current_commander->TakeSpellPoints(spell.CostManaPoints(current_commander));
 
 #ifdef WITH_NET
 	if(Network::isRemoteClient())
@@ -668,11 +680,11 @@ Battle2::TargetsInfo Battle2::Arena::GetTargetsForDamage(Stats & attacker, Stats
     return targets;
 }
 
-void Battle2::Arena::TargetsApplySpell(const HeroBase* hero, const u8 spell, TargetsInfo & targets)
+void Battle2::Arena::TargetsApplySpell(const HeroBase* hero, const Spell & spell, TargetsInfo & targets)
 {
     DEBUG(DBG_BATTLE, DBG_TRACE, "targets: " << targets.size());
 
-    if(Spell::isSummon(spell))
+    if(spell.isSummon())
     {
         SpellActionSummonElemental(hero, spell);
     }
@@ -688,7 +700,7 @@ void Battle2::Arena::TargetsApplySpell(const HeroBase* hero, const u8 spell, Tar
     }
 }
 
-Battle2::TargetsInfo Battle2::Arena::GetTargetsForSpells(const HeroBase* hero, const u8 spell, const u16 dst)
+Battle2::TargetsInfo Battle2::Arena::GetTargetsForSpells(const HeroBase* hero, const Spell & spell, const u16 dst)
 {
     TargetsInfo targets;
     targets.reserve(8);
@@ -697,7 +709,7 @@ Battle2::TargetsInfo Battle2::Arena::GetTargetsForSpells(const HeroBase* hero, c
     Stats* target = GetTroopBoard(dst);
 
     // from spells
-    switch(spell)
+    switch(spell())
     {
 	case Spell::CHAINLIGHTNING:
 	case Spell::COLDRING:
@@ -728,7 +740,7 @@ Battle2::TargetsInfo Battle2::Arena::GetTargetsForSpells(const HeroBase* hero, c
     }
     else
     // check other spells
-    switch(spell)
+    switch(spell())
     {
 	case Spell::CHAINLIGHTNING:
         {
@@ -772,7 +784,7 @@ Battle2::TargetsInfo Battle2::Arena::GetTargetsForSpells(const HeroBase* hero, c
 	case Spell::FIREBLAST:
 	{
 	    std::vector<u16> positions;
-	    u8 radius = (Spell::FIREBLAST == spell ? 2 : 1);
+	    u8 radius = (spell == Spell::FIREBLAST ? 2 : 1);
 	    board.GetAbroadPositions(dst, radius, false, positions);
 	    std::vector<u16>::const_iterator it1 = positions.begin();
 	    std::vector<u16>::const_iterator it2 = positions.end();
@@ -896,7 +908,29 @@ void Battle2::Arena::ApplyActionCatapult(Action & action)
 	DEBUG(DBG_BATTLE, DBG_WARN, "incorrect param");
 }
 
-void Battle2::Arena::SpellActionSummonElemental(const HeroBase* hero, u8 type)
+void Battle2::Arena::ApplyActionAutoBattle(Action & action)
+{
+    u8 color;
+    action.Pop(color);
+
+    if(current_color == color)
+    {
+	if(auto_battle & color)
+	{
+	    if(interface) interface->SetStatus(_("Set auto battle off"), true);
+	    auto_battle &= ~color;
+	}
+	else
+	{
+	    if(interface) interface->SetStatus(_("Set auto battle on"), true);
+	    auto_battle |= color;
+	}
+    }
+    else
+	DEBUG(DBG_BATTLE, DBG_WARN, "incorrect param");
+}
+
+void Battle2::Arena::SpellActionSummonElemental(const HeroBase* hero, const Spell & spell)
 {
     const u16 pos = GetFreePositionNearHero(hero->GetColor());
     Army::army_t* army = GetArmy(hero->GetColor());
@@ -908,7 +942,7 @@ void Battle2::Arena::SpellActionSummonElemental(const HeroBase* hero, u8 type)
 	Stats* elem = friends.FindMode(CAP_SUMMONELEM);
         bool affect = true;
 
-        if(elem) switch(type)
+        if(elem) switch(spell())
         {
             case Spell::SUMMONEELEMENT: if(elem->GetID() != Monster::EARTH_ELEMENT) affect = false; break;
             case Spell::SUMMONAELEMENT: if(elem->GetID() != Monster::AIR_ELEMENT) affect = false; break;
@@ -924,7 +958,7 @@ void Battle2::Arena::SpellActionSummonElemental(const HeroBase* hero, u8 type)
 	}
 
 	Monster::monster_t mons = Monster::UNKNOWN;
-        switch(type)
+        switch(spell())
         {
             case Spell::SUMMONEELEMENT: mons = Monster::EARTH_ELEMENT; break;
             case Spell::SUMMONAELEMENT: mons = Monster::AIR_ELEMENT; break;
@@ -934,7 +968,7 @@ void Battle2::Arena::SpellActionSummonElemental(const HeroBase* hero, u8 type)
         }
 
 	DEBUG(DBG_BATTLE, DBG_TRACE, Monster::GetName(mons) << ", position: " << pos);
-	u16 count = Spell::GetExtraValue(Spell::FromInt(type)) * hero->GetPower();
+	u16 count = spell.ExtraValue() * hero->GetPower();
 	if(hero->HasArtifact(Artifact::BOOK_ELEMENTS)) count *= 2;
 
         elem = friends.CreateNewStats(mons, count);
@@ -955,7 +989,7 @@ void Battle2::Arena::SpellActionSummonElemental(const HeroBase* hero, u8 type)
     }
 }
 
-void Battle2::Arena::SpellActionDefaults(Action & a, u8 spell)
+void Battle2::Arena::SpellActionDefaults(Action & a, const Spell & spell)
 {
 #ifdef WITH_NET
     if((Settings::Get().GameType() & Game::LOCAL) || Network::isRemoteClient())
@@ -1020,7 +1054,7 @@ void Battle2::Arena::SpellActionTeleport(Action & a)
 
     Stats* b = GetTroopBoard(src);
     Cell* cell = GetCell(dst);
-    const char* name = Spell::GetName(Spell::TELEPORT);
+    const Spell spell(Spell::TELEPORT);
 
     if(b)
     {
@@ -1031,11 +1065,11 @@ void Battle2::Arena::SpellActionTeleport(Action & a)
 	b->position = dst;
 	b->UpdateDirection();
 
-	DEBUG(DBG_BATTLE, DBG_TRACE, "spell: " << name << ", src: " << src << ", dst: " << dst);
+	DEBUG(DBG_BATTLE, DBG_TRACE, "spell: " << spell.GetName() << ", src: " << src << ", dst: " << dst);
     }
     else
     {
-	DEBUG(DBG_BATTLE, DBG_WARN, "spell: " << name << " false");
+	DEBUG(DBG_BATTLE, DBG_WARN, "spell: " << spell.GetName() << " false");
     }
 
 #ifdef WITH_NET
@@ -1079,7 +1113,7 @@ void Battle2::Arena::SpellActionEarthQuake(Action & a)
 	if(towers[0] && towers[0]->isValid() && Rand::Get(1)) towers[0]->SetDestroy();
 	if(towers[2] && towers[2]->isValid() && Rand::Get(1)) towers[2]->SetDestroy();
 
-	DEBUG(DBG_BATTLE, DBG_TRACE, "spell: " << Spell::GetName(Spell::EARTHQUAKE) << ", targets: " << targets.size());
+	DEBUG(DBG_BATTLE, DBG_TRACE, "spell: " << Spell(Spell::EARTHQUAKE).GetName() << ", targets: " << targets.size());
 
 #ifdef WITH_NET
 	if(Game::REMOTE == army1.GetControl()) FH2Server::Get().BattleSendEarthQuakeSpell(army1.GetColor(), targets);

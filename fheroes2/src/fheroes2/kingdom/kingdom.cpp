@@ -31,6 +31,7 @@
 #include "profit.h"
 #include "world.h"
 #include "visit.h"
+#include "race.h"
 #include "battle2.h"
 #include "kingdom.h"
 #include "ai.h"
@@ -240,13 +241,10 @@ void Kingdom::ActionNewDay(void)
     }
 
     // check event day
-    std::vector<GameEvent::Day *> events;
-    events.reserve(5);
-    world.GetEventDay(color, events);
-    std::vector<GameEvent::Day *>::const_iterator it1 = events.begin();
-    std::vector<GameEvent::Day *>::const_iterator it2 = events.end();
-
-    for(; it1 != it2; ++it1) if(*it1) AddFundsResource((*it1)->GetResource());
+    EventsDate events = world.GetEventsDate(color);
+    for(EventsDate::const_iterator
+	it = events.begin(); it != events.end(); ++it)
+	AddFundsResource((*it).resource);
 
     // remove day visit object
     visit_object.remove_if(Visit::isDayLife);
@@ -369,7 +367,7 @@ u8 Kingdom::GetCountBuilding(u32 build) const
     return std::count_if(castles.begin(), castles.end(), std::bind2nd(std::mem_fun(&Castle::isBuild), build));
 }
 
-Race::race_t Kingdom::GetRace(void) const
+u8 Kingdom::GetRace(void) const
 {
     return Settings::Get().KingdomRace(color);
 }

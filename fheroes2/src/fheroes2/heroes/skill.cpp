@@ -847,7 +847,7 @@ void SecondarySkillBar::QueueEventProcessing(void)
     }
 }
 
-void Skill::Primary::LoadDefaults(u8 race, Primary & skill, u8 & book, u8 & spell)
+void Skill::Primary::LoadDefaults(u8 race, Primary & skill, u8 & book, Spell & spell)
 {
     const skillstats_t* ptr = GetSkillStats(race);
 

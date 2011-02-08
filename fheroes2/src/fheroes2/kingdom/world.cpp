@@ -34,6 +34,7 @@
 #include "gameevent.h"
 #include "mp2.h"
 #include "text.h"
+#include "race.h"
 #include "pairs.h"
 #include "algorithm.h"
 #include "game_over.h"
@@ -648,7 +649,7 @@ void World::LoadMaps(const std::string &filename)
 		    }
 		    else
 		    {
-			Race::race_t race = Race::KNGT;
+			u8 race = Race::KNGT;
 			switch(pblock[0x3c])
 			{
 			    case 1: race = Race::BARB; break;
@@ -701,7 +702,7 @@ void World::LoadMaps(const std::string &filename)
 			Kingdom & kingdom = GetKingdom(color);
 
 			// caclulate race
-			Race::race_t race = Race::BOMG;
+			u8 race = Race::BOMG;
 			switch(index_name % 7)
 			{
 			    case 0: race = Race::KNGT; break;
@@ -746,12 +747,12 @@ void World::LoadMaps(const std::string &filename)
 		case MP2::OBJ_EVENT:
 		    // add event maps
 		    if(SIZEOFMP2EVENT - 1 < sizeblock && 0x01 == pblock[0])
-				    vec_eventsmap.push_back(new GameEvent::Coord(*it_index, pblock));
+				    vec_eventsmap.push_back(EventMaps(*it_index, pblock));
 		    break;
 		case MP2::OBJ_SPHINX:
 		    // add riddle sphinx
 		    if(SIZEOFMP2RIDDLE - 1 < sizeblock && 0x00 == pblock[0])
-				    vec_riddles.push_back(new GameEvent::Riddle(*it_index, pblock));
+				    vec_riddles.push_back(Riddle(*it_index, pblock));
 		    break;
 		default:
 		    break;
@@ -763,7 +764,7 @@ void World::LoadMaps(const std::string &filename)
 	{
 	    // add event day
 	    if(SIZEOFMP2EVENT - 1 < sizeblock && 1 == pblock[42])
-		vec_eventsday.push_back(new GameEvent::Day(pblock));
+		vec_eventsday.push_back(EventDate(pblock));
 
 	    // add rumors
 	    else if(SIZEOFMP2RUMOR - 1 < sizeblock)
@@ -840,10 +841,11 @@ void World::LoadMaps(const std::string &filename)
 		// remove ultimate artifact sprite
 		if(NULL != (addon = tile.FindObject(MP2::OBJ_RNDULTIMATEARTIFACT)))
 		{
-		    tile.SetQuantity1(Artifact::FromIndexSprite(addon->index));
+		    Artifact artifact = Artifact::FromMP2IndexSprite(addon->index);
+		    tile.SetQuantity1(artifact());
 		    tile.Remove(addon->uniq);
 		    tile.SetObject(MP2::OBJ_ZERO);
-		    ultimate_artifact = ii;
+		    ultimate_index = ii;
 		}
 		break;
 
@@ -981,7 +983,7 @@ void World::LoadMaps(const std::string &filename)
     }
 
     // generate position for ultimate
-    if(-1 == ultimate_artifact)
+    if(-1 == ultimate_index)
     {
 	std::vector<s32> pools;
 	pools.reserve(vec_tiles.size());
@@ -997,13 +999,13 @@ void World::LoadMaps(const std::string &filename)
 	if(pools.size())
 	{
 	    const s32 pos = *Rand::Get(pools);
-	    ultimate_artifact = pos;
+	    ultimate_index = pos;
 	    vec_tiles[pos]->SetQuantity1(Artifact::Rand(Artifact::ART_ULTIMATE));
 	}
     }
 
-    if(Maps::isValidAbsIndex(ultimate_artifact))
-	Interface::GameArea::GenerateUltimateArtifactAreaSurface(ultimate_artifact, puzzle_surface);
+    if(Maps::isValidAbsIndex(ultimate_index))
+	Interface::GameArea::GenerateUltimateArtifactAreaSurface(ultimate_index, puzzle_surface);
 
     DEBUG(DBG_GAME, DBG_INFO, "end load");
 }
@@ -1197,30 +1199,12 @@ void World::Reset(void)
     vec_kingdoms.clear();
 
     // event day
-    if(vec_eventsday.size())
-    {
-	std::vector<GameEvent::Day *>::const_iterator it = vec_eventsday.begin();
-	
-	for(; it != vec_eventsday.end(); ++it) delete *it;
-    }
     vec_eventsday.clear();
 
     // event maps
-    if(vec_eventsmap.size())
-    {
-	std::vector<GameEvent::Coord *>::const_iterator it = vec_eventsmap.begin();
-	
-	for(; it != vec_eventsmap.end(); ++it) delete *it;
-    }
     vec_eventsmap.clear();
 
     // riddle
-    if(vec_riddles.size())
-    {
-	std::vector<GameEvent::Riddle *>::const_iterator it = vec_riddles.begin();
-	
-	for(; it != vec_riddles.end(); ++it) delete *it;
-    }
     vec_riddles.clear();
 
     // rumors
@@ -1248,7 +1232,7 @@ void World::Reset(void)
     map_sign.clear();
     map_captureobj.clear();
 
-    ultimate_artifact = -1;
+    ultimate_index = -1;
     Surface::FreeSurface(puzzle_surface);
 
     day = 0;
@@ -1270,7 +1254,7 @@ void World::Reset(void)
     vec_heroes.reserve(HEROESMAXCOUNT + 2);
 }
 
-Heroes* World::GetFreemanHeroes(Race::race_t rc) const
+Heroes* World::GetFreemanHeroes(u8 rc) const
 {
     u8 min = 0;
     u8 max = 0;
@@ -1657,9 +1641,10 @@ void World::UpdateMonsterPopulation(void)
     }
 }
 
-Artifact::artifact_t World::GetUltimateArtifact(void) const
+Artifact World::GetUltimateArtifact(void) const
 {
-    return Maps::isValidAbsIndex(ultimate_artifact) ? Artifact::FromInt(vec_tiles[ultimate_artifact]->GetQuantity1()) : Artifact::UNKNOWN;
+    return Maps::isValidAbsIndex(ultimate_index) ?
+	Artifact(vec_tiles[ultimate_index]->GetQuantity1()) : Artifact(Artifact::UNKNOWN);
 }
 
 bool World::DiggingForUltimateArtifact(const Point & center)
@@ -1681,7 +1666,7 @@ bool World::DiggingForUltimateArtifact(const Point & center)
     }
     tile.AddonsPushLevel1(Maps::TilesAddon(0, GetUniq(), obj, idx));
 
-    return ultimate_artifact == tile.GetIndex();
+    return ultimate_index == tile.GetIndex();
 }
 
 void World::ActionForMagellanMaps(u8 color)
@@ -1707,36 +1692,25 @@ s32 World::GetNearestObject(s32 center, MP2::object_t obj, bool check_hero) cons
     return -1;
 }
 
-void  World::GetEventDay(const Color::color_t c, std::vector<GameEvent::Day *> & v) const
+EventsDate World::GetEventsDate(const Color::color_t c) const
 {
-    if(vec_eventsday.size())
-    {
-	std::vector<GameEvent::Day *>::const_iterator it1 = vec_eventsday.begin();
-	std::vector<GameEvent::Day *>::const_iterator it2 = vec_eventsday.end();
+    EventsDate res;
+    res.reserve(vec_eventsday.size());
 
-	for(; it1 != it2; ++it1) if(*it1)
-	{
-	    const GameEvent::Day & event = **it1;
-	    const u16 today = day;
-	    const u16 first = event.GetFirst();
-	    const u16 sequent = event.GetSubsequent();
+    for(EventsDate::const_iterator
+	it = vec_eventsday.begin(); it != vec_eventsday.end(); ++it)
+	if((*it).isAllow(c, day)) res.push_back(*it);
 
-	    if((first == today ||
-	       (sequent && (first < today && 0 == ((today - first) % sequent)))) &&
-	       (c & event.GetColors())) v.push_back(*it1);
-	}
-    }
+    return res;
 }
 
-const GameEvent::Coord* World::GetEventMaps(const Color::color_t c, const s32 index) const
+const EventMaps* World::GetEventMaps(const Color::color_t c, const s32 index) const
 {
     if(vec_eventsmap.size())
     {
-	std::vector<GameEvent::Coord *>::const_iterator it1 = vec_eventsmap.begin();
-	std::vector<GameEvent::Coord *>::const_iterator it2 = vec_eventsmap.end();
-
-	for(; it1 != it2; ++it1)
-	    if(*it1 && (*it1)->GetIndex() == index && (c & (*it1)->GetColors())) return *it1;
+	for(EventsMaps::const_iterator
+	    it = vec_eventsmap.begin(); it != vec_eventsmap.end(); ++it)
+	    if(*it == index && (c & (*it).colors)) return &(*it);
     }
 
     return NULL;
@@ -1814,14 +1788,11 @@ void World::ActionToEyeMagi(const Color::color_t color) const
     }
 }
 
-GameEvent::Riddle* World::GetSphinx(const s32 index) const
+Riddle* World::GetSphinx(const s32 index)
 {
-    std::vector<GameEvent::Riddle *>::const_iterator it1 = vec_riddles.begin();
-    std::vector<GameEvent::Riddle *>::const_iterator it2 = vec_riddles.end();
-
-    for(; it1 != it2; ++it1) if(*it1 && (*it1)->GetIndex() == index) return  *it1;
-
-    return NULL;
+    Riddles::iterator
+	it = std::find(vec_riddles.begin(), vec_riddles.end(), index);
+    return it != vec_riddles.end() ? &(*it) : NULL;
 }
 
 bool World::GetObjectPositions(s32 center, MP2::object_t obj, std::vector<IndexDistance> & v, bool check_hero) const
@@ -1935,19 +1906,18 @@ u16 World::CheckKingdomWins(const Kingdom & kingdom) const
     else
     if(conf.ConditionWins() & GameOver::WINS_ARTIFACT)
     {
+	const std::vector<Heroes *> & heroes  = kingdom.GetHeroes();
 	if(conf.WinsFindUltimateArtifact())
 	{
-	    std::vector<Heroes *>::const_iterator beg = kingdom.GetHeroes().begin();
-	    std::vector<Heroes *>::const_iterator end = kingdom.GetHeroes().end();
-	    if(end != std::find_if(beg, end, std::mem_fun(&Heroes::HasUltimateArtifact)))
+	    if(heroes.end() != std::find_if(heroes.begin(), heroes.end(),
+		std::mem_fun(&Heroes::HasUltimateArtifact)))
 		return GameOver::WINS_ARTIFACT;
 	}
 	else
 	{
-	    const Artifact::artifact_t art = conf.WinsFindArtifact();
-	    std::vector<Heroes *>::const_iterator beg = kingdom.GetHeroes().begin();
-	    std::vector<Heroes *>::const_iterator end = kingdom.GetHeroes().end();
-	    if(end != std::find_if(beg, end, std::bind2nd(std::mem_fun(&Heroes::HasArtifact), art)))
+	    const Artifact art = conf.WinsFindArtifactID();
+	    if(heroes.end() != std::find_if(heroes.begin(), heroes.end(),
+		std::bind2nd(std::mem_fun(&Heroes::HasArtifact), art)))
 		return GameOver::WINS_ARTIFACT;
 	}
     }
@@ -1958,8 +1928,9 @@ u16 World::CheckKingdomWins(const Kingdom & kingdom) const
 	u8 side2 = conf.KingdomColors() & ~side1;
 	u8 loss  = 0;
 
-        for(Color::color_t cl = Color::BLUE; cl < Color::GRAY; ++cl)
-    	    if(world.GetKingdom(cl).isLoss()) loss |= cl;
+	for(std::vector<Kingdom *>::const_iterator
+	    it = vec_kingdoms.begin(); it != vec_kingdoms.end(); ++it)
+    	    if(*it && (*it)->isLoss()) loss |= (*it)->GetColor();
 
 	if(side2 == (loss & side2))
 	    return GameOver::WINS_SIDE;

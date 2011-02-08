@@ -27,6 +27,7 @@
 #include "castle.h"
 #include "monster.h"
 #include "heroes.h"
+#include "race.h"
 #include "battle2.h"
 #include "game_focus.h"
 #include "game_interface.h"
@@ -161,13 +162,13 @@ u16 DialogGoldWithExp(const std::string & hdr, const std::string & msg, const u1
     return Dialog::SpriteInfo(hdr, msg, image, buttons);
 }
 
-u16 DialogArtifactWithExp(const std::string & hdr, const std::string & msg, const Artifact::artifact_t art, const u16 exp, const u16 buttons = Dialog::OK)
+u16 DialogArtifactWithExp(const std::string & hdr, const std::string & msg, const Artifact & art, const u16 exp, const u16 buttons = Dialog::OK)
 {
     std::string str;
     String::AddInt(str, exp);
     const Sprite & sprite = AGG::GetICN(ICN::EXPMRL, 4);
     const Sprite & border = AGG::GetICN(ICN::RESOURCE, 7);
-    const Sprite & artifact = AGG::GetICN(ICN::ARTIFACT, Artifact::IndexSprite64(art));
+    const Sprite & artifact = AGG::GetICN(ICN::ARTIFACT, art.IndexSprite64());
     Surface image(sprite.w() + border.w() + 50, border.h());
     image.SetColorKey();
     image.Blit(border);
@@ -191,13 +192,13 @@ u16 DialogWithExp(const std::string & hdr, const std::string & msg, const u16 ex
     return Dialog::SpriteInfo(hdr, msg, image, buttons);
 }
 
-u16 DialogWithArtifactAndGold(const std::string & hdr, const std::string & msg, const Artifact::artifact_t art, const u16 count, const u16 buttons = Dialog::OK)
+u16 DialogWithArtifactAndGold(const std::string & hdr, const std::string & msg, const Artifact & art, const u16 count, const u16 buttons = Dialog::OK)
 {
     std::string str;
     String::AddInt(str, count);
     const Sprite & gold = AGG::GetICN(ICN::RESOURCE, 6);
     const Sprite & border = AGG::GetICN(ICN::RESOURCE, 7);
-    const Sprite & artifact = AGG::GetICN(ICN::ARTIFACT, Artifact::IndexSprite64(art));
+    const Sprite & artifact = AGG::GetICN(ICN::ARTIFACT, art.IndexSprite64());
     Surface image(gold.w() + border.w() + 50, border.h());
     image.SetColorKey();
     image.Blit(border);
@@ -995,13 +996,13 @@ void ActionToSkeleton(Heroes &hero, const u8 obj, const s32 dst_index)
     // artifact
     if(tile.GetQuantity1() && 0 == tile.GetQuantity2())
     {
-	const Artifact art(Artifact::FromInt(tile.GetQuantity1()));
-	if(hero.PickupArtifact(art()))
+	const Artifact art(tile.GetQuantity1());
+	if(hero.PickupArtifact(art))
 	{
 	    PlayPickupSound();
 	    std::string message(_("You come upon the remains of an unfortunate adventurer.\nSearching through the tattered clothing, you find %{artifact}."));
 	    String::Replace(message, "%{artifact}", art.GetName());
-	    Dialog::ArtifactInfo("", message, art());
+	    Dialog::ArtifactInfo("", message, art);
 	    tile.SetQuantity1(0);
 	    tile.SetQuantity2(0);
 	}
@@ -1024,13 +1025,13 @@ void ActionToWagon(Heroes &hero, const u8 obj, const s32 dst_index)
     // artifact
     if(tile.GetQuantity1() && 0 == tile.GetQuantity2())
     {
-	const Artifact art(Artifact::FromInt(tile.GetQuantity1()));
-	if(hero.PickupArtifact(art()))
+	const Artifact art(tile.GetQuantity1());
+	if(hero.PickupArtifact(art))
 	{
 	    PlayPickupSound();
 	    std::string message(_("You come across an old wagon left by a trader who didn't quite make it to safe terrain.\nSearching inside, you find the %{artifact}."));
 	    String::Replace(message, "%{artifact}", art.GetName());
-	    Dialog::ArtifactInfo("", message, art());
+	    Dialog::ArtifactInfo("", message, art);
 	    tile.SetQuantity1(0);
 	}
     }
@@ -1113,8 +1114,8 @@ void ActionToFlotSam(Heroes &hero, const u8 obj, const s32 dst_index)
 
 void ActionToShrine(Heroes &hero, const u8 obj, const s32 dst_index)
 {
-    const Spell spell(Spell::FromInt(world.GetTiles(dst_index).GetQuantity1()));
-    const u8 spell_level = spell.GetLevel();
+    const Spell spell(world.GetTiles(dst_index).GetQuantity1());
+    const u8 spell_level = spell.Level();
 
     std::string head;
     std::string body;
@@ -1285,9 +1286,9 @@ void ActionToPoorLuckObject(Heroes &hero, const u8 obj, const s32 dst_index)
 			    PlaySoundSuccess;
         		    hero.IncreaseExperience(res.GetExperienceAttacker());
 			    complete = true;
-			    const Spell::spell_t spell(Spell::FromInt(tile.GetQuantity1()));
+			    const Spell spell(tile.GetQuantity1());
 			    // check magick book
-			    if(!hero.HasArtifact(Artifact::MAGIC_BOOK))
+			    if(!hero.HaveSpellBook())
 				Dialog::Message(MP2::StringObject(obj), _("Unfortunately, you have no Magic Book to record the spell with."), Font::BIG, Dialog::OK);
 			    else
 			    // check skill level for wisdom
@@ -1295,7 +1296,7 @@ void ActionToPoorLuckObject(Heroes &hero, const u8 obj, const s32 dst_index)
 			    	Dialog::Message(MP2::StringObject(obj), _("Unfortunately, you do not have the wisdom to understand the spell, and you are unable to learn it."), Font::BIG, Dialog::OK);
 			    else
 			    {
-				Dialog::SpellInfo(Spell::GetName(spell), _("Upon defeating the monsters, you decipher an ancient glyph on the wall, telling the secret of the spell."), spell, true);
+				Dialog::SpellInfo(spell.GetName(), _("Upon defeating the monsters, you decipher an ancient glyph on the wall, telling the secret of the spell."), spell, true);
 				hero.AppendSpellToBook(spell);
 			    }
     			}
@@ -1454,7 +1455,7 @@ void ActionToPoorMoraleObject(Heroes &hero, const u8 obj, const s32 dst_index)
     			{
 			    hero.IncreaseExperience(res.GetExperienceAttacker());
 			    complete = true;
-			    const Artifact::artifact_t art = Artifact::FromInt(tile.GetQuantity1());
+			    const Artifact art(tile.GetQuantity1());
 			    Resource::funds_t resource;
 			    resource.gold = tile.GetQuantity2() * 100;
 			    PlaySoundSuccess;
@@ -1481,13 +1482,13 @@ void ActionToPoorMoraleObject(Heroes &hero, const u8 obj, const s32 dst_index)
 		    Army::army_t army;
 		    army.FromGuardian(tile);
 		    Resource::funds_t resource;
-		    Artifact::artifact_t art = Artifact::UNKNOWN;
+		    Artifact art = Artifact::UNKNOWN;
                     switch(tile.GetQuantity2())
                     {
                 	case 10: resource.gold = 1000; break;
                 	case 15: resource.gold = 2000; break;
                 	case 25: resource.gold = 5000; break;
-                	case 50: resource.gold = 2000; art = Artifact::FromInt(tile.GetQuantity1()); break;
+                	case 50: resource.gold = 2000; art = tile.GetQuantity1(); break;
                 	default: DEBUG(DBG_GAME, DBG_WARN, "unknown variant, " << "index: " << dst_index); break;
                     }
 
@@ -1498,13 +1499,13 @@ void ActionToPoorMoraleObject(Heroes &hero, const u8 obj, const s32 dst_index)
 			    hero.IncreaseExperience(res.GetExperienceAttacker());
 			    complete = true;
 			    PlaySoundSuccess;
-			    if(art == Artifact::UNKNOWN)
-				DialogWithGold(MP2::StringObject(obj), _("Upon defeating the Ghosts you sift through the debris and find something!"), resource.gold);
-			    else
+			    if(art.isValid())
 			    {
 				DialogWithArtifactAndGold(MP2::StringObject(obj), _("Upon defeating the Ghosts you sift through the debris and find something!"), art, resource.gold);
 				hero.PickupArtifact(art);
 			    }
+			    else
+				DialogWithGold(MP2::StringObject(obj), _("Upon defeating the Ghosts you sift through the debris and find something!"), resource.gold);
 			    world.GetKingdom(hero.GetColor()).AddFundsResource(resource);
 			}
 			else
@@ -1665,14 +1666,14 @@ void ActionToExperienceObject(Heroes &hero, const u8 obj, const s32 dst_index)
 void ActionToShipwreckSurvivor(Heroes &hero, const u8 obj, const s32 dst_index)
 {
     Maps::Tiles & tile = world.GetTiles(dst_index);
-    const Artifact art(Artifact::FromInt(tile.GetQuantity1()));
+    const Artifact art(tile.GetQuantity1());
 
     PlaySoundSuccess;
-    if(hero.PickupArtifact(art()))
+    if(hero.PickupArtifact(art))
     {
 	std::string str = _("You've pulled a shipwreck survivor from certain death in an unforgiving ocean. Grateful, he rewards you for your act of kindness by giving you the %{art}.");
 	String::Replace(str, "%{art}", art.GetName());
-	Dialog::ArtifactInfo(MP2::StringObject(obj), str, art());
+	Dialog::ArtifactInfo(MP2::StringObject(obj), str, art);
     }
     else
     {
@@ -1695,17 +1696,17 @@ void ActionToShipwreckSurvivor(Heroes &hero, const u8 obj, const s32 dst_index)
 void ActionToArtifact(Heroes &hero, const u8 obj, const s32 dst_index)
 {
     Maps::Tiles & tile = world.GetTiles(dst_index);
-    Artifact art(Artifact::FromInt(tile.GetQuantity1()));
+    Artifact art(tile.GetQuantity1());
 
     // update scroll artifact
-    if(art.GetID() == Artifact::SPELL_SCROLL)
+    if(art() == Artifact::SPELL_SCROLL)
     {
-	art.SetExt(tile.GetQuantity3());
+	art.SetSpell(tile.GetQuantity3());
     }
 
     if(hero.IsFullBagArtifacts())
     {
-	Dialog::Message(Artifact::GetName(art()), _("You have no room to carry another artifact!"), Font::BIG, Dialog::OK);
+	Dialog::Message(art.GetName(), _("You have no room to carry another artifact!"), Font::BIG, Dialog::OK);
 	return;
     }
 
@@ -1749,7 +1750,7 @@ void ActionToArtifact(Heroes &hero, const u8 obj, const s32 dst_index)
 	    String::Replace(header, "%{art}", art.GetName());
 
 	    PlaySoundWarning;
-	    if(Dialog::YES == Dialog::ArtifactInfo(header, _("Do you wish to buy this artifact?"), art(), Dialog::YES | Dialog::NO))
+	    if(Dialog::YES == Dialog::ArtifactInfo(header, _("Do you wish to buy this artifact?"), art, Dialog::YES | Dialog::NO))
 	    {
 		if(world.GetKingdom(hero.GetColor()).AllowPayment(payment))
 		{
@@ -1776,7 +1777,7 @@ void ActionToArtifact(Heroes &hero, const u8 obj, const s32 dst_index)
 		PlaySoundSuccess;
 		std::string msg(_("You've found the artifact: "));
 		msg.append(art.GetName());
-		Dialog::ArtifactInfo(MP2::StringObject(obj), msg, art(), Dialog::OK);
+		Dialog::ArtifactInfo(MP2::StringObject(obj), msg, art, Dialog::OK);
 		conditions = true;
 	    }
 	    else
@@ -1855,8 +1856,8 @@ void ActionToArtifact(Heroes &hero, const u8 obj, const s32 dst_index)
 	    PlaySoundSuccess;
 	    std::string msg;
 
-	    if(Artifact::GetScenario(art()))
-		msg = Artifact::GetScenario(art());
+	    if(Artifact::GetScenario(art))
+		msg = Artifact::GetScenario(art);
 	    else
 	    {
 		msg = (_("You've found the artifact: "));
@@ -1864,7 +1865,7 @@ void ActionToArtifact(Heroes &hero, const u8 obj, const s32 dst_index)
 		msg.append(art.GetName());
 	    }
 
-	    Dialog::ArtifactInfo(MP2::StringObject(obj), msg, art());
+	    Dialog::ArtifactInfo(MP2::StringObject(obj), msg, art);
 	    conditions = true;
 	    break;
     }
@@ -1899,14 +1900,14 @@ void ActionToTreasureChest(Heroes &hero, const u8 obj, const s32 dst_index)
 	// artifact
 	if(tile.GetQuantity1())
 	{
-	    const Artifact art(Artifact::FromInt(tile.GetQuantity1()));
+	    const Artifact art(tile.GetQuantity1());
 
-	    if(hero.PickupArtifact(art()))
+	    if(hero.PickupArtifact(art))
 	    {
 		message = _("After spending hours trying to fish the chest out of the sea, you open it and find %{gold} gold and the %{art}.");
 		String::Replace(message, "%{gold}", resource.gold);
 		String::Replace(message, "%{art}", art.GetName());
-		DialogWithArtifactAndGold(_("Sea Chest"), message, art(), resource.gold);
+		DialogWithArtifactAndGold(_("Sea Chest"), message, art, resource.gold);
 	    }
 	    else
 	    {
@@ -1938,13 +1939,13 @@ void ActionToTreasureChest(Heroes &hero, const u8 obj, const s32 dst_index)
 
 	if(tile.GetQuantity1())
 	{
-	    const Artifact art(Artifact::FromInt(tile.GetQuantity1()));
+	    const Artifact art(tile.GetQuantity1());
 	
-	    if(hero.PickupArtifact(art()))
+	    if(hero.PickupArtifact(art))
 	    {
 		message = _("After scouring the area, you fall upon a hidden chest, containing the ancient artifact %{art}.");
 		String::Replace(message, "%{art}", art.GetName());
-		Dialog::ArtifactInfo(_("Treasure Chest"), message, art());
+		Dialog::ArtifactInfo(_("Treasure Chest"), message, art);
 	    }
 	    else
 	    {
@@ -2706,29 +2707,33 @@ void ActionToMagellanMaps(Heroes &hero, const u8 obj, const s32 dst_index)
 void ActionToEvent(Heroes &hero, const u8 obj, const s32 dst_index)
 {
     // check event maps
-    const GameEvent::Coord* event_maps = world.GetEventMaps(hero.GetColor(), dst_index);
-    if(event_maps)
+    const EventMaps* event_ptr = world.GetEventMaps(hero.GetColor(), dst_index);
+
+    if(event_ptr)
     {
+	const EventMaps & event_maps = *event_ptr;
+
 	hero.SetMove(false);
 
-        if(event_maps->GetResource().GetValidItems())
-        {
-    	    world.GetKingdom(hero.GetColor()).AddFundsResource(event_maps->GetResource());
+	if(event_maps.resource.GetValidItems())
+	{
+    	    world.GetKingdom(hero.GetColor()).AddFundsResource(event_maps.resource);
 	    PlaySoundSuccess;
-    	    Dialog::ResourceInfo("", event_maps->GetMessage(), event_maps->GetResource());
+    	    Dialog::ResourceInfo("", event_maps.message, event_maps.resource);
 	}
 	else
-        if(event_maps->GetMessage().size())
-            Dialog::Message("", event_maps->GetMessage(), Font::BIG, Dialog::OK);
+	if(event_maps.message.size())
+	    Dialog::Message("", event_maps.message, Font::BIG, Dialog::OK);
 
-	if(Artifact::UNKNOWN != event_maps->GetArtifact())
+	const Artifact & art = event_maps.artifact;
+	if(art.isValid())
 	{
-	    if(hero.PickupArtifact(event_maps->GetArtifact()))
+	    if(hero.PickupArtifact(art))
 	    {
 		PlayPickupSound();
 		std::string message(_("You find %{artifact}."));
-		String::Replace(message, "%{artifact}", Artifact::GetName(event_maps->GetArtifact()));
-		Dialog::ArtifactInfo("", message, event_maps->GetArtifact());
+		String::Replace(message, "%{artifact}", art.GetName());
+		Dialog::ArtifactInfo("", message, art);
 	    }
 	}
     }
@@ -2868,10 +2873,10 @@ void ActionToDaemonCave(Heroes &hero, const u8 obj, const s32 dst_index)
 		    case 2:
 		    {
 		    	exp = 1000;
-			const Artifact::artifact_t art = Artifact::FromInt(tile.GetQuantity1());
+			const Artifact art = tile.GetQuantity1();
 			std::string str = _("The Demon screams its challenge and attacks! After a short, desperate battle, you slay the monster and find the %{art} in the back of the cave.");
-			String::Replace(str, "%{art}", Artifact::GetName(art));
-			if(Artifact::UNKNOWN != art) DialogArtifactWithExp("", str, art, exp);
+			String::Replace(str, "%{art}", art.GetName());
+			if(art.isValid()) DialogArtifactWithExp("", str, art, exp);
     			hero.PickupArtifact(art);
     			hero.IncreaseExperience(exp);
 			tile.SetQuantity1(Artifact::UNKNOWN);
@@ -3070,40 +3075,40 @@ void ActionToEyeMagi(Heroes &hero, const u8 obj, const s32 dst_index)
 
 void ActionToSphinx(Heroes &hero, const u8 obj, const s32 dst_index)
 {
-    GameEvent::Riddle* riddle = world.GetSphinx(dst_index);
+    Riddle* riddle = world.GetSphinx(dst_index);
 
-    if(riddle && riddle->isValid())
+    if(riddle && riddle->valid)
     {
 	if(Dialog::YES == Dialog::Message("", _("\"I have a riddle for you,\" the Sphinx says. \"Answer correctly, and you shall be rewarded. Answer incorrectly, and you shall be eaten. Do you accept the challenge?\""), Font::BIG, Dialog::YES|Dialog::NO))
 	{
 	    std::string header(_("The Sphinx asks you the following riddle: %{riddle}. Your answer?"));
-	    String::Replace(header, "%{riddle}", riddle->GetMessage());
+	    String::Replace(header, "%{riddle}", riddle->message);
 	    std::string answer;
 	    Dialog::InputString(header, answer);
 	    if(riddle->AnswerCorrect(answer))
 	    {
-		const Resource::funds_t & res = riddle->GetResource();
-		const Artifact::artifact_t art = riddle->GetArtifact();
+		const Resource::funds_t & res = riddle->resource;
+		const Artifact art = riddle->artifact;
 		const std::string say = _("Looking somewhat disappointed, the Sphinx sighs. You've answered my riddle so here's your reward. Now begone.");
 		const u8 count = res.GetValidItems();
 
 		if(count)
 		{
-		    if(1 == count && res.gold && Artifact::UNKNOWN != art)
+		    if(1 == count && res.gold && art.isValid())
 			DialogWithArtifactAndGold("", say, art, res.gold);
 		    else
 		    {
 			Dialog::ResourceInfo("", say, res);
-			if(Artifact::UNKNOWN != art) Dialog::ArtifactInfo("", say, art);
+			if(art.isValid()) Dialog::ArtifactInfo("", say, art);
 		    }
 		}
 		else
-		if(Artifact::UNKNOWN != art) Dialog::ArtifactInfo("", say, art);
+		if(art.isValid()) Dialog::ArtifactInfo("", say, art);
 
 		riddle->SetQuiet();
 		hero.SetVisited(dst_index, Visit::GLOBAL);
 
-		if(Artifact::UNKNOWN != art)
+		if(art.isValid())
     		    hero.PickupArtifact(art);
 
 		if(count)

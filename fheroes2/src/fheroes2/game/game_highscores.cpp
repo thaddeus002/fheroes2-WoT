@@ -201,7 +201,10 @@ void HGSData::RedrawList(s16 ox, s16 oy)
     display.Blit(back, ox, oy);
 
     const Sprite &head = AGG::GetICN(ICN::HISCORE, 6);
-    display.Blit(head, ox + 50, oy + 31);
+    if(conf.QVGA())
+	display.Blit(head, ox + 25, oy + 15);
+    else
+	display.Blit(head, ox + 50, oy + 31);
 
     std::sort(list.begin(), list.end(), RatingSort);
 
@@ -302,7 +305,7 @@ Game::menu_t Game::HighScores(void)
     while(le.HandleEvents())
     {
 	// key code info
-        if(IS_DEBUG(DBG_ENGINE, DBG_INFO) && le.KeyPress())
+        if(Settings::Get().Debug() == 0x12 && le.KeyPress())
         {
             std::string str;
             String::AddInt(str, le.KeyValue());

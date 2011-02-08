@@ -91,7 +91,7 @@ namespace Army
 	    const Troop &	At(u8) const;
 	    const Troop &	GetSlowestTroop(void) const;
 
-	    Race::race_t   GetRace(void) const;
+	    u8   GetRace(void) const;
 	    Color::color_t GetColor(void) const;
 	    u8             GetControl(void) const;
 

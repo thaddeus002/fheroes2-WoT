@@ -176,24 +176,26 @@ Game::menu_t Game::StartGame(void)
     bool skip_turns = conf.LoadedGameVersion();
     GameOver::Result & gameResult = GameOver::Result::Get();
     Game::menu_t m = ENDTURN;
+    Color::Colors colors = Color::GetColors();
 
     while(m == ENDTURN)
     {
 	if(!skip_turns) world.NewDay();
 
-	for(Color::color_t color = Color::BLUE; color != Color::GRAY; ++color)
+	for(Color::Colors::const_iterator
+	    color = colors.begin(); color != colors.end(); ++color)
 	{
-	    Kingdom & kingdom = world.GetKingdom(color);
+	    Kingdom & kingdom = world.GetKingdom(*color);
 
 	    if(!kingdom.isPlay() ||
-	    (skip_turns && color != conf.MyColor())) continue;
+	    (skip_turns && *color != conf.MyColor())) continue;
 
 	    if(IS_DEBUG(DBG_GAME, DBG_INFO)) kingdom.Dump();
 
 	    radar.SetHide(true);
 	    I.SetRedraw(REDRAW_RADAR);
-	    conf.SetCurrentColor(color);
-	    world.ClearFog(color);
+	    conf.SetCurrentColor(*color);
+	    world.ClearFog(*color);
 	    kingdom.ActionBeforeTurn();
 
 	    switch(kingdom.Control())
@@ -209,12 +211,12 @@ Game::menu_t Game::StartGame(void)
 			I.Redraw();
 			display.Flip();
 			std::string str = _("%{color} player's turn");
-			String::Replace(str, "%{color}", Color::String(color));
-			DialogPlayers(color, str);
+			String::Replace(str, "%{color}", Color::String(*color));
+			DialogPlayers(*color, str);
 		    }
 		    I.SetRedraw(REDRAW_ICONS);
 		    I.iconsPanel.ShowIcons();
-		    conf.SetMyColor(color);
+		    conf.SetMyColor(*color);
 		    m = HumanTurn(skip_turns);
 		    if(skip_turns) skip_turns = false;
 		break;
@@ -653,7 +655,7 @@ void Game::ShowPathOrStartMoveHero(Heroes *hero, const s32 dst_index)
         
         hero->SetMove(false);
 	path.Calculate(dst_index);
-        if(IS_DEBUG(DBG_GAME, DBG_TRACE)) path.Dump();
+        if(IS_DEBUG(DBG_GAME, DBG_TRACE)) path.DumpPath();
 	I.SetRedraw(REDRAW_GAMEAREA);
 	cursor.SetThemes(Game::GetCursor(dst_index));
     }
@@ -1573,20 +1575,17 @@ void Game::NewWeekDialog(void)
 void Game::ShowEventDay(void)
 {
     Kingdom & myKingdom = world.GetMyKingdom();
-    std::vector<GameEvent::Day *> events;
-    events.reserve(5);
-    world.GetEventDay(myKingdom.GetColor(), events);
-    std::vector<GameEvent::Day *>::const_iterator it1 = events.begin();
-    std::vector<GameEvent::Day *>::const_iterator it2 = events.end();
+    EventsDate events = world.GetEventsDate(myKingdom.GetColor());
 
-    for(; it1 != it2; ++it1) if(*it1)
+    for(EventsDate::const_iterator
+	it = events.begin(); it != events.end(); ++it)
     {
     	AGG::PlayMusic(MUS::NEWS, false);
-	if((*it1)->GetResource().GetValidItems())
-	    Dialog::ResourceInfo("", (*it1)->GetMessage(), (*it1)->GetResource());
+	if((*it).resource.GetValidItems())
+	    Dialog::ResourceInfo("", (*it).message, (*it).resource);
 	else
-	if((*it1)->GetMessage().size())
-	    Dialog::Message("", (*it1)->GetMessage(), Font::BIG, Dialog::OK);
+	if((*it).message.size())
+	    Dialog::Message("", (*it).message, Font::BIG, Dialog::OK);
     }
 }
 

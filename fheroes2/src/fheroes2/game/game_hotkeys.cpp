@@ -64,6 +64,7 @@ const char* Game::EventsName(events_t evnt)
 	case EVENT_BUTTON_NETWORK:	return "button network";
 	case EVENT_BUTTON_HOST:		return "button host";
 	case EVENT_BUTTON_GUEST:	return "button guest";
+	case EVENT_BUTTON_BATTLEONLY:	return "button battleonly";
 
 	case EVENT_DEFAULT_READY:	return "default ready";
 	case EVENT_DEFAULT_EXIT:	return "default exit";
@@ -141,6 +142,7 @@ void Game::HotKeysDefaults(void)
     key_events[EVENT_BUTTON_NETWORK] = KEY_n;
     key_events[EVENT_BUTTON_HOST] = KEY_h;
     key_events[EVENT_BUTTON_GUEST] = KEY_g;
+    key_events[EVENT_BUTTON_BATTLEONLY] = KEY_b;
 
     // default
     key_events[EVENT_DEFAULT_READY] = KEY_RETURN;

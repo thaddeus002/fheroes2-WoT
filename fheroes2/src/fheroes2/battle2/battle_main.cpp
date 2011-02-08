@@ -41,7 +41,7 @@ void PlayPickupSound(void);
 namespace Battle2
 {
     void PickupArtifactsAction(HeroBase &, HeroBase &, bool);
-    void EagleEyeSkillAction(HeroBase &, const std::vector<u8> &, bool);
+    void EagleEyeSkillAction(HeroBase &, const SpellStorage &, bool);
     void NecromancySkillAction(Army::army_t &, u32, bool);
 }
 
@@ -191,16 +191,16 @@ void Battle2::PickupArtifactsAction(HeroBase & hero1, HeroBase & hero2, bool loc
 	    art = Artifact::UNKNOWN;
 	}
 	else
-	if(art != Artifact::UNKNOWN && art != Artifact::MAGIC_BOOK)
+	if(art() != Artifact::UNKNOWN && art() != Artifact::MAGIC_BOOK)
         {
-            BagArtifacts::iterator it = std::find(bag1.begin(), bag1.end(), Artifact::UNKNOWN);
+            BagArtifacts::iterator it = std::find(bag1.begin(), bag1.end(), Artifact((Artifact::UNKNOWN)));
             if(bag1.end() != it)
             {
         	*it = art;
         	if(local)
 		{
 		    PlayPickupSound();
-		    Dialog::ArtifactInfo(_("You have captured an enemy artifact!"), art.GetName(), art());
+		    Dialog::ArtifactInfo(_("You have captured an enemy artifact!"), art.GetName(), art);
 		}
     	    }
     	    art = Artifact::UNKNOWN;
@@ -208,35 +208,37 @@ void Battle2::PickupArtifactsAction(HeroBase & hero1, HeroBase & hero2, bool loc
     }
 }
 
-void Battle2::EagleEyeSkillAction(HeroBase & hero, const std::vector<u8> & spells, bool local)
+void Battle2::EagleEyeSkillAction(HeroBase & hero, const SpellStorage & spells, bool local)
 {
     if(spells.empty() ||
 	!hero.HaveSpellBook()) return;
 
-    std::vector<Spell::spell_t> new_spells;
+    SpellStorage new_spells;
     new_spells.reserve(10);
 
     const u8 level = hero.GetLevelSkill(Skill::Secondary::EAGLEEYE);
     const u8 value = Skill::Secondary::GetValues(Skill::Secondary::EAGLEEYE, level);
 
     // filter spells
-    for(std::vector<u8>::const_iterator it = spells.begin(); it != spells.end(); ++it)
+    for(SpellStorage::const_iterator
+	it = spells.begin(); it != spells.end(); ++it)
     {
-    	if(!hero.HaveSpell(Spell::FromInt(*it)))
+	const Spell & sp = *it;
+    	if(!hero.HaveSpell(sp))
 	{
 	    switch(level)
 	    {
 		case Skill::Level::BASIC:
 		    // 20%
-		    if(3 > Spell::Level(*it) && value >= Rand::Get(1, 100)) new_spells.push_back(Spell::FromInt(*it));
+		    if(3 > sp.Level() && value >= Rand::Get(1, 100)) new_spells.push_back(sp);
 		    break;
 		case Skill::Level::ADVANCED:
 		    // 30%
-		    if(4 > Spell::Level(*it) && value >= Rand::Get(1, 100)) new_spells.push_back(Spell::FromInt(*it));
+		    if(4 > sp.Level() && value >= Rand::Get(1, 100)) new_spells.push_back(sp);
 		    break;
 		case Skill::Level::EXPERT:
 		    // 40%
-		    if(5 > Spell::Level(*it) && value >= Rand::Get(1, 100)) new_spells.push_back(Spell::FromInt(*it));
+		    if(5 > sp.Level() && value >= Rand::Get(1, 100)) new_spells.push_back(sp);
 		    break;
 		default: break;
     	    }
@@ -244,18 +246,21 @@ void Battle2::EagleEyeSkillAction(HeroBase & hero, const std::vector<u8> & spell
     }
 
     // add new spell
-    for(std::vector<Spell::spell_t>::const_iterator it = new_spells.begin(); it != new_spells.end(); ++it)
+    for(SpellStorage::const_iterator
+	it = new_spells.begin(); it != new_spells.end(); ++it)
     {
+	const Spell & sp = *it;
 	if(local)
 	{
 	    std::string msg = _("Through eagle-eyed observation, %{name} is able to learn the magic spell %{spell}.");
 	    String::Replace(msg, "%{name}", hero.GetName());
-	    String::Replace(msg, "%{spell}", Spell::GetName(*it));
+	    String::Replace(msg, "%{spell}", sp.GetName());
 	    PlayPickupSound();
-	    Dialog::SpellInfo("", msg, *it);
+	    Dialog::SpellInfo("", msg, sp);
 	}
-	hero.AppendSpellToBook(*it, true);
     }
+
+    hero.AppendSpellsToBook(new_spells, true);
 }
 
 void Battle2::NecromancySkillAction(Army::army_t & army1, u32 killed, bool local)

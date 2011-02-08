@@ -24,7 +24,6 @@
 
 #include <vector>
 #include <map>
-#include "race.h"
 #include "color.h"
 #include "payment.h"
 #include "puzzle.h"
@@ -62,7 +61,7 @@ public:
     bool AllowRecruitHero(bool check_payment, u8 level) const;
 
     Color::color_t GetColor(void) const{ return color; }
-    Race::race_t GetRace(void) const;
+    u8 GetRace(void) const;
 
     const Resource::funds_t & GetFundsResource(void) const{ return resource; }
     u16 GetFundsWood(void) const{ return resource.wood; }

@@ -29,6 +29,7 @@
 #include "engine.h"
 #include "midi_xmi.h"
 #include "midi_mid.h"
+#include "artifact.h"
 #include "dir.h"
 #include "agg.h"
 
@@ -529,7 +530,7 @@ void AGG::Cache::LoadOrgICN(Sprite & sp, const ICN::icn_t icn, const u16 index, 
 	// hard fix artifact "ultimate stuff" sprite for loyalty version
 	if(Settings::Get().PriceLoyaltyVersion() &&
 	    ICN::ARTIFACT == icn &&
-	    Artifact::IndexSprite64(Artifact::ULTIMATE_STAFF) == index)
+	    Artifact(Artifact::ULTIMATE_STAFF).IndexSprite64() == index)
 	{
 	    body.clear();
 	    heroes2_agg.Read(ICN::GetString(icn), body);
@@ -861,7 +862,7 @@ void AGG::Cache::LoadFNT(u16 ch)
 /* free ICN object in AGG::Cache */
 void AGG::Cache::FreeICN(const ICN::icn_t icn)
 {
-    DEBUG(DBG_ENGINE, DBG_INFO, ICN::GetString(icn));
+    DEBUG(DBG_ENGINE, DBG_TRACE, ICN::GetString(icn));
     if(icn_cache[icn].sprites){ delete [] icn_cache[icn].sprites; icn_cache[icn].sprites = NULL; }
     if(icn_cache[icn].reflect){ delete [] icn_cache[icn].reflect; icn_cache[icn].reflect = NULL; }
     icn_cache[icn].count = 0;

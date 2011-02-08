@@ -30,6 +30,7 @@
 #include "battle2.h"
 #include "luck.h"
 #include "morale.h"
+#include "race.h"
 #include "world.h"
 #include "payment.h"
 #include "gameevent.h"
@@ -643,8 +644,8 @@ void AIToTreasureChest(Heroes &hero, const u8 obj, const s32 dst_index)
     {
 	if(tile.GetQuantity1())
 	{
-	    const Artifact art(Artifact::FromInt(tile.GetQuantity1()));
-	    if(!hero.PickupArtifact(art()))
+	    const Artifact art(tile.GetQuantity1());
+	    if(!hero.PickupArtifact(art))
 		    resource.gold = 1500;	// it is from FAQ
 	}
 	world.GetKingdom(hero.GetColor()).AddFundsResource(resource);
@@ -653,9 +654,9 @@ void AIToTreasureChest(Heroes &hero, const u8 obj, const s32 dst_index)
     {
 	if(tile.GetQuantity1())
 	{
-	    const Artifact art(Artifact::FromInt(tile.GetQuantity1()));
+	    const Artifact art(tile.GetQuantity1());
 	
-	    if(!hero.PickupArtifact(art()))
+	    if(!hero.PickupArtifact(art))
 	    {
 		resource.gold = 1000;	// it is from FAQ
 		world.GetKingdom(hero.GetColor()).AddFundsResource(resource);
@@ -715,9 +716,9 @@ void AIToSkeleton(Heroes &hero, const u8 obj, const s32 dst_index)
     // artifact
     if(tile.GetQuantity1() && 0 == tile.GetQuantity2())
     {
-	const Artifact art(Artifact::FromInt(tile.GetQuantity1()));
+	const Artifact art(tile.GetQuantity1());
 
-	if(hero.PickupArtifact(art()))
+	if(hero.PickupArtifact(art))
 	{
 	    tile.SetQuantity1(0);
 	    tile.SetQuantity2(0);
@@ -734,8 +735,8 @@ void AIToWagon(Heroes &hero, const u8 obj, const s32 dst_index)
     // artifact
     if(tile.GetQuantity1() && 0 == tile.GetQuantity2())
     {
-	const Artifact art(Artifact::FromInt(tile.GetQuantity1()));
-	if(hero.PickupArtifact(art()))
+	const Artifact art(tile.GetQuantity1());
+	if(hero.PickupArtifact(art))
 	    tile.SetQuantity1(0);
     }
     else
@@ -962,11 +963,11 @@ void AIToWitchsHut(Heroes &hero, const u8 obj, const s32 dst_index)
 
 void AIToShrine(Heroes &hero, const u8 obj, const s32 dst_index)
 {
-    const Spell::spell_t spell = Spell::FromInt(world.GetTiles(dst_index).GetQuantity1());
-    const u8 spell_level = Spell::Level(spell);
+    const Spell spell(world.GetTiles(dst_index).GetQuantity1());
+    const u8 spell_level = spell.Level();
 
     // check spell book
-    if(hero.HasArtifact(Artifact::MAGIC_BOOK) &&
+    if(hero.HaveSpellBook() &&
       !hero.HaveSpell(spell) &&
     // check valid level spell and wisdom skill
       !(3 == spell_level && Skill::Level::NONE == hero.GetLevelSkill(Skill::Secondary::WISDOM)))
@@ -1065,13 +1066,13 @@ void AIToXanadu(Heroes &hero, const u8 obj, const s32 dst_index)
 void AIToEvent(Heroes &hero, const u8 obj, const s32 dst_index)
 {
     // check event maps
-    const GameEvent::Coord* event_maps = world.GetEventMaps(hero.GetColor(), dst_index);
+    const EventMaps* event_maps = world.GetEventMaps(hero.GetColor(), dst_index);
     if(event_maps)
     {
-        if(event_maps->GetResource().GetValidItems())
-    	    world.GetKingdom(hero.GetColor()).AddFundsResource(event_maps->GetResource());
-	if(Artifact::UNKNOWN != event_maps->GetArtifact())
-	    hero.PickupArtifact(event_maps->GetArtifact());
+        if(event_maps->resource.GetValidItems())
+    	    world.GetKingdom(hero.GetColor()).AddFundsResource(event_maps->resource);
+	if(event_maps->artifact.isValid())
+	    hero.PickupArtifact(event_maps->artifact);
     }
 
     hero.SaveUnderObject(MP2::OBJ_ZERO);
@@ -1129,10 +1130,10 @@ void AIToPoorMoraleObject(Heroes &hero, const u8 obj, const s32 dst_index)
 		{
         	    hero.IncreaseExperience(res.GetExperienceAttacker());
 	    	    complete = true;
-	    	    const Artifact art(Artifact::FromInt(tile.GetQuantity1()));
+	    	    const Artifact art(tile.GetQuantity1());
 	    	    Resource::funds_t resource;
 	    	    resource.gold = tile.GetQuantity2() * 100;
-	    	    hero.PickupArtifact(art());
+	    	    hero.PickupArtifact(art);
 	    	    world.GetKingdom(hero.GetColor()).AddFundsResource(resource);
 		}
 		else
@@ -1148,13 +1149,13 @@ void AIToPoorMoraleObject(Heroes &hero, const u8 obj, const s32 dst_index)
 		Army::army_t army;
 		army.FromGuardian(tile);
 		Resource::funds_t resource;
-		Artifact::artifact_t art = Artifact::UNKNOWN;
+		Artifact art(Artifact::UNKNOWN);
                 switch(tile.GetQuantity2())
                 {
             	    case 10: resource.gold = 1000; break;
             	    case 15: resource.gold = 2000; break;
             	    case 25: resource.gold = 5000; break;
-            	    case 50: resource.gold = 2000; art = Artifact::FromInt(tile.GetQuantity1()); break;
+            	    case 50: resource.gold = 2000; art = tile.GetQuantity1(); break;
             	    default: DEBUG(DBG_AI, DBG_WARN, "unknown variant:" << static_cast<int>(tile.GetQuantity2()) << ", index: " << dst_index); break;
                 }
 
@@ -1239,9 +1240,9 @@ void AIToPoorLuckObject(Heroes &hero, const u8 obj, const s32 dst_index)
 		{
         	    hero.IncreaseExperience(res.GetExperienceAttacker());
 		    complete = true;
-		    const Spell::spell_t spell(static_cast<Spell::spell_t>(tile.GetQuantity1()));
+		    const Spell spell(tile.GetQuantity1());
 		    // check magick book
-		    if(hero.HasArtifact(Artifact::MAGIC_BOOK) &&
+		    if(hero.HaveSpellBook() &&
 		    // check skill level for wisdom
 			Skill::Level::EXPERT == hero.GetLevelSkill(Skill::Secondary::WISDOM))
 		    {
@@ -1328,8 +1329,8 @@ void AIToDaemonCave(Heroes &hero, const u8 obj, const s32 dst_index)
 		break;
 	    case 2:
 	    {
-		const Artifact::artifact_t art = Artifact::FromInt(tile.GetQuantity1());
-		if(Artifact::UNKNOWN != art) hero.PickupArtifact(art);
+		const Artifact art(tile.GetQuantity1());
+		if(art.isValid()) hero.PickupArtifact(art);
     		hero.IncreaseExperience(1000);
 		tile.SetQuantity1(Artifact::UNKNOWN);
 		tile.SetQuantity2(0);
@@ -1455,9 +1456,9 @@ void AIToTravellersTent(Heroes &hero, const u8 obj, const s32 dst_index)
 void AIToShipwreckSurvivor(Heroes &hero, const u8 obj, const s32 dst_index)
 {
     Maps::Tiles & tile = world.GetTiles(dst_index);
-    const Artifact art(Artifact::FromInt(tile.GetQuantity1()));
+    const Artifact art(tile.GetQuantity1());
 
-    if(!hero.PickupArtifact(art()))
+    if(!hero.PickupArtifact(art))
     {
         Resource::funds_t prize(Resource::GOLD, 1500);
 	world.GetKingdom(hero.GetColor()).OddFundsResource(prize);
@@ -1475,11 +1476,11 @@ void AIToArtifact(Heroes &hero, const u8 obj, const s32 dst_index)
     if(hero.IsFullBagArtifacts()) return;
 
     Maps::Tiles & tile = world.GetTiles(dst_index);
-    Artifact art(Artifact::FromInt(tile.GetQuantity1()));
+    Artifact art(tile.GetQuantity1());
 
     // update scroll artifact
-    if(art.GetID() == Artifact::SPELL_SCROLL)
-	art.SetExt(tile.GetQuantity3());
+    if(art() == Artifact::SPELL_SCROLL)
+	art.SetSpell(tile.GetQuantity3());
 
     bool conditions = false;
 
@@ -1772,12 +1773,15 @@ bool AIHeroesValidObject(const Heroes & hero, s32 index)
         case MP2::OBJ_SHRINE1:
 	case MP2::OBJ_SHRINE2:
 	case MP2::OBJ_SHRINE3:
+	{
+	    Spell spell(tile.GetQuantity1());
 	    if( // check spell book
-		hero.HasArtifact(Artifact::MAGIC_BOOK) &&
-		!hero.HaveSpell(Spell::FromInt(tile.GetQuantity1())) &&
+		hero.HaveSpellBook() &&
+		!hero.HaveSpell(spell) &&
                 // check valid level spell and wisdom skill
-                !(3 == Spell::Level(Spell::FromInt(tile.GetQuantity1())) &&
+                !(3 == spell.Level() &&
                 Skill::Level::NONE == hero.GetLevelSkill(Skill::Secondary::WISDOM))) return true;
+	}
 	    break;
 
     	// primary skill
@@ -2468,7 +2472,7 @@ void AIHeroesGetTask(Heroes & hero)
 	ai_objects.erase(index);
 	task.pop_front();
 
-	if(IS_DEBUG(DBG_AI, DBG_TRACE)) hero.GetPath().Dump();
+	if(IS_DEBUG(DBG_AI, DBG_TRACE)) hero.GetPath().DumpPath();
     }
     else
     if(hero.Modes(Heroes::AIWAITING))
@@ -2566,7 +2570,8 @@ void AIHeroesTurn(Heroes* hero)
 {
     if(hero)
     {
-	DEBUG(DBG_AI, DBG_TRACE, hero->GetName());
+	DEBUG(DBG_AI, DBG_TRACE, hero->GetName() <<
+	    (hero->Modes(Heroes::AIWAITING|Heroes::STUPID) || !hero->MayStillMove() ? ", skipping..." : ""));
 
 	Interface::StatusWindow *status = Interface::NoGUI() ? NULL : &Interface::StatusWindow::Get();
 
@@ -2589,6 +2594,8 @@ void AIHeroesTurn(Heroes* hero)
                 AIHeroesNoGUITurns(*hero);
             else
                 AIHeroesTurns(*hero);
+
+	    DEBUG(DBG_AI, DBG_TRACE, hero->GetName() << ", moved");
 
             // turn indicator
             if(status) status->RedrawTurnProgress(7);
@@ -2640,7 +2647,8 @@ void AIHeroesEnd(Heroes* hero)
 	while(ai_objects.end() != (it = std::find_if(ai_objects.begin(), ai_objects.end(),
 		    std::bind2nd(std::ptr_fun(&IsPriorityAndNotVisitAndNotPresent), hero))))
 	{
-	    DEBUG(DBG_AI, DBG_TRACE, hero->GetName() << ", added priority object: " << MP2::StringObject((*it).second));
+	    DEBUG(DBG_AI, DBG_TRACE, hero->GetName() << ", added priority object: " <<
+		MP2::StringObject((*it).second) << ", index: " << (*it).first);
 	    task.push_front((*it).first);
 	    ai_objects.erase((*it).first);
 	}

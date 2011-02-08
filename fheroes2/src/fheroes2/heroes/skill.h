@@ -26,11 +26,11 @@
 #include <string>
 #include <vector>
 #include <utility>
-#include "race.h"
 #include "color.h"
 #include "gamedefs.h"
 
 void StringAppendModifiers(std::string &, s8);
+class Spell;
 
 namespace Skill
 {
@@ -132,12 +132,12 @@ namespace Skill
         virtual u8 GetKnowledge(void) const = 0;
 	virtual s8 GetMorale(void) const = 0;
 	virtual s8 GetLuck(void) const = 0;
-	virtual Race::race_t GetRace(void) const = 0;
+	virtual u8 GetRace(void) const = 0;
 	virtual u8 GetType(void) const = 0;
 
         static const char* String(const skill_t skill);
 	static skill_t FromLevelUp(const u8 race, const u8 level);
-	static void LoadDefaults(u8, Primary &, u8 &, u8 &);
+	static void LoadDefaults(u8, Primary &, u8 &, Spell &);
 
 	protected:
 	u8			attack;

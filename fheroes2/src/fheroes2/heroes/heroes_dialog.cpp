@@ -29,6 +29,7 @@
 #include "payment.h"
 #include "heroes.h"
 #include "skill.h"
+#include "race.h"
 #include "kingdom.h"
 #include "text.h"
 #include "castle.h"

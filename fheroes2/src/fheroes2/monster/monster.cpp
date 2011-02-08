@@ -26,6 +26,7 @@
 #include "speed.h"
 #include "settings.h"
 #include "luck.h"
+#include "race.h"
 #include "morale.h"
 #include "payment.h"
 #include "monster.h"
@@ -267,7 +268,7 @@ s8 Monster::GetLuck(void) const
     return Luck::NORMAL;
 }
 
-Race::race_t Monster::GetRace(void) const
+u8 Monster::GetRace(void) const
 {
     if(UNKNOWN == id)	return Race::BOMG;
     else

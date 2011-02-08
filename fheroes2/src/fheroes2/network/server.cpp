@@ -31,6 +31,7 @@
 #include "world.h"
 #include "kingdom.h"
 #include "battle2.h"
+#include "spell.h"
 #include "battle_stats.h"
 #include "heroes_recruits.h"
 #include "server.h"
@@ -293,6 +294,7 @@ bool FH2Server::BattleRecvTurn(u8 color, const Battle2::Stats & b, const Battle2
 
 		switch(Network::GetMsg(msg.GetID()))
 		{
+		    case MSG_BATTLE_AUTO:
 		    case MSG_BATTLE_CAST:
 		    case MSG_BATTLE_SKIP:
 		    case MSG_BATTLE_END_TURN:
@@ -675,9 +677,10 @@ void FH2Server::MsgLoadMaps(QueueMessage & msg, FH2RemoteClient & client)
 	}
 
 	// set control
-	for(Color::color_t color = Color::BLUE; color != Color::GRAY; ++color)
-	    if(color & conf.PlayersColors())
-    		world.GetKingdom(color).SetControl(Game::REMOTE);
+	Color::Colors colors = Color::GetColors(conf.PlayersColors());
+	for(Color::Colors::iterator
+	    it = colors.begin(); it != colors.end(); ++it)
+    	    world.GetKingdom(*it).SetControl(Game::REMOTE);
 
 	mutexConf.Unlock();
     }
@@ -747,25 +750,25 @@ bool FH2Server::BattleSendBoard(u8 color, const Battle2::Arena & a)
 	QueueMessage msg(MSG_BATTLE_BOARD);
 	a.PackBoard(msg);
 
-	DEBUG(DBG_NETWORK, DBG_INFO, msg.DtSz() << " bytes");
+	DEBUG(DBG_NETWORK, DBG_INFO, std::dec << msg.DtSz() << " bytes");
 	return client->Send(msg);
     }
     return false;
 }
 
-bool FH2Server::BattleSendSpell(u8 color, u16 who, u16 dst, u8 spell, const Battle2::TargetsInfo & targets)
+bool FH2Server::BattleSendSpell(u8 color, u16 who, u16 dst, const Spell & spell, const Battle2::TargetsInfo & targets)
 {
     FH2RemoteClient* client = clients.GetClient(color);
     if(client)
     {
 	QueueMessage msg(MSG_BATTLE_CAST);
-	msg.Push(spell);
+	msg.Push(spell());
 	msg.Push(who);
 	msg.Push(dst);
 	msg.Push(color);
 	targets.Pack(msg);
 
-	DEBUG(DBG_NETWORK, DBG_INFO, Spell::GetName(Spell::FromInt(spell)));
+	DEBUG(DBG_NETWORK, DBG_INFO, spell.GetName());
 	return client->Send(msg);
     }
     return false;
@@ -773,20 +776,10 @@ bool FH2Server::BattleSendSpell(u8 color, u16 who, u16 dst, u8 spell, const Batt
 
 bool FH2Server::BattleSendTeleportSpell(u8 color, u16 src, u16 dst)
 {
-    FH2RemoteClient* client = clients.GetClient(color);
-    if(client)
-    {
-	QueueMessage msg(MSG_BATTLE_CAST);
-	msg.Push(static_cast<u8>(Spell::TELEPORT));
-	msg.Push(src);
-	msg.Push(dst);
-	//msg.Push(color); // unused
-	//msg.Push(static_cast<u32>(0)); // empty TargetsInfo // unused
+    Spell spell(Spell::TELEPORT);
+    Battle2::TargetsInfo targets;
 
-	DEBUG(DBG_NETWORK, DBG_INFO, Spell::GetName(Spell::TELEPORT));
-	return client->Send(msg);
-    }
-    return false;
+    return BattleSendSpell(color, src, dst, spell, targets);
 }
 
 bool FH2Server::BattleSendEarthQuakeSpell(u8 color, const std::vector<u8> & targets)
@@ -794,15 +787,16 @@ bool FH2Server::BattleSendEarthQuakeSpell(u8 color, const std::vector<u8> & targ
     FH2RemoteClient* client = clients.GetClient(color);
     if(client)
     {
+	Spell spell(Spell::EARTHQUAKE);
 	QueueMessage msg(MSG_BATTLE_CAST);
-	msg.Push(static_cast<u8>(Spell::EARTHQUAKE));
+	msg.Push(spell());
 	msg.Push(static_cast<u32>(targets.size()));
 
 	for(std::vector<u8>::const_iterator
 	    it = targets.begin(); it != targets.end(); ++it)
 	    msg.Push(*it);
 
-	DEBUG(DBG_NETWORK, DBG_INFO, Spell::GetName(Spell::EARTHQUAKE));
+	DEBUG(DBG_NETWORK, DBG_INFO, spell.GetName());
 	return client->Send(msg);
     }
     return false;

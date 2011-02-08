@@ -27,6 +27,7 @@
 #include "gamedefs.h"
 #include "button.h"
 #include "cursor.h"
+#include "race.h"
 #include "settings.h"
 #include "maps_fileinfo.h"
 #include "dialog_selectscenario.h"
@@ -278,7 +279,7 @@ Game::menu_t Game::ScenarioInfo(void)
 		if(conf.AllowChangeRace(color))
 		{
 		    cursor.Hide();
-		    Race::race_t race = conf.KingdomRace(color);
+		    u8 race = conf.KingdomRace(color);
 		    switch(race)
 		    {
 			case Race::KNGT: race = Race::BARB; break;
@@ -361,8 +362,12 @@ void UpdateCoordOpponentsInfo(const Point & dst, std::vector<Rect> & rects)
     const Sprite &sprite = AGG::GetICN(ICN::NGEXTRA, 3);
     u8 current = 0;
 
-    for(Color::color_t color = Color::BLUE; color != Color::GRAY; ++color)
-	rects[Color::GetIndex(color)] = conf.KingdomColors(color) ? Rect(dst.x + GetStepFor(current++, sprite.w(), count), dst.y, sprite.w(), sprite.h()) : Rect();
+    std::fill(rects.begin(), rects.end(), Rect());
+
+    Color::Colors colors = Color::GetColors(conf.KingdomColors());
+    for(Color::Colors::iterator
+	it = colors.begin(); it != colors.end(); ++it)
+	rects[Color::GetIndex(*it)] = Rect(dst.x + GetStepFor(current++, sprite.w(), count), dst.y, sprite.w(), sprite.h());
 }
 
 void Game::Scenario::RedrawStaticInfo(const Point & pt)
@@ -402,16 +407,17 @@ void Game::Scenario::RedrawOpponentsInfo(const Point & dst, const std::vector<Pl
 
     u8 current = 0;
 
-    for(Color::color_t color = Color::BLUE; color != Color::GRAY; ++color)
-    {
-	if(conf.KingdomColors(color))
-	{
-	    u8 index = 0;
+    Color::Colors colors = Color::GetColors(conf.KingdomColors());
 
-	    if(!(conf.AllowColors(color)))
-	    {
+    for(Color::Colors::iterator
+	color = colors.begin(); color != colors.end(); ++color)
+    {
+	u8 index = 0;
+
+	if(! conf.AllowColors(*color))
+	{
 		// comp only
-		switch(color)
+		switch(*color)
 		{
 		    case Color::BLUE:	index = players ? 39 : 15; break;
 		    case Color::GREEN:	index = players ? 40 : 16; break;
@@ -421,12 +427,12 @@ void Game::Scenario::RedrawOpponentsInfo(const Point & dst, const std::vector<Pl
 		    case Color::PURPLE:	index = players ? 44 : 20; break;
 		    default: break;
 		}
-	    }
-	    else
-	    if(conf.PlayersColors() & color)
-	    {
+	}
+	else
+	if(conf.PlayersColors() & *color)
+	{
 		// cur player
-		switch(color)
+		switch(*color)
 		{
 		    case Color::BLUE:	index = players ? 33 :  9; break;
 		    case Color::GREEN:	index = players ? 34 : 10; break;
@@ -436,11 +442,11 @@ void Game::Scenario::RedrawOpponentsInfo(const Point & dst, const std::vector<Pl
 		    case Color::PURPLE:	index = players ? 38 : 14; break;
 		    default: break;
 		}
-	    }
-	    else
-	    {
+	}
+	else
+	{
 		// comp/human
-		switch(color)
+		switch(*color)
 		{
 		    case Color::BLUE:	index = players ? 27 : 3; break;
 		    case Color::GREEN:	index = players ? 28 : 4; break;
@@ -450,26 +456,27 @@ void Game::Scenario::RedrawOpponentsInfo(const Point & dst, const std::vector<Pl
 		    case Color::PURPLE:	index = players ? 32 : 8; break;
 		    default: break;
 		}
-	    }
+	}
 
-	    if(index)
-	    {
+	if(index)
+	{
 		const Sprite & sprite = AGG::GetICN(ICN::NGEXTRA, index);
 		Display::Get().Blit(sprite, dst.x + GetStepFor(current, sprite.w(), count), dst.y);
 		
 		// draw name
 		if(players)
 		{
-		    std::vector<Player>::const_iterator itp = std::find_if(players->begin(), players->end(), std::bind2nd(std::mem_fun_ref(&Player::isColor), color));
+		    std::vector<Player>::const_iterator itp = std::find_if(players->begin(), players->end(),
+							std::bind2nd(std::mem_fun_ref(&Player::isColor), *color));
 		    if(players->end() != itp)
 		    {
 			Text name((*itp).player_name, Font::SMALL);
-			name.Blit(dst.x + GetStepFor(current, sprite.w(), count) + (sprite.w() - name.w()) / 2, dst.y + sprite.h() - 14);
+			name.Blit(dst.x + GetStepFor(current, sprite.w(), count) + (sprite.w() - name.w()) / 2,
+											dst.y + sprite.h() - 14);
 		    }
 		}
 
 		++current;
-	    }
 	}
     }
 }
@@ -481,19 +488,21 @@ void Game::Scenario::RedrawClassInfo(const Point & dst, bool label)
     const u8 count = conf.KingdomColorsCount();
     u8 current = 0;
 
-    for(Color::color_t color = Color::BLUE; color != Color::GRAY; ++color)
-	if(conf.KingdomColors(color))
+    Color::Colors colors = Color::GetColors(conf.KingdomColors());
+
+    for(Color::Colors::iterator
+	color = colors.begin(); color != colors.end(); ++color)
     {
 	    u8 index = 0;
-	    const Race::race_t race = conf.KingdomRace(color);
+	    const u8 race = conf.KingdomRace(*color);
 	    switch(race)
 	    {
-		case Race::KNGT: index = conf.AllowChangeRace(color) ? 51 : 70; break;
-	        case Race::BARB: index = conf.AllowChangeRace(color) ? 52 : 71; break;
-	        case Race::SORC: index = conf.AllowChangeRace(color) ? 53 : 72; break;
-		case Race::WRLK: index = conf.AllowChangeRace(color) ? 54 : 73; break;
-	        case Race::WZRD: index = conf.AllowChangeRace(color) ? 55 : 74; break;
-		case Race::NECR: index = conf.AllowChangeRace(color) ? 56 : 75; break;
+		case Race::KNGT: index = conf.AllowChangeRace(*color) ? 51 : 70; break;
+	        case Race::BARB: index = conf.AllowChangeRace(*color) ? 52 : 71; break;
+	        case Race::SORC: index = conf.AllowChangeRace(*color) ? 53 : 72; break;
+		case Race::WRLK: index = conf.AllowChangeRace(*color) ? 54 : 73; break;
+	        case Race::WZRD: index = conf.AllowChangeRace(*color) ? 55 : 74; break;
+		case Race::NECR: index = conf.AllowChangeRace(*color) ? 56 : 75; break;
 	        case Race::MULT: index = 76; break;
 		case Race::RAND: index = 58; break;
 		default: continue;

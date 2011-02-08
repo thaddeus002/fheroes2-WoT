@@ -28,26 +28,16 @@
 
 class HeroBase;
 
-class SpellBook : public SpellStorage
+struct SpellBook : public SpellStorage
 {
-public:
-	enum filter_t
-	{
-	    ADVN = 0x01,
-	    CMBT = 0x02,
-	    ALL  = ADVN | CMBT
-	};
+    enum filter_t
+    {
+	ADVN = 0x01,
+	CMBT = 0x02,
+	ALL  = ADVN | CMBT
+    };
 
-	SpellBook(void);
-
-	Spell::spell_t Open(const HeroBase &, filter_t filt, bool canselect) const;
-	void Activate(void);
-	bool isActive(void) const { return active; }
-
-private:
-	friend class Game::IO;
-
-	bool active;
+    Spell Open(const HeroBase &, filter_t, bool canselect) const;
 };
 
 #endif

@@ -40,7 +40,7 @@ std::string Game::IO::last_name;
 
 bool Game::Save(const std::string &fn)
 {
-    DEBUG(DBG_GAME , DBG_INFO, "Game::Save: " << fn);
+    DEBUG(DBG_GAME, DBG_INFO, fn);
     const bool autosave = std::string::npos != fn.find("autosave.sav");
 
     if(Settings::Get().ExtRewriteConfirm() && FilePresent(fn) &&
@@ -96,7 +96,7 @@ bool Game::IO::LoadSAV(const std::string & fn)
 
 bool Game::Load(const std::string & fn)
 {
-    DEBUG(DBG_GAME , DBG_INFO, "Game::Load: " << fn);
+    DEBUG(DBG_GAME, DBG_INFO, fn);
 
     // loading info
     Game::ShowLoadMapsText();
@@ -241,7 +241,7 @@ bool Game::IO::SaveBIN(QueueMessage & msg)
     msg.Push(static_cast<u16>(0xFF05));
     msg.Push(world.width);
     msg.Push(world.height);
-    msg.Push(world.ultimate_artifact);
+    msg.Push(world.ultimate_index);
     msg.Push(world.uniq0);
     msg.Push(static_cast<u8>(world.week_name));
     msg.Push(static_cast<u8>(world.heroes_cond_wins));
@@ -255,7 +255,7 @@ bool Game::IO::SaveBIN(QueueMessage & msg)
     msg.Push(static_cast<u32>(world.vec_tiles.size()));
     for(u32 ii = 0; ii < world.vec_tiles.size(); ++ii)
     {
-	if(NULL == world.vec_tiles[ii]){ DEBUG(DBG_GAME , DBG_WARN, "Game::IO::SaveBIN: tiles is NULL"); return false; }
+	if(NULL == world.vec_tiles[ii]){ DEBUG(DBG_GAME, DBG_WARN, "tiles: " << "is NULL"); return false; }
 	PackTile(msg, *world.vec_tiles[ii]);
     }
 
@@ -264,7 +264,7 @@ bool Game::IO::SaveBIN(QueueMessage & msg)
     msg.Push(static_cast<u32>(world.vec_heroes.size()));
     for(u32 ii = 0; ii < world.vec_heroes.size(); ++ii)
     {
-	if(NULL == world.vec_heroes[ii]){ DEBUG(DBG_GAME , DBG_WARN, "Game::IO::SaveBIN: heroes is NULL"); return false; }
+	if(NULL == world.vec_heroes[ii]){ DEBUG(DBG_GAME, DBG_WARN, "heroes: " << "is NULL"); return false; }
 	PackHeroes(msg, *world.vec_heroes[ii]);
     }
 
@@ -273,7 +273,7 @@ bool Game::IO::SaveBIN(QueueMessage & msg)
     msg.Push(static_cast<u32>(world.vec_castles.size()));
     for(u32 ii = 0; ii < world.vec_castles.size(); ++ii)
     {
-	if(NULL == world.vec_castles[ii]){ DEBUG(DBG_GAME , DBG_WARN, "Game::IO::SaveBIN: castles is NULL"); return false; }
+	if(NULL == world.vec_castles[ii]){ DEBUG(DBG_GAME, DBG_WARN, "castles: " << "is NULL"); return false; }
 	PackCastle(msg, *world.vec_castles[ii]);
     }
 
@@ -282,7 +282,7 @@ bool Game::IO::SaveBIN(QueueMessage & msg)
     msg.Push(static_cast<u32>(world.vec_kingdoms.size()));
     for(u32 ii = 0; ii < world.vec_kingdoms.size(); ++ii)
     {
-	if(NULL == world.vec_kingdoms[ii]){ DEBUG(DBG_GAME , DBG_WARN, "Game::IO::SaveBIN: kingdoms is NULL"); return false; }
+	if(NULL == world.vec_kingdoms[ii]){ DEBUG(DBG_GAME, DBG_WARN, "kingdoms: " << "is NULL"); return false; }
 	PackKingdom(msg, *world.vec_kingdoms[ii]);
     }
 
@@ -290,12 +290,11 @@ bool Game::IO::SaveBIN(QueueMessage & msg)
     msg.Push(static_cast<u16>(0xFF0A));
     msg.Push(static_cast<u32>(world.map_sign.size()));
     {
-        std::map<s32, std::string>::const_iterator it1 = world.map_sign.begin();
-	std::map<s32, std::string>::const_iterator it2 = world.map_sign.end();
-	for(; it1 != it2; ++it1)
+        for(std::map<s32, std::string>::const_iterator
+	    it = world.map_sign.begin(); it != world.map_sign.end(); ++it)
 	{
-	    msg.Push((*it1).first);
-	    msg.Push((*it1).second);
+	    msg.Push((*it).first);
+	    msg.Push((*it).second);
 	}
     }
 
@@ -303,13 +302,12 @@ bool Game::IO::SaveBIN(QueueMessage & msg)
     msg.Push(static_cast<u16>(0xFF0B));
     msg.Push(static_cast<u32>(world.map_captureobj.size()));
     {
-	std::map<s32, ObjectColor>::const_iterator it1 = world.map_captureobj.begin();
-	std::map<s32, ObjectColor>::const_iterator it2 = world.map_captureobj.end();
-	for(; it1 != it2; ++it1)
+	for(std::map<s32, ObjectColor>::const_iterator
+	    it = world.map_captureobj.begin(); it != world.map_captureobj.end(); ++it)
 	{
-	    msg.Push((*it1).first);
-	    msg.Push(static_cast<u8>((*it1).second.first));
-	    msg.Push(static_cast<u8>((*it1).second.second));
+	    msg.Push((*it).first);
+	    msg.Push(static_cast<u8>((*it).second.first));
+	    msg.Push(static_cast<u8>((*it).second.second));
 	}
     }
 
@@ -317,33 +315,30 @@ bool Game::IO::SaveBIN(QueueMessage & msg)
     msg.Push(static_cast<u16>(0xFF0C));
     msg.Push(static_cast<u32>(world.vec_rumors.size()));
     {
-	std::vector<std::string>::const_iterator it1 = world.vec_rumors.begin();
-	std::vector<std::string>::const_iterator it2 = world.vec_rumors.end();
-	for(; it1 != it2; ++it1) msg.Push(*it1);
+	for(std::vector<std::string>::const_iterator
+	    it = world.vec_rumors.begin(); it != world.vec_rumors.end(); ++it)
+	    msg.Push(*it);
     }
 
     // day events
     msg.Push(static_cast<u16>(0xFF0D));
     msg.Push(static_cast<u32>(world.vec_eventsday.size()));
     {
-	std::vector<GameEvent::Day *>::const_iterator it1 = world.vec_eventsday.begin();
-	std::vector<GameEvent::Day *>::const_iterator it2 = world.vec_eventsday.end();
-	for(; it1 != it2; ++it1)
+	for(EventsDate::const_iterator
+	    it = world.vec_eventsday.begin(); it != world.vec_eventsday.end(); ++it)
 	{
-	    if(NULL == *it1){ DEBUG(DBG_GAME , DBG_WARN, "Game::IO::SaveBIN: eventday is NULL"); return false; }
-
-	    msg.Push((*it1)->resource.wood);
-	    msg.Push((*it1)->resource.mercury);
-	    msg.Push((*it1)->resource.ore);
-	    msg.Push((*it1)->resource.sulfur);
-	    msg.Push((*it1)->resource.crystal);
-	    msg.Push((*it1)->resource.gems);
-	    msg.Push((*it1)->resource.gold);
-	    msg.Push(static_cast<u8>((*it1)->computer));
-	    msg.Push((*it1)->first);
-	    msg.Push((*it1)->subsequent);
-	    msg.Push((*it1)->colors);
-	    msg.Push((*it1)->message);
+	    msg.Push((*it).resource.wood);
+	    msg.Push((*it).resource.mercury);
+	    msg.Push((*it).resource.ore);
+	    msg.Push((*it).resource.sulfur);
+	    msg.Push((*it).resource.crystal);
+	    msg.Push((*it).resource.gems);
+	    msg.Push((*it).resource.gold);
+	    msg.Push((*it).computer);
+	    msg.Push((*it).first);
+	    msg.Push((*it).subsequent);
+	    msg.Push((*it).colors);
+	    msg.Push((*it).message);
 	}
     }
 
@@ -351,25 +346,22 @@ bool Game::IO::SaveBIN(QueueMessage & msg)
     msg.Push(static_cast<u16>(0xFF0E));
     msg.Push(static_cast<u32>(world.vec_eventsmap.size()));
     {
-	std::vector<GameEvent::Coord *>::const_iterator it1 = world.vec_eventsmap.begin();
-	std::vector<GameEvent::Coord *>::const_iterator it2 = world.vec_eventsmap.end();
-	for(; it1 != it2; ++it1)
+	for(EventsMaps::const_iterator
+	    it = world.vec_eventsmap.begin(); it != world.vec_eventsmap.end(); ++it)
 	{
-	    if(NULL == *it1){ DEBUG(DBG_GAME , DBG_WARN, "Game::IO::SaveBIN: eventmaps is NULL"); return false; }
-
-	    msg.Push((*it1)->index_map);
-	    msg.Push((*it1)->resource.wood);
-	    msg.Push((*it1)->resource.mercury);
-	    msg.Push((*it1)->resource.ore);
-	    msg.Push((*it1)->resource.sulfur);
-	    msg.Push((*it1)->resource.crystal);
-	    msg.Push((*it1)->resource.gems);
-	    msg.Push((*it1)->resource.gold);
-	    msg.Push(static_cast<u8>((*it1)->artifact));
-	    msg.Push(static_cast<u8>((*it1)->computer));
-	    msg.Push(static_cast<u8>((*it1)->cancel));
-	    msg.Push((*it1)->colors);
-	    msg.Push((*it1)->message);
+	    msg.Push((*it).GetIndex());
+	    msg.Push((*it).resource.wood);
+	    msg.Push((*it).resource.mercury);
+	    msg.Push((*it).resource.ore);
+	    msg.Push((*it).resource.sulfur);
+	    msg.Push((*it).resource.crystal);
+	    msg.Push((*it).resource.gems);
+	    msg.Push((*it).resource.gold);
+	    msg.Push((*it).artifact());
+	    msg.Push((*it).computer);
+	    msg.Push((*it).cancel);
+	    msg.Push((*it).colors);
+	    msg.Push((*it).message);
 	}
     }
 
@@ -377,29 +369,26 @@ bool Game::IO::SaveBIN(QueueMessage & msg)
     msg.Push(static_cast<u16>(0xFF0F));
     msg.Push(static_cast<u32>(world.vec_riddles.size()));
     {
-	std::vector<GameEvent::Riddle *>::const_iterator it1 = world.vec_riddles.begin();
-	std::vector<GameEvent::Riddle *>::const_iterator it2 = world.vec_riddles.end();
-	for(; it1 != it2; ++it1)
+	for(Riddles::const_iterator
+	    it = world.vec_riddles.begin(); it != world.vec_riddles.end(); ++it)
 	{
-	    if(NULL == *it1){ DEBUG(DBG_GAME , DBG_WARN, "Game::IO::SaveBIN: riddles is NULL"); return false; }
+	    msg.Push((*it).GetIndex());
+	    msg.Push((*it).resource.wood);
+	    msg.Push((*it).resource.mercury);
+	    msg.Push((*it).resource.ore);
+	    msg.Push((*it).resource.sulfur);
+	    msg.Push((*it).resource.crystal);
+	    msg.Push((*it).resource.gems);
+	    msg.Push((*it).resource.gold);
+	    msg.Push((*it).artifact());
+	    msg.Push((*it).valid);
 
-	    msg.Push((*it1)->index_map);
-	    msg.Push((*it1)->resource.wood);
-	    msg.Push((*it1)->resource.mercury);
-	    msg.Push((*it1)->resource.ore);
-	    msg.Push((*it1)->resource.sulfur);
-	    msg.Push((*it1)->resource.crystal);
-	    msg.Push((*it1)->resource.gems);
-	    msg.Push((*it1)->resource.gold);
-	    msg.Push(static_cast<u8>((*it1)->artifact));
-	    msg.Push(static_cast<u8>((*it1)->valid));
+	    msg.Push(static_cast<u32>((*it).answers.size()));
+	    for(std::vector<std::string>::const_iterator
+		ita = (*it).answers.begin(); ita != (*it).answers.end(); ++ita)
+		msg.Push(*ita);
 
-	    msg.Push(static_cast<u32>((*it1)->answers.size()));
-	    std::vector<std::string>::const_iterator ita1 = (*it1)->answers.begin();
-	    std::vector<std::string>::const_iterator ita2 = (*it1)->answers.end();
-	    for(; ita1 != ita2; ++ita1) msg.Push(*ita1);
-
-	    msg.Push((*it1)->message);
+	    msg.Push((*it).message);
 	}
     }
 
@@ -423,11 +412,10 @@ void Game::IO::PackTile(QueueMessage & msg, const Maps::Tiles & tile)
 
     // addons 1
     msg.Push(static_cast<u8>(tile.addons_level1.size()));
-    std::list<Maps::TilesAddon>::const_iterator it1 = tile.addons_level1.begin();
-    std::list<Maps::TilesAddon>::const_iterator it2 = tile.addons_level1.end();
-    for(; it1 != it2; ++it1)
+    for(std::list<Maps::TilesAddon>::const_iterator
+	it = tile.addons_level1.begin(); it != tile.addons_level1.end(); ++it)
     {
-	const Maps::TilesAddon & addon = *it1;
+	const Maps::TilesAddon & addon = *it;
 	msg.Push(addon.level);
 	msg.Push(addon.uniq);
 	msg.Push(addon.object);
@@ -436,11 +424,10 @@ void Game::IO::PackTile(QueueMessage & msg, const Maps::Tiles & tile)
 
     // addons 2
     msg.Push(static_cast<u8>(tile.addons_level2.size()));
-    it1 = tile.addons_level2.begin();
-    it2 = tile.addons_level2.end();
-    for(; it1 != it2; ++it1)
+    for(std::list<Maps::TilesAddon>::const_iterator
+	it = tile.addons_level2.begin(); it != tile.addons_level2.end(); ++it)
     {
-	const Maps::TilesAddon & addon = *it1;
+	const Maps::TilesAddon & addon = *it;
 	msg.Push(addon.level);
 	msg.Push(addon.uniq);
 	msg.Push(addon.object);
@@ -469,12 +456,11 @@ void Game::IO::PackKingdom(QueueMessage & msg, const Kingdom & kingdom)
 
     // visit objects
     msg.Push(static_cast<u32>(kingdom.visit_object.size()));
-    std::list<IndexObject>::const_iterator it1 = kingdom.visit_object.begin();
-    std::list<IndexObject>::const_iterator it2 = kingdom.visit_object.end();
-    for(; it1 != it2; ++it1)
+    for(std::list<IndexObject>::const_iterator
+	it = kingdom.visit_object.begin(); it != kingdom.visit_object.end(); ++it)
     {
-	msg.Push((*it1).first);
-	msg.Push(static_cast<u8>((*it1).second));
+	msg.Push((*it).first);
+	msg.Push(static_cast<u8>((*it).second));
     }
 
     // recruits
@@ -504,7 +490,7 @@ void Game::IO::PackCastle(QueueMessage & msg, const Castle & castle)
 {
     msg.Push(castle.GetCenter().x);
     msg.Push(castle.GetCenter().y);
-    msg.Push(static_cast<u8>(castle.race));
+    msg.Push(castle.race);
 
     msg.Push(castle.modes);
     msg.Push(static_cast<u8>(castle.color));
@@ -513,19 +499,17 @@ void Game::IO::PackCastle(QueueMessage & msg, const Castle & castle)
 	
     // mageguild
     {
-	std::vector<Spell::spell_t>::const_iterator it1, it2;
+	msg.Push(static_cast<u32>(castle.mageguild.general.size()));
 
-	msg.Push(static_cast<u32>(castle.mageguild.general.spells.size()));
+	for(SpellStorage::const_iterator
+	    it = castle.mageguild.general.begin(); it != castle.mageguild.general.end(); ++it)
+	    msg.Push((*it)());
 
-	it1 = castle.mageguild.general.spells.begin();
-	it2 = castle.mageguild.general.spells.end();
-	for(; it1 != it2; ++it1) msg.Push(static_cast<u8>(*it1));
+	msg.Push(static_cast<u32>(castle.mageguild.library.size()));
 
-	msg.Push(static_cast<u32>(castle.mageguild.library.spells.size()));
-
-	it1 = castle.mageguild.library.spells.begin();
-	it2 = castle.mageguild.library.spells.end();
-	for(; it1 != it2; ++it1) msg.Push(static_cast<u8>(*it1));
+	for(SpellStorage::const_iterator
+	    it = castle.mageguild.library.begin(); it != castle.mageguild.library.end(); ++it)
+	    msg.Push((*it)());
     }
 
     // armies
@@ -564,23 +548,18 @@ void Game::IO::PackHeroBase(QueueMessage & msg, const HeroBase & hero)
     msg.Push(hero.magic_point);
 
     // spell book
-    msg.Push(static_cast<u8>(hero.spell_book.active));
-    {
-	std::vector<Spell::spell_t>::const_iterator it1, it2;
+    msg.Push(static_cast<u32>(hero.spell_book.size()));
 
-	msg.Push(static_cast<u32>(hero.spell_book.spells.size()));
-
-	it1 = hero.spell_book.spells.begin();
-	it2 = hero.spell_book.spells.end();
-	for(; it1 != it2; ++it1) msg.Push(static_cast<u8>(*it1));
-    }
+    for(SpellBook::const_iterator
+	it = hero.spell_book.begin(); it != hero.spell_book.end(); ++it)
+	msg.Push((*it)());
 
     // artifacts
     msg.Push(static_cast<u32>(hero.bag_artifacts.size()));
     for(u32 jj = 0; jj < hero.bag_artifacts.size(); ++jj)
     {
-	msg.Push(static_cast<u8>(hero.bag_artifacts[jj].GetID()));
-	msg.Push(hero.bag_artifacts[jj].GetExt());
+	msg.Push(hero.bag_artifacts[jj].id);
+	msg.Push(hero.bag_artifacts[jj].ext);
     }
 }
 
@@ -590,7 +569,7 @@ void Game::IO::PackHeroes(QueueMessage & msg, const Heroes & hero)
 
     msg.Push(static_cast<u8>(hero.hid));
     msg.Push(static_cast<u8>(hero.portrait));
-    msg.Push(static_cast<u8>(hero.race));
+    msg.Push(hero.race);
 
     msg.Push(static_cast<u8>(hero.color));
     msg.Push(hero.name);
@@ -623,24 +602,22 @@ void Game::IO::PackHeroes(QueueMessage & msg, const Heroes & hero)
 	
     // visit objects
     msg.Push(static_cast<u32>(hero.visit_object.size()));
-    std::list<IndexObject>::const_iterator it1 = hero.visit_object.begin();
-    std::list<IndexObject>::const_iterator it2 = hero.visit_object.end();
-    for(; it1 != it2; ++it1)
+    for(std::list<IndexObject>::const_iterator
+	it = hero.visit_object.begin(); it != hero.visit_object.end(); ++it)
     {
-	msg.Push((*it1).first);
-	msg.Push(static_cast<u8>((*it1).second));
+	msg.Push((*it).first);
+	msg.Push(static_cast<u8>((*it).second));
     }
 
     // route path
     msg.Push(hero.path.dst);
     msg.Push(static_cast<u8>(hero.path.hide));
     msg.Push(static_cast<u32>(hero.path.size()));
-    Route::Path::const_iterator ip1 = hero.path.begin();
-    Route::Path::const_iterator ip2 = hero.path.end();
-    for(; ip1 != ip2; ++ip1)
+    for(Route::Path::const_iterator
+	ip = hero.path.begin(); ip != hero.path.end(); ++ip)
     {
-	msg.Push(static_cast<u16>((*ip1).Direction()));
-	msg.Push((*ip1).Penalty());
+	msg.Push(static_cast<u16>((*ip).Direction()));
+	msg.Push((*ip).Penalty());
     }
 }
 
@@ -658,18 +635,18 @@ bool Game::IO::LoadBIN(QueueMessage & msg)
     world.Reset();
 
     msg.Pop(byte16);
-    if(byte16 != 0xFF01){ DEBUG(DBG_GAME , DBG_WARN, "Game::IO::LoadBIN: 0xFF01"); return false; }
+    if(byte16 != 0xFF01){ DEBUG(DBG_GAME, DBG_WARN, "0xFF01"); return false; }
 
     // format version
     msg.Pop(format);
     if(format > CURRENT_FORMAT_VERSION || format < LAST_FORMAT_VERSION)
     {
-    	DEBUG(DBG_GAME , DBG_WARN, "Game::IO::LoadBIN: unknown format: 0x" << std::hex << format);
+    	DEBUG(DBG_GAME , DBG_WARN, "unknown format: 0x" << std::hex << format);
     	return false;
     }
     else
     {
-    	DEBUG(DBG_GAME , DBG_INFO, "Game::IO::LoadBIN: format: " << format);
+    	DEBUG(DBG_GAME , DBG_INFO, "format: " << format);
     }
 
 
@@ -695,7 +672,7 @@ bool Game::IO::LoadBIN(QueueMessage & msg)
 
     // maps
     msg.Pop(byte16);
-    if(byte16 != 0xFF02) DEBUG(DBG_GAME , DBG_WARN, "Game::IO::LoadBIN: 0xFF02");
+    if(byte16 != 0xFF02) DEBUG(DBG_GAME, DBG_WARN, "0xFF02");
 
     msg.Pop(conf.current_maps_file.size_w);
     msg.Pop(conf.current_maps_file.size_h);
@@ -715,7 +692,7 @@ bool Game::IO::LoadBIN(QueueMessage & msg)
     msg.Pop(conf.current_maps_file.loss2);
 
     msg.Pop(byte16);
-    if(byte16 != 0xFF03) DEBUG(DBG_GAME , DBG_WARN, "Game::IO::LoadBIN: 0xFF03");
+    if(byte16 != 0xFF03) DEBUG(DBG_GAME, DBG_WARN, "0xFF03");
     // races
     msg.Pop(byte32);
     for(u8 ii = 0; ii < byte32; ++ii)
@@ -736,7 +713,7 @@ bool Game::IO::LoadBIN(QueueMessage & msg)
     msg.Pop(conf.current_maps_file.description);
     // game
     msg.Pop(byte16);
-    if(byte16 != 0xFF04) DEBUG(DBG_GAME , DBG_WARN, "Game::IO::LoadBIN: 0xFF04");
+    if(byte16 != 0xFF04) DEBUG(DBG_GAME, DBG_WARN, "0xFF04");
     msg.Pop(byte8); conf.game_difficulty = Difficulty::Get(byte8);
     msg.Pop(byte8); conf.my_color = Color::Get(byte8);
     msg.Pop(byte8); conf.cur_color = Color::NONE;
@@ -761,11 +738,11 @@ bool Game::IO::LoadBIN(QueueMessage & msg)
 
     // world
     msg.Pop(byte16);
-    if(byte16 != 0xFF05) DEBUG(DBG_GAME , DBG_WARN, "Game::IO::LoadBIN: 0xFF05");
+    if(byte16 != 0xFF05) DEBUG(DBG_GAME, DBG_WARN, "0xFF05");
     msg.Pop(world.width);
     msg.Pop(world.height);
 
-    msg.Pop(world.ultimate_artifact);
+    msg.Pop(world.ultimate_index);
     msg.Pop(world.uniq0);
     msg.Pop(byte8); world.week_name = Week::Get(byte8);
     msg.Pop(byte8); world.heroes_cond_wins = Heroes::ConvertID(byte8);
@@ -776,7 +753,7 @@ bool Game::IO::LoadBIN(QueueMessage & msg)
 
     // tiles
     msg.Pop(byte16);
-    if(byte16 != 0xFF06) DEBUG(DBG_GAME , DBG_WARN, "Game::IO::LoadBIN: 0xFF06");
+    if(byte16 != 0xFF06) DEBUG(DBG_GAME, DBG_WARN, "0xFF06");
     msg.Pop(byte32);
     world.vec_tiles.reserve(byte32);
     for(u32 maps_index = 0; maps_index < byte32; ++maps_index)
@@ -788,7 +765,7 @@ bool Game::IO::LoadBIN(QueueMessage & msg)
 
     // heroes
     msg.Pop(byte16);
-    if(byte16 != 0xFF07) DEBUG(DBG_GAME , DBG_WARN, "Game::IO::LoadBIN: 0xFF07");
+    if(byte16 != 0xFF07) DEBUG(DBG_GAME, DBG_WARN, "0xFF07");
     msg.Pop(byte32);
     world.vec_heroes.reserve(byte32);
     for(u32 ii = 0; ii < byte32; ++ii)
@@ -800,7 +777,7 @@ bool Game::IO::LoadBIN(QueueMessage & msg)
 
     // castles
     msg.Pop(byte16);
-    if(byte16 != 0xFF08) DEBUG(DBG_GAME , DBG_WARN, "Game::IO::LoadBIN: 0xFF08");
+    if(byte16 != 0xFF08) DEBUG(DBG_GAME, DBG_WARN, "0xFF08");
     msg.Pop(byte32);
     world.vec_castles.reserve(byte32);
     for(u32 ii = 0; ii < byte32; ++ii)
@@ -812,7 +789,7 @@ bool Game::IO::LoadBIN(QueueMessage & msg)
 
     // kingdoms
     msg.Pop(byte16);
-    if(byte16 != 0xFF09) DEBUG(DBG_GAME , DBG_WARN, "Game::IO::LoadBIN: 0xFF09");
+    if(byte16 != 0xFF09) DEBUG(DBG_GAME, DBG_WARN, "0xFF09");
     msg.Pop(byte32);
     world.vec_kingdoms.reserve(byte32);
     for(u32 ii = 0; ii < byte32; ++ii)
@@ -824,7 +801,7 @@ bool Game::IO::LoadBIN(QueueMessage & msg)
 
     // signs
     msg.Pop(byte16);
-    if(byte16 != 0xFF0A) DEBUG(DBG_GAME , DBG_WARN, "Game::IO::LoadBIN: 0xFF0A");
+    if(byte16 != 0xFF0A) DEBUG(DBG_GAME, DBG_WARN, "0xFF0A");
     msg.Pop(byte32);
     byte16 = byte32;
     world.map_sign.clear();
@@ -837,7 +814,7 @@ bool Game::IO::LoadBIN(QueueMessage & msg)
 
     // captured object
     msg.Pop(byte16);
-    if(byte16 != 0xFF0B) DEBUG(DBG_GAME , DBG_WARN, "Game::IO::LoadBIN: 0xFF0B");
+    if(byte16 != 0xFF0B) DEBUG(DBG_GAME, DBG_WARN, "0xFF0B");
     msg.Pop(byte32);
     byte16 = byte32;
     world.map_captureobj.clear();
@@ -851,7 +828,7 @@ bool Game::IO::LoadBIN(QueueMessage & msg)
 
     // rumors
     msg.Pop(byte16);
-    if(byte16 != 0xFF0C) DEBUG(DBG_GAME , DBG_WARN, "Game::IO::LoadBIN: 0xFF0C");
+    if(byte16 != 0xFF0C) DEBUG(DBG_GAME, DBG_WARN, "0xFF0C");
     msg.Pop(byte32);
     world.vec_rumors.clear();
     world.vec_rumors.reserve(byte32);
@@ -863,90 +840,91 @@ bool Game::IO::LoadBIN(QueueMessage & msg)
 
     // day events
     msg.Pop(byte16);
-    if(byte16 != 0xFF0D) DEBUG(DBG_GAME , DBG_WARN, "Game::IO::LoadBIN: 0xFF0D");
+    if(byte16 != 0xFF0D) DEBUG(DBG_GAME, DBG_WARN, "0xFF0D");
     msg.Pop(byte32);
     world.vec_eventsday.clear();
     world.vec_eventsday.reserve(byte32);
     for(u32 ii = 0; ii < byte32; ++ii)
     {
-	GameEvent::Day *event = new GameEvent::Day();
-	u32 size;
+	EventDate event;
 
-	msg.Pop(size); event->resource.wood = size;
-	msg.Pop(size); event->resource.mercury = size;
-	msg.Pop(size); event->resource.ore = size;
-	msg.Pop(size); event->resource.sulfur = size;
-	msg.Pop(size); event->resource.crystal = size;
-	msg.Pop(size); event->resource.gems = size;
-	msg.Pop(size); event->resource.gold = size;
-	msg.Pop(byte8);event->computer = byte8;
-	msg.Pop(event->first);
-	msg.Pop(event->subsequent);
-	msg.Pop(event->colors);
-	msg.Pop(event->message);
+	msg.Pop(event.resource.wood);
+	msg.Pop(event.resource.mercury);
+	msg.Pop(event.resource.ore);
+	msg.Pop(event.resource.sulfur);
+	msg.Pop(event.resource.crystal);
+	msg.Pop(event.resource.gems);
+	msg.Pop(event.resource.gold);
+	msg.Pop(event.computer);
+	msg.Pop(event.first);
+	msg.Pop(event.subsequent);
+	msg.Pop(event.colors);
+	msg.Pop(event.message);
 
 	world.vec_eventsday.push_back(event);
     }
 
     // coord events
     msg.Pop(byte16);
-    if(byte16 != 0xFF0E) DEBUG(DBG_GAME , DBG_WARN, "Game::IO::LoadBIN: 0xFF0E");
+    if(byte16 != 0xFF0E) DEBUG(DBG_GAME, DBG_WARN, "0xFF0E");
     msg.Pop(byte32);
     world.vec_eventsmap.clear();
     world.vec_eventsmap.reserve(byte32);
     for(u32 ii = 0; ii < byte32; ++ii)
     {
-	GameEvent::Coord *event = new GameEvent::Coord();
-	u32 size;
+	EventMaps event;
 
-	msg.Pop(size); event->index_map = size;
-	msg.Pop(size); event->resource.wood = size;
-	msg.Pop(size); event->resource.mercury = size;
-	msg.Pop(size); event->resource.ore = size;
-	msg.Pop(size); event->resource.sulfur = size;
-	msg.Pop(size); event->resource.crystal = size;
-	msg.Pop(size); event->resource.gems = size;
-	msg.Pop(size); event->resource.gold = size;
+	s32 index;
+	msg.Pop(index); event.SetIndex(index);
 
-	msg.Pop(byte8);event->artifact = Artifact::FromInt(byte8);
-	msg.Pop(byte8);event->computer = byte8;
-	msg.Pop(byte8);event->cancel = byte8;
-	msg.Pop(event->colors);
-	msg.Pop(event->message);
+	msg.Pop(event.resource.wood);
+	msg.Pop(event.resource.mercury);
+	msg.Pop(event.resource.ore);
+	msg.Pop(event.resource.sulfur);
+	msg.Pop(event.resource.crystal);
+	msg.Pop(event.resource.gems);
+	msg.Pop(event.resource.gold);
+
+	msg.Pop(byte8); event.artifact = byte8;
+	msg.Pop(event.computer);
+	msg.Pop(event.cancel);
+	msg.Pop(event.colors);
+	msg.Pop(event.message);
 
 	world.vec_eventsmap.push_back(event);
     }
     
     // sphinx riddles
     msg.Pop(byte16);
-    if(byte16 != 0xFF0F) DEBUG(DBG_GAME , DBG_WARN, "Game::IO::LoadBIN: 0xFF0F");
+    if(byte16 != 0xFF0F) DEBUG(DBG_GAME, DBG_WARN, "0xFF0F");
     msg.Pop(byte32);
     world.vec_riddles.clear();
     world.vec_riddles.reserve(byte32);
     for(u32 ii = 0; ii < byte32; ++ii)
     {
-	GameEvent::Riddle *riddle = new GameEvent::Riddle();
+	Riddle riddle;
+	s32 index;
 	u32 size;
-	
-	msg.Pop(size); riddle->index_map = size;
-	msg.Pop(size); riddle->resource.wood = size;
-	msg.Pop(size); riddle->resource.mercury = size;
-	msg.Pop(size); riddle->resource.ore = size;
-	msg.Pop(size); riddle->resource.sulfur = size;
-	msg.Pop(size); riddle->resource.crystal = size;
-	msg.Pop(size); riddle->resource.gems = size;
-	msg.Pop(size); riddle->resource.gold = size;
-	msg.Pop(byte8);riddle->artifact = Artifact::FromInt(byte8);
-	msg.Pop(byte8);riddle->valid = byte8;
+
+	msg.Pop(index); riddle.SetIndex(index);
+	msg.Pop(riddle.resource.wood);
+	msg.Pop(riddle.resource.mercury);
+	msg.Pop(riddle.resource.ore);
+	msg.Pop(riddle.resource.sulfur);
+	msg.Pop(riddle.resource.crystal);
+	msg.Pop(riddle.resource.gems);
+	msg.Pop(riddle.resource.gold);
+	msg.Pop(byte8); riddle.artifact = byte8;
+	msg.Pop(riddle.valid);
 
 	msg.Pop(size);
-	riddle->answers.reserve(size);
+	riddle.answers.reserve(size);
 	for(u32 jj = 0; jj < size; ++jj)
 	{
 	    msg.Pop(str);
-	    riddle->answers.push_back(str);
+	    riddle.answers.push_back(str);
 	}
-	msg.Pop(riddle->message);
+	msg.Pop(riddle.message);
 
 	world.vec_riddles.push_back(riddle);
     }
@@ -954,19 +932,17 @@ bool Game::IO::LoadBIN(QueueMessage & msg)
     msg.Pop(byte16);
 
     // sort castles to kingdoms
-    std::vector<Castle *>::const_iterator itc1 = world.vec_castles.begin();
-    std::vector<Castle *>::const_iterator itc2 = world.vec_castles.end();
-    for(; itc1 != itc2; ++itc1)
-        if(*itc1) world.GetKingdom((*itc1)->GetColor()).AddCastle(*itc1);
+    for(std::vector<Castle *>::const_iterator
+	itc = world.vec_castles.begin(); itc != world.vec_castles.end(); ++itc)
+        if(*itc) world.GetKingdom((*itc)->GetColor()).AddCastle(*itc);
 
     // sort heroes to kingdoms
-    std::vector<Heroes *>::const_iterator ith1 = world.vec_heroes.begin();
-    std::vector<Heroes *>::const_iterator ith2 = world.vec_heroes.end();
-    for(; ith1 != ith2; ++ith1)
-        if(*ith1) world.GetKingdom((*ith1)->GetColor()).AddHeroes(*ith1);
+    for(std::vector<Heroes *>::const_iterator
+	ith = world.vec_heroes.begin(); ith != world.vec_heroes.end(); ++ith)
+        if(*ith) world.GetKingdom((*ith)->GetColor()).AddHeroes(*ith);
 
     // regenerate puzzle surface
-    Interface::GameArea::GenerateUltimateArtifactAreaSurface(world.ultimate_artifact, world.puzzle_surface);
+    Interface::GameArea::GenerateUltimateArtifactAreaSurface(world.ultimate_index, world.puzzle_surface);
 
     return byte16 == 0xFFFF;
 }
@@ -1108,7 +1084,7 @@ void Game::IO::UnpackCastle(QueueMessage & msg, Castle & castle, u16 check_versi
     msg.Pop(castle.center.x);
     msg.Pop(castle.center.y);
 
-    msg.Pop(byte8); castle.race = Race::Get(byte8);
+    msg.Pop(castle.race);
 
     msg.Pop(castle.modes);
     msg.Pop(byte8); castle.color = Color::Get(byte8);
@@ -1117,21 +1093,21 @@ void Game::IO::UnpackCastle(QueueMessage & msg, Castle & castle, u16 check_versi
 
     // general
     msg.Pop(byte32);
-    castle.mageguild.general.spells.clear();
-    castle.mageguild.general.spells.reserve(byte32);
+    castle.mageguild.general.clear();
+    castle.mageguild.general.reserve(byte32);
     for(u32 jj = 0; jj < byte32; ++jj)
     {
 	msg.Pop(byte8);
-	castle.mageguild.general.spells.push_back(Spell::FromInt(byte8));
+	castle.mageguild.general.push_back(Spell(byte8));
     }
     // library
     msg.Pop(byte32);
-    castle.mageguild.library.spells.clear();
-    castle.mageguild.library.spells.reserve(byte32);
+    castle.mageguild.library.clear();
+    castle.mageguild.library.reserve(byte32);
     for(u32 jj = 0; jj < byte32; ++jj)
     {
 	msg.Pop(byte8);
-	castle.mageguild.library.spells.push_back(Spell::FromInt(byte8));
+	castle.mageguild.library.push_back(Spell(byte8));
     }
 
     // armies
@@ -1175,28 +1151,30 @@ void Game::IO::UnpackHeroBase(QueueMessage & msg, HeroBase & hero, u16 check_ver
     msg.Pop(hero.magic_point);
 
     // spell book
-    hero.spell_book.spells.clear();
-    msg.Pop(byte8);
-    hero.spell_book.active = byte8;
+    hero.spell_book.clear();
+    if(check_version < FORMAT_VERSION_2248)
+    {
+	msg.Pop(byte8); // spellbook active DEPRECATED
+    }
 
     msg.Pop(byte32);
-    hero.spell_book.spells.reserve(byte32);
+    hero.spell_book.reserve(byte32);
     for(u32 jj = 0; jj < byte32; ++jj)
     {
 	msg.Pop(byte8);
-	hero.spell_book.spells.push_back(Spell::FromInt(byte8));
+	hero.spell_book.push_back(Spell(byte8));
     }
 
     // artifacts
-    std::fill(hero.bag_artifacts.begin(), hero.bag_artifacts.end(), Artifact::UNKNOWN);
+    std::fill(hero.bag_artifacts.begin(), hero.bag_artifacts.end(), Artifact(Artifact::UNKNOWN));
     msg.Pop(byte32);
     for(u32 jj = 0; jj < hero.bag_artifacts.size(); ++jj)
     {
 	msg.Pop(byte8);
-	hero.bag_artifacts[jj].Set(Artifact::FromInt(byte8));
+	hero.bag_artifacts[jj].id = byte8;
 
 	msg.Pop(byte8);
-	hero.bag_artifacts[jj].SetExt(byte8);
+	hero.bag_artifacts[jj].ext = byte8;
     }
 }
 
@@ -1214,7 +1192,7 @@ void Game::IO::UnpackHeroes(QueueMessage & msg, Heroes & hero, u16 check_version
 	msg.Pop(byte8); hero.hid = Heroes::ConvertID(byte8);
 	msg.Pop(byte8); hero.portrait = Heroes::ConvertID(byte8);
 	// race
-	msg.Pop(byte8); hero.race = Race::Get(byte8);
+	msg.Pop(hero.race);
 
 	msg.Pop(byte8); hero.color = Color::Get(byte8);
         msg.Pop(hero.name);
@@ -1263,7 +1241,7 @@ void Game::IO::UnpackHeroes(QueueMessage & msg, Heroes & hero, u16 check_version
 	    msg.Pop(byte8); hero.portrait = Heroes::ConvertID(byte8);
 	    hero.hid = hero.portrait;
 	}
-	msg.Pop(byte8); hero.race = Race::Get(byte8);
+	msg.Pop(hero.race);
 
 	msg.Pop(hero.modes);
 	msg.Pop(byte8); hero.color = Color::Get(byte8);
@@ -1300,15 +1278,15 @@ void Game::IO::UnpackHeroes(QueueMessage & msg, Heroes & hero, u16 check_version
 	}
 
 	// artifacts
-	std::fill(hero.bag_artifacts.begin(), hero.bag_artifacts.end(), Artifact::UNKNOWN);
+	std::fill(hero.bag_artifacts.begin(), hero.bag_artifacts.end(), Artifact(Artifact::UNKNOWN));
 	msg.Pop(byte32);
 	for(u32 jj = 0; jj < hero.bag_artifacts.size(); ++jj)
 	{
 	    msg.Pop(byte8);
-	    hero.bag_artifacts[jj].Set(Artifact::FromInt(byte8));
+	    hero.bag_artifacts[jj].id = byte8;
 
 	    msg.Pop(byte8);
-	    hero.bag_artifacts[jj].SetExt(byte8);
+	    hero.bag_artifacts[jj].ext = byte8;
 	}
 
 	// armies
@@ -1322,16 +1300,18 @@ void Game::IO::UnpackHeroes(QueueMessage & msg, Heroes & hero, u16 check_version
 	}
 
 	// spell book
-	hero.spell_book.spells.clear();
-	msg.Pop(byte8);
-	hero.spell_book.active = byte8;
+	hero.spell_book.clear();
+	if(check_version < FORMAT_VERSION_2248)
+	{
+	    msg.Pop(byte8); // spellbook active DEPRECATED
+	}
 
 	msg.Pop(byte32);
-	hero.spell_book.spells.reserve(byte32);
+	hero.spell_book.reserve(byte32);
 	for(u32 jj = 0; jj < byte32; ++jj)
 	{
 	    msg.Pop(byte8);
-	    hero.spell_book.spells.push_back(Spell::FromInt(byte8));
+	    hero.spell_book.push_back(Spell(byte8));
 	}
     }
 

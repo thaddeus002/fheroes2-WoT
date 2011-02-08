@@ -32,6 +32,7 @@
 #include "heroes.h"
 #include "portrait.h"
 #include "world.h"
+#include "race.h"
 #include "selectarmybar.h"
 #include "buildinginfo.h"
 #include "profit.h"
@@ -711,7 +712,7 @@ screen_t CastleOpenDialog5(Castle & castle, bool readonly)
 
     // magic book sprite
     const Heroes* hero = castle.GetHeroes().GuestFirst();
-    bool need_buy_book = hero && !hero->HasArtifact(Artifact::MAGIC_BOOK) && castle.GetLevelMageGuild();
+    bool need_buy_book = hero && !hero->HaveSpellBook() && castle.GetLevelMageGuild();
     const Rect book_pos(dst_rt.x + 250, dst_rt.y + 5, 32, 32);
     if(need_buy_book)
     {

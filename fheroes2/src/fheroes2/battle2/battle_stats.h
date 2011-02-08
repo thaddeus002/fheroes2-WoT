@@ -30,6 +30,7 @@
 #include "battle_arena.h"
 
 class Sprite;
+class Spell;
 class HeroBase;
 
 namespace Battle2
@@ -153,13 +154,13 @@ namespace Battle2
 	u32	GetDamageMin(const Stats &) const;
 	u32	GetDamageMax(const Stats &) const;
 	u32     CalculateDamageStats(const Stats &, double) const;
-	bool	ApplySpell(u8, const HeroBase* hero, TargetInfo &);
-	bool	AllowApplySpell(u8, const HeroBase* hero, std::string* msg = NULL) const;
+	bool	ApplySpell(const Spell &, const HeroBase* hero, TargetInfo &);
+	bool	AllowApplySpell(const Spell &, const HeroBase* hero, std::string* msg = NULL) const;
 	void	PostAttackAction(Stats &);
 	void	ResetBlind(void);
-	void	SpellModesAction(u8, u8, const HeroBase*);
-	void	SpellApplyDamage(u8, u8, const HeroBase*, TargetInfo &);
-	void	SpellRestoreAction(u8, u8, const HeroBase*);
+	void	SpellModesAction(const Spell &, u8, const HeroBase*);
+	void	SpellApplyDamage(const Spell &, u8, const HeroBase*, TargetInfo &);
+	void	SpellRestoreAction(const Spell &, u8, const HeroBase*);
 	u32	Resurrect(u32, bool, bool);
 
 	Monster GetMonster(void) const;
@@ -205,8 +206,8 @@ namespace Battle2
 	bool	isMultiCellAttack(void) const;
 	bool	isHideAttack(void) const;
 	bool	isAlwayResponse(void) const;
-	bool 	isMagicResist(u8, u8) const;
-	u8	GetMagicResist(u8, u8) const;
+	bool 	isMagicResist(const Spell &, u8) const;
+	u8	GetMagicResist(const Spell &, u8) const;
 	bool	isMagicAttack(void) const;
 	u8	GetSpellMagic(bool force = false) const;
 	bool	isHaveDamage(void) const;

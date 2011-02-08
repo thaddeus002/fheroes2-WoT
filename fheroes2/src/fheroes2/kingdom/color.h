@@ -23,11 +23,12 @@
 #define H2COLOR_H
 
 #include <string>
+#include <vector>
 #include "gamedefs.h"
 
-namespace Barrier
+namespace BarrierColor
 {
-    enum color_t
+    enum
     {
 	NONE	= 0x00,
         AQUA	= 0x01,
@@ -40,8 +41,8 @@ namespace Barrier
         RED	= 0x80
     };
 
-    const char* Color(u8);
-    color_t FromMP2(u8);
+    const char* String(u8);
+    u8 FromMP2(u8);
 }
 
 namespace Color
@@ -55,13 +56,15 @@ namespace Color
         YELLOW  = 0x08,
         ORANGE  = 0x10,
         PURPLE  = 0x20,
-        GRAY    = 0x40
+        GRAY    = 0x40,
+	ALL	= BLUE | GREEN | RED | YELLOW | ORANGE | PURPLE
     };
 
-    inline color_t& operator++ (color_t& color){ return color = ( GRAY == color ? BLUE : color_t(color << 1)); }
-    inline color_t& operator-- (color_t& color){ return color = ( BLUE == color ? GRAY : color_t(color >> 1)); }
+    typedef std::vector<Color::color_t> Colors;
 
     const char* String(u8);
+
+    Colors GetColors(u8 = ALL);
 
     u8 Count(u8);
     u8 GetIndex(color_t);

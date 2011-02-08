@@ -28,6 +28,7 @@
 
 #include "battle2.h"
 #include "gamedefs.h"
+#include "spell_storage.h"
 #include "ai.h"
 
 #define ARENAW 11
@@ -50,9 +51,10 @@ namespace Battle2
 
     struct Actions : public std::list<Action>
     {
+        void AddedAutoBattleAction(u8);
         void AddedRetreatAction(void);
         void AddedSurrenderAction(void);
-        void AddedCastAction(u8, u16);
+        void AddedCastAction(const Spell &, u16);
         void AddedCastTeleportAction(u16, u16);
         void AddedEndAction(const Stats &);
         void AddedSkipAction(const Stats &, bool);
@@ -143,8 +145,8 @@ namespace Battle2
 
 	void FadeArena(void) const;
 
-	const std::vector<u8> & GetUsageSpells(void) const;
-	void AddSpell(u8);
+	const SpellStorage & GetUsageSpells(void) const;
+	void AddSpell(const Spell &);
 
 	u16  GetPath(const Stats &, u16, std::vector<u16> &);
 	void DumpBoard(void) const;
@@ -157,8 +159,8 @@ namespace Battle2
 	TargetsInfo GetTargetsForDamage(Stats &, Stats &, u16);
 	void TargetsApplyDamage(Stats &, Stats &, TargetsInfo &);
 
-	TargetsInfo GetTargetsForSpells(const HeroBase*, const u8, const u16);
-	void TargetsApplySpell(const HeroBase*, const u8, TargetsInfo &);
+	TargetsInfo GetTargetsForSpells(const HeroBase*, const Spell &, const u16);
+	void TargetsApplySpell(const HeroBase*, const Spell &, TargetsInfo &);
 
 	void UnpackBoard(Action &);
 	void PackBoard(Action &) const;
@@ -166,8 +168,8 @@ namespace Battle2
         u8 GetCastleTargetValue(u8) const;
         void SetCastleTargetValue(u8, u8);
 
-	bool isDisableCastSpell(u8 spell, std::string *msg);
-	bool isAllowResurrectFromGraveyard(u8, u16) const;
+	bool isDisableCastSpell(const Spell &, std::string *msg);
+	bool isAllowResurrectFromGraveyard(const Spell &, u16) const;
 
 	u8 GetOppositeColor(u8) const;
 
@@ -184,11 +186,11 @@ namespace Battle2
 	u16 GetFreePositionNearHero(u8) const;
 
 	// uniq spells
-	void SpellActionSummonElemental(const HeroBase*, u8);
+	void SpellActionSummonElemental(const HeroBase*, const Spell &);
 	void SpellActionMirrorImage(Stats &);
 	void SpellActionTeleport(Action &);
 	void SpellActionEarthQuake(Action &);
-	void SpellActionDefaults(Action &, u8);
+	void SpellActionDefaults(Action &, const Spell &);
 
 	// battle_action
 	void ApplyActionRetreat(Action &);
@@ -202,6 +204,7 @@ namespace Battle2
 	void ApplyActionSpellCast(Action &);
 	void ApplyActionTower(Action &);
 	void ApplyActionCatapult(Action &);
+	void ApplyActionAutoBattle(Action &);
 	void BattleProcess(Stats &, Stats & b2, s16 = -1, u8 = 0);
 
 	HeroBase* GetCurrentCommander(void);
@@ -237,12 +240,13 @@ namespace Battle2
 	Result *result_game;
 
 	GraveyardTroop graveyard;
-	std::vector<u8> usage_spells;
+	SpellStorage usage_spells;
 
 	Board board;
 	ICN::icn_t icn_covr;
 
 	u16 current_turn;
+	u8 auto_battle;
     };
 }
 

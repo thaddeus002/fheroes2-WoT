@@ -26,12 +26,14 @@
 #include "heroes.h"
 #include "castle.h"
 #include "monster.h"
+#include "race.h"
 #include "interface_gamearea.h"
 #include "cursor.h"
 #include "game_focus.h"
 #include "world.h"
 #include "settings.h"
 #include "kingdom.h"
+#include "spell.h"
 #include "dialog.h"
 
 const char* ArmyGetSizeString(u32 count)
@@ -228,7 +230,7 @@ void Dialog::QuickInfo(const Maps::Tiles & tile)
 	    if(settings.ExtShowVisitedContent())
 	    {
 	    	name_object.append("\n(");
-		name_object.append( Artifact::GetName(Artifact::FromInt(tile.GetQuantity1())));
+		name_object.append(Artifact(tile.GetQuantity1()).GetName());
 	    	name_object.append(")");
 	    }
 	    break;
@@ -317,10 +319,11 @@ void Dialog::QuickInfo(const Maps::Tiles & tile)
 	    // addons pack
 	    if(settings.ExtShowVisitedContent() && kingdom.isVisited(tile))
 	    {
+		const Spell spell(tile.GetQuantity1());
 	    	name_object.append("\n(");
-	    	name_object.append(Spell::GetName(Spell::FromInt(tile.GetQuantity1())));
+	    	name_object.append(spell.GetName());
 	    	name_object.append(")");
-		if(from_hero && from_hero->HaveSpell(Spell::FromInt(tile.GetQuantity1())))
+		if(from_hero && from_hero->HaveSpell(spell))
 		{
 	    	    name_object.append("\n(");
 	    	    name_object.append(_("already learned"));
@@ -367,7 +370,7 @@ void Dialog::QuickInfo(const Maps::Tiles & tile)
 
         case MP2::OBJ_BARRIER:
         case MP2::OBJ_TRAVELLERTENT:
-	    name_object = Barrier::Color(tile.GetQuantity1());
+	    name_object = BarrierColor::String(tile.GetQuantity1());
 	    name_object.append(" ");
 	    name_object.append(MP2::StringObject(tile.GetObject()));
 
