@@ -29,6 +29,8 @@
 
 const char* strip_context(const char* c);
 
+#define GCC_VERSION (__GNUC__ * 10000 + __GNUC_MINOR__ * 100 + __GNUC_PATCHLEVEL__)
+
 #ifdef WITH_TTF
 #include <libintl.h>
 #define _(s) strip_context(gettext(s))
