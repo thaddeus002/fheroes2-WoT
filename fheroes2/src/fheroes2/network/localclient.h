@@ -72,7 +72,6 @@ public:
     bool ConnectionChat(void);
     bool GetCurrentMapInfo(void);
     bool GetPlayersInfo(void);
-    bool GetGameType(void);
     bool GetLoadMaps(bool, bool);
     bool ScenarioInfoDialog(void);
     bool Prepare4BattleOnly(void);

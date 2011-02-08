@@ -144,6 +144,10 @@ int FH2Server::Main(void* ptr)
 
 		switch(Network::GetMsg(msg.GetID()))
 		{
+		    case MSG_SET_GAMETYPE:
+			server.MsgSetGameType(msg, *client);
+			break;
+
 		    case MSG_MAPS_LOAD:
 			server.MsgLoadMaps(msg, *client);
 			break;
@@ -154,11 +158,7 @@ int FH2Server::Main(void* ptr)
 
 		    case MSG_LOGOUT:
 			server.MsgLogout(msg, *client);
-			server.clients.Dump();
-			break;
-
-    		    case MSG_GET_GAME_TYPE:
-			server.MsgGetGameType(msg, *client);
+			if(IS_DEBUG(DBG_NETWORK, DBG_TRACE)) server.clients.Dump();
 			break;
 
     		    case MSG_SHUTDOWN:
@@ -270,6 +270,13 @@ bool FH2Server::BattleRecvTurn(u8 color, const Battle2::Stats & b, const Battle2
 {
     // FIXME: check client
     FH2RemoteClient* client = clients.GetClient(color);
+    if(!client)
+    {
+	DEBUG(DBG_NETWORK, DBG_INFO, "unknown color: " << static_cast<int>(color));
+	clients.Dump();
+	Error::Except("FH2Server::BattleRecvTurn");
+	return false;
+    }
 
     QueueMessage msg(MSG_BATTLE_TURN);
     msg.Push(b.GetID());
@@ -375,7 +382,6 @@ int FH2Server::WaitClients(void* ptr)
     		client->RunThread();
 
 		DELAY(200);
-		server.clients.Dump();
 	    }
 	}
 
@@ -620,7 +626,7 @@ void FH2Server::MsgShutdown(QueueMessage & msg)
     SetModes(ST_SHUTDOWN);
 }
 
-void FH2Server::MsgGetGameType(QueueMessage & msg, FH2RemoteClient & client)
+void FH2Server::MsgSetGameType(QueueMessage & msg, FH2RemoteClient & client)
 {
     Settings & conf = Settings::Get();
     u8 type;

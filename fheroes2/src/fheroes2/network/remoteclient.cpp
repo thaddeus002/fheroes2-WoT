@@ -302,6 +302,8 @@ int FH2RemoteClient::Main(void)
 	    server.SendUpdatePlayers(msg, player_id);
 	}
 
+	if(IS_DEBUG(DBG_NETWORK, DBG_INFO)) Dump();
+	
 	DEBUG(DBG_NETWORK, DBG_INFO, "start queue");
 
 	while(! Modes(ST_SHUTDOWN))
@@ -358,7 +360,7 @@ void FH2RemoteClient::CloseConnection(void)
 
 bool FH2RemoteClient::ConnectionChat(void)
 {
-    Settings & conf = Settings::Get();
+    const Settings & conf = Settings::Get();
 
     QueueMessage packet;
 
@@ -382,6 +384,8 @@ bool FH2RemoteClient::ConnectionChat(void)
     DEBUG(DBG_NETWORK, DBG_INFO, "id: 0x" << std::hex << player_id << ", wait hello");
     if(!Wait(packet, MSG_HELLO)) return false;
 
+    u8 game_type;
+    packet.Pop(game_type);
     packet.Pop(player_name);
     DEBUG(DBG_NETWORK, DBG_INFO, "id: 0x" << std::hex << player_id << ", connected " << 
 			" player: " << player_name << ", host 0x" << std::hex << Host() << ":0x" << Port());
@@ -396,8 +400,22 @@ bool FH2RemoteClient::ConnectionChat(void)
 
     DEBUG(DBG_NETWORK, DBG_INFO, (Modes(ST_ADMIN) ? "admin" : "client") << " mode");
 
+    if(Modes(ST_ADMIN) && conf.GameType() != game_type) SetGameType(game_type);
+
     // update colors
     return UpdateColors();
+}
+
+void FH2RemoteClient::SetGameType(u8 type)
+{
+    FH2Server & server = FH2Server::Get();
+
+    RemoteMessage & msg = server.GetNewMessage(*this);
+    QueueMessage & packet = msg.packet;
+
+    packet.setID(MSG_SET_GAMETYPE);
+    packet.Push(type);
+    msg.SetReady();
 }
 
 bool FH2RemoteClient::UpdateColors(void)
@@ -418,6 +436,7 @@ bool FH2RemoteClient::UpdateColors(void)
     packet.Push(err);
     if(!Send(packet) || err.size()) return false;
 
+    DEBUG(DBG_NETWORK, DBG_INFO, "select " << Color::String(player_color));
     server.UpdateColors();
 
     return true;
@@ -456,7 +475,7 @@ bool FH2RemoteClient::SendCurrentColor(QueueMessage & msg)
     // players info
     server.PushPlayersInfo(msg);
 
-    DEBUG(DBG_NETWORK, DBG_INFO, "");
+    DEBUG(DBG_NETWORK, DBG_INFO, Color::String(player_color));
     return Send(msg);
 }
 

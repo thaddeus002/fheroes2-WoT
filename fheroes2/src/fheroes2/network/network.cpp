@@ -56,7 +56,7 @@ const char* Network::GetMsgString(u16 msg)
         case MSG_ACCESS_DENIED:		return "MSG_ACCESS_DENIED";
 
         case MSG_UPDATE_PLAYERS:	return "MSG_UPDATE_PLAYERS";
-        case MSG_GET_GAME_TYPE:		return "MSG_GET_GAME_TYPE";
+        case MSG_SET_GAMETYPE:		return "MSG_SET_GAMETYPE";
         case MSG_GET_MAPS_LIST:		return "MSG_GET_MAPS_LIST";
         case MSG_SET_CURRENT_MAP:	return "MSG_SET_CURRENT_MAP";
         case MSG_GET_CURRENT_MAP:	return "MSG_GET_CURRENT_MAP";

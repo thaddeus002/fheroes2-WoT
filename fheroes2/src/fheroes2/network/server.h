@@ -96,7 +96,7 @@ protected:
     void MsgChangeRaces(QueueMessage &);
     void MsgLogout(QueueMessage &, FH2RemoteClient &);
     void MsgShutdown(QueueMessage &);
-    void MsgGetGameType(QueueMessage &, FH2RemoteClient &);
+    void MsgSetGameType(QueueMessage &, FH2RemoteClient &);
     void MsgLoadMaps(QueueMessage &, FH2RemoteClient &);
 
     FH2RemoteClients clients;

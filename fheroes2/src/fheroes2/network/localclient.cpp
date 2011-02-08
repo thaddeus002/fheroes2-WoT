@@ -103,7 +103,7 @@ int FH2LocalClient::Main(void)
     const Settings & conf = Settings::Get();
     std::string err;
 
-    if(ConnectionChat() && GetGameType())
+    if(ConnectionChat())
     {
 	if(Game::STANDARD & conf.GameType())
 	{
@@ -197,6 +197,7 @@ bool FH2LocalClient::WaitSend(QueueMessage & msg, u16 id, const char* str)
 
 bool FH2LocalClient::ConnectionChat(void)
 {
+    const Settings & conf = Settings::Get();
     QueueMessage packet;
 
     player_color = 0;
@@ -219,6 +220,7 @@ bool FH2LocalClient::ConnectionChat(void)
     // send hello
     packet.Reset();
     packet.SetID(MSG_HELLO);
+    packet.Push(conf.GameType());
     packet.Push(player_name);
 
     if(!SendWait(packet, MSG_HELLO, "ConnectionChat: "))
@@ -238,24 +240,6 @@ bool FH2LocalClient::ConnectionChat(void)
 	Dialog::Message("Error", str, Font::BIG, Dialog::OK);
 	return false;
     }
-
-    return true;
-}
-
-bool FH2LocalClient::GetGameType(void)
-{
-    Settings & conf = Settings::Get();
-
-    // game type
-    u8 type = conf.GameType();
-    QueueMessage packet(MSG_GET_GAME_TYPE);
-    packet.Push(type);
-
-    if(!SendWait(packet, MSG_GET_GAME_TYPE, "ConnectionChat: "))
-	return false;
-
-    packet.Pop(type);
-    conf.SetGameType(type);
 
     return true;
 }
