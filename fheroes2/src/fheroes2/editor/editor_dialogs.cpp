@@ -149,6 +149,86 @@ public:
     };
 };
 
+class SelectEnumSpell : public SelectEnum
+{
+public:
+    SelectEnumSpell(const Rect & rt) : SelectEnum(rt) { SetAreaMaxItems(4); };
+
+    void RedrawItem(const int & index, s16 dstx, s16 dsty, bool current)
+    {
+      Display & display = Display::Get();
+      Spell spell(index);
+      display.Blit(AGG::GetICN(ICN::SPELLS, spell.IndexSprite()), dstx + 5, dsty + 3);
+
+      Text text(spell.GetName(), (current ? Font::YELLOW_BIG : Font::BIG));
+      text.Blit(dstx + 80, dsty + 10);
+    };
+
+    void RedrawBackground(const Point & dst)
+    {
+      Text text("Select Spell:", Font::YELLOW_BIG);
+      text.Blit(dst.x + (area.w - text.w()) / 2, dst.y);
+
+      SelectEnum::RedrawBackground(dst);
+    };
+};
+
+Spell Dialog::SelectSpell(u8 cur)
+{
+    Display & display = Display::Get();
+    Cursor & cursor = Cursor::Get();
+    LocalEvent & le = LocalEvent::Get();
+
+    std::vector<int> spells(static_cast<int>(Spell::STONE - 1), Spell::NONE);
+
+    cursor.Hide();
+    cursor.SetThemes(cursor.POINTER);
+
+
+    for(size_t ii = 0; ii < spells.size(); ++ii) spells[ii] = ii + 1;
+
+    const u16 window_w = 340;
+    const u16 window_h = 280;
+
+    Dialog::FrameBorder frameborder;
+    frameborder.SetPosition((display.w() - window_w) / 2 - BORDERWIDTH,
+			    (display.h() - window_h) / 2 - BORDERWIDTH, window_w, window_h);
+    frameborder.Redraw(AGG::GetICN(ICN::TEXTBAK2, 0));
+
+    const Rect & area = frameborder.GetArea();
+
+    SelectEnumSpell listbox(area);
+
+    listbox.SetListContent(spells);
+    if(cur != Spell::NONE)
+	listbox.SetCurrent(static_cast<int>(cur));
+    listbox.Redraw();
+
+    ButtonGroups btnGroups(area, Dialog::OK|Dialog::CANCEL);
+    btnGroups.Draw();
+
+    cursor.Show();
+    display.Flip();
+
+    u16 result = Dialog::ZERO;
+
+    while(result == Dialog::ZERO && ! listbox.ok && le.HandleEvents())
+    {
+        result = btnGroups.QueueEventProcessing();
+        listbox.QueueEventProcessing();
+
+        if(!cursor.isVisible())
+        {
+            listbox.Redraw();
+            cursor.Show();
+            display.Flip();
+        }
+    }
+
+    return result == Dialog::OK || listbox.ok ?
+	Spell(listbox.GetCurrent()) : Spell(Spell::NONE);
+}
+
 
 Artifact Dialog::SelectArtifact(u8 cur)
 {

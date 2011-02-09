@@ -253,7 +253,12 @@ bool SelectArtifactsBar::QueueEventProcessing(SelectArtifactsBar & bar)
 	    if(index1 == index2)
 	    {
 		if(art1() == Artifact::MAGIC_BOOK)
-		    bar.hero.OpenSpellBook(SpellBook::ALL, false);
+		{
+		    if(bar.ChangeMode())
+			bar.hero.EditSpellBook();
+		    else
+			bar.hero.OpenSpellBook(SpellBook::ALL, false);
+		}
 		else
 		    Dialog::ArtifactInfo(art1.GetName(), art1.GetDescription(), art1);
 	    }

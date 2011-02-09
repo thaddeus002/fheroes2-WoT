@@ -73,6 +73,7 @@ public:
     void SetSpellPoints(u16);
     void TakeSpellPoints(u16);
 
+    void EditSpellBook(void);
     Spell OpenSpellBook(SpellBook::filter_t, bool) const;
     bool HaveSpellBook(void) const;
     bool HaveSpell(const Spell &) const;

@@ -38,6 +38,7 @@ struct SpellBook : public SpellStorage
     };
 
     Spell Open(const HeroBase &, filter_t, bool canselect) const;
+    void  Edit(const HeroBase &);
 };
 
 #endif

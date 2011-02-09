@@ -78,6 +78,11 @@ void HeroBase::TakeSpellPoints(u16 points)
     magic_point -= (points < magic_point ? points : magic_point);
 }
 
+void HeroBase::EditSpellBook(void)
+{
+    spell_book.Edit(*this);
+}
+
 Spell HeroBase::OpenSpellBook(SpellBook::filter_t flt, bool canselect) const
 {
     return spell_book.Open(*this, flt, canselect);
