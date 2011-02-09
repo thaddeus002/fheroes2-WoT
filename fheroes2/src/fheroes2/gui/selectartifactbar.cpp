@@ -30,15 +30,17 @@
 #include "tools.h"
 #include "heroes.h"
 #include "artifact.h"
-#include "selectartifactbar.h"
+#include "editor_dialogs.h"
 #include "localclient.h"
+#include "selectartifactbar.h"
 
 #define MAXARTIFACTLINE		7
 
 enum
 {
     FLAGS_READONLY	= 0x01,
-    FLAGS_USEART32	= 0x02
+    FLAGS_USEART32	= 0x02,
+    FLAGS_CHANGEMODE	= 0x04
 };
 
 SelectArtifactsBar::SelectArtifactsBar(Heroes &h) : hero(h), interval(0), selected(-1), flags(0), background(NULL)
@@ -131,6 +133,11 @@ void SelectArtifactsBar::SetInterval(const u8 it)
     }
 }
 
+void SelectArtifactsBar::SetChangeMode(void)
+{
+    flags |= FLAGS_CHANGEMODE;
+}
+
 void SelectArtifactsBar::SetReadOnly(void)
 {
     flags |= FLAGS_READONLY;
@@ -139,6 +146,11 @@ void SelectArtifactsBar::SetReadOnly(void)
 void SelectArtifactsBar::SetUseArts32Sprite(void)
 {
     flags |= FLAGS_USEART32;
+}
+
+bool SelectArtifactsBar::ChangeMode(void) const
+{
+    return flags & FLAGS_CHANGEMODE;
 }
 
 bool SelectArtifactsBar::ReadOnly(void) const
@@ -159,7 +171,7 @@ void SelectArtifactsBar::Redraw(Surface & display)
 	const Artifact & art = arts[ii];
 
 	display.Blit(*background, pt);
-	if(art != Artifact::UNKNOWN)
+	if(art.isValid())
 	{
 	    if(flags & FLAGS_USEART32)
     		display.Blit(AGG::GetICN(ICN::ARTFX, art.IndexSprite32()), pt.x + 1, pt.y + 1);
@@ -177,7 +189,7 @@ void SelectArtifactsBar::Redraw(Surface & display)
 	const Artifact & art = arts[ii + MAXARTIFACTLINE];
 
 	display.Blit(*background, pt);
-	if(art != Artifact::UNKNOWN)
+	if(art.isValid())
 	{
 	    if(flags & FLAGS_USEART32)
     		display.Blit(AGG::GetICN(ICN::ARTFX, art.IndexSprite32()), pt.x + 1, pt.y + 1);
@@ -260,10 +272,17 @@ bool SelectArtifactsBar::QueueEventProcessing(SelectArtifactsBar & bar)
 	}
 	else
 	// select
-	if(!bar.ReadOnly() && art1() != Artifact::UNKNOWN)
+	if(!bar.ReadOnly() && art1.isValid())
 	{
 	    bar.Select(index1);
 	    change = true;
+	}
+	else
+	if(bar.ChangeMode() && !art1.isValid())
+	{
+	    art1 = Dialog::SelectArtifact();
+	    if(art1.isValid())
+		change = true;
 	}
     }
     else
@@ -272,8 +291,16 @@ bool SelectArtifactsBar::QueueEventProcessing(SelectArtifactsBar & bar)
     {
         bar.Reset();
 	// show quick info
-	if(art1() != Artifact::UNKNOWN)
+	if(art1.isValid())
+	{
+	    if(bar.ChangeMode())
+    	    {
+                art1.Reset();                                                                                                
+                change = true;                                                                                                 
+    	    }
+	    else
 	    Dialog::ArtifactInfo(art1.GetName(), art1.GetDescription(), art1, 0);
+	}
     }
 
     Cursor::Get().Show();

@@ -105,6 +105,11 @@ void Dialog::FrameBorder::Redraw(const Surface & sf)
     DrawBorder2(GetRect().x, GetRect().y, GetRect().w, GetRect().h, sf, Display::Get());
 }
 
+void Dialog::FrameBorder::Redraw(const Rect & rt, const Surface & sf)
+{
+    DrawBorder2(rt.x, rt.y, rt.w, rt.h, sf, Display::Get());
+}
+
 Dialog::FrameBorder::~FrameBorder()
 {
     if(Cursor::Get().isVisible()){ Cursor::Get().Hide(); };

@@ -41,6 +41,7 @@ public:
     s8		GetIndexFromCoord(const Point &);
     s8		Selected(void) const;
 
+    bool	ChangeMode(void) const;
     bool	ReadOnly(void) const;
     bool	isValid(void) const;
 
@@ -50,6 +51,7 @@ public:
     void	SetCursorSprite(const Surface &);
     void 	SetInterval(u8);
 
+    void        SetChangeMode(void);
     void	SetReadOnly(void);
     void        SetUseArts32Sprite(void);
 

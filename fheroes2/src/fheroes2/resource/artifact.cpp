@@ -483,6 +483,11 @@ void Artifact::SetSpell(u8 v)
     ext = v;
 }
 
+void Artifact::Reset(void)
+{
+    id = UNKNOWN;
+    ext = 0;
+}
 
 /* get rand all artifact */
 u8 Artifact::Rand(level_t lvl)

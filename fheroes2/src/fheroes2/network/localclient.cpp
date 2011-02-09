@@ -217,16 +217,18 @@ bool FH2LocalClient::ConnectionChat(void)
     if(!Dialog::InputString("Connected to " + server + "\n \n" + str + "\n \nEnter player name:", player_name))
 	return false;
 
+    u8 game_type = conf.GameType();
+    DEBUG(DBG_NETWORK, DBG_INFO, "game type: 0x" << std::hex << static_cast<int>(game_type));
+    
     // send hello
     packet.Reset();
     packet.SetID(MSG_HELLO);
-    packet.Push(conf.GameType());
+    packet.Push(game_type);
     packet.Push(player_name);
 
     if(!SendWait(packet, MSG_HELLO, "ConnectionChat: "))
 	return false;
 
-    u8 game_type;
 
     packet.Pop(modes);
     packet.Pop(game_type);
@@ -235,6 +237,7 @@ bool FH2LocalClient::ConnectionChat(void)
 
     if(conf.GameType() != game_type)
 	conf.SetGameType(game_type);
+    DEBUG(DBG_NETWORK, DBG_INFO, "game type: 0x" << std::hex << static_cast<int>(game_type));
 
     // ready
     DEBUG(DBG_NETWORK, DBG_INFO, "wait: " << Network::GetMsgString(MSG_READY));

@@ -29,39 +29,30 @@
 class SelectEnum : public Interface::ListBox<int>
 {
 public:
-    SelectEnum(const Point & pt) : Interface::ListBox<int>(pt), ok(false)
+    SelectEnum(const Rect & rt) : Interface::ListBox<int>(rt), area(rt), ok(false)
     {
-      RedrawBackground(pt);
-      SetScrollButtonUp(ICN::LISTBOX, 3, 4, Point(pt.x + 256, pt.y + 25));
-      SetScrollButtonDn(ICN::LISTBOX, 5, 6, Point(pt.x + 256, pt.y + 225));
+      RedrawBackground(rt);
+      SetScrollButtonUp(ICN::LISTBOX, 3, 4, Point(rt.x + rt.w - 24, rt.y + 25));
+      SetScrollButtonDn(ICN::LISTBOX, 5, 6, Point(rt.x + rt.w - 24, rt.y + rt.h - 55));
 
-      SetScrollSplitter(AGG::GetICN(ICN::LISTBOX, 10), Rect(pt.x + 261, pt.y + 48, 14, 174));
+      SetScrollSplitter(AGG::GetICN(ICN::LISTBOX, 10), Rect(rt.x + rt.w - 19, rt.y + 48, 14, rt.h - 106));
       SetAreaMaxItems(5);
-      SetAreaItems(Rect(pt.x + 10, pt.y + 30, 250, 210));
+      SetAreaItems(Rect(rt.x + 10, rt.y + 30, rt.w - 30, rt.h - 70));
     };
    
     void RedrawBackground(const Point & dst)
     {
       Display & display = Display::Get();
 
-      // top line
-      display.Blit(AGG::GetICN(ICN::LISTBOX, 0), dst.x + 2, dst.y + 25);
-
-      // middle line
-      for(u8 ii = 1; ii < 11; ++ii)
-        display.Blit(AGG::GetICN(ICN::LISTBOX, 1), dst.x + 2, dst.y + 25 + (ii * 19));
-
-      // bottom line
-      display.Blit(AGG::GetICN(ICN::LISTBOX, 2), dst.x + 2, dst.y + 225);
-
-
+      Dialog::FrameBorder::Redraw(Rect(dst.x, dst.y + 25, rtAreaItems.w + 5, rtAreaItems.h + 10),
+							AGG::GetICN(ICN::CELLWIN, 1));
       // scroll
-      display.Blit(AGG::GetICN(ICN::LISTBOX, 7), dst.x + 256, dst.y + 45);
+      display.Blit(AGG::GetICN(ICN::LISTBOX, 7), dst.x + area.w - 24, dst.y + 45);
 
       for(u8 ii = 1; ii < 9; ++ii)
-        display.Blit(AGG::GetICN(ICN::LISTBOX, 8), dst.x + 256, dst.y + 44 + (ii * 19));
+        display.Blit(AGG::GetICN(ICN::LISTBOX, 8), dst.x + area.w - 24, dst.y + 44 + (ii * 19));
 
-      display.Blit(AGG::GetICN(ICN::LISTBOX, 9), dst.x + 256, dst.y + 206);
+      display.Blit(AGG::GetICN(ICN::LISTBOX, 9), dst.x + area.w - 24, dst.y + area.h - 74);
     };
 
     void ActionListDoubleClick(int & index)
@@ -75,13 +66,14 @@ public:
     void ActionListSingleClick(int &){};
     void ActionListPressRight(int &){};
 
+    Rect area;
     bool ok;
 };
 
 class SelectEnumMonster : public SelectEnum
 {
 public:
-    SelectEnumMonster(const Point & pt) : SelectEnum(pt) {};
+    SelectEnumMonster(const Rect & rt) : SelectEnum(rt) {};
 
 
     void RedrawItem(const int & index, s16 dstx, s16 dsty, bool current)
@@ -97,7 +89,7 @@ public:
     void RedrawBackground(const Point & dst)
     {
       Text text("Select Monster:", Font::YELLOW_BIG);
-      text.Blit(dst.x + 140 - text.w() / 2, dst.y);
+      text.Blit(dst.x + (area.w - text.w()) / 2, dst.y);
 
       SelectEnum::RedrawBackground(dst);
     };
@@ -112,7 +104,7 @@ public:
 class SelectEnumHeroes : public SelectEnum
 {
 public:
-    SelectEnumHeroes(const Point & pt) : SelectEnum(pt) {};
+    SelectEnumHeroes(const Rect & rt) : SelectEnum(rt) { SetAreaMaxItems(6); };
 
     void RedrawItem(const int & index, s16 dstx, s16 dsty, bool current)
     {
@@ -121,20 +113,98 @@ public:
       display.Blit(Heroes::GetPortrait30x22(hero), dstx + 5, dsty + 3);
 
       Text text(Heroes::GetName(hero), (current ? Font::YELLOW_BIG : Font::BIG));
-      text.Blit(dstx + 50, dsty + 10);
+      text.Blit(dstx + 50, dsty + 5);
     };
 
     void RedrawBackground(const Point & dst)
     {
       Text text("Select Hero:", Font::YELLOW_BIG);
-      text.Blit(dst.x + 140 - text.w() / 2, dst.y);
+      text.Blit(dst.x + (area.w - text.w()) / 2, dst.y);
+
+      SelectEnum::RedrawBackground(dst);
+    };
+};
+
+class SelectEnumArtifact : public SelectEnum
+{
+public:
+    SelectEnumArtifact(const Rect & rt) : SelectEnum(rt) {};
+
+    void RedrawItem(const int & index, s16 dstx, s16 dsty, bool current)
+    {
+      Display & display = Display::Get();
+      Artifact art(index);
+      display.Blit(AGG::GetICN(ICN::ARTFX, art.IndexSprite32()), dstx + 5, dsty + 3);
+
+      Text text(art.GetName(), (current ? Font::YELLOW_BIG : Font::BIG));
+      text.Blit(dstx + 50, dsty + 10);
+    };
+
+    void RedrawBackground(const Point & dst)
+    {
+      Text text("Select Artifact:", Font::YELLOW_BIG);
+      text.Blit(dst.x + (area.w - text.w()) / 2, dst.y);
 
       SelectEnum::RedrawBackground(dst);
     };
 };
 
 
+Artifact Dialog::SelectArtifact(u8 cur)
+{
+    Display & display = Display::Get();
+    Cursor & cursor = Cursor::Get();
+    LocalEvent & le = LocalEvent::Get();
 
+    std::vector<int> artifacts(static_cast<int>(Artifact::UNKNOWN), Artifact::UNKNOWN);
+
+    cursor.Hide();
+    cursor.SetThemes(cursor.POINTER);
+
+
+    for(size_t ii = 0; ii < artifacts.size(); ++ii) artifacts[ii] = ii;
+
+    const u16 window_w = 370;
+    const u16 window_h = 280;
+
+    Dialog::FrameBorder frameborder;
+    frameborder.SetPosition((display.w() - window_w) / 2 - BORDERWIDTH,
+			    (display.h() - window_h) / 2 - BORDERWIDTH, window_w, window_h);
+    frameborder.Redraw(AGG::GetICN(ICN::TEXTBAK2, 0));
+
+    const Rect & area = frameborder.GetArea();
+
+    SelectEnumArtifact listbox(area);
+
+    listbox.SetListContent(artifacts);
+    if(cur != Artifact::UNKNOWN)
+	listbox.SetCurrent(static_cast<int>(cur));
+    listbox.Redraw();
+
+    ButtonGroups btnGroups(area, Dialog::OK|Dialog::CANCEL);
+    btnGroups.Draw();
+
+    cursor.Show();
+    display.Flip();
+
+    u16 result = Dialog::ZERO;
+
+    while(result == Dialog::ZERO && ! listbox.ok && le.HandleEvents())
+    {
+        result = btnGroups.QueueEventProcessing();
+        listbox.QueueEventProcessing();
+
+        if(!cursor.isVisible())
+        {
+            listbox.Redraw();
+            cursor.Show();
+            display.Flip();
+        }
+    }
+
+    return result == Dialog::OK || listbox.ok ?
+	Artifact(listbox.GetCurrent()) : Artifact(Artifact::UNKNOWN);
+}
 
 Monster::monster_t Dialog::SelectMonster(Monster::monster_t cur)
 {
@@ -150,7 +220,7 @@ Monster::monster_t Dialog::SelectMonster(Monster::monster_t cur)
 
     for(size_t ii = 0; ii < monsters.size(); ++ii) monsters[ii] = Monster::FromInt(ii + 1);
 
-    const u16 window_w = 280;
+    const u16 window_w = 260;
     const u16 window_h = 280;
 
     Dialog::FrameBorder frameborder;
@@ -206,7 +276,7 @@ Heroes::heroes_t Dialog::SelectHeroes(Heroes::heroes_t cur)
 
     for(size_t ii = 0; ii < heroes.size(); ++ii) heroes[ii] = Heroes::ConvertID(ii);
 
-    const u16 window_w = 280;
+    const u16 window_w = 240;
     const u16 window_h = 280;
 
     Dialog::FrameBorder frameborder;

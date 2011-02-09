@@ -321,7 +321,7 @@ int FH2RemoteClient::Main(void)
 		msg.SetReady();
 	    }
 
-	    DELAY(100);
+	    DELAY(10);
 	}
     }
 
@@ -392,6 +392,9 @@ bool FH2RemoteClient::ConnectionChat(void)
 
     if(Modes(ST_ADMIN) && conf.GameType() != game_type) SetGameType(game_type);
 
+    // wait set game type
+    DELAY(100);
+
     // send hello, modes, id
     packet.Reset();
     packet.SetID(MSG_HELLO);
@@ -416,6 +419,8 @@ void FH2RemoteClient::SetGameType(u8 type)
     RemoteMessage & msg = server.GetNewMessage(*this);
     QueueMessage & packet = msg.packet;
 
+    DEBUG(DBG_NETWORK, DBG_INFO, "0x" << std::hex << static_cast<int>(type));
+
     packet.SetID(MSG_SET_GAMETYPE);
     packet.Push(type);
     msg.SetReady();
@@ -431,7 +436,7 @@ bool FH2RemoteClient::UpdateColors(void)
 
     if(0 == player_color)
     {
-	DEBUG(DBG_NETWORK, DBG_INFO, "id: 0x" << std::hex << player_id << " invalid color");
+	DEBUG(DBG_NETWORK, DBG_INFO, "0x" << std::hex << player_id << " invalid color");
 	err = "full house";
     }
 
@@ -450,7 +455,7 @@ bool FH2RemoteClient::SendAccessDenied(QueueMessage & msg)
     msg.Reset();
     msg.SetID(MSG_ACCESS_DENIED);
 
-    DEBUG(DBG_NETWORK, DBG_INFO, "");
+    DEBUG(DBG_NETWORK, DBG_INFO, "size: " << std::dec << msg.DtSz() << " bytes");
     return Send(msg);
 }
 
@@ -462,7 +467,7 @@ bool FH2RemoteClient::SendMapsInfoList(QueueMessage & msg)
     msg.SetID(MSG_GET_MAPS_LIST);
     server.PushMapsFileInfoList(msg);
 
-    DEBUG(DBG_NETWORK, DBG_INFO, "");
+    DEBUG(DBG_NETWORK, DBG_INFO, "size: " << std::dec << msg.DtSz() << " bytes");
     return Send(msg);
 }
 
@@ -478,7 +483,8 @@ bool FH2RemoteClient::SendCurrentColor(QueueMessage & msg)
     // players info
     server.PushPlayersInfo(msg);
 
-    DEBUG(DBG_NETWORK, DBG_INFO, Color::String(player_color));
+    DEBUG(DBG_NETWORK, DBG_INFO, Color::String(player_color) << ", " <<
+			    "size: " << std::dec << msg.DtSz() << " bytes");
     return Send(msg);
 }
 
@@ -492,7 +498,8 @@ bool FH2RemoteClient::SendCurrentMapInfo(QueueMessage & msg)
     // added cur maps info
     Network::PacketPushMapsFileInfo(msg, conf.CurrentFileInfo());
 
-    DEBUG(DBG_NETWORK, DBG_INFO, "");
+    DEBUG(DBG_NETWORK, DBG_INFO, "size: " << std::dec << msg.DtSz() << " bytes");
+
     return Send(msg);
 }
 
@@ -507,6 +514,7 @@ void FH2RemoteClient::Reset(void)
 	Network::Socket::Close();
 
     modes = 0;
+    DEBUG(DBG_NETWORK, DBG_TRACE, "reset modes");
 }
 
 void FH2RemoteClient::Dump(void) const

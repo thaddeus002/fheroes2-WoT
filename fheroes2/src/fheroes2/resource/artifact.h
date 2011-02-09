@@ -165,6 +165,8 @@ public:
     bool isUltimate(void) const;
     bool isValid(void) const;
 
+    void Reset(void);
+
     u16 ExtraValue(void) const;
     u8 Level(void) const;
     u8 LoyaltyLevel(void) const;

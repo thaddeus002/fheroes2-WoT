@@ -37,6 +37,7 @@
 #include "editor_dialogs.h"
 #include "network.h"
 #include "button.h"
+#include "race.h"
 #include "game.h"
 
 #ifdef BUILD_BATTLEONLY
@@ -146,7 +147,7 @@ struct BattleOnly
 	rt2(23, 347, 34, 34), sfb2(rt2.w, rt2.h), sfc2(rt2.w, rt2.h)
     {
 #ifdef WITH_NET
-	if(Network::isLocalClient())
+	if(! Network::isRemoteClient())
 #endif
 	{
 	    const Sprite &backSprite = AGG::GetICN(ICN::SWAPWIN, 0);
@@ -250,16 +251,25 @@ bool BattleOnly::ChangeSettings(void)
     bool exit = false;
     bool redraw = false;
     bool result = false;
+    bool allow1 = true;
+    bool allow2 = true;
 
     Button buttonStart(Point(cur_pt.x + 280, cur_pt.y + 428), ICN::SYSTEM, 1, 2);
 
 #ifdef WITH_NET
-    FH2LocalClient & local = FH2LocalClient::Get();
+    if(Network::isLocalClient())
+    {
+	FH2LocalClient & local = FH2LocalClient::Get();
 
-    if(local.Modes(ST_ADMIN))
-	FH2LocalClient::SendUpdateBattleOnlySettings(*this);
-
-    buttonStart.SetDisable(! local.Modes(ST_ADMIN));
+	if(local.Modes(ST_ADMIN))
+	    FH2LocalClient::SendUpdateBattleOnlySettings(*this);
+	else
+	{
+	    allow1 = false;
+	    allow2 = false;
+	    buttonStart.SetDisable(true);
+	}
+    }
 #endif
 
     buttonStart.Draw();
@@ -275,15 +285,24 @@ bool BattleOnly::ChangeSettings(void)
 
 	if((buttonStart.isEnable() && le.MouseClickLeft(buttonStart)) ||
 	    Game::HotKeyPress(Game::EVENT_DEFAULT_READY))
+	{
 #ifdef WITH_NET
-	    { if(local.Modes(ST_ADMIN)) local.SendStartBattleOnly(); }
-#else
-	    { result = true; exit = true; }
+	    if(Network::isLocalClient())
+	    {
+		FH2LocalClient & local = FH2LocalClient::Get();
+		if(local.Modes(ST_ADMIN)) local.SendStartBattleOnly();
+	    }
+	    else
 #endif
+	    {
+		result = true;
+		exit = true;
+	    }
+	}
         else
 	if(Game::HotKeyPress(Game::EVENT_DEFAULT_EXIT)) exit = true;
 
-	if(le.MouseClickLeft(rtPortrait1))
+	if(allow1 && le.MouseClickLeft(rtPortrait1))
 	{
 	    Heroes::heroes_t hid = Dialog::SelectHeroes(hero1->GetID());
 	    if(hero2 && hid == hero2->GetID())
@@ -299,7 +318,7 @@ bool BattleOnly::ChangeSettings(void)
 	    }
 	}
 	else
-	if(le.MouseClickLeft(rtPortrait2))
+	if(allow2 && le.MouseClickLeft(rtPortrait2))
 	{
 	    Heroes::heroes_t hid = Dialog::SelectHeroes(hero2 ? hero2->GetID() : Heroes::UNKNOWN);
 	    if(hid == hero1->GetID())
@@ -317,47 +336,50 @@ bool BattleOnly::ChangeSettings(void)
 	    }
 	}
 
-	if(le.MouseClickLeft(rtAttack1))
+	if(hero1 && allow1)
 	{
-	    u32 value = hero1->attack;
-	    if(Dialog::SelectCount("Set Attack Skill", 0, PRIMARY_MAX_VALUE, value))
+	    if(le.MouseClickLeft(rtAttack1))
 	    {
-		hero1->attack = value;
-		redraw = true;
+		u32 value = hero1->attack;
+		if(Dialog::SelectCount("Set Attack Skill", 0, PRIMARY_MAX_VALUE, value))
+		{
+		    hero1->attack = value;
+		    redraw = true;
+		}
 	    }
-	}
-	else
-	if(le.MouseClickLeft(rtDefense1))
-	{
-	    u32 value = hero1->defense;
-	    if(Dialog::SelectCount("Set Defense Skill", 0, PRIMARY_MAX_VALUE, value))
+	    else
+	    if(le.MouseClickLeft(rtDefense1))
 	    {
-		hero1->defense = value;
-		redraw = true;
+		u32 value = hero1->defense;
+		if(Dialog::SelectCount("Set Defense Skill", 0, PRIMARY_MAX_VALUE, value))
+		{
+		    hero1->defense = value;
+		    redraw = true;
+		}
 	    }
-	}
-	else
-	if(le.MouseClickLeft(rtPower1))
-	{
-	    u32 value = hero1->power;
-	    if(Dialog::SelectCount("Set Power Skill", 0, PRIMARY_MAX_VALUE, value))
+	    else
+	    if(le.MouseClickLeft(rtPower1))
 	    {
-		hero1->power = value;
-		redraw = true;
+		u32 value = hero1->power;
+		if(Dialog::SelectCount("Set Power Skill", 0, PRIMARY_MAX_VALUE, value))
+		{
+		    hero1->power = value;
+		    redraw = true;
+		}
 	    }
-	}
-	else
-	if(le.MouseClickLeft(rtKnowledge1))
-	{
-	    u32 value = hero1->knowledge;
-	    if(Dialog::SelectCount("Set Knowledge Skill", 0, PRIMARY_MAX_VALUE, value))
+	    else
+	    if(le.MouseClickLeft(rtKnowledge1))
 	    {
-		hero1->knowledge = value;
-		redraw = true;
+		u32 value = hero1->knowledge;
+		if(Dialog::SelectCount("Set Knowledge Skill", 0, PRIMARY_MAX_VALUE, value))
+		{
+		    hero1->knowledge = value;
+		    redraw = true;
+		}
 	    }
 	}
 
-	if(hero2)
+	if(hero2 && allow2)
 	{
 	    if(le.MouseClickLeft(rtAttack2))
 	    {
@@ -400,7 +422,7 @@ bool BattleOnly::ChangeSettings(void)
 	    }
 	}
 
-	if(le.MouseCursor(selectArmy1.GetArea()))
+	if(allow1 && le.MouseCursor(selectArmy1.GetArea()))
 	{
 	  if(selectArtifacts1->isSelected()) selectArtifacts1->Reset();
 	  else
@@ -412,7 +434,7 @@ bool BattleOnly::ChangeSettings(void)
 	  }
 	}
 
-	if(le.MouseCursor(selectArmy2.GetArea()))
+	if(allow2 && le.MouseCursor(selectArmy2.GetArea()))
 	{
 	  if(selectArtifacts1->isSelected()) selectArtifacts1->Reset();
 	  else
@@ -424,7 +446,7 @@ bool BattleOnly::ChangeSettings(void)
 	  }
 	}
 
-	if(le.MouseCursor(selectArtifacts1->GetArea()))
+	if(allow1 && le.MouseCursor(selectArtifacts1->GetArea()))
 	{
 	  if(selectArmy1.isSelected()) selectArmy1.Reset();
 	  else
@@ -434,7 +456,7 @@ bool BattleOnly::ChangeSettings(void)
 	      redraw = true;
 	}
 
-	if(selectArtifacts2 && le.MouseCursor(selectArtifacts2->GetArea()))
+	if(allow2 && selectArtifacts2 && le.MouseCursor(selectArtifacts2->GetArea()))
 	{
 	  if(selectArmy1.isSelected()) selectArmy1.Reset();
 	  else
@@ -444,13 +466,16 @@ bool BattleOnly::ChangeSettings(void)
 	      redraw = true;
 	}
 
-        if(le.MouseCursor(moraleIndicator1->GetArea())) MoraleIndicator::QueueEventProcessing(*moraleIndicator1);
-        else
-	if(le.MouseCursor(luckIndicator1->GetArea())) LuckIndicator::QueueEventProcessing(*luckIndicator1);
-        else
-	if(le.MouseCursor(secskill_bar1->GetArea())) secskill_bar1->QueueEventProcessing();
+	if(hero1 && allow1)
+	{
+          if(le.MouseCursor(moraleIndicator1->GetArea())) MoraleIndicator::QueueEventProcessing(*moraleIndicator1);
+          else
+	  if(le.MouseCursor(luckIndicator1->GetArea())) LuckIndicator::QueueEventProcessing(*luckIndicator1);
+          else
+	  if(le.MouseCursor(secskill_bar1->GetArea())) secskill_bar1->QueueEventProcessing();
+	}
 
-	if(hero2)
+	if(hero2 && allow2)
 	{
 	  if(le.MouseCursor(moraleIndicator2->GetArea())) MoraleIndicator::QueueEventProcessing(*moraleIndicator2);
 	  else
@@ -459,7 +484,7 @@ bool BattleOnly::ChangeSettings(void)
 	  if(le.MouseCursor(secskill_bar2->GetArea())) secskill_bar2->QueueEventProcessing();
 	}
 
-	if(cinfo2)
+	if(cinfo2 && allow1)
 	{
 	    if(hero2 && le.MouseClickLeft(cinfo2->rtLocal) && control2 != Game::LOCAL)
 	    {
@@ -475,52 +500,56 @@ bool BattleOnly::ChangeSettings(void)
 	}
 
 #ifdef WITH_NET
-	if(redraw && local.Modes(ST_ADMIN))
+	if(Network::isLocalClient())
 	{
-	    FH2LocalClient::SendUpdateBattleOnlySettings(*this);
-	    redraw = false;
-	}
-
-        if(local.Ready())
-        {
-	    QueueMessage packet;
-
-	    if(!local.Recv(packet)) return false;
-	    DEBUG(DBG_NETWORK, DBG_INFO, "recv: " << Network::GetMsgString(packet.GetID()));
-	    switch(packet.GetID())
+	    FH2LocalClient & local = FH2LocalClient::Get();
+	    if(redraw && local.Modes(ST_ADMIN))
 	    {
-		case MSG_START_BATTLEONLY:
-		    result = true;
-		    exit = true;
-		    break;
+		FH2LocalClient::SendUpdateBattleOnlySettings(*this);
+		redraw = false;
+	    }
 
-		case MSG_READY:
-		    break;
+    	    if(local.Ready())
+    	    {
+		QueueMessage packet;
 
-		case MSG_MESSAGE:
-		    break;
-
-		case MSG_SHUTDOWN:
-                    exit = true;
-                    break;
-
-		case MSG_UPDATE_BATTLEONLY:
+		if(!local.Recv(packet)) return false;
+		DEBUG(DBG_NETWORK, DBG_INFO, "recv: " << Network::GetMsgString(packet.GetID()));
+		switch(packet.GetID())
 		{
-		    const Heroes* h1 = hero1;
-		    const Heroes* h2 = hero2;
-		    Network::UnpackBattleOnly(packet, *this);
+		    case MSG_START_BATTLEONLY:
+			result = true;
+			exit = true;
+			break;
 
-		    if(h1 != hero1)
-			UpdateHero1(cur_pt);
+		    case MSG_READY:
+			break;
 
-		    if(h2 != hero2)
-			UpdateHero2(cur_pt);
+		    case MSG_MESSAGE:
+			break;
 
-		    redraw = true;
-		    break;
+		    case MSG_SHUTDOWN:
+                	exit = true;
+                	break;
+
+		    case MSG_UPDATE_BATTLEONLY:
+		    {
+			const Heroes* h1 = hero1;
+			const Heroes* h2 = hero2;
+			Network::UnpackBattleOnly(packet, *this);
+
+			if(h1 != hero1)
+			    UpdateHero1(cur_pt);
+
+			if(h2 != hero2)
+			    UpdateHero2(cur_pt);
+
+			redraw = true;
+			break;
+		    }
+
+		    default: break;
 		}
-
-		default: break;
 	    }
 	}
 #endif
@@ -616,6 +645,7 @@ void BattleOnly::UpdateHero1(const Point & cur_pt)
       selectArtifacts1->SetBackgroundSprite(sfb2);
       selectArtifacts1->SetCursorSprite(sfc2);
       selectArtifacts1->SetUseArts32Sprite();
+      selectArtifacts1->SetChangeMode();
 
       army1 = &hero1->GetArmy();
       selectArmy1.SetArmy(*army1);
@@ -670,6 +700,7 @@ void BattleOnly::UpdateHero2(const Point & cur_pt)
       selectArtifacts2->SetBackgroundSprite(sfb2);
       selectArtifacts2->SetCursorSprite(sfc2);
       selectArtifacts2->SetUseArts32Sprite();
+      selectArtifacts2->SetChangeMode();
 
       army2 = &hero2->GetArmy();
       selectArmy2.SetArmy(*army2);
@@ -686,20 +717,25 @@ void BattleOnly::RedrawBaseInfo(const Point & top)
     std::string message = "%{name1} vs %{name2}";
 
 #ifdef WITH_NET
-    FH2LocalClient & local = FH2LocalClient::Get();
-    const Player* player;
+    if(Network::isLocalClient())
+    {
+	FH2LocalClient & local = FH2LocalClient::Get();
+	const Player* player;
 
-    if(NULL != (player = local.FindPlayer(color1)))
-	String::Replace(message, "%{name1}", player->player_name);
+	if(NULL != (player = local.FindPlayer(color1)))
+	    String::Replace(message, "%{name1}", player->player_name);
 
-    if(NULL != (player = local.FindPlayer(color2)))
-	String::Replace(message, "%{name2}", player->player_name);
+	if(NULL != (player = local.FindPlayer(color2)))
+	    String::Replace(message, "%{name2}", player->player_name);
+	else
+	    String::Replace(message, "(wait connect)", player->player_name);
+    }
     else
-	String::Replace(message, "(wait connect)", player->player_name);
-#else
-    String::Replace(message, "%{name1}", std::string(Race::String(hero1->GetRace())) + " " + hero1->GetName());
-    String::Replace(message, "%{name2}", (hero2 ? std::string(Race::String(hero2->GetRace())) + " " + hero2->GetName() : "Monsters"));
 #endif
+    {
+	String::Replace(message, "%{name1}", std::string(Race::String(hero1->GetRace())) + " " + hero1->GetName());
+	String::Replace(message, "%{name2}", (hero2 ? std::string(Race::String(hero2->GetRace())) + " " + hero2->GetName() : "Monsters"));
+    }
 
     Text text(message, Font::BIG);
     text.Blit(top.x + 320 - text.w() / 2, top.y + 26);
@@ -747,7 +783,7 @@ void BattleOnly::StartBattle(void)
 	    kingdom2->SetControl(Game::REMOTE);
     }
     else
-#else
+#endif
     {
 	conf.SetMyColor(color1);
 	conf.SetCurrentColor(color1);
@@ -755,7 +791,6 @@ void BattleOnly::StartBattle(void)
 	kingdom1->SetControl(control1);
 	if(kingdom2) kingdom2->SetControl(control2);
     }
-#endif
 
     hero1->SetSpellPoints(hero1->GetMaxSpellPoints());
     hero1->Recruit(color1, Point(5, 5));

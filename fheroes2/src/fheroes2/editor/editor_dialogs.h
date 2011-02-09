@@ -26,11 +26,13 @@
 #include "dialog.h"
 #include "heroes.h"
 #include "monster.h"
+#include "artifact.h"
 
 namespace Dialog
 {
     Monster::monster_t	SelectMonster(Monster::monster_t cur = Monster::UNKNOWN);
     Heroes::heroes_t	SelectHeroes(Heroes::heroes_t cur = Heroes::UNKNOWN);
+    Artifact		SelectArtifact(u8 id = Artifact::UNKNOWN);
 }
 
 #endif

@@ -165,6 +165,8 @@ public:
     const Rect & GetArea(void) const;
     const Rect & GetTop(void) const;
 
+    static void Redraw(const Rect &, const Surface &);
+
 private:
     Rect area;
     Rect top;

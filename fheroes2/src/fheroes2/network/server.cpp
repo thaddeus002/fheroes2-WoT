@@ -125,6 +125,8 @@ int FH2Server::Main(void* ptr)
     FH2Server & server = Get();
     SDL::Thread threadConnections;
 
+    DEBUG(DBG_NETWORK, DBG_INFO, "count players: " << static_cast<int>(conf.PreferablyCountPlayers()));
+
     threadConnections.Create(FH2Server::WaitClients, NULL);
 
     Recruits heroes;
@@ -254,7 +256,7 @@ int FH2Server::Main(void* ptr)
 	    }
 	}
 
-	DELAY(100);
+	DELAY(10);
     }
 
     server.clients.Shutdown();
@@ -268,11 +270,11 @@ int FH2Server::Main(void* ptr)
 
 bool FH2Server::BattleRecvTurn(u8 color, const Battle2::Stats & b, const Battle2::Arena & arena, Battle2::Actions & a)
 {
-    // FIXME: check client
+    DEBUG(DBG_NETWORK, DBG_INFO, "color: " << static_cast<int>(color));
+
     FH2RemoteClient* client = clients.GetClient(color);
     if(!client)
     {
-	DEBUG(DBG_NETWORK, DBG_INFO, "unknown color: " << static_cast<int>(color));
 	clients.Dump();
 	Error::Except("FH2Server::BattleRecvTurn");
 	return false;
@@ -330,7 +332,7 @@ bool FH2Server::BattleRecvTurn(u8 color, const Battle2::Stats & b, const Battle2
 		RemoveMessage(*rm);
 	    }
 	}
-	DELAY(100);
+	DELAY(10);
     }
 
     // FIXME: need send board?
@@ -456,9 +458,13 @@ void FH2Server::UpdateColors(void)
 {
     Settings & conf = Settings::Get();
 
+    const u8 colors = clients.GetPlayersColors();
+
     mutexConf.Lock();
-    conf.SetPlayersColors(clients.GetPlayersColors());
+    conf.SetPlayersColors(colors);
     mutexConf.Unlock();
+
+    DEBUG(DBG_NETWORK, DBG_INFO, static_cast<int>(colors));
 }
 
 u8 FH2Server::GetFreeColor(bool admin)
@@ -479,6 +485,8 @@ u8 FH2Server::GetFreeColor(bool admin)
         res = admin ? Color::BLUE : Color::RED;
     }
 
+    DEBUG(DBG_NETWORK, DBG_INFO, Color::String(res));
+
     return res;
 }
 
@@ -493,6 +501,9 @@ void FH2Server::RemoveMessage(const RemoteMessage & rm)
 void FH2Server::PushPlayersInfo(QueueMessage & msg) const
 {
     clients.PushPlayersInfo(msg);
+
+    DEBUG(DBG_NETWORK, DBG_INFO, "count: " << clients.GetConnected());
+    if(IS_DEBUG(DBG_NETWORK, DBG_TRACE)) clients.Dump();
 }
 
 void FH2Server::PushMapsFileInfoList(QueueMessage & msg) const
@@ -502,6 +513,7 @@ void FH2Server::PushMapsFileInfoList(QueueMessage & msg) const
     for(MapsFileInfoList::const_iterator
 	it = finfoList.begin(); it != finfoList.end(); ++it)
 	    Network::PacketPushMapsFileInfo(msg, *it);
+    DEBUG(DBG_NETWORK, DBG_INFO, std::dec << finfoList.size() << "maps, " << "size: " << msg.DtSz() << " bytes");
     mutexConf.Unlock();
 }
 
@@ -511,16 +523,22 @@ void FH2Server::SendUpdatePlayers(QueueMessage & msg, u32 exclude)
     msg.SetID(MSG_UPDATE_PLAYERS);
     PushPlayersInfo(msg);
     clients.Send2All(msg, exclude);
+
+    DEBUG(DBG_NETWORK, DBG_INFO, "size: " << std::dec << msg.DtSz() << " bytes");
 }
 
 void FH2Server::ResetPlayers(void)
 {
     Settings & conf = Settings::Get();
+    clients.ResetPlayersColors();
+    const u8 colors = clients.ResetPlayersColors();
 
     mutexConf.Lock();
     conf.SetPlayersColors(0);
-    conf.SetPlayersColors(clients.ResetPlayersColors());
+    conf.SetPlayersColors(colors);
     mutexConf.Unlock();
+
+    DEBUG(DBG_NETWORK, DBG_INFO, "colors: " << static_cast<int>(colors));
 }
 
 void FH2Server::SetCurrentMap(QueueMessage & msg)
@@ -537,6 +555,8 @@ void FH2Server::SetCurrentMap(QueueMessage & msg)
 
 	mutexConf.Lock();
 	Network::PacketPushMapsFileInfo(msg, conf.CurrentFileInfo());
+	DEBUG(DBG_NETWORK, DBG_INFO, "file: " << conf.CurrentFileInfo().file << ", "
+					<< "size: " << std::dec << msg.DtSz() << " bytes");
 	mutexConf.Unlock();
 
 	clients.Send2All(msg, 0);
@@ -557,6 +577,7 @@ void FH2Server::MsgChangeColors(QueueMessage & msg)
     {
 	if(! clients.ChangeColors(from, to))
 	    UpdateColors();
+	DEBUG(DBG_NETWORK, DBG_INFO, "size: " << std::dec << msg.DtSz() << " bytes");
 	SendUpdatePlayers(msg, 0);
     }
 }
@@ -576,6 +597,7 @@ void FH2Server::MsgChangeRaces(QueueMessage & msg)
         msg.SetID(MSG_CHANGE_RACE);
         clients.ChangeRace(color, race);
         Network::PackRaceColors(msg);
+	DEBUG(DBG_NETWORK, DBG_INFO, "size: " << std::dec << msg.DtSz() << " bytes");
         clients.Send2All(msg, 0);
     }
 }
@@ -596,6 +618,9 @@ void FH2Server::MsgLogout(QueueMessage & msg, FH2RemoteClient & client)
 	str.append(err);
     }
     msg.Push(str);
+
+    DEBUG(DBG_NETWORK, DBG_INFO, str);
+    DEBUG(DBG_NETWORK, DBG_INFO, "size: " << std::dec << msg.DtSz() << " bytes");
 
     clients.Send2All(msg, client.player_id);
 
@@ -621,6 +646,9 @@ void FH2Server::MsgShutdown(QueueMessage & msg)
     std::string str = "server shutdown";
     msg.Push(str);
 
+    DEBUG(DBG_NETWORK, DBG_INFO, str);
+    DEBUG(DBG_NETWORK, DBG_INFO, "size: " << std::dec << msg.DtSz() << " bytes");
+
     clients.Send2All(msg, 0);
 
     SetModes(ST_SHUTDOWN);
@@ -642,6 +670,8 @@ void FH2Server::MsgSetGameType(QueueMessage & msg, FH2RemoteClient & client)
 	    conf.SetGameType(Game::BATTLEONLY | Game::NETWORK);
 	    world.NewMaps(10, 10);
 	}
+
+	DEBUG(DBG_NETWORK, DBG_INFO, "0x" << std::hex << static_cast<int>(conf.GameType()));
     }
 }
 
@@ -685,6 +715,8 @@ void FH2Server::MsgLoadMaps(QueueMessage & msg, FH2RemoteClient & client)
     msg.SetID(MSG_MAPS_LOAD);
     Game::IO::SaveBIN(msg);
 
+    DEBUG(DBG_NETWORK, DBG_INFO, "size: " << std::dec << msg.DtSz() << " bytes");
+
     if(client.Modes(ST_ADMIN) && toAll)
 	clients.Send2All(msg, 0);
     else
@@ -696,7 +728,8 @@ bool FH2Server::BattleSendAction(u8 color, QueueMessage & msg)
     FH2RemoteClient* client = clients.GetClient(color);
     if(client)
     {
-	DEBUG(DBG_NETWORK, DBG_INFO, Network::GetMsgString(msg.GetID()));
+	DEBUG(DBG_NETWORK, DBG_INFO, Network::GetMsgString(msg.GetID()) << ", "
+				<< "size: " << std::dec << msg.DtSz() << " bytes");
 	return client->Send(msg);
     }
     return false;
@@ -713,7 +746,7 @@ bool FH2Server::BattleSendResult(u8 color, const Battle2::Result & res)
 	msg.Push(res.exp1);
 	msg.Push(res.exp2);
 
-	DEBUG(DBG_NETWORK, DBG_INFO, "");
+	DEBUG(DBG_NETWORK, DBG_INFO, "size: " << std::dec << msg.DtSz() << " bytes");
 	return client->Send(msg);
     }
     return false;
@@ -732,7 +765,7 @@ bool FH2Server::BattleSendAttack(u8 color, const Battle2::Stats & attacker, cons
 	msg.Push(dst);
 	targets.Pack(msg);
 
-	DEBUG(DBG_NETWORK, DBG_INFO, "");
+	DEBUG(DBG_NETWORK, DBG_INFO, "size: " << std::dec << msg.DtSz() << " bytes");
 	return client->Send(msg);
     }
     return false;
@@ -746,7 +779,7 @@ bool FH2Server::BattleSendBoard(u8 color, const Battle2::Arena & a)
 	QueueMessage msg(MSG_BATTLE_BOARD);
 	a.PackBoard(msg);
 
-	DEBUG(DBG_NETWORK, DBG_INFO, std::dec << msg.DtSz() << " bytes");
+	DEBUG(DBG_NETWORK, DBG_INFO, "size: " << std::dec << msg.DtSz() << " bytes");
 	return client->Send(msg);
     }
     return false;
@@ -764,7 +797,7 @@ bool FH2Server::BattleSendSpell(u8 color, u16 who, u16 dst, const Spell & spell,
 	msg.Push(color);
 	targets.Pack(msg);
 
-	DEBUG(DBG_NETWORK, DBG_INFO, spell.GetName());
+	DEBUG(DBG_NETWORK, DBG_INFO, spell.GetName() << " " << "size: " << std::dec << msg.DtSz() << " bytes");
 	return client->Send(msg);
     }
     return false;
@@ -792,7 +825,7 @@ bool FH2Server::BattleSendEarthQuakeSpell(u8 color, const std::vector<u8> & targ
 	    it = targets.begin(); it != targets.end(); ++it)
 	    msg.Push(*it);
 
-	DEBUG(DBG_NETWORK, DBG_INFO, spell.GetName());
+	DEBUG(DBG_NETWORK, DBG_INFO, spell.GetName() << " " << "size: " << std::dec << msg.DtSz() << " bytes");
 	return client->Send(msg);
     }
     return false;
