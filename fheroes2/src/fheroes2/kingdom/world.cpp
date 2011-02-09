@@ -42,7 +42,7 @@
 #include "world.h"
 #include "ai.h"
 
-#if GCC_REFERENCE_FAIL
+#ifdef GCC_REFERENCE_FAIL
 struct HeroHasArtifact : public std::binary_function <const HeroBase*, Artifact, bool>
 {
     bool operator() (const HeroBase* hero, Artifact art) const
@@ -1926,7 +1926,7 @@ u16 World::CheckKingdomWins(const Kingdom & kingdom) const
 	else
 	{
 	    const Artifact art = conf.WinsFindArtifactID();
-#if GCC_REFERENCE_FAIL
+#ifdef GCC_REFERENCE_FAIL
 	    if(heroes.end() != std::find_if(heroes.begin(), heroes.end(),
 		std::bind2nd(HeroHasArtifact(), art)))
 		return GameOver::WINS_ARTIFACT;
