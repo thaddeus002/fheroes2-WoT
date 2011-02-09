@@ -2707,11 +2707,11 @@ void ActionToMagellanMaps(Heroes &hero, const u8 obj, const s32 dst_index)
 void ActionToEvent(Heroes &hero, const u8 obj, const s32 dst_index)
 {
     // check event maps
-    const EventMaps* event_ptr = world.GetEventMaps(hero.GetColor(), dst_index);
+    EventMaps* event_ptr = world.GetEventMaps(hero.GetColor(), dst_index);
 
     if(event_ptr)
     {
-	const EventMaps & event_maps = *event_ptr;
+	EventMaps & event_maps = *event_ptr;
 
 	hero.SetMove(false);
 
@@ -2736,6 +2736,8 @@ void ActionToEvent(Heroes &hero, const u8 obj, const s32 dst_index)
 		Dialog::ArtifactInfo("", message, art);
 	    }
 	}
+
+	event_maps.SetVisited(hero.GetColor());
     }
 
     hero.SaveUnderObject(MP2::OBJ_ZERO);

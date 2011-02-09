@@ -48,6 +48,9 @@ struct EventMaps : public Maps::Position
 {
     EventMaps() {}
     EventMaps(s32 index, const void *ptr);
+    
+    bool isAllow(u8 color, s32 index) const;
+    void SetVisited(u8 color);
 
     Resource::funds_t resource;
     Artifact artifact;

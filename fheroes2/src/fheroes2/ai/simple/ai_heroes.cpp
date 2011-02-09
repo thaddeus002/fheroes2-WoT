@@ -1066,13 +1066,14 @@ void AIToXanadu(Heroes &hero, const u8 obj, const s32 dst_index)
 void AIToEvent(Heroes &hero, const u8 obj, const s32 dst_index)
 {
     // check event maps
-    const EventMaps* event_maps = world.GetEventMaps(hero.GetColor(), dst_index);
+    EventMaps* event_maps = world.GetEventMaps(hero.GetColor(), dst_index);
     if(event_maps)
     {
         if(event_maps->resource.GetValidItems())
     	    world.GetKingdom(hero.GetColor()).AddFundsResource(event_maps->resource);
 	if(event_maps->artifact.isValid())
 	    hero.PickupArtifact(event_maps->artifact);
+	event_maps->SetVisited(hero.GetColor());
     }
 
     hero.SaveUnderObject(MP2::OBJ_ZERO);

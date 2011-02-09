@@ -137,7 +137,7 @@ public:
     u16 CheckKingdomLoss(const Kingdom &) const;
 
     EventsDate GetEventsDate(const Color::color_t) const;
-    const EventMaps* GetEventMaps(const Color::color_t c, const s32 index) const;
+    EventMaps* GetEventMaps(const Color::color_t c, const s32 index);
     Riddle* GetSphinx(const s32 index);
 
     Heroes* GetFreemanHeroes(u8 rc = 0) const;

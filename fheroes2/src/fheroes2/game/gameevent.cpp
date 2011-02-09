@@ -228,6 +228,19 @@ EventMaps::EventMaps(s32 index, const void *ptr)
     DEBUG(DBG_GAME , DBG_INFO, "add: " << message);
 }
 
+void EventMaps::SetVisited(u8 color)
+{
+    if(cancel)
+	colors = 0;
+    else
+	colors &= ~color;
+}
+
+bool EventMaps::isAllow(u8 col, s32 ii) const
+{
+    return ii == GetIndex() && (col & colors);
+}
+
 Riddle::Riddle(s32 index, const void *ptr) : valid(false)
 {
     SetIndex(index);

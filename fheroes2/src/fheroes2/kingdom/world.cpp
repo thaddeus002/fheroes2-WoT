@@ -1714,13 +1714,13 @@ EventsDate World::GetEventsDate(const Color::color_t c) const
     return res;
 }
 
-const EventMaps* World::GetEventMaps(const Color::color_t c, const s32 index) const
+EventMaps* World::GetEventMaps(const Color::color_t c, const s32 index)
 {
     if(vec_eventsmap.size())
     {
-	for(EventsMaps::const_iterator
+	for(EventsMaps::iterator
 	    it = vec_eventsmap.begin(); it != vec_eventsmap.end(); ++it)
-	    if(*it == index && (c & (*it).colors)) return &(*it);
+	    if((*it).isAllow(c, index)) return &(*it);
     }
 
     return NULL;
