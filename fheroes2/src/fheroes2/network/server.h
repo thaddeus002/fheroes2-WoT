@@ -77,6 +77,7 @@ public:
 
     static int Main(void*);
     static int WaitClients(void*);
+    static int RunServerProcess(void*);
 
     bool BattleSendAction(u8, QueueMessage &);
     bool BattleSendAttack(u8, const Battle2::Stats &, const Battle2::Stats &, u16, const Battle2::TargetsInfo &);

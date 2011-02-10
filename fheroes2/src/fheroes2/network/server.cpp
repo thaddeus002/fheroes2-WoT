@@ -37,6 +37,7 @@
 #include "server.h"
 
 #ifdef WITH_NET
+#include <stdlib.h>
 
 u32 RemoteMessage::sid = 1001;
 
@@ -876,9 +877,13 @@ bool FH2Server::BattleSendEarthQuakeSpell(u8 color, const std::vector<u8> & targ
     return false;
 }
 
-
-
-
+int FH2Server::RunServerProcess(void*)
+{
+    const std::string command = Game::GetARGV(0);
+    std::ostringstream os;
+    os << command << " -s" << ">" << GetDirname(command) << SEPARATOR << "fh2server.log";
+    return system(os.str().c_str());
+}
 
 Game::menu_t Game::NetworkHost(void)
 {
@@ -905,17 +910,10 @@ Game::menu_t Game::NetworkHost(void)
     if(conf.GameType() & Game::BATTLEONLY)
 	conf.SetPreferablyCountPlayers(2);
 
-    // create local server
-    FH2Server & server = FH2Server::Get();
-
-    if(! server.Bind(conf.GetPort()))
-    {
-	Dialog::Message(_("Error"), Network::GetError(), Font::BIG, Dialog::OK);
-	return Game::MAINMENU;
-    }
-
     SDL::Thread thread;
-    thread.Create(FH2Server::Main, NULL);
+    thread.Create(FH2Server::RunServerProcess, NULL);
+
+    DELAY(300);
 
     // create local client
     const std::string localhost("127.0.0.1");
@@ -930,14 +928,7 @@ Game::menu_t Game::NetworkHost(void)
     else
         Dialog::Message(_("Error"), Network::GetError(), Font::BIG, Dialog::OK);
 
-    server.SetModes(ST_SHUTDOWN);
-
-    if(0 > thread.Wait())
-    {
-	Dialog::Message(_("Error"), Network::GetError(), Font::BIG, Dialog::OK);
-	return Game::MAINMENU;
-    }
-    server.Close();
+    thread.Kill();
 
     return QUITGAME;
 }

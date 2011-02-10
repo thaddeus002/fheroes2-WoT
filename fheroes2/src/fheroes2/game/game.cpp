@@ -69,6 +69,8 @@ namespace Game
     static u8 view_distance[] = { 4, 5, 4, 1, 10, 9 };
     static u8 whirlpool_percent = 50;
     static u8 heroes_restore_spell_points_day = 1;
+
+    static char** argv = NULL;
 }
 
 Game::menu_t Game::Testing(u8 t)
@@ -103,10 +105,17 @@ Game::menu_t Game::Credits(void)
     return Game::MAINMENU;
 }
 
-void Game::Init(void)
+std::string Game::GetARGV(int v)
+{
+    return std::string(argv[v]);
+}
+
+void Game::Init(char** ptr)
 {
     Settings & conf = Settings::Get();
     LocalEvent & le = LocalEvent::Get();
+
+    argv = ptr;
 
     // update all global defines
     if(conf.UseAltResource()) LoadExternalResource(conf);

@@ -66,7 +66,8 @@ namespace Game
 	TESTING
     };
 
-    void Init(void);
+    void Init(char**);
+    std::string GetARGV(int);
 
     enum type_t { MENU = 0, STANDARD = 0x01, CAMPAIGN = 0x02, HOTSEAT = 0x04, NETWORK = 0x08, BATTLEONLY = 0x10, LOADFILE = 0x80, MULTI = HOTSEAT | NETWORK };
     enum control_t { NONE = 0, LOCAL = 1, REMOTE = 2, AI = 4 };

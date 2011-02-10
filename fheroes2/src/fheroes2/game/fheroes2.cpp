@@ -207,7 +207,7 @@ int main(int argc, char **argv)
 	    AGG::ICNRegistryEnable(true);
 
 	    // init game data
-	    Game::Init();
+	    Game::Init(argv);
 
 	    // goto main menu
 #ifdef WITH_EDITOR
