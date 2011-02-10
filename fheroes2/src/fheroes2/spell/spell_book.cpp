@@ -253,6 +253,7 @@ void SpellBook::Edit(const HeroBase & hero)
     const Sprite & l_list = AGG::GetICN(ICN::BOOK, 0, true);
 
     size_t current_index = 0;
+    SpellBookSetFilter(hero.GetBagArtifacts(), *this, spells2, SpellBook::ALL);
 
     cursor.Hide();
     cursor.SetThemes(Cursor::POINTER);

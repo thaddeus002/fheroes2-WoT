@@ -26,6 +26,7 @@
 #include "speed.h"
 #include "settings.h"
 #include "luck.h"
+#include "spell.h"
 #include "race.h"
 #include "morale.h"
 #include "payment.h"
@@ -201,6 +202,23 @@ Monster::Monster(monster_t m) : id(m)
 
 Monster::Monster(u8 race, u32 dwelling) : id(FromDwelling(race, dwelling))
 {
+}
+
+Monster::Monster(const Spell & sp) : id(UNKNOWN)
+{
+    switch(sp())
+    {
+	case Spell::SUMMONEELEMENT: id = EARTH_ELEMENT; break;
+        case Spell::SUMMONAELEMENT: id = AIR_ELEMENT; break;
+        case Spell::SUMMONFELEMENT: id = FIRE_ELEMENT; break;
+        case Spell::SUMMONWELEMENT: id = WATER_ELEMENT; break;
+        default: break;
+    }
+}
+
+bool Monster::isValid(void) const
+{
+    return id != UNKNOWN;
 }
 
 bool Monster::operator== (monster_t m) const

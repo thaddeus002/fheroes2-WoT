@@ -1421,7 +1421,7 @@ void Battle2::Arena::AddSpell(const Spell & spell)
     usage_spells.Append(spell);
 }
 
-u16 Battle2::Arena::GetFreePositionNearHero(u8 color) const
+s16 Battle2::Arena::GetFreePositionNearHero(u8 color) const
 {
     const u8 cells1[] = { 11, 22, 33 };
     const u8 cells2[] = { 21, 32, 43 };
@@ -1433,7 +1433,7 @@ u16 Battle2::Arena::GetFreePositionNearHero(u8 color) const
 
     if(cells) for(u8 ii = 0; ii < 3; ++ii) if(board[cells[ii]].isPassable() && NULL == GetTroopBoard(cells[ii])) return cells[ii];
 
-    return 0;
+    return -1;
 }
 
 void Battle2::Arena::DumpBoard(void) const
@@ -1552,7 +1552,7 @@ bool Battle2::Arena::isDisableCastSpell(const Spell & spell, std::string* msg)
 		return true;
 	    }
 
-	    if(0 == GetFreePositionNearHero(current_color))
+	    if(0 > GetFreePositionNearHero(current_color))
 	    {
 		*msg = _("There is no open space adjacent to your hero to summon an Elemental to.");
 		return true;
@@ -1675,6 +1675,7 @@ Battle2::Tower* Battle2::Arena::GetTower(u8 type)
 
 void Battle2::Arena::PackBoard(Action & msg) const
 {
+    msg.Push(current_turn);
     msg.Push(static_cast<u32>(board.size()));
 
     Board::const_iterator it = board.begin();
@@ -1715,6 +1716,8 @@ void Battle2::Arena::PackBoard(Action & msg) const
 void Battle2::Arena::UnpackBoard(Action & msg)
 {
     u32 size;
+
+    msg.Pop(current_turn);
     msg.Pop(size);
 
     if(size == board.size())
@@ -1775,17 +1778,87 @@ bool Battle2::Arena::NetworkTurn(Result & result)
     return interface && interface->NetworkTurn(result);
 }
 
-/*
-void Settings::SetAutoBattle(u8 color, bool f)                                                                                 
-{                                                                                                                              
-    if(f)                                                                                                                      
-        auto_battle_on |= color;                                                                                               
-    else                                                                                                                       
-        auto_battle_on &= ~color;                                                                                              
-}                                                                                                                              
+Battle2::Stats* Battle2::Arena::CreateElemental(const Spell & spell)
+{
+    const HeroBase* hero = GetCurrentCommander();
+    const s16 pos = GetFreePositionNearHero(current_color);
 
-bool Settings::AutoBattle(u8 color) const                                                                                      
-{                                                                                                                              
-    return auto_battle_on & color;                                                                                             
-}                                                                                                                              
-*/
+    if(0 > pos || !hero)
+    {
+	DEBUG(DBG_BATTLE, DBG_WARN, "internal error");
+	return NULL;
+    }
+
+    Armies friends(*GetArmy(hero->GetColor()));
+
+    Stats* elem = friends.FindMode(CAP_SUMMONELEM);
+    bool affect = true;
+
+    if(elem) switch(spell())
+    {
+        case Spell::SUMMONEELEMENT: if(elem->GetID() != Monster::EARTH_ELEMENT) affect = false; break;
+        case Spell::SUMMONAELEMENT: if(elem->GetID() != Monster::AIR_ELEMENT) affect = false; break;
+        case Spell::SUMMONFELEMENT: if(elem->GetID() != Monster::FIRE_ELEMENT) affect = false; break;
+        case Spell::SUMMONWELEMENT: if(elem->GetID() != Monster::WATER_ELEMENT) affect = false; break;
+        default: break;
+    }
+
+    if(!affect)
+    {
+	DEBUG(DBG_BATTLE, DBG_WARN, "other elemental summon");
+	return NULL;
+    }
+
+    Monster mons(spell);
+
+    if(! mons.isValid())
+    {
+	DEBUG(DBG_BATTLE, DBG_WARN, "unknown id");
+	return NULL;
+    }
+
+    DEBUG(DBG_BATTLE, DBG_TRACE, mons.GetName() << ", position: " << pos);
+    u16 count = spell.ExtraValue() * hero->GetPower();
+    if(hero->HasArtifact(Artifact::BOOK_ELEMENTS)) count *= 2;
+
+    elem = friends.CreateNewStats(mons(), count);
+    if(elem)
+    {
+        elem->position = pos;
+        elem->arena = this;
+        elem->SetReflection(hero == army2.GetCommander());
+        elem->SetModes(CAP_SUMMONELEM);
+        if(interface) elem->InitContours();
+    }
+    else
+    {
+	DEBUG(DBG_BATTLE, DBG_WARN, "is NULL");
+    }
+
+    return elem;
+}
+
+Battle2::Stats* Battle2::Arena::CreateMirrorImage(Stats & b, u16 pos)
+{
+    Armies friends(*b.GetArmy());
+
+    Stats* image = friends.CreateNewStats(b.troop(), b.count);
+
+    if(image)
+    {
+	b.mirror = image;
+	image->position = pos;
+	image->arena = this;
+	image->mirror = &b;
+	image->SetReflection(b.reflect);
+	image->SetModes(CAP_MIRRORIMAGE);
+	b.SetModes(CAP_MIRROROWNER);
+        if(interface) image->InitContours();
+    }
+    else
+    {
+	DEBUG(DBG_BATTLE, DBG_WARN, "internal error");
+    }
+
+    return image;
+}

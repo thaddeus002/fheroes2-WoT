@@ -335,7 +335,6 @@ bool FH2Server::BattleRecvTurn(u8 color, const Battle2::Stats & b, const Battle2
 	DELAY(10);
     }
 
-    // FIXME: need send board?
     // send board
     DEBUG(DBG_NETWORK, DBG_INFO, "id: 0x" << b.GetID() << ", send board");
     if(! BattleSendBoard(color, arena)) return false;
@@ -806,9 +805,55 @@ bool FH2Server::BattleSendSpell(u8 color, u16 who, u16 dst, const Spell & spell,
 bool FH2Server::BattleSendTeleportSpell(u8 color, u16 src, u16 dst)
 {
     Spell spell(Spell::TELEPORT);
-    Battle2::TargetsInfo targets;
 
-    return BattleSendSpell(color, src, dst, spell, targets);
+    FH2RemoteClient* client = clients.GetClient(color);
+    if(client)
+    {
+	QueueMessage msg(MSG_BATTLE_CAST);
+	msg.Push(spell());
+	msg.Push(src);
+	msg.Push(dst);
+
+	DEBUG(DBG_NETWORK, DBG_INFO, spell.GetName() << " " << "size: " << std::dec << msg.DtSz() << " bytes");
+	return client->Send(msg);
+    }
+    return false;
+}
+
+bool FH2Server::BattleSendMirrorImageSpell(u8 color, u16 src, u16 dst, const Battle2::Stats & image)
+{
+    Spell spell(Spell::MIRRORIMAGE);
+
+    FH2RemoteClient* client = clients.GetClient(color);
+    if(client)
+    {
+	QueueMessage msg(MSG_BATTLE_CAST);
+	msg.Push(spell());
+	msg.Push(src);
+	msg.Push(dst);
+	msg.Push(image.GetID());
+	image.Pack(msg);
+
+	DEBUG(DBG_NETWORK, DBG_INFO, spell.GetName() << " " << "size: " << std::dec << msg.DtSz() << " bytes");
+	return client->Send(msg);
+    }
+    return false;
+}
+
+bool FH2Server::BattleSendSummonElementalSpell(u8 color, const Spell & spell, const Battle2::Stats & elem)
+{
+    FH2RemoteClient* client = clients.GetClient(color);
+    if(client)
+    {
+	QueueMessage msg(MSG_BATTLE_CAST);
+	msg.Push(spell());
+	msg.Push(elem.GetID());
+	elem.Pack(msg);
+
+	DEBUG(DBG_NETWORK, DBG_INFO, spell.GetName() << " " << "size: " << std::dec << msg.DtSz() << " bytes");
+	return client->Send(msg);
+    }
+    return false;
 }
 
 bool FH2Server::BattleSendEarthQuakeSpell(u8 color, const std::vector<u8> & targets)

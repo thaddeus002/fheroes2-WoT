@@ -30,6 +30,8 @@
 #include "payment.h"
 #include "gamedefs.h"
 
+class Spell;
+
 class Monster : public Skill::Primary
 {
 public:
@@ -122,6 +124,7 @@ public:
     };
 
     Monster();
+    Monster(const Spell &);
     Monster(monster_t);
     Monster(u8, u32);
 
@@ -157,6 +160,7 @@ public:
     const char* GetMultiName(void) const;
     const char* GetPluralName(u32) const;
 
+    bool isValid(void) const;
     bool isElemental(void) const;
     bool isUndead(void) const;
     bool isFly(void) const;

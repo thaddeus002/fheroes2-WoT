@@ -1421,7 +1421,6 @@ void Battle2::Stats::SpellModesAction(const Spell & spell, u8 duration, const He
 	    break;
 
 	case Spell::MIRRORIMAGE:
-	    arena->SpellActionMirrorImage(*this);
 	    affected.AddMode(CAP_MIRRORIMAGE, duration);
 	    break;
 

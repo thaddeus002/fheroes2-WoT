@@ -1768,13 +1768,14 @@ void Battle2::Interface::HumanCastSpellTurn(const Stats & b, Actions & a, std::s
 		listlog->AddMessage(str);
 	    }
 
+	    DEBUG(DBG_BATTLE, DBG_TRACE, humanturn_spell.GetName() << ", dst: " << index);
+
 	    if(Cursor::SP_TELEPORT == cursor.Themes())
 	    {
 		if(MAXU16 == teleport_src)
 		    teleport_src = index;
 		else
 		{
-		    DEBUG(DBG_BATTLE, DBG_TRACE, humanturn_spell.GetName() << ", dst: " << index);
 		    a.AddedCastTeleportAction(teleport_src, index);
 		    humanturn_spell = Spell::NONE;
 		    humanturn_exit = true;
@@ -1782,8 +1783,14 @@ void Battle2::Interface::HumanCastSpellTurn(const Stats & b, Actions & a, std::s
 		}
 	    }
 	    else
+	    if(Cursor::SP_MIRRORIMAGE == cursor.Themes())
 	    {
-		DEBUG(DBG_BATTLE, DBG_TRACE, humanturn_spell.GetName() << ", dst: " << index);
+		a.AddedCastMirrorImageAction(index);
+		humanturn_spell = Spell::NONE;
+		humanturn_exit = true;
+	    }
+	    else
+	    {
 		a.AddedCastAction(humanturn_spell, index);
 		humanturn_spell = Spell::NONE;
 		humanturn_exit = true;
@@ -3583,8 +3590,6 @@ void Battle2::Interface::RedrawActionEarthQuakeSpell(const std::vector<u8> & tar
     u8 frame = 0;
     area.h -= Settings::Get().QVGA() ? 19 : 38;
 
-    std::vector<u8>::const_iterator it;
-
     Surface sprite;
     sprite.Set(area.w, area.h);
 
@@ -3599,6 +3604,7 @@ void Battle2::Interface::RedrawActionEarthQuakeSpell(const std::vector<u8> & tar
     const u8 offset = Settings::Get().QVGA() ? 5 : 10;
     bool restore = false;
 
+    // draw earth quake
     while(le.HandleEvents() && frame < 18)
     {
 	CheckGlobalEvents(le);
@@ -3632,7 +3638,7 @@ void Battle2::Interface::RedrawActionEarthQuakeSpell(const std::vector<u8> & tar
 	}
     }
 
-    // clod
+    // draw clod
     frame = 0;
     ICN::icn_t icn = ICN::LICHCLOD;
     AGG::PlaySound(M82::CATSND02);
@@ -3646,8 +3652,8 @@ void Battle2::Interface::RedrawActionEarthQuakeSpell(const std::vector<u8> & tar
 	    cursor.Hide();
 	    Redraw();
 
-	    it = targets.begin();
-	    for(; it != targets.end(); ++it)
+	    for(std::vector<u8>::const_iterator
+		it = targets.begin(); it != targets.end(); ++it)
 	    {
 		Point pt2 = arena.catapult->GetTargetPosition(*it);
 
@@ -4231,6 +4237,17 @@ bool Battle2::Interface::NetworkTurn(Result & result)
 
         		case Spell::EARTHQUAKE:
 			    arena.SpellActionEarthQuake(msg);
+			    break;
+
+			case Spell::MIRRORIMAGE:
+			    arena.SpellActionMirrorImage(msg);
+			    break;
+
+        		case Spell::SUMMONEELEMENT:
+        		case Spell::SUMMONAELEMENT:
+        		case Spell::SUMMONFELEMENT:
+        		case Spell::SUMMONWELEMENT:
+			    arena.SpellActionSummonElemental(msg, spell);
 			    break;
 
 			default:

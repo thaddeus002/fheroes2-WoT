@@ -82,6 +82,8 @@ public:
     bool BattleSendAttack(u8, const Battle2::Stats &, const Battle2::Stats &, u16, const Battle2::TargetsInfo &);
     bool BattleSendSpell(u8, u16, u16, const Spell &, const Battle2::TargetsInfo &);
     bool BattleSendTeleportSpell(u8, u16, u16);
+    bool BattleSendMirrorImageSpell(u8, u16, u16, const Battle2::Stats &);
+    bool BattleSendSummonElementalSpell(u8, const Spell &, const Battle2::Stats &);
     bool BattleSendEarthQuakeSpell(u8, const std::vector<u8> &);
     bool BattleSendBoard(u8, const Battle2::Arena &);
     bool BattleSendResult(u8, const Battle2::Result &);

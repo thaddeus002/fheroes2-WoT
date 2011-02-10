@@ -64,8 +64,18 @@ void Battle2::Actions::AddedCastAction(const Spell & spell, u16 dst)
     Action action;
     action.SetID(MSG_BATTLE_CAST);
     action.Push(spell());
-    action.Push(static_cast<u16>(0));
+    action.Push(static_cast<u16>(0));	// id, hero or monster
     action.Push(dst);
+
+    push_back(action);
+}
+
+void Battle2::Actions::AddedCastMirrorImageAction(u16 who)
+{
+    Action action;
+    action.SetID(MSG_BATTLE_CAST);
+    action.Push(static_cast<u8>(Spell::MIRRORIMAGE));
+    action.Push(who);
 
     push_back(action);
 }
@@ -270,6 +280,17 @@ void Battle2::Arena::ApplyActionSpellCast(Action & action)
 		SpellActionEarthQuake(action);
 		break;
 
+	    case Spell::MIRRORIMAGE:
+		SpellActionMirrorImage(action);
+		break;
+
+	    case Spell::SUMMONEELEMENT:
+	    case Spell::SUMMONAELEMENT:
+	    case Spell::SUMMONFELEMENT:
+	    case Spell::SUMMONWELEMENT:
+		SpellActionSummonElemental(action, spell);
+		break;
+
 	    default:
 		SpellActionDefaults(action, spell);
 		break;
@@ -287,7 +308,9 @@ void Battle2::Arena::ApplyActionSpellCast(Action & action)
 #endif
     }
     else
-	DEBUG(DBG_BATTLE, DBG_WARN, "incorrect param");
+    {
+	DEBUG(DBG_BATTLE, DBG_WARN, spell.GetName() << ", " << "incorrect param");
+    }
 }
 
 void Battle2::Arena::ApplyActionAttack(Action & action)
@@ -684,19 +707,12 @@ void Battle2::Arena::TargetsApplySpell(const HeroBase* hero, const Spell & spell
 {
     DEBUG(DBG_BATTLE, DBG_TRACE, "targets: " << targets.size());
 
-    if(spell.isSummon())
-    {
-        SpellActionSummonElemental(hero, spell);
-    }
-    else
-    {
-	TargetsInfo::iterator it = targets.begin();
+    TargetsInfo::iterator it = targets.begin();
 
-	for(; it != targets.end(); ++it)
-	{
-	    TargetInfo & target = *it;
-	    if(target.defender) target.defender->ApplySpell(spell, hero, target);
-	}
+    for(; it != targets.end(); ++it)
+    {
+	TargetInfo & target = *it;
+	if(target.defender) target.defender->ApplySpell(spell, hero, target);
     }
 }
 
@@ -930,69 +946,47 @@ void Battle2::Arena::ApplyActionAutoBattle(Action & action)
 	DEBUG(DBG_BATTLE, DBG_WARN, "incorrect param");
 }
 
-void Battle2::Arena::SpellActionSummonElemental(const HeroBase* hero, const Spell & spell)
+void Battle2::Arena::SpellActionSummonElemental(Action & a, const Spell & spell)
 {
-    const u16 pos = GetFreePositionNearHero(hero->GetColor());
-    Army::army_t* army = GetArmy(hero->GetColor());
-
-    if(army && 0 != pos)
+#ifdef WITH_NET
+    if(! (Settings::Get().GameType() & Game::NETWORK) || Network::isRemoteClient())
     {
-	Armies friends(*army);
+#endif
+	Stats* elem = CreateElemental(spell);
+	if(interface) interface->RedrawActionSummonElementalSpell(*elem);
 
-	Stats* elem = friends.FindMode(CAP_SUMMONELEM);
-        bool affect = true;
-
-        if(elem) switch(spell())
-        {
-            case Spell::SUMMONEELEMENT: if(elem->GetID() != Monster::EARTH_ELEMENT) affect = false; break;
-            case Spell::SUMMONAELEMENT: if(elem->GetID() != Monster::AIR_ELEMENT) affect = false; break;
-            case Spell::SUMMONFELEMENT: if(elem->GetID() != Monster::FIRE_ELEMENT) affect = false; break;
-            case Spell::SUMMONWELEMENT: if(elem->GetID() != Monster::WATER_ELEMENT) affect = false; break;
-            default: break;
-        }
-
-	if(!affect)
-	{
-	    DEBUG(DBG_BATTLE, DBG_WARN, "other elemental summon");
-	    return;
-	}
-
-	Monster::monster_t mons = Monster::UNKNOWN;
-        switch(spell())
-        {
-            case Spell::SUMMONEELEMENT: mons = Monster::EARTH_ELEMENT; break;
-            case Spell::SUMMONAELEMENT: mons = Monster::AIR_ELEMENT; break;
-            case Spell::SUMMONFELEMENT: mons = Monster::FIRE_ELEMENT; break;
-            case Spell::SUMMONWELEMENT: mons = Monster::WATER_ELEMENT; break;
-            default: break;
-        }
-
-	DEBUG(DBG_BATTLE, DBG_TRACE, Monster::GetName(mons) << ", position: " << pos);
-	u16 count = spell.ExtraValue() * hero->GetPower();
-	if(hero->HasArtifact(Artifact::BOOK_ELEMENTS)) count *= 2;
-
-        elem = friends.CreateNewStats(mons, count);
-        elem->position = pos;
-        elem->arena = this;
-        elem->SetReflection(hero == army2.GetCommander());
-        elem->SetModes(CAP_SUMMONELEM);
-        if(interface)
-	{
-	    elem->InitContours();
-	    interface->RedrawActionSummonElementalSpell(*elem);
-	}
+#ifdef WITH_NET
+	if(Game::REMOTE == army1.GetControl()) FH2Server::Get().BattleSendSummonElementalSpell(army1.GetColor(), spell, *elem);
+	if(Game::REMOTE == army2.GetControl()) FH2Server::Get().BattleSendSummonElementalSpell(army2.GetColor(), spell, *elem);
     }
     else
+    if(Network::isLocalClient())
     {
-    	if(interface) interface->SetStatus(_("Summon Elemental spell failed!"), true);
-	DEBUG(DBG_BATTLE, DBG_WARN, "incorrect param");
+	u16 id;
+	a.Pop(id);
+
+	Stats* elem = CreateElemental(spell);
+	if(elem)
+	{
+	    elem->Unpack(a);
+
+	    if(id != elem->GetID())
+    		    DEBUG(DBG_BATTLE, DBG_WARN, "internal error");
+
+	    if(interface) interface->RedrawActionSummonElementalSpell(*elem);
+	}
+	else
+	{
+    	    DEBUG(DBG_BATTLE, DBG_WARN, "is NULL");
+	}
     }
+#endif
 }
 
 void Battle2::Arena::SpellActionDefaults(Action & a, const Spell & spell)
 {
 #ifdef WITH_NET
-    if((Settings::Get().GameType() & Game::LOCAL) || Network::isRemoteClient())
+    if(! (Settings::Get().GameType() & Game::NETWORK) || Network::isRemoteClient())
     {
 #endif
         const HeroBase* current_commander = GetCurrentCommander();
@@ -1049,8 +1043,8 @@ void Battle2::Arena::SpellActionTeleport(Action & a)
 {
     u16 src, dst;
 
-    a.Pop(dst);
     a.Pop(src);
+    a.Pop(dst);
 
     Stats* b = GetTroopBoard(src);
     Cell* cell = GetCell(dst);
@@ -1084,7 +1078,7 @@ void Battle2::Arena::SpellActionTeleport(Action & a)
 void Battle2::Arena::SpellActionEarthQuake(Action & a)
 {
 #ifdef WITH_NET
-    if((Settings::Get().GameType() & Game::LOCAL) || Network::isRemoteClient())
+    if(! (Settings::Get().GameType() & Game::NETWORK) || Network::isRemoteClient())
     {
 #endif
 	std::vector<u8> targets;
@@ -1135,46 +1129,86 @@ void Battle2::Arena::SpellActionEarthQuake(Action & a)
 #endif
 }
 
-void Battle2::Arena::SpellActionMirrorImage(Stats & b)
+void Battle2::Arena::SpellActionMirrorImage(Action & a)
 {
-    std::vector<u16> v;
-    board.GetAbroadPositions(b.position, 4, true, v);
-
-    std::vector<u16>::const_iterator it1 = v.begin();
-    std::vector<u16>::const_iterator it2 = v.end();
-
-    for(; it1 != it2; ++it1)
+    u16 who;
+    a.Pop(who);
+    Stats* b = GetTroopBoard(who);
+    
+    if(b)
     {
-    	const Cell* cell = GetCell(*it1);
-    	if(cell && cell->isPassable(b, true))
+#ifdef WITH_NET
+	if(! (Settings::Get().GameType() & Game::NETWORK) || Network::isRemoteClient())
 	{
-	    if(b.isWide() && (b.position + 1 == *it1))
-		continue;
+#endif
+	    std::vector<u16> v;
+	    board.GetAbroadPositions(b->position, 4, true, v);
+
+	    std::vector<u16>::const_iterator it;
+	    for(it = v.begin(); it != v.end(); ++it)
+	    {
+    		const Cell* cell = GetCell(*it);
+    		if(cell && cell->isPassable(*b, true))
+		{
+		    if(b->isWide() && (b->position + 1 == *it))
+			continue; else break;
+		}
+	    }
+
+	    if(it != v.end())
+	    {
+    		DEBUG(DBG_BATTLE, DBG_TRACE, "set position: " << *it);
+		if(interface) interface->RedrawActionMirrorImageSpell(*b, *it);
+
+		Stats* image = CreateMirrorImage(*b, *it);
+#ifdef WITH_NET
+		if(image)
+		{
+		    if(Game::REMOTE == army1.GetControl())
+			FH2Server::Get().BattleSendMirrorImageSpell(army1.GetColor(), who, *it, *image);
+		    if(Game::REMOTE == army2.GetControl())
+			FH2Server::Get().BattleSendMirrorImageSpell(army2.GetColor(), who, *it, *image);
+		}
+		else
+		{
+    		    DEBUG(DBG_BATTLE, DBG_WARN, "is NULL");
+		}
+#endif
+	    }
 	    else
-		break;
+	    {
+    		if(interface) interface->SetStatus(_("spell failed!"), true);
+    		DEBUG(DBG_BATTLE, DBG_WARN, "new position not found!");
+	    }
+#ifdef WITH_NET
 	}
-    }
+	else
+	if(Network::isLocalClient())
+	{
+	    u16 id, dst;
 
-    if(it1 != v.end())
-    {
-    	DEBUG(DBG_BATTLE, DBG_TRACE, "set position: " << *it1);
-	if(interface) interface->RedrawActionMirrorImageSpell(b, *it1);
+	    a.Pop(dst);
+	    a.Pop(id);
 
-	Armies friends(*b.GetArmy());
-	Stats* image = friends.CreateNewStats(b.troop(), b.count);
+	    Stats* image = CreateMirrorImage(*b, dst);
+	    if(image)
+	    {
+		image->Unpack(a);
 
-    	b.mirror = image;
-    	image->position = *it1;
-    	image->arena = this;
-    	image->mirror = &b;
-    	image->SetReflection(b.reflect);
-    	image->SetModes(CAP_MIRRORIMAGE);
-    	if(interface) image->InitContours();
-    	b.SetModes(CAP_MIRROROWNER);
+		if(id != image->GetID())
+    		    DEBUG(DBG_BATTLE, DBG_WARN, "internal error");
+
+		if(interface) interface->RedrawActionMirrorImageSpell(*b, dst);
+	    }
+	    else
+	    {
+    		DEBUG(DBG_BATTLE, DBG_WARN, "is NULL");
+	    }
+	}
+#endif
     }
     else
     {
-    	if(interface) interface->SetStatus(_("Mirror Image spell failed!"), true);
-        DEBUG(DBG_BATTLE, DBG_WARN, "new position not found!");
+	DEBUG(DBG_BATTLE, DBG_WARN, "false");
     }
 }

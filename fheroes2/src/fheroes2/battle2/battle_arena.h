@@ -56,6 +56,7 @@ namespace Battle2
         void AddedSurrenderAction(void);
         void AddedCastAction(const Spell &, u16);
         void AddedCastTeleportAction(u16, u16);
+	void AddedCastMirrorImageAction(u16 who);
         void AddedEndAction(const Stats &);
         void AddedSkipAction(const Stats &, bool);
         void AddedMoveAction(const Stats &, u16);
@@ -183,11 +184,11 @@ namespace Battle2
 	void ScanPassabilityBoard(const Stats &, bool skip_speed = false);
 	static u16 GetShortDistance(u16, const std::vector<u16> &);
 	void GetPassableQualityPositions(const Stats &, std::vector<u16> &);
-	u16 GetFreePositionNearHero(u8) const;
+	s16 GetFreePositionNearHero(u8) const;
 
 	// uniq spells
-	void SpellActionSummonElemental(const HeroBase*, const Spell &);
-	void SpellActionMirrorImage(Stats &);
+	void SpellActionSummonElemental(Action &, const Spell &);
+	void SpellActionMirrorImage(Action &);
 	void SpellActionTeleport(Action &);
 	void SpellActionEarthQuake(Action &);
 	void SpellActionDefaults(Action &, const Spell &);
@@ -214,6 +215,9 @@ namespace Battle2
 	const HeroBase* GetCommander(u8) const;
 
 	bool NetworkTurn(Result &);
+
+	Stats* CreateElemental(const Spell &);
+	Stats* CreateMirrorImage(Stats &, u16);
 
     protected:
 	friend class Interface;
