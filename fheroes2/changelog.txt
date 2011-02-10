@@ -1,4 +1,9 @@
-SVN - up to r2241
+SVN - up to r2260
+
+Feb, 10, 2011
++ Added: BattleOnly (experimental)
+
+Jan, 22, 2011
 
 + Fixed: artifact: crystal ball level
 + Added: game: localized maps support, add iconv support
