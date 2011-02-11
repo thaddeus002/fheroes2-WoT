@@ -30,6 +30,7 @@
 Captain::Captain(const Castle & c) : home(c)
 {
     center = home.GetCenter();
+    bag_artifacts.clear();
 }
 
 void Captain::LoadDefaults(void)

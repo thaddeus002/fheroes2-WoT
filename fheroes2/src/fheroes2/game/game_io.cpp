@@ -641,7 +641,11 @@ bool Game::IO::LoadBIN(QueueMessage & msg)
     msg.Pop(format);
     if(format > CURRENT_FORMAT_VERSION || format < LAST_FORMAT_VERSION)
     {
-    	DEBUG(DBG_GAME , DBG_WARN, "unknown format: 0x" << std::hex << format);
+	std::ostringstream os;
+	os << "usupported save format: " << format << std::endl <<
+	    "game version: " << CURRENT_FORMAT_VERSION << std::endl <<
+	    "last version: " << LAST_FORMAT_VERSION;
+	Dialog::Message("Error", os.str(), Font::BIG, Dialog::OK);
     	return false;
     }
     else
@@ -1166,15 +1170,31 @@ void Game::IO::UnpackHeroBase(QueueMessage & msg, HeroBase & hero, u16 check_ver
     }
 
     // artifacts
-    std::fill(hero.bag_artifacts.begin(), hero.bag_artifacts.end(), Artifact(Artifact::UNKNOWN));
-    msg.Pop(byte32);
-    for(u32 jj = 0; jj < hero.bag_artifacts.size(); ++jj)
+    if(check_version < FORMAT_VERSION_2261) // remove and fix: captain: bag_artifacts
     {
-	msg.Pop(byte8);
-	hero.bag_artifacts[jj].id = byte8;
+	std::fill(hero.bag_artifacts.begin(), hero.bag_artifacts.end(), Artifact(Artifact::UNKNOWN));
+	msg.Pop(byte32);
+	for(u32 jj = 0; jj < hero.bag_artifacts.size(); ++jj)
+	{
+	    msg.Pop(byte8);
+	    hero.bag_artifacts[jj].id = byte8;
 
-	msg.Pop(byte8);
-	hero.bag_artifacts[jj].ext = byte8;
+	    msg.Pop(byte8);
+	    hero.bag_artifacts[jj].ext = byte8;
+	}
+    }
+    else
+    {
+	msg.Pop(byte32);
+	hero.bag_artifacts.clear();
+	hero.bag_artifacts.reserve(byte32);
+	for(u32 jj = 0; jj < byte32; ++jj)
+	{
+	    Artifact art;
+	    msg.Pop(art.id);
+	    msg.Pop(art.ext);
+	    hero.bag_artifacts.push_back(art);
+	}
     }
 }
 
