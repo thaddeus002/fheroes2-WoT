@@ -172,6 +172,7 @@ void AI::BattleTurn(Arena & arena, const Stats & b, Actions & a)
 	    else
 	    {
 		std::vector<u16> path;
+		BattleMagicTurn(arena, b, a, NULL);
 		arena.GetPath(b, move, path);
 		if(path.size())
 		{
@@ -257,7 +258,7 @@ void AI::BattleMagicTurn(Arena & arena, const Stats & b, Actions & a, const Stat
     }
 
     // up speed
-    if(hero->HaveSpell(Spell::HASTE))
+    if(hero->HaveSpell(Spell::HASTE) && !enemy)
     {
 	// sort strongest
 	Armies::iterator it = std::find_if(friends.begin(), friends.end(),
