@@ -120,12 +120,7 @@ Game::menu_t Game::ScenarioInfo(void)
     {
 	const Maps::FileInfo & info = conf.CurrentFileInfo();
 
-	if(info.HumanOnlyColors())
-	    conf.SetPlayersColors(info.HumanOnlyColors());
-	else
-	    conf.SetPlayersColors(conf.MyColor());
-
-	conf.SetMyColor(conf.FirstAllowColor());
+	conf.SetPlayersColors(info.HumanOnlyColors() ? info.HumanOnlyColors() : conf.FirstAllowColor());
     }
 
     Scenario::RedrawStaticInfo(pointPanel);
@@ -187,11 +182,7 @@ Game::menu_t Game::ScenarioInfo(void)
 		cursor.Hide();
 		levelCursor.Hide();
 		const Maps::FileInfo & info = conf.CurrentFileInfo();
-		if(info.HumanOnlyColors())
-		    conf.SetPlayersColors(info.HumanOnlyColors());
-		else
-		    conf.SetPlayersColors(conf.MyColor());
-		conf.SetMyColor(conf.FirstAllowColor());
+		conf.SetPlayersColors(info.HumanOnlyColors() ? info.HumanOnlyColors() : conf.FirstAllowColor());
 		Scenario::RedrawStaticInfo(pointPanel);
 		Scenario::RedrawDifficultyInfo(pointDifficultyInfo);
 		UpdateCoordOpponentsInfo(pointOpponentInfo, coordColors);
@@ -221,10 +212,8 @@ Game::menu_t Game::ScenarioInfo(void)
 	    DEBUG(DBG_GAME, DBG_INFO, "select maps: " << conf.MapsFile() << \
 		    ", difficulty: " << Difficulty::String(conf.GameDifficulty()));
 	    conf.FixKingdomRandomRace();
-	    if(Game::HOTSEAT == conf.GameType())
-		conf.SetMyColor(Color::GRAY);
-	    else
-	    DEBUG(DBG_GAME, DBG_INFO, "select color: " << Color::String(conf.MyColor()));
+	    //FIXME: dump colors: players and computers
+	    //DEBUG(DBG_GAME, DBG_INFO, "select color: " << Color::String(conf.MyColor()));
 	    result = STARTGAME;
 	    break;
 	}
@@ -255,17 +244,16 @@ Game::menu_t Game::ScenarioInfo(void)
 		if(conf.AllowColors(color))
 		{
 		    cursor.Hide();
-		    switch(conf.GameType())
-		    {
-			case Game::NETWORK:
-			case Game::HOTSEAT:
-			    conf.SetPlayersColors(conf.PlayersColors() & color ? conf.PlayersColors() & ~color : conf.PlayersColors() | color);
-			    break;
-			default:
-			    conf.SetMyColor(color);
-			    conf.SetPlayersColors(conf.MyColor());
-	    		    break;
-		    }
+		    u8 players = color;
+		
+		    if((Game::NETWORK | Game::HOTSEAT) & conf.GameType())
+		        players = conf.PlayersColors() & color ?
+				/* reset color */
+				conf.PlayersColors() & ~color :
+				/* set color */
+				conf.PlayersColors() | color;
+
+		    conf.SetPlayersColors(players);
 		    Scenario::RedrawOpponentsInfo(pointOpponentInfo);
 		    cursor.Show();
 		    display.Flip();
@@ -335,6 +323,7 @@ Game::menu_t Game::ScenarioInfo(void)
 
     if(result == STARTGAME)
     {
+	conf.SetMyColor(Color::Get(Color::GetFirst(conf.PlayersColors())));
 	conf.SetCurrentColor(Color::NONE);
 	if(conf.ExtUseFade()) display.Fade();
 	Game::ShowLoadMapsText();
