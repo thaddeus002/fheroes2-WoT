@@ -177,7 +177,7 @@ Spell SpellBook::Open(const HeroBase & hero, const filter_t filt, bool canselect
 		{
 		    if(canselect)
 		    {
-			if(hero.HaveSpellPoints((*spell).CostManaPoints(&hero)))
+			if(hero.CanCastSpell(*spell))
 			{
 			    curspell = *spell;
 			    break;

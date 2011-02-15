@@ -22,9 +22,12 @@
 
 #include <algorithm>
 #include <utility>
+#include <sstream>
 #include "artifact.h"
 #include "race.h"
 #include "army.h"
+#include "world.h"
+#include "kingdom.h"
 #include "castle.h"
 #include "heroes_base.h"
 
@@ -71,11 +74,6 @@ void HeroBase::SetSpellPoints(u16 points)
 bool HeroBase::HaveSpellPoints(u16 points) const
 {
     return magic_point >= points;
-}
-
-void HeroBase::TakeSpellPoints(u16 points)
-{
-    magic_point -= (points < magic_point ? points : magic_point);
 }
 
 void HeroBase::EditSpellBook(void)
@@ -333,4 +331,49 @@ s8 HeroBase::GetLuckModificator(bool shipmaster, std::string* strs) const
     result += GetArmy().GetLuckModificator(strs);
 
     return result;
+}
+
+bool HeroBase::CanCastSpell(const Spell & spell, std::string* res) const
+{
+    const Kingdom & kingdom = world.GetKingdom(GetColor());
+
+    if(res)
+    {
+	std::ostringstream os;
+
+	if(HaveSpellBook())
+	{
+	    if(HaveSpell(spell))
+	    {
+		if(HaveSpellPoints(spell.CostManaPoints(this)))
+		{
+		    if(kingdom.AllowPayment(spell.GetCost()))
+			return true;
+		    else
+	    		os << "resource" << " " << "failed";
+		}
+		else
+	    	    os << "mana points" << " " << "failed";
+	    }
+	    else
+	    	os << spell.GetName() << " " << "not found";
+	}
+	else
+	    os << "spell book" << " " << "not found";
+	*res = os.str();
+	return false;
+    }
+    return HaveSpellBook() && HaveSpell(spell) && HaveSpellPoints(spell.CostManaPoints(this)) && kingdom.AllowPayment(spell.GetCost());
+}
+
+void HeroBase::SpellCasted(const Spell & spell)
+{
+    // resource cost
+    Kingdom & kingdom = world.GetKingdom(GetColor());
+    const payment_t & cost = spell.GetCost();
+    if(cost.GetValidItems()) kingdom.OddFundsResource(cost);
+
+    // mana cost
+    u16 mp_cost = spell.CostManaPoints(this);
+    magic_point -= (mp_cost < magic_point ? mp_cost : magic_point);
 }

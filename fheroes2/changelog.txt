@@ -1,4 +1,7 @@
-SVN - up to r2260
+SVN - up to r2262
+
++ Fixed: load old format game
++ Fixed: hotseat select players
 
 Feb, 10, 2011
 + Added: BattleOnly (experimental)

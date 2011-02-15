@@ -22,7 +22,7 @@
 #ifndef H2SPELL_H
 #define H2SPELL_H
 
-#include <string>
+#include "payment.h"
 #include "gamedefs.h"
 
 class HeroBase;
@@ -119,6 +119,7 @@ public:
     u8 Resurrect(void) const;
 
     u8 ExtraValue(void) const;
+    payment_t GetCost(void) const;
     
     bool isValid(void) const;
     bool isLevel(u8) const;

@@ -35,6 +35,8 @@ struct cost_t
     u8 gems;
 };
 
+#define COST_NONE { 0, 0, 0, 0, 0, 0 ,0 }
+
 #ifdef WITH_XML
 struct TiXmlElement;                                                                                                     
 void   LoadCostFromXMLElement(cost_t &, const TiXmlElement &);

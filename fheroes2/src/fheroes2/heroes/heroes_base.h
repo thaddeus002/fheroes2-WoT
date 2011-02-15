@@ -70,8 +70,9 @@ public:
 
     u16 GetSpellPoints(void) const;
     bool HaveSpellPoints(u16) const;
+    bool CanCastSpell(const Spell &, std::string* = NULL) const;
+    void SpellCasted(const Spell &);
     void SetSpellPoints(u16);
-    void TakeSpellPoints(u16);
 
     void EditSpellBook(void);
     Spell OpenSpellBook(SpellBook::filter_t, bool) const;

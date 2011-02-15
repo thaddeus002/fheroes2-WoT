@@ -1,139 +1,139 @@
 <?xml version="1.0" ?>
 <spells>
 
- <!-- first: unknown spell, skip: skip read line, disable: spell not used in game (only for random spells) -->
- <spell skip="0" disable="0" cost="1" />
+ <!-- first: unknown spell, skip: skip read line, disable: spell not used in game (only for random spells), mp: mana point use -->
+ <spell skip="0" mp="1" disable="0" > <cost gold="0" wood="0" mercury="0" ore="0" sulfur="0" crystal="0" gems="0" /> </spell>
 
  <!-- Fireball -->
- <spell cost="9" extra="10" />
+ <spell mp="9" extra="10" />
  <!-- Fireblast -->
- <spell cost="15" extra="10" />
+ <spell mp="15" extra="10" />
  <!-- Lightning Bolt -->
- <spell cost="7" extra="25" />
+ <spell mp="7" extra="25" />
  <!-- Chain Lightning -->
- <spell cost="15" extra="40" />
+ <spell mp="15" extra="40" />
  <!-- Teleport -->
- <spell cost="9" />
+ <spell mp="9" />
  <!-- Cure -->
- <spell cost="6" extra="5" />
+ <spell mp="6" extra="5" />
  <!-- Mass Cure -->
- <spell cost="15" extra="5" />
+ <spell mp="15" extra="5" />
  <!-- Resurrect -->
- <spell cost="12" extra="50" />
+ <spell mp="12" extra="50" />
  <!-- Resurrect True -->
- <spell cost="15" extra="50" />
+ <spell mp="15" extra="50" />
  <!-- Haste (if set: current + extra, or zero: default h2) -->
- <spell cost="3" extra="0" />
+ <spell mp="3" extra="0" />
  <!-- Mass Haste (extra used from Haste) -->
- <spell cost="10" />
+ <spell mp="10" />
  <!-- Slow (if set: current - extra, or zero: default h2) -->
- <spell cost="3" extra="0" />
+ <spell mp="3" extra="0" />
  <!-- Mass Slow (extra used from Slow) -->
- <spell cost="15" />
+ <spell mp="15" />
  <!-- Blind  -->
- <spell cost="6" />
+ <spell mp="6" />
  <!-- Bless -->
- <spell cost="3" />
+ <spell mp="3" />
  <!-- Mass Bless -->
- <spell cost="12" />
+ <spell mp="12" />
  <!-- Stoneskin -->
- <spell cost="3" extra="3" />
+ <spell mp="3" extra="3" />
  <!-- Steelskin -->
- <spell cost="6" extra="5" />
+ <spell mp="6" extra="5" />
  <!-- Curse -->
- <spell cost="3" />
+ <spell mp="3" />
  <!-- Mass Curse -->
- <spell cost="12" />
+ <spell mp="12" />
  <!-- Holy Word -->
- <spell cost="9" extra="10" />
+ <spell mp="9" extra="10" />
  <!-- Holy Shout -->
- <spell cost="12" extra="20" />
+ <spell mp="12" extra="20" />
  <!-- Anti-Magic -->
- <spell cost="7" />
+ <spell mp="7" />
  <!-- Dispel Magic -->
- <spell cost="5" />
+ <spell mp="5" />
  <!-- Mass Dispel -->
- <spell cost="12" />
+ <spell mp="12" />
  <!-- Magic Arrow -->
- <spell cost="3" extra="10" />
+ <spell mp="3" extra="10" />
  <!-- Berserker -->
- <spell cost="12" />
+ <spell mp="12" />
  <!-- Armageddon -->
- <spell cost="20" extra="50" />
+ <spell mp="20" extra="50" />
  <!-- Elemental Storm -->
- <spell cost="15" extra="25" />
+ <spell mp="15" extra="25" />
  <!-- Meteor Shower -->
- <spell cost="15" extra="25" />
+ <spell mp="15" extra="25" />
  <!-- Paralyze -->
- <spell cost="9" />
+ <spell mp="9" />
  <!-- Hypnotize -->
- <spell cost="15" extra="25" />
+ <spell mp="15" extra="25" />
  <!-- Cold Ray -->
- <spell cost="6" extra="20" />
+ <spell mp="6" extra="20" />
  <!-- Cold Ring -->
- <spell cost="9" extra="10" />
+ <spell mp="9" extra="10" />
  <!-- Disrupting Ray -->
- <spell cost="7" extra="3" />
+ <spell mp="7" extra="3" />
  <!-- Death Ripple -->
- <spell cost="6" extra="5" />
+ <spell mp="6" extra="5" />
  <!-- Death Wave -->
- <spell cost="10" extra="10" />
+ <spell mp="10" extra="10" />
  <!-- Dragon Slayer -->
- <spell cost="6" extra="5" />
+ <spell mp="6" extra="5" />
  <!-- Blood Lust -->
- <spell cost="3" extra="3" />
+ <spell mp="3" extra="3" />
  <!-- Animate Dead -->
- <spell cost="10" extra="50" />
+ <spell mp="10" extra="50" />
  <!-- Mirror Image -->
- <spell cost="25" />
+ <spell mp="25" />
  <!-- Shield -->
- <spell cost="3" extra="2" />
+ <spell mp="3" extra="2" />
  <!-- Mass Shield -->
- <spell cost="7" />
+ <spell mp="7" />
  <!-- Summon Earth Elemental -->
- <spell cost="30" extra="3" />
+ <spell mp="30" extra="3" />
  <!-- Summon Air Elemental -->
- <spell cost="30" extra="3" />
+ <spell mp="30" extra="3" />
  <!-- Summon Fire Elemental -->
- <spell cost="30" extra="3" />
+ <spell mp="30" extra="3" />
  <!-- Summon Water Elemental -->
- <spell cost="30" extra="3" />
+ <spell mp="30" extra="3" />
  <!-- Earthquake -->
- <spell cost="15" />
+ <spell mp="15" />
  <!-- View Mines -->
- <spell cost="1" />
+ <spell mp="1" />
  <!-- View Resources -->
- <spell cost="1" />
+ <spell mp="1" />
  <!-- View Artifacts -->
- <spell cost="2" />
+ <spell mp="2" />
  <!-- View Towns -->
- <spell cost="2" />
+ <spell mp="2" />
  <!-- View Heroes -->
- <spell cost="2" />
+ <spell mp="2" />
  <!-- View All -->
- <spell cost="3" />
+ <spell mp="3" />
  <!-- Identify Hero -->
- <spell cost="3" />
+ <spell mp="3" />
  <!-- Summon Boat -->
- <spell cost="5" />
+ <spell mp="5" />
  <!-- Dimension Door (distance settings, or distance="0" for defaults: 14) OR:
    current_distance = configurable_distance * (current_sp * configurable_hp) / (configurable_sp * current_hp)  -->
- <spell cost="10" distance="10" sp="2" hp="100" />
+ <spell mp="10" distance="10" sp="2" hp="100" />
  <!-- Town Gate -->
- <spell cost="10" />
+ <spell mp="10" />
  <!-- Town Portal -->
- <spell cost="20" />
+ <spell mp="20" />
  <!-- Visions -->
- <spell cost="6" />
+ <spell mp="6" />
  <!-- Haunt -->
- <spell cost="8" extra="4" />
+ <spell mp="8" extra="4" />
  <!-- Set Earth Guardian -->
- <spell cost="15" extra="4" />
+ <spell mp="15" extra="4" />
  <!-- Set Air Guardian -->
- <spell cost="15" extra="4" />
+ <spell mp="15" extra="4" />
  <!-- Set Fire Guardian -->
- <spell cost="15" extra="4" />
+ <spell mp="15" extra="4" />
  <!-- Set Water Guardian -->
- <spell cost="15" extra="4" />
+ <spell mp="15" extra="4" />
 
 </spells>

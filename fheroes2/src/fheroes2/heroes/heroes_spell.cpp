@@ -108,7 +108,7 @@ bool Heroes::ActionSpellCast(const Spell & spell)
 	return false;
     }
     else
-    if(spell == Spell::NONE || spell.isCombat() || ! HaveSpellPoints(spell.CostManaPoints(this)))
+    if(spell == Spell::NONE || spell.isCombat() || ! CanCastSpell(spell))
     {
 	return false;
     }
@@ -140,7 +140,7 @@ bool Heroes::ActionSpellCast(const Spell & spell)
     if(apply)
     {
 	DEBUG(DBG_GAME, DBG_INFO, GetName() << " cast spell: " << spell.GetName());
-	TakeSpellPoints(spell.CostManaPoints(this));
+	SpellCasted(spell);
 	return true;
     }
     return false;

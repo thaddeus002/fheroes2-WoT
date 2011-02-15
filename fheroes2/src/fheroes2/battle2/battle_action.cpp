@@ -263,8 +263,7 @@ void Battle2::Arena::ApplyActionSpellCast(Action & action)
     HeroBase* current_commander = GetCurrentCommander();
 
     if(current_commander && !current_commander->Modes(Heroes::SPELLCASTED) &&
-	current_commander->HaveSpell(spell) &&
-	spell.isCombat() && current_commander->HaveSpellPoints(spell.CostManaPoints(current_commander)))
+	current_commander->CanCastSpell(spell) && spell.isCombat())
     {
 	DEBUG(DBG_BATTLE, DBG_TRACE, current_commander->GetName() << ", color: " << \
 	    Color::String(current_commander->GetColor()) << ", spell: " << spell.GetName());
@@ -297,7 +296,7 @@ void Battle2::Arena::ApplyActionSpellCast(Action & action)
 	}
 
 	current_commander->SetModes(Heroes::SPELLCASTED);
-	current_commander->TakeSpellPoints(spell.CostManaPoints(current_commander));
+	current_commander->SpellCasted(spell);
 
 #ifdef WITH_NET
 	if(Network::isRemoteClient())
