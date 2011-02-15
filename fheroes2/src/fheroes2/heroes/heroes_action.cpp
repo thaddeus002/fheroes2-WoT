@@ -541,7 +541,7 @@ void ActionToMonster(Heroes &hero, const u8 obj, const s32 dst_index)
 
 
     u32 join = 0;
-    Resource::funds_t cost;
+    Funds cost;
 
     u8 reason = Army::GetJoinSolution(hero, tile, join, cost.gold);
 
@@ -870,21 +870,13 @@ void ActionToCoast(Heroes &hero, const u8 obj, const s32 dst_index)
 void ActionToPickupResource(Heroes &hero, const u8 obj, const s32 dst_index)
 {
     Maps::Tiles & tile = world.GetTiles(dst_index);
-    Resource::funds_t resource;
-    Resource::resource_t res = Resource::UNKNOWN;
-    const u8 count = tile.GetQuantity2();
+    u16 count = tile.GetQuantity2();
+    Funds resource(tile.GetQuantity1(), count);
 
-    switch(tile.GetQuantity1())
+    if(tile.GetQuantity1() == Resource::GOLD)
     {
-	case Resource::WOOD: res = Resource::WOOD; resource.wood += count; break;
-    	case Resource::MERCURY: res = Resource::MERCURY; resource.mercury += count; break;
-    	case Resource::ORE: res = Resource::ORE; resource.ore += count; break;
-    	case Resource::SULFUR: res = Resource::SULFUR; resource.sulfur += count; break;
-    	case Resource::CRYSTAL: res = Resource::CRYSTAL; resource.crystal += count; break;
-    	case Resource::GEMS: res = Resource::GEMS; resource.gems += count; break;
-    	case Resource::GOLD: res = Resource::GOLD; resource.gold += 100 * count; break;
-
-	default: break;
+    	count *= 100;
+	resource.gold *= 100;
     }
 
     PlayPickupSound();
@@ -899,7 +891,6 @@ void ActionToPickupResource(Heroes &hero, const u8 obj, const s32 dst_index)
             tile.SetObject(MP2::OBJ_ZERO);
             Game::EnvironmentSoundMixer();
 
-            resource.gold += 100 * count;
             Dialog::ResourceInfo(MP2::StringObject(obj), _("Ransacking an enemy camp, you discover a hidden cache of treasures."), resource);
             break;
 
@@ -910,9 +901,8 @@ void ActionToPickupResource(Heroes &hero, const u8 obj, const s32 dst_index)
         default:
         {
             Interface::Basic & I = Interface::Basic::Get();
-            I.statusWindow.SetResource(res, (Resource::GOLD == res ? 100 * count : count));
+            I.statusWindow.SetResource(tile.GetQuantity1(), count);
             I.SetRedraw(REDRAW_STATUS);
-//            Display::Get().Flip();
 	}
             break;
     }
@@ -926,7 +916,7 @@ void ActionToResource(Heroes &hero, const u8 obj, const s32 dst_index)
 {
     Maps::Tiles & tile = world.GetTiles(dst_index);
     const u8 count = tile.GetQuantity2();
-    Resource::funds_t resource;
+    Funds resource;
 
     switch(tile.GetQuantity1())
     {
@@ -1039,7 +1029,7 @@ void ActionToWagon(Heroes &hero, const u8 obj, const s32 dst_index)
     if(tile.GetQuantity1() && tile.GetQuantity2())
     {
 	const u8 count = tile.GetQuantity2();
-	Resource::funds_t resource;
+	Funds resource;
 
 	switch(tile.GetQuantity1())
 	{
@@ -1078,7 +1068,7 @@ void ActionToFlotSam(Heroes &hero, const u8 obj, const s32 dst_index)
 {
     Maps::Tiles & tile = world.GetTiles(dst_index);
     std::string body;
-    Resource::funds_t resource;
+    Funds resource;
 
     resource.gold += 100 * tile.GetQuantity1();
     resource.wood += tile.GetQuantity2();
@@ -1456,7 +1446,7 @@ void ActionToPoorMoraleObject(Heroes &hero, const u8 obj, const s32 dst_index)
 			    hero.IncreaseExperience(res.GetExperienceAttacker());
 			    complete = true;
 			    const Artifact art(tile.GetQuantity1());
-			    Resource::funds_t resource;
+			    Funds resource;
 			    resource.gold = tile.GetQuantity2() * 100;
 			    PlaySoundSuccess;
 			    DialogWithArtifactAndGold(MP2::StringObject(obj), _("Upon defeating the zomies you search the graves and find something!"), art, resource.gold);
@@ -1481,7 +1471,7 @@ void ActionToPoorMoraleObject(Heroes &hero, const u8 obj, const s32 dst_index)
     		{
 		    Army::army_t army;
 		    army.FromGuardian(tile);
-		    Resource::funds_t resource;
+		    Funds resource;
 		    Artifact art = Artifact::UNKNOWN;
                     switch(tile.GetQuantity2())
                     {
@@ -1533,7 +1523,7 @@ void ActionToPoorMoraleObject(Heroes &hero, const u8 obj, const s32 dst_index)
     			{
 			    hero.IncreaseExperience(res.GetExperienceAttacker());
 			    complete = true;
-			    Resource::funds_t resource;
+			    Funds resource;
 			    resource.gold = tile.GetQuantity2() * 100;
 			    PlaySoundSuccess;
 			    DialogWithGold(MP2::StringObject(obj), _("Upon defeating the Skeletons you sift through the debris and find something!"), resource.gold);
@@ -1677,7 +1667,7 @@ void ActionToShipwreckSurvivor(Heroes &hero, const u8 obj, const s32 dst_index)
     }
     else
     {
-	Resource::funds_t prize(Resource::GOLD, 1500);
+	Funds prize(Resource::GOLD, 1500);
     	DialogWithGold(MP2::StringObject(obj),
 	    _("You've pulled a shipwreck survivor from certain death in an unforgiving ocean. Grateful, he says, \"I would give you an artifact as a reward, but you're all full.\""),
 	    prize.gold, Dialog::OK);
@@ -1720,13 +1710,13 @@ void ActionToArtifact(Heroes &hero, const u8 obj, const s32 dst_index)
 	case 3:
 	{
 	    std::string header;
-	    Resource::funds_t payment;
+	    Funds payment;
 
 	    if(1 == tile.GetQuantity2())
 	    {
 		header = _("A leprechaun offers you the %{art} for the small price of %{gold} Gold.");
 		String::Replace(header, "%{gold}", 2000);
-		payment += Resource::funds_t(Resource::GOLD, 2000);
+		payment += Funds(Resource::GOLD, 2000);
 	    }
 	    else
 	    if(2 == tile.GetQuantity2())
@@ -1735,8 +1725,8 @@ void ActionToArtifact(Heroes &hero, const u8 obj, const s32 dst_index)
 		String::Replace(header, "%{gold}", 2500);
 		String::Replace(header, "%{count}", 3);
 		String::Replace(header, "%{res}", Resource::String(tile.GetQuantity4()));
-		payment += Resource::funds_t(Resource::GOLD, 2500);
-		payment += Resource::funds_t(tile.GetQuantity4(), 3);
+		payment += Funds(Resource::GOLD, 2500);
+		payment += Funds(tile.GetQuantity4(), 3);
 	    }
 	    else
 	    {
@@ -1744,8 +1734,8 @@ void ActionToArtifact(Heroes &hero, const u8 obj, const s32 dst_index)
 		String::Replace(header, "%{gold}", 3000);
 		String::Replace(header, "%{count}", 5);
 		String::Replace(header, "%{res}", Resource::String(tile.GetQuantity4()));
-		payment += Resource::funds_t(Resource::GOLD, 3000);
-		payment += Resource::funds_t(tile.GetQuantity4(), 5);
+		payment += Funds(Resource::GOLD, 3000);
+		payment += Funds(tile.GetQuantity4(), 5);
 	    }
 	    String::Replace(header, "%{art}", art.GetName());
 
@@ -1886,7 +1876,7 @@ void ActionToArtifact(Heroes &hero, const u8 obj, const s32 dst_index)
 void ActionToTreasureChest(Heroes &hero, const u8 obj, const s32 dst_index)
 {
     Maps::Tiles & tile = world.GetTiles(dst_index);
-    Resource::funds_t resource;
+    Funds resource;
     resource.gold = tile.GetQuantity2() * 100;
 
     PlayPickupSound();
@@ -1988,7 +1978,8 @@ void ActionToAncientLamp(Heroes &hero, const u8 obj, const s32 dst_index)
 	const u16 recruit = Dialog::RecruitMonster(Monster::GENIE, count);
 	if(recruit)
 	{
-	    if(hero.GetArmy().JoinTroop(Monster::GENIE, recruit))
+	    const Monster genie(Monster::GENIE);
+	    if(hero.GetArmy().JoinTroop(genie, recruit))
 	    {
 		if(recruit == count)
 		{
@@ -2001,11 +1992,11 @@ void ActionToAncientLamp(Heroes &hero, const u8 obj, const s32 dst_index)
 		else
 		    tile.SetCountMonster(count - recruit);
 
-    		const payment_t paymentCosts(PaymentConditions::BuyMonster(Monster::GENIE) * recruit);
+    		const payment_t paymentCosts = genie.GetCost() * recruit;
                 world.GetKingdom(hero.GetColor()).OddFundsResource(paymentCosts);
 	    }
 	    else
-		Dialog::Message(Monster::GetName(Monster::GENIE), _("You are unable to recruit at this time, your ranks are full."), Font::BIG, Dialog::OK);
+		Dialog::Message(genie.GetName(), _("You are unable to recruit at this time, your ranks are full."), Font::BIG, Dialog::OK);
 	}
     }
 
@@ -2132,29 +2123,28 @@ void ActionToCaptureObject(Heroes &hero, const u8 obj, const s32 dst_index)
     Maps::Tiles & tile = world.GetTiles(dst_index);
     std::string header;
     std::string body;
-
-    Resource::resource_t res = Resource::UNKNOWN;
+    u8 resource = Resource::UNKNOWN;
 
     switch(obj)
     {
         case MP2::OBJ_ALCHEMYLAB:
-	    res = Resource::MERCURY;
+	    resource = Resource::MERCURY;
 	    header = MP2::StringObject(obj);
 	    body = _("You have taken control of the local Alchemist shop. It will provide you with %{count} unit of Mercury per day.");
 	    break;
 
         case MP2::OBJ_SAWMILL:    
-            res = Resource::WOOD;
+	    resource = Resource::WOOD;
 	    header = MP2::StringObject(obj);
 	    body = _("You gain control of a sawmill. It will provide you with %{count} units of wood per day.");
             break;
 
         case MP2::OBJ_MINES:
 	{
-	    res = static_cast<Resource::resource_t>(tile.GetMinesType());
-    	    header = Maps::GetMinesName(res);
+	    resource = tile.GetMinesType();
+    	    header = Maps::GetMinesName(resource);
 
-    	    switch(res)
+    	    switch(resource)
     	    {
         	case Resource::ORE:
         	    body = _("You gain control of an ore mine. It will provide you with %{count} units of ore per day."); break;
@@ -2206,7 +2196,7 @@ void ActionToCaptureObject(Heroes &hero, const u8 obj, const s32 dst_index)
 		capture = false;
         	BattleLose(hero, result, true);
 		if(Settings::Get().ExtSaveMonsterBattle())
-            	    tile.SetCountMonster(army.GetCountMonsters(troop()));
+            	    tile.SetCountMonster(army.GetCountMonsters(troop));
     	    }
 	}
 
@@ -2214,10 +2204,10 @@ void ActionToCaptureObject(Heroes &hero, const u8 obj, const s32 dst_index)
 	{
 	    world.CaptureObject(dst_index, hero.GetColor());
 
-	    if(res == Resource::UNKNOWN)
+	    if(resource == Resource::UNKNOWN)
 		Dialog::Message(header, body, Font::BIG, Dialog::OK);
 	    else
-		DialogCaptureResourceObject(header, body, res);
+		DialogCaptureResourceObject(header, body, resource);
 	}
     }
     else
@@ -2354,7 +2344,7 @@ void ActionToDwellingRecruitMonster(Heroes &hero, const u8 obj, const s32 dst_in
 		{
 		    tile.SetCountMonster(count - recruit);
 
-		    const payment_t paymentCosts(PaymentConditions::BuyMonster(monster()) * recruit);
+		    const payment_t paymentCosts = monster.GetCost() * recruit;
 		    world.GetKingdom(hero.GetColor()).OddFundsResource(paymentCosts);
 
 		    if(Settings::Get().ExtHeroRecalculateMovement())
@@ -2468,7 +2458,7 @@ void ActionToDwellingBattleMonster(Heroes &hero, const u8 obj, const s32 dst_ind
     		{
 		    tile.SetCountMonster(count - recruit);
 
-    		    const payment_t paymentCosts(PaymentConditions::BuyMonster(monster()) * recruit);
+    		    const payment_t paymentCosts = monster.GetCost() * recruit;
     		    world.GetKingdom(hero.GetColor()).OddFundsResource(paymentCosts);
 
 		    if(Settings::Get().ExtHeroRecalculateMovement())
@@ -2563,6 +2553,20 @@ void ActionToXanadu(Heroes &hero, const u8 obj, const s32 dst_index)
     DEBUG(DBG_GAME, DBG_INFO, hero.GetName());
 }
 
+bool ActionToUpgradeArmy(Army::army_t & army, const Monster & mons, std::string & str1, std::string & str2)
+{
+    if(army.HasMonster(mons))
+    {
+	army.UpgradeMonsters(mons);
+	if(str1.size()) str1 += ", ";
+	str1 += mons.GetMultiName();
+	if(str2.size()) str2 += ", ";
+	str2 += mons.GetUpgrade().GetMultiName();
+	return true;
+    }
+    return false;
+}
+
 void ActionToUpgradeArmyObject(Heroes &hero, const u8 obj, const s32 dst_index)
 {
     std::string monsters;
@@ -2571,7 +2575,7 @@ void ActionToUpgradeArmyObject(Heroes &hero, const u8 obj, const s32 dst_index)
     std::string msg2;
     std::string msg3;
     
-    std::vector<Monster::monster_t> mons;
+    std::vector<Monster> mons;
     mons.reserve(3);
 
     hero.MovePointsScaleFixed();
@@ -2579,31 +2583,13 @@ void ActionToUpgradeArmyObject(Heroes &hero, const u8 obj, const s32 dst_index)
     switch(obj)
     {
 	case MP2::OBJ_HILLFORT:
-	    if(hero.GetArmy().HasMonster(Monster::DWARF))
-	    {
-		hero.GetArmy().UpgradeMonsters(Monster::DWARF);
-		mons.push_back(Monster::DWARF);
-		monsters = Monster(Monster::DWARF).GetMultiName();
-		monsters_upgrade = Monster(Monster::Upgrade(Monster::DWARF)).GetMultiName();
-	    }
-	    if(hero.GetArmy().HasMonster(Monster::ORC))
-	    {
-		hero.GetArmy().UpgradeMonsters(Monster::ORC);
-		mons.push_back(Monster::ORC);
-		if(monsters.size()) monsters += ", ";
-		monsters += Monster(Monster::ORC).GetMultiName();
-		if(monsters_upgrade.size()) monsters_upgrade += ", ";
-		monsters_upgrade += Monster(Monster::Upgrade(Monster::ORC)).GetMultiName();
-	    }
-	    if(hero.GetArmy().HasMonster(Monster::OGRE))
-	    {
-		hero.GetArmy().UpgradeMonsters(Monster::OGRE);
-		mons.push_back(Monster::OGRE);
-		if(monsters.size()) monsters += ", ";
-		monsters += Monster(Monster::OGRE).GetMultiName();
-		if(monsters_upgrade.size()) monsters_upgrade += ", ";
-		monsters_upgrade += Monster(Monster::Upgrade(Monster::OGRE)).GetMultiName();
-	    }
+	    if(ActionToUpgradeArmy(hero.GetArmy(), Monster(Monster::DWARF), monsters, monsters_upgrade))
+		mons.push_back(Monster(Monster::DWARF));
+	    if(ActionToUpgradeArmy(hero.GetArmy(), Monster(Monster::ORC), monsters, monsters_upgrade))
+		mons.push_back(Monster(Monster::ORC));
+	    if(ActionToUpgradeArmy(hero.GetArmy(), Monster(Monster::OGRE), monsters, monsters_upgrade))
+		mons.push_back(Monster(Monster::OGRE));
+
 	    msg1 = _("All of the %{monsters} you have in your army have been trained by the battle masters of the fort. Your army now contains %{monsters2}.");
 	    String::Replace(msg1, "%{monsters}", monsters);
 	    String::Replace(msg1, "%{monsters2}", monsters_upgrade);
@@ -2611,31 +2597,13 @@ void ActionToUpgradeArmyObject(Heroes &hero, const u8 obj, const s32 dst_index)
 	    break;
 
 	case MP2::OBJ_FREEMANFOUNDRY:
-	    if(hero.GetArmy().HasMonster(Monster::PIKEMAN))
-	    {
-		hero.GetArmy().UpgradeMonsters(Monster::PIKEMAN);
-		mons.push_back(Monster::PIKEMAN);
-		monsters = Monster(Monster::PIKEMAN).GetMultiName();
-		monsters_upgrade = Monster(Monster::Upgrade(Monster::PIKEMAN)).GetMultiName();
-	    }
-	    if(hero.GetArmy().HasMonster(Monster::SWORDSMAN))
-	    {
-		hero.GetArmy().UpgradeMonsters(Monster::SWORDSMAN);
-		mons.push_back(Monster::SWORDSMAN);
-		if(monsters.size()) monsters += ", ";
-		monsters += Monster(Monster::SWORDSMAN).GetMultiName();
-		if(monsters_upgrade.size()) monsters_upgrade += ", ";
-		monsters_upgrade += Monster(Monster::Upgrade(Monster::SWORDSMAN)).GetMultiName();
-	    }
-	    if(hero.GetArmy().HasMonster(Monster::IRON_GOLEM))
-	    {
-		hero.GetArmy().UpgradeMonsters(Monster::IRON_GOLEM);
-		mons.push_back(Monster::IRON_GOLEM);
-		if(monsters.size()) monsters += ", ";
-		monsters += Monster(Monster::IRON_GOLEM).GetMultiName();
-		if(monsters_upgrade.size()) monsters_upgrade += ", ";
-		monsters_upgrade += Monster(Monster::Upgrade(Monster::IRON_GOLEM)).GetMultiName();
-	    }
+	    if(ActionToUpgradeArmy(hero.GetArmy(), Monster(Monster::PIKEMAN), monsters, monsters_upgrade))
+		mons.push_back(Monster(Monster::PIKEMAN));
+	    if(ActionToUpgradeArmy(hero.GetArmy(), Monster(Monster::SWORDSMAN), monsters, monsters_upgrade))
+		mons.push_back(Monster(Monster::SWORDSMAN));
+	    if(ActionToUpgradeArmy(hero.GetArmy(), Monster(Monster::IRON_GOLEM), monsters, monsters_upgrade))
+		mons.push_back(Monster(Monster::IRON_GOLEM));
+
 	    msg1 = _("All of your %{monsters} have been upgraded into %{monsters2}.");
 	    String::Replace(msg1, "%{monsters}", monsters);
 	    String::Replace(msg1, "%{monsters2}", monsters_upgrade);
@@ -2652,12 +2620,11 @@ void ActionToUpgradeArmyObject(Heroes &hero, const u8 obj, const s32 dst_index)
 	const Sprite & br = AGG::GetICN(ICN::STRIP, 12);
 	Surface sf(br.w() * mons.size() + (mons.size() - 1) * 4, br.h());
 	sf.SetColorKey();
-	std::vector<Monster::monster_t>::const_iterator it1 = mons.begin();
-	std::vector<Monster::monster_t>::const_iterator it2 = mons.end();
-	for(; it1 != it2; ++it1)
+	for(std::vector<Monster>::const_iterator
+	    it = mons.begin(); it != mons.end(); ++it)
 	{
 	    sf.Blit(br, ox, 0);
-	    switch(Monster(*it1).GetRace())
+	    switch(Monster(*it).GetRace())
 	    {
 		case Race::KNGT:	sf.Blit(AGG::GetICN(ICN::STRIP, 4), ox + 6, 6); break;
 		case Race::BARB:	sf.Blit(AGG::GetICN(ICN::STRIP, 5), ox + 6, 6); break;
@@ -2667,7 +2634,7 @@ void ActionToUpgradeArmyObject(Heroes &hero, const u8 obj, const s32 dst_index)
 		case Race::NECR:	sf.Blit(AGG::GetICN(ICN::STRIP, 9), ox + 6, 6); break;
 		default:		sf.Blit(AGG::GetICN(ICN::STRIP, 10), ox + 6, 6); break;
 	    }
-	    const Sprite & mon = AGG::GetICN(Monster(Monster::Upgrade(*it1)).ICNMonh(), 0);
+	    const Sprite & mon = AGG::GetICN((*it).GetUpgrade().ICNMonh(), 0);
 	    sf.Blit(mon, ox + 6 + mon.x(), 6 + mon.y());
 	    ox += br.w() + 4;
 	}
@@ -2774,7 +2741,7 @@ void ActionToTreeKnowledge(Heroes &hero, const u8 obj, const s32 dst_index)
     else
     {
 	bool conditions = false;
-	Resource::funds_t payment;
+	Funds payment;
 	switch(tile.GetQuantity2())
 	{
 	    case 10:	payment.gems = 10; break;
@@ -2837,7 +2804,7 @@ void ActionToDaemonCave(Heroes &hero, const u8 obj, const s32 dst_index)
     {
 	if(tile.GetQuantity2())
 	{
-	    Resource::funds_t resource;
+	    Funds resource;
 
 	    if(Dialog::YES == Dialog::Message("", _("You find a powerful and grotesque Demon in the cave. \"Today,\" it rasps, \"you will fight and surely die. But I will give you a choice of deaths. You may fight me, or you may fight my servants. Do you prefer to fight my servants?\""), Font::BIG, Dialog::YES|Dialog::NO))
 	    {
@@ -3089,7 +3056,7 @@ void ActionToSphinx(Heroes &hero, const u8 obj, const s32 dst_index)
 	    Dialog::InputString(header, answer);
 	    if(riddle->AnswerCorrect(answer))
 	    {
-		const Resource::funds_t & res = riddle->resource;
+		const Funds & res = riddle->resource;
 		const Artifact art = riddle->artifact;
 		const std::string say = _("Looking somewhat disappointed, the Sphinx sighs. You've answered my riddle so here's your reward. Now begone.");
 		const u8 count = res.GetValidItems();

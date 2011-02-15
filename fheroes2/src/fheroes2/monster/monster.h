@@ -24,7 +24,6 @@
 #define H2MONSTER_H
 
 #include <string>
-#include "skill.h"
 #include "icn.h"
 #include "m82.h"
 #include "payment.h"
@@ -32,7 +31,7 @@
 
 class Spell;
 
-class Monster : public Skill::Primary
+class Monster
 {
 public:
     enum level_t
@@ -123,29 +122,22 @@ public:
 	MONSTER_RND
     };
 
-    Monster();
+    Monster(u8 = UNKNOWN);
     Monster(const Spell &);
-    Monster(monster_t);
-    Monster(u8, u32);
+    Monster(u8 race, u32 dw);
 
-    bool operator== (monster_t) const;
-    bool operator!= (monster_t) const;
-    monster_t operator() (void) const;
+    bool operator== (const Monster &) const;
+    bool operator!= (const Monster &) const;
+    u8 operator() (void) const;
 
-    monster_t GetID(void) const;
+    u8 GetID(void) const;
 
-    void Set(monster_t);
-    void Set(const Monster &);
     void Upgrade(void);
+    Monster GetUpgrade(void) const;
 
     u8 GetAttack(void) const;
     u8 GetDefense(void) const;
-    u8 GetPower(void) const;
-    u8 GetKnowledge(void) const;
-    s8 GetMorale(void) const;
-    s8 GetLuck(void) const;
     u8 GetRace(void) const;
-    u8 GetType(void) const;
 
     u8  GetDamageMin(void) const;
     u8  GetDamageMax(void) const;
@@ -173,31 +165,22 @@ public:
 
     ICN::icn_t ICNMonh(void) const;
 
-    static monster_t Upgrade(Monster &);
-    static u8  GetLevel(Monster &);
-    static u32 GetDwelling(Monster &);
+    u8		GetSpriteIndex(void) const;
+    payment_t	GetCost(void) const;
+    payment_t	GetUpgradeCost(void) const;
+    u32		GetDwelling(void) const;
 
-    static u8 GetSpriteIndex(u8);
-    static const char* GetName(monster_t);
-    static const char* GetMultiName(monster_t);
-    static const char* GetPluralName(monster_t, u32);
-    static monster_t Upgrade(monster_t);
-    static u8  GetLevel(monster_t);
-    static u32 GetDwelling(monster_t);
-    static u32 GetCountFromHitPoints(monster_t, u32);
+    static Monster FromObject(u8);
+    static Monster Rand(level_t = LEVEL0);
 
-    static void GetCost(u8, payment_t &);
-    static void GetUpgradeCost(u8, payment_t &);
-
-    static monster_t FromInt(u8);
-    static monster_t FromDwelling(u8, u32);
-    static monster_t FromObject(u8);
-    static monster_t Rand(level_t = LEVEL0);
+    static u32 GetCountFromHitPoints(const Monster &, u32);
 
     static void UpdateStats(const std::string &);
 
 protected:
-    monster_t id;
+    static Monster FromDwelling(u8 race, u32 dw);
+
+    u8 id;
 };
 
 #endif

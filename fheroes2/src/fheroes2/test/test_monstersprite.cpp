@@ -101,7 +101,7 @@ void TestMonsterSprite(void)
             if(Dialog::SelectCount("Monster", Monster::PEASANT, Monster::WATER_ELEMENT, mons))
 	    {
         	cursor.Hide();
-		troop.SetMonster(Monster::FromInt(mons));
+		troop.SetMonster(Monster(mons));
 		start = 0;
 		count = AGG::GetICNCount(b.ICNFile());
 		frame = 0;

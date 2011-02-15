@@ -20,17 +20,7 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#include "gamedefs.h"
 #include "difficulty.h"
-
-// operator ++difficulty_t
-Difficulty::difficulty_t& Difficulty::operator++ (Difficulty::difficulty_t& difficulty)
-{ return difficulty = ( Difficulty::IMPOSSIBLE == difficulty ? Difficulty::EASY : Difficulty::difficulty_t(difficulty + 1)); }
-
-// operator --difficulty_t
-Difficulty::difficulty_t& Difficulty::operator-- (Difficulty::difficulty_t& difficulty)
-{ return difficulty = ( Difficulty::EASY == difficulty ? Difficulty::IMPOSSIBLE : Difficulty::difficulty_t(difficulty - 1)); }
-
 
 const char* Difficulty::String(u8 difficulty)
 {
@@ -47,9 +37,4 @@ const char* Difficulty::String(u8 difficulty)
     }
 
     return str_difficulty[5];
-}
-
-Difficulty::difficulty_t Difficulty::Get(u8 index)
-{
-    return IMPOSSIBLE < index ? IMPOSSIBLE : static_cast<difficulty_t>(index);
 }

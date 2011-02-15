@@ -44,7 +44,7 @@ public:
 	display.Blit(back, *this);
 	if(troop.isValid())
 	{
-	    const Sprite & mons32 = AGG::GetICN(ICN::MONS32, Monster::GetSpriteIndex(troop()));
+	    const Sprite & mons32 = AGG::GetICN(ICN::MONS32, troop.GetSpriteIndex());
 	    display.Blit(mons32, x + (back.w() - mons32.w()) / 2, y + back.h() - mons32.h() - 11);
 
 	    if(readonly)

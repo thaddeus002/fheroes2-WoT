@@ -27,6 +27,7 @@
 #include "world.h"
 #include "button.h"
 #include "kingdom.h"
+#include "monster.h"
 #include "dialog.h"
 
 void RedrawCurrentInfo(const Point & pos, u16 available, u32 result,
@@ -111,9 +112,9 @@ u16 Dialog::RecruitMonster(const Monster & monster, u16 available)
     
     // calculate max count
     u32 max = 0;
-    const PaymentConditions::BuyMonster paymentMonster(monster());
-    const Resource::funds_t & kingdomResource = world.GetMyKingdom().GetFundsResource();
-    while(Resource::funds_t(paymentMonster * max) <= kingdomResource && max <= available) ++max;
+    const payment_t paymentMonster = monster.GetCost();
+    const Funds & kingdomResource = world.GetMyKingdom().GetFunds();
+    while(Funds(paymentMonster * max) <= kingdomResource && max <= available) ++max;
 
     u32 result = --max;
 
@@ -370,8 +371,7 @@ void Dialog::DwellingInfo(const Monster & monster, u16 available)
     cursor.Hide();
     cursor.SetThemes(cursor.POINTER);
     
-    const PaymentConditions::BuyMonster paymentMonster(monster());
-
+    const payment_t paymentMonster = monster.GetCost();
     const Sprite & box = AGG::GetICN(ICN::RECR2BKG, 0);
     const Rect pos((display.w() - box.w()) / 2, (display.h() - box.h()) / 2, box.w(), box.h());
 

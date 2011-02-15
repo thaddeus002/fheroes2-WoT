@@ -125,7 +125,6 @@ public:
     u32 GetActualDwelling(u32) const;
 
     bool RecruitMonster(u32 dw, u16 count);
-    u16  HowManyRecruitMonster(u32 dw, const Resource::funds_t* add = NULL, Resource::funds_t* res = NULL) const;
     void RecruitAllMonster(void);
 
     void ChangeColor(Color::color_t cl);

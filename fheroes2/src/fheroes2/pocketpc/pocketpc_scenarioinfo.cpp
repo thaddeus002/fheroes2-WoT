@@ -132,7 +132,7 @@ Game::menu_t PocketPC::ScenarioInfo(void)
 	    {
 		cursor.Hide();
 		levelCursor.Move((*itr).x, (*itr).y);
-		conf.SetGameDifficulty(Difficulty::Get(itr - coordDifficulty.begin()));
+		conf.SetGameDifficulty(itr - coordDifficulty.begin());
 		cursor.Show();
 		display.Flip();
 	    }

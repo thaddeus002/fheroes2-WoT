@@ -25,6 +25,7 @@
 
 #include <string>
 #include "bitmodes.h"
+#include "color.h"
 #include "monster.h"
 
 namespace Battle2
@@ -34,6 +35,7 @@ namespace Battle2
     class Armies;
 }
 
+namespace Skill { class Primary; }
 namespace Maps { class Tiles; }
 
 namespace Army
@@ -50,17 +52,17 @@ namespace Army
     class Troop : public Monster
     {
       public:
-        Troop(monster_t m = Monster::UNKNOWN, u32 c = 0);
+        Troop();
+        Troop(const Monster &, u32 c = 0);
         Troop(const Troop &);
 	Troop(const Maps::Tiles &);
 	~Troop();
-        
+
+	bool	operator== (const Monster &) const;
         Troop & operator= (const Troop &);
 
         void	Set(const Monster &, u32);
-        void	Set(monster_t, u32);
         void	SetMonster(const Monster &);
-        void	SetMonster(monster_t);
         void	SetCount(u32);
         void	Reset(void);
         
@@ -90,12 +92,14 @@ namespace Army
 
         bool		isValid(void) const;
         bool    	isAffectedByMorale(void) const;
-	bool		HasMonster(monster_t) const;
 
 	bool		BattleInit(void);
 	void		BattleQuit(void);
 	u32		BattleKilled(void) const;
 	s8		GetArmyIndex(void) const;
+
+	payment_t	GetCost(void) const;
+	payment_t	GetUpgradeCost(void) const;
 
       protected:
         friend class army_t;

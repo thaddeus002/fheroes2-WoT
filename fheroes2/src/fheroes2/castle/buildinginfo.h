@@ -23,6 +23,7 @@
 #ifndef H2BUILDINGINFO_H
 #define H2BUILDINGINFO_H
 
+#include "payment.h"
 #include "castle.h"
 
 class StatusBar;
@@ -50,7 +51,7 @@ public:
     bool DialogBuyBuilding(bool buttons) const;
 
     static void UpdateCosts(const std::string &);
-    static void GetCost(u32, u8, payment_t &);
+    static payment_t GetCost(u32, u8);
 
 private:
     void RedrawCaptain(void);

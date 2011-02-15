@@ -2329,7 +2329,7 @@ Battle2::Stats* Battle2::Armies::FindMode(u32 mod)
     return it == end() ? NULL : *it;
 }
 
-Battle2::Stats* Battle2::Armies::CreateNewStats(Monster::monster_t id, u32 count)
+Battle2::Stats* Battle2::Armies::CreateNewStats(const Monster & mons, u32 count)
 {
     std::vector<Army::Troop> & armies = parent.army;
     std::vector<Army::Troop>::iterator it = armies.begin();
@@ -2343,8 +2343,7 @@ Battle2::Stats* Battle2::Armies::CreateNewStats(Monster::monster_t id, u32 count
         it = armies.end() - 1;
     }
 
-    (*it).id = id;
-    (*it).count = count;
+    (*it).Set(mons, count);
     (*it).army = &parent;
 
     (*it).BattleInit();

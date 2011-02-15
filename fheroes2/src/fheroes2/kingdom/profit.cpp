@@ -94,8 +94,9 @@ void ProfitConditions::UpdateCosts(const std::string & spec)
 #endif
 }
 
-ProfitConditions::FromBuilding::FromBuilding(u32 building, u8 race)
+payment_t ProfitConditions::FromBuilding(u32 building, u8 race)
 {
+    payment_t result;
     const char* id = NULL;
 
     switch(building)
@@ -109,12 +110,14 @@ ProfitConditions::FromBuilding::FromBuilding(u32 building, u8 race)
 
     profitstats_t* ptr = &_profits[0];
     while(ptr->id && id && std::strcmp(id, ptr->id)) ++ptr;
+    if(ptr && id) result = ptr->cost;
 
-    if(ptr && id) PaymentLoadCost(*this, ptr->cost);
+    return result;
 }
 
-ProfitConditions::FromArtifact::FromArtifact(u8 artifact)
+payment_t ProfitConditions::FromArtifact(u8 artifact)
 {
+    payment_t result;
     const char* id = NULL;
 
     switch(artifact)
@@ -135,12 +138,14 @@ ProfitConditions::FromArtifact::FromArtifact(u8 artifact)
 
     profitstats_t* ptr = &_profits[0];
     while(ptr->id && id && std::strcmp(id, ptr->id)) ++ptr;
+    if(ptr && id) result = ptr->cost;
 
-    if(ptr && id) PaymentLoadCost(*this, ptr->cost);
+    return result;
 }
 
-ProfitConditions::FromMine::FromMine(u8 type)
+payment_t ProfitConditions::FromMine(u8 type)
 {
+    payment_t result;
     const char* id = NULL;
 
     switch(type)
@@ -157,6 +162,7 @@ ProfitConditions::FromMine::FromMine(u8 type)
 
     profitstats_t* ptr = &_profits[0];
     while(ptr->id && id && std::strcmp(id, ptr->id)) ++ptr;
+    if(ptr && id) result = ptr->cost;
 
-    if(ptr && id) PaymentLoadCost(*this, ptr->cost);
+    return result;
 }

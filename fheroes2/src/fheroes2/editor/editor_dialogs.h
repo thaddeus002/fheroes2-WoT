@@ -31,7 +31,7 @@
 
 namespace Dialog
 {
-    Monster::monster_t	SelectMonster(Monster::monster_t cur = Monster::UNKNOWN);
+    Monster		SelectMonster(u8 id = Monster::UNKNOWN);
     Heroes::heroes_t	SelectHeroes(Heroes::heroes_t cur = Heroes::UNKNOWN);
     Artifact		SelectArtifact(u8 id = Artifact::UNKNOWN);
     Spell		SelectSpell(u8 id = Spell::NONE);

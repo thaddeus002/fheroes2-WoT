@@ -37,6 +37,7 @@
 #include "object.h"
 #include "objxloc.h"
 #include "monster.h"
+#include "spell.h"
 #include "resource.h"
 #include "maps_tiles.h"
 
@@ -535,6 +536,8 @@ void Maps::Tiles::RedrawMonster(Surface & dst) const
 	    break;
     }
 
+    const Monster mons(quantity3);
+
     // draw attack sprite
     if(-1 != dst_index && !conf.ExtOnlyFirstMonsterAttack())
     {
@@ -548,17 +551,17 @@ void Maps::Tiles::RedrawMonster(Surface & dst) const
 	    default: break;
 	}
 
-	const Sprite & sprite_first = AGG::GetICN(ICN::MINIMON, Monster::GetSpriteIndex(quantity3) * 9 + (revert ? 8 : 7));
+	const Sprite & sprite_first = AGG::GetICN(ICN::MINIMON, mons.GetSpriteIndex() * 9 + (revert ? 8 : 7));
 	area.BlitOnTile(dst, sprite_first, sprite_first.x() + 16, TILEWIDTH + sprite_first.y(), mp);
     }
     else
     {
 	// draw first sprite
-	const Sprite & sprite_first = AGG::GetICN(ICN::MINIMON, Monster::GetSpriteIndex(quantity3) * 9);
+	const Sprite & sprite_first = AGG::GetICN(ICN::MINIMON, mons.GetSpriteIndex() * 9);
 	area.BlitOnTile(dst, sprite_first, sprite_first.x() + 16, TILEWIDTH + sprite_first.y(), mp);
 
 	// draw second sprite
-	const Sprite & sprite_next = AGG::GetICN(ICN::MINIMON, Monster::GetSpriteIndex(quantity3) * 9 + 1 + 
+	const Sprite & sprite_next = AGG::GetICN(ICN::MINIMON, mons.GetSpriteIndex() * 9 + 1 + 
 	    monster_animation_cicle[ (Maps::AnimationTicket() + mp.x * mp.y) % (sizeof(monster_animation_cicle) / sizeof(monster_animation_cicle[0])) ]);
 	area.BlitOnTile(dst, sprite_next, sprite_next.x() + 16, TILEWIDTH + sprite_next.y(), mp);
     }
@@ -634,17 +637,10 @@ void Maps::Tiles::RedrawTop(Surface & dst, const TilesAddon* skip) const
 	else
 	if(quantity4 >= Spell::SETEGUARDIAN && quantity4 <= Spell::SETWGUARDIAN)
 	{
-	    const Sprite* mons = NULL;
-	    switch(quantity4)
-	    {
-		case Spell::SETAGUARDIAN: mons = &AGG::GetICN(ICN::MONS32, Monster::GetSpriteIndex(Monster::AIR_ELEMENT)); break;
-		case Spell::SETWGUARDIAN: mons = &AGG::GetICN(ICN::MONS32, Monster::GetSpriteIndex(Monster::WATER_ELEMENT)); break;
-		case Spell::SETEGUARDIAN: mons = &AGG::GetICN(ICN::MONS32, Monster::GetSpriteIndex(Monster::EARTH_ELEMENT)); break;
-		case Spell::SETFGUARDIAN: mons = &AGG::GetICN(ICN::MONS32, Monster::GetSpriteIndex(Monster::FIRE_ELEMENT)); break;
-		default: break;
-	    }
-	    if(mons)
-		area.BlitOnTile(dst, *mons, TILEWIDTH, 0, mp);
+	    const Spell spell(quantity4);
+	    const Monster mons(spell);
+	    if(mons.isValid())
+		area.BlitOnTile(dst, AGG::GetICN(ICN::MONS32, mons.GetSpriteIndex()), TILEWIDTH, 0, mp);
 	}
     }
 
@@ -1877,7 +1873,7 @@ void Maps::Tiles::UpdateMonsterInfo(void)
     }
 
     const TilesAddon* addons = FindObject(MP2::OBJ_MONSTER);
-    const Monster m(addons ? Monster::FromInt(addons->index + 1) : Monster::UNKNOWN);
+    const Monster m(addons ? addons->index + 1 : Monster::UNKNOWN);
     // fixed count
     quantity5 = 0;
 
@@ -1922,11 +1918,11 @@ void Maps::Tiles::UpdateRNDMonsterSprite(void)
     {
 	switch(mp2_object)
 	{
-    	    case MP2::OBJ_RNDMONSTER:       addon->index = Monster::Rand(); break;
-    	    case MP2::OBJ_RNDMONSTER1:      addon->index = Monster::Rand(Monster::LEVEL1); break;
-    	    case MP2::OBJ_RNDMONSTER2:      addon->index = Monster::Rand(Monster::LEVEL2); break;
-    	    case MP2::OBJ_RNDMONSTER3:      addon->index = Monster::Rand(Monster::LEVEL3); break;
-    	    case MP2::OBJ_RNDMONSTER4:      addon->index = Monster::Rand(Monster::LEVEL4); break;
+    	    case MP2::OBJ_RNDMONSTER:       addon->index = Monster::Rand().GetID(); break;
+    	    case MP2::OBJ_RNDMONSTER1:      addon->index = Monster::Rand(Monster::LEVEL1).GetID(); break;
+    	    case MP2::OBJ_RNDMONSTER2:      addon->index = Monster::Rand(Monster::LEVEL2).GetID(); break;
+    	    case MP2::OBJ_RNDMONSTER3:      addon->index = Monster::Rand(Monster::LEVEL3).GetID(); break;
+    	    case MP2::OBJ_RNDMONSTER4:      addon->index = Monster::Rand(Monster::LEVEL4).GetID(); break;
 
 	    default: DEBUG(DBG_GAME, DBG_WARN, "unknown object" << ", index: " << maps_index); return;
 	}

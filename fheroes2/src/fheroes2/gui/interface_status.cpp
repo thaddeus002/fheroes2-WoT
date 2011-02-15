@@ -30,6 +30,7 @@
 #include "castle.h"
 #include "heroes.h"
 #include "army.h"
+#include "resource.h"
 #include "game_focus.h"
 #include "game_interface.h"
 #include "interface_status.h"
@@ -239,7 +240,7 @@ void Interface::StatusWindow::DrawDayInfo(const u8 oh) const
     text.Blit(x + (w - text.w()) / 2, y + 46 + oh);
 }
 
-void Interface::StatusWindow::SetResource(Resource::resource_t res, u16 count)
+void Interface::StatusWindow::SetResource(u8 res, u16 count)
 {
     lastResource = res;
     countLastResource = count;

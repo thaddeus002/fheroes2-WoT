@@ -26,7 +26,10 @@
 #include "cursor.h"
 #include "speed.h"
 #include "settings.h"
+#include "resource.h"
 #include "castle.h"
+#include "kingdom.h"
+#include "world.h"
 #include "text.h"
 
 struct dwelling_t : public std::pair<u32, u16>
@@ -38,6 +41,28 @@ struct dwellings_t : public std::vector<dwelling_t>
 {
     dwellings_t() { reserve(6); };
 };
+
+u16 HowManyRecruitMonster(const Castle & castle, u32 dw, const Funds & add, Funds & res)
+{
+    const Monster ms(castle.GetRace(), castle.GetActualDwelling(dw));
+    const Kingdom & kingdom = world.GetKingdom(castle.GetColor());
+
+    if(! castle.GetArmy().CanJoinTroop(ms)) return 0;
+                                                                                                                         
+    u16 count = castle.GetDwellingLivedCount(dw);
+    payment_t payment;
+
+    while(count)
+    {
+        payment = ms.GetCost() * count;
+        res = payment;
+        payment += add;
+        if(kingdom.AllowPayment(payment)) break;
+        --count;
+    }
+
+    return count;
+}
 
 void Castle::OpenWell(void)
 {
@@ -113,12 +138,12 @@ void Castle::OpenWell(void)
 	    {
 		dwellings_t results;
 		std::string str;
-		Resource::funds_t cur, total;
+		Funds cur, total;
 		u16 can_recruit;
 
 		for(std::vector<u32>::const_iterator
 		    it = alldwellings.begin(); it != alldwellings.end(); ++it)
-		if(0 != (can_recruit = HowManyRecruitMonster(*it, &total, &cur)))
+		if(0 != (can_recruit = HowManyRecruitMonster(*this, *it, total, cur)))
 		{
 		    results.push_back(dwelling_t(*it, can_recruit));
 		    total += cur;

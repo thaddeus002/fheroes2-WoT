@@ -138,23 +138,23 @@ void Castle::LoadFromMP2(const void *ptr)
 	++ptr8;
 	
 	// monster1
-	army.At(0).SetMonster(Monster::FromInt(*ptr8 + 1));
+	army.At(0).SetMonster(Monster(*ptr8 + 1));
 	++ptr8;
 
 	// monster2
-	army.At(1).SetMonster(Monster::FromInt(*ptr8 + 1));
+	army.At(1).SetMonster(Monster(*ptr8 + 1));
 	++ptr8;
 
 	// monster3
-	army.At(2).SetMonster(Monster::FromInt(*ptr8 + 1));
+	army.At(2).SetMonster(Monster(*ptr8 + 1));
 	++ptr8;
 
 	// monster4
-	army.At(3).SetMonster(Monster::FromInt(*ptr8 + 1));
+	army.At(3).SetMonster(Monster(*ptr8 + 1));
 	++ptr8;
 
 	// monster5
-	army.At(4).SetMonster(Monster::FromInt(*ptr8 + 1));
+	army.At(4).SetMonster(Monster(*ptr8 + 1));
 	++ptr8;
 
 	// count1
@@ -618,7 +618,7 @@ bool Castle::RecruitMonster(u32 dw, u16 count)
     if(dwelling[dw_index] < count) count = dwelling[dw_index];
 
     // buy
-    const Resource::funds_t paymentCosts(PaymentConditions::BuyMonster(ms()) * count);
+    const payment_t paymentCosts = ms.GetCost() * count;
     Kingdom & kingdom = world.GetKingdom(color);
 
     // may be guardian present
@@ -636,42 +636,6 @@ bool Castle::RecruitMonster(u32 dw, u16 count)
 #endif
 
     return true;
-}
-
-u16 Castle::HowManyRecruitMonster(u32 dw, const Resource::funds_t* add, Resource::funds_t* res) const
-{
-    u8 dw_index = 0;
-
-    switch(dw)
-    {
-	case DWELLING_MONSTER1: dw_index = 0; break;
-	case DWELLING_MONSTER2: dw_index = 1; break;
-	case DWELLING_MONSTER3: dw_index = 2; break;
-	case DWELLING_MONSTER4: dw_index = 3; break;
-	case DWELLING_MONSTER5: dw_index = 4; break;
-	case DWELLING_MONSTER6: dw_index = 5; break;	
-	default: return 0;
-    }
-
-    const Monster ms(race, GetActualDwelling(dw));
-    const Kingdom & kingdom = world.GetKingdom(color);
-
-    if(!army.CanJoinTroop(ms())) return 0;
-
-    u16 count = dwelling[dw_index];
-    Resource::funds_t payment;
-
-    while(count)
-    {
-	payment = PaymentConditions::BuyMonster(ms());
-	payment *= count;
-	if(res) *res = payment;
-	if(add) payment += *add;
-	if(kingdom.AllowPayment(payment)) break;
-	--count;
-    }
-
-    return count;
 }
 
 /* return current count monster in dwelling */

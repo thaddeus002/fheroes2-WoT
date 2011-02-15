@@ -225,7 +225,7 @@ bool Game::IO::SaveBIN(QueueMessage & msg)
     msg.Push(conf.current_maps_file.description);
     // game
     msg.Push(static_cast<u16>(0xFF04));
-    msg.Push(static_cast<u8>(conf.game_difficulty));
+    msg.Push(conf.game_difficulty);
     msg.Push(static_cast<u8>(conf.my_color));
     msg.Push(static_cast<u8>(conf.cur_color));
     msg.Push(conf.game_type);
@@ -718,7 +718,7 @@ bool Game::IO::LoadBIN(QueueMessage & msg)
     // game
     msg.Pop(byte16);
     if(byte16 != 0xFF04) DEBUG(DBG_GAME, DBG_WARN, "0xFF04");
-    msg.Pop(byte8); conf.game_difficulty = Difficulty::Get(byte8);
+    msg.Pop(conf.game_difficulty);
     msg.Pop(byte8); conf.my_color = Color::Get(byte8);
     msg.Pop(byte8); conf.cur_color = Color::NONE;
     msg.Pop(conf.game_type);
@@ -1119,7 +1119,7 @@ void Game::IO::UnpackCastle(QueueMessage & msg, Castle & castle, u16 check_versi
     for(u32 jj = 0; jj < castle.army.Size(); ++jj)
     {
 	msg.Pop(byte8);
-	castle.army.At(jj).SetMonster(Monster::FromInt(byte8));
+	castle.army.At(jj).SetMonster(Monster(byte8));
         msg.Pop(byte32);
         castle.army.At(jj).SetCount(byte32);
     }
@@ -1244,7 +1244,7 @@ void Game::IO::UnpackHeroes(QueueMessage & msg, Heroes & hero, u16 check_version
 	for(u32 jj = 0; jj < hero.army.Size(); ++jj)
 	{
 	    msg.Pop(byte8);
-	    hero.army.At(jj).SetMonster(Monster::FromInt(byte8));
+	    hero.army.At(jj).SetMonster(Monster(byte8));
     	    msg.Pop(byte32);
 	    hero.army.At(jj).SetCount(byte32);
 	}
@@ -1314,7 +1314,7 @@ void Game::IO::UnpackHeroes(QueueMessage & msg, Heroes & hero, u16 check_version
 	for(u32 jj = 0; jj < hero.army.Size(); ++jj)
 	{
 	    msg.Pop(byte8);
-	    hero.army.At(jj).SetMonster(Monster::FromInt(byte8));
+	    hero.army.At(jj).SetMonster(Monster(byte8));
     	    msg.Pop(byte32);
 	    hero.army.At(jj).SetCount(byte32);
 	}

@@ -79,10 +79,10 @@ public:
     void RedrawItem(const int & index, s16 dstx, s16 dsty, bool current)
     {
       Display & display = Display::Get();
-      Monster::monster_t mons = Monster::FromInt(index);
-      display.Blit(AGG::GetICN(ICN::MONS32, Monster::GetSpriteIndex(mons)), dstx + 5, dsty + 3);
+      Monster mons(index);
+      display.Blit(AGG::GetICN(ICN::MONS32, mons.GetSpriteIndex()), dstx + 5, dsty + 3);
 
-      Text text(Monster::GetName(mons), (current ? Font::YELLOW_BIG : Font::BIG));
+      Text text(mons.GetName(), (current ? Font::YELLOW_BIG : Font::BIG));
       text.Blit(dstx + 50, dsty + 10);
     };
 
@@ -96,7 +96,7 @@ public:
 
     void ActionListPressRight(int & index)
     {
-      Army::Troop troop(Monster::FromInt(index), 1);
+      Army::Troop troop(Monster(index), 1);
       Dialog::ArmyInfo(troop, 0);
     };
 };
@@ -286,19 +286,19 @@ Artifact Dialog::SelectArtifact(u8 cur)
 	Artifact(listbox.GetCurrent()) : Artifact(Artifact::UNKNOWN);
 }
 
-Monster::monster_t Dialog::SelectMonster(Monster::monster_t cur)
+Monster Dialog::SelectMonster(u8 id)
 {
     Display & display = Display::Get();
     Cursor & cursor = Cursor::Get();
     LocalEvent & le = LocalEvent::Get();
 
-    std::vector<int> monsters(static_cast<int>(Monster::MONSTER_RND1) - 1, Monster::UNKNOWN);
+    std::vector<int> monsters(static_cast<int>(Monster::WATER_ELEMENT), Monster::UNKNOWN);
 
     cursor.Hide();
     cursor.SetThemes(cursor.POINTER);
 
 
-    for(size_t ii = 0; ii < monsters.size(); ++ii) monsters[ii] = Monster::FromInt(ii + 1);
+    for(size_t ii = 0; ii < monsters.size(); ++ii) monsters[ii] = ii + 1; // skip Monser::UNKNOWN
 
     const u16 window_w = 260;
     const u16 window_h = 280;
@@ -313,8 +313,8 @@ Monster::monster_t Dialog::SelectMonster(Monster::monster_t cur)
     SelectEnumMonster listbox(area);
 
     listbox.SetListContent(monsters);
-    if(cur != Monster::UNKNOWN)
-	listbox.SetCurrent(static_cast<int>(cur));
+    if(id != Monster::UNKNOWN)
+	listbox.SetCurrent(static_cast<int>(id));
     listbox.Redraw();
 
     ButtonGroups btnGroups(area, Dialog::OK|Dialog::CANCEL);
@@ -339,7 +339,7 @@ Monster::monster_t Dialog::SelectMonster(Monster::monster_t cur)
     }
 
     return result == Dialog::OK || listbox.ok ?
-	Monster::FromInt(listbox.GetCurrent()) : Monster::UNKNOWN;
+	Monster(listbox.GetCurrent()) : Monster(Monster::UNKNOWN);
 }
 
 Heroes::heroes_t Dialog::SelectHeroes(Heroes::heroes_t cur)

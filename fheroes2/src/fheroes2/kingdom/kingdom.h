@@ -57,13 +57,13 @@ public:
     void UpdateStartingResource(void);
     bool isPlay(void) const{ return Modes(PLAY); }
     bool isLoss(void) const;
-    bool AllowPayment(const Resource::funds_t & funds) const;
+    bool AllowPayment(const Funds & funds) const;
     bool AllowRecruitHero(bool check_payment, u8 level) const;
 
     Color::color_t GetColor(void) const{ return color; }
     u8 GetRace(void) const;
 
-    const Resource::funds_t & GetFundsResource(void) const{ return resource; }
+    const Funds & GetFunds(void) const{ return resource; }
     u16 GetFundsWood(void) const{ return resource.wood; }
     u16 GetFundsMercury(void) const{ return resource.mercury; }
     u16 GetFundsOre(void) const{ return resource.ore; }
@@ -76,8 +76,8 @@ public:
     const Heroes* GetBestHero(void) const;
     u32 GetArmiesStrength(void) const;
 
-    void AddFundsResource(const Resource::funds_t & funds);
-    void OddFundsResource(const Resource::funds_t & funds);
+    void AddFundsResource(const Funds & funds);
+    void OddFundsResource(const Funds & funds);
 
     u8 GetCountCastle(void) const;
     u8 GetCountTown(void) const;
@@ -139,7 +139,7 @@ private:
 
     Color::color_t color;
     Game::control_t control;
-    Resource::funds_t resource;
+    Funds resource;
 
     u16 flags;
     u8  lost_town_days;

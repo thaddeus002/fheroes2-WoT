@@ -22,7 +22,6 @@
 #ifndef H2COLOR_H
 #define H2COLOR_H
 
-#include <string>
 #include <vector>
 #include "gamedefs.h"
 

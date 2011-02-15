@@ -588,7 +588,7 @@ void Battle2::Arena::ApplyActionSurrender(Action & action)
 
     if(CanSurrenderOpponent(current_color))
     {
-	Resource::funds_t cost;
+	Funds cost;
 
     	if(army1.GetColor() == current_color)
 		cost.gold = army1.GetSurrenderCost();

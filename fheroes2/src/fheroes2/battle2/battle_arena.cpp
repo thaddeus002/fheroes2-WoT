@@ -1821,7 +1821,7 @@ Battle2::Stats* Battle2::Arena::CreateElemental(const Spell & spell)
     u16 count = spell.ExtraValue() * hero->GetPower();
     if(hero->HasArtifact(Artifact::BOOK_ELEMENTS)) count *= 2;
 
-    elem = friends.CreateNewStats(mons(), count);
+    elem = friends.CreateNewStats(mons, count);
     if(elem)
     {
         elem->position = pos;
@@ -1842,7 +1842,7 @@ Battle2::Stats* Battle2::Arena::CreateMirrorImage(Stats & b, u16 pos)
 {
     Armies friends(*b.GetArmy());
 
-    Stats* image = friends.CreateNewStats(b.troop(), b.count);
+    Stats* image = friends.CreateNewStats(b.troop, b.count);
 
     if(image)
     {

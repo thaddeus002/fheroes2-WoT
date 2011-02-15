@@ -930,7 +930,7 @@ Dialog::answer_t Castle::OpenDialog(bool readonly, bool fade)
 void Castle::RedrawResourcePanel(const Point & pt)
 {
     Display & display = Display::Get();
-    const Resource::funds_t & resource = world.GetMyKingdom().GetFundsResource();
+    const Funds & resource = world.GetMyKingdom().GetFunds();
 
     Point dst_pt = pt;
 

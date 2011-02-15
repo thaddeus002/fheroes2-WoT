@@ -313,23 +313,23 @@ void Heroes::LoadFromMP2(s32 map_index, const void *ptr, const Color::color_t cl
 	custom_troop = true;
 
         // monster1
-        army.At(0).SetMonster(Monster::FromInt(*ptr8 + 1));
+        army.At(0).SetMonster(Monster(*ptr8 + 1));
         ++ptr8;
 
         // monster2
-        army.At(1).SetMonster(Monster::FromInt(*ptr8 + 1));
+        army.At(1).SetMonster(Monster(*ptr8 + 1));
         ++ptr8;
 
         // monster3
-        army.At(2).SetMonster(Monster::FromInt(*ptr8 + 1));
+        army.At(2).SetMonster(Monster(*ptr8 + 1));
         ++ptr8;
 
         // monster4
-        army.At(3).SetMonster(Monster::FromInt(*ptr8 + 1));
+        army.At(3).SetMonster(Monster(*ptr8 + 1));
         ++ptr8;
 
         // monster5
-        army.At(4).SetMonster(Monster::FromInt(*ptr8 + 1));
+        army.At(4).SetMonster(Monster(*ptr8 + 1));
         ++ptr8;
 
         // count1
@@ -793,7 +793,7 @@ bool Heroes::Recruit(const Castle & castle)
 void Heroes::ActionNewDay(void)
 {
     // increase resource
-    Resource::funds_t resource;
+    Funds resource;
 
     // skip incomes for first day
     if(HasArtifact(Artifact::GOLDEN_GOOSE))           resource += ProfitConditions::FromArtifact(Artifact::GOLDEN_GOOSE);

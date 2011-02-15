@@ -158,9 +158,8 @@ Dialog::answer_t Dialog::ArmyInfo(const Army::Troop & troop, u16 flags)
             // upgrade
             if(buttonUpgrade.isEnable() && le.MouseClickLeft(buttonUpgrade))
             {
-        	PaymentConditions::UpgradeMonster payment(troop());
-                payment *= troop.GetCount();
-        	if(Dialog::YES == Dialog::ResourceInfo("", _("Your troops can be upgraded, but it will cost you dearly. Do you wish to upgrade them?"), payment, Dialog::YES|Dialog::NO))
+        	if(Dialog::YES == Dialog::ResourceInfo("", _("Your troops can be upgraded, but it will cost you dearly. Do you wish to upgrade them?"),
+									troop.GetUpgradeCost(), Dialog::YES|Dialog::NO))
 		{
 		    result = Dialog::UPGRADE;
         	    break;

@@ -25,6 +25,7 @@
 #include "maps.h"
 #include "race.h"
 #include "tinyconfig.h"
+#include "difficulty.h"
 #include "settings.h"
 
 #define DEFAULT_PORT	5154
@@ -647,7 +648,7 @@ u8 Settings::MinorVersion(void) const { return minor_version; }
 u16 Settings::Debug(void) const { return debug; }
 
 /* return game difficulty */
-Difficulty::difficulty_t Settings::GameDifficulty(void) const { return game_difficulty; }
+u8 Settings::GameDifficulty(void) const { return game_difficulty; }
 
 Color::color_t Settings::CurrentColor(void) const { return cur_color; }
 Color::color_t Settings::MyColor(void) const { return my_color; }
@@ -760,7 +761,7 @@ void Settings::SetDebug(const u16 d)
 }
 
 /**/
-void Settings::SetGameDifficulty(const Difficulty::difficulty_t d) { game_difficulty = d; }
+void Settings::SetGameDifficulty(u8 d) { game_difficulty = d; }
 
 void Settings::SetCurrentColor(const Color::color_t c) { cur_color = c; }
 void Settings::SetMyColor(const Color::color_t c) { my_color = c; }
@@ -865,9 +866,9 @@ const std::string & Settings::MapsDescription(void) const
     return current_maps_file.description;
 }
 
-Difficulty::difficulty_t Settings::MapsDifficulty(void) const
+u8 Settings::MapsDifficulty(void) const
 {
-    return Difficulty::Get(current_maps_file.difficulty);
+    return current_maps_file.difficulty;
 }
 
 u16 Settings::MapsWidth(void) const

@@ -49,7 +49,7 @@ bool ActionSpellDimensionDoor(Heroes &);
 bool ActionSpellTownGate(Heroes &);
 bool ActionSpellTownPortal(Heroes &);
 bool ActionSpellVisions(Heroes &);
-bool ActionSpellSetGuardian(Heroes &, Monster::monster_t);
+bool ActionSpellSetGuardian(Heroes &, const Spell &, u8 id);
 
 class CastleIndexListBox : public Interface::ListBox<s32>
 {
@@ -129,11 +129,11 @@ bool Heroes::ActionSpellCast(const Spell & spell)
 	case Spell::TOWNGATE:		apply = ActionSpellTownGate(*this); break;
 	case Spell::TOWNPORTAL:		apply = ActionSpellTownPortal(*this); break;
 	case Spell::VISIONS:		apply = ActionSpellVisions(*this); break;
-	case Spell::HAUNT:		apply = ActionSpellSetGuardian(*this, Monster::GHOST); break;
-	case Spell::SETEGUARDIAN:	apply = ActionSpellSetGuardian(*this, Monster::EARTH_ELEMENT); break;
-	case Spell::SETAGUARDIAN:	apply = ActionSpellSetGuardian(*this, Monster::AIR_ELEMENT); break;
-	case Spell::SETFGUARDIAN:	apply = ActionSpellSetGuardian(*this, Monster::FIRE_ELEMENT); break;
-	case Spell::SETWGUARDIAN:	apply = ActionSpellSetGuardian(*this, Monster::WATER_ELEMENT); break;
+	case Spell::HAUNT:
+	case Spell::SETEGUARDIAN:
+	case Spell::SETAGUARDIAN:
+	case Spell::SETFGUARDIAN:
+	case Spell::SETWGUARDIAN:	apply = ActionSpellSetGuardian(*this, spell, Monster::WATER_ELEMENT); break;
 	default: break;
     }
 
@@ -462,7 +462,7 @@ bool ActionSpellVisions(Heroes & hero)
 	    const Army::Troop troop(tile);
 
     	    u32 join = troop.GetCount();
-    	    Resource::funds_t cost;
+    	    Funds cost;
 
 	    const u8 reason = Army::GetJoinSolution(hero, tile, join, cost.gold);
 	    std::string hdr, msg;
@@ -515,7 +515,7 @@ bool ActionSpellVisions(Heroes & hero)
     return true;
 }
 
-bool ActionSpellSetGuardian(Heroes & hero, Monster::monster_t m)
+bool ActionSpellSetGuardian(Heroes & hero, const Spell & spell, u8 id)
 {
     if(MP2::OBJ_MINES != hero.GetUnderObject())
     {
@@ -526,19 +526,6 @@ bool ActionSpellSetGuardian(Heroes & hero, Monster::monster_t m)
     const s32 index = hero.GetIndex();
     if(!Maps::isValidAbsIndex(index)) return false;
 
-    Spell spell(Spell::NONE);
-
-    switch(m)
-    {
-	case Monster::GHOST:		spell = Spell::HAUNT; break;
-	case Monster::EARTH_ELEMENT:	spell = Spell::SETEGUARDIAN; break;
-	case Monster::AIR_ELEMENT:	spell = Spell::SETAGUARDIAN; break;
-	case Monster::FIRE_ELEMENT:	spell = Spell::SETFGUARDIAN; break;
-	case Monster::WATER_ELEMENT:	spell = Spell::SETWGUARDIAN; break;
-	default: return false;
-    }
-
-
     const u16 count = hero.GetPower() * spell.ExtraValue();
 
     if(count)
@@ -548,7 +535,7 @@ bool ActionSpellSetGuardian(Heroes & hero, Monster::monster_t m)
 	// clear old spell
 	if(spell != tile.GetQuantity3()) tile.ResetQuantity();
 
-	tile.SetQuantity3(m);
+	tile.SetQuantity3(id);
 	tile.SetQuantity4(spell());
 
 	//if(Settings::Get().OriginalVersion())

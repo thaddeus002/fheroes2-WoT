@@ -22,12 +22,11 @@
 #ifndef H2DIFFICULTY_H
 #define H2DIFFICULTY_H
 
-#include <string>
 #include "gamedefs.h"
 
 namespace Difficulty
 {
-    enum  difficulty_t
+    enum
     {
 	EASY,
         NORMAL,
@@ -36,11 +35,7 @@ namespace Difficulty
         IMPOSSIBLE
     };
 
-    difficulty_t& operator++ (difficulty_t& difficulty);
-    difficulty_t& operator-- (difficulty_t& difficulty);
-    
     const char* String(u8);
-    difficulty_t Get(u8);
 }
 
 #endif

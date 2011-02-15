@@ -27,6 +27,7 @@
 #include "maps.h"
 #include "game.h"
 #include "game_over.h"
+#include "difficulty.h"
 #include "dialog.h"
 
 void Dialog::GameInfo(void)

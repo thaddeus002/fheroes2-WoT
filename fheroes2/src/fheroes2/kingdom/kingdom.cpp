@@ -143,7 +143,7 @@ void Kingdom::UpdateStartingResource(void)
     }
 
     if(Game::AI == control) sres = &starting_resource[5];
-    if(sres) PaymentLoadCost(resource, *sres);
+    if(sres) resource = *sres;
 }
 
 void Kingdom::SetModes(flags_t f)
@@ -264,7 +264,7 @@ void Kingdom::ActionNewWeek(void)
 	// debug an gift
 	if(IS_DEVEL() && Game::LOCAL == Control())
 	{
-	    Resource::funds_t gift(20, 20, 10, 10, 10, 10, 5000);
+	    Funds gift(20, 20, 10, 10, 10, 10, 5000);
 	    DEBUG(DBG_GAME, DBG_INFO, "debug gift: " << gift.Dump());
 	    resource += gift;
 	}
@@ -372,7 +372,7 @@ u8 Kingdom::GetRace(void) const
     return Settings::Get().KingdomRace(color);
 }
 
-bool Kingdom::AllowPayment(const Resource::funds_t & funds) const
+bool Kingdom::AllowPayment(const Funds & funds) const
 {
     return funds > resource ? false : true;
 }
@@ -422,7 +422,7 @@ u8 Kingdom::GetCountCapital(void) const
     return std::count_if(castles.begin(), castles.end(), Castle::PredicateIsCapital);
 }
 
-void Kingdom::AddFundsResource(const Resource::funds_t & funds)
+void Kingdom::AddFundsResource(const Funds & funds)
 {
     resource = resource + funds;
 
@@ -435,7 +435,7 @@ void Kingdom::AddFundsResource(const Resource::funds_t & funds)
     if(0 > resource.gold) resource.gold = 0;
 }
 
-void Kingdom::OddFundsResource(const Resource::funds_t & funds)
+void Kingdom::OddFundsResource(const Funds & funds)
 {
     resource = resource - funds;
 
@@ -566,7 +566,7 @@ void Kingdom::HeroesActionNewPosition(void)
 
 u32 Kingdom::GetIncome(void)
 {
-    Resource::funds_t resource;
+    Funds resource;
 
     // captured object
     //resource += ProfitConditions::FromMine(Resource::WOOD) * world.CountCapturedObject(MP2::OBJ_SAWMILL, color);

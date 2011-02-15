@@ -23,7 +23,6 @@
 #include <cstring>
 #include "castle.h"
 #include "race.h"
-#include "monster.h"
 #include "buildinginfo.h"
 #include "settings.h"
 #include "payment.h"
@@ -49,17 +48,6 @@ static paymentstats_t _payments[] = {
 
     { NULL, { 0, 0, 0, 0, 0, 0, 0 } },
 };
-
-void PaymentLoadCost(payment_t & payment, const cost_t & cost)
-{
-    payment.gold = cost.gold;
-    payment.wood = cost.wood;
-    payment.mercury = cost.mercury;
-    payment.ore = cost.ore;
-    payment.sulfur = cost.sulfur;
-    payment.crystal = cost.crystal;
-    payment.gems = cost.gems;
-}
 
 #ifdef WITH_XML
 void LoadCostFromXMLElement(cost_t & cost, const TiXmlElement & element)
@@ -103,32 +91,25 @@ void PaymentConditions::UpdateCosts(const std::string & spec)
 #endif
 }
 
-PaymentConditions::BuyMonster::BuyMonster(u8 monster)
+payment_t PaymentConditions::BuyBuilding(u8 race, u32 build)
 {
-    Monster::GetCost(monster, *this);
+    return BuildingInfo::GetCost(build, race);
 }
 
-PaymentConditions::UpgradeMonster::UpgradeMonster(u8 monster)
+payment_t PaymentConditions::BuyBoat(void)
 {
-    Monster::GetUpgradeCost(monster, *this);
-}
-
-PaymentConditions::BuyBuilding::BuyBuilding(u8 race, u32 build)
-{
-    BuildingInfo::GetCost(build, race, *this);
-}
-
-PaymentConditions::BuyBoat::BuyBoat()
-{
+    payment_t result;
     paymentstats_t* ptr = &_payments[0];
 
     while(ptr->id && std::strcmp("buy_boat", ptr->id)) ++ptr;
+    if(ptr) result = ptr->cost;
 
-    if(ptr) PaymentLoadCost(*this, ptr->cost);
+    return result;
 }
 
-PaymentConditions::BuySpellBook::BuySpellBook(u8 shrine)
+payment_t PaymentConditions::BuySpellBook(u8 shrine)
 {
+    payment_t result;
     paymentstats_t* ptr = &_payments[0];
     const char* skey = NULL;
 
@@ -141,15 +122,17 @@ PaymentConditions::BuySpellBook::BuySpellBook(u8 shrine)
     }
 
     while(ptr->id && std::strcmp(skey, ptr->id)) ++ptr;
+    if(ptr) result = ptr->cost;
 
-    if(ptr) PaymentLoadCost(*this, ptr->cost);
+    return result;
 }
 
-PaymentConditions::RecruitHero::RecruitHero(u8 level)
+payment_t PaymentConditions::RecruitHero(u8 level)
 {
+    payment_t result;
     paymentstats_t* ptr = &_payments[0];
     while(ptr->id && std::strcmp("recruit_hero", ptr->id)) ++ptr;
-    if(ptr) PaymentLoadCost(*this, ptr->cost);
+    if(ptr) result = ptr->cost;
 
     // level price
     if(Settings::Get().ExtHeroRecruitCostDependedFromLevel())
@@ -158,13 +141,15 @@ PaymentConditions::RecruitHero::RecruitHero(u8 level)
 	while(ptr->id && std::strcmp("recruit_level", ptr->id)) ++ptr;
 	if(ptr && 1 < level)
 	{
-	    if(ptr->cost.gold) gold += (level - 1) * ptr->cost.gold;
-	    if(ptr->cost.wood) wood += (level - 1) * ptr->cost.wood;
-	    if(ptr->cost.mercury) mercury += (level - 1) * ptr->cost.mercury;
-	    if(ptr->cost.ore) ore += (level - 1) * ptr->cost.ore;
-	    if(ptr->cost.sulfur) sulfur += (level - 1) * ptr->cost.sulfur;
-	    if(ptr->cost.crystal) crystal += (level - 1) * ptr->cost.crystal;
-	    if(ptr->cost.gems) gems += (level - 1) * ptr->cost.gems;
+	    if(ptr->cost.gold) result.gold += (level - 1) * ptr->cost.gold;
+	    if(ptr->cost.wood) result.wood += (level - 1) * ptr->cost.wood;
+	    if(ptr->cost.mercury) result.mercury += (level - 1) * ptr->cost.mercury;
+	    if(ptr->cost.ore) result.ore += (level - 1) * ptr->cost.ore;
+	    if(ptr->cost.sulfur) result.sulfur += (level - 1) * ptr->cost.sulfur;
+	    if(ptr->cost.crystal) result.crystal += (level - 1) * ptr->cost.crystal;
+	    if(ptr->cost.gems) result.gems += (level - 1) * ptr->cost.gems;
 	}
     }
+
+    return result;
 }

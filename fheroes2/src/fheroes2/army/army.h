@@ -33,7 +33,6 @@ class Castle;
 class Heroes;
 namespace Maps { class Tiles; }
 namespace Battle2 { class Stats; class Armies; }
-namespace Resource { struct funds_t; }
 
 namespace Army
 {
@@ -73,7 +72,6 @@ namespace Army
 
 	    void	FromGuardian(const Maps::Tiles &);
 	    void	UpgradeMonsters(const Monster &);
-	    void	UpgradeMonsters(const Monster::monster_t);
 	    void	Clear(void);
 	    void	Reset(bool = false);	// reset: soft or hard
 
@@ -101,7 +99,6 @@ namespace Army
 	    u8		GetCount(void) const;
 	    u8		GetUniqCount(void) const;
 	    u32		GetCountMonsters(const Monster &) const;
-	    u32		GetCountMonsters(const Monster::monster_t) const;
 	    s8		GetMorale(void) const;
 	    s8		GetLuck(void) const;
 	    s8		GetMoraleModificator(std::string *strs) const;
@@ -119,12 +116,10 @@ namespace Army
 
 	    bool	isValid(void) const;
 	    bool	HasMonster(const Monster &) const;
-	    bool	HasMonster(const Monster::monster_t) const;
 	    bool	JoinTroop(const Troop & troop);
-	    bool	JoinTroop(const Monster::monster_t mon, const u32 count);
 	    bool	JoinTroop(const Monster & mon, const u32 count);
 	    bool 	JoinArmy(Army::army_t &);
-	    bool	CanJoinTroop(const Monster::monster_t mon) const;
+	    bool	CanJoinTroop(const Monster & mon) const;
 	    bool	CanJoinArmy(const Army::army_t &) const;
 	    bool	StrongerEnemyArmy(const army_t &) const;
 	    bool	AllTroopsIsRace(u8) const;
@@ -142,6 +137,8 @@ namespace Army
 
 	    void        SetCombatFormat(format_t);
 	    u8          GetCombatFormat(void) const;
+
+	std::vector<Troop> Optimize(void) const;
 
 	protected:
 	    friend class Troop;

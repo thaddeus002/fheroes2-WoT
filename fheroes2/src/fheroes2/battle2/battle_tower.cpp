@@ -26,7 +26,7 @@
 #include "battle_stats.h"
 #include "battle_tower.h"
 
-Battle2::Tower::Tower(const Castle & castle, u8 twr, Arena & a) : Army::Troop(Monster::ARCHER), arena(a), type(twr), valid(true)
+Battle2::Tower::Tower(const Castle & castle, u8 twr, Arena & a) : Army::Troop(Monster(Monster::ARCHER)), arena(a), type(twr), valid(true)
 {
     count += castle.CountBuildings();
     count += castle.GetLevelMageGuild() - 1;

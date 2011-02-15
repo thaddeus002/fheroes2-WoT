@@ -25,7 +25,6 @@
 
 #include "gamedefs.h"
 #include "thread.h"
-#include "resource.h"
 #include "dialog.h"
 
 class Surface;
@@ -49,7 +48,7 @@ namespace Interface
 	void NextState(void);
 	info_t GetState(void) const;
 	void SetState(info_t info);
-	void SetResource(Resource::resource_t, u16);
+	void SetResource(u8, u16);
 	void RedrawTurnProgress(u8);
 	void QueueEventProcessing(void);
 
@@ -69,7 +68,7 @@ namespace Interface
 
 	info_t               state;
 	info_t               oldState;
-	Resource::resource_t lastResource;
+	u8                   lastResource;
 	u16                  countLastResource;
 	SDL::Timer           timerShowLastResource;
 	SDL::Timer           timerRedrawAIStatus;

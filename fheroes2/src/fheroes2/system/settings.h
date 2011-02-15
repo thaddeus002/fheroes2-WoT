@@ -29,7 +29,6 @@
 #include <iomanip>
 #include <sstream>
 #include "gamedefs.h"
-#include "difficulty.h"
 #include "color.h"
 #include "maps_fileinfo.h"
 #include "game.h"
@@ -216,7 +215,7 @@ public:
 
     const ListMapsDirectory & GetListMapsDirectory(void) const;
 
-    Difficulty::difficulty_t GameDifficulty(void) const;
+    u8 GameDifficulty(void) const;
 
     const std::string & MapsCharset(void) const;
     const std::string & ForceLang(void) const;
@@ -329,7 +328,7 @@ public:
     void SetEditor(void);
     void SetUnicode(bool);
     void SetPriceLoyaltyVersion(void);
-    void SetGameDifficulty(const Difficulty::difficulty_t d);
+    void SetGameDifficulty(u8);
     void SetEvilInterface(bool);
     void SetBattleGrid(bool);
     void SetBattleMovementShaded(bool);
@@ -377,7 +376,7 @@ public:
     const std::string & MapsFile(void) const;
     const std::string & MapsName(void) const;
     const std::string & MapsDescription(void) const;
-    Difficulty::difficulty_t MapsDifficulty(void) const;
+    u8  MapsDifficulty(void) const;
     u16 MapsWidth(void) const;
     bool AllowColors(u8) const;
     u8   AllowColors(void) const;
@@ -423,7 +422,7 @@ private:
 
     Size video_mode;
 
-    Difficulty::difficulty_t game_difficulty;
+    u8 game_difficulty;
     Color::color_t my_color;
     Color::color_t cur_color;
 

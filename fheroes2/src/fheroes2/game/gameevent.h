@@ -36,7 +36,7 @@ struct EventDate
 
     bool isAllow(u8 color, u16 date) const;
 
-    Resource::funds_t resource;
+    Funds resource;
     bool computer;
     u16 first;
     u16 subsequent;
@@ -52,7 +52,7 @@ struct EventMaps : public Maps::Position
     bool isAllow(u8 color, s32 index) const;
     void SetVisited(u8 color);
 
-    Resource::funds_t resource;
+    Funds resource;
     Artifact artifact;
     bool computer;
     bool cancel;
@@ -69,7 +69,7 @@ struct Riddle : public Maps::Position
     void SetQuiet(void);
 
     s32 index_map;
-    Resource::funds_t resource;
+    Funds resource;
     Artifact artifact;
     std::vector<std::string> answers;
     std::string message;

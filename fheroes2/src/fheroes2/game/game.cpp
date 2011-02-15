@@ -45,6 +45,7 @@
 #include "skill.h"
 #include "battle2.h"
 #include "tools.h"
+#include "difficulty.h"
 #include "game.h"
 
 #ifdef WITH_XML

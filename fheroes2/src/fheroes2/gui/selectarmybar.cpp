@@ -209,7 +209,7 @@ void SelectArmyBar::Redraw(Surface & display)
             }
 
 	    const Sprite & spmonh = AGG::GetICN(troop.ICNMonh(), 0);
-	    const Sprite & mons32 = AGG::GetICN(ICN::MONS32, Monster::GetSpriteIndex(troop()));
+	    const Sprite & mons32 = AGG::GetICN(ICN::MONS32, troop.GetSpriteIndex());
 
             if(flags & FLAGS_USEMONS32)
 	    {
@@ -346,16 +346,15 @@ bool SelectArmyBar::QueueEventProcessing(SelectArmyBar & bar, std::string* msg)
 	    if(index1 == index2)
 	    {
 		u16 flags = (bar.ReadOnly() || bar.SaveLastTroop() ? Dialog::READONLY | Dialog::BUTTONS : Dialog::BUTTONS);
-		PaymentConditions::UpgradeMonster payment(troop1());
-		payment *= troop1.GetCount();
+		payment_t payment = troop1.GetUpgradeCost();
 
 		if(troop1.isAllowUpgrade() &&
 		    bar.castle &&
 		    bar.castle->GetRace() == troop1.GetRace() &&
-		    bar.castle->isBuild(Monster::GetDwelling(Monster::Upgrade(troop1))))
+		    bar.castle->isBuild(troop1.GetUpgrade().GetDwelling()))
 		    flags |= Dialog::UPGRADE;
 
-		if(payment > world.GetMyKingdom().GetFundsResource())
+		if(payment > world.GetMyKingdom().GetFunds())
 		    flags |= Dialog::READONLY;
 
 		switch(Dialog::ArmyInfo(troop1, flags))
@@ -415,21 +414,23 @@ bool SelectArmyBar::QueueEventProcessing(SelectArmyBar & bar, std::string* msg)
 	else
 	if(bar.ChangeMode() && ! troop1.isValid())
 	{
-	    Monster::monster_t mons = Monster::UNKNOWN;
+	    u8 cur = Monster::UNKNOWN;
 
 	    if(bar.army->GetCommander())
 	    switch(bar.army->GetCommander()->GetRace())
 	    {
-		case Race::KNGT: mons = Monster::PEASANT; break;
-		case Race::BARB: mons = Monster::GOBLIN; break;
-		case Race::SORC: mons = Monster::SPRITE; break;
-		case Race::WRLK: mons = Monster::CENTAUR; break;
-		case Race::WZRD: mons = Monster::HALFLING; break;
-		case Race::NECR: mons = Monster::SKELETON; break;
+		case Race::KNGT: cur = Monster::PEASANT; break;
+		case Race::BARB: cur = Monster::GOBLIN; break;
+		case Race::SORC: cur = Monster::SPRITE; break;
+		case Race::WRLK: cur = Monster::CENTAUR; break;
+		case Race::WZRD: cur = Monster::HALFLING; break;
+		case Race::NECR: cur = Monster::SKELETON; break;
 		default: break;
 	    }
 
-	    if(Monster::UNKNOWN != (mons = Dialog::SelectMonster(mons)))
+	    Monster mons = Dialog::SelectMonster(cur);
+
+	    if(mons.isValid())
 	    {
 		u32 count = 1;
 		if(Dialog::SelectCount("Set Count", 1, 500000, count))

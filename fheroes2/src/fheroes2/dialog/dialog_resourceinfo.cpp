@@ -26,7 +26,7 @@
 #include "button.h"
 #include "dialog.h"
 
-u16 Dialog::ResourceInfo(const std::string &header, const std::string &message, const Resource::funds_t & rs, u16 buttons)
+u16 Dialog::ResourceInfo(const std::string &header, const std::string &message, const Funds & rs, u16 buttons)
 {
     Display & display = Display::Get();
     const ICN::icn_t system = Settings::Get().EvilInterface() ? ICN::SYSTEME : ICN::SYSTEM;

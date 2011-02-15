@@ -54,7 +54,7 @@ private:
 
 void RedrawTownSprite(const Rect &, const Castle &);
 void RedrawBackground(const Rect &, const Castle &);
-void RedrawResourceBar(const Point &, const Resource::funds_t &);
+void RedrawResourceBar(const Point &, const Funds &);
 void RedrawIcons(const Castle & castle, const CastleHeroes & hero, const Point & pt);
 
 enum screen_t { SCREENOUT, SCREENOUT_PREV, SCREENOUT_NEXT, SCREEN1, SCREEN2, SCREEN3, SCREEN4, SCREEN5, SCREEN6 };
@@ -247,7 +247,7 @@ screen_t CastleOpenDialog1(Castle & castle, bool readonly)
     }
 
     // resource bar
-    RedrawResourceBar(Point(dst_rt.x + 4, dst_rt.y + 181), world.GetMyKingdom().GetFundsResource());
+    RedrawResourceBar(Point(dst_rt.x + 4, dst_rt.y + 181), world.GetMyKingdom().GetFunds());
 
     const Rect rectExit(dst_rt.x + dst_rt.w - 26, dst_rt.y + 7, 25, 25);
     display.Blit(AGG::GetICN(ICN::TOWNWIND, 12), rectExit.x, rectExit.y);
@@ -317,7 +317,7 @@ screen_t CastleOpenDialog1(Castle & castle, bool readonly)
 	    cursor.Hide();
 	    dwbar.Redraw();
 	    selectArmy1.Redraw();
-	    RedrawResourceBar(Point(dst_rt.x + 4, dst_rt.y + 181), world.GetMyKingdom().GetFundsResource());
+	    RedrawResourceBar(Point(dst_rt.x + 4, dst_rt.y + 181), world.GetMyKingdom().GetFunds());
 	    cursor.Show();
 	    display.Flip();
 	}
@@ -350,7 +350,7 @@ screen_t CastleOpenDialog1(Castle & castle, bool readonly)
     	    if(le.MouseCursor(selectArmy1.GetArea()) || le.MouseCursor(selectArmy2.GetArea()))
     	    {
 		if(SelectArmyBar::QueueEventProcessing(selectArmy1, selectArmy2))
-		    RedrawResourceBar(Point(dst_rt.x + 4, dst_rt.y + 181), world.GetMyKingdom().GetFundsResource());
+		    RedrawResourceBar(Point(dst_rt.x + 4, dst_rt.y + 181), world.GetMyKingdom().GetFunds());
 	    }
 	}
         else
@@ -358,7 +358,7 @@ screen_t CastleOpenDialog1(Castle & castle, bool readonly)
     	    if(le.MouseCursor(selectArmy1.GetArea()))
 	    {
     		if(SelectArmyBar::QueueEventProcessing(selectArmy1))
-		    RedrawResourceBar(Point(dst_rt.x + 4, dst_rt.y + 181), world.GetMyKingdom().GetFundsResource());
+		    RedrawResourceBar(Point(dst_rt.x + 4, dst_rt.y + 181), world.GetMyKingdom().GetFunds());
 	    }
 	}
 
@@ -924,7 +924,7 @@ screen_t CastleOpenDialog6(Castle & castle, bool readonly)
 }
 
 
-void RedrawResourceBar(const Point & dst, const Resource::funds_t & rs)
+void RedrawResourceBar(const Point & dst, const Funds & rs)
 {
     Display & display = Display::Get();
     display.Blit(AGG::GetICN(ICN::STONEBAK, 0), Rect(0, 0, 312, 13), dst.x, dst.y + 30);
@@ -1045,8 +1045,8 @@ void DwellingBar::Redraw(void) const
     {
     	display.Blit(AGG::GetICN(ICN::SWAPWIN, 0), Rect(36, 267, w, h), dw[ii].x, dw[ii].y);
     	const u32 dwelling = castle.GetActualDwelling(GetDwellingFromIndex(ii));
-	Monster m(castle.GetRace(), dwelling);
-	const Sprite & mons32 = AGG::GetICN(ICN::MONS32, Monster::GetSpriteIndex(m()));
+	const Monster m(castle.GetRace(), dwelling);
+	const Sprite & mons32 = AGG::GetICN(ICN::MONS32, m.GetSpriteIndex());
     	display.Blit(mons32, dw[ii].x + (w - mons32.w()) / 2, dw[ii].y + (h - 3 - mons32.h()));
 
     	if(castle.isBuild(dwelling))

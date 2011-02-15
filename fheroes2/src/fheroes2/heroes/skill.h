@@ -118,7 +118,6 @@ namespace Skill
 	enum type_t
 	{
 	    UNDEFINED,
-	    MONSTER,
 	    CAPTAIN,
 	    HEROES
 	};

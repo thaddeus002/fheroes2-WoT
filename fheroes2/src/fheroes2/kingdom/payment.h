@@ -25,61 +25,14 @@
 
 #include "resource.h"
 
-struct cost_t
-{
-    u16 gold;
-    u8 wood;
-    u8 mercury;
-    u8 ore;
-    u8 sulfur;
-    u8 crystal;
-    u8 gems;
-};
-
-typedef Resource::funds_t payment_t;
-void PaymentLoadCost(payment_t &, const cost_t &);
-#ifdef WITH_XML
-struct TiXmlElement;
-void LoadCostFromXMLElement(cost_t &, const TiXmlElement &);
-#endif
+typedef Funds payment_t;
 
 namespace PaymentConditions
 {
-    class BuyBuilding : public payment_t
-    {
-    public:
-	BuyBuilding(u8 race, u32 build);
-    };
-
-    class BuyMonster : public payment_t
-    {
-    public:
-	BuyMonster(u8 monster);
-    };
-    
-    class UpgradeMonster : public payment_t
-    {
-    public:
-	UpgradeMonster(u8 monster);
-    };
-
-    class BuyBoat : public payment_t
-    {
-    public:
-	BuyBoat();
-    };
-
-    class BuySpellBook : public payment_t
-    {
-    public:
-	BuySpellBook(u8 shrine = 0);
-    };
-
-    class RecruitHero : public payment_t
-    {
-    public:
-	RecruitHero(u8 level);
-    };
+    payment_t BuyBuilding(u8 race, u32 build);
+    payment_t BuyBoat(void);
+    payment_t BuySpellBook(u8 shrine = 0);
+    payment_t RecruitHero(u8 level);
 
     void UpdateCosts(const std::string &);
 }

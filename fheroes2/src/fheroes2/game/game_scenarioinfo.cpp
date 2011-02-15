@@ -225,7 +225,7 @@ Game::menu_t Game::ScenarioInfo(void)
 	    {
 		cursor.Hide();
 		levelCursor.Move((*itr).x, (*itr).y);
-		conf.SetGameDifficulty(Difficulty::Get(itr - coordDifficulty.begin()));
+		conf.SetGameDifficulty(itr - coordDifficulty.begin());
 		RedrawRatingInfo(rating);
 		cursor.Show();
 		display.Flip();

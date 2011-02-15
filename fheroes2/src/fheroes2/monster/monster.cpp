@@ -184,7 +184,7 @@ void Monster::UpdateStats(const std::string & spec)
 	    ++ptr;
 
 	    // out of range
-	    if((ptr - &monsters[0]) >= MONSTER_RND1) break;
+	    if((ptr - &monsters[0]) > WATER_ELEMENT) break;
         }
     }
     else
@@ -192,28 +192,49 @@ void Monster::UpdateStats(const std::string & spec)
 #endif
 }
 
-Monster::Monster() : id(UNKNOWN)
+Monster::Monster(u8 m) : id(UNKNOWN)
 {
-}
-
-Monster::Monster(monster_t m) : id(m)
-{
-}
-
-Monster::Monster(u8 race, u32 dwelling) : id(FromDwelling(race, dwelling))
-{
+    if(m <= WATER_ELEMENT)
+	id = m;
+    else
+    if(MONSTER_RND1 == m)
+	id = Rand(LEVEL1).GetID();
+    else
+    if(MONSTER_RND2 == m)
+	id = Rand(LEVEL2).GetID();
+    else
+    if(MONSTER_RND3 == m)
+	id = Rand(LEVEL3).GetID();
+    else
+    if(MONSTER_RND4 == m)
+	id = Rand(LEVEL4).GetID();
+    else
+    if(MONSTER_RND == m)
+	id = Rand(LEVEL0).GetID();
 }
 
 Monster::Monster(const Spell & sp) : id(UNKNOWN)
 {
     switch(sp())
     {
+	case Spell::SETEGUARDIAN:
 	case Spell::SUMMONEELEMENT: id = EARTH_ELEMENT; break;
+
+	case Spell::SETAGUARDIAN:
         case Spell::SUMMONAELEMENT: id = AIR_ELEMENT; break;
+
+	case Spell::SETFGUARDIAN:
         case Spell::SUMMONFELEMENT: id = FIRE_ELEMENT; break;
+
+	case Spell::SETWGUARDIAN:
         case Spell::SUMMONWELEMENT: id = WATER_ELEMENT; break;
         default: break;
     }
+}
+
+Monster::Monster(u8 race, u32 dw) : id(UNKNOWN)
+{
+    id = FromDwelling(race, dw).id;
 }
 
 bool Monster::isValid(void) const
@@ -221,39 +242,29 @@ bool Monster::isValid(void) const
     return id != UNKNOWN;
 }
 
-bool Monster::operator== (monster_t m) const
+bool Monster::operator== (const Monster & m) const
 {
-    return id == m;
+    return id == m.id;
 }
 
-bool Monster::operator!= (monster_t m) const
+bool Monster::operator!= (const Monster & m) const
 {
-    return id != m;
+    return id != m.id;
 }
 
-Monster::monster_t Monster::operator() (void) const
+u8 Monster::operator() (void) const
 {
     return id;
 }
 
-Monster::monster_t Monster::GetID(void) const
+u8 Monster::GetID(void) const
 {
     return id;
-}
-
-void Monster::Set(const Monster & m)
-{
-    id = m.id;
-}
-
-void Monster::Set(monster_t m)
-{
-    id = m;
 }
 
 void Monster::Upgrade(void)
 {
-    id = Upgrade(id);
+    id = GetUpgrade().id;
 }
 
 u8 Monster::GetAttack(void) const
@@ -264,26 +275,6 @@ u8 Monster::GetAttack(void) const
 u8 Monster::GetDefense(void) const
 {
     return monsters[id].defense;
-}
-
-u8 Monster::GetPower(void) const
-{
-    return 0;
-}
-
-u8 Monster::GetKnowledge(void) const
-{
-    return 0;
-}
-
-s8 Monster::GetMorale(void) const
-{
-    return Morale::NORMAL;
-}
-
-s8 Monster::GetLuck(void) const
-{
-    return Luck::NORMAL;
 }
 
 u8 Monster::GetRace(void) const
@@ -303,11 +294,6 @@ u8 Monster::GetRace(void) const
     if(ROGUE > id)	return Race::NECR;
 
     return Race::BOMG;
-}
-
-u8 Monster::GetType(void) const
-{
-    return Skill::Primary::MONSTER;
 }
 
 u8  Monster::GetDamageMin(void) const
@@ -340,11 +326,6 @@ u8  Monster::GetGrown(void) const
     return monsters[id].grown;
 }
 
-u8  Monster::GetLevel(void) const
-{
-    return GetLevel(id);
-}
-
 u16 Monster::GetRNDSize(bool skip_factor) const
 {
     const u32 hps = (GetGrown() ? GetGrown() : 1) * GetHitPoints();
@@ -370,21 +351,6 @@ u16 Monster::GetRNDSize(bool skip_factor) const
     }
 
     return GetCountFromHitPoints(id, res);
-}
-
-const char* Monster::GetName(void) const
-{
-    return GetName(id);
-}
-
-const char* Monster::GetPluralName(u32 count) const
-{
-    return GetPluralName(id, count);
-}
-
-const char* Monster::GetMultiName(void) const
-{
-    return GetMultiName(id);
 }
 
 bool Monster::isUndead(void) const
@@ -497,7 +463,7 @@ bool Monster::isArchers(void) const
 
 bool Monster::isAllowUpgrade(void) const
 {
-    return id != Upgrade(id);
+    return id != GetUpgrade().id;
 }
 
 bool Monster::isHideAttack(void) const
@@ -533,56 +499,51 @@ bool Monster::isTwiceAttack(void) const
     return false;
 }
 
-Monster::monster_t Monster::Upgrade(monster_t m)
+Monster Monster::GetUpgrade(void) const
 {
-    switch(m)
+    switch(id)
     {
-        case ARCHER:		return RANGER;
-        case PIKEMAN:		return VETERAN_PIKEMAN;
-        case SWORDSMAN:		return MASTER_SWORDSMAN;
-        case CAVALRY:		return CHAMPION;
-        case PALADIN:		return CRUSADER;
-        case ORC:		return ORC_CHIEF;
-        case OGRE:		return OGRE_LORD;
-        case TROLL:		return WAR_TROLL;
-        case DWARF:		return BATTLE_DWARF;
-        case ELF:		return GRAND_ELF;
-        case DRUID:		return GREATER_DRUID;
-        case ZOMBIE:		return MUTANT_ZOMBIE;
-        case MUMMY:		return ROYAL_MUMMY;
-        case VAMPIRE:		return VAMPIRE_LORD;
-        case LICH:		return POWER_LICH;
-        case MINOTAUR:		return MINOTAUR_KING;
-        case GREEN_DRAGON:	return RED_DRAGON;
-        case RED_DRAGON:	return BLACK_DRAGON;
-        case IRON_GOLEM:	return STEEL_GOLEM;
-        case MAGE:		return ARCHMAGE;
-        case GIANT:		return TITAN;
+        case ARCHER:		return Monster(RANGER);
+        case PIKEMAN:		return Monster(VETERAN_PIKEMAN);
+        case SWORDSMAN:		return Monster(MASTER_SWORDSMAN);
+        case CAVALRY:		return Monster(CHAMPION);
+        case PALADIN:		return Monster(CRUSADER);
+        case ORC:		return Monster(ORC_CHIEF);
+        case OGRE:		return Monster(OGRE_LORD);
+        case TROLL:		return Monster(WAR_TROLL);
+        case DWARF:		return Monster(BATTLE_DWARF);
+        case ELF:		return Monster(GRAND_ELF);
+        case DRUID:		return Monster(GREATER_DRUID);
+        case ZOMBIE:		return Monster(MUTANT_ZOMBIE);
+        case MUMMY:		return Monster(ROYAL_MUMMY);
+        case VAMPIRE:		return Monster(VAMPIRE_LORD);
+        case LICH:		return Monster(POWER_LICH);
+        case MINOTAUR:		return Monster(MINOTAUR_KING);
+        case GREEN_DRAGON:	return Monster(RED_DRAGON);
+        case RED_DRAGON:	return Monster(BLACK_DRAGON);
+        case IRON_GOLEM:	return Monster(STEEL_GOLEM);
+        case MAGE:		return Monster(ARCHMAGE);
+        case GIANT:		return Monster(TITAN);
 
 	default: break;
     }
 
-    return m;
+    return Monster(id);
 }
 
-Monster::monster_t Monster::FromInt(u8 num)
-{
-    return MONSTER_RND < num ? UNKNOWN : static_cast<monster_t>(num);
-}
-
-Monster::monster_t Monster::FromDwelling(u8 race, u32 dwelling)
+Monster Monster::FromDwelling(u8 race, u32 dwelling)
 {
     switch(dwelling)
     {
         case DWELLING_MONSTER1:
         switch(race)
         {
-	case Race::KNGT: return PEASANT;
-	case Race::BARB: return GOBLIN;
-	case Race::SORC: return SPRITE;
-	case Race::WRLK: return CENTAUR;
-	case Race::WZRD: return HALFLING;
-	case Race::NECR: return SKELETON;
+	case Race::KNGT: return Monster(PEASANT);
+	case Race::BARB: return Monster(GOBLIN);
+	case Race::SORC: return Monster(SPRITE);
+	case Race::WRLK: return Monster(CENTAUR);
+	case Race::WZRD: return Monster(HALFLING);
+	case Race::NECR: return Monster(SKELETON);
 	default: break;
         }
         break;
@@ -590,12 +551,12 @@ Monster::monster_t Monster::FromDwelling(u8 race, u32 dwelling)
         case DWELLING_MONSTER2:
         switch(race)
         {
-	case Race::KNGT: return ARCHER;
-	case Race::BARB: return ORC;
-	case Race::SORC: return DWARF;
-	case Race::WRLK: return GARGOYLE;
-	case Race::WZRD: return BOAR;
-	case Race::NECR: return ZOMBIE;
+	case Race::KNGT: return Monster(ARCHER);
+	case Race::BARB: return Monster(ORC);
+	case Race::SORC: return Monster(DWARF);
+	case Race::WRLK: return Monster(GARGOYLE);
+	case Race::WZRD: return Monster(BOAR);
+	case Race::NECR: return Monster(ZOMBIE);
 	default: break;
         }
         break;
@@ -603,12 +564,12 @@ Monster::monster_t Monster::FromDwelling(u8 race, u32 dwelling)
         case DWELLING_UPGRADE2:
         switch(race)
         {
-	case Race::KNGT: return RANGER;
-	case Race::BARB: return ORC_CHIEF;
-	case Race::SORC: return BATTLE_DWARF;
-	case Race::WRLK: return GARGOYLE;
-	case Race::WZRD: return BOAR;
-	case Race::NECR: return MUTANT_ZOMBIE;
+	case Race::KNGT: return Monster(RANGER);
+	case Race::BARB: return Monster(ORC_CHIEF);
+	case Race::SORC: return Monster(BATTLE_DWARF);
+	case Race::WRLK: return Monster(GARGOYLE);
+	case Race::WZRD: return Monster(BOAR);
+	case Race::NECR: return Monster(MUTANT_ZOMBIE);
 	default: break;
         }
         break;
@@ -616,12 +577,12 @@ Monster::monster_t Monster::FromDwelling(u8 race, u32 dwelling)
         case DWELLING_MONSTER3:
         switch(race)
         {
-	case Race::KNGT: return PIKEMAN;
-	case Race::BARB: return WOLF;
-	case Race::SORC: return ELF;
-	case Race::WRLK: return GRIFFIN;
-	case Race::WZRD: return IRON_GOLEM;
-	case Race::NECR: return MUMMY;
+	case Race::KNGT: return Monster(PIKEMAN);
+	case Race::BARB: return Monster(WOLF);
+	case Race::SORC: return Monster(ELF);
+	case Race::WRLK: return Monster(GRIFFIN);
+	case Race::WZRD: return Monster(IRON_GOLEM);
+	case Race::NECR: return Monster(MUMMY);
 	default: break;
         }
         break;
@@ -629,12 +590,12 @@ Monster::monster_t Monster::FromDwelling(u8 race, u32 dwelling)
         case DWELLING_UPGRADE3:
         switch(race)
         {
-	case Race::KNGT: return VETERAN_PIKEMAN;
-	case Race::BARB: return WOLF;
-	case Race::SORC: return GRAND_ELF;
-	case Race::WRLK: return GRIFFIN;
-	case Race::WZRD: return STEEL_GOLEM;
-	case Race::NECR: return ROYAL_MUMMY;
+	case Race::KNGT: return Monster(VETERAN_PIKEMAN);
+	case Race::BARB: return Monster(WOLF);
+	case Race::SORC: return Monster(GRAND_ELF);
+	case Race::WRLK: return Monster(GRIFFIN);
+	case Race::WZRD: return Monster(STEEL_GOLEM);
+	case Race::NECR: return Monster(ROYAL_MUMMY);
 	default: break;
         }
         break;
@@ -642,12 +603,12 @@ Monster::monster_t Monster::FromDwelling(u8 race, u32 dwelling)
         case DWELLING_MONSTER4:
         switch(race)
         {
-	case Race::KNGT: return SWORDSMAN;
-	case Race::BARB: return OGRE;
-	case Race::SORC: return DRUID;
-	case Race::WRLK: return MINOTAUR;
-	case Race::WZRD: return ROC;
-	case Race::NECR: return VAMPIRE;
+	case Race::KNGT: return Monster(SWORDSMAN);
+	case Race::BARB: return Monster(OGRE);
+	case Race::SORC: return Monster(DRUID);
+	case Race::WRLK: return Monster(MINOTAUR);
+	case Race::WZRD: return Monster(ROC);
+	case Race::NECR: return Monster(VAMPIRE);
 	default: break;
         }
         break;
@@ -655,12 +616,12 @@ Monster::monster_t Monster::FromDwelling(u8 race, u32 dwelling)
         case DWELLING_UPGRADE4:
         switch(race)
         {
-	case Race::KNGT: return MASTER_SWORDSMAN;
-	case Race::BARB: return OGRE_LORD;
-	case Race::SORC: return GREATER_DRUID;
-	case Race::WRLK: return MINOTAUR_KING;
-	case Race::WZRD: return ROC;
-	case Race::NECR: return VAMPIRE_LORD;
+	case Race::KNGT: return Monster(MASTER_SWORDSMAN);
+	case Race::BARB: return Monster(OGRE_LORD);
+	case Race::SORC: return Monster(GREATER_DRUID);
+	case Race::WRLK: return Monster(MINOTAUR_KING);
+	case Race::WZRD: return Monster(ROC);
+	case Race::NECR: return Monster(VAMPIRE_LORD);
 	default: break;
         }
         break;
@@ -668,12 +629,12 @@ Monster::monster_t Monster::FromDwelling(u8 race, u32 dwelling)
         case DWELLING_MONSTER5:
         switch(race)
         {
-	case Race::KNGT: return CAVALRY;
-	case Race::BARB: return TROLL;
-	case Race::SORC: return UNICORN;
-	case Race::WRLK: return HYDRA;
-	case Race::WZRD: return MAGE;
-	case Race::NECR: return LICH;
+	case Race::KNGT: return Monster(CAVALRY);
+	case Race::BARB: return Monster(TROLL);
+	case Race::SORC: return Monster(UNICORN);
+	case Race::WRLK: return Monster(HYDRA);
+	case Race::WZRD: return Monster(MAGE);
+	case Race::NECR: return Monster(LICH);
 	default: break;
         }
         break;
@@ -681,12 +642,12 @@ Monster::monster_t Monster::FromDwelling(u8 race, u32 dwelling)
         case DWELLING_UPGRADE5:
         switch(race)
         {
-	case Race::KNGT: return CHAMPION;
-	case Race::BARB: return WAR_TROLL;
-	case Race::SORC: return UNICORN;
-	case Race::WRLK: return HYDRA;
-	case Race::WZRD: return ARCHMAGE;
-	case Race::NECR: return POWER_LICH;
+	case Race::KNGT: return Monster(CHAMPION);
+	case Race::BARB: return Monster(WAR_TROLL);
+	case Race::SORC: return Monster(UNICORN);
+	case Race::WRLK: return Monster(HYDRA);
+	case Race::WZRD: return Monster(ARCHMAGE);
+	case Race::NECR: return Monster(POWER_LICH);
 	default: break;
         }
         break;
@@ -694,12 +655,12 @@ Monster::monster_t Monster::FromDwelling(u8 race, u32 dwelling)
 	case DWELLING_MONSTER6:
         switch(race)
         {
-	case Race::KNGT: return PALADIN;
-	case Race::BARB: return CYCLOPS;
-	case Race::SORC: return PHOENIX;
-	case Race::WRLK: return GREEN_DRAGON;
-	case Race::WZRD: return GIANT;
-	case Race::NECR: return BONE_DRAGON;
+	case Race::KNGT: return Monster(PALADIN);
+	case Race::BARB: return Monster(CYCLOPS);
+	case Race::SORC: return Monster(PHOENIX);
+	case Race::WRLK: return Monster(GREEN_DRAGON);
+	case Race::WZRD: return Monster(GIANT);
+	case Race::NECR: return Monster(BONE_DRAGON);
 	default: break;
         }
         break;
@@ -707,12 +668,12 @@ Monster::monster_t Monster::FromDwelling(u8 race, u32 dwelling)
         case DWELLING_UPGRADE6:
         switch(race)
         {
-	case Race::KNGT: return CRUSADER;
-	case Race::BARB: return CYCLOPS;
-	case Race::SORC: return PHOENIX;
-	case Race::WRLK: return RED_DRAGON;
-	case Race::WZRD: return TITAN;
-	case Race::NECR: return BONE_DRAGON;
+	case Race::KNGT: return Monster(CRUSADER);
+	case Race::BARB: return Monster(CYCLOPS);
+	case Race::SORC: return Monster(PHOENIX);
+	case Race::WRLK: return Monster(RED_DRAGON);
+	case Race::WZRD: return Monster(TITAN);
+	case Race::NECR: return Monster(BONE_DRAGON);
 	default: break;
         }
         break;
@@ -720,12 +681,12 @@ Monster::monster_t Monster::FromDwelling(u8 race, u32 dwelling)
         case DWELLING_UPGRADE7:
         switch(race)
         {
-	case Race::KNGT: return CRUSADER;
-	case Race::BARB: return CYCLOPS;
-	case Race::SORC: return PHOENIX;
-	case Race::WRLK: return BLACK_DRAGON;
-	case Race::WZRD: return TITAN;
-	case Race::NECR: return BONE_DRAGON;
+	case Race::KNGT: return Monster(CRUSADER);
+	case Race::BARB: return Monster(CYCLOPS);
+	case Race::SORC: return Monster(PHOENIX);
+	case Race::WRLK: return Monster(BLACK_DRAGON);
+	case Race::WZRD: return Monster(TITAN);
+	case Race::NECR: return Monster(BONE_DRAGON);
 	default: break;
         }
         break;
@@ -733,151 +694,76 @@ Monster::monster_t Monster::FromDwelling(u8 race, u32 dwelling)
         default: break;
     }
 
-    return UNKNOWN;
+    return Monster(UNKNOWN);
 }
 
-Monster::monster_t Monster::FromObject(u8 obj)
+Monster Monster::FromObject(u8 obj)
 {
     switch(obj)
     {
-        case MP2::OBJ_WATCHTOWER:	return ORC;
-        case MP2::OBJ_EXCAVATION:	return SKELETON;
-        case MP2::OBJ_CAVE:		return CENTAUR;
-        case MP2::OBJ_TREEHOUSE:	return SPRITE;
-        case MP2::OBJ_ARCHERHOUSE:	return ARCHER;
-        case MP2::OBJ_GOBLINHUT:	return GOBLIN;
-        case MP2::OBJ_DWARFCOTT:	return DWARF;
-        case MP2::OBJ_HALFLINGHOLE:	return HALFLING;
+        case MP2::OBJ_WATCHTOWER:	return Monster(ORC);
+        case MP2::OBJ_EXCAVATION:	return Monster(SKELETON);
+        case MP2::OBJ_CAVE:		return Monster(CENTAUR);
+        case MP2::OBJ_TREEHOUSE:	return Monster(SPRITE);
+        case MP2::OBJ_ARCHERHOUSE:	return Monster(ARCHER);
+        case MP2::OBJ_GOBLINHUT:	return Monster(GOBLIN);
+        case MP2::OBJ_DWARFCOTT:	return Monster(DWARF);
+        case MP2::OBJ_HALFLINGHOLE:	return Monster(HALFLING);
         case MP2::OBJ_PEASANTHUT:
-        case MP2::OBJ_THATCHEDHUT: 	return PEASANT;
+        case MP2::OBJ_THATCHEDHUT: 	return Monster(PEASANT);
 
-	case MP2::OBJ_RUINS:		return MEDUSA;
-        case MP2::OBJ_TREECITY:		return SPRITE;
-        case MP2::OBJ_WAGONCAMP:	return ROGUE;
-        case MP2::OBJ_DESERTTENT:	return NOMAD;
+	case MP2::OBJ_RUINS:		return Monster(MEDUSA);
+        case MP2::OBJ_TREECITY:		return Monster(SPRITE);
+        case MP2::OBJ_WAGONCAMP:	return Monster(ROGUE);
+        case MP2::OBJ_DESERTTENT:	return Monster(NOMAD);
 
-        case MP2::OBJ_TROLLBRIDGE:	return TROLL;
-        case MP2::OBJ_DRAGONCITY:	return RED_DRAGON;
-        case MP2::OBJ_CITYDEAD:		return POWER_LICH;
+        case MP2::OBJ_TROLLBRIDGE:	return Monster(TROLL);
+        case MP2::OBJ_DRAGONCITY:	return Monster(RED_DRAGON);
+        case MP2::OBJ_CITYDEAD:		return Monster(POWER_LICH);
 
-        case MP2::OBJ_ANCIENTLAMP:	return GENIE;
+        case MP2::OBJ_ANCIENTLAMP:	return Monster(GENIE);
 
         // loyalty version
-	case MP2::OBJ_WATERALTAR:	return WATER_ELEMENT;
-        case MP2::OBJ_AIRALTAR:		return AIR_ELEMENT;
-        case MP2::OBJ_FIREALTAR:	return FIRE_ELEMENT;
-        case MP2::OBJ_EARTHALTAR:	return EARTH_ELEMENT;
-	case MP2::OBJ_BARROWMOUNDS:	return GHOST;
+	case MP2::OBJ_WATERALTAR:	return Monster(WATER_ELEMENT);
+        case MP2::OBJ_AIRALTAR:		return Monster(AIR_ELEMENT);
+        case MP2::OBJ_FIREALTAR:	return Monster(FIRE_ELEMENT);
+        case MP2::OBJ_EARTHALTAR:	return Monster(EARTH_ELEMENT);
+	case MP2::OBJ_BARROWMOUNDS:	return Monster(GHOST);
 
         default: break;
     }
 
-    return UNKNOWN;
+    return Monster(UNKNOWN);
 }
 
-Monster::monster_t Monster::Rand(level_t level)
+Monster Monster::Rand(level_t level)
 {
     switch(level)
     {
-	case LEVEL0: return FromInt(Rand::Get(PEASANT, WATER_ELEMENT));
+	default: return Monster(Rand::Get(PEASANT, WATER_ELEMENT));
 
 	case LEVEL1:
-	    switch(Rand::Get(1, 9))
-	    {
-		case 1:  return PEASANT;
-		case 2:  return ARCHER;
-		case 3:  return GOBLIN;
-		case 4:  return ORC;
-		case 5:  return SPRITE;
-		case 6:  return CENTAUR;
-		case 7:  return HALFLING;
-		case 8:  return SKELETON;
-		case 9:  return ZOMBIE;
-		default: break;
-	    }
-	    break;
-    
 	case LEVEL2:
-	    switch(Rand::Get(1, 14))
-	    {
-		case 1:  return RANGER;
-		case 2:  return PIKEMAN;
-		case 3:  return VETERAN_PIKEMAN;
-		case 4:  return ORC_CHIEF;
-		case 5:  return WOLF;
-		case 6:  return DWARF;
-		case 7:  return BATTLE_DWARF;
-		case 8:  return ELF;
-		case 9:  return GRAND_ELF;
-		case 10: return GARGOYLE;
-		case 11: return BOAR;
-		case 12: return IRON_GOLEM;
-		case 13: return MUTANT_ZOMBIE;
-		case 14: return MUMMY;
-		default: break;
-	    }
-	    break;
-
 	case LEVEL3:
-	    switch(Rand::Get(1, 26))
-	    {
-	        case 1:  return SWORDSMAN;
-		case 2:  return MASTER_SWORDSMAN;
-	        case 3:  return CAVALRY;
-		case 4:  return CHAMPION;
-		case 5:  return OGRE;
-		case 6:  return OGRE_LORD;
-		case 7:  return TROLL;
-		case 8:  return WAR_TROLL;
-		case 9:  return DRUID;
-		case 10: return GREATER_DRUID;
-		case 11: return GRIFFIN;
-		case 12: return MINOTAUR;
-		case 13: return MINOTAUR_KING;
-		case 14: return STEEL_GOLEM;
-		case 15: return ROC;
-		case 16: return MAGE;
-		case 17: return ARCHMAGE;
-		case 18: return ROYAL_MUMMY;
-		case 19: return VAMPIRE;
-		case 20: return VAMPIRE_LORD;
-		case 21: return LICH;
-		case 22: return GHOST;
-		case 23: return MEDUSA;
-		case 24: return EARTH_ELEMENT;
-		case 25: return AIR_ELEMENT;
-		case 26: return FIRE_ELEMENT;
-		default: break;
-	    }
-	    break;
-
 	case LEVEL4:
-	    switch(Rand::Get(1, 13))
-	    {
-		case 1:  return PALADIN;
-		case 2:  return CRUSADER;
-		case 3:  return CYCLOPS;
-		case 4:  return UNICORN;
-		case 5:  return PHOENIX;
-		case 6:  return HYDRA;
-		case 7:  return GREEN_DRAGON;
-		case 8:  return RED_DRAGON;
-		case 9:  return BLACK_DRAGON;
-		case 10: return GIANT;
-		case 11: return TITAN;
-		case 12: return POWER_LICH;
-		case 13: return BONE_DRAGON;
-		default: break;
-	    }
-	    break;
+		break;
     }
 
-    return UNKNOWN;
+    std::vector<Monster> monsters;
+    monsters.reserve(30);
+
+    for(u8 ii = PEASANT; ii <= WATER_ELEMENT; ++ii)
+    {
+	Monster mons(ii);
+	if(mons.GetLevel() == level) monsters.push_back(mons);
+    }
+
+    return monsters.size() ? *Rand::Get(monsters) : UNKNOWN;
 }
 
-u8 Monster::GetLevel(monster_t m)
+u8 Monster::GetLevel(void) const
 {
-    switch(m)
+    switch(id)
     {
 	case PEASANT:
 	case ARCHER:
@@ -969,9 +855,9 @@ u8 Monster::GetLevel(monster_t m)
     return LEVEL0;
 }
 
-u32 Monster::GetDwelling(monster_t m)
+u32 Monster::GetDwelling(void) const
 {
-    switch(m)
+    switch(id)
     {
 	case PEASANT:
 	case GOBLIN:
@@ -1048,19 +934,19 @@ u32 Monster::GetDwelling(monster_t m)
     return 0;
 }
 
-const char* Monster::GetName(monster_t m)
+const char* Monster::GetName(void) const
 {
-    return _(monsters[m].name);
+    return _(monsters[id].name);
 }
 
-const char* Monster::GetMultiName(monster_t m)
+const char* Monster::GetMultiName(void) const
 {
-    return _(monsters[m].multiname);
+    return _(monsters[id].multiname);
 }
 
-const char* Monster::GetPluralName(monster_t m, u32 count)
+const char* Monster::GetPluralName(u32 count) const
 {
-    switch(m)
+    switch(id)
     {
 	case PEASANT:		return ngettext("Peasant", "Peasants", count);
 	case ARCHER:		return ngettext("Archer", "Archers", count);
@@ -1138,27 +1024,12 @@ const char* Monster::GetPluralName(monster_t m, u32 count)
 	default: break;
     }
 
-    return 1 == count ? GetName(m) : GetMultiName(m);
+    return 1 == count ? GetName() : GetMultiName();
 }
 
-u8 Monster::GetSpriteIndex(u8 m)
+u8 Monster::GetSpriteIndex(void) const
 {
-    return UNKNOWN < m ? m - 1 : 0;
-}
-
-Monster::monster_t Monster::Upgrade(Monster & m)
-{
-    return Upgrade(m.id);
-}
-
-u8 Monster::GetLevel(Monster & m)
-{
-    return GetLevel(m.id);
-}
-
-u32 Monster::GetDwelling(Monster & m)
-{
-    return GetDwelling(m.id);
+    return UNKNOWN < id ? id - 1 : 0;
 }
 
 ICN::icn_t Monster::ICNMonh(void) const
@@ -1167,41 +1038,23 @@ ICN::icn_t Monster::ICNMonh(void) const
     return id >= PEASANT && id <= WATER_ELEMENT ? static_cast<ICN::icn_t>(ICN::MONH0000 + id - PEASANT) : ICN::UNKNOWN;
 }
 
-void Monster::GetCost(u8 id, payment_t & payment)
+payment_t Monster::GetCost(void) const
 {
-    cost_t & cost = monsters[FromInt(id)].cost;
-
-    payment.gold = cost.gold;
-    payment.wood = cost.wood;
-    payment.mercury = cost.mercury;
-    payment.ore = cost.ore;
-    payment.sulfur = cost.sulfur;
-    payment.crystal = cost.crystal;
-    payment.gems = cost.gems;
+    return payment_t(monsters[id].cost);
 }
 
-void Monster::GetUpgradeCost(u8 id, payment_t & payment)
+payment_t Monster::GetUpgradeCost(void) const
 {
-    monster_t m1 = FromInt(id);
-    monster_t m2 = Upgrade(m1);
+    Monster upgr = GetUpgrade();
 
-    if(m1 != m2)
-    {
-	payment_t payment2;
-	payment_t payment1;
-	GetCost(m2, payment2);
-	GetCost(m1, payment1);
-	payment = payment2 - payment1;
-    }
-    else
-	GetCost(m1, payment);
+    return id != upgr.id ? upgr.GetCost() - GetCost() : GetCost();
 }
 
-u32 Monster::GetCountFromHitPoints(monster_t m, u32 hp)
+u32 Monster::GetCountFromHitPoints(const Monster & mons, u32 hp)
 {
     if(hp)
     {
-	const u16 hp1 = monsters[m].hp;
+	const u16 hp1 = mons.GetHitPoints();
 	const u32 count = hp / hp1;
 	return (count * hp1) < hp ? count + 1 : count;
     }

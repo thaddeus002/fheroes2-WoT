@@ -31,6 +31,7 @@
 #include "luck.h"
 #include "morale.h"
 #include "race.h"
+#include "difficulty.h"
 #include "world.h"
 #include "payment.h"
 #include "gameevent.h"
@@ -504,7 +505,7 @@ void AIToMonster(Heroes &hero, const u8 obj, const s32 dst_index)
     //const Settings & conf = Settings::Get();
 
     u32 join = 0;
-    Resource::funds_t cost;
+    Funds cost;
 
     u8 reason = Army::GetJoinSolution(hero, tile, join, cost.gold);
 
@@ -600,7 +601,7 @@ void AIToMonster(Heroes &hero, const u8 obj, const s32 dst_index)
 void AIToPickupResource(Heroes &hero, const u8 obj, const s32 dst_index)
 {
     Maps::Tiles & tile = world.GetTiles(dst_index);
-    Resource::funds_t resource;
+    Funds resource;
     const u8 count = tile.GetQuantity2();
 
     switch(tile.GetQuantity1())
@@ -637,7 +638,7 @@ void AIToPickupResource(Heroes &hero, const u8 obj, const s32 dst_index)
 void AIToTreasureChest(Heroes &hero, const u8 obj, const s32 dst_index)
 {
     Maps::Tiles & tile = world.GetTiles(dst_index);
-    Resource::funds_t resource;
+    Funds resource;
     resource.gold = tile.GetQuantity2() * 100;
 
     if(Maps::Ground::WATER == tile.GetGround())
@@ -685,7 +686,7 @@ void AIToResource(Heroes &hero, const u8 obj, const s32 dst_index)
 {
     Maps::Tiles & tile = world.GetTiles(dst_index);
     const u8 count = tile.GetQuantity2();
-    Resource::funds_t resource;
+    Funds resource;
 
     switch(tile.GetQuantity1())
     {
@@ -743,7 +744,7 @@ void AIToWagon(Heroes &hero, const u8 obj, const s32 dst_index)
     if(tile.GetQuantity1() && tile.GetQuantity2())
     {
 	const u8 count = tile.GetQuantity2();
-	Resource::funds_t resource;
+	Funds resource;
 
 	switch(tile.GetQuantity1())
 	{
@@ -770,15 +771,6 @@ void AIToWagon(Heroes &hero, const u8 obj, const s32 dst_index)
 void AIToCaptureObject(Heroes &hero, const u8 obj, const s32 dst_index)
 {
     Maps::Tiles & tile = world.GetTiles(dst_index);
-    Resource::resource_t res = Resource::UNKNOWN;
-
-    switch(obj)
-    {
-	case MP2::OBJ_ALCHEMYLAB:	res = Resource::MERCURY; break;
-	case MP2::OBJ_SAWMILL:		res = Resource::WOOD; break;
-        case MP2::OBJ_MINES:		res = static_cast<Resource::resource_t>(tile.GetMinesType()); break;
-        default: break;
-    }
 
     // capture object
     if(hero.GetColor() != world.ColorCapturedObject(dst_index))
@@ -817,7 +809,7 @@ void AIToCaptureObject(Heroes &hero, const u8 obj, const s32 dst_index)
 void AIToFlotSam(Heroes &hero, const u8 obj, const s32 dst_index)
 {
     Maps::Tiles & tile = world.GetTiles(dst_index);
-    Resource::funds_t resource;
+    Funds resource;
 
     resource.gold += 100 * tile.GetQuantity1();
     resource.wood += tile.GetQuantity2();
@@ -1132,7 +1124,7 @@ void AIToPoorMoraleObject(Heroes &hero, const u8 obj, const s32 dst_index)
         	    hero.IncreaseExperience(res.GetExperienceAttacker());
 	    	    complete = true;
 	    	    const Artifact art(tile.GetQuantity1());
-	    	    Resource::funds_t resource;
+	    	    Funds resource;
 	    	    resource.gold = tile.GetQuantity2() * 100;
 	    	    hero.PickupArtifact(art);
 	    	    world.GetKingdom(hero.GetColor()).AddFundsResource(resource);
@@ -1149,7 +1141,7 @@ void AIToPoorMoraleObject(Heroes &hero, const u8 obj, const s32 dst_index)
 	{
 		Army::army_t army;
 		army.FromGuardian(tile);
-		Resource::funds_t resource;
+		Funds resource;
 		Artifact art(Artifact::UNKNOWN);
                 switch(tile.GetQuantity2())
                 {
@@ -1190,7 +1182,7 @@ void AIToPoorMoraleObject(Heroes &hero, const u8 obj, const s32 dst_index)
 		{
         	    hero.IncreaseExperience(res.GetExperienceAttacker());
 	    	    complete = true;
-	    	    Resource::funds_t resource;
+	    	    Funds resource;
 	    	    resource.gold = tile.GetQuantity2() * 100;
 	    	    world.GetKingdom(hero.GetColor()).AddFundsResource(resource);
 		}
@@ -1293,7 +1285,7 @@ void AIToTreeKnowledge(Heroes &hero, const u8 obj, const s32 dst_index)
 
     if(!hero.isVisited(tile))
     {
-	Resource::funds_t payment;
+	Funds payment;
 	switch(tile.GetQuantity2())
 	{
 	    case 10:	payment.gems = 10; break;
@@ -1319,7 +1311,7 @@ void AIToDaemonCave(Heroes &hero, const u8 obj, const s32 dst_index)
 
     if(tile.GetQuantity2())
     {
-	Resource::funds_t resource;
+	Funds resource;
 
 	// check variants
 	switch(tile.GetQuantity2())
@@ -1369,9 +1361,9 @@ void AIToDwellingRecruitMonster(Heroes &hero, const u8 obj, const s32 dst_index)
     if(count)
     {
         Kingdom & kingdom = world.GetKingdom(hero.GetColor());
-        const Monster monster(Monster::FromObject(obj));
-	const payment_t paymentCosts(PaymentConditions::BuyMonster(monster()) * count);
-	const Resource::funds_t & kingdomResource = kingdom.GetFundsResource();
+        const Monster monster = Monster::FromObject(obj);
+	const payment_t paymentCosts = monster.GetCost() * count;
+	const Funds & kingdomResource = kingdom.GetFunds();
 
         if(paymentCosts <= kingdomResource && hero.GetArmy().JoinTroop(monster, count))
         {
@@ -1461,7 +1453,7 @@ void AIToShipwreckSurvivor(Heroes &hero, const u8 obj, const s32 dst_index)
 
     if(!hero.PickupArtifact(art))
     {
-        Resource::funds_t prize(Resource::GOLD, 1500);
+        Funds prize(Resource::GOLD, 1500);
 	world.GetKingdom(hero.GetColor()).OddFundsResource(prize);
     }
 
@@ -1492,20 +1484,20 @@ void AIToArtifact(Heroes &hero, const u8 obj, const s32 dst_index)
 	case 2:
 	case 3:
 	{
-	    Resource::funds_t payment;
+	    Funds payment;
 
 	    if(1 == tile.GetQuantity2())
-		payment += Resource::funds_t(Resource::GOLD, 2000);
+		payment += Funds(Resource::GOLD, 2000);
 	    else
 	    if(2 == tile.GetQuantity2())
 	    {
-		payment += Resource::funds_t(Resource::GOLD, 2500);
-		payment += Resource::funds_t(tile.GetQuantity4(), 3);
+		payment += Funds(Resource::GOLD, 2500);
+		payment += Funds(tile.GetQuantity4(), 3);
 	    }
 	    else
 	    {
-		payment += Resource::funds_t(Resource::GOLD, 3000);
-		payment += Resource::funds_t(tile.GetQuantity4(), 5);
+		payment += Funds(Resource::GOLD, 3000);
+		payment += Funds(tile.GetQuantity4(), 5);
 	    }
 
 	    if(world.GetKingdom(hero.GetColor()).AllowPayment(payment))
@@ -1719,19 +1711,19 @@ bool AIHeroesValidObject(const Heroes & hero, s32 index)
 	    // 1,2,3 - 2000g, 2500g+3res, 3000g+5res
 	    if(1 <= tile.GetQuantity2() && 3 >= tile.GetQuantity2())
 	    {
-		Resource::funds_t payment;
+		Funds payment;
 		if(1 == tile.GetQuantity2())
-		    payment += Resource::funds_t(Resource::GOLD, 2000);
+		    payment += Funds(Resource::GOLD, 2000);
 		else
 		if(2 == tile.GetQuantity2())
 		{
-		    payment += Resource::funds_t(Resource::GOLD, 2500);
-		    payment += Resource::funds_t(tile.GetQuantity4(), 3);
+		    payment += Funds(Resource::GOLD, 2500);
+		    payment += Funds(tile.GetQuantity4(), 3);
 		}
 		else
 		{
-		    payment += Resource::funds_t(Resource::GOLD, 3000);
-		    payment += Resource::funds_t(tile.GetQuantity4(), 5);
+		    payment += Funds(Resource::GOLD, 3000);
+		    payment += Funds(tile.GetQuantity4(), 5);
 		}
 		return kingdom.AllowPayment(payment);
 	    }
@@ -1800,7 +1792,7 @@ bool AIHeroesValidObject(const Heroes & hero, s32 index)
 	case MP2::OBJ_TREEKNOWLEDGE:
 	    if(! hero.isVisited(tile))
 	    {
-		Resource::funds_t payment;
+		Funds payment;
 		switch(tile.GetQuantity2())
 		{
 		    case 10:	payment.gems = 10; break;
@@ -1882,9 +1874,9 @@ bool AIHeroesValidObject(const Heroes & hero, s32 index)
         case MP2::OBJ_BARROWMOUNDS:
 	{
 	    const u32 count = tile.GetCountMonster();
-    	    const Monster monster(Monster::FromObject(obj));
-	    const payment_t paymentCosts(PaymentConditions::BuyMonster(monster()) * count);
-	    const Resource::funds_t & kingdomResource = kingdom.GetFundsResource();
+    	    const Monster monster = Monster::FromObject(obj);
+	    const payment_t paymentCosts = monster.GetCost() * count;
+	    const Funds & kingdomResource = kingdom.GetFunds();
 
 	    if(count && paymentCosts <= kingdomResource &&
 		(army.HasMonster(monster) ||
@@ -1899,9 +1891,9 @@ bool AIHeroesValidObject(const Heroes & hero, s32 index)
         {
     	    const bool battle = (Color::GRAY == world.ColorCapturedObject(index));
 	    const u32 count = tile.GetCountMonster();
-    	    const Monster monster(Monster::FromObject(obj));
-	    const payment_t paymentCosts(PaymentConditions::BuyMonster(monster()) * count);
-	    const Resource::funds_t & kingdomResource = kingdom.GetFundsResource();
+    	    const Monster monster = Monster::FromObject(obj);
+	    const payment_t paymentCosts = monster.GetCost() * count;
+	    const Funds & kingdomResource = kingdom.GetFunds();
 
 	    if(!battle && count && paymentCosts <= kingdomResource &&
 		(army.HasMonster(monster) ||
@@ -1913,8 +1905,8 @@ bool AIHeroesValidObject(const Heroes & hero, s32 index)
 	case MP2::OBJ_ANCIENTLAMP:
 	{
 	    const u32 count = tile.GetCountMonster();
-	    const payment_t paymentCosts(PaymentConditions::BuyMonster(Monster::GENIE) * count);
-	    const Resource::funds_t & kingdomResource = kingdom.GetFundsResource();
+	    const payment_t paymentCosts = Monster(Monster::GENIE).GetCost() * count;
+	    const Funds & kingdomResource = kingdom.GetFunds();
 
 	    if(count && paymentCosts <= kingdomResource &&
 		(army.HasMonster(Monster::GENIE) ||

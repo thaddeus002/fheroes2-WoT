@@ -33,7 +33,11 @@
 #include "army_troop.h"
 #include "battle_stats.h"
 
-Army::Troop::Troop(monster_t m, u32 c) : Monster(m), count(c), army(NULL), battle(NULL)
+Army::Troop::Troop() : Monster(Monster::UNKNOWN), count(0), army(NULL), battle(NULL)
+{
+}
+
+Army::Troop::Troop(const Monster & m, u32 c) : Monster(m), count(c), army(NULL), battle(NULL)
 {
 }
 
@@ -41,10 +45,9 @@ Army::Troop::Troop(const Troop & t) : Monster(t.id), count(t.count), army(t.army
 {
 }
 
-Army::Troop::Troop(const Maps::Tiles & t) : army(NULL), battle(NULL)
+Army::Troop::Troop(const Maps::Tiles & t) : Monster(t.GetQuantity3()), count(t.GetCountMonster()),
+					    army(NULL), battle(NULL)
 {
-    id = Monster::FromInt(t.GetQuantity3());
-    count = t.GetCountMonster();
 }
 
 Army::Troop::~Troop()
@@ -62,31 +65,20 @@ Army::Troop & Army::Troop::operator= (const Troop & t)
     return *this;
 }
 
-bool Army::Troop::HasMonster(monster_t m) const
+bool Army::Troop::operator== (const Monster & m) const
 {
-    return id == m;
+    return static_cast<Monster>(*this) == m;
 }
 
 void Army::Troop::Set(const Monster & m, u32 c)
 {
-    Monster::Set(m);
-    count = c;
-}
-
-void Army::Troop::Set(monster_t m, u32 c)
-{
-    Monster::Set(m);
-    count = c;
+    SetMonster(m);
+    SetCount(c);
 }
 
 void Army::Troop::SetMonster(const Monster & m)
 {
-    Monster::Set(m);
-}
-
-void Army::Troop::SetMonster(monster_t m)
-{
-    Monster::Set(m);
+    id = m();
 }
 
 void Army::Troop::SetCount(u32 c)
@@ -96,7 +88,7 @@ void Army::Troop::SetCount(u32 c)
 
 void Army::Troop::Reset(void)
 {
-    Monster::Set(Monster::UNKNOWN);
+    id = Monster::UNKNOWN;
     count = 0;
 }
 
@@ -255,6 +247,16 @@ bool Army::Troop::isAffectedByMorale(void) const
 s8 Army::Troop::GetArmyIndex(void) const
 {
     return army ? army->GetTroopIndex(*this) : -1;
+}
+
+payment_t Army::Troop::GetCost(void) const
+{
+    return Monster::GetCost() * count;
+}
+
+payment_t Army::Troop::GetUpgradeCost(void) const
+{
+    return Monster::GetUpgradeCost() * count;
 }
 
 bool Army::isValidTroop(const Troop & troop)

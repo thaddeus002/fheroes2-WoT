@@ -38,6 +38,7 @@
 #include "pairs.h"
 #include "algorithm.h"
 #include "game_over.h"
+#include "resource.h"
 #include "interface_gamearea.h"
 #include "world.h"
 #include "ai.h"
@@ -1430,31 +1431,29 @@ u16 World::CountCapturedObject(const MP2::object_t obj, const Color::color_t col
 }
 
 /* return count captured mines */
-u16 World::CountCapturedMines(const Resource::resource_t res, const Color::color_t col) const
+u16 World::CountCapturedMines(const u8 res, const Color::color_t col) const
 {
-    std::map<s32, ObjectColor>::const_iterator it1 = map_captureobj.begin();
-    std::map<s32, ObjectColor>::const_iterator it2 = map_captureobj.end();
-
     u16 result = 0;
 
-    for(; it1 != it2; ++it1)
-	if((*it1).second.isObject(MP2::OBJ_MINES) || (*it1).second.isObject(MP2::OBJ_HEROES))
+    for(std::map<s32, ObjectColor>::const_iterator
+	it = map_captureobj.begin(); it != map_captureobj.end(); ++it)
+	if((*it).second.isObject(MP2::OBJ_MINES) || (*it).second.isObject(MP2::OBJ_HEROES))
     {
 	    // scan for find mines
-	    const Maps::TilesAddon * addon = GetTiles((*it1).first).FindObject(MP2::OBJ_MINES);
+	    const Maps::TilesAddon * addon = GetTiles((*it).first).FindObject(MP2::OBJ_MINES);
 
 	    if(addon)
 	    {
 		// index sprite EXTRAOVR
-		if(0 == addon->index && Resource::ORE == res && (*it1).second.isColor(col)) ++result;
+		if(0 == addon->index && Resource::ORE == res && (*it).second.isColor(col)) ++result;
 		else
-		if(1 == addon->index && Resource::SULFUR == res && (*it1).second.isColor(col)) ++result;
+		if(1 == addon->index && Resource::SULFUR == res && (*it).second.isColor(col)) ++result;
 		else
-		if(2 == addon->index && Resource::CRYSTAL == res && (*it1).second.isColor(col)) ++result;
+		if(2 == addon->index && Resource::CRYSTAL == res && (*it).second.isColor(col)) ++result;
 		else
-		if(3 == addon->index && Resource::GEMS == res && (*it1).second.isColor(col)) ++result;
+		if(3 == addon->index && Resource::GEMS == res && (*it).second.isColor(col)) ++result;
 		else
-		if(4 == addon->index && Resource::GOLD == res && (*it1).second.isColor(col)) ++result;
+		if(4 == addon->index && Resource::GOLD == res && (*it).second.isColor(col)) ++result;
 	    }
     }
     

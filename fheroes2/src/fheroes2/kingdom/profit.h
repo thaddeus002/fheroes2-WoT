@@ -27,23 +27,9 @@
 
 namespace ProfitConditions
 {
-    class FromBuilding : public payment_t
-    {
-    public:
-	FromBuilding(u32, u8);
-    };
-
-    class FromArtifact : public payment_t
-    {
-    public:
-	FromArtifact(u8);
-    };
-    
-    class FromMine : public payment_t
-    {
-    public:
-	FromMine(u8);
-    };
+    payment_t FromBuilding(u32, u8);
+    payment_t FromArtifact(u8);
+    payment_t FromMine(u8);
 
     void UpdateCosts(const std::string &);
 }

@@ -185,13 +185,12 @@ void BuildingInfo::UpdateCosts(const std::string & spec)
 #endif
 }
 
-void BuildingInfo::GetCost(u32 build, u8 race, payment_t & payment)
+payment_t BuildingInfo::GetCost(u32 build, u8 race)
 {
+    payment_t payment;
     const buildstats_t* ptr = &_builds[0];
 
     while(ptr->id1 && !(ptr->id2 == build && (!race || (race & ptr->race)))) ++ptr;
-
-    payment.Reset();
 
     if(ptr)
     {
@@ -203,6 +202,8 @@ void BuildingInfo::GetCost(u32 build, u8 race, payment_t & payment)
 	payment.crystal = ptr->cost.crystal;
 	payment.gems = ptr->cost.gems;
     }
+
+    return payment;
 }
 
 u8 GetIndexBuildingSprite(u32 build)
@@ -370,8 +371,7 @@ void BuildingInfo::RedrawCaptain(void)
     else
     if(! allow_buy)
     {
-	payment_t payment;
-	GetCost(building, castle.GetRace(), payment);
+	payment_t payment = GetCost(building, castle.GetRace());
 	(1 == payment.GetValidItems() && payment.gold && castle.AllowBuild()) ? display.Blit(sprite_money, dst_pt) : display.Blit(sprite_deny, dst_pt);
     }
 }
@@ -412,8 +412,7 @@ void BuildingInfo::Redraw(void)
     else
     if(! allow_buy)
     {
-	payment_t payment;
-	GetCost(building, castle.GetRace(), payment);
+	payment_t payment = GetCost(building, castle.GetRace());
 	(1 == payment.GetValidItems() && payment.gold && castle.AllowBuild()) ? display.Blit(sprite_money, dst_pt) : display.Blit(sprite_deny, dst_pt);
     }
 
@@ -603,14 +602,12 @@ void BuildingInfo::SetStatusMessage(StatusBar & bar) const
     }
     else
     {
-        const PaymentConditions::BuyBuilding paymentBuild(castle.GetRace(), building);
-
         if(!castle.AllowBuild())
         {
             str = _("Cannot build. Already built here this turn.");
         }
         else
-        if(castle.AllowBuild() && ! world.GetMyKingdom().AllowPayment(paymentBuild))
+        if(castle.AllowBuild() && ! world.GetMyKingdom().AllowPayment(GetCost(castle.GetRace(), building)))
         {
             str = _("Cannot afford %{name}");
             String::Replace(str, "%{name}", name);

@@ -26,7 +26,6 @@
 #include <list>
 #include <vector>
 #include "gamedefs.h"
-#include "monster.h"
 #include "skill.h"
 #include "text.h"
 #include "game.h"
@@ -41,6 +40,7 @@ class Surface;
 class Artifact;
 class Spell;
 class SpriteCursor;
+class Monster;
 
 namespace Army
 {
@@ -107,7 +107,7 @@ namespace Dialog
     void PrimarySkillInfo(const std::string &, const std::string &, const Skill::Primary::skill_t);
     u16  SpriteInfo(const std::string &, const std::string &, const Surface &, u16 buttons = Dialog::OK);
     u16  ArtifactInfo(const std::string &, const std::string &, const Artifact &, const u16 buttons = Dialog::OK);
-    u16  ResourceInfo(const std::string &, const std::string &, const Resource::funds_t &, u16 buttons = Dialog::OK);
+    u16  ResourceInfo(const std::string &, const std::string &, const Funds &, u16 buttons = Dialog::OK);
 
     Skill::Primary::skill_t SelectSkillFromArena(void);
 

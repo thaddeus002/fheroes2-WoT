@@ -31,6 +31,7 @@
 #include "kingdom.h"
 #include "castle.h"
 #include "pocketpc.h"
+#include "monster.h"
 #include "dialog.h"
 
 struct ValueColors : std::pair<int, int>
