@@ -270,11 +270,21 @@ bool SelectArtifactsBar::QueueEventProcessing(SelectArtifactsBar & bar)
 		    {
 			payment_t cost = spell.GetCost();
 			u16 answer = 0;
+			std::string msg = _("Do you want to use your knowledge of magical secrets to transcribe the %{spell} Scroll into your spell book?\nThe Scroll will be consumed.\n Spell point: %{sp}");
+
+			String::Replace(msg, "%{spell}", spell.GetName());
+			String::Replace(msg, "%{sp}", spell.SpellPoint());
+			if(spell.MovePoint())
+			{
+			    msg.append("\n");
+			    msg.append("Move point: %{mp}");
+			    String::Replace(msg, "%{mp}", spell.MovePoint());
+			}
 
 			if(cost.GetValidItems())
-			    answer = Dialog::ResourceInfo("Transcribe Scroll", "", cost, Dialog::YES|Dialog::NO);
+			    answer = Dialog::ResourceInfo("", msg, cost, Dialog::YES|Dialog::NO);
 			else
-			    answer = Dialog::Message("Transcribe Scroll", "", Font::BIG, Dialog::YES|Dialog::NO);
+			    answer = Dialog::Message("", msg, Font::BIG, Dialog::YES|Dialog::NO);
 
 			if(answer == Dialog::YES)
 			    bar.hero.TranscribeScroll(art1);

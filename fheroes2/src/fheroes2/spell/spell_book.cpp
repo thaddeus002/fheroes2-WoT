@@ -186,7 +186,7 @@ Spell SpellBook::Open(const HeroBase & hero, const filter_t filt, bool canselect
 			{
 			    cursor.Hide();
 			    std::string str = _("That spell costs %{mana} mana. You only have %{point} mana, so you can't cast the spell.");
-			    String::Replace(str, "%{mana}", (*spell).CostManaPoints(&hero));
+			    String::Replace(str, "%{mana}", (*spell).SpellPoint(&hero));
 			    String::Replace(str, "%{point}", hero.GetSpellPoints());
 			    Dialog::Message("", str, Font::BIG, Dialog::OK);
 			    cursor.Show();
@@ -473,7 +473,7 @@ void SpellBookRedrawSpells(const SpellStorage & spells, std::vector<Rect> & coor
 
     	std::string str(spell.GetName());
     	str.append(" [");
-	String::AddInt(str, spell.CostManaPoints(&hero));
+	String::AddInt(str, spell.SpellPoint(&hero));
 	str.append("]");
 	    
 	TextBox box(str, Font::SMALL, (small ? 94 : 80));

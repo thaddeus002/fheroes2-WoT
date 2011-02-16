@@ -108,7 +108,7 @@ Heroes::Heroes() : move_point_scale(-1), army(this), path(*this),
 {
 }
 
-Heroes::Heroes(heroes_t ht, u8 rc) : killer_color(Color::GRAY), experience(0), move_point(0),
+Heroes::Heroes(heroes_t ht, u8 rc) : killer_color(Color::GRAY), experience(0),
     move_point_scale(-1), army(this), hid(ht), portrait(ht), race(rc),
     save_maps_object(MP2::OBJ_ZERO), path(*this), direction(Direction::RIGHT), sprite_index(18), patrol_square(0)
 {

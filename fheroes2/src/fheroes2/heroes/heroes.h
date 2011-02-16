@@ -259,7 +259,6 @@ private:
     Color::color_t	color;
     Color::color_t	killer_color;
     u32			experience;
-    u16			move_point;
     s32			move_point_scale;
 
     std::vector<Skill::Secondary>	secondary_skills;

@@ -546,6 +546,7 @@ void Game::IO::PackHeroBase(QueueMessage & msg, const HeroBase & hero)
 
     // hero base
     msg.Push(hero.magic_point);
+    msg.Push(hero.move_point);
 
     // spell book
     msg.Push(static_cast<u32>(hero.spell_book.size()));
@@ -574,7 +575,6 @@ void Game::IO::PackHeroes(QueueMessage & msg, const Heroes & hero)
     msg.Push(static_cast<u8>(hero.color));
     msg.Push(hero.name);
     msg.Push(hero.experience);
-    msg.Push(hero.move_point);
     msg.Push(static_cast<u16>(hero.direction));
     msg.Push(hero.sprite_index);
     msg.Push(static_cast<u8>(hero.save_maps_object));
@@ -1153,6 +1153,10 @@ void Game::IO::UnpackHeroBase(QueueMessage & msg, HeroBase & hero, u16 check_ver
 
     // hero base
     msg.Pop(hero.magic_point);
+    if(FORMAT_VERSION_2268 <= check_version)
+    {
+	msg.Pop(hero.move_point);
+    }
 
     // spell book
     hero.spell_book.clear();
@@ -1218,7 +1222,10 @@ void Game::IO::UnpackHeroes(QueueMessage & msg, Heroes & hero, u16 check_version
         msg.Pop(hero.name);
 
 	msg.Pop(hero.experience);
-	msg.Pop(hero.move_point);
+	if(FORMAT_VERSION_2268 > check_version)
+	{
+	    msg.Pop(hero.move_point);
+	}
 	msg.Pop(byte16); hero.direction = Direction::FromInt(byte16);
 	msg.Pop(hero.sprite_index);
 	msg.Pop(byte8); hero.save_maps_object = static_cast<MP2::object_t>(byte8);

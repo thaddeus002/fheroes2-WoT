@@ -69,7 +69,7 @@ public:
     s8 GetLuckModificator(bool, std::string* = NULL) const;
 
     u16 GetSpellPoints(void) const;
-    bool HaveSpellPoints(u16) const;
+    bool HaveSpellPoints(const Spell &) const;
     bool CanCastSpell(const Spell &, std::string* = NULL) const;
     bool CanTeachSpell(const Spell &) const;
     bool CanLearnSpell(const Spell &) const;
@@ -98,6 +98,8 @@ protected:
 #endif
 
     u16 magic_point;
+    u16 move_point;
+
     SpellBook spell_book;
     BagArtifacts bag_artifacts;
 };

@@ -37,7 +37,8 @@ enum { SP_DISABLE = 0x01 };
 struct spellstats_t
 {
         const char* name;
-        u8 mana;
+        u8 sp;
+        u8 mp;
         u8 sprite;
         u8 extra;
 	u8 bits;
@@ -50,76 +51,76 @@ u16 Spell::dd_sp = 0;
 u16 Spell::dd_hp = 0;
 
 static spellstats_t spells[] = {
-	//  name                      mana spr value  bits cost     description
-	{ "Unknown",                    0,  0,     0, 0, COST_NONE,  "Unknown spell." },
-	{ _("Fireball"),                9,  8,    10, 0, COST_NONE,  _("Causes a giant fireball to strike the selected area, damaging all nearby creatures.") },
-	{ _("Fireblast"),              15,  9,    10, 0, COST_NONE,  _("An improved version of fireball, fireblast affects two hexes around the center point of the spell, rather than one.") }, 
-	{ _("Lightning Bolt"),          7,  4,    25, 0, COST_NONE,  _("Causes a bolt of electrical energy to strike the selected creature.") }, 
-	{ _("Chain Lightning"),        15,  5,    40, 0, COST_NONE,  _("Causes a bolt of electrical energy to strike a selected creature, then strike the nearest creature with half damage, then strike the NEXT nearest creature with half again damage, and so on, until it becomes too weak to be harmful.  Warning:  This spell can hit your own creatures!") }, 
-	{ _("Teleport"),                9, 10,     0, 0, COST_NONE,  _("Teleports the creature you select to any open position on the battlefield.") }, 
-	{ _("Cure"),                    6,  6,     5, 0, COST_NONE,  _("Removes all negative spells cast upon one of your units, and restores up to %{count} HP per level of spell power.") }, 
-	{ _("Mass Cure"),              15,  2,     5, 0, COST_NONE,  _("Removes all negative spells cast upon your forces, and restores up to %{count} HP per level of spell power, per creature.") }, 
-	{ _("Resurrect"),              12, 13,    50, 0, COST_NONE,  _("Resurrects creatures from a damaged or dead unit until end of combat.") }, 
-	{ _("Resurrect True"),         15, 12,    50, 0, COST_NONE,  _("Resurrects creatures from a damaged or dead unit permanently.") }, 
+	//  name                      sp   mp  spr value  bits cost     description
+	{ "Unknown",                    0, 0,  0,     0, 0, COST_NONE,  "Unknown spell." },
+	{ _("Fireball"),                9, 0,  8,    10, 0, COST_NONE,  _("Causes a giant fireball to strike the selected area, damaging all nearby creatures.") },
+	{ _("Fireblast"),              15, 0,  9,    10, 0, COST_NONE,  _("An improved version of fireball, fireblast affects two hexes around the center point of the spell, rather than one.") }, 
+	{ _("Lightning Bolt"),          7, 0,  4,    25, 0, COST_NONE,  _("Causes a bolt of electrical energy to strike the selected creature.") }, 
+	{ _("Chain Lightning"),        15, 0,  5,    40, 0, COST_NONE,  _("Causes a bolt of electrical energy to strike a selected creature, then strike the nearest creature with half damage, then strike the NEXT nearest creature with half again damage, and so on, until it becomes too weak to be harmful.  Warning:  This spell can hit your own creatures!") }, 
+	{ _("Teleport"),                9, 0, 10,     0, 0, COST_NONE,  _("Teleports the creature you select to any open position on the battlefield.") }, 
+	{ _("Cure"),                    6, 0,  6,     5, 0, COST_NONE,  _("Removes all negative spells cast upon one of your units, and restores up to %{count} HP per level of spell power.") }, 
+	{ _("Mass Cure"),              15, 0,  2,     5, 0, COST_NONE,  _("Removes all negative spells cast upon your forces, and restores up to %{count} HP per level of spell power, per creature.") }, 
+	{ _("Resurrect"),              12, 0, 13,    50, 0, COST_NONE,  _("Resurrects creatures from a damaged or dead unit until end of combat.") }, 
+	{ _("Resurrect True"),         15, 0, 12,    50, 0, COST_NONE,  _("Resurrects creatures from a damaged or dead unit permanently.") }, 
 	// extra: 0, because also used Speed:GetOriginal (see Battle2::Stats::GetSpeed)
-	{ _("Haste"),                   3, 14,     0, 0, COST_NONE,  _("Increases the speed of any creature by %{count}.") }, 
-	{ _("Mass Haste"),             10, 14,     0, 0, COST_NONE,  _("Increases the speed of all of your creatures by %{count}.") }, 
-	{ _("spell|Slow"),              3,  1,     0, 0, COST_NONE,  _("Slows target to half movement rate.") }, 
-	{ _("Mass Slow"),              15,  1,     0, 0, COST_NONE,  _("Slows all enemies to half movement rate.") }, 
+	{ _("Haste"),                   3, 0, 14,     0, 0, COST_NONE,  _("Increases the speed of any creature by %{count}.") }, 
+	{ _("Mass Haste"),             10, 0, 14,     0, 0, COST_NONE,  _("Increases the speed of all of your creatures by %{count}.") }, 
+	{ _("spell|Slow"),              3, 0,  1,     0, 0, COST_NONE,  _("Slows target to half movement rate.") }, 
+	{ _("Mass Slow"),              15, 0,  1,     0, 0, COST_NONE,  _("Slows all enemies to half movement rate.") }, 
 	//
-	{ _("Blind "),                  6, 21,     0, 0, COST_NONE,  _("Clouds the affected creatures' eyes, preventing them from moving.") }, 
-	{ _("Bless"),                   3,  7,     0, 0, COST_NONE,  _("Causes the selected creatures to inflict maximum damage.") }, 
-	{ _("Mass Bless"),             12,  7,     0, 0, COST_NONE,  _("Causes all of your units to inflict maximum damage.") },
-	{ _("Stoneskin"),               3, 31,     3, 0, COST_NONE,  _("Magically increases the defense skill of the selected creatures.") },
-	{ _("Steelskin"),               6, 30,     5, 0, COST_NONE,  _("Increases the defense skill of the targeted creatures.  This is an improved version of Stoneskin.") },
-	{ _("Curse"),                   3,  3,     0, 0, COST_NONE,  _("Causes the selected creatures to inflict minimum damage.") },
-	{ _("Mass Curse"),             12,  3,     0, 0, COST_NONE,  _("Causes all enemy troops to inflict minimum damage.") },
-	{ _("Holy Word"),               9, 22,    10, 0, COST_NONE,  _("Damages all undead in the battle.") },
-	{ _("Holy Shout"),             12, 23,    20, 0, COST_NONE,  _("Damages all undead in the battle.  This is an improved version of Holy Word.") },
-	{ _("Anti-Magic"),              7, 17,     0, 0, COST_NONE,  _("Prevents harmful magic against the selected creatures.") },
-	{ _("Dispel Magic"),            5, 18,     0, 0, COST_NONE,  _("Removes all magic spells from a single target.") },
-	{ _("Mass Dispel"),            12, 18,     0, 0, COST_NONE,  _("Removes all magic spells from all creatures.") },
-	{ _("Magic Arrow"),             3, 38,    10, 0, COST_NONE,  _("Causes a magic arrow to strike the selected target.") },
-	{ _("Berserker"),              12, 19,     0, 0, COST_NONE,  _("Causes a creature to attack its nearest neighbor.") },
-	{ _("Armageddon"),             20, 16,    50, 0, COST_NONE,  _("Holy terror strikes the battlefield, causing severe damage to all creatures.") },
-	{ _("Elemental Storm"),        15, 11,    25, 0, COST_NONE,  _("Magical elements pour down on the battlefield, damaging all creatures.") },
-	{ _("Meteor Shower"),          15, 24,    25, 0, COST_NONE,  _("A rain of rocks strikes an area of the battlefield, damaging all nearby creatures.") },
-	{ _("Paralyze"),                9, 20,     0, 0, COST_NONE,  _("The targeted creatures are paralyzed, unable to move or retaliate.") },
-	{ _("Hypnotize"),              15, 37,    25, 0, COST_NONE,  _("Brings a single enemy unit under your control for one combat round if its hits are less than %{count} times the caster's spell power.") },
-	{ _("Cold Ray"),                6, 36,    20, 0, COST_NONE,  _("Drains body heat from a single enemy unit.") },
-	{ _("Cold Ring"),               9, 35,    10, 0, COST_NONE,  _("Drains body heat from all units surrounding the center point, but not including the center point.") },
-	{ _("Disrupting Ray"),          7, 34,     3, 0, COST_NONE,  _("Reduces the defense rating of an enemy unit by three.") },
-	{ _("Death Ripple"),            6, 28,     5, 0, COST_NONE,  _("Damages all living (non-undead) units in the battle.") },
-	{ _("Death Wave"),             10, 29,    10, 0, COST_NONE,  _("Damages all living (non-undead) units in the battle.  This spell is an improved version of Death Ripple.") },
-	{ _("Dragon Slayer"),           6, 32,     5, 0, COST_NONE,  _("Greatly increases a unit's attack skill vs. Dragons.") },
-	{ _("Blood Lust"),              3, 27,     3, 0, COST_NONE,  _("Increases a unit's attack skill.") },
-	{ _("Animate Dead"),           10, 25,    50, 0, COST_NONE,  _("Resurrects creatures from a damaged or dead undead unit permanently.") },
-	{ _("Mirror Image"),           25, 26,     0, 0, COST_NONE,  _("Creates an illusionary unit that duplicates one of your existing units.  This illusionary unit does the same damages as the original, but will vanish if it takes any damage.") },
-	{ _("Shield"),                  3, 15,     2, 0, COST_NONE,  _("Halves damage received from ranged attacks for a single unit.") },
-	{ _("Mass Shield"),             7, 15,     0, 0, COST_NONE,  _("Halves damage received from ranged attacks for all of your units.") },
-	{ _("Summon Earth Elemental"), 30, 56,     3, 0, COST_NONE,  _("Summons Earth Elementals to fight for your army.") },
-	{ _("Summon Air Elemental"),   30, 57,     3, 0, COST_NONE,  _("Summons Air Elementals to fight for your army.") },
-	{ _("Summon Fire Elemental"),  30, 58,     3, 0, COST_NONE,  _("Summons Fire Elementals to fight for your army.") },
-	{ _("Summon Water Elemental"), 30, 59,     3, 0, COST_NONE,  _("Summons Water Elementals to fight for your army.") },
-	{ _("Earthquake"),             15, 33,     0, 0, COST_NONE,  _("Damages castle walls.") },
-	{ _("View Mines"),              1, 39,     0, 0, COST_NONE,  _("Causes all mines across the land to become visible.") },
-	{ _("View Resources"),          1, 40,     0, 0, COST_NONE,  _("Causes all resources across the land to become visible.") },
-	{ _("View Artifacts"),          2, 41,     0, 0, COST_NONE,  _("Causes all artifacts across the land to become visible.") },
-	{ _("View Towns"),              2, 42,     0, 0, COST_NONE,  _("Causes all towns and castles across the land to become visible.") },
-	{ _("View Heroes"),             2, 43,     0, 0, COST_NONE,  _("Causes all Heroes across the land to become visible.") },
-	{ _("View All"),                3, 44,     0, 0, COST_NONE,  _("Causes the entire land to become visible.") },
-	{ _("Identify Hero"),           3, 45,     0, 0, COST_NONE,  _("Allows the caster to view detailed information on enemy Heroes.") },
-	{ _("Summon Boat"),             5, 46,     0, 0, COST_NONE,  _("Summons the nearest unoccupied, friendly boat to an adjacent shore location.  A friendly boat is one which you just built or were the most recent player to occupy.") },
-	{ _("Dimension Door"),         10, 47,     0, 0, COST_NONE,  _("Allows the caster to magically transport to a nearby location.") },
-	{ _("Town Gate"),              10, 48,     0, 0, COST_NONE,  _("Returns the caster to any town or castle currently owned.") },
-	{ _("Town Portal"),            20, 49,     0, 0, COST_NONE,  _("Returns the hero to the town or castle of choice, provided it is controlled by you.") },
-	{ _("Visions"),                 6, 50,     3, 0, COST_NONE,  _("Visions predicts the likely outcome of an encounter with a neutral army camp.") },
-	{ _("Haunt"),                   8, 51,     4, 0, COST_NONE,  _("Haunts a mine you control with Ghosts.  This mine stops producing resources.  (If I can't keep it, nobody will!)") },
-	{ _("Set Earth Guardian"),     15, 52,     4, 0, COST_NONE,  _("Sets Earth Elementals to guard a mine against enemy armies.") },
-	{ _("Set Air Guardian"),       15, 53,     4, 0, COST_NONE,  _("Sets Air Elementals to guard a mine against enemy armies.") },
-	{ _("Set Fire Guardian"),      15, 54,     4, 0, COST_NONE,  _("Sets Fire Elementals to guard a mine against enemy armies.") },
-	{ _("Set Water Guardian"),     15, 55,     4, 0, COST_NONE,  _("Sets Water Elementals to guard a mine against enemy armies.") },
-	{ _("Stone"),  		        0,  0,     0, 0, COST_NONE,  _("Stone spell from Medusa.") },
+	{ _("Blind "),                  6, 0, 21,     0, 0, COST_NONE,  _("Clouds the affected creatures' eyes, preventing them from moving.") }, 
+	{ _("Bless"),                   3, 0,  7,     0, 0, COST_NONE,  _("Causes the selected creatures to inflict maximum damage.") }, 
+	{ _("Mass Bless"),             12, 0,  7,     0, 0, COST_NONE,  _("Causes all of your units to inflict maximum damage.") },
+	{ _("Stoneskin"),               3, 0, 31,     3, 0, COST_NONE,  _("Magically increases the defense skill of the selected creatures.") },
+	{ _("Steelskin"),               6, 0, 30,     5, 0, COST_NONE,  _("Increases the defense skill of the targeted creatures.  This is an improved version of Stoneskin.") },
+	{ _("Curse"),                   3, 0,  3,     0, 0, COST_NONE,  _("Causes the selected creatures to inflict minimum damage.") },
+	{ _("Mass Curse"),             12, 0,  3,     0, 0, COST_NONE,  _("Causes all enemy troops to inflict minimum damage.") },
+	{ _("Holy Word"),               9, 0, 22,    10, 0, COST_NONE,  _("Damages all undead in the battle.") },
+	{ _("Holy Shout"),             12, 0, 23,    20, 0, COST_NONE,  _("Damages all undead in the battle.  This is an improved version of Holy Word.") },
+	{ _("Anti-Magic"),              7, 0, 17,     0, 0, COST_NONE,  _("Prevents harmful magic against the selected creatures.") },
+	{ _("Dispel Magic"),            5, 0, 18,     0, 0, COST_NONE,  _("Removes all magic spells from a single target.") },
+	{ _("Mass Dispel"),            12, 0, 18,     0, 0, COST_NONE,  _("Removes all magic spells from all creatures.") },
+	{ _("Magic Arrow"),             3, 0, 38,    10, 0, COST_NONE,  _("Causes a magic arrow to strike the selected target.") },
+	{ _("Berserker"),              12, 0, 19,     0, 0, COST_NONE,  _("Causes a creature to attack its nearest neighbor.") },
+	{ _("Armageddon"),             20, 0, 16,    50, 0, COST_NONE,  _("Holy terror strikes the battlefield, causing severe damage to all creatures.") },
+	{ _("Elemental Storm"),        15, 0, 11,    25, 0, COST_NONE,  _("Magical elements pour down on the battlefield, damaging all creatures.") },
+	{ _("Meteor Shower"),          15, 0, 24,    25, 0, COST_NONE,  _("A rain of rocks strikes an area of the battlefield, damaging all nearby creatures.") },
+	{ _("Paralyze"),                9, 0, 20,     0, 0, COST_NONE,  _("The targeted creatures are paralyzed, unable to move or retaliate.") },
+	{ _("Hypnotize"),              15, 0, 37,    25, 0, COST_NONE,  _("Brings a single enemy unit under your control for one combat round if its hits are less than %{count} times the caster's spell power.") },
+	{ _("Cold Ray"),                6, 0, 36,    20, 0, COST_NONE,  _("Drains body heat from a single enemy unit.") },
+	{ _("Cold Ring"),               9, 0, 35,    10, 0, COST_NONE,  _("Drains body heat from all units surrounding the center point, but not including the center point.") },
+	{ _("Disrupting Ray"),          7, 0, 34,     3, 0, COST_NONE,  _("Reduces the defense rating of an enemy unit by three.") },
+	{ _("Death Ripple"),            6, 0, 28,     5, 0, COST_NONE,  _("Damages all living (non-undead) units in the battle.") },
+	{ _("Death Wave"),             10, 0, 29,    10, 0, COST_NONE,  _("Damages all living (non-undead) units in the battle.  This spell is an improved version of Death Ripple.") },
+	{ _("Dragon Slayer"),           6, 0, 32,     5, 0, COST_NONE,  _("Greatly increases a unit's attack skill vs. Dragons.") },
+	{ _("Blood Lust"),              3, 0, 27,     3, 0, COST_NONE,  _("Increases a unit's attack skill.") },
+	{ _("Animate Dead"),           10, 0, 25,    50, 0, COST_NONE,  _("Resurrects creatures from a damaged or dead undead unit permanently.") },
+	{ _("Mirror Image"),           25, 0, 26,     0, 0, COST_NONE,  _("Creates an illusionary unit that duplicates one of your existing units.  This illusionary unit does the same damages as the original, but will vanish if it takes any damage.") },
+	{ _("Shield"),                  3, 0, 15,     2, 0, COST_NONE,  _("Halves damage received from ranged attacks for a single unit.") },
+	{ _("Mass Shield"),             7, 0, 15,     0, 0, COST_NONE,  _("Halves damage received from ranged attacks for all of your units.") },
+	{ _("Summon Earth Elemental"), 30, 0, 56,     3, 0, COST_NONE,  _("Summons Earth Elementals to fight for your army.") },
+	{ _("Summon Air Elemental"),   30, 0, 57,     3, 0, COST_NONE,  _("Summons Air Elementals to fight for your army.") },
+	{ _("Summon Fire Elemental"),  30, 0, 58,     3, 0, COST_NONE,  _("Summons Fire Elementals to fight for your army.") },
+	{ _("Summon Water Elemental"), 30, 0, 59,     3, 0, COST_NONE,  _("Summons Water Elementals to fight for your army.") },
+	{ _("Earthquake"),             15, 0, 33,     0, 0, COST_NONE,  _("Damages castle walls.") },
+	{ _("View Mines"),              1, 0, 39,     0, 0, COST_NONE,  _("Causes all mines across the land to become visible.") },
+	{ _("View Resources"),          1, 0, 40,     0, 0, COST_NONE,  _("Causes all resources across the land to become visible.") },
+	{ _("View Artifacts"),          2, 0, 41,     0, 0, COST_NONE,  _("Causes all artifacts across the land to become visible.") },
+	{ _("View Towns"),              2, 0, 42,     0, 0, COST_NONE,  _("Causes all towns and castles across the land to become visible.") },
+	{ _("View Heroes"),             2, 0, 43,     0, 0, COST_NONE,  _("Causes all Heroes across the land to become visible.") },
+	{ _("View All"),                3, 0, 44,     0, 0, COST_NONE,  _("Causes the entire land to become visible.") },
+	{ _("Identify Hero"),           3, 0, 45,     0, 0, COST_NONE,  _("Allows the caster to view detailed information on enemy Heroes.") },
+	{ _("Summon Boat"),             5, 0, 46,     0, 0, COST_NONE,  _("Summons the nearest unoccupied, friendly boat to an adjacent shore location.  A friendly boat is one which you just built or were the most recent player to occupy.") },
+	{ _("Dimension Door"),         10, 0, 47,     0, 0, COST_NONE,  _("Allows the caster to magically transport to a nearby location.") },
+	{ _("Town Gate"),              10, 0, 48,     0, 0, COST_NONE,  _("Returns the caster to any town or castle currently owned.") },
+	{ _("Town Portal"),            20, 0, 49,     0, 0, COST_NONE,  _("Returns the hero to the town or castle of choice, provided it is controlled by you.") },
+	{ _("Visions"),                 6, 0, 50,     3, 0, COST_NONE,  _("Visions predicts the likely outcome of an encounter with a neutral army camp.") },
+	{ _("Haunt"),                   8, 0, 51,     4, 0, COST_NONE,  _("Haunts a mine you control with Ghosts.  This mine stops producing resources.  (If I can't keep it, nobody will!)") },
+	{ _("Set Earth Guardian"),     15, 0, 52,     4, 0, COST_NONE,  _("Sets Earth Elementals to guard a mine against enemy armies.") },
+	{ _("Set Air Guardian"),       15, 0, 53,     4, 0, COST_NONE,  _("Sets Air Elementals to guard a mine against enemy armies.") },
+	{ _("Set Fire Guardian"),      15, 0, 54,     4, 0, COST_NONE,  _("Sets Fire Elementals to guard a mine against enemy armies.") },
+	{ _("Set Water Guardian"),     15, 0, 55,     4, 0, COST_NONE,  _("Sets Water Elementals to guard a mine against enemy armies.") },
+	{ _("Stone"),  		        0, 0,  0,     0, 0, COST_NONE,  _("Stone spell from Medusa.") },
 };
 
 void Spell::UpdateStats(const std::string & spec)
@@ -142,7 +143,8 @@ void Spell::UpdateStats(const std::string & spec)
             xml_spell->Attribute("skip", &value);
             if(0 == value)
             {
-		xml_spell->Attribute("sp", &value); if(value) ptr->mana = value;
+		xml_spell->Attribute("sp", &value); if(value) ptr->sp = value;
+		xml_spell->Attribute("mp", &value); if(value) ptr->mp = value;
 		xml_spell->Attribute("extra", &value); if(value) ptr->extra = value;
 	    }
 
@@ -214,7 +216,12 @@ const char* Spell::GetDescription(void) const
     return _(spells[id].description);
 }
 
-u8 Spell::CostManaPoints(const HeroBase* hero) const
+u8 Spell::MovePoint(void) const
+{
+    return spells[id].mp;
+}
+
+u8 Spell::SpellPoint(const HeroBase* hero) const
 {
     if(hero)
     {
@@ -222,28 +229,28 @@ u8 Spell::CostManaPoints(const HeroBase* hero) const
 	{
 	    case BLESS:
 	    case MASSBLESS:
-	    if(hero->HasArtifact(Artifact::SNAKE_RING)) return spells[id].mana / 2;
+	    if(hero->HasArtifact(Artifact::SNAKE_RING)) return spells[id].sp / 2;
 	    break;
 
 	    case SUMMONEELEMENT:
 	    case SUMMONAELEMENT:
 	    case SUMMONFELEMENT:
 	    case SUMMONWELEMENT:
-	    if(hero->HasArtifact(Artifact::ELEMENTAL_RING)) return spells[id].mana / 2;
+	    if(hero->HasArtifact(Artifact::ELEMENTAL_RING)) return spells[id].sp / 2;
 	    break;
 
 	    case CURSE:
 	    case MASSCURSE:
-	    if(hero->HasArtifact(Artifact::EVIL_EYE)) return spells[id].mana / 2;
+	    if(hero->HasArtifact(Artifact::EVIL_EYE)) return spells[id].sp / 2;
 	    break;
 
 	    default: break;
 	}
 
-	if(isMindInfluence() && hero->HasArtifact(Artifact::SKULLCAP)) return spells[id].mana / 2;
+	if(isMindInfluence() && hero->HasArtifact(Artifact::SKULLCAP)) return spells[id].sp / 2;
     }
 
-    return spells[id].mana;
+    return spells[id].sp;
 }
 
 payment_t Spell::GetCost(void) const

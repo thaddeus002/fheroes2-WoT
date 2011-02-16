@@ -57,7 +57,7 @@ s8 GetResultModifiers(const ArtifactsModifiers & modifiers, const HeroBase & bas
     return result;
 }
 
-HeroBase::HeroBase() : magic_point(0), spell_book()
+HeroBase::HeroBase() : magic_point(0), move_point(0), spell_book()
 {
 }
 
@@ -71,9 +71,9 @@ void HeroBase::SetSpellPoints(u16 points)
     magic_point = points;
 }
 
-bool HeroBase::HaveSpellPoints(u16 points) const
+bool HeroBase::HaveSpellPoints(const Spell & spell) const
 {
-    return magic_point >= points;
+    return magic_point >= spell.SpellPoint(this);
 }
 
 void HeroBase::EditSpellBook(void)
@@ -343,15 +343,20 @@ bool HeroBase::CanCastSpell(const Spell & spell, std::string* res) const
 	{
 	    if(HaveSpell(spell))
 	    {
-		if(HaveSpellPoints(spell.CostManaPoints(this)))
+		if(HaveSpellPoints(spell))
 		{
-		    if(kingdom.AllowPayment(spell.GetCost()))
-			return true;
+		    if(spell.MovePoint() <= move_point)
+		    {
+			if(kingdom.AllowPayment(spell.GetCost()))
+			    return true;
+			else
+	    		    os << "resource" << " " << "failed";
+		    }
 		    else
-	    		os << "resource" << " " << "failed";
+	    		os << "move points" << " " << "failed";
 		}
 		else
-	    	    os << "mana points" << " " << "failed";
+	    	    os << "spell points" << " " << "failed";
 	    }
 	    else
 	    	os << spell.GetName() << " " << "not found";
@@ -361,7 +366,7 @@ bool HeroBase::CanCastSpell(const Spell & spell, std::string* res) const
 	*res = os.str();
 	return false;
     }
-    return HaveSpellBook() && HaveSpell(spell) && HaveSpellPoints(spell.CostManaPoints(this)) && kingdom.AllowPayment(spell.GetCost());
+    return HaveSpellBook() && HaveSpell(spell) && HaveSpellPoints(spell) && kingdom.AllowPayment(spell.GetCost());
 }
 
 void HeroBase::SpellCasted(const Spell & spell)
@@ -371,9 +376,12 @@ void HeroBase::SpellCasted(const Spell & spell)
     const payment_t & cost = spell.GetCost();
     if(cost.GetValidItems()) kingdom.OddFundsResource(cost);
 
-    // mana cost
-    u16 mp_cost = spell.CostManaPoints(this);
-    magic_point -= (mp_cost < magic_point ? mp_cost : magic_point);
+    // spell point cost
+    magic_point -= (spell.SpellPoint(this) < magic_point ? spell.SpellPoint(this) : magic_point);
+
+    // move point cost
+    if(spell.MovePoint())
+	move_point -= (spell.MovePoint() < move_point ? spell.MovePoint() : move_point);
 }
 
 bool HeroBase::CanTranscribeScroll(const Artifact & art) const
