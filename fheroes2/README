@@ -53,6 +53,7 @@ All possibilities of fheroes2:
 - heroes: remember MP/SP for retreat/surrender result
 - heroes: surrendering gives some experience
 - heroes: recalculate movement points after creatures movement
+- heroes: transcribe scroll (depends skill: eye eagle)
 - unions: allow meeting heroes
 - unions: allow castle visiting
 - unions: allow view maps

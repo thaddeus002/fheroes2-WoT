@@ -8,15 +8,15 @@ msgstr ""
 "Project-Id-Version: fheroes2\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
 "POT-Creation-Date: 2011-01-11 09:22+0800\n"
-"PO-Revision-Date: 2010-11-04 11:11+0000\n"
+"PO-Revision-Date: 2011-01-22 13:31+0000\n"
 "Last-Translator: Phoenix <Unknown>\n"
 "Language-Team: Swedish <sv@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Launchpad-Export-Date: 2011-01-11 06:32+0000\n"
-"X-Generator: Launchpad (build 12161)\n"
+"X-Launchpad-Export-Date: 2011-02-16 10:16+0000\n"
+"X-Generator: Launchpad (build 12381)\n"
 
 #: ../fheroes2/army/army.cpp:43
 msgid "army|Few"
@@ -91,6 +91,8 @@ msgid ""
 "The Sphere of Negation artifact is in effect for this battle, disabling all "
 "combat spells."
 msgstr ""
+"Negationsklotsartefakten är i effn ekt för den här striden och inaktivera "
+"alla stridsbesvärjelser."
 
 #: ../fheroes2/battle2/battle_arena.cpp:1462
 msgid "You have already cast a spell this round."
@@ -113,7 +115,7 @@ msgstr ""
 
 #: ../fheroes2/battle2/battle_dialogs.cpp:42
 msgid "speed: %{speed}"
-msgstr ""
+msgstr "Hastighet: %{speed}"
 
 #: ../fheroes2/battle2/battle_dialogs.cpp:159
 msgid "The enemy has surrendered!"
@@ -306,7 +308,7 @@ msgstr "Flytta %{monster} hit."
 #: ../fheroes2/battle2/battle_interface.cpp:1367
 #: ../fheroes2/battle2/battle_interface.cpp:1459
 msgid "Turn %{turn}"
-msgstr ""
+msgstr "Sväng %{turn}"
 
 #: ../fheroes2/battle2/battle_interface.cpp:1397
 msgid "Teleport Here"
@@ -360,15 +362,15 @@ msgstr "Visa motstående hjälte"
 
 #: ../fheroes2/battle2/battle_interface.cpp:1713
 msgid "Hide logs"
-msgstr ""
+msgstr "Göm logg"
 
 #: ../fheroes2/battle2/battle_interface.cpp:1713
 msgid "Show logs"
-msgstr ""
+msgstr "Visa logg"
 
 #: ../fheroes2/battle2/battle_interface.cpp:1754
 msgid "%{color} cast spell: %{spell}"
-msgstr ""
+msgstr "%{color} Kastar besvärjelse: %{spell}"
 
 #: ../fheroes2/battle2/battle_interface.cpp:1825
 msgid "Set auto battle on"
@@ -398,15 +400,15 @@ msgstr "%{attacker} tar %{damage} skada."
 #: ../fheroes2/battle2/battle_interface.cpp:2605
 msgid "one creature perishes."
 msgid_plural "%{count} creatures perish."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "en varelse dör."
+msgstr[1] "%{count} varelser dör."
 
 #: ../fheroes2/battle2/battle_interface.cpp:2222
 #: ../fheroes2/battle2/battle_interface.cpp:2798
 msgid "one %{defender} perishes."
 msgid_plural "%{count} %{defender} perish."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "en %{defender} dör."
+msgstr[1] "%{count} %{defender} dör."
 
 #: ../fheroes2/battle2/battle_interface.cpp:2482
 msgid "The %{name} resist the spell!"
@@ -474,7 +476,7 @@ msgstr "Torn tar %{damage} skada."
 
 #: ../fheroes2/battle2/battle_interface.cpp:3129
 msgid "MirrorImage created"
-msgstr ""
+msgstr "Spegelbild skapad"
 
 #: ../fheroes2/battle2/battle_interface.cpp:3687
 msgid "MirrorImage ended"
@@ -494,11 +496,11 @@ msgstr "Du har inte tillräckligt mycket guld!"
 
 #: ../fheroes2/battle2/battle_interface.cpp:4137
 msgid "Damage: %{max}"
-msgstr ""
+msgstr "Skada: %{max}"
 
 #: ../fheroes2/battle2/battle_interface.cpp:4137
 msgid "Damage: %{min} - %{max}"
-msgstr ""
+msgstr "Skada: %{min} - %{max}"
 
 #: ../fheroes2/battle2/battle_interface.cpp:4150
 msgid "Kills: %{max}"
@@ -517,6 +519,7 @@ msgid ""
 "Through eagle-eyed observation, %{name} is able to learn the magic spell "
 "%{spell}."
 msgstr ""
+"Genom en falkblicksobservation, %{name} kan lära sig besvärjelsen %{spell}."
 
 #: ../fheroes2/battle2/battle_main.cpp:289
 msgid ""
@@ -533,6 +536,8 @@ msgid ""
 "The %{artifact} artifact is in effect for this battle, disabling %{spell} "
 "spell."
 msgstr ""
+"%{artifact}-artefakten är i effekt för denna strid och inaktiverar %{spell}-"
+"besvärjelsen."
 
 #: ../fheroes2/battle2/battle_stats.cpp:1532
 msgid "%{count} %{name} rise(s) from the dead!"
@@ -5167,12 +5172,16 @@ msgid ""
 "Advanced Eagle Eye gives your hero a %{count} percent chance to learn any "
 "given 3rd level spell (or below) used against him in combat."
 msgstr ""
+"Avancerad Falkblick ger din hjälte %{count} % chans att lära sig någon given "
+"3:e nivås besvärjelse (eller lägre) som används mot honom i strid."
 
 #: ../fheroes2/heroes/skill.cpp:592
 msgid ""
 "Expert Eagle Eye gives your hero a %{count} percent chance to learn any "
 "given 4th level spell (or below) used against him in combat."
 msgstr ""
+"Professionell Falkblick ger din hjälte %{count} % chans att lära sig någon "
+"given 4:e nivås besvärjelse (eller lägre) som används mot honom i strid."
 
 #: ../fheroes2/heroes/skill.cpp:594
 msgid ""
@@ -5430,7 +5439,7 @@ msgstr "vecka|Humla"
 
 #: ../fheroes2/kingdom/week.cpp:31
 msgid "week|Locust"
-msgstr ""
+msgstr "vecka|Vandringsgräshoppa"
 
 #: ../fheroes2/kingdom/week.cpp:31
 msgid "week|Earthworm"

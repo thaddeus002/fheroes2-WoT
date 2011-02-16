@@ -1,10 +1,14 @@
-SVN - up to r2262
+SVN - up to r2268
 
-+ Fixed: load old format game
-+ Fixed: hotseat select players
+Feb, 16, 2011
+
++ Added: game: transcribe scroll option
++ Fixed: game: load old format game
++ Fixed: game: hotseat select players
 
 Feb, 10, 2011
-+ Added: BattleOnly (experimental)
+
++ Added: game: BattleOnly (experimental)
 
 Jan, 22, 2011
 

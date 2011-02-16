@@ -8,15 +8,15 @@ msgstr ""
 "Project-Id-Version: fheroes2\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2011-01-11 09:22+0800\n"
-"PO-Revision-Date: 2010-11-25 19:03+0000\n"
-"Last-Translator: DiegoJ <diegojromerolopez@gmail.com>\n"
+"PO-Revision-Date: 2011-02-09 08:50+0000\n"
+"Last-Translator: PhoneixS <PhoneixSegovia@gmail.com>\n"
 "Language-Team: Spanish <es@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Launchpad-Export-Date: 2011-01-11 06:32+0000\n"
-"X-Generator: Launchpad (build 12161)\n"
+"X-Launchpad-Export-Date: 2011-02-16 10:17+0000\n"
+"X-Generator: Launchpad (build 12381)\n"
 
 #: ../fheroes2/army/army.cpp:43
 msgid "army|Few"
@@ -115,7 +115,7 @@ msgstr ""
 
 #: ../fheroes2/battle2/battle_dialogs.cpp:42
 msgid "speed: %{speed}"
-msgstr ""
+msgstr "velocidad: %{speed}"
 
 #: ../fheroes2/battle2/battle_dialogs.cpp:159
 msgid "The enemy has surrendered!"
@@ -310,7 +310,7 @@ msgstr "Mover a %{monster} aquí."
 #: ../fheroes2/battle2/battle_interface.cpp:1367
 #: ../fheroes2/battle2/battle_interface.cpp:1459
 msgid "Turn %{turn}"
-msgstr ""
+msgstr "Turno %{turn}"
 
 #: ../fheroes2/battle2/battle_interface.cpp:1397
 msgid "Teleport Here"
@@ -346,7 +346,7 @@ msgstr "Personalizar opciones del sistema."
 
 #: ../fheroes2/battle2/battle_interface.cpp:1614
 msgid "Wait this unit"
-msgstr ""
+msgstr "Esta unidad espera"
 
 #: ../fheroes2/battle2/battle_interface.cpp:1621
 msgid "Skip this unit"
@@ -364,15 +364,15 @@ msgstr "Ver el Heroe Contrario"
 
 #: ../fheroes2/battle2/battle_interface.cpp:1713
 msgid "Hide logs"
-msgstr ""
+msgstr "Ocultar registro"
 
 #: ../fheroes2/battle2/battle_interface.cpp:1713
 msgid "Show logs"
-msgstr ""
+msgstr "Mostrar registros"
 
 #: ../fheroes2/battle2/battle_interface.cpp:1754
 msgid "%{color} cast spell: %{spell}"
-msgstr ""
+msgstr "%{color} lanzó el hechizo: %{spell}"
 
 #: ../fheroes2/battle2/battle_interface.cpp:1825
 msgid "Set auto battle on"
@@ -402,15 +402,15 @@ msgstr "%{attacker} hace %{damage} de daño."
 #: ../fheroes2/battle2/battle_interface.cpp:2605
 msgid "one creature perishes."
 msgid_plural "%{count} creatures perish."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "una criatura murió."
+msgstr[1] "%{count} criaturas murieron."
 
 #: ../fheroes2/battle2/battle_interface.cpp:2222
 #: ../fheroes2/battle2/battle_interface.cpp:2798
 msgid "one %{defender} perishes."
 msgid_plural "%{count} %{defender} perish."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "un %{defender} murió."
+msgstr[1] "%{count} %{defender} murieron."
 
 #: ../fheroes2/battle2/battle_interface.cpp:2482
 msgid "The %{name} resist the spell!"
@@ -482,11 +482,11 @@ msgstr "Torre ha hecho %{damage} de daño."
 
 #: ../fheroes2/battle2/battle_interface.cpp:3129
 msgid "MirrorImage created"
-msgstr ""
+msgstr "Reflejo creado"
 
 #: ../fheroes2/battle2/battle_interface.cpp:3687
 msgid "MirrorImage ended"
-msgstr ""
+msgstr "Reflejo terminado"
 
 #: ../fheroes2/battle2/battle_interface.cpp:4047
 msgid "No spells to cast."
@@ -502,19 +502,19 @@ msgstr "¡Tu no tienes suficiente oro!"
 
 #: ../fheroes2/battle2/battle_interface.cpp:4137
 msgid "Damage: %{max}"
-msgstr ""
+msgstr "Daño: %{max}"
 
 #: ../fheroes2/battle2/battle_interface.cpp:4137
 msgid "Damage: %{min} - %{max}"
-msgstr ""
+msgstr "Daño: %{min} - %{max}"
 
 #: ../fheroes2/battle2/battle_interface.cpp:4150
 msgid "Kills: %{max}"
-msgstr ""
+msgstr "Muertes: %{max}"
 
 #: ../fheroes2/battle2/battle_interface.cpp:4150
 msgid "Kills: %{min} - %{max}"
-msgstr ""
+msgstr "Muertes: %{min} - %{max}"
 
 #: ../fheroes2/battle2/battle_main.cpp:204
 msgid "You have captured an enemy artifact!"
@@ -1239,7 +1239,7 @@ msgstr "Opciones del castillo"
 
 #: ../fheroes2/castle/castle_well.cpp:133
 msgid "Buy Monsters:"
-msgstr ""
+msgstr "Comprar Monstruos:"
 
 #: ../fheroes2/castle/castle_well.cpp:198
 msgid "Town Population Information and Statistics"
@@ -1810,15 +1810,15 @@ msgstr "música"
 
 #: ../fheroes2/dialog/dialog_system.cpp:243
 msgid "hero speed"
-msgstr ""
+msgstr "Velocidad del héroe"
 
 #: ../fheroes2/dialog/dialog_system.cpp:258
 msgid "ai speed"
-msgstr ""
+msgstr "velocidad de la IA"
 
 #: ../fheroes2/dialog/dialog_system.cpp:273
 msgid "scroll speed"
-msgstr ""
+msgstr "Velocidad de desplazamiento"
 
 #: ../fheroes2/dialog/dialog_system.cpp:284
 msgid "Interface"
@@ -1835,32 +1835,32 @@ msgstr "Bien"
 #: ../fheroes2/dialog/dialog_thievesguild.cpp:341
 #: ../fheroes2/pocketpc/pocketpc_thievesguild.cpp:100
 msgid "1st"
-msgstr ""
+msgstr "1º"
 
 #: ../fheroes2/dialog/dialog_thievesguild.cpp:342
 #: ../fheroes2/pocketpc/pocketpc_thievesguild.cpp:101
 msgid "2nd"
-msgstr ""
+msgstr "2º"
 
 #: ../fheroes2/dialog/dialog_thievesguild.cpp:343
 #: ../fheroes2/pocketpc/pocketpc_thievesguild.cpp:102
 msgid "3rd"
-msgstr ""
+msgstr "3º"
 
 #: ../fheroes2/dialog/dialog_thievesguild.cpp:344
 #: ../fheroes2/pocketpc/pocketpc_thievesguild.cpp:103
 msgid "4th"
-msgstr ""
+msgstr "4º"
 
 #: ../fheroes2/dialog/dialog_thievesguild.cpp:345
 #: ../fheroes2/pocketpc/pocketpc_thievesguild.cpp:104
 msgid "5th"
-msgstr ""
+msgstr "5º"
 
 #: ../fheroes2/dialog/dialog_thievesguild.cpp:346
 #: ../fheroes2/pocketpc/pocketpc_thievesguild.cpp:105
 msgid "6th"
-msgstr ""
+msgstr "6º"
 
 #: ../fheroes2/dialog/dialog_thievesguild.cpp:361
 msgid "Thieves' Guild: Player RanKings"
@@ -1975,6 +1975,7 @@ msgstr "Salir del editor de mapas."
 #: ../fheroes2/editor/editor_newmaps.cpp:138
 msgid "Create a map that is %{size} squares wide by %{size} squares high."
 msgstr ""
+"Crear un mapa que sea %{size} casillas de ancho por %{size} casillas de alto."
 
 #: ../fheroes2/editor/editor_newmaps.cpp:143
 #: ../fheroes2/game/game_newgame.cpp:110 ../fheroes2/game/game_newgame.cpp:187
@@ -2962,7 +2963,7 @@ msgstr "%{count} / día"
 #: ../fheroes2/heroes/heroes_action.cpp:269
 #: ../fheroes2/ai/simple/ai_heroes.cpp:187
 msgid "Hero %{name} also got a %{count} experience."
-msgstr ""
+msgstr "El héroe %{name} también obtubo %{count} de experiencia."
 
 #: ../fheroes2/heroes/heroes_action.cpp:562
 msgid ""
@@ -4861,7 +4862,7 @@ msgstr ""
 
 #: ../fheroes2/heroes/heroes.cpp:1034
 msgid "The three Anduran artifacts magically combine into one."
-msgstr ""
+msgstr "Los tres artefactos mágicos de Anduran combinados en uno."
 
 #: ../fheroes2/heroes/heroes.cpp:1125
 msgid "To cast spells, you must first buy a spell book for %{gold} gold."
@@ -6963,7 +6964,7 @@ msgstr "Elementales del Agua"
 
 #: ../fheroes2/network/localclient.cpp:111
 msgid "Please wait..."
-msgstr ""
+msgstr "Por favor, espere..."
 
 #: ../fheroes2/network/localclient.cpp:493
 #: ../fheroes2/network/localclient.cpp:507 ../fheroes2/network/server.cpp:476
