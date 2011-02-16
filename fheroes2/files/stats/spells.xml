@@ -1,8 +1,8 @@
 <?xml version="1.0" ?>
 <spells>
 
- <!-- first: unknown spell, skip: skip read line, disable: spell not used in game (only for random spells), mp: mana point use -->
- <spell skip="0" sp="1" disable="0" > <cost gold="0" wood="0" mercury="0" ore="0" sulfur="0" crystal="0" gems="0" /> </spell>
+ <!-- first: unknown spell, skip: skip read line, disable: spell not used in game (only for random spells), sp: spell point use, mp: move point use -->
+ <spell skip="0" sp="1" mp="0" disable="0" > <cost gold="0" wood="0" mercury="0" ore="0" sulfur="0" crystal="0" gems="0" /> </spell>
 
  <!-- Fireball -->
  <spell sp="9" extra="10" />
