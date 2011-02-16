@@ -57,10 +57,10 @@ SpellStorage SpellStorage::GetSpells(u8 lvl) const
     return result;
 }
 
-void SpellStorage::Append(const Spell & sp, u8 wisdom)
+void SpellStorage::Append(const Spell & sp)
 {
     if(sp != Spell::NONE &&
-	end() == std::find(begin(), end(), sp) && (0 == wisdom || sp.isAllowWithWisdom(wisdom)))
+	end() == std::find(begin(), end(), sp))
 	push_back(sp);
 }
 

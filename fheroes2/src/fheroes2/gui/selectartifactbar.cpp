@@ -31,6 +31,7 @@
 #include "heroes.h"
 #include "artifact.h"
 #include "editor_dialogs.h"
+#include "settings.h"
 #include "localclient.h"
 #include "selectartifactbar.h"
 
@@ -258,6 +259,32 @@ bool SelectArtifactsBar::QueueEventProcessing(SelectArtifactsBar & bar)
 			bar.hero.EditSpellBook();
 		    else
 			bar.hero.OpenSpellBook(SpellBook::ALL, false);
+		}
+		else
+		if(art1() == Artifact::SPELL_SCROLL &&
+		    Settings::Get().ExtHeroAllowTranscribingScroll() &&
+		    bar.hero.CanTranscribeScroll(art1))
+		{
+		    Spell spell = art1.GetSpell();
+		    if(spell.isValid())
+		    {
+			payment_t cost = spell.GetCost();
+			u16 answer = 0;
+
+			if(cost.GetValidItems())
+			    answer = Dialog::ResourceInfo("Transcribe Scroll", "", cost, Dialog::YES|Dialog::NO);
+			else
+			    answer = Dialog::Message("Transcribe Scroll", "", Font::BIG, Dialog::YES|Dialog::NO);
+
+			if(answer == Dialog::YES)
+			    bar.hero.TranscribeScroll(art1);
+
+			change = true;
+		    }
+		    else
+		    {
+			DEBUG(DBG_GAME, DBG_WARN, "invalid spell");
+		    }
 		}
 		else
 		    Dialog::ArtifactInfo(art1.GetName(), art1.GetDescription(), art1);

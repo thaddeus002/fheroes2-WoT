@@ -184,7 +184,6 @@ public:
     const char* GetName(void) const;
     std::string GetDescription(void) const;
 
-
     static u8 Rand(level_t);
     static Artifact FromMP2IndexSprite(u8);
     static const char* GetScenario(const Artifact &);
@@ -207,6 +206,8 @@ struct BagArtifacts : std::vector<Artifact>
     bool isFull(void) const;
     bool MakeBattleGarb(void);
     bool ContainUltimateArtifact(void) const;
+
+    void  RemoveScroll(const Artifact &);
 
     u8   CountArtifacts(void) const;
 };

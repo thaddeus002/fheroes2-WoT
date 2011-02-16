@@ -68,7 +68,9 @@ namespace Skill
 	    BALLISTICS	= 11,
 	    EAGLEEYE	= 12,
 	    NECROMANCY	= 13,
-	    ESTATES	= 14
+	    ESTATES	= 14,
+
+	    LEARNING	= EAGLEEYE
 	};
 
 	Secondary();

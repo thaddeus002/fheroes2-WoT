@@ -102,14 +102,17 @@ void CastleIndexListBox::RedrawBackground(const Point & dst)
 
 bool Heroes::ActionSpellCast(const Spell & spell)
 {
+    std::string error;
+
     if(! CanMove())
     {
         Dialog::Message("", _("Your hero is too tired to cast this spell today. Try again tomorrow."), Font::BIG, Dialog::OK);
 	return false;
     }
     else
-    if(spell == Spell::NONE || spell.isCombat() || ! CanCastSpell(spell))
+    if(spell == Spell::NONE || spell.isCombat() || ! CanCastSpell(spell, &error))
     {
+	if(error.size()) Dialog::Message("Error", error, Font::BIG, Dialog::OK);
 	return false;
     }
 

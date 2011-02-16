@@ -71,6 +71,10 @@ public:
     u16 GetSpellPoints(void) const;
     bool HaveSpellPoints(u16) const;
     bool CanCastSpell(const Spell &, std::string* = NULL) const;
+    bool CanTeachSpell(const Spell &) const;
+    bool CanLearnSpell(const Spell &) const;
+    bool CanTranscribeScroll(const Artifact &) const;
+    void TranscribeScroll(const Artifact &);
     void SpellCasted(const Spell &);
     void SetSpellPoints(u16);
 

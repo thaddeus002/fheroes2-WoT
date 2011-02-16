@@ -346,30 +346,14 @@ void RedrawPrimarySkillInfo(const Point & cur_pt, const Skill::Primary* p1, cons
 // spell_book.cpp
 void SpellBookSetFilter(const BagArtifacts &, const SpellStorage &, SpellStorage &, SpellBook::filter_t);
 
-struct CanTeachSpell : std::binary_function<u8, Spell, bool>
+struct HeroesCanTeachSpell : std::binary_function<const HeroBase*, Spell, bool>
 {
-    bool operator() (u8 scholar, Spell spell) const
-    {
-	// FIXME: teach conditions for level5
-	if(4 < spell.Level())
-	    return false;
-
-	if(4 == spell.Level())
-	    return Skill::Level::EXPERT == scholar;
-	else
-	if(3 == spell.Level())
-	    return Skill::Level::ADVANCED <= scholar;
-	else
-	if(3 > spell.Level())
-	    return Skill::Level::BASIC <= scholar;
-
-	return false;
-    };
+    bool operator() (const HeroBase* hero, Spell spell) const { return hero->CanTeachSpell(spell); };
 };
 
-struct HeroesHaveSpell : std::binary_function<const Heroes*, Spell, bool>
+struct HeroesHaveSpell : std::binary_function<const HeroBase*, Spell, bool>
 {
-    bool operator() (const Heroes* hero, Spell spell) const { return hero->HaveSpell(spell); };
+    bool operator() (const HeroBase* hero, Spell spell) const { return hero->HaveSpell(spell); };
 };
 
 void Heroes::ScholarAction(Heroes & hero1, Heroes & hero2)
@@ -414,8 +398,8 @@ void Heroes::ScholarAction(Heroes & hero1, Heroes & hero2)
 
     SpellStorage learn, teach;
 
-    learn.reserve(15);
-    teach.reserve(15);
+    learn.reserve(25);
+    teach.reserve(25);
 
     SpellBookSetFilter(teacher->bag_artifacts, teacher->spell_book, teach, SpellBook::ALL);
     SpellBookSetFilter(learner->bag_artifacts, learner->spell_book, learn, SpellBook::ALL);
@@ -431,7 +415,7 @@ void Heroes::ScholarAction(Heroes & hero1, Heroes & hero2)
     if(learn.size())
     {
 	SpellStorage::iterator
-	    res = std::remove_if(learn.begin(), learn.end(), std::not1(std::bind1st(CanTeachSpell(), scholar)));
+	    res = std::remove_if(learn.begin(), learn.end(), std::not1(std::bind1st(HeroesCanTeachSpell(), teacher)));
 	learn.resize(std::distance(learn.begin(), res));
     }
 
@@ -446,7 +430,7 @@ void Heroes::ScholarAction(Heroes & hero1, Heroes & hero2)
     if(teach.size())
     {
 	SpellStorage::iterator
-	    res = std::remove_if(teach.begin(), teach.end(), std::not1(std::bind1st(CanTeachSpell(), scholar)));
+	    res = std::remove_if(teach.begin(), teach.end(), std::not1(std::bind1st(HeroesCanTeachSpell(), teacher)));
 	teach.resize(std::distance(teach.begin(), res));
     }
 

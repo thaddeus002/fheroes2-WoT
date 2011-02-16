@@ -624,3 +624,13 @@ bool BagArtifacts::ContainUltimateArtifact(void) const
 {
     return end() != std::find_if(begin(), end(), std::mem_fun_ref(&Artifact::isUltimate));
 }
+
+void BagArtifacts::RemoveScroll(const Artifact & art)
+{
+    Spell spell(art.GetSpell());
+    if(spell.isValid())
+    {
+	iterator it = std::find(begin(), end(), spell);
+	if(it != end()) (*it).Reset();
+    }
+}

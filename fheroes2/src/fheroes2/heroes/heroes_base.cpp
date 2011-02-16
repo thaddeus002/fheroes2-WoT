@@ -99,17 +99,15 @@ bool HeroBase::HaveSpell(const Spell & spell) const
 
 void HeroBase::AppendSpellToBook(const Spell & spell, bool without_wisdom)
 {
-    if(without_wisdom)
+    if(without_wisdom || CanLearnSpell(spell))
 	spell_book.Append(spell);
-    else
-	spell_book.Append(spell, GetLevelSkill(Skill::Secondary::WISDOM));
 }
 
 void HeroBase::AppendSpellsToBook(const SpellStorage & spells, bool without_wisdom)
 {
     for(SpellStorage::const_iterator
 	it = spells.begin(); it != spells.end(); ++it)
-	spell_book.Append(*it, without_wisdom);
+	AppendSpellToBook(*it, without_wisdom);
 }
 
 bool HeroBase::SpellBookActivate(void)
@@ -376,4 +374,55 @@ void HeroBase::SpellCasted(const Spell & spell)
     // mana cost
     u16 mp_cost = spell.CostManaPoints(this);
     magic_point -= (mp_cost < magic_point ? mp_cost : magic_point);
+}
+
+bool HeroBase::CanTranscribeScroll(const Artifact & art) const
+{
+    Spell spell = art.GetSpell();
+
+    if(spell.isValid() && CanCastSpell(spell))
+    {
+	u8 learning = GetLevelSkill(Skill::Secondary::LEARNING);
+
+	return ((3 <  spell.Level() && Skill::Level::EXPERT == learning) ||
+	    (3 == spell.Level() && Skill::Level::ADVANCED <= learning) ||
+	    (3 > spell.Level() && Skill::Level::BASIC <= learning));
+    }
+
+    return false;
+}
+
+bool HeroBase::CanTeachSpell(const Spell & spell) const
+{
+    u8 learning = GetLevelSkill(Skill::Secondary::LEARNING);
+
+    return ((4 == spell.Level() && Skill::Level::EXPERT == learning) ||
+	    (3 == spell.Level() && Skill::Level::ADVANCED <= learning) ||
+	    (3 > spell.Level() && Skill::Level::BASIC <= learning));
+}
+
+bool HeroBase::CanLearnSpell(const Spell & spell) const
+{
+    u8 wisdom = GetLevelSkill(Skill::Secondary::WISDOM);
+
+    return ((4 < spell.Level() && Skill::Level::EXPERT > wisdom) ||
+            (3 < spell.Level() && Skill::Level::ADVANCED > wisdom) ||
+            (2 < spell.Level() && Skill::Level::BASIC > wisdom) ? false : true);
+}
+
+void HeroBase::TranscribeScroll(const Artifact & art)
+{
+    Spell spell = art.GetSpell();
+
+    if(spell.isValid())
+    {
+	// add spell
+	spell_book.Append(spell);
+
+	// remove art
+	bag_artifacts.RemoveScroll(art);
+
+	// reduce mp and resource
+	SpellCasted(spell);
+    }
 }

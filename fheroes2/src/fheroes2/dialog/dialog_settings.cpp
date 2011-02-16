@@ -157,6 +157,7 @@ void Dialog::ExtSettings(bool readonly)
     states.push_back(Settings::HEROES_PATROL_ALLOW_PICKUP);
     states.push_back(Settings::HEROES_AUTO_MOVE_BATTLE_DST);
     states.push_back(Settings::HEROES_PICKUP_ARTIFACT_INFO);
+    states.push_back(Settings::HEROES_TRANSCRIBING_SCROLLS);
 
     if(! conf.QVGA())
     {

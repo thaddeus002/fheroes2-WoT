@@ -145,6 +145,7 @@ static const settings_t settingsFHeroes2[] =
     { Settings::HEROES_PATROL_ALLOW_PICKUP,     _("heroes: allow pickup objects for patrol"),           },
     { Settings::HEROES_AUTO_MOVE_BATTLE_DST,	_("heroes: after battle move to target cell"),		},
     { Settings::HEROES_PICKUP_ARTIFACT_INFO,	_("heroes: pickup artifact + info dialog"),		},
+    { Settings::HEROES_TRANSCRIBING_SCROLLS,	_("heroes: allow transcribing scrolls (needs: Eye Eagle skill)"), },
     { Settings::UNIONS_ALLOW_HERO_MEETINGS,	_("unions: allow meeting heroes"),                      },
     { Settings::UNIONS_ALLOW_CASTLE_VISITING,	_("unions: allow castle visiting"),                     },
     { Settings::UNIONS_ALLOW_VIEW_MAPS,		_("unions: allow view maps"),                           },
@@ -1290,6 +1291,11 @@ bool Settings::ExtBattleTroopDirection(void) const
 bool Settings::ExtBattleSkipIncreaseDefense(void) const
 {
     return ExtModes(BATTLE_SKIP_INCREASE_DEFENSE);
+}
+
+bool Settings::ExtHeroAllowTranscribingScroll(void) const
+{
+    return ExtModes(HEROES_TRANSCRIBING_SCROLLS);
 }
 
 bool Settings::ExtHeroAutoMove2BattleTarget(void) const

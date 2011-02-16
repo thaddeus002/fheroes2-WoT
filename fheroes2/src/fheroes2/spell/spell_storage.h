@@ -40,7 +40,7 @@ public:
 
 	SpellStorage GetSpells(u8) const;
 	void Append(const SpellStorage &);
-	void Append(const Spell &, u8 wisdom = 0);
+	void Append(const Spell &);
 	void Append(const BagArtifacts &);
 	void Append(const Artifact &);
 	bool isPresentSpell(const Spell &) const;

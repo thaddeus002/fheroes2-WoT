@@ -142,7 +142,7 @@ void Spell::UpdateStats(const std::string & spec)
             xml_spell->Attribute("skip", &value);
             if(0 == value)
             {
-		xml_spell->Attribute("mp", &value); if(value) ptr->mana = value;
+		xml_spell->Attribute("sp", &value); if(value) ptr->mana = value;
 		xml_spell->Attribute("extra", &value); if(value) ptr->extra = value;
 	    }
 
@@ -155,9 +155,9 @@ void Spell::UpdateStats(const std::string & spec)
             // load dimension door params
             if(spell == DIMENSIONDOOR)
             {
-		xml_spell->Attribute("distance", &value); dd_distance = value;
-		xml_spell->Attribute("sp", &value); dd_sp = value;
-		xml_spell->Attribute("hp", &value); dd_hp = value;
+		xml_spell->Attribute("conf_distance", &value); dd_distance = value;
+		xml_spell->Attribute("conf_sp", &value); dd_sp = value;
+		xml_spell->Attribute("conf_hp", &value); dd_hp = value;
             }
 
 	    // load spell cost
@@ -728,11 +728,4 @@ u8 Spell::CalculateDimensionDoorDistance(u8 current_sp, u32 total_hp)
     }
     // original h2 variant
     return 14;
-}
-
-bool Spell::isAllowWithWisdom(u8 wisdom) const
-{
-    return ((4 < Level() && Skill::Level::EXPERT > wisdom) ||
-	    (3 < Level() && Skill::Level::ADVANCED > wisdom) ||
-	    (2 < Level() && Skill::Level::BASIC > wisdom) ? false : true);
 }

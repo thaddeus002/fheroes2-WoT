@@ -138,7 +138,6 @@ public:
     bool isApplyToEnemies(void) const;
     bool isMassActions(void) const;
     bool isRaceCompatible(u8 race) const;
-    bool isAllowWithWisdom(u8 wisdom) const;
 
     /* return index sprite spells.icn */
     u8 IndexSprite(void) const;
