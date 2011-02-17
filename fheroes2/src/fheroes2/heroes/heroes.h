@@ -267,7 +267,7 @@ private:
 
     heroes_t		hid;
     heroes_t		portrait;
-    u8	race;
+    u8			race;
 
     MP2::object_t	save_maps_object;
 

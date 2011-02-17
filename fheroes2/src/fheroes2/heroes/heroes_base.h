@@ -41,6 +41,7 @@ namespace Army { class army_t; }
 class HeroBase : public Skill::Primary, public Maps::Position, public BitModes
 {
 public:
+    HeroBase(u8 type, u8 race);
     HeroBase();
 
     virtual const std::string & GetName(void) const = 0;
@@ -90,6 +91,8 @@ public:
     const BagArtifacts & GetBagArtifacts(void) const;
     bool HasArtifact(const Artifact &) const;
     bool PickupArtifact(const Artifact &);
+
+    static void LoadDefaults(u8 type, u8 race, HeroBase &);
 
 protected:
     friend class Game::IO;

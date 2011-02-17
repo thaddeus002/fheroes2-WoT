@@ -32,7 +32,6 @@ class Captain : public HeroBase
   public:
     Captain(const Castle &);
 
-    void LoadDefaults(void);
     bool isValid(void) const;
     u8 GetAttack(void) const;
     u8 GetDefense(void) const;

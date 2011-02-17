@@ -275,6 +275,38 @@ Skill::Primary::Primary() : attack(0), defense(0), power(0), knowledge(0)
 {
 }
 
+void Skill::Primary::LoadDefaults(u8 type, u8 race, Primary & skill)
+{
+    const skillstats_t* ptr = GetSkillStats(race);
+
+    if(ptr)
+    switch(type)
+    {
+	case CAPTAIN:
+	    skill.attack = ptr->captain_primary.attack;
+	    skill.defense = ptr->captain_primary.defense;
+	    skill.power = ptr->captain_primary.power;
+	    skill.knowledge = ptr->captain_primary.knowledge;
+	    break;
+
+	case HEROES:
+	    skill.attack = ptr->initial_primary.attack;
+	    skill.defense = ptr->initial_primary.defense;
+	    skill.power = ptr->initial_primary.power;
+	    skill.knowledge = ptr->initial_primary.knowledge;
+	    break;
+
+	default:
+	    break;
+    }
+}
+
+u8 Skill::Primary::GetInitialSpell(u8 race)
+{
+    const skillstats_t* ptr = GetSkillStats(race);
+    return ptr ? ptr->initial_spell : 0;
+}
+
 // primary skill from level up (dependence from race and hero level)
 Skill::Primary::skill_t Skill::Primary::FromLevelUp(const u8 race, const u8 level)
 {
@@ -843,34 +875,6 @@ void SecondarySkillBar::QueueEventProcessing(void)
     	    Dialog::SecondarySkillInfo(skill, level, !le.MousePressRight());
     	    cursor.Show();
     	    display.Flip();
-	}
-    }
-}
-
-void Skill::Primary::LoadDefaults(u8 race, Primary & skill, u8 & book, Spell & spell)
-{
-    const skillstats_t* ptr = GetSkillStats(race);
-
-    if(ptr)
-    {
-	if(CAPTAIN == skill.GetType())
-	{
-	    skill.attack = ptr->captain_primary.attack;
-	    skill.defense = ptr->captain_primary.defense;
-	    skill.power = ptr->captain_primary.power;
-	    skill.knowledge = ptr->captain_primary.knowledge;
-	    book = ptr->initial_book;
-	    spell = 0;
-	}
-	else
-	if(HEROES == skill.GetType())
-	{
-	    skill.attack = ptr->initial_primary.attack;
-	    skill.defense = ptr->initial_primary.defense;
-	    skill.power = ptr->initial_primary.power;
-	    skill.knowledge = ptr->initial_primary.knowledge;
-	    book = ptr->initial_book;
-	    spell = ptr->initial_spell;
 	}
     }
 }

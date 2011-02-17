@@ -108,26 +108,14 @@ Heroes::Heroes() : move_point_scale(-1), army(this), path(*this),
 {
 }
 
-Heroes::Heroes(heroes_t ht, u8 rc) : killer_color(Color::GRAY), experience(0),
+Heroes::Heroes(heroes_t ht, u8 rc) : HeroBase(Skill::Primary::HEROES, rc), killer_color(Color::GRAY), experience(0),
     move_point_scale(-1), army(this), hid(ht), portrait(ht), race(rc),
     save_maps_object(MP2::OBJ_ZERO), path(*this), direction(Direction::RIGHT), sprite_index(18), patrol_square(0)
 {
     name = _(Heroes::GetName(ht));
 
-    bag_artifacts.assign(HEROESMAXARTIFACT, Artifact::UNKNOWN);
-
-    u8 book;
-    Spell spell;
-    Skill::Primary::LoadDefaults(race, *this, book, spell);
-
     secondary_skills.reserve(HEROESMAXSKILL);
     Skill::Secondary::LoadDefaults(race, secondary_skills);
-
-    if(book)
-    {
-        SpellBookActivate();
-        AppendSpellToBook(spell);
-    }
 
     // hero is freeman
     color = Color::GRAY;
@@ -441,12 +429,8 @@ void Heroes::LoadFromMP2(s32 map_index, const void *ptr, const Color::color_t cl
     // fixed race for custom portrait
     if(custom_portrait && Settings::Get().ExtForceSelectRaceFromType())
     {
-	if(Race::ALL & rc) race = rc;
-
-	// fixed default primary skills
-	u8 book;
-	Spell spell;
-	Skill::Primary::LoadDefaults(race, *this, book, spell);
+	if(Race::ALL & rc)
+	    HeroBase::LoadDefaults(Skill::Primary::HEROES, rc, *this);
 
 	// fixed default troop
 	if(!custom_troop)
@@ -455,13 +439,6 @@ void Heroes::LoadFromMP2(s32 map_index, const void *ptr, const Color::color_t cl
 	// fixed default sec skills
 	if(!custom_secskill)
 	    Skill::Secondary::LoadDefaults(race, secondary_skills);
-
-	// fixed default spell
-	if(book)
-	{
-    	    SpellBookActivate();
-    	    AppendSpellToBook(spell);
-	}
     }
 
     // patrol

@@ -27,22 +27,11 @@
 #include "captain.h"
 #include "settings.h"
 
-Captain::Captain(const Castle & c) : home(c)
+Captain::Captain(const Castle & c) : HeroBase(Skill::Primary::CAPTAIN, c.GetRace()), home(c)
 {
     center = home.GetCenter();
     bag_artifacts.clear();
-}
-
-void Captain::LoadDefaults(void)
-{
-    if(Race::ALL & home.GetRace())
-    {
-	u8 book;
-	Spell spell;
-	Skill::Primary::LoadDefaults(home.GetRace(), *this, book, spell);
-	SpellBookActivate();
-	if(home.GetLevelMageGuild()) home.GetMageGuild().EducateHero(*this);
-    }
+    if(home.GetLevelMageGuild()) home.GetMageGuild().EducateHero(*this);
 }
 
 bool Captain::isValid(void) const

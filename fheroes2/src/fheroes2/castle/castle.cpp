@@ -258,7 +258,8 @@ void Castle::LoadFromMP2(const void *ptr)
     // fix captain
     if(building & BUILD_CAPTAIN)
     {
-	captain.LoadDefaults();
+	HeroBase::LoadDefaults(Skill::Primary::CAPTAIN, race, captain);
+	if(mageguild.GetLevel()) mageguild.EducateHero(captain);
 	army.SetCommander(&captain);
     }
     else
@@ -1021,7 +1022,7 @@ bool Castle::BuyBuilding(u32 build)
 		break;
 
 	    case BUILD_CAPTAIN:
-		captain.LoadDefaults();
+		if(mageguild.GetLevel()) mageguild.EducateHero(captain);
 		army.SetCommander(&captain);
 		break;
 

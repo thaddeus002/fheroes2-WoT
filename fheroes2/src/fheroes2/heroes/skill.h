@@ -138,7 +138,8 @@ namespace Skill
 
         static const char* String(const skill_t skill);
 	static skill_t FromLevelUp(const u8 race, const u8 level);
-	static void LoadDefaults(u8, Primary &, u8 &, Spell &);
+	static void LoadDefaults(u8 type, u8 race, Primary &);
+	static u8 GetInitialSpell(u8 race);
 
 	protected:
 	u8			attack;
@@ -146,7 +147,6 @@ namespace Skill
 	u8			power;
 	u8			knowledge;
     };
-
 }
 
 class SecondarySkillBar
