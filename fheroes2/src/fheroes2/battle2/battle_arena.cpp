@@ -1416,11 +1416,6 @@ const SpellStorage & Battle2::Arena::GetUsageSpells(void) const
     return usage_spells;
 }
 
-void Battle2::Arena::AddSpell(const Spell & spell)
-{
-    usage_spells.Append(spell);
-}
-
 s16 Battle2::Arena::GetFreePositionNearHero(u8 color) const
 {
     const u8 cells1[] = { 11, 22, 33 };

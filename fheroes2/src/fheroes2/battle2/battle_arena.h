@@ -147,7 +147,6 @@ namespace Battle2
 	void FadeArena(void) const;
 
 	const SpellStorage & GetUsageSpells(void) const;
-	void AddSpell(const Spell &);
 
 	u16  GetPath(const Stats &, u16, std::vector<u16> &);
 	void DumpBoard(void) const;

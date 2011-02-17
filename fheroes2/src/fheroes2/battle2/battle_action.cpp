@@ -298,6 +298,9 @@ void Battle2::Arena::ApplyActionSpellCast(Action & action)
 	current_commander->SetModes(Heroes::SPELLCASTED);
 	current_commander->SpellCasted(spell);
 
+	// save spell for "eagle eye" capability
+	usage_spells.Append(spell);
+
 #ifdef WITH_NET
 	if(Network::isRemoteClient())
 	{

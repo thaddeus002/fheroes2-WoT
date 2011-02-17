@@ -1024,9 +1024,6 @@ bool Battle2::Stats::ApplySpell(const Spell & spell, const HeroBase* hero, Targe
 
     DEBUG(DBG_BATTLE, DBG_TRACE, spell.GetName() << " to " << Info());
 
-    // save spell for "eagle eye" capability
-    arena->AddSpell(spell);
-
     u16 spoint = hero ? hero->GetPower() : 3;
 
     if(spell.isDamage())

@@ -736,16 +736,3 @@ u8 Spell::CalculateDimensionDoorDistance(u8 current_sp, u32 total_hp)
     // original h2 variant
     return 14;
 }
-
-bool Spell::Allow4EyeEagle(void) const
-{
-    switch(id)
-    {
-	case STONE:
-	    return false;
-
-	default: break;
-    }
-
-    return true;
-}
