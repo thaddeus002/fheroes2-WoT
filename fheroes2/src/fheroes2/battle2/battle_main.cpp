@@ -224,7 +224,7 @@ void Battle2::EagleEyeSkillAction(HeroBase & hero, const SpellStorage & spells, 
 	it = spells.begin(); it != spells.end(); ++it)
     {
 	const Spell & sp = *it;
-    	if(!hero.HaveSpell(sp))
+    	if(sp.Allow4EyeEagle() && !hero.HaveSpell(sp))
 	{
 	    switch(level)
 	    {
