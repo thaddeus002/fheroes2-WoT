@@ -121,14 +121,14 @@ Dialog::answer_t Dialog::ArmyInfo(const Army::Troop & troop, u16 flags)
     {
         if(UPGRADE & flags)
         {
-            buttonUpgrade.SetDisable(false);
-            buttonUpgrade.Draw();
-        }
-        else if(READONLY & flags)
-        {
-            buttonUpgrade.Press();
-            buttonUpgrade.SetDisable(true);
-            buttonUpgrade.Draw();
+    	    if(UPGRADE_DISABLE & flags)
+    	    {
+        	buttonUpgrade.Press();
+        	buttonUpgrade.SetDisable(true);
+            }
+	    else
+        	buttonUpgrade.SetDisable(false);
+	    buttonUpgrade.Draw();
         }
         else buttonUpgrade.SetDisable(true);
     }

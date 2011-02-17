@@ -303,7 +303,7 @@ void SelectArmyBar::StatusMessageEvent1(const SelectArmyBar & bar, u8 index1, co
 	String::Replace(res, "%{name}", troop1.GetName());
     }
 }
-
+#include "settings.h"
 bool SelectArmyBar::QueueEventProcessing(SelectArmyBar & bar, std::string* msg)
 {
     LocalEvent & le = LocalEvent::Get();
@@ -346,21 +346,22 @@ bool SelectArmyBar::QueueEventProcessing(SelectArmyBar & bar, std::string* msg)
 	    if(index1 == index2)
 	    {
 		u16 flags = (bar.ReadOnly() || bar.SaveLastTroop() ? Dialog::READONLY | Dialog::BUTTONS : Dialog::BUTTONS);
-		payment_t payment = troop1.GetUpgradeCost();
 
 		if(troop1.isAllowUpgrade() &&
 		    bar.castle &&
 		    bar.castle->GetRace() == troop1.GetRace() &&
 		    bar.castle->isBuild(troop1.GetUpgrade().GetDwelling()))
-		    flags |= Dialog::UPGRADE;
+		{
+			flags |= Dialog::UPGRADE;
 
-		if(payment > world.GetMyKingdom().GetFunds())
-		    flags |= Dialog::READONLY;
+			if(! world.GetMyKingdom().AllowPayment(troop1.GetUpgradeCost()))
+			    flags |= Dialog::UPGRADE_DISABLE;
+		}
 
 		switch(Dialog::ArmyInfo(troop1, flags))
 		{
             	    case Dialog::UPGRADE:
-            		world.GetMyKingdom().OddFundsResource(payment);
+            		world.GetMyKingdom().OddFundsResource(troop1.GetUpgradeCost());
             		troop1.Upgrade();
 			change = true;
 #ifdef WITH_NET

@@ -1528,6 +1528,9 @@ void Heroes::SetFreeman(const u8 reason)
 bool Heroes::isShow(u8 color)
 {
     const s32 index_from = GetIndex();
+
+    if(! Maps::isValidAbsIndex(index_from)) return false;
+
     const Maps::Tiles & tile_from = world.GetTiles(index_from);
 
     if(path.isValid())
