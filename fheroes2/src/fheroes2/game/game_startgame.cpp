@@ -1431,11 +1431,8 @@ void Game::EventNextTown(void)
 void Game::EventSaveGame(void)
 {
     std::string filename;
-    if(Dialog::SelectFileSave(filename) && filename.size())
-    {
-	Game::Save(filename);
+    if(Dialog::SelectFileSave(filename) && filename.size() && Game::Save(filename))
 	Dialog::Message("", _("Game saved successfully."), Font::BIG, Dialog::OK);
-    }
 }
 
 void Game::EventLoadGame(menu_t & ret)
