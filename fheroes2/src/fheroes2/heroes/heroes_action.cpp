@@ -1161,11 +1161,11 @@ void ActionToShrine(Heroes &hero, const u8 obj, const s32 dst_index)
 	{
 	    PlaySoundSuccess;
 	    hero.AppendSpellToBook(spell());
-	    hero.SetVisited(dst_index, Visit::GLOBAL);
 	    Dialog::SpellInfo(head, body, spell());
 	}
     }
 
+    hero.SetVisited(dst_index, Visit::GLOBAL);
     DEBUG(DBG_GAME, DBG_INFO, hero.GetName());
 }
 
