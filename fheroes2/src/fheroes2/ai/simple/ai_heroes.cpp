@@ -2522,12 +2522,12 @@ void AIHeroesTurns(Heroes &hero)
 	    display.Flip();
     }
 
-    bool hide_move = (0 == conf.AIMoveSpeed()) ||
-	    (! IS_DEVEL() && !hero.isShow(Settings::Get().MyColor()));
-
     while(LocalEvent::Get().HandleEvents())
     {
 	if(hero.isFreeman() || !hero.isEnableMove()) break;
+
+	bool hide_move = (0 == conf.AIMoveSpeed()) ||
+	    (! IS_DEVEL() && !hero.isShow(Settings::Get().MyColor()));
 
 	if(hide_move)
 	{
@@ -2554,6 +2554,9 @@ void AIHeroesTurns(Heroes &hero)
 	    display.Flip();
 	}
     }
+
+    bool hide_move = (0 == conf.AIMoveSpeed()) ||
+	    (! IS_DEVEL() && !hero.isShow(Settings::Get().MyColor()));
 
     // 0.2 sec delay for show enemy hero position
     if(!hero.isFreeman() && !hide_move) DELAY(200);
