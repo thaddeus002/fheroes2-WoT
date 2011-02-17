@@ -113,8 +113,8 @@ namespace Battle2
 	void	SetPosition(u16);
 	void	SetArena(Arena*);
 	void	SetReflection(bool);
-	void	SetMorale(s8);
-	void	SetLuck(s8);
+	void	SetRandomMorale(void);
+	void	SetRandomLuck(void);
 	void	NewTurn(void);
 
 	bool	isArchers(void) const;

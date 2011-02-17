@@ -420,9 +420,9 @@ u16 Battle2::Stats::GetTailIndex(void) const
     return MAXU16;
 }
 
-void Battle2::Stats::SetMorale(s8 f)
+void Battle2::Stats::SetRandomMorale(void)
 {
-    switch(f)
+    switch(troop.GetMorale())
     {
         case Morale::TREASON:   if(9 > Rand::Get(1, 16)) SetModes(MORALE_BAD); break;     // 50%
         case Morale::AWFUL:     if(6 > Rand::Get(1, 15)) SetModes(MORALE_BAD); break;     // 30%
@@ -434,11 +434,12 @@ void Battle2::Stats::SetMorale(s8 f)
     }
 }
 
-void Battle2::Stats::SetLuck(s8 f)
+void Battle2::Stats::SetRandomLuck(void)
 {
     //check bone dragon
     const Army::army_t* enemy = arena->GetArmy(arena->GetOppositeColor(troop.GetColor()));
 
+    s8 f = troop.GetLuck();
     if(enemy && enemy->HasMonster(Monster::BONE_DRAGON)) --f;
 
     switch(f)
@@ -697,12 +698,15 @@ void Battle2::Stats::NewTurn(void)
 	}
     }
 
-    // define morale
-    if(troop.isAffectedByMorale())
-	SetMorale(troop.GetMorale());
+    if(! Modes(SP_BLIND | IS_PARALYZE_MAGIC))
+    {
+	// define morale
+	if(troop.isAffectedByMorale())
+	    SetRandomMorale();
 
-    // define luck
-    SetLuck(troop.GetLuck());
+	// define luck
+	SetRandomLuck();
+    }
 }
 
 u8 Battle2::Stats::GetSpeed(bool skip_standing_check) const
