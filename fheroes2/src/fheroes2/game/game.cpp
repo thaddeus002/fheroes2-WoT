@@ -378,6 +378,15 @@ void Game::UpdateGlobalDefines(const std::string & spec)
 	// castle_extra_growth 
 	xml_element = xml_globals->FirstChildElement("castle_extra_growth ");
 	if(xml_element) Castle::UpdateExtraGrowth(xml_element);
+
+	// monster upgrade ratio
+	xml_element = xml_globals->FirstChildElement("monster_upgrade");
+	if(xml_element)
+	{
+	    double ratio;
+	    xml_element->Attribute("rate", &ratio);
+	    Monster::SetUpgradeRatio(ratio);
+	}
     }
     else
     VERBOSE(spec << ": " << doc.ErrorDesc());

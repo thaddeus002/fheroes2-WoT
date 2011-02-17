@@ -142,6 +142,13 @@ namespace
 	{     0,   0,   0,   0,   0,  Speed::VERYSLOW,   0,     0, "Random Monster 3", "Random Monsters 3", { 0, 0, 0, 0, 0, 0, 0} },
 	{     0,   0,   0,   0,   0,  Speed::VERYSLOW,   0,     0, "Random Monster 4", "Random Monsters 4", { 0, 0, 0, 0, 0, 0, 0} },
     };
+
+    double upgrade_ratio = 0;
+}
+
+void Monster::SetUpgradeRatio(double rate)
+{
+    upgrade_ratio = rate;
 }
 
 void Monster::UpdateStats(const std::string & spec)
@@ -1046,8 +1053,17 @@ payment_t Monster::GetCost(void) const
 payment_t Monster::GetUpgradeCost(void) const
 {
     Monster upgr = GetUpgrade();
+    payment_t pay = id != upgr.id ? upgr.GetCost() - GetCost() : GetCost();
 
-    return id != upgr.id ? upgr.GetCost() - GetCost() : GetCost();
+    pay.wood *= upgrade_ratio;
+    pay.mercury *= upgrade_ratio;
+    pay.ore *= upgrade_ratio;
+    pay.sulfur *= upgrade_ratio;
+    pay.crystal *= upgrade_ratio;
+    pay.gems *= upgrade_ratio;
+    pay.gold *= upgrade_ratio;
+
+    return pay;
 }
 
 u32 Monster::GetCountFromHitPoints(const Monster & mons, u32 hp)

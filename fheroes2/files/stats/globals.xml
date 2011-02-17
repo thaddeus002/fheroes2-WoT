@@ -27,4 +27,7 @@
  <!-- whirlpool percent: 1 - 90 -->
  <whirlpool percent="50" />
 
+ <!-- monster upgrade ratio -->
+ <monster_upgrade rate="1.0" />
+
 </globals>
