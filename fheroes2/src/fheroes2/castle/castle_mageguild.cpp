@@ -185,11 +185,11 @@ void Castle::OpenMageGuild(void)
     dst_pt.y = cur_pt.y + 290 - sprite.h();
     display.Blit(sprite, dst_pt);
 
-    RowSpells spells5(Point(cur_pt.x + 250, cur_pt.y +  10), mageguild, 5);
+    RowSpells spells5(Point(cur_pt.x + 250, cur_pt.y +  5), mageguild, 5);
     RowSpells spells4(Point(cur_pt.x + 250, cur_pt.y +  95), mageguild, 4);
-    RowSpells spells3(Point(cur_pt.x + 250, cur_pt.y + 180), mageguild, 3);
-    RowSpells spells2(Point(cur_pt.x + 250, cur_pt.y + 265), mageguild, 2);
-    RowSpells spells1(Point(cur_pt.x + 250, cur_pt.y + 350), mageguild, 1);
+    RowSpells spells3(Point(cur_pt.x + 250, cur_pt.y + 185), mageguild, 3);
+    RowSpells spells2(Point(cur_pt.x + 250, cur_pt.y + 275), mageguild, 2);
+    RowSpells spells1(Point(cur_pt.x + 250, cur_pt.y + 365), mageguild, 1);
 
     spells1.Redraw();
     spells2.Redraw();
