@@ -266,7 +266,13 @@ bool SelectArtifactsBar::QueueEventProcessing(SelectArtifactsBar & bar)
 		    bar.hero.CanTranscribeScroll(art1))
 		{
 		    Spell spell = art1.GetSpell();
-		    if(spell.isValid())
+
+		    if(! spell.isValid())
+		    {
+			DEBUG(DBG_GAME, DBG_WARN, "invalid spell");
+		    }
+		    else
+		    if(bar.hero.CanLearnSpell(spell))
 		    {
 			payment_t cost = spell.GetCost();
 			u16 answer = 0;
@@ -290,10 +296,6 @@ bool SelectArtifactsBar::QueueEventProcessing(SelectArtifactsBar & bar)
 			    bar.hero.TranscribeScroll(art1);
 
 			change = true;
-		    }
-		    else
-		    {
-			DEBUG(DBG_GAME, DBG_WARN, "invalid spell");
 		    }
 		}
 		else

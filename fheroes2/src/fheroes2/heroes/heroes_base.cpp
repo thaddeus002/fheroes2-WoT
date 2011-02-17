@@ -413,9 +413,9 @@ bool HeroBase::CanLearnSpell(const Spell & spell) const
 {
     u8 wisdom = GetLevelSkill(Skill::Secondary::WISDOM);
 
-    return ((4 < spell.Level() && Skill::Level::EXPERT > wisdom) ||
-            (3 < spell.Level() && Skill::Level::ADVANCED > wisdom) ||
-            (2 < spell.Level() && Skill::Level::BASIC > wisdom) ? false : true);
+    return ((5 == spell.Level() && Skill::Level::EXPERT == wisdom) ||
+            (4 == spell.Level() && Skill::Level::ADVANCED <= wisdom) ||
+            (3 == spell.Level() && Skill::Level::BASIC <= wisdom));
 }
 
 void HeroBase::TranscribeScroll(const Artifact & art)
