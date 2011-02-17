@@ -63,7 +63,7 @@ CastleDialog::CacheBuildings::CacheBuildings(const Castle & castle, const Point 
 const Rect & CastleDialog::CacheBuildings::GetRect(building_t b) const
 {
     const_iterator it = std::find(begin(), end(), b);
-    return (*it).coord;
+    return it != end() ? (*it).coord : back().coord;
 }
 
 void CastleDialog::RedrawAnimationBuilding(const Castle & castle, const Point & dst_pt, const CacheBuildings & orders, u32 build)
@@ -125,8 +125,8 @@ void CastleRedrawCurrentBuilding(const Castle & castle, const Point & dst_pt,
     // sea anime
     if(Race::WZRD == castle.GetRace() || (!castle.isBuild(BUILD_SHIPYARD) && castle.HaveNearlySea()))
     {
-    	const Sprite * sprite50 = NULL;
-    	const Sprite * sprite51 = NULL;
+    	const Sprite* sprite50 = NULL;
+    	const Sprite* sprite51 = NULL;
 
     	switch(castle.GetRace())
     	{
@@ -696,8 +696,8 @@ void CastlePackOrdersBuildings(const Castle & castle, std::vector<building_t> & 
 	    ordersBuildings.push_back(BUILD_MAGEGUILD1);
 	    ordersBuildings.push_back(BUILD_MAGEGUILD2);
 	    ordersBuildings.push_back(BUILD_MAGEGUILD3);
-	    ordersBuildings.push_back(BUILD_MAGEGUILD3);
 	    ordersBuildings.push_back(BUILD_MAGEGUILD4);
+	    ordersBuildings.push_back(BUILD_MAGEGUILD5);
 	    ordersBuildings.push_back(BUILD_CAPTAIN);
 	    ordersBuildings.push_back(BUILD_TENT);
 	    ordersBuildings.push_back(BUILD_CASTLE);
@@ -725,8 +725,8 @@ void CastlePackOrdersBuildings(const Castle & castle, std::vector<building_t> & 
 	    ordersBuildings.push_back(BUILD_MAGEGUILD1);
 	    ordersBuildings.push_back(BUILD_MAGEGUILD2);
 	    ordersBuildings.push_back(BUILD_MAGEGUILD3);
-	    ordersBuildings.push_back(BUILD_MAGEGUILD3);
 	    ordersBuildings.push_back(BUILD_MAGEGUILD4);
+	    ordersBuildings.push_back(BUILD_MAGEGUILD5);
 	    ordersBuildings.push_back(BUILD_CAPTAIN);
 	    ordersBuildings.push_back(BUILD_TENT);
 	    ordersBuildings.push_back(BUILD_CASTLE);
@@ -763,8 +763,8 @@ void CastlePackOrdersBuildings(const Castle & castle, std::vector<building_t> & 
 	    ordersBuildings.push_back(BUILD_MAGEGUILD1);
 	    ordersBuildings.push_back(BUILD_MAGEGUILD2);
 	    ordersBuildings.push_back(BUILD_MAGEGUILD3);
-	    ordersBuildings.push_back(BUILD_MAGEGUILD3);
 	    ordersBuildings.push_back(BUILD_MAGEGUILD4);
+	    ordersBuildings.push_back(BUILD_MAGEGUILD5);
 	    ordersBuildings.push_back(BUILD_TAVERN);
 	    ordersBuildings.push_back(BUILD_THIEVESGUILD);
 	    ordersBuildings.push_back(BUILD_MARKETPLACE);
@@ -843,6 +843,8 @@ void CastlePackOrdersBuildings(const Castle & castle, std::vector<building_t> & 
 	    break;
 	default: break;
     }
+
+    ordersBuildings.push_back(BUILD_NOTHING);
 }
 
 Rect CastleGetMaxArea(const Castle & castle, const Point & top)
