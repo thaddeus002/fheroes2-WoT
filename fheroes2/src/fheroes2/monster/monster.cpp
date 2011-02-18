@@ -1055,13 +1055,13 @@ payment_t Monster::GetUpgradeCost(void) const
     Monster upgr = GetUpgrade();
     payment_t pay = id != upgr.id ? upgr.GetCost() - GetCost() : GetCost();
 
-    pay.wood *= upgrade_ratio;
-    pay.mercury *= upgrade_ratio;
-    pay.ore *= upgrade_ratio;
-    pay.sulfur *= upgrade_ratio;
-    pay.crystal *= upgrade_ratio;
-    pay.gems *= upgrade_ratio;
-    pay.gold *= upgrade_ratio;
+    pay.wood = static_cast<s32>(pay.wood * upgrade_ratio);
+    pay.mercury = static_cast<s32>(pay.mercury * upgrade_ratio);
+    pay.ore = static_cast<s32>(pay.ore * upgrade_ratio);
+    pay.sulfur = static_cast<s32>(pay.sulfur * upgrade_ratio);
+    pay.crystal = static_cast<s32>(pay.crystal * upgrade_ratio);
+    pay.gems = static_cast<s32>(pay.gems * upgrade_ratio);
+    pay.gold = static_cast<s32>(pay.gold * upgrade_ratio);
 
     return pay;
 }
