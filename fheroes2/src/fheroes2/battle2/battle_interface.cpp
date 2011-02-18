@@ -4023,25 +4023,28 @@ void Battle2::Interface::ProcessingHeroDialogResult(u8 res, Actions & a)
 		    else
 		    {
 			const Spell spell = hero->OpenSpellBook(SpellBook::CMBT, true);
-			std::string error;
-
-			if(arena.isDisableCastSpell(spell, &msg))
-			    Dialog::Message("", msg, Font::BIG, Dialog::OK);
-			else
-			if(hero->CanCastSpell(spell, &error))
+			if(spell.isValid())
 			{
-			    if(spell.isApplyWithoutFocusObject())
+			    std::string error;
+
+			    if(arena.isDisableCastSpell(spell, &msg))
+				Dialog::Message("", msg, Font::BIG, Dialog::OK);
+			    else
+			    if(hero->CanCastSpell(spell, &error))
 			    {
-				a.AddedCastAction(spell, MAXU16);
-				humanturn_redraw = true;
-				humanturn_exit = true;
+				if(spell.isApplyWithoutFocusObject())
+				{
+				    a.AddedCastAction(spell, MAXU16);
+				    humanturn_redraw = true;
+				    humanturn_exit = true;
+				}
+				else
+				    humanturn_spell = spell;
 			    }
 			    else
-				humanturn_spell = spell;
+			    if(error.size())
+				Dialog::Message("Error", error, Font::BIG, Dialog::OK);
 			}
-			else
-			if(error.size())
-			    Dialog::Message("Error", error, Font::BIG, Dialog::OK);
 		    }
 		}
 		else
