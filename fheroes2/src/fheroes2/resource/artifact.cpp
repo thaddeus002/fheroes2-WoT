@@ -189,28 +189,25 @@ void Artifact::UpdateStats(const std::string & spec)
     // parse artifacts.xml
     TiXmlDocument doc;
     const TiXmlElement* xml_artifacts = NULL;
-    artifactstats_t* ptr = &artifacts[0];
+    size_t index = 0;
 
     if(doc.LoadFile(spec.c_str()) &&
         NULL != (xml_artifacts = doc.FirstChildElement("artifacts")))
     {
         const TiXmlElement* xml_artifact = xml_artifacts->FirstChildElement("artifact");
-        for(; xml_artifact; xml_artifact = xml_artifact->NextSiblingElement("artifact"))
+        for(; xml_artifact && index < UNKNOWN; xml_artifact = xml_artifact->NextSiblingElement("artifact"), ++index)
         {
             int value;
-	    int art = (ptr - &artifacts[0]) / sizeof(artifactstats_t);
+	    artifactstats_t* ptr = &artifacts[index];
 
             xml_artifact->Attribute("disable", &value);
             if(value) ptr->bits |= ART_DISABLED;
 
             xml_artifact->Attribute("extra", &value);
-	    if(value && !SkipExtra(art)) ptr->extra = value;
+	    if(value && !SkipExtra(index)) ptr->extra = value;
 
-            ++ptr;
-
-	    
-            // out of range
-            if(art >= UNKNOWN) break;
+	    Artifact art(index);
+	    VERBOSE("index: " << index << ", name: " << art.GetName() << (ptr->bits & ART_DISABLED ? " DISABLED" : ""));
         }
     }
     else
@@ -326,7 +323,7 @@ u8 Artifact::LoyaltyLevel(void) const
         case BROACH_SHIELDING:
         case HEART_FIRE:
         case HEART_ICE:
-	    return ART_NOLEVEL;
+	    return ART_NORANDOM;
 
 	default: break;
     }
@@ -424,12 +421,14 @@ u8 Artifact::Level(void) const
         case GOLDEN_GOOSE:
 	    return ART_ULTIMATE;
 
-	// no level
+	// no random
 	case MAGIC_BOOK:
 	case FIZBIN_MISFORTUNE:
 	case TAX_LIEN:
 	case HIDEOUS_MASK:
-	    return ART_NOLEVEL;
+        case HEART_FIRE:
+        case HEART_ICE:
+	    return ART_NORANDOM;
 
 	// price loyalty
 	case SPELL_SCROLL:
@@ -438,8 +437,6 @@ u8 Artifact::Level(void) const
         case BROACH_SHIELDING:
         case BATTLE_GARB:
         case CRYSTAL_BALL:
-        case HEART_FIRE:
-        case HEART_ICE:
         case HELMET_ANDURAN:
         case HOLY_HAMMER:
         case LEGENDARY_SCEPTER:
@@ -460,7 +457,7 @@ u8 Artifact::Level(void) const
 /* return index sprite objnarti.icn */
 u8 Artifact::IndexSprite(void) const
 {
-    return id < UNKNOWN ? id * 2 - 1 : 0;
+    return id < UNKNOWN ? id * 2 + 1 : 0;
 }
 
 u8 Artifact::IndexSprite32(void) const
@@ -517,9 +514,9 @@ u8 Artifact::Rand(level_t lvl)
 
 Artifact Artifact::FromMP2IndexSprite(u8 index)
 {
-    if(0x10 < index && 0xA2 > index) return Artifact((index - 1)/2);
+    if(0xA2 > index) return Artifact((index - 1) / 2);
     else
-    if(Settings::Get().PriceLoyaltyVersion() && 0xAB < index && 0xCE > index) return Artifact((index - 1)/2);
+    if(Settings::Get().PriceLoyaltyVersion() && 0xAB < index && 0xCE > index) return Artifact((index - 1) / 2);
     else
     if(0xA3 == index) return Artifact(Rand(ART_LEVEL123));
     else

@@ -371,8 +371,10 @@ void BuildingInfo::RedrawCaptain(void)
     else
     if(! allow_buy)
     {
-	payment_t payment = GetCost(building, castle.GetRace());
-	(1 == payment.GetValidItems() && payment.gold && castle.AllowBuild()) ? display.Blit(sprite_money, dst_pt) : display.Blit(sprite_deny, dst_pt);
+	if(! world.GetKingdom(castle.GetColor()).AllowPayment(GetCost(building, castle.GetRace())))
+	    display.Blit(sprite_money, dst_pt);
+	else
+	    display.Blit(sprite_deny, dst_pt);
     }
 }
 
@@ -412,8 +414,10 @@ void BuildingInfo::Redraw(void)
     else
     if(! allow_buy)
     {
-	payment_t payment = GetCost(building, castle.GetRace());
-	(1 == payment.GetValidItems() && payment.gold && castle.AllowBuild()) ? display.Blit(sprite_money, dst_pt) : display.Blit(sprite_deny, dst_pt);
+	if(! world.GetKingdom(castle.GetColor()).AllowPayment(GetCost(building, castle.GetRace())))
+	    display.Blit(sprite_money, dst_pt);
+	else
+	    display.Blit(sprite_deny, dst_pt);
     }
 
     // status bar

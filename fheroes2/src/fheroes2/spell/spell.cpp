@@ -129,16 +129,16 @@ void Spell::UpdateStats(const std::string & spec)
     // parse spells.xml
     TiXmlDocument doc;
     const TiXmlElement* xml_spells = NULL;
-    spellstats_t* ptr = &spells[0];
+    size_t index = 0;
 
     if(doc.LoadFile(spec.c_str()) &&
         NULL != (xml_spells = doc.FirstChildElement("spells")))
     {
         const TiXmlElement* xml_spell = xml_spells->FirstChildElement("spell");
-        for(; xml_spell; xml_spell = xml_spell->NextSiblingElement("spell"))
+        for(; xml_spell && index < STONE; xml_spell = xml_spell->NextSiblingElement("spell"), ++index)
         {
             int value;
-	    int spell = (ptr - &spells[0]) / sizeof(spellstats_t);
+	    spellstats_t* ptr = &spells[index];
 
             xml_spell->Attribute("skip", &value);
             if(0 == value)
@@ -155,7 +155,7 @@ void Spell::UpdateStats(const std::string & spec)
 	    }
 
             // load dimension door params
-            if(spell == DIMENSIONDOOR)
+            if(index == DIMENSIONDOOR)
             {
 		xml_spell->Attribute("conf_distance", &value); dd_distance = value;
 		xml_spell->Attribute("conf_sp", &value); dd_sp = value;
@@ -165,11 +165,6 @@ void Spell::UpdateStats(const std::string & spec)
 	    // load spell cost
 	    if(const TiXmlElement* xml_cost = xml_spell->FirstChildElement("cost"))
 		LoadCostFromXMLElement(ptr->cost, *xml_cost);
-
-	    ++ptr;
-
-            // out of range
-            if(spell >= STONE) break;
 	}
     }
     else

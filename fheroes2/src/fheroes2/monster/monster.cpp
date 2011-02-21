@@ -157,14 +157,15 @@ void Monster::UpdateStats(const std::string & spec)
     // parse monsters.xml
     TiXmlDocument doc;
     const TiXmlElement* xml_monsters = NULL;
-    monstats_t* ptr = &monsters[0];
+    size_t index = 0;
 
     if(doc.LoadFile(spec.c_str()) &&
         NULL != (xml_monsters = doc.FirstChildElement("monsters")))
     {
         const TiXmlElement* xml_monster = xml_monsters->FirstChildElement("monster");
-        for(; xml_monster; xml_monster = xml_monster->NextSiblingElement("monster"))
+        for(; xml_monster && index < MONSTER_RND1; xml_monster = xml_monster->NextSiblingElement("monster"), ++index)
         {
+	    monstats_t* ptr = &monsters[index];
 	    cost_t & cost = ptr->cost;
             int value;
 
@@ -189,9 +190,6 @@ void Monster::UpdateStats(const std::string & spec)
 	    }
 
 	    ++ptr;
-
-	    // out of range
-	    if((ptr - &monsters[0]) > WATER_ELEMENT) break;
         }
     }
     else

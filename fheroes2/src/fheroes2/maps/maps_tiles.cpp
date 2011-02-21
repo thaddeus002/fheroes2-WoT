@@ -798,7 +798,7 @@ void Maps::Tiles::DebugInfo(void) const
     VERBOSE("quantity 4      : " << static_cast<int>(quantity4));
 
     std::for_each(addons_level1.begin(), addons_level1.end(), std::bind2nd(std::mem_fun_ref(&TilesAddon::DebugInfo), 1));
-    std::for_each(addons_level1.begin(), addons_level1.end(), std::bind2nd(std::mem_fun_ref(&TilesAddon::DebugInfo), 2));
+    std::for_each(addons_level2.begin(), addons_level2.end(), std::bind2nd(std::mem_fun_ref(&TilesAddon::DebugInfo), 2));
 
     VERBOSE("----------------I--------");
 
@@ -1444,6 +1444,7 @@ void Maps::Tiles::UpdateQuantity(void)
 	    if(addon)
 	    {
 		Artifact art = Artifact::FromMP2IndexSprite(addon->index);
+		VERBOSE("Maps::Tiles::UpdateQuantity: " << art.GetName());
 
 		if(art() == Artifact::SPELL_SCROLL)
 		{
@@ -1455,6 +1456,7 @@ void Maps::Tiles::UpdateQuantity(void)
 		    quantity3 = spell();
 		}
 		else
+		if(art.isValid())
 		{
 		    quantity1 = art();
 		    // conditions: 70% empty
@@ -1466,6 +1468,10 @@ void Maps::Tiles::UpdateQuantity(void)
 		    // always available
 		    if(Settings::Get().ExtNoRequirementsForArtifacts())
 			quantity2 = 0;
+		}
+		else
+		{
+		    DEBUG(DBG_GAME, DBG_INFO, "unknown artifact");
 		}
 	    }
 	break;
@@ -2079,6 +2085,13 @@ void Maps::Tiles::UpdateRNDArtifactSprite(void)
         default: return;
     }
 
+    VERBOSE("UpdateRNDArtifactSprite: " << art.GetName());
+
+    if(!art.isValid())
+    {
+    	DEBUG(DBG_GAME, DBG_INFO, "unknown artifact");
+    }
+    else
     if(addon)
     {
         addon->index = index;
