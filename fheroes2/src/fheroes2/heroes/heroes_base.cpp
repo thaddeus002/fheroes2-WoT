@@ -29,6 +29,7 @@
 #include "world.h"
 #include "kingdom.h"
 #include "castle.h"
+#include "settings.h"
 #include "heroes_base.h"
 
 typedef std::vector< std::pair<Artifact, s8> > ArtifactsModifiers;
@@ -62,7 +63,10 @@ HeroBase::HeroBase(u8 type, u8 race)
 {
     bag_artifacts.assign(HEROESMAXARTIFACT, Artifact::UNKNOWN);
 
-    LoadDefaults(type, race, *this);
+    if(Race::ALL & race)
+	LoadDefaults(type, race, *this);
+    else
+	DEBUG(DBG_GAME, DBG_INFO, "unknown race");
 }
 
 HeroBase::HeroBase() : magic_point(0), move_point(0), spell_book()

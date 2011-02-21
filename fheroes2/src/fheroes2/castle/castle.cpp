@@ -1022,6 +1022,7 @@ bool Castle::BuyBuilding(u32 build)
 		break;
 
 	    case BUILD_CAPTAIN:
+		HeroBase::LoadDefaults(Skill::Primary::CAPTAIN, race, captain);
 		if(mageguild.GetLevel()) mageguild.EducateHero(captain);
 		army.SetCommander(&captain);
 		break;
