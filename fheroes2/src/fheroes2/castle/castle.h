@@ -78,6 +78,19 @@ enum building_t
     DWELLING_UPGRADE7       = 0x80000000        // black dragon
 };
 
+enum buildcond_t
+{
+    NOT_TODAY		= -1,
+    ALREADY_BUILT	= -2,
+    NEED_CASTLE		= -3,
+    CASTLE_DISABLE	= -4,
+    SHIPYARD_DISABLE	= -5,
+    UNKNOWN_UPGRADE	= -6,
+    REQUIRES_BUILD	= -7,
+    LACK_RESOURCES	= -8,
+    ALLOW_BUILD		= 1
+};
+
 class Castle : public Maps::Position, public BitModes
 {
 public:
@@ -149,6 +162,7 @@ public:
 
     bool AllowBuild(void) const{ return Modes(ALLOWBUILD); }
     bool AllowBuyBuilding(u32) const;
+    buildcond_t CheckBuyBuilding(u32) const;
     bool isBuild(u32 bd) const{ return building & bd; }
     bool BuyBuilding(u32);
     bool AllowBuyBoat(void) const;

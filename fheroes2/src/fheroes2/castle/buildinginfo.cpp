@@ -317,12 +317,6 @@ const Rect & BuildingInfo::GetArea(void) const
     return area;
 }
 
-bool BuildingInfo::AllowBuy(void) const
-{
-    return (building == BUILD_CASTLE || castle.isCastle()) &&
-		castle.AllowBuyBuilding(building);
-}
-
 bool BuildingInfo::IsDisable(void) const
 {
     return disable;
@@ -362,7 +356,8 @@ void BuildingInfo::RedrawCaptain(void)
     const Sprite & sprite_money = AGG::GetICN(ICN::TOWNWIND, 13);
     Point dst_pt;
 
-    bool allow_buy = AllowBuy();
+    buildcond_t build_condition = castle.CheckBuyBuilding(building);
+    bool allow_buy = build_condition == ALLOW_BUILD;
 
     // indicator
     dst_pt.x = area.x + 65;
@@ -371,7 +366,7 @@ void BuildingInfo::RedrawCaptain(void)
     else
     if(! allow_buy)
     {
-	if(! world.GetKingdom(castle.GetColor()).AllowPayment(GetCost(building, castle.GetRace())))
+	if(LACK_RESOURCES == build_condition)
 	    display.Blit(sprite_money, dst_pt);
 	else
 	    display.Blit(sprite_deny, dst_pt);
@@ -405,7 +400,8 @@ void BuildingInfo::Redraw(void)
     const Sprite & sprite_money = AGG::GetICN(ICN::TOWNWIND, 13);
     Point dst_pt;
 
-    bool allow_buy = AllowBuy();
+    buildcond_t build_condition = castle.CheckBuyBuilding(building);
+    bool allow_buy = build_condition == ALLOW_BUILD;
 
     // indicator
     dst_pt.x = area.x + 115;
@@ -414,7 +410,7 @@ void BuildingInfo::Redraw(void)
     else
     if(! allow_buy)
     {
-	if(! world.GetKingdom(castle.GetColor()).AllowPayment(GetCost(building, castle.GetRace())))
+	if(LACK_RESOURCES == build_condition)
 	    display.Blit(sprite_money, dst_pt);
 	else
 	    display.Blit(sprite_deny, dst_pt);
@@ -566,7 +562,8 @@ bool BuildingInfo::DialogBuyBuilding(bool buttons) const
 
     if(buttons)
     {
-	if(!AllowBuy()) button1.SetDisable(true);
+	if(ALLOW_BUILD != castle.CheckBuyBuilding(building))
+	    button1.SetDisable(true);
 
 	button1.Draw();
 	button2.Draw();

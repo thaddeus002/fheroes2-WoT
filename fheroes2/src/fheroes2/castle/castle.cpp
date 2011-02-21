@@ -944,32 +944,46 @@ u32 Castle::GetBuildingRequires(u32 build) const
 }
 
 /* check allow buy building */
-bool Castle::AllowBuyBuilding(u32 build) const
+buildcond_t Castle::CheckBuyBuilding(u32 build) const
 {
-    // check allow building
-    if(!Modes(ALLOWBUILD) || build & building) return false;
+    if(! Modes(ALLOWBUILD)) return NOT_TODAY;
+
+    if(build & building) return ALREADY_BUILT;
+
+    if(build != BUILD_CASTLE && ! isCastle()) return NEED_CASTLE;
 
     switch(build)
     {
 	// allow build castle
-	case BUILD_CASTLE: if(! Modes(ALLOWCASTLE)) return false; break;
-
+	case BUILD_CASTLE:
+	    if(! Modes(ALLOWCASTLE)) return CASTLE_DISABLE;
+	    break;
 	// buid shipyard only nearly sea
-	case BUILD_SHIPYARD: if(! HaveNearlySea()) return false; break;
-
+	case BUILD_SHIPYARD:
+	    if(! HaveNearlySea()) return SHIPYARD_DISABLE;
+	    break;
 	// check upgrade dwelling
-        case DWELLING_UPGRADE2: if((Race::WRLK | Race::WZRD) & race) return false; break;
-        case DWELLING_UPGRADE3: if((Race::BARB | Race::WRLK) & race) return false; break;
-        case DWELLING_UPGRADE4: if((Race::WZRD) & race) return false; break;
-        case DWELLING_UPGRADE5: if((Race::SORC | Race::WRLK) & race) return false; break;
-        case DWELLING_UPGRADE6: if((Race::BARB | Race::SORC | Race::NECR) & race) return false; break;
-        case DWELLING_UPGRADE7: if(Race::WRLK != race) return false; break;
+        case DWELLING_UPGRADE2:
+	    if((Race::WRLK | Race::WZRD) & race) return UNKNOWN_UPGRADE;
+	    break;
+        case DWELLING_UPGRADE3:
+	    if((Race::BARB | Race::WRLK) & race) return UNKNOWN_UPGRADE;
+	    break;
+        case DWELLING_UPGRADE4:
+	    if((Race::WZRD) & race) return UNKNOWN_UPGRADE;
+	    break;
+        case DWELLING_UPGRADE5:
+	    if((Race::SORC | Race::WRLK) & race) return UNKNOWN_UPGRADE;
+	    break;
+        case DWELLING_UPGRADE6:
+	    if((Race::BARB | Race::SORC | Race::NECR) & race) return UNKNOWN_UPGRADE;
+	    break;
+        case DWELLING_UPGRADE7:
+	    if(Race::WRLK != race) return UNKNOWN_UPGRADE;
+	    break;
 
 	default: break;
     }
-
-    // check valid payment
-    if(! world.GetKingdom(color).AllowPayment(PaymentConditions::BuyBuilding(race, build))) return false;
 
     // check build requirements
     std::bitset<32> requires(Castle::GetBuildingRequires(build));
@@ -983,12 +997,20 @@ bool Castle::AllowBuyBuilding(u32 build) const
                 u32 value = 1;
                 value <<= pos;
 
-                if(! (building & value)) return false;
+                if(! (building & value)) return REQUIRES_BUILD;
 	    }
 	}
     }
 
-    return true;
+    // check valid payment
+    if(! world.GetKingdom(color).AllowPayment(PaymentConditions::BuyBuilding(race, build))) return LACK_RESOURCES;
+
+    return ALLOW_BUILD;
+}
+
+bool Castle::AllowBuyBuilding(u32 build) const
+{
+    return ALLOW_BUILD == CheckBuyBuilding(build);
 }
 
 /* buy building */

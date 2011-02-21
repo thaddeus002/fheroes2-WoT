@@ -42,7 +42,6 @@ public:
     const std::string & GetDescription(void) const;
     void SetStatusMessage(StatusBar &) const;
 
-    bool AllowBuy(void) const;
     bool IsDwelling(void) const;
     bool IsDisable(void) const;
     
