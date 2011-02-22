@@ -1444,7 +1444,6 @@ void Maps::Tiles::UpdateQuantity(void)
 	    if(addon)
 	    {
 		Artifact art = Artifact::FromMP2IndexSprite(addon->index);
-		VERBOSE("Maps::Tiles::UpdateQuantity: " << art.GetName());
 
 		if(art() == Artifact::SPELL_SCROLL)
 		{
@@ -2084,8 +2083,6 @@ void Maps::Tiles::UpdateRNDArtifactSprite(void)
             break;
         default: return;
     }
-
-    VERBOSE("UpdateRNDArtifactSprite: " << art.GetName());
 
     if(!art.isValid())
     {

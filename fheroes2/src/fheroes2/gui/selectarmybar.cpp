@@ -224,9 +224,9 @@ void SelectArmyBar::Redraw(Surface & display)
         	Text text(str, Font::SMALL);
 
         	if(flags & FLAGS_COUNT2SPRITE)
-		    text.Blit(pt.x + background->w() - text.w() - 3, pt.y + background->h() - text.h() - 2);
+		    text.Blit(pt.x + background->w() - text.w() - 3, pt.y + background->h() - text.h() - 2, display);
 		else
-		    text.Blit(pt.x + (background->w() - text.w()) / 2, pt.y + background->h() - 11);
+		    text.Blit(pt.x + (background->w() - text.w()) / 2, pt.y + background->h() - 11, display);
             }
             else
 	    {
@@ -236,7 +236,7 @@ void SelectArmyBar::Redraw(Surface & display)
         	std::string str;
         	String::AddInt(str, troop.GetCount());
         	Text text(str, Font::SMALL);
-		text.Blit(pt.x + background->w() - text.w() - 3, pt.y + background->h() - 13);
+		text.Blit(pt.x + background->w() - text.w() - 3, pt.y + background->h() - 13, display);
 	    }
 	}
 	else
@@ -303,7 +303,7 @@ void SelectArmyBar::StatusMessageEvent1(const SelectArmyBar & bar, u8 index1, co
 	String::Replace(res, "%{name}", troop1.GetName());
     }
 }
-#include "settings.h"
+
 bool SelectArmyBar::QueueEventProcessing(SelectArmyBar & bar, std::string* msg)
 {
     LocalEvent & le = LocalEvent::Get();

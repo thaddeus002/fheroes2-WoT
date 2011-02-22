@@ -246,7 +246,8 @@ Game::menu_t Game::StartGame(void)
 		break;
 	    }
 
-	    if(gameResult.CheckGameOver(m) || m != ENDTURN) break;
+	    if(m != ENDTURN ||
+		gameResult.CheckGameOver(m)) break;
 	}
 
 	DELAY(10);
