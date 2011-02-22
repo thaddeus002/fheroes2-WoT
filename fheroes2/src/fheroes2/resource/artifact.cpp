@@ -426,8 +426,6 @@ u8 Artifact::Level(void) const
 	case FIZBIN_MISFORTUNE:
 	case TAX_LIEN:
 	case HIDEOUS_MASK:
-        case HEART_FIRE:
-        case HEART_ICE:
 	    return ART_NORANDOM;
 
 	// price loyalty
@@ -446,6 +444,8 @@ u8 Artifact::Level(void) const
         case SWORD_BREAKER:
         case SWORD_ANDURAN:
         case SPADE_NECROMANCY:
+        case HEART_FIRE:
+        case HEART_ICE:
 	    return Settings::Get().PriceLoyaltyVersion() ? ART_LOYALTY | LoyaltyLevel() : ART_LOYALTY;
 
 	default: break;
