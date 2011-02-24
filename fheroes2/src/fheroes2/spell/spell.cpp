@@ -38,7 +38,7 @@ struct spellstats_t
 {
         const char* name;
         u8 sp;
-        u8 mp;
+        u16 mp;
         u8 sprite;
         u8 extra;
 	u8 bits;
