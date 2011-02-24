@@ -634,13 +634,13 @@ void Dialog::QuickInfo(const Heroes & hero)
     // heroes name
     text.Set(hero.GetName(), Font::SMALL);
     dst_pt.x = cur_rt.x + (cur_rt.w - text.w()) / 2;
-    dst_pt.y = cur_rt.y + 2;
+    dst_pt.y = cur_rt.y;
     text.Blit(dst_pt);
 
     // mini port heroes
     const Surface & port = hero.GetPortrait30x22();
     dst_pt.x = cur_rt.x + (cur_rt.w - port.w()) / 2;
-    dst_pt.y += 15;
+    dst_pt.y += 13;
     display.Blit(port, dst_pt);
 
     // color flags
@@ -671,8 +671,8 @@ void Dialog::QuickInfo(const Heroes & hero)
     message = _("Attack");
     message += ":";
     text.Set(message);
-    dst_pt.x = cur_rt.x + 35;
-    dst_pt.y += port.h() + 4;
+    dst_pt.x = cur_rt.x + 20;
+    dst_pt.y += port.h();
     text.Blit(dst_pt);
 
     message.clear();
@@ -685,7 +685,7 @@ void Dialog::QuickInfo(const Heroes & hero)
     message = _("Defense");
     message += ":";
     text.Set(message);
-    dst_pt.x = cur_rt.x + 35;
+    dst_pt.x = cur_rt.x + 20;
     dst_pt.y += 12;
     text.Blit(dst_pt);
 
@@ -699,7 +699,7 @@ void Dialog::QuickInfo(const Heroes & hero)
     message = _("Spell Power");
     message += ":";
     text.Set(message);
-    dst_pt.x = cur_rt.x + 35;
+    dst_pt.x = cur_rt.x + 20;
     dst_pt.y += 12;
     text.Blit(dst_pt);
 
@@ -713,7 +713,7 @@ void Dialog::QuickInfo(const Heroes & hero)
     message = _("Knowledge");
     message += ":";
     text.Set(message);
-    dst_pt.x = cur_rt.x + 35;
+    dst_pt.x = cur_rt.x + 20;
     dst_pt.y += 12;
     text.Blit(dst_pt);
 
@@ -727,7 +727,7 @@ void Dialog::QuickInfo(const Heroes & hero)
     message = _("Spell Points");
     message += ":";
     text.Set(message);
-    dst_pt.x = cur_rt.x + 35;
+    dst_pt.x = cur_rt.x + 20;
     dst_pt.y += 12;
     text.Blit(dst_pt);
 
@@ -735,6 +735,22 @@ void Dialog::QuickInfo(const Heroes & hero)
     String::AddInt(message, hero.GetSpellPoints());
     message += "/";
     String::AddInt(message, hero.GetMaxSpellPoints());
+    text.Set(message);
+    dst_pt.x += 75;
+    text.Blit(dst_pt);
+
+    // move point
+    message = _("Move Points");
+    message += ":";
+    text.Set(message);
+    dst_pt.x = cur_rt.x + 20;
+    dst_pt.y += 12;
+    text.Blit(dst_pt);
+
+    message.clear();
+    String::AddInt(message, hero.GetMovePoints());
+    message += "/";
+    String::AddInt(message, hero.GetMaxMovePoints());
     text.Set(message);
     dst_pt.x += 75;
     text.Blit(dst_pt);
