@@ -207,7 +207,6 @@ void Artifact::UpdateStats(const std::string & spec)
 	    if(value && !SkipExtra(index)) ptr->extra = value;
 
 	    Artifact art(index);
-	    VERBOSE("index: " << index << ", name: " << art.GetName() << (ptr->bits & ART_DISABLED ? " DISABLED" : ""));
         }
     }
     else
