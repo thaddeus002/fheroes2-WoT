@@ -161,7 +161,7 @@ Game::menu_t Game::StartGame(void)
     areaMaps.Build();
 
     Game::Focus & global_focus = Focus::Get();
-    global_focus.Reset();
+    global_focus.Reset(Focus::FIRSTHERO);
 
     Interface::Radar & radar = I.radar;
     Interface::StatusWindow& statusWin = I.statusWindow;
@@ -703,17 +703,7 @@ Game::menu_t Game::HumanTurn(bool isload)
 	    global_focus.Reset(Focus::CASTLE);
     }
     else
-    {
-	// skip sleeping
-	std::vector<Heroes *>::const_iterator it =
-	    std::find_if(myHeroes.begin(), myHeroes.end(),
-		std::not1(std::bind2nd(std::mem_fun(&Heroes::Modes), Heroes::SLEEPER)));
-
-	if(it != myHeroes.end())
-	    global_focus.Set(*it);
-	else
-	    global_focus.Reset(Focus::CASTLE);
-    }
+	global_focus.Reset(Focus::FIRSTHERO);
 
     // and show path
     if(Focus::HEROES == global_focus.Type() &&

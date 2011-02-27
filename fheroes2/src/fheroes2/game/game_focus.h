@@ -34,7 +34,7 @@ namespace Game
     class Focus
     {
     public:
-	enum focus_t { UNSEL, HEROES, CASTLE };
+	enum focus_t { UNSEL, HEROES, CASTLE, FIRSTHERO };
 
    	static Focus &	Get(void);
 

@@ -101,6 +101,22 @@ void Game::Focus::Reset(const focus_t priority)
 
     switch(priority)
     {
+	case FIRSTHERO:
+	{
+	    const std::vector<Heroes *> & heroes = myKingdom.GetHeroes();
+	    // skip sleeping
+	    std::vector<Heroes *>::const_iterator it =
+		std::find_if(heroes.begin(), heroes.end(),
+                std::not1(std::bind2nd(std::mem_fun(&Heroes::Modes), Heroes::SLEEPER)));
+
+	    if(it != heroes.end())
+    		Set(*it);
+	    else
+		Reset(Focus::CASTLE);
+
+	    break;
+	}
+
 	case HEROES:
 	    if(heroes && heroes->GetColor() == Settings::Get().MyColor())
         	Set(heroes);
