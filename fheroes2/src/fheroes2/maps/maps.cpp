@@ -78,7 +78,7 @@ void Maps::IncreaseAnimationTicket(void)
     ++animation_ticket;
 }
 
-s32 Maps::GetDirectionIndex(s32 from, Direction::vector_t vector)
+s32 Maps::GetDirectionIndex(s32 from, u16 vector)
 {
     switch(vector)
     {
@@ -97,7 +97,7 @@ s32 Maps::GetDirectionIndex(s32 from, Direction::vector_t vector)
 }
 
 // check bound
-bool Maps::isValidDirection(s32 from, Direction::vector_t vector)
+bool Maps::isValidDirection(s32 from, u16 vector)
 {
     switch(vector)
     {

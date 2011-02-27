@@ -229,7 +229,7 @@ bool Algorithm::PathFind(std::list<Route::Step> *result, const s32 from, const s
 	    if(-1 == list[cur].parent) break;
 	    alt = cur;
     	    cur = list[alt].parent;
-	    if(result) result->push_front(Route::Step(Direction::Get(cur, alt), list[alt].cost_g));
+	    if(result) result->push_front(Route::Step(cur, Direction::Get(cur, alt), list[alt].cost_g));
 	}
         return true;
     }

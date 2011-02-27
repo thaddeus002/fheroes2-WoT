@@ -44,13 +44,12 @@ namespace Direction
     inline vector_t& operator++ (vector_t& direct){ return direct = ( CENTER == direct ? TOP_LEFT : vector_t(direct << 1)); }
     inline vector_t& operator-- (vector_t& direct){ return direct = ( TOP_LEFT == direct ? CENTER : vector_t(direct >> 1)); }
 
-    const char* String(vector_t direct);
+    const char* String(u16 direct);
 
-    vector_t FromInt(u16);
     vector_t Get(s32 from, s32 to);
-    vector_t Reflect(vector_t from);
+    vector_t Reflect(u16 from);
 
-    bool ShortDistanceClockWise(const vector_t from, const vector_t to);
+    bool ShortDistanceClockWise(u16 from, u16 to);
 }
 
 #define DIRECTION_TOP_ROW	(Direction::TOP_LEFT | Direction::TOP | Direction::TOP_RIGHT)

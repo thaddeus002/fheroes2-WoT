@@ -31,23 +31,27 @@
 #include "settings.h"
 #include "route.h"
 
+s32 Route::Step::GetIndex(void) const
+{
+    return from < 0 ? -1 : Maps::GetDirectionIndex(from, direction);
+}
+
 /* construct */
 Route::Path::Path(const Heroes & h)
-    : hero(h), dst(h.GetIndex()), dst0(dst), hide(true)
+    : hero(h), dst(h.GetIndex()), hide(true)
 {
 }
 
-Direction::vector_t Route::Path::GetFrontDirection(void) const
+u16 Route::Path::GetFrontDirection(void) const
 {
-    if(!empty())
-	return front().Direction();
-
-    return isValid0() ? Direction::Get(dst, dst0) : Direction::CENTER;
+    return empty() ?
+	(dst != hero.GetIndex() ? Direction::Get(dst, hero.GetIndex())
+					    : Direction::CENTER) : front().direction;
 }
 
 u16 Route::Path::GetFrontPenalty(void) const
 {
-    return empty() ? 0 : front().Penalty();
+    return empty() ? 0 : front().penalty;
 }
 
 void Route::Path::PopFront(void)
@@ -55,21 +59,34 @@ void Route::Path::PopFront(void)
     if(!empty()) pop_front();
 }
 
+s32 Route::Path::GetDestinationIndex(void) const
+{
+    return empty() ? GetDestinedIndex() : GetLastIndex();
+}
+
+s32 Route::Path::GetLastIndex(void) const
+{
+    return empty() ? -1 : back().GetIndex();
+}
+
+s32 Route::Path::GetDestinedIndex(void) const
+{
+    return dst;
+}
+
 /* return length path */
-s32 Route::Path::Calculate(const s32 dst_index, const u16 limit)
+bool Route::Path::Calculate(const s32 dst_index, const u16 limit)
 {
     clear();
-
     Algorithm::PathFind(this, hero.GetIndex(), dst_index, limit, &hero);
-
-    dst0 = dst = empty() ? hero.GetIndex() : dst_index;
+    dst = empty() ? hero.GetIndex() : dst_index;
 
     return !empty();
 }
 
 void Route::Path::Reset(void)
 {
-    dst0 = dst = hero.GetIndex();
+    dst = hero.GetIndex();
     if(!empty())
     {
 	clear();
@@ -77,12 +94,13 @@ void Route::Path::Reset(void)
     }
 }
 
-bool Route::Path::isValid0(void) const
+bool Route::Path::isValid(void) const
 {
-    return empty() && dst != dst0;
+    return !empty() || (dst != hero.GetIndex() &&
+			Direction::UNKNOWN != Direction::Get(dst, hero.GetIndex()));
 }
 
-u16 Route::Path::GetIndexSprite(const Direction::vector_t & from, const Direction::vector_t & to, u8 mod)
+u16 Route::Path::GetIndexSprite(u16 from, u16 to, u8 mod)
 {
     // ICN::ROUTE
     // start index 1, 25, 49, 73, 97, 121 (size arrow path)
@@ -224,10 +242,9 @@ u32 Route::Path::TotalPenalty(void) const
 {
     u32 result = 0;
 
-    const_iterator it1 = begin();
-    const_iterator it2 = end();
-
-    for(; it1 != it2; ++it1) result += (*it1).Penalty();
+    for(const_iterator
+	it = begin(); it != end(); ++it)
+	result += (*it).penalty;
 
     return result;
 }
@@ -235,20 +252,13 @@ u32 Route::Path::TotalPenalty(void) const
 u16 Route::Path::GetAllowStep(void) const
 {
     u16 green = 0;
-
-    const_iterator it1 = begin();
-    const_iterator it2 = end();
-
     u16 move_point = hero.GetMovePoints();
 
-    for(; it1 != it2; ++it1)
+    for(const_iterator
+	it = begin(); it != end() && move_point >= (*it).penalty; ++it)
     {
-	if(move_point >= (*it1).Penalty())
-	{
-	    move_point -= (*it1).Penalty();
-	    ++green;
-	}
-	else break;
+	move_point -= (*it).penalty;
+	++green;
     }
 
     return green;
@@ -260,91 +270,73 @@ void Route::Path::DumpPath(void) const
 
     for(const_iterator
 	it = begin(); it != end(); ++it)
-    {
-	os << Direction::String((*it).Direction()) << "(" << (*it).Penalty() << ")" << ", ";
-    }
+	os << Direction::String((*it).direction) << "(" << (*it).penalty << ")" << ", ";
+
     os << "end";
 
-    DEBUG(DBG_GAME, DBG_TRACE, hero.GetName() << ", from: " << hero.GetIndex() << ", to: " << dst <<
+    DEBUG(DBG_GAME, DBG_TRACE, hero.GetName() << ", from: " << hero.GetIndex() << ", to: " << GetLastIndex() <<
 	", obj: " << MP2::StringObject(world.GetTiles(dst).GetObject()) << ", dump: " << os.str());
 }
 
 u16 Route::Path::isUnderProtection(s32 & pos) const
 {
-    const_iterator it = begin();
     s32 next = hero.GetIndex();
+    u16 res = 0;
 
-    for(; it != end(); ++it)
+    for(const_iterator
+	it = begin(); it != end() && res == 0; ++it)
     {
-	if(Maps::isValidDirection(next, (*it).Direction()))
-	    next = Maps::GetDirectionIndex(next, (*it).Direction());
-
-	const u16 res = Maps::TileUnderProtection(next);
-
-	if(res == dst &&
-	    MP2::isPickupObject(world.GetTiles(dst).GetObject()))
-	    return 0;
-
-	if(res)
-	{
-	    pos = next;
-	    return res;
-	}
+	next = (*it).GetIndex();
+	res = Maps::TileUnderProtection(next);
     }
 
-    return 0;
+    if(res)
+    {
+	s32 last = GetLastIndex();
+	if(next == last &&
+	    MP2::isPickupObject(world.GetTiles(last).GetObject()))
+	    return 0;
+
+	pos = next;
+    }
+
+    return res;
 }
 
-bool Route::Path::hasObstacle(s32* res) const
+bool StepIsObstacle(const Route::Step & s)
 {
-    const_iterator it = begin();
-    s32 next = hero.GetIndex();
+    s32 index = s.GetIndex();
+    u8 obj = 0 <= index ? world.GetTiles(index).GetObject() : MP2::OBJ_ZERO;
 
-    for(; it != end(); ++it)
+    switch(obj)
     {
-	if(Maps::isValidDirection(next, (*it).Direction()))
-	    next = Maps::GetDirectionIndex(next, (*it).Direction());
+	case MP2::OBJ_HEROES:
+	case MP2::OBJ_MONSTER:
+	    return true;
 
-	// skip end point
-	if(next == dst) return false;
-
-	switch(world.GetTiles(next).GetObject())
-	{
-	    case MP2::OBJ_HEROES:
-	    case MP2::OBJ_MONSTER:
-		if(res) *res = next;
-		return true;
-
-	    default: break;
-	}
+	default: break;
     }
 
     return false;
 }
 
-void Route::Path::ScanObstacleAndReduce(void)
+bool Route::Path::hasObstacle(void) const
 {
-    iterator it = begin();
-    s32 next = hero.GetIndex();
+    const_iterator it = std::find_if(begin(), end(), StepIsObstacle);
+    return it != end() && (*it).GetIndex() != GetLastIndex();
+}
 
-    for(; it != end(); ++it)
+void Route::Path::Rescan(void)
+{
+    // scan obstacle
+    iterator it = std::find_if(begin(), end(), StepIsObstacle);
+
+    if(it != end() && (*it).GetIndex() != GetLastIndex())
     {
-	if(Maps::isValidDirection(next, (*it).Direction()))
-	    next = Maps::GetDirectionIndex(next, (*it).Direction());
-
-
-	switch(world.GetTiles(next).GetObject())
-	{
-	    case MP2::OBJ_HEROES:
-		// skip end point
-		if(next == dst) return;
-
-	    case MP2::OBJ_MONSTER:
-		dst = Maps::GetDirectionIndex(next, Direction::Reflect((*it).Direction()));
-		erase(it, end());
-		return;
-
-	    default: break;
-	}
+	size_t size1 = size();
+	s32 reduce = (*it).from;
+	Calculate(dst);
+	// reduce
+	if(size() > size1 * 2) Calculate(reduce);
     }
 }

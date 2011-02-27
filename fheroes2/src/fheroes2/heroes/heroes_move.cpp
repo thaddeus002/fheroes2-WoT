@@ -379,7 +379,7 @@ bool Heroes::MoveStep(bool fast)
 {
     s32 index_from = GetIndex();
     s32 index_to = Maps::GetDirectionIndex(index_from, path.GetFrontDirection());
-    s32 index_dst = path.isValid() ? path.GetDestinationIndex() : path.GetDestinationIndex0();
+    s32 index_dst = path.GetDestinationIndex();
     const Point & mp = GetCenter();
 
     if(fast)
@@ -421,10 +421,10 @@ bool Heroes::MoveStep(bool fast)
     return false;
 }
 
-void Heroes::AngleStep(const Direction::vector_t to_direct)
+void Heroes::AngleStep(u16 to_direct)
 {
     //bool check = false;
-    bool clockwise = ShortDistanceClockWise(direction, to_direct);
+    bool clockwise = Direction::ShortDistanceClockWise(direction, to_direct);
 
     // start index
     if(45 > sprite_index && 0 == sprite_index % 9)
@@ -657,7 +657,7 @@ bool Heroes::Move(bool fast)
     if(Modes(ACTION)) ResetModes(ACTION);
 
     // move hero
-    if((path.isValid() || path.isValid0()) &&
+    if(path.isValid() &&
            (isEnableMove() || (GetSpriteIndex() < 45 && GetSpriteIndex() % 9) || GetSpriteIndex() >= 45))
     {
 	// fast move for hide AI

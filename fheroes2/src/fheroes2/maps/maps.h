@@ -46,8 +46,8 @@ namespace Maps
     const char* SizeString(u16);
     const char* GetMinesName(u8);
 
-    s32 GetDirectionIndex(s32 from, Direction::vector_t vector);
-    bool isValidDirection(s32 from, Direction::vector_t vector);
+    s32 GetDirectionIndex(s32 from, u16 direct);
+    bool isValidDirection(s32 from, u16 direct);
 
     bool isValidAbsIndex(s32);
     bool isValidAbsPoint(const Point & pt);

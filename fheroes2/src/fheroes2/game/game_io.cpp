@@ -575,7 +575,7 @@ void Game::IO::PackHeroes(QueueMessage & msg, const Heroes & hero)
     msg.Push(static_cast<u8>(hero.color));
     msg.Push(hero.name);
     msg.Push(hero.experience);
-    msg.Push(static_cast<u16>(hero.direction));
+    msg.Push(hero.direction);
     msg.Push(hero.sprite_index);
     msg.Push(static_cast<u8>(hero.save_maps_object));
     msg.Push(hero.patrol_center.x);
@@ -616,8 +616,9 @@ void Game::IO::PackHeroes(QueueMessage & msg, const Heroes & hero)
     for(Route::Path::const_iterator
 	ip = hero.path.begin(); ip != hero.path.end(); ++ip)
     {
-	msg.Push(static_cast<u16>((*ip).Direction()));
-	msg.Push((*ip).Penalty());
+	msg.Push((*ip).from);
+	msg.Push((*ip).direction);
+	msg.Push((*ip).penalty);
     }
 }
 
@@ -1205,7 +1206,7 @@ void Game::IO::UnpackHeroBase(QueueMessage & msg, HeroBase & hero, u16 check_ver
 void Game::IO::UnpackHeroes(QueueMessage & msg, Heroes & hero, u16 check_version)
 {
     u8 byte8;
-    u16 byte16;
+    //u16 byte16;
     u32 byte32;
 
     if(FORMAT_VERSION_2213 <= check_version)
@@ -1226,7 +1227,7 @@ void Game::IO::UnpackHeroes(QueueMessage & msg, Heroes & hero, u16 check_version
 	{
 	    msg.Pop(hero.move_point);
 	}
-	msg.Pop(byte16); hero.direction = Direction::FromInt(byte16);
+	msg.Pop(hero.direction);
 	msg.Pop(hero.sprite_index);
 	msg.Pop(byte8); hero.save_maps_object = static_cast<MP2::object_t>(byte8);
 
@@ -1280,7 +1281,7 @@ void Game::IO::UnpackHeroes(QueueMessage & msg, Heroes & hero, u16 check_version
 	msg.Pop(hero.experience);
 	msg.Pop(hero.magic_point);
 	msg.Pop(hero.move_point);
-	msg.Pop(byte16); hero.direction = Direction::FromInt(byte16);
+	msg.Pop(hero.direction);
 	msg.Pop(hero.sprite_index);
 	msg.Pop(byte8); hero.save_maps_object = static_cast<MP2::object_t>(byte8);
 	msg.Pop(hero.center.x);
@@ -1363,9 +1364,10 @@ void Game::IO::UnpackHeroes(QueueMessage & msg, Heroes & hero, u16 check_version
     for(u32 jj = 0; jj < byte32; ++jj)
     {
 	Route::Step step;
-	msg.Pop(byte16);
-	step.first = Direction::FromInt(byte16);
-	msg.Pop(step.second);
+	if(FORMAT_VERSION_2293 <= check_version)
+	    msg.Pop(step.from);
+	msg.Pop(step.direction);
+	msg.Pop(step.penalty);
 	hero.path.push_back(step);
     }
 }

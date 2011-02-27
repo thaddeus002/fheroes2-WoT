@@ -865,13 +865,6 @@ void Heroes::ActionAfterBattle(void)
     SetModes(ACTION);
 }
 
-s32 Heroes::FindPath(s32 dst_index) const
-{
-    Route::Path route(*this);
-
-    return route.Calculate(dst_index);
-}
-
 void Heroes::RescanPath(void)
 {
     if(path.isValid())
@@ -882,7 +875,7 @@ void Heroes::RescanPath(void)
 	}
 	else
 	{
-	    path.ScanObstacleAndReduce();
+	    path.Rescan();
 	}
     }
 }
@@ -1134,7 +1127,7 @@ bool Heroes::BuySpellBook(const MageGuild* mageguild, u8 shrine)
 /* return true is move enable */
 bool Heroes::isEnableMove(void) const
 {
-    return Modes(ENABLEMOVE) && (path.isValid() || path.isValid0()) && path.GetFrontPenalty() <= move_point;
+    return Modes(ENABLEMOVE) && path.isValid() && path.GetFrontPenalty() <= move_point;
 }
 
 bool Heroes::CanMove(void) const
@@ -1203,7 +1196,7 @@ bool Heroes::CanPassToShipMaster(const Heroes & hero) const
             coast = Maps::GetIndexFromAbsPoint(cx + x, cy + y);
 
             if(Maps::isValidAbsIndex(coast) &&
-                MP2::OBJ_COAST == world.GetTiles(coast).GetObject() && FindPath(coast)) return true;
+                MP2::OBJ_COAST == world.GetTiles(coast).GetObject() && route.Calculate(coast)) return true;
 	}
     }
     return false;
@@ -1648,7 +1641,7 @@ void Heroes::ActionNewPosition(void)
 	GetPath().Hide();
 
 	// first target
-	Direction::vector_t dir = Direction::Get(GetIndex(), GetPath().GetDestinationIndex0());
+	Direction::vector_t dir = Direction::Get(GetIndex(), GetPath().GetDestinedIndex());
 
 	if(dst_around & dir)
 	{

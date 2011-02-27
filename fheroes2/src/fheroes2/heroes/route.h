@@ -31,14 +31,16 @@ class Heroes;
 
 namespace Route
 {
-    class Step : public std::pair<Direction::vector_t, u16>
+    struct Step
     {
-	public:
-	Step() : std::pair<Direction::vector_t, u16>(Direction::CENTER, 0) {}
-	Step(const Direction::vector_t v, const u16 c) : std::pair<Direction::vector_t, u16>(v, c) {}
+	Step() : from(-1), direction(Direction::CENTER), penalty(0) {}
+	Step(s32 index, u16 dir, u16 cost) : from(index), direction(dir), penalty(cost) {}
 
-	Direction::vector_t Direction() const { return first; }
-	u16 Penalty() const { return second; }
+	s32	GetIndex(void) const;
+
+	s32	from;
+	u16	direction;
+	u16	penalty;
     };
 
     class Path : public std::list<Step>
@@ -46,39 +48,35 @@ namespace Route
 	public:
 	    Path(const Heroes & h);
 
-	    s32		GetDestinationIndex(void) const{ return dst; }
-	    s32		GetDestinationIndex0(void) const{ return dst0; }
-	    Direction::vector_t GetFrontDirection(void) const;
+	    s32		GetDestinationIndex(void) const;
+	    s32		GetLastIndex(void) const;
+	    s32		GetDestinedIndex(void) const;
+	    u16		GetFrontDirection(void) const;
 	    u16		GetFrontPenalty(void) const;
-	    s32		Calculate(const s32 dst_index, const u16 limit = MAXU16);
+	    bool	Calculate(const s32 dst_index, const u16 limit = MAXU16);
 
 	    void	Show(void){ hide = false; }
 	    void	Hide(void){ hide = true; }
 	    void	Reset(void);
 	    void	PopFront(void);
-	    void	ScanObstacleAndReduce(void);
+	    void	Rescan(void);
 
-	    bool	isValid0(void) const;
-	    bool	isValid(void) const { return !(dst < 0 || empty()); }
+	    bool	isValid(void) const;
 	    bool	isShow(void) const { return !hide; }
 	    u16		isUnderProtection(s32 & pos) const;
-	    bool	hasObstacle(s32* res = NULL) const;
+	    bool	hasObstacle(void) const;
 
 	    void	DumpPath(void) const;
 
 	    u16		GetAllowStep(void) const;
 	    u32		TotalPenalty(void) const;
 
-	    const_iterator Begin(void) const{ return begin(); }
-	    const_iterator End(void) const{ return end(); }
-
-    	    static u16	GetIndexSprite(const Direction::vector_t & from, const Direction::vector_t & to, u8 mod);
+    	    static u16	GetIndexSprite(u16 from, u16 to, u8 mod);
 
 	private:
 	    friend class Game::IO;
 	    const Heroes & hero;
 	    s32		dst;
-	    s32		dst0;
 	    bool	hide;
     };
 }

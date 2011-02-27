@@ -23,7 +23,7 @@
 #include "maps.h"
 #include "direction.h"
 
-const char* Direction::String(vector_t direct)
+const char* Direction::String(u16 direct)
 {
    const char* str_direct[] = { "center", "top", "top right", "right", "bottom right", "bottom", "bottom left", "left", "top left", "unknown" };
    
@@ -77,7 +77,7 @@ Direction::vector_t Direction::Get(s32 from, s32 to)
     return UNKNOWN;
 }
 
-bool Direction::ShortDistanceClockWise(const vector_t from , const vector_t to)
+bool Direction::ShortDistanceClockWise(u16 from , u16 to)
 {
    switch(from)
    {
@@ -182,7 +182,7 @@ bool Direction::ShortDistanceClockWise(const vector_t from , const vector_t to)
     return false;
 }
 
-Direction::vector_t Direction::Reflect(Direction::vector_t from)
+Direction::vector_t Direction::Reflect(u16 from)
 {
     switch(from)
     {
@@ -195,25 +195,6 @@ Direction::vector_t Direction::Reflect(Direction::vector_t from)
 	case BOTTOM_LEFT:	return TOP_RIGHT;
 	case LEFT:		return RIGHT;
 	case CENTER:		return CENTER;
-	default: break;
-    }
-
-    return UNKNOWN;
-}
-
-Direction::vector_t Direction::FromInt(u16 index)
-{
-    switch(index)
-    {
-	case 0x0001:	return TOP_LEFT;
-	case 0x0002:	return TOP;
-	case 0x0004:	return TOP_RIGHT;
-	case 0x0008:	return RIGHT;
-	case 0x0010:	return BOTTOM_RIGHT;
-	case 0x0020:	return BOTTOM;
-	case 0x0040:	return BOTTOM_LEFT;
-	case 0x0080:	return LEFT;
-	case 0x0100:	return CENTER;
 	default: break;
     }
 

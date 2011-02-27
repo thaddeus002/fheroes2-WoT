@@ -188,12 +188,11 @@ public:
 
     const Route::Path & GetPath(void) const{ return path; }
     Route::Path & GetPath(void) { return path; }
-    s32 FindPath(s32 dst_index) const;
     u8 GetRangeRouteDays(const s32 dst) const;
     void ShowPath(bool f){ f ? path.Show() : path.Hide(); }
     void RescanPath(void);
 
-    Direction::vector_t GetDirection(void) const{ return direction; }
+    u16 GetDirection(void) const{ return direction; }
 
     void SetVisited(const s32 index, const Visit::type_t type = Visit::LOCAL);
     void SetVisitedWideTile(const s32 index, const u8 object, const Visit::type_t type = Visit::LOCAL);
@@ -251,7 +250,7 @@ private:
     void LevelUp(bool autoselect = false);
     Skill::Primary::skill_t LevelUpPrimarySkill(void);
     void LevelUpSecondarySkill(const Skill::Primary::skill_t, bool autoselect = false);
-    void AngleStep(const Direction::vector_t to_direct);
+    void AngleStep(u16 to_direct);
     bool MoveStep(bool fast = false);
     static void MoveStep(Heroes &, s32 from, s32 to, bool newpos);
 
@@ -273,7 +272,7 @@ private:
 
     Route::Path		path;
 
-    Direction::vector_t direction;
+    u16			direction;
     u8			sprite_index;
 
     Point patrol_center;

@@ -198,17 +198,17 @@ void Interface::GameArea::Redraw(Surface & dst, u8 flag, const Rect & rt) const
 
 	for(; it1 != it2; ++it1)
 	{
-	    from = Maps::GetDirectionIndex(from, (*it1).Direction());
+	    from = (*it1).GetIndex();
     	    const Point mp(from % world.w(), from / world.h());
 
-	    ++it3;
+ 	    ++it3;
 	    --green;
 
             if(!(Rect(rectMaps.x + rt.x, rectMaps.y + rt.y, rt.w, rt.h) & mp)) continue;
 	    if(it1 == hero.GetPath().begin() && skipfirst) continue;
 
 	    const u16 index = (it3 == it2 ? 0 :
-		    Route::Path::GetIndexSprite((*it1).Direction(), (*it3).Direction(), 
+		    Route::Path::GetIndexSprite((*it1).direction, (*it3).direction, 
 			Maps::Ground::GetBasePenalty(from, hero.GetLevelSkill(Skill::Secondary::PATHFINDING))));
 
 	    const Sprite & sprite = AGG::GetICN(0 > green ? ICN::ROUTERED : ICN::ROUTE, index);

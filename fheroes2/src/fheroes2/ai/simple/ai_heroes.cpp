@@ -2242,6 +2242,9 @@ void AIHeroesGetTask(Heroes & hero)
     Queue & task = ai_hero.sheduled_visit;
     IndexObjectMap & ai_objects = ai_kingdom.scans;
 
+    // rescan path
+    hero.RescanPath();
+
     Castle *castle = hero.inCastle();
     // if hero in castle
     if(castle)
