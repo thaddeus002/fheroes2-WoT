@@ -36,21 +36,262 @@
 #include "spell.h"
 #include "dialog.h"
 
-const char* ArmyGetSizeString(u32 count)
+std::string CountScoute(u32 count, u8 scoute)
 {
-    switch(Army::GetSize(count))
+    std::string str;
+    switch(scoute)
+    {
+	case Skill::Level::BASIC:
+	    String::AddInt(str, Rand::Get(count - count * 30 / 100, count));
+	    str.append("-");
+	    String::AddInt(str, Rand::Get(count, count + count * 30 / 100));
+	    break;
+	case Skill::Level::ADVANCED:
+	    String::AddInt(str, Rand::Get(count - count * 14 / 100, count));
+	    str.append("-");
+	    String::AddInt(str, Rand::Get(count, count + count * 15 / 100));
+	    break;
+	case Skill::Level::EXPERT:
+	    String::AddInt(str, count);
+	    break;
+	default:
+	    str = Army::String(count);
+	    break;
+    }
+
+    return str;
+}
+
+std::string ShowGuardiansInfo(const Maps::Tiles & tile, u8 scoute)
+{
+    std::string str;
+    const Army::Troop troop(tile);
+
+    if(MP2::OBJ_MINES == tile.GetObject())
+        str = Maps::GetMinesName(tile.GetMinesType());
+    else
+	str = MP2::StringObject(tile.GetObject());
+
+    str.append("\n");
+    str.append(_("guarded by %{count} of %{monster}"));
+
+    String::Replace(str, "%{monster}", troop.GetMultiName());
+    String::Replace(str, "%{count}", CountScoute(troop.GetCount(), scoute));
+
+    return str;
+}
+
+std::string ShowMonsterInfo(const Maps::Tiles & tile, u8 scoute)
+{
+    std::string str;
+    const Army::Troop troop(tile);
+
+    if(scoute)
+    {
+        str = "%{count} %{monster}";
+	String::Replace(str, "%{count}", CountScoute(troop.GetCount(), scoute));
+    }
+    else
+    switch(Army::GetSize(troop.GetCount()))
     {
         default: break;
-        case Army::SEVERAL:     return _("Several\n%{monster}");
-        case Army::PACK:        return _("A pack of\n%{monster}");
-        case Army::LOTS:        return _("Lots of\n%{monster}");
-        case Army::HORDE:       return _("A horde of\n%{monster}");
-        case Army::THRONG:      return _("A throng of\n%{monster}");
-        case Army::SWARM:       return _("A swarm of\n%{monster}");
-        case Army::ZOUNDS:      return _("Zounds of\n%{monster}");
-        case Army::LEGION:      return _("A legion of\n%{monster}");
+        case Army::FEW:     str = _("A few\n%{monster}"); break;
+        case Army::SEVERAL: str = _("Several\n%{monster}"); break;
+        case Army::PACK:    str = _("A pack of\n%{monster}"); break;
+        case Army::LOTS:    str = _("Lots of\n%{monster}"); break;
+        case Army::HORDE:   str = _("A horde of\n%{monster}"); break;
+        case Army::THRONG:  str = _("A throng of\n%{monster}"); break;
+        case Army::SWARM:   str = _("A swarm of\n%{monster}"); break;
+        case Army::ZOUNDS:  str = _("Zounds of\n%{monster}"); break;
+        case Army::LEGION:  str = _("A legion of\n%{monster}"); break;
     }
-    return _("A few\n%{monster}");
+    String::Replace(str, "%{monster}", troop.GetMultiName());
+
+    return str;
+}
+
+std::string ShowArtifactInfo(const Maps::Tiles & tile, bool show)
+{
+    std::string str = MP2::StringObject(tile.GetObject());
+
+    if(show)
+    {
+	str.append("\n(");
+	str.append(Artifact(tile.GetQuantity1()).GetName());
+	str.append(")");
+    }
+
+    return str;
+}
+
+std::string ShowResourceInfo(const Maps::Tiles & tile, bool show, u8 scoute)
+{
+    std::string str = MP2::StringObject(tile.GetObject());
+
+    if(show)
+    {
+	str.append("\n(");
+	str.append(Resource::String(tile.GetQuantity1()));
+
+	if(scoute)
+	{
+	    str.append(": ");
+	    str.append(CountScoute(tile.GetQuantity2(), scoute));
+	}
+	str.append(")");
+    }
+
+    return str;
+}
+
+std::string ShowDwellingInfo(const Maps::Tiles & tile, u8 scoute)
+{
+    std::string str = MP2::StringObject(tile.GetObject());
+
+    if(scoute)
+    {
+	str.append("\n");
+	if(tile.GetCountMonster())
+	{
+	    str.append(_("(available: %{count})"));
+	    String::Replace(str, "%{count}", CountScoute(tile.GetCountMonster(), scoute));
+	}
+	else
+	    str.append("(empty)");
+    }
+
+    return str;
+}
+
+std::string ShowShrineInfo(const Maps::Tiles & tile, const Heroes* hero, u8 scoute)
+{
+    std::string str = MP2::StringObject(tile.GetObject());
+    bool show = false;
+
+    switch(tile.GetObject())
+    {
+	case MP2::OBJ_SHRINE1: show = scoute >= Skill::Level::BASIC; break;
+	case MP2::OBJ_SHRINE2: show = scoute >= Skill::Level::ADVANCED; break;
+	case MP2::OBJ_SHRINE3: show = scoute == Skill::Level::EXPERT; break;
+	default: break;
+    }
+
+    if(show)
+    {
+	const Spell spell(tile.GetQuantity1());
+	str.append("\n(");
+	str.append(spell.GetName());
+	str.append(")");
+	if(hero && hero->HaveSpell(spell))
+	{
+	    str.append("\n(");
+	    str.append(_("already learned"));
+	    str.append(")");
+	}
+    }
+
+    return str;
+}
+
+std::string ShowWitchHutInfo(const Maps::Tiles & tile, const Heroes* hero, bool show)
+{
+    std::string str = MP2::StringObject(tile.GetObject());
+
+    if(show)
+    {
+	const Skill::Secondary::skill_t skill = Skill::Secondary::Skill(tile.GetQuantity1());
+	str.append("\n(");
+	str.append(Skill::Secondary::String(skill));
+	str.append(")");
+
+	if(hero)
+	{
+	    if(hero->HasSecondarySkill(skill))
+	    {
+		str.append("\n(");
+		str.append(_("already knows this skill"));
+		str.append(")");
+	    }
+	    else
+	    if(hero->HasMaxSecondarySkill())
+	    {
+		str.append("\n(");
+		str.append(_("already has max skills"));
+		str.append(")");
+	    }
+	}
+    }
+
+    return str;
+}
+
+std::string ShowLocalVisitTileInfo(const Maps::Tiles & tile, const Heroes* hero)
+{
+    std::string str = MP2::StringObject(tile.GetObject());
+    if(hero)
+    {
+	str.append("\n");
+	str.append(hero->isVisited(tile) ? _("(already visited)") : _("(not visited)"));
+    }
+
+    return str;
+}
+
+std::string ShowLocalVisitObjectInfo(const Maps::Tiles & tile, const Heroes* hero)
+{
+    std::string str = MP2::StringObject(tile.GetObject());
+    if(hero)
+    {
+	str.append("\n");
+	str.append(hero->isVisited(tile.GetObject()) ? _("(already visited)") : _("(not visited)"));
+    }
+
+    return str;
+}
+
+std::string ShowGlobalVisitInfo(const Maps::Tiles & tile, const Kingdom & kingdom)
+{
+    std::string str = MP2::StringObject(tile.GetObject());
+    str.append("\n");
+    str.append(kingdom.isVisited(tile) ? _("(already visited)") : _("(not visited)"));
+
+    return str;
+}
+
+std::string ShowGlobalVisitInfo(const Maps::Tiles & tile, const Kingdom & kingdom, bool ext)
+{
+    std::string str = MP2::StringObject(tile.GetObject());
+    if(ext && kingdom.isVisited(tile))
+    {
+	str.append("\n");
+	str.append(_("(already visited)"));
+    }
+
+    return str;
+}
+
+std::string ShowBarrierTentInfo(const Maps::Tiles & tile, const Kingdom & kingdom)
+{
+    std::string str = BarrierColor::String(tile.GetQuantity1());
+    str.append(" ");
+    str.append(MP2::StringObject(tile.GetObject()));
+
+    if(MP2::OBJ_TRAVELLERTENT == tile.GetObject() &&
+	kingdom.IsVisitTravelersTent(tile.GetQuantity1()))
+    {
+	str.append("\n");
+	str.append(_("(already visited)"));
+    }
+
+    return str;
+}
+
+std::string ShowTreasureChestInfo(const Maps::Tiles & tile)
+{
+    std::string str = Maps::Ground::WATER == tile.GetGround() ? 
+		    _("Sea Chest") : MP2::StringObject(MP2::OBJ_TREASURECHEST);
+
+    return str;
 }
 
 void Dialog::QuickInfo(const Maps::Tiles & tile)
@@ -131,61 +372,24 @@ void Dialog::QuickInfo(const Maps::Tiles & tile)
 
     const Heroes* from_hero = (Game::Focus::HEROES == Game::Focus::Get().Type() ? &Game::Focus::Get().GetHeroes() : NULL);
     const Kingdom & kingdom = world.GetKingdom(settings.MyColor());
+    u8 scoute = from_hero ? from_hero->CanScouteTile(tile.GetIndex()) : 0;
+    const bool & show = settings.ExtShowVisitedContent();
 
     if(tile.isFog(settings.MyColor()))
 	name_object = _("Unchartered Territory");
     else
     // check guardians mine
-    if(MP2::OBJ_ABANDONEDMINE == tile.GetObject() || tile.CaptureObjectIsProtection(settings.MyColor()))
+    if(MP2::OBJ_ABANDONEDMINE == tile.GetObject() ||
+	tile.CaptureObjectIsProtection(settings.MyColor()))
     {
-	const Army::Troop troop(tile);
-
-	if(MP2::OBJ_MINES == tile.GetObject())
-            name_object = Maps::GetMinesName(tile.GetMinesType());
-	else
-	    name_object = MP2::StringObject(tile.GetObject());
-
-	name_object.append("\n");
-        name_object.append(_("guarded by %{count} of %{monster}"));
-        std::string name = troop.GetMultiName();
-        if(!settings.Unicode()) String::Lower(name);
-        String::Replace(name_object, "%{monster}", name);
-
-	if((settings.MyColor() == world.ColorCapturedObject(tile.GetIndex())) ||
-	    (from_hero && from_hero->CanScouteTile(tile.GetIndex())))
-	{
-	    name.clear();
-	    String::AddInt(name, troop.GetCount());
-	}
-	else
-	{
-	    name = Army::String(troop.GetCount());
-    	    if(!settings.Unicode()) String::Lower(name);
-        }
-
-	String::Replace(name_object, "%{count}", name);
+	name_object = ShowGuardiansInfo(tile,
+		(settings.MyColor() == world.ColorCapturedObject(tile.GetIndex()) ? Skill::Level::EXPERT : scoute));
     }
     else
     switch(tile.GetObject())
     {
         case MP2::OBJ_MONSTER:
-    	{
-	    const Army::Troop troop(tile);
-
-            if(from_hero && from_hero->CanScouteTile(tile.GetIndex()))
-            {
-        	name_object = "%{count} %{monster}";
-        	String::Replace(name_object, "%{count}", troop.GetCount());
-	    }
-	    else
-	    {
-		name_object = ArmyGetSizeString(troop.GetCount());
-	    }
-
-            std::string name = troop.GetMultiName();
-            if(!settings.Unicode()) String::Lower(name);
-            String::Replace(name_object, "%{monster}", name);
-    	}
+	    name_object = ShowMonsterInfo(tile, scoute);
     	    break;
 
         case MP2::OBJ_EVENT:
@@ -204,35 +408,19 @@ void Dialog::QuickInfo(const Maps::Tiles & tile)
 	case MP2::OBJ_WATERWHEEL:
 	case MP2::OBJ_LEANTO:
 	case MP2::OBJ_MAGICGARDEN:
-	    name_object = MP2::StringObject(tile.GetObject());
-	    // check visited
-	    if(settings.ExtShowVisitedContent() && kingdom.isVisited(tile))
-	    {
-	    	name_object.append("\n");
-		name_object.append(_("(already visited)"));
-	    }
+	    name_object = ShowGlobalVisitInfo(tile, kingdom, show);
+	    break;
+
+	case MP2::OBJ_CAMPFIRE:
+	    name_object = ShowResourceInfo(tile, scoute, scoute);
 	    break;
 
 	case MP2::OBJ_RESOURCE:
-	    name_object = MP2::StringObject(tile.GetObject());
-	    // check visited
-	    if(settings.ExtShowVisitedContent())
-	    {
-	    	name_object.append("\n(");
-		name_object.append(Resource::String(tile.GetQuantity1()));
-	    	name_object.append(")");
-	    }
+	    name_object = ShowResourceInfo(tile, show || scoute, scoute);
 	    break;
 
 	case MP2::OBJ_ARTIFACT:
-	    name_object = MP2::StringObject(tile.GetObject());
-	    // check visited
-	    if(settings.ExtShowVisitedContent())
-	    {
-	    	name_object.append("\n(");
-		name_object.append(Artifact(tile.GetQuantity1()).GetName());
-	    	name_object.append(")");
-	    }
+	    name_object = ShowArtifactInfo(tile, show || scoute);
 	    break;
 
 	case MP2::OBJ_MINES:
@@ -259,21 +447,7 @@ void Dialog::QuickInfo(const Maps::Tiles & tile)
         case MP2::OBJ_DRAGONCITY:
         case MP2::OBJ_CITYDEAD:
         case MP2::OBJ_TROLLBRIDGE:
-	    name_object = MP2::StringObject(tile.GetObject());
-	    if((settings.ExtShowVisitedContent() && kingdom.isVisited(tile)) ||
-		(from_hero && from_hero->CanScouteTile(tile.GetIndex())))
-	    {
-	    	name_object.append("\n");
-		if(tile.GetCountMonster())
-		{
-		    name_object.append(_("(available: %{count})"));
-		    String::Replace(name_object, "%{count}", tile.GetCountMonster());
-		}
-		else
-		{
-		    name_object.append("(empty)");
-		}
-	    }
+	    name_object = ShowDwellingInfo(tile, (kingdom.isVisited(tile) ? Skill::Level::EXPERT : scoute));
 	    break;
 
 	case MP2::OBJ_GAZEBO:
@@ -284,13 +458,7 @@ void Dialog::QuickInfo(const Maps::Tiles & tile)
 	case MP2::OBJ_STANDINGSTONES:
 	case MP2::OBJ_ARTESIANSPRING:
 	case MP2::OBJ_TREEKNOWLEDGE:
-	    name_object = MP2::StringObject(tile.GetObject());
-	    // check visited
-	    if(from_hero)
-	    {
-	    	name_object.append("\n");
-		name_object.append(from_hero->isVisited(tile) ? _("(already visited)") : _("(not visited)"));
-	    }
+	    name_object = ShowLocalVisitTileInfo(tile, from_hero);
 	    break;
 
 	case MP2::OBJ_MAGICWELL:
@@ -303,90 +471,32 @@ void Dialog::QuickInfo(const Maps::Tiles & tile)
 	case MP2::OBJ_WATERINGHOLE:
 	case MP2::OBJ_ARENA:
 	case MP2::OBJ_STABLES:
-	    name_object = MP2::StringObject(tile.GetObject());
-	    // check visited
-	    if(from_hero)
-	    {
-		name_object.append("\n");
-		name_object.append(from_hero->isVisited(tile.GetObject()) ? _("(already visited)") : _("(not visited)"));
-	    }
+	    name_object = ShowLocalVisitObjectInfo(tile, from_hero);
 	    break;
 
 	case MP2::OBJ_SHRINE1:
 	case MP2::OBJ_SHRINE2:
 	case MP2::OBJ_SHRINE3:
-	    name_object = MP2::StringObject(tile.GetObject());
-	    // addons pack
-	    if(settings.ExtShowVisitedContent() && kingdom.isVisited(tile))
-	    {
-		const Spell spell(tile.GetQuantity1());
-	    	name_object.append("\n(");
-	    	name_object.append(spell.GetName());
-	    	name_object.append(")");
-		if(from_hero && from_hero->HaveSpell(spell))
-		{
-	    	    name_object.append("\n(");
-	    	    name_object.append(_("already learned"));
-	    	    name_object.append(")");
-		}
-	    }
+	    name_object = ShowShrineInfo(tile, from_hero,
+			    (show && kingdom.isVisited(tile) ? Skill::Level::EXPERT : scoute));
 	    break;
 
 	case MP2::OBJ_WITCHSHUT:
-	    name_object = MP2::StringObject(tile.GetObject());
-	    // addons pack
-	    if(settings.ExtShowVisitedContent() && kingdom.isVisited(tile))
-	    {
-		const Skill::Secondary::skill_t skill = Skill::Secondary::Skill(tile.GetQuantity1());
-		name_object.append("\n(");
-		name_object.append(Skill::Secondary::String(skill));
-		name_object.append(")");
-
-		if(from_hero)
-		{
-		    if(from_hero->HasSecondarySkill(skill))
-		    {
-			name_object.append("\n(");
-			name_object.append(_("already knows this skill"));
-			name_object.append(")");
-		    }
-		    else
-		    if(from_hero->HasMaxSecondarySkill())
-		    {
-			name_object.append("\n(");
-			name_object.append(_("already has max skills"));
-			name_object.append(")");
-		    }
-		}
-	    }
+	    name_object = ShowWitchHutInfo(tile, from_hero,
+			    ((show && kingdom.isVisited(tile)) || scoute == Skill::Level::EXPERT));
 	    break;
 
         case MP2::OBJ_OBELISK:
-	    name_object = MP2::StringObject(tile.GetObject());
-            // check visited
-	    name_object.append("\n");
-	    name_object.append(kingdom.isVisited(tile) ? _("(already visited)") : _("(not visited)"));
+	    name_object = ShowGlobalVisitInfo(tile, kingdom);
             break;
 
         case MP2::OBJ_BARRIER:
         case MP2::OBJ_TRAVELLERTENT:
-	    name_object = BarrierColor::String(tile.GetQuantity1());
-	    name_object.append(" ");
-	    name_object.append(MP2::StringObject(tile.GetObject()));
-
-	    if(MP2::OBJ_TRAVELLERTENT == tile.GetObject() &&
-		kingdom.IsVisitTravelersTent(tile.GetQuantity1()))
-	    {
-		name_object.append("\n");
-		name_object.append(_("(already visited)"));
-	    }
+	    name_object = ShowBarrierTentInfo(tile, kingdom);
 	    break;
 
 	case MP2::OBJ_TREASURECHEST:
-	    if(Maps::Ground::WATER == tile.GetGround())
-		name_object = _("Sea Chest");
-	    else
-		name_object = MP2::StringObject(tile.GetObject());
+	    name_object = ShowTreasureChestInfo(tile);
 	    break;
 
         default: 

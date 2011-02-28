@@ -218,7 +218,7 @@ public:
     void FadeIn(void) const;
     void Scoute(void);
     u8   GetScoute(void) const;
-    bool CanScouteTile(s32) const;
+    u8   CanScouteTile(s32) const;
     u16  GetVisionsDistance(void) const;
 
     bool isShipMaster(void) const;

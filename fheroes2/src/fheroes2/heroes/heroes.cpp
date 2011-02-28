@@ -1683,8 +1683,9 @@ u8 Heroes::GetSquarePatrol(void) const
     return patrol_square;
 }
 
-bool Heroes::CanScouteTile(s32 dst) const
+u8 Heroes::CanScouteTile(s32 dst) const
 {
+    u8 scouting = GetSecondaryValues(Skill::Secondary::SCOUTING);
     bool army_info = false;
 
     switch(world.GetTiles(dst).GetObject())
@@ -1692,7 +1693,8 @@ bool Heroes::CanScouteTile(s32 dst) const
 	case MP2::OBJ_MONSTER:
 	case MP2::OBJ_CASTLE:
 	case MP2::OBJ_HEROES:
-	    army_info = true;
+	    army_info = true; break;
+
 	default: break;
     }
 
@@ -1702,19 +1704,15 @@ bool Heroes::CanScouteTile(s32 dst) const
 	if(Maps::GetApproximateDistance(GetIndex(), dst) <= GetVisionsDistance())
 	{
 	    // check crystal ball
-	    if(HasArtifact(Artifact::CRYSTAL_BALL))
-		return true;
-
-	    // check scouting expert
-	    if(Skill::Level::EXPERT == GetSecondaryValues(Skill::Secondary::SCOUTING))
-		return true;
+	    return HasArtifact(Artifact::CRYSTAL_BALL) ?
+			    Skill::Level::EXPERT : scouting;
 	}
 	else
 	{
 	    // check spell identify hero
 	    if(world.GetKingdom(GetColor()).Modes(Kingdom::IDENTIFYHERO) &&
 		MP2::OBJ_HEROES == world.GetTiles(dst).GetObject())
-		return true;
+		return Skill::Level::EXPERT;
 	}
     }
     else
@@ -1726,11 +1724,12 @@ bool Heroes::CanScouteTile(s32 dst) const
 	    u16 dist = GetSecondaryValues(Skill::Secondary::SCOUTING) ? GetScoute() : 0;
 	    if(Modes(VISIONS) && dist < GetVisionsDistance()) dist = GetVisionsDistance();
 
-	    return (dist > Maps::GetApproximateDistance(GetIndex(), dst));
+	    if(dist > Maps::GetApproximateDistance(GetIndex(), dst))
+		return scouting;
 	}
     }
 
-    return false;
+    return 0;
 }
 
 void Heroes::MovePointsScaleFixed(void)
