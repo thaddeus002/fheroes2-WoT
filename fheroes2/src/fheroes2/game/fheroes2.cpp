@@ -350,7 +350,7 @@ void SetLangEnvPath(const Settings & conf)
     }
 
     const std::string strtmp = conf.LocalPrefix() + SEPARATOR + "files" + SEPARATOR + "lang";
-    setlocale(LC_ALL, "");
+    setlocale(LC_ALL, "en_US.UTF8");
     bindtextdomain(GETTEXT_PACKAGE, strtmp.c_str());
     bind_textdomain_codeset(GETTEXT_PACKAGE, "UTF-8");
     textdomain(GETTEXT_PACKAGE);
