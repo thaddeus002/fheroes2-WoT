@@ -309,14 +309,19 @@ bool Maps::FileInfo::ReadMP2(const std::string & filename)
     //fill unions
     if(4 == conditions_wins)
     {
-	u16 index = 0;
 	u8 side1 = 0;
 	u8 side2 = 0;
 
-	if(index < wins3)
-	    side1 |= Color::ALL & kingdom_colors;
-	else
-	    side2 |= Color::ALL & kingdom_colors;
+	Color::Colors colors = Color::GetColors(kingdom_colors);
+
+	for(Color::Colors::const_iterator
+	    it = colors.begin(); it != colors.end(); ++it)
+	{
+	    if(Color::GetIndex(*it) < wins3)
+		side1 |= *it;
+	    else
+		side2 |= *it;
+	}
 
 	for(u8 ii = 0; ii < KINGDOMMAX; ++ii)
 	{
