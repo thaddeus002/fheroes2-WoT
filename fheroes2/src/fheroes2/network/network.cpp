@@ -53,7 +53,6 @@ const char* Network::GetMsgString(u16 msg)
         case MSG_HELLO:         	return "MSG_HELLO";
         case MSG_LOGOUT:        	return "MSG_LOGOUT";
         case MSG_SHUTDOWN:      	return "MSG_SHUTDOWN";
-        case MSG_ACCESS_DENIED:		return "MSG_ACCESS_DENIED";
 
         case MSG_UPDATE_PLAYERS:	return "MSG_UPDATE_PLAYERS";
         case MSG_SET_GAMETYPE:		return "MSG_SET_GAMETYPE";

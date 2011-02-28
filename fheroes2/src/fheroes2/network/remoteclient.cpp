@@ -450,15 +450,6 @@ bool FH2RemoteClient::UpdateColors(void)
     return true;
 }
 
-bool FH2RemoteClient::SendAccessDenied(QueueMessage & msg)
-{
-    msg.Reset();
-    msg.SetID(MSG_ACCESS_DENIED);
-
-    DEBUG(DBG_NETWORK, DBG_INFO, "size: " << std::dec << msg.DtSz() << " bytes");
-    return Send(msg);
-}
-
 bool FH2RemoteClient::SendMapsInfoList(QueueMessage & msg)
 {
     FH2Server & server = FH2Server::Get();

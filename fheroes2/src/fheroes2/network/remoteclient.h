@@ -59,7 +59,6 @@ struct FH2RemoteClient : public FH2Client
     bool SendCurrentMapInfo(QueueMessage &);
     bool SendCurrentColor(QueueMessage &);
     bool SendMapsInfoList(QueueMessage &);
-    bool SendAccessDenied(QueueMessage &);
     void MsgChangeColors(void);
     void MsgChangeRace(void);
     void SetGameType(u8 type);

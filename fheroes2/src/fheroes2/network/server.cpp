@@ -155,10 +155,6 @@ int FH2Server::Main(void* ptr)
 			server.MsgLoadMaps(msg, *client);
 			break;
 
-		    case MSG_ACCESS_DENIED:
-			server.SetModes(ST_FULLHOUSE);
-			break;
-
 		    case MSG_LOGOUT:
 			server.MsgLogout(msg, *client);
 			if(IS_DEBUG(DBG_NETWORK, DBG_TRACE)) server.clients.Dump();
@@ -187,8 +183,8 @@ int FH2Server::Main(void* ptr)
                 	break;
 
             	    case MSG_GET_MAPS_LIST:
-                    	clientResult = client->Modes(ST_ADMIN) ? client->SendMapsInfoList(msg) :
-					client->SendAccessDenied(msg);
+			if(client->Modes(ST_ADMIN))
+                    	clientResult = client->SendMapsInfoList(msg);
                 	break;
 
             	    case MSG_CHANGE_COLORS:
@@ -362,10 +358,9 @@ int FH2Server::WaitClients(void* ptr)
 	    FH2RemoteClient* client = clients.GetAdmin();
 
 	    // check count players
-    	    if(preferablyPlayers <= connectedPlayers ||
-		server.Modes(ST_FULLHOUSE))
+    	    if(preferablyPlayers <= connectedPlayers)
 	    {
-		DEBUG(DBG_NETWORK, DBG_INFO, "full house");
+		DEBUG(DBG_NETWORK, DBG_INFO, "players limit: " << preferablyPlayers);
 		Socket sct(csd);
 		sct.Close();
 	    }
@@ -692,13 +687,11 @@ void FH2Server::MsgLoadMaps(QueueMessage & msg, FH2RemoteClient & client)
 	if(Game::STANDARD & conf.GameType())
 	{
 	    // disable connect
-	    // SetModes(ST_FULLHOUSE);
 	    //world.LoadMaps(conf.MapsFile());
 	}
 	else
 	if(Game::BATTLEONLY & conf.GameType())
 	{
-	    // FIXME
 	    //world.NewMaps(10, 10);
 	}
 
