@@ -120,15 +120,6 @@ int String::ToInt(const std::string & str)
     return res;
 }
 
-/* string compare */
-bool String::Compare(const std::string &str1, const std::string &str2, bool sensitive)
-{
-    if(str1.size() != str2.size()) return false;
-    if(sensitive) return str1 == str2;
-
-    return Lower(str1) == Lower(str2);
-}
-
 void String::Replace(std::string & dst, const char* pred, const char* src)
 {
     size_t pos = std::string::npos;
