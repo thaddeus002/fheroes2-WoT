@@ -37,12 +37,12 @@
 u8 Castle::grown_well(2);
 u8 Castle::grown_wel2(8);
 
-Castle::Castle() : captain(*this), mageguild(*this), army(&captain)
+Castle::Castle() : race(Race::BOMG), building(0), captain(*this), color(Color::GRAY), mageguild(*this), army(&captain)
 {
 }
 
-Castle::Castle(s16 cx, s16 cy, const u8 rc) : Position(Point(cx, cy)), race(rc), captain(*this),
-    color(Color::GRAY), building(0), mageguild(*this), army(NULL)
+Castle::Castle(s16 cx, s16 cy, const u8 rc) : Position(Point(cx, cy)), race(rc), building(0), captain(*this),
+    color(Color::GRAY), mageguild(*this), army(NULL)
 {
     std::fill(dwelling, dwelling + CASTLEMAXMONSTER, 0);
     SetModes(ALLOWBUILD);

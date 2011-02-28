@@ -208,11 +208,11 @@ private:
     friend class Game::IO;
 
     u8			race;
+    u32			building;
     Captain		captain;
 
     Color::color_t	color;
     std::string		name;
-    u32			building;
 
     MageGuild		mageguild;
     u16			dwelling[CASTLEMAXMONSTER];
