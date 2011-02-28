@@ -259,9 +259,7 @@ BuildingInfo::BuildingInfo(const Castle & c, building_t b) : castle(c), building
     {
 	description = _("The %{building} produces %{monster}.");
         String::Replace(description, "%{building}", Castle::GetStringBuilding(building, castle.GetRace()));
-        std::string name = Monster(castle.GetRace(), building).GetMultiName();
-        String::Lower(name);
-        String::Replace(description, "%{monster}", name);
+        String::Replace(description, "%{monster}", String::Lower(Monster(castle.GetRace(), building).GetMultiName()));
     }
     else
 	description = Castle::GetDescriptionBuilding(building, castle.GetRace());

@@ -71,9 +71,7 @@ void FileInfoListBox::RedrawItem(const Maps::FileInfo & info, s16 dstx, s16 dsty
     {
 	Text text;
 	const size_t dotpos = savname.size() - 4;
-	std::string ext = savname.substr(dotpos);
-	String::Lower(ext);
-    	if(ext == ".sav") savname.erase(dotpos);
+    	if(String::Lower(savname.substr(dotpos)) == ".sav") savname.erase(dotpos);
 
 	text.Set(savname, (current ? Font::YELLOW_BIG : Font::BIG));
 	text.Blit(dstx + 5, dsty, (Settings::Get().QVGA() ? 190 : 155));

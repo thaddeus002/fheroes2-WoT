@@ -281,8 +281,7 @@ bool Settings::Read(const std::string & filename)
 	entry = config.Find("maps charset");
 	if(entry)
 	{
-	    maps_charset = entry->StrParams();
-	    String::Lower(maps_charset);
+	    maps_charset = String::Lower(entry->StrParams());
 	}
 
 	entry = config.Find("lang");
@@ -427,8 +426,7 @@ bool Settings::Read(const std::string & filename)
 	video_mode.w = 640;
         video_mode.h = 480;
 
-        std::string value(entry->StrParams());
-        String::Lower(value);
+        std::string value = String::Lower(entry->StrParams());
         const size_t pos = value.find('x');
 
         if(std::string::npos != pos)
@@ -473,7 +471,7 @@ bool Settings::Read(const std::string & filename)
     BinaryLoad();
 
     if(video_driver.size())
-	String::Lower(video_driver);
+	video_driver = String::Lower(video_driver);
 
     if(video_mode.w && video_mode.h) PostLoad();
 

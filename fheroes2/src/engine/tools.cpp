@@ -33,7 +33,7 @@
 #include "tools.h"
 
 /* trim left right space */
-void String::Trim(std::string & str)
+std::string String::Trim(std::string str)
 {
     std::string::iterator iter;
 
@@ -46,18 +46,22 @@ void String::Trim(std::string & str)
     iter = str.end() - 1;
     while(iter != str.begin() && std::isspace(*iter)) --iter;
     if(iter != str.end() - 1) str.erase(iter + 1, str.end());
+
+    return str;
 }
 
 /* convert to lower case */
-void String::Lower(std::string & str)
+std::string String::Lower(std::string str)
 {
     std::transform(str.begin(), str.end(), str.begin(), ::tolower);
+    return str;
 }
 
 /* convert to upper case */
-void String::Upper(std::string & str)
+std::string String::Upper(std::string str)
 {
     std::transform(str.begin(), str.end(), str.begin(), ::toupper);
+    return str;
 }
 
 /* int to string */
@@ -90,8 +94,7 @@ int String::ToInt(const std::string & str)
     else
     // str
     {
-        std::string lower(str);
-        String::Lower(lower);
+        std::string lower = String::Lower(str);
 
         if(lower == "on")       return 1;
         else
@@ -123,12 +126,7 @@ bool String::Compare(const std::string &str1, const std::string &str2, bool sens
     if(str1.size() != str2.size()) return false;
     if(sensitive) return str1 == str2;
 
-    std::string strl1(str1);
-    std::string strl2(str2);
-    Lower(strl1);
-    Lower(strl2);
-
-    return str1 == str2;
+    return Lower(str1) == Lower(str2);
 }
 
 void String::Replace(std::string & dst, const char* pred, const char* src)

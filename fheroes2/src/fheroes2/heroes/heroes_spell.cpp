@@ -470,8 +470,7 @@ bool ActionSpellVisions(Heroes & hero)
 	    const u8 reason = Army::GetJoinSolution(hero, tile, join, cost.gold);
 	    std::string hdr, msg;
 
-	    hdr = std::string("%{count} ") + troop.GetPluralName(join);
-	    String::Lower(hdr);
+	    hdr = std::string("%{count} ") + String::Lower(troop.GetPluralName(join));
 	    String::Replace(hdr, "%{count}", join);
 
 	    switch(reason)

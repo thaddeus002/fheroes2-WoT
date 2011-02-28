@@ -300,8 +300,7 @@ Riddle::Riddle(s32 index, const void *ptr) : valid(false)
     // answers
     for(u8 i = 0; i < 8; ++i)
     {
-	std::string str(reinterpret_cast<const char *>(ptr8));
-	String::Lower(str);
+	std::string str = String::Lower(reinterpret_cast<const char *>(ptr8));
 
 	if(count-- && str.size())
 	{

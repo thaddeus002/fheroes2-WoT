@@ -70,10 +70,7 @@ std::string GetCaption(void)
 bool RunEditor(const char* name)
 {
     const char* feditor2 = "feditor2";
-    std::string namelower = GetBasename(name);
-    String::Lower(namelower);
-
-    return 0 == namelower.compare(0, strlen(feditor2), feditor2);
+    return 0 == String::Lower(GetBasename(name)).compare(0, strlen(feditor2), feditor2);
 }
 
 int main(int argc, char **argv)

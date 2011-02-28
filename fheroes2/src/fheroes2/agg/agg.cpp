@@ -257,8 +257,7 @@ bool AGG::Cache::ReadDataDir(void)
     // attach agg files
     for(Dir::const_iterator itd = dir.begin(); itd != dir.end(); ++itd)
     {
-	std::string lower = *itd;
-	String::Lower(lower);
+	std::string lower = String::Lower(*itd);
 	if(std::string::npos != lower.find("heroes2.agg") && !heroes2_agg.isGood()) heroes2_agg.Open(*itd);
 	if(std::string::npos != lower.find("heroes2x.agg") && !heroes2x_agg.isGood()) heroes2x_agg.Open(*itd);
     }
@@ -610,9 +609,8 @@ void AGG::Cache::LoadICN(const ICN::icn_t icn, u16 index, bool reflect)
     if(conf.UseAltResource())
     {
 	Dir dir;
-	std::string name(ICN::GetString(icn));
-	String::Lower(name);
-	const std::string xml_spec(conf.LocalPrefix() + SEPARATOR + "files" + SEPARATOR + "images" + SEPARATOR + name + SEPARATOR + "spec.xml");
+	const std::string xml_spec(conf.LocalPrefix() + SEPARATOR + "files" + SEPARATOR + "images" + SEPARATOR +
+								String::Lower(ICN::GetString(icn)) + SEPARATOR + "spec.xml");
 
 	if(FilePresent(xml_spec) &&
 	    LoadAltICN(v, xml_spec, index, reflect)) skip_origin = true;
@@ -682,8 +680,7 @@ void AGG::Cache::LoadWAV(const M82::m82_t m82)
 
     if(conf.UseAltResource())
     {
-       std::string name(M82::GetString(m82));
-       String::Lower(name);
+       std::string name = String::Lower(M82::GetString(m82));
        // ogg
        String::Replace(name, ".82m", ".ogg");
        std::string sound = conf.LocalPrefix() + SEPARATOR + "files" + SEPARATOR + "sounds" + SEPARATOR + name;

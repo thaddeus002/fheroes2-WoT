@@ -36,8 +36,8 @@ bool SpaceCompare(char a, char b)
 
 void ModifyKey(std::string & key)
 {
-    String::Lower(key);
-    String::Trim(key);
+    key = String::Lower(key);
+    key = String::Trim(key);
 
     // remove multiple space
     std::string::iterator it = std::unique(key.begin(), key.end(), SpaceCompare);
@@ -151,7 +151,7 @@ bool Tiny::Config::Load(const char* cfile)
     std::string str;
     while(std::getline(fs, str))
     {
-	String::Trim(str);
+	str = String::Trim(str);
 	if(str.empty() || str[0] == comment) continue;
 
         size_t pos = str.find(separator);
@@ -160,8 +160,8 @@ bool Tiny::Config::Load(const char* cfile)
             std::string left(str.substr(0, pos));
             std::string right(str.substr(pos + 1, str.length() - pos - 1));
 
-	    String::Trim(left);
-    	    String::Trim(right);
+	    left = String::Trim(left);
+    	    right = String::Trim(right);
 
 	    AddEntry(left.c_str(), right.c_str(), false);
         }

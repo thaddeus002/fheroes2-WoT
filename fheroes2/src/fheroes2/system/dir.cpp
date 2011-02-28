@@ -61,11 +61,7 @@ void Dir::Read(const std::string &path, const std::string &filter, bool sensitiv
     		}
     		else
     		{
-    		    std::string filterlow(filter);
-    		    String::Lower(filterlow);
-    		    String::Lower(filename);
-
-		    if(std::string::npos == filename.find(filterlow)) continue;
+		    if(std::string::npos == String::Lower(filename).find(String::Lower(filter))) continue;
 		}
     	    }
 

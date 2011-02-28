@@ -75,7 +75,7 @@ std::string ShowGuardiansInfo(const Maps::Tiles & tile, u8 scoute)
     str.append("\n");
     str.append(_("guarded by %{count} of %{monster}"));
 
-    String::Replace(str, "%{monster}", troop.GetMultiName());
+    String::Replace(str, "%{monster}", String::Lower(troop.GetMultiName()));
     String::Replace(str, "%{count}", CountScoute(troop.GetCount(), scoute));
 
     return str;
@@ -105,7 +105,7 @@ std::string ShowMonsterInfo(const Maps::Tiles & tile, u8 scoute)
         case Army::ZOUNDS:  str = _("Zounds of\n%{monster}"); break;
         case Army::LEGION:  str = _("A legion of\n%{monster}"); break;
     }
-    String::Replace(str, "%{monster}", troop.GetMultiName());
+    String::Replace(str, "%{monster}", String::Lower(troop.GetMultiName()));
 
     return str;
 }

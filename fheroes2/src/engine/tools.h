@@ -28,9 +28,9 @@
 
 namespace String
 {
-    void Trim(std::string &str);
-    void Lower(std::string &str);
-    void Upper(std::string &str);
+    std::string Trim(std::string);
+    std::string Lower(std::string);
+    std::string Upper(std::string);
     void AddInt(std::string &str, int value);
     int  ToInt(const std::string &str);
     bool Compare(const std::string &str1, const std::string &str2, bool sensitive = true);

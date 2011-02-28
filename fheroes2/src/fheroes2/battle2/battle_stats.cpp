@@ -177,8 +177,7 @@ void Battle2::UpdateMonsterInfoAnimation(const std::string & spec)
         const TiXmlElement* xml_icn = xml_animation->FirstChildElement("icn");
         for(; xml_icn; xml_icn = xml_icn->NextSiblingElement("icn"))
 	{
-	    std::string icn_name(xml_icn->Attribute("name"));
-	    String::Upper(icn_name);
+	    std::string icn_name = String::Upper(xml_icn->Attribute("name"));
 	    // find icn name
 	    ICN::icn_t icn = ICN::FromString(icn_name.c_str());
 	    if(icn == ICN::UNKNOWN) continue;

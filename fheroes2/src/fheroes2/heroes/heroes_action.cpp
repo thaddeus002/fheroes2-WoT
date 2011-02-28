@@ -551,9 +551,7 @@ void ActionToMonster(Heroes &hero, const u8 obj, const s32 dst_index)
 	DEBUG(DBG_GAME, DBG_INFO, hero.GetName() << " join monster " << troop.GetName());
 
         std::string message = _("A group of %{monster} with a desire for greater glory wish to join you.\nDo you accept?");
-        std::string monst = troop.GetMultiName();
-        String::Lower(monst);
-        String::Replace(message, "%{monster}", monst);
+        String::Replace(message, "%{monster}", String::Lower(troop.GetMultiName()));
 
         if(Dialog::Message("Followers", message, Font::BIG, Dialog::YES | Dialog::NO) == Dialog::YES)
             hero.GetArmy().JoinTroop(troop);
@@ -581,9 +579,7 @@ void ActionToMonster(Heroes &hero, const u8 obj, const s32 dst_index)
 
         String::Replace(message, "%{offer}", join);
         String::Replace(message, "%{total}", troop.GetCount());
-        std::string monst = troop.GetPluralName(join);
-        String::Lower(monst);
-        String::Replace(message, "%{monster}", monst);
+        String::Replace(message, "%{monster}", String::Lower(troop.GetPluralName(join)));
         String::Replace(message, "%{gold}", cost.gold);
 
         if(Dialog::YES == Dialog::ResourceInfo("", message, cost, Dialog::YES | Dialog::NO))
@@ -604,9 +600,7 @@ void ActionToMonster(Heroes &hero, const u8 obj, const s32 dst_index)
     if(3 == reason)
     {
 	std::string message = _("The %{monster}, awed by the power of your forces, begin to scatter.\nDo you wish to pursue and engage them?");
-    	std::string monst = troop.GetMultiName();
-    	String::Lower(monst);
-    	String::Replace(message, "%{monster}", monst);
+    	String::Replace(message, "%{monster}", String::Lower(troop.GetMultiName()));
 
     	if(Dialog::Message("", message, Font::BIG, Dialog::YES | Dialog::NO) == Dialog::NO)
     	    destroy = true;
