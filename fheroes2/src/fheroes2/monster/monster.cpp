@@ -143,7 +143,12 @@ namespace
 	{     0,   0,   0,   0,   0,  Speed::VERYSLOW,   0,     0, "Random Monster 4", "Random Monsters 4", { 0, 0, 0, 0, 0, 0, 0} },
     };
 
-    double upgrade_ratio = 0;
+    double upgrade_ratio = 1.0;
+}
+
+double Monster::GetUpgradeRatio(void)
+{
+    return upgrade_ratio;
 }
 
 void Monster::SetUpgradeRatio(double rate)

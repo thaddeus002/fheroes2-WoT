@@ -33,6 +33,7 @@ namespace String
     std::string Upper(std::string);
     void AddInt(std::string &str, int value);
     int  ToInt(const std::string &str);
+    std::string Double(double, u8);
 
     void Replace(std::string &, const char*, const char *);
     void Replace(std::string &, const char*, const std::string &);

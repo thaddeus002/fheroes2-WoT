@@ -24,6 +24,7 @@
 #include <sstream>
 #include <fstream>
 #include <iostream>
+#include <iomanip>
 #include <cstring>
 #include <locale>
 #include <climits>
@@ -142,6 +143,13 @@ void String::Replace(std::string & dst, const char* pred, int value)
 	stream << value;
 	Replace(dst, pred, stream.str());
     }
+}
+
+std::string String::Double(double value, u8 prec)
+{
+    std::ostringstream stream;
+    stream << std::setprecision(prec) << value;
+    return stream.str();
 }
 
 // from SDL_ttf

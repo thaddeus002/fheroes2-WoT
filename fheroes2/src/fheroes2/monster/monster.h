@@ -177,6 +177,7 @@ public:
 
     static void UpdateStats(const std::string &);
     static void SetUpgradeRatio(double rate);
+    static double GetUpgradeRatio(void);
 
 protected:
     static Monster FromDwelling(u8 race, u32 dw);

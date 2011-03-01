@@ -158,8 +158,11 @@ Dialog::answer_t Dialog::ArmyInfo(const Army::Troop & troop, u16 flags)
             // upgrade
             if(buttonUpgrade.isEnable() && le.MouseClickLeft(buttonUpgrade))
             {
-        	if(Dialog::YES == Dialog::ResourceInfo("", _("Your troops can be upgraded, but it will cost you dearly. Do you wish to upgrade them?"),
-									troop.GetUpgradeCost(), Dialog::YES|Dialog::NO))
+		std::string msg = 1.0f != Monster::GetUpgradeRatio() ?
+		    _("Your troops can be upgraded, but it will cost you %{ratio} times the difference in cost for each troop, rounded up to next highest number. Do you wish to upgrade them?") :
+		    _("Your troops can be upgraded, but it will cost you dearly. Do you wish to upgrade them?");
+		String::Replace(msg, "%{ratio}", String::Double(Monster::GetUpgradeRatio(), 2));
+        	if(Dialog::YES == Dialog::ResourceInfo("", msg,	troop.GetUpgradeCost(), Dialog::YES|Dialog::NO))
 		{
 		    result = Dialog::UPGRADE;
         	    break;
