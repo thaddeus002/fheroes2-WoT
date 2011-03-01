@@ -889,7 +889,9 @@ void Army::army_t::UpgradeTroops(const Castle & castle)
 void Army::army_t::Dump(const char* prefix) const
 {
     if(prefix)
+    {
 	VERBOSN(prefix);
+    }
     else
     {
 	VERBOSN("Army::Dump: " <<

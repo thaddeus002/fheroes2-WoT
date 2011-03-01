@@ -26,6 +26,10 @@
 #include "settings.h"
 #include "pocketpc.h"
 
+#ifdef ANDROID
+#include <SDL/SDL_screenkeyboard.h>
+#endif
+
 u16 PocketPC::GetCursorAttackDialog(const Point & dst, u8 allow)
 {
     Display & display = Display::Get();
@@ -118,6 +122,14 @@ void DrawWideCell(const Rect & dst)
 
 void PocketPC::KeyboardDialog(std::string & str)
 {
+#ifdef ANDROID
+	char inputbuf[256];
+	strncpy(inputbuf, str.c_str(), sizeof(inputbuf));
+	inputbuf[sizeof(inputbuf) - 1] = 0;
+	SDL_ANDROID_GetScreenKeyboardTextInput(inputbuf, sizeof(inputbuf));
+	str = inputbuf;
+	return;
+#endif
     Cursor & cursor = Cursor::Get();
     Display & display = Display::Get();
     LocalEvent & le = LocalEvent::Get();

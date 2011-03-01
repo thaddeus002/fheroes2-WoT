@@ -23,8 +23,8 @@
 #ifndef H2PAIRS_H
 #define H2PAIRS_H
 
-#include <utility>
 #include <list>
+#include <utility>
 #include "maps_tiles.h"
 
 class IndexDistance : public std::pair<s32, u16>
