@@ -23,7 +23,7 @@
 #include "icn.h"
 #include "objdirt.h"
 
-bool ObjDirt::isPassable(const u16 icn, const u8 index, const Direction::vector_t direct)
+bool ObjDirt::isPassable(u16 icn, u8 index, u16 direct)
 {
     switch(icn)
     {

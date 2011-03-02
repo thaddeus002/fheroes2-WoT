@@ -27,25 +27,22 @@
 #include "direction.h"
 #include "gamedefs.h"
 
-namespace Maps { class TilesAddon; }
-
 namespace Mines
 {
-	bool		isPassable(u8 index, u8 center, Direction::vector_t);
+	bool		isPassable(u8 index, u8 center, u16);
 }
 
 class Object
 {
     public:
-	Object(const MP2::object_t obj = MP2::OBJ_ZERO, const u16 sicn = ICN::UNKNOWN, const u32 uid = 0);
+	Object(MP2::object_t obj = MP2::OBJ_ZERO, u16 sicn = ICN::UNKNOWN, u32 uid = 0);
 	~Object();
 
-	static bool		isPassable(const std::list<Maps::TilesAddon> & bottoms, Direction::vector_t, const s32 maps_index);
-	static bool		AllowDirect(const u8 general, const u16 direct);
+	static bool		AllowDirect(u8 general, u16 direct);
 
-	const MP2::object_t	object;
-	const u16		icn;
-	const u32		id;
+	MP2::object_t	object;
+	u16		icn;
+	u32		id;
 
     private:
 };

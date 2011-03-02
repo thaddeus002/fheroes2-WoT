@@ -23,7 +23,7 @@
 #include "settings.h"
 #include "mounts.h"
 
-Mounts::Mounts(const ICN::icn_t icn) : Object(MP2::OBJ_MOUNTS, icn)
+Mounts::Mounts(ICN::icn_t icn) : Object(MP2::OBJ_MOUNTS, icn)
 {
     switch(icn)
     {
@@ -40,7 +40,7 @@ Mounts::Mounts(const ICN::icn_t icn) : Object(MP2::OBJ_MOUNTS, icn)
     }
 }
 
-bool Mounts::isPassable(const u16 icn, const u8 index, const Direction::vector_t direct)
+bool Mounts::isPassable(u16 icn, u8 index, u16 direct)
 {
     // bug fix
     switch(icn)

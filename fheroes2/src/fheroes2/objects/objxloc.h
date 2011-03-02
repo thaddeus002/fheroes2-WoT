@@ -29,7 +29,7 @@ namespace Maps { class TilesAddon; }
 
 namespace ObjLoyalty
 {
-    bool	isPassable(const u16 icn, const u8 index, const Direction::vector_t = Direction::UNKNOWN);
+    bool	isPassable(u16 icn, u8 index, u16 = Direction::UNKNOWN);
     u8		LearnObject(const Maps::TilesAddon & addon);
 }
 

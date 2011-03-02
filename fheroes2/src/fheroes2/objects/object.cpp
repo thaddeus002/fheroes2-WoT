@@ -21,7 +21,6 @@
  ***************************************************************************/
 
 #include "world.h"
-#include "maps_tiles.h"
 #include "mounts.h"
 #include "trees.h"
 #include "objxloc.h"
@@ -35,10 +34,9 @@
 #include "objswmp.h"
 #include "objgras.h"
 #include "objcrck.h"
-#include "direction.h"
 #include "object.h"
 
-bool Mines::isPassable(u8 index, u8 center, Direction::vector_t direct)
+bool Mines::isPassable(u8 index, u8 center, u16 direct)
 {
     if(index == center - 1 || index == center)
         return (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
@@ -49,7 +47,7 @@ bool Mines::isPassable(u8 index, u8 center, Direction::vector_t direct)
     return false;
 }
 
-Object::Object(const MP2::object_t obj, const u16 sicn, const u32 uid)
+Object::Object(MP2::object_t obj, u16 sicn, u32 uid)
     : object(obj), icn(sicn), id(uid ? uid : World::GetUniq())
 {
 }
@@ -58,80 +56,7 @@ Object::~Object()
 {
 }
 
-bool Object::isPassable(const std::list<Maps::TilesAddon> & bottoms, Direction::vector_t direct, const s32 maps_index)
-{
-    if(bottoms.size())
-    {
-        std::list<Maps::TilesAddon>::const_iterator it1 = bottoms.begin();
-        std::list<Maps::TilesAddon>::const_iterator it2 = bottoms.end();
-
-        for(; it1 != it2; ++it1)
-        {
-            const Maps::TilesAddon & addon = *it1;
-	    const ICN::icn_t icn = MP2::GetICNObject(addon.object);
-
-            switch(icn)
-            {
-		case ICN::MTNCRCK:
-		case ICN::MTNSNOW:
-		case ICN::MTNSWMP:
-	    	case ICN::MTNLAVA:
-	    	case ICN::MTNDSRT:
-	    	case ICN::MTNDIRT:
-	    	case ICN::MTNMULT:
-	    	case ICN::MTNGRAS:	if(! Mounts::isPassable(icn, addon.index, direct)) return false; break;
-
-		case ICN::TREJNGL:
-		case ICN::TREEVIL:
-		case ICN::TRESNOW:
-		case ICN::TREFIR:
-		case ICN::TREFALL:
-		case ICN::TREDECI:	if(! Trees::isPassable(icn, addon.index, direct)) return false; break;
-
-		case ICN::OBJNSNOW:	if(! ObjSnow::isPassable(icn, addon.index, direct)) return false; break;
-		case ICN::OBJNSWMP:	if(! ObjSwamp::isPassable(icn, addon.index, direct)) return false; break;
-		case ICN::OBJNGRAS:
-		case ICN::OBJNGRA2:	if(! ObjGrass::isPassable(icn, addon.index, direct)) return false; break;
-		case ICN::OBJNCRCK:	if(! ObjWasteLand::isPassable(icn, addon.index, direct)) return false; break;
-		case ICN::OBJNDIRT:	if(! ObjDirt::isPassable(icn, addon.index, direct)) return false; break;
-		case ICN::OBJNDSRT:	if(! ObjDesert::isPassable(icn, addon.index, direct)) return false; break;
-		case ICN::OBJNMUL2:
-		case ICN::OBJNMULT:	if(! ObjMulti::isPassable(icn, addon.index, direct)) return false; break;
-		case ICN::OBJNLAVA:
-		case ICN::OBJNLAV3:
-		case ICN::OBJNLAV2:	if(! ObjLava::isPassable(icn, addon.index, direct)) return false; break;
-		case ICN::OBJNWAT2:
-		case ICN::OBJNWATR:	if(! ObjWater::isPassable(icn, addon.index, direct)) return false; break;
-
-		case ICN::MONS32:
-		case ICN::MINIMON:	return false;
-
-		case ICN::OBJNARTI:
-		case ICN::OBJNRSRC:	if(addon.index % 2) return false; break;
-
-		case ICN::OBJNTWBA:
-		case ICN::OBJNTOWN:	if(! ObjTown::isPassable(icn, addon.index, direct, maps_index)) return false; break;
-
-		case ICN::X_LOC1:
-		case ICN::X_LOC2:
-		case ICN::X_LOC3:	if(! ObjLoyalty::isPassable(icn, addon.index, direct)) return false; break;
-
-		// MANUAL.ICN
-		case ICN::TREASURE:
-		case ICN::TELEPORT1:
-	        case ICN::TELEPORT2:
-		case ICN::TELEPORT3:
-		case ICN::FOUNTAIN:	return false; break;
-
-		default: break;
-	    }
-        }
-    }
-
-    return true;
-}
-
-bool Object::AllowDirect(const u8 general, const u16 direct)
+bool Object::AllowDirect(u8 general, u16 direct)
 {
     switch(general)
     {

@@ -30,9 +30,9 @@
 class Trees : public Object
 {
     public:
-	Trees(const ICN::icn_t icn);
+	Trees(ICN::icn_t icn);
 
-	static bool	isPassable(const u16 icn, const u8 index, const Direction::vector_t = Direction::UNKNOWN);
+	static bool	isPassable(u16 icn, u8 index, u16 = Direction::UNKNOWN);
 
     private:
 };

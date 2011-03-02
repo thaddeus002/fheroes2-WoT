@@ -27,7 +27,7 @@
 
 namespace ObjWasteLand
 {
-    bool	isPassable(const u16 icn, const u8 index, const Direction::vector_t = Direction::UNKNOWN);
+    bool	isPassable(u16 icn, u8 index, u16 = Direction::UNKNOWN);
 }
 
 #endif

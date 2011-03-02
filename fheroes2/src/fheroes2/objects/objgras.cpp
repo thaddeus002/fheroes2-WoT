@@ -24,7 +24,7 @@
 #include "objgras.h"
 #include <iostream>
 
-bool ObjGrass::isPassable(const u16 icn, const u8 index, const Direction::vector_t direct)
+bool ObjGrass::isPassable(u16 icn, u8 index, u16 direct)
 {
     switch(icn)
     {

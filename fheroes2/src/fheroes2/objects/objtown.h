@@ -27,7 +27,7 @@
 
 namespace ObjTown
 {
-    bool	isPassable(const u16 icn, const u8 index, const Direction::vector_t, const s32 maps_index);
+    bool	isPassable(u16 icn, u8 index, u16, s32 maps_index);
 }
 
 #endif

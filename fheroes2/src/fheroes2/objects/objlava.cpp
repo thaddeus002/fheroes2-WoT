@@ -23,7 +23,7 @@
 #include "icn.h"
 #include "objlava.h"
 
-bool ObjLava::isPassable(const u16 icn, const u8 index, const Direction::vector_t direct)
+bool ObjLava::isPassable(u16 icn, u8 index, u16 direct)
 {
     switch(icn)
     {

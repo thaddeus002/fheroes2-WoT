@@ -23,7 +23,7 @@
 #include "settings.h"
 #include "trees.h"
 
-Trees::Trees(const ICN::icn_t icn) : Object(MP2::OBJ_TREES, icn)
+Trees::Trees(ICN::icn_t icn) : Object(MP2::OBJ_TREES, icn)
 {
     switch(icn)
     {
@@ -38,7 +38,7 @@ Trees::Trees(const ICN::icn_t icn) : Object(MP2::OBJ_TREES, icn)
     }
 }
 
-bool Trees::isPassable(const u16 icn, const u8 index, const Direction::vector_t direct)
+bool Trees::isPassable(u16 icn, u8 index, u16 direct)
 {
     switch(icn)
     {
