@@ -1,7 +1,35 @@
-SVN - up to r2268
+SVN - up to r2310
+
+Mar, 2, 2011
+
++ Update: remove old save formats: 2100, 2154, 2178, 2213, 2248
++ Update: android: latest changes
++ Update: army upgrade message
++ Update: stats files (stevenaus ver. 02)
++ Fixed: gameover: wins side
++ Fixed: setlocale (win32 ver.)
++ Update: visiting info, and depend. scoute skills
++ Fixed: set start focus to first hero
++ Added: heroes: add move points info
++ Fixed: spells.xml: increase move point limit
++ Fixed: artifact: level for Heart of Ice and Fire
++ Fixed: game: army bar redraw
++ fixed: double wins dialog popup
++ Fixed: game: show artifact sprite
++ Fixed  castle: build req. indicator
++ Fixed: battle: close spell book
++ Fixed: castle: mageguild coordinate
++ Added: global.xml: monster upgrade ratio param
++ Fixed: Dialog::ArmyInfo buttons
++ Fixed: battle: morale cond. override
++ Fixed: save dialog "saved successfully"
++ Fixed: heroes: Shrine visit
++ Fixed: battle: spell store for eye eagle skill
++ Fixed: ai: hide move
++ Fixed: game: transcribe scroll - add check wisdom
 
 Feb, 16, 2011
-
++ Added: spells.xml: move point use for spell cast
 + Added: game: transcribe scroll option
 + Fixed: game: load old format game
 + Fixed: game: hotseat select players
