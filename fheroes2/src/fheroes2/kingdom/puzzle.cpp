@@ -44,7 +44,7 @@ void ShowStandardDialog(const Puzzle &, const Surface &);
 void ShowExtendedDialog(const Puzzle &, const Surface &);
 void PuzzlesDraw(const Puzzle &, const Surface &, s16, s16);
 
-Puzzle::Puzzle() : was_saved(true)
+Puzzle::Puzzle()
 {
     std::copy(zone1_index, zone1_index + sizeof(zone1_index), zone1_order);
     std::copy(zone2_index, zone2_index + sizeof(zone2_index), zone2_order);
@@ -74,8 +74,6 @@ void Puzzle::Update(u8 open_obelisk, u8 total_obelisk)
     u8 open_puzzle = open_obelisk * PUZZLETILES / total_obelisk;
     u8 need_puzzle = open_puzzle > count() ? open_puzzle - count() : 0;
 
-    if(was_saved)
-    {
 	if(need_puzzle && ClosedTilesExists(*this, zone1_order, zone1_order + sizeof(zone1_order)))
 	    ZoneOpenFirstTiles(*this, need_puzzle, zone1_order, zone1_order + sizeof(zone1_order));
 
@@ -87,21 +85,6 @@ void Puzzle::Update(u8 open_obelisk, u8 total_obelisk)
 
 	if(need_puzzle && ClosedTilesExists(*this, zone4_order, zone4_order + sizeof(zone4_order)))
 	    ZoneOpenFirstTiles(*this, need_puzzle, zone4_order, zone4_order + sizeof(zone4_order));
-    }
-    else
-    {
-	if(need_puzzle && ClosedTilesExists(*this, zone1_index, zone1_index + sizeof(zone1_index)))
-	    ZoneOpenRandomTiles(*this, need_puzzle, zone1_index, zone1_index + sizeof(zone1_index));
-
-	if(need_puzzle && ClosedTilesExists(*this, zone2_index, zone2_index + sizeof(zone2_index)))
-	    ZoneOpenRandomTiles(*this, need_puzzle, zone2_index, zone2_index + sizeof(zone2_index));
-
-	if(need_puzzle && ClosedTilesExists(*this, zone3_index, zone3_index + sizeof(zone3_index)))
-	    ZoneOpenRandomTiles(*this, need_puzzle, zone3_index, zone3_index + sizeof(zone3_index));
-
-	if(need_puzzle && ClosedTilesExists(*this, zone4_index, zone4_index + sizeof(zone4_index)))
-	    ZoneOpenRandomTiles(*this, need_puzzle, zone4_index, zone4_index + sizeof(zone4_index));
-    }
 }
 
 void Puzzle::ShowMapsDialog(void) const

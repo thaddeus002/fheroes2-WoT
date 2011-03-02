@@ -41,9 +41,6 @@ public:
     u8 zone2_order[16];
     u8 zone3_order[4];
     u8 zone4_order[4];
-
-    // compat save flag
-    bool was_saved;
 };
 
 #endif

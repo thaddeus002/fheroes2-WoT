@@ -1036,24 +1036,15 @@ void Game::IO::UnpackKingdom(QueueMessage & msg, Kingdom & kingdom, u16 check_ve
     pzl = str.c_str();
 
     // puzzle orders
-    if(check_version < FORMAT_VERSION_2100)
-    {
-	pzl.was_saved = false;
-    }
-    else
-    {
-	u32 size;
-	msg.Pop(size);
-	for(u32 ii = 0; ii < size; ++ii) msg.Pop(pzl.zone1_order[ii]);
-	msg.Pop(size);
-	for(u32 ii = 0; ii < size; ++ii) msg.Pop(pzl.zone2_order[ii]);
-	msg.Pop(size);
-	for(u32 ii = 0; ii < size; ++ii) msg.Pop(pzl.zone3_order[ii]);
-	msg.Pop(size);
-	for(u32 ii = 0; ii < size; ++ii) msg.Pop(pzl.zone4_order[ii]);
-
-	pzl.was_saved = true;
-    }
+    u32 size;
+    msg.Pop(size);
+    for(u32 ii = 0; ii < size; ++ii) msg.Pop(pzl.zone1_order[ii]);
+    msg.Pop(size);
+    for(u32 ii = 0; ii < size; ++ii) msg.Pop(pzl.zone2_order[ii]);
+    msg.Pop(size);
+    for(u32 ii = 0; ii < size; ++ii) msg.Pop(pzl.zone3_order[ii]);
+    msg.Pop(size);
+    for(u32 ii = 0; ii < size; ++ii) msg.Pop(pzl.zone4_order[ii]);
 
     // visited tents
     msg.Pop(kingdom.visited_tents_colors);
@@ -1108,8 +1099,7 @@ void Game::IO::UnpackCastle(QueueMessage & msg, Castle & castle, u16 check_versi
     for(u32 jj = 0; jj < CASTLEMAXMONSTER; ++jj) msg.Pop(castle.dwelling[jj]);
 
     // captain
-    if(FORMAT_VERSION_2213 <= check_version)
-	UnpackHeroBase(msg, castle.captain, check_version);
+    UnpackHeroBase(msg, castle.captain, check_version);
 }
 
 void Game::IO::UnpackHeroBase(QueueMessage & msg, HeroBase & hero, u16 check_version)
@@ -1140,10 +1130,6 @@ void Game::IO::UnpackHeroBase(QueueMessage & msg, HeroBase & hero, u16 check_ver
 
     // spell book
     hero.spell_book.clear();
-    if(check_version < FORMAT_VERSION_2248)
-    {
-	msg.Pop(byte8); // spellbook active DEPRECATED
-    }
 
     msg.Pop(byte32);
     hero.spell_book.reserve(byte32);
@@ -1188,138 +1174,50 @@ void Game::IO::UnpackHeroes(QueueMessage & msg, Heroes & hero, u16 check_version
     //u16 byte16;
     u32 byte32;
 
-    if(FORMAT_VERSION_2213 <= check_version)
+    UnpackHeroBase(msg, hero, check_version);
+
+    // hid
+    msg.Pop(byte8); hero.hid = Heroes::ConvertID(byte8);
+    msg.Pop(byte8); hero.portrait = Heroes::ConvertID(byte8);
+    // race
+    msg.Pop(hero.race);
+
+    msg.Pop(byte8); hero.color = Color::Get(byte8);
+    msg.Pop(hero.name);
+
+    msg.Pop(hero.experience);
+    if(FORMAT_VERSION_2268 > check_version)
     {
-	UnpackHeroBase(msg, hero, check_version);
+	msg.Pop(hero.move_point);
+    }
+    msg.Pop(hero.direction);
+    msg.Pop(hero.sprite_index);
+    msg.Pop(byte8); hero.save_maps_object = static_cast<MP2::object_t>(byte8);
 
-	// hid
-	msg.Pop(byte8); hero.hid = Heroes::ConvertID(byte8);
-	msg.Pop(byte8); hero.portrait = Heroes::ConvertID(byte8);
-	// race
-	msg.Pop(hero.race);
+    msg.Pop(hero.patrol_center.x);
+    msg.Pop(hero.patrol_center.y);
+    msg.Pop(hero.patrol_square);
 
-	msg.Pop(byte8); hero.color = Color::Get(byte8);
-        msg.Pop(hero.name);
-
-	msg.Pop(hero.experience);
-	if(FORMAT_VERSION_2268 > check_version)
-	{
-	    msg.Pop(hero.move_point);
-	}
-	msg.Pop(hero.direction);
-	msg.Pop(hero.sprite_index);
-	msg.Pop(byte8); hero.save_maps_object = static_cast<MP2::object_t>(byte8);
-
-	msg.Pop(hero.patrol_center.x);
-	msg.Pop(hero.patrol_center.y);
-	msg.Pop(hero.patrol_square);
-
-	// sec skills
-	hero.secondary_skills.clear();
-	hero.secondary_skills.reserve(HEROESMAXSKILL);
-	msg.Pop(byte32);
-	for(u32 jj = 0; jj < byte32; ++jj)
-	{
+    // sec skills
+    hero.secondary_skills.clear();
+    hero.secondary_skills.reserve(HEROESMAXSKILL);
+    msg.Pop(byte32);
+    for(u32 jj = 0; jj < byte32; ++jj)
+    {
 	    Skill::Secondary skill;
 	    msg.Pop(byte8); skill.SetSkill(Skill::Secondary::Skill(byte8));
 	    msg.Pop(byte8); skill.SetLevel(byte8);
 	    hero.secondary_skills.push_back(skill);
-	}
-
-	// armies
-	msg.Pop(byte32);
-	for(u32 jj = 0; jj < hero.army.Size(); ++jj)
-	{
-	    msg.Pop(byte8);
-	    hero.army.At(jj).SetMonster(Monster(byte8));
-    	    msg.Pop(byte32);
-	    hero.army.At(jj).SetCount(byte32);
-	}
     }
-    else
+
+    // armies
+    msg.Pop(byte32);
+    for(u32 jj = 0; jj < hero.army.Size(); ++jj)
     {
-	if(FORMAT_VERSION_2154 <= check_version)
-	{
-	    msg.Pop(byte8); hero.hid = Heroes::ConvertID(byte8);
-	    msg.Pop(byte8); hero.portrait = Heroes::ConvertID(byte8);
-	}
-	else
-	{
-	    msg.Pop(byte8); hero.portrait = Heroes::ConvertID(byte8);
-	    hero.hid = hero.portrait;
-	}
-	msg.Pop(hero.race);
-
-	msg.Pop(hero.modes);
-	msg.Pop(byte8); hero.color = Color::Get(byte8);
-	msg.Pop(hero.name);
-	msg.Pop(hero.attack);
-	msg.Pop(hero.defense);
-	msg.Pop(hero.knowledge);
-	msg.Pop(hero.power);
-	msg.Pop(hero.experience);
-	msg.Pop(hero.magic_point);
-	msg.Pop(hero.move_point);
-	msg.Pop(hero.direction);
-	msg.Pop(hero.sprite_index);
-	msg.Pop(byte8); hero.save_maps_object = static_cast<MP2::object_t>(byte8);
-	msg.Pop(hero.center.x);
-	msg.Pop(hero.center.y);
-	if(FORMAT_VERSION_2178 <= check_version)
-	{
-	    msg.Pop(hero.patrol_center.x);
-	    msg.Pop(hero.patrol_center.y);
-	    msg.Pop(hero.patrol_square);
-	}
-
-	// sec skills
-	hero.secondary_skills.clear();
-	hero.secondary_skills.reserve(HEROESMAXSKILL);
-	msg.Pop(byte32);
-	for(u32 jj = 0; jj < byte32; ++jj)
-	{
-    	    Skill::Secondary skill;
-	    msg.Pop(byte8); skill.SetSkill(Skill::Secondary::Skill(byte8));
-	    msg.Pop(byte8); skill.SetLevel(byte8);
-	    hero.secondary_skills.push_back(skill);
-	}
-
-	// artifacts
-	std::fill(hero.bag_artifacts.begin(), hero.bag_artifacts.end(), Artifact(Artifact::UNKNOWN));
-	msg.Pop(byte32);
-	for(u32 jj = 0; jj < hero.bag_artifacts.size(); ++jj)
-	{
-	    msg.Pop(byte8);
-	    hero.bag_artifacts[jj].id = byte8;
-
-	    msg.Pop(byte8);
-	    hero.bag_artifacts[jj].ext = byte8;
-	}
-
-	// armies
-	msg.Pop(byte32);
-	for(u32 jj = 0; jj < hero.army.Size(); ++jj)
-	{
 	    msg.Pop(byte8);
 	    hero.army.At(jj).SetMonster(Monster(byte8));
     	    msg.Pop(byte32);
 	    hero.army.At(jj).SetCount(byte32);
-	}
-
-	// spell book
-	hero.spell_book.clear();
-	if(check_version < FORMAT_VERSION_2248)
-	{
-	    msg.Pop(byte8); // spellbook active DEPRECATED
-	}
-
-	msg.Pop(byte32);
-	hero.spell_book.reserve(byte32);
-	for(u32 jj = 0; jj < byte32; ++jj)
-	{
-	    msg.Pop(byte8);
-	    hero.spell_book.push_back(Spell(byte8));
-	}
     }
 
     // visit objects
