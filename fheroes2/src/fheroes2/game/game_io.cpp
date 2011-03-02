@@ -411,27 +411,21 @@ void Game::IO::PackTile(QueueMessage & msg, const Maps::Tiles & tile)
     msg.Push(tile.quantity7);
 
     // addons 1
-    msg.Push(static_cast<u8>(tile.addons_level1.size()));
-    for(std::list<Maps::TilesAddon>::const_iterator
-	it = tile.addons_level1.begin(); it != tile.addons_level1.end(); ++it)
-    {
-	const Maps::TilesAddon & addon = *it;
-	msg.Push(addon.level);
-	msg.Push(addon.uniq);
-	msg.Push(addon.object);
-	msg.Push(addon.index);
-    }
-
+    PackTileAddons(msg, tile.addons_level1);
     // addons 2
-    msg.Push(static_cast<u8>(tile.addons_level2.size()));
-    for(std::list<Maps::TilesAddon>::const_iterator
-	it = tile.addons_level2.begin(); it != tile.addons_level2.end(); ++it)
+    PackTileAddons(msg, tile.addons_level2);
+}
+
+void Game::IO::PackTileAddons(QueueMessage & msg, const Maps::Addons & addons)
+{
+    msg.Push(static_cast<u8>(addons.size()));
+    for(Maps::Addons::const_iterator
+	it = addons.begin(); it != addons.end(); ++it)
     {
-	const Maps::TilesAddon & addon = *it;
-	msg.Push(addon.level);
-	msg.Push(addon.uniq);
-	msg.Push(addon.object);
-	msg.Push(addon.index);
+	msg.Push((*it).level);
+	msg.Push((*it).uniq);
+	msg.Push((*it).object);
+	msg.Push((*it).index);
     }
 }
 
@@ -971,30 +965,15 @@ void Game::IO::UnpackTile(QueueMessage & msg, Maps::Tiles & tile, u16 check_vers
 #endif
 
     // addons 1
-    u8 size;
-    tile.addons_level1.clear();
-    msg.Pop(size);
-    for(u8 ii = 0; ii < size; ++ii)
-    {
-	Maps::TilesAddon addon;
-	msg.Pop(addon.level);
-	msg.Pop(addon.uniq);
-	msg.Pop(addon.object);
-	msg.Pop(addon.index);
-	tile.addons_level1.push_back(addon);
-
-	// fix bug: #3113888 (empty treasure chest) - unknown case?
-	if(ICN::TREASURE == MP2::GetICNObject(addon.object) &&
-	    0 == addon.index &&
-	    MP2::OBJ_TREASURECHEST != tile.mp2_object)
-	{
-	    VERBOSE("Game::IO::UnpackTile: " << "fix bug: #3113888 (empty treasure chest)");
-	    tile.mp2_object = MP2::OBJ_TREASURECHEST;
-	}
-    }
-
+    UnpackTileAddons(msg, tile.addons_level1, check_version);
     // addons 2
-    tile.addons_level2.clear();
+    UnpackTileAddons(msg, tile.addons_level2, check_version);
+}
+
+void Game::IO::UnpackTileAddons(QueueMessage & msg, Maps::Addons & addons, u16 check_version)
+{
+    addons.clear();
+    u8 size;
     msg.Pop(size);
     for(u8 ii = 0; ii < size; ++ii)
     {
@@ -1003,7 +982,7 @@ void Game::IO::UnpackTile(QueueMessage & msg, Maps::Tiles & tile, u16 check_vers
 	msg.Pop(addon.uniq);
 	msg.Pop(addon.object);
 	msg.Pop(addon.index);
-	tile.addons_level2.push_back(addon);
+	addons.push_back(addon);
     }
 }
 

@@ -36,9 +36,8 @@ class Heroes;
 
 namespace Maps
 {
-    class TilesAddon
+    struct TilesAddon
     {
-    public:
 	enum level_t { GROUND = 0, DOWN = 1, SHADOW = 2, UPPER = 3 };
 
 	TilesAddon();
@@ -46,9 +45,17 @@ namespace Maps
 
 	TilesAddon & operator= (const TilesAddon & ta);
 
+	bool isUniq(u32) const;
+	bool isRoad(u16) const;
+	bool isICN(u16) const;
+
+	void UpdateAbandoneMineLeftSprite(u8 resource);
+	void UpdateAbandoneMineRightSprite(void);
+        void UpdateFountainSprite(void);
+	void UpdateTreasureChestSprite(void);
+
 	void DebugInfo(int level) const;
 
-	static u16 isRoad(const TilesAddon &);
 	static bool isStream(const TilesAddon &);
 
 	static bool isResource(const TilesAddon &);
@@ -77,6 +84,9 @@ namespace Maps
 	static bool isRandomCastle(const TilesAddon &);
 	static bool isRandomMonster(const TilesAddon &);
 	static bool isFlag32(const TilesAddon &);
+	static bool isX_LOC123(const TilesAddon &);
+	static bool isAbandoneMineSprite(const TilesAddon &);
+	static bool isPassable(const TilesAddon &, u16 direct, s32 maps_index);
 
 	static bool PredicateSortRules1(const TilesAddon & ta1, const TilesAddon & ta2);
 	static bool PredicateSortRules2(const TilesAddon & ta1, const TilesAddon & ta2);
@@ -85,6 +95,11 @@ namespace Maps
         u32	uniq;
         u8	object;
         u8	index;
+    };
+
+    struct Addons : public std::list<TilesAddon>
+    {
+	void Remove(u32 uniq);
     };
 
     class Tiles
@@ -103,7 +118,7 @@ namespace Maps
 	const Surface & GetTileSurface(void) const;
 
 	bool isPassable(const Heroes*, Direction::vector_t, bool skipfog) const;
-	bool isRoad(const Direction::vector_t & direct = Direction::CENTER) const;
+	bool isRoad(u16 = DIRECTION_ALL) const;
 	bool isStream(void) const;
 	bool GoodForUltimateArtifact(void) const;
 
@@ -187,8 +202,8 @@ namespace Maps
     private:
 	friend class Game::IO;
 
-        std::list<TilesAddon> addons_level1;
-        std::list<TilesAddon> addons_level2;
+        Addons addons_level1;
+        Addons addons_level2;
 
 	const s32 maps_index;
 

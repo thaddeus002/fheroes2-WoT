@@ -35,7 +35,19 @@
 #include "interface_gamearea.h"
 #include "game_focus.h"
 #include "object.h"
+#include "mounts.h"
+#include "trees.h"
 #include "objxloc.h"
+#include "objtown.h"
+#include "objwatr.h"
+#include "objlava.h"
+#include "objmult.h"
+#include "objdsrt.h"
+#include "objdirt.h"
+#include "objsnow.h"
+#include "objswmp.h"
+#include "objgras.h"
+#include "objcrck.h"
 #include "monster.h"
 #include "spell.h"
 #include "resource.h"
@@ -64,14 +76,21 @@ void Maps::TilesAddon::DebugInfo(int level) const
 Maps::TilesAddon & Maps::TilesAddon::operator= (const Maps::TilesAddon & ta)
 {
     level = ta.level;
-
     object = ta.object;
-
     index = ta.index;
-
     uniq = ta.uniq;
     
     return *this;
+}
+
+bool Maps::TilesAddon::isUniq(u32 id) const
+{
+    return uniq == id;
+}
+
+bool Maps::TilesAddon::isICN(u16 icn) const
+{
+    return icn == MP2::GetICNObject(object);
 }
 
 bool Maps::TilesAddon::PredicateSortRules1(const Maps::TilesAddon & ta1, const Maps::TilesAddon & ta2)
@@ -84,69 +103,133 @@ bool Maps::TilesAddon::PredicateSortRules2(const Maps::TilesAddon & ta1, const M
     return ((ta1.level % 4) < (ta2.level % 4));
 }
 
-u16 Maps::TilesAddon::isRoad(const TilesAddon & ta)
+bool Maps::TilesAddon::isPassable(const Maps::TilesAddon & ta, u16 direct, s32 maps_index)
 {
-    switch(MP2::GetICNObject(ta.object))
+    ICN::icn_t icn = MP2::GetICNObject(ta.object);
+    const u16 & index = ta.index;
+
+    switch(icn)
+    {
+	case ICN::MTNCRCK:
+	case ICN::MTNSNOW:
+	case ICN::MTNSWMP:
+	case ICN::MTNLAVA:
+	case ICN::MTNDSRT:
+	case ICN::MTNDIRT:
+	case ICN::MTNMULT:
+	case ICN::MTNGRAS:	if(! Mounts::isPassable(icn, index, direct)) return false; break;
+
+	case ICN::TREJNGL:
+	case ICN::TREEVIL:
+	case ICN::TRESNOW:
+	case ICN::TREFIR:
+	case ICN::TREFALL:
+	case ICN::TREDECI:	if(! Trees::isPassable(icn, index, direct)) return false; break;
+
+	case ICN::OBJNSNOW:	if(! ObjSnow::isPassable(icn, index, direct)) return false; break;
+	case ICN::OBJNSWMP:	if(! ObjSwamp::isPassable(icn, index, direct)) return false; break;
+	case ICN::OBJNGRAS:
+	case ICN::OBJNGRA2:	if(! ObjGrass::isPassable(icn, index, direct)) return false; break;
+	case ICN::OBJNCRCK:	if(! ObjWasteLand::isPassable(icn, index, direct)) return false; break;
+	case ICN::OBJNDIRT:	if(! ObjDirt::isPassable(icn, index, direct)) return false; break;
+	case ICN::OBJNDSRT:	if(! ObjDesert::isPassable(icn, index, direct)) return false; break;
+	case ICN::OBJNMUL2:
+	case ICN::OBJNMULT:	if(! ObjMulti::isPassable(icn, index, direct)) return false; break;
+	case ICN::OBJNLAVA:
+	case ICN::OBJNLAV3:
+	case ICN::OBJNLAV2:	if(! ObjLava::isPassable(icn, index, direct)) return false; break;
+	case ICN::OBJNWAT2:
+	case ICN::OBJNWATR:	if(! ObjWater::isPassable(icn, index, direct)) return false; break;
+
+	case ICN::MONS32:
+	case ICN::MINIMON:	return false;
+
+	case ICN::OBJNARTI:
+	case ICN::OBJNRSRC:	if(index % 2) return false; break;
+
+	case ICN::OBJNTWBA:
+	case ICN::OBJNTOWN:	if(! ObjTown::isPassable(icn, index, direct, maps_index)) return false; break;
+
+	case ICN::X_LOC1:
+	case ICN::X_LOC2:
+	case ICN::X_LOC3:	if(! ObjLoyalty::isPassable(icn, index, direct)) return false; break;
+
+	// MANUAL.ICN
+	case ICN::TREASURE:
+	case ICN::TELEPORT1:
+	case ICN::TELEPORT2:
+	case ICN::TELEPORT3:
+	case ICN::FOUNTAIN:	return false; break;
+
+	default: break;
+    }
+
+    return true;
+}
+
+bool Maps::TilesAddon::isRoad(u16 direct) const
+{
+    switch(MP2::GetICNObject(object))
     {
 	// castle and tower (gate)
 	case ICN::OBJNTOWN:
-	    return (13 == ta.index ||
-		    29 == ta.index ||
-	    	    45 == ta.index ||
-	    	    61 == ta.index ||
-	    	    77 == ta.index ||
-	    	    93 == ta.index ||
-	    	    109 == ta.index ||
-	    	    125 == ta.index ||
-	    	    141 == ta.index ||
-	    	    157 == ta.index ||
-	    	    173 == ta.index ||
-	    	    189 == ta.index ? Direction::TOP | Direction::BOTTOM : 0);
+	    if(13 == index ||
+		29 == index ||
+	    	45 == index ||
+	    	61 == index ||
+	    	77 == index ||
+	    	93 == index ||
+	    	109 == index ||
+	    	125 == index ||
+	    	141 == index ||
+	    	157 == index ||
+	    	173 == index ||
+	    	189 == index) return direct & (Direction::TOP | Direction::BOTTOM);
 
 	// castle lands (gate)
         case ICN::OBJNTWBA:
-	    return ( 7 == ta.index ||
-		    17 == ta.index ||
-		    27 == ta.index ||
-		    37 == ta.index ||
-		    47 == ta.index ||
-		    57 == ta.index ||
-		    67 == ta.index ||
-		    77 == ta.index ? Direction::TOP | Direction::BOTTOM : 0);
+	    if(7 == index ||
+		17 == index ||
+		27 == index ||
+		37 == index ||
+		47 == index ||
+		57 == index ||
+		67 == index ||
+		77 == index) return direct & (Direction::TOP | Direction::BOTTOM);
 
 	// from sprite road
 	case ICN::ROAD:
-	    if(0  == ta.index ||
-	       4  == ta.index ||
-	       5  == ta.index ||
-	       7  == ta.index ||
-	       9  == ta.index ||
-	       12 == ta.index ||
-	       13 == ta.index ||
-	       16 == ta.index ||
-	       19 == ta.index ||
-	       20 == ta.index ||
-	       26 == ta.index)	return Direction::TOP | Direction::BOTTOM;
+	    if(0  == index ||
+	       4  == index ||
+	       5  == index ||
+	       7  == index ||
+	       9  == index ||
+	       12 == index ||
+	       13 == index ||
+	       16 == index ||
+	       19 == index ||
+	       20 == index ||
+	       26 == index) return direct & (Direction::TOP | Direction::BOTTOM);
 	    else
-	    if(2  == ta.index ||
-	       21 == ta.index ||
-	       28 == ta.index)	return Direction::RIGHT | Direction::LEFT;
+	    if(2  == index ||
+	       21 == index ||
+	       28 == index) return direct & (Direction::RIGHT | Direction::LEFT);
 	    else
-	    if(3  == ta.index ||
-	       6  == ta.index ||
-	       14 == ta.index)	return Direction::TOP | Direction::BOTTOM | Direction::RIGHT | Direction::LEFT;
+	    if(3  == index ||
+	       6  == index ||
+	       14 == index) return direct & (Direction::TOP | Direction::BOTTOM | Direction::RIGHT | Direction::LEFT);
 	    else
-	    if(17 == ta.index ||
-	       29 == ta.index)	return Direction::TOP_LEFT | Direction::BOTTOM_RIGHT;
+	    if(17 == index ||
+	       29 == index) return direct & (Direction::TOP_LEFT | Direction::BOTTOM_RIGHT);
 	    else
-	    if(18 == ta.index ||
-	       30 == ta.index)	return Direction::TOP_RIGHT | Direction::BOTTOM_LEFT;
+	    if(18 == index ||
+	       30 == index) return direct & (Direction::TOP_RIGHT | Direction::BOTTOM_LEFT);
 	
 	default:
 	    break;
     }
 
-    return 0;
+    return false;
 }
 
 bool Maps::TilesAddon::isStream(const TilesAddon & ta)
@@ -321,10 +404,99 @@ bool Maps::TilesAddon::isBarrier(const TilesAddon & ta)
 		102 == ta.index));
 }
 
+bool Maps::TilesAddon::isAbandoneMineSprite(const TilesAddon & ta)
+{
+    return (ICN::OBJNGRAS == MP2::GetICNObject(ta.object) && 6 == ta.index) ||
+	    (ICN::OBJNDIRT == MP2::GetICNObject(ta.object) && 8 == ta.index);
+}
+
 bool Maps::TilesAddon::isFlag32(const TilesAddon & ta)
 {
     return ICN::FLAG32 == MP2::GetICNObject(ta.object);
 }
+
+bool Maps::TilesAddon::isX_LOC123(const TilesAddon & ta)
+{
+    return (ICN::X_LOC1 == MP2::GetICNObject(ta.object) ||
+	    ICN::X_LOC2 == MP2::GetICNObject(ta.object) ||
+	    ICN::X_LOC3 == MP2::GetICNObject(ta.object));
+}
+
+void Maps::TilesAddon::UpdateAbandoneMineLeftSprite(u8 resource)
+{
+    if(ICN::OBJNGRAS == MP2::GetICNObject(object) && 6 == index)
+    {
+	object = 128; // MTNGRAS
+	index = 82;
+    }
+    else
+    if(ICN::OBJNDIRT == MP2::GetICNObject(object) && 8 == index)
+    {
+	object = 104; // MTNDIRT
+	index = 112;
+    }
+    else
+    if(ICN::EXTRAOVR == MP2::GetICNObject(object) && 5 == index)
+    {
+	switch(resource)
+	{
+	    case Resource::ORE:		index = 0; break;
+	    case Resource::SULFUR:	index = 1; break;
+	    case Resource::CRYSTAL:	index = 2; break;
+	    case Resource::GEMS:	index = 3; break;
+	    case Resource::GOLD:	index = 4; break;
+	    default: break;
+	}
+    }
+}
+
+void Maps::TilesAddon::UpdateAbandoneMineRightSprite(void)
+{
+    if(ICN::OBJNDIRT == MP2::GetICNObject(object) && index == 9)
+    {
+	object = 104;
+	index = 113;
+    }
+    else
+    if(ICN::OBJNGRAS == MP2::GetICNObject(object) && index == 7)
+    {
+	object = 128;
+	index = 83;
+    }
+}
+
+void Maps::TilesAddon::UpdateFountainSprite(void)
+{
+    if(ICN::OBJNMUL2 == MP2::GetICNObject(object) && 15 == index)
+    {
+	object = 0x14;
+	index = 0;
+    }
+}
+
+void Maps::TilesAddon::UpdateTreasureChestSprite(void)
+{
+    if(ICN::OBJNRSRC == MP2::GetICNObject(object) && 19 == index)
+    {
+	object = 0x15;
+	index = 0;
+    }
+}
+
+/* Maps::Addons */
+
+void Maps::Addons::Remove(u32 uniq)
+{
+    /*
+    erase(std::remove_if(begin(), end(),
+	    std::bind2nd(std::mem_fun_ref(&Maps::TilesAddon::isUniq), uniq)),
+	    end());
+    */
+    remove_if(std::bind2nd(std::mem_fun_ref(&Maps::TilesAddon::isUniq), uniq));
+}
+
+
+/* Maps::Tiles */
 
 Maps::Tiles::Tiles(s32 index) : maps_index(index), tile_sprite_index(0), tile_sprite_shape(0),
     mp2_object(0), quantity1(0), quantity2(0), quantity3(0), quantity4(0), fogs(0xFF), quantity5(0), quantity6(0), quantity7(0)
@@ -389,7 +561,6 @@ void Maps::Tiles::AddonsPushLevel2(const TilesAddon & ta)
 void Maps::Tiles::AddonsSort(void)
 {
     if(!addons_level1.empty()) addons_level1.sort(Maps::TilesAddon::PredicateSortRules1);
-
     if(!addons_level2.empty()) addons_level2.sort(Maps::TilesAddon::PredicateSortRules2);
 }
 
@@ -427,29 +598,8 @@ Maps::Ground::ground_t Maps::Tiles::GetGround(void) const
 
 void Maps::Tiles::Remove(u32 uniq)
 {
-    if(!addons_level1.empty())
-    {
-	std::list<TilesAddon>::iterator       it1 = addons_level1.begin();
-	std::list<TilesAddon>::const_iterator it2 = addons_level1.end();
-
-	while(it1 != it2)
-	    if(uniq == (*it1).uniq)
-		it1 = addons_level1.erase(it1);
-	    else
-		++it1;
-    }
-
-    if(!addons_level2.empty())
-    {
-	std::list<TilesAddon>::iterator       it1 = addons_level2.begin();
-	std::list<TilesAddon>::const_iterator it2 = addons_level2.end();
-
-	while(it1 != it2)
-	    if(uniq == (*it1).uniq)
-		it1 = addons_level2.erase(it1);
-	    else
-		++it1;
-    }
+    if(!addons_level1.empty()) addons_level1.Remove(uniq);
+    if(!addons_level2.empty()) addons_level2.Remove(uniq);
 }
 
 void Maps::Tiles::RedrawTile(Surface & dst) const
@@ -469,8 +619,8 @@ void Maps::Tiles::RedrawBottom(Surface & dst, bool skip_objs) const
     if((area.GetRectMaps() & mp) &&
 	!addons_level1.empty())
     {
-	std::list<TilesAddon>::const_iterator it1 = addons_level1.begin();
-	std::list<TilesAddon>::const_iterator it2 = addons_level1.end();
+	Addons::const_iterator it1 = addons_level1.begin();
+	Addons::const_iterator it2 = addons_level1.end();
 
 	for(; it1 != it2; ++it1)
 	{
@@ -592,8 +742,8 @@ void Maps::Tiles::RedrawBottom4Hero(Surface & dst) const
     if((area.GetRectMaps() & mp) &&
 	!addons_level1.empty())
     {
-	std::list<TilesAddon>::const_iterator it1 = addons_level1.begin();
-	std::list<TilesAddon>::const_iterator it2 = addons_level1.end();
+	Addons::const_iterator it1 = addons_level1.begin();
+	Addons::const_iterator it2 = addons_level1.end();
 
 	for(; it1 != it2; ++it1)
 	{
@@ -646,8 +796,8 @@ void Maps::Tiles::RedrawTop(Surface & dst, const TilesAddon* skip) const
 
     if(!addons_level2.empty())
     {
-	std::list<TilesAddon>::const_iterator it1 = addons_level2.begin();
-	std::list<TilesAddon>::const_iterator it2 = addons_level2.end();
+	Addons::const_iterator it1 = addons_level2.begin();
+	Addons::const_iterator it2 = addons_level2.end();
 
 	for(; it1 != it2; ++it1)
 	{
@@ -682,8 +832,8 @@ void Maps::Tiles::RedrawTop4Hero(Surface & dst, bool skip_ground) const
 
     if(!addons_level2.empty())
     {
-	std::list<TilesAddon>::const_iterator it1 = addons_level2.begin();
-	std::list<TilesAddon>::const_iterator it2 = addons_level2.end();
+	Addons::const_iterator it1 = addons_level2.begin();
+	Addons::const_iterator it2 = addons_level2.end();
 
 	for(; it1 != it2; ++it1)
 	{
@@ -709,76 +859,36 @@ void Maps::Tiles::RedrawTop4Hero(Surface & dst, bool skip_ground) const
     }
 }
 
-Maps::TilesAddon * Maps::Tiles::FindAddonICN1(u16 icn1)
+Maps::TilesAddon* Maps::Tiles::FindAddonICN1(u16 icn1)
 {
-    if(!addons_level1.empty())
-    {
-	std::list<TilesAddon>::iterator it1 = addons_level1.begin();
-	std::list<TilesAddon>::const_iterator it2 = addons_level1.end();
+    Addons::iterator it = std::find_if(addons_level1.begin(), addons_level1.end(),
+			    std::bind2nd(std::mem_fun_ref(&Maps::TilesAddon::isICN), icn1));
 
-	for(; it1 != it2; ++it1)
-	{
-	    TilesAddon & addon = *it1;
-
-	    if(icn1 == MP2::GetICNObject(addon.object)) return &addon;
-	}
-    }
-
-    return NULL;
+    return it != addons_level1.end() ? &(*it) : NULL;
 }
 
-Maps::TilesAddon * Maps::Tiles::FindAddonICN2(u16 icn2)
+Maps::TilesAddon* Maps::Tiles::FindAddonICN2(u16 icn2)
 {
-    if(!addons_level2.empty())
-    {
-	std::list<TilesAddon>::iterator it1 = addons_level2.begin();
-	std::list<TilesAddon>::const_iterator it2 = addons_level2.end();
+    Addons::iterator it = std::find_if(addons_level2.begin(), addons_level2.end(),
+			    std::bind2nd(std::mem_fun_ref(&Maps::TilesAddon::isICN), icn2));
 
-	for(; it1 != it2; ++it1)
-	{
-	    TilesAddon & addon = *it1;
-
-	    if(icn2 == MP2::GetICNObject(addon.object)) return &addon;
-	}
-    }
-
-    return NULL;
+    return it != addons_level2.end() ? &(*it) : NULL;
 }
 
-Maps::TilesAddon * Maps::Tiles::FindAddonLevel1(u32 uniq1)
+Maps::TilesAddon* Maps::Tiles::FindAddonLevel1(u32 uniq1)
 {
-    if(!addons_level1.empty())
-    {
-	std::list<TilesAddon>::iterator it1 = addons_level1.begin();
-	std::list<TilesAddon>::const_iterator it2 = addons_level1.end();
+    Addons::iterator it = std::find_if(addons_level1.begin(), addons_level1.end(),
+			    std::bind2nd(std::mem_fun_ref(&Maps::TilesAddon::isUniq), uniq1));
 
-	for(; it1 != it2; ++it1)
-	{
-	    TilesAddon & addon = *it1;
-
-	    if(uniq1 == addon.uniq) return &addon;
-	}
-    }
-
-    return NULL;
+    return it != addons_level1.end() ? &(*it) : NULL;
 }
 
-Maps::TilesAddon * Maps::Tiles::FindAddonLevel2(u32 uniq2)
+Maps::TilesAddon* Maps::Tiles::FindAddonLevel2(u32 uniq2)
 {
-    if(!addons_level2.empty())
-    {
-	std::list<TilesAddon>::iterator it1 = addons_level2.begin();
-	std::list<TilesAddon>::const_iterator it2 = addons_level2.end();
+    Addons::iterator it = std::find_if(addons_level2.begin(), addons_level2.end(),
+			    std::bind2nd(std::mem_fun_ref(&Maps::TilesAddon::isUniq), uniq2));
 
-	for(; it1 != it2; ++it1)
-	{
-	    TilesAddon & addon = *it1;
-
-	    if(uniq2 == addon.uniq) return &addon;
-	}
-    }
-
-    return NULL;
+    return it != addons_level2.end() ? &(*it) : NULL;
 }
 
 
@@ -907,39 +1017,29 @@ bool Maps::Tiles::isPassable(const Heroes* hero, Direction::vector_t direct, boo
        }
     }
 
-    return Object::isPassable(addons_level1, direct, maps_index);
+    for(Addons::const_iterator
+	it = addons_level1.begin(); it != addons_level1.end(); ++it)
+	if(! TilesAddon::isPassable(*it, direct, maps_index)) return false;
+
+    return true;
 }
 
 /* check road */
-bool Maps::Tiles::isRoad(const Direction::vector_t & direct) const
+bool Maps::Tiles::isRoad(u16 direct) const
 {
-    switch(direct)
-    {
-	case Direction::UNKNOWN:
-	case Direction::CENTER:	return addons_level1.end() != find_if(addons_level1.begin(), addons_level1.end(), TilesAddon::isRoad);
-
-	default: break;
-    }
-
-    if(!addons_level1.empty())
-    {
-	std::list<TilesAddon>::const_iterator it1 = addons_level1.begin();
-	std::list<TilesAddon>::const_iterator it2 = addons_level1.end();
-
-	for(; it1 != it2; ++it1) if(direct & TilesAddon::isRoad(*it1)) return true;
-    }
-
-    return false;
+    return addons_level1.end() != std::find_if(addons_level1.begin(), addons_level1.end(),
+				std::bind2nd(std::mem_fun_ref(&TilesAddon::isRoad), direct));
 }
 
 bool Maps::Tiles::isStream(void) const
 {
-    return addons_level1.end() != std::find_if(addons_level1.begin(), addons_level1.end(), TilesAddon::isStream);
+    return addons_level1.end() != std::find_if(addons_level1.begin(), addons_level1.end(),
+				TilesAddon::isStream);
 }
 
 Maps::TilesAddon* Maps::Tiles::FindObject(u8 objs)
 {
-    std::list<TilesAddon>::iterator it = addons_level1.begin();
+    Addons::iterator it = addons_level1.begin();
 
     switch(objs)
     {
@@ -1070,7 +1170,7 @@ Maps::TilesAddon* Maps::Tiles::FindObject(u8 objs)
 
 const Maps::TilesAddon* Maps::Tiles::FindObject(u8 objs) const
 {
-    std::list<TilesAddon>::const_iterator it = addons_level1.begin();
+    Addons::const_iterator it = addons_level1.begin();
 
     switch(objs)
     {
@@ -1201,7 +1301,7 @@ const Maps::TilesAddon* Maps::Tiles::FindObject(u8 objs) const
 
 Maps::TilesAddon* Maps::Tiles::FindFlags(void)
 {
-    std::list<TilesAddon>::iterator it =
+    Addons::iterator it =
 	std::find_if(addons_level1.begin(), addons_level1.end(), TilesAddon::isFlag32);
 
     if(it == addons_level1.end())
@@ -1307,44 +1407,28 @@ void Maps::Tiles::FixLoyaltyVersion(void)
         case MP2::OBJ_UNKNW_F9:
         case MP2::OBJ_UNKNW_FA:
 	{
-	    std::list<TilesAddon>::iterator it1 = addons_level1.begin();
-	    std::list<TilesAddon>::const_iterator it2 = addons_level1.end();
+	    u8 newobj = MP2::OBJ_ZERO;
+	    Addons::iterator it = std::find_if(addons_level1.begin(), addons_level1.end(),
+								    TilesAddon::isX_LOC123);
 
-	    // check level1
-	    for(; it1 != it2; ++it1)
+	    if(it != addons_level1.end())
 	    {
-		TilesAddon & addon = *it1;
-
-		if(ICN::X_LOC1 == MP2::GetICNObject(addon.object) ||
-		    ICN::X_LOC2 == MP2::GetICNObject(addon.object) ||
-		    ICN::X_LOC3 == MP2::GetICNObject(addon.object))
-		{
-		    const u8 newobj = ObjLoyalty::LearnObject(addon);
-		    if(MP2::OBJ_ZERO != newobj) mp2_object = newobj;
-		    return;
-		}
+		newobj = ObjLoyalty::LearnObject(*it);
+	    }
+	    else
+	    {
+		it = std::find_if(addons_level2.begin(), addons_level2.end(),
+							TilesAddon::isX_LOC123);
+		if(it != addons_level2.end())
+		    newobj = ObjLoyalty::LearnObject(*it);
 	    }
 
-	    it1 = addons_level2.begin();
-	    it2 = addons_level2.end();
-
-	    // check level2
-	    for(; it1 != it2; ++it1)
+	    if(MP2::OBJ_ZERO != newobj)
+		mp2_object = newobj;
+	    else
 	    {
-		TilesAddon & addon = *it1;
-
-		if(ICN::X_LOC1 == MP2::GetICNObject(addon.object) ||
-		    ICN::X_LOC2 == MP2::GetICNObject(addon.object) ||
-		    ICN::X_LOC3 == MP2::GetICNObject(addon.object))
-		{
-		    const u8 newobj = ObjLoyalty::LearnObject(addon);
-		    if(MP2::OBJ_ZERO != newobj) mp2_object = newobj;
-		    return;
-		}
+		DEBUG(DBG_GAME, DBG_WARN, "index: " << maps_index);
 	    }
-
-	    DEBUG(DBG_GAME, DBG_WARN, "index: " << maps_index);
-
 	} break;
 
 	default: break;
@@ -1943,67 +2027,25 @@ void Maps::Tiles::UpdateRNDMonsterSprite(void)
 
 void Maps::Tiles::UpdateAbandoneMineSprite(void)
 {
-    u32 uniq = 0;
+    Addons::iterator it = std::find_if(addons_level1.begin(), addons_level1.end(),
+						    TilesAddon::isAbandoneMineSprite);
+    u32 uniq = it != addons_level1.end() ? (*it).uniq : 0;
 
-    if(!addons_level1.empty())
+    if(uniq)
     {
-	std::list<TilesAddon>::iterator it1 = addons_level1.begin();
-	std::list<TilesAddon>::iterator it2 = addons_level1.end();
+	std::for_each(addons_level1.begin(), addons_level1.end(),
+	    std::bind2nd(std::mem_fun_ref(&TilesAddon::UpdateAbandoneMineLeftSprite), quantity4));
 
-	for(; it1 != it2; ++it1)
+	if(Maps::isValidDirection(maps_index, Direction::RIGHT))
 	{
-	    TilesAddon & addon = *it1;
+    	    Tiles & tile = world.GetTiles(Maps::GetDirectionIndex(maps_index, Direction::RIGHT));
+    	    TilesAddon *mines = tile.FindAddonLevel1(uniq);
 
-	    if(ICN::OBJNGRAS == MP2::GetICNObject(addon.object) && 6 == addon.index)
-	    {
-		addon.object = 128;
-		addon.index = 82;
-		uniq = addon.uniq;
-	    }
-
-	    if(ICN::OBJNDIRT == MP2::GetICNObject(addon.object) && 8 == addon.index)
-	    {
-		addon.object = 104;
-		addon.index = 112;
-	    }
-
-	    if(ICN::EXTRAOVR == MP2::GetICNObject(addon.object) && 5 == addon.index)
-	    {
-		switch(quantity4)
-		{
-		    case Resource::ORE:		addon.index = 0; break;
-		    case Resource::SULFUR:	addon.index = 1; break;
-		    case Resource::CRYSTAL:	addon.index = 2; break;
-		    case Resource::GEMS:	addon.index = 3; break;
-		    case Resource::GOLD:	addon.index = 4; break;
-		    default: break;
-		}
-	    }
+	    if(mines) mines->UpdateAbandoneMineRightSprite();
+	    if(tile.mp2_object == MP2::OBJN_ABANDONEDMINE) tile.mp2_object = MP2::OBJN_MINES;
 	}
     }
 
-    if(uniq && Maps::isValidDirection(maps_index, Direction::RIGHT))
-    {
-        Tiles & tile = world.GetTiles(Maps::GetDirectionIndex(maps_index, Direction::RIGHT));
-        TilesAddon *mines = tile.FindAddonLevel1(uniq);
-	if(mines)
-	{
-	    // dirt
-	    if(ICN::OBJNDIRT == MP2::GetICNObject(mines->object) && mines->index == 9)
-	    {
-		mines->object = 104;
-		mines->index = 113;
-	    }
-
-	    // grass
-	    if(ICN::OBJNGRAS == MP2::GetICNObject(mines->object) && mines->index == 7)
-	    {
-		mines->object = 128;
-		mines->index = 83;
-	    }
-	}
-	if(tile.mp2_object == MP2::OBJN_ABANDONEDMINE) tile.mp2_object = MP2::OBJN_MINES;
-    }
 
     if(Maps::isValidDirection(maps_index, Direction::LEFT))
     {
@@ -2034,8 +2076,8 @@ void Maps::Tiles::UpdateStoneLightsSprite(void)
 {
     if(!addons_level1.empty())
     {
-	std::list<TilesAddon>::iterator it1 = addons_level1.begin();
-	std::list<TilesAddon>::iterator it2 = addons_level1.end();
+	Addons::iterator it1 = addons_level1.begin();
+	Addons::iterator it2 = addons_level1.end();
 
 	for(; it1 != it2; ++it1)
 	{
@@ -2127,42 +2169,14 @@ void Maps::Tiles::UpdateRNDResourceSprite(void)
 
 void Maps::Tiles::UpdateFountainSprite(void)
 {
-    if(!addons_level1.empty())
-    {
-	std::list<TilesAddon>::iterator it1 = addons_level1.begin();
-	std::list<TilesAddon>::iterator it2 = addons_level1.end();
-
-	for(; it1 != it2; ++it1)
-	{
-	    TilesAddon & addon = *it1;
-
-	    if(ICN::OBJNMUL2 == MP2::GetICNObject(addon.object) && 15 == addon.index)
-	    {
-		addon.object = 0x14;
-		addon.index = 0;
-	    }
-	}
-    }
+    std::for_each(addons_level1.begin(), addons_level1.end(),
+		std::mem_fun_ref(&TilesAddon::UpdateFountainSprite));
 }
 
 void Maps::Tiles::UpdateTreasureChestSprite(void)
 {
-    if(!addons_level1.empty())
-    {
-	std::list<TilesAddon>::iterator it1 = addons_level1.begin();
-	std::list<TilesAddon>::iterator it2 = addons_level1.end();
-
-	for(; it1 != it2; ++it1)
-	{
-	    TilesAddon & addon = *it1;
-
-	    if(ICN::OBJNRSRC == MP2::GetICNObject(addon.object) && 19 == addon.index)
-	    {
-		addon.object = 0x15;
-		addon.index = 0;
-	    }
-	}
-    }
+    std::for_each(addons_level1.begin(), addons_level1.end(),
+		std::mem_fun_ref(&TilesAddon::UpdateTreasureChestSprite));
 }
 
 bool Maps::Tiles::isFog(u8 color) const
