@@ -825,11 +825,11 @@ void World::LoadMaps(const std::string &filename)
 		break;
 
 	    case MP2::OBJ_STONELIGHTS:
-		tile.UpdateStoneLightsSprite();
+		Maps::Tiles::UpdateStoneLightsSprite(tile);
 		break;
 
 	    case MP2::OBJ_FOUNTAIN:
-		tile.UpdateFountainSprite();
+		Maps::Tiles::UpdateFountainSprite(tile);
 		break;
 
 	    case MP2::OBJ_EVENT:
@@ -865,13 +865,13 @@ void World::LoadMaps(const std::string &filename)
     	    case MP2::OBJ_RNDARTIFACT2:
     	    case MP2::OBJ_RNDARTIFACT3:
 		// modify rnd artifact sprite
-		tile.UpdateRNDArtifactSprite();
+		Maps::Tiles::UpdateRNDArtifactSprite(tile);
     		tile.UpdateQuantity();
 		break;
 
 	    case MP2::OBJ_RNDRESOURCE:
 		// modify rnd resource sprite
-		tile.UpdateRNDResourceSprite();
+		Maps::Tiles::UpdateRNDResourceSprite(tile);
 		tile.UpdateQuantity();
 		break;
 
@@ -879,7 +879,7 @@ void World::LoadMaps(const std::string &filename)
 		if(Maps::Ground::WATER == tile.GetGround())
 		    tile.SetObject(MP2::OBJ_WATERCHEST);
     		else
-		    tile.UpdateTreasureChestSprite();
+		    Maps::Tiles::UpdateTreasureChestSprite(tile);
     		tile.UpdateQuantity();
 		break;
 
@@ -913,7 +913,7 @@ void World::LoadMaps(const std::string &filename)
 	    case MP2::OBJ_RNDMONSTER3:
 	    case MP2::OBJ_RNDMONSTER4:
 		// modify rnd monster sprite
-		tile.UpdateMonsterInfo();
+		Maps::Tiles::UpdateMonsterInfo(tile);
 		break;
 
 	    // join dwelling

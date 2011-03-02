@@ -422,66 +422,79 @@ bool Maps::TilesAddon::isX_LOC123(const TilesAddon & ta)
 	    ICN::X_LOC3 == MP2::GetICNObject(ta.object));
 }
 
-void Maps::TilesAddon::UpdateAbandoneMineLeftSprite(u8 resource)
+void Maps::TilesAddon::UpdateAbandoneMineLeftSprite(TilesAddon & ta, u8 resource)
 {
-    if(ICN::OBJNGRAS == MP2::GetICNObject(object) && 6 == index)
+    if(ICN::OBJNGRAS == MP2::GetICNObject(ta.object) && 6 == ta.index)
     {
-	object = 128; // MTNGRAS
-	index = 82;
+	ta.object = 128; // MTNGRAS
+	ta.index = 82;
     }
     else
-    if(ICN::OBJNDIRT == MP2::GetICNObject(object) && 8 == index)
+    if(ICN::OBJNDIRT == MP2::GetICNObject(ta.object) && 8 == ta.index)
     {
-	object = 104; // MTNDIRT
-	index = 112;
+	ta.object = 104; // MTNDIRT
+	ta.index = 112;
     }
     else
-    if(ICN::EXTRAOVR == MP2::GetICNObject(object) && 5 == index)
+    if(ICN::EXTRAOVR == MP2::GetICNObject(ta.object) && 5 == ta.index)
     {
 	switch(resource)
 	{
-	    case Resource::ORE:		index = 0; break;
-	    case Resource::SULFUR:	index = 1; break;
-	    case Resource::CRYSTAL:	index = 2; break;
-	    case Resource::GEMS:	index = 3; break;
-	    case Resource::GOLD:	index = 4; break;
+	    case Resource::ORE:		ta.index = 0; break;
+	    case Resource::SULFUR:	ta.index = 1; break;
+	    case Resource::CRYSTAL:	ta.index = 2; break;
+	    case Resource::GEMS:	ta.index = 3; break;
+	    case Resource::GOLD:	ta.index = 4; break;
 	    default: break;
 	}
     }
 }
 
-void Maps::TilesAddon::UpdateAbandoneMineRightSprite(void)
+void Maps::TilesAddon::UpdateAbandoneMineRightSprite(TilesAddon & ta)
 {
-    if(ICN::OBJNDIRT == MP2::GetICNObject(object) && index == 9)
+    if(ICN::OBJNDIRT == MP2::GetICNObject(ta.object) && ta.index == 9)
     {
-	object = 104;
-	index = 113;
+	ta.object = 104;
+	ta.index = 113;
     }
     else
-    if(ICN::OBJNGRAS == MP2::GetICNObject(object) && index == 7)
+    if(ICN::OBJNGRAS == MP2::GetICNObject(ta.object) && ta.index == 7)
     {
-	object = 128;
-	index = 83;
+	ta.object = 128;
+	ta.index = 83;
     }
 }
 
-void Maps::TilesAddon::UpdateFountainSprite(void)
+void Maps::TilesAddon::UpdateFountainSprite(TilesAddon & ta)
 {
-    if(ICN::OBJNMUL2 == MP2::GetICNObject(object) && 15 == index)
+    if(ICN::OBJNMUL2 == MP2::GetICNObject(ta.object) && 15 == ta.index)
     {
-	object = 0x14;
-	index = 0;
+	ta.object = 0x14;
+	ta.index = 0;
     }
 }
 
-void Maps::TilesAddon::UpdateTreasureChestSprite(void)
+void Maps::TilesAddon::UpdateTreasureChestSprite(TilesAddon & ta)
 {
-    if(ICN::OBJNRSRC == MP2::GetICNObject(object) && 19 == index)
+    if(ICN::OBJNRSRC == MP2::GetICNObject(ta.object) && 19 == ta.index)
     {
-	object = 0x15;
-	index = 0;
+	ta.object = 0x15;
+	ta.index = 0;
     }
 }
+
+void Maps::TilesAddon::UpdateStoneLightsSprite(TilesAddon & ta, u8 & type)
+{
+    if(ICN::OBJNMUL2 == MP2::GetICNObject(ta.object))
+    switch(ta.index)
+    {
+	case 116: ta.object = 0x11; ta.index = 0; type = 1; break;
+	case 119: ta.object = 0x12; ta.index = 0; type = 2; break;
+	case 122: ta.object = 0x13; ta.index = 0; type = 3; break;
+	default: break;
+    }
+}
+
 
 /* Maps::Addons */
 
@@ -1948,178 +1961,138 @@ void Maps::Tiles::SetCountMonster(const u16 count)
     }
 }
 
-void Maps::Tiles::UpdateMonsterInfo(void)
+void Maps::Tiles::UpdateMonsterInfo(Tiles & tile)
 {
-    switch(mp2_object)
-    {
-	case MP2::OBJ_RNDMONSTER:
-        case MP2::OBJ_RNDMONSTER1:
-        case MP2::OBJ_RNDMONSTER2:
-        case MP2::OBJ_RNDMONSTER3:
-        case MP2::OBJ_RNDMONSTER4:
-	    UpdateRNDMonsterSprite(); break;
-	default: break;
-    }
-
-    const TilesAddon* addons = FindObject(MP2::OBJ_MONSTER);
-    const Monster m(addons ? addons->index + 1 : Monster::UNKNOWN);
-    // fixed count
-    quantity5 = 0;
-
-    // update random count
-    if(0 == quantity1 && 0 == quantity2)
-        SetCountMonster(4 * m.GetRNDSize(false));
-    // update fixed count (mp2 format)
-    else
-    {
-	u16 count = quantity2;
-	    count <<= 8;
-	    count |= quantity1;
-	    count >>= 3;
-
-        SetCountMonster(count);
-	quantity5 = 1;
-    }
-
-    // set monster
-    quantity3 = m();
-
-    // extra params:
-    // quantity4 - join conditions (0: skip, 1: money, 2: free, 3: force (for campain need store color also)
-
-    // skip join
-    if(m() == Monster::GHOST || m.isElemental())
-	quantity4 = 0;
-    else
-    if(FixedCountMonster())
-	// for money
-	quantity4 = 1;
-    else
-	// 20% chance of joining
-        quantity4 = (3 > Rand::Get(1, 10) ? 2 : 1);
-}
-
-void Maps::Tiles::UpdateRNDMonsterSprite(void)
-{
-    Maps::TilesAddon *addon = FindObject(MP2::OBJ_RNDMONSTER);
+    Maps::TilesAddon *addon = tile.FindObject(MP2::OBJ_RNDMONSTER);
 
     if(addon)
     {
-	switch(mp2_object)
+	switch(tile.mp2_object)
 	{
     	    case MP2::OBJ_RNDMONSTER:       addon->index = Monster::Rand().GetID(); break;
     	    case MP2::OBJ_RNDMONSTER1:      addon->index = Monster::Rand(Monster::LEVEL1).GetID(); break;
     	    case MP2::OBJ_RNDMONSTER2:      addon->index = Monster::Rand(Monster::LEVEL2).GetID(); break;
     	    case MP2::OBJ_RNDMONSTER3:      addon->index = Monster::Rand(Monster::LEVEL3).GetID(); break;
     	    case MP2::OBJ_RNDMONSTER4:      addon->index = Monster::Rand(Monster::LEVEL4).GetID(); break;
-
-	    default: DEBUG(DBG_GAME, DBG_WARN, "unknown object" << ", index: " << maps_index); return;
+	    default: addon = NULL; break;
 	}
 
 	// ICN::MONS32 start from PEASANT
-        addon->index = addon->index - 1;
+        if(addon) addon->index = addon->index - 1;
 
-	mp2_object = MP2::OBJ_MONSTER;
+	tile.mp2_object = MP2::OBJ_MONSTER;
     }
+
+    addon = tile.FindObject(MP2::OBJ_MONSTER);
+    const Monster m(addon ? addon->index + 1 : Monster::UNKNOWN);
+    // fixed count
+    tile.quantity5 = 0;
+
+    // update random count
+    if(0 == tile.quantity1 && 0 == tile.quantity2)
+        tile.SetCountMonster(4 * m.GetRNDSize(false));
+    // update fixed count (mp2 format)
     else
-        DEBUG(DBG_GAME, DBG_WARN, "is NULL" << ", index: " << maps_index);
+    {
+	u16 count = tile.quantity2;
+	    count <<= 8;
+	    count |= tile.quantity1;
+	    count >>= 3;
+
+        tile.SetCountMonster(count);
+	tile.quantity5 = 1;
+    }
+
+    // set monster
+    tile.quantity3 = m();
+
+    // extra params:
+    // quantity4 - join conditions (0: skip, 1: money, 2: free, 3: force (for campain need store color also)
+
+    // skip join
+    if(m() == Monster::GHOST || m.isElemental())
+	tile.quantity4 = 0;
+    else
+    if(tile.FixedCountMonster())
+	// for money
+	tile.quantity4 = 1;
+    else
+	// 20% chance of joining
+        tile.quantity4 = (3 > Rand::Get(1, 10) ? 2 : 1);
 }
 
-void Maps::Tiles::UpdateAbandoneMineSprite(void)
+void Maps::Tiles::UpdateAbandoneMineSprite(Tiles & tile)
 {
-    Addons::iterator it = std::find_if(addons_level1.begin(), addons_level1.end(),
+    Addons::iterator it = std::find_if(tile.addons_level1.begin(), tile.addons_level1.end(),
 						    TilesAddon::isAbandoneMineSprite);
-    u32 uniq = it != addons_level1.end() ? (*it).uniq : 0;
+    u32 uniq = it != tile.addons_level1.end() ? (*it).uniq : 0;
 
     if(uniq)
     {
-	std::for_each(addons_level1.begin(), addons_level1.end(),
-	    std::bind2nd(std::mem_fun_ref(&TilesAddon::UpdateAbandoneMineLeftSprite), quantity4));
-
-	if(Maps::isValidDirection(maps_index, Direction::RIGHT))
-	{
-    	    Tiles & tile = world.GetTiles(Maps::GetDirectionIndex(maps_index, Direction::RIGHT));
-    	    TilesAddon *mines = tile.FindAddonLevel1(uniq);
-
-	    if(mines) mines->UpdateAbandoneMineRightSprite();
-	    if(tile.mp2_object == MP2::OBJN_ABANDONEDMINE) tile.mp2_object = MP2::OBJN_MINES;
-	}
-    }
-
-
-    if(Maps::isValidDirection(maps_index, Direction::LEFT))
-    {
-        Tiles & tile = world.GetTiles(Maps::GetDirectionIndex(maps_index, Direction::LEFT));
-	if(tile.mp2_object == MP2::OBJN_ABANDONEDMINE) tile.mp2_object = MP2::OBJN_MINES;
-    }
-
-    if(Maps::isValidDirection(maps_index, Direction::TOP))
-    {
-        Tiles & tile = world.GetTiles(Maps::GetDirectionIndex(maps_index, Direction::TOP));
-	if(tile.mp2_object == MP2::OBJN_ABANDONEDMINE) tile.mp2_object = MP2::OBJN_MINES;
-
-	if(Maps::isValidDirection(tile.maps_index, Direction::LEFT))
-	{
-    	    Tiles & tile2 = world.GetTiles(Maps::GetDirectionIndex(tile.maps_index, Direction::LEFT));
-	    if(tile2.mp2_object == MP2::OBJN_ABANDONEDMINE) tile2.mp2_object = MP2::OBJN_MINES;
-	}
+	for(Addons::iterator
+	    it = tile.addons_level1.begin(); it != tile.addons_level1.end(); ++it)
+		TilesAddon::UpdateAbandoneMineLeftSprite(*it, tile.quantity4);
 
 	if(Maps::isValidDirection(tile.maps_index, Direction::RIGHT))
 	{
     	    Tiles & tile2 = world.GetTiles(Maps::GetDirectionIndex(tile.maps_index, Direction::RIGHT));
+    	    TilesAddon *mines = tile2.FindAddonLevel1(uniq);
+
+	    if(mines) TilesAddon::UpdateAbandoneMineRightSprite(*mines);
 	    if(tile2.mp2_object == MP2::OBJN_ABANDONEDMINE) tile2.mp2_object = MP2::OBJN_MINES;
 	}
     }
-}
 
-void Maps::Tiles::UpdateStoneLightsSprite(void)
-{
-    if(!addons_level1.empty())
+    if(Maps::isValidDirection(tile.maps_index, Direction::LEFT))
     {
-	Addons::iterator it1 = addons_level1.begin();
-	Addons::iterator it2 = addons_level1.end();
+        Tiles & tile2 = world.GetTiles(Maps::GetDirectionIndex(tile.maps_index, Direction::LEFT));
+	if(tile2.mp2_object == MP2::OBJN_ABANDONEDMINE) tile2.mp2_object = MP2::OBJN_MINES;
+    }
 
-	for(; it1 != it2; ++it1)
+    if(Maps::isValidDirection(tile.maps_index, Direction::TOP))
+    {
+        Tiles & tile2 = world.GetTiles(Maps::GetDirectionIndex(tile.maps_index, Direction::TOP));
+	if(tile2.mp2_object == MP2::OBJN_ABANDONEDMINE) tile2.mp2_object = MP2::OBJN_MINES;
+
+	if(Maps::isValidDirection(tile2.maps_index, Direction::LEFT))
 	{
-	    TilesAddon & addon = *it1;
+    	    Tiles & tile3 = world.GetTiles(Maps::GetDirectionIndex(tile2.maps_index, Direction::LEFT));
+	    if(tile3.mp2_object == MP2::OBJN_ABANDONEDMINE) tile3.mp2_object = MP2::OBJN_MINES;
+	}
 
-	    if(ICN::OBJNMUL2 == MP2::GetICNObject(addon.object))
-	    switch(addon.index)
-	    {
-		case 116:	addon.object = 0x11; addon.index = 0; quantity1 = 1; break;
-		case 119:	addon.object = 0x12; addon.index = 0; quantity1 = 2; break;
-		case 122:	addon.object = 0x13; addon.index = 0; quantity1 = 3; break;
-		default: 	break;
-	    }
+	if(Maps::isValidDirection(tile2.maps_index, Direction::RIGHT))
+	{
+    	    Tiles & tile3 = world.GetTiles(Maps::GetDirectionIndex(tile2.maps_index, Direction::RIGHT));
+	    if(tile3.mp2_object == MP2::OBJN_ABANDONEDMINE) tile3.mp2_object = MP2::OBJN_MINES;
 	}
     }
 }
 
-void Maps::Tiles::UpdateRNDArtifactSprite(void)
+void Maps::Tiles::UpdateRNDArtifactSprite(Tiles & tile)
 {
     TilesAddon *addon = NULL;
     u8 index = 0;
     Artifact art;
 
-    switch(mp2_object)
+    switch(tile.mp2_object)
     {
         case MP2::OBJ_RNDARTIFACT:
-            addon = FindObject(MP2::OBJ_RNDARTIFACT);
+            addon = tile.FindObject(MP2::OBJ_RNDARTIFACT);
 	    art = Artifact::Rand(Artifact::ART_LEVEL123);
             index = art.IndexSprite();
             break;
         case MP2::OBJ_RNDARTIFACT1:
-            addon = FindObject(MP2::OBJ_RNDARTIFACT1);
+            addon = tile.FindObject(MP2::OBJ_RNDARTIFACT1);
 	    art = Artifact::Rand(Artifact::ART_LEVEL1);
             index = art.IndexSprite();
             break;
         case MP2::OBJ_RNDARTIFACT2:
-            addon = FindObject(MP2::OBJ_RNDARTIFACT2);
+            addon = tile.FindObject(MP2::OBJ_RNDARTIFACT2);
 	    art = Artifact::Rand(Artifact::ART_LEVEL2);
             index = art.IndexSprite();
             break;
         case MP2::OBJ_RNDARTIFACT3:
-            addon = FindObject(MP2::OBJ_RNDARTIFACT3);
+            addon = tile.FindObject(MP2::OBJ_RNDARTIFACT3);
 	    art = Artifact::Rand(Artifact::ART_LEVEL3);
             index = art.IndexSprite();
             break;
@@ -2134,12 +2107,12 @@ void Maps::Tiles::UpdateRNDArtifactSprite(void)
     if(addon)
     {
         addon->index = index;
-        mp2_object = MP2::OBJ_ARTIFACT;
+        tile.mp2_object = MP2::OBJ_ARTIFACT;
 
         // replace shadow artifact
-        if(Maps::isValidDirection(maps_index, Direction::LEFT))
+        if(Maps::isValidDirection(tile.maps_index, Direction::LEFT))
         {
-            Maps::Tiles & left_tile = world.GetTiles(Maps::GetDirectionIndex(maps_index, Direction::LEFT));
+            Maps::Tiles & left_tile = world.GetTiles(Maps::GetDirectionIndex(tile.maps_index, Direction::LEFT));
             Maps::TilesAddon *shadow = left_tile.FindAddonLevel1(addon->uniq);
 
             if(shadow) shadow->index = index - 1;
@@ -2147,19 +2120,19 @@ void Maps::Tiles::UpdateRNDArtifactSprite(void)
     }
 }
 
-void Maps::Tiles::UpdateRNDResourceSprite(void)
+void Maps::Tiles::UpdateRNDResourceSprite(Tiles & tile)
 {
-    TilesAddon *addon = FindObject(MP2::OBJ_RNDRESOURCE);
+    TilesAddon *addon = tile.FindObject(MP2::OBJ_RNDRESOURCE);
 
     if(addon)
     {
         addon->index = Resource::GetIndexSprite(Resource::Rand());
-        mp2_object = MP2::OBJ_RESOURCE;
+        tile.mp2_object = MP2::OBJ_RESOURCE;
 
         // replace shadow artifact
-        if(Maps::isValidDirection(maps_index, Direction::LEFT))
+        if(Maps::isValidDirection(tile.maps_index, Direction::LEFT))
         {
-            Maps::Tiles & left_tile = world.GetTiles(Maps::GetDirectionIndex(maps_index, Direction::LEFT));
+            Maps::Tiles & left_tile = world.GetTiles(Maps::GetDirectionIndex(tile.maps_index, Direction::LEFT));
             Maps::TilesAddon *shadow = left_tile.FindAddonLevel1(addon->uniq);
 
             if(shadow) shadow->index = addon->index - 1;
@@ -2167,16 +2140,25 @@ void Maps::Tiles::UpdateRNDResourceSprite(void)
     }
 }
 
-void Maps::Tiles::UpdateFountainSprite(void)
+void Maps::Tiles::UpdateStoneLightsSprite(Tiles & tile)
 {
-    std::for_each(addons_level1.begin(), addons_level1.end(),
-		std::mem_fun_ref(&TilesAddon::UpdateFountainSprite));
+    for(Addons::iterator
+	it = tile.addons_level1.begin(); it != tile.addons_level1.end(); ++it)
+	    TilesAddon::UpdateStoneLightsSprite(*it, tile.quantity1);
 }
 
-void Maps::Tiles::UpdateTreasureChestSprite(void)
+void Maps::Tiles::UpdateFountainSprite(Tiles & tile)
 {
-    std::for_each(addons_level1.begin(), addons_level1.end(),
-		std::mem_fun_ref(&TilesAddon::UpdateTreasureChestSprite));
+    for(Addons::iterator
+	it = tile.addons_level1.begin(); it != tile.addons_level1.end(); ++it)
+	    TilesAddon::UpdateFountainSprite(*it);
+}
+
+void Maps::Tiles::UpdateTreasureChestSprite(Tiles & tile)
+{
+    for(Addons::iterator
+	it = tile.addons_level1.begin(); it != tile.addons_level1.end(); ++it)
+	    TilesAddon::UpdateTreasureChestSprite(*it);
 }
 
 bool Maps::Tiles::isFog(u8 color) const

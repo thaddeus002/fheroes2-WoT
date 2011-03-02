@@ -49,11 +49,6 @@ namespace Maps
 	bool isRoad(u16) const;
 	bool isICN(u16) const;
 
-	void UpdateAbandoneMineLeftSprite(u8 resource);
-	void UpdateAbandoneMineRightSprite(void);
-        void UpdateFountainSprite(void);
-	void UpdateTreasureChestSprite(void);
-
 	void DebugInfo(int level) const;
 
 	static bool isStream(const TilesAddon &);
@@ -88,8 +83,14 @@ namespace Maps
 	static bool isAbandoneMineSprite(const TilesAddon &);
 	static bool isPassable(const TilesAddon &, u16 direct, s32 maps_index);
 
-	static bool PredicateSortRules1(const TilesAddon & ta1, const TilesAddon & ta2);
-	static bool PredicateSortRules2(const TilesAddon & ta1, const TilesAddon & ta2);
+	static bool PredicateSortRules1(const TilesAddon &, const TilesAddon &);
+	static bool PredicateSortRules2(const TilesAddon &, const TilesAddon &);
+
+	static void UpdateFountainSprite(TilesAddon &);
+	static void UpdateTreasureChestSprite(TilesAddon &);
+	static void UpdateStoneLightsSprite(TilesAddon &, u8 &);
+	static void UpdateAbandoneMineLeftSprite(TilesAddon &, u8 resource);
+	static void UpdateAbandoneMineRightSprite(TilesAddon &);
 
         u8	level;
         u32	uniq;
@@ -179,16 +180,14 @@ namespace Maps
 	bool FixedCountMonster(void) const;
 	u16 GetCountMonster(void) const;
 	void SetCountMonster(const u16 count);
-	void UpdateRNDMonsterSprite(void);
-	void UpdateMonsterInfo(void);
 
-	void UpdateRNDArtifactSprite(void);
-	void UpdateRNDResourceSprite(void);
-
-	void UpdateAbandoneMineSprite(void);
-	void UpdateStoneLightsSprite(void);
-	void UpdateFountainSprite(void);
-	void UpdateTreasureChestSprite(void);
+	static void UpdateMonsterInfo(Tiles &);
+	static void UpdateRNDArtifactSprite(Tiles &);
+	static void UpdateRNDResourceSprite(Tiles &);
+	static void UpdateAbandoneMineSprite(Tiles &);
+	static void UpdateStoneLightsSprite(Tiles &);
+	static void UpdateFountainSprite(Tiles &);
+	static void UpdateTreasureChestSprite(Tiles &);
 
     private:
 	TilesAddon* FindFlags(void);

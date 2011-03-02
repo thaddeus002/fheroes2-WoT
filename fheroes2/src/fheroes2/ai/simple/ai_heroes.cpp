@@ -1410,7 +1410,7 @@ void AIToAbandoneMine(Heroes &hero, const u8 obj, const s32 dst_index)
 	{
             hero.IncreaseExperience(res.GetExperienceAttacker());
             tile.SetQuantity1(0);
-            tile.UpdateAbandoneMineSprite();
+	    Maps::Tiles::UpdateAbandoneMineSprite(tile);
             world.CaptureObject(dst_index, hero.GetColor());
             hero.SaveUnderObject(MP2::OBJ_MINES);
         }

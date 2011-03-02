@@ -2097,7 +2097,7 @@ void ActionToAbandoneMine(Heroes &hero, const u8 obj, const s32 dst_index)
 	    PlaySoundSuccess;
 	    std::string msg = _("You beat the Ghosts and are able to restore the mine to production.");
 	    DialogCaptureResourceObject(MP2::StringObject(obj), msg, tile.GetQuantity4());
-	    tile.UpdateAbandoneMineSprite();
+	    Maps::Tiles::UpdateAbandoneMineSprite(tile);
 	    tile.ResetQuantity();
 	    hero.SaveUnderObject(MP2::OBJ_MINES);
 	    world.CaptureObject(dst_index, hero.GetColor());
