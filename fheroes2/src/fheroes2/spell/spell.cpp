@@ -211,7 +211,7 @@ const char* Spell::GetDescription(void) const
     return _(spells[id].description);
 }
 
-u8 Spell::MovePoint(void) const
+u16 Spell::MovePoint(void) const
 {
     return spells[id].mp;
 }

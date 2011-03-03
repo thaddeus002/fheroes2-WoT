@@ -113,7 +113,7 @@ public:
     const char* GetDescription(void) const;
 
     u8 SpellPoint(const HeroBase* hero = NULL) const;
-    u8 MovePoint(void) const;
+    u16 MovePoint(void) const;
     u8 Level(void) const;
     u8 Damage(void) const;
     u8 Restore(void) const;
