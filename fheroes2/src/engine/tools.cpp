@@ -329,7 +329,7 @@ std::string GetDirname(const std::string & str)
 	    return std::string(".");
         else
 	if(pos == 0)
-	    return std:string("./");
+	    return std::string("./");
 	else
 	if(pos == str.size() - 1)
 	    return GetDirname(str.substr(0, str.size() - 1));
