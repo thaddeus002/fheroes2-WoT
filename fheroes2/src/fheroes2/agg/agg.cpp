@@ -801,15 +801,12 @@ void AGG::Cache::LoadFNT(void)
     {
 	if(fnt_cache.size()) return;
 
-	const char *letters = "!\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~";
-	const u8 letters_size = std::strlen(letters);
-	u16 *unicode = new u16[letters_size + 1];
+	const std::string letters = "!\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~";
+	std::vector<u16> unicode = String::UTF8_to_UNICODE(letters);
 
-	String::UTF8_to_UNICODE(unicode, letters, letters_size);
-
-	for(u8 ii = 0; ii < letters_size; ++ii) LoadFNT(unicode[ii]);
-
-	delete [] unicode;
+	for(std::vector<u16>::const_iterator
+	    it = unicode.begin(); it != unicode.end(); ++it)
+	    LoadFNT(*it);
 
 	if(fnt_cache.size())
 	{

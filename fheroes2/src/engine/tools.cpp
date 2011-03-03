@@ -153,62 +153,82 @@ std::string String::Double(double value, u8 prec)
 }
 
 // from SDL_ttf
-void String::UTF8_to_UNICODE(u16 *unicode, const char *utf8, int len)
+std::vector<u16> String::UTF8_to_UNICODE(const std::string & utf8)
 {
-    int i, j;
-    u16 ch;
+    std::vector<u16> unicode;
+    unicode.reserve(utf8.size());
 
-    for ( i=0, j=0; i < len; ++i, ++j )
+    for(std::string::const_iterator
+	it = utf8.begin(); it < utf8.end(); ++it)
     {
-	ch = ((const unsigned char *)utf8)[i];
-        if ( ch >= 0xF0 )
+	u16 ch = static_cast<u8>(*it);
+
+        if(ch >= 0xF0)
 	{
-            ch  =  (u16)(utf8[i]&0x07) << 18;
-            ch |=  (u16)(utf8[++i]&0x3F) << 12;
-            ch |=  (u16)(utf8[++i]&0x3F) << 6;
-            ch |=  (u16)(utf8[++i]&0x3F);
+	    if(utf8.end() - it > 3)
+    	    {
+	        ch  =  static_cast<u16>(*it++ & 0x07) << 18;
+        	ch |=  static_cast<u16>(*it++ & 0x3F) << 12;
+        	ch |=  static_cast<u16>(*it++ & 0x3F) << 6;
+        	ch |=  static_cast<u16>(*it & 0x3F);
+	    }
+	    else break;
         }
 	else
-        if ( ch >= 0xE0 )
+        if(ch >= 0xE0)
 	{
-            ch  =  (u16)(utf8[i]&0x0F) << 12;
-            ch |=  (u16)(utf8[++i]&0x3F) << 6;
-            ch |=  (u16)(utf8[++i]&0x3F);
+	    if(utf8.end() - it > 2)
+            {
+		ch  =  static_cast<u16>(*it++ & 0x0F) << 12;
+        	ch |=  static_cast<u16>(*it++ & 0x3F) << 6;
+        	ch |=  static_cast<u16>(*it & 0x3F);
+	    }
+	    else break;
         }
 	else
-        if ( ch >= 0xC0 )
+        if(ch >= 0xC0)
 	{
-            ch  =  (u16)(utf8[i]&0x1F) << 6;
-            ch |=  (u16)(utf8[++i]&0x3F);
+	    if(utf8.end() - it > 1)
+            {
+        	ch  =  static_cast<u16>(*it++ & 0x1F) << 6;
+        	ch |=  static_cast<u16>(*it & 0x3F);
+	    }
+	    else break;
         }
-        unicode[j] = ch;
+
+        unicode.push_back(ch);
     }
-    unicode[j] = 0;
+
+    return unicode;
 }
 
-void String::UNICODE_to_UTF8(std::string & utf8, const u16 *unicode, size_t len)
+std::string UNICODE_to_UTF8(const std::vector<u16> & unicode)
 {
-    utf8.reserve(2 * len);
+    std::string utf8;
+    utf8.reserve(2 * unicode.size());
 
-    for(size_t ii = 0; ii < len; ++ii)
+    for(std::vector<u16>::const_iterator
+	it = unicode.begin(); it != unicode.end(); ++it)
     {
-	if(unicode[ii] < 128)
+	if(*it < 128)
 	{
-            utf8.append(1, static_cast<char>(unicode[ii]));
+            utf8.append(1, static_cast<char>(*it));
 	}
 	else
-	if(unicode[ii] < 2048)
+	if(*it < 2048)
 	{
-    	    utf8.append(1, static_cast<char>(192 + ((unicode[ii] - (unicode[ii] % 64)) / 64)));
-            utf8.append(1, static_cast<char>(128 + (unicode[ii] % 64)));
+    	    utf8.append(1, static_cast<char>(192 + ((*it - (*it % 64)) / 64)));
+            utf8.append(1, static_cast<char>(128 + (*it % 64)));
         }
         else
         {
-    	    utf8.append(1, static_cast<char>(224 + ((unicode[ii] - (unicode[ii] % 4096)) / 4096)));
-            utf8.append(1, static_cast<char>(128 + (((unicode[ii] % 4096) - (unicode[ii] % 64)) / 64)));
-            utf8.append(1, static_cast<char>(128 + (unicode[ii] % 64)));
+    	    utf8.append(1, static_cast<char>(224 + ((*it - (*it % 4096)) / 4096)));
+            utf8.append(1, static_cast<char>(128 + (((*it % 4096) - (*it % 64)) / 64)));
+            utf8.append(1, static_cast<char>(128 + (*it % 64)));
         }
     }
+
+    return utf8;
 }
 
 void String::AppendKey(std::string & res, KeySym sym, u16 mod)

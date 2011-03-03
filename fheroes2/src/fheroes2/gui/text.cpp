@@ -197,13 +197,8 @@ void TextAscii::Blit(u16 ax, u16 ay, const u16 maxw, Surface & dst)
 }
 
 #ifdef WITH_TTF
-TextUnicode::TextUnicode(const std::string & msg, Font::type_t ft) : TextInterface(ft), message(2 * msg.size(), 0)
+TextUnicode::TextUnicode(const std::string & msg, Font::type_t ft) : TextInterface(ft), message(String::UTF8_to_UNICODE(msg))
 {
-    if(msg.size())
-    {
-	String::UTF8_to_UNICODE(&message[0], msg.c_str(), msg.size());
-	while(0 == message.back()) message.pop_back();
-    }
 }
 
 TextUnicode::TextUnicode(const u16 *pt, size_t sz, Font::type_t ft) : TextInterface(ft), message(pt, pt+sz)
@@ -229,13 +224,7 @@ bool TextUnicode::isspace(u16 c)
 
 void TextUnicode::SetText(const std::string & msg)
 {
-    if(msg.size())
-    {
-	message.resize(2 * msg.size(), 0);
-	std::fill(message.begin(), message.end(), 0);
-	String::UTF8_to_UNICODE(&message[0], msg.c_str(), msg.size());
-	while(0 == message.back()) message.pop_back();
-    }
+    message = String::UTF8_to_UNICODE(msg);
 }
 
 void TextUnicode::SetFont(const Font::type_t & ft)
@@ -549,9 +538,7 @@ void TextBox::Set(const std::string & msg, Font::type_t ft, u16 width)
 #ifdef WITH_TTF
     if(Settings::Get().Unicode())
     {
-	std::vector<u16> unicode(2 * msg.size(), 0);
-	String::UTF8_to_UNICODE(&unicode[0], msg.c_str(), msg.size());
-	while(0 == unicode.back()) unicode.pop_back();
+	std::vector<u16> unicode = String::UTF8_to_UNICODE(msg);
 
         const u16 sep = '\n';
         std::vector<u16> substr;

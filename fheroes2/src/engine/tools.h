@@ -42,8 +42,8 @@ namespace String
     void AppendKey(std::string &, KeySym, u16);
 
     // from SDL_ttf
-    void UTF8_to_UNICODE(u16 *unicode, const char *utf8, int len);
-    void UNICODE_to_UTF8(std::string & utf8, const u16 *unicode, size_t len);
+    std::vector<u16> UTF8_to_UNICODE(const std::string &);
+    std::string UNICODE_to_UTF8(const std::vector<u16> &);
 
     std::string GetTime(void);
 }
