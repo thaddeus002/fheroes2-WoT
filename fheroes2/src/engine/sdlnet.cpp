@@ -189,6 +189,60 @@ void QueueMessage::Push(const std::string & str)
     Push(str.c_str());
 }
 
+QueueMessage & QueueMessage::operator<< (u8 v)
+{
+    Push(v);
+    return *this;
+}
+
+QueueMessage & QueueMessage::operator<< (s8 v)
+{
+    Push(v);
+    return *this;
+}
+
+QueueMessage & QueueMessage::operator<< (u16 v)
+{
+    Push(v);
+    return *this;
+}
+
+QueueMessage & QueueMessage::operator<< (s16 v)
+{
+    Push(v);
+    return *this;
+}
+
+QueueMessage & QueueMessage::operator<< (u32 v)
+{
+    Push(v);
+    return *this;
+}
+
+QueueMessage & QueueMessage::operator<< (s32 v)
+{
+    Push(v);
+    return *this;
+}
+
+QueueMessage & QueueMessage::operator<< (bool v)
+{
+    Push(v);
+    return *this;
+}
+
+QueueMessage & QueueMessage::operator<< (const std::string & v)
+{
+    Push(v);
+    return *this;
+}
+
+QueueMessage & QueueMessage::operator<< (const char* v)
+{
+    Push(v);
+    return *this;
+}
+
 void QueueMessage::Push(const char* str)
 {
     const size_t len = std::strlen(str);

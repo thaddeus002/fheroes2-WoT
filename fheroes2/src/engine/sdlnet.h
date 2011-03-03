@@ -95,6 +95,16 @@ public:
     u16		GetID(void) const;
     void	SetID(u16);
 
+    QueueMessage & operator<< (u8);
+    QueueMessage & operator<< (s8);
+    QueueMessage & operator<< (u16);
+    QueueMessage & operator<< (s16);
+    QueueMessage & operator<< (u32);
+    QueueMessage & operator<< (s32);
+    QueueMessage & operator<< (bool);
+    QueueMessage & operator<< (const std::string &);
+    QueueMessage & operator<< (const char*);
+
     void	Push(u8);
     void	Push(s8);
     void	Push(u16);
