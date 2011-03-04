@@ -123,6 +123,12 @@ static const settings_t settingsFHeroes2[] =
     { Settings::GAME_ALSO_CONFIRM_AUTOSAVE,	_("game: also confirm autosave"),			},
     { Settings::GAME_REMEMBER_LAST_FOCUS,	_("game: remember last focus"),				},
     { Settings::GAME_REMEMBER_LAST_FILENAME,	_("game: remember last filename"),			},
+    { Settings::GAME_BATTLE_SHOW_GRID,		_("game: battle show grid"),				},
+    { Settings::GAME_BATTLE_SHOW_MOUSE_SHADOW,	_("game: battle mouse shadow")				},
+    { Settings::GAME_BATTLE_SHOW_MOVE_SHADOW,	_("game: battle move shadow"),				},
+    { Settings::GAME_BATTLE_SHOW_DAMAGE,	_("game: battle show damage info"),  			},
+    { Settings::GAME_PICKUP_ARTIFACT_INFO,	_("game: pickup artifact + info dialog"),		},
+    { Settings::GAME_CASTLE_FLASH_BUILDING,	_("game: castle flash building"),			},
     { Settings::WORLD_SHOW_VISITED_CONTENT,	_("world: show visited content from objects"),		},
     { Settings::WORLD_SCOUTING_EXTENDED,	_("world: scouting skill show extended content info"),  },
     { Settings::WORLD_ABANDONED_MINE_RANDOM,	_("world: abandoned mine random resource"),		},
@@ -135,7 +141,6 @@ static const settings_t settingsFHeroes2[] =
     { Settings::WORLD_ARTIFACT_CRYSTAL_BALL,	_("artifact: Crystal Ball also added Identify Hero and Visions spells"), },
     { Settings::CASTLE_ALLOW_BUY_FROM_WELL,	_("castle: allow buy from well"),			},
     { Settings::CASTLE_ALLOW_GUARDIANS,		_("castle: allow guardians"),				},
-    { Settings::CASTLE_ALLOW_FLASH_BUILDING,	_("castle: allow flash building"),			},
     { Settings::HEROES_LEARN_SPELLS_WITH_DAY,	_("heroes: learn new spells with day"),  		},
     { Settings::HEROES_FORCE_RACE_FROM_TYPE,	_("heroes: fixed race with custom portrait"),  		},
     { Settings::HEROES_COST_DEPENDED_FROM_LEVEL,_("heroes: recruit cost to be dependent on hero level"),},
@@ -144,17 +149,12 @@ static const settings_t settingsFHeroes2[] =
     { Settings::HEROES_RECALCULATE_MOVEMENT,    _("heroes: recalculate movement points after creatures movement"), },
     { Settings::HEROES_PATROL_ALLOW_PICKUP,     _("heroes: allow pickup objects for patrol"),           },
     { Settings::HEROES_AUTO_MOVE_BATTLE_DST,	_("heroes: after battle move to target cell"),		},
-    { Settings::HEROES_PICKUP_ARTIFACT_INFO,	_("heroes: pickup artifact + info dialog"),		},
     { Settings::HEROES_TRANSCRIBING_SCROLLS,	_("heroes: allow transcribing scrolls (needs: Eye Eagle skill)"), },
     { Settings::UNIONS_ALLOW_HERO_MEETINGS,	_("unions: allow meeting heroes"),                      },
     { Settings::UNIONS_ALLOW_CASTLE_VISITING,	_("unions: allow castle visiting"),                     },
     { Settings::UNIONS_ALLOW_VIEW_MAPS,		_("unions: allow view maps"),                           },
-    { Settings::BATTLE_SHOW_DAMAGE,		_("battle: show damage info"),    			},
     { Settings::BATTLE_TROOP_DIRECTION,		_("battle: troop direction to move"),			},
     { Settings::BATTLE_SOFT_WAITING,		_("battle: soft wait troop"),				},
-    { Settings::BATTLE_SHOW_GRID,		_("battle: show grid"),					},
-    { Settings::BATTLE_SHOW_MOUSE_SHADOW,	_("battle: show mouse shadow"),				},
-    { Settings::BATTLE_SHOW_MOVE_SHADOW,	_("battle: show move shadow"),				},
     { Settings::BATTLE_OBJECTS_ARCHERS_PENALTY, _("battle: high objects are an obstacle for archers"),  },
     { Settings::BATTLE_MERGE_ARMIES, 		_("battle: merge armies for hero from castle"),  	},
     { Settings::BATTLE_ARCHMAGE_RESIST_BAD_SPELL,_("battle: archmage can resists (20%) bad spells"),     },
@@ -1048,17 +1048,17 @@ void Settings::SetEvilInterface(bool f)
 
 void Settings::SetBattleGrid(bool f)
 {
-    f ? ExtSetModes(BATTLE_SHOW_GRID) : ExtResetModes(BATTLE_SHOW_GRID);
+    f ? ExtSetModes(GAME_BATTLE_SHOW_GRID) : ExtResetModes(GAME_BATTLE_SHOW_GRID);
 }
 
 void Settings::SetBattleMovementShaded(bool f)
 {
-    f ? ExtSetModes(BATTLE_SHOW_MOVE_SHADOW) : ExtResetModes(BATTLE_SHOW_MOVE_SHADOW);
+    f ? ExtSetModes(GAME_BATTLE_SHOW_MOVE_SHADOW) : ExtResetModes(GAME_BATTLE_SHOW_MOVE_SHADOW);
 }
 
 void Settings::SetBattleMouseShaded(bool f)
 {
-    f ? ExtSetModes(BATTLE_SHOW_MOUSE_SHADOW) : ExtResetModes(BATTLE_SHOW_MOUSE_SHADOW);
+    f ? ExtSetModes(GAME_BATTLE_SHOW_MOUSE_SHADOW) : ExtResetModes(GAME_BATTLE_SHOW_MOUSE_SHADOW);
 }
 
 void Settings::ResetSound(void)
@@ -1158,7 +1158,7 @@ bool Settings::ExtAllowBuyFromWell(void) const
 
 bool Settings::ExtCastleAllowFlash(void) const
 {
-    return ExtModes(CASTLE_ALLOW_FLASH_BUILDING);
+    return ExtModes(GAME_CASTLE_FLASH_BUILDING);
 }
 
 bool Settings::ExtAllowCastleGuardians(void) const
@@ -1223,7 +1223,7 @@ bool Settings::ExtBuySpellBookFromShrine(void) const
 
 bool Settings::ExtHeroPickupArtifactWithInfoDialog(void) const
 {
-    return ExtModes(HEROES_PICKUP_ARTIFACT_INFO);
+    return ExtModes(GAME_PICKUP_ARTIFACT_INFO);
 }
 
 bool Settings::ExtHeroRecruitCostDependedFromLevel(void) const
@@ -1278,7 +1278,7 @@ bool Settings::ExtUnionsAllowViewMaps(void) const
 
 bool Settings::ExtBattleShowDamage(void) const
 {
-    return ExtModes(BATTLE_SHOW_DAMAGE);
+    return ExtModes(GAME_BATTLE_SHOW_DAMAGE);
 }
 
 bool Settings::ExtBattleTroopDirection(void) const
@@ -1308,17 +1308,17 @@ bool Settings::ExtBattleSoftWait(void) const
 
 bool Settings::ExtBattleShowGrid(void) const
 {
-    return ExtModes(BATTLE_SHOW_GRID);
+    return ExtModes(GAME_BATTLE_SHOW_GRID);
 }
 
 bool Settings::ExtBattleShowMouseShadow(void) const
 {
-    return ExtModes(BATTLE_SHOW_MOUSE_SHADOW);
+    return ExtModes(GAME_BATTLE_SHOW_MOUSE_SHADOW);
 }
 
 bool Settings::ExtBattleShowMoveShadow(void) const
 {
-    return ExtModes(BATTLE_SHOW_MOVE_SHADOW);
+    return ExtModes(GAME_BATTLE_SHOW_MOVE_SHADOW);
 }
 
 bool Settings::ExtBattleObjectsArchersPenalty(void) const

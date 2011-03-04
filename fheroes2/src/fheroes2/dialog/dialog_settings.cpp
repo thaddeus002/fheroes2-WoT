@@ -128,10 +128,18 @@ void Dialog::ExtSettings(bool readonly)
     states.push_back(Settings::GAME_REMEMBER_LAST_FILENAME);
     states.push_back(Settings::GAME_SHOW_SYSTEM_INFO);
     states.push_back(Settings::GAME_EVIL_INTERFACE);
+    states.push_back(Settings::GAME_BATTLE_SHOW_GRID);
+    states.push_back(Settings::GAME_BATTLE_SHOW_MOUSE_SHADOW);
+    states.push_back(Settings::GAME_BATTLE_SHOW_MOVE_SHADOW);
+    states.push_back(Settings::GAME_BATTLE_SHOW_DAMAGE);
+    states.push_back(Settings::GAME_PICKUP_ARTIFACT_INFO);
+    if(! conf.QVGA())
+    {
+	states.push_back(Settings::GAME_CASTLE_FLASH_BUILDING);
+	states.push_back(Settings::GAME_HIDE_INTERFACE);
+    }
     if(!conf.PocketPC())
 	states.push_back(Settings::GAME_DYNAMIC_INTERFACE);
-    if(conf.VideoMode().w >= 640 && conf.VideoMode().w >= 480)
-	states.push_back(Settings::GAME_HIDE_INTERFACE);
     states.push_back(Settings::GAME_AUTOSAVE_ON);
     if(conf.VideoMode().w == 640 && conf.VideoMode().w == 480)
 	states.push_back(Settings::GAME_USE_FADE);
@@ -156,26 +164,20 @@ void Dialog::ExtSettings(bool readonly)
     states.push_back(Settings::HEROES_RECALCULATE_MOVEMENT);
     states.push_back(Settings::HEROES_PATROL_ALLOW_PICKUP);
     states.push_back(Settings::HEROES_AUTO_MOVE_BATTLE_DST);
-    states.push_back(Settings::HEROES_PICKUP_ARTIFACT_INFO);
     states.push_back(Settings::HEROES_TRANSCRIBING_SCROLLS);
 
     if(! conf.QVGA())
     {
 	states.push_back(Settings::CASTLE_ALLOW_GUARDIANS);
 	states.push_back(Settings::CASTLE_ALLOW_BUY_FROM_WELL);
-	states.push_back(Settings::CASTLE_ALLOW_FLASH_BUILDING);
     }
 
     states.push_back(Settings::UNIONS_ALLOW_HERO_MEETINGS);
     states.push_back(Settings::UNIONS_ALLOW_CASTLE_VISITING);
     states.push_back(Settings::UNIONS_ALLOW_VIEW_MAPS);
 
-    states.push_back(Settings::BATTLE_SHOW_DAMAGE);
     states.push_back(Settings::BATTLE_SOFT_WAITING);
     states.push_back(Settings::BATTLE_TROOP_DIRECTION);
-    states.push_back(Settings::BATTLE_SHOW_GRID);
-    states.push_back(Settings::BATTLE_SHOW_MOUSE_SHADOW);
-    states.push_back(Settings::BATTLE_SHOW_MOVE_SHADOW);
     states.push_back(Settings::BATTLE_OBJECTS_ARCHERS_PENALTY);
     states.push_back(Settings::BATTLE_MERGE_ARMIES);
     states.push_back(Settings::BATTLE_ARCHMAGE_RESIST_BAD_SPELL);
@@ -192,14 +194,14 @@ void Dialog::ExtSettings(bool readonly)
 
     SettingsListBox listbox(area, readonly);
 
-    const u16 ah = window_h - 54;
+    const u16 ah = window_h - 60;
 
     listbox.RedrawBackground(area);
     listbox.SetScrollButtonUp(ICN::DROPLISL, 6, 7, Point(area.x + 295, area.y + 25));
     listbox.SetScrollButtonDn(ICN::DROPLISL, 8, 9, Point(area.x + 295, area.y + ah + 5));
     listbox.SetScrollSplitter(AGG::GetICN(ICN::DROPLISL, 13), Rect(area.x + 300, area.y + 49, 12, ah - 48));
-    listbox.SetAreaMaxItems(ah / 36);
-    listbox.SetAreaItems(Rect(area.x + 10, area.y + 30, 290, ah));
+    listbox.SetAreaMaxItems(ah / 40);
+    listbox.SetAreaItems(Rect(area.x + 10, area.y + 30, 290, ah + 5));
     listbox.SetListContent(states);
     listbox.Redraw();
 
