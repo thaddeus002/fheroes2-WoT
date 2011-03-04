@@ -2117,7 +2117,6 @@ void ActionToCaptureObject(Heroes &hero, const u8 obj, const s32 dst_index)
     Maps::Tiles & tile = world.GetTiles(dst_index);
     std::string header;
     std::string body;
-    std::string plural;
     u8 resource = Resource::UNKNOWN;
 
     switch(obj)
