@@ -294,6 +294,29 @@ std::string ShowTreasureChestInfo(const Maps::Tiles & tile)
     return str;
 }
 
+std::string ShowGroundInfo(const Maps::Tiles & tile, bool show, const Heroes* hero)
+{
+    std::string str = Maps::Ground::String(tile.GetGround());
+
+    if(show && hero)
+    {
+	Direction::vector_t dir = Direction::Get(hero->GetIndex(), tile.GetIndex());
+	if(dir != Direction::UNKNOWN)
+	{
+	    u16 cost = Maps::Ground::GetPenalty(tile.GetIndex(), dir,
+				    hero->GetLevelSkill(Skill::Secondary::PATHFINDING));
+	    if(cost)
+	    {
+		str.append("\n");
+		str.append(_("penalty: %{cost}"));
+		String::Replace(str, "%{cost}", cost);
+	    }
+	}
+    }
+
+    return str;
+}
+
 void Dialog::QuickInfo(const Maps::Tiles & tile)
 {
     // check 
@@ -394,7 +417,7 @@ void Dialog::QuickInfo(const Maps::Tiles & tile)
 
         case MP2::OBJ_EVENT:
         case MP2::OBJ_ZERO:
-    	    name_object = Maps::Ground::String(tile.GetGround());
+    	    name_object = ShowGroundInfo(tile, show, from_hero);
     	    break;
 
 	case MP2::OBJ_DERELICTSHIP:
