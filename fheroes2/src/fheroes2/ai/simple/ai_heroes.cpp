@@ -379,7 +379,7 @@ void AIToHeroes(Heroes &hero, const u8 obj, const s32 dst_index)
             }
         }
 
-	bool disable_auto_move = hero.isShipMaster() || other_hero->isShipMaster() || other_hero->inCastle();
+	//bool disable_auto_move = hero.isShipMaster() || other_hero->isShipMaster() || other_hero->inCastle();
         DEBUG(DBG_AI, DBG_INFO, hero.GetName() << " attack enemy hero " << other_hero->GetName());
 
             // new battle2
@@ -398,11 +398,13 @@ void AIToHeroes(Heroes &hero, const u8 obj, const s32 dst_index)
             {
                 hero.IncreaseExperience(res.GetExperienceAttacker());
 
-        	// auto move hero
+        	// disable: auto move hero for AI
+		/*
         	if(conf.ExtHeroAutoMove2BattleTarget() && !disable_auto_move)
         	{
             	    MoveHero2Dest(hero, dst_index, hero.GetUnderObject(), world.GetTiles(dst_index).GetObject());
         	}
+		*/
             }
             else
             // wins defender
@@ -488,12 +490,14 @@ void AIToCastle(Heroes &hero, const u8 obj, const s32 dst_index)
 	    allow_enter = true;
 	}
 
-        // auto move hero to castle
+        // disable: auto move hero to castle for AI
+	/*
         if(conf.ExtHeroAutoMove2BattleTarget() && allow_enter)
         {
             MoveHero2Dest(hero, dst_index, hero.GetUnderObject(), MP2::OBJ_CASTLE);
             AIToCastle(hero, MP2::OBJ_CASTLE, dst_index);
         }
+	*/
     }
 }
 
