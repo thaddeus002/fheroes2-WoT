@@ -52,7 +52,7 @@ Game::menu_t Game::NewHotSeat(void)
     Settings & conf = Settings::Get();
     conf.SetGameType(conf.GameType() | Game::HOTSEAT);
 
-    if(Game::BATTLEONLY & conf.GameType())
+    if(conf.GameType(Game::BATTLEONLY))
     {
 	conf.SetPreferablyCountPlayers(2);
 	world.NewMaps(10, 10);
@@ -227,7 +227,7 @@ Game::menu_t Game::NewMulti(void)
 {
     Settings & conf = Settings::Get();
 
-    if(! (conf.GameType() & Game::BATTLEONLY))
+    if(! (conf.GameType(Game::BATTLEONLY)))
 	conf.SetGameType(Game::STANDARD);
 
     // reset prev. scenario info

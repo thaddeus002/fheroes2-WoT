@@ -117,12 +117,13 @@ Kingdom::Kingdom(const Color::color_t cl) : color(cl), control(Game::AI), flags(
 
     // set control
     if(color & conf.PlayersColors())
-    switch(Settings::Get().GameType())
     {
-        default: control = Game::LOCAL; break;
 #ifdef WITH_NET
-        case Game::NETWORK: control = (color == conf.MyColor() ? Game::LOCAL : Game::REMOTE); break;
+	if(Settings::Get().GameType(Game::NETWORK))
+    	    control = (color == conf.MyColor() ? Game::LOCAL : Game::REMOTE);
+        else
 #endif
+	    control = Game::LOCAL;
     }
 
     UpdateStartingResource();

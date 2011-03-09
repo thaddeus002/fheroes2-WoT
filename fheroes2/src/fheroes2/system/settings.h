@@ -351,6 +351,7 @@ public:
     void ResetSound(void);
     void ResetMusic(void);
     
+    bool GameType(u8) const;
     u8   GameType(void) const;
     void SetGameType(u8);
 

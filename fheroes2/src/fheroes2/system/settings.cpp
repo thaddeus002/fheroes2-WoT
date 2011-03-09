@@ -788,6 +788,11 @@ void Settings::SetMusicVolume(const u8 v)
 }
 
 /* check game type */
+bool Settings::GameType(u8 f) const
+{
+    return game_type & f;
+}
+
 u8 Settings::GameType(void) const
 {
     return game_type;

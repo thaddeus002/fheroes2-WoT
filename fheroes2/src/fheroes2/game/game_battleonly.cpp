@@ -192,7 +192,7 @@ bool BattleOnly::ChangeSettings(void)
     rtKnowledge1 = Rect(cur_pt.x + 215, cur_pt.y + 149, 33, 33);
     rtKnowledge2 = Rect(cur_pt.x + 390, cur_pt.y + 149, 33, 33);
 
-    if(conf.GameType() & Game::NETWORK)
+    if(conf.GameType(Game::NETWORK))
     {
 	color2 = Color::RED;
 

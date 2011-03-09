@@ -201,7 +201,7 @@ Game::menu_t Game::StartGame(void)
 	    switch(kingdom.Control())
 	    {
 		case LOCAL:
-		    if(Game::HOTSEAT == conf.GameType())
+		    if(conf.GameType(Game::HOTSEAT))
 		    {
 			cursor.Hide();
 			conf.SetMyColor(Color::GRAY);
@@ -693,7 +693,7 @@ Game::menu_t Game::HumanTurn(bool isload)
     GameOver::Result & gameResult = GameOver::Result::Get();
 
     // set focus
-    if(Game::HOTSEAT == conf.GameType()) global_focus.Reset();
+    if(conf.GameType(Game::HOTSEAT)) global_focus.Reset();
 
     if(conf.ExtRememberLastFocus())
     {

@@ -55,21 +55,15 @@ Game::menu_t Game::SelectScenario(void)
 Game::menu_t Game::ScenarioInfo(void)
 {
     Settings & conf = Settings::Get();
-    if(conf.QVGA()) return PocketPC::ScenarioInfo();
 
     AGG::PlayMusic(MUS::MAINMENU);
 
     MapsFileInfoList lists;
-    if(!PrepareMapsFileInfoList(lists, (conf.GameType() & Game::MULTI)))
+    if(!PrepareMapsFileInfoList(lists, (conf.GameType(Game::MULTI))))
     {
 	Dialog::Message(_("Warning"), _("No maps available!"), Font::BIG, Dialog::OK);
         return MAINMENU;
     }
-
-    // preload
-    AGG::PreloadObject(ICN::HEROES);
-    AGG::PreloadObject(ICN::NGEXTRA);
-    AGG::PreloadObject(ICN::NGHSBKG);
 
     menu_t result = QUITGAME;
     LocalEvent & le = LocalEvent::Get();
@@ -81,10 +75,77 @@ Game::menu_t Game::ScenarioInfo(void)
 
     Display & display = Display::Get();
 
+    Point top, pointDifficultyInfo, pointOpponentInfo, pointClassInfo;
+    Rect rectPanel;
+    Button* buttonSelectMaps = NULL;
+    Button* buttonOk = NULL;
+    Button* buttonCancel = NULL;
+
+    std::vector<Rect>::iterator itr;
+    // vector coord difficulty
+    std::vector<Rect> coordDifficulty(5);
+    // vector coord colors opponent
+    std::vector<Rect> coordColors(KINGDOMMAX);
+    // vector coord class
+    std::vector<Rect> coordClass(KINGDOMMAX);
+
+    const Sprite & ngextra = AGG::GetICN(ICN::NGEXTRA, 62);
+    Dialog::FrameBorder* frameborder = NULL;
+
     // image background
-    const Sprite &back = AGG::GetICN(ICN::HEROES, 0);
-    const Point top((display.w() - back.w()) / 2, (display.h() - back.h()) / 2);
-    display.Blit(back, top);
+    if(conf.QVGA())
+    {
+	const u16 window_w = 380;
+	const u16 window_h = 224;
+
+	frameborder = new Dialog::FrameBorder();
+	frameborder->SetPosition((display.w() - window_w) / 2 - BORDERWIDTH, (display.h() - window_h) / 2 - BORDERWIDTH, window_w, window_h);
+	frameborder->Redraw();
+
+	rectPanel = frameborder->GetArea();
+	pointDifficultyInfo = Point(rectPanel.x + 4, rectPanel.y + 24);
+	pointOpponentInfo = Point(rectPanel.x + 4, rectPanel.y + 94);
+	pointClassInfo = Point(rectPanel.x + 4, rectPanel.y + 144);
+
+	coordDifficulty[0] = Rect(rectPanel.x + 1, rectPanel.y + 21,   ngextra.w(), ngextra.h());
+	coordDifficulty[1] = Rect(rectPanel.x + 78, rectPanel.y + 21,  ngextra.w(), ngextra.h());
+	coordDifficulty[2] = Rect(rectPanel.x + 154, rectPanel.y + 21, ngextra.w(), ngextra.h());
+	coordDifficulty[3] = Rect(rectPanel.x + 231, rectPanel.y + 21, ngextra.w(), ngextra.h());
+        coordDifficulty[4] = Rect(rectPanel.x + 308, rectPanel.y + 21, ngextra.w(), ngextra.h());
+
+	buttonOk = new Button(rectPanel.x + rectPanel.w / 2 - 160, rectPanel.y + rectPanel.h - 30, ICN::NGEXTRA, 66, 67);
+	buttonCancel = new Button(rectPanel.x + rectPanel.w / 2 + 60, rectPanel.y + rectPanel.h - 30, ICN::NGEXTRA, 68, 69);
+
+	const Sprite & background = AGG::GetICN(ICN::STONEBAK, 0);
+	display.Blit(background, Rect(0, 0, window_w, window_h), rectPanel);
+
+	Text text;
+	text.Set(conf.CurrentFileInfo().name, Font::BIG);
+	text.Blit(rectPanel.x + (rectPanel.w - text.w()) / 2, rectPanel.y + 5);
+    }
+    else
+    {
+	const Sprite &panel = AGG::GetICN(ICN::NGHSBKG, 0);
+	const Sprite &back = AGG::GetICN(ICN::HEROES, 0);
+	const Point top((display.w() - back.w()) / 2, (display.h() - back.h()) / 2);
+
+	rectPanel = Rect(top.x + 204, top.y + 32, panel.w(), panel.h());
+	pointDifficultyInfo = Point(rectPanel.x + 24, rectPanel.y + 93);
+	pointOpponentInfo = Point(rectPanel.x + 24, rectPanel.y + 202);
+	pointClassInfo = Point(rectPanel.x + 24, rectPanel.y + 282);
+
+	coordDifficulty[0] = Rect(rectPanel.x + 21, rectPanel.y + 91,  ngextra.w(), ngextra.h());
+	coordDifficulty[1] = Rect(rectPanel.x + 98, rectPanel.y + 91,  ngextra.w(), ngextra.h());
+	coordDifficulty[2] = Rect(rectPanel.x + 174, rectPanel.y + 91, ngextra.w(), ngextra.h());
+	coordDifficulty[3] = Rect(rectPanel.x + 251, rectPanel.y + 91, ngextra.w(), ngextra.h());
+	coordDifficulty[4] = Rect(rectPanel.x + 328, rectPanel.y + 91, ngextra.w(), ngextra.h());
+
+	buttonSelectMaps = new Button(rectPanel.x + 309, rectPanel.y + 45, ICN::NGEXTRA, 64, 65);
+	buttonOk = new Button(rectPanel.x + 31, rectPanel.y + 380, ICN::NGEXTRA, 66, 67);
+	buttonCancel = new Button(rectPanel.x + 287, rectPanel.y + 380, ICN::NGEXTRA, 68, 69);
+
+	display.Blit(back, top);
+    }
 
     const bool reset_starting_settings = (Color::GRAY == conf.MyColor() || !FilePresent(conf.MapsFile()));
 
@@ -92,54 +153,22 @@ Game::menu_t Game::ScenarioInfo(void)
     if(reset_starting_settings)
 	conf.LoadFileMapsMP2(lists.front().file);
 
-    const Point pointPanel(top.x + 204, top.y + 32);
-    const Point pointDifficultyInfo(pointPanel.x + 24, pointPanel.y + 93);
-    const Point pointOpponentInfo(pointPanel.x + 24, pointPanel.y + 202);
-    const Point pointClassInfo(pointPanel.x + 24, pointPanel.y + 282);
-
-    const Sprite &panel = AGG::GetICN(ICN::NGHSBKG, 0);
-    const Rect box(pointPanel, panel.w(), panel.h());
-
-    Button buttonSelectMaps(pointPanel.x + 309, pointPanel.y + 45, ICN::NGEXTRA, 64, 65);
-    Button buttonOk(pointPanel.x + 31, pointPanel.y + 380, ICN::NGEXTRA, 66, 67);
-    Button buttonCancel(pointPanel.x + 287, pointPanel.y + 380, ICN::NGEXTRA, 68, 69);
-
-    std::vector<Rect>::iterator itr;
-
-    // vector coord difficulty
-    std::vector<Rect> coordDifficulty(5);
-
-    // vector coord colors opponent
-    std::vector<Rect> coordColors(KINGDOMMAX);
-
-    // vector coord class
-    std::vector<Rect> coordClass(KINGDOMMAX);
-
     // first allow color
     if(reset_starting_settings)
     {
 	const Maps::FileInfo & info = conf.CurrentFileInfo();
-
 	conf.SetPlayersColors(info.HumanOnlyColors() ? info.HumanOnlyColors() : conf.FirstAllowColor());
     }
 
-    Scenario::RedrawStaticInfo(pointPanel);
-    Scenario::RedrawDifficultyInfo(pointDifficultyInfo);
+    Scenario::RedrawStaticInfo(rectPanel);
+    Scenario::RedrawDifficultyInfo(pointDifficultyInfo, !conf.QVGA());
 
     UpdateCoordOpponentsInfo(pointOpponentInfo, coordColors);
     Scenario::RedrawOpponentsInfo(pointOpponentInfo);
 
     UpdateCoordClassInfo(pointClassInfo, coordClass);
-    Scenario::RedrawClassInfo(pointClassInfo);
-
-    const Sprite & ngextra = AGG::GetICN(ICN::NGEXTRA, 62);
+    Scenario::RedrawClassInfo(pointClassInfo, !conf.QVGA());
     
-    coordDifficulty[0] = Rect(pointPanel.x + 21, pointPanel.y + 91,  ngextra.w(), ngextra.h());
-    coordDifficulty[1] = Rect(pointPanel.x + 98, pointPanel.y + 91,  ngextra.w(), ngextra.h());
-    coordDifficulty[2] = Rect(pointPanel.x + 174, pointPanel.y + 91, ngextra.w(), ngextra.h());
-    coordDifficulty[3] = Rect(pointPanel.x + 251, pointPanel.y + 91, ngextra.w(), ngextra.h());
-    coordDifficulty[4] = Rect(pointPanel.x + 328, pointPanel.y + 91, ngextra.w(), ngextra.h());
-
     SpriteCursor levelCursor(ngextra);
 
     switch(conf.GameDifficulty())
@@ -153,15 +182,18 @@ Game::menu_t Game::ScenarioInfo(void)
 
     levelCursor.Show();
 
+    TextSprite* rating = conf.QVGA() ? NULL : new TextSprite();
 
-    TextSprite rating;
-    rating.SetFont(Font::BIG);
-    rating.SetPos(pointPanel.x + 166, pointPanel.y + 383);
-    RedrawRatingInfo(rating);
+    if(rating)
+    {
+	rating->SetFont(Font::BIG);
+	rating->SetPos(rectPanel.x + 166, rectPanel.y + 383);
+	RedrawRatingInfo(*rating);
+    }
 
-    buttonSelectMaps.Draw();
-    buttonOk.Draw();
-    buttonCancel.Draw();
+    if(buttonSelectMaps) buttonSelectMaps->Draw();
+    buttonOk->Draw();
+    buttonCancel->Draw();
 
     cursor.Show();
     display.Flip();
@@ -169,12 +201,14 @@ Game::menu_t Game::ScenarioInfo(void)
     while(le.HandleEvents())
     {
 	// press button
-	le.MousePressLeft(buttonSelectMaps) ? buttonSelectMaps.PressDraw() : buttonSelectMaps.ReleaseDraw();
-	le.MousePressLeft(buttonOk) ? buttonOk.PressDraw() : buttonOk.ReleaseDraw();
-	le.MousePressLeft(buttonCancel) ? buttonCancel.PressDraw() : buttonCancel.ReleaseDraw();
+	if(buttonSelectMaps)
+	le.MousePressLeft(*buttonSelectMaps) ? buttonSelectMaps->PressDraw() : buttonSelectMaps->ReleaseDraw();
+	le.MousePressLeft(*buttonOk) ? buttonOk->PressDraw() : buttonOk->ReleaseDraw();
+	le.MousePressLeft(*buttonCancel) ? buttonCancel->PressDraw() : buttonCancel->ReleaseDraw();
 
 	// click select
-	if(Game::HotKeyPress(Game::EVENT_BUTTON_SELECT) || le.MouseClickLeft(buttonSelectMaps))
+	if(buttonSelectMaps &&
+	  (Game::HotKeyPress(Game::EVENT_BUTTON_SELECT) || le.MouseClickLeft(*buttonSelectMaps)))
 	{
 	    std::string filemaps;
 	    if(Dialog::SelectScenario(lists, filemaps) && conf.LoadFileMapsMP2(filemaps))
@@ -183,31 +217,33 @@ Game::menu_t Game::ScenarioInfo(void)
 		levelCursor.Hide();
 		const Maps::FileInfo & info = conf.CurrentFileInfo();
 		conf.SetPlayersColors(info.HumanOnlyColors() ? info.HumanOnlyColors() : conf.FirstAllowColor());
-		Scenario::RedrawStaticInfo(pointPanel);
-		Scenario::RedrawDifficultyInfo(pointDifficultyInfo);
+		Scenario::RedrawStaticInfo(rectPanel);
+		Scenario::RedrawDifficultyInfo(pointDifficultyInfo, !conf.QVGA());
 		UpdateCoordOpponentsInfo(pointOpponentInfo, coordColors);
 		Scenario::RedrawOpponentsInfo(pointOpponentInfo);
 		UpdateCoordClassInfo(pointClassInfo, coordClass);
-		Scenario::RedrawClassInfo(pointClassInfo);
-		RedrawRatingInfo(rating);
+		Scenario::RedrawClassInfo(pointClassInfo, !conf.QVGA());
+		if(rating) RedrawRatingInfo(*rating);
 		// default difficulty normal
 		levelCursor.Move(coordDifficulty[1]);
 		levelCursor.Show();
     		conf.SetGameDifficulty(Difficulty::NORMAL);
+		buttonOk->Draw();
+		buttonCancel->Draw();
 	    }
 	    cursor.Show();
 	    display.Flip();
 	}
 	else
 	// click cancel
-	if(HotKeyPress(EVENT_DEFAULT_EXIT) || le.MouseClickLeft(buttonCancel))
+	if(HotKeyPress(EVENT_DEFAULT_EXIT) || le.MouseClickLeft(*buttonCancel))
 	{
 	    result = MAINMENU;
 	    break;
 	}
 	else
 	// click ok
-	if(HotKeyPress(EVENT_DEFAULT_READY) || le.MouseClickLeft(buttonOk))
+	if(HotKeyPress(EVENT_DEFAULT_READY) || le.MouseClickLeft(*buttonOk))
 	{
 	    DEBUG(DBG_GAME, DBG_INFO, "select maps: " << conf.MapsFile() << \
 		    ", difficulty: " << Difficulty::String(conf.GameDifficulty()));
@@ -218,7 +254,7 @@ Game::menu_t Game::ScenarioInfo(void)
 	    break;
 	}
 	else
-	if(le.MouseClickLeft(box))
+	if(le.MouseClickLeft(rectPanel))
 	{
 	    // select difficulty
 	    if(coordDifficulty.end() != (itr = std::find_if(coordDifficulty.begin(), coordDifficulty.end(), std::bind2nd(RectIncludePoint(), le.GetMouseCursor()))))
@@ -226,7 +262,7 @@ Game::menu_t Game::ScenarioInfo(void)
 		cursor.Hide();
 		levelCursor.Move((*itr).x, (*itr).y);
 		conf.SetGameDifficulty(itr - coordDifficulty.begin());
-		RedrawRatingInfo(rating);
+		if(rating) RedrawRatingInfo(*rating);
 		cursor.Show();
 		display.Flip();
 	    }
@@ -246,7 +282,7 @@ Game::menu_t Game::ScenarioInfo(void)
 		    cursor.Hide();
 		    u8 players = color;
 		
-		    if((Game::NETWORK | Game::HOTSEAT) & conf.GameType())
+		    if(conf.GameType(Game::NETWORK | Game::HOTSEAT))
 		        players = conf.PlayersColors() & color ?
 				/* reset color */
 				conf.PlayersColors() & ~color :
@@ -280,22 +316,25 @@ Game::menu_t Game::ScenarioInfo(void)
 			default: break;
 		    }
 		    conf.SetKingdomRace(color, race);
-		    Scenario::RedrawStaticInfo(pointPanel);
+		    Scenario::RedrawStaticInfo(rectPanel);
 		    levelCursor.Redraw();
-		    Scenario::RedrawDifficultyInfo(pointDifficultyInfo);
+		    Scenario::RedrawDifficultyInfo(pointDifficultyInfo, !conf.QVGA());
 		    Scenario::RedrawOpponentsInfo(pointOpponentInfo);
-		    Scenario::RedrawClassInfo(pointClassInfo);
-		    RedrawRatingInfo(rating);
+		    Scenario::RedrawClassInfo(pointClassInfo, !conf.QVGA());
+		    if(rating) RedrawRatingInfo(*rating);
+		    buttonOk->Draw();
+		    buttonCancel->Draw();
 		    cursor.Show();
 		    display.Flip();
 		}
 	    }
 	}
 	
-	if(le.MousePressRight(box))
+	if(le.MousePressRight(rectPanel))
 	{
 	    // right info
-	    if(le.MousePressRight(buttonSelectMaps)) Dialog::Message(_("Scenario"), _("Click here to select which scenario to play."), Font::BIG);
+	    if(buttonSelectMaps && le.MousePressRight(*buttonSelectMaps))
+		Dialog::Message(_("Scenario"), _("Click here to select which scenario to play."), Font::BIG);
 	    else
 	    // difficulty
 	    if(coordDifficulty.end() != (itr = std::find_if(coordDifficulty.begin(), coordDifficulty.end(), std::bind2nd(RectIncludePoint(), le.GetMouseCursor()))))
@@ -311,11 +350,14 @@ Game::menu_t Game::ScenarioInfo(void)
 		conf.KingdomColors(Color::GetFromIndex(itr - coordClass.begin())))
 		    Dialog::Message(_("Class"), _("This lets you change the class of a player. Classes are not always changeable. Depending on the scenario, a player may receive additional towns and/or heroes not of their primary alignment."), Font::BIG);
 	    else
-	    if(le.MousePressRight(rating.GetRect())) Dialog::Message(_("Difficulty Rating"), _("The difficulty rating reflects a combination of various settings for your game. This number will be applied to your final score."), Font::BIG);
+	    if(rating && le.MousePressRight(rating->GetRect()))
+		Dialog::Message(_("Difficulty Rating"), _("The difficulty rating reflects a combination of various settings for your game. This number will be applied to your final score."), Font::BIG);
 	    else
-	    if(le.MousePressRight(buttonOk)) Dialog::Message(_("OK"), _("Click to accept these settings and start a new game."), Font::BIG);
+	    if(le.MousePressRight(*buttonOk))
+		Dialog::Message(_("OK"), _("Click to accept these settings and start a new game."), Font::BIG);
 	    else
-	    if(le.MousePressRight(buttonCancel)) Dialog::Message(_("Cancel"), _("Click to return to the main menu."), Font::BIG);
+	    if(le.MousePressRight(*buttonCancel))
+		Dialog::Message(_("Cancel"), _("Click to return to the main menu."), Font::BIG);
 	}
     }
 
@@ -330,6 +372,12 @@ Game::menu_t Game::ScenarioInfo(void)
 	// Load maps
 	world.LoadMaps(conf.MapsFile());
     }
+
+    if(frameborder) delete frameborder;
+    if(rating) delete rating;
+    if(buttonSelectMaps) delete buttonSelectMaps;
+    delete buttonOk;
+    delete buttonCancel;
 
     return result;
 }
@@ -359,34 +407,46 @@ void UpdateCoordOpponentsInfo(const Point & dst, std::vector<Rect> & rects)
 	rects[Color::GetIndex(*it)] = Rect(dst.x + GetStepFor(current++, sprite.w(), count), dst.y, sprite.w(), sprite.h());
 }
 
-void Game::Scenario::RedrawStaticInfo(const Point & pt)
+void Game::Scenario::RedrawStaticInfo(const Rect & rt)
 {
     Display & display = Display::Get();
-    const Settings & conf = Settings::Get();
+    Settings & conf = Settings::Get();
 
-    // image panel
-    const Sprite &panel = AGG::GetICN(ICN::NGHSBKG, 0);
-    display.Blit(panel, pt);
+    if(conf.QVGA())
+    {
+	const Sprite & background = AGG::GetICN(ICN::STONEBAK, 0);
+	display.Blit(background, Rect(0, 0, rt.w, rt.h), rt);
 
-    // text scenario
-    Text text(_("Scenario:"), Font::BIG);
-    text.Blit(pt.x + (panel.w() - text.w()) / 2, pt.y + 20);
+	Text text;
+	text.Set(conf.CurrentFileInfo().name, Font::BIG);
+	text.Blit(rt.x + (rt.w - text.w()) / 2, rt.y + 5);
+    }
+    else
+    {
+	// image panel
+	const Sprite &panel = AGG::GetICN(ICN::NGHSBKG, 0);
+	display.Blit(panel, rt);
 
-    // maps name
-    text.Set(conf.MapsName());
-    text.Blit(pt.x + (panel.w() - text.w()) / 2, pt.y + 46);
+	// text scenario
+	Text text(_("Scenario:"), Font::BIG);
+        text.Blit(rt.x + (rt.w - text.w()) / 2, rt.y + 20);
+
+	// maps name
+	text.Set(conf.MapsName());
+	text.Blit(rt.x + (rt.w - text.w()) / 2, rt.y + 46);
     
-    // text game difficulty
-    text.Set(_("Game Difficulty:"));
-    text.Blit(pt.x + (panel.w() - text.w()) / 2, pt.y + 75);
+	// text game difficulty
+	text.Set(_("Game Difficulty:"));
+	text.Blit(rt.x + (rt.w - text.w()) / 2, rt.y + 75);
 
-    // text opponents
-    text.Set(_("Opponents:"), Font::BIG);
-    text.Blit(pt.x + (panel.w() - text.w()) / 2, pt.y + 181);
+	// text opponents
+	text.Set(_("Opponents:"), Font::BIG);
+	text.Blit(rt.x + (rt.w - text.w()) / 2, rt.y + 181);
 
-    // text class
-    text.Set(_("Class:"), Font::BIG);
-    text.Blit(pt.x + (panel.w() - text.w()) / 2, pt.y + 262);
+	// text class
+	text.Set(_("Class:"), Font::BIG);
+	text.Blit(rt.x + (rt.w - text.w()) / 2, rt.y + 262);
+    }
 }
 
 void Game::Scenario::RedrawOpponentsInfo(const Point & dst, const std::vector<Player> *players)

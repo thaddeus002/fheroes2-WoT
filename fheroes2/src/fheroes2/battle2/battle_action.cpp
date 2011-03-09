@@ -951,7 +951,7 @@ void Battle2::Arena::ApplyActionAutoBattle(Action & action)
 void Battle2::Arena::SpellActionSummonElemental(Action & a, const Spell & spell)
 {
 #ifdef WITH_NET
-    if(! (Settings::Get().GameType() & Game::NETWORK) || Network::isRemoteClient())
+    if(! (Settings::Get().GameType(Game::NETWORK)) || Network::isRemoteClient())
     {
 #endif
 	Stats* elem = CreateElemental(spell);
@@ -988,7 +988,7 @@ void Battle2::Arena::SpellActionSummonElemental(Action & a, const Spell & spell)
 void Battle2::Arena::SpellActionDefaults(Action & a, const Spell & spell)
 {
 #ifdef WITH_NET
-    if(! (Settings::Get().GameType() & Game::NETWORK) || Network::isRemoteClient())
+    if(! (Settings::Get().GameType(Game::NETWORK)) || Network::isRemoteClient())
     {
 #endif
         const HeroBase* current_commander = GetCurrentCommander();
@@ -1080,7 +1080,7 @@ void Battle2::Arena::SpellActionTeleport(Action & a)
 void Battle2::Arena::SpellActionEarthQuake(Action & a)
 {
 #ifdef WITH_NET
-    if(! (Settings::Get().GameType() & Game::NETWORK) || Network::isRemoteClient())
+    if(! (Settings::Get().GameType(Game::NETWORK)) || Network::isRemoteClient())
     {
 #endif
 	std::vector<u8> targets;
@@ -1140,7 +1140,7 @@ void Battle2::Arena::SpellActionMirrorImage(Action & a)
     if(b)
     {
 #ifdef WITH_NET
-	if(! (Settings::Get().GameType() & Game::NETWORK) || Network::isRemoteClient())
+	if(! (Settings::Get().GameType(Game::NETWORK)) || Network::isRemoteClient())
 	{
 #endif
 	    std::vector<u16> v;

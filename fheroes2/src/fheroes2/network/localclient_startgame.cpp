@@ -522,6 +522,7 @@ void FH2LocalClient::SendArmyCombatFormation(const Army::army_t & army)
 
 void FH2LocalClient::SendUpdateBattleOnlySettings(const BattleOnly & b)
 {
+#ifdef BUILD_BATTLEONLY
     FH2LocalClient & client = FH2LocalClient::Get();
     QueueMessage packet;
 
@@ -530,6 +531,7 @@ void FH2LocalClient::SendUpdateBattleOnlySettings(const BattleOnly & b)
 
     DEBUG(DBG_NETWORK, DBG_INFO, "");
     client.Send(packet);
+#endif
 }
 
 #endif

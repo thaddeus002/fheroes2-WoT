@@ -105,7 +105,7 @@ int FH2LocalClient::Main(void)
 
     if(ConnectionChat())
     {
-	if(Game::STANDARD & conf.GameType())
+	if(conf.GameType(Game::STANDARD))
 	{
 	    if(ScenarioInfoDialog())
 	    {
@@ -133,7 +133,7 @@ int FH2LocalClient::Main(void)
 		err = "close scenario dialog";
 	}
 	else
-	if(Game::BATTLEONLY & conf.GameType())
+	if(conf.GameType(Game::BATTLEONLY))
 	{
 	    if(Prepare4BattleOnly())
 	    {
@@ -373,9 +373,10 @@ bool FH2LocalClient::ScenarioInfoDialog(void)
     if(!GetCurrentMapInfo() ||
 	!GetPlayersInfo()) return false;
 
-    const Point pointPanel(204, 32);
-    const Point pointOpponentInfo(pointPanel.x + 24, pointPanel.y + 202);
-    const Point pointClassInfo(pointPanel.x + 24, pointPanel.y + 282);
+    const Sprite &panel = AGG::GetICN(ICN::NGHSBKG, 0);
+    const Rect  rectPanel(204, 32, panel.w(), panel.h());
+    const Point pointOpponentInfo(rectPanel.x + 24, rectPanel.y + 202);
+    const Point pointClassInfo(rectPanel.x + 24, rectPanel.y + 282);
     const Rect  box(pointOpponentInfo, 360, 180);
 
     std::vector<Rect>::const_iterator itr;
@@ -386,13 +387,13 @@ bool FH2LocalClient::ScenarioInfoDialog(void)
     UpdateCoordOpponentsInfo(pointOpponentInfo, coordColors);
     UpdateCoordClassInfo(pointClassInfo, coordRaces);
 
-    Game::Scenario::RedrawStaticInfo(pointPanel);
+    Game::Scenario::RedrawStaticInfo(rectPanel);
     Game::Scenario::RedrawOpponentsInfo(pointOpponentInfo, &players);
     Game::Scenario::RedrawClassInfo(pointClassInfo);
 
-    Button buttonSelectMaps(pointPanel.x + 309, pointPanel.y + 45, ICN::NGEXTRA, 64, 65);
-    Button buttonOk(pointPanel.x + 31, pointPanel.y + 380, ICN::NGEXTRA, 66, 67);
-    Button buttonCancel(pointPanel.x + 287, pointPanel.y + 380, ICN::NGEXTRA, 68, 69);
+    Button buttonSelectMaps(rectPanel.x + 309, rectPanel.y + 45, ICN::NGEXTRA, 64, 65);
+    Button buttonOk(rectPanel.x + 31, rectPanel.y + 380, ICN::NGEXTRA, 66, 67);
+    Button buttonCancel(rectPanel.x + 287, rectPanel.y + 380, ICN::NGEXTRA, 68, 69);
 
     SpriteCursor sp;
     sp.SetSprite(AGG::GetICN(ICN::NGEXTRA, 80));
@@ -476,7 +477,7 @@ bool FH2LocalClient::ScenarioInfoDialog(void)
 	if(update_info)
 	{
 	    cursor.Hide();
-	    Game::Scenario::RedrawStaticInfo(pointPanel);
+	    Game::Scenario::RedrawStaticInfo(rectPanel);
 	    Game::Scenario::RedrawOpponentsInfo(pointOpponentInfo, &players);
 	    Game::Scenario::RedrawClassInfo(pointClassInfo);
 	    buttonSelectMaps.Draw();

@@ -197,6 +197,7 @@ int FH2Server::Main(void* ptr)
 			    server.MsgChangeRaces(msg);
                 	break;
 
+#ifdef BUILD_BATTLEONLY
 		    case MSG_UPDATE_BATTLEONLY:
 		    {
 			server.mutexConf.Lock();
@@ -205,6 +206,7 @@ int FH2Server::Main(void* ptr)
 			server.mutexConf.Unlock();
 			break;
 		    }
+#endif
 
 		    case MSG_START_BATTLEONLY:
                 	if(client->Modes(ST_ADMIN))
@@ -467,7 +469,7 @@ u8 FH2Server::GetFreeColor(bool admin)
     Settings & conf = Settings::Get();
     u8 res = 0;
 
-    if(Game::STANDARD & conf.GameType())
+    if(conf.GameType(Game::STANDARD))
     {
         // check color
         mutexConf.Lock();
@@ -475,7 +477,7 @@ u8 FH2Server::GetFreeColor(bool admin)
         mutexConf.Unlock();
     }
     else
-    if(Game::BATTLEONLY & conf.GameType())
+    if(conf.GameType(Game::BATTLEONLY))
     {
         res = admin ? Color::BLUE : Color::RED;
     }
@@ -684,13 +686,13 @@ void FH2Server::MsgLoadMaps(QueueMessage & msg, FH2RemoteClient & client)
 
 	conf.SetPlayersColors(clients.GetPlayersColors());
 
-	if(Game::STANDARD & conf.GameType())
+	if(conf.GameType(Game::STANDARD))
 	{
 	    // disable connect
 	    //world.LoadMaps(conf.MapsFile());
 	}
 	else
-	if(Game::BATTLEONLY & conf.GameType())
+	if(conf.GameType(Game::BATTLEONLY))
 	{
 	    //world.NewMaps(10, 10);
 	}
@@ -882,7 +884,7 @@ Game::menu_t Game::NetworkHost(void)
 {
     Settings & conf = Settings::Get();
 
-    if(conf.GameType() & Game::STANDARD)
+    if(conf.GameType(Game::STANDARD))
     {
 	// select count players
 	const u8 max_players = Game::SelectCountPlayers();
@@ -900,7 +902,7 @@ Game::menu_t Game::NetworkHost(void)
 	display.Flip();
     }
     else
-    if(conf.GameType() & Game::BATTLEONLY)
+    if(conf.GameType(Game::BATTLEONLY))
 	conf.SetPreferablyCountPlayers(2);
 
     SDL::Thread thread;

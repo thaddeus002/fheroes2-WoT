@@ -259,7 +259,7 @@ namespace Game
 
     namespace Scenario
     {
-	void RedrawStaticInfo(const Point &);
+	void RedrawStaticInfo(const Rect &);
 	void RedrawDifficultyInfo(const Point & dst, bool label = true);
 	void RedrawOpponentsInfo(const Point &, const std::vector<Player> *players = NULL);
 	void RedrawClassInfo(const Point &, bool label = true);
