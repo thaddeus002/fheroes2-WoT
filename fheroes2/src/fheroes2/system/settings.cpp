@@ -170,6 +170,7 @@ static const settings_t settingsFHeroes2[] =
     { Settings::POCKETPC_HIDE_CURSOR,		_("pocketpc: hide cursor"),				},
     { Settings::POCKETPC_TAP_MODE,		_("pocketpc: tap mode"),				},
     { Settings::POCKETPC_DRAG_DROP_SCROLL,	_("pocketpc: drag&drop gamearea as scroll"),		},
+    { Settings::POCKETPC_LOW_RESOLUTION,	_("pocketpc: low display resolution (needs restart)"),},
     { Settings::POCKETPC_LOW_MEMORY,		_("pocketpc: low memory"),				},
 
     { 0, NULL },
@@ -480,6 +481,13 @@ bool Settings::Read(const std::string & filename)
 	entry = config.Find("fullscreen");
 	if(!entry || entry->StrParams() != "off")
 	    opt_global.SetModes(GLOBAL_FULLSCREEN);
+	if(ExtLowResolution())
+	{
+#ifdef ANDROID
+	    video_mode.w = 480;
+	    video_mode.h = 320;
+#endif
+	}
     }
 
     return true;
@@ -1414,6 +1422,11 @@ bool Settings::ExtTapMode(void) const
 bool Settings::ExtDragDropScroll(void) const
 {
     return ExtModes(POCKETPC_DRAG_DROP_SCROLL);
+}
+
+bool Settings::ExtLowResolution(void) const
+{
+    return ExtModes(POCKETPC_LOW_RESOLUTION);
 }
 
 const Point & Settings::PosRadar(void) const { return pos_radr; }

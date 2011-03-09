@@ -150,6 +150,7 @@ public:
 	POCKETPC_LOW_MEMORY		= 0x10800000,
 	POCKETPC_TAP_MODE		= 0x11000000,
 	POCKETPC_DRAG_DROP_SCROLL	= 0x12000000,
+	POCKETPC_LOW_RESOLUTION		= 0x14000000,
 
 	/* influence on game balance: save to savefile */
 	WORLD_SHOW_VISITED_CONTENT	= 0x20000001,
@@ -311,6 +312,7 @@ public:
     bool ExtLowMemory(void) const;
     bool ExtTapMode(void) const;
     bool ExtDragDropScroll(void) const;
+    bool ExtLowResolution(void) const;
     bool EvilInterface(void) const;
     bool DynamicInterface(void) const;
     bool HideInterface(void) const;
