@@ -606,17 +606,17 @@ void AIToPickupResource(Heroes &hero, const u8 obj, const s32 dst_index)
 {
     Maps::Tiles & tile = world.GetTiles(dst_index);
     Funds resource;
-    const u8 count = tile.GetQuantity2();
+    u16 count = tile.GetQuantity2();
 
     switch(tile.GetQuantity1())
     {
-        case Resource::WOOD: resource.wood += count; break;
-        case Resource::MERCURY: resource.mercury += count; break;
-        case Resource::ORE: resource.ore += count; break;
-        case Resource::SULFUR: resource.sulfur += count; break;
-        case Resource::CRYSTAL: resource.crystal += count; break;
-        case Resource::GEMS: resource.gems += count; break;
-        case Resource::GOLD: resource.gold += 100 * count; break;
+        case Resource::WOOD: resource.wood = count; break;
+        case Resource::MERCURY: resource.mercury = count; break;
+        case Resource::ORE: resource.ore = count; break;
+        case Resource::SULFUR: resource.sulfur = count; break;
+        case Resource::CRYSTAL: resource.crystal = count; break;
+        case Resource::GEMS: resource.gems = count; break;
+        case Resource::GOLD: count *= 100; resource.gold = count; break;
 
         default: break;
     }
@@ -624,7 +624,7 @@ void AIToPickupResource(Heroes &hero, const u8 obj, const s32 dst_index)
     switch(obj)
     {
         case MP2::OBJ_CAMPFIRE:
-	    resource.gold += 100 * count;
+	    resource.gold = 100 * tile.GetQuantity2();
     	    break;
 
         default: break;

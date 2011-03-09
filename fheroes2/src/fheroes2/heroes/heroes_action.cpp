@@ -865,12 +865,18 @@ void ActionToPickupResource(Heroes &hero, const u8 obj, const s32 dst_index)
 {
     Maps::Tiles & tile = world.GetTiles(dst_index);
     u16 count = tile.GetQuantity2();
-    Funds resource(tile.GetQuantity1(), count);
+    Funds resource;
 
-    if(tile.GetQuantity1() == Resource::GOLD)
+    switch(tile.GetQuantity1())
     {
-    	count *= 100;
-	resource.gold *= 100;
+        case Resource::WOOD: resource.wood = count; break;
+        case Resource::MERCURY: resource.mercury = count; break;
+        case Resource::ORE: resource.ore = count; break;
+        case Resource::SULFUR: resource.sulfur = count; break;
+        case Resource::CRYSTAL: resource.crystal = count; break;
+        case Resource::GEMS: resource.gems = count; break;
+        case Resource::GOLD: count *= 100; resource.gold = count; break;
+        default: break;
     }
 
     PlayPickupSound();
@@ -884,6 +890,8 @@ void ActionToPickupResource(Heroes &hero, const u8 obj, const s32 dst_index)
             // force reset sound
             tile.SetObject(MP2::OBJ_ZERO);
             Game::EnvironmentSoundMixer();
+
+	    resource.gold = tile.GetQuantity2() * 100;
 
             Dialog::ResourceInfo(MP2::StringObject(obj), _("Ransacking an enemy camp, you discover a hidden cache of treasures."), resource);
             break;
