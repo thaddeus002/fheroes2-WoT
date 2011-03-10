@@ -1162,8 +1162,8 @@ void Battle2::Arena::SpellActionMirrorImage(Action & a)
     		DEBUG(DBG_BATTLE, DBG_TRACE, "set position: " << *it);
 		if(interface) interface->RedrawActionMirrorImageSpell(*b, *it);
 
-		Stats* image = CreateMirrorImage(*b, *it);
 #ifdef WITH_NET
+		Stats* image = CreateMirrorImage(*b, *it);
 		if(image)
 		{
 		    if(Game::REMOTE == army1.GetControl())
