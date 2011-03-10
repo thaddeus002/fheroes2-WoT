@@ -161,6 +161,9 @@ Game::menu_t Game::StartGame(void)
     areaMaps.Build();
 
     Game::Focus & global_focus = Focus::Get();
+    // clear prev settings
+    if(conf.GameType(LOADFILE))
+	global_focus.Reset(Focus::UNSEL);
     global_focus.Reset(Focus::FIRSTHERO);
 
     Interface::Radar & radar = I.radar;
