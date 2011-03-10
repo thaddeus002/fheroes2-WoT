@@ -126,8 +126,8 @@ using namespace std;
 #endif
 #define setlocale(x,y) 0
 #define system(x) 0
-#define putenv(x) SDL_putenv(x)
-#define getenv(x) SDL_getenv(x)
+#define setenv(x, y, z) wince_putenv(x, y, z)
+#define getenv(x) wince_getenv(x)
 #define getopt(x, y, z) -1
 #define optarg 0
 #else

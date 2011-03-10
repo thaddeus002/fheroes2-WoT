@@ -324,17 +324,15 @@ void LoadZLogo(void)
 
 void SetVideoDriver(const std::string & driver)
 {
-    std::string strtmp = "SDL_VIDEODRIVER=" + driver;
-    putenv(const_cast<char *>(strtmp.c_str()));
+    setenv("SDL_VIDEODRIVER", driver.c_str(), 1);
 }
 
 void SetTimidityEnvPath(const Settings & conf)
 {
-    std::string strtmp = conf.LocalPrefix() + SEPARATOR + "files" + SEPARATOR + "timidity" + SEPARATOR + "timidity.cfg";
-    if(FilePresent(strtmp))
+    const std::string timidity = conf.LocalPrefix() + SEPARATOR + "files" + SEPARATOR + "timidity";
+    if(FilePresent(timidity + SEPARATOR + "timidity.cfg"))
     {
-	strtmp = "TIMIDITY_PATH=" + conf.LocalPrefix() + SEPARATOR + "files" + SEPARATOR + "timidity";
-	putenv(const_cast<char *>(strtmp.c_str()));
+	setenv("TIMIDITY_PATH", timidity.c_str(), 1);
     }
 }
 
@@ -343,10 +341,8 @@ void SetLangEnvPath(const Settings & conf)
 #ifdef WITH_TTF
     if(conf.ForceLang().size())
     {
-	static std::string language("LANGUAGE=" + conf.ForceLang());
-	static std::string lang("LANG=" + conf.ForceLang());
-    	putenv(const_cast<char*>(language.c_str()));
-    	putenv(const_cast<char*>(lang.c_str()));
+	setenv("LANGUAGE", conf.ForceLang().c_str(), 1);
+	setenv("LANG", conf.ForceLang().c_str(), 1);
     }
 
     const std::string strtmp = conf.LocalPrefix() + SEPARATOR + "files" + SEPARATOR + "lang";

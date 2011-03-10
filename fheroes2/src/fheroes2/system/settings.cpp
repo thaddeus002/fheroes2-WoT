@@ -417,6 +417,12 @@ bool Settings::Read(const std::string & filename)
 
 	entry = config.Find("tap delay");
 	if(entry) le.SetTapDelayForRightClickEmulation(entry->IntParams());
+
+	entry = config.Find("pointer rotate fix");
+	if(entry)
+	{
+    	    setenv("GAPI_POINTER_FIX", entry->StrParams().c_str(), 1);
+	}
     }
 
     // videomode

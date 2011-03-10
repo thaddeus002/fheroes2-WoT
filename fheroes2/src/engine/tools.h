@@ -65,4 +65,9 @@ std::string EncodeString(const std::string & str, const char* charset);
 
 void ToolsSrcRectFixed(Rect &, s16 &, s16 &, const u16, const u16, const Rect &);
 
+#ifdef __MINGW32CE__
+int	wince_putenv(const char *name, const char *value, int overwrite);
+char*	wince_getenv(const char* env);
+#endif
+
 #endif
