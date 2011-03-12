@@ -292,6 +292,13 @@ bool GameOver::Result::CheckGameOver(Game::menu_t & res)
         colors &= (~*it);
     }
 
+    // players miss
+    if( !(colors & Settings::Get().PlayersColors()))
+    {
+        res = Game::MAINMENU;
+	return true;
+    }
+
     const Kingdom & myKingdom = world.GetMyKingdom();
 
     if(GameOver::COND_NONE != (result = world.CheckKingdomLoss(myKingdom)))
