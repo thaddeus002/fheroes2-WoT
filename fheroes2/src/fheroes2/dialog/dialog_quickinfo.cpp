@@ -881,6 +881,8 @@ void Dialog::QuickInfo(const Heroes & hero)
     text.Blit(dst_pt);
 
     message.clear();
+    String::AddInt(message, hero.GetMobilityIndexSprite());
+    message += "/";
     String::AddInt(message, hero.GetMovePoints());
     message += "/";
     String::AddInt(message, hero.GetMaxMovePoints());
