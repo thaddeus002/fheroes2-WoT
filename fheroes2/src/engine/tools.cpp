@@ -703,6 +703,7 @@ std::string EncodeString(const std::string & str, const char* charset)
 int sdl_putenv(const char *name, const char *value, int overwrite)
 {
     std::string str(std::string(name) + "=" + std::string(value));
+    // SDL 1.2.12 (char *)
     return SDL_putenv(const_cast<char *>(str.c_str()));
 }
 
