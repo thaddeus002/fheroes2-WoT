@@ -467,7 +467,6 @@ Dialog::answer_t Castle::OpenDialog(bool readonly, bool fade)
 		heroes.Guest()->SetModes(Heroes::GUARDIAN);
 		heroes.Guest()->ResetModes(Heroes::SLEEPER);
 		heroes.Swap();
-		heroes.Guard()->GetPath().Reset();
 		heroes.Guard()->GetArmy().JoinArmy(army);
 
 		world.GetTiles(center).SetObject(MP2::OBJ_CASTLE);
@@ -477,6 +476,7 @@ Dialog::answer_t Castle::OpenDialog(bool readonly, bool fade)
 		Point position(heroes.Guard()->GetCenter());
 		position.y -= 1;
 		heroes.Guard()->SetCenter(position);
+		heroes.Guard()->GetPath().Reset();
 
 		cursor.Hide();
         	if(selectArmy1.isSelected()) selectArmy1.Reset();
@@ -502,6 +502,7 @@ Dialog::answer_t Castle::OpenDialog(bool readonly, bool fade)
 	    Point position(heroes.Guest()->GetCenter());
 	    position.y += 1;
 	    heroes.Guest()->SetCenter(position);
+	    heroes.Guest()->GetPath().Reset();
 
 	    world.GetTiles(center).SetObject(MP2::OBJ_HEROES);
 	    heroes.Guest()->SaveUnderObject(MP2::OBJ_CASTLE);
