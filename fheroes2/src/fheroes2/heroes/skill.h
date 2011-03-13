@@ -43,8 +43,6 @@ namespace Skill
     {
 	enum type_t { NONE=0, BASIC=1, ADVANCED=2, EXPERT=3 };
 
-	type_t FromMP2(const u8 byte);
-
 	const char* String(u8 level);
     }
 
@@ -74,36 +72,45 @@ namespace Skill
 	};
 
 	Secondary();
-	Secondary(const skill_t s, const Level::type_t t);
+	Secondary(u8 skill, u8 level);
 
-	void		SetSkill(const skill_t s);
-	void		SetLevel(const u8 level);
+	void		SetSkill(u8);
+	void		SetLevel(u8);
 	void		NextLevel(void);
 
-	Level::type_t	Level(void) const;
-	skill_t		Skill(void) const;
+	u8		Level(void) const;
+	u8		Skill(void) const;
 
 	bool		isLevel(u8) const;
 	bool		isSkill(u8) const;
+	bool		isValid(void) const;
 
-	static skill_t 	Skill(const u8);
-	static skill_t 	FromMP2(const u8 byte);
-	static skill_t 	RandForWitchsHut(void);
-	static const char* String(const skill_t skill);
-	static const char* Description(const skill_t skill, const Level::type_t level);
-	static skill_t PriorityFromRace(const u8 race, const std::vector<skill_t>& exclude);
-	static void FillStandard(std::vector<skill_t> &);
-	static u8 GetWeightSkillFromRace(u8 race, u8 skill);
-	static void LoadDefaults(u8, std::vector<Secondary> &);
-	static u16 GetValues(skill_t, u8);
+	const char*	GetName(void) const;
+	std::string	GetDescription(void) const;
+	u16		GetValues(void) const;
 
 	/* index sprite from SECSKILL */
-	static u8 GetIndexSprite1(const skill_t skill);
-
+	u8		GetIndexSprite1(void) const;
 	/* index sprite from MINISS */
-	static u8 GetIndexSprite2(const skill_t skill);
+	u8		GetIndexSprite2(void) const;
+
+	static u8	RandForWitchsHut(void);
+	static const char* String(u8);
     };
     
+    struct SecSkills : std::vector<Secondary>
+    {
+	SecSkills();
+	SecSkills(u8 race);
+
+	u8	GetLevel(u8 skill) const;
+	u16	GetValues(u8 skill) const;
+	void	AddSkill(const Skill::Secondary &);
+	void	FindSkillsForLevelUp(u8 race, Secondary &, Secondary &) const;
+
+	void	ReadFromMP2(const u8*);
+    };
+
     class Primary
     {
 	public:
@@ -136,8 +143,9 @@ namespace Skill
 	virtual u8 GetRace(void) const = 0;
 	virtual u8 GetType(void) const = 0;
 
-        static const char* String(const skill_t skill);
-	static skill_t FromLevelUp(const u8 race, const u8 level);
+	u8 LevelUp(u8 race, u8 level);
+
+        static const char* String(u8);
 	static void LoadDefaults(u8 type, u8 race, Primary &);
 	static u8 GetInitialSpell(u8 race);
 
@@ -157,7 +165,7 @@ public:
     const Rect & GetArea(void) const;
     u8 GetIndexFromCoord(const Point &);
 
-    void SetSkills(const std::vector<Skill::Secondary> &);
+    void SetSkills(const Skill::SecSkills &);
     void SetUseMiniSprite(void);
     void SetPos(s16, s16);
     void SetInterval(u8);
@@ -169,7 +177,7 @@ private:
     void CalcSize(void);
 
     Rect pos;
-    const std::vector<Skill::Secondary> *skills;
+    const Skill::SecSkills *skills;
     u8 interval;
     bool use_mini_sprite;
 };

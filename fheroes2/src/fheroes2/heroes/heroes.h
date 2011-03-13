@@ -155,14 +155,12 @@ public:
     void MovePointsScaleFixed(void);
     void RecalculateMovePoints(void);
 
-    bool HasSecondarySkill(const Skill::Secondary::skill_t skill) const;
+    bool HasSecondarySkill(u8) const;
     bool HasMaxSecondarySkill(void) const;
-    u8   GetLevelSkill(const Skill::Secondary::skill_t skill) const;
-    void LearnBasicSkill(const Skill::Secondary::skill_t skill);
-    void LevelUpSkill(const Skill::Secondary::skill_t skill);
-    void FindSkillsForLevelUp(Skill::Secondary & sec1, Skill::Secondary & sec2) const;
-    const std::vector<Skill::Secondary>	& GetSecondarySkills(void) const;
-    u8   GetSecondaryValues(const Skill::Secondary::skill_t) const;
+    u8   GetLevelSkill(u8) const;
+    u16  GetSecondaryValues(u8) const;
+    void LearnSkill(const Skill::Secondary &);
+    const Skill::SecSkills & GetSecondarySkills(void) const;
 
     bool PickupArtifact(const Artifact &);
     bool HasUltimateArtifact(void) const;
@@ -247,9 +245,9 @@ private:
     friend struct BattleOnly;
 #endif
 
-    void LevelUp(bool autoselect = false);
-    Skill::Primary::skill_t LevelUpPrimarySkill(void);
-    void LevelUpSecondarySkill(const Skill::Primary::skill_t, bool autoselect = false);
+    void LevelUp(bool skipsecondary, bool autoselect = false);
+    u8   LevelUpPrimarySkill(void);
+    void LevelUpSecondarySkill(u8, bool autoselect = false);
     void AngleStep(u16 to_direct);
     bool MoveStep(bool fast = false);
     static void MoveStep(Heroes &, s32 from, s32 to, bool newpos);
@@ -260,7 +258,7 @@ private:
     u32			experience;
     s32			move_point_scale;
 
-    std::vector<Skill::Secondary>	secondary_skills;
+    Skill::SecSkills	secondary_skills;
 
     Army::army_t        army;
 

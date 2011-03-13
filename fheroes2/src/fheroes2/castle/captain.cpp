@@ -125,12 +125,12 @@ u8 Captain::GetType(void) const
     return Skill::Primary::CAPTAIN;
 }
 
-u8 Captain::GetLevelSkill(const Skill::Secondary::skill_t skill) const
+u8 Captain::GetLevelSkill(u8) const
 {
     return 0;
 }
 
-u8 Captain::GetSecondaryValues(const Skill::Secondary::skill_t skill) const
+u16 Captain::GetSecondaryValues(u8) const
 {
     return 0;
 }

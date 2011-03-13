@@ -26,8 +26,54 @@
 #include "button.h"
 #include "dialog.h"
 
-Skill::Secondary::skill_t Dialog::LevelUpSelectSkill(const std::string & header, const Skill::Secondary & sec1, const Skill::Secondary & sec2)
+void DialogPrimaryOnly(const std::string & name, const std::string & primary)
 {
+    std::string message = _("%{name} has gained a level.");
+    message.append("\n \n");
+    message.append(_("%{skill} Skill +1"));
+    String::Replace(message, "%{name}", name);
+    String::Replace(message, "%{skill}", primary);
+    Dialog::Message("", message, Font::BIG, Dialog::OK);
+}
+
+u8 DialogOneSecondary(const std::string & name, const std::string & primary, const Skill::Secondary & sec)
+{
+    std::string message = _("%{name} has gained a level.");
+    message.append("\n \n");
+    message.append(_("%{skill} Skill +1"));
+    String::Replace(message, "%{name}", name);
+    String::Replace(message, "%{skill}", primary);
+
+    message.append("\n \n");
+    message.append(_("You have learned %{skill}."));
+    String::Replace(message, "%{skill}", sec.GetName());
+
+    const Sprite & sprite_frame = AGG::GetICN(ICN::SECSKILL, 15);
+    Surface sf(sprite_frame.w(), sprite_frame.h());
+    sf.Blit(sprite_frame);
+
+    // sprite
+    const Sprite & sprite_skill = AGG::GetICN(ICN::SECSKILL, sec.GetIndexSprite1());
+    sf.Blit(sprite_skill, 3, 3);
+    // text
+    Text text_skill(Skill::Secondary::String(sec.Skill()), Font::SMALL);
+    text_skill.Blit(3 + (sprite_skill.w() - text_skill.w()) / 2, 6, sf);
+    Text text_level(Skill::Level::String(sec.Level()), Font::SMALL);
+    text_level.Blit(3 + (sprite_skill.w() - text_level.w()) / 2, sprite_skill.h() - 12, sf);
+
+    Dialog::SpriteInfo("", message, sf);
+
+    return sec.Skill();
+}
+
+u8 DialogSelectSecondary(const std::string & name, const std::string & primary, const Skill::Secondary & sec1, const Skill::Secondary & sec2)
+{
+    std::string header = _("%{name} has gained a level.");
+    header.append("\n \n");
+    header.append(_("%{skill} Skill +1"));
+    String::Replace(header, "%{name}", name);
+    String::Replace(header, "%{skill}", primary);
+
     Display & display = Display::Get();
     const ICN::icn_t system = Settings::Get().EvilInterface() ? ICN::SYSTEME : ICN::SYSTEM;
 
@@ -41,21 +87,24 @@ Skill::Secondary::skill_t Dialog::LevelUpSelectSkill(const std::string & header,
     cursor.SetThemes(cursor.POINTER);
 
     const Sprite &sprite_frame = AGG::GetICN(ICN::SECSKILL, 15);
-    const Sprite & sprite_skill1 = AGG::GetICN(ICN::SECSKILL, Skill::Secondary::GetIndexSprite1(sec1.Skill()));
-    const Sprite & sprite_skill2 = AGG::GetICN(ICN::SECSKILL, Skill::Secondary::GetIndexSprite1(sec2.Skill()));
+    const Sprite & sprite_skill1 = AGG::GetICN(ICN::SECSKILL, sec1.GetIndexSprite1());
+    const Sprite & sprite_skill2 = AGG::GetICN(ICN::SECSKILL, sec2.GetIndexSprite1());
 
     Point pt;
-    std::string message = _("You may learn either %{level1} %{skill1} or %{level2} %{skill2}.");
-    String::Replace(message, "%{level1}", Skill::Level::String(sec1.Level()));
-    String::Replace(message, "%{skill1}", Skill::Secondary::String(sec1.Skill()));
-    String::Replace(message, "%{level2}", Skill::Level::String(sec2.Level()));
-    String::Replace(message, "%{skill2}", Skill::Secondary::String(sec2.Skill()));
+    std::string message = _("You may learn either:");
+    message.append("\n%{skill1}\n");
+    message.append(" ");
+    message.append(_("or"));
+    message.append(" ");
+    message.append("\n%{skill2}");
+    String::Replace(message, "%{skill1}", sec1.GetName());
+    String::Replace(message, "%{skill2}", sec2.GetName());
 
     TextBox box1(header, Font::BIG, BOXAREA_WIDTH);
     TextBox box2(message, Font::BIG, BOXAREA_WIDTH);
     const u8 spacer = Settings::Get().QVGA() ? 5 : 10;
 
-    Box box(box1.h() + spacer + box2.h() + 10 + sprite_frame.h(), true);
+    Dialog::Box box(box1.h() + spacer + box2.h() + 10 + sprite_frame.h(), true);
 
     pt.x = box.GetArea().x + box.GetArea().w / 2 - AGG::GetICN(system, 9).w() - 20;
     pt.y = box.GetArea().y + box.GetArea().h - AGG::GetICN(system, 9).h();
@@ -105,7 +154,6 @@ Skill::Secondary::skill_t Dialog::LevelUpSelectSkill(const std::string & header,
     cursor.Show();
     display.Flip();
     LocalEvent & le = LocalEvent::Get();
-    Skill::Secondary::skill_t result = Skill::Secondary::UNKNOWN;
 
     // message loop
     while(le.HandleEvents())
@@ -113,19 +161,40 @@ Skill::Secondary::skill_t Dialog::LevelUpSelectSkill(const std::string & header,
 	le.MousePressLeft(button_learn1) ? button_learn1.PressDraw() : button_learn1.ReleaseDraw();
 	le.MousePressLeft(button_learn2) ? button_learn2.PressDraw() : button_learn2.ReleaseDraw();
 
-        if(le.MouseClickLeft(button_learn1) || Game::HotKeyPress(Game::EVENT_DEFAULT_LEFT)){ result = sec1.Skill(); break; }
-        if(le.MouseClickLeft(button_learn2) || Game::HotKeyPress(Game::EVENT_DEFAULT_RIGHT)){ result = sec2.Skill(); break; }
+        if(le.MouseClickLeft(button_learn1) || Game::HotKeyPress(Game::EVENT_DEFAULT_LEFT)) return sec1.Skill();
+        else
+	if(le.MouseClickLeft(button_learn2) || Game::HotKeyPress(Game::EVENT_DEFAULT_RIGHT)) return sec2.Skill();
 
-	if(le.MouseClickLeft(rect_image1)){ cursor.Hide(); SecondarySkillInfo(sec1.Skill(), sec1.Level()); cursor.Show(); display.Flip(); }
+	if(le.MouseClickLeft(rect_image1))
+	    { cursor.Hide(); Dialog::SecondarySkillInfo(sec1); cursor.Show(); display.Flip(); }
 	else
-	if(le.MouseClickLeft(rect_image2)){ cursor.Hide(); SecondarySkillInfo(sec2.Skill(), sec2.Level()); cursor.Show(); display.Flip(); }
+	if(le.MouseClickLeft(rect_image2))
+	    { cursor.Hide(); Dialog::SecondarySkillInfo(sec2); cursor.Show(); display.Flip(); }
 
-	if(le.MousePressRight(rect_image1)){ cursor.Hide(); SecondarySkillInfo(sec1.Skill(), sec1.Level(), false); cursor.Show(); display.Flip(); }
+	if(le.MousePressRight(rect_image1))
+	    { cursor.Hide(); Dialog::SecondarySkillInfo(sec1, false); cursor.Show(); display.Flip(); }
 	else
-	if(le.MousePressRight(rect_image2)){ cursor.Hide(); SecondarySkillInfo(sec2.Skill(), sec2.Level(), false); cursor.Show(); display.Flip(); }
+	if(le.MousePressRight(rect_image2))
+	    { cursor.Hide(); Dialog::SecondarySkillInfo(sec2, false); cursor.Show(); display.Flip(); }
     }
 
     cursor.Hide();
 
+    return Skill::Secondary::UNKNOWN;
+}
+
+u8 Dialog::LevelUpSelectSkill(const std::string & name, const std::string & primary, const Skill::Secondary & sec1, const Skill::Secondary & sec2)
+{
+    u8 result = Skill::Secondary::UNKNOWN;
+
+    if(Skill::Secondary::UNKNOWN == sec1.Skill() && Skill::Secondary::UNKNOWN == sec2.Skill())
+	DialogPrimaryOnly(name, primary);
+    else
+    if(Skill::Secondary::UNKNOWN == sec1.Skill() || Skill::Secondary::UNKNOWN == sec2.Skill())
+	result = DialogOneSecondary(name, primary, (Skill::Secondary::UNKNOWN == sec2.Skill() ? sec1 : sec2));
+    else
+	result = DialogSelectSecondary(name, primary, sec1, sec2);
+
     return result;
 }
+

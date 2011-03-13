@@ -1204,10 +1204,10 @@ void Game::IO::UnpackHeroes(QueueMessage & msg, Heroes & hero, u16 check_version
     msg.Pop(byte32);
     for(u32 jj = 0; jj < byte32; ++jj)
     {
-	    Skill::Secondary skill;
-	    msg.Pop(byte8); skill.SetSkill(Skill::Secondary::Skill(byte8));
-	    msg.Pop(byte8); skill.SetLevel(byte8);
-	    hero.secondary_skills.push_back(skill);
+	u8 skill, level;
+	msg.Pop(skill);
+	msg.Pop(level);
+	hero.secondary_skills.push_back(Skill::Secondary(skill, level));
     }
 
     // armies

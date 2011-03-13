@@ -216,8 +216,7 @@ void Battle2::EagleEyeSkillAction(HeroBase & hero, const SpellStorage & spells, 
     SpellStorage new_spells;
     new_spells.reserve(10);
 
-    const u8 level = hero.GetLevelSkill(Skill::Secondary::EAGLEEYE);
-    const u8 value = Skill::Secondary::GetValues(Skill::Secondary::EAGLEEYE, level);
+    const Skill::Secondary eagleeye(Skill::Secondary::EAGLEEYE, hero.GetLevelSkill(Skill::Secondary::EAGLEEYE));
 
     // filter spells
     for(SpellStorage::const_iterator
@@ -226,19 +225,19 @@ void Battle2::EagleEyeSkillAction(HeroBase & hero, const SpellStorage & spells, 
 	const Spell & sp = *it;
     	if(!hero.HaveSpell(sp))
 	{
-	    switch(level)
+	    switch(eagleeye.Level())
 	    {
 		case Skill::Level::BASIC:
 		    // 20%
-		    if(3 > sp.Level() && value >= Rand::Get(1, 100)) new_spells.push_back(sp);
+		    if(3 > sp.Level() && eagleeye.GetValues() >= Rand::Get(1, 100)) new_spells.push_back(sp);
 		    break;
 		case Skill::Level::ADVANCED:
 		    // 30%
-		    if(4 > sp.Level() && value >= Rand::Get(1, 100)) new_spells.push_back(sp);
+		    if(4 > sp.Level() && eagleeye.GetValues() >= Rand::Get(1, 100)) new_spells.push_back(sp);
 		    break;
 		case Skill::Level::EXPERT:
 		    // 40%
-		    if(5 > sp.Level() && value >= Rand::Get(1, 100)) new_spells.push_back(sp);
+		    if(5 > sp.Level() && eagleeye.GetValues() >= Rand::Get(1, 100)) new_spells.push_back(sp);
 		    break;
 		default: break;
     	    }

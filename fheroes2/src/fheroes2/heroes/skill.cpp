@@ -35,6 +35,13 @@
 #include "xmlccwrap.h"
 #endif
 
+namespace Skill
+{
+    u8 SecondaryGetWeightSkillFromRace(u8 race, u8 skill);
+    u8 SecondaryPriorityFromRace(u8, const std::vector<u8> &);
+    std::vector<u8> SecondarySkills(void);
+}
+
 struct level_t
 {
     u16 basic;
@@ -259,13 +266,13 @@ void Skill::UpdateStats(const std::string & spec)
 #endif
 }
 
-u16 Skill::Secondary::GetValues(skill_t skill, u8 level)
+u16 Skill::Secondary::GetValues(void) const
 {
-    switch(level)
+    switch(Level())
     {
-	case Level::BASIC:	return _skillvalues[skill - 1].values.basic;
-	case Level::ADVANCED:	return _skillvalues[skill - 1].values.advanced;
-	case Level::EXPERT:	return _skillvalues[skill - 1].values.expert;
+	case Level::BASIC:	return _skillvalues[Skill() - 1].values.basic;
+	case Level::ADVANCED:	return _skillvalues[Skill() - 1].values.advanced;
+	case Level::EXPERT:	return _skillvalues[Skill() - 1].values.expert;
 	default: break;
     }
     return 0;
@@ -307,8 +314,7 @@ u8 Skill::Primary::GetInitialSpell(u8 race)
     return ptr ? ptr->initial_spell : 0;
 }
 
-// primary skill from level up (dependence from race and hero level)
-Skill::Primary::skill_t Skill::Primary::FromLevelUp(const u8 race, const u8 level)
+u8 Skill::Primary::LevelUp(u8 race, u8 level)
 {
     Rand::Queue percents(MAXPRIMARYSKILL);
 
@@ -331,21 +337,21 @@ Skill::Primary::skill_t Skill::Primary::FromLevelUp(const u8 race, const u8 leve
 	}
     }
 
-    if(percents.Size())
-    switch(percents.Get())
+    u8 result = percents.Size() ? percents.Get() : UNKNOWN;
+
+    switch(result)
     {
-	case ATTACK:	return ATTACK;
-	case DEFENSE:	return DEFENSE;
-	case POWER:	return POWER;
-	case KNOWLEDGE:	return KNOWLEDGE;
+	case ATTACK:	++attack; break;
+	case DEFENSE:	++defense; break;
+	case POWER:	++power; break;
+	case KNOWLEDGE:	++knowledge; break;
 	default: break;
     }
 
-    DEBUG(DBG_GAME, DBG_WARN, "unknown result");
-    return UNKNOWN;
+    return result;
 }
 
-const char* Skill::Primary::String(const Skill::Primary::skill_t skill)
+const char* Skill::Primary::String(u8 skill)
 {
     const char* str_skill[] = { _("Attack"), _("Defense"), _("Power"), _("Knowledge"), "Unknown" };
 
@@ -361,23 +367,9 @@ const char* Skill::Primary::String(const Skill::Primary::skill_t skill)
     return str_skill[4];
 }
 
-Skill::Level::type_t Skill::Level::FromMP2(const u8 byte)
-{
-    switch(byte)
-    {
-       case 1: return BASIC;
-       case 2: return ADVANCED;
-       case 3: return EXPERT;
-
-	default: break;
-    }
-
-    return NONE;
-}
-
 const char* Skill::Level::String(u8 level)
 {
-    const char* str_level[] = { "None", _("Basic"), _("Advanced"), _("Expert") };
+    const char* str_level[] = { "None", _("skill|Basic"), _("skill|Advanced"), _("skill|Expert") };
 
     switch(level)
     {
@@ -390,30 +382,24 @@ const char* Skill::Level::String(u8 level)
     return str_level[0];
 }
 
-Skill::Secondary::Secondary() : std::pair<u8, u8>(Skill::Secondary::UNKNOWN, Skill::Level::NONE)
+Skill::Secondary::Secondary() : std::pair<u8, u8>(UNKNOWN, Level::NONE)
 {
 }
 
-Skill::Secondary::Secondary(const skill_t s, const Level::type_t t) : std::pair<u8, u8>(s, t)
+Skill::Secondary::Secondary(u8 skill, u8 level) : std::pair<u8, u8>(UNKNOWN, Level::NONE)
 {
+    SetSkill(skill);
+    SetLevel(level);
 }
 
-void Skill::Secondary::SetSkill(const skill_t skill)
+void Skill::Secondary::SetSkill(u8 skill)
 {
-    if(UNKNOWN == skill) return;
-
-    first = skill;
+    first = skill <= ESTATES ? skill : UNKNOWN;
 }
 
-void Skill::Secondary::SetLevel(const u8 level)
+void Skill::Secondary::SetLevel(u8 level)
 {
-    switch(level)
-    {
-	case Level::BASIC:
-	case Level::ADVANCED:
-	case Level::EXPERT:	second = level; break;
-	default: break;
-    }
+    second = level <= Level::EXPERT ? level : Level::NONE;
 }
 
 void Skill::Secondary::NextLevel(void)
@@ -427,14 +413,14 @@ void Skill::Secondary::NextLevel(void)
     }
 }
 
-Skill::Level::type_t Skill::Secondary::Level(void) const
+u8 Skill::Secondary::Skill(void) const
 {
-    return second > Level::EXPERT ? Level::NONE : static_cast<Level::type_t>(second);
+    return first;
 }
 
-Skill::Secondary::skill_t Skill::Secondary::Skill(void) const
+u8 Skill::Secondary::Level(void) const
 {
-    return Skill(first);
+    return second;
 }
 
 bool Skill::Secondary::isLevel(u8 level) const
@@ -447,114 +433,47 @@ bool Skill::Secondary::isSkill(u8 skill) const
     return skill == first;
 }
 
-Skill::Secondary::skill_t Skill::Secondary::Skill(const u8 index)
+bool Skill::Secondary::isValid(void) const
 {
-    return index > ESTATES ? UNKNOWN : static_cast<skill_t>(index);
+    return Skill() != UNKNOWN && Level() != Level::NONE;
 }
 
-Skill::Secondary::skill_t Skill::Secondary::FromMP2(const u8 byte)
+u8 Skill::Secondary::RandForWitchsHut(void)
 {
-    switch(byte)
-    {
-	case 0:		return PATHFINDING;
-        case 1:		return ARCHERY;
-        case 2:		return LOGISTICS;
-        case 3:		return SCOUTING;
-        case 4:		return DIPLOMACY;
-        case 5:		return NAVIGATION;
-        case 6:		return LEADERSHIP;
-        case 7:		return WISDOM;
-        case 8:		return MYSTICISM;
-        case 9:		return LUCK;
-        case 10:	return BALLISTICS;
-        case 11:	return EAGLEEYE;
-        case 12:	return NECROMANCY;
-        case 13:	return ESTATES;
-        
-        default: break;
-    }
-    
-    return UNKNOWN;
-}
-
-Skill::Secondary::skill_t Skill::Secondary::RandForWitchsHut(void)
-{
-    std::vector<skill_t> v;
+    std::vector<u8> v;
     v.reserve(14);
 
-    if(_from_witchs_hut.archery) v.push_back(ARCHERY);
-    if(_from_witchs_hut.ballistics) v.push_back(BALLISTICS);
-    if(_from_witchs_hut.diplomacy) v.push_back(DIPLOMACY);
-    if(_from_witchs_hut.eagleeye) v.push_back(EAGLEEYE);
-    if(_from_witchs_hut.estates) v.push_back(ESTATES);
-    if(_from_witchs_hut.leadership) v.push_back(LEADERSHIP);
-    if(_from_witchs_hut.logistics) v.push_back(LOGISTICS);
-    if(_from_witchs_hut.luck) v.push_back(LUCK);
-    if(_from_witchs_hut.mysticism) v.push_back(MYSTICISM);
-    if(_from_witchs_hut.navigation) v.push_back(NAVIGATION);
-    if(_from_witchs_hut.necromancy) v.push_back(NECROMANCY);
-    if(_from_witchs_hut.pathfinding) v.push_back(PATHFINDING);
-    if(_from_witchs_hut.scouting) v.push_back(SCOUTING);
-    if(_from_witchs_hut.wisdom) v.push_back(WISDOM);
+    if(_from_witchs_hut.archery)	v.push_back(ARCHERY);
+    if(_from_witchs_hut.ballistics)	v.push_back(BALLISTICS);
+    if(_from_witchs_hut.diplomacy)	v.push_back(DIPLOMACY);
+    if(_from_witchs_hut.eagleeye)	v.push_back(EAGLEEYE);
+    if(_from_witchs_hut.estates)	v.push_back(ESTATES);
+    if(_from_witchs_hut.leadership)	v.push_back(LEADERSHIP);
+    if(_from_witchs_hut.logistics)	v.push_back(LOGISTICS);
+    if(_from_witchs_hut.luck)		v.push_back(LUCK);
+    if(_from_witchs_hut.mysticism)	v.push_back(MYSTICISM);
+    if(_from_witchs_hut.navigation)	v.push_back(NAVIGATION);
+    if(_from_witchs_hut.necromancy)	v.push_back(NECROMANCY);
+    if(_from_witchs_hut.pathfinding)	v.push_back(PATHFINDING);
+    if(_from_witchs_hut.scouting)	v.push_back(SCOUTING);
+    if(_from_witchs_hut.wisdom)		v.push_back(WISDOM);
 
     return v.empty() ? UNKNOWN : *Rand::Get(v);
 }
 
 /* index sprite from SECSKILL */
-u8 Skill::Secondary::GetIndexSprite1(const skill_t skill)
+u8 Skill::Secondary::GetIndexSprite1(void) const
 {
-    switch(skill)
-    {
-    	case PATHFINDING:	return 1;
-        case ARCHERY:		return 2;
-        case LOGISTICS:		return 3;
-        case SCOUTING:		return 4;
-        case DIPLOMACY:		return 5;
-        case NAVIGATION:	return 6;
-        case LEADERSHIP:	return 7;
-        case WISDOM:		return 8;
-        case MYSTICISM:		return 9;
-        case LUCK:		return 10;
-        case BALLISTICS:	return 11;
-        case EAGLEEYE:		return 12;
-        case NECROMANCY:	return 13;
-        case ESTATES:		return 14;
-
-        default: break;
-    }
-
-    return 0;
+    return Skill() <= ESTATES ? Skill() : 0;
 }
 
 /* index sprite from MINISS */
-u8 Skill::Secondary::GetIndexSprite2(const skill_t skill)
+u8 Skill::Secondary::GetIndexSprite2(void) const
 {
-    switch(skill)
-    {
-    	case PATHFINDING:	return 0;
-        case ARCHERY:		return 1;
-        case LOGISTICS:		return 2;
-        case SCOUTING:		return 3;
-        case DIPLOMACY:		return 4;
-        case NAVIGATION:	return 5;
-        case LEADERSHIP:	return 6;
-        case WISDOM:		return 7;
-        case MYSTICISM:		return 8;
-        case LUCK:		return 9;
-        case BALLISTICS:	return 10;
-        case EAGLEEYE:		return 11;
-        case NECROMANCY:	return 12;
-        case ESTATES:		return 13;
-
-        default: break;
-    }
-
-    DEBUG(DBG_GAME, DBG_WARN, "index out of range");
-
-    return 0xff;
+    return Skill() <= ESTATES ? Skill() - 1 : 0xFF;
 }
 
-const char* Skill::Secondary::String(const skill_t skill)
+const char* Skill::Secondary::String(u8 skill)
 {
     const char* str_skill[] = { _("Pathfinding"), _("Archery"), _("Logistics"), _("Scouting"), _("Diplomacy"), _("Navigation"), 
 	_("Leadership"), _("Wisdom"), _("Mysticism"), _("Luck"), _("Ballistics"), _("Eagle Eye"), _("Necromancy"), _("Estates"), "Unknown"  };
@@ -582,172 +501,303 @@ const char* Skill::Secondary::String(const skill_t skill)
     return str_skill[14];
 }
 
-const char* Skill::Secondary::Description(const skill_t skill, const Level::type_t level)
+const char* Skill::Secondary::GetName(void) const
 {
-    const char* description_skill[] =
+    const char* name_skill[] =
     {
-	_("Basic Pathfinding reduces the movement penalty for rough terrain by %{count} percent."),
-	_("Advanced Pathfinding reduces the movement penalty for rough terrain by %{count} percent."),
-	_("Expert Pathfinding eliminates the movement penalty for rough terrain by %{count} percent."),
+        _("Basic Pathfinding"), _("Advanced Pathfinding"), _("Expert Pathfinding"),
+        _("Basic Archery"), _("Advanced Archery"), _("Expert Archery"),
+        _("Basic Logistics"), _("Advanced Logistics"), _("Expert Logistics"),
+        _("Basic Scouting"), _("Advanced Scouting"), _("Expert Scouting"),
+        _("Basic Diplomacy"), _("Advanced Diplomacy"), _("Expert Diplomacy"),
+        _("Basic Navigation"),_("Advanced Navigation"), _("Expert Navigation"),
+        _("Basic Leadership"), _("Advanced Leadership"), _("Expert Leadership"),
+        _("Basic Wisdom"), _("Advanced Wisdom"), _("Expert Wisdom"),
+        _("Basic Mysticism"), _("Advanced Mysticism"), _("Expert Mysticism"),
+        _("Basic Luck"), _("Advanced Luck"), _("Expert Luck"),
+        _("Basic Ballistics"), _("Advanced Ballistics"), _("Expert Ballistics"),
+        _("Basic Eagle Eye"), _("Advanced Eagle Eye"), _("Expert Eagle Eye"),
+        _("Basic Necromancy"), _("Advanced Necromancy"), _("Expert Necromancy"),
+        _("Basic Estates"), _("Advanced Estates"), _("Expert Estates")
+    };
 
-	_("Basic Archery increases the damage done by range attacking creatures by %{count} percent."),
-	_("Advanced Archery increases the damage done by range attacking creatures by %{count} percent."),
-	_("Expert Archery increases the damage done by range attacking creatures by %{count} percent."),
-
-	_("Basic Logistics increases your hero's movement points by %{count} percent."),
-	_("Advanced Logistics increases your hero's movement points by %{count} percent."),
-	_("Expert Logistics increases your hero's movement points by %{count} percent."),
-
-	_("Basic Scouting increases your hero's viewable area by %{count} square."),
-	_("Advanced Scouting increases your hero's viewable area by %{count} squares."),
-	_("Expert Scouting increases your hero's viewable area by %{count} squares."),
-
-	_("Basic Diplomacy allows you to negotiate with monsters who are weaker than your group. Approximately %{count} percent of the creatures may offer to join you."),
-	_("Advanced Diplomacy allows you to negotiate with monsters who are weaker than your group. Approximately %{count} percent of the creatures may offer to join you."),
-	_("Expert Diplomacy allows you to negotiate with monsters who are weaker than your group. %{count} percent of the creatures may offer to join you."),
-
-	_("Basic Navigation increases your hero's movement points over water by %{count} percent."),
-	_("Advanced Navigation increases your hero's movement points over water by %{count} percent."),
-	_("Expert Navigation increases your hero's movement points over water by %{count} percent."),
-
-	_("Basic Leadership increases your hero's troops' morale by %{count}."),
-	_("Advanced Leadership increases your hero's troops' morale by %{count}."),
-	_("Expert Leadership increases your hero's troops' morale by %{count}."),
-
-	_("Basic Wisdom allows your hero to learn third level spells."),
-	_("Advanced Wisdom allows your hero to learn fourth level spells."),
-	_("Expert Wisdom allows your hero to learn fifth level spells."),
-
-	_("Basic Mysticism regenerates %{count} of your hero's spell points per day."),
-	_("Advanced Mysticism regenerates %{count} of your hero's spell points per day."),
-	_("Expert Mysticism regenerates %{count} of your hero's spell points per day."),
-
-	_("Basic Luck increases your hero's luck by %{count}."),
-	_("Advanced Luck increases your hero's luck by %{count}."),
-	_("Expert Luck increases your hero's luck by %{count}."),
-
-	_("Basic Ballistics gives your hero's catapult shots a greater chance to hit and do damage to castle walls."),
-	_("Advanced Ballistics gives your hero's catapult an extra shot, and each shot has a greater chance to hit and do damage to castle walls."),
-	_("Expert Ballistics gives your hero's catapult an extra shot, and each shot automatically destroys any wall, except a fortified wall in a Knight town."),
-
-	_("Basic Eagle Eye gives your hero a %{count} percent chance to learn any given 1st or 2nd level enemy spell used against him in a combat."),
-	_("Advanced Eagle Eye gives your hero a %{count} percent chance to learn any given 3rd level spell (or below) used against him in combat."),
-	_("Expert Eagle Eye gives your hero a %{count} percent chance to learn any given 4th level spell (or below) used against him in combat."),
-
-	_("Basic Necromancy allows %{count} percent of the creatures killed in combat to be brought back from the dead as Skeletons."),
-	_("Advanced Necromancy allows %{count} percent of the creatures killed in combat to be brought back from the dead as Skeletons."),
-	_("Expert Necromancy allows %{count} percent of the creatures killed in combat to be brought back from the dead as Skeletons."),
-
-	_("Your hero produces %{count} gold pieces per turn as tax revenue from estates."),
-	_("Your hero produces %{count} gold pieces per turn as tax revenue from estates."),
-	_("Your hero produces %{count} gold pieces per turn as tax revenue from estates.") };
-
-    u8 index = 0;
-
-    switch(level)
-    {
-	case Level::BASIC:	index = 0; break;
-	case Level::ADVANCED:	index = 1; break;
-	case Level::EXPERT:	index = 2; break;
-	default: break;
-    }
-    switch(skill)
-    {
-	case PATHFINDING:			break;
-        case ARCHERY:		index +=  3;	break;
-        case LOGISTICS:		index +=  6;	break;
-        case SCOUTING:		index +=  9;	break;
-        case DIPLOMACY:		index += 12;	break;
-        case NAVIGATION:	index += 15;	break;
-        case LEADERSHIP:	index += 18;	break;
-        case WISDOM:		index += 21;	break;
-        case MYSTICISM:		index += 24;	break;
-        case LUCK:		index += 27;	break;
-        case BALLISTICS:	index += 30;	break;
-        case EAGLEEYE:		index += 33;	break;
-        case NECROMANCY:	index += 36;	break;
-        case ESTATES:		index += 39;	break;
-	
-	default: break;
-    }
-
-    return description_skill[index];
+    return isValid() ? name_skill[(Level() - 1) + (Skill() - 1) * 3] : "unknown";
 }
 
-void Skill::Secondary::FillStandard(std::vector<skill_t> & v)
+std::string Skill::Secondary::GetDescription(void) const
 {
-    v.clear();
-    v.reserve(MAXSECONDARYSKILL);
-    v.push_back(PATHFINDING);
-    v.push_back(ARCHERY);
-    v.push_back(LOGISTICS);
-    v.push_back(SCOUTING);
-    v.push_back(DIPLOMACY);
-    v.push_back(NAVIGATION);
-    v.push_back(LEADERSHIP);
-    v.push_back(WISDOM);
-    v.push_back(MYSTICISM);
-    v.push_back(LUCK);
-    v.push_back(BALLISTICS);
-    v.push_back(EAGLEEYE);
-    v.push_back(NECROMANCY);
-    v.push_back(ESTATES);
+    const u16 count = GetValues();
+    std::string str = "unknown";
+
+    switch(Skill())
+    {
+	case PATHFINDING:
+	    str = ngettext("Reduces the movement penalty for rough terrain by %{count} percent.", 
+			"Reduces the movement penalty for rough terrain by %{count} percents.", count); break;
+        case ARCHERY:	
+	    str = ngettext("Increases the damage done by range attacking creatures by %{count} percent.",
+			"Increases the damage done by range attacking creatures by %{count} percents.", count); break;
+        case LOGISTICS:	
+	    str = ngettext("Increases your hero's movement points by %{count} percent.",
+			"Increases your hero's movement points by %{count} percent.", count); break;
+        case SCOUTING:	
+	    str = ngettext("Increases your hero's viewable area by %{count} square.",
+			"Increases your hero's viewable area by %{count} squares.", count); break;
+        case DIPLOMACY:	
+	    str = _("Allows you to negotiate with monsters who are weaker than your group.");
+	    str.append(" ");
+	    str.append(ngettext("Approximately %{count} percent of the creatures may offer to join you.",
+		    "Approximately %{count} percents of the creatures may offer to join you.", count)); break;
+        case NAVIGATION:
+	    str = ngettext("Increases your hero's movement points over water by %{count} percent.",
+		    "Increases your hero's movement points over water by %{count} percents.", count); break;
+        case LEADERSHIP:
+	    str = ngettext("Increases your hero's troops' morale by %{count}.",
+		    "Increases your hero's troops' morale by %{count}.", count); break;
+        case WISDOM:	
+	{
+	    switch(Level())
+	    {
+		case Level::BASIC:
+		    str = _("Allows your hero to learn third level spells."); break;
+		case Level::ADVANCED:
+		    str = _("Allows your hero to learn fourth level spells."); break;
+		case Level::EXPERT:
+		    str = _("Allows your hero to learn fifth level spells."); break;
+		default: break;
+	    }
+	    break;
+	}
+        case MYSTICISM:	
+	    str = ngettext("Regenerates %{count} of your hero's spell point per day.",
+		    "Regenerates %{count} of your hero's spell points per day.", count); break;
+        case LUCK:	
+	    str = ngettext("Increases your hero's luck by %{count}.",
+		    "Increases your hero's luck by %{count}.", count); break;
+        case BALLISTICS:
+	    switch(Level())
+	    {
+		case Level::BASIC:
+		    str = _("Gives your hero's catapult shots a greater chance to hit and do damage to castle walls."); break;
+		case Level::ADVANCED:
+		    str = _("Gives your hero's catapult an extra shot, and each shot has a greater chance to hit and do damage to castle walls."); break;
+		case Level::EXPERT:
+		    str = _("Gives your hero's catapult an extra shot, and each shot automatically destroys any wall, except a fortified wall in a Knight town."); break;
+		default: break;
+	    }
+	    break;
+        case EAGLEEYE:	
+	    switch(Level())
+	    {
+		case Level::BASIC:
+		    str = _("Gives your hero a %{count} percent chance to learn any given 1st or 2nd level enemy spell used against him in a combat."); break;
+		case Level::ADVANCED:
+		    str = _("Gives your hero a %{count} percent chance to learn any given 3rd level spell (or below) used against him in combat."); break;
+		case Level::EXPERT:
+		    str = _("Gives your hero a %{count} percent chance to learn any given 4th level spell (or below) used against him in combat."); break;
+		default: break;
+	    }
+	    break;
+        case NECROMANCY:
+	    str = ngettext("Allows %{count} percent of the creatures killed in combat to be brought back from the dead as Skeletons.",
+		    "Allows %{count} percents of the creatures killed in combat to be brought back from the dead as Skeletons.", count); break;
+	case ESTATES:	
+	    str = ngettext("Your hero produce %{count} gold pieces per turn as tax revenue from estates.",
+		    "Your hero produces %{count} gold pieces per turn as tax revenue from estates.", count); break;
+	default: break;
+    }
+
+    String::Replace(str, "%{count}", count);
+
+    return str;
 }
 
-u8 Skill::Secondary::GetWeightSkillFromRace(u8 race, u8 skill)
+Skill::SecSkills::SecSkills()
+{
+    reserve(HEROESMAXSKILL);
+}
+
+Skill::SecSkills::SecSkills(u8 race)
+{
+    reserve(HEROESMAXSKILL);
+
+    if(race & Race::ALL)
+    {
+	const skillstats_t* ptr = GetSkillStats(race);
+
+	if(ptr)
+	{
+	    if(ptr->initial_secondary.archery)		push_back(Secondary(Secondary::ARCHERY, ptr->initial_secondary.archery));
+	    if(ptr->initial_secondary.ballistics)	push_back(Secondary(Secondary::BALLISTICS, ptr->initial_secondary.ballistics));
+	    if(ptr->initial_secondary.diplomacy)	push_back(Secondary(Secondary::DIPLOMACY, ptr->initial_secondary.diplomacy));
+	    if(ptr->initial_secondary.eagleeye)		push_back(Secondary(Secondary::EAGLEEYE, ptr->initial_secondary.eagleeye));
+	    if(ptr->initial_secondary.estates)		push_back(Secondary(Secondary::ESTATES, ptr->initial_secondary.estates));
+	    if(ptr->initial_secondary.leadership)	push_back(Secondary(Secondary::LEADERSHIP, ptr->initial_secondary.leadership));
+	    if(ptr->initial_secondary.logistics)	push_back(Secondary(Secondary::LOGISTICS, ptr->initial_secondary.logistics));
+	    if(ptr->initial_secondary.luck)		push_back(Secondary(Secondary::LUCK, ptr->initial_secondary.luck));
+	    if(ptr->initial_secondary.mysticism)	push_back(Secondary(Secondary::MYSTICISM, ptr->initial_secondary.mysticism));
+	    if(ptr->initial_secondary.navigation)	push_back(Secondary(Secondary::NAVIGATION, ptr->initial_secondary.navigation));
+	    if(ptr->initial_secondary.necromancy)	push_back(Secondary(Secondary::NECROMANCY, ptr->initial_secondary.necromancy));
+	    if(ptr->initial_secondary.pathfinding)	push_back(Secondary(Secondary::PATHFINDING, ptr->initial_secondary.pathfinding));
+	    if(ptr->initial_secondary.scouting)		push_back(Secondary(Secondary::SCOUTING, ptr->initial_secondary.scouting));
+	    if(ptr->initial_secondary.wisdom)		push_back(Secondary(Secondary::WISDOM, ptr->initial_secondary.wisdom));
+	}
+    }
+}
+
+void Skill::SecSkills::ReadFromMP2(const u8* ptr)
+{
+    clear();
+
+    for(u8 ii = 0; ii < 8; ++ii)
+    {
+	Skill::Secondary skill(*(ptr + ii) + 1, *(ptr + ii + 8));
+        if(skill.isValid()) push_back(skill);
+    }
+}
+
+u8 Skill::SecSkills::GetLevel(u8 skill) const
+{
+    const_iterator it = std::find_if(begin(), end(),
+                        std::bind2nd(std::mem_fun_ref(&Secondary::isSkill), skill));
+
+    return it == end() ? Level::NONE : (*it).Level();
+}
+
+u16 Skill::SecSkills::GetValues(u8 skill) const
+{
+    const_iterator it = std::find_if(begin(), end(),
+                        std::bind2nd(std::mem_fun_ref(&Secondary::isSkill), skill));
+
+    return it == end() ? 0 : (*it).GetValues();
+}
+
+void Skill::SecSkills::AddSkill(const Skill::Secondary & skill)
+{
+    iterator it = std::find_if(begin(), end(),
+                        std::bind2nd(std::mem_fun_ref(&Secondary::isSkill), skill.Skill()));
+
+    if(it != end())
+        (*it).SetLevel(skill.Level());
+    else
+        push_back(skill);
+}
+
+u8 Skill::SecondaryGetWeightSkillFromRace(u8 race, u8 skill)
 {
     const skillstats_t* ptr = GetSkillStats(race);
 
     if(ptr)
     {
-	if(skill == PATHFINDING)	return ptr->mature_secondary.pathfinding;
+	if(skill == Secondary::PATHFINDING)	return ptr->mature_secondary.pathfinding;
 	else
-	if(skill == ARCHERY)		return ptr->mature_secondary.archery;
+	if(skill == Secondary::ARCHERY)		return ptr->mature_secondary.archery;
 	else
-	if(skill == LOGISTICS)		return ptr->mature_secondary.logistics;
+	if(skill == Secondary::LOGISTICS)	return ptr->mature_secondary.logistics;
 	else
-	if(skill == SCOUTING)		return ptr->mature_secondary.scouting;
+	if(skill == Secondary::SCOUTING)	return ptr->mature_secondary.scouting;
 	else
-	if(skill == DIPLOMACY)		return ptr->mature_secondary.diplomacy;
+	if(skill == Secondary::DIPLOMACY)	return ptr->mature_secondary.diplomacy;
 	else
-	if(skill == NAVIGATION)		return ptr->mature_secondary.navigation;
+	if(skill == Secondary::NAVIGATION)	return ptr->mature_secondary.navigation;
 	else
-	if(skill == LEADERSHIP)		return ptr->mature_secondary.leadership;
+	if(skill == Secondary::LEADERSHIP)	return ptr->mature_secondary.leadership;
 	else
-	if(skill == WISDOM)		return ptr->mature_secondary.wisdom;
+	if(skill == Secondary::WISDOM)		return ptr->mature_secondary.wisdom;
 	else
-	if(skill == MYSTICISM)		return ptr->mature_secondary.mysticism;
+	if(skill == Secondary::MYSTICISM)	return ptr->mature_secondary.mysticism;
 	else
-	if(skill == LUCK)		return ptr->mature_secondary.luck;
+	if(skill == Secondary::LUCK)		return ptr->mature_secondary.luck;
 	else
-	if(skill == BALLISTICS)		return ptr->mature_secondary.ballistics;
+	if(skill == Secondary::BALLISTICS)	return ptr->mature_secondary.ballistics;
 	else
-	if(skill == EAGLEEYE)		return ptr->mature_secondary.eagleeye;
+	if(skill == Secondary::EAGLEEYE)	return ptr->mature_secondary.eagleeye;
 	else
-	if(skill == NECROMANCY)		return ptr->mature_secondary.necromancy;
+	if(skill == Secondary::NECROMANCY)	return ptr->mature_secondary.necromancy;
 	else
-	if(skill == ESTATES)		return ptr->mature_secondary.estates;
+	if(skill == Secondary::ESTATES)		return ptr->mature_secondary.estates;
     }
 
     return 0;
 }
 
-Skill::Secondary::skill_t Skill::Secondary::PriorityFromRace(u8 race, const std::vector<skill_t>& exclude)
+std::vector<u8> Skill::SecondarySkills(void)
+{
+    std::vector<u8> skills;
+
+    skills.reserve(MAXSECONDARYSKILL);
+    skills.push_back(Secondary::PATHFINDING);
+    skills.push_back(Secondary::ARCHERY);
+    skills.push_back(Secondary::LOGISTICS);
+    skills.push_back(Secondary::SCOUTING);
+    skills.push_back(Secondary::DIPLOMACY);
+    skills.push_back(Secondary::NAVIGATION);
+    skills.push_back(Secondary::LEADERSHIP);
+    skills.push_back(Secondary::WISDOM);
+    skills.push_back(Secondary::MYSTICISM);
+    skills.push_back(Secondary::LUCK);
+    skills.push_back(Secondary::BALLISTICS);
+    skills.push_back(Secondary::EAGLEEYE);
+    skills.push_back(Secondary::NECROMANCY);
+    skills.push_back(Secondary::ESTATES);
+
+    return skills;
+}
+
+u8 Skill::SecondaryPriorityFromRace(u8 race, const std::vector<u8> & exclude)
 {
     Rand::Queue parts(MAXSECONDARYSKILL);
 
-    std::vector<skill_t> skills;
-    FillStandard(skills);
+    std::vector<u8> skills = SecondarySkills();
 
-    std::vector<skill_t>::const_iterator it1 = skills.begin();
-    std::vector<skill_t>::const_iterator it2 = skills.end();
+    for(std::vector<u8>::const_iterator
+	it = skills.begin(); it != skills.end(); ++it)
+	if(exclude.empty() ||
+	    exclude.end() == std::find(exclude.begin(), exclude.end(), *it))
+	    parts.Push(*it, SecondaryGetWeightSkillFromRace(race, *it));
 
-    for(; it1 != it2; ++it1)
-	if(exclude.empty() || exclude.end() == std::find(exclude.begin(), exclude.end(), *it1))
-	    parts.Push(*it1, GetWeightSkillFromRace(race, *it1));
-
-    return parts.Size() ? Skill(parts.Get()) : UNKNOWN;
+    return parts.Size() ? parts.Get() : Secondary::UNKNOWN;
 }
+
+/* select secondary skills for level up */
+void Skill::SecSkills::FindSkillsForLevelUp(u8 race, Secondary & sec1, Secondary & sec2) const
+{
+    std::vector<u8> exclude_skills;
+    exclude_skills.reserve(MAXSECONDARYSKILL + HEROESMAXSKILL);
+
+    // exclude for expert
+    {
+	for(const_iterator
+	    it = begin(); it != end(); ++it)
+	    if((*it).Level() == Level::EXPERT) exclude_skills.push_back((*it).Skill());
+    }
+
+    // exclude is full, add other.
+    if(HEROESMAXSKILL <= size())
+    {
+	std::vector<u8> skills = SecondarySkills();
+
+	for(std::vector<u8>::const_iterator
+	    it = skills.begin(); it != skills.end(); ++it)
+	    if(Level::NONE == GetLevel(*it)) exclude_skills.push_back(*it);
+    }
+
+    sec1.SetSkill(SecondaryPriorityFromRace(race, exclude_skills));
+    exclude_skills.push_back(sec1.Skill());
+    sec2.SetSkill(SecondaryPriorityFromRace(race, exclude_skills));
+
+    sec1.SetLevel(GetLevel(sec1.Skill()));
+    sec2.SetLevel(GetLevel(sec2.Skill()));
+
+    sec1.NextLevel();
+    sec2.NextLevel();
+}
+
+
+
+
+
+
 
 SecondarySkillBar::SecondarySkillBar() : skills(NULL), use_mini_sprite(false)
 {
@@ -758,7 +808,7 @@ const Rect & SecondarySkillBar::GetArea(void) const
     return pos;
 }
 
-void SecondarySkillBar::SetSkills(const std::vector<Skill::Secondary> & v)
+void SecondarySkillBar::SetSkills(const Skill::SecSkills & v)
 {
     skills = &v;
     CalcSize();
@@ -805,27 +855,26 @@ void SecondarySkillBar::Redraw(void)
 
     for(u8 ii = 0; ii < HEROESMAXSKILL; ++ii)
     {
-        const Skill::Secondary::skill_t skill = ii < skills->size() ? skills->at(ii).Skill() : Skill::Secondary::UNKNOWN;
-        const Skill::Level::type_t level = ii < skills->size() ? skills->at(ii).Level() : Skill::Level::NONE;
+        const Skill::Secondary & skill = ii < skills->size() ? skills->at(ii) : Skill::Secondary();
 
-        if(Skill::Secondary::UNKNOWN != skill && Skill::Level::NONE != level)
+        if(skill.isValid())
         {
-            const Sprite & sprite_skill = AGG::GetICN((use_mini_sprite ? ICN::MINISS : ICN::SECSKILL), (use_mini_sprite ? Skill::Secondary::GetIndexSprite2(skill) : Skill::Secondary::GetIndexSprite1(skill)));
+            const Sprite & sprite_skill = AGG::GetICN((use_mini_sprite ? ICN::MINISS : ICN::SECSKILL), (use_mini_sprite ? skill.GetIndexSprite2() : skill.GetIndexSprite1()));
             display.Blit(sprite_skill, dst_pt);
 
             if(use_mini_sprite)
 	    {
 		message.clear();
-		String::AddInt(message, level);
+		String::AddInt(message, skill.Level());
         	text.Set(message);
         	text.Blit(dst_pt.x + (sprite_skill.w() - text.w()) - 3, dst_pt.y + sprite_skill.h() - 12);
 	    }
 	    else
 	    {
-        	text.Set(Skill::Secondary::String(skill));
+        	text.Set(Skill::Secondary::String(skill.Skill()));
         	text.Blit(dst_pt.x + (sprite_skill.w() - text.w()) / 2, dst_pt.y + 3);
 
-        	text.Set(Skill::Level::String(level));
+        	text.Set(Skill::Level::String(skill.Level()));
         	text.Blit(dst_pt.x + (sprite_skill.w() - text.w()) / 2, dst_pt.y + 50);
 	    }
 
@@ -866,43 +915,18 @@ void SecondarySkillBar::QueueEventProcessing(void)
 
     if(ii < skills->size() && (le.MouseClickLeft(tile) || le.MousePressRight(tile)))
     {
-	const Skill::Secondary::skill_t & skill = skills->at(ii).Skill();
-	const Skill::Level::type_t & level = skills->at(ii).Level();
+	const Skill::Secondary skill = skills->at(ii);
 
-	if(Skill::Secondary::UNKNOWN != skill && Skill::Level::NONE != level)
+	if(skill.isValid())
 	{
     	    cursor.Hide();
-    	    Dialog::SecondarySkillInfo(skill, level, !le.MousePressRight());
+    	    Dialog::SecondarySkillInfo(skill, !le.MousePressRight());
     	    cursor.Show();
     	    display.Flip();
 	}
     }
 }
 
-void Skill::Secondary::LoadDefaults(u8 race, std::vector<Secondary> & skills)
-{
-    const skillstats_t* ptr = GetSkillStats(race);
-
-    if(skills.size()) skills.clear();
-
-    if(ptr)
-    {
-	if(ptr->initial_secondary.archery)	skills.push_back(Secondary(ARCHERY, Level::FromMP2(ptr->initial_secondary.archery)));
-	if(ptr->initial_secondary.ballistics)	skills.push_back(Secondary(BALLISTICS, Level::FromMP2(ptr->initial_secondary.ballistics)));
-	if(ptr->initial_secondary.diplomacy)	skills.push_back(Secondary(DIPLOMACY, Level::FromMP2(ptr->initial_secondary.diplomacy)));
-	if(ptr->initial_secondary.eagleeye)	skills.push_back(Secondary(EAGLEEYE, Level::FromMP2(ptr->initial_secondary.eagleeye)));
-	if(ptr->initial_secondary.estates)	skills.push_back(Secondary(ESTATES, Level::FromMP2(ptr->initial_secondary.estates)));
-	if(ptr->initial_secondary.leadership)	skills.push_back(Secondary(LEADERSHIP, Level::FromMP2(ptr->initial_secondary.leadership)));
-	if(ptr->initial_secondary.logistics)	skills.push_back(Secondary(LOGISTICS, Level::FromMP2(ptr->initial_secondary.logistics)));
-	if(ptr->initial_secondary.luck)		skills.push_back(Secondary(LUCK, Level::FromMP2(ptr->initial_secondary.luck)));
-	if(ptr->initial_secondary.mysticism)	skills.push_back(Secondary(MYSTICISM, Level::FromMP2(ptr->initial_secondary.mysticism)));
-	if(ptr->initial_secondary.navigation)	skills.push_back(Secondary(NAVIGATION, Level::FromMP2(ptr->initial_secondary.navigation)));
-	if(ptr->initial_secondary.necromancy)	skills.push_back(Secondary(NECROMANCY, Level::FromMP2(ptr->initial_secondary.necromancy)));
-	if(ptr->initial_secondary.pathfinding)	skills.push_back(Secondary(PATHFINDING, Level::FromMP2(ptr->initial_secondary.pathfinding)));
-	if(ptr->initial_secondary.scouting)	skills.push_back(Secondary(SCOUTING, Level::FromMP2(ptr->initial_secondary.scouting)));
-	if(ptr->initial_secondary.wisdom)	skills.push_back(Secondary(WISDOM, Level::FromMP2(ptr->initial_secondary.wisdom)));
-    }
-}
 
 void StringAppendModifiers(std::string & str, s8 value)
 {
@@ -915,32 +939,28 @@ void StringAppendModifiers(std::string & str, s8 value)
 
 s8 Skill::GetLeadershipModifiers(u8 level, std::string* strs = NULL)
 {
-    level = Secondary::GetValues(Secondary::LEADERSHIP, level);
+    Secondary skill(Secondary::LEADERSHIP, level);
 
-    if(level && strs)
+    if(skill.GetValues() && strs)
     {
-        strs->append(Level::String(level));
-        strs->append(" ");
-        strs->append(Secondary::String(Secondary::LEADERSHIP));
-        StringAppendModifiers(*strs, level);
+        strs->append(skill.GetName());
+        StringAppendModifiers(*strs, skill.GetValues());
         strs->append("\n");
     }
 
-    return level;
+    return skill.GetValues();
 }
 
 s8 Skill::GetLuckModifiers(u8 level, std::string* strs = NULL)
 {
-    level = Secondary::GetValues(Secondary::LUCK, level);
+    Secondary skill(Secondary::LUCK, level);
 
-    if(level && strs)
+    if(skill.GetValues() && strs)
     {
-        strs->append(Level::String(level));
-        strs->append(" ");
-        strs->append(Secondary::String(Secondary::LUCK));
-        StringAppendModifiers(*strs, level);
+        strs->append(skill.GetName());
+        StringAppendModifiers(*strs, skill.GetValues());
         strs->append("\n");
     }
 
-    return level;
+    return skill.GetValues();
 }

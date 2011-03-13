@@ -947,11 +947,12 @@ void AIToExperienceObject(Heroes &hero, const u8 obj, const s32 dst_index)
 
 void AIToWitchsHut(Heroes &hero, const u8 obj, const s32 dst_index)
 {
-    const Skill::Secondary::skill_t skill = Skill::Secondary::Skill(world.GetTiles(dst_index).GetQuantity1());
+    const Skill::Secondary skill(world.GetTiles(dst_index).GetQuantity1(), Skill::Level::BASIC);
 
     // check full
-    if(!hero.HasMaxSecondarySkill() && !hero.HasSecondarySkill(skill))
-	hero.LearnBasicSkill(skill);
+    if(skill.isValid() && 
+	!hero.HasMaxSecondarySkill() && !hero.HasSecondarySkill(skill.Skill()))
+	hero.LearnSkill(skill);
 
     hero.SetVisited(dst_index);
     DEBUG(DBG_AI, DBG_INFO, hero.GetName());

@@ -1173,35 +1173,35 @@ void ActionToShrine(Heroes &hero, const u8 obj, const s32 dst_index)
 
 void ActionToWitchsHut(Heroes &hero, const u8 obj, const s32 dst_index)
 {
-    const Skill::Secondary::skill_t skill = Skill::Secondary::Skill(world.GetTiles(dst_index).GetQuantity1());
-    const std::string & skill_name = Skill::Secondary::String(skill);
-    const std::string head = _("Witch's Hut");
+    const Skill::Secondary skill(world.GetTiles(dst_index).GetQuantity1(), Skill::Level::BASIC);
 
-    std::string body = _("You approach the hut and observe a witch inside studying an ancient tome on %{skill}.\n \n");
-    String::Replace(body, "%{skill}", skill_name);
+    if(skill.isValid())
+    {
+	//const std::string & skill_name = Skill::Secondary::String(skill);
+	const std::string head = _("Witch's Hut");
 
-    // check full
-    if(hero.HasMaxSecondarySkill())
-    {
-	Dialog::Message(head, body + _("As you approach, she turns and focuses her one glass eye on you.\n\"You already know everything you deserve to learn!\" the witch screeches. \"NOW GET OUT OF MY HOUSE!\""), Font::BIG, Dialog::OK);
-    }
-    else
-    // check present skill
-    if(hero.HasSecondarySkill(skill))
-    {
-	Dialog::Message(head, body + _("As you approach, she turns and speaks.\n\"You already know that which I would teach you. I can help you no further.\""), Font::BIG, Dialog::OK);
-    }
-    else
-    {
-	hero.LearnBasicSkill(skill);
-
-	body = _("An ancient and immortal witch living in a hut with bird's legs for stilts teaches you %{skill} for her own inscrutable purposes.");
+	std::string body = _("You approach the hut and observe a witch inside studying an ancient tome on %{skill}.\n \n");
+	const std::string & skill_name = Skill::Secondary::String(skill.Skill());
 	String::Replace(body, "%{skill}", skill_name);
-	Dialog::SecondarySkillInfo(head, body, skill, Skill::Level::BASIC);
+
+	// check full
+	if(hero.HasMaxSecondarySkill())
+	    Dialog::Message(head, body + _("As you approach, she turns and focuses her one glass eye on you.\n\"You already know everything you deserve to learn!\" the witch screeches. \"NOW GET OUT OF MY HOUSE!\""), Font::BIG, Dialog::OK);
+	else
+	// check present skill
+	if(hero.HasSecondarySkill(skill.Skill()))
+	    Dialog::Message(head, body + _("As you approach, she turns and speaks.\n\"You already know that which I would teach you. I can help you no further.\""), Font::BIG, Dialog::OK);
+	else
+	{
+	    hero.LearnSkill(skill);
+
+	    body = _("An ancient and immortal witch living in a hut with bird's legs for stilts teaches you %{skill} for her own inscrutable purposes.");
+	    String::Replace(body, "%{skill}", skill_name);
+	    Dialog::SecondarySkillInfo(head, body, skill);
+	}
     }
 
     hero.SetVisited(dst_index, Visit::GLOBAL);
-
     DEBUG(DBG_GAME, DBG_INFO, hero.GetName());
 }
 

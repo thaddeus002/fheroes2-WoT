@@ -48,8 +48,8 @@ class Captain : public HeroBase
 
     const Castle* inCastle(void) const;
 
-    u8 GetLevelSkill(const Skill::Secondary::skill_t) const;
-    u8 GetSecondaryValues(const Skill::Secondary::skill_t skill) const;
+    u8  GetLevelSkill(u8) const;
+    u16 GetSecondaryValues(u8) const;
 
     const Army::army_t & GetArmy(void) const;
     Army::army_t & GetArmy(void);

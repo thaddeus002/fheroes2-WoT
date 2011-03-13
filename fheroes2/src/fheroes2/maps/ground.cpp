@@ -47,9 +47,10 @@ const char* Maps::Ground::String(u16 ground)
     return str_ground[8];
 }
 
-u16 Maps::Ground::GetBasePenalty(const s32 index, const u8 pathfinding)
+u16 Maps::Ground::GetBasePenalty(const s32 index, const u8 level)
 {
     const Maps::Tiles & tile = world.GetTiles(index);
+    const Skill::Secondary pathfinding(Skill::Secondary::PATHFINDING, level);
 
     //            none   basc   advd   expr
     //    Desert  2.00   1.75   1.50   1.00
@@ -73,25 +74,22 @@ u16 Maps::Ground::GetBasePenalty(const s32 index, const u8 pathfinding)
     {
         case DESERT:
 	{
-	    u16 fee = Skill::Secondary::GetValues(Skill::Secondary::PATHFINDING, pathfinding);
-	    if(fee > 100) fee = 100;
-
+	    const u16 & fee = pathfinding.GetValues();
 	    const u8 extra = 100;
-	    return 100 + extra - (extra * fee / 100);
+	    return 100 + extra - (extra * (fee > 100 ? 100 : fee) / 100);
 	}
 
         case SNOW:
         case SWAMP:
 	{
-	    u16 fee = Skill::Secondary::GetValues(Skill::Secondary::PATHFINDING, pathfinding);
-
+	    const u16 & fee = pathfinding.GetValues();
 	    const u8 extra = 75;
-	    return 100 + extra - (extra * fee / 100);
+	    return 100 + extra - (extra * (fee > 100 ? 100 : fee) / 100);
 	}
 
         case WASTELAND:
         case BEACH:
-            return (Skill::Level::NONE == pathfinding ? 125 : 100);
+            return (Skill::Level::NONE == pathfinding.Level() ? 125 : 100);
 
         default: break;
     }

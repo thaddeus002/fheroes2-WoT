@@ -27,19 +27,12 @@
 #include "button.h"
 #include "dialog.h"
 
-void Dialog::SecondarySkillInfo(const Skill::Secondary::skill_t skill, const Skill::Level::type_t level, const bool ok_button)
+void Dialog::SecondarySkillInfo(const Skill::Secondary & skill, const bool ok_button)
 {
-    std::string header(Skill::Level::String(level));
-    header.append(" ");
-    header.append(Skill::Secondary::String(skill));
-
-    std::string description(Skill::Secondary::Description(skill, level));
-    String::Replace(description, "%{count}", Skill::Secondary::GetValues(skill, level));
-
-    SecondarySkillInfo(header, description, skill, level, ok_button);
+    SecondarySkillInfo(skill.GetName(), skill.GetDescription(), skill, ok_button);
 }
 
-void Dialog::SecondarySkillInfo(const std::string &header, const std::string &message, const Skill::Secondary::skill_t skill, const Skill::Level::type_t level, const bool ok_button)
+void Dialog::SecondarySkillInfo(const std::string & header, const std::string & message, const Skill::Secondary & skill, const bool ok_button)
 {
     Display & display = Display::Get();
     const ICN::icn_t system = Settings::Get().EvilInterface() ? ICN::SYSTEME : ICN::SYSTEM;
@@ -70,18 +63,18 @@ void Dialog::SecondarySkillInfo(const std::string &header, const std::string &me
     // blit sprite
     pos.x = box.GetArea().x + (pos.w - border.w()) / 2;
     display.Blit(border, pos.x, pos.y);
-    const Sprite & sprite = AGG::GetICN(ICN::SECSKILL, Skill::Secondary::GetIndexSprite1(skill));
+    const Sprite & sprite = AGG::GetICN(ICN::SECSKILL, skill.GetIndexSprite1());
     pos.x = box.GetArea().x + (pos.w - sprite.w()) / 2;
     display.Blit(sprite, pos.x, pos.y + 3);
 
     Text text;
 
     // small text
-    text.Set(Skill::Secondary::String(skill), Font::SMALL);
+    text.Set(Skill::Secondary::String(skill.Skill()), Font::SMALL);
     pos.x = box.GetArea().x + (pos.w - text.w()) / 2;
     text.Blit(pos.x, pos.y + 3);
 
-    text.Set(Skill::Level::String(level));
+    text.Set(Skill::Level::String(skill.Level()));
     pos.x = box.GetArea().x + (pos.w - text.w()) / 2;
     text.Blit(pos.x, pos.y + 55);
 

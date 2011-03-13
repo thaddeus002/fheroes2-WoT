@@ -199,14 +199,14 @@ std::string ShowWitchHutInfo(const Maps::Tiles & tile, const Heroes* hero, bool 
 
     if(show)
     {
-	const Skill::Secondary::skill_t skill = Skill::Secondary::Skill(tile.GetQuantity1());
+	const Skill::Secondary skill(tile.GetQuantity1(), Skill::Level::BASIC);
 	str.append("\n(");
-	str.append(Skill::Secondary::String(skill));
+	str.append(Skill::Secondary::String(skill.Skill()));
 	str.append(")");
 
 	if(hero)
 	{
-	    if(hero->HasSecondarySkill(skill))
+	    if(hero->HasSecondarySkill(skill.Skill()))
 	    {
 		str.append("\n(");
 		str.append(_("already knows this skill"));
@@ -804,7 +804,7 @@ void Dialog::QuickInfo(const Heroes & hero)
     message = _("Attack");
     message += ":";
     text.Set(message);
-    dst_pt.x = cur_rt.x + 20;
+    dst_pt.x = cur_rt.x + 10;
     dst_pt.y += port.h();
     text.Blit(dst_pt);
 
@@ -818,7 +818,7 @@ void Dialog::QuickInfo(const Heroes & hero)
     message = _("Defense");
     message += ":";
     text.Set(message);
-    dst_pt.x = cur_rt.x + 20;
+    dst_pt.x = cur_rt.x + 10;
     dst_pt.y += 12;
     text.Blit(dst_pt);
 
@@ -832,7 +832,7 @@ void Dialog::QuickInfo(const Heroes & hero)
     message = _("Spell Power");
     message += ":";
     text.Set(message);
-    dst_pt.x = cur_rt.x + 20;
+    dst_pt.x = cur_rt.x + 10;
     dst_pt.y += 12;
     text.Blit(dst_pt);
 
@@ -846,7 +846,7 @@ void Dialog::QuickInfo(const Heroes & hero)
     message = _("Knowledge");
     message += ":";
     text.Set(message);
-    dst_pt.x = cur_rt.x + 20;
+    dst_pt.x = cur_rt.x + 10;
     dst_pt.y += 12;
     text.Blit(dst_pt);
 
@@ -860,7 +860,7 @@ void Dialog::QuickInfo(const Heroes & hero)
     message = _("Spell Points");
     message += ":";
     text.Set(message);
-    dst_pt.x = cur_rt.x + 20;
+    dst_pt.x = cur_rt.x + 10;
     dst_pt.y += 12;
     text.Blit(dst_pt);
 
@@ -876,7 +876,7 @@ void Dialog::QuickInfo(const Heroes & hero)
     message = _("Move Points");
     message += ":";
     text.Set(message);
-    dst_pt.x = cur_rt.x + 20;
+    dst_pt.x = cur_rt.x + 10;
     dst_pt.y += 12;
     text.Blit(dst_pt);
 

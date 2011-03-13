@@ -54,8 +54,8 @@ public:
 
     virtual u16 GetMaxSpellPoints(void) const = 0;
 
-    virtual u8 GetLevelSkill(const Skill::Secondary::skill_t) const = 0;
-    virtual u8 GetSecondaryValues(const Skill::Secondary::skill_t) const = 0;
+    virtual u8  GetLevelSkill(u8 skill) const = 0;
+    virtual u16 GetSecondaryValues(u8 skill) const = 0;
 
     virtual void ActionAfterBattle(void) = 0;
     virtual void ActionPreBattle(void) = 0;
@@ -105,6 +105,14 @@ protected:
 
     SpellBook spell_book;
     BagArtifacts bag_artifacts;
+};
+
+struct HeroHasArtifact : public std::binary_function <const HeroBase*, Artifact, bool>
+{
+    bool operator() (const HeroBase* hero, Artifact art) const
+    {
+        return hero->HasArtifact(art);
+    }
 };
 
 #endif

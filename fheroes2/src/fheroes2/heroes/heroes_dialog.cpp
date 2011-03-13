@@ -495,15 +495,19 @@ Dialog::answer_t Heroes::OpenDialog(bool readonly, bool fade)
 	if(le.MouseCursor(secskill_bar.GetArea()))
 	{
             const u8 ii = secskill_bar.GetIndexFromCoord(le.GetMouseCursor());
-	    const Skill::Secondary::skill_t skill = ii < secondary_skills.size() ? secondary_skills[ii].Skill() : Skill::Secondary::UNKNOWN;
-	    const Skill::Level::type_t level = ii < secondary_skills.size() ? secondary_skills[ii].Level() : Skill::Level::NONE;
 
-	    if(Skill::Secondary::UNKNOWN != skill && Skill::Level::NONE != level)
+	    if(ii < secondary_skills.size())
 	    {
-		message = _("View %{level} %{skill} Info");
-		String::Replace(message, "%{level}", Skill::Level::String(level));
-		String::Replace(message, "%{skill}", Skill::Secondary::String(skill));
-		statusBar.ShowMessage(message);
+		const Skill::Secondary & skill = secondary_skills[ii];
+
+		if(skill.isValid())
+		{
+		    message = _("View %{skill} Info");
+		    String::Replace(message, "%{skill}", skill.GetName());
+		    statusBar.ShowMessage(message);
+		}
+		else
+		    statusBar.ShowMessage(_("Hero Screen"));
 	    }
 	    else
 		statusBar.ShowMessage(_("Hero Screen"));
