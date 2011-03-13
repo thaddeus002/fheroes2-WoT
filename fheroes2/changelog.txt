@@ -1,4 +1,13 @@
-SVN - up to r2310
+SVN - up to r2325
+
+Update: translations
+Added: game: quick info: penalty cost
+Added: game: plural descriptions for artifacts
+Added: android: latest changes
+Fixed: game: CampFire gold value
+Fixed: game: invalid game focus for load game type
+Fixed: game: gameover loss condition
+Fixed: game: hotkey hero move
 
 Mar, 2, 2011
 
