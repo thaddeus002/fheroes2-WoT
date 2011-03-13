@@ -126,12 +126,17 @@ using namespace std;
 #endif
 #define setlocale(x,y) 0
 #define system(x) 0
-#define setenv(x, y, z) wince_putenv(x, y, z)
-#define getenv(x) wince_getenv(x)
+#define setenv(x, y, z) sdl_putenv(x, y, z)
+#define getenv(x) sdl_getenv(x)
 #define getopt(x, y, z) -1
 #define optarg 0
 #else
 #include <cstdlib>
+#endif
+
+#if defined __MINGW32__
+#define setenv(x, y, z) sdl_putenv(x, y, z)
+#define getenv(x) sdl_getenv(x)
 #endif
 
 #endif

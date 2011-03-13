@@ -700,15 +700,13 @@ std::string EncodeString(const std::string & str, const char* charset)
 }
 #endif
 
-#ifdef __MINGW32CE__
-int wince_putenv(const char *name, const char *value, int overwrite)
+int sdl_putenv(const char *name, const char *value, int overwrite)
 {
     std::string str(std::string(name) + "=" + std::string(value));
     return SDL_putenv(str.c_str());
 }
 
-char* wince_getenv(const char* env)
+char* sdl_getenv(const char* env)
 {
     return SDL_getenv(env);
 }
-#endif
