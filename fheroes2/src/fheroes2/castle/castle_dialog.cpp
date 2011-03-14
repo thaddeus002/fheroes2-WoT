@@ -43,6 +43,8 @@
 #include "selectarmybar.h"
 #include "pocketpc.h"
 
+void CastleRedrawTownName(const Castle & castle, const Point & dst);
+
 bool AllowFlashBuilding(u32 build)
 {
     switch(build)
@@ -487,6 +489,7 @@ Dialog::answer_t Castle::OpenDialog(bool readonly, bool fade)
 		RedrawIcons(*this, heroes, cur_pt);
         	selectArmy2.Redraw();
         	selectArmy1.Redraw();
+		CastleRedrawTownName(*this, cur_pt);
 		cursor.Show();
 		display.Flip();
 	    }
@@ -517,6 +520,7 @@ Dialog::answer_t Castle::OpenDialog(bool readonly, bool fade)
 	    RedrawIcons(*this, heroes, cur_pt);
     	    selectArmy1.Redraw();
     	    selectArmy2.Redraw();
+	    CastleRedrawTownName(*this, cur_pt);
 	    cursor.Show();
 	    display.Flip();
 	}
