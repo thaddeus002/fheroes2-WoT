@@ -209,7 +209,8 @@ void AI::BattleMagicTurn(Arena & arena, const Stats & b, Actions & a, const Stat
 {
     const HeroBase* hero = b.GetCommander();
 
-    if(b.Modes(SP_BERSERKER) || !hero || hero->Modes(Heroes::SPELLCASTED) || !hero->HaveSpellBook()) return;
+    if(b.Modes(SP_BERSERKER) || !hero || hero->Modes(Heroes::SPELLCASTED) || !hero->HaveSpellBook() ||
+	arena.isDisableCastSpell(Spell(), NULL)) return;
 
     Army::army_t* my_army = arena.GetArmy(b.GetColor());
     Army::army_t* enemy_army = arena.GetArmy(arena.GetOppositeColor(b.GetColor()));
