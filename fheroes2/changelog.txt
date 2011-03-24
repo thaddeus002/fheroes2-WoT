@@ -1,4 +1,4 @@
-SVN - up to r2325
+SVN - up to r2334
 
 Update: translations
 Added: game: quick info: penalty cost

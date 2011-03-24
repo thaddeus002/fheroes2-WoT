@@ -1,5 +1,7 @@
-include Makefile.unix
+AR := ar
+CXX := g++
 
 ifndef WITHOUT_UNICODE
+CFLAGS := $(CFLAGS) -DWITH_ICONV
 LIBS := $(LIBS) -lintl -liconv
 endif

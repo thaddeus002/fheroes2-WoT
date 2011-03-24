@@ -21,9 +21,6 @@ TARGET := fheroes2
 all:
 	$(MAKE) -C src
 	@cp src/dist/$(TARGET) .
-ifndef WITHOUT_UNICODE
-	@cp src/dist/$(TARGET).pot files/lang
-endif
 
 clean:
 	$(MAKE) -C src clean
