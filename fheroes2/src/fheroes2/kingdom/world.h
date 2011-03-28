@@ -46,6 +46,7 @@ class Artifact;
 typedef std::vector<EventDate> EventsDate;
 typedef std::vector<EventMaps> EventsMaps;
 typedef std::vector<Riddle>    Riddles;
+typedef std::vector<Maps::Tiles> MapsTiles;
 
 class World : protected Size
 {
@@ -63,13 +64,13 @@ public:
     const Maps::Tiles & GetTiles(const Point & pt) const{ return GetTiles(pt.y * width + pt.x); }
     const Maps::Tiles & GetTiles(u16 ax, u16 ay) const{ return GetTiles(ay * width + ax); }
 #ifdef WITH_DEBUG
-    const Maps::Tiles & GetTiles(s32 index) const{ return *vec_tiles.at(index); }
+    const Maps::Tiles & GetTiles(s32 index) const{ return vec_tiles.at(index); }
 #else
-    const Maps::Tiles & GetTiles(s32 index) const{ return *vec_tiles[index]; }
+    const Maps::Tiles & GetTiles(s32 index) const{ return vec_tiles[index]; }
 #endif
     Maps::Tiles & GetTiles(const Point & pt) { return GetTiles(pt.y * width + pt.x); }
     Maps::Tiles & GetTiles(u16 ax, u16 ay) { return GetTiles(ay * width + ax); }
-    Maps::Tiles & GetTiles(s32 index){ return *vec_tiles.at(index); }
+    Maps::Tiles & GetTiles(s32 index){ return vec_tiles.at(index); }
 
     Kingdom & GetMyKingdom(void);
     Kingdom & GetKingdom(u8 color);
@@ -159,7 +160,7 @@ private:
     friend class Radar;
     friend class Game::IO;
 
-    std::vector<Maps::Tiles *>          vec_tiles;
+    MapsTiles				vec_tiles;
     std::vector<Kingdom *>              vec_kingdoms;
     std::vector<std::string>     	vec_rumors;
     std::vector<Castle *>               vec_castles;

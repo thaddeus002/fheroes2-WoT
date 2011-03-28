@@ -106,10 +106,11 @@ namespace Maps
     class Tiles
     {
     public:
-	Tiles(s32);
-	Tiles(s32 mi, const MP2::mp2tile_t & mp2tile);
+	Tiles();
 
-	s32 GetIndex(void) const{ return maps_index; }
+	void Set(s32, const MP2::mp2tile_t &);
+
+	const s32 & GetIndex(void) const{ return maps_index; }
 	MP2::object_t GetObject(void) const;
 	u8 GetQuantity1(void) const{ return quantity1; }
 	u8 GetQuantity2(void) const{ return quantity2; }
@@ -204,7 +205,7 @@ namespace Maps
         Addons addons_level1;
         Addons addons_level2;
 
-	const s32 maps_index;
+	s32	maps_index;
 
 	u16	tile_sprite_index;
 	u8	tile_sprite_shape;

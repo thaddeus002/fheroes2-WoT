@@ -206,7 +206,8 @@ void World::NewMaps(const u16 sw, const u16 sh)
     vec_tiles.resize(width * height);
 
     // init all tiles
-    for(int ii = 0; ii < width * height; ++ii)
+    for(MapsTiles::iterator
+	it = vec_tiles.begin(); it != vec_tiles.end(); ++it)
     {
 	MP2::mp2tile_t mp2tile;
 	
@@ -223,7 +224,7 @@ void World::NewMaps(const u16 sw, const u16 sh)
         mp2tile.uniqNumber1	= 0;
         mp2tile.uniqNumber2	= 0;
 
-	vec_tiles[ii] = new Maps::Tiles(ii, mp2tile);
+	(*it).Set(std::distance(vec_tiles.begin(), it), mp2tile);
     }
 
     Maps::FileInfo & fi = Settings::Get().CurrentFileInfo();
@@ -332,11 +333,15 @@ void World::LoadMaps(const std::string &filename)
     // offset data
     fd.seekg(MP2OFFSETDATA, std::ios_base::beg);
 
-    vec_tiles.resize(width * height, NULL);
+    vec_tiles.resize(width * height);
 
     // read all tiles
-    for(int ii = 0; ii < width * height; ++ii)
+    for(MapsTiles::iterator
+	it = vec_tiles.begin(); it != vec_tiles.end(); ++it)
     {
+	const size_t index = std::distance(vec_tiles.begin(), it);
+	Maps::Tiles & tile = *it;
+
 	MP2::mp2tile_t mp2tile;
 
 	// byte16
@@ -378,7 +383,7 @@ void World::LoadMaps(const std::string &filename)
 	    case MP2::OBJ_EVENT:
 	    case MP2::OBJ_SPHINX:
 	    case MP2::OBJ_JAIL:
-		vec_object.push_back(ii);
+		vec_object.push_back(index);
 		break;
 	    default:
 		break;
@@ -396,22 +401,18 @@ void World::LoadMaps(const std::string &filename)
 	fd.read(reinterpret_cast<char *>(&mp2tile.uniqNumber2), sizeof(u32));
 	SwapLE32(mp2tile.uniqNumber2);
 
-	Maps::Tiles * tile = new Maps::Tiles(ii, mp2tile);
+	tile.Set(index, mp2tile);
 
 	// load all addon for current tils
 	while(byte16)
 	{
 	    if(vec_mp2addons.size() <= byte16){ DEBUG(DBG_GAME, DBG_WARN, "index out of range"); break; }
-
-	    (*tile).AddonsPushLevel1(vec_mp2addons[byte16]);
-	    (*tile).AddonsPushLevel2(vec_mp2addons[byte16]);
-
+	    tile.AddonsPushLevel1(vec_mp2addons[byte16]);
+	    tile.AddonsPushLevel2(vec_mp2addons[byte16]);
 	    byte16 = vec_mp2addons[byte16].indexAddon;
 	}
 
-	(*tile).AddonsSort();
-
-	vec_tiles[ii] = tile;
+	tile.AddonsSort();
     }
 
     DEBUG(DBG_GAME, DBG_INFO, "read all tiles, tellg: " << fd.tellg());
@@ -574,26 +575,25 @@ void World::LoadMaps(const std::string &filename)
 	// read block
 	fd.read(reinterpret_cast<char *>(pblock), sizeblock);
 
-	std::vector<s32>::const_iterator it_index = vec_object.begin();
-	bool findobject = false;
+	s32 findobject = -1;
 
-	while(it_index != vec_object.end())
+	for(std::vector<s32>::const_iterator
+	    it_index = vec_object.begin(); it_index != vec_object.end() && findobject < 0; ++it_index)
 	{
-	    const Maps::Tiles & tile = *vec_tiles.at(*it_index);
+	    const Maps::Tiles & tile = vec_tiles[*it_index];
 
 	    // orders(quantity2, quantity1)
 	    u16 orders = (tile.GetQuantity2() ? tile.GetQuantity2() : 0);
 	    orders <<= 8;
 	    orders |= static_cast<u16>(tile.GetQuantity1());
 	    
-	    if(orders && !(orders % 0x08) && (ii + 1 == orders / 0x08)){ findobject = true; break; }
-
-	    ++it_index;
+	    if(orders && !(orders % 0x08) && (ii + 1 == orders / 0x08))
+		findobject = *it_index;
 	}
 
-	if(findobject)
+	if(0 <= findobject)
 	{
-	    Maps::Tiles & tile = *vec_tiles.at(*it_index);
+	    const Maps::Tiles & tile = vec_tiles[findobject];
 	    const Maps::TilesAddon *addon = NULL;
 
 	    switch(tile.GetObject())
@@ -606,7 +606,7 @@ void World::LoadMaps(const std::string &filename)
 		    }
 		    else
 		    {
-			Castle *castle = GetCastle(*it_index);
+			Castle *castle = GetCastle(findobject);
 			if(castle)
 			{
 			    castle->LoadFromMP2(pblock);
@@ -615,7 +615,7 @@ void World::LoadMaps(const std::string &filename)
 			}
 			else
 			{
-			    DEBUG(DBG_GAME, DBG_WARN, "load castle: " << "not found, index: " << *it_index);
+			    DEBUG(DBG_GAME, DBG_WARN, "load castle: " << "not found, index: " << findobject);
 			}
 		    }
 		    break;
@@ -628,7 +628,7 @@ void World::LoadMaps(const std::string &filename)
 		    }
 		    else
 		    {
-			Castle *castle = GetCastle(*it_index);
+			Castle *castle = GetCastle(findobject);
 			if(castle)
 			{
 			    castle->LoadFromMP2(pblock);
@@ -638,7 +638,7 @@ void World::LoadMaps(const std::string &filename)
 			}
 			else
 			{
-			    DEBUG(DBG_GAME , DBG_WARN, "load castle: " << "not found, index: " << *it_index);
+			    DEBUG(DBG_GAME , DBG_WARN, "load castle: " << "not found, index: " << findobject);
 			}
 		    }
 		    break;
@@ -665,7 +665,7 @@ void World::LoadMaps(const std::string &filename)
 
 			if(hero)
 			{
-			    hero->LoadFromMP2(*it_index, pblock, Color::GRAY, hero->GetRace());
+			    hero->LoadFromMP2(findobject, pblock, Color::GRAY, hero->GetRace());
 			    hero->SetModes(Heroes::JAIL);
 			}
 		    }
@@ -718,7 +718,7 @@ void World::LoadMaps(const std::string &filename)
 			// check heroes max count
 			if(kingdom.AllowRecruitHero(false, 0))
 			{
-			    const Heroes * hero = NULL;
+			    const Heroes* hero = NULL;
 
 			    hero = (pblock[17] &&
 				    pblock[18] < Heroes::BAX &&
@@ -729,7 +729,7 @@ void World::LoadMaps(const std::string &filename)
 			    if(hero)
 			    {
 				Heroes* herow = const_cast<Heroes *>(hero);
-			    	herow->LoadFromMP2(*it_index, pblock, color, race);
+			    	herow->LoadFromMP2(findobject, pblock, color, race);
 			    	kingdom.AddHeroes(herow);
 			    }
 			}
@@ -743,17 +743,17 @@ void World::LoadMaps(const std::string &filename)
 		case MP2::OBJ_BOTTLE:
 		    // add sign or buttle
 		    if(SIZEOFMP2SIGN - 1 < sizeblock && 0x01 == pblock[0])
-			map_sign[*it_index] = Game::GetEncodeString(reinterpret_cast<char *>(&pblock[9]));
+			map_sign[findobject] = Game::GetEncodeString(reinterpret_cast<char *>(&pblock[9]));
 		    break;
 		case MP2::OBJ_EVENT:
 		    // add event maps
 		    if(SIZEOFMP2EVENT - 1 < sizeblock && 0x01 == pblock[0])
-				    vec_eventsmap.push_back(EventMaps(*it_index, pblock));
+				    vec_eventsmap.push_back(EventMaps(findobject, pblock));
 		    break;
 		case MP2::OBJ_SPHINX:
 		    // add riddle sphinx
 		    if(SIZEOFMP2RIDDLE - 1 < sizeblock && 0x00 == pblock[0])
-				    vec_riddles.push_back(Riddle(*it_index, pblock));
+				    vec_riddles.push_back(Riddle(findobject, pblock));
 		    break;
 		default:
 		    break;
@@ -794,11 +794,9 @@ void World::LoadMaps(const std::string &filename)
     fd.close();
 
     // modify other objects
-    const s32 vec_size = vec_tiles.size();
-
-    for(s32 ii = 0; ii < vec_size; ++ii)
+    for(size_t ii = 0; ii < vec_tiles.size(); ++ii)
     {
-	Maps::Tiles & tile = *vec_tiles[ii];
+	Maps::Tiles & tile = vec_tiles[ii];
 	const Maps::TilesAddon *addon = NULL;
 
 	// fix loyalty version objects
@@ -989,19 +987,21 @@ void World::LoadMaps(const std::string &filename)
 	std::vector<s32> pools;
 	pools.reserve(vec_tiles.size());
 
-	for(u16 ii = 0; ii < vec_tiles.size(); ++ii)
+	for(size_t ii = 0; ii < vec_tiles.size(); ++ii)
 	{
-	    const Maps::Tiles & tile = *vec_tiles[ii];
+	    const Maps::Tiles & tile = vec_tiles[ii];
 	    const u16 x = tile.GetIndex() % width;
 	    const u16 y = tile.GetIndex() / width;
-	    if(Maps::Ground::WATER != tile.GetGround() && tile.GoodForUltimateArtifact() && x > 5 && x < width - 5 && y > 5 && y < height - 5) pools.push_back(tile.GetIndex());
+	    if(Maps::Ground::WATER != tile.GetGround() &&
+		tile.GoodForUltimateArtifact() &&
+		x > 5 && x < width - 5 && y > 5 && y < height - 5) pools.push_back(tile.GetIndex());
 	}
 
 	if(pools.size())
 	{
 	    const s32 pos = *Rand::Get(pools);
 	    ultimate_index = pos;
-	    vec_tiles[pos]->SetQuantity1(Artifact::Rand(Artifact::ART_ULTIMATE));
+	    vec_tiles[pos].SetQuantity1(Artifact::Rand(Artifact::ART_ULTIMATE));
 	}
     }
 
@@ -1148,11 +1148,6 @@ void World::NewDay(void)
     }
 }
 
-void WeekLifeUpdateQuantity(Maps::Tiles* tile)
-{
-    if(MP2::isWeekLife(tile->GetObject())) tile->UpdateQuantity();
-}
-
 void World::NewWeek(void)
 {
     UpdateDwellingPopulation();
@@ -1162,7 +1157,9 @@ void World::NewWeek(void)
 	UpdateMonsterPopulation();
 
 	// update week object
-	std::for_each(vec_tiles.begin(), vec_tiles.end(), WeekLifeUpdateQuantity);
+	for(MapsTiles::iterator
+	    it = vec_tiles.begin(); it != vec_tiles.end(); ++it)
+	    if(MP2::isWeekLife((*it).GetObject())) (*it).UpdateQuantity();
     }
 
     // update week type
@@ -1182,12 +1179,6 @@ void World::NewMonth(void)
 void World::Reset(void)
 {
     // maps tiles
-    if(vec_tiles.size())
-    {
-	std::vector<Maps::Tiles *>::const_iterator it = vec_tiles.begin();
-	
-	for(; it != vec_tiles.end(); ++it) delete *it;
-    }
     vec_tiles.clear();
 
     // kingdoms
@@ -1533,11 +1524,10 @@ void World::ClearFog(const u8 color)
 /* update population monster in dwelling */
 void World::UpdateDwellingPopulation(void)
 {
-    std::vector<Maps::Tiles *>::iterator it1 = vec_tiles.begin();
-    std::vector<Maps::Tiles *>::const_iterator it2 = vec_tiles.end();
-    for(; it1 != it2; ++it1)
+    for(MapsTiles::iterator
+	it = vec_tiles.begin(); it != vec_tiles.end(); ++it)
     {
-	Maps::Tiles & tile = **it1;
+	Maps::Tiles & tile = *it;
 	MP2::object_t obj = tile.GetObject();
 	float count = 0;
 
@@ -1624,12 +1614,11 @@ void World::UpdateDwellingPopulation(void)
 
 void World::UpdateMonsterPopulation(void)
 {
-    std::vector<Maps::Tiles *>::const_iterator it1 = vec_tiles.begin();
-    std::vector<Maps::Tiles *>::const_iterator it2 = vec_tiles.end();
-        
-    for(; it1 != it2; ++it1) if(*it1 && MP2::OBJ_MONSTER == (*it1)->GetObject())
+    for(MapsTiles::iterator
+	it = vec_tiles.begin(); it != vec_tiles.end(); ++it)
+    if(MP2::OBJ_MONSTER == (*it).GetObject())
     {
-	Maps::Tiles & tile = **it1;
+	Maps::Tiles & tile = *it;
 	const Army::Troop troop(tile);
 
 	if(0 == troop.GetCount())
@@ -1643,7 +1632,7 @@ void World::UpdateMonsterPopulation(void)
 Artifact World::GetUltimateArtifact(void) const
 {
     return Maps::isValidAbsIndex(ultimate_index) ?
-	Artifact(vec_tiles[ultimate_index]->GetQuantity1()) : Artifact(Artifact::UNKNOWN);
+	Artifact(vec_tiles[ultimate_index].GetQuantity1()) : Artifact(Artifact::UNKNOWN);
 }
 
 bool World::DiggingForUltimateArtifact(const Point & center)
@@ -1670,10 +1659,9 @@ bool World::DiggingForUltimateArtifact(const Point & center)
 
 void World::ActionForMagellanMaps(u8 color)
 {
-    std::vector<Maps::Tiles *>::const_iterator it1 = vec_tiles.begin();
-    std::vector<Maps::Tiles *>::const_iterator it2 = vec_tiles.end();
-        
-    for(; it1 != it2; ++it1) if(*it1 && Maps::Ground::WATER == (*it1)->GetGround()) (*it1)->ClearFog(color);
+    for(MapsTiles::iterator
+	it = vec_tiles.begin(); it != vec_tiles.end(); ++it)
+	if(Maps::Ground::WATER == (*it).GetGround()) (*it).ClearFog(color);
 }
 
 s32 World::GetNearestObject(s32 center, MP2::object_t obj, bool check_hero) const
@@ -1721,14 +1709,14 @@ void World::DateDump(void) const
 	    ", week " << static_cast<int>(GetWeek()) << ", day: " << static_cast<int>(GetDay()));
 }
 
-bool IsObeliskOnMaps(const Maps::Tiles* tile)
+bool IsObeliskOnMaps(const Maps::Tiles & tile)
 {
-    switch(tile->GetObject())
+    switch(tile.GetObject())
     {
 	case MP2::OBJ_OBELISK:	return true;
 	case MP2::OBJ_HEROES:
 	{
-	    const Heroes* hero = world.GetHeroes(tile->GetIndex());
+	    const Heroes* hero = world.GetHeroes(tile.GetIndex());
 	    if(hero && MP2::OBJ_OBELISK == hero->GetUnderObject()) return true;
 	}
 	default: break;
@@ -1798,17 +1786,15 @@ bool World::GetObjectPositions(s32 center, MP2::object_t obj, std::vector<IndexD
 {
     if(v.size()) v.clear();
 
-    std::vector<Maps::Tiles *>::const_iterator it1 = vec_tiles.begin();
-    std::vector<Maps::Tiles *>::const_iterator it2 = vec_tiles.end();
-
-    for(; it1 != it2; ++it1) if(*it1)
+    for(MapsTiles::const_iterator
+	it = vec_tiles.begin(); it != vec_tiles.end(); ++it)
     {
-	MP2::object_t obj2 = check_hero && MP2::OBJ_HEROES == (*it1)->GetObject() && GetHeroes((*it1)->GetIndex()) ?
-		GetHeroes((*it1)->GetIndex())->GetUnderObject() : (*it1)->GetObject();
+	MP2::object_t obj2 = check_hero && MP2::OBJ_HEROES == (*it).GetObject() && GetHeroes((*it).GetIndex()) ?
+		GetHeroes((*it).GetIndex())->GetUnderObject() : (*it).GetObject();
 
 	if(obj == obj2)
-		v.push_back(IndexDistance((*it1)->GetIndex(),
-			Maps::GetApproximateDistance(center, (*it1)->GetIndex())));
+		v.push_back(IndexDistance((*it).GetIndex(),
+			Maps::GetApproximateDistance(center, (*it).GetIndex())));
     }
 
     return v.size();
@@ -1818,16 +1804,14 @@ bool World::GetObjectPositions(MP2::object_t obj, std::vector<s32> & v, bool che
 {
     if(v.size()) v.clear();
 
-    std::vector<Maps::Tiles *>::const_iterator it1 = vec_tiles.begin();
-    std::vector<Maps::Tiles *>::const_iterator it2 = vec_tiles.end();
-
-    for(; it1 != it2; ++it1) if(*it1)
+    for(MapsTiles::const_iterator
+	it = vec_tiles.begin(); it != vec_tiles.end(); ++it)
     {
-	MP2::object_t obj2 = check_hero && MP2::OBJ_HEROES == (*it1)->GetObject() && GetHeroes((*it1)->GetIndex()) ?
-		GetHeroes((*it1)->GetIndex())->GetUnderObject() : (*it1)->GetObject();
+	MP2::object_t obj2 = check_hero && MP2::OBJ_HEROES == (*it).GetObject() && GetHeroes((*it).GetIndex()) ?
+		GetHeroes((*it).GetIndex())->GetUnderObject() : (*it).GetObject();
 
 	if(obj == obj2)
-		v.push_back((*it1)->GetIndex());
+		v.push_back((*it).GetIndex());
     }
 
     return v.size();

@@ -510,18 +510,31 @@ void Maps::Addons::Remove(u32 uniq)
 
 
 /* Maps::Tiles */
-
-Maps::Tiles::Tiles(s32 index) : maps_index(index), tile_sprite_index(0), tile_sprite_shape(0),
+Maps::Tiles::Tiles() : maps_index(0), tile_sprite_index(0), tile_sprite_shape(0),
     mp2_object(0), quantity1(0), quantity2(0), quantity3(0), quantity4(0), fogs(0xFF), quantity5(0), quantity6(0), quantity7(0)
 {
 }
 
-Maps::Tiles::Tiles(s32 mi, const MP2::mp2tile_t & mp2tile) : maps_index(mi), tile_sprite_index(mp2tile.tileIndex),
-    tile_sprite_shape(mp2tile.shape), mp2_object(mp2tile.generalObject), quantity1(mp2tile.quantity1), quantity2(mp2tile.quantity2),
-    quantity3(0), quantity4(0), fogs(0xFF), quantity5(0), quantity6(0), quantity7(0)
+void Maps::Tiles::Set(s32 index, const MP2::mp2tile_t & mp2)
 {
-    AddonsPushLevel1(mp2tile);
-    AddonsPushLevel2(mp2tile);
+    maps_index	= index;
+    tile_sprite_index	= mp2.tileIndex;
+    tile_sprite_shape	= mp2.shape;
+    mp2_object	= mp2.generalObject;
+    quantity1	= mp2.quantity1;
+    quantity2	= mp2.quantity2;
+    quantity3	= 0;
+    quantity4	= 0;
+    fogs	= 0xFF;
+    quantity5	= 0;
+    quantity6	= 0;
+    quantity7	= 0;
+
+    addons_level1.clear();
+    addons_level2.clear();
+
+    AddonsPushLevel1(mp2);
+    AddonsPushLevel2(mp2);
 
     if(IS_DEVEL()) ClearFog(Settings::Get().MyColor());
 }
@@ -664,7 +677,7 @@ void Maps::Tiles::RedrawBottom(Surface & dst, bool skip_objs) const
 
 void Maps::Tiles::RedrawObjects(Surface & dst) const
 {
-    switch(GetObject())
+    switch(mp2_object)
     {
         // boat
         case MP2::OBJ_BOAT:	RedrawBoat(dst); break;

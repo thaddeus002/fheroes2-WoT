@@ -255,8 +255,8 @@ bool Game::IO::SaveBIN(QueueMessage & msg)
     msg.Push(static_cast<u32>(world.vec_tiles.size()));
     for(u32 ii = 0; ii < world.vec_tiles.size(); ++ii)
     {
-	if(NULL == world.vec_tiles[ii]){ DEBUG(DBG_GAME, DBG_WARN, "tiles: " << "is NULL"); return false; }
-	PackTile(msg, *world.vec_tiles[ii]);
+	//if(NULL == world.vec_tiles[ii]){ DEBUG(DBG_GAME, DBG_WARN, "tiles: " << "is NULL"); return false; }
+	PackTile(msg, world.vec_tiles[ii]);
     }
 
     // heroes
@@ -754,12 +754,11 @@ bool Game::IO::LoadBIN(QueueMessage & msg)
     msg.Pop(byte16);
     if(byte16 != 0xFF06) DEBUG(DBG_GAME, DBG_WARN, "0xFF06");
     msg.Pop(byte32);
-    world.vec_tiles.reserve(byte32);
+    world.vec_tiles.resize(byte32);
     for(u32 maps_index = 0; maps_index < byte32; ++maps_index)
     {
-	Maps::Tiles *tile = new Maps::Tiles(maps_index);
-	UnpackTile(msg, *tile, format);
-	world.vec_tiles.push_back(tile);
+	world.vec_tiles[maps_index].maps_index = maps_index;
+	UnpackTile(msg, world.vec_tiles[maps_index], format);
     }
 
     // heroes
