@@ -324,7 +324,7 @@ std::string String::GetTime(void)
 {
     time_t raw;
     struct tm* tmi;
-    char buf [10] = { 0 };
+    char buf [13] = { 0 };
 
     std::time(&raw);
     tmi = std::localtime(&raw);
