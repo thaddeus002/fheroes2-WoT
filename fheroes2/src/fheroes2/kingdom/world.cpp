@@ -80,14 +80,7 @@ World & World::Get(void)
 void World::Defaults(void)
 {
     // playing kingdom
-    vec_kingdoms.resize(KINGDOMMAX + 1);
-    vec_kingdoms[0] = new Kingdom(Color::BLUE);
-    vec_kingdoms[1] = new Kingdom(Color::GREEN);
-    vec_kingdoms[2] = new Kingdom(Color::RED);
-    vec_kingdoms[3] = new Kingdom(Color::YELLOW);
-    vec_kingdoms[4] = new Kingdom(Color::ORANGE);
-    vec_kingdoms[5] = new Kingdom(Color::PURPLE);
-    vec_kingdoms[6] = new Kingdom(Color::GRAY);
+    vec_kingdoms.Init();
 
     // initialize all heroes
     vec_heroes.resize(HEROESMAXCOUNT + 2);
@@ -224,7 +217,7 @@ void World::NewMaps(const u16 sw, const u16 sh)
         mp2tile.uniqNumber1	= 0;
         mp2tile.uniqNumber2	= 0;
 
-	(*it).Set(std::distance(vec_tiles.begin(), it), mp2tile);
+	(*it).Init(std::distance(vec_tiles.begin(), it), mp2tile);
     }
 
     Maps::FileInfo & fi = Settings::Get().CurrentFileInfo();
@@ -401,7 +394,7 @@ void World::LoadMaps(const std::string &filename)
 	fd.read(reinterpret_cast<char *>(&mp2tile.uniqNumber2), sizeof(u32));
 	SwapLE32(mp2tile.uniqNumber2);
 
-	tile.Set(index, mp2tile);
+	tile.Init(index, mp2tile);
 
 	// load all addon for current tils
 	while(byte16)
@@ -960,7 +953,7 @@ void World::LoadMaps(const std::string &filename)
     }
 
     // play with hero
-    std::for_each(vec_kingdoms.begin(), vec_kingdoms.end(), std::mem_fun(&Kingdom::ApplyPlayWithStartingHero));
+    vec_kingdoms.ApplyPlayWithStartingHero();
 
     // play with debug hero
     if(IS_DEVEL())
@@ -1021,38 +1014,12 @@ const Kingdom & World::GetMyKingdom(void) const
 /* get kingdom */
 Kingdom & World::GetKingdom(u8 color)
 {
-    switch(color)
-    {
-        case Color::BLUE:       return *vec_kingdoms[0];
-        case Color::GREEN:      return *vec_kingdoms[1];
-        case Color::RED:        return *vec_kingdoms[2];
-        case Color::YELLOW:     return *vec_kingdoms[3];
-        case Color::ORANGE:     return *vec_kingdoms[4];
-        case Color::PURPLE:     return *vec_kingdoms[5];
-        case Color::GRAY:       return *vec_kingdoms[6];
-    }
-
-    DEBUG(DBG_GAME, DBG_WARN, "unknown color");
-
-    return *vec_kingdoms[6];
+    return vec_kingdoms.Get(color);
 }
 
 const Kingdom & World::GetKingdom(u8 color) const
 {
-    switch(color)
-    {
-        case Color::BLUE:       return *vec_kingdoms[0];
-        case Color::GREEN:      return *vec_kingdoms[1];
-        case Color::RED:        return *vec_kingdoms[2];
-        case Color::YELLOW:     return *vec_kingdoms[3];
-        case Color::ORANGE:     return *vec_kingdoms[4];
-        case Color::PURPLE:     return *vec_kingdoms[5];
-        case Color::GRAY:       return *vec_kingdoms[6];
-    }
-
-    DEBUG(DBG_GAME, DBG_WARN, "unknown color");
-
-    return *vec_kingdoms[6];
+    return vec_kingdoms.Get(color);
 }
 
 /* get castle from index maps */
@@ -1131,20 +1098,20 @@ void World::NewDay(void)
     }
 
     // action new day
-    for(u8 ii = 0; ii < vec_kingdoms.size(); ++ii) if((*vec_kingdoms[ii]).isPlay()) (*vec_kingdoms[ii]).ActionNewDay();
+    vec_kingdoms.NewDay();
 
     // action new week
     if(BeginWeek())
     {
         NewWeek();
-        for(u8 ii = 0; ii < vec_kingdoms.size(); ++ii) if((*vec_kingdoms[ii]).isPlay()) (*vec_kingdoms[ii]).ActionNewWeek();
+        vec_kingdoms.NewWeek();
     }
     
     // action new month
     if(BeginMonth())
     {
         NewMonth();
-        for(u8 ii = 0; ii < vec_kingdoms.size(); ++ii) if((*vec_kingdoms[ii]).isPlay()) (*vec_kingdoms[ii]).ActionNewMonth();
+        vec_kingdoms.NewMonth();
     }
 }
 
@@ -1182,13 +1149,7 @@ void World::Reset(void)
     vec_tiles.clear();
 
     // kingdoms
-    if(vec_kingdoms.size())
-    {
-	std::vector<Kingdom *>::const_iterator it = vec_kingdoms.begin();
-	
-	for(; it != vec_kingdoms.end(); ++it) delete *it;
-    }
-    vec_kingdoms.clear();
+    //vec_kingdoms.clear();
 
     // event day
     vec_eventsday.clear();
@@ -1242,7 +1203,6 @@ void World::Reset(void)
     vec_riddles.reserve(10);
     vec_rumors.reserve(10);
     vec_castles.reserve(MAXCASTLES);
-    vec_kingdoms.reserve(KINGDOMMAX);
     vec_heroes.reserve(HEROESMAXCOUNT + 2);
 }
 
@@ -1834,26 +1794,92 @@ const Heroes* World::GetHeroesCondLoss(void) const
 {
     return GetHeroes(heroes_cond_loss);
 }
-        
-bool World::CheckKingdomNormalVictory(const Kingdom & kingdom) const
-{
-    return !kingdom.isLoss() &&
-           1 == std::count_if(&vec_kingdoms[0], &vec_kingdoms[6], std::not1(std::mem_fun(&Kingdom::isLoss)));
-}
 
-bool WorldCheckKingdomLossWins(const Kingdom* kingdom)
+bool World::KingdomIsWins(const Kingdom & kingdom, u16 wins) const
 {
-    if(kingdom)
-    switch(world.CheckKingdomWins(*kingdom))
+    const Settings & conf = Settings::Get();
+
+    switch(wins)
     {
 	case GameOver::WINS_ALL:
-        case GameOver::WINS_TOWN:
-        case GameOver::WINS_HERO:
-        case GameOver::COND_NONE:
-    	    return false;
+	    return kingdom.GetColor() == vec_kingdoms.GetNotLossColors();
 
-        default:
-    	    return true;
+	case GameOver::WINS_TOWN:
+	{
+	    const Castle *town = GetCastle(conf.WinsMapsIndexObject());
+	    // check comp also wins
+	    return ((Game::AI != kingdom.Control() || conf.WinsCompAlsoWins()) &&
+    	       (town && town->GetColor() == kingdom.GetColor()));
+	}
+
+	case GameOver::WINS_HERO:
+	{
+    	    const Heroes *hero = GetHeroesCondWins();
+    	    return (hero && Heroes::UNKNOWN != heroes_cond_wins &&
+    		    hero->isFreeman() &&
+    		    hero->GetKillerColor() == kingdom.GetColor());
+	}
+
+	case GameOver::WINS_ARTIFACT:
+	{
+	    const std::vector<Heroes *> & heroes  = kingdom.GetHeroes();
+	    if(conf.WinsFindUltimateArtifact())
+	    {
+		return (heroes.end() != std::find_if(heroes.begin(), heroes.end(),
+		    std::mem_fun(&Heroes::HasUltimateArtifact)));
+	    }
+	    else
+	    {
+		const Artifact art = conf.WinsFindArtifactID();
+		return (heroes.end() != std::find_if(heroes.begin(), heroes.end(),
+		    std::bind2nd(HeroHasArtifact(), art)));
+	    }
+	}
+
+	case GameOver::WINS_SIDE:
+	{
+	    const u8 side2 = conf.KingdomColors() & ~conf.GetUnions(kingdom.GetColor());
+	    return (side2 == (vec_kingdoms.GetLossColors() & side2));
+	}
+
+	case GameOver::WINS_GOLD:
+	    // check comp also wins
+	    return ((Game::AI != kingdom.Control() || conf.WinsCompAlsoWins()) &&
+		    (kingdom.GetFundsGold() >= conf.WinsAccumulateGold()));
+
+	default: break;
+    }
+
+    return false;
+}
+
+bool World::KingdomIsLoss(const Kingdom & kingdom, u16 loss) const
+{
+    const Settings & conf = Settings::Get();
+
+    switch(loss)
+    {
+	case GameOver::LOSS_ALL:
+	    return kingdom.isLoss();
+
+	case GameOver::LOSS_TOWN:
+	{
+    	    const Castle *town = GetCastle(conf.LossMapsIndexObject());
+    	    return (town && town->GetColor() != kingdom.GetColor());
+	}
+
+	case GameOver::LOSS_HERO:
+	{
+    	    const Heroes *hero = GetHeroesCondLoss();
+    	    return (hero && Heroes::UNKNOWN != heroes_cond_loss &&
+    		    hero->isFreeman() &&
+    		    hero->GetKillerColor() != kingdom.GetColor());
+	}
+
+	case GameOver::LOSS_TIME:
+    	    return (CountDay() > conf.LossCountDays() && Game::AI != kingdom.Control());
+
+	default: break;
     }
 
     return false;
@@ -1862,73 +1888,12 @@ bool WorldCheckKingdomLossWins(const Kingdom* kingdom)
 u16 World::CheckKingdomWins(const Kingdom & kingdom) const
 {
     const Settings & conf = Settings::Get();
+    const u16 wins [] = { GameOver::WINS_ALL, GameOver::WINS_TOWN, GameOver::WINS_HERO, GameOver::WINS_ARTIFACT, GameOver::WINS_SIDE, GameOver::WINS_GOLD };
 
-    if((conf.ConditionWins() & GameOver::WINS_ALL) && CheckKingdomNormalVictory(kingdom))
-	return GameOver::WINS_ALL;
-    else
-    if(conf.ConditionWins() & GameOver::WINS_TOWN)
-    {
-	const Castle *town = GetCastle(conf.WinsMapsIndexObject());
+    for(u8 ii = 0; ii < sizeof(wins) / sizeof(u16); ++ii)
+	if((conf.ConditionWins() & wins[ii]) &&
+	    KingdomIsWins(kingdom, wins[ii])) return wins[ii];
 
-	// check comp also wins
-	if(Game::AI == kingdom.Control() && !conf.WinsCompAlsoWins())
-	    return GameOver::COND_NONE;
-	else
-        if(town && town->GetColor() == kingdom.GetColor())
-	    return GameOver::WINS_TOWN;
-    }
-    else
-    if(conf.ConditionWins() & GameOver::WINS_HERO)
-    {
-        const Heroes *hero = GetHeroesCondWins();
-        if(hero && Heroes::UNKNOWN != heroes_cond_wins &&
-    	    hero->isFreeman() &&
-    	    hero->GetKillerColor() == kingdom.GetColor())
-        	return GameOver::WINS_HERO;
-    }
-    else
-    if(conf.ConditionWins() & GameOver::WINS_ARTIFACT)
-    {
-	const std::vector<Heroes *> & heroes  = kingdom.GetHeroes();
-	if(conf.WinsFindUltimateArtifact())
-	{
-	    if(heroes.end() != std::find_if(heroes.begin(), heroes.end(),
-		std::mem_fun(&Heroes::HasUltimateArtifact)))
-		return GameOver::WINS_ARTIFACT;
-	}
-	else
-	{
-	    const Artifact art = conf.WinsFindArtifactID();
-	    if(heroes.end() != std::find_if(heroes.begin(), heroes.end(),
-		std::bind2nd(HeroHasArtifact(), art)))
-		return GameOver::WINS_ARTIFACT;
-	}
-    }
-    else
-    if(conf.ConditionWins() & GameOver::WINS_SIDE)
-    {
-	u8 side1 = conf.GetUnions(kingdom.GetColor());
-	u8 side2 = conf.KingdomColors() & ~side1;
-	u8 loss  = 0;
-
-	for(std::vector<Kingdom *>::const_iterator
-	    it = vec_kingdoms.begin(); it != vec_kingdoms.end(); ++it)
-    	    if(*it && (*it)->isLoss()) loss |= (*it)->GetColor();
-
-	if(side2 == (loss & side2))
-	    return GameOver::WINS_SIDE;
-    }
-    else
-    if(conf.ConditionWins() & GameOver::WINS_GOLD)
-    {
-	// check comp also wins
-    	if(Game::AI == kingdom.Control() && !conf.WinsCompAlsoWins())
-    	    return GameOver::COND_NONE;
-	else
-	if(kingdom.GetFundsGold() >= conf.WinsAccumulateGold())
-	    return GameOver::WINS_GOLD;
-    }
-    
     return GameOver::COND_NONE;
 }
 
@@ -1936,41 +1901,19 @@ u16 World::CheckKingdomLoss(const Kingdom & kingdom) const
 {
     const Settings & conf = Settings::Get();
 
-    // if other wins return false (skip for alianse)
-    if(!(conf.ConditionWins() & GameOver::WINS_SIDE))
+    // firs check priority: other WINS_GOLD or WINS_ARTIFACT
+    if(conf.ConditionWins() & (GameOver::WINS_GOLD | GameOver::WINS_ARTIFACT))
     {
-	std::vector<Kingdom *>::const_iterator it = std::find_if(vec_kingdoms.begin(), vec_kingdoms.end(), WorldCheckKingdomLossWins);
-	if(vec_kingdoms.end() != it && *it && (*it)->GetColor() != kingdom.GetColor())
-	    return CheckKingdomWins(**it);
-    }
-
-    if(conf.ConditionLoss() & GameOver::LOSS_ALL)
-    {
-	if(kingdom.isLoss())
+	u8 priority = vec_kingdoms.FindArtOrGoldWins();
+	if(priority && priority != kingdom.GetColor())
     	    return GameOver::LOSS_ALL;
     }
-    else
-    if(conf.ConditionLoss() & GameOver::LOSS_TOWN)
-    {
-        const Castle *town = GetCastle(conf.LossMapsIndexObject());
-        if(town && town->GetColor() != kingdom.GetColor())
-    	    return GameOver::LOSS_TOWN;
-    }
-    else
-    if(conf.ConditionLoss() & GameOver::LOSS_HERO)
-    {
-        const Heroes *hero = GetHeroesCondLoss();
-        if(hero && Heroes::UNKNOWN != heroes_cond_loss &&
-    	    hero->isFreeman() &&
-    	    hero->GetKillerColor() != kingdom.GetColor())
-        	return GameOver::LOSS_HERO;
-    }
-    else
-    if(conf.ConditionLoss() & GameOver::LOSS_TIME)
-    {
-        if(CountDay() > conf.LossCountDays())
-    	    return GameOver::LOSS_TIME;
-    }
+
+    const u16 loss [] = { GameOver::LOSS_ALL, GameOver::LOSS_TOWN, GameOver::LOSS_HERO, GameOver::LOSS_TIME };
+
+    for(u8 ii = 0; ii < sizeof(loss) / sizeof(u16); ++ii)
+	if((conf.ConditionWins() & loss[ii]) &&
+	    KingdomIsWins(kingdom, loss[ii])) return loss[ii];
 
     return GameOver::COND_NONE;
 }

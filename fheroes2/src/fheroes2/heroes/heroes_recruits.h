@@ -32,6 +32,8 @@ class Recruits : protected std::pair<Heroes::heroes_t, Heroes::heroes_t>
 public:
     Recruits();
 
+    void Reset(void);
+
     Heroes::heroes_t GetID1(void) const;
     Heroes::heroes_t GetID2(void) const;
 

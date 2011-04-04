@@ -301,17 +301,17 @@ bool GameOver::Result::CheckGameOver(Game::menu_t & res)
 
     const Kingdom & myKingdom = world.GetMyKingdom();
 
-    if(GameOver::COND_NONE != (result = world.CheckKingdomLoss(myKingdom)))
-    {
-        GameOver::DialogLoss(result);
-        res = Game::MAINMENU;
-        return true;
-    }
-    else
     if(GameOver::COND_NONE != (result = world.CheckKingdomWins(myKingdom)))
     {
         GameOver::DialogWins(result);
         res = Game::HIGHSCORES;
+        return true;
+    }
+    else
+    if(GameOver::COND_NONE != (result = world.CheckKingdomLoss(myKingdom)))
+    {
+        GameOver::DialogLoss(result);
+        res = Game::MAINMENU;
         return true;
     }
 

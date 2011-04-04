@@ -31,6 +31,7 @@
 #include "heroes.h"
 #include "week.h"
 #include "color.h"
+#include "kingdom.h"
 #include "sprite.h"
 #include "castle_heroes.h"
 #include "gameevent.h"
@@ -135,7 +136,9 @@ public:
     void ClearFog(const u8 color);
 
     u16  CheckKingdomWins(const Kingdom &) const;
-    u16 CheckKingdomLoss(const Kingdom &) const;
+    bool KingdomIsWins(const Kingdom &, u16 wins) const;
+    u16  CheckKingdomLoss(const Kingdom &) const;
+    bool KingdomIsLoss(const Kingdom &, u16 loss) const;
 
     EventsDate GetEventsDate(const Color::color_t) const;
     EventMaps* GetEventMaps(const Color::color_t c, const s32 index);
@@ -149,7 +152,6 @@ public:
 protected:
     void UpdateDwellingPopulation(void);
     void UpdateMonsterPopulation(void);
-    bool CheckKingdomNormalVictory(const Kingdom &) const;
 
 private:
     World() : Size(0, 0), width(Size::w), height(Size::h) {};
@@ -161,7 +163,7 @@ private:
     friend class Game::IO;
 
     MapsTiles				vec_tiles;
-    std::vector<Kingdom *>              vec_kingdoms;
+    Kingdoms				vec_kingdoms;
     std::vector<std::string>     	vec_rumors;
     std::vector<Castle *>               vec_castles;
     std::vector<Heroes *>               vec_heroes;

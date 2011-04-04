@@ -515,7 +515,7 @@ Maps::Tiles::Tiles() : maps_index(0), tile_sprite_index(0), tile_sprite_shape(0)
 {
 }
 
-void Maps::Tiles::Set(s32 index, const MP2::mp2tile_t & mp2)
+void Maps::Tiles::Init(s32 index, const MP2::mp2tile_t & mp2)
 {
     maps_index	= index;
     tile_sprite_index	= mp2.tileIndex;

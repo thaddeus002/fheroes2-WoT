@@ -99,18 +99,29 @@ void Kingdom::UpdateStartingResource(const TiXmlElement* xml_resource)
 }
 #endif
 
-Kingdom::Kingdom()
+Kingdom::Kingdom() : color(Color::GRAY), control(Game::AI), flags(0), lost_town_days(0), visited_tents_colors(0)
 {
 }
 
-Kingdom::Kingdom(const Color::color_t cl) : color(cl), control(Game::AI), flags(0), lost_town_days(0), visited_tents_colors(0)
+void Kingdom::Init(Color::color_t cl)
 {
     const Settings & conf = Settings::Get();
+
+    color	= cl;
+    control	= Game::AI;
+    flags	= 0;
+    visited_tents_colors = 0;
 
     lost_town_days = Game::GetLostTownDays() + 1;
 
     // set play
     if(conf.KingdomColors(color)) SetModes(PLAY);
+
+    heroes.clear();
+    castles.clear();
+    visit_object.clear();
+
+    recruits.Reset();
     
     heroes.reserve(GetMaxHeroes());
     castles.reserve(15);
@@ -634,4 +645,108 @@ u32 Kingdom::GetArmiesStrength(void) const
     for(; itc != castles.end(); ++itc) if(*itc) res += (**itc).GetArmy().GetStrength();
 
     return static_cast<u32>(res);
+}
+
+Kingdoms::Kingdoms()
+{
+    Init();
+}
+
+void Kingdoms::Init(void)
+{
+    kingdoms[0].Init(Color::BLUE);
+    kingdoms[1].Init(Color::GREEN);
+    kingdoms[2].Init(Color::RED);
+    kingdoms[3].Init(Color::YELLOW);
+    kingdoms[4].Init(Color::ORANGE);
+    kingdoms[5].Init(Color::PURPLE);
+    kingdoms[6].Init(Color::GRAY);
+}
+
+u8 Kingdoms::size(void) const
+{
+    return KINGDOMMAX + 1;
+}
+
+void Kingdoms::ApplyPlayWithStartingHero(void)
+{
+    for(u8 ii = 0; ii < size(); ++ii)
+	kingdoms[ii].ApplyPlayWithStartingHero();
+}
+
+const Kingdom & Kingdoms::Get(u8 color) const
+{
+    switch(color)
+    {
+        case Color::BLUE:       return kingdoms[0];
+        case Color::GREEN:      return kingdoms[1];
+        case Color::RED:        return kingdoms[2];
+        case Color::YELLOW:     return kingdoms[3];
+        case Color::ORANGE:     return kingdoms[4];
+        case Color::PURPLE:     return kingdoms[5];
+	default: break;
+    }
+
+    return kingdoms[6];
+}
+
+Kingdom & Kingdoms::Get(u8 color)
+{
+    switch(color)
+    {
+        case Color::BLUE:       return kingdoms[0];
+        case Color::GREEN:      return kingdoms[1];
+        case Color::RED:        return kingdoms[2];
+        case Color::YELLOW:     return kingdoms[3];
+        case Color::ORANGE:     return kingdoms[4];
+        case Color::PURPLE:     return kingdoms[5];
+	default: break;
+    }
+
+    return kingdoms[6];
+}
+
+void Kingdoms::NewDay(void)
+{
+    for(u8 ii = 0; ii < size(); ++ii)
+	if(kingdoms[ii].isPlay()) kingdoms[ii].ActionNewDay();
+}
+
+void Kingdoms::NewWeek(void)
+{
+    for(u8 ii = 0; ii < size(); ++ii)
+	if(kingdoms[ii].isPlay()) kingdoms[ii].ActionNewWeek();
+}
+
+void Kingdoms::NewMonth(void)
+{
+    for(u8 ii = 0; ii < size(); ++ii)
+	if(kingdoms[ii].isPlay()) kingdoms[ii].ActionNewMonth();
+}
+
+u8 Kingdoms::GetNotLossColors(void) const
+{
+    u8 result = 0;
+    for(u8 ii = 0; ii < size(); ++ii)
+	if(kingdoms[ii].GetColor() != Color::GRAY &&
+	    ! kingdoms[ii].isLoss()) result |= kingdoms[ii].GetColor();
+    return result;
+}
+
+u8 Kingdoms::GetLossColors(void) const
+{
+    u8 result = 0;
+    for(u8 ii = 0; ii < size(); ++ii)
+	if(kingdoms[ii].GetColor() != Color::GRAY &&
+	    kingdoms[ii].isLoss()) result |= kingdoms[ii].GetColor();
+    return result;
+}
+
+u8 Kingdoms::FindArtOrGoldWins(void) const
+{
+    for(u8 ii = 0; ii < size(); ++ii)
+	if(kingdoms[ii].GetColor() != Color::GRAY &&
+	    (world.KingdomIsWins(kingdoms[ii], GameOver::WINS_GOLD) || world.KingdomIsWins(kingdoms[ii], GameOver::WINS_ARTIFACT)))
+		return kingdoms[ii].GetColor();
+    return 0;
 }

@@ -46,8 +46,8 @@ public:
     };
 
     Kingdom();
-    Kingdom(const Color::color_t cl);
 
+    void Init(Color::color_t);
     void SetModes(flags_t);
     void ResetModes(flags_t);
     bool Modes(flags_t) const;
@@ -156,6 +156,33 @@ private:
 
     static cost_t starting_resource[];
     static u8 max_heroes;
+};
+
+class Kingdoms
+{
+public:
+    Kingdoms();
+
+    void Init(void);
+    void ApplyPlayWithStartingHero(void);
+
+    void NewDay(void);
+    void NewWeek(void);
+    void NewMonth(void);
+
+    Kingdom & Get(u8 color);
+    const Kingdom & Get(u8 color) const;
+
+    u8 GetLossColors(void) const;
+    u8 GetNotLossColors(void) const;
+    u8 FindArtOrGoldWins(void) const;
+
+    u8 size(void) const;
+
+private:
+    friend class Game::IO;
+
+    Kingdom kingdoms[KINGDOMMAX + 1];
 };
 
 #endif

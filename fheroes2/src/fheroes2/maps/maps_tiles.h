@@ -108,7 +108,7 @@ namespace Maps
     public:
 	Tiles();
 
-	void Set(s32, const MP2::mp2tile_t &);
+	void Init(s32, const MP2::mp2tile_t &);
 
 	const s32 & GetIndex(void) const{ return maps_index; }
 	MP2::object_t GetObject(void) const;

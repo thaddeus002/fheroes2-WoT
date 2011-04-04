@@ -27,6 +27,12 @@ Recruits::Recruits() : std::pair<Heroes::heroes_t, Heroes::heroes_t>(Heroes::UNK
 {
 }
 
+void Recruits::Reset(void)
+{
+    first = Heroes::UNKNOWN;
+    second = Heroes::UNKNOWN;
+}
+
 Heroes::heroes_t Recruits::GetID1(void) const
 {
     return first;

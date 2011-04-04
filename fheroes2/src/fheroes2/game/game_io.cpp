@@ -282,8 +282,8 @@ bool Game::IO::SaveBIN(QueueMessage & msg)
     msg.Push(static_cast<u32>(world.vec_kingdoms.size()));
     for(u32 ii = 0; ii < world.vec_kingdoms.size(); ++ii)
     {
-	if(NULL == world.vec_kingdoms[ii]){ DEBUG(DBG_GAME, DBG_WARN, "kingdoms: " << "is NULL"); return false; }
-	PackKingdom(msg, *world.vec_kingdoms[ii]);
+	//if(NULL == world.vec_kingdoms[ii]){ DEBUG(DBG_GAME, DBG_WARN, "kingdoms: " << "is NULL"); return false; }
+	PackKingdom(msg, world.vec_kingdoms.kingdoms[ii]);
     }
 
     // signs
@@ -789,12 +789,12 @@ bool Game::IO::LoadBIN(QueueMessage & msg)
     msg.Pop(byte16);
     if(byte16 != 0xFF09) DEBUG(DBG_GAME, DBG_WARN, "0xFF09");
     msg.Pop(byte32);
-    world.vec_kingdoms.reserve(byte32);
+    world.vec_kingdoms.Init();
     for(u32 ii = 0; ii < byte32; ++ii)
     {
-	Kingdom* kingdom = new Kingdom();
-	UnpackKingdom(msg, *kingdom, format);
-	world.vec_kingdoms.push_back(kingdom);
+	//Kingdom* kingdom = new Kingdom();
+	UnpackKingdom(msg, world.vec_kingdoms.kingdoms[ii], format);
+	//world.vec_kingdoms.push_back(kingdom);
     }
 
     // signs
