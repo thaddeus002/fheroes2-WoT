@@ -308,7 +308,7 @@ bool ActionSpellDimensionDoor(Heroes & hero)
     if(Maps::isValidAbsIndex(src) && Maps::isValidAbsIndex(dst))
     {
 	AGG::PlaySound(M82::KILLFADE);
-	hero.GetPath().Hide();
+	hero.GetPath().Reset();
 	hero.FadeOut();
 
 	cursor.Hide();
@@ -324,12 +324,9 @@ bool ActionSpellDimensionDoor(Heroes & hero)
 	I.Redraw();
 
 	AGG::PlaySound(M82::KILLFADE);
-	hero.GetPath().Hide();
 	hero.FadeIn();
 
 	hero.ApplyPenaltyMovement();
-	hero.GetPath().Reset();
-	hero.GetPath().Show();
 	hero.ActionNewPosition();
 
 	return true;

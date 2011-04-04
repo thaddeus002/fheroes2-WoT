@@ -260,7 +260,7 @@ s32 Interface::Basic::GetDimensionDoorDestination(const s32 from, const u8 dista
 	// exit
 	if(le.MousePressRight()) break;
 	else
-	if(le.MouseClickLeft() && Cursor::MOVE == cursor.Themes()) return dst;
+	if(le.MouseClickLeft() && valid) return dst;
 
 	// redraw cursor
         if(!cursor.isVisible())
