@@ -910,11 +910,12 @@ void AIToPrimarySkillObject(Heroes &hero, const u8 obj, const s32 dst_index)
     	default: break;
     }
 
-    if(!hero.isVisited(tile))
+    if((MP2::OBJ_ARENA == obj && !hero.isVisited(obj)) ||
+       !hero.isVisited(tile))
     {
 	// increase skill
 	hero.IncreasePrimarySkill(skill);
-	hero.SetVisited(dst_index, (MP2::OBJ_ARENA == obj ? Visit::GLOBAL : Visit::LOCAL));
+	hero.SetVisited(dst_index);
 
         // fix double action tile
 	hero.SetVisitedWideTile(dst_index, obj);

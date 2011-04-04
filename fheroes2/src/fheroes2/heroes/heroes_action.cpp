@@ -2960,7 +2960,7 @@ void ActionToArena(Heroes &hero, const u8 obj, const s32 dst_index)
     }
     else
     {
-	hero.SetVisited(dst_index, Visit::GLOBAL);
+	hero.SetVisited(dst_index);
 	PlaySoundSuccess;
 	hero.IncreasePrimarySkill(Dialog::SelectSkillFromArena());
     }
