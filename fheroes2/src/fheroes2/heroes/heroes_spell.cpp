@@ -303,7 +303,7 @@ bool ActionSpellDimensionDoor(Heroes & hero)
 
     const s32 src = hero.GetIndex();
     // get destination
-    const s32 dst = I.GetDimensionDoorDestination(src, distance);
+    const s32 dst = I.GetDimensionDoorDestination(src, distance, hero.isShipMaster());
 
     if(Maps::isValidAbsIndex(src) && Maps::isValidAbsIndex(dst))
     {
@@ -329,6 +329,7 @@ bool ActionSpellDimensionDoor(Heroes & hero)
 
 	hero.ApplyPenaltyMovement();
 	hero.GetPath().Reset();
+	hero.GetPath().Show();
 	hero.ActionNewPosition();
 
 	return true;

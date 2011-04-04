@@ -231,7 +231,7 @@ void Interface::Basic::RedrawSystemInfo(s16 cx, s16 cy, u32 usage)
     system_info.Blit(cx, cy);
 }
 
-s32 Interface::Basic::GetDimensionDoorDestination(const s32 from, const u8 distance) const
+s32 Interface::Basic::GetDimensionDoorDestination(const s32 from, const u8 distance, bool water) const
 {
     Cursor & cursor = Cursor::Get();
     Display & display = Display::Get();
@@ -251,15 +251,16 @@ s32 Interface::Basic::GetDimensionDoorDestination(const s32 from, const u8 dista
 			dst >= 0 &&
 			(! tile.isFog(conf.MyColor())) &&
 			MP2::isClearGroundObject(tile.GetObject()) &&
-			Maps::Ground::WATER != world.GetTiles(dst).GetGround() &&
+			((water && Maps::Ground::WATER == world.GetTiles(dst).GetGround()) ||
+			(!water && Maps::Ground::WATER != world.GetTiles(dst).GetGround())) &&
 			distance >= Maps::GetApproximateDistance(from, dst));
 
-	cursor.SetThemes(valid ? Cursor::MOVE : Cursor::WAR_NONE);
+	cursor.SetThemes(valid ? (water ? Cursor::BOAT : Cursor::MOVE) : Cursor::WAR_NONE);
 
 	// exit
 	if(le.MousePressRight()) break;
 	else
-	if(Cursor::MOVE == cursor.Themes() && le.MouseClickLeft()) return dst;
+	if(le.MouseClickLeft() && Cursor::MOVE == cursor.Themes()) return dst;
 
 	// redraw cursor
         if(!cursor.isVisible())
