@@ -395,10 +395,10 @@ bool HeroBase::CanCastSpell(const Spell & spell, std::string* res) const
 	    		os << "move points" << " " << "failed";
 		}
 		else
-	    	    os << "spell points" << " " << "failed";
+	    	    os << _("That spell costs %{mana} mana. You only have %{point} mana, so you can't cast the spell.");
 	    }
 	    else
-	    	os << spell.GetName() << " " << "not found";
+	    	os << "spell" << " " << "not found";
 	}
 	else
 	    os << "spell book" << " " << "not found";

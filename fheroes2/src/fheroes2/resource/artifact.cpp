@@ -256,7 +256,23 @@ Artifact::Artifact(u8 art) : id(art < UNKNOWN ? art : UNKNOWN), ext(0)
 
 bool Artifact::operator== (const Spell & spell) const
 {
-    return id == SPELL_SCROLL && ext == spell();
+    switch(id)
+    {
+	case SPELL_SCROLL:
+	    return ext == spell();
+
+	case Artifact::CRYSTAL_BALL:
+	    return spell == Spell::IDENTIFYHERO || 
+		    spell == Spell::VISIONS;
+
+        case Artifact::BATTLE_GARB:
+            return spell == Spell::TOWNPORTAL;
+    
+	default:
+            break;
+    }
+
+    return  false;
 }
 
 bool Artifact::operator== (const Artifact & art) const

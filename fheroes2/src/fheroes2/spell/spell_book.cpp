@@ -177,7 +177,8 @@ Spell SpellBook::Open(const HeroBase & hero, const filter_t filt, bool canselect
 		{
 		    if(canselect)
 		    {
-			if(hero.CanCastSpell(*spell))
+			std::string str;
+			if(hero.CanCastSpell(*spell, &str))
 			{
 			    curspell = *spell;
 			    break;
@@ -185,7 +186,6 @@ Spell SpellBook::Open(const HeroBase & hero, const filter_t filt, bool canselect
 			else
 			{
 			    cursor.Hide();
-			    std::string str = _("That spell costs %{mana} mana. You only have %{point} mana, so you can't cast the spell.");
 			    String::Replace(str, "%{mana}", (*spell).SpellPoint(&hero));
 			    String::Replace(str, "%{point}", hero.GetSpellPoints());
 			    Dialog::Message("", str, Font::BIG, Dialog::OK);
