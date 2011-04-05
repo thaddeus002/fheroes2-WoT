@@ -160,7 +160,7 @@ public:
     u8   GetLevelSkill(u8) const;
     u16  GetSecondaryValues(u8) const;
     void LearnSkill(const Skill::Secondary &);
-    const Skill::SecSkills & GetSecondarySkills(void) const;
+    Skill::SecSkills & GetSecondarySkills(void);
 
     bool PickupArtifact(const Artifact &);
     bool HasUltimateArtifact(void) const;

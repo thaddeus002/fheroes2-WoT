@@ -28,6 +28,7 @@
 #include "monster.h"
 #include "artifact.h"
 #include "spell.h"
+#include "skill.h"
 
 namespace Dialog
 {
@@ -35,6 +36,7 @@ namespace Dialog
     Heroes::heroes_t	SelectHeroes(Heroes::heroes_t cur = Heroes::UNKNOWN);
     Artifact		SelectArtifact(u8 id = Artifact::UNKNOWN);
     Spell		SelectSpell(u8 id = Spell::NONE);
+    Skill::Secondary	SelectSecondarySkill(void);
 }
 
 #endif

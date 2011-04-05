@@ -1194,7 +1194,7 @@ void Heroes::SetShipMaster(bool f)
     f ? SetModes(SHIPMASTER) : ResetModes(SHIPMASTER);
 }
 
-const Skill::SecSkills & Heroes::GetSecondarySkills(void) const
+Skill::SecSkills & Heroes::GetSecondarySkills(void)
 {
     return secondary_skills;
 }

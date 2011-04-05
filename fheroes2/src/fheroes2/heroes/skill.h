@@ -74,6 +74,8 @@ namespace Skill
 	Secondary();
 	Secondary(u8 skill, u8 level);
 
+	void		Reset(void);
+	void		Set(const Secondary &);
 	void		SetSkill(u8);
 	void		SetLevel(u8);
 	void		NextLevel(void);
@@ -165,10 +167,11 @@ public:
     const Rect & GetArea(void) const;
     u8 GetIndexFromCoord(const Point &);
 
-    void SetSkills(const Skill::SecSkills &);
+    void SetSkills(Skill::SecSkills &);
     void SetUseMiniSprite(void);
     void SetPos(s16, s16);
     void SetInterval(u8);
+    void SetChangeMode(void);
 
     void Redraw(void);
     void QueueEventProcessing(void);
@@ -177,9 +180,10 @@ private:
     void CalcSize(void);
 
     Rect pos;
-    const Skill::SecSkills *skills;
+    Skill::SecSkills *skills;
     u8 interval;
     bool use_mini_sprite;
+    bool can_change;
 };
 
 #endif

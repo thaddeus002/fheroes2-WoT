@@ -638,6 +638,7 @@ void BattleOnly::UpdateHero1(const Point & cur_pt)
       secskill_bar1->SetUseMiniSprite();
       secskill_bar1->SetInterval(1);
       secskill_bar1->SetSkills(hero1->GetSecondarySkills());
+      secskill_bar1->SetChangeMode();
 
       selectArtifacts1 = new SelectArtifactsBar(*hero1);
       selectArtifacts1->SetPos(Point(cur_pt.x + 23, cur_pt.y + 347));
@@ -693,6 +694,7 @@ void BattleOnly::UpdateHero2(const Point & cur_pt)
       secskill_bar2->SetUseMiniSprite();
       secskill_bar2->SetInterval(1);
       secskill_bar2->SetSkills(hero2->GetSecondarySkills());
+      secskill_bar2->SetChangeMode();
 
       selectArtifacts2 = new SelectArtifactsBar(*hero2);
       selectArtifacts2->SetPos(Point(cur_pt.x + 367, cur_pt.y + 347));

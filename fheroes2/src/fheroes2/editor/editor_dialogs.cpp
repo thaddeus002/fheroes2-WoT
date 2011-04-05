@@ -173,6 +173,91 @@ public:
     };
 };
 
+class SelectEnumSecSkill : public SelectEnum
+{
+public:
+    SelectEnumSecSkill(const Rect & rt) : SelectEnum(rt) { SetAreaMaxItems(5); };
+
+    void RedrawItem(const int & index, s16 dstx, s16 dsty, bool current)
+    {
+      Display & display = Display::Get();
+
+      Skill::Secondary skill(1 + index / 3, 1 + (index % 3));
+      display.Blit(AGG::GetICN(ICN::MINISS, skill.GetIndexSprite2()), dstx + 5, dsty + 3);
+      std::string str = skill.GetName();
+      Text text(str, (current ? Font::YELLOW_BIG : Font::BIG));
+      text.Blit(dstx + 50, dsty + 10);
+    };
+
+    void RedrawBackground(const Point & dst)
+    {
+      Text text("Select Skill:", Font::YELLOW_BIG);
+      text.Blit(dst.x + (area.w - text.w()) / 2, dst.y);
+
+      SelectEnum::RedrawBackground(dst);
+    };
+};
+
+Skill::Secondary Dialog::SelectSecondarySkill(void)
+{
+    Display & display = Display::Get();
+    Cursor & cursor = Cursor::Get();
+    LocalEvent & le = LocalEvent::Get();
+
+    std::vector<int> skills(MAXSECONDARYSKILL * 3, 0);
+
+    cursor.Hide();
+    cursor.SetThemes(cursor.POINTER);
+
+    for(size_t ii = 0; ii < MAXSECONDARYSKILL * 3; ++ii) skills[ii] = ii;
+
+    const u16 window_w = 310;
+    const u16 window_h = 280;
+
+    Dialog::FrameBorder frameborder;
+    frameborder.SetPosition((display.w() - window_w) / 2 - BORDERWIDTH,
+			    (display.h() - window_h) / 2 - BORDERWIDTH, window_w, window_h);
+    frameborder.Redraw(AGG::GetICN(ICN::TEXTBAK2, 0));
+
+    const Rect & area = frameborder.GetArea();
+
+    SelectEnumSecSkill listbox(area);
+
+    listbox.SetListContent(skills);
+    listbox.Redraw();
+
+    ButtonGroups btnGroups(area, Dialog::OK|Dialog::CANCEL);
+    btnGroups.Draw();
+
+    cursor.Show();
+    display.Flip();
+
+    u16 result = Dialog::ZERO;
+
+    while(result == Dialog::ZERO && ! listbox.ok && le.HandleEvents())
+    {
+        result = btnGroups.QueueEventProcessing();
+        listbox.QueueEventProcessing();
+
+        if(!cursor.isVisible())
+        {
+            listbox.Redraw();
+            cursor.Show();
+            display.Flip();
+        }
+    }
+
+    Skill::Secondary skill;
+
+    if(result == Dialog::OK || listbox.ok)
+    {
+	skill.SetSkill(1 + (listbox.GetCurrent() / 3));
+	skill.SetLevel(1 + (listbox.GetCurrent() % 3));
+    }
+
+    return skill;
+}
+
 Spell Dialog::SelectSpell(u8 cur)
 {
     Display & display = Display::Get();
@@ -183,7 +268,6 @@ Spell Dialog::SelectSpell(u8 cur)
 
     cursor.Hide();
     cursor.SetThemes(cursor.POINTER);
-
 
     for(size_t ii = 0; ii < spells.size(); ++ii) spells[ii] = ii + 1;
 

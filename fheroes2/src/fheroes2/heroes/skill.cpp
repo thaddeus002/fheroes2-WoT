@@ -27,6 +27,7 @@
 #include "agg.h"
 #include "cursor.h"
 #include "dialog.h"
+#include "editor_dialogs.h"
 #include "heroes.h"
 #include "settings.h"
 #include "skill.h"
@@ -392,6 +393,18 @@ Skill::Secondary::Secondary(u8 skill, u8 level) : std::pair<u8, u8>(UNKNOWN, Lev
     SetLevel(level);
 }
 
+void Skill::Secondary::Reset(void)
+{
+    first = UNKNOWN;
+    second = Level::NONE;
+}
+
+void Skill::Secondary::Set(const Secondary & skill)
+{
+    first = skill.first;
+    second = skill.second;
+}
+
 void Skill::Secondary::SetSkill(u8 skill)
 {
     first = skill <= ESTATES ? skill : UNKNOWN;
@@ -676,11 +689,17 @@ void Skill::SecSkills::AddSkill(const Skill::Secondary & skill)
 {
     iterator it = std::find_if(begin(), end(),
                         std::bind2nd(std::mem_fun_ref(&Secondary::isSkill), skill.Skill()));
-
     if(it != end())
         (*it).SetLevel(skill.Level());
     else
-        push_back(skill);
+    {
+	it = std::find_if(begin(), end(),
+                	std::not1(std::mem_fun_ref(&Secondary::isValid)));
+	if(it != end())
+    	    (*it).Set(skill);
+        else
+	    push_back(skill);
+    }
 }
 
 u8 Skill::SecondaryGetWeightSkillFromRace(u8 race, u8 skill)
@@ -799,7 +818,7 @@ void Skill::SecSkills::FindSkillsForLevelUp(u8 race, Secondary & sec1, Secondary
 
 
 
-SecondarySkillBar::SecondarySkillBar() : skills(NULL), use_mini_sprite(false)
+SecondarySkillBar::SecondarySkillBar() : skills(NULL), use_mini_sprite(false), can_change(false)
 {
 }
 
@@ -808,7 +827,7 @@ const Rect & SecondarySkillBar::GetArea(void) const
     return pos;
 }
 
-void SecondarySkillBar::SetSkills(const Skill::SecSkills & v)
+void SecondarySkillBar::SetSkills(Skill::SecSkills & v)
 {
     skills = &v;
     CalcSize();
@@ -830,6 +849,11 @@ void SecondarySkillBar::SetPos(s16 sx, s16 sy)
     pos.x = sx;
     pos.y = sy;
     CalcSize();
+}
+
+void SecondarySkillBar::SetChangeMode(void)
+{
+    can_change = true;
 }
 
 void SecondarySkillBar::CalcSize(void)
@@ -913,20 +937,44 @@ void SecondarySkillBar::QueueEventProcessing(void)
     const Sprite & sprite_skill = AGG::GetICN((use_mini_sprite ? ICN::MINISS : ICN::SECSKILL), 0);
     const Rect tile(pos.x + (ii * (sprite_skill.w() + interval)), pos.y, sprite_skill.w(), sprite_skill.h());
 
-    if(ii < skills->size() && (le.MouseClickLeft(tile) || le.MousePressRight(tile)))
+    if(ii < skills->size())
     {
-	const Skill::Secondary skill = skills->at(ii);
+	Skill::Secondary skill = skills->at(ii);
 
 	if(skill.isValid())
 	{
-    	    cursor.Hide();
-    	    Dialog::SecondarySkillInfo(skill, !le.MousePressRight());
-    	    cursor.Show();
-    	    display.Flip();
+	    if(le.MouseClickLeft(tile))
+    	    {
+        	cursor.Hide();
+        	Dialog::SecondarySkillInfo(skill, true);
+        	cursor.Show();
+        	display.Flip();
+	    }
+	    else
+	    if(le.MousePressRight(tile))
+	    {
+		if(can_change)
+		    skill.Reset();
+		else
+		{
+		    cursor.Hide();
+		    Dialog::SecondarySkillInfo(skill, false);
+		    cursor.Show();
+		    display.Flip();
+		}
+	    }
+	}
+    }
+    else
+    if(ii < MAXSECONDARYSKILL)
+    {
+	if(can_change && le.MouseClickLeft(tile))
+	{
+	    Skill::Secondary alt = Dialog::SelectSecondarySkill();
+	    if(alt.isValid() && skills) skills->AddSkill(alt);
 	}
     }
 }
-
 
 void StringAppendModifiers(std::string & str, s8 value)
 {
