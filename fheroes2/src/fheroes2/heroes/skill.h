@@ -174,7 +174,7 @@ public:
     void SetChangeMode(void);
 
     void Redraw(void);
-    void QueueEventProcessing(void);
+    bool QueueEventProcessing(void);
 
 private:
     void CalcSize(void);

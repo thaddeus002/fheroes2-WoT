@@ -924,14 +924,15 @@ u8 SecondarySkillBar::GetIndexFromCoord(const Point & cu)
     return (pos & cu) ? (cu.x - pos.x) / (sprite_skill.w() + interval) : 0;
 }
 
-void SecondarySkillBar::QueueEventProcessing(void)
+bool SecondarySkillBar::QueueEventProcessing(void)
 {
     Display & display = Display::Get();
     Cursor & cursor = Cursor::Get();
     LocalEvent & le = LocalEvent::Get();
     const Point & cu = le.GetMouseCursor();
+    bool modify = false;
 
-    if(!(pos & cu) || !skills) return;
+    if(!(pos & cu) || !skills) return false;
 
     u8 ii = GetIndexFromCoord(cu);
     const Sprite & sprite_skill = AGG::GetICN((use_mini_sprite ? ICN::MINISS : ICN::SECSKILL), 0);
@@ -939,7 +940,7 @@ void SecondarySkillBar::QueueEventProcessing(void)
 
     if(ii < skills->size())
     {
-	Skill::Secondary skill = skills->at(ii);
+	Skill::Secondary & skill = skills->at(ii);
 
 	if(skill.isValid())
 	{
@@ -954,7 +955,10 @@ void SecondarySkillBar::QueueEventProcessing(void)
 	    if(le.MousePressRight(tile))
 	    {
 		if(can_change)
+		{
 		    skill.Reset();
+		    modify = true;
+		}
 		else
 		{
 		    cursor.Hide();
@@ -971,9 +975,15 @@ void SecondarySkillBar::QueueEventProcessing(void)
 	if(can_change && le.MouseClickLeft(tile))
 	{
 	    Skill::Secondary alt = Dialog::SelectSecondarySkill();
-	    if(alt.isValid() && skills) skills->AddSkill(alt);
+	    if(alt.isValid() && skills)
+	    {
+		skills->AddSkill(alt);
+		modify = true;
+	    }
 	}
     }
+
+    return modify;
 }
 
 void StringAppendModifiers(std::string & str, s8 value)

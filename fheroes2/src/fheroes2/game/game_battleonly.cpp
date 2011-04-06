@@ -472,7 +472,8 @@ bool BattleOnly::ChangeSettings(void)
           else
 	  if(le.MouseCursor(luckIndicator1->GetArea())) LuckIndicator::QueueEventProcessing(*luckIndicator1);
           else
-	  if(le.MouseCursor(secskill_bar1->GetArea())) secskill_bar1->QueueEventProcessing();
+	  if(le.MouseCursor(secskill_bar1->GetArea()) && secskill_bar1->QueueEventProcessing())
+	      redraw = true;
 	}
 
 	if(hero2 && allow2)
@@ -481,7 +482,8 @@ bool BattleOnly::ChangeSettings(void)
 	  else
 	  if(le.MouseCursor(luckIndicator2->GetArea())) LuckIndicator::QueueEventProcessing(*luckIndicator2);
 	  else
-	  if(le.MouseCursor(secskill_bar2->GetArea())) secskill_bar2->QueueEventProcessing();
+	  if(le.MouseCursor(secskill_bar2->GetArea()) && secskill_bar2->QueueEventProcessing())
+	      redraw = true;
 	}
 
 	if(cinfo2 && allow1)
