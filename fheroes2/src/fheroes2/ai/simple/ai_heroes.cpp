@@ -60,12 +60,7 @@ AIHero & AIHeroes::Get(const Heroes & ht)
 void AIHeroes::Reset(void)
 {
     AIHeroes & ai = AIHeroes::Get();
-#ifdef ANDROID
-    for(AIHeroes::iterator
-	it = ai.begin(); it != ai.end(); ++it) it->Reset();
-#else
     std::for_each(ai.begin(), ai.end(), std::mem_fun_ref(&AIHero::Reset));
-#endif
 }
 
 void AIHero::Reset(void)

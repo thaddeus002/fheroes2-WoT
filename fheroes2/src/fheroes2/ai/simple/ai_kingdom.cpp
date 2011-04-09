@@ -55,12 +55,7 @@ AIKingdom & AIKingdoms::Get(Color::color_t color)
 void AIKingdoms::Reset(void)
 {
     AIKingdoms & ai = AIKingdoms::Get();
-#ifdef ANDROID
-    for(AIKingdoms::iterator
-	it = ai.begin(); it != ai.end(); ++it) it->Reset();
-#else
     std::for_each(ai.begin(), ai.end(), std::mem_fun_ref(&AIKingdom::Reset));
-#endif
 }
 
 void AIKingdom::Reset(void)
@@ -167,21 +162,11 @@ void AI::KingdomTurn(Kingdom & kingdom)
     if(status) status->RedrawTurnProgress(1);
 
     // castles AI turn
-#ifdef ANDROID
-    for(std::vector<Castle *>::iterator
-	it = castles.begin(); it != castles.end(); ++it) AICastleTurn(*it);
-#else
     std::for_each(castles.begin(), castles.end(), AICastleTurn);
-#endif
 
     // need capture town?
     if(castles.empty())
-#ifdef ANDROID
-	for(std::vector<Heroes *>::iterator
-	it = heroes.begin(); it != heroes.end(); ++it) AIHeroesCaptureNearestTown(*it);
-#else
 	std::for_each(heroes.begin(), heroes.end(), AIHeroesCaptureNearestTown);
-#endif
 
     // buy hero in capital
     if(ai.capital && ai.capital->isCastle())
@@ -247,12 +232,7 @@ void AI::KingdomTurn(Kingdom & kingdom)
 
     // update roles
     {
-#ifdef ANDROID
-	for(std::vector<Heroes *>::iterator
-	it = heroes.begin(); it != heroes.end(); ++it) (*it)->ResetStupidFlag();
-#else
 	std::for_each(heroes.begin(), heroes.end(), std::bind2nd(std::mem_fun(&Heroes::ResetModes), Heroes::STUPID|Heroes::AIWAITING));
-#endif
 
 	// init roles
 	if(heroes.end() != std::find_if(heroes.begin(), heroes.end(),
@@ -280,20 +260,10 @@ void AI::KingdomTurn(Kingdom & kingdom)
     if(status) status->RedrawTurnProgress(2);
 
     // heroes turns
-#ifdef ANDROID
-    for(std::vector<Heroes *>::iterator
-	it = heroes.begin(); it != heroes.end(); ++it) AIHeroesTurn(*it);
-    std::for_each(heroes.begin(), heroes.end(), std::bind2nd(std::mem_fun(&Heroes::ResetModes), Heroes::STUPID|Heroes::AIWAITING));
-    for(std::vector<Heroes *>::iterator
-	it = heroes.begin(); it != heroes.end(); ++it) AIHeroesTurn(*it);
-    for(std::vector<Heroes *>::iterator
-	it = heroes.begin(); it != heroes.end(); ++it) AIHeroesEnd(*it);
-#else
     std::for_each(heroes.begin(), heroes.end(), std::ptr_fun(&AIHeroesTurn));
     std::for_each(heroes.begin(), heroes.end(), std::bind2nd(std::mem_fun(&Heroes::ResetModes), Heroes::STUPID|Heroes::AIWAITING));
     std::for_each(heroes.begin(), heroes.end(), std::ptr_fun(&AIHeroesTurn));
     std::for_each(heroes.begin(), heroes.end(), std::ptr_fun(&AIHeroesEnd));
-#endif
 
     // turn indicator
     if(status) status->RedrawTurnProgress(9);
