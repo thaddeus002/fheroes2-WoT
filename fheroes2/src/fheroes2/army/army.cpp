@@ -1128,7 +1128,7 @@ u8 Army::GetJoinSolution(const Heroes & hero, const Maps::Tiles & tile, u32 & jo
         {
             const Kingdom & kingdom = world.GetKingdom(hero.GetColor());
             payment_t payment = troop.GetCost();
-            cost = payment.gold * troop.GetCount();
+            cost = payment.gold;
 	    payment.Reset();
 	    payment.gold = cost;
 
