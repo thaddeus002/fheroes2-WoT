@@ -1,4 +1,18 @@
-SVN - up to r2334
+May, 26, 2011 (2356 rev.)
+
+Added: game: BattleOnly: add sec. skill modify
+Added: android: latest fixes
+Fixed: AI: check cast spell
+Fixed: heroes: arena visit
+Fixed: game: crash with old save format
+Fixed: game: diplomacy skill, count mounster
+Fixed: game: Heroes::HaveSpell with bag artifact
+Fixed: game: Heroes::CanLearnSpell
+Fixed: game: artifact contain spell
+Fixed: game: DimensionDoor spell, on water
+Fixed: game: redraw town name, after switch hero/guardian
+
+Mar, 13, 2011 (2334 rev.)
 
 Update: translations
 Added: game: quick info: penalty cost
