@@ -1122,10 +1122,7 @@ void Game::IO::UnpackHeroBase(QueueMessage & msg, HeroBase & hero, u16 check_ver
 
     // hero base
     msg.Pop(hero.magic_point);
-    if(FORMAT_VERSION_2268 <= check_version)
-    {
-	msg.Pop(hero.move_point);
-    }
+    msg.Pop(hero.move_point);
 
     // spell book
     hero.spell_book.clear();
@@ -1139,31 +1136,15 @@ void Game::IO::UnpackHeroBase(QueueMessage & msg, HeroBase & hero, u16 check_ver
     }
 
     // artifacts
-    if(check_version < FORMAT_VERSION_2261) // remove and fix: captain: bag_artifacts
+    msg.Pop(byte32);
+    hero.bag_artifacts.clear();
+    hero.bag_artifacts.reserve(byte32);
+    for(u32 jj = 0; jj < byte32; ++jj)
     {
-	std::fill(hero.bag_artifacts.begin(), hero.bag_artifacts.end(), Artifact(Artifact::UNKNOWN));
-	msg.Pop(byte32);
-	for(u32 jj = 0; jj < hero.bag_artifacts.size(); ++jj)
-	{
-	    msg.Pop(byte8);
-	    hero.bag_artifacts[jj].id = byte8;
-
-	    msg.Pop(byte8);
-	    hero.bag_artifacts[jj].ext = byte8;
-	}
-    }
-    else
-    {
-	msg.Pop(byte32);
-	hero.bag_artifacts.clear();
-	hero.bag_artifacts.reserve(byte32);
-	for(u32 jj = 0; jj < byte32; ++jj)
-	{
-	    Artifact art;
-	    msg.Pop(art.id);
-	    msg.Pop(art.ext);
-	    hero.bag_artifacts.push_back(art);
-	}
+	Artifact art;
+	msg.Pop(art.id);
+	msg.Pop(art.ext);
+	hero.bag_artifacts.push_back(art);
     }
 }
 
@@ -1185,10 +1166,6 @@ void Game::IO::UnpackHeroes(QueueMessage & msg, Heroes & hero, u16 check_version
     msg.Pop(hero.name);
 
     msg.Pop(hero.experience);
-    if(FORMAT_VERSION_2268 > check_version)
-    {
-	msg.Pop(hero.move_point);
-    }
     msg.Pop(hero.direction);
     msg.Pop(hero.sprite_index);
     msg.Pop(byte8); hero.save_maps_object = static_cast<MP2::object_t>(byte8);

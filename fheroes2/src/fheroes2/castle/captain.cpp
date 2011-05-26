@@ -30,7 +30,6 @@
 Captain::Captain(const Castle & c) : HeroBase(Skill::Primary::CAPTAIN, c.GetRace()), home(c)
 {
     center = home.GetCenter();
-    bag_artifacts.clear();
     if(home.GetLevelMageGuild()) home.GetMageGuild().EducateHero(*this);
 }
 
