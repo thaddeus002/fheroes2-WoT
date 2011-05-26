@@ -1075,7 +1075,7 @@ u32 Army::army_t::GetSurrenderCost(void) const
     {
 	// FIXME: orig: 3 titan = 7500
 	payment_t payment = (*it).GetCost();
-	res += (payment.gold * (*it).GetCount());
+	res += payment.gold;
     }
 
     if(commander)
