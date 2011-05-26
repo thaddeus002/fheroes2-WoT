@@ -1152,8 +1152,8 @@ void ActionToShrine(Heroes &hero, const u8 obj, const s32 dst_index)
 	    Dialog::Message(head, body, Font::BIG, Dialog::OK);
 	}
 	else
-	// already know
-	if(hero.HaveSpell(spell()))
+	// already know (skip bag artifacts)
+	if(hero.HaveSpell(spell(), true))
 	{
 	    PlaySoundFailure;
 	    body += _("\nUnfortunately, you already have knowledge of this spell, so there is nothing more for them to teach you.");

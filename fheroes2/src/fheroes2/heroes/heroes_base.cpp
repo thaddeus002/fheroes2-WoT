@@ -130,10 +130,10 @@ bool HeroBase::HaveSpellBook(void) const
     return bag_artifacts.isPresentArtifact(Artifact::MAGIC_BOOK);
 }
 
-bool HeroBase::HaveSpell(const Spell & spell) const
+bool HeroBase::HaveSpell(const Spell & spell, bool skip_bag) const
 {
     return HaveSpellBook() &&
-	(spell_book.isPresentSpell(spell) || bag_artifacts.ContainSpell(spell));
+	(spell_book.isPresentSpell(spell) || (!skip_bag && bag_artifacts.ContainSpell(spell)));
 }
 
 void HeroBase::AppendSpellToBook(const Spell & spell, bool without_wisdom)

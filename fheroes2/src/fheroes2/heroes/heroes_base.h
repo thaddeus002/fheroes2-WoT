@@ -82,7 +82,7 @@ public:
     void EditSpellBook(void);
     Spell OpenSpellBook(SpellBook::filter_t, bool) const;
     bool HaveSpellBook(void) const;
-    bool HaveSpell(const Spell &) const;
+    bool HaveSpell(const Spell &, bool skip_bag = false) const;
     void AppendSpellToBook(const Spell &, bool without_wisdom = false);
     void AppendSpellsToBook(const SpellStorage &, bool without_wisdom = false);
     bool SpellBookActivate(void);

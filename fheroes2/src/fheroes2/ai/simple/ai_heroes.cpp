@@ -961,7 +961,8 @@ void AIToShrine(Heroes &hero, const u8 obj, const s32 dst_index)
 
     // check spell book
     if(hero.HaveSpellBook() &&
-      !hero.HaveSpell(spell) &&
+    // check present spell (skip bag artifacts)
+      !hero.HaveSpell(spell, true) &&
     // check valid level spell and wisdom skill
       !(3 == spell_level && Skill::Level::NONE == hero.GetLevelSkill(Skill::Secondary::WISDOM)))
     {
