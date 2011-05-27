@@ -1215,25 +1215,17 @@ void Game::IO::UnpackHeroes(QueueMessage & msg, Heroes & hero, u16 check_version
     msg.Pop(byte32);
     hero.path.clear();
 
-    // unsupported: old format bug
-    bool clear_path = false;
-
     for(u32 jj = 0; jj < byte32; ++jj)
     {
 	Route::Step step;
 	if(FORMAT_VERSION_2293 <= check_version)
 	    msg.Pop(step.from);
 
-	// unsupported: old format bug
-	if(step.from < 0)
-	    clear_path = true;
-
 	msg.Pop(step.direction);
 	msg.Pop(step.penalty);
 	hero.path.push_back(step);
     }
 
-    // unsupported: old format bug
-    if(clear_path)
-	    hero.path.clear();
+    // check path
+    if(hero.path.isBroken()) hero.path.Reset();
 }

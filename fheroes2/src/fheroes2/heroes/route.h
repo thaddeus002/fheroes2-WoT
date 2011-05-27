@@ -37,6 +37,7 @@ namespace Route
 	Step(s32 index, u16 dir, u16 cost) : from(index), direction(dir), penalty(cost) {}
 
 	s32	GetIndex(void) const;
+	bool	isBad(void) const;
 
 	s32	from;
 	u16	direction;
@@ -62,6 +63,7 @@ namespace Route
 	    void	Rescan(void);
 
 	    bool	isValid(void) const;
+	    bool	isBroken(void) const;
 	    bool	isShow(void) const { return !hide; }
 	    u16		isUnderProtection(s32 & pos) const;
 	    bool	hasObstacle(void) const;

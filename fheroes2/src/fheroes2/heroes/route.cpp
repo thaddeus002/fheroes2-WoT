@@ -36,6 +36,11 @@ s32 Route::Step::GetIndex(void) const
     return from < 0 ? -1 : Maps::GetDirectionIndex(from, direction);
 }
 
+bool Route::Step::isBad(void) const
+{
+    return from < 0 || (direction == Direction::UNKNOWN || direction == Direction::CENTER);
+}
+
 /* construct */
 Route::Path::Path(const Heroes & h)
     : hero(h), dst(h.GetIndex()), hide(true)
@@ -98,6 +103,11 @@ bool Route::Path::isValid(void) const
 {
     return !empty() || (dst != hero.GetIndex() &&
 			Direction::UNKNOWN != Direction::Get(dst, hero.GetIndex()));
+}
+
+bool Route::Path::isBroken(void) const
+{
+    return end() != std::find_if(begin(), end(), std::mem_fun_ref(&Route::Step::isBad));
 }
 
 u16 Route::Path::GetIndexSprite(u16 from, u16 to, u8 mod)
