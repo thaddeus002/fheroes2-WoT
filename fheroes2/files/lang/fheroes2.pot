@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-06-02 12:12+0900\n"
+"POT-Creation-Date: 2011-06-02 13:02+0900\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -4879,21 +4879,33 @@ msgstr ""
 msgid ""
 "Gives your hero a %{count} percent chance to learn any given 1st or 2nd "
 "level enemy spell used against him in a combat."
-msgstr ""
+msgid_plural ""
+"Gives your hero a %{count} percents chance to learn any given 1st or 2nd "
+"level enemy spell used against him in a combat."
+msgstr[0] ""
+msgstr[1] ""
 
-#: ../fheroes2/heroes/skill.cpp:608
+#: ../fheroes2/heroes/skill.cpp:609
 msgid ""
 "Gives your hero a %{count} percent chance to learn any given 3rd level spell "
 "(or below) used against him in combat."
-msgstr ""
+msgid_plural ""
+"Gives your hero a %{count} percents chance to learn any given 3rd level "
+"spell (or below) used against him in combat."
+msgstr[0] ""
+msgstr[1] ""
 
-#: ../fheroes2/heroes/skill.cpp:610
+#: ../fheroes2/heroes/skill.cpp:612
 msgid ""
 "Gives your hero a %{count} percent chance to learn any given 4th level spell "
 "(or below) used against him in combat."
-msgstr ""
+msgid_plural ""
+"Gives your hero a %{count} percents chance to learn any given 4th level "
+"spell (or below) used against him in combat."
+msgstr[0] ""
+msgstr[1] ""
 
-#: ../fheroes2/heroes/skill.cpp:615
+#: ../fheroes2/heroes/skill.cpp:618
 msgid ""
 "Allows %{count} percent of the creatures killed in combat to be brought back "
 "from the dead as Skeletons."
@@ -4903,7 +4915,7 @@ msgid_plural ""
 msgstr[0] ""
 msgstr[1] ""
 
-#: ../fheroes2/heroes/skill.cpp:618
+#: ../fheroes2/heroes/skill.cpp:621
 msgid ""
 "Your hero produce %{count} gold pieces per turn as tax revenue from estates."
 msgid_plural ""
