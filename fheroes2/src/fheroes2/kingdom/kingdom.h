@@ -36,6 +36,11 @@
 class Castle;
 class Heroes;
 
+struct LastLoseHero : std::pair<Heroes*, u16>
+{
+    LastLoseHero() : std::pair<Heroes*, u16>(NULL, 0) {}
+};
+
 class Kingdom
 {
 public:
@@ -59,6 +64,9 @@ public:
     bool isLoss(void) const;
     bool AllowPayment(const Funds & funds) const;
     bool AllowRecruitHero(bool check_payment, u8 level) const;
+
+    void SetLastLostHero(Heroes &);
+    Heroes* GetLastLostHero(void) const;
 
     Color::color_t GetColor(void) const{ return color; }
     u8 GetRace(void) const;
@@ -148,6 +156,7 @@ private:
     std::vector<Heroes *> heroes;
 
     Recruits recruits;
+    LastLoseHero lost_hero;
 
     std::list<IndexObject> visit_object;
 

@@ -706,6 +706,17 @@ Kingdom & Kingdoms::Get(u8 color)
     return kingdoms[6];
 }
 
+void Kingdom::SetLastLostHero(Heroes & hero)
+{
+    lost_hero.first = &hero;
+    lost_hero.second = world.CountDay();
+}
+
+Heroes* Kingdom::GetLastLostHero(void) const
+{
+    return lost_hero.first && world.CountDay() - lost_hero.second < DAYOFWEEK ? lost_hero.first : NULL;
+}
+
 void Kingdoms::NewDay(void)
 {
     for(u8 ii = 0; ii < size(); ++ii)

@@ -603,11 +603,14 @@ std::string Skill::Secondary::GetDescription(void) const
 	    switch(Level())
 	    {
 		case Level::BASIC:
-		    str = _("Gives your hero a %{count} percent chance to learn any given 1st or 2nd level enemy spell used against him in a combat."); break;
+		    str = ngettext("Gives your hero a %{count} percent chance to learn any given 1st or 2nd level enemy spell used against him in a combat.",
+		    "Gives your hero a %{count} percents chance to learn any given 1st or 2nd level enemy spell used against him in a combat.", count); break;
 		case Level::ADVANCED:
-		    str = _("Gives your hero a %{count} percent chance to learn any given 3rd level spell (or below) used against him in combat."); break;
+		    str = ngettext("Gives your hero a %{count} percent chance to learn any given 3rd level spell (or below) used against him in combat.",
+		    "Gives your hero a %{count} percents chance to learn any given 3rd level spell (or below) used against him in combat.", count); break;
 		case Level::EXPERT:
-		    str = _("Gives your hero a %{count} percent chance to learn any given 4th level spell (or below) used against him in combat."); break;
+		    str = ngettext("Gives your hero a %{count} percent chance to learn any given 4th level spell (or below) used against him in combat.",
+		    "Gives your hero a %{count} percents chance to learn any given 4th level spell (or below) used against him in combat.", count); break;
 		default: break;
 	    }
 	    break;

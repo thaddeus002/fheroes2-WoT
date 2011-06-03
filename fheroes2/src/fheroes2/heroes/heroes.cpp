@@ -1394,7 +1394,7 @@ void Heroes::SetFreeman(const u8 reason)
     if((Battle2::RESULT_RETREAT | Battle2::RESULT_SURRENDER) & reason)
     {
 	if(Settings::Get().ExtRememberPointsForHeroRetreating()) savepoints = true;
-	world.GetKingdom(color).GetRecruits().SetHero2(this);
+	world.GetKingdom(color).SetLastLostHero(*this);
     }
 
     if(!army.isValid() || (Battle2::RESULT_RETREAT & reason)) army.Reset(false);

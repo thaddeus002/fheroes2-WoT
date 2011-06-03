@@ -344,7 +344,7 @@ u32 Castle::OpenTown(void)
     Kingdom & kingdom = world.GetKingdom(GetColor());
 
     Heroes* hero1 = kingdom.GetRecruits().GetHero1();
-    Heroes* hero2 = kingdom.GetRecruits().GetHero2();
+    Heroes* hero2 = kingdom.GetLastLostHero() && kingdom.GetLastLostHero() != hero1 ? kingdom.GetLastLostHero() : kingdom.GetRecruits().GetHero2();
 
     const bool many_hero1 = hero1 ? !kingdom.AllowRecruitHero(false, hero1->GetLevel()) : false;
     const bool many_hero2 = hero2 ? !kingdom.AllowRecruitHero(false, hero2->GetLevel()) : false;
