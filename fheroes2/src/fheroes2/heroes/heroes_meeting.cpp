@@ -401,8 +401,9 @@ void Heroes::ScholarAction(Heroes & hero1, Heroes & hero2)
     learn.reserve(25);
     teach.reserve(25);
 
-    SpellBookSetFilter(teacher->bag_artifacts, teacher->spell_book, teach, SpellBook::ALL);
-    SpellBookSetFilter(learner->bag_artifacts, learner->spell_book, learn, SpellBook::ALL);
+    // skip bag srtifacts
+    SpellBookSetFilter(BagArtifacts(), teacher->spell_book, teach, SpellBook::ALL);
+    SpellBookSetFilter(BagArtifacts(), learner->spell_book, learn, SpellBook::ALL);
 
     // remove_if for learn spells
     if(learn.size())
