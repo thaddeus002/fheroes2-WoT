@@ -188,8 +188,9 @@ void World::Defaults(void)
 /* new maps */
 void World::NewMaps(const u16 sw, const u16 sh)
 {
-    Reset();
-    Defaults();
+    /*mingw32ce bug: need namespace */
+    World::Reset();
+    World::Defaults();
 
     width = sw;
     height = sh;
@@ -230,8 +231,9 @@ void World::NewMaps(const u16 sw, const u16 sh)
 /* load maps */
 void World::LoadMaps(const std::string &filename)
 {
-    Reset();
-    Defaults();
+    /*mingw32ce bug: need namespace */
+    World::Reset();
+    World::Defaults();
 
     std::ifstream fd(filename.c_str(), std::ios::binary);
     if(!fd.is_open())
