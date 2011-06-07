@@ -188,9 +188,8 @@ void World::Defaults(void)
 /* new maps */
 void World::NewMaps(const u16 sw, const u16 sh)
 {
-    /*mingw32ce bug: need namespace */
-    World::Reset();
-    World::Defaults();
+    Reset();
+    Defaults();
 
     width = sw;
     height = sh;
@@ -231,9 +230,8 @@ void World::NewMaps(const u16 sw, const u16 sh)
 /* load maps */
 void World::LoadMaps(const std::string &filename)
 {
-    /*mingw32ce bug: need namespace */
-    World::Reset();
-    World::Defaults();
+    Reset();
+    Defaults();
 
     std::ifstream fd(filename.c_str(), std::ios::binary);
     if(!fd.is_open())
@@ -1200,10 +1198,6 @@ void World::Reset(void)
     heroes_cond_loss = Heroes::UNKNOWN;
 
     // reserve memory
-    vec_eventsday.reserve(6);
-    vec_eventsmap.reserve(6);
-    vec_riddles.reserve(10);
-    vec_rumors.reserve(10);
     vec_castles.reserve(MAXCASTLES);
     vec_heroes.reserve(HEROESMAXCOUNT + 2);
 }
@@ -1277,7 +1271,8 @@ Heroes* World::GetFreemanHeroes(u8 rc) const
 
 const std::string & World::GetRumors(void)
 {
-    return vec_rumors[Rand::Get(vec_rumors.size() - 1)];
+    // vec_rumors always contain values
+    return *Rand::Get(vec_rumors);
 }
 
 /* return random teleport destination */
@@ -1644,7 +1639,6 @@ s32 World::GetNearestObject(s32 center, MP2::object_t obj, bool check_hero) cons
 EventsDate World::GetEventsDate(const Color::color_t c) const
 {
     EventsDate res;
-    res.reserve(vec_eventsday.size());
 
     for(EventsDate::const_iterator
 	it = vec_eventsday.begin(); it != vec_eventsday.end(); ++it)

@@ -248,7 +248,6 @@ Riddle::Riddle(s32 index, const void *ptr) : valid(false)
     const u8  *ptr8  = static_cast<const u8 *>(ptr);
     u16 byte16 = 0;
     u32 byte32 = 0;
-    answers.reserve(9);
 
     // id
     if(0x00 != *ptr8)

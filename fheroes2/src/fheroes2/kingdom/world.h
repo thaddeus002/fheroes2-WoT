@@ -44,9 +44,10 @@ class Recruits;
 class Radar;
 class Artifact;
 
-typedef std::vector<EventDate> EventsDate;
-typedef std::vector<EventMaps> EventsMaps;
-typedef std::vector<Riddle>    Riddles;
+typedef std::list<std::string> Rumors;
+typedef std::list<EventDate> EventsDate;
+typedef std::list<EventMaps> EventsMaps;
+typedef std::list<Riddle>    Riddles;
 typedef std::vector<Maps::Tiles> MapsTiles;
 
 class World : protected Size
@@ -164,7 +165,7 @@ private:
 
     MapsTiles				vec_tiles;
     Kingdoms				vec_kingdoms;
-    std::vector<std::string>     	vec_rumors;
+    Rumors				vec_rumors;
     std::vector<Castle *>               vec_castles;
     std::vector<Heroes *>               vec_heroes;
     EventsDate                          vec_eventsday;

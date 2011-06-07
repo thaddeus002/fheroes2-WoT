@@ -60,6 +60,8 @@ struct EventMaps : public Maps::Position
     std::string message;
 };
 
+typedef std::list<std::string>    RiddleAnswers;
+
 struct Riddle : public Maps::Position
 {
     Riddle() {}
@@ -71,7 +73,7 @@ struct Riddle : public Maps::Position
     s32 index_map;
     Funds resource;
     Artifact artifact;
-    std::vector<std::string> answers;
+    RiddleAnswers answers;
     std::string message;
     bool valid;
 };

@@ -315,7 +315,7 @@ bool Game::IO::SaveBIN(QueueMessage & msg)
     msg.Push(static_cast<u16>(0xFF0C));
     msg.Push(static_cast<u32>(world.vec_rumors.size()));
     {
-	for(std::vector<std::string>::const_iterator
+	for(Rumors::const_iterator
 	    it = world.vec_rumors.begin(); it != world.vec_rumors.end(); ++it)
 	    msg.Push(*it);
     }
@@ -384,7 +384,7 @@ bool Game::IO::SaveBIN(QueueMessage & msg)
 	    msg.Push((*it).valid);
 
 	    msg.Push(static_cast<u32>((*it).answers.size()));
-	    for(std::vector<std::string>::const_iterator
+	    for(RiddleAnswers::const_iterator
 		ita = (*it).answers.begin(); ita != (*it).answers.end(); ++ita)
 		msg.Push(*ita);
 
@@ -829,7 +829,6 @@ bool Game::IO::LoadBIN(QueueMessage & msg)
     if(byte16 != 0xFF0C) DEBUG(DBG_GAME, DBG_WARN, "0xFF0C");
     msg.Pop(byte32);
     world.vec_rumors.clear();
-    world.vec_rumors.reserve(byte32);
     for(u32 ii = 0; ii < byte32; ++ii)
     {
 	msg.Pop(str);
@@ -841,7 +840,6 @@ bool Game::IO::LoadBIN(QueueMessage & msg)
     if(byte16 != 0xFF0D) DEBUG(DBG_GAME, DBG_WARN, "0xFF0D");
     msg.Pop(byte32);
     world.vec_eventsday.clear();
-    world.vec_eventsday.reserve(byte32);
     for(u32 ii = 0; ii < byte32; ++ii)
     {
 	EventDate event;
@@ -867,7 +865,6 @@ bool Game::IO::LoadBIN(QueueMessage & msg)
     if(byte16 != 0xFF0E) DEBUG(DBG_GAME, DBG_WARN, "0xFF0E");
     msg.Pop(byte32);
     world.vec_eventsmap.clear();
-    world.vec_eventsmap.reserve(byte32);
     for(u32 ii = 0; ii < byte32; ++ii)
     {
 	EventMaps event;
@@ -897,7 +894,6 @@ bool Game::IO::LoadBIN(QueueMessage & msg)
     if(byte16 != 0xFF0F) DEBUG(DBG_GAME, DBG_WARN, "0xFF0F");
     msg.Pop(byte32);
     world.vec_riddles.clear();
-    world.vec_riddles.reserve(byte32);
     for(u32 ii = 0; ii < byte32; ++ii)
     {
 	Riddle riddle;
@@ -916,7 +912,6 @@ bool Game::IO::LoadBIN(QueueMessage & msg)
 	msg.Pop(riddle.valid);
 
 	msg.Pop(size);
-	riddle.answers.reserve(size);
 	for(u32 jj = 0; jj < size; ++jj)
 	{
 	    msg.Pop(str);
