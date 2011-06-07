@@ -1704,12 +1704,15 @@ bool AIHeroesValidObject(const Heroes & hero, s32 index)
 	case MP2::OBJ_RESOURCE:
 	case MP2::OBJ_CAMPFIRE:
 	case MP2::OBJ_TREASURECHEST:
-	    return true;
+	    if(! hero.isShipMaster()) return true;
+	    break;
 
 	case MP2::OBJ_ARTIFACT:
 	{
 	    if(hero.IsFullBagArtifacts()) return false;
 
+	    if(hero.isShipMaster()) return false;
+	    else
 	    // 1,2,3 - 2000g, 2500g+3res, 3000g+5res
 	    if(1 <= tile.GetQuantity2() && 3 >= tile.GetQuantity2())
 	    {
