@@ -608,7 +608,7 @@ void ActionToMonster(Heroes &hero, const u8 obj, const s32 dst_index)
 	    reason = 0;
     }
 
-    bool allow_move = false;
+    //bool allow_move = false;
 
     // fight
     if(0 == reason)
@@ -625,7 +625,7 @@ void ActionToMonster(Heroes &hero, const u8 obj, const s32 dst_index)
 	{
     	    hero.IncreaseExperience(res.GetExperienceAttacker());
     	    destroy = true;
-	    allow_move = true;
+	    //allow_move = true;
 	}
 	else
 	{
@@ -2100,7 +2100,6 @@ void ActionToAbandoneMine(Heroes &hero, const u8 obj, const s32 dst_index)
 	Battle2::Result res = Battle2::Loader(hero.GetArmy(), army, dst_index);
     	if(res.AttackerWins())
     	{
-    	    payment_t info = ProfitConditions::FromMine(tile.GetQuantity4());
 	    hero.IncreaseExperience(res.GetExperienceAttacker());
 	    PlaySoundSuccess;
 	    std::string msg = _("You beat the Ghosts and are able to restore the mine to production.");

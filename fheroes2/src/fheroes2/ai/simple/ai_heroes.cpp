@@ -438,7 +438,7 @@ void AIToCastle(Heroes &hero, const u8 obj, const s32 dst_index)
         }
 
         Army::army_t & army = castle->GetActualArmy();
-	bool allow_enter = false;
+	//bool allow_enter = false;
 
 	if(army.isValid())
 	{
@@ -467,7 +467,7 @@ void AIToCastle(Heroes &hero, const u8 obj, const s32 dst_index)
     		castle->Scoute();
 
                 hero.IncreaseExperience(res.GetExperienceAttacker());
-		allow_enter = true;
+		//allow_enter = true;
             }
             else
             // wins defender
@@ -482,7 +482,7 @@ void AIToCastle(Heroes &hero, const u8 obj, const s32 dst_index)
 	    world.GetKingdom(hero.GetColor()).AddCastle(castle);
     	    world.CaptureObject(dst_index, hero.GetColor());
     	    castle->Scoute();
-	    allow_enter = true;
+	    //allow_enter = true;
 	}
 
         // disable: auto move hero to castle for AI
@@ -537,7 +537,7 @@ void AIToMonster(Heroes &hero, const u8 obj, const s32 dst_index)
 	    reason = 0;
     }
 
-    bool allow_move = false;
+    //bool allow_move = false;
 
     // fight
     if(0 == reason)
@@ -554,7 +554,7 @@ void AIToMonster(Heroes &hero, const u8 obj, const s32 dst_index)
     	{
     	    hero.IncreaseExperience(res.GetExperienceAttacker());
     	    destroy = true;
-	    allow_move = true;
+	    //allow_move = true;
     	}
     	else
     	{
