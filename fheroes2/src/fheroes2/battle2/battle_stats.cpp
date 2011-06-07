@@ -583,6 +583,8 @@ u8 Battle2::Stats::GetObstaclesPenalty(const Stats & attacker) const
 		    case 0x85:
 		    // tree
 		    case 0x89:
+		    // tree
+		    case 0x8D:
 		    // rock
 		    case 0x95:
 		    case 0x96:
