@@ -348,7 +348,7 @@ void Castle::ActionNewWeek(void)
     // increase population
     if(world.GetWeekType().GetType() != Week::PLAGUE)
     {
-	const u32 dwellings[] = { DWELLING_MONSTER1, DWELLING_MONSTER2, DWELLING_MONSTER3, DWELLING_MONSTER4, DWELLING_MONSTER5, DWELLING_MONSTER6 };
+	const u32 dwellings[] = { DWELLING_MONSTER1, DWELLING_MONSTER2, DWELLING_MONSTER3, DWELLING_MONSTER4, DWELLING_MONSTER5 };
 
 	for(u8 ii = 0; ii < 6; ++ii) if(building & dwellings[ii])
 	{
@@ -390,9 +390,9 @@ void Castle::ActionNewMonth(void)
     // Month Of
     if(world.GetWeekType().GetType() == Week::MONSTERS)
     {
-	const u32 dwellings[] = { DWELLING_MONSTER1, DWELLING_MONSTER2, DWELLING_MONSTER3, DWELLING_MONSTER4, DWELLING_MONSTER5, DWELLING_MONSTER6 };
+	const u32 dwellings[] = { DWELLING_MONSTER1, DWELLING_MONSTER2, DWELLING_MONSTER3, DWELLING_MONSTER4, DWELLING_MONSTER5 };
 
-	for(u8 ii = 0; ii < 6; ++ii)
+	for(u8 ii = 0; ii < 5; ++ii)
 	    if((building & dwellings[ii]) &&
 		Monster(race, dwellings[ii]).GetID() == world.GetWeekType().GetMonster())
 	    {
