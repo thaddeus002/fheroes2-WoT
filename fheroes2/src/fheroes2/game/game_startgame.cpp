@@ -1113,6 +1113,7 @@ void Game::FocusHeroesClickLeftAction(Heroes & from_hero, s32 index_maps)
     Game::Focus & global_focus = Focus::Get();
     Maps::Tiles & tile = world.GetTiles(index_maps);
 
+    if(! from_hero.isEnableMove())
     switch(tile.GetObject())
     {
 	// from hero to castle
@@ -1155,6 +1156,11 @@ void Game::FocusHeroesClickLeftAction(Heroes & from_hero, s32 index_maps)
 		    MP2::isActionObject(tile.GetObject(), from_hero.isShipMaster()))
 			ShowPathOrStartMoveHero(&from_hero, index_maps);
 	    break;
+    }
+    // stop hero
+    else
+    {
+	from_hero.SetMove(false);
     }
 }
 
