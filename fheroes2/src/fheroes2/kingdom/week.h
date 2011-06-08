@@ -24,8 +24,9 @@
 #define H2WEEK_H
 
 #include <string>
+#include "monster.h"
 
-namespace Week
+struct Week : std::pair<u8, u8>
 {
     enum type_t
     {
@@ -58,10 +59,16 @@ namespace Week
 	MONSTERS	// week of monsters game
     };
 
-    const char* GetString(type_t type);
-    type_t WeekRand(void);
-    type_t MonthRand(void);
-    type_t Get(u8);
-}
+    Week() : std::pair<u8, u8>(UNNAMED, Monster::UNKNOWN){}
+
+    Week & operator= (u8);
+
+    u8 GetType(void) const { return first; }
+    u8 GetMonster(void) const { return second; }
+    const char* GetName(void) const;
+
+    static type_t WeekRand(void);
+    static type_t MonthRand(void);
+};
 
 #endif

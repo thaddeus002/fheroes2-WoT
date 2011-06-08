@@ -1117,6 +1117,9 @@ void World::NewDay(void)
 
 void World::NewWeek(void)
 {
+    // update week type
+    week_name = BeginMonth() ? Week::MonthRand() : Week::WeekRand();
+
     UpdateDwellingPopulation();
 
     if(1 < week)
@@ -1128,9 +1131,6 @@ void World::NewWeek(void)
 	    it = vec_tiles.begin(); it != vec_tiles.end(); ++it)
 	    if(MP2::isWeekLife((*it).GetObject())) (*it).UpdateQuantity();
     }
-
-    // update week type
-    week_name = BeginMonth() ? Week::MonthRand() : Week::WeekRand();
 
     // added army for gray castle
     std::vector<Castle *>::const_iterator itc = vec_castles.begin();

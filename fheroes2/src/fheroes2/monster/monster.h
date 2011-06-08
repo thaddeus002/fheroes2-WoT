@@ -172,6 +172,7 @@ public:
 
     static Monster FromObject(u8);
     static Monster Rand(level_t = LEVEL0);
+    static u8 Rand4Week(void);
 
     static u32 GetCountFromHitPoints(const Monster &, u32);
 

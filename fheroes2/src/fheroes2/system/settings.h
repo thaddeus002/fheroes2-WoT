@@ -39,9 +39,10 @@
 #include <android/log.h>
 #endif
 
+#define FORMAT_VERSION_2371 0x0943
 #define FORMAT_VERSION_2315 0x090B
 #define FORMAT_VERSION_2293 0x08F5
-#define CURRENT_FORMAT_VERSION FORMAT_VERSION_2315
+#define CURRENT_FORMAT_VERSION FORMAT_VERSION_2371
 #define LAST_FORMAT_VERSION FORMAT_VERSION_2293
 
 #define ListMapsDirectory std::list<std::string>
@@ -161,6 +162,8 @@ public:
 	WORLD_ONLY_FIRST_MONSTER_ATTACK	= 0x20000080,
 	WORLD_EYE_EAGLE_AS_SCHOLAR	= 0x20000100,
 	WORLD_BUY_BOOK_FROM_SHRINES	= 0x20000200,
+	WORLD_BAN_WEEKOF		= 0x20000400,
+	WORLD_BAN_PLAGUES		= 0x20000800,
 	UNIONS_ALLOW_HERO_MEETINGS	= 0x20001000,
 	UNIONS_ALLOW_CASTLE_VISITING	= 0x20002000,
 	UNIONS_ALLOW_VIEW_MAPS		= 0x20004000,
@@ -288,6 +291,8 @@ public:
     bool ExtUnionsAllowHeroesMeetings(void) const;
     bool ExtUnionsAllowViewMaps(void) const;
     bool ExtAllowCastleGuardians(void) const;
+    bool ExtWorldBanWeekOf(void) const;
+    bool ExtWorldBanPlagues(void) const;
     bool ExtCastleAllowFlash(void) const;
     bool ExtBattleShowDamage(void) const;
     bool ExtBattleTroopDirection(void) const;

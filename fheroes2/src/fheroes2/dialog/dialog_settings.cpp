@@ -156,6 +156,8 @@ void Dialog::ExtSettings(bool readonly)
     states.push_back(Settings::WORLD_ONLY_FIRST_MONSTER_ATTACK);
     states.push_back(Settings::WORLD_EYE_EAGLE_AS_SCHOLAR);
     states.push_back(Settings::WORLD_BUY_BOOK_FROM_SHRINES);
+    states.push_back(Settings::WORLD_BAN_WEEKOF);
+    states.push_back(Settings::WORLD_BAN_PLAGUES);
     states.push_back(Settings::HEROES_FORCE_RACE_FROM_TYPE);
     states.push_back(Settings::HEROES_LEARN_SPELLS_WITH_DAY);
     states.push_back(Settings::HEROES_COST_DEPENDED_FROM_LEVEL);

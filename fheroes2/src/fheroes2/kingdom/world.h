@@ -107,7 +107,7 @@ public:
     bool BeginMonth(void) const{ return 1 == (week % WEEKOFMONTH) && BeginWeek(); }
     bool LastDay(void) const{ return (0 == (day % DAYOFWEEK)); }
     bool LastWeek(void) const{ return (0 == (week % WEEKOFMONTH)); }
-    Week::type_t GetWeekType(void) const{ return week_name; }
+    const Week & GetWeekType(void) const{ return week_name; }
     void DateDump(void) const;
 
     void NewDay(void);
@@ -186,7 +186,7 @@ private:
     u16 week;
     u8 month;
 
-    Week::type_t week_name;    
+    Week week_name;    
 
     Heroes::heroes_t heroes_cond_wins;
     Heroes::heroes_t heroes_cond_loss;

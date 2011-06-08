@@ -771,6 +771,51 @@ Monster Monster::Rand(level_t level)
     return monsters.size() ? *Rand::Get(monsters) : UNKNOWN;
 }
 
+u8 Monster::Rand4Week(void)
+{
+    switch(Rand::Get(1, 36))
+    {
+	case  1: return PEASANT;
+        case  2: return ARCHER;
+        case  3: return PIKEMAN;
+        case  4: return SWORDSMAN;
+        case  5: return CAVALRY;
+        case  6: return PALADIN;
+        case  7: return GOBLIN;
+        case  8: return ORC;
+        case  9: return WOLF;
+        case 10: return OGRE;
+        case 11: return TROLL;
+        case 12: return CYCLOPS;
+        case 13: return SPRITE;
+        case 14: return DWARF;
+        case 15: return ELF;
+        case 16: return DRUID;
+        case 17: return UNICORN;
+        case 18: return PHOENIX;
+        case 19: return CENTAUR;
+        case 20: return GARGOYLE;
+        case 21: return GRIFFIN;
+        case 22: return MINOTAUR;
+        case 23: return HYDRA;
+        case 24: return GREEN_DRAGON;
+        case 25: return HALFLING;
+        case 26: return BOAR;
+        case 27: return IRON_GOLEM;
+        case 28: return ROC;
+        case 29: return MAGE;
+        case 30: return GIANT;
+        case 31: return SKELETON;
+        case 32: return ZOMBIE;
+        case 33: return MUMMY;
+        case 34: return VAMPIRE;
+        case 35: return LICH;
+        case 36: return BONE_DRAGON;
+	default: break;
+    }
+    return UNKNOWN;
+}
+
 u8 Monster::GetLevel(void) const
 {
     switch(id)

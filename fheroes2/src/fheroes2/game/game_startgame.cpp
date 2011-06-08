@@ -1560,12 +1560,41 @@ void Game::KeyArrowPress(Direction::vector_t dir)
 
 void Game::NewWeekDialog(void)
 {
-    const Week::type_t name = world.GetWeekType();
+    const Week & week = world.GetWeekType();
+
+    // head
     std::string message = world.BeginMonth() ? _("Astrologers proclaim month of the %{name}.") : _("Astrologers proclaim week of the %{name}.");
     AGG::PlayMusic(world.BeginMonth() ? MUS::WEEK2_MONTH1 : MUS::WEEK1, false);
-    String::Replace(message, "%{name}", Week::GetString(name));
+    String::Replace(message, "%{name}", week.GetName());
     message += "\n \n";
-    message += (name == Week::PLAGUE ? _(" All populations are halved.") : _(" All dwellings increase population."));
+
+    switch(week.GetType())
+    {
+	case Week::PLAGUE:
+	    message += (week.GetType() == Week::PLAGUE ? _(" All populations are halved.") : _(" All dwellings increase population."));
+	    break;
+	case Week::MONSTERS:
+	{
+	    const Monster monster(week.GetMonster());
+	    if(world.BeginMonth())
+		message += 100 == Castle::GetGrownMonthOf() ? _("%{monster} population doubles!") : _("%{monster} population increase on %{count} percent!");
+	    else
+		message += _("%{monster} growth +%{count}.");
+	    String::Replace(message, "%{monster}", monster.GetMultiName());
+	    String::Replace(message, "%{count}", (world.BeginMonth() ? Castle::GetGrownMonthOf() : Castle::GetGrownWeekOf()));
+	}
+	    break;
+	default:
+	    break;
+    }
+
+    // tail
+    if(week.GetType() != Week::PLAGUE)
+    {
+	message += "\n";
+	message += _("All dwellings increase population.");
+    }
+
     Dialog::Message("", message, Font::BIG, Dialog::OK);
 }
 

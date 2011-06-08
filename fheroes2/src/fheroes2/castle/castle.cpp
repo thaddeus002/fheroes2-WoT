@@ -36,6 +36,8 @@
 
 u8 Castle::grown_well(2);
 u8 Castle::grown_wel2(8);
+u8 Castle::grown_week_of(5);
+u8 Castle::grown_month_of(100);
 
 Castle::Castle() : race(Race::BOMG), building(0), captain(*this), color(Color::GRAY), mageguild(*this), army(&captain)
 {
@@ -343,40 +345,66 @@ void Castle::ActionNewDay(void)
 
 void Castle::ActionNewWeek(void)
 {
-    u8 well = building & BUILD_WELL ? grown_well : 0;
-    u8 wel2 = building & BUILD_WEL2 ? grown_wel2 : 0;
+    // increase population
+    if(world.GetWeekType().GetType() != Week::PLAGUE)
+    {
+	const u32 dwellings[] = { DWELLING_MONSTER1, DWELLING_MONSTER2, DWELLING_MONSTER3, DWELLING_MONSTER4, DWELLING_MONSTER5, DWELLING_MONSTER6 };
 
-    // dw 1
-    if(building & DWELLING_MONSTER1) dwelling[0]  += Monster(race, DWELLING_MONSTER1).GetGrown() + well + wel2;
-    // dw 2
-    if(building & DWELLING_UPGRADE2) dwelling[1]  += Monster(race, DWELLING_UPGRADE2).GetGrown() + well;
-    else
-    if(building & DWELLING_MONSTER2) dwelling[1]  += Monster(race, DWELLING_MONSTER2).GetGrown() + well;
-    // dw 3
-    if(building & DWELLING_UPGRADE3) dwelling[2]  += Monster(race, DWELLING_UPGRADE3).GetGrown() + well;
-    else
-    if(building & DWELLING_MONSTER3) dwelling[2]  += Monster(race, DWELLING_MONSTER3).GetGrown() + well;
-    // dw 4
-    if(building & DWELLING_UPGRADE4) dwelling[3]  += Monster(race, DWELLING_UPGRADE4).GetGrown() + well;
-    else
-    if(building & DWELLING_MONSTER4) dwelling[3]  += Monster(race, DWELLING_MONSTER4).GetGrown() + well;
-    // dw 5
-    if(building & DWELLING_UPGRADE5) dwelling[4]  += Monster(race, DWELLING_UPGRADE5).GetGrown() + well;
-    else
-    if(building & DWELLING_MONSTER5) dwelling[4]  += Monster(race, DWELLING_MONSTER5).GetGrown() + well;
-    // dw 6
-    if(building & DWELLING_UPGRADE7) dwelling[5]  += Monster(race, DWELLING_UPGRADE7).GetGrown() + well;
-    else
-    if(building & DWELLING_UPGRADE6) dwelling[5]  += Monster(race, DWELLING_UPGRADE6).GetGrown() + well;
-    else
-    if(building & DWELLING_MONSTER6) dwelling[5]  += Monster(race, DWELLING_MONSTER6).GetGrown() + well;
+	for(u8 ii = 0; ii < 6; ++ii) if(building & dwellings[ii])
+	{
+	    const u32 & dw = dwellings[ii];
+	    const u32 up = GetUpgradeBuilding(dw);
+	    const Monster mons(race, (building & up ? up : dw));
+	    const u8 growth = GetColor() == Color::GRAY ? mons.GetGrown() / 2 : mons.GetGrown();
+
+	    dwelling[ii] += growth;
+	    if(building & BUILD_WELL) dwelling[ii] += grown_well;
+	}
+
+	// wel2
+	if(building & (DWELLING_MONSTER1 | BUILD_WEL2)) dwelling[0] += grown_wel2;
+
+	// Week Of
+	if(world.GetWeekType().GetType() == Week::MONSTERS && !world.BeginMonth())
+	{
+	    for(u8 ii = 0; ii < 6; ++ii)
+		if((building & dwellings[ii]) &&
+		    Monster(race, dwellings[ii]).GetID() == world.GetWeekType().GetMonster())
+		{
+		    dwelling[ii] += grown_week_of;
+		    break;
+		}
+	}
+    }
 }
 
 void Castle::ActionNewMonth(void)
 {
-    if(world.GetWeekType() == Week::PLAGUE)
+    // population halved
+    if(world.GetWeekType().GetType() == Week::PLAGUE)
     {
-	for(u8 ii = 0; ii < CASTLEMAXMONSTER; ++ii) if(dwelling[ii]) dwelling[ii] /= 2;
+	for(u8 ii = 0; ii < CASTLEMAXMONSTER; ++ii)
+	    if(dwelling[ii]) dwelling[ii] /= 2;
+    }
+    else
+    // Month Of
+    if(world.GetWeekType().GetType() == Week::MONSTERS)
+    {
+	const u32 dwellings[] = { DWELLING_MONSTER1, DWELLING_MONSTER2, DWELLING_MONSTER3, DWELLING_MONSTER4, DWELLING_MONSTER5, DWELLING_MONSTER6 };
+
+	for(u8 ii = 0; ii < 6; ++ii)
+	    if((building & dwellings[ii]) &&
+		Monster(race, dwellings[ii]).GetID() == world.GetWeekType().GetMonster())
+	    {
+		const u32 & dw = dwellings[ii];
+		const u32 up = GetUpgradeBuilding(dw);
+		const Monster mons(race, (building & up ? up : dw));
+		const u8 growth = GetColor() == Color::GRAY ? mons.GetGrown() / 2 : mons.GetGrown();
+
+		dwelling[ii] -= growth;
+		dwelling[ii] += dwelling[ii] * grown_month_of / 100;
+		dwelling[ii] += growth;
+	    }
     }
 }
 
@@ -1756,6 +1784,16 @@ u8 Castle::GetGrownWel2(void)
     return grown_wel2;
 }
 
+u8 Castle::GetGrownWeekOf(void)
+{
+    return grown_week_of;
+}
+
+u8 Castle::GetGrownMonthOf(void)
+{
+    return grown_month_of;
+}
+
 void Castle::Scoute(void) const
 {
     Maps::ClearFog(GetIndex(), Game::GetViewDistance(isCastle() ? Game::VIEW_CASTLE : Game::VIEW_TOWN), color);
@@ -1770,8 +1808,14 @@ void Castle::UpdateExtraGrowth(const TiXmlElement* xml)
     xml->Attribute("well", &value);
     grown_well = value;
 
-    xml->Attribute("wel", &value);
+    xml->Attribute("wel2", &value);
     grown_wel2 = value;
+
+    xml->Attribute("week_of", &value);
+    grown_week_of = value;
+
+    xml->Attribute("month_of", &value);
+    grown_month_of = value > 255 ? 255 : value;
 }
 #endif
 

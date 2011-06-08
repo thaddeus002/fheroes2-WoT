@@ -136,8 +136,10 @@ static const settings_t settingsFHeroes2[] =
     { Settings::WORLD_ALLOW_SET_GUARDIAN,	_("world: allow set guardian to objects"),		},
     { Settings::WORLD_NOREQ_FOR_ARTIFACTS,	_("world: no in-built requirements or guardians for placed artifacts"),	},
     { Settings::WORLD_ONLY_FIRST_MONSTER_ATTACK,_("world: only the first monster will attack (H2 bug)."), },
-    { Settings::WORLD_EYE_EAGLE_AS_SCHOLAR,	_("world: Eagle Eye also works like Scholar in H3."), },
-    { Settings::WORLD_BUY_BOOK_FROM_SHRINES,	_("world: allow buy a spellbook from Shrines"), },
+    { Settings::WORLD_EYE_EAGLE_AS_SCHOLAR,	_("world: Eagle Eye also works like Scholar in H3."),   },
+    { Settings::WORLD_BUY_BOOK_FROM_SHRINES,	_("world: allow buy a spellbook from Shrines"),         },
+    { Settings::WORLD_BAN_WEEKOF,		_("world: ban week of monster"),                        },
+    { Settings::WORLD_BAN_PLAGUES,		_("world: ban plagues week"),                           },
     { Settings::WORLD_ARTIFACT_CRYSTAL_BALL,	_("artifact: Crystal Ball also added Identify Hero and Visions spells"), },
     { Settings::CASTLE_ALLOW_BUY_FROM_WELL,	_("castle: allow buy from well"),			},
     { Settings::CASTLE_ALLOW_GUARDIANS,		_("castle: allow guardians"),				},
@@ -1433,6 +1435,16 @@ bool Settings::ExtDragDropScroll(void) const
 bool Settings::ExtLowResolution(void) const
 {
     return ExtModes(POCKETPC_LOW_RESOLUTION);
+}
+
+bool Settings::ExtWorldBanWeekOf(void) const
+{
+    return ExtModes(WORLD_BAN_WEEKOF);
+}
+
+bool Settings::ExtWorldBanPlagues(void) const
+{
+    return ExtModes(WORLD_BAN_PLAGUES);
 }
 
 const Point & Settings::PosRadar(void) const { return pos_radr; }

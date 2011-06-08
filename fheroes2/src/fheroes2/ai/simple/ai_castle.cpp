@@ -155,7 +155,8 @@ void AICastleDevelopment(Castle & c)
 
 void AICastleTurn(Castle* castle)
 {
-    if(castle)
+    // skip neutral town
+    if(castle && castle->GetColor() != Color::GRAY)
     {
 	s8 range = Game::GetViewDistance(castle->isCastle() ? Game::VIEW_CASTLE : Game::VIEW_TOWN);
 	const Heroes* enemy = NULL;

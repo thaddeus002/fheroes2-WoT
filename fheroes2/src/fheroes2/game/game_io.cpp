@@ -243,7 +243,8 @@ bool Game::IO::SaveBIN(QueueMessage & msg)
     msg.Push(world.height);
     msg.Push(world.ultimate_index);
     msg.Push(world.uniq0);
-    msg.Push(static_cast<u8>(world.week_name));
+    msg.Push(world.week_name.first);
+    msg.Push(world.week_name.second);
     msg.Push(static_cast<u8>(world.heroes_cond_wins));
     msg.Push(static_cast<u8>(world.heroes_cond_loss));
     msg.Push(world.month);
@@ -743,7 +744,17 @@ bool Game::IO::LoadBIN(QueueMessage & msg)
 
     msg.Pop(world.ultimate_index);
     msg.Pop(world.uniq0);
-    msg.Pop(byte8); world.week_name = Week::Get(byte8);
+
+    if(format < FORMAT_VERSION_2371)
+    {
+	msg.Pop(byte8); world.week_name = byte8;
+    }
+    else
+    {
+	msg.Pop(world.week_name.first);
+	msg.Pop(world.week_name.second);
+    }
+
     msg.Pop(byte8); world.heroes_cond_wins = Heroes::ConvertID(byte8);
     msg.Pop(byte8); world.heroes_cond_loss = Heroes::ConvertID(byte8);
     msg.Pop(world.month);

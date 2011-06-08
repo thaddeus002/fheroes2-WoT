@@ -22,17 +22,25 @@
 
 #include "engine.h"
 #include "gamedefs.h"
+#include "settings.h"
 #include "week.h"
 
-const char* Week::GetString(type_t type)
+Week & Week::operator= (u8 type)
+{
+    first = type > MONSTERS ? UNNAMED : type;
+    second = type == MONSTERS ? Monster::Rand4Week() : Monster::UNKNOWN;
+    return *this;
+}
+
+const char* Week::GetName(void) const
 {
     const char* str_name[] = { "Unnamed", _("week|PLAGUE"),
 		_("week|Ant"), _("week|Grasshopper"), _("week|Dragonfly"), _("week|Spider"), _("week|Butterfly"), _("week|Bumblebee"),
 		_("week|Locust"), _("week|Earthworm"), _("week|Hornet"), _("week|Beetle"), _("week|Squirrel"), _("week|Rabbit"),
 		_("week|Gopher"), _("week|Badger"), _("week|Eagle"), _("week|Weasel"), _("week|Raven"), _("week|Mongoose"), _("week|Aardvark"),
-		_("week|Lizard"), _("week|Tortoise"), _("week|Hedgehog"), _("week|Condor"), "Monsters HII" };
+		_("week|Lizard"), _("week|Tortoise"), _("week|Hedgehog"), _("week|Condor") };
 
-    switch(type)
+    switch(first)
     {
 	case PLAGUE:		return str_name[1];
 	case ANT:		return str_name[2];
@@ -58,7 +66,7 @@ const char* Week::GetString(type_t type)
 	case TORTOISE:		return str_name[22];
 	case HEDGEHOG:		return str_name[23];
 	case CONDOR:		return str_name[24];
-	case MONSTERS:		return str_name[25];
+	case MONSTERS:		return Monster(second).GetName();
 	default: break;
     }
 
@@ -67,72 +75,16 @@ const char* Week::GetString(type_t type)
 
 Week::type_t Week::WeekRand(void)
 {
-    switch(Rand::Get(2, 24))
-    {
-	case 2:		return ANT;
-	case 3:		return GRASSHOPPER;
-	case 4:		return DRAGONFLY;
-	case 5:		return SPIDER;
-	case 6:		return BUTTERFLY;
-	case 7:		return BUMBLEBEE;
-	case 8:		return LOCUST;
-	case 9:		return EARTHWORM;
-	case 10:	return HORNET;
-	case 11:	return BEETLE;
-	case 12:	return SQUIRREL;
-	case 13:	return RABBIT;
-	case 14:	return GOPHER;
-	case 15:	return BADGER;
-	case 16:	return EAGLE;
-	case 17:	return WEASEL;
-	case 18:	return RAVEN;
-	case 19:	return MONGOOSE;
-	case 20:	return AARDVARK;
-	case 21:	return LIZARD;
-	case 22:	return TORTOISE;
-	case 23:	return HEDGEHOG;
-	case 24:	return CONDOR;
-	default: break;
-    }
+    const u8 first = ANT;
+    const u8 last = Settings::Get().ExtWorldBanWeekOf() ? CONDOR : MONSTERS;
 
-    return UNNAMED;
+    return static_cast<type_t>(Rand::Get(first, last));
 }
 
 Week::type_t Week::MonthRand(void)
 {
-    switch(Rand::Get(1, 24))
-    {
-	case 1:		return PLAGUE;
-	case 2:		return ANT;
-	case 3:		return GRASSHOPPER;
-	case 4:		return DRAGONFLY;
-	case 5:		return SPIDER;
-	case 6:		return BUTTERFLY;
-	case 7:		return BUMBLEBEE;
-	case 8:		return LOCUST;
-	case 9:		return EARTHWORM;
-	case 10:	return HORNET;
-	case 11:	return BEETLE;
-	case 12:	return SQUIRREL;
-	case 13:	return RABBIT;
-	case 14:	return GOPHER;
-	case 15:	return BADGER;
-	case 16:	return EAGLE;
-	case 17:	return WEASEL;
-	case 18:	return RAVEN;
-	case 19:	return MONGOOSE;
-	case 20:	return AARDVARK;
-	case 21:	return LIZARD;
-	case 22:	return TORTOISE;
-	case 23:	return HEDGEHOG;
-	case 24:	return CONDOR;
-	default: break;
-    }
+    const u8 first = (Settings::Get().ExtWorldBanPlagues() ? ANT : PLAGUE);
+    const u8 last = Settings::Get().ExtWorldBanWeekOf() ? CONDOR : MONSTERS;
 
-    return UNNAMED;
-}
-
-Week::type_t Week::Get(u8 index)
-{
-    return index > CONDOR ? UNNAMED : static_cast<type_t>(index);
+    return static_cast<type_t>(Rand::Get(first, last));
 }
