@@ -116,7 +116,7 @@ bool SDL::SubSystem(const u32 system)
 #undef Shell_NotifyIcon
 extern "C" {
 BOOL WINAPI Shell_NotifyIcon(DWORD, PNOTIFYICONDATAW);
-};
+}
 #endif
 
 // wincommon/SDL_sysevents.c
