@@ -138,7 +138,7 @@ static const settings_t settingsFHeroes2[] =
     { Settings::WORLD_ONLY_FIRST_MONSTER_ATTACK,_("world: only the first monster will attack (H2 bug)."), },
     { Settings::WORLD_EYE_EAGLE_AS_SCHOLAR,	_("world: Eagle Eye also works like Scholar in H3."),   },
     { Settings::WORLD_BUY_BOOK_FROM_SHRINES,	_("world: allow buy a spellbook from Shrines"),         },
-    { Settings::WORLD_BAN_WEEKOF,		_("world: ban week of monster"),                        },
+    { Settings::WORLD_BAN_WEEKOF,		_("world: ban for WeekOf/MonthOf Monsters"),            },
     { Settings::WORLD_BAN_PLAGUES,		_("world: ban plagues week"),                           },
     { Settings::WORLD_BAN_MONTHOF_MONSTERS,	_("world: Months Of Monsters do not place creatures on map"),   },
     { Settings::WORLD_ARTIFACT_CRYSTAL_BALL,	_("artifact: Crystal Ball also added Identify Hero and Visions spells"), },
