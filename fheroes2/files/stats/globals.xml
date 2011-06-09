@@ -16,8 +16,8 @@
  <!-- clear fog distance -->
  <view_distance town="4" castle="5" heroes="4" artifact_telescope="1" object_observation_tower="10" object_magi_eyes="9" />
 
- <!-- additional growth -->
- <castle_extra_growth well="2" wel2="8" />
+ <!-- additional growth, month_of in percent (0%, 255%) -->
+ <castle_extra_growth well="2" wel2="8" week_of="5" month_of="100" />
 
  <!-- restore spell point: 0 - 10 -->
  <heroes spell_points_per_day="1" />
