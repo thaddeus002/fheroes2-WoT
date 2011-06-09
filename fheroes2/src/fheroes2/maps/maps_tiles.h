@@ -33,6 +33,7 @@
 
 class Sprite;
 class Heroes;
+class Monster;
 
 namespace Maps
 {
@@ -182,6 +183,7 @@ namespace Maps
 	u16 GetCountMonster(void) const;
 	void SetCountMonster(const u16 count);
 
+	static void PlaceMonsterOnTile(Tiles &, const Monster &, u32);
 	static void UpdateMonsterInfo(Tiles &);
 	static void UpdateRNDArtifactSprite(Tiles &);
 	static void UpdateRNDResourceSprite(Tiles &);

@@ -168,6 +168,7 @@ public:
 	UNIONS_ALLOW_CASTLE_VISITING	= 0x20002000,
 	UNIONS_ALLOW_VIEW_MAPS		= 0x20004000,
 	HEROES_AUTO_MOVE_BATTLE_DST	= 0x20008000,
+	WORLD_BAN_MONTHOF_MONSTERS	= 0x20010000,
 	HEROES_TRANSCRIBING_SCROLLS	= 0x20020000,
 	CASTLE_ALLOW_GUARDIANS		= 0x20080000,
 	CASTLE_ALLOW_BUY_FROM_WELL	= 0x20100000,
@@ -291,6 +292,7 @@ public:
     bool ExtUnionsAllowHeroesMeetings(void) const;
     bool ExtUnionsAllowViewMaps(void) const;
     bool ExtAllowCastleGuardians(void) const;
+    bool ExtWorldBanMonthOfMonsters(void) const;
     bool ExtWorldBanWeekOf(void) const;
     bool ExtWorldBanPlagues(void) const;
     bool ExtCastleAllowFlash(void) const;

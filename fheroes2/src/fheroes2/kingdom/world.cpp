@@ -978,15 +978,14 @@ void World::LoadMaps(const std::string &filename)
     if(-1 == ultimate_index)
     {
 	std::vector<s32> pools;
-	pools.reserve(vec_tiles.size());
+	pools.reserve(vec_tiles.size() / 2);
 
 	for(size_t ii = 0; ii < vec_tiles.size(); ++ii)
 	{
 	    const Maps::Tiles & tile = vec_tiles[ii];
 	    const u16 x = tile.GetIndex() % width;
 	    const u16 y = tile.GetIndex() / width;
-	    if(Maps::Ground::WATER != tile.GetGround() &&
-		tile.GoodForUltimateArtifact() &&
+	    if(tile.GoodForUltimateArtifact() &&
 		x > 5 && x < width - 5 && y > 5 && y < height - 5) pools.push_back(tile.GetIndex());
 	}
 
@@ -1135,12 +1134,41 @@ void World::NewWeek(void)
     // added army for gray castle
     std::vector<Castle *>::const_iterator itc = vec_castles.begin();
     for(; itc != vec_castles.end(); ++itc) if(*itc && Color::GRAY == (*itc)->GetColor()) (*itc)->JoinRNDArmy();
-
-    // TODO:: action for week type: PLAGUE and MONSTERS
 }
 
 void World::NewMonth(void)
 {
+    // skip first month
+    if(1 < week && week_name.GetType() == Week::MONSTERS && !Settings::Get().ExtWorldBanMonthOfMonsters())
+	MonthOfMonstersAction(Monster(week_name.GetMonster()));
+}
+
+void World::MonthOfMonstersAction(const Monster & mons)
+{
+    if(mons.isValid())
+    {
+	std::vector<s32> tiles;
+	tiles.reserve(vec_tiles.size() / 2);
+
+	for(size_t ii = 0; ii < vec_tiles.size(); ++ii)
+	{
+	    const Maps::Tiles & tile = vec_tiles[ii];
+
+	    if(Maps::Ground::WATER != tile.GetGround() &&
+		MP2::OBJ_ZERO == tile.GetObject() &&
+		tile.isPassable(NULL, Direction::UNKNOWN, true))
+		tiles.push_back(ii);
+	}
+
+	const u8 area = 12;
+	const u16 maxc = (width / area) * (height / area);
+	std::random_shuffle(tiles.begin(), tiles.end());
+	if(tiles.size() > maxc) tiles.resize(maxc);
+
+	for(std::vector<s32>::iterator
+	    it = tiles.begin(); it != tiles.end(); ++it)
+		Maps::Tiles::PlaceMonsterOnTile(vec_tiles[*it], mons, GetUniq());
+    }
 }
 
 void World::Reset(void)

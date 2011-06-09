@@ -153,6 +153,7 @@ public:
 protected:
     void UpdateDwellingPopulation(void);
     void UpdateMonsterPopulation(void);
+    void MonthOfMonstersAction(const Monster &);
 
 private:
     World() : Size(0, 0), width(Size::w), height(Size::h) {};

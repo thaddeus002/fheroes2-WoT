@@ -1974,6 +1974,19 @@ void Maps::Tiles::SetCountMonster(const u16 count)
     }
 }
 
+void Maps::Tiles::PlaceMonsterOnTile(Tiles & tile, const Monster & mons, u32 uniq)
+{
+    tile.ResetQuantity();
+    tile.SetObject(MP2::OBJ_MONSTER);
+    tile.SetCountMonster(5 * mons.GetRNDSize(true));
+    tile.SetQuantity3(mons());
+    // join for money
+    tile.SetQuantity4(1);
+
+    // set sprite
+    tile.AddonsPushLevel1(TilesAddon(TilesAddon::UPPER, uniq, 0x33, mons() - 1));
+}
+
 void Maps::Tiles::UpdateMonsterInfo(Tiles & tile)
 {
     Maps::TilesAddon *addon = tile.FindObject(MP2::OBJ_RNDMONSTER);
