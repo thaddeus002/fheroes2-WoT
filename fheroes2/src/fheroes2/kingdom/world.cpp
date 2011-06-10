@@ -1117,7 +1117,8 @@ void World::NewDay(void)
 void World::NewWeek(void)
 {
     // update week type
-    week_name = BeginMonth() ? Week::MonthRand() : Week::WeekRand();
+    week_current = week_next;
+    week_next = LastWeek() ? Week::MonthRand() : Week::WeekRand();
 
     UpdateDwellingPopulation();
 
@@ -1139,8 +1140,8 @@ void World::NewWeek(void)
 void World::NewMonth(void)
 {
     // skip first month
-    if(1 < week && week_name.GetType() == Week::MONSTERS && !Settings::Get().ExtWorldBanMonthOfMonsters())
-	MonthOfMonstersAction(Monster(week_name.GetMonster()));
+    if(1 < week && week_current.GetType() == Week::MONSTERS && !Settings::Get().ExtWorldBanMonthOfMonsters())
+	MonthOfMonstersAction(Monster(week_current.GetMonster()));
 }
 
 void World::MonthOfMonstersAction(const Monster & mons)
@@ -1220,7 +1221,8 @@ void World::Reset(void)
     week = 0;
     month = 0;
 
-    week_name = Week::TORTOISE;
+    week_current = Week::TORTOISE;
+    week_next = Week::WeekRand();
 
     heroes_cond_wins = Heroes::UNKNOWN;
     heroes_cond_loss = Heroes::UNKNOWN;
