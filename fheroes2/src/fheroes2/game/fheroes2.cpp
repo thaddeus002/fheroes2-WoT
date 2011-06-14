@@ -403,6 +403,6 @@ void ShowAGGError(void)
 	display.Blit(zerr, (display.w() - zerr.w()) / 2, (display.h() - zerr.h()) / 2);
 	display.Flip();
 
-	while(le.HandleEvents() && !le.KeyPress());
+	while(le.HandleEvents() && !le.KeyPress() && !le.MouseClickLeft());
     }
 }
