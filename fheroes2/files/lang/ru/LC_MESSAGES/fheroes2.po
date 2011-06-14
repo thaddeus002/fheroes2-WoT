@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: fheroes2\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2011-06-09 19:42+0900\n"
-"PO-Revision-Date: 2011-06-09 19:43+0800\n"
+"PO-Revision-Date: 2011-06-14 10:41+0800\n"
 "Last-Translator: Andrey Afletdinov <afletdinov@mail.dc.baikal.ru>\n"
 "Language-Team:  <ru@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -2602,11 +2602,11 @@ msgstr " Население всех жилищ возросло."
 
 #: ../fheroes2/game/game_startgame.cpp:1580
 msgid "%{monster} population doubles!"
-msgstr ""
+msgstr "Популяция %{monster} увеличилась в двое!"
 
 #: ../fheroes2/game/game_startgame.cpp:1580
 msgid "%{monster} population increase on %{count} percent!"
-msgstr ""
+msgstr "Популяция %{monster} увеличилась на %{count} процентов!"
 
 #: ../fheroes2/game/game_startgame.cpp:1582
 msgid "%{monster} growth +%{count}."
@@ -8186,11 +8186,11 @@ msgstr "Жадность"
 
 #: ../fheroes2/resource/maps_text.cpp:305
 msgid "Green bonus stuff"
-msgstr ""
+msgstr "хабар для Зеленого"
 
 #: ../fheroes2/resource/maps_text.cpp:306
 msgid "Green gets stuff"
-msgstr ""
+msgstr "хабар для Зеленого"
 
 #: ../fheroes2/resource/maps_text.cpp:307
 msgid "Greenroot"
@@ -8206,11 +8206,11 @@ msgstr "Зеленая Лавка"
 
 #: ../fheroes2/resource/maps_text.cpp:310
 msgid "green stuff"
-msgstr ""
+msgstr "хабар для Зеленого"
 
 #: ../fheroes2/resource/maps_text.cpp:311
 msgid "Green stuff"
-msgstr ""
+msgstr "хабар для Зеленого"
 
 #: ../fheroes2/resource/maps_text.cpp:312
 msgid "Greywind"
@@ -8514,7 +8514,7 @@ msgstr ""
 
 #: ../fheroes2/resource/maps_text.cpp:390
 msgid "Lavalor"
-msgstr ""
+msgstr "Лавалор"
 
 #: ../fheroes2/resource/maps_text.cpp:391
 msgid "Like, Stuff And Junk?"
@@ -8602,7 +8602,7 @@ msgstr ""
 
 #: ../fheroes2/resource/maps_text.cpp:413
 msgid "Magic Three"
-msgstr ""
+msgstr "Магическое Дерево"
 
 #: ../fheroes2/resource/maps_text.cpp:414
 msgid "Many dust plumes rise from the floor of this small valley. You see various bands of nomads roaming about, and in the distant, the bright flames of their camp."
@@ -8630,7 +8630,7 @@ msgstr ""
 
 #: ../fheroes2/resource/maps_text.cpp:420
 msgid "Marco"
-msgstr ""
+msgstr "Марко"
 
 #: ../fheroes2/resource/maps_text.cpp:421
 msgid "Marsh Home"
@@ -8642,7 +8642,7 @@ msgstr ""
 
 #: ../fheroes2/resource/maps_text.cpp:424
 msgid "Meramec"
-msgstr ""
+msgstr "Мерамек"
 
 #: ../fheroes2/resource/maps_text.cpp:425
 msgid "Message from Archibald. \" Do not dare to return without my Crown.\""
@@ -8678,7 +8678,7 @@ msgstr "Средние Ворота"
 
 #: ../fheroes2/resource/maps_text.cpp:433
 msgid "Middleton"
-msgstr ""
+msgstr "Мидлтаун"
 
 #: ../fheroes2/resource/maps_text.cpp:434
 msgid "Middletown"
@@ -8694,7 +8694,7 @@ msgstr "Война за Ресурсы"
 
 #: ../fheroes2/resource/maps_text.cpp:437
 msgid "Mirkosov"
-msgstr ""
+msgstr "Миркосов"
 
 #: ../fheroes2/resource/maps_text.cpp:438
 msgid "mirror"
@@ -8778,7 +8778,7 @@ msgstr ""
 
 #: ../fheroes2/resource/maps_text.cpp:458
 msgid "No Fishing!"
-msgstr ""
+msgstr "Здесь рыбы нет!"
 
 #: ../fheroes2/resource/maps_text.cpp:459
 msgid "No gems, crystal, or mercury for red."
@@ -8798,7 +8798,7 @@ msgstr ""
 
 #: ../fheroes2/resource/maps_text.cpp:463
 msgid "Noraston"
-msgstr ""
+msgstr "Норастун"
 
 #: ../fheroes2/resource/maps_text.cpp:464
 msgid "North Road"
@@ -8846,7 +8846,7 @@ msgstr ""
 
 #: ../fheroes2/resource/maps_text.cpp:475
 msgid "Ogrehild"
-msgstr ""
+msgstr "Огрхилд"
 
 #: ../fheroes2/resource/maps_text.cpp:476
 msgid "Olympus"
@@ -8894,7 +8894,7 @@ msgstr ""
 
 #: ../fheroes2/resource/maps_text.cpp:487
 msgid "Orange stuff"
-msgstr ""
+msgstr "хабар для Оранжевого"
 
 #: ../fheroes2/resource/maps_text.cpp:488
 msgid "Orcville"
@@ -9014,7 +9014,7 @@ msgstr ""
 
 #: ../fheroes2/resource/maps_text.cpp:518
 msgid "POSION - DO NOT DRINK"
-msgstr ""
+msgstr "не пейте - это ЯД"
 
 #: ../fheroes2/resource/maps_text.cpp:519
 msgid "Powerful magic lies southwest of here in the Valley of the Kings."
@@ -9062,7 +9062,7 @@ msgstr ""
 
 #: ../fheroes2/resource/maps_text.cpp:531
 msgid "Red stuff"
-msgstr ""
+msgstr "хабар для Красного"
 
 #: ../fheroes2/resource/maps_text.cpp:532
 msgid "Regrettably, you have no castle with which to begin your assault. Fortunately, however, Kraeger's forces are weak here in the south, and you have bribed a rebel necromancer to aid you in the beginning of your conquest."
@@ -9158,7 +9158,7 @@ msgstr ""
 
 #: ../fheroes2/resource/maps_text.cpp:556
 msgid "Sandcaster"
-msgstr ""
+msgstr "Сандкастер"
 
 #: ../fheroes2/resource/maps_text.cpp:558
 msgid "Sands of Time"
@@ -9166,7 +9166,7 @@ msgstr "Пески времени"
 
 #: ../fheroes2/resource/maps_text.cpp:559
 msgid "Sansobar"
-msgstr ""
+msgstr "Сансобр"
 
 #: ../fheroes2/resource/maps_text.cpp:560
 msgid "\"Save the Dwarves\""
@@ -9174,7 +9174,7 @@ msgstr "\"Спасите Гномов\""
 
 #: ../fheroes2/resource/maps_text.cpp:561
 msgid "Scabsdale"
-msgstr ""
+msgstr "Скабсдэл"
 
 #: ../fheroes2/resource/maps_text.cpp:562
 msgid "Scorched Earth"
@@ -9334,7 +9334,7 @@ msgstr ""
 
 #: ../fheroes2/resource/maps_text.cpp:601
 msgid "Spector"
-msgstr ""
+msgstr "Спектор"
 
 #: ../fheroes2/resource/maps_text.cpp:602
 msgid "Spell Casters"
@@ -9366,11 +9366,11 @@ msgstr ""
 
 #: ../fheroes2/resource/maps_text.cpp:609
 msgid "Stromgild"
-msgstr ""
+msgstr "Стромхилд"
 
 #: ../fheroes2/resource/maps_text.cpp:610
 msgid "Stromhild"
-msgstr ""
+msgstr "Стромхилд"
 
 #: ../fheroes2/resource/maps_text.cpp:611
 msgid "Stronghold"
@@ -9378,15 +9378,15 @@ msgstr "Крепость"
 
 #: ../fheroes2/resource/maps_text.cpp:612
 msgid "Stuff for red"
-msgstr ""
+msgstr "хабар для Красного"
 
 #: ../fheroes2/resource/maps_text.cpp:613
 msgid "Stuff for Yellow"
-msgstr ""
+msgstr "хабар для Желтого"
 
 #: ../fheroes2/resource/maps_text.cpp:614
 msgid "Stuff For Yellow"
-msgstr ""
+msgstr "хабар для Желтого"
 
 #: ../fheroes2/resource/maps_text.cpp:615
 msgid "Subbaculcha"
@@ -9414,7 +9414,7 @@ msgstr ""
 
 #: ../fheroes2/resource/maps_text.cpp:621
 msgid "Teleporters"
-msgstr ""
+msgstr "Телепорты"
 
 #: ../fheroes2/resource/maps_text.cpp:622
 msgid "Terra Firma"
@@ -9450,7 +9450,7 @@ msgstr "Говорят что центральный остров таит мн�
 
 #: ../fheroes2/resource/maps_text.cpp:630
 msgid "The Citadel"
-msgstr ""
+msgstr "Цитадель"
 
 #: ../fheroes2/resource/maps_text.cpp:631
 msgid "The cities of the plains."
@@ -9610,7 +9610,7 @@ msgstr ""
 
 #: ../fheroes2/resource/maps_text.cpp:670
 msgid "The land of Heroes II."
-msgstr ""
+msgstr "Земля Героев II."
 
 #: ../fheroes2/resource/maps_text.cpp:671
 msgid "The Lost Castle of the Ancients"
@@ -9794,19 +9794,19 @@ msgstr ""
 
 #: ../fheroes2/resource/maps_text.cpp:716
 msgid "The way of magic"
-msgstr ""
+msgstr "Дорога магии"
 
 #: ../fheroes2/resource/maps_text.cpp:717
 msgid "The way of might"
-msgstr ""
+msgstr "Дорога силы"
 
 #: ../fheroes2/resource/maps_text.cpp:718
 msgid "The way of numbers"
-msgstr ""
+msgstr "Дорога чисел"
 
 #: ../fheroes2/resource/maps_text.cpp:719
 msgid "The western town."
-msgstr ""
+msgstr "Западный город"
 
 #: ../fheroes2/resource/maps_text.cpp:720
 msgid "The winds howl in mourning around the shipwreck."
@@ -9938,27 +9938,27 @@ msgstr "Тундра"
 
 #: ../fheroes2/resource/maps_text.cpp:752
 msgid "Turn back, friend, while you still can!"
-msgstr ""
+msgstr "Возвращайся назад, друг,  пока еще можешь!"
 
 #: ../fheroes2/resource/maps_text.cpp:753
 msgid "Turn Back Now!"
-msgstr ""
+msgstr "Возвращайся назад!"
 
 #: ../fheroes2/resource/maps_text.cpp:754
 msgid "Turn Back Now or all will be LOST!"
-msgstr ""
+msgstr "Возвращайся назад или ПОГИБНЕШЬ!"
 
 #: ../fheroes2/resource/maps_text.cpp:755
 msgid "Turn Back or DIE!"
-msgstr ""
+msgstr "Возвращайся назад или УМРЕШЬ!"
 
 #: ../fheroes2/resource/maps_text.cpp:756
 msgid "Turn Back or else!"
-msgstr ""
+msgstr "Возвращайся назад иначе..."
 
 #: ../fheroes2/resource/maps_text.cpp:757
 msgid "Turn back, you fool."
-msgstr ""
+msgstr "Возвращайся назад глупец."
 
 #: ../fheroes2/resource/maps_text.cpp:758
 msgid "\"Turning Point\""
@@ -9970,11 +9970,11 @@ msgstr ""
 
 #: ../fheroes2/resource/maps_text.cpp:761
 msgid "Uncle Leo"
-msgstr ""
+msgstr "Дядя Ли"
 
 #: ../fheroes2/resource/maps_text.cpp:762
 msgid "Uncle Milty"
-msgstr ""
+msgstr "Дядя Милти"
 
 #: ../fheroes2/resource/maps_text.cpp:763
 msgid "Undead Armies"
@@ -9982,7 +9982,7 @@ msgstr "Армии Мертвых"
 
 #: ../fheroes2/resource/maps_text.cpp:764
 msgid "Unholy Alliance"
-msgstr ""
+msgstr "Нечестный Союз"
 
 #: ../fheroes2/resource/maps_text.cpp:765
 msgid "Unite the Tribes. Don't lose your main hero, the first Descendant."
@@ -10002,7 +10002,7 @@ msgstr "Долина Королей"
 
 #: ../fheroes2/resource/maps_text.cpp:769
 msgid "Vaultius"
-msgstr ""
+msgstr "Ваултиус"
 
 #: ../fheroes2/resource/maps_text.cpp:770
 msgid "Vertigo"
@@ -10018,7 +10018,7 @@ msgstr "Змеиное Гнездо"
 
 #: ../fheroes2/resource/maps_text.cpp:773
 msgid "Vulcania"
-msgstr ""
+msgstr "Вулкания"
 
 #: ../fheroes2/resource/maps_text.cpp:774
 msgid "Warrior Knight"
@@ -10110,7 +10110,7 @@ msgstr ""
 
 #: ../fheroes2/resource/maps_text.cpp:796
 msgid "Westmoor"
-msgstr ""
+msgstr "Восточное Болото"
 
 #: ../fheroes2/resource/maps_text.cpp:797
 msgid "We told you not to drink!"
@@ -10310,7 +10310,7 @@ msgstr ""
 
 #: ../fheroes2/resource/maps_text.cpp:846
 msgid "Yellow stuff"
-msgstr ""
+msgstr "хабар для Желтого"
 
 #: ../fheroes2/resource/maps_text.cpp:847
 msgid "Yellow's Yarbols"
