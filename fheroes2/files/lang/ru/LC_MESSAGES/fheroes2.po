@@ -550,7 +550,7 @@ msgstr "%{name} построить не получится."
 
 #: ../fheroes2/castle/buildinginfo.cpp:628
 msgid "Build %{name}"
-msgstr "%{name} построено."
+msgstr "%{name} - можно построить."
 
 #: ../fheroes2/castle/castle.cpp:449
 msgid "Thieves' Guild"
