@@ -84,10 +84,10 @@ bool ZLib::Compress(std::vector<char> & dst, const std::string & src)
     return src.size() && Compress(dst, src.c_str(), src.size());
 }
 
-bool ZSurface::Load(u16 w, u16 h, u8 b, const u8* p, size_t s, bool a)
+bool ZSurface::Load(u16 w, u16 h, u8 bpp, u16 pitch, u32 rmask, u32 gmask, u32 bmask, u32 amask, const u8* p, size_t s)
 {
     if(!ZLib::UnCompress(buf, reinterpret_cast<const char*>(p), s)) return false;
-    Set(&buf[0], w, h, b, a);
+    Set(SDL_CreateRGBSurfaceFrom(&buf[0], w, h, bpp, pitch, rmask, gmask, bmask, amask));
     return true;
 }
 

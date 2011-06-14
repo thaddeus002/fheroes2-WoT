@@ -46,7 +46,7 @@ class ZSurface : public Surface
 public:
     ZSurface(){}
 
-    bool Load(u16 w, u16 h, u8 b, const u8* p, size_t s, bool a);
+    bool Load(u16 w, u16 h, u8 b, u16 pitch, u32 rmask, u32 gmask, u32 bmask, u32 amask, const u8* p, size_t s);
 
 private:
     std::vector<char> buf;

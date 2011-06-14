@@ -44,6 +44,7 @@ void SetTimidityEnvPath(const Settings &);
 void SetLangEnvPath(const Settings &);
 void ReadConfigFile(Settings &);
 void LoadConfigFiles(Settings &, const std::string &);
+void ShowAGGError(void);
 
 int PrintHelp(const char *basename)
 {
@@ -176,7 +177,9 @@ int main(int argc, char **argv)
 
 #ifdef WITH_ZLIB
     	    ZSurface zicons;
-	    if(zicons.Load(FH2_ICONS_WIDTH, FH2_ICONS_HEIGHT, FH2_ICONS_BPP, fh2_icons_pack, FH2_ICONS_SIZE, true)) Display::SetIcons(zicons);
+	    if(zicons.Load(_ptr_08067830.width, _ptr_08067830.height, _ptr_08067830.bpp, _ptr_08067830.pitch,
+    		_ptr_08067830.rmask, _ptr_08067830.gmask, _ptr_08067830.bmask, _ptr_08067830.amask, _ptr_08067830.zdata, sizeof(_ptr_08067830.zdata)))
+	    Display::SetIcons(zicons);
 #endif
 	    AGG::Cache & cache = AGG::Cache::Get();
 
@@ -184,6 +187,7 @@ int main(int argc, char **argv)
 	    if(! cache.ReadDataDir())
 	    {
 		DEBUG(DBG_GAME, DBG_WARN, "data files not found");
+		ShowAGGError();
 		return EXIT_FAILURE;
 	    }
 
@@ -276,7 +280,8 @@ void LoadZLogo(void)
 	Display & display = Display::Get();
 
     	ZSurface* zlogo = new ZSurface();
-	if(zlogo->Load(SDL_LOGO_WIDTH, SDL_LOGO_HEIGHT, SDL_LOGO_BPP, sdl_logo_data, SDL_LOGO_SIZE, false))
+	if(zlogo->Load(_ptr_0806f690.width, _ptr_0806f690.height, _ptr_0806f690.bpp, _ptr_0806f690.pitch,
+    		_ptr_0806f690.rmask, _ptr_0806f690.gmask, _ptr_0806f690.bmask, _ptr_0806f690.amask, _ptr_0806f690.zdata, sizeof(_ptr_0806f690.zdata)))
 	{
 	    Surface* logo = zlogo;
 
@@ -383,5 +388,21 @@ void LoadConfigFiles(Settings & conf, const std::string & dirname)
     {
 	conf.SetLocalPrefix(dirname.c_str());
 	ReadConfigFile(conf);
+    }
+}
+
+void ShowAGGError(void)
+{
+    ZSurface zerr;
+    if(zerr.Load(_ptr_080721d0.width, _ptr_080721d0.height, _ptr_080721d0.bpp, _ptr_080721d0.pitch,
+    	    _ptr_080721d0.rmask, _ptr_080721d0.gmask, _ptr_080721d0.bmask, _ptr_080721d0.amask, _ptr_080721d0.zdata, sizeof(_ptr_080721d0.zdata)))
+    {
+	Display & display = Display::Get();
+	LocalEvent & le = LocalEvent::Get();
+
+	display.Blit(zerr, (display.w() - zerr.w()) / 2, (display.h() - zerr.h()) / 2);
+	display.Flip();
+
+	while(le.HandleEvents() && !le.KeyPress());
     }
 }
