@@ -30,7 +30,8 @@
 Captain::Captain(const Castle & c) : HeroBase(Skill::Primary::CAPTAIN, c.GetRace()), home(c)
 {
     center = home.GetCenter();
-    if(home.GetLevelMageGuild()) home.GetMageGuild().EducateHero(*this);
+    if(home.GetLevelMageGuild())
+	home.MageGuildEducateHero(*this);
 }
 
 bool Captain::isValid(void) const

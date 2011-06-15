@@ -745,7 +745,7 @@ Dialog::answer_t Castle::OpenDialog(bool readonly, bool fade)
 		if(!heroes.Guest() || heroes.Guest()->HaveSpellBook())
 		    OpenMageGuild();
 		else
-		if(heroes.Guest()->BuySpellBook(&mageguild))
+		if(heroes.Guest()->BuySpellBook(this))
 		    army_redraw = true;
 	}
 	else

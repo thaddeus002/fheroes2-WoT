@@ -32,9 +32,10 @@
 #include "mageguild.h"
 #include "text.h"
 
-RowSpells::RowSpells(const Point & pos, const MageGuild & guild, u8 lvl)
+RowSpells::RowSpells(const Point & pos, const Castle & castle, u8 lvl)
 {
-    bool hide = guild.GetLevel() < lvl;
+    const MageGuild & guild = castle.GetMageGuild();
+    bool hide = castle.GetLevelMageGuild() < lvl;
     const Sprite & roll_show = AGG::GetICN(ICN::TOWNWIND, 0);
     const Sprite & roll_hide = AGG::GetICN(ICN::TOWNWIND, 1);
     const Sprite & roll = (hide ? roll_hide : roll_show);
@@ -54,16 +55,16 @@ RowSpells::RowSpells(const Point & pos, const MageGuild & guild, u8 lvl)
     for(u8 ii = 0; ii < count; ++ii)
 	coords.push_back(Rect(pos.x + coords.size() * (Settings::Get().QVGA() ? 72 : 110) - roll.w() / 2, pos.y, roll.w(), roll.h()));
 
-    if(guild.HaveLibraryCapability())
+    if(castle.HaveLibraryCapability())
     {
-	if(! hide && guild.isLibraryBuild())
+	if(! hide && castle.isLibraryBuild())
 	    coords.push_back(Rect(pos.x + coords.size() * (Settings::Get().QVGA() ? 72 : 110) - roll_show.w() / 2, pos.y, roll_show.w(), roll_show.h()));
 	else
 	    coords.push_back(Rect(pos.x + coords.size() * (Settings::Get().QVGA() ? 72 : 110) - roll_hide.w() / 2, pos.y, roll_hide.w(), roll_hide.h()));
     }
 
     spells.reserve(6);
-    spells = guild.GetSpells(lvl);
+    spells = guild.GetSpells(castle.GetLevelMageGuild(), castle.isLibraryBuild(), lvl);
     spells.resize(coords.size(), Spell::NONE);
 }
 
@@ -167,7 +168,7 @@ void Castle::OpenMageGuild(void)
     dst_pt.y = cur_pt.y + 461;
     text.Blit(dst_pt);
 
-    const u8 level = mageguild.GetLevel();
+    const u8 level = GetLevelMageGuild();
     // sprite
     ICN::icn_t icn = ICN::UNKNOWN;
     switch(race)
@@ -185,11 +186,11 @@ void Castle::OpenMageGuild(void)
     dst_pt.y = cur_pt.y + 290 - sprite.h();
     display.Blit(sprite, dst_pt);
 
-    RowSpells spells5(Point(cur_pt.x + 250, cur_pt.y +  5), mageguild, 5);
-    RowSpells spells4(Point(cur_pt.x + 250, cur_pt.y +  95), mageguild, 4);
-    RowSpells spells3(Point(cur_pt.x + 250, cur_pt.y + 185), mageguild, 3);
-    RowSpells spells2(Point(cur_pt.x + 250, cur_pt.y + 275), mageguild, 2);
-    RowSpells spells1(Point(cur_pt.x + 250, cur_pt.y + 365), mageguild, 1);
+    RowSpells spells5(Point(cur_pt.x + 250, cur_pt.y +  5),  *this, 5);
+    RowSpells spells4(Point(cur_pt.x + 250, cur_pt.y +  95), *this, 4);
+    RowSpells spells3(Point(cur_pt.x + 250, cur_pt.y + 185), *this, 3);
+    RowSpells spells2(Point(cur_pt.x + 250, cur_pt.y + 275), *this, 2);
+    RowSpells spells1(Point(cur_pt.x + 250, cur_pt.y + 365), *this, 1);
 
     spells1.Redraw();
     spells2.Redraw();

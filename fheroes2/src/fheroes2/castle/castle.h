@@ -126,8 +126,12 @@ public:
     Color::color_t GetColor(void) const{ return color; }
     const std::string & GetName(void) const{ return name; }
     u8 GetControl(void) const;
+
     u8 GetLevelMageGuild(void) const;
     const MageGuild & GetMageGuild(void) const;
+    bool HaveLibraryCapability(void) const;
+    bool isLibraryBuild(void) const;
+    void MageGuildEducateHero(HeroBase &) const;
 
     const Army::army_t & GetArmy(void) const;
     Army::army_t & GetArmy(void);

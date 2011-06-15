@@ -698,11 +698,11 @@ screen_t CastleOpenDialog5(Castle & castle, bool readonly)
     display.Blit(background, Rect(0, 0, window_w, window_h), dst_rt);
 
 
-    RowSpells spells1(Point(dst_rt.x + 38, dst_rt.y + 220 - 44), castle.GetMageGuild(), 1);
-    RowSpells spells2(Point(dst_rt.x + 38, dst_rt.y + 220 - 44 * 2), castle.GetMageGuild(), 2);
-    RowSpells spells3(Point(dst_rt.x + 38, dst_rt.y + 220 - 44 * 3), castle.GetMageGuild(), 3);
-    RowSpells spells4(Point(dst_rt.x + 38, dst_rt.y + 220 - 44 * 4), castle.GetMageGuild(), 4);
-    RowSpells spells5(Point(dst_rt.x + 38, dst_rt.y + 220 - 44 * 5), castle.GetMageGuild(), 5);
+    RowSpells spells1(Point(dst_rt.x + 38, dst_rt.y + 220 - 44), castle, 1);
+    RowSpells spells2(Point(dst_rt.x + 38, dst_rt.y + 220 - 44 * 2), castle, 2);
+    RowSpells spells3(Point(dst_rt.x + 38, dst_rt.y + 220 - 44 * 3), castle, 3);
+    RowSpells spells4(Point(dst_rt.x + 38, dst_rt.y + 220 - 44 * 4), castle, 4);
+    RowSpells spells5(Point(dst_rt.x + 38, dst_rt.y + 220 - 44 * 5), castle, 5);
 
     spells1.Redraw();
     spells2.Redraw();
@@ -739,7 +739,7 @@ screen_t CastleOpenDialog5(Castle & castle, bool readonly)
         // exit
         if(le.MouseClickLeft(rectExit) || Game::HotKeyPress(Game::EVENT_DEFAULT_EXIT)) break;
 	else
-	if(need_buy_book && le.MouseClickLeft(book_pos)) { const_cast<Heroes *>(hero)->BuySpellBook(&castle.GetMageGuild()); return SCREEN1; }
+	if(need_buy_book && le.MouseClickLeft(book_pos)) { const_cast<Heroes *>(hero)->BuySpellBook(&castle); return SCREEN1; }
 
         spells1.QueueEventProcessing();
         spells2.QueueEventProcessing();

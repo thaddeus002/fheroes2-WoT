@@ -182,7 +182,7 @@ public:
     void ActionAfterBattle(void);
     void ActionPreBattle(void);
 
-    bool BuySpellBook(const MageGuild*, u8 shrine = 0);
+    bool BuySpellBook(const Castle*, u8 shrine = 0);
 
     const Route::Path & GetPath(void) const{ return path; }
     Route::Path & GetPath(void) { return path; }

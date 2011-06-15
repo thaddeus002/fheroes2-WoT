@@ -183,7 +183,7 @@ bool HeroesTownGate(Heroes & hero, const Castle* castle)
 	hero.FadeIn();
 
 	// educate spells
-	if(! Settings::Get().ExtLearnSpellsWithDay()) castle->GetMageGuild().EducateHero(hero);
+	if(! Settings::Get().ExtLearnSpellsWithDay()) castle->MageGuildEducateHero(hero);
 
 	return true;
     }

@@ -746,7 +746,7 @@ bool Heroes::Recruit(const Castle & castle)
 	    // magic point
 	    if(!Modes(SAVEPOINTS)) SetSpellPoints(GetMaxSpellPoints());
 	    // learn spell
-	    castle.GetMageGuild().EducateHero(*this);
+	    castle.MageGuildEducateHero(*this);
 	}
 	return true;
     }
@@ -1061,7 +1061,7 @@ u32 Heroes::GetExperienceFromLevel(u8 lvl)
 }
 
 /* buy book */
-bool Heroes::BuySpellBook(const MageGuild* mageguild, u8 shrine)
+bool Heroes::BuySpellBook(const Castle* castle, u8 shrine)
 {
     if(HaveSpellBook() || Color::GRAY == color) return false;
 
@@ -1101,7 +1101,7 @@ bool Heroes::BuySpellBook(const MageGuild* mageguild, u8 shrine)
 	kingdom.OddFundsResource(payment);
 
 	// add all spell to book
-	if(mageguild) mageguild->EducateHero(*this);
+	if(castle) castle->MageGuildEducateHero(*this);
 #ifdef WITH_NET
 	FH2LocalClient::SendHeroesBuyMagicBook(*this);
 #endif

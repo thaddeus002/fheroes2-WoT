@@ -39,17 +39,17 @@ u8 Castle::grown_wel2(8);
 u8 Castle::grown_week_of(5);
 u8 Castle::grown_month_of(100);
 
-Castle::Castle() : race(Race::BOMG), building(0), captain(*this), color(Color::GRAY), mageguild(*this), army(&captain)
+Castle::Castle() : race(Race::BOMG), building(0), captain(*this), color(Color::GRAY), army(&captain)
 {
 }
 
 Castle::Castle(s16 cx, s16 cy, const u8 rc) : Position(Point(cx, cy)), race(rc), building(0), captain(*this),
-    color(Color::GRAY), mageguild(*this), army(NULL)
+    color(Color::GRAY), army(NULL)
 {
     std::fill(dwelling, dwelling + CASTLEMAXMONSTER, 0);
     SetModes(ALLOWBUILD);
 
-    mageguild.Builds();
+    mageguild.Builds(race, HaveLibraryCapability());
 }
 
 void Castle::LoadFromMP2(const void *ptr)
@@ -243,7 +243,7 @@ void Castle::LoadFromMP2(const void *ptr)
     if(building & DWELLING_UPGRADE7) dwelling[5]  = Monster(race, DWELLING_UPGRADE7).GetGrown();
 
     // MageGuild
-    mageguild.Builds();
+    mageguild.Builds(race, HaveLibraryCapability());
     EducateHeroes();
 
     // fix upgrade dwelling dependend from race
@@ -261,7 +261,7 @@ void Castle::LoadFromMP2(const void *ptr)
     if(building & BUILD_CAPTAIN)
     {
 	HeroBase::LoadDefaults(Skill::Primary::CAPTAIN, race, captain);
-	if(mageguild.GetLevel()) mageguild.EducateHero(captain);
+	if(GetLevelMageGuild()) MageGuildEducateHero(captain);
 	army.SetCommander(&captain);
     }
     else
@@ -324,15 +324,15 @@ void Castle::EducateHeroes(void)
 
 	if(heroes.FullHouse())
 	{
-	    mageguild.EducateHero(*heroes.Guest());
-	    mageguild.EducateHero(*heroes.Guard());
+	    MageGuildEducateHero(*heroes.Guest());
+	    MageGuildEducateHero(*heroes.Guard());
 	}
 	else
 	if(heroes.IsValid())
-	    mageguild.EducateHero(*heroes.GuestFirst());
+	    MageGuildEducateHero(*heroes.GuestFirst());
 
 	// captain
-	if(captain.isValid()) mageguild.EducateHero(captain);
+	if(captain.isValid()) MageGuildEducateHero(captain);
     }
 }
 
@@ -442,6 +442,21 @@ u8 Castle::GetLevelMageGuild(void) const
 const MageGuild & Castle::GetMageGuild(void) const
 {
     return mageguild;
+}
+
+bool Castle::HaveLibraryCapability(void) const
+{
+    return race == Race::WZRD;
+}
+
+bool Castle::isLibraryBuild(void) const
+{
+    return race == Race::WZRD && isBuild(BUILD_SPEC);
+}
+
+void Castle::MageGuildEducateHero(HeroBase & hero) const 
+{
+    mageguild.EducateHero(hero, GetLevelMageGuild(), isLibraryBuild());
 }
 
 const char* Castle::GetStringBuilding(u32 build, u8 race)
@@ -620,7 +635,7 @@ Heroes* Castle::RecruitHero(Heroes* hero)
     world.GetKingdom(color).OddFundsResource(PaymentConditions::RecruitHero(hero->GetLevel()));
 
     // update spell book
-    if(GetLevelMageGuild()) mageguild.EducateHero(*hero);
+    if(GetLevelMageGuild()) MageGuildEducateHero(*hero);
 
     DEBUG(DBG_GAME , DBG_INFO, name << ", recruit: " << hero->GetName());
 
@@ -1078,13 +1093,14 @@ bool Castle::BuyBuilding(u32 build)
 
 	    case BUILD_CAPTAIN:
 		HeroBase::LoadDefaults(Skill::Primary::CAPTAIN, race, captain);
-		if(mageguild.GetLevel()) mageguild.EducateHero(captain);
+		if(GetLevelMageGuild())
+		    MageGuildEducateHero(captain);
 		army.SetCommander(&captain);
 		break;
 
             case BUILD_SPEC:
         	// build library
-		if(mageguild.HaveLibraryCapability())
+		if(HaveLibraryCapability())
 		    EducateHeroes();
 		break;
 

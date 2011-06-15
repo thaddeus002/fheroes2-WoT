@@ -33,20 +33,15 @@ class HeroBase;
 class MageGuild
 {
     public:
-	MageGuild(const Castle &);
+	MageGuild() {};
 
-	void Builds(void);
-	void EducateHero(HeroBase &) const;
+	void Builds(u8 race, bool libraryCap);
+	void EducateHero(HeroBase &, u8 lvlmage, bool isLibraryBuild) const;
 
-	bool isLibraryBuild(void) const;
-	bool HaveLibraryCapability(void) const;
-	u8   GetLevel(void) const;
-	SpellStorage GetSpells(u8) const;
+	SpellStorage GetSpells(u8 lvlmage, bool islibrary, u8) const;
 
     private:
 	friend class Game::IO;
-
-	const Castle & home;
 
 	SpellStorage general;
 	SpellStorage library;
@@ -55,7 +50,7 @@ class MageGuild
 class RowSpells
 {
 public:
-    RowSpells(const Point &, const MageGuild &, u8);
+    RowSpells(const Point &, const Castle &, u8);
     void Redraw(void);
     bool QueueEventProcessing(void);
 

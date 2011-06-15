@@ -751,7 +751,7 @@ void ActionToCastle(Heroes &hero, const u8 obj, const s32 dst_index)
     {
         DEBUG(DBG_GAME, DBG_INFO, hero.GetName() << " goto castle " << castle->GetName());
         Mixer::Reduce();
-	if(!conf.ExtLearnSpellsWithDay()) castle->GetMageGuild().EducateHero(hero);
+	if(!conf.ExtLearnSpellsWithDay()) castle->MageGuildEducateHero(hero);
     	Game::OpenCastleDialog(castle);
     	Mixer::Enhance();
     }
