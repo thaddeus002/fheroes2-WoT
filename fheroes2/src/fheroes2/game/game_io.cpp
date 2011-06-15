@@ -762,6 +762,8 @@ bool Game::IO::LoadBIN(QueueMessage & msg)
 	}
 	else
 	{
+	    msg.Pop(world.week_current.first);
+	    msg.Pop(world.week_current.second);
 	    msg.Pop(world.week_next.first);
 	    msg.Pop(world.week_next.second);
 	}
