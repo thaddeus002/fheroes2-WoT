@@ -213,7 +213,7 @@ void DrawMonsterStats(const Point & dst, const Army::Troop & troop)
     message.clear();
     String::AddInt(message, mons.GetAttack());
 
-    if(commander)
+    if(commander && mons.GetAttack() != troop.GetAttack())
     {
 	message += " (";
 	String::AddInt(message, troop.GetAttack());
@@ -245,7 +245,7 @@ void DrawMonsterStats(const Point & dst, const Army::Troop & troop)
     message.clear();
     String::AddInt(message, mons.GetDefense());
 
-    if(commander)
+    if(commander && mons.GetDefense() != troop.GetDefense())
     {
 	message += " (";
 	String::AddInt(message, troop.GetDefense());
