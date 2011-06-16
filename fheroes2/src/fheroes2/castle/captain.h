@@ -30,7 +30,7 @@ class Castle;
 class Captain : public HeroBase
 {
   public:
-    Captain(const Castle &);
+    Captain(Castle &);
 
     bool isValid(void) const;
     u8 GetAttack(void) const;
@@ -60,7 +60,7 @@ class Captain : public HeroBase
     void ActionAfterBattle(void);
 
   private:
-    const Castle & home;
+    Castle & home;
 };
 
 #endif

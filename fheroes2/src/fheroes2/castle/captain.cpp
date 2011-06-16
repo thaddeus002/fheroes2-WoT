@@ -27,11 +27,9 @@
 #include "captain.h"
 #include "settings.h"
 
-Captain::Captain(const Castle & c) : HeroBase(Skill::Primary::CAPTAIN, c.GetRace()), home(c)
+Captain::Captain(Castle & cstl) : HeroBase(Skill::Primary::CAPTAIN, cstl.GetRace()), home(cstl)
 {
-    center = home.GetCenter();
-    if(home.GetLevelMageGuild())
-	home.MageGuildEducateHero(*this);
+    SetCenter(home.GetCenter());
 }
 
 bool Captain::isValid(void) const
@@ -142,7 +140,7 @@ const Army::army_t & Captain::GetArmy(void) const
 
 Army::army_t & Captain::GetArmy(void)
 {
-    return const_cast<Army::army_t &>(home.GetArmy());
+    return home.GetArmy();
 }
 
 u16 Captain::GetMaxSpellPoints(void) const

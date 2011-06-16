@@ -39,7 +39,7 @@ u8 Castle::grown_wel2(8);
 u8 Castle::grown_week_of(5);
 u8 Castle::grown_month_of(100);
 
-Castle::Castle() : race(Race::BOMG), building(0), captain(*this), color(Color::GRAY), army(&captain)
+Castle::Castle() : race(Race::BOMG), building(0), captain(*this), color(Color::GRAY), army(NULL)
 {
 }
 
@@ -242,10 +242,6 @@ void Castle::LoadFromMP2(const void *ptr)
     if(building & DWELLING_UPGRADE6) dwelling[5]  = Monster(race, DWELLING_UPGRADE6).GetGrown();
     if(building & DWELLING_UPGRADE7) dwelling[5]  = Monster(race, DWELLING_UPGRADE7).GetGrown();
 
-    // MageGuild
-    mageguild.Builds(race, HaveLibraryCapability());
-    EducateHeroes();
-
     // fix upgrade dwelling dependend from race
     switch(race)
     {
@@ -261,11 +257,15 @@ void Castle::LoadFromMP2(const void *ptr)
     if(building & BUILD_CAPTAIN)
     {
 	HeroBase::LoadDefaults(Skill::Primary::CAPTAIN, race, captain);
-	if(GetLevelMageGuild()) MageGuildEducateHero(captain);
 	army.SetCommander(&captain);
     }
     else
 	army.SetColor(color);
+
+    // MageGuild
+    mageguild.Builds(race, HaveLibraryCapability());
+    // educate heroes and captain
+    EducateHeroes();
 
     // AI troops auto pack
     if(!custom_troops && Game::AI == GetControl())
@@ -1093,15 +1093,13 @@ bool Castle::BuyBuilding(u32 build)
 
 	    case BUILD_CAPTAIN:
 		HeroBase::LoadDefaults(Skill::Primary::CAPTAIN, race, captain);
-		if(GetLevelMageGuild())
-		    MageGuildEducateHero(captain);
+		if(GetLevelMageGuild()) MageGuildEducateHero(captain);
 		army.SetCommander(&captain);
 		break;
 
             case BUILD_SPEC:
         	// build library
-		if(HaveLibraryCapability())
-		    EducateHeroes();
+		if(HaveLibraryCapability()) EducateHeroes();
 		break;
 
 	    case DWELLING_MONSTER1: dwelling[0] = Monster(race, DWELLING_MONSTER1).GetGrown(); break;
