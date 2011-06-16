@@ -45,7 +45,6 @@ class Monster;
 namespace Army
 {
     class Troop;
-    class BattleTroop;
 }
 
 namespace Maps

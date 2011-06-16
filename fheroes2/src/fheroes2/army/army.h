@@ -36,8 +36,6 @@ namespace Battle2 { class Stats; class Armies; }
 
 namespace Army
 {
-    class BattleTroop;
-
     enum format_t
     {
 	FORMAT_GROUPED = 0,
