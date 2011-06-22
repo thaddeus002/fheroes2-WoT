@@ -1,3 +1,18 @@
+Jun, 26, 2011 (2390 rev.)
+
+Update: translation: (ru, sv, es, hu, pl)
+Fixed: game: Army::GetSurrenderCost
+Fixed: game: days period for lost hero
+Fixed: game: percents string
+Fixed: game: scroll spells for meeting heroes
+Fixed: game: AI shipmaster and pickup resource
+Added: game: click mouse and stop hero
+Added: world: new growth rules
+Added: option: BanWeekOf
+Added: option: BanPlagues
+Added: option: MonthOfMonsters
+Added: option: NewVersionWeekOfMonsters
+
 May, 26, 2011 (2356 rev.)
 
 Added: game: BattleOnly: add sec. skill modify
