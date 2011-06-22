@@ -201,6 +201,7 @@ public:
     Dialog::answer_t DialogBuyCastle(bool fixed = true) const;
 
 private:
+    u8   GetDwellingGrowth(u32 dw);
     void EducateHeroes(void);
     void RedrawResourcePanel(const Point &);
     u32  OpenTown(void);

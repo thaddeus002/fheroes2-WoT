@@ -157,6 +157,8 @@ void Dialog::ExtSettings(bool readonly)
     states.push_back(Settings::WORLD_EYE_EAGLE_AS_SCHOLAR);
     states.push_back(Settings::WORLD_BUY_BOOK_FROM_SHRINES);
     states.push_back(Settings::WORLD_BAN_WEEKOF);
+    if(! conf.ExtWorldBanWeekOf())
+	states.push_back(Settings::WORLD_NEW_VERSION_WEEKOF);
     states.push_back(Settings::WORLD_BAN_PLAGUES);
     states.push_back(Settings::WORLD_BAN_MONTHOF_MONSTERS);
     states.push_back(Settings::HEROES_FORCE_RACE_FROM_TYPE);

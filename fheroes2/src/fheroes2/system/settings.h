@@ -172,6 +172,7 @@ public:
 	HEROES_AUTO_MOVE_BATTLE_DST	= 0x20008000,
 	WORLD_BAN_MONTHOF_MONSTERS	= 0x20010000,
 	HEROES_TRANSCRIBING_SCROLLS	= 0x20020000,
+	WORLD_NEW_VERSION_WEEKOF	= 0x20040000,
 	CASTLE_ALLOW_GUARDIANS		= 0x20080000,
 	CASTLE_ALLOW_BUY_FROM_WELL	= 0x20100000,
 	HEROES_LEARN_SPELLS_WITH_DAY	= 0x20200000,
@@ -296,6 +297,7 @@ public:
     bool ExtAllowCastleGuardians(void) const;
     bool ExtWorldBanMonthOfMonsters(void) const;
     bool ExtWorldBanWeekOf(void) const;
+    bool ExtWorldNewVersionWeekOf(void) const;
     bool ExtWorldBanPlagues(void) const;
     bool ExtCastleAllowFlash(void) const;
     bool ExtBattleShowDamage(void) const;

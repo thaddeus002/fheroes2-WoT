@@ -139,6 +139,7 @@ static const settings_t settingsFHeroes2[] =
     { Settings::WORLD_EYE_EAGLE_AS_SCHOLAR,	_("world: Eagle Eye also works like Scholar in H3."),   },
     { Settings::WORLD_BUY_BOOK_FROM_SHRINES,	_("world: allow buy a spellbook from Shrines"),         },
     { Settings::WORLD_BAN_WEEKOF,		_("world: ban for WeekOf/MonthOf Monsters"),            },
+    { Settings::WORLD_NEW_VERSION_WEEKOF,	_("world: new version WeekOf (+growth)"),       	},
     { Settings::WORLD_BAN_PLAGUES,		_("world: ban plagues week"),                           },
     { Settings::WORLD_BAN_MONTHOF_MONSTERS,	_("world: Months Of Monsters do not place creatures on map"),   },
     { Settings::WORLD_ARTIFACT_CRYSTAL_BALL,	_("artifact: Crystal Ball also added Identify Hero and Visions spells"), },
@@ -1436,6 +1437,11 @@ bool Settings::ExtDragDropScroll(void) const
 bool Settings::ExtLowResolution(void) const
 {
     return ExtModes(POCKETPC_LOW_RESOLUTION);
+}
+
+bool Settings::ExtWorldNewVersionWeekOf(void) const
+{
+    return ExtModes(WORLD_NEW_VERSION_WEEKOF);
 }
 
 bool Settings::ExtWorldBanWeekOf(void) const
