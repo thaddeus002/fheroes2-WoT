@@ -256,6 +256,9 @@ Game::menu_t Game::StartGame(void)
 	DELAY(10);
     }
 
+    // reset focus
+    global_focus.Reset();
+
     display.Fill(0, 0, 0);
 
     return m == ENDTURN ? QUITGAME : m;
