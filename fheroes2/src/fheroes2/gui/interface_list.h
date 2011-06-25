@@ -99,6 +99,11 @@ namespace Interface
 	    splitter.SetSprite(sp);
 	}
 
+	Splitter & GetSplitter(void)
+	{
+	    return splitter;
+	}
+
 	void SetAreaMaxItems(const u8 max)
 	{
 	    maxItems = max;

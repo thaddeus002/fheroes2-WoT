@@ -191,6 +191,16 @@ void Interface::CastleIcons::ActionListPressRight(CASTLE & item)
     }
 }
 
+void Interface::CastleIcons::SetShow(bool f)
+{
+    IconsBar::SetShow(f);
+
+    if(f)
+	GetSplitter().Show();
+    else
+	GetSplitter().Hide();
+}
+
 void Interface::CastleIcons::SetPos(s16 px, s16 py)
 {
     const ICN::icn_t icnscroll = Settings::Get().EvilInterface() ? ICN::SCROLLE : ICN::SCROLL;
@@ -270,6 +280,16 @@ void Interface::HeroesIcons::ActionListPressRight(HEROES & item)
 	Cursor::Get().Hide();
 	Dialog::QuickInfo(*item);
     }
+}
+
+void Interface::HeroesIcons::SetShow(bool f)
+{
+    IconsBar::SetShow(f);
+
+    if(f)
+	GetSplitter().Show();
+    else
+	GetSplitter().Hide();
 }
 
 void Interface::HeroesIcons::SetPos(s16 px, s16 py)

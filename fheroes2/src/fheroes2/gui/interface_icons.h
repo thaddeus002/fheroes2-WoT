@@ -56,6 +56,7 @@ namespace Interface
 	HeroesIcons(const u8 & count, const Surface & sf) : IconsBar(count, sf) {};
 
 	void SetPos(s16, s16);
+	void SetShow(bool);
 
     protected:
 	void ActionCurrentUp(void);
@@ -73,6 +74,7 @@ namespace Interface
 	CastleIcons(const u8 & count, const Surface & sf) : IconsBar(count, sf) {};
 
 	void SetPos(s16, s16);
+	void SetShow(bool);
 
     protected:
 	void ActionCurrentUp(void);
