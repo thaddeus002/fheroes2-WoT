@@ -109,13 +109,12 @@ void SpriteCursor::Show(const Point &pt)
 
 void SpriteCursor::Show(s16 ax, s16 ay)
 {
-    if(visible) return;
-
-    Save(ax, ay);
-
-    if(sprite) Display::Get().Blit(*sprite, ax, ay);
-    
-    visible = true;
+    if(! visible)
+    {
+	Save(ax, ay);
+	if(sprite) Display::Get().Blit(*sprite, ax, ay);
+	visible = true;
+    }
 }
 
 bool SpriteCursor::isVisible(void) const
