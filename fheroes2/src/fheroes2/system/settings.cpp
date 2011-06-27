@@ -140,7 +140,7 @@ static const settings_t settingsFHeroes2[] =
     { Settings::WORLD_BUY_BOOK_FROM_SHRINES,	_("world: allow buy a spellbook from Shrines"),         },
     { Settings::WORLD_BAN_WEEKOF,		_("world: ban for WeekOf/MonthOf Monsters"),            },
     { Settings::WORLD_NEW_VERSION_WEEKOF,	_("world: new version WeekOf (+growth)"),       	},
-    { Settings::WORLD_BAN_PLAGUES,		_("world: ban plagues week"),                           },
+    { Settings::WORLD_BAN_PLAGUES,		_("world: ban plagues months"),                         },
     { Settings::WORLD_BAN_MONTHOF_MONSTERS,	_("world: Months Of Monsters do not place creatures on map"),   },
     { Settings::WORLD_ARTIFACT_CRYSTAL_BALL,	_("artifact: Crystal Ball also added Identify Hero and Visions spells"), },
     { Settings::CASTLE_ALLOW_BUY_FROM_WELL,	_("castle: allow buy from well"),			},
