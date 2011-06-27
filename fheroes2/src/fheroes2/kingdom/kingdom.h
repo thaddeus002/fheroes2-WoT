@@ -31,14 +31,28 @@
 #include "mp2.h"
 #include "pairs.h"
 #include "game_io.h"
+#include "heroes.h"
+#include "castle.h"
 #include "heroes_recruits.h"
 
 class Castle;
 class Heroes;
+struct AllHeroes;
+struct VecHeroes;
+struct AllCastles;
+struct VecCastles;
 
 struct LastLoseHero : std::pair<Heroes*, u16>
 {
     LastLoseHero() : std::pair<Heroes*, u16>(NULL, 0) {}
+};
+
+struct KingdomCastles : public VecCastles
+{
+};
+
+struct KingdomHeroes : public VecHeroes
+{
 };
 
 class Kingdom
@@ -53,6 +67,7 @@ public:
     Kingdom();
 
     void Init(Color::color_t);
+    void clear(void);
     void SetModes(flags_t);
     void ResetModes(flags_t);
     bool Modes(flags_t) const;
@@ -97,13 +112,13 @@ public:
 
     Recruits & GetRecruits(void);
 
-    const std::vector<Heroes *> & GetHeroes(void) const{ return heroes; }
-    const std::vector<Castle *> & GetCastles(void) const{ return castles; }
+    const KingdomHeroes & GetHeroes(void) const{ return heroes; }
+    const KingdomCastles & GetCastles(void) const{ return castles; }
 
-    std::vector<Heroes *> & GetHeroes(void) { return heroes; }
-    std::vector<Castle *> & GetCastles(void) { return castles; }
+    KingdomHeroes & GetHeroes(void) { return heroes; }
+    KingdomCastles & GetCastles(void) { return castles; }
 
-    void AddHeroes(const Heroes *hero);
+    void AddHeroes(Heroes *);
     void RemoveHeroes(const Heroes *hero);
     void ApplyPlayWithStartingHero(void);
     void HeroesActionNewPosition(void);
@@ -152,8 +167,8 @@ private:
     u16 flags;
     u8  lost_town_days;
 
-    std::vector<Castle *> castles;
-    std::vector<Heroes *> heroes;
+    KingdomCastles castles;
+    KingdomHeroes heroes;
 
     Recruits recruits;
     LastLoseHero lost_hero;
@@ -173,6 +188,8 @@ public:
     Kingdoms();
 
     void Init(void);
+    void clear(void);
+
     void ApplyPlayWithStartingHero(void);
 
     void NewDay(void);
@@ -185,6 +202,9 @@ public:
     u8 GetLossColors(void) const;
     u8 GetNotLossColors(void) const;
     u8 FindArtOrGoldWins(void) const;
+
+    void AddHeroes(const AllHeroes &);
+    void AddCastles(const AllCastles &);
 
     u8 size(void) const;
 

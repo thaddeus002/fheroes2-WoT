@@ -137,7 +137,6 @@ public:
     Army::army_t & GetArmy(void);
     const Army::army_t & GetActualArmy(void) const;
     Army::army_t & GetActualArmy(void);
-    void JoinRNDArmy(void);
     u16 GetDwellingLivedCount(u32) const;
     u32 GetActualDwelling(u32) const;
 
@@ -210,6 +209,7 @@ private:
     void OpenWell(void);
     void OpenMageGuild(void);
     void WellRedrawInfoArea(const Point & cur_pt);
+    void JoinRNDArmy(void);
 
 private:
     friend class Game::IO;
@@ -254,5 +254,25 @@ namespace CastleDialog
     void RedrawAnimationBuilding(const Castle &, const Point &, const CacheBuildings &, u32 build);
     void RedrawBuildingSpriteToArea(const Sprite &, s16, s16, const Rect &);
 }
+
+struct VecCastles : public std::vector<Castle *>
+{
+    Castle* Get(s32) const;
+    Castle* Get(const Point &) const;
+    Castle* GetFirstCastle(void) const;
+
+    void ChangeColors(Color::color_t, Color::color_t);
+};
+
+struct AllCastles : public VecCastles
+{
+    AllCastles();
+    ~AllCastles();
+
+    void Init(void);
+    void clear(void);
+
+    void Scoute(u8) const;
+};
 
 #endif

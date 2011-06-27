@@ -274,9 +274,9 @@ void Game::OpenCastleDialog(Castle *castle)
     //Cursor & cursor = Cursor::Get();
     Kingdom & myKingdom = world.GetMyKingdom();
     const Settings & conf = Settings::Get();
-    std::vector<Castle *> & myCastles = myKingdom.GetCastles();
+    const KingdomCastles & myCastles = myKingdom.GetCastles();
     Display & display = Display::Get();
-    std::vector<Castle *>::const_iterator it = std::find(myCastles.begin(), myCastles.end(), castle);
+    KingdomCastles::const_iterator it = std::find(myCastles.begin(), myCastles.end(), castle);
     Game::Focus & globalfocus = Game::Focus::Get();
     Interface::StatusWindow::ResetTimer();
     bool need_fade = conf.ExtUseFade() && 640 == display.w() && 480 == display.h();
@@ -353,9 +353,9 @@ void Game::OpenHeroesDialog(Heroes *hero)
     //Cursor & cursor = Cursor::Get();
     Kingdom & myKingdom = world.GetMyKingdom();
     const Settings & conf = Settings::Get();
-    std::vector<Heroes *> & myHeroes = myKingdom.GetHeroes();
+    const KingdomHeroes & myHeroes = myKingdom.GetHeroes();
     Display & display = Display::Get();
-    std::vector<Heroes *>::const_iterator it = std::find(myHeroes.begin(), myHeroes.end(), hero);
+    KingdomHeroes::const_iterator it = std::find(myHeroes.begin(), myHeroes.end(), hero);
     Game::Focus & globalfocus = Game::Focus::Get();
     Interface::StatusWindow::ResetTimer();
     Interface::Basic & I = Interface::Basic::Get();
@@ -693,8 +693,8 @@ Game::menu_t Game::HumanTurn(bool isload)
     Interface::Basic & I = Interface::Basic::Get();
 
     Kingdom & myKingdom = world.GetMyKingdom();
-    const std::vector<Castle *> & myCastles = myKingdom.GetCastles();
-    const std::vector<Heroes *> & myHeroes = myKingdom.GetHeroes();
+    const KingdomCastles & myCastles = myKingdom.GetCastles();
+    const KingdomHeroes & myHeroes = myKingdom.GetHeroes();
 
     GameOver::Result & gameResult = GameOver::Result::Get();
 
@@ -1261,7 +1261,7 @@ void Game::EventNextHero(void)
     Game::Focus & global_focus = Focus::Get();
 
     const Kingdom & myKingdom = world.GetMyKingdom();
-    const std::vector<Heroes *> & myHeroes = myKingdom.GetHeroes();
+    const KingdomHeroes & myHeroes = myKingdom.GetHeroes();
 
     if(myHeroes.empty()) return;
 
@@ -1271,7 +1271,8 @@ void Game::EventNextHero(void)
     }
     else
     {
-	std::vector<Heroes *>::const_iterator it = std::find(myHeroes.begin(), myHeroes.end(), &global_focus.GetHeroes());
+	KingdomHeroes::const_iterator it = std::find(myHeroes.begin(), myHeroes.end(),
+								&global_focus.GetHeroes());
 	++it;
 	if(it == myHeroes.end()) it = myHeroes.begin();
 	global_focus.Set(*it);
@@ -1412,7 +1413,7 @@ void Game::EventExit(menu_t & ret)
 void Game::EventNextTown(void)
 {
     Kingdom & myKingdom = world.GetMyKingdom();
-    std::vector<Castle *> & myCastles = myKingdom.GetCastles();
+    KingdomCastles & myCastles = myKingdom.GetCastles();
 
     if(myCastles.size())
     {
@@ -1422,7 +1423,8 @@ void Game::EventNextTown(void)
 	    global_focus.Reset(Game::Focus::CASTLE);
 	else
 	{
-	    std::vector<Castle *>::const_iterator it = std::find(myCastles.begin(), myCastles.end(), &global_focus.GetCastle());
+	    KingdomCastles::const_iterator it = std::find(myCastles.begin(), myCastles.end(),
+						    &global_focus.GetCastle());
     	    ++it;
     	    if(it == myCastles.end()) it = myCastles.begin();
 	    global_focus.Set(*it);

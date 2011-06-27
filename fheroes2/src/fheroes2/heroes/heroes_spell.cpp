@@ -338,8 +338,8 @@ bool ActionSpellDimensionDoor(Heroes & hero)
 bool ActionSpellTownGate(Heroes & hero)
 {
     const Kingdom & kingdom = world.GetKingdom(hero.GetColor());
-    const std::vector<Castle *> & castles = kingdom.GetCastles();
-    std::vector<Castle*>::const_iterator it;
+    const KingdomCastles & castles = kingdom.GetCastles();
+    KingdomCastles::const_iterator it;
 
     const Castle* castle = NULL;
     const s32 center = hero.GetIndex();
@@ -387,7 +387,7 @@ bool ActionSpellTownPortal(Heroes & hero)
     cursor.Hide();
     cursor.SetThemes(cursor.POINTER);
 
-    for(std::vector<Castle *>::const_iterator it = kingdom.GetCastles().begin(); it != kingdom.GetCastles().end(); ++it)
+    for(KingdomCastles::const_iterator it = kingdom.GetCastles().begin(); it != kingdom.GetCastles().end(); ++it)
 	if(*it && !(*it)->GetHeroes().Guest()) castles.push_back((**it).GetIndex());
 
     if(castles.empty())

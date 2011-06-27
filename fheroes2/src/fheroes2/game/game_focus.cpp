@@ -103,9 +103,9 @@ void Game::Focus::Reset(const focus_t priority)
     {
 	case FIRSTHERO:
 	{
-	    const std::vector<Heroes *> & heroes = myKingdom.GetHeroes();
+	    const KingdomHeroes & heroes = myKingdom.GetHeroes();
 	    // skip sleeping
-	    std::vector<Heroes *>::const_iterator it =
+	    KingdomHeroes::const_iterator it =
 		std::find_if(heroes.begin(), heroes.end(),
                 std::not1(std::bind2nd(std::mem_fun(&Heroes::Modes), Heroes::SLEEPER)));
 

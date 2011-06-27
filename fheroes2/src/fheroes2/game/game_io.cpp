@@ -267,7 +267,7 @@ bool Game::IO::SaveBIN(QueueMessage & msg)
     msg.Push(static_cast<u32>(world.vec_heroes.size()));
     for(u32 ii = 0; ii < world.vec_heroes.size(); ++ii)
     {
-	if(NULL == world.vec_heroes[ii]){ DEBUG(DBG_GAME, DBG_WARN, "heroes: " << "is NULL"); return false; }
+	//if(NULL == world.vec_heroes[ii]){ DEBUG(DBG_GAME, DBG_WARN, "heroes: " << "is NULL"); return false; }
 	PackHeroes(msg, *world.vec_heroes[ii]);
     }
 
@@ -276,7 +276,7 @@ bool Game::IO::SaveBIN(QueueMessage & msg)
     msg.Push(static_cast<u32>(world.vec_castles.size()));
     for(u32 ii = 0; ii < world.vec_castles.size(); ++ii)
     {
-	if(NULL == world.vec_castles[ii]){ DEBUG(DBG_GAME, DBG_WARN, "castles: " << "is NULL"); return false; }
+	//if(NULL == world.vec_castles[ii]){ DEBUG(DBG_GAME, DBG_WARN, "castles: " << "is NULL"); return false; }
 	PackCastle(msg, *world.vec_castles[ii]);
     }
 
@@ -790,19 +790,25 @@ bool Game::IO::LoadBIN(QueueMessage & msg)
     msg.Pop(byte16);
     if(byte16 != 0xFF07) DEBUG(DBG_GAME, DBG_WARN, "0xFF07");
     msg.Pop(byte32);
-    world.vec_heroes.reserve(byte32);
+    world.vec_heroes.Init();
+
+    if(world.vec_heroes.size() < byte32)
+    {
+	VERBOSE("heroes: " << "incorrect size: " << byte32);
+	return false;
+    }
+    else
     for(u32 ii = 0; ii < byte32; ++ii)
     {
-	Heroes* hero = new Heroes();
-	UnpackHeroes(msg, *hero, format);
-	world.vec_heroes.push_back(hero);
+	UnpackHeroes(msg, *world.vec_heroes[ii], format);
     }
 
     // castles
     msg.Pop(byte16);
     if(byte16 != 0xFF08) DEBUG(DBG_GAME, DBG_WARN, "0xFF08");
     msg.Pop(byte32);
-    world.vec_castles.reserve(byte32);
+    world.vec_castles.Init();
+
     for(u32 ii = 0; ii < byte32; ++ii)
     {
 	Castle* castle = new Castle();
@@ -949,15 +955,11 @@ bool Game::IO::LoadBIN(QueueMessage & msg)
 
     msg.Pop(byte16);
 
-    // sort castles to kingdoms
-    for(std::vector<Castle *>::const_iterator
-	itc = world.vec_castles.begin(); itc != world.vec_castles.end(); ++itc)
-        if(*itc) world.GetKingdom((*itc)->GetColor()).AddCastle(*itc);
+    // add castles to kingdoms
+    world.vec_kingdoms.AddCastles(world.vec_castles);
 
-    // sort heroes to kingdoms
-    for(std::vector<Heroes *>::const_iterator
-	ith = world.vec_heroes.begin(); ith != world.vec_heroes.end(); ++ith)
-        if(*ith) world.GetKingdom((*ith)->GetColor()).AddHeroes(*ith);
+    // add heroes to kingdoms
+    world.vec_kingdoms.AddHeroes(world.vec_heroes);
 
     // regenerate puzzle surface
     Interface::GameArea::GenerateUltimateArtifactAreaSurface(world.ultimate_index, world.puzzle_surface);

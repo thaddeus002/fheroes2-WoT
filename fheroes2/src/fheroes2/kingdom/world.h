@@ -28,7 +28,6 @@
 #include "gamedefs.h"
 #include "maps.h"
 #include "maps_tiles.h"
-#include "heroes.h"
 #include "week.h"
 #include "color.h"
 #include "kingdom.h"
@@ -165,10 +164,10 @@ private:
     friend class Game::IO;
 
     MapsTiles				vec_tiles;
+    AllCastles                          vec_castles;
+    AllHeroes				vec_heroes;
     Kingdoms				vec_kingdoms;
     Rumors				vec_rumors;
-    std::vector<Castle *>               vec_castles;
-    std::vector<Heroes *>               vec_heroes;
     EventsDate                          vec_eventsday;
     EventsMaps                          vec_eventsmap;
     Riddles				vec_riddles;

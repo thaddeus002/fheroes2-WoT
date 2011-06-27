@@ -114,8 +114,9 @@ void WorldStoreObjects(u8 color, IndexObjectMap & store)
 
 void AI::KingdomTurn(Kingdom & kingdom)
 {
-    std::vector<Castle *> & castles = kingdom.GetCastles();
-    std::vector<Heroes *> & heroes = kingdom.GetHeroes();
+    KingdomHeroes & heroes = kingdom.GetHeroes();
+    KingdomCastles & castles = kingdom.GetCastles();
+
     const Color::color_t & color = kingdom.GetColor();
 
     if(kingdom.isLoss() || color == Color::GRAY)
@@ -140,7 +141,7 @@ void AI::KingdomTurn(Kingdom & kingdom)
     // set capital
     if(NULL == ai.capital && castles.size())
     {
-	std::vector<Castle *>::iterator it = std::find_if(castles.begin(), castles.end(), Castle::PredicateIsCastle);
+	KingdomCastles::iterator it = std::find_if(castles.begin(), castles.end(), Castle::PredicateIsCastle);
 
 	if(castles.end() != it)
 	{
@@ -209,7 +210,7 @@ void AI::KingdomTurn(Kingdom & kingdom)
 	if(0 == hunters &&
 	    heroes.size())
 	{
-	    std::vector<Heroes*>::iterator it = std::find_if(heroes.begin(), heroes.end(),
+	    KingdomHeroes::iterator it = std::find_if(heroes.begin(), heroes.end(),
 				std::not1(std::bind2nd(std::mem_fun(&Heroes::Modes), Heroes::PATROL)));
 
 	    if(it != heroes.end() &&
@@ -220,7 +221,7 @@ void AI::KingdomTurn(Kingdom & kingdom)
 	// each month
 	if(world.BeginMonth() && 1 < world.CountDay())
 	{
-	    std::vector<Heroes*>::iterator it = 
+	    KingdomHeroes::iterator it = 
 		    std::find_if(heroes.begin(), heroes.end(),
 			std::bind2nd(std::mem_fun(&Heroes::Modes), Heroes::HUNTER));
 
@@ -238,7 +239,7 @@ void AI::KingdomTurn(Kingdom & kingdom)
 	if(heroes.end() != std::find_if(heroes.begin(), heroes.end(),
 		std::not1(std::bind2nd(std::mem_fun(&Heroes::Modes), Heroes::SCOUTER|Heroes::HUNTER))))
 	{
-	    std::vector<Heroes*>::iterator ith, first = heroes.end();
+	    KingdomHeroes::iterator ith, first = heroes.end();
 
 	    while(heroes.end() != (ith = std::find_if(heroes.begin(), heroes.end(),
 				std::not1(std::bind2nd(std::mem_fun(&Heroes::Modes),

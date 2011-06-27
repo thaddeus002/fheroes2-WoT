@@ -214,7 +214,7 @@ public:
     u8   GetSpriteIndex(void) const{ return sprite_index; }
     void FadeOut(void) const;
     void FadeIn(void) const;
-    void Scoute(void);
+    void Scoute(void) const;
     u8   GetScoute(void) const;
     u8   CanScouteTile(s32) const;
     u16  GetVisionsDistance(void) const;
@@ -277,6 +277,30 @@ private:
     u8 patrol_square;
 
     std::list<IndexObject> visit_object;
+};
+
+struct VecHeroes : public std::vector<Heroes *>
+{
+    Heroes* Get(Heroes::heroes_t) const;
+    Heroes* Get(s32) const;
+};
+
+struct AllHeroes : public VecHeroes
+{
+    AllHeroes();
+    ~AllHeroes();
+
+    void Init(void);
+    void clear(void);
+
+    void Scoute(u8) const;
+
+    Heroes* GetGuest(const Castle &) const;
+    Heroes* GetGuard(const Castle &) const;
+    Heroes* GetFreeman(u8) const;
+    Heroes* FromJail(s32) const;
+
+    bool HaveTwoFreemans(void) const;
 };
 
 #endif

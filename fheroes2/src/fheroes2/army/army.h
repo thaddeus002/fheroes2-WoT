@@ -61,12 +61,12 @@ namespace Army
     // 0: fight, 1: free join, 2: join with gold, 3: flee
     u8 GetJoinSolution(const Heroes &, const Maps::Tiles &, u32 &, s32 &);
 
+    typedef std::vector<Troop> Troops;
+
     class army_t
     {
 	public:
 	    army_t(HeroBase* s = NULL);
-	    army_t(const army_t &);
-	    army_t & operator= (const army_t &);
 
 	    void	FromGuardian(const Maps::Tiles &);
 	    void	UpgradeMonsters(const Monster &);
@@ -130,26 +130,29 @@ namespace Army
 	    void	Dump(const char* prefix = NULL) const;
 
 	    const HeroBase* GetCommander(void) const;
-	    HeroBase* GetCommander(void);
-	    void        SetCommander(HeroBase*);
+	    HeroBase*       GetCommander(void);
+	    void            SetCommander(HeroBase*);
 
 	    void        SetCombatFormat(format_t);
 	    u8          GetCombatFormat(void) const;
 
-	std::vector<Troop> Optimize(void) const;
+	    Troops	Optimize(void) const;
 
 	protected:
 	    friend class Troop;
 	    friend class Battle2::Armies;
 
+	    army_t(const army_t &);
+	    army_t & operator= (const army_t &);
+
 	    void	Import(army_t &);
-	    void	Import(const std::vector<Troop> &);
+	    void	Import(const Troops &);
 	    s8		GetTroopIndex(const Troop &) const;
 
-	    std::vector<Troop> army;
-	    HeroBase*    commander;
-	    u8 combat_format;
-	    Color::color_t color;
+	    Troops		army;
+	    HeroBase*		commander;
+	    u8			combat_format;
+	    Color::color_t	color;
     };
 }
 

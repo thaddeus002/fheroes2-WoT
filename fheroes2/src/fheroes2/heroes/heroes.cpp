@@ -22,6 +22,7 @@
 
 #include <cmath>
 #include <algorithm>
+#include <functional>
 #include "artifact.h"
 #include "world.h"
 #include "castle.h"
@@ -1225,7 +1226,7 @@ void Heroes::LearnSkill(const Skill::Secondary & skill)
 	secondary_skills.AddSkill(skill);
 }
 
-void Heroes::Scoute(void)
+void Heroes::Scoute(void) const
 {
     Maps::ClearFog(GetIndex(), GetScoute(), color);
 }
@@ -1686,4 +1687,216 @@ void Heroes::Dump(void) const
     }
 
     VERBOSE("");
+}
+
+struct InCastleAndGuardian : public std::binary_function <const Castle*, Heroes*, bool>
+{
+    bool operator() (const Castle* castle, Heroes* hero) const
+    {
+        const Point & cpt = castle->GetCenter();
+        const Point & hpt = hero->GetCenter();
+        return cpt.x == hpt.x && cpt.y == hpt.y + 1 && hero->Modes(Heroes::GUARDIAN);
+    }
+};
+
+struct InCastleNotGuardian : public std::binary_function <const Castle*, Heroes*, bool>
+{
+    bool operator() (const Castle* castle, Heroes* hero) const
+    {
+        return castle->GetCenter() == hero->GetCenter() && !hero->Modes(Heroes::GUARDIAN);
+    }
+};
+
+struct InJailMode : public std::binary_function <s32, Heroes*, bool>
+{
+    bool operator() (s32 index, Heroes* hero) const
+    {
+	return hero->Modes(Heroes::JAIL) && index == hero->GetIndex();
+    }
+};
+
+AllHeroes::AllHeroes()
+{
+    reserve(HEROESMAXCOUNT + 2);
+}
+
+AllHeroes::~AllHeroes()
+{
+    AllHeroes::clear();
+}
+
+void AllHeroes::Init(void)
+{
+    if(size())
+	AllHeroes::clear();
+
+    const bool loyalty = Settings::Get().PriceLoyaltyVersion();
+
+    // knight: LORDKILBURN, SIRGALLANTH, ECTOR, GVENNETH, TYRO, AMBROSE, RUBY, MAXIMUS, DIMITRY
+    for(u8 hid = Heroes::LORDKILBURN; hid <= Heroes::DIMITRY; ++hid)
+        push_back(new Heroes(static_cast<Heroes::heroes_t>(hid), Race::KNGT));
+
+    // barbarian: THUNDAX, FINEOUS, JOJOSH, CRAGHACK, JEZEBEL, JACLYN, ERGON, TSABU, ATLAS
+    for(u8 hid = Heroes::THUNDAX; hid <= Heroes::ATLAS; ++hid)
+        push_back(new Heroes(static_cast<Heroes::heroes_t>(hid), Race::BARB));
+
+    // sorceress: ASTRA, NATASHA, TROYAN, VATAWNA, REBECCA, GEM, ARIEL, CARLAWN, LUNA
+    for(u8 hid = Heroes::ASTRA; hid <= Heroes::LUNA; ++hid)
+        push_back(new Heroes(static_cast<Heroes::heroes_t>(hid), Race::SORC));
+
+    // warlock: ARIE, ALAMAR, VESPER, CRODO, BAROK, KASTORE, AGAR, FALAGAR, WRATHMONT
+    for(u8 hid = Heroes::ARIE; hid <= Heroes::WRATHMONT; ++hid)
+        push_back(new Heroes(static_cast<Heroes::heroes_t>(hid), Race::WRLK));
+
+    // wizard: MYRA, FLINT, DAWN, HALON, MYRINI, WILFREY, SARAKIN, KALINDRA, MANDIGAL
+    for(u8 hid = Heroes::MYRA; hid <= Heroes::MANDIGAL; ++hid)
+        push_back(new Heroes(static_cast<Heroes::heroes_t>(hid), Race::WZRD));
+
+    // necromancer: ZOM, DARLANA, ZAM, RANLOO, CHARITY, RIALDO, ROXANA, SANDRO, CELIA                            
+    for(u8 hid = Heroes::ZOM; hid <= Heroes::CELIA; ++hid)
+        push_back(new Heroes(static_cast<Heroes::heroes_t>(hid), Race::NECR));
+
+    // from campain
+    push_back(new Heroes(Heroes::ROLAND, Race::WZRD));
+    push_back(new Heroes(Heroes::CORLAGON, Race::KNGT));
+    push_back(new Heroes(Heroes::ELIZA, Race::SORC));
+    push_back(new Heroes(Heroes::ARCHIBALD, Race::WRLK));
+    push_back(new Heroes(Heroes::HALTON, Race::KNGT));
+    push_back(new Heroes(Heroes::BAX, Race::NECR));
+
+    // loyalty version
+    push_back(new Heroes(loyalty ? Heroes::SOLMYR : Heroes::UNKNOWN, Race::WZRD));
+    push_back(new Heroes(loyalty ? Heroes::DAINWIN : Heroes::UNKNOWN, Race::WRLK));
+    push_back(new Heroes(loyalty ? Heroes::MOG : Heroes::UNKNOWN, Race::NECR));
+    push_back(new Heroes(loyalty ? Heroes::UNCLEIVAN : Heroes::UNKNOWN, Race::BARB));
+    push_back(new Heroes(loyalty ? Heroes::JOSEPH : Heroes::UNKNOWN, Race::KNGT));
+    push_back(new Heroes(loyalty ? Heroes::GALLAVANT : Heroes::UNKNOWN, Race::KNGT));
+    push_back(new Heroes(loyalty ? Heroes::ELDERIAN : Heroes::UNKNOWN, Race::WRLK));
+    push_back(new Heroes(loyalty ? Heroes::CEALLACH : Heroes::UNKNOWN, Race::KNGT));
+    push_back(new Heroes(loyalty ? Heroes::DRAKONIA : Heroes::UNKNOWN, Race::WZRD));
+    push_back(new Heroes(loyalty ? Heroes::MARTINE : Heroes::UNKNOWN, Race::SORC));
+    push_back(new Heroes(loyalty ? Heroes::JARKONAS : Heroes::UNKNOWN, Race::BARB));
+
+    // devel
+    push_back(new Heroes(IS_DEVEL() ? Heroes::SANDYSANDY : Heroes::UNKNOWN, Race::WRLK));
+    push_back(new Heroes(Heroes::UNKNOWN, Race::KNGT));
+}
+
+void AllHeroes::clear(void)
+{
+    for(iterator
+	it = begin(); it != end(); ++it) delete *it;
+    std::vector<Heroes *>::clear();
+}
+
+Heroes* VecHeroes::Get(Heroes::heroes_t hid) const
+{
+    return at(hid);
+}
+
+Heroes* VecHeroes::Get(s32 index) const
+{
+    const_iterator it = std::find_if(begin(), end(),
+    	    std::bind2nd(std::mem_fun(&Heroes::isPosition), index));
+    return end() != it ? *it : NULL;
+}
+
+Heroes* AllHeroes::GetGuest(const Castle & castle) const
+{
+    const_iterator it = std::find_if(begin(), end(),
+	    std::bind1st(InCastleNotGuardian(), &castle));
+    return end() != it ? *it : NULL;
+}
+
+Heroes* AllHeroes::GetGuard(const Castle & castle) const
+{
+    const_iterator it = Settings::Get().ExtAllowCastleGuardians() ?                                                          
+        std::find_if(begin(), end(), std::bind1st(InCastleAndGuardian(), &castle)) : end();
+    return end() != it ? *it : NULL;
+}
+
+Heroes* AllHeroes::GetFreeman(u8 race) const
+{
+    u8 min = Heroes::UNKNOWN;
+    u8 max = Heroes::UNKNOWN;
+
+    switch(race)
+    {
+	case Race::KNGT:
+	    min = Heroes::LORDKILBURN;
+	    max = Heroes::DIMITRY;
+	    break;
+	
+	case Race::BARB:
+	    min = Heroes::THUNDAX;
+	    max = Heroes::ATLAS;
+	    break;
+	
+	case Race::SORC:
+	    min = Heroes::ASTRA;
+	    max = Heroes::LUNA;
+	    break;
+	    
+	case Race::WRLK:
+	    min = Heroes::ARIE;
+	    max = Heroes::WRATHMONT;
+	    break;
+	
+	case Race::WZRD:
+	    min = Heroes::MYRA;
+	    max = Heroes::MANDIGAL;
+	    break;
+	
+	case Race::NECR:
+	    min = Heroes::ZOM;
+	    max = Heroes::CELIA;
+	    break;
+	
+	default:
+	    min = Heroes::LORDKILBURN;
+	    max = Heroes::CELIA;
+	    break;
+    }
+
+    std::vector<u8> freeman_heroes;
+    freeman_heroes.reserve(HEROESMAXCOUNT);
+
+    // find freeman in race
+    if(Race::BOMG != race)
+	for(u8 ii = min; ii <= max; ++ii)
+	    if(at(ii)->isFreeman())
+		freeman_heroes.push_back(ii);
+
+    // not found, find other race
+    if(Race::BOMG == race || freeman_heroes.empty())
+	for(u8 ii = 0; ii <= 53; ++ii)
+	    if(at(ii)->isFreeman()) freeman_heroes.push_back(ii);
+
+    // not found, all heroes busy
+    if(freeman_heroes.empty())
+    {
+	DEBUG(DBG_GAME, DBG_WARN, "freeman not found, all heroes busy.");
+	return NULL;
+    }
+
+    return at(*Rand::Get(freeman_heroes));
+}
+
+void AllHeroes::Scoute(u8 color) const
+{
+    for(const_iterator it = begin(); it != end(); ++it)
+	if(color & (*it)->GetColor()) (*it)->Scoute();                        
+}
+
+Heroes* AllHeroes::FromJail(s32 index) const
+{
+    const_iterator it = std::find_if(begin(), end(),
+	    std::bind1st(InJailMode(), index));
+    return end() != it ? *it : NULL;
+}
+
+bool AllHeroes::HaveTwoFreemans(void) const
+{
+    return 2 <= std::count_if(begin(), end(),
+			    std::mem_fun(&Heroes::isFreeman));
 }

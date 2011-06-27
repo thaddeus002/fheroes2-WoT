@@ -428,6 +428,10 @@ void Castle::ActionNewMonth(void)
 	    break;
 	}
     }
+
+    // neutral town: small increase garrisons (random)
+    if(world.GetWeekType().GetType() != Week::PLAGUE &&
+	1 < world.GetDay() && Color::GRAY == GetColor()) JoinRNDArmy();
 }
 
 // change castle color
@@ -1910,4 +1914,67 @@ void Castle::ActionAfterBattle(bool attacker_wins)
 
     if(Game::AI == GetControl())
 	AI::CastleAfterBattle(*this, attacker_wins);
+}
+
+struct CastleHavePoint : public std::binary_function <const Castle*, const Point*, bool>
+{
+    bool operator() (const Castle* castle, const Point* pt) const
+    {
+        return castle->isPosition(*pt);
+    }
+};
+
+Castle* VecCastles::Get(s32 index) const
+{
+    return Get(Point(index % world.w(), index / world.h()));
+}
+
+Castle* VecCastles::Get(const Point & position) const
+{
+    const_iterator it = std::find_if(begin(), end(),
+            std::bind2nd(CastleHavePoint(), &position));
+    return end() != it ? *it : NULL;
+}
+
+Castle* VecCastles::GetFirstCastle(void) const
+{
+    const_iterator it = std::find_if(begin(), end(),
+	    std::mem_fun(&Castle::isCastle));
+    return end() != it ? *it : NULL;
+}
+
+void VecCastles::ChangeColors(Color::color_t col1, Color::color_t col2)
+{
+    for(iterator it = begin(); it != end(); ++it)
+	if((*it)->GetColor() == col1) (*it)->ChangeColor(col2);
+}
+
+AllCastles::AllCastles()
+{
+    // reserve memory                                                                                            
+    reserve(MAXCASTLES);
+}
+
+AllCastles::~AllCastles()
+{
+    AllCastles::clear();
+}
+
+void AllCastles::Init(void)
+{
+    if(size())
+	AllCastles::clear();
+}
+
+void AllCastles::clear(void)
+{
+    for(iterator
+        it = begin(); it != end(); ++it) delete *it;
+    std::vector<Castle *>::clear();
+}
+
+void AllCastles::Scoute(u8 color) const
+{
+    for(const_iterator it = begin(); it != end(); ++it)
+        if(color & (*it)->GetColor()) (*it)->Scoute();
 }

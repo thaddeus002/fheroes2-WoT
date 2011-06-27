@@ -2610,9 +2610,8 @@ void AIHeroesTurn(Heroes* hero)
 
 bool AIHeroesScheduledVisit(const Kingdom & kingdom, s32 index)
 {
-    const std::vector<Heroes *> & heroes = kingdom.GetHeroes();
-    for(std::vector<Heroes *>::const_iterator
-	it = heroes.begin(); it != heroes.end(); ++it)
+    for(KingdomHeroes::const_iterator
+	it = kingdom.GetHeroes().begin(); it != kingdom.GetHeroes().end(); ++it)
     {
 	AIHero & ai_hero = AIHeroes::Get(**it);
 	Queue & task = ai_hero.sheduled_visit;

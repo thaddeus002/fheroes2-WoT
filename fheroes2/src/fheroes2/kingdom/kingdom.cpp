@@ -107,22 +107,12 @@ void Kingdom::Init(Color::color_t cl)
 {
     const Settings & conf = Settings::Get();
 
-    color	= cl;
-    control	= Game::AI;
-    flags	= 0;
-    visited_tents_colors = 0;
-
-    lost_town_days = Game::GetLostTownDays() + 1;
+    clear();
 
     // set play
+    color	= cl;
     if(conf.KingdomColors(color)) SetModes(PLAY);
 
-    heroes.clear();
-    castles.clear();
-    visit_object.clear();
-
-    recruits.Reset();
-    
     heroes.reserve(GetMaxHeroes());
     castles.reserve(15);
 
@@ -138,6 +128,21 @@ void Kingdom::Init(Color::color_t cl)
     }
 
     UpdateStartingResource();
+}
+
+void Kingdom::clear(void)
+{
+    color	= Color::GRAY;
+    control	= Game::AI;
+    flags	= 0;
+    visited_tents_colors = 0;
+    lost_town_days = Game::GetLostTownDays() + 1;
+
+    heroes.clear();
+    castles.clear();
+    visit_object.clear();
+
+    recruits.Reset();
 }
 
 void Kingdom::UpdateStartingResource(void)
@@ -185,10 +190,15 @@ void Kingdom::LossPostActions(void)
 	ResetModes(PLAY);
 	if(heroes.size())
 	{
-	    std::for_each(heroes.begin(), heroes.end(), std::bind2nd(std::mem_fun(&Heroes::SetFreeman), static_cast<u8>(Battle2::RESULT_LOSS)));
+	    std::for_each(heroes.begin(), heroes.end(),
+		std::bind2nd(std::mem_fun(&Heroes::SetFreeman), static_cast<u8>(Battle2::RESULT_LOSS)));
 	    heroes.clear();
 	}
-	if(castles.size()) castles.clear();
+	if(castles.size())
+	{
+	    castles.ChangeColors(color, Color::GRAY);
+	    castles.clear();
+	}
 	world.KingdomLoss(color);
     }
 }
@@ -234,10 +244,10 @@ void Kingdom::ActionNewDay(void)
 	resource += ProfitConditions::FromMine(Resource::GOLD) * world.CountCapturedMines(Resource::GOLD, color);
 
 	// funds
-	std::vector<Castle*>::const_iterator itc = castles.begin();
-	for(; itc != castles.end(); ++itc) if(*itc)
+	for(KingdomCastles::const_iterator
+	    it = castles.begin(); it != castles.end(); ++it)
 	{
-	    const Castle & castle = **itc;
+	    const Castle & castle = **it;
 
 	    // castle or town profit
 	    resource += ProfitConditions::FromBuilding((castle.isCastle() ? BUILD_CASTLE : BUILD_TENT), 0);
@@ -304,12 +314,12 @@ void Kingdom::ActionNewMonth(void)
     visit_object.remove_if(Visit::isMonthLife);
 }
 
-void Kingdom::AddHeroes(const Heroes *hero)
+void Kingdom::AddHeroes(Heroes *hero)
 {
     if(hero)
     {
 	if(heroes.end() == std::find(heroes.begin(), heroes.end(), hero))
-	    heroes.push_back(const_cast<Heroes *>(hero));
+	    heroes.push_back(hero);
 
 	AI::AddHeroes(*hero);
     }
@@ -518,11 +528,11 @@ void Kingdom::ApplyPlayWithStartingHero(void)
     if(isPlay() && castles.size())
     {
 	// get first castle
-	std::vector<Castle*>::const_iterator it = std::find_if(castles.begin(), castles.end(), std::mem_fun(&Castle::isCastle));
-	if(it == castles.end()) it = castles.begin();
+	Castle* first = castles.GetFirstCastle();
+	if(NULL == first) first = castles.front();
 
 	// check manual set hero (castle position + point(0, 1))?
-	const Point & cp = (*it)->GetCenter();
+	const Point & cp = (first)->GetCenter();
 	if(world.GetTiles(cp.x, cp.y + 1).GetObject() == MP2::OBJ_HEROES)
 	{
     	    Heroes *hero = world.GetHeroes((cp.y + 1) * world.w() + cp.x);
@@ -531,7 +541,7 @@ void Kingdom::ApplyPlayWithStartingHero(void)
     	    {
 		bool patrol = hero->Modes(Heroes::PATROL);
     		hero->SetFreeman(0);
-    		hero->Recruit(**it);
+    		hero->Recruit(*first);
 
 		if(patrol)
 		{
@@ -543,8 +553,8 @@ void Kingdom::ApplyPlayWithStartingHero(void)
 	else
 	if(Settings::Get().GameStartWithHeroes())
 	{
-    	    Heroes *hero = world.GetFreemanHeroes((*it)->GetRace());
-	    if(hero && AllowRecruitHero(false, 0)) hero->Recruit(**it);
+    	    Heroes *hero = world.GetFreemanHeroes(first->GetRace());
+	    if(hero && AllowRecruitHero(false, 0)) hero->Recruit(*first);
 	}
     }
 }
@@ -561,19 +571,9 @@ u8 Kingdom::GetMaxHeroes(void)
 
 void Kingdom::HeroesActionNewPosition(void)
 {
-    // Heroes::ActionNewPosition: can ramove elements from heroes vector.
-    size_t size = heroes.size();
-    std::vector<Heroes *>::iterator it = heroes.begin();
-
-    while(it != heroes.end())
-    {
-	(**it).ActionNewPosition();
-
-	if(size != heroes.size())
-	    size = heroes.size();
-	else
-	    ++it;
-    }
+    // Heroes::ActionNewPosition: can remove elements from heroes vector.
+    KingdomHeroes heroes2(heroes);
+    std::for_each(heroes2.begin(), heroes2.end(), std::mem_fun(&Heroes::ActionNewPosition));
 }
 
 u32 Kingdom::GetIncome(void)
@@ -589,10 +589,10 @@ u32 Kingdom::GetIncome(void)
     //resource += ProfitConditions::FromMine(Resource::GEMS) * world.CountCapturedMines(Resource::GEMS, color);
     resource += ProfitConditions::FromMine(Resource::GOLD) * world.CountCapturedMines(Resource::GOLD, color);
 
-    std::vector<Castle*>::const_iterator itc = castles.begin();
-    for(; itc != castles.end(); ++itc) if(*itc)
+    for(KingdomCastles::const_iterator
+	it = castles.begin(); it != castles.end(); ++it)
     {
-        const Castle & castle = **itc;
+        const Castle & castle = **it;
 
         // castle or town profit
         resource += ProfitConditions::FromBuilding((castle.isCastle() ? BUILD_CASTLE : BUILD_TENT), 0);
@@ -606,8 +606,8 @@ u32 Kingdom::GetIncome(void)
                 resource += ProfitConditions::FromBuilding(BUILD_SPEC, Race::WRLK);
     }
 
-    std::vector<Heroes*>::const_iterator ith = heroes.begin();
-    for(; ith != heroes.end(); ++ith) if(*ith)
+    for(KingdomHeroes::const_iterator
+	ith = heroes.begin(); ith != heroes.end(); ++ith)
     {
 	if((**ith).HasArtifact(Artifact::GOLDEN_GOOSE))           resource += ProfitConditions::FromArtifact(Artifact::GOLDEN_GOOSE);
         if((**ith).HasArtifact(Artifact::ENDLESS_SACK_GOLD))      resource += ProfitConditions::FromArtifact(Artifact::ENDLESS_SACK_GOLD);
@@ -638,11 +638,13 @@ u32 Kingdom::GetArmiesStrength(void) const
 {
     double res = 0;
 
-    std::vector<Heroes*>::const_iterator ith = heroes.begin();
-    for(; ith != heroes.end(); ++ith) if(*ith) res += (**ith).GetArmy().GetStrength();
+    for(KingdomHeroes::const_iterator
+	ith = heroes.begin(); ith != heroes.end(); ++ith)
+	res += (**ith).GetArmy().GetStrength();
 
-    std::vector<Castle*>::const_iterator itc = castles.begin();
-    for(; itc != castles.end(); ++itc) if(*itc) res += (**itc).GetArmy().GetStrength();
+    for(KingdomCastles::const_iterator
+	itc = castles.begin(); itc != castles.end(); ++itc)
+	res += (**itc).GetArmy().GetStrength();
 
     return static_cast<u32>(res);
 }
@@ -666,6 +668,12 @@ void Kingdoms::Init(void)
 u8 Kingdoms::size(void) const
 {
     return KINGDOMMAX + 1;
+}
+
+void Kingdoms::clear(void)
+{
+    for(u8 ii = 0; ii < size(); ++ii)
+	kingdoms[ii].clear();
 }
 
 void Kingdoms::ApplyPlayWithStartingHero(void)
@@ -760,4 +768,18 @@ u8 Kingdoms::FindArtOrGoldWins(void) const
 	    (world.KingdomIsWins(kingdoms[ii], GameOver::WINS_GOLD) || world.KingdomIsWins(kingdoms[ii], GameOver::WINS_ARTIFACT)))
 		return kingdoms[ii].GetColor();
     return 0;
+}
+
+void Kingdoms::AddHeroes(const AllHeroes & heroes)
+{
+    for(AllHeroes::const_iterator                                                                    
+        it = heroes.begin(); it != heroes.end(); ++it)
+        Get((*it)->GetColor()).AddHeroes(*it);
+}
+
+void Kingdoms::AddCastles(const AllCastles & castles)
+{
+    for(AllCastles::const_iterator
+	it = castles.begin(); it != castles.end(); ++it)
+        Get((*it)->GetColor()).AddCastle(*it);
 }
