@@ -549,7 +549,7 @@ screen_t CastleOpenDialog3(Castle & castle, bool readonly)
     building1.SetPos(dst_rt.x + 2, dst_rt.y + 2);
     building1.Redraw();
 
-    BuildingInfo building2(castle, BUILD_TAVERN);
+    BuildingInfo building2(castle, (castle.GetRace() == Race::NECR ? BUILD_SHRINE : BUILD_TAVERN));
     building2.SetPos(dst_rt.x + 141, dst_rt.y + 2);
     building2.Redraw();
 
