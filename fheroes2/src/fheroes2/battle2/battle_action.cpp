@@ -190,22 +190,25 @@ void Battle2::Arena::BattleProcess(Stats & attacker, Stats & defender, s16 dst, 
     if(defender.isValid() && spell.isValid())
     {
 	const std::string name(attacker.GetName());
-
 	targets = GetTargetsForSpells(attacker.GetCommander(), spell, defender.GetPosition());
-	if(interface) interface->RedrawActionSpellCastPart1(spell, defender.GetPosition(), name, targets);
 
-	// magic attack not depends from hero
-	TargetsApplySpell(NULL, spell, targets);
-	if(interface) interface->RedrawActionSpellCastPart2(spell, targets);
-	if(interface) interface->RedrawActionMonsterSpellCastStatus(attacker, targets.front());
+	if(targets.size())
+	{
+	    if(interface) interface->RedrawActionSpellCastPart1(spell, defender.GetPosition(), name, targets);
+
+	    // magic attack not depends from hero
+	    TargetsApplySpell(NULL, spell, targets);
+	    if(interface) interface->RedrawActionSpellCastPart2(spell, targets);
+	    if(interface) interface->RedrawActionMonsterSpellCastStatus(attacker, targets.front());
 
 #ifdef WITH_NET
-	if(Network::isRemoteClient())
-    	{
-	    if(Game::REMOTE == army1.GetControl()) FH2Server::Get().BattleSendSpell(army1.GetColor(), attacker.GetID(), defender.GetPosition(), spell, targets);
-	    if(Game::REMOTE == army2.GetControl()) FH2Server::Get().BattleSendSpell(army2.GetColor(), attacker.GetID(), defender.GetPosition(), spell, targets);
-	}
+	    if(Network::isRemoteClient())
+    	    {
+		if(Game::REMOTE == army1.GetControl()) FH2Server::Get().BattleSendSpell(army1.GetColor(), attacker.GetID(), defender.GetPosition(), spell, targets);
+		if(Game::REMOTE == army2.GetControl()) FH2Server::Get().BattleSendSpell(army2.GetColor(), attacker.GetID(), defender.GetPosition(), spell, targets);
+	    }
 #endif
+	}
     }
 
     attacker.PostAttackAction(defender);
