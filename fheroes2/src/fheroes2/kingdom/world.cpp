@@ -1105,12 +1105,13 @@ s32 World::NextTeleport(const s32 index) const
     for(std::vector<s32>::const_iterator itv = vec_teleports.begin(); itv != vec_teleports.end(); ++itv)
 	if(type == GetTiles(*itv).GetQuantity1())
 	{
-	    if(MP2::OBJ_HEROES == GetTiles(*itv).GetObject())
+	    if(MP2::OBJ_HEROES != GetTiles(*itv).GetObject())
+		v.push_back(*itv);
+	    else
+	    if(index != (*itv).GetIndex())
 	    {
 		DEBUG(DBG_GAME, DBG_WARN, "is busy");
 	    }
-	    else
-		v.push_back(*itv);
 	}
 
     if(v.empty()) DEBUG(DBG_GAME , DBG_WARN, "not found");
