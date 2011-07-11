@@ -1089,7 +1089,7 @@ s32 World::NextTeleport(const s32 index) const
     std::vector<s32> vec_teleports;
     
     vec_teleports.reserve(10);
-    GetObjectPositions(MP2::OBJ_STONELIGHTS, vec_teleports);
+    GetObjectPositions(MP2::OBJ_STONELIGHTS, vec_teleports, true);
 
     if(2 > vec_teleports.size())
     {
@@ -1103,7 +1103,15 @@ s32 World::NextTeleport(const s32 index) const
     v.reserve(vec_teleports.size());
 
     for(std::vector<s32>::const_iterator itv = vec_teleports.begin(); itv != vec_teleports.end(); ++itv)
-	if(type == GetTiles(*itv).GetQuantity1()) v.push_back(*itv);
+	if(type == GetTiles(*itv).GetQuantity1())
+	{
+	    if(MP2::OBJ_HEROES == GetTiles(*itv).GetObject())
+	    {
+		DEBUG(DBG_GAME, DBG_WARN, "is busy");
+	    }
+	    else
+		v.push_back(*itv);
+	}
 
     if(v.empty()) DEBUG(DBG_GAME , DBG_WARN, "not found");
 
