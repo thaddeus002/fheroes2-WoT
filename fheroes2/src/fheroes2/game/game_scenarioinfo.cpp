@@ -59,7 +59,7 @@ Game::menu_t Game::ScenarioInfo(void)
     AGG::PlayMusic(MUS::MAINMENU);
 
     MapsFileInfoList lists;
-    if(!PrepareMapsFileInfoList(lists, (conf.GameType(Game::MULTI))))
+    if(!PrepareMapsFileInfoList(lists, (conf.GameType(Game::TYPE_MULTI))))
     {
 	Dialog::Message(_("Warning"), _("No maps available!"), Font::BIG, Dialog::OK);
         return MAINMENU;
@@ -282,7 +282,7 @@ Game::menu_t Game::ScenarioInfo(void)
 		    cursor.Hide();
 		    u8 players = color;
 		
-		    if(conf.GameType(Game::NETWORK | Game::HOTSEAT))
+		    if(conf.GameType(Game::TYPE_NETWORK | Game::TYPE_HOTSEAT))
 		        players = conf.PlayersColors() & color ?
 				/* reset color */
 				conf.PlayersColors() & ~color :

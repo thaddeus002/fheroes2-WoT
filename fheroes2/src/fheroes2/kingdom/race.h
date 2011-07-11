@@ -37,7 +37,7 @@ namespace Race
         NECR    = 0x20,
         MULT    = 0x40,
         RAND    = 0x80,
-        BOMG    = 0x00,
+        NONE    = 0x00,
 	ALL	= KNGT | BARB | SORC | WRLK | WZRD | NECR
     };
 

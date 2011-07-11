@@ -78,12 +78,12 @@ void RunTest3(void)
     Kingdom & kingdom2 = world.GetKingdom(Color::YELLOW);
 
     conf.SetMyColor(Color::RED);
-    conf.SetGameType(Game::BATTLEONLY);
+    conf.SetGameType(Game::TYPE_BATTLEONLY);
 
     hero1.SetSpellPoints(150);
 
-    kingdom1.SetControl(Game::LOCAL);
-    kingdom2.SetControl(Game::AI);
+    kingdom1.SetControl(Game::CONTROL_LOCAL);
+    kingdom2.SetControl(Game::CONTROL_AI);
 
     if(kingdom1.GetCastles().size())
     hero1.Recruit(kingdom1.GetColor(), Point(20, 20));

@@ -371,7 +371,7 @@ void MoveHero2Dest(Heroes & hero, s32 dst_index, MP2::object_t from_obj, MP2::ob
 // action to next cell
 void Heroes::Action(const s32 dst_index)
 {
-    if(Game::AI == world.GetKingdom(GetColor()).Control()) return AI::HeroesAction(*this, dst_index);
+    if(Game::CONTROL_AI == world.GetKingdom(GetColor()).Control()) return AI::HeroesAction(*this, dst_index);
 
     const MP2::object_t object = (dst_index == GetIndex() ?
 				    GetUnderObject() : world.GetTiles(dst_index).GetObject());

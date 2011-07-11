@@ -38,7 +38,7 @@ const char* Race::String(u8 race)
         case Race::NECR: return str_race[5];
         case Race::MULT: return str_race[6];
         case Race::RAND: return str_race[7];
-	case Race::BOMG: return str_race[8];
+	case Race::NONE: return str_race[8];
         default: break;
     }
 
@@ -75,5 +75,5 @@ u8 Race::Get(u8 index)
 	default: break;
     }
 
-    return Race::BOMG;
+    return Race::NONE;
 }

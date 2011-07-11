@@ -753,7 +753,7 @@ bool Settings::QVGA(void) const { return video_mode.w && video_mode.h && (video_
 
 bool Settings::UseAltResource(void) const { return opt_global.Modes(GLOBAL_ALTRESOURCE); }
 bool Settings::PriceLoyaltyVersion(void) const { return opt_global.Modes(GLOBAL_PRICELOYALTY); }
-bool Settings::LoadedGameVersion(void) const { return game_type & Game::LOADFILE; }
+bool Settings::LoadedGameVersion(void) const { return game_type & Game::TYPE_LOADFILE; }
 
 bool Settings::ShowControlPanel(void) const { return opt_global.Modes(GLOBAL_SHOWCPANEL); }
 bool Settings::ShowRadar(void) const { return opt_global.Modes(GLOBAL_SHOWRADAR); }

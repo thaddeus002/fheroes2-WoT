@@ -205,18 +205,6 @@ u8 Game::GetMixerChannelFromObject(const Maps::Tiles & tile)
     return M82::GetIndexLOOP00XXFromObject(object);
 }
 
-Game::control_t Game::GetControl(u8 index)
-{
-    switch(index)
-    {
-	case LOCAL:	return LOCAL;
-	case REMOTE:	return REMOTE;
-	case AI:	return AI;
-	default: break;
-    }
-    return NONE;
-}
-
 u8 Game::GetRating(void)
 {
     Settings & conf = Settings::Get();
@@ -293,7 +281,7 @@ u8 Game::GetLostTownDays(void)
     return lost_town_days;
 }
 
-u8 Game::GetViewDistance(distance_t d)
+u8 Game::GetViewDistance(u8 d)
 {
     return view_distance[d];
 }

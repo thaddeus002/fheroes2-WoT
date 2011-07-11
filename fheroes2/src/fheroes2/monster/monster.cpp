@@ -289,7 +289,7 @@ u8 Monster::GetDefense(void) const
 
 u8 Monster::GetRace(void) const
 {
-    if(UNKNOWN == id)	return Race::BOMG;
+    if(UNKNOWN == id)	return Race::NONE;
     else
     if(GOBLIN > id)	return Race::KNGT;
     else
@@ -303,7 +303,7 @@ u8 Monster::GetRace(void) const
     else
     if(ROGUE > id)	return Race::NECR;
 
-    return Race::BOMG;
+    return Race::NONE;
 }
 
 u8  Monster::GetDamageMin(void) const

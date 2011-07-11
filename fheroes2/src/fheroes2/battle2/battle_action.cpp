@@ -171,8 +171,8 @@ void Battle2::Arena::BattleProcess(Stats & attacker, Stats & defender, s16 dst, 
 #ifdef WITH_NET
     if(Network::isRemoteClient())
     {
-	if(Game::REMOTE == army1.GetControl()) FH2Server::Get().BattleSendAttack(army1.GetColor(), attacker, defender, dst, targets);
-	if(Game::REMOTE == army2.GetControl()) FH2Server::Get().BattleSendAttack(army2.GetColor(), attacker, defender, dst, targets);
+	if(Game::CONTROL_REMOTE == army1.GetControl()) FH2Server::Get().BattleSendAttack(army1.GetColor(), attacker, defender, dst, targets);
+	if(Game::CONTROL_REMOTE == army2.GetControl()) FH2Server::Get().BattleSendAttack(army2.GetColor(), attacker, defender, dst, targets);
     }
 #endif
 
@@ -204,8 +204,8 @@ void Battle2::Arena::BattleProcess(Stats & attacker, Stats & defender, s16 dst, 
 #ifdef WITH_NET
 	    if(Network::isRemoteClient())
     	    {
-		if(Game::REMOTE == army1.GetControl()) FH2Server::Get().BattleSendSpell(army1.GetColor(), attacker.GetID(), defender.GetPosition(), spell, targets);
-		if(Game::REMOTE == army2.GetControl()) FH2Server::Get().BattleSendSpell(army2.GetColor(), attacker.GetID(), defender.GetPosition(), spell, targets);
+		if(Game::CONTROL_REMOTE == army1.GetControl()) FH2Server::Get().BattleSendSpell(army1.GetColor(), attacker.GetID(), defender.GetPosition(), spell, targets);
+		if(Game::CONTROL_REMOTE == army2.GetControl()) FH2Server::Get().BattleSendSpell(army2.GetColor(), attacker.GetID(), defender.GetPosition(), spell, targets);
 	    }
 #endif
 	}
@@ -247,8 +247,8 @@ void Battle2::Arena::ApplyAction(Action & action)
 	case MSG_BATTLE_CATAPULT:
 	    if(Network::isRemoteClient())
     	    {
-		if(Game::REMOTE == army1.GetControl()) FH2Server::Get().BattleSendAction(army1.GetColor(), action);
-    		if(Game::REMOTE == army2.GetControl()) FH2Server::Get().BattleSendAction(army2.GetColor(), action);
+		if(Game::CONTROL_REMOTE == army1.GetControl()) FH2Server::Get().BattleSendAction(army1.GetColor(), action);
+    		if(Game::CONTROL_REMOTE == army2.GetControl()) FH2Server::Get().BattleSendAction(army2.GetColor(), action);
 	    }
 	    break;
 
@@ -307,8 +307,8 @@ void Battle2::Arena::ApplyActionSpellCast(Action & action)
 #ifdef WITH_NET
 	if(Network::isRemoteClient())
 	{
-	    if(Game::REMOTE == army1.GetControl()) FH2Server::Get().BattleSendBoard(army1.GetColor(), *this);
-	    if(Game::REMOTE == army2.GetControl()) FH2Server::Get().BattleSendBoard(army2.GetColor(), *this);
+	    if(Game::CONTROL_REMOTE == army1.GetControl()) FH2Server::Get().BattleSendBoard(army1.GetColor(), *this);
+	    if(Game::CONTROL_REMOTE == army2.GetControl()) FH2Server::Get().BattleSendBoard(army2.GetColor(), *this);
 	}
 #endif
     }
@@ -383,8 +383,8 @@ void Battle2::Arena::ApplyActionAttack(Action & action)
 #ifdef WITH_NET
 	if(Network::isRemoteClient())
 	{
-	    if(Game::REMOTE == army1.GetControl()) FH2Server::Get().BattleSendBoard(army1.GetColor(), *this);
-	    if(Game::REMOTE == army2.GetControl()) FH2Server::Get().BattleSendBoard(army2.GetColor(), *this);
+	    if(Game::CONTROL_REMOTE == army1.GetControl()) FH2Server::Get().BattleSendBoard(army1.GetColor(), *this);
+	    if(Game::CONTROL_REMOTE == army2.GetControl()) FH2Server::Get().BattleSendBoard(army2.GetColor(), *this);
 	}
 #endif
     }
@@ -954,15 +954,15 @@ void Battle2::Arena::ApplyActionAutoBattle(Action & action)
 void Battle2::Arena::SpellActionSummonElemental(Action & a, const Spell & spell)
 {
 #ifdef WITH_NET
-    if(! (Settings::Get().GameType(Game::NETWORK)) || Network::isRemoteClient())
+    if(! (Settings::Get().GameType(Game::TYPE_NETWORK)) || Network::isRemoteClient())
     {
 #endif
 	Stats* elem = CreateElemental(spell);
 	if(interface) interface->RedrawActionSummonElementalSpell(*elem);
 
 #ifdef WITH_NET
-	if(Game::REMOTE == army1.GetControl()) FH2Server::Get().BattleSendSummonElementalSpell(army1.GetColor(), spell, *elem);
-	if(Game::REMOTE == army2.GetControl()) FH2Server::Get().BattleSendSummonElementalSpell(army2.GetColor(), spell, *elem);
+	if(Game::CONTROL_REMOTE == army1.GetControl()) FH2Server::Get().BattleSendSummonElementalSpell(army1.GetColor(), spell, *elem);
+	if(Game::CONTROL_REMOTE == army2.GetControl()) FH2Server::Get().BattleSendSummonElementalSpell(army2.GetColor(), spell, *elem);
     }
     else
     if(Network::isLocalClient())
@@ -991,7 +991,7 @@ void Battle2::Arena::SpellActionSummonElemental(Action & a, const Spell & spell)
 void Battle2::Arena::SpellActionDefaults(Action & a, const Spell & spell)
 {
 #ifdef WITH_NET
-    if(! (Settings::Get().GameType(Game::NETWORK)) || Network::isRemoteClient())
+    if(! (Settings::Get().GameType(Game::TYPE_NETWORK)) || Network::isRemoteClient())
     {
 #endif
         const HeroBase* current_commander = GetCurrentCommander();
@@ -1008,8 +1008,8 @@ void Battle2::Arena::SpellActionDefaults(Action & a, const Spell & spell)
 	if(interface) interface->RedrawActionSpellCastPart2(spell, targets);
 
 #ifdef WITH_NET
-	if(Game::REMOTE == army1.GetControl()) FH2Server::Get().BattleSendSpell(army1.GetColor(), 0, dst, spell, targets);
-	if(Game::REMOTE == army2.GetControl()) FH2Server::Get().BattleSendSpell(army2.GetColor(), 0, dst, spell, targets);
+	if(Game::CONTROL_REMOTE == army1.GetControl()) FH2Server::Get().BattleSendSpell(army1.GetColor(), 0, dst, spell, targets);
+	if(Game::CONTROL_REMOTE == army2.GetControl()) FH2Server::Get().BattleSendSpell(army2.GetColor(), 0, dst, spell, targets);
     }
     else
     if(Network::isLocalClient())
@@ -1074,8 +1074,8 @@ void Battle2::Arena::SpellActionTeleport(Action & a)
 #ifdef WITH_NET
     if(Network::isRemoteClient())
     {
-	if(Game::REMOTE == army1.GetControl()) FH2Server::Get().BattleSendTeleportSpell(army1.GetColor(), src, dst);
-	if(Game::REMOTE == army2.GetControl()) FH2Server::Get().BattleSendTeleportSpell(army2.GetColor(), src, dst);
+	if(Game::CONTROL_REMOTE == army1.GetControl()) FH2Server::Get().BattleSendTeleportSpell(army1.GetColor(), src, dst);
+	if(Game::CONTROL_REMOTE == army2.GetControl()) FH2Server::Get().BattleSendTeleportSpell(army2.GetColor(), src, dst);
     }
 #endif
 }
@@ -1083,7 +1083,7 @@ void Battle2::Arena::SpellActionTeleport(Action & a)
 void Battle2::Arena::SpellActionEarthQuake(Action & a)
 {
 #ifdef WITH_NET
-    if(! (Settings::Get().GameType(Game::NETWORK)) || Network::isRemoteClient())
+    if(! (Settings::Get().GameType(Game::TYPE_NETWORK)) || Network::isRemoteClient())
     {
 #endif
 	std::vector<u8> targets;
@@ -1115,8 +1115,8 @@ void Battle2::Arena::SpellActionEarthQuake(Action & a)
 	DEBUG(DBG_BATTLE, DBG_TRACE, "spell: " << Spell(Spell::EARTHQUAKE).GetName() << ", targets: " << targets.size());
 
 #ifdef WITH_NET
-	if(Game::REMOTE == army1.GetControl()) FH2Server::Get().BattleSendEarthQuakeSpell(army1.GetColor(), targets);
-	if(Game::REMOTE == army2.GetControl()) FH2Server::Get().BattleSendEarthQuakeSpell(army2.GetColor(), targets);
+	if(Game::CONTROL_REMOTE == army1.GetControl()) FH2Server::Get().BattleSendEarthQuakeSpell(army1.GetColor(), targets);
+	if(Game::CONTROL_REMOTE == army2.GetControl()) FH2Server::Get().BattleSendEarthQuakeSpell(army2.GetColor(), targets);
     }
     else
     if(Network::isLocalClient())
@@ -1143,7 +1143,7 @@ void Battle2::Arena::SpellActionMirrorImage(Action & a)
     if(b)
     {
 #ifdef WITH_NET
-	if(! (Settings::Get().GameType(Game::NETWORK)) || Network::isRemoteClient())
+	if(! (Settings::Get().GameType(Game::TYPE_NETWORK)) || Network::isRemoteClient())
 	{
 #endif
 	    std::vector<u16> v;
@@ -1169,9 +1169,9 @@ void Battle2::Arena::SpellActionMirrorImage(Action & a)
 		Stats* image = CreateMirrorImage(*b, *it);
 		if(image)
 		{
-		    if(Game::REMOTE == army1.GetControl())
+		    if(Game::CONTROL_REMOTE == army1.GetControl())
 			FH2Server::Get().BattleSendMirrorImageSpell(army1.GetColor(), who, *it, *image);
-		    if(Game::REMOTE == army2.GetControl())
+		    if(Game::CONTROL_REMOTE == army2.GetControl())
 			FH2Server::Get().BattleSendMirrorImageSpell(army2.GetColor(), who, *it, *image);
 		}
 		else

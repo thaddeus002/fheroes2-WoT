@@ -105,7 +105,7 @@ int FH2LocalClient::Main(void)
 
     if(ConnectionChat())
     {
-	if(conf.GameType(Game::STANDARD))
+	if(conf.GameType(Game::TYPE_STANDARD))
 	{
 	    if(ScenarioInfoDialog())
 	    {
@@ -133,7 +133,7 @@ int FH2LocalClient::Main(void)
 		err = "close scenario dialog";
 	}
 	else
-	if(conf.GameType(Game::BATTLEONLY))
+	if(conf.GameType(Game::TYPE_BATTLEONLY))
 	{
 	    if(Prepare4BattleOnly())
 	    {

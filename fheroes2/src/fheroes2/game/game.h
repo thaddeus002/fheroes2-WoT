@@ -69,9 +69,12 @@ namespace Game
     void Init(char**);
     std::string GetARGV(int);
 
-    enum type_t { MENU = 0, STANDARD = 0x01, CAMPAIGN = 0x02, HOTSEAT = 0x04, NETWORK = 0x08, BATTLEONLY = 0x10, LOADFILE = 0x80, MULTI = HOTSEAT | NETWORK };
-    enum control_t { NONE = 0, LOCAL = 1, REMOTE = 2, AI = 4 };
-    enum distance_t { VIEW_TOWN  = 0, VIEW_CASTLE = 1, VIEW_HEROES = 2, VIEW_TELESCOPE = 3, VIEW_OBSERVATION_TOWER = 4, VIEW_MAGI_EYES = 5 };
+    // type_t
+    enum type_t { TYPE_MENU = 0, TYPE_STANDARD = 0x01, TYPE_CAMPAIGN = 0x02, TYPE_HOTSEAT = 0x04, TYPE_NETWORK = 0x08, TYPE_BATTLEONLY = 0x10, TYPE_LOADFILE = 0x80, TYPE_MULTI = TYPE_HOTSEAT | TYPE_NETWORK };
+    // control_t
+    enum { CONTROL_NONE = 0, CONTROL_LOCAL = 1, CONTROL_REMOTE = 2, CONTROL_AI = 4 };
+    // distance_t
+    enum { VIEW_TOWN  = 0, VIEW_CASTLE = 1, VIEW_HEROES = 2, VIEW_TELESCOPE = 3, VIEW_OBSERVATION_TOWER = 4, VIEW_MAGI_EYES = 5 };
 
     enum events_t
     {
@@ -186,8 +189,6 @@ namespace Game
     void UpdateHeroesMoveSpeed(void);
     void UpdateBattleSpeed(void);
 
-    control_t GetControl(u8);
-
     menu_t MainMenu(void);
     menu_t NewGame(void);
     menu_t LoadGame(void);
@@ -221,7 +222,7 @@ namespace Game
     u8  GetRating(void);
     u16 GetGameOverScores(void);
     u8  GetLostTownDays(void);
-    u8  GetViewDistance(distance_t);
+    u8  GetViewDistance(u8);
     u8  GetWhirlpoolPercent(void);
     u8  GetHeroRestoreSpellPointsPerDay(void);
     u8  SelectCountPlayers(void);

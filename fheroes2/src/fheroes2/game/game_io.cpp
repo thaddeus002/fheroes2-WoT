@@ -107,7 +107,7 @@ bool Game::Load(const std::string & fn)
     Game::IO::last_name = fn;
     Settings & conf = Settings::Get();
 
-    conf.SetGameType(conf.GameType() | Game::LOADFILE);
+    conf.SetGameType(conf.GameType() | Game::TYPE_LOADFILE);
 
     return true;
 }
@@ -435,8 +435,8 @@ void Game::IO::PackTileAddons(QueueMessage & msg, const Maps::Addons & addons)
 void Game::IO::PackKingdom(QueueMessage & msg, const Kingdom & kingdom)
 {
     msg.Push(static_cast<u8>(kingdom.color));
-    msg.Push(static_cast<u8>(kingdom.control));
 
+    msg.Push(kingdom.control);
     msg.Push(kingdom.flags);
     msg.Push(kingdom.lost_town_days);
     // unused
@@ -1014,11 +1014,9 @@ void Game::IO::UnpackKingdom(QueueMessage & msg, Kingdom & kingdom, u16 check_ve
     u32 byte32;
 
     msg.Pop(byte8);
-    kingdom.color =Color::Get(byte8);
+    kingdom.color = Color::Get(byte8);
 
-    msg.Pop(byte8);
-    kingdom.control = Game::GetControl(byte8);
-
+    msg.Pop(kingdom.control);
     msg.Pop(kingdom.flags);
     msg.Pop(kingdom.lost_town_days);
     // unused

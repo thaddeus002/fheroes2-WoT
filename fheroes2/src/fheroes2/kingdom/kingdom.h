@@ -72,8 +72,8 @@ public:
     void ResetModes(flags_t);
     bool Modes(flags_t) const;
 
-    Game::control_t Control(void) const{ return control; }
-    void SetControl(const Game::control_t con) { control = con; }
+    u8 Control(void) const{ return control; }
+    void SetControl(const u8 con) { control = con; }
     void UpdateStartingResource(void);
     bool isPlay(void) const{ return Modes(PLAY); }
     bool isLoss(void) const;
@@ -161,7 +161,7 @@ private:
     friend class Game::IO;
 
     Color::color_t color;
-    Game::control_t control;
+    u8 control;
     Funds resource;
 
     u16 flags;

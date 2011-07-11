@@ -99,7 +99,7 @@ void Kingdom::UpdateStartingResource(const TiXmlElement* xml_resource)
 }
 #endif
 
-Kingdom::Kingdom() : color(Color::GRAY), control(Game::AI), flags(0), lost_town_days(0), visited_tents_colors(0)
+Kingdom::Kingdom() : color(Color::GRAY), control(Game::CONTROL_AI), flags(0), lost_town_days(0), visited_tents_colors(0)
 {
 }
 
@@ -120,11 +120,11 @@ void Kingdom::Init(Color::color_t cl)
     if(color & conf.PlayersColors())
     {
 #ifdef WITH_NET
-	if(Settings::Get().GameType(Game::NETWORK))
-    	    control = (color == conf.MyColor() ? Game::LOCAL : Game::REMOTE);
+	if(Settings::Get().GameType(Game::TYPE_NETWORK))
+    	    control = (color == conf.MyColor() ? Game::CONTROL_LOCAL : Game::CONTROL_REMOTE);
         else
 #endif
-	    control = Game::LOCAL;
+	    control = Game::CONTROL_LOCAL;
     }
 
     UpdateStartingResource();
@@ -133,7 +133,7 @@ void Kingdom::Init(Color::color_t cl)
 void Kingdom::clear(void)
 {
     color	= Color::GRAY;
-    control	= Game::AI;
+    control	= Game::CONTROL_AI;
     flags	= 0;
     visited_tents_colors = 0;
     lost_town_days = Game::GetLostTownDays() + 1;
@@ -159,7 +159,7 @@ void Kingdom::UpdateStartingResource(void)
 	default: break;
     }
 
-    if(Game::AI == control) sres = &starting_resource[5];
+    if(Game::CONTROL_AI == control) sres = &starting_resource[5];
     if(sres) resource = *sres;
 }
 
@@ -284,7 +284,7 @@ void Kingdom::ActionNewWeek(void)
 	std::for_each(heroes.begin(), heroes.end(), std::mem_fun(&Heroes::ActionNewWeek));
 
 	// debug an gift
-	if(IS_DEVEL() && Game::LOCAL == Control())
+	if(IS_DEVEL() && Game::CONTROL_LOCAL == Control())
 	{
 	    Funds gift(20, 20, 10, 10, 10, 10, 5000);
 	    DEBUG(DBG_GAME, DBG_INFO, "debug gift: " << gift.Dump());

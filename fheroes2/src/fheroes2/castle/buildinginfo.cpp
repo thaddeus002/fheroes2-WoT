@@ -145,7 +145,7 @@ static buildstats_t _builds[] = {
     { "laboratory",    DWELLING_MONSTER6, Race::NECR, {10000,10,5,10, 5, 5, 5 } },
 
     // end
-    { NULL, BUILD_NOTHING, Race::BOMG, { 0, 0, 0, 0, 0, 0, 0 } },
+    { NULL, BUILD_NOTHING, Race::NONE, { 0, 0, 0, 0, 0, 0, 0 } },
 };
 
 void BuildingInfo::UpdateCosts(const std::string & spec)

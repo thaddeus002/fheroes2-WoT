@@ -132,13 +132,13 @@ msg_t Network::GetMsg(u16 msg)
 bool Network::isLocalClient(void)
 {
     Settings & conf = Settings::Get();
-    return conf.GameType(Game::NETWORK) && conf.NetworkLocalClient() && !conf.NetworkDedicatedServer();
+    return conf.GameType(Game::TYPE_NETWORK) && conf.NetworkLocalClient() && !conf.NetworkDedicatedServer();
 }
 
 bool Network::isRemoteClient(void)
 {
     Settings & conf = Settings::Get();
-    return conf.GameType(Game::NETWORK) && (!conf.NetworkLocalClient() || conf.NetworkDedicatedServer());
+    return conf.GameType(Game::TYPE_NETWORK) && (!conf.NetworkLocalClient() || conf.NetworkDedicatedServer());
 }
 
 bool Network::MsgIsBroadcast(u16 msg)
@@ -172,7 +172,7 @@ int Network::RunDedicatedServer(void)
         }
 
 	conf.SetNetworkDedicatedServer(true);
-	conf.SetGameType(Game::STANDARD|Game::NETWORK);
+	conf.SetGameType(Game::TYPE_STANDARD|Game::TYPE_NETWORK);
 	conf.SetPreferablyCountPlayers(2);
 
         return FH2Server::Main(NULL);

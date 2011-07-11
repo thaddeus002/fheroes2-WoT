@@ -34,7 +34,7 @@
 Game::menu_t Game::NewStandard(void)
 {
     Settings & conf = Settings::Get();
-    conf.SetGameType(Game::STANDARD);
+    conf.SetGameType(Game::TYPE_STANDARD);
     conf.SetPreferablyCountPlayers(0);
     return Game::SELECTSCENARIO;
 }
@@ -42,7 +42,7 @@ Game::menu_t Game::NewStandard(void)
 Game::menu_t Game::NewBattleOnly(void)
 {
     Settings & conf = Settings::Get();
-    conf.SetGameType(Game::BATTLEONLY);
+    conf.SetGameType(Game::TYPE_BATTLEONLY);
 
     return Game::NEWMULTI;
 }
@@ -50,9 +50,9 @@ Game::menu_t Game::NewBattleOnly(void)
 Game::menu_t Game::NewHotSeat(void)
 {
     Settings & conf = Settings::Get();
-    conf.SetGameType(conf.GameType() | Game::HOTSEAT);
+    conf.SetGameType(conf.GameType() | Game::TYPE_HOTSEAT);
 
-    if(conf.GameType(Game::BATTLEONLY))
+    if(conf.GameType(Game::TYPE_BATTLEONLY))
     {
 	conf.SetPreferablyCountPlayers(2);
 	world.NewMaps(10, 10);
@@ -72,7 +72,7 @@ Game::menu_t Game::NewHotSeat(void)
 
 Game::menu_t Game::NewCampain(void)
 {
-    Settings::Get().SetGameType(Game::CAMPAIGN);
+    Settings::Get().SetGameType(Game::TYPE_CAMPAIGN);
     VERBOSE("New Campain Game: under construction.");
     return Game::NEWGAME;
 }
@@ -80,7 +80,7 @@ Game::menu_t Game::NewCampain(void)
 Game::menu_t Game::NewNetwork(void)
 {
     Settings & conf = Settings::Get();
-    conf.SetGameType(conf.GameType() | Game::NETWORK);
+    conf.SetGameType(conf.GameType() | Game::TYPE_NETWORK);
 
     // cursor
     Cursor & cursor = Cursor::Get();
@@ -227,8 +227,8 @@ Game::menu_t Game::NewMulti(void)
 {
     Settings & conf = Settings::Get();
 
-    if(! (conf.GameType(Game::BATTLEONLY)))
-	conf.SetGameType(Game::STANDARD);
+    if(! (conf.GameType(Game::TYPE_BATTLEONLY)))
+	conf.SetGameType(Game::TYPE_STANDARD);
 
     // reset prev. scenario info
     conf.SetMyColor(Color::GRAY);

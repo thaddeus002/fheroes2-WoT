@@ -263,7 +263,7 @@ int main(int argc, char **argv)
 	{
     	    AGG::Cache::Get().Dump();
 #ifdef WITH_NET
-            if(conf.GameType(Game::NETWORK)) FH2LocalClient::Get().Logout("internal error");
+            if(conf.GameType(Game::TYPE_NETWORK)) FH2LocalClient::Get().Logout("internal error");
 #endif
 	    conf.Dump();
 	}

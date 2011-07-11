@@ -39,7 +39,7 @@ u8 Castle::grown_wel2(8);
 u8 Castle::grown_week_of(5);
 u8 Castle::grown_month_of(100);
 
-Castle::Castle() : race(Race::BOMG), building(0), captain(*this), color(Color::GRAY), army(NULL)
+Castle::Castle() : race(Race::NONE), building(0), captain(*this), color(Color::GRAY), army(NULL)
 {
 }
 
@@ -268,7 +268,7 @@ void Castle::LoadFromMP2(const void *ptr)
     EducateHeroes();
 
     // AI troops auto pack
-    if(!custom_troops && Game::AI == GetControl())
+    if(!custom_troops && Game::CONTROL_AI == GetControl())
 	JoinRNDArmy();
 
     // fix shipyard
@@ -1764,7 +1764,7 @@ bool Castle::AllowBuyBoat(void) const
 bool Castle::BuyBoat(void)
 {
     if(!AllowBuyBoat()) return false;
-    if(Game::LOCAL == world.GetKingdom(color).Control()) AGG::PlaySound(M82::BUILDTWN);
+    if(Game::CONTROL_LOCAL == world.GetKingdom(color).Control()) AGG::PlaySound(M82::BUILDTWN);
 
     const s32 index = GetIndex() + world.w() * 2;
     Maps::Tiles & left = world.GetTiles(index - 1);
@@ -1893,7 +1893,7 @@ void Castle::JoinRNDArmy(void)
 
 void Castle::ActionPreBattle(void)
 {
-    if(Game::AI == GetControl())
+    if(Game::CONTROL_AI == GetControl())
 	AI::CastlePreBattle(*this);
     else
     if(Settings::Get().ExtBattleMergeArmies())
@@ -1912,7 +1912,7 @@ void Castle::ActionAfterBattle(bool attacker_wins)
 	army.Clear();
     }
 
-    if(Game::AI == GetControl())
+    if(Game::CONTROL_AI == GetControl())
 	AI::CastleAfterBattle(*this, attacker_wins);
 }
 

@@ -42,7 +42,7 @@ Game::menu_t Game::MainMenu(void)
 
     Settings & conf = Settings::Get();
 
-    conf.SetGameType(MENU);
+    conf.SetGameType(TYPE_MENU);
     if(conf.QVGA()) return PocketPC::MainMenu();
 
     // preload

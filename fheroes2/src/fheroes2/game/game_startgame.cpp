@@ -162,7 +162,7 @@ Game::menu_t Game::StartGame(void)
 
     Game::Focus & global_focus = Focus::Get();
     // clear prev settings
-    if(conf.GameType(LOADFILE))
+    if(conf.GameType(TYPE_LOADFILE))
 	global_focus.Reset(Focus::UNSEL);
     global_focus.Reset(Focus::FIRSTHERO);
 
@@ -203,8 +203,8 @@ Game::menu_t Game::StartGame(void)
 
 	    switch(kingdom.Control())
 	    {
-		case LOCAL:
-		    if(conf.GameType(Game::HOTSEAT))
+		case CONTROL_LOCAL:
+		    if(conf.GameType(Game::TYPE_HOTSEAT))
 		    {
 			cursor.Hide();
 			conf.SetMyColor(Color::GRAY);
@@ -699,7 +699,7 @@ Game::menu_t Game::HumanTurn(bool isload)
     GameOver::Result & gameResult = GameOver::Result::Get();
 
     // set focus
-    if(conf.GameType(Game::HOTSEAT)) global_focus.Reset();
+    if(conf.GameType(Game::TYPE_HOTSEAT)) global_focus.Reset();
 
     if(conf.ExtRememberLastFocus())
     {

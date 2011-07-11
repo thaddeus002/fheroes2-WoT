@@ -442,7 +442,7 @@ s8 Army::army_t::GetMoraleModificator(std::string *strs) const
             case Race::WRLK: ++count_wrlk; break;
             case Race::WZRD: ++count_wzrd; break;
             case Race::NECR: ++count_necr; break;
-            case Race::BOMG: ++count_bomg; break;
+            case Race::NONE: ++count_bomg; break;
             default: break;
 	}
         if(*it == Monster::GHOST) ghost_present = true;
@@ -455,7 +455,7 @@ s8 Army::army_t::GetMoraleModificator(std::string *strs) const
     if(count_wrlk){ ++count; r = Race::WRLK; }
     if(count_wzrd){ ++count; r = Race::WZRD; }
     if(count_necr){ ++count; r = Race::NECR; }
-    if(count_bomg){ ++count; r = Race::BOMG; }
+    if(count_bomg){ ++count; r = Race::NONE; }
     const u8 uniq_count = GetUniqCount();
 
     switch(count)
@@ -634,7 +634,7 @@ std::vector<Army::Troop> Army::army_t::Optimize(void) const
 
 void Army::army_t::ArrangeForBattle(void)
 {
-    if(GetControl() != Game::AI) return;
+    if(GetControl() != Game::CONTROL_AI) return;
 
     Troops priority = Optimize();
 
@@ -1062,7 +1062,7 @@ u32 Army::army_t::ActionToSirens(void)
 
 u8 Army::army_t::GetControl(void) const
 {
-    return commander ? commander->GetControl() : (color == Color::GRAY ? Game::AI : world.GetKingdom(color).Control());
+    return commander ? commander->GetControl() : (color == Color::GRAY ? Game::CONTROL_AI : world.GetKingdom(color).Control());
 }
 
 u32 Army::army_t::GetSurrenderCost(void) const
@@ -1148,7 +1148,7 @@ u8 Army::GetJoinSolution(const Heroes & hero, const Maps::Tiles & tile, u32 & jo
     {
 	// ... surely flee before us
 
-	if(hero.GetControl() == Game::AI) return Rand::Get(0, 10) < 5 ? 0 : 3;
+	if(hero.GetControl() == Game::CONTROL_AI) return Rand::Get(0, 10) < 5 ? 0 : 3;
 
 	return 3;
     }

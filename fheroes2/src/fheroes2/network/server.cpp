@@ -222,8 +222,8 @@ int FH2Server::Main(void* ptr)
 				Kingdom* kingdom1 = &world.GetKingdom(color1);
 				Kingdom* kingdom2 = &world.GetKingdom(color2);
 
-				kingdom1->SetControl(Game::REMOTE);
-				kingdom2->SetControl(Game::REMOTE);
+				kingdom1->SetControl(Game::CONTROL_REMOTE);
+				kingdom2->SetControl(Game::CONTROL_REMOTE);
 
 				conf.SetKingdomRace(color1, hero1->GetRace());
 				conf.SetKingdomRace(color2, hero2->GetRace());
@@ -469,7 +469,7 @@ u8 FH2Server::GetFreeColor(bool admin)
     Settings & conf = Settings::Get();
     u8 res = 0;
 
-    if(conf.GameType(Game::STANDARD))
+    if(conf.GameType(Game::TYPE_STANDARD))
     {
         // check color
         mutexConf.Lock();
@@ -477,7 +477,7 @@ u8 FH2Server::GetFreeColor(bool admin)
         mutexConf.Unlock();
     }
     else
-    if(conf.GameType(Game::BATTLEONLY))
+    if(conf.GameType(Game::TYPE_BATTLEONLY))
     {
         res = admin ? Color::BLUE : Color::RED;
     }
@@ -632,7 +632,7 @@ void FH2Server::MsgLogout(QueueMessage & msg, FH2RemoteClient & client)
     SendUpdatePlayers(msg, client.player_id);
 
     // FIXME: logout
-    // if(Modes(ST_INGAME)) world.GetKingdom(player_color).SetControl(Game::AI); // FIXME: MSGLOGOUT: INGAME AND CURRENT TURN?    
+    // if(Modes(ST_INGAME)) world.GetKingdom(player_color).SetControl(Game::CONTROL_AI); // FIXME: MSGLOGOUT: INGAME AND CURRENT TURN?    
 }
 
 void FH2Server::MsgShutdown(QueueMessage & msg)
@@ -659,12 +659,12 @@ void FH2Server::MsgSetGameType(QueueMessage & msg, FH2RemoteClient & client)
 
     if(client.Modes(ST_ADMIN))
     {
-	if(type & Game::STANDARD)
-	    conf.SetGameType(Game::STANDARD | Game::NETWORK);
+	if(type & Game::TYPE_STANDARD)
+	    conf.SetGameType(Game::TYPE_STANDARD | Game::TYPE_NETWORK);
 	else
-	if(type & Game::BATTLEONLY)
+	if(type & Game::TYPE_BATTLEONLY)
 	{
-	    conf.SetGameType(Game::BATTLEONLY | Game::NETWORK);
+	    conf.SetGameType(Game::TYPE_BATTLEONLY | Game::TYPE_NETWORK);
 	    world.NewMaps(10, 10);
 	}
 
@@ -686,13 +686,13 @@ void FH2Server::MsgLoadMaps(QueueMessage & msg, FH2RemoteClient & client)
 
 	conf.SetPlayersColors(clients.GetPlayersColors());
 
-	if(conf.GameType(Game::STANDARD))
+	if(conf.GameType(Game::TYPE_STANDARD))
 	{
 	    // disable connect
 	    //world.LoadMaps(conf.MapsFile());
 	}
 	else
-	if(conf.GameType(Game::BATTLEONLY))
+	if(conf.GameType(Game::TYPE_BATTLEONLY))
 	{
 	    //world.NewMaps(10, 10);
 	}
@@ -701,7 +701,7 @@ void FH2Server::MsgLoadMaps(QueueMessage & msg, FH2RemoteClient & client)
 	Color::Colors colors = Color::GetColors(conf.PlayersColors());
 	for(Color::Colors::iterator
 	    it = colors.begin(); it != colors.end(); ++it)
-    	    world.GetKingdom(*it).SetControl(Game::REMOTE);
+    	    world.GetKingdom(*it).SetControl(Game::CONTROL_REMOTE);
 
 	mutexConf.Unlock();
     }
@@ -884,7 +884,7 @@ Game::menu_t Game::NetworkHost(void)
 {
     Settings & conf = Settings::Get();
 
-    if(conf.GameType(Game::STANDARD))
+    if(conf.GameType(Game::TYPE_STANDARD))
     {
 	// select count players
 	const u8 max_players = Game::SelectCountPlayers();
@@ -902,7 +902,7 @@ Game::menu_t Game::NetworkHost(void)
 	display.Flip();
     }
     else
-    if(conf.GameType(Game::BATTLEONLY))
+    if(conf.GameType(Game::TYPE_BATTLEONLY))
 	conf.SetPreferablyCountPlayers(2);
 
     SDL::Thread thread;

@@ -335,7 +335,7 @@ void World::LoadMaps(const std::string &filename)
 
 	    case 0x06: // tower: random
 	    case 0x86: // castle: random
-		vec_castles.push_back(new Castle(cx, cy, Race::BOMG));	break;
+		vec_castles.push_back(new Castle(cx, cy, Race::NONE));	break;
 
 	    default:
 		DEBUG(DBG_GAME, DBG_WARN, "castle block: " << "unknown id: " << static_cast<int>(id) << ", maps index: " << cx + cy * w());
@@ -577,7 +577,7 @@ void World::LoadMaps(const std::string &filename)
 			Kingdom & kingdom = GetKingdom(color);
 
 			// caclulate race
-			u8 race = Race::BOMG;
+			u8 race = Race::NONE;
 			switch(index_name % 7)
 			{
 			    case 0: race = Race::KNGT; break;
@@ -1591,7 +1591,7 @@ bool World::KingdomIsWins(const Kingdom & kingdom, u16 wins) const
 	{
 	    const Castle *town = GetCastle(conf.WinsMapsIndexObject());
 	    // check comp also wins
-	    return ((Game::AI != kingdom.Control() || conf.WinsCompAlsoWins()) &&
+	    return ((Game::CONTROL_AI != kingdom.Control() || conf.WinsCompAlsoWins()) &&
     	       (town && town->GetColor() == kingdom.GetColor()));
 	}
 
@@ -1627,7 +1627,7 @@ bool World::KingdomIsWins(const Kingdom & kingdom, u16 wins) const
 
 	case GameOver::WINS_GOLD:
 	    // check comp also wins
-	    return ((Game::AI != kingdom.Control() || conf.WinsCompAlsoWins()) &&
+	    return ((Game::CONTROL_AI != kingdom.Control() || conf.WinsCompAlsoWins()) &&
 		    (kingdom.GetFundsGold() >= conf.WinsAccumulateGold()));
 
 	default: break;
@@ -1660,7 +1660,7 @@ bool World::KingdomIsLoss(const Kingdom & kingdom, u16 loss) const
 	}
 
 	case GameOver::LOSS_TIME:
-    	    return (CountDay() > conf.LossCountDays() && Game::AI != kingdom.Control());
+    	    return (CountDay() > conf.LossCountDays() && Game::CONTROL_AI != kingdom.Control());
 
 	default: break;
     }

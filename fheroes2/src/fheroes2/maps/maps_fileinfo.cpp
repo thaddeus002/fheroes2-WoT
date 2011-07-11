@@ -59,7 +59,7 @@ u8 ByteToRace(u8 byte)
 	default: 	break;
     }
 
-    return Race::BOMG;
+    return Race::NONE;
 }
 
 Maps::FileInfo::FileInfo() : difficulty(Difficulty::EASY),
@@ -72,7 +72,7 @@ void Maps::FileInfo::Reset(void)
 {
     for(u8 ii = 0; ii < KINGDOMMAX; ++ii)
     {
-	races[ii] = Race::BOMG;
+	races[ii] = Race::NONE;
 	unions[ii] = Color::GetFromIndex(ii);
     }
 }

@@ -857,7 +857,7 @@ void Heroes::RescanPath(void)
 {
     if(path.isValid())
     {
-	if(Game::AI == GetControl())
+	if(Game::CONTROL_AI == GetControl())
 	{
 	    if(path.hasObstacle()) path.Reset();
 	}
@@ -1286,8 +1286,8 @@ void Heroes::LevelUp(bool skipsecondary, bool autoselect)
 {
     u8 primary = LevelUpPrimarySkill();
     if(! skipsecondary)
-	LevelUpSecondarySkill(primary, (autoselect || Game::AI == GetControl()));
-    if(Game::AI == GetControl()) AI::HeroesLevelUp(*this);
+	LevelUpSecondarySkill(primary, (autoselect || Game::CONTROL_AI == GetControl()));
+    if(Game::CONTROL_AI == GetControl()) AI::HeroesLevelUp(*this);
 }
 
 u8 Heroes::LevelUpPrimarySkill(void)
@@ -1677,7 +1677,7 @@ void Heroes::Dump(void) const
 	VERBOSE("");
     }
 
-    if(GetControl() == Game::AI)
+    if(GetControl() == Game::CONTROL_AI)
     {
 	VERBOSE("spell book      : " << (HaveSpellBook() ? spell_book.String() : "disabled"));
 
@@ -1862,13 +1862,13 @@ Heroes* AllHeroes::GetFreeman(u8 race) const
     freeman_heroes.reserve(HEROESMAXCOUNT);
 
     // find freeman in race
-    if(Race::BOMG != race)
+    if(Race::NONE != race)
 	for(u8 ii = min; ii <= max; ++ii)
 	    if(at(ii)->isFreeman())
 		freeman_heroes.push_back(ii);
 
     // not found, find other race
-    if(Race::BOMG == race || freeman_heroes.empty())
+    if(Race::NONE == race || freeman_heroes.empty())
 	for(u8 ii = 0; ii <= 53; ++ii)
 	    if(at(ii)->isFreeman()) freeman_heroes.push_back(ii);
 
