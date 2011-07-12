@@ -52,10 +52,10 @@ namespace SDL
 	int Descent(void) const;
 	int LineSkip(void) const;
 
-	void RenderText(Surface &, const std::string &, const Colors &, render_t = SOLID);
-	void RenderChar(Surface &, char, const Colors &, render_t = SOLID);
-	void RenderUnicodeText(Surface &, const u16 *, const Colors &, render_t = SOLID);
-	void RenderUnicodeChar(Surface &, u16, const Colors &, render_t = SOLID);
+	void RenderText(Surface &, const std::string &, const RGBColor &, render_t = SOLID);
+	void RenderChar(Surface &, char, const RGBColor &, render_t = SOLID);
+	void RenderUnicodeText(Surface &, const u16 *, const RGBColor &, render_t = SOLID);
+	void RenderUnicodeChar(Surface &, u16, const RGBColor &, render_t = SOLID);
 
     private:
 	TTF_Font *fnt;

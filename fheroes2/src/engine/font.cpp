@@ -74,7 +74,7 @@ void SDL::Font::SetStyle(u8 style)
     if(fnt) TTF_SetFontStyle(fnt, style);
 }
 
-void SDL::Font::RenderText(Surface & dst, const std::string & msg, const Colors & clr, render_t render)
+void SDL::Font::RenderText(Surface & dst, const std::string & msg, const RGBColor & clr, render_t render)
 {
     if(dst.surface) Surface::FreeSurface(dst);
     if(fnt) switch(render)
@@ -84,7 +84,7 @@ void SDL::Font::RenderText(Surface & dst, const std::string & msg, const Colors 
     }
 }
 
-void SDL::Font::RenderChar(Surface & dst, char ch, const Colors & clr, render_t render)
+void SDL::Font::RenderChar(Surface & dst, char ch, const RGBColor & clr, render_t render)
 {
     char buf[2] = { '\0', '\0' };
          buf[0] = ch;
@@ -97,7 +97,7 @@ void SDL::Font::RenderChar(Surface & dst, char ch, const Colors & clr, render_t 
     }
 }
 
-void SDL::Font::RenderUnicodeText(Surface & dst, const u16 *msg, const Colors & clr, render_t render)
+void SDL::Font::RenderUnicodeText(Surface & dst, const u16 *msg, const RGBColor & clr, render_t render)
 {
     if(dst.surface) Surface::FreeSurface(dst);
     if(fnt) switch(render)
@@ -107,7 +107,7 @@ void SDL::Font::RenderUnicodeText(Surface & dst, const u16 *msg, const Colors & 
     }
 }
 
-void SDL::Font::RenderUnicodeChar(Surface & dst, u16 ch, const Colors & clr, render_t render)
+void SDL::Font::RenderUnicodeChar(Surface & dst, u16 ch, const RGBColor & clr, render_t render)
 {
     u16 buf[2] = { L'\0', L'\0' };
         buf[0] = ch;

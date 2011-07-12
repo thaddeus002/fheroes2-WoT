@@ -834,8 +834,8 @@ void AGG::Cache::LoadFNT(u16 ch)
 
     if(conf.Unicode())
     {
-        const Colors white = { 0xFF, 0xFF, 0xFF, 0x00 };
-        const Colors yellow= { 0xFF, 0xFF, 0x00, 0x00 };
+        const RGBColor white = { 0xFF, 0xFF, 0xFF, 0x00 };
+        const RGBColor yellow= { 0xFF, 0xFF, 0x00, 0x00 };
 
 	// small
 	font_small.RenderUnicodeChar(fnt_cache[ch].small_white, ch, white, conf.FontSmallRenderBlended() ? SDL::Font::BLENDED : SDL::Font::SOLID);
