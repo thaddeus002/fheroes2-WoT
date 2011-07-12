@@ -48,6 +48,7 @@ typedef std::list<EventDate> EventsDate;
 typedef std::list<EventMaps> EventsMaps;
 typedef std::list<Riddle>    Riddles;
 typedef std::vector<Maps::Tiles> MapsTiles;
+typedef std::map<s32, ObjectColor> CapturedObjects;
 
 class World : protected Size
 {
@@ -175,7 +176,7 @@ private:
     std::map<s32, std::string>		map_sign;
 
     // index, object, color
-    std::map<s32, ObjectColor> map_captureobj;
+    CapturedObjects			map_captureobj;
 
     s32 ultimate_index;
 

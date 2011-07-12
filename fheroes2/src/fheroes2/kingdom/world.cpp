@@ -1102,13 +1102,14 @@ s32 World::NextTeleport(const s32 index) const
     std::vector<s32> v;
     v.reserve(vec_teleports.size());
 
-    for(std::vector<s32>::const_iterator itv = vec_teleports.begin(); itv != vec_teleports.end(); ++itv)
-	if(type == GetTiles(*itv).GetQuantity1())
+    for(std::vector<s32>::const_iterator
+	it = vec_teleports.begin(); it != vec_teleports.end(); ++it)
+	if(type == GetTiles(*it).GetQuantity1())
 	{
-	    if(MP2::OBJ_HEROES != GetTiles(*itv).GetObject())
-		v.push_back(*itv);
+	    if(MP2::OBJ_HEROES != GetTiles(*it).GetObject())
+		v.push_back(*it);
 	    else
-	    if(index != *itv)
+	    if(index != *it)
 	    {
 		DEBUG(DBG_GAME, DBG_WARN, "is busy");
 	    }
@@ -1123,17 +1124,17 @@ s32 World::NextTeleport(const s32 index) const
 s32 World::NextWhirlpool(const s32 index)
 {
     std::vector<s32> whilrpools;
-    std::vector<s32>::const_iterator itv;
 
     whilrpools.reserve(40);
     GetObjectPositions(MP2::OBJ_WHIRLPOOL, whilrpools);
 
     std::map<s32, std::vector<s32> > uniq_whirlpools;
 
-    for(itv = whilrpools.begin(); itv != whilrpools.end(); ++itv)
+    for(std::vector<s32>::const_iterator
+	it = whilrpools.begin(); it != whilrpools.end(); ++it)
     {
-    	const Maps::TilesAddon* addon = GetTiles(*itv).FindObject(MP2::OBJ_WHIRLPOOL);
-	if(addon) uniq_whirlpools[addon->uniq].push_back(*itv);
+    	const Maps::TilesAddon* addon = GetTiles(*it).FindObject(MP2::OBJ_WHIRLPOOL);
+	if(addon) uniq_whirlpools[addon->uniq].push_back(*it);
     }
     whilrpools.clear();
 
@@ -1149,11 +1150,10 @@ s32 World::NextWhirlpool(const s32 index)
 
     if(addon)
     {
-	std::map<s32, std::vector<s32> >::const_iterator it1 = uniq_whirlpools.begin();
-	std::map<s32, std::vector<s32> >::const_iterator it2 = uniq_whirlpools.end();
-	for(; it1 != it2; ++it1)
+	for(std::map<s32, std::vector<s32> >::const_iterator
+	    it = uniq_whirlpools.begin(); it != uniq_whirlpools.end(); ++it)
 	{
-	    const u32 & uniq = (*it1).first;
+	    const u32 & uniq = (*it).first;
 	    if(uniq == addon->uniq) continue;
 	    uniqs.push_back(uniq);
 	}
@@ -1176,13 +1176,9 @@ const std::string & World::MessageSign(const s32 index)
 /* return count captured object */
 u16 World::CountCapturedObject(const MP2::object_t obj, const Color::color_t col) const
 {
-    std::map<s32, ObjectColor>::const_iterator it1 = map_captureobj.begin();
-    std::map<s32, ObjectColor>::const_iterator it2 = map_captureobj.end();
-
-    u16 result = 0;
-    for(; it1 != it2; ++it1) if((*it1).second.isObject(obj) && (*it1).second.isColor(col)) ++result;
-
-    return result;
+    const ObjectColor objcol(obj, col);
+    return std::count_if(map_captureobj.begin(), map_captureobj.end(),
+		    std::bind2nd(map_data_compare<CapturedObjects>(), objcol));
 }
 
 /* return count captured mines */
@@ -1190,28 +1186,35 @@ u16 World::CountCapturedMines(const u8 res, const Color::color_t col) const
 {
     u16 result = 0;
 
-    for(std::map<s32, ObjectColor>::const_iterator
+    const ObjectColor objcol1(MP2::OBJ_MINES, col);
+    const ObjectColor objcol2(MP2::OBJ_HEROES, col);
+
+    for(CapturedObjects::const_iterator
 	it = map_captureobj.begin(); it != map_captureobj.end(); ++it)
-	if((*it).second.isObject(MP2::OBJ_MINES) || (*it).second.isObject(MP2::OBJ_HEROES))
     {
+	const ObjectColor & objcol = (*it).second;
+
+	if(objcol == objcol1 || objcol == objcol2)
+	{
 	    // scan for find mines
 	    const Maps::TilesAddon * addon = GetTiles((*it).first).FindObject(MP2::OBJ_MINES);
 
 	    if(addon)
 	    {
 		// index sprite EXTRAOVR
-		if(0 == addon->index && Resource::ORE == res && (*it).second.isColor(col)) ++result;
+		if(0 == addon->index && Resource::ORE == res) ++result;
 		else
-		if(1 == addon->index && Resource::SULFUR == res && (*it).second.isColor(col)) ++result;
+		if(1 == addon->index && Resource::SULFUR == res) ++result;
 		else
-		if(2 == addon->index && Resource::CRYSTAL == res && (*it).second.isColor(col)) ++result;
+		if(2 == addon->index && Resource::CRYSTAL == res) ++result;
 		else
-		if(3 == addon->index && Resource::GEMS == res && (*it).second.isColor(col)) ++result;
+		if(3 == addon->index && Resource::GEMS == res) ++result;
 		else
-		if(4 == addon->index && Resource::GOLD == res && (*it).second.isColor(col)) ++result;
+		if(4 == addon->index && Resource::GOLD == res) ++result;
 	    }
+	}
     }
-    
+
     return result;
 }
 
@@ -1228,8 +1231,7 @@ void World::CaptureObject(const s32 index, const Color::color_t col)
 	obj = hero->GetUnderObject();
     }
 
-    map_captureobj[index].first = obj;
-    map_captureobj[index].second = col;
+    map_captureobj[index] = ObjectColor(obj, col);
 
     if(MP2::OBJ_CASTLE == obj)
     {
@@ -1243,12 +1245,8 @@ void World::CaptureObject(const s32 index, const Color::color_t col)
 /* return color captured object */
 Color::color_t World::ColorCapturedObject(const s32 index) const
 {
-    std::map<s32, ObjectColor>::const_iterator it1 = map_captureobj.begin();
-    std::map<s32, ObjectColor>::const_iterator it2 = map_captureobj.end();
-
-    for(; it1 != it2; ++it1) if((*it1).first == index) return (*it1).second.second;
-
-    return Color::GRAY;
+    CapturedObjects::const_iterator it = map_captureobj.find(index);
+    return it != map_captureobj.end() ? (*it).second.second : Color::GRAY;
 }
 
 void World::ClearFog(const u8 color)
@@ -1260,26 +1258,28 @@ void World::ClearFog(const u8 color)
     vec_heroes.Scoute(color);
 
     // clear abroad objects
-    std::map<s32, ObjectColor>::const_iterator it1 = map_captureobj.begin();
-    std::map<s32, ObjectColor>::const_iterator it2 = map_captureobj.end();
-
-    for(; it1 != it2; ++it1)
-	if(color & (*it1).second.second)
+    for(CapturedObjects::const_iterator
+	it = map_captureobj.begin(); it != map_captureobj.end(); ++it)
     {
-	u8 scoute = 0;
+	const ObjectColor & objcol = (*it).second;
 
-	switch((*it1).second.first)
+	if(objcol.isColor(color))
 	{
-	    case MP2::OBJ_MINES:
-	    case MP2::OBJ_ALCHEMYLAB:
-	    case MP2::OBJ_SAWMILL:	scoute = 2; break;
+	    u8 scoute = 0;
 
-	    case MP2::OBJ_LIGHTHOUSE:	scoute = 4; break; // FIXME: scoute and lighthouse
+	    switch(objcol.first)
+	    {
+		case MP2::OBJ_MINES:
+		case MP2::OBJ_ALCHEMYLAB:
+		case MP2::OBJ_SAWMILL:	scoute = 2; break;
 
-	    default: break;
+		case MP2::OBJ_LIGHTHOUSE: scoute = 4; break; // FIXME: scoute and lighthouse
+
+		default: break;
+	    }
+
+    	    if(scoute) Maps::ClearFog((*it).first, scoute, color);
 	}
-
-        if(scoute) Maps::ClearFog((*it1).first, scoute, color);
     }
 }
 
@@ -1494,15 +1494,15 @@ u16 World::CountObeliskOnMaps(void)
 void World::KingdomLoss(const Color::color_t color)
 {
     // capture object
-    std::map<s32, ObjectColor>::iterator it1 = map_captureobj.begin();
-    std::map<s32, ObjectColor>::const_iterator it2 = map_captureobj.end();
-    for(; it1 != it2; ++it1)
+    for(CapturedObjects::iterator
+	it = map_captureobj.begin(); it != map_captureobj.end(); ++it)
     {
-	ObjectColor & pair = (*it1).second;
-	if(pair.isColor(color))
+	ObjectColor & objcol = (*it).second;
+
+	if(objcol.isColor(color))
 	{
-	    pair.second = Color::GRAY;
-	    GetTiles((*it1).first).CaptureFlags32(pair.first, Color::GRAY);
+	    objcol.second = Color::GRAY;
+	    GetTiles((*it).first).CaptureFlags32(objcol.first, Color::GRAY);
 	}
     }
 }

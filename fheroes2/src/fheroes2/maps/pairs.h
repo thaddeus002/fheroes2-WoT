@@ -59,4 +59,14 @@ class ObjectColor : public std::pair<MP2::object_t, Color::color_t>
     bool isColor(u8 color) const { return color == second; };
 };
 
+template<class T>
+struct map_data_compare : public std::binary_function<typename T::value_type, 
+                                                      typename T::mapped_type, bool>
+{
+    bool operator() (const typename T::value_type & p, const typename T::mapped_type & i) const
+    {
+        return p.second == i;
+    }
+};
+
 #endif
