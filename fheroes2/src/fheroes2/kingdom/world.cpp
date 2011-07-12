@@ -1108,7 +1108,7 @@ s32 World::NextTeleport(const s32 index) const
 	    if(MP2::OBJ_HEROES != GetTiles(*itv).GetObject())
 		v.push_back(*itv);
 	    else
-	    if(index != (*itv).GetIndex())
+	    if(index != *itv)
 	    {
 		DEBUG(DBG_GAME, DBG_WARN, "is busy");
 	    }

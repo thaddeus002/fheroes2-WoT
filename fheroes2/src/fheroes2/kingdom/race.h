@@ -29,6 +29,7 @@ namespace Race
 {
     enum
     {
+        NONE    = 0x00,
         KNGT    = 0x01,
         BARB    = 0x02,
         SORC    = 0x04,
@@ -37,7 +38,6 @@ namespace Race
         NECR    = 0x20,
         MULT    = 0x40,
         RAND    = 0x80,
-        NONE    = 0x00,
 	ALL	= KNGT | BARB | SORC | WRLK | WZRD | NECR
     };
 

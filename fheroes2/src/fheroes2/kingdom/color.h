@@ -68,7 +68,7 @@ namespace Color
     u8 Count(u8);
     u8 GetIndex(color_t);
     color_t GetFromIndex(u8);
-    u8 GetFirst(u8);
+    color_t GetFirst(u8);
     color_t Get(u8);
 }
 

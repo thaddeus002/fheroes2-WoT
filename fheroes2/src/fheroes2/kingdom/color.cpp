@@ -96,7 +96,7 @@ Color::color_t Color::Get(u8 index)
     return GRAY;
 }
 
-u8 Color::GetFirst(u8 colors)
+Color::color_t Color::GetFirst(u8 colors)
 {
     if(colors & BLUE) return BLUE;
     else
@@ -110,7 +110,7 @@ u8 Color::GetFirst(u8 colors)
     else
     if(colors & PURPLE) return PURPLE;
 
-    return 0;
+    return Color::NONE;
 }
 
 Color::Colors Color::GetColors(u8 all)

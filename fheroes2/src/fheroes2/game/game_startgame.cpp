@@ -224,7 +224,7 @@ Game::menu_t Game::StartGame(void)
 		    if(skip_turns) skip_turns = false;
 		break;
 
-		// AI turn
+		// CONTROL_AI turn
 		default:
         	    if(m == ENDTURN)
 		    {
