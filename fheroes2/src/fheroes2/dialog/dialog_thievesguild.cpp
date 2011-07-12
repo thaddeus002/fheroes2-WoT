@@ -56,11 +56,11 @@ void UpdateValuesColors(std::vector<ValueColors> & v, int value, int color)
 	(*it).second |= color;
 }
 
-void GetTownsInfo(std::vector<ValueColors> & v, const Color::Colors & colors)
+void GetTownsInfo(std::vector<ValueColors> & v, const Colors & colors)
 {
     v.clear();
 
-    for(Color::Colors::const_iterator
+    for(Colors::const_iterator
 	color = colors.begin(); color != colors.end(); ++color)
     {
 	    int value = world.GetKingdom(*color).GetCountTown();
@@ -70,11 +70,11 @@ void GetTownsInfo(std::vector<ValueColors> & v, const Color::Colors & colors)
     std::sort(v.begin(), v.end(), ValueColors::SortValueGreat);
 }
 
-void GetCastlesInfo(std::vector<ValueColors> & v, const Color::Colors & colors)
+void GetCastlesInfo(std::vector<ValueColors> & v, const Colors & colors)
 {
     v.clear();
 
-    for(Color::Colors::const_iterator
+    for(Colors::const_iterator
 	color = colors.begin(); color != colors.end(); ++color)
     {
 	    int value = world.GetKingdom(*color).GetCountCastle();
@@ -84,11 +84,11 @@ void GetCastlesInfo(std::vector<ValueColors> & v, const Color::Colors & colors)
     std::sort(v.begin(), v.end(), ValueColors::SortValueGreat);
 }
 
-void GetHeroesInfo(std::vector<ValueColors> & v, const Color::Colors & colors)
+void GetHeroesInfo(std::vector<ValueColors> & v, const Colors & colors)
 {
     v.clear();
 
-    for(Color::Colors::const_iterator
+    for(Colors::const_iterator
 	color = colors.begin(); color != colors.end(); ++color)
     {
 	    int value = world.GetKingdom(*color).GetHeroes().size();
@@ -98,11 +98,11 @@ void GetHeroesInfo(std::vector<ValueColors> & v, const Color::Colors & colors)
     std::sort(v.begin(), v.end(), ValueColors::SortValueGreat);
 }
 
-void GetGoldsInfo(std::vector<ValueColors> & v, const Color::Colors & colors)
+void GetGoldsInfo(std::vector<ValueColors> & v, const Colors & colors)
 {
     v.clear();
 
-    for(Color::Colors::const_iterator
+    for(Colors::const_iterator
 	color = colors.begin(); color != colors.end(); ++color)
     {
 	    int value = world.GetKingdom(*color).GetFundsGold();
@@ -112,11 +112,11 @@ void GetGoldsInfo(std::vector<ValueColors> & v, const Color::Colors & colors)
     std::sort(v.begin(), v.end(), ValueColors::SortValueGreat);
 }
 
-void GetWoodOreInfo(std::vector<ValueColors> & v, const Color::Colors & colors)
+void GetWoodOreInfo(std::vector<ValueColors> & v, const Colors & colors)
 {
     v.clear();
 
-    for(Color::Colors::const_iterator
+    for(Colors::const_iterator
 	color = colors.begin(); color != colors.end(); ++color)
     {
 	    const Kingdom & kingdom = world.GetKingdom(*color);
@@ -127,11 +127,11 @@ void GetWoodOreInfo(std::vector<ValueColors> & v, const Color::Colors & colors)
     std::sort(v.begin(), v.end(), ValueColors::SortValueGreat);
 }
 
-void GetGemsCrSlfMerInfo(std::vector<ValueColors> & v, const Color::Colors & colors)
+void GetGemsCrSlfMerInfo(std::vector<ValueColors> & v, const Colors & colors)
 {
     v.clear();
 
-    for(Color::Colors::const_iterator
+    for(Colors::const_iterator
 	color = colors.begin(); color != colors.end(); ++color)
     {
 	    const Kingdom & kingdom = world.GetKingdom(*color);
@@ -145,11 +145,11 @@ void GetGemsCrSlfMerInfo(std::vector<ValueColors> & v, const Color::Colors & col
     std::sort(v.begin(), v.end(), ValueColors::SortValueGreat);
 }
 
-void GetObelisksInfo(std::vector<ValueColors> & v, const Color::Colors & colors)
+void GetObelisksInfo(std::vector<ValueColors> & v, const Colors & colors)
 {
     v.clear();
 
-    for(Color::Colors::const_iterator
+    for(Colors::const_iterator
 	color = colors.begin(); color != colors.end(); ++color)
     {
 	    int value = world.GetKingdom(*color).CountVisitedObjects(MP2::OBJ_OBELISK);
@@ -159,11 +159,11 @@ void GetObelisksInfo(std::vector<ValueColors> & v, const Color::Colors & colors)
     std::sort(v.begin(), v.end(), ValueColors::SortValueGreat);
 }
 
-void GetArmyInfo(std::vector<ValueColors> & v, const Color::Colors & colors)
+void GetArmyInfo(std::vector<ValueColors> & v, const Colors & colors)
 {
     v.clear();
 
-    for(Color::Colors::const_iterator
+    for(Colors::const_iterator
 	color = colors.begin(); color != colors.end(); ++color)
     {
 	    int value = world.GetKingdom(*color).GetArmiesStrength();
@@ -173,11 +173,11 @@ void GetArmyInfo(std::vector<ValueColors> & v, const Color::Colors & colors)
     std::sort(v.begin(), v.end(), ValueColors::SortValueGreat);
 }
 
-void GetIncomesInfo(std::vector<ValueColors> & v, const Color::Colors & colors)
+void GetIncomesInfo(std::vector<ValueColors> & v, const Colors & colors)
 {
     v.clear();
 
-    for(Color::Colors::const_iterator
+    for(Colors::const_iterator
 	color = colors.begin(); color != colors.end(); ++color)
     {
 	    int value = world.GetKingdom(*color).GetIncome();
@@ -187,11 +187,11 @@ void GetIncomesInfo(std::vector<ValueColors> & v, const Color::Colors & colors)
     std::sort(v.begin(), v.end(), ValueColors::SortValueGreat);
 }
 
-void GetBestHeroArmyInfo(std::vector<ValueColors> & v, const Color::Colors & colors)
+void GetBestHeroArmyInfo(std::vector<ValueColors> & v, const Colors & colors)
 {
     v.clear();
 
-    for(Color::Colors::const_iterator
+    for(Colors::const_iterator
 	color = colors.begin(); color != colors.end(); ++color)
     {
 	const Heroes* hero = world.GetKingdom(*color).GetBestHero();
@@ -209,11 +209,11 @@ void DrawFlags(const std::vector<ValueColors> & v, const Point & pos, const u16 
     {
 	if(ii < v.size())
 	{
-	    const Color::Colors colors = Color::GetColors(v[ii].second);
+	    const Colors colors(v[ii].second);
 	    const u8 sw = qvga ? AGG::GetICN(ICN::MISC6, 7).w() : AGG::GetICN(ICN::FLAG32, 1).w();
 	    u16 px = pos.x + chunk / 2 + ii * chunk - (colors.size() * sw) / 2;
 
-	    for(Color::Colors::const_iterator
+	    for(Colors::const_iterator
 		color = colors.begin(); color != colors.end(); ++color)
 	    {
 		const Sprite & flag = qvga ?
@@ -278,7 +278,7 @@ void Dialog::ThievesGuild(bool oracle)
 
     std::vector<ValueColors> v;
     v.reserve(KINGDOMMAX);
-    const Color::Colors colors = Color::GetColors(Settings::Get().KingdomColors());
+    const Colors colors(Settings::Get().KingdomColors());
     const u16 textx = 185;
     const u16 startx = 210;
     const u16 maxw = 430;
@@ -403,7 +403,7 @@ void Dialog::ThievesGuild(bool oracle)
 
     // head 2
     ii = 0;
-    for(Color::Colors::const_iterator
+    for(Colors::const_iterator
 	color = colors.begin(); color != colors.end(); ++color)
     {
 	text.Set(Color::String(*color));

@@ -266,8 +266,9 @@ void Network::PackRaceColors(QueueMessage & m)
 {
     m.Push(static_cast<u8>(KINGDOMMAX));
 
-    Color::Colors colors = Color::GetColors();
-    for(Color::Colors::iterator
+    const Colors colors(Color::ALL);
+
+    for(Colors::const_iterator
 	it = colors.begin(); it != colors.end(); ++it)
     {
 	m.Push(static_cast<u8>(*it));

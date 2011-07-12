@@ -698,8 +698,9 @@ void FH2Server::MsgLoadMaps(QueueMessage & msg, FH2RemoteClient & client)
 	}
 
 	// set control
-	Color::Colors colors = Color::GetColors(conf.PlayersColors());
-	for(Color::Colors::iterator
+	const Colors colors(conf.PlayersColors());
+
+	for(Colors::const_iterator
 	    it = colors.begin(); it != colors.end(); ++it)
     	    world.GetKingdom(*it).SetControl(Game::CONTROL_REMOTE);
 

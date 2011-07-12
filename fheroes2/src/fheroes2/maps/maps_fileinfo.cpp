@@ -312,9 +312,9 @@ bool Maps::FileInfo::ReadMP2(const std::string & filename)
 	u8 side1 = 0;
 	u8 side2 = 0;
 
-	Color::Colors colors = Color::GetColors(kingdom_colors);
+	const Colors colors(kingdom_colors);
 
-	for(Color::Colors::const_iterator
+	for(Colors::const_iterator
 	    it = colors.begin(); it != colors.end(); ++it)
 	{
 	    if(Color::GetIndex(*it) < wins3)

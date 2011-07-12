@@ -59,11 +59,8 @@ namespace Color
 	ALL	= BLUE | GREEN | RED | YELLOW | ORANGE | PURPLE
     };
 
-    typedef std::vector<Color::color_t> Colors;
 
     const char* String(u8);
-
-    Colors GetColors(u8 = ALL);
 
     u8 Count(u8);
     u8 GetIndex(color_t);
@@ -71,5 +68,13 @@ namespace Color
     color_t GetFirst(u8);
     color_t Get(u8);
 }
+
+class Colors : public std::vector<Color::color_t>
+{
+public:
+    Colors(u8 = Color::ALL);
+
+    std::string String(void) const;
+};
 
 #endif

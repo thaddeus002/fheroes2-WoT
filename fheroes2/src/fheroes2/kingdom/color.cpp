@@ -21,6 +21,7 @@
  ***************************************************************************/
 
 #include <bitset>
+#include <sstream>
 #include "color.h"
 
 const char* Color::String(u8 color)
@@ -113,19 +114,6 @@ Color::color_t Color::GetFirst(u8 colors)
     return Color::NONE;
 }
 
-Color::Colors Color::GetColors(u8 all)
-{
-    Colors colors;
-    colors.reserve(6);
-    if(all & BLUE) colors.push_back(BLUE);
-    if(all & GREEN) colors.push_back(GREEN);
-    if(all & RED) colors.push_back(RED);
-    if(all & YELLOW) colors.push_back(YELLOW);
-    if(all & ORANGE) colors.push_back(ORANGE);
-    if(all & PURPLE) colors.push_back(PURPLE);
-    return colors;
-}
-
 const char* BarrierColor::String(u8 val)
 {
     switch(val)
@@ -160,4 +148,28 @@ u8 BarrierColor::FromMP2(u8 val)
     }
 
     return NONE;
+}
+
+Colors::Colors(u8 colors)
+{
+    reserve(6);
+
+    if(colors & Color::BLUE)	push_back(Color::BLUE);
+    if(colors & Color::GREEN)	push_back(Color::GREEN);
+    if(colors & Color::RED)	push_back(Color::RED);
+    if(colors & Color::YELLOW)	push_back(Color::YELLOW);
+    if(colors & Color::ORANGE)	push_back(Color::ORANGE);
+    if(colors & Color::PURPLE)	push_back(Color::PURPLE);
+}
+
+std::string Colors::String(void) const
+{
+    std::ostringstream os;
+
+    for(const_iterator
+	it = begin(); it != end(); ++it)
+	    os << Color::String(*it) << ",";
+
+    return os.str();
+
 }

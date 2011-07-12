@@ -280,9 +280,9 @@ namespace Game
 
 bool GameOver::Result::CheckGameOver(Game::menu_t & res)
 {
-    Color::Colors colors2 = Color::GetColors(colors);
+    const Colors colors2(colors);
 
-    for(Color::Colors::iterator
+    for(Colors::const_iterator
 	it = colors2.begin(); it != colors2.end(); ++it)
     if(! world.GetKingdom(*it).isPlay())
     {

@@ -401,8 +401,9 @@ void UpdateCoordOpponentsInfo(const Point & dst, std::vector<Rect> & rects)
 
     std::fill(rects.begin(), rects.end(), Rect());
 
-    Color::Colors colors = Color::GetColors(conf.KingdomColors());
-    for(Color::Colors::iterator
+    const Colors colors(conf.KingdomColors());
+
+    for(Colors::const_iterator
 	it = colors.begin(); it != colors.end(); ++it)
 	rects[Color::GetIndex(*it)] = Rect(dst.x + GetStepFor(current++, sprite.w(), count), dst.y, sprite.w(), sprite.h());
 }
@@ -456,9 +457,9 @@ void Game::Scenario::RedrawOpponentsInfo(const Point & dst, const std::vector<Pl
 
     u8 current = 0;
 
-    Color::Colors colors = Color::GetColors(conf.KingdomColors());
+    const Colors colors(conf.KingdomColors());
 
-    for(Color::Colors::iterator
+    for(Colors::const_iterator
 	color = colors.begin(); color != colors.end(); ++color)
     {
 	u8 index = 0;
@@ -537,9 +538,9 @@ void Game::Scenario::RedrawClassInfo(const Point & dst, bool label)
     const u8 count = conf.KingdomColorsCount();
     u8 current = 0;
 
-    Color::Colors colors = Color::GetColors(conf.KingdomColors());
+    const Colors colors(conf.KingdomColors());
 
-    for(Color::Colors::iterator
+    for(Colors::const_iterator
 	color = colors.begin(); color != colors.end(); ++color)
     {
 	    u8 index = 0;

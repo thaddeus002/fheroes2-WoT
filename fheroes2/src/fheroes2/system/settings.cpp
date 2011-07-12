@@ -1037,8 +1037,9 @@ bool Settings::IsUnions(u8 cl1, u8 cl2) const
 
 void Settings::FixKingdomRandomRace(void)
 {
-    Color::Colors colors = Color::GetColors();
-    for(Color::Colors::iterator
+    const Colors colors(Color::ALL);
+
+    for(Colors::const_iterator
 	it = colors.begin(); it != colors.end(); ++it)
     if(KingdomColors(*it))
     {

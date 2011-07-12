@@ -179,13 +179,14 @@ Game::menu_t Game::StartGame(void)
     bool skip_turns = conf.LoadedGameVersion();
     GameOver::Result & gameResult = GameOver::Result::Get();
     Game::menu_t m = ENDTURN;
-    Color::Colors colors = Color::GetColors();
+
+    const Colors colors(Color::ALL);
 
     while(m == ENDTURN)
     {
 	if(!skip_turns) world.NewDay();
 
-	for(Color::Colors::const_iterator
+	for(Colors::const_iterator
 	    color = colors.begin(); color != colors.end(); ++color)
 	{
 	    Kingdom & kingdom = world.GetKingdom(*color);

@@ -44,16 +44,16 @@ struct ValueColors : std::pair<int, int>
     static bool SortValueGreat(const ValueColors & v1, const ValueColors & v2);
 };
 
-void GetTownsInfo(std::vector<ValueColors> &, const Color::Colors &);
-void GetCastlesInfo(std::vector<ValueColors> &, const Color::Colors &);
-void GetHeroesInfo(std::vector<ValueColors> &, const Color::Colors &);
-void GetGoldsInfo(std::vector<ValueColors> &, const Color::Colors &);
-void GetWoodOreInfo(std::vector<ValueColors> &, const Color::Colors &);
-void GetGemsCrSlfMerInfo(std::vector<ValueColors> &, const Color::Colors &);
-void GetObelisksInfo(std::vector<ValueColors> &, const Color::Colors &);
-void GetArmyInfo(std::vector<ValueColors> &, const Color::Colors &);
-void GetIncomesInfo(std::vector<ValueColors> &, const Color::Colors &);
-void GetBestHeroArmyInfo(std::vector<ValueColors> &, const Color::Colors &);
+void GetTownsInfo(std::vector<ValueColors> &, const Colors &);
+void GetCastlesInfo(std::vector<ValueColors> &, const Colors &);
+void GetHeroesInfo(std::vector<ValueColors> &, const Colors &);
+void GetGoldsInfo(std::vector<ValueColors> &, const Colors &);
+void GetWoodOreInfo(std::vector<ValueColors> &, const Colors &);
+void GetGemsCrSlfMerInfo(std::vector<ValueColors> &, const Colors &);
+void GetObelisksInfo(std::vector<ValueColors> &, const Colors &);
+void GetArmyInfo(std::vector<ValueColors> &, const Colors &);
+void GetIncomesInfo(std::vector<ValueColors> &, const Colors &);
+void GetBestHeroArmyInfo(std::vector<ValueColors> &, const Colors &);
 void DrawFlags(const std::vector<ValueColors> &, const Point &, const u16 width, const u8 count);
 void DrawHeroIcons(const std::vector<ValueColors> &, const Point &, const u16 width);
 
@@ -84,7 +84,7 @@ void PocketPC::ThievesGuild(bool oracle)
 
     std::vector<ValueColors> v;
     v.reserve(KINGDOMMAX);
-    Color::Colors colors = Color::GetColors(Settings::Get().KingdomColors());
+    const Colors colors(Settings::Get().KingdomColors());
     u16 textx = 115;
     u16 startx = 120;
     u16 maxw = 200;
@@ -202,7 +202,7 @@ void PocketPC::ThievesGuild(bool oracle)
 
     // head 2
     ii = 0;
-    for(Color::Colors::iterator
+    for(Colors::const_iterator
 	color = colors.begin(); color != colors.end(); ++color)
     {
 	text.Set(Color::String(*color), Font::SMALL);
