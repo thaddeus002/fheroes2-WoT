@@ -473,7 +473,8 @@ u8 FH2Server::GetFreeColor(bool admin)
     {
         // check color
         mutexConf.Lock();
-        res = Color::GetFirst(conf.CurrentFileInfo().human_colors & (~clients.GetPlayersColors()));
+	// first:  get allow colors
+	res = Color::GetFirst(conf.CurrentFileInfo().AllowHumanColors() & (~clients.GetPlayersColors()));
         mutexConf.Unlock();
     }
     else
@@ -564,13 +565,14 @@ void FH2Server::SetCurrentMap(QueueMessage & msg)
 
 void FH2Server::MsgChangeColors(QueueMessage & msg)
 {
-    Settings & conf = Settings::Get();
+    const Settings & conf = Settings::Get();
+    const Maps::FileInfo & fi = conf.CurrentFileInfo();
     u8 from, to;
 
     msg.Pop(from);
     msg.Pop(to);
 
-    if(conf.AllowColors(from) && conf.AllowColors(to))
+    if(fi.AllowHumanColors() & from & to)
     {
 	if(! clients.ChangeColors(from, to))
 	    UpdateColors();

@@ -181,8 +181,9 @@ Game::menu_t PocketPC::SelectScenario(void)
     {
 	if(conf.LoadFileMapsMP2(listbox.GetCurrent().file))
 	{
-    	    conf.SetMyColor(conf.FirstAllowColor());
-    	    conf.SetPlayersColors(conf.MyColor());
+	    const Color::color_t color = Color::GetFirst(conf.CurrentFileInfo().AllowHumanColors());
+    	    conf.SetMyColor(color);
+    	    conf.SetPlayersColors(color);
     	    conf.SetGameDifficulty(Difficulty::NORMAL);
 	}
 	return Game::SCENARIOINFO;

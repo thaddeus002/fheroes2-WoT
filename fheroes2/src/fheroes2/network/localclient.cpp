@@ -555,7 +555,7 @@ bool FH2LocalClient::ScenarioInfoDialog(void)
 		    change_color = color;
 		}
 		else
-		if(conf.AllowColors(color))
+		if(conf.CurrentFileInfo().AllowHumanColors() & color)
 		{
 		    cursor.Hide();
 		    sp.Hide();

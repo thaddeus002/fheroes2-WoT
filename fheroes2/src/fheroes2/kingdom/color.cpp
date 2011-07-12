@@ -166,10 +166,11 @@ std::string Colors::String(void) const
 {
     std::ostringstream os;
 
+    os << "Colors" << "(";
+
     for(const_iterator
 	it = begin(); it != end(); ++it)
-	    os << Color::String(*it) << ",";
+	    os << Color::String(*it) << (it + 1 != end() ? ", " : ")");
 
     return os.str();
-
 }

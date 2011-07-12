@@ -63,7 +63,7 @@ u8 ByteToRace(u8 byte)
 }
 
 Maps::FileInfo::FileInfo() : difficulty(Difficulty::EASY),
-    kingdom_colors(0), human_colors(0), computer_colors(0), rnd_races(0), localtime(0), with_heroes(false)
+    kingdom_colors(0), allow_human_colors(0), allow_comp_colors(0), rnd_races(0), localtime(0), with_heroes(false)
 {
     Reset();
 }
@@ -99,8 +99,8 @@ bool Maps::FileInfo::ReadMP2(const std::string & filename)
 
     file = filename;
     kingdom_colors = 0;
-    human_colors = 0;
-    computer_colors = 0;
+    allow_human_colors = 0;
+    allow_comp_colors = 0;
     rnd_races = 0;
     localtime = 0;
 
@@ -178,53 +178,53 @@ bool Maps::FileInfo::ReadMP2(const std::string & filename)
     fd.read(reinterpret_cast<char *>(&byte8), 1);
     if(byte8) kingdom_colors |= Color::PURPLE;
 
-    // allow color blue
+    // allow human blue
     fd.read(reinterpret_cast<char *>(&byte8), 1);
-    if(byte8) human_colors |= Color::BLUE;
+    if(byte8) allow_human_colors |= Color::BLUE;
 
-    // allow color green
+    // allow human green
     fd.read(reinterpret_cast<char *>(&byte8), 1);
-    if(byte8) human_colors |= Color::GREEN;
+    if(byte8) allow_human_colors |= Color::GREEN;
 
-    // allow color red
+    // allow human red
     fd.read(reinterpret_cast<char *>(&byte8), 1);
-    if(byte8) human_colors |= Color::RED;
+    if(byte8) allow_human_colors |= Color::RED;
 
-    // allow color yellow
+    // allow human yellow
     fd.read(reinterpret_cast<char *>(&byte8), 1);
-    if(byte8) human_colors |= Color::YELLOW;
+    if(byte8) allow_human_colors |= Color::YELLOW;
 
-    // allow color orange
+    // allow human orange
     fd.read(reinterpret_cast<char *>(&byte8), 1);
-    if(byte8) human_colors |= Color::ORANGE;
+    if(byte8) allow_human_colors |= Color::ORANGE;
 
-    // allow color purple
+    // allow human purple
     fd.read(reinterpret_cast<char *>(&byte8), 1);
-    if(byte8) human_colors |= Color::PURPLE;
+    if(byte8) allow_human_colors |= Color::PURPLE;
 
-    // rnd color blue
+    // allow comp blue
     fd.read(reinterpret_cast<char *>(&byte8), 1);
-    if(byte8) computer_colors |= Color::BLUE;
+    if(byte8) allow_comp_colors |= Color::BLUE;
 
-    // rnd color green
+    // allow comp green
     fd.read(reinterpret_cast<char *>(&byte8), 1);
-    if(byte8) computer_colors |= Color::GREEN;
+    if(byte8) allow_comp_colors |= Color::GREEN;
 
-    // rnd color red
+    // allow comp red
     fd.read(reinterpret_cast<char *>(&byte8), 1);
-    if(byte8) computer_colors |= Color::RED;
+    if(byte8) allow_comp_colors |= Color::RED;
 
-    // rnd color yellow
+    // allow comp yellow
     fd.read(reinterpret_cast<char *>(&byte8), 1);
-    if(byte8) computer_colors |= Color::YELLOW;
+    if(byte8) allow_comp_colors |= Color::YELLOW;
 
-    // rnd color orange
+    // allow comp orange
     fd.read(reinterpret_cast<char *>(&byte8), 1);
-    if(byte8) computer_colors |= Color::ORANGE;
+    if(byte8) allow_comp_colors |= Color::ORANGE;
 
-    // rnd color purple
+    // allow comp purple
     fd.read(reinterpret_cast<char *>(&byte8), 1);
-    if(byte8) computer_colors |= Color::PURPLE;
+    if(byte8) allow_comp_colors |= Color::PURPLE;
 
     // kingdom count
     // fd.seekg(0x1A, std::ios_base::beg);
@@ -446,20 +446,35 @@ u16 Maps::FileInfo::LossCountDays(void) const
     return loss1;
 }
 
+u8 Maps::FileInfo::AllowCompHumanColors(void) const
+{
+    return allow_human_colors & allow_comp_colors;
+}
+
+u8 Maps::FileInfo::AllowHumanColors(void) const
+{
+    return allow_human_colors;
+}
+
+u8 Maps::FileInfo::AllowComputerColors(void) const
+{
+    return allow_comp_colors;
+}
+
 u8 Maps::FileInfo::HumanOnlyColors(void) const
 {
-    return human_colors & ~(human_colors & computer_colors);
+    return allow_human_colors & ~(allow_comp_colors);
 }
 
 u8 Maps::FileInfo::ComputerOnlyColors(void) const
 {
-    return computer_colors & ~(human_colors & computer_colors);
+    return allow_comp_colors & ~(allow_human_colors);
 }
 
 bool Maps::FileInfo::isAllowCountPlayers(u8 colors) const
 {
     const u8 human_only = Color::Count(HumanOnlyColors());
-    const u8 comp_human = Color::Count(human_colors & computer_colors);
+    const u8 comp_human = Color::Count(AllowCompHumanColors());
 
     return human_only <= colors && colors <= human_only + comp_human;
 }
@@ -472,7 +487,7 @@ bool Maps::FileInfo::isMultiPlayerMap(void) const
 void Maps::FileInfo::Dump(void) const
 {
     VERBOSE("Maps::FileInfo::Dump: " << "file: " << file << ", name: " << name << ", kingdom colors: " << static_cast<int>(kingdom_colors) << \
-	", human colors: " << static_cast<int>(human_colors) << ", computer colors: " << static_cast<int>(computer_colors) << ", rnd races: " << \
+	", allow human colors: " << static_cast<int>(allow_human_colors) << ", allow comp colors: " << static_cast<int>(allow_comp_colors) << ", rnd races: " << \
 	static_cast<int>(rnd_races) << ", conditions wins: " << static_cast<int>(conditions_wins) << ", wins1: " << static_cast<int>(wins1) << \
 	", wins2: " << static_cast<int>(wins2) << ", wins3: " << wins3 << ", wins4: " << wins4 << ", conditions loss: " << static_cast<int>(conditions_loss) << \
         ", loss1: " << loss1 << ", loss2: " << loss2);

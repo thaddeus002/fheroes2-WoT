@@ -640,14 +640,17 @@ bool Settings::LoadFileMapsMP2(const std::string & file)
     if(! current_maps_file.ReadMP2(file)) return false;
 
     // get first color
-    my_color = Color::Get(Color::GetFirst(current_maps_file.human_colors));
-
+    my_color = Color::GetFirst(current_maps_file.AllowHumanColors());
     // game difficulty
     game_difficulty = Difficulty::NORMAL;
-
-    preferably_count_players = Color::Count(current_maps_file.human_colors);
+    preferably_count_players = 0;
 
     return true;
+}
+
+const Maps::FileInfo & Settings::CurrentFileInfo(void) const
+{
+    return current_maps_file;
 }
 
 Maps::FileInfo & Settings::CurrentFileInfo(void)
@@ -898,24 +901,6 @@ u16 Settings::MapsWidth(void) const
     return current_maps_file.size_w;
 }
 
-u8 Settings::AllowColors(void) const
-{
-    return current_maps_file.human_colors;
-}
-
-bool Settings::AllowColors(u8 f) const
-{
-    return current_maps_file.human_colors & f;
-}
-
-Color::color_t Settings::FirstAllowColor(void) const
-{
-    if(current_maps_file.HumanOnlyColors())
-	return Color::Get(Color::GetFirst(current_maps_file.HumanOnlyColors()));
-
-    return Color::Get(Color::GetFirst(current_maps_file.human_colors));
-}
-
 bool Settings::AllowChangeRace(u8 f) const
 {
     return current_maps_file.rnd_races & f;
@@ -929,16 +914,6 @@ u8 Settings::KingdomColors(void) const
 bool Settings::KingdomColors(u8 f) const
 {
     return current_maps_file.kingdom_colors & f;
-}
-
-u8 Settings::AllowColorsCount(void) const
-{
-    return Color::Count(current_maps_file.human_colors);
-}
-
-u8 Settings::KingdomColorsCount(void) const
-{
-    return Color::Count(current_maps_file.kingdom_colors);
 }
 
 bool Settings::GameStartWithHeroes(void) const

@@ -157,7 +157,7 @@ Game::menu_t Game::ScenarioInfo(void)
     if(reset_starting_settings)
     {
 	const Maps::FileInfo & info = conf.CurrentFileInfo();
-	conf.SetPlayersColors(info.HumanOnlyColors() ? info.HumanOnlyColors() : conf.FirstAllowColor());
+	conf.SetPlayersColors(Color::GetFirst(info.AllowHumanColors()));
     }
 
     Scenario::RedrawStaticInfo(rectPanel);
@@ -216,7 +216,7 @@ Game::menu_t Game::ScenarioInfo(void)
 		cursor.Hide();
 		levelCursor.Hide();
 		const Maps::FileInfo & info = conf.CurrentFileInfo();
-		conf.SetPlayersColors(info.HumanOnlyColors() ? info.HumanOnlyColors() : conf.FirstAllowColor());
+		conf.SetPlayersColors(Color::GetFirst(info.AllowHumanColors()));
 		Scenario::RedrawStaticInfo(rectPanel);
 		Scenario::RedrawDifficultyInfo(pointDifficultyInfo, !conf.QVGA());
 		UpdateCoordOpponentsInfo(pointOpponentInfo, coordColors);
@@ -272,22 +272,24 @@ Game::menu_t Game::ScenarioInfo(void)
 	    {
 		Color::color_t color = Color::GetFromIndex(itr - coordColors.begin());
 		const Maps::FileInfo & info = conf.CurrentFileInfo();
-		if(info.HumanOnlyColors() & color)
-		{
-		    // change human only color to other player
-		}
-		else
-		if(conf.AllowColors(color))
+
+		if(info.AllowHumanColors() & color)
 		{
 		    cursor.Hide();
 		    u8 players = color;
 		
 		    if(conf.GameType(Game::TYPE_NETWORK | Game::TYPE_HOTSEAT))
-		        players = conf.PlayersColors() & color ?
-				/* reset color */
-				conf.PlayersColors() & ~color :
-				/* set color */
-				conf.PlayersColors() | color;
+		    {
+			/* reset color */
+		        if(conf.PlayersColors() & color)
+			{
+			    if(1 < Color::Count(conf.PlayersColors()))
+		    		players = conf.PlayersColors() & ~color;
+			}
+			/* set color */
+			else
+			    players = conf.PlayersColors() | color;
+		    }
 
 		    conf.SetPlayersColors(players);
 		    Scenario::RedrawOpponentsInfo(pointOpponentInfo);
@@ -365,7 +367,7 @@ Game::menu_t Game::ScenarioInfo(void)
 
     if(result == STARTGAME)
     {
-	conf.SetMyColor(Color::Get(Color::GetFirst(conf.PlayersColors())));
+	conf.SetMyColor(Color::GetFirst(conf.PlayersColors()));
 	conf.SetCurrentColor(Color::NONE);
 	if(conf.ExtUseFade()) display.Fade();
 	Game::ShowLoadMapsText();
@@ -395,7 +397,7 @@ void UpdateCoordClassInfo(const Point & dst, std::vector<Rect> & rects)
 void UpdateCoordOpponentsInfo(const Point & dst, std::vector<Rect> & rects)
 {
     const Settings & conf = Settings::Get();
-    const u8 count = conf.KingdomColorsCount();
+    const u8 count = Color::Count(conf.KingdomColors());
     const Sprite &sprite = AGG::GetICN(ICN::NGEXTRA, 3);
     u8 current = 0;
 
@@ -453,10 +455,10 @@ void Game::Scenario::RedrawStaticInfo(const Rect & rt)
 void Game::Scenario::RedrawOpponentsInfo(const Point & dst, const std::vector<Player> *players)
 {
     const Settings & conf = Settings::Get();
-    const u8 count = conf.KingdomColorsCount();
+    const Maps::FileInfo & fi = conf.CurrentFileInfo();
+    const u8 count = Color::Count(conf.KingdomColors());
 
     u8 current = 0;
-
     const Colors colors(conf.KingdomColors());
 
     for(Colors::const_iterator
@@ -464,49 +466,19 @@ void Game::Scenario::RedrawOpponentsInfo(const Point & dst, const std::vector<Pl
     {
 	u8 index = 0;
 
-	if(! conf.AllowColors(*color))
-	{
-		// comp only
-		switch(*color)
-		{
-		    case Color::BLUE:	index = players ? 39 : 15; break;
-		    case Color::GREEN:	index = players ? 40 : 16; break;
-		    case Color::RED:	index = players ? 41 : 17; break;
-		    case Color::YELLOW:	index = players ? 42 : 18; break;
-		    case Color::ORANGE:	index = players ? 43 : 19; break;
-		    case Color::PURPLE:	index = players ? 44 : 20; break;
-		    default: break;
-		}
-	}
-	else
+	// current human
 	if(conf.PlayersColors() & *color)
-	{
-		// cur player
-		switch(*color)
-		{
-		    case Color::BLUE:	index = players ? 33 :  9; break;
-		    case Color::GREEN:	index = players ? 34 : 10; break;
-		    case Color::RED:	index = players ? 35 : 11; break;
-		    case Color::YELLOW:	index = players ? 36 : 12; break;
-		    case Color::ORANGE:	index = players ? 37 : 13; break;
-		    case Color::PURPLE:	index = players ? 38 : 14; break;
-		    default: break;
-		}
-	}
+	    index = 9 + Color::GetIndex(*color);
 	else
-	{
-		// comp/human
-		switch(*color)
-		{
-		    case Color::BLUE:	index = players ? 27 : 3; break;
-		    case Color::GREEN:	index = players ? 28 : 4; break;
-		    case Color::RED:	index = players ? 29 : 5; break;
-		    case Color::YELLOW:	index = players ? 30 : 6; break;
-		    case Color::ORANGE:	index = players ? 31 : 7; break;
-		    case Color::PURPLE:	index = players ? 32 : 8; break;
-		    default: break;
-		}
-	}
+	// comp only
+	if(fi.ComputerOnlyColors() & *color)
+	    index = 15 + Color::GetIndex(*color);
+	else
+	// comp/human
+	    index = 3 + Color::GetIndex(*color);
+
+	// multiplay sprite offset
+        if(players) index += 24;
 
 	if(index)
 	{
@@ -535,7 +507,7 @@ void Game::Scenario::RedrawClassInfo(const Point & dst, bool label)
 {
     Display & display = Display::Get();
     const Settings & conf = Settings::Get();
-    const u8 count = conf.KingdomColorsCount();
+    const u8 count = Color::Count(conf.KingdomColors());
     u8 current = 0;
 
     const Colors colors(conf.KingdomColors());

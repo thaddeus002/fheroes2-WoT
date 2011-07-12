@@ -202,6 +202,7 @@ public:
     void Dump(std::ostream & stream = std::cout) const;
     bool LoadFileMapsMP2(const std::string & file);
     Maps::FileInfo & CurrentFileInfo(void);
+    const Maps::FileInfo & CurrentFileInfo(void) const;
 
     u8 MajorVersion(void) const;
     u8 MinorVersion(void) const;
@@ -390,14 +391,9 @@ public:
     const std::string & MapsDescription(void) const;
     u8  MapsDifficulty(void) const;
     u16 MapsWidth(void) const;
-    bool AllowColors(u8) const;
-    u8   AllowColors(void) const;
-    Color::color_t FirstAllowColor(void) const;
     bool KingdomColors(u8) const;
     u8 KingdomColors(void) const;
     bool AllowChangeRace(u8) const;
-    u8 AllowColorsCount(void) const;
-    u8 KingdomColorsCount(void) const;
     bool GameStartWithHeroes(void) const;
     u16 ConditionWins(void) const;
     u16 ConditionLoss(void) const;

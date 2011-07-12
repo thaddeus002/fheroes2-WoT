@@ -42,6 +42,9 @@ namespace Maps
 
     bool isAllowCountPlayers(u8) const;
     bool isMultiPlayerMap(void) const;
+    u8   AllowCompHumanColors(void) const;
+    u8   AllowComputerColors(void) const;
+    u8   AllowHumanColors(void) const;
     u8   HumanOnlyColors(void) const;
     u8   ComputerOnlyColors(void) const;
 
@@ -73,8 +76,8 @@ namespace Maps
     u8 unions[KINGDOMMAX];
 
     u8 kingdom_colors;
-    u8 human_colors;
-    u8 computer_colors;
+    u8 allow_human_colors;
+    u8 allow_comp_colors;
     u8 rnd_races;
     u8 conditions_wins;
     u8 wins1;

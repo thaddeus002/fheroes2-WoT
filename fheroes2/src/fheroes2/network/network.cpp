@@ -214,8 +214,8 @@ void Network::PacketPushMapsFileInfo(QueueMessage & packet, const Maps::FileInfo
     for(u8 ii = 0; ii < KINGDOMMAX; ++ii) packet.Push(fi.races[ii]);
 
     packet.Push(fi.kingdom_colors);
-    packet.Push(fi.human_colors);
-    packet.Push(fi.computer_colors);
+    packet.Push(fi.allow_human_colors);
+    packet.Push(fi.allow_comp_colors);
     packet.Push(fi.rnd_races);
     packet.Push(fi.conditions_wins);
     packet.Push(fi.wins1);
@@ -245,8 +245,8 @@ void Network::PacketPopMapsFileInfo(QueueMessage & packet, Maps::FileInfo & fi)
     for(u8 ii = 0; ii < byte8; ++ii){ packet.Pop(race); fi.races[ii] = race; }
 
     packet.Pop(fi.kingdom_colors);
-    packet.Pop(fi.human_colors);
-    packet.Pop(fi.computer_colors);
+    packet.Pop(fi.allow_human_colors);
+    packet.Pop(fi.allow_comp_colors);
     packet.Pop(fi.rnd_races);
     packet.Pop(fi.conditions_wins);
     packet.Pop(fi.wins1);

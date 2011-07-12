@@ -152,7 +152,7 @@ u8 FH2RemoteClients::ResetPlayersColors(void)
 				std::bind2nd(std::mem_fun_ref(&FH2RemoteClient::Modes), ST_ADMIN));
     if(it != clients.end())
     {
-        (*it).player_color = conf.FirstAllowColor();
+        (*it).player_color = Color::GetFirst(conf.CurrentFileInfo().AllowHumanColors());
         colors |= (*it).player_color;
     }
 
@@ -161,7 +161,7 @@ u8 FH2RemoteClients::ResetPlayersColors(void)
 	it = clients.begin(); it != clients.end(); ++it)
 	if(0 == (*it).player_color)
     {
-        const u8 color = Color::GetFirst(conf.AllowColors() & (~colors));
+        const u8 color = Color::GetFirst(conf.CurrentFileInfo().AllowHumanColors() & (~colors));
         if(color)
         {
             (*it).player_color = color;
