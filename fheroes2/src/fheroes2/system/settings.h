@@ -391,7 +391,6 @@ public:
     const std::string & MapsDescription(void) const;
     u8  MapsDifficulty(void) const;
     u16 MapsWidth(void) const;
-    bool KingdomColors(u8) const;
     u8 KingdomColors(void) const;
     bool AllowChangeRace(u8) const;
     bool GameStartWithHeroes(void) const;

@@ -344,12 +344,12 @@ Game::menu_t Game::ScenarioInfo(void)
 	    else
 	    // color
 	    if(coordColors.end() != (itr = std::find_if(coordColors.begin(), coordColors.end(), std::bind2nd(RectIncludePoint(), le.GetMouseCursor()))) &&
-		conf.KingdomColors(Color::GetFromIndex(itr - coordColors.begin())))
+		(conf.KingdomColors() & Color::GetFromIndex(itr - coordColors.begin())))
 		    Dialog::Message(_("Opponents"), _("This lets you change player starting positions and colors. A particular color will always start in a particular location. Some positions may only be played by a computer player or only by a human player."), Font::BIG);
 	    else
 	    // class
 	    if(coordClass.end() != (itr = std::find_if(coordClass.begin(), coordClass.end(), std::bind2nd(RectIncludePoint(), le.GetMouseCursor()))) &&
-		conf.KingdomColors(Color::GetFromIndex(itr - coordClass.begin())))
+		(conf.KingdomColors() & Color::GetFromIndex(itr - coordClass.begin())))
 		    Dialog::Message(_("Class"), _("This lets you change the class of a player. Classes are not always changeable. Depending on the scenario, a player may receive additional towns and/or heroes not of their primary alignment."), Font::BIG);
 	    else
 	    if(rating && le.MousePressRight(rating->GetRect()))
