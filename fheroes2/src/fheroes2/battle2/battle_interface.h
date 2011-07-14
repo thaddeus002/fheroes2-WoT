@@ -126,7 +126,7 @@ namespace Battle2
 
         void RedrawActionAttackPart1(Stats &, Stats &, const TargetsInfo &);
         void RedrawActionAttackPart2(Stats &, TargetsInfo &);
-        void RedrawActionSpellCastPart1(const Spell &, u16, const std::string & name, const TargetsInfo &);
+        void RedrawActionSpellCastPart1(const Spell &, u16, const HeroBase*, const std::string &, const TargetsInfo &);
         void RedrawActionSpellCastPart2(const Spell &, TargetsInfo &);
         void RedrawActionResistSpell(const Stats &);
         void RedrawActionMonsterSpellCastStatus(const Stats &, const TargetInfo &);

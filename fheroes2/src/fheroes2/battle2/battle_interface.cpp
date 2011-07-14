@@ -513,9 +513,9 @@ void Battle2::OpponentSprite::ResetAnimFrame(u8 rule)
 		    icn = ICN::CMBTHROB;
 		    switch(rule)
 		    {
-			case OP_IDLE:	animframe_start = 12; animframe_count = 7; break;
+			case OP_IDLE:	animframe_start = 15; animframe_count = 4; break;
 			case OP_SRRW:	animframe_start = 1; animframe_count = 5; break;
-			case OP_CAST:	animframe_start = 7; animframe_count = 5; break;
+			case OP_CAST:	animframe_start = 6; animframe_count = 9; break;
 			default: break;
 		    }
 		    break;
@@ -523,9 +523,9 @@ void Battle2::OpponentSprite::ResetAnimFrame(u8 rule)
 		    icn = ICN::CMBTHROK;
 		    switch(rule)
 		    {
-			case OP_IDLE:	animframe_start = 12; animframe_count = 8; break;
+			case OP_IDLE:	animframe_start = 15; animframe_count = 5; break;
 			case OP_SRRW:	animframe_start = 1; animframe_count = 5; break;
-			case OP_CAST:	animframe_start = 7; animframe_count = 5; break;
+			case OP_CAST:	animframe_start = 6; animframe_count = 9; break;
 			default: break;
 		    }
 		    break;
@@ -533,9 +533,9 @@ void Battle2::OpponentSprite::ResetAnimFrame(u8 rule)
 		    icn = ICN::CMBTHRON;
 		    switch(rule)
 		    {
-			case OP_IDLE:	animframe_start = 16; animframe_count = 4; break;
+			case OP_IDLE:	animframe_start = 15; animframe_count = 4; break;
 			case OP_SRRW:	animframe_start = 1; animframe_count = 5; break;
-			case OP_CAST:	animframe_start = 8; animframe_count = 6; break;
+			case OP_CAST:	animframe_start = 6; animframe_count = 9; break;
 			default: break;
 		    }
 		    break;
@@ -543,9 +543,9 @@ void Battle2::OpponentSprite::ResetAnimFrame(u8 rule)
 		    icn = ICN::CMBTHROS;
 		    switch(rule)
 		    {
-			case OP_IDLE:	animframe_start = 10; animframe_count = 6; break;
+			case OP_IDLE:	animframe_start = 13; animframe_count = 4; break;
 			case OP_SRRW:	animframe_start = 1; animframe_count = 5; break;
-			case OP_CAST:	animframe_start = 7; animframe_count = 3; break;
+			case OP_CAST:	animframe_start = 6; animframe_count = 7; break;
 			default: break;
 		    }
 		    break;
@@ -553,9 +553,9 @@ void Battle2::OpponentSprite::ResetAnimFrame(u8 rule)
 		    icn = ICN::CMBTHROW;
 		    switch(rule)
 		    {
-			case OP_IDLE:	animframe_start = 13; animframe_count = 4; break;
+			case OP_IDLE:	animframe_start = 14; animframe_count = 3; break;
 			case OP_SRRW:	animframe_start = 1; animframe_count = 5; break;
-			case OP_CAST:	animframe_start = 7; animframe_count = 6; break;
+			case OP_CAST:	animframe_start = 6; animframe_count = 8; break;
 			default: break;
 		    }
 		    break;
@@ -565,7 +565,7 @@ void Battle2::OpponentSprite::ResetAnimFrame(u8 rule)
 		    {
 			case OP_IDLE:	animframe_start = 16; animframe_count = 3; break;
 			case OP_SRRW:	animframe_start = 1; animframe_count = 5; break;
-			case OP_CAST:	animframe_start = 7; animframe_count = 9; break;
+			case OP_CAST:	animframe_start = 6; animframe_count = 10; break;
 			default: break;
 		    }
 		    break;
@@ -592,7 +592,7 @@ void Battle2::OpponentSprite::ResetAnimFrame(u8 rule)
 	    {
 		case OP_IDLE:	animframe_start = 1; animframe_count = 1; break;
 		case OP_SRRW:	animframe_start = 1; animframe_count = 1; break;
-		case OP_CAST:	animframe_start = 3; animframe_count = 5; break;
+		case OP_CAST:	animframe_start = 3; animframe_count = 6; break;
 		default: break;
 	    }
 	    animframe = animframe_start;
@@ -2443,7 +2443,7 @@ void Battle2::Interface::RedrawActionResistSpell(const Stats & target)
     status.SetMessage("", false);
 }
 
-void Battle2::Interface::RedrawActionSpellCastPart1(const Spell & spell, u16 dst, const std::string & name, const TargetsInfo & targets)
+void Battle2::Interface::RedrawActionSpellCastPart1(const Spell & spell, u16 dst, const HeroBase* caster, const std::string & name, const TargetsInfo & targets)
 {
     std::string msg;
     Stats* target = targets.size() ? targets.front().defender : NULL;
@@ -2463,6 +2463,31 @@ void Battle2::Interface::RedrawActionSpellCastPart1(const Spell & spell, u16 dst
 	String::Replace(msg, "%{spell}", spell.GetName());
 	status.SetMessage(msg, true);
 	status.SetMessage("", false);
+    }
+
+    // set spell cast animation
+    if(caster)
+    {
+	OpponentSprite* opponent = caster->GetColor() == arena.army1.GetColor() ? opponent1 : opponent2;
+	if(opponent)
+	{
+	    opponent->ResetAnimFrame(OP_CAST);
+	    Display & display = Display::Get();
+	    LocalEvent & le = LocalEvent::Get();
+	    Cursor & cursor = Cursor::Get();
+	    do
+	    {
+		if(Game::AnimateInfrequent(Game::BATTLE_SPELL_DELAY))
+		{
+		    opponent->IncreaseAnimFrame();
+        	    cursor.Hide();
+        	    Redraw();
+        	    cursor.Show();
+        	    display.Flip();
+    		}
+	    }
+	    while(le.HandleEvents()  && !opponent->isFinishFrame());
+	}
     }
 
     // without object

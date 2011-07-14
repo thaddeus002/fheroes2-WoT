@@ -194,7 +194,7 @@ void Battle2::Arena::BattleProcess(Stats & attacker, Stats & defender, s16 dst, 
 
 	if(targets.size())
 	{
-	    if(interface) interface->RedrawActionSpellCastPart1(spell, defender.GetPosition(), name, targets);
+	    if(interface) interface->RedrawActionSpellCastPart1(spell, defender.GetPosition(), NULL, name, targets);
 
 	    // magic attack not depends from hero
 	    TargetsApplySpell(NULL, spell, targets);
@@ -1002,7 +1002,7 @@ void Battle2::Arena::SpellActionDefaults(Action & a, const Spell & spell)
 	a.Pop(dst);
 
 	TargetsInfo targets = GetTargetsForSpells(current_commander, spell, dst);
-	if(interface) interface->RedrawActionSpellCastPart1(spell, dst, current_commander->GetName(), targets);
+	if(interface) interface->RedrawActionSpellCastPart1(spell, dst, current_commander, current_commander->GetName(), targets);
 
     	TargetsApplySpell(current_commander, spell, targets);
 	if(interface) interface->RedrawActionSpellCastPart2(spell, targets);
@@ -1034,7 +1034,7 @@ void Battle2::Arena::SpellActionDefaults(Action & a, const Spell & spell)
 
 	if(interface)
 	{
-	    interface->RedrawActionSpellCastPart1(spell, dst, name, targets);
+	    interface->RedrawActionSpellCastPart1(spell, dst, (monster ? NULL : hero), name, targets);
     	    if(monster && targets.size())
         	interface->RedrawActionMonsterSpellCastStatus(*monster, targets.front());
         }
