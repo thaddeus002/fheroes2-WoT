@@ -162,8 +162,7 @@ namespace Battle2
 	void RedrawTroopCount(const Stats &, const Rect &) const;
 	void RedrawPocketControls(void) const;
 
-	void RedrawActionWinces(TargetsInfo &);
-	void RedrawActionKills(TargetsInfo &);
+	void RedrawActionWincesKills(TargetsInfo &);
 	void RedrawActionArrowSpell(const Stats &);
 	void RedrawActionColdRaySpell(Stats &);
 	void RedrawActionDisruptingRaySpell(Stats &);

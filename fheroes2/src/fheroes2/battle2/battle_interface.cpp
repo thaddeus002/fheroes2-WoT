@@ -2184,7 +2184,7 @@ void Battle2::Interface::RedrawActionAttackPart1(Stats & attacker, Stats & defen
 void Battle2::Interface::RedrawActionAttackPart2(Stats & attacker, TargetsInfo & targets)
 {
     // targets damage animation
-    RedrawActionWinces(targets);
+    RedrawActionWincesKills(targets);
 
     // draw status for first defender
     if(targets.size())
@@ -2231,9 +2231,6 @@ void Battle2::Interface::RedrawActionAttackPart2(Stats & attacker, TargetsInfo &
 	status.SetMessage("", false);
     }
 
-    // targets killed animation
-    RedrawActionKills(targets);
-
     // restore
     for(TargetsInfo::iterator
 	it = targets.begin(); it != targets.end(); ++it) if((*it).defender)
@@ -2253,7 +2250,7 @@ void Battle2::Interface::RedrawActionAttackPart2(Stats & attacker, TargetsInfo &
     attacker.ResetAnimFrame(AS_IDLE);
 }
 
-void Battle2::Interface::RedrawActionWinces(TargetsInfo & targets)
+void Battle2::Interface::RedrawActionWincesKills(TargetsInfo & targets)
 {
     const Settings & conf = Settings::Get();
     Display & display = Display::Get();
@@ -2261,24 +2258,41 @@ void Battle2::Interface::RedrawActionWinces(TargetsInfo & targets)
     Cursor & cursor = Cursor::Get();
 
     // targets damage animation
-    std::string msg;
     u16 py = (conf.QVGA() ? 20 : 50);
     u8 finish = 0;
 
     for(TargetsInfo::iterator
 	it = targets.begin(); it != targets.end(); ++it) if((*it).defender)
     {
-	if((*it).damage)
+	TargetInfo & target = *it;
+
+	// kill animation
+	if(!target.defender->isValid())
 	{
-	    TargetInfo & target = *it;
+	    target.defender->ResetAnimFrame(AS_KILL);
+	    AGG::PlaySound(target.defender->M82Kill());
+	    ++finish;
+
+	    // set opponent OP_SRRW animation
+ 	    OpponentSprite* commander = NULL;
+	    if(target.defender->GetColor() != Color::GRAY)
+	    {
+		commander = target.defender->GetColor() == arena.army1.GetColor() ? opponent1 : opponent2;
+	    }
+	    if(commander) commander->ResetAnimFrame(OP_SRRW);
+	}
+	else
+	// wince animation
+	if(target.damage)
+	{
 	    // wnce animation
 	    target.defender->ResetAnimFrame(AS_WNCE);
 	    AGG::PlaySound(target.defender->M82Wnce());
 	    ++finish;
 	}
 	else
+	// have immunitet
 	{
-	    // defense
 	    AGG::PlaySound(M82::RSBRYFZL);
 	}
     }
@@ -2302,7 +2316,7 @@ void Battle2::Interface::RedrawActionWinces(TargetsInfo & targets)
 		// extended damage info
 		if(conf.ExtBattleShowDamage() && target.killed)
 		{
-		    msg = "-";
+		    std::string msg = "-";
 		    String::AddInt(msg, target.killed);
 		    Text txt(msg, Font::YELLOW_SMALL);
 		    txt.Blit(pos.x + (target.defender->isWide() ? 0 : (pos.w - txt.w()) / 2), pos.y - py);
@@ -2317,63 +2331,6 @@ void Battle2::Interface::RedrawActionWinces(TargetsInfo & targets)
     }
 
     DELAY(200);
-}
-
-void Battle2::Interface::RedrawActionKills(TargetsInfo & targets)
-{
-    Display & display = Display::Get();
-    LocalEvent & le = LocalEvent::Get();
-    Cursor & cursor = Cursor::Get();
-
-    // targets damage animation
-    std::string msg;
-    u8 finish = 0;
-
-    // targets killed animation
-    finish = 0;
-    for(TargetsInfo::iterator
-	it = targets.begin(); it != targets.end(); ++it) if((*it).defender)
-    {
-	TargetInfo & target = *it;
-
-	if(!target.defender->isValid())
-	{
-	    AGG::PlaySound(target.defender->M82Kill());
-	    target.defender->ResetAnimFrame(AS_KILL);
-	    ++finish;
-	    // set opponent OP_SRRW animation
- 	    OpponentSprite* commander = NULL;
-	    if(target.defender->GetColor() != Color::GRAY)
-	    {
-		commander = target.defender->GetColor() == arena.army1.GetColor() ? opponent1 : opponent2;
-	    }
-	    if(commander) commander->ResetAnimFrame(OP_SRRW);
-	}
-	else
-	    target.defender->ResetAnimFrame(AS_IDLE);
-    }
-
-    // targets killed animation loop
-    while(le.HandleEvents() && finish != std::count_if(targets.begin(), targets.end(), std::mem_fun_ref(&TargetInfo::isFinishAnimFrame)))
-    {
-	CheckGlobalEvents(le);
-
-	if(Game::AnimateInfrequent(Game::BATTLE_FRAME_DELAY))
-    	{
-	    for(TargetsInfo::iterator
-		it = targets.begin(); it != targets.end(); ++it) if((*it).defender)
-	    {
-		TargetInfo & target = *it;
-
-		cursor.Hide();
-		Redraw();
-		cursor.Show();
-		display.Flip();
-
-		if(!target.defender->isValid()) target.defender->IncreaseAnimFrame();
-	    }
-	}
-    }
 }
 
 void Battle2::Interface::RedrawActionMove(Stats & b, const std::vector<u16> & path)
@@ -2578,7 +2535,7 @@ void Battle2::Interface::RedrawActionSpellCastPart2(const Spell & spell, Targets
     if(spell.isDamage())
     {
         // targets damage animation
-	RedrawActionWinces(targets);
+	RedrawActionWincesKills(targets);
 
 	u32 killed = 0;
 	u32 damage = 0;
@@ -2612,9 +2569,6 @@ void Battle2::Interface::RedrawActionSpellCastPart2(const Spell & spell, Targets
 
 	    status.SetMessage(msg, true);
 	}
-
-	// target killed animation
-	RedrawActionKills(targets);
     }
 
     status.SetMessage(" ", false);
@@ -2791,7 +2745,7 @@ void Battle2::Interface::RedrawActionTowerPart2(Tower & tower, TargetInfo & targ
     targets.push_back(target);
 
     // targets damage animation
-    RedrawActionWinces(targets);
+    RedrawActionWincesKills(targets);
 
     // draw status for first defender
     std::string msg = _("Tower do %{damage} damage.");
@@ -2805,9 +2759,6 @@ void Battle2::Interface::RedrawActionTowerPart2(Tower & tower, TargetInfo & targ
     }
     status.SetMessage(msg, true);
     status.SetMessage("", false);
-
-    // targets killed animation
-    RedrawActionKills(targets);
 
     // restore
     if(!target.defender->isValid())
