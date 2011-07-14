@@ -79,16 +79,12 @@ const char* Week::GetName(void) const
 
 Week::type_t Week::WeekRand(void)
 {
-    const u8 first = ANT;
-    const u8 last = Settings::Get().ExtWorldBanWeekOf() ? CONDOR : MONSTERS;
-
-    return static_cast<type_t>(Rand::Get(first, last));
+    return (0 == (world.CountWeek() + 1) % 3) && (! Settings::Get().ExtWorldBanWeekOf()) ?  MONSTERS :
+		static_cast<type_t>(Rand::Get(ANT, CONDOR));
 }
 
 Week::type_t Week::MonthRand(void)
 {
-    const u8 first = (Settings::Get().ExtWorldBanPlagues() ? ANT : PLAGUE);
-    const u8 last = Settings::Get().ExtWorldBanWeekOf() ? CONDOR : MONSTERS;
-
-    return static_cast<type_t>(Rand::Get(first, last));
+    return (0 == (world.GetMonth() + 1) % 3) && (! Settings::Get().ExtWorldBanWeekOf()) ?  MONSTERS :
+		static_cast<type_t>(Rand::Get(Settings::Get().ExtWorldBanPlagues() ? ANT : PLAGUE, CONDOR));
 }
