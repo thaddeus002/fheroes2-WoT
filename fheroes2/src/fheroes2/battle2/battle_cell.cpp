@@ -164,17 +164,14 @@ void Battle2::Cell::ResetDirection(void)
     direction = UNKNOWN;
 }
 
-void Battle2::Cell::SetEnemyQuality(const Stats & my)
+void Battle2::Cell::SetEnemyQuality(const Stats & attaker)
 {
-    const Stats* b = arena->GetTroopBoard(index);
-    if(b && b->GetColor() != my.GetColor() && my.isValid())
+    const Stats* defender = arena->GetTroopBoard(index);
+    if(defender && defender->GetColor() != attaker.GetColor() && attaker.isValid())
     {
 	// strength monster quality
-	quality = b->GetScoreQuality(my) * b->HowManyWillKilled(my.GetDamage(*b));
-	quality += b->GetExtraQuality(quality);
-
-	if(quality < 1) quality = 1;
-	DEBUG(DBG_BATTLE, DBG_TRACE, quality << " for " << b->Info());
+	quality = attaker.GetScoreQuality(*defender);
+	DEBUG(DBG_BATTLE, DBG_TRACE, quality << " for " << defender->Info());
     }
 }
 

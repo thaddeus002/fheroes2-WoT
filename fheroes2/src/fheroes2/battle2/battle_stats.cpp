@@ -839,7 +839,7 @@ u32 Battle2::Stats::GetDamage(const Stats & enemy) const
 
 u32 Battle2::Stats::HowManyCanKill(const Stats & b) const
 {
-    return b.HowManyWillKilled((GetDamageMin(b) + GetDamageMin(b)) / 2);
+    return b.HowManyWillKilled((GetDamageMin(b) + GetDamageMax(b)) / 2);
 }
 
 u32 Battle2::Stats::HowManyWillKilled(u32 dmg) const
@@ -1213,68 +1213,57 @@ const char* Battle2::Stats::GetPluralName(u32 count) const
     return troop.GetPluralName(count);
 }
 
-u16 Battle2::Stats::GetScoreQuality(const Stats & enemy) const
+s32 Battle2::Stats::GetScoreQuality(const Stats & defender) const
 {
-    float res = 0;
+    const Stats & attacker = *this;
 
-    // level priority
-    switch(troop.GetLevel())
-    {
-        case Monster::LEVEL1:   res = 8; break;
-        case Monster::LEVEL2:   res = 15; break;
-        case Monster::LEVEL3:   res = 24; break;
-        case Monster::LEVEL4:   res = 36; break;
-        default: break;
-    }
-
-    switch(troop())
-    {
-	// for ghosts: count priority
-	case Monster::GHOST:	res = 8; break;
-
-	default: break;
-    }
-
-    if(troop.isFly()) res += res * 3 / 10;
-    if(troop.isArchers()) res += res * 5 / 10;
-    if(isTwiceAttack()) res += res * 2 / 10;
-    if(isResurectLife()) res += res * 1 / 10;
-    if(isDoubleCellAttack()) res += res * 1 / 10;
-    if(isHideAttack()) res += res * 4 / 10;
-    if(isAlwayResponse()) res -= res * 4 / 10;
+    // initial value: (hitpoints)
+    double res = attacker.HowManyCanKill(defender) * defender.GetMonster().GetHitPoints();
+    bool noscale = false;
 
     // attacker
-    switch(enemy.GetMonster().GetID())
+    switch(attacker.GetMonster().GetID())
     {
 	case Monster::GHOST:
 	    // priority: from killed only
-	    res = 1;
+	    noscale = true;
 	    break;
 
 	case Monster::VAMPIRE_LORD:
-	    if(enemy.isHaveDamage())
+	    if(attacker.isHaveDamage())
 	    {
 		// alive priority
-		if(troop.isElemental() || troop.isUndead()) res /= 3;
+		if(defender.isElemental() || defender.isUndead()) res /= 2;
 	    }
 	    break;
 
 	default: break;
     }
 
-    return res > 1.0 ? static_cast<u16>(res) : 1;
-}
+    // scale on ability
+    if(! noscale)
+    {
+	if(defender.isArchers())		res += res * 0.7;
+	if(defender.isFly())			res += res * 0.6;
+	if(defender.isHideAttack())		res += res * 0.5;
+	if(defender.isTwiceAttack())		res += res * 0.4;
+	if(defender.isResurectLife())		res += res * 0.3;
+	if(defender.isDoubleCellAttack())	res += res * 0.3;
+	if(defender.isAlwayResponse())		res -= res * 0.5;
+    }
 
-s32 Battle2::Stats::GetExtraQuality(s32 quality) const
-{
-    s32 res = 0;
+    // extra
+    if(defender.Modes(CAP_MIRRORIMAGE)) res += res * 0.7;
+    if(defender.Modes(TR_RESPONSED))
+	res += res * 0.3;
+    else
+    {
+	if(defender.Modes(LUCK_BAD))  res += res * 0.3;
+	else
+	if(defender.Modes(LUCK_GOOD)) res -= res * 0.3;
+    }
 
-    if(Modes(TR_RESPONSED)) res += quality / 2;
-    if(Modes(LUCK_BAD)) res += quality / 2;
-    if(Modes(LUCK_GOOD)) res -= quality / 2;
-    if(Modes(CAP_MIRRORIMAGE)) res += quality;
-
-    return res;
+    return res > 1.0 ? static_cast<u32>(res) : 1;
 }
 
 u32 Battle2::Stats::GetHitPoints(void) const

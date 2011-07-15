@@ -134,7 +134,6 @@ namespace Battle2
 	bool	isID(u16) const;
 
 	u32	GetCount(void) const;
-	s32	GetExtraQuality(s32) const;
 	u16	GetTailIndex(void) const;
 	u16	GetAttack(void) const;
 	u16	GetDefense(void) const;
@@ -145,7 +144,7 @@ namespace Battle2
 	const char* GetPluralName(u32) const;
 	u8	GetControl(void) const;
 	u32	GetDamage(const Stats &) const;
-	u16	GetScoreQuality(const Stats &) const;
+	s32	GetScoreQuality(const Stats &) const;
 	u32	GetHitPoints(void) const;
 	u8	GetShots(void) const;
 	u16	GetPosition(void) const;
