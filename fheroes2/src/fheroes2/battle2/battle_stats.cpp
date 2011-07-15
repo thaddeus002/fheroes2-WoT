@@ -1218,7 +1218,9 @@ s32 Battle2::Stats::GetScoreQuality(const Stats & defender) const
     const Stats & attacker = *this;
 
     // initial value: (hitpoints)
-    double res = attacker.HowManyCanKill(defender) * defender.GetMonster().GetHitPoints();
+    const u32 & damage = (attacker.GetDamageMin(defender) + attacker.GetDamageMax(defender)) / 2;
+    const u32 & kills = defender.HowManyWillKilled(attacker.isTwiceAttack() ? damage * 2 : damage);
+    double res = kills * defender.GetMonster().GetHitPoints();
     bool noscale = false;
 
     // attacker
@@ -1254,13 +1256,16 @@ s32 Battle2::Stats::GetScoreQuality(const Stats & defender) const
 
     // extra
     if(defender.Modes(CAP_MIRRORIMAGE)) res += res * 0.7;
-    if(defender.Modes(TR_RESPONSED))
-	res += res * 0.3;
-    else
+    if(!attacker.isArchers())
     {
-	if(defender.Modes(LUCK_BAD))  res += res * 0.3;
+	if(defender.Modes(TR_RESPONSED))
+	    res += res * 0.3;
 	else
-	if(defender.Modes(LUCK_GOOD)) res -= res * 0.3;
+	{
+	    if(defender.Modes(LUCK_BAD))  res += res * 0.3;
+	    else
+	    if(defender.Modes(LUCK_GOOD)) res -= res * 0.3;
+	}
     }
 
     return res > 1.0 ? static_cast<u32>(res) : 1;
