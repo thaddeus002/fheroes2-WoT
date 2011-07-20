@@ -132,33 +132,39 @@ u8 GameStatic::GetCastleGrownMonthOf(void)
 
 void Game::CastleUpdateGrowth(const TiXmlElement* xml)
 {
-    int value;
-    xml->Attribute("well", &value);
-    GameStatic::castle_grown_well =  value > 255 ? 255 : value;
+    if(xml)
+    {
+	int value;
+	xml->Attribute("well", &value);
+        GameStatic::castle_grown_well =  value > 255 ? 255 : value;
 
-    xml->Attribute("wel2", &value);
-    GameStatic::castle_grown_wel2 =  value > 255 ? 255 : value;
+	xml->Attribute("wel2", &value);
+	GameStatic::castle_grown_wel2 =  value > 255 ? 255 : value;
 
-    xml->Attribute("week_of", &value);
-    GameStatic::castle_grown_week_of =  value > 255 ? 255 : value;
+	xml->Attribute("week_of", &value);
+	GameStatic::castle_grown_week_of =  value > 255 ? 255 : value;
 
-    xml->Attribute("month_of", &value);
-    GameStatic::castle_grown_month_of = value > 255 ? 255 : value;
+	xml->Attribute("month_of", &value);
+	GameStatic::castle_grown_month_of = value > 255 ? 255 : value;
+    }
 }
 
-void Game::KingdomUpdateStartingResource(const TiXmlElement* xml_resource)
+void Game::KingdomUpdateStartingResource(const TiXmlElement* xml)
 {
-    const TiXmlElement* xml_difficult;
-    const char* ai_always = xml_resource->Attribute("ai_always");
-    const char* level[] = { "easy", "normal", "hard", "expert", "impossible", NULL };
-
-    for(u8 ii = 0; ii < 5; ++ii)
+    if(xml)
     {
-	if(NULL != (xml_difficult = xml_resource->FirstChildElement(level[ii])))
+	const TiXmlElement* xml_difficult;
+	const char* ai_always = xml->Attribute("ai_always");
+	const char* level[] = { "easy", "normal", "hard", "expert", "impossible", NULL };
+
+	for(u8 ii = 0; ii < 5; ++ii)
 	{
-    	    LoadCostFromXMLElement(GameStatic::kingdom_starting_resource[ii], *xml_difficult);
-    	    if(ai_always && 0 == std::strcmp(ai_always, level[ii]))
-		LoadCostFromXMLElement(GameStatic::kingdom_starting_resource[5], *xml_difficult);
+	    if(NULL != (xml_difficult = xml->FirstChildElement(level[ii])))
+	    {
+    		LoadCostFromXMLElement(GameStatic::kingdom_starting_resource[ii], *xml_difficult);
+    		if(ai_always && 0 == std::strcmp(ai_always, level[ii]))
+		    LoadCostFromXMLElement(GameStatic::kingdom_starting_resource[5], *xml_difficult);
+	    }
 	}
     }
 }

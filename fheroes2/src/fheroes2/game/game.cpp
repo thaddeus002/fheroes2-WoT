@@ -304,7 +304,7 @@ void Game::UpdateGlobalDefines(const std::string & spec)
 	// heroes
 	HeroesUpdateStatic(xml_globals->FirstChildElement("heroes"));
 	// castle_extra_growth 
-	CastleUpdateGrowth(xml_globals->FirstChildElement("castle_extra_growth "));
+	CastleUpdateGrowth(xml_globals->FirstChildElement("castle_extra_growth"));
 	// monster upgrade ratio
 	MonsterUpdateStatic(xml_globals->FirstChildElement("monster_upgrade"));
     }
