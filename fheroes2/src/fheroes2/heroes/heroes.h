@@ -273,8 +273,8 @@ private:
     u16			direction;
     u8			sprite_index;
 
-    Point patrol_center;
-    u8 patrol_square;
+    Point		patrol_center;
+    u8			patrol_square;
 
     std::list<IndexObject> visit_object;
 };
