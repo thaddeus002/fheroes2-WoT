@@ -189,9 +189,6 @@ public:
     static u8 GetGrownWel2(void);
     static u8 GetGrownWeekOf(void);
     static u8 GetGrownMonthOf(void);
-#ifdef WITH_XML
-    static void UpdateExtraGrowth(const TiXmlElement*);
-#endif
 
     void Dump(void) const;
 
@@ -224,11 +221,6 @@ private:
     MageGuild		mageguild;
     u16			dwelling[CASTLEMAXMONSTER];
     Army::army_t        army;
-    
-    static u8 grown_well;
-    static u8 grown_wel2;
-    static u8 grown_week_of;
-    static u8 grown_month_of;
 };
 
 namespace CastleDialog

@@ -20,7 +20,6 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#include <cstring>
 #include <algorithm>
 
 #include "settings.h"
@@ -34,70 +33,13 @@
 #include "race.h"
 #include "battle2.h"
 #include "kingdom.h"
+#include "game_static.h"
 #include "ai.h"
-
-u8 Kingdom::max_heroes = 8;
-
-cost_t Kingdom::starting_resource[] = {
-    { 10000, 30, 10, 30, 10, 10, 10 },
-    { 7500, 20, 5, 20, 5, 5, 5 },
-    { 5000, 10, 2, 10, 2, 2, 2 },
-    { 2500, 5, 0, 5, 0, 0, 0 },
-    { 0, 0, 0, 0, 0, 0, 0 },
-    // ai resource
-    { 10000, 30, 10, 30, 10, 10, 10 },
-};
 
 bool HeroesStrongestArmy(const Heroes* h1, const Heroes* h2)
 {
     return h1 && h2 && h2->GetArmy().StrongerEnemyArmy(h1->GetArmy());
 }
-
-#ifdef WITH_XML
-#include "xmlccwrap.h"
-
-void Kingdom::UpdateStartingResource(const TiXmlElement* xml_resource)
-{
-    const TiXmlElement* xml_difficult;
-    const char* ai_always = xml_resource->Attribute("ai_always");
-    const char* level;
-
-    level = "easy";
-    if(NULL != (xml_difficult = xml_resource->FirstChildElement(level)))
-    {
-        LoadCostFromXMLElement(Kingdom::starting_resource[0], *xml_difficult);
-        if(ai_always && 0 == std::strcmp(ai_always, level)) LoadCostFromXMLElement(Kingdom::starting_resource[5], *xml_difficult);
-    }
-
-    level = "normal";
-    if(NULL != (xml_difficult = xml_resource->FirstChildElement(level)))
-    {
-	LoadCostFromXMLElement(Kingdom::starting_resource[1], *xml_difficult);
-        if(ai_always && 0 == std::strcmp(ai_always, level)) LoadCostFromXMLElement(Kingdom::starting_resource[5], *xml_difficult);
-    }
-    
-    level = "hard";
-    if(NULL != (xml_difficult = xml_resource->FirstChildElement(level)))
-    {
-	LoadCostFromXMLElement(Kingdom::starting_resource[2], *xml_difficult);
-        if(ai_always && 0 == std::strcmp(ai_always, level)) LoadCostFromXMLElement(Kingdom::starting_resource[5], *xml_difficult);
-    }
-
-    level = "expert";
-    if(NULL != (xml_difficult = xml_resource->FirstChildElement(level)))
-    {
-	LoadCostFromXMLElement(Kingdom::starting_resource[3], *xml_difficult);
-        if(ai_always && 0 == std::strcmp(ai_always, level)) LoadCostFromXMLElement(Kingdom::starting_resource[5], *xml_difficult);
-    }
-
-    level = "impossible";
-    if(NULL != (xml_difficult = xml_resource->FirstChildElement(level)))
-    {
-	LoadCostFromXMLElement(Kingdom::starting_resource[4], *xml_difficult);
-        if(ai_always && 0 == std::strcmp(ai_always, level)) LoadCostFromXMLElement(Kingdom::starting_resource[5], *xml_difficult);
-    }
-}
-#endif
 
 Kingdom::Kingdom() : color(Color::GRAY), control(Game::CONTROL_AI), flags(0), lost_town_days(0), visited_tents_colors(0)
 {
@@ -147,20 +89,7 @@ void Kingdom::clear(void)
 
 void Kingdom::UpdateStartingResource(void)
 {
-    cost_t* sres = NULL;
-
-    switch(Settings::Get().GameDifficulty())
-    {
-	case Difficulty::EASY:       sres = &starting_resource[0]; break;
-	case Difficulty::NORMAL:     sres = &starting_resource[1]; break;
-	case Difficulty::HARD:       sres = &starting_resource[2]; break;
-	case Difficulty::EXPERT:     sres = &starting_resource[3]; break;
-	case Difficulty::IMPOSSIBLE: sres = &starting_resource[4]; break;
-	default: break;
-    }
-
-    if(Game::CONTROL_AI == control) sres = &starting_resource[5];
-    if(sres) resource = *sres;
+    resource = GameStatic::GetKingdomStartingResource(Game::CONTROL_AI == control ? 5 : Settings::Get().GameDifficulty());
 }
 
 void Kingdom::SetModes(flags_t f)
@@ -176,6 +105,11 @@ void Kingdom::ResetModes(flags_t f)
 bool Kingdom::Modes(flags_t f) const
 {
     return flags & f;
+}
+
+void Kingdom::SetControl(u8 ctrl)
+{
+    control = ctrl > Game::CONTROL_AI ? Game::CONTROL_NONE : ctrl;
 }
 
 bool Kingdom::isLoss(void) const
@@ -559,14 +493,9 @@ void Kingdom::ApplyPlayWithStartingHero(void)
     }
 }
 
-void Kingdom::SetMaxHeroes(u8 max)
-{
-    max_heroes = max;
-}
-
 u8 Kingdom::GetMaxHeroes(void)
 {
-    return max_heroes;
+    return GameStatic::GetKingdomMaxHeroes();
 }
 
 void Kingdom::HeroesActionNewPosition(void)

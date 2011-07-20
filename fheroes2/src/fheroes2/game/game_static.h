@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2009 by Andrey Afletdinov <fheroes2@gmail.com>          *
+ *   Copyright (C) 2011 by Andrey Afletdinov <fheroes2@gmail.com>          *
  *                                                                         *
  *   Part of the Free Heroes2 Engine:                                      *
  *   http://sourceforge.net/projects/fheroes2                              *
@@ -19,62 +19,46 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef H2GAMEEVENT_H
-#define H2GAMEEVENT_H
 
-#include <vector>
-#include <string>
-#include "resource.h"
-#include "artifact.h"
-#include "position.h"
+#ifndef H2GAMESTATIC_H
+#define H2GAMESTATIC_H
+
 #include "gamedefs.h"
 
-struct EventDate
+struct cost_t;
+
+namespace GameStatic
 {
-    EventDate() {}
-    EventDate(const void *ptr);
+    u8		GetLostOnWhirlpoolPercent(void);
+    u8		GetGameOverLostDays(void);
+    u8		GetOverViewDistance(u8);
 
-    bool isAllow(u8 color, u16 date) const;
+    cost_t &	GetKingdomStartingResource(u8);
+    u8		GetKingdomMaxHeroes(void);
 
-    Funds resource;
-    bool computer;
-    u16 first;
-    u16 subsequent;
-    u8 colors;
-    std::string message;
-};
+    u8		GetCastleGrownWell(void);
+    u8		GetCastleGrownWel2(void);
+    u8		GetCastleGrownWeekOf(void);
+    u8		GetCastleGrownMonthOf(void);
 
-struct EventMaps : public Maps::Position
+    u8		GetHeroesSpellPointsPerDay(void);
+
+    double	GetMonsterUpgradeRatio(void);
+}
+
+#ifdef WITH_XML
+#include "xmlccwrap.h"
+namespace Game
 {
-    EventMaps() {}
-    EventMaps(s32 index, const void *ptr);
-    
-    bool isAllow(u8 color, s32 index) const;
-    void SetVisited(u8 color);
-
-    Funds resource;
-    Artifact artifact;
-    bool computer;
-    bool cancel;
-    u8 colors;
-    std::string message;
-};
-
-typedef std::list<std::string>    RiddleAnswers;
-
-struct Riddle : public Maps::Position
-{
-    Riddle() {}
-    Riddle(s32 index, const void *ptr);
-
-    bool AnswerCorrect(const std::string & answer);
-    void SetQuiet(void);
-
-    Funds resource;
-    Artifact artifact;
-    RiddleAnswers answers;
-    std::string message;
-    bool valid;
-};
+    void	CastleUpdateGrowth(const TiXmlElement*);
+    void	KingdomUpdateStartingResource(const TiXmlElement*);
+    void	HeroesUpdateStatic(const TiXmlElement*);
+    void	KingdomUpdateStatic(const TiXmlElement*);
+    void	GameOverUpdateStatic(const TiXmlElement*);
+    void	OverViewUpdateStatic(const TiXmlElement*);
+    void	WhirlpoolUpdateStatic(const TiXmlElement*);
+    void	MonsterUpdateStatic(const TiXmlElement*);
+}
+#endif
 
 #endif

@@ -32,12 +32,8 @@
 #include "maps_tiles.h"
 #include "castle.h"
 #include "localclient.h"
+#include "game_static.h"
 #include "ai.h"
-
-u8 Castle::grown_well(2);
-u8 Castle::grown_wel2(8);
-u8 Castle::grown_week_of(5);
-u8 Castle::grown_month_of(100);
 
 Castle::Castle() : race(Race::NONE), building(0), captain(*this), color(Color::GRAY), army(NULL)
 {
@@ -349,10 +345,10 @@ u8 Castle::GetDwellingGrowth(u32 dw)
     u8 growth = Monster(race, (building & up ? up : dw)).GetGrown();
 
     // well build
-    if(building & BUILD_WELL) growth += grown_well;
+    if(building & BUILD_WELL) growth += GetGrownWell();
 
     // wel2 extras
-    if(building & (DWELLING_MONSTER1 | BUILD_WEL2)) growth += grown_wel2;
+    if(building & (DWELLING_MONSTER1 | BUILD_WEL2)) growth += GetGrownWel2();
 
     return growth;
 }
@@ -1816,48 +1812,28 @@ bool Castle::isNecromancyShrineBuild(void) const
 
 u8 Castle::GetGrownWell(void)
 {
-    return grown_well;
+    return GameStatic::GetCastleGrownWell();
 }
 
 u8 Castle::GetGrownWel2(void)
 {
-    return grown_wel2;
+    return GameStatic::GetCastleGrownWel2();
 }
 
 u8 Castle::GetGrownWeekOf(void)
 {
-    return grown_week_of;
+    return GameStatic::GetCastleGrownWeekOf();
 }
 
 u8 Castle::GetGrownMonthOf(void)
 {
-    return grown_month_of;
+    return GameStatic::GetCastleGrownMonthOf();
 }
 
 void Castle::Scoute(void) const
 {
     Maps::ClearFog(GetIndex(), Game::GetViewDistance(isCastle() ? Game::VIEW_CASTLE : Game::VIEW_TOWN), color);
 }
-
-#ifdef WITH_XML
-#include "xmlccwrap.h"
-
-void Castle::UpdateExtraGrowth(const TiXmlElement* xml)
-{
-    int value;
-    xml->Attribute("well", &value);
-    grown_well = value;
-
-    xml->Attribute("wel2", &value);
-    grown_wel2 = value;
-
-    xml->Attribute("week_of", &value);
-    grown_week_of = value;
-
-    xml->Attribute("month_of", &value);
-    grown_month_of = value > 255 ? 255 : value;
-}
-#endif
 
 void Castle::JoinRNDArmy(void)
 {

@@ -73,7 +73,7 @@ public:
     bool Modes(flags_t) const;
 
     u8 Control(void) const{ return control; }
-    void SetControl(const u8 con) { control = con; }
+    void SetControl(const u8 con);
     void UpdateStartingResource(void);
     bool isPlay(void) const{ return Modes(PLAY); }
     bool isLoss(void) const;
@@ -150,11 +150,6 @@ public:
     void UpdateRecruits(void);
     void LossPostActions(void);
 
-#ifdef WITH_XML
-    static void UpdateStartingResource(const TiXmlElement*);
-#endif
-
-    static void SetMaxHeroes(u8);
     static u8 GetMaxHeroes(void);
 
 private:
@@ -177,9 +172,6 @@ private:
 
     Puzzle puzzle_maps;
     u8 visited_tents_colors;
-
-    static cost_t starting_resource[];
-    static u8 max_heroes;
 };
 
 class Kingdoms

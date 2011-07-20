@@ -30,6 +30,7 @@
 #include "race.h"
 #include "morale.h"
 #include "payment.h"
+#include "game_static.h"
 #include "monster.h"
 
 #ifdef WITH_XML
@@ -142,18 +143,11 @@ namespace
 	{     0,   0,   0,   0,   0,  Speed::VERYSLOW,   0,     0, "Random Monster 3", "Random Monsters 3", { 0, 0, 0, 0, 0, 0, 0} },
 	{     0,   0,   0,   0,   0,  Speed::VERYSLOW,   0,     0, "Random Monster 4", "Random Monsters 4", { 0, 0, 0, 0, 0, 0, 0} },
     };
-
-    double upgrade_ratio = 1.0;
 }
 
 double Monster::GetUpgradeRatio(void)
 {
-    return upgrade_ratio;
-}
-
-void Monster::SetUpgradeRatio(double rate)
-{
-    upgrade_ratio = rate;
+    return GameStatic::GetMonsterUpgradeRatio();
 }
 
 void Monster::UpdateStats(const std::string & spec)
@@ -1153,13 +1147,13 @@ payment_t Monster::GetUpgradeCost(void) const
     Monster upgr = GetUpgrade();
     payment_t pay = id != upgr.id ? upgr.GetCost() - GetCost() : GetCost();
 
-    pay.wood = static_cast<s32>(pay.wood * upgrade_ratio);
-    pay.mercury = static_cast<s32>(pay.mercury * upgrade_ratio);
-    pay.ore = static_cast<s32>(pay.ore * upgrade_ratio);
-    pay.sulfur = static_cast<s32>(pay.sulfur * upgrade_ratio);
-    pay.crystal = static_cast<s32>(pay.crystal * upgrade_ratio);
-    pay.gems = static_cast<s32>(pay.gems * upgrade_ratio);
-    pay.gold = static_cast<s32>(pay.gold * upgrade_ratio);
+    pay.wood = static_cast<s32>(pay.wood * GetUpgradeRatio());
+    pay.mercury = static_cast<s32>(pay.mercury * GetUpgradeRatio());
+    pay.ore = static_cast<s32>(pay.ore * GetUpgradeRatio());
+    pay.sulfur = static_cast<s32>(pay.sulfur * GetUpgradeRatio());
+    pay.crystal = static_cast<s32>(pay.crystal * GetUpgradeRatio());
+    pay.gems = static_cast<s32>(pay.gems * GetUpgradeRatio());
+    pay.gold = static_cast<s32>(pay.gold * GetUpgradeRatio());
 
     return pay;
 }

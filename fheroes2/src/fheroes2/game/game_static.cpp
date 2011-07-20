@@ -1,0 +1,237 @@
+/***************************************************************************
+ *   Copyright (C) 2011 by Andrey Afletdinov <fheroes2@gmail.com>          *
+ *                                                                         *
+ *   Part of the Free Heroes2 Engine:                                      *
+ *   http://sourceforge.net/projects/fheroes2                              *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *                                                                         *
+ *   This program is distributed in the hope that it will be useful,       *
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
+ *   GNU General Public License for more details.                          *
+ *                                                                         *
+ *   You should have received a copy of the GNU General Public License     *
+ *   along with this program; if not, write to the                         *
+ *   Free Software Foundation, Inc.,                                       *
+ *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
+ ***************************************************************************/
+
+#include <cstring>
+
+#include "resource.h"
+#include "difficulty.h"
+#include "game_static.h"
+
+namespace GameStatic
+{
+    u8		whirlpool_lost_percent	= 50;
+
+    /* town, castle, heroes, artifact_telescope, object_observation_tower, object_magi_eyes */
+    u8		overview_distance[]	= { 4, 5, 4, 1, 10, 9 }; 
+
+    u8		gameover_lost_days	= 7;
+
+    // kingdom
+    u8          kingdom_max_heroes	= 8;
+    cost_t	kingdom_starting_resource[] = {
+						{ 10000, 30, 10, 30, 10, 10, 10 },
+						{ 7500, 20, 5, 20, 5, 5, 5 },
+						{ 5000, 10, 2, 10, 2, 2, 2 },
+						{ 2500, 5, 0, 5, 0, 0, 0 },
+						{ 0, 0, 0, 0, 0, 0, 0 },
+						// ai resource
+						{ 10000, 30, 10, 30, 10, 10, 10 } };
+
+    // castle
+    u8          castle_grown_well	= 2;
+    u8          castle_grown_wel2	= 8;
+    u8          castle_grown_week_of	= 5;
+    u8          castle_grown_month_of	= 100;
+
+    // heroes
+    u8		heroes_spell_points_day	= 1;
+
+    // monsters
+    double	monster_upgrade_ratio	= 1.0;
+}
+
+double GameStatic::GetMonsterUpgradeRatio(void)
+{
+    return monster_upgrade_ratio;
+}
+
+u8 GameStatic::GetLostOnWhirlpoolPercent(void)
+{
+    return whirlpool_lost_percent;
+}
+
+u8 GameStatic::GetOverViewDistance(u8 d)
+{
+    return d >= sizeof(overview_distance) ? 0 : overview_distance[d];
+}
+
+u8 GameStatic::GetGameOverLostDays(void)
+{
+    return gameover_lost_days;
+}
+
+cost_t & GameStatic::GetKingdomStartingResource(u8 df)
+{
+    switch(df)
+    {
+        case Difficulty::EASY:       return kingdom_starting_resource[0];
+        case Difficulty::NORMAL:     return kingdom_starting_resource[1];
+        case Difficulty::HARD:       return kingdom_starting_resource[2];
+        case Difficulty::EXPERT:     return kingdom_starting_resource[3];
+        case Difficulty::IMPOSSIBLE: return kingdom_starting_resource[4];
+        default: break;
+    }
+
+    return kingdom_starting_resource[5];
+}
+
+u8 GameStatic::GetHeroesSpellPointsPerDay(void)
+{
+    return heroes_spell_points_day;
+}
+
+u8 GameStatic::GetKingdomMaxHeroes(void)
+{
+    return kingdom_max_heroes;
+}
+
+u8 GameStatic::GetCastleGrownWell(void)
+{
+    return castle_grown_well;
+}
+
+u8 GameStatic::GetCastleGrownWel2(void)
+{
+    return castle_grown_wel2;
+}
+
+u8 GameStatic::GetCastleGrownWeekOf(void)
+{
+    return castle_grown_week_of;
+}
+
+u8 GameStatic::GetCastleGrownMonthOf(void)
+{
+    return castle_grown_month_of;
+}
+
+/*
+*/
+
+#ifdef WITH_XML
+#include "xmlccwrap.h"
+
+void Game::CastleUpdateGrowth(const TiXmlElement* xml)
+{
+    int value;
+    xml->Attribute("well", &value);
+    GameStatic::castle_grown_well =  value > 255 ? 255 : value;
+
+    xml->Attribute("wel2", &value);
+    GameStatic::castle_grown_wel2 =  value > 255 ? 255 : value;
+
+    xml->Attribute("week_of", &value);
+    GameStatic::castle_grown_week_of =  value > 255 ? 255 : value;
+
+    xml->Attribute("month_of", &value);
+    GameStatic::castle_grown_month_of = value > 255 ? 255 : value;
+}
+
+void Game::KingdomUpdateStartingResource(const TiXmlElement* xml_resource)
+{
+    const TiXmlElement* xml_difficult;
+    const char* ai_always = xml_resource->Attribute("ai_always");
+    const char* level[] = { "easy", "normal", "hard", "expert", "impossible", NULL };
+
+    for(u8 ii = 0; ii < 5; ++ii)
+    {
+	if(NULL != (xml_difficult = xml_resource->FirstChildElement(level[ii])))
+	{
+    	    LoadCostFromXMLElement(GameStatic::kingdom_starting_resource[ii], *xml_difficult);
+    	    if(ai_always && 0 == std::strcmp(ai_always, level[ii]))
+		LoadCostFromXMLElement(GameStatic::kingdom_starting_resource[5], *xml_difficult);
+	}
+    }
+}
+
+void Game::KingdomUpdateStatic(const TiXmlElement* xml)
+{
+    if(xml)
+    {
+        int value;
+        xml->Attribute("max_heroes", &value);
+	GameStatic::kingdom_max_heroes = value;
+    }
+}
+
+void Game::HeroesUpdateStatic(const TiXmlElement* xml)
+{
+    if(xml)
+    {
+        int value;
+        xml->Attribute("spell_points_per_day", &value);
+        if(value < 11) GameStatic::heroes_spell_points_day = value;
+    }
+}
+
+void Game::GameOverUpdateStatic(const TiXmlElement* xml)
+{
+    if(xml)
+    {
+	int value;
+        xml->Attribute("lost_towns_days", &value);
+        GameStatic::gameover_lost_days = value;
+    }
+}
+
+void Game::OverViewUpdateStatic(const TiXmlElement* xml)
+{
+    if(xml)
+    {
+        int value;
+        xml->Attribute("town", &value);
+        if(value) GameStatic::overview_distance[0] = value;
+
+        xml->Attribute("castle", &value);
+        if(value) GameStatic::overview_distance[1] = value;
+
+        xml->Attribute("heroes", &value);
+        if(value) GameStatic::overview_distance[2] = value;
+
+        xml->Attribute("artifact_telescope", &value);
+        if(value) GameStatic::overview_distance[3] = value;
+
+        xml->Attribute("object_observation_tower", &value);
+        if(value) GameStatic::overview_distance[4] = value;
+
+        xml->Attribute("object_magi_eyes", &value);
+        if(value) GameStatic::overview_distance[5] = value;
+    }
+}
+
+void Game::WhirlpoolUpdateStatic(const TiXmlElement* xml)
+{
+    if(xml)
+    {
+        int value;
+        xml->Attribute("percent", &value);
+	GameStatic::whirlpool_lost_percent = 0 < value && value < 90 ? value : 50;
+    }
+}
+
+void Game::MonsterUpdateStatic(const TiXmlElement* xml)
+{
+    if(xml)
+        xml->Attribute("rate", & GameStatic::monster_upgrade_ratio);
+}
+
+#endif

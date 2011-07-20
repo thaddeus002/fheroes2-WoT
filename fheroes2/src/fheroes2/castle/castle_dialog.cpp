@@ -386,8 +386,8 @@ Dialog::answer_t Castle::OpenDialog(bool readonly, bool fade)
     std::string description_castle = GetDescriptionBuilding(BUILD_CASTLE, race);
     std::string description_statue = GetDescriptionBuilding(BUILD_STATUE, race);
     std::string description_spec = GetDescriptionBuilding(BUILD_SPEC, race);
-    String::Replace(description_well, "%{count}", grown_well);
-    String::Replace(description_wel2, "%{count}", grown_wel2);
+    String::Replace(description_well, "%{count}", GetGrownWell());
+    String::Replace(description_wel2, "%{count}", GetGrownWel2());
     profit = ProfitConditions::FromBuilding(BUILD_CASTLE, race);
     String::Replace(description_castle, "%{count}", profit.gold);
     profit = ProfitConditions::FromBuilding(BUILD_STATUE, race);

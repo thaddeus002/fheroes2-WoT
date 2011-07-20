@@ -46,6 +46,7 @@
 #include "battle2.h"
 #include "tools.h"
 #include "difficulty.h"
+#include "game_static.h"
 #include "game.h"
 
 #ifdef WITH_XML
@@ -63,13 +64,7 @@ namespace Game
     void HotKeysDefaults(void);
     void HotKeysLoad(const std::string &);
 
-    static u8 lost_town_days(7);
     static u16 reserved_vols[LOOPXX_COUNT];
-
-    // town, castle, heroes, artifact_telescope, object_observation_tower, object_magi_eyes
-    static u8 view_distance[] = { 4, 5, 4, 1, 10, 9 };
-    static u8 whirlpool_percent = 50;
-    static u8 heroes_restore_spell_points_day = 1;
 
     static char** argv = NULL;
 }
@@ -278,12 +273,12 @@ void Game::ShowLoadMapsText(void)
 
 u8 Game::GetLostTownDays(void)
 {
-    return lost_town_days;
+    return GameStatic::GetGameOverLostDays();
 }
 
 u8 Game::GetViewDistance(u8 d)
 {
-    return view_distance[d];
+    return GameStatic::GetOverViewDistance(d);
 }
 
 void Game::UpdateGlobalDefines(const std::string & spec)
@@ -296,85 +291,22 @@ void Game::UpdateGlobalDefines(const std::string & spec)
     if(doc.LoadFile(spec.c_str()) &&
 	NULL != (xml_globals = doc.FirstChildElement("globals")))
     {
-	const TiXmlElement* xml_element;
-
 	// starting_resource
-	xml_element = xml_globals->FirstChildElement("starting_resource");
-	if(xml_element)
-	    Kingdom::UpdateStartingResource(xml_element);
-
+	KingdomUpdateStartingResource(xml_globals->FirstChildElement("starting_resource"));
 	// view_distance
-	xml_element = xml_globals->FirstChildElement("view_distance");
-	if(xml_element)
-	{
-	    int value;
-	    xml_element->Attribute("town", &value);
-	    if(value) view_distance[0] = value;
-
-	    xml_element->Attribute("castle", &value);
-	    if(value) view_distance[1] = value;
-
-	    xml_element->Attribute("heroes", &value);
-	    if(value) view_distance[2] = value;
-
-	    xml_element->Attribute("artifact_telescope", &value);
-	    if(value) view_distance[3] = value;
-
-	    xml_element->Attribute("object_observation_tower", &value);
-	    if(value) view_distance[4] = value;
-
-	    xml_element->Attribute("object_magi_eyes", &value);
-	    if(value) view_distance[5] = value;
-	}
-
+	OverViewUpdateStatic(xml_globals->FirstChildElement("view_distance"));
 	// kingdom
-	xml_element = xml_globals->FirstChildElement("kingdom");
-	if(xml_element)
-	{
-	    int value;
-	    xml_element->Attribute("max_heroes", &value);
-	    Kingdom::SetMaxHeroes(value);
-	}
-
+	KingdomUpdateStatic(xml_globals->FirstChildElement("kingdom"));
 	// game_over
-	xml_element = xml_globals->FirstChildElement("game_over");
-	if(xml_element)
-	{
-	    int value;
-	    xml_element->Attribute("lost_towns_days", &value);
-	    lost_town_days = value;
-	}
-
+	GameOverUpdateStatic(xml_globals->FirstChildElement("game_over"));
 	// whirlpool
-	xml_element = xml_globals->FirstChildElement("whirlpool");
-	if(xml_element)
-	{
-	    int value;
-	    xml_element->Attribute("percent", &value);
-	    if(value && value < 90) whirlpool_percent = value;
-	}
-
+	WhirlpoolUpdateStatic(xml_globals->FirstChildElement("whirlpool"));
 	// heroes
-	xml_element = xml_globals->FirstChildElement("heroes");
-	if(xml_element)
-	{
-	    int value;
-	    xml_element->Attribute("spell_points_per_day", &value);
-	    if(value < 11) heroes_restore_spell_points_day = value;
-	}
-
+	HeroesUpdateStatic(xml_globals->FirstChildElement("heroes"));
 	// castle_extra_growth 
-	xml_element = xml_globals->FirstChildElement("castle_extra_growth ");
-	if(xml_element) Castle::UpdateExtraGrowth(xml_element);
-
+	CastleUpdateGrowth(xml_globals->FirstChildElement("castle_extra_growth "));
 	// monster upgrade ratio
-	xml_element = xml_globals->FirstChildElement("monster_upgrade");
-	if(xml_element)
-	{
-	    double ratio;
-	    xml_element->Attribute("rate", &ratio);
-	    Monster::SetUpgradeRatio(ratio);
-	}
+	MonsterUpdateStatic(xml_globals->FirstChildElement("monster_upgrade"));
     }
     else
     VERBOSE(spec << ": " << doc.ErrorDesc());
@@ -383,12 +315,12 @@ void Game::UpdateGlobalDefines(const std::string & spec)
 
 u8 Game::GetWhirlpoolPercent(void)
 {
-    return whirlpool_percent;
+    return GameStatic::GetLostOnWhirlpoolPercent();
 }
 
 u8 Game::GetHeroRestoreSpellPointsPerDay(void)
 {
-    return heroes_restore_spell_points_day;
+    return GameStatic::GetHeroesSpellPointsPerDay();
 }
 
 void Game::LoadExternalResource(const Settings & conf)
