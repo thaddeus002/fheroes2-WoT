@@ -7,7 +7,7 @@ SDL_LIBS := $(shell sdl-config --libs)
 SDL_FLAGS := $(shell sdl-config --cflags)
 
 CFLAGS := $(CFLAGS) -Wall -fsigned-char
-LDFLAGS :=
+LDFLAGS := $(LDFLAGS)
 LIBS :=
 
 ifdef DEBUG
