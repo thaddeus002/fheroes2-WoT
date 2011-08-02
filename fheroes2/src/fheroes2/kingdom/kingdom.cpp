@@ -53,7 +53,7 @@ void Kingdom::Init(Color::color_t cl)
 
     // set play
     color	= cl;
-    if(conf.KingdomColors() & color) SetModes(PLAY);
+    if(Game::GetKingdomColors() & color) SetModes(PLAY);
 
     heroes.reserve(GetMaxHeroes());
     castles.reserve(15);

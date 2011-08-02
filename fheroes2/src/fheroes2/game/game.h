@@ -219,6 +219,7 @@ namespace Game
     
     void EnvironmentSoundMixer(void);
 
+    u8  GetKingdomColors(void);
     u8  GetRating(void);
     u16 GetGameOverScores(void);
     u8  GetLostTownDays(void);

@@ -386,13 +386,12 @@ public:
     u8 KingdomRace(u8) const;
     void SetKingdomRace(u8, u8);
     void FixKingdomRandomRace(void);
+    bool AllowChangeRace(u8) const;
     const std::string & MapsFile(void) const;
     const std::string & MapsName(void) const;
     const std::string & MapsDescription(void) const;
     u8  MapsDifficulty(void) const;
     u16 MapsWidth(void) const;
-    u8 KingdomColors(void) const;
-    bool AllowChangeRace(u8) const;
     bool GameStartWithHeroes(void) const;
     u16 ConditionWins(void) const;
     u16 ConditionLoss(void) const;

@@ -401,3 +401,8 @@ std::string Game::GetEncodeString(const char* str)
 
     return str2;
 }
+
+u8 Game::GetKingdomColors(void)
+{
+    return Settings::Get().CurrentFileInfo().kingdom_colors;
+}

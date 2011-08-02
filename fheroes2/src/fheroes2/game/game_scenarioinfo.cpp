@@ -344,12 +344,12 @@ Game::menu_t Game::ScenarioInfo(void)
 	    else
 	    // color
 	    if(coordColors.end() != (itr = std::find_if(coordColors.begin(), coordColors.end(), std::bind2nd(RectIncludePoint(), le.GetMouseCursor()))) &&
-		(conf.KingdomColors() & Color::GetFromIndex(itr - coordColors.begin())))
+		(Game::GetKingdomColors() & Color::GetFromIndex(itr - coordColors.begin())))
 		    Dialog::Message(_("Opponents"), _("This lets you change player starting positions and colors. A particular color will always start in a particular location. Some positions may only be played by a computer player or only by a human player."), Font::BIG);
 	    else
 	    // class
 	    if(coordClass.end() != (itr = std::find_if(coordClass.begin(), coordClass.end(), std::bind2nd(RectIncludePoint(), le.GetMouseCursor()))) &&
-		(conf.KingdomColors() & Color::GetFromIndex(itr - coordClass.begin())))
+		(Game::GetKingdomColors() & Color::GetFromIndex(itr - coordClass.begin())))
 		    Dialog::Message(_("Class"), _("This lets you change the class of a player. Classes are not always changeable. Depending on the scenario, a player may receive additional towns and/or heroes not of their primary alignment."), Font::BIG);
 	    else
 	    if(rating && le.MousePressRight(rating->GetRect()))
@@ -396,18 +396,16 @@ void UpdateCoordClassInfo(const Point & dst, std::vector<Rect> & rects)
 
 void UpdateCoordOpponentsInfo(const Point & dst, std::vector<Rect> & rects)
 {
-    const Settings & conf = Settings::Get();
-    const u8 count = Color::Count(conf.KingdomColors());
     const Sprite &sprite = AGG::GetICN(ICN::NGEXTRA, 3);
     u8 current = 0;
 
     std::fill(rects.begin(), rects.end(), Rect());
 
-    const Colors colors(conf.KingdomColors());
+    const Colors colors(Game::GetKingdomColors());
 
     for(Colors::const_iterator
 	it = colors.begin(); it != colors.end(); ++it)
-	rects[Color::GetIndex(*it)] = Rect(dst.x + GetStepFor(current++, sprite.w(), count), dst.y, sprite.w(), sprite.h());
+	rects[Color::GetIndex(*it)] = Rect(dst.x + GetStepFor(current++, sprite.w(), colors.size()), dst.y, sprite.w(), sprite.h());
 }
 
 void Game::Scenario::RedrawStaticInfo(const Rect & rt)
@@ -456,10 +454,9 @@ void Game::Scenario::RedrawOpponentsInfo(const Point & dst, const std::vector<Pl
 {
     const Settings & conf = Settings::Get();
     const Maps::FileInfo & fi = conf.CurrentFileInfo();
-    const u8 count = Color::Count(conf.KingdomColors());
 
     u8 current = 0;
-    const Colors colors(conf.KingdomColors());
+    const Colors colors(Game::GetKingdomColors());
 
     for(Colors::const_iterator
 	color = colors.begin(); color != colors.end(); ++color)
@@ -483,7 +480,7 @@ void Game::Scenario::RedrawOpponentsInfo(const Point & dst, const std::vector<Pl
 	if(index)
 	{
 		const Sprite & sprite = AGG::GetICN(ICN::NGEXTRA, index);
-		Display::Get().Blit(sprite, dst.x + GetStepFor(current, sprite.w(), count), dst.y);
+		Display::Get().Blit(sprite, dst.x + GetStepFor(current, sprite.w(), colors.size()), dst.y);
 		
 		// draw name
 		if(players)
@@ -493,7 +490,7 @@ void Game::Scenario::RedrawOpponentsInfo(const Point & dst, const std::vector<Pl
 		    if(players->end() != itp)
 		    {
 			Text name((*itp).player_name, Font::SMALL);
-			name.Blit(dst.x + GetStepFor(current, sprite.w(), count) + (sprite.w() - name.w()) / 2,
+			name.Blit(dst.x + GetStepFor(current, sprite.w(), colors.size()) + (sprite.w() - name.w()) / 2,
 											dst.y + sprite.h() - 14);
 		    }
 		}
@@ -507,10 +504,9 @@ void Game::Scenario::RedrawClassInfo(const Point & dst, bool label)
 {
     Display & display = Display::Get();
     const Settings & conf = Settings::Get();
-    const u8 count = Color::Count(conf.KingdomColors());
     u8 current = 0;
 
-    const Colors colors(conf.KingdomColors());
+    const Colors colors(Game::GetKingdomColors());
 
     for(Colors::const_iterator
 	color = colors.begin(); color != colors.end(); ++color)
@@ -531,13 +527,13 @@ void Game::Scenario::RedrawClassInfo(const Point & dst, bool label)
 	    }
 
     	    const Sprite &sprite = AGG::GetICN(ICN::NGEXTRA, index);
-	    display.Blit(sprite, dst.x + GetStepFor(current, sprite.w(), count), dst.y);
+	    display.Blit(sprite, dst.x + GetStepFor(current, sprite.w(), colors.size()), dst.y);
 
 	    if(label)
 	    {
 		const std::string & name = (Race::NECR == race ? _("Necroman") : Race::String(race));
 		Text text(name, Font::SMALL);
-		text.Blit(dst.x + GetStepFor(current, sprite.w(), count) + (sprite.w() - text.w()) / 2, dst.y + sprite.h() + 2);
+		text.Blit(dst.x + GetStepFor(current, sprite.w(), colors.size()) + (sprite.w() - text.w()) / 2, dst.y + sprite.h() + 2);
 	    }
 
     	    ++current;

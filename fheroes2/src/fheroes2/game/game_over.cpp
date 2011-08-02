@@ -259,7 +259,7 @@ GameOver::Result::Result() : colors(0), result(0)
 
 void GameOver::Result::Reset(void)
 {
-    colors = Settings::Get().KingdomColors();
+    colors = Game::GetKingdomColors();
     result = GameOver::COND_NONE;
 }
 

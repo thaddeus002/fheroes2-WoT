@@ -906,11 +906,6 @@ bool Settings::AllowChangeRace(u8 f) const
     return current_maps_file.rnd_races & f;
 }
 
-u8 Settings::KingdomColors(void) const
-{
-    return current_maps_file.kingdom_colors;
-}
-
 bool Settings::GameStartWithHeroes(void) const
 {
     return current_maps_file.with_heroes;
@@ -1011,7 +1006,7 @@ void Settings::FixKingdomRandomRace(void)
 
     for(Colors::const_iterator
 	it = colors.begin(); it != colors.end(); ++it)
-    if(KingdomColors() & *it)
+    if(current_maps_file.kingdom_colors & *it)
     {
         if(Race::RAND == KingdomRace(*it)) SetKingdomRace(*it, Race::Rand());
         DEBUG(DBG_GAME, DBG_INFO, Color::String(*it) << ": " << Race::String(KingdomRace(*it)));
