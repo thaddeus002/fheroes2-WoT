@@ -60,11 +60,23 @@ endif
 CFLAGS := $(SDL_FLAGS) $(CFLAGS)
 LIBS := $(SDL_LIBS) $(LIBS)
 
-ifeq ($(PLATFORM),)
+# platform specific flags
+ifndef PLATFORM
+ifndef OS
+OS := $(shell uname)
+endif
+
 ifeq ($(OS),Windows_NT)
 PLATFORM := mingw
-else
-PLATFORM := unix
+endif
+ifeq ($(OS),FreeBSD)
+PLATFORM := bsd
+endif
+ifeq ($(OS),Darwin)
+PLATFORM := osx
+endif
+ifeq ($(OS),Linux)
+PLATFORM := all
 endif
 endif
 

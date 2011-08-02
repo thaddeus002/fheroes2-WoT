@@ -1,0 +1,7 @@
+AR := ar
+CXX := g++
+LIBS := $(LIBS) -L/usr/local/lib
+
+ifndef WITHOUT_UNICODE
+LIBS := $(LIBS) -lintl
+endif
