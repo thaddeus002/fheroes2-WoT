@@ -26,20 +26,19 @@
 
 const char* Color::String(u8 color)
 {
-    const char* str_color[] = { _("Blue"), _("Green"), _("Red"), _("Yellow"), _("Orange"), _("Purple"), _("Gray"), "Unknown" };
+    const char* str_color[] = { "Unknown", _("Blue"), _("Green"), _("Red"), _("Yellow"), _("Orange"), _("Purple") };
 
     switch(color)
     {
-        case Color::BLUE: 	return str_color[0];
-        case Color::GREEN: 	return str_color[1];
-        case Color::RED:	return str_color[2];
-        case Color::YELLOW:	return str_color[3];
-	case Color::ORANGE: 	return str_color[4];
-	case Color::PURPLE: 	return str_color[5];
-	case Color::GRAY: 	return str_color[6];
+        case Color::BLUE: 	return str_color[1];
+        case Color::GREEN: 	return str_color[2];
+        case Color::RED:	return str_color[3];
+        case Color::YELLOW:	return str_color[4];
+	case Color::ORANGE: 	return str_color[5];
+	case Color::PURPLE: 	return str_color[6];
     }
 
-    return str_color[7];
+    return str_color[0];
 }
 
 u8 Color::GetIndex(color_t color)
@@ -55,7 +54,7 @@ u8 Color::GetIndex(color_t color)
 	default: break;
     }
 
-    // GRAY
+    // NONE
     return 6;
 }
 
@@ -78,7 +77,7 @@ Color::color_t Color::GetFromIndex(u8 index)
 	default: break;
     }
 
-    return GRAY;
+    return NONE;
 }
 
 Color::color_t Color::Get(u8 index)
@@ -94,7 +93,7 @@ Color::color_t Color::Get(u8 index)
 	default: break;
     }
 
-    return GRAY;
+    return NONE;
 }
 
 Color::color_t Color::GetFirst(u8 colors)
@@ -111,7 +110,7 @@ Color::color_t Color::GetFirst(u8 colors)
     else
     if(colors & PURPLE) return PURPLE;
 
-    return Color::NONE;
+    return NONE;
 }
 
 const char* BarrierColor::String(u8 val)

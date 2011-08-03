@@ -630,7 +630,7 @@ void Dialog::QuickInfo(const Castle & castle)
 	case Color::YELLOW:	index = 6; break;
 	case Color::ORANGE:	index = 8; break;
 	case Color::PURPLE:	index = 10; break;
-	case Color::GRAY:	index = 12; break;
+	case Color::NONE:	index = 12; break;
 	default: break;
     }
 
@@ -787,7 +787,7 @@ void Dialog::QuickInfo(const Heroes & hero)
 	case Color::YELLOW:	index = 6; break;
 	case Color::ORANGE:	index = 8; break;
 	case Color::PURPLE:	index = 10; break;
-	case Color::GRAY:	index = 12; break;
+	case Color::NONE:	index = 12; break;
 	default: break;
     }
 

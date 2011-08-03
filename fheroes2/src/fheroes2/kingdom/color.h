@@ -55,7 +55,6 @@ namespace Color
         YELLOW  = 0x08,
         ORANGE  = 0x10,
         PURPLE  = 0x20,
-        GRAY    = 0x40,
 	ALL	= BLUE | GREEN | RED | YELLOW | ORANGE | PURPLE
     };
 

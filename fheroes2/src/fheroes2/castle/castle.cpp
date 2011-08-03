@@ -35,12 +35,12 @@
 #include "game_static.h"
 #include "ai.h"
 
-Castle::Castle() : race(Race::NONE), building(0), captain(*this), color(Color::GRAY), army(NULL)
+Castle::Castle() : race(Race::NONE), building(0), captain(*this), color(Color::NONE), army(NULL)
 {
 }
 
 Castle::Castle(s16 cx, s16 cy, const u8 rc) : Position(Point(cx, cy)), race(rc), building(0), captain(*this),
-    color(Color::GRAY), army(NULL)
+    color(Color::NONE), army(NULL)
 {
     std::fill(dwelling, dwelling + CASTLEMAXMONSTER, 0);
     SetModes(ALLOWBUILD);
@@ -61,7 +61,7 @@ void Castle::LoadFromMP2(const void *ptr)
         case 0x03: color = Color::YELLOW; break;
         case 0x04: color = Color::ORANGE; break;
         case 0x05: color = Color::PURPLE; break;
-        default:   color = Color::GRAY;   break;
+        default:   color = Color::NONE;   break;
     }
     ++ptr8;
     
@@ -209,7 +209,7 @@ void Castle::LoadFromMP2(const void *ptr)
 	case 0x03: race = Race::WRLK; break; 	 
 	case 0x04: race = Race::WZRD; break; 	 
         case 0x05: race = Race::NECR; break; 	 
-        default: race = (Color::GRAY != color && (Race::ALL & kingdom_race) ? kingdom_race : Race::Rand()); break;
+        default: race = (Color::NONE != color && (Race::ALL & kingdom_race) ? kingdom_race : Race::Rand()); break;
     }
     ++ptr8;
 
@@ -367,7 +367,7 @@ void Castle::ActionNewWeek(void)
 	    u8 growth = GetDwellingGrowth(dwellings1[ii]);
 
 	    // neutral town: half population (normal for begin month)
-	    if(GetColor() == Color::GRAY && !world.BeginMonth())
+	    if(GetColor() == Color::NONE && !world.BeginMonth())
 		growth /= 2;
 
 	    dwelling[ii] += growth;
@@ -416,7 +416,7 @@ void Castle::ActionNewMonth(void)
 	    u8 growth = GetDwellingGrowth(dwellings[ii]);
 
 	    // neutral town: half population (normal for begin month)
-	    if(GetColor() == Color::GRAY && !world.BeginMonth())
+	    if(GetColor() == Color::NONE && !world.BeginMonth())
 		growth /= 2;
 
 	    dwelling[ii] += growth;
@@ -427,7 +427,7 @@ void Castle::ActionNewMonth(void)
 
     // neutral town: small increase garrisons (random)
     if(world.GetWeekType().GetType() != Week::PLAGUE &&
-	1 < world.GetDay() && Color::GRAY == GetColor()) JoinRNDArmy();
+	1 < world.GetDay() && Color::NONE == GetColor()) JoinRNDArmy();
 }
 
 // change castle color

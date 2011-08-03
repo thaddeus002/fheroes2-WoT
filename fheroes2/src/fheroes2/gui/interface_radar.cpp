@@ -293,7 +293,7 @@ Surface* Interface::Radar::GetSurfaceFromColor(const u8 color)
 	case Color::YELLOW:	return sf_yellow;
 	case Color::ORANGE:	return sf_orange;
 	case Color::PURPLE:	return sf_purple;
-	case Color::GRAY:	return sf_gray;
+	case Color::NONE:	return sf_gray;
 	default:		break;
     }
 

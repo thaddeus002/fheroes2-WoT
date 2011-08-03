@@ -26,6 +26,6 @@
 
 void Player::FixRandomRace(Player & p)
 {
-    if(p.player_id && p.player_color && Color::GRAY != p.player_color)
+    if(p.player_id && p.player_color && Color::NONE != p.player_color)
     p.player_race = Settings::Get().KingdomRace(Color::Get(p.player_color));
 }

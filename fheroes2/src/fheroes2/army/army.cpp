@@ -80,14 +80,14 @@ Army::armysize_t Army::GetSize(u32 count)
     return FEW;
 }
 
-Army::army_t::army_t(HeroBase* s) : army(ARMYMAXTROOPS), commander(s), combat_format(FORMAT_SPREAD), color(Color::GRAY)
+Army::army_t::army_t(HeroBase* s) : army(ARMYMAXTROOPS), commander(s), combat_format(FORMAT_SPREAD), color(Color::NONE)
 {
     for(Troops::iterator
 	it = army.begin(); it != army.end(); ++it)
 	(*it).army = this;
 }
 
-Army::army_t::army_t(const army_t & a) : army(ARMYMAXTROOPS), commander(NULL), combat_format(FORMAT_SPREAD), color(Color::GRAY)
+Army::army_t::army_t(const army_t & a) : army(ARMYMAXTROOPS), commander(NULL), combat_format(FORMAT_SPREAD), color(Color::NONE)
 {
     for(Troops::iterator
 	it = army.begin(); it != army.end(); ++it)
@@ -1062,7 +1062,7 @@ u32 Army::army_t::ActionToSirens(void)
 
 u8 Army::army_t::GetControl(void) const
 {
-    return commander ? commander->GetControl() : (color == Color::GRAY ? Game::CONTROL_AI : world.GetKingdom(color).Control());
+    return commander ? commander->GetControl() : (color == Color::NONE ? Game::CONTROL_AI : world.GetKingdom(color).Control());
 }
 
 u32 Army::army_t::GetSurrenderCost(void) const

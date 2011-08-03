@@ -119,7 +119,7 @@ void AI::KingdomTurn(Kingdom & kingdom)
 
     const Color::color_t & color = kingdom.GetColor();
 
-    if(kingdom.isLoss() || color == Color::GRAY)
+    if(kingdom.isLoss() || color == Color::NONE)
     {
 	kingdom.LossPostActions();
 	return;

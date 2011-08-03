@@ -2275,7 +2275,7 @@ void Battle2::Interface::RedrawActionWincesKills(TargetsInfo & targets)
 
 	    // set opponent OP_SRRW animation
  	    OpponentSprite* commander = NULL;
-	    if(target.defender->GetColor() != Color::GRAY)
+	    if(target.defender->GetColor() != Color::NONE)
 	    {
 		commander = target.defender->GetColor() == arena.army1.GetColor() ? opponent1 : opponent2;
 	    }

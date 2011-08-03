@@ -544,7 +544,7 @@ bool ActionSpellSetGuardian(Heroes & hero, const Spell & spell, u8 id)
 	//    tile.SetCountMonster(count + tile.GetCountMonster());
 
 	if(spell == Spell::HAUNT)
-	    world.CaptureObject(index, Color::GRAY);
+	    world.CaptureObject(index, Color::NONE);
     }
 
     return false;

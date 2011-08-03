@@ -41,7 +41,7 @@ bool HeroesStrongestArmy(const Heroes* h1, const Heroes* h2)
     return h1 && h2 && h2->GetArmy().StrongerEnemyArmy(h1->GetArmy());
 }
 
-Kingdom::Kingdom() : color(Color::GRAY), control(Game::CONTROL_AI), flags(0), lost_town_days(0), visited_tents_colors(0)
+Kingdom::Kingdom() : color(Color::NONE), control(Game::CONTROL_AI), flags(0), lost_town_days(0), visited_tents_colors(0)
 {
 }
 
@@ -74,7 +74,7 @@ void Kingdom::Init(Color::color_t cl)
 
 void Kingdom::clear(void)
 {
-    color	= Color::GRAY;
+    color	= Color::NONE;
     control	= Game::CONTROL_AI;
     flags	= 0;
     visited_tents_colors = 0;
@@ -130,7 +130,7 @@ void Kingdom::LossPostActions(void)
 	}
 	if(castles.size())
 	{
-	    castles.ChangeColors(color, Color::GRAY);
+	    castles.ChangeColors(color, Color::NONE);
 	    castles.clear();
 	}
 	world.KingdomLoss(color);
@@ -591,7 +591,7 @@ void Kingdoms::Init(void)
     kingdoms[3].Init(Color::YELLOW);
     kingdoms[4].Init(Color::ORANGE);
     kingdoms[5].Init(Color::PURPLE);
-    kingdoms[6].Init(Color::GRAY);
+    kingdoms[6].Init(Color::NONE);
 }
 
 u8 Kingdoms::size(void) const
@@ -608,7 +608,7 @@ void Kingdoms::clear(void)
 void Kingdoms::ApplyPlayWithStartingHero(void)
 {
     for(u8 ii = 0; ii < size(); ++ii)
-	kingdoms[ii].ApplyPlayWithStartingHero();
+	if(kingdoms[ii].isPlay()) kingdoms[ii].ApplyPlayWithStartingHero();
 }
 
 const Kingdom & Kingdoms::Get(u8 color) const
@@ -676,7 +676,7 @@ u8 Kingdoms::GetNotLossColors(void) const
 {
     u8 result = 0;
     for(u8 ii = 0; ii < size(); ++ii)
-	if(kingdoms[ii].GetColor() != Color::GRAY &&
+	if(kingdoms[ii].GetColor() &&
 	    ! kingdoms[ii].isLoss()) result |= kingdoms[ii].GetColor();
     return result;
 }
@@ -685,7 +685,7 @@ u8 Kingdoms::GetLossColors(void) const
 {
     u8 result = 0;
     for(u8 ii = 0; ii < size(); ++ii)
-	if(kingdoms[ii].GetColor() != Color::GRAY &&
+	if(kingdoms[ii].GetColor() &&
 	    kingdoms[ii].isLoss()) result |= kingdoms[ii].GetColor();
     return result;
 }
@@ -693,7 +693,7 @@ u8 Kingdoms::GetLossColors(void) const
 u8 Kingdoms::FindArtOrGoldWins(void) const
 {
     for(u8 ii = 0; ii < size(); ++ii)
-	if(kingdoms[ii].GetColor() != Color::GRAY &&
+	if(kingdoms[ii].GetColor() &&
 	    (world.KingdomIsWins(kingdoms[ii], GameOver::WINS_GOLD) || world.KingdomIsWins(kingdoms[ii], GameOver::WINS_ARTIFACT)))
 		return kingdoms[ii].GetColor();
     return 0;
@@ -703,12 +703,14 @@ void Kingdoms::AddHeroes(const AllHeroes & heroes)
 {
     for(AllHeroes::const_iterator                                                                    
         it = heroes.begin(); it != heroes.end(); ++it)
-        Get((*it)->GetColor()).AddHeroes(*it);
+	// skip gray color
+        if((*it)->GetColor()) Get((*it)->GetColor()).AddHeroes(*it);
 }
 
 void Kingdoms::AddCastles(const AllCastles & castles)
 {
     for(AllCastles::const_iterator
 	it = castles.begin(); it != castles.end(); ++it)
-        Get((*it)->GetColor()).AddCastle(*it);
+	// skip gray color
+        if((*it)->GetColor()) Get((*it)->GetColor()).AddCastle(*it);
 }

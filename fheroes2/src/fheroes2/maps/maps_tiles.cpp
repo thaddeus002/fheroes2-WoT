@@ -1352,7 +1352,7 @@ void Maps::Tiles::CaptureFlags32(const MP2::object_t obj, const Color::color_t c
 	case Color::YELLOW:	index = 3; break;
 	case Color::ORANGE:	index = 4; break;
 	case Color::PURPLE:	index = 5; break;
-	case Color::GRAY:	index = 6; break;
+	case Color::NONE:	index = 6; break;
 
 	default: break;
     }

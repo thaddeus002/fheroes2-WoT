@@ -52,7 +52,7 @@ class IndexObject : public std::pair<s32, MP2::object_t>
 class ObjectColor : public std::pair<MP2::object_t, Color::color_t>
 {
     public:
-    ObjectColor() : std::pair<MP2::object_t, Color::color_t>(MP2::OBJ_ZERO, Color::GRAY) {};
+    ObjectColor() : std::pair<MP2::object_t, Color::color_t>(MP2::OBJ_ZERO, Color::NONE) {};
     ObjectColor(const MP2::object_t object, Color::color_t color) : std::pair<MP2::object_t, Color::color_t>(object, color) {};
 
     bool isObject(u8 object) const { return object == first; };

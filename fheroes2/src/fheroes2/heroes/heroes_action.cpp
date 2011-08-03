@@ -246,7 +246,7 @@ u16 DialogLuck(const std::string & hdr, const std::string & msg, const bool good
     return Dialog::SpriteInfo(hdr, msg, image);
 }
 
-void BattleLose(Heroes &hero, const Battle2::Result & res, bool attacker, Color::color_t color = Color::GRAY)
+void BattleLose(Heroes &hero, const Battle2::Result & res, bool attacker, Color::color_t color = Color::NONE)
 {
     u8 reason = attacker ? res.AttackerResult() : res.DefenderResult();
 
@@ -2369,7 +2369,7 @@ void ActionToDwellingBattleMonster(Heroes &hero, const u8 obj, const s32 dst_ind
     Maps::Tiles & tile = world.GetTiles(dst_index);
 
     // yet no one captured.
-    const bool battle = (Color::GRAY == world.ColorCapturedObject(dst_index) && 0 == tile.GetQuantity4());
+    const bool battle = (Color::NONE == world.ColorCapturedObject(dst_index) && 0 == tile.GetQuantity4());
     const u32 count = tile.GetCountMonster();
     bool complete = false;
 

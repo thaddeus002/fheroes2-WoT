@@ -231,7 +231,7 @@ Game::menu_t Game::NewMulti(void)
 	conf.SetGameType(Game::TYPE_STANDARD);
 
     // reset prev. scenario info
-    conf.SetMyColor(Color::GRAY);
+    conf.SetMyColor(Color::NONE);
 
     if(conf.QVGA()) return PocketPC::NewMulti();
 

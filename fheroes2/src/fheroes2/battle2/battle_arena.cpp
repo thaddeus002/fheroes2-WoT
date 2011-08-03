@@ -1222,23 +1222,19 @@ const Battle2::Stats* Battle2::Arena::GetTroopBoard(u16 index) const
 
 const Army::army_t* Battle2::Arena::GetArmy(u8 color) const
 {
-    if(color)
-    {
-	if(army1.GetColor() == color) return &army1;
-	else
-	if(army2.GetColor() == color) return &army2;
-    }
+    if(army1.GetColor() == color) return &army1;
+    else
+    if(army2.GetColor() == color) return &army2;
+
     return NULL;
 }
 
 Army::army_t* Battle2::Arena::GetArmy(u8 color)
 {
-    if(color)
-    {
-	if(army1.GetColor() == color) return &army1;
-	else
-	if(army2.GetColor() == color) return &army2;
-    }
+    if(army1.GetColor() == color) return &army1;
+    else
+    if(army2.GetColor() == color) return &army2;
+
     return NULL;
 }
 

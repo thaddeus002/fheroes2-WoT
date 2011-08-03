@@ -170,7 +170,7 @@ Skill::Primary::skill_t AISelectPrimarySkill(Heroes &hero)
     return Skill::Primary::UNKNOWN;
 }
 
-void AIBattleLose(Heroes &hero, const Battle2::Result & res, bool attacker, Color::color_t color = Color::GRAY)
+void AIBattleLose(Heroes &hero, const Battle2::Result & res, bool attacker, Color::color_t color = Color::NONE)
 {
     u8 reason = attacker ? res.AttackerResult() : res.DefenderResult();
 
@@ -1894,7 +1894,7 @@ bool AIHeroesValidObject(const Heroes & hero, s32 index)
         case MP2::OBJ_CITYDEAD:
         case MP2::OBJ_TROLLBRIDGE:
         {
-    	    const bool battle = (Color::GRAY == world.ColorCapturedObject(index));
+    	    const bool battle = (Color::NONE == world.ColorCapturedObject(index));
 	    const u32 count = tile.GetCountMonster();
     	    const Monster monster = Monster::FromObject(obj);
 	    const payment_t paymentCosts = monster.GetCost() * count;

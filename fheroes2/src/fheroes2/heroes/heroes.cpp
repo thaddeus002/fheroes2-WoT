@@ -109,14 +109,14 @@ Heroes::Heroes() : move_point_scale(-1), army(this), path(*this),
 {
 }
 
-Heroes::Heroes(heroes_t ht, u8 rc) : HeroBase(Skill::Primary::HEROES, rc), killer_color(Color::GRAY), experience(0),
+Heroes::Heroes(heroes_t ht, u8 rc) : HeroBase(Skill::Primary::HEROES, rc), killer_color(Color::NONE), experience(0),
     move_point_scale(-1), secondary_skills(rc), army(this), hid(ht), portrait(ht), race(rc),
     save_maps_object(MP2::OBJ_ZERO), path(*this), direction(Direction::RIGHT), sprite_index(18), patrol_square(0)
 {
     name = _(Heroes::GetName(ht));
 
     // hero is freeman
-    color = Color::GRAY;
+    color = Color::NONE;
 
     // set default army
     army.Reset(true);
@@ -282,7 +282,7 @@ void Heroes::LoadFromMP2(s32 map_index, const void *ptr, const Color::color_t cl
     SetIndex(map_index);
 
     color = cl;
-    killer_color = Color::GRAY;
+    killer_color = Color::NONE;
 
     const u8  *ptr8  = static_cast<const u8 *>(ptr);
     u16 byte16 = 0;
@@ -707,7 +707,7 @@ s8 Heroes::GetLuckWithModificators(std::string *strs) const
 /* recrut hero */
 bool Heroes::Recruit(const Color::color_t cl, const Point & pt)
 {
-    if(color != Color::GRAY)
+    if(color != Color::NONE)
     {
 	DEBUG(DBG_GAME, DBG_WARN, "not freeman");
 	return false;
@@ -719,7 +719,7 @@ bool Heroes::Recruit(const Color::color_t cl, const Point & pt)
     {
 	Maps::Tiles & tiles = world.GetTiles(pt);
 	color = cl;
-	killer_color = Color::GRAY;
+	killer_color = Color::NONE;
 	SetCenter(pt);
 	if(!Modes(SAVEPOINTS)) move_point = GetMaxMovePoints();
 	MovePointsScaleFixed();
@@ -871,13 +871,13 @@ void Heroes::RescanPath(void)
 /* if hero in castle */
 const Castle* Heroes::inCastle(void) const
 {
-    const Castle* castle = Color::GRAY != color ? world.GetCastle(GetIndex()) : NULL;
+    const Castle* castle = Color::NONE != color ? world.GetCastle(GetIndex()) : NULL;
     return castle && castle->GetHeroes() == this ? castle : NULL;
 }
 
 Castle* Heroes::inCastle(void)
 {
-    Castle* castle = Color::GRAY != color ? world.GetCastle(GetIndex()) : NULL;
+    Castle* castle = Color::NONE != color ? world.GetCastle(GetIndex()) : NULL;
     return castle && castle->GetHeroes() == this ? castle : NULL;
 }
 
@@ -1064,7 +1064,7 @@ u32 Heroes::GetExperienceFromLevel(u8 lvl)
 /* buy book */
 bool Heroes::BuySpellBook(const Castle* castle, u8 shrine)
 {
-    if(HaveSpellBook() || Color::GRAY == color) return false;
+    if(HaveSpellBook() || Color::NONE == color) return false;
 
     const payment_t payment = PaymentConditions::BuySpellBook(shrine);
     Kingdom & kingdom = world.GetKingdom(color);
@@ -1384,7 +1384,7 @@ bool Heroes::isValid(void) const
 
 bool Heroes::isFreeman(void) const
 {
-    return Color::GRAY == color && !Modes(JAIL);
+    return Color::NONE == color && !Modes(JAIL);
 }
 
 void Heroes::SetFreeman(const u8 reason)
@@ -1402,9 +1402,9 @@ void Heroes::SetFreeman(const u8 reason)
     else
     if((Battle2::RESULT_LOSS & reason) && !(Battle2::RESULT_SURRENDER & reason)) army.Reset(true);
 
-    if(color != Color::GRAY) world.GetKingdom(color).RemoveHeroes(this);
+    if(color != Color::NONE) world.GetKingdom(color).RemoveHeroes(this);
 
-    color = Color::GRAY;
+    color = Color::NONE;
     world.GetTiles(GetIndex()).SetObject(save_maps_object);
     modes = 0;
     SetIndex(-1);

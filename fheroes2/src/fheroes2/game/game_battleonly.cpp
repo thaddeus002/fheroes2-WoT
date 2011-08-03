@@ -137,7 +137,7 @@ struct BattleOnly
 
     static BattleOnly & Get(void);
 
-    BattleOnly(void) : hero1(NULL), hero2(NULL), color1(Color::BLUE), color2(Color::GRAY),
+    BattleOnly(void) : hero1(NULL), hero2(NULL), color1(Color::BLUE), color2(Color::NONE),
 	control1(Game::CONTROL_LOCAL), control2(Game::CONTROL_AI),
 	army1(NULL), army2(NULL),
 	moraleIndicator1(NULL), moraleIndicator2(NULL),

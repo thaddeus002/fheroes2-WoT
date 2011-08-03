@@ -208,7 +208,7 @@ Game::menu_t Game::StartGame(void)
 		    if(conf.GameType(Game::TYPE_HOTSEAT))
 		    {
 			cursor.Hide();
-			conf.SetMyColor(Color::GRAY);
+			conf.SetMyColor(Color::NONE);
 			I.iconsPanel.HideIcons();
 			statusWin.Reset();
 			I.SetRedraw(REDRAW_GAMEAREA | REDRAW_STATUS | REDRAW_ICONS);

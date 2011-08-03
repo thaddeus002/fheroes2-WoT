@@ -179,7 +179,7 @@ u8 Army::Troop::GetDefense(bool hero) const
 
 Color::color_t Army::Troop::GetColor(void) const
 {
-    return army ? army->GetColor() : Color::GRAY;
+    return army ? army->GetColor() : Color::NONE;
 }
 
 u32 Army::Troop::GetHitPoints(void) const

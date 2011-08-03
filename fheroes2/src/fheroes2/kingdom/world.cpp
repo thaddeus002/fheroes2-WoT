@@ -342,7 +342,7 @@ void World::LoadMaps(const std::string &filename)
 		break;
 	}
 	// preload in to capture objects cache
-	map_captureobj[Maps::GetIndexFromAbsPoint(cx, cy)] = ObjectColor(MP2::OBJ_CASTLE, Color::GRAY);
+	map_captureobj[Maps::GetIndexFromAbsPoint(cx, cy)] = ObjectColor(MP2::OBJ_CASTLE, Color::NONE);
     }
 
     DEBUG(DBG_GAME, DBG_INFO, "read coord castles, tellg: " << fd.tellg());
@@ -365,11 +365,11 @@ void World::LoadMaps(const std::string &filename)
 	{
 	    // mines: wood
 	    case 0x00:
-		map_captureobj[Maps::GetIndexFromAbsPoint(cx, cy)] = ObjectColor(MP2::OBJ_SAWMILL, Color::GRAY);
+		map_captureobj[Maps::GetIndexFromAbsPoint(cx, cy)] = ObjectColor(MP2::OBJ_SAWMILL, Color::NONE);
 		break; 
 	    // mines: mercury
 	    case 0x01:
-		map_captureobj[Maps::GetIndexFromAbsPoint(cx, cy)] = ObjectColor(MP2::OBJ_ALCHEMYLAB, Color::GRAY);
+		map_captureobj[Maps::GetIndexFromAbsPoint(cx, cy)] = ObjectColor(MP2::OBJ_ALCHEMYLAB, Color::NONE);
 		break;
 	    // mines: ore
  	    case 0x02:
@@ -381,19 +381,19 @@ void World::LoadMaps(const std::string &filename)
 	    case 0x05:
 	    // mines: gold
 	    case 0x06:
-		map_captureobj[Maps::GetIndexFromAbsPoint(cx, cy)] = ObjectColor(MP2::OBJ_MINES, Color::GRAY);
+		map_captureobj[Maps::GetIndexFromAbsPoint(cx, cy)] = ObjectColor(MP2::OBJ_MINES, Color::NONE);
 		break; 
 	    // lighthouse
 	    case 0x64:
-		map_captureobj[Maps::GetIndexFromAbsPoint(cx, cy)] = ObjectColor(MP2::OBJ_LIGHTHOUSE, Color::GRAY);
+		map_captureobj[Maps::GetIndexFromAbsPoint(cx, cy)] = ObjectColor(MP2::OBJ_LIGHTHOUSE, Color::NONE);
 		break; 
 	    // dragon city
 	    case 0x65:
-		map_captureobj[Maps::GetIndexFromAbsPoint(cx, cy)] = ObjectColor(MP2::OBJ_DRAGONCITY, Color::GRAY);
+		map_captureobj[Maps::GetIndexFromAbsPoint(cx, cy)] = ObjectColor(MP2::OBJ_DRAGONCITY, Color::NONE);
 		break; 
 	    // abandoned mines
 	    case 0x67:
-		map_captureobj[Maps::GetIndexFromAbsPoint(cx, cy)] = ObjectColor(MP2::OBJ_ABANDONEDMINE, Color::GRAY);
+		map_captureobj[Maps::GetIndexFromAbsPoint(cx, cy)] = ObjectColor(MP2::OBJ_ABANDONEDMINE, Color::NONE);
 		break; 
 	    default:
 		DEBUG(DBG_GAME, DBG_WARN, "kingdom block: " << "unknown id: " << static_cast<int>(id) << ", maps index: " << cx + cy * w());
@@ -539,7 +539,7 @@ void World::LoadMaps(const std::string &filename)
 
 			if(hero)
 			{
-			    hero->LoadFromMP2(findobject, pblock, Color::GRAY, hero->GetRace());
+			    hero->LoadFromMP2(findobject, pblock, Color::NONE, hero->GetRace());
 			    hero->SetModes(Heroes::JAIL);
 			}
 		    }
@@ -555,7 +555,7 @@ void World::LoadMaps(const std::string &filename)
 		    {
 			// calculate color
 			const u8 index_name = addon->index;
-			Color::color_t color = Color::GRAY;
+			Color::color_t color = Color::NONE;
 
 			if( 7 > index_name)
     			    color = Color::BLUE;
@@ -586,7 +586,7 @@ void World::LoadMaps(const std::string &filename)
 			    case 3: race = Race::WRLK; break;
 			    case 4: race = Race::WZRD; break;
 			    case 5: race = Race::NECR; break;
-			    case 6: race = (Color::GRAY != color ?
+			    case 6: race = (Color::NONE != color ?
 					    Settings::Get().KingdomRace(color) : Race::Rand()); break;
 			}
 
@@ -990,6 +990,11 @@ void World::NewWeek(void)
 	for(MapsTiles::iterator
 	    it = vec_tiles.begin(); it != vec_tiles.end(); ++it)
 	    if(MP2::isWeekLife((*it).GetObject())) (*it).UpdateQuantity();
+
+	// update gray towns
+        for(AllCastles::iterator
+	    it = vec_castles.begin(); it != vec_castles.end(); ++it)
+	    if((*it)->GetColor() == Color::NONE) (*it)->ActionNewWeek();
     }
 }
 
@@ -998,6 +1003,11 @@ void World::NewMonth(void)
     // skip first month
     if(1 < week && week_current.GetType() == Week::MONSTERS && !Settings::Get().ExtWorldBanMonthOfMonsters())
 	MonthOfMonstersAction(Monster(week_current.GetMonster()));
+
+    // update gray towns
+    for(AllCastles::iterator
+	it = vec_castles.begin(); it != vec_castles.end(); ++it)
+	if((*it)->GetColor() == Color::NONE) (*it)->ActionNewMonth();
 }
 
 void World::MonthOfMonstersAction(const Monster & mons)
@@ -1246,7 +1256,7 @@ void World::CaptureObject(const s32 index, const Color::color_t col)
 Color::color_t World::ColorCapturedObject(const s32 index) const
 {
     CapturedObjects::const_iterator it = map_captureobj.find(index);
-    return it != map_captureobj.end() ? (*it).second.second : Color::GRAY;
+    return it != map_captureobj.end() ? (*it).second.second : Color::NONE;
 }
 
 void World::ClearFog(const u8 color)
@@ -1501,8 +1511,8 @@ void World::KingdomLoss(const Color::color_t color)
 
 	if(objcol.isColor(color))
 	{
-	    objcol.second = Color::GRAY;
-	    GetTiles((*it).first).CaptureFlags32(objcol.first, Color::GRAY);
+	    objcol.second = Color::NONE;
+	    GetTiles((*it).first).CaptureFlags32(objcol.first, Color::NONE);
 	}
     }
 }
