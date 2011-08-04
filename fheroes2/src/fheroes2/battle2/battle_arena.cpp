@@ -285,9 +285,7 @@ void Battle2::Board::GetIndexesFromAbsPoints(std::vector<u16> & indexes, const s
     if(indexes.size())
     {
 	std::sort(indexes.begin(), indexes.end());
-
-	std::vector<u16>::iterator it1 = std::unique(indexes.begin(), indexes.end());
-	indexes.resize(it1 - indexes.begin());
+	indexes.resize(std::unique(indexes.begin(), indexes.end()) - indexes.begin());
     }
 }
 

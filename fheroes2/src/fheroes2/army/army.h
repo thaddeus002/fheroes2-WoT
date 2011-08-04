@@ -149,7 +149,7 @@ namespace Army
 	    void	Import(const Troops &);
 	    s8		GetTroopIndex(const Troop &) const;
 
-	    Troops		army;
+	    Troops		troops;
 	    HeroBase*		commander;
 	    u8			combat_format;
 	    Color::color_t	color;

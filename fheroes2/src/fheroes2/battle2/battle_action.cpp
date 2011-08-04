@@ -679,7 +679,8 @@ Battle2::TargetsInfo Battle2::Arena::GetTargetsForDamage(Stats & attacker, Stats
 		NULL != (enemy = GetTroopBoard(cell->index)) && enemy != &defender && enemy->GetColor() != attacker.GetColor())
         	    v.push_back(enemy);
 	}
-	std::unique(v.begin(), v.end());
+	std::sort(v.begin(), v.end());
+	v.resize(std::unique(v.begin(), v.end()) - v.begin());
 	for(u8 ii = 0; ii < v.size(); ++ii)
     	{
 	    enemy = v[ii];

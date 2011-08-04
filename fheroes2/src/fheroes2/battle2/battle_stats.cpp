@@ -2263,7 +2263,7 @@ namespace Battle2
 
 Battle2::Armies::Armies(Army::army_t & a) : parent(a)
 {
-    reserve(a.army.size());
+    reserve(a.troops.size());
     Init();
 }
 
@@ -2272,7 +2272,7 @@ void Battle2::Armies::Init(void)
     clear();
 
     for(Army::Troops::const_iterator
-        it = parent.army.begin(); it != parent.army.end(); ++it)
+        it = parent.troops.begin(); it != parent.troops.end(); ++it)
             if((*it).isValid() && (*it).battle) push_back((*it).battle);
 }
 
@@ -2327,7 +2327,7 @@ Battle2::Stats* Battle2::Armies::FindMode(u32 mod)
 
 Battle2::Stats* Battle2::Armies::CreateNewStats(const Monster & mons, u32 count)
 {
-    Army::Troops & armies = parent.army;
+    Army::Troops & armies = parent.troops;
     Army::Troops::iterator it = armies.begin();
 
     // find free invalid
