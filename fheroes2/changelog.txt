@@ -1,3 +1,16 @@
+Aug, 04, 2011 (2427 rev.)
+
+Fixed: AI: recruit troops for castles
+Fixed: game: Army::color null after load game
+Update: xml resources
+Fixed: AI: add prioritize range attackers and others...
+Added: game: WeekOfMonster can be 1 in every 3
+Fixed: battle animation, opponent animation and kill troop animation
+Fixed: World: next teleport scan
+Fixed: pocketpc: necromancer build shrine
+Fixed: GUI: incorrect focus after restart game
+Fixed: GUI: incorrect show splitter
+
 Jun, 26, 2011 (2390 rev.)
 
 Update: translation: (ru, sv, es, hu, pl)
