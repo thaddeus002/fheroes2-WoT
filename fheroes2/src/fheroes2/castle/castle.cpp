@@ -744,9 +744,8 @@ u16 Castle::RecruitMaxMonster(u32 dw)
 #ifdef WITH_NET
 	    FH2LocalClient::SendCastleRecruitMonster(*this, dw, count);
 #endif
+	    DEBUG(DBG_GAME, DBG_INFO, name << " recruit: " << ms.GetMultiName() << "(" << count << ")");
 	}
-
-	DEBUG(DBG_GAME, DBG_INFO, name << " recruit: " << ms.GetMultiName() << "(" << count << ")");
     }
 
     return count;
