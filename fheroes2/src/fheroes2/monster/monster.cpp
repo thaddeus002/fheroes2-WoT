@@ -246,6 +246,11 @@ bool Monster::isValid(void) const
     return id != UNKNOWN;
 }
 
+bool Monster::operator< (const Monster & m) const
+{
+    return id < m.id;
+}
+
 bool Monster::operator== (const Monster & m) const
 {
     return id == m.id;

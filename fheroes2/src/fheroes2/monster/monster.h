@@ -126,6 +126,7 @@ public:
     Monster(const Spell &);
     Monster(u8 race, u32 dw);
 
+    bool operator< (const Monster &) const;
     bool operator== (const Monster &) const;
     bool operator!= (const Monster &) const;
     u8 operator() (void) const;
