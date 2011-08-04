@@ -634,65 +634,66 @@ void Battle2::Board::SetCovrObjects(u16 icn)
     }
 }
 
-Battle2::GraveyardTroop::GraveyardTroop(const Arena & a) : arena(a)
-{
-}
-
 void Battle2::GraveyardTroop::GetClosedCells(std::vector<u16> & v) const
 {
     v.clear();
-    std::map<u16, std::vector<u16> >::const_iterator it1 = map.begin();
-    std::map<u16, std::vector<u16> >::const_iterator it2 = map.end();
-    for(; it1 != it2; ++it1) v.push_back((*it1).first);
+    for(const_iterator
+	it = begin(); it != end(); ++it)
+	v.push_back((*it).first);
 }
 
-u16 Battle2::GraveyardTroop::GetLastTroopIDFromCell(u16 index) const
+Battle2::Stats* Battle2::Arena::GetLastTroopFromGraveyard(u16 index)
 {
-    std::map<u16, std::vector<u16> >::const_iterator it1 = map.begin();
-    std::map<u16, std::vector<u16> >::const_iterator it2 = map.end();
-    for(; it1 != it2; ++it1) if(index == (*it1).first) break;
+    for(GraveyardTroop::const_iterator
+	it = graveyard.begin(); it != graveyard.end(); ++it)
+	if(index == (*it).first && (*it).second.size())
+	return GetTroopID((*it).second.back());
 
-    return it1 != it2 && (*it1).second.size() ? (*it1).second.back() : 0;
+    return NULL;
 }
 
-void Battle2::GraveyardTroop::AddTroopID(u16 id)
+const Battle2::Stats* Battle2::Arena::GetLastTroopFromGraveyard(u16 index) const
 {
-    const Stats* b = arena.GetTroopID(id);
-    if(b)
+    for(GraveyardTroop::const_iterator
+	it = graveyard.begin(); it != graveyard.end(); ++it)
+	if(index == (*it).first && (*it).second.size())
+	return GetTroopID((*it).second.back());
+
+    return NULL;
+}
+
+void Battle2::GraveyardTroop::AddTroop(const Stats & b)
+{
+    GraveyardTroop & map = *this;
+    std::vector<u16> & v = map[b.GetPosition()];
+    if(v.empty()) v.reserve(3);
+    v.push_back(b.GetID());
+
+    if(b.isWide())
     {
-	std::vector<u16> & v = map[b->position];
-	if(v.empty()) v.reserve(3);
-	v.push_back(id);
-
-	if(b->isWide())
-	{
-	    std::vector<u16> & v2 = map[b->GetTailIndex()];
-	    if(v2.empty()) v2.reserve(3);
-	    v2.push_back(id);
-	}
+	std::vector<u16> & v2 = map[b.GetTailIndex()];
+	if(v2.empty()) v2.reserve(3);
+	v2.push_back(b.GetID());
     }
 }
 
-void Battle2::GraveyardTroop::RemoveTroopID(u16 id)
+void Battle2::GraveyardTroop::RemoveTroop(const Stats & b)
 {
-    const Stats* b = arena.GetTroopID(id);
-    if(b)
-    {
-	std::vector<u16> & v = map[b->position];
-	std::vector<u16>::iterator it = std::find(v.begin(), v.end(), id);
-	if(it != v.end()) v.erase(it);
+    GraveyardTroop & map = *this;
+    std::vector<u16> & v = map[b.GetPosition()];
+    std::vector<u16>::iterator it = std::find(v.begin(), v.end(), b.GetID());
+    if(it != v.end()) v.erase(it);
 
-	if(b->isWide())
-	{
-	    std::vector<u16> & v2 = map[b->GetTailIndex()];
-	    std::vector<u16>::iterator it = std::find(v2.begin(), v2.end(), id);
-	    if(it != v2.end()) v2.erase(it);
-	}
+    if(b.isWide())
+    {
+	std::vector<u16> & v2 = map[b.GetTailIndex()];
+	std::vector<u16>::iterator it = std::find(v2.begin(), v2.end(), b.GetID());
+	if(it != v2.end()) v2.erase(it);
     }
 }
 
 Battle2::Arena::Arena(Army::army_t & a1, Army::army_t & a2, s32 index, bool local) :
-	army1(a1), army2(a2), castle(NULL), current_color(0), catapult(NULL), bridge(NULL), interface(NULL), result_game(NULL), graveyard(*this),
+	army1(a1), army2(a2), castle(NULL), current_color(0), catapult(NULL), bridge(NULL), interface(NULL), result_game(NULL),
 	icn_covr(ICN::UNKNOWN), current_turn(0), auto_battle(0)
 {
     const Settings & conf = Settings::Get();
@@ -1593,12 +1594,8 @@ bool Battle2::Arena::isAllowResurrectFromGraveyard(const Spell & spell, u16 cell
 
 	if(current_commander && it_closed != closed.end())
 	{
-	    const u16 id_killed = graveyard.GetLastTroopIDFromCell(cell);
-	    if(id_killed)
-	    {
-		const Battle2::Stats* killed = GetTroopID(id_killed);
-		if(killed->AllowApplySpell(spell, current_commander, NULL)) return true;
-	    }
+	    const Battle2::Stats* killed = GetLastTroopFromGraveyard(cell);
+	    if(killed->AllowApplySpell(spell, current_commander, NULL)) return true;
 	}
     }
     return false;

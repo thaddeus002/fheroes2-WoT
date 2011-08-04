@@ -90,20 +90,14 @@ namespace Battle2
 	static u16 GetIndexDirection(u16, u8);
     };
 
-    class GraveyardTroop
+    class GraveyardTroop : public std::map<u16, std::vector<u16> >
     {
     public:
-	GraveyardTroop(const Arena &);
+	GraveyardTroop() {}
 	
 	void GetClosedCells(std::vector<u16> &) const;
-	u16 GetLastTroopIDFromCell(u16) const;
-	void AddTroopID(u16);
-	void RemoveTroopID(u16);
-
-    private:
-	std::map<u16, std::vector<u16> > map;
-	
-	const Arena & arena;
+	void AddTroop(const Stats &);
+	void RemoveTroop(const Stats &);
     };
 
     class Arena
@@ -133,6 +127,9 @@ namespace Battle2
 
 	Stats* GetEnemyMaxQuality(u8);
 	const Stats* GetEnemyMaxQuality(u8) const;
+
+	Stats* GetLastTroopFromGraveyard(u16);
+	const Stats* GetLastTroopFromGraveyard(u16) const;
 
 	Army::army_t* GetArmy(u8);
 	const Army::army_t* GetArmy(u8) const;

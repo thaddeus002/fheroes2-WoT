@@ -906,7 +906,7 @@ void Battle2::Stats::PostKilledAction(void)
     // save troop to graveyard
     // skip mirror and summon
     if(!Modes(CAP_MIRRORIMAGE) && !Modes(CAP_SUMMONELEM))
-	arena->graveyard.AddTroopID(id);
+	arena->graveyard.AddTroop(*this);
 
     DEBUG(DBG_BATTLE, DBG_TRACE, Info() << "is dead...");
     // possible also..
@@ -1585,7 +1585,7 @@ void Battle2::Stats::SpellRestoreAction(const Spell & spell, u8 spoint, const He
 	    // remove from graveyard
 	    if(!isValid())
 	    {
-		arena->graveyard.RemoveTroopID(id);
+		arena->graveyard.RemoveTroop(*this);
 		ResetAnimFrame(AS_IDLE);
 	    }
 	    // restore hp

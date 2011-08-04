@@ -752,7 +752,7 @@ Battle2::TargetsInfo Battle2::Arena::GetTargetsForSpells(const HeroBase* hero, c
     // resurrect spell? get target from graveyard
     if(NULL == target && isAllowResurrectFromGraveyard(spell, dst))
     {
-        target = GetTroopID(graveyard.GetLastTroopIDFromCell(dst));
+        target = GetLastTroopFromGraveyard(dst);
 
 	if(target && target->AllowApplySpell(spell, hero))
 	{

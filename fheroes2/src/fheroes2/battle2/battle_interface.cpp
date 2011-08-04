@@ -1276,16 +1276,11 @@ void Battle2::Interface::RedrawKilled(void)
 
 	for(it = cells.begin(); it != cells.end(); ++it)
 	{
-    	    const u16 id_killed = arena.graveyard.GetLastTroopIDFromCell(*it);
-
-	    if(id_killed)
+	    const Stats* b = arena.GetLastTroopFromGraveyard(*it);
+	    if(b)
 	    {
-		const Stats* b = arena.GetTroopID(id_killed);
-		if(b)
-		{
-		    if(b->isWide() && *it == b->GetTailIndex()) continue;
-		    RedrawTroopSprite(*b, arena.board[*it].pos);
-		}
+		if(b->isWide() && *it == b->GetTailIndex()) continue;
+		RedrawTroopSprite(*b, arena.board[*it].pos);
 	    }
 	}
     }
@@ -1384,10 +1379,7 @@ u16 Battle2::Interface::GetBattleSpellCursor(const Point & mouse, std::string & 
 
 	// over graveyard
 	if(!b_stats && arena.isAllowResurrectFromGraveyard(spell, index))
-	{
-    	    const u16 id_killed = arena.graveyard.GetLastTroopIDFromCell(index);
-    	    if(id_killed) b_stats = arena.GetTroopID(id_killed);
-	}
+    	    b_stats = arena.GetLastTroopFromGraveyard(index);
 
 	// teleport check first
 	if(MAXU16 != teleport_src)
