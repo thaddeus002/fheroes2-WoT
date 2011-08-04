@@ -738,6 +738,7 @@ u16 Castle::RecruitMaxMonster(u32 dw)
 	if(count)
 	{
 	    kingdom.OddFundsResource(paymentCosts);
+	    army2.JoinTroop(ms, count);
 	    dwelling[dw_index] -= count;
 
 #ifdef WITH_NET
