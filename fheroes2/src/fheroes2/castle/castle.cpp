@@ -202,7 +202,7 @@ void Castle::LoadFromMP2(const void *ptr)
     ptr8 += 13;
 
     // race
-    const u8 kingdom_race = Settings::Get().KingdomRace(color);
+    const u8 kingdom_race = Game::GetKingdomRace(color);
     switch(*ptr8)
     { 	 
 	case 0x00: race = Race::KNGT; break; 	 
@@ -675,7 +675,7 @@ bool Castle::RecruitMonster(u32 dw, u16 count)
 	default: return false;
     }
 
-    Monster ms = Monster(race, GetActualDwelling(dw));
+    const Monster ms(race, GetActualDwelling(dw));
 
     // fix count
     if(dwelling[dw_index] < count) count = dwelling[dw_index];
@@ -692,13 +692,63 @@ bool Castle::RecruitMonster(u32 dw, u16 count)
     kingdom.OddFundsResource(paymentCosts);
     dwelling[dw_index] -= count;
 
-    DEBUG(DBG_GAME , DBG_INFO, name);
+    DEBUG(DBG_GAME, DBG_INFO, name << " recruit: " << ms.GetMultiName() << "(" << count << ")");
 
 #ifdef WITH_NET
     FH2LocalClient::SendCastleRecruitMonster(*this, dw, count);
 #endif
 
     return true;
+}
+
+u16 Castle::RecruitMaxMonster(u32 dw)
+{
+    u8 dw_index = 0;
+
+    switch(dw)
+    {
+	case DWELLING_MONSTER1: dw_index = 0; break;
+	case DWELLING_MONSTER2: dw_index = 1; break;
+	case DWELLING_MONSTER3: dw_index = 2; break;
+	case DWELLING_MONSTER4: dw_index = 3; break;
+	case DWELLING_MONSTER5: dw_index = 4; break;
+	case DWELLING_MONSTER6: dw_index = 5; break;	
+	default: return false;
+    }
+
+    const Monster ms(race, GetActualDwelling(dw));
+    u16 count = 0;
+
+    // may be guardian present
+    Army::army_t & army2 = GetArmy();
+
+    if(army2.CanJoinTroop(ms))
+    {
+	Kingdom & kingdom = world.GetKingdom(color);
+	count = dwelling[dw_index];
+	payment_t paymentCosts = ms.GetCost() * count;
+
+	while(count && !kingdom.AllowPayment(paymentCosts))
+	{
+	    --count;
+	    paymentCosts = ms.GetCost() * count;
+	}
+
+	// buy
+	if(count)
+	{
+	    kingdom.OddFundsResource(paymentCosts);
+	    dwelling[dw_index] -= count;
+
+#ifdef WITH_NET
+	    FH2LocalClient::SendCastleRecruitMonster(*this, dw, count);
+#endif
+	}
+
+	DEBUG(DBG_GAME, DBG_INFO, name << " recruit: " << ms.GetMultiName() << "(" << count << ")");
+    }
+
+    return count;
 }
 
 /* return current count monster in dwelling */
@@ -1714,12 +1764,12 @@ s8 Castle::GetLuckModificator(std::string *strs) const
 
 void Castle::RecruitAllMonster(void)
 {
-    if(isBuild(DWELLING_MONSTER6)) RecruitMonster(DWELLING_MONSTER6, MAXU16);
-    if(isBuild(DWELLING_MONSTER5)) RecruitMonster(DWELLING_MONSTER5, MAXU16);
-    if(isBuild(DWELLING_MONSTER4)) RecruitMonster(DWELLING_MONSTER4, MAXU16);
-    if(isBuild(DWELLING_MONSTER3)) RecruitMonster(DWELLING_MONSTER3, MAXU16);
-    if(isBuild(DWELLING_MONSTER2)) RecruitMonster(DWELLING_MONSTER2, MAXU16);
-    if(isBuild(DWELLING_MONSTER1)) RecruitMonster(DWELLING_MONSTER1, MAXU16);
+    if(isBuild(DWELLING_MONSTER6)) RecruitMaxMonster(DWELLING_MONSTER6);
+    if(isBuild(DWELLING_MONSTER5)) RecruitMaxMonster(DWELLING_MONSTER5);
+    if(isBuild(DWELLING_MONSTER4)) RecruitMaxMonster(DWELLING_MONSTER4);
+    if(isBuild(DWELLING_MONSTER3)) RecruitMaxMonster(DWELLING_MONSTER3);
+    if(isBuild(DWELLING_MONSTER2)) RecruitMaxMonster(DWELLING_MONSTER2);
+    if(isBuild(DWELLING_MONSTER1)) RecruitMaxMonster(DWELLING_MONSTER1);
 }
 
 const Army::army_t & Castle::GetArmy(void) const

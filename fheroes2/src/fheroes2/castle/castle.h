@@ -141,6 +141,7 @@ public:
     u32 GetActualDwelling(u32) const;
 
     bool RecruitMonster(u32 dw, u16 count);
+    u16  RecruitMaxMonster(u32 dw);
     void RecruitAllMonster(void);
 
     void ChangeColor(Color::color_t cl);
