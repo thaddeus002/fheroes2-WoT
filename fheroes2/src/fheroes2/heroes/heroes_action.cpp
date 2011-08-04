@@ -757,8 +757,6 @@ void ActionToCastle(Heroes &hero, const u8 obj, const s32 dst_index)
     }
     else
     {
-        DEBUG(DBG_GAME, DBG_INFO, hero.GetName() << " attack enemy castle " << castle->GetName());
-
 	CastleHeroes heroes = castle->GetHeroes();
 
 	// first attack to guest hero
@@ -773,6 +771,8 @@ void ActionToCastle(Heroes &hero, const u8 obj, const s32 dst_index)
 
 	if(army.isValid())
 	{
+    	    DEBUG(DBG_GAME, DBG_INFO, hero.GetName() << " attack enemy castle " << castle->GetName());
+
 	    Heroes* defender = heroes.GuardFirst();
     	    castle->ActionPreBattle();
 
@@ -810,6 +810,8 @@ void ActionToCastle(Heroes &hero, const u8 obj, const s32 dst_index)
 	}
 	else
 	{
+    	    DEBUG(DBG_GAME, DBG_INFO, hero.GetName() << " capture enemy castle " << castle->GetName());
+
     	    world.GetKingdom(castle->GetColor()).RemoveCastle(castle);
             world.GetKingdom(hero.GetColor()).AddCastle(castle);
             world.CaptureObject(dst_index, hero.GetColor());

@@ -129,6 +129,8 @@ void Castle::LoadFromMP2(const void *ptr)
 	if(dwelling2 && dwelling2 >= Rand::Get(1, 100)) building |= DWELLING_MONSTER2;
     }
 
+    army.SetColor(color);
+
     // custom troops
     bool custom_troops = *ptr8;
     if(custom_troops)
@@ -255,8 +257,6 @@ void Castle::LoadFromMP2(const void *ptr)
 	HeroBase::LoadDefaults(Skill::Primary::CAPTAIN, race, captain);
 	army.SetCommander(&captain);
     }
-    else
-	army.SetColor(color);
 
     // MageGuild
     mageguild.Builds(race, HaveLibraryCapability());
@@ -434,10 +434,7 @@ void Castle::ActionNewMonth(void)
 void Castle::ChangeColor(Color::color_t cl)
 {
     color = cl;
-
-    // fix army
-    if(!isBuild(BUILD_CAPTAIN))
-	army.SetColor(color);
+    army.SetColor(color);
 }
 
 // return mage guild level

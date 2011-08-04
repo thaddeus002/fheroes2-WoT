@@ -109,7 +109,7 @@ bool Kingdom::Modes(flags_t f) const
 
 void Kingdom::SetControl(u8 ctrl)
 {
-    control = ctrl > Game::CONTROL_AI ? Game::CONTROL_NONE : ctrl;
+    control = ctrl > Game::CONTROL_HUMAN ? Game::CONTROL_NONE : ctrl;
 }
 
 bool Kingdom::isLoss(void) const

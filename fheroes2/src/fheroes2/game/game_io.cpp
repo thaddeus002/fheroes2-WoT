@@ -1113,6 +1113,8 @@ void Game::IO::UnpackCastle(QueueMessage & msg, Castle & castle, u16 check_versi
         msg.Pop(byte32);
         castle.army.At(jj).SetCount(byte32);
     }
+    castle.army.SetColor(castle.color);
+
     // dwelling
     msg.Pop(byte32);
     for(u32 jj = 0; jj < CASTLEMAXMONSTER; ++jj) msg.Pop(castle.dwelling[jj]);
