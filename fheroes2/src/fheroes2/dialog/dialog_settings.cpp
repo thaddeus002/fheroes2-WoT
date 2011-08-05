@@ -141,6 +141,8 @@ void Dialog::ExtSettings(bool readonly)
     if(!conf.PocketPC())
 	states.push_back(Settings::GAME_DYNAMIC_INTERFACE);
     states.push_back(Settings::GAME_AUTOSAVE_ON);
+    if(conf.ExtAutoSaveOn())
+	states.push_back(Settings::GAME_AUTOSAVE_BEGIN_DAY);
     if(conf.VideoMode().w == 640 && conf.VideoMode().w == 480)
 	states.push_back(Settings::GAME_USE_FADE);
 #ifdef BUILD_RELEASE

@@ -166,6 +166,7 @@ static const settings_t settingsFHeroes2[] =
     { Settings::BATTLE_SKIP_INCREASE_DEFENSE,	_("battle: skip increase +2 defense"), 			},
     { Settings::GAME_SHOW_SYSTEM_INFO,		_("game: show system info"),				},
     { Settings::GAME_AUTOSAVE_ON,		_("game: autosave on"),					},
+    { Settings::GAME_AUTOSAVE_BEGIN_DAY,	_("game: autosave will be made at the beginning of the day"), },
     { Settings::GAME_USE_FADE,			_("game: use fade"),					},
     { Settings::GAME_SHOW_SDL_LOGO,		_("game: show SDL logo"),				},
     { Settings::GAME_EVIL_INTERFACE,		_("game: use evil interface"),				},
@@ -1348,6 +1349,11 @@ bool Settings::ExtHideCursor(void) const
 bool Settings::ExtShowSystemInfo(void) const
 {
     return ExtModes(GAME_SHOW_SYSTEM_INFO);
+}
+
+bool Settings::ExtAutoSaveBeginOfDay(void) const
+{
+    return ExtModes(GAME_AUTOSAVE_BEGIN_DAY);
 }
 
 bool Settings::ExtAutoSaveOn(void) const

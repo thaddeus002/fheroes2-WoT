@@ -129,7 +129,7 @@ class Settings
 public:
     enum
     {
-	//GAME_UNUSED			= 0x10000010,
+	GAME_AUTOSAVE_BEGIN_DAY		= 0x10000010,
 	GAME_REMEMBER_LAST_FOCUS	= 0x10000020,
 	GAME_SAVE_REWRITE_CONFIRM	= 0x10000040,
 	GAME_CASTLE_FLASH_BUILDING	= 0x10000080,
@@ -316,6 +316,7 @@ public:
     bool ExtBattleShowMouseShadow(void) const;
     bool ExtBattleShowMoveShadow(void) const;
     bool ExtShowSystemInfo(void) const;
+    bool ExtAutoSaveBeginOfDay(void) const;
     bool ExtAutoSaveOn(void) const;
     bool ExtUseFade(void) const;
     bool ExtShowSDL(void) const;

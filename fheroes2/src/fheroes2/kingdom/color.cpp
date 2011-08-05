@@ -26,7 +26,7 @@
 
 const char* Color::String(u8 color)
 {
-    const char* str_color[] = { "Unknown", _("Blue"), _("Green"), _("Red"), _("Yellow"), _("Orange"), _("Purple") };
+    const char* str_color[] = { "None", _("Blue"), _("Green"), _("Red"), _("Yellow"), _("Orange"), _("Purple") };
 
     switch(color)
     {

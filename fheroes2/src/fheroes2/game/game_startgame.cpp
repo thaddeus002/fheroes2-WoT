@@ -735,6 +735,13 @@ Game::menu_t Game::HumanTurn(bool isload)
 
 	// show event day
 	 ShowEventDay();
+
+	// autosave
+	if(conf.ExtAutoSaveOn() && conf.ExtAutoSaveBeginOfDay())
+	{
+	    std::string filename(conf.LocalPrefix() + SEPARATOR + "files" + SEPARATOR + "save" + SEPARATOR +  "autosave.sav");
+	    Game::Save(filename);
+	}
     }
 
     // check game over
@@ -1053,7 +1060,7 @@ Game::menu_t Game::HumanTurn(bool isload)
 	    global_focus.SetRedraw();
 	}
 
-	if(conf.ExtAutoSaveOn())
+	if(conf.ExtAutoSaveOn() && !conf.ExtAutoSaveBeginOfDay())
 	{
 	    std::string filename(conf.LocalPrefix() + SEPARATOR + "files" + SEPARATOR + "save" + SEPARATOR +  "autosave.sav");
 	    Game::Save(filename);
