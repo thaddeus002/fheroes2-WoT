@@ -36,7 +36,7 @@ bool ObjSnow::isPassable(u16 icn, u8 index, u16 direct)
 	    if(4 == index) return false;
 	    else
 	    // learn to
-	    if(12 == index || 13 == index)
+	    if(13 == index)
 		return (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
 	    else
 	    // rock
