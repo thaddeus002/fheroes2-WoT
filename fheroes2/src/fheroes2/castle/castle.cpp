@@ -341,7 +341,7 @@ void Castle::ActionNewDay(void)
 
 u8 Castle::GetDwellingGrowth(u32 dw)
 {
-    const u32 up = ((dw == DWELLING_MONSTER6) && (building & DWELLING_UPGRADE7) ? DWELLING_UPGRADE7 : GetUpgradeBuilding(dw));
+    const u32 up = GetUpgradeBuilding(dw);
     u8 growth = Monster(race, (building & up ? up : dw)).GetGrown();
 
     // well build
@@ -1630,8 +1630,7 @@ u32 Castle::GetUpgradeBuilding(u32 build) const
 	switch(build)
 	{
 	    case DWELLING_MONSTER4:	return DWELLING_UPGRADE4;
-	    case DWELLING_MONSTER6:	return DWELLING_UPGRADE6;
-	    case DWELLING_UPGRADE6: return DWELLING_UPGRADE7;
+	    case DWELLING_MONSTER6:	return isBuild(DWELLING_UPGRADE6) ? DWELLING_UPGRADE7 : DWELLING_UPGRADE6;
 	    default: break;
 	}
     }
