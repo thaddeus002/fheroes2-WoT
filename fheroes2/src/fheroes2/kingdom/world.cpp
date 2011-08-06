@@ -1690,9 +1690,9 @@ bool World::KingdomIsLoss(const Kingdom & kingdom, u16 loss) const
 u16 World::CheckKingdomWins(const Kingdom & kingdom) const
 {
     const Settings & conf = Settings::Get();
-    const u16 wins [] = { GameOver::WINS_ALL, GameOver::WINS_TOWN, GameOver::WINS_HERO, GameOver::WINS_ARTIFACT, GameOver::WINS_SIDE, GameOver::WINS_GOLD };
+    const u16 wins [] = { GameOver::WINS_ALL, GameOver::WINS_TOWN, GameOver::WINS_HERO, GameOver::WINS_ARTIFACT, GameOver::WINS_SIDE, GameOver::WINS_GOLD, 0 };
 
-    for(u8 ii = 0; ii < sizeof(wins) / sizeof(u16); ++ii)
+    for(u8 ii = 0; wins[ii]; ++ii)
 	if((conf.ConditionWins() & wins[ii]) &&
 	    KingdomIsWins(kingdom, wins[ii])) return wins[ii];
 
@@ -1711,9 +1711,9 @@ u16 World::CheckKingdomLoss(const Kingdom & kingdom) const
     	    return GameOver::LOSS_ALL;
     }
 
-    const u16 loss [] = { GameOver::LOSS_ALL, GameOver::LOSS_TOWN, GameOver::LOSS_HERO, GameOver::LOSS_TIME };
+    const u16 loss [] = { GameOver::LOSS_ALL, GameOver::LOSS_TOWN, GameOver::LOSS_HERO, GameOver::LOSS_TIME, 0 };
 
-    for(u8 ii = 0; ii < sizeof(loss) / sizeof(u16); ++ii)
+    for(u8 ii = 0; loss[ii]; ++ii)
 	if((conf.ConditionWins() & loss[ii]) &&
 	    KingdomIsWins(kingdom, loss[ii])) return loss[ii];
 
