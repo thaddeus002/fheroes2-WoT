@@ -330,7 +330,7 @@ u8 Kingdom::GetRace(void) const
 
 bool Kingdom::AllowPayment(const Funds & funds) const
 {
-    return funds > resource ? false : true;
+    return funds <= resource;
 }
 
 /* is visited cell */

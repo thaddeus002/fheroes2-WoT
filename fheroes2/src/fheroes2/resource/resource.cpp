@@ -220,24 +220,24 @@ bool Funds::operator<= (const Funds & pm) const
 // operator Funds >
 bool Funds::operator> (const Funds & pm) const
 {
-    return      wood > pm.wood ||
-                mercury > pm.mercury ||
-                ore > pm.ore ||
-                sulfur > pm.sulfur ||
-                crystal > pm.crystal ||
-                gems > pm.gems ||
+    return      wood > pm.wood &&
+                mercury > pm.mercury &&
+                ore > pm.ore &&
+                sulfur > pm.sulfur &&
+                crystal > pm.crystal &&
+                gems > pm.gems &&
                 gold > pm.gold;
 }
 
 // operator Funds >=
 bool Funds::operator>= (const Funds & pm) const
 {
-    return      wood >= pm.wood ||
-                mercury >= pm.mercury ||
-                ore >= pm.ore ||
-                sulfur >= pm.sulfur ||
-                crystal >= pm.crystal ||
-                gems >= pm.gems ||
+    return      wood >= pm.wood &&
+                mercury >= pm.mercury &&
+                ore >= pm.ore &&
+                sulfur >= pm.sulfur &&
+                crystal >= pm.crystal &&
+                gems >= pm.gems &&
                 gold >= pm.gold;
 }
 

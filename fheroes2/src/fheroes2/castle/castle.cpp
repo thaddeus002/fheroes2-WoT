@@ -730,13 +730,10 @@ u16 Castle::RecruitMaxMonster(u32 dw)
     {
 	Kingdom & kingdom = world.GetKingdom(color);
 	count = dwelling[dw_index];
-	payment_t paymentCosts = ms.GetCost() * count;
+	const payment_t paymentCosts = ms.GetCost();
+	const Funds & kingdomResource = kingdom.GetFunds();
 
-	while(count && !kingdom.AllowPayment(paymentCosts))
-	{
-	    --count;
-	    paymentCosts = ms.GetCost() * count;
-	}
+	while(count && Funds(paymentCosts * count) > kingdomResource) --count;
 
 	// buy
 	if(count)
@@ -1767,12 +1764,8 @@ s8 Castle::GetLuckModificator(std::string *strs) const
 
 void Castle::RecruitAllMonster(void)
 {
-    if(isBuild(DWELLING_MONSTER6)) RecruitMaxMonster(DWELLING_MONSTER6);
-    if(isBuild(DWELLING_MONSTER5)) RecruitMaxMonster(DWELLING_MONSTER5);
-    if(isBuild(DWELLING_MONSTER4)) RecruitMaxMonster(DWELLING_MONSTER4);
-    if(isBuild(DWELLING_MONSTER3)) RecruitMaxMonster(DWELLING_MONSTER3);
-    if(isBuild(DWELLING_MONSTER2)) RecruitMaxMonster(DWELLING_MONSTER2);
-    if(isBuild(DWELLING_MONSTER1)) RecruitMaxMonster(DWELLING_MONSTER1);
+    for(u32 dw = DWELLING_MONSTER6; dw >= DWELLING_MONSTER1; --dw)
+	if(isBuild(dw)) RecruitMaxMonster(dw);
 }
 
 const Army::army_t & Castle::GetArmy(void) const
