@@ -649,6 +649,12 @@ void Kingdom::SetLastLostHero(Heroes & hero)
     lost_hero.second = world.CountDay();
 }
 
+void Kingdom::ResetLastLostHero(void)
+{
+    lost_hero.first = NULL;
+    lost_hero.second = 0;
+}
+
 Heroes* Kingdom::GetLastLostHero(void) const
 {
     return lost_hero.first && world.CountDay() - lost_hero.second < DAYOFWEEK ? lost_hero.first : NULL;

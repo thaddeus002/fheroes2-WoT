@@ -188,6 +188,9 @@ void AI::KingdomTurn(Kingdom & kingdom)
 	    Recruits & rec = kingdom.GetRecruits();
 	    Heroes* hero = NULL;
 
+	    if(rec.GetHero1() && rec.GetHero2())
+		hero = ai.capital->RecruitHero(rec.GetHero1()->GetLevel() >= rec.GetHero2()->GetLevel() ? rec.GetHero1() : rec.GetHero2());
+	    else
 	    if(rec.GetHero1())
 		hero = ai.capital->RecruitHero(rec.GetHero1());
 	    else

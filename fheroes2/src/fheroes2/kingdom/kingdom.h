@@ -42,7 +42,7 @@ struct VecHeroes;
 struct AllCastles;
 struct VecCastles;
 
-struct LastLoseHero : std::pair<Heroes*, u16>
+struct LastLoseHero : std::pair<Heroes*, u16> /* Heroes, date */
 {
     LastLoseHero() : std::pair<Heroes*, u16>(NULL, 0) {}
 };
@@ -81,6 +81,7 @@ public:
     bool AllowRecruitHero(bool check_payment, u8 level) const;
 
     void SetLastLostHero(Heroes &);
+    void ResetLastLostHero(void);
     Heroes* GetLastLostHero(void) const;
 
     Color::color_t GetColor(void) const{ return color; }

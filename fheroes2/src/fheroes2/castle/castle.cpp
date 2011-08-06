@@ -646,7 +646,12 @@ Heroes* Castle::RecruitHero(Heroes* hero)
 {
     if(!hero || !AllowBuyHero(*hero) || !hero->Recruit(*this)) return NULL;
 
-    world.GetKingdom(color).OddFundsResource(PaymentConditions::RecruitHero(hero->GetLevel()));
+    Kingdom & kingdom = world.GetKingdom(color);
+
+    if(kingdom.GetLastLostHero() == hero)
+	kingdom.ResetLastLostHero();
+
+    kingdom.OddFundsResource(PaymentConditions::RecruitHero(hero->GetLevel()));
 
     // update spell book
     if(GetLevelMageGuild()) MageGuildEducateHero(*hero);
