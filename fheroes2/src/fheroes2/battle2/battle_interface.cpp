@@ -533,7 +533,7 @@ void Battle2::OpponentSprite::ResetAnimFrame(u8 rule)
 		    icn = ICN::CMBTHRON;
 		    switch(rule)
 		    {
-			case OP_IDLE:	animframe_start = 15; animframe_count = 4; break;
+			case OP_IDLE:	animframe_start = 16; animframe_count = 4; break;
 			case OP_SRRW:	animframe_start = 1; animframe_count = 5; break;
 			case OP_CAST:	animframe_start = 6; animframe_count = 9; break;
 			default: break;
