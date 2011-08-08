@@ -198,6 +198,7 @@ public:
     Dialog::answer_t DialogBuyCastle(bool fixed = true) const;
 
 private:
+    u16* GetDwelling(u32 dw);
     u8   GetDwellingGrowth(u32 dw);
     void EducateHeroes(void);
     void RedrawResourcePanel(const Point &);

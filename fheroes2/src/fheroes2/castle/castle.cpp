@@ -352,6 +352,27 @@ u8 Castle::GetDwellingGrowth(u32 dw)
     return growth;
 }
 
+u16* Castle::GetDwelling(u32 dw)
+{
+    switch(dw)
+    {
+	case DWELLING_MONSTER1: return &dwelling[0];
+	case DWELLING_MONSTER2:
+	case DWELLING_UPGRADE2: return &dwelling[1];
+	case DWELLING_MONSTER3:
+	case DWELLING_UPGRADE3: return &dwelling[2];
+	case DWELLING_MONSTER4:
+	case DWELLING_UPGRADE4: return &dwelling[3];
+	case DWELLING_MONSTER5:
+	case DWELLING_UPGRADE5: return &dwelling[4];
+	case DWELLING_MONSTER6:
+	case DWELLING_UPGRADE6:
+	case DWELLING_UPGRADE7: return &dwelling[5];
+	default: break;
+    }
+    return NULL;
+}
+
 void Castle::ActionNewWeek(void)
 {
     // increase population
@@ -369,7 +390,8 @@ void Castle::ActionNewWeek(void)
 	    if(GetColor() == Color::NONE && !world.BeginMonth())
 		growth /= 2;
 
-	    dwelling[ii] += growth;
+	    u16* dw = GetDwelling(dwellings1[ii]);
+	    if(dw) *dw += growth;
 	}
 
 	// Week Of
@@ -381,10 +403,11 @@ void Castle::ActionNewWeek(void)
 	    for(u8 ii = 0; dwellings2[ii]; ++ii) if(building & dwellings2[ii])
 	    {
 		const Monster mons(race, dwellings2[ii]);
+		u16* dw = GetDwelling(dwellings2[ii]);
 
-		if(mons() == world.GetWeekType().GetMonster())
+		if(dw && mons() == world.GetWeekType().GetMonster())
 		{
-		    dwelling[ii] += Settings::Get().ExtWorldNewVersionWeekOf() ?
+		    *dw += Settings::Get().ExtWorldNewVersionWeekOf() ?
 				    GetDwellingGrowth(dwellings2[ii]) : GetGrownWeekOf();
 		    break;
 		}
@@ -418,9 +441,13 @@ void Castle::ActionNewMonth(void)
 	    if(GetColor() == Color::NONE && !world.BeginMonth())
 		growth /= 2;
 
-	    dwelling[ii] += growth;
-	    dwelling[ii] += dwelling[ii] * GetGrownMonthOf() / 100;
-	    break;
+	    u16* dw = GetDwelling(dwellings[ii]);
+	    if(dw)
+	    {
+		*dw += growth;
+		*dw += *dw * GetGrownMonthOf() / 100;
+		break;
+	    }
 	}
     }
 
