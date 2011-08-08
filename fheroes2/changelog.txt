@@ -1,5 +1,10 @@
-Aug, 04, 2011 (2427 rev.)
 
+Aug, 04, 2011 (2440 rev.)
+
+Added: option: autosave begin of day
+Fixed: world: move "lean to" object
+Fixed: game: AI recruit hero, fixed: recruit hero and surrender status
+Fixed  game: crash, Castle::ActionNewWeek, Castle::ActionNewMonth
 Fixed: AI: recruit troops for castles
 Fixed: game: Army::color null after load game
 Update: xml resources
