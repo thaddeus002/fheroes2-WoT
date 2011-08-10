@@ -458,7 +458,7 @@ void Heroes::ScholarAction(Heroes & hero1, Heroes & hero2)
     }
 
 
-    if(Game::CONTROL_LOCAL == teacher->GetControl() || Game::CONTROL_LOCAL == learner->GetControl())
+    if((Game::CONTROL_HUMAN & teacher->GetControl()) || (Game::CONTROL_HUMAN & learner->GetControl()))
     {
 	if(spells1.size() && spells2.size())
 	    message = _("%{teacher}, whose %{level} %{scholar} knows many magical secrets, learns %{spells1} from %{learner}, and teaches %{spells2} to %{learner}.");

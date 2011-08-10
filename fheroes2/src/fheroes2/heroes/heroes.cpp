@@ -857,7 +857,7 @@ void Heroes::RescanPath(void)
 {
     if(path.isValid())
     {
-	if(Game::CONTROL_AI == GetControl())
+	if(Game::CONTROL_AI & GetControl())
 	{
 	    if(path.hasObstacle()) path.Reset();
 	}
@@ -1286,8 +1286,8 @@ void Heroes::LevelUp(bool skipsecondary, bool autoselect)
 {
     u8 primary = LevelUpPrimarySkill();
     if(! skipsecondary)
-	LevelUpSecondarySkill(primary, (autoselect || Game::CONTROL_AI == GetControl()));
-    if(Game::CONTROL_AI == GetControl()) AI::HeroesLevelUp(*this);
+	LevelUpSecondarySkill(primary, (autoselect || (Game::CONTROL_AI & GetControl())));
+    if(Game::CONTROL_AI & GetControl()) AI::HeroesLevelUp(*this);
 }
 
 u8 Heroes::LevelUpPrimarySkill(void)
@@ -1677,7 +1677,7 @@ void Heroes::Dump(void) const
 	VERBOSE("");
     }
 
-    if(GetControl() == Game::CONTROL_AI)
+    if(GetControl() & Game::CONTROL_AI)
     {
 	VERBOSE("spell book      : " << (HaveSpellBook() ? spell_book.String() : "disabled"));
 

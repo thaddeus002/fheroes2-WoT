@@ -67,12 +67,12 @@ void ControlInfo::Redraw(void)
   const Sprite & mark = AGG::GetICN(ICN::CELLWIN, 2);
 
   display.Blit(cell, rtLocal.x, rtLocal.y);
-  if(result == Game::CONTROL_LOCAL) display.Blit(mark, rtLocal.x + 3, rtLocal.y + 2);
-  Text text("Local", Font::SMALL);
+  if(result & Game::CONTROL_HUMAN) display.Blit(mark, rtLocal.x + 3, rtLocal.y + 2);
+  Text text("Human", Font::SMALL);
   text.Blit(rtLocal.x + cell.w() + 5, rtLocal.y + 5);
   
   display.Blit(cell, rtAI.x, rtAI.y);
-  if(result == Game::CONTROL_AI) display.Blit(mark, rtAI.x + 3, rtAI.y + 2);
+  if(result & Game::CONTROL_AI) display.Blit(mark, rtAI.x + 3, rtAI.y + 2);
   text.Set("AI");
   text.Blit(rtAI.x + cell.w() + 5, rtAI.y + 5);
 }
@@ -138,7 +138,7 @@ struct BattleOnly
     static BattleOnly & Get(void);
 
     BattleOnly(void) : hero1(NULL), hero2(NULL), color1(Color::BLUE), color2(Color::NONE),
-	control1(Game::CONTROL_LOCAL), control2(Game::CONTROL_AI),
+	control1(Game::CONTROL_HUMAN), control2(Game::CONTROL_AI),
 	army1(NULL), army2(NULL),
 	moraleIndicator1(NULL), moraleIndicator2(NULL),
 	luckIndicator1(NULL), luckIndicator2(NULL), secskill_bar1(NULL), secskill_bar2(NULL),
@@ -330,7 +330,7 @@ bool BattleOnly::ChangeSettings(void)
 	    {
 		hero2 = world.GetHeroes(hid);
 		UpdateHero2(cur_pt);
-		if(control2 != Game::CONTROL_REMOTE && NULL == cinfo2)
+		if(!(control2 & Game::CONTROL_REMOTE) && NULL == cinfo2)
 		    cinfo2 = new ControlInfo(Point(cur_pt.x + 510, cur_pt.y + 425), control2);
 		redraw = true;
 	    }
@@ -488,13 +488,13 @@ bool BattleOnly::ChangeSettings(void)
 
 	if(cinfo2 && allow1)
 	{
-	    if(hero2 && le.MouseClickLeft(cinfo2->rtLocal) && control2 != Game::CONTROL_LOCAL)
+	    if(hero2 && le.MouseClickLeft(cinfo2->rtLocal) && (control2 & Game::CONTROL_AI))
 	    {
-		control2 = Game::CONTROL_LOCAL;
+		control2 = Game::CONTROL_HUMAN;
 		redraw = true;
 	    }
 	    else
-	    if(le.MouseClickLeft(cinfo2->rtAI) && control2 != Game::CONTROL_AI)
+	    if(le.MouseClickLeft(cinfo2->rtAI) && (control2 & Game::CONTROL_HUMAN))
 	    {
 		control2 = Game::CONTROL_AI;
 		redraw = true;
@@ -770,7 +770,7 @@ void BattleOnly::StartBattle(void)
     conf.SetKingdomRace(color1, hero1->GetRace());
     if(hero2) conf.SetKingdomRace(color2, hero2->GetRace());
 
-    conf.SetPlayersColors(control2 != Game::CONTROL_AI ? color1 | color2 : color1);
+    conf.SetPlayersColors(control2 & Game::CONTROL_HUMAN ? color1 | color2 : color1);
 
 #ifdef WITH_NET
     if(Network::isLocalClient())
@@ -779,7 +779,7 @@ void BattleOnly::StartBattle(void)
 	Color::color_t & mycolor = client.player_color == color1 ? color1 : color2;
 	conf.SetMyColor(mycolor);
 	conf.SetCurrentColor(mycolor);
-	world.GetKingdom(mycolor).SetControl(Game::CONTROL_LOCAL);
+	world.GetKingdom(mycolor).SetControl(Game::CONTROL_HUMAN);
 	if(mycolor != color1)
 	    kingdom1->SetControl(Game::CONTROL_REMOTE);
 	else

@@ -637,64 +637,65 @@ std::vector<Army::Troop> Army::army_t::Optimize(void) const
 
 void Army::army_t::ArrangeForBattle(void)
 {
-    if(GetControl() != Game::CONTROL_AI) return;
-
-    Troops priority = Optimize();
-
-    Clear();
-
-    switch(priority.size())
+    if(GetControl() & Game::CONTROL_AI)
     {
-	case 1:
+	Troops priority = Optimize();
+	Clear();
+
+	switch(priority.size())
 	{
-	    const Monster & m = priority.back();
-	    const u32 count = priority.back().GetCount();
-	    if(49 < count)
+	    case 1:
 	    {
-		const u32 c = count / 5;
-		troops[0].Set(m, c);
-		troops[1].Set(m, c);
-		troops[2].Set(m, c + count - (c * 5));
-		troops[3].Set(m, c);
-		troops[4].Set(m, c);
+		const Monster & m = priority.back();
+		const u32 count = priority.back().GetCount();
+		if(49 < count)
+		{
+		    const u32 c = count / 5;
+		    troops[0].Set(m, c);
+		    troops[1].Set(m, c);
+		    troops[2].Set(m, c + count - (c * 5));
+		    troops[3].Set(m, c);
+		    troops[4].Set(m, c);
+		}
+		else
+		if(20 < count)
+		{
+		    const u32 c = count / 3;
+		    troops[1].Set(m, c);
+		    troops[2].Set(m, c + count - (c * 3));
+		    troops[3].Set(m, c);
+		}
+		else
+	    	    troops[2].Set(m, count);
+		break;
 	    }
-	    else
-	    if(20 < count)
+	    case 2:
 	    {
-		const u32 c = count / 3;
-		troops[1].Set(m, c);
-		troops[2].Set(m, c + count - (c * 3));
-		troops[3].Set(m, c);
+		// TODO: need modify army for 2 troops
+		Import(priority);
+		break;
 	    }
-	    else
-		troops[2].Set(m, count);
-	    break;
+	    case 3:
+	    {
+		// TODO: need modify army for 3 troops
+		Import(priority);
+		break;
+	    }
+	    case 4:
+	    {
+		// TODO: need modify army for 4 troops
+		Import(priority);
+		break;
+	    }
+	    case 5:
+	    {
+		// possible change orders monster
+		// store
+		Import(priority);
+		break;
+	    }
+	    default: break;
 	}
-	case 2:
-	{
-	    // TODO: need modify army for 2 troops
-	    Import(priority);
-	    break;
-	}
-	case 3:
-	{
-	    // TODO: need modify army for 3 troops
-	    Import(priority);
-	    break;
-	}
-	case 4:
-	{
-	    // TODO: need modify army for 4 troops
-	    Import(priority);
-	    break;
-	}
-	case 5:
-	{    // possible change orders monster
-	    // store
-	    Import(priority);
-	    break;
-	}
-	default: break;
     }
 }
 
@@ -1151,7 +1152,7 @@ u8 Army::GetJoinSolution(const Heroes & hero, const Maps::Tiles & tile, u32 & jo
     {
 	// ... surely flee before us
 
-	if(hero.GetControl() == Game::CONTROL_AI) return Rand::Get(0, 10) < 5 ? 0 : 3;
+	if(hero.GetControl() & Game::CONTROL_AI) return Rand::Get(0, 10) < 5 ? 0 : 3;
 
 	return 3;
     }

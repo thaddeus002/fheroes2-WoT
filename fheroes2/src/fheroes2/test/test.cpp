@@ -82,7 +82,7 @@ void RunTest3(void)
 
     hero1.SetSpellPoints(150);
 
-    kingdom1.SetControl(Game::CONTROL_LOCAL);
+    kingdom1.SetControl(Game::CONTROL_HUMAN);
     kingdom2.SetControl(Game::CONTROL_AI);
 
     if(kingdom1.GetCastles().size())

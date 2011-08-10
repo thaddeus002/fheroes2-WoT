@@ -204,7 +204,7 @@ Game::menu_t Game::StartGame(void)
 
 	    switch(kingdom.GetControl())
 	    {
-		case CONTROL_LOCAL:
+		case CONTROL_HUMAN:
 		    if(conf.GameType(Game::TYPE_HOTSEAT))
 		    {
 			cursor.Hide();

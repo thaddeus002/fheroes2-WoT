@@ -64,7 +64,7 @@ Battle2::Result Battle2::Loader(Army::army_t & army1, Army::army_t & army2, s32 
         AGG::ICNRegistryEnable(true);
 
     AGG::ResetMixer();
-    bool local = Game::CONTROL_LOCAL == army1.GetControl() || Game::CONTROL_LOCAL == army2.GetControl();
+    bool local = (Game::CONTROL_HUMAN & army1.GetControl()) || (Game::CONTROL_HUMAN & army2.GetControl());
 #ifdef WITH_NET
     if(Network::isLocalClient()) local = true;
 #endif
@@ -92,8 +92,8 @@ Battle2::Result Battle2::Loader(Army::army_t & army1, Army::army_t & army2, s32 
 #ifdef WITH_NET
     if(Network::isRemoteClient())
     {
-        if(Game::CONTROL_REMOTE == army1.GetControl()) FH2Server::Get().BattleSendResult(army1.GetColor(), result);
-        if(Game::CONTROL_REMOTE == army2.GetControl()) FH2Server::Get().BattleSendResult(army2.GetColor(), result);
+        if(Game::CONTROL_REMOTE & army1.GetControl()) FH2Server::Get().BattleSendResult(army1.GetColor(), result);
+        if(Game::CONTROL_REMOTE & army2.GetControl()) FH2Server::Get().BattleSendResult(army2.GetColor(), result);
     }
 #endif
 
@@ -131,19 +131,19 @@ Battle2::Result Battle2::Loader(Army::army_t & army1, Army::army_t & army2, s32 
 	!((RESULT_RETREAT | RESULT_SURRENDER) & loss_result) &&
 	Skill::Primary::HEROES == army_wins->GetCommander()->GetType() &&
 	Skill::Primary::HEROES == army_loss->GetCommander()->GetType())
-	PickupArtifactsAction(*army_wins->GetCommander(), *army_loss->GetCommander(), local && (Game::CONTROL_LOCAL == army_wins->GetControl()));
+	PickupArtifactsAction(*army_wins->GetCommander(), *army_loss->GetCommander(), (Game::CONTROL_HUMAN & army_wins->GetControl()));
 
     // eagle eye capability
     if(army_wins && army_wins->GetCommander() &&
 	army_loss && army_loss->GetCommander() &&
 	army_wins->GetCommander()->GetLevelSkill(Skill::Secondary::EAGLEEYE) &&
 	Skill::Primary::HEROES == army_loss->GetCommander()->GetType())
-	    EagleEyeSkillAction(*army_wins->GetCommander(), arena.GetUsageSpells(), local && (Game::CONTROL_LOCAL == army_wins->GetControl()));
+	    EagleEyeSkillAction(*army_wins->GetCommander(), arena.GetUsageSpells(), (Game::CONTROL_HUMAN & army_wins->GetControl()));
 
     // necromancy capability
     if(army_wins && army_wins->GetCommander() &&
 	army_wins->GetCommander()->GetLevelSkill(Skill::Secondary::NECROMANCY))
-	    NecromancySkillAction(*army_wins, killed2, local && (Game::CONTROL_LOCAL == army_wins->GetControl()));
+	    NecromancySkillAction(*army_wins, killed2, (Game::CONTROL_HUMAN & army_wins->GetControl()));
 
     if(IS_DEBUG(DBG_BATTLE , DBG_INFO))
     {

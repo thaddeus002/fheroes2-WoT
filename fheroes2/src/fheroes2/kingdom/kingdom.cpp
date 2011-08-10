@@ -63,10 +63,10 @@ void Kingdom::Init(Color::color_t cl)
     {
 #ifdef WITH_NET
 	if(Settings::Get().GameType(Game::TYPE_NETWORK))
-    	    control = (color == conf.MyColor() ? Game::CONTROL_LOCAL : Game::CONTROL_REMOTE);
+    	    control = (color == conf.MyColor() ? Game::CONTROL_HUMAN : Game::CONTROL_REMOTE);
         else
 #endif
-	    control = Game::CONTROL_LOCAL;
+	    control = Game::CONTROL_HUMAN;
     }
 
     UpdateStartingResource();
@@ -89,7 +89,7 @@ void Kingdom::clear(void)
 
 void Kingdom::UpdateStartingResource(void)
 {
-    resource = GameStatic::GetKingdomStartingResource(Game::CONTROL_AI == control ? 5 : Settings::Get().GameDifficulty());
+    resource = GameStatic::GetKingdomStartingResource(Game::CONTROL_AI & control ? 5 : Settings::Get().GameDifficulty());
 }
 
 void Kingdom::SetModes(flags_t f)
@@ -109,7 +109,7 @@ bool Kingdom::Modes(flags_t f) const
 
 void Kingdom::SetControl(u8 ctrl)
 {
-    control = ctrl > Game::CONTROL_HUMAN ? Game::CONTROL_NONE : ctrl;
+    control = ctrl;
 }
 
 bool Kingdom::isLoss(void) const
@@ -218,7 +218,7 @@ void Kingdom::ActionNewWeek(void)
 	std::for_each(heroes.begin(), heroes.end(), std::mem_fun(&Heroes::ActionNewWeek));
 
 	// debug an gift
-	if(IS_DEVEL() && Game::CONTROL_LOCAL == GetControl())
+	if(IS_DEVEL() && (Game::CONTROL_HUMAN & GetControl()))
 	{
 	    Funds gift(20, 20, 10, 10, 10, 10, 5000);
 	    DEBUG(DBG_GAME, DBG_INFO, "debug gift: " << gift.Dump());
