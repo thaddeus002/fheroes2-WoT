@@ -1072,6 +1072,9 @@ Game::menu_t Game::HumanTurn(bool isload)
 
 bool Game::DiggingForArtifacts(const Heroes & hero)
 {
+    if(hero.isShipMaster())
+	Dialog::Message("", _("Try looking on land!!!"), Font::BIG, Dialog::OK);
+    else
     if(hero.GetMaxMovePoints() == hero.GetMovePoints())
     {
 	if(! world.GetTiles(hero.GetCenter()).GoodForUltimateArtifact())
