@@ -218,7 +218,7 @@ void Kingdom::ActionNewWeek(void)
 	std::for_each(heroes.begin(), heroes.end(), std::mem_fun(&Heroes::ActionNewWeek));
 
 	// debug an gift
-	if(IS_DEVEL() && Game::CONTROL_LOCAL == Control())
+	if(IS_DEVEL() && Game::CONTROL_LOCAL == GetControl())
 	{
 	    Funds gift(20, 20, 10, 10, 10, 10, 5000);
 	    DEBUG(DBG_GAME, DBG_INFO, "debug gift: " << gift.Dump());

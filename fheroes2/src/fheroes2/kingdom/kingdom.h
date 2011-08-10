@@ -72,7 +72,7 @@ public:
     void ResetModes(flags_t);
     bool Modes(flags_t) const;
 
-    u8 Control(void) const{ return control; }
+    u8 GetControl(void) const{ return control; }
     void SetControl(const u8 con);
     void UpdateStartingResource(void);
     bool isPlay(void) const{ return Modes(PLAY); }

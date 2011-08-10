@@ -1065,7 +1065,7 @@ u32 Army::army_t::ActionToSirens(void)
 
 u8 Army::army_t::GetControl(void) const
 {
-    return commander ? commander->GetControl() : (color == Color::NONE ? Game::CONTROL_AI : world.GetKingdom(color).Control());
+    return commander ? commander->GetControl() : (color == Color::NONE ? Game::CONTROL_AI : world.GetKingdom(color).GetControl());
 }
 
 u32 Army::army_t::GetSurrenderCost(void) const

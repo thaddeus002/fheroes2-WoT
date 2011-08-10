@@ -202,7 +202,7 @@ Game::menu_t Game::StartGame(void)
 	    world.ClearFog(*color);
 	    kingdom.ActionBeforeTurn();
 
-	    switch(kingdom.Control())
+	    switch(kingdom.GetControl())
 	    {
 		case CONTROL_LOCAL:
 		    if(conf.GameType(Game::TYPE_HOTSEAT))

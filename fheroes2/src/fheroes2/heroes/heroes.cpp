@@ -1486,7 +1486,7 @@ Color::color_t Heroes::GetKillerColor(void) const
 
 u8 Heroes::GetControl(void) const
 {
-    return world.GetKingdom(color).Control();
+    return world.GetKingdom(color).GetControl();
 }
 
 bool Heroes::AllowBattle(bool attacker) const

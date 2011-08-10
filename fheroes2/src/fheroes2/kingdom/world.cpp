@@ -1610,7 +1610,7 @@ bool World::KingdomIsWins(const Kingdom & kingdom, u16 wins) const
 	{
 	    const Castle *town = GetCastle(conf.WinsMapsIndexObject());
 	    // check comp also wins
-	    return ((Game::CONTROL_AI != kingdom.Control() || conf.WinsCompAlsoWins()) &&
+	    return ((Game::CONTROL_AI != kingdom.GetControl() || conf.WinsCompAlsoWins()) &&
     	       (town && town->GetColor() == kingdom.GetColor()));
 	}
 
@@ -1646,7 +1646,7 @@ bool World::KingdomIsWins(const Kingdom & kingdom, u16 wins) const
 
 	case GameOver::WINS_GOLD:
 	    // check comp also wins
-	    return ((Game::CONTROL_AI != kingdom.Control() || conf.WinsCompAlsoWins()) &&
+	    return ((Game::CONTROL_AI != kingdom.GetControl() || conf.WinsCompAlsoWins()) &&
 		    (kingdom.GetFundsGold() >= conf.WinsAccumulateGold()));
 
 	default: break;
@@ -1679,7 +1679,7 @@ bool World::KingdomIsLoss(const Kingdom & kingdom, u16 loss) const
 	}
 
 	case GameOver::LOSS_TIME:
-    	    return (CountDay() > conf.LossCountDays() && Game::CONTROL_AI != kingdom.Control());
+    	    return (CountDay() > conf.LossCountDays() && Game::CONTROL_AI != kingdom.GetControl());
 
 	default: break;
     }

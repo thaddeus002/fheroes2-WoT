@@ -227,7 +227,7 @@ void Maps::ClearFog(s32 index, u8 scoute, const u8 color)
     const Point center(index % world.w(), index / world.w());
 
     // AI advantage
-    if(Game::CONTROL_AI == world.GetKingdom(color).Control())
+    if(Game::CONTROL_AI == world.GetKingdom(color).GetControl())
     {
 	switch(Settings::Get().GameDifficulty())
 	{

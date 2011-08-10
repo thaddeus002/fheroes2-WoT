@@ -1825,7 +1825,7 @@ bool Castle::AllowBuyBoat(void) const
 bool Castle::BuyBoat(void)
 {
     if(!AllowBuyBoat()) return false;
-    if(Game::CONTROL_LOCAL == world.GetKingdom(color).Control()) AGG::PlaySound(M82::BUILDTWN);
+    if(Game::CONTROL_LOCAL == world.GetKingdom(color).GetControl()) AGG::PlaySound(M82::BUILDTWN);
 
     const s32 index = GetIndex() + world.w() * 2;
     Maps::Tiles & left = world.GetTiles(index - 1);
@@ -1867,7 +1867,7 @@ bool Castle::BuyBoat(void)
 
 u8 Castle::GetControl(void) const
 {
-    return world.GetKingdom(color).Control();
+    return world.GetKingdom(color).GetControl();
 }
 
 bool Castle::isNecromancyShrineBuild(void) const
