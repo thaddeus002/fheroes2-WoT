@@ -185,7 +185,7 @@ void AICastleTurn(Castle* castle)
 	enemy ? AICastleDefense(*castle) : AICastleDevelopment(*castle);
 
 	Kingdom & kingdom = world.GetKingdom(castle->GetColor());
-	bool can_recruit = kingdom.GetHeroes().size() < Kingdom::GetMaxHeroes();
+	bool can_recruit = castle->isCastle() && kingdom.GetHeroes().size() < Kingdom::GetMaxHeroes();
 
 	// part II
 	if(enemy &&
