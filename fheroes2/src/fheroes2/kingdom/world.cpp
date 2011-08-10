@@ -1114,16 +1114,8 @@ s32 World::NextTeleport(const s32 index) const
 
     for(std::vector<s32>::const_iterator
 	it = vec_teleports.begin(); it != vec_teleports.end(); ++it)
-	if(type == GetTiles(*it).GetQuantity1())
-	{
-	    if(MP2::OBJ_HEROES != GetTiles(*it).GetObject())
-		v.push_back(*it);
-	    else
-	    if(index != *it)
-	    {
-		DEBUG(DBG_GAME, DBG_WARN, "is busy");
-	    }
-	}
+	if(type == GetTiles(*it).GetQuantity1() && index != *it)
+	    v.push_back(*it);
 
     if(v.empty()) DEBUG(DBG_GAME , DBG_WARN, "not found");
 

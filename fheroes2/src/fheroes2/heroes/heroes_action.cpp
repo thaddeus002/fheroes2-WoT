@@ -706,7 +706,7 @@ void ActionToHeroes(Heroes &hero, const u8 obj, const s32 dst_index)
 	    }
 	}
 
-	bool disable_auto_move = hero.isShipMaster() || other_hero->isShipMaster() || other_hero->inCastle();
+	bool disable_auto_move = hero.isShipMaster() || other_hero->isShipMaster() || other_hero->inCastle() || hero.GetUnderObject() == MP2::OBJ_STONELIGHTS;
         DEBUG(DBG_GAME, DBG_INFO, hero.GetName() << " attack enemy hero " << other_hero->GetName());
 
 	// new battle2
@@ -2018,6 +2018,19 @@ void ActionToTeleports(Heroes &hero, const s32 index_from)
 	AGG::PlaySound(M82::RSBRYFZL);
 	DEBUG(DBG_GAME, DBG_WARN, "action unsuccessfully...");
 	return;
+    }
+
+    if(MP2::OBJ_HEROES == world.GetTiles(index_to).GetObject())
+    {
+	const Heroes* other_hero = world.GetHeroes(index_to);
+
+	if(other_hero)
+	{
+	    ActionToHeroes(hero, MP2::OBJ_STONELIGHTS, index_to);
+
+	    if(! other_hero->isFreeman())
+		DEBUG(DBG_GAME, DBG_WARN, "is busy...");
+	}
     }
 
     AGG::PlaySound(M82::KILLFADE);
