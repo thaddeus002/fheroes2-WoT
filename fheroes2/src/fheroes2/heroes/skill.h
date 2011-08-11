@@ -111,6 +111,8 @@ namespace Skill
 	void	FindSkillsForLevelUp(u8 race, Secondary &, Secondary &) const;
 
 	void	ReadFromMP2(const u8*);
+
+	std::string String(void) const;
     };
 
     class Primary

@@ -705,6 +705,16 @@ void Skill::SecSkills::AddSkill(const Skill::Secondary & skill)
     }
 }
 
+std::string Skill::SecSkills::String(void) const
+{
+    std::ostringstream os;
+
+    for(const_iterator it = begin(); it != end(); ++it)
+        os << (*it).GetName() << ", ";
+
+    return os.str();
+}
+
 u8 Skill::SecondaryGetWeightSkillFromRace(u8 race, u8 skill)
 {
     const skillstats_t* ptr = GetSkillStats(race);

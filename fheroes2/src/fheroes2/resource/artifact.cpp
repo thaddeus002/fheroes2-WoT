@@ -685,3 +685,13 @@ void BagArtifacts::RemoveScroll(const Artifact & art)
 	if(it != end()) (*it).Reset();
     }
 }
+
+std::string BagArtifacts::String(void) const
+{
+    std::ostringstream os;
+
+    for(const_iterator it = begin(); it != end(); ++it)
+        os << (*it).GetName() << ", ";
+
+    return os.str();
+}

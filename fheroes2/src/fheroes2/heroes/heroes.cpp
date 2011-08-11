@@ -416,18 +416,14 @@ void Heroes::LoadFromMP2(s32 map_index, const void *ptr, const Color::color_t cl
     ptr8 += 14;
 
     // fixed race for custom portrait
-    if(custom_portrait && Settings::Get().ExtForceSelectRaceFromType())
+    if(custom_portrait &&
+	Settings::Get().ExtForceSelectRaceFromType() && race != rc)
     {
-	if(Race::ALL & rc)
-	    HeroBase::LoadDefaults(Skill::Primary::HEROES, rc, *this);
-
 	// fixed default troop
 	if(!custom_troop)
 	    army.Reset(true);
 
-	// fixed default sec skills
-	if(!custom_secskill)
-	    secondary_skills = Skill::SecSkills(race);
+	race = rc;
     }
 
     // patrol
@@ -1679,6 +1675,8 @@ void Heroes::Dump(void) const
 
     if(GetControl() & Game::CONTROL_AI)
     {
+	VERBOSE("skills          : " << secondary_skills.String());
+	VERBOSE("artifacts       : " << bag_artifacts.String());
 	VERBOSE("spell book      : " << (HaveSpellBook() ? spell_book.String() : "disabled"));
 
 	GetArmy().Dump("army dump       : ");
