@@ -415,17 +415,6 @@ void Heroes::LoadFromMP2(s32 map_index, const void *ptr, const Color::color_t cl
     if(*ptr8) name = Game::GetEncodeString(reinterpret_cast<const char *>(ptr8 + 1));
     ptr8 += 14;
 
-    // fixed race for custom portrait
-    if(custom_portrait &&
-	Settings::Get().ExtForceSelectRaceFromType() && race != rc)
-    {
-	// fixed default troop
-	if(!custom_troop)
-	    army.Reset(true);
-
-	race = rc;
-    }
-
     // patrol
     if(*ptr8)
     {
@@ -452,6 +441,11 @@ void Heroes::LoadFromMP2(s32 map_index, const void *ptr, const Color::color_t cl
     {
 	LevelUp(custom_secskill, true);
     }
+
+    // fixed race for custom portrait (after level up)
+    if(custom_portrait &&
+	Settings::Get().ExtForceSelectRaceFromType() && race != rc)
+	race = rc;
 
     // other param
     SetSpellPoints(GetMaxSpellPoints());
