@@ -174,7 +174,7 @@ bool HeroesTownGate(Heroes & hero, const Castle* castle)
 	hero.SaveUnderObject(world.GetTiles(dst).GetObject());
 	world.GetTiles(dst).SetObject(MP2::OBJ_HEROES);
 
-	I.gameArea.Center(F.Center());
+	I.gameArea.SetCenter(hero.GetCenter());
 	F.SetRedraw();
 	I.Redraw();
 
@@ -297,7 +297,7 @@ bool ActionSpellDimensionDoor(Heroes & hero)
 
     // center hero
     cursor.Hide();
-    I.gameArea.Center(F.Center());
+    I.gameArea.SetCenter(hero.GetCenter());
     F.SetRedraw();
     I.Redraw();
 
@@ -319,7 +319,7 @@ bool ActionSpellDimensionDoor(Heroes & hero)
 	hero.SaveUnderObject(world.GetTiles(dst).GetObject());
 	world.GetTiles(dst).SetObject(MP2::OBJ_HEROES);
 
-	I.gameArea.Center(F.Center());
+	I.gameArea.SetCenter(hero.GetCenter());
 	F.SetRedraw();
 	I.Redraw();
 
@@ -362,7 +362,7 @@ bool ActionSpellTownGate(Heroes & hero)
 
     // center hero
     cursor.Hide();
-    I.gameArea.Center(F.Center());
+    I.gameArea.SetCenter(hero.GetCenter());
     F.SetRedraw();
     I.Redraw();
 

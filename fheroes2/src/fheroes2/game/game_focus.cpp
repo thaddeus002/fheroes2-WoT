@@ -70,7 +70,7 @@ void Game::Focus::Set(Heroes *hero2)
     Interface::Basic & I = Interface::Basic::Get();
     
     I.iconsPanel.Select(*heroes);
-    I.gameArea.Center(heroes->GetCenter());
+    I.gameArea.SetCenter(heroes->GetCenter());
     I.statusWindow.SetState(STATUS_ARMY);
 
     AGG::PlayMusic(MUS::FromGround(world.GetTiles(heroes->GetCenter()).GetGround()));
@@ -93,7 +93,7 @@ void Game::Focus::Set(Castle *castle2)
     Interface::Basic & I = Interface::Basic::Get();
 
     I.iconsPanel.Select(*castle);
-    I.gameArea.Center(castle->GetCenter());
+    I.gameArea.SetCenter(castle->GetCenter());
     I.statusWindow.SetState(STATUS_FUNDS);
 
     AGG::PlayMusic(MUS::FromGround(world.GetTiles(castle->GetCenter()).GetGround()));
@@ -208,13 +208,13 @@ Heroes & Game::Focus::GetHeroes(void)
     return *heroes;
 }
 
-const Point & Game::Focus::Center(void) const
+Point Game::Focus::GetCenter(void) const
 {
     if(heroes) return heroes->GetCenter();
     else
     if(castle) return castle->GetCenter();
 
-    return center;
+    return Point(world.w()/2, world.h()/2);
 }
 
 void Game::Focus::CheckIconsPanel(void)

@@ -66,8 +66,8 @@ namespace Interface
 	void Scroll(void);
 	void SetScroll(scroll_t);
 
-	void Center(s16, s16);
-	void Center(const Point &pt);
+	void SetCenter(s16, s16);
+	void SetCenter(const Point &);
 
 	void Redraw(Surface & dst, u8) const;
 	void Redraw(Surface & dst, u8, const Rect &) const;

@@ -2526,7 +2526,7 @@ void AIHeroesTurns(Heroes &hero)
     if(0 != conf.AIMoveSpeed() && hero.isShow(Settings::Get().MyColor()))
     {
 	    cursor.Hide();
-	    I.gameArea.Center(hero.GetCenter());
+	    I.gameArea.SetCenter(hero.GetCenter());
 	    I.Redraw(REDRAW_GAMEAREA);
 	    cursor.Show();
 	    display.Flip();
@@ -2549,7 +2549,7 @@ void AIHeroesTurns(Heroes &hero)
 	    cursor.Hide();
 	    hero.Move();
 
-	    I.gameArea.Center(hero.GetCenter());
+	    I.gameArea.SetCenter(hero.GetCenter());
 	    I.Redraw(REDRAW_GAMEAREA);
 	    cursor.Show();
 	    display.Flip();

@@ -2043,7 +2043,7 @@ void ActionToTeleports(Heroes &hero, const s32 index_from)
 
     Interface::Basic & I = Interface::Basic::Get();
     Game::Focus & F = Game::Focus::Get();
-    I.gameArea.Center(F.Center());
+    I.gameArea.SetCenter(hero.GetCenter());
     F.SetRedraw();
     I.Redraw();
 
@@ -2079,7 +2079,7 @@ void ActionToWhirlpools(Heroes &hero, const u8 obj, const s32 index_from)
 
     Interface::Basic & I = Interface::Basic::Get();
     Game::Focus & F = Game::Focus::Get();
-    I.gameArea.Center(F.Center());
+    I.gameArea.SetCenter(hero.GetCenter());
     F.SetRedraw();
     I.Redraw();
 

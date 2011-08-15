@@ -200,7 +200,7 @@ Game::menu_t Game::Editor::StartGame()
 	{
 	    const Point prev(gameArea.GetRectMaps());
             const Point & pt = le.GetMouseCursor();
-            gameArea.Center((pt.x - radar.GetArea().x) * world.w() / RADARWIDTH, (pt.y - radar.GetArea().y) * world.h() / RADARWIDTH);
+            gameArea.SetCenter((pt.x - radar.GetArea().x) * world.w() / RADARWIDTH, (pt.y - radar.GetArea().y) * world.h() / RADARWIDTH);
 	    if(prev != gameArea.GetRectMaps())
 	    {
 		cursor.Hide();

@@ -720,7 +720,8 @@ Game::menu_t Game::HumanTurn(bool isload)
     I.gameArea.SetUpdateCursor();
     I.Redraw(REDRAW_GAMEAREA | REDRAW_RADAR | REDRAW_ICONS | REDRAW_BUTTONS | REDRAW_STATUS | REDRAW_BORDER);
 
-    AGG::PlayMusic(MUS::FromGround(world.GetTiles(global_focus.Center()).GetGround()));
+    if(global_focus.Type() != Focus::UNSEL)
+    AGG::PlayMusic(MUS::FromGround(world.GetTiles(global_focus.GetCenter()).GetGround()));
     Game::EnvironmentSoundMixer();
 
     cursor.Show();
@@ -995,7 +996,7 @@ Game::menu_t Game::HumanTurn(bool isload)
 		{
 		    if(hero.Move(0 == conf.HeroesMoveSpeed()))
 		    {
-            		I.gameArea.Center(global_focus.Center());
+            		I.gameArea.SetCenter(global_focus.GetCenter());
             		global_focus.Reset(Focus::HEROES);
             		global_focus.SetRedraw();
 
@@ -1392,12 +1393,14 @@ void Game::EventSystemDialog(void)
     const u8 changes = Dialog::SystemOptions();
     Interface::Basic & I = Interface::Basic::Get();
 
+    // change scroll
     if(0x10 & changes)
     {
 	Game::Focus & focus = Game::Focus::Get();
 	// hardcore reset pos
-	I.gameArea.Center(0, 0);
-	I.gameArea.Center(focus.Center());
+	I.gameArea.SetCenter(0, 0);
+	if(focus.Type() != Game::Focus::UNSEL)
+	    I.gameArea.SetCenter(focus.GetCenter());
         I.SetRedraw(REDRAW_GAMEAREA);
 
 	if(Settings::Get().HideInterface())

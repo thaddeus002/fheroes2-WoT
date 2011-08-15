@@ -366,7 +366,7 @@ void Interface::Radar::QueueEventProcessing(void)
     	    const Point & pt = le.GetMouseCursor();
 	    if(*this & pt)
 	    {
-		gamearea.Center((pt.x - x) * world.w() / w, (pt.y - y) * world.h() / h);
+		gamearea.SetCenter((pt.x - x) * world.w() / w, (pt.y - y) * world.h() / h);
     		if(prev != gamearea.GetRectMaps())
     		{
 		    Cursor::Get().Hide();

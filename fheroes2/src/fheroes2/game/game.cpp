@@ -154,7 +154,7 @@ void Game::SetFixVideoMode(void)
 void Game::EnvironmentSoundMixer(void)
 {
     const Focus & focus = Focus::Get();
-    const Point & abs_pt = focus.Center();
+    const Point & abs_pt = focus.GetCenter();
     const Settings & conf = Settings::Get();
 
     if(conf.Sound())

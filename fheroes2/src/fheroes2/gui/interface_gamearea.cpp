@@ -309,12 +309,12 @@ void Interface::GameArea::Scroll(void)
 }
 
 /* scroll area to center point maps */
-void Interface::GameArea::Center(const Point &pt)
+void Interface::GameArea::SetCenter(const Point &pt)
 {
-    Center(pt.x, pt.y);
+    SetCenter(pt.x, pt.y);
 }
 
-void Interface::GameArea::Center(s16 px, s16 py)
+void Interface::GameArea::SetCenter(s16 px, s16 py)
 {
     Point pos(px - rectMaps.w / 2, py - rectMaps.h / 2);
 
@@ -420,7 +420,7 @@ void Interface::GameArea::GenerateUltimateArtifactAreaSurface(const s32 index, S
 	const Rect & areaPosition = gamearea.GetArea();
 	Point pt(index % world.w(), index / world.h());
 
-        gamearea.Center(pt);
+        gamearea.SetCenter(pt);
 	gamearea.Redraw(sf, LEVEL_BOTTOM | LEVEL_TOP);
 
 	// blit marker

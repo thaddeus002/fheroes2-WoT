@@ -1505,7 +1505,7 @@ void RedrawGameAreaAndHeroAttackMonster(Heroes & hero, s32 dst)
 	Interface::Basic & I = Interface::Basic::Get();
 	Game::Focus & F = Game::Focus::Get();
         Cursor::Get().Hide();
-	I.gameArea.Center(F.Center());
+	I.gameArea.SetCenter(hero.GetCenter());
 	F.SetRedraw();
 	I.Redraw();
         Cursor::Get().Show();
