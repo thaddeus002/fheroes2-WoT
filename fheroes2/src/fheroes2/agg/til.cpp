@@ -40,8 +40,3 @@ const char* TIL::GetString(const til_t til)
 {
     return tilmap[til].string;
 }
-
-void TIL::Reflect(Surface & sf_dst, const Surface & sf_src, const u8 shape)
-{
-    Surface::TILReflect(sf_dst, sf_src, shape);
-}

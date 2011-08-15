@@ -951,8 +951,7 @@ const Surface & AGG::Cache::GetTIL(const TIL::til_t til, u16 index, u8 shape)
 
 	if(src.isValid())
 	{
-	    surface.Set(src.w(), src.h(), 8, SDL_SWSURFACE);
-	    TIL::Reflect(surface, src, shape);
+	    Surface::Reflect(surface, src, shape);
 	}
 	else
 	DEBUG(DBG_ENGINE, DBG_WARN, "is NULL");

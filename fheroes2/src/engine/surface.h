@@ -116,7 +116,7 @@ public:
 
     u32  GetSize(void) const;
 
-    static void TILReflect(Surface & sf_dst, const Surface & sf_src, const u8 shape);
+    static void Reflect(Surface & sf_dst, const Surface & sf_src, const u8 shape);
 
     static void MakeStencil(Surface &, const Surface &, u32);
     static void MakeContour(Surface &, const Surface &, u32);

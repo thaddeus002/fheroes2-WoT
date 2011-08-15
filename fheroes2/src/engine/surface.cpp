@@ -795,86 +795,51 @@ void Surface::MakeContour(Surface & dst, const Surface & src, u32 col)
     dst.Unlock();
 }
 
-void Surface::TILReflect(Surface & sf_dst, const Surface & sf_src, const u8 shape)
+void Surface::Reflect(Surface & sf_dst, const Surface & sf_src, const u8 shape)
 {
-    // valid sf_src
-    if(!sf_src.surface || sf_src.w() != sf_src.h())
+    if(sf_src.surface)
     {
-	std::cerr << "Surface::TILReflect: " << "incorrect size" << std::endl;
-	return;
-    }
+	sf_dst = Surface(sf_src.w(), sf_src.h(), sf_src.depth(), SWSURFACE);
 
-    if(sf_src.depth() != 8)
-    {
-	std::cerr << "Surface::TILReflect: " << "incorrect depth, use only 8 bpp" << std::endl;
-	return;
-    }
+	const char* src = static_cast<const char*>(sf_src.surface->pixels);
+	char* dst = static_cast<char*>(sf_dst.surface->pixels);
+	const s32 size = sf_src.surface->h * sf_src.surface->pitch;
+	const u8 bpp = sf_src.surface->format->BytesPerPixel;
 
-    const u8 tile_width = sf_src.w();
-    const u8 tile_height = sf_src.h();
+	sf_dst.Lock();
 
-    // valid sf_dst
-    if(!sf_dst.surface || sf_dst.w() != tile_width || sf_dst.h() != tile_height)
-    {
-        sf_dst = Surface(tile_width, tile_height, 8, SWSURFACE);
-    }
-
-    const char* src = static_cast<const char*>(sf_src.surface->pixels);
-    char* dst = static_cast<char*>(sf_dst.surface->pixels);
-
-    s16 x, y;
-
-    char * dst2 = NULL;
-
-    sf_dst.Lock();
-
-    // draw tiles
-    switch(shape % 4)
-    {
-        // normal
-	case 0:
-	    std::memcpy(dst, src, tile_width * tile_height);
-            break;
-
-        // vertical reflect
-        case 1:
+	switch(shape % 4)
 	{
-	    dst2 = dst + tile_width * (tile_height - 1);
+    	    // normal
+	    default:
+		std::memcpy(dst, src, size);
+        	break;
 
-	    for(int i = 0; i < tile_height; i++)
-	    {
-    		memcpy(dst2, src, tile_width);
+    	    // vertical reflect
+    	    case 1:
+		for(s32 offset = 0; offset < size; offset += sf_src.surface->pitch)
+    		    memcpy(dst + size - sf_src.surface->pitch - offset,
+			src + offset, sf_src.surface->pitch);
+        	break;
 
-    		src += tile_width;
-    		dst2 -= tile_width;
-	    }
+    	    // horizontal reflect
+    	    case 2:
+        	for(s32 offset = 0; offset < size; offset += bpp)
+		    memcpy(dst + (offset % sf_src.surface->pitch) +
+			size - sf_src.surface->pitch - static_cast<s32>(offset / sf_src.surface->pitch) * sf_src.surface->pitch, src + size - offset - bpp, bpp);
+		break;
+
+    	    // both variants
+	    case 3:
+        	for(s32 offset = 0; offset < size; offset += bpp)
+		    memcpy(dst + offset, src + size - offset - bpp, bpp);
+    		break;
 	}
-            break;
 
-        // horizontal reflect
-        case 2:
-            for(y = 0; y < tile_height; ++y)
-                for(x = tile_width - 1; x >= 0; --x)
-                {
-		    dst2 = dst + y * tile_width + x;
-		    *dst2 = *src;
-                    ++src;
-                }
-            break;
-
-        // any variant
-        case 3:
-            for(y = tile_height - 1; y >= 0; --y)
-                for( x = tile_width - 1; x >= 0; --x)
-                {
-		    dst2 = dst + y * tile_width + x;
-		    *dst2 = *src;
-                    ++src;
-                }
-            break;
+	sf_dst.Unlock();
     }
-
-    sf_dst.Unlock();
+    else
+	std::cerr << "Surface::TILReflect: " << "incorrect param" << std::endl;
 }
 
 u32 Surface::GetSize(void) const

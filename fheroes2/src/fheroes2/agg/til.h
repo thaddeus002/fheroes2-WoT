@@ -39,7 +39,6 @@ namespace TIL
     };
 
     const char* GetString(const til_t til);
-    void Reflect(Surface & sf_dst, const Surface & sf_src, const u8 shape);
 }
 
 #endif
