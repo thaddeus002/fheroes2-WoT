@@ -94,8 +94,7 @@ bool FH2LocalClient::StartGame(void)
     Interface::GameArea & areaMaps = I.gameArea;
     areaMaps.Build();
 
-    Game::Focus & global_focus = Game::Focus::Get();
-    global_focus.Reset();
+    Game::Focus::ResetAll(Game::Focus::UNSEL);
 
     //Interface::Radar & radar = I.radar;
     //Interface::StatusWindow& statusWin = I.statusWindow;

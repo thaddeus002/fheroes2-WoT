@@ -160,11 +160,12 @@ Game::menu_t Game::StartGame(void)
     Interface::GameArea & areaMaps = I.gameArea;
     areaMaps.Build();
 
-    Game::Focus & global_focus = Focus::Get();
     // clear prev settings
     if(conf.GameType(TYPE_LOADFILE))
-	global_focus.Reset(Focus::UNSEL);
-    global_focus.Reset(Focus::FIRSTHERO);
+	Game::Focus::ResetAll(Focus::UNSEL);
+
+    // init focus: set first hero
+    Game::Focus::ResetAll(Focus::FIRSTHERO);
 
     Interface::Radar & radar = I.radar;
     Interface::StatusWindow& statusWin = I.statusWindow;
@@ -258,7 +259,7 @@ Game::menu_t Game::StartGame(void)
     }
 
     // reset focus
-    global_focus.Reset();
+    Game::Focus::ResetAll(Focus::UNSEL);
 
     display.Fill(0, 0, 0);
 

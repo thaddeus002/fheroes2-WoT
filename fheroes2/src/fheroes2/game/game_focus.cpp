@@ -20,6 +20,7 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
+#include <algorithm>
 #include "castle.h"
 #include "heroes.h"
 #include "cursor.h"
@@ -30,14 +31,23 @@
 #include "kingdom.h"
 #include "game_focus.h"
 
+namespace Game
+{
+    static Focus gfocus[KINGDOMMAX+1];
+}
+
 Game::Focus::Focus() : castle(NULL), heroes(NULL)
 {
 }
 
 Game::Focus & Game::Focus::Get(void)
 {
-    static Game::Focus gfocus[KINGDOMMAX+1];
     return gfocus[Color::GetIndex(Settings::Get().MyColor())];
+}
+
+void Game::Focus::ResetAll(u8 priority)
+{
+    std::for_each(&gfocus[0], &gfocus[KINGDOMMAX], std::bind2nd(std::mem_fun_ref(&Focus::Reset), priority));
 }
 
 void Game::Focus::Set(Heroes *hero2)
@@ -90,7 +100,7 @@ void Game::Focus::Set(Castle *castle2)
     Game::EnvironmentSoundMixer();
 }
 
-void Game::Focus::Reset(const focus_t priority)
+void Game::Focus::Reset(u8 priority)
 {
     Kingdom & myKingdom = world.GetMyKingdom();
 
@@ -161,7 +171,7 @@ void Game::Focus::Reset(const focus_t priority)
     }
 }
 
-Game::Focus::focus_t Game::Focus::Type(void) const
+u8 Game::Focus::Type(void) const
 {
     if(heroes) return HEROES;
     else

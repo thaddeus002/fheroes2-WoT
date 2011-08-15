@@ -34,20 +34,21 @@ namespace Game
     class Focus
     {
     public:
-	enum focus_t { UNSEL, HEROES, CASTLE, FIRSTHERO };
+	enum focus_t { UNSEL = 0, HEROES = 1, CASTLE = 2, FIRSTHERO = 3 };
 
    	static Focus &	Get(void);
+	static void	ResetAll(u8);
 
 	void		Set(Heroes *hr);
 	void		Set(Castle *cs);
 	void		SetRedraw(void);
-	void		Reset(const focus_t priority = UNSEL);
+	void		Reset(u8);
 
 	void		CheckIconsPanel(void);
 
 	const Point &	Center(void) const;
 
-	focus_t		Type(void) const;
+	u8		Type(void) const;
 
 	const Castle &	GetCastle(void) const;
 	const Heroes &	GetHeroes(void) const;
@@ -55,9 +56,9 @@ namespace Game
 	Heroes & GetHeroes(void);
 	Castle & GetCastle(void);
 
-    private:
 	Focus();
 
+    private:
 	Castle *	castle;
 	Heroes *	heroes;
 	Point		center;
