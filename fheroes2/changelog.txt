@@ -1,60 +1,70 @@
+latest (2454 rev.)
+
++ Update: alternative fonts
++ Fixed: world: add action for busy teleport (battle or meeting)
++ Fixed: AI: recruit hero and check castle
++ Fixed: custom portrait, +level up
++ Fixed: hotseat: show maps
++ Fixed: battle: wizard cast opponent sprite
++ Fixed: game: digging on water
++ Fixed: game: focus for multi players
 
 Aug, 04, 2011 (2440 rev.)
 
-Added: option: autosave begin of day
-Fixed: world: move "lean to" object
-Fixed: game: AI recruit hero, fixed: recruit hero and surrender status
-Fixed  game: crash, Castle::ActionNewWeek, Castle::ActionNewMonth
-Fixed: AI: recruit troops for castles
-Fixed: game: Army::color null after load game
-Update: xml resources
-Fixed: AI: add prioritize range attackers and others...
-Added: game: WeekOfMonster can be 1 in every 3
-Fixed: battle animation, opponent animation and kill troop animation
-Fixed: World: next teleport scan
-Fixed: pocketpc: necromancer build shrine
-Fixed: GUI: incorrect focus after restart game
-Fixed: GUI: incorrect show splitter
++ Added: option: autosave begin of day
++ Fixed: world: move "lean to" object
++ Fixed: game: AI recruit hero, fixed: recruit hero and surrender status
++ Fixed  game: crash, Castle::ActionNewWeek, Castle::ActionNewMonth
++ Fixed: AI: recruit troops for castles
++ Fixed: game: Army::color null after load game
++ Update: xml resources
++ Fixed: AI: add prioritize range attackers and others...
++ Added: game: WeekOfMonster can be 1 in every 3
++ Fixed: battle animation, opponent animation and kill troop animation
++ Fixed: World: next teleport scan
++ Fixed: pocketpc: necromancer build shrine
++ Fixed: GUI: incorrect focus after restart game
++ Fixed: GUI: incorrect show splitter
 
 Jun, 26, 2011 (2390 rev.)
 
-Update: translation: (ru, sv, es, hu, pl)
-Fixed: game: Army::GetSurrenderCost
-Fixed: game: days period for lost hero
-Fixed: game: percents string
-Fixed: game: scroll spells for meeting heroes
-Fixed: game: AI shipmaster and pickup resource
-Added: game: click mouse and stop hero
-Added: world: new growth rules
-Added: option: BanWeekOf
-Added: option: BanPlagues
-Added: option: MonthOfMonsters
-Added: option: NewVersionWeekOfMonsters
++ Update: translation: (ru, sv, es, hu, pl)
++ Fixed: game: Army::GetSurrenderCost
++ Fixed: game: days period for lost hero
++ Fixed: game: percents string
++ Fixed: game: scroll spells for meeting heroes
++ Fixed: game: AI shipmaster and pickup resource
++ Added: game: click mouse and stop hero
++ Added: world: new growth rules
++ Added: option: BanWeekOf
++ Added: option: BanPlagues
++ Added: option: MonthOfMonsters
++ Added: option: NewVersionWeekOfMonsters
 
 May, 26, 2011 (2356 rev.)
 
-Added: game: BattleOnly: add sec. skill modify
-Added: android: latest fixes
-Fixed: AI: check cast spell
-Fixed: heroes: arena visit
-Fixed: game: crash with old save format
-Fixed: game: diplomacy skill, count mounster
-Fixed: game: Heroes::HaveSpell with bag artifact
-Fixed: game: Heroes::CanLearnSpell
-Fixed: game: artifact contain spell
-Fixed: game: DimensionDoor spell, on water
-Fixed: game: redraw town name, after switch hero/guardian
++ Added: game: BattleOnly: add sec. skill modify
++ Added: android: latest fixes
++ Fixed: AI: check cast spell
++ Fixed: heroes: arena visit
++ Fixed: game: crash with old save format
++ Fixed: game: diplomacy skill, count mounster
++ Fixed: game: Heroes::HaveSpell with bag artifact
++ Fixed: game: Heroes::CanLearnSpell
++ Fixed: game: artifact contain spell
++ Fixed: game: DimensionDoor spell, on water
++ Fixed: game: redraw town name, after switch hero/guardian
 
 Mar, 13, 2011 (2334 rev.)
 
-Update: translations
-Added: game: quick info: penalty cost
-Added: game: plural descriptions for artifacts
-Added: android: latest changes
-Fixed: game: CampFire gold value
-Fixed: game: invalid game focus for load game type
-Fixed: game: gameover loss condition
-Fixed: game: hotkey hero move
++ Update: translations
++ Added: game: quick info: penalty cost
++ Added: game: plural descriptions for artifacts
++ Added: android: latest changes
++ Fixed: game: CampFire gold value
++ Fixed: game: invalid game focus for load game type
++ Fixed: game: gameover loss condition
++ Fixed: game: hotkey hero move
 
 Mar, 2, 2011
 
