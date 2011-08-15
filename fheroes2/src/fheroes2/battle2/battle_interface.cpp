@@ -565,7 +565,7 @@ void Battle2::OpponentSprite::ResetAnimFrame(u8 rule)
 		    {
 			case OP_IDLE:	animframe_start = 16; animframe_count = 3; break;
 			case OP_SRRW:	animframe_start = 1; animframe_count = 5; break;
-			case OP_CAST:	animframe_start = 6; animframe_count = 10; break;
+			case OP_CAST:	animframe_start = 12; animframe_count = 7; break;
 			default: break;
 		    }
 		    break;
