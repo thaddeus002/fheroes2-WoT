@@ -36,9 +36,8 @@ Game::Focus::Focus() : castle(NULL), heroes(NULL)
 
 Game::Focus & Game::Focus::Get(void)
 {
-    static Game::Focus gfocus;
-    
-    return gfocus;
+    static Game::Focus gfocus[KINGDOMMAX+1];
+    return gfocus[Color::GetIndex(Settings::Get().MyColor())];
 }
 
 void Game::Focus::Set(Heroes *hero2)

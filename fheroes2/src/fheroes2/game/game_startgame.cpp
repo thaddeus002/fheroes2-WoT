@@ -700,8 +700,6 @@ Game::menu_t Game::HumanTurn(bool isload)
     GameOver::Result & gameResult = GameOver::Result::Get();
 
     // set focus
-    if(conf.GameType(Game::TYPE_HOTSEAT)) global_focus.Reset();
-
     if(conf.ExtRememberLastFocus())
     {
 	if(Focus::HEROES == global_focus.Type())
