@@ -134,7 +134,9 @@ namespace AGG
 	void LoadOrgICN(Sprite &, const ICN::icn_t, const u16, bool);
 	void LoadOrgICN(icn_cache_t &, const ICN::icn_t, const u16, bool);
 	void LoadICN(const ICN::icn_t icn, u16 index, bool reflect = false);
-	void LoadTIL(const TIL::til_t til);
+	bool LoadAltTIL(til_cache_t &, const std::string &, u16 max);
+	void LoadOrgTIL(til_cache_t &, const TIL::til_t, u16 max);
+	void LoadTIL(const TIL::til_t);
 	void LoadWAV(const M82::m82_t m82);
 	void LoadMID(const XMI::xmi_t xmi);
 

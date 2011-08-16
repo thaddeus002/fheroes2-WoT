@@ -608,10 +608,8 @@ void AGG::Cache::LoadICN(const ICN::icn_t icn, u16 index, bool reflect)
     // load from images dir
     if(conf.UseAltResource())
     {
-	Dir dir;
 	const std::string xml_spec(conf.LocalPrefix() + SEPARATOR + "files" + SEPARATOR + "images" + SEPARATOR +
 								String::Lower(ICN::GetString(icn)) + SEPARATOR + "spec.xml");
-
 	if(FilePresent(xml_spec) &&
 	    LoadAltICN(v, xml_spec, index, reflect)) skip_origin = true;
     }
@@ -633,15 +631,49 @@ void AGG::Cache::LoadICN(const ICN::icn_t icn, u16 index, bool reflect)
 	icn_registry.push_back(icn);
 }
 
-/* load TIL object to AGG::Cache */
-void AGG::Cache::LoadTIL(const TIL::til_t til)
+bool AGG::Cache::LoadAltTIL(til_cache_t & v, const std::string & spec, u16 max)
 {
-    til_cache_t & v = til_cache[til];
+#ifdef WITH_XML
+    // parse spec.xml
+    TiXmlDocument doc;
+    const TiXmlElement* xml_til = NULL;
 
-    if(v.sprites) return;
+    if(doc.LoadFile(spec.c_str()) &&
+	NULL != (xml_til = doc.FirstChildElement("til")))
+    {
+	int count, index;
+	xml_til->Attribute("count", &count);
 
-    DEBUG(DBG_ENGINE, DBG_INFO, TIL::GetString(til));
+	if(NULL == v.sprites)
+	{
+	    v.count = count;
+	    v.sprites = new Surface [v.count];
+	}
 
+	index = 0;
+	for(const TiXmlElement*
+	    xml_sprite = xml_til->FirstChildElement("sprite"); index < count && xml_sprite; ++index, xml_sprite = xml_sprite->NextSiblingElement("sprite"))
+	{
+	    Surface & sf = v.sprites[index];
+	    std::string name(spec);
+	    String::Replace(name, "spec.xml", xml_sprite->Attribute("name"));
+
+	    if(sf.Load(name.c_str()) && sf.isValid())
+	    {
+		DEBUG(DBG_ENGINE, DBG_TRACE, spec << ", " << index);
+	    }
+	}
+	return true;
+    }
+    else
+    DEBUG(DBG_ENGINE, DBG_WARN, "broken xml file: " <<  spec);
+#endif
+
+    return false;
+}
+
+void AGG::Cache::LoadOrgTIL(til_cache_t & v, const TIL::til_t til, u16 max)
+{
     std::vector<u8> body;
 
     if(ReadChunk(TIL::GetString(til), body))
@@ -654,18 +686,51 @@ void AGG::Cache::LoadTIL(const TIL::til_t til)
 	const u32 body_size = 6 + count * tile_size;
 
 	// check size
-	if(body.size() != body_size)
+	if(body.size() == body_size && count <= max)
 	{
-	    DEBUG(DBG_ENGINE, DBG_WARN, "size mismach" << ", skipping...");
-	    return;
+	    for(u16 ii = 0; ii < max; ++ii)
+		v.sprites[ii].Set(&body[6 + ii * tile_size], width, height, 1, false);
 	}
-
-	v.count = count * 4;  // rezerve for rotate sprites
-	v.sprites = new Surface [v.count];
-
-	for(u16 ii = 0; ii < count; ++ii)
-	    v.sprites[ii].Set(&body[6 + ii * tile_size], width, height, 1, false);
+	else
+	    DEBUG(DBG_ENGINE, DBG_WARN, "size mismach" << ", skipping...");
     }
+}
+
+/* load TIL object to AGG::Cache */
+void AGG::Cache::LoadTIL(const TIL::til_t til)
+{
+    til_cache_t & v = til_cache[til];
+
+    if(v.sprites) return;
+
+    DEBUG(DBG_ENGINE, DBG_INFO, TIL::GetString(til));
+    u16 max = 0;
+
+    switch(til)
+    {
+	case TIL::CLOF32:	max = 36;  break;
+        case TIL::GROUND32:	max = 432; break;
+        case TIL::STON:		max = 4;   break;
+	default: break;
+    }
+
+    v.count = max * 4;  // rezerve for rotate sprites
+    v.sprites = new Surface [v.count];
+
+    const Settings & conf = Settings::Get();
+    bool skip_orig = false;
+
+    // load from images dir
+    if(conf.UseAltResource())
+    {
+	const std::string xml_spec(conf.LocalPrefix() + SEPARATOR + "files" + SEPARATOR + "images" + SEPARATOR +
+								String::Lower(TIL::GetString(til)) + SEPARATOR + "spec.xml");
+	if(FilePresent(xml_spec) &&
+	    LoadAltTIL(v, xml_spec, max)) skip_orig = true;
+    }
+
+    if(!skip_orig)
+	LoadOrgTIL(v, til, max);
 }
 
 /* load 82M object to AGG::Cache in Audio::CVT */
