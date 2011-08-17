@@ -38,28 +38,50 @@
 
 std::string CountScoute(u32 count, u8 scoute)
 {
-    std::string str;
+    u32 infelicity;
+    std::string res;
+
     switch(scoute)
     {
 	case Skill::Level::BASIC:
-	    String::AddInt(str, Rand::Get(count - count * 30 / 100, count));
-	    str.append("-");
-	    String::AddInt(str, Rand::Get(count, count + count * 30 / 100));
+	    infelicity = count * 30 / 100;
 	    break;
+
 	case Skill::Level::ADVANCED:
-	    String::AddInt(str, Rand::Get(count - count * 14 / 100, count));
-	    str.append("-");
-	    String::AddInt(str, Rand::Get(count, count + count * 15 / 100));
+	    infelicity = count * 15 / 100;
 	    break;
+
 	case Skill::Level::EXPERT:
-	    String::AddInt(str, count);
+	    String::AddInt(res, count);
 	    break;
+
 	default:
-	    str = Army::String(count);
-	    break;
+	    return Army::String(count);
     }
 
-    return str;
+    if(res.empty())
+    {
+	u32 min = Rand::Get(count - infelicity, count + infelicity);
+	u32 max = 0;
+
+	if(min > count)
+	{
+	    max = min;
+	    min = count - infelicity;
+	}
+	else
+	    max = count + infelicity;
+
+	String::AddInt(res, min);
+
+	if(min != max)
+	{
+	    res.append("-");
+	    String::AddInt(res, max);
+	}
+    }
+
+    return res;
 }
 
 std::string ShowGuardiansInfo(const Maps::Tiles & tile, u8 scoute)
