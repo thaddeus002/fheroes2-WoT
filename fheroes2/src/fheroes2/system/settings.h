@@ -39,12 +39,13 @@
 #include <android/log.h>
 #endif
 
+#define FORMAT_VERSION_2460 0x099C
 #define FORMAT_VERSION_2379 0x094B
 #define FORMAT_VERSION_2371 0x0943
 #define FORMAT_VERSION_2315 0x090B
 #define FORMAT_VERSION_2293 0x08F5
 #define FORMAT_VERSION_2268 0x08DC
-#define CURRENT_FORMAT_VERSION FORMAT_VERSION_2379
+#define CURRENT_FORMAT_VERSION FORMAT_VERSION_2460
 #define LAST_FORMAT_VERSION FORMAT_VERSION_2268
 
 #define ListMapsDirectory std::list<std::string>
@@ -183,6 +184,8 @@ public:
 	HEROES_RECALCULATE_MOVEMENT	= 0x24000000,
 	HEROES_PATROL_ALLOW_PICKUP	= 0x28000000,
 
+	CASTLE_MAGEGUILD_POINTS_TURN	= 0x30000001,
+
 	BATTLE_ARCHMAGE_RESIST_BAD_SPELL= 0x40001000,
 	BATTLE_MAGIC_TROOP_RESIST	= 0x40002000,
 	BATTLE_TROOP_DIRECTION		= 0x40008000,
@@ -301,6 +304,7 @@ public:
     bool ExtWorldNewVersionWeekOf(void) const;
     bool ExtWorldBanPlagues(void) const;
     bool ExtCastleAllowFlash(void) const;
+    bool ExtCastleGuildRestorePointsTurn(void) const;
     bool ExtBattleShowDamage(void) const;
     bool ExtBattleTroopDirection(void) const;
     bool ExtBattleSoftWait(void) const;
@@ -421,6 +425,7 @@ private:
     BitModes opt_game;
     BitModes opt_battle;
     BitModes opt_world;
+    BitModes opt_addons;
 
     const u8 major_version;
     const u8 minor_version;

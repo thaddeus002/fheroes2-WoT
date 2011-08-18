@@ -41,7 +41,8 @@ namespace GameStatic
     u8		GetCastleGrownWeekOf(void);
     u8		GetCastleGrownMonthOf(void);
 
-    u8		GetHeroesSpellPointsPerDay(void);
+    u8		GetHeroesRestoreSpellPointsPerDay(void);
+    u8		GetMageGuildRestoreSpellPointsPercentDay(u8);
 
     double	GetMonsterUpgradeRatio(void);
 }

@@ -43,6 +43,7 @@
 #include "localclient.h"
 #include "game_focus.h"
 #include "game_interface.h"
+#include "game_static.h"
 #include "ai.h"
 
 // heroes_action.cpp
@@ -793,12 +794,18 @@ void Heroes::ActionNewDay(void)
 	    if(castle && castle->GetLevelMageGuild())
 	    {
 		//restore from mage guild
-		SetSpellPoints(maxp);
+		if(Settings::Get().ExtCastleGuildRestorePointsTurn())
+		{
+		    const u8 add = curr * GameStatic::GetMageGuildRestoreSpellPointsPercentDay(castle->GetLevelMageGuild()) / 100;
+		    curr = curr + add > maxp ? maxp : curr + add;
+		}
+		else
+		    SetSpellPoints(maxp);
 	    }
 	    else
 	    {
 		// everyday
-		curr += Game::GetHeroRestoreSpellPointsPerDay();
+		curr += GameStatic::GetHeroesRestoreSpellPointsPerDay();
 
 		// power ring action
 	        if(HasArtifact(Artifact::POWER_RING))

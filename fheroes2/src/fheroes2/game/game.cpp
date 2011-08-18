@@ -318,11 +318,6 @@ u8 Game::GetWhirlpoolPercent(void)
     return GameStatic::GetLostOnWhirlpoolPercent();
 }
 
-u8 Game::GetHeroRestoreSpellPointsPerDay(void)
-{
-    return GameStatic::GetHeroesSpellPointsPerDay();
-}
-
 void Game::LoadExternalResource(const Settings & conf)
 {
     std::string spec;

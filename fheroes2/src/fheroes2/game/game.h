@@ -225,7 +225,6 @@ namespace Game
     u8  GetLostTownDays(void);
     u8  GetViewDistance(u8);
     u8  GetWhirlpoolPercent(void);
-    u8  GetHeroRestoreSpellPointsPerDay(void);
     u8  SelectCountPlayers(void);
 
     void ShowLoadMapsText(void);

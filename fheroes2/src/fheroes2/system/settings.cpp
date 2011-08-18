@@ -145,6 +145,7 @@ static const settings_t settingsFHeroes2[] =
     { Settings::WORLD_ARTIFACT_CRYSTAL_BALL,	_("artifact: Crystal Ball also added Identify Hero and Visions spells"), },
     { Settings::CASTLE_ALLOW_BUY_FROM_WELL,	_("castle: allow buy from well"),			},
     { Settings::CASTLE_ALLOW_GUARDIANS,		_("castle: allow guardians"),				},
+    { Settings::CASTLE_MAGEGUILD_POINTS_TURN,	_("castle: higher mage guilds regenerate more spell points/turn (20/40/60/80/100%)"), },
     { Settings::HEROES_LEARN_SPELLS_WITH_DAY,	_("heroes: learn new spells with day"),  		},
     { Settings::HEROES_FORCE_RACE_FROM_TYPE,	_("heroes: fixed race with custom portrait"),  		},
     { Settings::HEROES_COST_DEPENDED_FROM_LEVEL,_("heroes: recruit cost to be dependent on hero level"),},
@@ -1103,6 +1104,7 @@ bool Settings::ExtModes(u32 f) const
     {
 	case 0x01: return opt_game.Modes(f & mask);
 	case 0x02: return opt_world.Modes(f & mask);
+	case 0x03: return opt_addons.Modes(f & mask);
 	case 0x04: return opt_battle.Modes(f & mask);
 	default: break;
     }
@@ -1124,6 +1126,7 @@ void Settings::ExtSetModes(u32 f)
     {
 	case 0x01: opt_game.SetModes(f & mask); break;
 	case 0x02: opt_world.SetModes(f & mask); break;
+	case 0x03: opt_addons.SetModes(f & mask); break;
 	case 0x04: opt_battle.SetModes(f & mask); break;
 	default: break;
     }
@@ -1136,6 +1139,7 @@ void Settings::ExtResetModes(u32 f)
     {
 	case 0x01: opt_game.ResetModes(f & mask); break;
 	case 0x02: opt_world.ResetModes(f & mask); break;
+	case 0x03: opt_addons.ResetModes(f & mask); break;
 	case 0x04: opt_battle.ResetModes(f & mask); break;
 	default: break;
     }
@@ -1144,6 +1148,11 @@ void Settings::ExtResetModes(u32 f)
 bool Settings::ExtAllowBuyFromWell(void) const
 {
     return ExtModes(CASTLE_ALLOW_BUY_FROM_WELL);
+}
+
+bool Settings::ExtCastleGuildRestorePointsTurn(void) const
+{
+    return ExtModes(CASTLE_MAGEGUILD_POINTS_TURN);
 }
 
 bool Settings::ExtCastleAllowFlash(void) const
@@ -1453,6 +1462,7 @@ void Settings::BinarySave(void) const
     msg.Push(opt_game());
     msg.Push(opt_world());
     msg.Push(opt_battle());
+    msg.Push(opt_addons());
 
     // radar position
     msg.Push(pos_radr.x);
@@ -1499,6 +1509,12 @@ void Settings::BinaryLoad(void)
 
 	msg.Pop(byte32);
 	opt_battle.SetModes(byte32);
+
+	if(version < FORMAT_VERSION_2460)
+	{
+	    msg.Pop(byte32);
+	    opt_addons.SetModes(byte32);
+	}
 
 	msg.Pop(byte16);
 	pos_radr.x = byte16;
