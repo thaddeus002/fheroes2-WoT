@@ -58,7 +58,7 @@ namespace Game
 
     void ShowPathOrStartMoveHero(Heroes *hero, const s32 dst_index);
     menu_t HumanTurn(bool);
-    bool DiggingForArtifacts(const Heroes & hero);
+    bool DiggingForArtifacts(Heroes & hero);
     void DialogPlayers(const Color::color_t, const std::string &);
     void MoveHeroFromArrowKeys(Heroes & hero, Direction::vector_t direct);
 
@@ -1070,12 +1070,12 @@ Game::menu_t Game::HumanTurn(bool isload)
     return res;
 }
 
-bool Game::DiggingForArtifacts(const Heroes & hero)
+bool Game::DiggingForArtifacts(Heroes & hero)
 {
     if(hero.isShipMaster())
 	Dialog::Message("", _("Try looking on land!!!"), Font::BIG, Dialog::OK);
     else
-    if(hero.GetMaxMovePoints() == hero.GetMovePoints())
+    if(hero.GetMaxMovePoints() <= hero.GetMovePoints())
     {
 	if(! world.GetTiles(hero.GetCenter()).GoodForUltimateArtifact())
 	{
@@ -1085,14 +1085,14 @@ bool Game::DiggingForArtifacts(const Heroes & hero)
 
 	AGG::PlaySound(M82::DIGSOUND);
 
-	const_cast<Heroes &>(hero).ResetMovePoints();
+	hero.ResetMovePoints();
 	const Artifact ultimate(world.GetUltimateArtifact());
 
 	if(world.DiggingForUltimateArtifact(hero.GetCenter()) && ultimate != Artifact::UNKNOWN)
 	{
 	    AGG::PlaySound(M82::TREASURE);
 	    // check returns
-	    const_cast<Heroes &>(hero).PickupArtifact(ultimate());
+	    hero.PickupArtifact(ultimate());
 	    std::string msg(_("After spending many hours digging here, you have uncovered the "));
 	    msg.append(ultimate.GetName());
 	    Dialog::ArtifactInfo(_("Congratulations!"), msg, ultimate());
