@@ -858,6 +858,23 @@ void AIToTeleports(Heroes &hero, const s32 index_from)
 	return;
     }
 
+    if(MP2::OBJ_HEROES == world.GetTiles(index_to).GetObject())
+    {
+        const Heroes* other_hero = world.GetHeroes(index_to);
+
+        if(other_hero)
+        {
+            AIToHeroes(hero, MP2::OBJ_STONELIGHTS, index_to);
+
+            // lose battle
+            if(hero.isFreeman())
+                return;
+            else
+            if(! other_hero->isFreeman())
+                DEBUG(DBG_GAME, DBG_WARN, "is busy...");
+        }
+    }
+
     MoveHero2Dest(hero, index_to, MP2::OBJ_STONELIGHTS, MP2::OBJ_STONELIGHTS);
 
     hero.GetPath().Reset();

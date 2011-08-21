@@ -365,6 +365,7 @@ void MoveHero2Dest(Heroes & hero, s32 dst_index, MP2::object_t from_obj, MP2::ob
     hero.SetIndex(dst_index);
     hero.Scoute();
     hero.SaveUnderObject(under_obj);
+    hero.ApplyPenaltyMovement();
     tiles_to.SetObject(MP2::OBJ_HEROES);
 }
 
@@ -2028,8 +2029,13 @@ void ActionToTeleports(Heroes &hero, const s32 index_from)
 	{
 	    ActionToHeroes(hero, MP2::OBJ_STONELIGHTS, index_to);
 
+	    // lose battle
+	    if(hero.isFreeman())
+		return;
+	    else
 	    if(! other_hero->isFreeman())
 		DEBUG(DBG_GAME, DBG_WARN, "is busy...");
+
 	}
     }
 

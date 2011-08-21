@@ -1512,13 +1512,13 @@ void Game::EventDefaultAction(void)
 	// 1. action object
 	if(MP2::isActionObject(hero.GetUnderObject(), hero.isShipMaster()))
 	{
-	    hero.Action(hero.GetIndex());
-	    if(MP2::OBJ_STONELIGHTS == hero.GetUnderObject() || MP2::OBJ_WHIRLPOOL == hero.GetUnderObject())
+	    if(hero.isEnableMove())
 	    {
-		hero.ApplyPenaltyMovement();
-		I.SetRedraw(REDRAW_HEROES);
+		hero.Action(hero.GetIndex());
+		if(MP2::OBJ_STONELIGHTS == hero.GetUnderObject() || MP2::OBJ_WHIRLPOOL == hero.GetUnderObject())
+		    I.SetRedraw(REDRAW_HEROES);
+		I.SetRedraw(REDRAW_GAMEAREA);
 	    }
-	    I.SetRedraw(REDRAW_GAMEAREA);
 	}
 	else
 	// 2. continue
