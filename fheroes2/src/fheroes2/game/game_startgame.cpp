@@ -1512,7 +1512,7 @@ void Game::EventDefaultAction(void)
 	// 1. action object
 	if(MP2::isActionObject(hero.GetUnderObject(), hero.isShipMaster()))
 	{
-	    if(hero.isEnableMove())
+	    //if(hero.isEnableMove())
 	    {
 		hero.Action(hero.GetIndex());
 		if(MP2::OBJ_STONELIGHTS == hero.GetUnderObject() || MP2::OBJ_WHIRLPOOL == hero.GetUnderObject())

@@ -346,11 +346,15 @@ void AIToHeroes(Heroes &hero, const u8 obj, const s32 dst_index)
     Heroes *other_hero = world.GetHeroes(dst_index);
     if(! other_hero) return;
 
-    if(hero.GetColor() == other_hero->GetColor() ||
-        (conf.ExtUnionsAllowHeroesMeetings() && conf.IsUnions(hero.GetColor(), other_hero->GetColor())))
+    if(hero.GetColor() == other_hero->GetColor() || conf.IsUnions(hero.GetColor(), other_hero->GetColor()))
     {
-        DEBUG(DBG_AI, DBG_INFO, hero.GetName() << " meeting " << other_hero->GetName());
-        AIMeeting(hero, *other_hero);
+	// ext: check unions
+	if(! conf.IsUnions(hero.GetColor(), other_hero->GetColor()) ||
+	    conf.ExtUnionsAllowCastleVisiting())
+	{
+    	    DEBUG(DBG_AI, DBG_INFO, hero.GetName() << " meeting " << other_hero->GetName());
+    	    AIMeeting(hero, *other_hero);
+	}
     }
     else
     if(! hero.AllowBattle(true))
@@ -417,12 +421,16 @@ void AIToCastle(Heroes &hero, const u8 obj, const s32 dst_index)
 
     if(! castle) return;
 
-    if(hero.GetColor() == castle->GetColor() ||
-	(conf.ExtUnionsAllowCastleVisiting() && conf.IsUnions(hero.GetColor(), castle->GetColor())))
+    if(hero.GetColor() == castle->GetColor() || conf.IsUnions(hero.GetColor(), castle->GetColor()))
     {
-        DEBUG(DBG_AI, DBG_INFO, hero.GetName() << " goto castle " << castle->GetName());
-	castle->MageGuildEducateHero(hero);
-	hero.SetVisited(dst_index);
+	// ext: check unions
+	if(! conf.IsUnions(hero.GetColor(), castle->GetColor()) ||
+	    conf.ExtUnionsAllowCastleVisiting())
+	{
+	    DEBUG(DBG_AI, DBG_INFO, hero.GetName() << " goto castle " << castle->GetName());
+	    castle->MageGuildEducateHero(hero);
+	    hero.SetVisited(dst_index);
+	}
     }
     else
     {
