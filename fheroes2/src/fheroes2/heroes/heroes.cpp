@@ -293,11 +293,11 @@ void Heroes::LoadFromMP2(s32 map_index, const void *ptr, const Color::color_t cl
     ++ptr8;
 
     // custom troops
-    bool custom_troop = false;
+    //bool custom_troop = false;
     if(*ptr8)
     {
         ++ptr8;
-	custom_troop = true;
+	//custom_troop = true;
 
         // monster1
         army.At(0).SetMonster(Monster(*ptr8 + 1));

@@ -38,7 +38,7 @@
 
 std::string CountScoute(u32 count, u8 scoute)
 {
-    u32 infelicity;
+    u32 infelicity = 0;
     std::string res;
 
     switch(scoute)
