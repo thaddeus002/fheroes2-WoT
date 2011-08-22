@@ -754,10 +754,15 @@ bool MP2::isWaterObject(const u8 obj)
 
             return true;
 
+    	    case OBJ_CASTLE:
+    	    case OBJ_BOAT:
+            return false;
+
         default: break;
     }
 
-    return false;
+    // price loyalty: editor allow place other objects
+    return Settings::Get().PriceLoyaltyVersion() ? isGroundObject(obj) : false;
 }
 
 bool MP2::isGroundObject(const u8 obj)
