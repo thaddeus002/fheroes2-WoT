@@ -1652,6 +1652,7 @@ void Heroes::Dump(void) const
     VERBOSE("direction       : " << Direction::String(direction));
     VERBOSE("index sprite    : " << static_cast<u16>(sprite_index));
     VERBOSE("in castle       : " << (inCastle() ? "true" : "false"));
+    VERBOSE("save object     : " << MP2::StringObject(save_maps_object));
     VERBOSE("flags           : " << (Modes(SHIPMASTER) ? "SHIPMASTER," : ",") <<
                                          (Modes(SCOUTER) ? "SCOUTER," : ",") <<
                                          (Modes(HUNTER) ? "HUNTER," : ",") <<

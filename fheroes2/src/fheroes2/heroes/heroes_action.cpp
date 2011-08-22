@@ -861,7 +861,7 @@ void ActionToCoast(Heroes &hero, const u8 obj, const s32 dst_index)
     if(! hero.isShipMaster()) return;
 
     hero.ResetMovePoints();
-    MoveHero2Dest(hero, dst_index, MP2::OBJ_BOAT, MP2::OBJ_ZERO);
+    MoveHero2Dest(hero, dst_index, MP2::OBJ_BOAT, MP2::OBJ_COAST);
     hero.SetShipMaster(false);
     AGG::PlaySound(M82::KILLFADE);
     hero.GetPath().Hide();
