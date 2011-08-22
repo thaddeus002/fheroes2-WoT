@@ -80,7 +80,7 @@ public:
     void SetSpellPoints(u16);
 
     void EditSpellBook(void);
-    Spell OpenSpellBook(SpellBook::filter_t, bool) const;
+    Spell OpenSpellBook(u8 filter, bool) const;
     bool HaveSpellBook(void) const;
     bool HaveSpell(const Spell &, bool skip_bag = false) const;
     void AppendSpellToBook(const Spell &, bool without_wisdom = false);

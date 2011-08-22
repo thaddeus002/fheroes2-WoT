@@ -34,16 +34,15 @@
 #define SPELL_PER_PAGE		6
 #define SPELL_PER_PAGE_SMALL	2
 
-struct SpellFiltered : std::binary_function<Spell, SpellBook::filter_t, bool>
+struct SpellFiltered : std::binary_function<Spell, u8, bool>
 {
-    bool operator() (Spell s, SpellBook::filter_t f) const
+    bool operator() (Spell s, u8 f) const
     {
 	return ((SpellBook::ADVN & f) && s.isCombat()) || ((SpellBook::CMBT & f) && !s.isCombat());
     }
 };
 
-void SpellBookSetFilter(const BagArtifacts &, const SpellStorage &, SpellStorage &, SpellBook::filter_t);
-void SpellBookRedrawLists(const SpellStorage &, std::vector<Rect> &, const size_t, const Point &, u16, const SpellBook::filter_t only, const HeroBase & hero);
+void SpellBookRedrawLists(const SpellStorage &, std::vector<Rect> &, const size_t, const Point &, u16, const u8 only, const HeroBase & hero);
 void SpellBookRedrawSpells(const SpellStorage &, std::vector<Rect> &, const size_t, s16, s16, const HeroBase & hero);
 void SpellBookRedrawMP(const Point &, u16);
 
@@ -53,16 +52,13 @@ bool SpellBookSortingSpell(const Spell & spell1, const Spell & spell2)
 	    (std::string(spell1.GetName()) < std::string(spell2.GetName())));
 }
 
-Spell SpellBook::Open(const HeroBase & hero, const filter_t filt, bool canselect) const
+Spell SpellBook::Open(const HeroBase & hero, const u8 filt, bool canselect) const
 {
     if(!hero.HaveSpellBook())
     {
 	Dialog::Message("", _("No spell to cast."), Font::BIG, Dialog::OK);
 	return Spell(Spell::NONE);
     }
-
-    SpellStorage spells2;
-    spells2.reserve(size());
 
     Display & display = Display::Get();
     Cursor & cursor = Cursor::Get();
@@ -73,8 +69,8 @@ Spell SpellBook::Open(const HeroBase & hero, const filter_t filt, bool canselect
     const Sprite & r_list = AGG::GetICN(ICN::BOOK, 0);
     const Sprite & l_list = AGG::GetICN(ICN::BOOK, 0, true);
 
-    filter_t filter = filt;
-    SpellBookSetFilter(hero.GetBagArtifacts(), *this, spells2, filter);
+    u8 filter = filt;
+    SpellStorage spells2 = SetFilter(filter, &hero);
 
     if(canselect && spells2.empty())
     {
@@ -151,7 +147,7 @@ Spell SpellBook::Open(const HeroBase & hero, const filter_t filt, bool canselect
 	{
 	    filter = ADVN;
 	    current_index = 0;
-	    SpellBookSetFilter(hero.GetBagArtifacts(), *this, spells2, filter);
+	    spells2 = SetFilter(filter, &hero);
 	    redraw = true;
 	}
 	else
@@ -159,7 +155,7 @@ Spell SpellBook::Open(const HeroBase & hero, const filter_t filt, bool canselect
 	{
 	    filter = CMBT;
 	    current_index = 0;
-	    SpellBookSetFilter(hero.GetBagArtifacts(), *this, spells2, filter);
+	    spells2 = SetFilter(filter, &hero);
 	    redraw = true;
 	}
 	else
@@ -168,7 +164,8 @@ Spell SpellBook::Open(const HeroBase & hero, const filter_t filt, bool canselect
 	else
 	if(le.MouseClickLeft(pos))
 	{
-	    std::vector<Rect>::const_iterator it = std::find_if(coords.begin(), coords.end(), std::bind2nd(RectIncludePoint(), le.GetMouseCursor()));
+	    std::vector<Rect>::const_iterator it = std::find_if(coords.begin(), coords.end(),
+							std::bind2nd(RectIncludePoint(), le.GetMouseCursor()));
 	    if(it != coords.end())
 	    {
 		SpellStorage::const_iterator spell = spells2.begin() + (it - coords.begin() + current_index);
@@ -244,16 +241,13 @@ void SpellBook::Edit(const HeroBase & hero)
     Display & display = Display::Get();
     Cursor & cursor = Cursor::Get();
 
-    SpellStorage spells2;
-    spells2.reserve(size());
-
     const Cursor::themes_t oldcursor = cursor.Themes();
 
     const Sprite & r_list = AGG::GetICN(ICN::BOOK, 0);
     const Sprite & l_list = AGG::GetICN(ICN::BOOK, 0, true);
 
     size_t current_index = 0;
-    SpellBookSetFilter(hero.GetBagArtifacts(), *this, spells2, SpellBook::ALL);
+    SpellStorage spells2 = SetFilter(SpellBook::ALL, &hero);
 
     cursor.Hide();
     cursor.SetThemes(Cursor::POINTER);
@@ -350,18 +344,30 @@ void SpellBook::Edit(const HeroBase & hero)
     display.Flip();
 }
 
-void SpellBookSetFilter(const BagArtifacts & bag, const SpellStorage & spells, SpellStorage & v, SpellBook::filter_t filter)
+SpellStorage SpellBook::SetFilter(u8 filter, const HeroBase* hero) const
 {
-    v = spells;
+    SpellStorage res(*this);
 
     // added heroes spell scrolls
-    v.Append(bag);
+    if(hero) res.Append(hero->GetBagArtifacts());
 
     if(filter != SpellBook::ALL)
     {
-	SpellStorage::iterator it = std::remove_if(v.begin(), v.end(), std::bind2nd(SpellFiltered(), filter));
-	if(v.end() != it) v.resize(it - v.begin());
+	res.resize(std::distance(res.begin(),
+		    std::remove_if(res.begin(), res.end(), std::bind2nd(SpellFiltered(), filter))));
     }
+
+    // check on water: disable portal spells
+    if(hero && hero->Modes(Heroes::SHIPMASTER))
+    {
+	SpellStorage::iterator itend = res.end();
+	itend = std::remove(res.begin(), itend, Spell(Spell::TOWNGATE));
+	itend = std::remove(res.begin(), itend, Spell(Spell::TOWNPORTAL));
+	if(res.end() != itend)
+	    res.resize(std::distance(res.begin(), itend));
+    }
+
+    return res;
 }
 
 void SpellBookRedrawMP(const Point & dst, u16 mp)
@@ -387,7 +393,7 @@ void SpellBookRedrawMP(const Point & dst, u16 mp)
     }
 }
 
-void SpellBookRedrawLists(const SpellStorage & spells, std::vector<Rect> & coords, const size_t cur, const Point & pt, u16 sp, const SpellBook::filter_t only, const HeroBase & hero)
+void SpellBookRedrawLists(const SpellStorage & spells, std::vector<Rect> & coords, const size_t cur, const Point & pt, u16 sp, const u8 only, const HeroBase & hero)
 {
     Display & display = Display::Get();
     bool small = Settings::Get().QVGA();

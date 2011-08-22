@@ -118,9 +118,9 @@ void HeroBase::EditSpellBook(void)
     spell_book.Edit(*this);
 }
 
-Spell HeroBase::OpenSpellBook(SpellBook::filter_t flt, bool canselect) const
+Spell HeroBase::OpenSpellBook(u8 filter, bool canselect) const
 {
-    return spell_book.Open(*this, flt, canselect);
+    return spell_book.Open(*this, filter, canselect);
 }
 
 bool HeroBase::HaveSpellBook(void) const

@@ -129,8 +129,8 @@ bool Heroes::ActionSpellCast(const Spell & spell)
 	case Spell::IDENTIFYHERO:	apply = ActionSpellIdentifyHero(*this); break;
 	case Spell::SUMMONBOAT:		apply = ActionSpellSummonBoat(*this); break;
 	case Spell::DIMENSIONDOOR:	apply = ActionSpellDimensionDoor(*this); break;
-	case Spell::TOWNGATE:		apply = ActionSpellTownGate(*this); break;
-	case Spell::TOWNPORTAL:		apply = ActionSpellTownPortal(*this); break;
+	case Spell::TOWNGATE:		apply = isShipMaster() ? false : ActionSpellTownGate(*this); break;
+	case Spell::TOWNPORTAL:		apply = isShipMaster() ? false : ActionSpellTownPortal(*this); break;
 	case Spell::VISIONS:		apply = ActionSpellVisions(*this); break;
 	case Spell::HAUNT:
 	case Spell::SETEGUARDIAN:

@@ -344,8 +344,6 @@ void RedrawPrimarySkillInfo(const Point & cur_pt, const Skill::Primary* p1, cons
 }
 
 // spell_book.cpp
-void SpellBookSetFilter(const BagArtifacts &, const SpellStorage &, SpellStorage &, SpellBook::filter_t);
-
 struct HeroesCanTeachSpell : std::binary_function<const HeroBase*, Spell, bool>
 {
     bool operator() (const HeroBase* hero, Spell spell) const { return hero->CanTeachSpell(spell); };
@@ -396,14 +394,9 @@ void Heroes::ScholarAction(Heroes & hero1, Heroes & hero2)
 	return;
     }
 
-    SpellStorage learn, teach;
-
-    learn.reserve(25);
-    teach.reserve(25);
-
-    // skip bag srtifacts
-    SpellBookSetFilter(BagArtifacts(), teacher->spell_book, teach, SpellBook::ALL);
-    SpellBookSetFilter(BagArtifacts(), learner->spell_book, learn, SpellBook::ALL);
+    // skip bag artifacts
+    SpellStorage teach = teacher->spell_book.SetFilter(SpellBook::ALL);
+    SpellStorage learn = learner->spell_book.SetFilter(SpellBook::ALL);
 
     // remove_if for learn spells
     if(learn.size())
