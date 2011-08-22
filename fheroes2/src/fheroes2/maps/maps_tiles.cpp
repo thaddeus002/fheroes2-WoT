@@ -331,6 +331,12 @@ bool Maps::TilesAddon::isArtesianSpring(const TilesAddon & ta)
 	    (ta.index == 3 || ta.index == 4));
 }
 
+bool Maps::TilesAddon::isSkeleton(const TilesAddon & ta)
+{
+    return (ICN::OBJNDSRT == MP2::GetICNObject(ta.object) &&
+	    (ta.index == 83 || ta.index == 84));
+}
+
 bool Maps::TilesAddon::isOasis(const TilesAddon & ta)
 {
     return (ICN::OBJNDSRT == MP2::GetICNObject(ta.object) &&
@@ -1188,6 +1194,10 @@ Maps::TilesAddon* Maps::Tiles::FindObject(u8 objs)
 	    it = std::find_if(addons_level1.begin(), addons_level1.end(), TilesAddon::isRandomMonster);
 	    break;
 
+	case MP2::OBJ_SKELETON:
+	    it = std::find_if(addons_level1.begin(), addons_level1.end(), TilesAddon::isSkeleton);
+	    break;
+
 	default: break;
     }
 
@@ -1317,6 +1327,10 @@ const Maps::TilesAddon* Maps::Tiles::FindObject(u8 objs) const
 	case MP2::OBJ_RNDMONSTER3:
 	case MP2::OBJ_RNDMONSTER4:
 	    it = std::find_if(addons_level1.begin(), addons_level1.end(), TilesAddon::isRandomMonster);
+	    break;
+
+	case MP2::OBJ_SKELETON:
+	    it = std::find_if(addons_level1.begin(), addons_level1.end(), TilesAddon::isSkeleton);
 	    break;
 
 	default: break;

@@ -79,6 +79,7 @@ namespace Maps
 	static bool isCastle(const TilesAddon &);
 	static bool isRandomCastle(const TilesAddon &);
 	static bool isRandomMonster(const TilesAddon &);
+	static bool isSkeleton(const TilesAddon &);
 	static bool isFlag32(const TilesAddon &);
 	static bool isX_LOC123(const TilesAddon &);
 	static bool isAbandoneMineSprite(const TilesAddon &);

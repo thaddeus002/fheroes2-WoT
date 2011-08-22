@@ -997,18 +997,17 @@ void ActionToSkeleton(Heroes &hero, const u8 obj, const s32 dst_index)
     Maps::Tiles & tile = world.GetTiles(dst_index);
 
     // artifact
-    if(tile.GetQuantity1() && 0 == tile.GetQuantity2())
+    if(tile.GetQuantity1())
     {
 	const Artifact art(tile.GetQuantity1());
-	if(hero.PickupArtifact(art))
+	if(art.isValid() && hero.PickupArtifact(art))
 	{
 	    PlayPickupSound();
 	    std::string message(_("You come upon the remains of an unfortunate adventurer.\nSearching through the tattered clothing, you find %{artifact}."));
 	    String::Replace(message, "%{artifact}", art.GetName());
 	    Dialog::ArtifactInfo("", message, art);
-	    tile.SetQuantity1(0);
-	    tile.SetQuantity2(0);
 	}
+	tile.ResetQuantity();
     }
     else
     {

@@ -931,7 +931,7 @@ void Heroes::SetVisitedWideTile(const s32 index, const u8 object, const Visit::t
     {
 	for(s32 ii = tile.GetIndex() - (wide - 1); ii <= tile.GetIndex() + (wide - 1); ++ii)
 	    if(Maps::isValidAbsIndex(ii) &&
-		world.GetTiles(ii).FindAddonLevel1(addon->uniq)) SetVisited(ii);
+		world.GetTiles(ii).FindAddonLevel1(addon->uniq)) SetVisited(ii, type);
     }
 }
 
