@@ -735,6 +735,8 @@ void AIToSkeleton(Heroes &hero, const u8 obj, const s32 dst_index)
 	}
     }
 
+    hero.SetVisitedWideTile(dst_index, obj, Visit::GLOBAL);
+
     DEBUG(DBG_AI, DBG_INFO, hero.GetName());
 }
 
@@ -1243,8 +1245,7 @@ void AIToPoorMoraleObject(Heroes &hero, const u8 obj, const s32 dst_index)
 void AIToPoorLuckObject(Heroes &hero, const u8 obj, const s32 dst_index)
 {
     Maps::Tiles & tile = world.GetTiles(dst_index);
-    const bool battle = tile.GetQuantity1();
-    bool complete = false;
+    const bool & battle = tile.OtherObjectsIsProtection();
 
     switch(obj)
     {
@@ -1261,15 +1262,16 @@ void AIToPoorLuckObject(Heroes &hero, const u8 obj, const s32 dst_index)
     		if(res.AttackerWins())
 		{
         	    hero.IncreaseExperience(res.GetExperienceAttacker());
-		    complete = true;
-		    const Spell spell(tile.GetQuantity1());
 		    // check magick book
 		    if(hero.HaveSpellBook() &&
 		    // check skill level for wisdom
 			Skill::Level::EXPERT == hero.GetLevelSkill(Skill::Secondary::WISDOM))
 		    {
-			hero.AppendSpellToBook(spell);
+			hero.AppendSpellToBook(Spell(tile.GetQuantity1()));
 		    }
+    		    // reset battle status
+		    tile.ResetQuantity();
+		    hero.SetVisited(dst_index, Visit::GLOBAL);
 		}
 		else
 		{
@@ -1281,16 +1283,10 @@ void AIToPoorLuckObject(Heroes &hero, const u8 obj, const s32 dst_index)
     	default: break;
     }
 
-    if(complete)
+    if(! battle)
     {
-	tile.SetQuantity1(0);
-	tile.SetQuantity2(0);
-    }
-    else
-    if(!battle && !hero.isVisited(obj))
-    {
-	// modify luck
-        hero.SetVisited(dst_index);
+	hero.SetVisited(dst_index, Visit::LOCAL);
+	hero.SetVisited(dst_index, Visit::GLOBAL);
     }
 
     DEBUG(DBG_AI, DBG_INFO, hero.GetName());

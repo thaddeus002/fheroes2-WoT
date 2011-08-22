@@ -907,10 +907,8 @@ void Heroes::SetVisited(const s32 index, const Visit::type_t type)
     if(Visit::GLOBAL == type)
 	world.GetKingdom(color).SetVisited(index, object);
     else
-    if(isVisited(tile))
-	return;
-    else
-    if(MP2::OBJ_ZERO != object) visit_object.push_front(IndexObject(index, object));
+    if(! isVisited(tile) && MP2::OBJ_ZERO != object)
+	visit_object.push_front(IndexObject(index, object));
 }
 
 void Heroes::SetVisitedWideTile(const s32 index, const u8 object, const Visit::type_t type)
@@ -921,6 +919,7 @@ void Heroes::SetVisitedWideTile(const s32 index, const u8 object, const Visit::t
 
     switch(object)
     {
+	case MP2::OBJ_SKELETON:
 	case MP2::OBJ_OASIS:
 	case MP2::OBJ_STANDINGSTONES:
 	case MP2::OBJ_ARTESIANSPRING:	wide = 2; break;

@@ -1001,7 +1001,7 @@ bool SecondarySkillBar::QueueEventProcessing(void)
 
 void StringAppendModifiers(std::string & str, s8 value)
 {
-    if(value < 0) str.append(" -");
+    if(value < 0) str.append(" "); // '-' present
     else
     if(value > 0) str.append(" +");
 

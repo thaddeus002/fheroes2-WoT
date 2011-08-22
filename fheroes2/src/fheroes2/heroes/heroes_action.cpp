@@ -432,7 +432,6 @@ void Heroes::Action(const s32 dst_index)
         case MP2::OBJ_IDOL:		ActionToGoodLuckObject(*this, object, dst_index); break;
 
 	case MP2::OBJ_PYRAMID:		ActionToPoorLuckObject(*this, object, dst_index); break;
-
         case MP2::OBJ_MAGICWELL: 	ActionToMagicWell(*this, object, dst_index); break;
         case MP2::OBJ_TRADINGPOST:	ActionToTradingPost(*this, object); break;
 
@@ -1017,7 +1016,7 @@ void ActionToSkeleton(Heroes &hero, const u8 obj, const s32 dst_index)
 	Dialog::Message("", _("You come upon the remains of an unfortunate adventurer.\nSearching through the tattered clothing, you find nothing."), Font::BIG, Dialog::OK);
     }
 
-    hero.SetVisited(dst_index, Visit::GLOBAL);
+    hero.SetVisitedWideTile(dst_index, obj, Visit::GLOBAL);
 
     DEBUG(DBG_GAME, DBG_INFO, hero.GetName());
 }
@@ -1267,8 +1266,7 @@ void ActionToGoodLuckObject(Heroes &hero, const u8 obj, const s32 dst_index)
 void ActionToPoorLuckObject(Heroes &hero, const u8 obj, const s32 dst_index)
 {
     Maps::Tiles & tile = world.GetTiles(dst_index);
-    const bool battle = tile.OtherObjectsIsProtection();
-    bool complete = false;
+    const bool & battle = tile.OtherObjectsIsProtection();
     std::string body;
 
     switch(obj)
@@ -1289,8 +1287,6 @@ void ActionToPoorLuckObject(Heroes &hero, const u8 obj, const s32 dst_index)
     			{
 			    PlaySoundSuccess;
         		    hero.IncreaseExperience(res.GetExperienceAttacker());
-			    complete = true;
-			    const Spell spell(tile.GetQuantity1());
 			    // check magick book
 			    if(!hero.HaveSpellBook())
 				Dialog::Message(MP2::StringObject(obj), _("Unfortunately, you have no Magic Book to record the spell with."), Font::BIG, Dialog::OK);
@@ -1300,9 +1296,13 @@ void ActionToPoorLuckObject(Heroes &hero, const u8 obj, const s32 dst_index)
 			    	Dialog::Message(MP2::StringObject(obj), _("Unfortunately, you do not have the wisdom to understand the spell, and you are unable to learn it."), Font::BIG, Dialog::OK);
 			    else
 			    {
+				const Spell spell(tile.GetQuantity1());
 				Dialog::SpellInfo(spell.GetName(), _("Upon defeating the monsters, you decipher an ancient glyph on the wall, telling the secret of the spell."), spell, true);
 				hero.AppendSpellToBook(spell);
 			    }
+			    // reset battle status
+			    tile.ResetQuantity();
+			    hero.SetVisited(dst_index, Visit::GLOBAL);
     			}
     			else
     			{
@@ -1317,18 +1317,15 @@ void ActionToPoorLuckObject(Heroes &hero, const u8 obj, const s32 dst_index)
     	default: return;
     }
 
-    if(complete)
-    {
-	tile.ResetQuantity();
-    }
-    else
-    if(!battle && !hero.isVisited(obj))
+
+    if(! battle)
     {
 	// modify luck
-        hero.SetVisited(dst_index);
-        hero.SetVisited(dst_index, Visit::GLOBAL);
 	AGG::PlaySound(M82::BADLUCK);
 	DialogLuck(MP2::StringObject(obj), body, false, 2);
+
+	hero.SetVisited(dst_index, Visit::LOCAL);
+	hero.SetVisited(dst_index, Visit::GLOBAL);
     }
 
     DEBUG(DBG_GAME, DBG_INFO, hero.GetName());
