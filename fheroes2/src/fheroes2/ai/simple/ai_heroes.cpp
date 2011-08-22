@@ -1057,8 +1057,11 @@ void AIToArtesianSpring(Heroes &hero, const u8 obj, const s32 dst_index)
     {
 	hero.SetSpellPoints(max * 2);
 
-        // fix double action tile
-	hero.SetVisitedWideTile(dst_index, obj);
+        if(Settings::Get().ExtWorldArtesianSpringSeparatelyVisit())
+            hero.SetVisited(dst_index, Visit::LOCAL);
+        else
+            // fix double action tile
+            hero.SetVisitedWideTile(dst_index, obj, Visit::LOCAL);
     }
 
     DEBUG(DBG_AI, DBG_INFO, hero.GetName());

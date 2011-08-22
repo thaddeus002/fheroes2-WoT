@@ -185,6 +185,7 @@ public:
 	HEROES_PATROL_ALLOW_PICKUP	= 0x28000000,
 
 	CASTLE_MAGEGUILD_POINTS_TURN	= 0x30000001,
+	WORLD_ARTSPRING_SEPARATELY_VISIT= 0x30000002,
 
 	BATTLE_ARCHMAGE_RESIST_BAD_SPELL= 0x40001000,
 	BATTLE_MAGIC_TROOP_RESIST	= 0x40002000,
@@ -303,6 +304,7 @@ public:
     bool ExtWorldBanWeekOf(void) const;
     bool ExtWorldNewVersionWeekOf(void) const;
     bool ExtWorldBanPlagues(void) const;
+    bool ExtWorldArtesianSpringSeparatelyVisit(void) const;
     bool ExtCastleAllowFlash(void) const;
     bool ExtCastleGuildRestorePointsTurn(void) const;
     bool ExtBattleShowDamage(void) const;

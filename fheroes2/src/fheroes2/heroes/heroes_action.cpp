@@ -2529,8 +2529,11 @@ void ActionToArtesianSpring(Heroes &hero, const u8 obj, const s32 dst_index)
 	hero.SetSpellPoints(max * 2);
 	Dialog::Message(name, _("A drink from the spring fills your blood with magic! You have twice your normal spell points in reserve."), Font::BIG, Dialog::OK);
 
-	// fix double action tile
-	hero.SetVisitedWideTile(dst_index, obj);
+	if(Settings::Get().ExtWorldArtesianSpringSeparatelyVisit())
+	    hero.SetVisited(dst_index, Visit::LOCAL);
+	else
+	    // fix double action tile
+	    hero.SetVisitedWideTile(dst_index, obj, Visit::LOCAL);
     }
 
     DEBUG(DBG_GAME, DBG_INFO, hero.GetName());
