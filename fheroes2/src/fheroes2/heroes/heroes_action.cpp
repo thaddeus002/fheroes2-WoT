@@ -2019,7 +2019,7 @@ void ActionToAncientLamp(Heroes &hero, const u8 obj, const s32 dst_index)
 
 void ActionToTeleports(Heroes &hero, const s32 index_from)
 {
-    s32 index_to = world.NextTeleport(index_from);
+    s32 index_to = world.NextTeleport(index_from, hero.isShipMaster());
     hero.ApplyPenaltyMovement();
 
     if(index_from == index_to)

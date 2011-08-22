@@ -857,7 +857,7 @@ void AIToMagellanMaps(Heroes &hero, const u8 obj, const s32 dst_index)
 
 void AIToTeleports(Heroes &hero, const s32 index_from)
 {
-    u16 index_to = world.NextTeleport(index_from);
+    u16 index_to = world.NextTeleport(index_from, hero.isShipMaster());
     hero.ApplyPenaltyMovement();
 
     if(index_from == index_to)

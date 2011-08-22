@@ -1093,11 +1093,21 @@ const std::string & World::GetRumors(void)
     return *Rand::Get(vec_rumors);
 }
 
+bool TeleportCheckType(s32 index, u8 type)
+{
+    return world.GetTiles(index).GetQuantity1() == type;
+}
+
+bool TeleportCheckGround(s32 index, bool water)
+{
+    return Maps::Ground::WATER == world.GetTiles(index).GetGround() ? water : !water;
+}
+
 /* return random teleport destination */
-s32 World::NextTeleport(const s32 index) const
+s32 World::NextTeleport(const s32 index, bool onwater) const
 {
     std::vector<s32> vec_teleports;
-    
+
     vec_teleports.reserve(10);
     GetObjectPositions(MP2::OBJ_STONELIGHTS, vec_teleports, true);
 
@@ -1107,19 +1117,24 @@ s32 World::NextTeleport(const s32 index) const
 	return index;
     }
 
-    const u8 type = GetTiles(index).GetQuantity1();
+    std::vector<s32>::iterator itend = vec_teleports.end();
 
-    std::vector<s32> v;
-    v.reserve(vec_teleports.size());
+    // remove if not type
+    itend = std::remove_if(vec_teleports.begin(), itend,
+		    std::not1(std::bind2nd(std::ptr_fun(&TeleportCheckType), GetTiles(index).GetQuantity1())));
 
-    for(std::vector<s32>::const_iterator
-	it = vec_teleports.begin(); it != vec_teleports.end(); ++it)
-	if(type == GetTiles(*it).GetQuantity1() && index != *it)
-	    v.push_back(*it);
+    // remove if index
+    itend = std::remove(vec_teleports.begin(), itend, index);
 
-    if(v.empty()) DEBUG(DBG_GAME , DBG_WARN, "not found");
+    // remove if not ground
+    itend = std::remove_if(vec_teleports.begin(), itend,
+		    std::not1(std::bind2nd(std::ptr_fun(&TeleportCheckGround), onwater)));
 
-    return v.size() ? *Rand::Get(v) : index;
+    vec_teleports.resize(std::distance(vec_teleports.begin(), itend));
+
+    if(vec_teleports.empty()) DEBUG(DBG_GAME , DBG_WARN, "not found");
+
+    return vec_teleports.size() ? *Rand::Get(vec_teleports) : index;
 }
 
 /* return random whirlpools destination */

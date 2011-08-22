@@ -116,7 +116,7 @@ public:
 
     const std::string & GetRumors(void);
     
-    s32 NextTeleport(const s32 index) const;
+    s32 NextTeleport(const s32 index, bool onwater) const;
     s32 NextWhirlpool(const s32 index);
 
     const std::string & MessageSign(const s32 index);
