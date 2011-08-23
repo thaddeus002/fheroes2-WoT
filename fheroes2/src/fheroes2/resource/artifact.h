@@ -210,6 +210,7 @@ struct BagArtifacts : std::vector<Artifact>
     void  RemoveScroll(const Artifact &);
 
     u8   CountArtifacts(void) const;
+    u8   Count(const Artifact &) const;
 
     std::string String(void) const;
 };

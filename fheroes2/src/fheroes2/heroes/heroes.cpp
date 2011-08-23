@@ -748,32 +748,25 @@ bool Heroes::Recruit(const Castle & castle)
 
 void Heroes::ActionNewDay(void)
 {
-    // increase resource
     Funds resource;
 
-    // skip incomes for first day
-    if(HasArtifact(Artifact::GOLDEN_GOOSE))           resource += ProfitConditions::FromArtifact(Artifact::GOLDEN_GOOSE);
-    if(HasArtifact(Artifact::ENDLESS_SACK_GOLD))      resource += ProfitConditions::FromArtifact(Artifact::ENDLESS_SACK_GOLD);
-    if(HasArtifact(Artifact::ENDLESS_BAG_GOLD))       resource += ProfitConditions::FromArtifact(Artifact::ENDLESS_BAG_GOLD);
-    if(HasArtifact(Artifact::ENDLESS_PURSE_GOLD))     resource += ProfitConditions::FromArtifact(Artifact::ENDLESS_PURSE_GOLD);
-    if(HasArtifact(Artifact::ENDLESS_POUCH_SULFUR))   resource += ProfitConditions::FromArtifact(Artifact::ENDLESS_POUCH_SULFUR);
-    if(HasArtifact(Artifact::ENDLESS_VIAL_MERCURY))   resource += ProfitConditions::FromArtifact(Artifact::ENDLESS_VIAL_MERCURY);
-    if(HasArtifact(Artifact::ENDLESS_POUCH_GEMS))     resource += ProfitConditions::FromArtifact(Artifact::ENDLESS_POUCH_GEMS);
-    if(HasArtifact(Artifact::ENDLESS_CORD_WOOD))      resource += ProfitConditions::FromArtifact(Artifact::ENDLESS_CORD_WOOD);
-    if(HasArtifact(Artifact::ENDLESS_CART_ORE))       resource += ProfitConditions::FromArtifact(Artifact::ENDLESS_CART_ORE);
-    if(HasArtifact(Artifact::ENDLESS_POUCH_CRYSTAL))  resource += ProfitConditions::FromArtifact(Artifact::ENDLESS_POUCH_CRYSTAL);
+    // find artifacts                                                                                 
+    const u8 artifacts[] = { Artifact::GOLDEN_GOOSE, Artifact::ENDLESS_SACK_GOLD, Artifact::ENDLESS_BAG_GOLD,
+                Artifact::ENDLESS_PURSE_GOLD, Artifact::ENDLESS_POUCH_SULFUR, Artifact::ENDLESS_VIAL_MERCURY,
+                Artifact::ENDLESS_POUCH_GEMS, Artifact::ENDLESS_CORD_WOOD, Artifact::ENDLESS_CART_ORE,
+                Artifact::ENDLESS_POUCH_CRYSTAL, Artifact::UNKNOWN };
+
+    for(u8 index = 0; artifacts[index] != Artifact::UNKNOWN; ++index)
+        resource += ProfitConditions::FromArtifact(artifacts[index]) * bag_artifacts.Count(Artifact(artifacts[index]));
+
+    // TAX_LIEN
+    resource -= ProfitConditions::FromArtifact(Artifact::TAX_LIEN) * bag_artifacts.Count(Artifact(Artifact::TAX_LIEN));
 
     // estates skill bonus
     resource.gold += GetSecondaryValues(Skill::Secondary::ESTATES);
 
     // added
     if(resource.GetValidItems()) world.GetKingdom(GetColor()).AddFundsResource(resource);
-
-    if(HasArtifact(Artifact::TAX_LIEN))
-    {
-	resource = ProfitConditions::FromArtifact(Artifact::TAX_LIEN);
-	world.GetKingdom(GetColor()).OddFundsResource(resource);
-    }
 
     // recovery move points
     move_point = GetMaxMovePoints();

@@ -169,13 +169,12 @@ void Kingdom::ActionNewDay(void)
 	std::for_each(heroes.begin(), heroes.end(), std::mem_fun(&Heroes::ActionNewDay));
 
 	// captured object
-	resource += ProfitConditions::FromMine(Resource::WOOD) * world.CountCapturedObject(MP2::OBJ_SAWMILL, color);
-	resource += ProfitConditions::FromMine(Resource::ORE) * world.CountCapturedMines(Resource::ORE, color);
-	resource += ProfitConditions::FromMine(Resource::MERCURY) * world.CountCapturedObject(MP2::OBJ_ALCHEMYLAB, color);
-	resource += ProfitConditions::FromMine(Resource::SULFUR) * world.CountCapturedMines(Resource::SULFUR, color);
-	resource += ProfitConditions::FromMine(Resource::CRYSTAL) * world.CountCapturedMines(Resource::CRYSTAL, color);
-	resource += ProfitConditions::FromMine(Resource::GEMS) * world.CountCapturedMines(Resource::GEMS, color);
-	resource += ProfitConditions::FromMine(Resource::GOLD) * world.CountCapturedMines(Resource::GOLD, color);
+	const u8 resources[] = { Resource::WOOD, Resource::ORE, Resource::MERCURY, Resource::SULFUR,
+				    Resource::CRYSTAL, Resource::GEMS, Resource::GOLD, Resource::UNKNOWN };
+
+	for(u8 index = 0; resources[index] != Resource::UNKNOWN; ++index)
+	    resource += ProfitConditions::FromMine(resources[index]) *
+				world.CountCapturedMines(resources[index], color);
 
 	// funds
 	for(KingdomCastles::const_iterator
@@ -510,12 +509,6 @@ u32 Kingdom::GetIncome(void)
     Funds resource;
 
     // captured object
-    //resource += ProfitConditions::FromMine(Resource::WOOD) * world.CountCapturedObject(MP2::OBJ_SAWMILL, color);
-    //resource += ProfitConditions::FromMine(Resource::ORE) * world.CountCapturedMines(Resource::ORE, color);
-    //resource += ProfitConditions::FromMine(Resource::MERCURY) * world.CountCapturedObject(MP2::OBJ_ALCHEMYLAB, color);
-    //resource += ProfitConditions::FromMine(Resource::SULFUR) * world.CountCapturedMines(Resource::SULFUR, color);
-    //resource += ProfitConditions::FromMine(Resource::CRYSTAL) * world.CountCapturedMines(Resource::CRYSTAL, color);
-    //resource += ProfitConditions::FromMine(Resource::GEMS) * world.CountCapturedMines(Resource::GEMS, color);
     resource += ProfitConditions::FromMine(Resource::GOLD) * world.CountCapturedMines(Resource::GOLD, color);
 
     for(KingdomCastles::const_iterator
@@ -535,25 +528,26 @@ u32 Kingdom::GetIncome(void)
                 resource += ProfitConditions::FromBuilding(BUILD_SPEC, Race::WRLK);
     }
 
+    // find artifacts                                                                                            
+    const u8 artifacts[] = { Artifact::GOLDEN_GOOSE, Artifact::ENDLESS_SACK_GOLD, Artifact::ENDLESS_BAG_GOLD,
+                Artifact::ENDLESS_PURSE_GOLD, Artifact::UNKNOWN };
+
+    for(u8 index = 0; artifacts[index] != Artifact::UNKNOWN; ++index)
+	for(KingdomHeroes::const_iterator
+	    ith = heroes.begin(); ith != heroes.end(); ++ith)
+    	    resource += ProfitConditions::FromArtifact(artifacts[index]) * 
+		    (**ith).GetBagArtifacts().Count(Artifact(artifacts[index]));
+
+    // TAX_LIEN
     for(KingdomHeroes::const_iterator
 	ith = heroes.begin(); ith != heroes.end(); ++ith)
-    {
-	if((**ith).HasArtifact(Artifact::GOLDEN_GOOSE))           resource += ProfitConditions::FromArtifact(Artifact::GOLDEN_GOOSE);
-        if((**ith).HasArtifact(Artifact::ENDLESS_SACK_GOLD))      resource += ProfitConditions::FromArtifact(Artifact::ENDLESS_SACK_GOLD);
-	if((**ith).HasArtifact(Artifact::ENDLESS_BAG_GOLD))       resource += ProfitConditions::FromArtifact(Artifact::ENDLESS_BAG_GOLD);
-        if((**ith).HasArtifact(Artifact::ENDLESS_PURSE_GOLD))     resource += ProfitConditions::FromArtifact(Artifact::ENDLESS_PURSE_GOLD);
-	//if((**ith).HasArtifact(Artifact::ENDLESS_POUCH_SULFUR))   resource += ProfitConditions::FromArtifact(Artifact::ENDLESS_POUCH_SULFUR);
-	//if((**ith).HasArtifact(Artifact::ENDLESS_VIAL_MERCURY))   resource += ProfitConditions::FromArtifact(Artifact::ENDLESS_VIAL_MERCURY);
-	//if((**ith).HasArtifact(Artifact::ENDLESS_POUCH_GEMS))     resource += ProfitConditions::FromArtifact(Artifact::ENDLESS_POUCH_GEMS);
-	//if((**ith).HasArtifact(Artifact::ENDLESS_CORD_WOOD))      resource += ProfitConditions::FromArtifact(Artifact::ENDLESS_CORD_WOOD);
-	//if((**ith).HasArtifact(Artifact::ENDLESS_CART_ORE))       resource += ProfitConditions::FromArtifact(Artifact::ENDLESS_CART_ORE);
-	//if((**ith).HasArtifact(Artifact::ENDLESS_POUCH_CRYSTAL))  resource += ProfitConditions::FromArtifact(Artifact::ENDLESS_POUCH_CRYSTAL);
+    	resource -= ProfitConditions::FromArtifact(Artifact::TAX_LIEN) * 
+		    (**ith).GetBagArtifacts().Count(Artifact(Artifact::TAX_LIEN));
 
-	// estates skill bonus
+    // estates skill bonus
+    for(KingdomHeroes::const_iterator
+	ith = heroes.begin(); ith != heroes.end(); ++ith)
 	resource.gold += (**ith).GetSecondaryValues(Skill::Secondary::ESTATES);
-
-	if((**ith).HasArtifact(Artifact::TAX_LIEN)) resource.gold -= 250;
-    }
 
     return resource.gold;
 }

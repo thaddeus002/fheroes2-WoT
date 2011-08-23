@@ -1201,6 +1201,13 @@ u16 World::CountCapturedObject(const MP2::object_t obj, const Color::color_t col
 /* return count captured mines */
 u16 World::CountCapturedMines(const u8 res, const Color::color_t col) const
 {
+    switch(res)
+    {
+	case Resource::WOOD:	return CountCapturedObject(MP2::OBJ_SAWMILL, col);
+	case Resource::MERCURY:	return CountCapturedObject(MP2::OBJ_ALCHEMYLAB, col);
+	default: break;
+    }
+
     u16 result = 0;
 
     const ObjectColor objcol1(MP2::OBJ_MINES, col);

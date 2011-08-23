@@ -695,3 +695,8 @@ std::string BagArtifacts::String(void) const
 
     return os.str();
 }
+
+u8 BagArtifacts::Count(const Artifact & art) const
+{
+    return std::count(begin(), end(), art);
+}
