@@ -785,9 +785,14 @@ void Dialog::QuickInfo(const Heroes & hero)
     cur_rt = Rect(back.GetRect().x + 28 , back.GetRect().y + 10, 146, 144);
     Point dst_pt;
     Text text;
+    std::string message;
 
     // heroes name
-    text.Set(hero.GetName(), Font::SMALL);
+    message = _("%{name} ( Level %{level} )");
+    String::Replace(message, "%{name}", hero.GetName());
+    String::Replace(message, "%{race}", Race::String(hero.GetRace()));
+    String::Replace(message, "%{level}", hero.GetLevel());
+    text.Set(message, Font::SMALL);
     dst_pt.x = cur_rt.x + (cur_rt.w - text.w()) / 2;
     dst_pt.y = cur_rt.y;
     text.Blit(dst_pt);
@@ -820,7 +825,6 @@ void Dialog::QuickInfo(const Heroes & hero)
     const Sprite & r_flag = AGG::GetICN(ICN::FLAG32, index + 1);
     dst_pt.x = cur_rt.x + (cur_rt.w + 40) / 2;
     display.Blit(r_flag, dst_pt);
-    std::string message;
 
     // attack
     message = _("Attack");
