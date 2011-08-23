@@ -88,12 +88,23 @@ void RedrawHeroesIcon(const Heroes & hero, s16 sx, s16 sy)
     display.FillRect(blue, Rect(sx + barw + port.w() + 2, sy, barw, ICONS_HEIGHT));
     display.Blit(mana, sx + barw + port.w() + 2, sy + mana.y());
 
+    u8 oy = 0;
+
     // heroes marker
-    if(hero.Modes(Heroes::SLEEPER))
-        display.Blit(AGG::GetICN(ICN::MISC4, 14), sx + 36, sy - 2);
+    if(hero.Modes(Heroes::SHIPMASTER))
+    {
+        display.Blit(AGG::GetICN(ICN::BOAT12, 0), sx + 35, sy - 1);
+	oy = AGG::GetICN(ICN::BOAT12, 0).h();
+    }
     else
     if(hero.Modes(Heroes::GUARDIAN))
+    {
         display.Blit(AGG::GetICN(ICN::MISC6, 11), sx + 38, sy);
+	oy = AGG::GetICN(ICN::MISC6, 11).h();
+    }
+
+    if(hero.Modes(Heroes::SLEEPER))
+        display.Blit(AGG::GetICN(ICN::MISC4, 14), sx + 36, sy - 2 + oy);
 }
 
 void Interface::IconsBar::RedrawBackground(const Point & pos)

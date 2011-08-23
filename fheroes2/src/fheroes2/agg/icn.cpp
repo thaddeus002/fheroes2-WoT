@@ -921,6 +921,7 @@ namespace ICN
 	{ BUYMAX,       "MANUAL.ICN" },
 	{ BTNCONFIG,    "MANUAL.ICN" },
 	{ BTNBATTLEONLY,"MANUAL.ICN" },
+	{ BOAT12,       "MANUAL.ICN" },
 
 	{ UNKNOWN,	"UNKNOWN.ICN" },
     };
@@ -1901,6 +1902,7 @@ bool ICN::isModifiedSprite(const ICN::icn_t icn)
 	case BUYMAX:
 	case BTNCONFIG:
 	case BTNBATTLEONLY:
+	case BOAT12:
 	    return true;
 
 	default: break;

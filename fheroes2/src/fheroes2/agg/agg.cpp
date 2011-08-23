@@ -296,6 +296,7 @@ void AGG::Cache::LoadExtICN(icn_cache_t & v, const ICN::icn_t icn, const u16 ind
 	case ICN::BUYMAX:
 	case ICN::BTNBATTLEONLY:
 	case ICN::BTNCONFIG:  count = 2; break;
+	case ICN::BOAT12:  count = 1; break;
 
 	default: break;
     }
@@ -385,6 +386,15 @@ void AGG::Cache::LoadExtICN(icn_cache_t & v, const ICN::icn_t icn, const u16 ind
 	}
 	break;
 
+	case ICN::BOAT12:
+	if(index < count)
+	{
+	    Sprite & sprite = reflect ? v.reflect[index] : v.sprites[index];
+	    LoadOrgICN(sprite, ICN::ADVMCO, 28 + index, false);
+	    Surface dst;
+	    Surface::ScaleMinifyByTwo(dst, sprite);
+	    Surface::Swap(sprite, dst);
+	}
 	default: break;
     }
 
