@@ -1,6 +1,24 @@
-latest (2454 rev.)
+latest (2476 rev.)
 
++ Added: option: Artesian Springs have two separately visitable squares (h3 ver)"
++ Added: option: Higher Mage Guilds Regenerate More Spell Points/turn
++ Added: engine: external sprite load for tiles (xml)
++ Update: pot file
++ Update: heroes: add shipmaster marker to icons
++ Update: heroes: quick info: show luck/morale
++ Update: heroes: quick info: show level
 + Update: alternative fonts
++ Fixed: heroes: resource Artifacts income bonus
++ Fixed: heroes: cast spell TownGate/Portal on water
++ Fixed: Heroes::ActionToSkeleton, fixed Heroes::SetVisitedWideTile
++ Fixed: heroes: visit status for ActionToPoorLuckObject - Pyramid, fixed: ActionToSkeleton visited
++ Fixed: world: MP2::IsWaterObject add LoyaltyVersion check
++ Fixed: world: teleport check on water status (LoyaltyVersion)
++ Fixed: heroes: ActionToCoast
++ Fixed: unions: disable battle
++ Fixed: world: teleport with battle crash, fixed default action key + check move point
++ Fixed: heroes: check max move points for digging
++ Fixed: world: get count info from objects with scoute ability
 + Fixed: world: add action for busy teleport (battle or meeting)
 + Fixed: AI: recruit hero and check castle
 + Fixed: custom portrait, +level up
