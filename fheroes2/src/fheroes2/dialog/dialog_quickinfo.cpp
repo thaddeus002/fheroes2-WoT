@@ -736,6 +736,7 @@ void Dialog::QuickInfo(const Castle & castle)
 void Dialog::QuickInfo(const Heroes & hero)
 {
     Display & display = Display::Get();
+    const Settings & conf = Settings::Get();
 
     Cursor & cursor = Cursor::Get();
     cursor.Hide();
@@ -800,8 +801,40 @@ void Dialog::QuickInfo(const Heroes & hero)
     // mini port heroes
     const Surface & port = hero.GetPortrait30x22();
     dst_pt.x = cur_rt.x + (cur_rt.w - port.w()) / 2;
-    dst_pt.y += 13;
+    dst_pt.y = cur_rt.y + 13;
     display.Blit(port, dst_pt);
+
+    // luck
+    if(conf.MyColor() == hero.GetColor())
+    {
+	const s8 luck = hero.GetLuckWithModificators(NULL);
+	const Sprite & sprite = AGG::GetICN(ICN::MINILKMR, (0 > luck ? 0 : (0 < luck ? 1 : 2)));
+	u8 count = (0 == luck ? 1 : static_cast<u8>(std::abs(luck)));
+	dst_pt.x = cur_rt.x + 120;
+	dst_pt.y = cur_rt.y + (count == 1 ? 20 : 13);
+
+	while(count--)
+	{
+    	    display.Blit(sprite, dst_pt.x, dst_pt.y);
+    	    dst_pt.y += sprite.h() - 1;
+	}
+    }
+
+    // morale
+    if(conf.MyColor() == hero.GetColor())
+    {
+	const s8 morale = hero.GetMoraleWithModificators(NULL);
+	const Sprite & sprite = AGG::GetICN(ICN::MINILKMR, (0 > morale ? 3 : (0 < morale ? 4 : 5)));
+	u8 count = (0 == morale ? 1 : static_cast<u8>(std::abs(morale)));
+	dst_pt.x = cur_rt.x + 10;
+	dst_pt.y = cur_rt.y + (count == 1 ? 20 : 13);
+
+	while(count--)
+	{
+    	    display.Blit(sprite, dst_pt.x, dst_pt.y);
+    	    dst_pt.y += sprite.h() - 1;
+	}
+    }
 
     // color flags
     u8 index = 0;
@@ -817,6 +850,8 @@ void Dialog::QuickInfo(const Heroes & hero)
 	case Color::NONE:	index = 12; break;
 	default: break;
     }
+
+    dst_pt.y = cur_rt.y + 13;
 
     const Sprite & l_flag = AGG::GetICN(ICN::FLAG32, index);
     dst_pt.x = cur_rt.x + (cur_rt.w - 40) / 2 - l_flag.w();
@@ -917,7 +952,6 @@ void Dialog::QuickInfo(const Heroes & hero)
     text.Blit(dst_pt);
 
     // draw monster sprite in one string
-    const Settings & conf = Settings::Get();
     bool hide_count = conf.MyColor() != hero.GetColor() && !conf.IsUnions(conf.MyColor(), hero.GetColor());
 
     const Heroes* from_hero = Game::Focus::HEROES == Game::Focus::Get().Type() ?
