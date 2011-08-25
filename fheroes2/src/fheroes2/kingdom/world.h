@@ -108,7 +108,7 @@ public:
     bool LastDay(void) const{ return (0 == (day % DAYOFWEEK)); }
     bool LastWeek(void) const{ return (0 == (week % WEEKOFMONTH)); }
     const Week & GetWeekType(void) const{ return week_current; }
-    void DateDump(void) const;
+    std::string DateString(void) const;
 
     void NewDay(void);
     void NewWeek(void);

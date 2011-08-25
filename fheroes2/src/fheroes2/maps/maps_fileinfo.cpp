@@ -484,13 +484,17 @@ bool Maps::FileInfo::isMultiPlayerMap(void) const
     return 1 < Color::Count(HumanOnlyColors());
 }
 
-void Maps::FileInfo::Dump(void) const
+std::string Maps::FileInfo::String(void) const
 {
-    VERBOSE("Maps::FileInfo::Dump: " << "file: " << file << ", name: " << name << ", kingdom colors: " << static_cast<int>(kingdom_colors) << \
+    std::ostringstream os;
+
+    os << "file: " << file << ", name: " << name << ", kingdom colors: " << static_cast<int>(kingdom_colors) << \
 	", allow human colors: " << static_cast<int>(allow_human_colors) << ", allow comp colors: " << static_cast<int>(allow_comp_colors) << ", rnd races: " << \
 	static_cast<int>(rnd_races) << ", conditions wins: " << static_cast<int>(conditions_wins) << ", wins1: " << static_cast<int>(wins1) << \
 	", wins2: " << static_cast<int>(wins2) << ", wins3: " << wins3 << ", wins4: " << wins4 << ", conditions loss: " << static_cast<int>(conditions_loss) << \
-        ", loss1: " << loss1 << ", loss2: " << loss2);
+        ", loss1: " << loss1 << ", loss2: " << loss2;
+
+    return os.str();
 }
 
 bool PrepareMapsFileInfoList(MapsFileInfoList & lists, bool multi)

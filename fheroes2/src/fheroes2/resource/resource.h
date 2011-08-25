@@ -64,7 +64,7 @@ struct Funds
 
 	u8 GetValidItems(void) const;
 	void Reset(void);
-	std::string Dump(void) const;
+	std::string String(void) const;
 
         s32 wood;
         s32 mercury;

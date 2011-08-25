@@ -127,7 +127,7 @@ namespace Army
 	    void	UpgradeTroops(const Castle &);
 	    void	ArrangeForBattle(void);
 
-	    void	Dump(const char* prefix = NULL) const;
+	    std::string String(void) const;
 
 	    const HeroBase* GetCommander(void) const;
 	    HeroBase*       GetCommander(void);

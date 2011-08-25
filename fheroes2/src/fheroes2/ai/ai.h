@@ -44,7 +44,7 @@ struct AI
     static void BattleMagicTurn(Battle2::Arena &, const Battle2::Stats &, Battle2::Actions &, const Battle2::Stats*);
     static void HeroesAction(Heroes &, s32);
     static void HeroesLevelUp(Heroes &);
-    static void HeroesDumpInfo(const Heroes &);
+    static std::string HeroesString(const Heroes &);
 
     static void CastlePreBattle(Castle &);
     static void CastleAfterBattle(Castle &, bool attacker_wins);

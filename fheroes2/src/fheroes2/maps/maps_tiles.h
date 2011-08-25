@@ -50,7 +50,7 @@ namespace Maps
 	bool isRoad(u16) const;
 	bool isICN(u16) const;
 
-	void DebugInfo(int level) const;
+	std::string String(int level) const;
 
 	static bool isStream(const TilesAddon &);
 
@@ -170,7 +170,7 @@ namespace Maps
 	void Remove(u32 uniq);
 	void RemoveObjectSprite(void);
 
-	void DebugInfo(void) const;
+	std::string String(void) const;
 	
 	bool isFog(u8 color) const;
 	void SetFog(u8 color);

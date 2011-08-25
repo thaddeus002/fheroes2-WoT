@@ -195,7 +195,8 @@ Game::menu_t Game::StartGame(void)
 	    if(!kingdom.isPlay() ||
 	    (skip_turns && *color != conf.MyColor())) continue;
 
-	    if(IS_DEBUG(DBG_GAME, DBG_INFO)) kingdom.Dump();
+	    DEBUG(DBG_GAME, DBG_INFO, std::endl << world.DateString() << ", " << "color: " <<
+		    Color::String(*color) << ", resource: " << kingdom.GetFunds().String());
 
 	    radar.SetHide(true);
 	    I.SetRedraw(REDRAW_RADAR);
@@ -664,7 +665,7 @@ void Game::ShowPathOrStartMoveHero(Heroes *hero, const s32 dst_index)
         
         hero->SetMove(false);
 	path.Calculate(dst_index);
-        if(IS_DEBUG(DBG_GAME, DBG_TRACE)) path.DumpPath();
+        DEBUG(DBG_GAME, DBG_TRACE, hero->GetName() << ", route: " << path.String());
 	I.SetRedraw(REDRAW_GAMEAREA);
 	cursor.SetThemes(Game::GetCursor(dst_index));
     }
@@ -1238,7 +1239,7 @@ void Game::MouseCursorAreaPressRight(s32 index_maps)
 	Settings & conf = Settings::Get();
 	Maps::Tiles & tile = world.GetTiles(index_maps);
 
-	if(IS_DEVEL()) tile.DebugInfo();
+	DEBUG(DBG_DEVEL, DBG_INFO, std::endl << tile.String());
 
 	if(!IS_DEVEL() && tile.isFog(conf.MyColor()))
 	    Dialog::QuickInfo(tile);

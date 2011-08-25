@@ -191,7 +191,7 @@ int main(int argc, char **argv)
 		return EXIT_FAILURE;
 	    }
 
-            if(IS_DEBUG(DBG_GAME, DBG_INFO)) conf.Dump();
+            DEBUG(DBG_GAME, DBG_INFO, conf.String());
 
             // load palette
 	    cache.LoadPAL();
@@ -265,7 +265,7 @@ int main(int argc, char **argv)
 #ifdef WITH_NET
             if(conf.GameType(Game::TYPE_NETWORK)) FH2LocalClient::Get().Logout("internal error");
 #endif
-	    conf.Dump();
+	    VERBOSE(std::endl << conf.String());
 	}
 #endif
 	return EXIT_SUCCESS;

@@ -171,7 +171,7 @@ void Battle2::Cell::SetEnemyQuality(const Stats & attaker)
     {
 	// strength monster quality
 	quality = attaker.GetScoreQuality(*defender);
-	DEBUG(DBG_BATTLE, DBG_TRACE, quality << " for " << defender->Info());
+	DEBUG(DBG_BATTLE, DBG_TRACE, quality << " for " << defender->String());
     }
 }
 

@@ -236,8 +236,9 @@ void FH2RemoteClients::SetNewAdmin(u32 old_rid)
 void FH2RemoteClients::Dump(void) const
 {
     mutexClients.Lock();
-    std::for_each(clients.begin(), clients.end(),
-		std::mem_fun_ref(&FH2RemoteClient::Dump));
+    for(std::vector<FH2RemoteClient>::const_iterator
+	it = clients.begin(); it != clients.end(); ++it)
+	VERBOSE((*it).String());
     mutexClients.Unlock();
 }
 
@@ -302,8 +303,7 @@ int FH2RemoteClient::Main(void)
 	    server.SendUpdatePlayers(msg, player_id);
 	}
 
-	if(IS_DEBUG(DBG_NETWORK, DBG_INFO)) Dump();
-	
+	DEBUG(DBG_NETWORK, DBG_INFO, String());
 	DEBUG(DBG_NETWORK, DBG_INFO, "start queue");
 
 	while(! Modes(ST_SHUTDOWN))
@@ -508,26 +508,29 @@ void FH2RemoteClient::Reset(void)
     DEBUG(DBG_NETWORK, DBG_TRACE, "reset modes");
 }
 
-void FH2RemoteClient::Dump(void) const
+std::string FH2RemoteClient::String(void) const
 {
-    VERBOSN("FH2RemoteClient::" <<
-	" " << "Player(" <<
+    std::ostringstream os;
+
+    os << "Player(" <<
 	"id: " << "0x" << std::hex << player_id << ", " <<
 	"color: " << std::dec << static_cast<int>(player_color) << ", " <<
 	"race: " << static_cast<int>(player_race) << ", " <<
 	"name: " << player_name << "), " <<
 	"Modes(" << "0x" << std::hex << modes << "), " <<
-	"Socket(");
+	"Socket(";
 
     if(Network::Socket::IsValid())
     {
-    	VERBOSN("host: " << "0x" << Host() << ", " << "port: " << "0x" << Port());
+    	os << "host: " << "0x" << Host() << ", " << "port: " << "0x" << Port();
     }
     else
     {
-    	VERBOSN("false"); 
+    	os << "false";
     }
-    VERBOSE("), " << "Thread(0x" << thread.GetID() << ")" << std::dec);
+
+    os << "), " << "Thread(0x" << thread.GetID() << ")" << std::dec << std::endl;
+    return os.str();
 }
 
 #endif

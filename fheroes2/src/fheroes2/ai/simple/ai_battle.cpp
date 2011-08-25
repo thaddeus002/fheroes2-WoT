@@ -194,10 +194,8 @@ void AI::BattleTurn(Arena & arena, const Stats & b, Actions & a)
 	if(attack) a.AddedAttackAction(b, *enemy, enemy->GetPosition(), 0);
     }
     else
-    if(IS_DEBUG(DBG_BATTLE, DBG_TRACE))
     {
-	DEBUG(DBG_BATTLE, DBG_TRACE, "is NULL");
-	arena.DumpBoard();
+	DEBUG(DBG_BATTLE, DBG_TRACE, "enemy: " << "is NULL" << ", board: " << arena.BoardString());
     }
 
     // end action

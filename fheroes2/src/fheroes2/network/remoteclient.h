@@ -63,7 +63,7 @@ struct FH2RemoteClient : public FH2Client
     void MsgChangeRace(void);
     void SetGameType(u8 type);
 
-    void Dump(void) const;
+    std::string String(void) const;
     void Reset(void);
 
     static int callbackCreateThread(void*);

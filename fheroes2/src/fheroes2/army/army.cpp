@@ -313,7 +313,7 @@ bool Army::army_t::JoinTroop(const Troop & troop)
 	    (*it).SetCount((*it).GetCount() + troop.GetCount());
 	else
 	    (*it).Set(troop, troop.GetCount());
-	DEBUG(DBG_GAME, DBG_INFO, "monster: " << troop.GetName() << ", count: " << std::dec << troop.GetCount() << ", commander: " << (commander ? commander->GetName() : "unknown"));
+	DEBUG(DBG_GAME, DBG_INFO, std::dec << troop.GetCount() << " " << troop.GetName() << ", commander: " << (commander ? commander->GetName() : "unknown"));
 	return true;
     }
 
@@ -890,29 +890,23 @@ void Army::army_t::UpgradeTroops(const Castle & castle)
     }
 }
 
-void Army::army_t::Dump(const char* prefix) const
+std::string Army::army_t::String(void) const
 {
-    if(prefix)
-    {
-	VERBOSN(prefix);
-    }
-    else
-    {
-	VERBOSN("Army::Dump: " <<
-	    "color(" << Color::String(commander ? commander->GetColor() : color) << ")");
+    std::ostringstream os;
 
-	if(commander)
-	    VERBOSN(", commander(" << commander->GetName() << ")");
+    os << "color(" << Color::String(commander ? commander->GetColor() : color) << "), ";
 
-	VERBOSN(" :");
-    }
+    if(commander)
+	os << "commander(" << commander->GetName() << "), ";
+
+    os << ": ";
 
     for(Troops::const_iterator
 	    it = troops.begin(); it != troops.end(); ++it)
 	if((*it).isValid())
-	    VERBOSN((*it).GetName() << "(" << std::dec << (*it).GetCount() << "), ");
+	    os << std::dec << (*it).GetCount() << " " << (*it).GetName() << ", ";
 
-    VERBOSE("");
+    return os.str();
 }
 
 u16 Army::army_t::GetAttack(bool hero) const
@@ -1019,12 +1013,7 @@ bool Army::army_t::StrongerEnemyArmy(const army_t & army2) const
     r1 *= s1 / h2;
     r2 *= s2 / h1;
 
-    if(IS_DEBUG(DBG_GAME, DBG_INFO))
-    {
-	Dump();
-	army2.Dump();
-	DEBUG(DBG_GAME, DBG_INFO, "army1: " << r1 << ", army2: " << r2);
-    }
+    DEBUG(DBG_GAME, DBG_INFO, "army1: " << String() << ", army2: " << army2.String());
 
     return 0 == r2 || 1 <= (r1 / r2);
 }

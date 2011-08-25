@@ -191,7 +191,7 @@ public:
     static u8 GetGrownWeekOf(void);
     static u8 GetGrownMonthOf(void);
 
-    void Dump(void) const;
+    std::string String(void) const;
 
     Dialog::answer_t DialogBuyHero(const Heroes*);
     Dialog::answer_t DialogBuyCaptain(bool fixed = true) const;

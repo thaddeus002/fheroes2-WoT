@@ -848,7 +848,7 @@ void Battle2::Arena::TurnTroop(Stats* current_troop)
     Actions actions;
     bool end_turn = false;
 
-    DEBUG(DBG_BATTLE, DBG_TRACE, current_troop->Info(true));
+    DEBUG(DBG_BATTLE, DBG_TRACE, current_troop->String(true));
 
     while(! end_turn)
     {
@@ -1428,16 +1428,18 @@ s16 Battle2::Arena::GetFreePositionNearHero(u8 color) const
     return -1;
 }
 
-void Battle2::Arena::DumpBoard(void) const
+std::string Battle2::Arena::BoardString(void) const
 {
-    Board::const_iterator it1 = board.begin();
-    Board::const_iterator it2 = board.end();
-    VERBOSE("Battle2::Arena::" << " dump board");
-    for(; it1 != it2; ++it1)
+    std::ostringstream os;
+
+    for(Board::const_iterator
+	it = board.begin(); it != board.end(); ++it)
     {
-	const Battle2::Stats* b = GetTroopBoard((*it1).index);
-	if(b) VERBOSE("\t" << b->Info(true));
+	const Battle2::Stats* b = GetTroopBoard((*it).index);
+	if(b) os << "\t" << b->String(true) << std::endl;
     }
+
+    return os.str();
 }
 
 struct IndexDistanceEqualDistance : std::binary_function<IndexDistance, u16, bool>

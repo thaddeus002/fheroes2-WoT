@@ -38,7 +38,7 @@ bool IS_DEBUG(int name, int level)
         ((DBG_ENGINE & name) && ((DBG_ENGINE & debug) >> 2) >= level) ||
         ((DBG_GAME & name) && ((DBG_GAME & debug) >> 4) >= level) ||
         ((DBG_BATTLE & name) && ((DBG_BATTLE & debug) >> 6) >= level) ||
-        ((DBG_AI & name) && ((DBG_AI & debug) >> 8) == level) ||
+        ((DBG_AI & name) && ((DBG_AI & debug) >> 8) >= level) ||
         ((DBG_NETWORK & name) && ((DBG_NETWORK & debug) >> 10) >= level) ||
         ((DBG_DEVEL & name) && ((DBG_DEVEL & debug) >> 12) >= level);
 }
@@ -564,77 +564,64 @@ void Settings::SetAutoVideoMode(void)
 bool Settings::Save(const std::string & filename) const
 {
     if(filename.empty()) return false;
-    
+
     std::ofstream file(filename.c_str());
-
     if(!file.is_open()) return false;
-    
-    Dump(file);
 
+    file << String();
     file.close();
 
     return true;
 }
 
-void Settings::Dump(std::ostream & stream) const
+std::string Settings::String(void) const
 {
-    std::string str;
+    std::ostringstream os;
 
-    String::AddInt(str, major_version);
-    str += ".";
-    String::AddInt(str, minor_version);
-    str += "." + svn_version;
-    
-    stream << std::endl;
-    stream << "# fheroes2 dump config, version " << str << std::endl;
+    os << "# fheroes2 config, version " << static_cast<int>(major_version) << "." << static_cast<int>(minor_version) << "." << svn_version << std::endl;
+    os << "data = " << path_data_directory << std::endl;
 
-    if(path_data_directory.size()) stream << "data = " << path_data_directory << std::endl;
+    for(ListMapsDirectory::const_iterator
+	it = list_maps_directory.begin(); it != list_maps_directory.end(); ++it)
+    os << "maps = " << *it << std::endl;
 
-    ListMapsDirectory::const_iterator it1 = list_maps_directory.begin();
-    ListMapsDirectory::const_iterator it2 = list_maps_directory.end();
-
-    for(; it1 != it2; ++it1)
-    stream << "maps = " << *it1 << std::endl;
-
+    os << "videomode = ";
     if(video_mode.w && video_mode.h)
-    {
-	str.clear();
-	String::AddInt(str, video_mode.w);
-	str += "x";
-	String::AddInt(str, video_mode.h);
-    }
+	os << video_mode.w << "x" << video_mode.h << std::endl;
     else
-	str = "auto";
+	os << "auto" << std::endl;
 
-    stream << "videomode = " << str << std::endl;
-    stream << "sound = " << (opt_global.Modes(GLOBAL_SOUND) ? "on"  : "off") << std::endl;
-    stream << "music = " << (opt_global.Modes(GLOBAL_MUSIC_CD) ? "cd" : (opt_global.Modes(GLOBAL_MUSIC_MIDI) ? "midi" : (opt_global.Modes(GLOBAL_MUSIC_EXT) ? "ext" : "off"))) << std::endl;
-    stream << "sound volume = " << static_cast<int>(sound_volume) << std::endl;
-    stream << "music volume = " << static_cast<int>(music_volume) << std::endl;
-    stream << "fullscreen = " << (opt_global.Modes(GLOBAL_FULLSCREEN) ? "on"  : "off") << std::endl;
-    stream << "alt resource = " << (opt_global.Modes(GLOBAL_ALTRESOURCE) ? "on"  : "off") << std::endl;
-    stream << "debug = " << (debug ? "on"  : "off") << std::endl;
+    os <<
+	"sound = " << (opt_global.Modes(GLOBAL_SOUND) ? "on"  : "off") << std::endl <<
+	"music = " << (opt_global.Modes(GLOBAL_MUSIC_CD) ? "cd" : (opt_global.Modes(GLOBAL_MUSIC_MIDI) ? "midi" : (opt_global.Modes(GLOBAL_MUSIC_EXT) ? "ext" : "off"))) << std::endl <<
+	"sound volume = " << static_cast<int>(sound_volume) << std::endl <<
+	"music volume = " << static_cast<int>(music_volume) << std::endl <<
+	"fullscreen = " << (opt_global.Modes(GLOBAL_FULLSCREEN) ? "on"  : "off") << std::endl <<
+	"alt resource = " << (opt_global.Modes(GLOBAL_ALTRESOURCE) ? "on"  : "off") << std::endl <<
+	"debug = " << (debug ? "on"  : "off") << std::endl;
 
 #ifdef WITH_TTF
-    stream << "fonts normal = " << font_normal << std::endl;
-    stream << "fonts small = " << font_small << std::endl;
+    os <<
+	"fonts normal = " << font_normal << std::endl <<
+	"fonts small = " << font_small << std::endl <<
+	"fonts normal size = " << static_cast<int>(size_normal) << std::endl <<
+	"fonts small size = " << static_cast<int>(size_small) << std::endl <<
+	"unicode = " << (opt_global.Modes(GLOBAL_USEUNICODE) ? "on" : "off") << std::endl;
     if(force_lang.size())
-    stream << "lang = " << force_lang << std::endl;
-    stream << "fonts normal size = " << static_cast<int>(size_normal) << std::endl;
-    stream << "fonts small size = " << static_cast<int>(size_small) << std::endl;
-    stream << "unicode = " << (opt_global.Modes(GLOBAL_USEUNICODE) ? "on" : "off") << std::endl;
+    os << "lang = " << force_lang << std::endl;
 #endif
 
 #ifndef WITH_MIXER
-    stream << "playmus command = " << playmus_command << std::endl;
+    os << "playmus command = " << playmus_command << std::endl;
 #endif
 
-    if(video_driver.size()) stream << "videodriver = " << video_driver << std::endl;
+    if(video_driver.size())
+    os << "videodriver = " << video_driver << std::endl;
 
     if(opt_global.Modes(GLOBAL_POCKETPC))
-    stream << "pocket pc = on" << std::endl;
+    os << "pocket pc = on" << std::endl;
 
-    stream << std::endl;
+    return os.str();
 }
 
 /* read maps info */

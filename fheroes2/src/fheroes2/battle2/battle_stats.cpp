@@ -863,7 +863,7 @@ u32 Battle2::Stats::ApplyDamage(u32 dmg)
     	    mirror = NULL;
 	}
 
-	DEBUG(DBG_BATTLE, DBG_TRACE, dmg << " to " << Info() << " and killed: " << killed);
+	DEBUG(DBG_BATTLE, DBG_TRACE, dmg << " to " << String() << " and killed: " << killed);
 
 	dead += (killed >= count ? count : killed);
 	count -= (killed >= count ? count : killed);
@@ -908,7 +908,7 @@ void Battle2::Stats::PostKilledAction(void)
     if(!Modes(CAP_MIRRORIMAGE) && !Modes(CAP_SUMMONELEM))
 	arena->graveyard.AddTroop(*this);
 
-    DEBUG(DBG_BATTLE, DBG_TRACE, Info() << "is dead...");
+    DEBUG(DBG_BATTLE, DBG_TRACE, String() << "is dead...");
     // possible also..
 }
 
@@ -946,14 +946,14 @@ u32 Battle2::Stats::ApplyDamage(Stats & enemy, u32 dmg)
     {
 	case Monster::GHOST:
 	    resurrect = killed * enemy.GetMonster().GetHitPoints();
-	    DEBUG(DBG_BATTLE, DBG_TRACE, Info() << ", enemy: " << enemy.Info() << " resurrect: " << resurrect);
+	    DEBUG(DBG_BATTLE, DBG_TRACE, String() << ", enemy: " << enemy.String() << " resurrect: " << resurrect);
 	    // grow troop
 	    enemy.Resurrect(resurrect, true, false);
 	    break;
 
 	case Monster::VAMPIRE_LORD:
 	    resurrect = killed * GetMonster().GetHitPoints();
-	    DEBUG(DBG_BATTLE, DBG_TRACE, Info() << ", enemy: " << enemy.Info() << " resurrect: " << resurrect);
+	    DEBUG(DBG_BATTLE, DBG_TRACE, String() << ", enemy: " << enemy.String() << " resurrect: " << resurrect);
 	    // restore hit points
 	    enemy.Resurrect(resurrect, false, false);
 	    break;
@@ -1027,7 +1027,7 @@ bool Battle2::Stats::ApplySpell(const Spell & spell, const HeroBase* hero, Targe
 {
     if(! AllowApplySpell(spell, hero)) return false;
 
-    DEBUG(DBG_BATTLE, DBG_TRACE, spell.GetName() << " to " << Info());
+    DEBUG(DBG_BATTLE, DBG_TRACE, spell.GetName() << " to " << String());
 
     u16 spoint = hero ? hero->GetPower() : 3;
 
@@ -1044,7 +1044,7 @@ bool Battle2::Stats::ApplySpell(const Spell & spell, const HeroBase* hero, Targe
     return true;
 }
 
-std::string Battle2::Stats::Info(bool more) const
+std::string Battle2::Stats::String(bool more) const
 {
     std::stringstream ss;
 

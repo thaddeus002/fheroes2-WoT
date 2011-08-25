@@ -68,7 +68,7 @@ namespace Route
 	    u16		isUnderProtection(s32 & pos) const;
 	    bool	hasObstacle(void) const;
 
-	    void	DumpPath(void) const;
+	    std::string	String(void) const;
 
 	    u16		GetAllowStep(void) const;
 	    u32		TotalPenalty(void) const;

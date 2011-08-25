@@ -1488,10 +1488,12 @@ EventMaps* World::GetEventMaps(const Color::color_t c, const s32 index)
     return NULL;
 }
 
-void World::DateDump(void) const
+std::string World::DateString(void) const
 {
-    VERBOSE("World::Date: month: " << static_cast<int>(GetMonth()) <<
-	    ", week " << static_cast<int>(GetWeek()) << ", day: " << static_cast<int>(GetDay()));
+    std::ostringstream os;
+    os << "month: " << static_cast<int>(GetMonth()) <<
+	    ", " << "week: " << static_cast<int>(GetWeek()) << ", " << "day: " << static_cast<int>(GetDay());
+    return os.str();
 }
 
 bool IsObeliskOnMaps(const Maps::Tiles & tile)

@@ -146,7 +146,7 @@ namespace Battle2
 	const SpellStorage & GetUsageSpells(void) const;
 
 	u16  GetPath(const Stats &, u16, std::vector<u16> &);
-	void DumpBoard(void) const;
+	std::string BoardString(void) const;
 
 	Interface* GetInterface(void);
 	Tower* GetTower(u8);

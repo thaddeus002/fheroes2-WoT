@@ -53,7 +53,7 @@ void AI::HeroesAction(Heroes &, s32)
 {
 }
 
-void AI::HeroesDumpInfo(const Heroes &)
+std::string AI::HeroesString(const Heroes &)
 {
 }
 

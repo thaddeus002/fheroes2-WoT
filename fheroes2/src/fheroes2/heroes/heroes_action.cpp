@@ -1447,7 +1447,6 @@ void ActionToPoorMoraleObject(Heroes &hero, const u8 obj, const s32 dst_index)
     		{
 		    Army::army_t army;
 		    army.FromGuardian(tile);
-		    army.Dump();
 
 			// new battle2
 			Battle2::Result res = Battle2::Loader(hero.GetArmy(), army, dst_index);

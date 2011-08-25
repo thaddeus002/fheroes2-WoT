@@ -53,12 +53,9 @@ Battle2::Result Battle2::Loader(Army::army_t & army1, Army::army_t & army2, s32 
     army1.BattleInit();
     army2.BattleInit();
 
-    if(IS_DEBUG(DBG_BATTLE , DBG_INFO))
-    {
-	DEBUG(DBG_BATTLE, DBG_INFO, "start");
-	army1.Dump();
-	army2.Dump();
-    }
+    DEBUG(DBG_BATTLE, DBG_INFO, "start");
+    DEBUG(DBG_BATTLE, DBG_INFO, "army1 " << army1.String());
+    DEBUG(DBG_BATTLE, DBG_INFO, "army2 " << army1.String());
 
     if(conf.ExtLowMemory())
         AGG::ICNRegistryEnable(true);
@@ -145,12 +142,9 @@ Battle2::Result Battle2::Loader(Army::army_t & army1, Army::army_t & army2, s32 
 	army_wins->GetCommander()->GetLevelSkill(Skill::Secondary::NECROMANCY))
 	    NecromancySkillAction(*army_wins, killed2, (Game::CONTROL_HUMAN & army_wins->GetControl()));
 
-    if(IS_DEBUG(DBG_BATTLE , DBG_INFO))
-    {
-	DEBUG(DBG_BATTLE, DBG_INFO, "end");
-	army1.Dump();
-	army2.Dump();
-    }
+    DEBUG(DBG_BATTLE, DBG_INFO, "end");
+    DEBUG(DBG_BATTLE, DBG_INFO, "army1 " << army1.String());
+    DEBUG(DBG_BATTLE, DBG_INFO, "army2 " << army1.String());
 
     // update army
     if(army1.GetCommander() && Skill::Primary::HEROES == army1.GetCommander()->GetType())

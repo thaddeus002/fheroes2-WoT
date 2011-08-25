@@ -1687,19 +1687,22 @@ bool Castle::PredicateIsBuildMarketplace(const Castle* castle)
     return castle && castle->isBuild(BUILD_MARKETPLACE);
 }
 
-void Castle::Dump(void) const
+std::string Castle::String(void) const
 {
+    std::ostringstream os;
     const CastleHeroes heroes = GetHeroes();
 
-    VERBOSE("name            : " << name);
-    VERBOSE("race            : " << Race::String(race));
-    VERBOSE("color           : " << Color::String(color));
-    VERBOSE("build           : " << "0x" << std::hex << building << std::dec);
-    VERBOSE("present guest   : " << (heroes.Guest() ? "yes" : "no"));
-    VERBOSE("present guard   : " << (heroes.Guard() ? "yes" : "no"));
-    VERBOSE("present boat    : " << (PresentBoat() ? "yes" : "no"));
-    VERBOSE("nearly sea      : " << (HaveNearlySea() ? "yes" : "no"));
-    VERBOSE("is castle       : " << (isCastle() ? "yes" : "no"));
+    os << "name            : " << name << std::endl <<
+          "race            : " << Race::String(race) << std::endl <<
+          "color           : " << Color::String(color) << std::endl <<
+          "build           : " << "0x" << std::hex << building << std::dec << std::endl <<
+          "present guest   : " << (heroes.Guest() ? "yes" : "no") << std::endl <<
+          "present guard   : " << (heroes.Guard() ? "yes" : "no") << std::endl <<
+          "present boat    : " << (PresentBoat() ? "yes" : "no") << std::endl <<
+          "nearly sea      : " << (HaveNearlySea() ? "yes" : "no") << std::endl <<
+          "is castle       : " << (isCastle() ? "yes" : "no") << std::endl;
+
+    return os.str();
 }
 
 s8 Castle::GetAttackModificator(std::string *strs) const

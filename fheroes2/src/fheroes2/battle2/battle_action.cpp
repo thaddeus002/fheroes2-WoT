@@ -335,7 +335,7 @@ void Battle2::Arena::ApplyActionAttack(Action & action)
 	b2 && b2->isValid() &&
 	(b1->GetColor() != b2->GetColor() || b2->Modes(SP_HYPNOTIZE)))
     {
-	DEBUG(DBG_BATTLE, DBG_TRACE, b1->Info() << " to " << b2->Info());
+	DEBUG(DBG_BATTLE, DBG_TRACE, b1->String() << " to " << b2->String());
 
 	// fix dst
 	if(dst != b2->GetPosition() && dst != b2->GetTailIndex())
@@ -371,7 +371,7 @@ void Battle2::Arena::ApplyActionAttack(Action & action)
 	else
 	{
 	    DEBUG(DBG_BATTLE, DBG_WARN, "incorrect param: " << \
-		b1->Info() << " and " << b2->Info());
+		b1->String() << " and " << b2->String());
 	}
 
 	if(!Settings::Get().ExtBattleTroopDirection())
@@ -415,7 +415,7 @@ void Battle2::Arena::ApplyActionMove(Action & action)
 	    cell = GetCell(dst);
 	}
 
-	DEBUG(DBG_BATTLE, DBG_TRACE, b->Info() << " to " << "dst: " << dst);
+	DEBUG(DBG_BATTLE, DBG_TRACE, b->String() << " to " << "dst: " << dst);
 
 	// force check fly
 	if(b->troop.isFly())
@@ -447,7 +447,7 @@ void Battle2::Arena::ApplyActionMove(Action & action)
 
 	    if(path.empty())
 	    {
-		DEBUG(DBG_BATTLE, DBG_WARN, "path empty, " << b->Info() << " to " << "dst: " << dst);
+		DEBUG(DBG_BATTLE, DBG_WARN, "path empty, " << b->String() << " to " << "dst: " << dst);
 		return;
 	    }
 
@@ -494,7 +494,7 @@ void Battle2::Arena::ApplyActionSkip(Action & action)
 
 	    if(interface) interface->RedrawActionSkipStatus(*battle);
 
-	    DEBUG(DBG_BATTLE, DBG_TRACE, battle->Info());
+	    DEBUG(DBG_BATTLE, DBG_TRACE, battle->String());
 	}
 	else
 	{
@@ -521,7 +521,7 @@ void Battle2::Arena::ApplyActionEnd(Action & action)
 
 	    if(battle->Modes(TR_SKIPMOVE) && interface) interface->RedrawActionSkipStatus(*battle);
 
-	    DEBUG(DBG_BATTLE, DBG_TRACE, battle->Info());
+	    DEBUG(DBG_BATTLE, DBG_TRACE, battle->String());
 	}
 	else
 	{
@@ -560,7 +560,7 @@ void Battle2::Arena::ApplyActionMorale(Action & action)
 
 	if(interface) interface->RedrawActionMorale(*b, morale);
 
-	DEBUG(DBG_BATTLE, DBG_TRACE, (morale ? "good" : "bad") << " to " << b->Info());
+	DEBUG(DBG_BATTLE, DBG_TRACE, (morale ? "good" : "bad") << " to " << b->String());
     }
     else
 	DEBUG(DBG_BATTLE, DBG_WARN, "incorrect param: " << "id: " << id);
@@ -888,7 +888,7 @@ void Battle2::Arena::ApplyActionTower(Action & action)
     if(b2 && b2->isValid() && tower)
     {
 	DEBUG(DBG_BATTLE, DBG_TRACE, "tower: " << static_cast<int>(type) << \
-		", attack to " << b2->Info());
+		", attack to " << b2->String());
 
 	Stats* b1 = tower->GetBattleStats();
 	TargetInfo target;

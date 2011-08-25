@@ -231,7 +231,7 @@ public:
 
     bool AllowBattle(bool attacker) const;
 
-    void Dump(void) const;
+    std::string String(void) const;
 
     static u8 GetLevelFromExperience(u32 exp);
     static u32 GetExperienceFromLevel(u8 lvl);

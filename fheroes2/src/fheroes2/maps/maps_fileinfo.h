@@ -62,7 +62,7 @@ namespace Maps
     u32 LossMapsIndexObject(void) const;
     u16 LossCountDays(void) const;
 
-    void Dump(void) const;
+    std::string String(void) const;
     void Reset(void);
 
     std::string file;

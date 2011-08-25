@@ -1628,57 +1628,58 @@ void Heroes::RecalculateMovePoints(void)
     if(0 <= move_point_scale) move_point = GetMaxMovePoints() * move_point_scale / 1000;
 }
 
-void Heroes::Dump(void) const
+std::string Heroes::String(void) const
 {
-    VERBOSE("name            : " << name);
-    VERBOSE("race            : " << Race::String(race));
-    VERBOSE("color           : " << Color::String(color));
-    VERBOSE("experience      : " << experience);
-    VERBOSE("level           : " << static_cast<int>(GetLevel()));
-    VERBOSE("magic point     : " << GetSpellPoints());
-    VERBOSE("position x      : " << GetCenter().x);
-    VERBOSE("position y      : " << GetCenter().y);
-    VERBOSE("move point      : " << move_point);
-    VERBOSE("max magic point : " << GetMaxSpellPoints());
-    VERBOSE("max move point  : " << GetMaxMovePoints());
-    VERBOSE("direction       : " << Direction::String(direction));
-    VERBOSE("index sprite    : " << static_cast<u16>(sprite_index));
-    VERBOSE("in castle       : " << (inCastle() ? "true" : "false"));
-    VERBOSE("save object     : " << MP2::StringObject(save_maps_object));
-    VERBOSE("flags           : " << (Modes(SHIPMASTER) ? "SHIPMASTER," : ",") <<
-                                         (Modes(SCOUTER) ? "SCOUTER," : ",") <<
-                                         (Modes(HUNTER) ? "HUNTER," : ",") <<
-                                         (Modes(PATROL) ? "PATROL," : ",") <<
-                                         (Modes(AIWAITING) ? "WAITING," : ",") <<
-                                         (Modes(STUPID) ? "STUPID," : ","));
+    std::ostringstream os;
+
+    os <<
+	"name            : " << name << std::endl <<
+	"race            : " << Race::String(race) << std::endl <<
+	"color           : " << Color::String(color) << std::endl <<
+	"experience      : " << experience << std::endl <<
+	"level           : " << static_cast<int>(GetLevel()) << std::endl <<
+	"magic point     : " << GetSpellPoints() << std::endl <<
+	"position x      : " << GetCenter().x << std::endl <<
+	"position y      : " << GetCenter().y << std::endl <<
+	"move point      : " << move_point << std::endl <<
+	"max magic point : " << GetMaxSpellPoints() << std::endl <<
+	"max move point  : " << GetMaxMovePoints() << std::endl <<
+	"direction       : " << Direction::String(direction) << std::endl <<
+	"index sprite    : " << static_cast<u16>(sprite_index) << std::endl <<
+	"in castle       : " << (inCastle() ? "true" : "false") << std::endl <<
+	"save object     : " << MP2::StringObject(save_maps_object) << std::endl <<
+	"flags           : " << (Modes(SHIPMASTER) ? "SHIPMASTER," : "") <<
+                                         (Modes(SCOUTER) ? "SCOUTER," : "") <<
+                                         (Modes(HUNTER) ? "HUNTER," : "") <<
+                                         (Modes(PATROL) ? "PATROL," : "") <<
+                                         (Modes(AIWAITING) ? "WAITING," : "") <<
+                                         (Modes(STUPID) ? "STUPID," : "") << std::endl;
     if(Modes(PATROL))
     {
-	VERBOSE("patrol square   : " << static_cast<u16>(patrol_square));
+	os << "patrol square   : " << static_cast<u16>(patrol_square) << std::endl;
     }
 
     if(! visit_object.empty())
     {
-	VERBOSN("visit objects   : ");
-
+	os << "visit objects   : ";
 	for(std::list<IndexObject>::const_iterator
 	    it = visit_object.begin(); it != visit_object.end(); ++it)
-		VERBOSN(MP2::StringObject((*it).second) << "(" << (*it).first << "), ");
-
-	VERBOSE("");
+		os << MP2::StringObject((*it).second) << "(" << (*it).first << "), ";
+	os << std::endl;
     }
 
     if(GetControl() & Game::CONTROL_AI)
     {
-	VERBOSE("skills          : " << secondary_skills.String());
-	VERBOSE("artifacts       : " << bag_artifacts.String());
-	VERBOSE("spell book      : " << (HaveSpellBook() ? spell_book.String() : "disabled"));
+	os <<
+	    "skills          : " << secondary_skills.String() << std::endl <<
+	    "artifacts       : " << bag_artifacts.String() << std::endl <<
+	    "spell book      : " << (HaveSpellBook() ? spell_book.String() : "disabled") << std::endl <<
+	    "army dump       : " << army.String() << std::endl;
 
-	GetArmy().Dump("army dump       : ");
-
-	AI::HeroesDumpInfo(*this);
+	os << AI::HeroesString(*this);
     }
 
-    VERBOSE("");
+    return os.str();
 }
 
 struct InCastleAndGuardian : public std::binary_function <const Castle*, Heroes*, bool>

@@ -1651,17 +1651,21 @@ void AIMeeting(Heroes & hero1, Heroes & hero2)
 
 
 
-void AI::HeroesDumpInfo(const Heroes & hero)
+std::string AI::HeroesString(const Heroes & hero)
 {
+    std::ostringstream os;
+
     AIHero & ai_hero = AIHeroes::Get(hero);
     Queue & task = ai_hero.sheduled_visit;
 
-    VERBOSE("ai primary target: " << ai_hero.primary_target);
-    VERBOSN("ai sheduled visit: ");
-    Queue::const_iterator it1 = task.begin();
-    Queue::const_iterator it2 = task.end();
-    for(; it1 != it2; ++it1) VERBOSN(*it1 << "(" << MP2::StringObject(world.GetTiles(*it1).GetObject()) << "), ");
-    VERBOSE("");
+    os << "ai primary target: " << ai_hero.primary_target << std::endl <<
+          "ai sheduled visit: ";
+    for(Queue::const_iterator
+	it = task.begin(); it != task.end(); ++it)
+	os << *it << "(" << MP2::StringObject(world.GetTiles(*it).GetObject()) << "), ";
+    os << std::endl;
+
+    return os.str();
 }
 
 void AI::HeroesLevelUp(Heroes & hero)
@@ -2127,6 +2131,8 @@ void AIHeroesAddedRescueTask(Heroes & hero)
     scoute += 1;
     const Point & mp = hero.GetCenter();
 
+    DEBUG(DBG_AI, DBG_TRACE, hero.GetName());
+
     // find unchartered territory
     for(u8 ii = 1; ii <= scoute; ++ii)
     {
@@ -2169,17 +2175,11 @@ void AIHeroesAddedRescueTask(Heroes & hero)
 
 void AIHeroesAddedTask(Heroes & hero)
 {
-    if(hero.GetPath().isValid()) return;
-
     AIHero & ai_hero = AIHeroes::Get(hero);
     AIKingdom & ai_kingdom = AIKingdoms::Get(hero.GetColor());
 
     Queue & task = ai_hero.sheduled_visit;
     IndexObjectMap & ai_objects = ai_kingdom.scans;
-
-
-    DEBUG(DBG_AI, DBG_INFO, Color::String(hero.GetColor()) <<
-		    ", hero: " << hero.GetName() << ", task prepare");
 
     // load minimal distance tasks
     std::vector<IndexDistance> objs;
@@ -2188,9 +2188,11 @@ void AIHeroesAddedTask(Heroes & hero)
     for(std::map<s32, MP2::object_t>::const_iterator
 	it = ai_objects.begin(); it != ai_objects.end(); ++it)
     {
+	const Maps::Tiles & tile = world.GetTiles((*it).first);
+
 	if(hero.isShipMaster())
 	{
-	    if(MP2::isGroundObject((*it).second)) continue;
+	    if(Maps::Ground::WATER != tile.GetGround()) continue;
 
 	    // check previous positions
 	    if(MP2::OBJ_COAST == (*it).second &&
@@ -2198,12 +2200,15 @@ void AIHeroesAddedTask(Heroes & hero)
 	}
 	else
 	{
-	    if(MP2::isWaterObject((*it).second)) continue;
+	    if(Maps::Ground::WATER == tile.GetGround()) continue;
 	}
 
 	objs.push_back(IndexDistance((*it).first,
 			    Maps::GetApproximateDistance(hero.GetIndex(), (*it).first)));
     }
+
+    DEBUG(DBG_AI, DBG_INFO, Color::String(hero.GetColor()) <<
+		    ", hero: " << hero.GetName() << ", task prepare: " << objs.size());
 
     std::sort(objs.begin(), objs.end(), IndexDistance::Shortest);
 
@@ -2280,6 +2285,8 @@ void AIHeroesGetTask(Heroes & hero)
     // if hero in castle
     if(castle)
     {
+	DEBUG(DBG_AI, DBG_TRACE, hero.GetName() << ", in castle");
+
 	castle->RecruitAllMonster();
 	hero.GetArmy().UpgradeTroops(*castle);
 
@@ -2289,11 +2296,15 @@ void AIHeroesGetTask(Heroes & hero)
 	else
 	if(hero.Modes(Heroes::SCOUTER))
 		hero.GetArmy().KeepOnlyWeakestTroops(castle->GetArmy());
+
+	DEBUG(DBG_AI, DBG_TRACE, hero.GetName() << ", " << hero.GetArmy().String());
     }
 
     // patrol task
     if(hero.Modes(Heroes::PATROL))
     {
+	DEBUG(DBG_AI, DBG_TRACE, hero.GetName() << ", is patrol mode");
+
 	// goto patrol center
 	if(hero.GetCenterPatrol() != hero.GetCenter() &&
 	   hero.GetPath().Calculate(Maps::GetIndexFromAbsPoint(hero.GetCenterPatrol())))
@@ -2311,7 +2322,10 @@ void AIHeroesGetTask(Heroes & hero)
 		if(enemy && !Settings::Get().IsUnions(enemy->GetColor(), hero.GetColor()))
 		{
 		    if(hero.GetPath().Calculate(enemy->GetIndex()))
+		    {
+			DEBUG(DBG_AI, DBG_TRACE, hero.GetName() << ", find enemy");
 			return;
+		    }
 		}
 	    }
 	}
@@ -2327,8 +2341,7 @@ void AIHeroesGetTask(Heroes & hero)
 	    {
 		ai_objects.erase(*it);
 
-		DEBUG(DBG_AI, DBG_INFO, Color::String(hero.GetColor()) <<
-			", Patrol " << hero.GetName() << ": find object: " <<
+		DEBUG(DBG_AI, DBG_TRACE, hero.GetName() << ": find object: " <<
 			MP2::StringObject(world.GetTiles(*it).GetObject()) << "(" << *it << ")");
 		return;
 	    }
@@ -2361,8 +2374,7 @@ void AIHeroesGetTask(Heroes & hero)
 
     if(ai_hero.fix_loop > 3)
     {
-	DEBUG(DBG_AI, DBG_TRACE, Color::String(hero.GetColor()) <<
-	    ", Hero " << hero.GetName() << ": loop");
+	DEBUG(DBG_AI, DBG_TRACE, hero.GetName() << ": loop");
 	hero.SetModes(hero.Modes(Heroes::AIWAITING) ? Heroes::STUPID : Heroes::AIWAITING);
 	return;
     }
@@ -2373,43 +2385,53 @@ void AIHeroesGetTask(Heroes & hero)
 	const Castle* castle = NULL;
 
 	if(hero.GetIndex() == ai_hero.primary_target)
-	    ai_hero.primary_target = -1;
-	else
-	if(NULL != (castle = world.GetCastle(ai_hero.primary_target)) &&
-	    NULL != castle->GetHeroes().Guest())
-	    hero.SetModes(Heroes::AIWAITING);
-	else
-	if(ai_hero.primary_target != hero.GetPath().GetDestinationIndex() &&
-	    !hero.GetPath().Calculate(ai_hero.primary_target))
 	{
-	    DEBUG(DBG_AI, DBG_INFO, Color::String(hero.GetColor()) <<
-	    ", Hero " << hero.GetName() << ": path unknown, primary target reset");
-
 	    ai_hero.primary_target = -1;
+	    hero.GetPath().Reset();
+	    DEBUG(DBG_AI, DBG_TRACE, hero.GetName() << ", reset path");
+	}
+	else
+	{
+	    DEBUG(DBG_AI, DBG_TRACE, hero.GetName() << ", primary target: " <<
+		    ai_hero.primary_target << ", " << MP2::StringObject(world.GetTiles(ai_hero.primary_target).GetObject()));
+
+	    if(NULL != (castle = world.GetCastle(ai_hero.primary_target)) &&
+		NULL != castle->GetHeroes().Guest() && Settings::Get().IsUnions(castle->GetColor(), hero.GetColor()))
+	    {
+		hero.SetModes(Heroes::AIWAITING);
+		DEBUG(DBG_AI, DBG_TRACE, hero.GetName() << ", castle busy..");
+	    }
+
+	    // make path
+	    if(ai_hero.primary_target != hero.GetPath().GetDestinationIndex() &&
+		!hero.GetPath().Calculate(ai_hero.primary_target))
+	    {
+		DEBUG(DBG_AI, DBG_TRACE, hero.GetName() << ", path unknown, primary target reset");
+		ai_hero.primary_target = -1;
+	    }
 	}
 
 	if(hero.GetPath().isValid()) return;
     }
 
-	// scan heroes and castle
-	if(Maps::ScanDistanceObject(hero.GetIndex(), MP2::OBJ_CASTLE, hero.GetScoute(), results) ||
+    // scan heroes and castle
+    if(Maps::ScanDistanceObject(hero.GetIndex(), MP2::OBJ_CASTLE, hero.GetScoute(), results) ||
     	    Maps::ScanDistanceObject(hero.GetIndex(), MP2::OBJ_HEROES, hero.GetScoute(), results) ||
     	    Maps::ScanDistanceObject(hero.GetIndex(), MP2::OBJ_MONSTER, hero.GetScoute(), results))
-	{
+    {
 	    std::vector<s32>::const_iterator it = results.begin();
 
 	    for(; it != results.end(); ++it)
 		if(AIHeroesPriorityObject(hero, *it) &&
 		    hero.GetPath().Calculate(*it))
-	    {
-		DEBUG(DBG_AI, DBG_INFO, Color::String(hero.GetColor()) <<
-		", Hero " << hero.GetName() << ": set primary target: " <<
+	{
+		DEBUG(DBG_AI, DBG_TRACE, hero.GetName() << ", set primary target: " <<
 		MP2::StringObject(world.GetTiles(*it).GetObject()) << "(" << *it << ")");
 
 		ai_hero.primary_target = *it;
 		return;
-	    }
 	}
+    }
 
     // check destination
     if(hero.GetPath().isValid())
@@ -2419,48 +2441,48 @@ void AIHeroesGetTask(Heroes & hero)
 	else
 	if(hero.GetPath().size() < 5)
 	{
-	    DEBUG(DBG_AI, DBG_INFO, Color::String(hero.GetColor()) <<
-		", Hero " << hero.GetName() << ": continue" << " short");
+	    DEBUG(DBG_AI, DBG_TRACE, hero.GetName() << ", continue short");
 	    ai_hero.fix_loop++;
 	    return;
 	}
     }
 
-	// scan 2x2 pickup objects
-	if(ScanPickupObjects(hero, 2, results) ||
+    // scan 2x2 pickup objects
+    if(ScanPickupObjects(hero, 2, results) ||
     	    // scan 3x3 capture objects
     	    Maps::ScanDistanceObject(hero.GetIndex(), MP2::OBJ_SAWMILL, 3, results) ||
     	    Maps::ScanDistanceObject(hero.GetIndex(), MP2::OBJ_MINES, 3, results) ||
     	    Maps::ScanDistanceObject(hero.GetIndex(), MP2::OBJ_ALCHEMYLAB, 3, results))
+    {
+	std::vector<s32>::const_iterator it = results.begin();
+	for(; it != results.end(); ++it)
+    	    if(AIHeroesValidObject(hero, *it) &&
+		hero.GetPath().Calculate(*it))
 	{
-	    std::vector<s32>::const_iterator it = results.begin();
-	    for(; it != results.end(); ++it)
-    		if(AIHeroesValidObject(hero, *it) &&
-		    hero.GetPath().Calculate(*it))
-	    {
-		ai_objects.erase(*it);
+	    ai_objects.erase(*it);
 
-		DEBUG(DBG_AI, DBG_INFO, Color::String(hero.GetColor()) <<
-		", Hero " << hero.GetName() << ": find object: " <<
+	    DEBUG(DBG_AI, DBG_TRACE, hero.GetName() << ", find object: " <<
 		MP2::StringObject(world.GetTiles(*it).GetObject()) << "(" << *it << ")");
-
-		return;
-	    }
+	    return;
 	}
+    }
 
     if(hero.GetPath().isValid())
     {
-	DEBUG(DBG_AI, DBG_INFO, Color::String(hero.GetColor()) <<
-		", Hero " << hero.GetName() << ": continue");
+	DEBUG(DBG_AI, DBG_TRACE, hero.GetName() << ", continue");
         ai_hero.fix_loop++;
 	return;
     }
 
-    // get task from kingdom
-    if(task.empty()) AIHeroesAddedTask(hero);
+    if(task.empty())
+    {
+	// get task from kingdom
+	DEBUG(DBG_AI, DBG_TRACE, hero.GetName() << ", empty task");
+	AIHeroesAddedTask(hero);
+    }
     else
     // remove invalid task
-    task.remove_if(std::not1(std::bind1st(std::ptr_fun(&AIHeroesValidObject2), &hero)));
+	task.remove_if(std::not1(std::bind1st(std::ptr_fun(&AIHeroesValidObject2), &hero)));
 
     // random shuffle
     if(1 < task.size() && Rand::Get(1))
@@ -2477,13 +2499,10 @@ void AIHeroesGetTask(Heroes & hero)
     {
 	const s32 & index = task.front();
 
+	DEBUG(DBG_AI, DBG_TRACE, hero.GetName() << ", look for: " << MP2::StringObject(world.GetTiles(index).GetObject()) << "(" << index << ")");
 	if(hero.GetPath().Calculate(index)) break;
 
-	DEBUG(DBG_AI, DBG_INFO, Color::String(hero.GetColor()) <<
-	", Hero " << hero.GetName() << " say: unable get object: " <<
-	MP2::StringObject(world.GetTiles(index).GetObject()) << ", index: " <<
-	index << ", remove task...");
-
+	DEBUG(DBG_AI, DBG_TRACE, hero.GetName() << " say: unable get object: " << index << ", remove task...");
 	task.pop_front();
     }
 
@@ -2491,31 +2510,25 @@ void AIHeroesGetTask(Heroes & hero)
     if(task.size())
     {
 	const s32 & index = task.front();
-
-	DEBUG(DBG_AI, DBG_INFO, Color::String(hero.GetColor()) <<
-	", Hero " << hero.GetName() << " say: go to object: " <<
-	MP2::StringObject(world.GetTiles(index).GetObject()) << ", index: " << index);
+	DEBUG(DBG_AI, DBG_TRACE, hero.GetName() << " go to: " << index);
 
 	ai_objects.erase(index);
 	task.pop_front();
 
-	if(IS_DEBUG(DBG_AI, DBG_TRACE)) hero.GetPath().DumpPath();
+	DEBUG(DBG_AI, DBG_TRACE, hero.GetName() << ", route: " << hero.GetPath().String());
     }
     else
     if(hero.Modes(Heroes::AIWAITING))
     {
 	hero.GetPath().Reset();
-	DEBUG(DBG_AI, DBG_INFO, Color::String(hero.GetColor()) <<
-	", Hero " << hero.GetName() << " say: unknown task., help my please..");
+	DEBUG(DBG_AI, DBG_TRACE, hero.GetName() << " say: unknown task., help my please..");
 
 	hero.ResetModes(Heroes::AIWAITING);
 	hero.SetModes(Heroes::STUPID);
     }
     else
     {
-	DEBUG(DBG_AI, DBG_INFO, Color::String(hero.GetColor()) <<
-	", Hero " << hero.GetName() << " say: waiting...");
-
+	DEBUG(DBG_AI, DBG_TRACE, hero.GetName() << " say: waiting...");
 	hero.SetModes(Heroes::AIWAITING);
     }
 }
@@ -2600,8 +2613,13 @@ void AIHeroesTurn(Heroes* hero)
 {
     if(hero)
     {
-	DEBUG(DBG_AI, DBG_TRACE, hero->GetName() <<
-	    (hero->Modes(Heroes::AIWAITING|Heroes::STUPID) || !hero->MayStillMove() ? ", skipping..." : ""));
+	DEBUG(DBG_AI, DBG_TRACE, hero->GetName() << ", start: " <<
+	    (hero->Modes(Heroes::SHIPMASTER) ? "SHIPMASTER," : "") <<
+            (hero->Modes(Heroes::SCOUTER) ? "SCOUTER," : "") <<
+            (hero->Modes(Heroes::HUNTER) ? "HUNTER," : "") <<
+            (hero->Modes(Heroes::PATROL) ? "PATROL," : "") <<
+            (hero->Modes(Heroes::AIWAITING) ? "WAITING," : "") <<
+            (hero->Modes(Heroes::STUPID) ? "STUPID," : ""));
 
 	Interface::StatusWindow *status = Interface::NoGUI() ? NULL : &Interface::StatusWindow::Get();
 
@@ -2625,12 +2643,12 @@ void AIHeroesTurn(Heroes* hero)
             else
                 AIHeroesTurns(*hero);
 
-	    DEBUG(DBG_AI, DBG_TRACE, hero->GetName() << ", moved");
-
             // turn indicator
             if(status) status->RedrawTurnProgress(7);
             //if(status) status->RedrawTurnProgress(8);
         }
+
+	DEBUG(DBG_AI, DBG_TRACE, hero->GetName() << ", end");
     }
 }
 

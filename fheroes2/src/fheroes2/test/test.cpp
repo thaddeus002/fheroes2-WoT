@@ -122,8 +122,6 @@ void RunTest3(void)
 //    army2.JoinTroop(static_cast<Monster::monster_t>(6), 10);
 //    army2.JoinTroop(static_cast<Monster::monster_t>(8), 10);
 
-//    kingdom2.Dump();
-    
     Battle2::Loader(army1, army2, hero1.GetIndex());
 }
 

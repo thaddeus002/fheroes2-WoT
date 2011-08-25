@@ -104,15 +104,16 @@ enum
 
 #if defined(__SYMBIAN32__)
  #define VERBOSE(x)
- #define VERBOSN(x)
  #undef DEBUG
  #define DEBUG(x, y, z)
 #elif defined(ANDROID)
+namespace std
+{
+ #define endl "\n"
+}
  #define VERBOSE(x) { std::ostringstream osss; osss << x; __android_log_print(ANDROID_LOG_INFO, "FHeroes", "%s", osss.str().c_str()); }
- #define VERBOSN(x) { std::ostringstream osss; osss << x; __android_log_print(ANDROID_LOG_INFO, "FHeroes", "%s", osss.str().c_str()); }
 #else
  #define VERBOSE(x) std::cout << x << std::endl
- #define VERBOSN(x) std::cout << x
 #endif
 
 #ifdef WITH_DEBUG
@@ -203,7 +204,7 @@ public:
     bool Read(const std::string & filename);
     bool Save(const std::string & filename) const;
 
-    void Dump(std::ostream & stream = std::cout) const;
+    std::string String(void) const;
     bool LoadFileMapsMP2(const std::string & file);
     Maps::FileInfo & CurrentFileInfo(void);
     const Maps::FileInfo & CurrentFileInfo(void) const;

@@ -146,8 +146,6 @@ public:
     void SetVisitTravelersTent(u8);
     bool IsVisitTravelersTent(u8) const;
 
-    void Dump(void) const;
-
     void UpdateRecruits(void);
     void LossPostActions(void);
 

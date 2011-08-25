@@ -63,14 +63,16 @@ Maps::TilesAddon::TilesAddon(u8 lv, u32 gid, u8 obj, u8 ii) : level(lv), uniq(gi
 {
 }
 
-void Maps::TilesAddon::DebugInfo(int level) const
+std::string Maps::TilesAddon::String(int level) const
 {
-    VERBOSE("----------------" << level << "--------");
-    VERBOSE("object          : " << "0x" << std::setw(2) << std::setfill('0') << static_cast<int>(object) <<
-				", (" << ICN::GetString(MP2::GetICNObject(object)) << ")");
-    VERBOSE("index           : " << static_cast<int>(index));
-    VERBOSE("uniq            : " << uniq);
-    VERBOSE("level           : " << static_cast<int>(level));
+    std::ostringstream os;
+    os << "----------------" << level << "--------" << std::endl <<
+	  "object          : " << "0x" << std::setw(2) << std::setfill('0') << static_cast<int>(object) <<
+				", (" << ICN::GetString(MP2::GetICNObject(object)) << ")" << std::endl <<
+	  "index           : " << static_cast<int>(index) << std::endl <<
+	  "uniq            : " << uniq << std::endl <<
+	  "level           : " << static_cast<int>(level) << std::endl;
+    return os.str();
 }
 
 Maps::TilesAddon & Maps::TilesAddon::operator= (const Maps::TilesAddon & ta)
@@ -924,25 +926,33 @@ Maps::TilesAddon* Maps::Tiles::FindAddonLevel2(u32 uniq2)
 }
 
 
-void Maps::Tiles::DebugInfo(void) const
+std::string Maps::Tiles::String(void) const
 {
-    VERBOSE("----------------:--------");
-    VERBOSE("maps index      : " << maps_index);
-    VERBOSE("tile            : " << tile_sprite_index);
-    VERBOSN("ground          : " << Ground::String(GetGround()));
-    VERBOSE((isRoad() ? ", (road)" : ""));
-    VERBOSE("passable        : " << (isPassable(NULL, Direction::UNKNOWN, false) ? "true" : "false"));
-    VERBOSE("mp2 object      : " << "0x" << std::setw(2) << std::setfill('0') << static_cast<int>(mp2_object) <<
-				    ", (" << MP2::StringObject(mp2_object) << ")");
-    VERBOSE("quantity 1      : " << static_cast<int>(quantity1));
-    VERBOSE("quantity 2      : " << static_cast<int>(quantity2));
-    VERBOSE("quantity 3      : " << static_cast<int>(quantity3));
-    VERBOSE("quantity 4      : " << static_cast<int>(quantity4));
+    std::ostringstream os;
 
-    std::for_each(addons_level1.begin(), addons_level1.end(), std::bind2nd(std::mem_fun_ref(&TilesAddon::DebugInfo), 1));
-    std::for_each(addons_level2.begin(), addons_level2.end(), std::bind2nd(std::mem_fun_ref(&TilesAddon::DebugInfo), 2));
+    os <<
+	"----------------:--------" << std::endl <<
+	"maps index      : " << maps_index << std::endl <<
+	"tile            : " << tile_sprite_index << std::endl <<
+	"ground          : " << Ground::String(GetGround()) << (isRoad() ? ", (road)" : "") << std::endl <<
+	"passable        : " << (isPassable(NULL, Direction::UNKNOWN, false) ? "true" : "false") << std::endl <<
+	"mp2 object      : " << "0x" << std::setw(2) << std::setfill('0') << static_cast<int>(mp2_object) <<
+				    ", (" << MP2::StringObject(mp2_object) << ")" << std::endl <<
+	"quantity 1      : " << static_cast<int>(quantity1) << std::endl <<
+	"quantity 2      : " << static_cast<int>(quantity2) << std::endl <<
+	"quantity 3      : " << static_cast<int>(quantity3) << std::endl <<
+	"quantity 4      : " << static_cast<int>(quantity4) << std::endl;
 
-    VERBOSE("----------------I--------");
+    for(Addons::const_iterator
+	it = addons_level1.begin(); it != addons_level1.end(); ++it)
+	os << (*it).String(1);
+
+    for(Addons::const_iterator
+	it = addons_level2.begin(); it != addons_level2.end(); ++it)
+	os << (*it).String(2);
+
+    os <<
+	"----------------I--------" << std::endl;
 
     // extra obj info
     switch(mp2_object)
@@ -968,13 +978,13 @@ void Maps::Tiles::DebugInfo(void) const
         case MP2::OBJ_THATCHEDHUT:
 	//
 	case MP2::OBJ_MONSTER:
-	    VERBOSE("count           : " << GetCountMonster());
+	    os << "count           : " << GetCountMonster() << std::endl;
 	    break;
 
 	case MP2::OBJ_HEROES:
 	    {
 		const Heroes *hero = world.GetHeroes(maps_index);
-		if(hero) hero->Dump();
+		if(hero) os << hero->String();
 	    }
 	    break;
 
@@ -982,7 +992,7 @@ void Maps::Tiles::DebugInfo(void) const
 	case MP2::OBJ_CASTLE:
 	    {
 		const Castle *castle = world.GetCastle(maps_index);
-		if(castle) castle->Dump();
+		if(castle) os << castle->String();
 	    }
 	    break;
 
@@ -991,17 +1001,18 @@ void Maps::Tiles::DebugInfo(void) const
 	    const u16 dst_around = Maps::TileUnderProtection(maps_index);
 	    if(dst_around)
 	    {
-		VERBOSN("protection      : ");
+		os << "protection      : ";
 		for(Direction::vector_t dir = Direction::TOP_LEFT; dir < Direction::CENTER; ++dir)
 		    if(dst_around & dir)
-			VERBOSN(Maps::GetDirectionIndex(maps_index, dir) << ", ");
-		VERBOSE("");
+			os << Maps::GetDirectionIndex(maps_index, dir) << ", ";
+		os << std::endl;
 	    }
 	    break;
 	}
     }
 
-    VERBOSE("----------------:--------");
+    os << "----------------:--------" << std::endl;
+    return os.str();
 }
 
 MP2::object_t Maps::Tiles::GetObject(void) const

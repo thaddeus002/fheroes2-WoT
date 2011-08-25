@@ -182,7 +182,7 @@ int Network::RunDedicatedServer(void)
     }
     catch(Error::Exception)
     {
-        conf.Dump();
+        VERBOSE(conf.String());
     }
 
     return 0;

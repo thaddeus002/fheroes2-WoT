@@ -220,7 +220,7 @@ void Kingdom::ActionNewWeek(void)
 	if(IS_DEVEL() && (Game::CONTROL_HUMAN & GetControl()))
 	{
 	    Funds gift(20, 20, 10, 10, 10, 10, 5000);
-	    DEBUG(DBG_GAME, DBG_INFO, "debug gift: " << gift.Dump());
+	    DEBUG(DBG_GAME, DBG_INFO, "debug gift: " << gift.String());
 	    resource += gift;
 	}
     }
@@ -364,12 +364,6 @@ void Kingdom::SetVisited(const s32 index, const MP2::object_t object)
 bool Kingdom::HeroesMayStillMove(void) const
 {
     return heroes.end() != std::find_if(heroes.begin(), heroes.end(), std::mem_fun(&Heroes::MayStillMove));
-}
-
-void Kingdom::Dump(void) const
-{
-    world.DateDump();
-    DEBUG(DBG_GAME, DBG_INFO, "color: " << Color::String(color) << ", resource: " << resource.Dump());
 }
 
 u8 Kingdom::GetCountCapital(void) const

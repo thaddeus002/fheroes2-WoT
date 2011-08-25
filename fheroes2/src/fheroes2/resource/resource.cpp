@@ -241,7 +241,7 @@ bool Funds::operator>= (const Funds & pm) const
                 gold >= pm.gold;
 }
 
-std::string Funds::Dump(void) const
+std::string Funds::String(void) const
 {
     std::ostringstream os;
     os << "ore: " << ore <<
