@@ -978,7 +978,11 @@ void World::NewWeek(void)
 {
     // update week type
     week_current = week_next;
-    week_next = LastWeek() ? Week::MonthRand() : Week::WeekRand();
+    const u8 type = LastWeek() ? Week::MonthRand() : Week::WeekRand();
+    if(Week::MONSTERS == type)
+	week_next = Week(type, LastWeek() ? Monster::Rand4MonthOf() : Monster::Rand4WeekOf());
+    else
+	week_next = Week(type);
 
     UpdateDwellingPopulation();
 

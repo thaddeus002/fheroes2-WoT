@@ -26,16 +26,6 @@
 #include "world.h"
 #include "week.h"
 
-Week & Week::operator= (u8 type)
-{
-    first = type > MONSTERS ? UNNAMED : type;
-    if(type == MONSTERS)
-	second = world.BeginMonth() ? Monster::Rand4MonthOf() : Monster::Rand4WeekOf();
-    else
-	second = Monster::UNKNOWN;
-    return *this;
-}
-
 const char* Week::GetName(void) const
 {
     const char* str_name[] = { "Unnamed", _("week|PLAGUE"),

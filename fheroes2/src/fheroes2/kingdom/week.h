@@ -59,9 +59,7 @@ struct Week : std::pair<u8, u8>
 	MONSTERS	// week of monsters game
     };
 
-    Week() : std::pair<u8, u8>(UNNAMED, Monster::UNKNOWN){}
-
-    Week & operator= (u8);
+    Week(u8 type = UNNAMED, u8 mons = Monster::UNKNOWN) : std::pair<u8, u8>(type, mons){}
 
     u8 GetType(void) const { return first; }
     u8 GetMonster(void) const { return second; }
