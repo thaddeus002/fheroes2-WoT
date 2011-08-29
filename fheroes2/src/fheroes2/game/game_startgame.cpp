@@ -1582,36 +1582,26 @@ void Game::NewWeekDialog(void)
     const Week & week = world.GetWeekType();
 
     // head
-    std::string message = world.BeginMonth() ? _("Astrologers proclaim month of the %{name}.") : _("Astrologers proclaim week of the %{name}.");
+    std::string message = world.BeginMonth() ? _("Astrologers proclaim Month of the %{name}.") : _("Astrologers proclaim Week of the %{name}.");
     AGG::PlayMusic(world.BeginMonth() ? MUS::WEEK2_MONTH1 : MUS::WEEK1, false);
     String::Replace(message, "%{name}", week.GetName());
     message += "\n \n";
 
-    switch(week.GetType())
+    if(week.GetType() == Week::PLAGUE)
+	message += _(" All populations are halved.");
+    else
+    if(week.GetType() == Week::MONSTERS)
     {
-	case Week::PLAGUE:
-	    message += (week.GetType() == Week::PLAGUE ? _(" All populations are halved.") : _(" All dwellings increase population."));
-	    break;
-	case Week::MONSTERS:
-	{
-	    const Monster monster(week.GetMonster());
-	    if(world.BeginMonth())
-		message += 100 == Castle::GetGrownMonthOf() ? _("%{monster} population doubles!") : _("%{monster} population increase on %{count} percent!");
-	    else
-		message += _("%{monster} growth +%{count}.");
-	    String::Replace(message, "%{monster}", monster.GetMultiName());
-	    String::Replace(message, "%{count}", (world.BeginMonth() ? Castle::GetGrownMonthOf() : Castle::GetGrownWeekOf()));
-	}
-	    break;
-	default:
-	    break;
-    }
-
-    // tail
-    if(week.GetType() != Week::PLAGUE)
-    {
+	const Monster monster(week.GetMonster());
+	if(world.BeginMonth())
+	    message += 100 == Castle::GetGrownMonthOf() ? _("After regular growth, population of %{monster} doubled!") :
+								    _("After regular growth, population of %{monter} increase on %{count} percent!");
+	else
+	    message += _("%{monster} population increases by +%{count}.");
+	String::Replace(message, "%{monster}", monster.GetMultiName());
+	String::Replace(message, "%{count}", (world.BeginMonth() ? Castle::GetGrownMonthOf() : Castle::GetGrownWeekOf()));
 	message += "\n";
-	message += _("All dwellings increase population.");
+	message += _(" All dwellings increase population.");
     }
 
     Dialog::Message("", message, Font::BIG, Dialog::OK);
