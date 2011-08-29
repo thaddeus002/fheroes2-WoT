@@ -610,7 +610,8 @@ Cursor::themes_t Game::GetCursorFocusHeroes(const Heroes & from_hero, const Maps
 	    {
 		bool protection = (MP2::isPickupObject(tile.GetObject()) ? false :
 				(Maps::TileUnderProtection(tile.GetIndex()) ||
-					 tile.CaptureObjectIsProtection(from_hero.GetColor())));
+					(! conf.IsUnions(from_hero.GetColor(), world.ColorCapturedObject(tile.GetIndex())) &&
+					    tile.CaptureObjectIsProtection(from_hero.GetColor()))));
 
 		return Cursor::DistanceThemes((protection ? Cursor::FIGHT : Cursor::ACTION),
 						from_hero.GetRangeRouteDays(tile.GetIndex()));

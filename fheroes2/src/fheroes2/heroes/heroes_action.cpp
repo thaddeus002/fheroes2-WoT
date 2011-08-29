@@ -2200,7 +2200,7 @@ void ActionToCaptureObject(Heroes &hero, const u8 obj, const s32 dst_index)
     }
 
     // capture object
-    if(hero.GetColor() != world.ColorCapturedObject(dst_index))
+    if(! Settings::Get().IsUnions(hero.GetColor(), world.ColorCapturedObject(dst_index)))
     {
 	bool capture = true;
 

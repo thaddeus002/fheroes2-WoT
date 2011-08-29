@@ -94,11 +94,14 @@ std::string ShowGuardiansInfo(const Maps::Tiles & tile, u8 scoute)
     else
 	str = MP2::StringObject(tile.GetObject());
 
-    str.append("\n");
-    str.append(_("guarded by %{count} of %{monster}"));
+    if(troop.isValid())
+    {
+	str.append("\n");
+	str.append(_("guarded by %{count} of %{monster}"));
 
-    String::Replace(str, "%{monster}", String::Lower(troop.GetMultiName()));
-    String::Replace(str, "%{count}", CountScoute(troop.GetCount(), scoute));
+	String::Replace(str, "%{monster}", String::Lower(troop.GetMultiName()));
+	String::Replace(str, "%{count}", CountScoute(troop.GetCount(), scoute));
+    }
 
     return str;
 }
@@ -469,7 +472,7 @@ void Dialog::QuickInfo(const Maps::Tiles & tile)
 	    break;
 
 	case MP2::OBJ_MINES:
-            name_object = Maps::GetMinesName(tile.GetMinesType());
+	    name_object = Maps::GetMinesName(tile.GetMinesType());
 	    break;
 
         // join army

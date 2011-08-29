@@ -1865,16 +1865,19 @@ bool Maps::Tiles::OtherObjectsIsProtection(void) const
     return false;
 }
 
+/* true: if protection or has guardians */
 bool Maps::Tiles::CaptureObjectIsProtection(u8 color) const
 {
     u8 object = mp2_object;
 
-    if(MP2::OBJ_HEROES == mp2_object && world.GetHeroes(maps_index))
-	object = world.GetHeroes(maps_index)->GetUnderObject();
+    if(MP2::OBJ_HEROES == mp2_object)
+    {
+	const Heroes* hero = world.GetHeroes(maps_index);
+	if(hero) object = hero->GetUnderObject();
+    }
 
     if(color &&
-	MP2::isCaptureObject(object)  &&
-	! Settings::Get().IsUnions(color, world.ColorCapturedObject(maps_index)))
+	MP2::isCaptureObject(object))
     {
 	if(MP2::OBJ_CASTLE == object)
 	{
