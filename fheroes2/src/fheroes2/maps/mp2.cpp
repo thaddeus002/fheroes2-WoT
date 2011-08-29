@@ -736,6 +736,7 @@ bool MP2::isWaterObject(const u8 obj)
     {
     	    case OBJ_WATERCHEST:
 	    case OBJ_DERELICTSHIP:
+	    case OBJ_SHIPWRECK:
 	    case OBJ_WHIRLPOOL:
 	    case OBJ_BUOY:
 	    case OBJ_BOTTLE:

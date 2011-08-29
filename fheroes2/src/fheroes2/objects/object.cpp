@@ -61,7 +61,7 @@ bool Object::AllowDirect(u8 general, u16 direct)
     switch(general)
     {
 	case MP2::OBJ_SHIPWRECK:
-	    return (direct & (Direction::LEFT | Direction::BOTTOM_LEFT));
+	    return (direct & (Direction::LEFT | DIRECTION_BOTTOM_ROW));
 
 	case MP2::OBJ_DERELICTSHIP:
 	    return (direct & (Direction::LEFT | Direction::BOTTOM_LEFT | Direction::BOTTOM));
