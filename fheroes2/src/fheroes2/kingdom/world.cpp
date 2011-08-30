@@ -993,7 +993,11 @@ void World::NewWeek(void)
 	// update week object
 	for(MapsTiles::iterator
 	    it = vec_tiles.begin(); it != vec_tiles.end(); ++it)
-	    if(MP2::isWeekLife((*it).GetObject())) (*it).UpdateQuantity();
+	{
+	    const Heroes* hero = (*it).GetObject() == MP2::OBJ_HEROES ? world.GetHeroes((*it).GetIndex()) : NULL;
+	    const u8 obj = hero ? hero->GetUnderObject() : (*it).GetObject();
+	    if(MP2::isWeekLife(obj)) (*it).UpdateQuantity();
+	}
 
 	// update gray towns
         for(AllCastles::iterator

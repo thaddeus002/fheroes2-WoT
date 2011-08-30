@@ -1506,8 +1506,9 @@ u8 Maps::Tiles::GetMinesType(void) const
 void Maps::Tiles::UpdateQuantity(void)
 {
     const TilesAddon * addon = NULL;
+    const Heroes* hero = mp2_object == MP2::OBJ_HEROES ? world.GetHeroes(maps_index) : NULL;
 
-    switch(mp2_object)
+    switch(hero ? hero->GetUnderObject() : mp2_object)
     {
         case MP2::OBJ_WITCHSHUT:
             quantity1 = Skill::Secondary::RandForWitchsHut();
