@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-08-29 11:06+0900\n"
+"POT-Creation-Date: 2011-08-30 10:09+0900\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2629,7 +2629,7 @@ msgid " All populations are halved."
 msgstr ""
 
 #: ../fheroes2/game/game_startgame.cpp:1598
-msgid "After regular growth, population of %{monster} doubled!"
+msgid "After regular growth, population of %{monster} is doubled!"
 msgstr ""
 
 #: ../fheroes2/game/game_startgame.cpp:1599

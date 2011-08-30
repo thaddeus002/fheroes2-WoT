@@ -1595,7 +1595,7 @@ void Game::NewWeekDialog(void)
     {
 	const Monster monster(week.GetMonster());
 	if(world.BeginMonth() && Castle::GetGrownMonthOf())
-	    message += 100 == Castle::GetGrownMonthOf() ? _("After regular growth, population of %{monster} doubled!") :
+	    message += 100 == Castle::GetGrownMonthOf() ? _("After regular growth, population of %{monster} is doubled!") :
 								    _("After regular growth, population of %{monter} increase on %{count} percent!");
 	else
 	    message += _("%{monster} population increases by +%{count}.");
