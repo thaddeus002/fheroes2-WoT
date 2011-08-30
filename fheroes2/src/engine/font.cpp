@@ -28,8 +28,6 @@
 #include "surface.h"
 #include "SDL_ttf.h"
 
-bool SDL::Font::init = false;
-
 SDL::Font::Font() : fnt(NULL)
 {
 }
@@ -42,13 +40,11 @@ SDL::Font::~Font()
 void SDL::Font::Init(void)
 {
     if(0 != TTF_Init()) std::cerr << "Font::Init: error" << std::endl;
-    else init = true;
 }
 
 void SDL::Font::Quit(void)
 {
     TTF_Quit();
-    init = false;
 }
 
 bool SDL::Font::isValid(void) const
@@ -58,14 +54,9 @@ bool SDL::Font::isValid(void) const
 
 bool SDL::Font::Open(const std::string & filename, u8 size)
 {
-    if(init)
-    {
-	if(fnt) TTF_CloseFont(fnt);
-
-	fnt = TTF_OpenFont(filename.c_str(), size);
-
-	if(!fnt) std::cerr << "Font::Open: error open: " << filename << std::endl;
-    }
+    if(fnt) TTF_CloseFont(fnt);
+    fnt = TTF_OpenFont(filename.c_str(), size);
+    if(!fnt) std::cerr << "Font::Open: error open: " << filename << std::endl;
     return fnt;
 }
 

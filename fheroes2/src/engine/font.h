@@ -59,8 +59,6 @@ namespace SDL
 
     private:
 	TTF_Font *fnt;
-
-	static bool init;
     };
 }
 #endif
