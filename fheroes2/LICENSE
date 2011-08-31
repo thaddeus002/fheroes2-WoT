@@ -14,6 +14,16 @@ Please! Do not make the official packages for assembly FHeroes2
 together with the resource file HEROES2.AGG.
 
 Other components:
+- AI code files:
+    authors: Andrey Afletdinov
+    license: Non-commercial License
+    files:
+     src/fheroes2/ai/simple/ai_battle.cpp
+     src/fheroes2/ai/simple/ai_castle.cpp
+     src/fheroes2/ai/simple/ai_heroes.cpp
+     src/fheroes2/ai/simple/ai_kingdom.cpp
+     src/fheroes2/ai/simple/ai_simple.cpp
+     src/fheroes2/ai/simple/ai_simple.h
 
 - save SDL_Surface to PNG format:
     authors: Philip D. Bober
