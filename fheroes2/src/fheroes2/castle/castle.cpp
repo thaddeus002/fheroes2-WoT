@@ -202,7 +202,7 @@ void Castle::LoadFromMP2(const void *ptr)
     ptr8 += 13;
 
     // race
-    const u8 kingdom_race = Settings::Get().KingdomRace(color);
+    const u8 kingdom_race = Game::GetKingdomRace(color);
     switch(*ptr8)
     { 	 
 	case 0x00: race = Race::KNGT; break; 	 
@@ -264,7 +264,7 @@ void Castle::LoadFromMP2(const void *ptr)
     EducateHeroes();
 
     // AI troops auto pack
-    if(!custom_troops && (Game::CONTROL_AI & GetControl()))
+    if(!custom_troops && (CONTROL_AI & GetControl()))
 	JoinRNDArmy();
 
     // fix shipyard
@@ -1828,7 +1828,7 @@ bool Castle::AllowBuyBoat(void) const
 bool Castle::BuyBoat(void)
 {
     if(!AllowBuyBoat()) return false;
-    if(Game::CONTROL_HUMAN & world.GetKingdom(color).GetControl()) AGG::PlaySound(M82::BUILDTWN);
+    if(CONTROL_HUMAN & world.GetKingdom(color).GetControl()) AGG::PlaySound(M82::BUILDTWN);
 
     const s32 index = GetIndex() + world.w() * 2;
     Maps::Tiles & left = world.GetTiles(index - 1);
@@ -1937,7 +1937,7 @@ void Castle::JoinRNDArmy(void)
 
 void Castle::ActionPreBattle(void)
 {
-    if(Game::CONTROL_AI & GetControl())
+    if(CONTROL_AI & GetControl())
 	AI::CastlePreBattle(*this);
     else
     if(Settings::Get().ExtBattleMergeArmies())
@@ -1956,7 +1956,7 @@ void Castle::ActionAfterBattle(bool attacker_wins)
 	army.Clear();
     }
 
-    if(Game::CONTROL_AI & GetControl())
+    if(CONTROL_AI & GetControl())
 	AI::CastleAfterBattle(*this, attacker_wins);
 }
 

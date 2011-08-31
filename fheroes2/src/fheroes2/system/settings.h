@@ -32,6 +32,7 @@
 #include "color.h"
 #include "maps_fileinfo.h"
 #include "game.h"
+#include "players.h"
 #include "game_io.h"
 #include "bitmodes.h"
 
@@ -39,13 +40,14 @@
 #include <android/log.h>
 #endif
 
+#define FORMAT_VERSION_2487 0x09B7
 #define FORMAT_VERSION_2460 0x099C
 #define FORMAT_VERSION_2379 0x094B
 #define FORMAT_VERSION_2371 0x0943
 #define FORMAT_VERSION_2315 0x090B
 #define FORMAT_VERSION_2293 0x08F5
 #define FORMAT_VERSION_2268 0x08DC
-#define CURRENT_FORMAT_VERSION FORMAT_VERSION_2460
+#define CURRENT_FORMAT_VERSION FORMAT_VERSION_2487
 #define LAST_FORMAT_VERSION FORMAT_VERSION_2268
 
 #define ListMapsDirectory std::list<std::string>
@@ -205,7 +207,8 @@ public:
     bool Save(const std::string & filename) const;
 
     std::string String(void) const;
-    bool LoadFileMapsMP2(const std::string & file);
+    bool SetCurrentFileInfo(const std::string &);
+    void SetCurrentFileInfo(const Maps::FileInfo &);
     Maps::FileInfo & CurrentFileInfo(void);
     const Maps::FileInfo & CurrentFileInfo(void) const;
 
@@ -375,14 +378,15 @@ public:
     u8   GameType(void) const;
     void SetGameType(u8);
 
+    Players & GetPlayers(void);
+    const Players & GetPlayers(void) const;
+
     u8   GetUnions(u8 cl1) const;
     bool IsUnions(u8 cl1, u8 cl2) const;
     Color::color_t CurrentColor(void) const;
     Color::color_t MyColor(void) const;
-    void SetCurrentColor(const Color::color_t c);
-    void SetMyColor(const Color::color_t c);
-    u8   PlayersColors(void) const;
-    void SetPlayersColors(u8 c);
+    void SetCurrentColor(u8);
+    void SetMyColor(u8);
     u8   PreferablyCountPlayers(void) const;
     void SetPreferablyCountPlayers(u8 c);
 
@@ -391,9 +395,6 @@ public:
     u16	GetPort(void) const;
 
     // from maps info
-    u8 KingdomRace(u8) const;
-    void SetKingdomRace(u8, u8);
-    void FixKingdomRandomRace(void);
     bool AllowChangeRace(u8) const;
     const std::string & MapsFile(void) const;
     const std::string & MapsName(void) const;
@@ -464,7 +465,6 @@ private:
     u8 battle_speed;
 
     u8 game_type;
-    u8 players_colors;
     u8 preferably_count_players;
 
     std::string playmus_command;
@@ -478,6 +478,8 @@ private:
     Point pos_bttn;
     Point pos_icon;
     Point pos_stat;
+
+    Players players;
 };
 
 #endif

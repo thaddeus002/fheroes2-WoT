@@ -696,7 +696,7 @@ s8 Heroes::GetLuckWithModificators(std::string *strs) const
 }
 
 /* recrut hero */
-bool Heroes::Recruit(const Color::color_t cl, const Point & pt)
+bool Heroes::Recruit(u8 cl, const Point & pt)
 {
     if(color != Color::NONE)
     {
@@ -709,7 +709,7 @@ bool Heroes::Recruit(const Color::color_t cl, const Point & pt)
     if(kingdom.AllowRecruitHero(false, 0))
     {
 	Maps::Tiles & tiles = world.GetTiles(pt);
-	color = cl;
+	color = Color::Get(cl);
 	killer_color = Color::NONE;
 	SetCenter(pt);
 	if(!Modes(SAVEPOINTS)) move_point = GetMaxMovePoints();
@@ -847,7 +847,7 @@ void Heroes::RescanPath(void)
 {
     if(path.isValid())
     {
-	if(Game::CONTROL_AI & GetControl())
+	if(CONTROL_AI & GetControl())
 	{
 	    if(path.hasObstacle()) path.Reset();
 	}
@@ -1275,8 +1275,8 @@ void Heroes::LevelUp(bool skipsecondary, bool autoselect)
 {
     u8 primary = LevelUpPrimarySkill();
     if(! skipsecondary)
-	LevelUpSecondarySkill(primary, (autoselect || (Game::CONTROL_AI & GetControl())));
-    if(Game::CONTROL_AI & GetControl()) AI::HeroesLevelUp(*this);
+	LevelUpSecondarySkill(primary, (autoselect || (CONTROL_AI & GetControl())));
+    if(CONTROL_AI & GetControl()) AI::HeroesLevelUp(*this);
 }
 
 u8 Heroes::LevelUpPrimarySkill(void)
@@ -1668,7 +1668,7 @@ std::string Heroes::String(void) const
 	os << std::endl;
     }
 
-    if(GetControl() & Game::CONTROL_AI)
+    if(GetControl() & CONTROL_AI)
     {
 	os <<
 	    "skills          : " << secondary_skills.String() << std::endl <<

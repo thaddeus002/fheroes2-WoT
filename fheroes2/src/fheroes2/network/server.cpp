@@ -70,9 +70,10 @@ FH2Server::FH2Server()
 	Error::Except("create server");
     }
 
-    if(!PrepareMapsFileInfoList(finfoList, true) ||
-       !Settings::Get().LoadFileMapsMP2(finfoList.front().file))
+    if(!PrepareMapsFileInfoList(finfoList, true))
 	    DEBUG(DBG_NETWORK, DBG_WARN, "maps not found");
+    else
+	Settings::Get().SetCurrentFileInfo(finfoList.front());
 
     mutexConf.Create();
     mutexSpool.Create();
@@ -123,6 +124,7 @@ RemoteMessage* FH2Server::FindRemoteReady(void)
 int FH2Server::Main(void* ptr)
 {
     Settings & conf = Settings::Get();
+    Players & players = conf.GetPlayers();
     FH2Server & server = Get();
     SDL::Thread threadConnections;
 
@@ -216,18 +218,16 @@ int FH2Server::Main(void* ptr)
 			    Heroes* hero2 = heroes.GetHero2();
 			    if(hero1 && hero2)
 			    {
-				Color::color_t color1 = Color::BLUE;
-				Color::color_t color2 = Color::RED;
+				const Color::color_t & color1 = Color::BLUE;
+				const Color::color_t & color2 = Color::RED;
 
-				Kingdom* kingdom1 = &world.GetKingdom(color1);
-				Kingdom* kingdom2 = &world.GetKingdom(color2);
+				// SetMapsFileInfo
+				players.Init(color1 | color2);
+				//players.ResetControl(CONTROL_REMOTE);
 
-				kingdom1->SetControl(Game::CONTROL_REMOTE);
-				kingdom2->SetControl(Game::CONTROL_REMOTE);
-
-				conf.SetKingdomRace(color1, hero1->GetRace());
-				conf.SetKingdomRace(color2, hero2->GetRace());
-				conf.SetPlayersColors(color1 | color2);
+				Game::SetKingdomRace(color1, hero1->GetRace());
+				Game::SetKingdomRace(color2, hero2->GetRace());
+				//players.SetHumanColors(color1 | color2);
 
 				hero1->SetSpellPoints(hero1->GetMaxSpellPoints());
 				hero1->Recruit(color1, Point(5, 5));
@@ -247,7 +247,7 @@ int FH2Server::Main(void* ptr)
 
 		if(!clientResult)
 		{
-		    DEBUG(DBG_NETWORK, DBG_WARN, "client shutdown: " << "id: 0x" << std::hex << client->player_id);
+		    DEBUG(DBG_NETWORK, DBG_WARN, "client shutdown: " << "id: 0x" << std::hex << client->id);
 		    client->ShutdownThread();
 		}
 
@@ -423,7 +423,7 @@ bool FH2Server::WaitReadyClients(u32 ms)
 		u16 reply;
 		msg.Pop(reply);
 		if(reply == magick)
-		    remains &= (~rm->own->player_color);
+		    remains &= (~rm->own->color);
 	    }
 
 	    RemoveMessage(*rm);
@@ -458,7 +458,7 @@ void FH2Server::UpdateColors(void)
     const u8 colors = clients.GetPlayersColors();
 
     mutexConf.Lock();
-    conf.SetPlayersColors(colors);
+    conf.GetPlayers().SetHumanColors(colors);
     mutexConf.Unlock();
 
     DEBUG(DBG_NETWORK, DBG_INFO, static_cast<int>(colors));
@@ -532,8 +532,7 @@ void FH2Server::ResetPlayers(void)
     const u8 colors = clients.ResetPlayersColors();
 
     mutexConf.Lock();
-    conf.SetPlayersColors(0);
-    conf.SetPlayersColors(colors);
+    conf.GetPlayers().SetHumanColors(colors);
     mutexConf.Unlock();
 
     DEBUG(DBG_NETWORK, DBG_INFO, "colors: " << static_cast<int>(colors));
@@ -546,7 +545,7 @@ void FH2Server::SetCurrentMap(QueueMessage & msg)
 
     msg.Pop(str);
 
-    if(conf.LoadFileMapsMP2(str))
+    if(conf.SetCurrentFileInfo(str))
     {
 	msg.Reset();
 	msg.SetID(MSG_SET_CURRENT_MAP);
@@ -591,7 +590,7 @@ void FH2Server::MsgChangeRaces(QueueMessage & msg)
 
     if(conf.AllowChangeRace(color))
     {
-        conf.SetKingdomRace(color, race);
+        Game::SetKingdomRace(color, race);
         msg.Reset();
         msg.SetID(MSG_CHANGE_RACE);
         clients.ChangeRace(color, race);
@@ -610,7 +609,7 @@ void FH2Server::MsgLogout(QueueMessage & msg, FH2RemoteClient & client)
     // send message
     msg.Reset();
     msg.SetID(MSG_MESSAGE);
-    str = "logout player: " + client.player_name;
+    str = "logout player: " + client.name;
     if(err.size())
     {
 	str.append("\n");
@@ -621,9 +620,9 @@ void FH2Server::MsgLogout(QueueMessage & msg, FH2RemoteClient & client)
     DEBUG(DBG_NETWORK, DBG_INFO, str);
     DEBUG(DBG_NETWORK, DBG_INFO, "size: " << std::dec << msg.DtSz() << " bytes");
 
-    clients.Send2All(msg, client.player_id);
+    clients.Send2All(msg, client.id);
 
-    if(client.Modes(ST_ADMIN)) clients.SetNewAdmin(client.player_id);
+    if(client.Modes(ST_ADMIN)) clients.SetNewAdmin(client.id);
 
     client.SetModes(ST_SHUTDOWN);
 
@@ -631,10 +630,10 @@ void FH2Server::MsgLogout(QueueMessage & msg, FH2RemoteClient & client)
 
     // send players
     UpdateColors();
-    SendUpdatePlayers(msg, client.player_id);
+    SendUpdatePlayers(msg, client.id);
 
     // FIXME: logout
-    // if(Modes(ST_INGAME)) world.GetKingdom(player_color).SetControl(Game::CONTROL_AI); // FIXME: MSGLOGOUT: INGAME AND CURRENT TURN?    
+    // if(Modes(ST_INGAME)) world.GetKingdom(player_color).SetControl(CONTROL_AI); // FIXME: MSGLOGOUT: INGAME AND CURRENT TURN?    
 }
 
 void FH2Server::MsgShutdown(QueueMessage & msg)
@@ -686,7 +685,7 @@ void FH2Server::MsgLoadMaps(QueueMessage & msg, FH2RemoteClient & client)
     {
 	mutexConf.Lock();
 
-	conf.SetPlayersColors(clients.GetPlayersColors());
+	conf.GetPlayers().SetHumanColors(clients.GetPlayersColors());
 
 	if(conf.GameType(Game::TYPE_STANDARD))
 	{
@@ -699,12 +698,12 @@ void FH2Server::MsgLoadMaps(QueueMessage & msg, FH2RemoteClient & client)
 	    //world.NewMaps(10, 10);
 	}
 
-	// set control
-	const Colors colors(conf.PlayersColors());
+	// FIX ME: set control
+	const Colors colors(conf.GetPlayers().GetColors(CONTROL_HUMAN));
 
 	for(Colors::const_iterator
 	    it = colors.begin(); it != colors.end(); ++it)
-    	    world.GetKingdom(*it).SetControl(Game::CONTROL_REMOTE);
+    	    conf.GetPlayers().SetPlayerControl(*it, CONTROL_REMOTE);
 
 	mutexConf.Unlock();
     }
@@ -914,15 +913,11 @@ Game::menu_t Game::NetworkHost(void)
     DELAY(300);
 
     // create local client
-    const std::string localhost("127.0.0.1");
     FH2LocalClient & client = FH2LocalClient::Get();
 
     // connect to server
-    if(client.Connect(localhost, conf.GetPort()))
-    {
-	client.SetModes(ST_LOCALSERVER);
+    if(client.Connect("127.0.0.1", conf.GetPort()))
 	client.Main();
-    }
     else
         Dialog::Message(_("Error"), Network::GetError(), Font::BIG, Dialog::OK);
 

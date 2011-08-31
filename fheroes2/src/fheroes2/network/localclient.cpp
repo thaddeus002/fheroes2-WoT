@@ -40,8 +40,8 @@
 #ifdef WITH_NET
 
 // game_scenarioinfo.cpp
-void UpdateCoordOpponentsInfo(const Point &, std::vector<Rect> &);
-void UpdateCoordClassInfo(const Point &, std::vector<Rect> &);
+void RedrawScenarioStaticInfo(const Rect &);
+void UpdateCoordInfo(const Point &, std::vector<Rect> &);
 
 
 
@@ -54,7 +54,6 @@ FH2LocalClient & FH2LocalClient::Get(void)
 
 FH2LocalClient::FH2LocalClient() : admin_id(0)
 {
-    players.reserve(6);
 }
 
 u8 GetPlayersColors(const std::vector<Player> & v)
@@ -62,7 +61,7 @@ u8 GetPlayersColors(const std::vector<Player> & v)
     u8 res = 0;
     std::vector<Player>::const_iterator it1 = v.begin();
     std::vector<Player>::const_iterator it2 = v.end();
-    for(; it1 != it2; ++it1) if((*it1).player_id && (*it1).player_color) res |= (*it1).player_color;
+    for(; it1 != it2; ++it1) if((*it1).id && (*it1).color) res |= (*it1).color;
 
     return res;
 }
@@ -88,13 +87,13 @@ void FH2LocalClient::PopPlayersInfo(QueueMessage & msg)
     msg.Pop(size);
     for(u8 ii = 0; ii < size; ++ii)
     {
-        msg.Pop(cur.player_color);
-        msg.Pop(cur.player_race);
-        msg.Pop(cur.player_name);
-        msg.Pop(cur.player_id);
+        msg.Pop(cur.color);
+        msg.Pop(cur.race);
+        msg.Pop(cur.name);
+        msg.Pop(cur.id);
         msg.Pop(admin);
-	if(admin) admin_id = cur.player_id;
-        if(cur.player_id) players.push_back(cur);
+	if(admin) admin_id = cur.id;
+        if(cur.id) players.push_back(cur);
     }
 }
 
@@ -158,16 +157,6 @@ void FH2LocalClient::Logout(const std::string & err)
     DELAY(100);
     Close();
     modes = 0;
-
-    if(Modes(ST_LOCALSERVER))
-    {
-        FH2Server & server = FH2Server::Get();
-        if(! server.Modes(ST_SHUTDOWN))
-	{
-	    server.SetModes(ST_SHUTDOWN);
-    	    DELAY(100);
-	}
-    }
 }
 
 bool FH2LocalClient::SendWait(QueueMessage & msg, u16 id, const char* str)
@@ -200,10 +189,10 @@ bool FH2LocalClient::ConnectionChat(void)
     Settings & conf = Settings::Get();
     QueueMessage packet;
 
-    player_color = 0;
-    player_race = 0;
-    player_name.clear();
-    player_id = 0;
+    color = 0;
+    race = 0;
+    name.clear();
+    id = 0;
 
     // recv ready, banner
     DEBUG(DBG_NETWORK, DBG_INFO, "wait ready");
@@ -214,7 +203,7 @@ bool FH2LocalClient::ConnectionChat(void)
     packet.Pop(str);
 
     // dialog: input name
-    if(!Dialog::InputString("Connected to " + server + "\n \n" + str + "\n \nEnter player name:", player_name))
+    if(!Dialog::InputString("Connected to " + server + "\n \n" + str + "\n \nEnter player name:", name))
 	return false;
 
     u8 game_type = conf.GameType();
@@ -224,7 +213,7 @@ bool FH2LocalClient::ConnectionChat(void)
     packet.Reset();
     packet.SetID(MSG_HELLO);
     packet.Push(game_type);
-    packet.Push(player_name);
+    packet.Push(name);
 
     if(!SendWait(packet, MSG_HELLO, "ConnectionChat: "))
 	return false;
@@ -232,7 +221,7 @@ bool FH2LocalClient::ConnectionChat(void)
 
     packet.Pop(modes);
     packet.Pop(game_type);
-    packet.Pop(player_id);
+    packet.Pop(id);
     DEBUG(DBG_NETWORK, DBG_INFO, (Modes(ST_ADMIN) ? "admin" : "client") << " mode");
 
     if(conf.GameType() != game_type)
@@ -349,9 +338,9 @@ bool FH2LocalClient::GetPlayersInfo(void)
     if(!SendWait(packet, MSG_GET_CURRENT_COLOR, "GetPlayersInfo: "))
 	return false;
 
-    packet.Pop(player_color);
+    packet.Pop(color);
 
-    if(0 == player_color)
+    if(0 == color)
     {
 	DEBUG(DBG_NETWORK, DBG_WARN, "unknown color");
 	return false;
@@ -373,7 +362,7 @@ bool FH2LocalClient::ScenarioInfoDialog(void)
     if(!GetCurrentMapInfo() ||
 	!GetPlayersInfo()) return false;
 
-    const Sprite &panel = AGG::GetICN(ICN::NGHSBKG, 0);
+    const Sprite & panel = AGG::GetICN(ICN::NGHSBKG, 0);
     const Rect  rectPanel(204, 32, panel.w(), panel.h());
     const Point pointOpponentInfo(rectPanel.x + 24, rectPanel.y + 202);
     const Point pointClassInfo(rectPanel.x + 24, rectPanel.y + 282);
@@ -381,15 +370,12 @@ bool FH2LocalClient::ScenarioInfoDialog(void)
 
     std::vector<Rect>::const_iterator itr;
 
-    std::vector<Rect> coordColors(KINGDOMMAX);
-    std::vector<Rect> coordRaces(KINGDOMMAX);
+    Interface::PlayersInfo playersInfo(true, false, false);
 
-    UpdateCoordOpponentsInfo(pointOpponentInfo, coordColors);
-    UpdateCoordClassInfo(pointClassInfo, coordRaces);
+    playersInfo.UpdateInfo(conf.GetPlayers(), pointOpponentInfo, pointClassInfo);
 
-    Game::Scenario::RedrawStaticInfo(rectPanel);
-    Game::Scenario::RedrawOpponentsInfo(pointOpponentInfo, &players);
-    Game::Scenario::RedrawClassInfo(pointClassInfo);
+    RedrawScenarioStaticInfo(rectPanel);
+    playersInfo.RedrawInfo();
 
     Button buttonSelectMaps(rectPanel.x + 309, rectPanel.y + 45, ICN::NGEXTRA, 64, 65);
     Button buttonOk(rectPanel.x + 31, rectPanel.y + 380, ICN::NGEXTRA, 66, 67);
@@ -457,8 +443,7 @@ bool FH2LocalClient::ScenarioInfoDialog(void)
 
 		case MSG_SET_CURRENT_MAP:
 		    Network::PacketPopMapsFileInfo(packet, conf.CurrentFileInfo());
-		    UpdateCoordOpponentsInfo(pointOpponentInfo, coordColors);
-		    UpdateCoordClassInfo(pointClassInfo, coordRaces);
+		    playersInfo.UpdateInfo(conf.GetPlayers(), pointOpponentInfo, pointClassInfo);
 		    update_info = true;
 		    break;
 
@@ -477,9 +462,8 @@ bool FH2LocalClient::ScenarioInfoDialog(void)
 	if(update_info)
 	{
 	    cursor.Hide();
-	    Game::Scenario::RedrawStaticInfo(rectPanel);
-	    Game::Scenario::RedrawOpponentsInfo(pointOpponentInfo, &players);
-	    Game::Scenario::RedrawClassInfo(pointClassInfo);
+	    RedrawScenarioStaticInfo(rectPanel);
+	    playersInfo.RedrawInfo();
 	    buttonSelectMaps.Draw();
 	    buttonOk.Draw();
 	    buttonCancel.Draw();
@@ -507,14 +491,12 @@ bool FH2LocalClient::ScenarioInfoDialog(void)
 	    {
 		MapsFileInfoList lists;
 		Network::PacketPopMapsFileInfoList(packet, lists);
-
-        	std::string filemaps;
-	        if(Dialog::SelectScenario(lists, filemaps) && filemaps.size())
+		if(Maps::FileInfo *fi = Dialog::SelectScenario(lists))
         	{
 		    // send set_maps_info
 	    	    packet.Reset();
 		    packet.SetID(MSG_SET_CURRENT_MAP);
-	    	    packet.Push(filemaps);
+	    	    packet.Push(fi->file);
 		    DEBUG(DBG_NETWORK, DBG_INFO, "send: " << Network::GetMsgString(packet.GetID()));
 	    	    if(!Send(packet)) return false;
 		}
@@ -542,20 +524,20 @@ bool FH2LocalClient::ScenarioInfoDialog(void)
 	if(Modes(ST_ADMIN) && le.MouseClickLeft(box))
 	{
 	    // click colors
-	    if(coordColors.end() !=
-		(itr = std::find_if(coordColors.begin(), coordColors.end(), std::bind2nd(RectIncludePoint(), le.GetMouseCursor()))))
+	    if(Player* player = playersInfo.GetFromOpponentClick(le.GetMouseCursor()))
 	    {
-		u8 color = Color::GetFromIndex(itr - coordColors.begin());
-		if((conf.PlayersColors() & color) && Color::NONE == change_color)
+		u8 humans = conf.GetPlayers().GetColors(CONTROL_HUMAN);
+
+		if((humans & player->color) && Color::NONE == change_color)
 		{
 		    cursor.Hide();
 		    sp.Move((*itr).x - 3, (*itr).y - 3);
 		    cursor.Show();
 		    display.Flip();
-		    change_color = color;
+		    change_color = player->color;
 		}
 		else
-		if(conf.CurrentFileInfo().AllowHumanColors() & color)
+		if(conf.CurrentFileInfo().AllowHumanColors() & player->color)
 		{
 		    cursor.Hide();
 		    sp.Hide();
@@ -565,7 +547,7 @@ bool FH2LocalClient::ScenarioInfoDialog(void)
 		    {
 			QueueMessage packet(MSG_CHANGE_COLORS);
 			packet.Push(change_color);
-			packet.Push(color);
+			packet.Push(player->color);
 		        DEBUG(DBG_NETWORK, DBG_INFO, "send: " << Network::GetMsgString(packet.GetID()));
 			if(!Send(packet)) return false;
 			change_color = Color::NONE;
@@ -574,22 +556,19 @@ bool FH2LocalClient::ScenarioInfoDialog(void)
 	    }
 	    else
 	    // click races
-	    if(coordRaces.end() !=
-		(itr = std::find_if(coordRaces.begin(), coordRaces.end(), std::bind2nd(RectIncludePoint(), le.GetMouseCursor()))))
+	    if(Player* player = playersInfo.GetFromClassClick(le.GetMouseCursor()))
 	    {
-		u8 color = Color::GetFromIndex(itr - coordRaces.begin());
-		if(conf.AllowChangeRace(color))
+		if(conf.AllowChangeRace(player->color))
 		{
-                    u8 race = conf.KingdomRace(color);
-                    switch(race)
+                    switch(player->race)
                     {
-                        case Race::KNGT: race = Race::BARB; break;
-                        case Race::BARB: race = Race::SORC; break;
-                        case Race::SORC: race = Race::WRLK; break;
-                        case Race::WRLK: race = Race::WZRD; break;
-                        case Race::WZRD: race = Race::NECR; break;
-                        case Race::NECR: race = Race::RAND; break;
-                        case Race::RAND: race = Race::KNGT; break;
+                        case Race::KNGT: player->race = Race::BARB; break;
+                        case Race::BARB: player->race = Race::SORC; break;
+                        case Race::SORC: player->race = Race::WRLK; break;
+                        case Race::WRLK: player->race = Race::WZRD; break;
+                        case Race::WZRD: player->race = Race::NECR; break;
+                        case Race::NECR: player->race = Race::RAND; break;
+                        case Race::RAND: player->race = Race::KNGT; break;
                         default: break;
                     }
 		    if(change_color)
@@ -600,11 +579,11 @@ bool FH2LocalClient::ScenarioInfoDialog(void)
 			display.Flip();
 			change_color = Color::NONE;
 		    }
-		    if((race & Race::ALL) || race == Race::RAND)
+		    if((player->race & Race::ALL) || player->race == Race::RAND)
 		    {
 			QueueMessage packet(MSG_CHANGE_RACE);
-			packet.Push(color);
-			packet.Push(race);
+			packet.Push(player->color);
+			packet.Push(player->race);
 		        DEBUG(DBG_NETWORK, DBG_INFO, "send: " << Network::GetMsgString(packet.GetID()));
 			if(!Send(packet)) return false;
 		    }
@@ -621,13 +600,13 @@ bool FH2LocalClient::ScenarioInfoDialog(void)
 void FH2LocalClient::MsgUpdatePlayers(QueueMessage & packet)
 {
     PopPlayersInfo(packet);
-    Settings::Get().SetPlayersColors(GetPlayersColors(players));
-    std::vector<Player>::iterator itp = std::find_if(players.begin(), players.end(), std::bind2nd(std::mem_fun_ref(&Player::isID), player_id));
+    Settings::Get().GetPlayers().SetHumanColors(GetPlayersColors(players));
+    std::vector<Player>::iterator itp = std::find_if(players.begin(), players.end(), std::bind2nd(std::mem_fun_ref(&Player::isID), id));
     if(itp != players.end())
     {
-	player_color = (*itp).player_color;
-	player_race = (*itp).player_race;
-	(admin_id == player_id ? SetModes(ST_ADMIN) : ResetModes(ST_ADMIN));
+	color = (*itp).color;
+	race = (*itp).race;
+	(admin_id == id ? SetModes(ST_ADMIN) : ResetModes(ST_ADMIN));
     }
 }
 

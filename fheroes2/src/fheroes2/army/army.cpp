@@ -637,7 +637,7 @@ std::vector<Army::Troop> Army::army_t::Optimize(void) const
 
 void Army::army_t::ArrangeForBattle(void)
 {
-    if(GetControl() & Game::CONTROL_AI)
+    if(GetControl() & CONTROL_AI)
     {
 	Troops priority = Optimize();
 	Clear();
@@ -1055,7 +1055,7 @@ u32 Army::army_t::ActionToSirens(void)
 
 u8 Army::army_t::GetControl(void) const
 {
-    return commander ? commander->GetControl() : (color == Color::NONE ? Game::CONTROL_AI : world.GetKingdom(color).GetControl());
+    return commander ? commander->GetControl() : (color == Color::NONE ? CONTROL_AI : world.GetKingdom(color).GetControl());
 }
 
 u32 Army::army_t::GetSurrenderCost(void) const
@@ -1141,7 +1141,7 @@ u8 Army::GetJoinSolution(const Heroes & hero, const Maps::Tiles & tile, u32 & jo
     {
 	// ... surely flee before us
 
-	if(hero.GetControl() & Game::CONTROL_AI) return Rand::Get(0, 10) < 5 ? 0 : 3;
+	if(hero.GetControl() & CONTROL_AI) return Rand::Get(0, 10) < 5 ? 0 : 3;
 
 	return 3;
     }

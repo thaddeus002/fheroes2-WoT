@@ -66,24 +66,30 @@ void RunTest2(void)
 void RunTest3(void)
 {
     VERBOSE("Run Test3");
+    const std::string amap("/opt/projects/fh2/maps/beltway.mp2");
     Settings & conf = Settings::Get();
-    //conf.SetPlayers(Color::BLUE|Color::GREEN);
 
-    world.LoadMaps("/opt/projects/fh2/maps/beltway.mp2");
+    if(! conf.SetCurrentFileInfo(amap)) return;
+
+    world.LoadMaps(amap);
 
     Heroes & hero1 = *world.GetHeroes(Heroes::SANDYSANDY);
     Heroes & hero2 = *world.GetHeroes(Heroes::BAX);
 
-    Kingdom & kingdom1 = world.GetKingdom(Color::RED);
-    Kingdom & kingdom2 = world.GetKingdom(Color::YELLOW);
+    Players & players = conf.GetPlayers();
 
-    conf.SetMyColor(Color::RED);
+    const u8 mycolor = Color::GetFirst(players.GetColors(CONTROL_HUMAN));
+    const u8 aicolor = Color::GetFirst(players.GetColors((CONTROL_AI)));
+
+    Kingdom & kingdom1 = world.GetKingdom(mycolor);
+    Kingdom & kingdom2 = world.GetKingdom(aicolor);
+
+    conf.SetMyColor(Color::Get(mycolor));
     conf.SetGameType(Game::TYPE_BATTLEONLY);
 
-    hero1.SetSpellPoints(150);
+    players.SetStartGame();
 
-    kingdom1.SetControl(Game::CONTROL_HUMAN);
-    kingdom2.SetControl(Game::CONTROL_AI);
+    hero1.SetSpellPoints(150);
 
     if(kingdom1.GetCastles().size())
     hero1.Recruit(kingdom1.GetColor(), Point(20, 20));

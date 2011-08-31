@@ -229,13 +229,14 @@ bool Game::IO::SaveBIN(QueueMessage & msg)
     msg.Push(static_cast<u8>(conf.my_color));
     msg.Push(static_cast<u8>(conf.cur_color));
     msg.Push(conf.game_type);
-    msg.Push(conf.players_colors);
     msg.Push(conf.preferably_count_players);
     msg.Push(conf.debug);
 
     msg.Push(conf.opt_game());
     msg.Push(conf.opt_world());
     msg.Push(conf.opt_battle());
+
+    PackPlayers(msg, conf.players);
 
     // world
     msg.Push(static_cast<u16>(0xFF05));
@@ -434,9 +435,7 @@ void Game::IO::PackTileAddons(QueueMessage & msg, const Maps::Addons & addons)
 
 void Game::IO::PackKingdom(QueueMessage & msg, const Kingdom & kingdom)
 {
-    msg.Push(static_cast<u8>(kingdom.color));
-
-    msg.Push(kingdom.control);
+    msg.Push(kingdom.color);
     msg.Push(kingdom.flags);
     msg.Push(kingdom.lost_town_days);
     // unused
@@ -619,6 +618,80 @@ void Game::IO::PackHeroes(QueueMessage & msg, const Heroes & hero)
     }
 }
 
+void Game::IO::PackPlayers(QueueMessage & msg, const Players & players)
+{
+    const Colors colors(players.GetColors());
+
+    msg.Push(players.GetColors());
+    msg.Push(static_cast<u32>(colors.size()));
+
+    for(Colors::const_iterator
+	it = colors.begin(); it != colors.end(); ++it)
+    {
+	const Player* player = players.Get(*it);
+	if(player)
+	{
+	    msg.Push(player->color);
+	    msg.Push(player->id);
+	    msg.Push(player->control);
+	    msg.Push(player->race);
+	    msg.Push(player->friends);
+	    msg.Push(player->name);
+	}
+	else
+	    msg.Push(static_cast<u8>(0));
+    }
+}
+
+void Game::IO::UnpackPlayers(QueueMessage & msg, Players & players, u16 version)
+{
+    if(version < FORMAT_VERSION_2487)
+    {
+	const Settings & conf = Settings::Get();
+    	const Colors colors(conf.current_maps_file.kingdom_colors);
+
+	players.Init(conf.current_maps_file.kingdom_colors);
+
+	for(Colors::const_iterator
+	    it = colors.begin(); it != colors.end(); ++it)
+	{
+	    Player* player = players.Get(*it);
+	    if(player)
+	    {
+		player->id = World::GetUniq();
+		player->race = conf.current_maps_file.races[Color::GetIndex(*it)];
+		player->friends = conf.current_maps_file.unions[Color::GetIndex(*it)];
+	    }
+	}
+    }
+    else
+    // players
+    {
+	u8 byte8;
+	u32 byte32;
+
+	msg.Pop(byte8);
+	players.Init(byte8);
+	msg.Pop(byte32);
+	for(u32 ii = 0; ii < byte32; ++ii)
+	{
+	    msg.Pop(byte8);
+	    if(byte8)
+	    {
+		Player* player = players.Get(byte8);
+		if(player)
+		{
+		    msg.Pop(player->id);
+		    msg.Pop(player->control);
+		    msg.Pop(player->race);
+		    msg.Pop(player->friends);
+		    msg.Pop(player->name);
+		}
+	    }
+	}
+    }
+}
+
 bool Game::IO::LoadBIN(QueueMessage & msg)
 {
     Settings & conf = Settings::Get();
@@ -720,7 +793,9 @@ bool Game::IO::LoadBIN(QueueMessage & msg)
     msg.Pop(byte8); conf.my_color = Color::Get(byte8);
     msg.Pop(byte8); conf.cur_color = Color::NONE;
     msg.Pop(conf.game_type);
-    msg.Pop(conf.players_colors);
+    // settings::players_colors
+    if(format < FORMAT_VERSION_2487)
+    	msg.Pop(byte8);
     msg.Pop(conf.preferably_count_players);
 #ifdef WITH_DEBUG
     msg.Pop(byte16);
@@ -737,6 +812,8 @@ bool Game::IO::LoadBIN(QueueMessage & msg)
     msg.Pop(byte32);
     conf.opt_battle.ResetModes(MODES_ALL);
     conf.opt_battle.SetModes(byte32);
+
+    UnpackPlayers(msg, conf.GetPlayers(), format);
 
     // world
     msg.Pop(byte16);
@@ -1013,10 +1090,17 @@ void Game::IO::UnpackKingdom(QueueMessage & msg, Kingdom & kingdom, u16 check_ve
     u16 byte16;
     u32 byte32;
 
-    msg.Pop(byte8);
-    kingdom.color = Color::Get(byte8);
+    // kingdom: color
+    msg.Pop(kingdom.color);
 
-    msg.Pop(kingdom.control);
+    // kingdom: control
+    if(check_version < FORMAT_VERSION_2487)
+    {
+	msg.Pop(byte8);
+        Player* player = Settings::Get().GetPlayers().Get(kingdom.color);
+	if(player) player->control = byte8;
+    }
+
     msg.Pop(kingdom.flags);
     msg.Pop(kingdom.lost_town_days);
     // unused

@@ -587,7 +587,7 @@ void World::LoadMaps(const std::string &filename)
 			    case 4: race = Race::WZRD; break;
 			    case 5: race = Race::NECR; break;
 			    case 6: race = (Color::NONE != color ?
-					    Settings::Get().KingdomRace(color) : Race::Rand()); break;
+					    kingdom.GetRace() : Race::Rand()); break;
 			}
 
 			// check heroes max count
@@ -890,6 +890,11 @@ void World::LoadMaps(const std::string &filename)
     DEBUG(DBG_GAME, DBG_INFO, "end load");
 }
 
+Kingdoms & World::GetKingdoms(void)
+{
+    return vec_kingdoms;
+}
+
 /* get human kindom */
 Kingdom & World::GetMyKingdom(void)
 { return GetKingdom(Settings::Get().MyColor()); }
@@ -900,12 +905,12 @@ const Kingdom & World::GetMyKingdom(void) const
 /* get kingdom */
 Kingdom & World::GetKingdom(u8 color)
 {
-    return vec_kingdoms.Get(color);
+    return vec_kingdoms.GetKingdom(color);
 }
 
 const Kingdom & World::GetKingdom(u8 color) const
 {
-    return vec_kingdoms.Get(color);
+    return vec_kingdoms.GetKingdom(color);
 }
 
 /* get castle from index maps */
@@ -1473,24 +1478,24 @@ s32 World::GetNearestObject(s32 center, MP2::object_t obj, bool check_hero) cons
     return -1;
 }
 
-EventsDate World::GetEventsDate(const Color::color_t c) const
+EventsDate World::GetEventsDate(u8 color) const
 {
     EventsDate res;
 
     for(EventsDate::const_iterator
 	it = vec_eventsday.begin(); it != vec_eventsday.end(); ++it)
-	if((*it).isAllow(c, day)) res.push_back(*it);
+	if((*it).isAllow(color, day)) res.push_back(*it);
 
     return res;
 }
 
-EventMaps* World::GetEventMaps(const Color::color_t c, const s32 index)
+EventMaps* World::GetEventMaps(u8 color, s32 index)
 {
     if(vec_eventsmap.size())
     {
 	for(EventsMaps::iterator
 	    it = vec_eventsmap.begin(); it != vec_eventsmap.end(); ++it)
-	    if((*it).isAllow(c, index)) return &(*it);
+	    if((*it).isAllow(color, index)) return &(*it);
     }
 
     return NULL;
@@ -1546,7 +1551,7 @@ Heroes* World::FromJail(s32 index)
     return vec_heroes.FromJail(index);
 }
 
-void World::ActionToEyeMagi(const Color::color_t color) const
+void World::ActionToEyeMagi(u8 color) const
 {
     std::vector<s32> vec_eyes;
     vec_eyes.reserve(10);
@@ -1554,14 +1559,13 @@ void World::ActionToEyeMagi(const Color::color_t color) const
 
     if(vec_eyes.size())
     {
-	std::vector<s32>::const_iterator it1 = vec_eyes.begin();
-	std::vector<s32>::const_iterator it2 = vec_eyes.end();
-
-	for(; it1 != it2; ++it1) Maps::ClearFog(*it1, Game::GetViewDistance(Game::VIEW_MAGI_EYES), color);
+	for(std::vector<s32>::const_iterator
+	    it = vec_eyes.begin(); it != vec_eyes.end(); ++it)
+	    Maps::ClearFog(*it, Game::GetViewDistance(Game::VIEW_MAGI_EYES), color);
     }
 }
 
-Riddle* World::GetSphinx(const s32 index)
+Riddle* World::GetSphinxRiddle(s32 index)
 {
     Riddles::iterator
 	it = std::find(vec_riddles.begin(), vec_riddles.end(), index);
@@ -1634,7 +1638,7 @@ bool World::KingdomIsWins(const Kingdom & kingdom, u16 wins) const
 	{
 	    const Castle *town = GetCastle(conf.WinsMapsIndexObject());
 	    // check comp also wins
-	    return (((Game::CONTROL_HUMAN & kingdom.GetControl()) || conf.WinsCompAlsoWins()) &&
+	    return (((CONTROL_HUMAN & kingdom.GetControl()) || conf.WinsCompAlsoWins()) &&
     	       (town && town->GetColor() == kingdom.GetColor()));
 	}
 
@@ -1670,7 +1674,7 @@ bool World::KingdomIsWins(const Kingdom & kingdom, u16 wins) const
 
 	case GameOver::WINS_GOLD:
 	    // check comp also wins
-	    return (((Game::CONTROL_HUMAN & kingdom.GetControl()) || conf.WinsCompAlsoWins()) &&
+	    return (((CONTROL_HUMAN & kingdom.GetControl()) || conf.WinsCompAlsoWins()) &&
 		    (kingdom.GetFundsGold() >= conf.WinsAccumulateGold()));
 
 	default: break;
@@ -1703,7 +1707,7 @@ bool World::KingdomIsLoss(const Kingdom & kingdom, u16 loss) const
 	}
 
 	case GameOver::LOSS_TIME:
-    	    return (CountDay() > conf.LossCountDays() && (Game::CONTROL_HUMAN & kingdom.GetControl()));
+    	    return (CountDay() > conf.LossCountDays() && (CONTROL_HUMAN & kingdom.GetControl()));
 
 	default: break;
     }

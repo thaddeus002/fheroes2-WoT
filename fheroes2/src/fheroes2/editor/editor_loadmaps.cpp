@@ -32,7 +32,6 @@ Game::menu_t Game::Editor::LoadMaps(void)
 {
     Settings & conf = Settings::Get();
 
-    std::string filemaps;
     MapsFileInfoList lists;
 
     if(! PrepareMapsFileInfoList(lists, true))
@@ -41,8 +40,11 @@ Game::menu_t Game::Editor::LoadMaps(void)
         return MAINMENU;
     }
 
-    if(Dialog::SelectScenario(lists, filemaps) && conf.LoadFileMapsMP2(filemaps))
+    Maps::FileInfo* fi = Dialog::SelectScenario(lists);
+
+    if(fi)
     {
+	conf.SetCurrentFileInfo(*fi);
 	Game::ShowLoadMapsText();
     	//
     	world.LoadMaps(filemaps);

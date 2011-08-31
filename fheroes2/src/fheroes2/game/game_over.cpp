@@ -273,11 +273,6 @@ u16  GameOver::Result::GetResult(void) const
     return result;
 }
 
-namespace Game
-{
-    void DialogPlayers(const Color::color_t, const std::string &);
-}
-
 bool GameOver::Result::CheckGameOver(Game::menu_t & res)
 {
     const Colors colors2(colors);
@@ -286,14 +281,12 @@ bool GameOver::Result::CheckGameOver(Game::menu_t & res)
 	it = colors2.begin(); it != colors2.end(); ++it)
     if(! world.GetKingdom(*it).isPlay())
     {
-        std::string message(_("%{color} has been vanquished!"));
-        String::Replace(message, "%{color}", Color::String(*it));
-        Game::DialogPlayers(*it, message);
+        Game::DialogPlayers(*it, _("%{color} has been vanquished!"));
         colors &= (~*it);
     }
 
-    // players miss
-    if( !(colors & Settings::Get().PlayersColors()))
+    // local players miss
+    if( !(colors & Settings::Get().GetPlayers().GetColors(CONTROL_HUMAN)))
     {
         res = Game::MAINMENU;
 	return true;

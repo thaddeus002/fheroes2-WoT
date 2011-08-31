@@ -24,7 +24,7 @@
 #define H2CLIENT_H
 
 #include "gamedefs.h"
-#include "player.h"
+#include "players.h"
 
 #ifdef WITH_NET
 
@@ -39,7 +39,6 @@ enum status_t
     ST_ADMIN            = 0x0008,
     ST_SHUTDOWN         = 0x0010,
     ST_ALLOWPLAYERS     = 0x0020,
-    ST_LOCALSERVER      = 0x0040,
     ST_TURN		= 0x0080
 };
 

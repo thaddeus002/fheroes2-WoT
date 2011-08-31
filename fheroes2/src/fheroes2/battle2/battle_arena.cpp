@@ -804,8 +804,8 @@ Battle2::Arena::Arena(Army::army_t & a1, Army::army_t & a2, s32 index, bool loca
 	// sync clients ~10 sec
 	server.WaitReadyClients(10000);
 
-    	if(Game::CONTROL_REMOTE & army1.GetControl()) server.BattleSendBoard(army1.GetColor(), *this);
-	if(Game::CONTROL_REMOTE & army2.GetControl()) server.BattleSendBoard(army2.GetColor(), *this);
+    	if(CONTROL_REMOTE & army1.GetControl()) server.BattleSendBoard(army1.GetColor(), *this);
+	if(CONTROL_REMOTE & army2.GetControl()) server.BattleSendBoard(army2.GetColor(), *this);
     }
 #endif
 
@@ -861,15 +861,15 @@ void Battle2::Arena::TurnTroop(Stats* current_troop)
 	else
 	{
 	    // turn opponents
-	    if(Game::CONTROL_REMOTE & current_troop->GetControl())
+	    if(CONTROL_REMOTE & current_troop->GetControl())
 		RemoteTurn(*current_troop, actions);
 	    else
 	    {
-		if((Game::CONTROL_AI & current_troop->GetControl()) ||
+		if((CONTROL_AI & current_troop->GetControl()) ||
 		    (current_troop->GetColor() & auto_battle))
 		    AI::BattleTurn(*this, *current_troop, actions);
     		else
-		if(Game::CONTROL_HUMAN & current_troop->GetControl())
+		if(CONTROL_HUMAN & current_troop->GetControl())
 		    HumanTurn(*current_troop, actions);
 	    }
 	}
@@ -924,8 +924,8 @@ void Battle2::Arena::Turns(u16 turn, Result & result)
 #ifdef WITH_NET
     if(Network::isRemoteClient())
     {
-    	if(Game::CONTROL_REMOTE & army1.GetControl()) FH2Server::Get().BattleSendBoard(army1.GetColor(), *this);
-	if(Game::CONTROL_REMOTE & army2.GetControl()) FH2Server::Get().BattleSendBoard(army2.GetColor(), *this);
+    	if(CONTROL_REMOTE & army1.GetControl()) FH2Server::Get().BattleSendBoard(army1.GetColor(), *this);
+	if(CONTROL_REMOTE & army2.GetControl()) FH2Server::Get().BattleSendBoard(army2.GetColor(), *this);
     }
 #endif
 

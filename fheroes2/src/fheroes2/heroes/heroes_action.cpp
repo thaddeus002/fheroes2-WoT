@@ -372,7 +372,7 @@ void MoveHero2Dest(Heroes & hero, s32 dst_index, MP2::object_t from_obj, MP2::ob
 // action to next cell
 void Heroes::Action(const s32 dst_index)
 {
-    if(Game::CONTROL_AI & world.GetKingdom(GetColor()).GetControl())
+    if(CONTROL_AI & world.GetKingdom(GetColor()).GetControl())
 	return AI::HeroesAction(*this, dst_index);
 
     const MP2::object_t object = (dst_index == GetIndex() ?
@@ -3075,7 +3075,7 @@ void ActionToEyeMagi(Heroes &hero, const u8 obj, const s32 dst_index)
 
 void ActionToSphinx(Heroes &hero, const u8 obj, const s32 dst_index)
 {
-    Riddle* riddle = world.GetSphinx(dst_index);
+    Riddle* riddle = world.GetSphinxRiddle(dst_index);
 
     if(riddle && riddle->valid)
     {

@@ -272,7 +272,7 @@ void Network::PackRaceColors(QueueMessage & m)
 	it = colors.begin(); it != colors.end(); ++it)
     {
 	m.Push(static_cast<u8>(*it));
-	m.Push(Settings::Get().KingdomRace(*it));
+	m.Push(Game::GetKingdomRace(*it));
     }
 }
 
@@ -287,79 +287,9 @@ void Network::UnpackRaceColors(QueueMessage & m)
 	{
 	    m.Pop(color);
 	    m.Pop(race);
-	    Settings::Get().SetKingdomRace(color, race);
+	    Game::SetKingdomRace(color, race);
 	}
     }
-}
-
-void Network::PackKingdom(QueueMessage & msg, const Kingdom & kingdom)
-{
-    msg.Reset();
-    msg.SetID(MSG_KINGDOM);
-    msg.Push(static_cast<u8>(kingdom.GetColor()));
-    Game::IO::PackKingdom(msg, kingdom);
-}
-
-void Network::UnpackKingdom(QueueMessage & msg)
-{
-    u8 kingdom_color;
-    msg.Pop(kingdom_color);
-    Kingdom & kingdom = world.GetKingdom(kingdom_color);
-    Game::IO::UnpackKingdom(msg, kingdom);
-}
-
-void Network::PackHero(QueueMessage & msg, const Heroes & hero)
-{
-    msg.Reset();
-    msg.SetID(MSG_HEROES);
-    msg.Push(static_cast<u8>(hero.GetID()));
-    Game::IO::PackHeroes(msg, hero);
-}
-
-void Network::UnpackHero(QueueMessage & msg)
-{
-    u8 hero_id;
-    msg.Pop(hero_id);
-    Heroes *hero = world.GetHeroes(Heroes::ConvertID(hero_id));
-    if(hero)
-	Game::IO::UnpackHeroes(msg, *hero);
-    else
-	DEBUG(DBG_NETWORK, DBG_WARN, "unknown id");
-}
-
-void Network::PackTile(QueueMessage & msg, const Maps::Tiles & tile)
-{
-    msg.Reset();
-    msg.SetID(MSG_TILES);
-    msg.Push(tile.GetIndex());
-    Game::IO::PackTile(msg, tile);
-}
-
-void Network::UnpackTile(QueueMessage & msg)
-{
-    s32 tile_index;
-    msg.Pop(tile_index);
-    Maps::Tiles & tile = world.GetTiles(tile_index);
-    Game::IO::UnpackTile(msg, tile);
-}
-
-void Network::PackCastle(QueueMessage & msg, const Castle & castle)
-{
-    msg.Reset();
-    msg.SetID(MSG_CASTLE);
-    msg.Push(castle.GetIndex());
-    Game::IO::PackCastle(msg, castle);
-}
-
-void Network::UnpackCastle(QueueMessage & msg)
-{
-    s32 castle_index;
-    msg.Pop(castle_index);
-    Castle *castle = world.GetCastle(castle_index);
-    if(castle)
-	Game::IO::UnpackCastle(msg, *castle);
-    else
-	DEBUG(DBG_NETWORK, DBG_WARN, "unknown id");
 }
 
 #endif

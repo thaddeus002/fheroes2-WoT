@@ -45,7 +45,7 @@ public:
 
 namespace Dialog
 {
-    bool SelectScenario(const MapsFileInfoList &, std::string &);
+    Maps::FileInfo* SelectScenario(const MapsFileInfoList &);
 }
 
 #endif

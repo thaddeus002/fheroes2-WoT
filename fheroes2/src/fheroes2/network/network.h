@@ -136,18 +136,6 @@ namespace Network
     void		PackRaceColors(QueueMessage &);
     void		UnpackRaceColors(QueueMessage &);
 
-    void		PackKingdom(QueueMessage &, const Kingdom &);
-    void		UnpackKingdom(QueueMessage &);
-
-    void		PackTile(QueueMessage &, const Maps::Tiles &);
-    void		UnpackTile(QueueMessage &);
-
-    void		PackHero(QueueMessage &, const Heroes &);
-    void		UnpackHero(QueueMessage &);
-
-    void		PackCastle(QueueMessage &, const Castle &);
-    void		UnpackCastle(QueueMessage &);
-
     void		PackBattleOnly(QueueMessage &, const BattleOnly &);
     void		UnpackBattleOnly(QueueMessage &, BattleOnly &);
     void		UnpackBattleOnly(QueueMessage &, Recruits &);

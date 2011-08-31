@@ -35,6 +35,7 @@
 #include "castle.h"
 #include "heroes_recruits.h"
 
+class Player;
 class Castle;
 class Heroes;
 struct AllHeroes;
@@ -66,14 +67,12 @@ public:
 
     Kingdom();
 
-    void Init(Color::color_t);
+    void Init(u8 color);
     void clear(void);
     void SetModes(flags_t);
     void ResetModes(flags_t);
     bool Modes(flags_t) const;
 
-    u8 GetControl(void) const{ return control; }
-    void SetControl(const u8 con);
     void UpdateStartingResource(void);
     bool isPlay(void) const{ return Modes(PLAY); }
     bool isLoss(void) const;
@@ -84,7 +83,8 @@ public:
     void ResetLastLostHero(void);
     Heroes* GetLastLostHero(void) const;
 
-    Color::color_t GetColor(void) const{ return color; }
+    u8 GetControl(void) const;
+    Color::color_t GetColor(void) const;
     u8 GetRace(void) const;
 
     const Funds & GetFunds(void) const{ return resource; }
@@ -154,8 +154,7 @@ public:
 private:
     friend class Game::IO;
 
-    Color::color_t color;
-    u8 control;
+    u8 color;
     Funds resource;
 
     u16 flags;
@@ -187,8 +186,8 @@ public:
     void NewWeek(void);
     void NewMonth(void);
 
-    Kingdom & Get(u8 color);
-    const Kingdom & Get(u8 color) const;
+    Kingdom & GetKingdom(u8 color);
+    const Kingdom & GetKingdom(u8 color) const;
 
     u8 GetLossColors(void) const;
     u8 GetNotLossColors(void) const;

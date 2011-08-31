@@ -39,6 +39,7 @@
 #include "button.h"
 #include "race.h"
 #include "game.h"
+#include "players.h"
 
 #ifdef BUILD_BATTLEONLY
 
@@ -67,12 +68,12 @@ void ControlInfo::Redraw(void)
   const Sprite & mark = AGG::GetICN(ICN::CELLWIN, 2);
 
   display.Blit(cell, rtLocal.x, rtLocal.y);
-  if(result & Game::CONTROL_HUMAN) display.Blit(mark, rtLocal.x + 3, rtLocal.y + 2);
+  if(result & CONTROL_HUMAN) display.Blit(mark, rtLocal.x + 3, rtLocal.y + 2);
   Text text("Human", Font::SMALL);
   text.Blit(rtLocal.x + cell.w() + 5, rtLocal.y + 5);
   
   display.Blit(cell, rtAI.x, rtAI.y);
-  if(result & Game::CONTROL_AI) display.Blit(mark, rtAI.x + 3, rtAI.y + 2);
+  if(result & CONTROL_AI) display.Blit(mark, rtAI.x + 3, rtAI.y + 2);
   text.Set("AI");
   text.Blit(rtAI.x + cell.w() + 5, rtAI.y + 5);
 }
@@ -82,11 +83,8 @@ struct BattleOnly
     Heroes*	hero1;
     Heroes*	hero2;
 
-    Color::color_t color1;
-    Color::color_t color2;
-    
-    u8 control1;
-    u8 control2;
+    Player	player1;
+    Player	player2;
 
     Army::army_t* army1;
     Army::army_t* army2;
@@ -137,8 +135,7 @@ struct BattleOnly
 
     static BattleOnly & Get(void);
 
-    BattleOnly(void) : hero1(NULL), hero2(NULL), color1(Color::BLUE), color2(Color::NONE),
-	control1(Game::CONTROL_HUMAN), control2(Game::CONTROL_AI),
+    BattleOnly() : hero1(NULL), hero2(NULL), player1(Color::BLUE), player2(Color::NONE),
 	army1(NULL), army2(NULL),
 	moraleIndicator1(NULL), moraleIndicator2(NULL),
 	luckIndicator1(NULL), luckIndicator2(NULL), secskill_bar1(NULL), secskill_bar2(NULL),
@@ -146,6 +143,9 @@ struct BattleOnly
 	rt1(36, 267, 43, 53), sfb1(rt1.w, rt1.h), sfc1(rt1.w, rt1.h - 10),
 	rt2(23, 347, 34, 34), sfb2(rt2.w, rt2.h), sfc2(rt2.w, rt2.h)
     {
+	player1.SetControl(CONTROL_HUMAN);
+	player2.SetControl(CONTROL_AI);
+
 #ifdef WITH_NET
 	if(! Network::isRemoteClient())
 #endif
@@ -194,10 +194,10 @@ bool BattleOnly::ChangeSettings(void)
 
     if(conf.GameType(Game::TYPE_NETWORK))
     {
-	color2 = Color::RED;
+	player2.color = Color::RED;
 
-	control1 = Game::CONTROL_REMOTE;
-	control2 = Game::CONTROL_REMOTE;
+	player1.SetControl(CONTROL_REMOTE);
+	player2.SetControl(CONTROL_REMOTE);
 
 	hero2 = world.GetHeroes(Heroes::ZOM);
     }
@@ -330,8 +330,8 @@ bool BattleOnly::ChangeSettings(void)
 	    {
 		hero2 = world.GetHeroes(hid);
 		UpdateHero2(cur_pt);
-		if(!(control2 & Game::CONTROL_REMOTE) && NULL == cinfo2)
-		    cinfo2 = new ControlInfo(Point(cur_pt.x + 510, cur_pt.y + 425), control2);
+		if(player2.isLocal() && NULL == cinfo2)
+		    cinfo2 = new ControlInfo(Point(cur_pt.x + 510, cur_pt.y + 425), player2.control);
 		redraw = true;
 	    }
 	}
@@ -488,15 +488,15 @@ bool BattleOnly::ChangeSettings(void)
 
 	if(cinfo2 && allow1)
 	{
-	    if(hero2 && le.MouseClickLeft(cinfo2->rtLocal) && (control2 & Game::CONTROL_AI))
+	    if(hero2 && le.MouseClickLeft(cinfo2->rtLocal) && player2.isAI())
 	    {
-		control2 = Game::CONTROL_HUMAN;
+		player2.SetControl(CONTROL_HUMAN);
 		redraw = true;
 	    }
 	    else
-	    if(le.MouseClickLeft(cinfo2->rtAI) && (control2 & Game::CONTROL_HUMAN))
+	    if(le.MouseClickLeft(cinfo2->rtAI) && player2.isHuman())
 	    {
-		control2 = Game::CONTROL_AI;
+		player2.SetControl(CONTROL_AI);
 		redraw = true;
 	    }
 	}
@@ -627,7 +627,8 @@ void BattleOnly::UpdateHero1(const Point & cur_pt)
         
     if(hero1)
     {
-      color1 = Color::BLUE;
+      player1.color = Color::BLUE;
+      player1.race  = hero1->GetRace();
 
       moraleIndicator1 = new MoraleIndicator(*hero1);
       moraleIndicator1->SetPos(Point(cur_pt.x + 34, cur_pt.y + 75), true);
@@ -683,7 +684,8 @@ void BattleOnly::UpdateHero2(const Point & cur_pt)
 
     if(hero2)
     {
-      color2 = Color::RED;
+      player2.color = Color::RED;
+      player2.race  = hero2->GetRace();
 
       moraleIndicator2 = new MoraleIndicator(*hero2);
       moraleIndicator2->SetPos(Point(cur_pt.x + 566, cur_pt.y + 75), true);
@@ -726,13 +728,13 @@ void BattleOnly::RedrawBaseInfo(const Point & top)
 	FH2LocalClient & local = FH2LocalClient::Get();
 	const Player* player;
 
-	if(NULL != (player = local.FindPlayer(color1)))
-	    String::Replace(message, "%{name1}", player->player_name);
+	if(NULL != (player = local.FindPlayer(player1.color)))
+	    String::Replace(message, "%{name1}", player->name);
 
-	if(NULL != (player = local.FindPlayer(color2)))
-	    String::Replace(message, "%{name2}", player->player_name);
+	if(NULL != (player = local.FindPlayer(player2.color)))
+	    String::Replace(message, "%{name2}", player->name);
 	else
-	    String::Replace(message, "(wait connect)", player->player_name);
+	    String::Replace(message, "(wait connect)", player->name);
     }
     else
 #endif
@@ -763,46 +765,51 @@ void BattleOnly::RedrawBaseInfo(const Point & top)
 void BattleOnly::StartBattle(void)
 {
     Settings & conf = Settings::Get();
-  
-    Kingdom* kingdom1 = &world.GetKingdom(color1);
-    Kingdom* kingdom2 = hero2 ? &world.GetKingdom(color2) : NULL;
-    
-    conf.SetKingdomRace(color1, hero1->GetRace());
-    if(hero2) conf.SetKingdomRace(color2, hero2->GetRace());
 
-    conf.SetPlayersColors(control2 & Game::CONTROL_HUMAN ? color1 | color2 : color1);
+    Players & players = conf.GetPlayers();
+    players.Init(player1.color | player2.color);
+    world.GetKingdoms().Init();
+
+    players.SetPlayerRace(player1.color, player1.race);
+    players.SetPlayerRace(player2.color, player2.race);
 
 #ifdef WITH_NET
     if(Network::isLocalClient())
     {
         FH2LocalClient & client = FH2LocalClient::Get();
-	Color::color_t & mycolor = client.player_color == color1 ? color1 : color2;
+	u8 & mycolor = client.color == player1.color ? player1.color : player2.color;
+
 	conf.SetMyColor(mycolor);
 	conf.SetCurrentColor(mycolor);
-	world.GetKingdom(mycolor).SetControl(Game::CONTROL_HUMAN);
-	if(mycolor != color1)
-	    kingdom1->SetControl(Game::CONTROL_REMOTE);
+
+	players.SetPlayerControl(mycolor, CONTROL_HUMAN);
+
+	if(mycolor != player1.color)
+	    players.SetPlayerControl(player1.color, CONTROL_REMOTE);
 	else
-	if(mycolor != color2 && kingdom2)
-	    kingdom2->SetControl(Game::CONTROL_REMOTE);
+	if(mycolor != player2.color)
+	    players.SetPlayerControl(player2.color, CONTROL_REMOTE);
     }
     else
 #endif
     {
-	conf.SetMyColor(color1);
-	conf.SetCurrentColor(color1);
+	conf.SetMyColor(player1.color);
+	conf.SetCurrentColor(player1.color);
 
-	kingdom1->SetControl(control1);
-	if(kingdom2) kingdom2->SetControl(control2);
+	players.SetPlayerControl(player1.color, player1.control);
+	players.SetPlayerControl(player2.color, player2.control);
     }
 
-    hero1->SetSpellPoints(hero1->GetMaxSpellPoints());
-    hero1->Recruit(color1, Point(5, 5));
+    if(hero1)
+    {
+	hero1->SetSpellPoints(hero1->GetMaxSpellPoints());
+	hero1->Recruit(player1.color, Point(5, 5));
+    }
 
     if(hero2)
     {
       hero2->SetSpellPoints(hero2->GetMaxSpellPoints());
-      hero2->Recruit(color2, Point(5, 6));
+      hero2->Recruit(player2.color, Point(5, 6));
     }
 
     Battle2::Loader(hero1->GetArmy(), (hero2 ? hero2->GetArmy() : monsters), hero1->GetIndex() + 1);
@@ -826,11 +833,11 @@ void Network::PackBattleOnly(QueueMessage & msg, const BattleOnly & b)
     msg.Push(static_cast<u8>(b.hero2->GetID()));
     Game::IO::PackHeroes(msg, *b.hero2);
 
-    msg.Push(static_cast<u8>(b.color1));
-    msg.Push(static_cast<u8>(b.color2));
+    msg.Push(b.player1.color);
+    msg.Push(b.player2.color);
 
-    msg.Push(b.control1);
-    msg.Push(b.control2);
+    msg.Push(b.player1.control);
+    msg.Push(b.player2.control);
 }
 
 void Network::UnpackBattleOnly(QueueMessage & msg, Recruits & res)
@@ -859,11 +866,11 @@ void Network::UnpackBattleOnly(QueueMessage & msg, BattleOnly & b)
     else
 	DEBUG(DBG_NETWORK, DBG_WARN, "unknown id");
 
-    msg.Pop(id); b.color1 = Color::Get(id);
-    msg.Pop(id); b.color2 = Color::Get(id);
+    msg.Pop(b.player1.color);
+    msg.Pop(b.player2.color);
 
-    msg.Pop(b.control1);
-    msg.Pop(b.control2);
+    msg.Pop(b.player1.control);
+    msg.Pop(b.player2.control);
 }
 #endif
 

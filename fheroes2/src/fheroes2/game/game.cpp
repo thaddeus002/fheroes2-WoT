@@ -399,5 +399,15 @@ std::string Game::GetEncodeString(const char* str)
 
 u8 Game::GetKingdomColors(void)
 {
-    return Settings::Get().CurrentFileInfo().kingdom_colors;
+    return Settings::Get().GetPlayers().GetColors();
+}
+
+u8 Game::GetKingdomRace(u8 color)
+{
+    return Settings::Get().GetPlayers().GetPlayerRace(color);
+}
+
+void Game::SetKingdomRace(u8 color, u8 race)
+{
+    Settings::Get().GetPlayers().SetPlayerRace(color, race);
 }

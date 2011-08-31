@@ -71,8 +71,6 @@ namespace Game
 
     // type_t
     enum { TYPE_MENU = 0, TYPE_STANDARD = 0x01, TYPE_CAMPAIGN = 0x02, TYPE_HOTSEAT = 0x04, TYPE_NETWORK = 0x08, TYPE_BATTLEONLY = 0x10, TYPE_LOADFILE = 0x80, TYPE_MULTI = TYPE_HOTSEAT | TYPE_NETWORK };
-    // control_t
-    enum { CONTROL_NONE = 0, CONTROL_HUMAN = 1, CONTROL_AI = 4, CONTROL_REMOTE = 2 /*, CONTROL_LOCAL = CONTROL_AI | CONTROL_HUMAN */ };
     // distance_t
     enum { VIEW_TOWN  = 0, VIEW_CASTLE = 1, VIEW_HEROES = 2, VIEW_TELESCOPE = 3, VIEW_OBSERVATION_TOWER = 4, VIEW_MAGI_EYES = 5 };
 
@@ -220,6 +218,10 @@ namespace Game
     void EnvironmentSoundMixer(void);
 
     u8  GetKingdomColors(void);
+    u8  GetKingdomRace(u8);
+    void SetKingdomRace(u8, u8);
+    void DialogPlayers(u8, std::string);
+
     u8  GetRating(void);
     u16 GetGameOverScores(void);
     u8  GetLostTownDays(void);
@@ -258,14 +260,6 @@ namespace Game
 
     std::string GetEncodeString(const char*);
 
-    namespace Scenario
-    {
-	void RedrawStaticInfo(const Rect &);
-	void RedrawDifficultyInfo(const Point & dst, bool label = true);
-	void RedrawOpponentsInfo(const Point &, const std::vector<Player> *players = NULL);
-	void RedrawClassInfo(const Point &, bool label = true);
-    }
-
     namespace Editor
     {
 	Game::menu_t MainMenu(void);
@@ -274,6 +268,8 @@ namespace Game
 	Game::menu_t StartGame(void);
 	Game::menu_t StartGame(void);
     }
+
+    u16 GetStepFor(u16, u16, u16);
 }
 
 #define HotKeyCloseWindow (Game::HotKeyPress(Game::EVENT_DEFAULT_EXIT) || Game::HotKeyPress(Game::EVENT_DEFAULT_READY))

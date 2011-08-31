@@ -92,14 +92,13 @@ void Dialog::GameInfo(void)
     text.Set(_("Opponents"), Font::SMALL, 350);
     text.Blit(pt.x + 52, pt.y + 150);
 
-    Point dst(pt.x + 40, pt.y + 165);
-    Game::Scenario::RedrawOpponentsInfo(dst);
-
     text.Set(_("Class"), Font::SMALL, 350);
     text.Blit(pt.x + 52, pt.y + 225);
 
-    dst.y = pt.y + 240;
-    Game::Scenario::RedrawClassInfo(dst);
+    Interface::PlayersInfo playersInfo(true, false, false);
+
+    playersInfo.UpdateInfo(conf.GetPlayers(), Point(pt.x + 40, pt.y + 165), Point(pt.x + 40, pt.y + 240));
+    playersInfo.RedrawInfo();
 
     text.Set(_("Victory\nConditions"), Font::SMALL, 80);
     text.Blit(pt.x + 40, pt.y + 345);

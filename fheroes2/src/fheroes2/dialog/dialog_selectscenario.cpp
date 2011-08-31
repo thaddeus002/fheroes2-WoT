@@ -136,7 +136,7 @@ void ScenarioListBox::RedrawBackground(const Point & dst)
     }
 }
 
-bool Dialog::SelectScenario(const MapsFileInfoList & all, std::string & filename)
+Maps::FileInfo* Dialog::SelectScenario(const MapsFileInfoList & all)
 {
     Cursor & cursor = Cursor::Get();
     Display & display = Display::Get();
@@ -145,6 +145,7 @@ bool Dialog::SelectScenario(const MapsFileInfoList & all, std::string & filename
     cursor.Hide();
     cursor.SetThemes(cursor.POINTER);
 
+    Maps::FileInfo* result = NULL;
     MapsFileInfoList small;
     MapsFileInfoList medium;
     MapsFileInfoList large;
@@ -217,8 +218,6 @@ bool Dialog::SelectScenario(const MapsFileInfoList & all, std::string & filename
     buttonSelectXLarge.Draw();
     buttonSelectAll.Draw();
 
-    filename.clear();
-
     cursor.Show();
     display.Flip();
 
@@ -235,13 +234,13 @@ bool Dialog::SelectScenario(const MapsFileInfoList & all, std::string & filename
 	    Game::HotKeyPress(Game::EVENT_DEFAULT_READY) ||
 	    listbox.selectOk)
 	{
-	    filename = listbox.GetCurrent().file;
+	    result = &listbox.GetCurrent();
 	    break;
 	}
 	else
         if(Game::HotKeyPress(Game::EVENT_DEFAULT_EXIT))
 	{
-	    filename.clear();
+	    result = NULL;
 	    break;
 	}
 	else
@@ -333,7 +332,7 @@ bool Dialog::SelectScenario(const MapsFileInfoList & all, std::string & filename
     cursor.Hide();
     back.Restore();
 
-    return filename.size();
+    return result;
 }
 
 void LossConditionInfo(const Maps::FileInfo & info)

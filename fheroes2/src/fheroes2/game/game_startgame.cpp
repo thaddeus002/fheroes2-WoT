@@ -59,7 +59,6 @@ namespace Game
     void ShowPathOrStartMoveHero(Heroes *hero, const s32 dst_index);
     menu_t HumanTurn(bool);
     bool DiggingForArtifacts(Heroes & hero);
-    void DialogPlayers(const Color::color_t, const std::string &);
     void MoveHeroFromArrowKeys(Heroes & hero, Direction::vector_t direct);
 
     void MouseCursorAreaClickLeft(s32);
@@ -114,8 +113,11 @@ void Game::MoveHeroFromArrowKeys(Heroes & hero, Direction::vector_t direct)
     }
 }
                                    
-void Game::DialogPlayers(const Color::color_t color, const std::string & str)
+void Game::DialogPlayers(u8 color, std::string str)
 {
+    const Player* player = Settings::Get().GetPlayers().Get(color);
+    String::Replace(str, "%{color}", (player ? player->name : Color::String(color)));
+
     const Sprite & border = AGG::GetICN(ICN::BRCREST, 6);
 
     Surface sign(border.w(), border.h());
@@ -180,28 +182,28 @@ Game::menu_t Game::StartGame(void)
     bool skip_turns = conf.LoadedGameVersion();
     GameOver::Result & gameResult = GameOver::Result::Get();
     Game::menu_t m = ENDTURN;
-
-    const Colors colors(Color::ALL);
+    const Players & players = conf.GetPlayers();
 
     while(m == ENDTURN)
     {
 	if(!skip_turns) world.NewDay();
 
-	for(Colors::const_iterator
-	    color = colors.begin(); color != colors.end(); ++color)
+	for(Players::const_iterator
+	    it = players.begin(); it != players.end(); ++it) if(*it)
 	{
-	    Kingdom & kingdom = world.GetKingdom(*color);
+	    const Player & player = (**it);
+	    Kingdom & kingdom = world.GetKingdom(player.color);
 
 	    if(!kingdom.isPlay() ||
-	    (skip_turns && *color != conf.MyColor())) continue;
+	    (skip_turns && player.color != conf.MyColor())) continue;
 
 	    DEBUG(DBG_GAME, DBG_INFO, std::endl << world.DateString() << ", " << "color: " <<
-		    Color::String(*color) << ", resource: " << kingdom.GetFunds().String());
+		    Color::String(player.color) << ", resource: " << kingdom.GetFunds().String());
 
 	    radar.SetHide(true);
 	    I.SetRedraw(REDRAW_RADAR);
-	    conf.SetCurrentColor(*color);
-	    world.ClearFog(*color);
+	    conf.SetCurrentColor(player.color);
+	    world.ClearFog(player.color);
 	    kingdom.ActionBeforeTurn();
 
 	    switch(kingdom.GetControl())
@@ -216,13 +218,11 @@ Game::menu_t Game::StartGame(void)
 			I.SetRedraw(REDRAW_GAMEAREA | REDRAW_STATUS | REDRAW_ICONS);
 			I.Redraw();
 			display.Flip();
-			std::string str = _("%{color} player's turn");
-			String::Replace(str, "%{color}", Color::String(*color));
-			DialogPlayers(*color, str);
+			DialogPlayers(player.color, _("%{color} player's turn"));
 		    }
 		    I.SetRedraw(REDRAW_ICONS);
 		    I.iconsPanel.ShowIcons();
-		    conf.SetMyColor(*color);
+		    conf.SetMyColor(player.color);
 		    m = HumanTurn(skip_turns);
 		    if(skip_turns) skip_turns = false;
 		break;
@@ -1051,9 +1051,7 @@ Game::menu_t Game::HumanTurn(bool isload)
 	// warning lost all town
 	if(myHeroes.size() && myCastles.empty() && Game::GetLostTownDays() < myKingdom.GetLostTownDays())
 	{
-	    std::string str = _("%{color} player, you have lost your last town. If you do not conquer another town in next week, you will be eliminated.");
-	    String::Replace(str, "%{color}", Color::String(conf.MyColor()));
-	    DialogPlayers(conf.MyColor(), str);
+	    DialogPlayers(conf.MyColor(), _("%{color} player, you have lost your last town. If you do not conquer another town in next week, you will be eliminated."));
 	}
 
 	if(Game::Focus::HEROES == global_focus.Type())
@@ -1632,24 +1630,19 @@ void Game::ShowWarningLostTowns(menu_t & ret)
     if(0 == myKingdom.GetLostTownDays())
     {
     	    AGG::PlayMusic(MUS::DEATH, false);
-	    std::string str = _("%{color} player, your heroes abandon you, and you are banished from this land.");
-	    String::Replace(str, "%{color}", Color::String(conf.MyColor()));
-	    DialogPlayers(conf.MyColor(), str);
+	    DialogPlayers(conf.MyColor(), _("%{color} player, your heroes abandon you, and you are banished from this land."));
 	    GameOver::Result::Get().SetResult(GameOver::LOSS_ALL);
 	    ret = MAINMENU;
     }
     else
     if(1 == myKingdom.GetLostTownDays())
     {
-	    std::string str = _("%{color} player, this is your last day to capture a town, or you will be banished from this land.");
-	    String::Replace(str, "%{color}", Color::String(conf.MyColor()));
-	    DialogPlayers(conf.MyColor(), str);
+	    DialogPlayers(conf.MyColor(), _("%{color} player, this is your last day to capture a town, or you will be banished from this land."));
     }
     else
     if(Game::GetLostTownDays() >= myKingdom.GetLostTownDays())
     {
 	    std::string str = _("%{color} player, you only have %{day} days left to capture a town, or you will be banished from this land.");
-	    String::Replace(str, "%{color}", Color::String(conf.MyColor()));
 	    String::Replace(str, "%{day}", myKingdom.GetLostTownDays());
 	    DialogPlayers(conf.MyColor(), str);
     }

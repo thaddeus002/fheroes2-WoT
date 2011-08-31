@@ -403,7 +403,7 @@ bool Heroes::MoveStep(bool fast)
 	else
 	{
 	    // play sound
-	    if(Game::CONTROL_HUMAN & world.GetKingdom(GetColor()).GetControl())
+	    if(CONTROL_HUMAN & world.GetKingdom(GetColor()).GetControl())
 		PlayWalkSound(world.GetTiles(mp).GetGround());
 	}
     }

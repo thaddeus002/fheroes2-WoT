@@ -41,7 +41,7 @@ const char* Color::String(u8 color)
     return str_color[0];
 }
 
-u8 Color::GetIndex(color_t color)
+u8 Color::GetIndex(u8 color)
 {
     switch(color)
     {

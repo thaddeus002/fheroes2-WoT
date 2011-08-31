@@ -74,6 +74,7 @@ public:
     Maps::Tiles & GetTiles(u16 ax, u16 ay) { return GetTiles(ay * width + ax); }
     Maps::Tiles & GetTiles(s32 index){ return vec_tiles.at(index); }
 
+    Kingdoms & GetKingdoms(void);
     Kingdom & GetMyKingdom(void);
     Kingdom & GetKingdom(u8 color);
     const Kingdom & GetMyKingdom(void) const;
@@ -130,7 +131,7 @@ public:
     u16 CountCapturedMines(const u8 res, const Color::color_t col) const;
     Color::color_t ColorCapturedObject(const s32 index) const;
 
-    void ActionToEyeMagi(const Color::color_t) const;
+    void ActionToEyeMagi(u8 color) const;
 
     u16 CountObeliskOnMaps(void);
 
@@ -141,9 +142,9 @@ public:
     u16  CheckKingdomLoss(const Kingdom &) const;
     bool KingdomIsLoss(const Kingdom &, u16 loss) const;
 
-    EventsDate GetEventsDate(const Color::color_t) const;
-    EventMaps* GetEventMaps(const Color::color_t c, const s32 index);
-    Riddle* GetSphinx(const s32 index);
+    EventsDate GetEventsDate(u8 color) const;
+    EventMaps* GetEventMaps(u8 color, s32 index);
+    Riddle* GetSphinxRiddle(s32 index);
 
     Heroes* GetFreemanHeroes(u8 rc = 0) const;
     void UpdateRecruits(Recruits &) const;

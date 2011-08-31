@@ -33,6 +33,7 @@
 #include "race.h"
 #include "battle2.h"
 #include "kingdom.h"
+#include "players.h"
 #include "game_static.h"
 #include "ai.h"
 
@@ -41,41 +42,34 @@ bool HeroesStrongestArmy(const Heroes* h1, const Heroes* h2)
     return h1 && h2 && h2->GetArmy().StrongerEnemyArmy(h1->GetArmy());
 }
 
-Kingdom::Kingdom() : color(Color::NONE), control(Game::CONTROL_AI), flags(0), lost_town_days(0), visited_tents_colors(0)
+Kingdom::Kingdom() : color(Color::NONE), flags(0), lost_town_days(0), visited_tents_colors(0)
 {
 }
 
-void Kingdom::Init(Color::color_t cl)
+void Kingdom::Init(u8 clr)
 {
-    const Settings & conf = Settings::Get();
-
     clear();
+    color = clr;
 
-    // set play
-    color	= cl;
-    if(Game::GetKingdomColors() & color) SetModes(PLAY);
-
-    heroes.reserve(GetMaxHeroes());
-    castles.reserve(15);
-
-    // set control
-    if(color & conf.PlayersColors())
+    if(Color::ALL & color)
     {
-#ifdef WITH_NET
-	if(Settings::Get().GameType(Game::TYPE_NETWORK))
-    	    control = (color == conf.MyColor() ? Game::CONTROL_HUMAN : Game::CONTROL_REMOTE);
-        else
-#endif
-	    control = Game::CONTROL_HUMAN;
-    }
+	// set play
+	SetModes(PLAY);
 
-    UpdateStartingResource();
+	heroes.reserve(GetMaxHeroes());
+	castles.reserve(15);
+
+	UpdateStartingResource();
+    }
+    else
+    {
+	DEBUG(DBG_GAME, DBG_INFO, "Kingdom: unknown player: " << Color::String(color) << "(" << static_cast<int>(color) << ")");
+    }
 }
 
 void Kingdom::clear(void)
 {
     color	= Color::NONE;
-    control	= Game::CONTROL_AI;
     flags	= 0;
     visited_tents_colors = 0;
     lost_town_days = Game::GetLostTownDays() + 1;
@@ -87,9 +81,24 @@ void Kingdom::clear(void)
     recruits.Reset();
 }
 
+u8 Kingdom::GetControl(void) const
+{
+    return Settings::Get().GetPlayers().GetPlayerControl(color);
+}
+
+Color::color_t Kingdom::GetColor(void) const
+{
+    return Color::Get(color);
+}
+
+u8 Kingdom::GetRace(void) const
+{
+    return Settings::Get().GetPlayers().GetPlayerRace(GetColor());
+}
+
 void Kingdom::UpdateStartingResource(void)
 {
-    resource = GameStatic::GetKingdomStartingResource(Game::CONTROL_AI & control ? 5 : Settings::Get().GameDifficulty());
+    resource = GameStatic::GetKingdomStartingResource(CONTROL_AI == GetControl() ? 5 : Settings::Get().GameDifficulty());
 }
 
 void Kingdom::SetModes(flags_t f)
@@ -105,11 +114,6 @@ void Kingdom::ResetModes(flags_t f)
 bool Kingdom::Modes(flags_t f) const
 {
     return flags & f;
-}
-
-void Kingdom::SetControl(u8 ctrl)
-{
-    control = ctrl;
 }
 
 bool Kingdom::isLoss(void) const
@@ -130,10 +134,10 @@ void Kingdom::LossPostActions(void)
 	}
 	if(castles.size())
 	{
-	    castles.ChangeColors(color, Color::NONE);
+	    castles.ChangeColors(GetColor(), Color::NONE);
 	    castles.clear();
 	}
-	world.KingdomLoss(color);
+	world.KingdomLoss(GetColor());
     }
 }
 
@@ -145,7 +149,7 @@ void Kingdom::ActionBeforeTurn(void)
 
 void Kingdom::ActionNewDay(void)
 {
-    Settings::Get().SetCurrentColor(color);
+    Settings::Get().SetCurrentColor(GetColor());
 
     if(isLoss() || 0 == lost_town_days)
     {
@@ -174,7 +178,7 @@ void Kingdom::ActionNewDay(void)
 
 	for(u8 index = 0; resources[index] != Resource::UNKNOWN; ++index)
 	    resource += ProfitConditions::FromMine(resources[index]) *
-				world.CountCapturedMines(resources[index], color);
+				world.CountCapturedMines(resources[index], GetColor());
 
 	// funds
 	for(KingdomCastles::const_iterator
@@ -196,7 +200,7 @@ void Kingdom::ActionNewDay(void)
     }
 
     // check event day
-    EventsDate events = world.GetEventsDate(color);
+    EventsDate events = world.GetEventsDate(GetColor());
     for(EventsDate::const_iterator
 	it = events.begin(); it != events.end(); ++it)
 	AddFundsResource((*it).resource);
@@ -217,7 +221,7 @@ void Kingdom::ActionNewWeek(void)
 	std::for_each(heroes.begin(), heroes.end(), std::mem_fun(&Heroes::ActionNewWeek));
 
 	// debug an gift
-	if(IS_DEVEL() && (Game::CONTROL_HUMAN & GetControl()))
+	if(IS_DEVEL() && (CONTROL_HUMAN & GetControl()))
 	{
 	    Funds gift(20, 20, 10, 10, 10, 10, 5000);
 	    DEBUG(DBG_GAME, DBG_INFO, "debug gift: " << gift.String());
@@ -322,10 +326,6 @@ u8 Kingdom::GetCountBuilding(u32 build) const
     return std::count_if(castles.begin(), castles.end(), std::bind2nd(std::mem_fun(&Castle::isBuild), build));
 }
 
-u8 Kingdom::GetRace(void) const
-{
-    return Settings::Get().KingdomRace(color);
-}
 
 bool Kingdom::AllowPayment(const Funds & funds) const
 {
@@ -503,8 +503,9 @@ u32 Kingdom::GetIncome(void)
     Funds resource;
 
     // captured object
-    resource += ProfitConditions::FromMine(Resource::GOLD) * world.CountCapturedMines(Resource::GOLD, color);
+    resource += ProfitConditions::FromMine(Resource::GOLD) * world.CountCapturedMines(Resource::GOLD, GetColor());
 
+    // castles
     for(KingdomCastles::const_iterator
 	it = castles.begin(); it != castles.end(); ++it)
     {
@@ -568,18 +569,17 @@ u32 Kingdom::GetArmiesStrength(void) const
 
 Kingdoms::Kingdoms()
 {
-    Init();
 }
 
 void Kingdoms::Init(void)
 {
-    kingdoms[0].Init(Color::BLUE);
-    kingdoms[1].Init(Color::GREEN);
-    kingdoms[2].Init(Color::RED);
-    kingdoms[3].Init(Color::YELLOW);
-    kingdoms[4].Init(Color::ORANGE);
-    kingdoms[5].Init(Color::PURPLE);
-    kingdoms[6].Init(Color::NONE);
+    const Colors colors(Settings::Get().GetPlayers().GetColors());
+
+    clear();
+
+    for(Colors::const_iterator
+	it = colors.begin(); it != colors.end(); ++it)
+	GetKingdom(*it).Init(*it);
 }
 
 u8 Kingdoms::size(void) const
@@ -599,7 +599,7 @@ void Kingdoms::ApplyPlayWithStartingHero(void)
 	if(kingdoms[ii].isPlay()) kingdoms[ii].ApplyPlayWithStartingHero();
 }
 
-const Kingdom & Kingdoms::Get(u8 color) const
+const Kingdom & Kingdoms::GetKingdom(u8 color) const
 {
     switch(color)
     {
@@ -615,7 +615,7 @@ const Kingdom & Kingdoms::Get(u8 color) const
     return kingdoms[6];
 }
 
-Kingdom & Kingdoms::Get(u8 color)
+Kingdom & Kingdoms::GetKingdom(u8 color)
 {
     switch(color)
     {
@@ -698,7 +698,7 @@ void Kingdoms::AddHeroes(const AllHeroes & heroes)
     for(AllHeroes::const_iterator                                                                    
         it = heroes.begin(); it != heroes.end(); ++it)
 	// skip gray color
-        if((*it)->GetColor()) Get((*it)->GetColor()).AddHeroes(*it);
+        if((*it)->GetColor()) GetKingdom((*it)->GetColor()).AddHeroes(*it);
 }
 
 void Kingdoms::AddCastles(const AllCastles & castles)
@@ -706,5 +706,5 @@ void Kingdoms::AddCastles(const AllCastles & castles)
     for(AllCastles::const_iterator
 	it = castles.begin(); it != castles.end(); ++it)
 	// skip gray color
-        if((*it)->GetColor()) Get((*it)->GetColor()).AddCastle(*it);
+        if((*it)->GetColor()) GetKingdom((*it)->GetColor()).AddCastle(*it);
 }

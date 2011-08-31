@@ -32,6 +32,7 @@ class Kingdom;
 class Castle;
 class Heroes;
 class HeroBase;
+class Players;
 
 namespace Game
 {
@@ -51,6 +52,7 @@ namespace Game
 	static void PackCastle(QueueMessage &, const Castle &);
 	static void PackHeroes(QueueMessage &, const Heroes &);
 	static void PackHeroBase(QueueMessage &, const HeroBase &);
+	static void PackPlayers(QueueMessage &, const Players &);
 
 	static void UnpackTile(QueueMessage &, Maps::Tiles &, u16 = -1);
 	static void UnpackTileAddons(QueueMessage &, Maps::Addons &, u16 = -1);
@@ -58,6 +60,7 @@ namespace Game
 	static void UnpackCastle(QueueMessage &, Castle &, u16 = -1);
 	static void UnpackHeroes(QueueMessage &, Heroes &, u16 = -1);
 	static void UnpackHeroBase(QueueMessage &, HeroBase &, u16 = -1);
+	static void UnpackPlayers(QueueMessage &, Players &, u16 = -1);
 
 	static std::string last_name;
     };

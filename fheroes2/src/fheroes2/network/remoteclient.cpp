@@ -87,7 +87,7 @@ u8 FH2RemoteClients::GetPlayersColors(void) const
     mutexClients.Lock();
     for(std::vector<FH2RemoteClient>::const_iterator
 	it = clients.begin(); it != clients.end(); ++it)
-	    if((*it).player_id && (*it).player_color) res |= (*it).player_color;
+	    if((*it).id && (*it).color) res |= (*it).color;
     mutexClients.Unlock();
     return res;
 }
@@ -110,12 +110,12 @@ void FH2RemoteClients::PushPlayersInfo(QueueMessage & msg) const
     if(count)
     {
         for(std::vector<FH2RemoteClient>::const_iterator
-	    it = clients.begin(); it != clients.end(); ++it) if((*it).player_id)
+	    it = clients.begin(); it != clients.end(); ++it) if((*it).id)
         {
-            msg.Push((*it).player_color);
-            msg.Push((*it).player_race);
-            msg.Push((*it).player_name);
-            msg.Push((*it).player_id);
+            msg.Push((*it).color);
+            msg.Push((*it).race);
+            msg.Push((*it).name);
+            msg.Push((*it).id);
             msg.Push(static_cast<u8>((*it).Modes(ST_ADMIN)));
         }
     }
@@ -127,7 +127,7 @@ void FH2RemoteClients::Send2All(const QueueMessage & msg, u32 exclude)
     mutexClients.Lock();
     for(std::vector<FH2RemoteClient>::iterator
 	it = clients.begin(); it != clients.end(); ++it)
-	    if((*it).IsConnected() && (*it).player_id != exclude) Network::SendMessage(*it, msg);
+	    if((*it).IsConnected() && (*it).id != exclude) Network::SendMessage(*it, msg);
     mutexClients.Unlock();
 }
 
@@ -141,8 +141,8 @@ u8 FH2RemoteClients::ResetPlayersColors(void)
     for(std::vector<FH2RemoteClient>::iterator
 	it = clients.begin(); it != clients.end(); ++it)
     {
-        (*it).player_color = 0;
-        (*it).player_race = 0;
+        (*it).color = 0;
+        (*it).race = 0;
     }
 
     u8 colors = 0;
@@ -152,19 +152,19 @@ u8 FH2RemoteClients::ResetPlayersColors(void)
 				std::bind2nd(std::mem_fun_ref(&FH2RemoteClient::Modes), ST_ADMIN));
     if(it != clients.end())
     {
-        (*it).player_color = Color::GetFirst(conf.CurrentFileInfo().AllowHumanColors());
-        colors |= (*it).player_color;
+        (*it).color = Color::GetFirst(conf.CurrentFileInfo().AllowHumanColors());
+        colors |= (*it).color;
     }
 
     // set other
     for(std::vector<FH2RemoteClient>::iterator
 	it = clients.begin(); it != clients.end(); ++it)
-	if(0 == (*it).player_color)
+	if(0 == (*it).color)
     {
         const u8 color = Color::GetFirst(conf.CurrentFileInfo().AllowHumanColors() & (~colors));
         if(color)
         {
-            (*it).player_color = color;
+            (*it).color = color;
             colors |= color;
         }
         else
@@ -193,14 +193,14 @@ bool FH2RemoteClients::ChangeColors(u8 from, u8 to)
 
     if(it2 == clients.end())
     {
-        (*it1).player_color = to;
+        (*it1).color = to;
 	mutexClients.Unlock();
 	return false;
     }
     else
     if(it1 != clients.end())
     {
-        std::swap((*it1).player_color, (*it2).player_color);
+        std::swap((*it1).color, (*it2).color);
     }
 
     mutexClients.Unlock();
@@ -213,7 +213,7 @@ void FH2RemoteClients::ChangeRace(u8 color, u8 race)
     std::vector<FH2RemoteClient>::iterator it = std::find_if(clients.begin(), clients.end(),
 				std::bind2nd(std::mem_fun_ref(&FH2RemoteClient::isColor), color));
     if(it != clients.end())
-        (*it).player_race = race;
+        (*it).race = race;
     mutexClients.Unlock();
 }
 
@@ -300,7 +300,7 @@ int FH2RemoteClient::Main(void)
 	// send update players
 	{
 	    QueueMessage msg;
-	    server.SendUpdatePlayers(msg, player_id);
+	    server.SendUpdatePlayers(msg, id);
 	}
 
 	DEBUG(DBG_NETWORK, DBG_INFO, String());
@@ -364,7 +364,7 @@ bool FH2RemoteClient::ConnectionChat(void)
 
     QueueMessage packet;
 
-    player_id = thread.GetID();
+    id = thread.GetID();
 
     SetModes(ST_CONNECT);
 
@@ -377,18 +377,18 @@ bool FH2RemoteClient::ConnectionChat(void)
     packet.Push(banner.str());
 
     // send ready
-    DEBUG(DBG_NETWORK, DBG_INFO, "id: 0x" << std::hex << player_id << ", send ready");
+    DEBUG(DBG_NETWORK, DBG_INFO, "id: 0x" << std::hex << id << ", send ready");
     if(!Send(packet)) return false;
 
     // recv hello
-    DEBUG(DBG_NETWORK, DBG_INFO, "id: 0x" << std::hex << player_id << ", wait hello");
+    DEBUG(DBG_NETWORK, DBG_INFO, "id: 0x" << std::hex << id << ", wait hello");
     if(!Wait(packet, MSG_HELLO)) return false;
 
     u8 game_type;
     packet.Pop(game_type);
-    packet.Pop(player_name);
-    DEBUG(DBG_NETWORK, DBG_INFO, "id: 0x" << std::hex << player_id << ", connected " << 
-			" player: " << player_name << ", host 0x" << std::hex << Host() << ":0x" << Port());
+    packet.Pop(name);
+    DEBUG(DBG_NETWORK, DBG_INFO, "id: 0x" << std::hex << id << ", connected " << 
+			" player: " << name << ", host 0x" << std::hex << Host() << ":0x" << Port());
 
     if(Modes(ST_ADMIN) && conf.GameType() != game_type) SetGameType(game_type);
 
@@ -400,9 +400,9 @@ bool FH2RemoteClient::ConnectionChat(void)
     packet.SetID(MSG_HELLO);
     packet.Push(modes);
     packet.Push(conf.GameType());
-    packet.Push(player_id);
+    packet.Push(id);
     // send
-    DEBUG(DBG_NETWORK, DBG_INFO, "id: 0x" << std::hex << player_id << ", send hello");
+    DEBUG(DBG_NETWORK, DBG_INFO, "id: 0x" << std::hex << id << ", send hello");
     if(!Send(packet)) return false;
 
     DEBUG(DBG_NETWORK, DBG_INFO, (Modes(ST_ADMIN) ? "admin" : "client") << " mode");
@@ -430,13 +430,13 @@ bool FH2RemoteClient::UpdateColors(void)
 {
     FH2Server & server = FH2Server::Get();
 
-    player_color = server.GetFreeColor(Modes(ST_ADMIN));
+    color = server.GetFreeColor(Modes(ST_ADMIN));
     std::string err;
     QueueMessage packet;
 
-    if(0 == player_color)
+    if(0 == color)
     {
-	DEBUG(DBG_NETWORK, DBG_INFO, "0x" << std::hex << player_id << " invalid color");
+	DEBUG(DBG_NETWORK, DBG_INFO, "0x" << std::hex << id << " invalid color");
 	err = "full house";
     }
 
@@ -444,7 +444,7 @@ bool FH2RemoteClient::UpdateColors(void)
     packet.Push(err);
     if(!Send(packet) || err.size()) return false;
 
-    DEBUG(DBG_NETWORK, DBG_INFO, "select " << Color::String(player_color));
+    DEBUG(DBG_NETWORK, DBG_INFO, "select " << Color::String(color));
     server.UpdateColors();
 
     return true;
@@ -470,11 +470,11 @@ bool FH2RemoteClient::SendCurrentColor(QueueMessage & msg)
     msg.Reset();
     msg.SetID(MSG_GET_CURRENT_COLOR);
     // color
-    msg.Push(player_color);
+    msg.Push(color);
     // players info
     server.PushPlayersInfo(msg);
 
-    DEBUG(DBG_NETWORK, DBG_INFO, Color::String(player_color) << ", " <<
+    DEBUG(DBG_NETWORK, DBG_INFO, Color::String(color) << ", " <<
 			    "size: " << std::dec << msg.DtSz() << " bytes");
     return Send(msg);
 }
@@ -496,9 +496,9 @@ bool FH2RemoteClient::SendCurrentMapInfo(QueueMessage & msg)
 
 void FH2RemoteClient::Reset(void)
 {
-    player_color = 0;
-    player_race = Race::RAND;
-    player_name.clear();
+    color = 0;
+    race = Race::RAND;
+    name.clear();
     modes = ST_SHUTDOWN;
 
     if(Network::Socket::IsValid())
@@ -513,10 +513,10 @@ std::string FH2RemoteClient::String(void) const
     std::ostringstream os;
 
     os << "Player(" <<
-	"id: " << "0x" << std::hex << player_id << ", " <<
-	"color: " << std::dec << static_cast<int>(player_color) << ", " <<
-	"race: " << static_cast<int>(player_race) << ", " <<
-	"name: " << player_name << "), " <<
+	"id: " << "0x" << std::hex << id << ", " <<
+	"color: " << std::dec << static_cast<int>(color) << ", " <<
+	"race: " << static_cast<int>(race) << ", " <<
+	"name: " << name << "), " <<
 	"Modes(" << "0x" << std::hex << modes << "), " <<
 	"Socket(";
 

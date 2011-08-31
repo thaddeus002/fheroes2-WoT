@@ -192,7 +192,7 @@ Settings::Settings() : major_version(MAJOR_VERSION), minor_version(MINOR_VERSION
     my_color(Color::NONE), cur_color(Color::NONE), path_data_directory("data"),
     font_normal("dejavusans.ttf"), font_small("dejavusans.ttf"), force_lang("en"), size_normal(15), size_small(10),
     sound_volume(6), music_volume(6), heroes_speed(DEFAULT_SPEED_DELAY), ai_speed(DEFAULT_SPEED_DELAY), scroll_speed(SCROLL_NORMAL), battle_speed(DEFAULT_SPEED_DELAY),
-    game_type(0), players_colors(0), preferably_count_players(0), port(DEFAULT_PORT), memory_limit(0)
+    game_type(0), preferably_count_players(0), port(DEFAULT_PORT), memory_limit(0)
 {
     build_version = "version: ";
     String::AddInt(build_version, MAJOR_VERSION);
@@ -625,17 +625,30 @@ std::string Settings::String(void) const
 }
 
 /* read maps info */
-bool Settings::LoadFileMapsMP2(const std::string & file)
+bool Settings::SetCurrentFileInfo(const std::string & fn)
 {
-    if(! current_maps_file.ReadMP2(file)) return false;
+    Maps::FileInfo fi;
+    if(fi.ReadMP2(fn))
+    {
+	SetCurrentFileInfo(fi);
+	return true;
+    }
+    return false;
+}
 
-    // get first color
-    my_color = Color::GetFirst(current_maps_file.AllowHumanColors());
+void Settings::SetCurrentFileInfo(const Maps::FileInfo & fi)
+{
+    current_maps_file = fi;
+
+    players.Init(current_maps_file);
+
+    // reset colors
+    my_color = Color::NONE;
+    cur_color = Color::NONE;
+
     // game difficulty
     game_difficulty = Difficulty::NORMAL;
     preferably_count_players = 0;
-
-    return true;
 }
 
 const Maps::FileInfo & Settings::CurrentFileInfo(void) const
@@ -773,8 +786,8 @@ void Settings::SetDebug(const u16 d)
 /**/
 void Settings::SetGameDifficulty(u8 d) { game_difficulty = d; }
 
-void Settings::SetCurrentColor(const Color::color_t c) { cur_color = c; }
-void Settings::SetMyColor(const Color::color_t c) { my_color = c; }
+void Settings::SetCurrentColor(u8 color) { cur_color = Color::Get(color); }
+void Settings::SetMyColor(u8 color) { my_color = Color::Get(color); }
 
 u8   Settings::SoundVolume(void) const
 {
@@ -815,16 +828,14 @@ void Settings::SetGameType(u8 type)
     game_type = type;
 }
 
-/* get color players */
-u8 Settings::PlayersColors(void) const
+const Players & Settings::GetPlayers(void) const
 {
-    return players_colors;
+    return players;
 }
 
-/* set game color players */
-void Settings::SetPlayersColors(u8 c)
+Players & Settings::GetPlayers(void)
 {
-    players_colors = c;
+    return players;
 }
 
 void Settings::SetPreferablyCountPlayers(u8 c)
@@ -845,25 +856,6 @@ void Settings::SetLocalPrefix(const char* str)
 u16 Settings::GetPort(void) const
 {
     return port;
-}
-
-u8 Settings::KingdomRace(u8 color) const
-{
-    return Race::Get(current_maps_file.KingdomRace(color));
-}
-
-void Settings::SetKingdomRace(u8 color, u8 race)
-{
-    switch(color)
-    {
-        case Color::BLUE:       current_maps_file.races[0] = race; break;
-        case Color::GREEN:      current_maps_file.races[1] = race; break;
-        case Color::RED:        current_maps_file.races[2] = race; break;
-        case Color::YELLOW:     current_maps_file.races[3] = race; break;
-        case Color::ORANGE:     current_maps_file.races[4] = race; break;
-        case Color::PURPLE:     current_maps_file.races[5] = race; break;
-        default: break;
-    }
 }
 
 const std::string & Settings::MapsFile(void) const
@@ -958,49 +950,13 @@ u16 Settings::LossCountDays(void) const
 
 u8 Settings::GetUnions(u8 cl) const
 {
-    switch(cl)
-    {
-	case Color::BLUE:	return current_maps_file.unions[0];
-	case Color::GREEN:	return current_maps_file.unions[1];
-	case Color::RED:	return current_maps_file.unions[2];
-	case Color::YELLOW:	return current_maps_file.unions[3];
-	case Color::ORANGE:	return current_maps_file.unions[4];
-	case Color::PURPLE:	return current_maps_file.unions[5];
-	default: break;
-    }
-
-    return 0;
+    const Player* player = players.Get(cl);
+    return player ? player->friends : 0;
 }
 
 bool Settings::IsUnions(u8 cl1, u8 cl2) const
 {
-    if(cl1 == cl2) return true;
-    else
-    switch(cl1)
-    {
-	case Color::BLUE:	return (current_maps_file.unions[0] & cl2);
-	case Color::GREEN:	return (current_maps_file.unions[1] & cl2);
-	case Color::RED:	return (current_maps_file.unions[2] & cl2);
-	case Color::YELLOW:	return (current_maps_file.unions[3] & cl2);
-	case Color::ORANGE:	return (current_maps_file.unions[4] & cl2);
-	case Color::PURPLE:	return (current_maps_file.unions[5] & cl2);
-	default: break;
-    }
-
-    return false;
-}
-
-void Settings::FixKingdomRandomRace(void)
-{
-    const Colors colors(Color::ALL);
-
-    for(Colors::const_iterator
-	it = colors.begin(); it != colors.end(); ++it)
-    if(current_maps_file.kingdom_colors & *it)
-    {
-        if(Race::RAND == KingdomRace(*it)) SetKingdomRace(*it, Race::Rand());
-        DEBUG(DBG_GAME, DBG_INFO, Color::String(*it) << ": " << Race::String(KingdomRace(*it)));
-    }
+    return players.isFriends(cl1, cl2);
 }
 
 void Settings::SetEditor(void)

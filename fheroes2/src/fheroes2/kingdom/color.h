@@ -63,7 +63,7 @@ namespace Color
     const char* String(u8);
 
     u8 Count(u8);
-    u8 GetIndex(color_t);
+    u8 GetIndex(u8);
     color_t GetFromIndex(u8);
     color_t GetFirst(u8);
     color_t Get(u8);

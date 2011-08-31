@@ -137,7 +137,7 @@ bool FH2LocalClient::StartGame(void)
 		{
 		    if(Game::IO::LoadBIN(packet))
 		    {
-			conf.SetMyColor(Color::Get(player_color));
+			conf.SetMyColor(Color::Get(color));
 			heroesBar.Reset();
 			castleBar.Reset();
 		    }
