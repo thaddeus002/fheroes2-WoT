@@ -412,19 +412,20 @@ void Game::SetKingdomRace(u8 color, u8 race)
     Settings::Get().GetPlayers().SetPlayerRace(color, race);
 }
 
+#include <cmath>
 std::string Game::CountScoute(u32 count, u8 scoute)
 {
-    u32 infelicity = 0;
+    double infelicity = 0;
     std::string res;
 
     switch(scoute)
     {
         case Skill::Level::BASIC:
-            infelicity = count * 30 / 100;
+            infelicity = count * 30 / 100.0;
             break;
 
         case Skill::Level::ADVANCED:
-            infelicity = count * 15 / 100;
+            infelicity = count * 15 / 100.0;
             break;
 
         case Skill::Level::EXPERT:
@@ -437,16 +438,17 @@ std::string Game::CountScoute(u32 count, u8 scoute)
 
     if(res.empty())
     {
-        u32 min = Rand::Get(count - infelicity, count + infelicity);
+        u32 min = Rand::Get(static_cast<u32>(std::floor(count - infelicity + 0.5)),
+                            static_cast<u32>(std::floor(count + infelicity + 0.5)));
         u32 max = 0;
 
         if(min > count)
         {
             max = min;
-            min = count - infelicity;
+            min = static_cast<u32>(std::floor(count - infelicity + 0.5));
         }
         else
-            max = count + infelicity;
+            max = static_cast<u32>(std::floor(count + infelicity + 0.5));
 
         String::AddInt(res, min);
 
