@@ -192,7 +192,7 @@ void Interface::Radar::Redraw(void)
 
     if(!hide)
     {
-	RedrawArea(conf.MyColor());
+	RedrawArea(conf.CurrentColor());
 	RedrawCursor();
     }
     else

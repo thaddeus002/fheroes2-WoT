@@ -240,7 +240,8 @@ Dialog::answer_t Heroes::OpenDialog(bool readonly, bool fade)
     dst_pt.x = cur_pt.x + 49;
     dst_pt.y = cur_pt.y + 130;
 
-    display.Blit(AGG::GetICN(ICN::CREST, Color::NONE == color ? Color::GetIndex(world.GetMyKingdom().GetColor()) : Color::GetIndex(color)), dst_pt);
+    display.Blit(AGG::GetICN(ICN::CREST,
+		Color::NONE == color ? Color::GetIndex(Settings::Get().CurrentColor()) : Color::GetIndex(color)), dst_pt);
     
     // monster
     dst_pt.x = cur_pt.x + 156;
@@ -313,7 +314,7 @@ Dialog::answer_t Heroes::OpenDialog(bool readonly, bool fade)
 	buttonDismiss.SetDisable(true);
     }
 
-    if(readonly || 2 > world.GetMyKingdom().GetHeroes().size())
+    if(readonly || 2 > world.GetKingdom(GetColor()).GetHeroes().size())
     {
         buttonNextHero.Press();
         buttonPrevHero.Press();

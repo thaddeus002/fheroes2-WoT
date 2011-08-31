@@ -779,7 +779,6 @@ void BattleOnly::StartBattle(void)
         FH2LocalClient & client = FH2LocalClient::Get();
 	u8 & mycolor = client.color == player1.color ? player1.color : player2.color;
 
-	conf.SetMyColor(mycolor);
 	conf.SetCurrentColor(mycolor);
 
 	players.SetPlayerControl(mycolor, CONTROL_HUMAN);
@@ -793,7 +792,6 @@ void BattleOnly::StartBattle(void)
     else
 #endif
     {
-	conf.SetMyColor(player1.color);
 	conf.SetCurrentColor(player1.color);
 
 	players.SetPlayerControl(player1.color, player1.control);

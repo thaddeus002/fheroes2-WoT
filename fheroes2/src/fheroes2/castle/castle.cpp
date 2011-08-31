@@ -1822,7 +1822,7 @@ Army::army_t & Castle::GetActualArmy(void)
 bool Castle::AllowBuyBoat(void) const
 {
     // check payment and present other boat
-    return (HaveNearlySea() && world.GetMyKingdom().AllowPayment(PaymentConditions::BuyBoat()) && !PresentBoat());
+    return (HaveNearlySea() && world.GetKingdom(color).AllowPayment(PaymentConditions::BuyBoat()) && !PresentBoat());
 }
 
 bool Castle::BuyBoat(void)
@@ -1834,10 +1834,11 @@ bool Castle::BuyBoat(void)
     Maps::Tiles & left = world.GetTiles(index - 1);
     Maps::Tiles & right = world.GetTiles(index + 1);
     Maps::Tiles & center = world.GetTiles(index);
+    Kingdom & kingdom = world.GetKingdom(color);
 
     if(MP2::OBJ_ZERO == left.GetObject() && Maps::Ground::WATER == left.GetGround())
     {
-	world.GetMyKingdom().OddFundsResource(PaymentConditions::BuyBoat());
+	kingdom.OddFundsResource(PaymentConditions::BuyBoat());
 
     	left.SetObject(MP2::OBJ_BOAT);
 #ifdef WITH_NET
@@ -1847,7 +1848,7 @@ bool Castle::BuyBoat(void)
     else
     if(MP2::OBJ_ZERO == right.GetObject() && Maps::Ground::WATER == right.GetGround())
     {
-	world.GetMyKingdom().OddFundsResource(PaymentConditions::BuyBoat());
+	kingdom.OddFundsResource(PaymentConditions::BuyBoat());
 
     	right.SetObject(MP2::OBJ_BOAT);
 #ifdef WITH_NET
@@ -1857,7 +1858,7 @@ bool Castle::BuyBoat(void)
     else
     if(MP2::OBJ_ZERO == center.GetObject() && Maps::Ground::WATER == center.GetGround())
     {
-	world.GetMyKingdom().OddFundsResource(PaymentConditions::BuyBoat());
+	kingdom.OddFundsResource(PaymentConditions::BuyBoat());
 
     	center.SetObject(MP2::OBJ_BOAT);
 #ifdef WITH_NET

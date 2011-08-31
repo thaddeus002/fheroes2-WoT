@@ -255,7 +255,7 @@ void BattleLose(Heroes &hero, const Battle2::Result & res, bool attacker, Color:
     {
 	const u32 & exp = attacker ? res.GetExperienceAttacker() : res.GetExperienceDefender();
 
-	if(Settings::Get().MyColor() == hero.GetColor())
+	if(CONTROL_HUMAN == hero.GetControl())
 	{
 	    std::string msg = _("Hero %{name} also got a %{count} experience.");
 	    String::Replace(msg, "%{name}", hero.GetName());
@@ -372,7 +372,7 @@ void MoveHero2Dest(Heroes & hero, s32 dst_index, MP2::object_t from_obj, MP2::ob
 // action to next cell
 void Heroes::Action(const s32 dst_index)
 {
-    if(CONTROL_AI & world.GetKingdom(GetColor()).GetControl())
+    if(CONTROL_AI == world.GetKingdom(GetColor()).GetControl())
 	return AI::HeroesAction(*this, dst_index);
 
     const MP2::object_t object = (dst_index == GetIndex() ?
@@ -679,13 +679,13 @@ void ActionToHeroes(Heroes &hero, const u8 obj, const s32 dst_index)
     if(! other_hero) return;
 
     if(hero.GetColor() == other_hero->GetColor() ||
-	(conf.ExtUnionsAllowHeroesMeetings() && conf.IsUnions(hero.GetColor(), other_hero->GetColor())))
+	(conf.ExtUnionsAllowHeroesMeetings() && Players::isFriends(hero.GetColor(), other_hero->GetColor())))
     {
     	DEBUG(DBG_GAME, DBG_INFO, hero.GetName() << " meeting " << other_hero->GetName());
 	hero.MeetingDialog(*other_hero);
     }
     else
-    if(conf.IsUnions(hero.GetColor(), other_hero->GetColor()))
+    if(Players::isFriends(hero.GetColor(), other_hero->GetColor()))
     {
     	DEBUG(DBG_GAME, DBG_INFO, hero.GetName() << " disable meeting");
     }
@@ -753,7 +753,7 @@ void ActionToCastle(Heroes &hero, const u8 obj, const s32 dst_index)
     if(! castle) return;
 
     if(hero.GetColor() == castle->GetColor() ||
-	(conf.ExtUnionsAllowCastleVisiting() && conf.IsUnions(hero.GetColor(), castle->GetColor())))
+	(conf.ExtUnionsAllowCastleVisiting() && Players::isFriends(hero.GetColor(), castle->GetColor())))
     {
     	DEBUG(DBG_GAME, DBG_INFO, hero.GetName() << " goto castle " << castle->GetName());
     	Mixer::Reduce();
@@ -762,7 +762,7 @@ void ActionToCastle(Heroes &hero, const u8 obj, const s32 dst_index)
     	Mixer::Enhance();
     }
     else
-    if(conf.IsUnions(hero.GetColor(), castle->GetColor()))
+    if(Players::isFriends(hero.GetColor(), castle->GetColor()))
     {
     	DEBUG(DBG_GAME, DBG_INFO, hero.GetName() << " disable visiting");
     }
@@ -2200,7 +2200,7 @@ void ActionToCaptureObject(Heroes &hero, const u8 obj, const s32 dst_index)
     }
 
     // capture object
-    if(! Settings::Get().IsUnions(hero.GetColor(), world.ColorCapturedObject(dst_index)))
+    if(! Players::isFriends(hero.GetColor(), world.ColorCapturedObject(dst_index)))
     {
 	bool capture = true;
 

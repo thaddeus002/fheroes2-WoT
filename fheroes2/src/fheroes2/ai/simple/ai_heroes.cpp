@@ -186,7 +186,7 @@ void AIBattleLose(Heroes &hero, const Battle2::Result & res, bool attacker, Colo
     {
         const u32 & exp = attacker ? res.GetExperienceAttacker() : res.GetExperienceDefender();
 
-        if(Settings::Get().MyColor() == hero.GetColor())
+        if(CONTROL_HUMAN == hero.GetControl())
         {
             std::string msg = _("Hero %{name} also got a %{count} experience.");
             String::Replace(msg, "%{name}", hero.GetName());
@@ -354,13 +354,13 @@ void AIToHeroes(Heroes &hero, const u8 obj, const s32 dst_index)
     if(! other_hero) return;
 
     if(hero.GetColor() == other_hero->GetColor() ||
-	(conf.ExtUnionsAllowHeroesMeetings() && conf.IsUnions(hero.GetColor(), other_hero->GetColor())))
+	(conf.ExtUnionsAllowHeroesMeetings() && Players::isFriends(hero.GetColor(), other_hero->GetColor())))
     {
     	DEBUG(DBG_AI, DBG_INFO, hero.GetName() << " meeting " << other_hero->GetName());
     	AIMeeting(hero, *other_hero);
     }
     else
-    if(conf.IsUnions(hero.GetColor(), other_hero->GetColor()))
+    if(Players::isFriends(hero.GetColor(), other_hero->GetColor()))
     {
     	DEBUG(DBG_AI, DBG_INFO, hero.GetName() << " disable meeting");
     }
@@ -430,13 +430,13 @@ void AIToCastle(Heroes &hero, const u8 obj, const s32 dst_index)
     if(! castle) return;
 
     if(hero.GetColor() == castle->GetColor() ||
-	(conf.ExtUnionsAllowCastleVisiting() && conf.IsUnions(hero.GetColor(), castle->GetColor())))
+	(conf.ExtUnionsAllowCastleVisiting() && Players::isFriends(hero.GetColor(), castle->GetColor())))
     {
 	DEBUG(DBG_AI, DBG_INFO, hero.GetName() << " goto castle " << castle->GetName());
 	castle->MageGuildEducateHero(hero);
 	hero.SetVisited(dst_index);
     }
-    if(conf.IsUnions(hero.GetColor(), castle->GetColor()))
+    if(Players::isFriends(hero.GetColor(), castle->GetColor()))
     {
 	DEBUG(DBG_AI, DBG_INFO, hero.GetName() << " disable visiting");
     }
@@ -792,7 +792,7 @@ void AIToCaptureObject(Heroes &hero, const u8 obj, const s32 dst_index)
     Maps::Tiles & tile = world.GetTiles(dst_index);
 
     // capture object
-    if(! Settings::Get().IsUnions(hero.GetColor(), world.ColorCapturedObject(dst_index)))
+    if(! Players::isFriends(hero.GetColor(), world.ColorCapturedObject(dst_index)))
     {
 	bool capture = true;
 
@@ -1691,7 +1691,6 @@ bool AIHeroesValidObject(const Heroes & hero, s32 index)
     const u8 obj = tile.GetObject();
     const Army::army_t & army = hero.GetArmy();
     const Kingdom & kingdom = world.GetKingdom(hero.GetColor());
-    const Settings & conf = Settings::Get();
 
     // check other
     switch(obj)
@@ -1715,7 +1714,7 @@ bool AIHeroesValidObject(const Heroes & hero, s32 index)
 	case MP2::OBJ_SAWMILL:
 	case MP2::OBJ_MINES:
 	case MP2::OBJ_ALCHEMYLAB:
-	    if(! conf.IsUnions(hero.GetColor(), world.ColorCapturedObject(index)))
+	    if(! Players::isFriends(hero.GetColor(), world.ColorCapturedObject(index)))
 	    {
 		if(tile.CaptureObjectIsProtection(hero.GetColor()))
 		{
@@ -2024,7 +2023,7 @@ bool AIHeroesValidObject(const Heroes & hero, s32 index)
 		    return NULL == castle->GetHeroes().Guest() && ! hero.isVisited(tile);
 		else
 		// FIXME: AI skip visiting alliance
-		if(conf.IsUnions(hero.GetColor(), castle->GetColor())) return false;
+		if(Players::isFriends(hero.GetColor(), castle->GetColor())) return false;
 		else
 		if(army.StrongerEnemyArmy(castle->GetActualArmy())) return true;
 	    }
@@ -2039,7 +2038,7 @@ bool AIHeroesValidObject(const Heroes & hero, s32 index)
 		if(hero.GetColor() == hero2->GetColor()) return true;
 		// FIXME: AI skip visiting alliance
 		else
-		if(conf.IsUnions(hero.GetColor(), hero2->GetColor())) return false;
+		if(Players::isFriends(hero.GetColor(), hero2->GetColor())) return false;
 		else
 		if(hero2->AllowBattle(false) &&
 		    army.StrongerEnemyArmy(hero2->GetArmy())) return true;
@@ -2069,7 +2068,6 @@ bool AIHeroesValidObject2(const Heroes* hero, s32 index)
 // get priority object for AI independent of distance (1 day)
 bool AIHeroesPriorityObject(const Heroes & hero, s32 index)
 {
-    const Settings & conf = Settings::Get();
     Maps::Tiles & tile = world.GetTiles(index);
 
     if(MP2::OBJ_CASTLE == tile.GetObject())
@@ -2086,7 +2084,7 @@ bool AIHeroesPriorityObject(const Heroes & hero, s32 index)
 		    //castle->GetArmy().StrongerEnemyArmy(hero.GetArmy());
 	    }
 	    else
-	    if(!conf.IsUnions(hero.GetColor(), castle->GetColor()))
+	    if(!Players::isFriends(hero.GetColor(), castle->GetColor()))
 		return AIHeroesValidObject(hero, index);
 	}
     }
@@ -2096,7 +2094,7 @@ bool AIHeroesPriorityObject(const Heroes & hero, s32 index)
 	// kill enemy hero
 	const Heroes *hero2 = world.GetHeroes(index);
 	return hero2 &&
-		!conf.IsUnions(hero.GetColor(), hero2->GetColor()) &&
+		!Players::isFriends(hero.GetColor(), hero2->GetColor()) &&
 		AIHeroesValidObject(hero, index);
     }
 
@@ -2327,7 +2325,7 @@ void AIHeroesGetTask(Heroes & hero)
 	    for(; it != results.end(); ++it)
 	    {
 		const Heroes* enemy = world.GetHeroes(*it);
-		if(enemy && !Settings::Get().IsUnions(enemy->GetColor(), hero.GetColor()))
+		if(enemy && !Players::isFriends(enemy->GetColor(), hero.GetColor()))
 		{
 		    if(hero.GetPath().Calculate(enemy->GetIndex()))
 		    {
@@ -2404,7 +2402,7 @@ void AIHeroesGetTask(Heroes & hero)
 		    ai_hero.primary_target << ", " << MP2::StringObject(world.GetTiles(ai_hero.primary_target).GetObject()));
 
 	    if(NULL != (castle = world.GetCastle(ai_hero.primary_target)) &&
-		NULL != castle->GetHeroes().Guest() && Settings::Get().IsUnions(castle->GetColor(), hero.GetColor()))
+		NULL != castle->GetHeroes().Guest() && Players::isFriends(castle->GetColor(), hero.GetColor()))
 	    {
 		hero.SetModes(Heroes::AIWAITING);
 		DEBUG(DBG_AI, DBG_TRACE, hero.GetName() << ", castle busy..");
@@ -2556,7 +2554,27 @@ void AIHeroesNoGUITurns(Heroes &hero)
     }
 }
 
-void AIHeroesTurns(Heroes &hero)
+bool HeroesIsShow(const Heroes & hero)
+{
+    const u8 colors = Players::HumanColors();
+    const s32 index_from = hero.GetIndex();
+
+    if(! Maps::isValidAbsIndex(index_from)) return false;
+
+    const Maps::Tiles & tile_from = world.GetTiles(index_from);
+
+    if(hero.GetPath().isValid())
+    {
+        const s32 index_to = Maps::GetDirectionIndex(index_from, hero.GetPath().GetFrontDirection());
+        const Maps::Tiles & tile_to = world.GetTiles(index_to);
+
+        return !tile_from.isFog(colors) && !tile_to.isFog(colors);
+    }
+
+    return !tile_from.isFog(colors);
+}
+
+void AIHeroesTurns(Heroes & hero)
 {
     if(hero.GetPath().isValid()) hero.SetMove(true);
     else return;
@@ -2568,7 +2586,7 @@ void AIHeroesTurns(Heroes &hero)
 
     cursor.Hide();
 
-    if(0 != conf.AIMoveSpeed() && hero.isShow(Settings::Get().MyColor()))
+    if(0 != conf.AIMoveSpeed() && HeroesIsShow(hero))
     {
 	    cursor.Hide();
 	    I.gameArea.SetCenter(hero.GetCenter());
@@ -2582,7 +2600,7 @@ void AIHeroesTurns(Heroes &hero)
 	if(hero.isFreeman() || !hero.isEnableMove()) break;
 
 	bool hide_move = (0 == conf.AIMoveSpeed()) ||
-	    (! IS_DEVEL() && !hero.isShow(Settings::Get().MyColor()));
+	    (! IS_DEVEL() && !HeroesIsShow(hero));
 
 	if(hide_move)
 	{
@@ -2611,7 +2629,7 @@ void AIHeroesTurns(Heroes &hero)
     }
 
     bool hide_move = (0 == conf.AIMoveSpeed()) ||
-	    (! IS_DEVEL() && !hero.isShow(Settings::Get().MyColor()));
+	    (! IS_DEVEL() && !HeroesIsShow(hero));
 
     // 0.2 sec delay for show enemy hero position
     if(!hero.isFreeman() && !hide_move) DELAY(200);

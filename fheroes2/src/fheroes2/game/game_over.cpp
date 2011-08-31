@@ -207,7 +207,7 @@ void GameOver::DialogLoss(u16 cond)
         case WINS_SIDE:
         {
     	    body = _("%{color} has fallen!\nAll is lost.");
-	    String::Replace(body, "%{color}", Color::String(conf.MyColor()));
+	    String::Replace(body, "%{color}", Color::String(conf.CurrentColor()));
     	    break;
     	}
 
@@ -286,13 +286,13 @@ bool GameOver::Result::CheckGameOver(Game::menu_t & res)
     }
 
     // local players miss
-    if( !(colors & Settings::Get().GetPlayers().GetColors(CONTROL_HUMAN)))
+    if( !(colors & Players::HumanColors()))
     {
         res = Game::MAINMENU;
 	return true;
     }
 
-    const Kingdom & myKingdom = world.GetMyKingdom();
+    const Kingdom & myKingdom = world.GetKingdom(Settings::Get().CurrentColor());
 
     if(GameOver::COND_NONE != (result = world.CheckKingdomWins(myKingdom)))
     {

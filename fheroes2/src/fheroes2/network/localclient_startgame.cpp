@@ -181,7 +181,7 @@ bool FH2LocalClient::StartGame(void)
 		    packet.Pop(percent);
 
 		    radar.HideArea();
-		    conf.SetCurrentColor(Color::Get(color));
+		    conf.SetCurrentColor(color);
 		    //Interface::Basic::SetTurnProgress(percent);
 
 		    DEBUG(DBG_NETWORK, DBG_INFO, "player: " << Color::String(color));

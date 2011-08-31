@@ -83,7 +83,7 @@ void Kingdom::clear(void)
 
 u8 Kingdom::GetControl(void) const
 {
-    return Settings::Get().GetPlayers().GetPlayerControl(color);
+    return Players::GetPlayerControl(color);
 }
 
 Color::color_t Kingdom::GetColor(void) const
@@ -93,7 +93,7 @@ Color::color_t Kingdom::GetColor(void) const
 
 u8 Kingdom::GetRace(void) const
 {
-    return Settings::Get().GetPlayers().GetPlayerRace(GetColor());
+    return Players::GetPlayerRace(GetColor());
 }
 
 void Kingdom::UpdateStartingResource(void)
@@ -149,8 +149,6 @@ void Kingdom::ActionBeforeTurn(void)
 
 void Kingdom::ActionNewDay(void)
 {
-    Settings::Get().SetCurrentColor(GetColor());
-
     if(isLoss() || 0 == lost_town_days)
     {
 	LossPostActions();

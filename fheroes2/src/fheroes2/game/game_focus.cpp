@@ -42,7 +42,7 @@ Game::Focus::Focus() : castle(NULL), heroes(NULL)
 
 Game::Focus & Game::Focus::Get(void)
 {
-    return gfocus[Color::GetIndex(Settings::Get().MyColor())];
+    return gfocus[Color::GetIndex(Settings::Get().CurrentColor())];
 }
 
 void Game::Focus::ResetAll(u8 priority)
@@ -102,7 +102,7 @@ void Game::Focus::Set(Castle *castle2)
 
 void Game::Focus::Reset(u8 priority)
 {
-    Kingdom & myKingdom = world.GetMyKingdom();
+    Kingdom & myKingdom = world.GetKingdom(Settings::Get().CurrentColor());
 
     Interface::Basic & I = Interface::Basic::Get();
 
@@ -127,7 +127,7 @@ void Game::Focus::Reset(u8 priority)
 	}
 
 	case HEROES:
-	    if(heroes && heroes->GetColor() == Settings::Get().MyColor())
+	    if(heroes && heroes->GetColor() == Settings::Get().CurrentColor())
         	Set(heroes);
 	    else
 	    if(myKingdom.GetHeroes().size())
@@ -146,7 +146,7 @@ void Game::Focus::Reset(u8 priority)
 	    break;
 
 	case CASTLE:
-	    if(castle && castle->GetColor() == Settings::Get().MyColor())
+	    if(castle && castle->GetColor() == Settings::Get().CurrentColor())
         	Set(castle);
 	    else
 	    if(myKingdom.GetCastles().size())

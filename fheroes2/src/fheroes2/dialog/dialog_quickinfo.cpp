@@ -371,19 +371,19 @@ void Dialog::QuickInfo(const Maps::Tiles & tile)
     const Settings & settings = Settings::Get();
 
     const Heroes* from_hero = (Game::Focus::HEROES == Game::Focus::Get().Type() ? &Game::Focus::Get().GetHeroes() : NULL);
-    const Kingdom & kingdom = world.GetKingdom(settings.MyColor());
+    const Kingdom & kingdom = world.GetKingdom(settings.CurrentColor());
     u8 scoute = from_hero ? from_hero->CanScouteTile(tile.GetIndex()) : 0;
     const bool & show = settings.ExtShowVisitedContent();
 
-    if(tile.isFog(settings.MyColor()))
+    if(tile.isFog(settings.CurrentColor()))
 	name_object = _("Unchartered Territory");
     else
     // check guardians mine
     if(MP2::OBJ_ABANDONEDMINE == tile.GetObject() ||
-	tile.CaptureObjectIsProtection(settings.MyColor()))
+	tile.CaptureObjectIsProtection(settings.CurrentColor()))
     {
 	name_object = ShowGuardiansInfo(tile,
-		(settings.MyColor() == world.ColorCapturedObject(tile.GetIndex()) ? Skill::Level::EXPERT : scoute));
+		(settings.CurrentColor() == world.ColorCapturedObject(tile.GetIndex()) ? Skill::Level::EXPERT : scoute));
     }
     else
     switch(tile.GetObject())
@@ -636,8 +636,8 @@ void Dialog::QuickInfo(const Castle & castle)
     // draw guardian portrait
     if(guardian &&
 	// my  colors
-	(conf.MyColor() == castle.GetColor() ||
-		    conf.IsUnions(conf.MyColor(), castle.GetColor()) ||
+	(conf.CurrentColor() == castle.GetColor() ||
+		    Players::isFriends(conf.CurrentColor(), castle.GetColor()) ||
 	// show guardians (scouting: advanced)
 	(from_hero &&
 	    Skill::Level::ADVANCED <= from_hero->GetSecondaryValues(Skill::Secondary::SCOUTING))))
@@ -664,8 +664,8 @@ void Dialog::QuickInfo(const Castle & castle)
 	text.Blit(dst_pt);
     }
     else
-    if(conf.MyColor() == castle.GetColor() ||
-		    conf.IsUnions(conf.MyColor(), castle.GetColor()))
+    if(conf.CurrentColor() == castle.GetColor() ||
+		    Players::isFriends(conf.CurrentColor(), castle.GetColor()))
 	// show all
 	Army::DrawMons32Line(castle.GetArmy(), cur_rt.x - 5, cur_rt.y + 100, 192);
     else
@@ -758,7 +758,7 @@ void Dialog::QuickInfo(const Heroes & hero)
     display.Blit(port, dst_pt);
 
     // luck
-    if(conf.MyColor() == hero.GetColor())
+    if(conf.CurrentColor() == hero.GetColor())
     {
 	const s8 luck = hero.GetLuckWithModificators(NULL);
 	const Sprite & sprite = AGG::GetICN(ICN::MINILKMR, (0 > luck ? 0 : (0 < luck ? 1 : 2)));
@@ -774,7 +774,7 @@ void Dialog::QuickInfo(const Heroes & hero)
     }
 
     // morale
-    if(conf.MyColor() == hero.GetColor())
+    if(conf.CurrentColor() == hero.GetColor())
     {
 	const s8 morale = hero.GetMoraleWithModificators(NULL);
 	const Sprite & sprite = AGG::GetICN(ICN::MINILKMR, (0 > morale ? 3 : (0 < morale ? 4 : 5)));
@@ -908,8 +908,8 @@ void Dialog::QuickInfo(const Heroes & hero)
     const Heroes* from_hero = Game::Focus::HEROES == Game::Focus::Get().Type() ?
 			    &Game::Focus::Get().GetHeroes() : NULL;
 
-    if(conf.MyColor() == hero.GetColor() ||
-	conf.IsUnions(conf.MyColor(), hero.GetColor()))
+    if(conf.CurrentColor() == hero.GetColor() ||
+	Players::isFriends(conf.CurrentColor(), hero.GetColor()))
 	// show all
 	Army::DrawMons32Line(hero.GetArmy(), cur_rt.x - 5, cur_rt.y + 114, 160);
     else

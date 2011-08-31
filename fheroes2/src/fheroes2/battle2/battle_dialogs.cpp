@@ -361,7 +361,7 @@ u8 Battle2::Arena::DialogBattleHero(const HeroBase & hero) const
     cursor.Hide();
     cursor.SetThemes(Cursor::POINTER);
 
-    const bool readonly = conf.MyColor() != hero.GetColor();
+    const bool readonly = current_color != hero.GetColor();
     const Sprite & dialog = AGG::GetICN((conf.EvilInterface() ? ICN::VGENBKGE : ICN::VGENBKG), 0);
 
     Rect pos_rt;

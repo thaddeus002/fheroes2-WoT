@@ -230,9 +230,6 @@ Game::menu_t Game::NewMulti(void)
     if(! (conf.GameType(Game::TYPE_BATTLEONLY)))
 	conf.SetGameType(Game::TYPE_STANDARD);
 
-    // reset prev. scenario info
-    conf.SetMyColor(Color::NONE);
-
     if(conf.QVGA()) return PocketPC::NewMulti();
 
     // preload

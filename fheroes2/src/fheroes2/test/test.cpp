@@ -84,7 +84,7 @@ void RunTest3(void)
     Kingdom & kingdom1 = world.GetKingdom(mycolor);
     Kingdom & kingdom2 = world.GetKingdom(aicolor);
 
-    conf.SetMyColor(Color::Get(mycolor));
+    conf.SetCurrentColor(mycolor);
     conf.SetGameType(Game::TYPE_BATTLEONLY);
 
     players.SetStartGame();

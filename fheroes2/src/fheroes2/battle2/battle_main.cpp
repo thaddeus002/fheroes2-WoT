@@ -47,8 +47,7 @@ namespace Battle2
 
 Battle2::Result Battle2::Loader(Army::army_t & army1, Army::army_t & army2, s32 mapsindex)
 {
-    Settings & conf = Settings::Get();
-    Color::color_t mycolor = conf.MyColor();
+    const Settings & conf = Settings::Get();
 
     army1.BattleInit();
     army2.BattleInit();
@@ -95,7 +94,6 @@ Battle2::Result Battle2::Loader(Army::army_t & army1, Army::army_t & army2, s32 
 #endif
 
     AGG::ResetMixer();
-    conf.SetMyColor(mycolor);
 
     Army::army_t *army_wins = (result.army1 & RESULT_WINS ? &army1 : (result.army2 & RESULT_WINS ? &army2 : NULL));
     Army::army_t *army_loss = (result.army1 & RESULT_LOSS ? &army1 : (result.army2 & RESULT_LOSS ? &army2 : NULL));

@@ -247,7 +247,7 @@ screen_t CastleOpenDialog1(Castle & castle, bool readonly)
     }
 
     // resource bar
-    RedrawResourceBar(Point(dst_rt.x + 4, dst_rt.y + 181), world.GetMyKingdom().GetFunds());
+    RedrawResourceBar(Point(dst_rt.x + 4, dst_rt.y + 181), world.GetKingdom(castle.GetColor()).GetFunds());
 
     const Rect rectExit(dst_rt.x + dst_rt.w - 26, dst_rt.y + 7, 25, 25);
     display.Blit(AGG::GetICN(ICN::TOWNWIND, 12), rectExit.x, rectExit.y);
@@ -264,7 +264,7 @@ screen_t CastleOpenDialog1(Castle & castle, bool readonly)
 
     Button buttonPrev(dst_rt.x + 64, dst_rt.y + 5, ICN::TRADPOST, 3, 4);
     Button buttonNext(dst_rt.x + 245, dst_rt.y + 5, ICN::TRADPOST, 5, 6);
-    if(2 > world.GetMyKingdom().GetCastles().size())
+    if(2 > world.GetKingdom(castle.GetColor()).GetCastles().size())
     {
 	buttonNext.Press();
         buttonPrev.Press();
@@ -317,7 +317,7 @@ screen_t CastleOpenDialog1(Castle & castle, bool readonly)
 	    cursor.Hide();
 	    dwbar.Redraw();
 	    selectArmy1.Redraw();
-	    RedrawResourceBar(Point(dst_rt.x + 4, dst_rt.y + 181), world.GetMyKingdom().GetFunds());
+	    RedrawResourceBar(Point(dst_rt.x + 4, dst_rt.y + 181), world.GetKingdom(castle.GetColor()).GetFunds());
 	    cursor.Show();
 	    display.Flip();
 	}
@@ -350,7 +350,7 @@ screen_t CastleOpenDialog1(Castle & castle, bool readonly)
     	    if(le.MouseCursor(selectArmy1.GetArea()) || le.MouseCursor(selectArmy2.GetArea()))
     	    {
 		if(SelectArmyBar::QueueEventProcessing(selectArmy1, selectArmy2))
-		    RedrawResourceBar(Point(dst_rt.x + 4, dst_rt.y + 181), world.GetMyKingdom().GetFunds());
+		    RedrawResourceBar(Point(dst_rt.x + 4, dst_rt.y + 181), world.GetKingdom(castle.GetColor()).GetFunds());
 	    }
 	}
         else
@@ -358,7 +358,7 @@ screen_t CastleOpenDialog1(Castle & castle, bool readonly)
     	    if(le.MouseCursor(selectArmy1.GetArea()))
 	    {
     		if(SelectArmyBar::QueueEventProcessing(selectArmy1))
-		    RedrawResourceBar(Point(dst_rt.x + 4, dst_rt.y + 181), world.GetMyKingdom().GetFunds());
+		    RedrawResourceBar(Point(dst_rt.x + 4, dst_rt.y + 181), world.GetKingdom(castle.GetColor()).GetFunds());
 	    }
 	}
 
@@ -805,8 +805,8 @@ screen_t CastleOpenDialog6(Castle & castle, bool readonly)
 	rectRecruit2 = Rect(dst_rt.x + 4, dst_rt.y + 77, crest.w(), crest.h());
 	rectCaptain = Rect(dst_rt.x + 4, dst_rt.y + 136, crest.w(), crest.h());
 
-	hero1 = world.GetMyKingdom().GetRecruits().GetHero1();
-	hero2 = world.GetMyKingdom().GetRecruits().GetHero2();
+	hero1 = world.GetKingdom(castle.GetColor()).GetRecruits().GetHero1();
+	hero2 = world.GetKingdom(castle.GetColor()).GetRecruits().GetHero2();
 
 	display.Blit(crest, rectRecruit1);
 	if(hero1) display.Blit(hero1->GetPortrait50x46(), rectRecruit1.x + 4, rectRecruit1.y + 4);

@@ -75,9 +75,7 @@ public:
     Maps::Tiles & GetTiles(s32 index){ return vec_tiles.at(index); }
 
     Kingdoms & GetKingdoms(void);
-    Kingdom & GetMyKingdom(void);
     Kingdom & GetKingdom(u8 color);
-    const Kingdom & GetMyKingdom(void) const;
     const Kingdom & GetKingdom(u8 color) const;
     void KingdomLoss(const Color::color_t);
 

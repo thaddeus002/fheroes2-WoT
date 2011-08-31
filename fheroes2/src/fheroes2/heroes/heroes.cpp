@@ -945,12 +945,13 @@ bool Heroes::IsFullBagArtifacts(void) const
 
 bool Heroes::PickupArtifact(const Artifact & art)
 {
+    if(!art.isValid()) return false;
+
     const Settings & conf = Settings::Get();
-    bool interface = (conf.MyColor() == color && conf.CurrentColor() == color);
 
     if(! bag_artifacts.PushArtifact(art))
     {
-	if(interface)
+	if(CONTROL_HUMAN == GetControl())
 	{
 	    art() == Artifact::MAGIC_BOOK ?
 	    Dialog::Message("", _("You must purchase a spell book to use the mage guild, but you currently have no room for a spell book. Try giving one of your artifacts to another hero."), Font::BIG, Dialog::OK) :
@@ -959,14 +960,14 @@ bool Heroes::PickupArtifact(const Artifact & art)
 	return false;
     }
 
-    if(conf.ExtHeroPickupArtifactWithInfoDialog() &&
-	art() != Artifact::MAGIC_BOOK && interface)
+    if(conf.ExtHeroPickupArtifactWithInfoDialog() && 
+	art() != Artifact::MAGIC_BOOK && CONTROL_HUMAN == GetControl())
 	Dialog::ArtifactInfo(art.GetName(), art.GetDescription(), art);
 
     // check: anduran garb
     if(bag_artifacts.MakeBattleGarb())
     {
-	if(interface)
+	if(CONTROL_HUMAN == GetControl())
 	    Dialog::ArtifactInfo("", _("The three Anduran artifacts magically combine into one."), Artifact::BATTLE_GARB);
     }
 
@@ -1063,7 +1064,7 @@ bool Heroes::BuySpellBook(const Castle* castle, u8 shrine)
 
     if( ! kingdom.AllowPayment(payment))
     {
-	if(Settings::Get().MyColor() == color)
+	if(CONTROL_HUMAN == GetControl())
 	{
 	    header.append(". ");
 	    header.append(_("Unfortunately, you seem to be a little short of cash at the moment."));
@@ -1072,7 +1073,7 @@ bool Heroes::BuySpellBook(const Castle* castle, u8 shrine)
 	return false;
     }
 
-    if(Settings::Get().MyColor() == color)
+    if(CONTROL_HUMAN == GetControl())
     {
 	const Sprite & border = AGG::GetICN(ICN::RESOURCE, 7);
 	Surface sprite(border.w(), border.h());
@@ -1404,25 +1405,6 @@ void Heroes::SetFreeman(const u8 reason)
     if(savepoints) SetModes(SAVEPOINTS);
 }
 
-bool Heroes::isShow(u8 color)
-{
-    const s32 index_from = GetIndex();
-
-    if(! Maps::isValidAbsIndex(index_from)) return false;
-
-    const Maps::Tiles & tile_from = world.GetTiles(index_from);
-
-    if(path.isValid())
-    {
-        const s32 index_to = Maps::GetDirectionIndex(index_from, path.GetFrontDirection());
-        const Maps::Tiles & tile_to = world.GetTiles(index_to);
-
-        return !tile_from.isFog(color) && !tile_to.isFog(color);
-    }
-
-    return !tile_from.isFog(color);
-}
-
 const Surface & Heroes::GetPortrait30x22(heroes_t hid)
 {
     if(Heroes::SANDYSANDY > hid) return AGG::GetICN(ICN::MINIPORT, hid);
@@ -1496,10 +1478,8 @@ void Heroes::ActionPreBattle(void)
 
 void RedrawGameAreaAndHeroAttackMonster(Heroes & hero, s32 dst)
 {
-    const Settings & conf = Settings::Get();
-
     // redraw gamearea for monster action sprite
-    if(conf.MyColor() == hero.GetColor())
+    if(CONTROL_HUMAN == hero.GetControl())
     {
 	Interface::Basic & I = Interface::Basic::Get();
 	Game::Focus & F = Game::Focus::Get();

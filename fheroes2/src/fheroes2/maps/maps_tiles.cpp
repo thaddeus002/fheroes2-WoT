@@ -544,7 +544,7 @@ void Maps::Tiles::Init(s32 index, const MP2::mp2tile_t & mp2)
     AddonsPushLevel1(mp2);
     AddonsPushLevel2(mp2);
 
-    if(IS_DEVEL()) ClearFog(Settings::Get().MyColor());
+    if(IS_DEVEL()) ClearFog(Players::HumanColors());
 }
 
 void Maps::Tiles::SetTile(const u16 sprite_index, const u8 sh)
@@ -2223,14 +2223,12 @@ bool Maps::Tiles::isFog(u8 color) const
 
 void Maps::Tiles::SetFog(u8 color)
 {
-    const Settings & conf = Settings::Get();
-    fogs |= (conf.ExtUnionsAllowViewMaps() ? conf.GetUnions(color) : color);
+    fogs |= (Settings::Get().ExtUnionsAllowViewMaps() ? Players::GetPlayerFriends(color) : color);
 }
 
 void Maps::Tiles::ClearFog(u8 color)
 {
-    const Settings & conf = Settings::Get();
-    fogs &= ~(conf.ExtUnionsAllowViewMaps() ? conf.GetUnions(color) : color);
+    fogs &= ~(Settings::Get().ExtUnionsAllowViewMaps() ? Players::GetPlayerFriends(color) : color);
 }
 
 void Maps::Tiles::ResetQuantity(void)

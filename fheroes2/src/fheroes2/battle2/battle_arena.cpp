@@ -1016,10 +1016,6 @@ void Battle2::Arena::RemoteTurn(const Stats & b, Actions & a)
 
 void Battle2::Arena::HumanTurn(const Stats & b, Actions & a)
 {
-    Settings & conf = Settings::Get();
-
-    conf.SetMyColor(Color::Get(b.GetColor()));
-
     if(interface)
         interface->HumanTurn(b, a);
 }

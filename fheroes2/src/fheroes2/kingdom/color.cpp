@@ -64,22 +64,6 @@ u8 Color::Count(u8 colors)
     return bset.count();
 }
 
-Color::color_t Color::GetFromIndex(u8 index)
-{
-    switch(index)
-    {
-        case 0:	return BLUE;
-        case 1:	return GREEN;
-        case 2:	return RED;
-        case 3:	return YELLOW;
-	case 4:	return ORANGE;
-	case 5:	return PURPLE;
-	default: break;
-    }
-
-    return NONE;
-}
-
 Color::color_t Color::Get(u8 index)
 {
     switch(index)

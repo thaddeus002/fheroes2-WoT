@@ -173,7 +173,7 @@ Dialog::answer_t PocketPC::HeroesOpenDialog(Heroes & hero, bool readonly)
         buttonDismiss.SetDisable(true);
     }
 
-    if(readonly || 2 > world.GetMyKingdom().GetHeroes().size())
+    if(readonly || 2 > world.GetKingdom(hero.GetColor()).GetHeroes().size())
     {
 	buttonNext.Press();
 	buttonPrev.Press();

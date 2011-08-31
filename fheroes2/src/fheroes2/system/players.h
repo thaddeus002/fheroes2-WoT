@@ -65,23 +65,22 @@ public:
     void Init(const Maps::FileInfo &);
     void clear(void);
 
-    bool isFriends(u8 player, u8 colors) const;
+    void	SetHumanColors(u8 colors);
+    void	SetStartGame(void);
+    u8	 	GetColors(u8 control = 0xFF, bool strong = false) const;
+    std::string	String(void) const;
 
-    void SetPlayerRace(u8 color, u8 race);
-    void SetPlayerControl(u8 color, u8 ctrl);
 
-    void SetHumanColors(u8 colors);
+    static Player*	Get(u8 color);
+    static u8		GetPlayerControl(u8 color);
+    static u8		GetPlayerRace(u8 color);
+    static u8		GetPlayerFriends(u8 color);
+    static bool		isFriends(u8 player, u8 colors);
+    static void		SetPlayerRace(u8 color, u8 race);
+    static void		SetPlayerControl(u8 color, u8 ctrl);
+    static u8		HumanColors(void);
 
-    u8   GetPlayerControl(u8 color) const;
-    u8   GetPlayerRace(u8 color) const;
-
-    static Player* Get(u8 color);
-
-    u8 GetColors(u8 control = 0xFF, bool strong = false) const;
-
-    void SetStartGame(void);
-
-    std::string String(void) const;
+    u8		current_color;
 };
 
 namespace Interface

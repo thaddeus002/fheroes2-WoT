@@ -398,7 +398,7 @@ Dialog::answer_t Castle::OpenDialog(bool readonly, bool fade)
     // draw building
     CastleDialog::RedrawAllBuilding(*this, cur_pt, cacheBuildings);
 
-    if(2 > world.GetMyKingdom().GetCastles().size() || readonly)
+    if(2 > world.GetKingdom(GetColor()).GetCastles().size() || readonly)
     {
 	buttonPrevCastle.Press();
         buttonPrevCastle.SetDisable(true);
@@ -935,7 +935,7 @@ Dialog::answer_t Castle::OpenDialog(bool readonly, bool fade)
 void Castle::RedrawResourcePanel(const Point & pt)
 {
     Display & display = Display::Get();
-    const Funds & resource = world.GetMyKingdom().GetFunds();
+    const Funds & resource = world.GetKingdom(GetColor()).GetFunds();
 
     Point dst_pt = pt;
 

@@ -203,7 +203,7 @@ bool isNeedStayFrontObject(const Heroes & hero, const Maps::Tiles & next)
 
 	return (castle &&
 		hero.GetColor() != castle->GetColor() &&
-		    !Settings::Get().IsUnions(hero.GetColor(), castle->GetColor()));
+		    !Players::isFriends(hero.GetColor(), castle->GetColor()));
     }
     else
     // to coast action

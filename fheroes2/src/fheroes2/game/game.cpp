@@ -404,12 +404,12 @@ u8 Game::GetKingdomColors(void)
 
 u8 Game::GetKingdomRace(u8 color)
 {
-    return Settings::Get().GetPlayers().GetPlayerRace(color);
+    return Players::GetPlayerRace(color);
 }
 
 void Game::SetKingdomRace(u8 color, u8 race)
 {
-    Settings::Get().GetPlayers().SetPlayerRace(color, race);
+    Players::SetPlayerRace(color, race);
 }
 
 #include <cmath>
@@ -439,7 +439,7 @@ std::string Game::CountScoute(u32 count, u8 scoute)
     if(res.empty())
     {
         u32 min = Rand::Get(static_cast<u32>(std::floor(count - infelicity + 0.5)),
-                            static_cast<u32>(std::floor(count + infelicity + 0.5)));
+			    static_cast<u32>(std::floor(count + infelicity + 0.5)));
         u32 max = 0;
 
         if(min > count)

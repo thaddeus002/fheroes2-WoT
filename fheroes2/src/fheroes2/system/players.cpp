@@ -30,7 +30,11 @@
 #include "settings.h"
 #include "players.h"
 
-Player* _players[KINGDOMMAX + 1] = { NULL };
+namespace
+{
+    Player* _players[KINGDOMMAX + 1] = { NULL };
+    u8 human_colors = 0;
+}
 
 void PlayerFixMultiControl(Player* player)
 {
@@ -87,7 +91,7 @@ void Player::SetControl(u8 ctl)
     control = ctl;
 }
 
-Players::Players()
+Players::Players() : current_color(0)
 {
     reserve(KINGDOMMAX);
 }
@@ -106,6 +110,9 @@ void Players::clear(void)
 
     for(u8 ii = 0 ;ii < KINGDOMMAX + 1; ++ii)
 	_players[ii] = NULL;
+
+    current_color = 0;
+    human_colors = 0;
 }
 
 void Players::Init(u8 colors)
@@ -177,7 +184,7 @@ Player* Players::Get(u8 color)
     return _players[Color::GetIndex(color)];
 }
 
-bool Players::isFriends(u8 player, u8 colors) const
+bool Players::isFriends(u8 player, u8 colors)
 {
     const Player* ptr = Get(player);
     return ptr ? ptr->friends & colors : false;
@@ -211,19 +218,25 @@ u8 Players::GetColors(u8 control, bool strong) const
     return res;
 }
 
-u8 Players::GetPlayerControl(u8 color) const
+u8 Players::GetPlayerFriends(u8 color)
+{
+    const Player* player = Get(color);
+    return player ? player->friends : 0;
+}
+
+u8 Players::GetPlayerControl(u8 color)
 {
     const Player* player = Get(color);
     return player ? player->control : CONTROL_NONE;
 }
 
-u8 Players::GetPlayerRace(u8 color) const
+u8 Players::GetPlayerRace(u8 color)
 {
     const Player* player = Get(color);
     return player ? player->race : Race::NONE;
 }
 
-void Players::SetHumanColors(u8 cols)
+void Players::SetHumanColors(u8 cols) /* remove: server.cpp */
 {
     for(iterator it = begin(); it != end(); ++it)
 	(*it)->control = (*it)->color & cols ? CONTROL_HUMAN : CONTROL_AI;
@@ -234,10 +247,16 @@ void Players::SetStartGame(void)
     for_each(begin(), end(), std::ptr_fun(&PlayerFixRandomRace));
     for_each(begin(), end(), std::ptr_fun(&PlayerFixMultiControl));
 
-    Settings::Get().SetMyColor(Color::GetFirst(GetColors(CONTROL_HUMAN, true)));
-    Settings::Get().SetCurrentColor(Color::NONE);
+    current_color = Color::NONE;
 
     DEBUG(DBG_GAME, DBG_INFO, String());
+}
+
+u8 Players::HumanColors(void)
+{
+    if(0 == human_colors)
+	human_colors = Settings::Get().GetPlayers().GetColors(CONTROL_HUMAN, true);
+    return human_colors;
 }
 
 std::string Players::String(void) const
@@ -470,7 +489,7 @@ bool Interface::PlayersInfo::QueueEventProcessing(void)
                     /* reset color */
                     else
                     if(1 < Color::Count(humans))
-                        players.SetPlayerControl(humans, CONTROL_AI|CONTROL_HUMAN);
+                        players.SetPlayerControl(player->color, CONTROL_AI|CONTROL_HUMAN);
                 }
                 else
                 // single play

@@ -94,7 +94,7 @@ void WorldStoreObjects(u8 color, IndexObjectMap & store)
 
 	    // skip captured obj
 	    if(MP2::isCaptureObject(tile.GetObject()) &&
-		Settings::Get().IsUnions(color, world.ColorCapturedObject(tile.GetIndex()))) continue;
+		Players::isFriends(color, world.ColorCapturedObject(tile.GetIndex()))) continue;
 
             // skip for meeting heroes
             if(MP2::OBJ_HEROES == tile.GetObject())

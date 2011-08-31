@@ -255,11 +255,14 @@ int main(int argc, char **argv)
 
 	}
 #ifndef ANDROID
+/*
 	catch(std::bad_alloc)
 	{
     	    AGG::Cache::Get().Dump();
 	    DEBUG(DBG_GAME, DBG_WARN, "std::bad_alloc");
-	} catch(Error::Exception)
+	}
+*/
+	catch(Error::Exception)
 	{
     	    AGG::Cache::Get().Dump();
 #ifdef WITH_NET

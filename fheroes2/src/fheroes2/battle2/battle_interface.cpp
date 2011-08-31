@@ -1625,7 +1625,7 @@ void Battle2::Interface::HumanBattleTurn(const Stats & b, Actions & a, std::stri
     else
     if(opponent1 && le.MouseCursor(opponent1->GetArea()))
     {
-	if(conf.MyColor() == arena.army1.GetColor())
+	if(arena.current_color == arena.army1.GetColor())
 	{
 	    msg = _("Hero's Options");
 	    cursor.SetThemes(Cursor::WAR_HERO);
@@ -1651,7 +1651,7 @@ void Battle2::Interface::HumanBattleTurn(const Stats & b, Actions & a, std::stri
     else
     if(opponent2 && le.MouseCursor(opponent2->GetArea()))
     {
-	if(conf.MyColor() == arena.army2.GetColor())
+	if(arena.current_color == arena.army2.GetColor())
 	{
 	    msg = _("Hero's Options");
 	    cursor.SetThemes(Cursor::WAR_HERO);
@@ -1931,7 +1931,7 @@ void Battle2::Interface::MousePressRightBoardAction(u16 themes, s16 index, Actio
 	    const Settings & conf = Settings::Get();
 	    const u8 allow = GetAllowSwordDirection(index);
 
-	    if(conf.MyColor() == b->GetColor() || !conf.ExtTapMode() || !allow)
+	    if(arena.current_color == b->GetColor() || !conf.ExtTapMode() || !allow)
 		Dialog::ArmyInfo(b->troop, Dialog::READONLY);
 	    else
 	    switch(PocketPC::GetCursorAttackDialog(b->GetCellPosition(), allow))
@@ -3973,8 +3973,6 @@ void Battle2::Interface::CheckGlobalEvents(LocalEvent & le)
 
 void Battle2::Interface::ProcessingHeroDialogResult(u8 res, Actions & a)
 {
-    const Settings & conf = Settings::Get();
-
     switch(res)
     {
 	//cast
@@ -4035,12 +4033,12 @@ void Battle2::Interface::ProcessingHeroDialogResult(u8 res, Actions & a)
 	//surrender
 	case 3:
 	{
-	    const Army::army_t & army = arena.army1.GetColor() == conf.MyColor() ? arena.army1 : arena.army2;
-	    const HeroBase* enemy = arena.army1.GetColor() == conf.MyColor() ? arena.army2.GetCommander() : arena.army1.GetCommander();
+	    const Army::army_t & army = arena.army1.GetColor() == arena.current_color ? arena.army1 : arena.army2;
+	    const HeroBase* enemy = arena.army1.GetColor() == arena.current_color ? arena.army2.GetCommander() : arena.army1.GetCommander();
 	    const u32 cost = army.GetSurrenderCost();
 	    if(enemy && DialogBattleSurrender(*enemy, cost))
 	    {
-		if(world.GetKingdom(conf.MyColor()).GetFundsGold() < cost)
+		if(world.GetKingdom(arena.current_color).GetFundsGold() < cost)
 		    Dialog::Message("", _("You don't have enough gold!"), Font::BIG, Dialog::OK);
 		else
 		{

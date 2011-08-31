@@ -195,7 +195,7 @@ Game::menu_t Game::StartGame(void)
 	    Kingdom & kingdom = world.GetKingdom(player.color);
 
 	    if(!kingdom.isPlay() ||
-	    (skip_turns && player.color != conf.MyColor())) continue;
+		(skip_turns && player.color != conf.CurrentColor())) continue;
 
 	    DEBUG(DBG_GAME, DBG_INFO, std::endl << world.DateString() << ", " << "color: " <<
 		    Color::String(player.color) << ", resource: " << kingdom.GetFunds().String());
@@ -212,7 +212,6 @@ Game::menu_t Game::StartGame(void)
 		    if(conf.GameType(Game::TYPE_HOTSEAT))
 		    {
 			cursor.Hide();
-			conf.SetMyColor(Color::UNUSED);
 			I.iconsPanel.HideIcons();
 			statusWin.Reset();
 			I.SetRedraw(REDRAW_GAMEAREA | REDRAW_STATUS | REDRAW_ICONS);
@@ -222,7 +221,6 @@ Game::menu_t Game::StartGame(void)
 		    }
 		    I.SetRedraw(REDRAW_ICONS);
 		    I.iconsPanel.ShowIcons();
-		    conf.SetMyColor(player.color);
 		    m = HumanTurn(skip_turns);
 		    if(skip_turns) skip_turns = false;
 		break;
@@ -275,8 +273,8 @@ void Game::OpenCastleDialog(Castle *castle)
     Mixer::Pause();
 
     //Cursor & cursor = Cursor::Get();
-    Kingdom & myKingdom = world.GetMyKingdom();
     const Settings & conf = Settings::Get();
+    Kingdom & myKingdom = world.GetKingdom(conf.CurrentColor());
     const KingdomCastles & myCastles = myKingdom.GetCastles();
     Display & display = Display::Get();
     KingdomCastles::const_iterator it = std::find(myCastles.begin(), myCastles.end(), castle);
@@ -284,7 +282,7 @@ void Game::OpenCastleDialog(Castle *castle)
     Interface::StatusWindow::ResetTimer();
     bool need_fade = conf.ExtUseFade() && 640 == display.w() && 480 == display.h();
 
-    if(it != myCastles.end() || conf.IsUnions(conf.MyColor(), castle->GetColor()))
+    if(it != myCastles.end() || Players::isFriends(conf.CurrentColor(), castle->GetColor()))
     {
 	Dialog::answer_t result = Dialog::ZERO;
 
@@ -305,7 +303,7 @@ void Game::OpenCastleDialog(Castle *castle)
 	    if(Settings::Get().ExtLowMemory())
     		AGG::ICNRegistryEnable(true);
 
-	    result = castle->OpenDialog((conf.MyColor() != castle->GetColor()), need_fade);
+	    result = castle->OpenDialog((conf.CurrentColor() != castle->GetColor()), need_fade);
 	    if(need_fade) need_fade = false;
 
 	    if(Settings::Get().ExtLowMemory())
@@ -354,8 +352,8 @@ void Game::OpenHeroesDialog(Heroes *hero)
     if(! hero) return;
 
     //Cursor & cursor = Cursor::Get();
-    Kingdom & myKingdom = world.GetMyKingdom();
     const Settings & conf = Settings::Get();
+    Kingdom & myKingdom = world.GetKingdom(hero->GetColor());
     const KingdomHeroes & myHeroes = myKingdom.GetHeroes();
     Display & display = Display::Get();
     KingdomHeroes::const_iterator it = std::find(myHeroes.begin(), myHeroes.end(), hero);
@@ -486,7 +484,7 @@ Cursor::themes_t Game::GetCursorFocusShipmaster(const Heroes & from_hero, const 
 		if(from_hero.GetColor() == to_hero->GetColor())
 		    return Cursor::DistanceThemes(Cursor::CHANGE, from_hero.GetRangeRouteDays(tile.GetIndex()));
 		else
-		if(conf.IsUnions(from_hero.GetColor(), to_hero->GetColor()))
+		if(Players::isFriends(from_hero.GetColor(), to_hero->GetColor()))
 		    return conf.ExtUnionsAllowHeroesMeetings() ? Cursor::CHANGE : Cursor::POINTER;
 		else
 		if(to_hero->AllowBattle(false))
@@ -540,7 +538,7 @@ Cursor::themes_t Game::GetCursorFocusHeroes(const Heroes & from_hero, const Maps
 		if(from_hero.Modes(Heroes::GUARDIAN))
 		    return Cursor::POINTER;
 		else
-		if(conf.IsUnions(from_hero.GetColor(), castle->GetColor()))
+		if(Players::isFriends(from_hero.GetColor(), castle->GetColor()))
 		    return conf.ExtUnionsAllowCastleVisiting() ? Cursor::ACTION : Cursor::POINTER;
 		else
 		if(castle->GetActualArmy().isValid())
@@ -563,7 +561,7 @@ Cursor::themes_t Game::GetCursorFocusHeroes(const Heroes & from_hero, const Maps
 		if(from_hero.GetColor() == castle->GetColor())
 		    return Cursor::DistanceThemes(Cursor::ACTION, from_hero.GetRangeRouteDays(tile.GetIndex()));
 		else
-		if(conf.IsUnions(from_hero.GetColor(), castle->GetColor()))
+		if(Players::isFriends(from_hero.GetColor(), castle->GetColor()))
 		    return conf.ExtUnionsAllowCastleVisiting() ? Cursor::ACTION : Cursor::POINTER;
 		else
 		if(castle->GetActualArmy().isValid())
@@ -590,7 +588,7 @@ Cursor::themes_t Game::GetCursorFocusHeroes(const Heroes & from_hero, const Maps
 		if(from_hero.GetColor() == to_hero->GetColor())
 		    return Cursor::DistanceThemes(Cursor::CHANGE, from_hero.GetRangeRouteDays(tile.GetIndex()));
 		else
-		if(conf.IsUnions(from_hero.GetColor(), to_hero->GetColor()))
+		if(Players::isFriends(from_hero.GetColor(), to_hero->GetColor()))
 		    return conf.ExtUnionsAllowHeroesMeetings() ? Cursor::CHANGE : Cursor::POINTER;
 		else
 		    return Cursor::DistanceThemes(Cursor::FIGHT, from_hero.GetRangeRouteDays(tile.GetIndex()));
@@ -610,7 +608,7 @@ Cursor::themes_t Game::GetCursorFocusHeroes(const Heroes & from_hero, const Maps
 	    {
 		bool protection = (MP2::isPickupObject(tile.GetObject()) ? false :
 				(Maps::TileUnderProtection(tile.GetIndex()) ||
-					(! conf.IsUnions(from_hero.GetColor(), world.ColorCapturedObject(tile.GetIndex())) &&
+					(! Players::isFriends(from_hero.GetColor(), world.ColorCapturedObject(tile.GetIndex())) &&
 					    tile.CaptureObjectIsProtection(from_hero.GetColor()))));
 
 		return Cursor::DistanceThemes((protection ? Cursor::FIGHT : Cursor::ACTION),
@@ -633,7 +631,7 @@ Cursor::themes_t Game::GetCursorFocusHeroes(const Heroes & from_hero, const Maps
 Cursor::themes_t Game::GetCursor(const s32 dst_index)
 {
     const Maps::Tiles & tile = world.GetTiles(dst_index);
-    if(tile.isFog(Settings::Get().MyColor())) return Cursor::POINTER;
+    if(tile.isFog(Settings::Get().CurrentColor())) return Cursor::POINTER;
 
     const Game::Focus & focus = Game::Focus::Get();
 
@@ -696,7 +694,7 @@ Game::menu_t Game::HumanTurn(bool isload)
     cursor.Hide();
     Interface::Basic & I = Interface::Basic::Get();
 
-    Kingdom & myKingdom = world.GetMyKingdom();
+    Kingdom & myKingdom = world.GetKingdom(conf.CurrentColor());
     const KingdomCastles & myCastles = myKingdom.GetCastles();
     const KingdomHeroes & myHeroes = myKingdom.GetHeroes();
 
@@ -1051,7 +1049,7 @@ Game::menu_t Game::HumanTurn(bool isload)
 	// warning lost all town
 	if(myHeroes.size() && myCastles.empty() && Game::GetLostTownDays() < myKingdom.GetLostTownDays())
 	{
-	    DialogPlayers(conf.MyColor(), _("%{color} player, you have lost your last town. If you do not conquer another town in next week, you will be eliminated."));
+	    DialogPlayers(conf.CurrentColor(), _("%{color} player, you have lost your last town. If you do not conquer another town in next week, you will be eliminated."));
 	}
 
 	if(Game::Focus::HEROES == global_focus.Type())
@@ -1240,7 +1238,7 @@ void Game::MouseCursorAreaPressRight(s32 index_maps)
 
 	DEBUG(DBG_DEVEL, DBG_INFO, std::endl << tile.String());
 
-	if(!IS_DEVEL() && tile.isFog(conf.MyColor()))
+	if(!IS_DEVEL() && tile.isFog(conf.CurrentColor()))
 	    Dialog::QuickInfo(tile);
 	else
 	switch(tile.GetObject())
@@ -1271,7 +1269,7 @@ void Game::EventNextHero(void)
 {
     Game::Focus & global_focus = Focus::Get();
 
-    const Kingdom & myKingdom = world.GetMyKingdom();
+    const Kingdom & myKingdom = world.GetKingdom(Settings::Get().CurrentColor());
     const KingdomHeroes & myHeroes = myKingdom.GetHeroes();
 
     if(myHeroes.empty()) return;
@@ -1320,7 +1318,7 @@ void Game::EventCastSpell(void)
 void Game::EventEndTurn(Game::menu_t & ret)
 {
     Game::Focus & global_focus = Focus::Get();
-    const Kingdom & myKingdom = world.GetMyKingdom();
+    const Kingdom & myKingdom = world.GetKingdom(Settings::Get().CurrentColor());
 
     if(Game::Focus::HEROES == global_focus.Type())
 	global_focus.GetHeroes().SetMove(false);
@@ -1425,7 +1423,7 @@ void Game::EventExit(menu_t & ret)
 
 void Game::EventNextTown(void)
 {
-    Kingdom & myKingdom = world.GetMyKingdom();
+    Kingdom & myKingdom = world.GetKingdom(Settings::Get().CurrentColor());
     KingdomCastles & myCastles = myKingdom.GetCastles();
 
     if(myCastles.size())
@@ -1461,7 +1459,7 @@ void Game::EventLoadGame(menu_t & ret)
 
 void Game::EventPuzzleMaps(void)
 {
-    world.GetMyKingdom().PuzzleMaps().ShowMapsDialog();
+    world.GetKingdom(Settings::Get().CurrentColor()).PuzzleMaps().ShowMapsDialog();
 }
 
 void Game::EventGameInfo(void)
@@ -1608,7 +1606,7 @@ void Game::NewWeekDialog(void)
 
 void Game::ShowEventDay(void)
 {
-    Kingdom & myKingdom = world.GetMyKingdom();
+    Kingdom & myKingdom = world.GetKingdom(Settings::Get().CurrentColor());
     EventsDate events = world.GetEventsDate(myKingdom.GetColor());
 
     for(EventsDate::const_iterator
@@ -1625,26 +1623,25 @@ void Game::ShowEventDay(void)
 
 void Game::ShowWarningLostTowns(menu_t & ret)
 {
-    const Kingdom & myKingdom = world.GetMyKingdom();
-    Settings & conf = Settings::Get();
+    const Kingdom & myKingdom = world.GetKingdom(Settings::Get().CurrentColor());
     if(0 == myKingdom.GetLostTownDays())
     {
     	    AGG::PlayMusic(MUS::DEATH, false);
-	    DialogPlayers(conf.MyColor(), _("%{color} player, your heroes abandon you, and you are banished from this land."));
+	    DialogPlayers(myKingdom.GetColor(), _("%{color} player, your heroes abandon you, and you are banished from this land."));
 	    GameOver::Result::Get().SetResult(GameOver::LOSS_ALL);
 	    ret = MAINMENU;
     }
     else
     if(1 == myKingdom.GetLostTownDays())
     {
-	    DialogPlayers(conf.MyColor(), _("%{color} player, this is your last day to capture a town, or you will be banished from this land."));
+	    DialogPlayers(myKingdom.GetColor(), _("%{color} player, this is your last day to capture a town, or you will be banished from this land."));
     }
     else
     if(Game::GetLostTownDays() >= myKingdom.GetLostTownDays())
     {
 	    std::string str = _("%{color} player, you only have %{day} days left to capture a town, or you will be banished from this land.");
 	    String::Replace(str, "%{day}", myKingdom.GetLostTownDays());
-	    DialogPlayers(conf.MyColor(), str);
+	    DialogPlayers(myKingdom.GetColor(), str);
     }
 }
 

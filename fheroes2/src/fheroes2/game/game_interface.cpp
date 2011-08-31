@@ -34,7 +34,6 @@
 bool Interface::NoGUI(void)
 {
     const Settings & conf = Settings::Get();
-
     return conf.NetworkDedicatedServer();
 }
 
@@ -252,7 +251,7 @@ s32 Interface::Basic::GetDimensionDoorDestination(const s32 from, const u8 dista
 
 	const bool valid = ((gameArea.GetArea() & mp) &&
 			dst >= 0 &&
-			(! tile.isFog(conf.MyColor())) &&
+			(! tile.isFog(conf.CurrentColor())) &&
 			MP2::isClearGroundObject(tile.GetObject()) &&
 			((water && Maps::Ground::WATER == world.GetTiles(dst).GetGround()) ||
 			(!water && Maps::Ground::WATER != world.GetTiles(dst).GetGround())) &&

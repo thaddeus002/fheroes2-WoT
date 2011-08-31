@@ -59,12 +59,10 @@ namespace Color
 	ALL	= BLUE | GREEN | RED | YELLOW | ORANGE | PURPLE
     };
 
-
     const char* String(u8);
 
     u8 Count(u8);
     u8 GetIndex(u8);
-    color_t GetFromIndex(u8);
     color_t GetFirst(u8);
     color_t Get(u8);
 }

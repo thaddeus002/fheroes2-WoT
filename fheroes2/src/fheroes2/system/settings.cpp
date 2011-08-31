@@ -189,8 +189,7 @@ Settings::Settings() : major_version(MAJOR_VERSION), minor_version(MINOR_VERSION
     svn_version(SVN_REVISION),
 #endif
     debug(DEFAULT_DEBUG), video_mode(0, 0), game_difficulty(Difficulty::NORMAL),
-    my_color(Color::NONE), cur_color(Color::NONE), path_data_directory("data"),
-    font_normal("dejavusans.ttf"), font_small("dejavusans.ttf"), force_lang("en"), size_normal(15), size_small(10),
+    path_data_directory("data"), font_normal("dejavusans.ttf"), font_small("dejavusans.ttf"), force_lang("en"), size_normal(15), size_small(10),
     sound_volume(6), music_volume(6), heroes_speed(DEFAULT_SPEED_DELAY), ai_speed(DEFAULT_SPEED_DELAY), scroll_speed(SCROLL_NORMAL), battle_speed(DEFAULT_SPEED_DELAY),
     game_type(0), preferably_count_players(0), port(DEFAULT_PORT), memory_limit(0)
 {
@@ -642,10 +641,6 @@ void Settings::SetCurrentFileInfo(const Maps::FileInfo & fi)
 
     players.Init(current_maps_file);
 
-    // reset colors
-    my_color = Color::NONE;
-    cur_color = Color::NONE;
-
     // game difficulty
     game_difficulty = Difficulty::NORMAL;
     preferably_count_players = 0;
@@ -673,8 +668,7 @@ u16 Settings::Debug(void) const { return debug; }
 /* return game difficulty */
 u8 Settings::GameDifficulty(void) const { return game_difficulty; }
 
-Color::color_t Settings::CurrentColor(void) const { return cur_color; }
-Color::color_t Settings::MyColor(void) const { return my_color; }
+const u8 & Settings::CurrentColor(void) const { return players.current_color; }
 
 const std::string & Settings::SelectVideoDriver(void) const { return video_driver; }
 
@@ -786,8 +780,7 @@ void Settings::SetDebug(const u16 d)
 /**/
 void Settings::SetGameDifficulty(u8 d) { game_difficulty = d; }
 
-void Settings::SetCurrentColor(u8 color) { cur_color = Color::Get(color); }
-void Settings::SetMyColor(u8 color) { my_color = Color::Get(color); }
+void Settings::SetCurrentColor(u8 color) { players.current_color = color; }
 
 u8   Settings::SoundVolume(void) const
 {
@@ -946,17 +939,6 @@ u32 Settings::LossMapsIndexObject(void) const
 u16 Settings::LossCountDays(void) const
 {
     return current_maps_file.LossCountDays();
-}
-
-u8 Settings::GetUnions(u8 cl) const
-{
-    const Player* player = players.Get(cl);
-    return player ? player->friends : 0;
-}
-
-bool Settings::IsUnions(u8 cl1, u8 cl2) const
-{
-    return players.isFriends(cl1, cl2);
 }
 
 void Settings::SetEditor(void)

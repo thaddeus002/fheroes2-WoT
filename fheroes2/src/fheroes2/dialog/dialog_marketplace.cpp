@@ -211,7 +211,7 @@ void Dialog::Marketplace(bool fromTradingPost)
 
     TradeWindowGUI gui(pos_rt);
 
-    Kingdom & kingdom = world.GetMyKingdom();
+    Kingdom & kingdom = world.GetKingdom(Settings::Get().CurrentColor());
     const Sprite & spritecursor = AGG::GetICN(tradpost, 14);
 
     const std::string & header_from = _("Your Resources");
@@ -563,7 +563,7 @@ void GetStringTradeCosts(std::string & str, u8 rs_from, u8 rs_to, bool tradingPo
 
 u16 GetTradeCosts(u8 rs_from, u8 rs_to, bool tradingPost)
 {
-    const u8 markets = tradingPost ? 3 : world.GetMyKingdom().GetCountMarketplace();
+    const u8 markets = tradingPost ? 3 : world.GetKingdom(Settings::Get().CurrentColor()).GetCountMarketplace();
     
     if(rs_from == rs_to) return 0;
 

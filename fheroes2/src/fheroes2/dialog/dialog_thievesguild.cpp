@@ -274,7 +274,7 @@ void Dialog::ThievesGuild(bool oracle)
 
     display.Blit(AGG::GetICN(ICN::STONEBAK, 0), dst_pt);
 
-    const u8 count = oracle ? 0xFF : world.GetMyKingdom().GetCountBuilding(BUILD_THIEVESGUILD);
+    const u8 count = oracle ? 0xFF : world.GetKingdom(Settings::Get().CurrentColor()).GetCountBuilding(BUILD_THIEVESGUILD);
 
     std::vector<ValueColors> v;
     v.reserve(KINGDOMMAX);

@@ -854,7 +854,7 @@ void World::LoadMaps(const std::string &filename)
     if(IS_DEVEL())
     {
 	// get first castle position
-	Kingdom & kingdom = GetMyKingdom();
+	Kingdom & kingdom = GetKingdom(Color::GetFirst(Players::HumanColors()));
 
 	if(kingdom.GetCastles().size())
 	{
@@ -902,13 +902,6 @@ Kingdoms & World::GetKingdoms(void)
 {
     return vec_kingdoms;
 }
-
-/* get human kindom */
-Kingdom & World::GetMyKingdom(void)
-{ return GetKingdom(Settings::Get().MyColor()); }
-
-const Kingdom & World::GetMyKingdom(void) const
-{ return GetKingdom(Settings::Get().MyColor()); }
 
 /* get kingdom */
 Kingdom & World::GetKingdom(u8 color)
@@ -1676,7 +1669,7 @@ bool World::KingdomIsWins(const Kingdom & kingdom, u16 wins) const
 
 	case GameOver::WINS_SIDE:
 	{
-	    const u8 side2 = Game::GetKingdomColors() & ~conf.GetUnions(kingdom.GetColor());
+	    const u8 side2 = Game::GetKingdomColors() & ~Players::GetPlayerFriends(kingdom.GetColor());
 	    return (side2 == (vec_kingdoms.GetLossColors() & side2));
 	}
 

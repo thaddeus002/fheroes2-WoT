@@ -43,6 +43,23 @@ bool AlphabeticalCompare(const std::basic_string<CharType> & lhs, const std::bas
 		    rhs.data(), rhs.data() + rhs.size() ) == -1;
 }
 
+u8 ByteToColor(u8 byte)
+{
+    switch(byte)
+    {
+        case 0: return Color::BLUE;
+        case 1: return Color::GREEN;
+        case 2: return Color::RED;
+        case 3: return Color::YELLOW;
+        case 4: return Color::ORANGE;
+        case 5: return Color::PURPLE;
+
+        default: break;
+    }
+
+    return Color::NONE;
+}
+
 u8 ByteToRace(u8 byte)
 {
     switch(byte)
@@ -73,7 +90,7 @@ void Maps::FileInfo::Reset(void)
     for(u8 ii = 0; ii < KINGDOMMAX; ++ii)
     {
 	races[ii] = Race::NONE;
-	unions[ii] = Color::GetFromIndex(ii);
+	unions[ii] = ByteToColor(ii);
     }
 }
 
@@ -325,7 +342,7 @@ bool Maps::FileInfo::ReadMP2(const std::string & filename)
 
 	for(u8 ii = 0; ii < KINGDOMMAX; ++ii)
 	{
-	    Color::color_t cl = Color::GetFromIndex(ii);
+	    u8 cl = ByteToColor(ii);
 	
 	    if(side1 & cl)
 		unions[ii] = side1;

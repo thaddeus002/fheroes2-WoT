@@ -227,7 +227,7 @@ void Interface::CastleIcons::SetPos(s16 px, s16 py)
     SetAreaItems(Rect(px + 5, py + 5, ICONS_CURSOR_WIDTH, icons * ICONS_CURSOR_HEIGHT));
     DisableHotkeys(true);
 
-    SetListContent(world.GetMyKingdom().GetCastles());
+    SetListContent(world.GetKingdom(Settings::Get().CurrentColor()).GetCastles());
     Reset();
 }
 
@@ -318,7 +318,7 @@ void Interface::HeroesIcons::SetPos(s16 px, s16 py)
     SetAreaItems(Rect(px + 5, py + 5, ICONS_CURSOR_WIDTH, icons * ICONS_CURSOR_HEIGHT));
     DisableHotkeys(true);
 
-    SetListContent(world.GetMyKingdom().GetHeroes());
+    SetListContent(world.GetKingdom(Settings::Get().CurrentColor()).GetHeroes());
     Reset();
 }
 
@@ -467,13 +467,13 @@ void Interface::IconsPanel::ResetIcons(icons_t icons)
 {
     if(icons & ICON_HEROES)
     {
-	heroesIcons.SetListContent(world.GetMyKingdom().GetHeroes());
+	heroesIcons.SetListContent(world.GetKingdom(Settings::Get().CurrentColor()).GetHeroes());
 	heroesIcons.Reset();
     }
 
     if(icons & ICON_CASTLES)
     {
-	castleIcons.SetListContent(world.GetMyKingdom().GetCastles());
+	castleIcons.SetListContent(world.GetKingdom(Settings::Get().CurrentColor()).GetCastles());
 	castleIcons.Reset();
     }
 }

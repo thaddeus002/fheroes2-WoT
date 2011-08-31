@@ -198,7 +198,6 @@ public:
     bool isVisited(const Maps::Tiles & tile, const Visit::type_t type = Visit::LOCAL) const;
 
     bool Move(bool fast = false);
-    bool isShow(u8 color);
     bool isEnableMove(void) const;
     bool CanMove(void) const;
     void SetMove(bool f);

@@ -29,7 +29,6 @@
 #include <iomanip>
 #include <sstream>
 #include "gamedefs.h"
-#include "color.h"
 #include "maps_fileinfo.h"
 #include "game.h"
 #include "players.h"
@@ -40,6 +39,7 @@
 #include <android/log.h>
 #endif
 
+#define FORMAT_VERSION_2494 0x09BE
 #define FORMAT_VERSION_2487 0x09B7
 #define FORMAT_VERSION_2460 0x099C
 #define FORMAT_VERSION_2379 0x094B
@@ -47,7 +47,7 @@
 #define FORMAT_VERSION_2315 0x090B
 #define FORMAT_VERSION_2293 0x08F5
 #define FORMAT_VERSION_2268 0x08DC
-#define CURRENT_FORMAT_VERSION FORMAT_VERSION_2487
+#define CURRENT_FORMAT_VERSION FORMAT_VERSION_2494
 #define LAST_FORMAT_VERSION FORMAT_VERSION_2268
 
 #define ListMapsDirectory std::list<std::string>
@@ -381,12 +381,8 @@ public:
     Players & GetPlayers(void);
     const Players & GetPlayers(void) const;
 
-    u8   GetUnions(u8 cl1) const;
-    bool IsUnions(u8 cl1, u8 cl2) const;
-    Color::color_t CurrentColor(void) const;
-    Color::color_t MyColor(void) const;
+    const u8 & CurrentColor(void) const;
     void SetCurrentColor(u8);
-    void SetMyColor(u8);
     u8   PreferablyCountPlayers(void) const;
     void SetPreferablyCountPlayers(u8 c);
 
@@ -439,8 +435,6 @@ private:
     Size video_mode;
 
     u8 game_difficulty;
-    Color::color_t my_color;
-    Color::color_t cur_color;
 
     std::string build_version;
     std::string path_data_directory;

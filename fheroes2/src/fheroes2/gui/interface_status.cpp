@@ -169,7 +169,7 @@ void Interface::StatusWindow::DrawKingdomInfo(const u8 oh) const
 {
     std::string str;
 
-    Kingdom & myKingdom = world.GetMyKingdom();
+    Kingdom & myKingdom = world.GetKingdom(Settings::Get().CurrentColor());
     Display & display = Display::Get();
 
     // sprite all resource

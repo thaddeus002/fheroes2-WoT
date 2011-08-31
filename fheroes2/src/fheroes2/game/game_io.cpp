@@ -226,8 +226,6 @@ bool Game::IO::SaveBIN(QueueMessage & msg)
     // game
     msg.Push(static_cast<u16>(0xFF04));
     msg.Push(conf.game_difficulty);
-    msg.Push(static_cast<u8>(conf.my_color));
-    msg.Push(static_cast<u8>(conf.cur_color));
     msg.Push(conf.game_type);
     msg.Push(conf.preferably_count_players);
     msg.Push(conf.debug);
@@ -641,6 +639,8 @@ void Game::IO::PackPlayers(QueueMessage & msg, const Players & players)
 	else
 	    msg.Push(static_cast<u8>(0));
     }
+
+    msg.Push(players.current_color);
 }
 
 void Game::IO::UnpackPlayers(QueueMessage & msg, Players & players, u16 version)
@@ -689,6 +689,9 @@ void Game::IO::UnpackPlayers(QueueMessage & msg, Players & players, u16 version)
 		}
 	    }
 	}
+
+	if(version >= FORMAT_VERSION_2494)
+	    msg.Pop(players.current_color);
     }
 }
 
@@ -790,8 +793,14 @@ bool Game::IO::LoadBIN(QueueMessage & msg)
     msg.Pop(byte16);
     if(byte16 != 0xFF04) DEBUG(DBG_GAME, DBG_WARN, "0xFF04");
     msg.Pop(conf.game_difficulty);
-    msg.Pop(byte8); conf.my_color = Color::Get(byte8);
-    msg.Pop(byte8); conf.cur_color = Color::NONE;
+    u8 current_color = 0;
+    if(format < FORMAT_VERSION_2494)
+    {
+	// my_color
+	msg.Pop(byte8);
+	// current_color
+	msg.Pop(current_color);
+    }
     msg.Pop(conf.game_type);
     // settings::players_colors
     if(format < FORMAT_VERSION_2487)
@@ -814,6 +823,10 @@ bool Game::IO::LoadBIN(QueueMessage & msg)
     conf.opt_battle.SetModes(byte32);
 
     UnpackPlayers(msg, conf.GetPlayers(), format);
+    if(format < FORMAT_VERSION_2494)
+    {
+	conf.GetPlayers().current_color = current_color;
+    }
 
     // world
     msg.Pop(byte16);
@@ -1078,7 +1091,7 @@ void Game::IO::UnpackTile(QueueMessage & msg, Maps::Tiles & tile, u16 check_vers
     msg.Pop(tile.quantity7);
 
 #ifdef WITH_DEBUG
-    if(IS_DEVEL()) tile.fogs &= ~Settings::Get().MyColor();
+    if(IS_DEVEL()) tile.fogs &= ~Players::HumanColors();
 #endif
 
     // addons 1

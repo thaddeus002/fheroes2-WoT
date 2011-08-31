@@ -238,12 +238,18 @@ void Interface::GameArea::Redraw(Surface & dst, u8 flag, const Rect & rt) const
     else
     // redraw fog
     if(flag & LEVEL_FOG)
+    {
+	const Settings & conf = Settings::Get();
+	const u8 mycolor = Players::HumanColors() & conf.CurrentColor() ? conf.CurrentColor() : Players::HumanColors();
+
 	for(s16 oy = rt.y; oy < rt.y + rt.h; ++oy)
 	    for(s16 ox = rt.x; ox < rt.x + rt.w; ++ox)
-    {
-	const Maps::Tiles & tile = world.GetTiles(rectMaps.x + ox, rectMaps.y + oy);
-	if(tile.isFog(Settings::Get().MyColor()))
-	    tile.RedrawFogs(dst, Settings::Get().MyColor());
+	{
+	    const Maps::Tiles & tile = world.GetTiles(rectMaps.x + ox, rectMaps.y + oy);
+
+	    if(tile.isFog(mycolor))
+		tile.RedrawFogs(dst, mycolor);
+	}
     }
 }
 

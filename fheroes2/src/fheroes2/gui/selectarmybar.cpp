@@ -354,14 +354,14 @@ bool SelectArmyBar::QueueEventProcessing(SelectArmyBar & bar, std::string* msg)
 		{
 			flags |= Dialog::UPGRADE;
 
-			if(! world.GetMyKingdom().AllowPayment(troop1.GetUpgradeCost()))
+			if(! world.GetKingdom(bar.army->GetColor()).AllowPayment(troop1.GetUpgradeCost()))
 			    flags |= Dialog::UPGRADE_DISABLE;
 		}
 
 		switch(Dialog::ArmyInfo(troop1, flags))
 		{
             	    case Dialog::UPGRADE:
-            		world.GetMyKingdom().OddFundsResource(troop1.GetUpgradeCost());
+            		world.GetKingdom(bar.army->GetColor()).OddFundsResource(troop1.GetUpgradeCost());
             		troop1.Upgrade();
 			change = true;
 #ifdef WITH_NET
