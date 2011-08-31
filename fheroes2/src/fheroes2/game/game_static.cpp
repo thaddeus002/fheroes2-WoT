@@ -57,6 +57,11 @@ namespace GameStatic
     // heroes
     u8		heroes_spell_points_day	= 1;
 
+    // spells
+    u16		spell_dd_distance	= 0;
+    u16		spell_dd_sp		= 0;
+    u16		spell_dd_hp		= 0;
+
     // monsters
     double	monster_upgrade_ratio	= 1.0;
 }

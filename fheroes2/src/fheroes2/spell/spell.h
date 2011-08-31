@@ -154,10 +154,6 @@ public:
 
 private:
     u8 id;
-    
-    static u16 dd_distance;
-    static u16 dd_sp;
-    static u16 dd_hp;
 };
 
 #endif

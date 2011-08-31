@@ -46,9 +46,13 @@ struct spellstats_t
         const char* description;
 };
 
-u16 Spell::dd_distance = 0;
-u16 Spell::dd_sp = 0;
-u16 Spell::dd_hp = 0;
+// game_static.cpp
+namespace GameStatic
+{
+    extern u16 spell_dd_distance;
+    extern u16 spell_dd_sp;
+    extern u16 spell_dd_hp;
+}
 
 static spellstats_t spells[] = {
 	//  name                      sp   mp  spr value  bits cost     description
@@ -157,9 +161,9 @@ void Spell::UpdateStats(const std::string & spec)
             // load dimension door params
             if(index == DIMENSIONDOOR)
             {
-		xml_spell->Attribute("conf_distance", &value); dd_distance = value;
-		xml_spell->Attribute("conf_sp", &value); dd_sp = value;
-		xml_spell->Attribute("conf_hp", &value); dd_hp = value;
+		xml_spell->Attribute("conf_distance", &value); GameStatic::spell_dd_distance = value;
+		xml_spell->Attribute("conf_sp", &value); GameStatic::spell_dd_sp = value;
+		xml_spell->Attribute("conf_hp", &value); GameStatic::spell_dd_hp = value;
             }
 
 	    // load spell cost
@@ -723,9 +727,9 @@ bool Spell::isRaceCompatible(u8 race) const
 
 u8 Spell::CalculateDimensionDoorDistance(u8 current_sp, u32 total_hp)
 {
-    if(dd_distance && dd_hp && dd_sp && total_hp)
+    if(GameStatic::spell_dd_distance && GameStatic::spell_dd_hp && GameStatic::spell_dd_sp && total_hp)
     {
-	const u16 res = (dd_distance * current_sp * dd_hp) / (dd_sp * total_hp);
+	const u16 res = (GameStatic::spell_dd_distance * current_sp * GameStatic::spell_dd_hp) / (GameStatic::spell_dd_sp * total_hp);
 	return res ? (res < 255 ? res : 255) : 1;
     }
     // original h2 variant
