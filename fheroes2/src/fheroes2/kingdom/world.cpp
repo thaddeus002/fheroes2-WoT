@@ -151,15 +151,23 @@ void World::LoadMaps(const std::string &filename)
         case Maps::MEDIUM: width = Maps::MEDIUM; break;
         case Maps::LARGE:  width = Maps::LARGE;  break;
         case Maps::XLARGE: width = Maps::XLARGE; break;
-	default: width = Maps::ZERO; break;
+	default: width = byte32; break;
     }
-    height = width;
 
     // height
     fd.read(reinterpret_cast<char *>(&byte32), sizeof(u32));
     SwapLE32(byte32);
 
-    if(byte32 != static_cast<u32>(height)) DEBUG(DBG_GAME, DBG_WARN, "incrrect maps size");
+    switch(byte32)
+    {
+        case Maps::SMALL:  height = Maps::SMALL;  break;
+        case Maps::MEDIUM: height = Maps::MEDIUM; break;
+        case Maps::LARGE:  height = Maps::LARGE;  break;
+        case Maps::XLARGE: height = Maps::XLARGE; break;
+	default: height = byte32; break;
+    }
+
+    //if(byte32 != static_cast<u32>(height)) DEBUG(DBG_GAME, DBG_WARN, "incrrect maps size");
 
     // seek to ADDONS block
     fd.ignore(width * height * SIZEOFMP2TILE);
