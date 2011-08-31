@@ -47,7 +47,7 @@ Game::menu_t Game::Editor::LoadMaps(void)
 	conf.SetCurrentFileInfo(*fi);
 	Game::ShowLoadMapsText();
     	//
-    	world.LoadMaps(filemaps);
+    	world.LoadMaps(fi->file);
 
 	return EDITSTART;
     }

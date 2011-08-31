@@ -317,7 +317,7 @@ Game::menu_t Game::Editor::StartGame()
 		{
 		    if(IS_DEVEL())
 		    {
-			tile.DebugInfo();
+			DEBUG(DBG_GAME, DBG_INFO, tile.String());
 
 			const u16 around = Maps::GetDirectionAroundGround(tile.GetIndex(), tile.GetGround());
 			if(Direction::TOP_LEFT & around) VERBOSE("TOP_LEFT");
