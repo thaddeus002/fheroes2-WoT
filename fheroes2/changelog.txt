@@ -1,4 +1,4 @@
-latest (2483 rev.)
+latest (2490 rev.)
 
 + Added: option: Artesian Springs have two separately visitable squares (h3 ver)"
 + Added: option: Higher Mage Guilds Regenerate More Spell Points/turn
@@ -8,6 +8,8 @@ latest (2483 rev.)
 + Update: heroes: quick info: show luck/morale
 + Update: heroes: quick info: show level
 + Update: alternative fonts
++ Fixed: savefile: can not landing from boat to coast
++ Fixed: update objects WaterMill/WindMill/MagicGarde with hero present
 + Fixed: Heroes::ActionHeroes, Heroes::ActionCastle
 + Fixed: Weeks/Months Of messages and next_week
 + Fixed: shipwrek access from boat
