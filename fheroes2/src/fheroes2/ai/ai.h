@@ -48,6 +48,8 @@ struct AI
 
     static void CastlePreBattle(Castle &);
     static void CastleAfterBattle(Castle &, bool attacker_wins);
+
+    static const char* Type(void);
 };
 
 #endif

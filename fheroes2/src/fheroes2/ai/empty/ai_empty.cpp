@@ -28,9 +28,9 @@
 #include "battle_arena.h"
 #include "ai.h"
 
-void ShowWarning(void)
+const char* AI::Type(void)
 {
-    Dialog::Message("Warning!", "I removed the AI code.\nBecause there are scammers who use this free project in their commercial purposes.\nFor all the official binary releases will present my original version of AI.\nSo are you able to make their version of AI.", Font::BIG, Dialog::OK);
+    return "empty";
 }
 
 void AI::AddCastle(const Castle &)
@@ -63,13 +63,10 @@ void AI::HeroesLevelUp(Heroes &)
 
 void AI::KingdomTurn(Kingdom &)
 {
-    ShowWarning();
 }
 
 void AI::BattleTurn(Battle2::Arena &, const Battle2::Stats & b, Battle2::Actions & a)
 {
-    ShowWarning();
-
     a.AddedEndAction(b);
 }
 

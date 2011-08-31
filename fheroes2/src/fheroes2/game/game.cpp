@@ -47,6 +47,7 @@
 #include "tools.h"
 #include "difficulty.h"
 #include "game_static.h"
+#include "ai.h"
 #include "game.h"
 
 #ifdef WITH_XML
@@ -84,6 +85,8 @@ Game::menu_t Game::Credits(void)
     const Settings & conf = Settings::Get();
 
     std::string str = conf.BuildVersion();
+    str.append(", AI engine: ");
+    str.append(AI::Type());
     str.append("\n \n");
     str.append("This program is distributed under the terms of the GPL v2.");
     str.append("\n \n");

@@ -32,6 +32,11 @@
 #include "castle.h"
 #include "ai_simple.h"
 
+const char* AI::Type(void)
+{
+    return "simple";
+}
+
 void AI::AddHeroes(const Heroes &)
 {
 }
