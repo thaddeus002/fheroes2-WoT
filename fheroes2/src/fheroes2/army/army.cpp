@@ -567,13 +567,18 @@ const Army::Troop & Army::army_t::GetSlowestTroop(void) const
 }
 
 /* draw MONS32 sprite in line, first valid = 0, count = 0 */
-void Army::army_t::DrawMons32Line(s16 cx, s16 cy, u16 width, u8 first, u8 count, bool hide) const
+void Army::DrawMons32Line(const army_t & army, s16 cx, s16 cy, u16 width, u8 first, u8 count)
 {
-    if(!isValid()) return;
+    DrawMons32LineWithScoute(army, cx, cy, width, first, count, Skill::Level::EXPERT);
+}
 
-    if(0 == count) count = GetCount();
+void Army::DrawMons32LineWithScoute(const army_t & army, s16 cx, s16 cy, u16 width, u8 first, u8 count, u8 scoute)
+{
+    if(!army.isValid()) return;
+
+    if(0 == count) count = army.GetCount();
     else
-    if(Size() < count) count = Size();
+    if(army.Size() < count) count = army.Size();
 
     const u16 chunk = width / count;
     cx += chunk / 2;
@@ -582,9 +587,9 @@ void Army::army_t::DrawMons32Line(s16 cx, s16 cy, u16 width, u8 first, u8 count,
     Text text;
     text.Set(Font::SMALL);
 
-    for(u8 ii = 0; ii < Size(); ++ii)
+    for(u8 ii = 0; ii < army.Size(); ++ii)
     {
-	const Army::Troop & troop = troops[ii];
+	const Army::Troop & troop = army.At(ii);
 
     	if(troop.isValid())
 	{
@@ -593,17 +598,7 @@ void Army::army_t::DrawMons32Line(s16 cx, s16 cy, u16 width, u8 first, u8 count,
 		const Sprite & monster = AGG::GetICN(ICN::MONS32, troop.GetSpriteIndex());
 
     		Display::Get().Blit(monster, cx - monster.w() / 2, cy + 30 - monster.h());
-
-    		if(hide)
-		{
-		    text.Set(Army::String(troop.GetCount()));
-		}
-		else
-		{
-    		    str.clear();
-		    String::AddInt(str, troop.GetCount());
-		    text.Set(str);
-		}
+		text.Set(Game::CountScoute(troop.GetCount(), scoute));
 		text.Blit(cx - text.w() / 2, cy + 28);
 
 		cx += chunk;

@@ -78,8 +78,6 @@ namespace Army
 	    void	BattleQuit(void);
 	    u32		BattleKilled(void) const;
 
-	    void	DrawMons32Line(s16, s16, u16, u8 = 0, u8 = 0, bool = false) const;
-
 	    Troop &	FirstValid(void);
 	    Troop &	At(u8);
 	    Troop &	GetWeakestTroop(void);
@@ -154,6 +152,9 @@ namespace Army
 	    u8			combat_format;
 	    Color::color_t	color;
     };
+
+    void DrawMons32Line(const army_t &, s16, s16, u16, u8 = 0, u8 = 0);
+    void DrawMons32LineWithScoute(const army_t &, s16, s16, u16, u8, u8, u8);
 }
 
 #endif

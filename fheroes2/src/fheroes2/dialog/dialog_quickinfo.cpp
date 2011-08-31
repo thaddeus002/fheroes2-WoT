@@ -36,54 +36,6 @@
 #include "spell.h"
 #include "dialog.h"
 
-std::string CountScoute(u32 count, u8 scoute)
-{
-    u32 infelicity = 0;
-    std::string res;
-
-    switch(scoute)
-    {
-	case Skill::Level::BASIC:
-	    infelicity = count * 30 / 100;
-	    break;
-
-	case Skill::Level::ADVANCED:
-	    infelicity = count * 15 / 100;
-	    break;
-
-	case Skill::Level::EXPERT:
-	    String::AddInt(res, count);
-	    break;
-
-	default:
-	    return Army::String(count);
-    }
-
-    if(res.empty())
-    {
-	u32 min = Rand::Get(count - infelicity, count + infelicity);
-	u32 max = 0;
-
-	if(min > count)
-	{
-	    max = min;
-	    min = count - infelicity;
-	}
-	else
-	    max = count + infelicity;
-
-	String::AddInt(res, min);
-
-	if(min != max)
-	{
-	    res.append("-");
-	    String::AddInt(res, max);
-	}
-    }
-
-    return res;
-}
-
 std::string ShowGuardiansInfo(const Maps::Tiles & tile, u8 scoute)
 {
     std::string str;
@@ -100,7 +52,7 @@ std::string ShowGuardiansInfo(const Maps::Tiles & tile, u8 scoute)
 	str.append(_("guarded by %{count} of %{monster}"));
 
 	String::Replace(str, "%{monster}", String::Lower(troop.GetMultiName()));
-	String::Replace(str, "%{count}", CountScoute(troop.GetCount(), scoute));
+	String::Replace(str, "%{count}", Game::CountScoute(troop.GetCount(), scoute));
     }
 
     return str;
@@ -114,7 +66,7 @@ std::string ShowMonsterInfo(const Maps::Tiles & tile, u8 scoute)
     if(scoute)
     {
         str = "%{count} %{monster}";
-	String::Replace(str, "%{count}", CountScoute(troop.GetCount(), scoute));
+	String::Replace(str, "%{count}", Game::CountScoute(troop.GetCount(), scoute));
     }
     else
     switch(Army::GetSize(troop.GetCount()))
@@ -161,7 +113,7 @@ std::string ShowResourceInfo(const Maps::Tiles & tile, bool show, u8 scoute)
 	if(scoute)
 	{
 	    str.append(": ");
-	    str.append(CountScoute(tile.GetQuantity2(), scoute));
+	    str.append(Game::CountScoute(tile.GetQuantity2(), scoute));
 	}
 	str.append(")");
     }
@@ -179,7 +131,7 @@ std::string ShowDwellingInfo(const Maps::Tiles & tile, u8 scoute)
 	if(tile.GetCountMonster())
 	{
 	    str.append(_("(available: %{count})"));
-	    String::Replace(str, "%{count}", CountScoute(tile.GetCountMonster(), scoute));
+	    String::Replace(str, "%{count}", Game::CountScoute(tile.GetCountMonster(), scoute));
 	}
 	else
 	    str.append("(empty)");
@@ -677,27 +629,18 @@ void Dialog::QuickInfo(const Castle & castle)
     u8 count = castle.GetArmy().GetCount();
     const Settings & conf = Settings::Get();
 
-    bool hide_count, hide_guardians;
-
-    hide_count = hide_guardians = conf.MyColor() != castle.GetColor() &&
-		    !conf.IsUnions(conf.MyColor(), castle.GetColor());
-
     const Heroes* from_hero = Game::Focus::HEROES == Game::Focus::Get().Type() ?
 			    &Game::Focus::Get().GetHeroes() : NULL;
-
-    // show guardians (scouting: advanced)
-    if(hide_guardians &&
-	from_hero &&
-	Skill::Level::ADVANCED <= from_hero->GetSecondaryValues(Skill::Secondary::SCOUTING))
-		hide_guardians = false;
-
-    if(hide_count && from_hero && from_hero->CanScouteTile(castle.GetIndex()))
-	hide_count = false;
+    const Heroes* guardian = castle.GetHeroes().Guard();
 
     // draw guardian portrait
-    const Heroes* guardian = castle.GetHeroes().Guard();
     if(guardian &&
-	! hide_guardians)
+	// my  colors
+	(conf.MyColor() == castle.GetColor() ||
+		    conf.IsUnions(conf.MyColor(), castle.GetColor()) ||
+	// show guardians (scouting: advanced)
+	(from_hero &&
+	    Skill::Level::ADVANCED <= from_hero->GetSecondaryValues(Skill::Secondary::SCOUTING))))
     {
 	// heroes name
 	text.Set(guardian->GetName(), Font::SMALL);
@@ -721,7 +664,14 @@ void Dialog::QuickInfo(const Castle & castle)
 	text.Blit(dst_pt);
     }
     else
-	castle.GetArmy().DrawMons32Line(cur_rt.x - 5, cur_rt.y + 100, 192, 0, 0, hide_count);
+    if(conf.MyColor() == castle.GetColor() ||
+		    conf.IsUnions(conf.MyColor(), castle.GetColor()))
+	// show all
+	Army::DrawMons32Line(castle.GetArmy(), cur_rt.x - 5, cur_rt.y + 100, 192);
+    else
+	// show limited
+	Army::DrawMons32LineWithScoute(castle.GetArmy(), cur_rt.x - 5, cur_rt.y + 100, 192, 0, 0,
+				(from_hero && from_hero->CanScouteTile(castle.GetIndex()) ? from_hero->GetSecondaryValues(Skill::Secondary::SCOUTING) : Skill::Level::NONE));
 
     cursor.Show();
     display.Flip();
@@ -955,14 +905,17 @@ void Dialog::QuickInfo(const Heroes & hero)
     text.Blit(dst_pt);
 
     // draw monster sprite in one string
-    bool hide_count = conf.MyColor() != hero.GetColor() && !conf.IsUnions(conf.MyColor(), hero.GetColor());
-
     const Heroes* from_hero = Game::Focus::HEROES == Game::Focus::Get().Type() ?
 			    &Game::Focus::Get().GetHeroes() : NULL;
-    if(hide_count && from_hero && from_hero->CanScouteTile(hero.GetIndex()))
-	hide_count = false;
 
-    hero.GetArmy().DrawMons32Line(cur_rt.x - 5, cur_rt.y + 114, 160, 0, 0, hide_count);
+    if(conf.MyColor() == hero.GetColor() ||
+	conf.IsUnions(conf.MyColor(), hero.GetColor()))
+	// show all
+	Army::DrawMons32Line(hero.GetArmy(), cur_rt.x - 5, cur_rt.y + 114, 160);
+    else
+	// show limited
+	Army::DrawMons32LineWithScoute(hero.GetArmy(), cur_rt.x - 5, cur_rt.y + 114, 160, 0, 0,
+				(from_hero && from_hero->CanScouteTile(hero.GetIndex()) ? from_hero->GetSecondaryValues(Skill::Secondary::SCOUTING) : Skill::Level::NONE));
 
     cursor.Show();
     display.Flip();
