@@ -1041,6 +1041,25 @@ bool Game::IO::LoadBIN(QueueMessage & msg)
     // regenerate puzzle surface
     Interface::GameArea::GenerateUltimateArtifactAreaSurface(world.ultimate_index, world.puzzle_surface);
 
+    // fixed null coast
+    if(format < FORMAT_VERSION_2487)
+    {
+	for(u32 maps_index = 0; maps_index < world.vec_tiles.size(); ++maps_index)
+	{
+	    Maps::Tiles & tile = world.vec_tiles[maps_index];
+	    if(Maps::Ground::WATER == tile.GetGround())
+	    {
+		for(Direction::vector_t direct = Direction::TOP_LEFT; direct != Direction::CENTER; ++direct)
+		    if(Maps::isValidDirection(maps_index, direct))
+		{
+		    Maps::Tiles & tile2 = world.GetTiles(Maps::GetDirectionIndex(maps_index, direct));
+		    if(Maps::Ground::WATER != tile2.GetGround() && MP2::OBJ_ZERO == tile2.GetObject())
+			tile2.SetObject(MP2::OBJ_COAST);
+		}
+	    }
+	}
+    }
+
     return byte16 == 0xFFFF;
 }
 
