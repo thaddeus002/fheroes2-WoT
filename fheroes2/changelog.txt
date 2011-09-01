@@ -1,4 +1,12 @@
-latest (2490 rev.)
+latest (2503 rev.)
+
++ Fixed: game: update QuickDialog view Castle::Army or Heroes::Army with Scoute Skill
++ Fixed: game: Game::CountScoute, add round values
++ Fixed: heroes: Heroes::GetFreeman, Heroes::isFreeman
++ Fixed: world: World::CheckKingdomLoss: for accumulate gold conditions
++ Fixed: ai: AI profiling,  Castle::RecruitAllMonster
+
+Aug, 31, 2011 (2490 rev.)
 
 + Added: option: Artesian Springs have two separately visitable squares (h3 ver)"
 + Added: option: Higher Mage Guilds Regenerate More Spell Points/turn
