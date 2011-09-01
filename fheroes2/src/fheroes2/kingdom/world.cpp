@@ -1733,9 +1733,16 @@ u16 World::CheckKingdomLoss(const Kingdom & kingdom) const
     const Settings & conf = Settings::Get();
 
     // firs check priority: other WINS_GOLD or WINS_ARTIFACT
-    if(conf.ConditionWins() & (GameOver::WINS_GOLD | GameOver::WINS_ARTIFACT))
+    if(conf.ConditionWins() & GameOver::WINS_GOLD)
     {
-	u8 priority = vec_kingdoms.FindArtOrGoldWins();
+	u8 priority = vec_kingdoms.FindWins(GameOver::WINS_GOLD);
+	if(priority && priority != kingdom.GetColor())
+    	    return GameOver::LOSS_ALL;
+    }
+    else
+    if(conf.ConditionWins() & GameOver::WINS_ARTIFACT)
+    {
+	u8 priority = vec_kingdoms.FindWins(GameOver::WINS_ARTIFACT);
 	if(priority && priority != kingdom.GetColor())
     	    return GameOver::LOSS_ALL;
     }

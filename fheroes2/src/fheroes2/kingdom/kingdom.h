@@ -191,7 +191,7 @@ public:
 
     u8 GetLossColors(void) const;
     u8 GetNotLossColors(void) const;
-    u8 FindArtOrGoldWins(void) const;
+    u8 FindWins(u16) const;
 
     void AddHeroes(const AllHeroes &);
     void AddCastles(const AllCastles &);

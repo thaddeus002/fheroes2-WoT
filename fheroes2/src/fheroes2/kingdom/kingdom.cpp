@@ -682,11 +682,11 @@ u8 Kingdoms::GetLossColors(void) const
     return result;
 }
 
-u8 Kingdoms::FindArtOrGoldWins(void) const
+u8 Kingdoms::FindWins(u16 cond) const
 {
     for(u8 ii = 0; ii < size(); ++ii)
 	if(kingdoms[ii].GetColor() &&
-	    (world.KingdomIsWins(kingdoms[ii], GameOver::WINS_GOLD) || world.KingdomIsWins(kingdoms[ii], GameOver::WINS_ARTIFACT)))
+	    world.KingdomIsWins(kingdoms[ii], cond))
 		return kingdoms[ii].GetColor();
     return 0;
 }
