@@ -1369,12 +1369,12 @@ bool Heroes::MayStillMove(void) const
 
 bool Heroes::isValid(void) const
 {
-    return true;
+    return hid != UNKNOWN;
 }
 
 bool Heroes::isFreeman(void) const
 {
-    return Color::NONE == color && !Modes(JAIL);
+    return isValid() && Color::NONE == color && !Modes(JAIL);
 }
 
 void Heroes::SetFreeman(const u8 reason)
@@ -1827,7 +1827,7 @@ Heroes* AllHeroes::GetFreeman(u8 race) const
 	
 	default:
 	    min = Heroes::LORDKILBURN;
-	    max = Heroes::CELIA;
+	    max = Settings::Get().PriceLoyaltyVersion() ? Heroes::JARKONAS : Heroes::CELIA;
 	    break;
     }
 
@@ -1835,15 +1835,18 @@ Heroes* AllHeroes::GetFreeman(u8 race) const
     freeman_heroes.reserve(HEROESMAXCOUNT);
 
     // find freeman in race
-    if(Race::NONE != race)
-	for(u8 ii = min; ii <= max; ++ii)
-	    if(at(ii)->isFreeman())
-		freeman_heroes.push_back(ii);
+    for(u8 ii = min; ii <= max; ++ii)
+	if(at(ii)->isFreeman()) freeman_heroes.push_back(ii);
 
-    // not found, find other race
-    if(Race::NONE == race || freeman_heroes.empty())
-	for(u8 ii = 0; ii <= 53; ++ii)
+    // not found, find any race
+    if(Race::NONE != race && freeman_heroes.empty())
+    {
+	min = Heroes::LORDKILBURN;
+	max = Settings::Get().PriceLoyaltyVersion() ? Heroes::JARKONAS : Heroes::CELIA;
+
+	for(u8 ii = min; ii <= max; ++ii)
 	    if(at(ii)->isFreeman()) freeman_heroes.push_back(ii);
+    }
 
     // not found, all heroes busy
     if(freeman_heroes.empty())
