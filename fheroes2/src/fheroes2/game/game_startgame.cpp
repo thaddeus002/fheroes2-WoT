@@ -1587,14 +1587,19 @@ void Game::NewWeekDialog(void)
     if(week.GetType() == Week::MONSTERS)
     {
 	const Monster monster(week.GetMonster());
-	if(world.BeginMonth() && Castle::GetGrownMonthOf())
-	    message += 100 == Castle::GetGrownMonthOf() ? _("After regular growth, population of %{monster} is doubled!") :
+	const u8 count = world.BeginMonth() ? Castle::GetGrownMonthOf() : Castle::GetGrownWeekOf();
+
+	if(monster.isValid() && count)
+	{
+	    if(world.BeginMonth())
+		message += 100 == Castle::GetGrownMonthOf() ? _("After regular growth, population of %{monster} is doubled!") :
 								    _("After regular growth, population of %{monter} increase on %{count} percent!");
-	else
-	    message += _("%{monster} population increases by +%{count}.");
-	String::Replace(message, "%{monster}", monster.GetMultiName());
-	String::Replace(message, "%{count}", (world.BeginMonth() ? Castle::GetGrownMonthOf() : Castle::GetGrownWeekOf()));
-	message += "\n";
+	    else
+		message += _("%{monster} population increases by +%{count}.");
+	    String::Replace(message, "%{monster}", monster.GetMultiName());
+	    String::Replace(message, "%{count}", count);
+	    message += "\n";
+	}
     }
 
     if(week.GetType() == Week::PLAGUE)
