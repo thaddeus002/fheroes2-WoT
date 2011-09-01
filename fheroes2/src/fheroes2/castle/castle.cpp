@@ -1789,7 +1789,7 @@ s8 Castle::GetLuckModificator(std::string *strs) const
 
 void Castle::RecruitAllMonster(void)
 {
-    for(u32 dw = DWELLING_MONSTER6; dw >= DWELLING_MONSTER1; --dw)
+    for(u32 dw = DWELLING_MONSTER6; dw >= DWELLING_MONSTER1; dw >>= 1)
 	if(isBuild(dw)) RecruitMaxMonster(dw);
 }
 
