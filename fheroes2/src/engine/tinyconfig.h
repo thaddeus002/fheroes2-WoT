@@ -38,8 +38,8 @@ namespace Tiny
 	Value(int);
 	Value(const char*);
 
-	void operator= (int);
-	void operator= (const char*);
+	Value & operator= (int);
+	Value & operator= (const char*);
 
 	int ival;
 	std::string sval;

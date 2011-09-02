@@ -63,17 +63,21 @@ Tiny::Value::Value(const char* val)
     ival = String::ToInt(sval);
 }
 
-void Tiny::Value::operator= (int val)
+Tiny::Value & Tiny::Value::operator= (int val)
 {
     ival = val;
     sval.clear();
     String::AddInt(sval, val);
+
+    return *this;
 }
 
-void Tiny::Value::operator= (const char* val)
+Tiny::Value & Tiny::Value::operator= (const char* val)
 {
     sval = val;
     ival = String::ToInt(sval);
+
+    return *this;
 }
 
 std::ostream & Tiny::operator<< (std::ostream & os, const Tiny::Entry & en)

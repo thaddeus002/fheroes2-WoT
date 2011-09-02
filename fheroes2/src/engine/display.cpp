@@ -208,13 +208,6 @@ Display::~Display()
 {
 }
 
-Display & Display::operator= (const Display & dp)
-{
-    surface = SDL_GetVideoSurface();
-
-    return *this;
-}
-
 void Display::SetVideoMode(const u16 w, const u16 h, u32 flags)
 {
     Display & display = Display::Get();

@@ -73,8 +73,6 @@ public:
     static bool		Fade(u8 fadeTo=0);
     static bool		Rise(u8 riseTo=255);
 
-    Display &		operator= (const Display & dp);
-
 private:
     Display();
 
