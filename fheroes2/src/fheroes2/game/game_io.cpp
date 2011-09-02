@@ -618,26 +618,20 @@ void Game::IO::PackHeroes(QueueMessage & msg, const Heroes & hero)
 
 void Game::IO::PackPlayers(QueueMessage & msg, const Players & players)
 {
-    const Colors colors(players.GetColors());
-
     msg.Push(players.GetColors());
-    msg.Push(static_cast<u32>(colors.size()));
+    msg.Push(static_cast<u32>(players.size()));
 
-    for(Colors::const_iterator
-	it = colors.begin(); it != colors.end(); ++it)
+    for(Players::const_iterator
+	it = players.begin(); it != players.end(); ++it)
     {
-	const Player* player = players.Get(*it);
-	if(player)
-	{
-	    msg.Push(player->color);
-	    msg.Push(player->id);
-	    msg.Push(player->control);
-	    msg.Push(player->race);
-	    msg.Push(player->friends);
-	    msg.Push(player->name);
-	}
-	else
-	    msg.Push(static_cast<u8>(0));
+	const Player & player = **it;
+
+	msg.Push(player.color);
+	msg.Push(player.id);
+	msg.Push(player.control);
+	msg.Push(player.race);
+	msg.Push(player.friends);
+	msg.Push(player.name);
     }
 
     msg.Push(players.current_color);
@@ -669,29 +663,33 @@ void Game::IO::UnpackPlayers(QueueMessage & msg, Players & players, u16 version)
     {
 	u8 byte8;
 	u32 byte32;
+	std::vector<Player*> vec1;
+	std::vector<Player*> & vec2 = players;
 
 	msg.Pop(byte8);
 	players.Init(byte8);
 	msg.Pop(byte32);
 	for(u32 ii = 0; ii < byte32; ++ii)
 	{
-	    msg.Pop(byte8);
-	    if(byte8)
-	    {
-		Player* player = players.Get(byte8);
-		if(player)
-		{
-		    msg.Pop(player->id);
-		    msg.Pop(player->control);
-		    msg.Pop(player->race);
-		    msg.Pop(player->friends);
-		    msg.Pop(player->name);
-		}
-	    }
+	    Player player;
+
+	    msg.Pop(player.color);
+	    msg.Pop(player.id);
+	    msg.Pop(player.control);
+	    msg.Pop(player.race);
+	    msg.Pop(player.friends);
+	    msg.Pop(player.name);
+
+	    Player* ptr = players.Get(player.color);
+	    if(ptr) *ptr = player;
+
+	    vec1.push_back(ptr);
 	}
 
 	if(version >= FORMAT_VERSION_2494)
 	    msg.Pop(players.current_color);
+
+	std::swap(vec1, vec2);
     }
 }
 
