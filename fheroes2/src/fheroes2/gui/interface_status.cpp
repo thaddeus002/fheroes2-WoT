@@ -125,12 +125,15 @@ void Interface::StatusWindow::Redraw(void)
     if(STATUS_UNKNOWN != state && h >= (ston.h() * 3 + 15))
     {
         DrawDayInfo();
-        DrawKingdomInfo(ston.h() + 5);
+	if(conf.CurrentColor() & Players::HumanColors())
+	{
+    	    DrawKingdomInfo(ston.h() + 5);
 
-        if(state != STATUS_RESOURCE)
-            DrawArmyInfo(2 * ston.h() + 10);
-        else
-    	    DrawResourceInfo(2 * ston.h() + 10);
+    	    if(state != STATUS_RESOURCE)
+        	DrawArmyInfo(2 * ston.h() + 10);
+    	    else
+    		DrawResourceInfo(2 * ston.h() + 10);
+	}
     }
     else
     switch(state)
