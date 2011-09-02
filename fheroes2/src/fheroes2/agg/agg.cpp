@@ -698,7 +698,7 @@ void AGG::Cache::LoadOrgTIL(til_cache_t & v, const TIL::til_t til, u16 max)
 	// check size
 	if(body.size() == body_size && count <= max)
 	{
-	    for(u16 ii = 0; ii < max; ++ii)
+	    for(u16 ii = 0; ii < count; ++ii)
 		v.sprites[ii].Set(&body[6 + ii * tile_size], width, height, 1, false);
 	}
 	else
@@ -718,9 +718,9 @@ void AGG::Cache::LoadTIL(const TIL::til_t til)
 
     switch(til)
     {
-	case TIL::CLOF32:	max = 36;  break;
+	case TIL::CLOF32:	max = 4;   break;
         case TIL::GROUND32:	max = 432; break;
-        case TIL::STON:		max = 4;   break;
+        case TIL::STON:		max = 36;  break;
 	default: break;
     }
 
