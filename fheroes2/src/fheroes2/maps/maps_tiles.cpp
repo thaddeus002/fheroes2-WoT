@@ -1515,15 +1515,15 @@ void Maps::Tiles::UpdateQuantity(void)
 	    break;
 
 	case MP2::OBJ_SHRINE1:
-            quantity1 = Rand::Get(10) % 2 ? Spell::RandCombat(1)() : Spell::RandAdventure(1)();
+            quantity1 = 0 != (Rand::Get(10) % 2) ? Spell::RandCombat(1)() : Spell::RandAdventure(1)();
             break;
 
         case MP2::OBJ_SHRINE2:
-            quantity1 = Rand::Get(10) % 2 ? Spell::RandCombat(2)() : Spell::RandAdventure(2)();
+            quantity1 = 0 != (Rand::Get(10) % 2) ? Spell::RandCombat(2)() : Spell::RandAdventure(2)();
             break;
 
         case MP2::OBJ_SHRINE3:
-            quantity1 = Rand::Get(10) % 2 ? Spell::RandCombat(3)() : Spell::RandAdventure(3)();
+            quantity1 = 0 != (Rand::Get(10) % 2) ? Spell::RandCombat(3)() : Spell::RandAdventure(3)();
             break;
 
 	case MP2::OBJ_SKELETON:

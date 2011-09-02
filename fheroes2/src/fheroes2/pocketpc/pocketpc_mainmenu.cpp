@@ -96,8 +96,6 @@ Game::menu_t PocketPC::MainMenu(void)
     cursor.Show();
     display.Flip();
 
-    std::string test;
-
     // mainmenu loop
     while(le.HandleEvents())
     {

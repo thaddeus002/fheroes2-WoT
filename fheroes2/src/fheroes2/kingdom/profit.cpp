@@ -108,9 +108,12 @@ payment_t ProfitConditions::FromBuilding(u32 building, u8 race)
 	default: break;
     }
 
-    profitstats_t* ptr = &_profits[0];
-    while(ptr->id && id && std::strcmp(id, ptr->id)) ++ptr;
-    if(ptr && id) result = ptr->cost;
+    if(id)
+    {
+	profitstats_t* ptr = &_profits[0];
+	while(ptr->id && std::strcmp(id, ptr->id)) ++ptr;
+	if(ptr->id) result = ptr->cost;
+    }
 
     return result;
 }
@@ -136,9 +139,12 @@ payment_t ProfitConditions::FromArtifact(u8 artifact)
 	default: break;
     }
 
-    profitstats_t* ptr = &_profits[0];
-    while(ptr->id && id && std::strcmp(id, ptr->id)) ++ptr;
-    if(ptr && id) result = ptr->cost;
+    if(id)
+    {
+	profitstats_t* ptr = &_profits[0];
+	while(ptr->id && std::strcmp(id, ptr->id)) ++ptr;
+	if(ptr->id) result = ptr->cost;
+    }
 
     return result;
 }
@@ -160,9 +166,12 @@ payment_t ProfitConditions::FromMine(u8 type)
 	default: break;
     }
 
-    profitstats_t* ptr = &_profits[0];
-    while(ptr->id && id && std::strcmp(id, ptr->id)) ++ptr;
-    if(ptr && id) result = ptr->cost;
+    if(id)
+    {
+	profitstats_t* ptr = &_profits[0];
+	while(ptr->id && std::strcmp(id, ptr->id)) ++ptr;
+	if(ptr->id) result = ptr->cost;
+    }
 
     return result;
 }

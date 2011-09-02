@@ -2604,7 +2604,6 @@ void ActionToUpgradeArmyObject(Heroes &hero, const u8 obj, const s32 dst_index)
     std::string monsters_upgrade;
     std::string msg1;
     std::string msg2;
-    std::string msg3;
     
     std::vector<Monster> mons;
     mons.reserve(3);

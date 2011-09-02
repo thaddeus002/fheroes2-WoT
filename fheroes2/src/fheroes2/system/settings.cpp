@@ -55,9 +55,9 @@ const char* StringDebug(int name)
     else
     if(name & DBG_NETWORK)	return "DBG_NETWORK";
     else
-    if(name & DBG_NETWORK)	return "DBG_OTHER";
+    if(name & DBG_OTHER)	return "DBG_OTHER";
     else
-    if(name & DBG_NETWORK)	return "DBG_DEVEL";
+    if(name & DBG_DEVEL)	return "DBG_DEVEL";
     return "";
 }
 

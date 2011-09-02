@@ -40,7 +40,7 @@ struct ValueColors : std::pair<int, int>
     ValueColors(int v, int c) : std::pair<int, int>(v, c){};
 
     bool IsValue(int v) const { return v == first; };
-    bool IsColor(Color::color_t c) const { return (c & second); };
+    //bool IsColor(Color::color_t c) const { return (c & second); };
 
     static bool SortValueGreat(const ValueColors & v1, const ValueColors & v2) { return v1.first > v2.first; };
 };

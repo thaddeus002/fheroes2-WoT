@@ -31,7 +31,7 @@
 
 struct EventDate
 {
-    EventDate() {}
+    EventDate() : computer(false), first(0), subsequent(0), colors(0) {}
     EventDate(const void *ptr);
 
     bool isAllow(u8 color, u16 date) const;
@@ -46,7 +46,7 @@ struct EventDate
 
 struct EventMaps : public Maps::Position
 {
-    EventMaps() {}
+    EventMaps() : computer(false), cancel(false), colors(0) {}
     EventMaps(s32 index, const void *ptr);
     
     bool isAllow(u8 color, s32 index) const;
@@ -64,7 +64,7 @@ typedef std::list<std::string>    RiddleAnswers;
 
 struct Riddle : public Maps::Position
 {
-    Riddle() {}
+    Riddle() : valid(false) {}
     Riddle(s32 index, const void *ptr);
 
     bool AnswerCorrect(const std::string & answer);

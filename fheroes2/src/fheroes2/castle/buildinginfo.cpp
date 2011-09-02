@@ -192,7 +192,7 @@ payment_t BuildingInfo::GetCost(u32 build, u8 race)
 
     while(ptr->id1 && !(ptr->id2 == build && (!race || (race & ptr->race)))) ++ptr;
 
-    if(ptr)
+    if(ptr->id1)
     {
 	payment.gold = ptr->cost.gold;
 	payment.wood = ptr->cost.wood;

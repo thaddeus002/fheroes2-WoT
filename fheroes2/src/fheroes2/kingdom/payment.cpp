@@ -102,7 +102,7 @@ payment_t PaymentConditions::BuyBoat(void)
     paymentstats_t* ptr = &_payments[0];
 
     while(ptr->id && std::strcmp("buy_boat", ptr->id)) ++ptr;
-    if(ptr) result = ptr->cost;
+    if(ptr->id) result = ptr->cost;
 
     return result;
 }
@@ -122,7 +122,7 @@ payment_t PaymentConditions::BuySpellBook(u8 shrine)
     }
 
     while(ptr->id && std::strcmp(skey, ptr->id)) ++ptr;
-    if(ptr) result = ptr->cost;
+    if(ptr->id) result = ptr->cost;
 
     return result;
 }
@@ -132,7 +132,7 @@ payment_t PaymentConditions::RecruitHero(u8 level)
     payment_t result;
     paymentstats_t* ptr = &_payments[0];
     while(ptr->id && std::strcmp("recruit_hero", ptr->id)) ++ptr;
-    if(ptr) result = ptr->cost;
+    if(ptr->id) result = ptr->cost;
 
     // level price
     if(Settings::Get().ExtHeroRecruitCostDependedFromLevel())

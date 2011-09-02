@@ -38,9 +38,10 @@ struct TimeDelay : std::pair<SDL::Time, int>
 	return second;
     }
 
-    void operator= (int dl)
+    TimeDelay & operator= (int dl)
     {
 	second = dl;
+	return *this;
     }
 
     void Reset(void)
