@@ -742,10 +742,14 @@ void Dialog::QuickInfo(const Heroes & hero)
     std::string message;
 
     // heroes name
-    message = _("%{name} ( Level %{level} )");
-    String::Replace(message, "%{name}", hero.GetName());
-    String::Replace(message, "%{race}", Race::String(hero.GetRace()));
-    String::Replace(message, "%{level}", hero.GetLevel());
+    if(conf.CurrentColor() == hero.GetColor())
+    {
+	message = _("%{name} ( Level %{level} )");
+	String::Replace(message, "%{name}", hero.GetName());
+	String::Replace(message, "%{level}", hero.GetLevel());
+    }
+    else
+	message = hero.GetName();
     text.Set(message, Font::SMALL);
     dst_pt.x = cur_rt.x + (cur_rt.w - text.w()) / 2;
     dst_pt.y = cur_rt.y;
