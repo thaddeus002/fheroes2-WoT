@@ -179,7 +179,7 @@ public:
     static u32 GetCountFromHitPoints(const Monster &, u32);
 
     static void UpdateStats(const std::string &);
-    static double GetUpgradeRatio(void);
+    static float GetUpgradeRatio(void);
 
 protected:
     static Monster FromDwelling(u8 race, u32 dw);

@@ -744,7 +744,7 @@ u32 Battle2::Stats::GetDamageMax(const Stats & enemy) const
 	CalculateDamageStats(enemy, GetMonster().GetDamageMax() * count);
 }
 
-u32 Battle2::Stats::CalculateDamageStats(const Stats & enemy, double dmg) const
+u32 Battle2::Stats::CalculateDamageStats(const Stats & enemy, float dmg) const
 {
     if(troop.isArchers())
     {
@@ -1220,7 +1220,7 @@ s32 Battle2::Stats::GetScoreQuality(const Stats & defender) const
     // initial value: (hitpoints)
     const u32 & damage = (attacker.GetDamageMin(defender) + attacker.GetDamageMax(defender)) / 2;
     const u32 & kills = defender.HowManyWillKilled(attacker.isTwiceAttack() ? damage * 2 : damage);
-    double res = kills * defender.GetMonster().GetHitPoints();
+    float res = kills * defender.GetMonster().GetHitPoints();
     bool noscale = false;
 
     // attacker
@@ -1268,7 +1268,7 @@ s32 Battle2::Stats::GetScoreQuality(const Stats & defender) const
 	}
     }
 
-    return res > 1.0 ? static_cast<u32>(res) : 1;
+    return static_cast<s32>(res) > 1 ? static_cast<u32>(res) : 1;
 }
 
 u32 Battle2::Stats::GetHitPoints(void) const

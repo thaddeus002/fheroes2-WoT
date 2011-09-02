@@ -552,7 +552,7 @@ const Heroes* Kingdom::GetBestHero(void) const
 
 u32 Kingdom::GetArmiesStrength(void) const
 {
-    double res = 0;
+    u32 res = 0;
 
     for(KingdomHeroes::const_iterator
 	ith = heroes.begin(); ith != heroes.end(); ++ith)
@@ -562,7 +562,7 @@ u32 Kingdom::GetArmiesStrength(void) const
 	itc = castles.begin(); itc != castles.end(); ++itc)
 	res += (**itc).GetArmy().GetStrength();
 
-    return static_cast<u32>(res);
+    return res;
 }
 
 Kingdoms::Kingdoms()

@@ -145,7 +145,7 @@ namespace
     };
 }
 
-double Monster::GetUpgradeRatio(void)
+float Monster::GetUpgradeRatio(void)
 {
     return GameStatic::GetMonsterUpgradeRatio();
 }

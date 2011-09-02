@@ -2081,7 +2081,6 @@ bool AIHeroesPriorityObject(const Heroes & hero, s32 index)
 		return hero.Modes(Heroes::HUNTER) &&
 		    castle->GetArmy().isValid() &&
 		    ! hero.isVisited(world.GetTiles(castle->GetIndex()));
-		    //castle->GetArmy().StrongerEnemyArmy(hero.GetArmy());
 	    }
 	    else
 	    if(!Players::isFriends(hero.GetColor(), castle->GetColor()))
@@ -2222,8 +2221,9 @@ void AIHeroesAddedTask(Heroes & hero)
 	it = objs.begin(); it != objs.end(); ++it)
     {
 	if(task.size() >= HERO_MAX_SHEDULED_TASK) break;
+	const bool validobj = AIHeroesValidObject(hero, (*it).first);
 
-	if(AIHeroesValidObject(hero, (*it).first) &&
+	if(validobj &&
 	    hero.GetPath().Calculate((*it).first))
 	{
 	    s32 pos = 0;
@@ -2254,7 +2254,7 @@ void AIHeroesAddedTask(Heroes & hero)
 	else
 	{
 	    DEBUG(DBG_AI, DBG_TRACE, Color::String(hero.GetColor()) <<
-		    ", hero: " << hero.GetName() << (!AIHeroesValidObject(hero, (*it).first) ? ", invalid: " : ", impossible: ") << 
+		    ", hero: " << hero.GetName() << (!validobj ? ", invalid: " : ", impossible: ") << 
 		    MP2::StringObject(ai_objects[(*it).first]) << ", index: " << (*it).first <<
 		    ", distance: " << (*it).second);
 	}

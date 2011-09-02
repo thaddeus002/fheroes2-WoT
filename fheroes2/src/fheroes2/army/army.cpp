@@ -980,27 +980,27 @@ bool Army::army_t::StrongerEnemyArmy(const army_t & army2) const
 
     const u16 a1 = GetAttack(false);
     const u16 d1 = GetDefense(false);
-    double r1 = 0;
+    float r1 = 0;
 
     const u16 a2 = army2.GetAttack(false);
     const u16 d2 = army2.GetDefense(false);
-    double r2 = 0;
+    float r2 = 0;
 
     if(a1 > d2)
-        r1 = 1 + 0.1 * static_cast<double>(std::min(a1 - d2, 20));
+        r1 = 1 + 0.1 * static_cast<float>(std::min(a1 - d2, 20));
     else
-        r1 = 1 + 0.05 * static_cast<double>(std::min(d2 - a1, 14));
+        r1 = 1 + 0.05 * static_cast<float>(std::min(d2 - a1, 14));
 
     if(a2 > d1)
-        r2 = 1 + 0.1 * static_cast<double>(std::min(a2 - d1, 20));
+        r2 = 1 + 0.1 * static_cast<float>(std::min(a2 - d1, 20));
     else
-        r2 = 1 + 0.05 * static_cast<double>(std::min(d1 - a2, 14));
+        r2 = 1 + 0.05 * static_cast<float>(std::min(d1 - a2, 14));
 
     const u32 s1 = GetStrength();
     const u32 s2 = army2.GetStrength();
 
-    const double h1 = GetHitPoints();
-    const double h2 = army2.GetHitPoints();
+    const float h1 = GetHitPoints();
+    const float h2 = army2.GetHitPoints();
 
     DEBUG(DBG_AI, DBG_INFO, "r1: " << r1 << ", s1: " << s1 << ", h1: " << h1 \
 			<< ", r2: " << r2 << ", s2: " << s2 << ", h2: " << h2);
@@ -1010,7 +1010,7 @@ bool Army::army_t::StrongerEnemyArmy(const army_t & army2) const
 
     DEBUG(DBG_GAME, DBG_INFO, "army1: " << String() << ", army2: " << army2.String());
 
-    return 0 == r2 || 1 <= (r1 / r2);
+    return static_cast<s32>(r1) > static_cast<s32>(r2);
 }
 
 void Army::army_t::SetCommander(HeroBase* c)
@@ -1055,7 +1055,7 @@ u8 Army::army_t::GetControl(void) const
 
 u32 Army::army_t::GetSurrenderCost(void) const
 {
-    double res = 0;
+    float res = 0;
 
     for(Troops::const_iterator
 	it = troops.begin(); it != troops.end(); ++it)
@@ -1097,7 +1097,7 @@ u8 Army::GetJoinSolution(const Heroes & hero, const Maps::Tiles & tile, u32 & jo
 
     if(! troop.isValid()) return 0xFF;
 
-    const float ratios = troop.isValid() ? hero.GetArmy().GetHitPoints() / troop.GetHitPoints() : 0;
+    const u32  ratios = troop.isValid() ? hero.GetArmy().GetHitPoints() / troop.GetHitPoints() : 0;
     const bool check_free_stack = (hero.GetArmy().GetCount() < hero.GetArmy().Size() || hero.GetArmy().HasMonster(troop));
     const bool check_extra_condition = (!hero.HasArtifact(Artifact::HIDEOUS_MASK) && Morale::NORMAL <= hero.GetMorale());
 

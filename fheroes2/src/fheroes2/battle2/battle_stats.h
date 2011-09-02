@@ -152,7 +152,7 @@ namespace Battle2
 	u32	ApplyDamage(u32);
 	u32	GetDamageMin(const Stats &) const;
 	u32	GetDamageMax(const Stats &) const;
-	u32     CalculateDamageStats(const Stats &, double) const;
+	u32     CalculateDamageStats(const Stats &, float) const;
 	bool	ApplySpell(const Spell &, const HeroBase* hero, TargetInfo &);
 	bool	AllowApplySpell(const Spell &, const HeroBase* hero, std::string* msg = NULL) const;
 	void	PostAttackAction(Stats &);

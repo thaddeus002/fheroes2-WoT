@@ -418,7 +418,7 @@ void Game::SetKingdomRace(u8 color, u8 race)
 #include <cmath>
 std::string Game::CountScoute(u32 count, u8 scoute)
 {
-    double infelicity = 0;
+    float infelicity = 0;
     std::string res;
 
     switch(scoute)

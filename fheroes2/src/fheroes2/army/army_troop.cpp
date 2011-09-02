@@ -199,7 +199,7 @@ u32 Army::Troop::GetDamageMax(void) const
 
 u32 Army::Troop::GetStrength(void) const
 {
-    double res = (GetDamageMin() + GetDamageMax()) >> 1;
+    float res = (GetDamageMin() + GetDamageMax()) >> 1;
 
     // increase strength
     if(isFly())		res += res * 0.5;

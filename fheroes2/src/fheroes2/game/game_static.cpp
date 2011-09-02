@@ -63,10 +63,10 @@ namespace GameStatic
     u16		spell_dd_hp		= 0;
 
     // monsters
-    double	monster_upgrade_ratio	= 1.0;
+    float	monster_upgrade_ratio	= 1.0;
 }
 
-double GameStatic::GetMonsterUpgradeRatio(void)
+float GameStatic::GetMonsterUpgradeRatio(void)
 {
     return monster_upgrade_ratio;
 }
@@ -249,7 +249,11 @@ void Game::WhirlpoolUpdateStatic(const TiXmlElement* xml)
 void Game::MonsterUpdateStatic(const TiXmlElement* xml)
 {
     if(xml)
-        xml->Attribute("rate", & GameStatic::monster_upgrade_ratio);
+    {
+	double res;
+	xml->Attribute("rate", &res);
+	GameStatic::monster_upgrade_ratio = static_cast<float>(res);
+    }
 }
 
 #endif
