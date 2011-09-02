@@ -265,6 +265,13 @@ Battle2::ModesAffected::ModesAffected()
     reserve(3);
 }
 
+u16 Battle2::ModesAffected::GetMode(u32 mode) const
+{
+    const_iterator it = std::find_if(begin(), end(),
+				std::bind2nd(std::mem_fun_ref(&ModeDuration::isMode), mode));
+    return it == end() ? 0 : (*it).second;
+}
+
 void Battle2::ModesAffected::AddMode(u32 mode, u16 duration)
 {
     iterator it = std::find_if(begin(), end(), std::bind2nd(std::mem_fun_ref(&ModeDuration::isMode), mode));

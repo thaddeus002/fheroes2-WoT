@@ -368,41 +368,75 @@ void DrawMonsterStats(const Point & dst, const Army::Troop & troop)
     text.Blit(dst_pt);
 }
 
+const Sprite* GetModesSprite(u32 mod)
+{
+    switch(mod)
+    {
+	case Battle2::SP_BLOODLUST:	return &AGG::GetICN(ICN::SPELLINF, 9);
+	case Battle2::SP_BLESS:		return &AGG::GetICN(ICN::SPELLINF, 3);
+	case Battle2::SP_HASTE:		return &AGG::GetICN(ICN::SPELLINF, 0);
+	case Battle2::SP_SHIELD:	return &AGG::GetICN(ICN::SPELLINF, 10);
+	case Battle2::SP_STONESKIN:	return &AGG::GetICN(ICN::SPELLINF, 13);
+	case Battle2::SP_DRAGONSLAYER:	return &AGG::GetICN(ICN::SPELLINF, 8);
+	case Battle2::SP_STEELSKIN:	return &AGG::GetICN(ICN::SPELLINF, 14);
+	case Battle2::SP_ANTIMAGIC:	return &AGG::GetICN(ICN::SPELLINF, 12);
+	case Battle2::SP_CURSE:		return &AGG::GetICN(ICN::SPELLINF, 4);
+	case Battle2::SP_SLOW:		return &AGG::GetICN(ICN::SPELLINF, 1);
+	case Battle2::SP_BERSERKER:	return &AGG::GetICN(ICN::SPELLINF, 5);
+	case Battle2::SP_HYPNOTIZE:	return &AGG::GetICN(ICN::SPELLINF, 7);
+	case Battle2::SP_BLIND:		return &AGG::GetICN(ICN::SPELLINF, 2);
+	case Battle2::SP_PARALYZE:	return &AGG::GetICN(ICN::SPELLINF, 6);
+	case Battle2::SP_STONE:		return &AGG::GetICN(ICN::SPELLINF, 11);
+	default: break;
+    }
+    return NULL;
+}
+
+
 void DrawBattleStats(const Point & dst, const Battle2::Stats & b)
 {
-    std::vector<const Surface*> modes;
-    modes.reserve(4);
+    const u32 modes[] = {
+	Battle2::SP_BLOODLUST, Battle2::SP_BLESS, Battle2::SP_HASTE, Battle2::SP_SHIELD, Battle2::SP_STONESKIN,
+	Battle2::SP_DRAGONSLAYER, Battle2::SP_STEELSKIN, Battle2::SP_ANTIMAGIC, Battle2::SP_CURSE, Battle2::SP_SLOW,
+	Battle2::SP_BERSERKER, Battle2::SP_HYPNOTIZE, Battle2::SP_BLIND, Battle2::SP_PARALYZE, Battle2::SP_STONE
+    };
 
-    if(b.Modes(Battle2::SP_BLOODLUST)) modes.push_back(&AGG::GetICN(ICN::SPELLINF, 9));
-    if(b.Modes(Battle2::SP_BLESS)) modes.push_back(&AGG::GetICN(ICN::SPELLINF, 3));
-    if(b.Modes(Battle2::SP_HASTE)) modes.push_back(&AGG::GetICN(ICN::SPELLINF, 0));
-    if(b.Modes(Battle2::SP_SHIELD)) modes.push_back(&AGG::GetICN(ICN::SPELLINF, 10));
-    if(b.Modes(Battle2::SP_STONESKIN)) modes.push_back(&AGG::GetICN(ICN::SPELLINF, 13));
-    if(b.Modes(Battle2::SP_DRAGONSLAYER)) modes.push_back(&AGG::GetICN(ICN::SPELLINF, 8));
-    if(b.Modes(Battle2::SP_STEELSKIN)) modes.push_back(&AGG::GetICN(ICN::SPELLINF, 14));
-    if(b.Modes(Battle2::SP_ANTIMAGIC)) modes.push_back(&AGG::GetICN(ICN::SPELLINF, 12));
-    if(b.Modes(Battle2::SP_CURSE)) modes.push_back(&AGG::GetICN(ICN::SPELLINF, 4));
-    if(b.Modes(Battle2::SP_SLOW)) modes.push_back(&AGG::GetICN(ICN::SPELLINF, 1));
-    if(b.Modes(Battle2::SP_BERSERKER)) modes.push_back(&AGG::GetICN(ICN::SPELLINF, 5));
-    if(b.Modes(Battle2::SP_HYPNOTIZE)) modes.push_back(&AGG::GetICN(ICN::SPELLINF, 7));
-    if(b.Modes(Battle2::SP_BLIND)) modes.push_back(&AGG::GetICN(ICN::SPELLINF, 2));
-    if(b.Modes(Battle2::SP_PARALYZE)) modes.push_back(&AGG::GetICN(ICN::SPELLINF, 6));
-    if(b.Modes(Battle2::SP_STONE)) modes.push_back(&AGG::GetICN(ICN::SPELLINF, 11));
+    // accumulate width
+    u16 ow = 0;
 
-    if(modes.size())
-    {
-	std::vector<const Surface*>::const_iterator it;
-	u16 ow = 0;
-	for(it = modes.begin(); it != modes.end(); ++it)
+    for(u8 ii = 0; ii < sizeof(modes) / sizeof(u32); ++ii)
+	if(b.Modes(modes[ii]))
 	{
-	    ow += (*it)->w() + 4;
+	    const Sprite* sprite = GetModesSprite(modes[ii]);
+	    if(sprite)
+		ow += sprite->w() + 4;
 	}
-	ow -= 4;
-	ow = dst.x - ow / 2;
-	for(it = modes.begin(); it != modes.end(); ++it)
+
+    ow -= 4;
+    ow = dst.x - ow / 2;
+
+    Display & display = Display::Get();
+    Text text;
+
+    // blit centered
+    for(u8 ii = 0; ii < sizeof(modes) / sizeof(u32); ++ii)
+	if(b.Modes(modes[ii]))
 	{
-	    Display::Get().Blit(**it, ow, dst.y);
-	    ow += (*it)->w() + 4;
+	    const Sprite* sprite = GetModesSprite(modes[ii]);
+	    if(sprite)
+	    {
+		display.Blit(*sprite, ow, dst.y);
+
+		const u16 duration = b.affected.GetMode(modes[ii]);
+		if(duration)
+		{
+		    std::ostringstream os;
+		    os << duration;
+		    text.Set(os.str(), Font::SMALL);
+		    text.Blit(ow + (sprite->w() - text.w()) / 2, dst.y + sprite->h() + 1);
+		}
+
+		ow += sprite->w() + 4;
+	    }
 	}
-    }
 }

@@ -96,6 +96,7 @@ namespace Battle2
     {
 	ModesAffected();
 
+	u16  GetMode(u32) const;
 	void AddMode(u32, u16);
 	void RemoveMode(u32);
 	void DecreaseDuration(void);
