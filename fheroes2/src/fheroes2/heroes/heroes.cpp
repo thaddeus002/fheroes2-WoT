@@ -770,6 +770,8 @@ void Heroes::ActionNewDay(void)
 
     // recovery move points
     move_point = GetMaxMovePoints();
+    MovePointsScaleFixed();
+
     // stables visited?
     if(isVisited(MP2::OBJ_STABLES)) move_point += 400;
 
