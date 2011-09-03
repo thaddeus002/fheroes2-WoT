@@ -1792,6 +1792,8 @@ Heroes* AllHeroes::GetGuard(const Castle & castle) const
 
 Heroes* AllHeroes::GetFreeman(u8 race) const
 {
+    const Settings & conf = Settings::Get();
+
     u8 min = Heroes::UNKNOWN;
     u8 max = Heroes::UNKNOWN;
 
@@ -1829,7 +1831,7 @@ Heroes* AllHeroes::GetFreeman(u8 race) const
 	
 	default:
 	    min = Heroes::LORDKILBURN;
-	    max = Settings::Get().PriceLoyaltyVersion() ? Heroes::JARKONAS : Heroes::CELIA;
+	    max = conf.ExtCastleAllowRecruitSpecialHeroes() ? Heroes::JARKONAS : Heroes::CELIA;
 	    break;
     }
 
@@ -1844,7 +1846,7 @@ Heroes* AllHeroes::GetFreeman(u8 race) const
     if(Race::NONE != race && freeman_heroes.empty())
     {
 	min = Heroes::LORDKILBURN;
-	max = Settings::Get().PriceLoyaltyVersion() ? Heroes::JARKONAS : Heroes::CELIA;
+	max = conf.ExtCastleAllowRecruitSpecialHeroes() ? Heroes::JARKONAS : Heroes::CELIA;
 
 	for(u8 ii = min; ii <= max; ++ii)
 	    if(at(ii)->isFreeman()) freeman_heroes.push_back(ii);

@@ -147,6 +147,7 @@ static const settings_t settingsFHeroes2[] =
     { Settings::CASTLE_ALLOW_BUY_FROM_WELL,	_("castle: allow buy from well"),			},
     { Settings::CASTLE_ALLOW_GUARDIANS,		_("castle: allow guardians"),				},
     { Settings::CASTLE_MAGEGUILD_POINTS_TURN,	_("castle: higher mage guilds regenerate more spell points/turn (20/40/60/80/100%)"), },
+    { Settings::CASTLE_ALLOW_RECRUITS_SPECIAL,	_("castle: allow recruits special/expansion heroes"), },
     { Settings::HEROES_LEARN_SPELLS_WITH_DAY,	_("heroes: learn new spells with day"),  		},
     { Settings::HEROES_FORCE_RACE_FROM_TYPE,	_("heroes: fixed race with custom portrait"),  		},
     { Settings::HEROES_COST_DEPENDED_FROM_LEVEL,_("heroes: recruit cost to be dependent on hero level"),},
@@ -1344,6 +1345,11 @@ bool Settings::ExtDragDropScroll(void) const
 bool Settings::ExtLowResolution(void) const
 {
     return ExtModes(POCKETPC_LOW_RESOLUTION);
+}
+
+bool Settings::ExtCastleAllowRecruitSpecialHeroes(void) const
+{
+    return PriceLoyaltyVersion() && ExtModes(CASTLE_ALLOW_RECRUITS_SPECIAL);
 }
 
 bool Settings::ExtWorldNewVersionWeekOf(void) const
