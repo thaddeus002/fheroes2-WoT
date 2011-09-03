@@ -218,6 +218,16 @@ u8 Players::GetColors(u8 control, bool strong) const
     return res;
 }
 
+Player* Players::GetCurrent(void)
+{
+    return Get(current_color);
+}
+
+const Player* Players::GetCurrent(void) const
+{
+    return Get(current_color);
+}
+
 u8 Players::GetPlayerFriends(u8 color)
 {
     const Player* player = Get(color);

@@ -1901,7 +1901,7 @@ u8 Castle::GetGrownMonthOf(void)
 
 void Castle::Scoute(void) const
 {
-    Maps::ClearFog(GetIndex(), Game::GetViewDistance(isCastle() ? Game::VIEW_CASTLE : Game::VIEW_TOWN), color);
+    Maps::ClearFog(GetIndex(), Game::GetViewDistance(isCastle() ? Game::VIEW_CASTLE : Game::VIEW_TOWN), GetColor());
 }
 
 void Castle::JoinRNDArmy(void)
@@ -2018,8 +2018,8 @@ void AllCastles::clear(void)
     std::vector<Castle *>::clear();
 }
 
-void AllCastles::Scoute(u8 color) const
+void AllCastles::Scoute(u8 colors) const
 {
     for(const_iterator it = begin(); it != end(); ++it)
-        if(color & (*it)->GetColor()) (*it)->Scoute();
+        if(colors & (*it)->GetColor()) (*it)->Scoute();
 }

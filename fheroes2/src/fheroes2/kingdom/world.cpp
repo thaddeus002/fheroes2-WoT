@@ -1289,11 +1289,14 @@ Color::color_t World::ColorCapturedObject(const s32 index) const
 
 void World::ClearFog(const u8 color)
 {
+    const u8 colors = Settings::Get().ExtUnionsAllowViewMaps() ?
+				    Players::GetPlayerFriends(color) : color;
+
     // clear abroad castles
-    vec_castles.Scoute(color);
+    vec_castles.Scoute(colors);
 
     // clear abroad heroes
-    vec_heroes.Scoute(color);
+    vec_heroes.Scoute(colors);
 
     // clear abroad objects
     for(CapturedObjects::const_iterator
@@ -1301,7 +1304,7 @@ void World::ClearFog(const u8 color)
     {
 	const ObjectColor & objcol = (*it).second;
 
-	if(objcol.isColor(color))
+	if(objcol.isColor(colors))
 	{
 	    u8 scoute = 0;
 

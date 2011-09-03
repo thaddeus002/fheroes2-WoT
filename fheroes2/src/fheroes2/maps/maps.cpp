@@ -223,26 +223,32 @@ u16 Maps::GetMaxGroundAround(const s32 center)
 
 void Maps::ClearFog(s32 index, u8 scoute, const u8 color)
 {
-    if(0 == scoute || !isValidAbsIndex(index)) return;
-    const Point center(index % world.w(), index / world.w());
-
-    // AI advantage
-    if(CONTROL_AI & world.GetKingdom(color).GetControl())
+    if(0 != scoute && isValidAbsIndex(index))
     {
-	switch(Settings::Get().GameDifficulty())
-	{
-    	    case Difficulty::NORMAL:	scoute += 2; break;
-    	    case Difficulty::HARD:	scoute += 3; break;
-    	    case Difficulty::EXPERT:	scoute += 4; break;
-    	    case Difficulty::IMPOSSIBLE:scoute += 6; break;
-	    default: break;
-	}
-    }
+	const Point center(index % world.w(), index / world.w());
+	const Settings & conf = Settings::Get();
 
-    for(s16 y = center.y - scoute; y <= center.y + scoute; ++y)
-        for(s16 x = center.x - scoute; x <= center.x + scoute; ++x)
-            if(isValidAbsPoint(x, y) &&  (scoute + scoute / 2) >= std::abs(x - center.x) + std::abs(y - center.y))
-                world.GetTiles(GetIndexFromAbsPoint(x, y)).ClearFog(color);
+	// AI advantage
+	if(CONTROL_AI & world.GetKingdom(color).GetControl())
+	{
+	    switch(conf.GameDifficulty())
+	    {
+    		case Difficulty::NORMAL:	scoute += 2; break;
+    		case Difficulty::HARD:		scoute += 3; break;
+    		case Difficulty::EXPERT:	scoute += 4; break;
+    		case Difficulty::IMPOSSIBLE:	scoute += 6; break;
+		default: break;
+	    }
+	}
+
+	u8 colors = conf.ExtUnionsAllowViewMaps() ? Players::GetPlayerFriends(color) : color;
+
+	for(s16 y = center.y - scoute; y <= center.y + scoute; ++y)
+    	    for(s16 x = center.x - scoute; x <= center.x + scoute; ++x)
+        	if(isValidAbsPoint(x, y) &&
+		    (scoute + scoute / 2) >= std::abs(x - center.x) + std::abs(y - center.y))
+            	    world.GetTiles(GetIndexFromAbsPoint(x, y)).ClearFog(colors);
+    }
 }
 
 u16 Maps::ScanAroundObject(const s32 center, const u8 obj, const u16 exclude)

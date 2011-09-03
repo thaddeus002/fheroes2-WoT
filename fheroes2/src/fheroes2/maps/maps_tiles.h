@@ -173,7 +173,6 @@ namespace Maps
 	std::string String(void) const;
 	
 	bool isFog(u8 color) const;
-	void SetFog(u8 color);
 	void ClearFog(u8 color);
 
 	void FixLoyaltyVersion(void);

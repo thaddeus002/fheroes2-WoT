@@ -2554,24 +2554,49 @@ void AIHeroesNoGUITurns(Heroes &hero)
     }
 }
 
-bool HeroesIsShow(const Heroes & hero)
+bool AIHeroesShowAnimation(const Heroes & hero)
 {
-    const u8 colors = Players::HumanColors();
-    const s32 index_from = hero.GetIndex();
+    const Settings & conf = Settings::Get();
 
-    if(! Maps::isValidAbsIndex(index_from)) return false;
+    // accumulate colors
+    u8 colors = 0;
 
-    const Maps::Tiles & tile_from = world.GetTiles(index_from);
-
-    if(hero.GetPath().isValid())
+    if(conf.GameType() & Game::TYPE_HOTSEAT)
     {
-        const s32 index_to = Maps::GetDirectionIndex(index_from, hero.GetPath().GetFrontDirection());
-        const Maps::Tiles & tile_to = world.GetTiles(index_to);
+	const Colors vcolors(Players::HumanColors());
 
-        return !tile_from.isFog(colors) && !tile_to.isFog(colors);
+        for(Colors::const_iterator
+	    it = vcolors.begin(); it != vcolors.end(); ++it)
+	{
+    	    const Player* player = conf.GetPlayers().Get(*it);
+    	    if(player) colors |= player->friends;
+	}
+    }
+    else
+    {
+        const Player* player = conf.GetPlayers().Get(Players::HumanColors());
+        if(player) colors = player->friends;
     }
 
-    return !tile_from.isFog(colors);
+    // get result
+    const s32 index_from = hero.GetIndex();
+
+    if(colors && Maps::isValidAbsIndex(index_from))
+    {
+	const Maps::Tiles & tile_from = world.GetTiles(index_from);
+
+	if(hero.GetPath().isValid())
+	{
+    	    const s32 index_to = Maps::GetDirectionIndex(index_from, hero.GetPath().GetFrontDirection());
+    	    const Maps::Tiles & tile_to = world.GetTiles(index_to);
+
+    	    return !tile_from.isFog(colors) && !tile_to.isFog(colors);
+	}
+
+	return !tile_from.isFog(colors);
+    }
+
+    return false;
 }
 
 void AIHeroesTurns(Heroes & hero)
@@ -2586,7 +2611,7 @@ void AIHeroesTurns(Heroes & hero)
 
     cursor.Hide();
 
-    if(0 != conf.AIMoveSpeed() && HeroesIsShow(hero))
+    if(0 != conf.AIMoveSpeed() && AIHeroesShowAnimation(hero))
     {
 	    cursor.Hide();
 	    I.gameArea.SetCenter(hero.GetCenter());
@@ -2600,7 +2625,7 @@ void AIHeroesTurns(Heroes & hero)
 	if(hero.isFreeman() || !hero.isEnableMove()) break;
 
 	bool hide_move = (0 == conf.AIMoveSpeed()) ||
-	    (! IS_DEVEL() && !HeroesIsShow(hero));
+	    (! IS_DEVEL() && !AIHeroesShowAnimation(hero));
 
 	if(hide_move)
 	{
@@ -2629,7 +2654,7 @@ void AIHeroesTurns(Heroes & hero)
     }
 
     bool hide_move = (0 == conf.AIMoveSpeed()) ||
-	    (! IS_DEVEL() && !HeroesIsShow(hero));
+	    (! IS_DEVEL() && !AIHeroesShowAnimation(hero));
 
     // 0.2 sec delay for show enemy hero position
     if(!hero.isFreeman() && !hide_move) DELAY(200);

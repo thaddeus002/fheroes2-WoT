@@ -742,7 +742,8 @@ void Dialog::QuickInfo(const Heroes & hero)
     std::string message;
 
     // heroes name
-    if(conf.CurrentColor() == hero.GetColor())
+    if(conf.CurrentColor() == hero.GetColor() ||
+	Players::isFriends(conf.CurrentColor(), hero.GetColor()))
     {
 	message = _("%{name} ( Level %{level} )");
 	String::Replace(message, "%{name}", hero.GetName());
@@ -762,7 +763,8 @@ void Dialog::QuickInfo(const Heroes & hero)
     display.Blit(port, dst_pt);
 
     // luck
-    if(conf.CurrentColor() == hero.GetColor())
+    if(conf.CurrentColor() == hero.GetColor() ||
+	Players::isFriends(conf.CurrentColor(), hero.GetColor()))
     {
 	const s8 luck = hero.GetLuckWithModificators(NULL);
 	const Sprite & sprite = AGG::GetICN(ICN::MINILKMR, (0 > luck ? 0 : (0 < luck ? 1 : 2)));
@@ -778,7 +780,8 @@ void Dialog::QuickInfo(const Heroes & hero)
     }
 
     // morale
-    if(conf.CurrentColor() == hero.GetColor())
+    if(conf.CurrentColor() == hero.GetColor() ||
+	Players::isFriends(conf.CurrentColor(), hero.GetColor()))
     {
 	const s8 morale = hero.GetMoraleWithModificators(NULL);
 	const Sprite & sprite = AGG::GetICN(ICN::MINILKMR, (0 > morale ? 3 : (0 < morale ? 4 : 5)));

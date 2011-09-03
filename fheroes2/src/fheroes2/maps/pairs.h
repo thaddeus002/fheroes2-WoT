@@ -56,7 +56,7 @@ class ObjectColor : public std::pair<MP2::object_t, Color::color_t>
     ObjectColor(const MP2::object_t object, Color::color_t color) : std::pair<MP2::object_t, Color::color_t>(object, color) {};
 
     bool isObject(u8 object) const { return object == first; };
-    bool isColor(u8 color) const { return color == second; };
+    bool isColor(u8 colors) const { return colors & second; };
 };
 
 template<class T>

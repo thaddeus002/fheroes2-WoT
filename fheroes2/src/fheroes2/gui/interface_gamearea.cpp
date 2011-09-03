@@ -240,15 +240,24 @@ void Interface::GameArea::Redraw(Surface & dst, u8 flag, const Rect & rt) const
     if(flag & LEVEL_FOG)
     {
 	const Settings & conf = Settings::Get();
-	const u8 mycolor = Players::HumanColors() & conf.CurrentColor() ? conf.CurrentColor() : Players::HumanColors();
+	u8 colors = 0;
+
+        if(conf.CurrentColor() & Players::HumanColors())
+	{
+    	    const Player* player = conf.GetPlayers().GetCurrent();
+	    if(player)
+		colors = player->friends;
+	}
+	else
+	    colors = Players::HumanColors();
 
 	for(s16 oy = rt.y; oy < rt.y + rt.h; ++oy)
 	    for(s16 ox = rt.x; ox < rt.x + rt.w; ++ox)
 	{
 	    const Maps::Tiles & tile = world.GetTiles(rectMaps.x + ox, rectMaps.y + oy);
 
-	    if(tile.isFog(mycolor))
-		tile.RedrawFogs(dst, mycolor);
+	    if(tile.isFog(colors))
+		tile.RedrawFogs(dst, colors);
 	}
     }
 }

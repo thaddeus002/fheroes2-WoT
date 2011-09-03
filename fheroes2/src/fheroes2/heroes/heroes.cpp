@@ -1218,7 +1218,7 @@ void Heroes::LearnSkill(const Skill::Secondary & skill)
 
 void Heroes::Scoute(void) const
 {
-    Maps::ClearFog(GetIndex(), GetScoute(), color);
+    Maps::ClearFog(GetIndex(), GetScoute(), GetColor());
 }
 
 u8 Heroes::GetScoute(void) const
@@ -1858,10 +1858,10 @@ Heroes* AllHeroes::GetFreeman(u8 race) const
     return at(*Rand::Get(freeman_heroes));
 }
 
-void AllHeroes::Scoute(u8 color) const
+void AllHeroes::Scoute(u8 colors) const
 {
     for(const_iterator it = begin(); it != end(); ++it)
-	if(color & (*it)->GetColor()) (*it)->Scoute();                        
+	if(colors & (*it)->GetColor()) (*it)->Scoute();                        
 }
 
 Heroes* AllHeroes::FromJail(s32 index) const

@@ -543,8 +543,6 @@ void Maps::Tiles::Init(s32 index, const MP2::mp2tile_t & mp2)
 
     AddonsPushLevel1(mp2);
     AddonsPushLevel2(mp2);
-
-    if(IS_DEVEL()) ClearFog(Players::HumanColors());
 }
 
 void Maps::Tiles::SetTile(const u16 sprite_index, const u8 sh)
@@ -2216,19 +2214,15 @@ void Maps::Tiles::UpdateTreasureChestSprite(Tiles & tile)
 	    TilesAddon::UpdateTreasureChestSprite(*it);
 }
 
-bool Maps::Tiles::isFog(u8 color) const
+bool Maps::Tiles::isFog(u8 colors) const
 {
-    return fogs & color;
+    // colors may be the union friends
+    return (fogs & colors) == colors;
 }
 
-void Maps::Tiles::SetFog(u8 color)
+void Maps::Tiles::ClearFog(u8 colors)
 {
-    fogs |= (Settings::Get().ExtUnionsAllowViewMaps() ? Players::GetPlayerFriends(color) : color);
-}
-
-void Maps::Tiles::ClearFog(u8 color)
-{
-    fogs &= ~(Settings::Get().ExtUnionsAllowViewMaps() ? Players::GetPlayerFriends(color) : color);
+    fogs &= ~colors;
 }
 
 void Maps::Tiles::ResetQuantity(void)

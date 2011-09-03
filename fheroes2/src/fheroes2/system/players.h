@@ -70,6 +70,8 @@ public:
     u8	 	GetColors(u8 control = 0xFF, bool strong = false) const;
     std::string	String(void) const;
 
+    Player*		GetCurrent(void);
+    const Player*	GetCurrent(void) const;
 
     static Player*	Get(u8 color);
     static u8		GetPlayerControl(u8 color);
