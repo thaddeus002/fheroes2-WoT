@@ -36,6 +36,7 @@ namespace Maps
     bool ReadMP2(const std::string &);
     bool ReadSAV(const std::string &);
 
+    bool operator== (const FileInfo & fi) const { return file == fi.file; }
     static bool NameSorting(const FileInfo &, const FileInfo &);
     static bool FileSorting(const FileInfo &, const FileInfo &);
     static bool NameCompare(const FileInfo &, const FileInfo &);

@@ -136,7 +136,7 @@ void ScenarioListBox::RedrawBackground(const Point & dst)
     }
 }
 
-Maps::FileInfo* Dialog::SelectScenario(const MapsFileInfoList & all)
+const Maps::FileInfo* Dialog::SelectScenario(const MapsFileInfoList & all)
 {
     Cursor & cursor = Cursor::Get();
     Display & display = Display::Get();
@@ -145,7 +145,7 @@ Maps::FileInfo* Dialog::SelectScenario(const MapsFileInfoList & all)
     cursor.Hide();
     cursor.SetThemes(cursor.POINTER);
 
-    Maps::FileInfo* result = NULL;
+    const Maps::FileInfo* result = NULL;
     MapsFileInfoList small;
     MapsFileInfoList medium;
     MapsFileInfoList large;
@@ -234,7 +234,8 @@ Maps::FileInfo* Dialog::SelectScenario(const MapsFileInfoList & all)
 	    Game::HotKeyPress(Game::EVENT_DEFAULT_READY) ||
 	    listbox.selectOk)
 	{
-	    result = &listbox.GetCurrent();
+	    MapsFileInfoList::const_iterator it = std::find(all.begin(), all.end(), listbox.GetCurrent());
+	    result = it != all.end() ? &(*it) : NULL;
 	    break;
 	}
 	else

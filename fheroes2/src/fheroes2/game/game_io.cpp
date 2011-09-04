@@ -835,27 +835,10 @@ bool Game::IO::LoadBIN(QueueMessage & msg)
     msg.Pop(world.ultimate_index);
     msg.Pop(world.uniq0);
 
-    if(format < FORMAT_VERSION_2371)
-    {
-	msg.Pop(byte8); world.week_current = byte8;
-	world.week_next = Week::WeekRand();
-    }
-    else
-    {
-	if(format < FORMAT_VERSION_2379)
-	{
-	    msg.Pop(world.week_current.first);
-	    msg.Pop(world.week_current.second);
-	    world.week_next = Week::WeekRand();
-	}
-	else
-	{
-	    msg.Pop(world.week_current.first);
-	    msg.Pop(world.week_current.second);
-	    msg.Pop(world.week_next.first);
-	    msg.Pop(world.week_next.second);
-	}
-    }
+    msg.Pop(world.week_current.first);
+    msg.Pop(world.week_current.second);
+    msg.Pop(world.week_next.first);
+    msg.Pop(world.week_next.second);
 
     msg.Pop(byte8); world.heroes_cond_wins = Heroes::ConvertID(byte8);
     msg.Pop(byte8); world.heroes_cond_loss = Heroes::ConvertID(byte8);
@@ -1354,9 +1337,8 @@ void Game::IO::UnpackHeroes(QueueMessage & msg, Heroes & hero, u16 check_version
     for(u32 jj = 0; jj < byte32; ++jj)
     {
 	Route::Step step;
-	if(FORMAT_VERSION_2293 <= check_version)
-	    msg.Pop(step.from);
 
+	msg.Pop(step.from);
 	msg.Pop(step.direction);
 	msg.Pop(step.penalty);
 	hero.path.push_back(step);

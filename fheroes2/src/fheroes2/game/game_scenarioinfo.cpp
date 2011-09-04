@@ -197,7 +197,7 @@ Game::menu_t Game::ScenarioInfo(void)
 	if(buttonSelectMaps &&
 	  (Game::HotKeyPress(Game::EVENT_BUTTON_SELECT) || le.MouseClickLeft(*buttonSelectMaps)))
 	{
-	    Maps::FileInfo* fi = Dialog::SelectScenario(lists);
+	    const Maps::FileInfo* fi = Dialog::SelectScenario(lists);
 	    if(fi)
 	    {
 		conf.SetCurrentFileInfo(*fi);

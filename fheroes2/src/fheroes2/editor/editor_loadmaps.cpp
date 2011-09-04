@@ -40,8 +40,7 @@ Game::menu_t Game::Editor::LoadMaps(void)
         return MAINMENU;
     }
 
-    Maps::FileInfo* fi = Dialog::SelectScenario(lists);
-
+    const Maps::FileInfo* fi = Dialog::SelectScenario(lists);
     if(fi)
     {
 	conf.SetCurrentFileInfo(*fi);
