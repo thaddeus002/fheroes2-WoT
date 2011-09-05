@@ -62,7 +62,7 @@ s8 Captain::GetMorale(void) const
     s8 result = Morale::NORMAL;
 
     // global modificator
-    result += GetMoraleModificator(false, NULL);
+    result += GetMoraleModificator(NULL);
 
     // result
     if(result < Morale::AWFUL)  return Morale::TREASON;
@@ -85,7 +85,7 @@ s8 Captain::GetLuck(void) const
     s8 result = Luck::NORMAL;
 
     // global modificator
-    result += GetLuckModificator(false, NULL);
+    result += GetLuckModificator(NULL);
 
     // result
     if(result < Luck::AWFUL)    return Luck::CURSED;

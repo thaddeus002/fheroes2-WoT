@@ -1356,12 +1356,11 @@ void AGG::PlaySound(const M82::m82_t m82)
 /* wrapper Audio::Play */
 void AGG::PlayMusic(const MUS::mus_t mus, bool loop)
 {
-    static MUS::mus_t old = MUS::UNKNOWN;
     const Settings & conf = Settings::Get();
 
-    if(!conf.Music() || MUS::UNUSED == mus || MUS::UNKNOWN == mus || (old == mus && Music::isPlaying())) return;
+    if(!conf.Music() || MUS::UNUSED == mus || MUS::UNKNOWN == mus || (Game::CurrentMusic() == mus && Music::isPlaying())) return;
 
-    old = mus;
+    Game::SetCurrentMusic(mus);
     
     if(conf.MusicExt())
     {

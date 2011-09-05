@@ -44,7 +44,7 @@ namespace Game
     }
 
     KeySym key_events[EVENT_LAST];
-    static int key_groups = 0;
+    int key_groups = 0;
 }
 
 const char* Game::EventsName(events_t evnt)

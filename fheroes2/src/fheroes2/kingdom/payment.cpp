@@ -37,7 +37,7 @@ struct paymentstats_t
     cost_t cost;
 };
 
-static paymentstats_t _payments[] = {
+paymentstats_t _payments[] = {
     { "buy_boat",       { 1000,10, 0, 0, 0, 0, 0 } },
     { "buy_spell_book", {  500, 0, 0, 0, 0, 0, 0 } },
     { "buy_spell_book_from_shrine1", {  1250, 0, 0, 0, 0, 0, 0 } },

@@ -56,9 +56,6 @@ namespace Maps
     s32 GetIndexFromAbsPoint(const Point & mp);
     s32 GetIndexFromAbsPoint(s16 px, s16 py);
 
-    u32 AnimationTicket(void);
-    void IncreaseAnimationTicket(void);
-
     u16 GetDirectionAroundGround(const s32 center, const u16 ground);
     u8  GetCountAroundGround(const s32 center, const u16 ground);
     u16 GetMaxGroundAround(const s32 center);

@@ -37,8 +37,6 @@
 #include "pairs.h"
 #include "ai.h"
 
-class Army::army_t;
-
 struct IndexObjectMap : public std::map<s32, MP2::object_t>
 {
     void DumpObjects(const IndexDistance & id);

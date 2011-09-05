@@ -2645,7 +2645,8 @@ void AIHeroesTurns(Heroes & hero)
 
     	if(Game::AnimateInfrequent(Game::MAPS_DELAY))
 	{
-	    Maps::IncreaseAnimationTicket();
+	    u32 & frame = Game::MapsAnimationFrame();
+	    ++frame;
 	    cursor.Hide();
 	    I.Redraw(REDRAW_GAMEAREA);
 	    cursor.Show();

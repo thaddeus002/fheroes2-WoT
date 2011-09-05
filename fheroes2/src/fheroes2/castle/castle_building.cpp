@@ -92,7 +92,7 @@ void CastleRedrawTownName(const Castle & castle, const Point & dst)
 void CastleRedrawCurrentBuilding(const Castle & castle, const Point & dst_pt,
 				const CastleDialog::CacheBuildings & orders, u32 build, u32 flash)
 {
-    static u32 frame = 0;
+    u32 & frame = Game::CastleAnimationFrame();
 
     Display & display = Display::Get();
     Cursor & cursor = Cursor::Get();

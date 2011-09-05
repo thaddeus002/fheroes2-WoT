@@ -222,6 +222,12 @@ namespace Game
     void SetKingdomRace(u8, u8);
     void DialogPlayers(u8, std::string);
 
+    void SetCurrentMusic(u8);
+    u8   CurrentMusic(void);
+
+    u32 & CastleAnimationFrame(void);
+    u32 & MapsAnimationFrame(void);
+
     u8  GetRating(void);
     u16 GetGameOverScores(void);
     u8  GetLostTownDays(void);

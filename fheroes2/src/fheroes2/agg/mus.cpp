@@ -31,7 +31,7 @@
 
 namespace MUS
 {
-    static const struct
+    const struct
     {
 	mus_t type;
 	const char* string;

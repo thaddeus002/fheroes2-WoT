@@ -53,7 +53,7 @@
 #include "resource.h"
 #include "maps_tiles.h"
 
-static u8 monster_animation_cicle[] = { 0, 1, 2, 1, 0, 3, 4, 5, 4, 3 };
+u8 monster_animation_cicle[] = { 0, 1, 2, 1, 0, 3, 4, 5, 4, 3 };
 
 Maps::TilesAddon::TilesAddon() : level(0), uniq(0), object(0), index(0)
 {
@@ -671,7 +671,7 @@ void Maps::Tiles::RedrawBottom(Surface & dst, bool skip_objs) const
 		area.BlitOnTile(dst, sprite, mp);
 
 		// possible anime
-		if(const u16 anime_index = ICN::AnimationFrame(icn, index, Maps::AnimationTicket(), quantity2))
+		if(const u16 anime_index = ICN::AnimationFrame(icn, index, Game::MapsAnimationFrame(), quantity2))
 		{
 		    const Sprite & anime_sprite = AGG::GetICN(icn, anime_index);
 		    area.BlitOnTile(dst, anime_sprite, mp);
@@ -744,7 +744,7 @@ void Maps::Tiles::RedrawMonster(Surface & dst) const
 
 	// draw second sprite
 	const Sprite & sprite_next = AGG::GetICN(ICN::MINIMON, mons.GetSpriteIndex() * 9 + 1 + 
-	    monster_animation_cicle[ (Maps::AnimationTicket() + mp.x * mp.y) % (sizeof(monster_animation_cicle) / sizeof(monster_animation_cicle[0])) ]);
+	    monster_animation_cicle[ (Game::MapsAnimationFrame() + mp.x * mp.y) % (sizeof(monster_animation_cicle) / sizeof(monster_animation_cicle[0])) ]);
 	area.BlitOnTile(dst, sprite_next, sprite_next.x() + 16, TILEWIDTH + sprite_next.y(), mp);
     }
 }
@@ -791,7 +791,7 @@ void Maps::Tiles::RedrawBottom4Hero(Surface & dst) const
 		area.BlitOnTile(dst, sprite, mp);
 
 		// possible anime
-		if(const u16 anime_index = ICN::AnimationFrame(icn, index, Maps::AnimationTicket(), quantity2))
+		if(const u16 anime_index = ICN::AnimationFrame(icn, index, Game::MapsAnimationFrame(), quantity2))
 		{
 		    const Sprite & anime_sprite = AGG::GetICN(icn, anime_index);
 		    area.BlitOnTile(dst, anime_sprite, mp);
@@ -813,7 +813,7 @@ void Maps::Tiles::RedrawTop(Surface & dst, const TilesAddon* skip) const
     {
 	if(quantity4 == Spell::HAUNT)
 	{
-    	    const Sprite & anime_sprite = AGG::GetICN(ICN::OBJNHAUN,  Maps::AnimationTicket() % 15);
+    	    const Sprite & anime_sprite = AGG::GetICN(ICN::OBJNHAUN,  Game::MapsAnimationFrame() % 15);
 	    area.BlitOnTile(dst, anime_sprite, mp);
 	}
 	else
@@ -845,7 +845,7 @@ void Maps::Tiles::RedrawTop(Surface & dst, const TilesAddon* skip) const
 		area.BlitOnTile(dst, sprite, mp);
 
 		// possible anime
-		if(const u16 anime_index = ICN::AnimationFrame(icn, index, Maps::AnimationTicket()))
+		if(const u16 anime_index = ICN::AnimationFrame(icn, index, Game::MapsAnimationFrame()))
 		{
 		    const Sprite & anime_sprite = AGG::GetICN(icn, anime_index);
 		    area.BlitOnTile(dst, anime_sprite, mp);
@@ -881,7 +881,7 @@ void Maps::Tiles::RedrawTop4Hero(Surface & dst, bool skip_ground) const
 		area.BlitOnTile(dst, sprite, mp);
 
 		// possible anime
-		if(const u16 anime_index = ICN::AnimationFrame(icn, index, Maps::AnimationTicket()))
+		if(const u16 anime_index = ICN::AnimationFrame(icn, index, Game::MapsAnimationFrame()))
 		{
 		    const Sprite & anime_sprite = AGG::GetICN(icn, anime_index);
 		    area.BlitOnTile(dst, anime_sprite, mp);

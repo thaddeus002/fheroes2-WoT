@@ -54,7 +54,7 @@ namespace GameStatic
     extern u16 spell_dd_hp;
 }
 
-static spellstats_t spells[] = {
+spellstats_t spells[] = {
 	//  name                      sp   mp  spr value  bits cost     description
 	{ "Unknown",                    0, 0,  0,     0, 0, COST_NONE,  "Unknown spell." },
 	{ _("Fireball"),                9, 0,  8,    10, 0, COST_NONE,  _("Causes a giant fireball to strike the selected area, damaging all nearby creatures.") },

@@ -25,7 +25,7 @@
 
 namespace TIL
 {
-    static const struct
+    const struct
     {
 	til_t type;
 	const char* string;

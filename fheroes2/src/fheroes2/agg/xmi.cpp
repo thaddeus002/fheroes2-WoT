@@ -24,7 +24,7 @@
 
 namespace XMI
 {
-    static const struct
+    const struct
     {
 	xmi_t type;
 	const char* string;

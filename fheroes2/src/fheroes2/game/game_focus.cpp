@@ -33,7 +33,7 @@
 
 namespace Game
 {
-    static Focus gfocus[KINGDOMMAX+1];
+    Focus gfocus[KINGDOMMAX+1];
 }
 
 Game::Focus::Focus() : castle(NULL), heroes(NULL)

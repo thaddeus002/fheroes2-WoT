@@ -65,9 +65,11 @@ namespace Game
     void HotKeysDefaults(void);
     void HotKeysLoad(const std::string &);
 
-    static u16 reserved_vols[LOOPXX_COUNT];
-
-    static char** argv = NULL;
+    u16		reserved_vols[LOOPXX_COUNT];
+    char**	argv = NULL;
+    u8		current_music = MUS::UNKNOWN;
+    u32		castle_animation_frame = 0;
+    u32		maps_animation_frame = 0;
 }
 
 Game::menu_t Game::Testing(u8 t)
@@ -137,6 +139,26 @@ void Game::Init(char** ptr)
 
     if(FilePresent(hotkeys))
 	Game::HotKeysLoad(hotkeys);
+}
+
+u8 Game::CurrentMusic(void)
+{
+    return current_music;
+}
+
+void Game::SetCurrentMusic(u8 mus)
+{
+    current_music = mus;
+}
+
+u32 & Game::MapsAnimationFrame(void)
+{
+    return maps_animation_frame;
+}
+
+u32 & Game::CastleAnimationFrame(void)
+{
+    return castle_animation_frame;
 }
 
 void Game::SetFixVideoMode(void)

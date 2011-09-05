@@ -30,11 +30,6 @@
 #include "difficulty.h"
 #include "maps_tiles.h"
 
-namespace Maps
-{
-    static u32 animation_ticket = 0;
-}
-
 const char* Maps::SizeString(u16 s)
 {
     const char* mapsize[] = { "Unknown", _("maps|Small"), _("maps|Medium"), _("maps|Large"), _("maps|Extra Large"), "size256", "size320" };
@@ -66,16 +61,6 @@ const char* Maps::GetMinesName(u8 type)
     }
 
     return _("Mine");
-}
-
-u32 Maps::AnimationTicket(void)
-{
-    return animation_ticket;
-}
-
-void Maps::IncreaseAnimationTicket(void)
-{
-    ++animation_ticket;
 }
 
 s32 Maps::GetDirectionIndex(s32 from, u16 vector)

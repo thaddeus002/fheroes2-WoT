@@ -38,7 +38,7 @@ struct profitstats_t
     cost_t cost;
 };
 
-static profitstats_t _profits[] = {
+profitstats_t _profits[] = {
     { "castle",  {1000, 0, 0, 0, 0, 0, 0 } },
     { "town",    { 250, 0, 0, 0, 0, 0, 0 } },
     { "statue",  { 250, 0, 0, 0, 0, 0, 0 } },

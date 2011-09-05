@@ -1025,7 +1025,8 @@ Game::menu_t Game::HumanTurn(bool isload)
 	// slow maps objects animation
         if(AnimateInfrequent(MAPS_DELAY))
 	{
-	    Maps::IncreaseAnimationTicket();
+	    u32 & frame = Game::MapsAnimationFrame();
+	    ++frame;
 	    I.SetRedraw(REDRAW_GAMEAREA);
 	}
 

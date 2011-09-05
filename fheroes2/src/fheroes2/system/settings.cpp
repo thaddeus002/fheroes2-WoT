@@ -102,7 +102,7 @@ struct settings_t
 };
 
 // external settings
-static const settings_t settingsGeneral[] =
+const settings_t settingsGeneral[] =
 {
     { GLOBAL_SOUND,       "sound",        },
     { GLOBAL_MUSIC_MIDI,  "music",        },
@@ -117,7 +117,7 @@ static const settings_t settingsGeneral[] =
 };
 
 // internal settings
-static const settings_t settingsFHeroes2[] =
+const settings_t settingsFHeroes2[] =
 {
     { Settings::GAME_SAVE_REWRITE_CONFIRM,	_("game: always confirm for rewrite savefile"),		},
     { Settings::GAME_ALSO_CONFIRM_AUTOSAVE,	_("game: also confirm autosave"),			},

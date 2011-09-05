@@ -96,7 +96,7 @@ struct skillvalues_t
     level_t values;
 };
 
-static skillstats_t _skillstats[] = {
+skillstats_t _skillstats[] = {
     { "knight",      { 1, 1, 1, 1 }, { 2, 2, 1, 1 }, 0, 0, { 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0 }, 10, {35,45,10,10 }, {25,25,25,25 }, { 2, 4, 3, 1, 3, 5, 3, 1, 1, 2, 0, 3, 2, 2 } },
     { "barbarian",   { 1, 1, 1, 1 }, { 3, 1, 1, 1 }, 0, 0, { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0 }, 10, {55,35, 5, 5 }, {30,30,20,20 }, { 3, 3, 2, 1, 2, 3, 3, 2, 1, 3, 0, 4, 4, 1 } },
     { "sorceress",   { 0, 0, 2, 2 }, { 0, 0, 2, 3 }, 1,15, { 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 1 }, 10, {10,10,30,50 }, {20,20,30,30 }, { 3, 3, 2, 2, 2, 1, 2, 3, 3, 4, 0, 2, 1, 4 } },
@@ -106,7 +106,7 @@ static skillstats_t _skillstats[] = {
     { NULL,          { 0, 0, 0, 0 }, { 0, 0, 0, 0 }, 0, 0, { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }, 10, { 0, 0, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 } }
 };
 
-static skillvalues_t _skillvalues[] = {
+skillvalues_t _skillvalues[] = {
     { "pathfinding", { 25, 50,100} },
     { "archery",     { 10, 25, 50} },
     { "logistics",   { 10, 20, 30} },
@@ -124,7 +124,7 @@ static skillvalues_t _skillvalues[] = {
     { NULL,          {  0,  0,  0} },
 };
 
-static secondary_t _from_witchs_hut = {
+secondary_t _from_witchs_hut = {
     /* archery */   1, /* ballistics */ 1, /* diplomacy */ 1, /* eagleeye */    1,
     /* estates */   1, /* leadership */ 0, /* logistics */ 1, /* luck */        1,
     /* mysticism */ 1, /* navigation */ 1, /* necromancy*/ 0, /* pathfinding */ 1,

@@ -26,7 +26,7 @@
 
 namespace M82
 {
-    static const struct
+    const struct
     {
 	m82_t type;
     	const char* string;

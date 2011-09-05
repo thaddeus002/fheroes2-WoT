@@ -43,7 +43,7 @@ void GetLinePoints(const Point & pt1, const Point & pt2, u16 step, std::vector<P
 
 namespace Battle2
 {
-    static MonsterInfo monsters_info[] = {
+    MonsterInfo monsters_info[] = {
 
 	{ ICN::UNKNOWN , { 0, 0}, { 0, 0}, { 0, 0}, { 0, 0}, { 0, 0}, { 0, 0}, { 0, 0}, { 0, 0}, { 0, 0}, { 0, 0}, { 0, 0}, { 0, 0}, { 0, 0}, { 0, 0}, { 0, 0}, M82::UNKNOWN, M82::UNKNOWN, M82::UNKNOWN, M82::UNKNOWN },
 
@@ -134,7 +134,7 @@ namespace Battle2
 	{ ICN::UNKNOWN , { 0, 0}, { 0, 0}, { 0, 0}, { 0, 0}, { 0, 0}, { 0, 0}, { 0, 0}, { 0, 0}, { 0, 0}, { 0, 0}, { 0, 0}, { 0, 0}, { 0, 0}, { 0, 0}, { 0, 0}, M82::UNKNOWN, M82::UNKNOWN, M82::UNKNOWN, M82::UNKNOWN },
     };
 
-    static u8 genie_enemy_half_percent = 10;
+    u8 genie_enemy_half_percent = 10;
 }
 
 void Battle2::UpdateMonsterAttributes(const std::string & spec)

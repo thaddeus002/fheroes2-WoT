@@ -44,7 +44,7 @@ namespace ICN
         const char* string;
     };
 
-    static const icnmap_t icnmap[] = {
+    const icnmap_t icnmap[] = {
 	{ ADVBORDE,	"ADVBORDE.ICN" },
 	{ ADVBORD,	"ADVBORD.ICN" },
 	{ ADVBTNS,	"ADVBTNS.ICN" },

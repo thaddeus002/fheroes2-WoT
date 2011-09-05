@@ -54,7 +54,7 @@ struct monstats_t
 
 namespace
 {
-    static monstats_t monsters[] = {
+    monstats_t monsters[] = {
 	{     0,   0,   0,   0,   0,  Speed::VERYSLOW,   0,     0,    "Unknown Monster", "Unknown Monsters" , { 0, 0, 0, 0, 0, 0, 0} },
 
 	// atck dfnc  min  max   hp             speed grwn  shots  name                  multiname             cost

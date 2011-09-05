@@ -46,7 +46,7 @@ struct buildstats_t
     cost_t      cost;
 };
 
-static buildstats_t _builds[] = {
+buildstats_t _builds[] = {
     // id                                             gold wood mercury ore sulfur crystal gems
     { "thieves_guild", BUILD_THIEVESGUILD, Race::ALL, { 750, 5, 0, 0, 0, 0, 0 } },
     { "tavern",        BUILD_TAVERN,       Race::ALL, { 500, 5, 0, 0, 0, 0, 0 } },
