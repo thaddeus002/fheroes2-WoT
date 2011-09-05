@@ -370,8 +370,7 @@ bool FH2RemoteClient::ConnectionChat(void)
 
     // send banner
     std::ostringstream banner;
-    banner << "Free Heroes II Server, version: " << static_cast<int>(conf.MajorVersion()) <<
-					"." << static_cast<int>(conf.MinorVersion()) << std::endl;
+    banner << "Free Heroes II Server, version: " << Settings::GetVersion() << std::endl;
     packet.Reset();
     packet.SetID(MSG_READY);
     packet.Push(banner.str());

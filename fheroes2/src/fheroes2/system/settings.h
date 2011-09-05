@@ -39,11 +39,12 @@
 #include <android/log.h>
 #endif
 
+#define FORMAT_VERSION_2522 0x09DA
 #define FORMAT_VERSION_2494 0x09BE
 #define FORMAT_VERSION_2487 0x09B7
 #define FORMAT_VERSION_2460 0x099C
 #define FORMAT_VERSION_2379 0x094B
-#define CURRENT_FORMAT_VERSION FORMAT_VERSION_2494
+#define CURRENT_FORMAT_VERSION FORMAT_VERSION_2522
 #define LAST_FORMAT_VERSION FORMAT_VERSION_2379
 
 #define ListMapsDirectory std::list<std::string>
@@ -209,8 +210,6 @@ public:
     Maps::FileInfo & CurrentFileInfo(void);
     const Maps::FileInfo & CurrentFileInfo(void) const;
 
-    u8 MajorVersion(void) const;
-    u8 MinorVersion(void) const;
     u16 Debug(void) const;
     u8 HeroesMoveSpeed(void) const;
     u8 AIMoveSpeed(void) const;
@@ -218,7 +217,6 @@ public:
     u8 ScrollSpeed(void) const;
     u32 MemoryLimit(void) const;
 
-    const std::string & BuildVersion(void) const;
     const std::string & DataDirectory(void) const;
     const std::string & LocalPrefix(void) const;
     const std::string & PlayMusCommand(void) const;
@@ -408,6 +406,8 @@ public:
     u32 LossMapsIndexObject(void) const;
     u16 LossCountDays(void) const;
 
+    static std::string GetVersion(void);
+
 protected:
     void Parse(const std::string & left, const std::string & right);
     void PostLoad(void);
@@ -425,9 +425,6 @@ private:
     BitModes opt_world;
     BitModes opt_addons;
 
-    const u8 major_version;
-    const u8 minor_version;
-    std::string svn_version;
     u16 debug;
 
     Size video_mode;

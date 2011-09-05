@@ -65,7 +65,7 @@ int PrintHelp(const char *basename)
 
 std::string GetCaption(void)
 {
-    return std::string("Free Heroes II, " + Settings::Get().BuildVersion());
+    return std::string("Free Heroes II, version: " + Settings::GetVersion());
 }
 
 bool RunEditor(const char* name)
@@ -79,7 +79,7 @@ int main(int argc, char **argv)
 	Settings & conf = Settings::Get();
 	int test = 0;
 
-	DEBUG(DBG_ALL, DBG_INFO, "Free Heroes II, " + conf.BuildVersion());
+	DEBUG(DBG_ALL, DBG_INFO, "Free Heroes II, " + conf.GetVersion());
 
 	LoadConfigFiles(conf, GetDirname(argv[0]));
 
@@ -135,7 +135,7 @@ int main(int argc, char **argv)
             subsystem |= INIT_CDROM | INIT_AUDIO;
 #endif
 #ifdef WITH_NET
-        Network::SetProtocolVersion(static_cast<u16>((conf.MajorVersion() << 8)) | conf.MinorVersion());
+        Network::SetProtocolVersion(static_cast<u16>(MAJOR_VERSION << 8) | MINOR_VERSION);
 #endif
 
 	if(SDL::Init(subsystem))

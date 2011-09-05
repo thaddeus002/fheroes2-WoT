@@ -145,7 +145,7 @@ Game::menu_t PocketPC::NewGame(void)
     text.Set("Free Heroes II", Font::YELLOW_BIG);
     text.Blit(dst_pt.x + (src_rt.w - text.w()) / 2, dst_pt.y + 12);
 
-    text.Set(conf.BuildVersion(), Font::YELLOW_SMALL);
+    text.Set(conf.GetVersion(), Font::YELLOW_SMALL);
     text.Blit(dst_pt.x + (src_rt.w - text.w()) / 2, dst_pt.y + 148);
 
     text.Set(_("Standard Game"), Font::BIG);
@@ -210,7 +210,7 @@ Game::menu_t PocketPC::NewMulti(void)
     text.Set("Free Heroes II", Font::YELLOW_BIG);
     text.Blit(dst_pt.x + (src_rt.w - text.w()) / 2, dst_pt.y + 12);
 
-    text.Set(conf.BuildVersion(), Font::YELLOW_SMALL);
+    text.Set(conf.GetVersion(), Font::YELLOW_SMALL);
     text.Blit(dst_pt.x + (src_rt.w - text.w()) / 2, dst_pt.y + 148);
 
     text.Set(_("Hot Seat"), Font::BIG);

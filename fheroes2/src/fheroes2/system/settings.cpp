@@ -184,25 +184,27 @@ const settings_t settingsFHeroes2[] =
     { 0, NULL },
 };
 
-/* constructor */
-Settings::Settings() : major_version(MAJOR_VERSION), minor_version(MINOR_VERSION),
+std::string Settings::GetVersion(void)
+{
+    std::ostringstream os;
+
+    os << static_cast<int>(MAJOR_VERSION) << "." << static_cast<int>(MINOR_VERSION) << "."
 #ifdef SVN_REVISION
-    svn_version(SVN_REVISION),
+    SVN_REVISION <<
+#else
+    "0000" <<
 #endif
-    debug(DEFAULT_DEBUG), video_mode(0, 0), game_difficulty(Difficulty::NORMAL),
+    "." << CURRENT_FORMAT_VERSION;
+
+    return os.str();
+}
+
+/* constructor */
+Settings::Settings() : debug(DEFAULT_DEBUG), video_mode(0, 0), game_difficulty(Difficulty::NORMAL),
     path_data_directory("data"), font_normal("dejavusans.ttf"), font_small("dejavusans.ttf"), force_lang("en"), size_normal(15), size_small(10),
     sound_volume(6), music_volume(6), heroes_speed(DEFAULT_SPEED_DELAY), ai_speed(DEFAULT_SPEED_DELAY), scroll_speed(SCROLL_NORMAL), battle_speed(DEFAULT_SPEED_DELAY),
     game_type(0), preferably_count_players(0), port(DEFAULT_PORT), memory_limit(0)
 {
-    build_version = "version: ";
-    String::AddInt(build_version, MAJOR_VERSION);
-    build_version += ".";
-    String::AddInt(build_version, MINOR_VERSION);
-    if(svn_version.size())
-    {
-	build_version += "." + svn_version;
-    }
-
     // default maps dir
     list_maps_directory.push_back("maps");
 
@@ -578,7 +580,7 @@ std::string Settings::String(void) const
 {
     std::ostringstream os;
 
-    os << "# fheroes2 config, version " << static_cast<int>(major_version) << "." << static_cast<int>(minor_version) << "." << svn_version << std::endl;
+    os << "# fheroes2 config, version: " << GetVersion() << std::endl;
     os << "data = " << path_data_directory << std::endl;
 
     for(ListMapsDirectory::const_iterator
@@ -657,12 +659,6 @@ Maps::FileInfo & Settings::CurrentFileInfo(void)
     return current_maps_file;
 }
 
-/* return major version */
-u8 Settings::MajorVersion(void) const { return major_version; }
-
-/* return minor version */
-u8 Settings::MinorVersion(void) const { return minor_version; }
-
 /* return debug */
 u16 Settings::Debug(void) const { return debug; }
 
@@ -682,8 +678,6 @@ u8 Settings::FontsNormalSize(void) const { return size_normal; }
 u8 Settings::FontsSmallSize(void) const { return size_small; }
 bool Settings::FontSmallRenderBlended(void) const { return opt_global.Modes(GLOBAL_FONTRENDERBLENDED1); }
 bool Settings::FontNormalRenderBlended(void) const { return opt_global.Modes(GLOBAL_FONTRENDERBLENDED2); }
-
-const std::string & Settings::BuildVersion(void) const { return build_version; }
 
 /* return path to data directory */
 const std::string & Settings::DataDirectory(void) const { return path_data_directory; }

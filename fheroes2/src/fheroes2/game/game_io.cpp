@@ -183,10 +183,7 @@ bool Game::IO::SaveBIN(QueueMessage & msg)
     // format version
     msg.Push(static_cast<u16>(CURRENT_FORMAT_VERSION));
     // version
-    msg.Push(conf.major_version);
-    msg.Push(conf.minor_version);
-    // svn
-    msg.Push(conf.svn_version);
+    msg.Push(conf.GetVersion());
     // time
     msg.Push(static_cast<u32>(std::time(NULL)));
     // lang
@@ -726,13 +723,19 @@ bool Game::IO::LoadBIN(QueueMessage & msg)
     }
 
 
-    // major version
-    msg.Pop(byte8);
-    // minor version
-    msg.Pop(byte8);
+    if(format < FORMAT_VERSION_2522)
+    {
+	// major version
+        msg.Pop(byte8);
+	// minor version
+        msg.Pop(byte8);
+    }
 
-    // svn
-    msg.Pop(conf.svn_version);
+    // version
+    msg.Pop(str);
+
+    DEBUG(DBG_GAME, DBG_INFO, "version: " << str);
+
     // time
     msg.Pop(byte32);
     // lang

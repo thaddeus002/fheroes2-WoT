@@ -156,7 +156,7 @@ int Network::RunDedicatedServer(void)
 {
     Settings & conf = Settings::Get();
 
-    Network::SetProtocolVersion(static_cast<u16>((conf.MajorVersion() << 8)) | conf.MinorVersion());
+    Network::SetProtocolVersion(static_cast<u16>(MAJOR_VERSION << 8) | MINOR_VERSION);
     
     if(SDL::Init(INIT_TIMER))
     try
