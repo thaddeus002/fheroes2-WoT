@@ -86,7 +86,11 @@ Game::menu_t Game::Credits(void)
 {
     const Settings & conf = Settings::Get();
 
-    std::string str = conf.GetVersion();
+    std::string str;
+    str.reserve(200);
+
+    str.append("version: ");
+    str.append(conf.GetVersion());
     str.append(", AI engine: ");
     str.append(AI::Type());
     str.append("\n \n");
