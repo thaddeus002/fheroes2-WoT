@@ -186,6 +186,8 @@ void Castle::LoadFromMP2(const void *ptr)
 	army.At(4).SetCount(byte16);
 	++ptr8;
 	++ptr8;
+
+	SetModes(CUSTOMARMY);
     }
     else
     {
@@ -263,9 +265,9 @@ void Castle::LoadFromMP2(const void *ptr)
     // educate heroes and captain
     EducateHeroes();
 
-    // AI troops auto pack
-    if(!custom_troops && (CONTROL_AI & GetControl()))
-	JoinRNDArmy();
+    // AI troops auto pack for gray towns
+    if(Color::NONE == GetColor() &&
+	!Modes(CUSTOMARMY)) JoinRNDArmy();
 
     // fix shipyard
     if(!HaveNearlySea()) building &= ~(BUILD_SHIPYARD);
@@ -410,6 +412,10 @@ void Castle::ActionNewWeek(void)
 		    break;
 	    }
 	}
+
+        // neutral town: small increase garrisons (random)
+        if(Color::NONE == GetColor() &&
+		!Modes(CUSTOMARMY)) JoinRNDArmy();
     }
 }
 
@@ -445,10 +451,6 @@ void Castle::ActionNewMonth(void)
 	    break;
 	}
     }
-
-    // neutral town: small increase garrisons (random)
-    if(world.GetWeekType().GetType() != Week::PLAGUE &&
-	1 < world.GetDay() && Color::NONE == GetColor()) JoinRNDArmy();
 }
 
 // change castle color
@@ -1828,7 +1830,7 @@ bool Castle::AllowBuyBoat(void) const
 bool Castle::BuyBoat(void)
 {
     if(!AllowBuyBoat()) return false;
-    if(CONTROL_HUMAN & world.GetKingdom(color).GetControl()) AGG::PlaySound(M82::BUILDTWN);
+    if(CONTROL_HUMAN & GetControl()) AGG::PlaySound(M82::BUILDTWN);
 
     const s32 index = GetIndex() + world.w() * 2;
     Maps::Tiles & left = world.GetTiles(index - 1);
@@ -1871,7 +1873,8 @@ bool Castle::BuyBoat(void)
 
 u8 Castle::GetControl(void) const
 {
-    return world.GetKingdom(color).GetControl();
+    /* gray towns: ai control */
+    return GetColor() & Color::ALL ? world.GetKingdom(color).GetControl() : CONTROL_AI;
 }
 
 bool Castle::isNecromancyShrineBuild(void) const
