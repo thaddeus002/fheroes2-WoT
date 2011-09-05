@@ -1,5 +1,12 @@
-latest (2503 rev.)
+latest (2520 rev.)
 
++ Added: option: castle: allow recruits special/expansion heroes
++ Update: battle: Army::Dialog: added spell duration info
++ Update: QuickDialog for hero, disable show level for enemy hero
++ Fixed: hotseat: view AI move for all local players, unions: fixed maps view
++ Fixed: game: crash select maps, remove old save format support
++ Fixed: maps: RemoveJail, top cell object
++ Fixed: castle: neutral army present
 + Fixed: game: update QuickDialog view Castle::Army or Heroes::Army with Scoute Skill
 + Fixed: game: Game::CountScoute, add round values
 + Fixed: heroes: Heroes::GetFreeman, Heroes::isFreeman
