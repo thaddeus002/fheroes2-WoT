@@ -145,7 +145,9 @@ namespace Maps
 	void SetQuantity3(u8 val){ quantity3 = val; }
 	void SetQuantity4(u8 val){ quantity4 = val; }
 	void ResetQuantity(void);
-	void SetObject(MP2::object_t object){ mp2_object = object; }
+
+	void SetObject(MP2::object_t object);
+	void FixObject(void);
 
 	void UpdateQuantity(void);
 	bool ValidQuantity(void) const;

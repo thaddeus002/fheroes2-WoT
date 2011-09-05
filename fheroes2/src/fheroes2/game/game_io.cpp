@@ -1079,6 +1079,8 @@ void Game::IO::UnpackTile(QueueMessage & msg, Maps::Tiles & tile, u16 check_vers
     UnpackTileAddons(msg, tile.addons_level1, check_version);
     // addons 2
     UnpackTileAddons(msg, tile.addons_level2, check_version);
+
+    tile.FixObject();
 }
 
 void Game::IO::UnpackTileAddons(QueueMessage & msg, Maps::Addons & addons, u16 check_version)

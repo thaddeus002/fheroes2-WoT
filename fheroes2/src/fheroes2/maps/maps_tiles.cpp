@@ -658,8 +658,8 @@ void Maps::Tiles::RedrawBottom(Surface & dst, bool skip_objs) const
 	{
 	    // skip
 	    if(skip_objs &&
-		MP2::isRemoveObject(mp2_object) &&
-		FindObject(mp2_object) == &(*it1)) continue;
+		MP2::isRemoveObject(GetObject()) &&
+		FindObject(GetObject()) == &(*it1)) continue;
 
 	    const u8 & object = (*it1).object;
 	    const u8 & index  = (*it1).index;
@@ -683,7 +683,7 @@ void Maps::Tiles::RedrawBottom(Surface & dst, bool skip_objs) const
 
 void Maps::Tiles::RedrawObjects(Surface & dst) const
 {
-    switch(mp2_object)
+    switch(GetObject())
     {
         // boat
         case MP2::OBJ_BOAT:	RedrawBoat(dst); break;
@@ -809,7 +809,7 @@ void Maps::Tiles::RedrawTop(Surface & dst, const TilesAddon* skip) const
     if(!(area.GetRectMaps() & mp)) return;
 
     // fix for haut mine
-    if(MP2::OBJ_MINES == mp2_object)
+    if(MP2::OBJ_MINES == GetObject())
     {
 	if(quantity4 == Spell::HAUNT)
 	{
@@ -934,8 +934,8 @@ std::string Maps::Tiles::String(void) const
 	"tile            : " << tile_sprite_index << std::endl <<
 	"ground          : " << Ground::String(GetGround()) << (isRoad() ? ", (road)" : "") << std::endl <<
 	"passable        : " << (isPassable(NULL, Direction::UNKNOWN, false) ? "true" : "false") << std::endl <<
-	"mp2 object      : " << "0x" << std::setw(2) << std::setfill('0') << static_cast<int>(mp2_object) <<
-				    ", (" << MP2::StringObject(mp2_object) << ")" << std::endl <<
+	"mp2 object      : " << "0x" << std::setw(2) << std::setfill('0') << static_cast<int>(GetObject()) <<
+				    ", (" << MP2::StringObject(GetObject()) << ")" << std::endl <<
 	"quantity 1      : " << static_cast<int>(quantity1) << std::endl <<
 	"quantity 2      : " << static_cast<int>(quantity2) << std::endl <<
 	"quantity 3      : " << static_cast<int>(quantity3) << std::endl <<
@@ -953,7 +953,7 @@ std::string Maps::Tiles::String(void) const
 	"----------------I--------" << std::endl;
 
     // extra obj info
-    switch(mp2_object)
+    switch(GetObject())
     {
 	// dwelling
         case MP2::OBJ_RUINS:
@@ -1018,6 +1018,23 @@ MP2::object_t Maps::Tiles::GetObject(void) const
     return static_cast<MP2::object_t>(mp2_object);
 }
 
+void Maps::Tiles::SetObject(MP2::object_t object)
+{
+    mp2_object = object;
+}
+
+void Maps::Tiles::FixObject(void)
+{
+    if(MP2::OBJ_ZERO == mp2_object)
+    {
+	if(addons_level1.end() != std::find_if(addons_level1.begin(), addons_level1.end(), TilesAddon::isArtifact))
+	    mp2_object = MP2::OBJ_ARTIFACT;
+	else
+	if(addons_level1.end() != std::find_if(addons_level1.begin(), addons_level1.end(), TilesAddon::isResource))
+	    mp2_object = MP2::OBJ_RESOURCE;
+    }
+}
+
 bool Maps::Tiles::GoodForUltimateArtifact(void) const
 {
     return Ground::WATER != Maps::Tiles::GetGround() && isPassable(NULL, Direction::UNKNOWN, true);
@@ -1037,7 +1054,7 @@ bool Maps::Tiles::isPassable(const Heroes* hero, Direction::vector_t direct, boo
        {
            if(Ground::WATER != Maps::Tiles::GetGround()) return false;
 
-           switch(mp2_object)
+           switch(GetObject())
            {
                case MP2::OBJ_BOAT:
                case MP2::OBJ_HEROES:   return false;
@@ -1049,7 +1066,7 @@ bool Maps::Tiles::isPassable(const Heroes* hero, Direction::vector_t direct, boo
        {
            if(Ground::WATER == Maps::Tiles::GetGround()) return false;
 
-           switch(mp2_object)
+           switch(GetObject())
            {
                case MP2::OBJ_HEROES:   return false;
 
@@ -1449,7 +1466,7 @@ void Maps::Tiles::CorrectFlags32(const u8 index, bool up)
 
 void Maps::Tiles::FixLoyaltyVersion(void)
 {
-    switch(mp2_object)
+    switch(GetObject())
     {
 	case MP2::OBJ_UNKNW_79:
         case MP2::OBJ_UNKNW_7A:
@@ -1473,7 +1490,7 @@ void Maps::Tiles::FixLoyaltyVersion(void)
 	    }
 
 	    if(MP2::OBJ_ZERO != newobj)
-		mp2_object = newobj;
+		SetObject(static_cast<MP2::object_t>(newobj));
 	    else
 	    {
 		DEBUG(DBG_GAME, DBG_WARN, "index: " << maps_index);
@@ -1504,9 +1521,9 @@ u8 Maps::Tiles::GetMinesType(void) const
 void Maps::Tiles::UpdateQuantity(void)
 {
     const TilesAddon * addon = NULL;
-    const Heroes* hero = mp2_object == MP2::OBJ_HEROES ? world.GetHeroes(maps_index) : NULL;
+    const Heroes* hero = GetObject() == MP2::OBJ_HEROES ? world.GetHeroes(maps_index) : NULL;
 
-    switch(hero ? hero->GetUnderObject() : mp2_object)
+    switch(hero ? hero->GetUnderObject() : GetObject())
     {
         case MP2::OBJ_WITCHSHUT:
             quantity1 = Skill::Secondary::RandForWitchsHut();
@@ -1826,7 +1843,7 @@ void Maps::Tiles::UpdateQuantity(void)
 
 bool Maps::Tiles::ValidQuantity(void) const
 {
-    if(MP2::isQuantityObject(mp2_object))
+    if(MP2::isQuantityObject(GetObject()))
 	    return quantity1 || quantity2;
 
     return false;
@@ -1834,9 +1851,9 @@ bool Maps::Tiles::ValidQuantity(void) const
 
 bool Maps::Tiles::OtherObjectsIsProtection(void) const
 {
-    u8 object = mp2_object;
+    u8 object = GetObject();
 
-    if(MP2::OBJ_HEROES == mp2_object && world.GetHeroes(maps_index))
+    if(MP2::OBJ_HEROES == GetObject() && world.GetHeroes(maps_index))
 	object = world.GetHeroes(maps_index)->GetUnderObject();
 
     switch(object)
@@ -1867,9 +1884,9 @@ bool Maps::Tiles::OtherObjectsIsProtection(void) const
 /* true: if protection or has guardians */
 bool Maps::Tiles::CaptureObjectIsProtection(u8 color) const
 {
-    u8 object = mp2_object;
+    u8 object = GetObject();
 
-    if(MP2::OBJ_HEROES == mp2_object)
+    if(MP2::OBJ_HEROES == GetObject())
     {
 	const Heroes* hero = world.GetHeroes(maps_index);
 	if(hero) object = hero->GetUnderObject();
@@ -1895,7 +1912,7 @@ void Maps::Tiles::RemoveObjectSprite(void)
 {
     const Maps::TilesAddon *addon = NULL;
 
-    switch(mp2_object)
+    switch(GetObject())
     {
 	case MP2::OBJ_WATERCHEST:
 	case MP2::OBJ_BOTTLE:
@@ -1905,7 +1922,7 @@ void Maps::Tiles::RemoveObjectSprite(void)
 	case MP2::OBJ_ANCIENTLAMP:
 	case MP2::OBJ_RESOURCE:
 	case MP2::OBJ_ARTIFACT:
-	case MP2::OBJ_CAMPFIRE:		addon = FindObject(mp2_object); break;
+	case MP2::OBJ_CAMPFIRE:		addon = FindObject(GetObject()); break;
 
 	case MP2::OBJ_JAIL:		RemoveJailSprite(); return;
 
@@ -1964,12 +1981,14 @@ void Maps::Tiles::RemoveJailSprite(void)
 	    const s32 top = Maps::GetDirectionIndex(maps_index, Direction::TOP);
 	    world.GetTiles(top).Remove(addon->uniq);
 	    world.GetTiles(top).SetObject(MP2::OBJ_ZERO);
+	    world.GetTiles(top).FixObject();
 
     	    // remove top left sprite
     	    if(Maps::isValidDirection(top, Direction::LEFT))
     	    {
 		world.GetTiles(Maps::GetDirectionIndex(top, Direction::LEFT)).Remove(addon->uniq);
 		world.GetTiles(Maps::GetDirectionIndex(top, Direction::LEFT)).SetObject(MP2::OBJ_ZERO);
+		world.GetTiles(Maps::GetDirectionIndex(top, Direction::LEFT)).FixObject();
 	    }
 	}
 
@@ -2020,7 +2039,7 @@ void Maps::Tiles::UpdateMonsterInfo(Tiles & tile)
 
     if(addon)
     {
-	switch(tile.mp2_object)
+	switch(tile.GetObject())
 	{
     	    case MP2::OBJ_RNDMONSTER:       addon->index = Monster::Rand().GetID(); break;
     	    case MP2::OBJ_RNDMONSTER1:      addon->index = Monster::Rand(Monster::LEVEL1).GetID(); break;
@@ -2033,7 +2052,7 @@ void Maps::Tiles::UpdateMonsterInfo(Tiles & tile)
 	// ICN::MONS32 start from PEASANT
         if(addon) addon->index = addon->index - 1;
 
-	tile.mp2_object = MP2::OBJ_MONSTER;
+	tile.SetObject(MP2::OBJ_MONSTER);
     }
 
     addon = tile.FindObject(MP2::OBJ_MONSTER);
@@ -2092,31 +2111,31 @@ void Maps::Tiles::UpdateAbandoneMineSprite(Tiles & tile)
     	    TilesAddon *mines = tile2.FindAddonLevel1(uniq);
 
 	    if(mines) TilesAddon::UpdateAbandoneMineRightSprite(*mines);
-	    if(tile2.mp2_object == MP2::OBJN_ABANDONEDMINE) tile2.mp2_object = MP2::OBJN_MINES;
+	    if(tile2.GetObject() == MP2::OBJN_ABANDONEDMINE) tile2.SetObject(MP2::OBJN_MINES);
 	}
     }
 
     if(Maps::isValidDirection(tile.maps_index, Direction::LEFT))
     {
         Tiles & tile2 = world.GetTiles(Maps::GetDirectionIndex(tile.maps_index, Direction::LEFT));
-	if(tile2.mp2_object == MP2::OBJN_ABANDONEDMINE) tile2.mp2_object = MP2::OBJN_MINES;
+	if(tile2.GetObject() == MP2::OBJN_ABANDONEDMINE) tile2.SetObject(MP2::OBJN_MINES);
     }
 
     if(Maps::isValidDirection(tile.maps_index, Direction::TOP))
     {
         Tiles & tile2 = world.GetTiles(Maps::GetDirectionIndex(tile.maps_index, Direction::TOP));
-	if(tile2.mp2_object == MP2::OBJN_ABANDONEDMINE) tile2.mp2_object = MP2::OBJN_MINES;
+	if(tile2.GetObject() == MP2::OBJN_ABANDONEDMINE) tile2.SetObject(MP2::OBJN_MINES);
 
 	if(Maps::isValidDirection(tile2.maps_index, Direction::LEFT))
 	{
     	    Tiles & tile3 = world.GetTiles(Maps::GetDirectionIndex(tile2.maps_index, Direction::LEFT));
-	    if(tile3.mp2_object == MP2::OBJN_ABANDONEDMINE) tile3.mp2_object = MP2::OBJN_MINES;
+	    if(tile3.GetObject() == MP2::OBJN_ABANDONEDMINE) tile3.SetObject(MP2::OBJN_MINES);
 	}
 
 	if(Maps::isValidDirection(tile2.maps_index, Direction::RIGHT))
 	{
     	    Tiles & tile3 = world.GetTiles(Maps::GetDirectionIndex(tile2.maps_index, Direction::RIGHT));
-	    if(tile3.mp2_object == MP2::OBJN_ABANDONEDMINE) tile3.mp2_object = MP2::OBJN_MINES;
+	    if(tile3.GetObject() == MP2::OBJN_ABANDONEDMINE) tile3.SetObject(MP2::OBJN_MINES);
 	}
     }
 }
@@ -2127,7 +2146,7 @@ void Maps::Tiles::UpdateRNDArtifactSprite(Tiles & tile)
     u8 index = 0;
     Artifact art;
 
-    switch(tile.mp2_object)
+    switch(tile.GetObject())
     {
         case MP2::OBJ_RNDARTIFACT:
             addon = tile.FindObject(MP2::OBJ_RNDARTIFACT);
@@ -2160,7 +2179,7 @@ void Maps::Tiles::UpdateRNDArtifactSprite(Tiles & tile)
     if(addon)
     {
         addon->index = index;
-        tile.mp2_object = MP2::OBJ_ARTIFACT;
+        tile.SetObject(MP2::OBJ_ARTIFACT);
 
         // replace shadow artifact
         if(Maps::isValidDirection(tile.maps_index, Direction::LEFT))
@@ -2180,7 +2199,7 @@ void Maps::Tiles::UpdateRNDResourceSprite(Tiles & tile)
     if(addon)
     {
         addon->index = Resource::GetIndexSprite(Resource::Rand());
-        tile.mp2_object = MP2::OBJ_RESOURCE;
+        tile.SetObject(MP2::OBJ_RESOURCE);
 
         // replace shadow artifact
         if(Maps::isValidDirection(tile.maps_index, Direction::LEFT))
