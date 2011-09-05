@@ -23,6 +23,7 @@
 #include <cstring>
 
 #include "resource.h"
+#include "mp2.h"
 #include "difficulty.h"
 #include "game_static.h"
 
@@ -64,6 +65,10 @@ namespace GameStatic
 
     // monsters
     float	monster_upgrade_ratio	= 1.0;
+
+    // visit objects mod:	OBJ_BUOY, OBJ_OASIS, OBJ_WATERINGHOLE, OBJ_TEMPLE, OBJ_GRAVEYARD, OBJ_DERELICTSHIP,
+    //			        OBJ_SHIPWRECK, OBJ_MERMAID, OBJ_FAERIERING, OBJ_FOUNTAIN, OBJ_IDOL, OBJ_PYRAMID
+    s8		objects_mod[] = { 1, 1, 1, 2, -1, -1, -1, 1, 1, 1, 1, -2 };
 }
 
 float GameStatic::GetMonsterUpgradeRatio(void)
@@ -134,6 +139,28 @@ u8 GameStatic::GetCastleGrownWeekOf(void)
 u8 GameStatic::GetCastleGrownMonthOf(void)
 {
     return castle_grown_month_of;
+}
+
+s8 GameStatic::ObjectVisitedModifiers(u8 obj)
+{
+    switch(obj)
+    {
+	case MP2::OBJ_BUOY:		return objects_mod[0];
+	case MP2::OBJ_OASIS:		return objects_mod[1];
+	case MP2::OBJ_WATERINGHOLE:	return objects_mod[2];
+	case MP2::OBJ_TEMPLE:		return objects_mod[3];
+	case MP2::OBJ_GRAVEYARD:	return objects_mod[4];
+	case MP2::OBJ_DERELICTSHIP:	return objects_mod[5];
+	case MP2::OBJ_SHIPWRECK:	return objects_mod[6];
+	case MP2::OBJ_MERMAID:		return objects_mod[7];
+	case MP2::OBJ_FAERIERING:	return objects_mod[8];
+	case MP2::OBJ_FOUNTAIN:		return objects_mod[9];
+	case MP2::OBJ_IDOL:		return objects_mod[10];
+	case MP2::OBJ_PYRAMID:		return objects_mod[11];
+	default: break;
+    }
+
+    return 0;
 }
 
 /*

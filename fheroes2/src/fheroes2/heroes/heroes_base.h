@@ -38,6 +38,8 @@ struct BattleOnly;
 
 namespace Army { class army_t; }
 
+enum { MDF_NONE, MDF_ATTACK, MDF_DEFENSE, MDF_POWER, MDF_KNOWLEDGE, MDF_MORALE, MDF_LUCK };
+
 class HeroBase : public Skill::Primary, public Maps::Position, public BitModes
 {
 public:
@@ -66,8 +68,8 @@ public:
     s8 GetDefenseModificator(std::string* = NULL) const;
     s8 GetPowerModificator(std::string* = NULL) const;
     s8 GetKnowledgeModificator(std::string* = NULL) const;
-    s8 GetMoraleModificator(bool, std::string* = NULL) const;
-    s8 GetLuckModificator(bool, std::string* = NULL) const;
+    s8 GetMoraleModificator(std::string* = NULL) const;
+    s8 GetLuckModificator(std::string* = NULL) const;
 
     u16 GetSpellPoints(void) const;
     bool HaveSpellPoints(const Spell &) const;

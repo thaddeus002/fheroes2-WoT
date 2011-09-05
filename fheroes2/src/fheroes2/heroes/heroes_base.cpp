@@ -32,30 +32,108 @@
 #include "settings.h"
 #include "heroes_base.h"
 
-typedef std::vector< std::pair<Artifact, s8> > ArtifactsModifiers;
-
-s8 GetResultModifiers(const ArtifactsModifiers & modifiers, const HeroBase & base, std::string* strs)
+s8 ArtifactsModifiersResult(u8 type, const u8* arts, u8 size, const HeroBase & base, std::string* strs)
 {
     s8 result = 0;
 
-    for(size_t ii = 0; ii < modifiers.size(); ++ii)
+    for(u8 ii = 0; ii < size; ++ii)
     {
-	const std::pair<Artifact, s8> & pair = modifiers[ii];
+	    const Artifact art(arts[ii]);
 
-        if(base.HasArtifact(pair.first))
-        {
-    	    result += pair.second;
-
-    	    if(strs)
+    	    if(art.isValid() && base.HasArtifact(art))
     	    {
-        	strs->append(pair.first.GetName());
-		StringAppendModifiers(*strs, pair.second);
-        	strs->append("\n");
+		s32 mod = art.ExtraValue();
+
+		switch(art())
+		{
+		    // power
+		    case Artifact::BROACH_SHIELDING:	if(type == MDF_POWER) mod = -2; break;
+		    // morale/luck
+		    case Artifact::BATTLE_GARB:		if(type == MDF_MORALE || type == MDF_LUCK) mod = 10; break;
+		    case Artifact::MASTHEAD:		if(type == MDF_MORALE || type == MDF_LUCK) mod = base.Modes(Heroes::SHIPMASTER) ? art.ExtraValue() : 0; break;
+		    // morale
+		    case Artifact::FIZBIN_MISFORTUNE:	if(type == MDF_MORALE) mod = -art.ExtraValue(); break;
+		    default: break;
+		}
+
+    		result += mod;
+
+    		if(strs)
+    		{
+        	    strs->append(art.GetName());
+		    StringAppendModifiers(*strs, mod);
+        	    strs->append("\n");
+		}
 	    }
-	}
     }
 
     return result;
+}
+
+s8 ArtifactsModifiersAttack(const HeroBase & base, std::string* strs)
+{
+    const u8 arts[] = {
+            Artifact::SPIKED_HELM, Artifact::THUNDER_MACE, Artifact::GIANT_FLAIL,
+            Artifact::SWORD_BREAKER, Artifact::SPIKED_SHIELD, Artifact::POWER_AXE,
+            Artifact::LEGENDARY_SCEPTER, Artifact::DRAGON_SWORD, Artifact::ULTIMATE_CROWN,
+            Artifact::BATTLE_GARB, Artifact::SWORD_ANDURAN, Artifact::HOLY_HAMMER,
+            Artifact::ULTIMATE_SHIELD, Artifact::ULTIMATE_SWORD };
+
+    return ArtifactsModifiersResult(MDF_ATTACK, arts, sizeof(arts) / sizeof(u8), base, strs);
+}
+
+s8 ArtifactsModifiersDefense(const HeroBase & base, std::string* strs)
+{
+    const u8 arts[] = {
+	    Artifact::SPIKED_HELM, Artifact::ARMORED_GAUNTLETS, Artifact::DEFENDER_HELM,
+	    Artifact::SPIKED_SHIELD, Artifact::STEALTH_SHIELD, Artifact::LEGENDARY_SCEPTER,
+	    Artifact::DIVINE_BREASTPLATE, Artifact::ULTIMATE_CROWN,
+	    Artifact::SWORD_BREAKER, Artifact::BREASTPLATE_ANDURAN, Artifact::BATTLE_GARB,
+	    Artifact::ULTIMATE_SHIELD, Artifact::ULTIMATE_CLOAK };
+
+    return ArtifactsModifiersResult(MDF_DEFENSE, arts, sizeof(arts) / sizeof(u8), base, strs);
+}
+
+s8 ArtifactsModifiersPower(const HeroBase & base, std::string* strs)
+{
+    const u8 arts[] = {
+	    Artifact::WHITE_PEARL, Artifact::BLACK_PEARL, Artifact::CASTER_BRACELET,
+	    Artifact::MAGE_RING, Artifact::LEGENDARY_SCEPTER, Artifact::WITCHES_BROACH,
+	    Artifact::ARM_MARTYR, Artifact::ULTIMATE_CROWN, Artifact::ARCANE_NECKLACE,
+	    Artifact::BATTLE_GARB, Artifact::STAFF_WIZARDRY, Artifact::HELMET_ANDURAN,
+	    Artifact::ULTIMATE_STAFF, Artifact::ULTIMATE_WAND, Artifact::BROACH_SHIELDING };
+
+    return ArtifactsModifiersResult(MDF_POWER, arts, sizeof(arts) / sizeof(u8), base, strs);
+}
+
+s8 ArtifactsModifiersKnowledge(const HeroBase & base, std::string* strs)
+{
+    const u8 arts[] = {
+	    Artifact::WHITE_PEARL, Artifact::BLACK_PEARL, Artifact::MINOR_SCROLL,
+	    Artifact::MAJOR_SCROLL, Artifact::SUPERIOR_SCROLL, Artifact::FOREMOST_SCROLL,
+	    Artifact::LEGENDARY_SCEPTER, Artifact::ULTIMATE_CROWN,
+	    Artifact::ULTIMATE_STAFF, Artifact::ULTIMATE_BOOK };
+
+    return ArtifactsModifiersResult(MDF_KNOWLEDGE, arts, sizeof(arts) / sizeof(u8), base, strs);
+}
+
+s8 ArtifactsModifiersMorale(const HeroBase & base, std::string* strs)
+{
+    const u8 arts[] = {
+	    Artifact::MEDAL_VALOR, Artifact::MEDAL_COURAGE, Artifact::MEDAL_HONOR,
+	    Artifact::MEDAL_DISTINCTION, Artifact::BATTLE_GARB, Artifact::MASTHEAD,
+	    Artifact::FIZBIN_MISFORTUNE };
+
+    return ArtifactsModifiersResult(MDF_MORALE, arts, sizeof(arts) / sizeof(u8), base, strs);
+}
+
+s8 ArtifactsModifiersLuck(const HeroBase & base, std::string* strs)
+{
+    const u8 arts[] = {
+	    Artifact::RABBIT_FOOT, Artifact::GOLDEN_HORSESHOE, Artifact::GAMBLER_LUCKY_COIN,
+	    Artifact::FOUR_LEAF_CLOVER, Artifact::BATTLE_GARB, Artifact::MASTHEAD };
+
+    return ArtifactsModifiersResult(MDF_LUCK, arts, sizeof(arts) / sizeof(u8), base, strs);
 }
 
 HeroBase::HeroBase(u8 type, u8 race)
@@ -170,25 +248,7 @@ bool HeroBase::HasArtifact(const Artifact & art) const
 
 s8 HeroBase::GetAttackModificator(std::string* strs) const
 {
-    static ArtifactsModifiers modifiers;
-
-    if(modifiers.empty())
-    {
-	const Artifact arts[] = {
-	    Artifact::SPIKED_HELM, Artifact::THUNDER_MACE, Artifact::GIANT_FLAIL,
-	    Artifact::SWORD_BREAKER, Artifact::SPIKED_SHIELD, Artifact::POWER_AXE,
-	    Artifact::LEGENDARY_SCEPTER, Artifact::DRAGON_SWORD, Artifact::ULTIMATE_CROWN,
-	    Artifact::BATTLE_GARB, Artifact::SWORD_ANDURAN, Artifact::HOLY_HAMMER,
-	    Artifact::ULTIMATE_SHIELD, Artifact::ULTIMATE_SWORD };
-
-	const u8 size = sizeof(arts) / sizeof(Artifact);
-
-	modifiers.reserve(size);
-	for(u8 ii = 0; ii < size; ++ii) 
-	    modifiers.push_back(std::make_pair(arts[ii], arts[ii].ExtraValue()));
-    }
-
-    s8 result = GetResultModifiers(modifiers, *this, strs);
+    s8 result = ArtifactsModifiersAttack(*this, strs);
 
     // check castle modificator
     const Castle* castle = inCastle();
@@ -201,25 +261,7 @@ s8 HeroBase::GetAttackModificator(std::string* strs) const
 
 s8 HeroBase::GetDefenseModificator(std::string* strs) const
 {
-    static ArtifactsModifiers modifiers;
-
-    if(modifiers.empty())
-    {
-	const Artifact arts[] = {
-	    Artifact::SPIKED_HELM, Artifact::ARMORED_GAUNTLETS, Artifact::DEFENDER_HELM,
-	    Artifact::SPIKED_SHIELD, Artifact::STEALTH_SHIELD, Artifact::LEGENDARY_SCEPTER,
-	    Artifact::DIVINE_BREASTPLATE, Artifact::ULTIMATE_CROWN,
-	    Artifact::SWORD_BREAKER, Artifact::BREASTPLATE_ANDURAN, Artifact::BATTLE_GARB,
-	    Artifact::ULTIMATE_SHIELD, Artifact::ULTIMATE_CLOAK };
-
-	const u8 size = sizeof(arts) / sizeof(Artifact);
-
-	modifiers.reserve(size);
-	for(u8 ii = 0; ii < size; ++ii) 
-	    modifiers.push_back(std::make_pair(arts[ii], arts[ii].ExtraValue()));
-    }
-
-    s8 result = GetResultModifiers(modifiers, *this, strs);
+    s8 result = ArtifactsModifiersDefense(*this, strs);
 
     // check castle modificator
     const Castle* castle = inCastle();
@@ -232,27 +274,7 @@ s8 HeroBase::GetDefenseModificator(std::string* strs) const
 
 s8 HeroBase::GetPowerModificator(std::string* strs) const
 {
-    static ArtifactsModifiers modifiers;
-
-    if(modifiers.empty())
-    {
-	const Artifact arts[] = {
-	    Artifact::WHITE_PEARL, Artifact::BLACK_PEARL, Artifact::CASTER_BRACELET,
-	    Artifact::MAGE_RING, Artifact::LEGENDARY_SCEPTER, Artifact::WITCHES_BROACH,
-	    Artifact::ARM_MARTYR, Artifact::ULTIMATE_CROWN, Artifact::ARCANE_NECKLACE,
-	    Artifact::BATTLE_GARB, Artifact::STAFF_WIZARDRY, Artifact::HELMET_ANDURAN,
-	    Artifact::ULTIMATE_STAFF, Artifact::ULTIMATE_WAND };
-
-	const u8 size = sizeof(arts) / sizeof(Artifact);
-
-	modifiers.reserve(size + 1);
-	for(u8 ii = 0; ii < size; ++ii) 
-	    modifiers.push_back(std::make_pair(arts[ii], arts[ii].ExtraValue()));
-
-	modifiers.push_back(std::make_pair(Artifact(Artifact::BROACH_SHIELDING), -1));
-    }
-
-    s8 result = GetResultModifiers(modifiers, *this, strs);
+    s8 result = ArtifactsModifiersPower(*this, strs);
 
     // check castle modificator
     const Castle* castle = inCastle();
@@ -265,24 +287,7 @@ s8 HeroBase::GetPowerModificator(std::string* strs) const
 
 s8 HeroBase::GetKnowledgeModificator(std::string* strs) const
 {
-    static ArtifactsModifiers modifiers;
-
-    if(modifiers.empty())
-    {
-	const Artifact arts[] = {
-	    Artifact::WHITE_PEARL, Artifact::BLACK_PEARL, Artifact::MINOR_SCROLL,
-	    Artifact::MAJOR_SCROLL, Artifact::SUPERIOR_SCROLL, Artifact::FOREMOST_SCROLL,
-	    Artifact::LEGENDARY_SCEPTER, Artifact::ULTIMATE_CROWN,
-	    Artifact::ULTIMATE_STAFF, Artifact::ULTIMATE_BOOK };
-
-	const u8 size = sizeof(arts) / sizeof(Artifact);
-
-	modifiers.reserve(size);
-	for(u8 ii = 0; ii < size; ++ii) 
-	    modifiers.push_back(std::make_pair(arts[ii], arts[ii].ExtraValue()));
-    }
-
-    s8 result = GetResultModifiers(modifiers, *this, strs);
+    s8 result = ArtifactsModifiersKnowledge(*this, strs);
 
     // check castle modificator
     const Castle* castle = inCastle();
@@ -293,29 +298,9 @@ s8 HeroBase::GetKnowledgeModificator(std::string* strs) const
     return result;
 }
 
-s8 HeroBase::GetMoraleModificator(bool shipmaster, std::string* strs) const
+s8 HeroBase::GetMoraleModificator(std::string* strs) const
 {
-    ArtifactsModifiers modifiers;
-    Artifact art;
-
-    modifiers.reserve(7);
-
-    art = Artifact::MEDAL_VALOR;
-    modifiers.push_back(std::make_pair(art, art.ExtraValue()));
-    art = Artifact::MEDAL_COURAGE;
-    modifiers.push_back(std::make_pair(art, art.ExtraValue()));
-    art = Artifact::MEDAL_HONOR;
-    modifiers.push_back(std::make_pair(art, art.ExtraValue()));
-    art = Artifact::MEDAL_DISTINCTION;
-    modifiers.push_back(std::make_pair(art, art.ExtraValue()));
-    modifiers.push_back(std::make_pair(Artifact(Artifact::BATTLE_GARB), 10));
-
-    art = Artifact::MASTHEAD;
-    if(shipmaster) modifiers.push_back(std::make_pair(art, art.ExtraValue()));
-    art = Artifact::FIZBIN_MISFORTUNE;
-    modifiers.push_back(std::make_pair(art, -art.ExtraValue()));
-
-    s8 result = GetResultModifiers(modifiers, *this, strs);
+    s8 result = ArtifactsModifiersMorale(*this, strs);
 
     // check castle modificator
     const Castle* castle = inCastle();
@@ -335,26 +320,9 @@ s8 HeroBase::GetMoraleModificator(bool shipmaster, std::string* strs) const
     return result;
 }
 
-s8 HeroBase::GetLuckModificator(bool shipmaster, std::string* strs) const
+s8 HeroBase::GetLuckModificator(std::string* strs) const
 {
-    ArtifactsModifiers modifiers;
-    Artifact art;
-
-    modifiers.reserve(6);
-
-    art = Artifact::RABBIT_FOOT;
-    modifiers.push_back(std::make_pair(art, art.ExtraValue()));
-    art = Artifact::GOLDEN_HORSESHOE;
-    modifiers.push_back(std::make_pair(art, art.ExtraValue()));
-    art = Artifact::GAMBLER_LUCKY_COIN;
-    modifiers.push_back(std::make_pair(art, art.ExtraValue()));
-    art = Artifact::FOUR_LEAF_CLOVER;
-    modifiers.push_back(std::make_pair(art, art.ExtraValue()));
-    modifiers.push_back(std::make_pair(Artifact(Artifact::BATTLE_GARB), 10));
-    art = Artifact::MASTHEAD;
-    if(shipmaster) modifiers.push_back(std::make_pair(art, art.ExtraValue()));
-
-    s8 result = GetResultModifiers(modifiers, *this, strs);
+    s8 result = ArtifactsModifiersLuck(*this, strs);
 
     // check castle modificator
     const Castle* castle = inCastle();

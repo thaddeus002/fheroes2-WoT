@@ -74,27 +74,23 @@ const char* Heroes::GetName(heroes_t id)
     return names[id];
 }
 
-typedef std::vector< std::pair<MP2::object_t, s8> > ObjectVisitedModifiers;
-
-s8 GetResultModifiers(const ObjectVisitedModifiers & modifiers, const Heroes & hero, std::string* strs)
+s8 ObjectVisitedModifiersResult(u8 type, const u8* objs, u8 size, const Heroes & hero, std::string* strs)
 {
     s8 result = 0;
 
-    for(size_t ii = 0; ii < modifiers.size(); ++ii)
+    for(u8 ii = 0; ii < size; ++ii)
     {
-        const std::pair<MP2::object_t, s8> & pair = modifiers[ii];
-
-        if(hero.isVisited(pair.first))
-        {
-            result += pair.second;
+    	if(hero.isVisited(objs[ii]))
+    	{
+    	    result += GameStatic::ObjectVisitedModifiers(objs[ii]);
 
     	    if(strs)
     	    {
-		strs->append(MP2::StringObject(pair.first));
-		StringAppendModifiers(*strs, pair.second);
+		strs->append(MP2::StringObject(objs[ii]));
+		StringAppendModifiers(*strs, GameStatic::ObjectVisitedModifiers(objs[ii]));
 		strs->append("\n");
 	    }
-        }
+    	}
     }
 
     return result;
@@ -614,7 +610,7 @@ s8 Heroes::GetMoraleWithModificators(std::string *strs) const
     s8 result = Morale::NORMAL;
 
     // bonus artifact
-    result += GetMoraleModificator(isShipMaster(), strs);
+    result += GetMoraleModificator(strs);
 
     if(army.AllTroopsIsRace(Race::NECR)) return Morale::NORMAL;
 
@@ -622,19 +618,8 @@ s8 Heroes::GetMoraleWithModificators(std::string *strs) const
     result += Skill::GetLeadershipModifiers(GetLevelSkill(Skill::Secondary::LEADERSHIP), strs);
 
     // object visited
-    ObjectVisitedModifiers modifiers;
-    modifiers.reserve(7);
-
-    modifiers.push_back(std::make_pair(MP2::OBJ_BUOY, 1));
-    modifiers.push_back(std::make_pair(MP2::OBJ_OASIS, 1));
-    modifiers.push_back(std::make_pair(MP2::OBJ_WATERINGHOLE, 1));
-    modifiers.push_back(std::make_pair(MP2::OBJ_TEMPLE, 2));
-    modifiers.push_back(std::make_pair(MP2::OBJ_GRAVEYARD, -1));
-    modifiers.push_back(std::make_pair(MP2::OBJ_DERELICTSHIP, -1));
-    modifiers.push_back(std::make_pair(MP2::OBJ_SHIPWRECK, -1));
-
-    // global modificator
-    result += GetResultModifiers(modifiers, *this, strs);
+    const u8 objs [] = { MP2::OBJ_BUOY, MP2::OBJ_OASIS, MP2::OBJ_WATERINGHOLE, MP2::OBJ_TEMPLE, MP2::OBJ_GRAVEYARD, MP2::OBJ_DERELICTSHIP, MP2::OBJ_SHIPWRECK };
+    result += ObjectVisitedModifiersResult(MDF_MORALE, objs, sizeof(objs) / sizeof(u8), *this, strs);
 
     // result
     if(result < Morale::AWFUL)	return Morale::TREASON;
@@ -662,23 +647,14 @@ s8 Heroes::GetLuckWithModificators(std::string *strs) const
     s8 result = Luck::NORMAL;
 
     // bonus artifact
-    result += GetLuckModificator(isShipMaster(), strs);
+    result += GetLuckModificator(strs);
 
     // bonus luck
     result += Skill::GetLuckModifiers(GetLevelSkill(Skill::Secondary::LUCK), strs);
 
     // object visited
-    ObjectVisitedModifiers modifiers;
-    modifiers.reserve(5);
-
-    modifiers.push_back(std::make_pair(MP2::OBJ_MERMAID, 1));
-    modifiers.push_back(std::make_pair(MP2::OBJ_FAERIERING, 1));
-    modifiers.push_back(std::make_pair(MP2::OBJ_FOUNTAIN, 1));
-    modifiers.push_back(std::make_pair(MP2::OBJ_IDOL, 1));
-    modifiers.push_back(std::make_pair(MP2::OBJ_PYRAMID, -2));
-
-    // global modificator
-    result += GetResultModifiers(modifiers, *this, strs);
+    const u8 objs [] = { MP2::OBJ_MERMAID, MP2::OBJ_FAERIERING, MP2::OBJ_FOUNTAIN, MP2::OBJ_IDOL, MP2::OBJ_PYRAMID };
+    result += ObjectVisitedModifiersResult(MDF_LUCK, objs, sizeof(objs) / sizeof(u8), *this, strs);
 
     if(result < Luck::AWFUL)	return Luck::CURSED;
     else

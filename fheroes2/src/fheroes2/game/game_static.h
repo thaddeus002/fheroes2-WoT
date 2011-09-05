@@ -45,6 +45,7 @@ namespace GameStatic
     u8		GetMageGuildRestoreSpellPointsPercentDay(u8);
 
     float	GetMonsterUpgradeRatio(void);
+    s8		ObjectVisitedModifiers(u8);
 }
 
 #ifdef WITH_XML
