@@ -1714,6 +1714,7 @@ bool ICN::NeedMinify4PocketPC(icn_t icn, u16 index)
         case DISRRAY:
 	case MORALEG:
 	case MORALEB:
+	case EXPMRL:
 
 	// castle
         case CASTBKGB:
