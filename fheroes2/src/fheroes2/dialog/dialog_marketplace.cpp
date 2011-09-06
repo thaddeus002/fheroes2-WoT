@@ -92,6 +92,7 @@ void TradeWindowGUI::ShowTradeArea(u8 resourceFrom, u8 resourceTo, u32 max_buy, 
     if(resourceFrom == resourceTo || (Resource::GOLD != resourceTo && 0 == max_buy))
     {
         cursor.Hide();
+	splitter.Hide();
         back.Restore();
         Rect dst_rt(pos_rt.x, pos_rt.y + 30, pos_rt.w, 100);
         TextBox(_("You have received quite a bargain. I expect to make no profit on the deal. Can I interest you in any of my other wares?"), Font::BIG, dst_rt);
@@ -158,6 +159,7 @@ void TradeWindowGUI::ShowTradeArea(u8 resourceFrom, u8 resourceTo, u32 max_buy, 
         buttonRight.Draw();
 
         RedrawInfoBuySell(count_sell, count_buy);
+	splitter.Show();
         cursor.Show();
         display.Flip();
     }
@@ -272,7 +274,6 @@ void Dialog::Marketplace(bool fromTradingPost)
     Button buttonExit(dst_pt, tradpost, 17, 18);
 
     buttonExit.Draw();
-
     cursor.Show();
     display.Flip();
 
