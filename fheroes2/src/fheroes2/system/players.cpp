@@ -258,6 +258,7 @@ void Players::SetStartGame(void)
     for_each(begin(), end(), std::ptr_fun(&PlayerFixMultiControl));
 
     current_color = Color::NONE;
+    human_colors = Color::NONE;
 
     DEBUG(DBG_GAME, DBG_INFO, String());
 }
@@ -267,6 +268,23 @@ u8 Players::HumanColors(void)
     if(0 == human_colors)
 	human_colors = Settings::Get().GetPlayers().GetColors(CONTROL_HUMAN, true);
     return human_colors;
+}
+
+u8 Players::FriendColors(void)
+{
+    u8 colors = 0;
+    const Players & players = Settings::Get().GetPlayers();
+
+    if(players.current_color & Players::HumanColors())
+    {
+        const Player* player = players.GetCurrent();
+        if(player)
+            colors = player->friends;
+    }
+    else
+        colors = Players::HumanColors();
+
+    return colors;
 }
 
 std::string Players::String(void) const

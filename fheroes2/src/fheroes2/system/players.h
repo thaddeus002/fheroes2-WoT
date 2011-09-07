@@ -81,6 +81,7 @@ public:
     static void		SetPlayerRace(u8 color, u8 race);
     static void		SetPlayerControl(u8 color, u8 ctrl);
     static u8		HumanColors(void);
+    static u8 		FriendColors(void);
 
     u8		current_color;
 };

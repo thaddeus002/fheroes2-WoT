@@ -239,17 +239,7 @@ void Interface::GameArea::Redraw(Surface & dst, u8 flag, const Rect & rt) const
     // redraw fog
     if(flag & LEVEL_FOG)
     {
-	const Settings & conf = Settings::Get();
-	u8 colors = 0;
-
-        if(conf.CurrentColor() & Players::HumanColors())
-	{
-    	    const Player* player = conf.GetPlayers().GetCurrent();
-	    if(player)
-		colors = player->friends;
-	}
-	else
-	    colors = Players::HumanColors();
+	const u8 colors = Players::FriendColors();
 
 	for(s16 oy = rt.y; oy < rt.y + rt.h; ++oy)
 	    for(s16 ox = rt.x; ox < rt.x + rt.w; ++ox)

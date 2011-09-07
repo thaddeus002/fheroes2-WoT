@@ -192,7 +192,7 @@ void Interface::Radar::Redraw(void)
 
     if(!hide)
     {
-	RedrawArea(conf.CurrentColor());
+	RedrawArea(Players::FriendColors());
 	RedrawCursor();
     }
     else
