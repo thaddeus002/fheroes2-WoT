@@ -619,7 +619,7 @@ s8 Heroes::GetMoraleWithModificators(std::string *strs) const
 
     // object visited
     const u8 objs [] = { MP2::OBJ_BUOY, MP2::OBJ_OASIS, MP2::OBJ_WATERINGHOLE, MP2::OBJ_TEMPLE, MP2::OBJ_GRAVEYARD, MP2::OBJ_DERELICTSHIP, MP2::OBJ_SHIPWRECK };
-    result += ObjectVisitedModifiersResult(MDF_MORALE, objs, sizeof(objs) / sizeof(u8), *this, strs);
+    result += ObjectVisitedModifiersResult(MDF_MORALE, objs, ARRAY_COUNT(objs), *this, strs);
 
     // result
     if(result < Morale::AWFUL)	return Morale::TREASON;
@@ -654,7 +654,7 @@ s8 Heroes::GetLuckWithModificators(std::string *strs) const
 
     // object visited
     const u8 objs [] = { MP2::OBJ_MERMAID, MP2::OBJ_FAERIERING, MP2::OBJ_FOUNTAIN, MP2::OBJ_IDOL, MP2::OBJ_PYRAMID };
-    result += ObjectVisitedModifiersResult(MDF_LUCK, objs, sizeof(objs) / sizeof(u8), *this, strs);
+    result += ObjectVisitedModifiersResult(MDF_LUCK, objs, ARRAY_COUNT(objs), *this, strs);
 
     if(result < Luck::AWFUL)	return Luck::CURSED;
     else

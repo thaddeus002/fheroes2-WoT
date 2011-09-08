@@ -1035,7 +1035,7 @@ bool Settings::ExtModes(u32 f) const
 const char* Settings::ExtName(u32 f) const
 {
     const settings_t* ptr = std::find(settingsFHeroes2,
-		settingsFHeroes2 + sizeof(settingsFHeroes2) / sizeof(settings_t) - 1, f);
+		settingsFHeroes2 + ARRAY_COUNT(settingsFHeroes2) - 1, f);
 
     return ptr ? _(ptr->str) : NULL;
 }

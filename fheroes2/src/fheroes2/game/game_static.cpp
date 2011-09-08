@@ -83,7 +83,7 @@ u8 GameStatic::GetLostOnWhirlpoolPercent(void)
 
 u8 GameStatic::GetOverViewDistance(u8 d)
 {
-    return d >= sizeof(overview_distance) ? 0 : overview_distance[d];
+    return d >= ARRAY_COUNT(overview_distance) ? 0 : overview_distance[d];
 }
 
 u8 GameStatic::GetGameOverLostDays(void)

@@ -744,7 +744,7 @@ void Maps::Tiles::RedrawMonster(Surface & dst) const
 
 	// draw second sprite
 	const Sprite & sprite_next = AGG::GetICN(ICN::MINIMON, mons.GetSpriteIndex() * 9 + 1 + 
-	    monster_animation_cicle[ (Game::MapsAnimationFrame() + mp.x * mp.y) % (sizeof(monster_animation_cicle) / sizeof(monster_animation_cicle[0])) ]);
+	    monster_animation_cicle[ (Game::MapsAnimationFrame() + mp.x * mp.y) % ARRAY_COUNT(monster_animation_cicle) ]);
 	area.BlitOnTile(dst, sprite_next, sprite_next.x() + 16, TILEWIDTH + sprite_next.y(), mp);
     }
 }

@@ -79,7 +79,7 @@ s8 ArtifactsModifiersAttack(const HeroBase & base, std::string* strs)
             Artifact::BATTLE_GARB, Artifact::SWORD_ANDURAN, Artifact::HOLY_HAMMER,
             Artifact::ULTIMATE_SHIELD, Artifact::ULTIMATE_SWORD };
 
-    return ArtifactsModifiersResult(MDF_ATTACK, arts, sizeof(arts) / sizeof(u8), base, strs);
+    return ArtifactsModifiersResult(MDF_ATTACK, arts, ARRAY_COUNT(arts), base, strs);
 }
 
 s8 ArtifactsModifiersDefense(const HeroBase & base, std::string* strs)
@@ -91,7 +91,7 @@ s8 ArtifactsModifiersDefense(const HeroBase & base, std::string* strs)
 	    Artifact::SWORD_BREAKER, Artifact::BREASTPLATE_ANDURAN, Artifact::BATTLE_GARB,
 	    Artifact::ULTIMATE_SHIELD, Artifact::ULTIMATE_CLOAK };
 
-    return ArtifactsModifiersResult(MDF_DEFENSE, arts, sizeof(arts) / sizeof(u8), base, strs);
+    return ArtifactsModifiersResult(MDF_DEFENSE, arts, ARRAY_COUNT(arts), base, strs);
 }
 
 s8 ArtifactsModifiersPower(const HeroBase & base, std::string* strs)
@@ -103,7 +103,7 @@ s8 ArtifactsModifiersPower(const HeroBase & base, std::string* strs)
 	    Artifact::BATTLE_GARB, Artifact::STAFF_WIZARDRY, Artifact::HELMET_ANDURAN,
 	    Artifact::ULTIMATE_STAFF, Artifact::ULTIMATE_WAND, Artifact::BROACH_SHIELDING };
 
-    return ArtifactsModifiersResult(MDF_POWER, arts, sizeof(arts) / sizeof(u8), base, strs);
+    return ArtifactsModifiersResult(MDF_POWER, arts, ARRAY_COUNT(arts), base, strs);
 }
 
 s8 ArtifactsModifiersKnowledge(const HeroBase & base, std::string* strs)
@@ -114,7 +114,7 @@ s8 ArtifactsModifiersKnowledge(const HeroBase & base, std::string* strs)
 	    Artifact::LEGENDARY_SCEPTER, Artifact::ULTIMATE_CROWN,
 	    Artifact::ULTIMATE_STAFF, Artifact::ULTIMATE_BOOK };
 
-    return ArtifactsModifiersResult(MDF_KNOWLEDGE, arts, sizeof(arts) / sizeof(u8), base, strs);
+    return ArtifactsModifiersResult(MDF_KNOWLEDGE, arts, ARRAY_COUNT(arts), base, strs);
 }
 
 s8 ArtifactsModifiersMorale(const HeroBase & base, std::string* strs)
@@ -124,7 +124,7 @@ s8 ArtifactsModifiersMorale(const HeroBase & base, std::string* strs)
 	    Artifact::MEDAL_DISTINCTION, Artifact::BATTLE_GARB, Artifact::MASTHEAD,
 	    Artifact::FIZBIN_MISFORTUNE };
 
-    return ArtifactsModifiersResult(MDF_MORALE, arts, sizeof(arts) / sizeof(u8), base, strs);
+    return ArtifactsModifiersResult(MDF_MORALE, arts, ARRAY_COUNT(arts), base, strs);
 }
 
 s8 ArtifactsModifiersLuck(const HeroBase & base, std::string* strs)
@@ -133,7 +133,7 @@ s8 ArtifactsModifiersLuck(const HeroBase & base, std::string* strs)
 	    Artifact::RABBIT_FOOT, Artifact::GOLDEN_HORSESHOE, Artifact::GAMBLER_LUCKY_COIN,
 	    Artifact::FOUR_LEAF_CLOVER, Artifact::BATTLE_GARB, Artifact::MASTHEAD };
 
-    return ArtifactsModifiersResult(MDF_LUCK, arts, sizeof(arts) / sizeof(u8), base, strs);
+    return ArtifactsModifiersResult(MDF_LUCK, arts, ARRAY_COUNT(arts), base, strs);
 }
 
 HeroBase::HeroBase(u8 type, u8 race)

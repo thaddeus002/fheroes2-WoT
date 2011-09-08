@@ -464,14 +464,14 @@ void Game::IO::PackKingdom(QueueMessage & msg, const Kingdom & kingdom)
     msg.Push(pzl.to_string<char,std::char_traits<char>,std::allocator<char> >());
 
     // puzzle orders
-    msg.Push(static_cast<u32>(sizeof(pzl.zone1_order)));
-    for(size_t ii = 0; ii < sizeof(pzl.zone1_order); ++ii) msg.Push(pzl.zone1_order[ii]);
-    msg.Push(static_cast<u32>(sizeof(pzl.zone2_order)));
-    for(size_t ii = 0; ii < sizeof(pzl.zone2_order); ++ii) msg.Push(pzl.zone2_order[ii]);
-    msg.Push(static_cast<u32>(sizeof(pzl.zone3_order)));
-    for(size_t ii = 0; ii < sizeof(pzl.zone3_order); ++ii) msg.Push(pzl.zone3_order[ii]);
-    msg.Push(static_cast<u32>(sizeof(pzl.zone4_order)));
-    for(size_t ii = 0; ii < sizeof(pzl.zone4_order); ++ii) msg.Push(pzl.zone4_order[ii]);
+    msg.Push(static_cast<u32>(ARRAY_COUNT(pzl.zone1_order)));
+    for(size_t ii = 0; ii < ARRAY_COUNT(pzl.zone1_order); ++ii) msg.Push(pzl.zone1_order[ii]);
+    msg.Push(static_cast<u32>(ARRAY_COUNT(pzl.zone2_order)));
+    for(size_t ii = 0; ii < ARRAY_COUNT(pzl.zone2_order); ++ii) msg.Push(pzl.zone2_order[ii]);
+    msg.Push(static_cast<u32>(ARRAY_COUNT(pzl.zone3_order)));
+    for(size_t ii = 0; ii < ARRAY_COUNT(pzl.zone3_order); ++ii) msg.Push(pzl.zone3_order[ii]);
+    msg.Push(static_cast<u32>(ARRAY_COUNT(pzl.zone4_order)));
+    for(size_t ii = 0; ii < ARRAY_COUNT(pzl.zone4_order); ++ii) msg.Push(pzl.zone4_order[ii]);
 
     // tents colors
     msg.Push(kingdom.visited_tents_colors);

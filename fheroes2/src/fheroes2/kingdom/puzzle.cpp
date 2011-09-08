@@ -46,15 +46,15 @@ void PuzzlesDraw(const Puzzle &, const Surface &, s16, s16);
 
 Puzzle::Puzzle()
 {
-    std::copy(zone1_index, zone1_index + sizeof(zone1_index), zone1_order);
-    std::copy(zone2_index, zone2_index + sizeof(zone2_index), zone2_order);
-    std::copy(zone3_index, zone3_index + sizeof(zone3_index), zone3_order);
-    std::copy(zone4_index, zone4_index + sizeof(zone4_index), zone4_order);
+    std::copy(zone1_index, zone1_index + ARRAY_COUNT(zone1_index), zone1_order);
+    std::copy(zone2_index, zone2_index + ARRAY_COUNT(zone2_index), zone2_order);
+    std::copy(zone3_index, zone3_index + ARRAY_COUNT(zone3_index), zone3_order);
+    std::copy(zone4_index, zone4_index + ARRAY_COUNT(zone4_index), zone4_order);
 
-    std::random_shuffle(zone1_order, zone1_order + sizeof(zone1_order));
-    std::random_shuffle(zone2_order, zone2_order + sizeof(zone2_order));
-    std::random_shuffle(zone3_order, zone3_order + sizeof(zone3_order));
-    std::random_shuffle(zone4_order, zone4_order + sizeof(zone4_order));
+    std::random_shuffle(zone1_order, zone1_order + ARRAY_COUNT(zone1_order));
+    std::random_shuffle(zone2_order, zone2_order + ARRAY_COUNT(zone2_order));
+    std::random_shuffle(zone3_order, zone3_order + ARRAY_COUNT(zone3_order));
+    std::random_shuffle(zone4_order, zone4_order + ARRAY_COUNT(zone4_order));
 }
 
 Puzzle & Puzzle::operator= (const char* str)
@@ -74,17 +74,17 @@ void Puzzle::Update(u8 open_obelisk, u8 total_obelisk)
     u8 open_puzzle = open_obelisk * PUZZLETILES / total_obelisk;
     u8 need_puzzle = open_puzzle > count() ? open_puzzle - count() : 0;
 
-	if(need_puzzle && ClosedTilesExists(*this, zone1_order, zone1_order + sizeof(zone1_order)))
-	    ZoneOpenFirstTiles(*this, need_puzzle, zone1_order, zone1_order + sizeof(zone1_order));
+	if(need_puzzle && ClosedTilesExists(*this, zone1_order, zone1_order + ARRAY_COUNT(zone1_order)))
+	    ZoneOpenFirstTiles(*this, need_puzzle, zone1_order, zone1_order + ARRAY_COUNT(zone1_order));
 
-	if(need_puzzle && ClosedTilesExists(*this, zone2_order, zone2_order + sizeof(zone2_order)))
-	    ZoneOpenFirstTiles(*this, need_puzzle, zone2_order, zone2_order + sizeof(zone2_order));
+	if(need_puzzle && ClosedTilesExists(*this, zone2_order, zone2_order + ARRAY_COUNT(zone2_order)))
+	    ZoneOpenFirstTiles(*this, need_puzzle, zone2_order, zone2_order + ARRAY_COUNT(zone2_order));
 
-	if(need_puzzle && ClosedTilesExists(*this, zone3_order, zone3_order + sizeof(zone3_order)))
-	    ZoneOpenFirstTiles(*this, need_puzzle, zone3_order, zone3_order + sizeof(zone3_order));
+	if(need_puzzle && ClosedTilesExists(*this, zone3_order, zone3_order + ARRAY_COUNT(zone3_order)))
+	    ZoneOpenFirstTiles(*this, need_puzzle, zone3_order, zone3_order + ARRAY_COUNT(zone3_order));
 
-	if(need_puzzle && ClosedTilesExists(*this, zone4_order, zone4_order + sizeof(zone4_order)))
-	    ZoneOpenFirstTiles(*this, need_puzzle, zone4_order, zone4_order + sizeof(zone4_order));
+	if(need_puzzle && ClosedTilesExists(*this, zone4_order, zone4_order + ARRAY_COUNT(zone4_order)))
+	    ZoneOpenFirstTiles(*this, need_puzzle, zone4_order, zone4_order + ARRAY_COUNT(zone4_order));
 }
 
 void Puzzle::ShowMapsDialog(void) const

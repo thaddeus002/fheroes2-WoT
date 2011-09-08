@@ -109,7 +109,7 @@ Game::menu_t Game::MainMenu(void)
         { QUIT_DEFAULT, buttonQuit, false, false }
     };
 
-    for(u16 i = 0; le.MouseMotion() && i < sizeof(buttons) / sizeof(buttons[0]); i++)
+    for(u16 i = 0; le.MouseMotion() && i < ARRAY_COUNT(buttons); i++)
     {
         cursor.Hide();
         const Sprite & sprite = AGG::GetICN(ICN::BTNSHNGL, buttons[i].frame);
@@ -120,7 +120,7 @@ Game::menu_t Game::MainMenu(void)
     // mainmenu loop
     while(le.HandleEvents())
     {
-        for(u16 i = 0; i < sizeof(buttons) / sizeof(buttons[0]); i++)
+        for(u16 i = 0; i < ARRAY_COUNT(buttons); i++)
         {
             buttons[i].wasOver = buttons[i].isOver;
             

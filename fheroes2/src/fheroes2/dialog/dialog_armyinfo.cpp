@@ -404,7 +404,7 @@ void DrawBattleStats(const Point & dst, const Battle2::Stats & b)
     // accumulate width
     u16 ow = 0;
 
-    for(u8 ii = 0; ii < sizeof(modes) / sizeof(u32); ++ii)
+    for(u8 ii = 0; ii < ARRAY_COUNT(modes); ++ii)
 	if(b.Modes(modes[ii]))
 	{
 	    const Sprite* sprite = GetModesSprite(modes[ii]);
@@ -419,7 +419,7 @@ void DrawBattleStats(const Point & dst, const Battle2::Stats & b)
     Text text;
 
     // blit centered
-    for(u8 ii = 0; ii < sizeof(modes) / sizeof(u32); ++ii)
+    for(u8 ii = 0; ii < ARRAY_COUNT(modes); ++ii)
 	if(b.Modes(modes[ii]))
 	{
 	    const Sprite* sprite = GetModesSprite(modes[ii]);
