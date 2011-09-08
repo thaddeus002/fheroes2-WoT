@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: fheroes2\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2011-09-08 16:53+0900\n"
-"PO-Revision-Date: 2011-09-08 17:04+0800\n"
+"PO-Revision-Date: 2011-09-08 17:14+0800\n"
 "Last-Translator: Andrey Afletdinov <afletdinov@mail.dc.baikal.ru>\n"
 "Language-Team:  <ru@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -1493,7 +1493,7 @@ msgstr "Ничего"
 
 #: ../fheroes2/dialog/dialog_quickinfo.cpp:748
 msgid "%{name} ( Level %{level} )"
-msgstr "%{name} ( Уровеньl %{level} )"
+msgstr "%{name} ( Уровень %{level} )"
 
 #: ../fheroes2/dialog/dialog_quickinfo.cpp:897
 msgid "Move Points"
@@ -10576,15 +10576,15 @@ msgstr ""
 
 #: ../fheroes2/resource/maps_text.cpp:913
 msgid "Your subjects contribute to your war effort!"
-msgstr ""
+msgstr "Ваши субъекты способствуют военным усилиям!"
 
 #: ../fheroes2/resource/maps_text.cpp:914
 msgid "Your town is undefended and your heroes are scattered.  Do you attack or defend?"
-msgstr ""
+msgstr "Ваш город незащищен и герои разбросаны по стране. Что вам делать: атаковать или обороняться?"
 
 #: ../fheroes2/resource/maps_text.cpp:915
 msgid "Your treasury has been looted by robbers and you have lost valuable resources."
-msgstr ""
+msgstr "Ваша казна была разграблена грабителями, и Вы потеряли ценные ресурсы."
 
 #: ../fheroes2/resource/maps_text.cpp:916
 msgid "Your troops begin to wonder about your sanity."
@@ -10608,7 +10608,7 @@ msgstr ""
 
 #: ../fheroes2/resource/maps_text.cpp:921
 msgid "You see something that could just be the elusive Nubbie!"
-msgstr ""
+msgstr "Вы видите что-то, это как раз может быть неуловимая Nubbie!"
 
 #: ../fheroes2/resource/maps_text.cpp:922
 msgid "You see the mast of ancient ship here.  On further investigation you find that the ships holds are full of gems.  The hours pass as your crue liberates the treasure."
@@ -10616,11 +10616,11 @@ msgstr ""
 
 #: ../fheroes2/resource/maps_text.cpp:923
 msgid "You see the remains of a burned out sawmill here.  All you can salvage is some ofwood left for scrap."
-msgstr ""
+msgstr "Вы видите остатки сгоревшей лесопики. Все что осталось, вы разобрали на ресурсы."
 
 #: ../fheroes2/resource/maps_text.cpp:924
 msgid "You see the remains of an old sawmill, but it is obvious that you will not be able to make it work again."
-msgstr ""
+msgstr "Вы видите остатки старой лесопилки, и очевидно, что вы не сможете ее отремонтировать."
 
 #: ../fheroes2/resource/maps_text.cpp:925
 msgid "You see the remains of an old sawmill just to realize that it will no longer produce.  You gather the ramains and move on."
