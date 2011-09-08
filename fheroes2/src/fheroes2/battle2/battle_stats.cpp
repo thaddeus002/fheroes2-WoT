@@ -1312,6 +1312,7 @@ void Battle2::Stats::SpellModesAction(const Spell & spell, u8 duration, const He
 	    }
 	    SetModes(SP_BLESS);
 	    affected.AddMode(SP_BLESS, duration);
+	    ResetModes(LUCK_GOOD);
 	    break;
 
 	case Spell::BLOODLUST:
@@ -1328,6 +1329,7 @@ void Battle2::Stats::SpellModesAction(const Spell & spell, u8 duration, const He
 	    }
 	    SetModes(SP_CURSE);
 	    affected.AddMode(SP_CURSE, duration);
+	    ResetModes(LUCK_BAD);
 	    break;
 
 	case Spell::HASTE:
