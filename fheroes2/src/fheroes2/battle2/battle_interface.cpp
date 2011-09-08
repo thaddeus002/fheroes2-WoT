@@ -1440,8 +1440,6 @@ void Battle2::Interface::HumanTurn(const Stats & b, Actions & a)
     rectBoard = arena.board.GetArea();
     const HeroBase* current_commander = arena.GetCurrentCommander();
 
-    if(conf.Music() && !Music::isPlaying()) AGG::PlayMusic(MUS::GetBattleRandom(), false);
-
     if(conf.QVGA() && current_commander && current_commander->HaveSpellBook())
     {
 	const Rect & area = border.GetArea();

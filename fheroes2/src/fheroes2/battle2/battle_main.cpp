@@ -78,6 +78,9 @@ Battle2::Result Battle2::Loader(Army::army_t & army1, Army::army_t & army2, s32 
 #endif
     while(1)
     {
+	if(local && conf.Music() && !Music::isPlaying())
+	    AGG::PlayMusic(MUS::GetBattleRandom(), false);
+
 	arena.Turns(turn, result);
 
 	if(result.army1 || result.army2) break;
