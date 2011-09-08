@@ -149,7 +149,6 @@ const settings_t settingsFHeroes2[] =
     { Settings::CASTLE_MAGEGUILD_POINTS_TURN,	_("castle: higher mage guilds regenerate more spell points/turn (20/40/60/80/100%)"), },
     { Settings::CASTLE_ALLOW_RECRUITS_SPECIAL,	_("castle: allow recruits special/expansion heroes"), },
     { Settings::HEROES_LEARN_SPELLS_WITH_DAY,	_("heroes: learn new spells with day"),  		},
-    { Settings::HEROES_FORCE_RACE_FROM_TYPE,	_("heroes: fixed race with custom portrait"),  		},
     { Settings::HEROES_COST_DEPENDED_FROM_LEVEL,_("heroes: recruit cost to be dependent on hero level"),},
     { Settings::HEROES_REMEMBER_POINTS_RETREAT, _("heroes: remember MP/SP for retreat/surrender result"),},
     { Settings::HEROES_SURRENDERING_GIVE_EXP,   _("heroes: surrendering gives some experience"),        },
@@ -1174,11 +1173,6 @@ bool Settings::ExtHeroRecalculateMovement(void) const
 bool Settings::ExtLearnSpellsWithDay(void) const
 {
     return ExtModes(HEROES_LEARN_SPELLS_WITH_DAY);
-}
-
-bool Settings::ExtForceSelectRaceFromType(void) const
-{
-    return ExtModes(HEROES_FORCE_RACE_FROM_TYPE);
 }
 
 bool Settings::ExtUnionsAllowCastleVisiting(void) const

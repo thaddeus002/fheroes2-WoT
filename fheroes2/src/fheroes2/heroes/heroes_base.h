@@ -94,8 +94,6 @@ public:
     bool HasArtifact(const Artifact &) const;
     bool PickupArtifact(const Artifact &);
 
-    static void LoadDefaults(u8 type, u8 race, HeroBase &);
-
 protected:
     friend class Game::IO;
 #ifdef BUILD_BATTLEONLY

@@ -177,7 +177,7 @@ public:
 	CASTLE_ALLOW_GUARDIANS		= 0x20080000,
 	CASTLE_ALLOW_BUY_FROM_WELL	= 0x20100000,
 	HEROES_LEARN_SPELLS_WITH_DAY	= 0x20200000,
-	HEROES_FORCE_RACE_FROM_TYPE	= 0x20400000,
+	//HEROES_UNUSED			= 0x20400000,
 	HEROES_COST_DEPENDED_FROM_LEVEL = 0x20800000,
 	HEROES_REMEMBER_POINTS_RETREAT  = 0x21000000,
 	HEROES_SURRENDERING_GIVE_EXP	= 0x22000000,
@@ -283,7 +283,6 @@ public:
     bool ExtNoRequirementsForArtifacts(void) const;
     bool ExtArtifactCrystalBall(void) const;
     bool ExtLearnSpellsWithDay(void) const;
-    bool ExtForceSelectRaceFromType(void) const;
     bool ExtOnlyFirstMonsterAttack(void) const;
     bool ExtEyeEagleAsScholar(void) const;
     bool ExtBuySpellBookFromShrine(void) const;

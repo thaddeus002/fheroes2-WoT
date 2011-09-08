@@ -440,9 +440,19 @@ void Heroes::LoadFromMP2(s32 map_index, const void *ptr, const Color::color_t cl
     }
 
     // fixed race for custom portrait (after level up)
-    if(custom_portrait &&
-	Settings::Get().ExtForceSelectRaceFromType() && race != rc)
+    if(custom_portrait && race != rc)
 	race = rc;
+
+    if(race & (Race::SORC | Race::WRLK | Race::WZRD | Race::NECR) &&
+	! HaveSpellBook())
+    {
+	Spell spell = Skill::Primary::GetInitialSpell(race);
+        if(spell.isValid())
+        {
+            SpellBookActivate();
+            AppendSpellToBook(spell, true);
+        }
+    }
 
     // other param
     SetSpellPoints(GetMaxSpellPoints());

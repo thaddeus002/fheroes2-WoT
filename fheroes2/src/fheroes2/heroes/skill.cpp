@@ -755,25 +755,11 @@ u8 Skill::SecondaryGetWeightSkillFromRace(u8 race, u8 skill)
 
 std::vector<u8> Skill::SecondarySkills(void)
 {
-    std::vector<u8> skills;
+    const u8 vals[] = { Secondary::PATHFINDING, Secondary::ARCHERY, Secondary::LOGISTICS, Secondary::SCOUTING,
+			Secondary::DIPLOMACY, Secondary::NAVIGATION, Secondary::LEADERSHIP, Secondary::WISDOM, Secondary::MYSTICISM,
+			Secondary::LUCK, Secondary::BALLISTICS, Secondary::EAGLEEYE, Secondary::NECROMANCY, Secondary::ESTATES };
 
-    skills.reserve(MAXSECONDARYSKILL);
-    skills.push_back(Secondary::PATHFINDING);
-    skills.push_back(Secondary::ARCHERY);
-    skills.push_back(Secondary::LOGISTICS);
-    skills.push_back(Secondary::SCOUTING);
-    skills.push_back(Secondary::DIPLOMACY);
-    skills.push_back(Secondary::NAVIGATION);
-    skills.push_back(Secondary::LEADERSHIP);
-    skills.push_back(Secondary::WISDOM);
-    skills.push_back(Secondary::MYSTICISM);
-    skills.push_back(Secondary::LUCK);
-    skills.push_back(Secondary::BALLISTICS);
-    skills.push_back(Secondary::EAGLEEYE);
-    skills.push_back(Secondary::NECROMANCY);
-    skills.push_back(Secondary::ESTATES);
-
-    return skills;
+    return std::vector<u8>(vals, vals + ARRAY_COUNT(vals));
 }
 
 u8 Skill::SecondaryPriorityFromRace(u8 race, const std::vector<u8> & exclude)

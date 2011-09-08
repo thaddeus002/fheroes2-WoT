@@ -142,39 +142,37 @@ HeroBase::HeroBase(u8 type, u8 race)
     bag_artifacts.assign(HEROESMAXARTIFACT, Artifact::UNKNOWN);
 
     if(Race::ALL & race)
-	LoadDefaults(type, race, *this);
+    {
+	// fixed default primary skills
+	Skill::Primary::LoadDefaults(type, race, *this);
+
+	// fixed default spell
+	switch(type)
+	{
+	    case Skill::Primary::CAPTAIN:
+		SpellBookActivate();
+		break;
+
+	    case Skill::Primary::HEROES:
+	    {
+		Spell spell = Skill::Primary::GetInitialSpell(race);
+		if(spell.isValid())
+		{
+		    SpellBookActivate();
+		    AppendSpellToBook(spell, true);
+		}
+	    }
+    	    break;
+
+	    default: break;
+	}
+    }
 }
 
 HeroBase::HeroBase() : magic_point(0), move_point(0), spell_book()
 {
 }
 
-void HeroBase::LoadDefaults(u8 type, u8 race, HeroBase & hero)
-{
-    // fixed default primary skills
-    Skill::Primary::LoadDefaults(type, race, hero);
-
-    // fixed default spell
-    switch(type)
-    {
-	case Skill::Primary::CAPTAIN:
-	    hero.SpellBookActivate();
-	    break;
-
-	case Skill::Primary::HEROES:
-	{
-	    Spell spell = Skill::Primary::GetInitialSpell(race);
-	    if(spell.isValid())
-	    {
-		hero.SpellBookActivate();
-		hero.AppendSpellToBook(spell, true);
-	    }
-	}
-        break;
-
-	default: break;
-    }
-}
 
 u16 HeroBase::GetSpellPoints(void) const
 {
