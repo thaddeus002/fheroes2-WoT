@@ -259,6 +259,9 @@ namespace Game
     void EventSwitchShowIcons(void);
     void EventSwitchShowControlPanel(void);
 
+    void DisableChangeMusic(bool);
+    bool ChangeMusicDisabled(void);
+
     void OpenHeroesDialog(Heroes*);
     void OpenCastleDialog(Castle*);
 

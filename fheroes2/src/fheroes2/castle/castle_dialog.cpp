@@ -528,6 +528,7 @@ Dialog::answer_t Castle::OpenDialog(bool readonly, bool fade)
 	// view guardian
 	if(!readonly && heroes.Guard() && le.MouseClickLeft(rectSign1))
 	{
+	    Game::DisableChangeMusic(true);
 	    Game::OpenHeroesDialog(heroes.Guard());
 
 	    cursor.Hide();
@@ -541,6 +542,7 @@ Dialog::answer_t Castle::OpenDialog(bool readonly, bool fade)
 	// view hero
 	if(!readonly && heroes.Guest() && le.MouseClickLeft(rectSign2))
 	{
+	    Game::DisableChangeMusic(true);
 	    Game::OpenHeroesDialog(heroes.Guest());
 
 	    cursor.Hide();
@@ -927,6 +929,8 @@ Dialog::answer_t Castle::OpenDialog(bool readonly, bool fade)
 
     if(conf.DynamicInterface())
 	conf.SetEvilInterface(interface);
+
+    Game::DisableChangeMusic(false);
 
     return result;
 }

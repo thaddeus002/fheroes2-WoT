@@ -73,8 +73,11 @@ void Game::Focus::Set(Heroes *hero2)
     I.gameArea.SetCenter(heroes->GetCenter());
     I.statusWindow.SetState(STATUS_ARMY);
 
-    AGG::PlayMusic(MUS::FromGround(world.GetTiles(heroes->GetCenter()).GetGround()));
-    Game::EnvironmentSoundMixer();    
+    if(! Game::ChangeMusicDisabled())
+    {
+	AGG::PlayMusic(MUS::FromGround(world.GetTiles(heroes->GetCenter()).GetGround()));
+	Game::EnvironmentSoundMixer();    
+    }
 }
 
 void Game::Focus::Set(Castle *castle2)

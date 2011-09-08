@@ -65,6 +65,7 @@ namespace Game
     void HotKeysDefaults(void);
     void HotKeysLoad(const std::string &);
 
+    bool	disable_change_music = false;
     u16		reserved_vols[LOOPXX_COUNT];
     char**	argv = NULL;
     u8		current_music = MUS::UNKNOWN;
@@ -113,6 +114,16 @@ Game::menu_t Game::Credits(void)
 std::string Game::GetARGV(int v)
 {
     return std::string(argv[v]);
+}
+
+bool Game::ChangeMusicDisabled(void)
+{
+    return disable_change_music;
+}
+
+void Game::DisableChangeMusic(bool f)
+{
+    disable_change_music = f;
 }
 
 void Game::Init(char** ptr)
