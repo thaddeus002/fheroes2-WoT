@@ -272,7 +272,7 @@ void Network::PackRaceColors(QueueMessage & m)
 	it = colors.begin(); it != colors.end(); ++it)
     {
 	m.Push(static_cast<u8>(*it));
-	m.Push(Game::GetKingdomRace(*it));
+	m.Push(Players::GetPlayerRace(*it));
     }
 }
 
@@ -287,7 +287,7 @@ void Network::UnpackRaceColors(QueueMessage & m)
 	{
 	    m.Pop(color);
 	    m.Pop(race);
-	    Game::SetKingdomRace(color, race);
+	    Players::SetPlayerRace(color, race);
 	}
     }
 }

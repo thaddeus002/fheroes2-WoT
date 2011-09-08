@@ -225,8 +225,8 @@ int FH2Server::Main(void* ptr)
 				players.Init(color1 | color2);
 				//players.ResetControl(CONTROL_REMOTE);
 
-				Game::SetKingdomRace(color1, hero1->GetRace());
-				Game::SetKingdomRace(color2, hero2->GetRace());
+				Players::SetPlayerRace(color1, hero1->GetRace());
+				Players::SetPlayerRace(color2, hero2->GetRace());
 				//players.SetHumanColors(color1 | color2);
 
 				hero1->SetSpellPoints(hero1->GetMaxSpellPoints());
@@ -590,7 +590,7 @@ void FH2Server::MsgChangeRaces(QueueMessage & msg)
 
     if(conf.AllowChangeRace(color))
     {
-        Game::SetKingdomRace(color, race);
+        Players::SetPlayerRace(color, race);
         msg.Reset();
         msg.SetID(MSG_CHANGE_RACE);
         clients.ChangeRace(color, race);

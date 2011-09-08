@@ -430,7 +430,6 @@ private:
 
     u8 game_difficulty;
 
-    std::string build_version;
     std::string path_data_directory;
     std::string local_prefix;
 

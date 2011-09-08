@@ -218,8 +218,6 @@ namespace Game
     void EnvironmentSoundMixer(void);
 
     u8  GetKingdomColors(void);
-    u8  GetKingdomRace(u8);
-    void SetKingdomRace(u8, u8);
     void DialogPlayers(u8, std::string);
 
     void SetCurrentMusic(u8);

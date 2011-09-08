@@ -204,7 +204,7 @@ void Castle::LoadFromMP2(const void *ptr)
     ptr8 += 13;
 
     // race
-    const u8 kingdom_race = Game::GetKingdomRace(color);
+    const u8 kingdom_race = Players::GetPlayerRace(color);
     switch(*ptr8)
     { 	 
 	case 0x00: race = Race::KNGT; break; 	 
