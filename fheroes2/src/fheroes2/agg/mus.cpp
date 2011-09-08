@@ -107,6 +107,7 @@ MUS::mus_t MUS::FromGround(const u16 ground)
         case Maps::Ground::LAVA:	return LAVA;
         case Maps::Ground::DIRT:	return DIRT;
         case Maps::Ground::GRASS:	return GRASS;
+        case Maps::Ground::WATER:	return BEACH;
         default: break;
     }
 
