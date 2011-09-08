@@ -704,7 +704,7 @@ void ActionToHeroes(Heroes &hero, const u8 obj, const s32 dst_index)
 	if(other_hero->GetUnderObject() == MP2::OBJ_CASTLE)
 	{
 	    Castle *castle = world.GetCastle(dst_index);
-	    if(castle && &hero == castle->GetHeroes().GuardFirst())
+	    if(castle && other_hero == castle->GetHeroes().GuardFirst())
     	    {
 		ActionToCastle(hero, MP2::OBJ_CASTLE, dst_index);
 		return;
