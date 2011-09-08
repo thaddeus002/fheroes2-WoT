@@ -1187,6 +1187,8 @@ void ActionToWitchsHut(Heroes &hero, const u8 obj, const s32 dst_index)
 {
     const Skill::Secondary skill(world.GetTiles(dst_index).GetQuantity1(), Skill::Level::BASIC);
 
+    AGG::PlayMusic(MUS::SKILL, false);
+
     if(skill.isValid())
     {
 	//const std::string & skill_name = Skill::Secondary::String(skill);
@@ -1645,15 +1647,18 @@ void ActionToExperienceObject(Heroes &hero, const u8 obj, const s32 dst_index)
     	default: return;
     }
 
+    if(! Settings::Get().MusicMIDI())
+	AGG::PlayMusic(MUS::EXPERIENCE, false);
+
     // check already visited
     if(hero.isVisited(tile))
     {
-	PlaySoundVisited;
+	if(Settings::Get().MusicMIDI()) PlaySoundVisited;
 	Dialog::Message(MP2::StringObject(obj), body_false, Font::BIG, Dialog::OK);
     }
     else
     {
-	PlaySoundWarning;
+	if(Settings::Get().MusicMIDI()) PlaySoundWarning;
 	DialogWithExp(MP2::StringObject(obj), body_true, exp);
 
 	// visit
@@ -2271,7 +2276,11 @@ void ActionToDwellingJoinMonster(Heroes &hero, const u8 obj, const s32 dst_index
         std::string message = _("A group of %{monster} with a desire for greater glory wish to join you. Do you accept?");
         String::Replace(message, "%{monster}", monster.GetMultiName());
 
-        AGG::PlaySound(M82::EXPERNCE);
+	if(! Settings::Get().MusicMIDI() && obj == MP2::OBJ_WATCHTOWER)
+	    AGG::PlayMusic(MUS::WATCHTOWER, false);
+	else
+    	    AGG::PlaySound(M82::EXPERNCE);
+
         if(Dialog::YES == Dialog::Message(MP2::StringObject(obj), message, Font::BIG, Dialog::YES|Dialog::NO))
 	{
 	    if(!hero.GetArmy().JoinTroop(monster, count))
@@ -2306,21 +2315,25 @@ void ActionToDwellingRecruitMonster(Heroes &hero, const u8 obj, const s32 dst_in
         case MP2::OBJ_RUINS:
     	    msg_void = _("You search the ruins, but the Medusas that used to live here are gone. Perhaps there will be more next week.");
     	    msg_full = _("You've found some Medusas living in the ruins. They are willing to join your army for a price. Do you want to recruit Medusas?");
+	    AGG::PlayMusic(MUS::DEATH, false);
     	    break;
 
         case MP2::OBJ_TREECITY:
     	    msg_void = _("You've found a Sprite Tree City. Unfortunately, none of the Sprites living there wish to join an army. Maybe next week.");
     	    msg_full = _("Some of the Sprites living in the tree city are willing to join your army for a price. Do you want to recruit Sprites?");
+	    AGG::PlayMusic(MUS::TREEHOUSE, false);
     	    break;
   
         case MP2::OBJ_WAGONCAMP:
     	    msg_void = _("A colorful Rogues' wagon stands empty here. Perhaps more Rogues will be here later.");
     	    msg_full = _("Distant sounds of music and laughter draw you to a colorful wagon housing Rogues. Do you wish to have any Rogues join your army?");
+	    AGG::PlayMusic(MUS::ARABIAN, false);
     	    break;
 
 	case MP2::OBJ_DESERTTENT:
     	    msg_void = _("A group of tattered tents, billowing in the sandy wind, beckons you. The tents are unoccupied. Perhaps more Nomads will be here later.");
     	    msg_full = _("A group of tattered tents, billowing in the sandy wind, beckons you. Do you wish to have any Nomads join you during your travels?");
+	    AGG::PlayMusic(MUS::NOMADTENTS, false);
     	    break;
 
         case MP2::OBJ_EARTHALTAR:
@@ -2526,7 +2539,10 @@ void ActionToArtesianSpring(Heroes &hero, const u8 obj, const s32 dst_index)
     }
     else
     {
-	PlaySoundSuccess;
+	if(Settings::Get().MusicMIDI())
+	    PlaySoundSuccess;
+	else
+	    AGG::PlayMusic(MUS::WATERSPRING, false);
 	hero.SetSpellPoints(max * 2);
 	Dialog::Message(name, _("A drink from the spring fills your blood with magic! You have twice your normal spell points in reserve."), Font::BIG, Dialog::OK);
 
@@ -2829,6 +2845,8 @@ void ActionToOracle(Heroes &hero, const u8 obj, const s32 dst_index)
 void ActionToDaemonCave(Heroes &hero, const u8 obj, const s32 dst_index)
 {
     Maps::Tiles & tile = world.GetTiles(dst_index);
+
+    AGG::PlayMusic(MUS::DEMONCAVE, false);
 
     if(Dialog::YES == Dialog::Message(MP2::StringObject(obj), _("The entrance to the cave is dark, and a foul, sulfurous smell issues from the cave mouth. Will you enter?"), Font::BIG, Dialog::YES|Dialog::NO))
     {

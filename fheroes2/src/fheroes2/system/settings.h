@@ -251,7 +251,6 @@ public:
     bool Editor(void) const;
     bool Sound(void) const;
     bool Music(void) const;
-    bool CDMusic(void) const;
     bool ShowControlPanel(void) const;
     bool ShowRadar(void) const;
     bool ShowIcons(void) const;

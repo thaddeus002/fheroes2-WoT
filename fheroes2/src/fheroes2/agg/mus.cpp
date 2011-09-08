@@ -132,7 +132,7 @@ MUS::mus_t MUS::FromRace(const u8 race)
 
 MUS::mus_t MUS::FromMapObject(u8 object)
 {
-    if(!Settings::Get().CDMusic())
+    if(Settings::Get().MusicMIDI())
         return MUS::UNKNOWN;
     
     switch(object)

@@ -701,8 +701,6 @@ bool Settings::Sound(void) const { return opt_global.Modes(GLOBAL_SOUND); }
 /* return music */
 bool Settings::Music(void) const { return opt_global.Modes(GLOBAL_MUSIC); }
 
-bool Settings::CDMusic(void) const { return opt_global.Modes(GLOBAL_MUSIC_CD | GLOBAL_MUSIC_EXT); }
-
 /* return move speed */
 u8   Settings::HeroesMoveSpeed(void) const { return heroes_speed; }
 u8   Settings::AIMoveSpeed(void) const { return ai_speed; }

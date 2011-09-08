@@ -99,6 +99,8 @@ void Puzzle::ShowMapsDialog(void) const
 
     cursor.Hide();
 
+    AGG::PlayMusic(MUS::PUZZLE, false);
+
     if(display.w() == 640 && display.h() == 480 && !Settings::Get().HideInterface())
 	ShowStandardDialog(*this, sf);
     else

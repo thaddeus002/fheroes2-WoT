@@ -21,6 +21,7 @@
  ***************************************************************************/
 
 #include "gamedefs.h"
+#include "agg.h"
 #include "dialog.h"
 #include "world.h"
 #include "kingdom.h"
@@ -186,6 +187,8 @@ void GameOver::DialogWins(u16 cond)
     	default: break;
     }
 
+    AGG::PlayMusic(MUS::VICTORY, false);
+
     if(body.size()) Dialog::Message("", body, Font::BIG, Dialog::OK);
 }
 
@@ -243,6 +246,8 @@ void GameOver::DialogLoss(u16 cond)
 
     	default: break;
     }
+
+    AGG::PlayMusic(MUS::LOSTGAME, false);
 
     if(body.size()) Dialog::Message("", body, Font::BIG, Dialog::OK);
 }

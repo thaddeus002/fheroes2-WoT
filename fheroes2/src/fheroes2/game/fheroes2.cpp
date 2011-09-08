@@ -131,7 +131,7 @@ int main(int argc, char **argv)
         if(conf.Sound() || conf.Music())
             subsystem |= INIT_AUDIO;
 #ifdef WITH_AUDIOCD
-        if(conf.CDMusic())
+        if(conf.MusicCD())
             subsystem |= INIT_CDROM | INIT_AUDIO;
 #endif
 #ifdef WITH_NET

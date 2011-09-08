@@ -1581,7 +1581,8 @@ void Game::NewWeekDialog(void)
 
     // head
     std::string message = world.BeginMonth() ? _("Astrologers proclaim Month of the %{name}.") : _("Astrologers proclaim Week of the %{name}.");
-    AGG::PlayMusic(world.BeginMonth() ? MUS::WEEK2_MONTH1 : MUS::WEEK1, false);
+    AGG::PlayMusic(world.BeginMonth() ?
+	(week.GetType() == Week::MONSTERS ? MUS::MONTH2 : MUS::WEEK2_MONTH1) : MUS::WEEK1, false);
     String::Replace(message, "%{name}", week.GetName());
     message += "\n \n";
 
