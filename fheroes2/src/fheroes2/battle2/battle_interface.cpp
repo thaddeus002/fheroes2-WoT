@@ -2173,6 +2173,8 @@ void Battle2::Interface::RedrawActionAttackPart1(Stats & attacker, Stats & defen
 
 void Battle2::Interface::RedrawActionAttackPart2(Stats & attacker, TargetsInfo & targets)
 {
+    attacker.ResetAnimFrame(AS_IDLE);
+
     // targets damage animation
     RedrawActionWincesKills(targets);
 
