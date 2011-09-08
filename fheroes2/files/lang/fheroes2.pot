@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-09-08 15:56+0900\n"
+"POT-Creation-Date: 2011-09-08 16:53+0900\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2613,33 +2613,38 @@ msgstr ""
 #: ../fheroes2/game/game_startgame.cpp:1597
 msgid ""
 "After regular growth, population of %{monter} increase on %{count} percent!"
-msgstr ""
+msgid_plural ""
+"After regular growth, population of %{monter} increase on %{count} percent!"
+msgstr[0] ""
+msgstr[1] ""
 
-#: ../fheroes2/game/game_startgame.cpp:1599
+#: ../fheroes2/game/game_startgame.cpp:1600
 msgid "%{monster} population increases by +%{count}."
-msgstr ""
+msgid_plural "%{monster} population increases by +%{count}."
+msgstr[0] ""
+msgstr[1] ""
 
-#: ../fheroes2/game/game_startgame.cpp:1607
+#: ../fheroes2/game/game_startgame.cpp:1608
 msgid " All populations are halved."
 msgstr ""
 
-#: ../fheroes2/game/game_startgame.cpp:1609
+#: ../fheroes2/game/game_startgame.cpp:1610
 msgid " All dwellings increase population."
 msgstr ""
 
-#: ../fheroes2/game/game_startgame.cpp:1637
+#: ../fheroes2/game/game_startgame.cpp:1638
 msgid ""
 "%{color} player, your heroes abandon you, and you are banished from this "
 "land."
 msgstr ""
 
-#: ../fheroes2/game/game_startgame.cpp:1644
+#: ../fheroes2/game/game_startgame.cpp:1645
 msgid ""
 "%{color} player, this is your last day to capture a town, or you will be "
 "banished from this land."
 msgstr ""
 
-#: ../fheroes2/game/game_startgame.cpp:1649
+#: ../fheroes2/game/game_startgame.cpp:1650
 msgid ""
 "%{color} player, you only have %{day} days left to capture a town, or you "
 "will be banished from this land."
