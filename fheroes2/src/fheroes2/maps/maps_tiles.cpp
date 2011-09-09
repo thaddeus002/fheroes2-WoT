@@ -1013,8 +1013,14 @@ std::string Maps::Tiles::String(void) const
     return os.str();
 }
 
-MP2::object_t Maps::Tiles::GetObject(void) const
+MP2::object_t Maps::Tiles::GetObject(bool skip_hero) const
 {
+    if(!skip_hero && MP2::OBJ_HEROES == mp2_object)
+    {
+        const Heroes* hero = world.GetHeroes(maps_index);
+        if(hero) return hero->GetUnderObject();
+    }
+
     return static_cast<MP2::object_t>(mp2_object);
 }
 
@@ -1521,9 +1527,8 @@ u8 Maps::Tiles::GetMinesType(void) const
 void Maps::Tiles::UpdateQuantity(void)
 {
     const TilesAddon * addon = NULL;
-    const Heroes* hero = GetObject() == MP2::OBJ_HEROES ? world.GetHeroes(maps_index) : NULL;
 
-    switch(hero ? hero->GetUnderObject() : GetObject())
+    switch(GetObject(false))
     {
         case MP2::OBJ_WITCHSHUT:
             quantity1 = Skill::Secondary::RandForWitchsHut();
@@ -1851,10 +1856,7 @@ bool Maps::Tiles::ValidQuantity(void) const
 
 bool Maps::Tiles::OtherObjectsIsProtection(void) const
 {
-    u8 object = GetObject();
-
-    if(MP2::OBJ_HEROES == GetObject() && world.GetHeroes(maps_index))
-	object = world.GetHeroes(maps_index)->GetUnderObject();
+    const u8 object = GetObject(false);
 
     switch(object)
     {
@@ -1884,13 +1886,7 @@ bool Maps::Tiles::OtherObjectsIsProtection(void) const
 /* true: if protection or has guardians */
 bool Maps::Tiles::CaptureObjectIsProtection(u8 color) const
 {
-    u8 object = GetObject();
-
-    if(MP2::OBJ_HEROES == GetObject())
-    {
-	const Heroes* hero = world.GetHeroes(maps_index);
-	if(hero) object = hero->GetUnderObject();
-    }
+    const u8 object = GetObject(false);
 
     if(color &&
 	MP2::isCaptureObject(object))

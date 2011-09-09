@@ -230,14 +230,7 @@ u8 Game::GetMixerChannelFromObject(const Maps::Tiles & tile)
     // force: check stream
     if(tile.isStream()) return 13;
 
-    MP2::object_t object = tile.GetObject();
-    if(MP2::OBJ_HEROES == object)
-    {
-	const Heroes* hero = world.GetHeroes(tile.GetIndex());
-	object = hero->GetUnderObject();
-    }
-
-    return M82::GetIndexLOOP00XXFromObject(object);
+    return M82::GetIndexLOOP00XXFromObject(tile.GetObject(false));
 }
 
 u8 Game::GetRating(void)

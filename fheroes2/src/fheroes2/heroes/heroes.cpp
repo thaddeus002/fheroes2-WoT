@@ -863,7 +863,7 @@ Castle* Heroes::inCastle(void)
 bool Heroes::isVisited(const Maps::Tiles & tile, const Visit::type_t type) const
 {
     const s32 & index = tile.GetIndex();
-    const MP2::object_t object = (tile.GetObject() == MP2::OBJ_HEROES ? GetUnderObject() : tile.GetObject());
+    const MP2::object_t object = tile.GetObject(false);
 
     if(Visit::GLOBAL == type) return world.GetKingdom(color).isVisited(index, object);
 
@@ -882,8 +882,7 @@ bool Heroes::isVisited(const u8 object, const Visit::type_t type) const
 void Heroes::SetVisited(const s32 index, const Visit::type_t type)
 {
     const Maps::Tiles & tile = world.GetTiles(index);
-
-    const MP2::object_t object = (tile.GetObject() == MP2::OBJ_HEROES ? GetUnderObject() : tile.GetObject());
+    const MP2::object_t object = tile.GetObject(false);
 
     if(Visit::GLOBAL == type)
 	world.GetKingdom(color).SetVisited(index, object);

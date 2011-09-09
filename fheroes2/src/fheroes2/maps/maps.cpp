@@ -454,8 +454,7 @@ u16 Maps::TileUnderProtection(const s32 center)
 
     u16 result = 0;
     const u16 dst_around = Maps::ScanAroundObject(center, MP2::OBJ_MONSTER);
-    const u8  obj = MP2::OBJ_HEROES == world.GetTiles(center).GetObject() && world.GetHeroes(center) ?
-	    world.GetHeroes(center)->GetUnderObject() : world.GetTiles(center).GetObject();
+    const u8  obj = world.GetTiles(center).GetObject(false);
 
     for(Direction::vector_t dir = Direction::TOP_LEFT; dir < Direction::CENTER; ++dir) if(dst_around & dir)
     {

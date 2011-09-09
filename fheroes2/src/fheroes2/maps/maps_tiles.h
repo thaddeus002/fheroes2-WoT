@@ -113,7 +113,7 @@ namespace Maps
 	void Init(s32, const MP2::mp2tile_t &);
 
 	const s32 & GetIndex(void) const{ return maps_index; }
-	MP2::object_t GetObject(void) const;
+	MP2::object_t GetObject(bool skip_hero = true) const;
 	u8 GetQuantity1(void) const{ return quantity1; }
 	u8 GetQuantity2(void) const{ return quantity2; }
 	u8 GetQuantity3(void) const{ return quantity3; }

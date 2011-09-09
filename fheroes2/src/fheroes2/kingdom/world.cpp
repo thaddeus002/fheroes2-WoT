@@ -999,11 +999,7 @@ void World::NewWeek(void)
 	// update week object
 	for(MapsTiles::iterator
 	    it = vec_tiles.begin(); it != vec_tiles.end(); ++it)
-	{
-	    const Heroes* hero = (*it).GetObject() == MP2::OBJ_HEROES ? world.GetHeroes((*it).GetIndex()) : NULL;
-	    const u8 obj = hero ? hero->GetUnderObject() : (*it).GetObject();
-	    if(MP2::isWeekLife(obj)) (*it).UpdateQuantity();
-	}
+	    if(MP2::isWeekLife((*it).GetObject(false))) (*it).UpdateQuantity();
 
 	// update gray towns
         for(AllCastles::iterator
@@ -1259,15 +1255,7 @@ u16 World::CountCapturedMines(const u8 res, const Color::color_t col) const
 /* capture object */
 void World::CaptureObject(const s32 index, const Color::color_t col)
 {
-    MP2::object_t obj = GetTiles(index).GetObject();
-    
-    if(MP2::OBJ_HEROES == obj)
-    {
-	const Heroes * hero = GetHeroes(index);
-	if(NULL == hero) return;
-
-	obj = hero->GetUnderObject();
-    }
+    const MP2::object_t obj = GetTiles(index).GetObject(false);
 
     map_captureobj[index] = ObjectColor(obj, col);
 
@@ -1331,14 +1319,8 @@ void World::UpdateDwellingPopulation(void)
 	it = vec_tiles.begin(); it != vec_tiles.end(); ++it)
     {
 	Maps::Tiles & tile = *it;
-	MP2::object_t obj = tile.GetObject();
+	MP2::object_t obj = tile.GetObject(false);
 	float count = 0;
-
-	if(obj == MP2::OBJ_HEROES)
-	{
-	    const Heroes* hero = world.GetHeroes(tile.GetIndex());
-	    if(hero) obj = hero->GetUnderObject();
-	}
 
 	switch(obj)
 	{
@@ -1515,17 +1497,7 @@ std::string World::DateString(void) const
 
 bool IsObeliskOnMaps(const Maps::Tiles & tile)
 {
-    switch(tile.GetObject())
-    {
-	case MP2::OBJ_OBELISK:	return true;
-	case MP2::OBJ_HEROES:
-	{
-	    const Heroes* hero = world.GetHeroes(tile.GetIndex());
-	    if(hero && MP2::OBJ_OBELISK == hero->GetUnderObject()) return true;
-	}
-	default: break;
-    }
-    return false;
+    return MP2::OBJ_OBELISK == tile.GetObject(false);
 }
 
 u16 World::CountObeliskOnMaps(void)
@@ -1582,14 +1554,9 @@ bool World::GetObjectPositions(s32 center, MP2::object_t obj, std::vector<IndexD
 
     for(MapsTiles::const_iterator
 	it = vec_tiles.begin(); it != vec_tiles.end(); ++it)
-    {
-	MP2::object_t obj2 = check_hero && MP2::OBJ_HEROES == (*it).GetObject() && GetHeroes((*it).GetIndex()) ?
-		GetHeroes((*it).GetIndex())->GetUnderObject() : (*it).GetObject();
-
-	if(obj == obj2)
+	if(obj == (*it).GetObject(! check_hero))
 		v.push_back(IndexDistance((*it).GetIndex(),
 			Maps::GetApproximateDistance(center, (*it).GetIndex())));
-    }
 
     return v.size();
 }
@@ -1600,13 +1567,8 @@ bool World::GetObjectPositions(MP2::object_t obj, std::vector<s32> & v, bool che
 
     for(MapsTiles::const_iterator
 	it = vec_tiles.begin(); it != vec_tiles.end(); ++it)
-    {
-	MP2::object_t obj2 = check_hero && MP2::OBJ_HEROES == (*it).GetObject() && GetHeroes((*it).GetIndex()) ?
-		GetHeroes((*it).GetIndex())->GetUnderObject() : (*it).GetObject();
-
-	if(obj == obj2)
+	if(obj == (*it).GetObject(! check_hero))
 		v.push_back((*it).GetIndex());
-    }
 
     return v.size();
 }

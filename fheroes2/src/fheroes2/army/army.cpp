@@ -138,15 +138,7 @@ void Army::army_t::FromGuardian(const Maps::Tiles & t)
     if(MP2::isCaptureObject(t.GetObject()))
 	color = world.ColorCapturedObject(t.GetIndex());
 
-    u8 obj = t.GetObject();
-
-    if(MP2::OBJ_HEROES == obj)
-    {
-	const Heroes* hero = world.GetHeroes(t.GetIndex());
-	if(hero) obj = hero->GetUnderObject();
-    }
-
-    switch(obj)
+    switch(t.GetObject(false))
     {
 	case MP2::OBJ_PYRAMID:
             troops[0].Set(Monster::ROYAL_MUMMY, 10);
