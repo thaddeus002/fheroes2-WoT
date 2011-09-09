@@ -268,8 +268,7 @@ namespace Battle2
 	void	PackStats(Action &) const;
 	void	UnpackStats(Action &);
 
-	static Stats* GetStatsPart1(Armies &, Armies &, Stats* last);
-	static Stats* GetStatsPart2(Armies &, Armies &, Stats* last);
+	static Stats* GetStats(Armies &, Armies &, Stats* last, bool part1);
 
 	Army::army_t & parent;
     };

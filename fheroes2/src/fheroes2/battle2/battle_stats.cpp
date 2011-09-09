@@ -2358,7 +2358,7 @@ Battle2::Stats* Battle2::Armies::CreateNewStats(const Monster & mons, u32 count)
     return (*it).battle;
 }
 
-Battle2::Stats* Battle2::Armies::GetStatsPart1(Armies & armies1, Armies & armies2, Stats* last)
+Battle2::Stats* Battle2::Armies::GetStats(Armies & armies1, Armies & armies2, Stats* last, bool part1)
 {
     armies1.Init();
     armies2.Init();
@@ -2368,8 +2368,11 @@ Battle2::Stats* Battle2::Armies::GetStatsPart1(Armies & armies1, Armies & armies
 
     Stats* result = NULL;
 
-    Armies::iterator it1 = std::find_if(armies1.begin(), armies1.end(), AllowPart1);
-    Armies::iterator it2 = std::find_if(armies2.begin(), armies2.end(), AllowPart1);
+    Armies::iterator it1 = part1 ? std::find_if(armies1.begin(), armies1.end(), AllowPart1) :
+				    std::find_if(armies1.begin(), armies1.end(), AllowPart2);
+
+    Armies::iterator it2 = part1 ? std::find_if(armies2.begin(), armies2.end(), AllowPart1) :
+				    std::find_if(armies2.begin(), armies2.end(), AllowPart2);
 
     if(it1 != armies1.end() &&
 	it2 != armies2.end())
@@ -2403,58 +2406,6 @@ Battle2::Stats* Battle2::Armies::GetStatsPart1(Armies & armies1, Armies & armies
 	result = *it1;
     else
     if(it2 != armies2.end())
-	result = *it2;
-
-    return result &&
-	result->isValid() &&
-	result->GetSpeed() > Speed::STANDING ? result : NULL;
-}
-
-Battle2::Stats* Battle2::Armies::GetStatsPart2(Armies & armies1, Armies & armies2, Stats* last)
-{
-    armies1.Init();
-    armies2.Init();
-
-    armies1.SortFastest();
-    armies2.SortFastest();
-
-    Stats* result = NULL;
-
-    Armies::reverse_iterator it1 = std::find_if(armies1.rbegin(), armies1.rend(), AllowPart2);
-    Armies::reverse_iterator it2 = std::find_if(armies2.rbegin(), armies2.rend(), AllowPart2);
-
-    if(it1 != armies1.rend() &&
-	it2 != armies2.rend())
-    {
-	// defender first
-	if((*it2)->GetSpeed() < (*it1)->GetSpeed())
-	{
-	    result = *it2;
-	}
-	else
-	if((*it1)->GetSpeed() < (*it2)->GetSpeed())
-	{
-	    result = *it1;
-	}
-	else
-	{
-	    // defender first
-	    if(!last ||
-		armies1.parent.GetColor() == last->GetColor())
-	    {
-		result = *it2;
-	    }
-	    else
-	    {
-		result = *it1;
-	    }
-	}
-    }
-    else
-    if(it1 != armies1.rend())
-	result = *it1;
-    else
-    if(it2 != armies2.rend())
 	result = *it2;
 
     return result &&

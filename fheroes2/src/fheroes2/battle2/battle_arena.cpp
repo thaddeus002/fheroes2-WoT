@@ -934,7 +934,7 @@ void Battle2::Arena::Turns(u16 turn, Result & result)
 
     Stats* current_troop = NULL;
 
-    while(NULL != (current_troop = Armies::GetStatsPart1(armies1, armies2, current_troop)))
+    while(NULL != (current_troop = Armies::GetStats(armies1, armies2, current_troop, true)))
     {
 	// end battle
 	if(!army1.isValid() || !army2.isValid() || result_game->army1 || result_game->army2) break;
@@ -973,7 +973,7 @@ void Battle2::Arena::Turns(u16 turn, Result & result)
 
     // can skip move ?
     if(Settings::Get().ExtBattleSoftWait())
-    while(NULL != (current_troop = Armies::GetStatsPart2(armies1, armies2, current_troop)))
+    while(NULL != (current_troop = Armies::GetStats(armies1, armies2, current_troop, false)))
     {
 	// end battle
 	if(!army1.isValid() || !army2.isValid() || result_game->army1 || result_game->army2) break;
