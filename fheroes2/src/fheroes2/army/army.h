@@ -42,21 +42,8 @@ namespace Army
 	FORMAT_SPREAD  = 1
     };
 
-    enum armysize_t
-    {
-	FEW	= 1,
-	SEVERAL	= 5,
-	PACK	= 10,
-	LOTS	= 20,
-	HORDE	= 50,
-	THRONG	= 100,
-	SWARM	= 250,
-	ZOUNDS	= 500,
-	LEGION	= 1000
-    };
-
-    const char* String(u32);
-    armysize_t GetSize(u32);
+    std::string SizeString(u32);
+    std::string TroopSizeString(const Troop &);
 
     // 0: fight, 1: free join, 2: join with gold, 3: flee
     u8 GetJoinSolution(const Heroes &, const Maps::Tiles &, u32 &, s32 &);

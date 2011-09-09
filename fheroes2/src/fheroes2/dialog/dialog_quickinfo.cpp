@@ -67,22 +67,10 @@ std::string ShowMonsterInfo(const Maps::Tiles & tile, u8 scoute)
     {
         str = "%{count} %{monster}";
 	String::Replace(str, "%{count}", Game::CountScoute(troop.GetCount(), scoute));
+	String::Replace(str, "%{monster}", String::Lower(troop.GetMultiName()));
     }
     else
-    switch(Army::GetSize(troop.GetCount()))
-    {
-        default: break;
-        case Army::FEW:     str = _("A few\n%{monster}"); break;
-        case Army::SEVERAL: str = _("Several\n%{monster}"); break;
-        case Army::PACK:    str = _("A pack of\n%{monster}"); break;
-        case Army::LOTS:    str = _("Lots of\n%{monster}"); break;
-        case Army::HORDE:   str = _("A horde of\n%{monster}"); break;
-        case Army::THRONG:  str = _("A throng of\n%{monster}"); break;
-        case Army::SWARM:   str = _("A swarm of\n%{monster}"); break;
-        case Army::ZOUNDS:  str = _("Zounds of\n%{monster}"); break;
-        case Army::LEGION:  str = _("A legion of\n%{monster}"); break;
-    }
-    String::Replace(str, "%{monster}", String::Lower(troop.GetMultiName()));
+	str = Army::TroopSizeString(troop);
 
     return str;
 }

@@ -39,45 +39,80 @@
 #include "tools.h"
 #include "army.h"
 
-const char* Army::String(u32 size)
+enum armysize_t
 {
-    const char* str_size[] = { _("army|Few"), _("army|Several"), _("army|Pack"), _("army|Lots"), _("army|Horde"), _("army|Throng"), _("army|Swarm"), _("army|Zounds"), _("army|Legion") };
+    ARMY_FEW     = 1,
+    ARMY_SEVERAL = 5,
+    ARMY_PACK    = 10,
+    ARMY_LOTS    = 20,
+    ARMY_HORDE   = 50,
+    ARMY_THRONG  = 100,
+    ARMY_SWARM   = 250,
+    ARMY_ZOUNDS  = 500,
+    ARMY_LEGION  = 1000
+};
 
-    switch(GetSize(size))
+armysize_t ArmyGetSize(u32 count)
+{
+    if(ARMY_LEGION <= count)	return ARMY_LEGION;
+    else
+    if(ARMY_ZOUNDS <= count)	return ARMY_ZOUNDS;
+    else
+    if(ARMY_SWARM <= count)	return ARMY_SWARM;
+    else
+    if(ARMY_THRONG <= count)	return ARMY_THRONG;
+    else
+    if(ARMY_HORDE <= count)	return ARMY_HORDE;
+    else
+    if(ARMY_LOTS <= count)	return ARMY_LOTS;
+    else
+    if(ARMY_PACK <= count)	return ARMY_PACK;
+    else
+    if(ARMY_SEVERAL <= count)	return ARMY_SEVERAL;
+
+    return ARMY_FEW;
+}
+
+std::string Army::TroopSizeString(const Troop & troop)
+{
+    std::string str;
+
+    switch(ArmyGetSize(troop.GetCount()))
     {
-	case FEW:	return str_size[0];
-        case SEVERAL:	return str_size[1];
-        case PACK:	return str_size[2];
-        case LOTS:	return str_size[3];
-        case HORDE:	return str_size[4];
-        case THRONG:	return str_size[5];
-        case SWARM:	return str_size[6];
-        case ZOUNDS:	return str_size[7];
-        case LEGION:	return str_size[8];
+        default:		str = _("A few\n%{monster}"); break;
+        case ARMY_SEVERAL:	str = _("Several\n%{monster}"); break;
+        case ARMY_PACK:		str = _("A pack of\n%{monster}"); break;
+        case ARMY_LOTS:		str = _("Lots of\n%{monster}"); break;
+        case ARMY_HORDE:	str = _("A horde of\n%{monster}"); break;
+        case ARMY_THRONG:	str = _("A throng of\n%{monster}"); break;
+        case ARMY_SWARM:	str = _("A swarm of\n%{monster}"); break;
+        case ARMY_ZOUNDS:	str = _("Zounds of\n%{monster}"); break;
+        case ARMY_LEGION:	str = _("A legion of\n%{monster}"); break;
+    }
+
+    String::Replace(str, "%{monster}", String::Lower(troop.GetMultiName()));
+    return str;
+}
+
+std::string Army::SizeString(u32 size)
+{
+    const char* str_size[] = { _("army|Few"), _("army|Several"), _("army|Pack"), _("army|Lots"),
+		    _("army|Horde"), _("army|Throng"), _("army|Swarm"), _("army|Zounds"), _("army|Legion") };
+
+    switch(ArmyGetSize(size))
+    {
+        default: break;
+        case ARMY_SEVERAL:	return str_size[1];
+        case ARMY_PACK:		return str_size[2];
+        case ARMY_LOTS:		return str_size[3];
+        case ARMY_HORDE:	return str_size[4];
+        case ARMY_THRONG:	return str_size[5];
+        case ARMY_SWARM:	return str_size[6];
+        case ARMY_ZOUNDS:	return str_size[7];
+        case ARMY_LEGION:	return str_size[8];
     }
 
     return str_size[0];
-}
-
-Army::armysize_t Army::GetSize(u32 count)
-{
-    if(LEGION <= count)		return LEGION;
-    else
-    if(ZOUNDS <= count)		return ZOUNDS;
-    else
-    if(SWARM <= count)		return SWARM;
-    else
-    if(THRONG <= count)		return THRONG;
-    else
-    if(HORDE <= count)		return HORDE;
-    else
-    if(LOTS <= count)		return LOTS;
-    else
-    if(PACK <= count)		return PACK;
-    else
-    if(SEVERAL <= count)	return SEVERAL;
-
-    return FEW;
 }
 
 Army::army_t::army_t(HeroBase* s) : troops(ARMYMAXTROOPS), commander(s), combat_format(FORMAT_SPREAD), color(Color::NONE)
