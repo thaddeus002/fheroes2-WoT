@@ -1653,12 +1653,12 @@ void ActionToExperienceObject(Heroes &hero, const u8 obj, const s32 dst_index)
     // check already visited
     if(hero.isVisited(tile))
     {
-	if(Settings::Get().MusicMIDI()) PlaySoundVisited;
+	if(Settings::Get().MusicMIDI()){ PlaySoundVisited; }
 	Dialog::Message(MP2::StringObject(obj), body_false, Font::BIG, Dialog::OK);
     }
     else
     {
-	if(Settings::Get().MusicMIDI()) PlaySoundWarning;
+	if(Settings::Get().MusicMIDI()){ PlaySoundWarning; }
 	DialogWithExp(MP2::StringObject(obj), body_true, exp);
 
 	// visit
@@ -2540,7 +2540,9 @@ void ActionToArtesianSpring(Heroes &hero, const u8 obj, const s32 dst_index)
     else
     {
 	if(Settings::Get().MusicMIDI())
+	{
 	    PlaySoundSuccess;
+	}
 	else
 	    AGG::PlayMusic(MUS::WATERSPRING, false);
 	hero.SetSpellPoints(max * 2);
