@@ -308,7 +308,7 @@ Battle2::Stats::Stats(Army::Troop & t)
     reflect(false), mirror(NULL), animstate(0), animframe(0), animstep(1)
 {
     id = (troop.GetColor() << 8) | troop.GetArmyIndex();
-    count = troop.count;
+    count = troop.GetCount();
     hp = GetMonster().GetHitPoints() * count;
 
     contours[0] = NULL;
@@ -329,7 +329,7 @@ Battle2::Stats::~Stats()
     // reset summon elemental and mirror image
     if(Modes(CAP_SUMMONELEM) || Modes(CAP_MIRRORIMAGE))
     {
-	troop.count = 0;
+	troop.SetCount(0);
     }
 }
 
@@ -928,13 +928,13 @@ u32 Battle2::Stats::Resurrect(u32 points, bool allow_overflow, bool skip_dead)
 
     if(allow_overflow)
     {
-	if(troop.count < count) troop.count = count;
+	if(troop.GetCount() < count) troop.SetCount(count);
     }
     else
-    if(count > troop.count)
+    if(count > troop.GetCount())
     {
-	resurrect -= count - troop.count;
-	count = troop.count;
+	resurrect -= count - troop.GetCount();
+	count = troop.GetCount();
 	hp = count * GetMonster().GetHitPoints();
     }
 
@@ -1878,7 +1878,7 @@ u8 Battle2::Stats::GetSpellMagic(bool force) const
 
 bool Battle2::Stats::isHaveDamage(void) const
 {
-    return hp < troop.count * GetMonster().GetHitPoints();
+    return hp < troop.GetCount() * GetMonster().GetHitPoints();
 }
 
 u8 Battle2::Stats::GetFrameStart(void) const
@@ -2280,9 +2280,9 @@ void Battle2::Armies::Init(void)
 {
     clear();
 
-    for(Army::Troops::const_iterator
+    for(Army::Troops::iterator
         it = parent.troops.begin(); it != parent.troops.end(); ++it)
-            if((*it).isValid() && (*it).battle) push_back((*it).battle);
+            if((*it).isValid() && (*it).GetBattleStats()) push_back((*it).GetBattleStats());
 }
 
 Battle2::Stats* Battle2::Armies::GetRandom(void)
@@ -2340,7 +2340,7 @@ Battle2::Stats* Battle2::Armies::CreateNewStats(const Monster & mons, u32 count)
     Army::Troops::iterator it = armies.begin();
 
     // find free invalid
-    while(it != armies.end() && (*it).battle) ++it;
+    while(it != armies.end() && (*it).GetBattleStats()) ++it;
 
     if(armies.end() == it)
     {
@@ -2349,13 +2349,12 @@ Battle2::Stats* Battle2::Armies::CreateNewStats(const Monster & mons, u32 count)
     }
 
     (*it).Set(mons, count);
-    (*it).army = &parent;
+    (*it).SetArmy(&parent);
 
-    (*it).BattleInit();
+    if((*it).BattleInit())
+    push_back((*it).GetBattleStats());
 
-    push_back((*it).battle);
-
-    return (*it).battle;
+    return (*it).GetBattleStats();
 }
 
 Battle2::Stats* Battle2::Armies::GetStats(Armies & armies1, Armies & armies2, Stats* last, bool part1)

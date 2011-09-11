@@ -28,13 +28,7 @@
 #include "color.h"
 #include "monster.h"
 
-namespace Battle2
-{
-    class Arena;
-    class Stats;
-    class Armies;
-}
-
+namespace Battle2 { class Stats; }
 namespace Skill { class Primary; }
 namespace Maps { class Tiles; }
 
@@ -66,7 +60,7 @@ namespace Army
         void	SetCount(u32);
         void	Reset(void);
         
-        const Skill::Primary* MasterSkill(void) const;
+        void		SetArmy(army_t*);
         army_t*         GetArmy(void);
         const army_t*   GetArmy(void) const;
 	const char*     GetName(u32 amount = 0) const;
@@ -82,7 +76,8 @@ namespace Army
         u8		GetSpeed(void) const;
 
 	const Battle2::Stats*	GetBattleStats(void) const;
-	Battle2::Stats*	GetBattleStats(void);
+	Battle2::Stats*		GetBattleStats(void);
+
         u32		GetDamageMin(void) const;
 	u32		GetDamageMax(void) const;
 	u32		GetStrength(void) const;
@@ -102,11 +97,6 @@ namespace Army
 	payment_t	GetUpgradeCost(void) const;
 
       protected:
-        friend class army_t;
-        friend class Battle2::Stats;
-        friend class Battle2::Armies;
-        friend class Battle2::Arena;
-
         u32		count;
 	army_t*		army;
 	Battle2::Stats*	battle;

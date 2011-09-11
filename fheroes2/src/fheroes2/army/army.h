@@ -32,7 +32,7 @@
 class Castle;
 class Heroes;
 namespace Maps { class Tiles; }
-namespace Battle2 { class Stats; class Armies; }
+namespace Battle2 { class Armies; }
 
 namespace Army
 {
@@ -123,8 +123,9 @@ namespace Army
 
 	    Troops	Optimize(void) const;
 
+	    s8		GetTroopIndex(const Troop &) const;
+
 	protected:
-	    friend class Troop;
 	    friend class Battle2::Armies;
 
 	    army_t(const army_t &);
@@ -132,7 +133,6 @@ namespace Army
 
 	    void	Import(army_t &);
 	    void	Import(const Troops &);
-	    s8		GetTroopIndex(const Troop &) const;
 
 	    Troops		troops;
 	    HeroBase*		commander;

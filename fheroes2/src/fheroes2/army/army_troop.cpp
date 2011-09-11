@@ -137,9 +137,9 @@ u32 Army::Troop::BattleKilled(void) const
     return battle ? battle->dead : 0;
 }
 
-const Skill::Primary* Army::Troop::MasterSkill(void) const
+void Army::Troop::SetArmy(army_t* a)
 {
-    return army ? army->commander : NULL;
+    army = a;
 }
 
 Army::army_t* Army::Troop::GetArmy(void)
@@ -168,13 +168,13 @@ u32 Army::Troop::GetCount(void) const
 u8 Army::Troop::GetAttack(bool hero) const
 {
     return battle ? battle->GetAttack() : Monster::GetAttack() +
-            (army && hero && army->commander ? army->commander->GetAttack() : 0);
+            (army && hero && army->GetCommander() ? army->GetCommander()->GetAttack() : 0);
 }
 
 u8 Army::Troop::GetDefense(bool hero) const
 {
     return battle ? battle->GetDefense() : Monster::GetDefense() +
-            (army && hero && army->commander ? army->commander->GetDefense() : 0);
+            (army && hero && army->GetCommander() ? army->GetCommander()->GetDefense() : 0);
 }
 
 Color::color_t Army::Troop::GetColor(void) const

@@ -199,7 +199,7 @@ void DrawMonsterStats(const Point & dst, const Army::Troop & troop)
     Text text;
     const Monster & mons = static_cast<Monster>(troop);
     const Battle2::Stats* battle = troop.GetBattleStats();
-    bool commander = troop.MasterSkill();
+    bool commander = troop.GetArmy() && troop.GetArmy()->GetCommander();
     bool pda = Settings::Get().QVGA();
 
     // attack

@@ -1250,13 +1250,13 @@ void Battle2::Arena::GetArmyPositions(u8 color, std::vector<u16> & res) const
 Battle2::Stats* Battle2::Arena::GetTroopID(u16 id)
 {
     Army::army_t* army = GetArmy(id >> 8);
-    return army && army->Size() > (0x000F & id) ? army->At(0x000F & id).battle : NULL;
+    return army && army->Size() > (0x000F & id) ? army->At(0x000F & id).GetBattleStats() : NULL;
 }
 
 const Battle2::Stats* Battle2::Arena::GetTroopID(u16 id) const
 {
     const Army::army_t* army = GetArmy(id >> 8);
-    return army && army->Size() > (0x000F & id) ? army->At(0x000F & id).battle : NULL;
+    return army && army->Size() > (0x000F & id) ? army->At(0x000F & id).GetBattleStats() : NULL;
 }
 
 const Battle2::Stats* Battle2::Arena::GetEnemyAbroadMaxQuality(u16 position, u8 color) const

@@ -119,14 +119,14 @@ Army::army_t::army_t(HeroBase* s) : troops(ARMYMAXTROOPS), commander(s), combat_
 {
     for(Troops::iterator
 	it = troops.begin(); it != troops.end(); ++it)
-	(*it).army = this;
+	(*it).SetArmy(this);
 }
 
 Army::army_t::army_t(const army_t & a) : troops(ARMYMAXTROOPS), commander(NULL), combat_format(FORMAT_SPREAD), color(Color::NONE)
 {
     for(Troops::iterator
 	it = troops.begin(); it != troops.end(); ++it)
-	(*it).army = this;
+	(*it).SetArmy(this);
 
     Import(a.troops);
 }
