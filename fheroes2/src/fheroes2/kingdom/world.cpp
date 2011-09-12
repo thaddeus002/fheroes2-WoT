@@ -1442,6 +1442,10 @@ bool World::DiggingForUltimateArtifact(const Point & center)
     }
     tile.AddonsPushLevel1(Maps::TilesAddon(0, GetUniq(), obj, idx));
 
+    // reset
+    if(ultimate_index == tile.GetIndex())
+	ultimate_index = -1;
+
     return ultimate_index == tile.GetIndex();
 }
 
