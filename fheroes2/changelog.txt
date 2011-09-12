@@ -1,5 +1,6 @@
-latest (2549 rev.)
+latest (2551 rev.)
 
++ Fixed: battle: dialog summary disable loop animation
 + Fixed: battle: redraw obstacles level
 + Fixed: world: DiggingForUltimateArtifact, reset position
 + Fixed: world: MonthOfMonstersAction, add check heroes and castles
