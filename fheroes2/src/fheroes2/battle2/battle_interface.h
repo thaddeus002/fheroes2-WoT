@@ -149,7 +149,8 @@ namespace Battle2
 
 	void RedrawBorder(void);
 	void RedrawCover(void);
-	void RedrawObjects(const u16) const;
+	void RedrawLowObjects(const u16) const;
+	void RedrawHighObjects(const u16) const;
 	void RedrawCastle1(void) const;
 	void RedrawCastle2(const u16) const;
 	void RedrawCastle3(void) const;

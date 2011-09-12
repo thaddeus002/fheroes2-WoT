@@ -1,5 +1,7 @@
-latest (2546 rev.)
+latest (2549 rev.)
 
++ Fixed: battle: redraw obstacles level
++ Fixed: world: DiggingForUltimateArtifact, reset position
 + Fixed: world: MonthOfMonstersAction, add check heroes and castles
 + Fixed: pocketpc: good luck animation
 + Fixed: battle: fixed bless + good luck, curse + bad luck

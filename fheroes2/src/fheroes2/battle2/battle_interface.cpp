@@ -806,7 +806,7 @@ void Battle2::Interface::RedrawArmies(void) const
 {
     for(u16 ii = 0; ii < arena.board.size(); ++ii)
     {
-	RedrawObjects(ii);
+	RedrawHighObjects(ii);
 
 	const Stats* b = arena.GetTroopBoard(ii);
 	if(!b || (b->isWide() && ii == b->GetTailIndex())) continue;
@@ -1036,26 +1036,29 @@ void Battle2::Interface::RedrawCover(void)
 	display.Blit(cover, topleft.x + cover.x(), topleft.y + cover.y());
     }
 
+    // ground obstacles
+    for(u16 ii = 0; ii < arena.board.size(); ++ii)
+    {
+	RedrawLowObjects(ii);
+    }
+
     if(arena.castle) RedrawCastle1();
 
     // shadow
     if(!b_move && conf.ExtBattleShowMoveShadow())
     {
-	Board::const_iterator it1 = arena.board.begin();
-	Board::const_iterator it2 = arena.board.end();
-
-	for(; it1 != it2; ++it1) if((*it1).isPassable() && UNKNOWN != (*it1).GetDirection())
-	    display.Blit(sf_shadow, (*it1).GetPos().x, (*it1).GetPos().y);
+	for(Board::const_iterator
+	    it = arena.board.begin(); it != arena.board.end(); ++it)
+	    if((*it).isPassable() && UNKNOWN != (*it).GetDirection())
+	    display.Blit(sf_shadow, (*it).GetPos().x, (*it).GetPos().y);
     }
 
     // grid
     if(conf.ExtBattleShowGrid())
     {
-	Board::const_iterator it1 = arena.board.begin();
-	Board::const_iterator it2 = arena.board.end();
-
-	for(; it1 != it2; ++it1)
-	    if((*it1).object == 0) display.Blit(sf_hexagon, (*it1).GetPos());
+	for(Board::const_iterator
+	    it = arena.board.begin(); it != arena.board.end(); ++it)
+	    if((*it).object == 0) display.Blit(sf_hexagon, (*it).GetPos());
     }
 
     // cursor
@@ -1216,7 +1219,29 @@ void Battle2::Interface::RedrawCastle3(void) const
     display.Blit(sprite, topleft.x + sprite.x() ,topleft.y + sprite.y());
 }
 
-void Battle2::Interface::RedrawObjects(const u16 cell_index) const
+void Battle2::Interface::RedrawLowObjects(const u16 cell_index) const
+{
+    const Sprite* sprite = NULL;
+    switch(arena.board[cell_index].object)
+    {
+	case 0x84:	sprite = &AGG::GetICN(ICN::COBJ0004, 0); break;
+	case 0x87:	sprite = &AGG::GetICN(ICN::COBJ0007, 0); break;
+	case 0x90:	sprite = &AGG::GetICN(ICN::COBJ0016, 0); break;
+	case 0x9E:	sprite = &AGG::GetICN(ICN::COBJ0030, 0); break;
+	case 0x9F:	sprite = &AGG::GetICN(ICN::COBJ0031, 0); break;
+	default: break;
+    }
+
+    if(sprite)
+    {
+	Display & display = Display::Get();
+	//const Point & topleft = border.GetArea();
+	const Rect & pt = arena.board[cell_index].pos;
+	display.Blit(*sprite, pt.x + pt.w / 2 + sprite->x(), pt.y + pt.h + sprite->y() - (Settings::Get().QVGA() ? 5 : 10));
+    }
+}
+
+void Battle2::Interface::RedrawHighObjects(const u16 cell_index) const
 {
     const Sprite* sprite = NULL;
     switch(arena.board[cell_index].object)
@@ -1225,10 +1250,8 @@ void Battle2::Interface::RedrawObjects(const u16 cell_index) const
 	case 0x81:	sprite = &AGG::GetICN(ICN::COBJ0001, 0); break;
 	case 0x82:	sprite = &AGG::GetICN(ICN::COBJ0002, 0); break;
 	case 0x83:	sprite = &AGG::GetICN(ICN::COBJ0003, 0); break;
-	case 0x84:	sprite = &AGG::GetICN(ICN::COBJ0004, 0); break;
 	case 0x85:	sprite = &AGG::GetICN(ICN::COBJ0005, 0); break;
 	case 0x86:	sprite = &AGG::GetICN(ICN::COBJ0006, 0); break;
-	case 0x87:	sprite = &AGG::GetICN(ICN::COBJ0007, 0); break;
 	case 0x88:	sprite = &AGG::GetICN(ICN::COBJ0008, 0); break;
 	case 0x89:	sprite = &AGG::GetICN(ICN::COBJ0009, 0); break;
 	case 0x8A:	sprite = &AGG::GetICN(ICN::COBJ0010, 0); break;
@@ -1237,7 +1260,6 @@ void Battle2::Interface::RedrawObjects(const u16 cell_index) const
 	case 0x8D:	sprite = &AGG::GetICN(ICN::COBJ0013, 0); break;
 	case 0x8E:	sprite = &AGG::GetICN(ICN::COBJ0014, 0); break;
 	case 0x8F:	sprite = &AGG::GetICN(ICN::COBJ0015, 0); break;
-	case 0x90:	sprite = &AGG::GetICN(ICN::COBJ0016, 0); break;
 	case 0x91:	sprite = &AGG::GetICN(ICN::COBJ0017, 0); break;
 	case 0x92:	sprite = &AGG::GetICN(ICN::COBJ0018, 0); break;
 	case 0x93:	sprite = &AGG::GetICN(ICN::COBJ0019, 0); break;
@@ -1251,8 +1273,6 @@ void Battle2::Interface::RedrawObjects(const u16 cell_index) const
 	case 0x9B:	sprite = &AGG::GetICN(ICN::COBJ0027, 0); break;
 	case 0x9C:	sprite = &AGG::GetICN(ICN::COBJ0028, 0); break;
 	case 0x9D:	sprite = &AGG::GetICN(ICN::COBJ0029, 0); break;
-	case 0x9E:	sprite = &AGG::GetICN(ICN::COBJ0030, 0); break;
-	case 0x9F:	sprite = &AGG::GetICN(ICN::COBJ0031, 0); break;
 	default: break;
     }
 
