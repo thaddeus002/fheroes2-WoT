@@ -1,5 +1,16 @@
-latest (2520 rev.)
+latest (2546 rev.)
 
++ Fixed: world: MonthOfMonstersAction, add check heroes and castles
++ Fixed: pocketpc: good luck animation
++ Fixed: battle: fixed bless + good luck, curse + bad luck
++ Fixed: battle: fixed attacker animation pause
++ Fixed: battle: wait order turn
++ Fixed: gui: marketplace dialog show splitter cursor
++ Fixed: music: ocean theme
++ Fixed: play battle music
++ Fixed: music: puzzle, victory, lose, artesian spring, nomad tents, tree house, demon cave, experience, skill, watch tower
++ Fixed: music: castle music when hero open/close dialog
++ Fixed: game: heroes attack to castle (with hero present)
 + Added: option: castle: allow recruits special/expansion heroes
 + Update: battle: Army::Dialog: added spell duration info
 + Update: QuickDialog for hero, disable show level for enemy hero

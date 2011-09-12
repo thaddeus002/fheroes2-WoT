@@ -1033,7 +1033,10 @@ void World::MonthOfMonstersAction(const Monster & mons)
 
 	    if(Maps::Ground::WATER != tile.GetGround() &&
 		MP2::OBJ_ZERO == tile.GetObject() &&
-		tile.isPassable(NULL, Direction::UNKNOWN, true))
+		tile.isPassable(NULL, Direction::UNKNOWN, true) &&
+		! Maps::ScanAroundObject(ii, MP2::OBJ_HEROES) &&
+		! Maps::ScanAroundObject(ii, MP2::OBJ_CASTLE) &&
+		! Maps::ScanAroundObject(ii, MP2::OBJN_CASTLE))
 		tiles.push_back(ii);
 	}
 
