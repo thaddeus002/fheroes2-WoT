@@ -1444,9 +1444,12 @@ bool World::DiggingForUltimateArtifact(const Point & center)
 
     // reset
     if(ultimate_index == tile.GetIndex())
+    {
 	ultimate_index = -1;
+	return true;
+    }
 
-    return ultimate_index == tile.GetIndex();
+    return false;
 }
 
 void World::ActionForMagellanMaps(u8 color)
