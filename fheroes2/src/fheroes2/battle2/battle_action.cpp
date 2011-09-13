@@ -1166,20 +1166,21 @@ void Battle2::Arena::SpellActionMirrorImage(Action & a)
     		DEBUG(DBG_BATTLE, DBG_TRACE, "set position: " << *it);
 		if(interface) interface->RedrawActionMirrorImageSpell(*b, *it);
 
-#ifdef WITH_NET
 		Stats* image = CreateMirrorImage(*b, *it);
+
 		if(image)
 		{
+#ifdef WITH_NET
 		    if(CONTROL_REMOTE & army1.GetControl())
 			FH2Server::Get().BattleSendMirrorImageSpell(army1.GetColor(), who, *it, *image);
 		    if(CONTROL_REMOTE & army2.GetControl())
 			FH2Server::Get().BattleSendMirrorImageSpell(army2.GetColor(), who, *it, *image);
+#endif
 		}
 		else
 		{
     		    DEBUG(DBG_BATTLE, DBG_WARN, "is NULL");
 		}
-#endif
 	    }
 	    else
 	    {
