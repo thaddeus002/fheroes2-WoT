@@ -1434,7 +1434,7 @@ void Settings::BinaryLoad(void)
 	msg.Pop(byte32);
 	opt_battle.SetModes(byte32);
 
-	if(version < FORMAT_VERSION_2460)
+	if(version > FORMAT_VERSION_2460)
 	{
 	    msg.Pop(byte32);
 	    opt_addons.SetModes(byte32);
