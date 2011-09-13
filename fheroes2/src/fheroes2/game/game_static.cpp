@@ -53,7 +53,7 @@ namespace GameStatic
     u8          castle_grown_week_of	= 5;
     u8          castle_grown_month_of	= 100;
 
-    u8          mageguild_restore_spell_points_day[] = { 20, 40, 60, 80, 100 };
+    u8          mageguild_restore_spell_points_day[] = {  20, 40, 60, 80, 100 };
 
     // heroes
     u8		heroes_spell_points_day	= 1;
@@ -113,7 +113,7 @@ u8 GameStatic::GetHeroesRestoreSpellPointsPerDay(void)
 
 u8 GameStatic::GetMageGuildRestoreSpellPointsPercentDay(u8 level)
 {
-    return level && level < 5 ? mageguild_restore_spell_points_day[level] : 0;
+    return level && level < 5 ? mageguild_restore_spell_points_day[level - 1] : 0;
 }
 
 u8 GameStatic::GetKingdomMaxHeroes(void)
