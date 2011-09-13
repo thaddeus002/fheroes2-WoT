@@ -354,6 +354,8 @@ void Heroes::LoadFromMP2(s32 map_index, const void *ptr, const Color::color_t cl
     bool custom_portrait = false;
     if(*ptr8)
     {
+	SetModes(NOTDEFAULTS);
+
 	custom_portrait = true;
 	++ptr8;
 	// index sprite portrait
@@ -392,6 +394,8 @@ void Heroes::LoadFromMP2(s32 map_index, const void *ptr, const Color::color_t cl
     // custom skill
     if(*ptr8)
     {
+	SetModes(NOTDEFAULTS);
+
 	custom_secskill = true;
 	++ptr8;
 
@@ -409,7 +413,11 @@ void Heroes::LoadFromMP2(s32 map_index, const void *ptr, const Color::color_t cl
     ++ptr8;
 
     // custom name
-    if(*ptr8) name = Game::GetEncodeString(reinterpret_cast<const char *>(ptr8 + 1));
+    if(*ptr8)
+    {
+	SetModes(NOTDEFAULTS);
+	name = Game::GetEncodeString(reinterpret_cast<const char *>(ptr8 + 1));
+    }
     ptr8 += 14;
 
     // patrol
@@ -436,6 +444,7 @@ void Heroes::LoadFromMP2(s32 map_index, const void *ptr, const Color::color_t cl
     u8 level = GetLevel();
     while(1 < level--)
     {
+	SetModes(NOTDEFAULTS);
 	LevelUp(custom_secskill, true);
     }
 
@@ -1823,9 +1832,9 @@ Heroes* AllHeroes::GetFreeman(u8 race) const
     std::vector<u8> freeman_heroes;
     freeman_heroes.reserve(HEROESMAXCOUNT);
 
-    // find freeman in race
+    // find freeman in race (skip: manual changes)
     for(u8 ii = min; ii <= max; ++ii)
-	if(at(ii)->isFreeman()) freeman_heroes.push_back(ii);
+	if(at(ii)->isFreeman() && !at(ii)->Modes(Heroes::NOTDEFAULTS)) freeman_heroes.push_back(ii);
 
     // not found, find any race
     if(Race::NONE != race && freeman_heroes.empty())
