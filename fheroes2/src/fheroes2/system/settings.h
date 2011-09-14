@@ -39,12 +39,13 @@
 #include <android/log.h>
 #endif
 
+#define FORMAT_VERSION_2562 0x0A02
 #define FORMAT_VERSION_2522 0x09DA
 #define FORMAT_VERSION_2494 0x09BE
 #define FORMAT_VERSION_2487 0x09B7
 #define FORMAT_VERSION_2460 0x099C
 #define FORMAT_VERSION_2379 0x094B
-#define CURRENT_FORMAT_VERSION FORMAT_VERSION_2522
+#define CURRENT_FORMAT_VERSION FORMAT_VERSION_2562
 #define LAST_FORMAT_VERSION FORMAT_VERSION_2379
 
 #define ListMapsDirectory std::list<std::string>
@@ -188,6 +189,7 @@ public:
 	WORLD_ARTSPRING_SEPARATELY_VISIT= 0x30000002,
 	CASTLE_ALLOW_RECRUITS_SPECIAL	= 0x30000004,
 	WORLD_STARTHERO_LOSSCOND4HUMANS = 0x30000008,
+	WORLD_1HERO_HIRED_EVERY_WEEK	= 0x30000010,
 
 	BATTLE_ARCHMAGE_RESIST_BAD_SPELL= 0x40001000,
 	BATTLE_MAGIC_TROOP_RESIST	= 0x40002000,
@@ -306,6 +308,7 @@ public:
     bool ExtWorldBanPlagues(void) const;
     bool ExtWorldArtesianSpringSeparatelyVisit(void) const;
     bool ExtWorldStartHeroLossCond4Humans(void) const;
+    bool ExtWorldOneHeroHiredEveryWeek(void) const;
     bool ExtCastleAllowFlash(void) const;
     bool ExtCastleGuildRestorePointsTurn(void) const;
     bool ExtCastleAllowRecruitSpecialHeroes(void) const;

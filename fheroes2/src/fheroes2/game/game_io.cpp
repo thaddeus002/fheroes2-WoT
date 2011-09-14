@@ -431,7 +431,7 @@ void Game::IO::PackTileAddons(QueueMessage & msg, const Maps::Addons & addons)
 void Game::IO::PackKingdom(QueueMessage & msg, const Kingdom & kingdom)
 {
     msg.Push(kingdom.color);
-    msg.Push(kingdom.flags);
+    msg.Push(kingdom.modes);
     msg.Push(kingdom.lost_town_days);
     // unused
     msg.Push(static_cast<u16>(0));
@@ -769,6 +769,17 @@ bool Game::IO::LoadBIN(QueueMessage & msg)
     msg.Pop(conf.current_maps_file.conditions_loss);
     msg.Pop(conf.current_maps_file.loss1);
     msg.Pop(conf.current_maps_file.loss2);
+
+    if(! conf.PriceLoyaltyVersion() && 4 < conf.current_maps_file.file.size())
+    {
+	std::string lower = conf.current_maps_file.file;
+	String::Lower(lower);
+
+	if(".mx2" == lower.substr(lower.size() - 4))
+	{
+	    Dialog::Message("Warning!", "This is an saved file used the \"Price of Loyalty\" extension.\nAnd it will work for you with errors!", Font::BIG, Dialog::OK);
+	}
+    }
 
     msg.Pop(byte16);
     if(byte16 != 0xFF03) DEBUG(DBG_GAME, DBG_WARN, "0xFF03");
@@ -1119,7 +1130,13 @@ void Game::IO::UnpackKingdom(QueueMessage & msg, Kingdom & kingdom, u16 check_ve
 	if(player) player->control = byte8;
     }
 
-    msg.Pop(kingdom.flags);
+    if(check_version < FORMAT_VERSION_2562)
+    {
+	msg.Pop(byte16);
+	kingdom.modes = byte16;
+    }
+    else
+	msg.Pop(kingdom.modes);
     msg.Pop(kingdom.lost_town_days);
     // unused
     msg.Pop(byte16);

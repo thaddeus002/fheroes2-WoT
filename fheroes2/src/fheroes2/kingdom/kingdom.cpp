@@ -42,7 +42,7 @@ bool HeroesStrongestArmy(const Heroes* h1, const Heroes* h2)
     return h1 && h2 && h2->GetArmy().StrongerEnemyArmy(h1->GetArmy());
 }
 
-Kingdom::Kingdom() : color(Color::NONE), flags(0), lost_town_days(0), visited_tents_colors(0)
+Kingdom::Kingdom() : color(Color::NONE), lost_town_days(0), visited_tents_colors(0)
 {
     heroes_cond_loss.reserve(4);
 }
@@ -70,8 +70,9 @@ void Kingdom::Init(u8 clr)
 
 void Kingdom::clear(void)
 {
+    modes	= 0;
+
     color	= Color::NONE;
-    flags	= 0;
     visited_tents_colors = 0;
     lost_town_days = Game::GetLostTownDays() + 1;
 
@@ -102,21 +103,6 @@ u8 Kingdom::GetRace(void) const
 void Kingdom::UpdateStartingResource(void)
 {
     resource = GameStatic::GetKingdomStartingResource(CONTROL_AI == GetControl() ? 5 : Settings::Get().GameDifficulty());
-}
-
-void Kingdom::SetModes(flags_t f)
-{
-    flags |= f;
-}
-
-void Kingdom::ResetModes(flags_t f)
-{
-    flags &= ~f;
-}
-
-bool Kingdom::Modes(flags_t f) const
-{
-    return flags & f;
 }
 
 bool Kingdom::isLoss(void) const
@@ -212,6 +198,8 @@ void Kingdom::ActionNewDay(void)
 
 void Kingdom::ActionNewWeek(void)
 {
+    ResetModes(DISABLEHIRES);
+
     // skip first day
     if(1 < world.CountDay())
     {

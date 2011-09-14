@@ -661,6 +661,10 @@ const char* Castle::GetDescriptionBuilding(u32 build, u8 race)
 
 bool Castle::AllowBuyHero(const Heroes & hero)
 {
+    if(Settings::Get().ExtWorldOneHeroHiredEveryWeek() &&
+	world.GetKingdom(GetColor()).Modes(Kingdom::DISABLEHIRES))
+	return false;
+
     CastleHeroes heroes = world.GetHeroes(*this);
     return !heroes.Guest() && world.GetKingdom(color).AllowRecruitHero(true, hero.GetLevel());
 }
@@ -678,6 +682,9 @@ Heroes* Castle::RecruitHero(Heroes* hero)
 
     // update spell book
     if(GetLevelMageGuild()) MageGuildEducateHero(*hero);
+
+    if(Settings::Get().ExtWorldOneHeroHiredEveryWeek())
+        kingdom.SetModes(Kingdom::DISABLEHIRES);
 
     DEBUG(DBG_GAME , DBG_INFO, name << ", recruit: " << hero->GetName());
 

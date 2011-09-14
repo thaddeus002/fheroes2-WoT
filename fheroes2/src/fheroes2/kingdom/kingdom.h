@@ -56,22 +56,20 @@ struct KingdomHeroes : public VecHeroes
 {
 };
 
-class Kingdom
+class Kingdom : public BitModes
 {
 public:
-    enum flags_t
+    enum
     {
 	PLAY	     = 0x0001,
-	IDENTIFYHERO = 0x0002
+	IDENTIFYHERO = 0x0002,
+	DISABLEHIRES = 0x0004
     };
 
     Kingdom();
 
     void Init(u8 color);
     void clear(void);
-    void SetModes(flags_t);
-    void ResetModes(flags_t);
-    bool Modes(flags_t) const;
 
     void UpdateStartingResource(void);
     bool isPlay(void) const{ return Modes(PLAY); }
@@ -161,7 +159,6 @@ private:
     u8 color;
     Funds resource;
 
-    u16 flags;
     u8  lost_town_days;
 
     KingdomCastles castles;
