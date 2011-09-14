@@ -475,6 +475,11 @@ void Game::IO::PackKingdom(QueueMessage & msg, const Kingdom & kingdom)
 
     // tents colors
     msg.Push(kingdom.visited_tents_colors);
+
+    msg.Push(static_cast<u32>(kingdom.heroes_cond_loss.size()));
+    for(KingdomHeroes::const_iterator
+	it = kingdom.heroes_cond_loss.begin(); it != kingdom.heroes_cond_loss.end(); ++it)
+	msg.Push(static_cast<u8>((*it)->GetID()));
 }
 
 void Game::IO::PackCastle(QueueMessage & msg, const Castle & castle)
@@ -1134,6 +1139,17 @@ void Game::IO::UnpackKingdom(QueueMessage & msg, Kingdom & kingdom, u16 check_ve
 
     // visited tents
     msg.Pop(kingdom.visited_tents_colors);
+
+    if(check_version >= FORMAT_VERSION_2566)
+    {
+	msg.Pop(byte32);
+	kingdom.heroes_cond_loss.clear();
+	for(u32 jj = 0; jj < byte32; ++jj)
+	{
+	    msg.Pop(byte8);
+	    kingdom.heroes_cond_loss.push_back(world.GetHeroes(static_cast<Heroes::heroes_t>(byte8)));
+	}
+    }
 }
 
 void Game::IO::UnpackCastle(QueueMessage & msg, Castle & castle, u16 check_version)
