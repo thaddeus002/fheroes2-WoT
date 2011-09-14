@@ -159,9 +159,9 @@ void BuildingInfo::UpdateCosts(const std::string & spec)
         NULL != (xml_buildings = doc.FirstChildElement("buildings")))
     {
         for(const TiXmlElement* xml_building = xml_buildings->FirstChildElement("building");
-    		xml_building && BUILD_NOTHING != _builds[index]->id2; xml_building = xml_building->NextSiblingElement("building"), ++index)
+    		xml_building && BUILD_NOTHING != _builds[index].id2; xml_building = xml_building->NextSiblingElement("building"), ++index)
         {
-    	    cost_t & cost = ptr->cost;
+    	    cost_t & cost = _builds[index].cost;
 	    int value;
 
             xml_building->Attribute("gold", &value); cost.gold = value;
@@ -171,8 +171,6 @@ void BuildingInfo::UpdateCosts(const std::string & spec)
             xml_building->Attribute("sulfur", &value); cost.sulfur = value;
             xml_building->Attribute("crystal", &value); cost.crystal = value;
             xml_building->Attribute("gems", &value); cost.gems = value;
-
-	    ++ptr;
 	}
     }
     else
