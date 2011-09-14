@@ -177,7 +177,7 @@ public:
 	CASTLE_ALLOW_GUARDIANS		= 0x20080000,
 	CASTLE_ALLOW_BUY_FROM_WELL	= 0x20100000,
 	HEROES_LEARN_SPELLS_WITH_DAY	= 0x20200000,
-	//HEROES_UNUSED			= 0x20400000,
+	HEROES_ALLOW_BANNED_SECSKILLS	= 0x20400000,
 	HEROES_COST_DEPENDED_FROM_LEVEL = 0x20800000,
 	HEROES_REMEMBER_POINTS_RETREAT  = 0x21000000,
 	HEROES_SURRENDERING_GIVE_EXP	= 0x22000000,
@@ -295,6 +295,7 @@ public:
     bool ExtHeroAllowTranscribingScroll(void) const;
     bool ExtHeroAutoMove2BattleTarget(void) const;
     bool ExtHeroPickupArtifactWithInfoDialog(void) const;
+    bool ExtHeroAllowBannedSecSkillsUpgrade(void) const;
     bool ExtUnionsAllowCastleVisiting(void) const;
     bool ExtUnionsAllowHeroesMeetings(void) const;
     bool ExtUnionsAllowViewMaps(void) const;

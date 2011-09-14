@@ -157,6 +157,7 @@ const settings_t settingsFHeroes2[] =
     { Settings::HEROES_PATROL_ALLOW_PICKUP,     _("heroes: allow pickup objects for patrol"),           },
     { Settings::HEROES_AUTO_MOVE_BATTLE_DST,	_("heroes: after battle move to target cell"),		},
     { Settings::HEROES_TRANSCRIBING_SCROLLS,	_("heroes: allow transcribing scrolls (needs: Eye Eagle skill)"), },
+    { Settings::HEROES_ALLOW_BANNED_SECSKILLS,	_("heroes: allow banned sec. skills upgrade"), 		},
     { Settings::UNIONS_ALLOW_HERO_MEETINGS,	_("unions: allow meeting heroes"),                      },
     { Settings::UNIONS_ALLOW_CASTLE_VISITING,	_("unions: allow castle visiting"),                     },
     { Settings::UNIONS_ALLOW_VIEW_MAPS,		_("unions: allow view maps"),                           },
@@ -1373,6 +1374,11 @@ bool Settings::ExtBattleReverseWaitOrder(void) const
 bool Settings::ExtWorldStartHeroLossCond4Humans(void) const
 {
     return ExtModes(WORLD_STARTHERO_LOSSCOND4HUMANS);
+}
+
+bool Settings::ExtHeroAllowBannedSecSkillsUpgrade(void) const
+{
+    return ExtModes(HEROES_ALLOW_BANNED_SECSKILLS);
 }
 
 const Point & Settings::PosRadar(void) const { return pos_radr; }

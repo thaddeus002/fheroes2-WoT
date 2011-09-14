@@ -817,14 +817,29 @@ void Skill::SecSkills::FindSkillsForLevelUp(u8 race, Secondary & sec1, Secondary
     }
 
     sec1.SetSkill(SecondaryPriorityFromRace(race, exclude_skills));
-    exclude_skills.push_back(sec1.Skill());
-    sec2.SetSkill(SecondaryPriorityFromRace(race, exclude_skills));
+    if(Secondary::UNKNOWN != sec1.Skill())
+    {
+	exclude_skills.push_back(sec1.Skill());
+	sec2.SetSkill(SecondaryPriorityFromRace(race, exclude_skills));
 
-    sec1.SetLevel(GetLevel(sec1.Skill()));
-    sec2.SetLevel(GetLevel(sec2.Skill()));
+	sec1.SetLevel(GetLevel(sec1.Skill()));
+	sec2.SetLevel(GetLevel(sec2.Skill()));
 
-    sec1.NextLevel();
-    sec2.NextLevel();
+        sec1.NextLevel();
+	sec2.NextLevel();
+    }
+    else
+    if(Settings::Get().ExtHeroAllowBannedSecSkillsUpgrade())
+    {
+	const_iterator it = std::find_if(begin(), end(),
+			    std::not1(std::bind2nd(std::mem_fun_ref(&Secondary::isLevel), Level::EXPERT)));
+	if(it != end())
+	{
+	    sec1.SetSkill((*it).Skill());
+	    sec1.SetLevel(GetLevel(sec1.Skill()));
+    	    sec1.NextLevel();
+	}
+    }
 }
 
 

@@ -173,6 +173,7 @@ void Dialog::ExtSettings(bool readonly)
     states.push_back(Settings::HEROES_PATROL_ALLOW_PICKUP);
     states.push_back(Settings::HEROES_AUTO_MOVE_BATTLE_DST);
     states.push_back(Settings::HEROES_TRANSCRIBING_SCROLLS);
+    states.push_back(Settings::HEROES_ALLOW_BANNED_SECSKILLS);
 
     if(! conf.QVGA())
     {
