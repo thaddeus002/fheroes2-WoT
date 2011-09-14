@@ -131,6 +131,24 @@ secondary_t _from_witchs_hut = {
     /* scouting */  1, /* wisdom */ 1
 };
 
+struct defaulthero_t
+{
+    const char*	name;
+    primary_t	primary;
+    secondary_t	sec;
+    // default army
+    // default art
+    // default spells
+    Surface	port30x22;
+    Surface	port50x46;
+    Surface	port101x93;
+
+};
+/*
+ _defaultheroes[] = {
+};
+*/
+
 const skillstats_t* GetSkillStats(u8 race)
 {
     const char* id = NULL;

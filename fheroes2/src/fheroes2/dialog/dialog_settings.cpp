@@ -193,6 +193,7 @@ void Dialog::ExtSettings(bool readonly)
     states.push_back(Settings::BATTLE_ARCHMAGE_RESIST_BAD_SPELL);
     states.push_back(Settings::BATTLE_MAGIC_TROOP_RESIST);
     states.push_back(Settings::BATTLE_SKIP_INCREASE_DEFENSE);
+    states.push_back(Settings::BATTLE_REVERSE_WAIT_ORDER);
 
     if(conf.PocketPC())
     {

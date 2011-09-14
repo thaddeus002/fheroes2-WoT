@@ -166,6 +166,7 @@ const settings_t settingsFHeroes2[] =
     { Settings::BATTLE_ARCHMAGE_RESIST_BAD_SPELL,_("battle: archmage can resists (20%) bad spells"),     },
     { Settings::BATTLE_MAGIC_TROOP_RESIST,	_("battle: magical creature resists (20%) the same magic"),},
     { Settings::BATTLE_SKIP_INCREASE_DEFENSE,	_("battle: skip increase +2 defense"), 			},
+    { Settings::BATTLE_REVERSE_WAIT_ORDER,	_("battle: reverse wait order (fast, average, slow)"),	},
     { Settings::GAME_SHOW_SYSTEM_INFO,		_("game: show system info"),				},
     { Settings::GAME_AUTOSAVE_ON,		_("game: autosave on"),					},
     { Settings::GAME_AUTOSAVE_BEGIN_DAY,	_("game: autosave will be made at the beginning of the day"), },
@@ -1361,6 +1362,11 @@ bool Settings::ExtWorldArtesianSpringSeparatelyVisit(void) const
 bool Settings::ExtWorldBanPlagues(void) const
 {
     return ExtModes(WORLD_BAN_PLAGUES);
+}
+
+bool Settings::ExtBattleReverseWaitOrder(void) const
+{
+    return ExtModes(BATTLE_REVERSE_WAIT_ORDER);
 }
 
 const Point & Settings::PosRadar(void) const { return pos_radr; }

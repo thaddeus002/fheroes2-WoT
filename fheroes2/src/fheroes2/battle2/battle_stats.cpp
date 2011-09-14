@@ -2246,7 +2246,7 @@ namespace Battle2
 
     bool FastestStats(const Stats* b1, const Stats* b2)
     {
-	return SlowestStats(b2, b1);
+	return Army::SlowestTroop(b2->troop, b1->troop);
     }
 
     bool StrongestStats(const Stats* b1, const Stats* b2)
@@ -2362,8 +2362,16 @@ Battle2::Stats* Battle2::Armies::GetStats(Armies & armies1, Armies & armies2, St
     armies1.Init();
     armies2.Init();
 
-    armies1.SortFastest();
-    armies2.SortFastest();
+    if(part1 || Settings::Get().ExtBattleReverseWaitOrder())
+    {
+	armies1.SortFastest();
+	armies2.SortFastest();
+    }
+    else
+    {
+	armies1.SortSlowest();
+	armies2.SortSlowest();
+    }
 
     Stats* result = NULL;
 

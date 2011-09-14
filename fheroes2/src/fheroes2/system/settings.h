@@ -192,6 +192,7 @@ public:
 	BATTLE_MAGIC_TROOP_RESIST	= 0x40002000,
 	BATTLE_TROOP_DIRECTION		= 0x40008000,
 	BATTLE_SOFT_WAITING		= 0x40010000,
+	BATTLE_REVERSE_WAIT_ORDER	= 0x40020000,
         BATTLE_MERGE_ARMIES		= 0x40100000,
         BATTLE_SKIP_INCREASE_DEFENSE	= 0x40200000,
 	BATTLE_OBJECTS_ARCHERS_PENALTY	= 0x42000000,
@@ -313,6 +314,7 @@ public:
     bool ExtBattleObjectsArchersPenalty(void) const;
     bool ExtBattleMergeArmies(void) const;
     bool ExtBattleSkipIncreaseDefense(void) const;
+    bool ExtBattleReverseWaitOrder(void) const;
     bool ExtRewriteConfirm(void) const;
     bool ExtAutosaveConfirm(void) const;
     bool ExtHideCursor(void) const;
