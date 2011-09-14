@@ -636,58 +636,36 @@ void Game::IO::PackPlayers(QueueMessage & msg, const Players & players)
 
 void Game::IO::UnpackPlayers(QueueMessage & msg, Players & players, u16 version)
 {
-    if(version < FORMAT_VERSION_2487)
-    {
-	const Settings & conf = Settings::Get();
-    	const Colors colors(conf.current_maps_file.kingdom_colors);
-
-	players.Init(conf.current_maps_file.kingdom_colors);
-
-	for(Colors::const_iterator
-	    it = colors.begin(); it != colors.end(); ++it)
-	{
-	    Player* player = players.Get(*it);
-	    if(player)
-	    {
-		player->id = World::GetUniq();
-		player->race = conf.current_maps_file.races[Color::GetIndex(*it)];
-		player->friends = conf.current_maps_file.unions[Color::GetIndex(*it)];
-	    }
-	}
-    }
-    else
     // players
+    u8 byte8;
+    u32 byte32;
+    std::vector<Player*> vec1;
+    std::vector<Player*> & vec2 = players;
+
+    msg.Pop(byte8);
+    players.Init(byte8);
+    msg.Pop(byte32);
+    for(u32 ii = 0; ii < byte32; ++ii)
     {
-	u8 byte8;
-	u32 byte32;
-	std::vector<Player*> vec1;
-	std::vector<Player*> & vec2 = players;
+	Player player;
 
-	msg.Pop(byte8);
-	players.Init(byte8);
-	msg.Pop(byte32);
-	for(u32 ii = 0; ii < byte32; ++ii)
-	{
-	    Player player;
+	msg.Pop(player.color);
+	msg.Pop(player.id);
+	msg.Pop(player.control);
+	msg.Pop(player.race);
+	msg.Pop(player.friends);
+	msg.Pop(player.name);
 
-	    msg.Pop(player.color);
-	    msg.Pop(player.id);
-	    msg.Pop(player.control);
-	    msg.Pop(player.race);
-	    msg.Pop(player.friends);
-	    msg.Pop(player.name);
+	Player* ptr = players.Get(player.color);
+	if(ptr) *ptr = player;
 
-	    Player* ptr = players.Get(player.color);
-	    if(ptr) *ptr = player;
-
-	    vec1.push_back(ptr);
-	}
-
-	if(version >= FORMAT_VERSION_2494)
-	    msg.Pop(players.current_color);
-
-	std::swap(vec1, vec2);
+	vec1.push_back(ptr);
     }
+
+    if(version >= FORMAT_VERSION_2494)
+	msg.Pop(players.current_color);
+
+    std::swap(vec1, vec2);
 }
 
 bool Game::IO::LoadBIN(QueueMessage & msg)
@@ -814,9 +792,6 @@ bool Game::IO::LoadBIN(QueueMessage & msg)
 	msg.Pop(current_color);
     }
     msg.Pop(conf.game_type);
-    // settings::players_colors
-    if(format < FORMAT_VERSION_2487)
-    	msg.Pop(byte8);
     msg.Pop(conf.preferably_count_players);
 #ifdef WITH_DEBUG
     msg.Pop(byte16);
@@ -1049,25 +1024,6 @@ bool Game::IO::LoadBIN(QueueMessage & msg)
     // regenerate puzzle surface
     Interface::GameArea::GenerateUltimateArtifactAreaSurface(world.ultimate_index, world.puzzle_surface);
 
-    // fixed null coast
-    if(format < FORMAT_VERSION_2487)
-    {
-	for(u32 maps_index = 0; maps_index < world.vec_tiles.size(); ++maps_index)
-	{
-	    Maps::Tiles & tile = world.vec_tiles[maps_index];
-	    if(Maps::Ground::WATER == tile.GetGround())
-	    {
-		for(Direction::vector_t direct = Direction::TOP_LEFT; direct != Direction::CENTER; ++direct)
-		    if(Maps::isValidDirection(maps_index, direct))
-		{
-		    Maps::Tiles & tile2 = world.GetTiles(Maps::GetDirectionIndex(maps_index, direct));
-		    if(Maps::Ground::WATER != tile2.GetGround() && MP2::OBJ_ZERO == tile2.GetObject())
-			tile2.SetObject(MP2::OBJ_COAST);
-		}
-	    }
-	}
-    }
-
     return byte16 == 0xFFFF;
 }
 
@@ -1121,14 +1077,6 @@ void Game::IO::UnpackKingdom(QueueMessage & msg, Kingdom & kingdom, u16 check_ve
 
     // kingdom: color
     msg.Pop(kingdom.color);
-
-    // kingdom: control
-    if(check_version < FORMAT_VERSION_2487)
-    {
-	msg.Pop(byte8);
-        Player* player = Settings::Get().GetPlayers().Get(kingdom.color);
-	if(player) player->control = byte8;
-    }
 
     if(check_version < FORMAT_VERSION_2562)
     {
