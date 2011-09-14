@@ -44,6 +44,7 @@ bool HeroesStrongestArmy(const Heroes* h1, const Heroes* h2)
 
 Kingdom::Kingdom() : color(Color::NONE), flags(0), lost_town_days(0), visited_tents_colors(0)
 {
+    heroes_cond_loss.reserve(4);
 }
 
 void Kingdom::Init(u8 clr)
@@ -79,6 +80,8 @@ void Kingdom::clear(void)
     visit_object.clear();
 
     recruits.Reset();
+
+    heroes_cond_loss.clear();
 }
 
 u8 Kingdom::GetControl(void) const
@@ -258,6 +261,33 @@ void Kingdom::AddHeroes(Heroes *hero)
 
 	AI::AddHeroes(*hero);
     }
+}
+
+void Kingdom::AddHeroStartCondLoss(Heroes* hero)
+{
+    // see: Settings::ExtWorldStartHeroLossCond4Humans
+    heroes_cond_loss.push_back(hero);
+}
+
+const Heroes* Kingdom::GetFirstHeroStartCondLoss(void) const
+{
+    for(KingdomHeroes::const_iterator
+        it = heroes_cond_loss.begin(); it != heroes_cond_loss.end(); ++it)
+	if((*it)->isFreeman() || (*it)->GetColor() != GetColor())
+	    return *it;
+    return NULL;
+}
+
+std::string Kingdom::GetNamesHeroStartCondLoss(void) const
+{
+    std::string result;
+    for(KingdomHeroes::const_iterator
+        it = heroes_cond_loss.begin(); it != heroes_cond_loss.end(); ++it)
+    {
+	result.append((*it)->GetName());
+	if(it + 1 != heroes_cond_loss.end()) result.append(", ");
+    }
+    return result;
 }
 
 void Kingdom::RemoveHeroes(const Heroes *hero)
@@ -693,10 +723,27 @@ u8 Kingdoms::FindWins(u16 cond) const
 
 void Kingdoms::AddHeroes(const AllHeroes & heroes)
 {
-    for(AllHeroes::const_iterator                                                                    
+    for(AllHeroes::const_iterator
         it = heroes.begin(); it != heroes.end(); ++it)
 	// skip gray color
         if((*it)->GetColor()) GetKingdom((*it)->GetColor()).AddHeroes(*it);
+}
+
+void Kingdoms::AddCondLossHeroes(const AllHeroes & heroes)
+{
+    for(AllHeroes::const_iterator
+        it = heroes.begin(); it != heroes.end(); ++it)
+	// skip gray color
+        if((*it)->GetColor())
+    {
+	Kingdom & kingdom = GetKingdom((*it)->GetColor());
+
+	if(CONTROL_HUMAN & kingdom.GetControl())
+	{
+	    (*it)->SetModes(Heroes::NOTDISMISS | Heroes::NOTDEFAULTS);
+	    kingdom.AddHeroStartCondLoss(*it);
+	}
+    }
 }
 
 void Kingdoms::AddCastles(const AllCastles & castles)

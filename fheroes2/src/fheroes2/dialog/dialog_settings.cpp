@@ -164,6 +164,7 @@ void Dialog::ExtSettings(bool readonly)
 	states.push_back(Settings::WORLD_NEW_VERSION_WEEKOF);
     states.push_back(Settings::WORLD_BAN_PLAGUES);
     states.push_back(Settings::WORLD_BAN_MONTHOF_MONSTERS);
+    states.push_back(Settings::WORLD_STARTHERO_LOSSCOND4HUMANS);
     states.push_back(Settings::HEROES_LEARN_SPELLS_WITH_DAY);
     states.push_back(Settings::HEROES_COST_DEPENDED_FROM_LEVEL);
     states.push_back(Settings::HEROES_REMEMBER_POINTS_RETREAT);

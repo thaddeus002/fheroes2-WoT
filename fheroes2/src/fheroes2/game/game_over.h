@@ -44,7 +44,8 @@ namespace GameOver
 	LOSS_TOWN	= 0x0200,
 	LOSS_HERO	= 0x0400,
 	LOSS_TIME	= 0x0800,
-	LOSS            = LOSS_ALL | LOSS_TOWN | LOSS_HERO | LOSS_TIME
+	LOSS_STARTHERO	= 0x1000,
+	LOSS            = LOSS_ALL | LOSS_TOWN | LOSS_HERO | LOSS_TIME | LOSS_STARTHERO
     };
 
     const char* GetString(conditions_t);

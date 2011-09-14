@@ -120,7 +120,7 @@ void GameOver::GetActualDescription(u16 cond, std::string & msg)
     	const Heroes *hero = world.GetHeroesCondLoss();
 	if(hero)
 	{
-	    msg = _("Lose the hero '%{name}'.");
+	    msg = _("Lose the hero: %{name}.");
 	    String::Replace(msg, "%{name}", hero->GetName());
 	}
     }
@@ -131,6 +131,15 @@ void GameOver::GetActualDescription(u16 cond, std::string & msg)
         String::Replace(msg, "%{day}", (conf.LossCountDays() % DAYOFWEEK));
         String::Replace(msg, "%{week}", (conf.LossCountDays() / DAYOFWEEK) + 1);
         String::Replace(msg, "%{month}", (conf.LossCountDays() / (DAYOFWEEK * WEEKOFMONTH)) + 1);
+    }
+
+    if(conf.ExtWorldStartHeroLossCond4Humans())
+    {
+	const std::string names = world.GetKingdom(conf.CurrentColor()).GetNamesHeroStartCondLoss();
+        std::string str = std::string::npos == names.find(',') ? _("Lose the hero: %{name}.") : _("Lose the heroes: %{name}.");
+        String::Replace(str, "%{name}", names);
+	msg.append("\n");
+	msg.append(str);
     }
 }
 
@@ -230,6 +239,14 @@ void GameOver::DialogLoss(u16 cond)
 	    body = _("The enemy has captured %{name}!\nThey are triumphant.");
 	    const Castle *town = world.GetCastle(conf.WinsMapsIndexObject());
 	    if(town) String::Replace(body, "%{name}", town->GetName());
+	}
+
+	case LOSS_STARTHERO:
+	{
+	    const Heroes *hero = world.GetKingdom(conf.CurrentColor()).GetFirstHeroStartCondLoss();
+	    body = _("You have lost the hero %{name}.\nYour quest is over.");
+	    if(hero) String::Replace(body, "%{name}", hero->GetName());
+	    break;
 	}
 
 	case LOSS_HERO:

@@ -1760,7 +1760,8 @@ void AllHeroes::clear(void)
 
 Heroes* VecHeroes::Get(Heroes::heroes_t hid) const
 {
-    return at(hid);
+    const std::vector<Heroes *> & vec = * this;
+    return hid != Heroes::UNKNOWN ? vec[hid] : NULL;
 }
 
 Heroes* VecHeroes::Get(s32 index) const

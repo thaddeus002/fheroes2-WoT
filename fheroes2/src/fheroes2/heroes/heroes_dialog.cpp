@@ -308,7 +308,7 @@ Dialog::answer_t Heroes::OpenDialog(bool readonly, bool fade)
 
     LocalEvent & le = LocalEvent::Get();
 
-    if(castle || readonly)
+    if(castle || readonly || Modes(NOTDISMISS))
     {
 	buttonDismiss.Press();
 	buttonDismiss.SetDisable(true);
@@ -472,8 +472,14 @@ Dialog::answer_t Heroes::OpenDialog(bool readonly, bool fade)
 	else
         if(le.MouseCursor(buttonExit)) statusBar.ShowMessage(_("Exit hero"));
         else
-        if(le.MouseCursor(buttonDismiss)) statusBar.ShowMessage(_("Dismiss hero"));
-        else
+        if(le.MouseCursor(buttonDismiss))
+	{
+	    if(Modes(NOTDISMISS))
+	        statusBar.ShowMessage("Dismiss disabled, see game info");
+	    else
+	        statusBar.ShowMessage(_("Dismiss hero"));
+        }
+	else
         if(le.MouseCursor(buttonPrevHero)) statusBar.ShowMessage(_("Show prev heroes"));
         else
         if(le.MouseCursor(buttonNextHero)) statusBar.ShowMessage(_("Show next heroes"));

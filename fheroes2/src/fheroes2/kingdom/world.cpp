@@ -835,16 +835,23 @@ void World::LoadMaps(const std::string &filename)
     // add castles to kingdoms
     vec_kingdoms.AddCastles(vec_castles);
 
+    if(Settings::Get().ExtWorldStartHeroLossCond4Humans())
+	vec_kingdoms.AddCondLossHeroes(vec_heroes);
+
     // update wins, loss conditions
     if(GameOver::WINS_HERO & Settings::Get().ConditionWins())
     {
-	const Heroes* hero = GetHeroes(Settings::Get().WinsMapsIndexObject());
+	Heroes* hero = GetHeroes(Settings::Get().WinsMapsIndexObject());
 	heroes_cond_wins = hero ? hero->GetID() : Heroes::UNKNOWN;
     }
     if(GameOver::LOSS_HERO & Settings::Get().ConditionLoss())
     {
-	const Heroes* hero = GetHeroes(Settings::Get().LossMapsIndexObject());
-	heroes_cond_loss = hero ? hero->GetID() : Heroes::UNKNOWN;
+	Heroes* hero = GetHeroes(Settings::Get().LossMapsIndexObject());
+	if(hero)
+	{
+	    heroes_cond_loss = hero->GetID();
+	    hero->SetModes(Heroes::NOTDISMISS | Heroes::NOTDEFAULTS);
+	}
     }
 
     // play with hero
@@ -1677,7 +1684,7 @@ bool World::KingdomIsLoss(const Kingdom & kingdom, u16 loss) const
 	case GameOver::LOSS_HERO:
 	{
     	    const Heroes *hero = GetHeroesCondLoss();
-    	    return (hero && Heroes::UNKNOWN != heroes_cond_loss &&
+            return (hero && Heroes::UNKNOWN != heroes_cond_loss &&
     		    hero->isFreeman() &&
     		    hero->GetKillerColor() != kingdom.GetColor());
 	}
@@ -1725,8 +1732,14 @@ u16 World::CheckKingdomLoss(const Kingdom & kingdom) const
     const u16 loss [] = { GameOver::LOSS_ALL, GameOver::LOSS_TOWN, GameOver::LOSS_HERO, GameOver::LOSS_TIME, 0 };
 
     for(u8 ii = 0; loss[ii]; ++ii)
-	if((conf.ConditionWins() & loss[ii]) &&
-	    KingdomIsWins(kingdom, loss[ii])) return loss[ii];
+	if((conf.ConditionLoss() & loss[ii]) &&
+	    KingdomIsLoss(kingdom, loss[ii])) return loss[ii];
+
+    if(conf.ExtWorldStartHeroLossCond4Humans())
+    {
+	if(kingdom.GetFirstHeroStartCondLoss())
+	    return GameOver::LOSS_STARTHERO;
+    }
 
     return GameOver::COND_NONE;
 }

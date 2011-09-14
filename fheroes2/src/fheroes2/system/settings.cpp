@@ -144,6 +144,7 @@ const settings_t settingsFHeroes2[] =
     { Settings::WORLD_BAN_MONTHOF_MONSTERS,	_("world: Months Of Monsters do not place creatures on map"),   },
     { Settings::WORLD_ARTIFACT_CRYSTAL_BALL,	_("world: Crystal Ball also added Identify Hero and Visions spells"), },
     { Settings::WORLD_ARTSPRING_SEPARATELY_VISIT,_("world: Artesian Springs have two separately visitable squares (h3 ver)"), },
+    { Settings::WORLD_STARTHERO_LOSSCOND4HUMANS,_("world: Starting heroes as Loss Conditions for Human Players"), },
     { Settings::CASTLE_ALLOW_BUY_FROM_WELL,	_("castle: allow buy from well"),			},
     { Settings::CASTLE_ALLOW_GUARDIANS,		_("castle: allow guardians"),				},
     { Settings::CASTLE_MAGEGUILD_POINTS_TURN,	_("castle: higher mage guilds regenerate more spell points/turn (20/40/60/80/100%)"), },
@@ -1367,6 +1368,11 @@ bool Settings::ExtWorldBanPlagues(void) const
 bool Settings::ExtBattleReverseWaitOrder(void) const
 {
     return ExtModes(BATTLE_REVERSE_WAIT_ORDER);
+}
+
+bool Settings::ExtWorldStartHeroLossCond4Humans(void) const
+{
+    return ExtModes(WORLD_STARTHERO_LOSSCOND4HUMANS);
 }
 
 const Point & Settings::PosRadar(void) const { return pos_radr; }

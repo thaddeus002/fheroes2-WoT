@@ -83,6 +83,10 @@ public:
     void ResetLastLostHero(void);
     Heroes* GetLastLostHero(void) const;
 
+    void  AddHeroStartCondLoss(Heroes*);
+    std::string GetNamesHeroStartCondLoss(void) const;
+    const Heroes* GetFirstHeroStartCondLoss(void) const;
+
     u8 GetControl(void) const;
     Color::color_t GetColor(void) const;
     u8 GetRace(void) const;
@@ -170,6 +174,8 @@ private:
 
     Puzzle puzzle_maps;
     u8 visited_tents_colors;
+
+    KingdomHeroes heroes_cond_loss;
 };
 
 class Kingdoms
@@ -195,6 +201,8 @@ public:
 
     void AddHeroes(const AllHeroes &);
     void AddCastles(const AllCastles &);
+
+    void AddCondLossHeroes(const AllHeroes &);
 
     u8 size(void) const;
 

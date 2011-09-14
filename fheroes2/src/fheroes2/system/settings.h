@@ -187,6 +187,7 @@ public:
 	CASTLE_MAGEGUILD_POINTS_TURN	= 0x30000001,
 	WORLD_ARTSPRING_SEPARATELY_VISIT= 0x30000002,
 	CASTLE_ALLOW_RECRUITS_SPECIAL	= 0x30000004,
+	WORLD_STARTHERO_LOSSCOND4HUMANS = 0x30000008,
 
 	BATTLE_ARCHMAGE_RESIST_BAD_SPELL= 0x40001000,
 	BATTLE_MAGIC_TROOP_RESIST	= 0x40002000,
@@ -303,6 +304,7 @@ public:
     bool ExtWorldNewVersionWeekOf(void) const;
     bool ExtWorldBanPlagues(void) const;
     bool ExtWorldArtesianSpringSeparatelyVisit(void) const;
+    bool ExtWorldStartHeroLossCond4Humans(void) const;
     bool ExtCastleAllowFlash(void) const;
     bool ExtCastleGuildRestorePointsTurn(void) const;
     bool ExtCastleAllowRecruitSpecialHeroes(void) const;

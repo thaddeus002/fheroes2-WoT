@@ -131,6 +131,7 @@ secondary_t _from_witchs_hut = {
     /* scouting */  1, /* wisdom */ 1
 };
 
+/*
 struct defaulthero_t
 {
     const char*	name;
@@ -143,9 +144,6 @@ struct defaulthero_t
     Surface	port50x46;
     Surface	port101x93;
 
-};
-/*
- _defaultheroes[] = {
 };
 */
 
