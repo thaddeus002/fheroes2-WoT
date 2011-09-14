@@ -1,4 +1,17 @@
-latest (2551 rev.)
+latest (2563 rev.)
+
++ Fixed: battle: cast MirrorImage spell
++ Fixed: game: load binary settings
++ Fixed: game: fixed func GetMageGuildRestoreSpellPointsPercentDay
++ Fixed: game: fixed func DiggingForUltimateArtifact
++ Fixed: game: fixed loss conditions
++ Fixed: heroes: add Heroes::Mode(NOTDEFAULTS), and check this mode with AllHeroes::GetFreeman
++ Added: option: "world: Starting heroes as Loss Conditions for Human Players"
++ Added: option: "battle: reverse wait order (fast, average, slow)"
++ Added: option: "heroes: allow banned sec. skills upgrade"
++ Added: option: "world: Only 1 hero can be hired by the one player every week"
+
+Sep, 09, 2011 (2551 rev.)
 
 + Fixed: battle: dialog summary disable loop animation
 + Fixed: battle: redraw obstacles level
