@@ -249,6 +249,7 @@ void Dialog::MakeGiftResource(void)
 
 
     ButtonGroups btnGroups(box, Dialog::OK|Dialog::CANCEL);
+    btnGroups.DisableButton1(true);
     btnGroups.Draw();
 
 
@@ -266,6 +267,7 @@ void Dialog::MakeGiftResource(void)
 	{
 	    u8 new_count = Color::Count(selector.recipients);
 	    cursor.Hide();
+	    btnGroups.DisableButton1(0 == new_count || 0 == funds2.GetValidItems());
 	    if(count != new_count)
 	    {
 		funds1 = world.GetKingdom(conf.CurrentColor()).GetFunds();
@@ -274,6 +276,7 @@ void Dialog::MakeGiftResource(void)
 		info2.Redraw();
 		count = new_count;
 	    }
+	    btnGroups.Draw();
 	    selector.Redraw();
 	    cursor.Show();
 	    display.Flip();
@@ -282,8 +285,10 @@ void Dialog::MakeGiftResource(void)
 	if(info2.QueueEventProcessing(funds1, count))
 	{
 	    cursor.Hide();
+	    btnGroups.DisableButton1(0 == Color::Count(selector.recipients) || 0 == funds2.GetValidItems());
 	    info1.Redraw();
 	    info2.Redraw();
+	    btnGroups.Draw();
 	    cursor.Show();
 	    display.Flip();
 	}
@@ -291,8 +296,7 @@ void Dialog::MakeGiftResource(void)
         result = btnGroups.QueueEventProcessing();
     }
 
-    if(selector.recipients &&
-	funds2.GetValidItems() && Dialog::OK == result)
+    if(Dialog::OK == result)
     {
 	EventDate event;
 

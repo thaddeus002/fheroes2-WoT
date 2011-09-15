@@ -48,10 +48,12 @@ public:
     {
 	back.Save();
 
+        buttonGift.SetPos(pos_rt.x + (pos_rt.w - AGG::GetICN(tradpost, 17).w()) / 2, pos_rt.y + 120);
         buttonTrade.SetPos(pos_rt.x + (pos_rt.w - AGG::GetICN(tradpost, 17).w()) / 2, pos_rt.y + 150);
 	buttonLeft.SetPos(pos_rt.x + 11, pos_rt.y + 129);
 	buttonRight.SetPos(pos_rt.x + 220, pos_rt.y + 129);
 
+	buttonGift.SetSprite(ICN::BTNGIFT, 0, 1);
 	buttonTrade.SetSprite(tradpost, 15, 16);
 	buttonLeft.SetSprite(tradpost, 3, 4);
 	buttonRight.SetSprite(tradpost, 5, 6);
@@ -74,6 +76,7 @@ public:
     Button buttonTrade;
     Button buttonLeft;
     Button buttonRight;
+    Button buttonGift;
     Splitter splitter;
 
 private:
@@ -97,9 +100,11 @@ void TradeWindowGUI::ShowTradeArea(u8 resourceFrom, u8 resourceTo, u32 max_buy, 
         back.Restore();
         Rect dst_rt(pos_rt.x, pos_rt.y + 30, pos_rt.w, 100);
         TextBox(_("You have received quite a bargain. I expect to make no profit on the deal. Can I interest you in any of my other wares?"), Font::BIG, dst_rt);
+        buttonGift.SetDisable(false);
 	buttonTrade.SetDisable(true);
         buttonLeft.SetDisable(true);
         buttonRight.SetDisable(true);
+        buttonGift.Draw();
 	buttonMax = Rect();
         cursor.Show();
         display.Flip();
@@ -157,6 +162,7 @@ void TradeWindowGUI::ShowTradeArea(u8 resourceFrom, u8 resourceTo, u32 max_buy, 
         dst_pt.y = pos_rt.y + 110;
         text.Blit(dst_pt);
 
+        buttonGift.SetDisable(true);
         buttonTrade.SetDisable(false);
         buttonLeft.SetDisable(false);
         buttonRight.SetDisable(false);
@@ -270,6 +276,7 @@ void Dialog::Marketplace(bool fromTradingPost)
     u32 max_buy = 0;
 
     Rect & buttonMax = gui.buttonMax;
+    Button & buttonGift = gui.buttonGift;
     Button & buttonTrade = gui.buttonTrade;
     Button & buttonLeft = gui.buttonLeft;
     Button & buttonRight = gui.buttonRight;
@@ -281,6 +288,7 @@ void Dialog::Marketplace(bool fromTradingPost)
     dst_pt.y = pos_rt.y + pos_rt.h - sprite_exit.h();
     Button buttonExit(dst_pt, tradpost, 17, 18);
 
+    buttonGift.Draw();
     buttonExit.Draw();
     cursor.Show();
     display.Flip();
@@ -290,6 +298,7 @@ void Dialog::Marketplace(bool fromTradingPost)
     // message loop
     while(le.HandleEvents())
     {
+        if(buttonGift.isEnable()) le.MousePressLeft(buttonGift) ? buttonGift.PressDraw() : buttonGift.ReleaseDraw();
         if(buttonTrade.isEnable()) le.MousePressLeft(buttonTrade) ? buttonTrade.PressDraw() : buttonTrade.ReleaseDraw();
         if(buttonLeft.isEnable()) le.MousePressLeft(buttonLeft) ? buttonLeft.PressDraw() : buttonLeft.ReleaseDraw();
         if(buttonRight.isEnable()) le.MousePressLeft(buttonRight) ? buttonRight.PressDraw() : buttonRight.ReleaseDraw();
@@ -297,7 +306,16 @@ void Dialog::Marketplace(bool fromTradingPost)
         le.MousePressLeft(buttonExit) ? buttonExit.PressDraw() : buttonExit.ReleaseDraw();
 
         if(le.MouseClickLeft(buttonExit) || HotKeyCloseWindow) break;
-	
+
+	if(buttonGift.isEnable() &&
+	    le.MouseClickLeft(buttonGift))
+	{
+            cursor.Hide();                                                                                       
+	    Dialog::MakeGiftResource();
+            cursor.Show();                                                                                       
+            display.Flip();                                                                                      
+	}
+
         // click from
         for(u8 ii = 0; ii < rectsFrom.size(); ++ii)
         {

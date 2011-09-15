@@ -295,6 +295,7 @@ void AGG::Cache::LoadExtICN(icn_cache_t & v, const ICN::icn_t icn, const u16 ind
 	case ICN::BATTLEWAIT:
 	case ICN::BUYMAX:
 	case ICN::BTNBATTLEONLY:
+	case ICN::BTNGIFT:
 	case ICN::BTNCONFIG:  count = 2; break;
 	case ICN::BOAT12:  count = 1; break;
 
@@ -343,6 +344,26 @@ void AGG::Cache::LoadExtICN(icn_cache_t & v, const ICN::icn_t icn, const u16 ind
 	    LoadOrgICN(sprite, ICN::SYSTEM, 11 + index, false);
 	    // config
 	    sprite.Blit(GetICN(ICN::BTNDCCFG, 4 + index), Rect(30, 20, 80, 16), 8, 5);
+	}
+	break;
+
+	case ICN::BTNGIFT:
+	if(index < count)
+	{
+	    Sprite & sprite = reflect ? v.reflect[index] : v.sprites[index];
+	    LoadOrgICN(sprite,
+			(Settings::Get().EvilInterface() ? ICN::TRADPOSE : ICN::TRADPOST),
+			17 + index, false);
+	    // clean
+	    sprite.Blit(GetICN(ICN::SYSTEM, 11 + index), Rect(10, 6, 72, 15), 6, 4);
+	    // G
+	    sprite.Blit(GetICN(ICN::BTNDCCFG, 4 + index), Rect(94, 20, 15, 15), 20, 4);
+	    // I
+	    sprite.Blit(GetICN(ICN::BTNDCCFG, 4 + index), Rect(86, 20, 9, 15), 36, 4);
+	    // F
+	    sprite.Blit(GetICN(ICN::BTNDCCFG, 4 + index), Rect(74, 20, 13, 15), 46, 4);
+	    // T
+	    sprite.Blit(GetICN(ICN::BTNNEWGM, index), Rect(25, 13, 13, 14), 60, 5);
 	}
 	break;
 
