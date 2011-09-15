@@ -70,6 +70,7 @@ public:
     void RedrawInfoBuySell(u32 count_sell, u32 count_buy);
     void ShowTradeArea(u8 resourceFrom, u8 resourceTo, u32 max_buy, u32 max_sell, u32 count_buy, u32 count_sell, bool fromTradingPost);
 
+    Rect   buttonMax;
     Button buttonTrade;
     Button buttonLeft;
     Button buttonRight;
@@ -99,6 +100,7 @@ void TradeWindowGUI::ShowTradeArea(u8 resourceFrom, u8 resourceTo, u32 max_buy, 
 	buttonTrade.SetDisable(true);
         buttonLeft.SetDisable(true);
         buttonRight.SetDisable(true);
+	buttonMax = Rect();
         cursor.Show();
         display.Flip();
     }
@@ -145,7 +147,12 @@ void TradeWindowGUI::ShowTradeArea(u8 resourceFrom, u8 resourceTo, u32 max_buy, 
         dst_pt.x = pos_rt.x + pos_rt.w / 2 - sprite_fromto.w() / 2;
         dst_pt.y = pos_rt.y + 90;
         display.Blit(sprite_fromto, dst_pt);
-        Text text(_("Qty to trade"), Font::SMALL);
+	buttonMax = Rect(dst_pt.x, dst_pt.y, sprite_fromto.w(), sprite_fromto.h());
+        Text text("max", Font::SMALL);
+        dst_pt.x = buttonMax.x + (buttonMax.w - text.w()) / 2;
+        dst_pt.y = buttonMax.y + 2;
+        text.Blit(dst_pt);
+	text.Set(_("Qty to trade"), Font::SMALL);
         dst_pt.x = pos_rt.x + (pos_rt.w - text.w()) / 2;
         dst_pt.y = pos_rt.y + 110;
         text.Blit(dst_pt);
@@ -262,6 +269,7 @@ void Dialog::Marketplace(bool fromTradingPost)
     u32 max_sell = 0;
     u32 max_buy = 0;
 
+    Rect & buttonMax = gui.buttonMax;
     Button & buttonTrade = gui.buttonTrade;
     Button & buttonLeft = gui.buttonLeft;
     Button & buttonRight = gui.buttonRight;
@@ -416,7 +424,22 @@ void Dialog::Marketplace(bool fromTradingPost)
             cursor.Show();
             display.Flip();
         }
-        
+        else
+	// click max
+	if(buttonMax.w && max_buy && le.MouseClickLeft(buttonMax))
+	{
+	    u32 seek = splitter.Max();
+
+            count_buy  = max_buy * (Resource::GOLD == resourceTo ? GetTradeCosts(resourceFrom, resourceTo, fromTradingPost) : 1);
+            count_sell = max_buy * (Resource::GOLD == resourceTo ? 1: GetTradeCosts(resourceFrom, resourceTo, fromTradingPost));
+
+            cursor.Hide();
+            splitter.Move(seek);
+            gui.RedrawInfoBuySell(count_sell, count_buy);
+            cursor.Show();
+            display.Flip();
+	}
+
         // trade
         if(buttonTrade.isEnable() && le.MouseClickLeft(buttonTrade) && count_sell && count_buy)
         {
