@@ -74,22 +74,36 @@ u8 Resource::Rand(void)
     return Resource::WOOD;
 }
 
-u8 Resource::FromIndexSprite(u8 index)
+s32* Funds::GetPtr(u8 rs)
 {
-    switch(index)
+    switch(rs)
     {
-        case 1:     return WOOD;
-        case 3:     return MERCURY;
-	case 5:     return ORE;
-        case 7:     return SULFUR;
-        case 9:     return CRYSTAL;
-        case 11:    return GEMS;
-        case 13:    return GOLD;
-
-	default: break;
+        case Resource::ORE:     return &ore;
+        case Resource::WOOD:    return &wood;
+        case Resource::MERCURY: return &mercury;
+        case Resource::SULFUR:  return &sulfur;
+        case Resource::GEMS:    return &gems;
+        case Resource::CRYSTAL: return &crystal;
+        case Resource::GOLD:    return &gold;
+        default: break;
     }
+    return NULL;
+}
 
-    return UNKNOWN;
+s32 Funds::Get(u8 rs) const
+{
+    switch(rs)
+    {
+        case Resource::ORE:     return ore;
+        case Resource::WOOD:    return wood;
+        case Resource::MERCURY: return mercury;
+        case Resource::SULFUR:  return sulfur;
+        case Resource::GEMS:    return gems;
+        case Resource::CRYSTAL: return crystal;
+        case Resource::GOLD:    return gold;
+        default: break;
+    }
+    return 0;
 }
 
 Funds & Funds::operator= (const cost_t & cost)
@@ -291,6 +305,24 @@ u8 Resource::GetIndexSprite(u8 resource)
     return 0;
 }
 
+u8 Resource::FromIndexSprite(u8 index)
+{
+    switch(index)
+    {
+        case 1:     return WOOD;
+        case 3:     return MERCURY;
+	case 5:     return ORE;
+        case 7:     return SULFUR;
+        case 9:     return CRYSTAL;
+        case 11:    return GEMS;
+        case 13:    return GOLD;
+
+	default: break;
+    }
+
+    return UNKNOWN;
+}
+
 /* return index sprite resource.icn */
 u8 Resource::GetIndexSprite2(u8 resource)
 {
@@ -308,6 +340,24 @@ u8 Resource::GetIndexSprite2(u8 resource)
     }
 
     return 0;
+}
+
+u8 Resource::FromIndexSprite2(u8 index)
+{
+    switch(index)
+    {
+        case 0:     return WOOD;
+        case 1:     return MERCURY;
+	case 2:     return ORE;
+        case 3:     return SULFUR;
+        case 4:     return CRYSTAL;
+        case 5:     return GEMS;
+        case 6:     return GOLD;
+
+	default: break;
+    }
+
+    return UNKNOWN;
 }
 
 u8 Funds::GetValidItems(void) const

@@ -305,39 +305,9 @@ void Dialog::Marketplace(bool fromTradingPost)
             
             if(le.MouseClickLeft(rect_from))
             {
-                switch(ii)
-                {
-                    case 0:
-                        resourceFrom = Resource::WOOD;
-                        max_sell = fundsFrom.wood;
-                        break;
-                    case 1:
-                        resourceFrom = Resource::MERCURY;
-                        max_sell = fundsFrom.mercury;
-                        break;
-                    case 2:
-                        resourceFrom = Resource::ORE;
-                        max_sell = fundsFrom.ore;
-                        break;
-                    case 3:
-                        resourceFrom = Resource::SULFUR;
-                        max_sell = fundsFrom.sulfur;
-                        break;
-                    case 4:
-                        resourceFrom = Resource::CRYSTAL;
-                        max_sell = fundsFrom.crystal;
-                        break;
-                    case 5:
-                        resourceFrom = Resource::GEMS;
-                        max_sell = fundsFrom.gems;
-                        break;
-                    case 6:
-                        resourceFrom = Resource::GOLD;
-                        max_sell = fundsFrom.gold;
-                        break;
-                    default: break;
-                }
-                
+		resourceFrom = Resource::FromIndexSprite2(ii);
+                max_sell = fundsFrom.Get(resourceFrom);
+
                 if(GetTradeCosts(resourceFrom, resourceTo, fromTradingPost))
                 {
                     max_buy = Resource::GOLD == resourceTo ? 
@@ -369,17 +339,7 @@ void Dialog::Marketplace(bool fromTradingPost)
             
             if(le.MouseClickLeft(rect_to))
             {
-                switch(ii)
-                {
-                    case 0: resourceTo = Resource::WOOD; break;
-                    case 1: resourceTo = Resource::MERCURY; break;
-                    case 2: resourceTo = Resource::ORE; break;
-                    case 3: resourceTo = Resource::SULFUR; break;
-                    case 4: resourceTo = Resource::CRYSTAL; break;
-                    case 5: resourceTo = Resource::GEMS; break;
-                    case 6: resourceTo = Resource::GOLD; break;
-                    default: break;
-                }
+		resourceTo = Resource::FromIndexSprite2(ii);
                 
                 if(GetTradeCosts(resourceFrom, resourceTo, fromTradingPost))
                 {

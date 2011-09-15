@@ -310,9 +310,9 @@ Game::menu_t Game::ScenarioInfo(void)
     return result;
 }
 
-u16 Game::GetStepFor(u16 current, u16 width, u16 count)
+u16 Game::GetStep4Player(u16 current, u16 width, u16 count)
 {
-    return current * width * 6 / count + (width * (6 - count) / (2 * count));
+    return current * width * KINGDOMMAX / count + (width * (KINGDOMMAX - count) / (2 * count));
 }
 
 void UpdateCoordInfo(const Point & dst, std::vector<Rect> & rects)
@@ -326,7 +326,7 @@ void UpdateCoordInfo(const Point & dst, std::vector<Rect> & rects)
 
     for(Colors::const_iterator
 	it = colors.begin(); it != colors.end(); ++it)
-	rects[Color::GetIndex(*it)] = Rect(dst.x + Game::GetStepFor(current++, sprite.w(), colors.size()), dst.y, sprite.w(), sprite.h());
+	rects[Color::GetIndex(*it)] = Rect(dst.x + Game::GetStep4Player(current++, sprite.w(), colors.size()), dst.y, sprite.w(), sprite.h());
 }
 
 void RedrawScenarioStaticInfo(const Rect & rt)

@@ -113,7 +113,7 @@ namespace Dialog
     Skill::Primary::skill_t SelectSkillFromArena(void);
 
     // redistribute count
-    bool SelectCount(const std::string &header, u32 min, u32 max, u32 & res);
+    bool SelectCount(const std::string &header, u32 min, u32 max, u32 & res, u8 step = 1);
     bool InputString(const std::string &, std::string &);
 
     // recruit monster
@@ -125,6 +125,8 @@ namespace Dialog
     answer_t ArmyInfo(const Army::Troop & troop, u16 flags);
     // dialog marketplace
     void Marketplace(bool fromTradingPost = false);
+    void MakeGiftResource(void);
+
 
     // dialog buy boat
     answer_t BuyBoat(bool enable);

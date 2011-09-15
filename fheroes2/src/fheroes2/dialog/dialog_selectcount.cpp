@@ -27,7 +27,7 @@
 #include "pocketpc.h"
 #include "dialog.h"
 
-bool Dialog::SelectCount(const std::string &header, u32 min, u32 max, u32 & cur)
+bool Dialog::SelectCount(const std::string &header, u32 min, u32 max, u32 & cur, u8 step)
 {
     Display & display = Display::Get();
 
@@ -124,7 +124,7 @@ bool Dialog::SelectCount(const std::string &header, u32 min, u32 max, u32 & cur)
 	if((le.MouseWheelUp(pos) ||
             le.MouseClickLeft(buttonUp)) && cur < max)
 	{
-	    ++cur;
+	    cur += cur + step <= max ? step : max - cur;
     	    redraw_count = true;
 	}
 	else
@@ -132,7 +132,7 @@ bool Dialog::SelectCount(const std::string &header, u32 min, u32 max, u32 & cur)
 	if((le.MouseWheelDn(pos) ||
             le.MouseClickLeft(buttonDn)) && min < cur)
 	{
-	    --cur;
+	    cur -= min + cur >= step ? step : cur;
     	    redraw_count = true;
 	}
 
@@ -155,11 +155,11 @@ bool Dialog::SelectCount(const std::string &header, u32 min, u32 max, u32 & cur)
 	    redraw_count = false;
 	}
 
-        if(Game::HotKeyPress(Game::EVENT_DEFAULT_READY) || le.MouseClickLeft(buttonOk)){ cursor.Hide(); return true; }
+        if(Game::HotKeyPress(Game::EVENT_DEFAULT_READY) || le.MouseClickLeft(buttonOk)){ return true; }
 	else
 	if(Game::HotKeyPress(Game::EVENT_DEFAULT_EXIT) || le.MouseClickLeft(buttonCancel)){ cur = 0;  break; }
     }
-    cursor.Hide();
+
     return false;
 }
 

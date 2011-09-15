@@ -276,7 +276,7 @@ namespace Game
 	Game::menu_t StartGame(void);
     }
 
-    u16 GetStepFor(u16, u16, u16);
+    u16 GetStep4Player(u16, u16, u16);
     std::string CountScoute(u32 count, u8 scoute);
 }
 

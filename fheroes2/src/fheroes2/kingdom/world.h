@@ -140,6 +140,7 @@ public:
     u16  CheckKingdomLoss(const Kingdom &) const;
     bool KingdomIsLoss(const Kingdom &, u16 loss) const;
 
+    void AddEventDate(const EventDate &);
     EventsDate GetEventsDate(u8 color) const;
     EventMaps* GetEventMaps(u8 color, s32 index);
     Riddle* GetSphinxRiddle(s32 index);

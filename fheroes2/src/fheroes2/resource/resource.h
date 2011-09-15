@@ -57,6 +57,9 @@ struct Funds
 	Funds & operator-= (const Funds &);
 	Funds & operator= (const cost_t &);
 
+	s32 Get(u8 rs) const;
+	s32* GetPtr(u8 rs);
+
 	bool operator< (const Funds &) const;
 	bool operator<= (const Funds &) const;
 	bool operator> (const Funds &) const;
@@ -93,13 +96,14 @@ namespace Resource
     const char* String(u8 resource);
 
     u8 Rand(void);
-    u8 FromIndexSprite(u8 index);
 
     /* return index sprite objnrsrc.icn */
     u8 GetIndexSprite(u8 resource);
+    u8 FromIndexSprite(u8 index);
 
     /* return index sprite resource.icn */
     u8 GetIndexSprite2(u8 resource);
+    u8 FromIndexSprite2(u8 index);
 
     class BoxSprite : protected Rect
     {

@@ -349,8 +349,8 @@ void Interface::PlayersInfo::UpdateInfo(Players & players, const Point & pt1, co
         PlayerInfo info;
 
         info.player = *it;
-        info.rect1  = Rect(pt1.x + Game::GetStepFor(current, sprite.w(), players.size()), pt1.y, sprite.w(), sprite.h());
-        info.rect2  = Rect(pt2.x + Game::GetStepFor(current, sprite.w(), players.size()), pt2.y, sprite.w(), sprite.h());
+        info.rect1  = Rect(pt1.x + Game::GetStep4Player(current, sprite.w(), players.size()), pt1.y, sprite.w(), sprite.h());
+        info.rect2  = Rect(pt2.x + Game::GetStep4Player(current, sprite.w(), players.size()), pt2.y, sprite.w(), sprite.h());
 
         push_back(info);
     }

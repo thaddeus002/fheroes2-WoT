@@ -1481,6 +1481,11 @@ s32 World::GetNearestObject(s32 center, MP2::object_t obj, bool check_hero) cons
     return -1;
 }
 
+void World::AddEventDate(const EventDate & event)
+{
+    vec_eventsday.push_back(event);
+}
+
 EventsDate World::GetEventsDate(u8 color) const
 {
     EventsDate res;
