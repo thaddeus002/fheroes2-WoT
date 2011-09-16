@@ -225,7 +225,9 @@ void Dialog::MakeGiftResource(void)
     const Sprite & background = AGG::GetICN(ICN::STONEBAK, 0);
     display.Blit(background, Rect(0, 0, window_w, window_h), box);
 
-    Funds funds1(world.GetKingdom(conf.CurrentColor()).GetFunds());
+    Kingdom & myKingdom = world.GetKingdom(conf.CurrentColor());
+
+    Funds funds1(myKingdom.GetFunds());
     Funds funds2;
     Text text;
 
@@ -270,7 +272,7 @@ void Dialog::MakeGiftResource(void)
 	    btnGroups.DisableButton1(0 == new_count || 0 == funds2.GetValidItems());
 	    if(count != new_count)
 	    {
-		funds1 = world.GetKingdom(conf.CurrentColor()).GetFunds();
+		funds1 = myKingdom.GetFunds();
 		funds2.Reset();
 		info1.Redraw();
 		info2.Redraw();
@@ -312,11 +314,7 @@ void Dialog::MakeGiftResource(void)
 
 	world.AddEventDate(event);
 
-	const Colors colors(selector.recipients);
-	for(Colors::const_iterator
-	    it = colors.begin(); it != colors.end(); ++it)
-	{
-	    world.GetKingdom(*it).OddFundsResource(funds2);
-	}
+	if(1 < count) funds2 *= count;
+	myKingdom.OddFundsResource(funds2);
     }
 }

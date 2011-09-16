@@ -312,6 +312,8 @@ void Dialog::Marketplace(bool fromTradingPost)
 	{
             cursor.Hide();                                                                                       
 	    Dialog::MakeGiftResource();
+	    fundsFrom = kingdom.GetFunds();
+	    RedrawFromResource(pt1, fundsFrom);
             cursor.Show();                                                                                       
             display.Flip();                                                                                      
 	}
