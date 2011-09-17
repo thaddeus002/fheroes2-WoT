@@ -33,7 +33,7 @@ const char* AI::Type(void)
     return "empty";
 }
 
-const char* AI::Licese(void)
+const char* AI::License(void)
 {
     return "GPL";
 }
@@ -60,6 +60,7 @@ void AI::HeroesAction(Heroes &, s32)
 
 std::string AI::HeroesString(const Heroes &)
 {
+    return "";
 }
 
 void AI::HeroesLevelUp(Heroes &)
