@@ -37,6 +37,11 @@ const char* AI::Type(void)
     return "simple";
 }
 
+const char* AI::License(void)
+{
+    return "Non-Commercial";
+}
+
 void AI::AddHeroes(const Heroes &)
 {
 }

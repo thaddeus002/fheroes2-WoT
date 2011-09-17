@@ -33,6 +33,11 @@ const char* AI::Type(void)
     return "empty";
 }
 
+const char* AI::Licese(void)
+{
+    return "GPL";
+}
+
 void AI::AddCastle(const Castle &)
 {
 }

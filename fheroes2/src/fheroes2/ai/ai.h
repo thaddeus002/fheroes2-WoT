@@ -50,6 +50,7 @@ struct AI
     static void CastleAfterBattle(Castle &, bool attacker_wins);
 
     static const char* Type(void);
+    static const char* License(void);
 };
 
 #endif
