@@ -314,7 +314,7 @@ void Battle2::Arena::ApplyActionSpellCast(Action & action)
     }
     else
     {
-	DEBUG(DBG_BATTLE, DBG_WARN, spell.GetName() << ", " << "incorrect param");
+	DEBUG(DBG_BATTLE, DBG_INFO, spell.GetName() << ", " << "incorrect param");
     }
 }
 
@@ -525,11 +525,11 @@ void Battle2::Arena::ApplyActionEnd(Action & action)
 	}
 	else
 	{
-	    DEBUG(DBG_BATTLE, DBG_WARN, "id: " << id << " moved");
+	    DEBUG(DBG_BATTLE, DBG_INFO, "id: " << id << " moved");
 	}
     }
     else
-	DEBUG(DBG_BATTLE, DBG_WARN, "incorrect param: " << "id: " << id);
+	DEBUG(DBG_BATTLE, DBG_INFO, "incorrect param: " << "id: " << id);
 }
 
 void Battle2::Arena::ApplyActionMorale(Action & action)
