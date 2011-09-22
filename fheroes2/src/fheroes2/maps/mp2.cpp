@@ -932,6 +932,20 @@ bool MP2::isPickupObject(const u8 obj)
     return false;
 }
 
+bool MP2::isMoveObject(const u8 obj)
+{
+    switch(obj)
+    {
+	    case OBJ_STONELIGHTS:
+	    case OBJ_WHIRLPOOL:
+	    return true;
+
+	default: break;
+    }
+
+    return false;
+}
+
 bool MP2::isRemoveObject(const u8 obj)
 {
     switch(obj)

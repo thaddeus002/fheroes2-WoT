@@ -1512,15 +1512,13 @@ void Game::EventDefaultAction(void)
 	Interface::Basic & I = Interface::Basic::Get();
 
 	// 1. action object
-	if(MP2::isActionObject(hero.GetUnderObject(), hero.isShipMaster()))
+	if(MP2::isActionObject(hero.GetUnderObject(), hero.isShipMaster()) &&
+	    (! MP2::isMoveObject(hero.GetUnderObject()) || hero.isEnableMove()))
 	{
-	    //if(hero.isEnableMove())
-	    {
-		hero.Action(hero.GetIndex());
-		if(MP2::OBJ_STONELIGHTS == hero.GetUnderObject() || MP2::OBJ_WHIRLPOOL == hero.GetUnderObject())
-		    I.SetRedraw(REDRAW_HEROES);
-		I.SetRedraw(REDRAW_GAMEAREA);
-	    }
+	    hero.Action(hero.GetIndex());
+	    if(MP2::OBJ_STONELIGHTS == hero.GetUnderObject() || MP2::OBJ_WHIRLPOOL == hero.GetUnderObject())
+		I.SetRedraw(REDRAW_HEROES);
+	    I.SetRedraw(REDRAW_GAMEAREA);
 	}
 	else
 	// 2. continue
