@@ -30,10 +30,6 @@ class Point;
 class Rect;
 struct SDL_Surface;
 
-#ifdef WITH_TTF
-namespace SDL { class Font; }
-#endif
-
 class Surface
 {
 public:
@@ -133,11 +129,6 @@ protected:
     u32 GetPixel3(u16 x, u16 y) const;
     u32 GetPixel2(u16 x, u16 y) const;
     u32 GetPixel1(u16 x, u16 y) const;
-
-#ifdef WITH_TTF
-    friend class SDL::Font;
-#endif
-
     void LoadPalette(void);
     void CreateSurface(u16 sw, u16 sh, u8 bpp, bool amask);
 

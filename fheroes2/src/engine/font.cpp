@@ -67,11 +67,10 @@ void SDL::Font::SetStyle(u8 style)
 
 void SDL::Font::RenderText(Surface & dst, const std::string & msg, const RGBColor & clr, render_t render)
 {
-    if(dst.surface) Surface::FreeSurface(dst);
     if(fnt) switch(render)
     {
-	case BLENDED:	dst.surface = TTF_RenderUTF8_Blended(fnt, msg.c_str(), clr);	break;
-	default:	dst.surface = TTF_RenderUTF8_Solid(fnt, msg.c_str(), clr);	break;
+	case BLENDED:	dst.Set(TTF_RenderUTF8_Blended(fnt, msg.c_str(), clr));	break;
+	default:	dst.Set(TTF_RenderUTF8_Solid(fnt, msg.c_str(), clr));	break;
     }
 }
 
@@ -80,21 +79,19 @@ void SDL::Font::RenderChar(Surface & dst, char ch, const RGBColor & clr, render_
     char buf[2] = { '\0', '\0' };
          buf[0] = ch;
 
-    if(dst.surface) Surface::FreeSurface(dst);
     if(fnt) switch(render)
     {
-	case BLENDED:	dst.surface = TTF_RenderUTF8_Blended(fnt, buf, clr);	break;
-	default:	dst.surface = TTF_RenderUTF8_Solid(fnt, buf, clr);	break;
+	case BLENDED:	dst.Set(TTF_RenderUTF8_Blended(fnt, buf, clr));	break;
+	default:	dst.Set(TTF_RenderUTF8_Solid(fnt, buf, clr));	break;
     }
 }
 
 void SDL::Font::RenderUnicodeText(Surface & dst, const u16 *msg, const RGBColor & clr, render_t render)
 {
-    if(dst.surface) Surface::FreeSurface(dst);
     if(fnt) switch(render)
     {
-	case BLENDED:	dst.surface = TTF_RenderUNICODE_Blended(fnt, msg, clr);	break;
-	default:	dst.surface = TTF_RenderUNICODE_Solid(fnt, msg, clr);	break;
+	case BLENDED:	dst.Set(TTF_RenderUNICODE_Blended(fnt, msg, clr));	break;
+	default:	dst.Set(TTF_RenderUNICODE_Solid(fnt, msg, clr));	break;
     }
 }
 
@@ -103,11 +100,10 @@ void SDL::Font::RenderUnicodeChar(Surface & dst, u16 ch, const RGBColor & clr, r
     u16 buf[2] = { L'\0', L'\0' };
         buf[0] = ch;
 
-    if(dst.surface) Surface::FreeSurface(dst);
     if(fnt) switch(render)
     {
-	case BLENDED:	dst.surface = TTF_RenderUNICODE_Blended(fnt, buf, clr);	break;
-	default:	dst.surface = TTF_RenderUNICODE_Solid(fnt, buf, clr);	break;
+	case BLENDED:	dst.Set(TTF_RenderUNICODE_Blended(fnt, buf, clr));	break;
+	default:	dst.Set(TTF_RenderUNICODE_Solid(fnt, buf, clr));	break;
     }
 }
 

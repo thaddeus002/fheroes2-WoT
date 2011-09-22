@@ -214,8 +214,6 @@ void Surface::Set(SDL_Surface* sf)
 {
     FreeSurface(*this);
     surface = sf ? sf : NULL;
-
-    if(8 == depth()) LoadPalette();
 }
 
 void Surface::Set(const Surface & bs)
