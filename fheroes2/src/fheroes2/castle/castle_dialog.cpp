@@ -685,7 +685,7 @@ Dialog::answer_t Castle::OpenDialog(bool readonly, bool fade)
 		    LocalEvent & le = LocalEvent::Get();
 		    u8 alpha = 0;
 
-		    while(le.HandleEvents() && alpha < 250)
+		    while(le.HandleEvents() && alpha < 240)
 		    {
     			if(Game::AnimateInfrequent(Game::CASTLE_BUYHERO_DELAY))
     			{
