@@ -1077,7 +1077,7 @@ bool Heroes::BuySpellBook(const Castle* castle, u8 shrine)
 	Surface sprite(border.w(), border.h());
 
 	border.Blit(sprite);
-	AGG::GetICN(ICN::ARTIFACT, Artifact(Artifact::MAGIC_BOOK).IndexSprite64()).Blit(5, 5);
+	AGG::GetICN(ICN::ARTIFACT, Artifact(Artifact::MAGIC_BOOK).IndexSprite64()).Blit(5, 5, sprite);
 
 	header.append(". ");
 	header.append(_("Do you wish to buy one?"));
