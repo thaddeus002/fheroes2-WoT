@@ -26,6 +26,7 @@
 #include "rect.h"
 #include "types.h"
 #include "error.h"
+#include "surface.h"
 #include "display.h"
 
 UpdateRects::UpdateRects() : bits(NULL), len(0), bf(0), bw(0)
@@ -218,7 +219,7 @@ void Display::SetVideoMode(const u16 w, const u16 h, u32 flags)
     display.surface = SDL_SetVideoMode(w, h, 0, flags);
 
     if(!display.surface)
-	Error::Except(SDL_GetError());
+	Error::Except(__FUNCTION__, SDL_GetError());
 
     display.update_rects.SetVideoMode(display.w(), display.h());
 }
@@ -242,7 +243,6 @@ void Display::Flip()
 void Display::FullScreen(void)
 {
     Display & display = Display::Get();
-
     SDL_WM_ToggleFullScreen(display.surface);
 }
 
@@ -270,60 +270,36 @@ void Display::ShowCursor(void)
     SDL_ShowCursor(SDL_ENABLE);
 }
 
-bool Display::Fade(u8 fadeTo)
+void Display::Fade(void)
 {
     Display & display = Display::Get();
-    u8 alpha = display.GetAlpha();
+    Surface temp(display.w(), display.h(), false);
+    temp.Fill(0, 0, 0);
+    u8 alpha = 0;
 
-    if(alpha == fadeTo) return false;
-    else
-    if(alpha < fadeTo) return Rise(fadeTo);
-    if(display.w() != 640 || display.h() != 480) return false;
-
-    Surface temp(display);
-    temp.SetDisplayFormat();
-    temp.Blit(display);
-    const u32 black = temp.MapRGB(0, 0, 0);
-
-    while(alpha > fadeTo)
+    while(alpha < 70)
     {
-	alpha -= alpha - 10 > fadeTo ? 10 : alpha - fadeTo;
-	display.Fill(black);
-	temp.SetAlpha(alpha);
-	display.Blit(temp);
+	temp.Blit(alpha, 0, 0, display);
         display.Flip();
+	alpha += 5;
 	DELAY(10);
     }
-
-    return true;
 }
 
-bool Display::Rise(u8 riseTo)
+void Display::Rise(void)
 {
     Display & display = Display::Get();
-    u8 alpha = display.GetAlpha();
+    Surface temp(display.w(), display.h(), false);
+    temp.Fill(0, 0, 0);
+    u8 alpha = 71;
 
-    if(alpha == riseTo) return false;
-    else
-    if(riseTo < alpha) return Fade(riseTo);
-    if(display.w() != 640 || display.h() != 480) return false;
-
-    Surface temp(display);
-    temp.SetDisplayFormat();
-    temp.Blit(display);
-    const u32 black = temp.MapRGB(0, 0, 0);
-
-    while(alpha < riseTo)
+    while(alpha > 5)
     {
-	alpha += alpha + 10 < riseTo ? 10 : riseTo - alpha;
-	display.Fill(black);
-	temp.SetAlpha(alpha);
-	display.Blit(temp);
+	temp.Blit(alpha, 0, 0, display);
         display.Flip();
+	alpha -= 5;
 	DELAY(10);
     }
-
-    return true;
 }
 
 /* get video display */

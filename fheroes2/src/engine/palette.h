@@ -23,27 +23,4 @@
 #ifndef H2PALETTE_H
 #define H2PALETTE_H
 
-#include "types.h"
-
-struct SDL_Palette;
-struct SDL_Color;
-
-class Palette
-{
-public:
-    ~Palette();
-
-    static Palette & Get(void);
-
-    u16 Size(void) const;
-    u32 GetColor(u16) const;
-    const SDL_Palette * SDLPalette(void) const;
-
-private:
-    Palette(); 
-
-    u32* pal;
-    SDL_Palette *sdlpal;
-};
-
 #endif

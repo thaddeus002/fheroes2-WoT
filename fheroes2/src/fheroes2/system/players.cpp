@@ -403,7 +403,6 @@ Player* Interface::PlayersInfo::GetFromClassClick(const Point & pt)
 
 void Interface::PlayersInfo::RedrawInfo(void) const
 {
-    Display & display = Display::Get();
     const Settings & conf = Settings::Get();
     const Maps::FileInfo & fi = conf.CurrentFileInfo();
 
@@ -434,7 +433,7 @@ void Interface::PlayersInfo::RedrawInfo(void) const
         if(show_name) index += 24;
 
         const Sprite & sprite1 = AGG::GetICN(ICN::NGEXTRA, index);
-        display.Blit(sprite1, rect1.x, rect1.y);
+        sprite1.Blit(rect1.x, rect1.y);
 
         if(show_name)
         {
@@ -459,7 +458,7 @@ void Interface::PlayersInfo::RedrawInfo(void) const
         }
 
         const Sprite & sprite2 = AGG::GetICN(ICN::NGEXTRA, index);
-	display.Blit(sprite2, rect2.x, rect2.y);
+	sprite2.Blit(rect2.x, rect2.y);
 
 	if(show_race)
         {
@@ -474,7 +473,7 @@ void Interface::PlayersInfo::RedrawInfo(void) const
 	   ! conf.QVGA() && (it + 1) != end())
 	{
 	    const Sprite & sprite3 = AGG::GetICN(ICN::ADVMCO, 8);
-	    display.Blit(sprite3, rect3.x, rect3.y);
+	    sprite3.Blit(rect3.x, rect3.y);
 	}
     }
 }

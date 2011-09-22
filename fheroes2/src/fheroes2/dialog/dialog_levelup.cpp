@@ -50,11 +50,11 @@ u8 DialogOneSecondary(const std::string & name, const std::string & primary, con
 
     const Sprite & sprite_frame = AGG::GetICN(ICN::SECSKILL, 15);
     Surface sf(sprite_frame.w(), sprite_frame.h());
-    sf.Blit(sprite_frame);
+    sprite_frame.Blit(sf);
 
     // sprite
     const Sprite & sprite_skill = AGG::GetICN(ICN::SECSKILL, sec.GetIndexSprite1());
-    sf.Blit(sprite_skill, 3, 3);
+    sprite_skill.Blit(3, 3, sf);
     // text
     Text text_skill(Skill::Secondary::String(sec.Skill()), Font::SMALL);
     text_skill.Blit(3 + (sprite_skill.w() - text_skill.w()) / 2, 6, sf);
@@ -124,10 +124,10 @@ u8 DialogSelectSecondary(const std::string & name, const std::string & primary, 
 
     // sprite1
     pos.x = box.GetArea().x + box.GetArea().w / 2 - sprite_frame.w() - 20;
-    display.Blit(sprite_frame, pos);
+    sprite_frame.Blit(pos);
     pos.x += 3;
     Rect rect_image1(pos, sprite_skill1.w(), sprite_skill1.h());
-    display.Blit(sprite_skill1, pos.x, pos.y + 3);
+    sprite_skill1.Blit(pos.x, pos.y + 3);
 
     Text text;
     // text
@@ -138,10 +138,10 @@ u8 DialogSelectSecondary(const std::string & name, const std::string & primary, 
 
     // sprite2
     pos.x = box.GetArea().x + box.GetArea().w / 2 + 20;
-    display.Blit(sprite_frame, pos);
+    sprite_frame.Blit(pos);
     pos.x += 3;
     Rect rect_image2(pos, sprite_skill2.w(), sprite_skill2.h());
-    display.Blit(sprite_skill2, pos.x, pos.y + 3);
+    sprite_skill2.Blit(pos.x, pos.y + 3);
     // text
     Text name_skill2(Skill::Secondary::String(sec2.Skill()), Font::SMALL);
     name_skill2.Blit(pos.x + (sprite_skill2.w() - name_skill2.w()) / 2, pos.y + 5);

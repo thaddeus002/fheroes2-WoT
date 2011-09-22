@@ -278,22 +278,22 @@ void Heroes::Redraw(Surface & dst, const s16 dx, const s16 dy, bool with_shadow)
     if(isShipMaster())
     {
 	gamearea.SrcRectFixed(src_rt, dst_pt4, sprite4.w(), sprite4.h());
-	dst.Blit(sprite4, src_rt, dst_pt4);
+	sprite4.Blit(src_rt, dst_pt4, dst);
     }
 
     // redraw sprites for shadow
     if(with_shadow)
     {
 	gamearea.SrcRectFixed(src_rt, dst_pt3, sprite3.w(), sprite3.h());
-	dst.Blit(sprite3, src_rt, dst_pt3);
+	sprite3.Blit(src_rt, dst_pt3, dst);
     }
 
     // redraw sprites hero and flag
     gamearea.SrcRectFixed(src_rt, dst_pt1, sprite1.w(), sprite1.h());
-    dst.Blit(sprite1, src_rt, dst_pt1);
+    sprite1.Blit(src_rt, dst_pt1, dst);
 
     gamearea.SrcRectFixed(src_rt, dst_pt2, sprite2.w(), sprite2.h());
-    dst.Blit(sprite2, src_rt, dst_pt2);
+    sprite2.Blit(src_rt, dst_pt2, dst);
 
     // redraw dependences tiles
     const s32 center = GetIndex();
@@ -540,10 +540,6 @@ void Heroes::FadeOut(void) const
 
     const Sprite & sprite1 = SpriteHero(*this, sprite_index, reflect);
 
-    Surface sf(sprite1.w(), sprite1.h());
-    sf.SetColorKey();
-    sf.Blit(sprite1);
-
     Point dst_pt1(dx + (reflect ? TILEWIDTH - sprite1.x() - sprite1.w() : sprite1.x()), dy + sprite1.y() + TILEWIDTH);
     Rect src_rt;
 
@@ -569,8 +565,7 @@ void Heroes::FadeOut(void) const
         	tile.RedrawObjects(display);
     	    }
 
-    	    sf.SetAlpha(alpha);
-    	    display.Blit(sf, src_rt, dst_pt1);
+    	    sprite1.Blit(alpha, src_rt, dst_pt1, display);
 
 	    for(s16 y = mp.y - 1; y <= mp.y + 1; ++y)
 		for(s16 x = mp.x - 1; x <= mp.x + 1; ++x)
@@ -604,10 +599,6 @@ void Heroes::FadeIn(void) const
 
     const Sprite & sprite1 = SpriteHero(*this, sprite_index, reflect);
 
-    Surface sf(sprite1.w(), sprite1.h());
-    sf.SetColorKey();
-    sf.Blit(sprite1);
-
     Point dst_pt1(dx + (reflect ? TILEWIDTH - sprite1.x() - sprite1.w() : sprite1.x()), dy + sprite1.y() + TILEWIDTH);
     Rect src_rt;
 
@@ -633,8 +624,7 @@ void Heroes::FadeIn(void) const
         	tile.RedrawObjects(display);
     	    }
 
-    	    sf.SetAlpha(alpha);
-    	    display.Blit(sf, src_rt, dst_pt1);
+    	    sprite1.Blit(alpha, src_rt, dst_pt1, display);
 
 	    for(s16 y = mp.y - 1; y <= mp.y + 1; ++y)
 		for(s16 x = mp.x - 1; x <= mp.x + 1; ++x)

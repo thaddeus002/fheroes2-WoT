@@ -194,17 +194,16 @@ void HGSData::ScoreRegistry(const std::string & p, const std::string & m, u16 r,
 void HGSData::RedrawList(s16 ox, s16 oy)
 {
     const Settings & conf = Settings::Get();
-    Display & display = Display::Get();
 
     // image background
     const Sprite &back = AGG::GetICN(ICN::HSBKG, 0);
-    display.Blit(back, ox, oy);
+    back.Blit(ox, oy);
 
     const Sprite &head = AGG::GetICN(ICN::HISCORE, 6);
     if(conf.QVGA())
-	display.Blit(head, ox + 25, oy + 15);
+	head.Blit(ox + 25, oy + 15);
     else
-	display.Blit(head, ox + 50, oy + 31);
+	head.Blit(ox + 50, oy + 31);
 
     std::sort(list.begin(), list.end(), RatingSort);
 

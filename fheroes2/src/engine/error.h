@@ -24,15 +24,10 @@
 
 #include <string>
 
-class Error
+struct Error
 {
-
-public:
-    Error(){};
-    ~Error(){};
-
     class Exception{};
-    static void Except(const char*);
+    static void Except(const char* func, const char* message);
 };
 
 #endif

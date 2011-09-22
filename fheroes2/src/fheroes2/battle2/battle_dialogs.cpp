@@ -38,7 +38,6 @@
 
 void BattleSpeedRedraw(const Point & dst)
 {
-    Display & display = Display::Get();
     u8 speed = Settings::Get().BattleSpeed();
     std::string str = _("speed: %{speed}");
 
@@ -46,7 +45,7 @@ void BattleSpeedRedraw(const Point & dst)
     Text text(str, Font::SMALL);
     const Sprite & sprite = AGG::GetICN(ICN::CSPANEL, (speed < 3 ? 0 : (speed < 7 ? 1 : 2)));
 
-    display.Blit(sprite, dst);
+    sprite.Blit(dst);
     text.Blit(dst.x + (sprite.w() - text.w()) / 2, dst.y + sprite.h() - 15);
 }
 
@@ -71,7 +70,7 @@ void Battle2::DialogBattleSettings(void)
     back.Save();
 
     display.FillRect(0x00, 0x00, 0x00, back.GetRect());
-    display.Blit(dialog, pos_rt.x, pos_rt.y);
+    dialog.Blit(pos_rt.x, pos_rt.y);
     
     Button btn_ok(pos_rt.x + 113, pos_rt.y + 252, (conf.EvilInterface() ? ICN::CSPANBTE : ICN::CSPANBTN), 0, 1);
 
@@ -264,11 +263,11 @@ void Battle2::Arena::DialogBattleSummary(const Result & res) const
 
     if(conf.QVGA())
     {
-	display.Blit(dialog, Rect(0, 232, pos_rt.w, 224), pos_rt.x, pos_rt.y);
-	display.Blit(dialog, Rect(0, 0, pos_rt.w, 30), pos_rt.x, pos_rt.y);
+	dialog.Blit(Rect(0, 232, pos_rt.w, 224), pos_rt.x, pos_rt.y);
+	dialog.Blit(Rect(0, 0, pos_rt.w, 30), pos_rt.x, pos_rt.y);
     }
     else
-	display.Blit(dialog, pos_rt.x, pos_rt.y);
+	dialog.Blit(pos_rt.x, pos_rt.y);
 
     const u8 anime_ox = 47;
     const u8 anime_oy = 36;
@@ -278,8 +277,8 @@ void Battle2::Arena::DialogBattleSummary(const Result & res) const
 	const Sprite & sprite1 = AGG::GetICN(icn_anim, 0);
 	const Sprite & sprite2 = AGG::GetICN(icn_anim, 1);
 
-	display.Blit(sprite1, pos_rt.x + anime_ox + sprite1.x(), pos_rt.y + anime_oy + sprite1.y());
-	display.Blit(sprite2, pos_rt.x + anime_ox + sprite2.x(), pos_rt.y + anime_oy + sprite2.y());
+	sprite1.Blit(pos_rt.x + anime_ox + sprite1.x(), pos_rt.y + anime_oy + sprite1.y());
+	sprite2.Blit(pos_rt.x + anime_ox + sprite2.x(), pos_rt.y + anime_oy + sprite2.y());
     }
 
     Button btn_ok(pos_rt.x + 121, pos_rt.y + (conf.QVGA() ? 176 : 410), (conf.EvilInterface() ? ICN::WINCMBBE : ICN::WINCMBTB), 0, 1);
@@ -338,8 +337,8 @@ void Battle2::Arena::DialogBattleSummary(const Result & res) const
 		const Sprite & sprite2 = AGG::GetICN(icn_anim, ICN::AnimationFrame(icn_anim, 1, frame));
 
 		cursor.Hide();
-		display.Blit(sprite1, pos_rt.x + anime_ox + sprite1.x(), pos_rt.y + anime_oy + sprite1.y());
-		display.Blit(sprite2, pos_rt.x + anime_ox + sprite2.x(), pos_rt.y + anime_oy + sprite2.y());
+		sprite1.Blit(pos_rt.x + anime_ox + sprite1.x(), pos_rt.y + anime_oy + sprite1.y());
+		sprite2.Blit(pos_rt.x + anime_ox + sprite2.x(), pos_rt.y + anime_oy + sprite2.y());
 		cursor.Show();
 		display.Flip();
 		++frame;
@@ -376,11 +375,11 @@ u8 Battle2::Arena::DialogBattleHero(const HeroBase & hero) const
     Background back(pos_rt);
     back.Save();
 
-    display.Blit(dialog, pos_rt.x, pos_rt.y);
-    display.Blit(Portrait::Get(hero, Portrait::BIG), pos_rt.x + 27, pos_rt.y + 42);
+    dialog.Blit(pos_rt.x, pos_rt.y);
+    Portrait::Get(hero, Portrait::BIG).Blit(pos_rt.x + 27, pos_rt.y + 42, display);
 
     u8 col = (Color::NONE == hero.GetColor() ? 1 : Color::GetIndex(hero.GetColor()) + 1);
-    display.Blit(AGG::GetICN(ICN::VIEWGEN, col), pos_rt.x + 148, pos_rt.y + 36);
+    AGG::GetICN(ICN::VIEWGEN, col).Blit(pos_rt.x + 148, pos_rt.y + 36);
 
     Point tp(pos_rt);
 
@@ -456,9 +455,9 @@ u8 Battle2::Arena::DialogBattleHero(const HeroBase & hero) const
 	Surface shadow(btnCast.w, btnCast.h);
 	shadow.Fill(0, 0, 0);
 	shadow.SetAlpha(80);
-	if(btnCast.isDisable()) display.Blit(shadow, btnCast);
-	if(btnRetreat.isDisable()) display.Blit(shadow, btnRetreat);
-	if(btnSurrender.isDisable()) display.Blit(shadow, btnSurrender);
+	if(btnCast.isDisable()) shadow.Blit(btnCast, display);
+	if(btnRetreat.isDisable()) shadow.Blit(btnRetreat, display);
+	if(btnSurrender.isDisable()) shadow.Blit(btnSurrender, display);
     }
 
     u8 result = 0;
@@ -527,7 +526,7 @@ bool Battle2::DialogBattleSurrender(const HeroBase & hero, u32 cost)
     Background back(pos_rt);
     back.Save();
 
-    display.Blit(dialog, pos_rt.x, pos_rt.y);
+    dialog.Blit(pos_rt.x, pos_rt.y);
 
     const ICN::icn_t icn = conf.EvilInterface() ? ICN::SURRENDE : ICN::SURRENDR;
 
@@ -538,8 +537,8 @@ bool Battle2::DialogBattleSurrender(const HeroBase & hero, u32 cost)
     btnDecline.Draw();
 
     const Sprite & window = AGG::GetICN(icn, 4);
-    display.Blit(window, pos_rt.x + 54, pos_rt.y + 30);
-    display.Blit(Portrait::Get(hero, Portrait::BIG), pos_rt.x + 58, pos_rt.y + 38);
+    window.Blit(pos_rt.x + 54, pos_rt.y + 30);
+    Portrait::Get(hero, Portrait::BIG).Blit(pos_rt.x + 58, pos_rt.y + 38, display);
 
     std::string str = _("%{name} states:");
     String::Replace(str, "%{name}", hero.GetName());

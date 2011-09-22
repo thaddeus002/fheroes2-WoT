@@ -105,9 +105,8 @@ u16 DialogCaptureResourceObject(const std::string & hdr, std::string & msg, cons
     const Sprite & sprite = AGG::GetICN(ICN::RESOURCE, Resource::GetIndexSprite2(res));
 
     // sprite resource with x / day test
-    Surface sf(sprite.w() + 30, sprite.h() + 14);
-    sf.SetColorKey();
-    sf.Blit(sprite, 15, 0);
+    Surface sf(sprite.w() + 30, sprite.h() + 14, true);
+    sprite.Blit(15, 0, sf);
 
     std::string perday = _("%{count} / day");
     payment_t info = ProfitConditions::FromMine(res);
@@ -139,6 +138,8 @@ u16 DialogCaptureResourceObject(const std::string & hdr, std::string & msg, cons
 
     Text text(perday, Font::SMALL);
     text.Blit((sf.w() - text.w()) / 2, sf.h() - 12, sf);
+    sf.ResetAlpha();
+    sf.SetColorKey(sf.MapRGB(0, 0, 0));
 
     return Dialog::SpriteInfo(hdr, msg, sf, buttons);
 }
@@ -147,10 +148,9 @@ u16 DialogGoldWithExp(const std::string & hdr, const std::string & msg, const u1
 {
     const Sprite & gold = AGG::GetICN(ICN::RESOURCE, 6);
     const Sprite & sprite = AGG::GetICN(ICN::EXPMRL, 4);
-    Surface image(sprite.w() + gold.w() + 50, sprite.h() + 12);
-    image.SetColorKey();
-    image.Blit(gold, 0, image.h() - gold.h() - 12);
-    image.Blit(sprite, gold.w() + 50, 0);
+    Surface image(sprite.w() + gold.w() + 50, sprite.h() + 12, true);
+    gold.Blit(0, image.h() - gold.h() - 12, image);
+    sprite.Blit(gold.w() + 50, 0, image);
     std::string str;
     String::AddInt(str, count);
     Text text(str, Font::SMALL);
@@ -159,6 +159,9 @@ u16 DialogGoldWithExp(const std::string & hdr, const std::string & msg, const u1
     String::AddInt(str, exp);
     text.Set(str);
     text.Blit(gold.w() + 50 + (sprite.w() - text.w()) / 2, image.h() - 12, image);
+    image.ResetAlpha();
+    image.SetColorKey(image.MapRGB(0, 0, 0));
+
     return Dialog::SpriteInfo(hdr, msg, image, buttons);
 }
 
@@ -169,13 +172,15 @@ u16 DialogArtifactWithExp(const std::string & hdr, const std::string & msg, cons
     const Sprite & sprite = AGG::GetICN(ICN::EXPMRL, 4);
     const Sprite & border = AGG::GetICN(ICN::RESOURCE, 7);
     const Sprite & artifact = AGG::GetICN(ICN::ARTIFACT, art.IndexSprite64());
-    Surface image(sprite.w() + border.w() + 50, border.h());
-    image.SetColorKey();
-    image.Blit(border);
-    image.Blit(artifact, 5, 5);
-    image.Blit(sprite, border.w() + 50, (border.h() - sprite.h()) / 2);
+    Surface image(sprite.w() + border.w() + 50, border.h(), true);
+    border.Blit(image);
+    artifact.Blit(5, 5, image);
+    sprite.Blit(border.w() + 50, (border.h() - sprite.h()) / 2, image);
     Text text(str, Font::SMALL);
     text.Blit(border.w() + 50 + (sprite.w() - text.w()) / 2, image.h() - 12, image);
+    image.ResetAlpha();
+    image.SetColorKey(image.MapRGB(0, 0, 0));
+
     return Dialog::SpriteInfo(hdr, msg, image, buttons);
 }
 
@@ -184,11 +189,13 @@ u16 DialogWithExp(const std::string & hdr, const std::string & msg, const u16 ex
     std::string str;
     String::AddInt(str, exp);
     const Sprite & sprite = AGG::GetICN(ICN::EXPMRL, 4);
-    Surface image(sprite.w(), sprite.h() + 12);
-    image.SetColorKey();
-    image.Blit(sprite);
+    Surface image(sprite.w(), sprite.h() + 12, true);
+    sprite.Blit(image);
     Text text(str, Font::SMALL);
     text.Blit((sprite.w() - text.w()) / 2, sprite.h(), image);
+    image.ResetAlpha();
+    image.SetColorKey(image.MapRGB(0, 0, 0));
+
     return Dialog::SpriteInfo(hdr, msg, image, buttons);
 }
 
@@ -199,13 +206,15 @@ u16 DialogWithArtifactAndGold(const std::string & hdr, const std::string & msg, 
     const Sprite & gold = AGG::GetICN(ICN::RESOURCE, 6);
     const Sprite & border = AGG::GetICN(ICN::RESOURCE, 7);
     const Sprite & artifact = AGG::GetICN(ICN::ARTIFACT, art.IndexSprite64());
-    Surface image(gold.w() + border.w() + 50, border.h());
-    image.SetColorKey();
-    image.Blit(border);
-    image.Blit(artifact, 5, 5);
-    image.Blit(gold, border.w() + 50, (border.h() - gold.h()) / 2);
+    Surface image(gold.w() + border.w() + 50, border.h(), true);
+    border.Blit(image);
+    artifact.Blit(5, 5, image);
+    gold.Blit(border.w() + 50, (border.h() - gold.h()) / 2, image);
     Text text(str, Font::SMALL);
     text.Blit(border.w() + 50 + (gold.w() - text.w()) / 2, border.h() - 25, image);
+    image.ResetAlpha();
+    image.SetColorKey(image.MapRGB(0, 0, 0));
+
     return Dialog::SpriteInfo(hdr, msg, image, buttons);
 }
 
@@ -214,11 +223,13 @@ u16 DialogWithGold(const std::string & hdr, const std::string & msg, const u16 c
     std::string str;
     String::AddInt(str, count);
     const Sprite & gold = AGG::GetICN(ICN::RESOURCE, 6);
-    Surface image(gold.w(), gold.h() + 12);
-    image.SetColorKey();
-    image.Blit(gold);
+    Surface image(gold.w(), gold.h() + 12, true);
+    gold.Blit(image);
     Text text(str, Font::SMALL);
     text.Blit((gold.w() - text.w()) / 2, gold.h(), image);
+    image.ResetAlpha();
+    image.SetColorKey(image.MapRGB(0, 0, 0));
+
     return Dialog::SpriteInfo(hdr, msg, image, buttons);
 }
 
@@ -229,8 +240,8 @@ u16 DialogMorale(const std::string & hdr, const std::string & msg, const bool go
     const Sprite & sprite = AGG::GetICN(ICN::EXPMRL, (good ? 2 : 3));
     u8 offset = sprite.w() * 4 / 3;
     Surface image(sprite.w() + offset * (count - 1), sprite.h());
-    image.SetColorKey();
-    for(u8 ii = 0; ii < count; ++ii) image.Blit(sprite, offset * ii, 0);
+    for(u8 ii = 0; ii < count; ++ii) sprite.Blit(offset * ii, 0, image);
+
     return Dialog::SpriteInfo(hdr, msg, image);
 }
 
@@ -241,8 +252,8 @@ u16 DialogLuck(const std::string & hdr, const std::string & msg, const bool good
     const Sprite & sprite = AGG::GetICN(ICN::EXPMRL, (good ? 0 : 1));
     u8 offset = sprite.w() * 4 / 3;
     Surface image(sprite.w() + offset * (count - 1), sprite.h());
-    image.SetColorKey();
-    for(u8 ii = 0; ii < count; ++ii) image.Blit(sprite, offset * ii, 0);
+    for(u8 ii = 0; ii < count; ++ii) sprite.Blit(offset * ii, 0, image);
+
     return Dialog::SpriteInfo(hdr, msg, image);
 }
 
@@ -317,19 +328,21 @@ void AnimationRemoveObject(Maps::Tiles & tile)
 	if(around & dir)
 	    heroes.push_back(world.GetHeroes(Maps::GetDirectionIndex(tile.GetIndex(), dir)));
 
-    const Surface & st = tile.GetTileSurface();
-    Surface sf(st.w(), st.h());
-    sf.Blit(st);
+    const Surface & stile = tile.GetTileSurface();
+    Surface sobj(stile.w(), stile.h(), true);
+
     const Sprite & sprite = AGG::GetICN(MP2::GetICNObject(addon->object), addon->index);
-    sf.Blit(sprite, sprite.x(), sprite.y());
+    sprite.Blit(sprite.x(), sprite.y(), sobj);
 
     // if animation sprite
     u16 index;
     if(0 != (index = ICN::AnimationFrame(MP2::GetICNObject(addon->object), addon->index)))
     {
 	const Sprite & sprite = AGG::GetICN(MP2::GetICNObject(addon->object), index);
-	sf.Blit(sprite, sprite.x(), sprite.y());
+	sprite.Blit(sprite.x(), sprite.y(), sobj);
     }
+
+    sobj.ConvertGlobalAlpha();
 
     LocalEvent & le = LocalEvent::Get();
     u8 alpha = 250;
@@ -339,10 +352,8 @@ void AnimationRemoveObject(Maps::Tiles & tile)
 	if(Game::AnimateInfrequent(Game::HEROES_PICKUP_DELAY))
         {
 	    cursor.Hide();
-	    tile.RedrawTile(display);
-	    tile.RedrawBottom(display, true);
-            sf.SetAlpha(alpha);
-	    display.Blit(sf, dstx, dsty);
+	    stile.Blit(dstx, dsty, display);
+	    sobj.Blit(alpha, dstx, dsty, display);
 	    if(heroes.size())
 	    {
 		for(it = heroes.begin(); it != heroes.end(); ++it) if(*it) (*it)->Redraw(display, false);
@@ -2667,23 +2678,23 @@ void ActionToUpgradeArmyObject(Heroes &hero, const u8 obj, const s32 dst_index)
 	u8 ox = 0;
 	const Sprite & br = AGG::GetICN(ICN::STRIP, 12);
 	Surface sf(br.w() * mons.size() + (mons.size() - 1) * 4, br.h());
-	sf.SetColorKey();
+
 	for(std::vector<Monster>::const_iterator
 	    it = mons.begin(); it != mons.end(); ++it)
 	{
-	    sf.Blit(br, ox, 0);
+	    br.Blit(ox, 0, sf);
 	    switch(Monster(*it).GetRace())
 	    {
-		case Race::KNGT:	sf.Blit(AGG::GetICN(ICN::STRIP, 4), ox + 6, 6); break;
-		case Race::BARB:	sf.Blit(AGG::GetICN(ICN::STRIP, 5), ox + 6, 6); break;
-		case Race::SORC:	sf.Blit(AGG::GetICN(ICN::STRIP, 6), ox + 6, 6); break;
-		case Race::WRLK:	sf.Blit(AGG::GetICN(ICN::STRIP, 7), ox + 6, 6); break;
-		case Race::WZRD:	sf.Blit(AGG::GetICN(ICN::STRIP, 8), ox + 6, 6); break;
-		case Race::NECR:	sf.Blit(AGG::GetICN(ICN::STRIP, 9), ox + 6, 6); break;
-		default:		sf.Blit(AGG::GetICN(ICN::STRIP, 10), ox + 6, 6); break;
+		case Race::KNGT:	AGG::GetICN(ICN::STRIP, 4).Blit(ox + 6, 6, sf); break;
+		case Race::BARB:	AGG::GetICN(ICN::STRIP, 5).Blit(ox + 6, 6, sf); break;
+		case Race::SORC:	AGG::GetICN(ICN::STRIP, 6).Blit(ox + 6, 6, sf); break;
+		case Race::WRLK:	AGG::GetICN(ICN::STRIP, 7).Blit(ox + 6, 6, sf); break;
+		case Race::WZRD:	AGG::GetICN(ICN::STRIP, 8).Blit(ox + 6, 6, sf); break;
+		case Race::NECR:	AGG::GetICN(ICN::STRIP, 9).Blit(ox + 6, 6, sf); break;
+		default:		AGG::GetICN(ICN::STRIP, 10).Blit(ox + 6, 6, sf); break;
 	    }
 	    const Sprite & mon = AGG::GetICN((*it).GetUpgrade().ICNMonh(), 0);
-	    sf.Blit(mon, ox + 6 + mon.x(), 6 + mon.y());
+	    mon.Blit(ox + 6 + mon.x(), 6 + mon.y(), sf);
 	    ox += br.w() + 4;
 	}
 	Dialog::SpriteInfo(MP2::StringObject(obj), msg1, sf);

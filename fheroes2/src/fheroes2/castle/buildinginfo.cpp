@@ -335,10 +335,8 @@ bool BuildingInfo::IsDwelling(void) const
 
 void BuildingInfo::RedrawCaptain(void)
 {
-    Display & display = Display::Get();
-
-    display.Blit(AGG::GetICN(ICN::Get4Captain(castle.GetRace()),
-				(building & BUILD_CAPTAIN ? 1 : 0)), area.x, area.y);
+    AGG::GetICN(ICN::Get4Captain(castle.GetRace()),
+				(building & BUILD_CAPTAIN ? 1 : 0)).Blit(area.x, area.y);
 
     const Sprite & sprite_allow = AGG::GetICN(ICN::TOWNWIND, 11);
     const Sprite & sprite_deny  = AGG::GetICN(ICN::TOWNWIND, 12);
@@ -351,14 +349,14 @@ void BuildingInfo::RedrawCaptain(void)
     // indicator
     dst_pt.x = area.x + 65;
     dst_pt.y = area.y + 60;
-    if(castle.isBuild(building)) display.Blit(sprite_allow, dst_pt);
+    if(castle.isBuild(building)) sprite_allow.Blit(dst_pt);
     else
     if(! allow_buy)
     {
 	if(LACK_RESOURCES == build_condition)
-	    display.Blit(sprite_money, dst_pt);
+	    sprite_money.Blit(dst_pt);
 	else
-	    display.Blit(sprite_deny, dst_pt);
+	    sprite_deny.Blit(dst_pt);
     }
 }
 
@@ -373,7 +371,7 @@ void BuildingInfo::Redraw(void)
     u8 index = GetIndexBuildingSprite(building);
     Display & display = Display::Get();
 
-    display.Blit(AGG::GetICN(ICN::BLDGXTRA, 0), area.x, area.y);
+    AGG::GetICN(ICN::BLDGXTRA, 0).Blit(area.x, area.y);
 
     if(disable)
     {
@@ -381,8 +379,8 @@ void BuildingInfo::Redraw(void)
 	return;
     }
 
-    display.Blit(AGG::GetICN(ICN::Get4Building(castle.GetRace()), index),
-			area.x + 1, area.y + 1);
+    AGG::GetICN(ICN::Get4Building(castle.GetRace()),
+		index).Blit(area.x + 1, area.y + 1);
 
     const Sprite & sprite_allow = AGG::GetICN(ICN::TOWNWIND, 11);
     const Sprite & sprite_deny  = AGG::GetICN(ICN::TOWNWIND, 12);
@@ -395,14 +393,14 @@ void BuildingInfo::Redraw(void)
     // indicator
     dst_pt.x = area.x + 115;
     dst_pt.y = area.y + 40;
-    if(castle.isBuild(building)) display.Blit(sprite_allow, dst_pt);
+    if(castle.isBuild(building)) sprite_allow.Blit(dst_pt);
     else
     if(! allow_buy)
     {
 	if(LACK_RESOURCES == build_condition)
-	    display.Blit(sprite_money, dst_pt);
+	    sprite_money.Blit(dst_pt);
 	else
-	    display.Blit(sprite_deny, dst_pt);
+	    sprite_deny.Blit(dst_pt);
     }
 
     // status bar
@@ -410,7 +408,7 @@ void BuildingInfo::Redraw(void)
     {
 	dst_pt.x = area.x;
 	dst_pt.y = area.y + 58;
-	display.Blit(AGG::GetICN(ICN::CASLXTRA, allow_buy ? 1 : 2), dst_pt);
+	AGG::GetICN(ICN::CASLXTRA, allow_buy ? 1 : 2).Blit(dst_pt);
     }
 
     // name
@@ -516,13 +514,13 @@ bool BuildingInfo::DialogBuyBuilding(bool buttons) const
 
     dst_pt.x = box_rt.x + (box_rt.w - window_icons.w()) / 2;
     dst_pt.y = box_rt.y + space;
-    display.Blit(window_icons, dst_pt);
+    window_icons.Blit(dst_pt);
 
     const Sprite & building_icons = AGG::GetICN(ICN::Get4Building(castle.GetRace()),
 					    GetIndexBuildingSprite(building));
     dst_pt.x = box_rt.x + (box_rt.w - building_icons.w()) / 2;
     dst_pt.y += 1;
-    display.Blit(building_icons, dst_pt);
+    building_icons.Blit(dst_pt);
 
     Text text(GetName(), Font::SMALL);
     dst_pt.x = box_rt.x + (box_rt.w - text.w()) / 2;

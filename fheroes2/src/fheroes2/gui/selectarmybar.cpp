@@ -195,17 +195,17 @@ void SelectArmyBar::Redraw(Surface & display)
 	{
             // blit alt background
             if(flags & FLAGS_USEMONS32)
-		display.Blit(*background, pt);
+		background->Blit(pt, display);
 	    else
 	    switch(troop.GetRace())
             {
-                case Race::KNGT: display.Blit(AGG::GetICN(ICN::STRIP, 4), pt);  break;
-                case Race::BARB: display.Blit(AGG::GetICN(ICN::STRIP, 5), pt);  break;
-                case Race::SORC: display.Blit(AGG::GetICN(ICN::STRIP, 6), pt);  break;
-                case Race::WRLK: display.Blit(AGG::GetICN(ICN::STRIP, 7), pt);  break;
-                case Race::WZRD: display.Blit(AGG::GetICN(ICN::STRIP, 8), pt);  break;
-                case Race::NECR: display.Blit(AGG::GetICN(ICN::STRIP, 9), pt);  break;
-                default: display.Blit(AGG::GetICN(ICN::STRIP, 10), pt); break;
+                case Race::KNGT: AGG::GetICN(ICN::STRIP, 4).Blit(pt);  break;
+                case Race::BARB: AGG::GetICN(ICN::STRIP, 5).Blit(pt);  break;
+                case Race::SORC: AGG::GetICN(ICN::STRIP, 6).Blit(pt);  break;
+                case Race::WRLK: AGG::GetICN(ICN::STRIP, 7).Blit(pt);  break;
+                case Race::WZRD: AGG::GetICN(ICN::STRIP, 8).Blit(pt);  break;
+                case Race::NECR: AGG::GetICN(ICN::STRIP, 9).Blit(pt);  break;
+                default: AGG::GetICN(ICN::STRIP, 10).Blit(pt); break;
             }
 
 	    const Sprite & spmonh = AGG::GetICN(troop.ICNMonh(), 0);
@@ -214,9 +214,9 @@ void SelectArmyBar::Redraw(Surface & display)
             if(flags & FLAGS_USEMONS32)
 	    {
         	if(flags & FLAGS_COUNT2SPRITE)
-	    	    display.Blit(mons32, pt.x + (background->w() - mons32.w()) / 2, pt.y + background->h() - mons32.h() - 1);
+	    	    mons32.Blit(pt.x + (background->w() - mons32.w()) / 2, pt.y + background->h() - mons32.h() - 1);
 	    	else
-	    	    display.Blit(mons32, pt.x + (background->w() - mons32.w()) / 2, pt.y + background->h() - mons32.h() - 11);
+	    	    mons32.Blit(pt.x + (background->w() - mons32.w()) / 2, pt.y + background->h() - mons32.h() - 11);
     
         	// draw count
         	std::string str;
@@ -230,7 +230,7 @@ void SelectArmyBar::Redraw(Surface & display)
             }
             else
 	    {
-	    	display.Blit(spmonh, pt.x + spmonh.x(), pt.y + spmonh.y());
+	    	spmonh.Blit(pt.x + spmonh.x(), pt.y + spmonh.y());
     
         	// draw count
         	std::string str;
@@ -241,7 +241,7 @@ void SelectArmyBar::Redraw(Surface & display)
 	}
 	else
 	{
-	    display.Blit(*background, pt);
+	    background->Blit(pt, display);
 	}
 	pt.x += background->w() + interval;
     }

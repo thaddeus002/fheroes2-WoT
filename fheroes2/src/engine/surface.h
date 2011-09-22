@@ -26,13 +26,9 @@
 #include "rect.h"
 #include "types.h"
 
-#define SWSURFACE		SDL_SWSURFACE
-
-class Palette;
 class Point;
 class Rect;
 struct SDL_Surface;
-struct SDL_PixelFormat;
 
 #ifdef WITH_TTF
 namespace SDL { class Font; }
@@ -42,9 +38,8 @@ class Surface
 {
 public:
     Surface();
-    Surface(const void* pixels, unsigned int width, unsigned int height, unsigned char bytes_per_pixel, bool alpha);
-    Surface(u16 sw, u16 sh, u8 depth, u32 fl);
-    Surface(u16 sw, u16 sh, bool alpha = false);
+    Surface(const void* pixels, unsigned int width, unsigned int height, unsigned char bytes_per_pixel, bool amask);
+    Surface(u16 sw, u16 sh, bool amask = false);
     Surface(const Surface & bs);
     Surface(SDL_Surface * sf);
 
@@ -53,9 +48,9 @@ public:
     Surface & operator= (const Surface & bs);
     void Set(const Surface &);
     void Set(SDL_Surface * sf);
-    void Set(u16 sw, u16 sh, bool alpha = false);
-    void Set(u16 sw, u16 sh, u8 depth, u32 fl);
-    void Set(const void* pixels, unsigned int width, unsigned int height, unsigned char bytes_per_pixel, bool alpha);
+    void Set(u16 sw, u16 sh, bool amask = false);
+    void Set(u16 sw, u16 sh, u8 bpp, bool amask); /* bpp: 8, 16, 24, 32 */
+    void Set(const void* pixels, unsigned int width, unsigned int height, unsigned char bytes_per_pixel, bool amask); /* bytes_per_pixel: 1, 2, 3, 4 */
 
     bool Load(const char*);
     bool Load(const std::string &);
@@ -66,40 +61,41 @@ public:
     u16 w(void) const;
     u16 h(void) const;
     u8  depth(void) const;
+    u32 amask(void) const;
+    u8  alpha(void) const;
 
-    bool isValid(void) const{ return surface ? true : false; };
+    bool isValid(void) const;
     bool isDisplay(void) const;
-    bool isAlpha(void) const;
-    u8  GetAlpha(void) const;
     u32 MapRGB(u8 r, u8 g, u8 b, u8 a = 0) const;
     void GetRGB(u32 pixel, u8 *r, u8 *g, u8 *b, u8 *a = NULL) const;
 
-    void Blit(const Surface &src);
-    void Blit(const Surface &src, s16 dst_ox, s16 dst_oy);
-    void Blit(const Surface &src, const Point &dst_pt);
-    void Blit(const Surface &src, const Rect &src_rt, s16 dst_ox, s16 dst_oy);
-    void Blit(const Surface &src, const Rect &src_rt, const Point &dst_pt);
-
+    void Blit(Surface &) const;
+    void Blit(s16, s16, Surface &) const;
+    void Blit(const Point &, Surface &) const;
+    void Blit(const Rect & srt, s16, s16, Surface &) const;
+    void Blit(const Rect & srt, const Point &, Surface &) const;
+    void Blit(u8 alpha, s16, s16, Surface &) const;
+    void Blit(u8 alpha, const Rect & srt, const Point &, Surface &) const;
 
     const SDL_Surface *GetSurface(void) const{ return surface; };
 
     void Fill(u32 color);
-    void Fill(u8 r, u8 g, u8 b){ Fill(MapRGB(r, g, b)); };
+    void Fill(u8 r, u8 g, u8 b);
 
     void FillRect(u32 color, const Rect & src);
-    void FillRect(u8 r, u8 g, u8 b, const Rect & src){ FillRect(MapRGB(r, g, b), src); };
+    void FillRect(u8 r, u8 g, u8 b, const Rect & src);
 
     void SetDisplayFormat(void);
-    void SetColorKey(void);
-    void SetColorKey(u8 r, u8 g, u8 b);
+    void SetDefaultColorKey(void);
     void SetColorKey(u32 color);
+    void ConvertGlobalAlpha(void);
     void SetAlpha(u8 level);
     void ResetAlpha(void);
     void SetPixel(u16 x, u16 y, u32 color);
     
-    void LoadPalette(void);
     u32 GetColorKey(void) const;
-    u32 GetColor(u16) const;
+    u32 GetColorIndex(u16) const;
+    s32 GetIndexColor(u32) const;
     u32 GetPixel(u16 x, u16 y) const;
 
     void DrawLine(const Point &, const Point &, u32);
@@ -115,6 +111,7 @@ public:
     void Unlock(void) const;
 
     u32  GetSize(void) const;
+    std::string Info(void) const;
 
     static void Reflect(Surface & sf_dst, const Surface & sf_src, const u8 shape);
 
@@ -136,14 +133,13 @@ protected:
     u32 GetPixel3(u16 x, u16 y) const;
     u32 GetPixel2(u16 x, u16 y) const;
     u32 GetPixel1(u16 x, u16 y) const;
+
 #ifdef WITH_TTF
     friend class SDL::Font;
 #endif
-    friend class Palette;
 
-    void CreateSurface(const Rect &sz, u8 dp, u32 fl){ CreateSurface(sz.w, sz.h, dp, fl); };
-    void CreateSurface(u16 sw, u16 sh, u8 dp, u32 fl);
-    const SDL_PixelFormat *GetPixelFormat(void) const;
+    void LoadPalette(void);
+    void CreateSurface(u16 sw, u16 sh, u8 bpp, bool amask);
 
     SDL_Surface *surface;
 };

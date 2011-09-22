@@ -56,7 +56,7 @@ Dialog::answer_t Dialog::BuyBoat(bool enable)
 
     dst_pt.x = box_rt.x + (box_rt.w - sprite.w()) / 2;
     dst_pt.y = box_rt.y + text.h() + spacer;
-    display.Blit(sprite, dst_pt);
+    sprite.Blit(dst_pt);
 
     text.Set(_("Resource cost:"), Font::BIG);
     dst_pt.x = box_rt.x + (box_rt.w - text.w()) / 2;

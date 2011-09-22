@@ -41,14 +41,14 @@ public:
     {
 	Display & display = Display::Get();
 
-	display.Blit(back, *this);
+	back.Blit(*this, display);
 	if(troop.isValid())
 	{
 	    const Sprite & mons32 = AGG::GetICN(ICN::MONS32, troop.GetSpriteIndex());
-	    display.Blit(mons32, x + (back.w() - mons32.w()) / 2, y + back.h() - mons32.h() - 11);
+	    mons32.Blit(x + (back.w() - mons32.w()) / 2, y + back.h() - mons32.h() - 11);
 
 	    if(readonly)
-		display.Blit(AGG::GetICN(ICN::LOCATORS, 24), x + 33, y + 5);
+		AGG::GetICN(ICN::LOCATORS, 24).Blit(x + 33, y + 5);
 
 	    std::string str;
 	    String::AddInt(str, troop.GetCount());
@@ -57,7 +57,7 @@ public:
 	}
 
 	if(select)
-	    display.Blit(curs, *this);
+	    curs.Blit(*this, display);
     };
 
     bool select;
@@ -88,14 +88,14 @@ bool Dialog::SetGuardian(Heroes & hero, Army::Troop & troop, bool readonly)
     Point dst_pt;
     const Rect & area = frameborder.GetArea();
     const Sprite & background = AGG::GetICN(ICN::STONEBAK, 0);
-    display.Blit(background, Rect(0, 0, window_w, window_h), area);
+    background.Blit(Rect(0, 0, window_w, window_h), area);
 
     // portrait
     const Sprite & window = AGG::GetICN(ICN::BRCREST, 6);
     dst_pt.x = area.x + 3;
     dst_pt.y = area.y + 5;
-    display.Blit(window, dst_pt);
-    display.Blit(Portrait::Get(hero, Portrait::MEDIUM), dst_pt.x + 4, dst_pt.y + 4);
+    window.Blit(dst_pt);
+    Portrait::Get(hero, Portrait::MEDIUM).Blit(dst_pt.x + 4, dst_pt.y + 4, display);
 
     // indicators
     dst_pt.x = area.x + 185;
@@ -117,7 +117,7 @@ bool Dialog::SetGuardian(Heroes & hero, Army::Troop & troop, bool readonly)
     const Sprite &backSprite = AGG::GetICN(ICN::SWAPWIN, 0);
     const Rect rt(36, 267, 43, 53);
     Surface sfb(rt.w, rt.h);
-    sfb.Blit(backSprite, rt, 0, 0);
+    backSprite.Blit(rt, 0, 0, sfb);
     Surface sfc(rt.w, rt.h - 10);
     Cursor::DrawCursor(sfc, 0x10, true);
 

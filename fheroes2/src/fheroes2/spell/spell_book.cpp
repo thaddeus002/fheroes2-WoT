@@ -395,7 +395,6 @@ void SpellBookRedrawMP(const Point & dst, u16 mp)
 
 void SpellBookRedrawLists(const SpellStorage & spells, std::vector<Rect> & coords, const size_t cur, const Point & pt, u16 sp, const u8 only, const HeroBase & hero)
 {
-    Display & display = Display::Get();
     bool small = Settings::Get().QVGA();
 
     const Sprite & r_list = AGG::GetICN(ICN::BOOK, 0);
@@ -410,14 +409,14 @@ void SpellBookRedrawLists(const SpellStorage & spells, std::vector<Rect> & coord
     const Rect cmbt_rt(pt.x + (small ? 152: 304), pt.y + (small ? 138: 278), bookmark_cmbt.w(), bookmark_cmbt.h());
     const Rect clos_rt(pt.x + (small ? 210: 420), pt.y + (small ? 142: 284), bookmark_clos.w(), bookmark_clos.h());
 
-    display.Blit(l_list, pt.x, pt.y);
-    display.Blit(r_list, pt.x + l_list.w(), pt.y);
-    display.Blit(bookmark_info, info_rt);
+    l_list.Blit(pt.x, pt.y);
+    r_list.Blit(pt.x + l_list.w(), pt.y);
+    bookmark_info.Blit(info_rt);
     if(SpellBook::CMBT != only)
-	display.Blit(bookmark_advn, advn_rt);
+	bookmark_advn.Blit(advn_rt);
     if(SpellBook::ADVN != only)
-	display.Blit(bookmark_cmbt, cmbt_rt);
-    display.Blit(bookmark_clos, clos_rt);
+	bookmark_cmbt.Blit(cmbt_rt);
+    bookmark_clos.Blit(clos_rt);
 
     if(coords.size()) coords.clear();
 
@@ -428,7 +427,6 @@ void SpellBookRedrawLists(const SpellStorage & spells, std::vector<Rect> & coord
 
 void SpellBookRedrawSpells(const SpellStorage & spells, std::vector<Rect> & coords, const size_t cur, s16 px, s16 py, const HeroBase & hero)
 {
-    Display & display = Display::Get();
     bool small = Settings::Get().QVGA();
 
     u16 ox = 0;
@@ -457,7 +455,7 @@ void SpellBookRedrawSpells(const SpellStorage & spells, std::vector<Rect> & coor
 	const Sprite & icon = AGG::GetICN(ICN::SPELLS, spell.IndexSprite());
 	const Rect rect(px + ox - icon.w() / 2, py + oy - icon.h() / 2, icon.w(), icon.h() + 10);
 
-    	display.Blit(icon, rect.x, rect.y);
+    	icon.Blit(rect.x, rect.y);
 
 	// multiple icons for mass spells
 	if(!small)
@@ -470,8 +468,8 @@ void SpellBookRedrawSpells(const SpellStorage & spells, std::vector<Rect> & coor
             case Spell::MASSCURSE:
             case Spell::MASSDISPEL:
             case Spell::MASSSHIELD:
-    		display.Blit(icon, rect.x - 10, rect.y + 8);
-    		display.Blit(icon, rect.x + 10, rect.y + 8);
+    		icon.Blit(rect.x - 10, rect.y + 8);
+    		icon.Blit(rect.x + 10, rect.y + 8);
 		break;
 
 	    default: break;

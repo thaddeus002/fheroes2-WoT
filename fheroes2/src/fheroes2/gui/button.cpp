@@ -120,7 +120,10 @@ void Button::Draw(void)
     const Sprite & sprite1 = AGG::GetICN(icn, index1);
     const Sprite & sprite2 = AGG::GetICN(icn, index2);
 
-    Display::Get().Blit(pressed ? sprite2 : sprite1, x, y);
+    if(pressed)
+	sprite2.Blit(x, y);
+    else
+	sprite1.Blit(x, y);
 
     if(localcursor) cursor.Show();
 }

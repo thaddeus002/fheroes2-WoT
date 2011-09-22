@@ -47,8 +47,6 @@ const char* strip_context(const char* c);
 
 #define GETTEXT_PACKAGE "fheroes2"
 
-#define ARRAY_COUNT(A)	sizeof(A) / sizeof(A[0])
-
 // hardcore defines: kingdom
 #define KINGDOMMAX			6
 

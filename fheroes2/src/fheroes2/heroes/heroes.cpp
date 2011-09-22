@@ -259,6 +259,7 @@ Heroes::Heroes(heroes_t ht, u8 rc) : HeroBase(Skill::Primary::HEROES, rc), kille
 	    PickupArtifact(Artifact::TRUE_COMPASS_MOBILITY);
 
 	    experience = 777;
+	    magic_point = 120;
 
 	    // all spell in magic book
 	    for(u8 spell = Spell::FIREBALL; spell < Spell::STONE; ++spell) AppendSpellToBook(Spell(spell), true);
@@ -267,7 +268,8 @@ Heroes::Heroes(heroes_t ht, u8 rc) : HeroBase(Skill::Primary::HEROES, rc), kille
 	default: break;
     }
 
-    SetSpellPoints(GetMaxSpellPoints());
+    if(! magic_point)
+	SetSpellPoints(GetMaxSpellPoints());
     move_point = GetMaxMovePoints();
 }
 
@@ -1074,8 +1076,8 @@ bool Heroes::BuySpellBook(const Castle* castle, u8 shrine)
 	const Sprite & border = AGG::GetICN(ICN::RESOURCE, 7);
 	Surface sprite(border.w(), border.h());
 
-	sprite.Blit(border);
-	sprite.Blit(AGG::GetICN(ICN::ARTIFACT, Artifact(Artifact::MAGIC_BOOK).IndexSprite64()), 5, 5);
+	border.Blit(sprite);
+	AGG::GetICN(ICN::ARTIFACT, Artifact(Artifact::MAGIC_BOOK).IndexSprite64()).Blit(5, 5);
 
 	header.append(". ");
 	header.append(_("Do you wish to buy one?"));

@@ -54,11 +54,11 @@ void Interface::ControlPanel::ResetTheme(void)
 {
     ICN::icn_t icn = Settings::Get().EvilInterface() ? ICN::ADVEBTNS : ICN::ADVBTNS;
 
-    btn_radr.Blit(AGG::GetICN(icn, 4));
-    btn_icon.Blit(AGG::GetICN(icn, 0));
-    btn_bttn.Blit(AGG::GetICN(icn, 12));
-    btn_stat.Blit(AGG::GetICN(icn, 10));
-    btn_quit.Blit(AGG::GetICN(icn, 8));
+    AGG::GetICN(icn, 4).Blit(btn_radr);
+    AGG::GetICN(icn, 0).Blit(btn_icon);
+    AGG::GetICN(icn, 12).Blit(btn_bttn);
+    AGG::GetICN(icn, 10).Blit(btn_stat);
+    AGG::GetICN(icn, 8).Blit(btn_quit);
 
     btn_radr.SetAlpha(alpha);
     btn_icon.SetAlpha(alpha);
@@ -99,11 +99,11 @@ void Interface::ControlPanel::Redraw(void)
 {
     Display & display = Display::Get();
 
-    display.Blit(btn_radr,  x, y);
-    display.Blit(btn_icon,  x + 36, y);
-    display.Blit(btn_bttn, x + 72, y);
-    display.Blit(btn_stat, x + 108, y);
-    display.Blit(btn_quit,  x + 144, y);
+    btn_radr.Blit(x, y, display);
+    btn_icon.Blit(x + 36, y, display);
+    btn_bttn.Blit(x + 72, y, display);
+    btn_stat.Blit(x + 108, y, display);
+    btn_quit.Blit(x + 144, y, display);
 }
 
 void Interface::ControlPanel::QueueEventProcessing(Game::menu_t & ret)

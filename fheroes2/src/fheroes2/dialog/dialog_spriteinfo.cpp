@@ -32,8 +32,8 @@ u16 Dialog::ArtifactInfo(const std::string & hdr, const std::string & msg, const
     const Sprite & border = AGG::GetICN(ICN::RESOURCE, 7);
     const Sprite & artifact = AGG::GetICN(ICN::ARTIFACT, art.IndexSprite64());
     Surface image(border.w(), border.h());
-    image.Blit(border);
-    image.Blit(artifact, 5, 5);
+    border.Blit(image);
+    artifact.Blit(5, 5, image);
     return Dialog::SpriteInfo(hdr, msg, image, buttons);
 }
 
@@ -66,7 +66,7 @@ u16 Dialog::SpriteInfo(const std::string &header, const std::string &message, co
 
     // blit sprite
     pos.x = box.GetArea().x + (pos.w - sprite.w()) / 2;
-    display.Blit(sprite, pos.x, pos.y);
+    sprite.Blit(pos.x, pos.y, display);
 
     LocalEvent & le = LocalEvent::Get();
 

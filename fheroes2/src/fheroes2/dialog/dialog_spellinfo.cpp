@@ -87,7 +87,7 @@ void Dialog::SpellInfo(const std::string &header, const std::string &message, co
 
     // blit sprite
     pos.x = box.GetArea().x + (pos.w - sprite.w()) / 2;
-    display.Blit(sprite, pos.x, pos.y);
+    sprite.Blit(pos.x, pos.y);
 
     // small text
     pos.x = box.GetArea().x + (pos.w - text.w()) / 2;

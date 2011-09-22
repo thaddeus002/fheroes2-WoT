@@ -162,8 +162,8 @@ void ShowStandardDialog(const Puzzle & pzl, const Surface & sf)
     Background back(BORDERWIDTH, BORDERWIDTH, sf.w(), sf.h());
     back.Save();
 
-    display.Blit(AGG::GetICN((evil_interface ? ICN::EVIWPUZL : ICN::VIEWPUZL), 0), radar_pos);
-    display.Blit(sf, BORDERWIDTH, BORDERWIDTH);
+    AGG::GetICN((evil_interface ? ICN::EVIWPUZL : ICN::VIEWPUZL), 0).Blit(radar_pos);
+    sf.Blit(BORDERWIDTH, BORDERWIDTH, display);
 
     Point dst_pt(radar_pos.x + 32, radar_pos.y + radar_pos.h - 37);
     Button buttonExit(dst_pt, (evil_interface ? ICN::LGNDXTRE : ICN::LGNDXTRA), 4, 5);
@@ -205,7 +205,7 @@ void ShowExtendedDialog(const Puzzle & pzl, const Surface & sf)
 	display.FillRect(80, 80, 80, frameborder.GetArea());
     else
 	display.FillRect(128, 64, 32, frameborder.GetArea());
-    display.Blit(sf, frameborder.GetArea());
+    sf.Blit(frameborder.GetArea(), display);
 
     Button buttonExit(frameborder.GetArea().x + sf.w() / 2 - 40,
 	frameborder.GetArea().y + sf.h() + (Settings::Get().QVGA() ? 0 : 5),
@@ -243,27 +243,23 @@ void PuzzlesDraw(const Puzzle & pzl, const Surface & sf, s16 dstx, s16 dsty)
         if(Game::AnimateInfrequent(Game::PUZZLE_FADE_DELAY))
         {
     	    cursor.Hide();
-	    display.Blit(sf, dstx, dsty);
+	    sf.Blit(dstx, dsty, display);
 	    for(size_t ii = 0; ii < pzl.size(); ++ii)
 	    {
     		const Sprite & piece = AGG::GetICN(ICN::PUZZLE, ii);
 		if(pzl.test(ii))
 		{
-		    Surface fade(piece.w(), piece.h());
-		    fade.SetColorKey();
-		    fade.Blit(piece);
-		    fade.SetAlpha(alpha);
 		    if(Settings::Get().QVGA())
-		    display.Blit(fade, dstx + 8 + piece.x() - BORDERWIDTH, dsty + 8 + piece.y() - BORDERWIDTH);
+			piece.Blit(alpha, dstx + 8 + piece.x() - BORDERWIDTH, dsty + 8 + piece.y() - BORDERWIDTH);
 		    else
-		    display.Blit(fade, dstx + piece.x() - BORDERWIDTH, dsty + piece.y() - BORDERWIDTH);
+			piece.Blit(alpha, dstx + piece.x() - BORDERWIDTH, dsty + piece.y() - BORDERWIDTH);
 		}
 		else
 		{
 		    if(Settings::Get().QVGA())
-		    display.Blit(piece, dstx + 8 + piece.x() - BORDERWIDTH, dsty + 8 + piece.y() - BORDERWIDTH);
+			piece.Blit(dstx + 8 + piece.x() - BORDERWIDTH, dsty + 8 + piece.y() - BORDERWIDTH);
 		    else
-		    display.Blit(piece, dstx + piece.x() - BORDERWIDTH, dsty + piece.y() - BORDERWIDTH);
+			piece.Blit(dstx + piece.x() - BORDERWIDTH, dsty + piece.y() - BORDERWIDTH);
 		}
 	    }
 	    cursor.Show();

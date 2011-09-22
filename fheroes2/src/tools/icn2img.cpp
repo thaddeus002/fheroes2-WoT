@@ -153,7 +153,7 @@ int main(int argc, char **argv)
 
 	Surface sf(head.width, head.height, true);
 
-	sf.SetColorKey();
+	sf.SetDefaultColorKey();
 
 	sf.Fill(0xff, 0xff, 0xff);
 
@@ -207,8 +207,7 @@ void DrawICN(Surface & sf, u32 size, const u8 *vdata, bool rledebug, bool allow_
     u16 x = 0;
     u16 y = 0;
     u32 index = 0;
-
-    u32 shadow = sf.GetAlpha() ? sf.MapRGB(0, 0, 0, 0x40) : sf.GetColorKey();
+    u32 shadow = allow_shadow ? sf.MapRGB(0, 0, 0, 0x40) : sf.GetColorKey();
 
     if(rledebug) std::cerr << "START RLE DEBUG" << std::hex << std::setfill('0') << std::endl;
 
@@ -237,7 +236,7 @@ void DrawICN(Surface & sf, u32 size, const u8 *vdata, bool rledebug, bool allow_
 	    while(i++ < count && index < size)
 	    {
 		if(rledebug) std::cerr << ":0x" << std::setw(2) << static_cast<int>(vdata[index]);
-		sf.SetPixel(x++, y, sf.GetColor(vdata[index++]));
+		sf.SetPixel(x++, y, sf.GetColorIndex(vdata[index++]));
 	    }
 	    continue;
 	}
@@ -276,6 +275,7 @@ void DrawICN(Surface & sf, u32 size, const u8 *vdata, bool rledebug, bool allow_
 			sf.SetPixel(x++, y, shadow);
 			if(rledebug) std::cerr << ":0x" << std::setw(2) << static_cast<int>(count);
 		    }
+		    x++;
 		}
 		++index;
 		continue;
@@ -307,7 +307,7 @@ void DrawICN(Surface & sf, u32 size, const u8 *vdata, bool rledebug, bool allow_
 	    ++index;
 	    for(i = 0; i < count; ++i)
 	    {
-	    	sf.SetPixel(x++, y, sf.GetColor(vdata[index]));
+	    	sf.SetPixel(x++, y, sf.GetColorIndex(vdata[index]));
 		if(rledebug) std::cerr << ":0x" << std::setw(2) << static_cast<int>(vdata[index]);
 	    }
 	    ++index;
@@ -323,7 +323,7 @@ void DrawICN(Surface & sf, u32 size, const u8 *vdata, bool rledebug, bool allow_
 	    ++index;
 	    for(i = 0; i < count; ++i)
 	    {
-		sf.SetPixel(x++, y, sf.GetColor(vdata[index]));
+		sf.SetPixel(x++, y, sf.GetColorIndex(vdata[index]));
 		if(rledebug) std::cerr << ":0x" << std::setw(2) << static_cast<int>(vdata[index]);
 	    }
 	    ++index;

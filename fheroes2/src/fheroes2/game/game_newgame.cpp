@@ -93,10 +93,10 @@ Game::menu_t Game::NewNetwork(void)
     // image background
     const Sprite &back = AGG::GetICN(ICN::HEROES, 0);
     const Point top((display.w() - back.w()) / 2, (display.h() - back.h()) / 2);
-    display.Blit(back, top);
+    back.Blit(top);
 
     const Sprite &panel = AGG::GetICN(ICN::REDBACK, 0);
-    display.Blit(panel, top.x + 405, top.y + 5);
+    panel.Blit(top.x + 405, top.y + 5);
 
     LocalEvent & le = LocalEvent::Get();
 
@@ -159,10 +159,10 @@ Game::menu_t Game::NewGame(void)
     // image background
     const Sprite &back = AGG::GetICN(ICN::HEROES, 0);
     const Point top((display.w() - back.w()) / 2, (display.h() - back.h()) / 2);
-    display.Blit(back, top);
+    back.Blit(top);
 
     const Sprite &panel = AGG::GetICN(ICN::REDBACK, 0);
-    display.Blit(panel, top.x + 405, top.y + 5);
+    panel.Blit(top.x + 405, top.y + 5);
 
     LocalEvent & le = LocalEvent::Get();
 
@@ -247,10 +247,10 @@ Game::menu_t Game::NewMulti(void)
     // image background
     const Sprite &back = AGG::GetICN(ICN::HEROES, 0);
     const Point top((display.w() - back.w()) / 2, (display.h() - back.h()) / 2);
-    display.Blit(back, top);
+    back.Blit(top);
 
     const Sprite &panel = AGG::GetICN(ICN::REDBACK, 0);
-    display.Blit(panel, top.x + 405, top.y + 5);
+    panel.Blit(top.x + 405, top.y + 5);
 
     LocalEvent & le = LocalEvent::Get();
 
@@ -305,10 +305,10 @@ u8 Game::SelectCountPlayers(void)
     // image background
     const Sprite &back = AGG::GetICN(ICN::HEROES, 0);
     const Point top((display.w() - back.w()) / 2, (display.h() - back.h()) / 2);
-    display.Blit(back, top);
+    back.Blit(top);
 
     const Sprite &panel = AGG::GetICN(ICN::REDBACK, 0);
-    display.Blit(panel, top.x + 405, top.y + 5);
+    panel.Blit(top.x + 405, top.y + 5);
 
     LocalEvent & le = LocalEvent::Get();
 

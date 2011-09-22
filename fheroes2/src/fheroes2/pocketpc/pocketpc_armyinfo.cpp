@@ -55,7 +55,7 @@ Dialog::answer_t PocketPC::DialogArmyInfo(const Army::Troop & troop, u16 flags)
 
     const Rect & dst_rt = frameborder.GetArea();
     const Sprite & background = AGG::GetICN(ICN::STONEBAK, 0);
-    display.Blit(background, Rect(0, 0, window_w, window_h), dst_rt);
+    background.Blit(Rect(0, 0, window_w, window_h), dst_rt);
 
     // name
     Text text;
@@ -63,7 +63,7 @@ Dialog::answer_t PocketPC::DialogArmyInfo(const Army::Troop & troop, u16 flags)
     text.Blit(dst_rt.x + (dst_rt.w - text.w()) / 2, dst_rt.y + 10);
 
     const Sprite & frame = AGG::GetICN(troop.ICNMonh(), 0);
-    display.Blit(frame, dst_rt.x + 50 - frame.w() / 2, dst_rt.y + 145 - frame.h());
+    frame.Blit(dst_rt.x + 50 - frame.w() / 2, dst_rt.y + 145 - frame.h());
 
     std::string message;
     String::AddInt(message, (battle ? battle->GetCount() : troop.GetCount()));

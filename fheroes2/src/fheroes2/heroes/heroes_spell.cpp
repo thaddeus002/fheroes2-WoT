@@ -81,23 +81,21 @@ void CastleIndexListBox::RedrawItem(const s32 & index, s16 dstx, s16 dsty, bool 
 
 void CastleIndexListBox::RedrawBackground(const Point & dst)
 {
-    Display & display = Display::Get();
-
     Text text(_("Town Portal"), Font::YELLOW_BIG);
     text.Blit(dst.x + 140 - text.w() / 2, dst.y + 6);
 
     text.Set(_("Select town to port to."), Font::BIG);
     text.Blit(dst.x + 140 - text.w() / 2, dst.y + 30);
 
-    display.Blit(AGG::GetICN(ICN::LISTBOX, 0), dst.x + 2, dst.y + 55);
+    AGG::GetICN(ICN::LISTBOX, 0).Blit(dst.x + 2, dst.y + 55);
     for(u8 ii = 1; ii < 5; ++ii)
-	display.Blit(AGG::GetICN(ICN::LISTBOX, 1), dst.x + 2, dst.y + 55 + (ii * 19));
-    display.Blit(AGG::GetICN(ICN::LISTBOX, 2), dst.x + 2, dst.y + 145);
+	AGG::GetICN(ICN::LISTBOX, 1).Blit(dst.x + 2, dst.y + 55 + (ii * 19));
+    AGG::GetICN(ICN::LISTBOX, 2).Blit(dst.x + 2, dst.y + 145);
 
-    display.Blit(AGG::GetICN(ICN::LISTBOX, 7), dst.x + 256, dst.y + 75);
+    AGG::GetICN(ICN::LISTBOX, 7).Blit(dst.x + 256, dst.y + 75);
     for(u8 ii = 1; ii < 3; ++ii)
-	display.Blit(AGG::GetICN(ICN::LISTBOX, 8), dst.x + 256, dst.y + 74 + (ii * 19));
-    display.Blit(AGG::GetICN(ICN::LISTBOX, 9), dst.x + 256, dst.y + 126);
+	AGG::GetICN(ICN::LISTBOX, 8).Blit(dst.x + 256, dst.y + 74 + (ii * 19));
+    AGG::GetICN(ICN::LISTBOX, 9).Blit(dst.x + 256, dst.y + 126);
 }
 
 bool Heroes::ActionSpellCast(const Spell & spell)
@@ -405,7 +403,7 @@ bool ActionSpellTownPortal(Heroes & hero)
 
     const Rect & area = frameborder->GetArea();
     const Sprite & background = AGG::GetICN(ICN::STONEBAK, 0);
-    display.Blit(background, Rect(0, 0, window_w, window_h), area);
+    background.Blit(Rect(0, 0, window_w, window_h), area);
 
     u16 result = Dialog::ZERO;
 

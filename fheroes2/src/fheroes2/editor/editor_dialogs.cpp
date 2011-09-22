@@ -42,17 +42,15 @@ public:
    
     void RedrawBackground(const Point & dst)
     {
-      Display & display = Display::Get();
-
       Dialog::FrameBorder::Redraw(Rect(dst.x, dst.y + 25, rtAreaItems.w + 5, rtAreaItems.h + 10),
 							AGG::GetICN(ICN::CELLWIN, 1));
       // scroll
-      display.Blit(AGG::GetICN(ICN::LISTBOX, 7), dst.x + area.w - 24, dst.y + 45);
+     AGG::GetICN(ICN::LISTBOX, 7).Blit(dst.x + area.w - 24, dst.y + 45);
 
       for(u8 ii = 1; ii < 9; ++ii)
-        display.Blit(AGG::GetICN(ICN::LISTBOX, 8), dst.x + area.w - 24, dst.y + 44 + (ii * 19));
+        AGG::GetICN(ICN::LISTBOX, 8).Blit(dst.x + area.w - 24, dst.y + 44 + (ii * 19));
 
-      display.Blit(AGG::GetICN(ICN::LISTBOX, 9), dst.x + area.w - 24, dst.y + area.h - 74);
+      AGG::GetICN(ICN::LISTBOX, 9).Blit(dst.x + area.w - 24, dst.y + area.h - 74);
     };
 
     void ActionListDoubleClick(int & index)
@@ -78,9 +76,8 @@ public:
 
     void RedrawItem(const int & index, s16 dstx, s16 dsty, bool current)
     {
-      Display & display = Display::Get();
       Monster mons(index);
-      display.Blit(AGG::GetICN(ICN::MONS32, mons.GetSpriteIndex()), dstx + 5, dsty + 3);
+      AGG::GetICN(ICN::MONS32, mons.GetSpriteIndex()).Blit(dstx + 5, dsty + 3);
 
       Text text(mons.GetName(), (current ? Font::YELLOW_BIG : Font::BIG));
       text.Blit(dstx + 50, dsty + 10);
@@ -110,7 +107,7 @@ public:
     {
       Display & display = Display::Get();
       Heroes::heroes_t hero = Heroes::ConvertID(index);
-      display.Blit(Heroes::GetPortrait30x22(hero), dstx + 5, dsty + 3);
+      Heroes::GetPortrait30x22(hero).Blit(dstx + 5, dsty + 3, display);
 
       Text text(Heroes::GetName(hero), (current ? Font::YELLOW_BIG : Font::BIG));
       text.Blit(dstx + 50, dsty + 5);
@@ -132,9 +129,8 @@ public:
 
     void RedrawItem(const int & index, s16 dstx, s16 dsty, bool current)
     {
-      Display & display = Display::Get();
       Artifact art(index);
-      display.Blit(AGG::GetICN(ICN::ARTFX, art.IndexSprite32()), dstx + 5, dsty + 3);
+      AGG::GetICN(ICN::ARTFX, art.IndexSprite32()).Blit(dstx + 5, dsty + 3);
 
       Text text(art.GetName(), (current ? Font::YELLOW_BIG : Font::BIG));
       text.Blit(dstx + 50, dsty + 10);
@@ -156,9 +152,8 @@ public:
 
     void RedrawItem(const int & index, s16 dstx, s16 dsty, bool current)
     {
-      Display & display = Display::Get();
       Spell spell(index);
-      display.Blit(AGG::GetICN(ICN::SPELLS, spell.IndexSprite()), dstx + 5, dsty + 3);
+      AGG::GetICN(ICN::SPELLS, spell.IndexSprite()).Blit(dstx + 5, dsty + 3);
 
       Text text(spell.GetName(), (current ? Font::YELLOW_BIG : Font::BIG));
       text.Blit(dstx + 80, dsty + 10);
@@ -180,10 +175,8 @@ public:
 
     void RedrawItem(const int & index, s16 dstx, s16 dsty, bool current)
     {
-      Display & display = Display::Get();
-
       Skill::Secondary skill(1 + index / 3, 1 + (index % 3));
-      display.Blit(AGG::GetICN(ICN::MINISS, skill.GetIndexSprite2()), dstx + 5, dsty + 3);
+      AGG::GetICN(ICN::MINISS, skill.GetIndexSprite2()).Blit(dstx + 5, dsty + 3);
       std::string str = skill.GetName();
       Text text(str, (current ? Font::YELLOW_BIG : Font::BIG));
       text.Blit(dstx + 50, dsty + 10);

@@ -168,7 +168,7 @@ Game::menu_t Game::Editor::StartGame()
     gameArea.Redraw(display, LEVEL_ALL);
     radar.RedrawArea();
     radar.RedrawCursor();
-    display.Blit(spritePanelGround, dstPanel);
+    spritePanelGround.Blit(dstPanel);
     selectTerrainCursor.Show();
 
     cursor.Show();
@@ -397,7 +397,7 @@ Game::menu_t Game::Editor::StartGame()
 		btnSelectGround.Press();
 		btnSelectGround.Draw();
 
-		display.Blit(spritePanelGround, dstPanel);
+		spritePanelGround.Blit(dstPanel);
 		DEBUG(DBG_GAME, DBG_INFO, "select Terrain Mode");
 		selectTerrainCursor.Move(rectTerrainWater.x - 1, rectTerrainWater.y - 1);
 	    }
@@ -414,7 +414,7 @@ Game::menu_t Game::Editor::StartGame()
 		btnSelectObject.Press();
 		btnSelectObject.Draw();
 
-		display.Blit(spritePanelObject, dstPanel);
+		spritePanelObject.Blit(dstPanel);
 		DEBUG(DBG_GAME , DBG_INFO, "select Object Mode");
 		selectObjectCursor.Move(rectObjectWater.x - 1, rectObjectWater.y - 1);
 	    }
@@ -437,7 +437,7 @@ Game::menu_t Game::Editor::StartGame()
 		btnSelectInfo.Press();
 		btnSelectInfo.Draw();
 
-		display.Blit(spritePanelInfo, dstPanel);
+		spritePanelInfo.Blit(dstPanel);
 		DEBUG(DBG_GAME , DBG_INFO, "select Detail Mode");
 	    }
 	    else
@@ -451,7 +451,7 @@ Game::menu_t Game::Editor::StartGame()
 		btnSelectRiver.Press();
 		btnSelectRiver.Draw();
 
-		display.Blit(spritePanelRiver, dstPanel);
+		spritePanelRiver.Blit(dstPanel);
 		DEBUG(DBG_GAME , DBG_INFO, "select Stream Mode");
 	    }
 	    else
@@ -465,7 +465,7 @@ Game::menu_t Game::Editor::StartGame()
 		btnSelectRoad.Press();
 		btnSelectRoad.Draw();
 
-		display.Blit(spritePanelRoad, dstPanel);		
+		spritePanelRoad.Blit(dstPanel		);
 		DEBUG(DBG_GAME , DBG_INFO, "select Road Mode");
 	    }
 	    else
@@ -479,7 +479,7 @@ Game::menu_t Game::Editor::StartGame()
 		btnSelectClear.Press();
 		btnSelectClear.Draw();
 
-		display.Blit(spritePanelClear, dstPanel);
+		spritePanelClear.Blit(dstPanel);
 		DEBUG(DBG_GAME , DBG_INFO, "Erase Mode");
 	    }
 		

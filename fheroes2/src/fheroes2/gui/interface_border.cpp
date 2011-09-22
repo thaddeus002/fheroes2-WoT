@@ -61,19 +61,19 @@ void Interface::BorderWindow::Redraw(void)
     srcrt.h = BORDERWIDTH;
     dstpt.x = srcrt.x;
     dstpt.y = srcrt.y;
-    display.Blit(icnadv, srcrt, dstpt);
+    icnadv.Blit(srcrt, dstpt);
     srcrt.x = 223;
     srcrt.w = TILEWIDTH;
     dstpt.x = srcrt.x;
     dstpt.y = 0;
     for(u8 ii = 0; ii < count_w + 1; ++ii)
     {
-        display.Blit(icnadv, srcrt, dstpt);
+        icnadv.Blit(srcrt, dstpt);
 	dstpt.x += TILEWIDTH;
     }
     srcrt.x += TILEWIDTH;
     srcrt.w = icnadv.w() - srcrt.x;
-    display.Blit(icnadv, srcrt, dstpt);
+    icnadv.Blit(srcrt, dstpt);
 
 
     // LEFT BORDER
@@ -83,19 +83,19 @@ void Interface::BorderWindow::Redraw(void)
     srcrt.h = 255;
     dstpt.x = srcrt.x;
     dstpt.y = srcrt.y;
-    display.Blit(icnadv, srcrt, dstpt);
+    icnadv.Blit(srcrt, dstpt);
     srcrt.y = 255;
     srcrt.h = TILEWIDTH;
     dstpt.x = srcrt.x;
     dstpt.y = srcrt.y;
     for(u8 ii = 0; ii < count_h + 1; ++ii)
     {
-        display.Blit(icnadv, srcrt, dstpt);
+        icnadv.Blit(srcrt, dstpt);
 	dstpt.y += TILEWIDTH;
     }
     srcrt.y += TILEWIDTH;
     srcrt.h = icnadv.h() - srcrt.y;
-    display.Blit(icnadv, srcrt, dstpt);
+    icnadv.Blit(srcrt, dstpt);
 
     // MIDDLE BORDER
     srcrt.x = icnadv.w() - RADARWIDTH - 2 * BORDERWIDTH;
@@ -104,19 +104,19 @@ void Interface::BorderWindow::Redraw(void)
     srcrt.h = 255;
     dstpt.x = display.w() - RADARWIDTH - 2 * BORDERWIDTH;
     dstpt.y = srcrt.y;
-    display.Blit(icnadv, srcrt, dstpt);
+    icnadv.Blit(srcrt, dstpt);
     srcrt.y = 255;
     srcrt.h = TILEWIDTH;
     dstpt.x = display.w() - RADARWIDTH - 2 * BORDERWIDTH;
     dstpt.y = srcrt.y;
     for(u8 ii = 0; ii < count_h + 1; ++ii)
     {
-        display.Blit(icnadv, srcrt, dstpt);
+        icnadv.Blit(srcrt, dstpt);
         dstpt.y += TILEWIDTH;
     }
     srcrt.y += TILEWIDTH;
     srcrt.h = icnadv.h() - srcrt.y;
-    display.Blit(icnadv, srcrt, dstpt);
+    icnadv.Blit(srcrt, dstpt);
 
     // RIGHT BORDER
     srcrt.x = icnadv.w() - BORDERWIDTH;
@@ -125,19 +125,19 @@ void Interface::BorderWindow::Redraw(void)
     srcrt.h = 255;
     dstpt.x = display.w() - BORDERWIDTH;
     dstpt.y = srcrt.y;
-    display.Blit(icnadv, srcrt, dstpt);
+    icnadv.Blit(srcrt, dstpt);
     srcrt.y = 255;
     srcrt.h = TILEWIDTH;
     dstpt.x = display.w() - BORDERWIDTH;
     dstpt.y = srcrt.y;
     for(u8 ii = 0; ii < count_h + 1; ++ii)
     {
-        display.Blit(icnadv, srcrt, dstpt);
+        icnadv.Blit(srcrt, dstpt);
         dstpt.y += TILEWIDTH;
     }
     srcrt.y += TILEWIDTH;
     srcrt.h = icnadv.h() - srcrt.y;
-    display.Blit(icnadv, srcrt, dstpt);
+    icnadv.Blit(srcrt, dstpt);
 
     // BOTTOM BORDER
     srcrt.x = 0;
@@ -146,19 +146,19 @@ void Interface::BorderWindow::Redraw(void)
     srcrt.h = BORDERWIDTH;
     dstpt.x = srcrt.x;
     dstpt.y = display.h() - BORDERWIDTH;
-    display.Blit(icnadv, srcrt, dstpt);
+    icnadv.Blit(srcrt, dstpt);
     srcrt.x = 223;
     srcrt.w = TILEWIDTH;
     dstpt.x = srcrt.x;
     dstpt.y = display.h() - BORDERWIDTH;
     for(u8 ii = 0; ii < count_w + 1; ++ii)
     {
-        display.Blit(icnadv, srcrt, dstpt);
+        icnadv.Blit(srcrt, dstpt);
 	dstpt.x += TILEWIDTH;
     }
     srcrt.x += TILEWIDTH;
     srcrt.w = icnadv.w() - srcrt.x;
-    display.Blit(icnadv, srcrt, dstpt);
+    icnadv.Blit(srcrt, dstpt);
 
     // ICON BORDER
     srcrt.x = icnadv.w() - RADARWIDTH - BORDERWIDTH;
@@ -167,8 +167,8 @@ void Interface::BorderWindow::Redraw(void)
     srcrt.h = BORDERWIDTH;
     dstpt.x = display.w() - RADARWIDTH - BORDERWIDTH;
     dstpt.y = srcrt.y;
-    display.Blit(icnadv, srcrt, dstpt);
+    icnadv.Blit(srcrt, dstpt);
     dstpt.y = srcrt.y + BORDERWIDTH + count_icons * 32;
     srcrt.y = srcrt.y + BORDERWIDTH + 4 * 32;
-    display.Blit(icnadv, srcrt, dstpt);
+    icnadv.Blit(srcrt, dstpt);
 }

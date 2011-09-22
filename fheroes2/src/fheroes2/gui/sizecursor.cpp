@@ -54,10 +54,6 @@ void SizeCursor::ModifyCursor(const u8 w, const u8 h)
     if(cursor.w() == w && cursor.h() == h) return;
 
     cursor = Surface(w * TILEWIDTH, h * TILEWIDTH);
-
-    cursor.SetColorKey();
-
     Cursor::DrawCursor(cursor, 0x40);
-
     SetSprite(cursor);
 }

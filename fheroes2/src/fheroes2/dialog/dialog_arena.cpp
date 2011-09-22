@@ -159,24 +159,20 @@ Skill::Primary::skill_t Dialog::SelectSkillFromArena(void)
 
 void InfoSkillClear(const Rect & rect1, const Rect & rect2, const Rect & rect3, const Rect & rect4)
 {
-    Display & display = Display::Get();
-
-    display.Blit(AGG::GetICN(ICN::XPRIMARY, 0), rect1);
-    display.Blit(AGG::GetICN(ICN::XPRIMARY, 1), rect2);
-    display.Blit(AGG::GetICN(ICN::XPRIMARY, 2), rect3);
-    display.Blit(AGG::GetICN(ICN::XPRIMARY, 3), rect4);
+    AGG::GetICN(ICN::XPRIMARY, 0).Blit(rect1);
+    AGG::GetICN(ICN::XPRIMARY, 1).Blit(rect2);
+    AGG::GetICN(ICN::XPRIMARY, 2).Blit(rect3);
+    AGG::GetICN(ICN::XPRIMARY, 3).Blit(rect4);
 }
 
 void InfoSkillSelect(Skill::Primary::skill_t skill, const Rect & rect1, const Rect & rect2, const Rect & rect3, const Rect & rect4)
 {
-    Display & display = Display::Get();
-
     switch(skill)
     {
-	case Skill::Primary::ATTACK:	display.Blit(AGG::GetICN(ICN::XPRIMARY, 4), rect1); break;
-	case Skill::Primary::DEFENSE:	display.Blit(AGG::GetICN(ICN::XPRIMARY, 5), rect2); break;
-	case Skill::Primary::POWER:	display.Blit(AGG::GetICN(ICN::XPRIMARY, 6), rect3); break;
-	case Skill::Primary::KNOWLEDGE:	display.Blit(AGG::GetICN(ICN::XPRIMARY, 7), rect4); break;
+	case Skill::Primary::ATTACK:	AGG::GetICN(ICN::XPRIMARY, 4).Blit(rect1); break;
+	case Skill::Primary::DEFENSE:	AGG::GetICN(ICN::XPRIMARY, 5).Blit(rect2); break;
+	case Skill::Primary::POWER:	AGG::GetICN(ICN::XPRIMARY, 6).Blit(rect3); break;
+	case Skill::Primary::KNOWLEDGE:	AGG::GetICN(ICN::XPRIMARY, 7).Blit(rect4); break;
 	default: break;
     }
 }

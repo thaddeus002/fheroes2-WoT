@@ -206,9 +206,7 @@ void Castle::OpenWell(void)
 
 void Castle::WellRedrawInfoArea(const Point & cur_pt)
 {
-    Display & display = Display::Get();
-    display.Blit(AGG::GetICN(ICN::WELLBKG, 0), cur_pt);
-
+    AGG::GetICN(ICN::WELLBKG, 0).Blit(cur_pt);
 
     Text text;
     Point dst_pt, pt;
@@ -217,7 +215,7 @@ void Castle::WellRedrawInfoArea(const Point & cur_pt)
     {
 	const Sprite & button = AGG::GetICN(ICN::BUYMAX, 0);
 	Rect src_rt(0, 461, button.w(), 19);
-	display.Blit(AGG::GetICN(ICN::WELLBKG, 0), src_rt, cur_pt.x + button.w(), cur_pt.y + 461);
+	AGG::GetICN(ICN::WELLBKG, 0).Blit(src_rt, cur_pt.x + button.w(), cur_pt.y + 461);
     }
 
     text.Set(_("Town Population Information and Statistics"), Font::BIG);
@@ -292,7 +290,7 @@ void Castle::WellRedrawInfoArea(const Point & cur_pt)
 	// sprite
 	dst_pt.x = pt.x + 21;
 	dst_pt.y = pt.y + 35;
-	display.Blit(AGG::GetICN(ICN::Get4Building(race), icnindex), dst_pt);
+	AGG::GetICN(ICN::Get4Building(race), icnindex).Blit(dst_pt);
 	// text
 	text.Set(GetStringBuilding(dw_orig, race), Font::SMALL);
 	dst_pt.x = pt.x + 86 - text.w() / 2;
@@ -302,7 +300,7 @@ void Castle::WellRedrawInfoArea(const Point & cur_pt)
 	const Sprite & smonster = AGG::GetICN(monster.ICNMonh(), 0);
 	dst_pt.x = pt.x + 193 - smonster.w() / 2;
 	dst_pt.y = pt.y + 124 - smonster.h();
-	display.Blit(smonster, dst_pt);
+	smonster.Blit(dst_pt);
 	// name
 	text.Set(monster.GetMultiName());
 	dst_pt.x = pt.x + 122 - text.w() / 2;

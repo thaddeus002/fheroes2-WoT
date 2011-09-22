@@ -138,7 +138,7 @@ building_t GetCurrentFlash(const Castle & castle, CastleDialog::CacheBuildings &
 	if(! (*it).contour.isValid())
         {
             const Sprite & sprite = GetActualSpriteBuilding(castle, flash);
-    	    Surface::MakeContour((*it).contour, sprite, sprite.GetColor(0xDA));
+    	    Surface::MakeContour((*it).contour, sprite, sprite.GetColorIndex(0xDA));
 	    (*it).contour.SetOffset(sprite.x() - 1, sprite.y() - 1);
 	}
     }
@@ -155,57 +155,57 @@ void RedrawIcons(const Castle & castle, const CastleHeroes & heroes, const Point
 
     if(Settings::Get().QVGA())
     {
-	display.Blit(AGG::GetICN(ICN::SWAPWIN, 0), Rect(36, 267, 43, 43), pt.x + 2, pt.y + 79);
+	AGG::GetICN(ICN::SWAPWIN, 0).Blit(Rect(36, 267, 43, 43), pt.x + 2, pt.y + 79);
 
 	if(hero1 || !castle.isBuild(BUILD_CAPTAIN))
 	{
     	    const Surface & icon = hero1 ? Portrait::Hero(*hero1, Portrait::MEDIUM) :
 					    AGG::GetICN(ICN::BRCREST, Color::GetIndex(castle.GetColor()));
-    	    display.Blit(icon, Rect((icon.w() - 41) / 2, (icon.h() - 41) / 2, 41, 41), pt.x + 3, pt.y + 80);
+    	    icon.Blit(Rect((icon.w() - 41) / 2, (icon.h() - 41) / 2, 41, 41), pt.x + 3, pt.y + 80, display);
 	}
 	else
 	if(castle.isBuild(BUILD_CAPTAIN))
 	{
     	    const Surface & icon = Portrait::Captain(castle.GetRace(), Portrait::BIG);
-    	    display.Blit(icon, Rect((icon.w() - 41) / 2, 15, 41, 41), pt.x + 3, pt.y + 80);
+    	    icon.Blit(Rect((icon.w() - 41) / 2, 15, 41, 41), pt.x + 3, pt.y + 80, display);
 	}
 
-	display.Blit(AGG::GetICN(ICN::SWAPWIN, 0), Rect(36, 267, 43, 43), pt.x + 2, pt.y + 132);
+	AGG::GetICN(ICN::SWAPWIN, 0).Blit(Rect(36, 267, 43, 43), pt.x + 2, pt.y + 132);
 
         if(hero2)
 	{
     	    const Surface & icon = Portrait::Hero(*hero2, Portrait::MEDIUM);
-    	    display.Blit(icon, Rect((icon.w() - 41) / 2, (icon.h() - 41) / 2, 41, 41), pt.x + 3, pt.y + 133);
+    	    icon.Blit(Rect((icon.w() - 41) / 2, (icon.h() - 41) / 2, 41, 41), pt.x + 3, pt.y + 133, display);
 	}
 	else
 	{
     	    const Sprite & crest = AGG::GetICN(ICN::BRCREST, Color::GetIndex(castle.GetColor()));
-    	    display.Blit(crest, Rect((crest.w() - 41) / 2, (crest.h() - 41) / 2, 41, 41), pt.x + 3, pt.y + 133);
+    	    crest.Blit(Rect((crest.w() - 41) / 2, (crest.h() - 41) / 2, 41, 41), pt.x + 3, pt.y + 133, display);
 
 	    //
-	    display.Blit(AGG::GetICN(ICN::STONEBAK, 0), Rect(0, 0, 223, 53), pt.x + 47, pt.y + 132);
+	    AGG::GetICN(ICN::STONEBAK, 0).Blit(Rect(0, 0, 223, 53), pt.x + 47, pt.y + 132);
 	}
     }
     else
     {
-	display.Blit(AGG::GetICN(ICN::STRIP, 0), pt.x, pt.y + 256);
+	AGG::GetICN(ICN::STRIP, 0).Blit(pt.x, pt.y + 256);
 
 	const Surface & sprite1 = hero1 ? Portrait::Hero(*hero1, Portrait::BIG) :
 	    (castle.isBuild(BUILD_CAPTAIN) ? Portrait::Captain(castle.GetRace(), Portrait::BIG) :
 		AGG::GetICN(ICN::CREST, Color::GetIndex(castle.GetColor())));
 
 	// icons 1
-	display.Blit(sprite1, pt.x + 5, pt.y + 262);
+	sprite1.Blit(pt.x + 5, pt.y + 262, display);
 
 	const Surface & sprite2 = hero2 ? Portrait::Hero(*hero2, Portrait::BIG) :
 					    AGG::GetICN(ICN::STRIP, 3);
 
 	// icons 2
-	display.Blit(sprite2, pt.x + 5, pt.y + 361);
+	sprite2.Blit(pt.x + 5, pt.y + 361, display);
 
 	// ext
 	if(! hero2)
-        display.Blit(AGG::GetICN(ICN::STRIP, 11), pt.x + 112, pt.y + 361);
+    	    AGG::GetICN(ICN::STRIP, 11).Blit(pt.x + 112, pt.y + 361);
     }
 }
 
@@ -284,7 +284,7 @@ Dialog::answer_t Castle::OpenDialog(bool readonly, bool fade)
     // bottom small bar
     const Sprite & bar = AGG::GetICN(ICN::SMALLBAR, 0);
     dst_pt.x += buttonPrevCastle.w;
-    display.Blit(bar, dst_pt);
+    bar.Blit(dst_pt);
 
     StatusBar statusBar;
     statusBar.SetFont(Font::BIG);
@@ -670,11 +670,10 @@ Dialog::answer_t Castle::OpenDialog(bool readonly, bool fade)
 		if(buyhero)
 		{
 		    const Rect rt(0, 98, 552, 107);
-		    Surface sf(rt.w, rt.h);
-		    sf.SetColorKey();
-            	    sf.Blit(AGG::GetICN(ICN::STRIP, 0), rt, 0, 0);
+		    Surface sf(rt.w, rt.h, false);
+            	    AGG::GetICN(ICN::STRIP, 0).Blit(rt, 0, 0, sf);
 		    const Surface & port = Portrait::Hero((*heroes.Guest()), Portrait::BIG);
-		    sf.Blit(port, 6, 6);
+		    port.Blit(6, 6, sf);
             	    selectArmy2.SetArmy(heroes.Guest()->GetArmy());
 		    selectArmy2.SetPos(112, 5);
 		    selectArmy2.Redraw(sf);
@@ -691,8 +690,7 @@ Dialog::answer_t Castle::OpenDialog(bool readonly, bool fade)
     			if(Game::AnimateInfrequent(Game::CASTLE_BUYHERO_DELAY))
     			{
     			    cursor.Hide();
-        		    sf.SetAlpha(alpha);
-        		    display.Blit(sf, cur_pt.x, cur_pt.y + 356);
+        		    sf.Blit(alpha, cur_pt.x, cur_pt.y + 356, display);
     			    cursor.Show();
         		    display.Flip();
         		    alpha += 10;
@@ -953,7 +951,7 @@ void Castle::RedrawResourcePanel(const Point & pt)
     dst_pt.x = src_rt.x + 1;
     dst_pt.y = src_rt.y + 10;
     const Sprite & wood = AGG::GetICN(ICN::RESOURCE, 0);
-    display.Blit(wood, dst_pt);
+    wood.Blit(dst_pt);
     
     // count wood
     count.erase();
@@ -966,7 +964,7 @@ void Castle::RedrawResourcePanel(const Point & pt)
     dst_pt.x = src_rt.x + 42;
     dst_pt.y = src_rt.y + 6;
     const Sprite & sulfur = AGG::GetICN(ICN::RESOURCE, 3);
-    display.Blit(sulfur, dst_pt);
+    sulfur.Blit(dst_pt);
     
     // count sulfur
     count.erase();
@@ -979,7 +977,7 @@ void Castle::RedrawResourcePanel(const Point & pt)
     dst_pt.x = src_rt.x + 1;
     dst_pt.y = src_rt.y + 45;
     const Sprite & crystal = AGG::GetICN(ICN::RESOURCE, 4);
-    display.Blit(crystal, dst_pt);
+    crystal.Blit(dst_pt);
     
     // count crystal
     count.erase();
@@ -992,7 +990,7 @@ void Castle::RedrawResourcePanel(const Point & pt)
     dst_pt.x = src_rt.x + 44;
     dst_pt.y = src_rt.y + 47;
     const Sprite & mercury = AGG::GetICN(ICN::RESOURCE, 1);
-    display.Blit(mercury, dst_pt);
+    mercury.Blit(dst_pt);
     
     // count mercury
     count.erase();
@@ -1005,7 +1003,7 @@ void Castle::RedrawResourcePanel(const Point & pt)
     dst_pt.x = src_rt.x + 1;
     dst_pt.y = src_rt.y + 92;
     const Sprite & ore = AGG::GetICN(ICN::RESOURCE, 2);
-    display.Blit(ore, dst_pt);
+    ore.Blit(dst_pt);
     
     // count ore
     count.erase();
@@ -1018,7 +1016,7 @@ void Castle::RedrawResourcePanel(const Point & pt)
     dst_pt.x = src_rt.x + 45;
     dst_pt.y = src_rt.y + 92;
     const Sprite & gems = AGG::GetICN(ICN::RESOURCE, 5);
-    display.Blit(gems, dst_pt);
+    gems.Blit(dst_pt);
     
     // count gems
     count.erase();
@@ -1031,7 +1029,7 @@ void Castle::RedrawResourcePanel(const Point & pt)
     dst_pt.x = src_rt.x + 6;
     dst_pt.y = src_rt.y + 130;
     const Sprite & gold = AGG::GetICN(ICN::RESOURCE, 6);
-    display.Blit(gold, dst_pt);
+    gold.Blit(dst_pt);
     
     // count gold
     count.erase();
@@ -1044,5 +1042,5 @@ void Castle::RedrawResourcePanel(const Point & pt)
     dst_pt.x = src_rt.x + 1;
     dst_pt.y = src_rt.y + 166;
     const Sprite & exit = AGG::GetICN(ICN::SWAPBTN, 0);
-    display.Blit(exit, dst_pt);
+    exit.Blit(dst_pt);
 }

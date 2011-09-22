@@ -61,7 +61,7 @@ Dialog::answer_t Dialog::ArmyInfo(const Army::Troop & troop, u16 flags)
 
     Background back(pos_rt);
     back.Save();
-    display.Blit(sprite_dialog, pos_rt.x, pos_rt.y);
+    sprite_dialog.Blit(pos_rt.x, pos_rt.y, display);
 
     Point dst_pt;
     Text text;
@@ -94,7 +94,7 @@ Dialog::answer_t Dialog::ArmyInfo(const Army::Troop & troop, u16 flags)
     text.Blit(dst_pt);
 
     const Sprite & frame = AGG::GetICN(troop.ICNMonh(), 0);
-    display.Blit(frame, pos_rt.x + (pos_rt.w / 2 - frame.w()) / 2, pos_rt.y + 180 - frame.h());
+    frame.Blit(pos_rt.x + (pos_rt.w / 2 - frame.w()) / 2, pos_rt.y + 180 - frame.h());
 
     // button upgrade
     dst_pt.x = pos_rt.x + 284;
@@ -415,7 +415,6 @@ void DrawBattleStats(const Point & dst, const Battle2::Stats & b)
     ow -= 4;
     ow = dst.x - ow / 2;
 
-    Display & display = Display::Get();
     Text text;
 
     // blit centered
@@ -425,7 +424,7 @@ void DrawBattleStats(const Point & dst, const Battle2::Stats & b)
 	    const Sprite* sprite = GetModesSprite(modes[ii]);
 	    if(sprite)
 	    {
-		display.Blit(*sprite, ow, dst.y);
+		sprite->Blit(ow, dst.y);
 
 		const u16 duration = b.affected.GetMode(modes[ii]);
 		if(duration)

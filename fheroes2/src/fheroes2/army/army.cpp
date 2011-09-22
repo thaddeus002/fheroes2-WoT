@@ -624,7 +624,7 @@ void Army::DrawMons32LineWithScoute(const army_t & army, s16 cx, s16 cy, u16 wid
     	    {
 		const Sprite & monster = AGG::GetICN(ICN::MONS32, troop.GetSpriteIndex());
 
-    		Display::Get().Blit(monster, cx - monster.w() / 2, cy + 30 - monster.h());
+    		monster.Blit(cx - monster.w() / 2, cy + 30 - monster.h());
 		text.Set(Game::CountScoute(troop.GetCount(), scoute));
 		text.Blit(cx - text.w() / 2, cy + 28);
 

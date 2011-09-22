@@ -61,6 +61,83 @@ void RunTest1(void)
 void RunTest2(void)
 {
     VERBOSE("Run Test2");
+
+    Display & display = Display::Get();
+    LocalEvent & le = LocalEvent::Get();
+
+    display.Fill(0x85, 0x85, 0x85);
+    Point pt;
+
+    // test alpha (without amask)
+    const Sprite & sprite1 = AGG::GetICN(ICN::BTNSHNGL, 1);
+
+    sprite1.Blit(pt);
+    pt.x += sprite1.w() + 20;
+
+    Surface sf1;
+    sf1.Set(sprite1);
+    sf1.SetAlpha(50);
+
+    sf1.Blit(pt, display);
+    pt.x += sf1.w() + 20;
+
+    // test alpha (with amask, shadow)
+    const Sprite & sprite2 = AGG::GetICN(ICN::DRAGBLAK, 1);
+
+    sprite2.Blit(pt, display);
+    pt.x += sprite2.w() + 20;
+
+    Surface sf2(sprite2.w(), sprite2.h(), false);
+    //sf2.Fill(0, 0, 0xFF);
+
+    //sprite2.ResetAlpha();
+    //sprite2.SetColorKey(sprite2.MapRGB(0, 0, 0));
+    sprite2.Blit(sf2);
+    sf2.SetAlpha(50);
+
+    sf2.Blit(pt, display);
+    pt.x += sf2.w() + 20;
+
+    // stensil
+    Surface sf3;
+    Surface::MakeStencil(sf3, sprite2, sprite2.MapRGB(0x80, 0x50, 0x30));
+    VERBOSE(sf3.Info());
+    pt.x = 0;
+    pt.y = 150;
+
+    sf3.Blit(pt, display);
+
+    // contour
+    Surface sf4;
+    Surface::MakeContour(sf4, sprite2, sprite2.MapRGB(0xFF, 0xFF, 0));
+    pt.x += sprite2.w() + 20;
+
+    sf4.Blit(pt, display);
+
+    //sf2.Set(sprite2.w(), sprite2.h(), false);
+    //VERBOSE("sf2: " << sf2.Info());
+    //sf2.Blit(sprite2);
+    //sf2.SetAlpha(50);
+
+    //sf2.Blit(pt);
+    //pt.x += sf2.w() + 20;
+
+    //Surface::MakeStencil(sf, sprite2, sprite.MapRGB(0xFF, 0xFF, 0));
+
+    //sf1.SetAlpha(100);
+
+    //VERBOSE("sprite1: " << sprite.Info());
+    //VERBOSE("sprite2: " << sprite.Info());
+    //VERBOSE("sf: " << sf.Info());
+
+
+
+    display.Flip();
+
+    while(le.HandleEvents())
+    {
+        if(Game::HotKeyPress(Game::EVENT_DEFAULT_EXIT)) break;
+    }
 }
 
 void RunTest3(void)

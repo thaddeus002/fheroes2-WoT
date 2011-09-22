@@ -61,7 +61,7 @@ void Heroes::MeetingDialog(Heroes & heroes2)
     // background
     dst_pt.x = cur_pt.x;
     dst_pt.y = cur_pt.y;
-    display.Blit(backSprite, src_rt, dst_pt);
+    backSprite.Blit(src_rt, dst_pt);
 
     // header
     message = _("%{name1} meets %{name2}");
@@ -73,11 +73,11 @@ void Heroes::MeetingDialog(Heroes & heroes2)
     // portrait
     dst_pt.x = cur_pt.x + 93;
     dst_pt.y = cur_pt.y + 72;
-    display.Blit(GetPortrait101x93(), dst_pt);
+    GetPortrait101x93().Blit(dst_pt, display);
 
     dst_pt.x = cur_pt.x + 445;
     dst_pt.y = cur_pt.y + 72;
-    display.Blit(heroes2.GetPortrait101x93(), dst_pt);
+    heroes2.GetPortrait101x93().Blit(dst_pt, display);
 
     dst_pt.x = cur_pt.x + 34;
     dst_pt.y = cur_pt.y + 75;
@@ -129,7 +129,7 @@ void Heroes::MeetingDialog(Heroes & heroes2)
 
     const Rect rt1(36, 267, 43, 53);
     Surface sfb1(rt1.w, rt1.h);
-    sfb1.Blit(backSprite, rt1, 0, 0);
+    backSprite.Blit(rt1, 0, 0, sfb1);
     Surface sfc1(rt1.w, rt1.h - 10);
     Cursor::DrawCursor(sfc1, 0x10, true);
     
@@ -161,7 +161,7 @@ void Heroes::MeetingDialog(Heroes & heroes2)
 
     const Rect rt2(23, 347, 34, 34);
     Surface sfb2(rt2.w, rt2.h);
-    sfb2.Blit(backSprite, rt2, 0, 0);
+    backSprite.Blit(rt2, 0, 0, sfb2);
     Surface sfc2(rt2.w, rt2.h);
     Cursor::DrawCursor(sfc2, 0x10, true);
 

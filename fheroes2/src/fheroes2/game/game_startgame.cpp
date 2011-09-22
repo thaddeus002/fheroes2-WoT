@@ -121,16 +121,16 @@ void Game::DialogPlayers(u8 color, std::string str)
     const Sprite & border = AGG::GetICN(ICN::BRCREST, 6);
 
     Surface sign(border.w(), border.h());
-    sign.Blit(border);
+    border.Blit(sign);
 
     switch(color)
     {
-	    case Color::BLUE:	sign.Blit(AGG::GetICN(ICN::BRCREST, 0), 4, 4); break;
-	    case Color::GREEN:	sign.Blit(AGG::GetICN(ICN::BRCREST, 1), 4, 4); break;
-	    case Color::RED:	sign.Blit(AGG::GetICN(ICN::BRCREST, 2), 4, 4); break;
-	    case Color::YELLOW:	sign.Blit(AGG::GetICN(ICN::BRCREST, 3), 4, 4); break;
-	    case Color::ORANGE:	sign.Blit(AGG::GetICN(ICN::BRCREST, 4), 4, 4); break;
-	    case Color::PURPLE:	sign.Blit(AGG::GetICN(ICN::BRCREST, 5), 4, 4); break;
+	    case Color::BLUE:	AGG::GetICN(ICN::BRCREST, 0).Blit(4, 4, sign); break;
+	    case Color::GREEN:	AGG::GetICN(ICN::BRCREST, 1).Blit(4, 4, sign); break;
+	    case Color::RED:	AGG::GetICN(ICN::BRCREST, 2).Blit(4, 4, sign); break;
+	    case Color::YELLOW:	AGG::GetICN(ICN::BRCREST, 3).Blit(4, 4, sign); break;
+	    case Color::ORANGE:	AGG::GetICN(ICN::BRCREST, 4).Blit(4, 4, sign); break;
+	    case Color::PURPLE:	AGG::GetICN(ICN::BRCREST, 5).Blit(4, 4, sign); break;
    	    default: break;
     }
 
@@ -260,7 +260,10 @@ Game::menu_t Game::StartGame(void)
     // reset focus
     Game::Focus::ResetAll(Focus::UNSEL);
 
-    display.Fill(0, 0, 0);
+    if(m == ENDTURN)
+	display.Fill(0, 0, 0);
+    else
+	display.Fade();
 
     return m == ENDTURN ? QUITGAME : m;
 }

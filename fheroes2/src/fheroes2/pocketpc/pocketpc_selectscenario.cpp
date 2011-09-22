@@ -44,7 +44,7 @@ Game::menu_t PocketPC::SelectScenario(void)
 
     const Sprite &sprite = AGG::GetICN(ICN::HEROES, 0);
     Rect src_rt((sprite.w() - display.w()) / 2, 0, display.w(), display.h());
-    display.Blit(sprite, src_rt, 0, 0);
+    sprite.Blit(src_rt, 0, 0);
 
     MapsFileInfoList all;
     if(!PrepareMapsFileInfoList(all, false))
@@ -84,7 +84,7 @@ Game::menu_t PocketPC::SelectScenario(void)
 
     const Rect & rt = frameborder.GetArea();
     const Sprite & background = AGG::GetICN(ICN::STONEBAK, 0);
-    display.Blit(background, Rect(0, 0, window_w, window_h), rt);
+    background.Blit(Rect(0, 0, window_w, window_h), rt);
 
     ButtonGroups btnGroups(rt, Dialog::OK|Dialog::CANCEL);
 

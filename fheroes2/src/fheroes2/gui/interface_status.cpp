@@ -173,10 +173,9 @@ void Interface::StatusWindow::DrawKingdomInfo(const u8 oh) const
     std::string str;
 
     Kingdom & myKingdom = world.GetKingdom(Settings::Get().CurrentColor());
-    Display & display = Display::Get();
 
     // sprite all resource
-    display.Blit(AGG::GetICN(ICN::RESSMALL, 0), x + 6, y + 3 + oh);
+    AGG::GetICN(ICN::RESSMALL, 0).Blit(x + 6, y + 3 + oh);
 
     // count castle
     String::AddInt(str, myKingdom.GetCountCastle());
@@ -227,9 +226,8 @@ void Interface::StatusWindow::DrawKingdomInfo(const u8 oh) const
 void Interface::StatusWindow::DrawDayInfo(const u8 oh) const
 {
     std::string message;
-    Display & display = Display::Get();
 
-    display.Blit(AGG::GetICN(Settings::Get().EvilInterface() ? ICN::SUNMOONE : ICN::SUNMOON, (world.GetWeek() - 1) % 5), x, y + 1 + oh);
+    AGG::GetICN(Settings::Get().EvilInterface() ? ICN::SUNMOONE : ICN::SUNMOON, (world.GetWeek() - 1) % 5).Blit(x, y + 1 + oh);
 
     message = _("Month: %{month} Week: %{week}");
     String::Replace(message, "%{month}", world.GetMonth());
@@ -274,9 +272,8 @@ void Interface::StatusWindow::DrawResourceInfo(const u8 oh) const
     TextBox text(message, Font::SMALL, w);
     text.Blit(x, y + 4 + oh);
     
-    Display & display = Display::Get();
     const Sprite &spr = AGG::GetICN(ICN::RESOURCE, Resource::GetIndexSprite2(lastResource));
-    display.Blit(spr, x + (w - spr.w()) / 2, y + 6 + oh + text.h());
+    spr.Blit(x + (w - spr.w()) / 2, y + 6 + oh + text.h());
 
     message.clear();
     String::AddInt(message, countLastResource);
@@ -318,13 +315,12 @@ void Interface::StatusWindow::DrawAITurns(void) const
     // restore background
     DrawBackground();
 
-    Display & display = Display::Get();
     const Sprite & glass = AGG::GetICN(ICN::HOURGLAS, 0);
 
     u16 dst_x = x + (w - glass.w()) / 2;
     u16 dst_y = y + (h - glass.h()) / 2;
 
-    display.Blit(glass, dst_x, dst_y);
+    glass.Blit(dst_x, dst_y);
 
     u8 color_index = 0;
 
@@ -344,14 +340,14 @@ void Interface::StatusWindow::DrawAITurns(void) const
     dst_x += 2;
     dst_y += 2;
 
-    display.Blit(crest, dst_x, dst_y);
+    crest.Blit(dst_x, dst_y);
 
     const Sprite & sand = AGG::GetICN(ICN::HOURGLAS, 1 + (turn_progress % 10));
 
     dst_x += (glass.w() - sand.w() - sand.x() - 3);
     dst_y += sand.y();
 
-    display.Blit(sand, dst_x, dst_y);
+    sand.Blit(dst_x, dst_y);
     
     // animation sand
     //
@@ -373,7 +369,7 @@ void Interface::StatusWindow::DrawBackground(void) const
         srcrt.y = 0;
         srcrt.w = icnston.w();
         srcrt.h = 16;
-        display.Blit(icnston, srcrt, dstpt);
+        icnston.Blit(srcrt, dstpt);
 
         srcrt.y = 16;
         srcrt.h = 32;
@@ -383,7 +379,7 @@ void Interface::StatusWindow::DrawBackground(void) const
 
         for(u8 ii = 0; ii < body / 32; ++ii)
         {
-            display.Blit(icnston, srcrt, dstpt);
+            icnston.Blit(srcrt, dstpt);
     	    dstpt.y = dstpt.y + srcrt.h;
         }
 
@@ -392,18 +388,18 @@ void Interface::StatusWindow::DrawBackground(void) const
     	    dstpt.y = display.h() - BORDERWIDTH - 48;
     	    srcrt.y = icnston.h() - 48;
     	    srcrt.h = 48;
-    	    display.Blit(icnston, srcrt, dstpt);
+    	    icnston.Blit(srcrt, dstpt);
 	}
 	else
 	{
 	    dstpt.y = display.h() - BORDERWIDTH - 16;
     	    srcrt.y = icnston.h() - 16;
     	    srcrt.h = 16;
-    	    display.Blit(icnston, srcrt, dstpt);
+    	    icnston.Blit(srcrt, dstpt);
 	}
     }
     else
-	display.Blit(icnston, x, y);
+	icnston.Blit(x, y);
 }
 
 void Interface::StatusWindow::QueueEventProcessing(void)

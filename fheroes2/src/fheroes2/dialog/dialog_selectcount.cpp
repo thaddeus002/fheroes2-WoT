@@ -61,7 +61,7 @@ bool Dialog::SelectCount(const std::string &header, u32 min, u32 max, u32 & cur,
     const Surface & sprite_edit = AGG::GetICN(ICN::TOWNWIND, 4);
     pt.x = pos.x + 80;
     pt.y = pos.y + 35;
-    display.Blit(sprite_edit, pt);
+    sprite_edit.Blit(pt, display);
 
     message.clear();
     String::AddInt(message, cur);
@@ -141,7 +141,7 @@ bool Dialog::SelectCount(const std::string &header, u32 min, u32 max, u32 & cur,
 	    cursor.Hide();
 	    pt.x = pos.x + 80;
 	    pt.y = pos.y + 35;
-	    display.Blit(sprite_edit, pt);
+	    sprite_edit.Blit(pt, display);
 
 	    message.clear();
 	    String::AddInt(message, cur);
@@ -191,11 +191,11 @@ bool Dialog::InputString(const std::string &header, std::string &res)
 
     dst_pt.y = box_rt.y + 10 + textbox.h() + 10;
     dst_pt.x = box_rt.x + (box_rt.w - sprite.w()) / 2;
-    display.Blit(sprite, dst_pt);
+    sprite.Blit(dst_pt, display);
     const Rect text_rt(dst_pt.x, dst_pt.y, sprite.w(), sprite.h());
 
     Text text("_", Font::BIG);
-    display.Blit(sprite, text_rt);
+    sprite.Blit(text_rt, display);
     text.Blit(dst_pt.x + (sprite.w() - text.w()) / 2, dst_pt.y - 1);
 
     dst_pt.x = box_rt.x;
@@ -248,7 +248,7 @@ bool Dialog::InputString(const std::string &header, std::string &res)
 	    if(text.w() < sprite.w() - 24)
 	    {
 		cursor.Hide();
-		display.Blit(sprite, text_rt);
+		sprite.Blit(text_rt, display);
 		text.Blit(text_rt.x + (text_rt.w - text.w()) / 2, text_rt.y - 1);
 		cursor.Show();
 		display.Flip();

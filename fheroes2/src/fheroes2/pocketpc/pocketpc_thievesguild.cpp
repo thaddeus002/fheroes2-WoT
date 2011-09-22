@@ -75,7 +75,7 @@ void PocketPC::ThievesGuild(bool oracle)
 
     const Rect & dst_rt = frameborder.GetArea();
     const Sprite & background = AGG::GetICN(ICN::STONEBAK, 0);
-    display.Blit(background, Rect(0, 0, window_w, window_h), dst_rt);
+    background.Blit(Rect(0, 0, window_w, window_h), dst_rt);
 
     const Point & cur_pt = dst_rt;
     Point dst_pt(cur_pt);
@@ -113,7 +113,7 @@ void PocketPC::ThievesGuild(bool oracle)
 
     // button exit
     const Rect rectExit(dst_rt.x + dst_rt.w - 26, dst_rt.y + 7, 25, 25);
-    display.Blit(AGG::GetICN(ICN::TOWNWIND, 12), rectExit.x, rectExit.y);
+    AGG::GetICN(ICN::TOWNWIND, 12).Blit(rectExit.x, rectExit.y);
 
     text.Set(_("Number of Towns:"));
     dst_pt.x = cur_pt.x + textx - text.w();

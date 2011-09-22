@@ -63,16 +63,15 @@ Dialog::answer_t Heroes::OpenDialog(bool readonly, bool fade)
     if(fade && Settings::Get().ExtUseFade()) display.Fade();
     display.FillRect(0, 0, 0, Rect(dst_pt, 640, 480));
 
-    display.Blit(AGG::GetICN(ICN::HEROBKG, 0), dst_pt);
-
-    display.Blit(AGG::GetICN(Settings::Get().EvilInterface() ? ICN::HEROEXTE : ICN::HEROEXTG, 0), dst_pt);
+    AGG::GetICN(ICN::HEROBKG, 0).Blit(dst_pt);
+    AGG::GetICN(Settings::Get().EvilInterface() ? ICN::HEROEXTE : ICN::HEROEXTG, 0).Blit(dst_pt);
 
     std::string message;
 
     // portrait
     dst_pt.x = cur_pt.x + 49;
     dst_pt.y = cur_pt.y + 31;
-    display.Blit(GetPortrait101x93(), dst_pt);
+    GetPortrait101x93().Blit(dst_pt, display);
 
     // name
     message = _("%{name} the %{race} ( Level %{level} )");
@@ -206,7 +205,7 @@ Dialog::answer_t Heroes::OpenDialog(bool readonly, bool fade)
     dst_pt.x = cur_pt.x + 515;
     dst_pt.y = cur_pt.y + 63;
     const Sprite & sprite1 = AGG::GetICN(ICN::HSICONS, 9);
-    display.Blit(sprite1, dst_pt);
+    sprite1.Blit(dst_pt);
 
     const Rect rectSpreadArmyFormat(dst_pt, sprite1.w(), sprite1.h());
     const std::string descriptionSpreadArmyFormat = _("'Spread' combat formation spreads your armies from the top to the bottom of the battlefield, with at least one empty space between each army.");
@@ -216,7 +215,7 @@ Dialog::answer_t Heroes::OpenDialog(bool readonly, bool fade)
     dst_pt.x = cur_pt.x + 552;
     dst_pt.y = cur_pt.y + 63;
     const Sprite & sprite2 = AGG::GetICN(ICN::HSICONS, 10);
-    display.Blit(sprite2, dst_pt);
+    sprite2.Blit(dst_pt);
 
     const Rect rectGroupedArmyFormat(dst_pt, sprite2.w(), sprite2.h());    
     const std::string descriptionGroupedArmyFormat = _("'Grouped' combat formation bunches your army together in the center of your side of the battlefield.");
@@ -240,8 +239,7 @@ Dialog::answer_t Heroes::OpenDialog(bool readonly, bool fade)
     dst_pt.x = cur_pt.x + 49;
     dst_pt.y = cur_pt.y + 130;
 
-    display.Blit(AGG::GetICN(ICN::CREST,
-		Color::NONE == color ? Color::GetIndex(Settings::Get().CurrentColor()) : Color::GetIndex(color)), dst_pt);
+    AGG::GetICN(ICN::CREST, Color::NONE == color ? Color::GetIndex(Settings::Get().CurrentColor()) : Color::GetIndex(color)).Blit(dst_pt);
     
     // monster
     dst_pt.x = cur_pt.x + 156;
@@ -281,7 +279,7 @@ Dialog::answer_t Heroes::OpenDialog(bool readonly, bool fade)
     dst_pt.x = cur_pt.x + 22;
     dst_pt.y = cur_pt.y + 460;
     const Sprite & bar = AGG::GetICN(ICN::HSBTNS, 8);
-    display.Blit(bar, dst_pt);
+    bar.Blit(dst_pt);
 
     StatusBar statusBar;
     statusBar.SetCenter(dst_pt.x + bar.w() / 2, dst_pt.y + 11);

@@ -70,8 +70,8 @@ public:
     static void		Flip();
     static void		FullScreen(void);
     
-    static bool		Fade(u8 fadeTo=0);
-    static bool		Rise(u8 riseTo=255);
+    static void		Fade(void);
+    static void		Rise(void);
 
 private:
     Display();

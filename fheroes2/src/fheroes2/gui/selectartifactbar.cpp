@@ -171,13 +171,13 @@ void SelectArtifactsBar::Redraw(Surface & display)
     {
 	const Artifact & art = arts[ii];
 
-	display.Blit(*background, pt);
+	background->Blit(pt, display);
 	if(art.isValid())
 	{
 	    if(flags & FLAGS_USEART32)
-    		display.Blit(AGG::GetICN(ICN::ARTFX, art.IndexSprite32()), pt.x + 1, pt.y + 1);
+    		AGG::GetICN(ICN::ARTFX, art.IndexSprite32()).Blit(pt.x + 1, pt.y + 1);
 	    else
-    		display.Blit(AGG::GetICN(ICN::ARTIFACT, art.IndexSprite64()), pt);
+    		AGG::GetICN(ICN::ARTIFACT, art.IndexSprite64()).Blit(pt);
 	}
 	pt.x += background->w() + interval;
     }
@@ -189,13 +189,13 @@ void SelectArtifactsBar::Redraw(Surface & display)
     {
 	const Artifact & art = arts[ii + MAXARTIFACTLINE];
 
-	display.Blit(*background, pt);
+	background->Blit(pt, display);
 	if(art.isValid())
 	{
 	    if(flags & FLAGS_USEART32)
-    		display.Blit(AGG::GetICN(ICN::ARTFX, art.IndexSprite32()), pt.x + 1, pt.y + 1);
+    		AGG::GetICN(ICN::ARTFX, art.IndexSprite32()).Blit(pt.x + 1, pt.y + 1);
 	    else
-    		display.Blit(AGG::GetICN(ICN::ARTIFACT, art.IndexSprite64()), pt);
+    		AGG::GetICN(ICN::ARTIFACT, art.IndexSprite64()).Blit(pt);
 	}
 
 	pt.x += background->w() + interval;

@@ -230,6 +230,7 @@ namespace Battle2
 	const Stats* b_move;
 	const Stats* b_fly;
 	const Sprite* b_current_sprite;
+	u8 b_current_alpha;
 	Point p_move;
 	Point p_fly;
 

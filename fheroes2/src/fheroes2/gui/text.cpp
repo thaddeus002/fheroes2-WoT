@@ -191,7 +191,7 @@ void TextAscii::Blit(u16 ax, u16 ay, const u16 maxw, Surface & dst)
             break;
 	}
 
-	dst.Blit(sprite, ax, ay + 2 + oy);
+	sprite.Blit(ax, ay + 2 + oy, dst);
 	ax += sprite.w();
     }
 }
@@ -350,7 +350,7 @@ void TextUnicode::Blit(u16 ax, u16 ay, const u16 maxw, Surface & dst)
 	const Surface & sprite = AGG::GetUnicodeLetter(*it, font);
 	if(!sprite.isValid()) return;
 
-	dst.Blit(sprite, ax, ay);
+	sprite.Blit(ax, ay, dst);
 	ax += sprite.w();
     }
 }

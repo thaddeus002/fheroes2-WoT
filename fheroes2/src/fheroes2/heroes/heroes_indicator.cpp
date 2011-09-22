@@ -126,7 +126,7 @@ void LuckIndicator::Redraw(void)
     back.Restore();
     while(count--)
     {
-        Display::Get().Blit(sprite, cx, cy);
+        sprite.Blit(cx, cy);
         cx += inter;
     }
 }
@@ -172,7 +172,7 @@ void MoraleIndicator::Redraw(void)
     back.Restore();
     while(count--)
     {
-        Display::Get().Blit(sprite, cx, cy);
+        sprite.Blit(cx, cy);
         cx += inter;
     }
 }
@@ -199,7 +199,7 @@ ExperienceIndicator::ExperienceIndicator(const Heroes & h) : HeroesIndicator(h)
 void ExperienceIndicator::Redraw(void)
 {
     const Sprite & sprite3 = AGG::GetICN(ICN::HSICONS, 1);
-    Display::Get().Blit(sprite3, area.x, area.y);
+    sprite3.Blit(area.x, area.y);
 
     std::string message;
     String::AddInt(message, hero.GetExperience());
@@ -233,7 +233,7 @@ SpellPointsIndicator::SpellPointsIndicator(const Heroes & h) : HeroesIndicator(h
 void SpellPointsIndicator::Redraw(void)
 {
     const Sprite & sprite3 = AGG::GetICN(ICN::HSICONS, 8);
-    Display::Get().Blit(sprite3, area.x, area.y);
+    sprite3.Blit(area.x, area.y);
 
     std::string message;
     String::AddInt(message, hero.GetSpellPoints());

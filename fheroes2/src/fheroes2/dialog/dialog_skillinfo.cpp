@@ -62,10 +62,10 @@ void Dialog::SecondarySkillInfo(const std::string & header, const std::string & 
 
     // blit sprite
     pos.x = box.GetArea().x + (pos.w - border.w()) / 2;
-    display.Blit(border, pos.x, pos.y);
+    border.Blit(pos.x, pos.y);
     const Sprite & sprite = AGG::GetICN(ICN::SECSKILL, skill.GetIndexSprite1());
     pos.x = box.GetArea().x + (pos.w - sprite.w()) / 2;
-    display.Blit(sprite, pos.x, pos.y + 3);
+    sprite.Blit(pos.x, pos.y + 3);
 
     Text text;
 
@@ -169,10 +169,10 @@ void Dialog::PrimarySkillInfo(const std::string &header, const std::string &mess
 
     // blit sprite
     pos.x = box.GetArea().x + (pos.w - border.w()) / 2;
-    display.Blit(border, pos.x, pos.y);
+    border.Blit(pos.x, pos.y);
     const Sprite & sprite = AGG::GetICN(ICN::PRIMSKIL, index);
     pos.x = box.GetArea().x + (pos.w - sprite.w()) / 2;
-    display.Blit(sprite, pos.x, pos.y + 6);
+    sprite.Blit(pos.x, pos.y + 6);
 
     Text text;
 

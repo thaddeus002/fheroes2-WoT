@@ -357,14 +357,14 @@ void Battle2::Stats::InitContours(void)
     if(sprite1 && !contours[0])
     {
 	contours[0] = new Sprite();
-    	Surface::MakeContour(*contours[0], *sprite1, sprite1->GetColor(0xDA));
+    	Surface::MakeContour(*contours[0], *sprite1, sprite1->GetColorIndex(0xDA));
     }
 
     // revert
     if(sprite2 && !contours[1])
     {
 	contours[1] = new Sprite();
-	Surface::MakeContour(*contours[1], *sprite2, sprite2->GetColor(0xDA));
+	Surface::MakeContour(*contours[1], *sprite2, sprite2->GetColorIndex(0xDA));
     }
 
     // create white black sprite

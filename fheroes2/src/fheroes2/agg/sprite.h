@@ -22,24 +22,32 @@
 #ifndef H2SPRITE_H
 #define H2SPRITE_H
 
-#include "surface.h"
+#include "display.h"
 #include "gamedefs.h"
 
 class Sprite : public Surface
 {
 public:
     Sprite();
+    Sprite(const Sprite &);
 
     void SetOffset(s16, s16);
 
     s16 x(void) const{ return offsetX; }
     s16 y(void) const{ return offsetY; }
 
+    void Blit(Surface & = Display::Get()) const;
+    void Blit(s16, s16, Surface & = Display::Get()) const;
+    void Blit(const Point &, Surface & = Display::Get()) const;
+    void Blit(const Rect & srt, s16, s16, Surface & = Display::Get()) const;
+    void Blit(const Rect & srt, const Point &, Surface & = Display::Get()) const;
+    void Blit(u8 alpha, s16, s16, Surface & = Display::Get()) const;
+    void Blit(u8 alpha, const Rect & srt, const Point &, Surface & = Display::Get()) const;
+
     u32 GetSize(void) const;
     void ScaleMinifyByTwo(void);
-    void BlitSpriteWithAlpha(Surface &, u8, s16, s16) const;
 
-    static void DrawICN(Surface & sf, const u8* buf, const u32 size, bool reflect);
+    static void DrawICN(u16 icn, Surface & sf, const u8* buf, const u32 size, bool reflect);
     static void AddonExtensionModify(Sprite & sp, u16 icn, u16 index);
 
 private:

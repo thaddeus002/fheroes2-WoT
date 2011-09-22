@@ -59,18 +59,18 @@ void Castle::OpenTavern(void)
 
     dst_pt.x = pos.x + (pos.w - s1.w()) / 2;
     dst_pt.y += 10 + text.h();
-    display.Blit(s1, dst_pt);
+    s1.Blit(dst_pt);
 
     dst_pt.x += 3;
     dst_pt.y += 3;
 
     const Sprite & s20 = AGG::GetICN(tavwin, 1);
-    display.Blit(s20, dst_pt);
+    s20.Blit(dst_pt);
 
     if(const u16 index = ICN::AnimationFrame(tavwin, 0))
     {
 	const Sprite & s21 = AGG::GetICN(tavwin, index);
-	display.Blit(s21, dst_pt.x + s21.x(), dst_pt.y + s21.y());
+	s21.Blit(dst_pt.x + s21.x(), dst_pt.y + s21.y());
     }
 
     box1.Blit(pos.x, dst_pt.y + s1.h() + 10);
@@ -101,12 +101,12 @@ void Castle::OpenTavern(void)
 	{
 	    cursor.Hide();
 
-	    display.Blit(s20, dst_pt);
+	    s20.Blit(dst_pt);
 
 	    if(const u16 index = ICN::AnimationFrame(tavwin, 0, frame++))
 	    {
 		const Sprite & s22 = AGG::GetICN(tavwin, index);
-		display.Blit(s22, dst_pt.x + s22.x(), dst_pt.y + s22.y());
+		s22.Blit(dst_pt.x + s22.x(), dst_pt.y + s22.y());
 	    }
 
 	    cursor.Show();

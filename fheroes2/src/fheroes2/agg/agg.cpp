@@ -318,22 +318,22 @@ void AGG::Cache::LoadExtICN(icn_cache_t & v, const ICN::icn_t icn, const u16 ind
 	    Sprite & sprite = reflect ? v.reflect[index] : v.sprites[index];
 	    LoadOrgICN(sprite, ICN::BTNNEWGM, 2 + index, false);
 	    // clean
-	    sprite.Blit(GetICN(ICN::SYSTEM, 11 + index), Rect(10, 6, 55, 14), 15, 13);
-	    sprite.Blit(GetICN(ICN::SYSTEM, 11 + index), Rect(10, 6, 55, 14), 70, 13);
-	    sprite.Blit(GetICN(ICN::SYSTEM, 11 + index), Rect(10, 6, 55, 14), 42, 28);
+	    GetICN(ICN::SYSTEM, 11 + index).Blit(Rect(10, 6, 55, 14), 15, 13, sprite);
+	    GetICN(ICN::SYSTEM, 11 + index).Blit(Rect(10, 6, 55, 14), 70, 13, sprite);
+	    GetICN(ICN::SYSTEM, 11 + index).Blit(Rect(10, 6, 55, 14), 42, 28, sprite);
 	    // ba
-	    sprite.Blit(GetICN(ICN::BTNCMPGN, index), Rect(41, 28, 28, 14), 30, 13);
+	    GetICN(ICN::BTNCMPGN, index).Blit(Rect(41, 28, 28, 14), 30, 13, sprite);
 	    // tt
-	    sprite.Blit(GetICN(ICN::BTNNEWGM, index), Rect(25, 13, 13, 14), 57, 13);
-	    sprite.Blit(GetICN(ICN::BTNNEWGM, index), Rect(25, 13, 13, 14), 70, 13);
+	    GetICN(ICN::BTNNEWGM, index).Blit(Rect(25, 13, 13, 14), 57, 13, sprite);
+	    GetICN(ICN::BTNNEWGM, index).Blit(Rect(25, 13, 13, 14), 70, 13, sprite);
 	    // le
-	    sprite.Blit(GetICN(ICN::BTNNEWGM, 6 + index), Rect(97, 21, 13, 14), 83, 13);
-	    sprite.Blit(GetICN(ICN::BTNNEWGM, 6 + index), Rect(86, 21, 13, 14), 96, 13);
+	    GetICN(ICN::BTNNEWGM, 6 + index).Blit(Rect(97, 21, 13, 14), 83, 13, sprite);
+	    GetICN(ICN::BTNNEWGM, 6 + index).Blit(Rect(86, 21, 13, 14), 96, 13, sprite);
 	    // on
-	    sprite.Blit(GetICN(ICN::BTNDCCFG, 4 + index), Rect(44, 21, 31, 14), 40, 28);
+	    GetICN(ICN::BTNDCCFG, 4 + index).Blit(Rect(44, 21, 31, 14), 40, 28, sprite);
 	    // ly
-	    sprite.Blit(GetICN(ICN::BTNHOTST, index), Rect(47, 21, 13, 13), 71, 28);
-	    sprite.Blit(GetICN(ICN::BTNHOTST, index), Rect(72, 21, 13, 13), 84, 28);
+	    GetICN(ICN::BTNHOTST, index).Blit(Rect(47, 21, 13, 13), 71, 28, sprite);
+	    GetICN(ICN::BTNHOTST, index).Blit(Rect(72, 21, 13, 13), 84, 28, sprite);
 	}
 	break;
 
@@ -343,7 +343,7 @@ void AGG::Cache::LoadExtICN(icn_cache_t & v, const ICN::icn_t icn, const u16 ind
 	    Sprite & sprite = reflect ? v.reflect[index] : v.sprites[index];
 	    LoadOrgICN(sprite, ICN::SYSTEM, 11 + index, false);
 	    // config
-	    sprite.Blit(GetICN(ICN::BTNDCCFG, 4 + index), Rect(30, 20, 80, 16), 8, 5);
+	    GetICN(ICN::BTNDCCFG, 4 + index).Blit(Rect(30, 20, 80, 16), 8, 5, sprite);
 	}
 	break;
 
@@ -355,15 +355,15 @@ void AGG::Cache::LoadExtICN(icn_cache_t & v, const ICN::icn_t icn, const u16 ind
 			(Settings::Get().EvilInterface() ? ICN::TRADPOSE : ICN::TRADPOST),
 			17 + index, false);
 	    // clean
-	    sprite.Blit(GetICN(ICN::SYSTEM, 11 + index), Rect(10, 6, 72, 15), 6, 4);
+	    GetICN(ICN::SYSTEM, 11 + index).Blit(Rect(10, 6, 72, 15), 6, 4, sprite);
 	    // G
-	    sprite.Blit(GetICN(ICN::BTNDCCFG, 4 + index), Rect(94, 20, 15, 15), 20, 4);
+	    GetICN(ICN::BTNDCCFG, 4 + index).Blit(Rect(94, 20, 15, 15), 20, 4, sprite);
 	    // I
-	    sprite.Blit(GetICN(ICN::BTNDCCFG, 4 + index), Rect(86, 20, 9, 15), 36, 4);
+	    GetICN(ICN::BTNDCCFG, 4 + index).Blit(Rect(86, 20, 9, 15), 36, 4, sprite);
 	    // F
-	    sprite.Blit(GetICN(ICN::BTNDCCFG, 4 + index), Rect(74, 20, 13, 15), 46, 4);
+	    GetICN(ICN::BTNDCCFG, 4 + index).Blit(Rect(74, 20, 13, 15), 46, 4, sprite);
 	    // T
-	    sprite.Blit(GetICN(ICN::BTNNEWGM, index), Rect(25, 13, 13, 14), 60, 5);
+	    GetICN(ICN::BTNNEWGM, index).Blit(Rect(25, 13, 13, 14), 60, 5, sprite);
 	}
 	break;
 
@@ -373,9 +373,9 @@ void AGG::Cache::LoadExtICN(icn_cache_t & v, const ICN::icn_t icn, const u16 ind
 	    Sprite & sprite = reflect ? v.reflect[index] : v.sprites[index];
 	    LoadOrgICN(sprite, ICN::WELLXTRA, index, false);
 	    // clean
-	    sprite.Blit(GetICN(ICN::SYSTEM, 11 + index), Rect(10, 6, 52, 14), 6, 2);
+	    GetICN(ICN::SYSTEM, 11 + index).Blit(Rect(10, 6, 52, 14), 6, 2, sprite);
 	    // max
-	    sprite.Blit(GetICN(ICN::RECRUIT, 4 + index), Rect(12, 6, 50, 12), 7, 3);
+	    GetICN(ICN::RECRUIT, 4 + index).Blit(Rect(12, 6, 50, 12), 7, 3, sprite);
 	}
 	break;
 
@@ -385,9 +385,9 @@ void AGG::Cache::LoadExtICN(icn_cache_t & v, const ICN::icn_t icn, const u16 ind
 	    Sprite & sprite = reflect ? v.reflect[index] : v.sprites[index];
 	    LoadOrgICN(sprite, ICN::TEXTBAR, 4 + index, false);
 	    // clean
-	    sprite.Blit(GetICN(ICN::SYSTEM, 11 + index), Rect(3, 8, 43, 14), 3, 1);
+	    GetICN(ICN::SYSTEM, 11 + index).Blit(Rect(3, 8, 43, 14), 3, 1, sprite);
 	    // skip
-	    sprite.Blit(GetICN(ICN::TEXTBAR, index), Rect(3, 8, 43, 14), 3, 0);
+	    GetICN(ICN::TEXTBAR, index).Blit(Rect(3, 8, 43, 14), 3, 0, sprite);
 	}
 	break;
 
@@ -397,13 +397,13 @@ void AGG::Cache::LoadExtICN(icn_cache_t & v, const ICN::icn_t icn, const u16 ind
 	    Sprite & sprite = reflect ? v.reflect[index] : v.sprites[index];
 	    LoadOrgICN(sprite, ICN::TEXTBAR, 4 + index, false);
 	    // clean
-	    sprite.Blit(GetICN(ICN::SYSTEM, 11 + index), Rect(3, 8, 43, 14), 3, 1);
+	    GetICN(ICN::SYSTEM, 11 + index).Blit(Rect(3, 8, 43, 14), 3, 1, sprite);
 	    // wait
 	    Surface src, dst;
 	    src.Set(28, 28);
-	    src.Blit(GetICN(ICN::ADVBTNS, 8 + index), Rect(5, 4, 28, 28), 0, 0);
+	    GetICN(ICN::ADVBTNS, 8 + index).Blit(Rect(5, 4, 28, 28), 0, 0, src);
 	    Surface::ScaleMinifyByTwo(dst, src);
-	    sprite.Blit(dst, (sprite.w() - dst.w()) / 2, 2);
+	    dst.Blit((sprite.w() - dst.w()) / 2, 2, sprite);
 	}
 	break;
 
@@ -579,16 +579,15 @@ void AGG::Cache::LoadOrgICN(Sprite & sp, const ICN::icn_t icn, const u16 index, 
 				    // total size
 				    ReadLE32(&body[2]) - header1.OffsetData());
 
-	sp.Set(header1.Width(), header1.Height(), ICN::RequiresAlpha(icn));
+	sp.Set(header1.Width(), header1.Height(), false);
 	sp.SetOffset(header1.OffsetX(), header1.OffsetY());
-	sp.SetColorKey();
-	Sprite::DrawICN(sp, &body[6 + header1.OffsetData()], size_data, reflect);
+	Sprite::DrawICN(icn, sp, &body[6 + header1.OffsetData()], size_data, reflect);
 	Sprite::AddonExtensionModify(sp, icn, index);
     }
     else
     {
 	DEBUG(DBG_ENGINE, DBG_WARN, "error: " << ICN::GetString(icn));
-	Error::Except("load icn");
+	Error::Except(__FUNCTION__, "load icn");
     }
 }
 
@@ -607,9 +606,6 @@ void AGG::Cache::LoadOrgICN(icn_cache_t & v, const ICN::icn_t icn, const u16 ind
     Sprite & sp = reflect ? v.reflect[index] : v.sprites[index];
 
     LoadOrgICN(sp, icn, index, reflect);
-    // set display format
-    if(8 != sp.depth() &&
-       !(Settings::Get().QVGA() && ICN::NeedMinify4PocketPC(icn, index))) sp.SetDisplayFormat();
 }
 
 /* load ICN object to AGG::Cache */
@@ -653,7 +649,6 @@ void AGG::Cache::LoadICN(const ICN::icn_t icn, u16 index, bool reflect)
     {
 	Sprite & sp = reflect ? v.reflect[index] : v.sprites[index];
 	sp.ScaleMinifyByTwo();
-	//sp.SetDisplayFormat();
     }
 
     // registry icn
@@ -885,7 +880,6 @@ void AGG::Cache::LoadMID(const XMI::xmi_t xmi)
 
 void AGG::Cache::LoadPAL(void)
 {
-    DEBUG(DBG_ENGINE, DBG_INFO, Palette::Get().Size());
 }
 
 void AGG::Cache::LoadFNT(void)

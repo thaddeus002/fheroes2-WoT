@@ -82,17 +82,16 @@ Dialog::Box::~Box()
 
 void BoxRedraw(s16 posx, s16 posy, u8 count)
 {
-    Display & display = Display::Get();
     const ICN::icn_t buybuild = Settings::Get().EvilInterface() ? ICN::BUYBUILE : ICN::BUYBUILD;
 
     // left top sprite
     Point pt(posx, posy);
     if(!Settings::Get().EvilInterface()) ++pt.x;
-    display.Blit(AGG::GetICN(buybuild, 4), pt);
+    AGG::GetICN(buybuild, 4).Blit(pt);
 
     // right top sprite
     pt.x = posx + AGG::GetICN(buybuild, 4).w();
-    display.Blit(AGG::GetICN(buybuild, 0), pt);
+    AGG::GetICN(buybuild, 0).Blit(pt);
 
     pt.y += AGG::GetICN(buybuild, 4).h();
     for(int i = 0; i < count; ++i)
@@ -100,20 +99,20 @@ void BoxRedraw(s16 posx, s16 posy, u8 count)
 	// left middle sprite
 	pt.x = posx;
 	const Sprite & sl = AGG::GetICN(buybuild, 5);
-	display.Blit(sl, Rect(0, 10, sl.w(), BOXAREA_MIDDLE), pt);
+	sl.Blit(Rect(0, 10, sl.w(), BOXAREA_MIDDLE), pt);
 
 	// right middle sprite
 	pt.x += sl.w();
 	if(!Settings::Get().EvilInterface()) pt.x -= 1;
 	const Sprite & sr = AGG::GetICN(buybuild, 1);
-	display.Blit(sr, Rect(0, 10, sr.w(), BOXAREA_MIDDLE), pt);
+	sr.Blit(Rect(0, 10, sr.w(), BOXAREA_MIDDLE), pt);
 	pt.y += BOXAREA_MIDDLE;
     }
 
     // right bottom sprite
-    display.Blit(AGG::GetICN(buybuild, 2), pt);
+    AGG::GetICN(buybuild, 2).Blit(pt);
 
     // left bottom sprite
     pt.x = posx;
-    display.Blit(AGG::GetICN(buybuild, 6), pt);
+    AGG::GetICN(buybuild, 6).Blit(pt);
 }

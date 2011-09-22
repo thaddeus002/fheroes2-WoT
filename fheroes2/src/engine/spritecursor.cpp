@@ -111,8 +111,9 @@ void SpriteCursor::Show(s16 ax, s16 ay)
 {
     if(! visible)
     {
+	Display & display = Display::Get();
 	Save(ax, ay);
-	if(sprite) Display::Get().Blit(*sprite, ax, ay);
+	if(sprite) sprite->Blit(ax, ay, display);
 	visible = true;
     }
 }

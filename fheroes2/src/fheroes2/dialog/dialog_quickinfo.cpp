@@ -353,7 +353,7 @@ void Dialog::QuickInfo(const Maps::Tiles & tile)
     Background back(pos);
     back.Save();
 
-    display.Blit(box, pos.x, pos.y);
+    box.Blit(pos.x, pos.y);
 
     std::string name_object;
     const Settings & settings = Settings::Get();
@@ -554,7 +554,7 @@ void Dialog::QuickInfo(const Castle & castle)
 
     Background back(cur_rt);
     back.Save();
-    display.Blit(box, cur_rt.x, cur_rt.y);
+    box.Blit(cur_rt.x, cur_rt.y);
 
     cur_rt = Rect(back.GetRect().x + 28 , back.GetRect().y + 12, 178, 140);
     Point dst_pt;
@@ -584,7 +584,7 @@ void Dialog::QuickInfo(const Castle & castle)
 
     dst_pt.x = cur_rt.x + (cur_rt.w - sprite.w()) / 2;
     dst_pt.y += 18;
-    display.Blit(sprite, dst_pt);
+    sprite.Blit(dst_pt);
 
     // color flags
     switch(castle.GetColor())
@@ -601,11 +601,11 @@ void Dialog::QuickInfo(const Castle & castle)
 
     const Sprite & l_flag = AGG::GetICN(ICN::FLAG32, index);
     dst_pt.x = cur_rt.x + (cur_rt.w - 60) / 2 - l_flag.w();
-    display.Blit(l_flag, dst_pt);
+    l_flag.Blit(dst_pt);
 
     const Sprite & r_flag = AGG::GetICN(ICN::FLAG32, index + 1);
     dst_pt.x = cur_rt.x + (cur_rt.w + 60) / 2;
-    display.Blit(r_flag, dst_pt);
+    r_flag.Blit(dst_pt);
 
     // info
     text.Set(_("Defenders:"));
@@ -640,7 +640,7 @@ void Dialog::QuickInfo(const Castle & castle)
 	const Surface & port = guardian->GetPortrait30x22();
 	dst_pt.x = cur_rt.x + (cur_rt.w - port.w()) / 2;
 	dst_pt.y += 15;
-	display.Blit(port, dst_pt);
+	port.Blit(dst_pt, display);
     }
 
     // draw defenders
@@ -722,7 +722,7 @@ void Dialog::QuickInfo(const Heroes & hero)
     Background back(cur_rt);
     back.Save();
 
-    display.Blit(box, cur_rt.x, cur_rt.y);
+    box.Blit(cur_rt.x, cur_rt.y);
 
     cur_rt = Rect(back.GetRect().x + 28 , back.GetRect().y + 10, 146, 144);
     Point dst_pt;
@@ -748,7 +748,7 @@ void Dialog::QuickInfo(const Heroes & hero)
     const Surface & port = hero.GetPortrait30x22();
     dst_pt.x = cur_rt.x + (cur_rt.w - port.w()) / 2;
     dst_pt.y = cur_rt.y + 13;
-    display.Blit(port, dst_pt);
+    port.Blit(dst_pt, display);
 
     // luck
     if(conf.CurrentColor() == hero.GetColor() ||
@@ -762,7 +762,7 @@ void Dialog::QuickInfo(const Heroes & hero)
 
 	while(count--)
 	{
-    	    display.Blit(sprite, dst_pt.x, dst_pt.y);
+    	    sprite.Blit(dst_pt.x, dst_pt.y);
     	    dst_pt.y += sprite.h() - 1;
 	}
     }
@@ -779,7 +779,7 @@ void Dialog::QuickInfo(const Heroes & hero)
 
 	while(count--)
 	{
-    	    display.Blit(sprite, dst_pt.x, dst_pt.y);
+    	    sprite.Blit(dst_pt.x, dst_pt.y);
     	    dst_pt.y += sprite.h() - 1;
 	}
     }
@@ -803,11 +803,11 @@ void Dialog::QuickInfo(const Heroes & hero)
 
     const Sprite & l_flag = AGG::GetICN(ICN::FLAG32, index);
     dst_pt.x = cur_rt.x + (cur_rt.w - 40) / 2 - l_flag.w();
-    display.Blit(l_flag, dst_pt);
+    l_flag.Blit(dst_pt);
 
     const Sprite & r_flag = AGG::GetICN(ICN::FLAG32, index + 1);
     dst_pt.x = cur_rt.x + (cur_rt.w + 40) / 2;
-    display.Blit(r_flag, dst_pt);
+    r_flag.Blit(dst_pt);
 
     // attack
     message = _("Attack");

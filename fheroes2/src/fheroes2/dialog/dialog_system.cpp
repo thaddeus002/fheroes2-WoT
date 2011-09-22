@@ -65,7 +65,7 @@ u8 Dialog::SystemOptions(void)
     Rect rb((display.w() - box.w()) / 2, (display.h() - box.h()) / 2, box.w(), box.h());
     Background back(rb);
     back.Save();
-    display.Blit(box, rb.x, rb.y);
+    box.Blit(rb.x, rb.y);
 
     const Rect rect1(rb.x + 36,  rb.y + 47,  64, 64);
     const Rect rect2(rb.x + 128, rb.y + 47,  64, 64);
@@ -78,7 +78,7 @@ u8 Dialog::SystemOptions(void)
     //const Rect rect9(rb.x + 220, rb.y + 267, 64, 64);
 
     Surface back2(rb.w, rb.h);
-    back2.Blit(display, rb, 0, 0);
+    display.Blit(rb, 0, 0, back2);
 
     DrawSystemInfo(rb);
 
@@ -92,6 +92,7 @@ u8 Dialog::SystemOptions(void)
     display.Flip();
 
     u8 result = 0;
+    bool redraw = false;
 
     // dialog menu loop
     while(le.HandleEvents())
@@ -105,11 +106,7 @@ u8 Dialog::SystemOptions(void)
         if(conf.Sound() && le.MouseClickLeft(rect1))
         {
     	    conf.SetSoundVolume(10 > conf.SoundVolume() ? conf.SoundVolume() + 1 : 0);
-    	    cursor.Hide();
-    	    display.Blit(back2, rb);
-	    DrawSystemInfo(rb);
-    	    cursor.Show();
-    	    display.Flip();
+	    redraw = true;
     	    Game::EnvironmentSoundMixer();
     	}
 
@@ -117,11 +114,7 @@ u8 Dialog::SystemOptions(void)
         if(conf.Music() && le.MouseClickLeft(rect2))
         {
     	    conf.SetMusicVolume(10 > conf.MusicVolume() ? conf.MusicVolume() + 1 : 0);
-    	    cursor.Hide();
-    	    display.Blit(back2, rb);
-	    DrawSystemInfo(rb);
-    	    cursor.Show();
-    	    display.Flip();
+	    redraw = true;
     	    Music::Volume(Mixer::MaxVolume() * conf.MusicVolume() / 10);
     	}
 
@@ -130,11 +123,7 @@ u8 Dialog::SystemOptions(void)
         {
     	    conf.SetHeroesMoveSpeed(10 > conf.HeroesMoveSpeed() ? conf.HeroesMoveSpeed() + 1 : 0);
     	    result |= 0x01;
-    	    cursor.Hide();
-    	    display.Blit(back2, rb);
-	    DrawSystemInfo(rb);
-    	    cursor.Show();
-    	    display.Flip();
+	    redraw = true;
 	    Game::UpdateHeroesMoveSpeed();
     	}
 
@@ -143,11 +132,7 @@ u8 Dialog::SystemOptions(void)
         {
     	    conf.SetAIMoveSpeed(10 > conf.AIMoveSpeed() ? conf.AIMoveSpeed() + 1 : 0);
     	    result |= 0x01;
-    	    cursor.Hide();
-    	    display.Blit(back2, rb);
-	    DrawSystemInfo(rb);
-    	    cursor.Show();
-    	    display.Flip();
+	    redraw = true;
 	    Game::UpdateHeroesMoveSpeed();
     	}
 
@@ -156,11 +141,7 @@ u8 Dialog::SystemOptions(void)
         {
     	    conf.SetScrollSpeed(SCROLL_FAST2 > conf.ScrollSpeed() ? conf.ScrollSpeed() << 1 : SCROLL_SLOW);
     	    result |= 0x10;
-    	    cursor.Hide();
-    	    display.Blit(back2, rb);
-	    DrawSystemInfo(rb);
-    	    cursor.Show();
-    	    display.Flip();
+	    redraw = true;
     	}
 
         // set interface
@@ -168,12 +149,18 @@ u8 Dialog::SystemOptions(void)
         {
     	    conf.SetEvilInterface(!conf.EvilInterface());
     	    result |= 0x08;
+	    redraw = true;
+    	}
+
+	if(redraw)
+	{
     	    cursor.Hide();
-    	    display.Blit(back2, rb);
+    	    back2.Blit(rb, display);
 	    DrawSystemInfo(rb);
     	    cursor.Show();
     	    display.Flip();
-    	}
+	    redraw = false;
+	}
     }
 
     // restore background
@@ -200,7 +187,7 @@ void Dialog::DrawSystemInfo(const Point & dst)
     // sound
     const Sprite & sprite1 = AGG::GetICN(ICN::SPANEL, conf.Sound() ? 1 : 0);
     const Rect rect1(dst.x + 36, dst.y + 47, sprite1.w(), sprite1.h());
-    display.Blit(sprite1, rect1);
+    sprite1.Blit(rect1);
     str.clear();
     str = _("sound");
     str += " ";
@@ -214,7 +201,7 @@ void Dialog::DrawSystemInfo(const Point & dst)
     // music
     const Sprite & sprite2 = AGG::GetICN(ICN::SPANEL, conf.Music() ? 3 : 2);
     const Rect rect2(dst.x + 128, dst.y + 47, sprite2.w(), sprite2.h());
-    display.Blit(sprite2, rect2);
+    sprite2.Blit(rect2);
     str.clear();
     str = _("music");
     str += " ";
@@ -228,7 +215,7 @@ void Dialog::DrawSystemInfo(const Point & dst)
     // unused
     const Sprite & sprite3 = AGG::GetICN(ICN::SPANEL, 17);
     const Rect rect3(dst.x + 220, dst.y + 47, sprite3.w(), sprite3.h());
-    display.Blit(black, rect3);
+    black.Blit(rect3, display);
     str.clear();
     str = "unused";
     text.Set(str);
@@ -238,7 +225,7 @@ void Dialog::DrawSystemInfo(const Point & dst)
     const u8 is4 = conf.HeroesMoveSpeed() ? (conf.HeroesMoveSpeed() < 9 ? (conf.HeroesMoveSpeed() < 7 ? (conf.HeroesMoveSpeed() < 4 ? 4 : 5) : 6) : 7) : 9;
     const Sprite & sprite4 = AGG::GetICN(ICN::SPANEL, is4);
     const Rect rect4(dst.x + 36, dst.y + 157, sprite4.w(), sprite4.h());
-    display.Blit(sprite4, rect4);
+    sprite4.Blit(rect4);
     str.clear();
     str = _("hero speed");
     str += " ";
@@ -253,7 +240,7 @@ void Dialog::DrawSystemInfo(const Point & dst)
     const u8 is5 = conf.AIMoveSpeed() ? (conf.AIMoveSpeed() < 9 ? (conf.AIMoveSpeed() < 7 ? (conf.AIMoveSpeed() < 4 ? 4 : 5) : 6) : 7) : 9;
     const Sprite & sprite5 = AGG::GetICN(ICN::SPANEL, is5);
     const Rect rect5(dst.x + 128, dst.y + 157, sprite5.w(), sprite5.h());
-    display.Blit(sprite5, rect5);
+    sprite5.Blit(rect5);
     str.clear();
     str = _("ai speed");
     str += " ";
@@ -268,7 +255,7 @@ void Dialog::DrawSystemInfo(const Point & dst)
     const u8 is6 = (conf.ScrollSpeed() < SCROLL_FAST2 ? (conf.ScrollSpeed() < SCROLL_FAST1 ? (conf.ScrollSpeed() < SCROLL_NORMAL ? 4 : 5) : 6) : 7);
     const Sprite & sprite6 = AGG::GetICN(ICN::SPANEL, is6);
     const Rect rect6(dst.x + 220, dst.y + 157, sprite6.w(), sprite6.h());
-    display.Blit(sprite6, rect6);
+    sprite6.Blit(rect6);
     str.clear();
     str = _("scroll speed");
     str += " ";
@@ -279,7 +266,7 @@ void Dialog::DrawSystemInfo(const Point & dst)
     // interface
     const Sprite & sprite7 = AGG::GetICN(ICN::SPANEL, (conf.EvilInterface() ? 17 : 16));
     const Rect rect7(dst.x + 36, dst.y + 267, sprite7.w(), sprite7.h());
-    display.Blit(sprite7, rect7);
+    sprite7.Blit(rect7);
     str.clear();
     str = _("Interface");
     str += ": ";
@@ -293,7 +280,7 @@ void Dialog::DrawSystemInfo(const Point & dst)
     // unused
     const Sprite & sprite8 = AGG::GetICN(ICN::SPANEL, 17);
     const Rect rect8(dst.x + 128, dst.y + 267, sprite8.w(), sprite8.h());
-    display.Blit(black, rect8);
+    black.Blit(rect8, display);
     str.clear();
     str = "unused";
     text.Set(str);
@@ -302,7 +289,7 @@ void Dialog::DrawSystemInfo(const Point & dst)
     // unused
     const Sprite & sprite9 = AGG::GetICN(ICN::SPANEL, 17);
     const Rect rect9(dst.x + 220, dst.y + 267, sprite9.w(), sprite9.h());
-    display.Blit(black, rect9);
+    black.Blit(rect9, display);
     str.clear();
     str = "unused";
     text.Set(str);

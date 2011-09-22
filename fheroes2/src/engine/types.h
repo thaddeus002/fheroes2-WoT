@@ -37,6 +37,8 @@ typedef SDL_Color RGBColor;
 #define MAXU16   0xFFFF
 #define MAXU32   0xFFFFFFFF
 
+#define ARRAY_COUNT(A)       sizeof(A) / sizeof(A[0])
+
 #if defined __SYMBIAN32__
 #define MKDIR(X)    mkdir(X, S_IRWXU)
 #define SEPARATOR       '\\'
@@ -50,42 +52,6 @@ typedef SDL_Color RGBColor;
 #endif
 
 #define DELAY(X)	SDL_Delay(X)
-
-#if SDL_BYTEORDER == SDL_BIG_ENDIAN
-
-#define RMASK16			0x0000f000
-#define GMASK16			0x00000f00
-#define BMASK16			0x000000f0
-#define AMASK16			0x0000000f
-
-#define RMASK24			0x00fc0000
-#define GMASK24			0x0003f000
-#define BMASK24			0x00000fc0
-#define AMASK24			0x0000003f
-
-#define RMASK32			0xff000000
-#define GMASK32			0x00ff0000
-#define BMASK32			0x0000ff00
-#define AMASK32			0x000000ff
-
-#else
-
-#define RMASK16			0x0000000f
-#define GMASK16			0x000000f0
-#define BMASK16			0x00000f00
-#define AMASK16			0x0000f000
-
-#define RMASK24			0x0000003f
-#define GMASK24			0x00000fc0
-#define BMASK24			0x0003f000
-#define AMASK24			0x00fc0000
-
-#define RMASK32			0x000000ff
-#define GMASK32			0x0000ff00
-#define BMASK32			0x00ff0000
-#define AMASK32			0xff000000
-
-#endif
 
 #define Swap16(X)	X=SDL_Swap16(X)
 #define Swap32(X)	X=SDL_Swap32(X)

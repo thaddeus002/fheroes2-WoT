@@ -43,7 +43,6 @@
 
 void RedrawCastleIcon(const Castle & castle, s16 sx, s16 sy)
 {
-    Display & display = Display::Get();
     const bool evil = Settings::Get().EvilInterface();
     u8 index_sprite = 1;
 
@@ -58,11 +57,11 @@ void RedrawCastleIcon(const Castle & castle, s16 sx, s16 sy)
         default: DEBUG(DBG_ENGINE, DBG_WARN, "unknown race");
     }
 
-    display.Blit(AGG::GetICN(evil ? ICN::LOCATORE : ICN::LOCATORS, index_sprite), sx, sy);
+    AGG::GetICN(evil ? ICN::LOCATORE : ICN::LOCATORS, index_sprite).Blit(sx, sy);
 
     // castle build marker
     if(! castle.AllowBuild())
-        display.Blit(AGG::GetICN(evil ? ICN::LOCATORE : ICN::LOCATORS, 24), sx + 39, sy + 1);
+        AGG::GetICN(evil ? ICN::LOCATORE : ICN::LOCATORS, 24).Blit(sx + 39, sy + 1);
 }
 
 void RedrawHeroesIcon(const Heroes & hero, s16 sx, s16 sy)
@@ -79,37 +78,36 @@ void RedrawHeroesIcon(const Heroes & hero, s16 sx, s16 sy)
 
     // mobility
     display.FillRect(blue, Rect(sx, sy, barw, ICONS_HEIGHT));
-    display.Blit(mobility, sx, sy + mobility.y());
+    mobility.Blit(sx, sy + mobility.y());
 
     // portrait
-    display.Blit(port, sx + barw + 1, sy);
+    port.Blit(sx + barw + 1, sy, display);
 
     // mana
     display.FillRect(blue, Rect(sx + barw + port.w() + 2, sy, barw, ICONS_HEIGHT));
-    display.Blit(mana, sx + barw + port.w() + 2, sy + mana.y());
+    mana.Blit(sx + barw + port.w() + 2, sy + mana.y());
 
     u8 oy = 0;
 
     // heroes marker
     if(hero.Modes(Heroes::SHIPMASTER))
     {
-        display.Blit(AGG::GetICN(ICN::BOAT12, 0), sx + 35, sy - 1);
+        AGG::GetICN(ICN::BOAT12, 0).Blit(sx + 35, sy - 1);
 	oy = AGG::GetICN(ICN::BOAT12, 0).h();
     }
     else
     if(hero.Modes(Heroes::GUARDIAN))
     {
-        display.Blit(AGG::GetICN(ICN::MISC6, 11), sx + 38, sy);
+        AGG::GetICN(ICN::MISC6, 11).Blit(sx + 38, sy);
 	oy = AGG::GetICN(ICN::MISC6, 11).h();
     }
 
     if(hero.Modes(Heroes::SLEEPER))
-        display.Blit(AGG::GetICN(ICN::MISC4, 14), sx + 36, sy - 2 + oy);
+        AGG::GetICN(ICN::MISC4, 14).Blit(sx + 36, sy - 2 + oy);
 }
 
 void Interface::IconsBar::RedrawBackground(const Point & pos)
 {
-    Display & display = Display::Get();
     const Sprite & icnadv = AGG::GetICN(Settings::Get().EvilInterface() ? ICN::ADVBORDE : ICN::ADVBORD, 0);
     const Sprite & back = AGG::GetICN(Settings::Get().EvilInterface() ? ICN::LOCATORE : ICN::LOCATORS, 1);
     Rect srcrt;
@@ -122,7 +120,7 @@ void Interface::IconsBar::RedrawBackground(const Point & pos)
 
     dstpt.x = pos.x;
     dstpt.y = pos.y;
-    display.Blit(icnadv, srcrt, dstpt);
+    icnadv.Blit(srcrt, dstpt);
 
     srcrt.y = srcrt.y + srcrt.h;
     dstpt.y = dstpt.y + srcrt.h;
@@ -131,16 +129,16 @@ void Interface::IconsBar::RedrawBackground(const Point & pos)
     if(2 < icons)
 	for(u8 ii = 0; ii < icons - 2; ++ii)
 	{
-	    display.Blit(icnadv, srcrt, dstpt);
+	    icnadv.Blit(srcrt, dstpt);
 	    dstpt.y += srcrt.h;
 	}
 
     srcrt.y = srcrt.y + 64;
     srcrt.h = 32;
-    display.Blit(icnadv, srcrt, dstpt);
+    icnadv.Blit(srcrt, dstpt);
 
     for(u8 ii = 0; ii < icons; ++ii)
-	display.Blit(back, pos.x + 5, pos.y + 5 + ii * (ICONS_HEIGHT + 10));
+	back.Blit(pos.x + 5, pos.y + 5 + ii * (ICONS_HEIGHT + 10));
 }
 
 /* Interface::CastleIcons */
@@ -151,7 +149,7 @@ void Interface::CastleIcons::RedrawItem(const CASTLE & item, s16 ox, s16 oy, boo
 	RedrawCastleIcon(*item, ox, oy);
 
 	if(current)
-	    Display::Get().Blit(marker, ox - 5, oy - 5);
+	    marker.Blit(ox - 5, oy - 5, Display::Get());
     }
 }
 
@@ -239,7 +237,7 @@ void Interface::HeroesIcons::RedrawItem(const HEROES & item, s16 ox, s16 oy, boo
 	RedrawHeroesIcon(*item, ox, oy);
 
 	if(current)
-	    Display::Get().Blit(marker, ox - 5, oy - 5);
+	    marker.Blit(ox - 5, oy - 5, Display::Get());
     }
 }
 
@@ -326,8 +324,7 @@ void Interface::HeroesIcons::SetPos(s16 px, s16 py)
 Interface::IconsPanel::IconsPanel() : Rect(0, 0, 144, 128), icons(4),
     castleIcons(icons, sfMarker), heroesIcons(icons, sfMarker)
 {
-    sfMarker.Set(ICONS_CURSOR_WIDTH, ICONS_CURSOR_HEIGHT);
-    sfMarker.SetColorKey();
+    sfMarker.Set(ICONS_CURSOR_WIDTH, ICONS_CURSOR_HEIGHT, false);
     Cursor::DrawCursor(sfMarker, ICONS_CURSOR_COLOR, true);
 }
 

@@ -193,11 +193,10 @@ std::string Settings::GetVersion(void)
 
     os << static_cast<int>(MAJOR_VERSION) << "." << static_cast<int>(MINOR_VERSION) << "."
 #ifdef SVN_REVISION
-    SVN_REVISION <<
+    SVN_REVISION;
 #else
-    "0000" <<
+    "0000";
 #endif
-    "." << CURRENT_FORMAT_VERSION;
 
     return os.str();
 }
@@ -1294,7 +1293,7 @@ bool Settings::ExtRememberLastFilename(void) const
 
 bool Settings::ExtUseFade(void) const
 {
-    return ExtModes(GAME_USE_FADE);
+    return video_mode.w == 640 && video_mode.h == 480 && ExtModes(GAME_USE_FADE);
 }
 
 bool Settings::ExtShowSDL(void) const

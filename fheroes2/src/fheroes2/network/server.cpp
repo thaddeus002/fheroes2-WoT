@@ -67,7 +67,7 @@ FH2Server::FH2Server()
     if(! cache.ReadDataDir())
     {
 	DEBUG(DBG_NETWORK|DBG_GAME, DBG_WARN, "data files not found");
-	Error::Except("create server");
+	Error::Except(__FUNCTION__, "create server");
     }
 
     if(!PrepareMapsFileInfoList(finfoList, true))
@@ -275,7 +275,7 @@ bool FH2Server::BattleRecvTurn(u8 color, const Battle2::Stats & b, const Battle2
     if(!client)
     {
 	clients.Dump();
-	Error::Except("FH2Server::BattleRecvTurn");
+	Error::Except(__FUNCTION__, "client is NULL");
 	return false;
     }
 

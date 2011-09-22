@@ -414,7 +414,7 @@ void RedrawResourceSprite(const Surface & sf, const Point & pos,
     dst_pt.x = pos.x + width / 2 + count * width;
     dst_pt.y = pos.y + offset;
 
-    display.Blit(sf, dst_pt.x - sf.w() / 2, dst_pt.y - sf.h());
+    sf.Blit(dst_pt.x - sf.w() / 2, dst_pt.y - sf.h(), display);
 
     String::AddInt(str, value);
     text.Set(str, Font::SMALL);

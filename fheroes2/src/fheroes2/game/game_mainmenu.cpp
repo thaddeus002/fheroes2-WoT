@@ -60,7 +60,7 @@ Game::menu_t Game::MainMenu(void)
     // image background
     const Sprite &sprite = AGG::GetICN(ICN::HEROES, 0);
     const Point top((display.w() - sprite.w()) / 2, (display.h() - sprite.h()) / 2);
-    display.Blit(sprite, top);
+    sprite.Blit(top);
 
     LocalEvent & le = LocalEvent::Get();
 
@@ -79,10 +79,10 @@ Game::menu_t Game::MainMenu(void)
     const Point lt_pt(0, 0);
 
     const Sprite & lantern10 = AGG::GetICN(ICN::SHNGANIM, 0);
-    display.Blit(lantern10, top.x + lantern10.x(), top.y + lantern10.y());
+    lantern10.Blit(top.x + lantern10.x(), top.y + lantern10.y());
 
     const Sprite & lantern11 = AGG::GetICN(ICN::SHNGANIM, ICN::AnimationFrame(ICN::SHNGANIM, 0));
-    display.Blit(lantern11, top.x + lantern11.x(), top.y + lantern11.y());
+    lantern11.Blit(top.x + lantern11.x(), top.y + lantern11.y());
 
     buttonNewGame.Draw();
     buttonLoadGame.Draw();
@@ -113,7 +113,7 @@ Game::menu_t Game::MainMenu(void)
     {
         cursor.Hide();
         const Sprite & sprite = AGG::GetICN(ICN::BTNSHNGL, buttons[i].frame);
-        display.Blit(sprite, top.x + sprite.x(), top.y + sprite.y());
+        sprite.Blit(top.x + sprite.x(), top.y + sprite.y());
         cursor.Show();
     }
     
@@ -140,7 +140,7 @@ Game::menu_t Game::MainMenu(void)
                 
                 cursor.Hide();
                 const Sprite & sprite = AGG::GetICN(ICN::BTNSHNGL, frame);
-                display.Blit(sprite, top.x + sprite.x(), top.y + sprite.y());
+                sprite.Blit(top.x + sprite.x(), top.y + sprite.y());
                 cursor.Show();
             }
         }
@@ -153,7 +153,7 @@ Game::menu_t Game::MainMenu(void)
 	else
 	if(HotKeyPress(EVENT_BUTTON_CREDITS) || le.MouseClickLeft(buttonCredits)) return CREDITS;
 	else
-	if(HotKeyPress(EVENT_DEFAULT_EXIT) || le.MouseClickLeft(buttonQuit)) return QUITGAME;
+	if(HotKeyPress(EVENT_DEFAULT_EXIT) || le.MouseClickLeft(buttonQuit)){ display.Fade(); return QUITGAME; }
 
 	// right info
 	if(le.MousePressRight(buttonQuit)) Dialog::Message(_("Quit"), _("Quit Heroes of Might and Magic and return to the operating system."), Font::BIG);
@@ -170,7 +170,7 @@ Game::menu_t Game::MainMenu(void)
 	{
 	    cursor.Hide();
 	    const Sprite & lantern12 = AGG::GetICN(ICN::SHNGANIM, ICN::AnimationFrame(ICN::SHNGANIM, 0, lantern_frame++));
-	    display.Blit(lantern12, top.x + lantern12.x(), top.y + lantern12.y());
+	    lantern12.Blit(top.x + lantern12.x(), top.y + lantern12.y());
 	    cursor.Show();
 	    display.Flip();
 	}

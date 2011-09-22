@@ -89,7 +89,7 @@ void RedrawResourceInfo(const Surface & sres, const Point & pos, s32 value,
 
     dst_pt.x = pos.x + px1;
     dst_pt.y = pos.y + py1;
-    display.Blit(sres, dst_pt);
+    sres.Blit(dst_pt, display);
 
     String::AddInt(str, value);
     text.Set(str, Font::SMALL);
@@ -126,7 +126,7 @@ u16 Dialog::RecruitMonster(const Monster & monster, u16 available)
     Background back(pos);
     back.Save();
 
-    display.Blit(box, pos.x, pos.y);
+    box.Blit(pos.x, pos.y);
 
     Point dst_pt;
     std::string str;
@@ -136,7 +136,7 @@ u16 Dialog::RecruitMonster(const Monster & monster, u16 available)
     const Sprite & smear = AGG::GetICN(ICN::TOWNNAME, 0);
     dst_pt.x = pos.x + 144;
     dst_pt.y = pos.y + 55;
-    display.Blit(smear, Rect(8, 1, 120, 12), dst_pt);
+    smear.Blit(Rect(8, 1, 120, 12), dst_pt);
 
     str = _("Cost per troop:");
     text.Set(str, Font::SMALL);
@@ -156,7 +156,7 @@ u16 Dialog::RecruitMonster(const Monster & monster, u16 available)
     const Sprite & smon = AGG::GetICN(monster.ICNMonh(), 0);
     dst_pt.x = pos.x + 70 - smon.w() / 2;
     dst_pt.y = pos.y + 130 - smon.h();
-    display.Blit(smon, dst_pt);
+    smon.Blit(dst_pt);
 
     // info resource
     // gold
@@ -168,7 +168,7 @@ u16 Dialog::RecruitMonster(const Monster & monster, u16 available)
                         paymentMonster.sulfur ||
                         paymentMonster.gems ? 150 : 175);
     dst_pt.y = pos.y + 75;
-    display.Blit(sgold, dst_pt);
+    sgold.Blit(dst_pt);
 
     dst_pt.x = pos.x + (paymentMonster.ore ||
                         paymentMonster.wood ||
@@ -177,7 +177,7 @@ u16 Dialog::RecruitMonster(const Monster & monster, u16 available)
                         paymentMonster.sulfur ||
                         paymentMonster.gems ? 105 : 130);
     dst_pt.y = pos.y + 200;
-    display.Blit(sgold, dst_pt);
+    sgold.Blit(dst_pt);
 
     str.clear();
     String::AddInt(str, paymentMonster.gold);
@@ -199,7 +199,7 @@ u16 Dialog::RecruitMonster(const Monster & monster, u16 available)
 				225, 75, 240, 103);
 	dst_pt.x = pos.x + 180;
 	dst_pt.y = pos.y + 200;
-	display.Blit(sres, dst_pt);
+	sres.Blit(dst_pt);
     }
     else
     // mercury
@@ -210,7 +210,7 @@ u16 Dialog::RecruitMonster(const Monster & monster, u16 available)
 				225, 72, 240, 103);
 	dst_pt.x = pos.x + 180;
 	dst_pt.y = pos.y + 197;
-	display.Blit(sres, dst_pt);
+	sres.Blit(dst_pt);
     }
     else
     // wood
@@ -221,7 +221,7 @@ u16 Dialog::RecruitMonster(const Monster & monster, u16 available)
 				225, 72, 240, 103);
 	dst_pt.x = pos.x + 180;
 	dst_pt.y = pos.y + 197;
-	display.Blit(sres, dst_pt);
+	sres.Blit(dst_pt);
     }
     else
     // ore
@@ -232,7 +232,7 @@ u16 Dialog::RecruitMonster(const Monster & monster, u16 available)
 				225, 72, 240, 103);
 	dst_pt.x = pos.x + 180;
 	dst_pt.y = pos.y + 197;
-	display.Blit(sres, dst_pt);
+	sres.Blit(dst_pt);
     }
     else
     // sulfur
@@ -243,7 +243,7 @@ u16 Dialog::RecruitMonster(const Monster & monster, u16 available)
 				225, 75, 240, 103);
 	dst_pt.x = pos.x + 180;
 	dst_pt.y = pos.y + 200;
-	display.Blit(sres, dst_pt);
+	sres.Blit(dst_pt);
     }
     else
     // gems
@@ -254,7 +254,7 @@ u16 Dialog::RecruitMonster(const Monster & monster, u16 available)
 				225, 75, 240, 103);
 	dst_pt.x = pos.x + 180;
 	dst_pt.y = pos.y + 200;
-	display.Blit(sres, dst_pt);
+	sres.Blit(dst_pt);
     }
 
     // text number buy
@@ -378,7 +378,7 @@ void Dialog::DwellingInfo(const Monster & monster, u16 available)
     Background back(pos);
     back.Save();
 
-    display.Blit(box, pos.x, pos.y);
+    box.Blit(pos.x, pos.y);
     
     LocalEvent & le = LocalEvent::Get();
 
@@ -396,7 +396,7 @@ void Dialog::DwellingInfo(const Monster & monster, u16 available)
     const Sprite & smon = AGG::GetICN(monster.ICNMonh(), 0);
     dst_pt.x = pos.x + 70 - smon.w() / 2;
     dst_pt.y = pos.y + 120 - smon.h();
-    display.Blit(smon, dst_pt);
+    smon.Blit(dst_pt);
 
     // info resource
     // gold
@@ -408,7 +408,7 @@ void Dialog::DwellingInfo(const Monster & monster, u16 available)
                         paymentMonster.sulfur ||
                         paymentMonster.gems ? 150 : 175);
     dst_pt.y = pos.y + 75;
-    display.Blit(sgold, dst_pt);
+    sgold.Blit(dst_pt);
 
     str.clear();
     String::AddInt(str, paymentMonster.gold);

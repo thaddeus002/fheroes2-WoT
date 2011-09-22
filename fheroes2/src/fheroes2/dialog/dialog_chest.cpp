@@ -75,13 +75,13 @@ bool Dialog::SelectGoldOrExp(const std::string &header, const std::string &messa
     pos.y += sprite_expr.h();
     // sprite1
     pos.x = box.GetArea().x + box.GetArea().w / 2 - sprite_gold.w() - 30;
-    display.Blit(sprite_gold, pos.x, pos.y - sprite_gold.h());
+    sprite_gold.Blit(pos.x, pos.y - sprite_gold.h());
     // text
     text.Blit(pos.x + (sprite_gold.w() - text.w()) / 2, pos.y + 2);
 
     // sprite2
     pos.x = box.GetArea().x + box.GetArea().w / 2 + 30;
-    display.Blit(sprite_expr, pos.x, pos.y - sprite_expr.h());
+    sprite_expr.Blit(pos.x, pos.y - sprite_expr.h());
     // text
     str.clear();
     String::AddInt(str, expr);

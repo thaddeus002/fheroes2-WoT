@@ -108,16 +108,16 @@ void EditorInterface::Draw(void)
     src_rt.y = 0;
     src_rt.w = TILEWIDTH;
     src_rt.h = BORDERWIDTH;
-    display.Blit(spriteBottomBar, src_rt, dst_pt);
+    spriteBottomBar.Blit(src_rt, dst_pt);
     src_rt.x = TILEWIDTH;
     for(u16 ii = 0; ii < (areaPos.w / TILEWIDTH) - 3; ++ii)
     {
 	dst_pt.x += TILEWIDTH;
-	display.Blit(spriteBottomBar, src_rt, dst_pt);
+	spriteBottomBar.Blit(src_rt, dst_pt);
     }
     dst_pt.x += TILEWIDTH;
     src_rt.x = spriteBottomBar.w() - TILEWIDTH;
-    display.Blit(spriteBottomBar, src_rt, dst_pt);
+    spriteBottomBar.Blit(src_rt, dst_pt);
 
     // right scroll bar indicator
     const Sprite & spriteLeftBar(AGG::GetICN(ICN::ESCROLL, 1));
@@ -127,16 +127,16 @@ void EditorInterface::Draw(void)
     src_rt.y = 0;
     src_rt.w = BORDERWIDTH;
     src_rt.h = TILEWIDTH;
-    display.Blit(spriteLeftBar, src_rt, dst_pt);
+    spriteLeftBar.Blit(src_rt, dst_pt);
     src_rt.y = TILEWIDTH;
     for(u16 ii = 0; ii < (areaPos.h / TILEWIDTH) - 3; ++ii)
     {
 	dst_pt.y += TILEWIDTH;
-	display.Blit(spriteLeftBar, src_rt, dst_pt);
+	spriteLeftBar.Blit(src_rt, dst_pt);
     }
     dst_pt.y += TILEWIDTH;
     src_rt.y = spriteLeftBar.h() - TILEWIDTH;
-    display.Blit(spriteLeftBar,src_rt, dst_pt);
+    spriteLeftBar.Blit(src_rt, dst_pt);
 
     // draw EditorInterface
     const Sprite & spriteAdv = AGG::GetICN(ICN::ADVBORD, 0);
@@ -148,7 +148,7 @@ void EditorInterface::Draw(void)
     src_rt.h = BORDERWIDTH;
     dst_pt.x = 2 * BORDERWIDTH + areaPos.w;
     dst_pt.y = 0;
-    display.Blit(spriteAdv, src_rt, dst_pt);
+    spriteAdv.Blit(src_rt, dst_pt);
     // left bottom static border
     src_rt.x = spriteAdv.w() - BORDERWIDTH - RADARWIDTH;
     src_rt.y = spriteAdv.h() - BORDERWIDTH;
@@ -156,7 +156,7 @@ void EditorInterface::Draw(void)
     src_rt.h = BORDERWIDTH;
     dst_pt.x = 2 * BORDERWIDTH + areaPos.w;
     dst_pt.y = BORDERWIDTH + areaPos.h;
-    display.Blit(spriteAdv, src_rt, dst_pt);
+    spriteAdv.Blit(src_rt, dst_pt);
 
     // left static border
     src_rt.x = spriteAdv.w() - BORDERWIDTH;
@@ -165,7 +165,7 @@ void EditorInterface::Draw(void)
     src_rt.h = 250;
     dst_pt.x = display.w() - BORDERWIDTH;
     dst_pt.y = 0;
-    display.Blit(spriteAdv, src_rt, dst_pt);
+    spriteAdv.Blit(src_rt, dst_pt);
     //
     src_rt.y = 250;
     src_rt.h = TILEWIDTH;
@@ -175,14 +175,14 @@ void EditorInterface::Draw(void)
 
     for(u8 ii = 0; ii < var1; ++ii)
     {
-	display.Blit(spriteAdv, src_rt, dst_pt);
+	spriteAdv.Blit(src_rt, dst_pt);
 	dst_pt.y += TILEWIDTH;
     }
     //
     src_rt.y = spriteAdv.h() - 102;
     src_rt.h = 102;
     dst_pt.y = display.h() - 102;
-    display.Blit(spriteAdv, src_rt, dst_pt);
+    spriteAdv.Blit(src_rt, dst_pt);
 
 
     Point pt_rts, pt_tsc, pt_lbs, pt_lsc, pt_rsc, pt_rbs, pt_bsc, pt_sgr, pt_sob, pt_sin, pt_sri, pt_sro, pt_scl;
@@ -295,16 +295,16 @@ void EditorInterface::Draw(void)
 	src_rt.h = TILEWIDTH;
 	dst_pt.x = btnSpec.x;
 	dst_pt.y = btnSpec.y + btnSpec.h;
-	if(var1) display.Blit(spriteBac, src_rt, dst_pt);
+	if(var1) spriteBac.Blit(src_rt, dst_pt);
 	src_rt.y = TILEWIDTH;
 	dst_pt.y += TILEWIDTH;
 	for(u8 ii = 0; ii < var1; ++ii)
 	{
-	    display.Blit(spriteBac, src_rt, dst_pt);
+	    spriteBac.Blit(src_rt, dst_pt);
 	    dst_pt.y += TILEWIDTH;
 	}
 	src_rt.y = spriteBac.h() - TILEWIDTH;
-	if(var1) display.Blit(spriteBac, src_rt, dst_pt);
+	if(var1) spriteBac.Blit(src_rt, dst_pt);
     }
 /*
     const Point dstPanel(btnSelectRiver.x, btnSelectRiver.y + btnSelectRiver.h);
@@ -397,7 +397,7 @@ void EditorInterface::DrawTopNumberCell(void)
 	dst_pt.x = BORDERWIDTH + ii * TILEWIDTH;
 	dst_pt.y = 0;
 
-	Display::Get().Blit(AGG::GetICN(ICN::EDITBTNS, 34), dst_pt);
+	AGG::GetICN(ICN::EDITBTNS, 34).Blit(dst_pt);
 
 	std::string number;
 	String::AddInt(number, areaMaps.x + ii);
@@ -419,7 +419,7 @@ void EditorInterface::DrawLeftNumberCell(void)
 	dst_pt.x = 0;
 	dst_pt.y = BORDERWIDTH + ii * TILEWIDTH;
 
-	Display::Get().Blit(AGG::GetICN(ICN::EDITBTNS, 33), dst_pt);
+	AGG::GetICN(ICN::EDITBTNS, 33).Blit(dst_pt);
 
 	std::string number;
 	String::AddInt(number, areaMaps.y + ii);

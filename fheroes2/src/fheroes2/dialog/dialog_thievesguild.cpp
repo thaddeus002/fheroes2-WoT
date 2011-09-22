@@ -201,7 +201,6 @@ void GetBestHeroArmyInfo(std::vector<ValueColors> & v, const Colors & colors)
 
 void DrawFlags(const std::vector<ValueColors> & v, const Point & pos, const u16 width, const u8 count)
 {
-    Display & display = Display::Get();
     const u16 chunk = width / count;
     bool qvga = Settings::Get().QVGA();
 
@@ -219,7 +218,7 @@ void DrawFlags(const std::vector<ValueColors> & v, const Point & pos, const u16 
 		const Sprite & flag = qvga ?
 		    AGG::GetICN(ICN::MISC6, Color::GetIndex(*color) + 7) :
 		    AGG::GetICN(ICN::FLAG32, Color::GetIndex(*color) * 2 + 1);
-		display.Blit(flag, px, (qvga ? pos.y + 2 : pos.y));
+		flag.Blit(px, (qvga ? pos.y + 2 : pos.y));
 		px = px + sw;
 	    }
 	}
@@ -242,8 +241,8 @@ void DrawHeroIcons(const std::vector<ValueColors> & v, const Point & pos, const 
 	    {
 		const Sprite & window = AGG::GetICN(ICN::LOCATORS, 22);
 		const Surface & icons = world.GetHeroes(id)->GetPortrait30x22();
-		display.Blit(window, px - window.w() / 2, pos.y - 4);
-		display.Blit(icons, px - icons.w() / 2, pos.y);
+		window.Blit(px - window.w() / 2, pos.y - 4, display);
+		icons.Blit(px - icons.w() / 2, pos.y, display);
 	    }
 	}
     }
@@ -272,7 +271,7 @@ void Dialog::ThievesGuild(bool oracle)
     const Point cur_pt(frameborder.GetArea().x, frameborder.GetArea().y);
     Point dst_pt(cur_pt);
 
-    display.Blit(AGG::GetICN(ICN::STONEBAK, 0), dst_pt);
+    AGG::GetICN(ICN::STONEBAK, 0).Blit(dst_pt);
 
     const u8 count = oracle ? 0xFF : world.GetKingdom(Settings::Get().CurrentColor()).GetCountBuilding(BUILD_THIEVESGUILD);
 
@@ -307,7 +306,7 @@ void Dialog::ThievesGuild(bool oracle)
     // bar
     dst_pt.x = cur_pt.x;
     dst_pt.y = cur_pt.y + 461;
-    display.Blit(AGG::GetICN(ICN::WELLXTRA, 2), dst_pt);
+    AGG::GetICN(ICN::WELLXTRA, 2).Blit(dst_pt);
 
     // text bar
     text.Set(_("Thieves' Guild: Player RanKings"), Font::BIG);

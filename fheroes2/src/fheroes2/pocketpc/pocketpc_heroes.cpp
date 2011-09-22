@@ -52,11 +52,11 @@ Dialog::answer_t PocketPC::HeroesOpenDialog(Heroes & hero, bool readonly)
     const Rect & dst_rt = frameborder.GetArea();
     const Sprite & background = AGG::GetICN(ICN::STONEBAK, 0);
     const Sprite & backSprite = AGG::GetICN(ICN::SWAPWIN, 0);
-    display.Blit(background, Rect(0, 0, window_w, window_h), dst_rt);
+    background.Blit(Rect(0, 0, window_w, window_h), dst_rt);
 
     // portrait
-    display.Blit(AGG::GetICN(ICN::BRCREST, 6), dst_rt.x + 8, dst_rt.y);
-    display.Blit(hero.GetPortrait50x46(), dst_rt.x + 12, dst_rt.y + 4);
+    AGG::GetICN(ICN::BRCREST, 6).Blit(dst_rt.x + 8, dst_rt.y, display);
+    hero.GetPortrait50x46().Blit(dst_rt.x + 12, dst_rt.y + 4, display);
 
     // name
     std::string message = _("%{name} the %{race} ( Level %{level} )");
@@ -88,35 +88,35 @@ Dialog::answer_t PocketPC::HeroesOpenDialog(Heroes & hero, bool readonly)
 
     // prim skill
     const Rect ras(dst_rt.x + 74, dst_rt.y + 14, 34, 34);
-    display.Blit(backSprite, Rect(216, 51, ras.w, ras.h),  ras);
+    backSprite.Blit(Rect(216, 51, ras.w, ras.h),  ras);
     message.clear();
     String::AddInt(message, hero.GetAttack());
     text.Set(message);
     text.Blit(dst_rt.x + 74 + (34 - text.w()) / 2, dst_rt.y + 47);
 
     const Rect rds(dst_rt.x + 107, dst_rt.y + 14, 34, 34);
-    display.Blit(backSprite, Rect(216, 84, rds.w, rds.h),  rds);
+    backSprite.Blit(Rect(216, 84, rds.w, rds.h),  rds);
     message.clear();
     String::AddInt(message, hero.GetDefense());
     text.Set(message);
     text.Blit(dst_rt.x + 107 + (34 - text.w()) / 2, dst_rt.y + 47);
 
     const Rect rps(dst_rt.x + 140, dst_rt.y + 14, 34, 34);
-    display.Blit(backSprite, Rect(216, 117, rps.w, rps.h), rps);
+    backSprite.Blit(Rect(216, 117, rps.w, rps.h), rps);
     message.clear();
     String::AddInt(message, hero.GetPower());
     text.Set(message);
     text.Blit(dst_rt.x + 140 + (34 - text.w()) / 2, dst_rt.y + 47);
 
     const Rect rks(dst_rt.x + 173, dst_rt.y + 14, 34, 34);
-    display.Blit(backSprite, Rect(216, 150, rks.w, rks.h), rks);
+    backSprite.Blit(Rect(216, 150, rks.w, rks.h), rks);
     message.clear();
     String::AddInt(message, hero.GetKnowledge());
     text.Set(message);
     text.Blit(dst_rt.x + 173 + (34 - text.w()) / 2, dst_rt.y + 47);
 
     // sec skill
-    display.Blit(backSprite, Rect(21, 198, 267, 36), dst_rt.x + 7, dst_rt.y + 57);
+    backSprite.Blit(Rect(21, 198, 267, 36), dst_rt.x + 7, dst_rt.y + 57);
     // secondary skill
     SecondarySkillBar secskill_bar;
     secskill_bar.SetPos(dst_rt.x + 9, dst_rt.y + 59);
@@ -128,7 +128,7 @@ Dialog::answer_t PocketPC::HeroesOpenDialog(Heroes & hero, bool readonly)
     // army bar
     const Rect rt1(36, 267, 43, 53);
     Surface sfb1(rt1.w, rt1.h);
-    sfb1.Blit(backSprite, rt1, 0, 0);
+    backSprite.Blit(rt1, 0, 0, sfb1);
     Surface sfc1(rt1.w, rt1.h - 10);
     Cursor::DrawCursor(sfc1, 0xd6, true);
 
@@ -148,7 +148,7 @@ Dialog::answer_t PocketPC::HeroesOpenDialog(Heroes & hero, bool readonly)
     // art bar
     const Rect rt2(23, 347, 34, 34);
     Surface sfb2(rt2.w, rt2.h);
-    sfb2.Blit(backSprite, rt2, 0, 0);
+    backSprite.Blit(rt2, 0, 0, sfb2);
     Surface sfc2(rt2.w, rt2.h);
     Cursor::DrawCursor(sfc2, 0xd6, true);
 

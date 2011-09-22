@@ -51,7 +51,7 @@ Dialog::answer_t Dialog::AdventureOptions(const bool enabledig)
     Background back(rb);
     back.Save();
 
-    display.Blit(box, rb.x, rb.y);
+    box.Blit(rb.x, rb.y);
 
     LocalEvent & le = LocalEvent::Get();
 

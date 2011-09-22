@@ -118,7 +118,7 @@ void World::LoadMaps(const std::string &filename)
     if(!fd.is_open())
     {
 	 DEBUG(DBG_GAME|DBG_ENGINE, DBG_WARN, "file not found " << filename.c_str());
-	 Error::Except("load maps");
+	 Error::Except(__FUNCTION__, "load maps");
     }
 
     AGG::PreloadObject(TIL::GROUND32);
@@ -424,7 +424,7 @@ void World::LoadMaps(const std::string &filename)
 	u8 h = 0;
 
 	// debug endof mp2
-	//if(endof_mp2 < fd.tellg()) Error::Except("World::World: ", "read maps: out of range.");
+	//if(endof_mp2 < fd.tellg()) Error::Except(__FUNCTION__, "read maps: out of range.");
 
 	fd.read(reinterpret_cast<char *>(&l), 1);
 	fd.read(reinterpret_cast<char *>(&h), 1);
@@ -445,7 +445,7 @@ void World::LoadMaps(const std::string &filename)
     for(u16 ii = 0; ii < countblock; ++ii)
     {
 	// debug
-	//if(endof_mp2 < fd.tellg()) Error::Except("World::World: ", "read maps: out of range.");
+	//if(endof_mp2 < fd.tellg()) Error::Except(__FUNCTION__, "read maps: out of range.");
 
 	// size block
 	u16 sizeblock;

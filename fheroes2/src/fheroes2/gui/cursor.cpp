@@ -253,13 +253,11 @@ void Cursor::DrawCursor(Surface &surface, const u8 indexcolor, bool solid)
 {
     if(! surface.isValid()) return;
 
-    surface.SetColorKey();
-
     u16 width  = surface.w();
     u16 height = surface.h();
 
     // draw cursor
-    u32 color = surface.GetColor(indexcolor);
+    u32 color = surface.GetColorIndex(indexcolor);
     surface.Lock();
     if(solid)
     {

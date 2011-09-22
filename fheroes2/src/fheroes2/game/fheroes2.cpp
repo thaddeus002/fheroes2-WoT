@@ -249,19 +249,8 @@ int main(int argc, char **argv)
 	    		default: break;
 		}
 	    }
-
-	    //Display::ShowCursor();
-	    if(Settings::Get().ExtUseFade()) Display::Fade();
-
 	}
 #ifndef ANDROID
-/*
-	catch(std::bad_alloc)
-	{
-    	    AGG::Cache::Get().Dump();
-	    DEBUG(DBG_GAME, DBG_WARN, "std::bad_alloc");
-	}
-*/
 	catch(Error::Exception)
 	{
     	    AGG::Cache::Get().Dump();
@@ -298,8 +287,6 @@ void LoadZLogo(void)
 		logo = small;
 	    }
 
-    	    logo->SetDisplayFormat();
-
 	    const u32 black = logo->MapRGB(0, 0, 0);
 	    const Point offset((display.w() - logo->w()) / 2, (display.h() - logo->h()) / 2);
 
@@ -307,8 +294,7 @@ void LoadZLogo(void)
 
 	    while(ii < 250)
 	    {
-		logo->SetAlpha(ii);
-		display.Blit(*logo, offset);
+		logo->Blit(ii, offset.x, offset.y, display);
 		display.Flip();
 		display.Fill(black);
 		ii += 10;
@@ -318,8 +304,7 @@ void LoadZLogo(void)
 
 	    while(ii > 0)
 	    {
-		logo->SetAlpha(ii);
-		display.Blit(*logo, offset);
+		logo->Blit(ii, offset.x, offset.y, display);
 		display.Flip();
 		display.Fill(black);
 		ii -= 10;
@@ -403,7 +388,7 @@ void ShowAGGError(void)
 	Display & display = Display::Get();
 	LocalEvent & le = LocalEvent::Get();
 
-	display.Blit(zerr, (display.w() - zerr.w()) / 2, (display.h() - zerr.h()) / 2);
+	zerr.Blit((display.w() - zerr.w()) / 2, (display.h() - zerr.h()) / 2, display);
 	display.Flip();
 
 	while(le.HandleEvents() && !le.KeyPress() && !le.MouseClickLeft());

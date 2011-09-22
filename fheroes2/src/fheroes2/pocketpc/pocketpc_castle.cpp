@@ -100,23 +100,21 @@ ScreenSwitch::ScreenSwitch(const Castle & cstl, const Rect & rt, bool ronly) :
 
 void ScreenSwitch::Redraw(void)
 {
-    Display & display = Display::Get();
-
-    display.Blit(AGG::GetICN(ICN::REQUESTS, 20), rtScreen1.x, rtScreen1.y);
+    AGG::GetICN(ICN::REQUESTS, 20).Blit(rtScreen1.x, rtScreen1.y);
 
     if(!readonly)
     {
 	if(castle.isBuild(BUILD_CASTLE))
 	{
-	    display.Blit(AGG::GetICN(ICN::REQUESTS, 21), rtScreen2.x, rtScreen2.y);
-	    display.Blit(AGG::GetICN(ICN::REQUESTS, 22), rtScreen3.x, rtScreen3.y);
-	    display.Blit(AGG::GetICN(ICN::REQUESTS, 23), rtScreen4.x, rtScreen4.y);
+	    AGG::GetICN(ICN::REQUESTS, 21).Blit(rtScreen2.x, rtScreen2.y);
+	    AGG::GetICN(ICN::REQUESTS, 22).Blit(rtScreen3.x, rtScreen3.y);
+	    AGG::GetICN(ICN::REQUESTS, 23).Blit(rtScreen4.x, rtScreen4.y);
 	}
 
 	if(castle.GetLevelMageGuild())
-	    display.Blit(AGG::GetICN(ICN::REQUESTS, 24), rtScreen5.x, rtScreen5.y);
+	    AGG::GetICN(ICN::REQUESTS, 24).Blit(rtScreen5.x, rtScreen5.y);
 
-	display.Blit(AGG::GetICN(ICN::REQUESTS, 25), rtScreen6.x, rtScreen6.y);
+	AGG::GetICN(ICN::REQUESTS, 25).Blit(rtScreen6.x, rtScreen6.y);
     }
 }
 
@@ -183,7 +181,7 @@ screen_t CastleOpenDialog1(Castle & castle, bool readonly)
     const Rect & dst_rt = frameborder.GetArea();
     const Sprite & backSprite = AGG::GetICN(ICN::SWAPWIN, 0);
     const Sprite & background = AGG::GetICN(ICN::STONEBAK, 0);
-    display.Blit(background, Rect(0, 0, window_w, window_h), dst_rt);
+    background.Blit(Rect(0, 0, window_w, window_h), dst_rt);
 
     RedrawBackground(dst_rt, castle);
 
@@ -208,7 +206,7 @@ screen_t CastleOpenDialog1(Castle & castle, bool readonly)
     // castle army bar
     const Rect rt1(36, 267, 43, 53);
     Surface sfb1(rt1.w, rt1.h);
-    sfb1.Blit(backSprite, rt1, 0, 0);
+    backSprite.Blit(rt1, 0, 0, sfb1);
     Surface sfc1(rt1.w, rt1.h - 10);
     Cursor::DrawCursor(sfc1, 0x10, true);
 
@@ -250,7 +248,7 @@ screen_t CastleOpenDialog1(Castle & castle, bool readonly)
     RedrawResourceBar(Point(dst_rt.x + 4, dst_rt.y + 181), world.GetKingdom(castle.GetColor()).GetFunds());
 
     const Rect rectExit(dst_rt.x + dst_rt.w - 26, dst_rt.y + 7, 25, 25);
-    display.Blit(AGG::GetICN(ICN::TOWNWIND, 12), rectExit.x, rectExit.y);
+    AGG::GetICN(ICN::TOWNWIND, 12).Blit(rectExit.x, rectExit.y);
 
     ScreenSwitch screenSwitch(castle, dst_rt, readonly);
     screenSwitch.Redraw();
@@ -451,10 +449,10 @@ screen_t CastleOpenDialog2(Castle & castle, bool readonly)
 
     const Rect & dst_rt = frameborder.GetArea();
     const Sprite & background = AGG::GetICN(ICN::STONEBAK, 0);
-    display.Blit(background, Rect(0, 0, window_w, window_h), dst_rt);
+    background.Blit(Rect(0, 0, window_w, window_h), dst_rt);
 
     const Rect rectExit(dst_rt.x + dst_rt.w - 26, dst_rt.y + 7, 25, 25);
-    display.Blit(AGG::GetICN(ICN::TOWNWIND, 12), rectExit.x, rectExit.y);
+    AGG::GetICN(ICN::TOWNWIND, 12).Blit(rectExit.x, rectExit.y);
 
     ScreenSwitch screenSwitch(castle, dst_rt, readonly);
     screenSwitch.Redraw();
@@ -527,10 +525,10 @@ screen_t CastleOpenDialog3(Castle & castle, bool readonly)
 
     const Rect & dst_rt = frameborder.GetArea();
     const Sprite & background = AGG::GetICN(ICN::STONEBAK, 0);
-    display.Blit(background, Rect(0, 0, window_w, window_h), dst_rt);
+    background.Blit(Rect(0, 0, window_w, window_h), dst_rt);
 
     const Rect rectExit(dst_rt.x + dst_rt.w - 26, dst_rt.y + 7, 25, 25);
-    display.Blit(AGG::GetICN(ICN::TOWNWIND, 12), rectExit.x, rectExit.y);
+    AGG::GetICN(ICN::TOWNWIND, 12).Blit(rectExit.x, rectExit.y);
 
     ScreenSwitch screenSwitch(castle, dst_rt, readonly);
     screenSwitch.Redraw();
@@ -619,10 +617,10 @@ screen_t CastleOpenDialog4(Castle & castle, bool readonly)
 
     const Rect & dst_rt = frameborder.GetArea();
     const Sprite & background = AGG::GetICN(ICN::STONEBAK, 0);
-    display.Blit(background, Rect(0, 0, window_w, window_h), dst_rt);
+    background.Blit(Rect(0, 0, window_w, window_h), dst_rt);
 
     const Rect rectExit(dst_rt.x + dst_rt.w - 26, dst_rt.y + 7, 25, 25);
-    display.Blit(AGG::GetICN(ICN::TOWNWIND, 12), rectExit.x, rectExit.y);
+    AGG::GetICN(ICN::TOWNWIND, 12).Blit(rectExit.x, rectExit.y);
 
     ScreenSwitch screenSwitch(castle, dst_rt, readonly);
     screenSwitch.Redraw();
@@ -695,7 +693,7 @@ screen_t CastleOpenDialog5(Castle & castle, bool readonly)
 
     const Rect & dst_rt = frameborder.GetArea();
     const Sprite & background = AGG::GetICN(ICN::STONEBAK, 0);
-    display.Blit(background, Rect(0, 0, window_w, window_h), dst_rt);
+    background.Blit(Rect(0, 0, window_w, window_h), dst_rt);
 
 
     RowSpells spells1(Point(dst_rt.x + 38, dst_rt.y + 220 - 44), castle, 1);
@@ -716,14 +714,14 @@ screen_t CastleOpenDialog5(Castle & castle, bool readonly)
     const Rect book_pos(dst_rt.x + 250, dst_rt.y + 5, 32, 32);
     if(need_buy_book)
     {
-	display.Blit(AGG::GetICN(ICN::ARTFX, 81), book_pos);
+	AGG::GetICN(ICN::ARTFX, 81).Blit(book_pos);
 	Text text(_("buy"), Font::SMALL);
 	text.Blit(book_pos.x + (book_pos.w - text.w()) / 2, book_pos.y + book_pos.h - 12);
     }
 
     // buttons
     const Rect rectExit(dst_rt.x + dst_rt.w - 26, dst_rt.y + 7, 25, 25);
-    display.Blit(AGG::GetICN(ICN::TOWNWIND, 12), rectExit.x, rectExit.y);
+    AGG::GetICN(ICN::TOWNWIND, 12).Blit(rectExit.x, rectExit.y);
 
     ScreenSwitch screenSwitch(castle, dst_rt, readonly);
     screenSwitch.Redraw();
@@ -769,7 +767,7 @@ screen_t CastleOpenDialog6(Castle & castle, bool readonly)
 
     const Rect & dst_rt = frameborder.GetArea();
     const Sprite & background = AGG::GetICN(ICN::STONEBAK, 0);
-    display.Blit(background, Rect(0, 0, window_w, window_h), dst_rt);
+    background.Blit(Rect(0, 0, window_w, window_h), dst_rt);
 
     // tavern
     Point dst_pt;
@@ -787,10 +785,10 @@ screen_t CastleOpenDialog6(Castle & castle, bool readonly)
 
 	const Sprite & s1 = AGG::GetICN(ICN::TAVWIN, 0);
 	dst_pt = Point(dst_rt.x + (dst_rt.w - s1.w()) / 2, dst_rt.y + 18);
-	display.Blit(s1, dst_pt);
+	s1.Blit(dst_pt);
 
 	const Sprite & s20 = AGG::GetICN(ICN::TAVWIN, 1);
-	display.Blit(s20, dst_pt.x + 3, dst_pt.y + 3);
+	s20.Blit(dst_pt.x + 3, dst_pt.y + 3);
     }
 
     Rect rectRecruit1, rectRecruit2, rectCaptain;
@@ -808,16 +806,16 @@ screen_t CastleOpenDialog6(Castle & castle, bool readonly)
 	hero1 = world.GetKingdom(castle.GetColor()).GetRecruits().GetHero1();
 	hero2 = world.GetKingdom(castle.GetColor()).GetRecruits().GetHero2();
 
-	display.Blit(crest, rectRecruit1);
-	if(hero1) display.Blit(hero1->GetPortrait50x46(), rectRecruit1.x + 4, rectRecruit1.y + 4);
+	crest.Blit(rectRecruit1);
+	if(hero1) hero1->GetPortrait50x46().Blit(rectRecruit1.x + 4, rectRecruit1.y + 4, display);
 
-	display.Blit(crest, rectRecruit2);
-        if(hero2) display.Blit(hero2->GetPortrait50x46(), rectRecruit2.x + 4, rectRecruit2.y + 4);
+	crest.Blit(rectRecruit2);
+        if(hero2) hero2->GetPortrait50x46().Blit(rectRecruit2.x + 4, rectRecruit2.y + 4, display);
 
 	// captain
-	display.Blit(crest, rectCaptain);
+	crest.Blit(rectCaptain);
 	const Surface & captain = Portrait::Captain(castle.GetRace(), Portrait::BIG);
-        display.Blit(captain, Rect((captain.w() - 50) / 2, 15, 50, 47), rectCaptain.x + 4, rectCaptain.y + 4);
+        captain.Blit(Rect((captain.w() - 50) / 2, 15, 50, 47), rectCaptain.x + 4, rectCaptain.y + 4, display);
     }
 
     // shipyard, shieves guild, marketplace
@@ -826,27 +824,27 @@ screen_t CastleOpenDialog6(Castle & castle, bool readonly)
     if(castle.isBuild(BUILD_MARKETPLACE))
     {
 	Text txt(castle.GetStringBuilding(BUILD_MARKETPLACE), Font::SMALL);
-	display.Blit(spriteX, rt1);
+	spriteX.Blit(rt1);
 	txt.Blit(rt1.x + (rt1.w - txt.w()) / 2, rt1.y + 1);
     }
     const Rect rt2(dst_rt.x + 180, dst_rt.y + 195, spriteX.w(), spriteX.h());
     if(castle.isBuild(BUILD_THIEVESGUILD))
     {
 	Text txt(castle.GetStringBuilding(BUILD_THIEVESGUILD), Font::SMALL);
-	display.Blit(spriteX, rt2);
+	spriteX.Blit(rt2);
 	txt.Blit(rt2.x + (rt2.w - txt.w()) / 2, rt2.y + 1);
     }
     const Rect rt3(dst_rt.x + 180, dst_rt.y + 210, spriteX.w(), spriteX.h());
     if(castle.isBuild(BUILD_SHIPYARD))
     {
 	Text txt(castle.GetStringBuilding(BUILD_SHIPYARD), Font::SMALL);
-	display.Blit(spriteX, rt3);
+	spriteX.Blit(rt3);
 	txt.Blit(rt3.x + (rt3.w - txt.w()) / 2, rt3.y + 1);
     }
 
     // buttons
     const Rect rectExit(dst_rt.x + dst_rt.w - 26, dst_rt.y + 7, 25, 25);
-    display.Blit(AGG::GetICN(ICN::TOWNWIND, 12), rectExit.x, rectExit.y);
+    AGG::GetICN(ICN::TOWNWIND, 12).Blit(rectExit.x, rectExit.y);
 
     ScreenSwitch screenSwitch(castle, dst_rt, readonly);
     screenSwitch.Redraw();
@@ -909,11 +907,11 @@ screen_t CastleOpenDialog6(Castle & castle, bool readonly)
         {
             cursor.Hide();
 	    const Sprite & s20 = AGG::GetICN(ICN::TAVWIN, 1);
-            display.Blit(s20, dst_pt.x + 3, dst_pt.y + 3);
+            s20.Blit(dst_pt.x + 3, dst_pt.y + 3);
             if(const u16 index = ICN::AnimationFrame(ICN::TAVWIN, 0, frame++))
             {
         	const Sprite & s22 = AGG::GetICN(ICN::TAVWIN, index);
-                display.Blit(s22, dst_pt.x + s22.x() + 3, dst_pt.y + s22.y() + 3);
+                s22.Blit(dst_pt.x + s22.x() + 3, dst_pt.y + s22.y() + 3);
             }
     	    cursor.Show();
     	    display.Flip();
@@ -926,8 +924,7 @@ screen_t CastleOpenDialog6(Castle & castle, bool readonly)
 
 void RedrawResourceBar(const Point & dst, const Funds & rs)
 {
-    Display & display = Display::Get();
-    display.Blit(AGG::GetICN(ICN::STONEBAK, 0), Rect(0, 0, 312, 13), dst.x, dst.y + 30);
+    AGG::GetICN(ICN::STONEBAK, 0).Blit(Rect(0, 0, 312, 13), dst.x, dst.y + 30);
 
     const Sprite & ore = AGG::GetICN(ICN::RESOURCE, 2);
     const Sprite & wood = AGG::GetICN(ICN::RESOURCE, 0);
@@ -940,43 +937,43 @@ void RedrawResourceBar(const Point & dst, const Funds & rs)
     Text text;
     std::string str;
 
-    display.Blit(ore, dst.x + 22 - ore.w() / 2, dst.y + 34 - ore.h());
+    ore.Blit(dst.x + 22 - ore.w() / 2, dst.y + 34 - ore.h());
     str.clear();
     String::AddInt(str, rs.ore);
     text.Set(str, Font::SMALL);
     text.Blit(dst.x + 22 - text.w() / 2, dst.y + 33);
 
-    display.Blit(wood, dst.x + 68 - wood.w() / 2, dst.y + 34 - wood.h());
+    wood.Blit(dst.x + 68 - wood.w() / 2, dst.y + 34 - wood.h());
     str.clear();
     String::AddInt(str, rs.wood);
     text.Set(str, Font::SMALL);
     text.Blit(dst.x + 68 - text.w() / 2, dst.y + 33);
 
-    display.Blit(mercury, dst.x + 114 - mercury.w() / 2, dst.y + 34 - mercury.h());
+    mercury.Blit(dst.x + 114 - mercury.w() / 2, dst.y + 34 - mercury.h());
     str.clear();
     String::AddInt(str, rs.mercury);
     text.Set(str, Font::SMALL);
     text.Blit(dst.x + 114 - text.w() / 2, dst.y + 33);
 
-    display.Blit(sulfur, dst.x + 160 - sulfur.w() / 2, dst.y + 34 - sulfur.h());
+    sulfur.Blit(dst.x + 160 - sulfur.w() / 2, dst.y + 34 - sulfur.h());
     str.clear();
     String::AddInt(str, rs.sulfur);
     text.Set(str, Font::SMALL);
     text.Blit(dst.x + 160 - text.w() / 2, dst.y + 33);
 
-    display.Blit(crystal, dst.x + 206 - crystal.w() / 2, dst.y + 34 - crystal.h());
+    crystal.Blit(dst.x + 206 - crystal.w() / 2, dst.y + 34 - crystal.h());
     str.clear();
     String::AddInt(str, rs.crystal);
     text.Set(str, Font::SMALL);
     text.Blit(dst.x + 206 - text.w() / 2, dst.y + 33);
 
-    display.Blit(gems, dst.x + 252 - gems.w() / 2, dst.y + 34 - gems.h());
+    gems.Blit(dst.x + 252 - gems.w() / 2, dst.y + 34 - gems.h());
     str.clear();
     String::AddInt(str, rs.gems);
     text.Set(str, Font::SMALL);
     text.Blit(dst.x + 252 - text.w() / 2, dst.y + 33);
 
-    display.Blit(gold, Rect(0, 0, 40, gold.h()), dst.x + 292 - 20, dst.y + 34 - gold.h());
+    gold.Blit(Rect(0, 0, 40, gold.h()), dst.x + 292 - 20, dst.y + 34 - gold.h());
     str.clear();
     String::AddInt(str, rs.gold);
     text.Set(str, Font::SMALL);
@@ -999,7 +996,7 @@ void RedrawBackground(const Rect & rt, const Castle & castle)
 	default: break;
     }
 
-    if(sprite) Display::Get().Blit(*sprite, src, rt.x, rt.y);
+    if(sprite) sprite->Blit(src, rt.x, rt.y);
 }
 
 const Rect & DwellingBar::GetArea(void) const
@@ -1035,7 +1032,6 @@ u32 DwellingBar::GetDwellingFromIndex(u8 ii)
 
 void DwellingBar::Redraw(void) const
 {
-    Display & display = Display::Get();
     const u8 w = 43;
     const u8 h = 43;
     std::string str;
@@ -1043,11 +1039,11 @@ void DwellingBar::Redraw(void) const
 
     for(u8 ii = 0; ii < dw.size(); ++ii)
     {
-    	display.Blit(AGG::GetICN(ICN::SWAPWIN, 0), Rect(36, 267, w, h), dw[ii].x, dw[ii].y);
+    	AGG::GetICN(ICN::SWAPWIN, 0).Blit(Rect(36, 267, w, h), dw[ii].x, dw[ii].y);
     	const u32 dwelling = castle.GetActualDwelling(GetDwellingFromIndex(ii));
 	const Monster m(castle.GetRace(), dwelling);
 	const Sprite & mons32 = AGG::GetICN(ICN::MONS32, m.GetSpriteIndex());
-    	display.Blit(mons32, dw[ii].x + (w - mons32.w()) / 2, dw[ii].y + (h - 3 - mons32.h()));
+    	mons32.Blit(dw[ii].x + (w - mons32.w()) / 2, dw[ii].y + (h - 3 - mons32.h()));
 
     	if(castle.isBuild(dwelling))
     	{
@@ -1068,7 +1064,7 @@ void DwellingBar::Redraw(void) const
     	}
     	else
     	{
-    	    display.Blit(AGG::GetICN(ICN::LOCATORS, 24), dw[ii].x + w - 8, dw[ii].y + 3);
+    	    AGG::GetICN(ICN::LOCATORS, 24).Blit(dw[ii].x + w - 8, dw[ii].y + 3);
     	}
     }
 }
@@ -1104,18 +1100,17 @@ bool DwellingBar::QueueEventProcessing(void)
 
 void RedrawTownSprite(const Rect & rt, const Castle & castle)
 {
-    Display & display = Display::Get();
     const Sprite & slock = AGG::GetICN(ICN::LOCATORS, 23);
-    display.Blit(slock, rt.x, rt.y);
+    slock.Blit(rt.x, rt.y);
     switch(castle.GetRace())
     {
-        case Race::KNGT: display.Blit(AGG::GetICN(ICN::LOCATORS, castle.isCastle() ?  9 : 15),  rt.x + 4, rt.y + 4); break;
-        case Race::BARB: display.Blit(AGG::GetICN(ICN::LOCATORS, castle.isCastle() ?  10 : 16), rt.x + 4, rt.y + 4); break;
-        case Race::SORC: display.Blit(AGG::GetICN(ICN::LOCATORS, castle.isCastle() ?  11 : 17), rt.x + 4, rt.y + 4); break;
-        case Race::WRLK: display.Blit(AGG::GetICN(ICN::LOCATORS, castle.isCastle() ?  12 : 18), rt.x + 4, rt.y + 4); break;
-        case Race::WZRD: display.Blit(AGG::GetICN(ICN::LOCATORS, castle.isCastle() ?  13 : 19), rt.x + 4, rt.y + 4); break;
-        case Race::NECR: display.Blit(AGG::GetICN(ICN::LOCATORS, castle.isCastle() ?  14 : 20), rt.x + 4, rt.y + 4); break;
+        case Race::KNGT: AGG::GetICN(ICN::LOCATORS, castle.isCastle() ?  9 : 15).Blit(rt.x + 4, rt.y + 4); break;
+        case Race::BARB: AGG::GetICN(ICN::LOCATORS, castle.isCastle() ?  10 : 16).Blit(rt.x + 4, rt.y + 4); break;
+        case Race::SORC: AGG::GetICN(ICN::LOCATORS, castle.isCastle() ?  11 : 17).Blit(rt.x + 4, rt.y + 4); break;
+        case Race::WRLK: AGG::GetICN(ICN::LOCATORS, castle.isCastle() ?  12 : 18).Blit(rt.x + 4, rt.y + 4); break;
+        case Race::WZRD: AGG::GetICN(ICN::LOCATORS, castle.isCastle() ?  13 : 19).Blit(rt.x + 4, rt.y + 4); break;
+        case Race::NECR: AGG::GetICN(ICN::LOCATORS, castle.isCastle() ?  14 : 20).Blit(rt.x + 4, rt.y + 4); break;
         default: break;
     }
-    if(! castle.AllowBuild()) display.Blit(AGG::GetICN(ICN::LOCATORS, 24), rt.x + 43, rt.y + 5);
+    if(! castle.AllowBuild()) AGG::GetICN(ICN::LOCATORS, 24).Blit(rt.x + 43, rt.y + 5);
 }

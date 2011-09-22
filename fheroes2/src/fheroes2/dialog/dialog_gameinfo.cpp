@@ -51,7 +51,7 @@ void Dialog::GameInfo(void)
     Background back(pt, dlg.w(), dlg.h());
 
     back.Save();
-    display.Blit(dlg, pt);
+    dlg.Blit(pt);
 
     TextBox text;
     std::string msg;

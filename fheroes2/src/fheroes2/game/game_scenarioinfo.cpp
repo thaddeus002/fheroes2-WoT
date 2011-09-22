@@ -114,7 +114,7 @@ Game::menu_t Game::ScenarioInfo(void)
 	buttonCancel = new Button(rectPanel.x + rectPanel.w / 2 + 60, rectPanel.y + rectPanel.h - 30, ICN::NGEXTRA, 68, 69);
 
 	const Sprite & background = AGG::GetICN(ICN::STONEBAK, 0);
-	display.Blit(background, Rect(0, 0, window_w, window_h), rectPanel);
+	background.Blit(Rect(0, 0, window_w, window_h), rectPanel);
 
 	Text text;
 	text.Set(conf.CurrentFileInfo().name, Font::BIG);
@@ -141,7 +141,7 @@ Game::menu_t Game::ScenarioInfo(void)
 	buttonOk = new Button(rectPanel.x + 31, rectPanel.y + 380, ICN::NGEXTRA, 66, 67);
 	buttonCancel = new Button(rectPanel.x + 287, rectPanel.y + 380, ICN::NGEXTRA, 68, 69);
 
-	display.Blit(back, top);
+	back.Blit(top);
     }
 
     const bool reset_starting_settings = conf.MapsFile().empty() || ! FilePresent(conf.MapsFile());
@@ -331,13 +331,12 @@ void UpdateCoordInfo(const Point & dst, std::vector<Rect> & rects)
 
 void RedrawScenarioStaticInfo(const Rect & rt)
 {
-    Display & display = Display::Get();
     Settings & conf = Settings::Get();
 
     if(conf.QVGA())
     {
 	const Sprite & background = AGG::GetICN(ICN::STONEBAK, 0);
-	display.Blit(background, Rect(0, 0, rt.w, rt.h), rt);
+	background.Blit(Rect(0, 0, rt.w, rt.h), rt);
 
 	Text text;
 	text.Set(conf.CurrentFileInfo().name, Font::BIG);
@@ -347,7 +346,7 @@ void RedrawScenarioStaticInfo(const Rect & rt)
     {
 	// image panel
 	const Sprite &panel = AGG::GetICN(ICN::NGHSBKG, 0);
-	display.Blit(panel, rt);
+	panel.Blit(rt);
 
 	// text scenario
 	Text text(_("Scenario:"), Font::BIG);
@@ -373,15 +372,13 @@ void RedrawScenarioStaticInfo(const Rect & rt)
 
 void RedrawDifficultyInfo(const Point & dst, bool label)
 {
-    Display & display = Display::Get();
-
     for(u8 current = Difficulty::EASY; current <= Difficulty::IMPOSSIBLE; ++current)
     {
     	const Sprite & sprite = AGG::GetICN(ICN::NGHSBKG, 0);
     	Rect src_rt(24, 94, 65, 65);
     	u16 offset = current * (src_rt.w + 12);
     	src_rt.x = src_rt.x + offset;
-	display.Blit(sprite, src_rt, dst.x + offset, dst.y);
+	sprite.Blit(src_rt, dst.x + offset, dst.y);
 
 	if(label)
 	{

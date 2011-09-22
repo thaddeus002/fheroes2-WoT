@@ -51,10 +51,10 @@ Game::menu_t Game::Editor::NewMaps(void)
 
     // image background
     const Sprite &back = AGG::GetICN(ICN::EDITOR, 0);
-    display.Blit(back);
+    back.Blit();
 
     const Sprite &panel = AGG::GetICN(ICN::REDBACK, 0);
-    display.Blit(panel, 405, 5);
+    panel.Blit(405, 5);
 
     LocalEvent & le = LocalEvent::Get();
 

@@ -73,8 +73,6 @@ void RowSpells::Redraw(void)
     const Sprite & roll_show = AGG::GetICN(ICN::TOWNWIND, 0);
     const Sprite & roll_hide = AGG::GetICN(ICN::TOWNWIND, 1);
 
-    Display & display = Display::Get();
-
     std::vector<Rect>::const_iterator it1 = coords.begin();
     std::vector<Rect>::const_iterator it2 = coords.end();
 
@@ -86,22 +84,22 @@ void RowSpells::Redraw(void)
 	// roll hide
 	if(dst.w < roll_show.w() || spell == Spell::NONE)
 	{
-	    display.Blit(roll_hide, dst);
+	    roll_hide.Blit(dst);
 	}
 	// roll show
 	else
 	{
-	    display.Blit(roll_show, dst);
+	    roll_show.Blit(dst);
 
 	    const Sprite & icon = AGG::GetICN(ICN::SPELLS, spell.IndexSprite());
 
 	    if(Settings::Get().QVGA())
 	    {
-		display.Blit(icon, dst.x + 2 + (dst.w - icon.w()) / 2, dst.y + 20 - icon.h() / 2);
+		icon.Blit(dst.x + 2 + (dst.w - icon.w()) / 2, dst.y + 20 - icon.h() / 2);
 	    }
 	    else
 	    {
-		display.Blit(icon, dst.x + 5 + (dst.w - icon.w()) / 2, dst.y + 40 - icon.h() / 2);
+		icon.Blit(dst.x + 5 + (dst.w - icon.w()) / 2, dst.y + 40 - icon.h() / 2);
 
 		TextBox text(spell.GetName(), Font::SMALL, 78);
 		text.Blit(dst.x + 18, dst.y + 62);
@@ -152,7 +150,7 @@ void Castle::OpenMageGuild(void)
     const Point cur_pt(frameborder.GetArea().x, frameborder.GetArea().y);
     Point dst_pt(cur_pt);
 
-    display.Blit(AGG::GetICN(ICN::STONEBAK, 0), dst_pt);
+    AGG::GetICN(ICN::STONEBAK, 0).Blit(dst_pt);
 
     std::string message;
     Text text;
@@ -160,7 +158,7 @@ void Castle::OpenMageGuild(void)
     // bar
     dst_pt.x = cur_pt.x;
     dst_pt.y = cur_pt.y + 461;
-    display.Blit(AGG::GetICN(ICN::WELLXTRA, 2), dst_pt);
+    AGG::GetICN(ICN::WELLXTRA, 2).Blit(dst_pt);
 
     // text bar
     text.Set(_("The above spells have been added to your book."), Font::BIG);
@@ -184,7 +182,7 @@ void Castle::OpenMageGuild(void)
     const Sprite & sprite = AGG::GetICN(icn, level - 1);
     dst_pt.x = cur_pt.x + 90 - sprite.w() / 2;
     dst_pt.y = cur_pt.y + 290 - sprite.h();
-    display.Blit(sprite, dst_pt);
+    sprite.Blit(dst_pt);
 
     RowSpells spells5(Point(cur_pt.x + 250, cur_pt.y +  5),  *this, 5);
     RowSpells spells4(Point(cur_pt.x + 250, cur_pt.y +  95), *this, 4);

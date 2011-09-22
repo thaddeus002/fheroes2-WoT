@@ -47,14 +47,13 @@ public:
 
 void SettingsListBox::RedrawItem(const u32 & item, s16 ox, s16 oy, bool current)
 {
-    Display & display = Display::Get();
     const Settings & conf = Settings::Get();
 
     const Sprite & cell = AGG::GetICN(ICN::CELLWIN, 1);
     const Sprite & mark = AGG::GetICN(ICN::CELLWIN, 2);
 
-    display.Blit(cell, ox, oy);
-    if(conf.ExtModes(item)) display.Blit(mark, ox + 3, oy + 2);
+    cell.Blit(ox, oy);
+    if(conf.ExtModes(item)) mark.Blit(ox + 3, oy + 2);
 
     TextBox msg(conf.ExtName(item), Font::SMALL, 250);
     msg.SetAlign(ALIGN_LEFT);
@@ -67,19 +66,18 @@ void SettingsListBox::RedrawItem(const u32 & item, s16 ox, s16 oy, bool current)
 
 void SettingsListBox::RedrawBackground(const Point & top)
 {
-    Display & display = Display::Get();
     const Settings & conf = Settings::Get();
 
     const u16 window_h = conf.QVGA() ? 224 : 400;
     const u16 ah = window_h - 54;
 
-    display.Blit(AGG::GetICN(ICN::STONEBAK, 0), Rect(15, 25, 280, ah), top.x + 15, top.y + 25);
+    AGG::GetICN(ICN::STONEBAK, 0).Blit(Rect(15, 25, 280, ah), top.x + 15, top.y + 25);
 
     for(u8 ii = 1; ii < (window_h / 25); ++ii)
-	display.Blit(AGG::GetICN(ICN::DROPLISL, 11), top.x + 295, top.y + 35 + (19 * ii));
+	AGG::GetICN(ICN::DROPLISL, 11).Blit(top.x + 295, top.y + 35 + (19 * ii));
 
-    display.Blit(AGG::GetICN(ICN::DROPLISL, 10), top.x + 295, top.y + 46);
-    display.Blit(AGG::GetICN(ICN::DROPLISL, 12), top.x + 295, top.y + ah - 14);
+    AGG::GetICN(ICN::DROPLISL, 10).Blit(top.x + 295, top.y + 46);
+    AGG::GetICN(ICN::DROPLISL, 12).Blit(top.x + 295, top.y + ah - 14);
 }
 
 void SettingsListBox::ActionListDoubleClick(u32 & item)
@@ -115,7 +113,7 @@ void Dialog::ExtSettings(bool readonly)
 
     const Rect & area = frameborder.GetArea();
     const Sprite & background = AGG::GetICN(ICN::STONEBAK, 0);
-    display.Blit(background, Rect(0, 0, window_w, window_h), area);
+    background.Blit(Rect(0, 0, window_w, window_h), area);
 
     Text text("FHeroes2 Settings", Font::YELLOW_BIG);
     text.Blit(area.x + (area.w - text.w()) / 2, area.y + 6);
@@ -143,7 +141,7 @@ void Dialog::ExtSettings(bool readonly)
     states.push_back(Settings::GAME_AUTOSAVE_ON);
     if(conf.ExtAutoSaveOn())
 	states.push_back(Settings::GAME_AUTOSAVE_BEGIN_DAY);
-    if(conf.VideoMode().w == 640 && conf.VideoMode().w == 480)
+    if(conf.VideoMode().w == 640 && conf.VideoMode().h == 480)
 	states.push_back(Settings::GAME_USE_FADE);
 #ifdef BUILD_RELEASE
     states.push_back(Settings::GAME_SHOW_SDL_LOGO);

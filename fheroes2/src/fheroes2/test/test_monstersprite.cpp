@@ -168,7 +168,7 @@ void TestMonsterSprite(void)
 	    pos.h = sprite.h();
 	    back.Restore();
 	    back.Save(pos);
-            display.Blit(sprite, pos);
+            sprite.Blit(pos);
 
 	    str.clear();
 	    String::AddInt(str, frame);

@@ -62,18 +62,16 @@ struct ControlInfo
 
 void ControlInfo::Redraw(void)
 {
-  Display & display = Display::Get();
-  
   const Sprite & cell = AGG::GetICN(ICN::CELLWIN, 1);
   const Sprite & mark = AGG::GetICN(ICN::CELLWIN, 2);
 
-  display.Blit(cell, rtLocal.x, rtLocal.y);
-  if(result & CONTROL_HUMAN) display.Blit(mark, rtLocal.x + 3, rtLocal.y + 2);
+  cell.Blit(rtLocal.x, rtLocal.y);
+  if(result & CONTROL_HUMAN) mark.Blit(rtLocal.x + 3, rtLocal.y + 2);
   Text text("Human", Font::SMALL);
   text.Blit(rtLocal.x + cell.w() + 5, rtLocal.y + 5);
   
-  display.Blit(cell, rtAI.x, rtAI.y);
-  if(result & CONTROL_AI) display.Blit(mark, rtAI.x + 3, rtAI.y + 2);
+  cell.Blit(rtAI.x, rtAI.y);
+  if(result & CONTROL_AI) mark.Blit(rtAI.x + 3, rtAI.y + 2);
   text.Set("AI");
   text.Blit(rtAI.x + cell.w() + 5, rtAI.y + 5);
 }
@@ -152,8 +150,8 @@ struct BattleOnly
 	{
 	    const Sprite &backSprite = AGG::GetICN(ICN::SWAPWIN, 0);
 
-	    sfb1.Blit(backSprite, rt1, 0, 0);
-	    sfb2.Blit(backSprite, rt2, 0, 0);
+	    backSprite.Blit(rt1, 0, 0, sfb1);
+	    backSprite.Blit(rt2, 0, 0, sfb2);
 
 	    Cursor::DrawCursor(sfc1, 0x10, true);
 	    Cursor::DrawCursor(sfc2, 0x10, true);
@@ -717,7 +715,7 @@ void BattleOnly::RedrawBaseInfo(const Point & top)
 {
     Display & display = Display::Get();
 
-    display.Blit(AGG::GetICN(ICN::SWAPWIN, 0), top);
+    AGG::GetICN(ICN::SWAPWIN, 0).Blit(top);
 
     // header
     std::string message = "%{name1} vs %{name2}";
@@ -747,10 +745,10 @@ void BattleOnly::RedrawBaseInfo(const Point & top)
     text.Blit(top.x + 320 - text.w() / 2, top.y + 26);
     
     // portrait
-    display.Blit(hero1->GetPortrait101x93(), rtPortrait1);
+    hero1->GetPortrait101x93().Blit(rtPortrait1, display);
 
     if(hero2)
-      display.Blit(hero2->GetPortrait101x93(), rtPortrait2);
+      hero2->GetPortrait101x93().Blit(rtPortrait2, display);
     else
     {
       display.FillRect(0, 0, 0, rtPortrait2);

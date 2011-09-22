@@ -35,7 +35,7 @@ Game::menu_t PocketPC::LoadGame(void)
 
     const Sprite &sprite = AGG::GetICN(ICN::HEROES, 0);
     Rect src_rt((sprite.w() - display.w()) / 2, 0, display.w(), display.h());
-    display.Blit(sprite, src_rt, 0, 0);
+    sprite.Blit(src_rt, 0, 0);
 
     cursor.Show();
     display.Flip();
@@ -57,12 +57,12 @@ Game::menu_t PocketPC::MainMenu(void)
 
     const Sprite &sprite = AGG::GetICN(ICN::HEROES, 0);
     Rect src_rt((sprite.w() - display.w()) / 2, 0, display.w(), display.h());
-    display.Blit(sprite, src_rt, 0, 0);
+    sprite.Blit(src_rt, 0, 0);
 
     const Sprite &board = AGG::GetICN(ICN::QWIKTOWN, 0);
     src_rt = Rect(13, 0, board.w() - 13, board.h() - 13);
     Point dst_pt((display.w() - src_rt.w) / 2, (display.h() - src_rt.h) / 2);
-    display.Blit(board, src_rt, dst_pt.x , dst_pt.y);
+    board.Blit(src_rt, dst_pt.x , dst_pt.y);
 
     Text text;
     
@@ -133,12 +133,12 @@ Game::menu_t PocketPC::NewGame(void)
 
     const Sprite &sprite = AGG::GetICN(ICN::HEROES, 0);
     Rect src_rt((sprite.w() - display.w()) / 2, 0, display.w(), display.h());
-    display.Blit(sprite, src_rt, 0, 0);
+    sprite.Blit(src_rt, 0, 0);
 
     const Sprite &board = AGG::GetICN(ICN::QWIKTOWN, 0);
     src_rt = Rect(13, 0, board.w() - 13, board.h() - 13);
     Point dst_pt((display.w() - src_rt.w) / 2, (display.h() - src_rt.h) / 2);
-    display.Blit(board, src_rt, dst_pt.x , dst_pt.y);
+    board.Blit(src_rt, dst_pt.x , dst_pt.y);
 
     Text text;
     
@@ -198,12 +198,12 @@ Game::menu_t PocketPC::NewMulti(void)
 
     const Sprite &sprite = AGG::GetICN(ICN::HEROES, 0);
     Rect src_rt((sprite.w() - display.w()) / 2, 0, display.w(), display.h());
-    display.Blit(sprite, src_rt, 0, 0);
+    sprite.Blit(src_rt, 0, 0);
 
     const Sprite &board = AGG::GetICN(ICN::QWIKTOWN, 0);
     src_rt = Rect(13, 0, board.w() - 13, board.h() - 13);
     Point dst_pt((display.w() - src_rt.w) / 2, (display.h() - src_rt.h) / 2);
-    display.Blit(board, src_rt, dst_pt.x , dst_pt.y);
+    board.Blit(src_rt, dst_pt.x , dst_pt.y);
 
     Text text;
     

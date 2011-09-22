@@ -132,7 +132,7 @@ void Interface::GameArea::BlitOnTile(Surface & dst, const Surface & src, const s
     {
 	Rect srcrt;
 	SrcRectFixed(srcrt, dstpt, src.w(), src.h());
-	dst.Blit(src, srcrt, dstpt);
+	src.Blit(srcrt, dstpt, dst);
     }
 }
 
@@ -216,11 +216,14 @@ void Interface::GameArea::Redraw(Surface & dst, u8 flag, const Rect & rt) const
 	}
     }
 
+#ifdef WITH_DEBUG
     if(IS_DEVEL())
     {
 	// redraw grid
 	if(flag & LEVEL_ALL)
 	{
+	    u32 col = dst.GetColorIndex(0x40);
+
 	    for(s16 oy = rt.y; oy < rt.y + rt.h; ++oy)
 		for(s16 ox = rt.x; ox < rt.x + rt.w; ++ox)
 	    {
@@ -229,13 +232,14 @@ void Interface::GameArea::Redraw(Surface & dst, u8 flag, const Rect & rt) const
 		if(areaPosition & dstpt)
     		{
 		    dst.Lock();
-    		    dst.SetPixel(dstpt.x, dstpt.y, dst.GetColor(0x40));
+    		    dst.SetPixel(dstpt.x, dstpt.y, col);
     		    dst.Unlock();
 		}
 	    }
 	}
     }
     else
+#endif
     // redraw fog
     if(flag & LEVEL_FOG)
     {
@@ -442,7 +446,7 @@ void Interface::GameArea::GenerateUltimateArtifactAreaSurface(const s32 index, S
 	const Sprite & marker = AGG::GetICN(ICN::ROUTE, 0);
 	const Point dst(areaPosition.x + pt.x * TILEWIDTH - gamearea.scrollOffset.x,
 			    areaPosition.y + pt.y * TILEWIDTH - gamearea.scrollOffset.y);
-	sf.Blit(marker, dst.x, dst.y + 8);
+	marker.Blit(dst.x, dst.y + 8, sf);
 
 	Settings::Get().EvilInterface() ? sf.GrayScale() : sf.Sepia();
 

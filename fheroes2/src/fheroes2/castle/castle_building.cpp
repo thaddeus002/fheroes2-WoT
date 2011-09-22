@@ -38,11 +38,10 @@ Rect CastleGetMaxArea(const Castle &, const Point &);
 
 void CastleDialog::RedrawBuildingSpriteToArea(const Sprite & sprite, s16 dst_x, s16 dst_y, const Rect & max)
 {
-    Display & display = Display::Get();
     Rect src;
 
     ToolsSrcRectFixed(src, dst_x, dst_y, sprite.w(), sprite.h(), max);
-    display.Blit(sprite, src, dst_x, dst_y);
+    sprite.Blit(src, dst_x, dst_y);
 }
 
 CastleDialog::CacheBuildings::CacheBuildings(const Castle & castle, const Point & top)
@@ -81,7 +80,7 @@ void CastleRedrawTownName(const Castle & castle, const Point & dst)
 {
     const Sprite & ramka = AGG::GetICN(ICN::TOWNNAME, 0);
     Point dst_pt(dst.x + 320 - ramka.w() / 2, dst.y + 248);
-    Display::Get().Blit(ramka, dst_pt);
+    ramka.Blit(dst_pt);
 
     Text text(castle.GetName(), Font::SMALL);
     dst_pt.x = dst.x + 320 - text.w() / 2;
@@ -114,12 +113,12 @@ void CastleRedrawCurrentBuilding(const Castle & castle, const Point & dst_pt,
     const Rect max = CastleGetMaxArea(castle, dst_pt);
 
     if(townbkg)
-	display.Blit(*townbkg, dst_pt.x, dst_pt.y);
+	townbkg->Blit(dst_pt.x, dst_pt.y);
 
     if(Race::BARB == castle.GetRace())
     {
 	const Sprite & sprite0 = AGG::GetICN(ICN::TWNBEXT1, 1 + frame % 5);
-	display.Blit(sprite0, dst_pt.x + sprite0.x(), dst_pt.y + sprite0.y());
+	sprite0.Blit(dst_pt.x + sprite0.x(), dst_pt.y + sprite0.y());
     }
 
     // sea anime
@@ -260,13 +259,11 @@ void CastleRedrawBuilding(const Castle & castle, const Point & dst_pt, u32 build
         default: break;
     }
 
-    Display & display = Display::Get();
-
     // simple first sprite
     const Sprite & sprite1 = AGG::GetICN(icn, index);
 
     if(alpha)
-	sprite1.BlitSpriteWithAlpha(display, alpha, dst_pt.x + sprite1.x(), dst_pt.y + sprite1.y());
+	sprite1.Blit(alpha, dst_pt.x + sprite1.x(), dst_pt.y + sprite1.y());
     else
 	CastleDialog::RedrawBuildingSpriteToArea(sprite1, dst_pt.x + sprite1.x(), dst_pt.y + sprite1.y(), max);
 
@@ -275,7 +272,7 @@ void CastleRedrawBuilding(const Castle & castle, const Point & dst_pt, u32 build
     {
 	const Sprite & sprite2 = AGG::GetICN(icn, index2);
 	if(alpha)
-	    sprite2.BlitSpriteWithAlpha(display, alpha, dst_pt.x + sprite2.x(), dst_pt.y + sprite2.y());
+	    sprite2.Blit(alpha, dst_pt.x + sprite2.x(), dst_pt.y + sprite2.y());
 	else
 	    CastleDialog::RedrawBuildingSpriteToArea(sprite2, dst_pt.x + sprite2.x(), dst_pt.y + sprite2.y(), max);
     }

@@ -36,7 +36,6 @@ void VictoryConditionInfo(const Maps::FileInfo &);
 
 void ScenarioListBox::RedrawItem(const Maps::FileInfo & info, s16 dstx, s16 dsty, bool current)
 {
-    Display & display = Display::Get();
     Text text;
     u8 index = 19 + Color::Count(info.kingdom_colors);
 
@@ -47,7 +46,7 @@ void ScenarioListBox::RedrawItem(const Maps::FileInfo & info, s16 dstx, s16 dsty
     }
 
     const Sprite & spriteCount = AGG::GetICN(ICN::REQUESTS, index);
-    display.Blit(spriteCount, dstx, dsty);
+    spriteCount.Blit(dstx, dsty);
 
     switch(info.size_w)
     {
@@ -59,18 +58,18 @@ void ScenarioListBox::RedrawItem(const Maps::FileInfo & info, s16 dstx, s16 dsty
     }
 
     const Sprite & spriteSize = AGG::GetICN(ICN::REQUESTS, index);
-    display.Blit(spriteSize, dstx + spriteCount.w() + 2, dsty);
+    spriteSize.Blit(dstx + spriteCount.w() + 2, dsty);
 
     text.Set(info.name, (current ? Font::YELLOW_BIG : Font::BIG));
     text.Blit(dstx + 54, dsty + 2);
 
     index = 30 + info.conditions_wins;
     const Sprite & spriteWins = AGG::GetICN(ICN::REQUESTS, index);
-    display.Blit(spriteWins, dstx + 224, dsty);
+    spriteWins.Blit(dstx + 224, dsty);
 
     index = 36 + info.conditions_loss;
     const Sprite & spriteLoss = AGG::GetICN(ICN::REQUESTS, index);
-    display.Blit(spriteLoss, dstx + 224 + spriteWins.w() + 2, dsty);
+    spriteLoss.Blit(dstx + 224 + spriteWins.w() + 2, dsty);
 }
 
 void ScenarioListBox::ActionListDoubleClick(Maps::FileInfo &)
@@ -80,17 +79,15 @@ void ScenarioListBox::ActionListDoubleClick(Maps::FileInfo &)
 
 void ScenarioListBox::RedrawBackground(const Point & dst)
 {
-    Display & display = Display::Get();
-
     if(Settings::Get().QVGA())
     {
-	display.Blit(AGG::GetICN(ICN::STONEBAK, 0), Rect(17, 37, 266, 156), dst.x + 15, dst.y + 35);
-	display.Blit(AGG::GetICN(ICN::REQSBKG, 0), Rect(325, 70, 16, 100), dst.x + 283, dst.y + 55);
-	display.Blit(AGG::GetICN(ICN::REQSBKG, 0), Rect(325, 167, 16, 50), dst.x + 283, dst.y + 125);
+	AGG::GetICN(ICN::STONEBAK, 0).Blit(Rect(17, 37, 266, 156), dst.x + 15, dst.y + 35);
+	AGG::GetICN(ICN::REQSBKG, 0).Blit(Rect(325, 70, 16, 100), dst.x + 283, dst.y + 55);
+	AGG::GetICN(ICN::REQSBKG, 0).Blit(Rect(325, 167, 16, 50), dst.x + 283, dst.y + 125);
     }
     else
     {
-	display.Blit(AGG::GetICN(ICN::REQSBKG, 0), dst);
+	AGG::GetICN(ICN::REQSBKG, 0).Blit(dst);
 
 	if(content && cur != content->end())
 	{
@@ -99,7 +96,7 @@ void ScenarioListBox::RedrawBackground(const Point & dst)
 	    u8 index = 19 + Color::Count(info.kingdom_colors);
 
 	    const Sprite & spriteCount = AGG::GetICN(ICN::REQUESTS, index);
-	    display.Blit(spriteCount, dst.x + 65, dst.y + 265);
+	    spriteCount.Blit(dst.x + 65, dst.y + 265);
 
 	    switch(info.size_w)
 	    {
@@ -111,18 +108,18 @@ void ScenarioListBox::RedrawBackground(const Point & dst)
 	    }
 
 	    const Sprite & spriteSize = AGG::GetICN(ICN::REQUESTS, index);
-	    display.Blit(spriteSize, dst.x + 65 + spriteCount.w() + 2, dst.y + 265);
+	    spriteSize.Blit(dst.x + 65 + spriteCount.w() + 2, dst.y + 265);
 
 	    text.Set(info.name, Font::BIG);
 	    text.Blit(dst.x + 190 - text.w() / 2, dst.y + 265);
 
 	    index = 30 + info.conditions_wins;
 	    const Sprite & spriteWins = AGG::GetICN(ICN::REQUESTS, index);
-	    display.Blit(spriteWins, dst.x + 275, dst.y + 265);
+	    spriteWins.Blit(dst.x + 275, dst.y + 265);
 
 	    index = 36 + info.conditions_loss;
 	    const Sprite & spriteLoss = AGG::GetICN(ICN::REQUESTS, index);
-	    display.Blit(spriteLoss, dst.x + 275 + spriteWins.w() + 2, dst.y + 265);
+	    spriteLoss.Blit(dst.x + 275 + spriteWins.w() + 2, dst.y + 265);
 
 	    text.Set(_("Maps Difficulty:"), Font::BIG);
 	    text.Blit(dst.x + 70, dst.y + 290);

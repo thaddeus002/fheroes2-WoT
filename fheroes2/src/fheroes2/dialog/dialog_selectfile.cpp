@@ -83,16 +83,15 @@ void FileInfoListBox::RedrawItem(const Maps::FileInfo & info, s16 dstx, s16 dsty
 
 void FileInfoListBox::RedrawBackground(const Point & dst)
 {
-    Display & display = Display::Get();
     const Sprite & panel = AGG::GetICN(ICN::REQBKG, 0);
 
     if(Settings::Get().QVGA())
     {
-	display.Blit(panel, Rect(0, 0, panel.w(), 120), dst.x, dst.y);
-	display.Blit(panel, Rect(0, panel.h() - 120, panel.w(), 120), dst.x, dst.y + 224 - 120);
+	panel.Blit(Rect(0, 0, panel.w(), 120), dst.x, dst.y);
+	panel.Blit(Rect(0, panel.h() - 120, panel.w(), 120), dst.x, dst.y + 224 - 120);
     }
     else
-	display.Blit(panel, dst);
+	panel.Blit(dst);
 }
 
 void FileInfoListBox::ActionCurrentUp(void)

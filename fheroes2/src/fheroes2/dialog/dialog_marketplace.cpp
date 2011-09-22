@@ -118,7 +118,7 @@ void TradeWindowGUI::ShowTradeArea(u8 resourceFrom, u8 resourceTo, u32 max_buy, 
         const Sprite & bar = AGG::GetICN(tradpost, 1);
         dst_pt.x = pos_rt.x + (pos_rt.w - bar.w()) / 2 - 2;
         dst_pt.y = pos_rt.y + 128;
-        display.Blit(bar, dst_pt);
+        bar.Blit(dst_pt);
         splitter.SetRange(0, (Resource::GOLD == resourceTo ? max_sell : max_buy));
         u16 exchange_rate = GetTradeCosts(resourceFrom, resourceTo, fromTradingPost);
 	std::string message;
@@ -139,19 +139,19 @@ void TradeWindowGUI::ShowTradeArea(u8 resourceFrom, u8 resourceTo, u32 max_buy, 
         const Sprite & sprite_from = AGG::GetICN(ICN::RESOURCE, Resource::GetIndexSprite2(resourceFrom));
         dst_pt.x = pos_rt.x + pos_rt.w / 2 - 70 - sprite_from.w() / 2;
         dst_pt.y = pos_rt.y + 115 - sprite_from.h();
-        display.Blit(sprite_from, dst_pt);
+        sprite_from.Blit(dst_pt);
         message.clear();
         String::AddInt(message, count_sell);
         const Sprite & sprite_to = AGG::GetICN(ICN::RESOURCE, Resource::GetIndexSprite2(resourceTo));
         dst_pt.x = pos_rt.x + pos_rt.w / 2 + 70 - sprite_to.w() / 2;
         dst_pt.y = pos_rt.y + 115 - sprite_to.h();
-        display.Blit(sprite_to, dst_pt);
+        sprite_to.Blit(dst_pt);
         message.clear();
         String::AddInt(message, count_buy);
         const Sprite & sprite_fromto = AGG::GetICN(tradpost, 0);
         dst_pt.x = pos_rt.x + pos_rt.w / 2 - sprite_fromto.w() / 2;
         dst_pt.y = pos_rt.y + 90;
-        display.Blit(sprite_fromto, dst_pt);
+        sprite_fromto.Blit(dst_pt);
 	buttonMax = Rect(dst_pt.x, dst_pt.y, sprite_fromto.w(), sprite_fromto.h());
         Text text("max", Font::SMALL);
         dst_pt.x = buttonMax.x + (buttonMax.w - text.w()) / 2;
@@ -481,7 +481,7 @@ void RedrawResourceSprite(const Surface & sf, s16 px, s16 py, s32 value)
     Text text;
     Point dst_pt(px, py);
 
-    display.Blit(sf, dst_pt);
+    sf.Blit(dst_pt, display);
     String::AddInt(str, value);
     text.Set(str, Font::SMALL);
     dst_pt.x += (34 - text.w()) / 2;
@@ -514,7 +514,7 @@ void RedrawResourceSprite2(const Surface & sf, s16 px, s16 py, bool show, u8 fro
     Display & display = Display::Get();
     Point dst_pt(px, py);
 
-    display.Blit(sf, dst_pt);
+    sf.Blit(dst_pt, display);
 
     if(show)
     {

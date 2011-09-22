@@ -1536,23 +1536,6 @@ u16 ICN::AnimationFrame(const icn_t icn, const u16 start, const u32 ticket, cons
     return 0;
 }
 
-bool ICN::RequiresAlpha(const ICN::icn_t icn)
-{
-    switch(icn)
-    {
-        case ICN::SYSTEM:
-        case ICN::SYSTEME:
-        case ICN::BUYBUILD:
-        case ICN::BUYBUILE:
-        case ICN::BOOK:
-            return false;
-        default:
-            break;
-    }
-    
-    return true;
-}
-
 ICN::icn_t ICN::PORTxxxx(u8 id)
 {
     switch(id)

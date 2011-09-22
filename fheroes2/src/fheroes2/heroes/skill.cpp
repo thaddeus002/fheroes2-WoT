@@ -901,7 +901,6 @@ void SecondarySkillBar::CalcSize(void)
 
 void SecondarySkillBar::Redraw(void)
 {
-    Display & display = Display::Get();
     Point dst_pt(pos);
     std::string message;
     Text text;
@@ -914,7 +913,7 @@ void SecondarySkillBar::Redraw(void)
         if(skill.isValid())
         {
             const Sprite & sprite_skill = AGG::GetICN((use_mini_sprite ? ICN::MINISS : ICN::SECSKILL), (use_mini_sprite ? skill.GetIndexSprite2() : skill.GetIndexSprite1()));
-            display.Blit(sprite_skill, dst_pt);
+            sprite_skill.Blit(dst_pt);
 
             if(use_mini_sprite)
 	    {
@@ -939,9 +938,9 @@ void SecondarySkillBar::Redraw(void)
             const Sprite & sprite_skill = AGG::GetICN((use_mini_sprite ? ICN::HSICONS : ICN::SECSKILL), 0);
 
 	    if(use_mini_sprite)
-        	display.Blit(sprite_skill, Rect((sprite_skill.w() - 32) / 2, 20, 32, 32), dst_pt);
+        	sprite_skill.Blit(Rect((sprite_skill.w() - 32) / 2, 20, 32, 32), dst_pt);
 	    else
-        	display.Blit(sprite_skill, dst_pt);
+        	sprite_skill.Blit(dst_pt);
 
     	    dst_pt.x += (use_mini_sprite ? 32 : sprite_skill.w()) + interval;
 	}

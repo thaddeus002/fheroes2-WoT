@@ -51,19 +51,19 @@ void PocketPC::HeroesMeeting(Heroes & hero1, Heroes & hero2)
     const Rect & dst_rt = frameborder.GetArea();
     const Sprite & background = AGG::GetICN(ICN::STONEBAK, 0);
     const Sprite & backSprite = AGG::GetICN(ICN::SWAPWIN, 0);
-    display.Blit(background, Rect(0, 0, window_w, window_h), dst_rt);
+    background.Blit(Rect(0, 0, window_w, window_h), dst_rt);
 
     // portrait
-    display.Blit(AGG::GetICN(ICN::BRCREST, 6), dst_rt.x + 4, dst_rt.y + 4);
-    display.Blit(hero1.GetPortrait50x46(), dst_rt.x + 8, dst_rt.y + 8);
+    AGG::GetICN(ICN::BRCREST, 6).Blit(dst_rt.x + 4, dst_rt.y + 4, display);
+    hero1.GetPortrait50x46().Blit(dst_rt.x + 8, dst_rt.y + 8, display);
 
-    display.Blit(AGG::GetICN(ICN::BRCREST, 6), dst_rt.x + 4, dst_rt.y + 118);
-    display.Blit(hero2.GetPortrait50x46(), dst_rt.x + 8, dst_rt.y + 122);
+    AGG::GetICN(ICN::BRCREST, 6).Blit(dst_rt.x + 4, dst_rt.y + 118, display);
+    hero2.GetPortrait50x46().Blit(dst_rt.x + 8, dst_rt.y + 122, display);
 
     // art bar
     const Rect rt2(23, 347, 34, 34);
     Surface sfb2(rt2.w, rt2.h);
-    sfb2.Blit(backSprite, rt2, 0, 0);
+    backSprite.Blit(rt2, 0, 0, sfb2);
     Surface sfc2(rt2.w, rt2.h);
     Cursor::DrawCursor(sfc2, 0xd6, true);
 
@@ -86,7 +86,7 @@ void PocketPC::HeroesMeeting(Heroes & hero1, Heroes & hero2)
     // army bar
     const Rect rt1(36, 267, 43, 43);
     Surface sfb1(rt1.w, rt1.h);
-    sfb1.Blit(backSprite, rt1, 0, 0);
+    backSprite.Blit(rt1, 0, 0, sfb1);
     Surface sfc1(rt1.w, rt1.h);
     Cursor::DrawCursor(sfc1, 0xd6, true);
 
@@ -113,7 +113,7 @@ void PocketPC::HeroesMeeting(Heroes & hero1, Heroes & hero2)
     selectArmy2.Redraw();
 
     const Rect rectExit(dst_rt.x + dst_rt.w - 25, dst_rt.y + (dst_rt.h - 25) / 2, 25, 25);
-    display.Blit(AGG::GetICN(ICN::TOWNWIND, 12), rectExit.x + 4, rectExit.y + 4);
+    AGG::GetICN(ICN::TOWNWIND, 12).Blit(rectExit.x + 4, rectExit.y + 4);
 
     cursor.Show();
     display.Flip();

@@ -88,11 +88,11 @@ Dialog::answer_t Castle::DialogBuyHero(const Heroes* hero)
     //portrait and frame
     dst_pt.x = box_rt.x + (box_rt.w - portrait_frame.w()) / 2;
     dst_pt.y = dst_pt.y + text.h() + spacer;
-    display.Blit(portrait_frame, dst_pt);
+    portrait_frame.Blit(dst_pt);
 
     dst_pt.x = dst_pt.x + 5;
     dst_pt.y = dst_pt.y + 5;
-    display.Blit(hero->GetPortrait101x93(), dst_pt);
+    hero->GetPortrait101x93().Blit(dst_pt, display);
 
     dst_pt.x = box_rt.x;
     dst_pt.y = dst_pt.y + portrait_frame.h() + spacer;
@@ -159,7 +159,7 @@ u32 Castle::OpenTown(void)
     const Point cur_pt(background.GetArea().x, background.GetArea().y);
     Point dst_pt(cur_pt);
 
-    display.Blit(AGG::GetICN(ICN::CASLWIND, 0), dst_pt);
+    AGG::GetICN(ICN::CASLWIND, 0).Blit(dst_pt);
 
     const Heroes* castle_heroes = GetHeroes().Guest();
 
@@ -172,7 +172,7 @@ u32 Castle::OpenTown(void)
 	dst_pt.x += cur_pt.x;
 	dst_pt.y += cur_pt.y;
 		
-	display.Blit(AGG::GetICN(ICN::STONEBAK, 0), rect, dst_pt);
+	AGG::GetICN(ICN::STONEBAK, 0).Blit(rect, dst_pt);
     }
 
     // draw castle sprite
@@ -335,8 +335,8 @@ u32 Castle::OpenTown(void)
 	dst_pt.x += 90;
 	text.Blit(dst_pt);
 	
-	display.Blit(spriteSpreadArmyFormat, rectSpreadArmyFormat.x, rectSpreadArmyFormat.y);
-	display.Blit(spriteGroupedArmyFormat, rectGroupedArmyFormat.x, rectGroupedArmyFormat.y);
+	spriteSpreadArmyFormat.Blit(rectSpreadArmyFormat.x, rectSpreadArmyFormat.y);
+	spriteGroupedArmyFormat.Blit(rectGroupedArmyFormat.x, rectGroupedArmyFormat.y);
 
 	cursorFormat.Show(Army::FORMAT_SPREAD == army.GetCombatFormat() ? pointSpreadArmyFormat : pointGroupedArmyFormat);
     }
@@ -357,7 +357,7 @@ u32 Castle::OpenTown(void)
     const Rect rectHero1(dst_pt, 102, 93);
     if(hero1)
     {
-	display.Blit(hero1->GetPortrait101x93(), dst_pt);
+	hero1->GetPortrait101x93().Blit(dst_pt, display);
     }
     else
 	display.FillRect(0, 0, 0, rectHero1);
@@ -366,7 +366,7 @@ u32 Castle::OpenTown(void)
     {
 	dst_pt.x += 83;
 	dst_pt.y += 75;
-	display.Blit(AGG::GetICN(ICN::TOWNWIND, 12), dst_pt);
+	AGG::GetICN(ICN::TOWNWIND, 12).Blit(dst_pt);
     }
 
     // second hero
@@ -375,7 +375,7 @@ u32 Castle::OpenTown(void)
     const Rect rectHero2(dst_pt, 102, 94);
     if(hero2)
     {
-	display.Blit(hero2->GetPortrait101x93(), dst_pt);
+	hero2->GetPortrait101x93().Blit(dst_pt, display);
     }
     else
 	display.FillRect(0, 0, 0, rectHero2);
@@ -384,14 +384,14 @@ u32 Castle::OpenTown(void)
     {
 	dst_pt.x += 83;
 	dst_pt.y += 75;
-	display.Blit(AGG::GetICN(ICN::TOWNWIND, 12), dst_pt);
+	AGG::GetICN(ICN::TOWNWIND, 12).Blit(dst_pt);
     }
 
     // bottom bar
     dst_pt.x = cur_pt.x;
     dst_pt.y = cur_pt.y + 461;
     const Sprite & bar = AGG::GetICN(ICN::CASLBAR, 0);
-    display.Blit(bar, dst_pt);
+    bar.Blit(dst_pt);
 
     StatusBar statusBar;
     statusBar.SetCenter(dst_pt.x + bar.w() / 2, dst_pt.y + 11);

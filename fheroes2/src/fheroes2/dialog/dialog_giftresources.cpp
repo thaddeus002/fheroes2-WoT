@@ -75,12 +75,11 @@ struct SelectRecipientsColors
 	for(Colors::const_iterator
     	    it = colors.begin(); it != colors.end(); ++it)
 	{
-	    Display & display = Display::Get();
 	    const Rect & pos = positions[std::distance(colors.begin(), it)];
 
-	    display.Blit(AGG::GetICN(ICN::CELLWIN, 43 + Color::GetIndex(*it)), pos);
+	    AGG::GetICN(ICN::CELLWIN, 43 + Color::GetIndex(*it)).Blit(pos);
 	    if(recipients & *it)
-		display.Blit(AGG::GetICN(ICN::CELLWIN, 2), pos.x + 2, pos.y + 2);
+		AGG::GetICN(ICN::CELLWIN, 2).Blit(pos.x + 2, pos.y + 2);
 	}
     }
 
@@ -126,13 +125,12 @@ struct ResourceBar
 
     static void RedrawResource(u8 type, s32 count, s16 posx, s16 posy)
     {
-	Display & display = Display::Get();
 	std::ostringstream os;
 
 	os << count;
 	Text text(os.str(), Font::SMALL);
 	const Sprite & sprite = AGG::GetICN(ICN::TRADPOST, 7 + Resource::GetIndexSprite2(type));
-	display.Blit(sprite, posx, posy);
+	sprite.Blit(posx, posy);
 	text.Blit(posx + (sprite.w() - text.w()) / 2, posy + sprite.h() - 12);
     }
 
@@ -223,7 +221,7 @@ void Dialog::MakeGiftResource(void)
 
     const Rect & box = frameborder.GetArea();
     const Sprite & background = AGG::GetICN(ICN::STONEBAK, 0);
-    display.Blit(background, Rect(0, 0, window_w, window_h), box);
+    background.Blit(Rect(0, 0, window_w, window_h), box);
 
     Kingdom & myKingdom = world.GetKingdom(conf.CurrentColor());
 

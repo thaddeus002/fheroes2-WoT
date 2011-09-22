@@ -132,13 +132,13 @@ void Interface::Radar::Build(void)
     sf_gray = new Surface(n, n);
     sf_black = new Surface(n, n);
 
-    sf_blue->Fill(sf_blue->GetColor(COLOR_BLUE));
-    sf_green->Fill(sf_green->GetColor(COLOR_GREEN));
-    sf_red->Fill(sf_red->GetColor(COLOR_RED));
-    sf_yellow->Fill(sf_yellow->GetColor(COLOR_YELLOW));
-    sf_orange->Fill(sf_orange->GetColor(COLOR_ORANGE));
-    sf_purple->Fill(sf_purple->GetColor(COLOR_PURPLE));
-    sf_gray->Fill(sf_gray->GetColor(COLOR_GRAY));
+    sf_blue->Fill(sf_blue->GetColorIndex(COLOR_BLUE));
+    sf_green->Fill(sf_green->GetColorIndex(COLOR_GREEN));
+    sf_red->Fill(sf_red->GetColorIndex(COLOR_RED));
+    sf_yellow->Fill(sf_yellow->GetColorIndex(COLOR_YELLOW));
+    sf_orange->Fill(sf_orange->GetColorIndex(COLOR_ORANGE));
+    sf_purple->Fill(sf_purple->GetColorIndex(COLOR_PURPLE));
+    sf_gray->Fill(sf_gray->GetColorIndex(COLOR_GRAY));
     sf_black->Fill(0);
 
     Generate();
@@ -167,17 +167,17 @@ void Interface::Radar::Generate(void)
 	u32 color = COLOR_ROAD;
 
 	if(tile.isRoad())
-		tile_surface.Fill(tile_surface.GetColor(color));
+		tile_surface.Fill(tile_surface.GetColorIndex(color));
 	else
 	if(0 != (color = GetPaletteIndexFromGround(tile.GetGround())))
-		tile_surface.Fill(tile_surface.GetColor(tile.GetObject() == MP2::OBJ_MOUNTS ? color + 2 : color));
+		tile_surface.Fill(tile_surface.GetColorIndex(tile.GetObject() == MP2::OBJ_MOUNTS ? color + 2 : color));
 	else
 	    continue;
 
 	float dstx = (index % world_w) * w / world_w;
 	float dsty = (index / world_h) * h / world_w;
 
-	spriteArea->Blit(tile_surface, static_cast<u16>(dstx), static_cast<u16>(dsty));
+	tile_surface.Blit(static_cast<u16>(dstx), static_cast<u16>(dsty), *spriteArea);
     }
 }
 
@@ -197,7 +197,7 @@ void Interface::Radar::Redraw(void)
     }
     else
     if(!conf.HideInterface() || conf.ShowRadar())
-	Display::Get().Blit(AGG::GetICN((conf.EvilInterface() ? ICN::HEROLOGE : ICN::HEROLOGO), 0), x, y);
+	AGG::GetICN((conf.EvilInterface() ? ICN::HEROLOGE : ICN::HEROLOGO), 0).Blit(x, y);
 
     // redraw border
     if(conf.HideInterface() && conf.ShowRadar())
@@ -219,7 +219,7 @@ void Interface::Radar::RedrawArea(const u8 color)
     const Surface *tile_surface = NULL;
 
     cursorArea->Hide();
-    display.Blit(*spriteArea, x, y);
+    spriteArea->Blit(x, y, display);
 
     for(s32 index = 0; index < world_w * world_h; ++index)
     {
@@ -265,7 +265,7 @@ void Interface::Radar::RedrawArea(const u8 color)
 	    float dstx = (index % world_w) * w / world_w;
 	    float dsty = (index / world_h) * h / world_w;
 
-	    display.Blit(*tile_surface, x + static_cast<u16>(dstx), y + static_cast<u16>(dsty));
+	    tile_surface->Blit(x + static_cast<u16>(dstx), y + static_cast<u16>(dsty), display);
 	}
     }
 }

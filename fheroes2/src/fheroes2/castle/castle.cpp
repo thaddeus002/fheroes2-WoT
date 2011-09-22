@@ -1218,7 +1218,6 @@ bool Castle::BuyBuilding(u32 build)
 void Castle::DrawImageCastle(const Point & pt)
 {
     const Maps::Tiles & tile = world.GetTiles(GetCenter());
-    Display & display = Display::Get();
 
     u8 index = 0;
     Point dst_pt;
@@ -1243,7 +1242,7 @@ void Castle::DrawImageCastle(const Point & pt)
 	const Sprite & sprite = AGG::GetICN(ICN::OBJNTWBA, index + ii);
         dst_pt.x = pt.x + ii * 32 + sprite.x();
 	dst_pt.y = pt.y + 3 * 32 + sprite.y();
-	display.Blit(sprite, dst_pt);
+	sprite.Blit(dst_pt);
     }
 
     for(int ii = 0; ii < 5; ++ii)
@@ -1251,7 +1250,7 @@ void Castle::DrawImageCastle(const Point & pt)
 	const Sprite & sprite = AGG::GetICN(ICN::OBJNTWBA, index + 5 + ii);
         dst_pt.x = pt.x + ii * 32 + sprite.x();
 	dst_pt.y = pt.y + 4 * 32 + sprite.y();
-	display.Blit(sprite, dst_pt);
+	sprite.Blit(dst_pt);
     }
     
     // draw castle
@@ -1269,27 +1268,27 @@ void Castle::DrawImageCastle(const Point & pt)
     const Sprite & sprite2 = AGG::GetICN(ICN::OBJNTOWN, index);
     dst_pt.x = pt.x + 2 * 32 + sprite2.x();
     dst_pt.y = pt.y + sprite2.y();
-    display.Blit(sprite2, dst_pt);
+    sprite2.Blit(dst_pt);
     for(int ii = 0; ii < 5; ++ii)
     {
 	const Sprite & sprite = AGG::GetICN(ICN::OBJNTOWN, index + 1 + ii);
         dst_pt.x = pt.x + ii * 32 + sprite.x();
 	dst_pt.y = pt.y + 32 + sprite.y();
-	display.Blit(sprite, dst_pt);
+	sprite.Blit(dst_pt);
     }
     for(int ii = 0; ii < 5; ++ii)
     {
 	const Sprite & sprite = AGG::GetICN(ICN::OBJNTOWN, index + 6 + ii);
         dst_pt.x = pt.x + ii * 32 + sprite.x();
 	dst_pt.y = pt.y + 2 * 32 + sprite.y();
-	display.Blit(sprite, dst_pt);
+	sprite.Blit(dst_pt);
     }
     for(int ii = 0; ii < 5; ++ii)
     {
 	const Sprite & sprite = AGG::GetICN(ICN::OBJNTOWN, index + 11 + ii);
         dst_pt.x = pt.x + ii * 32 + sprite.x();
 	dst_pt.y = pt.y + 3 * 32 + sprite.y();
-	display.Blit(sprite, dst_pt);
+	sprite.Blit(dst_pt);
     }
 }
 
