@@ -1657,9 +1657,9 @@ void Maps::Tiles::UpdateQuantity(void)
 	break;
 
 	case MP2::OBJ_WATERWHEEL:
-	    // first week 500 gold, next week 100 gold
+	    // first week 500 gold, next week 1000 gold
 	    quantity1 = Resource::GOLD;
-	    quantity2 = (world.CountDay() == 1 ? 5 : 10);
+	    quantity2 = (0 == world.CountDay() ? 5 : 10);
 	break;
 
 	case MP2::OBJ_WINDMILL:
