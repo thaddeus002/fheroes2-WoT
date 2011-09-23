@@ -139,9 +139,9 @@ void Castle::OpenWell(void)
 	    if(buttonMax.isEnable() && le.MouseClickLeft(buttonMax))
 	    {
 		dwellings_t results;
-		std::string str;
 		Funds cur, total;
 		u16 can_recruit;
+		std::string str;
 
 		for(std::vector<u32>::const_iterator
 		    it = alldwellings.begin(); it != alldwellings.end(); ++it)
@@ -156,6 +156,8 @@ void Castle::OpenWell(void)
 		    str.append("\n");
 		}
 
+		if(str.empty()) str = "None";
+
 		if(Dialog::YES ==
 		    Dialog::ResourceInfo(_("Buy Monsters:"), str, total, Dialog::YES|Dialog::NO))
 		{
@@ -167,16 +169,6 @@ void Castle::OpenWell(void)
 		    }
 		    redraw = true;
 		}
-	    }
-
-	    if(buttonMax.isEnable())
-	    {
-		Funds cur, total;
-		for(std::vector<u32>::const_iterator
-		    it = alldwellings.begin(); it != alldwellings.end(); ++it)
-		if(0 == HowManyRecruitMonster(*this, *it, total, cur))
-		    buttonMax.SetDisable(true);
-		redraw = true;
 	    }
 
     	    if(building & DWELLING_MONSTER1 && dwelling[0] && le.MouseClickLeft(rectMonster1) &&
