@@ -105,7 +105,7 @@ u16 DialogCaptureResourceObject(const std::string & hdr, std::string & msg, cons
     const Sprite & sprite = AGG::GetICN(ICN::RESOURCE, Resource::GetIndexSprite2(res));
 
     // sprite resource with x / day test
-    Surface sf(sprite.w() + 30, sprite.h() + 14, true);
+    Surface sf(sprite.w() + 30, sprite.h() + 14);
     sprite.Blit(15, 0, sf);
 
     std::string perday = _("%{count} / day");
@@ -138,8 +138,6 @@ u16 DialogCaptureResourceObject(const std::string & hdr, std::string & msg, cons
 
     Text text(perday, Font::SMALL);
     text.Blit((sf.w() - text.w()) / 2, sf.h() - 12, sf);
-    sf.ResetAlpha();
-    sf.SetColorKey(sf.MapRGB(0, 0, 0));
 
     return Dialog::SpriteInfo(hdr, msg, sf, buttons);
 }
@@ -148,7 +146,7 @@ u16 DialogGoldWithExp(const std::string & hdr, const std::string & msg, const u1
 {
     const Sprite & gold = AGG::GetICN(ICN::RESOURCE, 6);
     const Sprite & sprite = AGG::GetICN(ICN::EXPMRL, 4);
-    Surface image(sprite.w() + gold.w() + 50, sprite.h() + 12, true);
+    Surface image(sprite.w() + gold.w() + 50, sprite.h() + 12);
     gold.Blit(0, image.h() - gold.h() - 12, image);
     sprite.Blit(gold.w() + 50, 0, image);
     std::string str;
@@ -159,8 +157,6 @@ u16 DialogGoldWithExp(const std::string & hdr, const std::string & msg, const u1
     String::AddInt(str, exp);
     text.Set(str);
     text.Blit(gold.w() + 50 + (sprite.w() - text.w()) / 2, image.h() - 12, image);
-    image.ResetAlpha();
-    image.SetColorKey(image.MapRGB(0, 0, 0));
 
     return Dialog::SpriteInfo(hdr, msg, image, buttons);
 }
@@ -172,14 +168,12 @@ u16 DialogArtifactWithExp(const std::string & hdr, const std::string & msg, cons
     const Sprite & sprite = AGG::GetICN(ICN::EXPMRL, 4);
     const Sprite & border = AGG::GetICN(ICN::RESOURCE, 7);
     const Sprite & artifact = AGG::GetICN(ICN::ARTIFACT, art.IndexSprite64());
-    Surface image(sprite.w() + border.w() + 50, border.h(), true);
+    Surface image(sprite.w() + border.w() + 50, border.h());
     border.Blit(image);
     artifact.Blit(5, 5, image);
     sprite.Blit(border.w() + 50, (border.h() - sprite.h()) / 2, image);
     Text text(str, Font::SMALL);
     text.Blit(border.w() + 50 + (sprite.w() - text.w()) / 2, image.h() - 12, image);
-    image.ResetAlpha();
-    image.SetColorKey(image.MapRGB(0, 0, 0));
 
     return Dialog::SpriteInfo(hdr, msg, image, buttons);
 }
@@ -189,12 +183,10 @@ u16 DialogWithExp(const std::string & hdr, const std::string & msg, const u16 ex
     std::string str;
     String::AddInt(str, exp);
     const Sprite & sprite = AGG::GetICN(ICN::EXPMRL, 4);
-    Surface image(sprite.w(), sprite.h() + 12, true);
+    Surface image(sprite.w(), sprite.h() + 12);
     sprite.Blit(image);
     Text text(str, Font::SMALL);
     text.Blit((sprite.w() - text.w()) / 2, sprite.h(), image);
-    image.ResetAlpha();
-    image.SetColorKey(image.MapRGB(0, 0, 0));
 
     return Dialog::SpriteInfo(hdr, msg, image, buttons);
 }
@@ -206,14 +198,12 @@ u16 DialogWithArtifactAndGold(const std::string & hdr, const std::string & msg, 
     const Sprite & gold = AGG::GetICN(ICN::RESOURCE, 6);
     const Sprite & border = AGG::GetICN(ICN::RESOURCE, 7);
     const Sprite & artifact = AGG::GetICN(ICN::ARTIFACT, art.IndexSprite64());
-    Surface image(gold.w() + border.w() + 50, border.h(), true);
+    Surface image(gold.w() + border.w() + 50, border.h());
     border.Blit(image);
     artifact.Blit(5, 5, image);
     gold.Blit(border.w() + 50, (border.h() - gold.h()) / 2, image);
     Text text(str, Font::SMALL);
     text.Blit(border.w() + 50 + (gold.w() - text.w()) / 2, border.h() - 25, image);
-    image.ResetAlpha();
-    image.SetColorKey(image.MapRGB(0, 0, 0));
 
     return Dialog::SpriteInfo(hdr, msg, image, buttons);
 }
@@ -223,12 +213,10 @@ u16 DialogWithGold(const std::string & hdr, const std::string & msg, const u16 c
     std::string str;
     String::AddInt(str, count);
     const Sprite & gold = AGG::GetICN(ICN::RESOURCE, 6);
-    Surface image(gold.w(), gold.h() + 12, true);
+    Surface image(gold.w(), gold.h() + 12);
     gold.Blit(image);
     Text text(str, Font::SMALL);
     text.Blit((gold.w() - text.w()) / 2, gold.h(), image);
-    image.ResetAlpha();
-    image.SetColorKey(image.MapRGB(0, 0, 0));
 
     return Dialog::SpriteInfo(hdr, msg, image, buttons);
 }
@@ -329,7 +317,7 @@ void AnimationRemoveObject(Maps::Tiles & tile)
 	    heroes.push_back(world.GetHeroes(Maps::GetDirectionIndex(tile.GetIndex(), dir)));
 
     const Surface & stile = tile.GetTileSurface();
-    Surface sobj(stile.w(), stile.h(), true);
+    Surface sobj(stile.w(), stile.h());
 
     const Sprite & sprite = AGG::GetICN(MP2::GetICNObject(addon->object), addon->index);
     sprite.Blit(sprite.x(), sprite.y(), sobj);
@@ -341,8 +329,6 @@ void AnimationRemoveObject(Maps::Tiles & tile)
 	const Sprite & sprite = AGG::GetICN(MP2::GetICNObject(addon->object), index);
 	sprite.Blit(sprite.x(), sprite.y(), sobj);
     }
-
-    sobj.ConvertGlobalAlpha();
 
     LocalEvent & le = LocalEvent::Get();
     u8 alpha = 250;

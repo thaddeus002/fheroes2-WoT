@@ -61,7 +61,6 @@ struct Rect : Point, Size
     Rect(const SDL_Rect & rt);
     Rect(const Point & pt, u16 rw, u16 rh);
     Rect(const Point & pt, const Size & sz);
-    Rect(const Rect & rt1, const Rect & rt2);
     Rect(const std::vector<Rect> & vect);
 
     Rect & operator= (const Point & pt);
@@ -73,6 +72,8 @@ struct Rect : Point, Size
 
     // rect intersects rect
     bool operator& (const Rect & rt) const;
+
+    static Rect Get(const Rect & rt1, const Rect & rt2, bool intersect);
 };
 
 struct RectIncludePoint : std::binary_function<Rect, Point, bool>

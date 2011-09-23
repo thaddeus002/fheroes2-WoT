@@ -90,7 +90,6 @@ void RunTest2(void)
     Surface sf2(sprite2.w(), sprite2.h(), false);
     //sf2.Fill(0, 0, 0xFF);
 
-    //sprite2.ResetAlpha();
     //sprite2.SetColorKey(sprite2.MapRGB(0, 0, 0));
     sprite2.Blit(sf2);
     sf2.SetAlpha(50);

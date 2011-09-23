@@ -97,12 +97,30 @@ Rect::Rect(const Point & pt, const Size & sz) : Point(pt), Size(sz)
 {
 }
 
-Rect::Rect(const Rect & rt1, const Rect & rt2)
+Rect Rect::Get(const Rect & rt1, const Rect & rt2, bool intersect)
 {
-    x = rt1.x < rt2.x ? rt1.x : rt2.x;
-    y = rt1.y < rt2.y ? rt1.y : rt2.y;
-    w = rt1.x + rt1.w > rt2.x + rt2.w ? rt1.x + rt1.w - x : rt2.x + rt2.w - x;
-    h = rt1.y + rt1.h > rt2.y + rt2.h ? rt1.y + rt1.h - y : rt2.y + rt2.h - y;
+    Rect rt3;
+
+    if(intersect)
+    {
+	if(rt1 & rt2)
+	{
+    	    rt3.x = std::max(rt1.x, rt2.x);
+    	    rt3.y = std::max(rt1.y, rt2.y);
+    	    rt3.w = std::min(rt1.x + rt1.w, rt2.x + rt2.w) - rt3.x;
+    	    rt3.h = std::min(rt1.y + rt1.h, rt2.y + rt2.h) - rt3.y;
+	}
+    }
+    else
+    // max
+    {
+	rt3.x = rt1.x < rt2.x ? rt1.x : rt2.x;
+	rt3.y = rt1.y < rt2.y ? rt1.y : rt2.y;
+	rt3.w = rt1.x + rt1.w > rt2.x + rt2.w ? rt1.x + rt1.w - rt3.x : rt2.x + rt2.w - rt3.x;
+	rt3.h = rt1.y + rt1.h > rt2.y + rt2.h ? rt1.y + rt1.h - rt3.y : rt2.y + rt2.h - rt3.y;
+    }
+
+    return rt3;
 }
 
 Rect::Rect(const std::vector<Rect> & vect)
@@ -153,13 +171,5 @@ bool Rect::operator& (const Point & pt) const
 
 bool Rect::operator& (const Rect & rt) const
 {
-    return
-	((rt.x >= x && rt.x < x + w) ||
-	(rt.x + rt.w >= x && rt.x + rt.w < x + w) ||
-	(x >= rt.x && x < rt.x + rt.w) ||
-	(x + w >= rt.x && x + w < rt.x + rt.w)) &&
-	((rt.y >= y && rt.y < y + h) ||
-	(rt.y + rt.h >= y && rt.y + rt.h < y + h) ||
-	(y >= rt.y && y < rt.y + rt.h) ||
-	(y + h >= rt.y && y + h < rt.y + rt.h));
+    return ! (x > rt.x + rt.w || x + w < rt.x || y > rt.y + rt.h || y + h < rt.y);
 }

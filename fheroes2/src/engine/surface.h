@@ -131,6 +131,7 @@ protected:
     u32 GetPixel1(u16 x, u16 y) const;
     void LoadPalette(void);
     void CreateSurface(u16 sw, u16 sh, u8 bpp, bool amask);
+    static void BlitSurface(const Surface &, SDL_Rect*, Surface &, SDL_Rect*);
 
     SDL_Surface *surface;
 };

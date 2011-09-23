@@ -86,6 +86,7 @@ void GetRGBAMask(u8 bpp, u32 & rmask, u32 & gmask, u32 & bmask, u32 & amask)
 	    break;
 
 	case 24:
+#if SDL_VERSION_ATLEAST(1, 3, 0)
 #if SDL_BYTEORDER == SDL_BIG_ENDIAN
 	    rmask = 0x00ff0000;
 	    gmask = 0x0000ff00;
@@ -96,6 +97,19 @@ void GetRGBAMask(u8 bpp, u32 & rmask, u32 & gmask, u32 & bmask, u32 & amask)
 	    gmask = 0x0000ff00;
 	    bmask = 0x00ff0000;
 	    amask = 0x00000000;
+#endif
+#else
+#if SDL_BYTEORDER == SDL_BIG_ENDIAN
+            rmask = 0x00fc0000;
+            gmask = 0x0003f000;
+            bmask = 0x00000fc0;
+            amask = 0x0000003f;
+#else
+            rmask = 0x0000003f;
+            gmask = 0x00000fc0;
+            bmask = 0x0003f000;
+            amask = 0x00fc0000;
+#endif
 #endif
 	    break;
 
@@ -193,9 +207,12 @@ void Surface::SetDefaultDepth(u8 depth)
 {
     switch(depth)
     {
+	case 24: /* incompatible */
+	    default_depth = 32;
+	    break;
+
 	case 8:
 	case 16:
-	case 24:
 	case 32:
 	    default_depth = depth;
 	    break;
@@ -241,7 +258,7 @@ void Surface::Set(u16 sw, u16 sh, u8 bpp, bool amask0)
     CreateSurface(sw, sh, bpp, amask0);
 
     if(8 == bpp) LoadPalette();
-    if(0 == amask()) SetDefaultColorKey();
+    SetDefaultColorKey();
 }
 
 void Surface::Set(const void* pixels, unsigned int width, unsigned int height, unsigned char bytes_per_pixel, bool amask0)
@@ -254,7 +271,7 @@ void Surface::Set(const void* pixels, unsigned int width, unsigned int height, u
 	    CreateSurface(width, height, 8, false);
 	    LoadPalette();
 	    Lock();
-	    memcpy(surface->pixels, pixels, width * height);
+	    std::memcpy(surface->pixels, pixels, width * height);
 	    Unlock();
 	    break;
 
@@ -513,7 +530,7 @@ u32 Surface::GetPixel4(u16 x, u16 y) const
 {
     if(x > surface->w || y > surface->h) return 0;
     
-    u32 *bufp = static_cast<u32 *>(surface->pixels) + y * surface->pitch / 4 + x;
+    u32 *bufp = static_cast<u32 *>(surface->pixels) + y * (surface->pitch >> 2) + x;
 
     return *bufp;
 }
@@ -549,7 +566,7 @@ u32 Surface::GetPixel3(u16 x, u16 y) const
 u32 Surface::GetPixel2(u16 x, u16 y) const
 {
     if(x > surface->w || y > surface->h) return 0;
-    u16 *bufp = static_cast<u16 *>(surface->pixels) + y * surface->pitch / 2 + x;
+    u16 *bufp = static_cast<u16 *>(surface->pixels) + y * (surface->pitch >> 1) + x;
 
     return static_cast<u32>(*bufp);
 }
@@ -603,11 +620,113 @@ void Surface::FillRect(u8 r, u8 g, u8 b, const Rect & src)
     FillRect(MapRGB(r, g, b), src);
 }
 
+bool BlitCheckVariant(const Surface & sf, u16 x, u16 y, u8 variant)
+{
+    u32 pixel = sf.GetPixel(x, y);
+
+    switch(variant)
+    {
+        // blit: skip alpha
+        case 0: return (pixel & sf.amask()) == sf.amask();
+        // blit: reset alpha
+        case 1: return pixel != sf.GetColorKey();
+        // blit: only alpha
+        case 2: return (pixel & sf.amask()) != sf.amask();
+        //
+        default: break;
+    }
+
+    return 1;
+}
+
+/* my alt. variant: for RGBA -> RGB */
+void Surface::BlitSurface(const Surface & sf1, SDL_Rect* srt, Surface & sf2, SDL_Rect* drt)
+{
+    if(sf1.amask() && 0 == sf2.amask() &&
+        sf1.depth() == sf2.depth())
+    {
+        SDL_Rect rt1 = {0, 0, sf1.w(), sf1.h()};
+        SDL_Rect rt2 = {0, 0, sf2.w(), sf2.h()};
+        if(!srt) srt = &rt1;
+        if(!drt) drt = &rt2;
+
+        if(srt->w == 0) srt->w = sf1.w();
+        if(srt->h == 0) srt->h = sf1.h();
+        if(drt->w == 0) drt->w = sf2.w();
+        if(drt->h == 0) drt->h = sf2.h();
+
+        if(srt != &rt1)
+	{
+            Rect tmp = Rect::Get(Rect(*srt), Rect(rt1), true);
+
+	    srt->x = tmp.x;
+	    srt->y = tmp.y;
+	    srt->w = tmp.w;
+	    srt->h = tmp.h;
+	}
+
+        if(drt != &rt2)
+	{
+            Rect tmp = Rect::Get(Rect(*drt), Rect(rt2), true);
+
+	    drt->x = tmp.x;
+	    drt->y = tmp.y;
+	    drt->w = tmp.w;
+	    drt->h = tmp.h;
+	}
+
+        srt->w = std::min(srt->w, drt->w);
+        srt->h = std::min(srt->h, drt->h);
+        drt->w = srt->w;
+        drt->h = srt->h;
+
+	const SDL_Surface* ss = sf1.surface;
+	SDL_Surface* ds = sf2.surface;
+
+        u16 x, y;
+	u8 variant = ss->flags & SDL_SRCALPHA ? 0 : 1;
+
+        sf2.Lock();
+
+        for(y = 0; y < srt->h; ++y)
+        {
+            x = 0;
+
+            while(x < srt->w)
+            {
+                if(! BlitCheckVariant(sf1, srt->x + x, srt->y + y, variant))
+                    x++;
+                else
+                {
+                    int w = 0;
+                    while(BlitCheckVariant(sf1, srt->x + x + w, srt->y + y, variant) && x + w < srt->w) ++w;
+
+                    u8* sptr = reinterpret_cast<u8*>(ss->pixels) + (srt->y + y) * ss->pitch + (srt->x + x) * ss->format->BytesPerPixel;
+                    u8* dptr = reinterpret_cast<u8*>(ds->pixels) + (drt->y + y) * ds->pitch + (drt->x + x) * ds->format->BytesPerPixel;
+
+                    std::memcpy(dptr, sptr, w * ds->format->BytesPerPixel);
+
+                    x += w;
+                }
+            }
+        }
+
+        sf2.Unlock();
+    }
+    else
+        SDL_BlitSurface(sf1.surface, srt, sf2.surface, drt);
+}
+
 /* blit */
 void Surface::Blit(Surface & dst) const
 {
-    SDL_BlitSurface(surface, NULL, dst.surface, NULL);
-    if(dst.isDisplay()) Display::Get().AddUpdateRect(0, 0, w(), h());
+    if(dst.isDisplay())
+    {
+	SDL_BlitSurface(surface, NULL, dst.surface, NULL);
+	Display::Get().AddUpdateRect(0, 0, w(), h());
+    }
+    else
+	BlitSurface(*this, NULL, dst, NULL);
 }
 
 /* blit */
@@ -615,8 +734,13 @@ void Surface::Blit(s16 dst_ox, s16 dst_oy, Surface & dst) const
 {
     SDL_Rect dstrect = {dst_ox, dst_oy, surface->w, surface->h};
 
-    SDL_BlitSurface(surface, NULL, dst.surface, &dstrect);
-    if(dst.isDisplay()) Display::Get().AddUpdateRect(dst_ox, dst_oy, surface->w, surface->h);
+    if(dst.isDisplay())
+    {
+	SDL_BlitSurface(surface, NULL, dst.surface, &dstrect);
+	Display::Get().AddUpdateRect(dst_ox, dst_oy, surface->w, surface->h);
+    }
+    else
+	BlitSurface(*this, NULL, dst, &dstrect);
 }
 
 /* blit */
@@ -625,8 +749,13 @@ void Surface::Blit(const Rect &src_rt, s16 dst_ox, s16 dst_oy, Surface & dst) co
     SDL_Rect dstrect = {dst_ox, dst_oy, src_rt.w, src_rt.h};
     SDL_Rect srcrect = {src_rt.x, src_rt.y, src_rt.w, src_rt.h};
 
-    SDL_BlitSurface(surface, &srcrect, dst.surface, &dstrect);
-    if(dst.isDisplay()) Display::Get().AddUpdateRect(dst_ox, dst_oy, src_rt.w, src_rt.h);
+    if(dst.isDisplay())
+    {
+	SDL_BlitSurface(surface, &srcrect, dst.surface, &dstrect);
+	Display::Get().AddUpdateRect(dst_ox, dst_oy, src_rt.w, src_rt.h);
+    }
+    else
+	BlitSurface(*this, &srcrect, dst, &dstrect);
 }
 
 void Surface::Blit(const Point & dpt, Surface & dst) const
@@ -646,8 +775,8 @@ void Surface::Blit(u8 alpha0, const Rect & srt, const Point & dpt, Surface & dst
     else
     if(amask())
     {
-        Surface tmp(*this);
-	tmp.ConvertGlobalAlpha();
+        Surface tmp(w(), h(), false);
+	Blit(tmp);
         tmp.SetAlpha(alpha0);
         tmp.Blit(srt, dpt, dst);
     }
@@ -670,8 +799,6 @@ void Surface::ConvertGlobalAlpha(void)
     if(amask())
     {
 	Surface tmp(w(), h(), false);
-	ResetAlpha();
-	SetColorKey(0);
 	Blit(tmp);
 	Swap(*this, tmp);
     }
@@ -938,21 +1065,21 @@ void Surface::Reflect(Surface & sf_dst, const Surface & sf_src, const u8 shape)
     	    // vertical reflect
     	    case 1:
 		for(s32 offset = 0; offset < size; offset += sf_src.surface->pitch)
-    		    memcpy(dst + size - sf_src.surface->pitch - offset,
+    		    std::memcpy(dst + size - sf_src.surface->pitch - offset,
 			src + offset, sf_src.surface->pitch);
         	break;
 
     	    // horizontal reflect
     	    case 2:
         	for(s32 offset = 0; offset < size; offset += bpp)
-		    memcpy(dst + (offset % sf_src.surface->pitch) +
+		    std::memcpy(dst + (offset % sf_src.surface->pitch) +
 			size - sf_src.surface->pitch - static_cast<s32>(offset / sf_src.surface->pitch) * sf_src.surface->pitch, src + size - offset - bpp, bpp);
 		break;
 
     	    // both variants
 	    case 3:
         	for(s32 offset = 0; offset < size; offset += bpp)
-		    memcpy(dst + offset, src + size - offset - bpp, bpp);
+		    std::memcpy(dst + offset, src + size - offset - bpp, bpp);
     		break;
 	}
 
