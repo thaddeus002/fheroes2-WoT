@@ -41,12 +41,6 @@ Interface::ControlPanel::ControlPanel() : alpha(130)
     rt_quit.w = 36;
     rt_quit.h = 36;
 
-    btn_radr.Set(h, h);
-    btn_icon.Set(h, h);
-    btn_bttn.Set(h, h);
-    btn_stat.Set(h, h);
-    btn_quit.Set(h, h);
-
     ResetTheme();
 }
 
@@ -54,11 +48,11 @@ void Interface::ControlPanel::ResetTheme(void)
 {
     ICN::icn_t icn = Settings::Get().EvilInterface() ? ICN::ADVEBTNS : ICN::ADVBTNS;
 
-    AGG::GetICN(icn, 4).Blit(btn_radr);
-    AGG::GetICN(icn, 0).Blit(btn_icon);
-    AGG::GetICN(icn, 12).Blit(btn_bttn);
-    AGG::GetICN(icn, 10).Blit(btn_stat);
-    AGG::GetICN(icn, 8).Blit(btn_quit);
+    btn_radr.Set(AGG::GetICN(icn, 4));
+    btn_icon.Set(AGG::GetICN(icn, 0));
+    btn_bttn.Set(AGG::GetICN(icn, 12));
+    btn_stat.Set(AGG::GetICN(icn, 10));
+    btn_quit.Set(AGG::GetICN(icn, 8));
 
     btn_radr.SetAlpha(alpha);
     btn_icon.SetAlpha(alpha);

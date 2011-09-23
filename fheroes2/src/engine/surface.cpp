@@ -150,6 +150,38 @@ void GetRGBAMask(u8 bpp, u32 & rmask, u32 & gmask, u32 & bmask, u32 & amask)
     }
 }
 
+u32 GetPixel24(u8* ptr)
+{
+    u32 color = 0;
+#if SDL_BYTEORDER == SDL_BIG_ENDIAN
+    color |= ptr[0];
+    color <<= 8;
+    color |= ptr[1];
+    color <<= 8;
+    color |= ptr[2];
+#else
+    color |= ptr[2];
+    color <<= 8;
+    color |= ptr[1];
+    color <<= 8;
+    color |= ptr[0];
+#endif
+    return color;                                                                                                
+}                                                                                                                
+
+void SetPixel24(u8* ptr, u32 color)
+{
+#if SDL_BYTEORDER == SDL_BIG_ENDIAN
+    ptr[2] = color;
+    ptr[1] = color >> 8;
+    ptr[0] = color >> 16;
+#else
+    ptr[0] = color;
+    ptr[1] = color >> 8;
+    ptr[2] = color >> 16;
+#endif
+}
+
 void SDLFreeSurface(SDL_Surface *sf)
 {
     if(sf)
@@ -207,12 +239,9 @@ void Surface::SetDefaultDepth(u8 depth)
 {
     switch(depth)
     {
-	case 24: /* incompatible */
-	    default_depth = 32;
-	    break;
-
 	case 8:
 	case 16:
+	case 24:
 	case 32:
 	    default_depth = depth;
 	    break;
@@ -475,28 +504,15 @@ void Surface::SetPixel4(u16 x, u16 y, u32 color)
 void Surface::SetPixel3(u16 x, u16 y, u32 color)
 {
     if(x > surface->w || y > surface->h) return;
-
     u8 *bufp = static_cast<u8 *>(surface->pixels) + y * surface->pitch + x * 3; 
 
-    if(SDL_BYTEORDER == SDL_LIL_ENDIAN)
-    {
-        bufp[0] = color;
-        bufp[1] = color >> 8;
-        bufp[2] = color >> 16;
-    }
-    else
-    { 
-	bufp[2] = color;
-	bufp[1] = color >> 8;
-        bufp[0] = color >> 16;
-    }
+    SetPixel24(bufp, color);
 }
 
 /* draw u16 pixel */
 void Surface::SetPixel2(u16 x, u16 y, u32 color)
 {
     if(x > surface->w || y > surface->h) return;
-    
     u16 *bufp = static_cast<u16 *>(surface->pixels) + y * surface->pitch / 2 + x;
 
     *bufp = static_cast<u16>(color);
@@ -506,7 +522,6 @@ void Surface::SetPixel2(u16 x, u16 y, u32 color)
 void Surface::SetPixel1(u16 x, u16 y, u32 color)
 {
     if(x > surface->w || y > surface->h) return;
-
     u8 *bufp = static_cast<u8 *>(surface->pixels) + y * surface->pitch + x;
 
     *bufp = static_cast<u8>(color);
@@ -529,7 +544,6 @@ void Surface::SetPixel(u16 x, u16 y, u32 color)
 u32 Surface::GetPixel4(u16 x, u16 y) const
 {
     if(x > surface->w || y > surface->h) return 0;
-    
     u32 *bufp = static_cast<u32 *>(surface->pixels) + y * (surface->pitch >> 2) + x;
 
     return *bufp;
@@ -538,29 +552,9 @@ u32 Surface::GetPixel4(u16 x, u16 y) const
 u32 Surface::GetPixel3(u16 x, u16 y) const
 {
     if(x > surface->w || y > surface->h) return 0;
-
     u8 *bufp = static_cast<u8 *>(surface->pixels) + y * surface->pitch + x * 3; 
 
-    u32 color = 0;
-
-    if(SDL_BYTEORDER == SDL_LIL_ENDIAN)
-    {
-        color |= bufp[2];
-        color <<= 8;
-        color |= bufp[1];
-        color <<= 8;
-        color |= bufp[0];
-    }
-    else
-    { 
-        color |= bufp[0];
-        color <<= 8;
-        color |= bufp[1];
-        color <<= 8;
-        color |= bufp[2];
-    }
-    
-    return color;
+    return GetPixel24(bufp);
 }
 
 u32 Surface::GetPixel2(u16 x, u16 y) const
@@ -636,14 +630,44 @@ bool BlitCheckVariant(const Surface & sf, u16 x, u16 y, u8 variant)
         default: break;
     }
 
-    return 1;
+    // skip colorkey
+    return pixel != sf.GetColorKey();
 }
 
-/* my alt. variant: for RGBA -> RGB */
+void SetAmask(u8* ptr, u16 w, const SDL_PixelFormat* format, u8 alpha)
+{
+    while(w--)
+    {
+        switch(format->BitsPerPixel)
+        {
+            case 16:
+                *reinterpret_cast<u16*>(ptr) |= ((static_cast<u16>(alpha) >> format->Aloss) << format->Ashift);
+                break;
+
+            case 24:
+                SetPixel24(ptr, GetPixel24(ptr) | ((static_cast<u32>(alpha) >> format->Aloss) << format->Ashift));
+                break;
+
+            case 32:
+                *reinterpret_cast<u32*>(ptr) |= ((static_cast<u32>(alpha) >> format->Aloss) << format->Ashift);
+                break; 
+
+            default:
+                break;
+        }
+        ptr += format->BytesPerPixel;
+    }
+}
+
+/* my alt. variant: for RGBA <-> RGB */
 void Surface::BlitSurface(const Surface & sf1, SDL_Rect* srt, Surface & sf2, SDL_Rect* drt)
 {
-    if(sf1.amask() && 0 == sf2.amask() &&
-        sf1.depth() == sf2.depth())
+    if(sf1.depth() == sf2.depth() &&
+	// RGBA <-> RGB
+	(((0 != sf1.amask() && 0 == sf2.amask()) ||
+	 (0 == sf1.amask() && 0 != sf2.amask())) ||
+	// depth 24, RGB <-> RGB
+	 (sf1.depth() == 24 && 0 == sf1.amask() && 0 == sf2.amask())))
     {
         SDL_Rect rt1 = {0, 0, sf1.w(), sf1.h()};
         SDL_Rect rt2 = {0, 0, sf2.w(), sf2.h()};
@@ -684,7 +708,20 @@ void Surface::BlitSurface(const Surface & sf1, SDL_Rect* srt, Surface & sf2, SDL
 	SDL_Surface* ds = sf2.surface;
 
         u16 x, y;
-	u8 variant = ss->flags & SDL_SRCALPHA ? 0 : 1;
+	u8 variant = 0;
+
+	// RGB -> RGB
+	if(24 == sf1.depth() &&
+	    0 == sf1.amask() && 0 == sf2.amask())
+	    variant = 4;
+	else
+	// RGBA -> RGB
+	if(0 != sf1.amask())
+	    variant = ss->flags & SDL_SRCALPHA ? 0 : 1;
+	else
+	// RGB -> RGBA
+	if(0 != sf2.amask())
+	    variant = 1;
 
         sf2.Lock();
 
@@ -705,6 +742,9 @@ void Surface::BlitSurface(const Surface & sf1, SDL_Rect* srt, Surface & sf2, SDL
                     u8* dptr = reinterpret_cast<u8*>(ds->pixels) + (drt->y + y) * ds->pitch + (drt->x + x) * ds->format->BytesPerPixel;
 
                     std::memcpy(dptr, sptr, w * ds->format->BytesPerPixel);
+
+                    // RGB -> RGBA only
+                    if(0 != sf2.amask()) SetAmask(dptr, w, ds->format, 0xFF);
 
                     x += w;
                 }
@@ -792,16 +832,6 @@ void Surface::Blit(u8 alpha0, const Rect & srt, const Point & dpt, Surface & dst
 void Surface::Blit(u8 alpha0, s16 dstx, s16 dsty, Surface & dst) const
 {
     Blit(alpha0, Rect(0, 0, w(), h()), Point(dstx, dsty), dst);
-}
-
-void Surface::ConvertGlobalAlpha(void)
-{
-    if(amask())
-    {
-	Surface tmp(w(), h(), false);
-	Blit(tmp);
-	Swap(*this, tmp);
-    }
 }
 
 void Surface::SetAlpha(u8 level)

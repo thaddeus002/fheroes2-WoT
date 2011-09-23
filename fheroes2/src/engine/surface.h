@@ -84,7 +84,6 @@ public:
     void SetDisplayFormat(void);
     void SetDefaultColorKey(void);
     void SetColorKey(u32 color);
-    void ConvertGlobalAlpha(void);
     void SetAlpha(u8 level);
     void ResetAlpha(void);
     void SetPixel(u16 x, u16 y, u32 color);
