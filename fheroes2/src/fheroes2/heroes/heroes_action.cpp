@@ -378,7 +378,11 @@ void Heroes::Action(const s32 dst_index)
     if(MUS::FromMapObject(object) != MUS::UNKNOWN)
         AGG::PlayMusic(MUS::FromMapObject(object), false);
 
-    if(MP2::isActionObject(object, isShipMaster())) SetModes(ACTION);
+    if(MP2::isActionObject(object, isShipMaster()))
+    {
+	Interface::Basic::Get().statusWindow.ResetTimer();
+	SetModes(ACTION);
+    }
 
     switch(object)
     {
