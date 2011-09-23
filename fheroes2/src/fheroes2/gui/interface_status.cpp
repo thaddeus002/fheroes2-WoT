@@ -154,7 +154,7 @@ void Interface::StatusWindow::NextState(void)
 {
     if(STATUS_DAY == state) state = STATUS_FUNDS;
     else
-    if(STATUS_FUNDS == state) state = (Game::Focus::UNSEL == Game::Focus::Get().Type() ? STATUS_DAY : STATUS_ARMY);
+    if(STATUS_FUNDS == state) state = (GameFocus::UNSEL == GameFocus::Type() ? STATUS_DAY : STATUS_ARMY);
     else
     if(STATUS_ARMY == state) state = STATUS_DAY;
     else
@@ -162,9 +162,10 @@ void Interface::StatusWindow::NextState(void)
     
     if(state == STATUS_ARMY)
     {
-	const Game::Focus & focus = Game::Focus::Get();
+	const Castle* castle = GameFocus::GetCastle();
+
 	// skip empty army for castle
-        if(Game::Focus::CASTLE == focus.Type() && !focus.GetCastle().GetArmy().isValid()) NextState();
+        if(castle && ! castle->GetArmy().isValid()) NextState();
     }
 }
 
@@ -283,27 +284,33 @@ void Interface::StatusWindow::DrawResourceInfo(const u8 oh) const
 
 void Interface::StatusWindow::DrawArmyInfo(const u8 oh) const
 {
-    const Game::Focus & focus = Game::Focus::Get();
+    const Army::army_t* armies = NULL;
 
-    if(Game::Focus::UNSEL == focus.Type()) return;
-
-    const Army::army_t & armies = (Game::Focus::HEROES == focus.Type() ? focus.GetHeroes().GetArmy() : focus.GetCastle().GetArmy());
-    const u8 count = armies.GetCount();
-
-    if(4 > count)
-    {
-	Army::DrawMons32Line(armies, x, y + 20 + oh, 144);
-    }
+    if(GameFocus::GetHeroes())
+	armies = &GameFocus::GetHeroes()->GetArmy();
     else
-    if(5 > count)
+    if(GameFocus::GetCastle())
+	armies = &GameFocus::GetCastle()->GetArmy();
+
+    if(armies)
     {
-	Army::DrawMons32Line(armies, x, y + 15 + oh, 110, 0, 2);
-	Army::DrawMons32Line(armies, x + 20, y + 30 + oh, 120, 2, 2);
-    }
-    else
-    {
-	Army::DrawMons32Line(armies, x, y + 15 + oh, 140, 0, 3);
-	Army::DrawMons32Line(armies, x + 10, y + 30 + oh, 120, 3, 2);
+	u8 count = armies->GetCount();
+
+	if(4 > count)
+	{
+	    Army::DrawMons32Line(*armies, x, y + 20 + oh, 144);
+	}
+	else
+	if(5 > count)
+	{
+	    Army::DrawMons32Line(*armies, x, y + 15 + oh, 110, 0, 2);
+	    Army::DrawMons32Line(*armies, x + 20, y + 30 + oh, 120, 2, 2);
+	}
+	else
+	{
+	    Army::DrawMons32Line(*armies, x, y + 15 + oh, 140, 0, 3);
+	    Army::DrawMons32Line(*armies, x + 10, y + 30 + oh, 120, 3, 2);
+	}
     }
 }
 

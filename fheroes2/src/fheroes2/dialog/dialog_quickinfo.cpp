@@ -358,7 +358,7 @@ void Dialog::QuickInfo(const Maps::Tiles & tile)
     std::string name_object;
     const Settings & settings = Settings::Get();
 
-    const Heroes* from_hero = (Game::Focus::HEROES == Game::Focus::Get().Type() ? &Game::Focus::Get().GetHeroes() : NULL);
+    const Heroes* from_hero = GameFocus::GetHeroes();
     const Kingdom & kingdom = world.GetKingdom(settings.CurrentColor());
     u8 scoute = from_hero ? from_hero->CanScouteTile(tile.GetIndex()) : 0;
     const bool & show = settings.ExtShowVisitedContent();
@@ -617,8 +617,7 @@ void Dialog::QuickInfo(const Castle & castle)
     u8 count = castle.GetArmy().GetCount();
     const Settings & conf = Settings::Get();
 
-    const Heroes* from_hero = Game::Focus::HEROES == Game::Focus::Get().Type() ?
-			    &Game::Focus::Get().GetHeroes() : NULL;
+    const Heroes* from_hero = GameFocus::GetHeroes();
     const Heroes* guardian = castle.GetHeroes().Guard();
 
     // draw guardian portrait
@@ -900,8 +899,7 @@ void Dialog::QuickInfo(const Heroes & hero)
     text.Blit(dst_pt);
 
     // draw monster sprite in one string
-    const Heroes* from_hero = Game::Focus::HEROES == Game::Focus::Get().Type() ?
-			    &Game::Focus::Get().GetHeroes() : NULL;
+    const Heroes* from_hero = GameFocus::GetHeroes();
 
     if(conf.CurrentColor() == hero.GetColor() ||
 	Players::isFriends(conf.CurrentColor(), hero.GetColor()))

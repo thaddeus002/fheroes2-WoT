@@ -24,44 +24,20 @@
 #define H2GAMEFOCUS_H
 
 #include "gamedefs.h"
-#include "game.h"
+#include "players.h"
 
-class Castle;
-class Heroes;
-
-namespace Game
+namespace GameFocus
 {
-    class Focus
-    {
-    public:
-	enum { UNSEL = 0, HEROES = 1, CASTLE = 2, FIRSTHERO = 3 };
+    enum { UNSEL = FOCUS_UNSEL, HEROES = FOCUS_HEROES, CASTLE = FOCUS_CASTLE, FIRSTHERO };
 
-   	static Focus &	Get(void);
-	static void	ResetAll(u8);
-
-	void		Set(Heroes*);
-	void		Set(Castle*);
-	void		SetRedraw(void);
-	void		Reset(u8);
-
-	void		CheckIconsPanel(void);
-
-	Point		GetCenter(void) const;
-
-	u8		Type(void) const;
-
-	const Castle &	GetCastle(void) const;
-	const Heroes &	GetHeroes(void) const;
-	
-	Heroes & GetHeroes(void);
-	Castle & GetCastle(void);
-
-	Focus();
-
-    private:
-	Castle*		castle;
-	Heroes*		heroes;
-    };
+    void	Set(Heroes*);
+    void	Set(Castle*);
+    void	Reset(u8);
+    u8		Type(void);
+    Castle*	GetCastle(void);
+    Heroes*	GetHeroes(void);
+    Point	GetCenter(void);
+    void	SetRedraw(void);
 }
 
 #endif

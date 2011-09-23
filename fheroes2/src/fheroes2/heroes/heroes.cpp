@@ -1480,10 +1480,9 @@ void RedrawGameAreaAndHeroAttackMonster(Heroes & hero, s32 dst)
     if(CONTROL_HUMAN == hero.GetControl())
     {
 	Interface::Basic & I = Interface::Basic::Get();
-	Game::Focus & F = Game::Focus::Get();
         Cursor::Get().Hide();
 	I.gameArea.SetCenter(hero.GetCenter());
-	F.SetRedraw();
+	GameFocus::SetRedraw();
 	I.Redraw();
         Cursor::Get().Show();
 	// force flip, for monster attack show sprite

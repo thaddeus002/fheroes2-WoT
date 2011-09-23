@@ -28,10 +28,29 @@
 #include "sdlnet.h"
 #include "color.h"
 #include "gamedefs.h"
+
 namespace Maps { struct FileInfo; }
+
+class Castle;
+class Heroes;
 
 // control_t
 enum { CONTROL_NONE = 0, CONTROL_HUMAN = 1, CONTROL_AI = 4, CONTROL_REMOTE = 2 /*, CONTROL_LOCAL = CONTROL_AI | CONTROL_HUMAN */ };
+enum { FOCUS_UNSEL = 0, FOCUS_HEROES = 1, FOCUS_CASTLE = 2 };
+
+struct Focus : std::pair<u8, void*>
+{
+    Focus() : std::pair<u8, void*>(FOCUS_UNSEL, NULL) {}
+
+    bool	isValid(void) const { return first != FOCUS_UNSEL && second; }
+
+    void	Reset(void) { first = FOCUS_UNSEL; second = NULL; }
+    void	Set(Castle* ptr) { first = FOCUS_CASTLE; second = ptr; }
+    void	Set(Heroes* ptr) { first = FOCUS_HEROES; second = ptr; }
+
+    Castle*	GetCastle(void) { return first == FOCUS_CASTLE && second ? reinterpret_cast<Castle*>(second) : NULL; }
+    Heroes*	GetHeroes(void) { return first == FOCUS_HEROES && second ? reinterpret_cast<Heroes*>(second) : NULL; }
+};
 
 struct Player
 {
@@ -53,6 +72,7 @@ struct Player
     u8		friends;
     std::string	name;
     u32		id;
+    Focus	focus;
 };
 
 class Players : public std::vector<Player*>

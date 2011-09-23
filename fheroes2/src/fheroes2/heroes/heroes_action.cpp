@@ -280,8 +280,8 @@ void BattleLose(Heroes &hero, const Battle2::Result & res, bool attacker, Color:
     hero.FadeOut();
     hero.SetKillerColor(color);
     hero.SetFreeman(reason);
-    Game::Focus::Get().Reset(Game::Focus::HEROES);
-    Game::Focus::Get().SetRedraw();
+    GameFocus::Reset(GameFocus::HEROES);
+    GameFocus::SetRedraw();
 }
 
 void PlayPickupSound(void)
@@ -2069,9 +2069,8 @@ void ActionToTeleports(Heroes &hero, const s32 index_from)
     MoveHero2Dest(hero, index_to, MP2::OBJ_STONELIGHTS, MP2::OBJ_STONELIGHTS);
 
     Interface::Basic & I = Interface::Basic::Get();
-    Game::Focus & F = Game::Focus::Get();
     I.gameArea.SetCenter(hero.GetCenter());
-    F.SetRedraw();
+    GameFocus::SetRedraw();
     I.Redraw();
 
     AGG::PlaySound(M82::KILLFADE);
@@ -2105,9 +2104,8 @@ void ActionToWhirlpools(Heroes &hero, const u8 obj, const s32 index_from)
     MoveHero2Dest(hero, index_to, MP2::OBJ_WHIRLPOOL, MP2::OBJ_WHIRLPOOL);
 
     Interface::Basic & I = Interface::Basic::Get();
-    Game::Focus & F = Game::Focus::Get();
     I.gameArea.SetCenter(hero.GetCenter());
-    F.SetRedraw();
+    GameFocus::SetRedraw();
     I.Redraw();
 
     AGG::PlaySound(M82::KILLFADE);
@@ -2724,7 +2722,7 @@ void ActionToMagellanMaps(Heroes &hero, const u8 obj, const s32 dst_index)
 	if(Dialog::YES == Dialog::Message(MP2::StringObject(obj), _("A retired captain living on this refurbished fishing platform offers to sell you maps of the sea he made in his younger days for 1,000 gold. Do you wish to buy the maps?"), Font::BIG, Dialog::YES | Dialog::NO))
 	    world.ActionForMagellanMaps(hero.GetColor());
 
-	Game::Focus::Get().SetRedraw();
+	GameFocus::SetRedraw();
     }
 
     DEBUG(DBG_GAME, DBG_INFO, hero.GetName());

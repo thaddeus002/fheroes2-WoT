@@ -160,12 +160,12 @@ void Interface::CastleIcons::RedrawBackground(const Point & pos)
 
 void Interface::CastleIcons::ActionCurrentUp(void)
 {
-    Game::Focus::Get().Set(GetCurrent());
+    GameFocus::Set(GetCurrent());
 }
 
 void Interface::CastleIcons::ActionCurrentDn(void)
 {
-    Game::Focus::Get().Set(GetCurrent());
+    GameFocus::Set(GetCurrent());
 }
 
 void Interface::CastleIcons::ActionListDoubleClick(CASTLE & item)
@@ -183,8 +183,8 @@ void Interface::CastleIcons::ActionListSingleClick(CASTLE & item)
 {
     if(item)
     {
-	Game::Focus::Get().Set(item);
-	Game::Focus::Get().SetRedraw();
+	GameFocus::Set(item);
+	GameFocus::SetRedraw();
 
 	// for QVGA: auto hide icons after click
 	if(Settings::Get().QVGA()) Settings::Get().SetShowIcons(false);
@@ -248,12 +248,12 @@ void Interface::HeroesIcons::RedrawBackground(const Point & pos)
 
 void Interface::HeroesIcons::ActionCurrentUp(void)
 {
-    Game::Focus::Get().Set(GetCurrent());
+    GameFocus::Set(GetCurrent());
 }
 
 void Interface::HeroesIcons::ActionCurrentDn(void)
 {
-    Game::Focus::Get().Set(GetCurrent());
+    GameFocus::Set(GetCurrent());
 }
 
 void Interface::HeroesIcons::ActionListDoubleClick(HEROES & item)
@@ -274,8 +274,8 @@ void Interface::HeroesIcons::ActionListSingleClick(HEROES & item)
 {
     if(item)
     {
-	Game::Focus::Get().Set(item);
-	Game::Focus::Get().SetRedraw();
+	GameFocus::Set(item);
+	GameFocus::SetRedraw();
 
 	// for QVGA: auto hide icons after click
 	if(Settings::Get().QVGA()) Settings::Get().SetShowIcons(false);
@@ -442,8 +442,8 @@ void Interface::IconsPanel::QueueEventProcessing(void)
         cursor.Hide();
 
         SetPos(mp.x - ox, mp.y - oy);
-	Game::Focus::Get().CheckIconsPanel();
 
+	GameFocus::SetRedraw();
 	Interface::Basic::Get().SetRedraw(REDRAW_ICONS|REDRAW_GAMEAREA);
     }
 }

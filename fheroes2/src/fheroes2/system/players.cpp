@@ -36,6 +36,11 @@ namespace
     u8 human_colors = 0;
 }
 
+void PlayerFocusReset(Player* player)
+{
+    if(player) player->focus.Reset();
+}
+
 void PlayerFixMultiControl(Player* player)
 {
     if(player && player->control == (CONTROL_HUMAN|CONTROL_AI)) player->control = CONTROL_AI;
@@ -254,6 +259,7 @@ void Players::SetHumanColors(u8 cols) /* remove: server.cpp */
 
 void Players::SetStartGame(void)
 {
+    for_each(begin(), end(), std::ptr_fun(&PlayerFocusReset));
     for_each(begin(), end(), std::ptr_fun(&PlayerFixRandomRace));
     for_each(begin(), end(), std::ptr_fun(&PlayerFixMultiControl));
 

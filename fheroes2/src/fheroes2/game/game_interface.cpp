@@ -190,10 +190,8 @@ void Interface::Basic::Redraw(u8 force)
 	    cursor.SetThemes(cursor.Themes(), true);
 	    cursor.Show();
 
-	    Game::Focus & focus = Game::Focus::Get();
-
-	    if(focus.Type() != Game::Focus::UNSEL)
-		AGG::PlayMusic(MUS::FromGround(world.GetTiles(focus.GetCenter()).GetGround()));
+	    if(GameFocus::Type() != GameFocus::UNSEL)
+		AGG::PlayMusic(MUS::FromGround(world.GetTiles(GameFocus::GetCenter()).GetGround()));
 	    Game::EnvironmentSoundMixer();
 	}
 

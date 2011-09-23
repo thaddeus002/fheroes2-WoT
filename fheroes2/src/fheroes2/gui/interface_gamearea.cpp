@@ -180,20 +180,17 @@ void Interface::GameArea::Redraw(Surface & dst, u8 flag, const Rect & rt) const
     }
 
     // route
-    const Game::Focus & focus = Game::Focus::Get();
+    const Heroes* hero = flag & LEVEL_HEROES ? GameFocus::GetHeroes() : NULL;
 
-    if((flag & LEVEL_HEROES) &&
-	Game::Focus::HEROES == focus.Type() &&
-	focus.GetHeroes().GetPath().isShow())
+    if(hero && hero->GetPath().isShow())
     {
-	const Heroes & hero = focus.GetHeroes();
-	s32 from = hero.GetIndex();
-	s16 green = hero.GetPath().GetAllowStep();
+	s32 from = hero->GetIndex();
+	s16 green = hero->GetPath().GetAllowStep();
 
-	const bool skipfirst = hero.isEnableMove() && 45 > hero.GetSpriteIndex() && 2 < (hero.GetSpriteIndex() % 9);
+	const bool skipfirst = hero->isEnableMove() && 45 > hero->GetSpriteIndex() && 2 < (hero->GetSpriteIndex() % 9);
 
-	Route::Path::const_iterator it1 = hero.GetPath().begin();
-	Route::Path::const_iterator it2 = hero.GetPath().end();
+	Route::Path::const_iterator it1 = hero->GetPath().begin();
+	Route::Path::const_iterator it2 = hero->GetPath().end();
 	Route::Path::const_iterator it3 = it1;
 
 	for(; it1 != it2; ++it1)
@@ -205,11 +202,11 @@ void Interface::GameArea::Redraw(Surface & dst, u8 flag, const Rect & rt) const
 	    --green;
 
             if(!(Rect(rectMaps.x + rt.x, rectMaps.y + rt.y, rt.w, rt.h) & mp)) continue;
-	    if(it1 == hero.GetPath().begin() && skipfirst) continue;
+	    if(it1 == hero->GetPath().begin() && skipfirst) continue;
 
 	    const u16 index = (it3 == it2 ? 0 :
 		    Route::Path::GetIndexSprite((*it1).direction, (*it3).direction, 
-			Maps::Ground::GetBasePenalty(from, hero.GetLevelSkill(Skill::Secondary::PATHFINDING))));
+			Maps::Ground::GetBasePenalty(from, hero->GetLevelSkill(Skill::Secondary::PATHFINDING))));
 
 	    const Sprite & sprite = AGG::GetICN(0 > green ? ICN::ROUTERED : ICN::ROUTE, index);
 	    BlitOnTile(dst, sprite, sprite.x() - 14, sprite.y(), mp);

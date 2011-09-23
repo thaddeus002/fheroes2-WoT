@@ -37,8 +37,7 @@ bool ObjTown::isPassable(u16 icn, u8 index, u16 direct, s32 maps_index)
 	    {
 		if(!Maps::isValidDirection(maps_index, Direction::BOTTOM)) return false;
 		const Maps::Tiles & tiles = world.GetTiles(Maps::GetDirectionIndex(maps_index, Direction::BOTTOM));
-		Game::Focus & focus = Game::Focus::Get();
-		return tiles.isPassable((Game::Focus::HEROES == focus.Type() ? &focus.GetHeroes() : NULL), Direction::UNKNOWN, false);
+		return tiles.isPassable(GameFocus::GetHeroes(), Direction::UNKNOWN, false);
 	    }
 
             if(index < 5 || ( 9 < index && index < 15) || (19 < index && index < 25) ||

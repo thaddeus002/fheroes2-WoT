@@ -152,7 +152,6 @@ bool HeroesTownGate(Heroes & hero, const Castle* castle)
     if(castle)
     {
 	Interface::Basic & I = Interface::Basic::Get();
-	Game::Focus & F = Game::Focus::Get();
 
 	const s32 src = hero.GetIndex();
 	const s32 dst = castle->GetIndex();
@@ -173,7 +172,7 @@ bool HeroesTownGate(Heroes & hero, const Castle* castle)
 	world.GetTiles(dst).SetObject(MP2::OBJ_HEROES);
 
 	I.gameArea.SetCenter(hero.GetCenter());
-	F.SetRedraw();
+	GameFocus::SetRedraw();
 	I.Redraw();
 
 	AGG::PlaySound(M82::KILLFADE);
@@ -290,13 +289,12 @@ bool ActionSpellDimensionDoor(Heroes & hero)
     const u8 distance = Spell::CalculateDimensionDoorDistance(hero.GetPower(), hero.GetArmy().GetHitPoints());
 
     Interface::Basic & I = Interface::Basic::Get();
-    Game::Focus & F = Game::Focus::Get();
     Cursor & cursor = Cursor::Get();
 
     // center hero
     cursor.Hide();
     I.gameArea.SetCenter(hero.GetCenter());
-    F.SetRedraw();
+    GameFocus::SetRedraw();
     I.Redraw();
 
     const s32 src = hero.GetIndex();
@@ -318,7 +316,7 @@ bool ActionSpellDimensionDoor(Heroes & hero)
 	world.GetTiles(dst).SetObject(MP2::OBJ_HEROES);
 
 	I.gameArea.SetCenter(hero.GetCenter());
-	F.SetRedraw();
+	GameFocus::SetRedraw();
 	I.Redraw();
 
 	AGG::PlaySound(M82::KILLFADE);
@@ -355,13 +353,12 @@ bool ActionSpellTownGate(Heroes & hero)
     }
 
     Interface::Basic & I = Interface::Basic::Get();
-    Game::Focus & F = Game::Focus::Get();
     Cursor & cursor = Cursor::Get();
 
     // center hero
     cursor.Hide();
     I.gameArea.SetCenter(hero.GetCenter());
-    F.SetRedraw();
+    GameFocus::SetRedraw();
     I.Redraw();
 
     if(!castle)
