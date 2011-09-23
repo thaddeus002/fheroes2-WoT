@@ -266,6 +266,7 @@ int main(int argc, char **argv)
 void LoadZLogo(void)
 {
 #ifdef BUILD_RELEASE
+#ifdef WITH_ZLIB
     // SDL logo
     if(Settings::Get().ExtShowSDL())
     {
@@ -312,6 +313,7 @@ void LoadZLogo(void)
 	}
 	if(zlogo) delete zlogo;
     }
+#endif
 #endif
 }
 
@@ -381,6 +383,7 @@ void LoadConfigFiles(Settings & conf, const std::string & dirname)
 
 void ShowAGGError(void)
 {
+#ifdef WITH_ZLIB
     ZSurface zerr;
     if(zerr.Load(_ptr_080721d0.width, _ptr_080721d0.height, _ptr_080721d0.bpp, _ptr_080721d0.pitch,
     	    _ptr_080721d0.rmask, _ptr_080721d0.gmask, _ptr_080721d0.bmask, _ptr_080721d0.amask, _ptr_080721d0.zdata, sizeof(_ptr_080721d0.zdata)))
@@ -393,4 +396,5 @@ void ShowAGGError(void)
 
 	while(le.HandleEvents() && !le.KeyPress() && !le.MouseClickLeft());
     }
+#endif
 }
