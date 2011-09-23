@@ -150,9 +150,6 @@ HeroBase::HeroBase(u8 type, u8 race)
 	switch(type)
 	{
 	    case Skill::Primary::CAPTAIN:
-		SpellBookActivate();
-		break;
-
 	    case Skill::Primary::HEROES:
 	    {
 		Spell spell = Skill::Primary::GetInitialSpell(race);
