@@ -146,6 +146,7 @@ const settings_t settingsFHeroes2[] =
     { Settings::WORLD_ARTSPRING_SEPARATELY_VISIT,_("world: Artesian Springs have two separately visitable squares (h3 ver)"), },
     { Settings::WORLD_STARTHERO_LOSSCOND4HUMANS,_("world: Starting heroes as Loss Conditions for Human Players"), },
     { Settings::WORLD_1HERO_HIRED_EVERY_WEEK,	_("world: Only 1 hero can be hired by the one player every week"), },
+    { Settings::WORLD_DWELLING_ACCUMULATE_UNITS,_("world: Outer creature dwellings should accumulate units"), },
     { Settings::CASTLE_ALLOW_BUY_FROM_WELL,	_("castle: allow buy from well"),			},
     { Settings::CASTLE_ALLOW_GUARDIANS,		_("castle: allow guardians"),				},
     { Settings::CASTLE_MAGEGUILD_POINTS_TURN,	_("castle: higher mage guilds regenerate more spell points/turn (20/40/60/80/100%)"), },
@@ -1384,6 +1385,11 @@ bool Settings::ExtHeroAllowBannedSecSkillsUpgrade(void) const
 bool Settings::ExtWorldOneHeroHiredEveryWeek(void) const
 {
     return ExtModes(WORLD_1HERO_HIRED_EVERY_WEEK);
+}
+
+bool Settings::ExtWorldDwellingsAccumulateUnits(void) const
+{
+    return ExtModes(WORLD_DWELLING_ACCUMULATE_UNITS);
 }
 
 const Point & Settings::PosRadar(void) const { return pos_radr; }

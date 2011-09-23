@@ -1403,7 +1403,13 @@ void World::UpdateDwellingPopulation(void)
 	    default: break;
 	}
 		
-	if(count) tile.SetCountMonster(tile.GetCountMonster() + static_cast<u16>(count));
+	if(count)
+	{
+	    if(Settings::Get().ExtWorldDwellingsAccumulateUnits())
+    		tile.SetCountMonster(tile.GetCountMonster() + static_cast<u16>(count));
+	    else
+		tile.SetCountMonster(static_cast<u16>(count));
+	}
     }
 }
 
