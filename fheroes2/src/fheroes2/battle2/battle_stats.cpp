@@ -1297,8 +1297,10 @@ void Battle2::Stats::SpellModesAction(const Spell & spell, u8 duration, const He
 {
     if(hero)
     {
-	if(hero->HasArtifact(Artifact::WIZARD_HAT)) duration += Artifact(Artifact::WIZARD_HAT).ExtraValue();
-	if(hero->HasArtifact(Artifact::ENCHANTED_HOURGLASS)) duration += Artifact(Artifact::ENCHANTED_HOURGLASS).ExtraValue();
+	u8 acount = hero->HasArtifact(Artifact::WIZARD_HAT);
+	if(acount) duration += acount * Artifact(Artifact::WIZARD_HAT).ExtraValue();
+	   acount = hero->HasArtifact(Artifact::ENCHANTED_HOURGLASS);
+	if(acount) duration += acount * Artifact(Artifact::ENCHANTED_HOURGLASS).ExtraValue();
     }
 
     switch(spell())
@@ -1416,8 +1418,11 @@ void Battle2::Stats::SpellModesAction(const Spell & spell, u8 duration, const He
 	    break;
 
 	case Spell::HYPNOTIZE:
+	{
 	    SetModes(SP_HYPNOTIZE);
-	    affected.AddMode(SP_HYPNOTIZE, (hero && hero->HasArtifact(Artifact::GOLD_WATCH) ? duration * 2 : duration));
+	    u8 acount = hero ? hero->HasArtifact(Artifact::GOLD_WATCH) : 0;
+	    affected.AddMode(SP_HYPNOTIZE, (acount ? duration * acount * 2 : duration));
+	}
 	    break;
 
         case Spell::STONE:
@@ -1502,43 +1507,58 @@ void Battle2::Stats::SpellApplyDamage(const Spell & spell, u8 spoint, const Hero
     if(hero)
     {
 	const HeroBase* myhero = GetCommander();
+	u8 acount = 0;
 
 	switch(spell())
 	{
             case Spell::COLDRAY:
             case Spell::COLDRING:
 		// +50%
-    		if(hero->HasArtifact(Artifact::EVERCOLD_ICICLE)) dmg += dmg * Artifact(Artifact::EVERCOLD_ICICLE).ExtraValue() / 100;
+    		acount = hero->HasArtifact(Artifact::EVERCOLD_ICICLE);
+		if(acount) dmg += dmg * acount * Artifact(Artifact::EVERCOLD_ICICLE).ExtraValue() / 100;
+    		acount = hero->HasArtifact(Artifact::EVERCOLD_ICICLE);
+		if(acount) dmg += dmg * acount * Artifact(Artifact::EVERCOLD_ICICLE).ExtraValue() / 100;
 		// -50%
-    		if(myhero && myhero->HasArtifact(Artifact::ICE_CLOAK)) dmg /= 2;
-    		if(myhero && myhero->HasArtifact(Artifact::HEART_ICE)) dmg -= dmg * Artifact(Artifact::HEART_ICE).ExtraValue() / 100;
+    		acount = myhero ? myhero->HasArtifact(Artifact::ICE_CLOAK) : 0;
+		if(acount) dmg /= acount * 2;
+    		acount = myhero ? myhero->HasArtifact(Artifact::HEART_ICE) : 0;
+		if(acount) dmg -= dmg * acount * Artifact(Artifact::HEART_ICE).ExtraValue() / 100;
     		// 100%
-    		if(myhero && myhero->HasArtifact(Artifact::HEART_FIRE)) dmg *= 2;
+    		acount = myhero ? myhero->HasArtifact(Artifact::HEART_FIRE) : 0;
+		if(acount) dmg *= acount * 2;
     		break;
 
             case Spell::FIREBALL:
             case Spell::FIREBLAST:
 		// +50%
-    		if(hero->HasArtifact(Artifact::EVERHOT_LAVA_ROCK)) dmg += dmg * Artifact(Artifact::EVERHOT_LAVA_ROCK).ExtraValue() / 100;
+    		acount = hero->HasArtifact(Artifact::EVERHOT_LAVA_ROCK);
+		if(acount) dmg += dmg * acount * Artifact(Artifact::EVERHOT_LAVA_ROCK).ExtraValue() / 100;
 		// -50%
-    		if(myhero && myhero->HasArtifact(Artifact::FIRE_CLOAK)) dmg /= 2;
-    		if(myhero && myhero->HasArtifact(Artifact::HEART_FIRE)) dmg -= dmg * Artifact(Artifact::HEART_FIRE).ExtraValue() / 100;
+    		acount = myhero ? myhero->HasArtifact(Artifact::FIRE_CLOAK) : 0;
+		if(acount) dmg /= acount * 2;
+    		acount = myhero ? myhero->HasArtifact(Artifact::HEART_FIRE) : 0;
+		if(acount) dmg -= dmg * acount * Artifact(Artifact::HEART_FIRE).ExtraValue() / 100;
     		// 100%
-    		if(myhero && myhero->HasArtifact(Artifact::HEART_ICE)) dmg *= 2;
+    		acount = myhero ? myhero->HasArtifact(Artifact::HEART_ICE) : 0;
+		if(acount) dmg *= acount * 2;
     		break;
 
             case Spell::LIGHTNINGBOLT:
 		// +50%
-    		if(hero->HasArtifact(Artifact::LIGHTNING_ROD)) dmg += dmg * Artifact(Artifact::LIGHTNING_ROD).ExtraValue() / 100;
+    		acount = hero->HasArtifact(Artifact::LIGHTNING_ROD);
+		if(acount) dmg += dmg * acount * Artifact(Artifact::LIGHTNING_ROD).ExtraValue() / 100;
 		// -50%
-    		if(myhero && myhero->HasArtifact(Artifact::LIGHTNING_HELM)) dmg /= 2;
+    		acount = myhero ? myhero->HasArtifact(Artifact::LIGHTNING_HELM) : 0;
+		if(acount) dmg /= acount * 2;
 		break;
 
             case Spell::CHAINLIGHTNING:
 		// +50%
-    		if(hero->HasArtifact(Artifact::LIGHTNING_ROD)) dmg += dmg / 2;
+    		acount = hero->HasArtifact(Artifact::LIGHTNING_ROD);
+		if(acount) dmg += acount * dmg / 2;
 		// -50%
-    		if(myhero && myhero->HasArtifact(Artifact::LIGHTNING_HELM)) dmg /= 2;
+    		acount = myhero ? myhero->HasArtifact(Artifact::LIGHTNING_HELM) : 0;
+		if(acount) dmg /= acount * 2;
 		// update orders damage
 		switch(target.damage)
 		{
@@ -1553,7 +1573,8 @@ void Battle2::Stats::SpellApplyDamage(const Spell & spell, u8 spoint, const Hero
         case Spell::ELEMENTALSTORM:
         case Spell::ARMAGEDDON:
 		// -50%
-    		if(myhero && myhero->HasArtifact(Artifact::BROACH_SHIELDING)) dmg /= 2;
+    		acount = myhero ? myhero->HasArtifact(Artifact::BROACH_SHIELDING) : 0;
+		if(acount) dmg /= acount * 2;
     		break;
 
 	    default: break;
@@ -1598,7 +1619,8 @@ void Battle2::Stats::SpellRestoreAction(const Spell & spell, u8 spoint, const He
 		ResetAnimFrame(AS_IDLE);
 	    }
 	    // restore hp
-	    if(hero && hero->HasArtifact(Artifact::ANKH)) restore *= 2;
+	    u8 acount = hero ? hero->HasArtifact(Artifact::ANKH) : 0;
+	    if(acount) restore *= acount * 2;
 
 	    const u16 res = Resurrect(restore, false, (spell == Spell::RESURRECT));
 

@@ -1807,7 +1807,8 @@ Battle2::Stats* Battle2::Arena::CreateElemental(const Spell & spell)
 
     DEBUG(DBG_BATTLE, DBG_TRACE, mons.GetName() << ", position: " << pos);
     u16 count = spell.ExtraValue() * hero->GetPower();
-    if(hero->HasArtifact(Artifact::BOOK_ELEMENTS)) count *= 2;
+    u8 acount = hero->HasArtifact(Artifact::BOOK_ELEMENTS);
+    if(acount) count *= acount * 2;
 
     elem = friends.CreateNewStats(mons, count);
     if(elem)

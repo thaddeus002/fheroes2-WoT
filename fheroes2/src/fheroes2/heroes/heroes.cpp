@@ -574,6 +574,7 @@ u16 Heroes::GetMaxSpellPoints(void) const
 u16 Heroes::GetMaxMovePoints(void) const
 {
     u16 point = 0;
+    u8 acount = 0;
 
     // start point
     if(isShipMaster())
@@ -584,7 +585,8 @@ u16 Heroes::GetMaxMovePoints(void) const
 	point += point * GetSecondaryValues(Skill::Secondary::NAVIGATION) / 100;
 
 	// artifact bonus
-        if(HasArtifact(Artifact::SAILORS_ASTROLABE_MOBILITY)) point += 1000;
+        acount = HasArtifact(Artifact::SAILORS_ASTROLABE_MOBILITY);
+        if(acount) point += acount * 1000;
 
         // visited object
         if(isVisited(MP2::OBJ_LIGHTHOUSE)) point += 500;
@@ -609,14 +611,18 @@ u16 Heroes::GetMaxMovePoints(void) const
 	point += point * GetSecondaryValues(Skill::Secondary::LOGISTICS) / 100;
 
 	// artifact bonus
-	if(HasArtifact(Artifact::NOMAD_BOOTS_MOBILITY)) point += 600;
-	if(HasArtifact(Artifact::TRAVELER_BOOTS_MOBILITY)) point += 300;
+	acount = HasArtifact(Artifact::NOMAD_BOOTS_MOBILITY);
+	if(acount) point += acount * 600;
+
+	acount = HasArtifact(Artifact::TRAVELER_BOOTS_MOBILITY);
+	if(acount) point += acount * 300;
 
         // visited object
         if(isVisited(MP2::OBJ_STABLES)) point += 500;
     }
 
-    if(HasArtifact(Artifact::TRUE_COMPASS_MOBILITY)) point += 500;
+    acount = HasArtifact(Artifact::TRUE_COMPASS_MOBILITY);
+    if(acount) point += acount * 500;
 
     return point;
 }
@@ -800,8 +806,9 @@ void Heroes::ActionNewDay(void)
 		curr += GameStatic::GetHeroesRestoreSpellPointsPerDay();
 
 		// power ring action
-	        if(HasArtifact(Artifact::POWER_RING))
-		    curr += Artifact(Artifact::POWER_RING).ExtraValue();
+	        u8 acount = HasArtifact(Artifact::POWER_RING);
+		if(acount)
+		    curr += acount * Artifact(Artifact::POWER_RING).ExtraValue();
 
 		// secondary skill
 	        curr += GetSecondaryValues(Skill::Secondary::MYSTICISM);
@@ -1221,16 +1228,19 @@ void Heroes::Scoute(void) const
 
 u8 Heroes::GetScoute(void) const
 {
-    return (HasArtifact(Artifact::TELESCOPE) ? Game::GetViewDistance(Game::VIEW_TELESCOPE) : 0) +
+    u8 acount = HasArtifact(Artifact::TELESCOPE);
+
+    return (acount ? acount * Game::GetViewDistance(Game::VIEW_TELESCOPE) : 0) +
 	Game::GetViewDistance(Game::VIEW_HEROES) + GetSecondaryValues(Skill::Secondary::SCOUTING);
 }
 
 u16 Heroes::GetVisionsDistance(void) const
 {
     u16 dist = Spell(Spell::VISIONS).ExtraValue();
+    u8 acount = HasArtifact(Artifact::CRYSTAL_BALL);
 
-    if(HasArtifact(Artifact::CRYSTAL_BALL))
-        dist = Settings::Get().UseAltResource() ? dist * 2 + 2 : 8;
+    if(acount)
+        dist = acount * (Settings::Get().UseAltResource() ? dist * 2 + 2 : 8);
 
     return dist;
 }

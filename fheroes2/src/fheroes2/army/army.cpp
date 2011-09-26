@@ -1108,8 +1108,9 @@ u32 Army::army_t::GetSurrenderCost(void) const
 	}
 
 	Artifact art(Artifact::STATESMAN_QUILL);
-	if(commander->HasArtifact(art))
-	    res -= res * art.ExtraValue() / 100;
+	u8 acount = commander->HasArtifact(art);
+	if(acount)
+	    res -= res * acount * art.ExtraValue() / 100;
     }
 
     // limit

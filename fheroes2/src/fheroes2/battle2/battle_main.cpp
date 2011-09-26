@@ -268,7 +268,8 @@ void Battle2::NecromancySkillAction(Army::army_t & army1, u32 killed, bool local
     u16 percent = 10 * world.GetKingdom(army1.GetColor()).GetCountNecromancyShrineBuild();
 
     // check artifact
-    if(hero->HasArtifact(Artifact::SPADE_NECROMANCY)) percent += 10;
+    u8 acount = hero->HasArtifact(Artifact::SPADE_NECROMANCY);
+    if(acount) percent += acount * 10;
 
     // fix over 60%
     if(percent > 60) percent = 60;

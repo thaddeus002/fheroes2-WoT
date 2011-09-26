@@ -40,29 +40,33 @@ s8 ArtifactsModifiersResult(u8 type, const u8* arts, u8 size, const HeroBase & b
     {
 	    const Artifact art(arts[ii]);
 
-    	    if(art.isValid() && base.HasArtifact(art))
+    	    if(art.isValid())
     	    {
-		s32 mod = art.ExtraValue();
-
-		switch(art())
+		u8 acount = base.HasArtifact(art);
+		if(acount)
 		{
-		    // power
-		    case Artifact::BROACH_SHIELDING:	if(type == MDF_POWER) mod = -2; break;
-		    // morale/luck
-		    case Artifact::BATTLE_GARB:		if(type == MDF_MORALE || type == MDF_LUCK) mod = 10; break;
-		    case Artifact::MASTHEAD:		if(type == MDF_MORALE || type == MDF_LUCK) mod = base.Modes(Heroes::SHIPMASTER) ? art.ExtraValue() : 0; break;
-		    // morale
-		    case Artifact::FIZBIN_MISFORTUNE:	if(type == MDF_MORALE) mod = -art.ExtraValue(); break;
-		    default: break;
-		}
+		    s32 mod = art.ExtraValue();
 
-    		result += mod;
+		    switch(art())
+		    {
+			// power
+			case Artifact::BROACH_SHIELDING:	if(type == MDF_POWER) mod = -2; break;
+			// morale/luck
+			case Artifact::BATTLE_GARB:		if(type == MDF_MORALE || type == MDF_LUCK) mod = 10; break;
+			case Artifact::MASTHEAD:		if(type == MDF_MORALE || type == MDF_LUCK) mod = base.Modes(Heroes::SHIPMASTER) ? art.ExtraValue() : 0; break;
+			// morale
+			case Artifact::FIZBIN_MISFORTUNE:	if(type == MDF_MORALE) mod = -art.ExtraValue(); break;
+			default: break;
+		    }
 
-    		if(strs)
-    		{
-        	    strs->append(art.GetName());
-		    StringAppendModifiers(*strs, mod);
-        	    strs->append("\n");
+    		    result += mod * acount;
+
+    		    if(strs)
+    		    {
+        		strs->append(art.GetName());
+			StringAppendModifiers(*strs, mod);
+        		strs->append("\n");
+		    }
 		}
 	    }
     }
@@ -198,7 +202,7 @@ Spell HeroBase::OpenSpellBook(u8 filter, bool canselect) const
 
 bool HeroBase::HaveSpellBook(void) const
 {
-    return bag_artifacts.isPresentArtifact(Artifact::MAGIC_BOOK);
+    return HasArtifact(Artifact::MAGIC_BOOK);
 }
 
 bool HeroBase::HaveSpell(const Spell & spell, bool skip_bag) const
@@ -236,9 +240,10 @@ BagArtifacts & HeroBase::GetBagArtifacts(void)
     return bag_artifacts;
 }
 
-bool HeroBase::HasArtifact(const Artifact & art) const
+u8 HeroBase::HasArtifact(const Artifact & art) const
 {
-    return bag_artifacts.isPresentArtifact(art);
+    return ! Settings::Get().ExtWorldUseUniqueArtifacts() ? bag_artifacts.Count(art) :
+        (bag_artifacts.isPresentArtifact(art) ? 1 : 0);
 }
 
 s8 HeroBase::GetAttackModificator(std::string* strs) const

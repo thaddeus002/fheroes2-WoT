@@ -91,7 +91,7 @@ public:
 
     BagArtifacts & GetBagArtifacts(void);
     const BagArtifacts & GetBagArtifacts(void) const;
-    bool HasArtifact(const Artifact &) const;
+    u8   HasArtifact(const Artifact &) const;
     bool PickupArtifact(const Artifact &);
 
 protected:

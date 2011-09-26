@@ -222,34 +222,48 @@ u16 Spell::MovePoint(void) const
 
 u8 Spell::SpellPoint(const HeroBase* hero) const
 {
+    u8 res = spells[id].sp;
+    u8 acount = 0;
+
     if(hero)
     {
 	switch(id)
 	{
 	    case BLESS:
 	    case MASSBLESS:
-	    if(hero->HasArtifact(Artifact::SNAKE_RING)) return spells[id].sp / 2;
-	    break;
+		acount = hero->HasArtifact(Artifact::SNAKE_RING);
+		if(acount)
+		    res = spells[id].sp / (acount * 2);
+		break;
 
 	    case SUMMONEELEMENT:
 	    case SUMMONAELEMENT:
 	    case SUMMONFELEMENT:
 	    case SUMMONWELEMENT:
-	    if(hero->HasArtifact(Artifact::ELEMENTAL_RING)) return spells[id].sp / 2;
-	    break;
+		acount = hero->HasArtifact(Artifact::ELEMENTAL_RING);
+		if(acount)
+		    res = spells[id].sp / (acount * 2);
+		break;
 
 	    case CURSE:
 	    case MASSCURSE:
-	    if(hero->HasArtifact(Artifact::EVIL_EYE)) return spells[id].sp / 2;
-	    break;
+		acount = hero->HasArtifact(Artifact::EVIL_EYE);
+		if(acount)
+		    res = spells[id].sp / (acount * 2);
+		break;
 
 	    default: break;
 	}
 
-	if(isMindInfluence() && hero->HasArtifact(Artifact::SKULLCAP)) return spells[id].sp / 2;
+	if(isMindInfluence())
+	{
+	    acount = hero->HasArtifact(Artifact::SKULLCAP);
+	    if(acount)
+		res = spells[id].sp / (acount * 2);
+	}
     }
 
-    return spells[id].sp;
+    return res ? res : 1;
 }
 
 payment_t Spell::GetCost(void) const
