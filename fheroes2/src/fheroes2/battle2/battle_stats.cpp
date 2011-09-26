@@ -1804,7 +1804,6 @@ u8 Battle2::Stats::GetMagicResist(const Spell & spell, u8 spower) const
     {
 	case Spell::CURE:
 	case Spell::MASSCURE:
-	    if(troop.isUndead()) return 100;
 	    if(!isHaveDamage() && !(modes & IS_MAGIC)) return 100;
 	    break;
 
