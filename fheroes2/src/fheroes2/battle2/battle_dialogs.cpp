@@ -545,7 +545,7 @@ bool Battle2::DialogBattleSurrender(const HeroBase & hero, u32 cost)
     Text text(str, Font::BIG);
     text.Blit(pos_rt.x + 320 - text.w() / 2, pos_rt.y + 30);
 
-    str = _("I will accept your surrender and grant you and your toops safe passage for the price of %{price} gold.");
+    str = _("I will accept your surrender and grant you and your troops safe passage for the price of %{price} gold.");
     String::Replace(str, "%{price}", cost);
 
     TextBox box(str, Font::BIG, 275);
