@@ -793,12 +793,9 @@ void Heroes::ActionNewDay(void)
 	    {
 		//restore from mage guild
 		if(Settings::Get().ExtCastleGuildRestorePointsTurn())
-		{
-		    const u8 add = curr * GameStatic::GetMageGuildRestoreSpellPointsPercentDay(castle->GetLevelMageGuild()) / 100;
-		    curr = curr + add > maxp ? maxp : curr + add;
-		}
+		    curr += maxp * GameStatic::GetMageGuildRestoreSpellPointsPercentDay(castle->GetLevelMageGuild()) / 100;
 		else
-		    SetSpellPoints(maxp);
+		    curr = maxp;
 	    }
 	    else
 	    {
@@ -812,9 +809,9 @@ void Heroes::ActionNewDay(void)
 
 		// secondary skill
 	        curr += GetSecondaryValues(Skill::Secondary::MYSTICISM);
-
-		SetSpellPoints(curr > maxp ? maxp : curr);
 	    }
+
+	    SetSpellPoints(curr > maxp ? maxp : curr);
 	}
     }
 
