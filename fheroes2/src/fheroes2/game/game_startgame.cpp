@@ -62,8 +62,6 @@ namespace Game
     void MoveHeroFromArrowKeys(Heroes & hero, Direction::vector_t direct);
 
     void MouseCursorAreaClickLeft(s32);
-    void FocusHeroesClickLeftAction(Heroes &, s32);
-    void FocusCastleClickLeftAction(Castle &, s32);
     void MouseCursorAreaPressRight(s32);
 
     void StartNewGame(menu_t &);
@@ -450,10 +448,7 @@ Cursor::themes_t Game::GetCursorFocusShipmaster(const Heroes & from_hero, const 
     switch(tile.GetObject())
     {
 	case MP2::OBJ_MONSTER:
-	    if(water)
-    		return from_hero.Modes(Heroes::GUARDIAN) ? Cursor::POINTER :
-		    Cursor::DistanceThemes(Cursor::FIGHT, from_hero.GetRangeRouteDays(tile.GetIndex()));
-	    break;
+    	    return water ? Cursor::DistanceThemes(Cursor::FIGHT, from_hero.GetRangeRouteDays(tile.GetIndex())) : Cursor::POINTER;
 
 	case MP2::OBJ_BOAT:
 	    return Cursor::POINTER;
@@ -463,7 +458,7 @@ Cursor::themes_t Game::GetCursorFocusShipmaster(const Heroes & from_hero, const 
 	{
     	    const Castle* castle = world.GetCastle(tile.GetIndex());
 
-    	    if(NULL != castle)
+    	    if(castle)
     		return from_hero.GetColor() == castle->GetColor() ? Cursor::CASTLE : Cursor::POINTER;
     	}
     	break;
@@ -472,8 +467,11 @@ Cursor::themes_t Game::GetCursorFocusShipmaster(const Heroes & from_hero, const 
 	{
 	    const Heroes* to_hero = world.GetHeroes(tile.GetIndex());
 
-    	    if(NULL != to_hero && to_hero->isShipMaster())
-    	    {
+    	    if(to_hero)
+	    {
+		if(! to_hero->isShipMaster())
+		    return Cursor::HEROES;
+		else
 		if(to_hero->GetCenter() == from_hero.GetCenter())
 		    return Cursor::HEROES;
 		else
@@ -572,9 +570,8 @@ Cursor::themes_t Game::GetCursorFocusHeroes(const Heroes & from_hero, const Maps
 	{
 	    const Heroes* to_hero = world.GetHeroes(tile.GetIndex());
 
-    	    if(NULL != to_hero && (!to_hero->isShipMaster() ||
-			from_hero.CanPassToShipMaster(*to_hero)))
-    	    {
+    	    if(NULL != to_hero)
+	    {
 		if(from_hero.Modes(Heroes::GUARDIAN))
 		    return from_hero.GetColor() == to_hero->GetColor() ? Cursor::HEROES : Cursor::POINTER;
 		else
@@ -582,7 +579,10 @@ Cursor::themes_t Game::GetCursorFocusHeroes(const Heroes & from_hero, const Maps
 		    return Cursor::HEROES;
 		else
 		if(from_hero.GetColor() == to_hero->GetColor())
-		    return Cursor::DistanceThemes(Cursor::CHANGE, from_hero.GetRangeRouteDays(tile.GetIndex()));
+		{
+		    Cursor::themes_t newcur = Cursor::DistanceThemes(Cursor::CHANGE, from_hero.GetRangeRouteDays(tile.GetIndex()));
+		    return newcur != Cursor::POINTER ? newcur : Cursor::HEROES;
+		}
 		else
 		if(Players::isFriends(from_hero.GetColor(), to_hero->GetColor()))
 		    return conf.ExtUnionsAllowHeroesMeetings() ? Cursor::CHANGE : Cursor::POINTER;
@@ -1099,110 +1099,59 @@ bool Game::DiggingForArtifacts(Heroes & hero)
 
 void Game::MouseCursorAreaClickLeft(s32 index_maps)
 {
-    switch(GameFocus::Type())
-    {
-	case GameFocus::HEROES:	FocusHeroesClickLeftAction(*GameFocus::GetHeroes(), index_maps); break;
-	case GameFocus::CASTLE:	FocusCastleClickLeftAction(*GameFocus::GetCastle(), index_maps); break;
-	default: break;
-    }
-}
+    Castle* to_castle = NULL;
+    Heroes* to_hero = NULL;
+    Heroes* from_hero = GameFocus::GetHeroes();
 
-void Game::FocusHeroesClickLeftAction(Heroes & from_hero, s32 index_maps)
-{
-    Maps::Tiles & tile = world.GetTiles(index_maps);
-
-    if(! from_hero.isEnableMove())
-    switch(tile.GetObject())
+    switch(Cursor::WithoutDistanceThemes(Cursor::Get().Themes()))
     {
-	// from hero to castle
-	case MP2::OBJN_CASTLE:
-	{
-    	    Castle* to_castle = world.GetCastle(index_maps);
-	    if(NULL == to_castle) break;
-	    else
-	    if(from_hero.GetColor() == to_castle->GetColor())
+	case Cursor::HEROES:
+	    // focus change/open hero
+	    if(NULL != (to_hero = world.GetHeroes(index_maps)))
 	    {
-		GameFocus::Set(to_castle);
-		GameFocus::SetRedraw();
-	    }
-	    else
-		ShowPathOrStartMoveHero(&from_hero, to_castle->GetIndex());
-	}
-	break;
-
-    	// from hero to hero
-    	case MP2::OBJ_HEROES:
-	{
-	    Heroes* to_hero = world.GetHeroes(index_maps);
-	    if(NULL == to_hero) break;
-	    else
-	    if(from_hero.Modes(Heroes::GUARDIAN))
-	    {
-    		GameFocus::Set(to_hero);
-    		GameFocus::SetRedraw();
-	    }
-	    else
-	    if(from_hero.GetCenter() == to_hero->GetCenter())
-		OpenHeroesDialog(&from_hero);
-	    else
-		ShowPathOrStartMoveHero(&from_hero, index_maps);
-    	}
-	break;
-
-	default:
-	    if(tile.isPassable(&from_hero, Direction::UNKNOWN, false) ||
-		    MP2::isActionObject(tile.GetObject(), from_hero.isShipMaster()))
-			ShowPathOrStartMoveHero(&from_hero, index_maps);
-	    break;
-    }
-    // stop hero
-    else
-    {
-	from_hero.SetMove(false);
-    }
-}
-
-void Game::FocusCastleClickLeftAction(Castle & from_castle, s32 index_maps)
-{
-    Maps::Tiles & tile = world.GetTiles(index_maps);
-
-    switch(tile.GetObject())
-    {
-	// from castle to castle
-	case MP2::OBJN_CASTLE:
-	case MP2::OBJ_CASTLE:
-	{
-	    Castle* to_castle = world.GetCastle(index_maps);
-	    if(NULL != to_castle &&
-		from_castle.GetColor() == to_castle->GetColor())
-    	    {
-		// is selected open dialog
-		if(from_castle.GetCenter() == to_castle->GetCenter())
-		    OpenCastleDialog(&from_castle);
-		// select other castle
+		if(! from_hero ||
+		    from_hero != to_hero)
+		{
+		    GameFocus::Set(to_hero);
+		    GameFocus::SetRedraw();
+		}
 		else
+		    OpenHeroesDialog(to_hero);
+	    }
+	    break;
+
+        case Cursor::CASTLE:
+	    // focus change/open castle
+	    if(NULL != (to_castle = world.GetCastle(index_maps)))
+	    {
+		Castle* from_castle = GameFocus::GetCastle();
+
+		if(! from_castle ||
+		    from_castle != to_castle)
 		{
 		    GameFocus::Set(to_castle);
 		    GameFocus::SetRedraw();
 		}
+		else
+		    OpenCastleDialog(to_castle);
 	    }
-	}
-	break;
+	    break;
 
-	// from castle to heroes
-	case MP2::OBJ_HEROES:
-	{
-	    Heroes* to_hero = world.GetHeroes(index_maps);
-	    if(NULL != to_hero &&
-		from_castle.GetColor() == to_hero->GetColor())
-	    {
-    		GameFocus::Set(to_hero);
-    		GameFocus::SetRedraw();
-    	    }
-	}
-	break;
+        case Cursor::MOVE:
+        case Cursor::FIGHT:
+        case Cursor::BOAT:
+        case Cursor::ANCHOR:
+        case Cursor::CHANGE:
+        case Cursor::ACTION:
+        case Cursor::REDBOAT:
+	    if(from_hero)
+		ShowPathOrStartMoveHero(from_hero, index_maps);
+	    break;
 
-	default: break;
+	default:
+	    if(from_hero)
+		from_hero->SetMove(false);
+	    break;
     }
 }
 

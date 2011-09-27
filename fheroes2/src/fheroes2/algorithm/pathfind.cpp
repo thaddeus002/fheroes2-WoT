@@ -112,9 +112,28 @@ bool PassableFromToTile(const Heroes* hero, const s32 from, const s32 to, const 
     // check direct to object
     if(! Object::AllowDirect(toTile.GetObject(), Direction::Reflect(direct))) return false;
 
+
     if(! fromTile.isPassable(hero, direct, false)) return false;
 
-    return toTile.isPassable(hero, Direction::Reflect(direct), false) || to == dst;
+    bool fromTile2 = toTile.isPassable(hero, Direction::Reflect(direct), false);
+
+    // end point
+    if(to == dst)
+    {
+	if(!fromTile2)
+	{
+	    if(! hero)
+		return false;
+	    else
+	    if(toTile.GetObject() == MP2::OBJ_HEROES)
+		return false;
+	    else
+	    if(MP2::isActionObject(toTile.GetObject(), hero->isShipMaster()))
+		return true;
+	}
+    }
+
+    return fromTile2;
 }
 
 bool Algorithm::PathFind(std::list<Route::Step> *result, const s32 from, const s32 to, const u16 limit, const Heroes *hero)
@@ -178,8 +197,6 @@ bool Algorithm::PathFind(std::list<Route::Step> *result, const s32 from, const s
 	    }
 	}
 
-	if(cur == to) break;
-	else
 	list[cur].open = false;
 
 	it1 = list.begin();

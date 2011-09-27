@@ -137,6 +137,7 @@ public:
 	static void	Redraw(u16 x, u16 y);
 	static void	DrawCursor(Surface &surface, const u8 indexcolor, bool solid = false);
 	static themes_t DistanceThemes(themes_t, u16);
+	static themes_t WithoutDistanceThemes(themes_t);
 
 	themes_t	Themes(void);
 	bool		SetThemes(u16 cursor, bool force = false);

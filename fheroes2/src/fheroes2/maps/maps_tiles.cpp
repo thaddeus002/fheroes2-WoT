@@ -598,6 +598,10 @@ void Maps::Tiles::AddonsSort(void)
 
 Maps::Ground::ground_t Maps::Tiles::GetGround(void) const
 {
+    // for: meetings/attack hero
+    if(MP2::OBJ_HEROES == GetObject())
+	return Maps::Ground::BEACH;
+
     // list grounds from GROUND32.TIL
     if(30 > tile_sprite_index)
         return Maps::Ground::WATER;
@@ -1054,31 +1058,19 @@ bool Maps::Tiles::isPassable(const Heroes* hero, Direction::vector_t direct, boo
 
     if(hero)
     {
-       if(hero->GetIndex() == maps_index) return true;
-
-       if(hero->isShipMaster())
-       {
-           if(Ground::WATER != Maps::Tiles::GetGround()) return false;
-
-           switch(GetObject())
-           {
-               case MP2::OBJ_BOAT:
-               case MP2::OBJ_HEROES:   return false;
-
-               default: break;
-           }
-       }
-       else
-       {
-           if(Ground::WATER == Maps::Tiles::GetGround()) return false;
-
-           switch(GetObject())
-           {
-               case MP2::OBJ_HEROES:   return false;
-
-               default: break;
-           }
-       }
+	if(hero->GetIndex() == maps_index)
+	    return true;
+	else
+	if(hero->isShipMaster())
+	{
+	    if(Ground::WATER != Maps::Tiles::GetGround())
+		return false;
+	}
+	else
+	{
+	    if(Ground::WATER == Maps::Tiles::GetGround())
+		return false;
+	}
     }
 
     for(Addons::const_iterator

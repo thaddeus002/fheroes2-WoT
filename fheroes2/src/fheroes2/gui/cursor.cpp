@@ -327,7 +327,40 @@ Cursor::themes_t Cursor::DistanceThemes(themes_t theme, u16 dist)
 	case REDBOAT:
 	    return static_cast<themes_t>(REDBOAT + dist - 1);
 
-	default: return theme;
+	default: break;
     }
-                                                
+
+    return theme;
+}
+
+Cursor::themes_t Cursor::WithoutDistanceThemes(themes_t theme)
+{
+    switch(theme)
+    {
+	case MOVE2:
+	case MOVE3:
+	case MOVE4: return MOVE;
+	case FIGHT2:
+	case FIGHT3:
+	case FIGHT4: return FIGHT;
+	case BOAT2:
+	case BOAT3:
+	case BOAT4: return BOAT;
+	case ANCHOR2:
+	case ANCHOR3:
+	case ANCHOR4: return ANCHOR;
+	case CHANGE2:
+	case CHANGE3:
+	case CHANGE4: return CHANGE;
+	case ACTION2:
+	case ACTION3:
+	case ACTION4: return ACTION;
+	case REDBOAT2:
+	case REDBOAT3:
+	case REDBOAT4: return REDBOAT;
+
+	default: break;
+    }
+
+    return theme;
 }
