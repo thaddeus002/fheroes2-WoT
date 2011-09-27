@@ -134,6 +134,16 @@ s32 Maps::GetIndexFromAbsPoint(s16 px, s16 py)
     return res;
 }
 
+MapsIndexes Maps::GetAroundIndexes(const s32 center, const u16 filter)
+{
+    MapsIndexes result;
+    result.reserve(8);
+    for(Direction::vector_t direct = Direction::TOP_LEFT; direct != Direction::CENTER; ++direct)
+	if((filter & direct) && 
+	    isValidDirection(center, direct)) result.push_back(GetDirectionIndex(center, direct));
+    return result;
+}
+
 u16 Maps::GetDirectionAroundGround(const s32 center, const u16 ground)
 {
     if(0 == ground || !isValidAbsIndex(center)) return 0;
@@ -251,7 +261,7 @@ u16 Maps::ScanAroundObject(const s32 center, const u8 obj, const u16 exclude)
     return result;
 }
 
-bool Maps::ScanDistanceObject(const s32 center, const u8 obj, const u16 dist, std::vector<s32> & results)
+bool Maps::ScanDistanceObject(const s32 center, const u8 obj, const u16 dist, MapsIndexes & results)
 {
     if(!isValidAbsIndex(center)) return false;
     if(results.size()) results.clear();
@@ -334,7 +344,7 @@ castle size: T and B - sprite, S - shadow, XX - center
       S3S3B1B1XXB1B1
         S4B2B2  B2B2
 */
-    std::vector<s32> coords;
+    MapsIndexes coords;
     coords.reserve(21);
 
     // T0
@@ -379,12 +389,11 @@ castle size: T and B - sprite, S - shadow, XX - center
     }
 
     // modify all rnd sprites
-    std::vector<s32>::const_iterator it1 = coords.begin();
-    std::vector<s32>::const_iterator it2 = coords.end();
-
-    for(; it1 != it2; ++it1) if(isValidAbsIndex(*it1))
+    for(MapsIndexes::const_iterator
+	it = coords.begin(); it != coords.end(); ++it)
+    if(isValidAbsIndex(*it))
     {
-	Maps::TilesAddon *addon = world.GetTiles(*it1).FindObject(MP2::OBJ_RNDCASTLE);
+	Maps::TilesAddon *addon = world.GetTiles(*it).FindObject(MP2::OBJ_RNDCASTLE);
 	if(addon)
 	{
     	    addon->object -= 12;
@@ -406,7 +415,7 @@ castle size: T and B - sprite, S - shadow, XX - center
 void Maps::UpdateSpritesFromTownToCastle(const Point & center)
 {
     // correct area maps sprites
-    std::vector<s32> coords;
+    MapsIndexes coords;
     coords.reserve(15);
 
     // T1
@@ -429,11 +438,11 @@ void Maps::UpdateSpritesFromTownToCastle(const Point & center)
     coords.push_back(GetIndexFromAbsPoint(center.x + 2, center.y));
 
     // modify all town sprites
-    std::vector<s32>::const_iterator it1 = coords.begin();
-    std::vector<s32>::const_iterator it2 = coords.end();
-    for(; it1 != it2; ++it1) if(isValidAbsIndex(*it1))
+    for(MapsIndexes::const_iterator
+	it = coords.begin(); it != coords.end(); ++it)
+    if(isValidAbsIndex(*it))
     {
-	TilesAddon *addon = world.GetTiles(*it1).FindObject(MP2::OBJ_CASTLE);
+	TilesAddon *addon = world.GetTiles(*it).FindObject(MP2::OBJ_CASTLE);
 	if(addon) addon->index -= 16;
     }
 

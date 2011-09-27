@@ -1031,20 +1031,28 @@ void World::MonthOfMonstersAction(const Monster & mons)
 {
     if(mons.isValid())
     {
-	std::vector<s32> tiles;
+	MapsIndexes tiles, excld;
 	tiles.reserve(vec_tiles.size() / 2);
+	excld.reserve(vec_tiles.size() / 2);
 
-	for(size_t ii = 0; ii < vec_tiles.size(); ++ii)
+	for(MapsTiles::const_iterator
+	    it = vec_tiles.begin(); it != vec_tiles.end(); ++it)
 	{
-	    const Maps::Tiles & tile = vec_tiles[ii];
+	    const Maps::Tiles & tile = *it;
 
 	    if(Maps::Ground::WATER != tile.GetGround() &&
 		MP2::OBJ_ZERO == tile.GetObject() &&
 		tile.isPassable(NULL, Direction::UNKNOWN, true) &&
-		! Maps::ScanAroundObject(ii, MP2::OBJ_HEROES) &&
-		! Maps::ScanAroundObject(ii, MP2::OBJ_CASTLE) &&
-		! Maps::ScanAroundObject(ii, MP2::OBJN_CASTLE))
-		tiles.push_back(ii);
+		! Maps::ScanAroundObject(tile.GetIndex(), MP2::OBJ_MONSTER) &&
+		! Maps::ScanAroundObject(tile.GetIndex(), MP2::OBJ_HEROES) &&
+		! Maps::ScanAroundObject(tile.GetIndex(), MP2::OBJ_CASTLE) &&
+		! Maps::ScanAroundObject(tile.GetIndex(), MP2::OBJN_CASTLE) &&
+		excld.end() == std::find(excld.begin(), excld.end(), tile.GetIndex()))
+	    {
+		tiles.push_back(tile.GetIndex());
+		const std::vector<s32> & v = Maps::GetAroundIndexes(tile.GetIndex());
+		excld.insert(excld.end(), v.begin(), v.end());
+	    }
 	}
 
 	const u8 area = 12;

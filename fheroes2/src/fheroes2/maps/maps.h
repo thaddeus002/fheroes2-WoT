@@ -30,6 +30,8 @@
 class Point;
 class Castle;
 
+typedef std::vector<s32> MapsIndexes;
+
 namespace Maps
 {
     enum mapsize_t
@@ -55,13 +57,14 @@ namespace Maps
 
     s32 GetIndexFromAbsPoint(const Point & mp);
     s32 GetIndexFromAbsPoint(s16 px, s16 py);
+    MapsIndexes GetAroundIndexes(const s32 center, const u16 filter = DIRECTION_ALL);
 
     u16 GetDirectionAroundGround(const s32 center, const u16 ground);
     u8  GetCountAroundGround(const s32 center, const u16 ground);
     u16 GetMaxGroundAround(const s32 center);
 
     u16  ScanAroundObject(const s32 center, const u8 obj, const u16 exclude = 0);
-    bool ScanDistanceObject(const s32 center, const u8 obj, const u16 dist, std::vector<s32> &);
+    bool ScanDistanceObject(const s32 center, const u8 obj, const u16 dist, MapsIndexes &);
     u16  TileUnderProtection(const s32 center);
 
     void ClearFog(s32 center, u8 scoute, const u8 color);
