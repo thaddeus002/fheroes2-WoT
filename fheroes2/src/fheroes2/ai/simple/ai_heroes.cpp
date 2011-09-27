@@ -937,7 +937,24 @@ void AIToPrimarySkillObject(Heroes &hero, const u8 obj, const s32 dst_index)
         case MP2::OBJ_MERCENARYCAMP:	skill = Skill::Primary::ATTACK; break;
         case MP2::OBJ_DOCTORHUT:	skill = Skill::Primary::KNOWLEDGE; break;
         case MP2::OBJ_STANDINGSTONES:	skill = Skill::Primary::POWER; break;
-        case MP2::OBJ_ARENA:		skill = AISelectPrimarySkill(hero); break;
+        case MP2::OBJ_ARENA:
+	    if(Settings::Get().ExtHeroArenaCanChoiseAnySkills())
+		skill = AISelectPrimarySkill(hero);
+	    else
+	    {
+		switch(Rand::Get(1, 3))
+		{
+		    case 1:
+		    case 2:
+			skill = Rand::Get(1) ? Skill::Primary::ATTACK : Skill::Primary::DEFENSE;
+			break;
+
+		    default:
+			skill = Skill::Primary::POWER;
+			break;
+		}
+	    }
+	    break;
 
     	default: break;
     }

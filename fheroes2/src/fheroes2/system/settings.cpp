@@ -161,6 +161,7 @@ const settings_t settingsFHeroes2[] =
     { Settings::HEROES_AUTO_MOVE_BATTLE_DST,	_("heroes: after battle move to target cell"),		},
     { Settings::HEROES_TRANSCRIBING_SCROLLS,	_("heroes: allow transcribing scrolls (needs: Eye Eagle skill)"), },
     { Settings::HEROES_ALLOW_BANNED_SECSKILLS,	_("heroes: allow banned sec. skills upgrade"), 		},
+    { Settings::HEROES_ARENA_ANY_SKILLS,	_("heroes: in Arena can choose any of primary skills"), },
     { Settings::UNIONS_ALLOW_HERO_MEETINGS,	_("unions: allow meeting heroes"),                      },
     { Settings::UNIONS_ALLOW_CASTLE_VISITING,	_("unions: allow castle visiting"),                     },
     { Settings::UNIONS_ALLOW_VIEW_MAPS,		_("unions: allow view maps"),                           },
@@ -1396,6 +1397,11 @@ bool Settings::ExtWorldDwellingsAccumulateUnits(void) const
 bool Settings::ExtWorldUseUniqueArtifacts(void) const
 {
     return ExtModes(WORLD_USE_UNIQUE_ARTIFACTS);
+}
+
+bool Settings::ExtHeroArenaCanChoiseAnySkills(void) const
+{
+    return ExtModes(HEROES_ARENA_ANY_SKILLS);
 }
 
 const Point & Settings::PosRadar(void) const { return pos_radr; }

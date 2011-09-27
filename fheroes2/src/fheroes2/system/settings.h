@@ -191,6 +191,7 @@ public:
 	WORLD_1HERO_HIRED_EVERY_WEEK	= 0x30000010,
 	WORLD_DWELLING_ACCUMULATE_UNITS = 0x30000020,
 	WORLD_USE_UNIQUE_ARTIFACTS	= 0x30000040,
+	HEROES_ARENA_ANY_SKILLS		= 0x30000080,
 
 	BATTLE_ARCHMAGE_RESIST_BAD_SPELL= 0x40001000,
 	BATTLE_MAGIC_TROOP_RESIST	= 0x40002000,
@@ -299,6 +300,7 @@ public:
     bool ExtHeroAutoMove2BattleTarget(void) const;
     bool ExtHeroPickupArtifactWithInfoDialog(void) const;
     bool ExtHeroAllowBannedSecSkillsUpgrade(void) const;
+    bool ExtHeroArenaCanChoiseAnySkills(void) const;
     bool ExtUnionsAllowCastleVisiting(void) const;
     bool ExtUnionsAllowHeroesMeetings(void) const;
     bool ExtUnionsAllowViewMaps(void) const;

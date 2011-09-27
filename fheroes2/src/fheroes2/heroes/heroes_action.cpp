@@ -3017,7 +3017,7 @@ void ActionToArena(Heroes &hero, const u8 obj, const s32 dst_index)
 
 void ActionToSirens(Heroes &hero, const u8 obj, const s32 dst_index)
 {
-    if(hero.isVisited(obj, Visit::GLOBAL))
+    if(hero.isVisited(obj))
     {
 	PlaySoundVisited;
 	Dialog::Message(MP2::StringObject(obj), _("As the sirens sing their eerie song, your small, determined army manages to overcome the urge to dive headlong into the sea."), Font::BIG, Dialog::OK);
@@ -3028,7 +3028,7 @@ void ActionToSirens(Heroes &hero, const u8 obj, const s32 dst_index)
 	std::string str = _("You have your crew stop up their ears with wax before the sirens' eerie song has any chance of luring them to a watery grave. An eerie wailing song emanates from the sirens perched upon the rocks. Many of your crew fall under its spell, and dive into the water where they drown. You are now wiser for the visit, and gain %{exp} experience.");
 	String::Replace(str, "%{exp}", exp);
 
-	hero.SetVisited(dst_index, Visit::GLOBAL);
+	hero.SetVisited(dst_index);
 	PlaySoundSuccess;
 	Dialog::Message(MP2::StringObject(obj), str, Font::BIG, Dialog::OK);
 	hero.IncreaseExperience(exp);
