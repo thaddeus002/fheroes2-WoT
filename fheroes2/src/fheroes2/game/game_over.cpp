@@ -295,7 +295,7 @@ u16  GameOver::Result::GetResult(void) const
     return result;
 }
 
-bool GameOver::Result::CheckGameOver(Game::menu_t & res)
+bool GameOver::Result::LocalCheckGameOver(Game::menu_t & res)
 {
     const Colors colors2(colors);
 
@@ -314,20 +314,23 @@ bool GameOver::Result::CheckGameOver(Game::menu_t & res)
 	return true;
     }
 
-    const Kingdom & myKingdom = world.GetKingdom(Settings::Get().CurrentColor());
+    if(Settings::Get().CurrentColor() & Players::HumanColors())
+    {
+	const Kingdom & myKingdom = world.GetKingdom(Settings::Get().CurrentColor());
 
-    if(GameOver::COND_NONE != (result = world.CheckKingdomWins(myKingdom)))
-    {
-        GameOver::DialogWins(result);
-        res = Game::HIGHSCORES;
-        return true;
-    }
-    else
-    if(GameOver::COND_NONE != (result = world.CheckKingdomLoss(myKingdom)))
-    {
-        GameOver::DialogLoss(result);
-        res = Game::MAINMENU;
-        return true;
+	if(GameOver::COND_NONE != (result = world.CheckKingdomWins(myKingdom)))
+	{
+    	    GameOver::DialogWins(result);
+    	    res = Game::HIGHSCORES;
+    	    return true;
+	}
+	else
+	if(GameOver::COND_NONE != (result = world.CheckKingdomLoss(myKingdom)))
+	{
+    	    GameOver::DialogLoss(result);
+    	    res = Game::MAINMENU;
+    	    return true;
+	}
     }
 
     return false;

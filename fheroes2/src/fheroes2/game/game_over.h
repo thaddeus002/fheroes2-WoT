@@ -62,7 +62,7 @@ namespace GameOver
 	void Reset(void);
 	void SetResult(u16);
 	u16  GetResult(void) const;
-	bool CheckGameOver(Game::menu_t &);
+	bool LocalCheckGameOver(Game::menu_t &);
 
     private:
 	Result();

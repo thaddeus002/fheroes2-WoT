@@ -245,7 +245,7 @@ Game::menu_t Game::StartGame(void)
 	    }
 
 	    if(m != ENDTURN ||
-		gameResult.CheckGameOver(m)) break;
+		gameResult.LocalCheckGameOver(m)) break;
 	}
 
 	DELAY(10);
@@ -732,7 +732,7 @@ Game::menu_t Game::HumanTurn(bool isload)
     }
 
     // check game over
-    gameResult.CheckGameOver(res);
+    gameResult.LocalCheckGameOver(res);
 
     // warning lost all town
     if(myCastles.empty()) ShowWarningLostTowns(res);
@@ -997,7 +997,7 @@ Game::menu_t Game::HumanTurn(bool isload)
 		    if(hero->isAction())
 		    {
 			// check game over
-			gameResult.CheckGameOver(res);
+			gameResult.LocalCheckGameOver(res);
 			hero->ResetAction();
 		    }
 		}
@@ -1422,7 +1422,7 @@ void Game::EventDigArtifact(menu_t & ret)
     {
 	DiggingForArtifacts(*hero);
 	// check game over for ultimate artifact
-	GameOver::Result::Get().CheckGameOver(ret);
+	GameOver::Result::Get().LocalCheckGameOver(ret);
     }
 }
 
