@@ -633,6 +633,7 @@ void Game::IO::PackPlayers(QueueMessage & msg, const Players & players)
 	msg.Push(player.control);
 	msg.Push(player.race);
 	msg.Push(player.friends);
+	msg.Push(player.mode);
 	msg.Push(player.name);
     }
 
@@ -659,6 +660,8 @@ void Game::IO::UnpackPlayers(QueueMessage & msg, Players & players, u16 version)
 	msg.Pop(player.control);
 	msg.Pop(player.race);
 	msg.Pop(player.friends);
+	if(version >= FORMAT_VERSION_2602)
+	msg.Pop(player.mode);
 	msg.Pop(player.name);
 
 	Player* ptr = players.Get(player.color);
@@ -1090,6 +1093,12 @@ void Game::IO::UnpackKingdom(QueueMessage & msg, Kingdom & kingdom, u16 check_ve
     }
     else
 	msg.Pop(kingdom.modes);
+
+    if(check_version < FORMAT_VERSION_2602)
+    {
+	Players::SetPlayerInGame(kingdom.color, kingdom.modes & 0x0001);
+    }
+
     msg.Pop(kingdom.lost_town_days);
     // unused
     msg.Pop(byte16);

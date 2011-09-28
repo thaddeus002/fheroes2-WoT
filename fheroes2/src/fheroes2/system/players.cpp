@@ -30,6 +30,8 @@
 #include "settings.h"
 #include "players.h"
 
+enum { PLAYER_INGAME = 0x01 };
+
 namespace
 {
     Player* _players[KINGDOMMAX + 1] = { NULL };
@@ -51,7 +53,7 @@ void PlayerFixRandomRace(Player* player)
     if(player && player->race == Race::RAND) player->race = Race::Rand();
 }
 
-Player::Player(u8 col) : control(CONTROL_NONE), color(col), race(Race::NONE), friends(col), id(World::GetUniq())
+Player::Player(u8 col) : control(CONTROL_NONE), color(col), race(Race::NONE), friends(col), mode(0), id(World::GetUniq())
 {
     name  = Color::String(color);
 }
@@ -91,9 +93,19 @@ bool Player::isName(const std::string & str) const
     return str == name;
 }
 
+bool Player::isPlay(void) const
+{
+    return mode & PLAYER_INGAME;
+}
+
 void Player::SetControl(u8 ctl)
 {
     control = ctl;
+}
+
+void Player::SetPlay(bool f)
+{
+    if(f) mode |= PLAYER_INGAME; else mode &= ~PLAYER_INGAME;
 }
 
 Players::Players() : current_color(0)
@@ -223,6 +235,16 @@ u8 Players::GetColors(u8 control, bool strong) const
     return res;
 }
 
+u8 Players::GetActualColors(void) const
+{
+    u8 res = 0;
+
+    for(const_iterator it = begin(); it != end(); ++it)
+	if((*it)->isPlay()) res |= (*it)->color;
+
+    return res;
+}
+
 Player* Players::GetCurrent(void)
 {
     return Get(current_color);
@@ -251,6 +273,18 @@ u8 Players::GetPlayerRace(u8 color)
     return player ? player->race : Race::NONE;
 }
 
+bool Players::GetPlayerInGame(u8 color)
+{
+    const Player* player = Get(color);
+    return player && player->isPlay();
+}
+
+void Players::SetPlayerInGame(u8 color, bool f)
+{
+    Player* player = Get(color);
+    if(player) player->SetPlay(f);
+}
+
 void Players::SetHumanColors(u8 cols) /* remove: server.cpp */
 {
     for(iterator it = begin(); it != end(); ++it)
@@ -259,6 +293,7 @@ void Players::SetHumanColors(u8 cols) /* remove: server.cpp */
 
 void Players::SetStartGame(void)
 {
+    for_each(begin(), end(), std::bind2nd(std::mem_fun(&Player::SetPlay), true));
     for_each(begin(), end(), std::ptr_fun(&PlayerFocusReset));
     for_each(begin(), end(), std::ptr_fun(&PlayerFixRandomRace));
     for_each(begin(), end(), std::ptr_fun(&PlayerFixMultiControl));

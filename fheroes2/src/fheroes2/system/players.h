@@ -59,7 +59,10 @@ struct Player
     bool isID(u32) const;
     bool isColor(u8) const;
     bool isName(const std::string &) const;
+    bool isPlay(void) const;
+
     void SetControl(u8);
+    void SetPlay(bool);
 
     bool isRemote(void) const;
     bool isLocal(void) const;
@@ -70,6 +73,7 @@ struct Player
     u8		color;
     u8		race;
     u8		friends;
+    u8		mode;
     std::string	name;
     u32		id;
     Focus	focus;
@@ -88,6 +92,7 @@ public:
     void	SetHumanColors(u8 colors);
     void	SetStartGame(void);
     u8	 	GetColors(u8 control = 0xFF, bool strong = false) const;
+    u8		GetActualColors(void) const;
     std::string	String(void) const;
 
     Player*		GetCurrent(void);
@@ -97,9 +102,11 @@ public:
     static u8		GetPlayerControl(u8 color);
     static u8		GetPlayerRace(u8 color);
     static u8		GetPlayerFriends(u8 color);
+    static bool		GetPlayerInGame(u8 color);
     static bool		isFriends(u8 player, u8 colors);
     static void		SetPlayerRace(u8 color, u8 race);
     static void		SetPlayerControl(u8 color, u8 ctrl);
+    static void		SetPlayerInGame(u8 color, bool);
     static u8		HumanColors(void);
     static u8 		FriendColors(void);
 

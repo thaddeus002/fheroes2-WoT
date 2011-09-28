@@ -277,7 +277,7 @@ void Dialog::ThievesGuild(bool oracle)
 
     std::vector<ValueColors> v;
     v.reserve(KINGDOMMAX);
-    const Colors colors(Game::GetKingdomColors());
+    const Colors colors(Game::GetActualKingdomColors());
     const u16 textx = 185;
     const u16 startx = 210;
     const u16 maxw = 430;

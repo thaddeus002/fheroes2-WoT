@@ -61,7 +61,7 @@ class Kingdom : public BitModes
 public:
     enum
     {
-	PLAY	     = 0x0001,
+	//UNDEF	     = 0x0001,
 	IDENTIFYHERO = 0x0002,
 	DISABLEHIRES = 0x0004
     };
@@ -72,7 +72,7 @@ public:
     void clear(void);
 
     void UpdateStartingResource(void);
-    bool isPlay(void) const{ return Modes(PLAY); }
+    bool isPlay(void) const;
     bool isLoss(void) const;
     bool AllowPayment(const Funds & funds) const;
     bool AllowRecruitHero(bool check_payment, u8 level) const;

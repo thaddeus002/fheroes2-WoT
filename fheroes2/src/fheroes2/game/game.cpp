@@ -437,6 +437,11 @@ u8 Game::GetKingdomColors(void)
     return Settings::Get().GetPlayers().GetColors();
 }
 
+u8 Game::GetActualKingdomColors(void)
+{
+    return Settings::Get().GetPlayers().GetActualColors();
+}
+
 #include <cmath>
 std::string Game::CountScoute(u32 count, u8 scoute)
 {

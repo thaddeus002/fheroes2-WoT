@@ -54,9 +54,6 @@ void Kingdom::Init(u8 clr)
 
     if(Color::ALL & color)
     {
-	// set play
-	SetModes(PLAY);
-
 	heroes.reserve(GetMaxHeroes());
 	castles.reserve(15);
 
@@ -110,11 +107,17 @@ bool Kingdom::isLoss(void) const
     return castles.empty() && heroes.empty();
 }
 
+bool Kingdom::isPlay(void) const
+{
+    return Players::GetPlayerInGame(color);
+}
+
 void Kingdom::LossPostActions(void)
 {
-    if(Modes(PLAY))
+    if(isPlay())
     {
-	ResetModes(PLAY);
+	Players::SetPlayerInGame(color, false);
+
 	if(heroes.size())
 	{
 	    std::for_each(heroes.begin(), heroes.end(),
