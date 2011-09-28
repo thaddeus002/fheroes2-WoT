@@ -744,7 +744,7 @@ void World::LoadMaps(const std::string &filename)
 		break;
 
             case MP2::OBJ_TREASURECHEST:
-		if(Maps::Ground::WATER == tile.GetGround())
+		if(tile.isWater())
 		    tile.SetObject(MP2::OBJ_WATERCHEST);
     		else
 		    Maps::Tiles::UpdateTreasureChestSprite(tile);
@@ -1040,7 +1040,7 @@ void World::MonthOfMonstersAction(const Monster & mons)
 	{
 	    const Maps::Tiles & tile = *it;
 
-	    if(Maps::Ground::WATER != tile.GetGround() &&
+	    if(! tile.isWater() &&
 		MP2::OBJ_ZERO == tile.GetObject() &&
 		tile.isPassable(NULL, Direction::UNKNOWN, true) &&
 		! Maps::ScanAroundObject(tile.GetIndex(), MP2::OBJ_MONSTER) &&
@@ -1128,7 +1128,7 @@ bool TeleportCheckType(s32 index, u8 type)
 
 bool TeleportCheckGround(s32 index, bool water)
 {
-    return Maps::Ground::WATER == world.GetTiles(index).GetGround() ? water : !water;
+    return world.GetTiles(index).isWater() == water;
 }
 
 /* return random teleport destination */
@@ -1477,7 +1477,7 @@ void World::ActionForMagellanMaps(u8 color)
 {
     for(MapsTiles::iterator
 	it = vec_tiles.begin(); it != vec_tiles.end(); ++it)
-	if(Maps::Ground::WATER == (*it).GetGround()) (*it).ClearFog(color);
+	if((*it).isWater()) (*it).ClearFog(color);
 }
 
 s32 World::GetNearestObject(s32 center, MP2::object_t obj, bool check_hero) const

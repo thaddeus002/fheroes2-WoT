@@ -64,6 +64,15 @@ void Route::Path::PopFront(void)
     if(!empty()) pop_front();
 }
 
+void Route::Path::PopBack(void)
+{
+    if(!empty())
+    {
+	pop_back();
+	dst = empty() ? -1 : back().GetIndex();
+    }
+}
+
 s32 Route::Path::GetDestinationIndex(void) const
 {
     return empty() ? GetDestinedIndex() : GetLastIndex();

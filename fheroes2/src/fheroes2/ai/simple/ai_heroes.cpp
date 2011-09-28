@@ -658,7 +658,7 @@ void AIToTreasureChest(Heroes &hero, const u8 obj, const s32 dst_index)
     Funds resource;
     resource.gold = tile.GetQuantity2() * 100;
 
-    if(Maps::Ground::WATER == tile.GetGround())
+    if(tile.isWater())
     {
 	if(tile.GetQuantity1())
 	{
@@ -2214,7 +2214,7 @@ void AIHeroesAddedTask(Heroes & hero)
 
 	if(hero.isShipMaster())
 	{
-	    if(Maps::Ground::WATER != tile.GetGround()) continue;
+	    if(! tile.isWater()) continue;
 
 	    // check previous positions
 	    if(MP2::OBJ_COAST == (*it).second &&
@@ -2222,7 +2222,7 @@ void AIHeroesAddedTask(Heroes & hero)
 	}
 	else
 	{
-	    if(Maps::Ground::WATER == tile.GetGround()) continue;
+	    if(tile.isWater()) continue;
 	}
 
 	objs.push_back(IndexDistance((*it).first,

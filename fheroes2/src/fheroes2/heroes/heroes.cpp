@@ -850,6 +850,15 @@ void Heroes::RescanPath(void)
 {
     if(path.isValid())
     {
+	const Maps::Tiles & tile = world.GetTiles(path.GetDestinationIndex());
+
+	if(!isShipMaster() && tile.isWater() &&
+	    !(MP2::OBJ_HEROES == tile.GetObject() || MP2::OBJ_BOAT == tile.GetObject()))
+	    path.PopBack();
+    }
+
+    if(path.isValid())
+    {
 	if(CONTROL_AI & GetControl())
 	{
 	    if(path.hasObstacle()) path.Reset();

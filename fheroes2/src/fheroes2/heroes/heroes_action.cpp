@@ -1900,7 +1900,7 @@ void ActionToTreasureChest(Heroes &hero, const u8 obj, const s32 dst_index)
     AnimationRemoveObject(tile);
 
     // dialog
-    if(Maps::Ground::WATER == tile.GetGround())
+    if(tile.isWater())
     {
 	std::string message;
 

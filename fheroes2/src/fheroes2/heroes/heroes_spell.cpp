@@ -264,7 +264,7 @@ bool ActionSpellSummonBoat(Heroes & hero)
     for(Direction::vector_t dir = Direction::TOP_LEFT; dir < Direction::CENTER; ++dir) if(around_zero & dir)
     {
 	const s32 dst = Maps::GetDirectionIndex(center, dir);
-        if(Maps::Ground::WATER == world.GetTiles(dst).GetGround()){ dst_water = dst; break; }
+        if(world.GetTiles(dst).isWater()){ dst_water = dst; break; }
     }
 
     // find boat

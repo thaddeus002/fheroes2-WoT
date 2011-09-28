@@ -443,7 +443,7 @@ Cursor::themes_t Game::GetCursorFocusCastle(const Castle & from_castle, const Ma
 Cursor::themes_t Game::GetCursorFocusShipmaster(const Heroes & from_hero, const Maps::Tiles & tile)
 {
     const Settings & conf = Settings::Get();
-    const bool water = tile.GetGround() == Maps::Ground::WATER;
+    const bool water = tile.isWater();
 
     switch(tile.GetObject())
     {

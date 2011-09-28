@@ -119,6 +119,7 @@ namespace Maps
 	u8 GetQuantity3(void) const{ return quantity3; }
 	u8 GetQuantity4(void) const{ return quantity4; }
 	Ground::ground_t GetGround(void) const;
+	bool isWater(void) const;
 	const Surface & GetTileSurface(void) const;
 
 	bool isPassable(const Heroes*, Direction::vector_t, bool skipfog) const;

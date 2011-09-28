@@ -251,8 +251,7 @@ s32 Interface::Basic::GetDimensionDoorDestination(const s32 from, const u8 dista
 			dst >= 0 &&
 			(! tile.isFog(conf.CurrentColor())) &&
 			MP2::isClearGroundObject(tile.GetObject()) &&
-			((water && Maps::Ground::WATER == world.GetTiles(dst).GetGround()) ||
-			(!water && Maps::Ground::WATER != world.GetTiles(dst).GetGround())) &&
+			water == world.GetTiles(dst).isWater() &&
 			distance >= Maps::GetApproximateDistance(from, dst));
 
 	cursor.SetThemes(valid ? (water ? Cursor::BOAT : Cursor::MOVE) : Cursor::WAR_NONE);

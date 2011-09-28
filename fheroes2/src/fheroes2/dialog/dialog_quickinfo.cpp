@@ -253,7 +253,7 @@ std::string ShowBarrierTentInfo(const Maps::Tiles & tile, const Kingdom & kingdo
 
 std::string ShowTreasureChestInfo(const Maps::Tiles & tile)
 {
-    std::string str = Maps::Ground::WATER == tile.GetGround() ? 
+    std::string str = tile.isWater() ? 
 		    _("Sea Chest") : MP2::StringObject(MP2::OBJ_TREASURECHEST);
 
     return str;

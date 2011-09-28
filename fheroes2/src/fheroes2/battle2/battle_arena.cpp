@@ -101,6 +101,9 @@ ICN::icn_t GetCovr(u16 ground)
     return covrs.empty() ? ICN::UNKNOWN : *Rand::Get(covrs);
 }
 
+
+//GetGround(        icn_covr = Maps::ScanAroundObject(index, MP2::OBJ_CRATER) ? GetCovr(world.GetTiles(index).GetGround()) : ICN::UNKNOWN;
+
 u16 GetObstaclePosition(void)
 {
     return Rand::Get(3, 6) + (11 * Rand::Get(1, 7));

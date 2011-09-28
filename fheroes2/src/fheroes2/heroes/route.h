@@ -60,6 +60,7 @@ namespace Route
 	    void	Hide(void){ hide = true; }
 	    void	Reset(void);
 	    void	PopFront(void);
+	    void	PopBack(void);
 	    void	Rescan(void);
 
 	    bool	isValid(void) const;

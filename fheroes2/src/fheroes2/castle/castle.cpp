@@ -1551,13 +1551,13 @@ bool Castle::HaveNearlySea(void) const
     const Maps::Tiles & right = world.GetTiles(index + 1);
     const Maps::Tiles & center = world.GetTiles(index);
 
-    return Maps::Ground::WATER == left.GetGround() || Maps::Ground::WATER == right.GetGround() || Maps::Ground::WATER == center.GetGround();
+    return left.isWater() || right.isWater() || center.isWater();
 }
 
 bool TilePresentBoat(const Maps::Tiles & tile)
 {
-    return (Maps::Ground::WATER == tile.GetGround() &&
-	(tile.GetObject() == MP2::OBJ_BOAT || tile.GetObject() == MP2::OBJ_HEROES));
+    return tile.isWater() &&
+	(tile.GetObject() == MP2::OBJ_BOAT || tile.GetObject() == MP2::OBJ_HEROES);
 }
 
 bool Castle::PresentBoat(void) const
@@ -1844,7 +1844,7 @@ bool Castle::BuyBoat(void)
     Maps::Tiles & center = world.GetTiles(index);
     Kingdom & kingdom = world.GetKingdom(color);
 
-    if(MP2::OBJ_ZERO == left.GetObject() && Maps::Ground::WATER == left.GetGround())
+    if(MP2::OBJ_ZERO == left.GetObject() && left.isWater())
     {
 	kingdom.OddFundsResource(PaymentConditions::BuyBoat());
 
@@ -1854,7 +1854,7 @@ bool Castle::BuyBoat(void)
 #endif
     }
     else
-    if(MP2::OBJ_ZERO == right.GetObject() && Maps::Ground::WATER == right.GetGround())
+    if(MP2::OBJ_ZERO == right.GetObject() && right.isWater())
     {
 	kingdom.OddFundsResource(PaymentConditions::BuyBoat());
 
@@ -1864,7 +1864,7 @@ bool Castle::BuyBoat(void)
 #endif
     }
     else
-    if(MP2::OBJ_ZERO == center.GetObject() && Maps::Ground::WATER == center.GetGround())
+    if(MP2::OBJ_ZERO == center.GetObject() && center.isWater())
     {
 	kingdom.OddFundsResource(PaymentConditions::BuyBoat());
 

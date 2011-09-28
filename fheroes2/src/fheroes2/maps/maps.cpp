@@ -459,7 +459,7 @@ u16 Maps::TileUnderProtection(const s32 center)
 {
     if(!isValidAbsIndex(center)) return 0;
 
-    const bool water1 = Ground::WATER == world.GetTiles(center).GetGround();
+    const bool water1 = world.GetTiles(center).isWater();
 
     u16 result = 0;
     const u16 dst_around = Maps::ScanAroundObject(center, MP2::OBJ_MONSTER);
@@ -468,7 +468,7 @@ u16 Maps::TileUnderProtection(const s32 center)
     for(Direction::vector_t dir = Direction::TOP_LEFT; dir < Direction::CENTER; ++dir) if(dst_around & dir)
     {
 	// check water
-	const bool water2 = Ground::WATER == world.GetTiles(GetDirectionIndex(center, dir)).GetGround();
+	const bool water2 = world.GetTiles(GetDirectionIndex(center, dir)).isWater();
 	if((water1 && !water2) || (!water1 && water2)) continue;
 
 	if((Direction::TOP | Direction::TOP_LEFT | Direction::TOP_RIGHT) & dir)

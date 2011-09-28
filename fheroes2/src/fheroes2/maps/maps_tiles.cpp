@@ -598,10 +598,6 @@ void Maps::Tiles::AddonsSort(void)
 
 Maps::Ground::ground_t Maps::Tiles::GetGround(void) const
 {
-    // for: meetings/attack hero
-    if(MP2::OBJ_HEROES == GetObject())
-	return Maps::Ground::BEACH;
-
     // list grounds from GROUND32.TIL
     if(30 > tile_sprite_index)
         return Maps::Ground::WATER;
@@ -630,6 +626,11 @@ Maps::Ground::ground_t Maps::Tiles::GetGround(void) const
     //else if(432 > tile_sprite_index)
 
 	return Maps::Ground::BEACH;
+}
+
+bool Maps::Tiles::isWater(void) const
+{
+    return 30 > tile_sprite_index;
 }
 
 void Maps::Tiles::Remove(u32 uniq)
@@ -716,7 +717,9 @@ void Maps::Tiles::RedrawMonster(Surface & dst) const
 
 	if(!hero ||
 	    // skip bottom, bottom_right, bottom_left with ground objects
-	    (((Direction::BOTTOM | Direction::BOTTOM_LEFT | Direction::BOTTOM_RIGHT) & dir) && MP2::isGroundObject(hero->GetUnderObject())))
+	    (((Direction::BOTTOM | Direction::BOTTOM_LEFT | Direction::BOTTOM_RIGHT) & dir) && MP2::isGroundObject(hero->GetUnderObject())) ||
+	    // skip ground check
+	    (world.GetTiles(dst_index).isWater() != isWater()))
 	    dst_index = -1;
 	else
 	    break;
@@ -1047,7 +1050,12 @@ void Maps::Tiles::FixObject(void)
 
 bool Maps::Tiles::GoodForUltimateArtifact(void) const
 {
-    return Ground::WATER != Maps::Tiles::GetGround() && isPassable(NULL, Direction::UNKNOWN, true);
+    return ! isWater() && isPassable(NULL, Direction::UNKNOWN, true);
+}
+
+bool TileIsGround(s32 index, u16 ground)
+{
+    return ground == world.GetTiles(index).GetGround();
 }
 
 /* accept move */
@@ -1063,13 +1071,26 @@ bool Maps::Tiles::isPassable(const Heroes* hero, Direction::vector_t direct, boo
 	else
 	if(hero->isShipMaster())
 	{
-	    if(Ground::WATER != Maps::Tiles::GetGround())
+	    if(! isWater())
 		return false;
 	}
 	else
+	if(! hero->isShipMaster())
 	{
-	    if(Ground::WATER == Maps::Tiles::GetGround())
-		return false;
+	    if(isWater())
+	    {
+		// for: meetings/attack hero
+		if(MP2::OBJ_HEROES == GetObject())
+		{
+		    // scan ground
+		    const MapsIndexes & v = Maps::GetAroundIndexes(GetIndex());
+		    if(v.end() == std::find_if(v.begin(), v.end(),
+				std::not1(std::bind2nd(std::ptr_fun(&TileIsGround), Ground::WATER))))
+			return false;
+		}
+		else
+		    return false;
+	    }
 	}
     }
 
