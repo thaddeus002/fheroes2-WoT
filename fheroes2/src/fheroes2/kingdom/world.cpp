@@ -1670,8 +1670,7 @@ bool World::KingdomIsWins(const Kingdom & kingdom, u16 wins) const
 
 	case GameOver::WINS_SIDE:
 	{
-	    const u8 side2 = Game::GetKingdomColors() & ~Players::GetPlayerFriends(kingdom.GetColor());
-	    return (side2 == (vec_kingdoms.GetLossColors() & side2));
+	    return Game::GetActualKingdomColors() & ~Players::GetPlayerFriends(kingdom.GetColor());
 	}
 
 	case GameOver::WINS_GOLD:

@@ -84,7 +84,7 @@ void PocketPC::ThievesGuild(bool oracle)
 
     std::vector<ValueColors> v;
     v.reserve(KINGDOMMAX);
-    const Colors colors(Game::GetKingdomColors());
+    const Colors colors(Game::GetActualKingdomColors());
     u16 textx = 115;
     u16 startx = 120;
     u16 maxw = 200;
