@@ -3132,7 +3132,10 @@ void Battle2::Interface::RedrawActionBloodLustSpell(Stats & target)
     const MonsterInfo & msi = target.GetMonsterInfo();
     const Sprite & sprite1 = AGG::GetICN(msi.icn_file, msi.frm_idle.start, target.reflect);
 
-    Sprite sprite2(sprite1);
+    Sprite sprite2;
+    sprite2.Set(sprite1.w(), sprite1.h(), false);
+    sprite2.SetOffset(sprite1.x(), sprite1.y());
+    sprite1.Blit(sprite2);
 
     Surface sprite3;
     Surface::MakeStencil(sprite3, sprite1, sprite1.GetColorIndex(0xD8));
@@ -3146,15 +3149,15 @@ void Battle2::Interface::RedrawActionBloodLustSpell(Stats & target)
 
     AGG::PlaySound(M82::BLOODLUS);
 
-    while(le.HandleEvents() && alpha < 120)
+    while(le.HandleEvents() && alpha < 150)
     {
 	CheckGlobalEvents(le);
 
 	if(Game::AnimateInfrequent(Game::BATTLE_SPELL_DELAY))
     	{
 	    cursor.Hide();
-	    sprite3.SetAlpha(alpha);
 	    sprite1.Blit(sprite2);
+	    sprite3.SetAlpha(alpha);
 	    sprite3.Blit(sprite2);
 	    Redraw();
 	    cursor.Show();
@@ -3163,6 +3166,8 @@ void Battle2::Interface::RedrawActionBloodLustSpell(Stats & target)
 	    alpha += 10;
 	}
     }
+
+    DELAY(100);
 
     while(Mixer::isValid() && Mixer::isPlaying(-1)) DELAY(10);
 
