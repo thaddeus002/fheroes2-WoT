@@ -673,7 +673,7 @@ Battle2::Interface::Interface(Arena & a, s32 center) : arena(a), icn_cbkg(ICN::U
     border.SetPosition((display.w() - arenaw) / 2 - BORDERWIDTH, (display.h() - arenah) / 2 - BORDERWIDTH, arenaw, arenah);
 
     // cover
-    bool trees = Maps::ScanAroundObject(center, MP2::OBJ_TREES);
+    bool trees = Maps::ScanAroundObjectV(center, MP2::OBJ_TREES).size();
     const Heroes *hero = world.GetHeroes(center);
     bool grave = hero && MP2::OBJ_GRAVEYARD == hero->GetUnderObject();
     bool light = true;

@@ -309,13 +309,7 @@ void AnimationRemoveObject(Maps::Tiles & tile)
     Cursor & cursor = Cursor::Get();
     Display & display = Display::Get();
 
-    std::vector<const Heroes *> heroes;
-    std::vector<const Heroes *>::const_iterator it;
-    const u16 around = Maps::ScanAroundObject(tile.GetIndex(), MP2::OBJ_HEROES);
-    for(Direction::vector_t dir = Direction::TOP_LEFT; dir < Direction::CENTER; ++dir)
-	if(around & dir)
-	    heroes.push_back(world.GetHeroes(Maps::GetDirectionIndex(tile.GetIndex(), dir)));
-
+    const MapsIndexes & heroes = Maps::ScanAroundObjectV(tile.GetIndex(), MP2::OBJ_HEROES);
     const Surface & stile = tile.GetTileSurface();
     Surface sobj(stile.w(), stile.h());
 
@@ -340,9 +334,15 @@ void AnimationRemoveObject(Maps::Tiles & tile)
 	    cursor.Hide();
 	    stile.Blit(dstx, dsty, display);
 	    sobj.Blit(alpha, dstx, dsty, display);
+
 	    if(heroes.size())
 	    {
-		for(it = heroes.begin(); it != heroes.end(); ++it) if(*it) (*it)->Redraw(display, false);
+		for(MapsIndexes::const_iterator
+		    it = heroes.begin(); it != heroes.end(); ++it)
+		{
+		    Heroes* hero = world.GetHeroes(*it);
+		    if(hero) hero->Redraw(display, false);
+		}
 	    }
 	    else
 		tile.RedrawTop(display);

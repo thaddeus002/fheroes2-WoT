@@ -1511,29 +1511,29 @@ void Heroes::ActionNewPosition(void)
 {
     const Settings & conf = Settings::Get();
     // check around monster
-    u16 dst_around = Maps::TileUnderProtection(GetIndex());
+    MapsIndexes targets = Maps::TileUnderProtectionV(GetIndex());
 
-    if(dst_around)
+    if(targets.size())
     {
 	bool skip_battle = false;
 	SetMove(false);
 	GetPath().Hide();
 
 	// first target
-	Direction::vector_t dir = Direction::Get(GetIndex(), GetPath().GetDestinedIndex());
-
-	if(dst_around & dir)
+        MapsIndexes::iterator it = std::find(targets.begin(), targets.end(),
+                                                        GetPath().GetDestinedIndex());
+        if(it != targets.end())
 	{
-	    RedrawGameAreaAndHeroAttackMonster(*this, Maps::GetDirectionIndex(GetIndex(), dir));
-	    dst_around &= ~dir;
+	    RedrawGameAreaAndHeroAttackMonster(*this, *it);
+	    targets.erase(it);
 	    if(conf.ExtOnlyFirstMonsterAttack()) skip_battle = true;
 	}
 
 	// other around targets
-	for(dir = Direction::TOP_LEFT;
-	    dir < Direction::CENTER && !isFreeman() && !skip_battle; ++dir) if(dst_around & dir) 
+	for(MapsIndexes::const_iterator
+	    it = targets.begin(); it != targets.end() && !isFreeman() && !skip_battle; ++it)
 	{
-	    RedrawGameAreaAndHeroAttackMonster(*this, Maps::GetDirectionIndex(GetIndex(), dir));
+	    RedrawGameAreaAndHeroAttackMonster(*this, *it);
 	    if(conf.ExtOnlyFirstMonsterAttack()) skip_battle = true;
 	}
     }

@@ -368,7 +368,7 @@ void Battle2::Board::GetAbroadPositions(u16 center, u8 radius, bool skiptroop, s
 
 void Battle2::Board::SetCobjObjects(s32 center)
 {
-//    bool trees = Maps::ScanAroundObject(center, MP2::OBJ_TREES, false);
+//    bool trees = Maps::ScanAroundObjectV(center, MP2::OBJ_TREES).size();
     const Heroes* hero = world.GetHeroes(center);
     bool grave = hero && MP2::OBJ_GRAVEYARD == hero->GetUnderObject();
     u16 ground = world.GetTiles(center).GetGround();
@@ -791,7 +791,8 @@ Battle2::Arena::Arena(Army::army_t & a1, Army::army_t & a2, s32 index, bool loca
     else
     // set obstacles
     {
-	icn_covr = Maps::ScanAroundObject(index, MP2::OBJ_CRATER) ? GetCovr(world.GetTiles(index).GetGround()) : ICN::UNKNOWN;
+	icn_covr = Maps::ScanAroundObjectV(index, MP2::OBJ_CRATER).size() ?
+			GetCovr(world.GetTiles(index).GetGround()) : ICN::UNKNOWN;
 
 	if(icn_covr != ICN::UNKNOWN)
 	    board.SetCovrObjects(icn_covr);

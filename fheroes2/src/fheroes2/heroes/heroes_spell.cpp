@@ -259,12 +259,12 @@ bool ActionSpellSummonBoat(Heroes & hero)
     const s32 center = hero.GetIndex();
 
     // find water
-    u16 around_zero = Maps::ScanAroundObject(center, MP2::OBJ_ZERO);
     s32 dst_water = -1;
-    for(Direction::vector_t dir = Direction::TOP_LEFT; dir < Direction::CENTER; ++dir) if(around_zero & dir)
+    const MapsIndexes & v = Maps::ScanAroundObjectV(center, MP2::OBJ_ZERO);
+    for(MapsIndexes::const_iterator
+	it = v.begin(); it != v.end(); ++it)
     {
-	const s32 dst = Maps::GetDirectionIndex(center, dir);
-        if(world.GetTiles(dst).isWater()){ dst_water = dst; break; }
+        if(world.GetTiles(*it).isWater()){ dst_water = *it; break; }
     }
 
     // find boat
@@ -446,13 +446,13 @@ bool ActionSpellTownPortal(Heroes & hero)
 
 bool ActionSpellVisions(Heroes & hero)
 {
-    std::vector<s32> monsters;
-
     const u16 dist = hero.GetVisionsDistance();
+    const MapsIndexes & monsters = Maps::ScanDistanceObject(hero.GetIndex(), MP2::OBJ_MONSTER, dist);
 
-    if(Maps::ScanDistanceObject(hero.GetIndex(), MP2::OBJ_MONSTER, dist, monsters))
+    if(monsters.size())
     {
-	for(std::vector<s32>::const_iterator it = monsters.begin(); it != monsters.end(); ++it)
+	for(MapsIndexes::const_iterator
+	    it = monsters.begin(); it != monsters.end(); ++it)
 	{
 	    const Maps::Tiles & tile = world.GetTiles(*it);
 	    const Army::Troop troop(tile);

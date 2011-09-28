@@ -56,6 +56,85 @@ namespace Game
     }
 }
 
+namespace Maps
+{
+    u16 GetDirectionAroundGround(const s32 center, const u16 ground);
+    u8 GetCountAroundGround(const s32 center, const u16 ground);
+    u16 GetMaxGroundAround(const s32 center);
+}
+
+u16 Maps::GetDirectionAroundGround(const s32 center, const u16 ground)                                           
+{                                                                                                                
+    if(0 == ground || !isValidAbsIndex(center)) return 0;                                                        
+                                                                                                                 
+    u16 result = 0;                                                                                              
+                                                                                                                 
+    for(Direction::vector_t direct = Direction::TOP_LEFT; direct != Direction::CENTER; ++direct)                 
+        if(!isValidDirection(center, direct))                                                                    
+            result |= direct;                                                                                    
+        else                                                                                                     
+        if(ground & world.GetTiles(GetDirectionIndex(center, direct)).GetGround()) result |= direct;             
+                                                                                                                 
+    return result;                                                                                               
+}                                                                                                                
+
+u8 Maps::GetCountAroundGround(const s32 center, const u16 ground)                                                
+{                                                                                                                
+    if(0 == ground || !isValidAbsIndex(center)) return 0;                                                        
+                                                                                                                 
+    u8 result = 0;                                                                                               
+                                                                                                                 
+    for(Direction::vector_t direct = Direction::TOP_LEFT; direct != Direction::CENTER; ++direct)                 
+        if(!isValidDirection(center, direct))                                                                    
+            ++result;                                                                                            
+        else                                                                                                     
+        if(ground & world.GetTiles(GetDirectionIndex(center, direct)).GetGround()) ++result;                     
+                                                                                                                 
+    return result;                                                                                               
+}                                                                                                                
+
+u16 Maps::GetMaxGroundAround(const s32 center)                                                                   
+{                                                                                                                
+    if(!isValidAbsIndex(center)) return 0;                                                                       
+                                                                                                                 
+    std::vector<u8> grounds(9, 0);                                                                               
+    u16 result = 0;                                                                                              
+                                                                                                                 
+    for(Direction::vector_t direct = Direction::TOP_LEFT; direct != Direction::CENTER; ++direct)                 
+    {                                                                                                            
+        const Maps::Tiles & tile = (isValidDirection(center, direct) ?                                           
+                            world.GetTiles(GetDirectionIndex(center, direct)) : world.GetTiles(center));         
+                                                                                                                 
+        switch(tile.GetGround())                                                                                 
+        {                                                                                                        
+            case Maps::Ground::DESERT:  ++grounds[0]; break;                                                     
+            case Maps::Ground::SNOW:    ++grounds[1]; break;                                                     
+            case Maps::Ground::SWAMP:   ++grounds[2]; break;                                                     
+            case Maps::Ground::WASTELAND:++grounds[3]; break;                                                    
+            case Maps::Ground::BEACH:   ++grounds[4]; break;                                                     
+            case Maps::Ground::LAVA:    ++grounds[5]; break;                                                     
+            case Maps::Ground::DIRT:    ++grounds[6]; break;                                                     
+            case Maps::Ground::GRASS:   ++grounds[7]; break;                                                     
+            case Maps::Ground::WATER:   ++grounds[8]; break;                                                     
+            default: break;                                                                                      
+        }                                                                                                        
+    }                                                                                                            
+
+    const u8 max = *std::max_element(grounds.begin(), grounds.end());                                            
+                                                                                                                 
+    if(max == grounds[0]) result |= Maps::Ground::DESERT;                                                        
+    if(max == grounds[1]) result |= Maps::Ground::SNOW;                                                          
+    if(max == grounds[2]) result |= Maps::Ground::SWAMP;                                                         
+    if(max == grounds[3]) result |= Maps::Ground::WASTELAND;                                                     
+    if(max == grounds[4]) result |= Maps::Ground::BEACH;                                                         
+    if(max == grounds[5]) result |= Maps::Ground::LAVA;                                                          
+    if(max == grounds[6]) result |= Maps::Ground::DIRT;                                                          
+    if(max == grounds[7]) result |= Maps::Ground::GRASS;                                                         
+    if(max == grounds[8]) result |= Maps::Ground::WATER;                                                         
+                                                                                                                 
+    return result;                                                                                               
+}                                                                                                                
+
 Game::menu_t Game::Editor::StartGame()
 {
     Display & display = Display::Get();
@@ -977,11 +1056,11 @@ void Game::Editor::ModifyTileAbroad(Maps::Tiles & tile)
     // fix
     if(Maps::Ground::WATER != tile.GetGround()) return;
 
-    for(Direction::vector_t direct = Direction::TOP_LEFT; direct != Direction::CENTER; ++direct)
+    const MapsIndexes & v = Maps::GetAroundIndexes(center);
+    for(MapsIndexes::const_iterator
+	it = v.begin(); it != v.end(); ++it)
     {
-	if(Maps::isValidDirection(center, direct))
-	{
-	    const Maps::Tiles & opposition = world.GetTiles(Maps::GetDirectionIndex(center, direct));
+	    const Maps::Tiles & opposition = world.GetTiles(*it);
 	    u16 index = 0;
 
 	    // start index sprite
@@ -1061,7 +1140,6 @@ void Game::Editor::ModifyTileAbroad(Maps::Tiles & tile)
                 tile.RedrawBottom(display);
     		tile.RedrawTop(display);
     	    }
-    	}
     }
 }
 

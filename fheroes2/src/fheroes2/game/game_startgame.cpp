@@ -603,7 +603,7 @@ Cursor::themes_t Game::GetCursorFocusHeroes(const Heroes & from_hero, const Maps
 	    if(MP2::isGroundObject(tile.GetObject()))
 	    {
 		bool protection = (MP2::isPickupObject(tile.GetObject()) ? false :
-				(Maps::TileUnderProtection(tile.GetIndex()) ||
+				(Maps::TileUnderProtectionV(tile.GetIndex()).size() ||
 					(! Players::isFriends(from_hero.GetColor(), world.ColorCapturedObject(tile.GetIndex())) &&
 					    tile.CaptureObjectIsProtection(from_hero.GetColor()))));
 
@@ -613,7 +613,7 @@ Cursor::themes_t Game::GetCursorFocusHeroes(const Heroes & from_hero, const Maps
 	    else
 	    if(tile.isPassable(&from_hero, Direction::UNKNOWN, false))
 	    {
-		bool protection = Maps::TileUnderProtection(tile.GetIndex());
+		bool protection = Maps::TileUnderProtectionV(tile.GetIndex()).size();
 
 		return Cursor::DistanceThemes((protection ? Cursor::FIGHT : Cursor::MOVE),
 	    					from_hero.GetRangeRouteDays(tile.GetIndex()));

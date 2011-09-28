@@ -30,6 +30,35 @@
 #include "difficulty.h"
 #include "maps_tiles.h"
 
+bool TileIsObject(s32 index, u8 obj)
+{
+    return obj == world.GetTiles(index).GetObject();
+}
+
+bool TileIsObjects(s32 index, const u8* objs)
+{
+    while(*objs)
+    {
+	if(*objs == world.GetTiles(index).GetObject()) return true;
+	++objs;
+    }
+    return false;
+}
+
+MapsIndexes & MapsIndexesFilteredObjects(MapsIndexes & indexes, const u8* objs)
+{
+    indexes.resize(std::distance(indexes.begin(),
+	    std::remove_if(indexes.begin(), indexes.end(), std::not1(std::bind2nd(std::ptr_fun(&TileIsObjects), objs)))));
+    return indexes;
+}
+
+MapsIndexes & MapsIndexesFilteredObject(MapsIndexes & indexes, const u8 obj)
+{
+    indexes.resize(std::distance(indexes.begin(),
+	    std::remove_if(indexes.begin(), indexes.end(), std::not1(std::bind2nd(std::ptr_fun(&TileIsObject), obj)))));
+    return indexes;
+}
+
 const char* Maps::SizeString(u16 s)
 {
     const char* mapsize[] = { "Unknown", _("maps|Small"), _("maps|Medium"), _("maps|Large"), _("maps|Extra Large"), "size256", "size320" };
@@ -138,82 +167,46 @@ MapsIndexes Maps::GetAroundIndexes(const s32 center, const u16 filter)
 {
     MapsIndexes result;
     result.reserve(8);
-    for(Direction::vector_t direct = Direction::TOP_LEFT; direct != Direction::CENTER; ++direct)
-	if((filter & direct) && 
-	    isValidDirection(center, direct)) result.push_back(GetDirectionIndex(center, direct));
-    return result;
-}
 
-u16 Maps::GetDirectionAroundGround(const s32 center, const u16 ground)
-{
-    if(0 == ground || !isValidAbsIndex(center)) return 0;
-
-    u16 result = 0;
-
-    for(Direction::vector_t direct = Direction::TOP_LEFT; direct != Direction::CENTER; ++direct)
-	if(!isValidDirection(center, direct))
-	    result |= direct;
-	else
-	if(ground & world.GetTiles(GetDirectionIndex(center, direct)).GetGround()) result |= direct;
+    if(isValidAbsIndex(center))
+	for(Direction::vector_t direct = Direction::TOP_LEFT; direct != Direction::CENTER; ++direct)
+	    if((filter & direct) && 
+	    isValidDirection(center, direct))
+		result.push_back(GetDirectionIndex(center, direct));
 
     return result;
 }
 
-u8 Maps::GetCountAroundGround(const s32 center, const u16 ground)
+MapsIndexes Maps::GetDistanceIndexes(const s32 center, const u16 dist)
 {
-    if(0 == ground || !isValidAbsIndex(center)) return 0;
+    MapsIndexes results;
+    results.reserve(dist * 12);
 
-    u8 result = 0;
+    const s16 cx = center % world.w();
+    const s16 cy = center / world.w();
 
-    for(Direction::vector_t direct = Direction::TOP_LEFT; direct != Direction::CENTER; ++direct)
-	if(!isValidDirection(center, direct))
-	    ++result;
-	else
-	if(ground & world.GetTiles(GetDirectionIndex(center, direct)).GetGround()) ++result;
-
-    return result;
-}
-
-u16 Maps::GetMaxGroundAround(const s32 center)
-{
-    if(!isValidAbsIndex(center)) return 0;
-
-    std::vector<u8> grounds(9, 0);
-    u16 result = 0;
-
-    for(Direction::vector_t direct = Direction::TOP_LEFT; direct != Direction::CENTER; ++direct)
+    // from center to abroad !!
+    if(isValidAbsIndex(center))
+	for(u16 ii = 1; ii <= dist; ++ii)
     {
-    	const Maps::Tiles & tile = (isValidDirection(center, direct) ?
-			    world.GetTiles(GetDirectionIndex(center, direct)) : world.GetTiles(center));
+	const s16 tx = cx - ii;
+	const s16 ty = cy - ii;
 
-	switch(tile.GetGround())
+	const s16 mx = tx + 2 * ii;
+	const s16 my = ty + 2 * ii;
+
+	for(s16 iy = ty; iy <= my; ++iy)
+	    for(s16 ix = tx; ix <= mx; ++ix)
 	{
-	    case Maps::Ground::DESERT:	++grounds[0]; break;
-	    case Maps::Ground::SNOW:	++grounds[1]; break;
-	    case Maps::Ground::SWAMP:	++grounds[2]; break;
-	    case Maps::Ground::WASTELAND:++grounds[3]; break;
-	    case Maps::Ground::BEACH:	++grounds[4]; break;
-	    case Maps::Ground::LAVA:	++grounds[5]; break;
-	    case Maps::Ground::DIRT:	++grounds[6]; break;
-	    case Maps::Ground::GRASS:	++grounds[7]; break;
-	    case Maps::Ground::WATER:	++grounds[8]; break;
-	    default: break;
+	    if(ty < iy && iy < my && tx < ix && ix < mx)
+		continue;
+	    else
+	    if(isValidAbsPoint(ix, iy))
+		results.push_back(GetIndexFromAbsPoint(ix, iy));
 	}
     }
-    
-    const u8 max = *std::max_element(grounds.begin(), grounds.end());
 
-    if(max == grounds[0]) result |= Maps::Ground::DESERT;
-    if(max == grounds[1]) result |= Maps::Ground::SNOW;
-    if(max == grounds[2]) result |= Maps::Ground::SWAMP;
-    if(max == grounds[3]) result |= Maps::Ground::WASTELAND;
-    if(max == grounds[4]) result |= Maps::Ground::BEACH;
-    if(max == grounds[5]) result |= Maps::Ground::LAVA;
-    if(max == grounds[6]) result |= Maps::Ground::DIRT;
-    if(max == grounds[7]) result |= Maps::Ground::GRASS;
-    if(max == grounds[8]) result |= Maps::Ground::WATER;
-
-    return result;
+    return results;
 }
 
 void Maps::ClearFog(s32 index, u8 scoute, const u8 color)
@@ -246,54 +239,49 @@ void Maps::ClearFog(s32 index, u8 scoute, const u8 color)
     }
 }
 
-u16 Maps::ScanAroundObject(const s32 center, const u8 obj, const u16 exclude)
+MapsIndexes Maps::ScanAroundObjectsV(const s32 center, const u8* objs)
 {
-    if(!isValidAbsIndex(center)) return 0;
+    MapsIndexes results = Maps::GetAroundIndexes(center);
+    return MapsIndexesFilteredObjects(results, objs);
+}
 
-    u16 result = 0;
+MapsIndexes Maps::ScanAroundObjectV(const s32 center, const u8 obj)
+{
+    MapsIndexes results = Maps::GetAroundIndexes(center);
+    return MapsIndexesFilteredObject(results, obj);
+}
 
-    for(Direction::vector_t dir = Direction::TOP_LEFT; dir < Direction::CENTER; ++dir)
+MapsIndexes Maps::ScanDistanceObject(const s32 center, const u8 obj, const u16 dist)
+{
+    MapsIndexes results = Maps::GetDistanceIndexes(center, dist);
+    return MapsIndexesFilteredObject(results, obj);
+}
+
+MapsIndexes Maps::ScanDistanceObjects(const s32 center, const u8* objs, const u16 dist)
+{
+    MapsIndexes results = Maps::GetDistanceIndexes(center, dist);
+    return MapsIndexesFilteredObjects(results, objs);
+}
+
+bool TileIsUnderProtection(s32 index, s32 from)
+{
+    bool result = false;
+
+    if(world.GetTiles(from).isWater() == world.GetTiles(index).isWater())
     {
-	if((exclude & dir) || !isValidDirection(center, dir)) continue;
-	if(obj == world.GetTiles(GetDirectionIndex(center, dir)).GetObject()) result |= dir;
+	result = DIRECTION_TOP_ROW & Direction::Get(from, index) ?
+		    ! MP2::isGroundObject(world.GetTiles(from).GetObject(false)) : true;
     }
 
     return result;
 }
-
-bool Maps::ScanDistanceObject(const s32 center, const u8 obj, const u16 dist, MapsIndexes & results)
+ 
+MapsIndexes Maps::TileUnderProtectionV(const s32 center)
 {
-    if(!isValidAbsIndex(center)) return false;
-    if(results.size()) results.clear();
-
-    const s16 cx = center % world.w();
-    const s16 cy = center / world.w();
-
-    // from center to abroad
-    for(u16 ii = 1; ii <= dist; ++ii)
-    {
-	const s16 tx = cx - ii;
-	const s16 ty = cy - ii;
-
-	const s16 mx = tx + 2 * ii;
-	const s16 my = ty + 2 * ii;
-
-	for(s16 iy = ty; iy <= my; ++iy)
-	    for(s16 ix = tx; ix <= mx; ++ix)
-	{
-	    if(ty < iy && iy < my && tx < ix && ix < mx) continue;
-
-	    if(isValidAbsPoint(ix, iy))
-	    {
-		const s32 index = GetIndexFromAbsPoint(ix, iy);
-
-		if(obj == world.GetTiles(index).GetObject())
-    		    results.push_back(index);
-	    }
-	}
-    }
-
-    return results.size();
+    MapsIndexes indexes = Maps::ScanAroundObjectV(center, MP2::OBJ_MONSTER);
+    indexes.resize(std::distance(indexes.begin(),
+	    std::remove_if(indexes.begin(), indexes.end(), std::not1(std::bind2nd(std::ptr_fun(&TileIsUnderProtection), center)))));
+    return indexes;
 }
 
 u16 Maps::GetApproximateDistance(const s32 index1, const s32 index2)
@@ -453,31 +441,4 @@ void Maps::UpdateSpritesFromTownToCastle(const Point & center)
 	if(addon)
 	    world.GetTiles(GetIndexFromAbsPoint(center.x, center.y - 3)).AddonsPushLevel2(TilesAddon(addon->level, addon->uniq, addon->object, addon->index - 3));
     }
-}
-
-u16 Maps::TileUnderProtection(const s32 center)
-{
-    if(!isValidAbsIndex(center)) return 0;
-
-    const bool water1 = world.GetTiles(center).isWater();
-
-    u16 result = 0;
-    const u16 dst_around = Maps::ScanAroundObject(center, MP2::OBJ_MONSTER);
-    const u8  obj = world.GetTiles(center).GetObject(false);
-
-    for(Direction::vector_t dir = Direction::TOP_LEFT; dir < Direction::CENTER; ++dir) if(dst_around & dir)
-    {
-	// check water
-	const bool water2 = world.GetTiles(GetDirectionIndex(center, dir)).isWater();
-	if((water1 && !water2) || (!water1 && water2)) continue;
-
-	if((Direction::TOP | Direction::TOP_LEFT | Direction::TOP_RIGHT) & dir)
-	{
-	    if(! MP2::isGroundObject(obj)) result |= dir;
-	}
-	else
-	    result |= dir;
-    }
-
-    return result;
 }

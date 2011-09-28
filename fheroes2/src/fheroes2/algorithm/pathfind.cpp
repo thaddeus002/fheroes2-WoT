@@ -93,9 +93,8 @@ bool PassableFromToTile(const Heroes* hero, const s32 from, const s32 to, const 
 {
     if(to != dst)
     {
-	const u16 mons = Maps::TileUnderProtection(to);
 	// check monster protection
-	if(mons &&
+	if(Maps::TileUnderProtectionV(to).size() &&
 	    ! FromTileToMonster(to, dst)) return false;
     }
 

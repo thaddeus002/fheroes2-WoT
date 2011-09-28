@@ -1035,6 +1035,8 @@ void World::MonthOfMonstersAction(const Monster & mons)
 	tiles.reserve(vec_tiles.size() / 2);
 	excld.reserve(vec_tiles.size() / 2);
 
+	const u8 objs[] = { MP2::OBJ_MONSTER, MP2::OBJ_HEROES, MP2::OBJ_CASTLE, MP2::OBJN_CASTLE, 0 };
+
 	for(MapsTiles::const_iterator
 	    it = vec_tiles.begin(); it != vec_tiles.end(); ++it)
 	{
@@ -1043,10 +1045,7 @@ void World::MonthOfMonstersAction(const Monster & mons)
 	    if(! tile.isWater() &&
 		MP2::OBJ_ZERO == tile.GetObject() &&
 		tile.isPassable(NULL, Direction::UNKNOWN, true) &&
-		! Maps::ScanAroundObject(tile.GetIndex(), MP2::OBJ_MONSTER) &&
-		! Maps::ScanAroundObject(tile.GetIndex(), MP2::OBJ_HEROES) &&
-		! Maps::ScanAroundObject(tile.GetIndex(), MP2::OBJ_CASTLE) &&
-		! Maps::ScanAroundObject(tile.GetIndex(), MP2::OBJN_CASTLE) &&
+		Maps::ScanAroundObjectsV(tile.GetIndex(), objs).empty() &&
 		excld.end() == std::find(excld.begin(), excld.end(), tile.GetIndex()))
 	    {
 		tiles.push_back(tile.GetIndex());

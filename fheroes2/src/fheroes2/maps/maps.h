@@ -57,15 +57,14 @@ namespace Maps
 
     s32 GetIndexFromAbsPoint(const Point & mp);
     s32 GetIndexFromAbsPoint(s16 px, s16 py);
+
     MapsIndexes GetAroundIndexes(const s32 center, const u16 filter = DIRECTION_ALL);
-
-    u16 GetDirectionAroundGround(const s32 center, const u16 ground);
-    u8  GetCountAroundGround(const s32 center, const u16 ground);
-    u16 GetMaxGroundAround(const s32 center);
-
-    u16  ScanAroundObject(const s32 center, const u8 obj, const u16 exclude = 0);
-    bool ScanDistanceObject(const s32 center, const u8 obj, const u16 dist, MapsIndexes &);
-    u16  TileUnderProtection(const s32 center);
+    MapsIndexes GetDistanceIndexes(const s32 center, const u16 dist);
+    MapsIndexes ScanAroundObjectV(const s32 center, const u8 obj);
+    MapsIndexes ScanAroundObjectsV(const s32 center, const u8* objs);
+    MapsIndexes TileUnderProtectionV(const s32 center);
+    MapsIndexes ScanDistanceObject(const s32 center, const u8 obj, const u16 dist);
+    MapsIndexes ScanDistanceObjects(const s32 center, const u8* objs, const u16 dist);
 
     void ClearFog(s32 center, u8 scoute, const u8 color);
     u16 GetApproximateDistance(const s32 index1, const s32 index2);

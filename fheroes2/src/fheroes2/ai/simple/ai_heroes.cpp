@@ -1618,10 +1618,10 @@ void AIToBoat(Heroes &hero, const u8 obj, const s32 dst_index)
     const s32 from_index = hero.GetIndex();
 
     // disabled nearest coasts (on week MP2::isWeekLife)
-    std::vector<s32> coasts;
-    Maps::ScanDistanceObject(from_index, MP2::OBJ_COAST, 4, coasts);
+    MapsIndexes coasts = Maps::ScanDistanceObject(from_index, MP2::OBJ_COAST, 4);
     coasts.push_back(from_index);
-    for(std::vector<s32>::const_iterator
+
+    for(MapsIndexes::const_iterator
 	it = coasts.begin(); it != coasts.end(); ++it) hero.SetVisited(*it);
 
     hero.ResetMovePoints();
@@ -2246,15 +2246,16 @@ void AIHeroesAddedTask(Heroes & hero)
 	    s32 pos = 0;
 
 	    // path dangerous
-	    if(u16 around = hero.GetPath().isUnderProtection(pos))
+	    const MapsIndexes & v = Maps::TileUnderProtectionV(pos);
+	    if(v.size())
 	    {
 		bool skip = false;
-    		for(Direction::vector_t
-        	    dir = Direction::TOP_LEFT; dir < Direction::CENTER && !skip; ++dir) if(around & dir)
+        	Army::army_t enemy;
+
+    		for(MapsIndexes::const_iterator
+		    it = v.begin(); it != v.end(); ++it)
     		{
-        	    const s32 dst = Maps::GetDirectionIndex(pos, dir);
-        	    Army::army_t enemy;
-        	    enemy.FromGuardian(world.GetTiles(dst));
+        	    enemy.FromGuardian(world.GetTiles(*it));
         	    if(enemy.isValid() && enemy.StrongerEnemyArmy(hero.GetArmy())) skip = true;
     		}
 		if(skip) continue;
@@ -2281,14 +2282,6 @@ void AIHeroesAddedTask(Heroes & hero)
 	AIHeroesAddedRescueTask(hero);
 }
 
-bool ScanPickupObjects(const Heroes & hero, u8 radius, std::vector<s32> & results)
-{
-    return Maps::ScanDistanceObject(hero.GetIndex(), MP2::OBJ_ARTIFACT, radius, results) ||
-    	    Maps::ScanDistanceObject(hero.GetIndex(), MP2::OBJ_RESOURCE, radius, results) ||
-    	    Maps::ScanDistanceObject(hero.GetIndex(), MP2::OBJ_CAMPFIRE, radius, results) ||
-    	    Maps::ScanDistanceObject(hero.GetIndex(), MP2::OBJ_TREASURECHEST, radius, results);
-}
-
 void AIHeroesGetTask(Heroes & hero)
 {
     std::vector<s32> results;
@@ -2300,6 +2293,10 @@ void AIHeroesGetTask(Heroes & hero)
 
     Queue & task = ai_hero.sheduled_visit;
     IndexObjectMap & ai_objects = ai_kingdom.scans;
+
+    const u8 objs1[] = { MP2::OBJ_ARTIFACT, MP2::OBJ_RESOURCE, MP2::OBJ_CAMPFIRE, MP2::OBJ_TREASURECHEST, 0 };
+    const u8 objs2[] = { MP2::OBJ_SAWMILL, MP2::OBJ_MINES, MP2::OBJ_ALCHEMYLAB, 0 };
+    const u8 objs3[] = { MP2::OBJ_CASTLE, MP2::OBJ_HEROES, MP2::OBJ_MONSTER, 0 };
 
     // rescan path
     hero.RescanPath();
@@ -2334,12 +2331,12 @@ void AIHeroesGetTask(Heroes & hero)
 		return;
 
 	// scan enemy hero
-	if(hero.GetSquarePatrol() &&
-	    Maps::ScanDistanceObject(Maps::GetIndexFromAbsPoint(hero.GetCenterPatrol()),
-				    MP2::OBJ_HEROES, hero.GetSquarePatrol(), results))
+	if(hero.GetSquarePatrol())
 	{
-	    std::vector<s32>::const_iterator it = results.begin();
-	    for(; it != results.end(); ++it)
+	    const MapsIndexes & results = Maps::ScanDistanceObject(Maps::GetIndexFromAbsPoint(hero.GetCenterPatrol()),
+									MP2::OBJ_HEROES, hero.GetSquarePatrol());
+	    for(MapsIndexes::const_iterator
+		it = results.begin(); it != results.end(); ++it)
 	    {
 		const Heroes* enemy = world.GetHeroes(*it);
 		if(enemy && !Players::isFriends(enemy->GetColor(), hero.GetColor()))
@@ -2354,11 +2351,12 @@ void AIHeroesGetTask(Heroes & hero)
 	}
 
 	// can pickup objects
-	if(conf.ExtHeroPatrolAllowPickup() &&
-	    ScanPickupObjects(hero, hero.GetSquarePatrol(), results))
+	if(conf.ExtHeroPatrolAllowPickup())
 	{
-	    std::vector<s32>::const_iterator it = results.begin();
-	    for(; it != results.end(); ++it)
+	    const MapsIndexes & results = Maps::ScanDistanceObjects(hero.GetIndex(),
+								    objs1, hero.GetSquarePatrol());
+	    for(MapsIndexes::const_iterator
+		it = results.begin(); it != results.end(); ++it)
     		if(AIHeroesValidObject(hero, *it) &&
 		    hero.GetPath().Calculate(*it))
 	    {
@@ -2438,22 +2436,18 @@ void AIHeroesGetTask(Heroes & hero)
     }
 
     // scan heroes and castle
-    if(Maps::ScanDistanceObject(hero.GetIndex(), MP2::OBJ_CASTLE, hero.GetScoute(), results) ||
-    	    Maps::ScanDistanceObject(hero.GetIndex(), MP2::OBJ_HEROES, hero.GetScoute(), results) ||
-    	    Maps::ScanDistanceObject(hero.GetIndex(), MP2::OBJ_MONSTER, hero.GetScoute(), results))
+    const MapsIndexes & enemies = Maps::ScanDistanceObjects(hero.GetIndex(), objs3, hero.GetScoute());
+
+    for(MapsIndexes::const_iterator
+	it = enemies.begin(); it != enemies.end(); ++it)
+	if(AIHeroesPriorityObject(hero, *it) &&
+		hero.GetPath().Calculate(*it))
     {
-	    std::vector<s32>::const_iterator it = results.begin();
+	DEBUG(DBG_AI, DBG_TRACE, hero.GetName() << ", set primary target: " <<
+	MP2::StringObject(world.GetTiles(*it).GetObject()) << "(" << *it << ")");
 
-	    for(; it != results.end(); ++it)
-		if(AIHeroesPriorityObject(hero, *it) &&
-		    hero.GetPath().Calculate(*it))
-	{
-		DEBUG(DBG_AI, DBG_TRACE, hero.GetName() << ", set primary target: " <<
-		MP2::StringObject(world.GetTiles(*it).GetObject()) << "(" << *it << ")");
-
-		ai_hero.primary_target = *it;
-		return;
-	}
+	ai_hero.primary_target = *it;
+	return;
     }
 
     // check destination
@@ -2471,16 +2465,17 @@ void AIHeroesGetTask(Heroes & hero)
     }
 
     // scan 2x2 pickup objects
-    if(ScanPickupObjects(hero, 2, results) ||
-    	    // scan 3x3 capture objects
-    	    Maps::ScanDistanceObject(hero.GetIndex(), MP2::OBJ_SAWMILL, 3, results) ||
-    	    Maps::ScanDistanceObject(hero.GetIndex(), MP2::OBJ_MINES, 3, results) ||
-    	    Maps::ScanDistanceObject(hero.GetIndex(), MP2::OBJ_ALCHEMYLAB, 3, results))
+    MapsIndexes pickups = Maps::ScanDistanceObjects(hero.GetIndex(), objs1, 2);
+    // scan 3x3 capture objects
+    const MapsIndexes & captures = Maps::ScanDistanceObjects(hero.GetIndex(), objs2, 3);
+    if(captures.size()) pickups.insert(pickups.end(), captures.begin(), captures.end());
+
+    if(pickups.size())
     {
-	std::vector<s32>::const_iterator it = results.begin();
-	for(; it != results.end(); ++it)
+	for(MapsIndexes::const_iterator
+	    it = pickups.begin(); it != pickups.end(); ++it)
     	    if(AIHeroesValidObject(hero, *it) &&
-		hero.GetPath().Calculate(*it))
+			hero.GetPath().Calculate(*it))
 	{
 	    ai_objects.erase(*it);
 

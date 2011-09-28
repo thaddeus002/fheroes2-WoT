@@ -314,7 +314,7 @@ u16 Route::Path::isUnderProtection(s32 & pos) const
 	it = begin(); it != end() && res == 0; ++it)
     {
 	next = (*it).GetIndex();
-	res = Maps::TileUnderProtection(next);
+	res = Maps::TileUnderProtectionV(next).size();
     }
 
     if(res)

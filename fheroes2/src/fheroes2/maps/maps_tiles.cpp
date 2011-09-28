@@ -709,15 +709,17 @@ void Maps::Tiles::RedrawMonster(Surface & dst) const
     if(!(area.GetRectMaps() & mp)) return;
 
     // scan hero around
-    const u16 dst_around = Maps::ScanAroundObject(maps_index, MP2::OBJ_HEROES);
-    for(Direction::vector_t dir = Direction::TOP_LEFT; dir < Direction::CENTER; ++dir) if(dst_around & dir)
+    const MapsIndexes & v = ScanAroundObjectV(maps_index, MP2::OBJ_HEROES);
+    for(MapsIndexes::const_iterator
+	it = v.begin(); it != v.end(); ++it)
     {
-	dst_index = Maps::GetDirectionIndex(maps_index, dir);
+	dst_index = *it;
 	const Heroes* hero = world.GetHeroes(dst_index);
 
 	if(!hero ||
 	    // skip bottom, bottom_right, bottom_left with ground objects
-	    (((Direction::BOTTOM | Direction::BOTTOM_LEFT | Direction::BOTTOM_RIGHT) & dir) && MP2::isGroundObject(hero->GetUnderObject())) ||
+	    ((DIRECTION_BOTTOM_ROW & Direction::Get(maps_index, *it)) && 
+			    MP2::isGroundObject(hero->GetUnderObject())) ||
 	    // skip ground check
 	    (world.GetTiles(dst_index).isWater() != isWater()))
 	    dst_index = -1;
@@ -1003,13 +1005,13 @@ std::string Maps::Tiles::String(void) const
 
 	default:
 	{
-	    const u16 dst_around = Maps::TileUnderProtection(maps_index);
-	    if(dst_around)
+	    const MapsIndexes & v = Maps::TileUnderProtectionV(maps_index);
+	    if(v.size())
 	    {
 		os << "protection      : ";
-		for(Direction::vector_t dir = Direction::TOP_LEFT; dir < Direction::CENTER; ++dir)
-		    if(dst_around & dir)
-			os << Maps::GetDirectionIndex(maps_index, dir) << ", ";
+		for(MapsIndexes::const_iterator
+		    it = v.begin(); it != v.end(); ++it)
+		    os << *it << ", ";
 		os << std::endl;
 	    }
 	    break;
