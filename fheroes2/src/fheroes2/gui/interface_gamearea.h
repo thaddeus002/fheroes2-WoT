@@ -94,7 +94,8 @@ namespace Interface
 	Point	scrollOffset;
 	u16	oldIndexPos;
 	u8	scrollDirection;
-	u8	scrollStep;
+	u8	scrollStepX;
+	u8	scrollStepY;
 	u8	tailX;
 	u8	tailY;
 	bool    updateCursor;
