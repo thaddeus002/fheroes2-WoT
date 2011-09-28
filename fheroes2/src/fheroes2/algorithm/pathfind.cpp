@@ -115,6 +115,16 @@ bool PassableFromToTile(const Heroes* hero, const s32 from, const s32 to, const 
 
     if(! fromTile.isPassable(hero, direct, false)) return false;
 
+    if(to != dst)
+    switch(toTile.GetObject())
+    {
+	case MP2::OBJ_HEROES:
+	case MP2::OBJ_MONSTER:
+		return false;
+
+	default: break;
+    }
+
     bool fromTile2 = toTile.isPassable(hero, Direction::Reflect(direct), false);
 
     // end point

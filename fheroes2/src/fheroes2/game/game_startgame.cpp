@@ -652,10 +652,10 @@ void Game::ShowPathOrStartMoveHero(Heroes *hero, const s32 dst_index)
     Cursor & cursor = Cursor::Get();
 
     // show path
-    if(path.GetDestinationIndex() != dst_index)
+    if(path.GetDestinedIndex() != dst_index &&
+	    path.GetDestinationIndex() != dst_index)
     {
         hero->ResetModes(Heroes::SLEEPER);
-        
         hero->SetMove(false);
 	path.Calculate(dst_index);
         DEBUG(DBG_GAME, DBG_TRACE, hero->GetName() << ", route: " << path.String());

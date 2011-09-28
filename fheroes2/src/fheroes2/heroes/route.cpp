@@ -93,6 +93,13 @@ bool Route::Path::Calculate(const s32 dst_index, const u16 limit)
 {
     clear();
     Algorithm::PathFind(this, hero.GetIndex(), dst_index, limit, &hero);
+
+    // check monster dst
+    if(!empty() &&
+	Maps::isValidAbsIndex(dst_index) &&
+	MP2::OBJ_MONSTER == world.GetTiles(dst_index).GetObject())
+	pop_back();
+
     dst = empty() ? hero.GetIndex() : dst_index;
 
     return !empty();
