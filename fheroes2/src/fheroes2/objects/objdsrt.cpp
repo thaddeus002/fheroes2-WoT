@@ -45,29 +45,29 @@ bool ObjDesert::isPassable(u16 icn, u8 index, u16 direct)
 	    else
 	    // desert tent
 	    if(71 < index && index < 74)
-		return (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
+		return Direction::UNKNOWN == direct || (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
 	    else
 	    // piramids
 	    if(80 < index && index < 83)
-		return (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
+		return Direction::UNKNOWN == direct || (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
 	    else
 	    // skeleton
 	    if(82 < index && index < 85)
-		return (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
+		return Direction::UNKNOWN == direct || (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
 	    else
 	    // sphinx
 	    if(86 < index && index < 89)
-		return (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
+		return Direction::UNKNOWN == direct || (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
 	    else
 	    // city of dead
 	    if(88 < index && index < 94) return false;
 	    else
 	    if(93 < index && index < 99)
-		return (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
+		return Direction::UNKNOWN == direct || (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
 	    else
 	    // excavation
 	    if(98 < index && index < 102)
-		return (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
+		return Direction::UNKNOWN == direct || (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
 	    else
 	    // obelisk
 	    if(104 == index) return false;
@@ -76,27 +76,27 @@ bool ObjDesert::isPassable(u16 icn, u8 index, u16 direct)
 	    if(104 < index && index < 107) return false;
 	    else
 	    if(107 < index && index < 110)
-		return (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
+		return Direction::UNKNOWN == direct || (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
 	    else
 	    // desert
 	    if(109 < index && index < 113) return false;
 	    else
 	    // daemon cave
 	    if(115 < index && index < 118)
-		return (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
+		return Direction::UNKNOWN == direct || (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
 	    else
 	    // sign
 	    if(119 == index) return false;
 	    else
 	    // grave yard
 	    if(120 < index && index < 123)
-		return (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
+		return Direction::UNKNOWN == direct || (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
 	    else
 	    // saw mill
 	    if(124 < index && index < 127) return false;
 	    else
 	    if(126 < index && index < 131)
-		return (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
+		return Direction::UNKNOWN == direct || (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
 	    else return true;
 
 	default: break;

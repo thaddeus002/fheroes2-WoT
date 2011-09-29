@@ -30,14 +30,14 @@ bool ObjSnow::isPassable(u16 icn, u8 index, u16 direct)
 	case ICN::OBJNSNOW:
 	    // cave for centaur
 	    if((1 < index && index < 4))
-		return (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
+		return Direction::UNKNOWN == direct || (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
 	    else
 	    // camp fire
 	    if(4 == index) return false;
 	    else
 	    // learn to
 	    if(13 == index)
-		return (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
+		return Direction::UNKNOWN == direct || (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
 	    else
 	    // rock
 	    if(22 == index || (25 < index && index < 29) || 30 == index ||
@@ -56,7 +56,7 @@ bool ObjSnow::isPassable(u16 icn, u8 index, u16 direct)
 	    else
 	    //wind mill
 	    if(128 == index || 132 == index)
-		return (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
+		return Direction::UNKNOWN == direct || (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
 	    else
 	    // watch tower
 	    if(138 == index) return false;
@@ -69,15 +69,15 @@ bool ObjSnow::isPassable(u16 icn, u8 index, u16 direct)
 	    else
 	    // alchemy tower
 	    if(148 < index && index < 152)
-		return (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
+		return Direction::UNKNOWN == direct || (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
 	    else
 	    // graveyard
 	    if((158 < index && index < 161) || (207 < index && index < 211))
-		return (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
+		return Direction::UNKNOWN == direct || (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
 	    else
 	    // water mill
 	    if(177 == index || 184 == index || 191 == index)
-		return (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
+		return Direction::UNKNOWN == direct || (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
 	    else
 	    // well
 	    if(194 == index) return false;
@@ -86,7 +86,7 @@ bool ObjSnow::isPassable(u16 icn, u8 index, u16 direct)
 	    if(196 < index && index < 199) return false;
 	    else
 	    if(198 < index && index < 202)
-		return (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
+		return Direction::UNKNOWN == direct || (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
 	    else return true;	    
 
 	default: break;

@@ -63,17 +63,17 @@ bool ObjWasteLand::isPassable(u16 icn, u8 index, u16 direct)
 	    if(181 < index && index < 188) return false;
 	    else
 	    if(188 == index)
-                return (direct & (Direction::RIGHT | DIRECTION_BOTTOM_ROW));
+                return Direction::UNKNOWN == direct || (direct & (Direction::RIGHT | DIRECTION_BOTTOM_ROW));
 	    else
 	    if(189 == index)
-                return (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
+                return Direction::UNKNOWN == direct || (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
 	    else
 	    // market
 	    if(202 == index || 213 == index) return false;
 	    else
 	    // watering hole
 	    if(216 < index && index < 221)
-                return (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
+                return Direction::UNKNOWN == direct || (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
 	    else
 	    // obelisk
 	    if(238 == index) return false;
@@ -82,7 +82,7 @@ bool ObjWasteLand::isPassable(u16 icn, u8 index, u16 direct)
 	    if(240 < index && index < 243) return false;
 	    else
 	    if(242 < index && index < 247)
-                return (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
+                return Direction::UNKNOWN == direct || (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
 
 	    else return true;
 

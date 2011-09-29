@@ -61,23 +61,47 @@ bool Mounts::isPassable(u16 icn, u8 index, u16 direct)
         // 133 sprites
         case ICN::MTNCRCK:
         case ICN::MTNDIRT:
-    	    if((5 < index && index < 10) || (11 < index && index < 17) || (17 < index && index < 21)) return false;	// LARGE LEFT
+    	    if((5 < index && index < 10) || (13 < index && index < 17)) return false;		// LARGE LEFT
     	    else
-    	    if((27 < index && index < 32) || (32 < index && index < 38) || (38 < index && index < 42)) return false;	// LARGE RIGHT
+	    if((11 < index && index < 14) || (17 < index && index < 21))
+		return Direction::UNKNOWN == direct || (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
     	    else
-    	    if((47 < index && index < 53) || (53 < index && index < 57)) return false;				// MEDIUM LEFT (51 and 52 for dirt need close)
+    	    if((27 < index && index < 32) || (32 < index && index < 36)) return false;		// LARGE RIGHT
     	    else
-    	    if((64 < index && index < 68) || (68 < index && index < 72)) return false;				// MEDIUM RIGHT
+	    if((35 < index && index < 38) || (38 < index && index < 42))
+		return Direction::UNKNOWN == direct || (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
     	    else
-    	    if((75 < index && index < 79) || (79 < index && index < 82)) return false;				// MEDIUM2 RIGHT
+    	    if(49 < index && index < 53) return false;						// MEDIUM LEFT (51 and 52 for dirt need close)
     	    else
-    	    if((86 < index && index < 89) || (89 < index && index < 92)) return false;				// MEDIUM2 LEFT
+	    if((47 < index && index < 50) || (53 < index && index < 57))
+		return Direction::UNKNOWN == direct || (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
     	    else
-    	    if((92 < index && index < 95) || (95 < index && index < 98)) return false;				// SMALL LEFT
+    	    if(65 == index) return false;							// MEDIUM RIGHT
     	    else
-    	    if((98 < index && index < 101) || (101 < index && index < 104)) return false;			// SMALL RIGHT
+	    if((65 < index && index < 68) || (68 < index && index < 72))
+		return Direction::UNKNOWN == direct || (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
     	    else
-    	    if(110 < index && index < 114) return Mines::isPassable(index, 112, direct);			// MINES
+    	    if(76 < index && index < 79) return false;						// MEDIUM2 RIGHT
+    	    else
+	    if(76 == index || (79 < index && index < 82))
+		return Direction::UNKNOWN == direct || (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
+    	    else
+    	    if(87 == index) return false;							// MEDIUM2 LEFT
+    	    else
+	    if(88 == index || (89 < index && index < 92))
+		return Direction::UNKNOWN == direct || (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
+    	    else
+    	    if(94 == index) return false;							// SMALL LEFT
+    	    else
+	    if(93 == index || (95 < index && index < 98))
+		return Direction::UNKNOWN == direct || (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
+    	    else
+    	    if(99 == index) return false;							// SMALL RIGHT
+    	    else
+	    if(100 == index || (101 < index && index < 104))
+		return Direction::UNKNOWN == direct || (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
+    	    else
+    	    if(110 < index && index < 114) return Mines::isPassable(index, 112, direct);	// MINES
     	    else return true;
 
         // 83 sprites
@@ -87,22 +111,42 @@ bool Mounts::isPassable(u16 icn, u8 index, u16 direct)
         case ICN::MTNMULT:
 	case ICN::MTNSNOW:
         case ICN::MTNSWMP:
-    	    if((5 < index && index < 10) || (11 < index && index < 17) || (17 < index && index < 21)) return false;	// LARGE LEFT
+    	    if((5 < index && index < 10) || (13 < index && index < 17)) return false;		// LARGE LEFT
+	    else
+	    if((11 < index && index < 14) || (17 < index && index < 21))
+		return Direction::UNKNOWN == direct || (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
     	    else
 	    if(25 == index) return false;	// bug: level 1 sprite for mtngrass
     	    else
-    	    if((27 < index && index < 32) || (32 < index && index < 38) || (38 < index && index < 42)) return false;	// LARGE RIGHT
+    	    if((27 < index && index < 32) || (32 < index && index < 36)) return false;		// LARGE RIGHT
+	    else
+	    if((35 < index && index < 38) || (38 < index && index < 42))
+		return Direction::UNKNOWN == direct || (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
     	    else
-    	    if((45 < index && index < 49) || (49 < index && index < 52)) return false;				// MEDIUM LEFT
+    	    if(46 < index && index < 49) return false;						// MEDIUM LEFT
+	    else
+	    if(46 == index || (49 < index && index < 52))
+		return Direction::UNKNOWN == direct || (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
     	    else
-    	    if((55 < index && index < 59) || (59 < index && index < 62)) return false;				// MEDIUM RIGHT
+    	    if((55 < index && index < 58)) return false;					// MEDIUM RIGHT
+	    else
+	    if(58 == index || (59 < index && index < 62))
+		return Direction::UNKNOWN == direct || (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
     	    else
-    	    if((62 < index && index < 65) || (65 < index && index < 68)) return false;				// SMALL LEFT
+    	    if(63 < index && index < 65) return false;						// SMALL LEFT
+	    else
+	    if(63 == index || (65 < index && index < 68))
+		return Direction::UNKNOWN == direct || (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
     	    else
-    	    if((68 < index && index < 71) || (71 < index && index < 74)) return false;				// SMALL RIGHT
+    	    if((68 < index && index < 70)) return false;					// SMALL RIGHT
+	    else
+	    if(70 == index || (71 < index && index < 74))
+		return Direction::UNKNOWN == direct || (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
     	    else
-    	    if(80 < index && index < 84) return Mines::isPassable(index, 82, direct);				// MINES
-    	    else return true;
+    	    if(80 < index && index < 84)							// MINES
+		return Direction::UNKNOWN == direct || (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
+    	    else
+		return true;
 
         default: break;
     }

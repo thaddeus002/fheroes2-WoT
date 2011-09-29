@@ -55,29 +55,29 @@ bool ObjDirt::isPassable(u16 icn, u8 index, u16 direct)
 	    else
 	    // faerie ring
 	    if(128 < index && index < 131)
-		return (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
+		return Direction::UNKNOWN == direct || (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
 	    else
 	    // hill fort
 	    if(132 < index && index < 134)  return false;
 	    else
 	    if(134 == index || index == 135)
-		return (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
+		return Direction::UNKNOWN == direct || (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
 	    else
 	    // halfling hole
 	    if(136 < index && index < 140)
-		return (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
+		return Direction::UNKNOWN == direct || (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
 	    else
 	    // tree city
 	    if(150 < index && index < 153)
-		return (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
+		return Direction::UNKNOWN == direct || (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
 	    else
 	    // wind mill
 	    if(185 == index || 189 == index)
-		return (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
+		return Direction::UNKNOWN == direct || (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
 	    else
 	    // oracul
 	    if(196 < index && index < 199)
-		return (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
+		return Direction::UNKNOWN == direct || (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
 	    else
 	    // obelisk
 	    if(201 == index)  return false;

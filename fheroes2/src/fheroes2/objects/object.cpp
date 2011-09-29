@@ -39,10 +39,10 @@
 bool Mines::isPassable(u8 index, u8 center, u16 direct)
 {
     if(index == center - 1 || index == center)
-        return (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
+        return Direction::UNKNOWN == direct || (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
     else
     if(index == center + 1)
-        return (direct & (Direction::LEFT | DIRECTION_BOTTOM_ROW));
+        return Direction::UNKNOWN == direct || (direct & (Direction::LEFT | DIRECTION_BOTTOM_ROW));
 
     return false;
 }
@@ -61,10 +61,10 @@ bool Object::AllowDirect(u8 general, u16 direct)
     switch(general)
     {
 	case MP2::OBJ_SHIPWRECK:
-	    return (direct & (Direction::LEFT | DIRECTION_BOTTOM_ROW));
+	    return Direction::UNKNOWN == direct || (direct & (Direction::LEFT | DIRECTION_BOTTOM_ROW));
 
 	case MP2::OBJ_DERELICTSHIP:
-	    return (direct & (Direction::LEFT | Direction::BOTTOM_LEFT | Direction::BOTTOM));
+	    return Direction::UNKNOWN == direct || (direct & (Direction::LEFT | Direction::BOTTOM_LEFT | Direction::BOTTOM));
 
 	case MP2::OBJ_ARCHERHOUSE:
 	case MP2::OBJ_DOCTORHUT:
@@ -139,16 +139,16 @@ bool Object::AllowDirect(u8 general, u16 direct)
 	case MP2::OBJ_ARENA:
 	case MP2::OBJ_SIRENS:
 	case MP2::OBJ_MERMAID:
-	    return (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
+	    return Direction::UNKNOWN == direct || (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
 
 	case MP2::OBJ_WATERWHEEL:
-	    return (direct & (Direction::RIGHT | DIRECTION_BOTTOM_ROW));
+	    return Direction::UNKNOWN == direct || (direct & (Direction::RIGHT | DIRECTION_BOTTOM_ROW));
 
 	case MP2::OBJ_MAGELLANMAPS:
-	    return (direct & (Direction::LEFT | DIRECTION_BOTTOM_ROW));
+	    return Direction::UNKNOWN == direct || (direct & (Direction::LEFT | DIRECTION_BOTTOM_ROW));
 
 	case MP2::OBJ_CASTLE:
-	    return (direct & Direction::BOTTOM);
+	    return Direction::UNKNOWN == direct || (direct & Direction::BOTTOM);
 
 	default: break;
     }

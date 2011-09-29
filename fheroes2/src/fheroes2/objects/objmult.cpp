@@ -36,17 +36,17 @@ bool ObjMulti::isPassable(u16 icn, u8 index, u16 direct)
 	    else
 	    // alchemy tower
 	    if(24 < index && index < 28)
-		return (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
+		return Direction::UNKNOWN == direct || (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
 	    else
 	    // dragon city
 	    if(46 == index) return false;
 	    else
 	    if(50 < index && index < 56)
-		return (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
+		return Direction::UNKNOWN == direct || (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
 	    else
 	    // grave yard
 	    if(56 < index && index < 59)
-		return (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
+		return Direction::UNKNOWN == direct || (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
 	    else
 	    // light house
 	    if(73 == index) return false;
@@ -55,11 +55,11 @@ bool ObjMulti::isPassable(u16 icn, u8 index, u16 direct)
 	    if(75 < index && index < 78) return false;
 	    else
 	    if(77 < index && index < 82)
-		return (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
+		return Direction::UNKNOWN == direct || (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
 	    else
 	    // water well
 	    if(98 == index || 105 == index || 112 == index)
-		return (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
+		return Direction::UNKNOWN == direct || (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
 	    else
 	    // sign
 	    if(114 == index) return false;
@@ -71,14 +71,14 @@ bool ObjMulti::isPassable(u16 icn, u8 index, u16 direct)
 	    if(123 < index && index < 127) return false;
 	    else
 	    if((127 < index && index < 130) || 136 == index)
-		return (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
+		return Direction::UNKNOWN == direct || (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
 	    else
 	    // well
 	    if(162 == index || 165 == index) return false;
 	    else
 	    // freeman foundry
 	    if(186 < index && index < 189)
-		return (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
+		return Direction::UNKNOWN == direct || (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
 	    else
 	    // magick garden
 	    if(190 == index) return false;
@@ -88,13 +88,13 @@ bool ObjMulti::isPassable(u16 icn, u8 index, u16 direct)
 	    else
 	    // grave yard
 	    if(206 < index && index < 210)
-		return (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
+		return Direction::UNKNOWN == direct || (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
 	    else
 	    // saw mill
 	    if(211 < index && index < 214) return false;
 	    else
 	    if(213 < index && index < 217)
-		return (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
+		return Direction::UNKNOWN == direct || (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
 	    else return true;
 
         case ICN::OBJNMULT:
@@ -106,7 +106,7 @@ bool ObjMulti::isPassable(u16 icn, u8 index, u16 direct)
 	    else
 	    // fort
 	    if(57 < index && index < 60)
-		return (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
+		return Direction::UNKNOWN == direct || (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
 	    else
 	    // gasebo
 	    if(62 == index) return false;
@@ -119,11 +119,11 @@ bool ObjMulti::isPassable(u16 icn, u8 index, u16 direct)
 	    else
 	    // mercenary camp
 	    if(69 < index && index < 73)
-                return (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
+                return Direction::UNKNOWN == direct || (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
 	    else
 	    // ruins
 	    if(72 < index && index < 75)
-		return (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
+		return Direction::UNKNOWN == direct || (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
 	    else
 	    // shrine
 	    if(76 == index || 78 == index || 80 == index) return false;
@@ -133,15 +133,15 @@ bool ObjMulti::isPassable(u16 icn, u8 index, u16 direct)
 	    else
 	    // standing stones
 	    if(83 < index && index < 86)
-		return (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
+		return Direction::UNKNOWN == direct || (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
 	    else
 	    // temple
 	    if(87 < index && index < 90)
-		return (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
+		return Direction::UNKNOWN == direct || (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
 	    else
 	    // market
 	    if(104 == index || 111 == index)
-		return (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
+		return Direction::UNKNOWN == direct || (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
 	    else
 	    // tree house
 	    if(114 == index) return false;

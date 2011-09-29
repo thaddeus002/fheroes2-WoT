@@ -36,11 +36,11 @@ bool ObjSwamp::isPassable(u16 icn, u8 index, u16 direct)
 	    else
 	    // xanadu
 	    if(67 == index || 74 == index || (80 < index && index < 83))
-		return (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
+		return Direction::UNKNOWN == direct || (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
 	    else
 	    // faerie ring
 	    if((83 < index && index < 86))
-		return (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
+		return Direction::UNKNOWN == direct || (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
 	    else
 	    // lake
 	    if((87 < index && index < 92) || (93 < index && index < 99) || (100 < index && index < 106)) return false;
@@ -68,7 +68,7 @@ bool ObjSwamp::isPassable(u16 icn, u8 index, u16 direct)
 	    if((192 < index && index < 195) || 196 == index || (197 < index && index < 202)) return false;
 	    else
 	    // rock
-	    if(203 == index || 205 == index || (207 < index && index < 211)) return false;
+	    if(203 == index || 205 == index || (207 < index && index < 210)) return false;
 	    else
 	    // obelisk
 	    if(216 == index) return false;

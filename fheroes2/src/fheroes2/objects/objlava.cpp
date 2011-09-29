@@ -53,7 +53,7 @@ bool ObjLava::isPassable(u16 icn, u8 index, u16 direct)
 	    else
 	    // daemon cave
 	    if(113 < index && index < 116)
-		return (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
+		return Direction::UNKNOWN == direct || (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
 	    else
 	    // sign
 	    if(117 == index) return false;
@@ -62,7 +62,7 @@ bool ObjLava::isPassable(u16 icn, u8 index, u16 direct)
 	    if(119 < index && index < 122) return false;
 	    else
 	    if(121 < index && index < 127)
-		return (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
+		return Direction::UNKNOWN == direct || (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
 
 	    else return true;
 
