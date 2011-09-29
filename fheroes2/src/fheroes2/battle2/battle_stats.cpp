@@ -1832,7 +1832,7 @@ u8 Battle2::Stats::GetMagicResist(const Spell & spell, u8 spower) const
 	case Spell::RESURRECT:
 	case Spell::RESURRECTTRUE:
 	case Spell::ANIMATEDEAD:
-	    if(!isHaveDamage()) return 100;
+	    if(count == troop.GetCount()) return 100;
 	    break;
 
 	case Spell::DISPEL:
