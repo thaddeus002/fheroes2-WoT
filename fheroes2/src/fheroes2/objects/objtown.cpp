@@ -21,25 +21,24 @@
  ***************************************************************************/
 
 #include "icn.h"
-#include "maps.h"
-#include "world.h"
-#include "maps_tiles.h"
-#include "game_focus.h"
 #include "direction.h"
 #include "objtown.h"
+#include "settings.h"
 
-bool ObjTown::isPassable(u16 icn, u8 index, u16 direct, s32 maps_index)
+bool ObjTown::isPassable(u16 icn, u8 index, u16 direct)
 {
     switch(icn)
     {
 	case ICN::OBJNTWBA:
-	    if(4 < index && index < 10 && 7 != index)
-	    {
-		if(!Maps::isValidDirection(maps_index, Direction::BOTTOM)) return false;
-		const Maps::Tiles & tiles = world.GetTiles(Maps::GetDirectionIndex(maps_index, Direction::BOTTOM));
-		return tiles.isPassable(GameFocus::GetHeroes(), Direction::UNKNOWN, false);
-	    }
-
+	    if(2 == index)
+		return Direction::UNKNOWN == direct || (direct & Direction::BOTTOM);
+	    else
+	    if(7 == index)
+		return Direction::UNKNOWN == direct || (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW | Direction::TOP));
+	    else
+	    if(4 < index && index < 10)
+		return Direction::UNKNOWN == direct || (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
+	    else
             if(index < 5 || ( 9 < index && index < 15) || (19 < index && index < 25) ||
                  (29 < index && index < 35) || (39 < index && index < 45) || (49 < index && index < 55) ||
                  (59 < index && index < 65) || (69 < index && index < 75) || 79 < index) return false;

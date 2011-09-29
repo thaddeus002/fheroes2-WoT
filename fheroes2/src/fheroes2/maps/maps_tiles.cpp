@@ -150,7 +150,7 @@ bool Maps::TilesAddon::isPassable(const Maps::TilesAddon & ta, u16 direct, s32 m
 	case ICN::OBJNRSRC:	if(index % 2) return false; break;
 
 	case ICN::OBJNTWBA:
-	case ICN::OBJNTOWN:	if(! ObjTown::isPassable(icn, index, direct, maps_index)) return false; break;
+	case ICN::OBJNTOWN:	if(! ObjTown::isPassable(icn, index, direct)) return false; break;
 
 	case ICN::X_LOC1:
 	case ICN::X_LOC2:
