@@ -83,6 +83,8 @@ namespace Maps
 	static bool isFlag32(const TilesAddon &);
 	static bool isX_LOC123(const TilesAddon &);
 	static bool isAbandoneMineSprite(const TilesAddon &);
+	static bool isMounts(const TilesAddon &);
+	static bool isTrees(const TilesAddon &);
 	static bool isPassable(const TilesAddon &, u16 direct, s32 maps_index);
 
 	static bool PredicateSortRules1(const TilesAddon &, const TilesAddon &);
@@ -93,6 +95,9 @@ namespace Maps
 	static void UpdateStoneLightsSprite(TilesAddon &, u8 &);
 	static void UpdateAbandoneMineLeftSprite(TilesAddon &, u8 resource);
 	static void UpdateAbandoneMineRightSprite(TilesAddon &);
+
+	static bool ForceLevel1(const TilesAddon &);
+	static bool ForceLevel2(const TilesAddon &);
 
         u8	level;
         u32	uniq;

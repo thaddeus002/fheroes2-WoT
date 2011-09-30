@@ -29,12 +29,14 @@ bool ObjLava::isPassable(u16 icn, u8 index, u16 direct)
     {
 	case ICN::OBJNLAV2:
 	    // volcano
-	    if((129 < index && index < 133) || (78 < index && index < 82)) return false;
+	    if((129 < index && index < 133) || (78 < index && index < 82))
+		return Direction::UNKNOWN == direct || (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
 	    else return true;
 
 	case ICN::OBJNLAV3:
 	    // volcano
-	    if(243 < index && index < 247) return false;
+	    if(243 < index && index < 247)
+		return Direction::UNKNOWN == direct || (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
 	    else return true;
 
 	case ICN::OBJNLAVA:
@@ -46,7 +48,8 @@ bool ObjLava::isPassable(u16 icn, u8 index, u16 direct)
 		( 49 < index && index < 64) || (64 < index && index < 74)) return false;
 	    else
 	    // volcano
-	    if((75 < index && index < 78) || 88 == index || 98 == index) return false;
+	    if((75 < index && index < 78) || 88 == index || 98 == index)
+		return Direction::UNKNOWN == direct || (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
 	    else
 	    // obelisk
 	    if(110 == index) return false;

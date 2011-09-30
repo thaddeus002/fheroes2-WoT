@@ -68,7 +68,7 @@ bool ObjGrass::isPassable(u16 icn, u8 index, u16 direct)
 		return false;
 	    else
 	    if(4 < index && index < 8)
-		return Mines::isPassable(index, 6, direct);
+		return Direction::UNKNOWN == direct || (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
 	    else
 	    // faerie ring
 	    if(29 < index && index < 32)
@@ -76,24 +76,29 @@ bool ObjGrass::isPassable(u16 icn, u8 index, u16 direct)
 	    else
 	    // rock
 	    if((32 < index && index < 35) || (36 < index && index < 39) || (39 < index && index < 42) ||
-		43 == index || 45 == index || 47 == index || 49 == index) return false;
+		43 == index || 45 == index || 47 == index || 49 == index)
+		return Direction::UNKNOWN == direct || (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
 	    else
 	    // lake
 	    if((53 < index && index < 64) || (64 < index && index < 76)) return false;
 	    else
 	    // mound
-	    if((76 < index && index < 79) || (148 < index && index < 151)) return false;
+	    if((76 < index && index < 79) || (148 < index && index < 151))
+		return Direction::UNKNOWN == direct || (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
 	    else
 	    // trees
-	    if((82 < index && index < 86) || (88 < index && index < 91) || 93 == index) return false;
+	    if((82 < index && index < 86) || (88 < index && index < 91) || 93 == index)
+		return Direction::UNKNOWN == direct || (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
 	    else
 	    // shrub
 	    if((94 < index && index < 98) || (98 < index && index < 102) || (102 < index && index < 105) ||
 		(105 < index && index < 108) || (108 < index && index < 111) || 112 == index ||
 		(113 < index && index < 117) || (120 < index && index < 124) || (124 < index && index < 128) ||
 		(128 < index && index < 132) || (134 < index && index < 137) || (138 < index && index < 141) ||
-		142 == index || 144 == index || 146 == index || 148 == index) return false;
-	    else return true;
+		142 == index || 144 == index || 146 == index || 148 == index)
+		return Direction::UNKNOWN == direct || (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
+	    else
+		return true;
 
 	default: break;
     }

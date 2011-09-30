@@ -32,7 +32,8 @@ bool ObjMulti::isPassable(u16 icn, u8 index, u16 direct)
 	    if(15 == index) return false;
 	    else
 	    // stub
-	    if(16 == index || (17 < index && index < 20)) return false;
+	    if(16 == index || (17 < index && index < 20))
+                return Direction::UNKNOWN == direct || (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
 	    else
 	    // alchemy tower
 	    if(24 < index && index < 28)
@@ -99,7 +100,8 @@ bool ObjMulti::isPassable(u16 icn, u8 index, u16 direct)
 
         case ICN::OBJNMULT:
     	    // dead tree
-            if(2 == index || 4 == index) return false;
+            if(2 == index || 4 == index)
+                return Direction::UNKNOWN == direct || (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
 	    else
 	    // peasant hut
 	    if(35 == index) return false;
@@ -112,7 +114,8 @@ bool ObjMulti::isPassable(u16 icn, u8 index, u16 direct)
 	    if(62 == index) return false;
 	    else
 	    // shrub
-	    if(62 < index && index < 66) return false;
+	    if(62 < index && index < 66)
+                return Direction::UNKNOWN == direct || (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
 	    else
 	    // witch hut
 	    if(69 == index) return false;

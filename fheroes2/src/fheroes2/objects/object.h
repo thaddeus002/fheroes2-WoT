@@ -27,11 +27,6 @@
 #include "direction.h"
 #include "gamedefs.h"
 
-namespace Mines
-{
-	bool		isPassable(u8 index, u8 center, u16);
-}
-
 class Object
 {
     public:

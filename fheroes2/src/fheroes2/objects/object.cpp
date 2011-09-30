@@ -36,17 +36,6 @@
 #include "objcrck.h"
 #include "object.h"
 
-bool Mines::isPassable(u8 index, u8 center, u16 direct)
-{
-    if(index == center - 1 || index == center)
-        return Direction::UNKNOWN == direct || (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
-    else
-    if(index == center + 1)
-        return Direction::UNKNOWN == direct || (direct & (Direction::LEFT | DIRECTION_BOTTOM_ROW));
-
-    return false;
-}
-
 Object::Object(MP2::object_t obj, u16 sicn, u32 uid)
     : object(obj), icn(sicn), id(uid ? uid : World::GetUniq())
 {
@@ -148,7 +137,7 @@ bool Object::AllowDirect(u8 general, u16 direct)
 	    return Direction::UNKNOWN == direct || (direct & (Direction::LEFT | DIRECTION_BOTTOM_ROW));
 
 	case MP2::OBJ_CASTLE:
-	    return Direction::UNKNOWN == direct || (direct & Direction::BOTTOM);
+	    return Direction::UNKNOWN == direct || Direction::BOTTOM == direct;
 
 	default: break;
     }

@@ -66,6 +66,8 @@ namespace Maps
     MapsIndexes ScanDistanceObject(const s32 center, const u8 obj, const u16 dist);
     MapsIndexes ScanDistanceObjects(const s32 center, const u8* objs, const u16 dist);
 
+    u16 TileIsCoast(const s32 &, u16 direct = DIRECTION_ALL);
+
     void ClearFog(s32 center, u8 scoute, const u8 color);
     u16 GetApproximateDistance(const s32 index1, const s32 index2);
 

@@ -430,6 +430,42 @@ bool Maps::TilesAddon::isX_LOC123(const TilesAddon & ta)
 	    ICN::X_LOC3 == MP2::GetICNObject(ta.object));
 }
 
+bool Maps::TilesAddon::isMounts(const TilesAddon & ta)
+{
+    switch(MP2::GetICNObject(ta.object))
+    {
+	case ICN::MTNCRCK:
+        case ICN::MTNSNOW:
+        case ICN::MTNSWMP:
+        case ICN::MTNLAVA:
+        case ICN::MTNDSRT:
+        case ICN::MTNDIRT:
+        case ICN::MTNMULT:
+        case ICN::MTNGRAS: return true;
+
+	default: break;
+    }
+
+    return false;
+}
+
+bool Maps::TilesAddon::isTrees(const TilesAddon & ta)
+{
+    switch(MP2::GetICNObject(ta.object))
+    {
+        case ICN::TREJNGL:
+        case ICN::TREEVIL:
+        case ICN::TRESNOW:
+        case ICN::TREFIR:
+        case ICN::TREFALL:
+        case ICN::TREDECI: return true;
+
+	default: break;
+    }
+
+    return false;
+}
+
 void Maps::TilesAddon::UpdateAbandoneMineLeftSprite(TilesAddon & ta, u8 resource)
 {
     if(ICN::OBJNGRAS == MP2::GetICNObject(ta.object) && 6 == ta.index)
@@ -503,9 +539,21 @@ void Maps::TilesAddon::UpdateStoneLightsSprite(TilesAddon & ta, u8 & type)
     }
 }
 
+bool Maps::TilesAddon::ForceLevel1(const TilesAddon & ta)
+{
+    // broken ship: left roc
+    if(ICN::OBJNWAT2 == MP2::GetICNObject(ta.object) && ta.index == 11)
+	return true;
+
+    return false;
+}
+
+bool Maps::TilesAddon::ForceLevel2(const TilesAddon & ta)
+{
+    return false;
+}
 
 /* Maps::Addons */
-
 void Maps::Addons::Remove(u32 uniq)
 {
     /*
@@ -559,41 +607,47 @@ const Surface & Maps::Tiles::GetTileSurface(void) const
 void Maps::Tiles::AddonsPushLevel1(const MP2::mp2tile_t & mt)
 {
     if(mt.objectName1 && mt.indexName1 < 0xFF)
-	addons_level1.push_back(TilesAddon(0, mt.uniqNumber1, mt.objectName1, mt.indexName1));
+	AddonsPushLevel1(TilesAddon(0, mt.uniqNumber1, mt.objectName1, mt.indexName1));
 }
 
 void Maps::Tiles::AddonsPushLevel1(const MP2::mp2addon_t & ma)
 {
     if(ma.objectNameN1 && ma.indexNameN1 < 0xFF)
-	addons_level1.push_back(TilesAddon(ma.quantityN, ma.uniqNumberN1, ma.objectNameN1, ma.indexNameN1));
+	AddonsPushLevel1(TilesAddon(ma.quantityN, ma.uniqNumberN1, ma.objectNameN1, ma.indexNameN1));
 }
 
 void Maps::Tiles::AddonsPushLevel1(const TilesAddon & ta)
 {
+    if(TilesAddon::ForceLevel2(ta))
+	addons_level2.push_back(ta);
+    else
     addons_level1.push_back(ta);
 }
 
 void Maps::Tiles::AddonsPushLevel2(const MP2::mp2tile_t & mt)
 {
     if(mt.objectName2 && mt.indexName2 < 0xFF)
-	addons_level2.push_back(TilesAddon(0, mt.uniqNumber2, mt.objectName2, mt.indexName2));
+	AddonsPushLevel2(TilesAddon(0, mt.uniqNumber2, mt.objectName2, mt.indexName2));
 }
 
 void Maps::Tiles::AddonsPushLevel2(const MP2::mp2addon_t & ma)
 {
     if(ma.objectNameN2 && ma.indexNameN2 < 0xFF)
-	addons_level2.push_back(TilesAddon(ma.quantityN, ma.uniqNumberN2, ma.objectNameN2, ma.indexNameN2));
+	AddonsPushLevel2(TilesAddon(ma.quantityN, ma.uniqNumberN2, ma.objectNameN2, ma.indexNameN2));
 }
 
 void Maps::Tiles::AddonsPushLevel2(const TilesAddon & ta)
 {
-    addons_level2.push_back(ta);
+    if(TilesAddon::ForceLevel1(ta))
+	addons_level1.push_back(ta);
+    else
+	addons_level2.push_back(ta);
 }
 
 void Maps::Tiles::AddonsSort(void)
 {
-    if(!addons_level1.empty()) addons_level1.sort(Maps::TilesAddon::PredicateSortRules1);
-    if(!addons_level2.empty()) addons_level2.sort(Maps::TilesAddon::PredicateSortRules2);
+    if(!addons_level1.empty()) addons_level1.sort(TilesAddon::PredicateSortRules1);
+    if(!addons_level2.empty()) addons_level2.sort(TilesAddon::PredicateSortRules2);
 }
 
 Maps::Ground::ground_t Maps::Tiles::GetGround(void) const
@@ -656,18 +710,16 @@ void Maps::Tiles::RedrawBottom(Surface & dst, bool skip_objs) const
     if((area.GetRectMaps() & mp) &&
 	!addons_level1.empty())
     {
-	Addons::const_iterator it1 = addons_level1.begin();
-	Addons::const_iterator it2 = addons_level1.end();
-
-	for(; it1 != it2; ++it1)
+	for(Addons::const_iterator
+	    it = addons_level1.begin(); it != addons_level1.end(); ++it)
 	{
 	    // skip
 	    if(skip_objs &&
 		MP2::isRemoveObject(GetObject()) &&
-		FindObject(GetObject()) == &(*it1)) continue;
+		FindObject(GetObject()) == &(*it)) continue;
 
-	    const u8 & object = (*it1).object;
-	    const u8 & index  = (*it1).index;
+	    const u8 & object = (*it).object;
+	    const u8 & index  = (*it).index;
 	    const ICN::icn_t icn = MP2::GetICNObject(object);
 
 	    if(ICN::UNKNOWN != icn && ICN::MINIHERO != icn && ICN::MONS32 != icn)
@@ -783,13 +835,11 @@ void Maps::Tiles::RedrawBottom4Hero(Surface & dst) const
     if((area.GetRectMaps() & mp) &&
 	!addons_level1.empty())
     {
-	Addons::const_iterator it1 = addons_level1.begin();
-	Addons::const_iterator it2 = addons_level1.end();
-
-	for(; it1 != it2; ++it1)
+	for(Addons::const_iterator
+	    it = addons_level1.begin(); it != addons_level1.end(); ++it)
 	{
-	    const u8 & object = (*it1).object;
-	    const u8 & index  = (*it1).index;
+	    const u8 & object = (*it).object;
+	    const u8 & index  = (*it).index;
 	    const ICN::icn_t icn = MP2::GetICNObject(object);
 
 	    if(ICN::SkipBottomForRedrawHeroes(icn, index)) continue;
@@ -837,15 +887,13 @@ void Maps::Tiles::RedrawTop(Surface & dst, const TilesAddon* skip) const
 
     if(!addons_level2.empty())
     {
-	Addons::const_iterator it1 = addons_level2.begin();
-	Addons::const_iterator it2 = addons_level2.end();
-
-	for(; it1 != it2; ++it1)
+	for(Addons::const_iterator
+	    it = addons_level2.begin(); it != addons_level2.end(); ++it)
 	{
-	    if(skip && skip == &(*it1)) continue;
+	    if(skip && skip == &(*it)) continue;
 
-	    const u8 & object = (*it1).object;
-	    const u8 & index  = (*it1).index;
+	    const u8 & object = (*it).object;
+	    const u8 & index  = (*it).index;
 	    const ICN::icn_t icn = MP2::GetICNObject(object);
 
 	    if(ICN::UNKNOWN != icn && ICN::MINIHERO != icn && ICN::MONS32 != icn)
@@ -873,15 +921,13 @@ void Maps::Tiles::RedrawTop4Hero(Surface & dst, bool skip_ground) const
 
     if(!addons_level2.empty())
     {
-	Addons::const_iterator it1 = addons_level2.begin();
-	Addons::const_iterator it2 = addons_level2.end();
-
-	for(; it1 != it2; ++it1)
+	for(Addons::const_iterator
+	    it = addons_level2.begin(); it != addons_level2.end(); ++it)
 	{
-	    if(skip_ground && MP2::isGroundObject((*it1).object)) continue;
+	    if(skip_ground && MP2::isGroundObject((*it).object)) continue;
 
-	    const u8 & object = (*it1).object;
-	    const u8 & index  = (*it1).index;
+	    const u8 & object = (*it).object;
+	    const u8 & index  = (*it).index;
 	    const ICN::icn_t icn = MP2::GetICNObject(object);
 
 	    if(ICN::HighlyObjectSprite(icn, index))
@@ -1068,9 +1114,6 @@ bool Maps::Tiles::isPassable(const Heroes* hero, Direction::vector_t direct, boo
 
     if(hero)
     {
-	if(hero->GetIndex() == maps_index)
-	    return true;
-	else
 	if(hero->isShipMaster())
 	{
 	    if(! isWater())
@@ -1096,6 +1139,29 @@ bool Maps::Tiles::isPassable(const Heroes* hero, Direction::vector_t direct, boo
 	}
     }
 
+    if(!hero || hero->GetIndex() != maps_index)
+    {
+	// fix coast passable
+	if(Maps::TileIsCoast(maps_index, Direction::TOP|Direction::BOTTOM|Direction::LEFT|Direction::RIGHT) &&
+	    ! MP2::isActionObject(GetObject(), (hero ? hero->isShipMaster() : false)) &&
+	    //MP2::OBJ_ZERO != GetObject() &&  /* Town check: false (OBJNTWBA) */
+	    MP2::OBJ_COAST != GetObject() &&
+	    !addons_level1.empty()) return false;
+
+	// fix mountain layer
+	if(MP2::OBJ_MOUNTS == GetObject() &&
+	    addons_level1.end() != std::find_if(addons_level1.begin(), addons_level1.end(), TilesAddon::isMounts) &&
+	    addons_level2.end() != std::find_if(addons_level2.begin(), addons_level2.end(), TilesAddon::isMounts))
+	    return false;
+
+	// fix trees layer
+        if(MP2::OBJ_TREES == GetObject() &&
+	    addons_level1.end() != std::find_if(addons_level1.begin(), addons_level1.end(), TilesAddon::isTrees) &&
+	    addons_level2.end() != std::find_if(addons_level2.begin(), addons_level2.end(), TilesAddon::isTrees))
+	    return false;
+    }
+
+    // check all sprite
     for(Addons::const_iterator
 	it = addons_level1.begin(); it != addons_level1.end(); ++it)
 	if(! TilesAddon::isPassable(*it, direct, maps_index)) return false;

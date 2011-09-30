@@ -49,16 +49,30 @@ bool Trees::isPassable(u16 icn, u8 index, u16 direct)
         case ICN::TREFIR:
         case ICN::TREJNGL:
         case ICN::TRESNOW:
-    	    if((3 < index && index < 6) || (7 < index && index < 10)) return false;	// LARGE LEFT
+    	    if(5 == index) return false;	// LARGE LEFT
     	    else
-    	    if((14 < index && index < 17) || (17 < index && index < 20)) return false;	// LARGE RIGHT
+	    if(4 == index || (7 < index && index < 10))
+		return Direction::UNKNOWN == direct || (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
     	    else
-    	    if((20 < index && index < 23) || (23 < index && index < 26)) return false;	// MEDIUM LEFT
+    	    if(15 == index) return false;	// LARGE RIGHT
+	    else
+    	    if(16 == index || (17 < index && index < 20))
+		return Direction::UNKNOWN == direct || (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
     	    else
-    	    if((26 < index && index < 29) || (29 < index && index < 32)) return false;	// MEDIUM RIGHT
+    	    if(22 == index) return false;	// MEDIUM LEFT
     	    else
-    	    if(33 == index || 35 == index) return false;				// SMALL
-    	    else return true;
+	    if(21 == index || (23 < index && index < 26))
+		return Direction::UNKNOWN == direct || (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
+    	    else
+    	    if(27 == index) return false;	// MEDIUM RIGHT
+	    else
+    	    if(28 == index || (29 < index && index < 32))
+		return Direction::UNKNOWN == direct || (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
+    	    else
+    	    if(33 == index || 35 == index)	// SMALL
+		return Direction::UNKNOWN == direct || (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
+    	    else
+		return true;
 
         default: break;;
     }

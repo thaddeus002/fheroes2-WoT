@@ -32,7 +32,8 @@ bool ObjSwamp::isPassable(u16 icn, u8 index, u16 direct)
 	    if(22 == index) return false;
 	    else
 	    // shrub
-	    if((31 < index && index < 34)) return false;
+	    if((31 < index && index < 34))
+		return Direction::UNKNOWN == direct || (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
 	    else
 	    // xanadu
 	    if(67 == index || 74 == index || (80 < index && index < 83))
@@ -50,25 +51,31 @@ bool ObjSwamp::isPassable(u16 icn, u8 index, u16 direct)
 	    if((114 < index && index < 117) || (117 < index && index < 120) || (121 < index && index < 124)) return false;
 	    else
 	    // mandrake
-	    if(126 == index || (127 < index && index < 130) || 131 == index || (132 < index && index < 136) || 137 == index) return false;
+	    if(126 == index || (127 < index && index < 130) || 131 == index || (132 < index && index < 136) || 137 == index)
+		return Direction::UNKNOWN == direct || (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
 	    else
 	    // swamp
-	    if((137 < index && index < 140) || (142 < index && index < 161)) return false;
+	    if((137 < index && index < 140) || (142 < index && index < 161))
+		return Direction::UNKNOWN == direct || (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
 	    else
 	    // sign
 	    if(140 == index) return false;
 	    else
 	    // trees
-	    if((165 < index && index < 168) || (170 < index && index < 173) || (175 < index && index < 178)) return false;
+	    if((165 < index && index < 168) || (170 < index && index < 173) || (175 < index && index < 178))
+		return Direction::UNKNOWN == direct || (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
 	    else
 	    // swamp
-	    if((178 < index && index < 193) || (211 < index && index < 214)) return false;
+	    if((178 < index && index < 193) || (211 < index && index < 214))
+		return Direction::UNKNOWN == direct || (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
 	    else
 	    // shrub
-	    if((192 < index && index < 195) || 196 == index || (197 < index && index < 202)) return false;
+	    if((192 < index && index < 195) || 196 == index || (197 < index && index < 202))
+		return Direction::UNKNOWN == direct || (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
 	    else
 	    // rock
-	    if(203 == index || 205 == index || (207 < index && index < 210)) return false;
+	    if(203 == index || 205 == index || (207 < index && index < 210))
+		return Direction::UNKNOWN == direct || (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
 	    else
 	    // obelisk
 	    if(216 == index) return false;

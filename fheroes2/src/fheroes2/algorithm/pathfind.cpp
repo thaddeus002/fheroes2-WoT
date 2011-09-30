@@ -42,38 +42,6 @@ struct cell_t
     bool	open;
 };
 
-/*
-bool ImpassableCorners(const s32 from, const Direction::vector_t to, const Heroes *hero)
-{
-    if( to & (Direction::TOP | Direction::BOTTOM | Direction::LEFT | Direction::RIGHT)) return false;
-
-    if(to & (Direction::TOP_LEFT | Direction::BOTTOM_LEFT))
-    {
-    	if(Maps::isValidDirection(from, Direction::LEFT) &&
-	   !world.GetTiles(Maps::GetDirectionIndex(from, Direction::LEFT)).isPassable(hero)) return true;
-    }
-
-    if(to & (Direction::TOP_RIGHT | Direction::BOTTOM_RIGHT))
-    {
-    	if(Maps::isValidDirection(from, Direction::RIGHT) &&
-	   !world.GetTiles(Maps::GetDirectionIndex(from, Direction::RIGHT)).isPassable(hero)) return true;
-    }
-
-    if(to & (Direction::TOP_LEFT | Direction::TOP_RIGHT))
-    {
-    	if(Maps::isValidDirection(from, Direction::TOP) &&
-	   !world.GetTiles(Maps::GetDirectionIndex(from, Direction::TOP)).isPassable(hero)) return true;
-    }
-
-    if(to & (Direction::BOTTOM_LEFT | Direction::BOTTOM_RIGHT))
-    {
-    	if(Maps::isValidDirection(from, Direction::BOTTOM) &&
-	   !world.GetTiles(Maps::GetDirectionIndex(from, Direction::BOTTOM)).isPassable(hero)) return true;
-    }
-
-    return false;
-}
-*/
 
 u32 GetCurrentLength(std::map<s32, cell_t> & list, s32 cur)
 {
@@ -83,66 +51,88 @@ u32 GetCurrentLength(std::map<s32, cell_t> & list, s32 cur)
     return res;
 }
 
-bool FromTileToMonster(const s32 from, const s32 to)
+bool CheckMonsterProtectionAndNotDst(const s32 & to, const s32 & dst)
 {
-    return 1 == Maps::GetApproximateDistance(from, to) &&
-	MP2::OBJ_MONSTER == world.GetTiles(to).GetObject();
+    const MapsIndexes & monsters = Maps::TileUnderProtectionV(to);
+    return monsters.size() && monsters.end() == std::find(monsters.begin(), monsters.end(), dst);
 }
 
-bool PassableFromToTile(const Heroes* hero, const s32 from, const s32 to, const Direction::vector_t direct, const s32 dst)
+bool PassableToTile(const Heroes* hero, const Maps::Tiles & toTile, const Direction::vector_t & direct, const s32 & dst)
 {
-    if(to != dst)
+    // check end point
+    if(toTile.GetIndex() == dst)
     {
-	// check monster protection
-	if(Maps::TileUnderProtectionV(to).size() &&
-	    ! FromTileToMonster(to, dst)) return false;
+	// fix toTilePassable with action object
+	if(hero && MP2::isPickupObject(toTile.GetObject()))
+	    return true;
+
+	// check direct to object
+	if(MP2::isActionObject(toTile.GetObject(), (hero ? hero->isShipMaster() : false)))
+	    return Object::AllowDirect(toTile.GetObject(), Direction::Reflect(direct));
     }
 
-    // check direct from object
-    if(hero && hero->GetIndex() == from &&
-	! Object::AllowDirect(hero->GetUnderObject(), direct)) return false;
+    // check to tile direct
+    if(! toTile.isPassable(hero, Direction::Reflect(direct), false))
+	return false;
 
-    // check obstacles as corners
-    //if(ImpassableCorners(from, direct, hero)) return false;  // disable, need fix more objects with passable option
+    if(toTile.GetIndex() != dst)
+    {
+	// check hero/monster on route
+	switch(toTile.GetObject())
+	{
+	    case MP2::OBJ_HEROES:
+	    case MP2::OBJ_MONSTER:
+		return false;
 
+	    default: break;
+	}
+
+	// check monster protection
+	if(CheckMonsterProtectionAndNotDst(toTile.GetIndex(), dst))
+	    return false;
+    }
+
+    return true;
+}
+
+bool PassableFromToTile(const Heroes* hero, const s32 & from, const s32 & to, const Direction::vector_t & direct, const s32 & dst)
+{
     const Maps::Tiles & fromTile = world.GetTiles(from);
     const Maps::Tiles & toTile = world.GetTiles(to);
 
-    // check direct to object
-    if(! Object::AllowDirect(toTile.GetObject(), Direction::Reflect(direct))) return false;
-
-
-    if(! fromTile.isPassable(hero, direct, false)) return false;
-
-    if(to != dst)
-    switch(toTile.GetObject())
+    // check start point
+    if(hero && hero->GetIndex() == from)
     {
-	case MP2::OBJ_HEROES:
-	case MP2::OBJ_MONSTER:
-		return false;
-
-	default: break;
-    }
-
-    bool fromTile2 = toTile.isPassable(hero, Direction::Reflect(direct), false);
-
-    // end point
-    if(to == dst)
-    {
-	if(!fromTile2)
+	if(MP2::isActionObject(hero->GetUnderObject(), hero->isShipMaster()))
 	{
-	    if(! hero)
+	    // check direct from object
+	    if(! Object::AllowDirect(hero->GetUnderObject(), direct))
 		return false;
-	    else
-	    if(toTile.GetObject() == MP2::OBJ_HEROES)
+	}
+	else
+	{
+	    // check from tile direct
+	    if(! fromTile.isPassable(hero, direct, false))
 		return false;
-	    else
-	    if(MP2::isActionObject(toTile.GetObject(), hero->isShipMaster()))
-		return true;
+	}
+    }
+    else
+    {
+	if(MP2::isActionObject(fromTile.GetObject(), (hero ? hero->isShipMaster() : false)))
+	{
+	    // check direct from object
+	    if(! Object::AllowDirect(fromTile.GetObject(), direct))
+		return false;
+	}
+	else
+	{
+	    // check from tile direct
+	    if(! fromTile.isPassable(hero, direct, false))
+		return false;
 	}
     }
 
-    return fromTile2;
+    return PassableToTile(hero, toTile, direct, dst);
 }
 
 bool Algorithm::PathFind(std::list<Route::Step> *result, const s32 from, const s32 to, const u16 limit, const Heroes *hero)
@@ -218,7 +208,7 @@ bool Algorithm::PathFind(std::list<Route::Step> *result, const s32 from, const s
 	for(; it1 != it2; ++it1) if((*it1).second.open)
 	{
 	    const cell_t & cell2 = (*it1).second;
-
+#ifdef WITH_DEBUG
 	    if(IS_DEBUG(DBG_OTHER, DBG_TRACE) && cell2.cost_g != MAXU16)
 	    {
 		direct = Direction::Get(cur, (*it1).first);
@@ -231,6 +221,7 @@ bool Algorithm::PathFind(std::list<Route::Step> *result, const s32 from, const s
 			    ", cost d: " << cell2.cost_d);
 		}
 	    }
+#endif
 
 	    if(cell2.cost_t + cell2.cost_d < tmp)
 	    {

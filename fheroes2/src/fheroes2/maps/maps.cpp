@@ -442,3 +442,13 @@ void Maps::UpdateSpritesFromTownToCastle(const Point & center)
 	    world.GetTiles(GetIndexFromAbsPoint(center.x, center.y - 3)).AddonsPushLevel2(TilesAddon(addon->level, addon->uniq, addon->object, addon->index - 3));
     }
 }
+
+u16  Maps::TileIsCoast(const s32 & index, u16 direct)
+{
+    u16 result = 0;
+    const MapsIndexes & v = GetAroundIndexes(index, direct);
+    for(MapsIndexes::const_iterator
+        it = v.begin(); it != v.end(); ++it)
+        if(world.GetTiles(*it).isWater()) result |= Direction::Get(index, *it);
+    return result;
+}

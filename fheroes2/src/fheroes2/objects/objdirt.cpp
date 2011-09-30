@@ -30,10 +30,11 @@ bool ObjDirt::isPassable(u16 icn, u8 index, u16 direct)
 	case ICN::OBJNDIRT:
 	    // abandone mines
 	    if(6 < index && index < 10)
-		return Mines::isPassable(index, 8, direct);
+		return Direction::UNKNOWN == direct || (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
 	    else
 	    // mound
-	    if((11 < index && index < 14) || (14 < index && index < 17)) return false;
+	    if((11 < index && index < 14) || (14 < index && index < 17))
+		return Direction::UNKNOWN == direct || (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
 	    else
 	    // crater
 	    if(16 < index && index < 23) return false;
@@ -45,13 +46,16 @@ bool ObjDirt::isPassable(u16 icn, u8 index, u16 direct)
 	    // shrub
 	    if((59 < index && index < 62) || (62 < index && index < 65) || (65 < index && index < 68) ||
 		69 == index || 71 == index || (72 < index && index < 75) || (75 < index && index < 78) ||
-		(78 < index && index < 81) || (81 < index && index < 84) || (84 < index && index < 87) || (87 < index && index < 91)) return false;
+		(78 < index && index < 81) || (81 < index && index < 84) || (84 < index && index < 87) || (87 < index && index < 91))
+		return Direction::UNKNOWN == direct || (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
 	    else
 	    // rock
-	    if((91 < index && index < 94) || (97 < index && index < 100) || (100 < index && index < 103) || (103 < index && index < 106)) return false;
+	    if((91 < index && index < 94) || (97 < index && index < 100) || (100 < index && index < 103) || (103 < index && index < 106))
+		return Direction::UNKNOWN == direct || (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
 	    else
 	    // trees
-	    if(118 == index || 123  == index || 127 == index)  return false;
+	    if(118 == index || 123  == index || 127 == index)
+		return Direction::UNKNOWN == direct || (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
 	    else
 	    // faerie ring
 	    if(128 < index && index < 131)

@@ -61,7 +61,11 @@ bool Mounts::isPassable(u16 icn, u8 index, u16 direct)
         // 133 sprites
         case ICN::MTNCRCK:
         case ICN::MTNDIRT:
-    	    if((5 < index && index < 10) || (13 < index && index < 17)) return false;		// LARGE LEFT
+	    // corner
+	    if(5 == index || 32 == index || 47 == index || 68 == index)
+		return direct != Direction::TOP_RIGHT;
+    	    else
+	    if((5 < index && index < 10) || (13 < index && index < 17)) return false;		// LARGE LEFT
     	    else
 	    if((11 < index && index < 14) || (17 < index && index < 21))
 		return Direction::UNKNOWN == direct || (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
@@ -101,7 +105,8 @@ bool Mounts::isPassable(u16 icn, u8 index, u16 direct)
 	    if(100 == index || (101 < index && index < 104))
 		return Direction::UNKNOWN == direct || (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
     	    else
-    	    if(110 < index && index < 114) return Mines::isPassable(index, 112, direct);	// MINES
+    	    if(110 < index && index < 114)							// MINES
+		return Direction::UNKNOWN == direct || (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
     	    else return true;
 
         // 83 sprites
@@ -111,6 +116,10 @@ bool Mounts::isPassable(u16 icn, u8 index, u16 direct)
         case ICN::MTNMULT:
 	case ICN::MTNSNOW:
         case ICN::MTNSWMP:
+	    // corner
+	    if(5 == index || 32 == index)
+		return direct != Direction::TOP_RIGHT;
+    	    else
     	    if((5 < index && index < 10) || (13 < index && index < 17)) return false;		// LARGE LEFT
 	    else
 	    if((11 < index && index < 14) || (17 < index && index < 21))

@@ -30,15 +30,18 @@ bool ObjDesert::isPassable(u16 icn, u8 index, u16 direct)
 	case ICN::OBJNDSRT:
 	    // trees
 	    if(3 == index || 6 == index || 9 == index || 12 == index ||
-		24 == index || 26 == index || 28 == index || 76 == index) return false;
+		24 == index || 26 == index || 28 == index || 76 == index)
+		return Direction::UNKNOWN == direct || (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
 	    else
 	    // dune
-	    if((13 < index && index < 16) || (16 < index && index < 19) || (19 < index && index < 23)) return false;
+	    if((13 < index && index < 16) || (16 < index && index < 19) || (19 < index && index < 23))
+		return Direction::UNKNOWN == direct || (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
 	    else
 	    // cactus
 	    if((29 < index && index < 33) || 34 == index || 36 == index ||
 		(38 < index && index < 41) || 42 == index || 45 == index ||
-		(47 < index && index < 50) || 51 == index || 53 == index) return false;
+		(47 < index && index < 50) || 51 == index || 53 == index)
+		return Direction::UNKNOWN == direct || (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
 	    else
 	    // camp fire
 	    if(61 == index) return false;
@@ -79,7 +82,8 @@ bool ObjDesert::isPassable(u16 icn, u8 index, u16 direct)
 		return Direction::UNKNOWN == direct || (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
 	    else
 	    // desert
-	    if(109 < index && index < 113) return false;
+	    if(109 < index && index < 113)
+		return Direction::UNKNOWN == direct || (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
 	    else
 	    // daemon cave
 	    if(115 < index && index < 118)

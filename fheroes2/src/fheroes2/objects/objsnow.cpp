@@ -44,7 +44,8 @@ bool ObjSnow::isPassable(u16 icn, u8 index, u16 direct)
 	    32 == index || (33 < index && index < 36) || (36 < index && index < 40)) return false;
 	    else
 	    // stub
-	    if(40 < index && index < 43) return false;
+	    if(40 < index && index < 43)
+		return Direction::UNKNOWN == direct || (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
 	    else
 	    // trees
 	    if((48 < index && index < 51) || (54 < index && index < 58) || 60 == index || 

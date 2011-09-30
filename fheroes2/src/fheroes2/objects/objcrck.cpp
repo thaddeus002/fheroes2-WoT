@@ -29,16 +29,22 @@ bool ObjWasteLand::isPassable(u16 icn, u8 index, u16 direct)
     {
 	case ICN::OBJNCRCK:
 	    // artesian spring
-	    if(2 < index && index < 5) return false;
+	    if(2 < index && index < 5)
+		return false;
+	    else
+	    if(5 == index || 6 == index)
+		return Direction::UNKNOWN == direct || (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
 	    else
 	    // rock
 	    if((9 < index && index < 12) || 18 == index || (20 < index && index < 23) ||
 		(23 < index && index < 26) || (28 < index && index < 33) || (33 < index && index < 36) ||
 		(36 < index && index < 39) || (39 < index && index < 44) || 46 == index ||
-		49 == index || 52 == index || 55 == index) return false;
+		49 == index || 52 == index || 55 == index)
+		return Direction::UNKNOWN == direct || (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
 	    else
 	    // cactus
-	    if(14 == index || 16 == index) return false;
+	    if(14 == index || 16 == index)
+		return Direction::UNKNOWN == direct || (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
 	    else
 	    // skull
 	    if(17 == index) return false;
