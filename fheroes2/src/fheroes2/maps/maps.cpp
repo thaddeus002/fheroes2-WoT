@@ -52,7 +52,7 @@ MapsIndexes & MapsIndexesFilteredObjects(MapsIndexes & indexes, const u8* objs)
     return indexes;
 }
 
-MapsIndexes & MapsIndexesFilteredObject(MapsIndexes & indexes, const u8 obj)
+MapsIndexes & MapsIndexesFilteredObject(MapsIndexes & indexes, u8 obj)
 {
     indexes.resize(std::distance(indexes.begin(),
 	    std::remove_if(indexes.begin(), indexes.end(), std::not1(std::bind2nd(std::ptr_fun(&TileIsObject), obj)))));
@@ -92,7 +92,7 @@ const char* Maps::GetMinesName(u8 type)
     return _("Mine");
 }
 
-s32 Maps::GetDirectionIndex(s32 from, u16 vector)
+s32 Maps::GetDirectionIndex(const s32 & from, u16 vector)
 {
     switch(vector)
     {
@@ -111,7 +111,7 @@ s32 Maps::GetDirectionIndex(s32 from, u16 vector)
 }
 
 // check bound
-bool Maps::isValidDirection(s32 from, u16 vector)
+bool Maps::isValidDirection(const s32 & from, u16 vector)
 {
     switch(vector)
     {
@@ -134,9 +134,9 @@ bool Maps::isValidAbsPoint(const Point & pt)
     return isValidAbsPoint(pt.x, pt.y);
 }
 
-bool Maps::isValidAbsIndex(s32 i)
+bool Maps::isValidAbsIndex(const s32 & ii)
 {
-    return 0 <= i && i < world.w() * world.h();
+    return 0 <= ii && ii < world.w() * world.h();
 }
 
 bool Maps::isValidAbsPoint(s16 x, s16 y)
@@ -163,7 +163,7 @@ s32 Maps::GetIndexFromAbsPoint(s16 px, s16 py)
     return res;
 }
 
-MapsIndexes Maps::GetAroundIndexes(const s32 center, const u16 filter)
+MapsIndexes Maps::GetAroundIndexes(const s32 & center, u16 filter)
 {
     MapsIndexes result;
     result.reserve(8);
@@ -177,7 +177,7 @@ MapsIndexes Maps::GetAroundIndexes(const s32 center, const u16 filter)
     return result;
 }
 
-MapsIndexes Maps::GetDistanceIndexes(const s32 center, const u16 dist)
+MapsIndexes Maps::GetDistanceIndexes(const s32 & center, u16 dist)
 {
     MapsIndexes results;
     results.reserve(dist * 12);
@@ -209,7 +209,7 @@ MapsIndexes Maps::GetDistanceIndexes(const s32 center, const u16 dist)
     return results;
 }
 
-void Maps::ClearFog(s32 index, u8 scoute, const u8 color)
+void Maps::ClearFog(const s32 & index, u8 scoute, u8 color)
 {
     if(0 != scoute && isValidAbsIndex(index))
     {
@@ -239,25 +239,25 @@ void Maps::ClearFog(s32 index, u8 scoute, const u8 color)
     }
 }
 
-MapsIndexes Maps::ScanAroundObjectsV(const s32 center, const u8* objs)
+MapsIndexes Maps::ScanAroundObjectsV(const s32 & center, const u8* objs)
 {
     MapsIndexes results = Maps::GetAroundIndexes(center);
     return MapsIndexesFilteredObjects(results, objs);
 }
 
-MapsIndexes Maps::ScanAroundObjectV(const s32 center, const u8 obj)
+MapsIndexes Maps::ScanAroundObjectV(const s32 & center, u8 obj)
 {
     MapsIndexes results = Maps::GetAroundIndexes(center);
     return MapsIndexesFilteredObject(results, obj);
 }
 
-MapsIndexes Maps::ScanDistanceObject(const s32 center, const u8 obj, const u16 dist)
+MapsIndexes Maps::ScanDistanceObject(const s32 & center, u8 obj, u16 dist)
 {
     MapsIndexes results = Maps::GetDistanceIndexes(center, dist);
     return MapsIndexesFilteredObject(results, obj);
 }
 
-MapsIndexes Maps::ScanDistanceObjects(const s32 center, const u8* objs, const u16 dist)
+MapsIndexes Maps::ScanDistanceObjects(const s32 & center, const u8* objs, u16 dist)
 {
     MapsIndexes results = Maps::GetDistanceIndexes(center, dist);
     return MapsIndexesFilteredObjects(results, objs);
@@ -276,7 +276,7 @@ bool TileIsUnderProtection(s32 index, s32 from)
     return result;
 }
  
-MapsIndexes Maps::TileUnderProtectionV(const s32 center)
+MapsIndexes Maps::TileUnderProtectionV(const s32 & center)
 {
     MapsIndexes indexes = Maps::ScanAroundObjectV(center, MP2::OBJ_MONSTER);
     indexes.resize(std::distance(indexes.begin(),
@@ -284,7 +284,7 @@ MapsIndexes Maps::TileUnderProtectionV(const s32 center)
     return indexes;
 }
 
-u16 Maps::GetApproximateDistance(const s32 index1, const s32 index2)
+u16 Maps::GetApproximateDistance(const s32 & index1, const s32 & index2)
 {
     return std::max(std::abs((index1 % world.w()) - (index2 % world.w())), 
 	            std::abs((index1 / world.w()) - (index2 / world.w())));

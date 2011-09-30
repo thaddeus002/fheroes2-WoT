@@ -48,28 +48,28 @@ namespace Maps
     const char* SizeString(u16);
     const char* GetMinesName(u8);
 
-    s32 GetDirectionIndex(s32 from, u16 direct);
-    bool isValidDirection(s32 from, u16 direct);
+    s32 GetDirectionIndex(const s32 & from, u16 direct);
+    bool isValidDirection(const s32 & from, u16 direct);
 
-    bool isValidAbsIndex(s32);
+    bool isValidAbsIndex(const s32 &);
     bool isValidAbsPoint(const Point & pt);
     bool isValidAbsPoint(s16 x, s16 y);
 
     s32 GetIndexFromAbsPoint(const Point & mp);
     s32 GetIndexFromAbsPoint(s16 px, s16 py);
 
-    MapsIndexes GetAroundIndexes(const s32 center, const u16 filter = DIRECTION_ALL);
-    MapsIndexes GetDistanceIndexes(const s32 center, const u16 dist);
-    MapsIndexes ScanAroundObjectV(const s32 center, const u8 obj);
-    MapsIndexes ScanAroundObjectsV(const s32 center, const u8* objs);
-    MapsIndexes TileUnderProtectionV(const s32 center);
-    MapsIndexes ScanDistanceObject(const s32 center, const u8 obj, const u16 dist);
-    MapsIndexes ScanDistanceObjects(const s32 center, const u8* objs, const u16 dist);
+    MapsIndexes GetAroundIndexes(const s32 &, u16 filter = DIRECTION_ALL);
+    MapsIndexes GetDistanceIndexes(const s32 &, u16 dist);
+    MapsIndexes ScanAroundObjectV(const s32 &, u8 obj);
+    MapsIndexes ScanAroundObjectsV(const s32 &, const u8* objs);
+    MapsIndexes TileUnderProtectionV(const s32 &);
+    MapsIndexes ScanDistanceObject(const s32 &, u8 obj, u16 dist);
+    MapsIndexes ScanDistanceObjects(const s32 &, const u8* objs, u16 dist);
 
     u16 TileIsCoast(const s32 &, u16 direct = DIRECTION_ALL);
 
-    void ClearFog(s32 center, u8 scoute, const u8 color);
-    u16 GetApproximateDistance(const s32 index1, const s32 index2);
+    void ClearFog(const s32 &, u8 scoute, u8 color);
+    u16 GetApproximateDistance(const s32 &, const s32 &);
 
 
     void UpdateRNDSpriteForCastle(const Point & center, u8 race, bool castle);

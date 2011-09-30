@@ -60,8 +60,8 @@ public:
 
     static World & Get(void);
 
-    u16 w(void){ return width; }
-    u16 h(void){ return height; }
+    const u16 & w(void){ return width; }
+    const u16 & h(void){ return height; }
 
     const Maps::Tiles & GetTiles(const Point & pt) const{ return GetTiles(pt.y * width + pt.x); }
     const Maps::Tiles & GetTiles(u16 ax, u16 ay) const{ return GetTiles(ay * width + ax); }

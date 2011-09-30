@@ -33,11 +33,12 @@
 
 struct cell_t
 {
-    cell_t() : cost_g(MAXU16), cost_t(MAXU16), cost_d(MAXU16), parent(-1), open(true){};
+    cell_t() : cost_g(MAXU16), cost_t(MAXU16), cost_d(MAXU16), passbl(0), parent(-1), open(true){};
 
     u16		cost_g;
     u16		cost_t;
     u16		cost_d;
+    u16		passbl;
     s32		parent;
     bool	open;
 };
@@ -170,8 +171,11 @@ bool Algorithm::PathFind(std::list<Route::Step> *result, const s32 from, const s
 	    		const u16 costg = Maps::Ground::GetPenalty(tmp, direct, pathfinding);
 			if(MAXU16 == costg) continue;
 
-			if(PassableFromToTile(hero, cur, tmp, direct, to))
+			if((list[cur].passbl & direct) ||
+			   PassableFromToTile(hero, cur, tmp, direct, to))
 			{
+			    list[cur].passbl |= direct;
+
 			    cell_t & cell = list[tmp];
 	    		    cell.cost_g = costg;
 			    cell.parent = cur;
@@ -185,8 +189,11 @@ bool Algorithm::PathFind(std::list<Route::Step> *result, const s32 from, const s
 		    {
 			alt = Maps::Ground::GetPenalty(cur, direct, pathfinding);
 			if(list[tmp].cost_t > list[cur].cost_t + alt &&
-			   PassableFromToTile(hero, cur, tmp, direct, to))
+			   ((list[cur].passbl & direct) ||
+			     PassableFromToTile(hero, cur, tmp, direct, to)))
 			{
+			    list[cur].passbl |= direct;
+
 			    list[tmp].parent = cur;
 			    list[tmp].cost_g = alt;
 			    list[tmp].cost_t = list[cur].cost_t + alt;
