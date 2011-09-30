@@ -165,7 +165,10 @@ void Dialog::ExtSettings(bool readonly)
     states.push_back(Settings::WORLD_STARTHERO_LOSSCOND4HUMANS);
     states.push_back(Settings::WORLD_1HERO_HIRED_EVERY_WEEK);
     states.push_back(Settings::WORLD_DWELLING_ACCUMULATE_UNITS);
-    states.push_back(Settings::WORLD_USE_UNIQUE_ARTIFACTS);
+    states.push_back(Settings::WORLD_USE_UNIQUE_ARTIFACTS1);
+    states.push_back(Settings::WORLD_USE_UNIQUE_ARTIFACTS2);
+    states.push_back(Settings::WORLD_USE_UNIQUE_ARTIFACTS3);
+    states.push_back(Settings::WORLD_USE_UNIQUE_ARTIFACTS4);
     states.push_back(Settings::HEROES_LEARN_SPELLS_WITH_DAY);
     states.push_back(Settings::HEROES_COST_DEPENDED_FROM_LEVEL);
     states.push_back(Settings::HEROES_REMEMBER_POINTS_RETREAT);

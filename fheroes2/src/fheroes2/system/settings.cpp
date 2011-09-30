@@ -147,7 +147,10 @@ const settings_t settingsFHeroes2[] =
     { Settings::WORLD_STARTHERO_LOSSCOND4HUMANS,_("world: Starting heroes as Loss Conditions for Human Players"), },
     { Settings::WORLD_1HERO_HIRED_EVERY_WEEK,	_("world: Only 1 hero can be hired by the one player every week"), },
     { Settings::WORLD_DWELLING_ACCUMULATE_UNITS,_("world: Outer creature dwellings should accumulate units"), },
-    { Settings::WORLD_USE_UNIQUE_ARTIFACTS,	_("world: use only unique artifacts"),                  },
+    { Settings::WORLD_USE_UNIQUE_ARTIFACTS1,	_("world: use unique artifacts for morale/luck"),       },
+    { Settings::WORLD_USE_UNIQUE_ARTIFACTS2,	_("world: use unique artifacts for resource producing"),},
+    { Settings::WORLD_USE_UNIQUE_ARTIFACTS3,	_("world: use unique artifacts for primary skill/mp/sp"), },
+    { Settings::WORLD_USE_UNIQUE_ARTIFACTS4,	_("world: use unique artifacts for sec. skills"),       },
     { Settings::CASTLE_ALLOW_BUY_FROM_WELL,	_("castle: allow buy from well"),			},
     { Settings::CASTLE_ALLOW_GUARDIANS,		_("castle: allow guardians"),				},
     { Settings::CASTLE_MAGEGUILD_POINTS_TURN,	_("castle: higher mage guilds regenerate more spell points/turn (20/40/60/80/100%)"), },
@@ -1394,9 +1397,24 @@ bool Settings::ExtWorldDwellingsAccumulateUnits(void) const
     return ExtModes(WORLD_DWELLING_ACCUMULATE_UNITS);
 }
 
-bool Settings::ExtWorldUseUniqueArtifacts(void) const
+bool Settings::ExtWorldUseUniqueArtifacts1(void) const
 {
-    return ExtModes(WORLD_USE_UNIQUE_ARTIFACTS);
+    return ExtModes(WORLD_USE_UNIQUE_ARTIFACTS1);
+}
+
+bool Settings::ExtWorldUseUniqueArtifacts2(void) const
+{
+    return ExtModes(WORLD_USE_UNIQUE_ARTIFACTS2);
+}
+
+bool Settings::ExtWorldUseUniqueArtifacts3(void) const
+{
+    return ExtModes(WORLD_USE_UNIQUE_ARTIFACTS3);
+}
+
+bool Settings::ExtWorldUseUniqueArtifacts4(void) const
+{
+    return ExtModes(WORLD_USE_UNIQUE_ARTIFACTS4);
 }
 
 bool Settings::ExtHeroArenaCanChoiseAnySkills(void) const

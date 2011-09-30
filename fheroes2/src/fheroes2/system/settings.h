@@ -190,8 +190,12 @@ public:
 	WORLD_STARTHERO_LOSSCOND4HUMANS = 0x30000008,
 	WORLD_1HERO_HIRED_EVERY_WEEK	= 0x30000010,
 	WORLD_DWELLING_ACCUMULATE_UNITS = 0x30000020,
-	WORLD_USE_UNIQUE_ARTIFACTS	= 0x30000040,
+	// UNUSED			= 0x30000040,
 	HEROES_ARENA_ANY_SKILLS		= 0x30000080,
+	WORLD_USE_UNIQUE_ARTIFACTS1	= 0x30000100,
+	WORLD_USE_UNIQUE_ARTIFACTS2	= 0x30000200,
+	WORLD_USE_UNIQUE_ARTIFACTS3	= 0x30000400,
+	WORLD_USE_UNIQUE_ARTIFACTS4	= 0x30000800,
 
 	BATTLE_ARCHMAGE_RESIST_BAD_SPELL= 0x40001000,
 	BATTLE_MAGIC_TROOP_RESIST	= 0x40002000,
@@ -313,7 +317,10 @@ public:
     bool ExtWorldStartHeroLossCond4Humans(void) const;
     bool ExtWorldOneHeroHiredEveryWeek(void) const;
     bool ExtWorldDwellingsAccumulateUnits(void) const;
-    bool ExtWorldUseUniqueArtifacts(void) const;
+    bool ExtWorldUseUniqueArtifacts1(void) const;
+    bool ExtWorldUseUniqueArtifacts2(void) const;
+    bool ExtWorldUseUniqueArtifacts3(void) const;
+    bool ExtWorldUseUniqueArtifacts4(void) const;
     bool ExtCastleAllowFlash(void) const;
     bool ExtCastleGuildRestorePointsTurn(void) const;
     bool ExtCastleAllowRecruitSpecialHeroes(void) const;

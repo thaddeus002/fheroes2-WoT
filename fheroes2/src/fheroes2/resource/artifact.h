@@ -170,6 +170,7 @@ public:
     u16 ExtraValue(void) const;
     u8 Level(void) const;
     u8 LoyaltyLevel(void) const;
+    u8 Type(void) const;
 
     /* objnarti.icn */
     u8 IndexSprite(void) const;
