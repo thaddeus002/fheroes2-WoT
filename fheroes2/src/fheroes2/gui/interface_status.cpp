@@ -122,6 +122,10 @@ void Interface::StatusWindow::Redraw(void)
 
     // draw info: Day and Funds and Army
     const Sprite & ston = AGG::GetICN(Settings::Get().EvilInterface() ? ICN::STONBAKE : ICN::STONBACK, 0);
+
+    if(STATUS_AITURN == state)
+	DrawAITurns();
+    else
     if(STATUS_UNKNOWN != state && h >= (ston.h() * 3 + 15))
     {
         DrawDayInfo();
@@ -142,7 +146,6 @@ void Interface::StatusWindow::Redraw(void)
         case STATUS_FUNDS:	DrawKingdomInfo();	break;
         case STATUS_ARMY:	DrawArmyInfo();		break;
         case STATUS_RESOURCE:   DrawResourceInfo();     break;
-	case STATUS_AITURN:	DrawAITurns();		break;
 	default: break;
     }
     
