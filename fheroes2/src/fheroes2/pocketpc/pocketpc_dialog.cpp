@@ -46,6 +46,9 @@ u16 PocketPC::GetCursorAttackDialog(const Point & dst, u8 allow)
     const Sprite & sp_bright = AGG::GetICN(ICN::CMSECO, 9);
 
     Surface shadow(rt.w, rt.h);
+    shadow.Fill(0, 0, 0);
+    shadow.SetAlpha(50);
+
     Background back(rt);
     back.Save();
 
