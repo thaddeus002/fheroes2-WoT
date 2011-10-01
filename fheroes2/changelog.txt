@@ -1,4 +1,22 @@
-latest (2563 rev.)
+
+Oct, 1, 2011 (2620 rev.)
+
++ Fixed: heroes: new day action, restore magic points
++ Fixed: heroes: defaut action for teleport with zero move points
++ Fixed: status window redraw for large resolution
++ Fixed: game: month of monsters: count depends from size map
++ Fixed: game: meeting friendlies/attacking enemies through object, add extended change focus
++ Fixed: game: crash with large resolution
++ Fixed: game: Water Mills should only give 500 gold in first week.
++ Fixed: game: more passable objects, mountains, trees, towns, and other
++ Fixed: battle: spell cure/masscure to undead
++ Fixed: battle: resurect/true, animatedead spell
++ Added: game: marketplace add max label, add Dialog::MakeGiftResource
++ Added: option: "heroes: in Arena can choose any of primary skills"
++ Added: option: "world: Outer creature dwellings should accumulate units"
++ Added: option: "world: use unique artifacts"
+
+Sep, 14, 2011 (2566 rev.)
 
 + Fixed: battle: cast MirrorImage spell
 + Fixed: game: load binary settings
