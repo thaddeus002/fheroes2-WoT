@@ -470,7 +470,7 @@ Cursor::themes_t Game::GetCursorFocusShipmaster(const Heroes & from_hero, const 
     	    if(to_hero)
 	    {
 		if(! to_hero->isShipMaster())
-		    return Cursor::HEROES;
+		    return from_hero.GetColor() == to_hero->GetColor() ? Cursor::HEROES : Cursor::POINTER;
 		else
 		if(to_hero->GetCenter() == from_hero.GetCenter())
 		    return Cursor::HEROES;
