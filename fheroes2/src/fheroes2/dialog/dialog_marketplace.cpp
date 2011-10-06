@@ -234,14 +234,15 @@ void Dialog::Marketplace(bool fromTradingPost)
     Funds fundsFrom = kingdom.GetFunds();
     u8 resourceFrom = 0;
     const Point pt1(pos_rt.x, pos_rt.y + 190);
-    std::vector<Rect> rectsFrom(7);
-    rectsFrom[0] = Rect(pt1.x, pt1.y, 34, 34);		// wood
-    rectsFrom[1] = Rect(pt1.x + 37, pt1.y, 34, 34);	// mercury
-    rectsFrom[2] = Rect(pt1.x + 74, pt1.y, 34, 34);	// ore
-    rectsFrom[3] = Rect(pt1.x, pt1.y + 37, 34, 34);	// sulfur
-    rectsFrom[4] = Rect(pt1.x + 37, pt1.y + 37, 34, 34);// crystal
-    rectsFrom[5] = Rect(pt1.x + 74, pt1.y + 37, 34, 34);// gems
-    rectsFrom[6] = Rect(pt1.x + 37, pt1.y + 74, 34, 34);// gold
+    Rects rectsFrom;
+    rectsFrom.reserve(7);
+    rectsFrom.push_back(Rect(pt1.x, pt1.y, 34, 34));		// wood
+    rectsFrom.push_back(Rect(pt1.x + 37, pt1.y, 34, 34));	// mercury
+    rectsFrom.push_back(Rect(pt1.x + 74, pt1.y, 34, 34));	// ore
+    rectsFrom.push_back(Rect(pt1.x, pt1.y + 37, 34, 34));	// sulfur
+    rectsFrom.push_back(Rect(pt1.x + 37, pt1.y + 37, 34, 34));	// crystal
+    rectsFrom.push_back(Rect(pt1.x + 74, pt1.y + 37, 34, 34));	// gems
+    rectsFrom.push_back(Rect(pt1.x + 37, pt1.y + 74, 34, 34));	// gold
     SpriteCursor cursorFrom(spritecursor);
     text.Set(header_from, Font::SMALL);
     dst_pt.x = pt1.x + (108 - text.w()) / 2;
@@ -254,14 +255,15 @@ void Dialog::Marketplace(bool fromTradingPost)
     Funds fundsTo;
     u8 resourceTo = 0;
     const Point pt2(138 + pos_rt.x, pos_rt.y + 190);
-    std::vector<Rect> rectsTo(7);
-    rectsTo[0] = Rect(pt2.x, pt2.y, 34, 34);		// wood
-    rectsTo[1] = Rect(pt2.x + 37, pt2.y, 34, 34);	// mercury
-    rectsTo[2] = Rect(pt2.x + 74, pt2.y, 34, 34);	// ore
-    rectsTo[3] = Rect(pt2.x, pt2.y + 37, 34, 34);	// sulfur
-    rectsTo[4] = Rect(pt2.x + 37, pt2.y + 37, 34, 34);	// crystal
-    rectsTo[5] = Rect(pt2.x + 74, pt2.y + 37, 34, 34);	// gems
-    rectsTo[6] = Rect(pt2.x + 37, pt2.y + 74, 34, 34);	// gold
+    Rects rectsTo;
+    rectsTo.reserve(7);
+    rectsTo.push_back(Rect(pt2.x, pt2.y, 34, 34));		// wood
+    rectsTo.push_back(Rect(pt2.x + 37, pt2.y, 34, 34));		// mercury
+    rectsTo.push_back(Rect(pt2.x + 74, pt2.y, 34, 34));		// ore
+    rectsTo.push_back(Rect(pt2.x, pt2.y + 37, 34, 34));		// sulfur
+    rectsTo.push_back(Rect(pt2.x + 37, pt2.y + 37, 34, 34));	// crystal
+    rectsTo.push_back(Rect(pt2.x + 74, pt2.y + 37, 34, 34));	// gems
+    rectsTo.push_back(Rect(pt2.x + 37, pt2.y + 74, 34, 34));	// gold
     SpriteCursor cursorTo(spritecursor);
     text.Set(header_to, Font::SMALL);
     dst_pt.x = pt2.x + (108 - text.w()) / 2;

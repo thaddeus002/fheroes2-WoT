@@ -20,6 +20,8 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
+#include <algorithm>
+#include <iterator>
 #include "rect.h"
 
 Point::Point(s16 px, s16 py) : x(px), y(py)
@@ -123,29 +125,6 @@ Rect Rect::Get(const Rect & rt1, const Rect & rt2, bool intersect)
     return rt3;
 }
 
-Rect::Rect(const std::vector<Rect> & vect)
-{
-    int x1 = 32766;
-    int y1 = 32766;
-    int x2 = -32766;
-    int y2 = -32766;
-       
-    std::vector<Rect>::const_iterator it = vect.begin();
-    
-    for(; it != vect.end(); ++it)
-    {
-	if((*it).x < x1) x1 = (*it).x;
-	if((*it).y < y1) y1 = (*it).y;
-	if((*it).x + (*it).w > x2) x2 = (*it).x + (*it).w;
-	if((*it).y + (*it).h > y2) y2 = (*it).y + (*it).h;
-    }
-    
-    x = x1;
-    y = y1;
-    w = x2 - x1;
-    h = y2 - y1;
-}
-
 Rect & Rect::operator= (const Point & pt)
 {
     x = pt.x;
@@ -172,4 +151,31 @@ bool Rect::operator& (const Point & pt) const
 bool Rect::operator& (const Rect & rt) const
 {
     return ! (x > rt.x + rt.w || x + w < rt.x || y > rt.y + rt.h || y + h < rt.y);
+}
+
+Rect Rects::GetRect(void) const
+{
+    s32 x1 = 32766;
+    s32 y1 = 32766;
+    s32 x2 = -32766;
+    s32 y2 = -32766;
+
+    for(const_iterator
+	it = begin(); it != end(); ++it)
+    {
+	if((*it).x < x1) x1 = (*it).x;
+	if((*it).y < y1) y1 = (*it).y;
+	if((*it).x + (*it).w > x2) x2 = (*it).x + (*it).w;
+	if((*it).y + (*it).h > y2) y2 = (*it).y + (*it).h;
+    }
+
+    return Rect(x1, y1, x2 - x1, y2 - y1);
+}
+
+s32 Rects::GetIndex(const Point & pt) const
+{
+    const_iterator it = std::find_if(begin(), end(),
+                                    std::bind2nd(RectIncludePoint(), pt));
+
+    return it != end() ? std::distance(begin(), it) : -1;
 }

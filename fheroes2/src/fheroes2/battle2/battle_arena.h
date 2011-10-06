@@ -77,7 +77,6 @@ namespace Battle2
 	void SetCovrObjects(u16);
 
 	void GetAbroadPositions(u16, u8, bool, std::vector<u16> &) const;
-	void GetIndexesFromAbsPoints(std::vector<u16> &, const std::vector<Point> &) const;
 
 	static bool NearCells(u16, u16);
 	static bool inCastle(u16);
@@ -214,6 +213,8 @@ namespace Battle2
 
 	Stats* CreateElemental(const Spell &);
 	Stats* CreateMirrorImage(Stats &, u16);
+
+	u8 GetObstaclesPenalty(const Stats &, const Stats &) const;
 
     protected:
 	friend class Interface;

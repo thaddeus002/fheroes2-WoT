@@ -28,26 +28,18 @@
 #include "gameevent.h"
 #include "dialog.h"
 
-s32 GetIndexClickRects(const std::vector<Rect> & rects)
+s32 GetIndexClickRects(const Rects & rects)
 {
     LocalEvent & le = LocalEvent::Get();
-
-    for(std::vector<Rect>::const_iterator
-    	it = rects.begin(); it != rects.end(); ++it)
-    {
-	size_t index = std::distance(rects.begin(), it);
-	    if(rects[index] & le.GetMouseCursor() &&
-		le.MouseClickLeft(rects[index]))
-		return index;
-    }
-    return -1;
+    const s32 index = rects.GetIndex(le.GetMouseCursor());
+    return 0 <= index && le.MouseClickLeft() ? index : -1;
 }
 
 struct SelectRecipientsColors
 {
     const Colors	colors;
     u8			recipients;
-    std::vector<Rect>	positions;
+    Rects		positions;
 
     SelectRecipientsColors(const Point & pos) :
 	colors(Settings::Get().GetPlayers().GetColors() & ~Settings::Get().GetPlayers().current_color), recipients(0)
@@ -105,9 +97,9 @@ struct SelectRecipientsColors
 
 struct ResourceBar
 {
-    Funds &		resource;
-    Point		pos;
-    std::vector<Rect>	positions;
+    Funds &	resource;
+    Point	pos;
+    Rects	positions;
 
     ResourceBar(Funds & funds, s16 posx, s16 posy) : resource(funds), pos(posx, posy)
     {
@@ -138,7 +130,7 @@ struct ResourceBar
     {
 	if(! res) res = &resource;
 
-	for(std::vector<Rect>::const_iterator
+	for(Rects::const_iterator
 	    it = positions.begin(); it != positions.end(); ++it)
 	{
 	    u8 rs = Resource::FromIndexSprite2(std::distance(positions.begin(), it));

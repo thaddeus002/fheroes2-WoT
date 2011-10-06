@@ -73,13 +73,11 @@ void RowSpells::Redraw(void)
     const Sprite & roll_show = AGG::GetICN(ICN::TOWNWIND, 0);
     const Sprite & roll_hide = AGG::GetICN(ICN::TOWNWIND, 1);
 
-    std::vector<Rect>::const_iterator it1 = coords.begin();
-    std::vector<Rect>::const_iterator it2 = coords.end();
-
-    for(; it1 != it2; ++it1)
+    for(Rects::iterator
+	it = coords.begin(); it != coords.end(); ++it)
     {
-	const Rect & dst = (*it1);
-	const Spell & spell = spells[it1 - coords.begin()];
+	const Rect & dst = (*it);
+	const Spell & spell = spells[std::distance(coords.begin(), it)];
 
 	// roll hide
 	if(dst.w < roll_show.w() || spell == Spell::NONE)
@@ -114,14 +112,13 @@ bool RowSpells::QueueEventProcessing(void)
     Display & display = Display::Get();
     Cursor & cursor = Cursor::Get();
 
-    std::vector<Rect>::const_iterator it = std::find_if(coords.begin(), coords.end(),
-					    std::bind2nd(RectIncludePoint(), le.GetMouseCursor()));
-    if(it == coords.end())
-	return false;
+    const s32 index = coords.GetIndex(le.GetMouseCursor());
 
-    if(le.MouseClickLeft() || le.MousePressRight())
+    if(0 <= index &&
+       (le.MouseClickLeft() || le.MousePressRight()))
     {
-	const Spell & spell = spells[it - coords.begin()];
+	const Spell & spell = spells[index];
+
 	if(spell != Spell::NONE)
 	{
     	    cursor.Hide();
@@ -131,7 +128,7 @@ bool RowSpells::QueueEventProcessing(void)
 	}
     }
 
-    return true;
+    return 0 <= index;
 }
 
 void Castle::OpenMageGuild(void)

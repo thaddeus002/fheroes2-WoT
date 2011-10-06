@@ -152,12 +152,13 @@ Battle2::Board::Board()
 
 Rect Battle2::Board::GetArea(void) const
 {
-    std::vector<Rect> rects;
+    Rects rects;
     rects.reserve(size());
-    std::vector<Cell>::const_iterator it1 = begin();
-    std::vector<Cell>::const_iterator it2 = end();
-    for(; it1 != it2; ++it1) rects.push_back((*it1).pos);
-    return Rect(rects);
+
+    for(const_iterator it = begin(); it != end(); ++it)
+	rects.push_back((*it).pos);
+
+    return rects.GetRect();
 }
 
 void Battle2::Board::SetPositionQuality(const Stats & b)
@@ -274,22 +275,6 @@ s16 Battle2::Board::GetIndexAbsPosition(const Point & pt) const
     const_iterator it2 = end();
     for(; it1 != it2; ++it1) if((*it1).isPositionIncludePoint(pt)) break;
     return it1 != it2 ? (*it1).GetIndex() : -1;
-}
-
-void Battle2::Board::GetIndexesFromAbsPoints(std::vector<u16> & indexes, const std::vector<Point> & points) const
-{
-    std::vector<Point>::const_iterator it = points.begin();
-    for(; it != points.end(); ++it)
-    {
-	const s16 index = GetIndexAbsPosition(*it);
-	if(0 <= index) indexes.push_back(index);
-    }
-
-    if(indexes.size())
-    {
-	std::sort(indexes.begin(), indexes.end());
-	indexes.resize(std::unique(indexes.begin(), indexes.end()) - indexes.begin());
-    }
 }
 
 bool Battle2::Board::inCastle(u16 ii)
@@ -1854,4 +1839,114 @@ Battle2::Stats* Battle2::Arena::CreateMirrorImage(Stats & b, u16 pos)
     }
 
     return image;
+}
+
+u8 Battle2::Arena::GetObstaclesPenalty(const Stats & attacker, const Stats & defender) const
+{
+    if(defender.Modes(CAP_TOWER) || attacker.Modes(CAP_TOWER)) return 0;
+
+    // check golden bow artifact
+    const HeroBase* enemy = attacker.GetCommander();
+    if(enemy && enemy->HasArtifact(Artifact::GOLDEN_BOW)) return 0;
+
+    u8 result = 0;
+
+    if(castle)
+    {
+	// archery skill
+	if(enemy && Skill::Level::NONE != enemy->GetLevelSkill(Skill::Secondary::ARCHERY)) return 0;
+
+	// attacker is castle owner
+	if(attacker.GetColor() == castle->GetColor() &&
+	    !attacker.OutOfWalls()) return 0;
+
+	if(defender.GetColor() == castle->GetColor() &&
+	    defender.OutOfWalls()) return 0;
+
+	// check castle walls defensed
+	const Rect & pos1 = attacker.GetCellPosition();
+	const Rect & pos2 = defender.GetCellPosition();
+
+	const Points points = GetLinePoints(pos1, pos2, pos1.w / 3);
+
+	for(Points::const_iterator
+	    it = points.begin(); it != points.end(); ++it)
+	{
+	    if(0 == board[8].object && (board[8].GetPos() & *it)) return 0;
+	    else
+	    if(0 == board[29].object && (board[29].GetPos() & *it)) return 0;
+	    else
+	    if(0 == board[73].object && (board[73].GetPos() & *it)) return 0;
+	    else
+	    if(0 == board[96].object && (board[96].GetPos() & *it)) return 0;
+	}
+
+	result = 1;
+    }
+    else
+    if(Settings::Get().ExtBattleObjectsArchersPenalty())
+    {
+	Rect pos1 = attacker.GetCellPosition();
+	Rect pos2 = defender.GetCellPosition();
+
+	pos1.y += pos1.h / 2;
+	pos2.y += pos2.h / 2;
+
+	const Points points = GetLinePoints(pos1, pos2, pos1.w / 3);
+	std::vector<u16> indexes;
+
+	for(Points::const_iterator
+	    it = points.begin(); it != points.end(); ++it)
+	{
+	    const s16 index = board.GetIndexAbsPosition(*it);
+	    if(0 <= index) indexes.push_back(index);
+	}
+
+	if(indexes.size())
+	{
+	    std::sort(indexes.begin(), indexes.end());
+	    indexes.resize(std::unique(indexes.begin(), indexes.end()) - indexes.begin());
+	}
+
+	for(std::vector<u16>::iterator
+	    it = indexes.begin(); it != indexes.end(); ++it)
+	{
+	    // obstacles
+	    switch(board[std::distance(indexes.begin(), it)].object)
+	    {
+		    // tree
+		    case 0x82:
+		    // trock
+		    case 0x85:
+		    // tree
+		    case 0x89:
+		    // tree
+		    case 0x8D:
+		    // rock
+		    case 0x95:
+		    case 0x96:
+		    // stub
+		    case 0x9A:
+		    // dead tree
+		    case 0x9B:
+		    // tree
+		    case 0x9C: ++result; break;
+
+		    default: break;
+	    }
+	}
+
+	if(enemy)
+	{
+	    switch(enemy->GetLevelSkill(Skill::Secondary::ARCHERY))
+	    {
+		case Skill::Level::BASIC:	if(result < 2) return 0; break;
+		case Skill::Level::ADVANCED:	if(result < 3) return 0; break;
+		case Skill::Level::EXPERT:	return 0;
+		default: break;
+	    }
+	}
+    }
+
+    return result;
 }

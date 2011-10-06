@@ -55,7 +55,7 @@ public:
     bool QueueEventProcessing(void);
 
 private:
-    std::vector<Rect> coords;
+    Rects coords;
     SpellStorage spells;
 };
 

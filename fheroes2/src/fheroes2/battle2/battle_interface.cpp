@@ -234,8 +234,11 @@ void DrawHexagonShadow(Surface & sf)
     sf.SetAlpha(0x30);
 }
 
-void GetLinePoints(const Point & pt1, const Point & pt2, u16 step, std::vector<Point> & res)
+Points GetLinePoints(const Point & pt1, const Point & pt2, u16 step)
 {
+    Points res;
+    res.reserve(10);
+
     const u16 dx = std::abs(pt2.x - pt1.x);
     const u16 dy = std::abs(pt2.y - pt1.y);
 
@@ -271,27 +274,36 @@ void GetLinePoints(const Point & pt1, const Point & pt2, u16 step, std::vector<P
 
 	if(0 == (i % step)) res.push_back(pt);
     }
+
+    return res;
 }
 
-void GetArcPoints(const Point & from, const Point & to, const Point & max, u16 step, std::vector<Point> & res)
+Points GetArcPoints(const Point & from, const Point & to, const Point & max, u16 step)
 {
+    Points res;
     Point pt1, pt2;
 
     pt1 = from;
     pt2 = Point(from.x + std::abs(max.x - from.x) / 2, from.y - std::abs(max.y - from.y) * 3 / 4);
-    GetLinePoints(pt1, pt2, step, res);
+    const Points & pts1 = GetLinePoints(pt1, pt2, step);
+    res.insert(res.end(), pts1.begin(), pts1.end());
 
     pt1 = pt2;
     pt2 = max;
-    GetLinePoints(pt1, pt2, step, res);
+    const Points & pts2 = GetLinePoints(pt1, pt2, step);
+    res.insert(res.end(), pts2.begin(), pts2.end());
 
     pt1 = max;
     pt2 = Point(max.x + std::abs(to.x - max.x)  / 2, to.y - std::abs(to.y - max.y) * 3 / 4);
-    GetLinePoints(pt1, pt2, step, res);
+    const Points & pts3 = GetLinePoints(pt1, pt2, step);
+    res.insert(res.end(), pts3.begin(), pts3.end());
 
     pt1 = pt2;
-    pt2 = to;    
-    GetLinePoints(pt1, pt2, step, res);
+    pt2 = to;
+    const Points & pts4 = GetLinePoints(pt1, pt2, step);
+    res.insert(res.end(), pts4.begin(), pts4.end());
+
+    return res;
 }
 
 bool Battle2::TargetInfo::isFinishAnimFrame(void) const
@@ -1333,7 +1345,7 @@ u16 Battle2::Interface::GetBattleCursor(const Point & mouse, std::string & statu
 		    String::Replace(status, "%{monster}", b_enemy->GetName());
 		    String::Replace(status, "%{count}", b_current->GetShots());
 
-		    return b_enemy->GetObstaclesPenalty(*b_current) ? Cursor::WAR_BROKENARROW : Cursor::WAR_ARROW;
+		    return arena.GetObstaclesPenalty(*b_current, *b_enemy) ? Cursor::WAR_BROKENARROW : Cursor::WAR_ARROW;
 		}
 		else
 		{
@@ -2138,24 +2150,24 @@ void Battle2::Interface::RedrawActionAttackPart1(Stats & attacker, Stats & defen
     if(archer)
     {
 	const Sprite & missile = AGG::GetICN(attacker.ICNMiss(), ICN::GetMissIndex(attacker.ICNMiss(), pos1.x - pos2.x, pos1.y - pos2.y), pos1.x > pos2.x);
-	std::vector<Point> points;
-	std::vector<Point>::const_iterator pnt;
+
+	Point line_from, line_to;
 	const u8 step = (missile.w() < 16 ? 16 : missile.w());
 
 	if(Settings::Get().QVGA())
 	{
-	    const Point line_from(pos1.x + (attacker.isReflect() ? -5 : pos1.w), pos1.y + attacker.GetStartMissileOffset(action1) / 2);
-	    const Point line_to(pos2.x + (attacker.isReflect() ? pos1.w : 0), pos2.y);
-	    GetLinePoints(line_from, line_to, step, points);
+	    line_from = Point(pos1.x + (attacker.isReflect() ? -5 : pos1.w), pos1.y + attacker.GetStartMissileOffset(action1) / 2);
+	    line_to = Point(pos2.x + (attacker.isReflect() ? pos1.w : 0), pos2.y);
 	}
 	else
 	{
-	    const Point line_from(pos1.x + (attacker.isReflect() ? -10 : pos1.w), pos1.y + attacker.GetStartMissileOffset(action1));
-	    const Point line_to(pos2.x + (attacker.isReflect() ? pos1.w : 0), pos2.y);
-	    GetLinePoints(line_from, line_to, step, points);
+	    line_from = Point(pos1.x + (attacker.isReflect() ? -10 : pos1.w), pos1.y + attacker.GetStartMissileOffset(action1));
+	    line_to = Point(pos2.x + (attacker.isReflect() ? pos1.w : 0), pos2.y);
 	}
 
-	pnt = points.begin();
+	const Points points = GetLinePoints(line_from, line_to, step);
+	Points::const_iterator pnt = points.begin();
+
 	while(le.HandleEvents(false) && pnt != points.end())
 	{
 	    CheckGlobalEvents(le);
@@ -2392,17 +2404,16 @@ void Battle2::Interface::RedrawActionFly(Stats & b, u16 dst)
     Cursor & cursor = Cursor::Get();
     const Rect & pos1 = b.GetCellPosition();
     const Rect & pos2 = arena.board[dst].pos;
-    std::vector<Point> points;
-    std::vector<Point>::const_iterator pnt;
 
     Point pt1(pos1.x, pos1.y);
     Point pt2(pos2.x, pos2.y);
 
     cursor.SetThemes(Cursor::WAR_NONE);
     const u8 step = b.isWide() ? 80 : 40;
-    GetLinePoints(pt1, pt2, Settings::Get().QVGA() ? step / 2 : step, points);
 
-    pnt = points.begin();
+    
+    const Points points = GetLinePoints(pt1, pt2, Settings::Get().QVGA() ? step / 2 : step);
+    Points::const_iterator pnt = points.begin();
 
     // jump up
     b_current = NULL;
@@ -2752,12 +2763,10 @@ void Battle2::Interface::RedrawActionTowerPart1(Tower & tower, Stats & defender)
 
     // draw missile animation
     const Sprite & missile = AGG::GetICN(ICN::KEEP, ICN::GetMissIndex(ICN::KEEP, pos1.x - pos2.x, pos1.y - pos2.y), pos1.x > pos2.x);
-    std::vector<Point> points;
-    std::vector<Point>::const_iterator pnt;
 
-    GetLinePoints(pos1, Point(pos2.x + pos2.w, pos2.y), missile.w(), points);
+    const Points points = GetLinePoints(pos1, Point(pos2.x + pos2.w, pos2.y), missile.w());
+    Points::const_iterator pnt = points.begin();
 
-    pnt = points.begin();
     while(le.HandleEvents(false) && pnt != points.end())
     {
 	CheckGlobalEvents(le);
@@ -2819,8 +2828,6 @@ void Battle2::Interface::RedrawActionCatapult(u8 target)
     const Sprite & missile = AGG::GetICN(ICN::BOULDER, 0);
     const Rect & area = border.GetArea();
 
-    std::vector<Point> points;
-    std::vector<Point>::const_iterator pnt;
     AGG::PlaySound(M82::CATSND00);
 
     // catapult animation
@@ -2860,9 +2867,9 @@ void Battle2::Interface::RedrawActionCatapult(u8 target)
     pt2.y += area.y;
     max.y += area.y;
 
-    GetArcPoints(pt1, pt2, max, missile.w(), points);
+    const Points points = GetArcPoints(pt1, pt2, max, missile.w());
+    Points::const_iterator pnt = points.begin();
 
-    pnt = points.begin();
     while(le.HandleEvents(false) && pnt != points.end())
     {
 	CheckGlobalEvents(le);
@@ -2936,15 +2943,13 @@ void Battle2::Interface::RedrawActionArrowSpell(const Stats & target)
 	}
 
 	const Sprite & missile = AGG::GetICN(ICN::ARCH_MSL, ICN::GetMissIndex(ICN::ARCH_MSL, pt_from.x - pt_to.x, pt_from.y - pt_to.y), pt_from.x > pt_to.x);
-	std::vector<Point> points;
-	std::vector<Point>::const_iterator pnt;
 
-	GetLinePoints(pt_from, pt_to, missile.w(), points);
+	const Points points = GetLinePoints(pt_from, pt_to, missile.w());
+	Points::const_iterator pnt = points.begin();
 
 	cursor.SetThemes(Cursor::WAR_NONE);
 	AGG::PlaySound(M82::MAGCAROW);
 
-	pnt = points.begin();
 	while(le.HandleEvents(false) && pnt != points.end())
 	{
 	    CheckGlobalEvents(le);
@@ -3069,19 +3074,17 @@ void Battle2::Interface::RedrawActionMirrorImageSpell(const Stats & target, u16 
 
     const MonsterInfo & msi = target.GetMonsterInfo();
     const Sprite & sprite = AGG::GetICN(msi.icn_file, msi.frm_idle.start, target.reflect);
-    std::vector<Point> points;
-    std::vector<Point>::const_iterator pnt;
     const Rect  & rt1 = target.GetCellPosition();
     const Point & pt2 = arena.board[dst].GetPos();
 
-    GetLinePoints(rt1, pt2, 5, points);
+
+    const Points points = GetLinePoints(rt1, pt2, 5);
+    Points::const_iterator pnt = points.begin();
 
     cursor.SetThemes(Cursor::WAR_NONE);
     cursor.Hide();
-
     AGG::PlaySound(M82::MIRRORIM);
 
-    pnt = points.begin();
     while(le.HandleEvents() && pnt != points.end())
     {
 	CheckGlobalEvents(le);
@@ -3184,8 +3187,6 @@ void Battle2::Interface::RedrawActionColdRaySpell(Stats & target)
     const ICN::icn_t icn = ICN::COLDRAY;
     u8 frame = 0;
 
-    std::vector<Point> points;
-    std::vector<Point>::const_iterator pnt;
     Point pt_from, pt_to;
     const HeroBase* current_commander = arena.GetCurrentCommander();
 
@@ -3209,12 +3210,14 @@ void Battle2::Interface::RedrawActionColdRaySpell(Stats & target)
     const u16 dx = std::abs(pt_from.x - pt_to.x);
     const u16 dy = std::abs(pt_from.y - pt_to.y);
     const u16 step = (dx > dy ? dx / AGG::GetICNCount(icn) : dy / AGG::GetICNCount(icn));
-    GetLinePoints(pt_from, pt_to, step, points);
+
+    
+    const Points points = GetLinePoints(pt_from, pt_to, step);
+    Points::const_iterator pnt = points.begin();
 
     cursor.SetThemes(Cursor::WAR_NONE);
     AGG::PlaySound(M82::COLDRAY);
 
-    pnt = points.begin();
     while(le.HandleEvents() && frame < AGG::GetICNCount(icn) && pnt != points.end())
     {
 	CheckGlobalEvents(le);
@@ -3280,8 +3283,6 @@ void Battle2::Interface::RedrawActionDisruptingRaySpell(Stats & target)
 
     const ICN::icn_t icn = ICN::DISRRAY;
     u8 frame = 0;
-    std::vector<Point> points;
-    std::vector<Point>::const_iterator pnt;
     Point pt_from, pt_to;
     const HeroBase* current_commander = arena.GetCurrentCommander();
 
@@ -3305,12 +3306,13 @@ void Battle2::Interface::RedrawActionDisruptingRaySpell(Stats & target)
     const u16 dx = std::abs(pt_from.x - pt_to.x);
     const u16 dy = std::abs(pt_from.y - pt_to.y);
     const u16 step = (dx > dy ? dx / AGG::GetICNCount(icn) : dy / AGG::GetICNCount(icn));
-    GetLinePoints(pt_from, pt_to, step, points);
+
+    const Points points = GetLinePoints(pt_from, pt_to, step);
+    Points::const_iterator pnt = points.begin();
 
     cursor.SetThemes(Cursor::WAR_NONE);
     AGG::PlaySound(M82::DISRUPTR);
 
-    pnt = points.begin();
     while(le.HandleEvents() && frame < AGG::GetICNCount(icn) && pnt != points.end())
     {
 	CheckGlobalEvents(le);

@@ -40,7 +40,6 @@ struct Point
 };
 
 Point operator+(const Point& pt1, const Point& pt2);
-
 Point operator-(const Point& pt1, const Point& pt2);
 
 struct Size
@@ -61,7 +60,6 @@ struct Rect : Point, Size
     Rect(const SDL_Rect & rt);
     Rect(const Point & pt, u16 rw, u16 rh);
     Rect(const Point & pt, const Size & sz);
-    Rect(const std::vector<Rect> & vect);
 
     Rect & operator= (const Point & pt);
     bool operator== (const Rect & rt) const;
@@ -79,6 +77,16 @@ struct Rect : Point, Size
 struct RectIncludePoint : std::binary_function<Rect, Point, bool>
 {
     bool operator() (const Rect & r, const Point & p) const { return r & p; };
+};
+
+struct Points : std::vector<Point>
+{
+};
+
+struct Rects : std::vector<Rect>
+{
+    s32  GetIndex(const Point &) const;
+    Rect GetRect(void) const;
 };
 
 #endif

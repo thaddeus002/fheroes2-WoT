@@ -49,7 +49,7 @@ public:
 
 private:
     const Castle & castle;
-    std::vector<Rect> dw;
+    Rects dw;
 };
 
 void RedrawTownSprite(const Rect &, const Castle &);
@@ -1004,12 +1004,14 @@ const Rect & DwellingBar::GetArea(void) const
     return *this;
 }
 
-DwellingBar::DwellingBar(const Point & dst, const Castle & cst) : Rect(dst.x, dst.y, 0, 0), castle(cst), dw(CASTLEMAXMONSTER)
+DwellingBar::DwellingBar(const Point & dst, const Castle & cst) : Rect(dst.x, dst.y, 0, 0), castle(cst)
 {
-    for(u8 ii = 0; ii < dw.size(); ++ii)
-	dw[ii] = Rect(dst.x + ii * (43 + 2), dst.y, 43, 43);
+    dw.reserve(CASTLEMAXMONSTER);
 
-    const Rect max = Rect(dw);
+    for(u8 ii = 0; ii < CASTLEMAXMONSTER; ++ii)
+	dw.push_back(Rect(dst.x + ii * (43 + 2), dst.y, 43, 43));
+
+    const Rect max = dw.GetRect();
 
     w = max.w;
     h = max.h;
@@ -1072,11 +1074,11 @@ void DwellingBar::Redraw(void) const
 bool DwellingBar::QueueEventProcessing(void)
 {
     LocalEvent & le = LocalEvent::Get();
-    std::vector<Rect>::const_iterator itr;
+    const s32 index = dw.GetIndex(le.GetMouseCursor());
 
-    if(dw.end() != (itr = std::find_if(dw.begin(), dw.end(), std::bind2nd(RectIncludePoint(), le.GetMouseCursor()))))
+    if(0 <= index)
     {
-	const u32 dwelling = GetDwellingFromIndex(itr - dw.begin());
+	const u32 dwelling = GetDwellingFromIndex(index);
 	if(castle.isBuild(dwelling))
 	{
 	    const u16 recruit = Dialog::RecruitMonster(Monster(castle.GetRace(), castle.GetActualDwelling(dwelling)), castle.GetDwellingLivedCount(dwelling));

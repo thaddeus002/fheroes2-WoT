@@ -159,4 +159,6 @@ namespace Battle2
     };
 }
 
+Points GetLinePoints(const Point &, const Point &, u16);
+
 #endif

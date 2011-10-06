@@ -58,12 +58,12 @@ bool Battle2::Cell::isPositionIncludePoint(const Point & pt) const
     return pos & pt;
 }
 
-u16 Battle2::Cell::GetIndex(void) const
+const u16 & Battle2::Cell::GetIndex(void) const
 {
     return index;
 }
 
-u8 Battle2::Cell::GetDirection(void) const
+const u8 & Battle2::Cell::GetDirection(void) const
 {
     return direction;
 }

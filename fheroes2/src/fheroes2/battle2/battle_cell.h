@@ -42,8 +42,8 @@ namespace Battle2
 	bool isPassable(const Stats &, bool check_reflect) const;
 	bool isPassable(bool check = true) const;
 	bool isPositionIncludePoint(const Point &) const;
-	u16 GetIndex(void) const;
-	u8 GetDirection(void) const;
+	const u16 &  GetIndex(void) const;
+	const u8 &   GetDirection(void) const;
 	const Rect & GetPos(void) const;
 
 	void SetPassabilityAbroad(const Stats & b, std::vector<u16> &);

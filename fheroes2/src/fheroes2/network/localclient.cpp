@@ -41,7 +41,6 @@
 
 // game_scenarioinfo.cpp
 void RedrawScenarioStaticInfo(const Rect &);
-void UpdateCoordInfo(const Point &, std::vector<Rect> &);
 
 
 
@@ -368,7 +367,7 @@ bool FH2LocalClient::ScenarioInfoDialog(void)
     const Point pointClassInfo(rectPanel.x + 24, rectPanel.y + 282);
     const Rect  box(pointOpponentInfo, 360, 180);
 
-    std::vector<Rect>::const_iterator itr;
+    Rects::const_iterator itr;
 
     Interface::PlayersInfo playersInfo(true, false, false);
 

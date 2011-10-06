@@ -39,8 +39,6 @@
 #include "xmlccwrap.h"
 #endif
 
-void GetLinePoints(const Point & pt1, const Point & pt2, u16 step, std::vector<Point> & res);
-
 namespace Battle2
 {
     MonsterInfo monsters_info[] = {
@@ -514,114 +512,6 @@ bool Battle2::Stats::OutOfWalls(void) const
     	    (88 <= position && position <= 96));
 }
 
-u8 Battle2::Stats::GetObstaclesPenalty(const Stats & attacker) const
-{
-    if(!arena || Modes(CAP_TOWER) || attacker.Modes(CAP_TOWER)) return 0;
-
-    // check golden bow artifact
-    const HeroBase* enemy = arena->army1.GetCommander();
-    if(enemy && enemy->HasArtifact(Artifact::GOLDEN_BOW)) return 0;
-
-    u8 result = 0;
-
-    if(arena->castle)
-    {
-	// archery skill
-	if(enemy && Skill::Level::NONE != enemy->GetLevelSkill(Skill::Secondary::ARCHERY)) return 0;
-
-	if(attacker.troop.GetColor() == arena->army2.GetColor())
-	    return 0;
-
-	// check castle walls defensed
-	if(troop.GetColor() == arena->army2.GetColor())
-	{
-	    if(!attacker.OutOfWalls() || OutOfWalls())
-		return 0;
-
-	    const Rect & pos1 = attacker.GetCellPosition();
-	    const Rect & pos2 = GetCellPosition();
-	    std::vector<Point> points;
-
-	    GetLinePoints(pos1, pos2, pos1.w / 3, points);
-
-	    std::vector<Point>::const_iterator it1 = points.begin();
-	    std::vector<Point>::const_iterator it2 = points.end();
-	    for(; it1 != it2; ++it1)
-	    {
-		if(0 == arena->board[8].object && (arena->board[8].pos & *it1)) return 0;
-		else
-		if(0 == arena->board[29].object && (arena->board[29].pos & *it1)) return 0;
-		else
-		if(0 == arena->board[73].object && (arena->board[73].pos & *it1)) return 0;
-		else
-		if(0 == arena->board[96].object && (arena->board[96].pos & *it1)) return 0;
-	    }
-	}
-
-	result = 1;
-    }
-    else
-    if(Settings::Get().ExtBattleObjectsArchersPenalty())
-    {
-	std::vector<Point> points;
-	std::vector<u16> indexes;
-
-	Rect pos1 = attacker.GetCellPosition();
-	Rect pos2 = GetCellPosition();
-
-	pos1.y += pos1.h / 2;
-	pos2.y += pos2.h / 2;
-
-	GetLinePoints(pos1, pos2, pos1.w / 3, points);
-	arena->board.GetIndexesFromAbsPoints(indexes, points);
-
-	if(indexes.size())
-	{
-	    for(u16 ii = 0; ii < indexes.size(); ++ii)
-	    {
-		const u16 index = indexes[ii];
-
-		// obstacles
-		switch(arena->board[index].object)
-		{
-		    // tree
-		    case 0x82:
-		    // trock
-		    case 0x85:
-		    // tree
-		    case 0x89:
-		    // tree
-		    case 0x8D:
-		    // rock
-		    case 0x95:
-		    case 0x96:
-		    // stub
-		    case 0x9A:
-		    // dead tree
-		    case 0x9B:
-		    // tree
-		    case 0x9C: ++result; break;
-
-		    default: break;
-		}
-	    }
-	}
-
-	if(enemy)
-	{
-	    switch(enemy->GetLevelSkill(Skill::Secondary::ARCHERY))
-	    {
-		case Skill::Level::BASIC:	if(result < 2) return 0; break;
-		case Skill::Level::ADVANCED:	if(result < 3) return 0; break;
-		case Skill::Level::EXPERT:	return 0;
-		default: break;
-	    }
-	}
-    }
-
-    return result;
-}
-
 bool Battle2::Stats::isHandFighting(void) const
 {
     if(count && !Modes(CAP_TOWER))
@@ -776,7 +666,7 @@ u32 Battle2::Stats::CalculateDamageStats(const Stats & enemy, float dmg) const
 	    }
 
 	    // check castle defense
-	    if(enemy.GetObstaclesPenalty(*this)) dmg /= 2;
+	    if(arena->GetObstaclesPenalty(*this, enemy)) dmg /= 2;
 
 	    // check spell shield
 	    if(enemy.Modes(SP_SHIELD)) dmg /= Spell(Spell::SHIELD).ExtraValue();

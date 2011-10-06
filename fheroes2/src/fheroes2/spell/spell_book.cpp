@@ -42,8 +42,8 @@ struct SpellFiltered : std::binary_function<Spell, u8, bool>
     }
 };
 
-void SpellBookRedrawLists(const SpellStorage &, std::vector<Rect> &, const size_t, const Point &, u16, const u8 only, const HeroBase & hero);
-void SpellBookRedrawSpells(const SpellStorage &, std::vector<Rect> &, const size_t, s16, s16, const HeroBase & hero);
+void SpellBookRedrawLists(const SpellStorage &, Rects &, const size_t, const Point &, u16, const u8 only, const HeroBase & hero);
+void SpellBookRedrawSpells(const SpellStorage &, Rects &, const size_t, s16, s16, const HeroBase & hero);
 void SpellBookRedrawMP(const Point &, u16);
 
 bool SpellBookSortingSpell(const Spell & spell1, const Spell & spell2)
@@ -105,7 +105,7 @@ Spell SpellBook::Open(const HeroBase & hero, const u8 filt, bool canselect) cons
 
     Spell curspell(Spell::NONE);
 
-    std::vector<Rect> coords;
+    Rects coords;
     coords.reserve(small ? SPELL_PER_PAGE_SMALL * 2 : SPELL_PER_PAGE * 2);
 
     SpellBookRedrawLists(spells2, coords, current_index, pos, hero.GetSpellPoints(), filt, hero);
@@ -164,11 +164,11 @@ Spell SpellBook::Open(const HeroBase & hero, const u8 filt, bool canselect) cons
 	else
 	if(le.MouseClickLeft(pos))
 	{
-	    std::vector<Rect>::const_iterator it = std::find_if(coords.begin(), coords.end(),
-							std::bind2nd(RectIncludePoint(), le.GetMouseCursor()));
-	    if(it != coords.end())
+	    const s32 index = coords.GetIndex(le.GetMouseCursor());
+
+	    if(0 <= index)
 	    {
-		SpellStorage::const_iterator spell = spells2.begin() + (it - coords.begin() + current_index);
+		SpellStorage::const_iterator spell = spells2.begin() + (index + current_index);
 
 		if(spell < spells2.end())
 		{
@@ -203,10 +203,11 @@ Spell SpellBook::Open(const HeroBase & hero, const u8 filt, bool canselect) cons
 
 	if(le.MousePressRight(pos))
 	{
-	    std::vector<Rect>::const_iterator it = std::find_if(coords.begin(), coords.end(), std::bind2nd(RectIncludePoint(), le.GetMouseCursor()));
-	    if(it != coords.end())
+	    const s32 index = coords.GetIndex(le.GetMouseCursor());
+
+	    if(0 <= index)
 	    {
-		SpellStorage::const_iterator spell = spells2.begin() + (it - coords.begin() + current_index);
+		SpellStorage::const_iterator spell = spells2.begin() + (index + current_index);
 		if(spell < spells2.end())
 		{
 		    cursor.Hide();
@@ -262,7 +263,7 @@ void SpellBook::Edit(const HeroBase & hero)
     const Rect next_list(pos.x + 410, pos.y + 8, 30, 25);
     const Rect clos_rt(pos.x + 420, pos.y + 284, bookmark_clos.w(), bookmark_clos.h());
 
-    std::vector<Rect> coords;
+    Rects coords;
     coords.reserve(SPELL_PER_PAGE * 2);
 
     SpellBookRedrawLists(spells2, coords, current_index, pos, hero.GetSpellPoints(), SpellBook::ALL, hero);
@@ -293,10 +294,11 @@ void SpellBook::Edit(const HeroBase & hero)
 	else
 	if(le.MouseClickLeft(pos))
 	{
-	    std::vector<Rect>::const_iterator it = std::find_if(coords.begin(), coords.end(), std::bind2nd(RectIncludePoint(), le.GetMouseCursor()));
-	    if(it != coords.end())
+	    const s32 index = coords.GetIndex(le.GetMouseCursor());
+
+	    if(0 <= index)
 	    {
-		SpellStorage::const_iterator spell = spells2.begin() + (it - coords.begin() + current_index);
+		SpellStorage::const_iterator spell = spells2.begin() + (index + current_index);
 
 		if(spell < spells2.end())
 		{
@@ -315,10 +317,12 @@ void SpellBook::Edit(const HeroBase & hero)
 
 	if(le.MousePressRight(pos))
 	{
-	    std::vector<Rect>::const_iterator it = std::find_if(coords.begin(), coords.end(), std::bind2nd(RectIncludePoint(), le.GetMouseCursor()));
-	    if(it != coords.end())
+	    const s32 index = coords.GetIndex(le.GetMouseCursor());
+
+	    if(0 <= index)
 	    {
-		SpellStorage::const_iterator spell = spells2.begin() + (it - coords.begin() + current_index);
+		SpellStorage::const_iterator spell = spells2.begin() + (index + current_index);
+
 		if(spell < spells2.end())
 		{
 		    Dialog::SpellInfo(*spell, false);
@@ -393,7 +397,7 @@ void SpellBookRedrawMP(const Point & dst, u16 mp)
     }
 }
 
-void SpellBookRedrawLists(const SpellStorage & spells, std::vector<Rect> & coords, const size_t cur, const Point & pt, u16 sp, const u8 only, const HeroBase & hero)
+void SpellBookRedrawLists(const SpellStorage & spells, Rects & coords, const size_t cur, const Point & pt, u16 sp, const u8 only, const HeroBase & hero)
 {
     bool small = Settings::Get().QVGA();
 
@@ -425,7 +429,7 @@ void SpellBookRedrawLists(const SpellStorage & spells, std::vector<Rect> & coord
     SpellBookRedrawSpells(spells, coords, cur + (small ? SPELL_PER_PAGE_SMALL : SPELL_PER_PAGE), pt.x + (small ? 110 : 220), pt.y, hero);
 }
 
-void SpellBookRedrawSpells(const SpellStorage & spells, std::vector<Rect> & coords, const size_t cur, s16 px, s16 py, const HeroBase & hero)
+void SpellBookRedrawSpells(const SpellStorage & spells, Rects & coords, const size_t cur, s16 px, s16 py, const HeroBase & hero)
 {
     bool small = Settings::Get().QVGA();
 

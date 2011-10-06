@@ -45,8 +45,6 @@ void RedrawScenarioStaticInfo(const Rect &);
 void RedrawRatingInfo(TextSprite &);
 void RedrawDifficultyInfo(const Point & dst, bool label = true);
 
-void UpdateCoordInfo(const Point &, std::vector<Rect> &);
-
 Game::menu_t Game::SelectScenario(void)
 {
     if(Settings::Get().QVGA()) return PocketPC::SelectScenario();
@@ -82,9 +80,10 @@ Game::menu_t Game::ScenarioInfo(void)
     Button* buttonOk = NULL;
     Button* buttonCancel = NULL;
 
-    std::vector<Rect>::iterator itr;
+    Rects::iterator itr;
     // vector coord difficulty
-    std::vector<Rect> coordDifficulty(5);
+    Rects coordDifficulty;
+    coordDifficulty.reserve(5);
 
     const Sprite & ngextra = AGG::GetICN(ICN::NGEXTRA, 62);
     Dialog::FrameBorder* frameborder = NULL;
@@ -104,11 +103,11 @@ Game::menu_t Game::ScenarioInfo(void)
 	pointOpponentInfo = Point(rectPanel.x + 4, rectPanel.y + 94);
 	pointClassInfo = Point(rectPanel.x + 4, rectPanel.y + 148);
 
-	coordDifficulty[0] = Rect(rectPanel.x + 1, rectPanel.y + 21,   ngextra.w(), ngextra.h());
-	coordDifficulty[1] = Rect(rectPanel.x + 78, rectPanel.y + 21,  ngextra.w(), ngextra.h());
-	coordDifficulty[2] = Rect(rectPanel.x + 154, rectPanel.y + 21, ngextra.w(), ngextra.h());
-	coordDifficulty[3] = Rect(rectPanel.x + 231, rectPanel.y + 21, ngextra.w(), ngextra.h());
-        coordDifficulty[4] = Rect(rectPanel.x + 308, rectPanel.y + 21, ngextra.w(), ngextra.h());
+	coordDifficulty.push_back(Rect(rectPanel.x + 1, rectPanel.y + 21,   ngextra.w(), ngextra.h()));
+	coordDifficulty.push_back(Rect(rectPanel.x + 78, rectPanel.y + 21,  ngextra.w(), ngextra.h()));
+	coordDifficulty.push_back(Rect(rectPanel.x + 154, rectPanel.y + 21, ngextra.w(), ngextra.h()));
+	coordDifficulty.push_back(Rect(rectPanel.x + 231, rectPanel.y + 21, ngextra.w(), ngextra.h()));
+        coordDifficulty.push_back(Rect(rectPanel.x + 308, rectPanel.y + 21, ngextra.w(), ngextra.h()));
 
 	buttonOk = new Button(rectPanel.x + rectPanel.w / 2 - 160, rectPanel.y + rectPanel.h - 30, ICN::NGEXTRA, 66, 67);
 	buttonCancel = new Button(rectPanel.x + rectPanel.w / 2 + 60, rectPanel.y + rectPanel.h - 30, ICN::NGEXTRA, 68, 69);
@@ -131,11 +130,11 @@ Game::menu_t Game::ScenarioInfo(void)
 	pointOpponentInfo = Point(rectPanel.x + 24, rectPanel.y + 202);
 	pointClassInfo = Point(rectPanel.x + 24, rectPanel.y + 282);
 
-	coordDifficulty[0] = Rect(rectPanel.x + 21, rectPanel.y + 91,  ngextra.w(), ngextra.h());
-	coordDifficulty[1] = Rect(rectPanel.x + 98, rectPanel.y + 91,  ngextra.w(), ngextra.h());
-	coordDifficulty[2] = Rect(rectPanel.x + 174, rectPanel.y + 91, ngextra.w(), ngextra.h());
-	coordDifficulty[3] = Rect(rectPanel.x + 251, rectPanel.y + 91, ngextra.w(), ngextra.h());
-	coordDifficulty[4] = Rect(rectPanel.x + 328, rectPanel.y + 91, ngextra.w(), ngextra.h());
+	coordDifficulty.push_back(Rect(rectPanel.x + 21, rectPanel.y + 91,  ngextra.w(), ngextra.h()));
+	coordDifficulty.push_back(Rect(rectPanel.x + 98, rectPanel.y + 91,  ngextra.w(), ngextra.h()));
+	coordDifficulty.push_back(Rect(rectPanel.x + 174, rectPanel.y + 91, ngextra.w(), ngextra.h()));
+	coordDifficulty.push_back(Rect(rectPanel.x + 251, rectPanel.y + 91, ngextra.w(), ngextra.h()));
+	coordDifficulty.push_back(Rect(rectPanel.x + 328, rectPanel.y + 91, ngextra.w(), ngextra.h()));
 
 	buttonSelectMaps = new Button(rectPanel.x + 309, rectPanel.y + 45, ICN::NGEXTRA, 64, 65);
 	buttonOk = new Button(rectPanel.x + 31, rectPanel.y + 380, ICN::NGEXTRA, 66, 67);
@@ -315,7 +314,8 @@ u16 Game::GetStep4Player(u16 current, u16 width, u16 count)
     return current * width * KINGDOMMAX / count + (width * (KINGDOMMAX - count) / (2 * count));
 }
 
-void UpdateCoordInfo(const Point & dst, std::vector<Rect> & rects)
+/*
+void UpdateCoordInfo(const Point & dst, Rects & rects)
 {
     const Sprite &sprite = AGG::GetICN(ICN::NGEXTRA, 3);
     u8 current = 0;
@@ -328,6 +328,7 @@ void UpdateCoordInfo(const Point & dst, std::vector<Rect> & rects)
 	it = colors.begin(); it != colors.end(); ++it)
 	rects[Color::GetIndex(*it)] = Rect(dst.x + Game::GetStep4Player(current++, sprite.w(), colors.size()), dst.y, sprite.w(), sprite.h());
 }
+*/
 
 void RedrawScenarioStaticInfo(const Rect & rt)
 {
