@@ -16,7 +16,8 @@
 # WITH_TOOLS: build tools
 # WITH_AI: empty (default), simple (Non-commercial License)
 
-TARGET := fheroes2
+TARGET	:= fheroes2
+MAKE	:= make
 
 all:
 	$(MAKE) -C src
