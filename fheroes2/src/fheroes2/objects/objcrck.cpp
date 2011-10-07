@@ -50,8 +50,12 @@ bool ObjWasteLand::isPassable(u16 icn, u8 index, u16 direct)
 	    if(17 == index) return false;
 	    else
 	    // crater
-	    if((57 < index && index < 60) || (61 < index && index < 66) || (67 < index && index < 70) ||
-		(220 < index && index < 226) || (226 < index && index < 236)) return false;
+	    if((57 < index && index < 60) || (62 < index && index < 66) ||
+		(220 < index && index < 224) || (226 < index && index < 231)) return false;
+	    else
+	    if(62 == index || (66 < index && index < 70) || (223 < index && index < 227) ||
+		(230 < index && index < 233) || (232 < index && index < 236))
+		return Direction::UNKNOWN == direct || (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
 	    else
 	    // shrub
 	    if(70 < index && index < 73) return false;
@@ -60,18 +64,16 @@ bool ObjWasteLand::isPassable(u16 icn, u8 index, u16 direct)
 	    if(74 == index) return false;
 	    else
 	    // tar pit
-	    if(80 == index || 91 == index ||
-		102 == index || 113 == index || 124 == index ||
-		(134 < index && index < 138) || 148 == index || 159 == index ||
-		170 == index || 181 == index) return false;
+	    if(80 == index || 91 == index || 102 == index || 113 == index || 124 == index ||
+		(134 < index && index < 136)) return false;
+	    else
+	    if((135 < index && index < 137) || ( 148 == index) || ( 159 == index) || ( 170 == index) || (181 == index))
+                return Direction::UNKNOWN == direct || (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
 	    else
 	    // troll bridge
-	    if(181 < index && index < 188) return false;
+	    if((181 < index && index < 186) || index == 189) return false;
 	    else
-	    if(188 == index)
-                return Direction::UNKNOWN == direct || (direct & (Direction::RIGHT | DIRECTION_BOTTOM_ROW));
-	    else
-	    if(189 == index)
+	    if((185 < index) || (index < 189))
                 return Direction::UNKNOWN == direct || (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
 	    else
 	    // market
@@ -79,7 +81,7 @@ bool ObjWasteLand::isPassable(u16 icn, u8 index, u16 direct)
 	    else
 	    // watering hole
 	    if(216 < index && index < 221)
-                return Direction::UNKNOWN == direct || (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
+                return false;
 	    else
 	    // obelisk
 	    if(238 == index) return false;

@@ -41,11 +41,22 @@ bool ObjLava::isPassable(u16 icn, u8 index, u16 direct)
 
 	case ICN::OBJNLAVA:
 	    // crater
-	    if((1 < index && index < 10) || (11 < index && index < 18)) return false;
+	    if((1 < index && index < 6) || (11 < index && index < 16)) return false;
+	    else
+	    if((5 < index && index < 10) || (15 < index && index < 18))
+		return Direction::UNKNOWN == direct || (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
 	    else
 	    // lava pool
-	    if((17 < index && index < 21) || (26 < index && index < 45) || (45 < index && index < 49) ||
-		( 49 < index && index < 64) || (64 < index && index < 74)) return false;
+	    if(18 == index || (26 < index && index < 33) || (38 < index && index < 42) ||
+		(45 < index && index < 49) || ( 52 < index && index < 55) || (57 == index) || (59 < index && index < 62) ||
+		(63 < index && index < 66) || (68 < index && index < 71)) return false;
+	    else
+	    if(20 < index && index < 26) return true;
+	    else
+	    if((18 < index && index < 21) || (32 < index && index < 39) || (41 < index && index < 45) ||
+		(49 < index && index < 53) || (54 < index && index < 57) || (57 < index && index < 60) || (61 < index || index < 63) ||
+		(65 < index && index < 69) || (71 < index && index < 74))
+		return Direction::UNKNOWN == direct || (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
 	    else
 	    // volcano
 	    if((75 < index && index < 78) || 88 == index || 98 == index)

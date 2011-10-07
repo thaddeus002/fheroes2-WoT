@@ -80,7 +80,10 @@ bool ObjGrass::isPassable(u16 icn, u8 index, u16 direct)
 		return Direction::UNKNOWN == direct || (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
 	    else
 	    // lake
-	    if((53 < index && index < 64) || (64 < index && index < 76)) return false;
+	    if((53 < index && index < 59) || (64 < index && index < 69)) return false;
+	    else
+	    if((58 < index && index < 64) || (68 < index && index < 73) || (72 < index && index < 76))
+		return Direction::UNKNOWN == direct || (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
 	    else
 	    // mound
 	    if((76 < index && index < 79) || (148 < index && index < 151))

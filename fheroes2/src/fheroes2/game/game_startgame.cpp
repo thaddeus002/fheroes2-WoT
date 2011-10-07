@@ -1137,8 +1137,14 @@ void Game::MouseCursorAreaClickLeft(s32 index_maps)
 	    }
 	    break;
 
-        case Cursor::MOVE:
         case Cursor::FIGHT:
+	    if(NULL != (to_castle = world.GetCastle(index_maps)))
+		ShowPathOrStartMoveHero(from_hero, to_castle->GetIndex());
+	    else
+		ShowPathOrStartMoveHero(from_hero, index_maps);
+	    break;
+
+        case Cursor::MOVE:
         case Cursor::BOAT:
         case Cursor::ANCHOR:
         case Cursor::CHANGE:

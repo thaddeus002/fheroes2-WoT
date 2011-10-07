@@ -37,11 +37,14 @@ bool ObjDirt::isPassable(u16 icn, u8 index, u16 direct)
 		return Direction::UNKNOWN == direct || (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
 	    else
 	    // crater
-	    if(16 < index && index < 23) return false;
+	    if(16 < index && index < 23)
+		return Direction::UNKNOWN == direct || (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
 	    // lake
 	    else
-	    if((22 < index && index < 39) || (39 < index && index < 46) ||
-		(47 < index && index < 52) || (52 < index && index < 59)) return false;
+	    if((22 < index && index < 39) || (47 < index && index < 52)) return false;
+	    else
+	    if((39 < index && index < 46) || (52 < index && index < 57) || (56 < index && index < 59))
+		return Direction::UNKNOWN == direct || (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
 	    else
 	    // shrub
 	    if((59 < index && index < 62) || (62 < index && index < 65) || (65 < index && index < 68) ||

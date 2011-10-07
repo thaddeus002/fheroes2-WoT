@@ -63,12 +63,14 @@ bool ObjDesert::isPassable(u16 icn, u8 index, u16 direct)
 		return Direction::UNKNOWN == direct || (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
 	    else
 	    // city of dead
-	    if(88 < index && index < 94) return false;
+	    if((88 < index && index < 94) || index == 96) return false;
 	    else
 	    if(93 < index && index < 99)
 		return Direction::UNKNOWN == direct || (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
 	    else
 	    // excavation
+	    if(index == 101) return false;
+	    else
 	    if(98 < index && index < 102)
 		return Direction::UNKNOWN == direct || (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
 	    else

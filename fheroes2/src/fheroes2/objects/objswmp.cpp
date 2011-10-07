@@ -44,7 +44,10 @@ bool ObjSwamp::isPassable(u16 icn, u8 index, u16 direct)
 		return Direction::UNKNOWN == direct || (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
 	    else
 	    // lake
-	    if((87 < index && index < 92) || (93 < index && index < 99) || (100 < index && index < 106)) return false;
+	    if((87 < index && index < 92) || (93 < index && index < 99)) return false;
+	    else
+	    if(99 < index && index < 107)
+		return Direction::UNKNOWN == direct || (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
 	    else
 	    if((107 < index && index < 111) || (111 < index && index < 114)) return false;
 	    else
@@ -55,7 +58,9 @@ bool ObjSwamp::isPassable(u16 icn, u8 index, u16 direct)
 		return Direction::UNKNOWN == direct || (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
 	    else
 	    // swamp
-	    if((137 < index && index < 140) || (142 < index && index < 161))
+	    if((142 < index && index < 145)) return false;
+	    else
+	    if((137 < index && index < 140) || (144 < index && index < 161))
 		return Direction::UNKNOWN == direct || (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
 	    else
 	    // sign

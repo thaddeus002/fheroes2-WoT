@@ -53,7 +53,10 @@ bool ObjSnow::isPassable(u16 icn, u8 index, u16 direct)
 	    74 == index || 77 == index || 80 == index) return false;
 	    else
 	    // lake
-	    if((80 < index && index < 93) || (93 < index && index < 96)) return false;
+	    if((80 < index && index < 85)) return false;
+	    else
+	    if((84 < index && index < 90) || (89 < index && index < 93) || (93 < index && index < 96))
+		return Direction::UNKNOWN == direct || (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
 	    else
 	    //wind mill
 	    if(128 == index || 132 == index)

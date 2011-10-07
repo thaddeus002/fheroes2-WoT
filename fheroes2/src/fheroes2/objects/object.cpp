@@ -91,9 +91,9 @@ bool Object::AllowDirect(u8 general, u16 direct)
 	case MP2::OBJ_ALCHEMYTOWER:
         case MP2::OBJ_HUTMAGI:
         case MP2::OBJ_EYEMAGI:
-	case MP2::OBJ_WATERINGHOLE:
 	case MP2::OBJ_MERCENARYCAMP:
 	case MP2::OBJ_WINDMILL:
+	case MP2::OBJ_WATERINGHOLE:
 	case MP2::OBJ_TROLLBRIDGE:
 	case MP2::OBJ_TRADINGPOST:
 	case MP2::OBJ_EXCAVATION:
