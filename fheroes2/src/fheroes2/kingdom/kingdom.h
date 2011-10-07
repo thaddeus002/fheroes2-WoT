@@ -43,9 +43,9 @@ struct VecHeroes;
 struct AllCastles;
 struct VecCastles;
 
-struct LastLoseHero : std::pair<Heroes*, u16> /* Heroes, date */
+struct LastLoseHero : std::pair<Heroes::heroes_t, u16> /* Heroes, date */
 {
-    LastLoseHero() : std::pair<Heroes*, u16>(NULL, 0) {}
+    LastLoseHero() : std::pair<Heroes::heroes_t, u16>(Heroes::UNKNOWN, 0) {}
 };
 
 struct KingdomCastles : public VecCastles

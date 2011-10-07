@@ -652,19 +652,20 @@ Kingdom & Kingdoms::GetKingdom(u8 color)
 
 void Kingdom::SetLastLostHero(Heroes & hero)
 {
-    lost_hero.first = &hero;
+    lost_hero.first = hero.GetID();
     lost_hero.second = world.CountDay();
 }
 
 void Kingdom::ResetLastLostHero(void)
 {
-    lost_hero.first = NULL;
+    lost_hero.first = Heroes::UNKNOWN;
     lost_hero.second = 0;
 }
 
 Heroes* Kingdom::GetLastLostHero(void) const
 {
-    return lost_hero.first && world.CountDay() - lost_hero.second < DAYOFWEEK ? lost_hero.first : NULL;
+    return Heroes::UNKNOWN != lost_hero.first && world.CountDay() - lost_hero.second < DAYOFWEEK ?
+		world.GetHeroes(lost_hero.first) : NULL;
 }
 
 void Kingdoms::NewDay(void)

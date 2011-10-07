@@ -457,6 +457,9 @@ void Game::IO::PackKingdom(QueueMessage & msg, const Kingdom & kingdom)
     // recruits
     msg.Push(static_cast<u8>(kingdom.recruits.GetID1()));
     msg.Push(static_cast<u8>(kingdom.recruits.GetID2()));
+    // lost_hero
+    msg.Push(static_cast<u8>(kingdom.lost_hero.first));
+    msg.Push(kingdom.lost_hero.second);
 
     const Puzzle & pzl = kingdom.puzzle_maps;
 
@@ -1114,6 +1117,13 @@ void Game::IO::UnpackKingdom(QueueMessage & msg, Kingdom & kingdom, u16 check_ve
     // recruits
     msg.Pop(byte8); kingdom.recruits.SetID1(byte8);
     msg.Pop(byte8); kingdom.recruits.SetID2(byte8);
+
+    // lost_hero
+    if(check_version >= FORMAT_VERSION_2626)
+    {
+	msg.Pop(byte8); kingdom.lost_hero.first = static_cast<Heroes::heroes_t>(byte8);
+	msg.Pop(kingdom.lost_hero.second);
+    }
 
     std::string str;
 
