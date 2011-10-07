@@ -35,6 +35,10 @@ bool SkipLocalAlpha(u16 icn)
         case ICN::BUYBUILD:
         case ICN::BUYBUILE:
         case ICN::BOOK:
+        case ICN::CSPANBKE:
+        case ICN::CPANBKGE:
+        case ICN::CAMPBKGE:
+
             return true;
 
         default: break;
