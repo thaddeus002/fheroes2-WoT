@@ -221,7 +221,6 @@ public:
     u16  GetVisionsDistance(void) const;
 
     bool isShipMaster(void) const;
-    bool CanPassToShipMaster(const Heroes &) const;
     void SetShipMaster(bool f);
 
     void SaveUnderObject(MP2::object_t obj);

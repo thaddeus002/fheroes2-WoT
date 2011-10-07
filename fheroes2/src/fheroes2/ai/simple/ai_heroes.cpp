@@ -2243,24 +2243,6 @@ void AIHeroesAddedTask(Heroes & hero)
 	if(validobj &&
 	    hero.GetPath().Calculate((*it).first))
 	{
-	    s32 pos = 0;
-
-	    // path dangerous
-	    const MapsIndexes & v = Maps::TileUnderProtectionV(pos);
-	    if(v.size())
-	    {
-		bool skip = false;
-        	Army::army_t enemy;
-
-    		for(MapsIndexes::const_iterator
-		    it = v.begin(); it != v.end(); ++it)
-    		{
-        	    enemy.FromGuardian(world.GetTiles(*it));
-        	    if(enemy.isValid() && enemy.StrongerEnemyArmy(hero.GetArmy())) skip = true;
-    		}
-		if(skip) continue;
-	    }
-
 	    DEBUG(DBG_AI, DBG_INFO, Color::String(hero.GetColor()) <<
 		    ", hero: " << hero.GetName() << ", added tasks: " << 
 		    MP2::StringObject(ai_objects[(*it).first]) << ", index: " << (*it).first <<

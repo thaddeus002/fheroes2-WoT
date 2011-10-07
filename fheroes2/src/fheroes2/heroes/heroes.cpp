@@ -1166,31 +1166,6 @@ bool Heroes::isShipMaster(void) const
     return Modes(SHIPMASTER);
 }
 
-bool Heroes::CanPassToShipMaster(const Heroes & hero) const
-{
-    if(hero.isShipMaster())
-    {
-	Route::Path route(*this);
-
-	const s16 & cx = hero.GetCenter().x;
-	const s16 & cy = hero.GetCenter().y;
-	const bool full = false;
-	s32 coast = 0;
-
-	for(s8 y = -1; y <= 1; ++y)
-    	    for(s8 x = -1; x <= 1; ++x)
-	{
-            if((!y && !x) || (y && x && !full)) continue;
-
-            coast = Maps::GetIndexFromAbsPoint(cx + x, cy + y);
-
-            if(Maps::isValidAbsIndex(coast) &&
-                MP2::OBJ_COAST == world.GetTiles(coast).GetObject() && route.Calculate(coast)) return true;
-	}
-    }
-    return false;
-}
-
 void Heroes::SetShipMaster(bool f)
 {
     f ? SetModes(SHIPMASTER) : ResetModes(SHIPMASTER);
