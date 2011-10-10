@@ -95,18 +95,21 @@ void Puzzle::ShowMapsDialog(void) const
 
     if(! Settings::Get().MusicMIDI()) AGG::PlayMusic(MUS::PUZZLE);
 
-    const Surface & sf = world.GetPuzzleSurface();
+    const Surface & sf =  world.GetUltimateArtifact().GetPuzzleMapSurface();
 
-    cursor.Hide();
+    if(sf.isValid())
+    {
+	cursor.Hide();
 
-    AGG::PlayMusic(MUS::PUZZLE, false);
+	AGG::PlayMusic(MUS::PUZZLE, false);
 
-    if(display.w() == 640 && display.h() == 480 && !Settings::Get().HideInterface())
-	ShowStandardDialog(*this, sf);
-    else
-	ShowExtendedDialog(*this, sf);
+	if(display.w() == 640 && display.h() == 480 && !Settings::Get().HideInterface())
+	    ShowStandardDialog(*this, sf);
+	else
+	    ShowExtendedDialog(*this, sf);
 
-    cursor.SetThemes(old_cursor);
+	cursor.SetThemes(old_cursor);
+    }
 }
 
 bool ClosedTilesExists(const Puzzle & pzl, const u8* it1, const u8* it2)

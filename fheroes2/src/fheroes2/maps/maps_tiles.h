@@ -129,6 +129,7 @@ namespace Maps
 
 	bool isPassable(const Heroes*, Direction::vector_t, bool skipfog) const;
 	bool isRoad(u16 = DIRECTION_ALL) const;
+	bool isObject(MP2::object_t obj) const { return obj == mp2_object; };
 	bool isStream(void) const;
 	bool GoodForUltimateArtifact(void) const;
 

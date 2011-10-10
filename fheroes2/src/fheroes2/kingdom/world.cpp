@@ -39,7 +39,6 @@
 #include "algorithm.h"
 #include "game_over.h"
 #include "resource.h"
-#include "interface_gamearea.h"
 #include "game_focus.h"
 #include "world.h"
 #include "ai.h"
@@ -716,18 +715,6 @@ void World::LoadMaps(const std::string &filename)
 		}
 		break;
 
-    	    case MP2::OBJ_RNDULTIMATEARTIFACT:
-		// remove ultimate artifact sprite
-		if(NULL != (addon = tile.FindObject(MP2::OBJ_RNDULTIMATEARTIFACT)))
-		{
-		    Artifact artifact = Artifact::FromMP2IndexSprite(addon->index);
-		    tile.SetQuantity1(artifact());
-		    tile.Remove(addon->uniq);
-		    tile.SetObject(MP2::OBJ_ZERO);
-		    ultimate_index = ii;
-		}
-		break;
-
     	    case MP2::OBJ_RNDARTIFACT:
     	    case MP2::OBJ_RNDARTIFACT1:
     	    case MP2::OBJ_RNDARTIFACT2:
@@ -876,9 +863,14 @@ void World::LoadMaps(const std::string &filename)
 	}
     }
 
-    // generate position for ultimate
-    if(-1 == ultimate_index)
+    // set ultimate
+    MapsTiles::iterator it = std::find_if(vec_tiles.begin(), vec_tiles.end(),
+	    std::bind2nd(std::mem_fun_ref(&Maps::Tiles::isObject), MP2::OBJ_RNDULTIMATEARTIFACT));
+
+    // not found
+    if(vec_tiles.end() == it)
     {
+	// generate position for ultimate
 	std::vector<s32> pools;
 	pools.reserve(vec_tiles.size() / 2);
 
@@ -894,13 +886,21 @@ void World::LoadMaps(const std::string &filename)
 	if(pools.size())
 	{
 	    const s32 pos = *Rand::Get(pools);
-	    ultimate_index = pos;
-	    vec_tiles[pos].SetQuantity1(Artifact::Rand(Artifact::ART_ULTIMATE));
+	    ultimate_artifact.Set(pos, Artifact::Rand(Artifact::ART_ULTIMATE));
 	}
     }
+    else
+    {
+	const Maps::TilesAddon *addon = NULL;
 
-    if(Maps::isValidAbsIndex(ultimate_index))
-	Interface::GameArea::GenerateUltimateArtifactAreaSurface(ultimate_index, puzzle_surface);
+	// remove ultimate artifact sprite
+	if(NULL != (addon = (*it).FindObject(MP2::OBJ_RNDULTIMATEARTIFACT)))
+	{
+	    ultimate_artifact.Set((*it).GetIndex(), Artifact::FromMP2IndexSprite(addon->index));
+	    (*it).Remove(addon->uniq);
+	    (*it).SetObject(MP2::OBJ_ZERO);
+	}
+    }
 
     DEBUG(DBG_GAME, DBG_INFO, "end load");
 }
@@ -1095,8 +1095,7 @@ void World::Reset(void)
     map_sign.clear();
     map_captureobj.clear();
 
-    ultimate_index = -1;
-    Surface::FreeSurface(puzzle_surface);
+    ultimate_artifact.Reset();
 
     day = 0;
     week = 0;
@@ -1437,10 +1436,9 @@ void World::UpdateMonsterPopulation(void)
     }
 }
 
-Artifact World::GetUltimateArtifact(void) const
+const UltimateArtifact & World::GetUltimateArtifact(void) const
 {
-    return Maps::isValidAbsIndex(ultimate_index) ?
-	Artifact(vec_tiles[ultimate_index].GetQuantity1()) : Artifact(Artifact::UNKNOWN);
+    return ultimate_artifact;
 }
 
 bool World::DiggingForUltimateArtifact(const Point & center)
@@ -1463,9 +1461,9 @@ bool World::DiggingForUltimateArtifact(const Point & center)
     tile.AddonsPushLevel1(Maps::TilesAddon(0, GetUniq(), obj, idx));
 
     // reset
-    if(ultimate_index == tile.GetIndex())
+    if(ultimate_artifact.isPosition(tile.GetIndex()) && ! ultimate_artifact.isFound())
     {
-	ultimate_index = -1;
+	ultimate_artifact.SetFound(true);
 	return true;
     }
 
@@ -1759,9 +1757,4 @@ u16 World::CheckKingdomLoss(const Kingdom & kingdom) const
     }
 
     return GameOver::COND_NONE;
-}
-
-const Surface & World::GetPuzzleSurface(void) const
-{
-    return puzzle_surface;
 }

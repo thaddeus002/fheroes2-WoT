@@ -34,6 +34,7 @@
 #include "sprite.h"
 #include "castle_heroes.h"
 #include "gameevent.h"
+#include "artifact_ultimate.h"
 #include "game_io.h"
 
 class Heroes;
@@ -41,7 +42,6 @@ class Castle;
 class Kingdom;
 class Recruits;
 class Radar;
-class Artifact;
 
 typedef std::list<std::string> Rumors;
 typedef std::list<EventDate> EventsDate;
@@ -92,8 +92,7 @@ public:
     const Heroes* GetHeroesCondWins(void) const;
     const Heroes* GetHeroesCondLoss(void) const;
 
-    const Surface & GetPuzzleSurface(void) const;
-    Artifact GetUltimateArtifact(void) const;
+    const UltimateArtifact & GetUltimateArtifact(void) const;
     bool DiggingForUltimateArtifact(const Point & center);
     void ActionForMagellanMaps(u8 color);
 
@@ -178,7 +177,7 @@ private:
     // index, object, color
     CapturedObjects			map_captureobj;
 
-    s32 ultimate_index;
+    UltimateArtifact			ultimate_artifact;
 
     u16 & width;
     u16 & height;
@@ -192,8 +191,6 @@ private:
 
     Heroes::heroes_t heroes_cond_wins;
     Heroes::heroes_t heroes_cond_loss;
-
-    Surface puzzle_surface;
 
     static u32 uniq0;
 };

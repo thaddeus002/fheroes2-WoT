@@ -237,7 +237,6 @@ bool Game::IO::SaveBIN(QueueMessage & msg)
     msg.Push(static_cast<u16>(0xFF05));
     msg.Push(world.width);
     msg.Push(world.height);
-    msg.Push(world.ultimate_index);
     msg.Push(world.uniq0);
     msg.Push(world.week_current.first);
     msg.Push(world.week_current.second);
@@ -390,6 +389,12 @@ bool Game::IO::SaveBIN(QueueMessage & msg)
 	    msg.Push((*it).message);
 	}
     }
+
+    // ultimate
+    msg.Push(static_cast<u16>(0xFF10));
+    msg.Push(world.ultimate_artifact.id);
+    msg.Push(world.ultimate_artifact.isfound);
+    msg.Push(world.ultimate_artifact.index);
 
     msg.Push(static_cast<u16>(0xFFFF));
     return true;
@@ -819,7 +824,9 @@ bool Game::IO::LoadBIN(QueueMessage & msg)
     msg.Pop(world.width);
     msg.Pop(world.height);
 
-    msg.Pop(world.ultimate_index);
+    s32 ultimate_index = -1;
+    if(format < FORMAT_VERSION_2629)
+	msg.Pop(ultimate_index);
     msg.Pop(world.uniq0);
 
     msg.Pop(world.week_current.first);
@@ -1011,6 +1018,25 @@ bool Game::IO::LoadBIN(QueueMessage & msg)
 	world.vec_riddles.push_back(riddle);
     }
 
+    // ultimate
+    if(format >= FORMAT_VERSION_2629)
+    {
+	msg.Pop(byte16);
+	if(byte16 != 0xFF10) DEBUG(DBG_GAME, DBG_WARN, "0xFF10");
+	bool isfound;
+	msg.Pop(byte8);
+	msg.Pop(isfound);
+	msg.Pop(byte32);
+
+	world.ultimate_artifact.Set(byte32, Artifact(byte8));
+	world.ultimate_artifact.isfound = isfound;
+    }
+    else
+    if(0 <= ultimate_index)
+	world.ultimate_artifact.Set(ultimate_index, Artifact(world.GetTiles(ultimate_index).GetQuantity1()));
+    else
+	world.ultimate_artifact.Reset();
+
     msg.Pop(byte16);
 
     // add castles to kingdoms
@@ -1019,8 +1045,6 @@ bool Game::IO::LoadBIN(QueueMessage & msg)
     // add heroes to kingdoms
     world.vec_kingdoms.AddHeroes(world.vec_heroes);
 
-    // regenerate puzzle surface
-    Interface::GameArea::GenerateUltimateArtifactAreaSurface(world.ultimate_index, world.puzzle_surface);
 
     return byte16 == 0xFFFF;
 }

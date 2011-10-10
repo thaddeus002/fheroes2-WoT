@@ -22,7 +22,7 @@
 #ifndef H2ARTIFACT_H
 #define H2ARTIFACT_H
 
-#include<vector>
+#include <vector>
 #include "game_io.h"
 #include "gamedefs.h"
 

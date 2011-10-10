@@ -26,6 +26,8 @@
 #include "gamedefs.h"
 #include "cursor.h"
 
+class Sprite;
+
 enum scroll_t
 {
     SCROLL_NONE	  = 0x00,
