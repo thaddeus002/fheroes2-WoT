@@ -74,11 +74,6 @@ struct Rect : Point, Size
     static Rect Get(const Rect & rt1, const Rect & rt2, bool intersect);
 };
 
-struct RectIncludePoint : std::binary_function<Rect, Point, bool>
-{
-    bool operator() (const Rect & r, const Point & p) const { return r & p; };
-};
-
 struct Points : std::vector<Point>
 {
 };

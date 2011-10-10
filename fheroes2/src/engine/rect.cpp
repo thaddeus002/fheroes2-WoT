@@ -174,8 +174,8 @@ Rect Rects::GetRect(void) const
 
 s32 Rects::GetIndex(const Point & pt) const
 {
-    const_iterator it = std::find_if(begin(), end(),
-                                    std::bind2nd(RectIncludePoint(), pt));
-
-    return it != end() ? std::distance(begin(), it) : -1;
+    for(const_iterator
+	it = begin(); it != end(); ++it)
+	if(*it & pt) return std::distance(begin(), it);
+    return -1;
 }

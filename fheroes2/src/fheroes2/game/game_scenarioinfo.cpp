@@ -80,7 +80,6 @@ Game::menu_t Game::ScenarioInfo(void)
     Button* buttonOk = NULL;
     Button* buttonCancel = NULL;
 
-    Rects::iterator itr;
     // vector coord difficulty
     Rects coordDifficulty;
     coordDifficulty.reserve(5);
@@ -237,13 +236,14 @@ Game::menu_t Game::ScenarioInfo(void)
 	else
 	if(le.MouseClickLeft(rectPanel))
 	{
+	    const s32 index = coordDifficulty.GetIndex(le.GetMouseCursor());
+
 	    // select difficulty
-	    if(coordDifficulty.end() != (itr = std::find_if(coordDifficulty.begin(), coordDifficulty.end(),
-							     std::bind2nd(RectIncludePoint(), le.GetMouseCursor()))))
+	    if(0 <= index)
 	    {
 		cursor.Hide();
-		levelCursor.Move((*itr).x, (*itr).y);
-		conf.SetGameDifficulty(itr - coordDifficulty.begin());
+		levelCursor.Move(coordDifficulty[index]);
+		conf.SetGameDifficulty(index);
 		if(rating) RedrawRatingInfo(*rating);
 		cursor.Show();
 		display.Flip();
@@ -271,9 +271,7 @@ Game::menu_t Game::ScenarioInfo(void)
 	    if(buttonSelectMaps && le.MousePressRight(*buttonSelectMaps))
 		Dialog::Message(_("Scenario"), _("Click here to select which scenario to play."), Font::BIG);
 	    else
-	    // difficulty
-	    if(coordDifficulty.end() != (itr = std::find_if(coordDifficulty.begin(), coordDifficulty.end(),
-							    std::bind2nd(RectIncludePoint(), le.GetMouseCursor()))))
+	    if(0 <= coordDifficulty.GetIndex(le.GetMouseCursor()))
 		Dialog::Message(_("Game Difficulty"), _("This lets you change the starting difficulty at which you will play. Higher difficulty levels start you of with fewer resources, and at the higher settings, give extra resources to the computer."), Font::BIG);
 	    else
 	    if(rating && le.MousePressRight(rating->GetRect()))
