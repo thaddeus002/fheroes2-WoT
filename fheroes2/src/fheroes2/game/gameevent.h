@@ -35,6 +35,7 @@ struct EventDate
     EventDate(const void *ptr);
 
     bool isAllow(u8 color, u16 date) const;
+    bool isDeprecated(u16 date) const;
 
     Funds resource;
     bool computer;

@@ -29,7 +29,6 @@
 #include "skill.h"
 #include "text.h"
 #include "game.h"
-#include "resource.h"
 
 #define	SHADOWWIDTH	16
 #define BOXAREA_WIDTH   245
@@ -41,6 +40,7 @@ class Artifact;
 class Spell;
 class SpriteCursor;
 class Monster;
+class Funds;
 
 namespace Army
 {

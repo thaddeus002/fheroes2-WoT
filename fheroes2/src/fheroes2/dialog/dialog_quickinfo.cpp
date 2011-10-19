@@ -39,10 +39,10 @@
 std::string ShowGuardiansInfo(const Maps::Tiles & tile, u8 scoute)
 {
     std::string str;
-    const Army::Troop troop(tile);
+    const Army::Troop & troop = tile.QuantityTroop();
 
     if(MP2::OBJ_MINES == tile.GetObject())
-        str = Maps::GetMinesName(tile.GetMinesType());
+        str = Maps::GetMinesName(tile.QuantityResourceCount().first);
     else
 	str = MP2::StringObject(tile.GetObject());
 
@@ -61,7 +61,7 @@ std::string ShowGuardiansInfo(const Maps::Tiles & tile, u8 scoute)
 std::string ShowMonsterInfo(const Maps::Tiles & tile, u8 scoute)
 {
     std::string str;
-    const Army::Troop troop(tile);
+    const Army::Troop & troop = tile.QuantityTroop();
 
     if(scoute)
     {
@@ -82,7 +82,7 @@ std::string ShowArtifactInfo(const Maps::Tiles & tile, bool show)
     if(show)
     {
 	str.append("\n(");
-	str.append(Artifact(tile.GetQuantity1()).GetName());
+	str.append(tile.QuantityArtifact().GetName());
 	str.append(")");
     }
 
@@ -95,13 +95,15 @@ std::string ShowResourceInfo(const Maps::Tiles & tile, bool show, u8 scoute)
 
     if(show)
     {
+	const ResourceCount & rc = tile.QuantityResourceCount();
+
 	str.append("\n(");
-	str.append(Resource::String(tile.GetQuantity1()));
+	str.append(Resource::String(rc.first));
 
 	if(scoute)
 	{
 	    str.append(": ");
-	    str.append(Game::CountScoute(tile.GetQuantity2(), scoute));
+	    str.append(Game::CountScoute(rc.second, scoute));
 	}
 	str.append(")");
     }
@@ -116,10 +118,10 @@ std::string ShowDwellingInfo(const Maps::Tiles & tile, u8 scoute)
     if(scoute)
     {
 	str.append("\n");
-	if(tile.GetCountMonster())
+	if(tile.MonsterCount())
 	{
 	    str.append(_("(available: %{count})"));
-	    String::Replace(str, "%{count}", Game::CountScoute(tile.GetCountMonster(), scoute));
+	    String::Replace(str, "%{count}", Game::CountScoute(tile.MonsterCount(), scoute));
 	}
 	else
 	    str.append("(empty)");
@@ -143,7 +145,7 @@ std::string ShowShrineInfo(const Maps::Tiles & tile, const Heroes* hero, u8 scou
 
     if(show)
     {
-	const Spell spell(tile.GetQuantity1());
+	const Spell & spell = tile.QuantitySpell();
 	str.append("\n(");
 	str.append(spell.GetName());
 	str.append(")");
@@ -164,7 +166,7 @@ std::string ShowWitchHutInfo(const Maps::Tiles & tile, const Heroes* hero, bool 
 
     if(show)
     {
-	const Skill::Secondary skill(tile.GetQuantity1(), Skill::Level::BASIC);
+	const Skill::Secondary & skill = tile.QuantitySkill();
 	str.append("\n(");
 	str.append(Skill::Secondary::String(skill.Skill()));
 	str.append(")");
@@ -237,24 +239,16 @@ std::string ShowGlobalVisitInfo(const Maps::Tiles & tile, const Kingdom & kingdo
 
 std::string ShowBarrierTentInfo(const Maps::Tiles & tile, const Kingdom & kingdom)
 {
-    std::string str = BarrierColor::String(tile.GetQuantity1());
+    std::string str = BarrierColor::String(tile.QuantityColor());
     str.append(" ");
     str.append(MP2::StringObject(tile.GetObject()));
 
     if(MP2::OBJ_TRAVELLERTENT == tile.GetObject() &&
-	kingdom.IsVisitTravelersTent(tile.GetQuantity1()))
+	kingdom.IsVisitTravelersTent(tile.QuantityColor()))
     {
 	str.append("\n");
 	str.append(_("(already visited)"));
     }
-
-    return str;
-}
-
-std::string ShowTreasureChestInfo(const Maps::Tiles & tile)
-{
-    std::string str = tile.isWater() ? 
-		    _("Sea Chest") : MP2::StringObject(MP2::OBJ_TREASURECHEST);
 
     return str;
 }
@@ -368,7 +362,7 @@ void Dialog::QuickInfo(const Maps::Tiles & tile)
     else
     // check guardians mine
     if(MP2::OBJ_ABANDONEDMINE == tile.GetObject() ||
-	tile.CaptureObjectIsProtection(settings.CurrentColor()))
+	tile.CaptureObjectIsProtection())
     {
 	name_object = ShowGuardiansInfo(tile,
 		(settings.CurrentColor() == world.ColorCapturedObject(tile.GetIndex()) ? Skill::Level::EXPERT : scoute));
@@ -392,11 +386,15 @@ void Dialog::QuickInfo(const Maps::Tiles & tile)
 	case MP2::OBJ_PYRAMID:
 	case MP2::OBJ_WAGON:
 	case MP2::OBJ_SKELETON:
-	case MP2::OBJ_WINDMILL:
-	case MP2::OBJ_WATERWHEEL:
 	case MP2::OBJ_LEANTO:
 	case MP2::OBJ_MAGICGARDEN:
 	    name_object = ShowGlobalVisitInfo(tile, kingdom, show);
+	    break;
+
+	case MP2::OBJ_WINDMILL:
+	case MP2::OBJ_WATERWHEEL:
+	    name_object = Settings::Get().ExtWorldWindWaterMillsCaptured() ? 
+		    MP2::StringObject(tile.GetObject()) : ShowGlobalVisitInfo(tile, kingdom, show);
 	    break;
 
 	case MP2::OBJ_CAMPFIRE:
@@ -412,7 +410,7 @@ void Dialog::QuickInfo(const Maps::Tiles & tile)
 	    break;
 
 	case MP2::OBJ_MINES:
-	    name_object = Maps::GetMinesName(tile.GetMinesType());
+	    name_object = Maps::GetMinesName(tile.QuantityResourceCount().first);
 	    break;
 
         // join army
@@ -481,10 +479,6 @@ void Dialog::QuickInfo(const Maps::Tiles & tile)
         case MP2::OBJ_BARRIER:
         case MP2::OBJ_TRAVELLERTENT:
 	    name_object = ShowBarrierTentInfo(tile, kingdom);
-	    break;
-
-	case MP2::OBJ_TREASURECHEST:
-	    name_object = ShowTreasureChestInfo(tile);
 	    break;
 
         default: 

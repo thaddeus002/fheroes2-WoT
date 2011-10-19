@@ -30,7 +30,6 @@
 
 namespace Battle2 { class Stats; }
 namespace Skill { class Primary; }
-namespace Maps { class Tiles; }
 
 namespace Army
 {
@@ -49,7 +48,6 @@ namespace Army
         Troop();
         Troop(const Monster &, u32 c = 0);
         Troop(const Troop &);
-	Troop(const Maps::Tiles &);
 	~Troop();
 
 	bool	operator== (const Monster &) const;
@@ -72,7 +70,7 @@ namespace Army
 	u8		GetDefense(bool = true) const;
 	u32		GetHitPoints(void) const;
 
-	Color::color_t	GetColor(void) const;
+	u8		GetColor(void) const;
         u8		GetSpeed(void) const;
 
 	const Battle2::Stats*	GetBattleStats(void) const;

@@ -130,10 +130,10 @@ bool Heroes::ActionSpellCast(const Spell & spell)
 	case Spell::TOWNGATE:		apply = isShipMaster() ? false : ActionSpellTownGate(*this); break;
 	case Spell::TOWNPORTAL:		apply = isShipMaster() ? false : ActionSpellTownPortal(*this); break;
 	case Spell::VISIONS:		apply = ActionSpellVisions(*this); break;
-	case Spell::HAUNT:
-	case Spell::SETEGUARDIAN:
-	case Spell::SETAGUARDIAN:
-	case Spell::SETFGUARDIAN:
+	case Spell::HAUNT:		apply = ActionSpellSetGuardian(*this, spell, Monster::GHOST); break;
+	case Spell::SETEGUARDIAN:	apply = ActionSpellSetGuardian(*this, spell, Monster::EARTH_ELEMENT); break;
+	case Spell::SETAGUARDIAN:	apply = ActionSpellSetGuardian(*this, spell, Monster::AIR_ELEMENT); break;
+	case Spell::SETFGUARDIAN:	apply = ActionSpellSetGuardian(*this, spell, Monster::FIRE_ELEMENT); break;
 	case Spell::SETWGUARDIAN:	apply = ActionSpellSetGuardian(*this, spell, Monster::WATER_ELEMENT); break;
 	default: break;
     }
@@ -455,7 +455,7 @@ bool ActionSpellVisions(Heroes & hero)
 	    it = monsters.begin(); it != monsters.end(); ++it)
 	{
 	    const Maps::Tiles & tile = world.GetTiles(*it);
-	    const Army::Troop troop(tile);
+	    const Army::Troop & troop = tile.QuantityTroop();
 
     	    u32 join = troop.GetCount();
     	    Funds cost;
@@ -525,21 +525,20 @@ bool ActionSpellSetGuardian(Heroes & hero, const Spell & spell, u8 id)
 
     if(count)
     {
-	Maps::Tiles & tile = world.GetTiles(index);
+        Maps::Tiles & tile = world.GetTiles(index);
+	Maps::TilesAddon* addon = tile.FindObject(MP2::OBJ_MINES);
 
-	// clear old spell
-	if(spell != tile.GetQuantity3()) tile.ResetQuantity();
-
-	tile.SetQuantity3(id);
-	tile.SetQuantity4(spell());
-
-	//if(Settings::Get().OriginalVersion())
-	    tile.SetCountMonster(count);
-	//else
-	//    tile.SetCountMonster(count + tile.GetCountMonster());
+	if(addon)
+	    addon->tmp = spell();
 
 	if(spell == Spell::HAUNT)
-	    world.CaptureObject(index, Color::NONE);
+	{
+            world.CaptureObject(index, Color::UNUSED);
+	    hero.SaveUnderObject(MP2::OBJ_ABANDONEDMINE);
+	}
+
+	Army::Troop & troop = world.GetCapturedObject(index).GetTroop();
+	troop.Set(Monster(spell), count);
     }
 
     return false;

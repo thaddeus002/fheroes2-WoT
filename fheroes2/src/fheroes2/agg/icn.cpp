@@ -931,7 +931,7 @@ namespace ICN
     u8 missile7(float, float);
 }
 
-const char* ICN::GetString(const icn_t icn)
+const char* ICN::GetString(const icn_t & icn)
 {
     return icnmap[icn].string;
 }
@@ -950,7 +950,7 @@ void ICN::Header::Load(const u8* p)
     offset_data = ReadLE32(&p[9]);
 }
 
-u16 ICN::AnimationFrame(const icn_t icn, const u16 start, const u32 ticket, const u8 quantity)
+u16 ICN::AnimationFrame(const icn_t & icn, const u8 & start, const u32 & ticket, bool quantity)
 {
     switch(icn)
     {
@@ -1621,7 +1621,7 @@ ICN::icn_t ICN::PORTxxxx(u8 id)
     return ICN::UNKNOWN;
 }
 
-bool ICN::NeedMinify4PocketPC(icn_t icn, u16 index)
+bool ICN::NeedMinify4PocketPC(const icn_t & icn, const u16 & index)
 {
     if(Settings::Get().ExtBattleSoftWait() &&
 	icn == TEXTBAR && (index == 0 || index == 1)) return false;
@@ -1791,7 +1791,7 @@ bool ICN::NeedMinify4PocketPC(icn_t icn, u16 index)
     return false;
 }
 
-bool ICN::SkipBottomForRedrawHeroes(icn_t icn, u16 index)
+bool ICN::SkipBottomForRedrawHeroes(const icn_t & icn, const u8 & index)
 {
     switch(icn)
     {
@@ -1800,14 +1800,15 @@ bool ICN::SkipBottomForRedrawHeroes(icn_t icn, u16 index)
         case ICN::STREAM:
             return true;
 
-	case ICN::OBJNCRCK: return ObjWasteLand::isPassable(icn, index);
-	case ICN::OBJNDIRT: return ObjDirt::isPassable(icn, index);
-	case ICN::OBJNDSRT: return ObjDesert::isPassable(icn, index);
+	case ICN::OBJNCRCK: return ObjWasteLand::isPassable(icn, index, DIRECTION_TOP_ROW);
+	case ICN::OBJNDIRT: return ObjDirt::isPassable(icn, index, DIRECTION_TOP_ROW);
+	case ICN::OBJNDSRT: return ObjDesert::isPassable(icn, index, DIRECTION_TOP_ROW);
 	case ICN::OBJNGRA2:
-	case ICN::OBJNGRAS: return ObjGrass::isPassable(icn, index);
-	case ICN::OBJNLAVA: return ObjLava::isPassable(icn, index);
-	case ICN::OBJNSNOW: return ObjSnow::isPassable(icn, index);
-	case ICN::OBJNSWMP: return ObjSwamp::isPassable(icn, index);
+	case ICN::OBJNGRAS: return ObjGrass::isPassable(icn, index, DIRECTION_TOP_ROW);
+	case ICN::OBJNLAVA: return ObjLava::isPassable(icn, index, DIRECTION_TOP_ROW);
+	case ICN::OBJNSNOW: return ObjSnow::isPassable(icn, index, DIRECTION_TOP_ROW);
+	case ICN::OBJNSWMP: return ObjSwamp::isPassable(icn, index, DIRECTION_TOP_ROW);
+
         default: break;
     }
     return false;
@@ -1846,7 +1847,7 @@ u8 ICN::missile7(float dx, float dy)
     return dy > 0 ? 1 : 5;
 }
 
-u8 ICN::GetMissIndex(icn_t icn, s16 dx, s16 dy)
+u8 ICN::GetMissIndex(const icn_t & icn, const s16 & dx, const s16 & dy)
 {
     switch(icn)
     {
@@ -1867,7 +1868,7 @@ u8 ICN::GetMissIndex(icn_t icn, s16 dx, s16 dy)
     return 0;
 }
 
-bool ICN::isModifiedSprite(const ICN::icn_t icn)
+bool ICN::isModifiedSprite(const ICN::icn_t & icn)
 {
     switch(icn)
     {
@@ -1993,7 +1994,7 @@ ICN::icn_t ICN::FromString(const char* str)
     return ptr->type;
 }
 
-bool ICN::HighlyObjectSprite(ICN::icn_t icn, u16 index)
+bool ICN::HighlyObjectSprite(const ICN::icn_t & icn, const u8 & index)
 {
     switch(icn)
     {

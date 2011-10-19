@@ -300,12 +300,14 @@ bool Game::IO::SaveBIN(QueueMessage & msg)
     msg.Push(static_cast<u16>(0xFF0B));
     msg.Push(static_cast<u32>(world.map_captureobj.size()));
     {
-	for(std::map<s32, ObjectColor>::const_iterator
+	for(CapturedObjects::const_iterator
 	    it = world.map_captureobj.begin(); it != world.map_captureobj.end(); ++it)
 	{
 	    msg.Push((*it).first);
-	    msg.Push(static_cast<u8>((*it).second.first));
-	    msg.Push(static_cast<u8>((*it).second.second));
+	    msg.Push(static_cast<u8>((*it).second.objcol.first));
+	    msg.Push(static_cast<u8>((*it).second.objcol.second));
+	    msg.Push(static_cast<u8>((*it).second.guardians.GetID()));
+	    msg.Push(static_cast<u32>((*it).second.guardians.GetCount()));
 	}
     }
 
@@ -402,17 +404,11 @@ bool Game::IO::SaveBIN(QueueMessage & msg)
 
 void Game::IO::PackTile(QueueMessage & msg, const Maps::Tiles & tile)
 {
-    msg.Push(tile.tile_sprite_index);
-    msg.Push(tile.tile_sprite_shape);
+    msg.Push(tile.pack_sprite_index);
     msg.Push(tile.mp2_object);
     msg.Push(tile.quantity1);
     msg.Push(tile.quantity2);
-    msg.Push(tile.quantity3);
-    msg.Push(tile.quantity4);
-    msg.Push(tile.fogs);
-    msg.Push(tile.quantity5);
-    msg.Push(tile.quantity6);
-    msg.Push(tile.quantity7);
+    msg.Push(tile.fog_colors);
 
     // addons 1
     PackTileAddons(msg, tile.addons_level1);
@@ -430,6 +426,7 @@ void Game::IO::PackTileAddons(QueueMessage & msg, const Maps::Addons & addons)
 	msg.Push((*it).uniq);
 	msg.Push((*it).object);
 	msg.Push((*it).index);
+	msg.Push((*it).tmp);
     }
 }
 
@@ -911,13 +908,22 @@ bool Game::IO::LoadBIN(QueueMessage & msg)
     if(byte16 != 0xFF0B) DEBUG(DBG_GAME, DBG_WARN, "0xFF0B");
     msg.Pop(byte32);
     byte16 = byte32;
-    world.map_captureobj.clear();
+
+    if(format >= FORMAT_VERSION_2632)
+	world.map_captureobj.clear();
+
     for(u16 ii = 0; ii < byte16; ++ii)
     {
 	msg.Pop(byte32);
-	ObjectColor & value = world.map_captureobj[byte32];
-	msg.Pop(byte8); value.first = static_cast<MP2::object_t>(byte8);
-	msg.Pop(byte8); value.second = Color::Get(byte8);
+	CapturedObject & co = world.map_captureobj[byte32];
+	msg.Pop(co.objcol.first);
+	msg.Pop(co.objcol.second);
+	if(format >= FORMAT_VERSION_2632)
+	{
+	    msg.Pop(byte8);
+	    msg.Pop(byte32);
+	    co.guardians.Set(byte8, byte32);
+	}
     }
 
     // rumors
@@ -1049,22 +1055,42 @@ bool Game::IO::LoadBIN(QueueMessage & msg)
     return byte16 == 0xFFFF;
 }
 
+extern u16 PackTileSpriteIndex(u16, u16);
+
 void Game::IO::UnpackTile(QueueMessage & msg, Maps::Tiles & tile, u16 check_version)
 {
-    msg.Pop(tile.tile_sprite_index);
-    msg.Pop(tile.tile_sprite_shape);
+    u8 byte8;
+
+    msg.Pop(tile.pack_sprite_index);
+    if(check_version < FORMAT_VERSION_2632)
+    {
+	msg.Pop(byte8);	// shape
+	tile.pack_sprite_index = PackTileSpriteIndex(tile.pack_sprite_index, byte8);
+    }
+
     msg.Pop(tile.mp2_object);
     msg.Pop(tile.quantity1);
     msg.Pop(tile.quantity2);
-    msg.Pop(tile.quantity3);
-    msg.Pop(tile.quantity4);
-    msg.Pop(tile.fogs);
-    msg.Pop(tile.quantity5);
-    msg.Pop(tile.quantity6);
-    msg.Pop(tile.quantity7);
+
+    u8 quantity3, quantity4, quantity5, quantity6, quantity7;
+
+    if(check_version < FORMAT_VERSION_2632)
+    {
+	msg.Pop(quantity3);
+	msg.Pop(quantity4);
+    }
+
+    msg.Pop(tile.fog_colors);
+
+    if(check_version < FORMAT_VERSION_2632)
+    {
+	msg.Pop(quantity5);
+	msg.Pop(quantity6);
+	msg.Pop(quantity7);
+    }
 
 #ifdef WITH_DEBUG
-    if(IS_DEVEL()) tile.fogs &= ~Players::HumanColors();
+    if(IS_DEVEL()) tile.fog_colors &= ~Players::HumanColors();
 #endif
 
     // addons 1
@@ -1073,6 +1099,8 @@ void Game::IO::UnpackTile(QueueMessage & msg, Maps::Tiles & tile, u16 check_vers
     UnpackTileAddons(msg, tile.addons_level2, check_version);
 
     tile.FixObject();
+
+    tile.FixLoadOldVersion(check_version, quantity3, quantity4, quantity5, quantity6, quantity7);
 }
 
 void Game::IO::UnpackTileAddons(QueueMessage & msg, Maps::Addons & addons, u16 check_version)
@@ -1087,6 +1115,7 @@ void Game::IO::UnpackTileAddons(QueueMessage & msg, Maps::Addons & addons, u16 c
 	msg.Pop(addon.uniq);
 	msg.Pop(addon.object);
 	msg.Pop(addon.index);
+	msg.Pop(addon.tmp);
 	addons.push_back(addon);
     }
 }

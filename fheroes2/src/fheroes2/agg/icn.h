@@ -938,18 +938,17 @@ namespace ICN
 	u32 offset_data;
     };
 
-    const char* GetString(const icn_t icn);
+    const char* GetString(const icn_t &);
     icn_t FromString(const char*);
-    u16 AnimationFrame(const icn_t icn, const u16 start, const u32 ticket = 0, const u8 quantity = 0);
-    bool isModifiedSprite(const icn_t icn);
-    bool NeedMinify4PocketPC(icn_t, u16);
-    bool SkipBottomForRedrawHeroes(icn_t, u16);
+    u16 AnimationFrame(const icn_t &, const u8 &, const u32 &, bool = false);
+    bool isModifiedSprite(const icn_t &);
+    bool NeedMinify4PocketPC(const icn_t & , const u16 &);
+    bool SkipBottomForRedrawHeroes(const icn_t &, const u8 &);
+    bool HighlyObjectSprite(const icn_t &, const u8 &);
     icn_t PORTxxxx(u8);
-    u8   GetMissIndex(icn_t, s16, s16);
+    u8   GetMissIndex(const icn_t &, const s16 &, const s16 &);
 
     bool isBattleMonsterICN(u16);
-    bool HighlyObjectSprite(icn_t, u16);
-
     bool SkipRegistryFree(icn_t);
 
     icn_t Get4Captain(u8 race);

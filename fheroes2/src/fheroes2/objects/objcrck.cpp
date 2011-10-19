@@ -23,79 +23,84 @@
 #include "icn.h"
 #include "objcrck.h"
 
-bool ObjWasteLand::isPassable(u16 icn, u8 index, u16 direct)
+bool ObjWasteLand::isPassable(const u16 & icn, const u8 & index, u16 direct)
+{
+    return direct & GetPassable(icn, index);
+}
+
+u16 ObjWasteLand::GetPassable(const u16 & icn, const u8 & index)
 {
     switch(icn)
     {
 	case ICN::OBJNCRCK:
 	    // artesian spring
 	    if(2 < index && index < 5)
-		return false;
+		return 0;
 	    else
 	    if(5 == index || 6 == index)
-		return Direction::UNKNOWN == direct || (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
+		return DIRECTION_CENTER_ROW | DIRECTION_BOTTOM_ROW;
 	    else
 	    // rock
 	    if((9 < index && index < 12) || 18 == index || (20 < index && index < 23) ||
 		(23 < index && index < 26) || (28 < index && index < 33) || (33 < index && index < 36) ||
 		(36 < index && index < 39) || (39 < index && index < 44) || 46 == index ||
 		49 == index || 52 == index || 55 == index)
-		return Direction::UNKNOWN == direct || (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
+		return DIRECTION_CENTER_ROW | DIRECTION_BOTTOM_ROW;
 	    else
 	    // cactus
 	    if(14 == index || 16 == index)
-		return Direction::UNKNOWN == direct || (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
+		return DIRECTION_CENTER_ROW | DIRECTION_BOTTOM_ROW;
 	    else
 	    // skull
-	    if(17 == index) return false;
+	    if(17 == index) return 0;
 	    else
 	    // crater
 	    if((57 < index && index < 60) || (62 < index && index < 66) ||
-		(220 < index && index < 224) || (226 < index && index < 231)) return false;
+		(220 < index && index < 224) || (226 < index && index < 231)) return 0;
 	    else
 	    if(62 == index || (66 < index && index < 70) || (223 < index && index < 227) ||
 		(230 < index && index < 233) || (232 < index && index < 236))
-		return Direction::UNKNOWN == direct || (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
+		return DIRECTION_CENTER_ROW | DIRECTION_BOTTOM_ROW;
 	    else
 	    // shrub
-	    if(70 < index && index < 73) return false;
+	    if(70 < index && index < 73) return 0;
 	    else
 	    // wagon
-	    if(74 == index) return false;
+	    if(74 == index) return 0;
 	    else
 	    // tar pit
 	    if(80 == index || 91 == index || 102 == index || 113 == index || 124 == index ||
-		(134 < index && index < 136)) return false;
+		(134 < index && index < 136)) return 0;
 	    else
 	    if((135 < index && index < 137) || ( 148 == index) || ( 159 == index) || ( 170 == index) || (181 == index))
-                return Direction::UNKNOWN == direct || (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
+		return DIRECTION_CENTER_ROW | DIRECTION_BOTTOM_ROW;
 	    else
 	    // troll bridge
-	    if((181 < index && index < 186) || index == 189) return false;
+	    if((181 < index && index < 186) || index == 189) return 0;
 	    else
-	    if((185 < index) || (index < 189))
-                return Direction::UNKNOWN == direct || (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
+	    if(185 < index && index < 189)
+		return DIRECTION_CENTER_ROW | DIRECTION_BOTTOM_ROW;
 	    else
 	    // market
-	    if(202 == index || 213 == index) return false;
+	    if(202 == index || 213 == index) return 0;
 	    else
 	    // watering hole
 	    if(216 < index && index < 221)
-                return false;
+                return 0;
 	    else
 	    // obelisk
-	    if(238 == index) return false;
+	    if(238 == index) return 0;
 	    else
 	    // saw mill
-	    if(240 < index && index < 243) return false;
+	    if(240 < index && index < 243) return 0;
 	    else
 	    if(242 < index && index < 247)
-                return Direction::UNKNOWN == direct || (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
-
-	    else return true;
+		return DIRECTION_CENTER_ROW | DIRECTION_BOTTOM_ROW;
+	    else
+		return DIRECTION_ALL;
 
 	default: break;
     }
 
-    return false;
+    return 0;
 }

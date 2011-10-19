@@ -29,7 +29,6 @@
 #include "luck.h"
 #include "morale.h"
 #include "army.h"
-#include "maps_tiles.h"
 #include "army_troop.h"
 #include "battle_stats.h"
 
@@ -42,11 +41,6 @@ Army::Troop::Troop(const Monster & m, u32 c) : Monster(m), count(c), army(NULL),
 }
 
 Army::Troop::Troop(const Troop & t) : Monster(t.id), count(t.count), army(t.army), battle(NULL)
-{
-}
-
-Army::Troop::Troop(const Maps::Tiles & t) : Monster(t.GetQuantity3()), count(t.GetCountMonster()),
-					    army(NULL), battle(NULL)
 {
 }
 
@@ -177,7 +171,7 @@ u8 Army::Troop::GetDefense(bool hero) const
             (army && hero && army->GetCommander() ? army->GetCommander()->GetDefense() : 0);
 }
 
-Color::color_t Army::Troop::GetColor(void) const
+u8 Army::Troop::GetColor(void) const
 {
     return army ? army->GetColor() : Color::NONE;
 }

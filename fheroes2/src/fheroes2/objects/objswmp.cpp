@@ -23,71 +23,77 @@
 #include "icn.h"
 #include "objswmp.h"
 
-bool ObjSwamp::isPassable(u16 icn, u8 index, u16 direct)
+bool ObjSwamp::isPassable(const u16 & icn, const u8 & index, u16 direct)
+{
+    return direct & GetPassable(icn, index);
+}
+
+u16 ObjSwamp::GetPassable(const u16 & icn, const u8 & index)
 {
     switch(icn)
     {
 	case ICN::OBJNSWMP:
 	    // witch hut
-	    if(22 == index) return false;
+	    if(22 == index) return 0;
 	    else
 	    // shrub
 	    if((31 < index && index < 34))
-		return Direction::UNKNOWN == direct || (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
+		return DIRECTION_CENTER_ROW | DIRECTION_BOTTOM_ROW;
 	    else
 	    // xanadu
 	    if(67 == index || 74 == index || (80 < index && index < 83))
-		return Direction::UNKNOWN == direct || (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
+		return DIRECTION_CENTER_ROW | DIRECTION_BOTTOM_ROW;
 	    else
 	    // faerie ring
 	    if((83 < index && index < 86))
-		return Direction::UNKNOWN == direct || (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
+		return DIRECTION_CENTER_ROW | DIRECTION_BOTTOM_ROW;
 	    else
 	    // lake
-	    if((87 < index && index < 92) || (93 < index && index < 99)) return false;
+	    if((87 < index && index < 92) || (93 < index && index < 99)) return 0;
 	    else
 	    if(99 < index && index < 107)
-		return Direction::UNKNOWN == direct || (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
+		return DIRECTION_CENTER_ROW | DIRECTION_BOTTOM_ROW;
 	    else
-	    if((107 < index && index < 111) || (111 < index && index < 114)) return false;
+	    if((107 < index && index < 111) || (111 < index && index < 114)) return 0;
 	    else
-	    if((114 < index && index < 117) || (117 < index && index < 120) || (121 < index && index < 124)) return false;
+	    if((114 < index && index < 117) || (117 < index && index < 120) || (121 < index && index < 124)) return 0;
 	    else
 	    // mandrake
 	    if(126 == index || (127 < index && index < 130) || 131 == index || (132 < index && index < 136) || 137 == index)
-		return Direction::UNKNOWN == direct || (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
+		return DIRECTION_CENTER_ROW | DIRECTION_BOTTOM_ROW;
 	    else
 	    // swamp
-	    if((142 < index && index < 145)) return false;
+	    if((142 < index && index < 145)) return 0;
 	    else
 	    if((137 < index && index < 140) || (144 < index && index < 161))
-		return Direction::UNKNOWN == direct || (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
+		return DIRECTION_CENTER_ROW | DIRECTION_BOTTOM_ROW;
 	    else
 	    // sign
-	    if(140 == index) return false;
+	    if(140 == index) return 0;
 	    else
 	    // trees
 	    if((165 < index && index < 168) || (170 < index && index < 173) || (175 < index && index < 178))
-		return Direction::UNKNOWN == direct || (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
+		return DIRECTION_CENTER_ROW | DIRECTION_BOTTOM_ROW;
 	    else
 	    // swamp
 	    if((178 < index && index < 193) || (211 < index && index < 214))
-		return Direction::UNKNOWN == direct || (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
+		return DIRECTION_CENTER_ROW | DIRECTION_BOTTOM_ROW;
 	    else
 	    // shrub
 	    if((192 < index && index < 195) || 196 == index || (197 < index && index < 202))
-		return Direction::UNKNOWN == direct || (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
+		return DIRECTION_CENTER_ROW | DIRECTION_BOTTOM_ROW;
 	    else
 	    // rock
 	    if(203 == index || 205 == index || (207 < index && index < 210))
-		return Direction::UNKNOWN == direct || (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
+		return DIRECTION_CENTER_ROW | DIRECTION_BOTTOM_ROW;
 	    else
 	    // obelisk
-	    if(216 == index) return false;
-	    else return true;
+	    if(216 == index) return 0;
+	    else
+		return DIRECTION_ALL;
 
 	default: break;
     }
 
-    return false;
+    return 0;
 }

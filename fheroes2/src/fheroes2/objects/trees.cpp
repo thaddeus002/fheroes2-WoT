@@ -38,7 +38,12 @@ Trees::Trees(ICN::icn_t icn) : Object(MP2::OBJ_TREES, icn)
     }
 }
 
-bool Trees::isPassable(u16 icn, u8 index, u16 direct)
+bool Trees::isPassable(const u16 & icn, const u8 & index, u16 direct)
+{
+    return direct & GetPassable(icn, index);
+}
+
+u16 Trees::GetPassable(const u16 & icn, const u8 & index)
 {
     switch(icn)
     {
@@ -49,33 +54,33 @@ bool Trees::isPassable(u16 icn, u8 index, u16 direct)
         case ICN::TREFIR:
         case ICN::TREJNGL:
         case ICN::TRESNOW:
-    	    if(5 == index) return false;	// LARGE LEFT
+    	    if(5 == index) return 0;	// LARGE LEFT
     	    else
 	    if(4 == index || (7 < index && index < 10))
-		return Direction::UNKNOWN == direct || (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
+		return DIRECTION_CENTER_ROW | DIRECTION_BOTTOM_ROW;
     	    else
-    	    if(15 == index) return false;	// LARGE RIGHT
+    	    if(15 == index) return 0;	// LARGE RIGHT
 	    else
     	    if(16 == index || (17 < index && index < 20))
-		return Direction::UNKNOWN == direct || (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
+		return DIRECTION_CENTER_ROW | DIRECTION_BOTTOM_ROW;
     	    else
-    	    if(22 == index) return false;	// MEDIUM LEFT
+    	    if(22 == index) return 0;	// MEDIUM LEFT
     	    else
 	    if(21 == index || (23 < index && index < 26))
-		return Direction::UNKNOWN == direct || (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
+		return DIRECTION_CENTER_ROW | DIRECTION_BOTTOM_ROW;
     	    else
-    	    if(27 == index) return false;	// MEDIUM RIGHT
+    	    if(27 == index) return 0;	// MEDIUM RIGHT
 	    else
     	    if(28 == index || (29 < index && index < 32))
-		return Direction::UNKNOWN == direct || (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
+		return DIRECTION_CENTER_ROW | DIRECTION_BOTTOM_ROW;
     	    else
     	    if(33 == index || 35 == index)	// SMALL
-		return Direction::UNKNOWN == direct || (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
+		return DIRECTION_CENTER_ROW | DIRECTION_BOTTOM_ROW;
     	    else
-		return true;
+		return DIRECTION_ALL;
 
         default: break;;
     }
 
-    return false;
+    return 0;
 }

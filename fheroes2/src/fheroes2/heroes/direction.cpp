@@ -20,28 +20,37 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
+#include <sstream>
 #include "maps.h"
 #include "direction.h"
 
-const char* Direction::String(u16 direct)
+std::string Direction::String(u16 direct)
 {
-   const char* str_direct[] = { "center", "top", "top right", "right", "bottom right", "bottom", "bottom left", "left", "top left", "unknown" };
-   
-   switch(direct)
-   {
-	case CENTER:		return str_direct[0];
-	case TOP:		return str_direct[1];
-	case TOP_RIGHT:		return str_direct[2];
-	case RIGHT:		return str_direct[3];
-	case BOTTOM_RIGHT:	return str_direct[4];
-	case BOTTOM:		return str_direct[5];
-	case BOTTOM_LEFT:	return str_direct[6];
-	case LEFT:		return str_direct[7];
-	case TOP_LEFT:		return str_direct[8];
-	default:	break;
-   }
- 
-    return str_direct[9];
+    const char* str_direct[] = { "unknown", "center", "top", "top right", "right", "bottom right", "bottom", "bottom left", "left", "top left" };
+    std::ostringstream os;
+
+    if(direct & CENTER)
+	os << str_direct[1] << ",";
+    if(direct & TOP)
+	os << str_direct[2] << ",";
+    if(direct & TOP_RIGHT)
+	os << str_direct[3] << ",";
+    if(direct & RIGHT)
+	os << str_direct[4] << ",";
+    if(direct & BOTTOM_RIGHT)
+	os << str_direct[5] << ",";
+    if(direct & BOTTOM)
+	os << str_direct[6] << ",";
+    if(direct & BOTTOM_LEFT)
+	os << str_direct[7] << ",";
+    if(direct & LEFT)
+	os << str_direct[8] << ",";
+    if(direct & TOP_LEFT)
+	os << str_direct[9] << ",";
+
+    const std::string & res = os.str();
+
+    return res.empty() ? str_direct[0] : res;
 }
 
 

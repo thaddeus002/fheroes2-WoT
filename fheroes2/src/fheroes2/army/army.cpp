@@ -117,23 +117,22 @@ std::string Army::SizeString(u32 size)
 
 Army::army_t::army_t(HeroBase* s) : troops(ARMYMAXTROOPS), commander(s), combat_format(FORMAT_SPREAD), color(Color::NONE)
 {
-    for(Troops::iterator
-	it = troops.begin(); it != troops.end(); ++it)
-	(*it).SetArmy(this);
+    std::for_each(troops.begin(), troops.end(),
+	std::bind2nd(std::mem_fun_ref(&Army::Troop::SetArmy), this));
 }
 
 Army::army_t::army_t(const army_t & a) : troops(ARMYMAXTROOPS), commander(NULL), combat_format(FORMAT_SPREAD), color(Color::NONE)
 {
-    for(Troops::iterator
-	it = troops.begin(); it != troops.end(); ++it)
-	(*it).SetArmy(this);
+    std::for_each(troops.begin(), troops.end(),
+	std::bind2nd(std::mem_fun_ref(&Army::Troop::SetArmy), this));
 
     Import(a.troops);
 }
 
-void Army::army_t::FromGuardian(const Maps::Tiles & t)
+Army::army_t::army_t(const Maps::Tiles & t) : troops(ARMYMAXTROOPS), commander(NULL), combat_format(FORMAT_SPREAD), color(Color::NONE)
 {
-    Reset();
+    std::for_each(troops.begin(), troops.end(),
+	std::bind2nd(std::mem_fun_ref(&Army::Troop::SetArmy), this));
 
     if(MP2::isCaptureObject(t.GetObject()))
 	color = world.ColorCapturedObject(t.GetIndex());
@@ -146,43 +145,33 @@ void Army::army_t::FromGuardian(const Maps::Tiles & t)
             troops[2].Set(Monster::ROYAL_MUMMY, 10);
             troops[3].Set(Monster::VAMPIRE_LORD, 10);
             troops[4].Set(Monster::ROYAL_MUMMY, 10);
-	    break;
+    	    break;
 
 	case MP2::OBJ_GRAVEYARD:
-	    troops[0].Set(Monster::MUTANT_ZOMBIE, 100);
-	    ArrangeForBattle();
-	    break;
-
-	case MP2::OBJ_SHIPWRECK:
-	    troops[0].Set(Monster::GHOST, t.GetQuantity2());
-	    ArrangeForBattle();
-	    break;
+           troops[0].Set(Monster::MUTANT_ZOMBIE, 100);
+           ArrangeForBattle();
+           break;
 
 	case MP2::OBJ_DERELICTSHIP:
-	    troops[0].Set(Monster::SKELETON, 200);
-	    ArrangeForBattle();
-	    break;
+           troops[0].Set(Monster::SKELETON, 200);
+           ArrangeForBattle();
+           break;
 
 	case MP2::OBJ_ARTIFACT:
-	    switch(t.GetQuantity2())
-	    {
-		case 6:	troops[0].Set(Monster::ROGUE, 50); break;	
-		case 7:	troops[0].Set(Monster::GENIE, 1); break;	
-		case 8:	troops[0].Set(Monster::PALADIN, 1); break;	
-		case 9:	troops[0].Set(Monster::CYCLOPS, 1); break;	
-		case 10:troops[0].Set(Monster::PHOENIX, 1); break;	
-		case 11:troops[0].Set(Monster::GREEN_DRAGON, 1); break;	
-		case 12:troops[0].Set(Monster::TITAN, 1); break;	
-		case 13:troops[0].Set(Monster::BONE_DRAGON, 1); break;
-		default: break;	
-	    }
-	    ArrangeForBattle();
-	    break;
-
-	//case MP2::OBJ_ABANDONEDMINE:
-	//    troops[0] = Troop(t);
-	//    ArrangeForBattle();
-	//    break;
+           switch(t.QuantityVariant())
+           {
+               case 6: troops[0].Set(Monster::ROGUE, 50); break;
+               case 7: troops[0].Set(Monster::GENIE, 1); break;
+               case 8: troops[0].Set((Rand::Get(1) ? Monster::PALADIN : Monster::CRUSADER), 1); break;
+               case 9: troops[0].Set(Monster::CYCLOPS, 1); break;
+               case 10:troops[0].Set(Monster::PHOENIX, 1); break;
+               case 11:troops[0].Set((Rand::Get(1) ? Monster::GREEN_DRAGON : (Rand::Get(1) ? Monster::RED_DRAGON : Monster::BLACK_DRAGON)), 1); break;
+               case 12:troops[0].Set((Rand::Get(1) ? Monster::GIANT : Monster::TITAN), 1); break;
+               case 13:troops[0].Set(Monster::BONE_DRAGON, 1); break;
+               default: break;
+           }
+           ArrangeForBattle();
+           break;
 
 	case MP2::OBJ_CITYDEAD:
             troops[0].Set(Monster::ZOMBIE, 20);
@@ -190,6 +179,17 @@ void Army::army_t::FromGuardian(const Maps::Tiles & t)
             troops[2].Set(Monster::POWER_LICH, 5);
             troops[3].Set(Monster::VAMPIRE_LORD, 5);
             troops[4].Set(Monster::ZOMBIE, 20);
+	    break;
+
+	case MP2::OBJ_SHIPWRECK:
+	    switch(t.QuantityVariant())
+	    {
+		case 1:  troops[0].Set(Monster::GHOST, 10); break;
+		case 2:  troops[0].Set(Monster::GHOST, 15); break;
+		case 3:  troops[0].Set(Monster::GHOST, 25); break;
+		default: troops[0].Set(Monster::GHOST, 50); break;
+	    }
+	    ArrangeForBattle();
 	    break;
 
 	case MP2::OBJ_TROLLBRIDGE:
@@ -214,7 +214,7 @@ void Army::army_t::FromGuardian(const Maps::Tiles & t)
 	    break;
 
 	default:
-	    troops[0] = Troop(t);
+	    troops[0] = t.QuantityTroop();
 	    ArrangeForBattle();
 	    break;
     }
@@ -311,7 +311,7 @@ u8 Army::army_t::GetUniqCount(void) const
     return troops2.size();
 }
 
-u32 Army::army_t::GetCountMonsters(const Monster & m) const
+u32 Army::army_t::MonsterCounts(const Monster & m) const
 {
     u32 c = 0;
 
@@ -390,12 +390,12 @@ bool Army::army_t::HasMonster(const Monster & mons) const
     return troops.end() != std::find(troops.begin(), troops.end(), mons);
 }
 
-Color::color_t Army::army_t::GetColor(void) const
+u8 Army::army_t::GetColor(void) const
 {
     return commander ? commander->GetColor() : color;
 }
 
-void Army::army_t::SetColor(Color::color_t cl)
+void Army::army_t::SetColor(u8 cl)
 {
     color = cl;
 }
@@ -1121,7 +1121,7 @@ u32 Army::army_t::GetSurrenderCost(void) const
 
 u8 Army::GetJoinSolution(const Heroes & hero, const Maps::Tiles & tile, u32 & join, s32 & cost)
 {
-    const Army::Troop troop(tile);
+    const Army::Troop & troop = tile.QuantityTroop();
 
     if(! troop.isValid()) return 0xFF;
 
@@ -1130,11 +1130,12 @@ u8 Army::GetJoinSolution(const Heroes & hero, const Maps::Tiles & tile, u32 & jo
     const bool check_extra_condition = (!hero.HasArtifact(Artifact::HIDEOUS_MASK) && Morale::NORMAL <= hero.GetMorale());
 
     // force join for campain and others...
-    const bool force_join = (5 == tile.GetQuantity4());
+    const bool & force_join = tile.MonsterJoinConditionForce();
 
-    if(tile.GetQuantity4() && check_free_stack && ((check_extra_condition && ratios >= 2) || force_join))
+    if(!tile.MonsterJoinConditionSkip() &&
+	check_free_stack && ((check_extra_condition && ratios >= 2) || force_join))
     {
-        if(2 == tile.GetQuantity4() || force_join)
+        if(tile.MonsterJoinConditionFree() || force_join)
         {
 	    join = troop.GetCount();
 	    return 1;

@@ -90,7 +90,8 @@ void WorldStoreObjects(u8 color, IndexObjectMap & store)
         if(MP2::isGroundObject(tile.GetObject()) || MP2::isWaterObject(tile.GetObject()) || MP2::OBJ_HEROES == tile.GetObject())
         {
             // if quantity object is empty
-            if(MP2::isQuantityObject(tile.GetObject()) && !tile.ValidQuantity()) continue;
+            if(MP2::isQuantityObject(tile.GetObject()) &&
+		! MP2::isPickupObject(tile.GetObject()) && ! tile.QuantityIsValid()) continue;
 
 	    // skip captured obj
 	    if(MP2::isCaptureObject(tile.GetObject()) &&

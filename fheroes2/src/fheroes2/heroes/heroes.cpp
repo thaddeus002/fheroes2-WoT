@@ -853,7 +853,7 @@ void Heroes::RescanPath(void)
 	const Maps::Tiles & tile = world.GetTiles(path.GetDestinationIndex());
 
 	if(!isShipMaster() && tile.isWater() &&
-	    !(MP2::OBJ_HEROES == tile.GetObject() || MP2::OBJ_BOAT == tile.GetObject()))
+	    !MP2::isNeedStayFront(tile.GetObject()))
 	    path.PopBack();
     }
 
@@ -899,7 +899,8 @@ bool Heroes::isVisited(const u8 object, const Visit::type_t type) const
 {
     if(Visit::GLOBAL == type) return world.GetKingdom(color).isVisited(object);
 
-    return visit_object.end() != std::find_if(visit_object.begin(), visit_object.end(), std::bind2nd(std::mem_fun_ref(&IndexObject::isObject), object));
+    return visit_object.end() != std::find_if(visit_object.begin(), visit_object.end(),
+				std::bind2nd(std::mem_fun_ref(&IndexObject::isObject), object));
 }
 
 /* set visited cell */
@@ -918,7 +919,7 @@ void Heroes::SetVisited(const s32 index, const Visit::type_t type)
 void Heroes::SetVisitedWideTile(const s32 index, const u8 object, const Visit::type_t type)
 {
     const Maps::Tiles & tile = world.GetTiles(index);
-    const Maps::TilesAddon* addon = tile.FindObject(object);
+    const Maps::TilesAddon* addon = tile.FindObjectConst(object);
     u8 wide = 0;
 
     switch(object)

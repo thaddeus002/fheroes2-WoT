@@ -26,7 +26,7 @@
 
 const char* Color::String(u8 color)
 {
-    const char* str_color[] = { "None", _("Blue"), _("Green"), _("Red"), _("Yellow"), _("Orange"), _("Purple") };
+    const char* str_color[] = { "None", _("Blue"), _("Green"), _("Red"), _("Yellow"), _("Orange"), _("Purple"), "uknown" };
 
     switch(color)
     {
@@ -36,6 +36,7 @@ const char* Color::String(u8 color)
         case Color::YELLOW:	return str_color[4];
 	case Color::ORANGE: 	return str_color[5];
 	case Color::PURPLE: 	return str_color[6];
+	case Color::UNUSED: 	return str_color[7];
     }
 
     return str_color[0];

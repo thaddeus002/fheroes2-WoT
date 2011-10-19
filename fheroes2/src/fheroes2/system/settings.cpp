@@ -134,6 +134,7 @@ const settings_t settingsFHeroes2[] =
     { Settings::WORLD_ABANDONED_MINE_RANDOM,	_("world: abandoned mine random resource"),		},
     { Settings::WORLD_SAVE_MONSTER_BATTLE,	_("world: save count monster after battle"),		},
     { Settings::WORLD_ALLOW_SET_GUARDIAN,	_("world: allow set guardian to objects"),		},
+    { Settings::WORLD_GUARDIAN_TWO_DEFENSE,	_("world: guardian objects gets +2 defense"),		},
     { Settings::WORLD_NOREQ_FOR_ARTIFACTS,	_("world: no in-built requirements or guardians for placed artifacts"),	},
     { Settings::WORLD_ONLY_FIRST_MONSTER_ATTACK,_("world: only the first monster will attack (H2 bug)."), },
     { Settings::WORLD_EYE_EAGLE_AS_SCHOLAR,	_("world: Eagle Eye also works like Scholar in H3."),   },
@@ -151,6 +152,7 @@ const settings_t settingsFHeroes2[] =
     { Settings::WORLD_USE_UNIQUE_ARTIFACTS2,	_("world: use unique artifacts for resource producing"),},
     { Settings::WORLD_USE_UNIQUE_ARTIFACTS3,	_("world: use unique artifacts for primary skill/mp/sp"), },
     { Settings::WORLD_USE_UNIQUE_ARTIFACTS4,	_("world: use unique artifacts for sec. skills"),       },
+    { Settings::WORLD_WIND_WATER_MILLS_CAPTURED,_("world: Wind/Water Mills can be captured"),           },
     { Settings::CASTLE_ALLOW_BUY_FROM_WELL,	_("castle: allow buy from well"),			},
     { Settings::CASTLE_ALLOW_GUARDIANS,		_("castle: allow guardians"),				},
     { Settings::CASTLE_MAGEGUILD_POINTS_TURN,	_("castle: higher mage guilds regenerate more spell points/turn (20/40/60/80/100%)"), },
@@ -1420,6 +1422,16 @@ bool Settings::ExtWorldUseUniqueArtifacts4(void) const
 bool Settings::ExtHeroArenaCanChoiseAnySkills(void) const
 {
     return ExtModes(HEROES_ARENA_ANY_SKILLS);
+}
+
+bool Settings::ExtWorldWindWaterMillsCaptured(void) const
+{
+    return ExtModes(WORLD_WIND_WATER_MILLS_CAPTURED);
+}
+
+bool Settings::ExtWorldGuardianObjectsTwoDefense(void) const
+{
+    return ExtModes(WORLD_GUARDIAN_TWO_DEFENSE);
 }
 
 const Point & Settings::PosRadar(void) const { return pos_radr; }

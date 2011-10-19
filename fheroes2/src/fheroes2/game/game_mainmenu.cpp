@@ -81,7 +81,7 @@ Game::menu_t Game::MainMenu(void)
     const Sprite & lantern10 = AGG::GetICN(ICN::SHNGANIM, 0);
     lantern10.Blit(top.x + lantern10.x(), top.y + lantern10.y());
 
-    const Sprite & lantern11 = AGG::GetICN(ICN::SHNGANIM, ICN::AnimationFrame(ICN::SHNGANIM, 0));
+    const Sprite & lantern11 = AGG::GetICN(ICN::SHNGANIM, ICN::AnimationFrame(ICN::SHNGANIM, 0, 0));
     lantern11.Blit(top.x + lantern11.x(), top.y + lantern11.y());
 
     buttonNewGame.Draw();

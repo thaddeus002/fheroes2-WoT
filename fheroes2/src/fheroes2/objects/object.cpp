@@ -50,10 +50,10 @@ bool Object::AllowDirect(u8 general, u16 direct)
     switch(general)
     {
 	case MP2::OBJ_SHIPWRECK:
-	    return Direction::UNKNOWN == direct || (direct & (Direction::LEFT | DIRECTION_BOTTOM_ROW));
+	    return direct & (Direction::CENTER | Direction::LEFT | DIRECTION_BOTTOM_ROW);
 
 	case MP2::OBJ_DERELICTSHIP:
-	    return Direction::UNKNOWN == direct || (direct & (Direction::LEFT | Direction::BOTTOM_LEFT | Direction::BOTTOM));
+	    return direct & (Direction::CENTER | Direction::LEFT | Direction::BOTTOM_LEFT | Direction::BOTTOM);
 
 	case MP2::OBJ_ARCHERHOUSE:
 	case MP2::OBJ_DOCTORHUT:
@@ -128,16 +128,16 @@ bool Object::AllowDirect(u8 general, u16 direct)
 	case MP2::OBJ_ARENA:
 	case MP2::OBJ_SIRENS:
 	case MP2::OBJ_MERMAID:
-	    return Direction::UNKNOWN == direct || (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
+	    return direct & (DIRECTION_CENTER_ROW | DIRECTION_BOTTOM_ROW); 
 
 	case MP2::OBJ_WATERWHEEL:
-	    return Direction::UNKNOWN == direct || (direct & (Direction::RIGHT | DIRECTION_BOTTOM_ROW));
+	    return direct & (Direction::CENTER | Direction::RIGHT | DIRECTION_BOTTOM_ROW);
 
 	case MP2::OBJ_MAGELLANMAPS:
-	    return Direction::UNKNOWN == direct || (direct & (Direction::LEFT | DIRECTION_BOTTOM_ROW));
+	    return direct & (Direction::CENTER | Direction::LEFT | DIRECTION_BOTTOM_ROW);
 
 	case MP2::OBJ_CASTLE:
-	    return Direction::UNKNOWN == direct || Direction::BOTTOM == direct;
+	    return direct & (Direction::CENTER | Direction::BOTTOM);
 
 	default: break;
     }

@@ -102,7 +102,7 @@ void Game::MoveHeroFromArrowKeys(Heroes & hero, Direction::vector_t direct)
 		break;
 
 	    default:
-		allow = (tile.isPassable(&hero, Direction::UNKNOWN, false) ||
+		allow = (tile.isPassable(&hero, Direction::CENTER, false) ||
 				MP2::isActionObject(tile.GetObject(), hero.isShipMaster()));
 		break;
 	}
@@ -496,7 +496,7 @@ Cursor::themes_t Game::GetCursorFocusShipmaster(const Heroes & from_hero, const 
 		if(MP2::isWaterObject(tile.GetObject()))
 		    return Cursor::DistanceThemes(Cursor::REDBOAT, from_hero.GetRangeRouteDays(tile.GetIndex()));
 		else
-		if(tile.isPassable(&from_hero, Direction::UNKNOWN, false))
+		if(tile.isPassable(&from_hero, Direction::CENTER, false))
 		    return Cursor::DistanceThemes(Cursor::BOAT, from_hero.GetRangeRouteDays(tile.GetIndex()));
 	    }
 	break;
@@ -605,13 +605,13 @@ Cursor::themes_t Game::GetCursorFocusHeroes(const Heroes & from_hero, const Maps
 		bool protection = (MP2::isPickupObject(tile.GetObject()) ? false :
 				(Maps::TileUnderProtectionV(tile.GetIndex()).size() ||
 					(! Players::isFriends(from_hero.GetColor(), world.ColorCapturedObject(tile.GetIndex())) &&
-					    tile.CaptureObjectIsProtection(from_hero.GetColor()))));
+					    tile.CaptureObjectIsProtection())));
 
 		return Cursor::DistanceThemes((protection ? Cursor::FIGHT : Cursor::ACTION),
 						from_hero.GetRangeRouteDays(tile.GetIndex()));
 	    }
 	    else
-	    if(tile.isPassable(&from_hero, Direction::UNKNOWN, false))
+	    if(tile.isPassable(&from_hero, Direction::CENTER, false))
 	    {
 		bool protection = Maps::TileUnderProtectionV(tile.GetIndex()).size();
 

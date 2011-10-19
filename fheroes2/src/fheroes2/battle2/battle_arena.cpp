@@ -798,6 +798,16 @@ Battle2::Arena::Arena(Army::army_t & a1, Army::army_t & a2, s32 index, bool loca
     }
 #endif
 
+    // set guardian objects mode (+2 defense)
+    if(conf.ExtWorldGuardianObjectsTwoDefense() &&
+	!castle &&
+        MP2::isCaptureObject(world.GetTiles(index).GetObject(false)))
+    {
+        Armies defenders(army2);
+        std::for_each(defenders.begin(), defenders.end(),
+                std::bind2nd(std::mem_fun(&Stats::SetModes), TR_GUARDIAN));
+    }
+
     //
     if(interface)
     {

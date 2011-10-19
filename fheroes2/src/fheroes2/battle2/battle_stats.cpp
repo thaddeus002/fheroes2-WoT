@@ -1086,6 +1086,8 @@ u16 Battle2::Stats::GetDefense(void) const
     s16 res = GetMonster().GetDefense() +
 	(GetCommander() ? GetCommander()->GetDefense() : 0);
 
+    if(Modes(TR_GUARDIAN)) res += 2;
+
     if(Modes(SP_STONESKIN)) res += Spell(Spell::STONESKIN).ExtraValue();
     else
     if(Modes(SP_STEELSKIN)) res += Spell(Spell::STEELSKIN).ExtraValue();

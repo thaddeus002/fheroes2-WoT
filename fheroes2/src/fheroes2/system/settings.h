@@ -39,6 +39,7 @@
 #include <android/log.h>
 #endif
 
+#define FORMAT_VERSION_2632 0x0A48
 #define FORMAT_VERSION_2629 0x0A45
 #define FORMAT_VERSION_2626 0x0A42
 #define FORMAT_VERSION_2602 0x0A2A
@@ -46,7 +47,7 @@
 #define FORMAT_VERSION_2562 0x0A02
 #define FORMAT_VERSION_2522 0x09DA
 #define FORMAT_VERSION_2520 0x09D8
-#define CURRENT_FORMAT_VERSION FORMAT_VERSION_2629
+#define CURRENT_FORMAT_VERSION FORMAT_VERSION_2632
 #define LAST_FORMAT_VERSION FORMAT_VERSION_2520
 
 #define ListMapsDirectory std::list<std::string>
@@ -192,12 +193,13 @@ public:
 	WORLD_STARTHERO_LOSSCOND4HUMANS = 0x30000008,
 	WORLD_1HERO_HIRED_EVERY_WEEK	= 0x30000010,
 	WORLD_DWELLING_ACCUMULATE_UNITS = 0x30000020,
-	// UNUSED			= 0x30000040,
+	WORLD_GUARDIAN_TWO_DEFENSE	= 0x30000040,
 	HEROES_ARENA_ANY_SKILLS		= 0x30000080,
 	WORLD_USE_UNIQUE_ARTIFACTS1	= 0x30000100,
 	WORLD_USE_UNIQUE_ARTIFACTS2	= 0x30000200,
 	WORLD_USE_UNIQUE_ARTIFACTS3	= 0x30000400,
 	WORLD_USE_UNIQUE_ARTIFACTS4	= 0x30000800,
+	WORLD_WIND_WATER_MILLS_CAPTURED = 0x30004000,
 
 	BATTLE_ARCHMAGE_RESIST_BAD_SPELL= 0x40001000,
 	BATTLE_MAGIC_TROOP_RESIST	= 0x40002000,
@@ -323,6 +325,8 @@ public:
     bool ExtWorldUseUniqueArtifacts2(void) const;
     bool ExtWorldUseUniqueArtifacts3(void) const;
     bool ExtWorldUseUniqueArtifacts4(void) const;
+    bool ExtWorldWindWaterMillsCaptured(void) const;
+    bool ExtWorldGuardianObjectsTwoDefense(void) const;
     bool ExtCastleAllowFlash(void) const;
     bool ExtCastleGuildRestorePointsTurn(void) const;
     bool ExtCastleAllowRecruitSpecialHeroes(void) const;

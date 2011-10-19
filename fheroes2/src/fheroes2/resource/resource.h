@@ -37,6 +37,8 @@ struct cost_t
 
 #define COST_NONE { 0, 0, 0, 0, 0, 0 ,0 }
 
+class ResourceCount;
+
 #ifdef WITH_XML
 struct TiXmlElement;                                                                                                     
 void   LoadCostFromXMLElement(cost_t &, const TiXmlElement &);
@@ -48,6 +50,7 @@ struct Funds
 	Funds(s32 _ore, s32 _wood, s32 _mercury, s32 _sulfur, s32 _crystal, s32 _gems, s32 _gold);
 	Funds(u8 rs, u32 count);
 	Funds(const cost_t &);
+	Funds(const ResourceCount &);
 
 	Funds operator+ (const Funds &) const;
 	Funds operator* (u32 mul) const;
@@ -57,7 +60,7 @@ struct Funds
 	Funds & operator-= (const Funds &);
 	Funds & operator= (const cost_t &);
 
-	s32 Get(u8 rs) const;
+	s32  Get(u8 rs) const;
 	s32* GetPtr(u8 rs);
 
 	bool operator< (const Funds &) const;
@@ -89,13 +92,14 @@ namespace Resource
         SULFUR	= 0x08,
         CRYSTAL	= 0x10,
         GEMS	= 0x20,
-        GOLD	= 0x40
+        GOLD	= 0x40,
+	ALL	= WOOD | MERCURY | ORE | SULFUR | CRYSTAL | GEMS | GOLD
     };
 
 
     const char* String(u8 resource);
 
-    u8 Rand(void);
+    u8 Rand(bool with_gold = false);
 
     /* return index sprite objnrsrc.icn */
     u8 GetIndexSprite(u8 resource);

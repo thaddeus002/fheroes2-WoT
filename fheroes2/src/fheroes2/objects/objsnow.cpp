@@ -23,78 +23,84 @@
 #include "icn.h"
 #include "objsnow.h"
 
-bool ObjSnow::isPassable(u16 icn, u8 index, u16 direct)
+bool ObjSnow::isPassable(const u16 & icn, const u8 & index, u16 direct)
+{
+    return direct & GetPassable(icn, index);
+}
+
+u16 ObjSnow::GetPassable(const u16 & icn, const u8 & index)
 {
     switch(icn)
     {
 	case ICN::OBJNSNOW:
 	    // cave for centaur
 	    if((1 < index && index < 4))
-		return Direction::UNKNOWN == direct || (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
+		return DIRECTION_CENTER_ROW | DIRECTION_BOTTOM_ROW;
 	    else
 	    // camp fire
-	    if(4 == index) return false;
+	    if(4 == index) return 0;
 	    else
 	    // learn to
 	    if(13 == index)
-		return Direction::UNKNOWN == direct || (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
+		return DIRECTION_CENTER_ROW | DIRECTION_BOTTOM_ROW;
 	    else
 	    // rock
 	    if(22 == index || (25 < index && index < 29) || 30 == index ||
-	    32 == index || (33 < index && index < 36) || (36 < index && index < 40)) return false;
+	    32 == index || (33 < index && index < 36) || (36 < index && index < 40)) return 0;
 	    else
 	    // stub
 	    if(40 < index && index < 43)
-		return Direction::UNKNOWN == direct || (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
+		return DIRECTION_CENTER_ROW | DIRECTION_BOTTOM_ROW;
 	    else
 	    // trees
 	    if((48 < index && index < 51) || (54 < index && index < 58) || 60 == index || 
 	    (63 < index && index < 66) || 68 == index || 71 == index || 
-	    74 == index || 77 == index || 80 == index) return false;
+	    74 == index || 77 == index || 80 == index) return 0;
 	    else
 	    // lake
-	    if((80 < index && index < 85)) return false;
+	    if((80 < index && index < 85)) return 0;
 	    else
 	    if((84 < index && index < 90) || (89 < index && index < 93) || (93 < index && index < 96))
-		return Direction::UNKNOWN == direct || (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
+		return DIRECTION_CENTER_ROW | DIRECTION_BOTTOM_ROW;
 	    else
 	    //wind mill
 	    if(128 == index || 132 == index)
-		return Direction::UNKNOWN == direct || (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
+		return DIRECTION_CENTER_ROW | DIRECTION_BOTTOM_ROW;
 	    else
 	    // watch tower
-	    if(138 == index) return false;
+	    if(138 == index) return 0;
 	    else
 	    // obelisk
-	    if(141 == index) return false;
+	    if(141 == index) return 0;
 	    else
 	    // sign
-	    if(143 == index) return false;
+	    if(143 == index) return 0;
 	    else
 	    // alchemy tower
 	    if(148 < index && index < 152)
-		return Direction::UNKNOWN == direct || (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
+		return DIRECTION_CENTER_ROW | DIRECTION_BOTTOM_ROW;
 	    else
 	    // graveyard
 	    if((158 < index && index < 161) || (207 < index && index < 211))
-		return Direction::UNKNOWN == direct || (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
+		return DIRECTION_CENTER_ROW | DIRECTION_BOTTOM_ROW;
 	    else
 	    // water mill
 	    if(177 == index || 184 == index || 191 == index)
-		return Direction::UNKNOWN == direct || (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
+		return DIRECTION_CENTER_ROW | DIRECTION_BOTTOM_ROW;
 	    else
 	    // well
-	    if(194 == index) return false;
+	    if(194 == index) return 0;
 	    else
 	    // saw mill
-	    if(196 < index && index < 199) return false;
+	    if(196 < index && index < 199) return 0;
 	    else
 	    if(198 < index && index < 202)
-		return Direction::UNKNOWN == direct || (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
-	    else return true;	    
+		return DIRECTION_CENTER_ROW | DIRECTION_BOTTOM_ROW;
+	    else
+		return DIRECTION_ALL;
 
 	default: break;
     }
 
-    return false;
+    return 0;
 }

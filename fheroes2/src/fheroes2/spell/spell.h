@@ -107,7 +107,9 @@ public:
     bool operator< (const Spell &) const;
     bool operator== (const Spell &) const;
     bool operator!= (const Spell &) const;
+
     u8 operator() (void) const;
+    u8 GetID(void) const;
 
     const char* GetName(void) const;
     const char* GetDescription(void) const;

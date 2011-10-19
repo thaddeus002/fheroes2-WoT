@@ -24,6 +24,7 @@
 #include "world.h"
 #include "agg.h"
 #include "settings.h"
+#include "pairs.h"
 #include "resource.h"
 
 Funds::Funds()
@@ -57,9 +58,16 @@ Funds::Funds(const cost_t & cost)
 {
 }
 
-u8 Resource::Rand(void)
+Funds::Funds(const ResourceCount & rs)
+    : wood(0), mercury(0), ore(0), sulfur(0), crystal(0), gems(0), gold(0)
 {
-    switch(Rand::Get(1, 6))
+    s32* ptr = GetPtr(rs.first);
+    if(ptr) *ptr = rs.second;
+}
+
+u8 Resource::Rand(bool with_gold)
+{
+    switch(Rand::Get(1, (with_gold ? 7 : 6)))
     {
         case 1: return Resource::WOOD;
         case 2: return Resource::MERCURY;
@@ -67,11 +75,11 @@ u8 Resource::Rand(void)
         case 4: return Resource::SULFUR;
         case 5: return Resource::CRYSTAL;
         case 6: return Resource::GEMS;
-	//case 7: return Resource::GOLD; exclude
+	case 7: return Resource::GOLD;
         default: break;
     }
 
-    return Resource::WOOD;
+    return Resource::UNKNOWN;
 }
 
 s32* Funds::GetPtr(u8 rs)

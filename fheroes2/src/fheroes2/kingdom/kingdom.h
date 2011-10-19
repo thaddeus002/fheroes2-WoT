@@ -42,6 +42,7 @@ struct AllHeroes;
 struct VecHeroes;
 struct AllCastles;
 struct VecCastles;
+struct CapturedObjects;
 
 struct LastLoseHero : std::pair<Heroes::heroes_t, u16> /* Heroes, date */
 {
@@ -200,6 +201,7 @@ public:
     void AddCastles(const AllCastles &);
 
     void AddCondLossHeroes(const AllHeroes &);
+    void AddTributeEvents(CapturedObjects &, u16 day, u8 obj);
 
     u8 size(void) const;
 

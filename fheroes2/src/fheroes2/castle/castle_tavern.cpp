@@ -67,7 +67,7 @@ void Castle::OpenTavern(void)
     const Sprite & s20 = AGG::GetICN(tavwin, 1);
     s20.Blit(dst_pt);
 
-    if(const u16 index = ICN::AnimationFrame(tavwin, 0))
+    if(const u16 index = ICN::AnimationFrame(tavwin, 0, 0))
     {
 	const Sprite & s21 = AGG::GetICN(tavwin, index);
 	s21.Blit(dst_pt.x + s21.x(), dst_pt.y + s21.y());

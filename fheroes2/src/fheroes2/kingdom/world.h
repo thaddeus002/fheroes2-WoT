@@ -43,12 +43,41 @@ class Kingdom;
 class Recruits;
 class Radar;
 
-typedef std::list<std::string> Rumors;
-typedef std::list<EventDate> EventsDate;
-typedef std::list<EventMaps> EventsMaps;
-typedef std::list<Riddle>    Riddles;
-typedef std::vector<Maps::Tiles> MapsTiles;
-typedef std::map<s32, ObjectColor> CapturedObjects;
+typedef std::list<std::string>		Rumors;
+typedef std::list<EventDate>		EventsDate;
+typedef std::list<EventMaps>		EventsMaps;
+typedef std::list<Riddle>		Riddles;
+typedef std::vector<Maps::Tiles>	MapsTiles;
+
+struct CapturedObject
+{
+    ObjectColor		objcol;
+    Army::Troop		guardians;
+
+    const u8 & GetObject(void) const { return objcol.first; }
+    const u8 & GetColor(void) const { return objcol.second; }
+    Army::Troop & GetTroop(void) { return guardians; }
+
+    void Set(u8 obj, u8 col) { objcol = ObjectColor(obj, col); }
+    void SetColor(u8 col) { objcol.second = col; }
+
+    bool GuardiansProtected(void) const { return guardians.isValid(); }
+};
+
+struct CapturedObjects : std::map<s32, CapturedObject>
+{
+    void Set(const s32 &, u8, u8);
+    void SetColor(const s32 &, u8);
+    void ClearFog(u8);
+    void ResetColor(u8);
+
+    CapturedObject & Get(const s32 &);
+    Funds TributeCapturedObject(u8 col, u8 obj);
+
+    u16	 GetCount(u8, u8) const;
+    u16	 GetCountMines(u8, u8) const;
+    u8   GetColor(const s32 &) const;
+};
 
 class World : protected Size
 {
@@ -77,7 +106,6 @@ public:
     Kingdoms & GetKingdoms(void);
     Kingdom & GetKingdom(u8 color);
     const Kingdom & GetKingdom(u8 color) const;
-    void KingdomLoss(const Color::color_t);
 
     const Castle* GetCastle(s32 maps_index) const;
     Castle* GetCastle(s32 maps_index);
@@ -123,16 +151,18 @@ public:
     bool GetObjectPositions(s32 center, MP2::object_t, std::vector<IndexDistance> &, bool check_hero = false) const;
     s32 GetNearestObject(s32 center, MP2::object_t, bool check_hero = false) const;
 
-    void CaptureObject(const s32 index, const Color::color_t col);
-    u16 CountCapturedObject(const MP2::object_t obj, const Color::color_t col) const;
-    u16 CountCapturedMines(const u8 res, const Color::color_t col) const;
-    Color::color_t ColorCapturedObject(const s32 index) const;
+    void CaptureObject(const s32 & index, u8 col);
+    u16  CountCapturedObject(u8 obj, u8 col) const;
+    u16  CountCapturedMines(u8 type, u8 col) const;
+    u8   ColorCapturedObject(const s32 & index) const;
+    void ResetCapturedObjects(u8);
+    CapturedObject & GetCapturedObject(const s32 &);
 
     void ActionToEyeMagi(u8 color) const;
 
     u16 CountObeliskOnMaps(void);
 
-    void ClearFog(const u8 color);
+    void ClearFog(u8 color);
 
     u16  CheckKingdomWins(const Kingdom &) const;
     bool KingdomIsWins(const Kingdom &, u16 wins) const;

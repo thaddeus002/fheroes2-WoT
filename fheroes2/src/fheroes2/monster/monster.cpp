@@ -232,6 +232,8 @@ Monster::Monster(const Spell & sp) : id(UNKNOWN)
 
 	case Spell::SETWGUARDIAN:
         case Spell::SUMMONWELEMENT: id = WATER_ELEMENT; break;
+
+	case Spell::HAUNT:          id = GHOST; break;
         default: break;
     }
 }

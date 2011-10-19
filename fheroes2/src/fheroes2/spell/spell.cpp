@@ -205,6 +205,11 @@ u8 Spell::operator() (void) const
     return id;
 }
 
+u8 Spell::GetID(void) const
+{
+    return id;
+}
+
 const char* Spell::GetName(void) const
 {
     return _(spells[id].name);

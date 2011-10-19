@@ -55,11 +55,11 @@
 
 u8 monster_animation_cicle[] = { 0, 1, 2, 1, 0, 3, 4, 5, 4, 3 };
 
-Maps::TilesAddon::TilesAddon() : level(0), uniq(0), object(0), index(0)
+Maps::TilesAddon::TilesAddon() : uniq(0), level(0), object(0), index(0), tmp(0)
 {
 }
 
-Maps::TilesAddon::TilesAddon(u8 lv, u32 gid, u8 obj, u8 ii) : level(lv), uniq(gid), object(obj), index(ii)
+Maps::TilesAddon::TilesAddon(u8 lv, u32 gid, u8 obj, u8 ii) : uniq(gid), level(lv), object(obj), index(ii), tmp(0)
 {
 }
 
@@ -71,7 +71,8 @@ std::string Maps::TilesAddon::String(int level) const
 				", (" << ICN::GetString(MP2::GetICNObject(object)) << ")" << std::endl <<
 	  "index           : " << static_cast<int>(index) << std::endl <<
 	  "uniq            : " << uniq << std::endl <<
-	  "level           : " << static_cast<int>(level) << std::endl;
+	  "level           : " << static_cast<int>(level) << std::endl <<
+	  "tmp             : " << static_cast<int>(tmp) << std::endl;
     return os.str();
 }
 
@@ -105,9 +106,9 @@ bool Maps::TilesAddon::PredicateSortRules2(const Maps::TilesAddon & ta1, const M
     return ((ta1.level % 4) < (ta2.level % 4));
 }
 
-bool Maps::TilesAddon::isPassable(const Maps::TilesAddon & ta, u16 direct, s32 maps_index)
+bool Maps::TilesAddon::isPassable(const Maps::TilesAddon & ta, u16 direct)
 {
-    ICN::icn_t icn = MP2::GetICNObject(ta.object);
+    const ICN::icn_t icn = MP2::GetICNObject(ta.object);
     const u16 & index = ta.index;
 
     switch(icn)
@@ -167,6 +168,57 @@ bool Maps::TilesAddon::isPassable(const Maps::TilesAddon & ta, u16 direct, s32 m
     }
 
     return true;
+}
+
+u16 Maps::TilesAddon::GetPassable(const Maps::TilesAddon & ta)
+{
+    const ICN::icn_t icn = MP2::GetICNObject(ta.object);
+    const u16 & index = ta.index;
+
+    switch(icn)
+    {
+	case ICN::MTNCRCK:
+	case ICN::MTNSNOW:
+	case ICN::MTNSWMP:
+	case ICN::MTNLAVA:
+	case ICN::MTNDSRT:
+	case ICN::MTNDIRT:
+	case ICN::MTNMULT:
+	case ICN::MTNGRAS:	return Mounts::GetPassable(icn, index);
+
+	case ICN::TREJNGL:
+	case ICN::TREEVIL:
+	case ICN::TRESNOW:
+	case ICN::TREFIR:
+	case ICN::TREFALL:
+	case ICN::TREDECI:	return Trees::GetPassable(icn, index);
+
+	case ICN::OBJNSNOW:	return ObjSnow::GetPassable(icn, index);
+	case ICN::OBJNSWMP:	return ObjSwamp::GetPassable(icn, index);
+	case ICN::OBJNGRAS:
+	case ICN::OBJNGRA2:	return ObjGrass::GetPassable(icn, index);
+	case ICN::OBJNCRCK:	return ObjWasteLand::GetPassable(icn, index);
+	case ICN::OBJNDIRT:	return ObjDirt::GetPassable(icn, index);
+	case ICN::OBJNDSRT:	return ObjDesert::GetPassable(icn, index);
+	case ICN::OBJNMUL2:
+	case ICN::OBJNMULT:	return ObjMulti::GetPassable(icn, index);
+	case ICN::OBJNLAVA:
+	case ICN::OBJNLAV3:
+	case ICN::OBJNLAV2:	return ObjLava::GetPassable(icn, index);
+	case ICN::OBJNWAT2:
+	case ICN::OBJNWATR:	return ObjWater::GetPassable(icn, index);
+
+	case ICN::OBJNTWBA:
+	case ICN::OBJNTOWN:	return ObjTown::GetPassable(icn, index);
+
+	case ICN::X_LOC1:
+	case ICN::X_LOC2:
+	case ICN::X_LOC3:	return ObjLoyalty::GetPassable(icn, index);
+
+	default: break;
+    }
+
+    return DIRECTION_ALL;
 }
 
 bool Maps::TilesAddon::isRoad(u16 direct) const
@@ -527,16 +579,17 @@ void Maps::TilesAddon::UpdateTreasureChestSprite(TilesAddon & ta)
     }
 }
 
-void Maps::TilesAddon::UpdateStoneLightsSprite(TilesAddon & ta, u8 & type)
+u8 Maps::TilesAddon::UpdateStoneLightsSprite(TilesAddon & ta)
 {
     if(ICN::OBJNMUL2 == MP2::GetICNObject(ta.object))
     switch(ta.index)
     {
-	case 116: ta.object = 0x11; ta.index = 0; type = 1; break;
-	case 119: ta.object = 0x12; ta.index = 0; type = 2; break;
-	case 122: ta.object = 0x13; ta.index = 0; type = 3; break;
+	case 116: ta.object = 0x11; ta.index = 0; return 1;
+	case 119: ta.object = 0x12; ta.index = 0; return 2;
+	case 122: ta.object = 0x13; ta.index = 0; return 3;
 	default: break;
     }
+    return 0;
 }
 
 bool Maps::TilesAddon::ForceLevel1(const TilesAddon & ta)
@@ -564,27 +617,26 @@ void Maps::Addons::Remove(u32 uniq)
     remove_if(std::bind2nd(std::mem_fun_ref(&Maps::TilesAddon::isUniq), uniq));
 }
 
+u16 PackTileSpriteIndex(u16 index, u16 shape) /* index max: 0x3FFF, shape value: 0, 1, 2, 3 */
+{
+    return (shape << 14) | (0x3FFF & index);
+}
 
 /* Maps::Tiles */
-Maps::Tiles::Tiles() : maps_index(0), tile_sprite_index(0), tile_sprite_shape(0),
-    mp2_object(0), quantity1(0), quantity2(0), quantity3(0), quantity4(0), fogs(0xFF), quantity5(0), quantity6(0), quantity7(0)
+Maps::Tiles::Tiles() : maps_index(0), pack_sprite_index(0), tile_passable(DIRECTION_ALL),
+    mp2_object(0), fog_colors(Color::ALL), quantity1(0), quantity2(0)
 {
 }
 
 void Maps::Tiles::Init(s32 index, const MP2::mp2tile_t & mp2)
 {
     maps_index	= index;
-    tile_sprite_index	= mp2.tileIndex;
-    tile_sprite_shape	= mp2.shape;
+    pack_sprite_index	= PackTileSpriteIndex(mp2.tileIndex, mp2.shape);
+    tile_passable = DIRECTION_ALL;
     mp2_object	= mp2.generalObject;
     quantity1	= mp2.quantity1;
     quantity2	= mp2.quantity2;
-    quantity3	= 0;
-    quantity4	= 0;
-    fogs	= 0xFF;
-    quantity5	= 0;
-    quantity6	= 0;
-    quantity7	= 0;
+    fog_colors	= Color::ALL;
 
     addons_level1.clear();
     addons_level2.clear();
@@ -593,15 +645,60 @@ void Maps::Tiles::Init(s32 index, const MP2::mp2tile_t & mp2)
     AddonsPushLevel2(mp2);
 }
 
-void Maps::Tiles::SetTile(const u16 sprite_index, const u8 sh)
+void Maps::Tiles::SetTile(const u16 sprite_index, const u8 shape)
 {
-    tile_sprite_index = sprite_index;
-    tile_sprite_shape = sh;
+    pack_sprite_index = PackTileSpriteIndex(sprite_index, shape);
+}
+
+u16 Maps::Tiles::TileSpriteIndex(void) const
+{
+    return pack_sprite_index & 0x3FFF;
+}
+
+u8  Maps::Tiles::TileSpriteShape(void) const
+{
+    return pack_sprite_index >> 14;
 }
 
 const Surface & Maps::Tiles::GetTileSurface(void) const
 {
-    return AGG::GetTIL(TIL::GROUND32, tile_sprite_index, tile_sprite_shape);
+    return AGG::GetTIL(TIL::GROUND32, TileSpriteIndex(), TileSpriteShape());
+}
+
+void Maps::Tiles::UpdatePassable(void)
+{
+    tile_passable = DIRECTION_ALL;
+
+    if(MP2::OBJ_HEROES != mp2_object && !isWater())
+    {
+	// fix coast passable
+	if(tile_passable &&
+	    Maps::TileIsCoast(maps_index, Direction::TOP|Direction::BOTTOM|Direction::LEFT|Direction::RIGHT) &&
+	    ! MP2::isActionObject(GetObject(), false) &&
+	    //MP2::OBJ_ZERO != GetObject() &&  // Town check: false (OBJNTWBA)
+	    MP2::OBJ_COAST != GetObject() &&
+	    !addons_level1.empty())
+		tile_passable = 0;
+
+	// fix mountain layer
+	if(tile_passable &&
+	    MP2::OBJ_MOUNTS == GetObject() &&
+	    addons_level1.end() != std::find_if(addons_level1.begin(), addons_level1.end(), TilesAddon::isMounts) &&
+	    addons_level2.end() != std::find_if(addons_level2.begin(), addons_level2.end(), TilesAddon::isMounts))
+		tile_passable = 0;
+
+	// fix trees layer
+	if(tile_passable &&
+    	    MP2::OBJ_TREES == GetObject() &&
+	    addons_level1.end() != std::find_if(addons_level1.begin(), addons_level1.end(), TilesAddon::isTrees) &&
+	    addons_level2.end() != std::find_if(addons_level2.begin(), addons_level2.end(), TilesAddon::isTrees))
+		tile_passable = 0;
+    }
+
+    // check all sprite
+    for(Addons::const_iterator
+	it = addons_level1.begin(); it != addons_level1.end(); ++it)
+	tile_passable &= TilesAddon::GetPassable(*it);
 }
 
 void Maps::Tiles::AddonsPushLevel1(const MP2::mp2tile_t & mt)
@@ -622,6 +719,8 @@ void Maps::Tiles::AddonsPushLevel1(const TilesAddon & ta)
 	addons_level2.push_back(ta);
     else
     addons_level1.push_back(ta);
+
+    UpdatePassable();
 }
 
 void Maps::Tiles::AddonsPushLevel2(const MP2::mp2tile_t & mt)
@@ -642,6 +741,8 @@ void Maps::Tiles::AddonsPushLevel2(const TilesAddon & ta)
 	addons_level1.push_back(ta);
     else
 	addons_level2.push_back(ta);
+
+    UpdatePassable();
 }
 
 void Maps::Tiles::AddonsSort(void)
@@ -652,45 +753,49 @@ void Maps::Tiles::AddonsSort(void)
 
 Maps::Ground::ground_t Maps::Tiles::GetGround(void) const
 {
+    const u16 index = TileSpriteIndex();
+
     // list grounds from GROUND32.TIL
-    if(30 > tile_sprite_index)
+    if(30 > index)
         return Maps::Ground::WATER;
-        
-    else if(92 > tile_sprite_index)
+    else
+    if(92 > index)
         return Maps::Ground::GRASS;
-
-    else if(146 > tile_sprite_index)
+    else
+    if(146 > index)
         return Maps::Ground::SNOW;
-
-    else if(208 > tile_sprite_index)
+    else
+    if(208 > index)
         return Maps::Ground::SWAMP;
-
-    else if(262 > tile_sprite_index)
+    else
+    if(262 > index)
         return Maps::Ground::LAVA;
-
-    else if(321 > tile_sprite_index)
+    else
+    if(321 > index)
         return Maps::Ground::DESERT;
-
-    else if(361 > tile_sprite_index)
+    else
+    if(361 > index)
         return Maps::Ground::DIRT;
-
-    else if(415 > tile_sprite_index)
+    else
+    if(415 > index)
         return Maps::Ground::WASTELAND;
 
-    //else if(432 > tile_sprite_index)
+    //else if(432 > pack_sprite_index)
 
-	return Maps::Ground::BEACH;
+    return Maps::Ground::BEACH;
 }
 
 bool Maps::Tiles::isWater(void) const
 {
-    return 30 > tile_sprite_index;
+    return 30 > TileSpriteIndex();
 }
 
 void Maps::Tiles::Remove(u32 uniq)
 {
     if(!addons_level1.empty()) addons_level1.Remove(uniq);
     if(!addons_level2.empty()) addons_level2.Remove(uniq);
+
+    UpdatePassable();
 }
 
 void Maps::Tiles::RedrawTile(Surface & dst) const
@@ -716,7 +821,7 @@ void Maps::Tiles::RedrawBottom(Surface & dst, bool skip_objs) const
 	    // skip
 	    if(skip_objs &&
 		MP2::isRemoveObject(GetObject()) &&
-		FindObject(GetObject()) == &(*it)) continue;
+		FindObjectConst(GetObject()) == &(*it)) continue;
 
 	    const u8 & object = (*it).object;
 	    const u8 & index  = (*it).index;
@@ -779,7 +884,7 @@ void Maps::Tiles::RedrawMonster(Surface & dst) const
 	    break;
     }
 
-    const Monster mons(quantity3);
+    const u8 sprite_index = QuantityMonster().GetSpriteIndex();
 
     // draw attack sprite
     if(-1 != dst_index && !conf.ExtOnlyFirstMonsterAttack())
@@ -794,17 +899,17 @@ void Maps::Tiles::RedrawMonster(Surface & dst) const
 	    default: break;
 	}
 
-	const Sprite & sprite_first = AGG::GetICN(ICN::MINIMON, mons.GetSpriteIndex() * 9 + (revert ? 8 : 7));
+	const Sprite & sprite_first = AGG::GetICN(ICN::MINIMON, sprite_index * 9 + (revert ? 8 : 7));
 	area.BlitOnTile(dst, sprite_first, sprite_first.x() + 16, TILEWIDTH + sprite_first.y(), mp);
     }
     else
     {
 	// draw first sprite
-	const Sprite & sprite_first = AGG::GetICN(ICN::MINIMON, mons.GetSpriteIndex() * 9);
+	const Sprite & sprite_first = AGG::GetICN(ICN::MINIMON, sprite_index * 9);
 	area.BlitOnTile(dst, sprite_first, sprite_first.x() + 16, TILEWIDTH + sprite_first.y(), mp);
 
 	// draw second sprite
-	const Sprite & sprite_next = AGG::GetICN(ICN::MINIMON, mons.GetSpriteIndex() * 9 + 1 + 
+	const Sprite & sprite_next = AGG::GetICN(ICN::MINIMON, sprite_index * 9 + 1 + 
 	    monster_animation_cicle[ (Game::MapsAnimationFrame() + mp.x * mp.y) % ARRAY_COUNT(monster_animation_cicle) ]);
 	area.BlitOnTile(dst, sprite_next, sprite_next.x() + 16, TILEWIDTH + sprite_next.y(), mp);
     }
@@ -867,21 +972,26 @@ void Maps::Tiles::RedrawTop(Surface & dst, const TilesAddon* skip) const
 
     if(!(area.GetRectMaps() & mp)) return;
 
-    // fix for haut mine
+    // animate objects
+    if(MP2::OBJ_ABANDONEDMINE == GetObject())
+    {
+    	const Sprite & anime_sprite = AGG::GetICN(ICN::OBJNHAUN,  Game::MapsAnimationFrame() % 15);
+	area.BlitOnTile(dst, anime_sprite, mp);
+    }
+    else
     if(MP2::OBJ_MINES == GetObject())
     {
-	if(quantity4 == Spell::HAUNT)
+	const Maps::TilesAddon* addon = FindObjectConst(MP2::OBJ_MINES);
+	if(addon && addon->tmp == Spell::HAUNT)
 	{
     	    const Sprite & anime_sprite = AGG::GetICN(ICN::OBJNHAUN,  Game::MapsAnimationFrame() % 15);
 	    area.BlitOnTile(dst, anime_sprite, mp);
 	}
 	else
-	if(quantity4 >= Spell::SETEGUARDIAN && quantity4 <= Spell::SETWGUARDIAN)
+	if(addon && addon->tmp >= Spell::SETEGUARDIAN && addon->tmp <= Spell::SETWGUARDIAN)
 	{
-	    const Spell spell(quantity4);
-	    const Monster mons(spell);
-	    if(mons.isValid())
-		area.BlitOnTile(dst, AGG::GetICN(ICN::MONS32, mons.GetSpriteIndex()), TILEWIDTH, 0, mp);
+	    area.BlitOnTile(dst,
+		AGG::GetICN(ICN::MONS32, Monster(Spell(addon->tmp)).GetSpriteIndex()), TILEWIDTH, 0, mp);
 	}
     }
 
@@ -986,15 +1096,13 @@ std::string Maps::Tiles::String(void) const
     os <<
 	"----------------:--------" << std::endl <<
 	"maps index      : " << maps_index << std::endl <<
-	"tile            : " << tile_sprite_index << std::endl <<
+	"tile index      : " << TileSpriteIndex() << std::endl <<
 	"ground          : " << Ground::String(GetGround()) << (isRoad() ? ", (road)" : "") << std::endl <<
-	"passable        : " << (isPassable(NULL, Direction::UNKNOWN, false) ? "true" : "false") << std::endl <<
+	"passable        : " << (tile_passable ? Direction::String(tile_passable) : "false") << std::endl <<
 	"mp2 object      : " << "0x" << std::setw(2) << std::setfill('0') << static_cast<int>(GetObject()) <<
 				    ", (" << MP2::StringObject(GetObject()) << ")" << std::endl <<
 	"quantity 1      : " << static_cast<int>(quantity1) << std::endl <<
-	"quantity 2      : " << static_cast<int>(quantity2) << std::endl <<
-	"quantity 3      : " << static_cast<int>(quantity3) << std::endl <<
-	"quantity 4      : " << static_cast<int>(quantity4) << std::endl;
+	"quantity 2      : " << static_cast<int>(quantity2) << std::endl;
 
     for(Addons::const_iterator
 	it = addons_level1.begin(); it != addons_level1.end(); ++it)
@@ -1031,7 +1139,7 @@ std::string Maps::Tiles::String(void) const
         case MP2::OBJ_THATCHEDHUT:
 	//
 	case MP2::OBJ_MONSTER:
-	    os << "count           : " << GetCountMonster() << std::endl;
+	    os << "count           : " << MonsterCount() << std::endl;
 	    break;
 
 	case MP2::OBJ_HEROES:
@@ -1062,6 +1170,16 @@ std::string Maps::Tiles::String(void) const
 	    }
 	    break;
 	}
+    }
+
+    if(MP2::isCaptureObject(GetObject(false)))
+    {
+	const CapturedObject & co = world.GetCapturedObject(maps_index);
+
+    os <<
+	"capture color   : " << Color::String(co.objcol.second) << std::endl <<
+	"capture guard   : " << co.guardians.GetName() << std::endl <<
+	"capture caunt   : " << co.guardians.GetCount() << std::endl;
     }
 
     os << "----------------:--------" << std::endl;
@@ -1098,7 +1216,7 @@ void Maps::Tiles::FixObject(void)
 
 bool Maps::Tiles::GoodForUltimateArtifact(void) const
 {
-    return ! isWater() && isPassable(NULL, Direction::UNKNOWN, true);
+    return ! isWater() && isPassable(NULL, Direction::CENTER, true);
 }
 
 bool TileIsGround(s32 index, u16 ground)
@@ -1120,53 +1238,28 @@ bool Maps::Tiles::isPassable(const Heroes* hero, Direction::vector_t direct, boo
 		return false;
 	}
 	else
-	if(! hero->isShipMaster())
+	// if(! hero->isShipMaster() &&
+	if(isWater())
 	{
-	    if(isWater())
+	    // fix shipwreck: place on water
+	    if(MP2::OBJ_SHIPWRECK == GetObject())
+		return Object::AllowDirect(MP2::OBJ_SHIPWRECK, direct);
+	    else
+	    // for: meetings/attack hero
+	    if(MP2::OBJ_HEROES == GetObject())
 	    {
-		// for: meetings/attack hero
-		if(MP2::OBJ_HEROES == GetObject())
-		{
-		    // scan ground
-		    const MapsIndexes & v = Maps::GetAroundIndexes(GetIndex());
-		    if(v.end() == std::find_if(v.begin(), v.end(),
-				std::not1(std::bind2nd(std::ptr_fun(&TileIsGround), Ground::WATER))))
-			return false;
-		}
-		else
+		// scan ground
+		const MapsIndexes & v = Maps::GetAroundIndexes(GetIndex());
+		if(v.end() == std::find_if(v.begin(), v.end(),
+		    std::not1(std::bind2nd(std::ptr_fun(&TileIsGround), Ground::WATER))))
 		    return false;
 	    }
+	    else
+		return false;
 	}
     }
 
-    if(!hero || hero->GetIndex() != maps_index)
-    {
-	// fix coast passable
-	if(Maps::TileIsCoast(maps_index, Direction::TOP|Direction::BOTTOM|Direction::LEFT|Direction::RIGHT) &&
-	    ! MP2::isActionObject(GetObject(), (hero ? hero->isShipMaster() : false)) &&
-	    //MP2::OBJ_ZERO != GetObject() &&  /* Town check: false (OBJNTWBA) */
-	    MP2::OBJ_COAST != GetObject() &&
-	    !addons_level1.empty()) return false;
-
-	// fix mountain layer
-	if(MP2::OBJ_MOUNTS == GetObject() &&
-	    addons_level1.end() != std::find_if(addons_level1.begin(), addons_level1.end(), TilesAddon::isMounts) &&
-	    addons_level2.end() != std::find_if(addons_level2.begin(), addons_level2.end(), TilesAddon::isMounts))
-	    return false;
-
-	// fix trees layer
-        if(MP2::OBJ_TREES == GetObject() &&
-	    addons_level1.end() != std::find_if(addons_level1.begin(), addons_level1.end(), TilesAddon::isTrees) &&
-	    addons_level2.end() != std::find_if(addons_level2.begin(), addons_level2.end(), TilesAddon::isTrees))
-	    return false;
-    }
-
-    // check all sprite
-    for(Addons::const_iterator
-	it = addons_level1.begin(); it != addons_level1.end(); ++it)
-	if(! TilesAddon::isPassable(*it, direct, maps_index)) return false;
-
-    return true;
+    return direct & tile_passable;
 }
 
 /* check road */
@@ -1184,142 +1277,12 @@ bool Maps::Tiles::isStream(void) const
 
 Maps::TilesAddon* Maps::Tiles::FindObject(u8 objs)
 {
-    Addons::iterator it = addons_level1.begin();
-
-    switch(objs)
-    {
-	case MP2::OBJ_CAMPFIRE:
-	    it = std::find_if(addons_level1.begin(), addons_level1.end(), TilesAddon::isCampFire);
-	    break;
-
-        case MP2::OBJ_TREASURECHEST:
-        case MP2::OBJ_ANCIENTLAMP:
-        case MP2::OBJ_RESOURCE:
-	    it = std::find_if(addons_level1.begin(), addons_level1.end(), TilesAddon::isResource);
-	    break;
-
-        case MP2::OBJ_RNDRESOURCE:
-	    it = std::find_if(addons_level1.begin(), addons_level1.end(), TilesAddon::isRandomResource);
-	    break;
-
-        case MP2::OBJ_FLOTSAM:
-        case MP2::OBJ_SHIPWRECKSURVIROR:
-        case MP2::OBJ_WATERCHEST:
-        case MP2::OBJ_BOTTLE:
-	    it = std::find_if(addons_level1.begin(), addons_level1.end(), TilesAddon::isWaterResource);
-	    break;
-
-	case MP2::OBJ_ARTIFACT:
-	    it = std::find_if(addons_level1.begin(), addons_level1.end(), TilesAddon::isArtifact);
-	    break;
-
-	case MP2::OBJ_RNDARTIFACT:
-	    it = std::find_if(addons_level1.begin(), addons_level1.end(), TilesAddon::isRandomArtifact);
-	    break;
-
-	case MP2::OBJ_RNDARTIFACT1:
-	    it = std::find_if(addons_level1.begin(), addons_level1.end(), TilesAddon::isRandomArtifact1);
-	    break;
-
-	case MP2::OBJ_RNDARTIFACT2:
-	    it = std::find_if(addons_level1.begin(), addons_level1.end(), TilesAddon::isRandomArtifact2);
-	    break;
-
-	case MP2::OBJ_RNDARTIFACT3:
-	    it = std::find_if(addons_level1.begin(), addons_level1.end(), TilesAddon::isRandomArtifact3);
-	    break;
-
-	case MP2::OBJ_RNDULTIMATEARTIFACT:
-	    it = std::find_if(addons_level1.begin(), addons_level1.end(), TilesAddon::isUltimateArtifact);
-	    break;
-
-	case MP2::OBJ_MONSTER:
-	    it = std::find_if(addons_level1.begin(), addons_level1.end(), TilesAddon::isMonster);
-	    break;
-
-	case MP2::OBJ_WHIRLPOOL:
-	    it = std::find_if(addons_level1.begin(), addons_level1.end(), TilesAddon::isWhirlPool);
-	    break;
-
-	case MP2::OBJ_STANDINGSTONES:
-	    it = std::find_if(addons_level1.begin(), addons_level1.end(), TilesAddon::isStandingStone);
-	    break;
-
-	case MP2::OBJ_ARTESIANSPRING:
-	    it = std::find_if(addons_level1.begin(), addons_level1.end(), TilesAddon::isArtesianSpring);
-	    break;
-
-	case MP2::OBJ_OASIS:
-	    it = std::find_if(addons_level1.begin(), addons_level1.end(), TilesAddon::isOasis);
-	    break;
-
-	case MP2::OBJ_WATERINGHOLE:
-	    it = std::find_if(addons_level1.begin(), addons_level1.end(), TilesAddon::isWateringHole);
-	    break;
-
-	case MP2::OBJ_MINES:
-	    it = std::find_if(addons_level1.begin(), addons_level1.end(), TilesAddon::isMine);
-	    break;
-
-	case MP2::OBJ_JAIL:
-	    it = std::find_if(addons_level1.begin(), addons_level1.end(), TilesAddon::isJail);
-	    break;
-
-	case MP2::OBJ_EVENT:
-	    it = std::find_if(addons_level1.begin(), addons_level1.end(), TilesAddon::isEvent);
-	    break;
-
-	case MP2::OBJ_BOAT:
-	    it = std::find_if(addons_level1.begin(), addons_level1.end(), TilesAddon::isBoat);
-	    break;
-
-	case MP2::OBJ_BARRIER:
-	    it = std::find_if(addons_level1.begin(), addons_level1.end(), TilesAddon::isBarrier);
-	    break;
-
-	case MP2::OBJ_HEROES:
-	    it = std::find_if(addons_level1.begin(), addons_level1.end(), TilesAddon::isMiniHero);
-	    break;
-
-	case MP2::OBJ_CASTLE:
-	    it = std::find_if(addons_level1.begin(), addons_level1.end(), TilesAddon::isCastle);
-	    if(it == addons_level1.end())
-	    {
-		it = std::find_if(addons_level2.begin(), addons_level2.end(), TilesAddon::isCastle);
-		return addons_level2.end() != it ? &(*it) : NULL;
-	    }
-	    break;
-
-	case MP2::OBJ_RNDCASTLE:
-	    it = std::find_if(addons_level1.begin(), addons_level1.end(), TilesAddon::isRandomCastle);
-	    if(it == addons_level1.end())
-	    {
-		it = std::find_if(addons_level2.begin(), addons_level2.end(), TilesAddon::isRandomCastle);
-		return addons_level2.end() != it ? &(*it) : NULL;
-	    }
-	    break;
-
-	case MP2::OBJ_RNDMONSTER:
-	case MP2::OBJ_RNDMONSTER1:
-	case MP2::OBJ_RNDMONSTER2:
-	case MP2::OBJ_RNDMONSTER3:
-	case MP2::OBJ_RNDMONSTER4:
-	    it = std::find_if(addons_level1.begin(), addons_level1.end(), TilesAddon::isRandomMonster);
-	    break;
-
-	case MP2::OBJ_SKELETON:
-	    it = std::find_if(addons_level1.begin(), addons_level1.end(), TilesAddon::isSkeleton);
-	    break;
-
-	default: break;
-    }
-
-    return addons_level1.end() != it ? &(*it) : NULL;
+    return const_cast<Maps::TilesAddon*>(FindObjectConst(objs));
 }
 
-const Maps::TilesAddon* Maps::Tiles::FindObject(u8 objs) const
+const Maps::TilesAddon* Maps::Tiles::FindObjectConst(u8 objs) const
 {
-    Addons::const_iterator it = addons_level1.begin();
+    Addons::const_iterator it = addons_level1.end();
 
     switch(objs)
     {
@@ -1467,7 +1430,7 @@ Maps::TilesAddon* Maps::Tiles::FindFlags(void)
 }
 
 /* ICN::FLAGS32 version */
-void Maps::Tiles::CaptureFlags32(const MP2::object_t obj, const Color::color_t col)
+void Maps::Tiles::CaptureFlags32(u8 obj, u8 col)
 {
     u8 index = 0;
 
@@ -1479,13 +1442,14 @@ void Maps::Tiles::CaptureFlags32(const MP2::object_t obj, const Color::color_t c
 	case Color::YELLOW:	index = 3; break;
 	case Color::ORANGE:	index = 4; break;
 	case Color::PURPLE:	index = 5; break;
-	case Color::NONE:	index = 6; break;
-
-	default: break;
+	default:		index = 6; break;
     }
 
     switch(obj)
     {
+	case MP2::OBJ_WINDMILL:		index += 42; CorrectFlags32(index, false); break;
+	case MP2::OBJ_WATERWHEEL:	index += 14; CorrectFlags32(index, false); break;
+
 	case MP2::OBJ_MINES:		index += 14; CorrectFlags32(index, true); break;
 	//case MP2::OBJ_DRAGONCITY:	index += 35; CorrectFlags32(index); break; unused
         case MP2::OBJ_LIGHTHOUSE:	index += 42; CorrectFlags32(index, false); break;
@@ -1588,389 +1552,12 @@ void Maps::Tiles::FixLoyaltyVersion(void)
     }
 }
 
-u8 Maps::Tiles::GetMinesType(void) const
-{
-    const TilesAddon* taddon = FindObject(MP2::OBJ_MINES);
-
-    if(taddon) switch(taddon->index)
-    {
-	case 0:	return Resource::ORE;
-	case 1: return Resource::SULFUR;
-        case 2: return Resource::CRYSTAL;
-        case 3: return Resource::GEMS;
-	case 4: return Resource::GOLD;
-        default: break;
-    }
-    return 0;
-}
-
-/* for few object need many resource */
-void Maps::Tiles::UpdateQuantity(void)
-{
-    const TilesAddon * addon = NULL;
-
-    switch(GetObject(false))
-    {
-        case MP2::OBJ_WITCHSHUT:
-            quantity1 = Skill::Secondary::RandForWitchsHut();
-	    break;
-
-	case MP2::OBJ_SHRINE1:
-            quantity1 = 0 != (Rand::Get(10) % 2) ? Spell::RandCombat(1)() : Spell::RandAdventure(1)();
-            break;
-
-        case MP2::OBJ_SHRINE2:
-            quantity1 = 0 != (Rand::Get(10) % 2) ? Spell::RandCombat(2)() : Spell::RandAdventure(2)();
-            break;
-
-        case MP2::OBJ_SHRINE3:
-            quantity1 = 0 != (Rand::Get(10) % 2) ? Spell::RandCombat(3)() : Spell::RandAdventure(3)();
-            break;
-
-	case MP2::OBJ_SKELETON:
-	{
-	    Rand::Queue percents(2);
-	    // 80%: empty
-	    percents.Push(0, 80);
-	    // 20%: artifact 1 or 2 or 3
-	    percents.Push(1, 20);
-	    
-	    if(percents.Get())
-	    {
-		switch(Rand::Get(1, 3))
-		{
-		    case 1: quantity1 = Artifact::Rand(Artifact::ART_LEVEL1); break;
-		    case 2: quantity1 = Artifact::Rand(Artifact::ART_LEVEL2); break;
-		    case 3: quantity1 = Artifact::Rand(Artifact::ART_LEVEL3); break;
-		    default: break;
-		}
-	    }
-	}
-	break;
-
-	case MP2::OBJ_WAGON:
-	{
-	    Rand::Queue percents(3);
-	    // 20%: empty
-	    percents.Push(0, 20);
-	    // 10%: artifact 1 or 2
-	    percents.Push(1, 10);
-	    // 50%: resource
-	    percents.Push(2, 50);
-
-	    switch(percents.Get())
-	    {
-		case 1:
-            	    quantity1 = Artifact::Rand(1 == Rand::Get(1, 2) ? Artifact::ART_LEVEL1 : Artifact::ART_LEVEL2);
-		    break;
-		case 2:
-		    quantity1 = Resource::Rand();
-		    quantity2 = Rand::Get(2, 5);
-		    break;
-		default: break;
-	    }
-	}
-	break;
-
-	case MP2::OBJ_ARTIFACT:
-	    // quantity1 - art, quantity2 - conditions for pickup: 
-	    // 1,2,3 - 2000g, 2500g+3res, 3000g+5res,
-	    // 4,5 - need have skill wisard or leadership,
-	    // 6 - 50 rogues, 7 - 1 gin, 8,9,10,11,12,13 - 1 monster level4, other - none
-	    addon = FindObject(MP2::OBJ_ARTIFACT);
-	    if(addon)
-	    {
-		Artifact art = Artifact::FromMP2IndexSprite(addon->index);
-
-		if(art() == Artifact::SPELL_SCROLL)
-		{
-		    // spell from origin mp2
-		    Spell spell(1 + (quantity2 * 256 + quantity1) / 8);
-		    quantity1 = art();
-		    // always available
-		    quantity2 = 0;
-		    quantity3 = spell();
-		}
-		else
-		if(art.isValid())
-		{
-		    quantity1 = art();
-		    // conditions: 70% empty
-		    quantity2 = Rand::Get(1, 10) < 4 ? Rand::Get(1, 13) : 0;
-		    //  added resource
-		    if(quantity2 == 2 || quantity2 == 3)
-			quantity4 = Resource::Rand();
-
-		    // always available
-		    if(Settings::Get().ExtNoRequirementsForArtifacts())
-			quantity2 = 0;
-		}
-		else
-		{
-		    DEBUG(DBG_GAME, DBG_INFO, "unknown artifact");
-		}
-	    }
-	break;
-
-	case MP2::OBJ_RESOURCE:
-	    addon = FindObject(MP2::OBJ_RESOURCE);
-	    if(addon)
-	    {
-		quantity1 = Resource::FromIndexSprite(addon->index);
-		switch(quantity1)
-		{
-		    case Resource::WOOD:
-		    case Resource::ORE:
-		    case Resource::GOLD:
-			quantity2 = Rand::Get(5, 10);
-			break;
-		    default:
-			quantity2 = Rand::Get(3, 6);
-			break;
-		}
-	    }
-	break;
-
-	case MP2::OBJ_MAGICGARDEN:
-	    // 5 gems or 500 gold
-	    quantity1 = (Rand::Get(1) ? Resource::GEMS : Resource::GOLD);
-	    quantity2 = 5;
-	break;
-
-	case MP2::OBJ_WATERWHEEL:
-	    // first week 500 gold, next week 1000 gold
-	    quantity1 = Resource::GOLD;
-	    quantity2 = (0 == world.CountDay() ? 5 : 10);
-	break;
-
-	case MP2::OBJ_WINDMILL:
-	    // 2 rnd resource
-	    quantity2 = 2;
-	    quantity1 = Resource::WOOD;
-	    // except: wood, bugs: #3117478
-	    while(quantity1 == Resource::WOOD) quantity1 = Resource::Rand();
-	break;
-
-	case MP2::OBJ_LEANTO:
-	    // 1-4 rnd resource
-	    quantity1 = Resource::Rand();
-	    quantity2 = Rand::Get(1, 4);
-	break;
-
-	case MP2::OBJ_CAMPFIRE:
-	    // 4-6 rnd resource and + 400-600 gold
-	    quantity1 = Resource::Rand();
-	    quantity2 = Rand::Get(4, 6);
-	break;
-
-	case MP2::OBJ_FLOTSAM:
-	{
-	    Rand::Queue percents(3);
-	    // 25%: empty
-	    percents.Push(0, 25);
-	    // 25%: 500 gold + 10 wood
-	    percents.Push(1, 25);
-	    // 25%: 200 gold + 5 wood
-	    percents.Push(2, 25);
-	    // 25%: 5 wood
-	    percents.Push(3, 25);
-	    
-	    // variant
-	    switch(percents.Get())
-	    {
-		case 1: quantity1 = 5; quantity2 = 10; break;
-		case 2: quantity1 = 2; quantity2 = 5;  break;
-		case 3: quantity2 = 5; break;
-		default: break;
-	    }
-	}
-	break;
-
-	case MP2::OBJ_SHIPWRECKSURVIROR:
-	{
-	    Rand::Queue percents(3);
-	    // 55%: artifact 1
-	    percents.Push(1, 55);
-	    // 30%: artifact 2
-	    percents.Push(1, 30);
-	    // 15%: artifact 3
-	    percents.Push(1, 15);
-	    
-	    // variant
-	    switch(percents.Get())
-	    {
-		case 1: quantity1 = Artifact::Rand(Artifact::ART_LEVEL1); break;
-		case 2: quantity1 = Artifact::Rand(Artifact::ART_LEVEL2); break;
-		case 3: quantity1 = Artifact::Rand(Artifact::ART_LEVEL3); break;
-		default: break;
-	    }
-	}
-	break;
-
-	case MP2::OBJ_WATERCHEST:
-	{
-	    Rand::Queue percents(3);
-            // 20% - empty
-	    percents.Push(0, 20);
-            // 70% - 1500 gold
-	    percents.Push(1, 70);
-            // 10% - 1000 gold + art
-	    percents.Push(2, 10);
-
-	    // variant
-	    switch(percents.Get())
-	    {
-		case 1: quantity2 = 15; break;
-		case 2: quantity2 = 10; quantity1 = Artifact::Rand(Artifact::ART_LEVEL1); break;
-		default: break;
-	    }
-	}
-	break;
-
-	case MP2::OBJ_TREASURECHEST:
-	{
-	    Rand::Queue percents(4);
-	    // 31% - 2000 gold or 1500 exp
-	    percents.Push(1, 31);
-	    // 32% - 1500 gold or 1000 exp
-	    percents.Push(2, 32);
-	    // 32% - 1000 gold or 500 exp
-	    percents.Push(3, 32);
-	    // 5% - art
-	    percents.Push(4,  5);
-	    
-	    // variant
-	    switch(percents.Get())
-	    {
-		case 1: quantity2 = 20; break;
-		case 2: quantity2 = 15; break;
-		case 3: quantity2 = 10; break;
-		case 4: quantity1 = Artifact::Rand(Artifact::ART_LEVEL1); break;
-		default: break;
-	    }
-	}
-	break;
-
-	case MP2::OBJ_DERELICTSHIP:
-	    // 5000 gold
-	    quantity2 = 50;
-	break;
-
-	case MP2::OBJ_SHIPWRECK:
-	    // variant: 10ghost(1000g), 15 ghost(2000g), 25ghost(5000g) or 50ghost(2000g+art)
-	    switch(Rand::Get(1, 4))
-	    {
-		case 1: quantity2 = 10; break;
-		case 2: quantity2 = 15; break;
-		case 3: quantity2 = 25; break;
-		case 4: quantity1 = Artifact::Rand(Artifact::ART_LEVEL123);
-		        quantity2 = 50; break;
-		default: break;
-	    }
-	break;
-
-	case MP2::OBJ_GRAVEYARD:
-	    // 1000 gold + art
-		quantity1 = Artifact::Rand(Artifact::ART_LEVEL123);
-		quantity2 = 10;
-	break;
-
-	case MP2::OBJ_PYRAMID:
-	    // random spell level 5
-	    quantity1 = (Rand::Get(1) ? Spell::RandCombat(5)() : Spell::RandAdventure(5)());
-	    quantity2 = 1;
-	break;
-
-	case MP2::OBJ_DAEMONCAVE:
-	    // 1000 exp or 1000 exp + 2500 gold or 1000 exp + art or (-2500 or remove hero)
-	    quantity2 = Rand::Get(1, 4);
-	    quantity1 = Artifact::Rand(Artifact::ART_LEVEL123);
-	break;
-
-	// aband mines
-	case MP2::OBJ_ABANDONEDMINE:
-	    SetCountMonster(Rand::Get(39, 45));	// I checked in Heroes II: min 3 x 13, and max 3 x 15
-	    quantity3 = Monster::GHOST;
-	    if(! Settings::Get().ExtAbandonedMineRandom())
-		quantity4 =  Resource::GOLD;
-	    else
-		switch(Rand::Get(1, 5))
-		{
-		    case 1: quantity4 =  Resource::ORE; break;
-		    case 2: quantity4 =  Resource::SULFUR; break;
-		    case 3: quantity4 =  Resource::CRYSTAL; break;
-		    case 4: quantity4 =  Resource::GEMS; break;
-		    default: quantity4 =  Resource::GOLD; break;
-		}
-	break;
-
-	case MP2::OBJ_TREEKNOWLEDGE:
-	    // variant: 10 gems, 2000 gold or free
-	    switch(Rand::Get(1, 3))
-	    {
-		case 1:
-		    quantity2 = 10;
-		break;
-		case 2:
-		    quantity2 = 20;
-		break;
-		default: break;
-	    }
-	break;
-
-        case MP2::OBJ_BARRIER:
-        case MP2::OBJ_TRAVELLERTENT:
-	    quantity1 = BarrierColor::FromMP2(quantity1);
-	break;
-
-	default: break;
-    }
-}
-
-bool Maps::Tiles::ValidQuantity(void) const
-{
-    if(MP2::isQuantityObject(GetObject()))
-	    return quantity1 || quantity2;
-
-    return false;
-}
-
-bool Maps::Tiles::OtherObjectsIsProtection(void) const
-{
-    const u8 object = GetObject(false);
-
-    switch(object)
-    {
-	case MP2::OBJ_ARTIFACT:
-	    return quantity2 > 5 && quantity2 < 14;
-
-	case MP2::OBJ_DERELICTSHIP:
-	case MP2::OBJ_SHIPWRECK:
-	case MP2::OBJ_GRAVEYARD:
-	    return quantity2;
-
-	case MP2::OBJ_PYRAMID:
-	case MP2::OBJ_DAEMONCAVE:
-	    return quantity2;
-
-	case MP2::OBJ_MONSTER:
-	case MP2::OBJ_ABANDONEDMINE:
-	    return GetCountMonster();
-
-	default:
-	    break;
-    }
-
-    return false;
-}
-
 /* true: if protection or has guardians */
-bool Maps::Tiles::CaptureObjectIsProtection(u8 color) const
+bool Maps::Tiles::CaptureObjectIsProtection(void) const
 {
     const u8 object = GetObject(false);
 
-    if(color &&
-	MP2::isCaptureObject(object))
+    if(MP2::isCaptureObject(object))
     {
 	if(MP2::OBJ_CASTLE == object)
 	{
@@ -1979,7 +1566,7 @@ bool Maps::Tiles::CaptureObjectIsProtection(u8 color) const
 		return castle->GetArmy().isValid();
 	}
 	else
-            return quantity3 && GetCountMonster();
+	    return QuantityTroop().isValid();
     }
 
     return false;
@@ -1987,7 +1574,7 @@ bool Maps::Tiles::CaptureObjectIsProtection(u8 color) const
 
 void Maps::Tiles::RemoveObjectSprite(void)
 {
-    const Maps::TilesAddon *addon = NULL;
+    Maps::TilesAddon *addon = NULL;
 
     switch(GetObject())
     {
@@ -2020,7 +1607,7 @@ void Maps::Tiles::RemoveObjectSprite(void)
 
 void Maps::Tiles::RemoveBarrierSprite(void)
 {
-    const Maps::TilesAddon *addon = FindObject(MP2::OBJ_BARRIER);
+    Maps::TilesAddon *addon = FindObject(MP2::OBJ_BARRIER);
 
     if(addon)
     {
@@ -2037,7 +1624,7 @@ void Maps::Tiles::RemoveBarrierSprite(void)
 
 void Maps::Tiles::RemoveJailSprite(void)
 {
-    const Maps::TilesAddon *addon = FindObject(MP2::OBJ_JAIL);
+    Maps::TilesAddon *addon = FindObject(MP2::OBJ_JAIL);
 
     if(addon)
     {
@@ -2073,103 +1660,6 @@ void Maps::Tiles::RemoveJailSprite(void)
     }
 }
 
-bool Maps::Tiles::FixedCountMonster(void) const
-{
-    return quantity5;
-}
-
-u16 Maps::Tiles::GetCountMonster(void) const
-{
-    return quantity2 * 0xFF + quantity1;
-}
-
-void Maps::Tiles::SetCountMonster(const u16 count)
-{
-    if(count > 0xFF * 0xFF + 0xFF - 1)
-    {
-	quantity1 = 0xFF;
-	quantity2 = 0xFF;
-    }
-    else
-    {
-	quantity1 = count % 0xFF;
-	quantity2 = count / 0xFF;
-    }
-}
-
-void Maps::Tiles::PlaceMonsterOnTile(Tiles & tile, const Monster & mons, u32 uniq)
-{
-    tile.ResetQuantity();
-    tile.SetObject(MP2::OBJ_MONSTER);
-    tile.SetCountMonster(5 * mons.GetRNDSize(true));
-    tile.SetQuantity3(mons());
-    // join for money
-    tile.SetQuantity4(1);
-
-    // set sprite
-    tile.AddonsPushLevel1(TilesAddon(TilesAddon::UPPER, uniq, 0x33, mons() - 1));
-}
-
-void Maps::Tiles::UpdateMonsterInfo(Tiles & tile)
-{
-    Maps::TilesAddon *addon = tile.FindObject(MP2::OBJ_RNDMONSTER);
-
-    if(addon)
-    {
-	switch(tile.GetObject())
-	{
-    	    case MP2::OBJ_RNDMONSTER:       addon->index = Monster::Rand().GetID(); break;
-    	    case MP2::OBJ_RNDMONSTER1:      addon->index = Monster::Rand(Monster::LEVEL1).GetID(); break;
-    	    case MP2::OBJ_RNDMONSTER2:      addon->index = Monster::Rand(Monster::LEVEL2).GetID(); break;
-    	    case MP2::OBJ_RNDMONSTER3:      addon->index = Monster::Rand(Monster::LEVEL3).GetID(); break;
-    	    case MP2::OBJ_RNDMONSTER4:      addon->index = Monster::Rand(Monster::LEVEL4).GetID(); break;
-	    default: addon = NULL; break;
-	}
-
-	// ICN::MONS32 start from PEASANT
-        if(addon) addon->index = addon->index - 1;
-
-	tile.SetObject(MP2::OBJ_MONSTER);
-    }
-
-    addon = tile.FindObject(MP2::OBJ_MONSTER);
-    const Monster m(addon ? addon->index + 1 : Monster::UNKNOWN);
-    // fixed count
-    tile.quantity5 = 0;
-
-    // update random count
-    if(0 == tile.quantity1 && 0 == tile.quantity2)
-        tile.SetCountMonster(4 * m.GetRNDSize(false));
-    // update fixed count (mp2 format)
-    else
-    {
-	u16 count = tile.quantity2;
-	    count <<= 8;
-	    count |= tile.quantity1;
-	    count >>= 3;
-
-        tile.SetCountMonster(count);
-	tile.quantity5 = 1;
-    }
-
-    // set monster
-    tile.quantity3 = m();
-
-    // extra params:
-    // quantity4 - join conditions (0: skip, 1: money, 2: free, 3: force (for campain need store color also)
-
-    // skip join
-    if(m() == Monster::GHOST || m.isElemental())
-	tile.quantity4 = 0;
-    else
-    if(tile.FixedCountMonster())
-	// for money
-	tile.quantity4 = 1;
-    else
-	// 20% chance of joining
-        tile.quantity4 = (3 > Rand::Get(1, 10) ? 2 : 1);
-}
-
 void Maps::Tiles::UpdateAbandoneMineSprite(Tiles & tile)
 {
     Addons::iterator it = std::find_if(tile.addons_level1.begin(), tile.addons_level1.end(),
@@ -2178,9 +1668,11 @@ void Maps::Tiles::UpdateAbandoneMineSprite(Tiles & tile)
 
     if(uniq)
     {
+	const u8 type = tile.QuantityResourceCount().first;
+
 	for(Addons::iterator
 	    it = tile.addons_level1.begin(); it != tile.addons_level1.end(); ++it)
-		TilesAddon::UpdateAbandoneMineLeftSprite(*it, tile.quantity4);
+		TilesAddon::UpdateAbandoneMineLeftSprite(*it, type);
 
 	if(Maps::isValidDirection(tile.maps_index, Direction::RIGHT))
 	{
@@ -2293,7 +1785,7 @@ void Maps::Tiles::UpdateStoneLightsSprite(Tiles & tile)
 {
     for(Addons::iterator
 	it = tile.addons_level1.begin(); it != tile.addons_level1.end(); ++it)
-	    TilesAddon::UpdateStoneLightsSprite(*it, tile.quantity1);
+	    tile.QuantitySetTeleportType(TilesAddon::UpdateStoneLightsSprite(*it));
 }
 
 void Maps::Tiles::UpdateFountainSprite(Tiles & tile)
@@ -2313,23 +1805,12 @@ void Maps::Tiles::UpdateTreasureChestSprite(Tiles & tile)
 bool Maps::Tiles::isFog(u8 colors) const
 {
     // colors may be the union friends
-    return (fogs & colors) == colors;
+    return (fog_colors & colors) == colors;
 }
 
 void Maps::Tiles::ClearFog(u8 colors)
 {
-    fogs &= ~colors;
-}
-
-void Maps::Tiles::ResetQuantity(void)
-{
-    quantity1 = 0;
-    quantity2 = 0;
-    quantity3 = 0;
-    quantity4 = 0;
-    quantity5 = 0;
-    quantity6 = 0;
-    quantity7 = 0;
+    fog_colors &= ~colors;
 }
 
 void Maps::Tiles::RedrawFogs(Surface & dst, u8 color) const
@@ -2337,7 +1818,7 @@ void Maps::Tiles::RedrawFogs(Surface & dst, u8 color) const
     const Interface::GameArea & area = Interface::GameArea::Get();
     const Point mp(maps_index % world.w(), maps_index / world.w());
 
-    // get direction around fogs
+    // get direction around foga
     u16 around = 0;
 
     for(Direction::vector_t direct = Direction::TOP_LEFT; direct != Direction::CENTER; ++direct)
@@ -2557,5 +2038,86 @@ void Maps::Tiles::RedrawFogs(Surface & dst, u8 color) const
 
 	const Sprite & sprite = AGG::GetICN(ICN::CLOP32, index, revert);
 	area.BlitOnTile(dst, sprite, (revert ? sprite.x() + TILEWIDTH - sprite.w() : sprite.x()), sprite.y(), mp);
+    }
+}
+
+void Maps::Tiles::FixLoadOldVersion(u16 version, u8 quantity3, u8 quantity4, u8 quantity5, u8 quantity6, u8 quantity7)
+{
+    if(version < FORMAT_VERSION_2632)
+    {
+	switch(mp2_object)
+	{
+	    case MP2::OBJ_FLOTSAM:
+		std::swap(quantity1, quantity2);
+		break;
+
+	    case MP2::OBJ_PYRAMID:
+		if(0 == quantity2)
+		    QuantitySetSpell(Spell::NONE);
+		break;
+
+	    case MP2::OBJ_TREEKNOWLEDGE:
+		switch(quantity2)
+		{
+		    case 10: QuantitySetResource(Resource::GEMS, 10); break;
+		    case 20: QuantitySetResource(Resource::GOLD, 2000); break;
+		    default: break;
+		}
+		break;
+
+	    case MP2::OBJ_MONSTER:
+	    {
+		MonsterSetCount(quantity2 * 0xFF + quantity1);
+    		MonsterSetJoinCondition(quantity4);
+    		if(quantity5) MonsterSetFixedCount();
+	    }
+		break;
+
+	    case MP2::OBJ_ABANDONEDMINE:
+    	    {
+        	Army::Troop & troop = world.GetCapturedObject(maps_index).GetTroop();
+        	troop.Set(Monster::GHOST, quantity2 * 0xFF + quantity1);
+
+        	switch(quantity4)
+        	{
+            	    case Resource::ORE:		QuantitySetResource(Resource::ORE, 2); break;
+            	    case Resource::SULFUR:	QuantitySetResource(Resource::SULFUR, 1); break;
+            	    case Resource::CRYSTAL:	QuantitySetResource(Resource::CRYSTAL, 1); break;
+            	    case Resource::GEMS:	QuantitySetResource(Resource::GEMS, 1); break;
+            	    default:			QuantitySetResource(Resource::GOLD, 1000); break;
+        	}
+	    }
+		break;
+
+	    case MP2::OBJ_ARTIFACT:
+    	    {
+		QuantitySetVariant(quantity2);
+		if(quantity4) QuantitySetExt(Resource::GetIndexSprite2(quantity4) + 1);
+		else
+		if(quantity3) QuantitySetSpell(quantity3);
+	    }
+		break;
+
+            case MP2::OBJ_ALCHEMYLAB:
+            case MP2::OBJ_MINES:
+            case MP2::OBJ_SAWMILL:
+            case MP2::OBJ_LIGHTHOUSE:
+    	    {
+		if(quantity3)
+		{
+        	    Army::Troop & troop = world.GetCapturedObject(maps_index).GetTroop();
+        	    troop.Set(quantity3, quantity2 * 0xFF + quantity1);
+
+		    if(quantity4)
+		    {
+			Maps::TilesAddon *addon = FindObject(MP2::OBJ_MINES);
+			if(addon) addon->tmp = quantity4;
+		    }
+		}
+	    }
+		break;
+
+	    default: break;
+	}
     }
 }

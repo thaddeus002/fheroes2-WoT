@@ -129,7 +129,7 @@ void Kingdom::LossPostActions(void)
 	    castles.ChangeColors(GetColor(), Color::NONE);
 	    castles.clear();
 	}
-	world.KingdomLoss(GetColor());
+	world.ResetCapturedObjects(GetColor());
     }
 }
 
@@ -744,4 +744,27 @@ void Kingdoms::AddCastles(const AllCastles & castles)
 	it = castles.begin(); it != castles.end(); ++it)
 	// skip gray color
         if((*it)->GetColor()) GetKingdom((*it)->GetColor()).AddCastle(*it);
+}
+
+void Kingdoms::AddTributeEvents(CapturedObjects & captureobj, u16 day, u8 obj)
+{
+    for(u8 ii = 0; ii < size(); ++ii)
+	if(kingdoms[ii].isPlay())
+    {
+	const u8 & color = kingdoms[ii].GetColor();
+        const Funds funds = captureobj.TributeCapturedObject(color, obj);
+
+        if(funds.GetValidItems())
+        {
+            EventDate event;
+
+            event.computer = true;
+            event.first = day;
+            event.colors = color;
+            event.resource = funds;
+	    event.message = MP2::StringObject(obj);
+
+            world.AddEventDate(event);
+        }
+    }
 }

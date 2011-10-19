@@ -130,6 +130,11 @@ EventDate::EventDate(const void *ptr)
     DEBUG(DBG_GAME, DBG_INFO, "add: " << message);
 }
 
+bool EventDate::isDeprecated(u16 date) const
+{
+    return 0 == subsequent && first < date;
+}
+
 bool EventDate::isAllow(u8 col, u16 date) const
 {
     return ((first == date ||

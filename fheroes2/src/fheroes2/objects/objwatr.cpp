@@ -23,51 +23,56 @@
 #include "icn.h"
 #include "objwatr.h"
 
-bool ObjWater::isPassable(u16 icn, u8 index, u16 direct)
+bool ObjWater::isPassable(const u16 & icn, const u8 & index, u16 direct)
+{
+    return direct & GetPassable(icn, index);
+}
+
+u16 ObjWater::GetPassable(const u16 & icn, const u8 & index)
 {
     switch(icn)
     {
 	case ICN::OBJNWAT2:
 	    // rock
-	    if(2 == index) return false;
+	    if(2 == index) return 0;
 	    else
 	    // ship
-	    if(11 == index || 12 == index || (18 < index && index < 23)) return false;
-	    
-	    else return true;
+	    if(11 == index || 12 == index || (18 < index && index < 23)) return 0;
+            else
+                return DIRECTION_ALL;
 
 	case ICN::OBJNWATR:
 	    // buttle
-	    if(0 == index) return false;
+	    if(0 == index) return 0;
 	    else
 	    // chest
-	    if(19 == index) return false;
+	    if(19 == index) return 0;
 	    else
 	    // flotsam
-	    if(45 == index) return false;
+	    if(45 == index) return 0;
 	    else
 	    // magellan maps
-	    if(62 == index || 69 == index) return false;
+	    if(62 == index || 69 == index) return 0;
 	    else
 	    // surviror
-	    if(111 == index) return false;
+	    if(111 == index) return 0;
 	    else
 	    // rock
-	    if((181 < index && index < 184) || (184 < index && index < 188)) return false;
+	    if((181 < index && index < 184) || (184 < index && index < 188)) return 0;
 	    else
 	    // buoy
-	    if(195 == index) return false;
+	    if(195 == index) return 0;
 	    else
 	    // whirlpoll
-	    if(202 == index || 206 == index || 210 == index || 214 == index || 218 == index || 222 == index) return false;
+	    if(202 == index || 206 == index || 210 == index || 214 == index || 218 == index || 222 == index) return 0;
 	    else
 	    // ship
-	    if(241 == index || 248 == index) return false;
-
-	    else return true;
+	    if(241 == index || 248 == index) return 0;
+	    else
+		return DIRECTION_ALL;
 
 	default: break;
     }
 
-    return false;
+    return 0;
 }

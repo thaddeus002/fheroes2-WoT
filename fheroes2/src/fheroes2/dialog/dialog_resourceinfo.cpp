@@ -24,6 +24,7 @@
 #include "settings.h"
 #include "cursor.h"
 #include "button.h"
+#include "resource.h"
 #include "dialog.h"
 
 u16 Dialog::ResourceInfo(const std::string &header, const std::string &message, const Funds & rs, u16 buttons)

@@ -482,8 +482,8 @@ const char* MP2::StringObject(u8 object)
         case MP2::OBJ_SHRUB:			return _("Shrub");
         case MP2::OBJ_BUOY:			return _("Buoy");
         case MP2::OBJ_SKELETON:			return _("Skeleton");
-        case MP2::OBJ_TREASURECHEST:
-        case MP2::OBJ_WATERCHEST:		return _("Treasure Chest");
+        case MP2::OBJ_TREASURECHEST:		return _("Treasure Chest");
+        case MP2::OBJ_WATERCHEST:		return _("Sea Chest");
         case MP2::OBJ_CAMPFIRE:			return _("Campfire");
         case MP2::OBJ_FOUNTAIN:			return _("Fountain");
         case MP2::OBJ_ANCIENTLAMP:		return _("Genie Lamp");
@@ -899,11 +899,16 @@ bool MP2::isCaptureObject(const u8 obj)
     switch(obj)
     {
         case OBJ_MINES:
+	case MP2::OBJ_ABANDONEDMINE:
         case OBJ_ALCHEMYLAB:
         case OBJ_SAWMILL:
         case OBJ_LIGHTHOUSE:
         case OBJ_CASTLE:
 	    return true;
+
+        case OBJ_WATERWHEEL:
+        case OBJ_WINDMILL:
+           return Settings::Get().ExtWorldWindWaterMillsCaptured();
 
 	default: break;
     }
@@ -978,6 +983,7 @@ bool MP2::isNeedStayFront(const u8 obj)
         case MP2::OBJ_BOAT:
         case MP2::OBJ_BARRIER:
         case MP2::OBJ_JAIL:
+	case MP2::OBJ_SHIPWRECK:
 	    return true;
 
 	default: break;

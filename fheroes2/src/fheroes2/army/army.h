@@ -54,8 +54,8 @@ namespace Army
     {
 	public:
 	    army_t(HeroBase* s = NULL);
+	    army_t(const Maps::Tiles &);
 
-	    void	FromGuardian(const Maps::Tiles &);
 	    void	UpgradeMonsters(const Monster &);
 	    void	Clear(void);
 	    void	Reset(bool = false);	// reset: soft or hard
@@ -72,16 +72,16 @@ namespace Army
 	    const Troop &	At(u8) const;
 	    const Troop &	GetSlowestTroop(void) const;
 
-	    u8   GetRace(void) const;
-	    Color::color_t GetColor(void) const;
-	    u8             GetControl(void) const;
+	    u8		GetRace(void) const;
+	    u8		GetColor(void) const;
+	    u8          GetControl(void) const;
 
-	    void        SetColor(Color::color_t);
+	    void        SetColor(u8);
 
 	    u8		Size(void) const;
 	    u8		GetCount(void) const;
 	    u8		GetUniqCount(void) const;
-	    u32		GetCountMonsters(const Monster &) const;
+	    u32		MonsterCounts(const Monster &) const;
 	    s8		GetMorale(void) const;
 	    s8		GetLuck(void) const;
 	    s8		GetMoraleModificator(std::string *strs) const;
@@ -137,7 +137,7 @@ namespace Army
 	    Troops		troops;
 	    HeroBase*		commander;
 	    u8			combat_format;
-	    Color::color_t	color;
+	    u8			color;
     };
 
     void DrawMons32Line(const army_t &, s16, s16, u16, u8 = 0, u8 = 0);

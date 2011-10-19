@@ -161,6 +161,7 @@ public:
     bool operator== (const Artifact &) const;
     bool operator!= (const Artifact &) const;
     u8 operator() (void) const;
+    u8 GetID(void) const;
 
     bool isUltimate(void) const;
     bool isValid(void) const;
@@ -196,6 +197,8 @@ private:
     u8 id;
     u8 ext;
 };
+
+u16 GoldInsteadArtifact(u8);
 
 struct BagArtifacts : std::vector<Artifact>
 {

@@ -40,16 +40,21 @@ Mounts::Mounts(ICN::icn_t icn) : Object(MP2::OBJ_MOUNTS, icn)
     }
 }
 
-bool Mounts::isPassable(u16 icn, u8 index, u16 direct)
+bool Mounts::isPassable(const u16 & icn, const u8 & index, u16 direct)
+{
+    return direct & GetPassable(icn, index);
+}
+
+u16 Mounts::GetPassable(const u16 & icn, const u8 & index)
 {
     // bug fix
     switch(icn)
     {
         case ICN::MTNGRAS:
-	    if(43 == index || 44 == index || 53 == index || 54 == index || 78 == index) return false;
+	    if(43 == index || 44 == index || 53 == index || 54 == index || 78 == index) return 0;
 	    break;
         case ICN::MTNDIRT:
-	    if(73 == index || 84 == index || 86 == index) return false;
+	    if(73 == index || 84 == index || 86 == index) return 0;
 	    break;
 
 	default: break;
@@ -63,51 +68,54 @@ bool Mounts::isPassable(u16 icn, u8 index, u16 direct)
         case ICN::MTNDIRT:
 	    // corner
 	    if(5 == index || 32 == index || 47 == index || 68 == index)
-		return direct != Direction::TOP_RIGHT;
+		return DIRECTION_ALL & ~Direction::TOP_RIGHT;
     	    else
-	    if((5 < index && index < 10) || (13 < index && index < 17)) return false;		// LARGE LEFT
+	    if((5 < index && index < 10) || (13 < index && index < 17)) return 0;		// LARGE LEFT
     	    else
 	    if((11 < index && index < 14) || (17 < index && index < 21))
-		return Direction::UNKNOWN == direct || (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
+		return DIRECTION_CENTER_ROW | DIRECTION_BOTTOM_ROW;
     	    else
-    	    if((27 < index && index < 32) || (32 < index && index < 36)) return false;		// LARGE RIGHT
+    	    if((27 < index && index < 32) || (32 < index && index < 36)) return 0;		// LARGE RIGHT
     	    else
 	    if((35 < index && index < 38) || (38 < index && index < 42))
-		return Direction::UNKNOWN == direct || (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
+		return DIRECTION_CENTER_ROW | DIRECTION_BOTTOM_ROW;
     	    else
-    	    if(49 < index && index < 53) return false;						// MEDIUM LEFT (51 and 52 for dirt need close)
+    	    if(49 < index && index < 53) return 0;						// MEDIUM LEFT (51 and 52 for dirt need close)
     	    else
 	    if((47 < index && index < 50) || (53 < index && index < 57))
-		return Direction::UNKNOWN == direct || (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
+		return DIRECTION_CENTER_ROW | DIRECTION_BOTTOM_ROW;
     	    else
-    	    if(65 == index) return false;							// MEDIUM RIGHT
+    	    if(65 == index) return 0;							// MEDIUM RIGHT
     	    else
 	    if((65 < index && index < 68) || (68 < index && index < 72))
-		return Direction::UNKNOWN == direct || (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
+		return DIRECTION_CENTER_ROW | DIRECTION_BOTTOM_ROW;
     	    else
-    	    if(76 < index && index < 79) return false;						// MEDIUM2 RIGHT
+    	    if(76 < index && index < 79) return 0;						// MEDIUM2 RIGHT
     	    else
 	    if(76 == index || (79 < index && index < 82))
-		return Direction::UNKNOWN == direct || (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
+		return DIRECTION_CENTER_ROW | DIRECTION_BOTTOM_ROW;
     	    else
-    	    if(87 == index) return false;							// MEDIUM2 LEFT
+    	    if(87 == index) return 0;							// MEDIUM2 LEFT
     	    else
 	    if(88 == index || (89 < index && index < 92))
-		return Direction::UNKNOWN == direct || (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
+		return DIRECTION_CENTER_ROW | DIRECTION_BOTTOM_ROW;
     	    else
-    	    if(94 == index) return false;							// SMALL LEFT
+    	    if(94 == index) return 0;							// SMALL LEFT
     	    else
 	    if(93 == index || (95 < index && index < 98))
-		return Direction::UNKNOWN == direct || (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
+		return DIRECTION_CENTER_ROW | DIRECTION_BOTTOM_ROW;
     	    else
-    	    if(99 == index) return false;							// SMALL RIGHT
+    	    if(99 == index) return 0;							// SMALL RIGHT
     	    else
 	    if(100 == index || (101 < index && index < 104))
-		return Direction::UNKNOWN == direct || (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
+		return DIRECTION_CENTER_ROW | DIRECTION_BOTTOM_ROW;
+	    else
+	    if(112 == index)
+		return 0;
     	    else
     	    if(110 < index && index < 114)							// MINES
-		return Direction::UNKNOWN == direct || (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
-    	    else return true;
+		return DIRECTION_CENTER_ROW | DIRECTION_BOTTOM_ROW;
+    	    else return DIRECTION_ALL;
 
         // 83 sprites
         case ICN::MTNDSRT:
@@ -118,47 +126,50 @@ bool Mounts::isPassable(u16 icn, u8 index, u16 direct)
         case ICN::MTNSWMP:
 	    // corner
 	    if(5 == index || 32 == index)
-		return direct != Direction::TOP_RIGHT;
+		return DIRECTION_ALL & ~Direction::TOP_RIGHT;
     	    else
-    	    if((5 < index && index < 10) || (13 < index && index < 17)) return false;		// LARGE LEFT
+    	    if((5 < index && index < 10) || (13 < index && index < 17)) return 0;		// LARGE LEFT
 	    else
 	    if((11 < index && index < 14) || (17 < index && index < 21))
-		return Direction::UNKNOWN == direct || (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
+		return DIRECTION_CENTER_ROW | DIRECTION_BOTTOM_ROW;
     	    else
-	    if(25 == index) return false;	// bug: level 1 sprite for mtngrass
+	    if(25 == index) return 0;	// bug: level 1 sprite for mtngrass
     	    else
-    	    if((27 < index && index < 32) || (32 < index && index < 36)) return false;		// LARGE RIGHT
+    	    if((27 < index && index < 32) || (32 < index && index < 36)) return 0;		// LARGE RIGHT
 	    else
 	    if((35 < index && index < 38) || (38 < index && index < 42))
-		return Direction::UNKNOWN == direct || (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
+		return DIRECTION_CENTER_ROW | DIRECTION_BOTTOM_ROW;
     	    else
-    	    if(46 < index && index < 49) return false;						// MEDIUM LEFT
+    	    if(46 < index && index < 49) return 0;						// MEDIUM LEFT
 	    else
 	    if(46 == index || (49 < index && index < 52))
-		return Direction::UNKNOWN == direct || (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
+		return DIRECTION_CENTER_ROW | DIRECTION_BOTTOM_ROW;
     	    else
-    	    if((55 < index && index < 58)) return false;					// MEDIUM RIGHT
+    	    if((55 < index && index < 58)) return 0;					// MEDIUM RIGHT
 	    else
 	    if(58 == index || (59 < index && index < 62))
-		return Direction::UNKNOWN == direct || (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
+		return DIRECTION_CENTER_ROW | DIRECTION_BOTTOM_ROW;
     	    else
-    	    if(63 < index && index < 65) return false;						// SMALL LEFT
+    	    if(63 < index && index < 65) return 0;						// SMALL LEFT
 	    else
 	    if(63 == index || (65 < index && index < 68))
-		return Direction::UNKNOWN == direct || (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
+		return DIRECTION_CENTER_ROW | DIRECTION_BOTTOM_ROW;
     	    else
-    	    if((68 < index && index < 70)) return false;					// SMALL RIGHT
+    	    if((68 < index && index < 70)) return 0;					// SMALL RIGHT
 	    else
 	    if(70 == index || (71 < index && index < 74))
-		return Direction::UNKNOWN == direct || (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
+		return DIRECTION_CENTER_ROW | DIRECTION_BOTTOM_ROW;
+	    else
+	    if(82 == index)
+		return 0;
     	    else
     	    if(80 < index && index < 84)							// MINES
-		return Direction::UNKNOWN == direct || (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
+		return DIRECTION_CENTER_ROW | DIRECTION_BOTTOM_ROW;
     	    else
-		return true;
+		return DIRECTION_ALL;
 
         default: break;
     }
 
-    return false;
+    return 0;
 }

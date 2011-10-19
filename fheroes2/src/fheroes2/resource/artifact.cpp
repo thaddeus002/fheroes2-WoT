@@ -292,6 +292,11 @@ u8 Artifact::operator() (void) const
     return id;
 }
 
+u8 Artifact::GetID(void) const
+{
+    return id;
+}
+
 const char* Artifact::GetName(void) const
 {
     return _(artifacts[id].name);
@@ -706,4 +711,19 @@ std::string BagArtifacts::String(void) const
 u8 BagArtifacts::Count(const Artifact & art) const
 {
     return std::count(begin(), end(), art);
+}
+
+u16 GoldInsteadArtifact(u8 obj)
+{
+    switch(obj)
+    {
+	case MP2::OBJ_SKELETON:		return 1000;
+	case MP2::OBJ_SHIPWRECKSURVIROR:return 1000;
+	case MP2::OBJ_WATERCHEST:	return 1500;
+	case MP2::OBJ_TREASURECHEST:	return 1000;
+	case MP2::OBJ_SHIPWRECK:	return 5000;
+	case MP2::OBJ_GRAVEYARD:	return 2000;
+	default: break;
+    }
+    return 0;
 }

@@ -30,9 +30,14 @@
 #include "gamedefs.h"
 #include "game_io.h"
 #include "color.h"
+#include "skill.h"
+#include "artifact.h"
+#include "army_troop.h"
+#include "resource.h"
 
 class Sprite;
 class Heroes;
+class Spell;
 class Monster;
 
 namespace Maps
@@ -85,24 +90,26 @@ namespace Maps
 	static bool isAbandoneMineSprite(const TilesAddon &);
 	static bool isMounts(const TilesAddon &);
 	static bool isTrees(const TilesAddon &);
-	static bool isPassable(const TilesAddon &, u16 direct, s32 maps_index);
+	static bool isPassable(const TilesAddon &, u16 direct);
+	static u16  GetPassable(const Maps::TilesAddon &);
 
 	static bool PredicateSortRules1(const TilesAddon &, const TilesAddon &);
 	static bool PredicateSortRules2(const TilesAddon &, const TilesAddon &);
 
 	static void UpdateFountainSprite(TilesAddon &);
 	static void UpdateTreasureChestSprite(TilesAddon &);
-	static void UpdateStoneLightsSprite(TilesAddon &, u8 &);
+	static u8   UpdateStoneLightsSprite(TilesAddon &);
 	static void UpdateAbandoneMineLeftSprite(TilesAddon &, u8 resource);
 	static void UpdateAbandoneMineRightSprite(TilesAddon &);
 
 	static bool ForceLevel1(const TilesAddon &);
 	static bool ForceLevel2(const TilesAddon &);
 
-        u8	level;
         u32	uniq;
+        u8	level;
         u8	object;
         u8	index;
+	u8	tmp;
     };
 
     struct Addons : public std::list<TilesAddon>
@@ -121,10 +128,12 @@ namespace Maps
 	MP2::object_t GetObject(bool skip_hero = true) const;
 	u8 GetQuantity1(void) const{ return quantity1; }
 	u8 GetQuantity2(void) const{ return quantity2; }
-	u8 GetQuantity3(void) const{ return quantity3; }
-	u8 GetQuantity4(void) const{ return quantity4; }
 	Ground::ground_t GetGround(void) const;
 	bool isWater(void) const;
+
+	u16 TileSpriteIndex(void) const;
+	u8  TileSpriteShape(void) const;
+
 	const Surface & GetTileSurface(void) const;
 
 	bool isPassable(const Heroes*, Direction::vector_t, bool skipfog) const;
@@ -133,9 +142,6 @@ namespace Maps
 	bool isStream(void) const;
 	bool GoodForUltimateArtifact(void) const;
 
-	bool OtherObjectsIsProtection(void) const;
-	bool CaptureObjectIsProtection(u8 color) const;
-
 	TilesAddon* FindAddonICN1(u16 icn1);
 	TilesAddon* FindAddonICN2(u16 icn2);
 
@@ -143,22 +149,16 @@ namespace Maps
 	TilesAddon* FindAddonLevel2(u32 uniq2);
 
 	TilesAddon* FindObject(u8);
-	const TilesAddon* FindObject(u8) const;
+	const TilesAddon* FindObjectConst(u8) const;
 
 	void SetTile(const u16 sprite_index, const u8 shape);
-
-	void SetQuantity1(u8 val){ quantity1 = val; }
-	void SetQuantity2(u8 val){ quantity2 = val; }
-	void SetQuantity3(u8 val){ quantity3 = val; }
-	void SetQuantity4(u8 val){ quantity4 = val; }
-	void ResetQuantity(void);
-
 	void SetObject(MP2::object_t object);
-	void FixObject(void);
 
-	void UpdateQuantity(void);
-	bool ValidQuantity(void) const;
-	void CaptureFlags32(const MP2::object_t obj, const Color::color_t col);
+	void FixObject(void);
+	void FixLoadOldVersion(u16 version, u8 quantity3, u8 quantity4, u8 quantity5, u8 quantity6, u8 quantity7);
+
+	void UpdatePassable(void);
+	void CaptureFlags32(u8 obj, u8 col);
 
 	void RedrawTile(Surface &) const;
 	void RedrawBottom(Surface &, bool skip_objs = false) const;
@@ -186,20 +186,39 @@ namespace Maps
 
 	void FixLoyaltyVersion(void);
 
-	u8   GetMinesType(void) const;
+	/* monster operation */
+	bool MonsterJoinConditionSkip(void) const;
+	bool MonsterJoinConditionMoney(void) const;
+	bool MonsterJoinConditionFree(void) const;
+	bool MonsterJoinConditionForce(void) const;
+	u8   MonsterJoinCondition(void) const;
+	void MonsterSetJoinCondition(u8);
+	void MonsterSetFixedCount(void);
+	bool MonsterFixedCount(void) const;
+	void MonsterSetCount(const u16 count);
+	u16  MonsterCount(void) const;
 
-	bool FixedCountMonster(void) const;
-	u16 GetCountMonster(void) const;
-	void SetCountMonster(const u16 count);
+	bool CaptureObjectIsProtection(void) const;
 
-	static void PlaceMonsterOnTile(Tiles &, const Monster &, u32);
-	static void UpdateMonsterInfo(Tiles &);
-	static void UpdateRNDArtifactSprite(Tiles &);
-	static void UpdateRNDResourceSprite(Tiles &);
+	/* object quantity operation */
+	void QuantityUpdate(void);
+	void QuantityReset(void);
+	bool QuantityIsValid(void) const;
+	u8		QuantityTeleportType(void) const;
+	u8   		QuantityVariant(void) const;
+	u8   		QuantityExt(void) const;
+	u8   		QuantityColor(void) const;
+	u16   		QuantityGold(void) const;
+	Spell		QuantitySpell(void) const;
+	Skill::Secondary QuantitySkill(void) const;
+	Artifact	QuantityArtifact(void) const;
+	ResourceCount	QuantityResourceCount(void) const;
+	Funds         	QuantityFunds(void) const;
+	Monster		QuantityMonster(void) const;
+	Army::Troop	QuantityTroop(void) const;
+
+	static void PlaceMonsterOnTile(Tiles &, const Monster &, u16, u32);
 	static void UpdateAbandoneMineSprite(Tiles &);
-	static void UpdateStoneLightsSprite(Tiles &);
-	static void UpdateFountainSprite(Tiles &);
-	static void UpdateTreasureChestSprite(Tiles &);
 
     private:
 	TilesAddon* FindFlags(void);
@@ -210,27 +229,37 @@ namespace Maps
 	void RedrawBoat(Surface &) const;
 	void RedrawMonster(Surface &) const;
 
+	void QuantitySetVariant(u8);
+	void QuantitySetExt(u8);
+	void QuantitySetSkill(u8);
+	void QuantitySetColor(u8);
+	void QuantitySetSpell(u8);
+	void QuantitySetArtifact(u8);
+	void QuantitySetResource(u8, u16);
+	void QuantitySetTeleportType(u8);
+
+	static void UpdateMonsterInfo(Tiles &);
+	static void UpdateRNDArtifactSprite(Tiles &);
+	static void UpdateRNDResourceSprite(Tiles &);
+	static void UpdateStoneLightsSprite(Tiles &);
+	static void UpdateFountainSprite(Tiles &);
+	static void UpdateTreasureChestSprite(Tiles &);
+
     private:
 	friend class Game::IO;
 
         Addons addons_level1;
-        Addons addons_level2;
+        Addons addons_level2; // 16
 
 	s32	maps_index;
+	u16	pack_sprite_index;
 
-	u16	tile_sprite_index;
-	u8	tile_sprite_shape;
-
+	u16	tile_passable;
         u8      mp2_object;
+        u8	fog_colors;
+
         u8      quantity1;
         u8      quantity2;
-	u8	quantity3;
-	u8	quantity4;
-        u8	fogs;
-
-	u8	quantity5;
-	u8	quantity6; /* unused: memory align */
-	u8	quantity7; /* unused: memory align */
     };
 }
 

@@ -34,14 +34,9 @@ class Spell;
 class Monster
 {
 public:
-    enum level_t
-    {
-	LEVEL0,
-	LEVEL1,
-	LEVEL2,
-	LEVEL3,
-	LEVEL4
-    };
+    enum { JOIN_CONDITION_SKIP  = 0, JOIN_CONDITION_MONEY = 1, JOIN_CONDITION_FREE  = 2, JOIN_CONDITION_FORCE = 3 };
+
+    enum level_t { LEVEL0, LEVEL1, LEVEL2, LEVEL3, LEVEL4 };
 
     enum monster_t
     {
@@ -129,8 +124,8 @@ public:
     bool operator< (const Monster &) const;
     bool operator== (const Monster &) const;
     bool operator!= (const Monster &) const;
-    u8 operator() (void) const;
 
+    u8 operator() (void) const;
     u8 GetID(void) const;
 
     void Upgrade(void);

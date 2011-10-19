@@ -43,6 +43,142 @@
 #include "world.h"
 #include "ai.h"
 
+CapturedObject & CapturedObjects::Get(const s32 & index)
+{
+    std::map<s32, CapturedObject> & my = *this;
+    return my[index];
+}
+
+void CapturedObjects::SetColor(const s32 & index, u8 col)
+{
+    Get(index).SetColor(col);
+}
+
+void CapturedObjects::Set(const s32 & index, u8 obj, u8 col)
+{
+    CapturedObject & co = Get(index);
+
+    if(co.GetColor() != col && co.guardians.isValid())
+	co.guardians.Reset();
+
+    co.Set(obj, col);
+}
+
+u16 CapturedObjects::GetCount(u8 obj, u8 col) const
+{
+    u16 result = 0;
+
+    const ObjectColor objcol(obj, col);
+
+    for(const_iterator it = begin(); it != end(); ++it)
+        if(objcol == (*it).second.objcol)
+	    ++result;
+
+    return result;
+}
+
+u16 CapturedObjects::GetCountMines(u8 type, u8 col) const
+{
+    u16 result = 0;
+
+    const ObjectColor objcol1(MP2::OBJ_MINES, col);
+    const ObjectColor objcol2(MP2::OBJ_HEROES, col);
+
+    for(const_iterator it = begin(); it != end(); ++it)
+    {
+        const ObjectColor & objcol = (*it).second.objcol;
+
+        if(objcol == objcol1 || objcol == objcol2)
+        {
+            // scan for find mines
+            const Maps::TilesAddon * addon = world.GetTiles((*it).first).FindObject(MP2::OBJ_MINES);
+
+            if(addon)
+            {
+                // index sprite EXTRAOVR
+                if(0 == addon->index && Resource::ORE == type) ++result;
+                else
+                if(1 == addon->index && Resource::SULFUR == type) ++result;
+                else
+                if(2 == addon->index && Resource::CRYSTAL == type) ++result;
+                else
+                if(3 == addon->index && Resource::GEMS == type) ++result;
+                else
+                if(4 == addon->index && Resource::GOLD == type) ++result;
+            }
+        }
+    }
+
+    return result;
+}
+
+u8 CapturedObjects::GetColor(const s32 & index) const
+{
+    const_iterator it = find(index);
+    return it != end() ? (*it).second.GetColor() : Color::NONE;
+}
+
+void CapturedObjects::ClearFog(u8 colors)
+{
+    // clear abroad objects
+    for(const_iterator it = begin(); it != end(); ++it)
+    {
+	const ObjectColor & objcol = (*it).second.objcol;
+
+	if(objcol.isColor(colors))
+	{
+	    u8 scoute = 0;
+
+	    switch(objcol.first)
+	    {
+		case MP2::OBJ_MINES:
+		case MP2::OBJ_ALCHEMYLAB:
+		case MP2::OBJ_SAWMILL:	scoute = 2; break;
+
+		case MP2::OBJ_LIGHTHOUSE: scoute = 4; break; // FIXME: scoute and lighthouse
+
+		default: break;
+	    }
+
+    	    if(scoute) Maps::ClearFog((*it).first, scoute, colors);
+	}
+    }
+}
+
+void CapturedObjects::ResetColor(u8 color)
+{
+    for(iterator it = begin(); it != end(); ++it)
+    {
+	ObjectColor & objcol = (*it).second.objcol;
+
+	if(objcol.isColor(color))
+	{
+	    objcol.second = Color::UNUSED;
+	    world.GetTiles((*it).first).CaptureFlags32(objcol.first, objcol.second);
+	}
+    }
+}
+
+Funds CapturedObjects::TributeCapturedObject(u8 color, u8 obj)
+{
+    Funds result;
+
+    for(iterator it = begin(); it != end(); ++it)
+    {
+	const ObjectColor & objcol = (*it).second.objcol;
+
+	if(objcol.isObject(obj) && objcol.isColor(color))
+	{
+	    Maps::Tiles & tile = world.GetTiles((*it).first);
+
+	    result += Funds(tile.QuantityResourceCount());
+	    tile.QuantityReset();
+	}
+    }
+
+    return result;
+}
+
 World & world = World::Get();
 
 u32 World::uniq0 = 0;
@@ -349,7 +485,7 @@ void World::LoadMaps(const std::string &filename)
 		break;
 	}
 	// preload in to capture objects cache
-	map_captureobj[Maps::GetIndexFromAbsPoint(cx, cy)] = ObjectColor(MP2::OBJ_CASTLE, Color::NONE);
+	map_captureobj.Set(Maps::GetIndexFromAbsPoint(cx, cy), MP2::OBJ_CASTLE, Color::NONE);
     }
 
     DEBUG(DBG_GAME, DBG_INFO, "read coord castles, tellg: " << fd.tellg());
@@ -372,11 +508,11 @@ void World::LoadMaps(const std::string &filename)
 	{
 	    // mines: wood
 	    case 0x00:
-		map_captureobj[Maps::GetIndexFromAbsPoint(cx, cy)] = ObjectColor(MP2::OBJ_SAWMILL, Color::NONE);
+		map_captureobj.Set(Maps::GetIndexFromAbsPoint(cx, cy), MP2::OBJ_SAWMILL, Color::NONE);
 		break; 
 	    // mines: mercury
 	    case 0x01:
-		map_captureobj[Maps::GetIndexFromAbsPoint(cx, cy)] = ObjectColor(MP2::OBJ_ALCHEMYLAB, Color::NONE);
+		map_captureobj.Set(Maps::GetIndexFromAbsPoint(cx, cy), MP2::OBJ_ALCHEMYLAB, Color::NONE);
 		break;
 	    // mines: ore
  	    case 0x02:
@@ -388,20 +524,20 @@ void World::LoadMaps(const std::string &filename)
 	    case 0x05:
 	    // mines: gold
 	    case 0x06:
-		map_captureobj[Maps::GetIndexFromAbsPoint(cx, cy)] = ObjectColor(MP2::OBJ_MINES, Color::NONE);
+		map_captureobj.Set(Maps::GetIndexFromAbsPoint(cx, cy), MP2::OBJ_MINES, Color::NONE);
 		break; 
 	    // lighthouse
 	    case 0x64:
-		map_captureobj[Maps::GetIndexFromAbsPoint(cx, cy)] = ObjectColor(MP2::OBJ_LIGHTHOUSE, Color::NONE);
+		map_captureobj.Set(Maps::GetIndexFromAbsPoint(cx, cy), MP2::OBJ_LIGHTHOUSE, Color::NONE);
 		break; 
 	    // dragon city
 	    case 0x65:
-		map_captureobj[Maps::GetIndexFromAbsPoint(cx, cy)] = ObjectColor(MP2::OBJ_DRAGONCITY, Color::NONE);
+		map_captureobj.Set(Maps::GetIndexFromAbsPoint(cx, cy), MP2::OBJ_DRAGONCITY, Color::NONE);
 		break; 
 	    // abandoned mines
 	    case 0x67:
-		map_captureobj[Maps::GetIndexFromAbsPoint(cx, cy)] = ObjectColor(MP2::OBJ_ABANDONEDMINE, Color::NONE);
-		break; 
+		map_captureobj.Set(Maps::GetIndexFromAbsPoint(cx, cy), MP2::OBJ_ABANDONEDMINE, Color::NONE);
+		break;
 	    default:
 		DEBUG(DBG_GAME, DBG_WARN, "kingdom block: " << "unknown id: " << static_cast<int>(id) << ", maps index: " << cx + cy * w());
 		break;
@@ -492,7 +628,7 @@ void World::LoadMaps(const std::string &filename)
 			{
 			    castle->LoadFromMP2(pblock);
 			    Maps::MinimizeAreaForCastle(castle->GetCenter());
-			    map_captureobj[tile.GetIndex()].second = castle->GetColor();
+			    map_captureobj.SetColor(tile.GetIndex(), castle->GetColor());
 			}
 			else
 			{
@@ -515,7 +651,7 @@ void World::LoadMaps(const std::string &filename)
 			    castle->LoadFromMP2(pblock);
 			    Maps::UpdateRNDSpriteForCastle(castle->GetCenter(), castle->GetRace(), castle->isCastle());
 			    Maps::MinimizeAreaForCastle(castle->GetCenter());
-			    map_captureobj[tile.GetIndex()].second = castle->GetColor();
+			    map_captureobj.SetColor(tile.GetIndex(), castle->GetColor());
 			}
 			else
 			{
@@ -558,7 +694,7 @@ void World::LoadMaps(const std::string &filename)
 			DEBUG(DBG_GAME, DBG_WARN, "read heroes: " << "incorrect size block: " << sizeblock);
 		    }
 		    else
-		    if(NULL != (addon = tile.FindObject(MP2::OBJ_HEROES)))
+		    if(NULL != (addon = tile.FindObjectConst(MP2::OBJ_HEROES)))
 		    {
 			// calculate color
 			const u8 index_name = addon->index;
@@ -676,10 +812,10 @@ void World::LoadMaps(const std::string &filename)
     for(size_t ii = 0; ii < vec_tiles.size(); ++ii)
     {
 	Maps::Tiles & tile = vec_tiles[ii];
-	const Maps::TilesAddon *addon = NULL;
 
 	// fix loyalty version objects
-	if(Settings::Get().PriceLoyaltyVersion()) tile.FixLoyaltyVersion();
+	if(Settings::Get().PriceLoyaltyVersion())
+	    tile.FixLoyaltyVersion();
 
 	//
 	switch(tile.GetObject())
@@ -688,56 +824,17 @@ void World::LoadMaps(const std::string &filename)
 	    case MP2::OBJ_SHRINE1:
 	    case MP2::OBJ_SHRINE2:
 	    case MP2::OBJ_SHRINE3:
-    		tile.UpdateQuantity();
-		break;
-
 	    case MP2::OBJ_STONELIGHTS:
-		Maps::Tiles::UpdateStoneLightsSprite(tile);
-		break;
-
 	    case MP2::OBJ_FOUNTAIN:
-		Maps::Tiles::UpdateFountainSprite(tile);
-		break;
-
 	    case MP2::OBJ_EVENT:
-		// remove event sprite
-		if(NULL != (addon = tile.FindObject(MP2::OBJ_EVENT)))
-		{
-		    tile.Remove(addon->uniq);
-		}
-		break;
-	
     	    case MP2::OBJ_BOAT:
-		// remove small sprite boat
-		if(NULL != (addon = tile.FindObject(MP2::OBJ_BOAT)))
-		{
-		    tile.Remove(addon->uniq);
-		}
-		break;
-
     	    case MP2::OBJ_RNDARTIFACT:
     	    case MP2::OBJ_RNDARTIFACT1:
     	    case MP2::OBJ_RNDARTIFACT2:
     	    case MP2::OBJ_RNDARTIFACT3:
-		// modify rnd artifact sprite
-		Maps::Tiles::UpdateRNDArtifactSprite(tile);
-    		tile.UpdateQuantity();
-		break;
-
 	    case MP2::OBJ_RNDRESOURCE:
-		// modify rnd resource sprite
-		Maps::Tiles::UpdateRNDResourceSprite(tile);
-		tile.UpdateQuantity();
-		break;
-
-            case MP2::OBJ_TREASURECHEST:
-		if(tile.isWater())
-		    tile.SetObject(MP2::OBJ_WATERCHEST);
-    		else
-		    Maps::Tiles::UpdateTreasureChestSprite(tile);
-    		tile.UpdateQuantity();
-		break;
-
+	    case MP2::OBJ_WATERCHEST:
+	    case MP2::OBJ_TREASURECHEST:
 	    case MP2::OBJ_ARTIFACT:
 	    case MP2::OBJ_RESOURCE:
             case MP2::OBJ_MAGICGARDEN:
@@ -755,27 +852,19 @@ void World::LoadMaps(const std::string &filename)
             case MP2::OBJ_PYRAMID:
             case MP2::OBJ_DAEMONCAVE:
             case MP2::OBJ_ABANDONEDMINE:
+	    case MP2::OBJ_ALCHEMYLAB:
+	    case MP2::OBJ_SAWMILL:
+	    case MP2::OBJ_MINES:
 	    case MP2::OBJ_TREEKNOWLEDGE:
 	    case MP2::OBJ_BARRIER:
 	    case MP2::OBJ_TRAVELLERTENT:
-    		tile.UpdateQuantity();
-		break;
-
 	    case MP2::OBJ_MONSTER:
 	    case MP2::OBJ_RNDMONSTER:
 	    case MP2::OBJ_RNDMONSTER1:
 	    case MP2::OBJ_RNDMONSTER2:
 	    case MP2::OBJ_RNDMONSTER3:
 	    case MP2::OBJ_RNDMONSTER4:
-		// modify rnd monster sprite
-		Maps::Tiles::UpdateMonsterInfo(tile);
-		break;
-
-	    // join dwelling
 	    case MP2::OBJ_ANCIENTLAMP:
-		    tile.SetCountMonster(Monster(Monster::FromObject(tile.GetObject())).GetRNDSize(true));
-		break;
-
     	    case MP2::OBJ_WATCHTOWER:
             case MP2::OBJ_EXCAVATION:
             case MP2::OBJ_CAVE:
@@ -786,7 +875,6 @@ void World::LoadMaps(const std::string &filename)
             case MP2::OBJ_HALFLINGHOLE:
             case MP2::OBJ_PEASANTHUT:
             case MP2::OBJ_THATCHEDHUT:
-	    // recruit dwelling
 	    case MP2::OBJ_RUINS:
             case MP2::OBJ_TREECITY:
             case MP2::OBJ_WAGONCAMP:
@@ -799,16 +887,8 @@ void World::LoadMaps(const std::string &filename)
     	    case MP2::OBJ_FIREALTAR:
     	    case MP2::OBJ_EARTHALTAR:
 	    case MP2::OBJ_BARROWMOUNDS:
-		    tile.SetCountMonster(0);
-		break;
-
-	    // check hero
 	    case MP2::OBJ_HEROES:
-		if(! vec_heroes.Get(tile.GetIndex()))
-		{
-		    tile.SetObject(MP2::OBJ_ZERO);
-		    DEBUG(DBG_GAME, DBG_WARN, "incorrect heroes info, reset tile: " << tile.GetIndex());
-		}
+    		tile.QuantityUpdate();
 		break;
 
 	    default:
@@ -840,6 +920,10 @@ void World::LoadMaps(const std::string &filename)
 	    hero->SetModes(Heroes::NOTDISMISS | Heroes::NOTDEFAULTS);
 	}
     }
+
+    // update tile passable
+    std::for_each(vec_tiles.begin(), vec_tiles.end(),
+	    std::mem_fun_ref(&Maps::Tiles::UpdatePassable));
 
     // play with hero
     vec_kingdoms.ApplyPlayWithStartingHero();
@@ -894,7 +978,7 @@ void World::LoadMaps(const std::string &filename)
 	const Maps::TilesAddon *addon = NULL;
 
 	// remove ultimate artifact sprite
-	if(NULL != (addon = (*it).FindObject(MP2::OBJ_RNDULTIMATEARTIFACT)))
+	if(NULL != (addon = (*it).FindObjectConst(MP2::OBJ_RNDULTIMATEARTIFACT)))
 	{
 	    ultimate_artifact.Set((*it).GetIndex(), Artifact::FromMP2IndexSprite(addon->index));
 	    (*it).Remove(addon->uniq);
@@ -985,6 +1069,9 @@ void World::NewDay(void)
         NewMonth();
         vec_kingdoms.NewMonth();
     }
+
+    // remove deprecated events
+    if(day) vec_eventsday.remove_if(std::bind2nd(std::mem_fun_ref(&EventDate::isDeprecated), day - 1));
 }
 
 void World::NewWeek(void)
@@ -1006,12 +1093,19 @@ void World::NewWeek(void)
 	// update week object
 	for(MapsTiles::iterator
 	    it = vec_tiles.begin(); it != vec_tiles.end(); ++it)
-	    if(MP2::isWeekLife((*it).GetObject(false))) (*it).UpdateQuantity();
+	    if(MP2::isWeekLife((*it).GetObject(false))) (*it).QuantityUpdate();
 
 	// update gray towns
         for(AllCastles::iterator
 	    it = vec_castles.begin(); it != vec_castles.end(); ++it)
 	    if((*it)->GetColor() == Color::NONE) (*it)->ActionNewWeek();
+    }
+
+    // add events
+    if(Settings::Get().ExtWorldWindWaterMillsCaptured())
+    {
+	vec_kingdoms.AddTributeEvents(map_captureobj, day, MP2::OBJ_WATERWHEEL);
+	vec_kingdoms.AddTributeEvents(map_captureobj, day, MP2::OBJ_WINDMILL);
     }
 }
 
@@ -1044,7 +1138,7 @@ void World::MonthOfMonstersAction(const Monster & mons)
 
 	    if(! tile.isWater() &&
 		MP2::OBJ_ZERO == tile.GetObject() &&
-		tile.isPassable(NULL, Direction::UNKNOWN, true) &&
+		tile.isPassable(NULL, Direction::CENTER, true) &&
 		Maps::ScanAroundObjectsV(tile.GetIndex(), objs).empty() &&
 		excld.end() == std::find(excld.begin(), excld.end(), tile.GetIndex()))
 	    {
@@ -1061,7 +1155,7 @@ void World::MonthOfMonstersAction(const Monster & mons)
 
 	for(std::vector<s32>::iterator
 	    it = tiles.begin(); it != tiles.end(); ++it)
-		Maps::Tiles::PlaceMonsterOnTile(vec_tiles[*it], mons, GetUniq());
+		Maps::Tiles::PlaceMonsterOnTile(vec_tiles[*it], mons, 0 /* random */, GetUniq());
     }
 }
 
@@ -1121,7 +1215,7 @@ const std::string & World::GetRumors(void)
 
 bool TeleportCheckType(s32 index, u8 type)
 {
-    return world.GetTiles(index).GetQuantity1() == type;
+    return world.GetTiles(index).QuantityTeleportType() == type;
 }
 
 bool TeleportCheckGround(s32 index, bool water)
@@ -1147,7 +1241,7 @@ s32 World::NextTeleport(const s32 index, bool onwater) const
 
     // remove if not type
     itend = std::remove_if(vec_teleports.begin(), itend,
-		    std::not1(std::bind2nd(std::ptr_fun(&TeleportCheckType), GetTiles(index).GetQuantity1())));
+		    std::not1(std::bind2nd(std::ptr_fun(&TeleportCheckType), GetTiles(index).QuantityTeleportType())));
 
     // remove if index
     itend = std::remove(vec_teleports.begin(), itend, index);
@@ -1176,7 +1270,7 @@ s32 World::NextWhirlpool(const s32 index)
     for(std::vector<s32>::const_iterator
 	it = whilrpools.begin(); it != whilrpools.end(); ++it)
     {
-    	const Maps::TilesAddon* addon = GetTiles(*it).FindObject(MP2::OBJ_WHIRLPOOL);
+    	const Maps::TilesAddon* addon = GetTiles(*it).FindObjectConst(MP2::OBJ_WHIRLPOOL);
 	if(addon) uniq_whirlpools[addon->uniq].push_back(*it);
     }
     whilrpools.clear();
@@ -1187,7 +1281,7 @@ s32 World::NextWhirlpool(const s32 index)
 	return index;
     }
 
-    const Maps::TilesAddon* addon = GetTiles(index).FindObject(MP2::OBJ_WHIRLPOOL);
+    const Maps::TilesAddon* addon = GetTiles(index).FindObjectConst(MP2::OBJ_WHIRLPOOL);
     std::vector<u32> uniqs;
     uniqs.reserve(uniq_whirlpools.size());
 
@@ -1217,84 +1311,56 @@ const std::string & World::MessageSign(const s32 index)
 }
 
 /* return count captured object */
-u16 World::CountCapturedObject(const MP2::object_t obj, const Color::color_t col) const
+u16 World::CountCapturedObject(u8 obj, u8 col) const
 {
-    const ObjectColor objcol(obj, col);
-    return std::count_if(map_captureobj.begin(), map_captureobj.end(),
-		    std::bind2nd(map_data_compare<CapturedObjects>(), objcol));
+    return map_captureobj.GetCount(obj, col);
 }
 
 /* return count captured mines */
-u16 World::CountCapturedMines(const u8 res, const Color::color_t col) const
+u16 World::CountCapturedMines(u8 type, u8 color) const
 {
-    switch(res)
+    switch(type)
     {
-	case Resource::WOOD:	return CountCapturedObject(MP2::OBJ_SAWMILL, col);
-	case Resource::MERCURY:	return CountCapturedObject(MP2::OBJ_ALCHEMYLAB, col);
+	case Resource::WOOD:	return CountCapturedObject(MP2::OBJ_SAWMILL, color);
+	case Resource::MERCURY:	return CountCapturedObject(MP2::OBJ_ALCHEMYLAB, color);
 	default: break;
     }
 
-    u16 result = 0;
-
-    const ObjectColor objcol1(MP2::OBJ_MINES, col);
-    const ObjectColor objcol2(MP2::OBJ_HEROES, col);
-
-    for(CapturedObjects::const_iterator
-	it = map_captureobj.begin(); it != map_captureobj.end(); ++it)
-    {
-	const ObjectColor & objcol = (*it).second;
-
-	if(objcol == objcol1 || objcol == objcol2)
-	{
-	    // scan for find mines
-	    const Maps::TilesAddon * addon = GetTiles((*it).first).FindObject(MP2::OBJ_MINES);
-
-	    if(addon)
-	    {
-		// index sprite EXTRAOVR
-		if(0 == addon->index && Resource::ORE == res) ++result;
-		else
-		if(1 == addon->index && Resource::SULFUR == res) ++result;
-		else
-		if(2 == addon->index && Resource::CRYSTAL == res) ++result;
-		else
-		if(3 == addon->index && Resource::GEMS == res) ++result;
-		else
-		if(4 == addon->index && Resource::GOLD == res) ++result;
-	    }
-	}
-    }
-
-    return result;
+    return map_captureobj.GetCountMines(type, color);
 }
 
 /* capture object */
-void World::CaptureObject(const s32 index, const Color::color_t col)
+void World::CaptureObject(const s32 & index, u8 color)
 {
     const MP2::object_t obj = GetTiles(index).GetObject(false);
 
-    map_captureobj[index] = ObjectColor(obj, col);
+    map_captureobj.Set(index, obj, color);
 
     if(MP2::OBJ_CASTLE == obj)
     {
 	Castle *castle = GetCastle(index);
-	if(castle) castle->ChangeColor(col);
+	if(castle) castle->ChangeColor(Color::Get(color));
     }
 
-    GetTiles(index).CaptureFlags32(obj, col);
+    if(color & (Color::ALL | Color::UNUSED))
+	GetTiles(index).CaptureFlags32(obj, color);
 }
 
 /* return color captured object */
-Color::color_t World::ColorCapturedObject(const s32 index) const
+u8 World::ColorCapturedObject(const s32 & index) const
 {
-    CapturedObjects::const_iterator it = map_captureobj.find(index);
-    return it != map_captureobj.end() ? (*it).second.second : Color::NONE;
+    return map_captureobj.GetColor(index);
 }
 
-void World::ClearFog(const u8 color)
+CapturedObject & World::GetCapturedObject(const s32 & index)
 {
-    const u8 colors = Settings::Get().ExtUnionsAllowViewMaps() ?
-				    Players::GetPlayerFriends(color) : color;
+    return map_captureobj.Get(index);
+}
+
+void World::ClearFog(u8 colors)
+{
+    if(Settings::Get().ExtUnionsAllowViewMaps())
+	colors = Players::GetPlayerFriends(colors);
 
     // clear abroad castles
     vec_castles.Scoute(colors);
@@ -1302,30 +1368,7 @@ void World::ClearFog(const u8 color)
     // clear abroad heroes
     vec_heroes.Scoute(colors);
 
-    // clear abroad objects
-    for(CapturedObjects::const_iterator
-	it = map_captureobj.begin(); it != map_captureobj.end(); ++it)
-    {
-	const ObjectColor & objcol = (*it).second;
-
-	if(objcol.isColor(colors))
-	{
-	    u8 scoute = 0;
-
-	    switch(objcol.first)
-	    {
-		case MP2::OBJ_MINES:
-		case MP2::OBJ_ALCHEMYLAB:
-		case MP2::OBJ_SAWMILL:	scoute = 2; break;
-
-		case MP2::OBJ_LIGHTHOUSE: scoute = 4; break; // FIXME: scoute and lighthouse
-
-		default: break;
-	    }
-
-    	    if(scoute) Maps::ClearFog((*it).first, scoute, color);
-	}
-    }
+    map_captureobj.ClearFog(colors);
 }
 
 /* update population monster in dwelling */
@@ -1403,7 +1446,8 @@ void World::UpdateDwellingPopulation(void)
             case MP2::OBJ_TROLLBRIDGE:
             case MP2::OBJ_CITYDEAD:
             case MP2::OBJ_DRAGONCITY:
-		if(0 == tile.GetQuantity4()) count = 0;
+		if(Color::NONE == ColorCapturedObject(tile.GetIndex()))
+		    count = 0;
 		break;
 
 	    default: break;
@@ -1412,9 +1456,9 @@ void World::UpdateDwellingPopulation(void)
 	if(count)
 	{
 	    if(Settings::Get().ExtWorldDwellingsAccumulateUnits())
-    		tile.SetCountMonster(tile.GetCountMonster() + static_cast<u16>(count));
+    		tile.MonsterSetCount(tile.MonsterCount() + static_cast<u16>(count));
 	    else
-		tile.SetCountMonster(static_cast<u16>(count));
+		tile.MonsterSetCount(static_cast<u16>(count));
 	}
     }
 }
@@ -1426,13 +1470,13 @@ void World::UpdateMonsterPopulation(void)
     if(MP2::OBJ_MONSTER == (*it).GetObject())
     {
 	Maps::Tiles & tile = *it;
-	const Army::Troop troop(tile);
+	const Army::Troop & troop = tile.QuantityTroop();
 
 	if(0 == troop.GetCount())
-	    tile.SetCountMonster(troop.GetRNDSize(false));
+	    tile.MonsterSetCount(troop.GetRNDSize(false));
 	else
-	if(! tile.FixedCountMonster())
-	    tile.SetCountMonster(troop.GetCount() * 8 / 7);
+	if(! tile.MonsterFixedCount())
+	    tile.MonsterSetCount(troop.GetCount() * 8 / 7);
     }
 }
 
@@ -1539,20 +1583,9 @@ u16 World::CountObeliskOnMaps(void)
     return res ? res : 6;
 }
 
-void World::KingdomLoss(const Color::color_t color)
+void World::ResetCapturedObjects(u8 color)
 {
-    // capture object
-    for(CapturedObjects::iterator
-	it = map_captureobj.begin(); it != map_captureobj.end(); ++it)
-    {
-	ObjectColor & objcol = (*it).second;
-
-	if(objcol.isColor(color))
-	{
-	    objcol.second = Color::NONE;
-	    GetTiles((*it).first).CaptureFlags32(objcol.first, Color::NONE);
-	}
-    }
+    map_captureobj.ResetColor(color);
 }
 
 Heroes* World::FromJail(s32 index)

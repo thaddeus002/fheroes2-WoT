@@ -44,7 +44,7 @@ namespace Direction
     inline vector_t& operator++ (vector_t& direct){ return direct = ( CENTER == direct ? TOP_LEFT : vector_t(direct << 1)); }
     inline vector_t& operator-- (vector_t& direct){ return direct = ( TOP_LEFT == direct ? CENTER : vector_t(direct >> 1)); }
 
-    const char* String(u16 direct);
+    std::string String(u16);
 
     vector_t Get(s32 from, s32 to);
     vector_t Reflect(u16 from);

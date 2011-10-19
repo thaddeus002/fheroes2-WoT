@@ -25,83 +25,91 @@
 #include "maps_tiles.h"
 #include "objxloc.h"
 
-bool ObjLoyalty::isPassable(u16 icn, u8 index, u16 direct)
+bool ObjLoyalty::isPassable(const u16 & icn, const u8 & index, u16 direct)
+{
+    return direct & GetPassable(icn, index);
+}
+
+u16 ObjLoyalty::GetPassable(const u16 & icn, const u8 & index)
 {
     switch(icn)
     {
 	case ICN::X_LOC1:
 	    // alchemist tower
-	    if(3 == index) return false;
+	    if(3 == index) return 0;
 	    else
 	    // arena
-	    if(31 == index || 40 == index || (48 < index && index < 51)) return false;
+	    if(31 == index || 40 == index || (48 < index && index < 51)) return 0;
 	    else
 	    if(68 < index && index < 72)
-		return Direction::UNKNOWN == direct || (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
+		return DIRECTION_CENTER_ROW | DIRECTION_BOTTOM_ROW;
 	    else
 	    // barrow mounds
 	    if(74 < index && index < 78)
-		return Direction::UNKNOWN == direct || (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
+		return DIRECTION_CENTER_ROW | DIRECTION_BOTTOM_ROW;
 	    else
 	    // eath altar
 	    if(85 == index || 94 == index || 103 == index)
-		return Direction::UNKNOWN == direct || (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
+		return DIRECTION_CENTER_ROW | DIRECTION_BOTTOM_ROW;
 	    else
 	    // air altar
 	    if(116 < index && index < 120)
-		return Direction::UNKNOWN == direct || (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
+		return DIRECTION_CENTER_ROW | DIRECTION_BOTTOM_ROW;
 	    else
 	    // fire altar
 	    if(125 < index && index < 129)
-		return Direction::UNKNOWN == direct || (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
+		return DIRECTION_CENTER_ROW | DIRECTION_BOTTOM_ROW;
 	    else
 	    // water altar
 	    if(133 < index && index < 137)
-		return Direction::UNKNOWN == direct || (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
-	    else return true;
+		return DIRECTION_CENTER_ROW | DIRECTION_BOTTOM_ROW;
+	    else
+		return DIRECTION_ALL;
 
 	case ICN::X_LOC2:
 	    // stables
 	    if(2 < index && index < 5)
-		return Direction::UNKNOWN == direct || (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
+		return DIRECTION_CENTER_ROW | DIRECTION_BOTTOM_ROW;
 	    else
 	    // jail
-	    if(9 == index) return false;
+	    if(9 == index) return 0;
 	    else
 	    // mermaid
 	    if(28 == index || 37 == index || 46 == index)
-		return Direction::UNKNOWN == direct || (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
+		return DIRECTION_CENTER_ROW | DIRECTION_BOTTOM_ROW;
 	    else
 	    // sirens
 	    if(92 == index || (100 < index && index < 103))
-		return Direction::UNKNOWN == direct || (direct & (Direction::LEFT | Direction::RIGHT | DIRECTION_BOTTOM_ROW));
+		return DIRECTION_CENTER_ROW | DIRECTION_BOTTOM_ROW;
 	    else
 	    // reefs
-	    if(110 < index && index < 136) return false;
-	    else return true;
+	    if(110 < index && index < 136) return 0;
+	    else
+		return DIRECTION_ALL;
 
 	case ICN::X_LOC3:
 	    // hut magi
-	    if(30 == index) return false;
+	    if(30 == index) return 0;
 	    else
 	    // eyes magi
-	    if(50 == index) return false;
+	    if(50 == index) return 0;
 	    else
 	    // barrier
 	    if(60 == index || 66 == index || 72 == index ||
 		78 == index || 84 == index || 90 == index ||
-		96 == index || 102 == index) return false;
+		96 == index || 102 == index) return 0;
 	    else
 	    // traveller tent
 	    if(110 == index || 114 == index || 118 == index ||
 		122 == index || 126 == index || 130 == index ||
-		134 == index || 138 == index) return false;
-	    else return true;
+		134 == index || 138 == index) return 0;
+	    else
+		return DIRECTION_ALL;
 
 	default: break;
     }
 
-    return false;
+    return 0;
 }
 
 u8 ObjLoyalty::LearnObject(const Maps::TilesAddon & addon)
