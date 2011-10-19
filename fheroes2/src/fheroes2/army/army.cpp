@@ -1113,10 +1113,7 @@ u32 Army::army_t::GetSurrenderCost(void) const
 	    res -= res * acount * art.ExtraValue() / 100;
     }
 
-    // limit
-    if(res < 100) res = 100.0;
-
-    return static_cast<u32>(res);
+    return 0 < res ? static_cast<u32>(res) : 0;
 }
 
 u8 Army::GetJoinSolution(const Heroes & hero, const Maps::Tiles & tile, u32 & join, s32 & cost)

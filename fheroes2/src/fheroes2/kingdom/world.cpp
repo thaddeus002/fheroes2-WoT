@@ -1139,7 +1139,7 @@ void World::MonthOfMonstersAction(const Monster & mons)
 	    if(! tile.isWater() &&
 		MP2::OBJ_ZERO == tile.GetObject() &&
 		tile.isPassable(NULL, Direction::CENTER, true) &&
-		Maps::ScanAroundObjectsV(tile.GetIndex(), objs).empty() &&
+		Maps::ScanDistanceObjects(tile.GetIndex(), objs, 2).empty() &&
 		excld.end() == std::find(excld.begin(), excld.end(), tile.GetIndex()))
 	    {
 		tiles.push_back(tile.GetIndex());
