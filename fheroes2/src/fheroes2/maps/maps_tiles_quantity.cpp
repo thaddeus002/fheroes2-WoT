@@ -93,25 +93,26 @@ void Maps::Tiles::QuantitySetExt(u8 ext)
 
 Skill::Secondary Maps::Tiles::QuantitySkill(void) const
 {
-    Skill::Secondary skill;
-
     switch(GetObject(false))
     {
         case MP2::OBJ_ARTIFACT:
             switch(QuantityVariant())
             {
-                case 4: skill.SetSkill(Skill::Secondary::LEADERSHIP); break;
-                case 5: skill.SetSkill(Skill::Secondary::WISDOM); break;
+                case 4:
+		    return Skill::Secondary(Skill::Secondary::LEADERSHIP, Skill::Level::BASIC);
+                case 5:
+		    return Skill::Secondary(Skill::Secondary::WISDOM, Skill::Level::BASIC);
                 default: break;
             }
             break;
 
-        case MP2::OBJ_WITCHSHUT: skill.SetSkill(quantity1); break;
+        case MP2::OBJ_WITCHSHUT:
+	    return Skill::Secondary(quantity1, Skill::Level::BASIC);
 
         default: break;
     }
 
-    return skill;
+    return Skill::Secondary();
 }
 
 void Maps::Tiles::QuantitySetSkill(u8 skill)
