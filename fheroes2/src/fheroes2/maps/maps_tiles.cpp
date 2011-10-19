@@ -693,6 +693,12 @@ void Maps::Tiles::UpdatePassable(void)
 	    addons_level1.end() != std::find_if(addons_level1.begin(), addons_level1.end(), TilesAddon::isTrees) &&
 	    addons_level2.end() != std::find_if(addons_level2.begin(), addons_level2.end(), TilesAddon::isTrees))
 		tile_passable = 0;
+
+	// fix bottom border
+	if(tile_passable &&
+	    (MP2::OBJ_MOUNTS == GetObject() || MP2::OBJ_TREES == GetObject()) &&
+	    ! Maps::isValidDirection(maps_index, Direction::BOTTOM))
+	    tile_passable = 0;
     }
 
     // check all sprite
