@@ -409,6 +409,7 @@ void Game::IO::PackTile(QueueMessage & msg, const Maps::Tiles & tile)
     msg.Push(tile.quantity1);
     msg.Push(tile.quantity2);
     msg.Push(tile.fog_colors);
+    msg.Push(tile.tile_passable);
 
     // addons 1
     PackTileAddons(msg, tile.addons_level1);
@@ -1051,6 +1052,10 @@ bool Game::IO::LoadBIN(QueueMessage & msg)
     // add heroes to kingdoms
     world.vec_kingdoms.AddHeroes(world.vec_heroes);
 
+    if(format < FORMAT_VERSION_2632)
+	// update tile passable
+	std::for_each(world.vec_tiles.begin(), world.vec_tiles.end(),
+            std::mem_fun_ref(&Maps::Tiles::UpdatePassable));
 
     return byte16 == 0xFFFF;
 }
@@ -1082,6 +1087,9 @@ void Game::IO::UnpackTile(QueueMessage & msg, Maps::Tiles & tile, u16 check_vers
 
     msg.Pop(tile.fog_colors);
 
+    if(check_version >= FORMAT_VERSION_2632)
+	msg.Pop(tile.tile_passable);
+
     if(check_version < FORMAT_VERSION_2632)
     {
 	msg.Pop(quantity5);
@@ -1098,9 +1106,8 @@ void Game::IO::UnpackTile(QueueMessage & msg, Maps::Tiles & tile, u16 check_vers
     // addons 2
     UnpackTileAddons(msg, tile.addons_level2, check_version);
 
-    tile.FixObject();
-
     tile.FixLoadOldVersion(check_version, quantity3, quantity4, quantity5, quantity6, quantity7);
+    tile.FixObject();
 }
 
 void Game::IO::UnpackTileAddons(QueueMessage & msg, Maps::Addons & addons, u16 check_version)
@@ -1115,6 +1122,7 @@ void Game::IO::UnpackTileAddons(QueueMessage & msg, Maps::Addons & addons, u16 c
 	msg.Pop(addon.uniq);
 	msg.Pop(addon.object);
 	msg.Pop(addon.index);
+	if(check_version >= FORMAT_VERSION_2632)
 	msg.Pop(addon.tmp);
 	addons.push_back(addon);
     }
