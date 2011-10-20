@@ -66,10 +66,6 @@ u16 Mounts::GetPassable(const u16 & icn, const u8 & index)
         // 133 sprites
         case ICN::MTNCRCK:
         case ICN::MTNDIRT:
-	    // corner
-	    if(5 == index || 32 == index || 47 == index || 68 == index)
-		return DIRECTION_ALL & ~Direction::TOP_RIGHT;
-    	    else
 	    if((5 < index && index < 10) || (13 < index && index < 17)) return 0;		// LARGE LEFT
     	    else
 	    if((11 < index && index < 14) || (17 < index && index < 21))
@@ -124,10 +120,6 @@ u16 Mounts::GetPassable(const u16 & icn, const u8 & index)
         case ICN::MTNMULT:
 	case ICN::MTNSNOW:
         case ICN::MTNSWMP:
-	    // corner
-	    if(5 == index || 32 == index)
-		return DIRECTION_ALL & ~Direction::TOP_RIGHT;
-    	    else
     	    if((5 < index && index < 10) || (13 < index && index < 17)) return 0;		// LARGE LEFT
 	    else
 	    if((11 < index && index < 14) || (17 < index && index < 21))

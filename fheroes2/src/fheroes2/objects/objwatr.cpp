@@ -34,11 +34,16 @@ u16 ObjWater::GetPassable(const u16 & icn, const u8 & index)
     {
 	case ICN::OBJNWAT2:
 	    // rock
-	    if(2 == index) return 0;
+	    if(2 == index)
+		return DIRECTION_CENTER_ROW | DIRECTION_BOTTOM_ROW;
 	    else
 	    // ship
-	    if(11 == index || 12 == index || (18 < index && index < 23)) return 0;
-            else
+	    if(11 == index || 12 == index || 19 == index || 21 == index || 22 == index)
+		return 0;
+	    else
+	    if(20 == index)
+		return DIRECTION_CENTER_ROW | DIRECTION_BOTTOM_ROW;
+	    else
                 return DIRECTION_ALL;
 
 	case ICN::OBJNWATR:
@@ -52,13 +57,17 @@ u16 ObjWater::GetPassable(const u16 & icn, const u8 & index)
 	    if(45 == index) return 0;
 	    else
 	    // magellan maps
-	    if(62 == index || 69 == index) return 0;
+	    if(62 == index) return 0;
+	    else
+	    if(69 == index)
+		return DIRECTION_CENTER_ROW | DIRECTION_BOTTOM_ROW;
 	    else
 	    // surviror
 	    if(111 == index) return 0;
 	    else
 	    // rock
-	    if((181 < index && index < 184) || (184 < index && index < 188)) return 0;
+	    if((181 < index && index < 184) || (184 < index && index < 188))
+		return DIRECTION_CENTER_ROW | DIRECTION_BOTTOM_ROW;
 	    else
 	    // buoy
 	    if(195 == index) return 0;
@@ -67,7 +76,10 @@ u16 ObjWater::GetPassable(const u16 & icn, const u8 & index)
 	    if(202 == index || 206 == index || 210 == index || 214 == index || 218 == index || 222 == index) return 0;
 	    else
 	    // ship
-	    if(241 == index || 248 == index) return 0;
+	    if(241 == index) return 0;
+	    else
+	    if(248 == index)
+		return DIRECTION_CENTER_ROW | DIRECTION_BOTTOM_ROW;
 	    else
 		return DIRECTION_ALL;
 

@@ -705,6 +705,25 @@ void Maps::Tiles::UpdatePassable(void)
     for(Addons::const_iterator
 	it = addons_level1.begin(); it != addons_level1.end(); ++it)
 	tile_passable &= TilesAddon::GetPassable(*it);
+
+
+    // fix corners
+    if(Maps::isValidDirection(maps_index, Direction::LEFT))
+    {
+	Tiles & left = world.GetTiles(Maps::GetDirectionIndex(maps_index, Direction::LEFT));
+
+	if(! ((Direction::TOP | Direction::TOP_LEFT) & tile_passable) &&
+	    (Direction::TOP_RIGHT & left.tile_passable))
+	{
+	    left.tile_passable &= ~Direction::TOP_RIGHT;
+	}
+	else
+	if(! ((Direction::TOP | Direction::TOP_RIGHT) & left.tile_passable) &&
+	    (Direction::TOP_LEFT & tile_passable))
+	{
+	    tile_passable &= ~Direction::TOP_LEFT;
+	}
+    }
 }
 
 void Maps::Tiles::AddonsPushLevel1(const MP2::mp2tile_t & mt)

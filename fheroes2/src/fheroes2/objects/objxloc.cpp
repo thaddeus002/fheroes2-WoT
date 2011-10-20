@@ -75,11 +75,12 @@ u16 ObjLoyalty::GetPassable(const u16 & icn, const u8 & index)
 	    if(9 == index) return 0;
 	    else
 	    // mermaid
-	    if(28 == index || 37 == index || 46 == index)
-		return DIRECTION_CENTER_ROW | DIRECTION_BOTTOM_ROW;
+	    if(37 == index) return 0;
 	    else
 	    // sirens
-	    if(92 == index || (100 < index && index < 103))
+	    if(101 == index) return 0;
+	    else
+	    if(92 == index || 102 == index)
 		return DIRECTION_CENTER_ROW | DIRECTION_BOTTOM_ROW;
 	    else
 	    // reefs
