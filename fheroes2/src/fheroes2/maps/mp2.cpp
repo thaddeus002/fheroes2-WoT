@@ -354,264 +354,264 @@ const char* MP2::StringObject(u8 object)
 {
     switch(object)
     {
-        case MP2::OBJ_ZERO:			return "OBJ_ZERO";
-        case MP2::OBJN_ALCHEMYLAB:
-        case MP2::OBJ_ALCHEMYLAB:		return _("Alchemist Lab");
-        case MP2::OBJN_DAEMONCAVE:
-        case MP2::OBJ_DAEMONCAVE:		return _("Daemon Cave");
-        case MP2::OBJN_FAERIERING:
-        case MP2::OBJ_FAERIERING:		return _("Faerie Ring");
-        case MP2::OBJN_GRAVEYARD:
-        case MP2::OBJ_GRAVEYARD:		return _("Graveyard");
-        case MP2::OBJN_DRAGONCITY:
-        case MP2::OBJ_DRAGONCITY:		return _("Dragon City");
-        case MP2::OBJN_LIGHTHOUSE:
-        case MP2::OBJ_LIGHTHOUSE:		return _("Light House");
-        case MP2::OBJN_WATERWHEEL:
-        case MP2::OBJ_WATERWHEEL:		return _("Water Wheel");
-        case MP2::OBJN_MINES:
-        case MP2::OBJ_MINES:			return _("Mines");
-        case MP2::OBJN_OBELISK:
-        case MP2::OBJ_OBELISK:			return _("Obelisk");
-        case MP2::OBJN_OASIS:
-        case MP2::OBJ_OASIS:			return _("Oasis");
-        case MP2::OBJN_SAWMILL:
-        case MP2::OBJ_SAWMILL:			return _("Sawmill");
-        case MP2::OBJN_ORACLE:
-        case MP2::OBJ_ORACLE:			return _("Oracle");
-        case MP2::OBJN_DESERTTENT:
-        case MP2::OBJ_DESERTTENT:		return _("Desert Tent");
-        case MP2::OBJN_CASTLE:
-        case MP2::OBJ_CASTLE:			return _("Castle");
-        case MP2::OBJN_WAGONCAMP:
-        case MP2::OBJ_WAGONCAMP:		return _("Wagon Camp");
-        case MP2::OBJN_WINDMILL:
-        case MP2::OBJ_WINDMILL:			return _("Windmill");
-        case MP2::OBJN_RNDTOWN:
-        case MP2::OBJ_RNDTOWN:			return _("Random Town");
-        case MP2::OBJN_RNDCASTLE:
-        case MP2::OBJ_RNDCASTLE:		return _("Random Castle");
-        case MP2::OBJN_WATCHTOWER:
-        case MP2::OBJ_WATCHTOWER:            	return _("Watch Tower");
-        case MP2::OBJN_TREECITY:
-        case MP2::OBJ_TREECITY:			return _("Tree City");
-        case MP2::OBJN_TREEHOUSE:
-        case MP2::OBJ_TREEHOUSE:             	return _("Tree House");
-        case MP2::OBJN_RUINS:
-        case MP2::OBJ_RUINS:			return _("Ruins");
-        case MP2::OBJN_FORT:
-        case MP2::OBJ_FORT:			return _("Fort");
-        case MP2::OBJN_TRADINGPOST:
-        case MP2::OBJ_TRADINGPOST:		return _("Trading Post");
-        case MP2::OBJN_ABANDONEDMINE:
-        case MP2::OBJ_ABANDONEDMINE:		return _("Abandoned Mine");
-        case MP2::OBJN_TREEKNOWLEDGE:
-        case MP2::OBJ_TREEKNOWLEDGE:		return _("Tree of Knowledge");
-        case MP2::OBJN_DOCTORHUT:
-        case MP2::OBJ_DOCTORHUT:		return _("Witch Doctor's Hut");
-        case MP2::OBJN_TEMPLE:
-        case MP2::OBJ_TEMPLE:			return _("Temple");
-        case MP2::OBJN_HILLFORT:
-        case MP2::OBJ_HILLFORT:			return _("Hill Fort");
-        case MP2::OBJN_HALFLINGHOLE:
-        case MP2::OBJ_HALFLINGHOLE:		return _("Halfling Hole");
-        case MP2::OBJN_MERCENARYCAMP:
-        case MP2::OBJ_MERCENARYCAMP:		return _("Mercenary Camp");
-        case MP2::OBJN_PYRAMID:
-        case MP2::OBJ_PYRAMID:			return _("Pyramid");
-        case MP2::OBJN_CITYDEAD:
-        case MP2::OBJ_CITYDEAD:			return _("City of the Dead");
-        case MP2::OBJN_EXCAVATION:
-        case MP2::OBJ_EXCAVATION:		return _("Excavation");
-        case MP2::OBJN_SPHINX:
-        case MP2::OBJ_SPHINX:			return _("Sphinx");
-        case MP2::OBJN_TROLLBRIDGE:
-        case MP2::OBJ_TROLLBRIDGE:		return _("Troll Bridge");
-        case MP2::OBJN_WITCHSHUT:
-        case MP2::OBJ_WITCHSHUT:		return _("Witch Hut");
-        case MP2::OBJN_XANADU:
-        case MP2::OBJ_XANADU:			return _("Xanadu");
-        case MP2::OBJN_CAVE:
-        case MP2::OBJ_CAVE:			return _("Cave");
-        case MP2::OBJN_MAGELLANMAPS:
-        case MP2::OBJ_MAGELLANMAPS:		return _("Magellan Maps");
-        case MP2::OBJN_DERELICTSHIP:
-        case MP2::OBJ_DERELICTSHIP:		return _("Derelict Ship");
-        case MP2::OBJN_SHIPWRECK:
-        case MP2::OBJ_SHIPWRECK:		return _("Ship Wreck");
-        case MP2::OBJN_OBSERVATIONTOWER:
-        case MP2::OBJ_OBSERVATIONTOWER:		return _("Observation Tower");
-        case MP2::OBJN_FREEMANFOUNDRY:
-        case MP2::OBJ_FREEMANFOUNDRY:		return _("Freeman Foundry");
-        case MP2::OBJN_WATERINGHOLE:
-        case MP2::OBJ_WATERINGHOLE:            	return _("Watering Hole");
-        case MP2::OBJN_ARTESIANSPRING:
-        case MP2::OBJ_ARTESIANSPRING:        	return _("Artesian Spring");
-        case MP2::OBJN_GAZEBO:
-        case MP2::OBJ_GAZEBO:			return _("Gazebo");
-        case MP2::OBJN_ARCHERHOUSE:
-        case MP2::OBJ_ARCHERHOUSE:		return _("Archer's House");
-        case MP2::OBJN_PEASANTHUT:
-        case MP2::OBJ_PEASANTHUT:		return _("Peasant Hut");
-        case MP2::OBJN_DWARFCOTT:
-        case MP2::OBJ_DWARFCOTT:		return _("Dwarf Cottage");
-        case MP2::OBJN_STONELIGHTS:
-        case MP2::OBJ_STONELIGHTS:		return _("Stone Liths");	// https://sourceforge.net/projects/fheroes2/forums/forum/335991/topic/4605429
-        case MP2::OBJN_MAGICWELL:
-        case MP2::OBJ_MAGICWELL:             	return _("Magic Well");
-        case MP2::OBJ_HEROES:			return _("Heroes");
-        case MP2::OBJ_SIGN:			return _("Sign");
-        case MP2::OBJ_SHRUB2:			return _("Shrub");
-        case MP2::OBJ_NOTHINGSPECIAL:		return _("Nothing Special");
-        case MP2::OBJ_TARPIT:			return _("Tar Pit");
-        case MP2::OBJ_COAST:			return _("Coast");
-        case MP2::OBJ_MOUND:			return _("Mound");
-        case MP2::OBJ_DUNE:			return _("Dune");
-	case MP2::OBJ_STUMP:			return _("Stump");
-	case MP2::OBJ_CACTUS:			return _("Cactus");
-        case MP2::OBJ_TREES:			return _("Trees");
-        case MP2::OBJ_DEADTREE:			return _("Dead Tree");
-        case MP2::OBJ_MOUNTS:			return _("Mountains");
-        case MP2::OBJ_VOLCANO:			return _("Volcano");
-        case MP2::OBJ_STONES:			return _("Rock");
-        case MP2::OBJ_FLOWERS:			return _("Flowers");
-        case MP2::OBJ_WATERLAKE:		return _("Water Lake");
-        case MP2::OBJ_MANDRAKE:			return _("Mandrake");
-        case MP2::OBJ_CRATER:			return _("Crater");
-        case MP2::OBJ_LAVAPOOL:			return _("Lava Pool");
-        case MP2::OBJ_SHRUB:			return _("Shrub");
-        case MP2::OBJ_BUOY:			return _("Buoy");
-        case MP2::OBJ_SKELETON:			return _("Skeleton");
-        case MP2::OBJ_TREASURECHEST:		return _("Treasure Chest");
-        case MP2::OBJ_WATERCHEST:		return _("Sea Chest");
-        case MP2::OBJ_CAMPFIRE:			return _("Campfire");
-        case MP2::OBJ_FOUNTAIN:			return _("Fountain");
-        case MP2::OBJ_ANCIENTLAMP:		return _("Genie Lamp");
-        case MP2::OBJ_GOBLINHUT:		return _("Goblin Hut");
-        case MP2::OBJ_THATCHEDHUT:		return _("Thatched Hut");
-        case MP2::OBJ_MONSTER:			return _("Monster");
-        case MP2::OBJ_RESOURCE:			return _("Resource");
-        case MP2::OBJ_WHIRLPOOL:		return _("Whirlpool");
-        case MP2::OBJ_ARTIFACT:			return _("Artifact");
-        case MP2::OBJ_BOAT:			return _("Boat");
-        case MP2::OBJ_RNDARTIFACT:		return "Random Artifact";
-        case MP2::OBJ_RNDRESOURCE:		return "Random Resource";
-        case MP2::OBJ_RNDMONSTER1:           	return "OBJ_RNDMONSTER1";
-        case MP2::OBJ_RNDMONSTER2:           	return "OBJ_RNDMONSTER2";
-        case MP2::OBJ_RNDMONSTER3:           	return "OBJ_RNDMONSTER3";
-        case MP2::OBJ_RNDMONSTER4:           	return "OBJ_RNDMONSTER4";
-        case MP2::OBJ_STANDINGSTONES:        	return _("Standing Stones");
-        case MP2::OBJ_EVENT:                 	return "OBJ_EVENT";
-        case MP2::OBJ_RNDMONSTER:            	return "OBJ_RNDMONSTER";
-        case MP2::OBJ_RNDULTIMATEARTIFACT:   	return "OBJ_RNDULTIMATEARTIFACT";
-        case MP2::OBJ_IDOL:                  	return _("Idol");
-        case MP2::OBJ_SHRINE1:               	return _("Shrine of the First Circle");
-        case MP2::OBJ_SHRINE2:               	return _("Shrine of the Second Circle");
-        case MP2::OBJ_SHRINE3:               	return _("Shrine of the Third Circle");
-        case MP2::OBJ_WAGON:                 	return _("Wagon");
-        case MP2::OBJ_LEANTO:                	return _("Lean To");
-        case MP2::OBJ_FLOTSAM:               	return _("Flotsam");
-        case MP2::OBJ_SHIPWRECKSURVIROR:     	return _("Shipwreck Surviror");
-        case MP2::OBJ_BOTTLE:                	return _("Bottle");
-        case MP2::OBJ_MAGICGARDEN:           	return _("Magic Garden");
-        case MP2::OBJ_RNDARTIFACT1:          	return "OBJ_RNDARTIFACT1";
-        case MP2::OBJ_RNDARTIFACT2:          	return "OBJ_RNDARTIFACT2";
-        case MP2::OBJ_RNDARTIFACT3:          	return "OBJ_RNDARTIFACT3";
+        case OBJ_ZERO:			return "OBJ_ZERO";
+        case OBJN_ALCHEMYLAB:
+        case OBJ_ALCHEMYLAB:		return _("Alchemist Lab");
+        case OBJN_DAEMONCAVE:
+        case OBJ_DAEMONCAVE:		return _("Daemon Cave");
+        case OBJN_FAERIERING:
+        case OBJ_FAERIERING:		return _("Faerie Ring");
+        case OBJN_GRAVEYARD:
+        case OBJ_GRAVEYARD:		return _("Graveyard");
+        case OBJN_DRAGONCITY:
+        case OBJ_DRAGONCITY:		return _("Dragon City");
+        case OBJN_LIGHTHOUSE:
+        case OBJ_LIGHTHOUSE:		return _("Light House");
+        case OBJN_WATERWHEEL:
+        case OBJ_WATERWHEEL:		return _("Water Wheel");
+        case OBJN_MINES:
+        case OBJ_MINES:			return _("Mines");
+        case OBJN_OBELISK:
+        case OBJ_OBELISK:		return _("Obelisk");
+        case OBJN_OASIS:
+        case OBJ_OASIS:			return _("Oasis");
+        case OBJN_SAWMILL:
+        case OBJ_SAWMILL:		return _("Sawmill");
+        case OBJN_ORACLE:
+        case OBJ_ORACLE:		return _("Oracle");
+        case OBJN_DESERTTENT:
+        case OBJ_DESERTTENT:		return _("Desert Tent");
+        case OBJN_CASTLE:
+        case OBJ_CASTLE:		return _("Castle");
+        case OBJN_WAGONCAMP:
+        case OBJ_WAGONCAMP:		return _("Wagon Camp");
+        case OBJN_WINDMILL:
+        case OBJ_WINDMILL:		return _("Windmill");
+        case OBJN_RNDTOWN:
+        case OBJ_RNDTOWN:		return _("Random Town");
+        case OBJN_RNDCASTLE:
+        case OBJ_RNDCASTLE:		return _("Random Castle");
+        case OBJN_WATCHTOWER:
+        case OBJ_WATCHTOWER:            return _("Watch Tower");
+        case OBJN_TREECITY:
+        case OBJ_TREECITY:		return _("Tree City");
+        case OBJN_TREEHOUSE:
+        case OBJ_TREEHOUSE:             return _("Tree House");
+        case OBJN_RUINS:
+        case OBJ_RUINS:			return _("Ruins");
+        case OBJN_FORT:
+        case OBJ_FORT:			return _("Fort");
+        case OBJN_TRADINGPOST:
+        case OBJ_TRADINGPOST:		return _("Trading Post");
+        case OBJN_ABANDONEDMINE:
+        case OBJ_ABANDONEDMINE:		return _("Abandoned Mine");
+        case OBJN_TREEKNOWLEDGE:
+        case OBJ_TREEKNOWLEDGE:		return _("Tree of Knowledge");
+        case OBJN_DOCTORHUT:
+        case OBJ_DOCTORHUT:		return _("Witch Doctor's Hut");
+        case OBJN_TEMPLE:
+        case OBJ_TEMPLE:		return _("Temple");
+        case OBJN_HILLFORT:
+        case OBJ_HILLFORT:		return _("Hill Fort");
+        case OBJN_HALFLINGHOLE:
+        case OBJ_HALFLINGHOLE:		return _("Halfling Hole");
+        case OBJN_MERCENARYCAMP:
+        case OBJ_MERCENARYCAMP:		return _("Mercenary Camp");
+        case OBJN_PYRAMID:
+        case OBJ_PYRAMID:		return _("Pyramid");
+        case OBJN_CITYDEAD:
+        case OBJ_CITYDEAD:		return _("City of the Dead");
+        case OBJN_EXCAVATION:
+        case OBJ_EXCAVATION:		return _("Excavation");
+        case OBJN_SPHINX:
+        case OBJ_SPHINX:		return _("Sphinx");
+        case OBJN_TROLLBRIDGE:
+        case OBJ_TROLLBRIDGE:		return _("Troll Bridge");
+        case OBJN_WITCHSHUT:
+        case OBJ_WITCHSHUT:		return _("Witch Hut");
+        case OBJN_XANADU:
+        case OBJ_XANADU:		return _("Xanadu");
+        case OBJN_CAVE:
+        case OBJ_CAVE:			return _("Cave");
+        case OBJN_MAGELLANMAPS:
+        case OBJ_MAGELLANMAPS:		return _("Magellan Maps");
+        case OBJN_DERELICTSHIP:
+        case OBJ_DERELICTSHIP:		return _("Derelict Ship");
+        case OBJN_SHIPWRECK:
+        case OBJ_SHIPWRECK:		return _("Ship Wreck");
+        case OBJN_OBSERVATIONTOWER:
+        case OBJ_OBSERVATIONTOWER:	return _("Observation Tower");
+        case OBJN_FREEMANFOUNDRY:
+        case OBJ_FREEMANFOUNDRY:	return _("Freeman Foundry");
+        case OBJN_WATERINGHOLE:
+        case OBJ_WATERINGHOLE:          return _("Watering Hole");
+        case OBJN_ARTESIANSPRING:
+        case OBJ_ARTESIANSPRING:        return _("Artesian Spring");
+        case OBJN_GAZEBO:
+        case OBJ_GAZEBO:		return _("Gazebo");
+        case OBJN_ARCHERHOUSE:
+        case OBJ_ARCHERHOUSE:		return _("Archer's House");
+        case OBJN_PEASANTHUT:
+        case OBJ_PEASANTHUT:		return _("Peasant Hut");
+        case OBJN_DWARFCOTT:
+        case OBJ_DWARFCOTT:		return _("Dwarf Cottage");
+        case OBJN_STONELIGHTS:
+        case OBJ_STONELIGHTS:		return _("Stone Liths");	// https://sourceforge.net/projects/fheroes2/forums/forum/335991/topic/4605429
+        case OBJN_MAGICWELL:
+        case OBJ_MAGICWELL:             return _("Magic Well");
+        case OBJ_HEROES:		return _("Heroes");
+        case OBJ_SIGN:			return _("Sign");
+        case OBJ_SHRUB2:		return _("Shrub");
+        case OBJ_NOTHINGSPECIAL:	return _("Nothing Special");
+        case OBJ_TARPIT:		return _("Tar Pit");
+        case OBJ_COAST:			return _("Coast");
+        case OBJ_MOUND:			return _("Mound");
+        case OBJ_DUNE:			return _("Dune");
+	case OBJ_STUMP:			return _("Stump");
+	case OBJ_CACTUS:		return _("Cactus");
+        case OBJ_TREES:			return _("Trees");
+        case OBJ_DEADTREE:		return _("Dead Tree");
+        case OBJ_MOUNTS:		return _("Mountains");
+        case OBJ_VOLCANO:		return _("Volcano");
+        case OBJ_STONES:		return _("Rock");
+        case OBJ_FLOWERS:		return _("Flowers");
+        case OBJ_WATERLAKE:		return _("Water Lake");
+        case OBJ_MANDRAKE:		return _("Mandrake");
+        case OBJ_CRATER:		return _("Crater");
+        case OBJ_LAVAPOOL:		return _("Lava Pool");
+        case OBJ_SHRUB:			return _("Shrub");
+        case OBJ_BUOY:			return _("Buoy");
+        case OBJ_SKELETON:		return _("Skeleton");
+        case OBJ_TREASURECHEST:		return _("Treasure Chest");
+        case OBJ_WATERCHEST:		return _("Sea Chest");
+        case OBJ_CAMPFIRE:		return _("Campfire");
+        case OBJ_FOUNTAIN:		return _("Fountain");
+        case OBJ_ANCIENTLAMP:		return _("Genie Lamp");
+        case OBJ_GOBLINHUT:		return _("Goblin Hut");
+        case OBJ_THATCHEDHUT:		return _("Thatched Hut");
+        case OBJ_MONSTER:		return _("Monster");
+        case OBJ_RESOURCE:		return _("Resource");
+        case OBJ_WHIRLPOOL:		return _("Whirlpool");
+        case OBJ_ARTIFACT:		return _("Artifact");
+        case OBJ_BOAT:			return _("Boat");
+        case OBJ_RNDARTIFACT:		return "Random Artifact";
+        case OBJ_RNDRESOURCE:		return "Random Resource";
+        case OBJ_RNDMONSTER1:           return "OBJ_RNDMONSTER1";
+        case OBJ_RNDMONSTER2:           return "OBJ_RNDMONSTER2";
+        case OBJ_RNDMONSTER3:           return "OBJ_RNDMONSTER3";
+        case OBJ_RNDMONSTER4:           return "OBJ_RNDMONSTER4";
+        case OBJ_STANDINGSTONES:        return _("Standing Stones");
+        case OBJ_EVENT:                 return "OBJ_EVENT";
+        case OBJ_RNDMONSTER:            return "OBJ_RNDMONSTER";
+        case OBJ_RNDULTIMATEARTIFACT:   return "OBJ_RNDULTIMATEARTIFACT";
+        case OBJ_IDOL:                  return _("Idol");
+        case OBJ_SHRINE1:               return _("Shrine of the First Circle");
+        case OBJ_SHRINE2:               return _("Shrine of the Second Circle");
+        case OBJ_SHRINE3:               return _("Shrine of the Third Circle");
+        case OBJ_WAGON:                 return _("Wagon");
+        case OBJ_LEANTO:                return _("Lean To");
+        case OBJ_FLOTSAM:               return _("Flotsam");
+        case OBJ_SHIPWRECKSURVIROR:     return _("Shipwreck Surviror");
+        case OBJ_BOTTLE:                return _("Bottle");
+        case OBJ_MAGICGARDEN:           return _("Magic Garden");
+        case OBJ_RNDARTIFACT1:          return "OBJ_RNDARTIFACT1";
+        case OBJ_RNDARTIFACT2:          return "OBJ_RNDARTIFACT2";
+        case OBJ_RNDARTIFACT3:          return "OBJ_RNDARTIFACT3";
 
-	case MP2::OBJN_JAIL:
-	case MP2::OBJ_JAIL:			return _("Jail");
-	case MP2::OBJN_TRAVELLERTENT:
-	case MP2::OBJ_TRAVELLERTENT:		return _("Traveller's Tent");
-	case MP2::OBJ_BARRIER:			return _("Barrier");
+	case OBJN_JAIL:
+	case OBJ_JAIL:			return _("Jail");
+	case OBJN_TRAVELLERTENT:
+	case OBJ_TRAVELLERTENT:		return _("Traveller's Tent");
+	case OBJ_BARRIER:		return _("Barrier");
 
-	case MP2::OBJN_FIREALTAR:
-	case MP2::OBJ_FIREALTAR:		return _("Fire Summoning Altar");
-	case MP2::OBJN_AIRALTAR:
-	case MP2::OBJ_AIRALTAR:			return _("Air Summoning Altar");
-	case MP2::OBJN_EARTHALTAR:
-	case MP2::OBJ_EARTHALTAR:		return _("Earth Summoning Altar");
-	case MP2::OBJN_WATERALTAR:
-	case MP2::OBJ_WATERALTAR:		return _("Water Summoning Altar");
-	case MP2::OBJN_BARROWMOUNDS:
-	case MP2::OBJ_BARROWMOUNDS:		return _("Barrow Mounds");
-	case MP2::OBJN_ARENA:
-	case MP2::OBJ_ARENA:			return _("Arena");
-	case MP2::OBJN_STABLES:
-	case MP2::OBJ_STABLES:			return _("Stables");
-	case MP2::OBJN_ALCHEMYTOWER:
-	case MP2::OBJ_ALCHEMYTOWER:		return _("Alchemist's Tower");
-	case MP2::OBJN_HUTMAGI:
-	case MP2::OBJ_HUTMAGI:			return _("Hut of the Magi");
-	case MP2::OBJN_EYEMAGI:
-	case MP2::OBJ_EYEMAGI:			return _("Eye of the Magi");
-	case MP2::OBJN_MERMAID:
-	case MP2::OBJ_MERMAID:			return _("Mermaid");
-	case MP2::OBJN_SIRENS:
-	case MP2::OBJ_SIRENS:			return _("Sirens");
-	case MP2::OBJ_REEFS:			return _("Reefs");
+	case OBJN_FIREALTAR:
+	case OBJ_FIREALTAR:		return _("Fire Summoning Altar");
+	case OBJN_AIRALTAR:
+	case OBJ_AIRALTAR:		return _("Air Summoning Altar");
+	case OBJN_EARTHALTAR:
+	case OBJ_EARTHALTAR:		return _("Earth Summoning Altar");
+	case OBJN_WATERALTAR:
+	case OBJ_WATERALTAR:		return _("Water Summoning Altar");
+	case OBJN_BARROWMOUNDS:
+	case OBJ_BARROWMOUNDS:		return _("Barrow Mounds");
+	case OBJN_ARENA:
+	case OBJ_ARENA:			return _("Arena");
+	case OBJN_STABLES:
+	case OBJ_STABLES:		return _("Stables");
+	case OBJN_ALCHEMYTOWER:
+	case OBJ_ALCHEMYTOWER:		return _("Alchemist's Tower");
+	case OBJN_HUTMAGI:
+	case OBJ_HUTMAGI:		return _("Hut of the Magi");
+	case OBJN_EYEMAGI:
+	case OBJ_EYEMAGI:		return _("Eye of the Magi");
+	case OBJN_MERMAID:
+	case OBJ_MERMAID:		return _("Mermaid");
+	case OBJN_SIRENS:
+	case OBJ_SIRENS:		return _("Sirens");
+	case OBJ_REEFS:			return _("Reefs");
 
-	case MP2::OBJ_UNKNW_02:		return "OBJ_UNKNW_02";
-	case MP2::OBJ_UNKNW_03:		return "OBJ_UNKNW_03";
-	case MP2::OBJ_UNKNW_04:		return "OBJ_UNKNW_04";
-	case MP2::OBJ_UNKNW_06:		return "OBJ_UNKNW_06";
-	case MP2::OBJ_UNKNW_08:		return "OBJ_UNKNW_08";
-	case MP2::OBJ_UNKNW_09:		return "OBJ_UNKNW_09";
-	case MP2::OBJ_UNKNW_0B:		return "OBJ_UNKNW_0B";
-	case MP2::OBJ_UNKNW_0E:		return "OBJ_UNKNW_0E";
-	case MP2::OBJ_UNKNW_11:		return "OBJ_UNKNW_11";
-	case MP2::OBJ_UNKNW_12:		return "OBJ_UNKNW_12";
-	case MP2::OBJ_UNKNW_13:		return "OBJ_UNKNW_13";
-	case MP2::OBJ_UNKNW_18:		return "OBJ_UNKNW_18";
-	case MP2::OBJ_UNKNW_1B:		return "OBJ_UNKNW_1B";
-	case MP2::OBJ_UNKNW_1F:		return "OBJ_UNKNW_1F";
-	case MP2::OBJ_UNKNW_21:		return "OBJ_UNKNW_21";
-	case MP2::OBJ_UNKNW_26:		return "OBJ_UNKNW_26";
-	case MP2::OBJ_UNKNW_27:		return "OBJ_UNKNW_27";
-	case MP2::OBJ_UNKNW_29:		return "OBJ_UNKNW_29";
-	case MP2::OBJ_UNKNW_2A:		return "OBJ_UNKNW_2A";
-	case MP2::OBJ_UNKNW_2B:		return "OBJ_UNKNW_2B";
-	case MP2::OBJ_UNKNW_2C:		return "OBJ_UNKNW_2C";
-	case MP2::OBJ_UNKNW_2D:		return "OBJ_UNKNW_2D";
-	case MP2::OBJ_UNKNW_2E:		return "OBJ_UNKNW_2E";
-	case MP2::OBJ_UNKNW_2F:		return "OBJ_UNKNW_2F";
-	case MP2::OBJ_UNKNW_32:		return "OBJ_UNKNW_32";
-	case MP2::OBJ_UNKNW_33:		return "OBJ_UNKNW_33";
-	case MP2::OBJ_UNKNW_34:		return "OBJ_UNKNW_34";
-	case MP2::OBJ_UNKNW_35:		return "OBJ_UNKNW_35";
-	case MP2::OBJ_UNKNW_36:		return "OBJ_UNKNW_36";
-	case MP2::OBJ_UNKNW_37:		return "OBJ_UNKNW_37";
-	case MP2::OBJ_UNKNW_41:		return "OBJ_UNKNW_41";
-	case MP2::OBJ_UNKNW_42:		return "OBJ_UNKNW_42";
-	case MP2::OBJ_UNKNW_43:		return "OBJ_UNKNW_43";
-	case MP2::OBJ_UNKNW_4A:		return "OBJ_UNKNW_4A";
-	case MP2::OBJ_UNKNW_4B:		return "OBJ_UNKNW_4B";
-	case MP2::OBJ_UNKNW_50:		return "OBJ_UNKNW_50";
-	case MP2::OBJ_UNKNW_58:		return "OBJ_UNKNW_58";
-	case MP2::OBJ_UNKNW_5A:		return "OBJ_UNKNW_5A";
-	case MP2::OBJ_UNKNW_5C:		return "OBJ_UNKNW_5C";
-	case MP2::OBJ_UNKNW_5D:		return "OBJ_UNKNW_5D";
-	case MP2::OBJ_UNKNW_5F:		return "OBJ_UNKNW_5F";
-	case MP2::OBJ_UNKNW_62:		return "OBJ_UNKNW_62";
-	case MP2::OBJ_UNKNW_79:		return "OBJ_UNKNW_79";
-	case MP2::OBJ_UNKNW_7A:		return "OBJ_UNKNW_7A";
-	case MP2::OBJ_UNKNW_91:		return "OBJ_UNKNW_91";
-	case MP2::OBJ_UNKNW_92:		return "OBJ_UNKNW_92";
-	case MP2::OBJ_UNKNW_A1:		return "OBJ_UNKNW_A1";
-	case MP2::OBJ_UNKNW_A6:		return "OBJ_UNKNW_A6";
-	case MP2::OBJ_UNKNW_AA:		return "OBJ_UNKNW_AA";
-	case MP2::OBJ_UNKNW_B2:		return "OBJ_UNKNW_B2";
-	case MP2::OBJ_UNKNW_B8:		return "OBJ_UNKNW_B8";
-	case MP2::OBJ_UNKNW_B9:		return "OBJ_UNKNW_B9";
-	case MP2::OBJ_UNKNW_D1:		return "OBJ_UNKNW_D1";
-	case MP2::OBJ_UNKNW_E2:		return "OBJ_UNKNW_E2";
-	case MP2::OBJ_UNKNW_E3:		return "OBJ_UNKNW_E3";
-	case MP2::OBJ_UNKNW_E4:		return "OBJ_UNKNW_E4";
-	case MP2::OBJ_UNKNW_E5:		return "OBJ_UNKNW_E5";
-	case MP2::OBJ_UNKNW_E6:		return "OBJ_UNKNW_E6";
-	case MP2::OBJ_UNKNW_E7:		return "OBJ_UNKNW_E7";
-	case MP2::OBJ_UNKNW_E8:		return "OBJ_UNKNW_E8";
-	case MP2::OBJ_UNKNW_F9:		return "OBJ_UNKNW_F9";
-	case MP2::OBJ_UNKNW_FA:		return "OBJ_UNKNW_FA";
+	case OBJ_UNKNW_02:		return "OBJ_UNKNW_02";
+	case OBJ_UNKNW_03:		return "OBJ_UNKNW_03";
+	case OBJ_UNKNW_04:		return "OBJ_UNKNW_04";
+	case OBJ_UNKNW_06:		return "OBJ_UNKNW_06";
+	case OBJ_UNKNW_08:		return "OBJ_UNKNW_08";
+	case OBJ_UNKNW_09:		return "OBJ_UNKNW_09";
+	case OBJ_UNKNW_0B:		return "OBJ_UNKNW_0B";
+	case OBJ_UNKNW_0E:		return "OBJ_UNKNW_0E";
+	case OBJ_UNKNW_11:		return "OBJ_UNKNW_11";
+	case OBJ_UNKNW_12:		return "OBJ_UNKNW_12";
+	case OBJ_UNKNW_13:		return "OBJ_UNKNW_13";
+	case OBJ_UNKNW_18:		return "OBJ_UNKNW_18";
+	case OBJ_UNKNW_1B:		return "OBJ_UNKNW_1B";
+	case OBJ_UNKNW_1F:		return "OBJ_UNKNW_1F";
+	case OBJ_UNKNW_21:		return "OBJ_UNKNW_21";
+	case OBJ_UNKNW_26:		return "OBJ_UNKNW_26";
+	case OBJ_UNKNW_27:		return "OBJ_UNKNW_27";
+	case OBJ_UNKNW_29:		return "OBJ_UNKNW_29";
+	case OBJ_UNKNW_2A:		return "OBJ_UNKNW_2A";
+	case OBJ_UNKNW_2B:		return "OBJ_UNKNW_2B";
+	case OBJ_UNKNW_2C:		return "OBJ_UNKNW_2C";
+	case OBJ_UNKNW_2D:		return "OBJ_UNKNW_2D";
+	case OBJ_UNKNW_2E:		return "OBJ_UNKNW_2E";
+	case OBJ_UNKNW_2F:		return "OBJ_UNKNW_2F";
+	case OBJ_UNKNW_32:		return "OBJ_UNKNW_32";
+	case OBJ_UNKNW_33:		return "OBJ_UNKNW_33";
+	case OBJ_UNKNW_34:		return "OBJ_UNKNW_34";
+	case OBJ_UNKNW_35:		return "OBJ_UNKNW_35";
+	case OBJ_UNKNW_36:		return "OBJ_UNKNW_36";
+	case OBJ_UNKNW_37:		return "OBJ_UNKNW_37";
+	case OBJ_UNKNW_41:		return "OBJ_UNKNW_41";
+	case OBJ_UNKNW_42:		return "OBJ_UNKNW_42";
+	case OBJ_UNKNW_43:		return "OBJ_UNKNW_43";
+	case OBJ_UNKNW_4A:		return "OBJ_UNKNW_4A";
+	case OBJ_UNKNW_4B:		return "OBJ_UNKNW_4B";
+	case OBJ_UNKNW_50:		return "OBJ_UNKNW_50";
+	case OBJ_UNKNW_58:		return "OBJ_UNKNW_58";
+	case OBJ_UNKNW_5A:		return "OBJ_UNKNW_5A";
+	case OBJ_UNKNW_5C:		return "OBJ_UNKNW_5C";
+	case OBJ_UNKNW_5D:		return "OBJ_UNKNW_5D";
+	case OBJ_UNKNW_5F:		return "OBJ_UNKNW_5F";
+	case OBJ_UNKNW_62:		return "OBJ_UNKNW_62";
+	case OBJ_UNKNW_79:		return "OBJ_UNKNW_79";
+	case OBJ_UNKNW_7A:		return "OBJ_UNKNW_7A";
+	case OBJ_UNKNW_91:		return "OBJ_UNKNW_91";
+	case OBJ_UNKNW_92:		return "OBJ_UNKNW_92";
+	case OBJ_UNKNW_A1:		return "OBJ_UNKNW_A1";
+	case OBJ_UNKNW_A6:		return "OBJ_UNKNW_A6";
+	case OBJ_UNKNW_AA:		return "OBJ_UNKNW_AA";
+	case OBJ_UNKNW_B2:		return "OBJ_UNKNW_B2";
+	case OBJ_UNKNW_B8:		return "OBJ_UNKNW_B8";
+	case OBJ_UNKNW_B9:		return "OBJ_UNKNW_B9";
+	case OBJ_UNKNW_D1:		return "OBJ_UNKNW_D1";
+	case OBJ_UNKNW_E2:		return "OBJ_UNKNW_E2";
+	case OBJ_UNKNW_E3:		return "OBJ_UNKNW_E3";
+	case OBJ_UNKNW_E4:		return "OBJ_UNKNW_E4";
+	case OBJ_UNKNW_E5:		return "OBJ_UNKNW_E5";
+	case OBJ_UNKNW_E6:		return "OBJ_UNKNW_E6";
+	case OBJ_UNKNW_E7:		return "OBJ_UNKNW_E7";
+	case OBJ_UNKNW_E8:		return "OBJ_UNKNW_E8";
+	case OBJ_UNKNW_F9:		return "OBJ_UNKNW_F9";
+	case OBJ_UNKNW_FA:		return "OBJ_UNKNW_FA";
 
 	default:
 	    DEBUG(DBG_GAME, DBG_WARN, "unknown object: " << static_cast<int>(object));
@@ -712,7 +712,6 @@ bool MP2::isBattleLife(const u8 obj)
 	case OBJ_GRAVEYARD:
         case OBJ_DERELICTSHIP:
         case OBJ_SHIPWRECK:
-
 	case OBJ_MERMAID:
 
 	    return true;
@@ -840,19 +839,19 @@ bool MP2::isGroundObject(const u8 obj)
     	    case OBJ_CASTLE:
     	    case OBJ_BOAT:
 
-	    case MP2::OBJ_BARRIER:
-	    case MP2::OBJ_TRAVELLERTENT:
-	    case MP2::OBJ_FIREALTAR:
-	    case MP2::OBJ_AIRALTAR:
-	    case MP2::OBJ_EARTHALTAR:
-	    case MP2::OBJ_WATERALTAR:
-	    case MP2::OBJ_BARROWMOUNDS:
-	    case MP2::OBJ_ARENA:
-	    case MP2::OBJ_JAIL:
-	    case MP2::OBJ_STABLES:
-	    case MP2::OBJ_ALCHEMYTOWER:
-	    case MP2::OBJ_HUTMAGI:
-	    case MP2::OBJ_EYEMAGI:
+	    case OBJ_BARRIER:
+	    case OBJ_TRAVELLERTENT:
+	    case OBJ_FIREALTAR:
+	    case OBJ_AIRALTAR:
+	    case OBJ_EARTHALTAR:
+	    case OBJ_WATERALTAR:
+	    case OBJ_BARROWMOUNDS:
+	    case OBJ_ARENA:
+	    case OBJ_JAIL:
+	    case OBJ_STABLES:
+	    case OBJ_ALCHEMYTOWER:
+	    case OBJ_HUTMAGI:
+	    case OBJ_EYEMAGI:
 		return true;
 
 	    default: break;
@@ -899,7 +898,7 @@ bool MP2::isCaptureObject(const u8 obj)
     switch(obj)
     {
         case OBJ_MINES:
-	case MP2::OBJ_ABANDONEDMINE:
+	case OBJ_ABANDONEDMINE:
         case OBJ_ALCHEMYLAB:
         case OBJ_SAWMILL:
         case OBJ_LIGHTHOUSE:
@@ -920,15 +919,15 @@ bool MP2::isPickupObject(const u8 obj)
 {
     switch(obj)
     {
-	case MP2::OBJ_WATERCHEST:
-	case MP2::OBJ_SHIPWRECKSURVIROR:
-        case MP2::OBJ_FLOTSAM:
-        case MP2::OBJ_BOTTLE:
-        case MP2::OBJ_TREASURECHEST:
-        case MP2::OBJ_ANCIENTLAMP:
-	case MP2::OBJ_CAMPFIRE:
-        case MP2::OBJ_RESOURCE:
-        case MP2::OBJ_ARTIFACT:
+	case OBJ_WATERCHEST:
+	case OBJ_SHIPWRECKSURVIROR:
+        case OBJ_FLOTSAM:
+        case OBJ_BOTTLE:
+        case OBJ_TREASURECHEST:
+        case OBJ_ANCIENTLAMP:
+	case OBJ_CAMPFIRE:
+        case OBJ_RESOURCE:
+        case OBJ_ARTIFACT:
 	    return true;
 
 	default: break;
@@ -955,8 +954,8 @@ bool MP2::isRemoveObject(const u8 obj)
 {
     switch(obj)
     {
-        case MP2::OBJ_MONSTER:
-        case MP2::OBJ_BARRIER:
+        case OBJ_MONSTER:
+        case OBJ_BARRIER:
 	    return true;
 
 	default: break;
@@ -969,22 +968,22 @@ bool MP2::isNeedStayFront(const u8 obj)
 {
     switch(obj)
     {
-        case MP2::OBJ_WATERCHEST:
-        case MP2::OBJ_SHIPWRECKSURVIROR:
-        case MP2::OBJ_FLOTSAM:
-        case MP2::OBJ_BOTTLE:
-        case MP2::OBJ_TREASURECHEST:
-        case MP2::OBJ_ANCIENTLAMP:
-        case MP2::OBJ_CAMPFIRE:
-        case MP2::OBJ_MONSTER:
-        case MP2::OBJ_RESOURCE:
-        case MP2::OBJ_ARTIFACT:
-        case MP2::OBJ_HEROES:
-        case MP2::OBJ_BOAT:
-        case MP2::OBJ_BARRIER:
-        case MP2::OBJ_JAIL:
-	case MP2::OBJ_SHIPWRECK:
-	case MP2::OBJ_BUOY:
+        case OBJ_WATERCHEST:
+        case OBJ_SHIPWRECKSURVIROR:
+        case OBJ_FLOTSAM:
+        case OBJ_BOTTLE:
+        case OBJ_TREASURECHEST:
+        case OBJ_ANCIENTLAMP:
+        case OBJ_CAMPFIRE:
+        case OBJ_MONSTER:
+        case OBJ_RESOURCE:
+        case OBJ_ARTIFACT:
+        case OBJ_HEROES:
+        case OBJ_BOAT:
+        case OBJ_BARRIER:
+        case OBJ_JAIL:
+	case OBJ_SHIPWRECK:
+	case OBJ_BUOY:
 	    return true;
 
 	default: break;
@@ -999,8 +998,8 @@ bool MP2::isClearGroundObject(const u8 obj)
 {
     switch(obj)
     {
-	case MP2::OBJ_ZERO:
-	case MP2::OBJ_COAST:
+	case OBJ_ZERO:
+	case OBJ_COAST:
 	    return true;
 
 	default: break;

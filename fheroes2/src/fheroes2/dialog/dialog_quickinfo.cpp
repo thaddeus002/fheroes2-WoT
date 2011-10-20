@@ -454,9 +454,11 @@ void Dialog::QuickInfo(const Maps::Tiles & tile)
 	case MP2::OBJ_OASIS:
 	case MP2::OBJ_TEMPLE:
 	case MP2::OBJ_BUOY:
+	case MP2::OBJ_MERMAID:
 	case MP2::OBJ_WATERINGHOLE:
 	case MP2::OBJ_ARENA:
 	case MP2::OBJ_STABLES:
+	case MP2::OBJ_SIRENS:
 	    name_object = ShowLocalVisitObjectInfo(tile, from_hero);
 	    break;
 
