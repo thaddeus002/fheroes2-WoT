@@ -305,31 +305,6 @@ std::string Route::Path::String(void) const
     return os.str();
 }
 
-u16 Route::Path::isUnderProtection(s32 & pos) const
-{
-    s32 next = hero.GetIndex();
-    u16 res = 0;
-
-    for(const_iterator
-	it = begin(); it != end() && res == 0; ++it)
-    {
-	next = (*it).GetIndex();
-	res = Maps::TileUnderProtectionV(next).size();
-    }
-
-    if(res)
-    {
-	s32 last = GetLastIndex();
-	if(next == last &&
-	    MP2::isPickupObject(world.GetTiles(last).GetObject()))
-	    return 0;
-
-	pos = next;
-    }
-
-    return res;
-}
-
 bool StepIsObstacle(const Route::Step & s)
 {
     s32 index = s.GetIndex();

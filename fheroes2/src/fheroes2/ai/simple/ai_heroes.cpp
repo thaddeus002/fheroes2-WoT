@@ -1923,10 +1923,66 @@ bool AIHeroesPriorityObject(const Heroes & hero, s32 index)
     return false;
 }
 
+s32  FindUncharteredTerritory(Heroes & hero, const u8 & scoute)
+{
+    MapsIndexes v = Maps::GetDistanceIndexes(hero.GetIndex(), scoute, true);
+    MapsIndexes res;
+
+    v.resize(std::distance(v.begin(),
+	std::remove_if(v.begin(), v.end(), std::ptr_fun(&Maps::TileIsUnderProtection))));
+
+    for(MapsIndexes::const_reverse_iterator it = v.rbegin(); it != v.rend() && res.size() < 4; ++it)
+    {
+	// find fogs
+	if(world.GetTiles(*it).isFog(hero.GetColor()) &&
+    	    world.GetTiles(*it).isPassable(&hero, Direction::CENTER, true) &&
+	    hero.GetPath().Calculate(*it))
+	    res.push_back(*it);
+    }
+
+    const s32 result = res.size() ? *Rand::Get(res) : -1;
+    
+    if(0 <= result)
+    {
+	DEBUG(DBG_AI, DBG_INFO, Color::String(hero.GetColor()) <<
+                ", hero: " << hero.GetName() << ", added task: " << result);
+    }
+
+    return result;
+}
+
+s32  GetRandomHeroesPosition(Heroes & hero, const u8 & scoute)
+{
+    MapsIndexes v = Maps::GetDistanceIndexes(hero.GetIndex(), scoute, true);
+    MapsIndexes res;
+
+    v.resize(std::distance(v.begin(),
+	std::remove_if(v.begin(), v.end(), std::ptr_fun(&Maps::TileIsUnderProtection))));
+
+    for(MapsIndexes::const_reverse_iterator it = v.rbegin(); it != v.rend() && res.size() < 4; ++it)
+    {
+        if(world.GetTiles(*it).isPassable(&hero, Direction::CENTER, true) &&
+	    hero.GetPath().Calculate(*it))
+	    res.push_back(*it);
+    }
+
+    const s32 result = res.size() ? *Rand::Get(res) : -1;
+    
+    if(0 <= result)
+    {
+	DEBUG(DBG_AI, DBG_INFO, Color::String(hero.GetColor()) <<
+                ", hero: " << hero.GetName() << ", added task: " << result);
+    }
+
+    return result;
+}
+
 void AIHeroesAddedRescueTask(Heroes & hero)
 {
     AIHero & ai_hero = AIHeroes::Get(hero);
     Queue & task = ai_hero.sheduled_visit;
+
+    DEBUG(DBG_AI, DBG_TRACE, hero.GetName());
 
     u8 scoute = hero.GetScoute();
 
@@ -1939,49 +1995,25 @@ void AIHeroesAddedRescueTask(Heroes & hero)
         default: break;
     }
 
-    scoute += 1;
-    const Point & mp = hero.GetCenter();
-
-    DEBUG(DBG_AI, DBG_TRACE, hero.GetName());
-
     // find unchartered territory
-    for(u8 ii = 1; ii <= scoute; ++ii)
+    s32 index = FindUncharteredTerritory(hero, scoute);
+
+    if(index < 0)
     {
-        const s32 tx = mp.x - ii;
-        const s32 ty = mp.y - ii;
-
-        const s32 mx = tx + 2 * ii;
-        const s32 my = ty + 2 * ii;
-
-        for(s32 iy = ty; iy <= my; ++iy)
-            for(s32 ix = tx; ix <= mx; ++ix)
-        {
-            if(ty < iy && iy < my && tx < ix && ix < mx) continue;
-
-            if(Maps::isValidAbsPoint(ix, iy))
-	    {
-        	const s32 res = Maps::GetIndexFromAbsPoint(ix, iy);
-
-        	if(world.GetTiles(res).isFog(hero.GetColor()) &&
-            	    world.GetTiles(res).isPassable(&hero, Direction::CENTER, true) &&
-		    hero.GetPath().Calculate(res))
-        	{
-            	    task.push_back(res);
-
-		    DEBUG(DBG_AI, DBG_INFO, Color::String(hero.GetColor()) <<
-                	", hero: " << hero.GetName() << ", added task: " << res);
-
-            	    return;
-        	}
-	    }
-        }
+	// check teleports
+	if(MP2::OBJ_STONELIGHTS == hero.GetUnderObject() ||
+	    MP2::OBJ_WHIRLPOOL == hero.GetUnderObject())
+	{
+	    AI::HeroesAction(hero, hero.GetIndex());
+	}
+	else
+	{
+	    // random
+	    index = GetRandomHeroesPosition(hero, scoute);
+	}
     }
 
-    if(MP2::OBJ_STONELIGHTS == hero.GetUnderObject() ||
-	MP2::OBJ_WHIRLPOOL == hero.GetUnderObject())
-    {
-	AI::HeroesAction(hero, hero.GetIndex());
-    }
+    if(0 <= index) task.push_back(index);
 }
 
 void AIHeroesAddedTask(Heroes & hero)

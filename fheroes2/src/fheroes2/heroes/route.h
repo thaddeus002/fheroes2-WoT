@@ -66,7 +66,6 @@ namespace Route
 	    bool	isValid(void) const;
 	    bool	isBroken(void) const;
 	    bool	isShow(void) const { return !hide; }
-	    u16		isUnderProtection(s32 & pos) const;
 	    bool	hasObstacle(void) const;
 
 	    std::string	String(void) const;

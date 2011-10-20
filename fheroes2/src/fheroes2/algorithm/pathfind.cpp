@@ -54,7 +54,7 @@ u32 GetCurrentLength(std::map<s32, cell_t> & list, s32 cur)
 
 bool CheckMonsterProtectionAndNotDst(const s32 & to, const s32 & dst)
 {
-    const MapsIndexes & monsters = Maps::TileUnderProtectionV(to);
+    const MapsIndexes & monsters = Maps::GetTilesUnderProtection(to);
     return monsters.size() && monsters.end() == std::find(monsters.begin(), monsters.end(), dst);
 }
 

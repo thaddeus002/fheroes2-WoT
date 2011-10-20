@@ -1186,7 +1186,7 @@ std::string Maps::Tiles::String(void) const
 
 	default:
 	{
-	    const MapsIndexes & v = Maps::TileUnderProtectionV(maps_index);
+	    const MapsIndexes & v = Maps::GetTilesUnderProtection(maps_index);
 	    if(v.size())
 	    {
 		os << "protection      : ";

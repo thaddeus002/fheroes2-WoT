@@ -59,10 +59,11 @@ namespace Maps
     s32 GetIndexFromAbsPoint(s16 px, s16 py);
 
     MapsIndexes GetAroundIndexes(const s32 &, u16 filter = DIRECTION_ALL);
-    MapsIndexes GetDistanceIndexes(const s32 &, u16 dist);
+    MapsIndexes GetDistanceIndexes(const s32 &, u16 dist, bool sort = false);
     MapsIndexes ScanAroundObjectV(const s32 &, u8 obj);
     MapsIndexes ScanAroundObjectsV(const s32 &, const u8* objs);
-    MapsIndexes TileUnderProtectionV(const s32 &);
+    MapsIndexes GetTilesUnderProtection(const s32 &);
+    bool	TileIsUnderProtection(const s32 &);
     MapsIndexes ScanDistanceObject(const s32 &, u8 obj, u16 dist);
     MapsIndexes ScanDistanceObjects(const s32 &, const u8* objs, u16 dist);
 

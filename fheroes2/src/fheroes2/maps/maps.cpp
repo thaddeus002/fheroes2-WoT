@@ -30,6 +30,20 @@
 #include "difficulty.h"
 #include "maps_tiles.h"
 
+struct ComparsionDistance
+{
+    ComparsionDistance(const s32 & index) : center(index)
+    {
+    }
+
+    bool operator() (const s32 & index1, const s32 & index2) const
+    {
+        return Maps::GetApproximateDistance(center, index1) < Maps::GetApproximateDistance(center, index2);
+    }
+
+    s32 center;
+};
+
 bool TileIsObject(s32 index, u8 obj)
 {
     return obj == world.GetTiles(index).GetObject();
@@ -186,7 +200,7 @@ MapsIndexes Maps::GetAroundIndexes(const s32 & center, u16 filter)
     return result;
 }
 
-MapsIndexes Maps::GetDistanceIndexes(const s32 & center, u16 dist)
+MapsIndexes Maps::GetDistanceIndexes(const s32 & center, u16 dist, bool sort)
 {
     MapsIndexes results;
     results.reserve(dist * 12);
@@ -194,26 +208,16 @@ MapsIndexes Maps::GetDistanceIndexes(const s32 & center, u16 dist)
     const s16 cx = center % world.w();
     const s16 cy = center / world.w();
 
-    // from center to abroad !!
-    if(isValidAbsIndex(center))
-	for(u16 ii = 1; ii <= dist; ++ii)
+    for(s16 xx = cx - dist; xx <= cx + dist; ++xx)
+	for(s16 yy = cy - dist; yy <= cy + dist; ++yy)
     {
-	const s16 tx = cx - ii;
-	const s16 ty = cy - ii;
-
-	const s16 mx = tx + 2 * ii;
-	const s16 my = ty + 2 * ii;
-
-	for(s16 iy = ty; iy <= my; ++iy)
-	    for(s16 ix = tx; ix <= mx; ++ix)
-	{
-	    if(ty < iy && iy < my && tx < ix && ix < mx)
-		continue;
-	    else
-	    if(isValidAbsPoint(ix, iy))
-		results.push_back(GetIndexFromAbsPoint(ix, iy));
-	}
+	if(xx != cx && yy != cy &&
+	    isValidAbsPoint(xx, yy))
+	    results.push_back(GetIndexFromAbsPoint(xx, yy));
     }
+
+    if(sort)
+	std::sort(results.begin(), results.end(), ComparsionDistance(center));
 
     return results;
 }
@@ -262,17 +266,17 @@ MapsIndexes Maps::ScanAroundObjectV(const s32 & center, u8 obj)
 
 MapsIndexes Maps::ScanDistanceObject(const s32 & center, u8 obj, u16 dist)
 {
-    MapsIndexes results = Maps::GetDistanceIndexes(center, dist);
+    MapsIndexes results = Maps::GetDistanceIndexes(center, dist, true);
     return MapsIndexesFilteredObject(results, obj);
 }
 
 MapsIndexes Maps::ScanDistanceObjects(const s32 & center, const u8* objs, u16 dist)
 {
-    MapsIndexes results = Maps::GetDistanceIndexes(center, dist);
+    MapsIndexes results = Maps::GetDistanceIndexes(center, dist, true);
     return MapsIndexesFilteredObjects(results, objs);
 }
 
-bool TileIsUnderProtection(s32 index, s32 from)
+bool MapsTileIsUnderProtection(const s32 from, const s32 index)
 {
     bool result = false;
 
@@ -284,12 +288,24 @@ bool TileIsUnderProtection(s32 index, s32 from)
 
     return result;
 }
- 
-MapsIndexes Maps::TileUnderProtectionV(const s32 & center)
+
+bool Maps::TileIsUnderProtection(const s32 & center)
+{
+    return MP2::OBJ_MONSTER == world.GetTiles(center).GetObject() ? true :
+	    GetTilesUnderProtection(center).size();
+}
+
+MapsIndexes Maps::GetTilesUnderProtection(const s32 & center)
 {
     MapsIndexes indexes = Maps::ScanAroundObjectV(center, MP2::OBJ_MONSTER);
+
     indexes.resize(std::distance(indexes.begin(),
-	    std::remove_if(indexes.begin(), indexes.end(), std::not1(std::bind2nd(std::ptr_fun(&TileIsUnderProtection), center)))));
+	    std::remove_if(indexes.begin(), indexes.end(),
+		std::not1(std::bind1st(std::ptr_fun(&MapsTileIsUnderProtection), center)))));
+
+    if(MP2::OBJ_MONSTER == world.GetTiles(center).GetObject())
+	indexes.push_back(center);
+
     return indexes;
 }
 

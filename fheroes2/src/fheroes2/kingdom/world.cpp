@@ -746,7 +746,10 @@ void World::LoadMaps(const std::string &filename)
 				hero = vec_heroes.GetFreeman(race);
 
 			    if(hero)
+			    {
 				hero->LoadFromMP2(findobject, pblock, color, race);
+				hero->SetModes(Heroes::HUNTER);
+			    }
 			}
 			else
 			{

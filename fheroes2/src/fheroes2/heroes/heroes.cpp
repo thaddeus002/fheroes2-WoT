@@ -1487,7 +1487,7 @@ void Heroes::ActionNewPosition(void)
 {
     const Settings & conf = Settings::Get();
     // check around monster
-    MapsIndexes targets = Maps::TileUnderProtectionV(GetIndex());
+    MapsIndexes targets = Maps::GetTilesUnderProtection(GetIndex());
 
     if(targets.size())
     {
