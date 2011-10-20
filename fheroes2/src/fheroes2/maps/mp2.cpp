@@ -984,6 +984,7 @@ bool MP2::isNeedStayFront(const u8 obj)
         case MP2::OBJ_BARRIER:
         case MP2::OBJ_JAIL:
 	case MP2::OBJ_SHIPWRECK:
+	case MP2::OBJ_BUOY:
 	    return true;
 
 	default: break;

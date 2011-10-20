@@ -713,13 +713,15 @@ void Maps::Tiles::UpdatePassable(void)
 	Tiles & left = world.GetTiles(Maps::GetDirectionIndex(maps_index, Direction::LEFT));
 
 	if(! ((Direction::TOP | Direction::TOP_LEFT) & tile_passable) &&
-	    (Direction::TOP_RIGHT & left.tile_passable))
+	    (Direction::TOP_RIGHT & left.tile_passable) &&
+	    ! MP2::isNeedStayFront(mp2_object))
 	{
 	    left.tile_passable &= ~Direction::TOP_RIGHT;
 	}
 	else
 	if(! ((Direction::TOP | Direction::TOP_RIGHT) & left.tile_passable) &&
-	    (Direction::TOP_LEFT & tile_passable))
+	    (Direction::TOP_LEFT & tile_passable) &&
+	    ! MP2::isNeedStayFront(left.mp2_object))
 	{
 	    tile_passable &= ~Direction::TOP_LEFT;
 	}
