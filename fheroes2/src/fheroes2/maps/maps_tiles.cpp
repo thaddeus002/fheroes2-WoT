@@ -501,7 +501,54 @@ bool Maps::TilesAddon::isMounts(const TilesAddon & ta)
     return false;
 }
 
-bool Maps::TilesAddon::isTrees(const TilesAddon & ta)
+
+bool Maps::TilesAddon::isRocs(const TilesAddon & ta)
+{
+    switch(MP2::GetICNObject(ta.object))
+    {
+	// roc objects
+	case ICN::OBJNSNOW:
+	    if((ta.index > 21 && ta.index < 25) || (ta.index > 25 && ta.index < 29) ||
+		ta.index == 30 || ta.index == 32 || ta.index == 34 || ta.index == 35 ||
+		(ta.index > 36 && ta.index < 40))
+		return true;
+	    break;
+
+	case ICN::OBJNSWMP:
+	    if(ta.index == 201 || ta.index == 205 || 
+		(ta.index > 207 && ta.index < 211))
+		return true;
+	    break;
+
+	case ICN::OBJNGRAS:
+	    if((ta.index > 32 && ta.index < 36) || ta.index == 37 || ta.index == 38 ||
+		ta.index == 40 || ta.index == 41 || ta.index == 43 || ta.index == 45)
+		return true;
+	    break;
+
+	case ICN::OBJNDIRT:
+	    if(ta.index == 92 || ta.index == 93 || ta.index == 95 || ta.index == 98 ||
+		ta.index == 99 || ta.index == 101 || ta.index == 102 || ta.index == 104 || ta.index == 105)
+		return true;
+	    break;
+
+	case ICN::OBJNCRCK:
+	    if(ta.index == 18 || ta.index == 19 || ta.index == 21 || ta.index == 22 ||
+		(ta.index > 23 && ta.index < 28) || (ta.index > 28 && ta.index < 33) ||
+		ta.index == 34 || ta.index == 35 || ta.index == 37 || ta.index == 38 ||
+		(ta.index > 39 && ta.index < 45) || ta.index == 46 || ta.index == 47 ||
+		ta.index == 49 || ta.index == 50 || ta.index == 52 || ta.index == 53 || ta.index == 55)
+		return true;
+	    break;
+
+	default: break;
+    }
+
+    return false;
+}
+    
+
+bool Maps::TilesAddon::isForests(const TilesAddon & ta)
 {
     switch(MP2::GetICNObject(ta.object))
     {
@@ -511,6 +558,61 @@ bool Maps::TilesAddon::isTrees(const TilesAddon & ta)
         case ICN::TREFIR:
         case ICN::TREFALL:
         case ICN::TREDECI: return true;
+
+	default: break;
+    }
+
+    return false;
+}
+
+bool Maps::TilesAddon::isTrees(const TilesAddon & ta)
+{
+    switch(MP2::GetICNObject(ta.object))
+    {
+	// tree objects
+	case ICN::OBJNDSRT:
+	    if(ta.index == 3 || ta.index == 4 || ta.index == 6 ||
+		ta.index == 7 || ta.index == 9 || ta.index == 10 ||
+		ta.index == 12 || ta.index == 74 || ta.index == 76)
+		return true;
+	    else
+	    // cactus
+	    if(ta.index == 34 || ta.index == 36 || ta.index == 39 ||
+		ta.index == 40 || ta.index == 42 || ta.index == 43 ||
+		ta.index == 45 || ta.index == 48 || ta.index == 49 ||
+		ta.index == 51 || ta.index == 53)
+		return true;
+	    break;
+
+	case ICN::OBJNDIRT:
+	    if(ta.index == 115 || ta.index == 118 || ta.index == 120 ||
+		ta.index == 123 || ta.index == 125 || ta.index == 127)
+		return true;
+	    break;
+
+	case ICN::OBJNGRAS:
+	    if(ta.index == 80 || (ta.index > 82 && ta.index < 86) ||
+		ta.index == 87 || (ta.index > 88 && ta.index < 92))
+		return true;
+	    break;
+
+	case ICN::OBJNMULT:
+	    if(0 == ta.index || 2 == ta.index) return true;
+	    break;
+
+	case ICN::OBJNSNOW:
+	    if((ta.index > 50 && ta.index < 53) || (ta.index > 54 && ta.index < 59) ||
+		(ta.index > 59 && ta.index < 63) || (ta.index > 63 && ta.index < 67) ||
+		ta.index == 68 || ta.index == 69 || ta.index == 71 || ta.index == 72 ||
+		ta.index == 74 || ta.index == 75 || ta.index == 77)
+		return true;
+	    break;
+
+	// cactus
+	case ICN::OBJNCRCK:
+    	    if(ta.index == 12 || ta.index == 14 || ta.index == 16)
+		return true;
+	    break;
 
 	default: break;
     }
@@ -665,12 +767,27 @@ const Surface & Maps::Tiles::GetTileSurface(void) const
     return AGG::GetTIL(TIL::GROUND32, TileSpriteIndex(), TileSpriteShape());
 }
 
+bool isMountsRocs(const Maps::TilesAddon & ta)
+{
+    return Maps::TilesAddon::isMounts(ta) || Maps::TilesAddon::isRocs(ta);
+}
+
+bool isForestsTrees(const Maps::TilesAddon & ta)
+{
+    return Maps::TilesAddon::isForests(ta) || Maps::TilesAddon::isTrees(ta);
+}
+
 void Maps::Tiles::UpdatePassable(void)
 {
     tile_passable = DIRECTION_ALL;
 
     if(MP2::OBJ_HEROES != mp2_object && !isWater())
     {
+	bool mounts1 = addons_level1.end() != std::find_if(addons_level1.begin(), addons_level1.end(), isMountsRocs);
+	bool mounts2 = addons_level2.end() != std::find_if(addons_level2.begin(), addons_level2.end(), isMountsRocs);
+	bool trees1  = addons_level1.end() != std::find_if(addons_level1.begin(), addons_level1.end(), isForestsTrees);
+	bool trees2  = addons_level2.end() != std::find_if(addons_level2.begin(), addons_level2.end(), isForestsTrees);
+
 	// fix coast passable
 	if(tile_passable &&
 	    Maps::TileIsCoast(maps_index, Direction::TOP|Direction::BOTTOM|Direction::LEFT|Direction::RIGHT) &&
@@ -682,22 +799,25 @@ void Maps::Tiles::UpdatePassable(void)
 
 	// fix mountain layer
 	if(tile_passable &&
-	    MP2::OBJ_MOUNTS == GetObject() &&
-	    addons_level1.end() != std::find_if(addons_level1.begin(), addons_level1.end(), TilesAddon::isMounts) &&
-	    addons_level2.end() != std::find_if(addons_level2.begin(), addons_level2.end(), TilesAddon::isMounts))
+	    (MP2::OBJ_MOUNTS == GetObject() || MP2::OBJ_TREES == GetObject()) &&
+	    mounts1 && (mounts2 || trees2))
 		tile_passable = 0;
 
 	// fix trees layer
 	if(tile_passable &&
-    	    MP2::OBJ_TREES == GetObject() &&
-	    addons_level1.end() != std::find_if(addons_level1.begin(), addons_level1.end(), TilesAddon::isTrees) &&
-	    addons_level2.end() != std::find_if(addons_level2.begin(), addons_level2.end(), TilesAddon::isTrees))
+	    (MP2::OBJ_MOUNTS == GetObject() || MP2::OBJ_TREES == GetObject()) &&
+	    trees1 && (mounts2 || trees2))
 		tile_passable = 0;
 
 	// fix bottom border
 	if(tile_passable &&
 	    (MP2::OBJ_MOUNTS == GetObject() || MP2::OBJ_TREES == GetObject()) &&
 	    ! Maps::isValidDirection(maps_index, Direction::BOTTOM))
+	    tile_passable = 0;
+
+	// town twba
+	if(tile_passable &&
+	    FindAddonICN1(ICN::OBJNTWBA) && (mounts2 || trees2))
 	    tile_passable = 0;
     }
 
@@ -706,20 +826,33 @@ void Maps::Tiles::UpdatePassable(void)
 	it = addons_level1.begin(); it != addons_level1.end(); ++it)
 	tile_passable &= TilesAddon::GetPassable(*it);
 
+    // fix top passable
+    if(Maps::isValidDirection(maps_index, Direction::TOP))
+    {
+	Tiles & top = world.GetTiles(Maps::GetDirectionIndex(maps_index, Direction::TOP));
+
+	if(tile_passable &&
+	    ! (tile_passable & DIRECTION_TOP_ROW) &&
+	    ! (top.tile_passable & DIRECTION_TOP_ROW))
+	    top.tile_passable = 0;
+    }
 
     // fix corners
     if(Maps::isValidDirection(maps_index, Direction::LEFT))
     {
 	Tiles & left = world.GetTiles(Maps::GetDirectionIndex(maps_index, Direction::LEFT));
-
-	if(! ((Direction::TOP | Direction::TOP_LEFT) & tile_passable) &&
+	// left corner
+	if(left.tile_passable &&
+	    ! ((Direction::TOP | Direction::TOP_LEFT) & tile_passable) &&
 	    (Direction::TOP_RIGHT & left.tile_passable) &&
 	    ! MP2::isNeedStayFront(mp2_object))
 	{
 	    left.tile_passable &= ~Direction::TOP_RIGHT;
 	}
 	else
-	if(! ((Direction::TOP | Direction::TOP_RIGHT) & left.tile_passable) &&
+	// right corner
+	if(tile_passable &&
+	    ! ((Direction::TOP | Direction::TOP_RIGHT) & left.tile_passable) &&
 	    (Direction::TOP_LEFT & tile_passable) &&
 	    ! MP2::isNeedStayFront(left.mp2_object))
 	{

@@ -121,10 +121,12 @@ bool Route::Path::isValid(void) const
 			Direction::UNKNOWN != Direction::Get(dst, hero.GetIndex()));
 }
 
+/*
 bool Route::Path::isBroken(void) const
 {
     return end() != std::find_if(begin(), end(), std::mem_fun_ref(&Route::Step::isBad));
 }
+*/
 
 u16 Route::Path::GetIndexSprite(u16 from, u16 to, u8 mod)
 {

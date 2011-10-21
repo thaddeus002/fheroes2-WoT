@@ -89,6 +89,8 @@ namespace Maps
 	static bool isX_LOC123(const TilesAddon &);
 	static bool isAbandoneMineSprite(const TilesAddon &);
 	static bool isMounts(const TilesAddon &);
+	static bool isRocs(const TilesAddon &);
+	static bool isForests(const TilesAddon &);
 	static bool isTrees(const TilesAddon &);
 	static bool isPassable(const TilesAddon &, u16 direct);
 	static u16  GetPassable(const Maps::TilesAddon &);

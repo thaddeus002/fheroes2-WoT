@@ -64,7 +64,6 @@ namespace Route
 	    void	Rescan(void);
 
 	    bool	isValid(void) const;
-	    bool	isBroken(void) const;
 	    bool	isShow(void) const { return !hide; }
 	    bool	hasObstacle(void) const;
 
