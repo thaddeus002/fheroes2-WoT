@@ -486,14 +486,67 @@ bool Maps::TilesAddon::isMounts(const TilesAddon & ta)
 {
     switch(MP2::GetICNObject(ta.object))
     {
-	case ICN::MTNCRCK:
+        case ICN::MTNCRCK:
+        case ICN::MTNDIRT:
+	    if((ta.index > 0 && ta.index < 5) ||
+		(ta.index > 5 && ta.index < 11) ||
+		(ta.index > 11 && ta.index < 17) ||
+		(ta.index > 17 && ta.index < 21) ||
+		(ta.index > 21 && ta.index < 26) ||
+		(ta.index > 26 && ta.index < 32) ||
+		(ta.index > 32 && ta.index < 38) ||
+		(ta.index > 38 && ta.index < 42) ||
+		(ta.index > 42 && ta.index < 46) ||
+		(ta.index > 47 && ta.index < 53) ||
+		(ta.index > 53 && ta.index < 57) ||
+		(ta.index > 58 && ta.index < 62) ||
+		(ta.index > 62 && ta.index < 67) ||
+		(ta.index > 67 && ta.index < 72) ||
+		(ta.index > 72 && ta.index < 75) ||
+		(ta.index > 75 && ta.index < 79) ||
+		(ta.index > 79 && ta.index < 82) ||
+		(ta.index > 82 && ta.index < 85) ||
+		(ta.index > 85 && ta.index < 89) ||
+		(ta.index > 89 && ta.index < 92) ||
+		(ta.index > 92 && ta.index < 95) ||
+		(ta.index > 95 && ta.index < 98) ||
+		(ta.index > 98 && ta.index < 101) ||
+		(ta.index > 101 && ta.index < 104) ||
+		(ta.index > 105 && ta.index < 109) ||
+		(ta.index > 110 && ta.index < 115))
+		return true;
+	    break;
+
         case ICN::MTNSNOW:
         case ICN::MTNSWMP:
         case ICN::MTNLAVA:
         case ICN::MTNDSRT:
-        case ICN::MTNDIRT:
         case ICN::MTNMULT:
-        case ICN::MTNGRAS: return true;
+        case ICN::MTNGRAS:
+	    if((ta.index > 0 && ta.index < 5) ||
+	        (ta.index > 5 && ta.index < 11) ||
+	        (ta.index > 11 && ta.index < 17) ||
+	        (ta.index > 17 && ta.index < 21) ||
+	        (ta.index > 21 && ta.index < 26) ||
+		(ta.index > 26 && ta.index < 32) ||
+		(ta.index > 32 && ta.index < 38) ||
+		(ta.index > 38 && ta.index < 42) ||
+		(ta.index > 42 && ta.index < 45) ||
+		(ta.index > 45 && ta.index < 49) ||
+		(ta.index > 49 && ta.index < 52) ||
+		(ta.index > 52 && ta.index < 55) ||
+		(ta.index > 55 && ta.index < 59) ||
+		(ta.index > 59 && ta.index < 62) ||
+		(ta.index > 62 && ta.index < 65) ||
+		(ta.index > 65 && ta.index < 68) ||
+		(ta.index > 68 && ta.index < 71) ||
+		(ta.index > 71 && ta.index < 74) ||
+		(ta.index > 75 && ta.index < 79) ||
+		(ta.index > 80 && ta.index < 85))
+		return true;
+	    break;
+
+	return true;
 
 	default: break;
     }
@@ -557,7 +610,20 @@ bool Maps::TilesAddon::isForests(const TilesAddon & ta)
         case ICN::TRESNOW:
         case ICN::TREFIR:
         case ICN::TREFALL:
-        case ICN::TREDECI: return true;
+        case ICN::TREDECI:
+	    if((ta.index > 0 && ta.index < 3) ||
+	        (ta.index > 3 && ta.index < 7) ||
+	        (ta.index > 7 && ta.index < 10) ||
+	        (ta.index > 10 && ta.index < 13) ||
+	        (ta.index > 13 && ta.index < 17) ||
+	        (ta.index > 17 && ta.index < 20) ||
+	        (ta.index > 20 && ta.index < 23) ||
+	        (ta.index > 23 && ta.index < 26) ||
+	        (ta.index > 26 && ta.index < 29) ||
+	        (ta.index > 29 && ta.index < 32) ||
+	        ta.index == 33 || ta.index == 35)
+		return true;
+	    break;
 
 	default: break;
     }
