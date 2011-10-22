@@ -74,6 +74,11 @@ bool PassableToTile(const Heroes* hero, const Maps::Tiles & toTile, const Direct
 	if(MP2::OBJ_HEROES == toTile.GetObject())
 	    return true;
     }
+    else
+    {
+	if(MP2::isPickupObject(toTile.GetObject()))
+	    return false;
+    }
 
     // check to tile direct
     if(! toTile.isPassable(hero, Direction::Reflect(direct), false))

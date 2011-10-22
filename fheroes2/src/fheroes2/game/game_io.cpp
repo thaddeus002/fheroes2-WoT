@@ -1052,7 +1052,7 @@ bool Game::IO::LoadBIN(QueueMessage & msg)
     // add heroes to kingdoms
     world.vec_kingdoms.AddHeroes(world.vec_heroes);
 
-    if(format < FORMAT_VERSION_2632)
+//    if(format < FORMAT_VERSION_2632)
 	// update tile passable
 	std::for_each(world.vec_tiles.begin(), world.vec_tiles.end(),
             std::mem_fun_ref(&Maps::Tiles::UpdatePassable));

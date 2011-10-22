@@ -227,6 +227,7 @@ namespace Maps
 	void CorrectFlags32(const u8 index, bool);
 	void RemoveJailSprite(void);
 	void RemoveBarrierSprite(void);
+	bool isLongObject(u16 direction);
 
 	void RedrawBoat(Surface &) const;
 	void RedrawMonster(Surface &) const;

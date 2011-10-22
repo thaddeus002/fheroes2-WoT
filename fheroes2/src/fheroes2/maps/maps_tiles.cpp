@@ -843,6 +843,21 @@ bool isForestsTrees(const Maps::TilesAddon & ta)
     return Maps::TilesAddon::isForests(ta) || Maps::TilesAddon::isTrees(ta);
 }
 
+bool Maps::Tiles::isLongObject(u16 direction)
+{
+    if(Maps::isValidDirection(maps_index, direction))
+    {
+	Tiles & tile = world.GetTiles(Maps::GetDirectionIndex(maps_index, direction));
+
+	for(Addons::const_iterator
+	    it = addons_level1.begin(); it != addons_level1.end(); ++it)
+	    if(tile.addons_level1.end() != std::find_if(tile.addons_level1.begin(), tile.addons_level1.end(),
+						    std::bind2nd(std::mem_fun_ref(&TilesAddon::isUniq), (*it).uniq)))
+		return true;
+    }
+    return false;
+}
+
 void Maps::Tiles::UpdatePassable(void)
 {
     tile_passable = DIRECTION_ALL;
@@ -907,8 +922,10 @@ void Maps::Tiles::UpdatePassable(void)
     if(Maps::isValidDirection(maps_index, Direction::LEFT))
     {
 	Tiles & left = world.GetTiles(Maps::GetDirectionIndex(maps_index, Direction::LEFT));
+
 	// left corner
-	if(left.tile_passable &&
+	if(left.tile_passable && ! MP2::isActionObject(mp2_object, isWater()) &&
+    	    isLongObject(Direction::TOP) &&
 	    ! ((Direction::TOP | Direction::TOP_LEFT) & tile_passable) &&
 	    (Direction::TOP_RIGHT & left.tile_passable) &&
 	    ! MP2::isNeedStayFront(mp2_object))
@@ -917,7 +934,8 @@ void Maps::Tiles::UpdatePassable(void)
 	}
 	else
 	// right corner
-	if(tile_passable &&
+	if(tile_passable && ! MP2::isActionObject(left.mp2_object, left.isWater()) &&
+    	    left.isLongObject(Direction::TOP) &&
 	    ! ((Direction::TOP | Direction::TOP_RIGHT) & left.tile_passable) &&
 	    (Direction::TOP_LEFT & tile_passable) &&
 	    ! MP2::isNeedStayFront(left.mp2_object))

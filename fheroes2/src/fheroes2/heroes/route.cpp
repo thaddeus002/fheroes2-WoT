@@ -198,7 +198,7 @@ u16 Route::Path::GetIndexSprite(u16 from, u16 to, u8 mod)
 		case Direction::BOTTOM:		index += 20; break;
 		case Direction::BOTTOM_LEFT:	index += 21; break;
 		case Direction::TOP:		index +=  0; break;
-		case Direction::LEFT:		index +=  6; break;
+		case Direction::LEFT:		index += 22; break;
 		default: 			index  =  0; break;
 	    }
 	    break;
