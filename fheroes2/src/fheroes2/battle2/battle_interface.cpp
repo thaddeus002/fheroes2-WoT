@@ -1126,6 +1126,12 @@ void Battle2::Interface::RedrawCastle2(const u16 cell_index) const
         const Sprite & sprite = AGG::GetICN(ICN::CATAPULT, catapult_frame);
 	const Rect & pos = arena.board[cell_index].pos;
         sprite.Blit(sprite.x() + pos.x - pos.w, sprite.y() + pos.y + pos.h - 10);
+
+	const u8 bottom = 88;
+
+	const Stats* b = arena.GetTroopBoard(bottom);
+	if(b)
+	    RedrawTroopSprite(*b, arena.board[b->GetPosition()].pos);
     }
     else
     // castle gate
@@ -2320,8 +2326,11 @@ void Battle2::Interface::RedrawActionWincesKills(TargetsInfo & targets)
 	}
     }
 
+    const Point & topleft = border.GetArea();
+
     // targets damage animation loop
-    while(le.HandleEvents() && finish != std::count_if(targets.begin(), targets.end(), std::mem_fun_ref(&TargetInfo::isFinishAnimFrame)))
+    while(le.HandleEvents() && finish != std::count_if(targets.begin(), targets.end(),
+					    std::mem_fun_ref(&TargetInfo::isFinishAnimFrame)))
     {
 	CheckGlobalEvents(le);
 
@@ -2337,7 +2346,8 @@ void Battle2::Interface::RedrawActionWincesKills(TargetsInfo & targets)
 		Redraw();
 
 		// extended damage info
-		if(conf.ExtBattleShowDamage() && target.killed)
+		if(conf.ExtBattleShowDamage() && target.killed &&
+			(pos.y - py) > topleft.y)
 		{
 		    std::string msg = "-";
 		    String::AddInt(msg, target.killed);

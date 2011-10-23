@@ -818,7 +818,6 @@ void CastlePackOrdersBuildings(const Castle & castle, std::vector<building_t> & 
 	    ordersBuildings.push_back(DWELLING_MONSTER6);
 	    ordersBuildings.push_back(BUILD_MOAT);
 	    ordersBuildings.push_back(DWELLING_MONSTER1);
-	    ordersBuildings.push_back(BUILD_SHIPYARD);
 	    ordersBuildings.push_back(BUILD_THIEVESGUILD);
 	    ordersBuildings.push_back(DWELLING_UPGRADE3);
 	    ordersBuildings.push_back(DWELLING_MONSTER3);
@@ -833,6 +832,7 @@ void CastlePackOrdersBuildings(const Castle & castle, std::vector<building_t> & 
 	    ordersBuildings.push_back(BUILD_MAGEGUILD3);
 	    ordersBuildings.push_back(BUILD_MAGEGUILD4);
 	    ordersBuildings.push_back(BUILD_MAGEGUILD5);
+	    ordersBuildings.push_back(BUILD_SHIPYARD);
 	    ordersBuildings.push_back(BUILD_WEL2);
 	    ordersBuildings.push_back(BUILD_MARKETPLACE);
 	    ordersBuildings.push_back(BUILD_STATUE);
