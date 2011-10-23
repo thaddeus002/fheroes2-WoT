@@ -144,3 +144,31 @@ bool Object::AllowDirect(u8 general, u16 direct)
 
     return true;
 }
+
+bool Object::isShadow(const u16 & icn, const u8 & index)
+{
+    switch(icn)
+    {
+        case ICN::MTNCRCK:
+        case ICN::MTNDIRT:
+        case ICN::MTNDSRT:
+        case ICN::MTNGRAS:
+        case ICN::MTNLAVA:
+        case ICN::MTNMULT:
+        case ICN::MTNSNOW:
+        case ICN::MTNSWMP:
+	    return Mounts::isShadow(icn, index);
+
+        case ICN::TREDECI:
+        case ICN::TREEVIL:
+        case ICN::TREFALL:
+        case ICN::TREFIR:
+        case ICN::TREJNGL:
+        case ICN::TRESNOW:
+	    return Trees::isShadow(icn, index);
+
+	default: break;
+    }
+
+    return false;
+}

@@ -84,3 +84,22 @@ u16 Trees::GetPassable(const u16 & icn, const u8 & index)
 
     return 0;
 }
+
+bool Trees::isShadow(const u16 & icn, const u8 & index)
+{
+    const u8 shadows[] = { 0, 3, 7, 10, 13, 17, 20, 23, 26, 29, 32, 34 };
+    switch(icn)
+    {
+        case ICN::TREDECI:
+        case ICN::TREEVIL:
+        case ICN::TREFALL:
+        case ICN::TREFIR:
+        case ICN::TREJNGL:
+        case ICN::TRESNOW:
+	    return ARRAY_COUNT_END(shadows) != std::find(shadows, ARRAY_COUNT_END(shadows), index);
+
+        default: break;;
+    }
+
+    return false;
+}

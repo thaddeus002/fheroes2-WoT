@@ -38,6 +38,7 @@ typedef SDL_Color RGBColor;
 #define MAXU32   0xFFFFFFFF
 
 #define ARRAY_COUNT(A)       sizeof(A) / sizeof(A[0])
+#define ARRAY_COUNT_END(A)   A + ARRAY_COUNT(A)
 
 #if defined __SYMBIAN32__
 #define MKDIR(X)    mkdir(X, S_IRWXU)

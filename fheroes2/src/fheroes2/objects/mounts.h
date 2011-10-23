@@ -32,6 +32,7 @@ class Mounts : public Object
 	Mounts(ICN::icn_t icn);
 
 	static bool	isPassable(const u16 & icn, const u8 & index, u16 direct);
+	static bool	isShadow(const u16 & icn, const u8 & index);
 	static u16	GetPassable(const u16 & icn, const u8 & index);
 
     private:

@@ -585,7 +585,10 @@ Cursor::themes_t Game::GetCursorFocusHeroes(const Heroes & from_hero, const Maps
 		}
 		else
 		if(Players::isFriends(from_hero.GetColor(), to_hero->GetColor()))
-		    return conf.ExtUnionsAllowHeroesMeetings() ? Cursor::CHANGE : Cursor::POINTER;
+		{
+		    Cursor::themes_t newcur = Cursor::DistanceThemes(Cursor::CHANGE, from_hero.GetRangeRouteDays(tile.GetIndex()));
+		    return conf.ExtUnionsAllowHeroesMeetings() ? newcur: Cursor::POINTER;
+		}
 		else
 		    return Cursor::DistanceThemes(Cursor::FIGHT, from_hero.GetRangeRouteDays(tile.GetIndex()));
 	    }

@@ -34,6 +34,7 @@ class Object
 	~Object();
 
 	static bool		AllowDirect(u8 general, u16 direct);
+	static bool		isShadow(const u16 &, const u8 &);
 
 	MP2::object_t	object;
 	u16		icn;

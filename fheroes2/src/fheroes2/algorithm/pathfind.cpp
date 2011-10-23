@@ -68,11 +68,11 @@ bool PassableToTile(const Heroes* hero, const Maps::Tiles & toTile, const Direct
 	    return true;
 
 	// check direct to object
-	if(MP2::isActionObject(toTile.GetObject(), (hero ? hero->isShipMaster() : false)))
-	    return Object::AllowDirect(toTile.GetObject(), Direction::Reflect(direct));
+	if(MP2::isActionObject(toTile.GetObject(false), (hero ? hero->isShipMaster() : false)))
+	    return Object::AllowDirect(toTile.GetObject(false), Direction::Reflect(direct));
 
 	if(MP2::OBJ_HEROES == toTile.GetObject())
-	    return true;
+	    return toTile.isPassable(NULL, Direction::Reflect(direct), false);
     }
     else
     {

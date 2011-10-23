@@ -165,3 +165,31 @@ u16 Mounts::GetPassable(const u16 & icn, const u8 & index)
 
     return 0;
 }
+
+// ARRAY_COUNT(A)       sizeof(A) / sizeof(A[0])
+
+bool Mounts::isShadow(const u16 & icn, const u8 & index)
+{
+    const u8 shadows1[] = { 0, 5, 11, 17, 21, 26, 32, 38, 42, 45, 49, 52, 55, 59, 62, 65, 68, 71, 74, 75, 79, 80 };
+    const u8 shadows2[] = { 0, 5, 11, 17, 21, 26, 32, 38, 42, 46, 47, 53, 57, 58, 62, 68, 72, 75, 79, 82, 85, 89, 92, 95, 98, 101, 104, 105, 109, 110 };
+
+    // bug fix
+    switch(icn)
+    {
+        case ICN::MTNCRCK:
+        case ICN::MTNDIRT:
+	    return ARRAY_COUNT_END(shadows2) != std::find(shadows2, ARRAY_COUNT_END(shadows2), index);
+
+        case ICN::MTNDSRT:
+        case ICN::MTNGRAS:
+        case ICN::MTNLAVA:
+        case ICN::MTNMULT:
+	case ICN::MTNSNOW:
+        case ICN::MTNSWMP:
+	    return ARRAY_COUNT_END(shadows1) != std::find(shadows1, ARRAY_COUNT_END(shadows1), index);
+
+        default: break;
+    }
+
+    return false;
+}
