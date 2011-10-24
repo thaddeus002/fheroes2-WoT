@@ -876,7 +876,8 @@ void Maps::Tiles::UpdatePassable(void)
 	    ! MP2::isActionObject(GetObject(), false) &&
 	    //MP2::OBJ_ZERO != GetObject() &&  // Town check: false (OBJNTWBA)
 	    MP2::OBJ_COAST != GetObject() &&
-	    !addons_level1.empty())
+	    (addons_level1.size() != static_cast<size_t>(std::count_if(addons_level1.begin(), addons_level1.end(),
+							std::ptr_fun(&TilesAddon::isShadow)))))
 		tile_passable = 0;
 
 	// fix mountain layer
