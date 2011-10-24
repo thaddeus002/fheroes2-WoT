@@ -63,7 +63,7 @@ void FileInfoListBox::RedrawItem(const Maps::FileInfo & info, s16 dstx, s16 dsty
 {
     char short_date[20];
 
-    std::fill(short_date, short_date + ARRAY_COUNT(short_date), 0);
+    std::fill(short_date, ARRAY_COUNT_END(short_date), 0);
     std::strftime(short_date, ARRAY_COUNT(short_date) - 1, "%b %d, %H:%M", std::localtime(&info.localtime));
     std::string savname(GetBasename(info.file));
     

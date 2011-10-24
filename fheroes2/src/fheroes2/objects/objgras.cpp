@@ -114,3 +114,26 @@ u16 ObjGrass::GetPassable(const u16 & icn, const u8 & index)
 
     return 0;
 }
+
+bool ObjGrass::isShadow(const u16 & icn, const u8 & index)
+{
+    const u8 shadows1[] = { 5, 19, 20, 31, 32, 33, 34, 35, 36, 37, 38, 47, 48, 49, 50, 51, 52, 53,
+		54, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 91, 100, 101, 102, 103,
+		104, 105, 106, 107, 108, 109, 110, 111, 112, 113, 124, 128 };
+
+    const u8 shadows2[] = { 4, 29, 32, 36, 39, 42, 44, 46, 48, 76, 82, 88, 92, 94, 102, 105,
+		108, 111, 113, 124, 128, 134, 138, 141, 143, 145, 147 };
+
+    switch(icn)
+    {
+	case ICN::OBJNGRA2:
+	    return ARRAY_COUNT_END(shadows1) != std::find(shadows1, ARRAY_COUNT_END(shadows1), index);
+
+	case ICN::OBJNGRAS:
+	    return ARRAY_COUNT_END(shadows2) != std::find(shadows2, ARRAY_COUNT_END(shadows2), index);
+
+	default: break;
+    }
+
+    return false;
+}

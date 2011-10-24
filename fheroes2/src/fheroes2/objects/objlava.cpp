@@ -93,3 +93,28 @@ u16 ObjLava::GetPassable(const u16 & icn, const u8 & index)
 
     return 0;
 }
+
+bool ObjLava::isShadow(const u16 & icn, const u8 & index)
+{
+    const u8 shadows[] = { 10, 11, 45, 49, 109, 113, 116 };
+
+    switch(icn)
+    {
+	case ICN::OBJNLAV2:
+	    if((6 < index && index < 21) || 29 == index || (42 < index && index < 79))
+        	return true;
+	    break;
+
+	case ICN::OBJNLAV3:
+	    if((115 < index && index < 140) || (175 < index && index < 240) || 243 == index)
+        	return true;
+	    break;
+
+	case ICN::OBJNLAVA:
+            return ARRAY_COUNT_END(shadows) != std::find(shadows, ARRAY_COUNT_END(shadows), index);
+
+	default: break;
+    }
+
+    return false;
+}

@@ -97,3 +97,12 @@ u16 ObjSwamp::GetPassable(const u16 & icn, const u8 & index)
 
     return 0;
 }
+
+bool ObjSwamp::isShadow(const u16 & icn, const u8 & index)
+{
+    const u8 shadows [] = { 0, 1, 2, 3, 4, 5, 6, 14, 15, 16, 17, 18, 19, 20, 21, 31,
+	43, 44, 45, 46, 47, 48, 49, 66, 83, 125, 127, 130, 132, 136, 141, 163, 170,
+	175, 178, 195, 197, 202, 204, 207, 211, 215 };
+
+    return ARRAY_COUNT_END(shadows) != std::find(shadows, ARRAY_COUNT_END(shadows), index);
+}

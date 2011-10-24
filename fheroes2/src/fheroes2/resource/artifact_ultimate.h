@@ -28,7 +28,7 @@
 
 class Artifact;
 
-class UltimateArtifact : protected Artifact
+class UltimateArtifact : public Artifact
 {
 public:
     UltimateArtifact();

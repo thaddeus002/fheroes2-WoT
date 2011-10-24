@@ -482,6 +482,70 @@ bool Maps::TilesAddon::isX_LOC123(const TilesAddon & ta)
 	    ICN::X_LOC3 == MP2::GetICNObject(ta.object));
 }
 
+bool Maps::TilesAddon::isShadow(const TilesAddon & ta)
+{
+    const ICN::icn_t & icn = MP2::GetICNObject(ta.object);
+
+    switch(icn)
+    {
+        case ICN::MTNCRCK:
+        case ICN::MTNDIRT:
+        case ICN::MTNDSRT:
+        case ICN::MTNGRAS:
+        case ICN::MTNLAVA:
+        case ICN::MTNMULT:
+        case ICN::MTNSNOW:
+        case ICN::MTNSWMP:
+            return Mounts::isShadow(icn, ta.index);
+
+        case ICN::TREDECI:
+        case ICN::TREEVIL:
+        case ICN::TREFALL:
+        case ICN::TREFIR:
+        case ICN::TREJNGL:
+        case ICN::TRESNOW:
+            return Trees::isShadow(icn, ta.index);
+
+	case ICN::OBJNCRCK:
+	    return ObjWasteLand::isShadow(icn, ta.index);
+
+	case ICN::OBJNDIRT:
+	    return ObjDirt::isShadow(icn, ta.index);
+
+	case ICN::OBJNDSRT:
+	    return ObjDesert::isShadow(icn, ta.index);
+
+	case ICN::OBJNGRA2:
+	case ICN::OBJNGRAS:
+	    return ObjGrass::isShadow(icn, ta.index);
+
+        case ICN::OBJNMUL2:
+        case ICN::OBJNMULT:
+	    return ObjMulti::isShadow(icn, ta.index);
+
+	case ICN::OBJNRSRC:
+	    return 0 == (ta.index % 2);
+
+	case ICN::OBJNSNOW:
+	    return ObjSnow::isShadow(icn, ta.index);
+
+	case ICN::OBJNSWMP:
+	    return ObjSwamp::isShadow(icn, ta.index);
+
+	case ICN::OBJNTWRD:
+	case ICN::OBJNTWSH:
+	    return true;
+
+	case ICN::OBJNWAT2:
+	case ICN::OBJNWATR:
+	    return ObjWater::isShadow(icn, ta.index);
+
+	default: break;
+    }
+
+    return false;
+}
+
 bool Maps::TilesAddon::isMounts(const TilesAddon & ta)
 {
     switch(MP2::GetICNObject(ta.object))
@@ -787,7 +851,7 @@ bool Maps::Tiles::isLongObject(u16 direction)
 
 	for(Addons::const_iterator
 	    it = addons_level1.begin(); it != addons_level1.end(); ++it)
-	    if(! Object::isShadow(MP2::GetICNObject((*it).object), (*it).index) &&
+	    if(! TilesAddon::isShadow(*it) &&
 		tile.addons_level1.end() != std::find_if(tile.addons_level1.begin(), tile.addons_level1.end(),
 						    std::bind2nd(std::mem_fun_ref(&TilesAddon::isUniq), (*it).uniq)))
 		return true;
@@ -1397,7 +1461,10 @@ void Maps::Tiles::FixObject(void)
 
 bool Maps::Tiles::GoodForUltimateArtifact(void) const
 {
-    return ! isWater() && isPassable(NULL, Direction::CENTER, true);
+    return ! isWater() && (addons_level1.empty() ||
+		addons_level1.size() == static_cast<size_t>(std::count_if(addons_level1.begin(), addons_level1.end(),
+							std::ptr_fun(&TilesAddon::isShadow)))) &&
+	    isPassable(NULL, Direction::CENTER, true);
 }
 
 bool TileIsGround(s32 index, u16 ground)

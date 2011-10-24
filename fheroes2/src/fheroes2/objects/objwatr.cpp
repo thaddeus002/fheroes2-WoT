@@ -88,3 +88,21 @@ u16 ObjWater::GetPassable(const u16 & icn, const u8 & index)
 
     return 0;
 }
+
+bool ObjWater::isShadow(const u16 & icn, const u8 & index)
+{
+    switch(icn)
+    {
+	case ICN::OBJNWAT2:
+	    return index == 1;
+
+	case ICN::OBJNWATR:
+	    return ((11 < index && index < 20) || (25 < index && index < 46) ||
+		52 == index || (117 < index && index < 134) || (165 < index && index < 182) ||
+		184 == index || (187 < index && index < 195) || 240 == index);
+
+	default: break;
+    }
+
+    return false;
+}

@@ -116,3 +116,10 @@ u16 ObjDesert::GetPassable(const u16 & icn, const u8 & index)
 
     return 0;
 }
+
+bool ObjDesert::isShadow(const u16 & icn, const u8 & index)
+{
+    const u8 shadows[] = { 11, 13, 16, 19, 23, 27, 29, 33, 35, 38, 41, 44, 47, 50, 52, 54, 55, 56, 57, 58, 59, 60,
+		    71, 75, 77, 80, 86, 103, 115, 118 };
+    return ARRAY_COUNT_END(shadows) != std::find(shadows, ARRAY_COUNT_END(shadows), index);
+}

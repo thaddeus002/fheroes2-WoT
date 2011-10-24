@@ -104,3 +104,12 @@ u16 ObjSnow::GetPassable(const u16 & icn, const u8 & index)
 
     return 0;
 }
+
+bool ObjSnow::isShadow(const u16 & icn, const u8 & index)
+{
+    const u8 shadows [] = { 21, 25, 29, 31, 33, 36, 40, 48, 54, 63, 67, 70, 73, 76, 79,
+	    104, 105, 106, 107, 108, 109, 110, 111, 120, 121, 122, 123, 124, 125, 126,
+	    127, 137, 140 ,142, 144, 148, 193, 203, 207 };
+
+    return ARRAY_COUNT_END(shadows) != std::find(shadows, ARRAY_COUNT_END(shadows), index);
+}

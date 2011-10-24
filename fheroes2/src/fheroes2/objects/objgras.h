@@ -28,6 +28,7 @@
 namespace ObjGrass
 {
     bool	isPassable(const u16 & icn, const u8 & index, u16 direct);
+    bool        isShadow(const u16 & icn, const u8 & index);
     u16         GetPassable(const u16 & icn, const u8 & index);
 }
 

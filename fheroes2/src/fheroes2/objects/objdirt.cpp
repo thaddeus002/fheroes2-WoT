@@ -101,3 +101,10 @@ u16 ObjDirt::GetPassable(const u16 & icn, const u8 & index)
 
     return 0;
 }
+
+bool ObjDirt::isShadow(const u16 & icn, const u8 & index)
+{
+    const u8 shadows[] = { 0, 1, 5, 6, 14, 59, 62, 65, 68, 70, 72, 75, 78, 81, 84, 87, 91, 94, 97, 100, 103, 111, 117, 126, 128, 136, 149, 150, 
+		161, 162, 163, 164, 165, 166, 167, 168, 178, 179, 180, 180, 182, 183, 184, 196, 200 };
+    return ARRAY_COUNT_END(shadows) != std::find(shadows, ARRAY_COUNT_END(shadows), index);
+}

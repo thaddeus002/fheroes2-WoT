@@ -104,3 +104,9 @@ u16 ObjWasteLand::GetPassable(const u16 & icn, const u8 & index)
 
     return 0;
 }
+
+bool ObjWasteLand::isShadow(const u16 & icn, const u8 & index)
+{
+    const u8 shadows[] = { 2, 9, 13, 15, 20, 23, 28, 33, 39, 45, 48, 51, 54, 56, 73, 201, 237 };
+    return ARRAY_COUNT_END(shadows) != std::find(shadows, ARRAY_COUNT_END(shadows), index);
+}

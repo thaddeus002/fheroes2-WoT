@@ -775,7 +775,7 @@ std::vector<u8> Skill::SecondarySkills(void)
 			Secondary::DIPLOMACY, Secondary::NAVIGATION, Secondary::LEADERSHIP, Secondary::WISDOM, Secondary::MYSTICISM,
 			Secondary::LUCK, Secondary::BALLISTICS, Secondary::EAGLEEYE, Secondary::NECROMANCY, Secondary::ESTATES };
 
-    return std::vector<u8>(vals, vals + ARRAY_COUNT(vals));
+    return std::vector<u8>(vals, ARRAY_COUNT_END(vals));
 }
 
 u8 Skill::SecondaryPriorityFromRace(u8 race, const std::vector<u8> & exclude)
