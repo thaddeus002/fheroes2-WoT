@@ -31,7 +31,7 @@
 #include "SDL.h"
 #include "engine.h"
 
-void DrawICN(Surface & sf, u32 size, const u8 *vdata, bool rledebug, bool);
+void SpriteDrawICN(Surface & sf, const u8* cur, const u32 size,  bool debug);
 
 class icnheader
 {
@@ -104,7 +104,6 @@ int main(int argc, char **argv)
     if(fd_data.fail())
     {
 	std::cout << "error open file: " << shortname << std::endl;
-
 	return EXIT_SUCCESS;
     }
     
@@ -115,7 +114,6 @@ int main(int argc, char **argv)
     if(0 != MKDIR(prefix.c_str()))
     {
 	std::cout << "error mkdir: " << prefix << std::endl;
-
 	return EXIT_SUCCESS;
     }
 
@@ -134,7 +132,6 @@ int main(int argc, char **argv)
     u32 save_pos = fd_data.tellg();
 
     std::vector<icnheader> headers(count_sprite);
-
     for(int ii = 0; ii < count_sprite; ++ii) headers[ii].read(fd_data);
 
     for(int ii = 0; ii < count_sprite; ++ii)
@@ -142,27 +139,20 @@ int main(int argc, char **argv)
 	const icnheader & head = headers[ii];
 
 	u32 data_size = (ii + 1 != count_sprite ? headers[ii + 1].offsetData - head.offsetData : total_size - head.offsetData);
-
 	fd_data.seekg(save_pos + head.offsetData, std::ios_base::beg);
     
         char *buf = new char[data_size + 100];
-
         std::memset(buf, 0x80, data_size + 100);
-
         fd_data.read(buf, data_size);
 
-	Surface sf(head.width, head.height, true);
-
+	Surface sf(head.width, head.height, false);
 	sf.SetDefaultColorKey();
-
 	sf.Fill(0xff, 0xff, 0xff);
 
-	DrawICN(sf, data_size, reinterpret_cast<const u8*>(buf), debug, shadow);
-
+	SpriteDrawICN(sf, reinterpret_cast<const u8*>(buf), data_size, debug);
         delete [] buf;
 
 	std::string dstfile(prefix);
-
 	dstfile += SEPARATOR;
 
 	std::ostringstream stream;
@@ -192,147 +182,97 @@ int main(int argc, char **argv)
     }
 
     fd_data.close();
-
     std::cout << "expand to: " << prefix << std::endl;
 
     SDL::Quit();
-
     return EXIT_SUCCESS;
 }
 
-/* draw RLE ICN to surface */
-void DrawICN(Surface & sf, u32 size, const u8 *vdata, bool rledebug, bool allow_shadow)
+void SpriteDrawICN(Surface & sf, const u8* cur, const u32 size,  bool debug)
 {
-    u8 i, count;
+    if(NULL == cur || 0 == size) return;
+
+    const u8 *max = cur + size;
+
+    u8  c = 0;
     u16 x = 0;
     u16 y = 0;
-    u32 index = 0;
-    u32 shadow = allow_shadow ? sf.MapRGB(0, 0, 0, 0x40) : sf.GetColorKey();
 
-    if(rledebug) std::cerr << "START RLE DEBUG" << std::hex << std::setfill('0') << std::endl;
+    u32 shadow = sf.MapRGB(0, 0, 0, 0x40);
 
     // lock surface
     sf.Lock();
-
-    while(index < size)
+    while(1)
     {
 	// 0x00 - end line
-	if(0 == vdata[index])
+	if(0 == *cur)
 	{
 	    ++y;
 	    x = 0;
-	    if(rledebug) std::cerr << " M:00" << std::endl;
-	    ++index;
-	    continue;
+	    ++cur;
 	}
 	else
-	// range 0x01..0x7F XX
-	if(0x80 > vdata[index])
+	// 0x7F - count data
+	if(0x80 > *cur)
 	{
-	    if(rledebug)std::cerr << " M:0x" << std::setw(2) << static_cast<int>(vdata[index]) << " C:0x" << std::setw(2) << static_cast<int>(vdata[index]);
-	    count = vdata[index];
-	    ++index;
-	    i = 0;
-	    while(i++ < count && index < size)
+	    c = *cur;
+	    ++cur;
+	    while(c-- && cur < max)
 	    {
-		if(rledebug) std::cerr << ":0x" << std::setw(2) << static_cast<int>(vdata[index]);
-		sf.SetPixel(x++, y, sf.GetColorIndex(vdata[index++]));
+		sf.SetPixel(x, y, sf.GetColorIndex(*cur));
+		++x;
+		++cur;
 	    }
-	    continue;
 	}
 	else
-	// end data
-	if(0x80 == vdata[index])
+	// 0x80 - end data
+	if(0x80 == *cur)
 	{
-	    if(rledebug) std::cerr << std::endl << "M:0x" << std::setw(2) << static_cast<int>(vdata[index]) << std::endl;
 	    break;
 	}
 	else
-	// range 0x81..0xBF 00 
-	if(0x80 < vdata[index] && 0xC0 > vdata[index])
+	// 0xBF - skip data
+	if(0xC0 > *cur)
 	{
-	    if(rledebug) std::cerr << "M:0x" << std::setw(2) << static_cast<int>(vdata[index]) << " Z:0x" << std::setw(2) << static_cast<int>(vdata[index] - 0x80) <<std::endl;
-	    x += (vdata[index] - 0x80);
-	    ++index;
-	    continue;
+	    x += *cur - 0x80;
+	    ++cur;
 	}
 	else
-	// 0xC0 - seek
-	if(0xC0 == vdata[index])
+	// 0xC0 - shadow
+	if(0xC0 == *cur)
 	{
-	    if(rledebug) printf(" M:C0");
-	    ++index;
+	    ++cur;
+	    c = *cur % 4 ? *cur % 4 : *(++cur);
 
-	    if( 0 == vdata[index] % 4)
-	    {
-		if(rledebug) std::cerr << " M4:0x" << std::setw(2) << static_cast<int>(vdata[index]) << ":" << std::setw(1) << static_cast<int>(vdata[index] % 4) << " A";
-		count = vdata[index];
-		++index;
-		for(i = 0; i < vdata[index]; ++i)
-		{
-		    if(allow_shadow)
-		    {
-			sf.SetPixel(x++, y, shadow);
-			if(rledebug) std::cerr << ":0x" << std::setw(2) << static_cast<int>(count);
-		    }
-		    x++;
-		}
-		++index;
-		continue;
-	    }
-	    else
-	    {
-		if(rledebug) std::cerr << " M4:0x" << std::setw(2) << static_cast<int>(vdata[index]) << ":" << std::setw(1) << static_cast<int>(vdata[index] % 4) << " A";
-		count = vdata[index];
-		for(i = 0; i < vdata[index] % 4; ++i)
-		{
-		    if(allow_shadow)
-		    {
-			sf.SetPixel(x++, y, shadow);
-			if(rledebug) std::cerr << ":0x" << std::setw(2) << static_cast<int>(count);
-		    }
-		}
-		++index;
-		continue;
-	    }
+	    while(c--){ sf.SetPixel(x, y, shadow); ++x; }
+
+	    ++cur;
 	}
 	else
-	// 0xC1 N D count - data
-	if(0xC1 == vdata[index])
+	// 0xC1
+	if(0xC1 == *cur)
 	{
-	    if(rledebug) std::cerr << ":0x" << std::setw(2) << static_cast<int>(vdata[index]);
-	    ++index;
-	    count = vdata[index];
-	    if(rledebug) std::cerr << " C:0x" << std::setw(2) << static_cast<int>(count) << ":D";
-	    ++index;
-	    for(i = 0; i < count; ++i)
-	    {
-	    	sf.SetPixel(x++, y, sf.GetColorIndex(vdata[index]));
-		if(rledebug) std::cerr << ":0x" << std::setw(2) << static_cast<int>(vdata[index]);
-	    }
-	    ++index;
-	    continue;
+	    ++cur;
+	    c = *cur;
+	    ++cur;
+	    while(c--){ sf.SetPixel(x, y, sf.GetColorIndex(*cur)); ++x; }
+	    ++cur;
 	}
 	else
-	// 0xC2 more
-	if(0xC1 < vdata[index])
 	{
-	    if(rledebug) std::cerr << " M:0x" << std::setw(2) << static_cast<int>(vdata[index]);
-	    count = vdata[index] - 0xC0;
-	    if(rledebug) std::cerr << " C:0x" << std::setw(2) << static_cast<int>(count) << ":D";
-	    ++index;
-	    for(i = 0; i < count; ++i)
-	    {
-		sf.SetPixel(x++, y, sf.GetColorIndex(vdata[index]));
-		if(rledebug) std::cerr << ":0x" << std::setw(2) << static_cast<int>(vdata[index]);
-	    }
-	    ++index;
-	    continue;
+	    c = *cur - 0xC0;
+	    ++cur;
+	    while(c--){ sf.SetPixel(x, y, sf.GetColorIndex(*cur)); ++x; }
+	    ++cur;
+	}
+
+	if(cur >= max)
+	{
+	    std::cerr << "out of range" << std::endl;
+	    break;
 	}
     }
 
     // unlock surface
     sf.Unlock();
-
-    if(rledebug) std::cerr << "END RLE DEBUG" << std::endl;
 }
