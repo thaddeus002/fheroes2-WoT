@@ -1931,7 +1931,16 @@ s32  FindUncharteredTerritory(Heroes & hero, const u8 & scoute)
     v.resize(std::distance(v.begin(),
 	std::remove_if(v.begin(), v.end(), std::ptr_fun(&Maps::TileIsUnderProtection))));
 
-    for(MapsIndexes::const_reverse_iterator it = v.rbegin(); it != v.rend() && res.size() < 4; ++it)
+
+#if (__GNUC__ == 3 && __GNUC_MINOR__ == 4)
+    const MapsIndexes::const_reverse_iterator crend = v.rend();
+
+    for(MapsIndexes::const_reverse_iterator
+	it = v.rbegin(); it != crend && res.size() < 4; ++it)
+#else
+    for(MapsIndexes::const_reverse_iterator
+	it = v.rbegin(); it != v.rend() && res.size() < 4; ++it)
+#endif
     {
 	// find fogs
 	if(world.GetTiles(*it).isFog(hero.GetColor()) &&
@@ -1959,7 +1968,15 @@ s32  GetRandomHeroesPosition(Heroes & hero, const u8 & scoute)
     v.resize(std::distance(v.begin(),
 	std::remove_if(v.begin(), v.end(), std::ptr_fun(&Maps::TileIsUnderProtection))));
 
-    for(MapsIndexes::const_reverse_iterator it = v.rbegin(); it != v.rend() && res.size() < 4; ++it)
+#if (__GNUC__ == 3 && __GNUC_MINOR__ == 4)
+    const MapsIndexes::const_reverse_iterator crend = v.rend();
+
+    for(MapsIndexes::const_reverse_iterator
+	it = v.rbegin(); it != crend && res.size() < 4; ++it)
+#else
+    for(MapsIndexes::const_reverse_iterator
+	it = v.rbegin(); it != v.rend() && res.size() < 4; ++it)
+#endif
     {
         if(world.GetTiles(*it).isPassable(&hero, Direction::CENTER, true) &&
 	    hero.GetPath().Calculate(*it))

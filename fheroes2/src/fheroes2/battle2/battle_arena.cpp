@@ -1731,11 +1731,11 @@ void Battle2::Arena::UnpackBoard(Action & msg)
 
     msg.Pop(type);
     if(hero1 && type == hero1->GetType())
-	Game::IO::UnpackHeroBase(msg, *hero1);
+	Game::IO::UnpackHeroBase(msg, *hero1, CURRENT_FORMAT_VERSION);
 
     msg.Pop(type);
     if(hero2 && type == hero2->GetType())
-	Game::IO::UnpackHeroBase(msg, *hero2);
+	Game::IO::UnpackHeroBase(msg, *hero2, CURRENT_FORMAT_VERSION);
 }
 
 const HeroBase* Battle2::Arena::GetCommander(u8 color) const
