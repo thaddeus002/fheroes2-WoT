@@ -23,19 +23,20 @@
 #ifndef H2MOUNTS_H
 #define H2MOUNTS_H
 
-#include "icn.h"
-#include "object.h"
+#include "gamedefs.h"
 
-class Mounts : public Object
+namespace ObjMnts1
 {
-    public:
-	Mounts(ICN::icn_t icn);
+	bool	isAction(const u8 & index);
+	bool	isShadow(const u8 & index);
+	u16	GetPassable(const u16 & icn, const u8 & index);
+}
 
-	static bool	isPassable(const u16 & icn, const u8 & index, u16 direct);
-	static bool	isShadow(const u16 & icn, const u8 & index);
-	static u16	GetPassable(const u16 & icn, const u8 & index);
-
-    private:
-};
+namespace ObjMnts2
+{
+	bool	isAction(const u8 & index);
+	bool	isShadow(const u8 & index);
+	u16	GetPassable(const u16 & icn, const u8 & index);
+}
 
 #endif

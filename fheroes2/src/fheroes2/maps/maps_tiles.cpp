@@ -34,7 +34,6 @@
 #include "maps.h"
 #include "interface_gamearea.h"
 #include "game_focus.h"
-#include "object.h"
 #include "mounts.h"
 #include "trees.h"
 #include "objxloc.h"
@@ -106,68 +105,75 @@ bool Maps::TilesAddon::PredicateSortRules2(const Maps::TilesAddon & ta1, const M
     return ((ta1.level % 4) < (ta2.level % 4));
 }
 
-bool Maps::TilesAddon::isPassable(const Maps::TilesAddon & ta, u16 direct)
+u8 Maps::TilesAddon::GetLoyaltyObject(const Maps::TilesAddon & addon)
 {
-    const ICN::icn_t icn = MP2::GetICNObject(ta.object);
-    const u16 & index = ta.index;
-
-    switch(icn)
+    switch(MP2::GetICNObject(addon.object))
     {
-	case ICN::MTNCRCK:
-	case ICN::MTNSNOW:
-	case ICN::MTNSWMP:
-	case ICN::MTNLAVA:
-	case ICN::MTNDSRT:
-	case ICN::MTNDIRT:
-	case ICN::MTNMULT:
-	case ICN::MTNGRAS:	if(! Mounts::isPassable(icn, index, direct)) return false; break;
+        case ICN::X_LOC1:
+            if(addon.index == 3) return MP2::OBJ_ALCHEMYTOWER;
+            else
+            if(addon.index < 3) return MP2::OBJN_ALCHEMYTOWER;
+            else
+            if(70 == addon.index) return MP2::OBJ_ARENA;
+            else
+            if(3 < addon.index && addon.index < 72) return MP2::OBJN_ARENA;
+            else
+            if(77 == addon.index) return MP2::OBJ_BARROWMOUNDS;
+            else
+            if(71 < addon.index && addon.index < 78) return MP2::OBJN_BARROWMOUNDS;
+            else
+            if(94 == addon.index) return MP2::OBJ_EARTHALTAR;
+            else
+            if(77 < addon.index && addon.index < 112) return MP2::OBJN_EARTHALTAR;
+            else
+            if(118 == addon.index) return MP2::OBJ_AIRALTAR;
+            else
+            if(111 < addon.index && addon.index < 120) return MP2::OBJN_AIRALTAR;
+            else
+            if(127 == addon.index) return MP2::OBJ_FIREALTAR;
+            else
+            if(119 < addon.index && addon.index < 129) return MP2::OBJN_FIREALTAR;
+            else
+            if(135 == addon.index) return MP2::OBJ_WATERALTAR;
+            else
+            if(128 < addon.index && addon.index < 137) return MP2::OBJN_WATERALTAR;
+            break;
 
-	case ICN::TREJNGL:
-	case ICN::TREEVIL:
-	case ICN::TRESNOW:
-	case ICN::TREFIR:
-	case ICN::TREFALL:
-	case ICN::TREDECI:	if(! Trees::isPassable(icn, index, direct)) return false; break;
+        case ICN::X_LOC2:
+            if(addon.index == 4) return MP2::OBJ_STABLES;
+            else
+            if(addon.index < 4) return MP2::OBJN_STABLES;
+            else
+            if(addon.index == 9) return MP2::OBJ_JAIL;
+            else
+            if(4 < addon.index && addon.index < 10) return MP2::OBJN_JAIL;
+            else
+            if(addon.index == 37) return MP2::OBJ_MERMAID;
+            else
+            if(9 < addon.index && addon.index < 47) return MP2::OBJN_MERMAID;
+            else
+            if(addon.index == 101) return MP2::OBJ_SIRENS;
+            else
+            if(46 < addon.index && addon.index < 111) return MP2::OBJN_SIRENS;
+            else
+            if(110 < addon.index && addon.index < 136) return MP2::OBJ_REEFS;
+            break;
 
-	case ICN::OBJNSNOW:	if(! ObjSnow::isPassable(icn, index, direct)) return false; break;
-	case ICN::OBJNSWMP:	if(! ObjSwamp::isPassable(icn, index, direct)) return false; break;
-	case ICN::OBJNGRAS:
-	case ICN::OBJNGRA2:	if(! ObjGrass::isPassable(icn, index, direct)) return false; break;
-	case ICN::OBJNCRCK:	if(! ObjWasteLand::isPassable(icn, index, direct)) return false; break;
-	case ICN::OBJNDIRT:	if(! ObjDirt::isPassable(icn, index, direct)) return false; break;
-	case ICN::OBJNDSRT:	if(! ObjDesert::isPassable(icn, index, direct)) return false; break;
-	case ICN::OBJNMUL2:
-	case ICN::OBJNMULT:	if(! ObjMulti::isPassable(icn, index, direct)) return false; break;
-	case ICN::OBJNLAVA:
-	case ICN::OBJNLAV3:
-	case ICN::OBJNLAV2:	if(! ObjLava::isPassable(icn, index, direct)) return false; break;
-	case ICN::OBJNWAT2:
-	case ICN::OBJNWATR:	if(! ObjWater::isPassable(icn, index, direct)) return false; break;
+        case ICN::X_LOC3:
+            if(addon.index == 30) return MP2::OBJ_HUTMAGI;
+            else
+            if(addon.index < 32) return MP2::OBJN_HUTMAGI;
+            else
+            if(addon.index == 50) return MP2::OBJ_EYEMAGI;
+            else
+            if(31 < addon.index && addon.index < 59) return MP2::OBJN_EYEMAGI;
+            // fix
+            break;
 
-	case ICN::MONS32:
-	case ICN::MINIMON:	return false;
-
-	case ICN::OBJNARTI:
-	case ICN::OBJNRSRC:	if(index % 2) return false; break;
-
-	case ICN::OBJNTWBA:
-	case ICN::OBJNTOWN:	if(! ObjTown::isPassable(icn, index, direct)) return false; break;
-
-	case ICN::X_LOC1:
-	case ICN::X_LOC2:
-	case ICN::X_LOC3:	if(! ObjLoyalty::isPassable(icn, index, direct)) return false; break;
-
-	// MANUAL.ICN
-	case ICN::TREASURE:
-	case ICN::TELEPORT1:
-	case ICN::TELEPORT2:
-	case ICN::TELEPORT3:
-	case ICN::FOUNTAIN:	return false; break;
-
-	default: break;
+        default: break;
     }
 
-    return true;
+    return MP2::OBJ_ZERO;
 }
 
 u16 Maps::TilesAddon::GetPassable(const Maps::TilesAddon & ta)
@@ -177,45 +183,52 @@ u16 Maps::TilesAddon::GetPassable(const Maps::TilesAddon & ta)
 
     switch(icn)
     {
-	case ICN::MTNCRCK:
-	case ICN::MTNSNOW:
-	case ICN::MTNSWMP:
-	case ICN::MTNLAVA:
-	case ICN::MTNDSRT:
-	case ICN::MTNDIRT:
-	case ICN::MTNMULT:
-	case ICN::MTNGRAS:	return Mounts::GetPassable(icn, index);
+        case ICN::MTNSNOW:
+        case ICN::MTNSWMP:
+        case ICN::MTNLAVA:
+        case ICN::MTNDSRT:
+        case ICN::MTNMULT:
+        case ICN::MTNGRAS:      return ObjMnts1::GetPassable(icn, index);
 
-	case ICN::TREJNGL:
-	case ICN::TREEVIL:
-	case ICN::TRESNOW:
-	case ICN::TREFIR:
-	case ICN::TREFALL:
-	case ICN::TREDECI:	return Trees::GetPassable(icn, index);
+        case ICN::MTNCRCK:
+        case ICN::MTNDIRT:      return ObjMnts2::GetPassable(icn, index);
 
-	case ICN::OBJNSNOW:	return ObjSnow::GetPassable(icn, index);
-	case ICN::OBJNSWMP:	return ObjSwamp::GetPassable(icn, index);
-	case ICN::OBJNGRAS:
-	case ICN::OBJNGRA2:	return ObjGrass::GetPassable(icn, index);
-	case ICN::OBJNCRCK:	return ObjWasteLand::GetPassable(icn, index);
-	case ICN::OBJNDIRT:	return ObjDirt::GetPassable(icn, index);
-	case ICN::OBJNDSRT:	return ObjDesert::GetPassable(icn, index);
-	case ICN::OBJNMUL2:
-	case ICN::OBJNMULT:	return ObjMulti::GetPassable(icn, index);
-	case ICN::OBJNLAVA:
-	case ICN::OBJNLAV3:
-	case ICN::OBJNLAV2:	return ObjLava::GetPassable(icn, index);
-	case ICN::OBJNWAT2:
-	case ICN::OBJNWATR:	return ObjWater::GetPassable(icn, index);
+        case ICN::TREJNGL:
+        case ICN::TREEVIL:
+        case ICN::TRESNOW:
+        case ICN::TREFIR:
+        case ICN::TREFALL:
+        case ICN::TREDECI:      return ObjTree::GetPassable(index);
 
-	case ICN::OBJNTWBA:
-	case ICN::OBJNTOWN:	return ObjTown::GetPassable(icn, index);
+        case ICN::OBJNSNOW:     return ObjSnow::GetPassable(index);
+        case ICN::OBJNSWMP:     return ObjSwmp::GetPassable(index);
+        case ICN::OBJNGRAS:     return ObjGras::GetPassable(index);
+        case ICN::OBJNGRA2:     return ObjGra2::GetPassable(index);
+        case ICN::OBJNCRCK:     return ObjCrck::GetPassable(index);
+        case ICN::OBJNDIRT:     return ObjDirt::GetPassable(index);
+        case ICN::OBJNDSRT:     return ObjDsrt::GetPassable(index);
+        case ICN::OBJNMUL2:	return ObjMul2::GetPassable(index);
+        case ICN::OBJNMULT:     return ObjMult::GetPassable(index);
+        case ICN::OBJNLAVA:     return ObjLava::GetPassable(index);
+        case ICN::OBJNLAV3:     return ObjLav3::GetPassable(index);
+        case ICN::OBJNLAV2:     return ObjLav2::GetPassable(index);
+        case ICN::OBJNWAT2:	return ObjWat2::GetPassable(index);
+        case ICN::OBJNWATR:     return ObjWatr::GetPassable(index);
 
-	case ICN::X_LOC1:
-	case ICN::X_LOC2:
-	case ICN::X_LOC3:	return ObjLoyalty::GetPassable(icn, index);
+        case ICN::OBJNTWBA:	return ObjTwba::GetPassable(index);
+        case ICN::OBJNTOWN:     return ObjTown::GetPassable(index);
 
-	default: break;
+        case ICN::X_LOC1:       return ObjXlc1::GetPassable(index);
+        case ICN::X_LOC2:       return ObjXlc2::GetPassable(index);
+        case ICN::X_LOC3:       return ObjXlc3::GetPassable(index);
+
+        // MANUAL.ICN
+        case ICN::TELEPORT1:
+        case ICN::TELEPORT2:
+        case ICN::TELEPORT3:
+        case ICN::FOUNTAIN:     return 0;
+
+        default: break;
     }
 
     return DIRECTION_ALL;
@@ -387,8 +400,12 @@ bool Maps::TilesAddon::isArtesianSpring(const TilesAddon & ta)
 
 bool Maps::TilesAddon::isSkeleton(const TilesAddon & ta)
 {
-    return (ICN::OBJNDSRT == MP2::GetICNObject(ta.object) &&
-	    (ta.index == 83 || ta.index == 84));
+    return (ICN::OBJNDSRT == MP2::GetICNObject(ta.object) && ta.index == 84);
+}
+
+bool Maps::TilesAddon::isSkeletonFix(const TilesAddon & ta)
+{
+    return (ICN::OBJNDSRT == MP2::GetICNObject(ta.object) && ta.index == 83);
 }
 
 bool Maps::TilesAddon::isOasis(const TilesAddon & ta)
@@ -488,57 +505,40 @@ bool Maps::TilesAddon::isShadow(const TilesAddon & ta)
 
     switch(icn)
     {
-        case ICN::MTNCRCK:
-        case ICN::MTNDIRT:
         case ICN::MTNDSRT:
         case ICN::MTNGRAS:
         case ICN::MTNLAVA:
         case ICN::MTNMULT:
         case ICN::MTNSNOW:
-        case ICN::MTNSWMP:
-            return Mounts::isShadow(icn, ta.index);
+        case ICN::MTNSWMP: return ObjMnts1::isShadow(ta.index);
+
+        case ICN::MTNCRCK:
+        case ICN::MTNDIRT: return ObjMnts2::isShadow(ta.index);
 
         case ICN::TREDECI:
         case ICN::TREEVIL:
         case ICN::TREFALL:
         case ICN::TREFIR:
         case ICN::TREJNGL:
-        case ICN::TRESNOW:
-            return Trees::isShadow(icn, ta.index);
+        case ICN::TRESNOW: return ObjTree::isShadow(ta.index);
 
-	case ICN::OBJNCRCK:
-	    return ObjWasteLand::isShadow(icn, ta.index);
+	case ICN::OBJNCRCK: return ObjCrck::isShadow(ta.index);
+	case ICN::OBJNDIRT: return ObjDirt::isShadow(ta.index);
+	case ICN::OBJNDSRT: return ObjDsrt::isShadow(ta.index);
+	case ICN::OBJNGRA2: return ObjGra2::isShadow(ta.index);
+	case ICN::OBJNGRAS: return ObjGras::isShadow(ta.index);
+        case ICN::OBJNMUL2: return ObjMul2::isShadow(ta.index);
+        case ICN::OBJNMULT: return ObjMult::isShadow(ta.index);
+	case ICN::OBJNSNOW: return ObjSnow::isShadow(ta.index);
+	case ICN::OBJNSWMP: return ObjSwmp::isShadow(ta.index);
+	case ICN::OBJNWAT2: return ObjWat2::isShadow(ta.index);
+	case ICN::OBJNWATR: return ObjWatr::isShadow(ta.index);
 
-	case ICN::OBJNDIRT:
-	    return ObjDirt::isShadow(icn, ta.index);
+	case ICN::OBJNARTI:
+	case ICN::OBJNRSRC: return 0 == (ta.index % 2);
 
-	case ICN::OBJNDSRT:
-	    return ObjDesert::isShadow(icn, ta.index);
-
-	case ICN::OBJNGRA2:
-	case ICN::OBJNGRAS:
-	    return ObjGrass::isShadow(icn, ta.index);
-
-        case ICN::OBJNMUL2:
-        case ICN::OBJNMULT:
-	    return ObjMulti::isShadow(icn, ta.index);
-
-	case ICN::OBJNRSRC:
-	    return 0 == (ta.index % 2);
-
-	case ICN::OBJNSNOW:
-	    return ObjSnow::isShadow(icn, ta.index);
-
-	case ICN::OBJNSWMP:
-	    return ObjSwamp::isShadow(icn, ta.index);
-
-	case ICN::OBJNTWRD:
-	case ICN::OBJNTWSH:
-	    return true;
-
-	case ICN::OBJNWAT2:
-	case ICN::OBJNWATR:
-	    return ObjWater::isShadow(icn, ta.index);
+	case ICN::OBJNTWRD: return ta.index > 31;
+	case ICN::OBJNTWSH: return true;
 
 	default: break;
     }
@@ -550,15 +550,17 @@ bool Maps::TilesAddon::isMounts(const TilesAddon & ta)
 {
     switch(MP2::GetICNObject(ta.object))
     {
-        case ICN::MTNCRCK:
-        case ICN::MTNDIRT:
         case ICN::MTNSNOW:
         case ICN::MTNSWMP:
         case ICN::MTNLAVA:
         case ICN::MTNDSRT:
         case ICN::MTNMULT:
         case ICN::MTNGRAS:
-	    return ! Mounts::isShadow(MP2::GetICNObject(ta.object), ta.index);
+	    return ! ObjMnts1::isShadow(ta.index);
+
+        case ICN::MTNCRCK:
+        case ICN::MTNDIRT:
+	    return ! ObjMnts2::isShadow(ta.index);
 
 	default: break;
     }
@@ -623,7 +625,7 @@ bool Maps::TilesAddon::isForests(const TilesAddon & ta)
         case ICN::TREFIR:
         case ICN::TREFALL:
         case ICN::TREDECI:
-	    return ! Trees::isShadow(MP2::GetICNObject(ta.object), ta.index);
+	    return ! ObjTree::isShadow(ta.index);
 
 	default: break;
     }
@@ -852,8 +854,10 @@ bool Maps::Tiles::isLongObject(u16 direction)
 	for(Addons::const_iterator
 	    it = addons_level1.begin(); it != addons_level1.end(); ++it)
 	    if(! TilesAddon::isShadow(*it) &&
-		tile.addons_level1.end() != std::find_if(tile.addons_level1.begin(), tile.addons_level1.end(),
-						    std::bind2nd(std::mem_fun_ref(&TilesAddon::isUniq), (*it).uniq)))
+		(tile.addons_level1.end() != std::find_if(tile.addons_level1.begin(), tile.addons_level1.end(),
+						    std::bind2nd(std::mem_fun_ref(&TilesAddon::isUniq), (*it).uniq)) ||
+		 tile.addons_level2.end() != std::find_if(tile.addons_level2.begin(), tile.addons_level2.end(),
+						    std::bind2nd(std::mem_fun_ref(&TilesAddon::isUniq), (*it).uniq))))
 		return true;
     }
     return false;
@@ -904,7 +908,7 @@ void Maps::Tiles::UpdatePassable(void)
 	    tile_passable = 0;
     }
 
-    // check all sprite
+    // check all sprite (level 1)
     for(Addons::const_iterator
 	it = addons_level1.begin(); it != addons_level1.end(); ++it)
 	tile_passable &= TilesAddon::GetPassable(*it);
@@ -926,7 +930,7 @@ void Maps::Tiles::UpdatePassable(void)
 	Tiles & left = world.GetTiles(Maps::GetDirectionIndex(maps_index, Direction::LEFT));
 
 	// left corner
-	if(left.tile_passable && ! MP2::isActionObject(mp2_object, isWater()) &&
+	if(left.tile_passable &&
     	    isLongObject(Direction::TOP) &&
 	    ! ((Direction::TOP | Direction::TOP_LEFT) & tile_passable) &&
 	    (Direction::TOP_RIGHT & left.tile_passable) &&
@@ -936,7 +940,7 @@ void Maps::Tiles::UpdatePassable(void)
 	}
 	else
 	// right corner
-	if(tile_passable && ! MP2::isActionObject(left.mp2_object, left.isWater()) &&
+	if(tile_passable &&
     	    left.isLongObject(Direction::TOP) &&
 	    ! ((Direction::TOP | Direction::TOP_RIGHT) & left.tile_passable) &&
 	    (Direction::TOP_LEFT & tile_passable) &&
@@ -1192,10 +1196,31 @@ void Maps::Tiles::RedrawBottom4Hero(Surface & dst) const
 	    const u8 & object = (*it).object;
 	    const u8 & index  = (*it).index;
 	    const ICN::icn_t icn = MP2::GetICNObject(object);
+	    bool skip = false;
 
-	    if(ICN::SkipBottomForRedrawHeroes(icn, index)) continue;
+	    switch(icn)
+	    {
+    		case ICN::OBJNTWBA:
+    		case ICN::ROAD:
+    		case ICN::STREAM:
+		    skip = true;
+        	    break;
 
-	    if(ICN::UNKNOWN != icn && ICN::MINIHERO != icn && ICN::MONS32 != icn)
+    		case ICN::OBJNCRCK:
+    		case ICN::OBJNDIRT:
+    		case ICN::OBJNDSRT:
+    		case ICN::OBJNGRA2:
+    		case ICN::OBJNGRAS:
+    		case ICN::OBJNLAVA:
+    		case ICN::OBJNSNOW:
+    		case ICN::OBJNSWMP:
+		    skip = tile_passable & DIRECTION_TOP_ROW;
+        	    break;
+
+    		default: break;
+	    }
+
+	    if(!skip && ICN::UNKNOWN != icn && ICN::MINIHERO != icn && ICN::MONS32 != icn)
 	    {
 		const Sprite & sprite = AGG::GetICN(icn, index);
 		area.BlitOnTile(dst, sprite, mp);
@@ -1492,7 +1517,7 @@ bool Maps::Tiles::isPassable(const Heroes* hero, Direction::vector_t direct, boo
 	{
 	    // fix shipwreck: place on water
 	    if(MP2::OBJ_SHIPWRECK == GetObject())
-		return Object::AllowDirect(MP2::OBJ_SHIPWRECK, direct);
+		return direct & MP2::GetObjectDirect(MP2::OBJ_SHIPWRECK);
 	    else
 	    // for: meetings/attack hero
 	    if(MP2::OBJ_HEROES == GetObject())
@@ -1764,9 +1789,22 @@ void Maps::Tiles::CorrectFlags32(const u8 index, bool up)
 	addons_level1.push_back(TilesAddon(TilesAddon::UPPER, world.GetUniq(), 0x38, index));
 }
 
-void Maps::Tiles::FixLoyaltyVersion(void)
+void Maps::Tiles::FixedPreload(Tiles & tile)
 {
-    switch(GetObject())
+    Addons::iterator it;
+
+    // fix skeleton: left position
+    it = std::find_if(tile.addons_level1.begin(), tile.addons_level1.end(), 
+		    TilesAddon::isSkeletonFix);
+
+    if(it != tile.addons_level1.end())
+    {
+	tile.SetObject(MP2::OBJN_SKELETON);
+    }
+
+    // fix price loyalty objects.
+    if(Settings::Get().PriceLoyaltyVersion())
+    switch(tile.GetObject())
     {
 	case MP2::OBJ_UNKNW_79:
         case MP2::OBJ_UNKNW_7A:
@@ -1774,26 +1812,25 @@ void Maps::Tiles::FixLoyaltyVersion(void)
         case MP2::OBJ_UNKNW_FA:
 	{
 	    u8 newobj = MP2::OBJ_ZERO;
-	    Addons::iterator it = std::find_if(addons_level1.begin(), addons_level1.end(),
+	    it = std::find_if(tile.addons_level1.begin(), tile.addons_level1.end(),
 								    TilesAddon::isX_LOC123);
-
-	    if(it != addons_level1.end())
+	    if(it != tile.addons_level1.end())
 	    {
-		newobj = ObjLoyalty::LearnObject(*it);
+		newobj = TilesAddon::GetLoyaltyObject(*it);
 	    }
 	    else
 	    {
-		it = std::find_if(addons_level2.begin(), addons_level2.end(),
+		it = std::find_if(tile.addons_level2.begin(), tile.addons_level2.end(),
 							TilesAddon::isX_LOC123);
-		if(it != addons_level2.end())
-		    newobj = ObjLoyalty::LearnObject(*it);
+		if(it != tile.addons_level2.end())
+		    newobj = TilesAddon::GetLoyaltyObject(*it);
 	    }
 
 	    if(MP2::OBJ_ZERO != newobj)
-		SetObject(static_cast<MP2::object_t>(newobj));
+		tile.SetObject(static_cast<MP2::object_t>(newobj));
 	    else
 	    {
-		DEBUG(DBG_GAME, DBG_WARN, "index: " << maps_index);
+		DEBUG(DBG_GAME, DBG_WARN, "index: " << tile.maps_index);
 	    }
 	} break;
 

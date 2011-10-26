@@ -21,177 +21,100 @@
  ***************************************************************************/
 
 #include "icn.h"
+#include "direction.h"
 #include "objmult.h"
 
-bool ObjMulti::isPassable(const u16 & icn, const u8 & index, u16 direct)
+u16 ObjMult::GetPassable(const u8 & index)
 {
-    return direct & GetPassable(icn, index);
+    const u8 restricted[] = { 2, 4, 58, 63, 64, 65, 70, 72, 73, 89, 104 };
+
+    if(isShadow(index))
+        return DIRECTION_ALL;
+    else
+    if(isAction(index))
+        return 0;
+
+    return ARRAY_COUNT_END(restricted) != std::find(restricted, ARRAY_COUNT_END(restricted), index) ?
+            DIRECTION_CENTER_ROW | DIRECTION_BOTTOM_ROW : DIRECTION_ALL;
 }
 
-u16 ObjMulti::GetPassable(const u16 & icn, const u8 & index)
+bool ObjMult::isAction(const u8 & index)
 {
-    switch(icn)
-    {
-	case ICN::OBJNMUL2:
-	    // fountain
-	    if(15 == index) return 0;
-	    else
-	    // stub
-	    if(16 == index || (17 < index && index < 20))
-                return DIRECTION_CENTER_ROW | DIRECTION_BOTTOM_ROW;
-	    else
-	    // alchemy tower
-	    if(24 < index && index < 28)
-		return DIRECTION_CENTER_ROW | DIRECTION_BOTTOM_ROW;
-	    else
-	    // dragon city
-	    if(46 == index) return 0;
-	    else
-	    if(50 < index && index < 56)
-		return DIRECTION_CENTER_ROW | DIRECTION_BOTTOM_ROW;
-	    else
-	    // grave yard
-	    if(56 < index && index < 59)
-		return DIRECTION_CENTER_ROW | DIRECTION_BOTTOM_ROW;
-	    else
-	    // light house
-	    if(73 == index) return 0;
-	    else
-	    // saw mill
-	    if(75 < index && index < 78) return 0;
-	    else
-	    if(77 < index && index < 82)
-		return DIRECTION_CENTER_ROW | DIRECTION_BOTTOM_ROW;
-	    else
-	    // water well
-	    if(98 == index || 105 == index || 112 == index)
-		return DIRECTION_CENTER_ROW | DIRECTION_BOTTOM_ROW;
-	    else
-	    // sign
-	    if(114 == index) return 0;
-	    else
-	    // teleport
-	    if(116 == index || 119 == index || 122 == index) return 0;
-	    else
-	    // wagon camp
-	    if(123 < index && index < 127) return 0;
-	    else
-	    if((127 < index && index < 130) || 136 == index)
-		return DIRECTION_CENTER_ROW | DIRECTION_BOTTOM_ROW;
-	    else
-	    // well
-	    if(162 == index || 165 == index) return 0;
-	    else
-	    // freeman foundry
-	    if(186 < index && index < 189)
-		return DIRECTION_CENTER_ROW | DIRECTION_BOTTOM_ROW;
-	    else
-	    // magick garden
-	    if(190 == index) return 0;
-	    else
-	    // observation tower
-	    if(201 == index) return 0;
-	    else
-	    // grave yard
-	    if(206 < index && index < 210)
-		return DIRECTION_CENTER_ROW | DIRECTION_BOTTOM_ROW;
-	    else
-	    // saw mill
-	    if(211 < index && index < 214) return 0;
-	    else
-	    if(213 < index && index < 217)
-		return DIRECTION_CENTER_ROW | DIRECTION_BOTTOM_ROW;
-            else
-                return DIRECTION_ALL;
+/*
+    peasant hut: 35
+    fort: 59
+    gasebo: 62
+    witch hut: 69
+    mercenary camp: 71
+    ruins: 74
+    shrine: 76, 78, 80
+    idol: 82
+    standing stones: 84, 85
+    temple: 88
+    market: 111
+    tree house: 114
+    watch tower: 116
+    tree knowledge: 123
+*/
+    const u8 actions[] = { 35, 59, 62, 69, 71, 74, 76, 78, 80, 82, 84, 85, 88, 111, 114, 116, 123 };
 
-        case ICN::OBJNMULT:
-    	    // dead tree
-            if(2 == index || 4 == index)
-                return DIRECTION_CENTER_ROW | DIRECTION_BOTTOM_ROW;
-	    else
-	    // peasant hut
-	    if(35 == index) return 0;
-	    else
-	    // fort
-	    if(57 < index && index < 60)
-		return DIRECTION_CENTER_ROW | DIRECTION_BOTTOM_ROW;
-	    else
-	    // gasebo
-	    if(62 == index) return 0;
-	    else
-	    // shrub
-	    if(62 < index && index < 66)
-                return DIRECTION_CENTER_ROW | DIRECTION_BOTTOM_ROW;
-	    else
-	    // witch hut
-	    if(69 == index) return 0;
-	    else
-	    // mercenary camp
-	    if(69 < index && index < 73)
-                return DIRECTION_CENTER_ROW | DIRECTION_BOTTOM_ROW;
-	    else
-	    // ruins
-	    if(72 < index && index < 75)
-		return DIRECTION_CENTER_ROW | DIRECTION_BOTTOM_ROW;
-	    else
-	    // shrine
-	    if(76 == index || 78 == index || 80 == index) return 0;
-	    else
-	    // idol
-	    if(82 == index) return 0;
-	    else
-	    // standing stones
-	    if(83 < index && index < 86)
-		return DIRECTION_CENTER_ROW | DIRECTION_BOTTOM_ROW;
-	    else
-	    // temple
-	    if(87 < index && index < 90)
-		return DIRECTION_CENTER_ROW | DIRECTION_BOTTOM_ROW;
-	    else
-	    // market
-	    if(104 == index || 111 == index)
-		return DIRECTION_CENTER_ROW | DIRECTION_BOTTOM_ROW;
-	    else
-	    // tree house
-	    if(114 == index) return 0;
-	    else
-	    // watch tower
-	    if(116 == index) return 0;
-	    else
-	    // tree knowledge
-	    if(123 == index) return 0;
-	    else
-	    // camp fire
-	    if(131 == index) return 0;
-	    else
-		return DIRECTION_ALL;
-
-	default: break;
-    }
-
-    return 0;
+    return ARRAY_COUNT_END(actions) != std::find(actions, ARRAY_COUNT_END(actions), index);
 }
 
-bool ObjMulti::isShadow(const u16 & icn, const u8 & index)
+bool ObjMult::isShadow(const u8 & index)
 {
-    const u8 shadows1[] = { 14, 17, 20, 24, 42, 43, 49, 50, 60, 71, 72, 113, 115, 118, 121, 123, 127,
-		    161, 164, 180, 181, 182, 183, 184, 185, 186, 189, 199, 200, 202, 206 };
+    const u8 shadows2[] = { 1, 3, 15, 25, 45, 54, 57, 61, 67, 68, 75, 77, 79, 81, 83,
+		    97, 98, 105, 113, 115, 121, 122, 124 };
 
-    const u8 shadows2[] = { 1, 3, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31,
-		    32, 33, 34, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 57, 61, 67, 68, 75, 77, 79, 81, 83,
-		    97, 98, 99, 100, 101, 102, 103, 105, 106, 107, 108, 109, 110, 113, 115, 121, 124, 125,
-		    126, 127, 128, 129, 130 };
+    return ARRAY_COUNT_END(shadows2) != std::find(shadows2, ARRAY_COUNT_END(shadows2), index);
+}
 
-    switch(icn)
-    {
-	case ICN::OBJNMUL2:
-	    return ARRAY_COUNT_END(shadows1) != std::find(shadows1, ARRAY_COUNT_END(shadows1), index);
+u16 ObjMul2::GetPassable(const u8 & index)
+{
+    const u8 disabled[] = { 46, 76, 77, 124, 125, 126, 221, 213 };
+    const u8 restricted[] = { 16, 18, 19, 25, 27, 51, 52, 53, 55, 57, 78, 79, 81, 98, 105, 128, 136, 187, 207, 209, 214, 215, 217 };
 
-        case ICN::OBJNMULT:
-	    return ARRAY_COUNT_END(shadows2) != std::find(shadows2, ARRAY_COUNT_END(shadows2), index);
+    if(isShadow(index))
+        return DIRECTION_ALL;
+    else
+    if(isAction(index) ||
+        ARRAY_COUNT_END(disabled) != std::find(disabled, ARRAY_COUNT_END(disabled), index))
+        return 0;
 
-	default: break;
-    }
+    return ARRAY_COUNT_END(restricted) != std::find(restricted, ARRAY_COUNT_END(restricted), index) ?
+            DIRECTION_CENTER_ROW | DIRECTION_BOTTOM_ROW : DIRECTION_ALL;
+}
 
-    return false;
+bool ObjMul2::isAction(const u8 & index)
+{
+/*
+    fountain: 15
+    alchemy tower: 26
+    dragon city: 54
+    grave yard: 58
+    light house: 73
+    saw mill: 80
+    water well: 112
+    sign: 114
+    teleport: 116, 119, 122
+    wagon camp: 129
+    well: 162, 165
+    freeman foundry: 188
+    magick garden: 190
+    observation tower: 201
+    grave yard: 208
+    saw mill: 216
+*/
+    const u8 actions[] = { 15, 26, 54, 58, 73, 80, 112, 114, 116, 119, 122, 129, 162, 165,
+	188, 190, 201, 208, 216 };
+
+    return ARRAY_COUNT_END(actions) != std::find(actions, ARRAY_COUNT_END(actions), index);
+}
+
+bool ObjMul2::isShadow(const u8 & index)
+{
+    const u8 shadows1[] = { 14, 17, 20, 24, 34, 36, 42, 43, 49, 50, 60, 71, 72, 113, 115, 118, 121, 123, 127,
+		    161, 164, 180, 181, 189, 199, 200, 202, 206 };
+
+    return ARRAY_COUNT_END(shadows1) != std::find(shadows1, ARRAY_COUNT_END(shadows1), index);
 }

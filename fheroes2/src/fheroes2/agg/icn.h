@@ -943,7 +943,6 @@ namespace ICN
     u16 AnimationFrame(const icn_t &, const u8 &, const u32 &, bool = false);
     bool isModifiedSprite(const icn_t &);
     bool NeedMinify4PocketPC(const icn_t & , const u16 &);
-    bool SkipBottomForRedrawHeroes(const icn_t &, const u8 &);
     bool HighlyObjectSprite(const icn_t &, const u8 &);
     icn_t PORTxxxx(u8);
     u8   GetMissIndex(const icn_t &, const s16 &, const s16 &);

@@ -21,105 +21,50 @@
  ***************************************************************************/
 
 #include "icn.h"
+#include "direction.h"
 #include "objdsrt.h"
 
-bool ObjDesert::isPassable(const u16 & icn, const u8 & index, u16 direct)
+u16 ObjDsrt::GetPassable(const u8 & index)
 {
-    return direct & GetPassable(icn, index);
+    const u8 disabled[] = { 61, 89, 90, 91, 92, 93, 125, 126 };
+    const u8 restricted[] = { 3, 6, 9, 12, 14, 15, 17, 18, 20, 21, 22, 24, 26, 28, 30, 31, 32, 34,
+	36, 39, 40, 42, 45, 48, 49, 51, 53, 72, 76, 81, 83, 94, 95, 97, 98, 99, 100, 110, 111, 112, 116, 121, 127, 128, 130 };
+
+    if(isShadow(index))
+        return DIRECTION_ALL;
+    else
+    if(isAction(index) ||
+	ARRAY_COUNT_END(disabled) != std::find(disabled, ARRAY_COUNT_END(disabled), index))
+        return 0;
+
+   return ARRAY_COUNT_END(restricted) != std::find(restricted, ARRAY_COUNT_END(restricted), index) ?
+            DIRECTION_CENTER_ROW | DIRECTION_BOTTOM_ROW : DIRECTION_ALL;
 }
 
-u16 ObjDesert::GetPassable(const u16 & icn, const u8 & index)
+bool ObjDsrt::isAction(const u8 & index)
 {
-    switch(icn)
-    {
-	case ICN::OBJNDSRT:
-	    // trees
-	    if(3 == index || 6 == index || 9 == index || 12 == index ||
-		24 == index || 26 == index || 28 == index || 76 == index)
-		return DIRECTION_CENTER_ROW | DIRECTION_BOTTOM_ROW;
-	    else
-	    // dune
-	    if((13 < index && index < 16) || (16 < index && index < 19) || (19 < index && index < 23))
-		return DIRECTION_CENTER_ROW | DIRECTION_BOTTOM_ROW;
-	    else
-	    // cactus
-	    if((29 < index && index < 33) || 34 == index || 36 == index ||
-		(38 < index && index < 41) || 42 == index || 45 == index ||
-		(47 < index && index < 50) || 51 == index || 53 == index)
-		return DIRECTION_CENTER_ROW | DIRECTION_BOTTOM_ROW;
-	    else
-	    // camp fire
-	    if(61 == index) return 0;
-	    else
-	    // desert tent
-	    if(71 < index && index < 74)
-		return DIRECTION_CENTER_ROW | DIRECTION_BOTTOM_ROW;
-	    else
-	    // piramids
-	    if(80 < index && index < 83)
-		return DIRECTION_CENTER_ROW | DIRECTION_BOTTOM_ROW;
-	    else
-	    // skeleton
-	    if(82 < index && index < 85)
-		return DIRECTION_CENTER_ROW | DIRECTION_BOTTOM_ROW;
-	    else
-	    // sphinx
-	    if(86 < index && index < 89)
-		return DIRECTION_CENTER_ROW | DIRECTION_BOTTOM_ROW;
-	    else
-	    // city of dead
-	    if((88 < index && index < 94) || index == 96) return 0;
-	    else
-	    if(93 < index && index < 99)
-		return DIRECTION_CENTER_ROW | DIRECTION_BOTTOM_ROW;
-	    else
-	    // excavation
-	    if(index == 101) return 0;
-	    else
-	    if(98 < index && index < 102)
-		return DIRECTION_CENTER_ROW | DIRECTION_BOTTOM_ROW;
-	    else
-	    // obelisk
-	    if(104 == index) return 0;
-	    else
-	    // oasis
-	    if(104 < index && index < 107) return 0;
-	    else
-	    if(107 < index && index < 110)
-		return DIRECTION_CENTER_ROW | DIRECTION_BOTTOM_ROW;
-	    else
-	    // desert
-	    if(109 < index && index < 113)
-		return DIRECTION_CENTER_ROW | DIRECTION_BOTTOM_ROW;
-	    else
-	    // daemon cave
-	    if(115 < index && index < 118)
-		return DIRECTION_CENTER_ROW | DIRECTION_BOTTOM_ROW;
-	    else
-	    // sign
-	    if(119 == index) return 0;
-	    else
-	    // grave yard
-	    if(120 < index && index < 123)
-		return DIRECTION_CENTER_ROW | DIRECTION_BOTTOM_ROW;
-	    else
-	    // saw mill
-	    if(124 < index && index < 127) return 0;
-	    else
-	    if(126 < index && index < 131)
-		return DIRECTION_CENTER_ROW | DIRECTION_BOTTOM_ROW;
-	    else
-		return DIRECTION_ALL;
+    /*
+	desert tent: 73
+	piramids: 82
+	skeleton: 84
+	sphinx: 87
+	city of dead: 96
+	excavation: 101
+	obelisk: 104
+	oasis: 108, 109
+	daemon cave: 117
+	sign: 119
+	grave yard: 122
+	saw mill: 129
+    */
 
-	default: break;
-    }
-
-    return 0;
+    const u8 actions[] = { 73, 82, 84, 87, 96, 101, 104, 108, 109, 117, 119, 122, 129 };
+    return ARRAY_COUNT_END(actions) != std::find(actions, ARRAY_COUNT_END(actions), index);
 }
 
-bool ObjDesert::isShadow(const u16 & icn, const u8 & index)
+bool ObjDsrt::isShadow(const u8 & index)
 {
-    const u8 shadows[] = { 11, 13, 16, 19, 23, 27, 29, 33, 35, 38, 41, 44, 47, 50, 52, 54, 55, 56, 57, 58, 59, 60,
-		    71, 75, 77, 80, 86, 103, 115, 118 };
+    const u8 shadows[] = { 11, 13, 16, 19, 23, 25, 27, 29, 33, 35, 38, 41, 44, 46, 47,
+		50, 52, 54, 71, 75, 77, 80, 86, 103, 115, 118 };
     return ARRAY_COUNT_END(shadows) != std::find(shadows, ARRAY_COUNT_END(shadows), index);
 }

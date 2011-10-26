@@ -21,95 +21,51 @@
  ***************************************************************************/
 
 #include "icn.h"
+#include "direction.h"
 #include "objsnow.h"
 
-bool ObjSnow::isPassable(const u16 & icn, const u8 & index, u16 direct)
+u16 ObjSnow::GetPassable(const u8 & index)
 {
-    return direct & GetPassable(icn, index);
+    const u8 disabled[] = { 22, 26, 27, 28, 30, 32, 34, 35, 37, 38, 39, 81, 82, 83, 84, 197, 198 };
+    const u8 restricted[] = { 2, 12, 41, 42, 49, 50, 55, 56, 57, 60, 64, 65, 68, 71, 74, 77, 80,
+	85, 86, 87, 88, 89, 90, 91, 92, 94, 95, 132, 149, 151, 159, 177, 184, 199, 200, 202, 208, 210 };
+
+    if(isShadow(index))
+        return DIRECTION_ALL;
+    else
+    if(isAction(index) ||
+        ARRAY_COUNT_END(disabled) != std::find(disabled, ARRAY_COUNT_END(disabled), index))
+        return 0;
+
+    return ARRAY_COUNT_END(restricted) != std::find(restricted, ARRAY_COUNT_END(restricted), index) ?
+            DIRECTION_CENTER_ROW | DIRECTION_BOTTOM_ROW : DIRECTION_ALL;
 }
 
-u16 ObjSnow::GetPassable(const u16 & icn, const u8 & index)
+bool ObjSnow::isAction(const u8 & index)
 {
-    switch(icn)
-    {
-	case ICN::OBJNSNOW:
-	    // cave for centaur
-	    if((1 < index && index < 4))
-		return DIRECTION_CENTER_ROW | DIRECTION_BOTTOM_ROW;
-	    else
-	    // camp fire
-	    if(4 == index) return 0;
-	    else
-	    // learn to
-	    if(13 == index)
-		return DIRECTION_CENTER_ROW | DIRECTION_BOTTOM_ROW;
-	    else
-	    // rock
-	    if(22 == index || (25 < index && index < 29) || 30 == index ||
-	    32 == index || (33 < index && index < 36) || (36 < index && index < 40)) return 0;
-	    else
-	    // stub
-	    if(40 < index && index < 43)
-		return DIRECTION_CENTER_ROW | DIRECTION_BOTTOM_ROW;
-	    else
-	    // trees
-	    if((48 < index && index < 51) || (54 < index && index < 58) || 60 == index || 
-	    (63 < index && index < 66) || 68 == index || 71 == index || 
-	    74 == index || 77 == index || 80 == index) return 0;
-	    else
-	    // lake
-	    if((80 < index && index < 85)) return 0;
-	    else
-	    if((84 < index && index < 90) || (89 < index && index < 93) || (93 < index && index < 96))
-		return DIRECTION_CENTER_ROW | DIRECTION_BOTTOM_ROW;
-	    else
-	    //wind mill
-	    if(128 == index || 132 == index)
-		return DIRECTION_CENTER_ROW | DIRECTION_BOTTOM_ROW;
-	    else
-	    // watch tower
-	    if(138 == index) return 0;
-	    else
-	    // obelisk
-	    if(141 == index) return 0;
-	    else
-	    // sign
-	    if(143 == index) return 0;
-	    else
-	    // alchemy tower
-	    if(148 < index && index < 152)
-		return DIRECTION_CENTER_ROW | DIRECTION_BOTTOM_ROW;
-	    else
-	    // graveyard
-	    if((158 < index && index < 161) || (207 < index && index < 211))
-		return DIRECTION_CENTER_ROW | DIRECTION_BOTTOM_ROW;
-	    else
-	    // water mill
-	    if(177 == index || 184 == index || 191 == index)
-		return DIRECTION_CENTER_ROW | DIRECTION_BOTTOM_ROW;
-	    else
-	    // well
-	    if(194 == index) return 0;
-	    else
-	    // saw mill
-	    if(196 < index && index < 199) return 0;
-	    else
-	    if(198 < index && index < 202)
-		return DIRECTION_CENTER_ROW | DIRECTION_BOTTOM_ROW;
-	    else
-		return DIRECTION_ALL;
+/*
+    cave: 3
+    learn to: 13
+    wind mill: 128
+    watch tower: 138
+    obelisk: 141
+    sign: 143
+    alchemy tower: 150
+    graveyard: 160
+    water mill: 191
+    well: 194
+    saw mill: 201
+    graveyard: 209
+*/
+    const u8 actions[] = { 3, 13, 128, 138, 141, 143, 150, 160, 191, 194, 201, 209 };
 
-	default: break;
-    }
-
-    return 0;
+    return ARRAY_COUNT_END(actions) != std::find(actions, ARRAY_COUNT_END(actions), index);
 }
 
-bool ObjSnow::isShadow(const u16 & icn, const u8 & index)
+bool ObjSnow::isShadow(const u8 & index)
 {
-    const u8 shadows [] = { 21, 25, 29, 31, 33, 36, 40, 48, 54, 63, 67, 70, 73, 76, 79,
-	    104, 105, 106, 107, 108, 109, 110, 111, 120, 121, 122, 123, 124, 125, 126,
-	    127, 137, 140 ,142, 144, 148, 193, 203, 207 };
+    const u8 shadows [] = { 21, 25, 29, 31, 33, 36, 40, 48, 54, 59, 63, 67, 70, 73, 76, 79,
+	    104, 108, 120, 124, 137, 140, 142, 144, 148, 193, 203, 207 };
 
     return ARRAY_COUNT_END(shadows) != std::find(shadows, ARRAY_COUNT_END(shadows), index);
 }

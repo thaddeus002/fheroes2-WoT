@@ -21,90 +21,49 @@
  ***************************************************************************/
 
 #include "icn.h"
+#include "direction.h"
 #include "objdirt.h"
 
-bool ObjDirt::isPassable(const u16 & icn, const u8 & index, u16 direct)
+u16 ObjDirt::GetPassable(const u8 & index)
 {
-    return direct & GetPassable(icn, index);
+    const u8 disabled[] = { 23, 24, 25, 26, 27, 28, 29, 30, 32, 33, 34, 35, 36, 37, 48, 49, 50, 51 };
+    const u8 restricted[] = { 7, 9, 12, 13, 15, 16, 17, 18 ,19, 20, 21, 22, 40, 41, 42, 43, 44, 45,
+	53, 54, 55, 56, 57, 58, 60, 61, 63, 64, 66, 67, 69, 71, 73, 74, 76, 77, 79, 80, 82, 83, 85,
+	86, 88, 89, 90, 92, 93, 98, 99, 101, 102, 104, 105, 118, 123, 127, 130, 133, 134, 137, 139,
+	152, 189 };
+
+    if(isShadow(index))
+        return DIRECTION_ALL;
+    else
+    if(isAction(index) ||
+	ARRAY_COUNT_END(disabled) != std::find(disabled, ARRAY_COUNT_END(disabled), index))
+        return 0;
+
+   return ARRAY_COUNT_END(restricted) != std::find(restricted, ARRAY_COUNT_END(restricted), index) ?
+            DIRECTION_CENTER_ROW | DIRECTION_BOTTOM_ROW : DIRECTION_ALL;
 }
 
-u16 ObjDirt::GetPassable(const u16 & icn, const u8 & index)
+bool ObjDirt::isAction(const u8 & index)
 {
-    switch(icn)
-    {
-	case ICN::OBJNDIRT:
-	    // abandone mines
-	    if(6 < index && index < 10)
-		return DIRECTION_CENTER_ROW | DIRECTION_BOTTOM_ROW;
-	    else
-	    // mound
-	    if((11 < index && index < 14) || (14 < index && index < 17))
-		return DIRECTION_CENTER_ROW | DIRECTION_BOTTOM_ROW;
-	    else
-	    // crater
-	    if(16 < index && index < 23)
-		return DIRECTION_CENTER_ROW | DIRECTION_BOTTOM_ROW;
-	    // lake
-	    else
-	    if((22 < index && index < 39) || (47 < index && index < 52)) return 0;
-	    else
-	    if((39 < index && index < 46) || (52 < index && index < 57) || (56 < index && index < 59))
-		return DIRECTION_CENTER_ROW | DIRECTION_BOTTOM_ROW;
-	    else
-	    // shrub
-	    if((59 < index && index < 62) || (62 < index && index < 65) || (65 < index && index < 68) ||
-		69 == index || 71 == index || (72 < index && index < 75) || (75 < index && index < 78) ||
-		(78 < index && index < 81) || (81 < index && index < 84) || (84 < index && index < 87) || (87 < index && index < 91))
-		return DIRECTION_CENTER_ROW | DIRECTION_BOTTOM_ROW;
-	    else
-	    // rock
-	    if((91 < index && index < 94) || (97 < index && index < 100) || (100 < index && index < 103) || (103 < index && index < 106))
-		return DIRECTION_CENTER_ROW | DIRECTION_BOTTOM_ROW;
-	    else
-	    // trees
-	    if(118 == index || 123  == index || 127 == index)
-		return DIRECTION_CENTER_ROW | DIRECTION_BOTTOM_ROW;
-	    else
-	    // faerie ring
-	    if(128 < index && index < 131)
-		return DIRECTION_CENTER_ROW | DIRECTION_BOTTOM_ROW;
-	    else
-	    // hill fort
-	    if(132 < index && index < 134)  return 0;
-	    else
-	    if(134 == index || index == 135)
-		return DIRECTION_CENTER_ROW | DIRECTION_BOTTOM_ROW;
-	    else
-	    // halfling hole
-	    if(136 < index && index < 140)
-		return DIRECTION_CENTER_ROW | DIRECTION_BOTTOM_ROW;
-	    else
-	    // tree city
-	    if(150 < index && index < 153)
-		return DIRECTION_CENTER_ROW | DIRECTION_BOTTOM_ROW;
-	    else
-	    // wind mill
-	    if(185 == index || 189 == index)
-		return DIRECTION_CENTER_ROW | DIRECTION_BOTTOM_ROW;
-	    else
-	    // oracul
-	    if(196 < index && index < 199)
-		return DIRECTION_CENTER_ROW | DIRECTION_BOTTOM_ROW;
-	    else
-	    // obelisk
-	    if(201 == index)  return 0;
-	    else
-		return DIRECTION_ALL;
+    /*
+	abandone mine: 8
+	faerie ring: 129
+	hill fort: 135
+	halfling hole: 138
+	tree city: 151
+	wind mill: 185
+	oracul: 197, 198
+	obelisk: 201
+    */
 
-	default: break;
-    }
-
-    return 0;
+    const u8 actions[] = { 8, 129, 135, 138, 151, 185, 197, 198, 201 };
+    return ARRAY_COUNT_END(actions) != std::find(actions, ARRAY_COUNT_END(actions), index);
 }
 
-bool ObjDirt::isShadow(const u16 & icn, const u8 & index)
+bool ObjDirt::isShadow(const u8 & index)
 {
-    const u8 shadows[] = { 0, 1, 5, 6, 14, 59, 62, 65, 68, 70, 72, 75, 78, 81, 84, 87, 91, 94, 97, 100, 103, 111, 117, 126, 128, 136, 149, 150, 
-		161, 162, 163, 164, 165, 166, 167, 168, 178, 179, 180, 180, 182, 183, 184, 196, 200 };
+    const u8 shadows[] = { 0, 1, 5, 6, 14, 47, 52, 59, 62, 65, 68, 70, 72, 75, 78, 81, 84,
+	    87, 91, 94, 97, 100, 103, 111, 114, 117, 126, 128, 136, 149, 150, 161, 165, 177, 181, 196, 200 };
+
     return ARRAY_COUNT_END(shadows) != std::find(shadows, ARRAY_COUNT_END(shadows), index);
 }

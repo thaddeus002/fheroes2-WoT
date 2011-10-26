@@ -26,7 +26,6 @@
 #include "world.h"
 #include "direction.h"
 #include "settings.h"
-#include "object.h"
 #include "heroes.h"
 #include "route.h"
 #include "algorithm.h"
@@ -69,7 +68,7 @@ bool PassableToTile(const Heroes* hero, const Maps::Tiles & toTile, const Direct
 
 	// check direct to object
 	if(MP2::isActionObject(toTile.GetObject(false), (hero ? hero->isShipMaster() : false)))
-	    return Object::AllowDirect(toTile.GetObject(false), Direction::Reflect(direct));
+	    return Direction::Reflect(direct) & MP2::GetObjectDirect(toTile.GetObject(false));
 
 	if(MP2::OBJ_HEROES == toTile.GetObject())
 	    return toTile.isPassable(NULL, Direction::Reflect(direct), false);
@@ -115,7 +114,7 @@ bool PassableFromToTile(const Heroes* hero, const s32 & from, const s32 & to, co
 	if(MP2::isActionObject(hero->GetUnderObject(), hero->isShipMaster()))
 	{
 	    // check direct from object
-	    if(! Object::AllowDirect(hero->GetUnderObject(), direct))
+	    if(! (direct & MP2::GetObjectDirect(hero->GetUnderObject())))
 		return false;
 	}
 	else
@@ -130,7 +129,7 @@ bool PassableFromToTile(const Heroes* hero, const s32 & from, const s32 & to, co
 	if(MP2::isActionObject(fromTile.GetObject(), (hero ? hero->isShipMaster() : false)))
 	{
 	    // check direct from object
-	    if(! Object::AllowDirect(fromTile.GetObject(), direct))
+	    if(! (direct & MP2::GetObjectDirect(fromTile.GetObject())))
 		return false;
 	}
 	else

@@ -1791,29 +1791,6 @@ bool ICN::NeedMinify4PocketPC(const icn_t & icn, const u16 & index)
     return false;
 }
 
-bool ICN::SkipBottomForRedrawHeroes(const icn_t & icn, const u8 & index)
-{
-    switch(icn)
-    {
-	case ICN::OBJNTWBA:
-        case ICN::ROAD:
-        case ICN::STREAM:
-            return true;
-
-	case ICN::OBJNCRCK: return ObjWasteLand::isPassable(icn, index, DIRECTION_TOP_ROW);
-	case ICN::OBJNDIRT: return ObjDirt::isPassable(icn, index, DIRECTION_TOP_ROW);
-	case ICN::OBJNDSRT: return ObjDesert::isPassable(icn, index, DIRECTION_TOP_ROW);
-	case ICN::OBJNGRA2:
-	case ICN::OBJNGRAS: return ObjGrass::isPassable(icn, index, DIRECTION_TOP_ROW);
-	case ICN::OBJNLAVA: return ObjLava::isPassable(icn, index, DIRECTION_TOP_ROW);
-	case ICN::OBJNSNOW: return ObjSnow::isPassable(icn, index, DIRECTION_TOP_ROW);
-	case ICN::OBJNSWMP: return ObjSwamp::isPassable(icn, index, DIRECTION_TOP_ROW);
-
-        default: break;
-    }
-    return false;
-}
-
 u8 ICN::missile9(float dx, float dy)
 {
     if(0 == dx)		return dy > 0 ? 0 : 8;

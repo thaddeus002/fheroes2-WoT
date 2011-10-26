@@ -21,165 +21,112 @@
  ***************************************************************************/
 
 #include "icn.h"
-#include "mp2.h"
-#include "maps_tiles.h"
+#include "direction.h"
 #include "objxloc.h"
 
-bool ObjLoyalty::isPassable(const u16 & icn, const u8 & index, u16 direct)
+u16 ObjXlc1::GetPassable(const u8 & index)
 {
-    return direct & GetPassable(icn, index);
+    const u8 disabled[] = { 40, 49, 50 };
+    const u8 restricted[] = { 69, 71, 75, 76,  85, 103, 117, 119, 126, 128, 134, 136 };
+
+    if(isShadow(index))
+        return DIRECTION_ALL;
+    else
+    if(isAction(index) ||
+        ARRAY_COUNT_END(disabled) != std::find(disabled, ARRAY_COUNT_END(disabled), index))
+        return 0;
+
+    return ARRAY_COUNT_END(restricted) != std::find(restricted, ARRAY_COUNT_END(restricted), index) ?
+            DIRECTION_CENTER_ROW | DIRECTION_BOTTOM_ROW : DIRECTION_ALL;
 }
 
-u16 ObjLoyalty::GetPassable(const u16 & icn, const u8 & index)
+bool ObjXlc1::isAction(const u8 & index)
 {
-    switch(icn)
-    {
-	case ICN::X_LOC1:
-	    // alchemist tower
-	    if(3 == index) return 0;
-	    else
-	    // arena
-	    if(31 == index || 40 == index || (48 < index && index < 51)) return 0;
-	    else
-	    if(68 < index && index < 72)
-		return DIRECTION_CENTER_ROW | DIRECTION_BOTTOM_ROW;
-	    else
-	    // barrow mounds
-	    if(74 < index && index < 78)
-		return DIRECTION_CENTER_ROW | DIRECTION_BOTTOM_ROW;
-	    else
-	    // eath altar
-	    if(85 == index || 94 == index || 103 == index)
-		return DIRECTION_CENTER_ROW | DIRECTION_BOTTOM_ROW;
-	    else
-	    // air altar
-	    if(116 < index && index < 120)
-		return DIRECTION_CENTER_ROW | DIRECTION_BOTTOM_ROW;
-	    else
-	    // fire altar
-	    if(125 < index && index < 129)
-		return DIRECTION_CENTER_ROW | DIRECTION_BOTTOM_ROW;
-	    else
-	    // water altar
-	    if(133 < index && index < 137)
-		return DIRECTION_CENTER_ROW | DIRECTION_BOTTOM_ROW;
-	    else
-		return DIRECTION_ALL;
+    /*
+	alchemist tower: 3
+	arena: 70
+	barrow mounds: 77
+	eath altar: 94
+	air altar: 118
+	fire altar: 127
+	water altar: 135
+    */
+    const u8 actions[] = { 3, 70, 77, 94, 118, 127, 135 };
 
-	case ICN::X_LOC2:
-	    // stables
-	    if(2 < index && index < 5)
-		return DIRECTION_CENTER_ROW | DIRECTION_BOTTOM_ROW;
-	    else
-	    // jail
-	    if(9 == index) return 0;
-	    else
-	    // mermaid
-	    if(37 == index) return 0;
-	    else
-	    // sirens
-	    if(101 == index) return 0;
-	    else
-	    if(92 == index || 102 == index)
-		return DIRECTION_CENTER_ROW | DIRECTION_BOTTOM_ROW;
-	    else
-	    // reefs
-	    if(110 < index && index < 136) return 0;
-	    else
-		return DIRECTION_ALL;
-
-	case ICN::X_LOC3:
-	    // hut magi
-	    if(30 == index) return 0;
-	    else
-	    // eyes magi
-	    if(50 == index) return 0;
-	    else
-	    // barrier
-	    if(60 == index || 66 == index || 72 == index ||
-		78 == index || 84 == index || 90 == index ||
-		96 == index || 102 == index) return 0;
-	    else
-	    // traveller tent
-	    if(110 == index || 114 == index || 118 == index ||
-		122 == index || 126 == index || 130 == index ||
-		134 == index || 138 == index) return 0;
-	    else
-		return DIRECTION_ALL;
-
-	default: break;
-    }
-
-    return 0;
+    return ARRAY_COUNT_END(actions) != std::find(actions, ARRAY_COUNT_END(actions), index);
 }
 
-u8 ObjLoyalty::LearnObject(const Maps::TilesAddon & addon)
+bool ObjXlc1::isShadow(const u8 & index)
 {
-    switch(MP2::GetICNObject(addon.object))
-    {
-	case ICN::X_LOC1:
-	    if(addon.index == 3) return MP2::OBJ_ALCHEMYTOWER;
-	    else
-	    if(addon.index < 3) return MP2::OBJN_ALCHEMYTOWER;
-	    else
-	    if(70 == addon.index) return MP2::OBJ_ARENA;
-	    else
-	    if(3 < addon.index && addon.index < 72) return MP2::OBJN_ARENA;
-	    else
-	    if(77 == addon.index) return MP2::OBJ_BARROWMOUNDS;
-	    else
-	    if(71 < addon.index && addon.index < 78) return MP2::OBJN_BARROWMOUNDS;
-	    else
-	    if(94 == addon.index) return MP2::OBJ_EARTHALTAR;
-	    else
-	    if(77 < addon.index && addon.index < 112) return MP2::OBJN_EARTHALTAR;
-	    else
-	    if(118 == addon.index) return MP2::OBJ_AIRALTAR;
-	    else
-	    if(111 < addon.index && addon.index < 120) return MP2::OBJN_AIRALTAR;
-	    else
-	    if(127 == addon.index) return MP2::OBJ_FIREALTAR;
-	    else
-	    if(119 < addon.index && addon.index < 129) return MP2::OBJN_FIREALTAR;
-	    else
-	    if(135 == addon.index) return MP2::OBJ_WATERALTAR;
-	    else
-	    if(128 < addon.index && addon.index < 137) return MP2::OBJN_WATERALTAR;
-	    break;
+    const u8 shadows [] = { 1, 2, 59, 68, 72, 78, 79, 83, 84, 112, 116, 120, 124, 125, 129, 133 };
 
-	case ICN::X_LOC2:
-	    if(addon.index == 4) return MP2::OBJ_STABLES;
-	    else
-	    if(addon.index < 4) return MP2::OBJN_STABLES;
-	    else
-	    if(addon.index == 9) return MP2::OBJ_JAIL;
-	    else
-	    if(4 < addon.index && addon.index < 10) return MP2::OBJN_JAIL;
-	    else
-	    if(addon.index == 37) return MP2::OBJ_MERMAID;
-	    else
-	    if(9 < addon.index && addon.index < 47) return MP2::OBJN_MERMAID;
-	    else
-	    if(addon.index == 101) return MP2::OBJ_SIRENS;
-	    else
-	    if(46 < addon.index && addon.index < 111) return MP2::OBJN_SIRENS;
-	    else
-	    if(110 < addon.index && addon.index < 136) return MP2::OBJ_REEFS;
-	    break;
+    return ARRAY_COUNT_END(shadows) != std::find(shadows, ARRAY_COUNT_END(shadows), index);
+}
 
-	case ICN::X_LOC3:
-	    if(addon.index == 30) return MP2::OBJ_HUTMAGI;
-	    else
-	    if(addon.index < 32) return MP2::OBJN_HUTMAGI;
-	    else
-	    if(addon.index == 50) return MP2::OBJ_EYEMAGI;
-	    else
-	    if(31 < addon.index && addon.index < 59) return MP2::OBJN_EYEMAGI;
-	    // fix
-	    break;
+u16 ObjXlc2::GetPassable(const u8 & index)
+{
+    const u8 restricted[] = { 3, 8, 28, 46, 92, 102 };
 
-	default: break;
-    }
+    if(isShadow(index))
+        return DIRECTION_ALL;
+    else
+    if(isAction(index) ||
+	(110 < index && index < 136))
+	return 0;
 
-    return MP2::OBJ_ZERO;
+    return ARRAY_COUNT_END(restricted) != std::find(restricted, ARRAY_COUNT_END(restricted), index) ?
+            DIRECTION_CENTER_ROW | DIRECTION_BOTTOM_ROW : DIRECTION_ALL;
+}
+
+bool ObjXlc2::isAction(const u8 & index)
+{
+    /*
+	stables: 4
+	jail: 9
+	mermaid: 37
+	sirens: 101
+    */
+    const u8 actions[] = { 4, 9, 37, 101 };
+
+    return ARRAY_COUNT_END(actions) != std::find(actions, ARRAY_COUNT_END(actions), index);
+}
+
+bool ObjXlc2::isShadow(const u8 & index)
+{
+    const u8 shadows [] = { 2, 10, 47, 83 };
+
+    return ARRAY_COUNT_END(shadows) != std::find(shadows, ARRAY_COUNT_END(shadows), index);
+}
+
+
+u16 ObjXlc3::GetPassable(const u8 & index)
+{
+    if(isShadow(index))
+        return DIRECTION_ALL;
+    else
+    if(isAction(index))
+        return 0;
+
+    return DIRECTION_ALL;
+}
+
+bool ObjXlc3::isAction(const u8 & index)
+{
+    /*
+	hut magi: 30
+	eyes magi: 50
+	barrier: 60, 66, 72, 78, 84, 90, 96, 102
+	traveller tent: 110, 114, 118, 122, 126, 130, 134, 138
+    */
+    const u8 actions[] = { 30, 50, 60, 66, 72, 78, 84, 90, 96, 102, 110, 114, 118, 122, 126, 130, 134, 138 };
+
+    return ARRAY_COUNT_END(actions) != std::find(actions, ARRAY_COUNT_END(actions), index);
+}
+
+bool ObjXlc3::isShadow(const u8 & index)
+{
+    const u8 shadows [] = { 0, 9, 20, 29, 41, 59, 65, 71, 77, 83, 89, 95, 101,
+	108, 109, 112, 113, 116, 117, 120, 121, 124, 125, 128, 129, 132, 133, 136, 137 };
+
+    return ARRAY_COUNT_END(shadows) != std::find(shadows, ARRAY_COUNT_END(shadows), index);
 }

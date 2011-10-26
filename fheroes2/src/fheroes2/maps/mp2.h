@@ -269,7 +269,7 @@ namespace MP2
 	OBJ_UNKNW_02		= 0x02,
 	OBJN_ALCHEMYLAB		= 0x01,
 	OBJ_UNKNW_03		= 0x03,
-	OBJ_UNKNW_04		= 0x04,
+	OBJN_SKELETON		= 0x04,
 	OBJN_DAEMONCAVE		= 0x05,
 	OBJ_UNKNW_06		= 0x06,
 	OBJN_FAERIERING		= 0x07,
@@ -557,6 +557,8 @@ namespace MP2
     bool isWeekLife(const u8 obj);
     bool isMonthLife(const u8 obj);
     bool isBattleLife(const u8 obj);
+
+    u16  GetObjectDirect(const u8 obj);
 }
 
 #endif

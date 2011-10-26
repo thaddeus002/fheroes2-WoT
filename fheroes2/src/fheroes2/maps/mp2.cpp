@@ -21,6 +21,7 @@
  ***************************************************************************/
 
 #include "settings.h"
+#include "direction.h"
 #include "mp2.h"
 
 /* return name icn object */
@@ -481,6 +482,7 @@ const char* MP2::StringObject(u8 object)
         case OBJ_LAVAPOOL:		return _("Lava Pool");
         case OBJ_SHRUB:			return _("Shrub");
         case OBJ_BUOY:			return _("Buoy");
+        case OBJN_SKELETON:
         case OBJ_SKELETON:		return _("Skeleton");
         case OBJ_TREASURECHEST:		return _("Treasure Chest");
         case OBJ_WATERCHEST:		return _("Sea Chest");
@@ -552,7 +554,6 @@ const char* MP2::StringObject(u8 object)
 
 	case OBJ_UNKNW_02:		return "OBJ_UNKNW_02";
 	case OBJ_UNKNW_03:		return "OBJ_UNKNW_03";
-	case OBJ_UNKNW_04:		return "OBJ_UNKNW_04";
 	case OBJ_UNKNW_06:		return "OBJ_UNKNW_06";
 	case OBJ_UNKNW_08:		return "OBJ_UNKNW_08";
 	case OBJ_UNKNW_09:		return "OBJ_UNKNW_09";
@@ -1006,4 +1007,104 @@ bool MP2::isClearGroundObject(const u8 obj)
     }
 
     return false;
+}
+
+u16 MP2::GetObjectDirect(const u8 obj)
+{
+    switch(obj)
+    {
+        case OBJ_SHIPWRECK:
+            return Direction::CENTER | Direction::LEFT | DIRECTION_BOTTOM_ROW;
+
+        case OBJ_DERELICTSHIP:
+            return Direction::CENTER | Direction::LEFT | Direction::BOTTOM_LEFT | Direction::BOTTOM;
+
+        case OBJ_ARCHERHOUSE:
+        case OBJ_DOCTORHUT:
+        case OBJ_DWARFCOTT:
+        case OBJ_THATCHEDHUT:
+        case OBJ_FOUNTAIN:
+        case OBJ_IDOL:
+        case OBJ_LIGHTHOUSE:
+        case OBJ_OBELISK:
+        case OBJ_SIGN:
+        case OBJ_WATCHTOWER:
+        case OBJ_WITCHSHUT:
+        case OBJ_GAZEBO:
+        case OBJ_MAGICWELL:
+        case OBJ_OBSERVATIONTOWER:
+        case OBJ_PEASANTHUT:
+        case OBJ_TROLLBRIDGE:
+        case OBJ_STONELIGHTS:
+        case OBJ_STANDINGSTONES:
+        case OBJ_GOBLINHUT:
+        case OBJ_SHRINE1:
+        case OBJ_SHRINE2:
+        case OBJ_SHRINE3:
+        case OBJ_TREEHOUSE:
+        case OBJ_ARTESIANSPRING:
+        case OBJ_SKELETON:
+        case OBJ_TREEKNOWLEDGE:
+        case OBJ_ORACLE:
+        case OBJ_OASIS:
+        case OBJ_LEANTO:
+        case OBJ_MAGICGARDEN:
+        case OBJ_WAGON:
+        //case OBJ_BARRIER: // because Barrier used with any direction
+        case OBJ_TRAVELLERTENT:
+        case OBJ_JAIL:
+        case OBJ_ALCHEMYTOWER:
+        case OBJ_HUTMAGI:
+        case OBJ_EYEMAGI:
+        case OBJ_MERCENARYCAMP:
+        case OBJ_WINDMILL:
+        case OBJ_WATERINGHOLE:
+        case OBJ_TRADINGPOST:
+        case OBJ_EXCAVATION:
+        case OBJ_DESERTTENT:
+        case OBJ_DAEMONCAVE:
+        case OBJ_PYRAMID:
+        case OBJ_FORT:
+        case OBJ_RUINS:
+        case OBJ_HILLFORT:
+        case OBJ_FREEMANFOUNDRY:
+        case OBJ_SAWMILL:
+        case OBJ_TREECITY:
+        case OBJ_SPHINX:
+        case OBJ_TEMPLE:
+        case OBJ_FAERIERING:
+        case OBJ_BARROWMOUNDS:
+        case OBJ_STABLES:
+        case OBJ_ABANDONEDMINE:
+        case OBJ_MINES:
+        case OBJ_ALCHEMYLAB:
+        case OBJ_CAVE:
+        case OBJ_CITYDEAD:
+        case OBJ_GRAVEYARD:
+        case OBJ_DRAGONCITY:
+        case OBJ_XANADU:
+        case OBJ_HALFLINGHOLE:
+        case OBJ_WAGONCAMP:
+        case OBJ_WATERALTAR:
+        case OBJ_AIRALTAR:
+        case OBJ_FIREALTAR:
+        case OBJ_EARTHALTAR:
+        case OBJ_ARENA:
+        case OBJ_SIRENS:
+        case OBJ_MERMAID:
+            return DIRECTION_CENTER_ROW | DIRECTION_BOTTOM_ROW;
+
+        case OBJ_WATERWHEEL:
+            return Direction::CENTER | Direction::RIGHT | DIRECTION_BOTTOM_ROW;
+
+        case OBJ_MAGELLANMAPS:
+            return Direction::CENTER | Direction::LEFT | DIRECTION_BOTTOM_ROW;
+
+        case OBJ_CASTLE:
+            return Direction::CENTER | Direction::BOTTOM;
+
+        default: break;
+    }
+
+    return DIRECTION_ALL;
 }

@@ -23,13 +23,27 @@
 #ifndef H2OBJLAVA_H
 #define H2OBJLAVA_H
 
-#include "object.h"
+#include "gamedefs.h"
+
+namespace ObjLav2
+{
+    bool	isAction(const u8 & index);
+    bool	isShadow(const u8 & index);
+    u16         GetPassable(const u8 & index);
+}
+
+namespace ObjLav3
+{
+    bool	isAction(const u8 & index);
+    bool	isShadow(const u8 & index);
+    u16         GetPassable(const u8 & index);
+}
 
 namespace ObjLava
 {
-    bool	isPassable(const u16 & icn, const u8 & index, u16 direct);
-    bool	isShadow(const u16 & icn, const u8 & index);
-    u16         GetPassable(const u16 & icn, const u8 & index);
+    bool	isAction(const u8 & index);
+    bool	isShadow(const u8 & index);
+    u16         GetPassable(const u8 & index);
 }
 
 #endif

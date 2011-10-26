@@ -21,100 +21,83 @@
  ***************************************************************************/
 
 #include "icn.h"
+#include "direction.h"
 #include "objlava.h"
 
-bool ObjLava::isPassable(const u16 & icn, const u8 & index, u16 direct)
+u16 ObjLav2::GetPassable(const u8 & index)
 {
-    return direct & GetPassable(icn, index);
+    if(isShadow(index))
+        return DIRECTION_ALL;
+    else
+    if(isAction(index))
+        return 0;
+
+    return DIRECTION_CENTER_ROW | DIRECTION_BOTTOM_ROW;
 }
 
-u16 ObjLava::GetPassable(const u16 & icn, const u8 & index)
+bool ObjLav2::isAction(const u8 & index)
 {
-    switch(icn)
-    {
-	case ICN::OBJNLAV2:
-	    // volcano
-	    if((129 < index && index < 133) || (78 < index && index < 82))
-		return DIRECTION_CENTER_ROW | DIRECTION_BOTTOM_ROW;
-            else
-                return DIRECTION_ALL;
-
-	case ICN::OBJNLAV3:
-	    // volcano
-	    if(243 < index && index < 247)
-		return DIRECTION_CENTER_ROW | DIRECTION_BOTTOM_ROW;
-            else
-                return DIRECTION_ALL;
-
-	case ICN::OBJNLAVA:
-	    // crater
-	    if((1 < index && index < 6) || (11 < index && index < 16)) return 0;
-	    else
-	    if((5 < index && index < 10) || (15 < index && index < 18))
-		return DIRECTION_CENTER_ROW | DIRECTION_BOTTOM_ROW;
-	    else
-	    // lava pool
-	    if(18 == index || (26 < index && index < 33) || (38 < index && index < 42) ||
-		(45 < index && index < 49) || ( 52 < index && index < 55) || (57 == index) || (59 < index && index < 62) ||
-		(63 < index && index < 66) || (68 < index && index < 71)) return 0;
-	    else
-	    if(20 < index && index < 26)
-                return DIRECTION_ALL;
-	    else
-	    if((18 < index && index < 21) || (32 < index && index < 39) || (41 < index && index < 45) ||
-		(49 < index && index < 53) || (54 < index && index < 57) || (57 < index && index < 60) || (61 < index || index < 63) ||
-		(65 < index && index < 69) || (71 < index && index < 74))
-		return DIRECTION_CENTER_ROW | DIRECTION_BOTTOM_ROW;
-	    else
-	    // volcano
-	    if((75 < index && index < 78) || 88 == index || 98 == index)
-		return DIRECTION_CENTER_ROW | DIRECTION_BOTTOM_ROW;
-	    else
-	    // obelisk
-	    if(110 == index) return 0;
-	    else
-	    // daemon cave
-	    if(113 < index && index < 116)
-		return DIRECTION_CENTER_ROW | DIRECTION_BOTTOM_ROW;
-	    else
-	    // sign
-	    if(117 == index) return 0;
-	    else
-	    // saw mill
-	    if(119 < index && index < 122) return 0;
-	    else
-	    if(121 < index && index < 127)
-		return DIRECTION_CENTER_ROW | DIRECTION_BOTTOM_ROW;
-	    else
-		return DIRECTION_ALL;
-
-	default: break;
-    }
-
-    return 0;
-}
-
-bool ObjLava::isShadow(const u16 & icn, const u8 & index)
-{
-    const u8 shadows[] = { 10, 11, 45, 49, 109, 113, 116 };
-
-    switch(icn)
-    {
-	case ICN::OBJNLAV2:
-	    if((6 < index && index < 21) || 29 == index || (42 < index && index < 79))
-        	return true;
-	    break;
-
-	case ICN::OBJNLAV3:
-	    if((115 < index && index < 140) || (175 < index && index < 240) || 243 == index)
-        	return true;
-	    break;
-
-	case ICN::OBJNLAVA:
-            return ARRAY_COUNT_END(shadows) != std::find(shadows, ARRAY_COUNT_END(shadows), index);
-
-	default: break;
-    }
-
     return false;
+}
+
+bool ObjLav2::isShadow(const u8 & index)
+{
+    const u8 shadows[] = { 0, 7, 14, 29, 33, 44, 55, 78 };
+    return ARRAY_COUNT_END(shadows) != std::find(shadows, ARRAY_COUNT_END(shadows), index);
+}
+
+u16 ObjLav3::GetPassable(const u8 & index)
+{
+    if(isShadow(index))
+        return DIRECTION_ALL;
+    else
+    if(isAction(index))
+        return 0;
+
+    return DIRECTION_CENTER_ROW | DIRECTION_BOTTOM_ROW;
+}
+
+bool ObjLav3::isAction(const u8 & index)
+{
+    return false;
+}
+
+bool ObjLav3::isShadow(const u8 & index)
+{
+    const u8 shadows[] = { 0, 15, 30, 45, 60, 75, 90, 105, 120, 135, 165, 180, 195, 210, 225, 243 };
+    return ARRAY_COUNT_END(shadows) != std::find(shadows, ARRAY_COUNT_END(shadows), index);
+}
+
+u16 ObjLava::GetPassable(const u8 & index)
+{
+    const u8 disabled[] = { 2, 3, 4, 5, 12, 13, 14, 15, 18, 27, 28, 29, 30, 31, 32, 39, 40,
+		    41, 46, 47, 48, 53, 54, 57, 60, 61, 64, 65, 69, 70, 120, 121 };
+
+    const u8 restricted[] = { 6, 7, 8, 9, 16, 17, 19, 20, 33, 34, 35, 36, 37, 38, 42, 43, 44,
+		    50, 51, 52, 55, 56, 58, 59, 62, 66, 67, 68, 72, 73, 76, 77, 88, 98, 114, 122, 123, 125 };
+
+    if(isAction(index) ||
+	ARRAY_COUNT_END(disabled) != std::find(disabled, ARRAY_COUNT_END(disabled), index))
+        return 0;
+
+    return ARRAY_COUNT_END(restricted) != std::find(restricted, ARRAY_COUNT_END(restricted), index) ?
+            DIRECTION_CENTER_ROW | DIRECTION_BOTTOM_ROW : DIRECTION_ALL;
+}
+
+bool ObjLava::isAction(const u8 & index)
+{
+/*
+    obelisk: 110
+    daemon cave: 115
+    sign: 117
+    saw mill: 124
+*/
+    const u8 actions[] = { 110, 115, 117, 124 };
+    return ARRAY_COUNT_END(actions) != std::find(actions, ARRAY_COUNT_END(actions), index);
+}
+
+bool ObjLava::isShadow(const u8 & index)
+{
+    const u8 shadows[] = { 10, 11, 45, 49, 77, 109, 113, 116 };
+    return ARRAY_COUNT_END(shadows) != std::find(shadows, ARRAY_COUNT_END(shadows), index);
 }

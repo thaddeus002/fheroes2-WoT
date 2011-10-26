@@ -23,52 +23,59 @@
 #include "icn.h"
 #include "direction.h"
 #include "objtown.h"
-#include "settings.h"
 
-bool ObjTown::isPassable(const u16 & icn, const u8 & index, u16 direct)
+u16 ObjTown::GetPassable(const u8 & index0)
 {
-    return direct & GetPassable(icn, index);
+    u8 index = index0 % 32;
+
+    // 13, 29, 45, 61, 77, 93, 109, 125, 141, 157, 173, 189
+    if(13 == index || 29 == index)
+	return Direction::CENTER | Direction::BOTTOM;
+    else
+    // town/castle
+    if((5 < index && index < 13) || (13 < index && index < 16) ||
+	(21 < index && index < 29) || (29 < index)) return 0;
+
+    return DIRECTION_ALL;
 }
 
-u16 ObjTown::GetPassable(const u16 & icn, const u8 & index0)
+u16 ObjTwba::GetPassable(const u8 & index0)
 {
-    u8 index = index0;
+    u8 index = index0 % 10;
 
-    switch(icn)
-    {
-	case ICN::OBJNTWBA:
-	    index = index0 % 10;
-	     // 2, 12, 22, 32, 42, 52, 62, 72
-	    if(2 == index)
-		return Direction::CENTER | Direction::BOTTOM;
-            else
-	    if(index < 5)
-		return 0;
-	    else
-	     // 7, 17, 27, 37, 47, 57, 67, 77
-	    if(7 == index)
-		return DIRECTION_CENTER_ROW | DIRECTION_BOTTOM_ROW | Direction::TOP;
-	    else
-	    if(4 < index)
-		return DIRECTION_CENTER_ROW | DIRECTION_BOTTOM_ROW;
-            else
-                return DIRECTION_ALL;
-	    break;
+    // 2, 12, 22, 32, 42, 52, 62, 72
+    if(2 == index)
+	return Direction::CENTER | Direction::BOTTOM;
+    else
+    if(index < 5)
+	return 0;
+    else
+    // 7, 17, 27, 37, 47, 57, 67, 77
+    if(7 == index)
+	return DIRECTION_CENTER_ROW | DIRECTION_BOTTOM_ROW | Direction::TOP;
+    else
+    if(4 < index)
+	return DIRECTION_CENTER_ROW | DIRECTION_BOTTOM_ROW;
 
-	case ICN::OBJNTOWN:
-	    index = index0 % 32;
-	    // 13, 29, 45, 61, 77, 93, 109, 125, 141, 157, 173, 189
-	    if(13 == index || 29 == index)
-		return Direction::CENTER | Direction::BOTTOM;
-	    else
-	    // town/castle
-	    if((5 < index && index < 13) || (13 < index && index < 16) ||
-		(21 < index && index < 29) || (29 < index)) return 0;
-	    else
-		return DIRECTION_ALL;
+    return DIRECTION_ALL;
+}
 
-	default: break;
-    }
+bool ObjTown::isAction(const u8 & index)
+{
+    return false;
+}
 
-    return 0;
+bool ObjTwba::isAction(const u8 & index)
+{
+    return false;
+}
+
+bool ObjTown::isShadow(const u8 & index)
+{
+    return false;
+}
+
+bool ObjTwba::isShadow(const u8 & index)
+{
+    return false;
 }

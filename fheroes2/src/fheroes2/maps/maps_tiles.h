@@ -86,6 +86,7 @@ namespace Maps
 	static bool isRandomCastle(const TilesAddon &);
 	static bool isRandomMonster(const TilesAddon &);
 	static bool isSkeleton(const TilesAddon &);
+	static bool isSkeletonFix(const TilesAddon &);
 	static bool isFlag32(const TilesAddon &);
 	static bool isX_LOC123(const TilesAddon &);
 	static bool isAbandoneMineSprite(const TilesAddon &);
@@ -93,8 +94,8 @@ namespace Maps
 	static bool isRocs(const TilesAddon &);
 	static bool isForests(const TilesAddon &);
 	static bool isTrees(const TilesAddon &);
-	static bool isPassable(const TilesAddon &, u16 direct);
-	static u16  GetPassable(const Maps::TilesAddon &);
+	static u16  GetPassable(const TilesAddon &);
+	static u8   GetLoyaltyObject(const TilesAddon &);
 
 	static bool PredicateSortRules1(const TilesAddon &, const TilesAddon &);
 	static bool PredicateSortRules2(const TilesAddon &, const TilesAddon &);
@@ -187,8 +188,6 @@ namespace Maps
 	bool isFog(u8 color) const;
 	void ClearFog(u8 color);
 
-	void FixLoyaltyVersion(void);
-
 	/* monster operation */
 	bool MonsterJoinConditionSkip(void) const;
 	bool MonsterJoinConditionMoney(void) const;
@@ -222,6 +221,7 @@ namespace Maps
 
 	static void PlaceMonsterOnTile(Tiles &, const Monster &, u16, u32);
 	static void UpdateAbandoneMineSprite(Tiles &);
+	static void FixedPreload(Tiles &);
 
     private:
 	TilesAddon* FindFlags(void);

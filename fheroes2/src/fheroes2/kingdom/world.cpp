@@ -816,9 +816,7 @@ void World::LoadMaps(const std::string &filename)
     {
 	Maps::Tiles & tile = vec_tiles[ii];
 
-	// fix loyalty version objects
-	if(Settings::Get().PriceLoyaltyVersion())
-	    tile.FixLoyaltyVersion();
+	Maps::Tiles::FixedPreload(tile);
 
 	//
 	switch(tile.GetObject())

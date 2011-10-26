@@ -21,119 +21,78 @@
  ***************************************************************************/
 
 #include "icn.h"
+#include "direction.h"
 #include "objgras.h"
-#include <iostream>
 
-bool ObjGrass::isPassable(const u16 & icn, const u8 & index, u16 direct)
+u16 ObjGras::GetPassable(const u8 & index)
 {
-    return direct & GetPassable(icn, index);
+    const u8 disabled[] = { 54, 55, 56, 57, 58, 65, 66, 67, 68 };
+    const u8 restricted[] = { 5, 7, 31, 33, 34, 37, 38, 40, 41, 43, 45, 47, 49, 59,
+	60, 61, 62, 63, 69, 70, 71, 72, 73, 74, 75, 77, 78, 83, 84, 85, 89, 90, 93, 95,
+	96, 97, 99, 100, 101, 103, 104, 106, 107, 109, 110, 112, 114, 115, 116, 121, 122,
+	123, 125, 126, 127, 129, 130, 131, 135, 136, 139, 140, 142, 144, 146, 148, 149, 150, };
+
+    if(isShadow(index))
+    	return DIRECTION_ALL;
+    else
+    if(isAction(index) ||
+	ARRAY_COUNT_END(disabled) != std::find(disabled, ARRAY_COUNT_END(disabled), index))
+        return 0;
+
+    return ARRAY_COUNT_END(restricted) != std::find(restricted, ARRAY_COUNT_END(restricted), index) ?
+            DIRECTION_CENTER_ROW | DIRECTION_BOTTOM_ROW : DIRECTION_ALL;
 }
 
-u16 ObjGrass::GetPassable(const u16 & icn, const u8 & index)
+bool ObjGras::isAction(const u8 & index)
 {
-    switch(icn)
-    {
-	case ICN::OBJNGRA2:
-	    // hill fort
-	    if(1 < index && index < 5)
-		return DIRECTION_CENTER_ROW | DIRECTION_BOTTOM_ROW;
-	    else
-	    // halfling hole
-	    if(5 < index && index < 9)
-		return DIRECTION_CENTER_ROW | DIRECTION_BOTTOM_ROW;
-	    else
-	    // tree city
-	    if(20 < index && index < 23)
-		return DIRECTION_CENTER_ROW | DIRECTION_BOTTOM_ROW;
-	    else
-	    // wind mill
-	    if(55 == index || 59 == index)
-		return DIRECTION_CENTER_ROW | DIRECTION_BOTTOM_ROW;
-	    else
-	    // archer house
-	    if(84 == index) return 0;
-	    else
-	    // goblin hut
-	    if(92 == index) return 0;
-	    else
-	    // dwarf cottadge
-	    if(114 == index) return 0;
-	    else
-	    // oracul
-	    if(124 < index && index < 127)
-		return DIRECTION_CENTER_ROW | DIRECTION_BOTTOM_ROW;
-	    else
-	    // obelisk
-	    if(129 == index) return 0;
-	    else
-		return DIRECTION_ALL;	    
+/*
+    abandone mine: 6
+    faerie ring: 30
+*/
 
-	case ICN::OBJNGRAS:
-	    // abandoned mines
-	    if(3 == index)
-		return 0;
-	    else
-	    if(4 < index && index < 8)
-		return DIRECTION_CENTER_ROW | DIRECTION_BOTTOM_ROW;
-	    else
-	    // faerie ring
-	    if(29 < index && index < 32)
-		return DIRECTION_CENTER_ROW | DIRECTION_BOTTOM_ROW;
-	    else
-	    // rock
-	    if((32 < index && index < 35) || (36 < index && index < 39) || (39 < index && index < 42) ||
-		43 == index || 45 == index || 47 == index || 49 == index)
-		return DIRECTION_CENTER_ROW | DIRECTION_BOTTOM_ROW;
-	    else
-	    // lake
-	    if((53 < index && index < 59) || (64 < index && index < 69)) return 0;
-	    else
-	    if((58 < index && index < 64) || (68 < index && index < 73) || (72 < index && index < 76))
-		return DIRECTION_CENTER_ROW | DIRECTION_BOTTOM_ROW;
-	    else
-	    // mound
-	    if((76 < index && index < 79) || (148 < index && index < 151))
-		return DIRECTION_CENTER_ROW | DIRECTION_BOTTOM_ROW;
-	    else
-	    // trees
-	    if((82 < index && index < 86) || (88 < index && index < 91) || 93 == index)
-		return DIRECTION_CENTER_ROW | DIRECTION_BOTTOM_ROW;
-	    else
-	    // shrub
-	    if((94 < index && index < 98) || (98 < index && index < 102) || (102 < index && index < 105) ||
-		(105 < index && index < 108) || (108 < index && index < 111) || 112 == index ||
-		(113 < index && index < 117) || (120 < index && index < 124) || (124 < index && index < 128) ||
-		(128 < index && index < 132) || (134 < index && index < 137) || (138 < index && index < 141) ||
-		142 == index || 144 == index || 146 == index || 148 == index)
-		return DIRECTION_CENTER_ROW | DIRECTION_BOTTOM_ROW;
-	    else
-		return DIRECTION_ALL;
-
-	default: break;
-    }
-
-    return 0;
+    const u8 actions[] = { 6, 30 };
+    return ARRAY_COUNT_END(actions) != std::find(actions, ARRAY_COUNT_END(actions), index);
 }
 
-bool ObjGrass::isShadow(const u16 & icn, const u8 & index)
+bool ObjGras::isShadow(const u8 & index)
 {
-    const u8 shadows1[] = { 5, 19, 20, 31, 32, 33, 34, 35, 36, 37, 38, 47, 48, 49, 50, 51, 52, 53,
-		54, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 91, 100, 101, 102, 103,
-		104, 105, 106, 107, 108, 109, 110, 111, 112, 113, 124, 128 };
+    const u8 shadows2[] = { 0, 4, 29, 32, 36, 39, 42, 44, 46, 48, 50, 76, 79, 82, 88, 92, 94, 98, 102, 105,
+		108, 111, 113, 120, 124, 128, 134, 138, 141, 143, 145, 147 };
+    return ARRAY_COUNT_END(shadows2) != std::find(shadows2, ARRAY_COUNT_END(shadows2), index);
+}
 
-    const u8 shadows2[] = { 4, 29, 32, 36, 39, 42, 44, 46, 48, 76, 82, 88, 92, 94, 102, 105,
-		108, 111, 113, 124, 128, 134, 138, 141, 143, 145, 147 };
+u16 ObjGra2::GetPassable(const u8 & index)
+{
+    const u8 restricted[] = { 2, 3, 6, 8, 22, 59 };
+    if(isShadow(index))
+    	return DIRECTION_ALL;
+    else
+    if(isAction(index))
+        return 0;
 
-    switch(icn)
-    {
-	case ICN::OBJNGRA2:
-	    return ARRAY_COUNT_END(shadows1) != std::find(shadows1, ARRAY_COUNT_END(shadows1), index);
+    return ARRAY_COUNT_END(restricted) != std::find(restricted, ARRAY_COUNT_END(restricted), index) ?
+            DIRECTION_CENTER_ROW | DIRECTION_BOTTOM_ROW : DIRECTION_ALL;
+}
 
-	case ICN::OBJNGRAS:
-	    return ARRAY_COUNT_END(shadows2) != std::find(shadows2, ARRAY_COUNT_END(shadows2), index);
+bool ObjGra2::isAction(const u8 & index)
+{
+/*
+    hill fort: 4
+    halfling hole: 7
+    tree city: 21
+    wind mill: 55
+    archer house: 84
+    goblin hut: 92
+    dwarf cottadge: 114
+    oracul: 125, 126
+    obelisk: 129
+*/
+    const u8 actions[] = { 4, 7, 21, 55, 84, 92, 114, 125, 126, 129 };
+    return ARRAY_COUNT_END(actions) != std::find(actions, ARRAY_COUNT_END(actions), index);
+}
 
-	default: break;
-    }
-
-    return false;
+bool ObjGra2::isShadow(const u8 & index)
+{
+    const u8 shadows1[] = { 5, 19, 20, 31, 33, 47, 51, 70, 77, 91, 100, 107, 124, 128 };
+    return ARRAY_COUNT_END(shadows1) != std::find(shadows1, ARRAY_COUNT_END(shadows1), index);
 }

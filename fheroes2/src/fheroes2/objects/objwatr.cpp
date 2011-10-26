@@ -21,88 +21,68 @@
  ***************************************************************************/
 
 #include "icn.h"
+#include "direction.h"
 #include "objwatr.h"
 
-bool ObjWater::isPassable(const u16 & icn, const u8 & index, u16 direct)
+u16 ObjWat2::GetPassable(const u8 & index)
 {
-    return direct & GetPassable(icn, index);
+    const u8 disabled[] = { 11, 12, 19, 22 };
+    const u8 restricted[] = { 2, 20 };
+
+    if(isShadow(index))
+        return DIRECTION_ALL;
+    else
+    if(isAction(index) ||
+        ARRAY_COUNT_END(disabled) != std::find(disabled, ARRAY_COUNT_END(disabled), index))
+        return 0;
+
+    return ARRAY_COUNT_END(restricted) != std::find(restricted, ARRAY_COUNT_END(restricted), index) ?
+            DIRECTION_CENTER_ROW | DIRECTION_BOTTOM_ROW : DIRECTION_ALL;
 }
 
-u16 ObjWater::GetPassable(const u16 & icn, const u8 & index)
+u16 ObjWatr::GetPassable(const u8 & index)
 {
-    switch(icn)
-    {
-	case ICN::OBJNWAT2:
-	    // rock
-	    if(2 == index)
-		return DIRECTION_CENTER_ROW | DIRECTION_BOTTOM_ROW;
-	    else
-	    // ship
-	    if(11 == index || 12 == index || 19 == index || 21 == index || 22 == index)
-		return 0;
-	    else
-	    if(20 == index)
-		return DIRECTION_CENTER_ROW | DIRECTION_BOTTOM_ROW;
-	    else
-                return DIRECTION_ALL;
+    const u8 disabled[] = { 11, 12, 19, 22 };
+    const u8 restricted[] = { 69, 182, 183, 185, 186, 187, 248 };
 
-	case ICN::OBJNWATR:
-	    // buttle
-	    if(0 == index) return 0;
-	    else
-	    // chest
-	    if(19 == index) return 0;
-	    else
-	    // flotsam
-	    if(45 == index) return 0;
-	    else
-	    // magellan maps
-	    if(62 == index) return 0;
-	    else
-	    if(69 == index)
-		return DIRECTION_CENTER_ROW | DIRECTION_BOTTOM_ROW;
-	    else
-	    // surviror
-	    if(111 == index) return 0;
-	    else
-	    // rock
-	    if((181 < index && index < 184) || (184 < index && index < 188))
-		return DIRECTION_CENTER_ROW | DIRECTION_BOTTOM_ROW;
-	    else
-	    // buoy
-	    if(195 == index) return 0;
-	    else
-	    // whirlpoll
-	    if(202 == index || 206 == index || 210 == index || 214 == index || 218 == index || 222 == index) return 0;
-	    else
-	    // ship
-	    if(241 == index) return 0;
-	    else
-	    if(248 == index)
-		return DIRECTION_CENTER_ROW | DIRECTION_BOTTOM_ROW;
-	    else
-		return DIRECTION_ALL;
+    if(isShadow(index))
+        return DIRECTION_ALL;
+    else
+    if(isAction(index) ||
+        ARRAY_COUNT_END(disabled) != std::find(disabled, ARRAY_COUNT_END(disabled), index))
+        return 0;
 
-	default: break;
-    }
-
-    return 0;
+    return ARRAY_COUNT_END(restricted) != std::find(restricted, ARRAY_COUNT_END(restricted), index) ?
+            DIRECTION_CENTER_ROW | DIRECTION_BOTTOM_ROW : DIRECTION_ALL;
 }
 
-bool ObjWater::isShadow(const u16 & icn, const u8 & index)
+bool ObjWat2::isAction(const u8 & index)
 {
-    switch(icn)
-    {
-	case ICN::OBJNWAT2:
-	    return index == 1;
+    // derelict ship
+    return 21 == index;
+}
 
-	case ICN::OBJNWATR:
-	    return ((11 < index && index < 20) || (25 < index && index < 46) ||
-		52 == index || (117 < index && index < 134) || (165 < index && index < 182) ||
-		184 == index || (187 < index && index < 195) || 240 == index);
+bool ObjWatr::isAction(const u8 & index)
+{
+    /*
+	magellan maps: 62:
+	buoy: 195
+	whirlpool: 202, 206, 210, 214, 218, 222
+	shipwrek: 241
+    */
+    const u8 actions[] = { 62, 195, 202, 206, 210, 214, 218, 222, 241 };
 
-	default: break;
-    }
+    return ARRAY_COUNT_END(actions) != std::find(actions, ARRAY_COUNT_END(actions), index);
+}
 
-    return false;
+bool ObjWatr::isShadow(const u8 & index)
+{
+    const u8 shadows [] = { 12, 38, 52, 55, 118, 166, 188, 240 };
+
+    return ARRAY_COUNT_END(shadows) != std::find(shadows, ARRAY_COUNT_END(shadows), index);
+}
+
+bool ObjWat2::isShadow(const u8 & index)
+{
+    return index == 1;
 }

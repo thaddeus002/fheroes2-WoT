@@ -23,20 +23,13 @@
 #ifndef H2TREES_H
 #define H2TREES_H
 
-#include "icn.h"
-#include "object.h"
 #include "gamedefs.h"
 
-class Trees : public Object
+namespace ObjTree
 {
-    public:
-	Trees(ICN::icn_t icn);
-
-	static bool	isPassable(const u16 & icn, const u8 & index, u16 direct);
-	static bool	isShadow(const u16 & icn, const u8 & index);
-	static u16      GetPassable(const u16 & icn, const u8 & index);
-
-    private:
-};
+    bool	isShadow(const u8 & index);
+    bool	isAction(const u8 & index);
+    u16		GetPassable(const u8 & index);
+}
 
 #endif

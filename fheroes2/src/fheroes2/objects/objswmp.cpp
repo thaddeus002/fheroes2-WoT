@@ -21,87 +21,47 @@
  ***************************************************************************/
 
 #include "icn.h"
+#include "direction.h"
 #include "objswmp.h"
 
-bool ObjSwamp::isPassable(const u16 & icn, const u8 & index, u16 direct)
+u16 ObjSwmp::GetPassable(const u8 & index)
 {
-    return direct & GetPassable(icn, index);
+    const u8 disabled[] = { 88, 89, 90, 91, 94, 95, 96, 97, 98, 108, 109, 110, 112,
+	113, 115, 116,118, 119, 122, 123, 143, 144 };
+    const u8 restricted[] = { 32, 33, 67, 74, 82, 85, 100, 101, 102, 103, 104, 105,
+	126, 128, 129, 131, 133, 134, 135, 137, 138, 139, 145, 146, 147, 148, 149, 150,
+	151, 152, 153, 154, 155, 156, 157, 158, 159, 160, 166, 167, 171, 172, 176, 177,
+	179, 180, 181, 182, 183, 184, 185, 186, 187, 188, 189, 190, 191, 192, 193, 194,
+	196, 198, 199, 200, 201, 203, 205, 208, 209, 212, 213 };
+
+    if(isShadow(index))
+        return DIRECTION_ALL;
+    else
+    if(isAction(index) ||
+        ARRAY_COUNT_END(disabled) != std::find(disabled, ARRAY_COUNT_END(disabled), index))
+        return 0;
+
+    return ARRAY_COUNT_END(restricted) != std::find(restricted, ARRAY_COUNT_END(restricted), index) ?
+            DIRECTION_CENTER_ROW | DIRECTION_BOTTOM_ROW : DIRECTION_ALL;
 }
 
-u16 ObjSwamp::GetPassable(const u16 & icn, const u8 & index)
+bool ObjSwmp::isAction(const u8 & index)
 {
-    switch(icn)
-    {
-	case ICN::OBJNSWMP:
-	    // witch hut
-	    if(22 == index) return 0;
-	    else
-	    // shrub
-	    if((31 < index && index < 34))
-		return DIRECTION_CENTER_ROW | DIRECTION_BOTTOM_ROW;
-	    else
-	    // xanadu
-	    if(67 == index || 74 == index || (80 < index && index < 83))
-		return DIRECTION_CENTER_ROW | DIRECTION_BOTTOM_ROW;
-	    else
-	    // faerie ring
-	    if((83 < index && index < 86))
-		return DIRECTION_CENTER_ROW | DIRECTION_BOTTOM_ROW;
-	    else
-	    // lake
-	    if((87 < index && index < 92) || (93 < index && index < 99)) return 0;
-	    else
-	    if(99 < index && index < 107)
-		return DIRECTION_CENTER_ROW | DIRECTION_BOTTOM_ROW;
-	    else
-	    if((107 < index && index < 111) || (111 < index && index < 114)) return 0;
-	    else
-	    if((114 < index && index < 117) || (117 < index && index < 120) || (121 < index && index < 124)) return 0;
-	    else
-	    // mandrake
-	    if(126 == index || (127 < index && index < 130) || 131 == index || (132 < index && index < 136) || 137 == index)
-		return DIRECTION_CENTER_ROW | DIRECTION_BOTTOM_ROW;
-	    else
-	    // swamp
-	    if((142 < index && index < 145)) return 0;
-	    else
-	    if((137 < index && index < 140) || (144 < index && index < 161))
-		return DIRECTION_CENTER_ROW | DIRECTION_BOTTOM_ROW;
-	    else
-	    // sign
-	    if(140 == index) return 0;
-	    else
-	    // trees
-	    if((165 < index && index < 168) || (170 < index && index < 173) || (175 < index && index < 178))
-		return DIRECTION_CENTER_ROW | DIRECTION_BOTTOM_ROW;
-	    else
-	    // swamp
-	    if((178 < index && index < 193) || (211 < index && index < 214))
-		return DIRECTION_CENTER_ROW | DIRECTION_BOTTOM_ROW;
-	    else
-	    // shrub
-	    if((192 < index && index < 195) || 196 == index || (197 < index && index < 202))
-		return DIRECTION_CENTER_ROW | DIRECTION_BOTTOM_ROW;
-	    else
-	    // rock
-	    if(203 == index || 205 == index || (207 < index && index < 210))
-		return DIRECTION_CENTER_ROW | DIRECTION_BOTTOM_ROW;
-	    else
-	    // obelisk
-	    if(216 == index) return 0;
-	    else
-		return DIRECTION_ALL;
+/*
+    witch hut: 22
+    xanadu: 81
+    faerie ring: 84
+    sign: 140
+    obelisk: 216
+*/
+    const u8 actions[] = { 22, 81, 84, 140, 216 };
 
-	default: break;
-    }
-
-    return 0;
+    return ARRAY_COUNT_END(actions) != std::find(actions, ARRAY_COUNT_END(actions), index);
 }
 
-bool ObjSwamp::isShadow(const u16 & icn, const u8 & index)
+bool ObjSwmp::isShadow(const u8 & index)
 {
-    const u8 shadows [] = { 0, 1, 2, 3, 4, 5, 6, 14, 15, 16, 17, 18, 19, 20, 21, 31,
-	43, 44, 45, 46, 47, 48, 49, 66, 83, 125, 127, 130, 132, 136, 141, 163, 170,
+    const u8 shadows [] = { 14, 21, 31, 43, 66, 83, 125, 127, 130, 132, 136, 141, 163, 170,
 	175, 178, 195, 197, 202, 204, 207, 211, 215 };
 
     return ARRAY_COUNT_END(shadows) != std::find(shadows, ARRAY_COUNT_END(shadows), index);

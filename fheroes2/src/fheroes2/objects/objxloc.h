@@ -23,15 +23,27 @@
 #ifndef H2OBJXLOC_H
 #define H2OBJXLOC_H
 
-#include "object.h"
+#include "gamedefs.h"
 
-namespace Maps { class TilesAddon; }
-
-namespace ObjLoyalty
+namespace ObjXlc1
 {
-    bool	isPassable(const u16 & icn, const u8 & index, u16 direct);
-    u16         GetPassable(const u16 & icn, const u8 & index);
-    u8		LearnObject(const Maps::TilesAddon & addon);
+    u16         GetPassable(const u8 & index);
+    bool	isAction(const u8 & index);
+    bool	isShadow(const u8 & index);
+}
+
+namespace ObjXlc2
+{
+    u16         GetPassable(const u8 & index);
+    bool	isAction(const u8 & index);
+    bool	isShadow(const u8 & index);
+}
+
+namespace ObjXlc3
+{
+    u16         GetPassable(const u8 & index);
+    bool	isAction(const u8 & index);
+    bool	isShadow(const u8 & index);
 }
 
 #endif

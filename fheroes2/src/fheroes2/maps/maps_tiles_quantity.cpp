@@ -424,15 +424,9 @@ void Maps::Tiles::QuantityUpdate(void)
             percents.Push(1, 20);
 
             if(percents.Get())
-            {
-                switch(Rand::Get(1, 3))
-                {
-                    case 1: QuantitySetArtifact(Artifact::Rand(Artifact::ART_LEVEL1)); break;
-                    case 2: QuantitySetArtifact(Artifact::Rand(Artifact::ART_LEVEL2)); break;
-                    case 3: QuantitySetArtifact(Artifact::Rand(Artifact::ART_LEVEL3)); break;
-                    default: break;
-                }
-            }
+                QuantitySetArtifact(Artifact::Rand(Artifact::ART_LEVEL123));
+	    else
+		QuantityReset();
         }
         break;
 
@@ -452,7 +446,7 @@ void Maps::Tiles::QuantityUpdate(void)
             {
                 case 1: QuantitySetArtifact(Artifact::Rand(Rand::Get(1) ? Artifact::ART_LEVEL1 : Artifact::ART_LEVEL2)); break;
                 case 2: QuantitySetResource(Resource::Rand(), Rand::Get(2, 5)); break;
-                default: break;
+                default: QuantityReset(); break;
             }
         }
         break;

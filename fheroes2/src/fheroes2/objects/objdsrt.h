@@ -23,13 +23,13 @@
 #ifndef H2OBJDSRT_H
 #define H2OBJDSRT_H
 
-#include "object.h"
+#include "gamedefs.h"
 
-namespace ObjDesert
+namespace ObjDsrt
 {
-    bool	isPassable(const u16 & icn, const u8 & index, u16 direct);
-    bool	isShadow(const u16 & icn, const u8 & index);
-    u16         GetPassable(const u16 & icn, const u8 & index);
+    bool	isShadow(const u8 & index);
+    bool	isAction(const u8 & index);
+    u16         GetPassable(const u8 & index);
 }
 
 #endif

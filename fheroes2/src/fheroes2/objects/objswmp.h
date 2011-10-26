@@ -23,13 +23,13 @@
 #ifndef H2OBJSWMP_H
 #define H2OBJSWMP_H
 
-#include "object.h"
+#include "gamedefs.h"
 
-namespace ObjSwamp
+namespace ObjSwmp
 {
-    bool	isPassable(const u16 & icn, const u8 & index, u16 direct);
-    bool	isShadow(const u16 & icn, const u8 & index);
-    u16         GetPassable(const u16 & icn, const u8 & index);
+    bool	isShadow(const u8 & index);
+    bool	isAction(const u8 & index);
+    u16         GetPassable(const u8 & index);
 }
 
 #endif
