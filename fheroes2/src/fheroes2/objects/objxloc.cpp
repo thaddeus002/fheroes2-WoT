@@ -87,14 +87,24 @@ bool ObjXlc2::isAction(const u8 & index)
 	mermaid: 37
 	sirens: 101
     */
+#if (__GNUC__ == 4 && __GNUC_MINOR__ == 4)
+    // fixed: array subscript is above array bounds
+    const u8 actions[] = { 4, 9, 37, 101, 255 };
+#else
     const u8 actions[] = { 4, 9, 37, 101 };
+#endif
 
     return ARRAY_COUNT_END(actions) != std::find(actions, ARRAY_COUNT_END(actions), index);
 }
 
 bool ObjXlc2::isShadow(const u8 & index)
 {
+#if (__GNUC__ == 4 && __GNUC_MINOR__ == 4)
+    // fixed: array subscript is above array bounds
+    const u8 shadows [] = { 2, 10, 47, 83, 255 };
+#else
     const u8 shadows [] = { 2, 10, 47, 83 };
+#endif
 
     return ARRAY_COUNT_END(shadows) != std::find(shadows, ARRAY_COUNT_END(shadows), index);
 }

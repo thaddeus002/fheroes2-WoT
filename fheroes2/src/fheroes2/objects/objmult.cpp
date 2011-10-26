@@ -72,7 +72,12 @@ bool ObjMult::isShadow(const u8 & index)
 
 u16 ObjMul2::GetPassable(const u8 & index)
 {
+#if (__GNUC__ == 4 && __GNUC_MINOR__ == 4)
+    // fixed: array subscript is above array bounds
+    const u8 disabled[] = { 46, 76, 77, 124, 125, 126, 221, 213, 255 };
+#else
     const u8 disabled[] = { 46, 76, 77, 124, 125, 126, 221, 213 };
+#endif
     const u8 restricted[] = { 16, 18, 19, 25, 27, 51, 52, 53, 55, 57, 78, 79, 81, 98, 105, 128, 136, 187, 207, 209, 214, 215, 217 };
 
     if(isShadow(index))
