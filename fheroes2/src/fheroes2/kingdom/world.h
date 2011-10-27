@@ -180,8 +180,6 @@ public:
     static u32 GetUniq(void){ return ++uniq0; };
 
 protected:
-    void UpdateDwellingPopulation(void);
-    void UpdateMonsterPopulation(void);
     void MonthOfMonstersAction(const Monster &);
 
 private:

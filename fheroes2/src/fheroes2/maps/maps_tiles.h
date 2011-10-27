@@ -252,6 +252,8 @@ namespace Maps
 	void ResetModes(u8);
 
 	static void UpdateMonsterInfo(Tiles &);
+	static void UpdateDwellingPopulation(Tiles &);
+	static void UpdateMonsterPopulation(Tiles &);
 	static void UpdateRNDArtifactSprite(Tiles &);
 	static void UpdateRNDResourceSprite(Tiles &);
 	static void UpdateStoneLightsSprite(Tiles &);
