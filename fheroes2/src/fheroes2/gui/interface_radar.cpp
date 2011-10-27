@@ -224,8 +224,12 @@ void Interface::Radar::RedrawArea(const u8 color)
     for(s32 index = 0; index < world_w * world_h; ++index)
     {
 	const Maps::Tiles & tile = world.GetTiles(index);
+	bool show_tile = ! tile.isFog(color);
+#ifdef WITH_DEBUG
+	     show_tile = IS_DEVEL() || ! tile.isFog(color);
+#endif
 
-	if(!IS_DEVEL() && tile.isFog(color))
+	if(! show_tile)
 	    tile_surface = sf_black;
 	else
 	    switch(tile.GetObject())
