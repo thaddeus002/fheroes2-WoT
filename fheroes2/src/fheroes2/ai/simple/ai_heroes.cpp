@@ -738,6 +738,8 @@ void AIToCaptureObject(Heroes & hero, const u8 & obj, const s32 & dst_index)
     // capture object
     if(! Players::isFriends(hero.GetColor(), tile.QuantityColor()))
     {
+	bool capture = true;
+
 	if(tile.CaptureObjectIsProtection())
 	{
 	    const Army::Troop & troop = tile.QuantityTroop();
@@ -749,26 +751,31 @@ void AIToCaptureObject(Heroes & hero, const u8 & obj, const s32 & dst_index)
 
 	    if(result.AttackerWins())
 	    {
-        	// update abandone mine
-        	if(obj == MP2::OBJ_ABANDONEDMINE)
-        	{
-            	    tile.UpdateAbandoneMineSprite(tile);
-            	    tile.SetObject(MP2::OBJ_MINES);
-        	}
-
-        	// reset spell info
-        	Maps::TilesAddon* addon = tile.FindObject(MP2::OBJ_MINES);
-        	if(addon) addon->tmp  = 0;
-
 		hero.IncreaseExperience(result.GetExperienceAttacker());
-		tile.QuantitySetColor(hero.GetColor());
 	    }
 	    else
 	    {
+		capture = false;
 	        AIBattleLose(hero, result, true);
 		if(Settings::Get().ExtSaveMonsterBattle())
 		    tile.MonsterSetCount(army.MonsterCounts(troop()));
 	    }
+	}
+
+	if(capture)
+	{
+    	    // update abandone mine
+    	    if(obj == MP2::OBJ_ABANDONEDMINE)
+    	    {
+            	tile.UpdateAbandoneMineSprite(tile);
+            	tile.SetObject(MP2::OBJ_MINES);
+    	    }
+
+    	    // reset spell info
+    	    Maps::TilesAddon* addon = tile.FindObject(MP2::OBJ_MINES);
+    	    if(addon) addon->tmp  = 0;
+
+    	    tile.QuantitySetColor(hero.GetColor());
 	}
     }
 
