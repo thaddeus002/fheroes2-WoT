@@ -1,5 +1,8 @@
 AR := ar
+
+ifndef CXX
 CXX := g++
+endif
 
 ifndef WITHOUT_UNICODE
 CFLAGS := $(CFLAGS) -DWITH_ICONV
