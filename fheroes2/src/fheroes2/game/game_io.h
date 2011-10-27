@@ -54,7 +54,7 @@ namespace Game
 	static void PackHeroBase(QueueMessage &, const HeroBase &);
 	static void PackPlayers(QueueMessage &, const Players &);
 
-	static void UnpackTile(QueueMessage &, Maps::Tiles &, u16 = -1);
+	static void UnpackTile(QueueMessage &, Maps::Tiles &, u32, u16 = -1);
 	static void UnpackTileAddons(QueueMessage &, Maps::Addons &, u16 = -1);
 	static void UnpackKingdom(QueueMessage &, Kingdom &, u16 = -1);
 	static void UnpackCastle(QueueMessage &, Castle &, u16 = -1);

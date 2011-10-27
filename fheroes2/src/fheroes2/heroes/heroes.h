@@ -200,6 +200,7 @@ public:
     bool isVisited(const Maps::Tiles & tile, const Visit::type_t type = Visit::LOCAL) const;
 
     bool Move(bool fast = false);
+    void Move2Dest(const s32 &, bool skip_action = false);
     bool isEnableMove(void) const;
     bool CanMove(void) const;
     void SetMove(bool f);
@@ -222,9 +223,6 @@ public:
 
     bool isShipMaster(void) const;
     void SetShipMaster(bool f);
-
-    void SaveUnderObject(MP2::object_t obj);
-    MP2::object_t GetUnderObject(void) const;
 
     u32 GetExperience(void) const;
     void IncreaseExperience(const u32 exp);

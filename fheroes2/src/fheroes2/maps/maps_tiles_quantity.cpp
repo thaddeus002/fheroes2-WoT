@@ -326,12 +326,32 @@ Funds Maps::Tiles::QuantityFunds(void) const
 
 void Maps::Tiles::QuantitySetColor(u8 col)
 {
-    quantity1 = col;
+    switch(GetObject(false))
+    {
+        case MP2::OBJ_BARRIER:
+        case MP2::OBJ_TRAVELLERTENT:
+	    quantity1 = col;
+	    break;
+
+	default:
+	    world.CaptureObject(GetIndex(), col);
+	    break;
+    }
 }
 
 u8 Maps::Tiles::QuantityColor(void) const
 {
-    return quantity1;
+    switch(GetObject(false))
+    {
+        case MP2::OBJ_BARRIER:
+        case MP2::OBJ_TRAVELLERTENT:
+	    return quantity1;
+
+	default:
+	    return world.ColorCapturedObject(GetIndex());
+    }
+
+    return Color::NONE;
 }
 
 u8 Maps::Tiles::QuantityTeleportType(void) const
@@ -346,27 +366,55 @@ void Maps::Tiles::QuantitySetTeleportType(u8 type)
 
 Monster Maps::Tiles::QuantityMonster(void) const
 {
-    if(mp2_object == MP2::OBJ_MONSTER)
+    switch(GetObject(false))
     {
-	const Maps::TilesAddon *addon = FindObjectConst(MP2::OBJ_MONSTER);
-	if(addon) return Monster(addon->index + 1);
-    }
-    else
-    if(MP2::isCaptureObject(mp2_object))
-	return world.GetCapturedObject(maps_index).GetTroop();
+        case MP2::OBJ_WATCHTOWER:       return Monster(Monster::ORC);
+        case MP2::OBJ_EXCAVATION:       return Monster(Monster::SKELETON);
+        case MP2::OBJ_CAVE:             return Monster(Monster::CENTAUR);
+        case MP2::OBJ_TREEHOUSE:        return Monster(Monster::SPRITE);
+        case MP2::OBJ_ARCHERHOUSE:      return Monster(Monster::ARCHER);
+        case MP2::OBJ_GOBLINHUT:        return Monster(Monster::GOBLIN);
+        case MP2::OBJ_DWARFCOTT:        return Monster(Monster::DWARF);
+        case MP2::OBJ_HALFLINGHOLE:     return Monster(Monster::HALFLING);
+        case MP2::OBJ_PEASANTHUT:
+        case MP2::OBJ_THATCHEDHUT:      return Monster(Monster::PEASANT);
 
-    return Monster(Monster::UNKNOWN);
+        case MP2::OBJ_RUINS:            return Monster(Monster::MEDUSA);
+        case MP2::OBJ_TREECITY:         return Monster(Monster::SPRITE);
+        case MP2::OBJ_WAGONCAMP:        return Monster(Monster::ROGUE);
+        case MP2::OBJ_DESERTTENT:       return Monster(Monster::NOMAD);
+
+        case MP2::OBJ_TROLLBRIDGE:      return Monster(Monster::TROLL);
+        case MP2::OBJ_DRAGONCITY:       return Monster(Monster::RED_DRAGON);
+        case MP2::OBJ_CITYDEAD:         return Monster(Monster::POWER_LICH);
+
+        case MP2::OBJ_ANCIENTLAMP:      return Monster(Monster::GENIE);
+
+        // loyalty version
+        case MP2::OBJ_WATERALTAR:       return Monster(Monster::WATER_ELEMENT);
+        case MP2::OBJ_AIRALTAR:         return Monster(Monster::AIR_ELEMENT);
+        case MP2::OBJ_FIREALTAR:        return Monster(Monster::FIRE_ELEMENT);
+        case MP2::OBJ_EARTHALTAR:       return Monster(Monster::EARTH_ELEMENT);
+        case MP2::OBJ_BARROWMOUNDS:     return Monster(Monster::GHOST);
+
+	case MP2::OBJ_MONSTER:
+	{
+	    const Maps::TilesAddon *addon = FindObjectConst(MP2::OBJ_MONSTER);
+	    if(addon) return Monster(addon->index + 1);
+	}
+	break;
+
+        default: break;
+    }
+
+    return MP2::isCaptureObject(GetObject(false)) ?
+	world.GetCapturedObject(GetIndex()).GetTroop() : Monster(Monster::UNKNOWN);
 }
 
 Army::Troop Maps::Tiles::QuantityTroop(void) const
 {
-    if(mp2_object == MP2::OBJ_MONSTER)
-	return Army::Troop(QuantityMonster(), MonsterCount());
-    else
-    if(MP2::isCaptureObject(GetObject(false)))
-	return world.GetCapturedObject(maps_index).GetTroop();
-
-    return Army::Troop();
+    return MP2::isCaptureObject(GetObject(false)) ?
+	world.GetCapturedObject(GetIndex()).GetTroop() : Army::Troop(QuantityMonster(), MonsterCount());
 }
 
 void Maps::Tiles::QuantityReset(void)
@@ -392,7 +440,7 @@ void Maps::Tiles::QuantityReset(void)
     }
 
     if(MP2::isPickupObject(mp2_object))
-        mp2_object = MP2::OBJ_ZERO;
+        SetObject(MP2::OBJ_ZERO);
 }
 
 void Maps::Tiles::QuantityUpdate(void)
@@ -732,7 +780,7 @@ void Maps::Tiles::QuantityUpdate(void)
 
         case MP2::OBJ_ABANDONEDMINE:
 	{
-            Army::Troop & troop = world.GetCapturedObject(maps_index).GetTroop();
+            Army::Troop & troop = world.GetCapturedObject(GetIndex()).GetTroop();
 
             // I checked in Heroes II: min 3 x 13, and max 3 x 15
 	    troop.Set(Monster::GHOST, 3 * Rand::Get(13, 15));
@@ -802,7 +850,7 @@ void Maps::Tiles::QuantityUpdate(void)
 
 	// join dwelling
         case MP2::OBJ_ANCIENTLAMP:
-            MonsterSetCount(Monster(Monster::FromObject(MP2::OBJ_ANCIENTLAMP)).GetRNDSize(true));
+            MonsterSetCount(QuantityMonster().GetRNDSize(true));
         break;
 
         case MP2::OBJ_WATCHTOWER:
@@ -834,11 +882,18 @@ void Maps::Tiles::QuantityUpdate(void)
         default: break;
     }
 
-    // reset hero
-    if(mp2_object == MP2::OBJ_HEROES && ! world.GetHeroes(maps_index))
+    if(isHeroesPresent())
     {
-	SetObject(MP2::OBJ_ZERO);
-        DEBUG(DBG_GAME, DBG_WARN, "incorrect heroes info, reset tile: " << maps_index);
+	TilesAddon* addon = FindAddonICN1(ICN::MINIHERO);
+ 	// remove event sprite
+        if(addon) Remove(addon->uniq);
+
+	// check hero
+	if(! world.GetHeroes(GetIndex()))
+	{
+	    SetObject(MP2::OBJ_ZERO);
+    	    DEBUG(DBG_GAME, DBG_WARN, "incorrect heroes info, reset tile: " << GetIndex());
+	}
     }
 }
 

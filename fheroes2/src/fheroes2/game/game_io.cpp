@@ -404,6 +404,7 @@ bool Game::IO::SaveBIN(QueueMessage & msg)
 
 void Game::IO::PackTile(QueueMessage & msg, const Maps::Tiles & tile)
 {
+    msg.Push(tile.pack_maps_index);
     msg.Push(tile.pack_sprite_index);
     msg.Push(tile.mp2_object);
     msg.Push(tile.quantity1);
@@ -519,7 +520,7 @@ void Game::IO::PackCastle(QueueMessage & msg, const Castle & castle)
     for(u32 jj = 0; jj < castle.army.Size(); ++jj)
     {
 	const Army::Troop & troop = castle.army.At(jj);
-	msg.Push(static_cast<u8>(troop()));
+	msg.Push(troop().GetID());
 	msg.Push(troop.GetCount());
     }
 
@@ -579,7 +580,6 @@ void Game::IO::PackHeroes(QueueMessage & msg, const Heroes & hero)
     msg.Push(hero.experience);
     msg.Push(hero.direction);
     msg.Push(hero.sprite_index);
-    msg.Push(static_cast<u8>(hero.save_maps_object));
     msg.Push(hero.patrol_center.x);
     msg.Push(hero.patrol_center.y);
     msg.Push(hero.patrol_square);
@@ -598,7 +598,7 @@ void Game::IO::PackHeroes(QueueMessage & msg, const Heroes & hero)
     for(u32 jj = 0; jj < hero.army.Size(); ++jj)
     {
 	const Army::Troop & troop = hero.army.At(jj);
-	msg.Push(static_cast<u8>(troop()));
+	msg.Push(troop().GetID());
 	msg.Push(troop.GetCount());
     }
 	
@@ -844,10 +844,7 @@ bool Game::IO::LoadBIN(QueueMessage & msg)
     msg.Pop(byte32);
     world.vec_tiles.resize(byte32);
     for(u32 maps_index = 0; maps_index < byte32; ++maps_index)
-    {
-	world.vec_tiles[maps_index].maps_index = maps_index;
-	UnpackTile(msg, world.vec_tiles[maps_index], format);
-    }
+	UnpackTile(msg, world.vec_tiles[maps_index], maps_index, format);
 
     // heroes
     msg.Pop(byte16);
@@ -1052,6 +1049,19 @@ bool Game::IO::LoadBIN(QueueMessage & msg)
     // add heroes to kingdoms
     world.vec_kingdoms.AddHeroes(world.vec_heroes);
 
+    if(format < FORMAT_VERSION_2655)
+    {
+	for(MapsTiles::iterator
+	    it = world.vec_tiles.begin(); it != world.vec_tiles.end(); ++it)
+	if((*it).mp2_object == MP2::OBJ_HEROES)
+	{
+	    (*it).SetHeroesPresent();
+	    const Heroes* hero = world.GetHeroes((*it).GetIndex());
+	    (*it).SetObject(hero ? hero->save_maps_object : MP2::OBJ_ZERO);
+	}
+    }
+
+
 //    if(format < FORMAT_VERSION_2632)
 	// update tile passable
 	std::for_each(world.vec_tiles.begin(), world.vec_tiles.end(),
@@ -1062,9 +1072,16 @@ bool Game::IO::LoadBIN(QueueMessage & msg)
 
 extern u16 PackTileSpriteIndex(u16, u16);
 
-void Game::IO::UnpackTile(QueueMessage & msg, Maps::Tiles & tile, u16 check_version)
+void Game::IO::UnpackTile(QueueMessage & msg, Maps::Tiles & tile, u32 maps_index, u16 check_version)
 {
     u8 byte8;
+
+    if(check_version >= FORMAT_VERSION_2655)
+	msg.Pop(tile.pack_maps_index);
+    else
+    {
+	tile.pack_maps_index = 0x00FFFFFF & maps_index;
+    }
 
     msg.Pop(tile.pack_sprite_index);
     if(check_version < FORMAT_VERSION_2632)
@@ -1340,7 +1357,10 @@ void Game::IO::UnpackHeroes(QueueMessage & msg, Heroes & hero, u16 check_version
     msg.Pop(hero.experience);
     msg.Pop(hero.direction);
     msg.Pop(hero.sprite_index);
-    msg.Pop(byte8); hero.save_maps_object = static_cast<MP2::object_t>(byte8);
+    if(check_version < FORMAT_VERSION_2655)
+    {
+	msg.Pop(byte8); hero.save_maps_object = static_cast<MP2::object_t>(byte8);
+    }
 
     msg.Pop(hero.patrol_center.x);
     msg.Pop(hero.patrol_center.y);

@@ -792,27 +792,82 @@ u16 PackTileSpriteIndex(u16 index, u16 shape) /* index max: 0x3FFF, shape value:
     return (shape << 14) | (0x3FFF & index);
 }
 
+enum { TILE_HERO_PRESENT = 0x01 };
+
 /* Maps::Tiles */
-Maps::Tiles::Tiles() : maps_index(0), pack_sprite_index(0), tile_passable(DIRECTION_ALL),
+Maps::Tiles::Tiles() : pack_maps_index(0), pack_sprite_index(0), tile_passable(DIRECTION_ALL),
     mp2_object(0), fog_colors(Color::ALL), quantity1(0), quantity2(0)
 {
 }
 
 void Maps::Tiles::Init(s32 index, const MP2::mp2tile_t & mp2)
 {
-    maps_index	= index;
+    pack_maps_index	= 0x00FFFFFF & index; // high reserver: for modes
     pack_sprite_index	= PackTileSpriteIndex(mp2.tileIndex, mp2.shape);
     tile_passable = DIRECTION_ALL;
-    mp2_object	= mp2.generalObject;
     quantity1	= mp2.quantity1;
     quantity2	= mp2.quantity2;
     fog_colors	= Color::ALL;
+
+    SetObject(mp2.generalObject);
 
     addons_level1.clear();
     addons_level2.clear();
 
     AddonsPushLevel1(mp2);
     AddonsPushLevel2(mp2);
+}
+
+u8 Maps::Tiles::GetModes(void) const
+{
+    return pack_maps_index >> 24;
+}
+
+void Maps::Tiles::ResetModes(u8 mod)
+{
+    pack_maps_index &= ~(static_cast<u32>(mod) << 24);
+}
+
+void Maps::Tiles::SetModes(u8 mod)
+{
+    pack_maps_index |= static_cast<u32>(mod) << 24;
+}
+
+bool Maps::Tiles::isHeroesPresent(void) const
+{
+    return TILE_HERO_PRESENT & GetModes();
+}
+
+void Maps::Tiles::SetHeroesPresent(void)
+{
+    SetModes(TILE_HERO_PRESENT);
+}
+
+void Maps::Tiles::ResetHeroesPresent(void)
+{
+    ResetModes(TILE_HERO_PRESENT);
+}
+
+s32 Maps::Tiles::GetIndex(void) const
+{
+    return 0x00FFFFFF & pack_maps_index;
+}
+
+MP2::object_t Maps::Tiles::GetObject(bool skip_hero  /* true */) const
+{
+    if(!skip_hero)
+	return static_cast<MP2::object_t>(mp2_object);
+
+    return TILE_HERO_PRESENT & GetModes() ?
+	MP2::OBJ_HEROES : static_cast<MP2::object_t>(mp2_object);
+}
+
+void Maps::Tiles::SetObject(u8 object)
+{
+    if(object == MP2::OBJ_HEROES)
+	SetHeroesPresent();
+    else
+	mp2_object = object;
 }
 
 void Maps::Tiles::SetTile(const u16 sprite_index, const u8 shape)
@@ -847,9 +902,9 @@ bool isForestsTrees(const Maps::TilesAddon & ta)
 
 bool Maps::Tiles::isLongObject(u16 direction)
 {
-    if(Maps::isValidDirection(maps_index, direction))
+    if(Maps::isValidDirection(GetIndex(), direction))
     {
-	Tiles & tile = world.GetTiles(Maps::GetDirectionIndex(maps_index, direction));
+	Tiles & tile = world.GetTiles(Maps::GetDirectionIndex(GetIndex(), direction));
 
 	for(Addons::const_iterator
 	    it = addons_level1.begin(); it != addons_level1.end(); ++it)
@@ -867,7 +922,7 @@ void Maps::Tiles::UpdatePassable(void)
 {
     tile_passable = DIRECTION_ALL;
 
-    if(MP2::OBJ_HEROES != mp2_object && !isWater())
+    if(! isHeroesPresent() && !isWater())
     {
 	bool mounts1 = addons_level1.end() != std::find_if(addons_level1.begin(), addons_level1.end(), isMountsRocs);
 	bool mounts2 = addons_level2.end() != std::find_if(addons_level2.begin(), addons_level2.end(), isMountsRocs);
@@ -876,7 +931,7 @@ void Maps::Tiles::UpdatePassable(void)
 
 	// fix coast passable
 	if(tile_passable &&
-	    Maps::TileIsCoast(maps_index, Direction::TOP|Direction::BOTTOM|Direction::LEFT|Direction::RIGHT) &&
+	    Maps::TileIsCoast(GetIndex(), Direction::TOP|Direction::BOTTOM|Direction::LEFT|Direction::RIGHT) &&
 	    ! MP2::isActionObject(GetObject(), false) &&
 	    //MP2::OBJ_ZERO != GetObject() &&  // Town check: false (OBJNTWBA)
 	    MP2::OBJ_COAST != GetObject() &&
@@ -899,7 +954,7 @@ void Maps::Tiles::UpdatePassable(void)
 	// fix bottom border
 	if(tile_passable &&
 	    (MP2::OBJ_MOUNTS == GetObject() || MP2::OBJ_TREES == GetObject()) &&
-	    ! Maps::isValidDirection(maps_index, Direction::BOTTOM))
+	    ! Maps::isValidDirection(GetIndex(), Direction::BOTTOM))
 	    tile_passable = 0;
 
 	// town twba
@@ -914,9 +969,9 @@ void Maps::Tiles::UpdatePassable(void)
 	tile_passable &= TilesAddon::GetPassable(*it);
 
     // fix top passable
-    if(Maps::isValidDirection(maps_index, Direction::TOP))
+    if(Maps::isValidDirection(GetIndex(), Direction::TOP))
     {
-	Tiles & top = world.GetTiles(Maps::GetDirectionIndex(maps_index, Direction::TOP));
+	Tiles & top = world.GetTiles(Maps::GetDirectionIndex(GetIndex(), Direction::TOP));
 
 	if(tile_passable &&
 	    ! (tile_passable & DIRECTION_TOP_ROW) &&
@@ -925,9 +980,9 @@ void Maps::Tiles::UpdatePassable(void)
     }
 
     // fix corners
-    if(Maps::isValidDirection(maps_index, Direction::LEFT))
+    if(Maps::isValidDirection(GetIndex(), Direction::LEFT))
     {
-	Tiles & left = world.GetTiles(Maps::GetDirectionIndex(maps_index, Direction::LEFT));
+	Tiles & left = world.GetTiles(Maps::GetDirectionIndex(GetIndex(), Direction::LEFT));
 
 	// left corner
 	if(left.tile_passable &&
@@ -1051,7 +1106,7 @@ void Maps::Tiles::Remove(u32 uniq)
 void Maps::Tiles::RedrawTile(Surface & dst) const
 {
     const Interface::GameArea & area = Interface::GameArea::Get();
-    const Point mp(maps_index % world.w(), maps_index / world.w());
+    const Point mp(GetIndex() % world.w(), GetIndex() / world.w());
 
     if(area.GetRectMaps() & mp)
 	area.BlitOnTile(dst, GetTileSurface(), 0, 0, mp);
@@ -1060,7 +1115,7 @@ void Maps::Tiles::RedrawTile(Surface & dst) const
 void Maps::Tiles::RedrawBottom(Surface & dst, bool skip_objs) const
 {
     const Interface::GameArea & area = Interface::GameArea::Get();
-    const Point mp(maps_index % world.w(), maps_index / world.w());
+    const Point mp(GetIndex() % world.w(), GetIndex() / world.w());
 
     if((area.GetRectMaps() & mp) &&
 	!addons_level1.empty())
@@ -1109,26 +1164,26 @@ void Maps::Tiles::RedrawObjects(Surface & dst) const
 void Maps::Tiles::RedrawMonster(Surface & dst) const
 {
     const Settings & conf = Settings::Get();
-    const Point mp(maps_index % world.w(), maps_index / world.w());
+    const Point mp(GetIndex() % world.w(), GetIndex() / world.w());
     const Interface::GameArea & area = Interface::GameArea::Get();
     s32 dst_index = -1;
 
     if(!(area.GetRectMaps() & mp)) return;
 
     // scan hero around
-    const MapsIndexes & v = ScanAroundObjectV(maps_index, MP2::OBJ_HEROES);
+    const MapsIndexes & v = ScanAroundObjectV(GetIndex(), MP2::OBJ_HEROES);
     for(MapsIndexes::const_iterator
 	it = v.begin(); it != v.end(); ++it)
     {
+	const Tiles & tile = world.GetTiles(*it);
 	dst_index = *it;
-	const Heroes* hero = world.GetHeroes(dst_index);
 
-	if(!hero ||
+	if(! tile.isHeroesPresent() ||
 	    // skip bottom, bottom_right, bottom_left with ground objects
-	    ((DIRECTION_BOTTOM_ROW & Direction::Get(maps_index, *it)) && 
-			    MP2::isGroundObject(hero->GetUnderObject())) ||
+	    ((DIRECTION_BOTTOM_ROW & Direction::Get(GetIndex(), *it)) && 
+			    MP2::isGroundObject(tile.GetObject(false))) ||
 	    // skip ground check
-	    (world.GetTiles(dst_index).isWater() != isWater()))
+	    (tile.isWater() != isWater()))
 	    dst_index = -1;
 	else
 	    break;
@@ -1141,7 +1196,7 @@ void Maps::Tiles::RedrawMonster(Surface & dst) const
     {
 	bool revert = false;
 
-	switch(Direction::Get(maps_index, dst_index))
+	switch(Direction::Get(GetIndex(), dst_index))
 	{
 	    case Direction::TOP_LEFT:
 	    case Direction::LEFT:
@@ -1167,7 +1222,7 @@ void Maps::Tiles::RedrawMonster(Surface & dst) const
 
 void Maps::Tiles::RedrawBoat(Surface & dst) const
 {
-    const Point mp(maps_index % world.w(), maps_index / world.w());
+    const Point mp(GetIndex() % world.w(), GetIndex() / world.w());
     const Interface::GameArea & area = Interface::GameArea::Get();
 
     if(!(area.GetRectMaps() & mp)) return;
@@ -1185,7 +1240,7 @@ void Maps::Tiles::RedrawBoat(Surface & dst) const
 void Maps::Tiles::RedrawBottom4Hero(Surface & dst) const
 {
     const Interface::GameArea & area = Interface::GameArea::Get();
-    const Point mp(maps_index % world.w(), maps_index / world.w());
+    const Point mp(GetIndex() % world.w(), GetIndex() / world.w());
 
     if((area.GetRectMaps() & mp) &&
 	!addons_level1.empty())
@@ -1207,6 +1262,9 @@ void Maps::Tiles::RedrawBottom4Hero(Surface & dst) const
         	    break;
 
     		case ICN::OBJNCRCK:
+		    skip = index == 188 || index == 189 || tile_passable & DIRECTION_TOP_ROW;
+        	    break;
+
     		case ICN::OBJNDIRT:
     		case ICN::OBJNDSRT:
     		case ICN::OBJNGRA2:
@@ -1239,7 +1297,7 @@ void Maps::Tiles::RedrawBottom4Hero(Surface & dst) const
 void Maps::Tiles::RedrawTop(Surface & dst, const TilesAddon* skip) const
 {
     const Interface::GameArea & area = Interface::GameArea::Get();
-    const Point mp(maps_index % world.w(), maps_index / world.w());
+    const Point mp(GetIndex() % world.w(), GetIndex() / world.w());
 
     if(!(area.GetRectMaps() & mp)) return;
 
@@ -1296,7 +1354,7 @@ void Maps::Tiles::RedrawTop(Surface & dst, const TilesAddon* skip) const
 void Maps::Tiles::RedrawTop4Hero(Surface & dst, bool skip_ground) const
 {
     const Interface::GameArea & area = Interface::GameArea::Get();
-    const Point mp(maps_index % world.w(), maps_index / world.w());
+    const Point mp(GetIndex() % world.w(), GetIndex() / world.w());
 
     if(!(area.GetRectMaps() & mp)) return;
 
@@ -1366,7 +1424,7 @@ std::string Maps::Tiles::String(void) const
 
     os <<
 	"----------------:--------" << std::endl <<
-	"maps index      : " << maps_index << std::endl <<
+	"maps index      : " << GetIndex() << std::endl <<
 	"tile index      : " << TileSpriteIndex() << std::endl <<
 	"ground          : " << Ground::String(GetGround()) << (isRoad() ? ", (road)" : "") << std::endl <<
 	"passable        : " << (tile_passable ? Direction::String(tile_passable) : "false") << std::endl <<
@@ -1415,7 +1473,7 @@ std::string Maps::Tiles::String(void) const
 
 	case MP2::OBJ_HEROES:
 	    {
-		const Heroes *hero = world.GetHeroes(maps_index);
+		const Heroes *hero = world.GetHeroes(GetIndex());
 		if(hero) os << hero->String();
 	    }
 	    break;
@@ -1423,14 +1481,14 @@ std::string Maps::Tiles::String(void) const
 	case MP2::OBJN_CASTLE:
 	case MP2::OBJ_CASTLE:
 	    {
-		const Castle *castle = world.GetCastle(maps_index);
+		const Castle *castle = world.GetCastle(GetIndex());
 		if(castle) os << castle->String();
 	    }
 	    break;
 
 	default:
 	{
-	    const MapsIndexes & v = Maps::GetTilesUnderProtection(maps_index);
+	    const MapsIndexes & v = Maps::GetTilesUnderProtection(GetIndex());
 	    if(v.size())
 	    {
 		os << "protection      : ";
@@ -1445,32 +1503,20 @@ std::string Maps::Tiles::String(void) const
 
     if(MP2::isCaptureObject(GetObject(false)))
     {
-	const CapturedObject & co = world.GetCapturedObject(maps_index);
+	const CapturedObject & co = world.GetCapturedObject(GetIndex());
 
-    os <<
-	"capture color   : " << Color::String(co.objcol.second) << std::endl <<
-	"capture guard   : " << co.guardians.GetName() << std::endl <<
-	"capture caunt   : " << co.guardians.GetCount() << std::endl;
+	os <<
+	"capture color   : " << Color::String(co.objcol.second) << std::endl;
+	if(co.guardians.isValid())
+	{
+	    os <<
+	    "capture guard   : " << co.guardians.GetName() << std::endl <<
+	    "capture caunt   : " << co.guardians.GetCount() << std::endl;
+	}
     }
 
     os << "----------------:--------" << std::endl;
     return os.str();
-}
-
-MP2::object_t Maps::Tiles::GetObject(bool skip_hero) const
-{
-    if(!skip_hero && MP2::OBJ_HEROES == mp2_object)
-    {
-        const Heroes* hero = world.GetHeroes(maps_index);
-        if(hero) return hero->GetUnderObject();
-    }
-
-    return static_cast<MP2::object_t>(mp2_object);
-}
-
-void Maps::Tiles::SetObject(MP2::object_t object)
-{
-    mp2_object = object;
 }
 
 void Maps::Tiles::FixObject(void)
@@ -1478,10 +1524,10 @@ void Maps::Tiles::FixObject(void)
     if(MP2::OBJ_ZERO == mp2_object)
     {
 	if(addons_level1.end() != std::find_if(addons_level1.begin(), addons_level1.end(), TilesAddon::isArtifact))
-	    mp2_object = MP2::OBJ_ARTIFACT;
+	    SetObject(MP2::OBJ_ARTIFACT);
 	else
 	if(addons_level1.end() != std::find_if(addons_level1.begin(), addons_level1.end(), TilesAddon::isResource))
-	    mp2_object = MP2::OBJ_RESOURCE;
+	    SetObject(MP2::OBJ_RESOURCE);
     }
 }
 
@@ -1534,6 +1580,22 @@ bool Maps::Tiles::isPassable(const Heroes* hero, Direction::vector_t direct, boo
     }
 
     return direct & tile_passable;
+}
+
+void Maps::Tiles::SetObjectPassable(bool pass)
+{
+    switch(GetObject(false))
+    {
+	case MP2::OBJ_TROLLBRIDGE:
+	    if(pass)
+		tile_passable |= Direction::TOP_LEFT;
+	    else
+		tile_passable &= ~Direction::TOP_LEFT;
+	    break;
+
+	default:
+	    break;
+    }
 }
 
 /* check road */
@@ -1731,9 +1793,9 @@ void Maps::Tiles::CaptureFlags32(u8 obj, u8 col)
 	case MP2::OBJ_ALCHEMYLAB:
 	{
 	    index += 21;
-	    if(Maps::isValidDirection(maps_index, Direction::TOP))
+	    if(Maps::isValidDirection(GetIndex(), Direction::TOP))
 	    {
-		Maps::Tiles & tile = world.GetTiles(Maps::GetDirectionIndex(maps_index, Direction::TOP));
+		Maps::Tiles & tile = world.GetTiles(Maps::GetDirectionIndex(GetIndex(), Direction::TOP));
 		tile.CorrectFlags32(index, true);
 	    }
 	}
@@ -1742,9 +1804,9 @@ void Maps::Tiles::CaptureFlags32(u8 obj, u8 col)
 	case MP2::OBJ_SAWMILL:
 	{
 	    index += 28;
-	    if(Maps::isValidDirection(maps_index, Direction::TOP_RIGHT))
+	    if(Maps::isValidDirection(GetIndex(), Direction::TOP_RIGHT))
     	    {
-    		Maps::Tiles & tile = world.GetTiles(Maps::GetDirectionIndex(maps_index, Direction::TOP_RIGHT));
+    		Maps::Tiles & tile = world.GetTiles(Maps::GetDirectionIndex(GetIndex(), Direction::TOP_RIGHT));
     		tile.CorrectFlags32(index, true);
 	    }
 	}
@@ -1753,16 +1815,16 @@ void Maps::Tiles::CaptureFlags32(u8 obj, u8 col)
 	case MP2::OBJ_CASTLE:
 	{
 	    index *= 2;
-	    if(Maps::isValidDirection(maps_index, Direction::LEFT))
+	    if(Maps::isValidDirection(GetIndex(), Direction::LEFT))
 	    {
-		Maps::Tiles & tile = world.GetTiles(Maps::GetDirectionIndex(maps_index, Direction::LEFT));
+		Maps::Tiles & tile = world.GetTiles(Maps::GetDirectionIndex(GetIndex(), Direction::LEFT));
     		tile.CorrectFlags32(index, true);
 	    }
 
 	    index += 1;
-	    if(Maps::isValidDirection(maps_index, Direction::RIGHT))
+	    if(Maps::isValidDirection(GetIndex(), Direction::RIGHT))
 	    {
-		Maps::Tiles & tile = world.GetTiles(Maps::GetDirectionIndex(maps_index, Direction::RIGHT));
+		Maps::Tiles & tile = world.GetTiles(Maps::GetDirectionIndex(GetIndex(), Direction::RIGHT));
     		tile.CorrectFlags32(index, true);
 	    }
 	}
@@ -1830,7 +1892,7 @@ void Maps::Tiles::FixedPreload(Tiles & tile)
 		tile.SetObject(static_cast<MP2::object_t>(newobj));
 	    else
 	    {
-		DEBUG(DBG_GAME, DBG_WARN, "index: " << tile.maps_index);
+		DEBUG(DBG_GAME, DBG_WARN, "index: " << tile.GetIndex());
 	    }
 	} break;
 
@@ -1847,7 +1909,7 @@ bool Maps::Tiles::CaptureObjectIsProtection(void) const
     {
 	if(MP2::OBJ_CASTLE == object)
 	{
-	    Castle* castle = world.GetCastle(maps_index);
+	    Castle* castle = world.GetCastle(GetIndex());
 	    if(castle)
 		return castle->GetArmy().isValid();
 	}
@@ -1884,8 +1946,8 @@ void Maps::Tiles::RemoveObjectSprite(void)
     if(addon)
     {
         // remove shadow sprite from left cell
-        if(Maps::isValidDirection(maps_index, Direction::LEFT))
-    	    world.GetTiles(Maps::GetDirectionIndex(maps_index, Direction::LEFT)).Remove(addon->uniq);
+        if(Maps::isValidDirection(GetIndex(), Direction::LEFT))
+    	    world.GetTiles(Maps::GetDirectionIndex(GetIndex(), Direction::LEFT)).Remove(addon->uniq);
 
 	Remove(addon->uniq);
     }
@@ -1898,9 +1960,9 @@ void Maps::Tiles::RemoveBarrierSprite(void)
     if(addon)
     {
         // remove left sprite
-        if(Maps::isValidDirection(maps_index, Direction::LEFT))
+        if(Maps::isValidDirection(GetIndex(), Direction::LEFT))
     	{
-	    const s32 left = Maps::GetDirectionIndex(maps_index, Direction::LEFT);
+	    const s32 left = Maps::GetDirectionIndex(GetIndex(), Direction::LEFT);
 	    world.GetTiles(left).Remove(addon->uniq);
 	}
 
@@ -1915,9 +1977,9 @@ void Maps::Tiles::RemoveJailSprite(void)
     if(addon)
     {
         // remove left sprite
-        if(Maps::isValidDirection(maps_index, Direction::LEFT))
+        if(Maps::isValidDirection(GetIndex(), Direction::LEFT))
     	{
-	    const s32 left = Maps::GetDirectionIndex(maps_index, Direction::LEFT);
+	    const s32 left = Maps::GetDirectionIndex(GetIndex(), Direction::LEFT);
 	    world.GetTiles(left).Remove(addon->uniq);
 
     	    // remove left left sprite
@@ -1926,9 +1988,9 @@ void Maps::Tiles::RemoveJailSprite(void)
 	}
 
         // remove top sprite
-        if(Maps::isValidDirection(maps_index, Direction::TOP))
+        if(Maps::isValidDirection(GetIndex(), Direction::TOP))
     	{
-	    const s32 top = Maps::GetDirectionIndex(maps_index, Direction::TOP);
+	    const s32 top = Maps::GetDirectionIndex(GetIndex(), Direction::TOP);
 	    world.GetTiles(top).Remove(addon->uniq);
 	    world.GetTiles(top).SetObject(MP2::OBJ_ZERO);
 	    world.GetTiles(top).FixObject();
@@ -1960,9 +2022,9 @@ void Maps::Tiles::UpdateAbandoneMineSprite(Tiles & tile)
 	    it = tile.addons_level1.begin(); it != tile.addons_level1.end(); ++it)
 		TilesAddon::UpdateAbandoneMineLeftSprite(*it, type);
 
-	if(Maps::isValidDirection(tile.maps_index, Direction::RIGHT))
+	if(Maps::isValidDirection(tile.GetIndex(), Direction::RIGHT))
 	{
-    	    Tiles & tile2 = world.GetTiles(Maps::GetDirectionIndex(tile.maps_index, Direction::RIGHT));
+    	    Tiles & tile2 = world.GetTiles(Maps::GetDirectionIndex(tile.GetIndex(), Direction::RIGHT));
     	    TilesAddon *mines = tile2.FindAddonLevel1(uniq);
 
 	    if(mines) TilesAddon::UpdateAbandoneMineRightSprite(*mines);
@@ -1970,26 +2032,26 @@ void Maps::Tiles::UpdateAbandoneMineSprite(Tiles & tile)
 	}
     }
 
-    if(Maps::isValidDirection(tile.maps_index, Direction::LEFT))
+    if(Maps::isValidDirection(tile.GetIndex(), Direction::LEFT))
     {
-        Tiles & tile2 = world.GetTiles(Maps::GetDirectionIndex(tile.maps_index, Direction::LEFT));
+        Tiles & tile2 = world.GetTiles(Maps::GetDirectionIndex(tile.GetIndex(), Direction::LEFT));
 	if(tile2.GetObject() == MP2::OBJN_ABANDONEDMINE) tile2.SetObject(MP2::OBJN_MINES);
     }
 
-    if(Maps::isValidDirection(tile.maps_index, Direction::TOP))
+    if(Maps::isValidDirection(tile.GetIndex(), Direction::TOP))
     {
-        Tiles & tile2 = world.GetTiles(Maps::GetDirectionIndex(tile.maps_index, Direction::TOP));
+        Tiles & tile2 = world.GetTiles(Maps::GetDirectionIndex(tile.GetIndex(), Direction::TOP));
 	if(tile2.GetObject() == MP2::OBJN_ABANDONEDMINE) tile2.SetObject(MP2::OBJN_MINES);
 
-	if(Maps::isValidDirection(tile2.maps_index, Direction::LEFT))
+	if(Maps::isValidDirection(tile2.GetIndex(), Direction::LEFT))
 	{
-    	    Tiles & tile3 = world.GetTiles(Maps::GetDirectionIndex(tile2.maps_index, Direction::LEFT));
+    	    Tiles & tile3 = world.GetTiles(Maps::GetDirectionIndex(tile2.GetIndex(), Direction::LEFT));
 	    if(tile3.GetObject() == MP2::OBJN_ABANDONEDMINE) tile3.SetObject(MP2::OBJN_MINES);
 	}
 
-	if(Maps::isValidDirection(tile2.maps_index, Direction::RIGHT))
+	if(Maps::isValidDirection(tile2.GetIndex(), Direction::RIGHT))
 	{
-    	    Tiles & tile3 = world.GetTiles(Maps::GetDirectionIndex(tile2.maps_index, Direction::RIGHT));
+    	    Tiles & tile3 = world.GetTiles(Maps::GetDirectionIndex(tile2.GetIndex(), Direction::RIGHT));
 	    if(tile3.GetObject() == MP2::OBJN_ABANDONEDMINE) tile3.SetObject(MP2::OBJN_MINES);
 	}
     }
@@ -2037,9 +2099,9 @@ void Maps::Tiles::UpdateRNDArtifactSprite(Tiles & tile)
         tile.SetObject(MP2::OBJ_ARTIFACT);
 
         // replace shadow artifact
-        if(Maps::isValidDirection(tile.maps_index, Direction::LEFT))
+        if(Maps::isValidDirection(tile.GetIndex(), Direction::LEFT))
         {
-            Maps::Tiles & left_tile = world.GetTiles(Maps::GetDirectionIndex(tile.maps_index, Direction::LEFT));
+            Maps::Tiles & left_tile = world.GetTiles(Maps::GetDirectionIndex(tile.GetIndex(), Direction::LEFT));
             Maps::TilesAddon *shadow = left_tile.FindAddonLevel1(addon->uniq);
 
             if(shadow) shadow->index = index - 1;
@@ -2057,9 +2119,9 @@ void Maps::Tiles::UpdateRNDResourceSprite(Tiles & tile)
         tile.SetObject(MP2::OBJ_RESOURCE);
 
         // replace shadow artifact
-        if(Maps::isValidDirection(tile.maps_index, Direction::LEFT))
+        if(Maps::isValidDirection(tile.GetIndex(), Direction::LEFT))
         {
-            Maps::Tiles & left_tile = world.GetTiles(Maps::GetDirectionIndex(tile.maps_index, Direction::LEFT));
+            Maps::Tiles & left_tile = world.GetTiles(Maps::GetDirectionIndex(tile.GetIndex(), Direction::LEFT));
             Maps::TilesAddon *shadow = left_tile.FindAddonLevel1(addon->uniq);
 
             if(shadow) shadow->index = addon->index - 1;
@@ -2102,21 +2164,21 @@ void Maps::Tiles::ClearFog(u8 colors)
 void Maps::Tiles::RedrawFogs(Surface & dst, u8 color) const
 {
     const Interface::GameArea & area = Interface::GameArea::Get();
-    const Point mp(maps_index % world.w(), maps_index / world.w());
+    const Point mp(GetIndex() % world.w(), GetIndex() / world.w());
 
     // get direction around foga
     u16 around = 0;
 
     for(Direction::vector_t direct = Direction::TOP_LEFT; direct != Direction::CENTER; ++direct)
-        if(!Maps::isValidDirection(maps_index, direct) ||
-           world.GetTiles(Maps::GetDirectionIndex(maps_index, direct)).isFog(color)) around |= direct;
+        if(!Maps::isValidDirection(GetIndex(), direct) ||
+           world.GetTiles(Maps::GetDirectionIndex(GetIndex(), direct)).isFog(color)) around |= direct;
 
     if(isFog(color)) around |= Direction::CENTER;
  
     // TIL::CLOF32
     if(DIRECTION_ALL == around)
     {
-	const Surface & sf = AGG::GetTIL(TIL::CLOF32, maps_index % 4, 0);
+	const Surface & sf = AGG::GetTIL(TIL::CLOF32, GetIndex() % 4, 0);
 	area.BlitOnTile(dst, sf, 0, 0, mp);
     }
     else
@@ -2301,23 +2363,23 @@ void Maps::Tiles::RedrawFogs(Surface & dst, u8 color) const
 	// see ICN::CLOP32: sprite 0, 1, 2, 3, 4, 5
 	if(around & (DIRECTION_CENTER_ROW | DIRECTION_BOTTOM_ROW) &&
 	 !(around & (Direction::TOP)))
-	{ index = maps_index % 2 ? 0 : 1; revert = false; }
+	{ index = GetIndex() % 2 ? 0 : 1; revert = false; }
 	else
 	if(around & (DIRECTION_CENTER_ROW | DIRECTION_TOP_ROW) &&
 	 !(around & (Direction::BOTTOM)))
-	{ index = maps_index % 2 ? 4 : 5; revert = false; }
+	{ index = GetIndex() % 2 ? 4 : 5; revert = false; }
 	else
 	if(around & (DIRECTION_CENTER_COL | DIRECTION_LEFT_COL) &&
 	 !(around & (Direction::RIGHT)))
-	{ index = maps_index % 2 ? 2 : 3; revert = false; }
+	{ index = GetIndex() % 2 ? 2 : 3; revert = false; }
 	else
 	if(around & (DIRECTION_CENTER_COL | DIRECTION_RIGHT_COL) &&
 	 !(around & (Direction::LEFT)))
-	{ index = maps_index % 2 ? 2 : 3; revert = true; }
+	{ index = GetIndex() % 2 ? 2 : 3; revert = true; }
 	// unknown
 	else
 	{
-	    const Surface & sf = AGG::GetTIL(TIL::CLOF32, maps_index % 4, 0);
+	    const Surface & sf = AGG::GetTIL(TIL::CLOF32, GetIndex() % 4, 0);
 	    area.BlitOnTile(dst, sf, 0, 0, mp);
 	    return;
 	}
@@ -2361,7 +2423,7 @@ void Maps::Tiles::FixLoadOldVersion(u16 version, u8 quantity3, u8 quantity4, u8 
 
 	    case MP2::OBJ_ABANDONEDMINE:
     	    {
-        	Army::Troop & troop = world.GetCapturedObject(maps_index).GetTroop();
+        	Army::Troop & troop = world.GetCapturedObject(GetIndex()).GetTroop();
         	troop.Set(Monster::GHOST, quantity2 * 0xFF + quantity1);
 
         	switch(quantity4)
@@ -2391,7 +2453,7 @@ void Maps::Tiles::FixLoadOldVersion(u16 version, u8 quantity3, u8 quantity4, u8 
     	    {
 		if(quantity3)
 		{
-        	    Army::Troop & troop = world.GetCapturedObject(maps_index).GetTroop();
+        	    Army::Troop & troop = world.GetCapturedObject(GetIndex()).GetTroop();
         	    troop.Set(quantity3, quantity2 * 0xFF + quantity1);
 
 		    if(quantity4)

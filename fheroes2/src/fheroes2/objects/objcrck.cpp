@@ -29,13 +29,16 @@ u16 ObjCrck::GetPassable(const u8 & index)
 {
 
     const u8 disabled[] = { 58, 59, 63, 64, 65, 76, 77, 78, 80, 91, 102, 113, 124,
-	    135, 182, 183, 184, 185, 221, 222, 223, 227, 228, 229, 230, 238, 241, 242, 245 };
+	    135, 182, 183, 185, 221, 222, 223, 227, 228, 229, 230, 238, 241, 242, 245 };
     const u8 restricted[] = { 5, 6, 10, 11, 14, 16, 17, 18, 21, 22, 24, 25, 29, 30, 31, 32, 34,
 	    35, 49, 52, 55, 62, 67, 68, 69, 136, 148, 159, 170, 181, 186, 187, 188, 202, 224,
 	    225, 226, 231, 232, 233, 234, 235, 243, 244, 246 };
 
     if(isShadow(index))
 	return DIRECTION_ALL;
+    else
+    if(184 == index)
+	return Direction::CENTER | Direction::BOTTOM_RIGHT | DIRECTION_TOP_ROW;
     else
     if(isAction(index) ||
 	ARRAY_COUNT_END(disabled) != std::find(disabled, ARRAY_COUNT_END(disabled), index))

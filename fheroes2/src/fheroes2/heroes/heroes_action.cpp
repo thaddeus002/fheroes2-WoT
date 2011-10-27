@@ -354,27 +354,15 @@ void AnimationRemoveObject(Maps::Tiles & tile)
     }
 }
 
-void MoveHero2Dest(Heroes & hero, s32 dst_index, MP2::object_t from_obj, MP2::object_t under_obj)
-{
-    Maps::Tiles & tiles_from = world.GetTiles(hero.GetIndex());
-    Maps::Tiles & tiles_to = world.GetTiles(dst_index);
-
-    tiles_from.SetObject(from_obj);
-    hero.SetIndex(dst_index);
-    hero.Scoute();
-    hero.SaveUnderObject(under_obj);
-    hero.ApplyPenaltyMovement();
-    tiles_to.SetObject(MP2::OBJ_HEROES);
-}
-
 // action to next cell
 void Heroes::Action(const s32 dst_index)
 {
     if(CONTROL_AI == world.GetKingdom(GetColor()).GetControl())
 	return AI::HeroesAction(*this, dst_index);
 
+    const Maps::Tiles & tile = world.GetTiles(dst_index);
     const MP2::object_t object = (dst_index == GetIndex() ?
-				    GetUnderObject() : world.GetTiles(dst_index).GetObject());
+				    tile.GetObject(false) : tile.GetObject());
 
     if(MUS::FromMapObject(object) != MUS::UNKNOWN)
         AGG::PlayMusic(MUS::FromMapObject(object), false);
@@ -557,8 +545,11 @@ void ActionToMonster(Heroes & hero, const u8 & obj, const s32 & dst_index)
         String::Replace(message, "%{monster}", String::Lower(troop.GetMultiName()));
 
         if(Dialog::Message("Followers", message, Font::BIG, Dialog::YES | Dialog::NO) == Dialog::YES)
-            hero.GetArmy().JoinTroop(troop);
-        else
+	{
+    	    hero.GetArmy().JoinTroop(troop);
+            Interface::Basic::Get().SetRedraw(REDRAW_STATUS);
+	}
+	else
 	{
 	    Dialog::Message("", _("Insulted by your refusal of their offer, the monsters attack!"), Font::BIG, Dialog::OK);
 	    reason = 0;
@@ -591,6 +582,7 @@ void ActionToMonster(Heroes & hero, const u8 & obj, const s32 & dst_index)
 						    ", count: " << join << ", cost: " << cost.gold);
             hero.GetArmy().JoinTroop(troop(), join);
             world.GetKingdom(hero.GetColor()).OddFundsResource(cost);
+            Interface::Basic::Get().SetRedraw(REDRAW_STATUS);
         }
         else
 	{
@@ -667,7 +659,7 @@ void ActionToMonster(Heroes & hero, const u8 & obj, const s32 & dst_index)
 	/*
 	if(conf.ExtHeroAutoMove2BattleTarget() && allow_move)
 	{
-	    MoveHero2Dest(hero, dst_index, hero.GetUnderObject(), tile.GetObject());
+	    hero.Move2Dest(dst_index);
 	}
 	*/
     }
@@ -703,17 +695,15 @@ void ActionToHeroes(Heroes & hero, const u8 & obj, const s32 & dst_index)
     }
     else
     {
-	if(other_hero->GetUnderObject() == MP2::OBJ_CASTLE)
+	Castle *other_hero_castle = other_hero->inCastle();
+	if(other_hero_castle && other_hero == other_hero_castle->GetHeroes().GuardFirst())
 	{
-	    Castle *castle = world.GetCastle(dst_index);
-	    if(castle && other_hero == castle->GetHeroes().GuardFirst())
-    	    {
-		ActionToCastle(hero, MP2::OBJ_CASTLE, dst_index);
-		return;
-	    }
+	    ActionToCastle(hero, MP2::OBJ_CASTLE, dst_index);
+	    return;
 	}
 
-	bool disable_auto_move = hero.isShipMaster() || other_hero->isShipMaster() || other_hero->inCastle() || hero.GetUnderObject() == MP2::OBJ_STONELIGHTS;
+	bool disable_auto_move = hero.isShipMaster() || other_hero->isShipMaster() ||
+			    other_hero_castle || world.GetTiles(hero.GetIndex()).GetObject(false) == MP2::OBJ_STONELIGHTS;
         DEBUG(DBG_GAME, DBG_INFO, hero.GetName() << " attack enemy hero " << other_hero->GetName());
 
 	// new battle2
@@ -735,7 +725,7 @@ void ActionToHeroes(Heroes & hero, const u8 & obj, const s32 & dst_index)
 	    // auto move hero
 	    if(conf.ExtHeroAutoMove2BattleTarget() && !disable_auto_move)
 	    {
-		MoveHero2Dest(hero, dst_index, hero.GetUnderObject(), world.GetTiles(dst_index).GetObject());
+		hero.Move2Dest(dst_index);
 	    }
 	}
 	else
@@ -836,7 +826,7 @@ void ActionToCastle(Heroes & hero, const u8 & obj, const s32 & dst_index)
 	// auto move hero to castle
 	if(conf.ExtHeroAutoMove2BattleTarget() && allow_enter)
 	{
-	    MoveHero2Dest(hero, dst_index, hero.GetUnderObject(), MP2::OBJ_CASTLE);
+	    hero.Move2Dest(dst_index);
 	    ActionToCastle(hero, MP2::OBJ_CASTLE, dst_index);
 	}
     }
@@ -850,11 +840,10 @@ void ActionToBoat(Heroes & hero, const u8 & obj, const s32 & dst_index)
     hero.GetPath().Hide();
     hero.FadeOut();
     hero.ResetMovePoints();
-    MoveHero2Dest(hero, dst_index, hero.GetUnderObject(), MP2::OBJ_ZERO);
+    hero.Move2Dest(dst_index);
+    world.GetTiles(dst_index).SetObject(MP2::OBJ_ZERO);
     hero.SetShipMaster(true);
-
     hero.GetPath().Reset();
-    hero.ActionNewPosition();
 
     DEBUG(DBG_GAME, DBG_INFO, hero.GetName());
 }
@@ -864,14 +853,13 @@ void ActionToCoast(Heroes & hero, const u8 & obj, const s32 & dst_index)
     if(! hero.isShipMaster()) return;
 
     hero.ResetMovePoints();
-    MoveHero2Dest(hero, dst_index, MP2::OBJ_BOAT, MP2::OBJ_COAST);
+    world.GetTiles(hero.GetIndex()).SetObject(MP2::OBJ_BOAT);
+    hero.Move2Dest(dst_index);
     hero.SetShipMaster(false);
     AGG::PlaySound(M82::KILLFADE);
     hero.GetPath().Hide();
     hero.FadeIn();
-
     hero.GetPath().Reset();
-    hero.ActionNewPosition();
 
     DEBUG(DBG_GAME, DBG_INFO, hero.GetName());
 }
@@ -919,7 +907,7 @@ void ActionToResource(Heroes & hero, const u8 & obj, const s32 & dst_index)
     Maps::Tiles & tile = world.GetTiles(dst_index);
     const ResourceCount & rc = tile.QuantityResourceCount();
     bool cancapture = Settings::Get().ExtWorldWindWaterMillsCaptured();
-    bool showinvalid = cancapture && hero.GetColor() == world.ColorCapturedObject(dst_index) ? false : true;
+    bool showinvalid = cancapture && hero.GetColor() == tile.QuantityColor() ? false : true;
 
     std::string msg;
 
@@ -1738,7 +1726,7 @@ void ActionToArtifact(Heroes & hero, const u8 & obj, const s32 & dst_index)
 
 	    PlaySoundWarning;
 
-	    if(Monster::ROGUE  == troop())
+	    if(Monster::ROGUE  == troop().GetID())
 		Dialog::Message("", _("You come upon an ancient artifact. As you reach for it, a pack of Rogues leap out of the brush to guard their stolen loot."), Font::BIG, Dialog::OK);
 	    else
 	    {
@@ -1896,18 +1884,17 @@ void ActionToTreasureChest(Heroes & hero, const u8 & obj, const s32 & dst_index)
 void ActionToAncientLamp(Heroes & hero, const u8 & obj, const s32 & dst_index)
 {
     Maps::Tiles & tile = world.GetTiles(dst_index);
-    const u32 count = tile.MonsterCount();
+    const Army::Troop & troop = tile.QuantityTroop();
 
     PlaySoundSuccess;
     if(Dialog::YES == Dialog::Message(MP2::StringObject(obj), _("You stumble upon a dented and tarnished lamp lodged deep in the earth. Do you wish to rub the lamp?"), Font::BIG, Dialog::YES|Dialog::NO))
     {
-	const u16 recruit = Dialog::RecruitMonster(Monster::GENIE, count);
+	const u16 recruit = Dialog::RecruitMonster(troop(), troop.GetCount());
 	if(recruit)
 	{
-	    const Monster genie(Monster::GENIE);
-	    if(hero.GetArmy().JoinTroop(genie, recruit))
+	    if(hero.GetArmy().JoinTroop(troop(), recruit))
 	    {
-		if(recruit == count)
+		if(recruit == troop.GetCount())
 		{
 		    PlayPickupSound();
 		    AnimationRemoveObject(tile);
@@ -1916,13 +1903,14 @@ void ActionToAncientLamp(Heroes & hero, const u8 & obj, const s32 & dst_index)
 		    tile.SetObject(MP2::OBJ_ZERO);
 		}
 		else
-		    tile.MonsterSetCount(count - recruit);
+		    tile.MonsterSetCount(troop.GetCount() - recruit);
 
-    		const payment_t paymentCosts = genie.GetCost() * recruit;
+    		const payment_t paymentCosts = troop().GetCost() * recruit;
                 world.GetKingdom(hero.GetColor()).OddFundsResource(paymentCosts);
+        	Interface::Basic::Get().SetRedraw(REDRAW_STATUS);
 	    }
 	    else
-		Dialog::Message(genie.GetName(), _("You are unable to recruit at this time, your ranks are full."), Font::BIG, Dialog::OK);
+		Dialog::Message(troop.GetName(), _("You are unable to recruit at this time, your ranks are full."), Font::BIG, Dialog::OK);
 	}
     }
 
@@ -1965,7 +1953,7 @@ void ActionToTeleports(Heroes & hero, const s32 & index_from)
 
     Cursor::Get().Hide();
 
-    MoveHero2Dest(hero, index_to, MP2::OBJ_STONELIGHTS, MP2::OBJ_STONELIGHTS);
+    hero.Move2Dest(index_to, true);
 
     Interface::Basic & I = Interface::Basic::Get();
     I.gameArea.SetCenter(hero.GetCenter());
@@ -2000,7 +1988,7 @@ void ActionToWhirlpools(Heroes & hero, const u8 & obj, const s32 & index_from)
 
     Cursor::Get().Hide();
 
-    MoveHero2Dest(hero, index_to, MP2::OBJ_WHIRLPOOL, MP2::OBJ_WHIRLPOOL);
+    hero.Move2Dest(index_to, true);
 
     Interface::Basic & I = Interface::Basic::Get();
     I.gameArea.SetCenter(hero.GetCenter());
@@ -2097,7 +2085,7 @@ void ActionToCaptureObject(Heroes & hero, const u8 & obj, const s32 & dst_index)
     }
 
     // capture object
-    if(! Players::isFriends(hero.GetColor(), world.ColorCapturedObject(dst_index)))
+    if(! Players::isFriends(hero.GetColor(), tile.QuantityColor()))
     {
 	bool capture = true;
 
@@ -2133,14 +2121,14 @@ void ActionToCaptureObject(Heroes & hero, const u8 & obj, const s32 & dst_index)
 	    if(obj == MP2::OBJ_ABANDONEDMINE)
 	    {
 		tile.UpdateAbandoneMineSprite(tile);
-		hero.SaveUnderObject(MP2::OBJ_MINES);
+		tile.SetObject(MP2::OBJ_MINES);
 	    }
 
 	    // reset spell info
 	    Maps::TilesAddon* addon = tile.FindObject(MP2::OBJ_MINES);
 	    if(addon) addon->tmp  = 0;
 
-	    world.CaptureObject(dst_index, hero.GetColor());
+	    tile.QuantitySetColor(hero.GetColor());
 	}
     }
     else
@@ -2164,16 +2152,14 @@ void ActionToCaptureObject(Heroes & hero, const u8 & obj, const s32 & dst_index)
 void ActionToDwellingJoinMonster(Heroes & hero, const u8 & obj, const s32 & dst_index)
 {
     Maps::Tiles & tile = world.GetTiles(dst_index);
+    const Army::Troop & troop = tile.QuantityTroop();
 
-    const u32 count = tile.MonsterCount();
-
-    if(count)
+    if(troop.isValid())
     {
 	hero.MovePointsScaleFixed();
 
-	const Monster monster(Monster::FromObject(obj));
         std::string message = _("A group of %{monster} with a desire for greater glory wish to join you. Do you accept?");
-        String::Replace(message, "%{monster}", monster.GetMultiName());
+        String::Replace(message, "%{monster}", troop.GetMultiName());
 
 	if(! Settings::Get().MusicMIDI() && obj == MP2::OBJ_WATCHTOWER)
 	    AGG::PlayMusic(MUS::WATCHTOWER, false);
@@ -2182,14 +2168,16 @@ void ActionToDwellingJoinMonster(Heroes & hero, const u8 & obj, const s32 & dst_
 
         if(Dialog::YES == Dialog::Message(MP2::StringObject(obj), message, Font::BIG, Dialog::YES|Dialog::NO))
 	{
-	    if(!hero.GetArmy().JoinTroop(monster, count))
-		Dialog::Message(monster.GetName(), _("You are unable to recruit at this time, your ranks are full."), Font::BIG, Dialog::OK);
+	    if(!hero.GetArmy().JoinTroop(troop))
+		Dialog::Message(troop.GetName(), _("You are unable to recruit at this time, your ranks are full."), Font::BIG, Dialog::OK);
 	    else
 	    {
 		tile.MonsterSetCount(0);
 
 		if(Settings::Get().ExtHeroRecalculateMovement())
 		    hero.RecalculateMovePoints();
+
+        	Interface::Basic::Get().SetRedraw(REDRAW_STATUS);
 	    }
 	}
     }
@@ -2263,32 +2251,31 @@ void ActionToDwellingRecruitMonster(Heroes & hero, const u8 & obj, const s32 & d
 	default: return;
     }
 
-    const u32 count = tile.MonsterCount();
-    
+    const Army::Troop & troop = tile.QuantityTroop();
     std::string name_object(MP2::StringObject(obj));
 
-    if(count)
+    if(troop.isValid())
     {
-	const Monster monster(Monster::FromObject(obj));
-
 	hero.MovePointsScaleFixed();
 
 	if(Dialog::YES == Dialog::Message(name_object, msg_full, Font::BIG, Dialog::YES | Dialog::NO))
 	{
-	    const u16 recruit = Dialog::RecruitMonster(monster, count);
+	    const u16 recruit = Dialog::RecruitMonster(troop(), troop.GetCount());
 	    if(recruit)
 	    {
-		if(!hero.GetArmy().JoinTroop(monster, recruit))
+		if(!hero.GetArmy().JoinTroop(troop))
 		    Dialog::Message(name_object, _("You are unable to recruit at this time, your ranks are full."), Font::BIG, Dialog::OK);
 		else
 		{
-		    tile.MonsterSetCount(count - recruit);
+		    tile.MonsterSetCount(troop.GetCount() - recruit);
 
-		    const payment_t paymentCosts = monster.GetCost() * recruit;
+		    const payment_t paymentCosts = troop().GetCost() * recruit;
 		    world.GetKingdom(hero.GetColor()).OddFundsResource(paymentCosts);
 
 		    if(Settings::Get().ExtHeroRecalculateMovement())
 			hero.RecalculateMovePoints();
+
+        	    Interface::Basic::Get().SetRedraw(REDRAW_STATUS);
 		}
 	    }
 	}
@@ -2308,36 +2295,36 @@ void ActionToDwellingBattleMonster(Heroes & hero, const u8 & obj, const s32 & ds
     Maps::Tiles & tile = world.GetTiles(dst_index);
 
     // yet no one captured.
-    const bool & battle = Color::NONE == world.ColorCapturedObject(dst_index);
-    const u32 count = tile.MonsterCount();
+    const bool & battle = Color::NONE == tile.QuantityColor();
+    const Army::Troop & troop = tile.QuantityTroop();
     bool complete = false;
 
     const char* str_empty = NULL;
-    const char* str_full  = NULL;
-    const char* str_warn  = NULL;
     const char* str_recr  = NULL;
+    const char* str_warn  = NULL;
+    const char* str_wins  = NULL;
     
     switch(obj)
     {
         case MP2::OBJ_CITYDEAD:
 	    str_empty = _("The City of the Dead is empty of life, and empty of unlife as well. Perhaps some undead will move in next week.");
-	    str_full  = _("Some Liches living here are willing to join your army for a price. Do you want to recruit Liches?");
+	    str_recr  = _("Some Liches living here are willing to join your army for a price. Do you want to recruit Liches?");
 	    str_warn  = _("You've found the ruins of an ancient city, now inhabited solely by the undead. Will you search?");
-	    str_recr  = _("Some of the surviving Liches are impressed by your victory over their fellows, and offer to join you for a price. Do you want to recruit Liches?");
+	    str_wins  = _("Some of the surviving Liches are impressed by your victory over their fellows, and offer to join you for a price. Do you want to recruit Liches?");
 	    break;
 
         case MP2::OBJ_TROLLBRIDGE:
 	    str_empty = _("You've found one of those bridges that Trolls are so fond of living under, but there are none here. Perhaps there will be some next week.");
-	    str_full  = _("Some Trolls living under a bridge are willing to join your army, but for a price. Do you want to recruit Trolls?");
+	    str_recr  = _("Some Trolls living under a bridge are willing to join your army, but for a price. Do you want to recruit Trolls?");
 	    str_warn  = _("Trolls living under the bridge challenge you. Will you fight them?");
-	    str_recr  = _("A few Trolls remain, cowering under the bridge. They approach you and offer to join your forces as mercenaries. Do you want to buy any Trolls?");
+	    str_wins  = _("A few Trolls remain, cowering under the bridge. They approach you and offer to join your forces as mercenaries. Do you want to buy any Trolls?");
     	    break;
 
 	case MP2::OBJ_DRAGONCITY:
 	    str_empty = _("The Dragon city has no Dragons willing to join you this week. Perhaps a Dragon will become available next week.");
-	    str_full  = _("The Dragon city is willing to offer some Dragons for your army for a price. Do you wish to recruit Dragons?");
+	    str_recr  = _("The Dragon city is willing to offer some Dragons for your army for a price. Do you wish to recruit Dragons?");
 	    str_warn  = _("You stand before the Dragon City, a place off-limits to mere humans. Do you wish to violate this rule and challenge the Dragons to a fight?");
-	    str_recr  = _("Having defeated the Dragon champions, the city's leaders agree to supply some Dragons to your army for a price. Do you wish to recruit Dragons?");
+	    str_wins  = _("Having defeated the Dragon champions, the city's leaders agree to supply some Dragons to your army for a price. Do you wish to recruit Dragons?");
 	    break;
 
 	default: return;
@@ -2345,15 +2332,15 @@ void ActionToDwellingBattleMonster(Heroes & hero, const u8 & obj, const s32 & ds
 
     if(!battle)
     {
-	if(0 == count)
+	if(troop.isValid())
 	{
-	    PlaySoundVisited;
-	    Dialog::Message(MP2::StringObject(obj), str_empty, Font::BIG, Dialog::OK);
+	    PlaySoundSuccess;
+	    complete = (Dialog::YES == Dialog::Message(MP2::StringObject(obj), str_recr, Font::BIG, Dialog::YES | Dialog::NO));
 	}
 	else
 	{
-	    PlaySoundSuccess;
-	    complete = (Dialog::YES == Dialog::Message(MP2::StringObject(obj), str_full, Font::BIG, Dialog::YES | Dialog::NO));
+	    PlaySoundVisited;
+	    Dialog::Message(MP2::StringObject(obj), str_empty, Font::BIG, Dialog::OK);
 	}
     }
     else
@@ -2368,9 +2355,10 @@ void ActionToDwellingBattleMonster(Heroes & hero, const u8 & obj, const s32 & ds
 	    if(res.AttackerWins())
 	    {
 		hero.IncreaseExperience(res.GetExperienceAttacker());
-		world.CaptureObject(dst_index, hero.GetColor());
+		tile.QuantitySetColor(hero.GetColor());
+		tile.SetObjectPassable(true);
 		PlaySoundSuccess;
-		complete = (Dialog::YES == Dialog::Message(MP2::StringObject(obj), str_recr, Font::BIG, Dialog::YES | Dialog::NO));
+		complete = (Dialog::YES == Dialog::Message(MP2::StringObject(obj), str_wins, Font::BIG, Dialog::YES | Dialog::NO));
 	    }
 	    else
 	    {
@@ -2382,25 +2370,26 @@ void ActionToDwellingBattleMonster(Heroes & hero, const u8 & obj, const s32 & ds
     // recruit monster
     if(complete)
     {
-	if(count)
+	if(troop.isValid())
 	{
 	    hero.MovePointsScaleFixed();
+    	    const u16 recruit = Dialog::RecruitMonster(troop(), troop.GetCount());
 
-	    const Monster monster(Monster::FromObject(obj));
-    	    const u16 recruit = Dialog::RecruitMonster(monster, count);
     	    if(recruit)
     	    {
-    		if(!hero.GetArmy().JoinTroop(monster, recruit))
-		    Dialog::Message(monster.GetName(), _("You are unable to recruit at this time, your ranks are full."), Font::BIG, Dialog::OK);
+    		if(!hero.GetArmy().JoinTroop(troop(), recruit))
+		    Dialog::Message(troop.GetName(), _("You are unable to recruit at this time, your ranks are full."), Font::BIG, Dialog::OK);
     		else
     		{
-		    tile.MonsterSetCount(count - recruit);
+		    tile.MonsterSetCount(troop.GetCount() - recruit);
 
-    		    const payment_t paymentCosts = monster.GetCost() * recruit;
+    		    const payment_t paymentCosts = troop().GetCost() * recruit;
     		    world.GetKingdom(hero.GetColor()).OddFundsResource(paymentCosts);
 
 		    if(Settings::Get().ExtHeroRecalculateMovement())
 			hero.RecalculateMovePoints();
+
+        	    Interface::Basic::Get().SetRedraw(REDRAW_STATUS);
 		}
     	    }
 	}
@@ -2650,9 +2639,10 @@ void ActionToEvent(Heroes & hero, const u8 & obj, const s32 & dst_index)
 	}
 
 	event_maps.SetVisited(hero.GetColor());
-    }
 
-    hero.SaveUnderObject(MP2::OBJ_ZERO);
+	if(event_maps.cancel)
+	    world.GetTiles(hero.GetIndex()).SetObject(MP2::OBJ_ZERO);
+    }
 
     DEBUG(DBG_GAME, DBG_INFO, hero.GetName());
 }

@@ -720,11 +720,9 @@ bool Heroes::Recruit(u8 cl, const Point & pt)
 
 	if(!army.isValid()) army.Reset(false);
 
-	// save general object
-	save_maps_object = tiles.GetObject();
-	tiles.SetObject(MP2::OBJ_HEROES);
-
+	tiles.SetHeroesPresent();
 	kingdom.AddHeroes(this);
+
 	return true;
     }
 
@@ -1152,16 +1150,6 @@ void Heroes::SetMove(bool f)
     }
 }
 
-void Heroes::SaveUnderObject(MP2::object_t obj)
-{
-    save_maps_object = obj;
-}
-
-MP2::object_t Heroes::GetUnderObject(void) const
-{
-    return save_maps_object;
-}
-
 bool Heroes::isShipMaster(void) const
 {
     return Modes(SHIPMASTER);
@@ -1372,20 +1360,22 @@ void Heroes::SetFreeman(const u8 reason)
     if(isFreeman()) return;
 
     bool savepoints = false;
+    Kingdom & kingdom = world.GetKingdom(color);
+
     if((Battle2::RESULT_RETREAT | Battle2::RESULT_SURRENDER) & reason)
     {
 	if(Settings::Get().ExtRememberPointsForHeroRetreating()) savepoints = true;
-	world.GetKingdom(color).SetLastLostHero(*this);
+	kingdom.SetLastLostHero(*this);
     }
 
     if(!army.isValid() || (Battle2::RESULT_RETREAT & reason)) army.Reset(false);
     else
     if((Battle2::RESULT_LOSS & reason) && !(Battle2::RESULT_SURRENDER & reason)) army.Reset(true);
 
-    if(color != Color::NONE) world.GetKingdom(color).RemoveHeroes(this);
+    if(color != Color::NONE) kingdom.RemoveHeroes(this);
 
     color = Color::NONE;
-    world.GetTiles(GetIndex()).SetObject(save_maps_object);
+    world.GetTiles(GetIndex()).ResetHeroesPresent();
     modes = 0;
     SetIndex(-1);
     move_point_scale = -1;
@@ -1453,7 +1443,7 @@ u8 Heroes::GetControl(void) const
 bool Heroes::AllowBattle(bool attacker) const
 {
     if(!attacker)
-    switch(save_maps_object)
+    switch(world.GetTiles(GetIndex()).GetObject(false))
     {
 	case MP2::OBJ_TEMPLE: return false;
 	default: break;
@@ -1514,7 +1504,8 @@ void Heroes::ActionNewPosition(void)
 	}
     }
 
-    if(MP2::OBJ_EVENT == save_maps_object)
+    if(! isFreeman() &&
+	world.GetTiles(GetIndex()).GetObject(false) == MP2::OBJ_EVENT)
     {
 	Action(GetIndex());
 	SetMove(false);
@@ -1597,6 +1588,21 @@ void Heroes::RecalculateMovePoints(void)
     if(0 <= move_point_scale) move_point = GetMaxMovePoints() * move_point_scale / 1000;
 }
 
+void Heroes::Move2Dest(const s32 & dst_index, bool skip_action /* false */)
+{
+    Maps::Tiles & tiles_from = world.GetTiles(GetIndex());
+    Maps::Tiles & tiles_to = world.GetTiles(dst_index);
+
+    tiles_from.ResetHeroesPresent();
+    SetIndex(dst_index);
+    Scoute();
+    ApplyPenaltyMovement();
+    tiles_to.SetHeroesPresent();
+
+    if(!skip_action)
+	ActionNewPosition();
+}
+
 std::string Heroes::String(void) const
 {
     std::ostringstream os;
@@ -1616,7 +1622,7 @@ std::string Heroes::String(void) const
 	"direction       : " << Direction::String(direction) << std::endl <<
 	"index sprite    : " << static_cast<u16>(sprite_index) << std::endl <<
 	"in castle       : " << (inCastle() ? "true" : "false") << std::endl <<
-	"save object     : " << MP2::StringObject(save_maps_object) << std::endl <<
+	"save object     : " << MP2::StringObject(world.GetTiles(GetIndex()).GetObject(false)) << std::endl <<
 	"flags           : " << (Modes(SHIPMASTER) ? "SHIPMASTER," : "") <<
                                          (Modes(SCOUTER) ? "SCOUTER," : "") <<
                                          (Modes(HUNTER) ? "HUNTER," : "") <<

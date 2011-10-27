@@ -1381,6 +1381,7 @@ void World::UpdateDwellingPopulation(void)
 	Maps::Tiles & tile = *it;
 	MP2::object_t obj = tile.GetObject(false);
 	float count = 0;
+	const Army::Troop & troop = tile.QuantityTroop();
 
 	switch(obj)
 	{
@@ -1392,18 +1393,12 @@ void World::UpdateDwellingPopulation(void)
             case MP2::OBJ_CAVE:
             case MP2::OBJ_TREEHOUSE:
             case MP2::OBJ_GOBLINHUT:
-	    {
-		const Monster m(Monster::FromObject(obj));
-		count = m.GetRNDSize(true) * 3 / 2;
+		count = troop().GetRNDSize(true) * 3 / 2;
 		break;
-	    }
 
             case MP2::OBJ_TREECITY:
-	    {
-		const Monster m(Monster::FromObject(obj));
-		count = 2 * m.GetRNDSize(true);
+		count = 2 * troop().GetRNDSize(true);
 		break;
-	    }
 	    
     	    case MP2::OBJ_WATCHTOWER:
             case MP2::OBJ_ARCHERHOUSE:
@@ -1417,19 +1412,13 @@ void World::UpdateDwellingPopulation(void)
             case MP2::OBJ_FIREALTAR:
             case MP2::OBJ_EARTHALTAR:
 	    case MP2::OBJ_BARROWMOUNDS:
-	    {
-		const Monster m(Monster::FromObject(obj));
-		count = m.GetRNDSize(true);
+		count = troop().GetRNDSize(true);
 		break;
-	    }
 
             case MP2::OBJ_TROLLBRIDGE:
             case MP2::OBJ_CITYDEAD:
-	    {
-		const Monster m(Monster::FromObject(obj));
-		count = m.GetRNDSize(true);
+		count = troop().GetRNDSize(true);
 		break;
-	    }
 
             case MP2::OBJ_DRAGONCITY:
         	count = 1;
@@ -1457,7 +1446,7 @@ void World::UpdateDwellingPopulation(void)
 	if(count)
 	{
 	    if(Settings::Get().ExtWorldDwellingsAccumulateUnits())
-    		tile.MonsterSetCount(tile.MonsterCount() + static_cast<u16>(count));
+    		tile.MonsterSetCount(troop.GetCount() + static_cast<u16>(count));
 	    else
 		tile.MonsterSetCount(static_cast<u16>(count));
 	}

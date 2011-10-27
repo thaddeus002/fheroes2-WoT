@@ -376,8 +376,7 @@ screen_t CastleOpenDialog1(Castle & castle, bool readonly)
                 heroes.Guard()->GetPath().Reset();
                 heroes.Guard()->GetArmy().JoinArmy(castle.GetArmy());
 
-                world.GetTiles(castle.GetCenter()).SetObject(MP2::OBJ_CASTLE);
-                heroes.Guard()->SaveUnderObject(MP2::OBJ_ZERO);
+                world.GetTiles(castle.GetCenter()).ResetHeroesPresent();
 
                 // free position
                 Point position(heroes.Guard()->GetCenter());
@@ -409,8 +408,7 @@ screen_t CastleOpenDialog1(Castle & castle, bool readonly)
             position.y += 1;
             heroes.Guest()->SetCenter(position);
 
-            world.GetTiles(castle.GetCenter()).SetObject(MP2::OBJ_HEROES);
-            heroes.Guest()->SaveUnderObject(MP2::OBJ_CASTLE);
+            world.GetTiles(castle.GetCenter()).SetHeroesPresent();
 
             cursor.Hide();
             if(selectArmy1.isSelected()) selectArmy1.Reset();

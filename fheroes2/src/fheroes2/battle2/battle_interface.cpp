@@ -686,11 +686,11 @@ Battle2::Interface::Interface(Arena & a, s32 center) : arena(a), icn_cbkg(ICN::U
 
     // cover
     bool trees = Maps::ScanAroundObjectV(center, MP2::OBJ_TREES).size();
-    const Heroes *hero = world.GetHeroes(center);
-    bool grave = hero && MP2::OBJ_GRAVEYARD == hero->GetUnderObject();
+    const Maps::Tiles & tile = world.GetTiles(center);
+    bool grave = MP2::OBJ_GRAVEYARD == tile.GetObject(false);
     bool light = true;
 
-    switch(world.GetTiles(center).GetGround())
+    switch(tile.GetGround())
     {
         case Maps::Ground::DESERT:      icn_cbkg = ICN::CBKGDSRT; light = false; icn_frng = ICN::FRNG0004; break;
 	case Maps::Ground::SNOW:        icn_cbkg = trees ? ICN::CBKGSNTR : ICN::CBKGSNMT; light = false; icn_frng = trees ? ICN::FRNG0006 : ICN::FRNG0007; break;
@@ -2652,7 +2652,7 @@ void Battle2::Interface::RedrawActionMonsterSpellCastStatus(const Stats & attack
 {
     const char* msg = NULL;
 
-    switch(attacker.troop())
+    switch(attacker.troop().GetID())
     {
 	case Monster::UNICORN:		msg = _("The Unicorns attack blinds the %{name}!"); break;
 	case Monster::MEDUSA:		msg = _("The Medusas gaze turns the %{name} to stone!"); break;

@@ -29,6 +29,10 @@ ICN::icn_t MP2::GetICNObject(const u8 type)
 {
     switch(type)
     {
+	// reserverd
+	case 0:
+	    return ICN::UNKNOWN;
+
 	// manual
 	case 0x11:
 	    return ICN::TELEPORT1;
@@ -1019,6 +1023,7 @@ u16 MP2::GetObjectDirect(const u8 obj)
         case OBJ_DERELICTSHIP:
             return Direction::CENTER | Direction::LEFT | Direction::BOTTOM_LEFT | Direction::BOTTOM;
 
+        case OBJ_TROLLBRIDGE:
         case OBJ_ARCHERHOUSE:
         case OBJ_DOCTORHUT:
         case OBJ_DWARFCOTT:
@@ -1034,7 +1039,6 @@ u16 MP2::GetObjectDirect(const u8 obj)
         case OBJ_MAGICWELL:
         case OBJ_OBSERVATIONTOWER:
         case OBJ_PEASANTHUT:
-        case OBJ_TROLLBRIDGE:
         case OBJ_STONELIGHTS:
         case OBJ_STANDINGSTONES:
         case OBJ_GOBLINHUT:

@@ -87,7 +87,8 @@ void WorldStoreObjects(u8 color, IndexObjectMap & store)
         const Maps::Tiles & tile = world.GetTiles(it);
         if(tile.isFog(color)) continue;
 
-        if(MP2::isGroundObject(tile.GetObject()) || MP2::isWaterObject(tile.GetObject()) || MP2::OBJ_HEROES == tile.GetObject())
+        if(MP2::isGroundObject(tile.GetObject()) ||
+	    MP2::isWaterObject(tile.GetObject()) || MP2::OBJ_HEROES == tile.GetObject())
         {
             // if quantity object is empty
             if(MP2::isQuantityObject(tile.GetObject()) &&
@@ -95,7 +96,7 @@ void WorldStoreObjects(u8 color, IndexObjectMap & store)
 
 	    // skip captured obj
 	    if(MP2::isCaptureObject(tile.GetObject()) &&
-		Players::isFriends(color, world.ColorCapturedObject(tile.GetIndex()))) continue;
+		Players::isFriends(color, tile.QuantityColor())) continue;
 
             // skip for meeting heroes
             if(MP2::OBJ_HEROES == tile.GetObject())

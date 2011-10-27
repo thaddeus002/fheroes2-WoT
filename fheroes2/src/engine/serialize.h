@@ -139,7 +139,8 @@ class PageBuffer : public std::streambuf
 	std::streampos seekpos(std::streampos sp, std::ios_base::openmode which)
 	{
 	    if((which & std::ios_base::in) &&
-		sp < obufpos())
+		sp >= 0 &&
+		static_cast<size_t>(sp) < obufpos())
 	    {
 		isp = listbuf.begin();
 		std::advance(isp, sp / pagesz);

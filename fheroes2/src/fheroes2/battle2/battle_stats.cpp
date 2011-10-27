@@ -647,7 +647,7 @@ u32 Battle2::Stats::CalculateDamageStats(const Stats & enemy, float dmg) const
     {
     	if(isHandFighting())
         {
-    	    switch(troop())
+    	    switch(troop().GetID())
             {
             	// skip
                 case Monster::MAGE:
@@ -685,7 +685,7 @@ u32 Battle2::Stats::CalculateDamageStats(const Stats & enemy, float dmg) const
     if(enemy.Modes(SP_STONE)) dmg /= 2;
 
     // check capability
-    switch(troop())
+    switch(troop().GetID())
     {
 	case Monster::CRUSADER:
 	    // double damage for undead
@@ -700,7 +700,7 @@ u32 Battle2::Stats::CalculateDamageStats(const Stats & enemy, float dmg) const
     if(enemy.troop.isDragons() && Modes(SP_DRAGONSLAYER)) r+= Spell(Spell::DRAGONSLAYER).ExtraValue();
     dmg *= 1 + (0 < r ? 0.1 * std::min(r,  20) : 0.05 * std::max(r, -15));
 
-    switch(troop())
+    switch(troop().GetID())
     {
 	case Monster::GENIE:
 	    // 10% half
@@ -839,7 +839,7 @@ u32 Battle2::Stats::ApplyDamage(Stats & enemy, u32 dmg)
     const u32 killed = ApplyDamage(dmg);
     u32 resurrect;
 
-    if(killed) switch(enemy.troop())
+    if(killed) switch(enemy.troop().GetID())
     {
 	case Monster::GHOST:
 	    resurrect = killed * enemy.GetMonster().GetHitPoints();
@@ -1017,7 +1017,7 @@ void Battle2::Stats::SetResponse(void)
 
 void Battle2::Stats::PostAttackAction(Stats & enemy)
 {
-    switch(troop())
+    switch(troop().GetID())
     {
 	case Monster::ARCHMAGE:
 	    // 20% clean magic state
@@ -1338,7 +1338,7 @@ void Battle2::Stats::SpellApplyDamage(const Spell & spell, u8 spoint, const Hero
 {
     u32 dmg = spell.Damage() * spoint;
 
-    switch(troop())
+    switch(troop().GetID())
     {
 	case Monster::IRON_GOLEM:
 	case Monster::STEEL_GOLEM:
@@ -1532,7 +1532,7 @@ void Battle2::Stats::SpellRestoreAction(const Spell & spell, u8 spoint, const He
 
 bool Battle2::Stats::isTwiceAttack(void) const
 {
-    switch(troop())
+    switch(troop().GetID())
     {
         case Monster::ELF:
         case Monster::GRAND_ELF:
@@ -1547,7 +1547,7 @@ bool Battle2::Stats::isTwiceAttack(void) const
 
 bool Battle2::Stats::isResurectLife(void) const
 {
-    switch(troop())
+    switch(troop().GetID())
     {
         case Monster::TROLL:
         case Monster::WAR_TROLL:
@@ -1561,7 +1561,7 @@ bool Battle2::Stats::isResurectLife(void) const
 
 bool Battle2::Stats::isDoubleCellAttack(void) const
 {
-    switch(troop())
+    switch(troop().GetID())
     {
         case Monster::CYCLOPS:
         case Monster::PHOENIX:
@@ -1578,7 +1578,7 @@ bool Battle2::Stats::isDoubleCellAttack(void) const
 
 bool Battle2::Stats::isMultiCellAttack(void) const
 {
-    switch(troop())
+    switch(troop().GetID())
     {
         case Monster::HYDRA:
             return true;
@@ -1597,7 +1597,7 @@ bool Battle2::Stats::isHideAttack(void) const
 
 bool Battle2::Stats::isAlwayResponse(void) const
 {
-    switch(troop())
+    switch(troop().GetID())
     {
         case Monster::GRIFFIN:
             return true;
@@ -1628,7 +1628,7 @@ u8 Battle2::Stats::GetMagicResist(const Spell & spell, u8 spower) const
     if(Settings::Get().ExtBattleMagicTroopCanResist() && spell == GetSpellMagic(true))
 	return 20;
 
-    switch(troop())
+    switch(troop().GetID())
     {
         case Monster::ARCHMAGE:
 	    if(Settings::Get().ExtBattleArchmageCanResistBadMagic() &&
@@ -1749,7 +1749,7 @@ bool Battle2::Stats::isMagicAttack(void) const
 
 u8 Battle2::Stats::GetSpellMagic(bool force) const
 {
-    switch(troop())
+    switch(troop().GetID())
     {
         case Monster::UNICORN:
             // 20% blind
@@ -1887,7 +1887,7 @@ M82::m82_t Battle2::Stats::M82Attk(void) const
 {
     if(isArchers() && !isHandFighting())
     {
-	switch(troop())
+	switch(troop().GetID())
 	{
 	    case Monster::ARCHER:
 	    case Monster::RANGER:	return M82::ARCHSHOT;

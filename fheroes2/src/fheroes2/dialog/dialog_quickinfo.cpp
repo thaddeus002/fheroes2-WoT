@@ -118,10 +118,11 @@ std::string ShowDwellingInfo(const Maps::Tiles & tile, u8 scoute)
     if(scoute)
     {
 	str.append("\n");
-	if(tile.MonsterCount())
+	const Army::Troop & troop = tile.QuantityTroop();
+	if(troop.isValid())
 	{
 	    str.append(_("(available: %{count})"));
-	    String::Replace(str, "%{count}", Game::CountScoute(tile.MonsterCount(), scoute));
+	    String::Replace(str, "%{count}", Game::CountScoute(troop.GetCount(), scoute));
 	}
 	else
 	    str.append("(empty)");
@@ -365,7 +366,7 @@ void Dialog::QuickInfo(const Maps::Tiles & tile)
 	tile.CaptureObjectIsProtection())
     {
 	name_object = ShowGuardiansInfo(tile,
-		(settings.CurrentColor() == world.ColorCapturedObject(tile.GetIndex()) ? Skill::Level::EXPERT : scoute));
+		(settings.CurrentColor() == tile.QuantityColor() ? Skill::Level::EXPERT : scoute));
     }
     else
     switch(tile.GetObject())

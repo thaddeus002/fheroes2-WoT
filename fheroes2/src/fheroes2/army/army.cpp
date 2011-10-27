@@ -135,7 +135,7 @@ Army::army_t::army_t(const Maps::Tiles & t) : troops(ARMYMAXTROOPS), commander(N
 	std::bind2nd(std::mem_fun_ref(&Army::Troop::SetArmy), this));
 
     if(MP2::isCaptureObject(t.GetObject()))
-	color = world.ColorCapturedObject(t.GetIndex());
+	color = t.QuantityColor();
 
     switch(t.GetObject(false))
     {

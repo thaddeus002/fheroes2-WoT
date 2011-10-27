@@ -471,8 +471,7 @@ Dialog::answer_t Castle::OpenDialog(bool readonly, bool fade)
 		heroes.Swap();
 		heroes.Guard()->GetArmy().JoinArmy(army);
 
-		world.GetTiles(center).SetObject(MP2::OBJ_CASTLE);
-		heroes.Guard()->SaveUnderObject(MP2::OBJ_ZERO);
+		world.GetTiles(center).ResetHeroesPresent();
 
 		// free position
 		Point position(heroes.Guard()->GetCenter());
@@ -507,8 +506,7 @@ Dialog::answer_t Castle::OpenDialog(bool readonly, bool fade)
 	    heroes.Guest()->SetCenter(position);
 	    heroes.Guest()->GetPath().Reset();
 
-	    world.GetTiles(center).SetObject(MP2::OBJ_HEROES);
-	    heroes.Guest()->SaveUnderObject(MP2::OBJ_CASTLE);
+	    world.GetTiles(center).SetHeroesPresent();
 
 	    cursor.Hide();
     	    if(selectArmy1.isSelected()) selectArmy1.Reset();

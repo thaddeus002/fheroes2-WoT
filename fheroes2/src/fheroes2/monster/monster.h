@@ -166,7 +166,6 @@ public:
     payment_t	GetUpgradeCost(void) const;
     u32		GetDwelling(void) const;
 
-    static Monster FromObject(u8);
     static Monster Rand(level_t = LEVEL0);
     static u8 Rand4WeekOf(void);
     static u8 Rand4MonthOf(void);

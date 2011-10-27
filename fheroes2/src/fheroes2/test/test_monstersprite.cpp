@@ -97,7 +97,7 @@ void TestMonsterSprite(void)
 
 	if(le.MouseClickLeft(pos))
 	{
-            u32 mons = troop();
+            u32 mons = troop().GetID();
             if(Dialog::SelectCount("Monster", Monster::PEASANT, Monster::WATER_ELEMENT, mons))
 	    {
         	cursor.Hide();

@@ -64,6 +64,11 @@ bool Army::Troop::operator== (const Monster & m) const
     return static_cast<Monster>(*this) == m;
 }
 
+Monster Army::Troop::operator() (void) const
+{
+    return *this;
+}
+
 void Army::Troop::Set(const Monster & m, u32 c)
 {
     SetMonster(m);

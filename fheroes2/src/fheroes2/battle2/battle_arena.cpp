@@ -354,9 +354,9 @@ void Battle2::Board::GetAbroadPositions(u16 center, u8 radius, bool skiptroop, s
 void Battle2::Board::SetCobjObjects(s32 center)
 {
 //    bool trees = Maps::ScanAroundObjectV(center, MP2::OBJ_TREES).size();
-    const Heroes* hero = world.GetHeroes(center);
-    bool grave = hero && MP2::OBJ_GRAVEYARD == hero->GetUnderObject();
-    u16 ground = world.GetTiles(center).GetGround();
+    const Maps::Tiles & tile = world.GetTiles(center);
+    bool grave = MP2::OBJ_GRAVEYARD == tile.GetObject(false);
+    u16 ground = tile.GetGround();
     std::vector<ICN::icn_t> objs;
 
     if(grave)

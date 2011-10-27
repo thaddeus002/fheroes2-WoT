@@ -164,12 +164,7 @@ bool HeroesTownGate(Heroes & hero, const Castle* castle)
 	hero.FadeOut();
 
 	Cursor::Get().Hide();
-	hero.SetIndex(dst);
-	hero.Scoute();
-
-	world.GetTiles(src).SetObject(hero.GetUnderObject());
-	hero.SaveUnderObject(world.GetTiles(dst).GetObject());
-	world.GetTiles(dst).SetObject(MP2::OBJ_HEROES);
+	hero.Move2Dest(dst);
 
 	I.gameArea.SetCenter(hero.GetCenter());
 	GameFocus::SetRedraw();
@@ -308,12 +303,7 @@ bool ActionSpellDimensionDoor(Heroes & hero)
 	hero.FadeOut();
 
 	cursor.Hide();
-	hero.SetIndex(dst);
-	hero.Scoute();
-
-	world.GetTiles(src).SetObject(hero.GetUnderObject());
-	hero.SaveUnderObject(world.GetTiles(dst).GetObject());
-	world.GetTiles(dst).SetObject(MP2::OBJ_HEROES);
+	hero.Move2Dest(dst, true);
 
 	I.gameArea.SetCenter(hero.GetCenter());
 	GameFocus::SetRedraw();
@@ -322,7 +312,6 @@ bool ActionSpellDimensionDoor(Heroes & hero)
 	AGG::PlaySound(M82::KILLFADE);
 	hero.FadeIn();
 
-	hero.ApplyPenaltyMovement();
 	hero.ActionNewPosition();
 
 	return true;
@@ -512,20 +501,18 @@ bool ActionSpellVisions(Heroes & hero)
 
 bool ActionSpellSetGuardian(Heroes & hero, const Spell & spell, u8 id)
 {
-    if(MP2::OBJ_MINES != hero.GetUnderObject())
+    Maps::Tiles & tile = world.GetTiles(hero.GetIndex());
+
+    if(MP2::OBJ_MINES != tile.GetObject(false))
     {
 	Dialog::Message("", _("You must be standing on the entrance to a mine (sawmills and alchemists don't count) to cast this spell."), Font::BIG, Dialog::OK);
 	return false;
     }
 
-    const s32 index = hero.GetIndex();
-    if(!Maps::isValidAbsIndex(index)) return false;
-
     const u16 count = hero.GetPower() * spell.ExtraValue();
 
     if(count)
     {
-        Maps::Tiles & tile = world.GetTiles(index);
 	Maps::TilesAddon* addon = tile.FindObject(MP2::OBJ_MINES);
 
 	if(addon)
@@ -533,11 +520,11 @@ bool ActionSpellSetGuardian(Heroes & hero, const Spell & spell, u8 id)
 
 	if(spell == Spell::HAUNT)
 	{
-            world.CaptureObject(index, Color::UNUSED);
-	    hero.SaveUnderObject(MP2::OBJ_ABANDONEDMINE);
+            world.CaptureObject(tile.GetIndex(), Color::UNUSED);
+	    tile.SetObject(MP2::OBJ_ABANDONEDMINE);
 	}
 
-	Army::Troop & troop = world.GetCapturedObject(index).GetTroop();
+	Army::Troop troop = world.GetCapturedObject(tile.GetIndex()).GetTroop();
 	troop.Set(Monster(spell), count);
     }
 

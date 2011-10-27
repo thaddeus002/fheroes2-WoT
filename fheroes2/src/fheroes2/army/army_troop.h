@@ -52,6 +52,7 @@ namespace Army
 
 	bool	operator== (const Monster &) const;
         Troop & operator= (const Troop &);
+	Monster operator() (void) const;
 
         void	Set(const Monster &, u32);
         void	SetMonster(const Monster &);

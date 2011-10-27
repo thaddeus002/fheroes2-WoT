@@ -128,7 +128,7 @@ namespace Maps
 
 	void Init(s32, const MP2::mp2tile_t &);
 
-	const s32 & GetIndex(void) const{ return maps_index; }
+	s32 GetIndex(void) const;
 	MP2::object_t GetObject(bool skip_hero = true) const;
 	u8 GetQuantity1(void) const{ return quantity1; }
 	u8 GetQuantity2(void) const{ return quantity2; }
@@ -156,7 +156,7 @@ namespace Maps
 	const TilesAddon* FindObjectConst(u8) const;
 
 	void SetTile(const u16 sprite_index, const u8 shape);
-	void SetObject(MP2::object_t object);
+	void SetObject(u8 object);
 
 	void FixObject(void);
 	void FixLoadOldVersion(u16 version, u8 quantity3, u8 quantity4, u8 quantity5, u8 quantity6, u8 quantity7);
@@ -206,6 +206,7 @@ namespace Maps
 	void QuantityUpdate(void);
 	void QuantityReset(void);
 	bool QuantityIsValid(void) const;
+	void QuantitySetColor(u8);
 	u8		QuantityTeleportType(void) const;
 	u8   		QuantityVariant(void) const;
 	u8   		QuantityExt(void) const;
@@ -218,6 +219,11 @@ namespace Maps
 	Funds         	QuantityFunds(void) const;
 	Monster		QuantityMonster(void) const;
 	Army::Troop	QuantityTroop(void) const;
+
+	void SetObjectPassable(bool);
+	bool isHeroesPresent(void) const;
+	void SetHeroesPresent(void);
+	void ResetHeroesPresent(void);
 
 	static void PlaceMonsterOnTile(Tiles &, const Monster &, u16, u32);
 	static void UpdateAbandoneMineSprite(Tiles &);
@@ -236,11 +242,14 @@ namespace Maps
 	void QuantitySetVariant(u8);
 	void QuantitySetExt(u8);
 	void QuantitySetSkill(u8);
-	void QuantitySetColor(u8);
 	void QuantitySetSpell(u8);
 	void QuantitySetArtifact(u8);
 	void QuantitySetResource(u8, u16);
 	void QuantitySetTeleportType(u8);
+
+	u8 GetModes(void) const;
+	void SetModes(u8);
+	void ResetModes(u8);
 
 	static void UpdateMonsterInfo(Tiles &);
 	static void UpdateRNDArtifactSprite(Tiles &);
@@ -255,7 +264,7 @@ namespace Maps
         Addons addons_level1;
         Addons addons_level2; // 16
 
-	s32	maps_index;
+	u32	pack_maps_index;
 	u16	pack_sprite_index;
 
 	u16	tile_passable;

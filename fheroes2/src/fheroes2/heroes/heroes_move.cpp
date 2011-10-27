@@ -296,10 +296,11 @@ void Heroes::Redraw(Surface & dst, const s16 dx, const s16 dy, bool with_shadow)
     sprite2.Blit(src_rt, dst_pt2, dst);
 
     // redraw dependences tiles
+    Maps::Tiles & tile = world.GetTiles(center);
     const s32 center = GetIndex();
-    bool skip_ground = MP2::isActionObject(save_maps_object, isShipMaster());
+    bool skip_ground = MP2::isActionObject(tile.GetObject(false), isShipMaster());
 
-    world.GetTiles(center).RedrawTop(dst);
+    tile.RedrawTop(dst);
 
     if(Maps::isValidDirection(center, Direction::TOP))
 	world.GetTiles(Maps::GetDirectionIndex(center, Direction::TOP)).RedrawTop4Hero(dst, skip_ground);
@@ -342,20 +343,8 @@ void Heroes::MoveStep(Heroes & hero, s32 index_from, s32 index_to, bool newpos)
 {
     if(newpos)
     {
-	Maps::Tiles & tiles_from = world.GetTiles(index_from);
-	Maps::Tiles & tiles_to = world.GetTiles(index_to);
-
-	if(MP2::OBJ_HEROES != hero.GetUnderObject()) tiles_from.SetObject(hero.GetUnderObject());
-
-	hero.SetIndex(index_to);
-	hero.SaveUnderObject(tiles_to.GetObject());
-	tiles_to.SetObject(MP2::OBJ_HEROES);
-	hero.Scoute();
-	hero.ApplyPenaltyMovement();
+	hero.Move2Dest(index_to);
 	hero.GetPath().PopFront();
-
-	// check protection tile
-	hero.ActionNewPosition();
 
 	// possible hero is die
 	if(!hero.isFreeman() &&

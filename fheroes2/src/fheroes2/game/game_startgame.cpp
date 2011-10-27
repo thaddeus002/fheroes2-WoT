@@ -607,7 +607,7 @@ Cursor::themes_t Game::GetCursorFocusHeroes(const Heroes & from_hero, const Maps
 	    {
 		bool protection = (MP2::isPickupObject(tile.GetObject()) ? false :
 				(Maps::TileIsUnderProtection(tile.GetIndex()) ||
-					(! Players::isFriends(from_hero.GetColor(), world.ColorCapturedObject(tile.GetIndex())) &&
+					(! Players::isFriends(from_hero.GetColor(), tile.QuantityColor()) &&
 					    tile.CaptureObjectIsProtection())));
 
 		return Cursor::DistanceThemes((protection ? Cursor::FIGHT : Cursor::ACTION),
@@ -1441,13 +1441,14 @@ void Game::EventDefaultAction(void)
     if(hero)
     {
 	Interface::Basic & I = Interface::Basic::Get();
+	const Maps::Tiles & tile = world.GetTiles(hero->GetIndex());
 
 	// 1. action object
-	if(MP2::isActionObject(hero->GetUnderObject(), hero->isShipMaster()) &&
-	    (! MP2::isMoveObject(hero->GetUnderObject()) || hero->isEnableMove()))
+	if(MP2::isActionObject(tile.GetObject(false), hero->isShipMaster()) &&
+	    (! MP2::isMoveObject(tile.GetObject(false)) || hero->isEnableMove()))
 	{
 	    hero->Action(hero->GetIndex());
-	    if(MP2::OBJ_STONELIGHTS == hero->GetUnderObject() || MP2::OBJ_WHIRLPOOL == hero->GetUnderObject())
+	    if(MP2::OBJ_STONELIGHTS == tile.GetObject(false) || MP2::OBJ_WHIRLPOOL == tile.GetObject(false))
 		I.SetRedraw(REDRAW_HEROES);
 	    I.SetRedraw(REDRAW_GAMEAREA);
 	}

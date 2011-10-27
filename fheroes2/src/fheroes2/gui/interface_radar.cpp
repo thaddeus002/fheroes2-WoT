@@ -255,7 +255,7 @@ void Interface::Radar::RedrawArea(const u8 color)
 		//case MP2::OBJN_MINES:
 		case MP2::OBJ_SAWMILL:
 		//case MP2::OBJN_SAWMILL:
-		    tile_surface = GetSurfaceFromColor(world.ColorCapturedObject(index)); break;
+		    tile_surface = GetSurfaceFromColor(tile.QuantityColor()); break;
 
 		default: continue;
 	    }

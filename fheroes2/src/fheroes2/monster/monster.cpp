@@ -708,45 +708,6 @@ Monster Monster::FromDwelling(u8 race, u32 dwelling)
     return Monster(UNKNOWN);
 }
 
-Monster Monster::FromObject(u8 obj)
-{
-    switch(obj)
-    {
-        case MP2::OBJ_WATCHTOWER:	return Monster(ORC);
-        case MP2::OBJ_EXCAVATION:	return Monster(SKELETON);
-        case MP2::OBJ_CAVE:		return Monster(CENTAUR);
-        case MP2::OBJ_TREEHOUSE:	return Monster(SPRITE);
-        case MP2::OBJ_ARCHERHOUSE:	return Monster(ARCHER);
-        case MP2::OBJ_GOBLINHUT:	return Monster(GOBLIN);
-        case MP2::OBJ_DWARFCOTT:	return Monster(DWARF);
-        case MP2::OBJ_HALFLINGHOLE:	return Monster(HALFLING);
-        case MP2::OBJ_PEASANTHUT:
-        case MP2::OBJ_THATCHEDHUT: 	return Monster(PEASANT);
-
-	case MP2::OBJ_RUINS:		return Monster(MEDUSA);
-        case MP2::OBJ_TREECITY:		return Monster(SPRITE);
-        case MP2::OBJ_WAGONCAMP:	return Monster(ROGUE);
-        case MP2::OBJ_DESERTTENT:	return Monster(NOMAD);
-
-        case MP2::OBJ_TROLLBRIDGE:	return Monster(TROLL);
-        case MP2::OBJ_DRAGONCITY:	return Monster(RED_DRAGON);
-        case MP2::OBJ_CITYDEAD:		return Monster(POWER_LICH);
-
-        case MP2::OBJ_ANCIENTLAMP:	return Monster(GENIE);
-
-        // loyalty version
-	case MP2::OBJ_WATERALTAR:	return Monster(WATER_ELEMENT);
-        case MP2::OBJ_AIRALTAR:		return Monster(AIR_ELEMENT);
-        case MP2::OBJ_FIREALTAR:	return Monster(FIRE_ELEMENT);
-        case MP2::OBJ_EARTHALTAR:	return Monster(EARTH_ELEMENT);
-	case MP2::OBJ_BARROWMOUNDS:	return Monster(GHOST);
-
-        default: break;
-    }
-
-    return Monster(UNKNOWN);
-}
-
 Monster Monster::Rand(level_t level)
 {
     switch(level)
