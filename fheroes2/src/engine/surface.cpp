@@ -736,7 +736,8 @@ void Surface::BlitSurface(const Surface & sf1, SDL_Rect* srt, Surface & sf2, SDL
                 else
                 {
                     int w = 0;
-                    while(BlitCheckVariant(sf1, srt->x + x + w, srt->y + y, variant) && x + w < srt->w) ++w;
+                    while(x + w < srt->w &&
+			BlitCheckVariant(sf1, srt->x + x + w, srt->y + y, variant)) ++w;
 
                     u8* sptr = reinterpret_cast<u8*>(ss->pixels) + (srt->y + y) * ss->pitch + (srt->x + x) * ss->format->BytesPerPixel;
                     u8* dptr = reinterpret_cast<u8*>(ds->pixels) + (drt->y + y) * ds->pitch + (drt->x + x) * ds->format->BytesPerPixel;
