@@ -1036,7 +1036,7 @@ void Maps::Tiles::UpdateMonsterInfo(Tiles & tile)
 
 void Maps::Tiles::UpdateDwellingPopulation(Tiles & tile)
 {
-    float count = 0;
+    u16 count = 0;
     const MP2::object_t & obj = tile.GetObject(false);
     const Army::Troop & troop = tile.QuantityTroop();
 
@@ -1054,7 +1054,7 @@ void Maps::Tiles::UpdateDwellingPopulation(Tiles & tile)
 	    break;
 
         case MP2::OBJ_TREECITY:
-	    count = 2 * troop().GetRNDSize(true);
+	    count = troop().GetRNDSize(true) * 2;
 	    break;
 	    
     	case MP2::OBJ_WATCHTOWER:
@@ -1074,28 +1074,14 @@ void Maps::Tiles::UpdateDwellingPopulation(Tiles & tile)
 
         case MP2::OBJ_TROLLBRIDGE:
         case MP2::OBJ_CITYDEAD:
-	    count = troop().GetRNDSize(true);
+	    count = 1 < world.CountWeek() &&
+		    Color::NONE == tile.QuantityColor() ? 0 : troop().GetRNDSize(true);
 	    break;
 
         case MP2::OBJ_DRAGONCITY:
-    	    count = 1;
+	    count = 1 < world.CountWeek() &&
+		    Color::NONE == tile.QuantityColor() ? 0 : 1;
     	    break;
-
-	default: break;
-    }
-
-    if(world.CountWeek() == 1)
-	count = count * 3 / 2;
-    else
-    // check guardians beaten
-    switch(obj)
-    {
-        case MP2::OBJ_TROLLBRIDGE:
-        case MP2::OBJ_CITYDEAD:
-        case MP2::OBJ_DRAGONCITY:
-	    if(Color::NONE == tile.QuantityColor())
-		count = 0;
-		break;
 
 	default: break;
     }
@@ -1103,9 +1089,9 @@ void Maps::Tiles::UpdateDwellingPopulation(Tiles & tile)
     if(count)
     {
 	if(Settings::Get().ExtWorldDwellingsAccumulateUnits())
-    	    tile.MonsterSetCount(troop.GetCount() + static_cast<u16>(count));
+    	    tile.MonsterSetCount(troop.GetCount() + count);
 	else
-	    tile.MonsterSetCount(static_cast<u16>(count));
+	    tile.MonsterSetCount(count);
     }
 }
 
