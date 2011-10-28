@@ -2468,4 +2468,23 @@ void Maps::Tiles::FixLoadOldVersion(u16 version, u8 quantity3, u8 quantity4, u8 
 	    default: break;
 	}
     }
+
+    if(version < FORMAT_VERSION_2662)
+    {
+	switch(mp2_object)
+	{
+    		case MP2::OBJ_SKELETON:
+    		case MP2::OBJ_WAGON:
+    		case MP2::OBJ_ARTIFACT:
+    		case MP2::OBJ_SHIPWRECKSURVIROR:
+    		case MP2::OBJ_WATERCHEST:
+    		case MP2::OBJ_TREASURECHEST:
+    		case MP2::OBJ_SHIPWRECK:
+    		case MP2::OBJ_GRAVEYARD:
+    		case MP2::OBJ_DAEMONCAVE:
+        	    if(quantity1 < 7) QuantitySetArtifact(Artifact::UNKNOWN);
+        	    break;
+		default: break;
+	}
+    }
 }

@@ -1062,10 +1062,9 @@ bool Game::IO::LoadBIN(QueueMessage & msg)
     }
 
 
-//    if(format < FORMAT_VERSION_2632)
-	// update tile passable
-	std::for_each(world.vec_tiles.begin(), world.vec_tiles.end(),
-            std::mem_fun_ref(&Maps::Tiles::UpdatePassable));
+    // update tile passable
+    std::for_each(world.vec_tiles.begin(), world.vec_tiles.end(),
+        std::mem_fun_ref(&Maps::Tiles::UpdatePassable));
 
     return byte16 == 0xFFFF;
 }
