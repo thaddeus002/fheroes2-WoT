@@ -304,6 +304,11 @@ bool Maps::TilesAddon::isStream(const TilesAddon & ta)
     return ICN::STREAM == MP2::GetICNObject(ta.object);
 }
 
+bool Maps::TilesAddon::isRoad(const TilesAddon & ta)
+{
+    return ICN::ROAD == MP2::GetICNObject(ta.object);
+}
+
 bool Maps::TilesAddon::isWaterResource(const TilesAddon & ta)
 {
     return (ICN::OBJNWATR == MP2::GetICNObject(ta.object) &&
@@ -900,6 +905,17 @@ bool isForestsTrees(const Maps::TilesAddon & ta)
     return Maps::TilesAddon::isForests(ta) || Maps::TilesAddon::isTrees(ta);
 }
 
+bool Exclude4LongObject(const Maps::TilesAddon & ta)
+{
+    return Maps::TilesAddon::isStream(ta) ||
+	    Maps::TilesAddon::isRoad(ta) || Maps::TilesAddon::isShadow(ta);
+}
+
+bool LongObjectUniq(const Maps::TilesAddon ta, u32 uid)
+{
+    return !Exclude4LongObject(ta) && ta.isUniq(uid);
+}
+
 bool Maps::Tiles::isLongObject(u16 direction)
 {
     if(Maps::isValidDirection(GetIndex(), direction))
@@ -908,11 +924,11 @@ bool Maps::Tiles::isLongObject(u16 direction)
 
 	for(Addons::const_iterator
 	    it = addons_level1.begin(); it != addons_level1.end(); ++it)
-	    if(! TilesAddon::isShadow(*it) &&
+	    if(! Exclude4LongObject(*it) &&
 		(tile.addons_level1.end() != std::find_if(tile.addons_level1.begin(), tile.addons_level1.end(),
-						    std::bind2nd(std::mem_fun_ref(&TilesAddon::isUniq), (*it).uniq)) ||
+						    std::bind2nd(std::ptr_fun(&LongObjectUniq), (*it).uniq)) ||
 		 tile.addons_level2.end() != std::find_if(tile.addons_level2.begin(), tile.addons_level2.end(),
-						    std::bind2nd(std::mem_fun_ref(&TilesAddon::isUniq), (*it).uniq))))
+						    std::bind2nd(std::ptr_fun(&LongObjectUniq), (*it).uniq))))
 		return true;
     }
     return false;
