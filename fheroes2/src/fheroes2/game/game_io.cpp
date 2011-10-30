@@ -1049,18 +1049,30 @@ bool Game::IO::LoadBIN(QueueMessage & msg)
     // add heroes to kingdoms
     world.vec_kingdoms.AddHeroes(world.vec_heroes);
 
-    if(format < FORMAT_VERSION_2655)
+    if(format < FORMAT_VERSION_2663)
     {
-	for(MapsTiles::iterator
-	    it = world.vec_tiles.begin(); it != world.vec_tiles.end(); ++it)
-	if((*it).mp2_object == MP2::OBJ_HEROES)
+	if(format < FORMAT_VERSION_2655)
 	{
-	    (*it).SetHeroesPresent();
-	    const Heroes* hero = world.GetHeroes((*it).GetIndex());
-	    (*it).SetObject(hero ? hero->save_maps_object : MP2::OBJ_ZERO);
+	    for(MapsTiles::iterator
+		it = world.vec_tiles.begin(); it != world.vec_tiles.end(); ++it)
+	    if((*it).mp2_object == MP2::OBJ_HEROES)
+	    {
+		const Heroes* hero = world.GetHeroes((*it).GetIndex());
+		(*it).SetObject(hero ? hero->save_maps_object : MP2::OBJ_ZERO);
+		(*it).SetHeroes(hero);
+	    }
+	}
+	else
+	{
+	    for(MapsTiles::iterator
+		it = world.vec_tiles.begin(); it != world.vec_tiles.end(); ++it)
+	    if(0x01 == (*it).GetQuantity3())
+	    {
+		const Heroes* hero = world.GetHeroes((*it).GetIndex());
+		(*it).SetHeroes(hero);
+	    }
 	}
     }
-
 
     // update tile passable
     std::for_each(world.vec_tiles.begin(), world.vec_tiles.end(),

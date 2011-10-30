@@ -351,7 +351,7 @@ void AI::HeroesAction(Heroes & hero, s32 dst_index)
 void AIToHeroes(Heroes & hero, const u8 & obj, const s32 & dst_index)
 {
     const Settings & conf = Settings::Get();
-    Heroes *other_hero = world.GetHeroes(dst_index);
+    Heroes *other_hero = world.GetTiles(dst_index).GetHeroes();
     if(! other_hero) return;
 
     if(hero.GetColor() == other_hero->GetColor() ||
@@ -830,7 +830,7 @@ void AIToTeleports(Heroes & hero, const s32 & index_from)
 
     if(MP2::OBJ_HEROES == world.GetTiles(index_to).GetObject())
     {
-        const Heroes* other_hero = world.GetHeroes(index_to);
+        const Heroes* other_hero = world.GetTiles(index_to).GetHeroes();
 
         if(other_hero)
         {
@@ -1852,7 +1852,7 @@ bool AIHeroesValidObject(const Heroes & hero, s32 index)
 
 	case MP2::OBJ_HEROES:
 	{
-	    const Heroes *hero2 = world.GetHeroes(index);
+	    const Heroes *hero2 = tile.GetHeroes();
 	    if(hero2)
 	    {
 		if(hero.GetColor() == hero2->GetColor()) return true;
@@ -1911,7 +1911,7 @@ bool AIHeroesPriorityObject(const Heroes & hero, s32 index)
     if(MP2::OBJ_HEROES == tile.GetObject())
     {
 	// kill enemy hero
-	const Heroes *hero2 = world.GetHeroes(index);
+	const Heroes *hero2 = tile.GetHeroes();
 	return hero2 &&
 		!Players::isFriends(hero.GetColor(), hero2->GetColor()) &&
 		AIHeroesValidObject(hero, index);
@@ -2173,7 +2173,7 @@ void AIHeroesGetTask(Heroes & hero)
 	    for(MapsIndexes::const_iterator
 		it = results.begin(); it != results.end(); ++it)
 	    {
-		const Heroes* enemy = world.GetHeroes(*it);
+		const Heroes* enemy = world.GetTiles(*it).GetHeroes();
 		if(enemy && !Players::isFriends(enemy->GetColor(), hero.GetColor()))
 		{
 		    if(hero.GetPath().Calculate(enemy->GetIndex()))

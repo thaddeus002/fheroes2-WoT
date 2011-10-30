@@ -180,7 +180,7 @@ void AICastleTurn(Castle* castle)
         	const Maps::Tiles & tile = world.GetTiles(Maps::GetIndexFromAbsPoint(center.x + x, center.y + y));
 
         	if(MP2::OBJ_HEROES == tile.GetObject())
-		    enemy = world.GetHeroes(tile.GetIndex());
+		    enemy = tile.GetHeroes();
 
 		if(enemy && castle->GetColor() == enemy->GetColor())
 		    enemy = NULL;

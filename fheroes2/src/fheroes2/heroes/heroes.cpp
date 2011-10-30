@@ -720,7 +720,7 @@ bool Heroes::Recruit(u8 cl, const Point & pt)
 
 	if(!army.isValid()) army.Reset(false);
 
-	tiles.SetHeroesPresent();
+	tiles.SetHeroes(this);
 	kingdom.AddHeroes(this);
 
 	return true;
@@ -1375,7 +1375,7 @@ void Heroes::SetFreeman(const u8 reason)
     if(color != Color::NONE) kingdom.RemoveHeroes(this);
 
     color = Color::NONE;
-    world.GetTiles(GetIndex()).ResetHeroesPresent();
+    world.GetTiles(GetIndex()).SetHeroes(NULL);
     modes = 0;
     SetIndex(-1);
     move_point_scale = -1;
@@ -1593,11 +1593,11 @@ void Heroes::Move2Dest(const s32 & dst_index, bool skip_action /* false */)
     Maps::Tiles & tiles_from = world.GetTiles(GetIndex());
     Maps::Tiles & tiles_to = world.GetTiles(dst_index);
 
-    tiles_from.ResetHeroesPresent();
+    tiles_from.SetHeroes(NULL);
     SetIndex(dst_index);
     Scoute();
     ApplyPenaltyMovement();
-    tiles_to.SetHeroesPresent();
+    tiles_to.SetHeroes(this);
 
     if(!skip_action)
 	ActionNewPosition();

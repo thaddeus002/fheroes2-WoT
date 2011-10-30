@@ -222,9 +222,9 @@ namespace Maps
 	Army::Troop	QuantityTroop(void) const;
 
 	void SetObjectPassable(bool);
-	bool isHeroesPresent(void) const;
-	void SetHeroesPresent(void);
-	void ResetHeroesPresent(void);
+
+	Heroes* GetHeroes(void) const;
+	void    SetHeroes(const Heroes*);
 
 	static void PlaceMonsterOnTile(Tiles &, const Monster &, u16, u32);
 	static void UpdateAbandoneMineSprite(Tiles &);
@@ -248,9 +248,8 @@ namespace Maps
 	void QuantitySetResource(u8, u16);
 	void QuantitySetTeleportType(u8);
 
-	u8 GetModes(void) const;
-	void SetModes(u8);
-	void ResetModes(u8);
+	u8 GetQuantity3(void) const;
+	void SetQuantity3(u8);
 
 	static void UpdateMonsterInfo(Tiles &);
 	static void UpdateDwellingPopulation(Tiles &);

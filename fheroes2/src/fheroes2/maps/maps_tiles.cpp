@@ -797,7 +797,7 @@ u16 PackTileSpriteIndex(u16 index, u16 shape) /* index max: 0x3FFF, shape value:
     return (shape << 14) | (0x3FFF & index);
 }
 
-enum { TILE_HERO_PRESENT = 0x01 };
+enum { TILE_HERO_PRESENT = 0x80 };
 
 /* Maps::Tiles */
 Maps::Tiles::Tiles() : pack_maps_index(0), pack_sprite_index(0), tile_passable(DIRECTION_ALL),
@@ -823,34 +823,27 @@ void Maps::Tiles::Init(s32 index, const MP2::mp2tile_t & mp2)
     AddonsPushLevel2(mp2);
 }
 
-u8 Maps::Tiles::GetModes(void) const
+u8 Maps::Tiles::GetQuantity3(void) const
 {
     return pack_maps_index >> 24;
 }
 
-void Maps::Tiles::ResetModes(u8 mod)
+void Maps::Tiles::SetQuantity3(u8 mod)
 {
-    pack_maps_index &= ~(static_cast<u32>(mod) << 24);
-}
-
-void Maps::Tiles::SetModes(u8 mod)
-{
+    pack_maps_index &= 0x00FFFFFF;
     pack_maps_index |= static_cast<u32>(mod) << 24;
 }
 
-bool Maps::Tiles::isHeroesPresent(void) const
+Heroes* Maps::Tiles::GetHeroes(void) const
 {
-    return TILE_HERO_PRESENT & GetModes();
+    const u8 & quantity3 = GetQuantity3();
+    return quantity3 & TILE_HERO_PRESENT ?
+	world.GetHeroes(Heroes::ConvertID(quantity3 & 0x7F)) : NULL;
 }
 
-void Maps::Tiles::SetHeroesPresent(void)
+void Maps::Tiles::SetHeroes(const Heroes* hero)
 {
-    SetModes(TILE_HERO_PRESENT);
-}
-
-void Maps::Tiles::ResetHeroesPresent(void)
-{
-    ResetModes(TILE_HERO_PRESENT);
+    SetQuantity3(hero ? TILE_HERO_PRESENT | static_cast<u8>(hero->GetID()) : 0);
 }
 
 s32 Maps::Tiles::GetIndex(void) const
@@ -863,16 +856,13 @@ MP2::object_t Maps::Tiles::GetObject(bool skip_hero  /* true */) const
     if(!skip_hero)
 	return static_cast<MP2::object_t>(mp2_object);
 
-    return TILE_HERO_PRESENT & GetModes() ?
+    return TILE_HERO_PRESENT & GetQuantity3() ?
 	MP2::OBJ_HEROES : static_cast<MP2::object_t>(mp2_object);
 }
 
 void Maps::Tiles::SetObject(u8 object)
 {
-    if(object == MP2::OBJ_HEROES)
-	SetHeroesPresent();
-    else
-	mp2_object = object;
+    mp2_object = object;
 }
 
 void Maps::Tiles::SetTile(const u16 sprite_index, const u8 shape)
@@ -938,7 +928,7 @@ void Maps::Tiles::UpdatePassable(void)
 {
     tile_passable = DIRECTION_ALL;
 
-    if(! isHeroesPresent() && !isWater())
+    if(NULL == GetHeroes() && !isWater())
     {
 	bool mounts1 = addons_level1.end() != std::find_if(addons_level1.begin(), addons_level1.end(), isMountsRocs);
 	bool mounts2 = addons_level2.end() != std::find_if(addons_level2.begin(), addons_level2.end(), isMountsRocs);
@@ -1194,7 +1184,7 @@ void Maps::Tiles::RedrawMonster(Surface & dst) const
 	const Tiles & tile = world.GetTiles(*it);
 	dst_index = *it;
 
-	if(! tile.isHeroesPresent() ||
+	if(NULL == GetHeroes() ||
 	    // skip bottom, bottom_right, bottom_left with ground objects
 	    ((DIRECTION_BOTTOM_ROW & Direction::Get(GetIndex(), *it)) && 
 			    MP2::isGroundObject(tile.GetObject(false))) ||

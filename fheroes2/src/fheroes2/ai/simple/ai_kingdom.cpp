@@ -101,7 +101,7 @@ void WorldStoreObjects(u8 color, IndexObjectMap & store)
             // skip for meeting heroes
             if(MP2::OBJ_HEROES == tile.GetObject())
             {
-                const Heroes* hero = world.GetHeroes(it);
+                const Heroes* hero = tile.GetHeroes();
                 if(hero && color == hero->GetColor()) continue;
             }
 

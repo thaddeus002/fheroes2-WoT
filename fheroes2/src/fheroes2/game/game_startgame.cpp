@@ -427,7 +427,7 @@ Cursor::themes_t Game::GetCursorFocusCastle(const Castle & from_castle, const Ma
 
 	case MP2::OBJ_HEROES:
     	{
-    	    const Heroes *heroes = world.GetHeroes(tile.GetIndex());
+    	    const Heroes *heroes = tile.GetHeroes();
 
 	    if(NULL != heroes)
     		return heroes->GetColor() == from_castle.GetColor() ? Cursor::HEROES : Cursor::POINTER;
@@ -465,7 +465,7 @@ Cursor::themes_t Game::GetCursorFocusShipmaster(const Heroes & from_hero, const 
 
 	case MP2::OBJ_HEROES:
 	{
-	    const Heroes* to_hero = world.GetHeroes(tile.GetIndex());
+	    const Heroes* to_hero = tile.GetHeroes();
 
     	    if(to_hero)
 	    {
@@ -568,7 +568,7 @@ Cursor::themes_t Game::GetCursorFocusHeroes(const Heroes & from_hero, const Maps
 
 	case MP2::OBJ_HEROES:
 	{
-	    const Heroes* to_hero = world.GetHeroes(tile.GetIndex());
+	    const Heroes* to_hero = tile.GetHeroes();
 
     	    if(NULL != to_hero)
 	    {
@@ -1104,12 +1104,13 @@ void Game::MouseCursorAreaClickLeft(s32 index_maps)
     Castle* to_castle = NULL;
     Heroes* to_hero = NULL;
     Heroes* from_hero = GameFocus::GetHeroes();
+    const Maps::Tiles & tile = world.GetTiles(index_maps);
 
     switch(Cursor::WithoutDistanceThemes(Cursor::Get().Themes()))
     {
 	case Cursor::HEROES:
 	    // focus change/open hero
-	    if(NULL != (to_hero = world.GetHeroes(index_maps)))
+	    if(NULL != (to_hero = tile.GetHeroes()))
 	    {
 		if(! from_hero ||
 		    from_hero != to_hero)
@@ -1195,7 +1196,7 @@ void Game::MouseCursorAreaPressRight(s32 index_maps)
 
 	    case MP2::OBJ_HEROES:
     	    {
-		const Heroes *heroes = world.GetHeroes(tile.GetIndex());
+		const Heroes *heroes = tile.GetHeroes();
 		if(heroes) Dialog::QuickInfo(*heroes);
 	    }
 	    break;

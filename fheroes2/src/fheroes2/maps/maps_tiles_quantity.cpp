@@ -888,18 +888,16 @@ void Maps::Tiles::QuantityUpdate(void)
         default: break;
     }
 
-    if(isHeroesPresent())
+    if(MP2::OBJ_HEROES == mp2_object)
     {
 	TilesAddon* addon = FindAddonICN1(ICN::MINIHERO);
  	// remove event sprite
         if(addon) Remove(addon->uniq);
 
-	// check hero
-	if(! world.GetHeroes(GetIndex()))
-	{
-	    SetObject(MP2::OBJ_ZERO);
-    	    DEBUG(DBG_GAME, DBG_WARN, "incorrect heroes info, reset tile: " << GetIndex());
-	}
+	SetObject(MP2::OBJ_ZERO);
+
+	if(NULL == GetHeroes())
+	    SetHeroes(world.GetHeroes(GetIndex()));
     }
 }
 

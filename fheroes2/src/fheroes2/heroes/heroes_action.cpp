@@ -341,7 +341,7 @@ void AnimationRemoveObject(Maps::Tiles & tile)
 		for(MapsIndexes::const_iterator
 		    it = heroes.begin(); it != heroes.end(); ++it)
 		{
-		    Heroes* hero = world.GetHeroes(*it);
+		    Heroes* hero = world.GetTiles(*it).GetHeroes();
 		    if(hero) hero->Redraw(display, false);
 		}
 	    }
@@ -667,7 +667,7 @@ void ActionToMonster(Heroes & hero, const u8 & obj, const s32 & dst_index)
 
 void ActionToHeroes(Heroes & hero, const u8 & obj, const s32 & dst_index)
 {
-    Heroes *other_hero = world.GetHeroes(dst_index);
+    Heroes *other_hero = world.GetTiles(dst_index).GetHeroes();
     const Settings & conf = Settings::Get();
     
     if(! other_hero) return;
@@ -1929,12 +1929,9 @@ void ActionToTeleports(Heroes & hero, const s32 & index_from)
 	return;
     }
 
-    if(MP2::OBJ_HEROES == world.GetTiles(index_to).GetObject())
+    const Heroes* other_hero = world.GetTiles(index_to).GetHeroes();
+    if(other_hero)
     {
-	const Heroes* other_hero = world.GetHeroes(index_to);
-
-	if(other_hero)
-	{
 	    ActionToHeroes(hero, MP2::OBJ_STONELIGHTS, index_to);
 
 	    // lose battle
@@ -1943,8 +1940,6 @@ void ActionToTeleports(Heroes & hero, const s32 & index_from)
 	    else
 	    if(! other_hero->isFreeman())
 		DEBUG(DBG_GAME, DBG_WARN, "is busy...");
-
-	}
     }
 
     AGG::PlaySound(M82::KILLFADE);

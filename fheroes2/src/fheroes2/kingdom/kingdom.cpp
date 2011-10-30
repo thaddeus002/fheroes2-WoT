@@ -479,12 +479,11 @@ void Kingdom::ApplyPlayWithStartingHero(void)
 
 	// check manual set hero (castle position + point(0, 1))?
 	const Point & cp = (first)->GetCenter();
-	if(world.GetTiles(cp.x, cp.y + 1).GetObject() == MP2::OBJ_HEROES)
+	Heroes *hero = world.GetTiles(cp.x, cp.y + 1).GetHeroes();
+
+    	// and move manual set hero to castle
+	if(hero && hero->GetColor() == GetColor())
 	{
-    	    Heroes *hero = world.GetHeroes((cp.y + 1) * world.w() + cp.x);
-    	    // and move manual set hero to castle
-    	    if(hero && hero->GetColor() == GetColor())
-    	    {
 		bool patrol = hero->Modes(Heroes::PATROL);
     		hero->SetFreeman(0);
     		hero->Recruit(*first);
@@ -494,7 +493,6 @@ void Kingdom::ApplyPlayWithStartingHero(void)
 		    hero->SetModes(Heroes::PATROL);
 		    hero->SetCenterPatrol(cp);
 		}
-    	    }
 	}
 	else
 	if(Settings::Get().GameStartWithHeroes())
