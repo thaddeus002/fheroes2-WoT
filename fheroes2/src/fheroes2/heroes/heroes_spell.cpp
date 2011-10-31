@@ -302,6 +302,8 @@ bool ActionSpellDimensionDoor(Heroes & hero)
 	hero.GetPath().Reset();
 	hero.FadeOut();
 
+	SpellCasted(Spell::DIMENSIONDOOR);
+
 	cursor.Hide();
 	hero.Move2Dest(dst, true);
 
@@ -314,7 +316,7 @@ bool ActionSpellDimensionDoor(Heroes & hero)
 
 	hero.ActionNewPosition();
 
-	return true;
+	return false; /* SpellCasted apply */
     }
 
     return false;
