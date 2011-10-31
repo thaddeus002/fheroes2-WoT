@@ -795,19 +795,17 @@ void Heroes::ActionNewDay(void)
 		else
 		    curr = maxp;
 	    }
-	    else
-	    {
-		// everyday
-		curr += GameStatic::GetHeroesRestoreSpellPointsPerDay();
 
-		// power ring action
-	        u8 acount = HasArtifact(Artifact::POWER_RING);
-		if(acount)
+	    // everyday
+	    curr += GameStatic::GetHeroesRestoreSpellPointsPerDay();
+
+	    // power ring action
+	    u8 acount = HasArtifact(Artifact::POWER_RING);
+	    if(acount)
 		    curr += acount * Artifact(Artifact::POWER_RING).ExtraValue();
 
-		// secondary skill
-	        curr += GetSecondaryValues(Skill::Secondary::MYSTICISM);
-	    }
+	    // secondary skill
+	    curr += GetSecondaryValues(Skill::Secondary::MYSTICISM);
 
 	    SetSpellPoints(curr > maxp ? maxp : curr);
 	}
