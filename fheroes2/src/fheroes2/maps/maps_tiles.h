@@ -224,7 +224,7 @@ namespace Maps
 	void SetObjectPassable(bool);
 
 	Heroes* GetHeroes(void) const;
-	void    SetHeroes(const Heroes*);
+	void    SetHeroes(Heroes*);
 
 	static void PlaceMonsterOnTile(Tiles &, const Monster &, u16, u32);
 	static void UpdateAbandoneMineSprite(Tiles &);

@@ -1440,6 +1440,16 @@ u8 Heroes::GetControl(void) const
     return world.GetKingdom(color).GetControl();
 }
 
+u8 Heroes::GetMapsObject(void) const
+{
+    return save_maps_object;
+}
+
+void Heroes::SetMapsObject(u8 obj)
+{
+    save_maps_object = obj != MP2::OBJ_HEROES ? obj : MP2::OBJ_ZERO;
+}
+
 bool Heroes::AllowBattle(bool attacker) const
 {
     if(!attacker)

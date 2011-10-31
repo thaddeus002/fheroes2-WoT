@@ -143,6 +143,9 @@ public:
     s8 GetLuckWithModificators(std::string *str = NULL) const;
     u8 GetLevel(void) const;
 
+    u8 GetMapsObject(void) const;
+    void SetMapsObject(u8);
+
     const Point & GetCenterPatrol(void) const;
     void SetCenterPatrol(const Point &);
     u8 GetSquarePatrol(void) const;
@@ -264,7 +267,7 @@ private:
     heroes_t		portrait;
     u8			race;
 
-    MP2::object_t	save_maps_object;
+    u8			save_maps_object;
 
     Route::Path		path;
 

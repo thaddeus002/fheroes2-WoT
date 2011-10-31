@@ -398,12 +398,7 @@ Monster Maps::Tiles::QuantityMonster(void) const
         case MP2::OBJ_EARTHALTAR:       return Monster(Monster::EARTH_ELEMENT);
         case MP2::OBJ_BARROWMOUNDS:     return Monster(Monster::GHOST);
 
-	case MP2::OBJ_MONSTER:
-	{
-	    const Maps::TilesAddon *addon = FindObjectConst(MP2::OBJ_MONSTER);
-	    if(addon) return Monster(addon->index + 1);
-	}
-	break;
+	case MP2::OBJ_MONSTER:		return Monster(GetQuantity3());
 
         default: break;
     }
@@ -895,10 +890,7 @@ void Maps::Tiles::QuantityUpdate(void)
  	// remove event sprite
         if(addon) Remove(addon->uniq);
 
-	SetObject(MP2::OBJ_ZERO);
-
-	if(NULL == GetHeroes())
-	    SetHeroes(world.GetHeroes(GetIndex()));
+	SetHeroes(world.GetHeroes(GetIndex()));
     }
 }
 
@@ -1041,6 +1033,9 @@ void Maps::Tiles::UpdateMonsterInfo(Tiles & tile)
 	if(addon)
 	    addon->index = mons() - 1; // ICN::MONS32 start from PEASANT
     }
+
+    // set monster
+    tile.SetQuantity3(mons());
 
     // reset random
     tile.SetObject(MP2::OBJ_MONSTER);

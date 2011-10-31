@@ -580,6 +580,7 @@ void Game::IO::PackHeroes(QueueMessage & msg, const Heroes & hero)
     msg.Push(hero.experience);
     msg.Push(hero.direction);
     msg.Push(hero.sprite_index);
+    msg.Push(hero.save_maps_object);
     msg.Push(hero.patrol_center.x);
     msg.Push(hero.patrol_center.y);
     msg.Push(hero.patrol_square);
@@ -1057,7 +1058,7 @@ bool Game::IO::LoadBIN(QueueMessage & msg)
 		it = world.vec_tiles.begin(); it != world.vec_tiles.end(); ++it)
 	    if((*it).mp2_object == MP2::OBJ_HEROES)
 	    {
-		const Heroes* hero = world.GetHeroes((*it).GetIndex());
+		Heroes* hero = world.GetHeroes((*it).GetIndex());
 		(*it).SetObject(hero ? hero->save_maps_object : MP2::OBJ_ZERO);
 		(*it).SetHeroes(hero);
 	    }
@@ -1068,9 +1069,44 @@ bool Game::IO::LoadBIN(QueueMessage & msg)
 		it = world.vec_tiles.begin(); it != world.vec_tiles.end(); ++it)
 	    if(0x01 == (*it).GetQuantity3())
 	    {
-		const Heroes* hero = world.GetHeroes((*it).GetIndex());
+		Heroes* hero = world.GetHeroes((*it).GetIndex());
 		(*it).SetHeroes(hero);
 	    }
+	}
+    }
+    else
+    if(format < FORMAT_VERSION_2667)
+    {
+	for(MapsTiles::iterator
+	    it = world.vec_tiles.begin(); it != world.vec_tiles.end(); ++it)
+	{
+	    Maps::Tiles & tile = *it;
+    	    Heroes* hero = world.GetHeroes(static_cast<Heroes::heroes_t>(0x7F & tile.GetQuantity3()));
+	    if(hero)
+	    {
+		hero->SetMapsObject(tile.GetObject());
+		tile.SetQuantity3(hero->GetID());
+		tile.SetObject(MP2::OBJ_HEROES);
+	    }
+	    else
+	    {
+		tile.SetQuantity3(0);
+		tile.SetObject(MP2::OBJ_ZERO);
+	    }
+	}
+    }
+
+    if(format < FORMAT_VERSION_2667)
+    {
+	for(MapsTiles::iterator
+	    it = world.vec_tiles.begin(); it != world.vec_tiles.end(); ++it)
+	{
+	    Maps::Tiles & tile = *it;
+	    if(MP2::OBJ_MONSTER == tile.GetObject())
+	    {
+        	const Maps::TilesAddon *addon = tile.FindObjectConst(MP2::OBJ_MONSTER);
+        	if(addon) tile.SetQuantity3(addon->index + 1);
+ 	    }
 	}
     }
 
@@ -1368,10 +1404,14 @@ void Game::IO::UnpackHeroes(QueueMessage & msg, Heroes & hero, u16 check_version
     msg.Pop(hero.experience);
     msg.Pop(hero.direction);
     msg.Pop(hero.sprite_index);
+
     if(check_version < FORMAT_VERSION_2655)
     {
 	msg.Pop(byte8); hero.save_maps_object = static_cast<MP2::object_t>(byte8);
     }
+
+    if(check_version >= FORMAT_VERSION_2667)
+	msg.Pop(hero.save_maps_object);
 
     msg.Pop(hero.patrol_center.x);
     msg.Pop(hero.patrol_center.y);

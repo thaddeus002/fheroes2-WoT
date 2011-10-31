@@ -797,8 +797,6 @@ u16 PackTileSpriteIndex(u16 index, u16 shape) /* index max: 0x3FFF, shape value:
     return (shape << 14) | (0x3FFF & index);
 }
 
-enum { TILE_HERO_PRESENT = 0x80 };
-
 /* Maps::Tiles */
 Maps::Tiles::Tiles() : pack_maps_index(0), pack_sprite_index(0), tile_passable(DIRECTION_ALL),
     mp2_object(0), fog_colors(Color::ALL), quantity1(0), quantity2(0)
@@ -836,14 +834,30 @@ void Maps::Tiles::SetQuantity3(u8 mod)
 
 Heroes* Maps::Tiles::GetHeroes(void) const
 {
-    const u8 & quantity3 = GetQuantity3();
-    return quantity3 & TILE_HERO_PRESENT ?
-	world.GetHeroes(Heroes::ConvertID(quantity3 & 0x7F)) : NULL;
+    return MP2::OBJ_HEROES == mp2_object ?
+	world.GetHeroes(Heroes::ConvertID(GetQuantity3())) : NULL;
 }
 
-void Maps::Tiles::SetHeroes(const Heroes* hero)
+void Maps::Tiles::SetHeroes(Heroes* hero)
 {
-    SetQuantity3(hero ? TILE_HERO_PRESENT | static_cast<u8>(hero->GetID()) : 0);
+    if(hero)
+    {
+	hero->SetMapsObject(mp2_object);
+	SetQuantity3(hero->GetID());
+	SetObject(MP2::OBJ_HEROES);
+    }
+    else
+    {
+	hero = GetHeroes();
+	if(hero)
+	{
+	    SetObject(hero->GetMapsObject());
+	    hero->SetMapsObject(MP2::OBJ_ZERO);
+	}
+	else
+	    SetObject(MP2::OBJ_ZERO);
+	SetQuantity3(0);
+    }
 }
 
 s32 Maps::Tiles::GetIndex(void) const
@@ -853,11 +867,13 @@ s32 Maps::Tiles::GetIndex(void) const
 
 MP2::object_t Maps::Tiles::GetObject(bool skip_hero  /* true */) const
 {
-    if(!skip_hero)
-	return static_cast<MP2::object_t>(mp2_object);
+    if(!skip_hero && MP2::OBJ_HEROES == mp2_object)
+    {
+	const Heroes* hero = GetHeroes();
+	return hero ? static_cast<MP2::object_t>(hero->GetMapsObject()) : MP2::OBJ_ZERO;
+    }
 
-    return TILE_HERO_PRESENT & GetQuantity3() ?
-	MP2::OBJ_HEROES : static_cast<MP2::object_t>(mp2_object);
+    return static_cast<MP2::object_t>(mp2_object);
 }
 
 void Maps::Tiles::SetObject(u8 object)
@@ -928,7 +944,7 @@ void Maps::Tiles::UpdatePassable(void)
 {
     tile_passable = DIRECTION_ALL;
 
-    if(NULL == GetHeroes() && !isWater())
+    if(MP2::OBJ_HEROES != mp2_object && !isWater())
     {
 	bool mounts1 = addons_level1.end() != std::find_if(addons_level1.begin(), addons_level1.end(), isMountsRocs);
 	bool mounts2 = addons_level2.end() != std::find_if(addons_level2.begin(), addons_level2.end(), isMountsRocs);
@@ -1184,7 +1200,7 @@ void Maps::Tiles::RedrawMonster(Surface & dst) const
 	const Tiles & tile = world.GetTiles(*it);
 	dst_index = *it;
 
-	if(NULL == GetHeroes() ||
+	if(MP2::OBJ_HEROES != mp2_object ||
 	    // skip bottom, bottom_right, bottom_left with ground objects
 	    ((DIRECTION_BOTTOM_ROW & Direction::Get(GetIndex(), *it)) && 
 			    MP2::isGroundObject(tile.GetObject(false))) ||
@@ -1437,7 +1453,8 @@ std::string Maps::Tiles::String(void) const
 	"mp2 object      : " << "0x" << std::setw(2) << std::setfill('0') << static_cast<int>(GetObject()) <<
 				    ", (" << MP2::StringObject(GetObject()) << ")" << std::endl <<
 	"quantity 1      : " << static_cast<int>(quantity1) << std::endl <<
-	"quantity 2      : " << static_cast<int>(quantity2) << std::endl;
+	"quantity 2      : " << static_cast<int>(quantity2) << std::endl <<
+	"quantity 3      : " << static_cast<int>(GetQuantity3()) << std::endl;
 
     for(Addons::const_iterator
 	it = addons_level1.begin(); it != addons_level1.end(); ++it)
@@ -1479,7 +1496,7 @@ std::string Maps::Tiles::String(void) const
 
 	case MP2::OBJ_HEROES:
 	    {
-		const Heroes *hero = world.GetHeroes(GetIndex());
+		const Heroes *hero = GetHeroes();
 		if(hero) os << hero->String();
 	    }
 	    break;
