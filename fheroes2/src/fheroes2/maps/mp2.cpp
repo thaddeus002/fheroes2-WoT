@@ -517,7 +517,7 @@ const char* MP2::StringObject(u8 object)
         case OBJ_WAGON:                 return _("Wagon");
         case OBJ_LEANTO:                return _("Lean To");
         case OBJ_FLOTSAM:               return _("Flotsam");
-        case OBJ_SHIPWRECKSURVIROR:     return _("Shipwreck Surviror");
+        case OBJ_SHIPWRECKSURVIROR:     return _("Shipwreck Survivor");
         case OBJ_BOTTLE:                return _("Bottle");
         case OBJ_MAGICGARDEN:           return _("Magic Garden");
         case OBJ_RNDARTIFACT1:          return "OBJ_RNDARTIFACT1";
