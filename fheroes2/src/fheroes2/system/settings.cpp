@@ -1411,12 +1411,12 @@ bool Settings::ExtWorldUseUniqueArtifacts2(void) const
 
 bool Settings::ExtWorldUseUniqueArtifacts3(void) const
 {
-    return ExtModes(WORLD_USE_UNIQUE_ARTIFACTS3);
+    return false; //ExtModes(WORLD_USE_UNIQUE_ARTIFACTS3); /* primary/mp/sp arts. */
 }
 
 bool Settings::ExtWorldUseUniqueArtifacts4(void) const
 {
-    return ExtModes(WORLD_USE_UNIQUE_ARTIFACTS4);
+    return false; //ExtModes(WORLD_USE_UNIQUE_ARTIFACTS4); /* sec. skills arts. */
 }
 
 bool Settings::ExtHeroArenaCanChoiseAnySkills(void) const
