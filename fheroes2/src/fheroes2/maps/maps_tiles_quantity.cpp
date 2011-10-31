@@ -25,6 +25,7 @@
 #include "spell.h"
 #include "pairs.h"
 #include "settings.h"
+#include "difficulty.h"
 #include "world.h"
 #include "maps_tiles.h"
 
@@ -970,7 +971,22 @@ void Maps::Tiles::PlaceMonsterOnTile(Tiles & tile, const Monster & mons, u16 cou
 	tile.MonsterSetCount(count);
     }
     else
-	tile.MonsterSetCount(5 * mons.GetRNDSize(true));
+    {
+	u8 mul = 4;
+
+	// set random count
+	switch(Settings::Get().GameDifficulty())
+	{
+    	    case Difficulty::EASY:	mul = 3; break;
+    	    case Difficulty::NORMAL:	mul = 4; break;
+    	    case Difficulty::HARD:	mul = 4; break;
+    	    case Difficulty::EXPERT:	mul = 5; break;
+    	    case Difficulty::IMPOSSIBLE:mul = 6; break;
+	    default: break;
+	}
+
+	tile.MonsterSetCount(mul * mons.GetRNDSize(true));
+    }
 
     // skip join
     if(mons() == Monster::GHOST || mons.isElemental())
@@ -998,22 +1014,33 @@ void Maps::Tiles::PlaceMonsterOnTile(Tiles & tile, const Monster & mons, u16 cou
 
 void Maps::Tiles::UpdateMonsterInfo(Tiles & tile)
 {
-    Maps::TilesAddon *addon = tile.FindObject(MP2::OBJ_RNDMONSTER);
     Monster mons;
 
-    switch(tile.GetObject())
+    if(MP2::OBJ_MONSTER == tile.GetObject())
     {
-        case MP2::OBJ_RNDMONSTER:	mons = Monster::Rand().GetID(); break;
-        case MP2::OBJ_RNDMONSTER1:      mons = Monster::Rand(Monster::LEVEL1).GetID(); break;
-        case MP2::OBJ_RNDMONSTER2:      mons = Monster::Rand(Monster::LEVEL2).GetID(); break;
-        case MP2::OBJ_RNDMONSTER3:      mons = Monster::Rand(Monster::LEVEL3).GetID(); break;
-        case MP2::OBJ_RNDMONSTER4:      mons = Monster::Rand(Monster::LEVEL4).GetID(); break;
-        default: break;
-    }
+	const Maps::TilesAddon *addon = tile.FindObject(MP2::OBJ_MONSTER);
 
-    // set sprite
-    if(addon)
-	addon->index = mons() - 1; // ICN::MONS32 start from PEASANT
+	if(addon)
+	    mons = Monster(addon->index + 1); // ICN::MONS32 start from PEASANT
+    }
+    else
+    {
+	Maps::TilesAddon *addon = tile.FindObject(MP2::OBJ_RNDMONSTER);
+
+	switch(tile.GetObject())
+	{
+    	    case MP2::OBJ_RNDMONSTER:	mons = Monster::Rand().GetID(); break;
+    	    case MP2::OBJ_RNDMONSTER1:  mons = Monster::Rand(Monster::LEVEL1).GetID(); break;
+    	    case MP2::OBJ_RNDMONSTER2:  mons = Monster::Rand(Monster::LEVEL2).GetID(); break;
+    	    case MP2::OBJ_RNDMONSTER3:  mons = Monster::Rand(Monster::LEVEL3).GetID(); break;
+    	    case MP2::OBJ_RNDMONSTER4:  mons = Monster::Rand(Monster::LEVEL4).GetID(); break;
+    	    default: break;
+	}
+
+	// set sprite
+	if(addon)
+	    addon->index = mons() - 1; // ICN::MONS32 start from PEASANT
+    }
 
     // reset random
     tile.SetObject(MP2::OBJ_MONSTER);
