@@ -248,8 +248,8 @@ u8 HeroBase::HasArtifact(const Artifact & art) const
     {
 	case 1:	unique = Settings::Get().ExtWorldUseUniqueArtifacts1(); break; /* morale/luck arts. */
 	case 2:	unique = Settings::Get().ExtWorldUseUniqueArtifacts2(); break; /* resource producing arts. */
-	case 3:	unique = Settings::Get().ExtWorldUseUniqueArtifacts3(); break; /* primary/mp/sp arts. */
-	case 4:	unique = Settings::Get().ExtWorldUseUniqueArtifacts4(); break; /* sec. skills arts. */
+	//case 3:	unique = true; break; /* primary/mp/sp arts. */
+	//case 4:	unique = true; break; /* sec. skills arts. */
 	default: break;
     }
 

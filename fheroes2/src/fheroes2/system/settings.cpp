@@ -149,9 +149,7 @@ const settings_t settingsFHeroes2[] =
     { Settings::WORLD_1HERO_HIRED_EVERY_WEEK,	_("world: Only 1 hero can be hired by the one player every week"), },
     { Settings::WORLD_DWELLING_ACCUMULATE_UNITS,_("world: Outer creature dwellings should accumulate units"), },
     { Settings::WORLD_USE_UNIQUE_ARTIFACTS1,	_("world: use unique artifacts for morale/luck"),       },
-    { Settings::WORLD_USE_UNIQUE_ARTIFACTS2,	_("world: use unique artifacts for resource producing"),},
-    { Settings::WORLD_USE_UNIQUE_ARTIFACTS3,	_("world: use unique artifacts for primary skill/mp/sp"), },
-    { Settings::WORLD_USE_UNIQUE_ARTIFACTS4,	_("world: use unique artifacts for sec. skills"),       },
+    { Settings::WORLD_USE_UNIQUE_ARTIFACTS2,	_("world: use unique artifacts for resource affecting"),},
     { Settings::WORLD_WIND_WATER_MILLS_CAPTURED,_("world: Wind/Water Mills can be captured"),           },
     { Settings::CASTLE_ALLOW_BUY_FROM_WELL,	_("castle: allow buy from well"),			},
     { Settings::CASTLE_ALLOW_GUARDIANS,		_("castle: allow guardians"),				},
@@ -1407,16 +1405,6 @@ bool Settings::ExtWorldUseUniqueArtifacts1(void) const
 bool Settings::ExtWorldUseUniqueArtifacts2(void) const
 {
     return ExtModes(WORLD_USE_UNIQUE_ARTIFACTS2);
-}
-
-bool Settings::ExtWorldUseUniqueArtifacts3(void) const
-{
-    return false; //ExtModes(WORLD_USE_UNIQUE_ARTIFACTS3); /* primary/mp/sp arts. */
-}
-
-bool Settings::ExtWorldUseUniqueArtifacts4(void) const
-{
-    return false; //ExtModes(WORLD_USE_UNIQUE_ARTIFACTS4); /* sec. skills arts. */
 }
 
 bool Settings::ExtHeroArenaCanChoiseAnySkills(void) const

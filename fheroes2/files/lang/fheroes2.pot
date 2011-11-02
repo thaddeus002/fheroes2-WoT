@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-10-31 13:21+0900\n"
+"POT-Creation-Date: 2011-11-02 10:24+0900\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -222,7 +222,7 @@ msgstr ""
 #: ../fheroes2/battle2/battle_dialogs.cpp:396
 #: ../fheroes2/castle/castle_well.cpp:315
 #: ../fheroes2/dialog/dialog_armyinfo.cpp:206
-#: ../fheroes2/dialog/dialog_quickinfo.cpp:809
+#: ../fheroes2/dialog/dialog_quickinfo.cpp:819
 #: ../fheroes2/heroes/skill.cpp:373
 msgid "Attack"
 msgstr ""
@@ -230,14 +230,14 @@ msgstr ""
 #: ../fheroes2/battle2/battle_dialogs.cpp:402
 #: ../fheroes2/castle/castle_well.cpp:323
 #: ../fheroes2/dialog/dialog_armyinfo.cpp:238
-#: ../fheroes2/dialog/dialog_quickinfo.cpp:823
+#: ../fheroes2/dialog/dialog_quickinfo.cpp:833
 #: ../fheroes2/heroes/skill.cpp:373
 msgid "Defense"
 msgstr ""
 
 #: ../fheroes2/battle2/battle_dialogs.cpp:408
 #: ../fheroes2/castle/castle_town.cpp:316
-#: ../fheroes2/dialog/dialog_quickinfo.cpp:837
+#: ../fheroes2/dialog/dialog_quickinfo.cpp:847
 #: ../fheroes2/dialog/dialog_skillinfo.cpp:145
 #: ../fheroes2/heroes/heroes_dialog.cpp:137
 #: ../fheroes2/heroes/heroes_dialog.cpp:407
@@ -249,7 +249,7 @@ msgstr ""
 
 #: ../fheroes2/battle2/battle_dialogs.cpp:414
 #: ../fheroes2/castle/castle_town.cpp:327
-#: ../fheroes2/dialog/dialog_quickinfo.cpp:851
+#: ../fheroes2/dialog/dialog_quickinfo.cpp:861
 #: ../fheroes2/dialog/dialog_skillinfo.cpp:150
 #: ../fheroes2/heroes/heroes_dialog.cpp:163
 #: ../fheroes2/heroes/heroes_dialog.cpp:409
@@ -270,7 +270,7 @@ msgid "Luck"
 msgstr ""
 
 #: ../fheroes2/battle2/battle_dialogs.cpp:430
-#: ../fheroes2/dialog/dialog_quickinfo.cpp:865
+#: ../fheroes2/dialog/dialog_quickinfo.cpp:875
 #: ../fheroes2/heroes/heroes_indicator.cpp:252
 msgid "Spell Points"
 msgstr ""
@@ -1481,25 +1481,25 @@ msgstr ""
 msgid "penalty: %{cost}"
 msgstr ""
 
-#: ../fheroes2/dialog/dialog_quickinfo.cpp:362
+#: ../fheroes2/dialog/dialog_quickinfo.cpp:372
 msgid "Unchartered Territory"
 msgstr ""
 
-#: ../fheroes2/dialog/dialog_quickinfo.cpp:608
+#: ../fheroes2/dialog/dialog_quickinfo.cpp:618
 msgid "Defenders:"
 msgstr ""
 
-#: ../fheroes2/dialog/dialog_quickinfo.cpp:645
+#: ../fheroes2/dialog/dialog_quickinfo.cpp:655
 #: ../fheroes2/heroes/heroes_indicator.cpp:124
 #: ../fheroes2/heroes/heroes_indicator.cpp:170
 msgid "None"
 msgstr ""
 
-#: ../fheroes2/dialog/dialog_quickinfo.cpp:732
+#: ../fheroes2/dialog/dialog_quickinfo.cpp:742
 msgid "%{name} ( Level %{level} )"
 msgstr ""
 
-#: ../fheroes2/dialog/dialog_quickinfo.cpp:881
+#: ../fheroes2/dialog/dialog_quickinfo.cpp:891
 msgid "Move Points"
 msgstr ""
 
@@ -4254,19 +4254,19 @@ msgid ""
 "no room for a spell book. Try giving one of your artifacts to another hero."
 msgstr ""
 
-#: ../fheroes2/heroes/heroes.cpp:979
+#: ../fheroes2/heroes/heroes.cpp:975
 msgid "The three Anduran artifacts magically combine into one."
 msgstr ""
 
-#: ../fheroes2/heroes/heroes.cpp:1070
+#: ../fheroes2/heroes/heroes.cpp:1066
 msgid "To cast spells, you must first buy a spell book for %{gold} gold."
 msgstr ""
 
-#: ../fheroes2/heroes/heroes.cpp:1078
+#: ../fheroes2/heroes/heroes.cpp:1074
 msgid "Unfortunately, you seem to be a little short of cash at the moment."
 msgstr ""
 
-#: ../fheroes2/heroes/heroes.cpp:1093
+#: ../fheroes2/heroes/heroes.cpp:1089
 msgid "Do you wish to buy one?"
 msgstr ""
 
@@ -12239,11 +12239,11 @@ msgid "game: battle show damage info"
 msgstr ""
 
 #: ../fheroes2/system/settings.cpp:130
-msgid "game: pickup artifact + info dialog"
+msgid "game: castle flash building"
 msgstr ""
 
 #: ../fheroes2/system/settings.cpp:131
-msgid "game: castle flash building"
+msgid "world: use enhanced artifact info dialog"
 msgstr ""
 
 #: ../fheroes2/system/settings.cpp:132
@@ -12327,171 +12327,163 @@ msgid "world: use unique artifacts for morale/luck"
 msgstr ""
 
 #: ../fheroes2/system/settings.cpp:152
-msgid "world: use unique artifacts for resource producing"
+msgid "world: use unique artifacts for resource affecting"
 msgstr ""
 
 #: ../fheroes2/system/settings.cpp:153
-msgid "world: use unique artifacts for primary skill/mp/sp"
-msgstr ""
-
-#: ../fheroes2/system/settings.cpp:154
-msgid "world: use unique artifacts for sec. skills"
-msgstr ""
-
-#: ../fheroes2/system/settings.cpp:155
 msgid "world: Wind/Water Mills can be captured"
 msgstr ""
 
-#: ../fheroes2/system/settings.cpp:156
+#: ../fheroes2/system/settings.cpp:154
 msgid "castle: allow buy from well"
 msgstr ""
 
-#: ../fheroes2/system/settings.cpp:157
+#: ../fheroes2/system/settings.cpp:155
 msgid "castle: allow guardians"
 msgstr ""
 
-#: ../fheroes2/system/settings.cpp:158
+#: ../fheroes2/system/settings.cpp:156
 msgid ""
 "castle: higher mage guilds regenerate more spell points/turn "
 "(20/40/60/80/100%)"
 msgstr ""
 
-#: ../fheroes2/system/settings.cpp:159
+#: ../fheroes2/system/settings.cpp:157
 msgid "castle: allow recruits special/expansion heroes"
 msgstr ""
 
-#: ../fheroes2/system/settings.cpp:160
+#: ../fheroes2/system/settings.cpp:158
 msgid "heroes: learn new spells with day"
 msgstr ""
 
-#: ../fheroes2/system/settings.cpp:161
+#: ../fheroes2/system/settings.cpp:159
 msgid "heroes: recruit cost to be dependent on hero level"
 msgstr ""
 
-#: ../fheroes2/system/settings.cpp:162
+#: ../fheroes2/system/settings.cpp:160
 msgid "heroes: remember MP/SP for retreat/surrender result"
 msgstr ""
 
-#: ../fheroes2/system/settings.cpp:163
+#: ../fheroes2/system/settings.cpp:161
 msgid "heroes: surrendering gives some experience"
 msgstr ""
 
-#: ../fheroes2/system/settings.cpp:164
+#: ../fheroes2/system/settings.cpp:162
 msgid "heroes: recalculate movement points after creatures movement"
 msgstr ""
 
-#: ../fheroes2/system/settings.cpp:165
+#: ../fheroes2/system/settings.cpp:163
 msgid "heroes: allow pickup objects for patrol"
 msgstr ""
 
-#: ../fheroes2/system/settings.cpp:166
+#: ../fheroes2/system/settings.cpp:164
 msgid "heroes: after battle move to target cell"
 msgstr ""
 
-#: ../fheroes2/system/settings.cpp:167
+#: ../fheroes2/system/settings.cpp:165
 msgid "heroes: allow transcribing scrolls (needs: Eye Eagle skill)"
 msgstr ""
 
-#: ../fheroes2/system/settings.cpp:168
+#: ../fheroes2/system/settings.cpp:166
 msgid "heroes: allow banned sec. skills upgrade"
 msgstr ""
 
-#: ../fheroes2/system/settings.cpp:169
+#: ../fheroes2/system/settings.cpp:167
 msgid "heroes: in Arena can choose any of primary skills"
 msgstr ""
 
-#: ../fheroes2/system/settings.cpp:170
+#: ../fheroes2/system/settings.cpp:168
 msgid "unions: allow meeting heroes"
 msgstr ""
 
-#: ../fheroes2/system/settings.cpp:171
+#: ../fheroes2/system/settings.cpp:169
 msgid "unions: allow castle visiting"
 msgstr ""
 
-#: ../fheroes2/system/settings.cpp:172
+#: ../fheroes2/system/settings.cpp:170
 msgid "unions: allow view maps"
 msgstr ""
 
-#: ../fheroes2/system/settings.cpp:173
+#: ../fheroes2/system/settings.cpp:171
 msgid "battle: troop direction to move"
 msgstr ""
 
-#: ../fheroes2/system/settings.cpp:174
+#: ../fheroes2/system/settings.cpp:172
 msgid "battle: soft wait troop"
 msgstr ""
 
-#: ../fheroes2/system/settings.cpp:175
+#: ../fheroes2/system/settings.cpp:173
 msgid "battle: high objects are an obstacle for archers"
 msgstr ""
 
-#: ../fheroes2/system/settings.cpp:176
+#: ../fheroes2/system/settings.cpp:174
 msgid "battle: merge armies for hero from castle"
 msgstr ""
 
-#: ../fheroes2/system/settings.cpp:177
+#: ../fheroes2/system/settings.cpp:175
 msgid "battle: archmage can resists (20%) bad spells"
 msgstr ""
 
-#: ../fheroes2/system/settings.cpp:178
+#: ../fheroes2/system/settings.cpp:176
 msgid "battle: magical creature resists (20%) the same magic"
 msgstr ""
 
-#: ../fheroes2/system/settings.cpp:179
+#: ../fheroes2/system/settings.cpp:177
 msgid "battle: skip increase +2 defense"
 msgstr ""
 
-#: ../fheroes2/system/settings.cpp:180
+#: ../fheroes2/system/settings.cpp:178
 msgid "battle: reverse wait order (fast, average, slow)"
 msgstr ""
 
-#: ../fheroes2/system/settings.cpp:181
+#: ../fheroes2/system/settings.cpp:179
 msgid "game: show system info"
 msgstr ""
 
-#: ../fheroes2/system/settings.cpp:182
+#: ../fheroes2/system/settings.cpp:180
 msgid "game: autosave on"
 msgstr ""
 
-#: ../fheroes2/system/settings.cpp:183
+#: ../fheroes2/system/settings.cpp:181
 msgid "game: autosave will be made at the beginning of the day"
 msgstr ""
 
-#: ../fheroes2/system/settings.cpp:184
+#: ../fheroes2/system/settings.cpp:182
 msgid "game: use fade"
 msgstr ""
 
-#: ../fheroes2/system/settings.cpp:185
+#: ../fheroes2/system/settings.cpp:183
 msgid "game: show SDL logo"
 msgstr ""
 
-#: ../fheroes2/system/settings.cpp:186
+#: ../fheroes2/system/settings.cpp:184
 msgid "game: use evil interface"
 msgstr ""
 
-#: ../fheroes2/system/settings.cpp:187
+#: ../fheroes2/system/settings.cpp:185
 msgid "game: also use dynamic interface for castles"
 msgstr ""
 
-#: ../fheroes2/system/settings.cpp:188
+#: ../fheroes2/system/settings.cpp:186
 msgid "game: hide interface"
 msgstr ""
 
-#: ../fheroes2/system/settings.cpp:189
+#: ../fheroes2/system/settings.cpp:187
 msgid "pocketpc: hide cursor"
 msgstr ""
 
-#: ../fheroes2/system/settings.cpp:190
+#: ../fheroes2/system/settings.cpp:188
 msgid "pocketpc: tap mode"
 msgstr ""
 
-#: ../fheroes2/system/settings.cpp:191
+#: ../fheroes2/system/settings.cpp:189
 msgid "pocketpc: drag&drop gamearea as scroll"
 msgstr ""
 
-#: ../fheroes2/system/settings.cpp:192
+#: ../fheroes2/system/settings.cpp:190
 msgid "pocketpc: low display resolution (needs restart)"
 msgstr ""
 
-#: ../fheroes2/system/settings.cpp:193
+#: ../fheroes2/system/settings.cpp:191
 msgid "pocketpc: low memory"
 msgstr ""
