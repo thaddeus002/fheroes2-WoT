@@ -306,6 +306,17 @@ void Dialog::QuickInfo(const Maps::Tiles & tile)
 	default: break;
     }
 
+    const Settings & settings = Settings::Get();
+
+    // ext dialog for artifacts
+    if(settings.ExtWorldEnhancedArtifactInfo() &&
+	MP2::OBJ_ARTIFACT == tile.GetObject())
+    {
+	const Artifact & art = tile.QuantityArtifact();
+        Dialog::ArtifactInfo(art.GetName(), art.GetDescription(), art, 0);
+	return;
+    }
+
     Display & display = Display::Get();
 
     Cursor & cursor = Cursor::Get();
@@ -351,7 +362,6 @@ void Dialog::QuickInfo(const Maps::Tiles & tile)
     box.Blit(pos.x, pos.y);
 
     std::string name_object;
-    const Settings & settings = Settings::Get();
 
     const Heroes* from_hero = GameFocus::GetHeroes();
     const Kingdom & kingdom = world.GetKingdom(settings.CurrentColor());

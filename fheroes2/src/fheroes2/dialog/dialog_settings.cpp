@@ -130,7 +130,6 @@ void Dialog::ExtSettings(bool readonly)
     states.push_back(Settings::GAME_BATTLE_SHOW_MOUSE_SHADOW);
     states.push_back(Settings::GAME_BATTLE_SHOW_MOVE_SHADOW);
     states.push_back(Settings::GAME_BATTLE_SHOW_DAMAGE);
-    states.push_back(Settings::GAME_PICKUP_ARTIFACT_INFO);
     if(! conf.QVGA())
     {
 	states.push_back(Settings::GAME_CASTLE_FLASH_BUILDING);

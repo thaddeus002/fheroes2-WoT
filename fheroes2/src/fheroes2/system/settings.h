@@ -155,7 +155,7 @@ public:
         GAME_BATTLE_SHOW_MOUSE_SHADOW	= 0x10040000,
         GAME_BATTLE_SHOW_MOVE_SHADOW	= 0x10080000,
 	GAME_BATTLE_SHOW_DAMAGE		= 0x10100000,
-	GAME_PICKUP_ARTIFACT_INFO	= 0x10200000,
+	//UNUSED			= 0x10200000,
 	POCKETPC_HIDE_CURSOR		= 0x10400000,
 	POCKETPC_LOW_MEMORY		= 0x10800000,
 	POCKETPC_TAP_MODE		= 0x11000000,
@@ -204,6 +204,7 @@ public:
 	WORLD_USE_UNIQUE_ARTIFACTS2	= 0x30000200,
 	WORLD_USE_UNIQUE_ARTIFACTS3	= 0x30000400,
 	WORLD_USE_UNIQUE_ARTIFACTS4	= 0x30000800,
+	WORLD_ENHANCED_ARTIFACT_INFO	= 0x30001000,
 	WORLD_WIND_WATER_MILLS_CAPTURED = 0x30004000,
 
 	BATTLE_ARCHMAGE_RESIST_BAD_SPELL= 0x40001000,
@@ -311,7 +312,6 @@ public:
     bool ExtHeroPatrolAllowPickup(void) const;
     bool ExtHeroAllowTranscribingScroll(void) const;
     bool ExtHeroAutoMove2BattleTarget(void) const;
-    bool ExtHeroPickupArtifactWithInfoDialog(void) const;
     bool ExtHeroAllowBannedSecSkillsUpgrade(void) const;
     bool ExtHeroArenaCanChoiseAnySkills(void) const;
     bool ExtUnionsAllowCastleVisiting(void) const;
@@ -332,6 +332,7 @@ public:
     bool ExtWorldUseUniqueArtifacts4(void) const;
     bool ExtWorldWindWaterMillsCaptured(void) const;
     bool ExtWorldGuardianObjectsTwoDefense(void) const;
+    bool ExtWorldEnhancedArtifactInfo(void) const;
     bool ExtCastleAllowFlash(void) const;
     bool ExtCastleGuildRestorePointsTurn(void) const;
     bool ExtCastleAllowRecruitSpecialHeroes(void) const;

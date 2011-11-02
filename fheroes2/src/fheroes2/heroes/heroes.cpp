@@ -955,7 +955,7 @@ bool Heroes::PickupArtifact(const Artifact & art)
 {
     if(!art.isValid()) return false;
 
-    const Settings & conf = Settings::Get();
+    //const Settings & conf = Settings::Get();
 
     if(! bag_artifacts.PushArtifact(art))
     {
@@ -967,10 +967,6 @@ bool Heroes::PickupArtifact(const Artifact & art)
 	}
 	return false;
     }
-
-    if(conf.ExtHeroPickupArtifactWithInfoDialog() && 
-	art() != Artifact::MAGIC_BOOK && CONTROL_HUMAN == GetControl())
-	Dialog::ArtifactInfo(art.GetName(), art.GetDescription(), art);
 
     // check: anduran garb
     if(bag_artifacts.MakeBattleGarb())
