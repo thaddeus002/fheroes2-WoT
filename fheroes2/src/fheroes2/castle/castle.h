@@ -188,7 +188,7 @@ public:
 
     static u8 GetGrownWell(void);
     static u8 GetGrownWel2(void);
-    static u8 GetGrownWeekOf(void);
+    static u8 GetGrownWeekOf(const Monster &);
     static u8 GetGrownMonthOf(void);
 
     std::string String(void) const;
@@ -199,7 +199,6 @@ public:
 
 private:
     u16* GetDwelling(u32 dw);
-    u8   GetDwellingGrowth(u32 dw);
     void EducateHeroes(void);
     void RedrawResourcePanel(const Point &);
     u32  OpenTown(void);

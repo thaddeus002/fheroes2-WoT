@@ -1515,7 +1515,7 @@ void Game::NewWeekDialog(void)
     if(week.GetType() == Week::MONSTERS)
     {
 	const Monster monster(week.GetMonster());
-	const u8 count = world.BeginMonth() ? Castle::GetGrownMonthOf() : Castle::GetGrownWeekOf();
+	const u8 count = world.BeginMonth() ? Castle::GetGrownMonthOf() : Castle::GetGrownWeekOf(monster);
 
 	if(monster.isValid() && count)
 	{

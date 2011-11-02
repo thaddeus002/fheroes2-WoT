@@ -341,19 +341,6 @@ void Castle::ActionNewDay(void)
     SetModes(ALLOWBUILD);
 }
 
-u8 Castle::GetDwellingGrowth(u32 dw)
-{
-    u8 growth = Monster(race, GetActualDwelling(dw)).GetGrown();
-
-    // well build
-    if(building & BUILD_WELL) growth += GetGrownWell();
-
-    // wel2 extras
-    if((dw == DWELLING_MONSTER1) && (building & BUILD_WEL2)) growth += GetGrownWel2();
-
-    return growth;
-}
-
 u16* Castle::GetDwelling(u32 dw)
 {
     if(isBuild(dw))
@@ -388,7 +375,13 @@ void Castle::ActionNewWeek(void)
 	for(u8 ii = 0; dwellings1[ii]; ++ii)
 	    if(NULL != (dw = GetDwelling(dwellings1[ii])))
 	{
-	    u8 growth = GetDwellingGrowth(dwellings1[ii]);
+	    u8 growth = Monster(race, GetActualDwelling(dwellings1[ii])).GetGrown();
+
+	    // well build
+	    if(building & BUILD_WELL) growth += GetGrownWell();
+
+	    // wel2 extras
+	    if((dwellings1[ii] == DWELLING_MONSTER1) && (building & BUILD_WEL2)) growth += GetGrownWel2();
 
 	    // neutral town: half population (normal for begin month)
 	    if(GetColor() == Color::NONE && !world.BeginMonth())
@@ -404,12 +397,14 @@ void Castle::ActionNewWeek(void)
 				    DWELLING_UPGRADE5, DWELLING_MONSTER2, DWELLING_MONSTER3, DWELLING_MONSTER4, DWELLING_MONSTER5, 0 };
 
 	    for(u8 ii = 0; dwellings2[ii]; ++ii)
-		if(NULL != (dw = GetDwelling(dwellings2[ii])) &&
-		    Monster(race, dwellings2[ii]).GetID() == world.GetWeekType().GetMonster())
+		if(NULL != (dw = GetDwelling(dwellings2[ii])))
 	    {
-		    *dw += Settings::Get().ExtWorldNewVersionWeekOf() ?
-				    GetDwellingGrowth(dwellings2[ii]) : GetGrownWeekOf();
+		const Monster mons(race, dwellings2[ii]);
+		if(mons.isValid() && mons() == world.GetWeekType().GetMonster())
+		{
+		    *dw += GetGrownWeekOf(mons);
 		    break;
+		}
 	    }
 	}
 
@@ -436,19 +431,14 @@ void Castle::ActionNewMonth(void)
 	u16* dw = NULL;
 
 	for(u8 ii = 0; dwellings[ii]; ++ii)
-	    if(NULL != (dw = GetDwelling(dwellings[ii])) &&
-		Monster(race, dwellings[ii]).GetID() == world.GetWeekType().GetMonster())
+	    if(NULL != (dw = GetDwelling(dwellings[ii])))
 	{
-	    u8 growth = GetDwellingGrowth(dwellings[ii]);
-
-	    // neutral town: half population (normal for begin month)
-	    if(GetColor() == Color::NONE && !world.BeginMonth())
-		growth /= 2;
-
-	    *dw += growth;
-	    *dw += *dw * GetGrownMonthOf() / 100;
-
-	    break;
+	    const Monster mons(race, dwellings[ii]);
+	    if(mons.isValid() && mons() == world.GetWeekType().GetMonster())
+	    {
+		*dw += *dw * GetGrownMonthOf() / 100;
+		break;
+	    }
 	}
     }
 }
@@ -1898,9 +1888,10 @@ u8 Castle::GetGrownWel2(void)
     return GameStatic::GetCastleGrownWel2();
 }
 
-u8 Castle::GetGrownWeekOf(void)
+u8 Castle::GetGrownWeekOf(const Monster & mons)
 {
-    return GameStatic::GetCastleGrownWeekOf();
+    return Settings::Get().ExtWorldNewVersionWeekOf() ?
+                mons.GetGrown() : GameStatic::GetCastleGrownWeekOf();
 }
 
 u8 Castle::GetGrownMonthOf(void)
