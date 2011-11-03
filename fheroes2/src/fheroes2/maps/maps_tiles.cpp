@@ -2444,6 +2444,32 @@ void Maps::Tiles::FixLoadOldVersion(u16 version, u8 quantity3, u8 quantity4, u8 
 	    }
 		break;
 
+        case MP2::OBJ_WATCHTOWER:                                                              
+        case MP2::OBJ_EXCAVATION:                                                              
+        case MP2::OBJ_CAVE:                                                                    
+        case MP2::OBJ_TREEHOUSE:                                                               
+        case MP2::OBJ_ARCHERHOUSE:                                                             
+        case MP2::OBJ_GOBLINHUT:                                                               
+        case MP2::OBJ_DWARFCOTT:                                                               
+        case MP2::OBJ_HALFLINGHOLE:                                                            
+        case MP2::OBJ_PEASANTHUT:                                                              
+        case MP2::OBJ_THATCHEDHUT:                                                             
+        // recruit dwelling                                                                    
+        case MP2::OBJ_RUINS:                                                                   
+        case MP2::OBJ_TREECITY:                                                                
+        case MP2::OBJ_WAGONCAMP:                                                               
+        case MP2::OBJ_DESERTTENT:                                                              
+        case MP2::OBJ_TROLLBRIDGE:                                                             
+        case MP2::OBJ_DRAGONCITY:                                                              
+        case MP2::OBJ_CITYDEAD:                                                                
+        case MP2::OBJ_WATERALTAR:                                                              
+        case MP2::OBJ_AIRALTAR:                                                                
+        case MP2::OBJ_FIREALTAR:                                                               
+        case MP2::OBJ_EARTHALTAR:                                                              
+        case MP2::OBJ_BARROWMOUNDS:                                                            
+		MonsterSetCount(quantity2 * 0xFF + quantity1);
+		break;
+
 	    case MP2::OBJ_ABANDONEDMINE:
     	    {
         	Army::Troop & troop = world.GetCapturedObject(GetIndex()).GetTroop();
