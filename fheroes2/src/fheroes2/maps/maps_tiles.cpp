@@ -2467,6 +2467,7 @@ void Maps::Tiles::FixLoadOldVersion(u16 version, u8 quantity3, u8 quantity4, u8 
         case MP2::OBJ_FIREALTAR:                                                               
         case MP2::OBJ_EARTHALTAR:                                                              
         case MP2::OBJ_BARROWMOUNDS:                                                            
+		if(quantity2 > quantity1) std::swap(quantity1, quantity2);
 		MonsterSetCount(quantity2 * 0xFF + quantity1);
 		break;
 

@@ -1122,12 +1122,15 @@ void Surface::Reflect(Surface & sf_dst, const Surface & sf_src, const u8 shape)
 
 u32 Surface::GetSize(void) const
 {
-    u32 res = 0;
+    u32 res = sizeof(surface);
 
     if(surface)
     {
-	res = sizeof(SDL_Surface) + sizeof(SDL_PixelFormat) + surface->pitch * surface->h;
-	if(surface->format->palette) res += sizeof(SDL_Palette) + surface->format->palette->ncolors * sizeof(SDL_Color);
+	res += sizeof(SDL_Surface) + sizeof(SDL_PixelFormat) + surface->pitch * surface->h;
+
+	if(surface->format && surface->format->palette &&
+	    (! pal_colors.size() || &pal_colors[0] != surface->format->palette->colors))
+	    res += sizeof(SDL_Palette) + surface->format->palette->ncolors * sizeof(SDL_Color);
     }
 
     return res;

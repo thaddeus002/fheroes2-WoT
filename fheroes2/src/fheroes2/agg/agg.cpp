@@ -1125,13 +1125,12 @@ void AGG::Cache::ICNRegistryFreeObjects(void)
 
 void AGG::Cache::Dump(void) const
 {
-    std::ostringstream os;
-
     u32 total1 = 0;
     u32 total2 = 0;
 
     if(icn_cache)
     {
+	std::ostringstream os;
 	total1 = 0;
         for(u16 ii = 0; ii < ICN::UNKNOWN; ++ii)
         {
@@ -1147,12 +1146,12 @@ void AGG::Cache::Dump(void) const
 	{
 	    DEBUG(DBG_ENGINE, DBG_TRACE, os.str());
 	    DEBUG(DBG_ENGINE, DBG_INFO, "ICN" << " total: " << total1 << " bytes");
-	    os.clear();
 	}
     }
 
     if(til_cache)
     {
+	std::ostringstream os;
 	total1 = 0;
         for(u16 ii = 0; ii < TIL::UNKNOWN; ++ii)
         {
@@ -1168,12 +1167,12 @@ void AGG::Cache::Dump(void) const
 	{
 	    DEBUG(DBG_ENGINE, DBG_TRACE, os.str());
 	    DEBUG(DBG_ENGINE, DBG_INFO, "TIL" << " total: " << total1 << " bytes");
-	    os.clear();
 	}
     }
 
     if(wav_cache.size())
     {
+	std::ostringstream os;
 	total1 = 0;
 	for(std::map<M82::m82_t, std::vector<u8> >::const_iterator
 	    it = wav_cache.begin(); it != wav_cache.end(); ++it)
@@ -1186,12 +1185,12 @@ void AGG::Cache::Dump(void) const
 	{
 	    DEBUG(DBG_ENGINE, DBG_TRACE, os.str());
 	    DEBUG(DBG_ENGINE, DBG_INFO, "WAV" << " total: " << total1 << " bytes");
-	    os.clear();
 	}
     }
 
     if(mid_cache.size())
     {
+	std::ostringstream os;
 	total1 = 0;
 	for(std::map<XMI::xmi_t, std::vector<u8> >::const_iterator
 	    it = mid_cache.begin(); it != mid_cache.end(); ++it)
@@ -1204,13 +1203,13 @@ void AGG::Cache::Dump(void) const
 	{
 	    DEBUG(DBG_ENGINE, DBG_TRACE, os.str());
 	    DEBUG(DBG_ENGINE, DBG_INFO, "MID" << " total: " << total1 << " bytes");
-	    os.clear();
 	}
     }
 
 #ifdef WITH_TTF
     if(fnt_cache.size())
     {
+	std::ostringstream os;
 	total1 = 0;
 	for(std::map<u16, fnt_cache_t>::const_iterator
 	    it = fnt_cache.begin(); it != fnt_cache.end(); ++it)
@@ -1219,7 +1218,6 @@ void AGG::Cache::Dump(void) const
 	if(total1)
 	{
 	    DEBUG(DBG_ENGINE, DBG_INFO, "FNT" << " total: " << total1 << " bytes");
-	    os.clear();
 	}
     }
 #endif
