@@ -1046,8 +1046,6 @@ void Maps::Tiles::AddonsPushLevel1(const TilesAddon & ta)
 	addons_level2.push_back(ta);
     else
     addons_level1.push_back(ta);
-
-    UpdatePassable();
 }
 
 void Maps::Tiles::AddonsPushLevel2(const MP2::mp2tile_t & mt)
@@ -1068,8 +1066,6 @@ void Maps::Tiles::AddonsPushLevel2(const TilesAddon & ta)
 	addons_level1.push_back(ta);
     else
 	addons_level2.push_back(ta);
-
-    UpdatePassable();
 }
 
 void Maps::Tiles::AddonsSort(void)
@@ -1121,8 +1117,6 @@ void Maps::Tiles::Remove(u32 uniq)
 {
     if(!addons_level1.empty()) addons_level1.Remove(uniq);
     if(!addons_level2.empty()) addons_level2.Remove(uniq);
-
-    UpdatePassable();
 }
 
 void Maps::Tiles::RedrawTile(Surface & dst) const
