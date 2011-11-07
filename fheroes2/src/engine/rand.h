@@ -36,15 +36,17 @@ namespace Rand
     template<typename T>
     const T* Get(const std::vector<T> & vec)
     {
-        return vec.empty() ? NULL:
-	    &(*std::advance(vec.begin(), Rand::Get(vec.size() - 1)));
+	typename std::vector<T>::const_iterator it = vec.begin();
+	std::advance(it, Rand::Get(vec.size() - 1));
+        return it == vec.end() ? NULL: &(*it);
     }
     
     template<typename T>
     const T* Get(const std::list<T> & list)
     {
-        return list.empty() ? NULL:
-	    &(*std::advance(list.begin(), Rand::Get(list.size() - 1)));
+	typename std::list<T>::const_iterator it = list.begin();
+	std::advance(it, Rand::Get(list.size() - 1));
+        return it == list.end() ? NULL: &(*it);
     }
 
     typedef std::pair<s32, u32> ValuePercent;
