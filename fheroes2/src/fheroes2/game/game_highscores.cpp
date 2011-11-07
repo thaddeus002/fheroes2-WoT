@@ -240,22 +240,27 @@ void HGSData::RedrawList(s16 ox, s16 oy)
 
 Game::menu_t Game::HighScores(void)
 {
-    if(IS_DEVEL())
+    Cursor & cursor = Cursor::Get();
+    Display & display = Display::Get();
+    const Settings & conf = Settings::Get();
+
+    cursor.Hide();
+    display.Fill(0, 0, 0);
+
+#ifdef WITH_DEBUG
+    if(IS_DEVEL() && world.CountDay())
     {
 	std::string msg = "Your result: ";
 	String::AddInt(msg, GetGameOverScores());
 	Dialog::Message("High Scores", msg, Font::BIG, Dialog::OK);
 	return MAINMENU;
     }
+#endif
 
-    const Settings & conf = Settings::Get();
     HGSData hgs;
 
     std::ostringstream stream;
     stream << conf.LocalPrefix() << SEPARATOR << "files" << SEPARATOR << "save" << SEPARATOR << "fheroes2.hgs";
-
-    Cursor & cursor = Cursor::Get();
-    Display & display = Display::Get();
 
     cursor.SetThemes(cursor.POINTER);
     Mixer::Pause();

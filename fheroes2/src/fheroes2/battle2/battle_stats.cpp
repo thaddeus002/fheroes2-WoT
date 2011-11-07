@@ -2249,15 +2249,15 @@ Battle2::Stats* Battle2::Armies::FindMode(u32 mod)
 Battle2::Stats* Battle2::Armies::CreateNewStats(const Monster & mons, u32 count)
 {
     Army::Troops & armies = parent.troops;
-    Army::Troops::iterator it = armies.begin();
+    Army::Troops::reverse_iterator it = armies.rbegin();
 
     // find free invalid
-    while(it != armies.end() && (*it).GetBattleStats()) ++it;
+    while(it != armies.rend() && (*it).GetBattleStats()) ++it;
 
-    if(armies.end() == it)
+    if(armies.rend() == it)
     {
         armies.resize(armies.size() + 1);
-        it = armies.end() - 1;
+        it = armies.rbegin();
     }
 
     (*it).Set(mons, count);
