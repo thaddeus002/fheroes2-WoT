@@ -246,6 +246,8 @@ void Interface::GameArea::Redraw(Surface & dst, u8 flag, const Rect & rt) const
     		    dst.SetPixel(dstpt.x, dstpt.y, col);
     		    dst.Unlock();
 		}
+
+		world.GetTiles(rectMaps.x + ox, rectMaps.y + oy).RedrawPassable(dst);
 	    }
 	}
     }

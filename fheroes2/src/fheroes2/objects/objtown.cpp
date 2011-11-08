@@ -20,6 +20,7 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
+#include "mp2.h"
 #include "icn.h"
 #include "direction.h"
 #include "objtown.h"
@@ -62,12 +63,12 @@ u16 ObjTwba::GetPassable(const u8 & index0)
 
 bool ObjTown::isAction(const u8 & index)
 {
-    return false;
+    return MP2::OBJ_ZERO != GetActionObject(index);
 }
 
 bool ObjTwba::isAction(const u8 & index)
 {
-    return false;
+    return MP2::OBJ_ZERO != GetActionObject(index);
 }
 
 bool ObjTown::isShadow(const u8 & index)
@@ -78,4 +79,21 @@ bool ObjTown::isShadow(const u8 & index)
 bool ObjTwba::isShadow(const u8 & index)
 {
     return false;
+}
+
+u8 ObjTown::GetActionObject(const u8 & index)
+{
+    switch(index % 32)
+    {
+        case 13:
+        case 29:        return MP2::OBJ_CASTLE;
+        default: break;
+    }
+
+    return MP2::OBJ_ZERO;
+}
+
+u8 ObjTwba::GetActionObject(const u8 & index)
+{
+    return MP2::OBJ_ZERO;
 }

@@ -21,6 +21,7 @@
  ***************************************************************************/
 
 #include <algorithm>
+#include "mp2.h"
 #include "icn.h"
 #include "direction.h"
 #include "objlava.h"
@@ -38,7 +39,7 @@ u16 ObjLav2::GetPassable(const u8 & index)
 
 bool ObjLav2::isAction(const u8 & index)
 {
-    return false;
+    return MP2::OBJ_ZERO != GetActionObject(index);
 }
 
 bool ObjLav2::isShadow(const u8 & index)
@@ -65,7 +66,7 @@ u16 ObjLav3::GetPassable(const u8 & index)
 
 bool ObjLav3::isAction(const u8 & index)
 {
-    return false;
+    return MP2::OBJ_ZERO != GetActionObject(index);
 }
 
 bool ObjLav3::isShadow(const u8 & index)
@@ -92,19 +93,7 @@ u16 ObjLava::GetPassable(const u8 & index)
 
 bool ObjLava::isAction(const u8 & index)
 {
-/*
-    obelisk: 110
-    daemon cave: 115
-    sign: 117
-    saw mill: 124
-*/
-#if (__GNUC__ == 4 && __GNUC_MINOR__ == 4)
-    // fixed: array subscript is above array bounds
-    const u8 actions[] = { 110, 115, 117, 124, 255 };
-#else
-    const u8 actions[] = { 110, 115, 117, 124 };
-#endif
-    return ARRAY_COUNT_END(actions) != std::find(actions, ARRAY_COUNT_END(actions), index);
+    return MP2::OBJ_ZERO != GetActionObject(index);
 }
 
 bool ObjLava::isShadow(const u8 & index)
@@ -117,3 +106,28 @@ bool ObjLava::isShadow(const u8 & index)
 #endif
     return ARRAY_COUNT_END(shadows) != std::find(shadows, ARRAY_COUNT_END(shadows), index);
 }
+
+u8 ObjLav2::GetActionObject(const u8 & index)
+{
+    return MP2::OBJ_ZERO;
+}
+
+u8 ObjLav3::GetActionObject(const u8 & index)
+{
+    return MP2::OBJ_ZERO;
+}
+
+u8 ObjLava::GetActionObject(const u8 & index)
+{
+    switch(index)
+    {
+	case 110:	return MP2::OBJ_OBELISK;
+	case 115:	return MP2::OBJ_DAEMONCAVE;
+	case 117:	return MP2::OBJ_SIGN;
+	case 124:	return MP2::OBJ_SAWMILL;
+        default: break;
+    }
+
+    return MP2::OBJ_ZERO;
+}
+

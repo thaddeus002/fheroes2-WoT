@@ -21,6 +21,7 @@
  ***************************************************************************/
 
 #include <algorithm>
+#include "mp2.h"
 #include "icn.h"
 #include "direction.h"
 #include "objdsrt.h"
@@ -49,23 +50,7 @@ u16 ObjDsrt::GetPassable(const u8 & index)
 
 bool ObjDsrt::isAction(const u8 & index)
 {
-    /*
-	desert tent: 73
-	piramids: 82
-	skeleton: 84
-	sphinx: 87
-	city of dead: 96
-	excavation: 101
-	obelisk: 104
-	oasis: 108, 109
-	daemon cave: 117
-	sign: 119
-	grave yard: 122
-	saw mill: 129
-    */
-
-    const u8 actions[] = { 73, 82, 84, 87, 96, 101, 104, 108, 109, 117, 119, 122, 129 };
-    return ARRAY_COUNT_END(actions) != std::find(actions, ARRAY_COUNT_END(actions), index);
+    return MP2::OBJ_ZERO != GetActionObject(index);
 }
 
 bool ObjDsrt::isShadow(const u8 & index)
@@ -73,4 +58,27 @@ bool ObjDsrt::isShadow(const u8 & index)
     const u8 shadows[] = { 11, 13, 16, 19, 23, 25, 27, 29, 33, 35, 38, 41, 44, 46, 47,
 		50, 52, 54, 71, 75, 77, 80, 86, 103, 115, 118 };
     return ARRAY_COUNT_END(shadows) != std::find(shadows, ARRAY_COUNT_END(shadows), index);
+}
+
+u8 ObjDsrt::GetActionObject(const u8 & index)
+{
+    switch(index)
+    {
+	case 73:	return MP2::OBJ_DESERTTENT;
+	case 82:	return MP2::OBJ_PYRAMID;
+	case 84:	return MP2::OBJ_SKELETON;
+	case 87:	return MP2::OBJ_SPHINX;
+	case 96:	return MP2::OBJ_CITYDEAD;
+	case 101:	return MP2::OBJ_EXCAVATION;
+	case 104:	return MP2::OBJ_OBELISK;
+	case 108:
+	case 109:	return MP2::OBJ_OASIS;
+	case 117:	return MP2::OBJ_DAEMONCAVE;
+	case 119:	return MP2::OBJ_SIGN;
+	case 122:	return MP2::OBJ_GRAVEYARD;
+	case 129:	return MP2::OBJ_SAWMILL;
+        default: break;
+    }
+
+    return MP2::OBJ_ZERO;
 }

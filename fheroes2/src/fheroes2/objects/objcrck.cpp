@@ -21,6 +21,7 @@
  ***************************************************************************/
 
 #include <algorithm>
+#include "mp2.h"
 #include "icn.h"
 #include "direction.h"
 #include "objcrck.h"
@@ -50,6 +51,18 @@ u16 ObjCrck::GetPassable(const u8 & index)
 
 bool ObjCrck::isAction(const u8 & index)
 {
+    return MP2::OBJ_ZERO != GetActionObject(index);
+}
+
+bool ObjCrck::isShadow(const u8 & index)
+{
+    const u8 shadows[] = { 0, 2, 9, 12, 13, 15, 20, 23, 28, 33, 36, 39,
+				45, 48, 51, 54, 56, 73, 75, 79, 190, 201, 237 };
+    return ARRAY_COUNT_END(shadows) != std::find(shadows, ARRAY_COUNT_END(shadows), index);
+}
+
+u8 ObjCrck::GetActionObject(const u8 & index)
+{
     /*
 	artesian spring: 3, 4
 	wagon: 74
@@ -60,13 +73,16 @@ bool ObjCrck::isAction(const u8 & index)
 	saw mill: 245
     */
 
-    const u8 actions[] = { 3, 4, 74, 189, 213, 217, 218, 219, 220 };
-    return ARRAY_COUNT_END(actions) != std::find(actions, ARRAY_COUNT_END(actions), index);
-}
+    switch(index)
+    {
+	case 3:
+	case 4:		return MP2::OBJ_ARTESIANSPRING;
+	case 74:	return MP2::OBJ_WAGON;
+	case 189:	return MP2::OBJ_TROLLBRIDGE;
+	case 213:	return MP2::OBJ_TRADINGPOST;
+	case 238:	return MP2::OBJ_OBELISK;
+	case 245:	return MP2::OBJ_SAWMILL;
+    }
 
-bool ObjCrck::isShadow(const u8 & index)
-{
-    const u8 shadows[] = { 0, 2, 9, 12, 13, 15, 20, 23, 28, 33, 36, 39,
-				45, 48, 51, 54, 56, 73, 75, 79, 190, 201, 237 };
-    return ARRAY_COUNT_END(shadows) != std::find(shadows, ARRAY_COUNT_END(shadows), index);
+    return MP2::OBJ_ZERO;
 }

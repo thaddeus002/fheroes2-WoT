@@ -21,6 +21,7 @@
  ***************************************************************************/
 
 #include <algorithm>
+#include "mp2.h"
 #include "icn.h"
 #include "direction.h"
 #include "objmult.h"
@@ -41,25 +42,7 @@ u16 ObjMult::GetPassable(const u8 & index)
 
 bool ObjMult::isAction(const u8 & index)
 {
-/*
-    peasant hut: 35
-    fort: 59
-    gasebo: 62
-    witch hut: 69
-    mercenary camp: 71
-    ruins: 74
-    shrine: 76, 78, 80
-    idol: 82
-    standing stones: 84, 85
-    temple: 88
-    market: 111
-    tree house: 114
-    watch tower: 116
-    tree knowledge: 123
-*/
-    const u8 actions[] = { 35, 59, 62, 69, 71, 74, 76, 78, 80, 82, 84, 85, 88, 111, 114, 116, 123 };
-
-    return ARRAY_COUNT_END(actions) != std::find(actions, ARRAY_COUNT_END(actions), index);
+    return MP2::OBJ_ZERO != GetActionObject(index);
 }
 
 bool ObjMult::isShadow(const u8 & index)
@@ -93,28 +76,7 @@ u16 ObjMul2::GetPassable(const u8 & index)
 
 bool ObjMul2::isAction(const u8 & index)
 {
-/*
-    fountain: 15
-    alchemy tower: 26
-    dragon city: 54
-    grave yard: 58
-    light house: 73
-    saw mill: 80
-    water well: 112
-    sign: 114
-    teleport: 116, 119, 122
-    wagon camp: 129
-    well: 162, 165
-    freeman foundry: 188
-    magick garden: 190
-    observation tower: 201
-    grave yard: 208
-    saw mill: 216
-*/
-    const u8 actions[] = { 15, 26, 54, 58, 73, 80, 112, 114, 116, 119, 122, 129, 162, 165,
-	188, 190, 201, 208, 216 };
-
-    return ARRAY_COUNT_END(actions) != std::find(actions, ARRAY_COUNT_END(actions), index);
+    return MP2::OBJ_ZERO != GetActionObject(index);
 }
 
 bool ObjMul2::isShadow(const u8 & index)
@@ -123,4 +85,60 @@ bool ObjMul2::isShadow(const u8 & index)
 		    161, 164, 180, 181, 189, 199, 200, 202, 206 };
 
     return ARRAY_COUNT_END(shadows1) != std::find(shadows1, ARRAY_COUNT_END(shadows1), index);
+}
+
+u8 ObjMul2::GetActionObject(const u8 & index)
+{
+    switch(index)
+    {
+	case 15:	return MP2::OBJ_FOUNTAIN;
+	case 26:	return MP2::OBJ_ALCHEMYTOWER;
+	case 54:	return MP2::OBJ_DRAGONCITY;
+	case 58:	return MP2::OBJ_GRAVEYARD;
+	case 73:	return MP2::OBJ_LIGHTHOUSE;
+	case 80:	return MP2::OBJ_SAWMILL;
+	case 112:	return MP2::OBJ_WATERWHEEL;
+	case 114:	return MP2::OBJ_SIGN;
+	case 116:
+	case 119:
+	case 122:	return MP2::OBJ_STONELIGHTS;
+	case 129:	return MP2::OBJ_WAGONCAMP;
+	case 162:
+	case 165:	return MP2::OBJ_MAGICWELL;
+	case 188:	return MP2::OBJ_FREEMANFOUNDRY;
+	case 190:	return MP2::OBJ_MAGICGARDEN;
+	case 201:	return MP2::OBJ_OBSERVATIONTOWER;
+	case 208:	return MP2::OBJ_GRAVEYARD;
+	case 216:	return MP2::OBJ_SAWMILL;
+        default: break;
+    }
+
+    return MP2::OBJ_ZERO;
+}
+
+u8 ObjMult::GetActionObject(const u8 & index)
+{
+    switch(index)
+    {
+	case 35:	return MP2::OBJ_PEASANTHUT;
+	case 59:	return MP2::OBJ_FORT;
+	case 62:	return MP2::OBJ_GAZEBO;
+	case 69:	return MP2::OBJ_WITCHSHUT;
+	case 71:	return MP2::OBJ_MERCENARYCAMP;
+	case 74:	return MP2::OBJ_RUINS;
+	case 76:	return MP2::OBJ_SHRINE1;
+	case 78:	return MP2::OBJ_SHRINE2;
+	case 80:	return MP2::OBJ_SHRINE3;
+	case 82:	return MP2::OBJ_IDOL;
+	case 84:
+	case 85:	return MP2::OBJ_STANDINGSTONES;
+	case 88:	return MP2::OBJ_TEMPLE;
+	case 111:	return MP2::OBJ_TRADINGPOST;
+	case 114:	return MP2::OBJ_TREEHOUSE;
+	case 116:	return MP2::OBJ_WATCHTOWER;
+	case 123:	return MP2::OBJ_TREEKNOWLEDGE;
+        default: break;
+    }
+
+    return MP2::OBJ_ZERO;
 }

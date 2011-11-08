@@ -96,6 +96,7 @@ namespace Maps
 	static bool isForests(const TilesAddon &);
 	static bool isTrees(const TilesAddon &);
 	static u16  GetPassable(const TilesAddon &);
+	static u8   GetActionObject(const TilesAddon &);
 	static u8   GetLoyaltyObject(const TilesAddon &);
 
 	static bool PredicateSortRules1(const TilesAddon &, const TilesAddon &);
@@ -161,6 +162,7 @@ namespace Maps
 
 	void FixObject(void);
 	void FixLoadOldVersion(u16 version, u8 quantity3, u8 quantity4, u8 quantity5, u8 quantity6, u8 quantity7);
+	void FixLoadOldVersion2(u16 version);
 
 	void UpdatePassable(void);
 	void CaptureFlags32(u8 obj, u8 col);
@@ -172,6 +174,7 @@ namespace Maps
 	void RedrawTop4Hero(Surface &, bool skip_ground) const;
 	void RedrawObjects(Surface &) const;
 	void RedrawFogs(Surface &, u8) const;
+	void RedrawPassable(Surface &) const;
 
 	void AddonsPushLevel1(const MP2::mp2tile_t & mt);
 	void AddonsPushLevel1(const MP2::mp2addon_t & ma);

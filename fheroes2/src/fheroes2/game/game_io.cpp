@@ -1114,6 +1114,10 @@ bool Game::IO::LoadBIN(QueueMessage & msg)
     std::for_each(world.vec_tiles.begin(), world.vec_tiles.end(),
         std::mem_fun_ref(&Maps::Tiles::UpdatePassable));
 
+    for(MapsTiles::iterator
+	it = world.vec_tiles.begin(); it != world.vec_tiles.end(); ++it)
+    	    (*it).FixLoadOldVersion2(format);
+
     return byte16 == 0xFFFF;
 }
 

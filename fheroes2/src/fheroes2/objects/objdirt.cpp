@@ -21,6 +21,7 @@
  ***************************************************************************/
 
 #include <algorithm>
+#include "mp2.h"
 #include "icn.h"
 #include "direction.h"
 #include "objdirt.h"
@@ -46,19 +47,7 @@ u16 ObjDirt::GetPassable(const u8 & index)
 
 bool ObjDirt::isAction(const u8 & index)
 {
-    /*
-	abandone mine: 8
-	faerie ring: 129
-	hill fort: 135
-	halfling hole: 138
-	tree city: 151
-	wind mill: 185
-	oracul: 197, 198
-	obelisk: 201
-    */
-
-    const u8 actions[] = { 8, 129, 135, 138, 151, 185, 197, 198, 201 };
-    return ARRAY_COUNT_END(actions) != std::find(actions, ARRAY_COUNT_END(actions), index);
+    return MP2::OBJ_ZERO != GetActionObject(index);
 }
 
 bool ObjDirt::isShadow(const u8 & index)
@@ -67,4 +56,23 @@ bool ObjDirt::isShadow(const u8 & index)
 	    87, 91, 94, 97, 100, 103, 111, 114, 117, 126, 128, 136, 149, 150, 161, 165, 177, 181, 196, 200 };
 
     return ARRAY_COUNT_END(shadows) != std::find(shadows, ARRAY_COUNT_END(shadows), index);
+}
+
+u8 ObjDirt::GetActionObject(const u8 & index)
+{
+    switch(index)
+    {
+	case 8:		return MP2::OBJ_ABANDONEDMINE;
+	case 129:	return MP2::OBJ_FAERIERING;
+	case 135:	return MP2::OBJ_HILLFORT;
+	case 138:	return MP2::OBJ_HALFLINGHOLE;
+	case 151:	return MP2::OBJ_TREECITY;
+	case 185:	return MP2::OBJ_WINDMILL;
+	case 197:
+	case 198:	return MP2::OBJ_ORACLE;
+	case 201:	return MP2::OBJ_OBELISK;
+	default: break;
+    }
+
+    return MP2::OBJ_ZERO;
 }

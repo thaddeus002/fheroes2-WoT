@@ -21,6 +21,7 @@
  ***************************************************************************/
 
 #include <algorithm>
+#include "mp2.h"
 #include "icn.h"
 #include "direction.h"
 #include "objswmp.h"
@@ -48,16 +49,7 @@ u16 ObjSwmp::GetPassable(const u8 & index)
 
 bool ObjSwmp::isAction(const u8 & index)
 {
-/*
-    witch hut: 22
-    xanadu: 81
-    faerie ring: 84
-    sign: 140
-    obelisk: 216
-*/
-    const u8 actions[] = { 22, 81, 84, 140, 216 };
-
-    return ARRAY_COUNT_END(actions) != std::find(actions, ARRAY_COUNT_END(actions), index);
+    return MP2::OBJ_ZERO != GetActionObject(index);
 }
 
 bool ObjSwmp::isShadow(const u8 & index)
@@ -66,4 +58,19 @@ bool ObjSwmp::isShadow(const u8 & index)
 	175, 178, 195, 197, 202, 204, 207, 211, 215 };
 
     return ARRAY_COUNT_END(shadows) != std::find(shadows, ARRAY_COUNT_END(shadows), index);
+}
+
+u8 ObjSwmp::GetActionObject(const u8 & index)
+{
+    switch(index)
+    {
+	case 22:	return MP2::OBJ_WITCHSHUT;
+	case 81:	return MP2::OBJ_XANADU;
+	case 84:	return MP2::OBJ_FAERIERING;
+	case 140:	return MP2::OBJ_SIGN;
+	case 216:	return MP2::OBJ_OBELISK;
+        default: break;
+    }
+
+    return MP2::OBJ_ZERO;
 }

@@ -21,6 +21,7 @@
  ***************************************************************************/
 
 #include <algorithm>
+#include "mp2.h"
 #include "icn.h"
 #include "direction.h"
 #include "objwatr.h"
@@ -69,21 +70,12 @@ u16 ObjWatr::GetPassable(const u8 & index)
 
 bool ObjWat2::isAction(const u8 & index)
 {
-    // derelict ship
-    return 21 == index;
+    return MP2::OBJ_ZERO != GetActionObject(index);
 }
 
 bool ObjWatr::isAction(const u8 & index)
 {
-    /*
-	magellan maps: 62:
-	buoy: 195
-	whirlpool: 202, 206, 210, 214, 218, 222
-	shipwrek: 241
-    */
-    const u8 actions[] = { 62, 195, 202, 206, 210, 214, 218, 222, 241 };
-
-    return ARRAY_COUNT_END(actions) != std::find(actions, ARRAY_COUNT_END(actions), index);
+    return MP2::OBJ_ZERO != GetActionObject(index);
 }
 
 bool ObjWatr::isShadow(const u8 & index)
@@ -101,4 +93,34 @@ bool ObjWatr::isShadow(const u8 & index)
 bool ObjWat2::isShadow(const u8 & index)
 {
     return index == 1;
+}
+
+u8 ObjWatr::GetActionObject(const u8 & index)
+{
+    switch(index)
+    {
+        case 62:	return MP2::OBJ_MAGELLANMAPS;
+        case 195:	return MP2::OBJ_BUOY;
+        case 202:
+        case 206:
+        case 210:
+        case 214:
+        case 218:
+        case 222:	return MP2::OBJ_WHIRLPOOL;
+        case 241:	return MP2::OBJ_SHIPWRECK;
+        default: break;
+    }
+
+    return MP2::OBJ_ZERO;
+}
+
+u8 ObjWat2::GetActionObject(const u8 & index)
+{
+    switch(index)
+    {
+        case 21:	return MP2::OBJ_DERELICTSHIP;
+        default: break;
+    }
+
+    return MP2::OBJ_ZERO;
 }

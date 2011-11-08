@@ -21,6 +21,7 @@
  ***************************************************************************/
 
 #include <algorithm>
+#include "mp2.h"
 #include "icn.h"
 #include "direction.h"
 #include "objgras.h"
@@ -46,13 +47,7 @@ u16 ObjGras::GetPassable(const u8 & index)
 
 bool ObjGras::isAction(const u8 & index)
 {
-/*
-    abandone mine: 6
-    faerie ring: 30
-*/
-
-    const u8 actions[] = { 6, 30 };
-    return ARRAY_COUNT_END(actions) != std::find(actions, ARRAY_COUNT_END(actions), index);
+    return MP2::OBJ_ZERO != GetActionObject(index);
 }
 
 bool ObjGras::isShadow(const u8 & index)
@@ -77,23 +72,43 @@ u16 ObjGra2::GetPassable(const u8 & index)
 
 bool ObjGra2::isAction(const u8 & index)
 {
-/*
-    hill fort: 4
-    halfling hole: 7
-    tree city: 21
-    wind mill: 55
-    archer house: 84
-    goblin hut: 92
-    dwarf cottadge: 114
-    oracul: 125, 126
-    obelisk: 129
-*/
-    const u8 actions[] = { 4, 7, 21, 55, 84, 92, 114, 125, 126, 129 };
-    return ARRAY_COUNT_END(actions) != std::find(actions, ARRAY_COUNT_END(actions), index);
+    return MP2::OBJ_ZERO != GetActionObject(index);
 }
 
 bool ObjGra2::isShadow(const u8 & index)
 {
     const u8 shadows1[] = { 5, 19, 20, 31, 33, 47, 51, 70, 77, 91, 100, 107, 124, 128 };
     return ARRAY_COUNT_END(shadows1) != std::find(shadows1, ARRAY_COUNT_END(shadows1), index);
+}
+
+u8 ObjGras::GetActionObject(const u8 & index)
+{
+    switch(index)
+    {
+	case 6:		return MP2::OBJ_ABANDONEDMINE;
+	case 30:	return MP2::OBJ_FAERIERING;
+        default: break;
+    }
+
+    return MP2::OBJ_ZERO;
+}
+
+u8 ObjGra2::GetActionObject(const u8 & index)
+{
+    switch(index)
+    {
+	case 4:		return MP2::OBJ_HILLFORT;
+	case 7:		return MP2::OBJ_HALFLINGHOLE;
+	case 21:	return MP2::OBJ_TREECITY;
+	case 55:	return MP2::OBJ_WINDMILL;
+	case 84:	return MP2::OBJ_ARCHERHOUSE;
+	case 92:	return MP2::OBJ_GOBLINHUT;
+	case 114:	return MP2::OBJ_DWARFCOTT;
+	case 125:
+	case 126:	return MP2::OBJ_ORACLE;
+	case 129:	return MP2::OBJ_OBELISK;
+        default: break;
+    }
+
+    return MP2::OBJ_ZERO;
 }

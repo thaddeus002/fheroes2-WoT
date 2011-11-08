@@ -21,6 +21,7 @@
  ***************************************************************************/
 
 #include <algorithm>
+#include "mp2.h"
 #include "icn.h"
 #include "direction.h"
 #include "objxloc.h"
@@ -43,18 +44,7 @@ u16 ObjXlc1::GetPassable(const u8 & index)
 
 bool ObjXlc1::isAction(const u8 & index)
 {
-    /*
-	alchemist tower: 3
-	arena: 70
-	barrow mounds: 77
-	eath altar: 94
-	air altar: 118
-	fire altar: 127
-	water altar: 135
-    */
-    const u8 actions[] = { 3, 70, 77, 94, 118, 127, 135 };
-
-    return ARRAY_COUNT_END(actions) != std::find(actions, ARRAY_COUNT_END(actions), index);
+    return MP2::OBJ_ZERO != GetActionObject(index);
 }
 
 bool ObjXlc1::isShadow(const u8 & index)
@@ -81,20 +71,7 @@ u16 ObjXlc2::GetPassable(const u8 & index)
 
 bool ObjXlc2::isAction(const u8 & index)
 {
-    /*
-	stables: 4
-	jail: 9
-	mermaid: 37
-	sirens: 101
-    */
-#if (__GNUC__ == 4 && __GNUC_MINOR__ == 4)
-    // fixed: array subscript is above array bounds
-    const u8 actions[] = { 4, 9, 37, 101, 255 };
-#else
-    const u8 actions[] = { 4, 9, 37, 101 };
-#endif
-
-    return ARRAY_COUNT_END(actions) != std::find(actions, ARRAY_COUNT_END(actions), index);
+    return MP2::OBJ_ZERO != GetActionObject(index);
 }
 
 bool ObjXlc2::isShadow(const u8 & index)
@@ -123,15 +100,7 @@ u16 ObjXlc3::GetPassable(const u8 & index)
 
 bool ObjXlc3::isAction(const u8 & index)
 {
-    /*
-	hut magi: 30
-	eyes magi: 50
-	barrier: 60, 66, 72, 78, 84, 90, 96, 102
-	traveller tent: 110, 114, 118, 122, 126, 130, 134, 138
-    */
-    const u8 actions[] = { 30, 50, 60, 66, 72, 78, 84, 90, 96, 102, 110, 114, 118, 122, 126, 130, 134, 138 };
-
-    return ARRAY_COUNT_END(actions) != std::find(actions, ARRAY_COUNT_END(actions), index);
+    return MP2::OBJ_ZERO != GetActionObject(index);
 }
 
 bool ObjXlc3::isShadow(const u8 & index)
@@ -140,4 +109,63 @@ bool ObjXlc3::isShadow(const u8 & index)
 	108, 109, 112, 113, 116, 117, 120, 121, 124, 125, 128, 129, 132, 133, 136, 137 };
 
     return ARRAY_COUNT_END(shadows) != std::find(shadows, ARRAY_COUNT_END(shadows), index);
+}
+
+u8 ObjXlc1::GetActionObject(const u8 & index)
+{
+    switch(index)
+    {
+        case 3:		return MP2::OBJ_ALCHEMYTOWER;
+        case 70:	return MP2::OBJ_ARENA;
+        case 77:	return MP2::OBJ_BARROWMOUNDS;
+        case 94:	return MP2::OBJ_EARTHALTAR;
+        case 118:	return MP2::OBJ_AIRALTAR;
+        case 127:	return MP2::OBJ_FIREALTAR;
+        case 135:	return MP2::OBJ_WATERALTAR;
+        default: break;
+    }
+
+    return MP2::OBJ_ZERO;
+}
+
+u8 ObjXlc2::GetActionObject(const u8 & index)
+{
+    switch(index)
+    {
+        case 4:		return MP2::OBJ_STABLES;
+        case 9:		return MP2::OBJ_JAIL;
+        case 37:	return MP2::OBJ_MERMAID;
+        case 101:	return MP2::OBJ_SIRENS;
+        default: break;
+    }
+
+    return MP2::OBJ_ZERO;
+}
+
+u8 ObjXlc3::GetActionObject(const u8 & index)
+{
+    switch(index)
+    {
+        case 30:	return MP2::OBJ_HUTMAGI;
+        case 50:	return MP2::OBJ_EYEMAGI;
+	case 60:
+	case 66:
+	case 72:
+	case 78:
+	case 84:
+	case 90:
+	case 96:
+        case 102:	return MP2::OBJ_BARRIER;
+	case 110:
+	case 114:
+	case 118:
+	case 122:
+	case 126:
+	case 130:
+	case 134:
+        case 138:	return MP2::OBJ_TRAVELLERTENT;
+        default: break;
+    }
+
+    return MP2::OBJ_ZERO;
 }

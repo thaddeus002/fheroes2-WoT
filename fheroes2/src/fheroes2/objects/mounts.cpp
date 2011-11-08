@@ -21,6 +21,7 @@
  ***************************************************************************/
 
 #include <algorithm>
+#include "mp2.h"
 #include "icn.h"
 #include "direction.h"
 #include "mounts.h"
@@ -61,12 +62,22 @@ u16 ObjMnts2::GetPassable(const u16 & icn, const u8 & index)
 
 bool ObjMnts1::isAction(const u8 & index)
 {
-    return false;
+    return MP2::OBJ_ZERO != GetActionObject(index);
 }
 
 bool ObjMnts2::isAction(const u8 & index)
 {
-    return false;
+    return MP2::OBJ_ZERO != GetActionObject(index);
+}
+
+u8 ObjMnts1::GetActionObject(const u8 & index)
+{
+    return MP2::OBJ_ZERO;
+}
+
+u8 ObjMnts2::GetActionObject(const u8 & index)
+{
+    return MP2::OBJ_ZERO;
 }
 
 bool ObjMnts1::isShadow(const u8 & index)

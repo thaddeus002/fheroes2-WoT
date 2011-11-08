@@ -234,6 +234,61 @@ u16 Maps::TilesAddon::GetPassable(const Maps::TilesAddon & ta)
     return DIRECTION_ALL;
 }
 
+u8 Maps::TilesAddon::GetActionObject(const Maps::TilesAddon & ta)
+{
+    switch(MP2::GetICNObject(ta.object))
+    {
+        case ICN::MTNSNOW:
+        case ICN::MTNSWMP:
+        case ICN::MTNLAVA:
+        case ICN::MTNDSRT:
+        case ICN::MTNMULT:
+        case ICN::MTNGRAS:      return ObjMnts1::GetActionObject(ta.index);
+
+        case ICN::MTNCRCK:
+        case ICN::MTNDIRT:      return ObjMnts2::GetActionObject(ta.index);
+
+        case ICN::TREJNGL:
+        case ICN::TREEVIL:
+        case ICN::TRESNOW:
+        case ICN::TREFIR:
+        case ICN::TREFALL:
+        case ICN::TREDECI:      return ObjTree::GetActionObject(ta.index);
+
+        case ICN::OBJNSNOW:     return ObjSnow::GetActionObject(ta.index);
+        case ICN::OBJNSWMP:     return ObjSwmp::GetActionObject(ta.index);
+        case ICN::OBJNGRAS:     return ObjGras::GetActionObject(ta.index);
+        case ICN::OBJNGRA2:     return ObjGra2::GetActionObject(ta.index);
+        case ICN::OBJNCRCK:     return ObjCrck::GetActionObject(ta.index);
+        case ICN::OBJNDIRT:     return ObjDirt::GetActionObject(ta.index);
+        case ICN::OBJNDSRT:     return ObjDsrt::GetActionObject(ta.index);
+        case ICN::OBJNMUL2:	return ObjMul2::GetActionObject(ta.index);
+        case ICN::OBJNMULT:     return ObjMult::GetActionObject(ta.index);
+        case ICN::OBJNLAVA:     return ObjLava::GetActionObject(ta.index);
+        case ICN::OBJNLAV3:     return ObjLav3::GetActionObject(ta.index);
+        case ICN::OBJNLAV2:     return ObjLav2::GetActionObject(ta.index);
+        case ICN::OBJNWAT2:	return ObjWat2::GetActionObject(ta.index);
+        case ICN::OBJNWATR:     return ObjWatr::GetActionObject(ta.index);
+
+        case ICN::OBJNTWBA:	return ObjTwba::GetActionObject(ta.index);
+        case ICN::OBJNTOWN:     return ObjTown::GetActionObject(ta.index);
+
+        case ICN::X_LOC1:       return ObjXlc1::GetActionObject(ta.index);
+        case ICN::X_LOC2:       return ObjXlc2::GetActionObject(ta.index);
+        case ICN::X_LOC3:       return ObjXlc3::GetActionObject(ta.index);
+
+        // MANUAL.ICN
+        case ICN::TELEPORT1:
+        case ICN::TELEPORT2:
+        case ICN::TELEPORT3:	return MP2::OBJ_STONELIGHTS;
+        case ICN::FOUNTAIN:	return MP2::OBJ_FOUNTAIN;
+
+        default: break;
+    }
+
+    return MP2::OBJ_ZERO;
+}
+
 bool Maps::TilesAddon::isRoad(u16 direct) const
 {
     switch(MP2::GetICNObject(object))
@@ -933,8 +988,9 @@ bool Maps::Tiles::isLongObject(u16 direction)
 	    if(! Exclude4LongObject(*it) &&
 		(tile.addons_level1.end() != std::find_if(tile.addons_level1.begin(), tile.addons_level1.end(),
 						    std::bind2nd(std::ptr_fun(&LongObjectUniq), (*it).uniq)) ||
+		(! Maps::TilesAddon::isTrees(*it) &&
 		 tile.addons_level2.end() != std::find_if(tile.addons_level2.begin(), tile.addons_level2.end(),
-						    std::bind2nd(std::ptr_fun(&LongObjectUniq), (*it).uniq))))
+						    std::bind2nd(std::ptr_fun(&LongObjectUniq), (*it).uniq)))))
 		return true;
     }
     return false;
@@ -953,10 +1009,10 @@ void Maps::Tiles::UpdatePassable(void)
 
 	// fix coast passable
 	if(tile_passable &&
-	    Maps::TileIsCoast(GetIndex(), Direction::TOP|Direction::BOTTOM|Direction::LEFT|Direction::RIGHT) &&
 	    ! MP2::isActionObject(GetObject(), false) &&
-	    //MP2::OBJ_ZERO != GetObject() &&  // Town check: false (OBJNTWBA)
+	    MP2::OBJ_ZERO != GetObject() &&
 	    MP2::OBJ_COAST != GetObject() &&
+	    Maps::TileIsCoast(GetIndex(), Direction::TOP|Direction::BOTTOM|Direction::LEFT|Direction::RIGHT) &&
 	    (addons_level1.size() != static_cast<size_t>(std::count_if(addons_level1.begin(), addons_level1.end(),
 							std::ptr_fun(&TilesAddon::isShadow)))))
 		tile_passable = 0;
@@ -991,6 +1047,7 @@ void Maps::Tiles::UpdatePassable(void)
 	tile_passable &= TilesAddon::GetPassable(*it);
 
     // fix top passable
+/*
     if(Maps::isValidDirection(GetIndex(), Direction::TOP))
     {
 	Tiles & top = world.GetTiles(Maps::GetDirectionIndex(GetIndex(), Direction::TOP));
@@ -1000,6 +1057,7 @@ void Maps::Tiles::UpdatePassable(void)
 	    ! (top.tile_passable & DIRECTION_TOP_ROW))
 	    top.tile_passable = 0;
     }
+*/
 
     // fix corners
     if(Maps::isValidDirection(GetIndex(), Direction::LEFT))
@@ -1010,8 +1068,7 @@ void Maps::Tiles::UpdatePassable(void)
 	if(left.tile_passable &&
     	    isLongObject(Direction::TOP) &&
 	    ! ((Direction::TOP | Direction::TOP_LEFT) & tile_passable) &&
-	    (Direction::TOP_RIGHT & left.tile_passable) &&
-	    ! MP2::isNeedStayFront(mp2_object))
+	    (Direction::TOP_RIGHT & left.tile_passable))
 	{
 	    left.tile_passable &= ~Direction::TOP_RIGHT;
 	}
@@ -1020,8 +1077,7 @@ void Maps::Tiles::UpdatePassable(void)
 	if(tile_passable &&
     	    left.isLongObject(Direction::TOP) &&
 	    ! ((Direction::TOP | Direction::TOP_RIGHT) & left.tile_passable) &&
-	    (Direction::TOP_LEFT & tile_passable) &&
-	    ! MP2::isNeedStayFront(left.mp2_object))
+	    (Direction::TOP_LEFT & tile_passable))
 	{
 	    tile_passable &= ~Direction::TOP_LEFT;
 	}
@@ -1162,6 +1218,39 @@ void Maps::Tiles::RedrawBottom(Surface & dst, bool skip_objs) const
 	    }
 	}
     }
+}
+
+void Maps::Tiles::RedrawPassable(Surface & dst) const
+{
+#ifdef WITH_DEBUG
+    const Interface::GameArea & area = Interface::GameArea::Get();
+    const Point mp(GetIndex() % world.w(), GetIndex() / world.w());
+
+    if(area.GetRectMaps() & mp)
+    {
+	static Surface sf[2];
+
+	if(! sf[0].isValid())
+	{
+	    sf[0].Set(31, 31);
+	    Cursor::DrawCursor(sf[0], 0xD7, true);
+	    sf[1].Set(31, 31);
+	    Cursor::DrawCursor(sf[1], 0xDE, true);
+	}
+
+	const Surface & sf_red = sf[0];
+	const Surface & sf_green = sf[1];
+
+	if(MP2::isActionObject(GetObject(false), isWater()))
+	    area.BlitOnTile(dst, sf_green, 0, 0, mp);
+	else
+	if(0 == tile_passable)
+	    area.BlitOnTile(dst, sf_red, 0, 0, mp);
+	else
+	if(DIRECTION_ALL != tile_passable)
+	    area.BlitOnTile(dst, sf_green, 0, 0, mp);
+    }
+#endif
 }
 
 void Maps::Tiles::RedrawObjects(Surface & dst) const
@@ -2403,6 +2492,23 @@ void Maps::Tiles::RedrawFogs(Surface & dst, u8 color) const
 
 	const Sprite & sprite = AGG::GetICN(ICN::CLOP32, index, revert);
 	area.BlitOnTile(dst, sprite, (revert ? sprite.x() + TILEWIDTH - sprite.w() : sprite.x()), sprite.y(), mp);
+    }
+}
+
+void Maps::Tiles::FixLoadOldVersion2(u16 version)
+{
+    if(version < FORMAT_VERSION_2683)
+    {
+        // fix load old save format
+        Heroes* hero = GetHeroes();
+        if(hero && MP2::OBJ_ZERO == hero->GetMapsObject())
+        {
+            Addons::const_iterator it = std::find_if(addons_level1.begin(), addons_level1.end(), TilesAddon::GetActionObject);
+            if(it != addons_level1.end())
+                hero->SetMapsObject(TilesAddon::GetActionObject(*it));
+
+            DEBUG(DBG_GAME, DBG_WARN, "incorrect passable" << ", index: " << GetIndex());
+        }
     }
 }
 

@@ -30,6 +30,7 @@ namespace ObjMult
     bool	isShadow(const u8 & index);
     bool	isAction(const u8 & index);
     u16         GetPassable(const u8 & index);
+    u8          GetActionObject(const u8 & index);
 }
 
 namespace ObjMul2
@@ -37,6 +38,7 @@ namespace ObjMul2
     bool	isShadow(const u8 & index);
     bool	isAction(const u8 & index);
     u16         GetPassable(const u8 & index);
+    u8          GetActionObject(const u8 & index);
 }
 
 #endif

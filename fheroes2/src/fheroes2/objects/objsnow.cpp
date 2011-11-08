@@ -21,6 +21,7 @@
  ***************************************************************************/
 
 #include <algorithm>
+#include "mp2.h"
 #include "icn.h"
 #include "direction.h"
 #include "objsnow.h"
@@ -44,23 +45,7 @@ u16 ObjSnow::GetPassable(const u8 & index)
 
 bool ObjSnow::isAction(const u8 & index)
 {
-/*
-    cave: 3
-    learn to: 13
-    wind mill: 128
-    watch tower: 138
-    obelisk: 141
-    sign: 143
-    alchemy tower: 150
-    graveyard: 160
-    water mill: 191
-    well: 194
-    saw mill: 201
-    graveyard: 209
-*/
-    const u8 actions[] = { 3, 13, 128, 138, 141, 143, 150, 160, 191, 194, 201, 209 };
-
-    return ARRAY_COUNT_END(actions) != std::find(actions, ARRAY_COUNT_END(actions), index);
+    return MP2::OBJ_ZERO != GetActionObject(index);
 }
 
 bool ObjSnow::isShadow(const u8 & index)
@@ -69,4 +54,26 @@ bool ObjSnow::isShadow(const u8 & index)
 	    104, 108, 120, 124, 137, 140, 142, 144, 148, 193, 203, 207 };
 
     return ARRAY_COUNT_END(shadows) != std::find(shadows, ARRAY_COUNT_END(shadows), index);
+}
+
+u8 ObjSnow::GetActionObject(const u8 & index)
+{
+    switch(index)
+    {
+	case 3:		return MP2::OBJ_CAVE;
+	case 13:	return MP2::OBJ_LEANTO;
+	case 128:	return MP2::OBJ_WINDMILL;
+	case 138:	return MP2::OBJ_WATCHTOWER;
+	case 141:	return MP2::OBJ_OBELISK;
+	case 143:	return MP2::OBJ_SIGN;
+	case 150:	return MP2::OBJ_ALCHEMYTOWER;
+	case 160:	return MP2::OBJ_GRAVEYARD;
+	case 191:	return MP2::OBJ_WATERWHEEL;
+	case 194:	return MP2::OBJ_MAGICWELL;
+	case 201:	return MP2::OBJ_SAWMILL;
+	case 209:	return MP2::OBJ_GRAVEYARD;
+        default: break;
+    }
+
+    return MP2::OBJ_ZERO;
 }

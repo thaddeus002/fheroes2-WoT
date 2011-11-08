@@ -21,6 +21,7 @@
  ***************************************************************************/
 
 #include <algorithm>
+#include "mp2.h"
 #include "icn.h"
 #include "direction.h"
 #include "trees.h"
@@ -35,11 +36,16 @@ u16 ObjTree::GetPassable(const u8 & index)
 
 bool ObjTree::isAction(const u8 & index)
 {
-    return false;
+    return MP2::OBJ_ZERO != GetActionObject(index);
 }
 
 bool ObjTree::isShadow(const u8 & index)
 {
     const u8 shadows[] = { 0, 3, 7, 10, 13, 17, 20, 23, 26, 29, 32, 34 };
     return ARRAY_COUNT_END(shadows) != std::find(shadows, ARRAY_COUNT_END(shadows), index);
+}
+
+u8 ObjTree::GetActionObject(const u8 & index)
+{
+    return MP2::OBJ_ZERO;
 }
