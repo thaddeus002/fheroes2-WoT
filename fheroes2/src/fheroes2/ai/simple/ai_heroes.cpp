@@ -1427,7 +1427,7 @@ void AIToBoat(Heroes & hero, const u8 & obj, const s32 & dst_index)
 
     hero.ResetMovePoints();
     hero.Move2Dest(dst_index);
-    world.GetTiles(dst_index).SetObject(MP2::OBJ_ZERO);
+    hero.SetMapsObject(MP2::OBJ_ZERO);
     hero.SetShipMaster(true);
     AIHeroes::Get(hero).ClearTasks();
     hero.GetPath().Reset();
@@ -1439,9 +1439,11 @@ void AIToCoast(Heroes & hero, const u8 & obj, const s32 & dst_index)
 {
     if(! hero.isShipMaster()) return;
 
+    Maps::Tiles & from = world.GetTiles(hero.GetIndex());
+
     hero.ResetMovePoints();
-    world.GetTiles(hero.GetIndex()).SetObject(MP2::OBJ_BOAT);
     hero.Move2Dest(dst_index);
+    from.SetObject(MP2::OBJ_BOAT);
     hero.SetShipMaster(false);
     AIHeroes::Get(hero).ClearTasks();
     hero.GetPath().Reset();
