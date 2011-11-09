@@ -276,14 +276,17 @@ MapsIndexes Maps::ScanDistanceObjects(const s32 & center, const u8* objs, u16 di
     return MapsIndexesFilteredObjects(results, objs);
 }
 
-bool MapsTileIsUnderProtection(const s32 from, const s32 index)
+bool MapsTileIsUnderProtection(const s32 from, const s32 index) /* from: center, index: monster */
 {
     bool result = false;
+    const Maps::Tiles & tile1 = world.GetTiles(from);
+    const Maps::Tiles & tile2 = world.GetTiles(index);
 
-    if(world.GetTiles(from).isWater() == world.GetTiles(index).isWater())
+    if(tile1.isWater() == tile2.isWater())
     {
-	result = DIRECTION_TOP_ROW & Direction::Get(from, index) ?
-		    ! MP2::isGroundObject(world.GetTiles(from).GetObject(false)) : true;
+	/* if monster can attack to */
+	result = (tile2.GetPassable() & Direction::Get(index, from)) &&
+		(tile1.GetPassable() & Direction::Get(from, index));
     }
 
     return result;
