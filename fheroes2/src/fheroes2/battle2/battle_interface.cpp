@@ -1591,6 +1591,7 @@ void Battle2::Interface::HumanBattleTurn(const Stats & b, Actions & a, std::stri
 		    // fast wins game
 		    arena.result_game->army1 = RESULT_WINS;
 		    humanturn_exit = true;
+		    a.AddedEndAction(b);
 		}
 		break;
 
@@ -1600,6 +1601,7 @@ void Battle2::Interface::HumanBattleTurn(const Stats & b, Actions & a, std::stri
 		    // fast loss game
 		    arena.result_game->army1 = RESULT_LOSS;
 		    humanturn_exit = true;
+		    a.AddedEndAction(b);
 		}
 		break;
 
