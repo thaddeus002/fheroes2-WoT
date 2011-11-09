@@ -85,6 +85,7 @@ namespace Battle2
 	    splitter.Hide();
 	    SetAreaItems(Rect(area.x, area.y, area.w - 10, area.h));
 	    SetListContent(messages);
+	    splitter.Show();
 	};
 
 	const Rect & GetArea(void) const
@@ -102,7 +103,7 @@ namespace Battle2
 	void RedrawItem(const std::string & str, s16 px, s16 py, bool f)
 	{
 	    Text text(str, Font::BIG);
-	    text.Blit(py, px);
+	    text.Blit(px, py);
 	};
 
 	void RedrawBackground(const Point & pt)
@@ -1580,6 +1581,7 @@ void Battle2::Interface::HumanBattleTurn(const Stats & b, Actions & a, std::stri
 	    ProcessingHeroDialogResult(3, a);
 
 	// debug only
+#ifdef DEBUG
 	if(IS_DEVEL()) 
 	switch(le.KeyValue())
 	{
@@ -1603,6 +1605,7 @@ void Battle2::Interface::HumanBattleTurn(const Stats & b, Actions & a, std::stri
 
     	    default: break;
     	}
+#endif
     }
 
     if(pocket_book.w && le.MouseCursor(pocket_book))
