@@ -1,3 +1,28 @@
+Oct, 9, 2011 (2691 rev.)
+
++ Added: option: "world: Wind/Water Mills can be captured"
++ Added: option: "world: guardian objects gets +2 defense"
++ Added: option: "world: use enhanced artifact info dialog"
+
++ Fixed: AI: on water action, add pre battle action
++ Fixed: game: redraw status window, after join troop
++ Fixed: game: add save Kingdom::last_lose_hero object
++ Fixed: game: shipyard redraw order for necr castle
++ Fixed: world: place monster count MonthOfMonster
++ fixed: world: army GetSurrenderCost
++ Fixed: world: more passable objects
++ Fixed: world: maps events correct
++ Fixed: world: update UltimateArtifact
++ Fixed: world: WeekOf/MonthOf grown
++ Fixed: world: artifacts exempt MovePts/half damage/spell cost/double effects
++ Fixed: heroes: visiting objects: Buoy, Sirens, Mermaid, Skeleton
++ Fixed: heroes: cast DD - spell point decrease
++ Fixed: heroes: new day - regenerate sp
++ Fixed: battle: damage info limit coord
++ Fixed: battle: redraw troop with catapult
++ Fixed: battle: genie ability, genie attack, huge damage
++ Fixed: battle: log window show correct
++ Fixed: battle: popup attack dialog
 
 Oct, 1, 2011 (2620 rev.)
 
