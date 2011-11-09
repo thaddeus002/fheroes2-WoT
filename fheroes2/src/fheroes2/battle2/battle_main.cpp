@@ -33,6 +33,7 @@
 #include "world.h"
 #include "kingdom.h"
 #include "server.h"
+#include "ai.h"
 #include "localclient.h"
 #include "battle2.h"
 
@@ -48,6 +49,13 @@ namespace Battle2
 Battle2::Result Battle2::Loader(Army::army_t & army1, Army::army_t & army2, s32 mapsindex)
 {
     const Settings & conf = Settings::Get();
+
+    // AI:: PreBattle
+    if((CONTROL_AI & army1.GetControl()) && army1.GetCommander())
+	AI::HeroesPreBattle(*army1.GetCommander());
+
+    if((CONTROL_AI & army2.GetControl()) && army2.GetCommander())
+	AI::HeroesPreBattle(*army2.GetCommander());
 
     army1.BattleInit();
     army2.BattleInit();

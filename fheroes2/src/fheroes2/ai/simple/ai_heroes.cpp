@@ -1501,6 +1501,13 @@ void AI::HeroesLevelUp(Heroes & hero)
 	hero.ResetModes(Heroes::SCOUTER);
 }
 
+void AI::HeroesPreBattle(HeroBase & hero)
+{
+    Castle* castle = world.GetCastle(hero.GetIndex());
+    if(castle)
+	hero.GetArmy().JoinArmy(castle->GetArmy());
+}
+
 bool AIHeroesValidObject(const Heroes & hero, s32 index)
 {
     Maps::Tiles & tile = world.GetTiles(index);

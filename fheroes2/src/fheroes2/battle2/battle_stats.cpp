@@ -719,7 +719,7 @@ u32 Battle2::Stats::GetDamage(const Stats & enemy) const
     {
 	case Monster::GENIE:
 	    // 10% half
-	    if(enemy.count > 1) // && genie_enemy_half_percent >= Rand::Get(1, 100))
+	    if(enemy.count > 1 && genie_enemy_half_percent >= Rand::Get(1, 100))
 	    {
 		res = enemy.hp / 2;
 		if(arena->interface)

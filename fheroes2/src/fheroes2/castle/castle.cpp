@@ -1689,16 +1689,28 @@ std::string Castle::String(void) const
 {
     std::ostringstream os;
     const CastleHeroes heroes = GetHeroes();
+    const Heroes* hero = NULL;
 
     os << "name            : " << name << std::endl <<
           "race            : " << Race::String(race) << std::endl <<
           "color           : " << Color::String(color) << std::endl <<
           "build           : " << "0x" << std::hex << building << std::dec << std::endl <<
-          "present guest   : " << (heroes.Guest() ? "yes" : "no") << std::endl <<
-          "present guard   : " << (heroes.Guard() ? "yes" : "no") << std::endl <<
           "present boat    : " << (PresentBoat() ? "yes" : "no") << std::endl <<
           "nearly sea      : " << (HaveNearlySea() ? "yes" : "no") << std::endl <<
-          "is castle       : " << (isCastle() ? "yes" : "no") << std::endl;
+          "is castle       : " << (isCastle() ? "yes" : "no") << std::endl <<
+          "army            : " << army.String() << std::endl;
+    
+    if(NULL != (hero = heroes.Guard()))
+    {
+	os <<
+          "army guard      : " << hero->GetArmy().String() << std::endl;
+    }
+
+    if(NULL != (hero = heroes.Guest()))
+    {
+	os <<
+          "army guest      : " << hero->GetArmy().String() << std::endl;
+    }
 
     return os.str();
 }

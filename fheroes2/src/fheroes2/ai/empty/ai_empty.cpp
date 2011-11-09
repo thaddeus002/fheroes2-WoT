@@ -54,6 +54,10 @@ void AI::RemoveHeroes(const Heroes &)
 {
 }
 
+void AI::HeroesPreBattle(HeroBase &)
+{
+}
+
 void AI::HeroesAction(Heroes &, s32)
 {
 }
