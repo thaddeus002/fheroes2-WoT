@@ -700,13 +700,28 @@ u32 Battle2::Stats::CalculateDamageStats(const Stats & enemy, float dmg) const
     if(enemy.troop.isDragons() && Modes(SP_DRAGONSLAYER)) r+= Spell(Spell::DRAGONSLAYER).ExtraValue();
     dmg *= 1 + (0 < r ? 0.1 * std::min(r,  20) : 0.05 * std::max(r, -15));
 
+    return static_cast<u32>(dmg) < 1 ? 1 : static_cast<u32>(dmg);
+}
+
+u32 Battle2::Stats::GetDamage(const Stats & enemy) const
+{
+    u32 res = 0;
+
+    if(Modes(SP_BLESS))
+	res = GetDamageMax(enemy);
+    else
+    if(Modes(SP_CURSE))
+    	res = GetDamageMin(enemy);
+    else
+	res = Rand::Get(GetDamageMin(enemy), GetDamageMax(enemy));
+
     switch(troop().GetID())
     {
 	case Monster::GENIE:
 	    // 10% half
-	    if(genie_enemy_half_percent >= Rand::Get(1, 100))
+	    if(enemy.count > 1) // && genie_enemy_half_percent >= Rand::Get(1, 100))
 	    {
-		dmg = enemy.hp / 2;
+		res = enemy.hp / 2;
 		if(arena->interface)
 		{
 		    std::string str(_("%{name} half the enemy troops!"));
@@ -719,18 +734,7 @@ u32 Battle2::Stats::CalculateDamageStats(const Stats & enemy, float dmg) const
 	default: break;
     }
 
-    return static_cast<u32>(dmg) < 1 ? 1 : static_cast<u32>(dmg);
-}
-
-u32 Battle2::Stats::GetDamage(const Stats & enemy) const
-{
-    if(Modes(SP_BLESS))
-	return GetDamageMax(enemy);
-    else
-    if(Modes(SP_CURSE))
-    	return GetDamageMin(enemy);
-
-    return Rand::Get(GetDamageMin(enemy), GetDamageMax(enemy));
+    return res;
 }
 
 u32 Battle2::Stats::HowManyCanKill(const Stats & b) const
