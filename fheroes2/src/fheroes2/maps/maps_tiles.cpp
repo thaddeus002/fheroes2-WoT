@@ -2497,7 +2497,7 @@ void Maps::Tiles::RedrawFogs(Surface & dst, u8 color) const
 
 void Maps::Tiles::FixLoadOldVersion2(u16 version)
 {
-    if(version < FORMAT_VERSION_2683)
+    if(version < FORMAT_VERSION_2689)
     {
         // fix load old save format
         Heroes* hero = GetHeroes();

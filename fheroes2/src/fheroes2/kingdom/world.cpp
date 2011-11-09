@@ -888,9 +888,18 @@ void World::LoadMaps(const std::string &filename)
     	    case MP2::OBJ_FIREALTAR:
     	    case MP2::OBJ_EARTHALTAR:
 	    case MP2::OBJ_BARROWMOUNDS:
-	    case MP2::OBJ_HEROES:
     		tile.QuantityUpdate();
 		break;
+
+	    case MP2::OBJ_HEROES:
+	    {
+    		Maps::TilesAddon* addon = tile.FindAddonICN1(ICN::MINIHERO);
+    		// remove event sprite
+    		if(addon) tile.Remove(addon->uniq);
+
+    		tile.SetHeroes(GetHeroes(ii));
+	    }
+	    break;
 
 	    default:
 		break;

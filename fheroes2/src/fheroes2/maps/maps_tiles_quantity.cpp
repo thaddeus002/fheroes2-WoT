@@ -883,15 +883,6 @@ void Maps::Tiles::QuantityUpdate(void)
 
         default: break;
     }
-
-    if(MP2::OBJ_HEROES == mp2_object)
-    {
-	TilesAddon* addon = FindAddonICN1(ICN::MINIHERO);
- 	// remove event sprite
-        if(addon) Remove(addon->uniq);
-
-	SetHeroes(world.GetHeroes(GetIndex()));
-    }
 }
 
 u8 Maps::Tiles::MonsterJoinCondition(void) const
