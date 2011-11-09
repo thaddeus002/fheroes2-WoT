@@ -1078,7 +1078,7 @@ void AIToEvent(Heroes & hero, const u8 & obj, const s32 & dst_index)
 	event_maps->SetVisited(hero.GetColor());
 
 	if(event_maps->cancel)
-	    world.GetTiles(hero.GetIndex()).SetObject(MP2::OBJ_ZERO);
+	    hero.SetMapsObject(MP2::OBJ_ZERO);
     }
 
     DEBUG(DBG_AI, DBG_INFO, hero.GetName());
