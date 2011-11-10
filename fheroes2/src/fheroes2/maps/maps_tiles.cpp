@@ -356,7 +356,8 @@ bool Maps::TilesAddon::isRoad(u16 direct) const
 
 bool Maps::TilesAddon::isStream(const TilesAddon & ta)
 {
-    return ICN::STREAM == MP2::GetICNObject(ta.object);
+    return ICN::STREAM == MP2::GetICNObject(ta.object) ||
+	(ICN::OBJNMUL2 == MP2::GetICNObject(ta.object) && (ta.index < 14));
 }
 
 bool Maps::TilesAddon::isRoad(const TilesAddon & ta)
@@ -1358,6 +1359,9 @@ void Maps::Tiles::RedrawBottom4Hero(Surface & dst) const
 	    const ICN::icn_t icn = MP2::GetICNObject(object);
 	    bool skip = false;
 
+	    if(Maps::TilesAddon::isStream(*it) || Maps::TilesAddon::isRoad(*it))
+		skip = true;
+	    else
 	    switch(icn)
 	    {
     		case ICN::OBJNTWBA:
