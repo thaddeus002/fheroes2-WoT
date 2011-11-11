@@ -32,7 +32,7 @@ namespace GameStatic
     u8		whirlpool_lost_percent	= 50;
 
     /* town, castle, heroes, artifact_telescope, object_observation_tower, object_magi_eyes */
-    u8		overview_distance[]	= { 4, 5, 4, 1, 10, 9 }; 
+    u8		overview_distance[]	= { 4, 5, 4, 1, 10, 9, 8 }; 
 
     u8		gameover_lost_days	= 7;
 
