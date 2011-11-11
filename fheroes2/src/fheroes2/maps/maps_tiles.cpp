@@ -1343,6 +1343,44 @@ void Maps::Tiles::RedrawBoat(Surface & dst) const
     }
 }
 
+bool SkipRedrawTileBottom4Hero(const Maps::TilesAddon & ta, const u16 & passable)
+{
+    if(Maps::TilesAddon::isStream(ta) || Maps::TilesAddon::isRoad(ta))
+	return true;
+    else
+    switch(MP2::GetICNObject(ta.object))
+    {
+	case ICN::UNKNOWN:
+	case ICN::MINIHERO:
+	case ICN::MONS32:
+	    return true;
+
+    	case ICN::OBJNWATR:
+	    return ta.index >= 202 && ta.index <= 225; /* whirlpool */
+
+    	case ICN::OBJNTWBA:
+    	case ICN::ROAD:
+    	case ICN::STREAM:
+	    return true;
+
+	case ICN::OBJNCRCK:
+	    return (ta.index == 188 || ta.index == 189 || (passable & DIRECTION_TOP_ROW));
+
+	case ICN::OBJNDIRT:
+	case ICN::OBJNDSRT:
+	case ICN::OBJNGRA2:
+	case ICN::OBJNGRAS:
+	case ICN::OBJNLAVA:
+	case ICN::OBJNSNOW:
+	case ICN::OBJNSWMP:
+	    return (passable & DIRECTION_TOP_ROW);
+
+	default: break;
+    }
+
+    return false;
+}
+
 void Maps::Tiles::RedrawBottom4Hero(Surface & dst) const
 {
     const Interface::GameArea & area = Interface::GameArea::Get();
@@ -1354,41 +1392,12 @@ void Maps::Tiles::RedrawBottom4Hero(Surface & dst) const
 	for(Addons::const_iterator
 	    it = addons_level1.begin(); it != addons_level1.end(); ++it)
 	{
-	    const u8 & object = (*it).object;
-	    const u8 & index  = (*it).index;
-	    const ICN::icn_t icn = MP2::GetICNObject(object);
-	    bool skip = false;
-
-	    if(Maps::TilesAddon::isStream(*it) || Maps::TilesAddon::isRoad(*it))
-		skip = true;
-	    else
-	    switch(icn)
+	    if(! SkipRedrawTileBottom4Hero(*it, tile_passable))
 	    {
-    		case ICN::OBJNTWBA:
-    		case ICN::ROAD:
-    		case ICN::STREAM:
-		    skip = true;
-        	    break;
+		const u8 & object = (*it).object;
+		const u8 & index  = (*it).index;
+		const ICN::icn_t icn = MP2::GetICNObject(object);
 
-    		case ICN::OBJNCRCK:
-		    skip = index == 188 || index == 189 || tile_passable & DIRECTION_TOP_ROW;
-        	    break;
-
-    		case ICN::OBJNDIRT:
-    		case ICN::OBJNDSRT:
-    		case ICN::OBJNGRA2:
-    		case ICN::OBJNGRAS:
-    		case ICN::OBJNLAVA:
-    		case ICN::OBJNSNOW:
-    		case ICN::OBJNSWMP:
-		    skip = tile_passable & DIRECTION_TOP_ROW;
-        	    break;
-
-    		default: break;
-	    }
-
-	    if(!skip && ICN::UNKNOWN != icn && ICN::MINIHERO != icn && ICN::MONS32 != icn)
-	    {
 		const Sprite & sprite = AGG::GetICN(icn, index);
 		area.BlitOnTile(dst, sprite, mp);
 
