@@ -2055,13 +2055,12 @@ void Maps::Tiles::RemoveObjectSprite(void)
 	case MP2::OBJ_ARTIFACT:
 	case MP2::OBJ_CAMPFIRE:		addon = FindObject(GetObject()); break;
 
-	case MP2::OBJ_JAIL:		RemoveJailSprite(); return;
+	case MP2::OBJ_JAIL:		RemoveJailSprite(); tile_passable = DIRECTION_ALL; break;
+	case MP2::OBJ_BARRIER:		RemoveBarrierSprite(); tile_passable = DIRECTION_ALL; break;
 
-	case MP2::OBJ_BARRIER:		RemoveBarrierSprite(); return;
-
-	default: return;
+	default: break;
     }
-    
+
     if(addon)
     {
         // remove shadow sprite from left cell
