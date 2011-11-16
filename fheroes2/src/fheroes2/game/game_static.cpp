@@ -113,7 +113,7 @@ u8 GameStatic::GetHeroesRestoreSpellPointsPerDay(void)
 
 u8 GameStatic::GetMageGuildRestoreSpellPointsPercentDay(u8 level)
 {
-    return level && level < 5 ? mageguild_restore_spell_points_day[level - 1] : 0;
+    return level && level < 6 ? mageguild_restore_spell_points_day[level - 1] : 0;
 }
 
 u8 GameStatic::GetKingdomMaxHeroes(void)
