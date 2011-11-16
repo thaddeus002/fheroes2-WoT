@@ -59,6 +59,7 @@ public:
 
     static void		SetVideoMode(const u16 w, const u16 h, u32 flags);
     static int 		GetMaxMode(Size &, bool enable_rotate);
+    static std::string	GetInfo(void);
 
     static void		HideCursor(void);
     static void		ShowCursor(void);

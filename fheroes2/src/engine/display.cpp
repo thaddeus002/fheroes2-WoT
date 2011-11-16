@@ -21,6 +21,7 @@
  ***************************************************************************/
 
 #include <iostream>
+#include <sstream>
 #include <algorithm>
 #include <string>
 #include "rect.h"
@@ -315,13 +316,13 @@ int Display::GetMaxMode(Size & result, bool rotate)
 
     if(modes == (SDL_Rect **) 0)
     {
-        std::cerr <<  "Display::GetMaxMode: " << "no modes available" << std::endl;
+        std::cerr <<  "Display::" << "GetMaxMode: " << "no modes available" << std::endl;
 	return 0;
     }
     else
     if(modes == (SDL_Rect **) -1)
     {
-        //std::cout <<  "Display::GetMaxMode: " << "all modes available" << std::endl;
+        //std::cout <<  "Display::" << "GetMaxMode: " << "all modes available" << std::endl;
 	return -1;
     }
     else
@@ -355,4 +356,18 @@ void Display::AddUpdateRect(s16 px, s16 py, u16 pw, u16 ph)
 {
     if(0 == (surface->flags & SDL_HWSURFACE))
 	update_rects.PushRect(px, py, pw, ph);
+}
+
+std::string Display::GetInfo(void)
+{
+    Display & display = Display::Get();
+    std::ostringstream os;
+    char namebuf[12];
+
+    os << "Display::" << "GetInfo: " <<
+	display.w() << "x" << display.h() << 
+	", bpp: " << static_cast<int>(display.depth()) <<
+	", driver: " << SDL_VideoDriverName(namebuf, 12);
+
+    return os.str();
 }

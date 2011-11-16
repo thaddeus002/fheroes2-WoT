@@ -192,6 +192,7 @@ int main(int argc, char **argv)
 	    }
 
             DEBUG(DBG_GAME, DBG_INFO, conf.String());
+            DEBUG(DBG_GAME|DBG_ENGINE, DBG_INFO, Display::GetInfo());
 
             // load palette
 	    cache.LoadPAL();
