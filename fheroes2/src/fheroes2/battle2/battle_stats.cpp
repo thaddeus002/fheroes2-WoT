@@ -631,14 +631,12 @@ u8 Battle2::Stats::GetSpeed(bool skip_standing_check) const
 
 u32 Battle2::Stats::GetDamageMin(const Stats & enemy) const
 {
-    return Modes(SP_BLESS) ? GetDamageMax(enemy) :
-	CalculateDamageStats(enemy, GetMonster().GetDamageMin() * count);
+    return CalculateDamageStats(enemy, GetMonster().GetDamageMin() * count);
 }
 
 u32 Battle2::Stats::GetDamageMax(const Stats & enemy) const
 {
-    return Modes(SP_CURSE) ? GetDamageMin(enemy) :
-	CalculateDamageStats(enemy, GetMonster().GetDamageMax() * count);
+    return CalculateDamageStats(enemy, GetMonster().GetDamageMax() * count);
 }
 
 u32 Battle2::Stats::CalculateDamageStats(const Stats & enemy, float dmg) const
