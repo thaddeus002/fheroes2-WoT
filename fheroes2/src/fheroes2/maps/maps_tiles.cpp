@@ -735,6 +735,11 @@ bool Maps::TilesAddon::isRocs(const TilesAddon & ta)
 		return true;
 	    break;
 
+	case ICN::OBJNWAT2:
+	    if(ta.index == 0 || ta.index == 2)
+		return true;
+	    break;
+
 	case ICN::OBJNWATR:
 	    if(ta.index == 182 || ta.index == 183 ||
 		(ta.index > 184 && ta.index < 188))
@@ -1134,6 +1139,7 @@ void Maps::Tiles::UpdatePassable(void)
     passable_disable = 0;
 #endif
 
+    // on ground
     if(MP2::OBJ_HEROES != mp2_object && !isWater())
     {
 	bool mounts1 = addons_level1.end() != std::find_if(addons_level1.begin(), addons_level1.end(), isMountsRocs);
@@ -1196,6 +1202,36 @@ void Maps::Tiles::UpdatePassable(void)
 	    tile_passable = 0;
 #ifdef WITH_DEBUG
 	    passable_disable = 5;
+#endif
+	}
+
+	if(Maps::isValidDirection(GetIndex(), Direction::TOP))
+	{
+	    Tiles & top = world.GetTiles(Maps::GetDirectionIndex(GetIndex(), Direction::TOP));
+	    // fix: rocs on water
+	    if(top.isWater() &&
+		top.tile_passable &&
+		! (Direction::TOP & top.tile_passable))
+	    {
+		top.tile_passable = 0;
+#ifdef WITH_DEBUG
+		top.passable_disable = 9;
+#endif
+	    }
+	}
+    }
+    else
+    // on water
+    if(MP2::OBJ_HEROES != mp2_object && isWater())
+    {
+	// roc: fix bottom border
+	if(tile_passable &&
+	    addons_level1.end() != std::find_if(addons_level1.begin(), addons_level1.end(), TilesAddon::isRocs) &&
+	    ! Maps::isValidDirection(GetIndex(), Direction::BOTTOM))
+	{
+	    tile_passable = 0;
+#ifdef WITH_DEBUG
+	    passable_disable = 4;
 #endif
 	}
     }
