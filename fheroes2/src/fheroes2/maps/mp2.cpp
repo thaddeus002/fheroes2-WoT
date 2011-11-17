@@ -751,6 +751,7 @@ bool MP2::isWaterObject(const u8 obj)
 
     	    case OBJ_MERMAID:
     	    case OBJ_SIRENS:
+    	    case OBJ_BARRIER:
 
     	    // hack (bug: #3142729)
 	    case OBJ_MONSTER:

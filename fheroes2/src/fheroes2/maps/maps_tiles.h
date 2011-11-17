@@ -95,6 +95,9 @@ namespace Maps
 	static bool isRocs(const TilesAddon &);
 	static bool isForests(const TilesAddon &);
 	static bool isTrees(const TilesAddon &);
+	static bool isDeadTrees(const TilesAddon &);
+	static bool isCactus(const TilesAddon &);
+	static bool isStump(const TilesAddon &);
 	static u16  GetPassable(const TilesAddon &);
 	static u8   GetActionObject(const TilesAddon &);
 	static u8   GetLoyaltyObject(const TilesAddon &);
@@ -279,6 +282,10 @@ namespace Maps
 
         u8      quantity1;
         u8      quantity2;
+
+#ifdef WITH_DEBUG
+	u8	passable_disable;
+#endif
     };
 }
 
