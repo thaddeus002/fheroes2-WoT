@@ -2118,7 +2118,7 @@ void ActionToCaptureObject(Heroes & hero, const u8 & obj, const s32 & dst_index)
 	    if(obj == MP2::OBJ_ABANDONEDMINE)
 	    {
 		tile.UpdateAbandoneMineSprite(tile);
-		tile.SetObject(MP2::OBJ_MINES);
+		hero.SetMapsObject(MP2::OBJ_MINES);
 	    }
 
 	    // reset spell info
