@@ -183,6 +183,9 @@ int main(int argc, char **argv)
 #endif
 	    AGG::Cache & cache = AGG::Cache::Get();
 
+            DEBUG(DBG_GAME, DBG_INFO, conf.String());
+            DEBUG(DBG_GAME|DBG_ENGINE, DBG_INFO, Display::GetInfo());
+
 	    // read data dir
 	    if(! cache.ReadDataDir())
 	    {
@@ -190,9 +193,6 @@ int main(int argc, char **argv)
 		ShowAGGError();
 		return EXIT_FAILURE;
 	    }
-
-            DEBUG(DBG_GAME, DBG_INFO, conf.String());
-            DEBUG(DBG_GAME|DBG_ENGINE, DBG_INFO, Display::GetInfo());
 
             // load palette
 	    cache.LoadPAL();
@@ -392,6 +392,7 @@ void ShowAGGError(void)
 	Display & display = Display::Get();
 	LocalEvent & le = LocalEvent::Get();
 
+	display.Fill(zerr.MapRGB(0, 0, 0));
 	zerr.Blit((display.w() - zerr.w()) / 2, (display.h() - zerr.h()) / 2, display);
 	display.Flip();
 
