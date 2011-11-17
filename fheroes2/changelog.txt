@@ -1,4 +1,15 @@
-Oct, 9, 2011 (2691 rev.)
+Nov, 17, 2011 (2704 rev.)
+
++ Fixed: world: old format load: huge population
++ Fixed: world: maps event reset
++ Fixed: world: monster attack direction + check passable
++ Fixed: world: redraw hero, on whirlpool, stream
++ Fixed: world: passable, after remove objects: jail and barrier
++ Fixed: world: object light house, add clean fog rad: 8 tile
++ Fixed: world: GameStatic::GetMageGuildRestoreSpellPointsPercentDay
++ Fixed: battle: luck mod. only for Battle2::Stats::GetDamage
+
+Nov, 9, 2011 (2691 rev.)
 
 + Added: option: "world: Wind/Water Mills can be captured"
 + Added: option: "world: guardian objects gets +2 defense"
