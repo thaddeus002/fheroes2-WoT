@@ -1255,6 +1255,7 @@ void Maps::Tiles::UpdatePassable(void)
 
 	if(isWater() == top.isWater() &&
 	    top.addons_level1.end() != std::find_if(top.addons_level1.begin(), top.addons_level1.end(), TopObjectDisable) &&
+	    ! MP2::isActionObject(GetObject(), isWater()) &&
 	    ! (tile_passable & DIRECTION_TOP_ROW) &&
 	    ! (top.tile_passable & DIRECTION_TOP_ROW))
 	{
