@@ -68,7 +68,7 @@ bool PassableToTile(const Heroes* hero, const Maps::Tiles & toTile, const Direct
 
 	// check direct to object
 	if(MP2::isActionObject(toTile.GetObject(false), (hero ? hero->isShipMaster() : false)))
-	    return Direction::Reflect(direct) & MP2::GetObjectDirect(toTile.GetObject(false));
+	    return Direction::Reflect(direct) & toTile.GetPassable();
 
 	if(MP2::OBJ_HEROES == toTile.GetObject())
 	    return toTile.isPassable(NULL, Direction::Reflect(direct), false);
@@ -80,7 +80,8 @@ bool PassableToTile(const Heroes* hero, const Maps::Tiles & toTile, const Direct
 
     if(toTile.GetIndex() != dst)
     {
-	if(MP2::isPickupObject(toTile.GetObject()))
+	if(MP2::isPickupObject(toTile.GetObject()) ||
+	    MP2::isActionObject(toTile.GetObject(false), (hero ? hero->isShipMaster() : false)))
 	    return false;
 
 	// check hero/monster on route
@@ -112,7 +113,7 @@ bool PassableFromToTile(const Heroes* hero, const s32 & from, const s32 & to, co
 	if(MP2::isActionObject(fromTile.GetObject(false), hero->isShipMaster()))
 	{
 	    // check direct from object
-	    if(! (direct & MP2::GetObjectDirect(fromTile.GetObject(false))))
+	    if(! (direct & fromTile.GetPassable()))
 		return false;
 	}
 	else
@@ -127,7 +128,7 @@ bool PassableFromToTile(const Heroes* hero, const s32 & from, const s32 & to, co
 	if(MP2::isActionObject(fromTile.GetObject(), (hero ? hero->isShipMaster() : false)))
 	{
 	    // check direct from object
-	    if(! (direct & MP2::GetObjectDirect(fromTile.GetObject())))
+	    if(! (direct & fromTile.GetPassable()))
 		return false;
 	}
 	else

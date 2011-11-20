@@ -1139,6 +1139,14 @@ void Maps::Tiles::UpdatePassable(void)
     passable_disable = 0;
 #endif
 
+    const u8 obj = GetObject(false);
+    
+    if(MP2::isActionObject(obj, isWater()))
+    {
+	tile_passable = MP2::GetObjectDirect(obj);
+	return;
+    }
+
     // on ground
     if(MP2::OBJ_HEROES != mp2_object && !isWater())
     {
@@ -1149,9 +1157,9 @@ void Maps::Tiles::UpdatePassable(void)
 
 	// fix coast passable
 	if(tile_passable &&
-	    ! MP2::isActionObject(GetObject(), false) &&
-	    MP2::OBJ_ZERO != GetObject() &&
-	    MP2::OBJ_COAST != GetObject() &&
+	    //! MP2::isActionObject(obj, false) &&
+	    MP2::OBJ_ZERO != obj &&
+	    MP2::OBJ_COAST != obj &&
 	    Maps::TileIsCoast(GetIndex(), Direction::TOP|Direction::BOTTOM|Direction::LEFT|Direction::RIGHT) &&
 	    (addons_level1.size() != static_cast<size_t>(std::count_if(addons_level1.begin(), addons_level1.end(),
 							std::ptr_fun(&TilesAddon::isShadow)))))
@@ -1164,7 +1172,7 @@ void Maps::Tiles::UpdatePassable(void)
 
 	// fix mountain layer
 	if(tile_passable &&
-	    (MP2::OBJ_MOUNTS == GetObject() || MP2::OBJ_TREES == GetObject()) &&
+	    (MP2::OBJ_MOUNTS == obj || MP2::OBJ_TREES == obj) &&
 	    mounts1 && (mounts2 || trees2))
 	{
 	    tile_passable = 0;
@@ -1175,7 +1183,7 @@ void Maps::Tiles::UpdatePassable(void)
 
 	// fix trees layer
 	if(tile_passable &&
-	    (MP2::OBJ_MOUNTS == GetObject() || MP2::OBJ_TREES == GetObject()) &&
+	    (MP2::OBJ_MOUNTS == obj || MP2::OBJ_TREES == obj) &&
 	    trees1 && (mounts2 || trees2))
 	{
 	    tile_passable = 0;
@@ -1186,7 +1194,7 @@ void Maps::Tiles::UpdatePassable(void)
 
 	// fix bottom border
 	if(tile_passable &&
-	    (MP2::OBJ_MOUNTS == GetObject() || MP2::OBJ_TREES == GetObject()) &&
+	    (MP2::OBJ_MOUNTS == obj || MP2::OBJ_TREES == obj) &&
 	    ! Maps::isValidDirection(GetIndex(), Direction::BOTTOM))
 	{
 	    tile_passable = 0;
@@ -1255,7 +1263,7 @@ void Maps::Tiles::UpdatePassable(void)
 
 	if(isWater() == top.isWater() &&
 	    top.addons_level1.end() != std::find_if(top.addons_level1.begin(), top.addons_level1.end(), TopObjectDisable) &&
-	    ! MP2::isActionObject(GetObject(), isWater()) &&
+	    //! MP2::isActionObject(obj, isWater()) &&
 	    ! (tile_passable & DIRECTION_TOP_ROW) &&
 	    ! (top.tile_passable & DIRECTION_TOP_ROW))
 	{
@@ -1289,6 +1297,11 @@ void Maps::Tiles::UpdatePassable(void)
 	    tile_passable &= ~Direction::TOP_LEFT;
 	}
     }
+}
+
+u16 Maps::Tiles::GetPassable(void) const
+{
+    return tile_passable;
 }
 
 void Maps::Tiles::AddonsPushLevel1(const MP2::mp2tile_t & mt)
@@ -1435,9 +1448,6 @@ void Maps::Tiles::RedrawPassable(Surface & dst) const
 
     if(area.GetRectMaps() & mp)
     {
-	if(MP2::isActionObject(GetObject(false), isWater()))
-	    area.BlitOnTile(dst, PassableViewSurface(MP2::GetObjectDirect(GetObject(false))), 0, 0, mp);
-	else
 	if(0 == tile_passable ||
 	   DIRECTION_ALL != tile_passable)
 	    area.BlitOnTile(dst, PassableViewSurface(tile_passable), 0, 0, mp);
@@ -1879,7 +1889,7 @@ bool Maps::Tiles::isPassable(const Heroes* hero, Direction::vector_t direct, boo
 	{
 	    // fix shipwreck: place on water
 	    if(MP2::OBJ_SHIPWRECK == GetObject())
-		return direct & MP2::GetObjectDirect(MP2::OBJ_SHIPWRECK);
+		return direct & tile_passable;
 	    else
 	    // for: meetings/attack hero
 	    if(MP2::OBJ_HEROES == GetObject())

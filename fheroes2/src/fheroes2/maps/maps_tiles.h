@@ -137,7 +137,7 @@ namespace Maps
 	MP2::object_t GetObject(bool skip_hero = true) const;
 	u8 GetQuantity1(void) const{ return quantity1; }
 	u8 GetQuantity2(void) const{ return quantity2; }
-	u16 GetPassable(void) const { return tile_passable; }
+	u16 GetPassable(void) const;
 	Ground::ground_t GetGround(void) const;
 	bool isWater(void) const;
 
