@@ -1445,8 +1445,8 @@ void Game::EventDefaultAction(void)
 	const Maps::Tiles & tile = world.GetTiles(hero->GetIndex());
 
 	// 1. action object
-	if(MP2::isActionObject(tile.GetObject(false), hero->isShipMaster()) &&
-	    (! MP2::isMoveObject(tile.GetObject(false)) || hero->isEnableMove()))
+	if(MP2::isActionObject(hero->GetMapsObject(), hero->isShipMaster()) &&
+	    (! MP2::isMoveObject(hero->GetMapsObject()) || hero->CanMove()))
 	{
 	    hero->Action(hero->GetIndex());
 	    if(MP2::OBJ_STONELIGHTS == tile.GetObject(false) || MP2::OBJ_WHIRLPOOL == tile.GetObject(false))
