@@ -56,34 +56,11 @@ std::string Direction::String(u16 direct)
 
 Direction::vector_t Direction::Get(s32 from, s32 to)
 {
-    if(to == from)
-	return CENTER;
-    else
-    if(to == Maps::GetDirectionIndex(from, TOP))
-	return TOP;
-    else
-    if(to == Maps::GetDirectionIndex(from, TOP_RIGHT))
-    	return TOP_RIGHT;
-    else
-    if(to == Maps::GetDirectionIndex(from, RIGHT))
-    	return RIGHT;
-    else
-    if(to == Maps::GetDirectionIndex(from, BOTTOM_RIGHT))
-    	return BOTTOM_RIGHT;
-    else
-    if(to == Maps::GetDirectionIndex(from, BOTTOM))
-    	return BOTTOM;
-    else
-    if(to == Maps::GetDirectionIndex(from, BOTTOM_LEFT))
-    	return BOTTOM_LEFT;
-    else
-    if(to == Maps::GetDirectionIndex(from, LEFT))
-    	return LEFT;
-    else
-    if(to == Maps::GetDirectionIndex(from, TOP_LEFT))
-    	return TOP_LEFT;
+    for(Direction::vector_t direct = Direction::TOP_LEFT; direct != Direction::CENTER; ++direct)
+	if(to == Maps::GetDirectionIndex(from, direct))
+	    return direct;
 
-    return UNKNOWN;
+    return to == from ? CENTER : UNKNOWN;
 }
 
 bool Direction::ShortDistanceClockWise(u16 from , u16 to)

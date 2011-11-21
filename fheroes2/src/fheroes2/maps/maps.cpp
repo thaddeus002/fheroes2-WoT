@@ -287,6 +287,19 @@ bool MapsTileIsUnderProtection(const s32 from, const s32 index) /* from: center,
 	/* if monster can attack to */
 	result = (tile2.GetPassable() & Direction::Get(index, from)) &&
 		(tile1.GetPassable() & Direction::Get(from, index));
+
+	if(! result)
+	{
+	    /* h2 specific monster attack: BOTTOM_LEFT impassable! */
+	    if(Direction::BOTTOM_LEFT == Direction::Get(index, from) &&
+		(Direction::LEFT & tile2.GetPassable()) && (Direction::TOP & tile1.GetPassable()))
+		result = true;
+	    else
+	    /* h2 specific monster attack: BOTTOM_RIGHT impassable! */
+	    if(Direction::BOTTOM_RIGHT == Direction::Get(index, from) &&
+		(Direction::RIGHT & tile2.GetPassable()) && (Direction::TOP & tile1.GetPassable()))
+		result = true;
+	}
     }
 
     return result;
