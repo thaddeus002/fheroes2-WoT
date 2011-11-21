@@ -1251,24 +1251,24 @@ void ActionToPoorLuckObject(Heroes & hero, const u8 & obj, const s32 & dst_index
 {
     Maps::Tiles & tile = world.GetTiles(dst_index);
     const Spell & spell = tile.QuantitySpell();
-    std::string msg;
+    std::string ask, msg;
 
     switch(obj)
     {
         case MP2::OBJ_PYRAMID:
-	    msg = spell.isValid() ? _("You come upon the pyramid of a great and ancient king.\nYou are tempted to search it for treasure, but all the old stories warn of fearful curses and undead guardians.\nWill you search?") :
-			    _("You come upon the pyramid of a great and ancient king.\nRoutine exploration reveals that the pyramid is completely empty.");
+	    ask = _("You come upon the pyramid of a great and ancient king.\nYou are tempted to search it for treasure, but all the old stories warn of fearful curses and undead guardians.\nWill you search?");
+	    msg = _("You come upon the pyramid of a great and ancient king.\nRoutine exploration reveals that the pyramid is completely empty.");
 	    break;
 
 	default: break;
     }
 
-    if(spell.isValid())
+    if(Dialog::YES == Dialog::Message("", ask, Font::BIG, Dialog::YES|Dialog::NO))
     {
-	PlaySoundWarning;
-
-	if(Dialog::YES == Dialog::Message("", msg, Font::BIG, Dialog::YES|Dialog::NO))
+	if(spell.isValid())
 	{
+	    PlaySoundWarning;
+
 	    // battle
 	    Army::army_t army(tile);
 
@@ -1309,15 +1309,15 @@ void ActionToPoorLuckObject(Heroes & hero, const u8 & obj, const s32 & dst_index
     		BattleLose(hero, res, true);
     	    }
 	}
-    }
-    else
-    {
-	// modify luck
-	AGG::PlaySound(M82::BADLUCK);
-	DialogLuck(MP2::StringObject(obj), msg, false, 2);
+	else
+	{
+	    // modify luck
+	    AGG::PlaySound(M82::BADLUCK);
+	    DialogLuck(MP2::StringObject(obj), msg, false, 2);
 
-	hero.SetVisited(dst_index, Visit::LOCAL);
-	hero.SetVisited(dst_index, Visit::GLOBAL);
+	    hero.SetVisited(dst_index, Visit::LOCAL);
+	    hero.SetVisited(dst_index, Visit::GLOBAL);
+	}
     }
 
     DEBUG(DBG_GAME, DBG_INFO, hero.GetName());
@@ -1427,34 +1427,34 @@ void ActionToPoorMoraleObject(Heroes & hero, const u8 & obj, const s32 & dst_ind
     Maps::Tiles & tile = world.GetTiles(dst_index);
     u16  gold = tile.QuantityGold();
     bool complete = false;
-    std::string msg, win;
+    std::string ask, msg, win;
 
     switch(obj)
     {
         case MP2::OBJ_GRAVEYARD:
-	    msg = gold ? _("You tentatively approach the burial ground of ancient warriors. Do you want to search the graves?") :
-		    _("Upon defeating the Zombies you spend several hours searching the graves and find nothing. Such a despicable act reduces your army's morale.");
+	    ask = _("You tentatively approach the burial ground of ancient warriors. Do you want to search the graves?");
+	    msg = _("Upon defeating the Zombies you spend several hours searching the graves and find nothing. Such a despicable act reduces your army's morale.");
 	    win = _("Upon defeating the zomies you search the graves and find something!");
 	    break;
         case MP2::OBJ_SHIPWRECK:
-    	    msg = gold ? _("The rotting hulk of a great pirate ship creaks eerily as it is pushed against the rocks. Do you wish to search the shipwreck?") :
-		    _("Upon defeating the Ghosts you spend several hours sifting through the debris and find nothing. Such a despicable act reduces your army's morale.");
+    	    ask = _("The rotting hulk of a great pirate ship creaks eerily as it is pushed against the rocks. Do you wish to search the shipwreck?");
+	    msg = _("Upon defeating the Ghosts you spend several hours sifting through the debris and find nothing. Such a despicable act reduces your army's morale.");
 	    win = _("Upon defeating the Ghosts you sift through the debris and find something!");
 	    break;
         case MP2::OBJ_DERELICTSHIP:
-    	    msg = gold ? _("The rotting hulk of a great pirate ship creaks eerily as it is pushed against the rocks. Do you wish to search the ship?") :
-		    _("Upon defeating the Skeletons you spend several hours sifting through the debris and find nothing. Such a despicable act reduces your army's morale.");
+    	    ask = _("The rotting hulk of a great pirate ship creaks eerily as it is pushed against the rocks. Do you wish to search the ship?");
+	    msg = _("Upon defeating the Skeletons you spend several hours sifting through the debris and find nothing. Such a despicable act reduces your army's morale.");
 	    win = _("Upon defeating the Skeletons you sift through the debris and find something!");
 	    break;
 	default: break;
     }
 
-    if(gold)
+    if(Dialog::YES == Dialog::Message("", ask, Font::BIG, Dialog::YES | Dialog::NO))
     {
-	PlaySoundWarning;
-
-	if(Dialog::YES == Dialog::Message("", msg, Font::BIG, Dialog::YES | Dialog::NO))
+	if(gold)
 	{
+	    PlaySoundWarning;
+
 	    Army::army_t army(tile);
 
 	    Battle2::Result res = Battle2::Loader(hero.GetArmy(), army, dst_index);
@@ -1489,18 +1489,18 @@ void ActionToPoorMoraleObject(Heroes & hero, const u8 & obj, const s32 & dst_ind
 		BattleLose(hero, res, true);
 	    }
 	}
-    }
 
-    if(complete)
-	tile.QuantityReset();
-    else
-    if(0 == gold && !hero.isVisited(obj))
-    {
-	// modify morale
-	hero.SetVisited(dst_index);
-        hero.SetVisited(dst_index, Visit::GLOBAL);
-	AGG::PlaySound(M82::BADMRLE);
-	DialogMorale(MP2::StringObject(obj), msg, false, 1);
+	if(complete)
+	    tile.QuantityReset();
+	else
+	if(0 == gold && !hero.isVisited(obj))
+	{
+	    // modify morale
+	    hero.SetVisited(dst_index);
+    	    hero.SetVisited(dst_index, Visit::GLOBAL);
+    	    AGG::PlaySound(M82::BADMRLE);
+	    DialogMorale(MP2::StringObject(obj), msg, false, 1);
+	}
     }
 
     DEBUG(DBG_GAME, DBG_INFO, hero.GetName());
