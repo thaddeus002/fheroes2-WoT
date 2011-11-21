@@ -1144,6 +1144,10 @@ void Maps::Tiles::UpdatePassable(void)
     if(MP2::isActionObject(obj, isWater()))
     {
 	tile_passable = MP2::GetObjectDirect(obj);
+#ifdef WITH_DEBUG
+	if(tile_passable == 0)
+	    passable_disable = 8;
+#endif
 	return;
     }
 
@@ -1263,13 +1267,13 @@ void Maps::Tiles::UpdatePassable(void)
 
 	if(isWater() == top.isWater() &&
 	    top.addons_level1.end() != std::find_if(top.addons_level1.begin(), top.addons_level1.end(), TopObjectDisable) &&
-	    //! MP2::isActionObject(obj, isWater()) &&
+	    ! MP2::isActionObject(top.GetObject(false), isWater()) &&
 	    ! (tile_passable & DIRECTION_TOP_ROW) &&
 	    ! (top.tile_passable & DIRECTION_TOP_ROW))
 	{
 	    top.tile_passable = 0;
 #ifdef WITH_DEBUG
-	    passable_disable = 7;
+	    top.passable_disable = 7;
 #endif
 	}
     }
