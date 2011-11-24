@@ -94,11 +94,11 @@ void Castle::LoadFromMP2(const void *ptr)
         if(0x0040 & byte16) building |= DWELLING_MONSTER4;
         if(0x0080 & byte16) building |= DWELLING_MONSTER5;
         if(0x0100 & byte16) building |= DWELLING_MONSTER6;
-        if(0x0200 & byte16) building |= DWELLING_UPGRADE2;
-        if(0x0400 & byte16) building |= DWELLING_UPGRADE3;
-        if(0x0800 & byte16) building |= DWELLING_UPGRADE4;
-        if(0x1000 & byte16) building |= DWELLING_UPGRADE5;
-        if(0x2000 & byte16) building |= DWELLING_UPGRADE6;
+        if(0x0200 & byte16) building |= DWELLING_UPGRADE2 | DWELLING_MONSTER2;
+        if(0x0400 & byte16) building |= DWELLING_UPGRADE3 | DWELLING_MONSTER3;
+        if(0x0800 & byte16) building |= DWELLING_UPGRADE4 | DWELLING_MONSTER4;
+        if(0x1000 & byte16) building |= DWELLING_UPGRADE5 | DWELLING_MONSTER5;
+        if(0x2000 & byte16) building |= DWELLING_UPGRADE6 | DWELLING_MONSTER6;
 	++ptr8;
 	++ptr8;
 
