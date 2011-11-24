@@ -1348,7 +1348,7 @@ u16 Battle2::Interface::GetBattleCursor(const Point & mouse, std::string & statu
 	    {
 		if(b_current->isArchers() && !b_current->isHandFighting())
 		{
-		    status = _("Shot %{monster} (%{count} shot(s) left)");
+		    status = _("Shoot %{monster} (%{count} shot(s) left)");
 		    String::Replace(status, "%{monster}", b_enemy->GetName());
 		    String::Replace(status, "%{count}", b_current->GetShots());
 
