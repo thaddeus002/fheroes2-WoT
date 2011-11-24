@@ -671,18 +671,13 @@ u32 Battle2::Stats::CalculateDamageStats(const Stats & enemy, float dmg) const
 	}
     }
 
-    // check luck x2
-    if(Modes(LUCK_GOOD)) dmg *= 2;
-    else
-    if(Modes(LUCK_BAD)) dmg /= 2;
-
     // after blind
     if(Modes(SP_BLIND)) dmg /= 2;
 
     // stone cap.
     if(enemy.Modes(SP_STONE)) dmg /= 2;
 
-    // check capability
+    // check monster capability
     switch(troop().GetID())
     {
 	case Monster::CRUSADER:
@@ -712,6 +707,10 @@ u32 Battle2::Stats::GetDamage(const Stats & enemy) const
     	res = GetDamageMin(enemy);
     else
 	res = Rand::Get(GetDamageMin(enemy), GetDamageMax(enemy));
+
+    if(Modes(LUCK_GOOD)) res <<= 1; // mul 2
+    else
+    if(Modes(LUCK_BAD)) res >>= 1; // div 2
 
     switch(troop().GetID())
     {
