@@ -1509,7 +1509,8 @@ void Heroes::ActionNewPosition(void)
     }
 
     if(! isFreeman() &&
-	world.GetTiles(GetIndex()).GetObject(false) == MP2::OBJ_EVENT)
+	GetMapsObject() == MP2::OBJ_EVENT &&
+	world.GetEventMaps(GetColor(), GetIndex()))
     {
 	Action(GetIndex());
 	SetMove(false);
