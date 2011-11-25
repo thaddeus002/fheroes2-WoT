@@ -28,6 +28,7 @@
 #include "monster.h"
 #include "race.h"
 #include "interface_gamearea.h"
+#include "game_interface.h"
 #include "cursor.h"
 #include "game_focus.h"
 #include "world.h"
@@ -310,6 +311,20 @@ void Dialog::QuickInfo(const Maps::Tiles & tile)
     Display & display = Display::Get();
     Cursor & cursor = Cursor::Get();
     cursor.Hide();
+
+    // ext dialog for artifacts
+    if(! tile.isFog(settings.CurrentColor()) &&
+	settings.ExtWorldEnhancedArtifactInfo() &&
+        MP2::OBJ_ARTIFACT == tile.GetObject())
+    {
+        const Artifact & art = tile.QuantityArtifact();
+	u16 oldcur = cursor.Themes();
+        Dialog::ArtifactInfo(art.GetName(), art.GetDescription(), art, 0);
+	cursor.SetThemes(oldcur);
+	cursor.Show();
+	Interface::Basic::Get().SetRedraw(REDRAW_CURSOR);
+        return;
+    }
 
     // preload
     const ICN::icn_t qwikinfo = ICN::QWIKINFO;
