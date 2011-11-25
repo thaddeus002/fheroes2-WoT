@@ -307,18 +307,7 @@ void Dialog::QuickInfo(const Maps::Tiles & tile)
     }
 
     const Settings & settings = Settings::Get();
-
-    // ext dialog for artifacts
-    if(settings.ExtWorldEnhancedArtifactInfo() &&
-	MP2::OBJ_ARTIFACT == tile.GetObject())
-    {
-	const Artifact & art = tile.QuantityArtifact();
-        Dialog::ArtifactInfo(art.GetName(), art.GetDescription(), art, 0);
-	return;
-    }
-
     Display & display = Display::Get();
-
     Cursor & cursor = Cursor::Get();
     cursor.Hide();
 
