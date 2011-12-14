@@ -1891,10 +1891,13 @@ void ActionToAncientLamp(Heroes & hero, const u8 & obj, const s32 & dst_index)
     PlaySoundSuccess;
     if(Dialog::YES == Dialog::Message(MP2::StringObject(obj), _("You stumble upon a dented and tarnished lamp lodged deep in the earth. Do you wish to rub the lamp?"), Font::BIG, Dialog::YES|Dialog::NO))
     {
-	const u16 recruit = Dialog::RecruitMonster(troop(), troop.GetCount());
-	if(recruit)
+	if(! hero.GetArmy().CanJoinTroop(troop))
+	    Dialog::Message(troop.GetName(), _("You are unable to recruit at this time, your ranks are full."), Font::BIG, Dialog::OK);
+	else
 	{
-	    if(hero.GetArmy().JoinTroop(troop(), recruit))
+	    const u16 recruit = Dialog::RecruitMonster(troop(), troop.GetCount());
+
+	    if(recruit)
 	    {
 		if(recruit == troop.GetCount())
 		{
@@ -1909,10 +1912,9 @@ void ActionToAncientLamp(Heroes & hero, const u8 & obj, const s32 & dst_index)
 
     		const payment_t paymentCosts = troop().GetCost() * recruit;
                 world.GetKingdom(hero.GetColor()).OddFundsResource(paymentCosts);
+		hero.GetArmy().JoinTroop(troop(), recruit);
         	Interface::Basic::Get().SetRedraw(REDRAW_STATUS);
 	    }
-	    else
-		Dialog::Message(troop.GetName(), _("You are unable to recruit at this time, your ranks are full."), Font::BIG, Dialog::OK);
 	}
     }
 
@@ -2168,11 +2170,12 @@ void ActionToDwellingJoinMonster(Heroes & hero, const u8 & obj, const s32 & dst_
 
         if(Dialog::YES == Dialog::Message(MP2::StringObject(obj), message, Font::BIG, Dialog::YES|Dialog::NO))
 	{
-	    if(!hero.GetArmy().JoinTroop(troop))
+	    if(! hero.GetArmy().CanJoinTroop(troop))
 		Dialog::Message(troop.GetName(), _("You are unable to recruit at this time, your ranks are full."), Font::BIG, Dialog::OK);
 	    else
 	    {
 		tile.MonsterSetCount(0);
+		hero.GetArmy().JoinTroop(troop);
 
 		if(Settings::Get().ExtHeroRecalculateMovement())
 		    hero.RecalculateMovePoints();
@@ -2263,7 +2266,7 @@ void ActionToDwellingRecruitMonster(Heroes & hero, const u8 & obj, const s32 & d
 	    const u16 recruit = Dialog::RecruitMonster(troop(), troop.GetCount());
 	    if(recruit)
 	    {
-		if(!hero.GetArmy().JoinTroop(troop))
+		if(! hero.GetArmy().CanJoinTroop(troop))
 		    Dialog::Message(name_object, _("You are unable to recruit at this time, your ranks are full."), Font::BIG, Dialog::OK);
 		else
 		{
@@ -2271,6 +2274,7 @@ void ActionToDwellingRecruitMonster(Heroes & hero, const u8 & obj, const s32 & d
 
 		    const payment_t paymentCosts = troop().GetCost() * recruit;
 		    world.GetKingdom(hero.GetColor()).OddFundsResource(paymentCosts);
+		    hero.GetArmy().JoinTroop(troop(), recruit);
 
 		    if(Settings::Get().ExtHeroRecalculateMovement())
 			hero.RecalculateMovePoints();
@@ -2377,7 +2381,7 @@ void ActionToDwellingBattleMonster(Heroes & hero, const u8 & obj, const s32 & ds
 
     	    if(recruit)
     	    {
-    		if(!hero.GetArmy().JoinTroop(troop(), recruit))
+    		if(! hero.GetArmy().CanJoinTroop(troop))
 		    Dialog::Message(troop.GetName(), _("You are unable to recruit at this time, your ranks are full."), Font::BIG, Dialog::OK);
     		else
     		{
@@ -2385,6 +2389,8 @@ void ActionToDwellingBattleMonster(Heroes & hero, const u8 & obj, const s32 & ds
 
     		    const payment_t paymentCosts = troop().GetCost() * recruit;
     		    world.GetKingdom(hero.GetColor()).OddFundsResource(paymentCosts);
+
+    		    hero.GetArmy().JoinTroop(troop(), recruit);
 
 		    if(Settings::Get().ExtHeroRecalculateMovement())
 			hero.RecalculateMovePoints();
