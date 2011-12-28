@@ -710,7 +710,7 @@ bool IsFile(const std::string & name, bool writable)
     if(stat(name.c_str(), &fs) || !S_ISREG(fs.st_mode))
 	return false;
 
-    return writable ? S_IWUSR & fs.st_mode : S_IRUSR & fs.st_mode;
+    return writable ? 0 == access(name.c_str(), W_OK) : S_IRUSR & fs.st_mode;
 }
 
 bool IsDirectory(const std::string & name, bool writable)
@@ -720,5 +720,5 @@ bool IsDirectory(const std::string & name, bool writable)
     if(stat(name.c_str(), &fs) || !S_ISDIR(fs.st_mode))
 	return false;
 
-    return writable ? S_IWUSR & fs.st_mode : S_IRUSR & fs.st_mode;
+    return writable ? 0 == access(name.c_str(), W_OK) : S_IRUSR & fs.st_mode;
 }

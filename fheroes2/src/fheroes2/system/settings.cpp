@@ -779,6 +779,8 @@ std::string Settings::GetSaveDir(void)
         if(IsDirectory(res, true)) return res;
     }
 
+    DEBUG(DBG_GAME, DBG_WARN, "writable directory not found");
+
     return "";
 }
 
