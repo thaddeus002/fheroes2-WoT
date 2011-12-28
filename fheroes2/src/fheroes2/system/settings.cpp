@@ -696,8 +696,8 @@ std::string Settings::GetHomeDir(void)
     if(getenv("HOME"))
 	home = std::string(getenv("HOME")) + SEPARATOR + std::string(".") + std::string("fheroes2");
     else
-    if(getenv("USERPROFILE"))
-	home = std::string(getenv("USERPROFILE")) + SEPARATOR + std::string("fheroes2");
+    if(getenv("APPDATA"))
+	home = std::string(getenv("APPDATA")) + SEPARATOR + std::string("fheroes2");
 
     return home;
 }
