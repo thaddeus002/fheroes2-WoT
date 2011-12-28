@@ -741,8 +741,6 @@ ListFiles Settings::GetListFiles(const std::string & prefix, const std::string &
 	    path = *it + SEPARATOR + prefix;
 
 	res.ReadDir(path, filter, false);
-
-	VERBOSE(path << ", " << filter);
     }
 
     return res;
