@@ -754,6 +754,9 @@ std::string Settings::GetLastFile(const std::string & prefix, const std::string 
 
 std::string Settings::GetLangDir(void)
 {
+#ifdef CONFIGURE_FHEROES2_LOCALEDIR
+    return std::string(CONFIGURE_FHEROES2_LOCALEDIR);
+#else
     std::string res;
     const ListDirs dirs = GetRootDirs();
 
@@ -763,6 +766,7 @@ std::string Settings::GetLangDir(void)
 	res = *it + SEPARATOR + "files" + SEPARATOR + "lang";
         if(IsDirectory(res)) return res;
     }
+#endif
 
     return "";
 }
