@@ -245,9 +245,10 @@ bool Algorithm::PathFind(std::list<Route::Step> *result, const s32 from, const s
 
 	// not found, and exception
 	if(MAXU16 == tmp || -1 == alt || (limit && GetCurrentLength(list, cur) > limit)) break;
+#ifdef WITH_DEBUG
 	else
 	DEBUG(DBG_OTHER, DBG_TRACE, "select: " << alt);
-
+#endif
 	cur = alt;
     }
 

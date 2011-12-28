@@ -876,7 +876,7 @@ bool FH2Server::BattleSendEarthQuakeSpell(u8 color, const std::vector<u8> & targ
 
 int FH2Server::RunServerProcess(void*)
 {
-    const std::string command = Game::GetARGV(0);
+    const std::string command = Settings::GetProgramPath();
     std::ostringstream os;
     os << command << " -s" << ">" << GetDirname(command) << SEPARATOR << "fh2server.log";
     return system(os.str().c_str());

@@ -59,7 +59,6 @@ u32 GetMemoryUsage(void);
 
 bool SaveMemToFile(const std::vector<u8> &, const std::string &);
 bool LoadFileToMem(std::vector<u8> &, const std::string &);
-bool FilePresent(const std::string &);
 
 std::string EncodeString(const std::string & str, const char* charset);
 
@@ -67,5 +66,8 @@ void ToolsSrcRectFixed(Rect &, s16 &, s16 &, const u16, const u16, const Rect &)
 
 int	sdl_putenv(const char *name, const char *value, int overwrite);
 char*	sdl_getenv(const char* env);
+
+bool	IsFile(const std::string &, bool writable = false);
+bool	IsDirectory(const std::string &, bool writable = false);
 
 #endif

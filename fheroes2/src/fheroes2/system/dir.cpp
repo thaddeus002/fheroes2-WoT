@@ -21,22 +21,22 @@
  ***************************************************************************/
 
 #include <dirent.h> 
-#include <sys/stat.h>
-#include <sys/types.h>
+
 #include "gamedefs.h"
 #include "settings.h"
 #include "dir.h"
 
-Dir::Dir()
+
+void ListFiles::Append(const ListFiles & list)
 {
+    insert(end(), list.begin(), list.end());
 }
 
-void Dir::Read(const std::string &path, const std::string &filter, bool sensitive)
+void ListFiles::ReadDir(const std::string &path, const std::string &filter, bool sensitive)
 {
     // read directory
     DIR *dp;
     struct dirent *ep;
-    struct stat fs;
 
     dp = opendir(path.c_str());
 
@@ -49,7 +49,7 @@ void Dir::Read(const std::string &path, const std::string &filter, bool sensitiv
 	    const std::string fullname(path + SEPARATOR + ep->d_name);
 
     	    // if not regular file
-    	    if(stat(fullname.c_str(), &fs) || !S_ISREG(fs.st_mode)) continue;
+    	    if(! IsFile(fullname)) continue;
 
 	    if(filter.size())
 	    {

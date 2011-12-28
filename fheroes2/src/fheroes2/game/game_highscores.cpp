@@ -260,7 +260,7 @@ Game::menu_t Game::HighScores(void)
     HGSData hgs;
 
     std::ostringstream stream;
-    stream << conf.LocalPrefix() << SEPARATOR << "files" << SEPARATOR << "save" << SEPARATOR << "fheroes2.hgs";
+    stream << conf.GetSaveDir() << SEPARATOR << "fheroes2.hgs";
 
     cursor.SetThemes(cursor.POINTER);
     Mixer::Pause();

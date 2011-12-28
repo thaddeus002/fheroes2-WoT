@@ -517,34 +517,33 @@ std::string Maps::FileInfo::String(void) const
 bool PrepareMapsFileInfoList(MapsFileInfoList & lists, bool multi)
 {
     const Settings & conf = Settings::Get();
-    Dir dir;
+    ListFiles maps = conf.GetListFiles("maps", ".mp2");
 
-    ListMapsDirectory::const_iterator it1 = conf.GetListMapsDirectory().begin();
-    ListMapsDirectory::const_iterator it2 = conf.GetListMapsDirectory().end();
+    // check loyality version
+    if(conf.PriceLoyaltyVersion())
+        maps.Append(conf.GetListFiles("maps", ".mx2"));
 
-    for(; it1 != it2; ++it1)
+    const ListDirs & list = conf.GetMapsParams();
+    if(! list.empty())
     {
-        dir.Read(*it1, ".mp2", false);
-        dir.Read(conf.LocalPrefix() + SEPARATOR + *it1, ".mp2", false);
-        // loyality version
-        if(conf.PriceLoyaltyVersion())
-        {
-    	    dir.Read(*it1, ".mx2", false);
-	    dir.Read(conf.LocalPrefix() + SEPARATOR + *it1, ".mx2", false);
+	for(ListDirs::const_iterator
+	    it = list.begin(); it != list.end(); ++it)
+	if(*it != "maps")
+	{
+    	    maps.Append(conf.GetListFiles(*it, ".mp2"));
+	    if(conf.PriceLoyaltyVersion())
+    		maps.Append(conf.GetListFiles(*it, ".mx2"));
 	}
     }
 
-    if(dir.empty()) return false;
+    if(maps.empty()) return false;
+    lists.reserve(maps.size());
 
-    dir.sort();
-    dir.unique();
-
-    lists.reserve(dir.size());
-
-    for(Dir::const_iterator itd = dir.begin(); itd != dir.end(); ++itd)
+    for(ListFiles::const_iterator
+	it = maps.begin(); it != maps.end(); ++it)
     {
 	Maps::FileInfo fi;
-	if(fi.ReadMP2(*itd)) lists.push_back(fi);
+	if(fi.ReadMP2(*it)) lists.push_back(fi);
     }
 
     std::sort(lists.begin(), lists.end(), Maps::FileInfo::NameSorting);
@@ -552,7 +551,8 @@ bool PrepareMapsFileInfoList(MapsFileInfoList & lists, bool multi)
 
     if(multi == false)
     {
-	MapsFileInfoList::iterator it = std::remove_if(lists.begin(), lists.end(), std::mem_fun_ref(&Maps::FileInfo::isMultiPlayerMap));
+	MapsFileInfoList::iterator it = std::remove_if(lists.begin(), lists.end(),
+				    std::mem_fun_ref(&Maps::FileInfo::isMultiPlayerMap));
 	if(it != lists.begin()) lists.resize(std::distance(lists.begin(), it));
     }
 
@@ -560,7 +560,8 @@ bool PrepareMapsFileInfoList(MapsFileInfoList & lists, bool multi)
     if(conf.PreferablyCountPlayers())
     {
 
-	MapsFileInfoList::iterator it = std::remove_if(lists.begin(), lists.end(), std::not1(std::bind2nd(std::mem_fun_ref(&Maps::FileInfo::isAllowCountPlayers), conf.PreferablyCountPlayers())));
+	MapsFileInfoList::iterator it = std::remove_if(lists.begin(), lists.end(),
+		std::not1(std::bind2nd(std::mem_fun_ref(&Maps::FileInfo::isAllowCountPlayers), conf.PreferablyCountPlayers())));
 	if(it != lists.begin()) lists.resize(std::distance(lists.begin(), it));
     }
 

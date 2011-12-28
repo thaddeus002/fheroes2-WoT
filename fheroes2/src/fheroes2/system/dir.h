@@ -25,12 +25,14 @@
 #include <list>
 #include <string>
 
-class Dir : public std::list<std::string>
+struct ListFiles : public std::list<std::string>
 {
-public:
-    Dir();
+    void Append(const ListFiles &);
+    void ReadDir(const std::string &path, const std::string &filter = "", bool sensitive = true);
+};
 
-    void Read(const std::string &path, const std::string &filter = "", bool sensitive = true);
+struct ListDirs : public std::list<std::string>
+{
 };
 
 #endif

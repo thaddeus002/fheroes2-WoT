@@ -38,7 +38,7 @@
 #include <unistd.h>
 #endif
 
-bool SelectFileListSimple(const std::string &, MapsFileInfoList &, std::string &, bool);
+bool SelectFileListSimple(const std::string &, std::string &, bool);
 void RedrawExtraInfo(const Point &, const std::string &, const std::string &);
 
 class FileInfoListBox : public Interface::ListBox<Maps::FileInfo>
@@ -122,24 +122,27 @@ void ResizeToShortName(const std::string & str, std::string & res)
     if(std::string::npos != it) res.resize(it);
 }
 
+MapsFileInfoList GetSortedMapsFileInfoList(void)
+{
+    ListFiles list1;
+    list1.ReadDir(Settings::GetSaveDir(), ".sav", false);
+
+    MapsFileInfoList list2(list1.size());
+    int ii = 0;
+    for(ListFiles::const_iterator itd = list1.begin(); itd != list1.end(); ++itd, ++ii) if(!list2[ii].ReadSAV(*itd)) --ii;
+    if(static_cast<size_t>(ii) != list2.size()) list2.resize(ii);
+    std::sort(list2.begin(), list2.end(), Maps::FileInfo::FileSorting);
+
+    return list2;
+}
+
 bool Dialog::SelectFileSave(std::string & file)
 {
-    Dir dir;
-    const std::string store_dir(Settings::Get().LocalPrefix() + SEPARATOR + "files" + SEPARATOR + "save");
-    dir.Read(store_dir, ".sav", false);
-
-    MapsFileInfoList lists(dir.size());
-    MapsFileInfoList::const_iterator res;
-    int ii = 0;
-    for(Dir::const_iterator itd = dir.begin(); itd != dir.end(); ++itd, ++ii) if(!lists[ii].ReadSAV(*itd)) --ii;
-    if(static_cast<size_t>(ii) != lists.size()) lists.resize(ii);
-    std::sort(lists.begin(), lists.end(), Maps::FileInfo::FileSorting);
-
     // set default
     if(file.empty())
     {
 	const Settings & conf = Settings::Get();
-	file = conf.LocalPrefix() + SEPARATOR + "files" + SEPARATOR + "save" + SEPARATOR;
+	file = Settings::GetSaveDir() + SEPARATOR;
 
 	if(conf.ExtRememberLastFilename() && Game::IO::last_name.size())
 	    file = Game::IO::last_name;
@@ -154,29 +157,17 @@ bool Dialog::SelectFileSave(std::string & file)
 	    file += "newgame.sav";
     }
 
-    return SelectFileListSimple(_("File to Save:"), lists, file, true);
+    return SelectFileListSimple(_("File to Save:"), file, true);
 }
 
 bool Dialog::SelectFileLoad(std::string & file)
 {
-    Dir dir;
-    const std::string store_dir(Settings::Get().LocalPrefix() + SEPARATOR + "files" + SEPARATOR + "save");
-    dir.Read(store_dir, ".sav", false);
-
-    MapsFileInfoList lists(dir.size());
-    MapsFileInfoList::const_iterator res;
-    int ii = 0;
-    for(Dir::const_iterator itd = dir.begin(); itd != dir.end(); ++itd, ++ii) if(!lists[ii].ReadSAV(*itd)) --ii;
-    if(static_cast<size_t>(ii) != lists.size()) lists.resize(ii);
-    std::sort(lists.begin(), lists.end(), Maps::FileInfo::FileSorting);
-
     // set default
     if(file.empty() && Settings::Get().ExtRememberLastFilename() && Game::IO::last_name.size()) file = Game::IO::last_name;
-
-    return SelectFileListSimple(_("File to Load:"), lists, file, false);
+    return SelectFileListSimple(_("File to Load:"), file, false);
 }
 
-bool SelectFileListSimple(const std::string & header, MapsFileInfoList & lists, std::string & result, bool editor)
+bool SelectFileListSimple(const std::string & header, std::string & result, bool editor)
 {
     Display & display = Display::Get();
     Cursor & cursor = Cursor::Get();
@@ -201,6 +192,7 @@ bool SelectFileListSimple(const std::string & header, MapsFileInfoList & lists, 
 
     bool edit_mode = false;
 
+    MapsFileInfoList lists = GetSortedMapsFileInfoList();
     FileInfoListBox listbox(rt, result, edit_mode);
 
     listbox.RedrawBackground(rt);
@@ -253,7 +245,7 @@ bool SelectFileListSimple(const std::string & header, MapsFileInfoList & lists, 
         if((buttonOk.isEnable() && le.MouseClickLeft(buttonOk)) || Game::HotKeyPress(Game::EVENT_DEFAULT_READY))
         {
     	    if(filename.size())
-		result = Settings::Get().LocalPrefix() + SEPARATOR + "files" + SEPARATOR + "save" + SEPARATOR + filename + ".sav";
+		result = Settings::GetSaveDir() + SEPARATOR + filename + ".sav";
     	    else
     	    if(listbox.isSelected())
     		result = listbox.GetCurrent().file;

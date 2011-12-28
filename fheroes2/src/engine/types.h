@@ -23,6 +23,8 @@
 #ifndef H2TYPES_H
 #define H2TYPES_H
 
+#include <sys/stat.h>
+#include <sys/types.h>
 #include "SDL.h"
 
 typedef Sint8		s8;

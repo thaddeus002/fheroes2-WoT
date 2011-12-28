@@ -728,10 +728,7 @@ Game::menu_t Game::HumanTurn(bool isload)
 
 	// autosave
 	if(conf.ExtAutoSaveOn() && conf.ExtAutoSaveBeginOfDay())
-	{
-	    std::string filename(conf.LocalPrefix() + SEPARATOR + "files" + SEPARATOR + "save" + SEPARATOR +  "autosave.sav");
-	    Game::Save(filename);
-	}
+	    Game::Save(conf.GetSaveDir() + SEPARATOR + "autosave.sav");
     }
 
     // check game over
@@ -1050,10 +1047,7 @@ Game::menu_t Game::HumanTurn(bool isload)
 	}
 
 	if(conf.ExtAutoSaveOn() && !conf.ExtAutoSaveBeginOfDay())
-	{
-	    std::string filename(conf.LocalPrefix() + SEPARATOR + "files" + SEPARATOR + "save" + SEPARATOR +  "autosave.sav");
-	    Game::Save(filename);
-	}
+	    Game::Save(conf.GetSaveDir() + SEPARATOR + "autosave.sav");
     }
 
     return res;

@@ -209,13 +209,10 @@ std::string Settings::GetVersion(void)
 
 /* constructor */
 Settings::Settings() : debug(DEFAULT_DEBUG), video_mode(0, 0), game_difficulty(Difficulty::NORMAL),
-    path_data_directory("data"), font_normal("dejavusans.ttf"), font_small("dejavusans.ttf"), force_lang("en"), size_normal(15), size_small(10),
+    font_normal("dejavusans.ttf"), font_small("dejavusans.ttf"), force_lang("en"), size_normal(15), size_small(10),
     sound_volume(6), music_volume(6), heroes_speed(DEFAULT_SPEED_DELAY), ai_speed(DEFAULT_SPEED_DELAY), scroll_speed(SCROLL_NORMAL), battle_speed(DEFAULT_SPEED_DELAY),
     game_type(0), preferably_count_players(0), port(DEFAULT_PORT), memory_limit(0)
 {
-    // default maps dir
-    list_maps_directory.push_back("maps");
-
     ExtSetModes(GAME_SHOW_SDL_LOGO);
     ExtSetModes(GAME_AUTOSAVE_ON);
 
@@ -285,13 +282,13 @@ bool Settings::Read(const std::string & filename)
     }
 
     // maps directories
-    config.GetParams("maps", list_maps_directory);
-    list_maps_directory.sort();
-    list_maps_directory.unique();
-    
+    config.GetParams("maps", maps_params);
+    maps_params.sort();
+    maps_params.unique();
+
     // data directory
     entry = config.Find("data");
-    if(entry) path_data_directory = entry->StrParams();
+    if(entry) data_params = entry->StrParams();
 
     // unicode
     if(Unicode())
@@ -589,10 +586,10 @@ std::string Settings::String(void) const
     std::ostringstream os;
 
     os << "# fheroes2 config, version: " << GetVersion() << std::endl;
-    os << "data = " << path_data_directory << std::endl;
+    os << "data = " << data_params << std::endl;
 
-    for(ListMapsDirectory::const_iterator
-	it = list_maps_directory.begin(); it != list_maps_directory.end(); ++it)
+    for(ListDirs::const_iterator
+	it = maps_params.begin(); it != maps_params.end(); ++it)
     os << "maps = " << *it << std::endl;
 
     os << "videomode = ";
@@ -687,14 +684,107 @@ u8 Settings::FontsSmallSize(void) const { return size_small; }
 bool Settings::FontSmallRenderBlended(void) const { return opt_global.Modes(GLOBAL_FONTRENDERBLENDED1); }
 bool Settings::FontNormalRenderBlended(void) const { return opt_global.Modes(GLOBAL_FONTRENDERBLENDED2); }
 
-/* return path to data directory */
-const std::string & Settings::DataDirectory(void) const { return path_data_directory; }
+void Settings::SetProgramPath(const char* argv0)
+{
+    if(argv0) path_program = argv0;
+}
 
-/* return path to maps directory */
-const ListMapsDirectory & Settings::GetListMapsDirectory(void) const { return list_maps_directory; }
+std::string Settings::GetHomeDir(void)
+{
+    std::string home;
+
+    if(getenv("HOME"))
+	home = std::string(getenv("HOME")) + SEPARATOR + std::string(".") + std::string("fheroes2");
+    else
+    if(getenv("USERPROFILE"))
+	home = std::string(getenv("USERPROFILE")) + SEPARATOR + std::string("fheroes2");
+
+    return home;
+}
+
+ListDirs Settings::GetRootDirs(void)
+{
+    const Settings & conf = Settings::Get();
+    ListDirs dirs;
+
+    // from build
+#ifdef CONFIGURE_FHEROES2_DATA
+    dirs.push_back(CONFIGURE_FHEROES2_DATA);
+#endif
+
+    // from env
+    if(getenv("FHEROES2_DATA"))
+	dirs.push_back(getenv("FHEROES2_DATA"));
+
+    // from dirname
+    dirs.push_back(GetDirname(conf.path_program));
+
+    // from HOME
+    const std::string & home = GetHomeDir();
+    if(! home.empty()) dirs.push_back(home);
+
+    return dirs;
+}
+
+/* return list files */
+ListFiles Settings::GetListFiles(const std::string & prefix, const std::string & filter)
+{
+    const ListDirs dirs = GetRootDirs();
+    ListFiles res;
+
+    for(ListDirs::const_iterator
+	it = dirs.begin(); it != dirs.end(); ++it)
+    {
+        std::string path = *it;
+
+	if(prefix.size())
+	    path = *it + SEPARATOR + prefix;
+
+	res.ReadDir(path, filter, false);
+
+	VERBOSE(path << ", " << filter);
+    }
+
+    return res;
+}
+
+std::string Settings::GetLastFile(const std::string & prefix, const std::string & name)
+{
+    const ListFiles & files = GetListFiles(prefix, name);
+    return files.empty() ? name : files.back();
+}
+
+std::string Settings::GetLangDir(void)
+{
+    std::string res;
+    const ListDirs dirs = GetRootDirs();
+
+    for(ListDirs::const_reverse_iterator
+	it = dirs.rbegin(); it != dirs.rend(); ++it)
+    {
+	res = *it + SEPARATOR + "files" + SEPARATOR + "lang";
+        if(IsDirectory(res)) return res;
+    }
+
+    return "";
+}
+
+std::string Settings::GetSaveDir(void)
+{
+    std::string res;
+    const ListDirs dirs = GetRootDirs();
+
+    for(ListDirs::const_reverse_iterator
+	it = dirs.rbegin(); it != dirs.rend(); ++it)
+    {
+	res = *it + SEPARATOR + "files" + SEPARATOR + "save";
+        if(IsDirectory(res, true)) return res;
+    }
+
+    return "";
+}
 
 /* return path to locales directory */
-const std::string & Settings::LocalPrefix(void) const { return local_prefix; }
 const std::string & Settings::PlayMusCommand(void) const { return playmus_command; }
 
 bool Settings::MusicExt(void) const { return opt_global.Modes(GLOBAL_MUSIC_EXT); }
@@ -840,11 +930,6 @@ void Settings::SetPreferablyCountPlayers(u8 c)
 u8 Settings::PreferablyCountPlayers(void) const
 {
     return preferably_count_players;
-}
-
-void Settings::SetLocalPrefix(const char* str)
-{
-    if(str) local_prefix = str;
 }
 
 u16 Settings::GetPort(void) const
@@ -1434,7 +1519,7 @@ void Settings::SetPosStatus(const Point & pt) { pos_stat = pt; }
 
 void Settings::BinarySave(void) const
 {
-    const std::string binary = local_prefix + SEPARATOR + "fheroes2.bin";
+    const std::string binary = GetSaveDir() + SEPARATOR + "fheroes2.bin";
     QueueMessage msg;
 
     // version
@@ -1467,9 +1552,12 @@ void Settings::BinarySave(void) const
 
 void Settings::BinaryLoad(void)
 {
-    const std::string binary = local_prefix + SEPARATOR + "fheroes2.bin";
+    std::string binary = GetSaveDir() + SEPARATOR + "fheroes2.bin";
 
-    if(FilePresent(binary))
+    if(! IsFile(binary))
+	binary = GetLastFile("", "fheroes2.bin");
+
+    if(IsFile(binary))
     {
 	QueueMessage msg;
 	u32 byte32;

@@ -33,6 +33,7 @@
 #include "game.h"
 #include "players.h"
 #include "game_io.h"
+#include "dir.h"
 #include "bitmodes.h"
 
 #ifdef ANDROID
@@ -56,8 +57,6 @@
 #define FORMAT_VERSION_2520 0x09D8
 #define CURRENT_FORMAT_VERSION FORMAT_VERSION_2707
 #define LAST_FORMAT_VERSION FORMAT_VERSION_2520
-
-#define ListMapsDirectory std::list<std::string>
 
 enum
 {
@@ -239,12 +238,8 @@ public:
     u8 ScrollSpeed(void) const;
     u32 MemoryLimit(void) const;
 
-    const std::string & DataDirectory(void) const;
-    const std::string & LocalPrefix(void) const;
     const std::string & PlayMusCommand(void) const;
     const std::string & SelectVideoDriver(void) const;
-
-    const ListMapsDirectory & GetListMapsDirectory(void) const;
 
     u8 GameDifficulty(void) const;
 
@@ -412,8 +407,6 @@ public:
     u8   PreferablyCountPlayers(void) const;
     void SetPreferablyCountPlayers(u8 c);
 
-    void SetLocalPrefix(const char*);
-
     u16	GetPort(void) const;
 
     // from maps info
@@ -436,7 +429,21 @@ public:
     u32 LossMapsIndexObject(void) const;
     u16 LossCountDays(void) const;
 
+    std::string GetProgramPath(void) const { return path_program; }
+    void SetProgramPath(const char*);
+
     static std::string GetVersion(void);
+
+    static ListFiles GetListFiles(const std::string & prefix, const std::string & filter);
+    static ListDirs GetRootDirs(void);
+    static std::string GetLastFile(const std::string & prefix, const std::string & name);
+    static std::string GetSaveDir(void);
+    static std::string GetLangDir(void);
+    static std::string GetHomeDir(void);
+
+    // deprecated
+    const std::string & GetDataParams(void) const { return data_params; }
+    const ListDirs GetMapsParams(void) const { return maps_params; }
 
 protected:
     void Parse(const std::string & left, const std::string & right);
@@ -461,10 +468,9 @@ private:
 
     u8 game_difficulty;
 
-    std::string path_data_directory;
-    std::string local_prefix;
-
-    ListMapsDirectory list_maps_directory;
+    std::string path_program;
+    std::string data_params;
+    ListDirs    maps_params;
 
     std::string font_normal;
     std::string font_small;

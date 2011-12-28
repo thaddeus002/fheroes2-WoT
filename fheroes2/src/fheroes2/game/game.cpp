@@ -67,7 +67,6 @@ namespace Game
 
     bool	disable_change_music = false;
     u16		reserved_vols[LOOPXX_COUNT];
-    char**	argv = NULL;
     u8		current_music = MUS::UNKNOWN;
     u32		castle_animation_frame = 0;
     u32		maps_animation_frame = 0;
@@ -114,11 +113,6 @@ Game::menu_t Game::Credits(void)
     return Game::MAINMENU;
 }
 
-std::string Game::GetARGV(int v)
-{
-    return std::string(argv[v]);
-}
-
 bool Game::ChangeMusicDisabled(void)
 {
     return disable_change_music;
@@ -129,12 +123,10 @@ void Game::DisableChangeMusic(bool f)
     disable_change_music = f;
 }
 
-void Game::Init(char** ptr)
+void Game::Init(void)
 {
     Settings & conf = Settings::Get();
     LocalEvent & le = LocalEvent::Get();
-
-    argv = ptr;
 
     // update all global defines
     if(conf.UseAltResource()) LoadExternalResource(conf);
@@ -153,10 +145,8 @@ void Game::Init(char** ptr)
 
     HotKeysDefaults();
 
-    const std::string hotkeys = conf.LocalPrefix() + SEPARATOR + "fheroes2.key";
-
-    if(FilePresent(hotkeys))
-	Game::HotKeysLoad(hotkeys);
+    const std::string hotkeys = Settings::GetLastFile("", "fheroes2.key");
+    Game::HotKeysLoad(hotkeys);
 }
 
 u8 Game::CurrentMusic(void)
@@ -359,65 +349,66 @@ u8 Game::GetWhirlpoolPercent(void)
 void Game::LoadExternalResource(const Settings & conf)
 {
     std::string spec;
+    const std::string prefix_stats = std::string("files") + SEPARATOR + std::string("stats");
 
     // globals.xml
-    spec = conf.LocalPrefix() + SEPARATOR + "files" + SEPARATOR + "stats" + SEPARATOR + "globals.xml";
+    spec = Settings::GetLastFile(prefix_stats, "globals.xml");
 
-    if(FilePresent(spec))
+    if(IsFile(spec))
 	Game::UpdateGlobalDefines(spec);
 
     // animations.xml
-    spec = conf.LocalPrefix() + SEPARATOR + "files" + SEPARATOR + "stats" + SEPARATOR + "animations.xml";
+    spec = Settings::GetLastFile(prefix_stats, "animations.xml");
 
-    if(FilePresent(spec))
+    if(IsFile(spec))
 	Battle2::UpdateMonsterInfoAnimation(spec);
 
     // battle.xml
-    spec = conf.LocalPrefix() + SEPARATOR + "files" + SEPARATOR + "stats" + SEPARATOR + "battle.xml";
+    spec = Settings::GetLastFile(prefix_stats, "battle.xml");
 
-    if(FilePresent(spec))
+    if(IsFile(spec))
 	Battle2::UpdateMonsterAttributes(spec);
 
     // monsters.xml
-    spec = conf.LocalPrefix() + SEPARATOR + "files" + SEPARATOR + "stats" + SEPARATOR + "monsters.xml";
+    spec = Settings::GetLastFile(prefix_stats, "monsters.xml");
 
-    if(FilePresent(spec))
+    if(IsFile(spec))
 	Monster::UpdateStats(spec);
 
     // spells.xml
-    spec = conf.LocalPrefix() + SEPARATOR + "files" + SEPARATOR + "stats" + SEPARATOR + "spells.xml";
+    spec = Settings::GetLastFile(prefix_stats, "spells.xml");
 
-    if(FilePresent(spec))
+    if(IsFile(spec))
 	Spell::UpdateStats(spec);
 
     // artifacts.xml
-    spec = conf.LocalPrefix() + SEPARATOR + "files" + SEPARATOR + "stats" + SEPARATOR + "artifacts.xml";
+    spec = Settings::GetLastFile(prefix_stats, "artifacts.xml");
 
-    if(FilePresent(spec))
+    if(IsFile(spec))
 	Artifact::UpdateStats(spec);
 
     // buildings.xml
-    spec = conf.LocalPrefix() + SEPARATOR + "files" + SEPARATOR + "stats" + SEPARATOR + "buildings.xml";
+    spec = Settings::GetLastFile(prefix_stats, "buildings.xml");
 
-    if(FilePresent(spec))
+    if(IsFile(spec))
 	BuildingInfo::UpdateCosts(spec);
 
     // payments.xml
-    spec = conf.LocalPrefix() + SEPARATOR + "files" + SEPARATOR + "stats" + SEPARATOR + "payments.xml";
+    spec = Settings::GetLastFile(prefix_stats, "payments.xml");
 
-    if(FilePresent(spec))
+    if(IsFile(spec))
 	PaymentConditions::UpdateCosts(spec);
 
     // profits.xml
-    spec = conf.LocalPrefix() + SEPARATOR + "files" + SEPARATOR + "stats" + SEPARATOR + "profits.xml";
+    spec = Settings::GetLastFile(prefix_stats, "profits.xml");
 
-    if(FilePresent(spec))
+    if(IsFile(spec))
 	ProfitConditions::UpdateCosts(spec);
 
     // skills.xml
-    spec = conf.LocalPrefix() + SEPARATOR + "files" + SEPARATOR + "stats" + SEPARATOR + "skills.xml";
+    spec = Settings::GetLastFile(prefix_stats, "skills.xml");
 
-    if(FilePresent(spec))
+    if(IsFile(spec))
 	Skill::UpdateStats(spec);
 }
 

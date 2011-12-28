@@ -66,8 +66,7 @@ namespace Game
 	TESTING
     };
 
-    void Init(char**);
-    std::string GetARGV(int);
+    void Init(void);
 
     // type_t
     enum { TYPE_MENU = 0, TYPE_STANDARD = 0x01, TYPE_CAMPAIGN = 0x02, TYPE_HOTSEAT = 0x04, TYPE_NETWORK = 0x08, TYPE_BATTLEONLY = 0x10, TYPE_LOADFILE = 0x80, TYPE_MULTI = TYPE_HOTSEAT | TYPE_NETWORK };

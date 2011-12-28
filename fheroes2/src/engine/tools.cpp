@@ -492,19 +492,6 @@ KeySym KeySymFromChar(char c)
     return KEY_NONE;
 }
 
-bool FilePresent(const std::string & file)
-{
-    std::ifstream fs;
-    // check file
-    fs.open(file.c_str(), std::ios::binary);
-    if(fs.is_open())
-    {
-        fs.close();
-        return true;
-    }
-    return false;
-}
-
 bool SaveMemToFile(const std::vector<u8> & data, const std::string & file)
 {
     std::ofstream fs;
@@ -714,4 +701,24 @@ int sdl_putenv(const char *name, const char *value, int overwrite)
 char* sdl_getenv(const char* env)
 {
     return SDL_getenv(env);
+}
+
+bool IsFile(const std::string & name, bool writable)
+{
+    struct stat fs;
+
+    if(stat(name.c_str(), &fs) || !S_ISREG(fs.st_mode))
+	return false;
+
+    return writable ? S_IWUSR & fs.st_mode : S_IRUSR & fs.st_mode;
+}
+
+bool IsDirectory(const std::string & name, bool writable)
+{
+    struct stat fs;
+
+    if(stat(name.c_str(), &fs) || !S_ISDIR(fs.st_mode))
+	return false;
+
+    return writable ? S_IWUSR & fs.st_mode : S_IRUSR & fs.st_mode;
 }

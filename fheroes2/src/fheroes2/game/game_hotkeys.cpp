@@ -288,7 +288,7 @@ void Game::KeyboardGlobalFilter(int sym, u16 mod)
     if(sym == key_events[EVENT_SYSTEM_SCREENSHOT])
     {
         std::ostringstream stream;
-        stream << Settings::Get().LocalPrefix() << SEPARATOR << "files" << SEPARATOR << "save" << SEPARATOR << "screenshot_" << std::time(0);
+        stream << Settings::GetSaveDir() << SEPARATOR << "screenshot_" << std::time(0);
 
 #ifndef WITH_IMAGE
         stream << ".bmp";

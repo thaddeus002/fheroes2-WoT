@@ -42,8 +42,8 @@ void LoadZLogo(void);
 void SetVideoDriver(const std::string &);
 void SetTimidityEnvPath(const Settings &);
 void SetLangEnvPath(const Settings &);
-void ReadConfigFile(Settings &);
-void LoadConfigFiles(Settings &, const std::string &);
+void InitHomeDir(void);
+void ReadConfigs(void);
 void ShowAGGError(void);
 
 int PrintHelp(const char *basename)
@@ -81,8 +81,10 @@ int main(int argc, char **argv)
 
 	DEBUG(DBG_ALL, DBG_INFO, "Free Heroes II, " + conf.GetVersion());
 
-	LoadConfigFiles(conf, GetDirname(argv[0]));
+	conf.SetProgramPath(argv[0]);
 
+	InitHomeDir();
+	ReadConfigs();
 
 #ifdef WITH_EDITOR
 	if(RunEditor(argv[0])) conf.SetEditor();
@@ -209,7 +211,7 @@ int main(int argc, char **argv)
 	    AGG::ICNRegistryEnable(true);
 
 	    // init game data
-	    Game::Init(argv);
+	    Game::Init();
 
 	    // goto main menu
 #ifdef WITH_EDITOR
@@ -318,6 +320,40 @@ void LoadZLogo(void)
 #endif
 }
 
+void ReadConfigs(void)
+{
+    Settings & conf = Settings::Get();
+    ListFiles files = conf.GetListFiles("", "fheroes2.cfg");
+
+    for(ListFiles::const_iterator
+	it = files.begin(); it != files.end(); ++it)
+    	if(IsFile(*it)) conf.Read(*it);
+}
+
+void InitHomeDir(void)
+{
+    const std::string & home = Settings::GetHomeDir();
+
+    if(! home.empty())
+    {
+	const std::string home_maps  = home + SEPARATOR + std::string("maps");
+	const std::string home_files = home + SEPARATOR + std::string("files");
+	const std::string home_files_save = home_files + SEPARATOR + std::string("save");
+
+	if(! IsDirectory(home))
+	    MKDIR(home.c_str());
+
+	if(IsDirectory(home, true) && ! IsDirectory(home_maps))
+	    MKDIR(home_maps.c_str());
+
+	if(IsDirectory(home, true) && ! IsDirectory(home_files))
+	    MKDIR(home_files.c_str());
+
+	if(IsDirectory(home_files, true) && ! IsDirectory(home_files_save))
+	    MKDIR(home_files_save.c_str());
+    }
+}
+
 void SetVideoDriver(const std::string & driver)
 {
     setenv("SDL_VIDEODRIVER", driver.c_str(), 1);
@@ -325,11 +361,11 @@ void SetVideoDriver(const std::string & driver)
 
 void SetTimidityEnvPath(const Settings & conf)
 {
-    const std::string timidity = conf.LocalPrefix() + SEPARATOR + "files" + SEPARATOR + "timidity";
-    if(FilePresent(timidity + SEPARATOR + "timidity.cfg"))
-    {
-	setenv("TIMIDITY_PATH", timidity.c_str(), 1);
-    }
+    const std::string prefix_timidity = std::string("files") + SEPARATOR + std::string("timidity");
+    const std::string result = Settings::GetLastFile(prefix_timidity, "timidity.cfg");
+
+    if(IsFile(result))
+	setenv("TIMIDITY_PATH", GetDirname(result).c_str(), 1);
 }
 
 void SetLangEnvPath(const Settings & conf)
@@ -341,45 +377,13 @@ void SetLangEnvPath(const Settings & conf)
 	setenv("LANG", conf.ForceLang().c_str(), 1);
     }
 
-    const std::string strtmp = conf.LocalPrefix() + SEPARATOR + "files" + SEPARATOR + "lang";
+    const std::string & strtmp = conf.GetLangDir();
+
     setlocale(LC_ALL, "en_US.UTF8");
     bindtextdomain(GETTEXT_PACKAGE, strtmp.c_str());
     bind_textdomain_codeset(GETTEXT_PACKAGE, "UTF-8");
     textdomain(GETTEXT_PACKAGE);
 #endif
-}
-
-void ReadConfigFile(Settings & conf)
-{
-    std::string strtmp = conf.LocalPrefix() + SEPARATOR + "fheroes2.cfg";
-    if(FilePresent(strtmp))
-    {
-	VERBOSE("config: " << strtmp << " load.");
-	conf.Read(strtmp);
-    }
-}
-
-void LoadConfigFiles(Settings & conf, const std::string & dirname)
-{
-    // prefix from build
-#ifdef CONFIGURE_FHEROES2_DATA
-    conf.SetLocalPrefix(CONFIGURE_FHEROES2_DATA);
-    if(conf.LocalPrefix().size()) ReadConfigFile(conf);
-#endif
-
-    // prefix from env
-    if(getenv("FHEROES2_DATA"))
-    {
-	conf.SetLocalPrefix(getenv("FHEROES2_DATA"));
-	ReadConfigFile(conf);
-    }
-
-    // prefix from dirname
-    if(conf.LocalPrefix().empty() && dirname.size())
-    {
-	conf.SetLocalPrefix(dirname.c_str());
-	ReadConfigFile(conf);
-    }
 }
 
 void ShowAGGError(void)

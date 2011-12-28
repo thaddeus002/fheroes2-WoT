@@ -160,8 +160,9 @@ AGG::Cache::Cache()
 {
 #ifdef WITH_TTF
     Settings & conf = Settings::Get();
-    const std::string font1(conf.LocalPrefix() + SEPARATOR + "files" + SEPARATOR + "fonts" + SEPARATOR + conf.FontsNormal());
-    const std::string font2(conf.LocalPrefix() + SEPARATOR + "files" + SEPARATOR + "fonts" + SEPARATOR + conf.FontsSmall());
+    const std::string prefix_fonts = std::string("files") + SEPARATOR + std::string("fonts");
+    const std::string font1 = Settings::GetLastFile(prefix_fonts, conf.FontsNormal());
+    const std::string font2 = Settings::GetLastFile(prefix_fonts, conf.FontsSmall());
 
     if(conf.Unicode())
     {
@@ -245,24 +246,26 @@ AGG::Cache & AGG::Cache::Get(void)
 /* read data directory */
 bool AGG::Cache::ReadDataDir(void)
 {
-    const Settings & conf = Settings::Get();
-    Dir dir;
+    Settings & conf = Settings::Get();
+    ListFiles aggs = conf.GetListFiles("data", ".agg");
+    const std::string & other_data = conf.GetDataParams();
 
-    dir.Read(conf.DataDirectory(), ".agg", false);
-    dir.Read(conf.LocalPrefix() + SEPARATOR + conf.DataDirectory(), ".agg", false);
+    if(other_data.size() && other_data != "data")
+	aggs.Append(conf.GetListFiles(other_data, ".agg"));
 
     // not found agg, exit
-    if(0 == dir.size()) return false;
+    if(0 == aggs.size()) return false;
 
     // attach agg files
-    for(Dir::const_iterator itd = dir.begin(); itd != dir.end(); ++itd)
+    for(ListFiles::const_iterator
+	it = aggs.begin(); it != aggs.end(); ++it)
     {
-	std::string lower = String::Lower(*itd);
-	if(std::string::npos != lower.find("heroes2.agg") && !heroes2_agg.isGood()) heroes2_agg.Open(*itd);
-	if(std::string::npos != lower.find("heroes2x.agg") && !heroes2x_agg.isGood()) heroes2x_agg.Open(*itd);
+	std::string lower = String::Lower(*it);
+	if(std::string::npos != lower.find("heroes2.agg") && !heroes2_agg.isGood()) heroes2_agg.Open(*it);
+	if(std::string::npos != lower.find("heroes2x.agg") && !heroes2x_agg.isGood()) heroes2x_agg.Open(*it);
     }
 
-    if(heroes2x_agg.isGood()) Settings::Get().SetPriceLoyaltyVersion();
+    if(heroes2x_agg.isGood()) conf.SetPriceLoyaltyVersion();
 
     return heroes2_agg.isGood();
 }
@@ -635,9 +638,10 @@ void AGG::Cache::LoadICN(const ICN::icn_t icn, u16 index, bool reflect)
     // load from images dir
     if(conf.UseAltResource())
     {
-	const std::string xml_spec(conf.LocalPrefix() + SEPARATOR + "files" + SEPARATOR + "images" + SEPARATOR +
-								String::Lower(ICN::GetString(icn)) + SEPARATOR + "spec.xml");
-	if(FilePresent(xml_spec) &&
+	const std::string prefix_images_icn = std::string("files") + SEPARATOR + std::string("images") + SEPARATOR + String::Lower(ICN::GetString(icn));
+	const std::string xml_spec = Settings::GetLastFile(prefix_images_icn, "spec.xml");
+
+	if(IsFile(xml_spec) &&
 	    LoadAltICN(v, xml_spec, index, reflect)) skip_origin = true;
     }
 
@@ -749,9 +753,10 @@ void AGG::Cache::LoadTIL(const TIL::til_t til)
     // load from images dir
     if(conf.UseAltResource())
     {
-	const std::string xml_spec(conf.LocalPrefix() + SEPARATOR + "files" + SEPARATOR + "images" + SEPARATOR +
-								String::Lower(TIL::GetString(til)) + SEPARATOR + "spec.xml");
-	if(FilePresent(xml_spec) &&
+	const std::string prefix_images_til = std::string("files") + SEPARATOR + std::string("images") + SEPARATOR + String::Lower(TIL::GetString(til));
+	const std::string xml_spec = Settings::GetLastFile(prefix_images_til, "spec.xml");
+
+	if(IsFile(xml_spec) &&
 	    LoadAltTIL(v, xml_spec, max)) skip_orig = true;
     }
 
@@ -772,25 +777,25 @@ void AGG::Cache::LoadWAV(const M82::m82_t m82)
     if(conf.UseAltResource())
     {
        std::string name = String::Lower(M82::GetString(m82));
+	const std::string prefix_sounds = std::string("files") + SEPARATOR + std::string("sounds");
        // ogg
        String::Replace(name, ".82m", ".ogg");
-       std::string sound = conf.LocalPrefix() + SEPARATOR + "files" + SEPARATOR + "sounds" + SEPARATOR + name;
+       std::string sound = Settings::GetLastFile(prefix_sounds, name);
 
-       if(LoadFileToMem(v, sound))
-       {
-           DEBUG(DBG_ENGINE, DBG_INFO, sound);
-           return;
-       }
+	if(! LoadFileToMem(v, sound))
+	{
+	    // find mp3
+	    String::Replace(name, ".82m", ".mp3");
+	    sound = Settings::GetLastFile(prefix_sounds, name);
 
-       // mp3
-       String::Replace(name, ".82m", ".mp3");
-       sound = conf.LocalPrefix() + SEPARATOR + "files" + SEPARATOR + "sounds" + SEPARATOR + name;
+	    LoadFileToMem(v, sound);
+	}
 
-       if(LoadFileToMem(v, sound))
-       {
-           DEBUG(DBG_ENGINE, DBG_INFO, sound);
-           return;
-       }
+	if(v.size())
+	{
+	    DEBUG(DBG_ENGINE, DBG_INFO, sound);
+	    return;
+	}
     }
 #endif
 
@@ -1374,28 +1379,30 @@ void AGG::PlayMusic(const MUS::mus_t mus, bool loop)
     if(!conf.Music() || MUS::UNUSED == mus || MUS::UNKNOWN == mus || (Game::CurrentMusic() == mus && Music::isPlaying())) return;
 
     Game::SetCurrentMusic(mus);
+    const std::string prefix_music = std::string("files") + SEPARATOR + std::string("music");
     
     if(conf.MusicExt())
     {
-	const std::string musname(conf.LocalPrefix() + SEPARATOR + "files" + SEPARATOR + "music" + SEPARATOR + MUS::GetString(mus));
+	const std::string musname = Settings::GetLastFile(prefix_music, MUS::GetString(mus));
+
 #ifdef WITH_MIXER
-	std::string shortname(conf.LocalPrefix() + SEPARATOR + "files" + SEPARATOR + "music" + SEPARATOR + MUS::GetString(mus, true));
+	std::string shortname = Settings::GetLastFile(prefix_music, MUS::GetString(mus, true));
 	const char* filename = NULL;
 
-	if(FilePresent(musname))   filename = musname.c_str();
+	if(IsFile(musname))   filename = musname.c_str();
 	else
-	if(FilePresent(shortname)) filename = shortname.c_str();
+	if(IsFile(shortname)) filename = shortname.c_str();
 	else
 	{
 	    String::Replace(shortname, ".ogg", ".mp3");
-	    if(FilePresent(shortname)) filename = shortname.c_str();
+	    if(IsFile(shortname)) filename = shortname.c_str();
 	    else
 		DEBUG(DBG_ENGINE, DBG_WARN, "error read file: " << musname << ", skipping...");
 	}
 
 	if(filename) Music::Play(filename, loop);
 #else
-	if(FilePresent(musname) && conf.PlayMusCommand().size())
+	if(IsFile(musname) && conf.PlayMusCommand().size())
 	{
 	    const std::string run = conf.PlayMusCommand() + " " + musname;
 	    Music::Play(run.c_str(), loop);
@@ -1423,8 +1430,9 @@ void AGG::PlayMusic(const MUS::mus_t mus, bool loop)
 #else
 	    if(conf.PlayMusCommand().size())
 	    {
-		const std::string file = conf.LocalPrefix() + SEPARATOR + "files" + SEPARATOR + "music" + SEPARATOR + XMI::GetString(xmi);
-		if(FilePresent(file))
+		const std::string file = Settings::GetLastFile(prefix_music, XMI::GetString(xmi));
+
+		if(IsFile(file))
 		{
 		    const std::string run = conf.PlayMusCommand() + " " + file;
 		    Music::Play(run.c_str(), loop);
