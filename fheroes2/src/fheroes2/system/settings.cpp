@@ -772,8 +772,8 @@ std::string Settings::GetSaveDir(void)
     std::string res;
     const ListDirs dirs = GetRootDirs();
 
-    for(ListDirs::const_reverse_iterator
-	it = dirs.rbegin(); it != dirs.rend(); ++it)
+    for(ListDirs::const_iterator
+	it = dirs.begin(); it != dirs.end(); ++it)
     {
 	res = *it + SEPARATOR + "files" + SEPARATOR + "save";
         if(IsDirectory(res, true)) return res;
