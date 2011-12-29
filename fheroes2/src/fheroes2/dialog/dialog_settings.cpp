@@ -192,7 +192,6 @@ void Dialog::ExtSettings(bool readonly)
 
     states.push_back(Settings::UNIONS_ALLOW_HERO_MEETINGS);
     states.push_back(Settings::UNIONS_ALLOW_CASTLE_VISITING);
-    states.push_back(Settings::UNIONS_ALLOW_VIEW_MAPS);
 
     states.push_back(Settings::BATTLE_SOFT_WAITING);
     states.push_back(Settings::BATTLE_TROOP_DIRECTION);

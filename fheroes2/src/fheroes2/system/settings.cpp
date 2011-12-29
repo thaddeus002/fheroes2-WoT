@@ -167,7 +167,6 @@ const settings_t settingsFHeroes2[] =
     { Settings::HEROES_ARENA_ANY_SKILLS,	_("heroes: in Arena can choose any of primary skills"), },
     { Settings::UNIONS_ALLOW_HERO_MEETINGS,	_("unions: allow meeting heroes"),                      },
     { Settings::UNIONS_ALLOW_CASTLE_VISITING,	_("unions: allow castle visiting"),                     },
-    { Settings::UNIONS_ALLOW_VIEW_MAPS,		_("unions: allow view maps"),                           },
     { Settings::BATTLE_TROOP_DIRECTION,		_("battle: troop direction to move"),			},
     { Settings::BATTLE_SOFT_WAITING,		_("battle: soft wait troop"),				},
     { Settings::BATTLE_OBJECTS_ARCHERS_PENALTY, _("battle: high objects are an obstacle for archers"),  },
@@ -1283,7 +1282,7 @@ bool Settings::ExtUnionsAllowHeroesMeetings(void) const
 
 bool Settings::ExtUnionsAllowViewMaps(void) const
 {
-    return ExtModes(UNIONS_ALLOW_VIEW_MAPS);
+    return true;
 }
 
 bool Settings::ExtBattleShowDamage(void) const
