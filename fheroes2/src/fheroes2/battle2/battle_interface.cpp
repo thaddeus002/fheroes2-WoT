@@ -2147,8 +2147,11 @@ void Battle2::Interface::RedrawActionAttackPart1(Stats & attacker, Stats & defen
     AGG::PlaySound(attacker.M82Attk());
 
     // redraw attack animation
-    attacker.ResetAnimFrame(action0);
-    RedrawTroopFrameAnimation(attacker);
+    if(attacker.GetFrameState(action0).count)
+    {
+	attacker.ResetAnimFrame(action0);
+	RedrawTroopFrameAnimation(attacker);
+    }
 
     if(attacker.GetFrameState(action1).count)
     {
