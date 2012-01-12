@@ -324,23 +324,34 @@ bool StepIsObstacle(const Route::Step & s)
     return false;
 }
 
+bool StepIsPassable(const Route::Step & s, const Heroes* h)
+{
+    return world.GetTiles(s.from).isPassable(h, s.direction, false);
+}
+
 bool Route::Path::hasObstacle(void) const
 {
     const_iterator it = std::find_if(begin(), end(), StepIsObstacle);
     return it != end() && (*it).GetIndex() != GetLastIndex();
 }
 
-void Route::Path::Rescan(void)
+void Route::Path::RescanPassable(void)
 {
-    // scan obstacle
-    iterator it = std::find_if(begin(), end(), StepIsObstacle);
+    iterator it = begin();
 
-    if(it != end() && (*it).GetIndex() != GetLastIndex())
+    for(; it != end(); ++it)
+	if(! world.GetTiles((*it).from).isPassable(&hero, (*it).direction, false) ||
+	    StepIsObstacle(*it)) break;
+
+    if(it != end())
     {
-	size_t size1 = size();
-	s32 reduce = (*it).from;
-	Calculate(dst);
-	// reduce
-	if(size() > size1 * 2) Calculate(reduce);
+	if(it == begin())
+	    Reset();
+	else
+	{
+	    --it;
+	    dst = (*it).from;
+	    erase(it, end());
+	}
     }
 }

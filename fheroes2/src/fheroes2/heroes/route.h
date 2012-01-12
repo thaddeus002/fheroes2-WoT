@@ -61,7 +61,7 @@ namespace Route
 	    void	Reset(void);
 	    void	PopFront(void);
 	    void	PopBack(void);
-	    void	Rescan(void);
+	    void	RescanPassable(void);
 
 	    bool	isValid(void) const;
 	    bool	isShow(void) const { return !hide; }

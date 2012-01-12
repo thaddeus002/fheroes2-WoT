@@ -861,7 +861,7 @@ void Heroes::RescanPath(void)
 	}
 	else
 	{
-	    path.Rescan();
+	    path.RescanPassable();
 	}
     }
 }

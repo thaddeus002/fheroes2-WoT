@@ -1140,7 +1140,8 @@ void Maps::Tiles::UpdatePassable(void)
 #endif
 
     const u8 obj = GetObject(false);
-    
+    bool emptyobj = MP2::OBJ_ZERO == obj || MP2::OBJ_COAST == obj || MP2::OBJ_EVENT == obj;
+
     if(MP2::isActionObject(obj, isWater()))
     {
 	tile_passable = MP2::GetObjectDirect(obj);
@@ -1162,8 +1163,7 @@ void Maps::Tiles::UpdatePassable(void)
 	// fix coast passable
 	if(tile_passable &&
 	    //! MP2::isActionObject(obj, false) &&
-	    MP2::OBJ_ZERO != obj &&
-	    MP2::OBJ_COAST != obj &&
+	    ! emptyobj &&
 	    Maps::TileIsCoast(GetIndex(), Direction::TOP|Direction::BOTTOM|Direction::LEFT|Direction::RIGHT) &&
 	    (addons_level1.size() != static_cast<size_t>(std::count_if(addons_level1.begin(), addons_level1.end(),
 							std::ptr_fun(&TilesAddon::isShadow)))))
@@ -1196,17 +1196,6 @@ void Maps::Tiles::UpdatePassable(void)
 #endif
 	}
 
-	// fix bottom border
-	if(tile_passable &&
-	    (MP2::OBJ_MOUNTS == obj || MP2::OBJ_TREES == obj) &&
-	    ! Maps::isValidDirection(GetIndex(), Direction::BOTTOM))
-	{
-	    tile_passable = 0;
-#ifdef WITH_DEBUG
-	    passable_disable = 4;
-#endif
-	}
-
 	// town twba
 	if(tile_passable &&
 	    FindAddonICN1(ICN::OBJNTWBA) && (mounts2 || trees2))
@@ -1232,20 +1221,17 @@ void Maps::Tiles::UpdatePassable(void)
 	    }
 	}
     }
-    else
-    // on water
-    if(MP2::OBJ_HEROES != mp2_object && isWater())
+
+    // fix bottom border: disable passable for all no action objects
+    if(tile_passable &&
+	! Maps::isValidDirection(GetIndex(), Direction::BOTTOM) &&
+	! emptyobj &&
+	! MP2::isActionObject(obj, isWater()))
     {
-	// roc: fix bottom border
-	if(tile_passable &&
-	    addons_level1.end() != std::find_if(addons_level1.begin(), addons_level1.end(), TilesAddon::isRocs) &&
-	    ! Maps::isValidDirection(GetIndex(), Direction::BOTTOM))
-	{
-	    tile_passable = 0;
+	tile_passable = 0;
 #ifdef WITH_DEBUG
-	    passable_disable = 4;
+	passable_disable = 4;
 #endif
-	}
     }
 
     // check all sprite (level 1)
@@ -1875,7 +1861,7 @@ bool TileIsGround(s32 index, u16 ground)
 }
 
 /* accept move */
-bool Maps::Tiles::isPassable(const Heroes* hero, Direction::vector_t direct, bool skipfog) const
+bool Maps::Tiles::isPassable(const Heroes* hero, u16 direct, bool skipfog) const
 {
     if(!skipfog && isFog(Settings::Get().CurrentColor()))
 	return false;
