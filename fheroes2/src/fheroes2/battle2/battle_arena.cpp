@@ -622,12 +622,13 @@ void Battle2::Board::SetCovrObjects(u16 icn)
     }
 }
 
-void Battle2::GraveyardTroop::GetClosedCells(std::vector<u16> & v) const
+std::vector<u16> Battle2::GraveyardTroop::GetClosedCells(void) const
 {
-    v.clear();
+    std::vector<u16> res;
     for(const_iterator
 	it = begin(); it != end(); ++it)
-	v.push_back((*it).first);
+	res.push_back((*it).first);
+    return res;
 }
 
 Battle2::Stats* Battle2::Arena::GetLastTroopFromGraveyard(u16 index)
@@ -1585,13 +1586,10 @@ bool Battle2::Arena::isAllowResurrectFromGraveyard(const Spell & spell, u16 cell
 {
     if(spell.isResurrect())
     {
-	std::vector<u16> closed;
-	std::vector<u16>::const_iterator it_closed;
-	graveyard.GetClosedCells(closed);
-
-	it_closed = std::find(closed.begin(), closed.end(), cell);
-
 	const HeroBase* current_commander = GetCurrentCommander();
+
+	std::vector<u16> closed = graveyard.GetClosedCells();
+	std::vector<u16>::const_iterator it_closed = std::find(closed.begin(), closed.end(), cell);
 
 	if(current_commander && it_closed != closed.end())
 	{

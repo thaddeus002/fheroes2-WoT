@@ -1294,20 +1294,16 @@ void Battle2::Interface::RedrawHighObjects(const u16 cell_index) const
 void Battle2::Interface::RedrawKilled(void)
 {
     // redraw killed troop
-    std::vector<u16> cells;
-    arena.graveyard.GetClosedCells(cells);
-    if(cells.size())
-    {
-	std::vector<u16>::const_iterator it;
+    std::vector<u16> cells = arena.graveyard.GetClosedCells();
 
-	for(it = cells.begin(); it != cells.end(); ++it)
+    for(std::vector<u16>::const_iterator
+	it = cells.begin(); it != cells.end(); ++it)
+    {
+	const Stats* b = arena.GetLastTroopFromGraveyard(*it);
+	if(b)
 	{
-	    const Stats* b = arena.GetLastTroopFromGraveyard(*it);
-	    if(b)
-	    {
-		if(b->isWide() && *it == b->GetTailIndex()) continue;
-		RedrawTroopSprite(*b, arena.board[*it].pos);
-	    }
+	    if(b->isWide() && *it == b->GetTailIndex()) continue;
+	    RedrawTroopSprite(*b, arena.board[*it].pos);
 	}
     }
 }

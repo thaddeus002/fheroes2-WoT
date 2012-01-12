@@ -94,7 +94,7 @@ namespace Battle2
     public:
 	GraveyardTroop() {}
 	
-	void GetClosedCells(std::vector<u16> &) const;
+	std::vector<u16> GetClosedCells(void) const;
 	void AddTroop(const Stats &);
 	void RemoveTroop(const Stats &);
     };
@@ -238,7 +238,7 @@ namespace Battle2
 	Bridge* bridge;
 
 	Interface* interface;
-	Result *result_game;
+	Result* result_game;
 
 	GraveyardTroop graveyard;
 	SpellStorage usage_spells;
