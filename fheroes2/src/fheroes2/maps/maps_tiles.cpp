@@ -727,7 +727,8 @@ bool Maps::TilesAddon::isRocs(const TilesAddon & ta)
 	    break;
 
 	case ICN::OBJNCRCK:
-	    if(ta.index == 18 || ta.index == 19 || ta.index == 21 || ta.index == 22 ||
+	    if(ta.index == 10 || ta.index == 11 ||
+	        ta.index == 18 || ta.index == 19 || ta.index == 21 || ta.index == 22 ||
 		(ta.index > 23 && ta.index < 28) || (ta.index > 28 && ta.index < 33) ||
 		ta.index == 34 || ta.index == 35 || ta.index == 37 || ta.index == 38 ||
 		(ta.index > 39 && ta.index < 45) || ta.index == 46 || ta.index == 47 ||
@@ -837,7 +838,7 @@ bool Maps::TilesAddon::isCactus(const TilesAddon & ta)
 	    break;
 
 	case ICN::OBJNCRCK:
-    	    if(ta.index == 12 || ta.index == 14 || ta.index == 16)
+    	    if(ta.index == 14 || ta.index == 16)
 		return true;
 	    break;
 
