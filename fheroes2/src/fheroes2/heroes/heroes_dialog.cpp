@@ -82,15 +82,12 @@ Dialog::answer_t Heroes::OpenDialog(bool readonly, bool fade)
     text.Blit(cur_pt.x + 320 - text.w() / 2, cur_pt.y + 1);
 
     // attack
-    message = _("Attack Skill");
-    text.Set(message, Font::SMALL);
+    text.Set(_("Attack Skill"), Font::SMALL);
     dst_pt.x = cur_pt.x + 196;
     dst_pt.y = cur_pt.y + 34;
     text.Blit(dst_pt.x - text.w() / 2, dst_pt.y);
 
-    message.clear();
-    String::AddInt(message, GetAttack());
-    text.Set(message, Font::BIG);
+    text.Set(GetString(GetAttack()), Font::BIG);
     dst_pt.y += 70;
     text.Blit(dst_pt.x - text.w() / 2, dst_pt.y);
     
@@ -108,16 +105,13 @@ Dialog::answer_t Heroes::OpenDialog(bool readonly, bool fade)
     }
 
     // defense
-    message = _("Defense Skill");
     dst_pt.x = cur_pt.x + 284;
     dst_pt.y = cur_pt.y + 34;
-    text.Set(message, Font::SMALL);
+    text.Set(_("Defense Skill"), Font::SMALL);
     text.Blit(dst_pt.x - text.w() / 2, dst_pt.y);
     
-    message.clear();
-    String::AddInt(message, GetDefense());
     dst_pt.y += 70;
-    text.Set(message, Font::BIG);
+    text.Set(GetString(GetDefense()), Font::BIG);
     text.Blit(dst_pt.x - text.w() / 2, dst_pt.y);
 
     const Rect rectDefenseSkill(cur_pt.x + 156 + 88, cur_pt.y + 30, 80, 92);
@@ -134,16 +128,13 @@ Dialog::answer_t Heroes::OpenDialog(bool readonly, bool fade)
     }
     
     // spell
-    message = _("Spell Power");
     dst_pt.x = cur_pt.x + 372;
     dst_pt.y = cur_pt.y + 34;
-    text.Set(message, Font::SMALL);
+    text.Set(_("Spell Power"), Font::SMALL);
     text.Blit(dst_pt.x - text.w() / 2, dst_pt.y);
     
-    message.clear();
-    String::AddInt(message, GetPower());
     dst_pt.y += 70;
-    text.Set(message, Font::BIG);
+    text.Set(GetString(GetPower()), Font::BIG);
     text.Blit(dst_pt.x - text.w() / 2, dst_pt.y);
 
     const Rect rectSpellSkill(cur_pt.x + 156 + 2 * 88, cur_pt.y + 30, 80, 92);
@@ -160,16 +151,13 @@ Dialog::answer_t Heroes::OpenDialog(bool readonly, bool fade)
     }
 
     // knowledge
-    message = _("Knowledge");
     dst_pt.x = cur_pt.x + 460;
     dst_pt.y = cur_pt.y + 34;
-    text.Set(message, Font::SMALL);
+    text.Set(_("Knowledge"), Font::SMALL);
     text.Blit(dst_pt.x - text.w() / 2, dst_pt.y);
     
-    message.clear();
-    String::AddInt(message, GetKnowledge());
     dst_pt.y += 70;
-    text.Set(message, Font::BIG);
+    text.Set(GetString(GetKnowledge()), Font::BIG);
     text.Blit(dst_pt.x - text.w() / 2, dst_pt.y);
 
     const Rect rectKnowledgeSkill(cur_pt.x + 156 + 3 * 88, cur_pt.y + 30, 80, 92);

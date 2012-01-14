@@ -36,7 +36,7 @@
 
 void RedrawFromResource(const Point & pt, const Funds & rs);
 void RedrawToResource(const Point & pt, bool showcost, bool tradingPost, u8 from_resource = 0);
-void GetStringTradeCosts(std::string & str, u8 rs_from, u8 rs_to, bool tradingPost);
+std::string GetStringTradeCosts(u8 rs_from, u8 rs_to, bool tradingPost);
 u16 GetTradeCosts(u8 rs_from, u8 rs_to, bool tradingPost);
 
 class TradeWindowGUI
@@ -140,14 +140,10 @@ void TradeWindowGUI::ShowTradeArea(u8 resourceFrom, u8 resourceTo, u32 max_buy, 
         dst_pt.x = pos_rt.x + pos_rt.w / 2 - 70 - sprite_from.w() / 2;
         dst_pt.y = pos_rt.y + 115 - sprite_from.h();
         sprite_from.Blit(dst_pt);
-        message.clear();
-        String::AddInt(message, count_sell);
         const Sprite & sprite_to = AGG::GetICN(ICN::RESOURCE, Resource::GetIndexSprite2(resourceTo));
         dst_pt.x = pos_rt.x + pos_rt.w / 2 + 70 - sprite_to.w() / 2;
         dst_pt.y = pos_rt.y + 115 - sprite_to.h();
         sprite_to.Blit(dst_pt);
-        message.clear();
-        String::AddInt(message, count_buy);
         const Sprite & sprite_fromto = AGG::GetICN(tradpost, 0);
         dst_pt.x = pos_rt.x + pos_rt.w / 2 - sprite_fromto.w() / 2;
         dst_pt.y = pos_rt.y + 90;
@@ -181,20 +177,16 @@ void TradeWindowGUI::ShowTradeArea(u8 resourceFrom, u8 resourceTo, u32 max_buy, 
 void TradeWindowGUI::RedrawInfoBuySell(u32 count_sell, u32 count_buy)
 {
     Point dst_pt;
-    std::string message;
 
-    String::AddInt(message, count_sell);
     textSell.Hide();
-    textSell.SetText(message);
+    textSell.SetText(GetString(count_sell));
     dst_pt.x = pos_rt.x + pos_rt.w / 2 - 70 - textSell.w() / 2;
     dst_pt.y = pos_rt.y + 116;
     textSell.SetPos(dst_pt);
     textSell.Show();
 
-    message.clear();
-    String::AddInt(message, count_buy);
     textBuy.Hide();
-    textBuy.SetText(message);
+    textBuy.SetText(GetString(count_buy));
     dst_pt.x = pos_rt.x + pos_rt.w / 2 + 70 - textBuy.w() / 2;
     dst_pt.y = pos_rt.y + 116;
     textBuy.SetPos(dst_pt);
@@ -479,13 +471,11 @@ void Dialog::Marketplace(bool fromTradingPost)
 void RedrawResourceSprite(const Surface & sf, s16 px, s16 py, s32 value)
 {
     Display & display = Display::Get();
-    std::string str;
     Text text;
     Point dst_pt(px, py);
 
     sf.Blit(dst_pt, display);
-    String::AddInt(str, value);
-    text.Set(str, Font::SMALL);
+    text.Set(GetString(value), Font::SMALL);
     dst_pt.x += (34 - text.w()) / 2;
     dst_pt.y += 21;
     text.Blit(dst_pt);
@@ -520,11 +510,7 @@ void RedrawResourceSprite2(const Surface & sf, s16 px, s16 py, bool show, u8 fro
 
     if(show)
     {
-	std::string str;
-	Text text;
-
-	GetStringTradeCosts(str, from, res, trading);
-	text.Set(str, Font::SMALL);
+	Text text(GetStringTradeCosts(from, res, trading), Font::SMALL);
 	dst_pt.x += (34 - text.w()) / 2;
 	dst_pt.y += 21;
 	text.Blit(dst_pt);
@@ -551,20 +537,22 @@ void RedrawToResource(const Point & pt, bool showcost, bool tradingPost, u8 from
     RedrawResourceSprite2(AGG::GetICN(tradpost, 13), pt.x + 37, pt.y + 74, showcost, from_resource, Resource::GOLD, tradingPost);
 }
 
-void GetStringTradeCosts(std::string & str, u8 rs_from, u8 rs_to, bool tradingPost)
+std::string GetStringTradeCosts(u8 rs_from, u8 rs_to, bool tradingPost)
 {
-    if(str.size()) str.clear();
+    std::string res;
 
     if(rs_from == rs_to)
     {
-	str = _("n/a");
-	
-	return;
+	res = _("n/a");
+    }
+    else
+    {
+	if(Resource::GOLD != rs_from && Resource::GOLD != rs_to)
+	    res = "1/";
+	res.append(GetString(GetTradeCosts(rs_from, rs_to, tradingPost)));
     }
 
-    if(Resource::GOLD != rs_from && Resource::GOLD != rs_to) str = "1/";
-
-    String::AddInt(str, GetTradeCosts(rs_from, rs_to, tradingPost));
+    return res;
 }
 
 u16 GetTradeCosts(u8 rs_from, u8 rs_to, bool tradingPost)

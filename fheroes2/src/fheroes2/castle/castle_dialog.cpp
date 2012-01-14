@@ -942,7 +942,6 @@ void Castle::RedrawResourcePanel(const Point & pt)
     Rect src_rt(dst_pt.x + 552, dst_pt.y + 262, 82, 192);
     display.FillRect(0, 0, 0, src_rt);
 
-    std::string count;
     Text text;
 
     // sprite wood
@@ -952,9 +951,7 @@ void Castle::RedrawResourcePanel(const Point & pt)
     wood.Blit(dst_pt);
     
     // count wood
-    count.erase();
-    String::AddInt(count, resource.wood);
-    text.Set(count, Font::SMALL);
+    text.Set(GetString(resource.wood), Font::SMALL);
     dst_pt.y += 22;
     text.Blit(dst_pt.x + (wood.w() - text.w()) / 2, dst_pt.y);
 
@@ -965,9 +962,7 @@ void Castle::RedrawResourcePanel(const Point & pt)
     sulfur.Blit(dst_pt);
     
     // count sulfur
-    count.erase();
-    String::AddInt(count, resource.sulfur);
-    text.Set(count);
+    text.Set(GetString(resource.sulfur));
     dst_pt.y += 26;
     text.Blit(dst_pt.x + (sulfur.w() - text.w()) / 2, dst_pt.y);
 
@@ -978,9 +973,7 @@ void Castle::RedrawResourcePanel(const Point & pt)
     crystal.Blit(dst_pt);
     
     // count crystal
-    count.erase();
-    String::AddInt(count, resource.crystal);
-    text.Set(count);
+    text.Set(GetString(resource.crystal));
     dst_pt.y += 33;
     text.Blit(dst_pt.x + (crystal.w() - text.w()) / 2, dst_pt.y);
 
@@ -991,9 +984,7 @@ void Castle::RedrawResourcePanel(const Point & pt)
     mercury.Blit(dst_pt);
     
     // count mercury
-    count.erase();
-    String::AddInt(count, resource.mercury);
-    text.Set(count);
+    text.Set(GetString(resource.mercury));
     dst_pt.y += 34;
     text.Blit(dst_pt.x + (mercury.w() - text.w()) / 2, dst_pt.y);
 
@@ -1004,9 +995,7 @@ void Castle::RedrawResourcePanel(const Point & pt)
     ore.Blit(dst_pt);
     
     // count ore
-    count.erase();
-    String::AddInt(count, resource.ore);
-    text.Set(count);
+    text.Set(GetString(resource.ore));
     dst_pt.y += 26;
     text.Blit(dst_pt.x + (ore.w() - text.w()) / 2, dst_pt.y);
 
@@ -1017,9 +1006,7 @@ void Castle::RedrawResourcePanel(const Point & pt)
     gems.Blit(dst_pt);
     
     // count gems
-    count.erase();
-    String::AddInt(count, resource.gems);
-    text.Set(count);
+    text.Set(GetString(resource.gems));
     dst_pt.y += 26;
     text.Blit(dst_pt.x + (gems.w() - text.w()) / 2, dst_pt.y);
 
@@ -1030,9 +1017,7 @@ void Castle::RedrawResourcePanel(const Point & pt)
     gold.Blit(dst_pt);
     
     // count gold
-    count.erase();
-    String::AddInt(count, resource.gold);
-    text.Set(count);
+    text.Set(GetString(resource.gold));
     dst_pt.y += 24;
     text.Blit(dst_pt.x + (gold.w() - text.w()) / 2, dst_pt.y);
     

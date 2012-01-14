@@ -201,9 +201,7 @@ void ExperienceIndicator::Redraw(void)
     const Sprite & sprite3 = AGG::GetICN(ICN::HSICONS, 1);
     sprite3.Blit(area.x, area.y);
 
-    std::string message;
-    String::AddInt(message, hero.GetExperience());
-    Text text(message, Font::SMALL);
+    Text text(GetString(hero.GetExperience()), Font::SMALL);
     text.Blit(area.x + 18 - text.w() / 2, area.y + 23);
 }
 
@@ -235,11 +233,7 @@ void SpellPointsIndicator::Redraw(void)
     const Sprite & sprite3 = AGG::GetICN(ICN::HSICONS, 8);
     sprite3.Blit(area.x, area.y);
 
-    std::string message;
-    String::AddInt(message, hero.GetSpellPoints());
-    message += "/";
-    String::AddInt(message, hero.GetMaxSpellPoints());
-    Text text(message, Font::SMALL);
+    Text text(GetString(hero.GetSpellPoints()) + "/" + GetString(hero.GetMaxSpellPoints()), Font::SMALL);
     text.Blit(area.x + 18 - text.w() / 2, area.y + 21);
 }
 

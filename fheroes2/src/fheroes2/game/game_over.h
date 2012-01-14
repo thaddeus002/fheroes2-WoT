@@ -49,7 +49,7 @@ namespace GameOver
     };
 
     const char* GetString(conditions_t);
-    void GetActualDescription(u16, std::string &);
+    std::string GetActualDescription(u16);
 
     void DialogWins(u16);
     void DialogLoss(u16);

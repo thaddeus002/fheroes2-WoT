@@ -274,71 +274,49 @@ void Heroes::MeetingDialog(Heroes & heroes2)
 
 void RedrawPrimarySkillInfo(const Point & cur_pt, const Skill::Primary* p1, const Skill::Primary* p2)
 {
-    std::string message;
-
     // attack skill
-    message = _("Attack Skill");
-    Text text(message, Font::SMALL);
+    Text text(_("Attack Skill"), Font::SMALL);
     text.Blit(cur_pt.x + 320 - text.w() / 2, cur_pt.y + 64);
 
     // defense skill
-    message = _("Defense Skill");
-    text.Set(message);
+    text.Set(_("Defense Skill"));
     text.Blit(cur_pt.x + 320 - text.w() / 2, cur_pt.y + 96);
 
     // spell power
-    message = _("Spell Power");
-    text.Set(message);
+    text.Set(_("Spell Power"));
     text.Blit(cur_pt.x + 320 - text.w() / 2, cur_pt.y + 128);
 
     // knowledge
-    message = _("Knowledge");
-    text.Set(message);
+    text.Set(_("Knowledge"));
     text.Blit(cur_pt.x + 320 - text.w() / 2, cur_pt.y + 160);
 
     if(p1)
     {
-	message.clear();
-	String::AddInt(message, p1->GetAttack());
-	text.Set(message);
+	text.Set(GetString(p1->GetAttack()));
 	text.Blit(cur_pt.x + 260 - text.w() / 2, cur_pt.y + 64);
 
-	message.clear();
-	String::AddInt(message, p1->GetDefense());
-	text.Set(message);
+	text.Set(GetString(p1->GetDefense()));
 	text.Blit(cur_pt.x + 260 - text.w() / 2, cur_pt.y + 96);
 
-	message.clear();
-	String::AddInt(message, p1->GetPower());
-	text.Set(message);
+	text.Set(GetString(p1->GetPower()));
         text.Blit(cur_pt.x + 260 - text.w() / 2, cur_pt.y + 128);
 
-	message.clear();
-	String::AddInt(message, p1->GetKnowledge());
-	text.Set(message);
+	text.Set(GetString(p1->GetKnowledge()));
 	text.Blit(cur_pt.x + 260 - text.w() / 2, cur_pt.y + 160);
     }
 
     if(p2)
     {
-	message.clear();
-	String::AddInt(message, p2->GetAttack());
-	text.Set(message);
+	text.Set(GetString(p2->GetAttack()));
 	text.Blit(cur_pt.x + 380 - text.w(), cur_pt.y + 64);
 
-	message.clear();
-	String::AddInt(message, p2->GetDefense());
-	text.Set(message);
+	text.Set(GetString(p2->GetDefense()));
 	text.Blit(cur_pt.x + 380 - text.w(), cur_pt.y + 96);
 
-	message.clear();
-	String::AddInt(message, p2->GetPower());
-	text.Set(message);
+	text.Set(GetString(p2->GetPower()));
 	text.Blit(cur_pt.x + 380 - text.w(), cur_pt.y + 128);
 
-	message.clear();
-	String::AddInt(message, p2->GetKnowledge());
-	text.Set(message);
+	text.Set(GetString(p2->GetKnowledge()));
 	text.Blit(cur_pt.x + 380 - text.w(), cur_pt.y + 160);
     }
 }

@@ -933,48 +933,33 @@ void RedrawResourceBar(const Point & dst, const Funds & rs)
     const Sprite & gold = AGG::GetICN(ICN::RESOURCE, 6);
 
     Text text;
-    std::string str;
 
     ore.Blit(dst.x + 22 - ore.w() / 2, dst.y + 34 - ore.h());
-    str.clear();
-    String::AddInt(str, rs.ore);
-    text.Set(str, Font::SMALL);
+    text.Set(GetString(rs.ore), Font::SMALL);
     text.Blit(dst.x + 22 - text.w() / 2, dst.y + 33);
 
     wood.Blit(dst.x + 68 - wood.w() / 2, dst.y + 34 - wood.h());
-    str.clear();
-    String::AddInt(str, rs.wood);
-    text.Set(str, Font::SMALL);
+    text.Set(GetString(rs.wood), Font::SMALL);
     text.Blit(dst.x + 68 - text.w() / 2, dst.y + 33);
 
     mercury.Blit(dst.x + 114 - mercury.w() / 2, dst.y + 34 - mercury.h());
-    str.clear();
-    String::AddInt(str, rs.mercury);
-    text.Set(str, Font::SMALL);
+    text.Set(GetString(rs.mercury), Font::SMALL);
     text.Blit(dst.x + 114 - text.w() / 2, dst.y + 33);
 
     sulfur.Blit(dst.x + 160 - sulfur.w() / 2, dst.y + 34 - sulfur.h());
-    str.clear();
-    String::AddInt(str, rs.sulfur);
-    text.Set(str, Font::SMALL);
+    text.Set(GetString(rs.sulfur), Font::SMALL);
     text.Blit(dst.x + 160 - text.w() / 2, dst.y + 33);
 
     crystal.Blit(dst.x + 206 - crystal.w() / 2, dst.y + 34 - crystal.h());
-    str.clear();
-    String::AddInt(str, rs.crystal);
-    text.Set(str, Font::SMALL);
+    text.Set(GetString(rs.crystal), Font::SMALL);
     text.Blit(dst.x + 206 - text.w() / 2, dst.y + 33);
 
     gems.Blit(dst.x + 252 - gems.w() / 2, dst.y + 34 - gems.h());
-    str.clear();
-    String::AddInt(str, rs.gems);
-    text.Set(str, Font::SMALL);
+    text.Set(GetString(rs.gems), Font::SMALL);
     text.Blit(dst.x + 252 - text.w() / 2, dst.y + 33);
 
     gold.Blit(Rect(0, 0, 40, gold.h()), dst.x + 292 - 20, dst.y + 34 - gold.h());
-    str.clear();
-    String::AddInt(str, rs.gold);
-    text.Set(str, Font::SMALL);
+    text.Set(GetString(rs.gold), Font::SMALL);
     text.Blit(dst.x + 292 - text.w() / 2, dst.y + 33);
 }
 
@@ -1034,8 +1019,7 @@ void DwellingBar::Redraw(void) const
 {
     const u8 w = 43;
     const u8 h = 43;
-    std::string str;
-    Text text(str, Font::SMALL);
+    Text text;
 
     for(u8 ii = 0; ii < dw.size(); ++ii)
     {
@@ -1048,18 +1032,14 @@ void DwellingBar::Redraw(void) const
     	if(castle.isBuild(dwelling))
     	{
 	    // count
-    	    str.clear();
-    	    String::AddInt(str, castle.GetDwellingLivedCount(dwelling));
-    	    text.Set(str);
+    	    text.Set(GetString(castle.GetDwellingLivedCount(dwelling)), Font::SMALL);
     	    text.Blit(dw[ii].x + dw[ii].w - text.w() - 3, dw[ii].y + dw[ii].h - text.h() - 1);
 
 	    // grown
 	    u8 grown = m.GetGrown();
 	    if(castle.isBuild(BUILD_WELL)) grown += Castle::GetGrownWell();
 	    if(castle.isBuild(BUILD_WEL2) && DWELLING_MONSTER1 == dwelling) grown += Castle::GetGrownWel2();
-	    str = "+";
-    	    String::AddInt(str, grown);
-    	    text.Set(str, Font::YELLOW_SMALL);
+    	    text.Set("+" + GetString(grown), Font::YELLOW_SMALL);
     	    text.Blit(dw[ii].x + dw[ii].w - text.w() - 3, dw[ii].y + 2);
     	}
     	else

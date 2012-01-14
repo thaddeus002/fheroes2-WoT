@@ -902,7 +902,6 @@ void SecondarySkillBar::CalcSize(void)
 void SecondarySkillBar::Redraw(void)
 {
     Point dst_pt(pos);
-    std::string message;
     Text text;
     text.Set(Font::SMALL);
 
@@ -917,9 +916,7 @@ void SecondarySkillBar::Redraw(void)
 
             if(use_mini_sprite)
 	    {
-		message.clear();
-		String::AddInt(message, skill.Level());
-        	text.Set(message);
+        	text.Set(GetString(skill.Level()));
         	text.Blit(dst_pt.x + (sprite_skill.w() - text.w()) - 3, dst_pt.y + sprite_skill.h() - 12);
 	    }
 	    else
@@ -1021,7 +1018,7 @@ void StringAppendModifiers(std::string & str, s8 value)
     else
     if(value > 0) str.append(" +");
 
-    String::AddInt(str, value);
+    str.append(GetString(value));
 }
 
 s8 Skill::GetLeadershipModifiers(u8 level, std::string* strs = NULL)

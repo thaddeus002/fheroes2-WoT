@@ -54,7 +54,6 @@ void Dialog::GameInfo(void)
     dlg.Blit(pt);
 
     TextBox text;
-    std::string msg;
 
     text.Set(conf.MapsName(), Font::BIG, 350);
     text.Blit(pt.x + 52, pt.y + 30);
@@ -77,10 +76,7 @@ void Dialog::GameInfo(void)
     text.Set(Difficulty::String(conf.GameDifficulty()), Font::SMALL, 80);
     text.Blit(pt.x + 140, pt.y + 80);
 
-    std::string str;
-    String::AddInt(str, Game::GetRating());
-    str.append(" %");
-    text.Set(str, Font::SMALL, 80);
+    text.Set(GetString(Game::GetRating()) + " %", Font::SMALL, 80);
     text.Blit(pt.x + 230, pt.y + 80);
 
     text.Set(Maps::SizeString(conf.MapsWidth()), Font::SMALL, 80);
@@ -103,20 +99,16 @@ void Dialog::GameInfo(void)
     text.Set(_("Victory\nConditions"), Font::SMALL, 80);
     text.Blit(pt.x + 40, pt.y + 345);
 
-    GameOver::GetActualDescription(conf.ConditionWins(), msg);
-    text.Set(msg, Font::SMALL, 272);
+    text.Set(GameOver::GetActualDescription(conf.ConditionWins()), Font::SMALL, 272);
     text.Blit(pt.x + 130, pt.y + 348);
 
     text.Set(_("Loss\nConditions"), Font::SMALL, 80);
     text.Blit(pt.x + 40, pt.y + 390);
 
-    GameOver::GetActualDescription(conf.ConditionLoss(), msg);
-    text.Set(msg, Font::SMALL, 272);
+    text.Set(GameOver::GetActualDescription(conf.ConditionLoss()), Font::SMALL, 272);
     text.Blit(pt.x + 130, pt.y + 396);
 
-    str = "score: ";
-    String::AddInt(str, Game::GetGameOverScores());
-    text.Set(str, Font::YELLOW_SMALL, 80);
+    text.Set("score: " + GetString(Game::GetGameOverScores()), Font::YELLOW_SMALL, 80);
     text.Blit(pt.x + 415 - text.w(), pt.y + 434);
 
     Button buttonOk(pt.x + 180, pt.y + 425, ICN::SYSTEM, 1, 2);

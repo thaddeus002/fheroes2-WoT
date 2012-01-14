@@ -48,9 +48,7 @@ bool Dialog::SelectGoldOrExp(const std::string &header, const std::string &messa
     TextBox box2(message, Font::BIG, BOXAREA_WIDTH);
 
     Text text;
-    std::string str;
-    String::AddInt(str, gold);
-    text.Set(str, Font::SMALL);
+    text.Set(GetString(gold), Font::SMALL);
 
     const u8 spacer = Settings::Get().QVGA() ? 5 : 10;
 
@@ -83,9 +81,7 @@ bool Dialog::SelectGoldOrExp(const std::string &header, const std::string &messa
     pos.x = box.GetArea().x + box.GetArea().w / 2 + 30;
     sprite_expr.Blit(pos.x, pos.y - sprite_expr.h());
     // text
-    str.clear();
-    String::AddInt(str, expr);
-    text.Set(str, Font::SMALL);
+    text.Set(GetString(expr), Font::SMALL);
     text.Blit(pos.x + (sprite_expr.w() - text.w()) / 2, pos.y + 2);
 
     button_yes.Draw();

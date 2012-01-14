@@ -399,10 +399,7 @@ void EditorInterface::DrawTopNumberCell(void)
 
 	AGG::GetICN(ICN::EDITBTNS, 34).Blit(dst_pt);
 
-	std::string number;
-	String::AddInt(number, areaMaps.x + ii);
-
-	Text text(number, Font::SMALL);
+	Text text(GetString(areaMaps.x + ii), Font::SMALL);
 	text.Blit(2 * BORDERWIDTH + ii * TILEWIDTH - text.w() / 2, 2);
     }
 }
@@ -421,10 +418,7 @@ void EditorInterface::DrawLeftNumberCell(void)
 
 	AGG::GetICN(ICN::EDITBTNS, 33).Blit(dst_pt);
 
-	std::string number;
-	String::AddInt(number, areaMaps.y + ii);
-
-	Text text(number, Font::SMALL);
+	Text text(GetString(areaMaps.y + ii), Font::SMALL);
  	text.Blit(BORDERWIDTH / 2 - text.w() / 2 - 1, BORDERWIDTH + ii * TILEWIDTH + BORDERWIDTH - 5);
     }
 }

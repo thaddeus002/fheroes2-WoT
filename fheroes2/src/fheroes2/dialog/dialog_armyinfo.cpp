@@ -65,7 +65,6 @@ Dialog::answer_t Dialog::ArmyInfo(const Army::Troop & troop, u16 flags)
 
     Point dst_pt;
     Text text;
-    std::string message;
 
     dst_pt.x = pos_rt.x + 400;
     dst_pt.y = pos_rt.y + 40;
@@ -87,8 +86,7 @@ Dialog::answer_t Dialog::ArmyInfo(const Army::Troop & troop, u16 flags)
     text.Blit(dst_pt);
     
     // count
-    String::AddInt(message, (battle ? battle->GetCount() : troop.GetCount()));
-    text.Set(message);
+    text.Set(GetString(battle ? battle->GetCount() : troop.GetCount()));
     dst_pt.x = pos_rt.x + 140 - text.w() / 2;
     dst_pt.y = pos_rt.y + 225;
     text.Blit(dst_pt);
@@ -203,29 +201,28 @@ void DrawMonsterStats(const Point & dst, const Army::Troop & troop)
     bool pda = Settings::Get().QVGA();
 
     // attack
-    message = _("Attack");
-    message += ":";
-    text.Set(message);
+    text.Set(std::string(_("Attack")) + ":");
     dst_pt.x = dst.x - text.w();
     dst_pt.y = dst.y;
     text.Blit(dst_pt);
 
-    message.clear();
-    String::AddInt(message, mons.GetAttack());
+    message = GetString(mons.GetAttack());
 
     if(commander && mons.GetAttack() != troop.GetAttack())
     {
-	message += " (";
-	String::AddInt(message, troop.GetAttack());
-	message += ")";
+	message.append(" ");
+	message.append("(");
+	message.append(GetString(troop.GetAttack()));
+	message.append(")");
     }
     else
     // added ext. battle info
     if(battle && mons.GetAttack() != battle->GetAttack())
     {
-	message += " (";
-	String::AddInt(message, battle->GetAttack());
-	message += ")";
+	message.append(" ");
+	message.append("(");
+	message.append(GetString(battle->GetAttack()));
+	message.append(")");
     }
 
     const u8 ox = 15;
@@ -235,29 +232,28 @@ void DrawMonsterStats(const Point & dst, const Army::Troop & troop)
     text.Blit(dst_pt);
 
     // defense
-    message = _("Defense");
-    message += ":";
-    text.Set(message);
+    text.Set(std::string(_("Defense")) + ":");
     dst_pt.x = dst.x - text.w();
     dst_pt.y += (pda ? 14 : 18);
     text.Blit(dst_pt);
 
-    message.clear();
-    String::AddInt(message, mons.GetDefense());
+    message = GetString(mons.GetDefense());
 
     if(commander && mons.GetDefense() != troop.GetDefense())
     {
-	message += " (";
-	String::AddInt(message, troop.GetDefense());
-	message += ")";
+	message.append(" ");
+	message.append("(");
+	message.append(GetString(troop.GetDefense()));
+	message.append(")");
     }
     else
     // added ext. battle info
     if(battle && mons.GetDefense() != battle->GetDefense())
     {
-	message += " (";
-	String::AddInt(message, battle->GetDefense());
-	message += ")";
+	message.append(" ");
+	message.append("(");
+	message.append(GetString(battle->GetDefense()));
+	message.append(")");
     }
 
     text.Set(message);
@@ -268,85 +264,66 @@ void DrawMonsterStats(const Point & dst, const Army::Troop & troop)
     if(mons.isArchers())
     {
 	message = battle ? _("Shots Left") : _("Shots");
-	message += ":";
+	message.append(":");
 	text.Set(message);
 	dst_pt.x = dst.x - text.w();
 	dst_pt.y += (pda ? 14 : 18);
 	text.Blit(dst_pt);
 
-	message.clear();
-	String::AddInt(message, battle ? battle->GetShots() : mons.GetShots());
-	text.Set(message);
+	text.Set(GetString(battle ? battle->GetShots() : mons.GetShots()));
 	dst_pt.x = dst.x + ox;
 	text.Blit(dst_pt);
     }
 
     // damage
-    message = _("Damage");
-    message += ":";
-    text.Set(message);
+    text.Set(std::string(_("Damage")) + ":");
     dst_pt.x = dst.x - text.w();
     dst_pt.y += (pda ? 14 : 18);
     text.Blit(dst_pt);
 
-    message.clear();
-    String::AddInt(message, mons.GetDamageMin());
-    message += " - ";
-    String::AddInt(message, mons.GetDamageMax());
-    text.Set(message);
+    text.Set(GetString(mons.GetDamageMin()) + " - " + GetString(mons.GetDamageMax()));
     dst_pt.x = dst.x + ox;
     text.Blit(dst_pt);
 
     // hp
-    message = _("Hit Points");
-    message += ":";
-    text.Set(message);
+    text.Set(std::string(_("Hit Points")) + ":");
     dst_pt.x = dst.x - text.w();
     dst_pt.y += (pda ? 14 : 18);
     text.Blit(dst_pt);
 
-    message.clear();
-    String::AddInt(message, mons.GetHitPoints());
-    text.Set(message);
+    text.Set(GetString(mons.GetHitPoints()));
     dst_pt.x = dst.x + ox;
     text.Blit(dst_pt);
 
     if(battle && battle->isValid())
     {
-	message = _("Hit Points Left");
-	message += ":";
-	text.Set(message);
+	text.Set(std::string(_("Hit Points Left")) + ":");
 	dst_pt.x = dst.x - text.w();
 	dst_pt.y += (pda ? 14 : 18);
 	text.Blit(dst_pt);
 	
-	message.clear();
-	String::AddInt(message, battle->GetHitPoints() - (battle->GetCount() - 1) * mons.GetHitPoints());
-	text.Set(message);
+	text.Set(GetString(battle->GetHitPoints() - (battle->GetCount() - 1) * mons.GetHitPoints()));
 	dst_pt.x = dst.x + ox;
 	text.Blit(dst_pt);
     }
 
     // speed
-    message = _("Speed");
-    message += ":";
-    text.Set(message);
+    text.Set(std::string(_("Speed")) + ":");
     dst_pt.x = dst.x - text.w();
     dst_pt.y += (pda ? 14 : 18);
     text.Blit(dst_pt);
 
     message = Speed::String(battle ? battle->GetSpeed(true) : mons.GetSpeed());
-    message += " (";
-    String::AddInt(message, battle ? battle->GetSpeed(true) : mons.GetSpeed());
-    message += ")";
+    message.append(" ");
+    message.append("(");
+    message.append(GetString(battle ? battle->GetSpeed(true) : mons.GetSpeed()));
+    message.append(")");
     text.Set(message);
     dst_pt.x = dst.x + ox;
     text.Blit(dst_pt);
 
     // morale
-    message = _("Morale");
-    message += ":";
-    text.Set(message);
+    text.Set(std::string(_("Morale")) + ":");
     dst_pt.x = dst.x - text.w();
     dst_pt.y += (pda ? 14 : 18);
     text.Blit(dst_pt);
@@ -356,9 +333,7 @@ void DrawMonsterStats(const Point & dst, const Army::Troop & troop)
     text.Blit(dst_pt);
 
     // luck
-    message = _("Luck");
-    message += ":";
-    text.Set(message);
+    text.Set(std::string(_("Luck")) + ":");
     dst_pt.x = dst.x - text.w();
     dst_pt.y += (pda ? 14 : 18);
     text.Blit(dst_pt);

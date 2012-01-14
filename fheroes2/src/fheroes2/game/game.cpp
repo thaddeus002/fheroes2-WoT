@@ -453,7 +453,7 @@ std::string Game::CountScoute(u32 count, u8 scoute)
             break;
 
         case Skill::Level::EXPERT:
-            String::AddInt(res, count);
+            res = GetString(count);
             break;
 
         default:
@@ -474,12 +474,12 @@ std::string Game::CountScoute(u32 count, u8 scoute)
         else
             max = static_cast<u32>(std::floor(count + infelicity + 0.5));
 
-        String::AddInt(res, min);
+        res = GetString(min);
 
         if(min != max)
         {
             res.append("-");
-            String::AddInt(res, max);
+            res.append(GetString(max));
         }
     }
 

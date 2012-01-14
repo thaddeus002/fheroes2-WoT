@@ -152,7 +152,7 @@ void Castle::OpenWell(void)
 		    const Monster ms(race, GetActualDwelling(*it));
 		    str.append(ms.GetPluralName(can_recruit));
 		    str.append(" - ");
-		    String::AddInt(str, can_recruit);
+		    str.append(GetString(can_recruit));
 		    str.append("\n");
 		}
 
@@ -312,42 +312,31 @@ void Castle::WellRedrawInfoArea(const Point & cur_pt)
 	text.Blit(dst_pt);
 	// attack
 	std::string str;
-	str = _("Attack");
-	str += ": ";
-	String::AddInt(str, monster.GetAttack());
+	str = std::string(_("Attack")) + ": " + GetString(monster.GetAttack());
 	text.Set(str);
 	dst_pt.x = pt.x + 268 - text.w() / 2;
 	dst_pt.y = pt.y + 22;
 	text.Blit(dst_pt);
 	// defense
-	str = _("Defense");
-	str += ": ";
-	String::AddInt(str, monster.GetDefense());
+	str = std::string(_("Defense")) + ": " + GetString(monster.GetDefense());
 	text.Set(str);
 	dst_pt.x = pt.x + 268 - text.w() / 2;
 	dst_pt.y = pt.y + 34;
 	text.Blit(dst_pt);
 	// damage
-	str = _("Damg");
-	str += ": ";
-	String::AddInt(str, monster.GetDamageMin());
-	str += "-";
-	String::AddInt(str, monster.GetDamageMax());
+	str = std::string(_("Damage")) + ": " + GetString(monster.GetDamageMin()) + "-" + GetString(monster.GetDamageMax());
 	text.Set(str);
 	dst_pt.x = pt.x + 268 - text.w() / 2;
 	dst_pt.y = pt.y + 46;
 	text.Blit(dst_pt);
 	// hp
-	str = _("HP");
-	str += ": ";
-	String::AddInt(str, monster.GetHitPoints());
+	str = std::string(_("HP")) + ": " + GetString(monster.GetHitPoints());
 	text.Set(str);
 	dst_pt.x = pt.x + 268 - text.w() / 2;
         dst_pt.y = pt.y + 58;
 	text.Blit(dst_pt);
         // speed
-        str = _("Speed");
-        str += ": ";
+        str = std::string(_("Speed")) + ": ";
 	text.Set(str);
 	dst_pt.x = pt.x + 268 - text.w() / 2;
         dst_pt.y = pt.y + 78;
@@ -367,24 +356,18 @@ void Castle::WellRedrawInfoArea(const Point & cur_pt)
 	    dst_pt.x = pt.x + 268 - text.w() / 2;
     	    dst_pt.y = pt.y + 110;
     	    text.Blit(dst_pt);
-	    str = "+ ";
-	    String::AddInt(str, grown);
-    	    str += " / ";
-    	    str += _("week");
+	    str = std::string("+ ") + GetString(grown) + " / " + _("week");
 	    text.Set(str);
 	    dst_pt.x = pt.x + 268 - text.w() / 2;
     	    dst_pt.y = pt.y + 122;
     	    text.Blit(dst_pt);
 
-    	    str = _("Available");
-    	    str += ": ";
+    	    str = std::string(_("Available")) + ": ";
     	    text.Set(str);
 	    dst_pt.x = pt.x + 44;
     	    dst_pt.y = pt.y + 122;
     	    text.Blit(dst_pt);
-	    str.clear();
-	    String::AddInt(str, available);
-	    text.Set(str, Font::BIG);
+	    text.Set(GetString(available), Font::BIG);
     	    dst_pt.x = pt.x + 129 - text.w() / 2;
     	    dst_pt.y = pt.y + 119;
 	    text.Blit(dst_pt);

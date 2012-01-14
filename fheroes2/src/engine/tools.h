@@ -52,6 +52,7 @@ int Sign(int);
 KeySym KeySymFromChar(char);
 bool PressIntKey(u32 min, u32 max, u32 & result);
 
+std::string GetString(int);
 std::string GetDirname(const std::string &);
 std::string GetBasename(const std::string &);
 

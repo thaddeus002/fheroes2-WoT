@@ -820,92 +820,62 @@ void Dialog::QuickInfo(const Heroes & hero)
     r_flag.Blit(dst_pt);
 
     // attack
-    message = _("Attack");
-    message += ":";
-    text.Set(message);
+    text.Set(std::string(_("Attack")) + ":");
     dst_pt.x = cur_rt.x + 10;
     dst_pt.y += port.h();
     text.Blit(dst_pt);
 
-    message.clear();
-    String::AddInt(message, hero.GetAttack());
-    text.Set(message);
+    text.Set(GetString(hero.GetAttack()));
     dst_pt.x += 75;
     text.Blit(dst_pt);
 
     // defense
-    message = _("Defense");
-    message += ":";
-    text.Set(message);
+    text.Set(std::string(_("Defense")) + ":");
     dst_pt.x = cur_rt.x + 10;
     dst_pt.y += 12;
     text.Blit(dst_pt);
 
-    message.clear();
-    String::AddInt(message, hero.GetDefense());
-    text.Set(message);
+    text.Set(GetString(hero.GetDefense()));
     dst_pt.x += 75;
     text.Blit(dst_pt);
 
     // power
-    message = _("Spell Power");
-    message += ":";
-    text.Set(message);
+    text.Set(std::string(_("Spell Power")) + ":");
     dst_pt.x = cur_rt.x + 10;
     dst_pt.y += 12;
     text.Blit(dst_pt);
 
-    message.clear();
-    String::AddInt(message, hero.GetPower());
-    text.Set(message);
+    text.Set(GetString(hero.GetPower()));
     dst_pt.x += 75;
     text.Blit(dst_pt);
 
     // knowledge
-    message = _("Knowledge");
-    message += ":";
-    text.Set(message);
+    text.Set(std::string(_("Knowledge")) + ":");
     dst_pt.x = cur_rt.x + 10;
     dst_pt.y += 12;
     text.Blit(dst_pt);
 
-    message.clear();
-    String::AddInt(message, hero.GetKnowledge());
-    text.Set(message);
+    text.Set(GetString(hero.GetKnowledge()));
     dst_pt.x += 75;
     text.Blit(dst_pt);
     
     // spell point
-    message = _("Spell Points");
-    message += ":";
-    text.Set(message);
+    text.Set(std::string(_("Spell Points")) + ":");
     dst_pt.x = cur_rt.x + 10;
     dst_pt.y += 12;
     text.Blit(dst_pt);
 
-    message.clear();
-    String::AddInt(message, hero.GetSpellPoints());
-    message += "/";
-    String::AddInt(message, hero.GetMaxSpellPoints());
-    text.Set(message);
+    text.Set(GetString(hero.GetSpellPoints()) + "/" + GetString(hero.GetMaxSpellPoints()));
     dst_pt.x += 75;
     text.Blit(dst_pt);
 
     // move point
-    message = _("Move Points");
-    message += ":";
-    text.Set(message);
+    text.Set(std::string(_("Move Points")) + ":");
     dst_pt.x = cur_rt.x + 10;
     dst_pt.y += 12;
     text.Blit(dst_pt);
 
-    message.clear();
-    String::AddInt(message, hero.GetMobilityIndexSprite());
-    message += "/";
-    String::AddInt(message, hero.GetMovePoints());
-    message += "/";
-    String::AddInt(message, hero.GetMaxMovePoints());
-    text.Set(message);
+    text.Set(GetString(hero.GetMobilityIndexSprite()) + "/" + GetString(hero.GetMovePoints()) + "/" + GetString(hero.GetMaxMovePoints()));
     dst_pt.x += 75;
     text.Blit(dst_pt);
 

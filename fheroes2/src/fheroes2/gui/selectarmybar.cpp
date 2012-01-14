@@ -219,9 +219,7 @@ void SelectArmyBar::Redraw(Surface & dst)
 	    	    mons32.Blit(pt.x + (background->w() - mons32.w()) / 2, pt.y + background->h() - mons32.h() - 11, dst);
     
         	// draw count
-        	std::string str;
-        	String::AddInt(str, troop.GetCount());
-        	Text text(str, Font::SMALL);
+        	Text text(GetString(troop.GetCount()), Font::SMALL);
 
         	if(flags & FLAGS_COUNT2SPRITE)
 		    text.Blit(pt.x + background->w() - text.w() - 3, pt.y + background->h() - text.h() - 2, dst);
@@ -233,9 +231,7 @@ void SelectArmyBar::Redraw(Surface & dst)
 	    	spmonh.Blit(pt.x + spmonh.x(), pt.y + spmonh.y(), dst);
     
         	// draw count
-        	std::string str;
-        	String::AddInt(str, troop.GetCount());
-        	Text text(str, Font::SMALL);
+        	Text text(GetString(troop.GetCount()), Font::SMALL);
 		text.Blit(pt.x + background->w() - text.w() - 3, pt.y + background->h() - 13, dst);
 	    }
 	}

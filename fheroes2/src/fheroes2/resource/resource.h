@@ -44,6 +44,22 @@ struct TiXmlElement;
 void   LoadCostFromXMLElement(cost_t &, const TiXmlElement &);
 #endif
 
+namespace Resource
+{
+    enum
+    {
+	UNKNOWN = 0x00,
+        WOOD	= 0x01,
+        MERCURY	= 0x02,
+        ORE	= 0x04,
+        SULFUR	= 0x08,
+        CRYSTAL	= 0x10,
+        GEMS	= 0x20,
+        GOLD	= 0x40,
+	ALL	= WOOD | MERCURY | ORE | SULFUR | CRYSTAL | GEMS | GOLD
+    };
+}
+
 struct Funds
 {
 	Funds();
@@ -62,6 +78,7 @@ struct Funds
 
 	s32  Get(u8 rs) const;
 	s32* GetPtr(u8 rs);
+	s32  GetFirstValidItems(u8 rs = Resource::ALL) const;
 
 	bool operator< (const Funds &) const;
 	bool operator<= (const Funds &) const;
@@ -83,20 +100,6 @@ struct Funds
 
 namespace Resource
 {
-    enum
-    {
-	UNKNOWN = 0x00,
-        WOOD	= 0x01,
-        MERCURY	= 0x02,
-        ORE	= 0x04,
-        SULFUR	= 0x08,
-        CRYSTAL	= 0x10,
-        GEMS	= 0x20,
-        GOLD	= 0x40,
-	ALL	= WOOD | MERCURY | ORE | SULFUR | CRYSTAL | GEMS | GOLD
-    };
-
-
     const char* String(u8 resource);
 
     u8 Rand(bool with_gold = false);

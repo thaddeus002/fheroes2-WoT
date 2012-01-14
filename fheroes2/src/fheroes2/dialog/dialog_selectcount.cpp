@@ -50,7 +50,6 @@ bool Dialog::SelectCount(const std::string &header, u32 min, u32 max, u32 & cur,
 
     const Rect & pos = box.GetArea();
     Point pt;
-    std::string message;
 
     // text
     pt.x = pos.x + (pos.w - text.w()) / 2;
@@ -63,9 +62,7 @@ bool Dialog::SelectCount(const std::string &header, u32 min, u32 max, u32 & cur,
     pt.y = pos.y + 35;
     sprite_edit.Blit(pt, display);
 
-    message.clear();
-    String::AddInt(message, cur);
-    text.Set(message);
+    text.Set(GetString(cur));
     pt.x = pos.x + 80 + (sprite_edit.w() - text.w()) / 2;
     pt.y = pos.y + 36;
     text.Blit(pt);
@@ -143,9 +140,7 @@ bool Dialog::SelectCount(const std::string &header, u32 min, u32 max, u32 & cur,
 	    pt.y = pos.y + 35;
 	    sprite_edit.Blit(pt, display);
 
-	    message.clear();
-	    String::AddInt(message, cur);
-	    text.Set(message, Font::BIG);
+	    text.Set(GetString(cur), Font::BIG);
 	    pt.x = pos.x + 80 + (sprite_edit.w() - text.w()) / 2;
 	    pt.y = pos.y + 36;
 	    text.Blit(pt);

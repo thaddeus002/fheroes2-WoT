@@ -296,9 +296,7 @@ u32 Castle::OpenTown(void)
 	dst_pt.y = cur_pt.y + 168;
 	text.Blit(dst_pt);
 
-	std::string message;
-	String::AddInt(message, captain.GetAttack());
-	text.Set(message);
+	text.Set(GetString(captain.GetAttack()));
 	dst_pt.x += 90;
 	text.Blit(dst_pt);
 	
@@ -307,9 +305,7 @@ u32 Castle::OpenTown(void)
 	dst_pt.y += 12;
 	text.Blit(dst_pt);
 
-	message.clear();
-	String::AddInt(message, captain.GetDefense());
-	text.Set(message);
+	text.Set(GetString(captain.GetDefense()));
 	dst_pt.x += 90;
 	text.Blit(dst_pt);
 
@@ -318,9 +314,7 @@ u32 Castle::OpenTown(void)
 	dst_pt.y += 12;
 	text.Blit(dst_pt);
 
-	message.clear();
-	String::AddInt(message, captain.GetPower());
-	text.Set(message);
+	text.Set(GetString(captain.GetPower()));
 	dst_pt.x += 90;
 	text.Blit(dst_pt);
 
@@ -329,9 +323,7 @@ u32 Castle::OpenTown(void)
 	dst_pt.y += 12;
 	text.Blit(dst_pt);
 
-	message.clear();
-	String::AddInt(message, captain.GetKnowledge());
-	text.Set(message);
+	text.Set(GetString(captain.GetKnowledge()));
 	dst_pt.x += 90;
 	text.Blit(dst_pt);
 	

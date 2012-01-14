@@ -33,48 +33,26 @@
 void RedrawCurrentInfo(const Point & pos, u16 available, u32 result,
 	    const payment_t & paymentMonster, const payment_t & paymentCosts)
 {
-    std::string str;
     Text text;
 
-    str = _("Available: %{count}");
+    std::string str = _("Available: %{count}");
     String::Replace(str, "%{count}", available);
     text.Set(str, Font::SMALL);
     text.Blit(pos.x + 70 - text.w() / 2, pos.y + 130);
-    str.clear();
-    String::AddInt(str, result);
-    text.Set(str, Font::BIG);
+    text.Set(GetString(result), Font::BIG);
     text.Blit(pos.x + 167 - text.w() / 2, pos.y + 160);
-    if(paymentMonster.ore ||
-       paymentMonster.wood ||
-       paymentMonster.mercury ||
-       paymentMonster.crystal ||
-       paymentMonster.sulfur ||
-       paymentMonster.gems)
+
+    if(2 == paymentMonster.GetValidItems())
     {
-	str.clear();
-	String::AddInt(str, paymentCosts.gold);
-	text.Set(str, Font::SMALL);
+	text.Set(GetString(paymentCosts.gold), Font::SMALL);
 	text.Blit(pos.x + 133 - text.w() / 2, pos.y + 228);
-	str.clear();
-	if(paymentMonster.ore) String::AddInt(str, paymentCosts.ore); 
-        else
-	if(paymentMonster.wood) String::AddInt(str, paymentCosts.wood);
-        else
-        if(paymentMonster.mercury) String::AddInt(str, paymentCosts.mercury);
-        else
-        if(paymentMonster.crystal) String::AddInt(str, paymentCosts.crystal);
-        else
-        if(paymentMonster.sulfur) String::AddInt(str, paymentCosts.sulfur);
-        else
-        if(paymentMonster.gems) String::AddInt(str, paymentCosts.gems);
-	text.Set(str, Font::SMALL);
+
+	text.Set(GetString(paymentMonster.GetFirstValidItems(Resource::ALL & ~Resource::GOLD)), Font::SMALL);
 	text.Blit(pos.x + 195 - text.w() / 2, pos.y + 228);
     }
     else
     {
-	str.clear();
-	String::AddInt(str, paymentCosts.gold);
-	text.Set(str, Font::SMALL);
+	text.Set(GetString(paymentCosts.gold), Font::SMALL);
 	text.Blit(pos.x + 160 - text.w() / 2, pos.y + 228);
     }
 }
@@ -84,16 +62,12 @@ void RedrawResourceInfo(const Surface & sres, const Point & pos, s32 value,
 {
     Display & display = Display::Get();
     Point dst_pt;
-    std::string str;
-    Text text;
 
     dst_pt.x = pos.x + px1;
     dst_pt.y = pos.y + py1;
     sres.Blit(dst_pt, display);
 
-    String::AddInt(str, value);
-    text.Set(str, Font::SMALL);
-
+    Text text(GetString(value), Font::SMALL);
     dst_pt.x = pos.x + px2 - text.w() / 2;
     dst_pt.y = pos.y + py2;
     text.Blit(dst_pt);
@@ -138,8 +112,7 @@ u16 Dialog::RecruitMonster(const Monster & monster, u16 available)
     dst_pt.y = pos.y + 55;
     smear.Blit(Rect(8, 1, 120, 12), dst_pt);
 
-    str = _("Cost per troop:");
-    text.Set(str, Font::SMALL);
+    text.Set(_("Cost per troop:"), Font::SMALL);
     dst_pt.x = pos.x + 206 - text.w() / 2;
     dst_pt.y = pos.y + 55;
     text.Blit(dst_pt);
@@ -158,36 +131,21 @@ u16 Dialog::RecruitMonster(const Monster & monster, u16 available)
     dst_pt.y = pos.y + 130 - smon.h();
     smon.Blit(dst_pt);
 
+    bool extres = 2 == paymentMonster.GetValidItems();
+
     // info resource
     // gold
     const Sprite & sgold = AGG::GetICN(ICN::RESOURCE, 6);
-    dst_pt.x = pos.x + (paymentMonster.ore ||
-                        paymentMonster.wood ||
-                        paymentMonster.mercury ||
-                        paymentMonster.crystal ||
-                        paymentMonster.sulfur ||
-                        paymentMonster.gems ? 150 : 175);
+    dst_pt.x = pos.x + (extres ? 150 : 175);
     dst_pt.y = pos.y + 75;
     sgold.Blit(dst_pt);
 
-    dst_pt.x = pos.x + (paymentMonster.ore ||
-                        paymentMonster.wood ||
-                        paymentMonster.mercury ||
-                        paymentMonster.crystal ||
-                        paymentMonster.sulfur ||
-                        paymentMonster.gems ? 105 : 130);
+    dst_pt.x = pos.x + (extres ? 105 : 130);
     dst_pt.y = pos.y + 200;
     sgold.Blit(dst_pt);
 
-    str.clear();
-    String::AddInt(str, paymentMonster.gold);
-    text.Set(str, Font::SMALL);
-    dst_pt.x = pos.x + (paymentMonster.ore ||
-                        paymentMonster.wood ||
-                        paymentMonster.mercury ||
-                        paymentMonster.crystal ||
-                        paymentMonster.sulfur ||
-                        paymentMonster.gems ? 183 : 205) - text.w() / 2;
+    text.Set(GetString(paymentMonster.gold), Font::SMALL);
+    dst_pt.x = pos.x + (extres ? 183 : 205) - text.w() / 2;
     dst_pt.y = pos.y + 103;
     text.Blit(dst_pt);
 
@@ -398,27 +356,17 @@ void Dialog::DwellingInfo(const Monster & monster, u16 available)
     dst_pt.y = pos.y + 120 - smon.h();
     smon.Blit(dst_pt);
 
+    bool extres = 2 == paymentMonster.GetValidItems();
+
     // info resource
     // gold
     const Sprite & sgold = AGG::GetICN(ICN::RESOURCE, 6);
-    dst_pt.x = pos.x + (paymentMonster.ore ||
-                        paymentMonster.wood ||
-                        paymentMonster.mercury ||
-                        paymentMonster.crystal ||
-                        paymentMonster.sulfur ||
-                        paymentMonster.gems ? 150 : 175);
+    dst_pt.x = pos.x + (extres ? 150 : 175);
     dst_pt.y = pos.y + 75;
     sgold.Blit(dst_pt);
 
-    str.clear();
-    String::AddInt(str, paymentMonster.gold);
-    text.Set(str, Font::SMALL);
-    dst_pt.x = pos.x + (paymentMonster.ore ||
-                        paymentMonster.wood ||
-                        paymentMonster.mercury ||
-                        paymentMonster.crystal ||
-                        paymentMonster.sulfur ||
-                        paymentMonster.gems ? 183 : 205) - text.w() / 2;
+    text.Set(GetString(paymentMonster.gold), Font::SMALL);
+    dst_pt.x = pos.x + (extres ? 183 : 205) - text.w() / 2;
     dst_pt.y = pos.y + 103;
     text.Blit(dst_pt);
     // crystal

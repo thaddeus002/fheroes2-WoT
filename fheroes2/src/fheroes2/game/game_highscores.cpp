@@ -212,7 +212,6 @@ void HGSData::RedrawList(s16 ox, s16 oy)
 
     Text text;
     text.Set(conf.QVGA() ? Font::SMALL : Font::BIG);
-    std::string str;
 
     for(; it1 != it2 && (it1 - list.begin() < HGS_MAX); ++it1)
     {
@@ -224,14 +223,10 @@ void HGSData::RedrawList(s16 ox, s16 oy)
 	text.Set(hgs.land);
 	text.Blit(ox + (conf.QVGA() ? 170 : 260), oy + (conf.QVGA() ? 33 : 70));
 
-	str.clear();
-	String::AddInt(str, hgs.days);
-	text.Set(str);
+	text.Set(GetString(hgs.days));
 	text.Blit(ox + (conf.QVGA() ? 250 : 420), oy + (conf.QVGA() ? 33 : 70));
 
-	str.clear();
-	String::AddInt(str, hgs.rating);
-	text.Set(str);
+	text.Set(GetString(hgs.rating));
 	text.Blit(ox + (conf.QVGA() ? 270 : 480), oy + (conf.QVGA() ? 33 : 70));
 
 	oy += conf.QVGA() ? 20 : 40;
@@ -250,8 +245,7 @@ Game::menu_t Game::HighScores(void)
 #ifdef WITH_DEBUG
     if(IS_DEVEL() && world.CountDay())
     {
-	std::string msg = "Your result: ";
-	String::AddInt(msg, GetGameOverScores());
+	std::string msg = std::string("Your result: ") + GetString(GetGameOverScores());
 	Dialog::Message("High Scores", msg, Font::BIG, Dialog::OK);
 	return MAINMENU;
     }
@@ -310,11 +304,7 @@ Game::menu_t Game::HighScores(void)
     {
 	// key code info
         if(Settings::Get().Debug() == 0x12 && le.KeyPress())
-        {
-            std::string str;
-            String::AddInt(str, le.KeyValue());
-            Dialog::Message("Key Press:", str, Font::SMALL, Dialog::OK);
-        }
+            Dialog::Message("Key Press:", GetString(le.KeyValue()), Font::SMALL, Dialog::OK);
 	le.MousePressLeft(buttonCampain) ? buttonCampain.PressDraw() : buttonCampain.ReleaseDraw();
 	le.MousePressLeft(buttonExit) ? buttonExit.PressDraw() : buttonExit.ReleaseDraw();
 

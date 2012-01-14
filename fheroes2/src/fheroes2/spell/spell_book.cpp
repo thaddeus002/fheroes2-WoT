@@ -379,19 +379,15 @@ void SpellBookRedrawMP(const Point & dst, u16 mp)
     bool small = Settings::Get().QVGA();
 
     Point tp(dst.x + (small ? 5 : 11), dst.y + (small ? 1 : 9));
-    std::string mps;
     if(0 == mp)
     {
-	mps = "0";
-	Text text(mps, Font::SMALL);
+	Text text("0", Font::SMALL);
 	text.Blit(tp.x - text.w() / 2, tp.y);
     }
     else
     for(int i = 100; i >= 1; i /= 10) if(mp >= i)
     {
-	mps.clear();
-	String::AddInt(mps, (mp % (i * 10)) / i);
-	Text text(mps, Font::SMALL);
+	Text text(GetString((mp % (i * 10)) / i), Font::SMALL);
 	text.Blit(tp.x - text.w() / 2, tp.y);
 	tp.y += (small ? -2 : 0) + text.h();
     }
@@ -479,12 +475,7 @@ void SpellBookRedrawSpells(const SpellStorage & spells, Rects & coords, const si
 	    default: break;
 	}
 
-    	std::string str(spell.GetName());
-    	str.append(" [");
-	String::AddInt(str, spell.SpellPoint(&hero));
-	str.append("]");
-	    
-	TextBox box(str, Font::SMALL, (small ? 94 : 80));
+	TextBox box(std::string(spell.GetName()) + " [" + GetString(spell.SpellPoint(&hero)) + "]", Font::SMALL, (small ? 94 : 80));
 	box.Blit(px + ox - (small ? 47 : 40), py + oy + (small ? 22 : 25));
 
     	oy += small ? 65 : 80;

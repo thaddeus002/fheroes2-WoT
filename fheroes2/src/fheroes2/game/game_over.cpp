@@ -55,9 +55,10 @@ const char* GameOver::GetString(conditions_t cond)
     return cond_str[0];
 }
 
-void GameOver::GetActualDescription(u16 cond, std::string & msg)
+std::string GameOver::GetActualDescription(u16 cond)
 {
     const Settings & conf = Settings::Get();
+    std::string msg;
 
     if(WINS_ALL == cond || WINS_SIDE == cond)
 	msg = GetString(WINS_ALL);
@@ -141,6 +142,8 @@ void GameOver::GetActualDescription(u16 cond, std::string & msg)
 	msg.append("\n");
 	msg.append(str);
     }
+
+    return msg;
 }
 
 void GameOver::DialogWins(u16 cond)

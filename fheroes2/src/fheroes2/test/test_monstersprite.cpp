@@ -50,7 +50,7 @@ void TestMonsterSprite(void)
     Display & display = Display::Get();
     LocalEvent & le = LocalEvent::Get();
 
-    std::string str;
+    //std::string str;
 
     StatusBar speed_bar;
     StatusBar count_bar;
@@ -71,21 +71,10 @@ void TestMonsterSprite(void)
     u8 frame = 0;
     u8 speed = 100;
 
-    str.clear();
-    String::AddInt(str, frame);
-    frame_bar.ShowMessage("frame: " + str);
-
-    str.clear();
-    String::AddInt(str, speed);
-    speed_bar.ShowMessage("speed: " + str);
-
-    str.clear();
-    String::AddInt(str, start);
-    start_bar.ShowMessage("start: " + str);
-
-    str.clear();
-    String::AddInt(str, count);
-    count_bar.ShowMessage("count: " + str);
+    frame_bar.ShowMessage("frame: " + GetString(frame));
+    speed_bar.ShowMessage("speed: " + GetString(speed));
+    start_bar.ShowMessage("start: " + GetString(start));
+    count_bar.ShowMessage("count: " + GetString(count));
 
     cursor.Show();
     display.Flip();
@@ -118,9 +107,7 @@ void TestMonsterSprite(void)
         	cursor.Hide();
 		start = start2;
 		if(start + count > AGG::GetICNCount(b.ICNFile())) count = AGG::GetICNCount(b.ICNFile()) - start;
-		str.clear();
-		String::AddInt(str, start);
-		start_bar.ShowMessage("start: " + str);
+		start_bar.ShowMessage("start: " + GetString(start));
         	cursor.Show();
         	display.Flip();
     	    }
@@ -134,9 +121,7 @@ void TestMonsterSprite(void)
         	cursor.Hide();
 		count = count2;
 		frame = start;
-		str.clear();
-		String::AddInt(str, count);
-		count_bar.ShowMessage("count: " + str);
+		count_bar.ShowMessage("count: " + GetString(count));
         	cursor.Show();
         	display.Flip();
 	    }
@@ -150,9 +135,7 @@ void TestMonsterSprite(void)
         	cursor.Hide();
 		speed = speed2;
 		frame = start;
-		str.clear();
-		String::AddInt(str, speed);
-		speed_bar.ShowMessage("speed: " + str);
+		speed_bar.ShowMessage("speed: " + GetString(speed));
         	cursor.Show();
         	display.Flip();
 	    }
@@ -170,15 +153,8 @@ void TestMonsterSprite(void)
 	    back.Save(pos);
             sprite.Blit(pos);
 
-	    str.clear();
-	    String::AddInt(str, frame);
-	    frame_bar.ShowMessage("frame: " + str);
-
-	    str = "ox: ";
-	    String::AddInt(str, sprite.x());
-	    str += ", oy: ";
-	    String::AddInt(str, sprite.y());
-	    info_bar.ShowMessage(str);
+	    frame_bar.ShowMessage("frame: " + GetString(frame));
+	    info_bar.ShowMessage("ox: " + GetString(sprite.x()) + ", oy: " + GetString(sprite.y()));
 
             cursor.Show();
             display.Flip();

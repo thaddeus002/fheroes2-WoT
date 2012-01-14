@@ -150,13 +150,9 @@ u16 DialogGoldWithExp(const std::string & hdr, const std::string & msg, const u1
     Surface image(sprite.w() + gold.w() + 50, sprite.h() + 12);
     gold.Blit(0, image.h() - gold.h() - 12, image);
     sprite.Blit(gold.w() + 50, 0, image);
-    std::string str;
-    String::AddInt(str, count);
-    Text text(str, Font::SMALL);
+    Text text(GetString(count), Font::SMALL);
     text.Blit((gold.w() - text.w()) / 2, image.h() - 12, image);
-    str.clear();
-    String::AddInt(str, exp);
-    text.Set(str);
+    text.Set(GetString(exp));
     text.Blit(gold.w() + 50 + (sprite.w() - text.w()) / 2, image.h() - 12, image);
 
     return Dialog::SpriteInfo(hdr, msg, image, buttons);
@@ -164,8 +160,6 @@ u16 DialogGoldWithExp(const std::string & hdr, const std::string & msg, const u1
 
 u16 DialogArtifactWithExp(const std::string & hdr, const std::string & msg, const Artifact & art, const u16 exp, const u16 buttons = Dialog::OK)
 {
-    std::string str;
-    String::AddInt(str, exp);
     const Sprite & sprite = AGG::GetICN(ICN::EXPMRL, 4);
     const Sprite & border = AGG::GetICN(ICN::RESOURCE, 7);
     const Sprite & artifact = AGG::GetICN(ICN::ARTIFACT, art.IndexSprite64());
@@ -173,7 +167,7 @@ u16 DialogArtifactWithExp(const std::string & hdr, const std::string & msg, cons
     border.Blit(image);
     artifact.Blit(5, 5, image);
     sprite.Blit(border.w() + 50, (border.h() - sprite.h()) / 2, image);
-    Text text(str, Font::SMALL);
+    Text text(GetString(exp), Font::SMALL);
     text.Blit(border.w() + 50 + (sprite.w() - text.w()) / 2, image.h() - 12, image);
 
     return Dialog::SpriteInfo(hdr, msg, image, buttons);
@@ -181,12 +175,10 @@ u16 DialogArtifactWithExp(const std::string & hdr, const std::string & msg, cons
 
 u16 DialogWithExp(const std::string & hdr, const std::string & msg, const u16 exp, const u16 buttons = Dialog::OK)
 {
-    std::string str;
-    String::AddInt(str, exp);
     const Sprite & sprite = AGG::GetICN(ICN::EXPMRL, 4);
     Surface image(sprite.w(), sprite.h() + 12);
     sprite.Blit(image);
-    Text text(str, Font::SMALL);
+    Text text(GetString(exp), Font::SMALL);
     text.Blit((sprite.w() - text.w()) / 2, sprite.h(), image);
 
     return Dialog::SpriteInfo(hdr, msg, image, buttons);
@@ -194,8 +186,6 @@ u16 DialogWithExp(const std::string & hdr, const std::string & msg, const u16 ex
 
 u16 DialogWithArtifactAndGold(const std::string & hdr, const std::string & msg, const Artifact & art, const u16 count, const u16 buttons = Dialog::OK)
 {
-    std::string str;
-    String::AddInt(str, count);
     const Sprite & gold = AGG::GetICN(ICN::RESOURCE, 6);
     const Sprite & border = AGG::GetICN(ICN::RESOURCE, 7);
     const Sprite & artifact = AGG::GetICN(ICN::ARTIFACT, art.IndexSprite64());
@@ -203,7 +193,7 @@ u16 DialogWithArtifactAndGold(const std::string & hdr, const std::string & msg, 
     border.Blit(image);
     artifact.Blit(5, 5, image);
     gold.Blit(border.w() + 50, (border.h() - gold.h()) / 2, image);
-    Text text(str, Font::SMALL);
+    Text text(GetString(count), Font::SMALL);
     text.Blit(border.w() + 50 + (gold.w() - text.w()) / 2, border.h() - 25, image);
 
     return Dialog::SpriteInfo(hdr, msg, image, buttons);
@@ -211,12 +201,10 @@ u16 DialogWithArtifactAndGold(const std::string & hdr, const std::string & msg, 
 
 u16 DialogWithGold(const std::string & hdr, const std::string & msg, const u16 count, const u16 buttons = Dialog::OK)
 {
-    std::string str;
-    String::AddInt(str, count);
     const Sprite & gold = AGG::GetICN(ICN::RESOURCE, 6);
     Surface image(gold.w(), gold.h() + 12);
     gold.Blit(image);
-    Text text(str, Font::SMALL);
+    Text text(GetString(count), Font::SMALL);
     text.Blit((gold.w() - text.w()) / 2, gold.h(), image);
 
     return Dialog::SpriteInfo(hdr, msg, image, buttons);

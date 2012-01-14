@@ -182,48 +182,31 @@ void Interface::StatusWindow::DrawKingdomInfo(const u8 oh) const
     AGG::GetICN(ICN::RESSMALL, 0).Blit(x + 6, y + 3 + oh);
 
     // count castle
-    String::AddInt(str, myKingdom.GetCountCastle());
-    Text text(str, Font::SMALL);
+    Text text(GetString(myKingdom.GetCountCastle()), Font::SMALL);
     text.Blit(x + 26 - text.w() / 2, y + 28 + oh);
     // count town
-    str.clear();
-    String::AddInt(str, myKingdom.GetCountTown());
-    text.Set(str);
+    text.Set(GetString(myKingdom.GetCountTown()));
     text.Blit(x + 78 - text.w() / 2, y + 28 + oh);
     // count gold
-    str.clear();
-    String::AddInt(str, myKingdom.GetFundsGold());
-    text.Set(str);
+    text.Set(GetString(myKingdom.GetFundsGold()));
     text.Blit(x + 122 - text.w() / 2, y + 28 + oh);
     // count wood
-    str.clear();
-    String::AddInt(str, myKingdom.GetFundsWood());
-    text.Set(str);
+    text.Set(GetString(myKingdom.GetFundsWood()));
     text.Blit(x + 15 - text.w() / 2, y + 58 + oh);
     // count mercury
-    str.clear();
-    String::AddInt(str, myKingdom.GetFundsMercury());
-    text.Set(str);
+    text.Set(GetString(myKingdom.GetFundsMercury()));
     text.Blit(x + 37 - text.w() / 2, y + 58 + oh);
     // count ore
-    str.clear();
-    String::AddInt(str, myKingdom.GetFundsOre());
-    text.Set(str);
+    text.Set(GetString(myKingdom.GetFundsOre()));
     text.Blit(x + 60 - text.w() / 2, y + 58 + oh);
     // count sulfur
-    str.clear();
-    String::AddInt(str, myKingdom.GetFundsSulfur());
-    text.Set(str);
+    text.Set(GetString(myKingdom.GetFundsSulfur()));
     text.Blit(x + 84 - text.w() / 2, y + 58 + oh);
     // count crystal
-    str.clear();
-    String::AddInt(str, myKingdom.GetFundsCrystal());
-    text.Set(str);
+    text.Set(GetString(myKingdom.GetFundsCrystal()));
     text.Blit(x + 108 - text.w() / 2, y + 58 + oh);
     // count gems
-    str.clear();
-    String::AddInt(str, myKingdom.GetFundsGems());
-    text.Set(str);
+    text.Set(GetString(myKingdom.GetFundsGems()));
     text.Blit(x + 130 - text.w() / 2, y + 58 + oh);
 }
 
@@ -279,9 +262,7 @@ void Interface::StatusWindow::DrawResourceInfo(const u8 oh) const
     const Sprite &spr = AGG::GetICN(ICN::RESOURCE, Resource::GetIndexSprite2(lastResource));
     spr.Blit(x + (w - spr.w()) / 2, y + 6 + oh + text.h());
 
-    message.clear();
-    String::AddInt(message, countLastResource);
-    text.Set(message, Font::SMALL, w);
+    text.Set(GetString(countLastResource), Font::SMALL, w);
     text.Blit(x + (w - text.w()) / 2, y + oh + text.h() + spr.h() - 8);
 }
 

@@ -188,13 +188,12 @@ void Dialog::DrawSystemInfo(const Point & dst)
     const Sprite & sprite1 = AGG::GetICN(ICN::SPANEL, conf.Sound() ? 1 : 0);
     const Rect rect1(dst.x + 36, dst.y + 47, sprite1.w(), sprite1.h());
     sprite1.Blit(rect1);
-    str.clear();
     str = _("sound");
-    str += " ";
+    str.append(" ");
     if(conf.Sound() && conf.SoundVolume())
-	String::AddInt(str, conf.SoundVolume());
+	str.append(GetString(conf.SoundVolume()));
     else
-	str += _("off");
+	str.append(_("off"));
     text.Set(str, Font::SMALL);
     text.Blit(rect1.x + (rect1.w - text.w()) / 2, rect1.y + rect1.h + 5);
 
@@ -202,13 +201,12 @@ void Dialog::DrawSystemInfo(const Point & dst)
     const Sprite & sprite2 = AGG::GetICN(ICN::SPANEL, conf.Music() ? 3 : 2);
     const Rect rect2(dst.x + 128, dst.y + 47, sprite2.w(), sprite2.h());
     sprite2.Blit(rect2);
-    str.clear();
     str = _("music");
-    str += " ";
+    str.append(" ");
     if(conf.Music() && conf.MusicVolume())
-	String::AddInt(str, conf.MusicVolume());
+	str.append(GetString(conf.MusicVolume()));
     else
-	str += _("off");
+	str.append(_("off"));
     text.Set(str);
     text.Blit(rect2.x + (rect2.w - text.w()) / 2, rect2.y + rect2.h + 5);
 
@@ -226,13 +224,12 @@ void Dialog::DrawSystemInfo(const Point & dst)
     const Sprite & sprite4 = AGG::GetICN(ICN::SPANEL, is4);
     const Rect rect4(dst.x + 36, dst.y + 157, sprite4.w(), sprite4.h());
     sprite4.Blit(rect4);
-    str.clear();
     str = _("hero speed");
-    str += " ";
+    str.append(" ");
     if(conf.HeroesMoveSpeed())
-	String::AddInt(str, conf.HeroesMoveSpeed());
+	str.append(GetString(conf.HeroesMoveSpeed()));
     else
-	str += _("off");
+	str.append(_("off"));
     text.Set(str);
     text.Blit(rect4.x + (rect4.w - text.w()) / 2, rect4.y + rect4.h + 5);
 
@@ -241,13 +238,12 @@ void Dialog::DrawSystemInfo(const Point & dst)
     const Sprite & sprite5 = AGG::GetICN(ICN::SPANEL, is5);
     const Rect rect5(dst.x + 128, dst.y + 157, sprite5.w(), sprite5.h());
     sprite5.Blit(rect5);
-    str.clear();
     str = _("ai speed");
-    str += " ";
+    str.append(" ");
     if(conf.AIMoveSpeed())
-	String::AddInt(str, conf.AIMoveSpeed());
+	str.append(GetString(conf.AIMoveSpeed()));
     else
-	str += _("off");
+	str.append(_("off"));
     text.Set(str);
     text.Blit(rect5.x + (rect5.w - text.w()) / 2, rect5.y + rect5.h + 5);
 
@@ -256,10 +252,9 @@ void Dialog::DrawSystemInfo(const Point & dst)
     const Sprite & sprite6 = AGG::GetICN(ICN::SPANEL, is6);
     const Rect rect6(dst.x + 220, dst.y + 157, sprite6.w(), sprite6.h());
     sprite6.Blit(rect6);
-    str.clear();
     str = _("scroll speed");
-    str += " ";
-    String::AddInt(str, conf.ScrollSpeed());
+    str.append(" ");
+    str.append(GetString(conf.ScrollSpeed()));
     text.Set(str);
     text.Blit(rect6.x + (rect6.w - text.w()) / 2, rect6.y + rect6.h + 5);
 

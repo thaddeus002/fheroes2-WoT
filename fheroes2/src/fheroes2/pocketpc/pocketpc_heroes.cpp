@@ -89,30 +89,22 @@ Dialog::answer_t PocketPC::HeroesOpenDialog(Heroes & hero, bool readonly)
     // prim skill
     const Rect ras(dst_rt.x + 74, dst_rt.y + 14, 34, 34);
     backSprite.Blit(Rect(216, 51, ras.w, ras.h),  ras);
-    message.clear();
-    String::AddInt(message, hero.GetAttack());
-    text.Set(message);
+    text.Set(GetString(hero.GetAttack()));
     text.Blit(dst_rt.x + 74 + (34 - text.w()) / 2, dst_rt.y + 47);
 
     const Rect rds(dst_rt.x + 107, dst_rt.y + 14, 34, 34);
     backSprite.Blit(Rect(216, 84, rds.w, rds.h),  rds);
-    message.clear();
-    String::AddInt(message, hero.GetDefense());
-    text.Set(message);
+    text.Set(GetString(hero.GetDefense()));
     text.Blit(dst_rt.x + 107 + (34 - text.w()) / 2, dst_rt.y + 47);
 
     const Rect rps(dst_rt.x + 140, dst_rt.y + 14, 34, 34);
     backSprite.Blit(Rect(216, 117, rps.w, rps.h), rps);
-    message.clear();
-    String::AddInt(message, hero.GetPower());
-    text.Set(message);
+    text.Set(GetString(hero.GetPower()));
     text.Blit(dst_rt.x + 140 + (34 - text.w()) / 2, dst_rt.y + 47);
 
     const Rect rks(dst_rt.x + 173, dst_rt.y + 14, 34, 34);
     backSprite.Blit(Rect(216, 150, rks.w, rks.h), rks);
-    message.clear();
-    String::AddInt(message, hero.GetKnowledge());
-    text.Set(message);
+    text.Set(GetString(hero.GetKnowledge()));
     text.Blit(dst_rt.x + 173 + (34 - text.w()) / 2, dst_rt.y + 47);
 
     // sec skill

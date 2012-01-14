@@ -368,19 +368,45 @@ u8 Resource::FromIndexSprite2(u8 index)
     return UNKNOWN;
 }
 
+s32 Funds::GetFirstValidItems(u8 rs) const
+{
+    if(0 < wood && (rs & Resource::WOOD))
+	return wood;
+    else
+    if(0 < ore && (rs & Resource::ORE))
+	return ore;
+    else
+    if(0 < mercury && (rs & Resource::MERCURY))
+	return mercury;
+    else
+    if(0 < sulfur && (rs & Resource::SULFUR))
+	return sulfur;
+    else
+    if(0 < crystal && (rs & Resource::CRYSTAL))
+	return crystal;
+    else
+    if(0 < gems && (rs & Resource::GEMS))
+	return gems;
+    else
+    if(0 < gold && (rs & Resource::GOLD))
+	return gold;
+
+    return 0;
+}
+
 u8 Funds::GetValidItems(void) const
 {
-	u8 result = 0;
+    u8 result = 0;
 
-	if(wood) ++result;
-	if(ore) ++result;
-	if(mercury) ++result;
-	if(sulfur) ++result;
-	if(crystal) ++result;
-	if(gems) ++result;
-	if(gold) ++result;
+    if(0 < wood) ++result;
+    if(0 < ore) ++result;
+    if(0 < mercury) ++result;
+    if(0 < sulfur) ++result;
+    if(0 < crystal) ++result;
+    if(0 < gems) ++result;
+    if(0 < gold) ++result;
 
-	return result;
+    return result;
 }
 
 void Funds::Reset(void)
@@ -416,7 +442,6 @@ void RedrawResourceSprite(const Surface & sf, const Point & pos,
 {
     Display & display = Display::Get();
     Point dst_pt;
-    std::string str;
     Text text;
 
     dst_pt.x = pos.x + width / 2 + count * width;
@@ -424,8 +449,7 @@ void RedrawResourceSprite(const Surface & sf, const Point & pos,
 
     sf.Blit(dst_pt.x - sf.w() / 2, dst_pt.y - sf.h(), display);
 
-    String::AddInt(str, value);
-    text.Set(str, Font::SMALL);
+    text.Set(GetString(value), Font::SMALL);
     text.Blit(dst_pt.x - text.w() / 2, dst_pt.y + 2);
 }
 

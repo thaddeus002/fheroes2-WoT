@@ -299,9 +299,7 @@ void Battle2::NecromancySkillAction(Army::army_t & army1, u32 killed, bool local
 	Surface sf1(40, 45);
 	const Sprite & sf2 = AGG::GetICN(ICN::MONS32, mons.GetSpriteIndex());
 	sf2.Blit((sf1.w() - sf2.w()) / 2, 0, sf1);
-	std::string str;
-	String::AddInt(str, count);
-	Text text(str, Font::SMALL);
+	Text text(GetString(count), Font::SMALL);
 	text.Blit((sf1.w() - text.w()) / 2, sf2.h() + 3, sf1);
 	PlayPickupSound();
 

@@ -50,9 +50,7 @@ public:
 	    if(readonly)
 		AGG::GetICN(ICN::LOCATORS, 24).Blit(x + 33, y + 5);
 
-	    std::string str;
-	    String::AddInt(str, troop.GetCount());
-	    Text text(str, Font::SMALL);
+	    Text text(GetString(troop.GetCount()), Font::SMALL);
 	    text.Blit(x + (back.w() - text.w()) / 2, y + back.h() - 11);
 	}
 

@@ -66,12 +66,16 @@ std::string String::Upper(std::string str)
 }
 
 /* int to string */
-void String::AddInt(std::string &str, int value)
+std::string GetString(int value)
 {
     std::ostringstream stream;
     stream << value;
+    return stream.str();
+}
 
-    str += stream.str();
+void String::AddInt(std::string &str, int value)
+{
+    str += GetString(value);
 }
 
 int String::ToInt(const std::string & str)

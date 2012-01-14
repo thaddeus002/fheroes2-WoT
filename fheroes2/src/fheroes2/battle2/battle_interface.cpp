@@ -999,16 +999,16 @@ void Battle2::Interface::RedrawTroopCount(const Stats & b, const Rect & rt) cons
     bar.Blit(sx, sy);
 
     if(b.count < 1000)
-	String::AddInt(str, b.count);
+	str = GetString(b.count);
     else
     if(b.count < 1000000)
     {
-	String::AddInt(str, b.count / 1000);
+	str = GetString(b.count / 1000);
     	str += "K";
     }
     else
     {
-	String::AddInt(str, b.count / 1000000);
+	str = GetString(b.count / 1000000);
 	str += "M";
     }
 
@@ -2353,8 +2353,7 @@ void Battle2::Interface::RedrawActionWincesKills(TargetsInfo & targets)
 		if(conf.ExtBattleShowDamage() && target.killed &&
 			(pos.y - py) > topleft.y)
 		{
-		    std::string msg = "-";
-		    String::AddInt(msg, target.killed);
+		    std::string msg = "-" + GetString(target.killed);
 		    Text txt(msg, Font::YELLOW_SMALL);
 		    txt.Blit(pos.x + (target.defender->isWide() ? 0 : (pos.w - txt.w()) / 2), pos.y - py);
 		}
