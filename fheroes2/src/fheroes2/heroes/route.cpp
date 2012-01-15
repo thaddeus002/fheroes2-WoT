@@ -335,13 +335,29 @@ bool Route::Path::hasObstacle(void) const
     return it != end() && (*it).GetIndex() != GetLastIndex();
 }
 
+void Route::Path::RescanObstacle(void)
+{
+    // scan obstacle
+    iterator it = std::find_if(begin(), end(), StepIsObstacle);
+ 
+    if(it != end() && (*it).GetIndex() != GetLastIndex())
+    {
+	size_t size1 = size();
+	s32 reduce = (*it).from;
+	Calculate(dst);
+	// reduce
+	if(size() > size1 * 2) Calculate(reduce);
+    }
+}
+
 void Route::Path::RescanPassable(void)
 {
+    // scan passable
     iterator it = begin();
 
     for(; it != end(); ++it)
-	if(! world.GetTiles((*it).from).isPassable(&hero, (*it).direction, false) ||
-	    StepIsObstacle(*it)) break;
+	if(! world.GetTiles((*it).from).isPassable(NULL, (*it).direction, false))
+	break;
 
     if(it != end())
     {

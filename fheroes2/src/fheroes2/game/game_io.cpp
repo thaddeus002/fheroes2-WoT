@@ -1476,5 +1476,5 @@ void Game::IO::UnpackHeroes(QueueMessage & msg, Heroes & hero, u16 check_version
     if(check_version < FORMAT_VERSION_2707)
 	hero.path.Reset();
 
-    hero.RescanPath();
+    hero.path.RescanPassable();
 }
