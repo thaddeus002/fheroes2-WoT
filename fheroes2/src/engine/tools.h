@@ -39,7 +39,8 @@ namespace String
     void Replace(std::string &, const char*, const std::string &);
     void Replace(std::string &, const char*, int);
 
-    void AppendKey(std::string &, KeySym, u16);
+    std::string InsertString(const std::string &, size_t, const char *);
+    size_t InsertKeySym(std::string &, size_t, KeySym, u16 mod = 0);
 
     // from SDL_ttf
     std::vector<u16> UTF8_to_UNICODE(const std::string &);
@@ -50,6 +51,7 @@ namespace String
 
 int Sign(int);
 KeySym KeySymFromChar(char);
+char   CharFromKeySym(KeySym, u16 mod = 0);
 bool PressIntKey(u32 min, u32 max, u32 & result);
 
 std::string GetString(int);

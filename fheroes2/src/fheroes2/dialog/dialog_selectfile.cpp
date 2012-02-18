@@ -66,7 +66,7 @@ void FileInfoListBox::RedrawItem(const Maps::FileInfo & info, s16 dstx, s16 dsty
     std::fill(short_date, ARRAY_COUNT_END(short_date), 0);
     std::strftime(short_date, ARRAY_COUNT(short_date) - 1, "%b %d, %H:%M", std::localtime(&info.localtime));
     std::string savname(GetBasename(info.file));
-    
+
     if(savname.size())
     {
 	Text text;
@@ -115,11 +115,32 @@ void FileInfoListBox::ActionListSingleClick(Maps::FileInfo &)
     edit_mode = false;
 }
 
-void ResizeToShortName(const std::string & str, std::string & res)
+std::string ResizeToShortName(const std::string & str)
 {
-    res.assign(GetBasename(str));
+    std::string res = GetBasename(str);
     size_t it = res.find('.');
     if(std::string::npos != it) res.resize(it);
+    return res;
+}
+
+size_t GetInsertPosition(const std::string & name, u16 cx, u16 center)
+{
+    if(name.size())
+    {
+	u16 tw = Text::width(name, Font::SMALL);
+	u16 spos = center - tw / 2;
+	if(cx <= spos)
+	    return 0;
+	else
+	if(cx >= spos + tw)
+	    return name.size();
+	else
+	{
+	    float cw = tw / name.size();
+	    return static_cast<size_t>((cx - spos) / cw);
+	}
+    }
+    return 0;
 }
 
 MapsFileInfoList GetSortedMapsFileInfoList(void)
@@ -204,10 +225,12 @@ bool SelectFileListSimple(const std::string & header, std::string & result, bool
     listbox.SetListContent(lists);
 
     std::string filename;
+    size_t charInsertPos = 0;
 
     if(result.size())
     {
-	ResizeToShortName(result, filename);
+	filename = ResizeToShortName(result);
+	charInsertPos = filename.size();
 
 	MapsFileInfoList::iterator it = lists.begin();
 	for(; it != lists.end(); ++it) if((*it).file == result) break;
@@ -224,7 +247,10 @@ bool SelectFileListSimple(const std::string & header, std::string & result, bool
     	buttonOk.SetDisable(true);
 
     if(filename.empty() && listbox.isSelected())
-        ResizeToShortName(listbox.GetCurrent().file, filename);
+    {
+        filename = ResizeToShortName(listbox.GetCurrent().file);
+	charInsertPos = filename.size();
+    }
 
     listbox.Redraw();
     RedrawExtraInfo(rt, header, filename);
@@ -259,6 +285,7 @@ bool SelectFileListSimple(const std::string & header, std::string & result, bool
         if(le.MouseClickLeft(enter_field) && editor)
 	{
 	    edit_mode = true;
+	    charInsertPos = GetInsertPosition(filename, le.GetMouseCursor().x, rt.x + 175);
 	    if(Settings::Get().PocketPC())
 		PocketPC::KeyboardDialog(filename);
     	    buttonOk.SetDisable(filename.empty());
@@ -267,7 +294,7 @@ bool SelectFileListSimple(const std::string & header, std::string & result, bool
 	else
 	if(edit_mode && le.KeyPress())
 	{
-	    String::AppendKey(filename, le.KeyValue(), le.KeyMod());
+	    charInsertPos = String::InsertKeySym(filename, charInsertPos, le.KeyValue(), le.KeyMod());
 	    buttonOk.SetDisable(filename.empty());
 	    cursor.Hide();
 	}
@@ -291,11 +318,12 @@ bool SelectFileListSimple(const std::string & header, std::string & result, bool
 	    listbox.Redraw();
 
 	    if(edit_mode && editor)
-		RedrawExtraInfo(rt, header, filename + "_");
+		RedrawExtraInfo(rt, header, String::InsertString(filename, charInsertPos, "_"));
 	    else
 	    if(listbox.isSelected())
 	    {
-	    	ResizeToShortName(listbox.GetCurrent().file, filename);
+		filename = ResizeToShortName(listbox.GetCurrent().file);
+		charInsertPos = filename.size();
 		RedrawExtraInfo(rt, header, filename);
 	    }
 	    else
@@ -318,7 +346,7 @@ void RedrawExtraInfo(const Point & dst, const std::string & header, const std::s
 {
     Text text(header, Font::BIG);
     text.Blit(dst.x + 175 - text.w() / 2, dst.y + 30);
-    
+
     if(filename.size())
     {
 	text.Set(filename, Font::BIG);

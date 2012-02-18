@@ -149,6 +149,18 @@ void String::Replace(std::string & dst, const char* pred, int value)
     }
 }
 
+std::string String::InsertString(const std::string & src, size_t pos, const char* c)
+{
+    std::string res = src;
+
+    if(pos >= src.size())
+	res.append(c);
+    else
+	res.insert(pos, c);
+
+    return res;
+}
+
 std::string String::Double(double value, u8 prec)
 {
     std::ostringstream stream;
@@ -235,93 +247,128 @@ std::string UNICODE_to_UTF8(const std::vector<u16> & unicode)
     return utf8;
 }
 
-void String::AppendKey(std::string & res, KeySym sym, u16 mod)
+char CharFromKeySym(KeySym sym, u16 mod)
 {
     switch(sym)
     {
-        case KEY_1:     res += (MOD_SHIFT & mod ? '!' : '1'); break;
-        case KEY_2:     res += (MOD_SHIFT & mod ? '@' : '2'); break;
-        case KEY_3:     res += (MOD_SHIFT & mod ? '#' : '3'); break;
-        case KEY_4:     res += (MOD_SHIFT & mod ? '$' : '4'); break;
-        case KEY_5:     res += (MOD_SHIFT & mod ? '%' : '5'); break;
-        case KEY_6:     res += (MOD_SHIFT & mod ? '^' : '6'); break;
-        case KEY_7:     res += (MOD_SHIFT & mod ? '&' : '7'); break;
-        case KEY_8:     res += (MOD_SHIFT & mod ? '*' : '8'); break;
-        case KEY_9:     res += (MOD_SHIFT & mod ? '(' : '9'); break;
-        case KEY_0:     res += (MOD_SHIFT & mod ? ')' : '0'); break;
+        case KEY_1:     return (MOD_SHIFT & mod ? '!' : '1');
+        case KEY_2:     return (MOD_SHIFT & mod ? '@' : '2');
+        case KEY_3:     return (MOD_SHIFT & mod ? '#' : '3');
+        case KEY_4:     return (MOD_SHIFT & mod ? '$' : '4');
+        case KEY_5:     return (MOD_SHIFT & mod ? '%' : '5');
+        case KEY_6:     return (MOD_SHIFT & mod ? '^' : '6');
+        case KEY_7:     return (MOD_SHIFT & mod ? '&' : '7');
+        case KEY_8:     return (MOD_SHIFT & mod ? '*' : '8');
+        case KEY_9:     return (MOD_SHIFT & mod ? '(' : '9');
+        case KEY_0:     return (MOD_SHIFT & mod ? ')' : '0');
 
-	case KEY_KP0:	if(MOD_NUM & mod) res += '0'; break;
-	case KEY_KP1:	if(MOD_NUM & mod) res += '1'; break;
-	case KEY_KP2:	if(MOD_NUM & mod) res += '2'; break;
-	case KEY_KP3:	if(MOD_NUM & mod) res += '3'; break;
-	case KEY_KP4:	if(MOD_NUM & mod) res += '4'; break;
-	case KEY_KP5:	if(MOD_NUM & mod) res += '5'; break;
-	case KEY_KP6:	if(MOD_NUM & mod) res += '6'; break;
-	case KEY_KP7:	if(MOD_NUM & mod) res += '7'; break;
-	case KEY_KP8:	if(MOD_NUM & mod) res += '8'; break;
-	case KEY_KP9:	if(MOD_NUM & mod) res += '9'; break;
+	case KEY_KP0:	if(MOD_NUM & mod) return '0'; break;
+	case KEY_KP1:	if(MOD_NUM & mod) return '1'; break;
+	case KEY_KP2:	if(MOD_NUM & mod) return '2'; break;
+	case KEY_KP3:	if(MOD_NUM & mod) return '3'; break;
+	case KEY_KP4:	if(MOD_NUM & mod) return '4'; break;
+	case KEY_KP5:	if(MOD_NUM & mod) return '5'; break;
+	case KEY_KP6:	if(MOD_NUM & mod) return '6'; break;
+	case KEY_KP7:	if(MOD_NUM & mod) return '7'; break;
+	case KEY_KP8:	if(MOD_NUM & mod) return '8'; break;
+	case KEY_KP9:	if(MOD_NUM & mod) return '9'; break;
 
-        case KEY_MINUS:         res += (MOD_SHIFT & mod ? '_' : '-'); break;
-        case KEY_EQUALS:        res += (MOD_SHIFT & mod ? '+' : '='); break;
-	case KEY_BACKSLASH:     res += (MOD_SHIFT & mod ? '|' : '\\'); break;
-	case KEY_LEFTBRACKET:   res += (MOD_SHIFT & mod ? '{' : '['); break;
-	case KEY_RIGHTBRACKET:  res += (MOD_SHIFT & mod ? '}' : ']'); break;
-        case KEY_SEMICOLON:     res += (MOD_SHIFT & mod ? ':' : ';'); break;
-        case KEY_QUOTE:         res += (MOD_SHIFT & mod ? '"' : '\''); break;
-        case KEY_COMMA:         res += (MOD_SHIFT & mod ? '<' : ','); break;
-        case KEY_PERIOD:        res += (MOD_SHIFT & mod ? '>' : '.'); break;
-        case KEY_SLASH:         res += (MOD_SHIFT & mod ? '?' : '/'); break;
+        case KEY_MINUS:         return (MOD_SHIFT & mod ? '_' : '-');
+        case KEY_EQUALS:        return (MOD_SHIFT & mod ? '+' : '=');
+	case KEY_BACKSLASH:     return (MOD_SHIFT & mod ? '|' : '\\');
+	case KEY_LEFTBRACKET:   return (MOD_SHIFT & mod ? '{' : '[');
+	case KEY_RIGHTBRACKET:  return (MOD_SHIFT & mod ? '}' : ']');
+        case KEY_SEMICOLON:     return (MOD_SHIFT & mod ? ':' : ';');
+        case KEY_QUOTE:         return (MOD_SHIFT & mod ? '"' : '\'');
+        case KEY_COMMA:         return (MOD_SHIFT & mod ? '<' : ',');
+        case KEY_PERIOD:        return (MOD_SHIFT & mod ? '>' : '.');
+        case KEY_SLASH:         return (MOD_SHIFT & mod ? '?' : '/');
 
-        case KEY_EXCLAIM:       res += '!'; break;
-	case KEY_AT:            res += '@'; break;
-        case KEY_HASH:          res += '#'; break;
-        case KEY_DOLLAR:        res += '$'; break;
-        case KEY_AMPERSAND:     res += '&'; break;
-        case KEY_ASTERISK:      res += '*'; break;
-        case KEY_LEFTPAREN:     res += '('; break;
-        case KEY_RIGHTPAREN:    res += ')'; break;
-        case KEY_QUOTEDBL:      res += '"'; break;
-        case KEY_PLUS:          res += '+'; break;
-        case KEY_COLON:         res += ':'; break;
-	case KEY_LESS:          res += '<'; break;
-	case KEY_GREATER:       res += '>'; break;
-	case KEY_QUESTION:      res += '?'; break;
-	case KEY_CARET:         res += '^'; break;
-	case KEY_UNDERSCORE:    res += '_'; break;
+        case KEY_EXCLAIM:       return '!';
+	case KEY_AT:            return '@';
+        case KEY_HASH:          return '#';
+        case KEY_DOLLAR:        return '$';
+        case KEY_AMPERSAND:     return '&';
+        case KEY_ASTERISK:      return '*';
+        case KEY_LEFTPAREN:     return '(';
+        case KEY_RIGHTPAREN:    return ')';
+        case KEY_QUOTEDBL:      return '"';
+        case KEY_PLUS:          return '+';
+        case KEY_COLON:         return ':';
+	case KEY_LESS:          return '<';
+	case KEY_GREATER:       return '>';
+	case KEY_QUESTION:      return '?';
+	case KEY_CARET:         return '^';
+	case KEY_UNDERSCORE:    return '_';
 
-        case KEY_SPACE:		res += ' '; break;
+        case KEY_SPACE:		return ' ';
 
-        case KEY_a:     res += ((MOD_SHIFT | MOD_CAPS) & mod ? 'A' : 'a'); break;
-        case KEY_b:     res += ((MOD_SHIFT | MOD_CAPS) & mod ? 'B' : 'b'); break;
-        case KEY_c:     res += ((MOD_SHIFT | MOD_CAPS) & mod ? 'C' : 'c'); break;
-        case KEY_d:     res += ((MOD_SHIFT | MOD_CAPS) & mod ? 'D' : 'd'); break;
-        case KEY_e:     res += ((MOD_SHIFT | MOD_CAPS) & mod ? 'E' : 'e'); break;
-        case KEY_f:     res += ((MOD_SHIFT | MOD_CAPS) & mod ? 'F' : 'f'); break;
-        case KEY_g:     res += ((MOD_SHIFT | MOD_CAPS) & mod ? 'G' : 'g'); break;
-        case KEY_h:     res += ((MOD_SHIFT | MOD_CAPS) & mod ? 'H' : 'h'); break;
-        case KEY_i:     res += ((MOD_SHIFT | MOD_CAPS) & mod ? 'I' : 'i'); break;
-        case KEY_j:     res += ((MOD_SHIFT | MOD_CAPS) & mod ? 'J' : 'j'); break;
-        case KEY_k:     res += ((MOD_SHIFT | MOD_CAPS) & mod ? 'K' : 'k'); break;
-        case KEY_l:     res += ((MOD_SHIFT | MOD_CAPS) & mod ? 'L' : 'l'); break;
-        case KEY_m:     res += ((MOD_SHIFT | MOD_CAPS) & mod ? 'M' : 'm'); break;
-        case KEY_n:     res += ((MOD_SHIFT | MOD_CAPS) & mod ? 'N' : 'n'); break;
-        case KEY_o:     res += ((MOD_SHIFT | MOD_CAPS) & mod ? 'O' : 'o'); break;
-        case KEY_p:     res += ((MOD_SHIFT | MOD_CAPS) & mod ? 'P' : 'p'); break;
-        case KEY_q:     res += ((MOD_SHIFT | MOD_CAPS) & mod ? 'Q' : 'q'); break;
-        case KEY_r:     res += ((MOD_SHIFT | MOD_CAPS) & mod ? 'R' : 'r'); break;
-        case KEY_s:     res += ((MOD_SHIFT | MOD_CAPS) & mod ? 'S' : 's'); break;
-        case KEY_t:     res += ((MOD_SHIFT | MOD_CAPS) & mod ? 'T' : 't'); break;
-        case KEY_u:     res += ((MOD_SHIFT | MOD_CAPS) & mod ? 'U' : 'u'); break;
-        case KEY_v:     res += ((MOD_SHIFT | MOD_CAPS) & mod ? 'V' : 'v'); break;
-        case KEY_w:     res += ((MOD_SHIFT | MOD_CAPS) & mod ? 'W' : 'w'); break;
-        case KEY_x:     res += ((MOD_SHIFT | MOD_CAPS) & mod ? 'X' : 'x'); break;
-        case KEY_y:     res += ((MOD_SHIFT | MOD_CAPS) & mod ? 'Y' : 'y'); break;
-        case KEY_z:     res += ((MOD_SHIFT | MOD_CAPS) & mod ? 'Z' : 'z'); break;
+        case KEY_a:     return ((MOD_SHIFT | MOD_CAPS) & mod ? 'A' : 'a');
+        case KEY_b:     return ((MOD_SHIFT | MOD_CAPS) & mod ? 'B' : 'b');
+        case KEY_c:     return ((MOD_SHIFT | MOD_CAPS) & mod ? 'C' : 'c');
+        case KEY_d:     return ((MOD_SHIFT | MOD_CAPS) & mod ? 'D' : 'd');
+        case KEY_e:     return ((MOD_SHIFT | MOD_CAPS) & mod ? 'E' : 'e');
+        case KEY_f:     return ((MOD_SHIFT | MOD_CAPS) & mod ? 'F' : 'f');
+        case KEY_g:     return ((MOD_SHIFT | MOD_CAPS) & mod ? 'G' : 'g');
+        case KEY_h:     return ((MOD_SHIFT | MOD_CAPS) & mod ? 'H' : 'h');
+        case KEY_i:     return ((MOD_SHIFT | MOD_CAPS) & mod ? 'I' : 'i');
+        case KEY_j:     return ((MOD_SHIFT | MOD_CAPS) & mod ? 'J' : 'j');
+        case KEY_k:     return ((MOD_SHIFT | MOD_CAPS) & mod ? 'K' : 'k');
+        case KEY_l:     return ((MOD_SHIFT | MOD_CAPS) & mod ? 'L' : 'l');
+        case KEY_m:     return ((MOD_SHIFT | MOD_CAPS) & mod ? 'M' : 'm');
+        case KEY_n:     return ((MOD_SHIFT | MOD_CAPS) & mod ? 'N' : 'n');
+        case KEY_o:     return ((MOD_SHIFT | MOD_CAPS) & mod ? 'O' : 'o');
+        case KEY_p:     return ((MOD_SHIFT | MOD_CAPS) & mod ? 'P' : 'p');
+        case KEY_q:     return ((MOD_SHIFT | MOD_CAPS) & mod ? 'Q' : 'q');
+        case KEY_r:     return ((MOD_SHIFT | MOD_CAPS) & mod ? 'R' : 'r');
+        case KEY_s:     return ((MOD_SHIFT | MOD_CAPS) & mod ? 'S' : 's');
+        case KEY_t:     return ((MOD_SHIFT | MOD_CAPS) & mod ? 'T' : 't');
+        case KEY_u:     return ((MOD_SHIFT | MOD_CAPS) & mod ? 'U' : 'u');
+        case KEY_v:     return ((MOD_SHIFT | MOD_CAPS) & mod ? 'V' : 'v');
+        case KEY_w:     return ((MOD_SHIFT | MOD_CAPS) & mod ? 'W' : 'w');
+        case KEY_x:     return ((MOD_SHIFT | MOD_CAPS) & mod ? 'X' : 'x');
+        case KEY_y:     return ((MOD_SHIFT | MOD_CAPS) & mod ? 'Y' : 'y');
+        case KEY_z:     return ((MOD_SHIFT | MOD_CAPS) & mod ? 'Z' : 'z');
 
-
-        case KEY_BACKSPACE: if(res.size()) res.resize(res.size() - 1); break;
         default: break;
     }
+
+    return 0;
+}
+
+size_t String::InsertKeySym(std::string & res, size_t pos, KeySym sym, u16 mod)
+{
+    switch(sym)
+    {
+	case KEY_BACKSPACE:
+	{
+	    if(res.size() && pos)
+	    {
+		if(pos >= res.size())
+		    res.resize(res.size() - 1);
+		else
+		    res.erase(pos - 1, 1);
+		--pos;
+	    }
+	}
+	break;
+
+	case KEY_LEFT:	if(pos) --pos; break;
+	case KEY_RIGHT: if(pos < res.size()) ++pos; break;
+
+	default:
+	{
+	    char c = CharFromKeySym(sym, mod);
+
+	    if(c)
+	    {
+		res.insert(pos, 1, c);
+		++pos;
+	    }
+	}
+    }
+
+    return pos;
 }
 
 std::string String::GetTime(void)

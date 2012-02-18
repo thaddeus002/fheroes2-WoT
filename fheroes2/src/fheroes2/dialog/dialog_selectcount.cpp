@@ -171,6 +171,7 @@ bool Dialog::InputString(const std::string &header, std::string &res)
     //const bool pda = Settings::Get().PocketPC();
     if(res.size()) res.clear();
     res.reserve(48);
+    size_t charInsertPos = 0;
 
     TextBox textbox(header, Font::BIG, BOXAREA_WIDTH);
     Point dst_pt;
@@ -229,7 +230,7 @@ bool Dialog::InputString(const std::string &header, std::string &res)
 	else
 	if(le.KeyPress())
 	{
-	    String::AppendKey(res, le.KeyValue(), le.KeyMod());
+	    charInsertPos = String::InsertKeySym(res, charInsertPos, le.KeyValue(), le.KeyMod());
 	    redraw = true;
 	}
 
@@ -238,7 +239,7 @@ bool Dialog::InputString(const std::string &header, std::string &res)
 	    buttonOk.SetDisable(res.empty());
 	    buttonOk.Draw();
 
-	    text.Set(res + "_");
+	    text.Set(String::InsertString(res, charInsertPos, "_"));
 
 	    if(text.w() < sprite.w() - 24)
 	    {
