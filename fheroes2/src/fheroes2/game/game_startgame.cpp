@@ -1243,9 +1243,13 @@ void Game::EventCastSpell(void)
 
     if(hero)
     {
+	const Spell spell = hero->OpenSpellBook(SpellBook::ADVN, true);
 	// apply cast spell
-	hero->ActionSpellCast(hero->OpenSpellBook(SpellBook::ADVN, true));
-	I.SetRedraw(REDRAW_ICONS);
+	if(spell.isValid())
+	{
+	    hero->ActionSpellCast(spell);
+	    I.SetRedraw(REDRAW_ICONS);
+	}
     }
 }
 
