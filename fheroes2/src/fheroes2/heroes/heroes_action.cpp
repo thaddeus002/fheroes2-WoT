@@ -298,7 +298,7 @@ void AnimationRemoveObject(Maps::Tiles & tile)
     Cursor & cursor = Cursor::Get();
     Display & display = Display::Get();
 
-    const MapsIndexes & heroes = Maps::ScanAroundObjectV(tile.GetIndex(), MP2::OBJ_HEROES);
+    const MapsIndexes & heroes = Maps::ScanAroundObject(tile.GetIndex(), MP2::OBJ_HEROES);
     const Surface & stile = tile.GetTileSurface();
     Surface sobj(stile.w(), stile.h());
 

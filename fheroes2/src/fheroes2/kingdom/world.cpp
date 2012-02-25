@@ -261,7 +261,7 @@ void World::LoadMaps(const std::string &filename)
     u8   byte8;
     u16  byte16;
     u32  byte32;
-    std::vector<s32> vec_object; // index maps for OBJ_CASTLE, OBJ_HEROES, OBJ_SIGN, OBJ_BOTTLE, OBJ_EVENT
+    MapsIndexes vec_object; // index maps for OBJ_CASTLE, OBJ_HEROES, OBJ_SIGN, OBJ_BOTTLE, OBJ_EVENT
     vec_object.reserve(100);
 
     // endof
@@ -594,7 +594,7 @@ void World::LoadMaps(const std::string &filename)
 
 	s32 findobject = -1;
 
-	for(std::vector<s32>::const_iterator
+	for(MapsIndexes::const_iterator
 	    it_index = vec_object.begin(); it_index != vec_object.end() && findobject < 0; ++it_index)
 	{
 	    const Maps::Tiles & tile = vec_tiles[*it_index];
@@ -965,7 +965,7 @@ void World::LoadMaps(const std::string &filename)
     if(vec_tiles.end() == it)
     {
 	// generate position for ultimate
-	std::vector<s32> pools;
+	MapsIndexes pools;
 	pools.reserve(vec_tiles.size() / 2);
 
 	for(size_t ii = 0; ii < vec_tiles.size(); ++ii)
@@ -1141,8 +1141,7 @@ void World::MonthOfMonstersAction(const Monster & mons)
 
 	// create exclude list
 	{
-	    MapsIndexes alli = Maps::GetAllIndexes();
-	    const MapsIndexes & objv = MapsIndexesFilteredObjects(alli, objs);
+	    const MapsIndexes & objv = Maps::GetObjectsPositions(objs);
 
 	    for(MapsIndexes::const_iterator
 		it = objv.begin(); it != objv.end(); ++it)
@@ -1174,7 +1173,7 @@ void World::MonthOfMonstersAction(const Monster & mons)
 	std::random_shuffle(tiles.begin(), tiles.end());
 	if(tiles.size() > maxc) tiles.resize(maxc);
 
-	for(std::vector<s32>::iterator
+	for(MapsIndexes::const_iterator
 	    it = tiles.begin(); it != tiles.end(); ++it)
 		Maps::Tiles::PlaceMonsterOnTile(vec_tiles[*it], mons, 0 /* random */);
     }
@@ -1247,10 +1246,7 @@ bool TeleportCheckGround(s32 index, bool water)
 /* return random teleport destination */
 s32 World::NextTeleport(const s32 index, bool onwater) const
 {
-    std::vector<s32> vec_teleports;
-
-    vec_teleports.reserve(10);
-    GetObjectPositions(MP2::OBJ_STONELIGHTS, vec_teleports, true);
+    MapsIndexes vec_teleports = Maps::GetObjectPositions(true, MP2::OBJ_STONELIGHTS);
 
     if(2 > vec_teleports.size())
     {
@@ -1258,7 +1254,7 @@ s32 World::NextTeleport(const s32 index, bool onwater) const
 	return index;
     }
 
-    std::vector<s32>::iterator itend = vec_teleports.end();
+    MapsIndexes::iterator itend = vec_teleports.end();
 
     // remove if not type
     itend = std::remove_if(vec_teleports.begin(), itend,
@@ -1281,14 +1277,11 @@ s32 World::NextTeleport(const s32 index, bool onwater) const
 /* return random whirlpools destination */
 s32 World::NextWhirlpool(const s32 index)
 {
-    std::vector<s32> whilrpools;
+    MapsIndexes whilrpools = Maps::GetObjectPositions(false, MP2::OBJ_WHIRLPOOL);
 
-    whilrpools.reserve(40);
-    GetObjectPositions(MP2::OBJ_WHIRLPOOL, whilrpools);
+    std::map<s32, MapsIndexes> uniq_whirlpools;
 
-    std::map<s32, std::vector<s32> > uniq_whirlpools;
-
-    for(std::vector<s32>::const_iterator
+    for(MapsIndexes::const_iterator
 	it = whilrpools.begin(); it != whilrpools.end(); ++it)
     {
     	const Maps::TilesAddon* addon = GetTiles(*it).FindObjectConst(MP2::OBJ_WHIRLPOOL);
@@ -1303,12 +1296,12 @@ s32 World::NextWhirlpool(const s32 index)
     }
 
     const Maps::TilesAddon* addon = GetTiles(index).FindObjectConst(MP2::OBJ_WHIRLPOOL);
-    std::vector<u32> uniqs;
+    MapsIndexes uniqs;
     uniqs.reserve(uniq_whirlpools.size());
 
     if(addon)
     {
-	for(std::map<s32, std::vector<s32> >::const_iterator
+	for(std::map<s32, MapsIndexes>::const_iterator
 	    it = uniq_whirlpools.begin(); it != uniq_whirlpools.end(); ++it)
 	{
 	    const u32 & uniq = (*it).first;
@@ -1317,7 +1310,7 @@ s32 World::NextWhirlpool(const s32 index)
 	}
     }
 
-    std::vector<s32> & dest = uniq_whirlpools[*Rand::Get(uniqs)];
+    MapsIndexes & dest = uniq_whirlpools[*Rand::Get(uniqs)];
     uniqs.clear();
 
     if(dest.empty()) DEBUG(DBG_GAME, DBG_WARN, "is full");
@@ -1433,21 +1426,6 @@ void World::ActionForMagellanMaps(u8 color)
 	if((*it).isWater()) (*it).ClearFog(color);
 }
 
-s32 World::GetNearestObject(s32 center, MP2::object_t obj, bool check_hero) const
-{
-    std::vector<IndexDistance> resv;
-    resv.reserve(10);
-
-    if(Maps::isValidAbsIndex(center) &&
-	GetObjectPositions(center, obj, resv, check_hero))
-    {
-	std::sort(resv.begin(), resv.end(), IndexDistance::Shortest);
-	return resv.front().first;
-    }
-
-    return -1;
-}
-
 void World::AddEventDate(const EventDate & event)
 {
     vec_eventsday.push_back(event);
@@ -1507,13 +1485,11 @@ Heroes* World::FromJail(s32 index)
 
 void World::ActionToEyeMagi(u8 color) const
 {
-    std::vector<s32> vec_eyes;
-    vec_eyes.reserve(10);
-    GetObjectPositions(MP2::OBJ_EYEMAGI, vec_eyes, true);
+    MapsIndexes vec_eyes = Maps::GetObjectPositions(true, MP2::OBJ_EYEMAGI);
 
     if(vec_eyes.size())
     {
-	for(std::vector<s32>::const_iterator
+	for(MapsIndexes::const_iterator
 	    it = vec_eyes.begin(); it != vec_eyes.end(); ++it)
 	    Maps::ClearFog(*it, Game::GetViewDistance(Game::VIEW_MAGI_EYES), color);
     }
@@ -1524,31 +1500,6 @@ Riddle* World::GetSphinxRiddle(s32 index)
     Riddles::iterator
 	it = std::find(vec_riddles.begin(), vec_riddles.end(), index);
     return it != vec_riddles.end() ? &(*it) : NULL;
-}
-
-bool World::GetObjectPositions(s32 center, MP2::object_t obj, std::vector<IndexDistance> & v, bool check_hero) const
-{
-    if(v.size()) v.clear();
-
-    for(MapsTiles::const_iterator
-	it = vec_tiles.begin(); it != vec_tiles.end(); ++it)
-	if(obj == (*it).GetObject(! check_hero))
-		v.push_back(IndexDistance((*it).GetIndex(),
-			Maps::GetApproximateDistance(center, (*it).GetIndex())));
-
-    return v.size();
-}
-
-bool World::GetObjectPositions(MP2::object_t obj, std::vector<s32> & v, bool check_hero) const
-{
-    if(v.size()) v.clear();
-
-    for(MapsTiles::const_iterator
-	it = vec_tiles.begin(); it != vec_tiles.end(); ++it)
-	if(obj == (*it).GetObject(! check_hero))
-		v.push_back((*it).GetIndex());
-
-    return v.size();
 }
 
 void World::UpdateRecruits(Recruits & recruits) const

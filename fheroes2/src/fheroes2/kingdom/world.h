@@ -147,10 +147,6 @@ public:
 
     const std::string & MessageSign(const s32 index);
 
-    bool GetObjectPositions(MP2::object_t, std::vector<s32> &, bool check_hero = false) const;
-    bool GetObjectPositions(s32 center, MP2::object_t, std::vector<IndexDistance> &, bool check_hero = false) const;
-    s32 GetNearestObject(s32 center, MP2::object_t, bool check_hero = false) const;
-
     void CaptureObject(const s32 & index, u8 col);
     u16  CountCapturedObject(u8 obj, u8 col) const;
     u16  CountCapturedMines(u8 type, u8 col) const;

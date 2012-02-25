@@ -2637,33 +2637,24 @@ void AIHeroesCaptureNearestTown(Heroes* hero)
 
 	if(0 > ai_hero.primary_target)
 	{
-	    std::vector<IndexDistance> pos_castles;
-	    pos_castles.reserve(10);
+	    const MapsIndexes & castles = Maps::GetObjectPositions(hero->GetIndex(), MP2::OBJ_CASTLE, true);
 
-	    if(world.GetObjectPositions(hero->GetIndex(), MP2::OBJ_CASTLE, pos_castles, false))
+	    for(MapsIndexes::const_iterator
+		it = castles.begin(); it != castles.end(); ++it)
 	    {
-		DEBUG(DBG_AI, DBG_TRACE, hero->GetName());
+		const Castle* castle = world.GetCastle(*it);
 
-    		std::sort(pos_castles.begin(), pos_castles.end(), IndexDistance::Shortest);
-
-		for(std::vector<IndexDistance>::iterator
-		    it = pos_castles.begin(); it != pos_castles.end(); ++it)
-		{
-		    const IndexDistance & id = *it;
-		    const Castle* castle = world.GetCastle(id.first);
-
-		    if(castle)
+		if(castle)
 		    DEBUG(DBG_AI, DBG_TRACE, hero->GetName() << ", to castle: " << castle->GetName());
 
-		    if(castle &&
-			hero->GetArmy().StrongerEnemyArmy(castle->GetArmy()))
-		    {
-			ai_hero.primary_target = id.first;
+		if(castle &&
+		    hero->GetArmy().StrongerEnemyArmy(castle->GetArmy()))
+		{
+		    ai_hero.primary_target = *it;
 
-			DEBUG(DBG_AI, DBG_INFO, Color::String(hero->GetColor()) <<
-			    ", Hero " << hero->GetName() << " set primary target: " << id.first);
-			break;
-		    }
+		    DEBUG(DBG_AI, DBG_INFO, Color::String(hero->GetColor()) <<
+			    ", Hero " << hero->GetName() << " set primary target: " << *it);
+		    break;
 		}
 	    }
 	}

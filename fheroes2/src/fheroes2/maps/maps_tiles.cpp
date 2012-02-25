@@ -1469,7 +1469,7 @@ void Maps::Tiles::RedrawMonster(Surface & dst) const
     if(!(area.GetRectMaps() & mp)) return;
 
     // scan hero around
-    const MapsIndexes & v = ScanAroundObjectV(GetIndex(), MP2::OBJ_HEROES);
+    const MapsIndexes & v = ScanAroundObject(GetIndex(), MP2::OBJ_HEROES);
     for(MapsIndexes::const_iterator
 	it = v.begin(); it != v.end(); ++it)
     {

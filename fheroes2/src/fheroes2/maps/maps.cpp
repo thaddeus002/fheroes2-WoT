@@ -261,13 +261,13 @@ void Maps::ClearFog(const s32 & index, u8 scoute, u8 color)
     }
 }
 
-MapsIndexes Maps::ScanAroundObjectsV(const s32 & center, const u8* objs)
+MapsIndexes Maps::ScanAroundObjects(const s32 & center, const u8* objs)
 {
     MapsIndexes results = Maps::GetAroundIndexes(center);
     return MapsIndexesFilteredObjects(results, objs);
 }
 
-MapsIndexes Maps::ScanAroundObjectV(const s32 & center, u8 obj)
+MapsIndexes Maps::ScanAroundObject(const s32 & center, u8 obj)
 {
     MapsIndexes results = Maps::GetAroundIndexes(center);
     return MapsIndexesFilteredObject(results, obj);
@@ -282,6 +282,39 @@ MapsIndexes Maps::ScanDistanceObject(const s32 & center, u8 obj, u16 dist)
 MapsIndexes Maps::ScanDistanceObjects(const s32 & center, const u8* objs, u16 dist)
 {
     MapsIndexes results = Maps::GetDistanceIndexes(center, dist, true);
+    return MapsIndexesFilteredObjects(results, objs);
+}
+
+MapsIndexes Maps::GetObjectPositions(u8 obj, bool check_hero)
+{
+    MapsIndexes results = GetAllIndexes();
+    MapsIndexesFilteredObject(results, obj);
+
+    if(check_hero && obj != MP2::OBJ_HEROES)
+    {
+	const MapsIndexes & v = GetObjectPositions(MP2::OBJ_HEROES, false);
+	for(MapsIndexes::const_iterator
+	    it = v.begin(); it != v.end(); ++it)
+	{
+	    const Heroes* hero = world.GetHeroes(*it);
+	    if(hero && obj == hero->GetMapsObject())
+		results.push_back(*it);
+	}
+    }
+
+    return results;
+}
+
+MapsIndexes Maps::GetObjectPositions(const s32 & center, u8 obj, bool check_hero)
+{
+    MapsIndexes results = Maps::GetObjectPositions(obj, check_hero);
+    std::sort(results.begin(), results.end(), ComparsionDistance(center));
+    return results;
+}
+
+MapsIndexes Maps::GetObjectsPositions(const u8* objs)
+{
+    MapsIndexes results = GetAllIndexes();
     return MapsIndexesFilteredObjects(results, objs);
 }
 
@@ -322,7 +355,7 @@ bool Maps::TileIsUnderProtection(const s32 & center)
 
 MapsIndexes Maps::GetTilesUnderProtection(const s32 & center)
 {
-    MapsIndexes indexes = Maps::ScanAroundObjectV(center, MP2::OBJ_MONSTER);
+    MapsIndexes indexes = Maps::ScanAroundObject(center, MP2::OBJ_MONSTER);
 
     indexes.resize(std::distance(indexes.begin(),
 	    std::remove_if(indexes.begin(), indexes.end(),

@@ -255,26 +255,30 @@ bool ActionSpellSummonBoat(Heroes & hero)
 
     // find water
     s32 dst_water = -1;
-    const MapsIndexes & v = Maps::ScanAroundObjectV(center, MP2::OBJ_ZERO);
+    const MapsIndexes & v = Maps::ScanAroundObject(center, MP2::OBJ_ZERO);
     for(MapsIndexes::const_iterator
 	it = v.begin(); it != v.end(); ++it)
     {
         if(world.GetTiles(*it).isWater()){ dst_water = *it; break; }
     }
 
-    // find boat
-    const s32 src = world.GetNearestObject(center, MP2::OBJ_BOAT);
-    if(src < 0)
-	DEBUG(DBG_GAME, DBG_WARN, "free boat: " << "not found");
+    const MapsIndexes & boats = Maps::GetObjectPositions(center, MP2::OBJ_BOAT, false);
 
-    if(Rand::Get(1, 100) <= chance &&
-	Maps::isValidAbsIndex(src) && Maps::isValidAbsIndex(dst_water))
-    {
-	world.GetTiles(src).SetObject(MP2::OBJ_ZERO);
-	world.GetTiles(dst_water).SetObject(MP2::OBJ_BOAT);
-    }
+    if(boats.empty())
+	DEBUG(DBG_GAME, DBG_WARN, "free boat: " << "not found");
     else
-	DialogSpellFailed(Spell::SUMMONBOAT);
+    {
+	const s32 & src = boats.front();
+
+	if(Rand::Get(1, 100) <= chance &&
+	    Maps::isValidAbsIndex(src) && Maps::isValidAbsIndex(dst_water))
+	{
+	    world.GetTiles(src).SetObject(MP2::OBJ_ZERO);
+	    world.GetTiles(dst_water).SetObject(MP2::OBJ_BOAT);
+	}
+	else
+	    DialogSpellFailed(Spell::SUMMONBOAT);
+    }
 
     return true;
 }

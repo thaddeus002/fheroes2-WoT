@@ -61,12 +61,15 @@ namespace Maps
     MapsIndexes GetAllIndexes(void);
     MapsIndexes GetAroundIndexes(const s32 &, u16 filter = DIRECTION_ALL);
     MapsIndexes GetDistanceIndexes(const s32 &, u16 dist, bool sort = false);
-    MapsIndexes ScanAroundObjectV(const s32 &, u8 obj);
-    MapsIndexes ScanAroundObjectsV(const s32 &, const u8* objs);
+    MapsIndexes ScanAroundObject(const s32 &, u8 obj);
+    MapsIndexes ScanAroundObjects(const s32 &, const u8* objs);
     MapsIndexes GetTilesUnderProtection(const s32 &);
     bool	TileIsUnderProtection(const s32 &);
     MapsIndexes ScanDistanceObject(const s32 &, u8 obj, u16 dist);
     MapsIndexes ScanDistanceObjects(const s32 &, const u8* objs, u16 dist);
+    MapsIndexes GetObjectPositions(u8 obj, bool check_hero);
+    MapsIndexes GetObjectPositions(const s32 &, u8 obj, bool check_hero); // sorting distance
+    MapsIndexes GetObjectsPositions(const u8* objs);
 
     u16 TileIsCoast(const s32 &, u16 direct = DIRECTION_ALL);
 
@@ -78,8 +81,5 @@ namespace Maps
     void UpdateSpritesFromTownToCastle(const Point & center);
     void MinimizeAreaForCastle(const Point & center);
 }
-
-MapsIndexes & MapsIndexesFilteredObjects(MapsIndexes & indexes, const u8* objs);
-MapsIndexes & MapsIndexesFilteredObject(MapsIndexes & indexes, u8 obj);
 
 #endif
