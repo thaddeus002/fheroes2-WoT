@@ -51,7 +51,7 @@ bool TileIsObject(s32 index, u8 obj)
 
 bool TileIsObjects(s32 index, const u8* objs)
 {
-    while(*objs)
+    while(objs && *objs)
     {
 	if(*objs == world.GetTiles(index).GetObject()) return true;
 	++objs;
@@ -63,6 +63,7 @@ MapsIndexes & MapsIndexesFilteredObjects(MapsIndexes & indexes, const u8* objs)
 {
     indexes.resize(std::distance(indexes.begin(),
 	    std::remove_if(indexes.begin(), indexes.end(), std::not1(std::bind2nd(std::ptr_fun(&TileIsObjects), objs)))));
+
     return indexes;
 }
 
@@ -186,6 +187,15 @@ s32 Maps::GetIndexFromAbsPoint(s16 px, s16 py)
     return res;
 }
 
+MapsIndexes Maps::GetAllIndexes(void)
+{
+    MapsIndexes result(world.w() * world.h());
+    for(MapsIndexes::iterator
+	it = result.begin(); it != result.end(); ++it)
+	*it = std::distance(result.begin(), it);
+    return result;
+}
+
 MapsIndexes Maps::GetAroundIndexes(const s32 & center, u16 filter)
 {
     MapsIndexes result;
@@ -211,8 +221,7 @@ MapsIndexes Maps::GetDistanceIndexes(const s32 & center, u16 dist, bool sort)
     for(s16 xx = cx - dist; xx <= cx + dist; ++xx)
 	for(s16 yy = cy - dist; yy <= cy + dist; ++yy)
     {
-	if(xx != cx && yy != cy &&
-	    isValidAbsPoint(xx, yy))
+	if(isValidAbsPoint(xx, yy) && (xx != cx || yy != cy))
 	    results.push_back(GetIndexFromAbsPoint(xx, yy));
     }
 

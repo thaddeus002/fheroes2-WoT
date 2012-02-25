@@ -944,9 +944,11 @@ void Maps::Tiles::MonsterSetCount(u16 count)
     quantity2 = 0x00FF & count;
 }
 
-void Maps::Tiles::PlaceMonsterOnTile(Tiles & tile, const Monster & mons, u16 count, u32 uniq)
+void Maps::Tiles::PlaceMonsterOnTile(Tiles & tile, const Monster & mons, u16 count)
 {
     tile.SetObject(MP2::OBJ_MONSTER);
+    // monster type
+    tile.SetQuantity3(mons());
 
     if(count)
     {
@@ -990,9 +992,20 @@ void Maps::Tiles::PlaceMonsterOnTile(Tiles & tile, const Monster & mons, u16 cou
             tile.MonsterSetJoinCondition(Monster::JOIN_CONDITION_MONEY);
     }
 
-    // set sprite
-    if(uniq)
-        tile.AddonsPushLevel1(TilesAddon(TilesAddon::UPPER, uniq, 0x33, mons.GetSpriteIndex()));
+    //
+    Maps::TilesAddon *addon = tile.FindObject(MP2::OBJ_MONSTER);
+
+    if(! addon)
+    {
+	// add new sprite
+        tile.AddonsPushLevel1(TilesAddon(TilesAddon::UPPER, World::GetUniq(), 0x33, mons.GetSpriteIndex()));
+    }
+    else
+    if(addon->index != mons() - 1)
+    {
+	// fixed sprite
+	addon->index = mons() - 1; // ICN::MONS32 start from PEASANT
+    }
 }
 
 void Maps::Tiles::UpdateMonsterInfo(Tiles & tile)
@@ -1020,16 +1033,12 @@ void Maps::Tiles::UpdateMonsterInfo(Tiles & tile)
     	    default: break;
 	}
 
-	// set sprite
+	// fixed random sprite
+	tile.SetObject(MP2::OBJ_MONSTER);
+
 	if(addon)
 	    addon->index = mons() - 1; // ICN::MONS32 start from PEASANT
     }
-
-    // set monster
-    tile.SetQuantity3(mons());
-
-    // reset random
-    tile.SetObject(MP2::OBJ_MONSTER);
 
     u16 count = 0;
 
@@ -1042,7 +1051,7 @@ void Maps::Tiles::UpdateMonsterInfo(Tiles & tile)
         count >>= 3;
     }
 
-    PlaceMonsterOnTile(tile, mons(), count, 0);
+    PlaceMonsterOnTile(tile, mons, count);
 }
 
 void Maps::Tiles::UpdateDwellingPopulation(Tiles & tile)

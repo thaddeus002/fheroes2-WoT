@@ -1136,8 +1136,23 @@ void World::MonthOfMonstersAction(const Monster & mons)
 	tiles.reserve(vec_tiles.size() / 2);
 	excld.reserve(vec_tiles.size() / 2);
 
+	const u16 dist = 2;
 	const u8 objs[] = { MP2::OBJ_MONSTER, MP2::OBJ_HEROES, MP2::OBJ_CASTLE, MP2::OBJN_CASTLE, 0 };
 
+	// create exclude list
+	{
+	    MapsIndexes alli = Maps::GetAllIndexes();
+	    const MapsIndexes & objv = MapsIndexesFilteredObjects(alli, objs);
+
+	    for(MapsIndexes::const_iterator
+		it = objv.begin(); it != objv.end(); ++it)
+	    {
+		const MapsIndexes & obja = Maps::GetDistanceIndexes(*it, dist);
+		excld.insert(excld.end(), obja.begin(), obja.end());
+	    }
+	}
+
+	// create valid points
 	for(MapsTiles::const_iterator
 	    it = vec_tiles.begin(); it != vec_tiles.end(); ++it)
 	{
@@ -1146,12 +1161,11 @@ void World::MonthOfMonstersAction(const Monster & mons)
 	    if(! tile.isWater() &&
 		MP2::OBJ_ZERO == tile.GetObject() &&
 		tile.isPassable(NULL, Direction::CENTER, true) &&
-		Maps::ScanDistanceObjects(tile.GetIndex(), objs, 2).empty() &&
 		excld.end() == std::find(excld.begin(), excld.end(), tile.GetIndex()))
 	    {
 		tiles.push_back(tile.GetIndex());
-		const std::vector<s32> & v = Maps::GetAroundIndexes(tile.GetIndex());
-		excld.insert(excld.end(), v.begin(), v.end());
+		const MapsIndexes & obja = Maps::GetDistanceIndexes(tile.GetIndex(), dist);
+		excld.insert(excld.end(), obja.begin(), obja.end());
 	    }
 	}
 
@@ -1162,7 +1176,7 @@ void World::MonthOfMonstersAction(const Monster & mons)
 
 	for(std::vector<s32>::iterator
 	    it = tiles.begin(); it != tiles.end(); ++it)
-		Maps::Tiles::PlaceMonsterOnTile(vec_tiles[*it], mons, 0 /* random */, GetUniq());
+		Maps::Tiles::PlaceMonsterOnTile(vec_tiles[*it], mons, 0 /* random */);
     }
 }
 

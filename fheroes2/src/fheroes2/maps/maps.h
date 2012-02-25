@@ -58,6 +58,7 @@ namespace Maps
     s32 GetIndexFromAbsPoint(const Point & mp);
     s32 GetIndexFromAbsPoint(s16 px, s16 py);
 
+    MapsIndexes GetAllIndexes(void);
     MapsIndexes GetAroundIndexes(const s32 &, u16 filter = DIRECTION_ALL);
     MapsIndexes GetDistanceIndexes(const s32 &, u16 dist, bool sort = false);
     MapsIndexes ScanAroundObjectV(const s32 &, u8 obj);
@@ -77,5 +78,8 @@ namespace Maps
     void UpdateSpritesFromTownToCastle(const Point & center);
     void MinimizeAreaForCastle(const Point & center);
 }
+
+MapsIndexes & MapsIndexesFilteredObjects(MapsIndexes & indexes, const u8* objs);
+MapsIndexes & MapsIndexesFilteredObject(MapsIndexes & indexes, u8 obj);
 
 #endif

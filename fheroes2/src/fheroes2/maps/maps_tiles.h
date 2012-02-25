@@ -233,7 +233,7 @@ namespace Maps
 	Heroes* GetHeroes(void) const;
 	void    SetHeroes(Heroes*);
 
-	static void PlaceMonsterOnTile(Tiles &, const Monster &, u16, u32);
+	static void PlaceMonsterOnTile(Tiles &, const Monster &, u16);
 	static void UpdateAbandoneMineSprite(Tiles &);
 	static void FixedPreload(Tiles &);
 
