@@ -1246,7 +1246,7 @@ bool TeleportCheckGround(s32 index, bool water)
 /* return random teleport destination */
 s32 World::NextTeleport(const s32 index, bool onwater) const
 {
-    MapsIndexes vec_teleports = Maps::GetObjectPositions(true, MP2::OBJ_STONELIGHTS);
+    MapsIndexes vec_teleports = Maps::GetObjectPositions(MP2::OBJ_STONELIGHTS, true);
 
     if(2 > vec_teleports.size())
     {
@@ -1277,7 +1277,7 @@ s32 World::NextTeleport(const s32 index, bool onwater) const
 /* return random whirlpools destination */
 s32 World::NextWhirlpool(const s32 index)
 {
-    MapsIndexes whilrpools = Maps::GetObjectPositions(false, MP2::OBJ_WHIRLPOOL);
+    MapsIndexes whilrpools = Maps::GetObjectPositions(MP2::OBJ_WHIRLPOOL, false);
 
     std::map<s32, MapsIndexes> uniq_whirlpools;
 
@@ -1485,7 +1485,7 @@ Heroes* World::FromJail(s32 index)
 
 void World::ActionToEyeMagi(u8 color) const
 {
-    MapsIndexes vec_eyes = Maps::GetObjectPositions(true, MP2::OBJ_EYEMAGI);
+    MapsIndexes vec_eyes = Maps::GetObjectPositions(MP2::OBJ_EYEMAGI, true);
 
     if(vec_eyes.size())
     {
