@@ -1245,8 +1245,8 @@ void Maps::Tiles::UpdatePassable(void)
 #ifdef WITH_DEBUG
 	    if(0 == tile_passable)
 		passable_disable = 6;
-	}
 #endif
+	}
     }
 
     // fix top passable
