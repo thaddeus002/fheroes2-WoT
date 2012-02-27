@@ -359,13 +359,17 @@ void Route::Path::RescanPassable(void)
 	if(! world.GetTiles((*it).from).isPassable(NULL, (*it).direction, false))
 	break;
 
+    if(hero.GetControl() == CONTROL_AI)
+    {
+	Reset();
+    }
+    else
     if(it != end())
     {
 	if(it == begin())
 	    Reset();
 	else
 	{
-	    --it;
 	    dst = (*it).from;
 	    erase(it, end());
 	}

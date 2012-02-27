@@ -847,6 +847,10 @@ bool Game::IO::LoadBIN(QueueMessage & msg)
     for(u32 maps_index = 0; maps_index < byte32; ++maps_index)
 	UnpackTile(msg, world.vec_tiles[maps_index], maps_index, format);
 
+    // update tile passable
+    std::for_each(world.vec_tiles.begin(), world.vec_tiles.end(),
+        std::mem_fun_ref(&Maps::Tiles::UpdatePassable));
+
     // heroes
     msg.Pop(byte16);
     if(byte16 != 0xFF07) DEBUG(DBG_GAME, DBG_WARN, "0xFF07");
