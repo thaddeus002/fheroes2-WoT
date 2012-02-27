@@ -1239,11 +1239,14 @@ void Maps::Tiles::UpdatePassable(void)
     for(Addons::const_iterator
 	it = addons_level1.begin(); it != addons_level1.end(); ++it)
     {
-	tile_passable &= TilesAddon::GetPassable(*it);
+	if(tile_passable)
+	{
+	    tile_passable &= TilesAddon::GetPassable(*it);
 
 #ifdef WITH_DEBUG
-	if(0 == tile_passable)
-	    passable_disable = 6;
+	    if(0 == tile_passable)
+		passable_disable = 6;
+	}
 #endif
     }
 
@@ -1441,7 +1444,17 @@ void Maps::Tiles::RedrawPassable(Surface & dst) const
     {
 	if(0 == tile_passable ||
 	   DIRECTION_ALL != tile_passable)
-	    area.BlitOnTile(dst, PassableViewSurface(tile_passable), 0, 0, mp);
+	{
+	    Surface sf = PassableViewSurface(tile_passable);
+
+	    if(passable_disable)
+	    {
+		Text text(GetString(passable_disable), Font::SMALL);
+		text.Blit(13, 13, sf);
+	    }
+
+    	    area.BlitOnTile(dst, sf, 0, 0, mp);
+	}
     }
 #endif
 }
