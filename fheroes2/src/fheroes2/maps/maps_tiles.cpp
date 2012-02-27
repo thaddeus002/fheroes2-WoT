@@ -1110,8 +1110,7 @@ bool LongObjectUniq(const Maps::TilesAddon ta, u32 uid)
 
 bool TopObjectDisable(const Maps::TilesAddon & ta)
 {
-    return isMountsRocs(ta) || isForestsTrees(ta) ||
-	Maps::TilesAddon::isDeadTrees(ta) || Maps::TilesAddon::isStump(ta);
+    return isMountsRocs(ta) || isForestsTrees(ta);
 }
 
 bool Maps::Tiles::isLongObject(u16 direction)
@@ -1887,8 +1886,8 @@ bool Maps::Tiles::isPassable(const Heroes* hero, u16 direct, bool skipfog) const
 	    if(! isWater())
 		return false;
 
-    	    if(MP2::OBJ_BOAT == GetObject())
-                return false;
+            if(MP2::OBJ_BOAT == GetObject())
+		return false;
 	}
 	else
 	// if(! hero->isShipMaster() &&
